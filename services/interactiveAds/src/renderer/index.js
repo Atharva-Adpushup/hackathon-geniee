@@ -41,6 +41,8 @@ const createParentNode = (appendTo, interactiveAd, css = {}, operation = 'append
 		const adCode = generateAdCode(interactiveAd);
 		const { value: xPath } = interactiveAd.formatData.eventData; // Value is the xPath
 
+		interactiveAd.status = 1; // Mark interactive ad status as successful impression
+		interactiveAd.services = [commonConsts.SERVICES.INTERACTIVE_AD]; // Set service id for interactive ads
 		let parentNode = null;
 
 		switch (type) {

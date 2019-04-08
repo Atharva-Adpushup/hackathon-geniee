@@ -63,10 +63,10 @@ class Component {
 			$banner = null,
 			$closeButton = this.createCloseButton(formatData),
 			feedbackOptions = {
-				ads: [id],
+				ads: [this.interactiveAd],
 				xpathMiss: [],
-				eventType: 1,
-				mode: 1, // Changed it 1 because Innovative Ad is now completely independent of AdPushup Layout Testing
+				eventType: commonConsts.ERROR_CODES.NO_ERROR,
+				mode: window.adpushup.config.mode,
 				referrer: adp.config.referrer,
 				tracking: false,
 				variationId: !adp.config.manualModeActive
@@ -90,12 +90,17 @@ class Component {
 		$frame.append('<div style="clear:both">&nbsp;</div>');
 		$format.append($frame);
 
-		adp.tracker.add(
-			$format,
-			function(adId) {
-				adp.utils.sendBeacon(adp.config.feedbackUrl, { eventType: 2, click: true, id: adId });
-			}.bind(adp, id)
-		);
+		// adp.tracker.add(
+		// 	$format,
+		// 	function(adId) {
+		// 		adp.utils.sendBeacon(
+		// 			adp.config.feedbackUrl,
+		// 			{ eventType: 2, click: true, id: adId },
+		// 			{},
+		// 			commonConsts.BEACON_TYPE.AD_FEEDBACK
+		// 		);
+		// 	}.bind(adp, id)
+		// );
 
 		switch (formatData.type) {
 			case commonConsts.FORMATS.STICKY.NAME:

@@ -5,12 +5,13 @@ var w = window,
 	utils = require('../libs/utils'),
 	defaultConfig = $.extend({}, require('../config/config.js')),
 	config = (adp.config = require('../config/config.js')),
-	Tracker = require('../libs/tracker'),
+	commonConsts = require('../config/commonConsts'),
+	// Tracker = require('../libs/tracker'),
 	nodewatcher = require('../libs/nodeWatcher'),
 	browserConfig = require('../libs/browserConfig'),
 	selectVariation = require('./variationSelectionModels/index'),
 	createAds = require('./adCreater').createAds,
-	heartBeat = require('../libs/heartBeat'),
+	// heartBeat = require('../libs/heartBeat'),
 	ampInit = require('./ampInit'),
 	hookAndInit = require('./hooksAndBlockList'),
 	control = require('./control')(),
@@ -27,12 +28,12 @@ function destroyAdpSlots() {
 
 	if (adpSlots.length) {
 		var adpGSlots = [];
-		adpSlots.forEach(function(adpSlot) {
+		adpSlots.forEach(function (adpSlot) {
 			adpGSlots.push(w.adpTags.adpSlots[adpSlot].gSlot);
 		});
 
 		w.adpTags.adpSlots = {};
-		w.googletag.cmd.push(function() {
+		w.googletag.cmd.push(function () {
 			w.googletag.destroySlots(adpGSlots);
 		});
 	}
@@ -68,7 +69,7 @@ function initAdpConfig() {
 		err: [],
 		utils: utils,
 		control: control,
-		tracker: new Tracker(),
+		// tracker: new Tracker(),
 		nodewatcher: nodewatcher,
 		geniee: genieeObject,
 		triggerAd: triggerAd,
@@ -83,18 +84,21 @@ function initAdpConfig() {
 	});
 }
 
+// Fire user async API
+function syncUser() {
+	return utils.sendBeacon(commonConsts.USER_SYNC_URL);
+}
+
 function shouldWeNotProceed() {
-	var hasGenieeStarted = !!(
-		config.partner === 'geniee' &&
+	var hasGenieeStarted = !!(config.partner === 'geniee' &&
 		w.gnsmod &&
 		w.gnsmod.creationProcessStarted &&
-		!config.isAdPushupControlWithPartnerSSP
-	);
+		!config.isAdPushupControlWithPartnerSSP);
 
 	return config.disable || adp.creationProcessStarted || hasGenieeStarted;
 }
 
-function triggerControl(mode) {
+function triggerControl(mode, errorCode) {
 	var isGenieeModeSelected = !!(adp && adp.geniee && adp.geniee.sendSelectedModeFeedback);
 
 	//Geniee method call for control mode
@@ -110,7 +114,7 @@ function triggerControl(mode) {
 		if (w.gnsmod && !w.gnsmod.creationProcessStarted && w.gnsmod.triggerAds) {
 			w.gnsmod.triggerAds();
 			utils.sendFeedback({
-				eventType: 3,
+				eventType: errorCode ? errorCode : commonConsts.ERROR_CODES.PAGEGROUP_NOT_FOUND,
 				mode: mode,
 				referrer: config.referrer
 			});
@@ -119,7 +123,7 @@ function triggerControl(mode) {
 		adp.creationProcessStarted = true;
 		control.trigger();
 		utils.sendFeedback({
-			eventType: 3,
+			eventType: errorCode ? errorCode : commonConsts.ERROR_CODES.PAGEGROUP_NOT_FOUND,
 			mode: mode,
 			referrer: config.referrer
 		});
@@ -127,7 +131,7 @@ function triggerControl(mode) {
 }
 
 function startCreation(forced) {
-	return new Promise(function(resolve) {
+	return new Promise(function (resolve) {
 		ampInit(adp.config);
 		// if config has disable or this function triggered more than once or no pageGroup found then do nothing;
 		if (!forced && (shouldWeNotProceed() || !config.pageGroup || parseInt(config.mode, 10) === 2)) {
@@ -156,6 +160,8 @@ function startCreation(forced) {
 
 				clearTimeout(pageGroupTimer);
 				config.selectedVariation = selectedVariation.id;
+				config.selectedVariationName = selectedVariation.name;
+				config.selectedVariationType = selectedVariation.isControl ? commonConsts.PAGE_VARIATION_TYPE.BENCHMARK : commonConsts.PAGE_VARIATION_TYPE.NON_BENCHMARK;
 
 				//Geniee method call for chosen variation id
 				if (isGenieeModeSelected) {
@@ -167,11 +173,11 @@ function startCreation(forced) {
 
 				if (selectVariation.isControl) {
 					isControlVariation = true;
-				}
-
+        }
+       
 				createAds(adp, selectedVariation);
 			} else {
-				triggerControl(3);
+				triggerControl(commonConsts.MODE.FALLBACK);
 			}
 
 			var finalInteractiveAds = !isControlVariation
@@ -183,6 +189,21 @@ function startCreation(forced) {
 					['interactiveAds/index.js'],
 					function(require) {
 						require('interactiveAds/index')(finalInteractiveAds);
+            if (interactiveAdsArr.ads) {
+								var ads = interactiveAdsArr.ads;
+								for (var id in ads) {
+									var hasDfpAdUnit = ads[id].networkData && ads[id].networkData.dfpAdunit;
+									if (hasDfpAdUnit) {
+										var slotId = ads[id].networkData.dfpAdunit, container = $('#' + slotId);
+										var currentTime = new Date();
+										container.attr('data-render-time', currentTime.getTime());
+										console.log('rendered slot ', id, ' ', currentTime, ' ', document.hasFocus());
+										if (ads[id].networkData && ads[id].networkData.refreshSlot) {
+											refreshAdSlot.refreshSlot(container, ads[id]);
+										}
+									}
+								}
+            }
 					},
 					'adpInteractiveAds' // Generated script will be named "adpInteractiveAds.js"
 				);
@@ -207,13 +228,16 @@ function initAdpQue() {
 	}
 
 	processQue();
-	adp.que.push = function(queFunc) {
+	adp.que.push = function (queFunc) {
 		[].push.call(w.adpushup.que, queFunc);
 		processQue();
 	};
 }
 
 function main() {
+	// Set user syncing cookies
+	syncUser();
+
 	// Initialise adp config
 	initAdpConfig();
 
@@ -250,30 +274,30 @@ function main() {
 
 	// AdPushup Debug Force Control
 	if (utils.queryParams && utils.queryParams.forceControl) {
-		triggerControl(5);
+		triggerControl(commonConsts.MODE.FALLBACK, commonConsts.ERROR_CODES.FALLBACK_FORCED); // Control forced (run fallback)
 		return false;
 	}
 
 	// AdPushup Mode Logic
 	if (parseInt(config.mode, 10) === 2) {
-		triggerControl(2);
+		triggerControl(commonConsts.MODE.FALLBACK, commonConsts.ERROR_CODES.PAUSED_IN_EDITOR); // Paused from editor (run fallback)
 		return false;
 	}
 
 	// AdPushup Percentage Logic
 	var rand = Math.floor(Math.random() * 100) + 1;
 	if (rand > config.adpushupPercentage) {
-		triggerControl(4);
+		triggerControl(commonConsts.MODE.FALLBACK, commonConsts.ERROR_CODES.FALLBACK_PLANNED); // Control planned (run fallback)
 		return false;
 	}
 
 	if (!config.pageGroup) {
 		pageGroupTimer = setTimeout(function() {
-			!config.pageGroup ? triggerControl(3) : clearTimeout(pageGroupTimer);
+			!config.pageGroup ? triggerControl(commonConsts.MODE.FALLBACK) : clearTimeout(pageGroupTimer);
 		}, config.pageGroupTimeout);
 	} else {
 		// start heartBeat
-		heartBeat(config.feedbackUrl, config.heartBeatMinInterval, config.heartBeatDelay).start();
+		// heartBeat(config.feedbackUrl, config.heartBeatMinInterval, config.heartBeatDelay).start();
 
 		//Init creation
 		startCreation();

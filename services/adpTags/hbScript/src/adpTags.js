@@ -23,9 +23,7 @@ var w = window,
 			bidders = null;
 
 		if (
-			optionalParam.headerBidding &&
-			inventory.hbConfig &&
-			Array.isArray(inventory.hbConfig.bidderAdUnits[size])
+			optionalParam.headerBidding && inventory.hbConfig && Array.isArray(inventory.hbConfig.bidderAdUnits[size])
 		) {
 			var overrideSize = size;
 			if (
@@ -73,6 +71,7 @@ var w = window,
 			slotId = adUnits.dfpAdUnit,
 			bidders = optionalParam.headerBidding ? adUnits.bidders : [],
 			isResponsive = optionalParam.isResponsive,
+			sectionName = optionalParam.sectionName,
 			multipleAdSizes = optionalParam.multipleAdSizes;
 
 		adpTags.adpSlots[containerId] = {
@@ -82,6 +81,7 @@ var w = window,
 			placement: placement,
 			activeDFPNetwork: utils.getActiveDFPNetwork(),
 			size: size,
+			sectionName: sectionName,
 			computedSizes: multipleAdSizes ? multipleAdSizes : [],
 			isResponsive: isResponsive,
 			containerId: containerId,
@@ -99,8 +99,7 @@ var w = window,
 		return adpTags.adpSlots[containerId];
 	},
 	processBatchForBidding = function() {
-		var batchId = adpTags.currentBatchId,
-			adpSlots = adpTags.currentBatchAdpSlots;
+		var batchId = adpTags.currentBatchId, adpSlots = adpTags.currentBatchAdpSlots;
 
 		adpTags.adpBatches.push({
 			batchId: batchId,
@@ -117,17 +116,6 @@ var w = window,
 		adpTags.currentBatchId = null;
 		adpTags.currentBatchAdpSlots = [];
 		adpTags.slotInterval = null;
-	},
-	queSlotForBidding = function(slot) {
-		if (!adpTags.slotInterval) {
-			adpTags.currentBatchId = !adpTags.currentBatchId
-				? Math.abs(utils.hashCode(+new Date() + ''))
-				: adpTags.currentBatchId;
-		} else {
-			clearTimeout(adpTags.slotInterval);
-		}
-		adpTags.currentBatchAdpSlots.push(slot);
-		adpTags.slotInterval = setTimeout(processBatchForBidding, config.SLOT_INTERVAL);
 	},
 	// Adp tags main object instance - instantiates adpslots
 	adpTags = {
@@ -147,8 +135,7 @@ var w = window,
 		},
 		// Function to define new adp slot
 		defineSlot: function(containerId, size, placement, optionalParam) {
-			var optionalParam = optionalParam || {},
-				slot = createSlot(containerId, size, placement, optionalParam);
+			var optionalParam = optionalParam || {}, slot = createSlot(containerId, size, placement, optionalParam);
 
 			if (utils.isSupportedBrowser()) {
 				// && adpTags.shouldRun(optionalParam)) {
@@ -174,8 +161,19 @@ var w = window,
 
 				slot.type = slot.slotId ? 6 : 7;
 			}
-			queSlotForBidding(this.adpSlots[containerId]);
+			this.queSlotForBidding(this.adpSlots[containerId]);
 			return this.adpSlots[containerId];
+		},
+		queSlotForBidding: function(slot) {
+			if (!adpTags.slotInterval) {
+				adpTags.currentBatchId = !adpTags.currentBatchId
+					? Math.abs(utils.hashCode(+new Date() + ''))
+					: adpTags.currentBatchId;
+			} else {
+				clearTimeout(adpTags.slotInterval);
+			}
+			adpTags.currentBatchAdpSlots.push(slot);
+			adpTags.slotInterval = setTimeout(processBatchForBidding, config.SLOT_INTERVAL);
 		},
 		processQue: function() {
 			while (this.que.length) {
@@ -195,8 +193,8 @@ var w = window,
 			if (slot && !slot.containerPresent) {
 				slot.containerPresent = true;
 				slot.sectionId = utils.getSectionId(containerId);
-				slot.variationId = utils.getVariationId(containerId);
-
+				slot.variationId = utils.getVariationId();
+				slot.variationName = utils.getVariationName();
 				slot.pageGroup = utils.getPageGroup();
 				slot.platform = utils.getPlatform();
 				adpRender.renderGPT(slot);

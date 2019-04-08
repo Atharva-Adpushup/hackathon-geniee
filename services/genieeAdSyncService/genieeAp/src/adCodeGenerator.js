@@ -59,6 +59,7 @@ var utils = require('../libs/utils'),
 						isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length),
 						isResponsive = !!(networkData && networkData.isResponsive),
 						isManual = !!ad.isManual,
+						sectionName = ad.sectionName || null,
 						adWidth = isResponsive ? ad.width : Number(ad.width),
 						adHeight = isResponsive ? ad.height : Number(ad.height),
 						defaultAdSizeArray = [adWidth, adHeight],
@@ -72,11 +73,13 @@ var utils = require('../libs/utils'),
 						keyValues: networkData.keyValues,
 						network: ad.network,
 						refreshSlot: networkData.refreshSlot,
+						enableLazyLoading:networkData.enableLazyLoading,
 						overrideActive: networkData.overrideActive,
 						overrideSizeTo: networkData.overrideSizeTo,
 						multipleAdSizes: isMultipleAdSizes ? ad.multipleAdSizes : null,
 						isResponsive: isResponsive,
-						isManual: isManual
+						isManual: isManual,
+						sectionName: sectionName
 					});
 				}
 				//Extend variation wise keyvalues if any for adpTags. These will be page level targeting keys

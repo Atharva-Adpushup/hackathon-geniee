@@ -84,7 +84,7 @@ module.exports = {
 		return null;
 	},
 	sendFeedback: function(feedback) {
-		$.post(config.FEEDBACK_URL, JSON.stringify(feedback.data));
+		$.get(config.FEEDBACK_URL + adp.utils.base64Decode(JSON.stringify(feedback.data)));
 	},
 	getBatchAdUnits: function(adpSlots) {
 		var adUnits = [];
@@ -128,15 +128,23 @@ module.exports = {
 		return null;
 	},
 	getVariationId: function() {
-		try {
-			if (adp) {
-				var variationId = adp.config.selectedVariation;
+		if (adp) {
+			var variationId = adp.config.selectedVariation;
 
-				if (variationId) {
-					return variationId;
-				}
+			if (variationId) {
+				return variationId;
 			}
-		} catch (error) {}
+		}
+		return null;
+	},
+	getVariationName: function() {
+		if (adp) {
+			var variationName = adp.config.selectedVariationName;
+
+			if (variationName) {
+				return variationName;
+			}
+		}
 		return null;
 	},
 	getPageGroup: function() {
@@ -220,5 +228,29 @@ module.exports = {
 		});
 
 		return collection;
+	},
+	isValidThirdPartyDFPAndCurrencyConfig: function(inputObject) {
+		var inputObject = inputObject || adp.config,
+			isActiveDFPNetwork = !!(inputObject.activeDFPNetwork && inputObject.activeDFPNetwork.length),
+			isActiveDFPCurrencyCode = !!(
+				inputObject.activeDFPCurrencyCode &&
+				inputObject.activeDFPCurrencyCode.length &&
+				inputObject.activeDFPCurrencyCode.length === 3 &&
+				inputObject.activeDFPCurrencyCode !== config.CURRENCY_CODES.USD
+			),
+			isPrebidGranularityMultiplier = !!(
+				inputObject.prebidGranularityMultiplier && Number(inputObject.prebidGranularityMultiplier)
+			),
+			isActiveDFPCurrencyExchangeRate = !!(
+				inputObject.activeDFPCurrencyExchangeRate && Number(inputObject.activeDFPCurrencyExchangeRate)
+			),
+			isValidResult = !!(
+				isActiveDFPNetwork &&
+				isActiveDFPCurrencyCode &&
+				isPrebidGranularityMultiplier &&
+				isActiveDFPCurrencyExchangeRate
+			);
+
+		return isValidResult;
 	}
 };

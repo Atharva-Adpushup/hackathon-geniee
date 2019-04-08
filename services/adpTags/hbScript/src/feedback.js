@@ -5,13 +5,14 @@ var config = require('./config'),
 	getBidDataForFeedback = function(containerId) {
 		var bidData = [],
 			// Not using getBidResponses() because context of all slot containers is not getting saved in it, instead using getBidResponsesForAdUnitCode(':adUnitCode')
-			slotBids = pbjs.getBidResponsesForAdUnitCode(containerId);
+			slotBids = pbjs.getBidResponsesForAdUnitCode(containerId),
+			computedCPMValue = utils.isValidThirdPartyDFPAndCurrencyConfig() ? 'originalCpm' : 'cpm';
 
 		if (slotBids) {
 			var bids = slotBids.bids;
 			for (var i in bids) {
 				bidData.push({
-					revenue: bids[i].cpm / 1000, // Actual revenue for impression = cpm/1000
+					revenue: bids[i][computedCPMValue] / 1000, // Actual revenue for impression = cpm/1000
 					bidder: bids[i].bidder,
 					adId: bids[i].adId,
 					responseTime: bids[i].timeToRespond
@@ -33,6 +34,7 @@ var config = require('./config'),
 				data: {
 					size: slot.size[0] + 'x' + slot.size[1],
 					siteId: config.SITE_ID,
+					siteDomain: window.adpushup.config.siteDomain,
 					placement: slot.placement,
 					containerId: slot.containerId,
 					type: slot.type,
@@ -40,11 +42,13 @@ var config = require('./config'),
 					bids: getBidDataForFeedback(slot.containerId) || [],
 					winner: slot.feedback.winner || config.DEFAULT_WINNER,
 					winningRevenue: slot.feedback.winningRevenue || 0,
+					winnerAdUnitId: slot.feedback.winnerAdUnitId || null,
 					timedOutBidders: slot.feedback.timedOutBidders || [],
 					timeout: slot.feedback.timeout || slot.timeout,
 					status: null,
 					sectionId: slot.sectionId,
 					variationId: slot.variationId,
+					sectionName: slot.sectionName,
 					pageGroup: slot.pageGroup,
 					platform: slot.platform
 				}

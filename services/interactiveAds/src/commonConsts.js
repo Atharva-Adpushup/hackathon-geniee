@@ -7,6 +7,20 @@ const commonConsts = {
 	NETWORKS: {
 		ADPTAGS: 'adpTags'
 	},
+	BEACON_TYPE: {
+		AD_FEEDBACK: 'AD_FEEDBACK'
+	},
+	SERVICES: {
+		LAYOUT: 1,
+		TAG: 2,
+		HB: 3,
+		MEDIATION: 4,
+		INTERACTIVE_AD: 5
+	},
+	ERROR_CODES: {
+		NO_ERROR: 1,
+		PAGEGROUP_NOT_FOUND: 2
+	},
 	EVENTS: {
 		DOM_LOAD: 'DOMContentLoaded',
 		SCROLL: 'scroll',

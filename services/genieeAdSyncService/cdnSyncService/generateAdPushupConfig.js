@@ -79,6 +79,7 @@ const Promise = require('bluebird'),
 
 			json = {
 				id: sectionId,
+				sectionName: section.name,
 				network: ad.network,
 				//Format type of ad like, 1 for structural, 2 for incontent
 				type: section.type,
@@ -157,6 +158,7 @@ const Promise = require('bluebird'),
 			customJs: variation.customJs,
 			adpKeyValues: variation.adpKeyValues,
 			contentSelector: isContentSelector ? contentSelector : '',
+			isControl: variation.isControl ? variation.isControl : false,
 			ads: ads,
 			personalization: variation.personalization,
 			isControl: !!variation.isControl,

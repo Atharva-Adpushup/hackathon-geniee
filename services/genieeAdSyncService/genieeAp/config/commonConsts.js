@@ -19,9 +19,41 @@ module.exports = {
 	},
 	NETWORKS: {
 		ADPTAGS: 'adpTags',
+		ADSENSE: 'adsense',
+		ADX: 'adx',
 		MEDIANET: 'medianet'
 	},
 	AMP_PUBLISH_URL: '//autoamp.io/publishAmpJob',
+	USER_SYNC_URL: '//staging.adpushup.com/AdPushupFeedbackWebService/user/sync',
+	BEACON_TYPE: {
+		AD_FEEDBACK: 'AD_FEEDBACK'
+	},
+	AD_STATUS: {
+		IMPRESSION: 1,
+		XPATH_MISS: 2
+	},
+	SERVICES: {
+		LAYOUT: 1,
+		TAG: 2,
+		HB: 3,
+		MEDIATION: 4,
+		INTERACTIVE_AD: 5
+	},
+	ERROR_CODES: {
+		NO_ERROR: 1,
+		PAGEGROUP_NOT_FOUND: 2,
+		FALLBACK_PLANNED: 3,
+		FALLBACK_FORCED: 4,
+		PAUSED_IN_EDITOR: 5
+	},
+	MODE: {
+		ADPUSHUP: 1,
+		FALLBACK: 2
+	},
+	PAGE_VARIATION_TYPE: {
+		NON_BENCHMARK: 1,
+		BENCHMARK: 2
+	},
 	COOKIE: {
 		NAME: '_adp_utm_session_',
 		EXPIRY: 30

@@ -13,10 +13,13 @@ block append headScripts
         '/assets/js/libs/custom/settings.js?v=1496398593986',
     ])
     style.
+        .u-hide {
+            display: none;
+        }
         .select-wrapper {
-            width: 50%;
-            margin: -10px 0 25px;
             border-right: 1px solid #ccc;
+            margin-bottom: 10px;
+            width: 100%;
         }
         table {
             border-collapse: collapse;
@@ -175,14 +178,41 @@ block bodyContent
                                             .row
                                                 .col-sm-12
                                                     h4 Thid party DFP
-                                                .col-sm-12
+                                                .col-sm-12(class="u-margin-b15px")
                                                     .row
-                                                        .col-sm-12
+                                                        .col-sm-6
                                                             .select-wrapper
-                                                                select(name="activeDFPNetwork")
+                                                                select(id="activeDFPNetwork", name="activeDFPNetwork")
                                                                     option(value="" selected) Select DFP Network
                                                                     each dfpAccount in dfpAccounts
-                                                                        option(value=dfpAccount.code + '-' + dfpAccount.dfpParentId, selected=(apConfigs.activeDFPNetwork === dfpAccount.code ? true : undefined)) #{dfpAccount.name ? dfpAccount.code + ' - ' + dfpAccount.name : dfpAccount.code + ' - ' + 'N/A' }
+                                                                        - var optionName = dfpAccount.name ? dfpAccount.code + ' - ' + dfpAccount.name : dfpAccount.code + ' - ' + 'N/A';
+                                                                        - var optionValue = dfpAccount.code + '-' + dfpAccount.dfpParentId;
+                                                                        - var optionCurrencyCode = dfpAccount.currencyCode || null;
+                                                                        - var isSelected = (apConfigs.activeDFPNetwork === dfpAccount.code ? true : undefined);
+
+                                                                        option(value=optionValue, data-currencyCode=optionCurrencyCode, selected=isSelected) #{optionName}
+                                                        .col-sm-6
+                                                            - var activeDFPCurrencyCode = (apConfigs.activeDFPCurrencyCode || '');
+                                                            - var isCurrencyTableHidden = (activeDFPCurrencyCode ? '' : 'u-hide')
+                                                            input(type="hidden", id="activeDFPCurrencyCode", name="activeDFPCurrencyCode", value=activeDFPCurrencyCode)
+                                                            table(class="u-margin-0px js-currency-table #{isCurrencyTableHidden}")
+                                                                tr
+                                                                    td
+                                                                        b Currency
+                                                                    td(id="currencyValue") #{activeDFPCurrencyCode}
+
+                                                    - var isActiveDFPNetwork = !!(apConfigs.activeDFPNetwork);
+                                                    - var isThirdPartyAdxProperty = !!(apConfigs && apConfigs.hasOwnProperty('isThirdPartyAdx'));
+                                                    - var isThirdPartyAdxUI = !!((isActiveDFPNetwork || (isActiveDFPNetwork && isThirdPartyAdxProperty)) ? true : false);
+                                                    - var computedClassName = !!(isThirdPartyAdxUI ? '' : 'u-hide');
+                                                    - var computedValue = apConfigs.isThirdPartyAdx ? 'true' : 'false';
+                                                    - var computedPropValue = apConfigs.isThirdPartyAdx ? true : false;
+
+                                                    .row(class='js-thirdpartyadx-wrapper #{computedClassName}')
+                                                        .col-sm-5
+                                                            .input-name Is Third Party AdX
+                                                        .col-sm-7
+                                                            input(type="checkbox" id="isThirdPartyAdx" name="isThirdPartyAdx" value=computedValue checked=computedPropValue)
 
                                         .row
                                             .col-sm-12

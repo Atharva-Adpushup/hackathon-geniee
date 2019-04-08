@@ -10,12 +10,16 @@ var ApConfig = {
 		'poweredByBanner',
 		'activeDFPNetwork',
 		'activeDFPParentId',
+		'activeDFPCurrencyCode',
+		'activeDFPCurrencyExchangeRate',
+		'prebidGranularityMultiplier',
 		'blocklist',
 		'isAdPushupControlWithPartnerSSP',
 		'isSPA',
-		'spaPageTransitionTimeout',
 		'isManual',
 		'isInnovative'
+		'isThirdPartyAdx',
+		'spaPageTransitionTimeout'
 	],
 	override: [
 		'mode',
@@ -28,12 +32,16 @@ var ApConfig = {
 		'poweredByBanner',
 		'activeDFPNetwork',
 		'activeDFPParentId',
+		'activeDFPCurrencyCode',
+		'activeDFPCurrencyExchangeRate',
+		'prebidGranularityMultiplier',
 		'blocklist',
 		'isAdPushupControlWithPartnerSSP',
 		'isSPA',
-		'spaPageTransitionTimeout',
 		'isManual',
 		'isInnovative'
+		'isThirdPartyAdx',
+		'spaPageTransitionTimeout'
 	],
 	merge: []
 };

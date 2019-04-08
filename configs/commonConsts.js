@@ -307,6 +307,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 	CDN_SYNC_MAX_ATTEMPTS: 10,
 	CURRENCY_EXCHANGE: {
 		API_URL: 'https://api.fixer.io/latest',
+		PREBID_API_URL: 'https://cdn.jsdelivr.net/gh/prebid/currency-file@1/latest.json',
 		PARAMETERS: {
 			BASE: 'base',
 			SYMBOLS: 'symbols'
