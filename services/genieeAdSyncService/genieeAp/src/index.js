@@ -148,7 +148,7 @@ function startCreation(forced) {
 			innovativeInteractiveAds = utils.filterInteractiveAds(window.adpushup.config.innovativeAds, true, channel);
 		}
 
-		return selectVariation(config).then(function(variationData) {
+		return selectVariation(config).then(function (variationData) {
 			var selectedVariation = variationData.selectedVariation,
 				moduleConfig = variationData.config,
 				isGenieeModeSelected = !!(adp && adp.geniee && adp.geniee.sendSelectedModeFeedback);
@@ -173,8 +173,8 @@ function startCreation(forced) {
 
 				if (selectVariation.isControl) {
 					isControlVariation = true;
-        }
-       
+				}
+
 				createAds(adp, selectedVariation);
 			} else {
 				triggerControl(commonConsts.MODE.FALLBACK);
@@ -187,23 +187,23 @@ function startCreation(forced) {
 			if (finalInteractiveAds && finalInteractiveAds.length) {
 				require.ensure(
 					['interactiveAds/index.js'],
-					function(require) {
+					function (require) {
 						require('interactiveAds/index')(finalInteractiveAds);
-            if (interactiveAdsArr.ads) {
-								var ads = interactiveAdsArr.ads;
-								for (var id in ads) {
-									var hasDfpAdUnit = ads[id].networkData && ads[id].networkData.dfpAdunit;
-									if (hasDfpAdUnit) {
-										var slotId = ads[id].networkData.dfpAdunit, container = $('#' + slotId);
-										var currentTime = new Date();
-										container.attr('data-render-time', currentTime.getTime());
-										console.log('rendered slot ', id, ' ', currentTime, ' ', document.hasFocus());
-										if (ads[id].networkData && ads[id].networkData.refreshSlot) {
-											refreshAdSlot.refreshSlot(container, ads[id]);
-										}
+						if (finalInteractiveAds) {
+							var ads = finalInteractiveAds;
+							for (var id in ads) {
+								var hasDfpAdUnit = ads[id].networkData && ads[id].networkData.dfpAdunit;
+								if (hasDfpAdUnit) {
+									var slotId = ads[id].networkData.dfpAdunit, container = $('#' + slotId);
+									var currentTime = new Date();
+									container.attr('data-render-time', currentTime.getTime());
+									console.log('rendered slot ', id, ' ', currentTime, ' ', document.hasFocus());
+									if (ads[id].networkData && ads[id].networkData.refreshSlot) {
+										refreshAdSlot.refreshSlot(container, ads[id]);
 									}
 								}
-            }
+							}
+						}
 					},
 					'adpInteractiveAds' // Generated script will be named "adpInteractiveAds.js"
 				);
@@ -292,7 +292,7 @@ function main() {
 	}
 
 	if (!config.pageGroup) {
-		pageGroupTimer = setTimeout(function() {
+		pageGroupTimer = setTimeout(function () {
 			!config.pageGroup ? triggerControl(commonConsts.MODE.FALLBACK) : clearTimeout(pageGroupTimer);
 		}, config.pageGroupTimeout);
 	} else {
