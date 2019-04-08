@@ -10,8 +10,8 @@ function shouldRunControl(config) {
 }
 
 function init(w, d) {
-	var control = require('./control'),
-		adp = require('./adp').adp,
+	// var control = require('./control');
+	var adp = require('./adp').adp,
 		apConfig = adp.config,
 		utils = require('../helpers/utils');
 
@@ -23,10 +23,10 @@ function init(w, d) {
 
 	if (shouldRunControl(apConfig)) {
 		w.adpTags = w.adpTags || {};
-		w.adpTags.control = control.initControl('prebid');
-		control.initControlFeedback(w);
+		// w.adpTags.control = control.initControl('prebid');
+		// control.initControlFeedback(w);
 
-		return w.adpTags.control.trigger();
+		// return w.adpTags.control.trigger();
 	} else {
 		// Execute prebid script
 		(function() {
