@@ -52,6 +52,8 @@ module.exports = {
 		);
 	},
 	sendFeedbackOld: function(options) {
+		var adp = window.adpushup;
+		
 		return this.sendBeaconOld(adp.config.feedbackUrlOld, options, {
 			method: 'image'
 		});

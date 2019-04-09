@@ -231,10 +231,12 @@ var $ = require('jquery'),
 						utils.sendFeedback(feedbackData);
 
 						// Old feedback
-						feedbackData.eventType = 1;
-						feedbackData.mode = 1;
-						feedbackData.xpathMiss = [adObj.id];
-						utils.sendFeedbackOld(feedbackData);
+						var oldFeedbackData = $.extend({}, feedbackData);
+						oldFeedbackData.ads = [];
+						oldFeedbackData.eventType = 1;
+						oldFeedbackData.mode = 1;
+						oldFeedbackData.xpathMiss = [adObj.id];
+						utils.sendFeedbackOld(oldFeedbackData);
 					}
 				}
 				if (!displayCounter && !finished) {
