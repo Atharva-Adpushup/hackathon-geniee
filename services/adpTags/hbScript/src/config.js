@@ -52,6 +52,7 @@ module.exports = {
 	},
 	DEFAULT_WINNER: 'adx',
 	FEEDBACK_URL: '//staging.adpushup.com/AdPushupFeedbackWebService/feedback/aphb?data=',
+	FEEDBACK_URL_OLD: '//e3.adpushup.com/ApHbWebService/feedback',
 	POSTBID_PASSBACKS: {
 		'*': 'PGgxPkJPTyBZQUghPC9oMT4='
 	},

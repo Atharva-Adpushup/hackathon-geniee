@@ -84,6 +84,9 @@ module.exports = {
 		return null;
 	},
 	sendFeedback: function(feedback) {
+		// Old feedback
+		$.post(config.FEEDBACK_URL_OLD, JSON.stringify(feedback.data));
+
 		$.get(config.FEEDBACK_URL + adp.utils.base64Decode(JSON.stringify(feedback.data)));
 	},
 	getBatchAdUnits: function(adpSlots) {
