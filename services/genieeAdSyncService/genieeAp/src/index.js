@@ -28,12 +28,12 @@ function destroyAdpSlots() {
 
 	if (adpSlots.length) {
 		var adpGSlots = [];
-		adpSlots.forEach(function (adpSlot) {
+		adpSlots.forEach(function(adpSlot) {
 			adpGSlots.push(w.adpTags.adpSlots[adpSlot].gSlot);
 		});
 
 		w.adpTags.adpSlots = {};
-		w.googletag.cmd.push(function () {
+		w.googletag.cmd.push(function() {
 			w.googletag.destroySlots(adpGSlots);
 		});
 	}
@@ -90,10 +90,12 @@ function syncUser() {
 }
 
 function shouldWeNotProceed() {
-	var hasGenieeStarted = !!(config.partner === 'geniee' &&
+	var hasGenieeStarted = !!(
+		config.partner === 'geniee' &&
 		w.gnsmod &&
 		w.gnsmod.creationProcessStarted &&
-		!config.isAdPushupControlWithPartnerSSP);
+		!config.isAdPushupControlWithPartnerSSP
+	);
 
 	return config.disable || adp.creationProcessStarted || hasGenieeStarted;
 }
@@ -113,8 +115,15 @@ function triggerControl(mode, errorCode) {
 	if (config.partner === 'geniee' && !config.isAdPushupControlWithPartnerSSP) {
 		if (w.gnsmod && !w.gnsmod.creationProcessStarted && w.gnsmod.triggerAds) {
 			w.gnsmod.triggerAds();
+
 			utils.sendFeedback({
 				eventType: errorCode ? errorCode : commonConsts.ERROR_CODES.PAGEGROUP_NOT_FOUND,
+				mode: mode,
+				referrer: config.referrer
+			});
+
+			utils.sendFeedbackOld({
+				eventType: 3,
 				mode: mode,
 				referrer: config.referrer
 			});
@@ -122,8 +131,15 @@ function triggerControl(mode, errorCode) {
 	} else {
 		adp.creationProcessStarted = true;
 		control.trigger();
+
 		utils.sendFeedback({
 			eventType: errorCode ? errorCode : commonConsts.ERROR_CODES.PAGEGROUP_NOT_FOUND,
+			mode: mode,
+			referrer: config.referrer
+		});
+
+		utils.sendFeedbackOld({
+			eventType: 3,
 			mode: mode,
 			referrer: config.referrer
 		});
@@ -131,14 +147,14 @@ function triggerControl(mode, errorCode) {
 }
 
 function startCreation(forced) {
-	return new Promise(function (resolve) {
+	return new Promise(function(resolve) {
 		ampInit(adp.config);
 		// if config has disable or this function triggered more than once or no pageGroup found then do nothing;
 		if (!forced && (shouldWeNotProceed() || !config.pageGroup || parseInt(config.mode, 10) === 2)) {
 			return resolve(false);
 		}
 
-		return selectVariation(config).then(function (variationData) {
+		return selectVariation(config).then(function(variationData) {
 			var selectedVariation = variationData.selectedVariation,
 				moduleConfig = variationData.config,
 				isGenieeModeSelected = !!(adp && adp.geniee && adp.geniee.sendSelectedModeFeedback);
@@ -149,7 +165,9 @@ function startCreation(forced) {
 				clearTimeout(pageGroupTimer);
 				config.selectedVariation = selectedVariation.id;
 				config.selectedVariationName = selectedVariation.name;
-				config.selectedVariationType = selectedVariation.isControl ? commonConsts.PAGE_VARIATION_TYPE.BENCHMARK : commonConsts.PAGE_VARIATION_TYPE.NON_BENCHMARK;
+				config.selectedVariationType = selectedVariation.isControl
+					? commonConsts.PAGE_VARIATION_TYPE.BENCHMARK
+					: commonConsts.PAGE_VARIATION_TYPE.NON_BENCHMARK;
 
 				//Geniee method call for chosen variation id
 				if (isGenieeModeSelected) {
@@ -161,7 +179,7 @@ function startCreation(forced) {
 				if (interactiveAds) {
 					require.ensure(
 						['interactiveAds/index.js'],
-						function (require) {
+						function(require) {
 							require('interactiveAds/index')(interactiveAds);
 							var interactiveAdsArr = adp.interactiveAds;
 							if (interactiveAdsArr.ads) {
@@ -169,7 +187,8 @@ function startCreation(forced) {
 								for (var id in ads) {
 									var hasDfpAdUnit = ads[id].networkData && ads[id].networkData.dfpAdunit;
 									if (hasDfpAdUnit) {
-										var slotId = ads[id].networkData.dfpAdunit, container = $('#' + slotId);
+										var slotId = ads[id].networkData.dfpAdunit,
+											container = $('#' + slotId);
 										var currentTime = new Date();
 										container.attr('data-render-time', currentTime.getTime());
 										console.log('rendered slot ', id, ' ', currentTime, ' ', document.hasFocus());
@@ -208,7 +227,7 @@ function initAdpQue() {
 	}
 
 	processQue();
-	adp.que.push = function (queFunc) {
+	adp.que.push = function(queFunc) {
 		[].push.call(w.adpushup.que, queFunc);
 		processQue();
 	};
