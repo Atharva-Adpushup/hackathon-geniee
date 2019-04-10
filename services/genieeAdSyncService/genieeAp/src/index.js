@@ -185,28 +185,46 @@ function startCreation(forced) {
 				: layoutAndManualInteractiveAds;
 
 			if (finalInteractiveAds && finalInteractiveAds.length) {
-				require.ensure(
-					['interactiveAds/index.js'],
-					function (require) {
-						require('interactiveAds/index')(finalInteractiveAds);
-						if (finalInteractiveAds) {
-							var ads = finalInteractiveAds;
-							for (var id in ads) {
-								var hasDfpAdUnit = ads[id].networkData && ads[id].networkData.dfpAdunit;
-								if (hasDfpAdUnit) {
-									var slotId = ads[id].networkData.dfpAdunit, container = $('#' + slotId);
-									var currentTime = new Date();
-									container.attr('data-render-time', currentTime.getTime());
-									console.log('rendered slot ', id, ' ', currentTime, ' ', document.hasFocus());
-									if (ads[id].networkData && ads[id].networkData.refreshSlot) {
-										refreshAdSlot.refreshSlot(container, ads[id]);
-									}
-								}
-							}
+				try {
+					window.processInnovativeAds(finalInteractiveAds);
+				} catch (e) {
+					console.log('Innovative Ads Failed', e);
+				}
+				var ads = finalInteractiveAds;
+				for (var id in ads) {
+					var hasDfpAdUnit = ads[id].networkData && ads[id].networkData.dfpAdunit;
+					if (hasDfpAdUnit) {
+						var slotId = ads[id].networkData.dfpAdunit, container = $('#' + slotId);
+						var currentTime = new Date();
+						container.attr('data-render-time', currentTime.getTime());
+						if (ads[id].networkData && ads[id].networkData.refreshSlot) {
+							refreshAdSlot.refreshSlot(container, ads[id]);
 						}
-					},
-					'adpInteractiveAds' // Generated script will be named "adpInteractiveAds.js"
-				);
+					}
+				}
+
+				// require.ensure(
+				// 	['interactiveAds/index.js'],
+				// 	function (require) {
+				// 		require('interactiveAds/index')(finalInteractiveAds);
+				// 		if (finalInteractiveAds) {
+				// 			var ads = finalInteractiveAds;
+				// 			for (var id in ads) {
+				// 				var hasDfpAdUnit = ads[id].networkData && ads[id].networkData.dfpAdunit;
+				// 				if (hasDfpAdUnit) {
+				// 					var slotId = ads[id].networkData.dfpAdunit, container = $('#' + slotId);
+				// 					var currentTime = new Date();
+				// 					container.attr('data-render-time', currentTime.getTime());
+				// 					console.log('rendered slot ', id, ' ', currentTime, ' ', document.hasFocus());
+				// 					if (ads[id].networkData && ads[id].networkData.refreshSlot) {
+				// 						refreshAdSlot.refreshSlot(container, ads[id]);
+				// 					}
+				// 				}
+				// 			}
+				// 		}
+				// 	},
+				// 	'adpInteractiveAds' // Generated script will be named "adpInteractiveAds.js"
+				// );
 			}
 
 			return resolve(true);

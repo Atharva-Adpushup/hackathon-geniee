@@ -66,9 +66,20 @@ module.exports = function(site, externalData = {}) {
 			'geniee',
 			site.get('siteId').toString()
 		),
+		innovativeAdsScript = path.join(
+			__dirname,
+			'..',
+			'..',
+			'..',
+			'public',
+			'assets',
+			'js',
+			'builds',
+			prodEnv ? 'adpInteractiveAds.min.js' : 'adpInteractiveAds.js'
+		),
 		setAllConfigs = function(combinedConfig) {
-			var apConfigs = site.get('apConfigs'),
-				isAdPartner = !!site.get('partner');
+			let apConfigs = site.get('apConfigs');
+			let isAdPartner = !!site.get('partner');
 			let { experiment, adpTagsConfig, manualAds, innovativeAds } = combinedConfig;
 
 			isAdPartner ? (apConfigs.partner = site.get('partner')) : null;
@@ -88,6 +99,7 @@ module.exports = function(site, externalData = {}) {
 			apConfigs.innovativeAds = innovativeAds || [];
 			apConfigs.experiment = experiment;
 			delete apConfigs.pageGroupPattern;
+
 			return { apConfigs, adpTagsConfig };
 		},
 		getJsFile = fs.readFileAsync(jsTplPath, 'utf8'),
@@ -95,6 +107,7 @@ module.exports = function(site, externalData = {}) {
 		getIncontentAnalyserScript = fs.readFileAsync(incontentAnalyserScriptPath, 'utf8'),
 		getAdpTagsScript = fs.readFileAsync(adpTagsScriptPath, 'utf8'),
 		getPrebidScript = fs.readFileAsync(prebidScriptPath, 'utf8'),
+		getInnovativeScript = fs.readFileAsync(innovativeAdsScript, 'utf-8'),
 		getHbConfig = couchbase
 			.connectToAppBucket()
 			.then(appBucket => appBucket.getAsync(`hbcf::${site.get('siteId')}`, {}))
@@ -214,6 +227,13 @@ module.exports = function(site, externalData = {}) {
 							}
 							return generateFinalInitScript(jsFile, uncompressedJsFile);
 
+						case CC.SERVICES.INNOVATIVE_ADS:
+							if (serviceConfig) {
+								jsFile = `${jsFile};${serviceScript}`;
+								uncompressedJsFile = `${uncompressedJsFile};${serviceScript}`;
+							}
+							return generateFinalInitScript(jsFile, uncompressedJsFile);
+
 						default:
 							return generateFinalInitScript(jsFile, uncompressedJsFile);
 					}
@@ -246,6 +266,7 @@ module.exports = function(site, externalData = {}) {
 			getAdpTagsScript,
 			getHbConfig,
 			getPrebidScript,
+			getInnovativeScript,
 			getHbAdsApTag(site.get('siteId'), site.get('isManual')),
 			function(
 				finalConfig,
@@ -256,13 +277,14 @@ module.exports = function(site, externalData = {}) {
 				adpTagsScript,
 				hbcf,
 				prebidScript,
-				hbAdsApTag
+				hbAdsApTag,
+				innovativeAdsScript
 			) {
-				let { apConfigs, adpTagsConfig } = finalConfig,
-					gdpr = site.get('gdpr'),
-					{ incontentAds, hbAds } = incontentAndHbAds,
-					isValidCurrencyConfig = isValidThirdPartyDFPAndCurrency(apConfigs),
-					computedPrebidCurrencyConfig = {};
+				let { apConfigs, adpTagsConfig } = finalConfig;
+				let	gdpr = site.get('gdpr');
+				let	{ incontentAds, hbAds } = incontentAndHbAds;
+				let	isValidCurrencyConfig = isValidThirdPartyDFPAndCurrency(apConfigs);
+				let	computedPrebidCurrencyConfig = {};
 
 				if (isValidCurrencyConfig) {
 					computedPrebidCurrencyConfig = {
@@ -300,11 +322,12 @@ module.exports = function(site, externalData = {}) {
 						prebidScript
 					)
 					.addService(CC.SERVICES.GDPR, gdpr)
+					.addService(CC.SERVICES.INNOVATIVE_ADS, apConfigs.innovativeAds, innovativeAdsScript)
 					.done();
 
 				return { default: scripts.jsFile, uncompressed: scripts.uncompressedJsFile };
 			}
-		),
+		) ,
 		writeTempFile = function(jsFile) {
 			return mkdirpAsync(tempDestPath)
 				.then(function() {
