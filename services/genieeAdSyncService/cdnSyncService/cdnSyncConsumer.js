@@ -277,8 +277,8 @@ module.exports = function(site, externalData = {}) {
 				adpTagsScript,
 				hbcf,
 				prebidScript,
-				hbAdsApTag,
-				innovativeAdsScript
+				innovativeAdsScript,
+				hbAdsApTag
 			) {
 				let { apConfigs, adpTagsConfig } = finalConfig;
 				let	gdpr = site.get('gdpr');

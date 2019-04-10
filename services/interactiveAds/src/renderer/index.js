@@ -6,7 +6,7 @@ import Docked from './components/Docked/index';
 //import Video from './components/Video/index';
 import $ from '../$';
 import config from '../config';
-import { generateAdCode } from '../../../genieeAdSyncService/genieeAp/src/adCodeGenerator';
+// import { generateAdCode } from '../../../genieeAdSyncService/genieeAp/src/adCodeGenerator';
 
 const createParentNode = (appendTo, interactiveAd, css = {}, operation = 'append') => {
 		const $parentNode = $('<div/>'),
@@ -38,7 +38,7 @@ const createParentNode = (appendTo, interactiveAd, css = {}, operation = 'append
 	},
 	renderAd = (interactiveAd, adInstance) => {
 		const type = interactiveAd.formatData.type;
-		const adCode = generateAdCode(interactiveAd);
+		const adCode = window.adpushup.generateAdCode(interactiveAd);
 		const { value: xPath } = interactiveAd.formatData.eventData; // Value is the xPath
 
 		interactiveAd.status = 1; // Mark interactive ad status as successful impression

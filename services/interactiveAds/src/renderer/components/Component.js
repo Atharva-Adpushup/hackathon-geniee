@@ -2,8 +2,8 @@
 
 import commonConsts from '../../commonConsts';
 import $ from '../../$';
-import { executeAdpTagsHeadCode } from '../../../../genieeAdSyncService/genieeAp/src/adCodeGenerator';
-import { executeAfterJS } from '../../../../genieeAdSyncService/genieeAp/src/adCreater';
+// import { executeAdpTagsHeadCode } from '../../../../genieeAdSyncService/genieeAp/src/adCodeGenerator';
+// import { executeAfterJS } from '../../../../genieeAdSyncService/genieeAp/src/adCreater';
 
 const adp = window.adpushup;
 
@@ -55,7 +55,7 @@ class Component {
 		const { POWERED_BY_BANNER } = commonConsts;
 
 		if (this.interactiveAd.network === commonConsts.NETWORKS.ADPTAGS) {
-			executeAdpTagsHeadCode([this.interactiveAd], {}); // This function expects an array of adpTags and optional adpKeyValues
+			window.adpushup.executeAdpTagsHeadCode([this.interactiveAd], {}); // This function expects an array of adpTags and optional adpKeyValues
 		}
 
 		let css = { width, height: parseInt(height) + POWERED_BY_BANNER.HEIGHT, ...customCSS },
@@ -171,7 +171,7 @@ class Component {
 			}
 
 			if (variation.customJs.afterAp) {
-				executeAfterJS(variation);
+				window.adpushup.executeAfterJS(variation);
 			}
 		}
 		return this.sendFeedback(feedbackOptions);

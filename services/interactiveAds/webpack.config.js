@@ -1,25 +1,15 @@
 const path = require('path');
 const webpack = require('webpack');
-const buildPath = '../../../public/assets/js/builds/';
-// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const buildPath = '../../public/assets/js/builds/';
 
 module.exports = [
 	{
 		//devtool: 'cheap-module-source-map',
-		entry: {
-			adpushup: path.join(__dirname, 'main.js')
-		},
+		entry: path.join(__dirname, 'index.js'),
 		output: {
 			path: path.join(__dirname, buildPath),
-			filename: '[name].js',
-			chunkFilename: '[name].js',
-			// publicPath: '//cdn.adpushup.com/'
-			// publicPath: 'http://localhost:8080/assets/js/builds/'
-		},
-		resolve: {
-			alias: {
-				interactiveAds: path.resolve(__dirname, '../../interactiveAds/')
-			}
+			filename: 'adpInteractiveAds.js',
+			chunkFilename: 'adpInteractiveAds.js',
 		},
 		module: {
 			loaders: [
@@ -37,27 +27,15 @@ module.exports = [
 					loader: 'url-loader'
 				}
 			]
-		},
-		plugins: [
-			//new BundleAnalyzerPlugin()
-		]
+		}
 	},
 	{
 		//devtool: 'cheap-module-source-map',
-		entry: {
-			adpushup: path.join(__dirname, 'main.js')
-		},
+		entry: path.join(__dirname, 'index.js'),
 		output: {
 			path: path.join(__dirname, buildPath),
-			filename: '[name].min.js',
-			chunkFilename: '[name].min.js'
-			// publicPath: '//cdn.adpushup.com/'
-			// publicPath: 'http://localhost:8080/assets/js/builds/'
-		},
-		resolve: {
-			alias: {
-				interactiveAds: path.resolve(__dirname, '../../interactiveAds/')
-			}
+			filename: 'adpInteractiveAds.min.js',
+			chunkFilename: 'adpInteractiveAds.min.js'
 		},
 		module: {
 			loaders: [

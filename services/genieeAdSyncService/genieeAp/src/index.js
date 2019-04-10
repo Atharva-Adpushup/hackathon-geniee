@@ -10,7 +10,7 @@ var w = window,
 	nodewatcher = require('../libs/nodeWatcher'),
 	browserConfig = require('../libs/browserConfig'),
 	selectVariation = require('./variationSelectionModels/index'),
-	createAds = require('./adCreater').createAds,
+	adCreater = require('./adCreater'),
 	// heartBeat = require('../libs/heartBeat'),
 	ampInit = require('./ampInit'),
 	hookAndInit = require('./hooksAndBlockList'),
@@ -20,6 +20,7 @@ var w = window,
 	refreshAdSlot = require('./refreshAdSlot'),
 	session = require('../libs/session'),
 	spaHandler = require('./spaHandler'),
+	adCodeGenerator = require('./adCodeGenerator'),
 	isGenieeSite;
 
 // Destroy ADP slots and their associated GPT slots
@@ -73,7 +74,10 @@ function initAdpConfig() {
 		nodewatcher: nodewatcher,
 		geniee: genieeObject,
 		triggerAd: triggerAd,
-		session: session
+		session: session,
+		generateAdCode: adCodeGenerator.generateAdCode,
+		executeAdpTagsHeadCode: adCodeGenerator.executeAdpTagsHeadCode,
+		executeAfterJS: adCreater.executeAfterJS
 	});
 
 	// Extend the settings with generated settings
@@ -175,7 +179,7 @@ function startCreation(forced) {
 					isControlVariation = true;
 				}
 
-				createAds(adp, selectedVariation);
+				adCreater.createAds(adp, selectedVariation);
 			} else {
 				triggerControl(commonConsts.MODE.FALLBACK);
 			}

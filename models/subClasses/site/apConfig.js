@@ -17,7 +17,7 @@ var ApConfig = {
 		'isAdPushupControlWithPartnerSSP',
 		'isSPA',
 		'isManual',
-		'isInnovative'
+		'isInnovative',
 		'isThirdPartyAdx',
 		'spaPageTransitionTimeout'
 	],
@@ -39,7 +39,7 @@ var ApConfig = {
 		'isAdPushupControlWithPartnerSSP',
 		'isSPA',
 		'isManual',
-		'isInnovative'
+		'isInnovative',
 		'isThirdPartyAdx',
 		'spaPageTransitionTimeout'
 	],
