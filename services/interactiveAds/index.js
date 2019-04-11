@@ -47,20 +47,20 @@ const createInViewAd = interactiveAd => {
 				switch (eventName) {
 					case commonConsts.EVENTS.DOM_LOAD:
 						emitter.subscribe(commonConsts.EVENTS.DOM_LOAD, eventData => {
-							return renderer(interactiveAd);
+							renderer(interactiveAd);
 						});
 						break;
 					case commonConsts.EVENTS.SCROLL:
 						emitter.subscribe(commonConsts.EVENTS.SCROLL, eventData => {
-							return renderer(interactiveAd, createInViewAd(interactiveAd));
+							renderer(interactiveAd, createInViewAd(interactiveAd));
 						});
 						break;
 					case commonConsts.EVENTS.SCRIPT_LOAD:
-						return renderer(interactiveAd);
+						renderer(interactiveAd);
 						break;
 				}
 			}
-			index === interactiveAds.length - 1 && cb && typeof cb === 'function' ? cb() : null;
+			return index === interactiveAds.length - 1 && cb && typeof cb === 'function' ? cb() : null;
 		});
 	};
 
