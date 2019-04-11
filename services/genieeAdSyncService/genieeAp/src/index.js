@@ -144,7 +144,6 @@ function startCreation(forced) {
 
 		var innovativeInteractiveAds = [];
 		var layoutAndManualInteractiveAds = [];
-		var layoutRunning = false;
 		var isControlVariation = false;
 
 		if (config.innovativeModeActive && window.adpushup.config.innovativeAds.length) {
@@ -160,7 +159,6 @@ function startCreation(forced) {
 			config = adp.config = moduleConfig;
 			if (selectedVariation) {
 				adp.creationProcessStarted = true;
-				layoutRunning = true;
 
 				clearTimeout(pageGroupTimer);
 				config.selectedVariation = selectedVariation.id;
@@ -205,7 +203,7 @@ function startCreation(forced) {
 							}
 						}
 					}
-					window.processInnovativeAds(finalInteractiveAds, refreshSlotProcessing);
+					w.adpushup.processInnovativeAds(finalInteractiveAds, refreshSlotProcessing);
 				} catch (e) {
 					console.log('Innovative Ads Failed', e);
 				}

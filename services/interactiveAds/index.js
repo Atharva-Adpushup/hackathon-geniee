@@ -64,6 +64,7 @@ const createInViewAd = interactiveAd => {
 		});
 	};
 
-window.processInnovativeAds = processInteractiveAds;
+window.adpushup = window.adpushup || {};
+window.adpushup.processInnovativeAds = processInteractiveAds;
 
 module.exports = processInteractiveAds;
