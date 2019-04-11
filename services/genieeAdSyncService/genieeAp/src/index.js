@@ -12,7 +12,7 @@ var w = window,
 	selectVariation = require('./variationSelectionModels/index'),
 	adCreater = require('./adCreater'),
 	// heartBeat = require('../libs/heartBeat'),
-	ampInit = require('./ampInit'),
+	// ampInit = require('./ampInit'),
 	hookAndInit = require('./hooksAndBlockList'),
 	control = require('./control')(),
 	genieeObject = require('./genieeObject'),
@@ -136,7 +136,7 @@ function triggerControl(mode, errorCode) {
 
 function startCreation(forced) {
 	return new Promise(function (resolve) {
-		ampInit(adp.config);
+		// ampInit(adp.config);
 		// if config has disable or this function triggered more than once or no pageGroup found then do nothing;
 		if (!forced && (shouldWeNotProceed() || !config.pageGroup || parseInt(config.mode, 10) === 2)) {
 			return resolve(false);

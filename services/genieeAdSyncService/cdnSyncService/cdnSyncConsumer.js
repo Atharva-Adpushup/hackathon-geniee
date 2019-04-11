@@ -298,11 +298,11 @@ module.exports = function(site, externalData = {}) {
 					};
 				}
 
-				if (site.get('ampSettings')) apConfigs.ampSettings = {
-					samplingPercent: site.get('ampSettings').samplingPercent,
-					blockList: site.get('ampSettings').blockList,
-					isEnabled: site.get('ampSettings').isEnabled
-				}
+				// if (site.get('ampSettings')) apConfigs.ampSettings = {
+				// 	samplingPercent: site.get('ampSettings').samplingPercent,
+				// 	blockList: site.get('ampSettings').blockList,
+				// 	isEnabled: site.get('ampSettings').isEnabled
+				// }
 				if (site.get('medianetId')) apConfigs.medianetId = site.get('medianetId');
 
 				jsFile = _.replace(jsFile, '__AP_CONFIG__', JSON.stringify(apConfigs));

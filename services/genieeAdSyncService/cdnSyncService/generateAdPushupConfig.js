@@ -210,7 +210,7 @@ const Promise = require('bluebird'),
 			contentSelector: channel.contentSelector,
 			pageGroupPattern: getPageGroupPattern(pageGroupPattern, platform, pageGroup),
 			hasVariationsWithNoData: false,
-			ampSettings: channel.ampSettings ? { isEnabled: channel.ampSettings.isEnabled } : { isEnabled: false },
+			// ampSettings: channel.ampSettings ? { isEnabled: channel.ampSettings.isEnabled } : { isEnabled: false },
 			autoOptimise: channel.hasOwnProperty('autoOptimise') ? channel.autoOptimise : false
 		};
 
