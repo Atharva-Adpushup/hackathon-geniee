@@ -10,20 +10,20 @@ import InView from './src/renderer/components/InView/index';
 import { generateAdCode } from '../genieeAdSyncService/genieeAp/src/adCodeGenerator';
 
 const createInViewAd = interactiveAd => {
-		const parentNode = null,
-			adCode = generateAdCode(interactiveAd),
-			inView = new InView(parentNode, interactiveAd, adCode);
+		const parentNode = null;
+		const adCode = generateAdCode(interactiveAd);
+		const inView = new InView(parentNode, interactiveAd, adCode);
 
 		return inView;
 	},
-	processInteractiveAds = interactiveAds => {
+	processInteractiveAds = (interactiveAds, cb) => {
 		const adp = window.adpushup;
 		adp.interactiveAds = $.extend({}, config, { adsRendered: 0 });
 		interactiveAds.forEach(interactiveAd => {
 			adp.interactiveAds.ads[interactiveAd.id] = interactiveAd;
 		});
 
-		interactiveAds.forEach(interactiveAd => {
+		interactiveAds.forEach((interactiveAd, index) => {
 			if (interactiveAd.formatData && interactiveAd.formatData.event) {
 				const eventName = interactiveAd.formatData.event;
 
@@ -60,6 +60,7 @@ const createInViewAd = interactiveAd => {
 						break;
 				}
 			}
+			index === interactiveAds.length - 1 && cb && typeof cb === 'function' ? cb() : null;
 		});
 	};
 
