@@ -21,7 +21,7 @@ const commonConsts = {
 		dfp: 'dfp',
 		adp: 'Adp'
 	},
-	LEGEND: ['Impressions', 'CPM ($)'],
+	LEGEND: ['Impressions', 'CPM ($)', 'Page CPM ($)'],
 	GROUP_BY: ['device_type', 'pagegroup'],
 	REPORT_ENDPOINT: '/user/reports/generate',
 	VARIATIONS_ENDPOINT: `/data/getVariations`,
