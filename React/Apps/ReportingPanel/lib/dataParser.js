@@ -21,6 +21,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 	reorderColumns = cols => {
 		let updatedCols = [];
 		updatedCols.push(reorderArray(dataLabels.date, cols));
+		updatedCols.push(reorderArray(dataLabels.pageCpm, cols));
 		updatedCols.push(reorderArray(dataLabels.pageViews, cols));
 
 		updatedCols.push(reorderArray(dataLabels.adpRequests, cols));
@@ -35,7 +36,6 @@ const dataLabels = commonConsts.DATA_LABELS,
 		updatedCols.push(reorderArray(dataLabels.revenue, cols));
 		updatedCols.push(reorderArray(dataLabels.grossRevenue, cols));
 		updatedCols.push(reorderArray(dataLabels.xpathMiss, cols));
-		updatedCols.push(reorderArray(dataLabels.pageCpm, cols));
 		return updatedCols;
 	},
 	normaliseRows = rows => {
@@ -302,7 +302,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 				xpathMiss
 			);
 		} else {
-			series.push(impressions, cpm, revenue, pageCpm);
+			series.push(pageCpm,impressions, cpm, revenue);
 		}
 
 		return series;
