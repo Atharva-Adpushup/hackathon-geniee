@@ -44,7 +44,7 @@ var adp = window.adpushup,
 			var manualAds = adp.config.manualAds,
 				newAdId = utils.uniqueId(),
 				manualAd = manualAds.filter(function (ad) {
-					return ad.id == adId;
+					return ad.id === adId;
 				})[0],
 				ad = $.extend(true, {}, manualAd),
 				siteId = adp.config.siteId,
@@ -90,7 +90,7 @@ var adp = window.adpushup,
 							generateMediaNetHeadCode();
 							isMedianetHeaderCodePlaced = true;
 						}
-						if (ad.enableLazyLoading == true) {
+						if (ad.enableLazyLoading === true) {
 							isAdContainerInView(container).done(function () {
 								// Send feedback call
 								utils.sendFeedback(feedbackData);

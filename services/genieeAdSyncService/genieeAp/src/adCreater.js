@@ -42,9 +42,9 @@ var $ = require('jquery'),
 
 			// Push ads to structural ad array only if ad is not interactive or not incontent
 			if (
-				ad.type == commonConsts.AD_TYPES.STRUCTURAL ||
+				ad.type === commonConsts.AD_TYPES.STRUCTURAL ||
 				(!ad.formatData && !ad.isIncontent && ad.type !== commonConsts.AD_TYPES.INTERACTIVE_AD) ||
-				ad.type == commonConsts.AD_TYPES.DOCKED_STRUCTURAL
+				ad.type === commonConsts.AD_TYPES.DOCKED_STRUCTURAL
 			) {
 				structuredAds.push(ad);
 			}
