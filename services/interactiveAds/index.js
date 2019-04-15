@@ -7,11 +7,11 @@ import emitter from './src/emitter';
 import { renderer } from './src/renderer/index';
 import config from './src/config';
 import InView from './src/renderer/components/InView/index';
-import { generateAdCode } from '../genieeAdSyncService/genieeAp/src/adCodeGenerator';
+// import { generateAdCode } from '../genieeAdSyncService/genieeAp/src/adCodeGenerator';
 
 const createInViewAd = interactiveAd => {
 		const parentNode = null;
-		const adCode = generateAdCode(interactiveAd);
+		const adCode = window.adpushup.generateAdCode(interactiveAd);
 		const inView = new InView(parentNode, interactiveAd, adCode);
 
 		return inView;
