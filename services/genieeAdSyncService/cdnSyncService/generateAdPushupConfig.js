@@ -1,5 +1,6 @@
-let ADPTags = [],
-	finalJson = {};
+let ADPTags = [];
+let finalJson = {};
+
 const Promise = require('bluebird'),
 	_ = require('lodash'),
 	AdPushupError = require('../../../helpers/AdPushupError'),
@@ -17,23 +18,23 @@ const Promise = require('bluebird'),
 			return false;
 		}
 		if (
-			(ad.network == 'geniee' && ad.networkData.zoneId) ||
-			(ad.network == 'adpTags' && ad.networkData.dfpAdunit) ||
-			(typeof ad.networkData.adCode == 'string' && ad.networkData.adCode.length) ||
-			(ad.network == 'custom' && ad.networkData.forceByPass)
+			(ad.network === 'geniee' && ad.networkData.zoneId) ||
+			(ad.network === 'adpTags' && ad.networkData.dfpAdunit) ||
+			(typeof ad.networkData.adCode === 'string' && ad.networkData.adCode.length) ||
+			(ad.network === 'custom' && ad.networkData.forceByPass)
 		) {
 			return true;
 		}
 		return false;
 	},
 	pushToAdpTags = function(ad, json) {
-		const isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length),
-			isNetwork = !!ad.network,
-			isNetworkData = !!ad.networkData,
-			isDynamicAllocation = !!(isNetworkData && ad.networkData.dynamicAllocation),
-			isZoneContainerId = !!(isNetworkData && ad.networkData.zoneContainerId),
-			isAdpTagsNetwork = !!(isNetwork && ad.network == 'adpTags'),
-			isGenieeNetwork = !!(isNetwork && ad.network == 'geniee');
+		const isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length);
+		const isNetwork = !!ad.network;
+		const isNetworkData = !!ad.networkData;
+		const isDynamicAllocation = !!(isNetworkData && ad.networkData.dynamicAllocation);
+		const isZoneContainerId = !!(isNetworkData && ad.networkData.zoneContainerId);
+		const isAdpTagsNetwork = !!(isNetwork && ad.network === 'adpTags');
+		const isGenieeNetwork = !!(isNetwork && ad.network === 'geniee');
 
 		if (isAdpTagsNetwork || (isGenieeNetwork && isDynamicAllocation)) {
 			let adData = {
@@ -54,10 +55,11 @@ const Promise = require('bluebird'),
 		}
 	},
 	getSectionsPayload = function(variationSections, platform, pagegroup, selectorsTreeLevel) {
-		var ads = [],
-			ad = null,
-			json,
-			unsyncedAds = false;
+		let ads = [];
+		let	ad = null;
+		let	json;
+		// let	unsyncedAds = false;
+
 		_.each(variationSections, function(section, sectionId) {
 			if (!Object.keys(section.ads).length) {
 				return true;
@@ -135,17 +137,17 @@ const Promise = require('bluebird'),
 		return ads;
 	},
 	getVariationPayload = (variation, platform, pageGroup, variationData, finalJson) => {
-		const isVariation = !!variation,
-			isDisable = !!(isVariation && variation.disable);
+		const isVariation = !!variation;
+		const isDisable = !!(isVariation && variation.disable);
 
 		if (isDisable) {
 			return true;
 		}
 
-		var ads = getSectionsPayload(variation.sections, platform, pageGroup, variation.selectorsTreeLevel),
-			computedVariationObj,
-			contentSelector = variation.contentSelector,
-			isContentSelector = !!contentSelector;
+		let ads = getSectionsPayload(variation.sections, platform, pageGroup, variation.selectorsTreeLevel);
+		let computedVariationObj;
+		let contentSelector = variation.contentSelector;
+		let isContentSelector = !!contentSelector;
 
 		if (!ads.length) {
 			return true;
@@ -263,8 +265,8 @@ const Promise = require('bluebird'),
 		//Empty finaJson and dfpAunits
 		finalJson = {};
 		ADPTags = [];
-		let manualAds = [];
-		let pageGroupPattern = site.get('apConfigs').pageGroupPattern;
+		// let manualAds = [];
+		const pageGroupPattern = site.get('apConfigs').pageGroupPattern;
 
 		return site
 			.getAllChannels()

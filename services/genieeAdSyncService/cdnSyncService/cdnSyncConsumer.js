@@ -257,46 +257,51 @@ module.exports = function(site, externalData = {}) {
 				.spread(generateCombinedJson)
 				.then(setAllConfigs);
 		},
+		getConfigWrapper = (site) => {
+			return getComputedConfig()
+			.then(computedConfig => generateStatusesAndConfig(site, computedConfig));
+		}
 		getFinalConfig = Promise.join(
-			getComputedConfig(),
-			getJsFile,
-			getUncompressedJsFile,
-			siteModel.getIncontentAndHbAds(site.get('siteId')),
-			getIncontentAnalyserScript,
-			getAdpTagsScript,
-			getHbConfig,
-			getPrebidScript,
-			getInnovativeScript,
-			getHbAdsApTag(site.get('siteId'), site.get('isManual')),
+			getConfigWrapper(),
+			// getJsFile,
+			// getUncompressedJsFile,
+			// siteModel.getIncontentAndHbAds(site.get('siteId')),
+			// getIncontentAnalyserScript,
+			// getAdpTagsScript,
+			// getHbConfig,
+			// getPrebidScript,
+			// getInnovativeScript,
+			// getHbAdsApTag(site.get('siteId'), site.get('isManual')),
 			function(
-				finalConfig,
-				jsFile,
-				uncompressedJsFile,
-				incontentAndHbAds,
-				incontentAnalyserScript,
-				adpTagsScript,
-				hbcf,
-				prebidScript,
-				innovativeAdsScript,
-				hbAdsApTag
+				generatedConfig,
+				// jsFile,
+				// uncompressedJsFile,
+				// incontentAndHbAds,
+				// incontentAnalyserScript,
+				// adpTagsScript,
+				// hbcf,
+				// prebidScript,
+				// innovativeAdsScript,
+				// hbAdsApTag
 			) {
-				let { apConfigs, adpTagsConfig } = finalConfig;
-				let	gdpr = site.get('gdpr');
-				let	{ incontentAds, hbAds } = incontentAndHbAds;
-				let	isValidCurrencyConfig = isValidThirdPartyDFPAndCurrency(apConfigs);
-				let	computedPrebidCurrencyConfig = {};
+				let { apConfigs, adpTagsConfig, finalConfig } = generatedConfig; 
+				// let { apConfigs, adpTagsConfig } = finalConfig;
+				// let	gdpr = site.get('gdpr');
+				// let	{ incontentAds, hbAds } = incontentAndHbAds;
+				// let	isValidCurrencyConfig = isValidThirdPartyDFPAndCurrency(apConfigs);
+				// let	computedPrebidCurrencyConfig = {};
 
-				if (isValidCurrencyConfig) {
-					computedPrebidCurrencyConfig = {
-						adServerCurrency: apConfigs.activeDFPCurrencyCode,
-						granularityMultiplier: Number(apConfigs.prebidGranularityMultiplier),
-						rates: {
-							USD: {
-								[apConfigs.activeDFPCurrencyCode]: Number(apConfigs.activeDFPCurrencyExchangeRate)
-							}
-						}
-					};
-				}
+				// if (isValidCurrencyConfig) {
+				// 	computedPrebidCurrencyConfig = {
+				// 		adServerCurrency: apConfigs.activeDFPCurrencyCode,
+				// 		granularityMultiplier: Number(apConfigs.prebidGranularityMultiplier),
+				// 		rates: {
+				// 			USD: {
+				// 				[apConfigs.activeDFPCurrencyCode]: Number(apConfigs.activeDFPCurrencyExchangeRate)
+				// 			}
+				// 		}
+				// 	};
+				// }
 
 				// if (site.get('ampSettings')) apConfigs.ampSettings = {
 				// 	samplingPercent: site.get('ampSettings').samplingPercent,
@@ -305,27 +310,27 @@ module.exports = function(site, externalData = {}) {
 				// }
 				if (site.get('medianetId')) apConfigs.medianetId = site.get('medianetId');
 
-				jsFile = _.replace(jsFile, '__AP_CONFIG__', JSON.stringify(apConfigs));
-				jsFile = _.replace(jsFile, /__SITE_ID__/g, site.get('siteId'));
-				jsFile = _.replace(jsFile, '__COUNTRY__', false);
-				uncompressedJsFile = _.replace(uncompressedJsFile, '__AP_CONFIG__', JSON.stringify(apConfigs));
-				uncompressedJsFile = _.replace(uncompressedJsFile, /__SITE_ID__/g, site.get('siteId'));
-				uncompressedJsFile = _.replace(uncompressedJsFile, '__COUNTRY__', false);
+				// jsFile = _.replace(jsFile, '__AP_CONFIG__', JSON.stringify(apConfigs));
+				// jsFile = _.replace(jsFile, /__SITE_ID__/g, site.get('siteId'));
+				// jsFile = _.replace(jsFile, '__COUNTRY__', false);
+				// uncompressedJsFile = _.replace(uncompressedJsFile, '__AP_CONFIG__', JSON.stringify(apConfigs));
+				// uncompressedJsFile = _.replace(uncompressedJsFile, /__SITE_ID__/g, site.get('siteId'));
+				// uncompressedJsFile = _.replace(uncompressedJsFile, '__COUNTRY__', false);
 
-				// Generate final init script based on the services that are enabled
-				var scripts = generateFinalInitScript(jsFile, uncompressedJsFile)
-					.addService(CC.SERVICES.INCONTENT_ANALYSER, incontentAds, incontentAnalyserScript)
-					.addService(CC.SERVICES.ADPTAGS, adpTagsConfig, adpTagsScript)
-					.addService(
-						CC.SERVICES.HEADER_BIDDING,
-						{ hbcf, hbAds: hbAds.concat(hbAdsApTag), currency: computedPrebidCurrencyConfig },
-						prebidScript
-					)
-					.addService(CC.SERVICES.GDPR, gdpr)
-					.addService(CC.SERVICES.INNOVATIVE_ADS, apConfigs.innovativeAds, innovativeAdsScript)
-					.done();
+				// // Generate final init script based on the services that are enabled
+				// var scripts = generateFinalInitScript(jsFile, uncompressedJsFile)
+				// 	.addService(CC.SERVICES.INCONTENT_ANALYSER, incontentAds, incontentAnalyserScript)
+				// 	.addService(CC.SERVICES.ADPTAGS, adpTagsConfig, adpTagsScript)
+				// 	.addService(
+				// 		CC.SERVICES.HEADER_BIDDING,
+				// 		{ hbcf, hbAds: hbAds.concat(hbAdsApTag), currency: computedPrebidCurrencyConfig },
+				// 		prebidScript
+				// 	)
+				// 	.addService(CC.SERVICES.GDPR, gdpr)
+				// 	.addService(CC.SERVICES.INNOVATIVE_ADS, apConfigs.innovativeAds, innovativeAdsScript)
+				// 	.done();
 
-				return { default: scripts.jsFile, uncompressed: scripts.uncompressedJsFile };
+				// return { default: scripts.jsFile, uncompressed: scripts.uncompressedJsFile };
 			}
 		) ,
 		writeTempFile = function(jsFile) {
