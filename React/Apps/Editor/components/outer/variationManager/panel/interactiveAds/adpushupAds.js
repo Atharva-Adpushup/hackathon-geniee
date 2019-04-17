@@ -317,7 +317,7 @@ class AdPushupAds extends Component {
 
 	render() {
 		const { fromEditSection, showNetworkOptions } = this.props;
-		const { event, showButtons, format } = this.state;
+		const { event, format } = this.state;
 		const parentStyle = { padding: fromEditSection ? '0px 0px' : '20px 0px' };
 		const colStyle = { padding: fromEditSection ? '0px 0px' : '' };
 		const overAllWidth = fromEditSection ? 12 : 7;
@@ -346,8 +346,10 @@ class AdPushupAds extends Component {
 					{event ? this.renderEventOptions(leftWidth, rightWidth) : null}
 					{event ? this.renderFormatSelect(leftWidth, rightWidth) : null}
 					{event && format ? this.renderFormatOptions(leftWidth, rightWidth) : null}
-					{showNetworkOptions && !showButtons ? this.renderNetwork(leftWidth, rightWidth) : null}
-					{showButtons || showButtons ? this.renderButtons(leftWidth, rightWidth) : null}
+					{showNetworkOptions && !this.state.showButtons ? this.renderNetwork(leftWidth, rightWidth) : null}
+					{this.state.showButtons || this.props.showButtons
+						? this.renderButtons(leftWidth, rightWidth)
+						: null}
 				</Col>
 				<div style={{ clear: 'both' }}>&nbsp;</div>
 			</div>
