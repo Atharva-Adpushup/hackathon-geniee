@@ -34,6 +34,8 @@ function HbProcessing(site, apConfigs) {
 			let	{ incontentAds, hbAds } = incontentAndHbAds;
 			let	isValidCurrencyCnfg = isValidThirdPartyDFPAndCurrency(apConfigs);
 			let	computedPrebidCurrencyConfig = {};
+			let deviceConfig = false;
+			let prebidCurrencyConfig = false;
 
 			// Final Hb Ads
 			hbAds = hbAds.concat(hbAdsApTag);
@@ -65,8 +67,8 @@ function HbProcessing(site, apConfigs) {
 			);
 
 			if (isValidHBConfig) {
-				let { deviceConfig } = hbcf.value;
-				let prebidCurrencyConfig = computedPrebidCurrencyConfig;
+				deviceConfig = hbcf.value.deviceConfig;
+				prebidCurrencyConfig = computedPrebidCurrencyConfig;
 
 				deviceConfig = deviceConfig && deviceConfig.sizeConfig.length ?  ',sizeConfig: ' + JSON.stringify(deviceConfig.sizeConfig) : '';
 				prebidCurrencyConfig = isValidCurrencyConfig ? ',currency: ' + JSON.stringify(prebidCurrencyConfig) : '';
@@ -91,7 +93,7 @@ function HbProcessing(site, apConfigs) {
 function init(site, computedConfig) {
 	// const apConfigs = site.get('apConfigs') || {};
 	const { apConfigs, adpTagsConfig } = computedConfig;
-	const statusesAndAds = {
+	let statusesAndAds = {
 		statuses: {
 			isApTagActive: !!apConfigs.manualModeActive,
 			isInnovativeAdsActive: !!apConfigs.innovativeModeActive,

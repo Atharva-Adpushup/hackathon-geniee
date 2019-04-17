@@ -245,7 +245,7 @@ const Promise = require('bluebird'),
 				const ads = docWithCas.value.ads.filter(ad => !ad.hasOwnProperty('isActive') || ad.isActive);
 				return ads;
 			})
-			.catch(err => Promise.reject(new Error(`Error fetching tgmr doc for ${siteId}`)));
+			// .catch(err => Promise.reject(new Error(`Error fetching tgmr doc for ${siteId}`)));
 	},
 	getAdsAndPushToAdp = (identifier, docKey, site) => {
 		if (!site.get(identifier)) {
