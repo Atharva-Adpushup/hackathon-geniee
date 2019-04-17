@@ -1,23 +1,26 @@
-var path = require('path'),
-	Promise = require('bluebird'),
-	retry = require('bluebird-retry'),
-	_ = require('lodash'),
-	moment = require('moment'),
-	PromiseFtp = require('promise-ftp'),
-	// universalReportService = require('../../../reports/universal/index'),
-	{ getReportData, getMediationData } = require('../../../reports/universal/index'),
-	mkdirpAsync = Promise.promisifyAll(require('mkdirp')).mkdirpAsync,
-	fs = Promise.promisifyAll(require('fs')),
-	AdPushupError = require('../../../helpers/AdPushupError'),
-	{ isValidThirdPartyDFPAndCurrency } = require('../../../helpers/commonFunctions'),
-	CC = require('../../../configs/commonConsts'),
-	generateADPTagsConfig = require('./generateADPTagsConfig'),
-	generateAdPushupConfig = require('./generateAdPushupConfig'),
-	{ getHbAdsApTag } = require('./generateAPTagConfig'),
-	siteModel = require('../../../models/siteModel'),
-	couchbase = require('../../../helpers/couchBaseService'),
-	config = require('../../../configs/config'),
-	prodEnv = config.environment.HOST_ENV === 'production';
+const path = require('path');
+const Promise = require('bluebird');
+const retry = require('bluebird-retry');
+const _ = require('lodash');
+const moment = require('moment');
+const PromiseFtp = require('promise-ftp');
+
+// const universalReportService = require('../../../reports/universal/index');
+const { getReportData, getMediationData } = require('../../../reports/universal/index');
+const mkdirpAsync = Promise.promisifyAll(require('mkdirp')).mkdirpAsync;
+const fs = Promise.promisifyAll(require('fs'));
+const AdPushupError = require('../../../helpers/AdPushupError');
+const { isValidThirdPartyDFPAndCurrency } = require('../../../helpers/commonFunctions');
+const CC = require('../../../configs/commonConsts');
+const generateADPTagsConfig = require('./generateADPTagsConfig');
+const generateAdPushupConfig = require('./generateAdPushupConfig');
+const { getHbAdsApTag } = require('./generateAPTagConfig');
+const siteModel = require('../../../models/siteModel');
+const couchbase = require('../../../helpers/couchBaseService');
+const config = require('../../../configs/config');
+const generateStatusesAndConfig = require('./generateConfig');
+
+const prodEnv = config.environment.HOST_ENV === 'production';
 
 module.exports = function(site, externalData = {}) {
 	ftp = new PromiseFtp();
@@ -262,7 +265,7 @@ module.exports = function(site, externalData = {}) {
 			.then(computedConfig => generateStatusesAndConfig(site, computedConfig));
 		}
 		getFinalConfig = Promise.join(
-			getConfigWrapper(),
+			getConfigWrapper(site),
 			// getJsFile,
 			// getUncompressedJsFile,
 			// siteModel.getIncontentAndHbAds(site.get('siteId')),

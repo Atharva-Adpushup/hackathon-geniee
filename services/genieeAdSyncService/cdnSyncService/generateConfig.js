@@ -32,13 +32,13 @@ function HbProcessing(site, apConfigs) {
 		getHbAdsApTag(siteId, isManual),
 		(hbcf, incontentAndHbAds, hbAdsApTag) => {
 			let	{ incontentAds, hbAds } = incontentAndHbAds;
-			let	isValidCurrencyConfig = isValidThirdPartyDFPAndCurrency(apConfigs);
+			let	isValidCurrencyCnfg = isValidThirdPartyDFPAndCurrency(apConfigs);
 			let	computedPrebidCurrencyConfig = {};
 
 			// Final Hb Ads
 			hbAds = hbAds.concat(hbAdsApTag);
 
-			if (isValidCurrencyConfig) {
+			if (isValidCurrencyCnfg) {
 				computedPrebidCurrencyConfig = {
 					adServerCurrency: apConfigs.activeDFPCurrencyCode,
 					granularityMultiplier: Number(apConfigs.prebidGranularityMultiplier),
@@ -130,9 +130,9 @@ function init(site, computedConfig) {
 				adpTagsConfig,
 				statusesAndAds
 			}
+	}).catch(err => {
+		console.log(err);
 	})
 }
 
-module.exports = {
-	init
-}
+module.exports = init;
