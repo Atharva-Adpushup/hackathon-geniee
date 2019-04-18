@@ -6,6 +6,7 @@ module.exports = {
 	REPORT_STATUS: 'https://api.adpushup.com/OpsWebService/ops',
 	PROXY_ORIGIN: '//proxy.app.adpushup.com',
 	DEMO_ACCOUNT_EMAIL: 'demo@adpushup.com',
+	AMP_SETTINGS_ACCESS_EMAILS: ['genieeamp@adpushup.com'],
 	DEMO_REPORT_SITE_ID: 31000,
 	DEMO_PAGEGROUPS: [
 		'HOME',
@@ -331,7 +332,6 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 			USD: 'USD'
 		}
 	},
-	dummy: 'test',
 	docKeys: {
 		tagManager: 'tgmr::',
 		user: 'user::'

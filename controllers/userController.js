@@ -32,6 +32,8 @@ function requestDemoRedirection(res) {
 }
 
 function dashboardRedirection(req, res, allUserSites, type) {
+	const currentUserEmail = req.session.user.email;
+
 	function setEmailCookie() {
 		var cookieName = 'email',
 			// "Email" cookie has 1 year expiry and accessible through JavaScript
@@ -43,7 +45,7 @@ function dashboardRedirection(req, res, allUserSites, type) {
 			isCookieSet = Object.keys(req.cookies).length > 0 && typeof req.cookies[cookieName] !== 'undefined';
 
 		isCookieSet ? res.clearCookie(cookieName, cookieOptions) : '';
-		res.cookie(cookieName, req.session.user.email, cookieOptions);
+		res.cookie(cookieName, currentUserEmail, cookieOptions);
 	}
 
 	function sitePromises() {
@@ -89,6 +91,11 @@ function dashboardRedirection(req, res, allUserSites, type) {
 				})
 		)
 			.then(() => {
+				const { AMP_SETTINGS_ACCESS_EMAILS } = CC;
+				const isAMPSettingsUIVisible = !!(
+					_.indexOf(AMP_SETTINGS_ACCESS_EMAILS, currentUserEmail.toLowerCase()) > -1
+				);
+
 				sites = _.map(sites, site => {
 					const reportData = _.find(siteReports, { siteId: site.siteId });
 					return {
@@ -113,7 +120,7 @@ function dashboardRedirection(req, res, allUserSites, type) {
 				switch (type) {
 					case 'dashboard':
 					case 'default':
-						return userModel.getUserByEmail(req.session.user.email).then(user => {
+						return userModel.getUserByEmail(currentUserEmail).then(user => {
 							let isPaymentDetailsComplete = user.get('isPaymentDetailsComplete');
 							return res.render('dashboard', {
 								validSites: sites,
@@ -122,6 +129,7 @@ function dashboardRedirection(req, res, allUserSites, type) {
 								requestDemo: req.session.user.requestDemo,
 								imageHeaderLogo: true,
 								isSuperUser: req.session.isSuperUser,
+								isAMPSettingsUIVisible,
 								isPaymentDetailsComplete: isPaymentDetailsComplete || false
 							});
 						});

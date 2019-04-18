@@ -30,7 +30,7 @@
                                                 a(title="View site pagegroups" href='/user/site/#{siteId}/pagegroups') 
                                                     i.fa.fa-th-list
                                                     |  PageGroups 
-                                            if isSuperUser
+                                            if (isSuperUser || isAMPSettingsUIVisible)
                                                 li
                                                     a(title="Open AMP Settings" href='/user/site/#{siteId}/ampSettings') 
                                                         i.fa.fa-th-list
