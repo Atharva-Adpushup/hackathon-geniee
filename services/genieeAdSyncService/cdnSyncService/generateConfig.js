@@ -98,7 +98,8 @@ function init(site, computedConfig) {
 			APTAG_ACTIVE: !!apConfigs.manualModeActive,
 			INNOVATIVE_ADS_ACTIVE: !!apConfigs.innovativeModeActive,
 			LAYOUT_ACTIVE: !!apConfigs.mode || false,
-			ADPTAG_ACTIVE: !!adpTagsConfig
+			ADPTAG_ACTIVE: !!adpTagsConfig,
+			SPA_ACTIVE: !!apConfigs.isSPA
 		},
 		ads: {},
 		config: {}

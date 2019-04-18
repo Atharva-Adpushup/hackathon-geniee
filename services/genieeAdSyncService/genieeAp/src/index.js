@@ -1,32 +1,39 @@
-var w = window,
-	pageGroupTimer,
-	adp = (w.adpushup =
-		w.adpushup ||
-		{}),
-	$ = (adp.$ = require('jquery')),
-	utils = require('../libs/utils'),
-	defaultConfig = $.extend(
-		{},
-		require('../config/config.js')
-	),
-	config = (adp.config = require('../config/config.js')),
-	commonConsts = require('../config/commonConsts'),
-	// Tracker = require('../libs/tracker'),
-	nodewatcher = require('../libs/nodeWatcher'),
-	browserConfig = require('../libs/browserConfig'),
-	selectVariation = require('./variationSelectionModels/index'),
-	adCreater = require('./adCreater'),
-	// heartBeat = require('../libs/heartBeat'),
-	// ampInit = require('./ampInit'),
-	hookAndInit = require('./hooksAndBlockList'),
-	control = require('./control')(),
-	genieeObject = require('./genieeObject'),
-	triggerAd = require('./trigger'),
-	refreshAdSlot = require('./refreshAdSlot'),
-	session = require('../libs/session'),
-	spaHandler = require('./spaHandler'),
-	adCodeGenerator = require('./adCodeGenerator'),
-	isGenieeSite;
+var w = window;
+var pageGroupTimer;
+var adp = (w.adpushup = w.adpushup || {});
+var $ = (adp.$ = require('jquery'));
+var utils = require('../libs/utils');
+var defaultConfig = $.extend({}, require('../config/config.js'));
+var config = (adp.config = require('../config/config.js'));
+var commonConsts = require('../config/commonConsts');
+var nodewatcher = require('../libs/nodeWatcher');
+var browserConfig = require('../libs/browserConfig');
+var adCreater = require('./adCreater');
+var hookAndInit = require('./hooksAndBlockList');
+var control = require('./control')();
+var adCodeGenerator = require('./adCodeGenerator');
+var session = require('../libs/session');
+
+if (LAYOUT_ACTIVE) {
+	var selectVariation = require('./variationSelectionModels/index');
+}
+if (GENIEE_ACTIVE) {
+	var genieeObject = require('./genieeObject');
+}
+if (APTAG_ACTIVE) {
+	var triggerAd = require('./trigger');
+}
+if (SPA_ACTIVE) {
+	var spaHandler = require('./spaHandler');
+}
+
+var refreshAdSlot = require('./refreshAdSlot');
+
+// var	Tracker = require('../libs/tracker');
+// var	heartBeat = require('../libs/heartBeat');
+// var	ampInit = require('./ampInit');
+
+var isGenieeSite;
 
 // Destroy ADP slots and their associated GPT slots
 function destroyAdpSlots() {
