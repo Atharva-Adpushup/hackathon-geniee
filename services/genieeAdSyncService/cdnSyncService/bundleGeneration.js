@@ -1,17 +1,30 @@
 const Promise = require('bluebird');
 const path = require('path');
+const fs = Promise.promisifyAll(require('fs'));
 const webpack = require('webpack');
 
-function init(statuses = { LAYOUT: true, AMP: false }) {
+const AdPushupError = require('../../../helpers/AdPushupError');
+let buildPath = '../../../public/assets/js/builds/geniee/__SITE_ID__/';
+
+function init(site, config) {
+	const { statusesAndAds: { statuses } = {} } = config;
+	const siteId = site.get('siteId');
+
+	buildPath = buildPath.replace('__SITE_ID__', siteId);
+
 	return new Promise((resolve, reject) => {
-		webpack(
+		if (!statuses || !Object.keys(statuses).length) {
+			return reject(new AdPushupError(`Invalid Service Statuses for site: ${site.get('siteId')}`));
+		}
+		const compiler = webpack([
 			{
 				entry: {
-					adpushup: path.join(__dirname, '..', 'genieeAp', 'main.js')
+					bundle: path.join(__dirname, '..', 'genieeAp', 'main.js')
 				},
 				output: {
+					path: path.join(__dirname, buildPath),
 					filename: '[name].js',
-					chunkFilename: '[name].js',
+					chunkFilename: '[name].js'
 				},
 				module: {
 					loaders: [
@@ -30,15 +43,14 @@ function init(statuses = { LAYOUT: true, AMP: false }) {
 						}
 					]
 				},
-				plugins: [
-					new webpack.DefinePlugin(statuses)
-				]
+				plugins: [new webpack.DefinePlugin(statuses)]
 			},
 			{
 				entry: {
-					adpushup: path.join(__dirname, '..', 'genieeAp', 'main.js')
+					bundle: path.join(__dirname, '..', 'genieeAp', 'main.js')
 				},
 				output: {
+					path: path.join(__dirname, buildPath),
 					filename: '[name].min.js',
 					chunkFilename: '[name].min.js'
 				},
@@ -69,16 +81,30 @@ function init(statuses = { LAYOUT: true, AMP: false }) {
 					}),
 					new webpack.DefinePlugin(statuses)
 				]
-			},
-			(err, stats, output) => {
-				if (err) {
-					console.log(err);
-				}
 			}
-		)
+		]);
+		new webpack.ProgressPlugin().apply(compiler);
+		compiler.run((err, stats) => {
+			if (err) {
+				return reject(err);
+			}
+			return resolve();
+		});
 	})
+		.then(() => {
+			debugger;
+			return [
+				config,
+				{
+					compressed: '',
+					uncompressed: ''
+				}
+			];
+		})
+		.catch(err => {
+			console.log(err);
+			debugger;
+		});
 }
-
-init();
 
 module.exports = init;

@@ -19,6 +19,7 @@ const siteModel = require('../../../models/siteModel');
 const couchbase = require('../../../helpers/couchBaseService');
 const config = require('../../../configs/config');
 const generateStatusesAndConfig = require('./generateConfig');
+const bundleGeneration = require('./bundleGeneration');
 
 const prodEnv = config.environment.HOST_ENV === 'production';
 
@@ -32,54 +33,54 @@ module.exports = function(site, externalData = {}) {
 		isExternalRequest = externalData && Object.keys(externalData).length && externalData.externalRequest,
 		isAutoOptimise = !!(site.get('apConfigs') && site.get('apConfigs').autoOptimise),
 		poweredByBanner = !!(site.get('apConfigs') && site.get('apConfigs').poweredByBanner),
-		jsTplPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'adpushup.min.js'),
-		uncompressedJsTplPath = path.join(
-			__dirname,
-			'..',
-			'..',
-			'..',
-			'public',
-			'assets',
-			'js',
-			'builds',
-			'adpushup.js'
-		),
-		incontentAnalyserScriptPath = path.join(__dirname, '..', 'genieeAp', 'libs', 'aa.js'),
-		adpTagsScriptPath = path.join(
-			__dirname,
-			'..',
-			'..',
-			'..',
-			'public',
-			'assets',
-			'js',
-			'builds',
-			prodEnv ? 'adptags.min.js' : 'adptags.js'
-		),
-		prebidScriptPath = path.join(__dirname, '..', '..', 'adpTags', 'Prebid.js', 'build', 'dist', 'prebid.js'),
-		tempDestPath = path.join(
-			__dirname,
-			'..',
-			'..',
-			'..',
-			'public',
-			'assets',
-			'js',
-			'builds',
-			'geniee',
-			site.get('siteId').toString()
-		),
-		innovativeAdsScript = path.join(
-			__dirname,
-			'..',
-			'..',
-			'..',
-			'public',
-			'assets',
-			'js',
-			'builds',
-			prodEnv ? 'adpInteractiveAds.min.js' : 'adpInteractiveAds.js'
-		),
+		// jsTplPath = path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'adpushup.min.js'),
+		// uncompressedJsTplPath = path.join(
+		// 	__dirname,
+		// 	'..',
+		// 	'..',
+		// 	'..',
+		// 	'public',
+		// 	'assets',
+		// 	'js',
+		// 	'builds',
+		// 	'adpushup.js'
+		// ),
+		// incontentAnalyserScriptPath = path.join(__dirname, '..', 'genieeAp', 'libs', 'aa.js'),
+		// adpTagsScriptPath = path.join(
+		// 	__dirname,
+		// 	'..',
+		// 	'..',
+		// 	'..',
+		// 	'public',
+		// 	'assets',
+		// 	'js',
+		// 	'builds',
+		// 	prodEnv ? 'adptags.min.js' : 'adptags.js'
+		// ),
+		// prebidScriptPath = path.join(__dirname, '..', '..', 'adpTags', 'Prebid.js', 'build', 'dist', 'prebid.js'),
+		// tempDestPath = path.join(
+		// 	__dirname,
+		// 	'..',
+		// 	'..',
+		// 	'..',
+		// 	'public',
+		// 	'assets',
+		// 	'js',
+		// 	'builds',
+		// 	'geniee',
+		// 	site.get('siteId').toString()
+		// ),
+		// innovativeAdsScript = path.join(
+		// 	__dirname,
+		// 	'..',
+		// 	'..',
+		// 	'..',
+		// 	'public',
+		// 	'assets',
+		// 	'js',
+		// 	'builds',
+		// 	prodEnv ? 'adpInteractiveAds.min.js' : 'adpInteractiveAds.js'
+		// ),
 		setAllConfigs = function(combinedConfig) {
 			let apConfigs = site.get('apConfigs');
 			let isAdPartner = !!site.get('partner');
@@ -98,23 +99,25 @@ module.exports = function(site, externalData = {}) {
 			apConfigs.innovativeModeActive = site.get('isInnovative') ? site.get('isInnovative') : false;
 			// Default 'draft' mode is selected if config mode is not present
 			apConfigs.mode = !apConfigs.mode ? 2 : apConfigs.mode;
-			apConfigs.manualAds = manualAds || [];
-			apConfigs.innovativeAds = innovativeAds || [];
+
+			apConfigs.manualModeActive ? (apConfigs.manualAds = manualAds || []) : null;
+			apConfigs.innovativeModeActive ? (apConfigs.innovativeAds = innovativeAds || []) : null;
+
 			apConfigs.experiment = experiment;
 			delete apConfigs.pageGroupPattern;
 
 			return { apConfigs, adpTagsConfig };
 		},
-		getJsFile = fs.readFileAsync(jsTplPath, 'utf8'),
-		getUncompressedJsFile = fs.readFileAsync(uncompressedJsTplPath, 'utf8'),
-		getIncontentAnalyserScript = fs.readFileAsync(incontentAnalyserScriptPath, 'utf8'),
-		getAdpTagsScript = fs.readFileAsync(adpTagsScriptPath, 'utf8'),
-		getPrebidScript = fs.readFileAsync(prebidScriptPath, 'utf8'),
-		getInnovativeScript = fs.readFileAsync(innovativeAdsScript, 'utf-8'),
-		getHbConfig = couchbase
-			.connectToAppBucket()
-			.then(appBucket => appBucket.getAsync(`hbcf::${site.get('siteId')}`, {}))
-			.catch(err => Promise.resolve({})),
+		// getJsFile = fs.readFileAsync(jsTplPath, 'utf8'),
+		// getUncompressedJsFile = fs.readFileAsync(uncompressedJsTplPath, 'utf8'),
+		// getIncontentAnalyserScript = fs.readFileAsync(incontentAnalyserScriptPath, 'utf8'),
+		// getAdpTagsScript = fs.readFileAsync(adpTagsScriptPath, 'utf8'),
+		// getPrebidScript = fs.readFileAsync(prebidScriptPath, 'utf8'),
+		// getInnovativeScript = fs.readFileAsync(innovativeAdsScript, 'utf-8'),
+		// getHbConfig = couchbase
+		// 	.connectToAppBucket()
+		// 	.then(appBucket => appBucket.getAsync(`hbcf::${site.get('siteId')}`, {}))
+		// 	.catch(err => Promise.resolve({})),
 		generateCombinedJson = (experiment, adpTags, manualAds, innovativeAds) => {
 			if (!(Array.isArray(adpTags) && adpTags.length)) {
 				return { experiment, adpTagsConfig: false, manualAds, innovativeAds };
@@ -260,82 +263,103 @@ module.exports = function(site, externalData = {}) {
 				.spread(generateCombinedJson)
 				.then(setAllConfigs);
 		},
-		getConfigWrapper = (site) => {
-			return getComputedConfig()
-			.then(computedConfig => generateStatusesAndConfig(site, computedConfig));
-		}
-		getFinalConfig = Promise.join(
-			getConfigWrapper(site),
-			// getJsFile,
-			// getUncompressedJsFile,
-			// siteModel.getIncontentAndHbAds(site.get('siteId')),
-			// getIncontentAnalyserScript,
-			// getAdpTagsScript,
-			// getHbConfig,
-			// getPrebidScript,
-			// getInnovativeScript,
-			// getHbAdsApTag(site.get('siteId'), site.get('isManual')),
-			function(
-				generatedConfig,
-				// jsFile,
-				// uncompressedJsFile,
-				// incontentAndHbAds,
-				// incontentAnalyserScript,
-				// adpTagsScript,
-				// hbcf,
-				// prebidScript,
-				// innovativeAdsScript,
-				// hbAdsApTag
-			) {
-				let { apConfigs, adpTagsConfig, finalConfig } = generatedConfig; 
-				// let { apConfigs, adpTagsConfig } = finalConfig;
-				// let	gdpr = site.get('gdpr');
-				// let	{ incontentAds, hbAds } = incontentAndHbAds;
-				// let	isValidCurrencyConfig = isValidThirdPartyDFPAndCurrency(apConfigs);
-				// let	computedPrebidCurrencyConfig = {};
+		getConfigWrapper = site => {
+			return getComputedConfig().then(computedConfig => generateStatusesAndConfig(site, computedConfig));
+		},
+		// getFinalConfig = Promise.join(
+		// 	getConfigWrapper(site),
+		// getJsFile,
+		// getUncompressedJsFile,
+		// siteModel.getIncontentAndHbAds(site.get('siteId')),
+		// getIncontentAnalyserScript,
+		// getAdpTagsScript,
+		// getHbConfig,
+		// getPrebidScript,
+		// getInnovativeScript,
+		// getHbAdsApTag(site.get('siteId'), site.get('isManual')),
+		// function(
+		// 	generatedConfig,
+		// jsFile,
+		// uncompressedJsFile,
+		// incontentAndHbAds,
+		// incontentAnalyserScript,
+		// adpTagsScript,
+		// hbcf,
+		// prebidScript,
+		// innovativeAdsScript,
+		// hbAdsApTag
+		// ) {
+		// let { apConfigs, adpTagsConfig, finalConfig } = generatedConfig;
+		// let { apConfigs, adpTagsConfig } = finalConfig;
+		// let	gdpr = site.get('gdpr');
+		// let	{ incontentAds, hbAds } = incontentAndHbAds;
+		// let	isValidCurrencyConfig = isValidThirdPartyDFPAndCurrency(apConfigs);
+		// let	computedPrebidCurrencyConfig = {};
 
-				// if (isValidCurrencyConfig) {
-				// 	computedPrebidCurrencyConfig = {
-				// 		adServerCurrency: apConfigs.activeDFPCurrencyCode,
-				// 		granularityMultiplier: Number(apConfigs.prebidGranularityMultiplier),
-				// 		rates: {
-				// 			USD: {
-				// 				[apConfigs.activeDFPCurrencyCode]: Number(apConfigs.activeDFPCurrencyExchangeRate)
-				// 			}
-				// 		}
-				// 	};
-				// }
+		// if (isValidCurrencyConfig) {
+		// 	computedPrebidCurrencyConfig = {
+		// 		adServerCurrency: apConfigs.activeDFPCurrencyCode,
+		// 		granularityMultiplier: Number(apConfigs.prebidGranularityMultiplier),
+		// 		rates: {
+		// 			USD: {
+		// 				[apConfigs.activeDFPCurrencyCode]: Number(apConfigs.activeDFPCurrencyExchangeRate)
+		// 			}
+		// 		}
+		// 	};
+		// }
 
-				// if (site.get('ampSettings')) apConfigs.ampSettings = {
-				// 	samplingPercent: site.get('ampSettings').samplingPercent,
-				// 	blockList: site.get('ampSettings').blockList,
-				// 	isEnabled: site.get('ampSettings').isEnabled
-				// }
-				if (site.get('medianetId')) apConfigs.medianetId = site.get('medianetId');
+		// if (site.get('ampSettings')) apConfigs.ampSettings = {
+		// 	samplingPercent: site.get('ampSettings').samplingPercent,
+		// 	blockList: site.get('ampSettings').blockList,
+		// 	isEnabled: site.get('ampSettings').isEnabled
+		// }
+		// if (site.get('medianetId')) apConfigs.medianetId = site.get('medianetId');
 
-				// jsFile = _.replace(jsFile, '__AP_CONFIG__', JSON.stringify(apConfigs));
-				// jsFile = _.replace(jsFile, /__SITE_ID__/g, site.get('siteId'));
-				// jsFile = _.replace(jsFile, '__COUNTRY__', false);
-				// uncompressedJsFile = _.replace(uncompressedJsFile, '__AP_CONFIG__', JSON.stringify(apConfigs));
-				// uncompressedJsFile = _.replace(uncompressedJsFile, /__SITE_ID__/g, site.get('siteId'));
-				// uncompressedJsFile = _.replace(uncompressedJsFile, '__COUNTRY__', false);
+		// jsFile = _.replace(jsFile, '__AP_CONFIG__', JSON.stringify(apConfigs));
+		// jsFile = _.replace(jsFile, /__SITE_ID__/g, site.get('siteId'));
+		// jsFile = _.replace(jsFile, '__COUNTRY__', false);
+		// uncompressedJsFile = _.replace(uncompressedJsFile, '__AP_CONFIG__', JSON.stringify(apConfigs));
+		// uncompressedJsFile = _.replace(uncompressedJsFile, /__SITE_ID__/g, site.get('siteId'));
+		// uncompressedJsFile = _.replace(uncompressedJsFile, '__COUNTRY__', false);
 
-				// // Generate final init script based on the services that are enabled
-				// var scripts = generateFinalInitScript(jsFile, uncompressedJsFile)
-				// 	.addService(CC.SERVICES.INCONTENT_ANALYSER, incontentAds, incontentAnalyserScript)
-				// 	.addService(CC.SERVICES.ADPTAGS, adpTagsConfig, adpTagsScript)
-				// 	.addService(
-				// 		CC.SERVICES.HEADER_BIDDING,
-				// 		{ hbcf, hbAds: hbAds.concat(hbAdsApTag), currency: computedPrebidCurrencyConfig },
-				// 		prebidScript
-				// 	)
-				// 	.addService(CC.SERVICES.GDPR, gdpr)
-				// 	.addService(CC.SERVICES.INNOVATIVE_ADS, apConfigs.innovativeAds, innovativeAdsScript)
-				// 	.done();
+		// // Generate final init script based on the services that are enabled
+		// var scripts = generateFinalInitScript(jsFile, uncompressedJsFile)
+		// 	.addService(CC.SERVICES.INCONTENT_ANALYSER, incontentAds, incontentAnalyserScript)
+		// 	.addService(CC.SERVICES.ADPTAGS, adpTagsConfig, adpTagsScript)
+		// 	.addService(
+		// 		CC.SERVICES.HEADER_BIDDING,
+		// 		{ hbcf, hbAds: hbAds.concat(hbAdsApTag), currency: computedPrebidCurrencyConfig },
+		// 		prebidScript
+		// 	)
+		// 	.addService(CC.SERVICES.GDPR, gdpr)
+		// 	.addService(CC.SERVICES.INNOVATIVE_ADS, apConfigs.innovativeAds, innovativeAdsScript)
+		// 	.done();
 
-				// return { default: scripts.jsFile, uncompressed: scripts.uncompressedJsFile };
-			}
-		) ,
+		// return { default: scripts.jsFile, uncompressed: scripts.uncompressedJsFile };
+		// 	}
+		// ) ,
+		getFinalConfig = () => {
+			return getConfigWrapper(site)
+				.then(generatedConfig => bundleGeneration(site, generatedConfig))
+				.spread((generatedConfig, bundles) => {
+					let { apConfigs, adpTagsConfig, finalConfig } = generatedConfig;
+					let { uncompressed, compressed } = bundles;
+
+					if (site.get('medianetId')) apConfigs.medianetId = site.get('medianetId');
+
+					compressed = _.replace(compressed, '__AP_CONFIG__', JSON.stringify(apConfigs));
+					compressed = _.replace(compressed, /__SITE_ID__/g, site.get('siteId'));
+					compressed = _.replace(compressed, '__COUNTRY__', false);
+					uncompressed = _.replace(uncompressed, '__AP_CONFIG__', JSON.stringify(apConfigs));
+					uncompressed = _.replace(uncompressed, /__SITE_ID__/g, site.get('siteId'));
+					uncompressed = _.replace(uncompressed, '__COUNTRY__', false);
+
+					return {
+						default: compressed,
+						uncompressed
+					};
+				});
+		},
 		writeTempFile = function(jsFile) {
 			return mkdirpAsync(tempDestPath)
 				.then(function() {
@@ -373,7 +397,7 @@ module.exports = function(site, externalData = {}) {
 			}
 			return Promise.resolve(fileConfig.uncompressed);
 		},
-		getFinalConfigWrapper = () => getFinalConfig.then(fileConfig => fileConfig);
+		getFinalConfigWrapper = () => getFinalConfig().then(fileConfig => fileConfig);
 
 	return Promise.join(getFinalConfigWrapper(), fileConfig => {
 		function processing() {

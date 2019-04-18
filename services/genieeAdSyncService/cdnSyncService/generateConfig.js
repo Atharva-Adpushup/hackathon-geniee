@@ -1,6 +1,6 @@
 const Promise = require('bluebird');
 
-const siteModel = require('../../../models/siteModel')
+const siteModel = require('../../../models/siteModel');
 const couchbase = require('../../../helpers/couchBaseService');
 const { getHbAdsApTag } = require('./generateAPTagConfig');
 const { isValidThirdPartyDFPAndCurrency } = require('../../../helpers/commonFunctions');
@@ -19,7 +19,7 @@ function gdprProcessing(site) {
 		config: {
 			gdpr: config
 		}
-	} 
+	};
 }
 
 function HbProcessing(site, apConfigs) {
@@ -31,9 +31,9 @@ function HbProcessing(site, apConfigs) {
 		siteModel.getIncontentAndHbAds(siteId),
 		getHbAdsApTag(siteId, isManual),
 		(hbcf, incontentAndHbAds, hbAdsApTag) => {
-			let	{ incontentAds, hbAds } = incontentAndHbAds;
-			let	isValidCurrencyCnfg = isValidThirdPartyDFPAndCurrency(apConfigs);
-			let	computedPrebidCurrencyConfig = {};
+			let { incontentAds, hbAds } = incontentAndHbAds;
+			let isValidCurrencyCnfg = isValidThirdPartyDFPAndCurrency(apConfigs);
+			let computedPrebidCurrencyConfig = {};
 			let deviceConfig = false;
 			let prebidCurrencyConfig = false;
 
@@ -52,11 +52,7 @@ function HbProcessing(site, apConfigs) {
 				};
 			}
 
-			const isValidHBConfig = !!(
-				hbcf.value &&
-				hbcf.value.hbConfig &&
-				hbAds.length
-			);
+			const isValidHBConfig = !!(hbcf.value && hbcf.value.hbConfig && hbAds.length);
 			const isValidCurrencyConfig = !!(
 				isValidHBConfig &&
 				computedPrebidCurrencyConfig &&
@@ -70,8 +66,13 @@ function HbProcessing(site, apConfigs) {
 				deviceConfig = hbcf.value.deviceConfig;
 				prebidCurrencyConfig = computedPrebidCurrencyConfig;
 
-				deviceConfig = deviceConfig && deviceConfig.sizeConfig.length ?  ',sizeConfig: ' + JSON.stringify(deviceConfig.sizeConfig) : '';
-				prebidCurrencyConfig = isValidCurrencyConfig ? ',currency: ' + JSON.stringify(prebidCurrencyConfig) : '';
+				deviceConfig =
+					deviceConfig && deviceConfig.sizeConfig.length
+						? ',sizeConfig: ' + JSON.stringify(deviceConfig.sizeConfig)
+						: '';
+				prebidCurrencyConfig = isValidCurrencyConfig
+					? ',currency: ' + JSON.stringify(prebidCurrencyConfig)
+					: '';
 			}
 
 			return {
@@ -85,56 +86,52 @@ function HbProcessing(site, apConfigs) {
 					prebidCurrencyConfig: prebidCurrencyConfig ? prebidCurrencyConfig : '',
 					hbcf
 				}
-			}
+			};
 		}
-	)
+	);
 }
 
 function init(site, computedConfig) {
-	// const apConfigs = site.get('apConfigs') || {};
 	const { apConfigs, adpTagsConfig } = computedConfig;
 	let statusesAndAds = {
 		statuses: {
-			isApTagActive: !!apConfigs.manualModeActive,
-			isInnovativeAdsActive: !!apConfigs.innovativeModeActive,
-			isLayoutActive: !!apConfigs.mode || false,
-			isAdpTagsActive: !!adpTagsConfig
+			APTAG_ACTIVE: !!apConfigs.manualModeActive,
+			INNOVATIVE_ADS_ACTIVE: !!apConfigs.innovativeModeActive,
+			LAYOUT_ACTIVE: !!apConfigs.mode || false,
+			ADPTAG_ACTIVE: !!adpTagsConfig
 		},
 		ads: {},
 		config: {}
-	}
+	};
 
-	return Promise.join(
-		HbProcessing(site, apConfigs),
-		gdprProcessing(site),
-		(hb, gdpr) => {
-			statusesAndAds = {
-				...statusesAndAds,
-				statuses: {
-					...statusesAndAds.statuses,
-					isHbActive: hb.status,
-					isGdprActive: gdpr.status,
-					isIncontentActive: !!(hb.ads.incontentAds && hb.ads.incontentAds.length)
-				},
-				ads: {
-					...hb.ads,
-					adpTags: adpTagsConfig,
-					layoutInventory: apConfigs.experiment
-				},
-				config: {
-					...hb.config,
-					...gdpr.config
-				}
+	return Promise.join(HbProcessing(site, apConfigs), gdprProcessing(site), (hb, gdpr) => {
+		statusesAndAds = {
+			...statusesAndAds,
+			statuses: {
+				...statusesAndAds.statuses,
+				HB_ACTIVE: hb.status,
+				GDPR_ACTIVE: gdpr.status,
+				INCONTENT_ACTIVE: !!(hb.ads.incontentAds && hb.ads.incontentAds.length)
+			},
+			ads: {
+				...hb.ads,
+				adpTags: adpTagsConfig,
+				layoutInventory: apConfigs.experiment
+			},
+			config: {
+				...hb.config,
+				...gdpr.config
 			}
+		};
 
-			return {
-				apConfigs,
-				adpTagsConfig,
-				statusesAndAds
-			}
+		return {
+			apConfigs,
+			adpTagsConfig,
+			statusesAndAds
+		};
 	}).catch(err => {
 		console.log(err);
-	})
+	});
 }
 
 module.exports = init;
