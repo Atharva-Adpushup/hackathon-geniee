@@ -80,6 +80,7 @@ function init(adp, onPageGroupPush, platform) {
 	// Blocklist Implementation
 	if (config.blocklist && config.blocklist instanceof Array) {
 		for (var x = 0, j = config.blocklist, k = j[x]; x < j.length; k = j[++x]) {
+			k = k.trim();
 			if (window.location.href.match(new RegExp(k, 'i'))) {
 				config.disable = true;
 				return true;
