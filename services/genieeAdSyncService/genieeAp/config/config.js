@@ -5,7 +5,7 @@ module.exports = {
 	// eslint-disable-next-line no-undef
 	country: __COUNTRY__,
 	feedbackUrl: '//staging.adpushup.com/AdPushupFeedbackWebService/feedback?data=',
-	feedbackUrlOld: '//e3.adpushup.com/ApexWebService/feedback',
+	feedbackUrlOld: '//staging.adpushup.com/ApexWebService/feedback',
 	heartBeatMinInterval: 30000,
 	heartBeatStartDelay: 2000,
 	xpathWaitTimeout: 5000,

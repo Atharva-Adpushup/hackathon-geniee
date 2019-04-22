@@ -24,7 +24,7 @@ module.exports = {
 		MEDIANET: 'medianet'
 	},
 	AMP_PUBLISH_URL: '//autoamp.io/publishAmpJob',
-	USER_SYNC_URL: '//staging.adpushup.com/AdPushupFeedbackWebService/user/sync',
+	USER_SYNC_URL: '//staging.adpushup.com/ApexWebService/user/sync',
 	BEACON_TYPE: {
 		AD_FEEDBACK: 'AD_FEEDBACK'
 	},
