@@ -17,7 +17,7 @@ class Component {
 
 	sendFeedback(options) {
 		if (adp && adp.utils && adp.utils.sendFeedback) {
-			adp.utils.sendFeedback(options);
+			adp.utils.sendFeedbackOld(options);
 		}
 	}
 
@@ -30,18 +30,25 @@ class Component {
 		}
 
 		let css = { width, height },
-			$format = $('<div />'),
-			feedbackOptions = {
-				ads: [this.interactiveAd],
-				xpathMiss: [],
-				eventType: commonConsts.ERROR_CODES.NO_ERROR,
-				mode: window.adpushup.config.mode,
-				referrer: adp.config.referrer,
-				tracking: false,
-				variationId: !adp.config.manualModeActive
-					? adp.config.selectedVariation
-					: commonConsts.MANUAL_ADS.VARIATION
-			};
+			$format = $('<div />');
+
+		var feedbackOptions = {
+			xpathMiss: [],
+			referrer: adp.config.referrer,
+			tracking: false,
+			variationId: !adp.config.manualModeActive ? adp.config.selectedVariation : commonConsts.MANUAL_ADS.VARIATION
+		};
+
+		// New feedback
+		var newFeedbackAdObj = $.extend({}, this.interactiveAd);
+		newFeedbackAdObj.status = 1;
+		newFeedbackAdObj.ads = [newFeedbackAdObj];
+		feedbackOptions.newFeedbackAdObj = newFeedbackAdObj;
+
+		feedbackOptions.eventType = 1;
+		feedbackOptions.mode = 1;
+		feedbackOptions.ads = [this.interactiveAd.id];
+
 		$format.attr({ id, 'data-section': id, class: '_ap_apex_ad' });
 
 		// adp.tracker.add(
