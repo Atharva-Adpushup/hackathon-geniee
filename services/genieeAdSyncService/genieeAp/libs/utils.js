@@ -53,7 +53,7 @@ module.exports = {
 	},
 	sendFeedbackOld: function(options) {
 		var adp = window.adpushup;
-		
+
 		return this.sendBeaconOld(adp.config.feedbackUrlOld, options, {
 			method: 'image'
 		});
@@ -153,7 +153,45 @@ module.exports = {
 		var toFeedback,
 			request,
 			evt,
-			adpConfig = window.adpushup.config;
+			adpConfig = window.adpushup.config,
+			newFeedback = {};
+
+		if (data.newFeedbackAdObj) {
+			newFeedback = {
+				packetId: adpConfig.packetId,
+				siteId: adpConfig.siteId,
+				siteDomain: adpConfig.siteDomain,
+				url: adpConfig.pageUrl,
+				mode: data.mode, // Denotes which mode is running (adpushup or fallback)
+				errorCode: data.eventType, // Denotes the error code (no error, pagegroup not found etc.)
+				pageGroup: adpConfig.pageGroup,
+				pageVariationId: adpConfig.selectedVariation,
+				pageVariationName: adpConfig.selectedVariationName,
+				pageVariationType: adpConfig.selectedVariationType,
+				platform: adpConfig.platform,
+				isGeniee: adpConfig.isGeniee || false,
+				sections:
+					data.newFeedbackAdObj.ads && data.newFeedbackAdObj.ads.length
+						? data.newFeedbackAdObj.ads.map(
+								function(ad) {
+									if (this.isHBActiveForAd(ad)) {
+										ad.services.push(commonConsts.SERVICES.HB);
+									}
+
+									return {
+										sectionId: ad.isManual ? ad.originalId : ad.id,
+										sectionName: ad.sectionName,
+										status: ad.status,
+										network: ad.network,
+										networkAdUnitId: this.getNetworkAdUnitIdForAd(ad),
+										services: ad.services
+									};
+								}.bind(this)
+						  )
+						: null
+			};
+			data.newFeedback = this.base64Encode(JSON.stringify(newFeedback));
+		}
 
 		data.packetId = adpConfig.packetId;
 		data.siteId = adpConfig.siteId;

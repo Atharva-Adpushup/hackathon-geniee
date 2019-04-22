@@ -210,33 +210,48 @@ var $ = require('jquery'),
 				});
 			},
 			next = function(adObj, data) {
+				var newFeedbackAdObj = $.extend({}, adObj);
+
 				if (displayCounter) {
 					displayCounter--;
 					if (data.success) {
 						// feedbackData.xpathMiss = [];
-						adObj.status = commonConsts.AD_STATUS.IMPRESSION;
-						feedbackData.ads = [adObj];
-						placeAd(data.container, adObj);
-						utils.sendFeedback(feedbackData);
+						// New feedback
+						newFeedbackAdObj.status = commonConsts.AD_STATUS.IMPRESSION;
+						newFeedbackAdObj.ads = [newFeedbackAdObj];
+						feedbackData.newFeedbackAdObj = newFeedbackAdObj;
 
-						// Old feedback
 						feedbackData.eventType = 1;
 						feedbackData.mode = 1;
 						feedbackData.ads = [adObj.id];
+						placeAd(data.container, adObj);
 						utils.sendFeedbackOld(feedbackData);
-					} else {
-						adObj.xpathMiss = true;
-						adObj.status = commonConsts.AD_STATUS.XPATH_MISS;
-						feedbackData.ads = [adObj];
-						utils.sendFeedback(feedbackData);
 
 						// Old feedback
-						var oldFeedbackData = $.extend({}, feedbackData);
-						oldFeedbackData.ads = [];
-						oldFeedbackData.eventType = 1;
-						oldFeedbackData.mode = 1;
-						oldFeedbackData.xpathMiss = [adObj.id];
-						utils.sendFeedbackOld(oldFeedbackData);
+						// feedbackData.eventType = 1;
+						// feedbackData.mode = 1;
+						// feedbackData.ads = [adObj.id];
+						// utils.sendFeedbackOld(feedbackData);
+					} else {
+						// New feedback
+						newFeedbackAdObj.xpathMiss = true;
+						newFeedbackAdObj.status = commonConsts.AD_STATUS.XPATH_MISS;
+						feedbackData.ads = [newFeedbackAdObj];
+						feedbackData.newFeedbackAdObj = newFeedbackAdObj;
+
+						feedbackData.ads = [];
+						feedbackData.eventType = 1;
+						feedbackData.mode = 1;
+						feedbackData.xpathMiss = [adObj.id];
+						utils.sendFeedbackOld(feedbackData);
+
+						// Old feedback
+						// var oldFeedbackData = $.extend({}, feedbackData);
+						// oldFeedbackData.ads = [];
+						// oldFeedbackData.eventType = 1;
+						// oldFeedbackData.mode = 1;
+						// oldFeedbackData.xpathMiss = [adObj.id];
+						// utils.sendFeedbackOld(oldFeedbackData);
 					}
 				}
 				if (!displayCounter && !finished) {
