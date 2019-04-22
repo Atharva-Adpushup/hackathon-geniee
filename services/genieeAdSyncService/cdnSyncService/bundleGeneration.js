@@ -85,25 +85,27 @@ function init(site, config) {
 		]);
 		new webpack.ProgressPlugin().apply(compiler);
 		compiler.run((err, stats) => {
-			if (err) {
-				return reject(err);
-			}
-			return resolve();
+			return err ? reject(err) : resolve();
 		});
 	})
 		.then(() => {
-			debugger;
-			return [
-				config,
-				{
-					compressed: '',
-					uncompressed: ''
+			return Promise.join(
+				fs.readFileAsync(path.join(__dirname, buildPath, 'bundle.js')),
+				fs.readFileAsync(path.join(__dirname, buildPath, 'bundle.min.js')),
+				(uncompressed, compressed) => {
+					return [
+						config,
+						{
+							compressed,
+							uncompressed
+						}
+					];
 				}
-			];
+			);
 		})
 		.catch(err => {
-			console.log(err);
-			debugger;
+			console.log(`Error while creating webpack bundle for siteId ${siteId} and err is ${err}`);
+			throw err;
 		});
 }
 

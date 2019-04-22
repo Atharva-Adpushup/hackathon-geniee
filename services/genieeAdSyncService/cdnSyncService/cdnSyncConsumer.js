@@ -58,18 +58,6 @@ module.exports = function(site, externalData = {}) {
 		// 	prodEnv ? 'adptags.min.js' : 'adptags.js'
 		// ),
 		// prebidScriptPath = path.join(__dirname, '..', '..', 'adpTags', 'Prebid.js', 'build', 'dist', 'prebid.js'),
-		// tempDestPath = path.join(
-		// 	__dirname,
-		// 	'..',
-		// 	'..',
-		// 	'..',
-		// 	'public',
-		// 	'assets',
-		// 	'js',
-		// 	'builds',
-		// 	'geniee',
-		// 	site.get('siteId').toString()
-		// ),
 		// innovativeAdsScript = path.join(
 		// 	__dirname,
 		// 	'..',
@@ -81,6 +69,18 @@ module.exports = function(site, externalData = {}) {
 		// 	'builds',
 		// 	prodEnv ? 'adpInteractiveAds.min.js' : 'adpInteractiveAds.js'
 		// ),
+		tempDestPath = path.join(
+			__dirname,
+			'..',
+			'..',
+			'..',
+			'public',
+			'assets',
+			'js',
+			'builds',
+			'geniee',
+			site.get('siteId').toString()
+		),
 		setAllConfigs = function(combinedConfig) {
 			let apConfigs = site.get('apConfigs');
 			let isAdPartner = !!site.get('partner');

@@ -14,7 +14,7 @@
 		"comma-dangle": 0,
 		"spaced-comment": 0,
 		"global-require": 0,
-		"no-mixed-spaces-and-tabs": 2,
+		"no-mixed-spaces-and-tabs": 4,
 		"no-case-declarations": 0,
 		"no-console": 1,
 		"max-len": [2, 200],
