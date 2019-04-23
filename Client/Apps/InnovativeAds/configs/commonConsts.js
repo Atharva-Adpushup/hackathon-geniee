@@ -12,12 +12,12 @@ const PLATFORMS = [
 		name: 'Mobile',
 		image: '/assets/images/interactiveAdsManager/devices/smartphone.png',
 		key: 'mobile'
+	},
+	{
+		name: 'Tablet',
+		image: '/assets/images/interactiveAdsManager/devices/tablet.png',
+		key: 'tablet'
 	}
-	// {
-	// 	name: 'Tablet',
-	// 	image: '/assets/images/interactiveAdsManager/devices/tablet.png',
-	// 	key: 'tablet'
-	// }
 ];
 const FORMATS = {
 	DESKTOP: [
@@ -77,36 +77,28 @@ const FORMATS = {
 			disabled: '/assets/images/interactiveAdsManager/formats/mobile/in-view-disabled.jpg',
 			key: 'inView'
 		}
+	],
+	TABLET: [
+		{
+			name: 'Sticky Top',
+			image: '/assets/images/interactiveAdsManager/formats/tablet/sticky-top.gif',
+			disabled: '/assets/images/interactiveAdsManager/formats/tablet/sticky-top-disabled.jpg',
+			key: 'stickyTop'
+		},
+		{
+			name: 'Sticky Bottom',
+			image: '/assets/images/interactiveAdsManager/formats/tablet/sticky-bottom.gif',
+			disabled: '/assets/images/interactiveAdsManager/formats/tablet/sticky-bottom-disabled.jpg',
+			key: 'stickyBottom'
+		},
+		{
+			name: 'In View',
+			image: '/assets/images/interactiveAdsManager/formats/tablet/in-view.gif',
+			disabled: '/assets/images/interactiveAdsManager/formats/tablet/in-view-disabled.jpg',
+			key: 'inView'
+		}
 	]
 };
-const TYPES = [
-	{
-		name: 'Display (Text / Image)',
-		image: '/assets/images/interactiveAdsManager/display.png',
-		key: 'display',
-		description:
-			'A simple way to get ads on your page. Select size, generate code and you are good to go'
-	},
-	{
-		name: 'Native',
-		image: '/assets/images/interactiveAdsManager/native.png',
-		key: 'native',
-		description:
-			'Ads that flow seamlessly inside a list of articles or products on your site, offering a great user experience'
-	},
-	{
-		name: 'Links',
-		image: '/assets/images/interactiveAdsManager/links.png',
-		key: 'links',
-		description: 'Link units display a list of topics that are relevant to the content of your page'
-	},
-	{
-		name: 'AMP Ad',
-		image: '/assets/images/interactiveAdsManager/amp.png',
-		key: 'amp',
-		description: 'AMPHTML ads are a faster, lighter and more secure way to advertise on the web'
-	}
-];
 const SIZES = {
 	DESKTOP: {
 		DOCKED: ['336x280', '300x250', '250x250', '200x200', '300x600', '160x600', '120x600'],
@@ -120,6 +112,11 @@ const SIZES = {
 		STICKYTOP: ['320x100', '300x100', '320x50', '300x50'],
 		STICKYBOTTOM: ['320x100', '300x100', '320x50', '300x50'],
 		INVIEW: ['336x280', '300x250', '250x250', '200x200', '320x100', '300x100', '320x50', '300x50']
+	},
+	TABLET: {
+		STICKYTOP: ['728x90'],
+		STICKYBOTTOM: ['728x90'],
+		INVIEW: ['300x250']
 	}
 };
 const interactiveAdEvents = ['DOMContentLoaded', 'scriptLoaded']; // load', 'scroll', 'onMills',
@@ -251,7 +248,6 @@ export {
 	EVENTS,
 	PLATFORMS,
 	FORMATS,
-	TYPES,
 	SIZES,
 	displayAdMessage,
 	interactiveAdMessage,

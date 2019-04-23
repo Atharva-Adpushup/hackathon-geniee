@@ -145,15 +145,16 @@ body {
 	}
 }
 
+.ad-tr:hover {
+	.ad-td .adDetails-icon {
+		visibility: visible;
+	}
+}
+
 .ad-td {
 	.adDetails-icon {
 		visibility: hidden;
 		cursor: pointer;
-	}
-	&:hover {
-		.adDetails-icon {
-			visibility: visible;
-		}
 	}
 	.action-button {
 		border: 1px solid rgb(0, 0, 0);
