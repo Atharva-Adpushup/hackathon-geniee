@@ -179,7 +179,6 @@ class AdCodeGenerator extends Component {
 			{
 				progress: 0,
 				platform: '',
-				type: '',
 				size: null,
 				loading: false
 			},
