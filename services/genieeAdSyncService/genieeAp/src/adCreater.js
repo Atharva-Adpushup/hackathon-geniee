@@ -236,7 +236,7 @@ var $ = require('jquery'),
 						// New feedback
 						newFeedbackAdObj.xpathMiss = true;
 						newFeedbackAdObj.status = commonConsts.AD_STATUS.XPATH_MISS;
-						feedbackData.ads = [newFeedbackAdObj];
+						newFeedbackAdObj.ads = [newFeedbackAdObj];
 						feedbackData.newFeedbackAdObj = newFeedbackAdObj;
 
 						feedbackData.ads = [];

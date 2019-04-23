@@ -193,6 +193,7 @@ module.exports = {
 			data.newFeedback = this.base64Encode(JSON.stringify(newFeedback));
 		}
 
+		delete data.newFeedbackAdObj;
 		data.packetId = adpConfig.packetId;
 		data.siteId = adpConfig.siteId;
 		data.pageGroup = adpConfig.pageGroup;
