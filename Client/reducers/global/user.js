@@ -42,6 +42,16 @@ const user = (state = { fetched: false, data: {} }, action) => {
 				}
 			};
 		}
+
+		case USER_ACTIONS.UPDATE_AD_NETWORK_SETTINGS: {
+			return {
+				...state,
+				data: {
+					...state.data,
+					adNetworkSettings: action.data
+				}
+			};
+		}
 		default:
 			return state;
 	}

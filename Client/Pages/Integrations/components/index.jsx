@@ -93,22 +93,22 @@ class Integrations extends Component {
 	};
 
 	handlePostMessageHandler(event) {
+		const { updateAdNetworkSettings } = this.props;
 		const isStringData = !!(typeof event.data === 'string');
 		const parsedData = isStringData ? JSON.parse(event.data) : event.data;
 		const isValidData = !!(
 			Object.keys(parsedData).length === 2 &&
 			parsedData.cmd &&
 			parsedData.data &&
-			parsedData.data.adsenseEmail &&
-			parsedData.data.pubId
+			Array.isArray(parsedData.data) &&
+			parsedData.data.length
 		);
 
 		if (!isValidData) {
 			return false;
 		}
 
-		this.setState({ isGoogleOauthConnected: true });
-
+		this.setState({ isGoogleOauthConnected: true }, () => updateAdNetworkSettings(parsedData.data));
 		return true;
 	}
 
