@@ -21,3 +21,8 @@ export const forgotPasswordAction = email => dispatch => userService.forgotPassw
 export const resetPasswordAction = (email, key, password) => dispatch =>
 	userService.resetPassword(email, key, password);
 export const paymentsAction = () => dispatch => userService.payments();
+export const updateAdNetworkSettingsAction = data => dispatch =>
+	dispatch({
+		type: USER_ACTIONS.UPDATE_AD_NETWORK_SETTINGS,
+		data
+	});

@@ -20,56 +20,43 @@ class VerifyAdsTxtCodeOnboarding extends Component {
 	adsTxtRef = React.createRef();
 
 	componentDidUpdate() {
-		const { siteId, site, onComplete, isActive } = this.props;
+		const { site, isActive } = this.props;
 		const { ourAdsTxt, success, error } = this.state;
 
 		if (isActive && site && ourAdsTxt === 'loading...' && !success && !error) {
-			const onboardingStage = 'onboarded';
-			const step = 3;
-
-			proxyService
-				.verifyAdsTxtCode(site)
-				.then(resp => userService.setSiteStep(siteId, onboardingStage, step))
-				.then(() => siteService.saveSite(siteId, site, onboardingStage, step))
-				.then(() =>
-					this.setState(
-						() => ({
-							ourAdsTxt: '',
-							success: 'Ads.txt verified successfully. Redirecting to My Sites Page...'
-						}),
-						() => setTimeout(() => onComplete(), 3000)
-					)
-				)
-				.catch(err => {
-					if (err.response) {
-						const { error, ourAdsTxt } = err.response.data;
-
-						return this.setState(
-							err.response.status === 404
-								? { error, verifyingAdsTxt: false, ourAdsTxt }
-								: { error, verifyingAdsTxt: false }
-						);
-					}
-
-					return this.setState({ error: 'Something went wrong!' });
-				});
+			this.verify(true);
 		}
 	}
 
-	verify = () => {
-		this.setState({ verifyingAdsTxt: true });
+	verify = isOnloadVerify => {
+		if (isOnloadVerify !== true) this.setState({ verifyingAdsTxt: true });
 
 		const { siteId, site, onComplete } = this.props;
+
+		const onboardingStage = 'onboarded';
+		const step = 3;
 
 		proxyService
 			.verifyAdsTxtCode(site)
 			.then(resp => {
-				const { success } = resp.data;
-				const onboardingStage = 'onboarded';
-				const step = 3;
-
-				return userService.setSiteStep(siteId, onboardingStage, step);
+				if (resp.status !== 200) {
+					if (resp.status === 204) {
+						return proxyService.getAdsTxt().then(response =>
+							Promise.reject({
+								response: {
+									...resp,
+									data: {
+										error: 'Our Ads.txt entries not found!',
+										ourAdsTxt: response.data.adsTxtSnippet
+									}
+								}
+							})
+						);
+					}
+					return Promise.reject({ response: resp });
+				}
 			})
+			.then(() => userService.setSiteStep(siteId, onboardingStage, step))
 			.then(() => siteService.saveSite(siteId, site, onboardingStage, step))
 			.then(() =>
 				this.setState(
@@ -83,16 +70,19 @@ class VerifyAdsTxtCodeOnboarding extends Component {
 			)
 			.catch(err => {
 				if (err.response) {
-					const { error, ourAdsTxt } = err.response.data;
+					const {
+						status,
+						data: { error, ourAdsTxt }
+					} = err.response;
 
-					return this.setState(
-						err.response.status === 404
-							? { error, ourAdsTxt, verifyingAdsTxt: false }
-							: { error, verifyingAdsTxt: false }
-					);
+					return this.setState(() => {
+						if (status === 204 || status === 206 || status === 404)
+							return { error, verifyingAdsTxt: false, ourAdsTxt };
+						return { error, verifyingAdsTxt: false };
+					});
 				}
 
-				return this.setState({ verifyingAdsTxt: false, error: 'Something went wrong!' });
+				return this.setState({ error: 'Something went wrong!', verifyingAdsTxt: false });
 			});
 	};
 

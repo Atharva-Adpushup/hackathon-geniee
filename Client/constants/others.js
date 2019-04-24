@@ -11,4 +11,9 @@ const ADSTXT_STATUS = {
 	3: 'No Ads.txt Found'
 };
 
-export { ADSTXT_SITE_LIST_HEADERS, ADSTXT_STATUS };
+const ROUTES = {
+	BLACK_LIST: ['/addSite', '/onboarding'],
+	DYNAMIC_PARAMS: [':siteId']
+};
+
+export { ADSTXT_SITE_LIST_HEADERS, ADSTXT_STATUS, ROUTES };

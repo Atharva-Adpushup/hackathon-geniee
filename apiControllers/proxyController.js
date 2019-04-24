@@ -20,7 +20,7 @@ router
 		proxy
 			.fetchOurAdsTxt()
 			.then(ourAdsTxt => proxy.verifyAdsTxt(req.query.url, ourAdsTxt))
-			.then(response => res.status(httpStatus.OK).json(response))
+			.then(response => res.status(httpStatus.OK).json({ success: 'Our Ads.txt entries found!' }))
 			.catch(err => {
 				if (err instanceof AdPushupError) {
 					return res
