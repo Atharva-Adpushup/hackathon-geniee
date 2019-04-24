@@ -5,7 +5,11 @@ import { withKnobs, object, array, select, text } from '@storybook/addon-knobs';
 import CustomChart from './Components/CustomChart';
 import defaultPieChartConfig from './customChartDummyData/pie.json';
 import defaultLineChartConfig from './customChartDummyData/line.json';
-import apLineChartConfig from './customChartDummyData/line-ap-data.json';
+import {
+	chartConfig,
+	defaultYAxisGroups,
+	activeLegendItemsArr
+} from './customChartDummyData/line-ap-data.json';
 
 const typeOptions = {
 	Line: 'line',
@@ -13,38 +17,16 @@ const typeOptions = {
 	Pie: 'pie'
 };
 
-const defaultYAxisGroups = [
-	{
-		seriesNames: ['Pageviews', 'Adpushup Requests', 'Impressions', 'Xpath Miss']
-	},
-	{
-		seriesNames: ['Page CPM ($)', 'CPM ($)'],
-		yAxisConfig: {
-			labels: {
-				format: '${value}'
-			}
-		}
-	},
-	{
-		seriesNames: ['Revenue ($)', 'Gross Revenue ($)'],
-		yAxisConfig: {
-			labels: {
-				format: '${value}'
-			}
-		}
-	}
-];
-
 storiesOf('UI.CustomChart', module)
 	.addDecorator(withKnobs)
 	.add('default', () => {
 		const title = text('Chart Title', 'My Chart');
 		const type = select('Chart Type', typeOptions, 'spline');
-		const series = array('Series', apLineChartConfig.series);
-		const categories = object('Categories', apLineChartConfig.categories);
-		const legends = object('Legends', apLineChartConfig.legends);
+		const series = array('Series', chartConfig.series);
+		const categories = object('Categories', chartConfig.categories);
+		const legends = object('Legends', chartConfig.legends);
 		const customConfig = object('Custom Config');
-		const activeLegendItems = array('Active Legend Items', ['Impressions', 'Pageviews', 'CPM ($)']);
+		const activeLegendItems = array('Active Legend Items', activeLegendItemsArr);
 		const yAxisGroups = array('yAxis Groups', defaultYAxisGroups);
 
 		return (
