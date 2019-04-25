@@ -2,7 +2,8 @@
 
 function getTickRoundOff(min, max) {
 	const diff = max - min;
-
+	if (diff < 1) return 0.1;
+	if (diff < 5) return 0.5;
 	if (diff < 10) return 1;
 	if (diff < 50) return 2;
 	if (diff < 100) return 5;
