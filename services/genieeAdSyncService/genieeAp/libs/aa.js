@@ -1,5 +1,5 @@
 (function() {
-	function IncontentAnalyzer(config) {
+	function IncontentAnalyzer(initOptions) {
 		this.$ = window.adpushup.$;
 		this.selectedElems = [];
 		this.containerWidth;
@@ -10,8 +10,8 @@
 		this.rootBackgroundColor;
 		this.placements = {};
 		this.started = false;
-		this.isEvenSpacingAlgo = config.isEvenSpacingAlgo || true;
-		this.defaultSectionBracket = config.sectionBracket || 600;
+		this.isEvenSpacingAlgo = initOptions.isEvenSpacingAlgo || true;
+		this.defaultSectionBracket = initOptions.sectionBracket || 600;
 
 		if (!window.console || !console.log) {
 			window.console = {};
@@ -261,7 +261,7 @@
 							: true;
 
 					return (
-						$this.css('display') == 'block' &&
+						$this.css('display') === 'block' &&
 						$this.height() > 10 &&
 						$this.width() > 200 &&
 						$this.height() < 1000 &&
@@ -273,7 +273,6 @@
 
 				$(blockChildren).each(function() {
 					var childPos = $(this).offset();
-					var childHeight = $(this).height();
 
 					if (childPos.top - rootPos.top >= top && childPos.top - rootPos.top <= bottom) {
 						ref.selectedElems.push(this);
@@ -295,7 +294,7 @@
 
 			$.fn.ignoreXpaths = function(xPathArr, minGap) {
 				// Convert all xPaths into a singular list of elements
-				var resolveXpaths = function(xPathArr) {
+				var resolveXpaths = function() {
 					var allElems = [];
 
 					xPathArr.forEach(function(xPath) {
@@ -305,7 +304,7 @@
 					return allElems;
 				};
 
-				resolveXpaths(xPathArr).forEach(function(xPath) {
+				resolveXpaths().forEach(function(xPath) {
 					var $xpathEl = $(xPath),
 						$xpathOffset = $xpathEl.offset(),
 						$xpathHeight = $xpathEl.height();
@@ -462,7 +461,7 @@
 					ref.started = true;
 					$(placementConfig).each(function(i, adObj) {
 						var sectionNumber = adObj.section;
-						var placeFn = function(adObj) {
+						var placeFn = function() {
 							var computedSectionNumber = ref.isEvenSpacingAlgo ? i + 1 : adObj.section;
 							var isNotNear = !!(adObj.notNear && adObj.notNear.length);
 							var isIgnoreXpaths = !!(adObj.ignoreXpaths && adObj.ignoreXpaths.length);
@@ -505,11 +504,11 @@
 
 							$selector.setPlacementForSection(adObj, adObj.minDistanceFromPrevAd);
 						};
-						placeFn(adObj);
+						placeFn();
 
 						if (!ref.placements[sectionNumber]) {
 							adObj.css.float = 'none';
-							placeFn(adObj);
+							placeFn();
 
 							if (ref.placements[sectionNumber]) {
 								ref.placements[sectionNumber].isSecondaryCss = true;
