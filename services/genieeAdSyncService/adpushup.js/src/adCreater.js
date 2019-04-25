@@ -1,19 +1,21 @@
+if (INCONTENT_ACTIVE) {
+	var incontentAnalyser = require('../libs/aa');
+}
 var $ = require('jquery'),
 	nodewatcher = require('../libs/nodeWatcher'),
 	utils = require('../libs/utils'),
 	isAdContainerInView = require('../libs/lazyload'),
 	browserConfig = require('../libs/browserConfig'),
-	incontentAnalyser = __IN_CONTENT_ANALYSER_SCRIPT__,
 	adCodeGenerator = require('./adCodeGenerator'),
 	refreshAdSlot = require('./refreshAdSlot'),
 	commonConsts = require('../config/commonConsts'),
-	shouldPushToADP = function (ad) {
+	shouldPushToADP = function(ad) {
 		return (
 			(ad.network === 'adpTags' && ad.networkData) ||
 			(ad.network === 'geniee' && ad.networkData && ad.networkData.dynamicAllocation)
 		);
 	},
-	segregateAds = function (ads) {
+	segregateAds = function(ads) {
 		var a,
 			ad,
 			structuredAds = [],
@@ -53,7 +55,7 @@ var $ = require('jquery'),
 			}
 		}
 
-		inContentAds.sort(function (next, prev) {
+		inContentAds.sort(function(next, prev) {
 			return parseInt(next.section, 10) > parseInt(prev.section, 10);
 		});
 		return {
@@ -65,7 +67,7 @@ var $ = require('jquery'),
 			medianetAds: medianetAds
 		};
 	},
-	getContainer = function (ad, el) {
+	getContainer = function(ad, el) {
 		if (!el) {
 			el = $(ad.xpath);
 		}
@@ -90,13 +92,15 @@ var $ = require('jquery'),
 			defaultAdProperties['text-align'] = 'center';
 		}
 
-		container = $('<div/>').css($.extend(defaultAdProperties, ad.css)).attr({
-			id: isGenieePartner ? computedSSPContainerId : ad.id,
-			'data-section': ad.id,
-			class: '_ap_apex_ad',
-			'data-xpath': ad.xpath ? ad.xpath : '',
-			'data-section-id': ad.section ? ad.section : ''
-		});
+		container = $('<div/>')
+			.css($.extend(defaultAdProperties, ad.css))
+			.attr({
+				id: isGenieePartner ? computedSSPContainerId : ad.id,
+				'data-section': ad.id,
+				class: '_ap_apex_ad',
+				'data-xpath': ad.xpath ? ad.xpath : '',
+				'data-section-id': ad.section ? ad.section : ''
+			});
 
 		switch (ad.operation) {
 			case 'Append':
@@ -113,23 +117,23 @@ var $ = require('jquery'),
 		}
 		return container;
 	},
-	getAdContainer = function (ad, xpathWaitTimeout) {
+	getAdContainer = function(ad, xpathWaitTimeout) {
 		// eslint-disable-next-line new-cap
 		var defer = $.Deferred();
 		nodewatcher
 			.watch(ad.xpath, xpathWaitTimeout)
-			.done(function () {
+			.done(function() {
 				var container = getContainer(ad);
 				container
 					? defer.resolve({ container: container, success: true })
 					: defer.reject({ xpathMiss: true, success: false });
 			})
-			.fail(function () {
+			.fail(function() {
 				defer.reject({ xpathMiss: true, success: false });
 			});
 		return defer.promise();
 	},
-	executeAfterJS = function (variation) {
+	executeAfterJS = function(variation) {
 		try {
 			utils.runScript(utils.base64Decode(variation.customJs.afterAp));
 		} catch (e) {
@@ -137,7 +141,7 @@ var $ = require('jquery'),
 		}
 		window.adpushup.afterJSExecuted = true;
 	},
-	placeAd = function (container, ad) {
+	placeAd = function(container, ad) {
 		var adp = window.adpushup;
 
 		try {
@@ -174,12 +178,12 @@ var $ = require('jquery'),
 		}
 		return true;
 	},
-	filterNonInteractiveAds = function (ads) {
-		return ads.filter(function (ad) {
+	filterNonInteractiveAds = function(ads) {
+		return ads.filter(function(ad) {
 			return !ad.type || (ad.type && ad.type !== commonConsts.AD_TYPES.INTERACTIVE_AD);
 		});
 	},
-	createAds = function (adp, variation) {
+	createAds = function(adp, variation) {
 		var config = adp.config,
 			err = adp.err,
 			finished = false,
@@ -196,18 +200,18 @@ var $ = require('jquery'),
 				// Replaced '-' with '_' to avoid ElasticSearch split issue
 				variationId: variation.id // set the chosenVariation variation in feedback data;
 			},
-			placeGenieeHeadCode = function (genieeIdCollection) {
+			placeGenieeHeadCode = function(genieeIdCollection) {
 				var genieeHeadCode = adCodeGenerator.generateGenieeHeaderCode(genieeIdCollection);
 				genieeHeadCode && $('head').append(genieeHeadCode);
 			},
-			handleContentSelectorFailure = function (inContentAds) {
+			handleContentSelectorFailure = function(inContentAds) {
 				feedbackData.contentSelectorMissing = true;
-				$.each(inContentAds, function (index, ad) {
+				$.each(inContentAds, function(index, ad) {
 					//feedbackData.xpathMiss.push(ad.id);
 					next(ad, { success: false });
 				});
 			},
-			next = function (adObj, data) {
+			next = function(adObj, data) {
 				if (displayCounter) {
 					displayCounter--;
 					if (data.success) {
@@ -232,14 +236,14 @@ var $ = require('jquery'),
 					//utils.sendFeedback(feedbackData);
 				}
 			},
-			placeStructuralAds = function (structuredAds) {
+			placeStructuralAds = function(structuredAds) {
 				// Process strutural sections
 				//window.adpushup.lazyload.cb = next;
-				$.each(structuredAds, function (index, ad) {
+				$.each(structuredAds, function(index, ad) {
 					getAdContainer(ad, config.xpathWaitTimeout)
-						.done(function (data) {
+						.done(function(data) {
 							if (ad.enableLazyLoading == true) {
-								isAdContainerInView(data.container).done(function () {
+								isAdContainerInView(data.container).done(function() {
 									next(ad, data);
 								});
 							} else next(ad, data);
@@ -255,15 +259,15 @@ var $ = require('jquery'),
 							// 	window.adpushup.lazyload.ads.push({ ad: ad, data: data });
 							// }
 						})
-						.fail(function (data) {
+						.fail(function(data) {
 							//feedbackData.xpathMiss.push(ad.id);
 							next(ad, data);
 						});
 				});
 			},
-			placeInContentAds = function ($incontentElm, inContentAds) {
-				incontentAnalyser($incontentElm, inContentAds, function (sectionsWithTargetElm) {
-					$(inContentAds).each(function (index, ad) {
+			placeInContentAds = function($incontentElm, inContentAds) {
+				incontentAnalyser($incontentElm, inContentAds, function(sectionsWithTargetElm) {
+					$(inContentAds).each(function(index, ad) {
 						var sectionObj = sectionsWithTargetElm[ad.section],
 							$containerElement,
 							isContainerElement,
@@ -326,10 +330,10 @@ var $ = require('jquery'),
 			} else if (ads.inContentAds.length) {
 				nodewatcher
 					.watch(contentSelector, config.xpathWaitTimeout)
-					.done(function ($incontentElm) {
+					.done(function($incontentElm) {
 						placeInContentAds($incontentElm, ads.inContentAds);
 					})
-					.fail(function () {
+					.fail(function() {
 						handleContentSelectorFailure(ads.inContentAds);
 					});
 			}

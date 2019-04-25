@@ -131,7 +131,7 @@ module.exports = function(site, externalData = {}) {
 		},
 		generateFinalInitScript = (jsFile, uncompressedJsFile) => {
 			return {
-				addService: (serviceName, serviceConfig = {}, serviceScript = null) => {
+				addService: (serviceName, isActive, serviceConfig = {}) => {
 					switch (serviceName) {
 						case CC.SERVICES.INCONTENT_ANALYSER:
 							serviceScript = serviceScript.substring(0, serviceScript.trim().length - 1);
@@ -154,52 +154,15 @@ module.exports = function(site, externalData = {}) {
 							return generateFinalInitScript(jsFile, uncompressedJsFile);
 
 						case CC.SERVICES.ADPTAGS:
-							if (serviceConfig) {
-								serviceScript = _.replace(
-									serviceScript,
-									'__INVENTORY__',
-									JSON.stringify(serviceConfig)
-								);
-								serviceScript = _.replace(serviceScript, '__SITE_ID__', site.get('siteId'));
-								jsFile = `${jsFile};${serviceScript}`;
-								uncompressedJsFile = `${uncompressedJsFile};${serviceScript}`;
+							if (isActive) {
+								jsFile = _.replace(jsFile, '__INVENTORY__', JSON.stringify(serviceConfig));
+								uncompressedJsFile = _.replace(uncompressedJsFile, '__SITE_ID__', site.get('siteId'));
 							}
 							return generateFinalInitScript(jsFile, uncompressedJsFile);
 
 						case CC.SERVICES.HEADER_BIDDING:
-							serviceScript = serviceScript.substring(50, serviceScript.trim().length - 1);
-							const isValidHBConfig = !!(
-									serviceConfig &&
-									serviceConfig.hbcf.value &&
-									serviceConfig.hbcf.value.hbConfig &&
-									serviceConfig.hbAds.length
-								),
-								isValidCurrencyConfig = !!(
-									isValidHBConfig &&
-									serviceConfig.currency &&
-									Object.keys(serviceConfig.currency).length &&
-									serviceConfig.currency.adServerCurrency &&
-									serviceConfig.currency.granularityMultiplier &&
-									serviceConfig.currency.rates
-								);
-
-							if (isValidHBConfig) {
-								jsFile = _.replace(jsFile, '__PREBID_SCRIPT__', serviceScript);
-								uncompressedJsFile = _.replace(uncompressedJsFile, '__PREBID_SCRIPT__', serviceScript);
-
-								let { deviceConfig } = serviceConfig.hbcf.value;
-								if (deviceConfig && deviceConfig.sizeConfig.length) {
-									deviceConfig = ',sizeConfig: ' + JSON.stringify(deviceConfig.sizeConfig);
-								} else {
-									deviceConfig = '';
-								}
-
-								let prebidCurrencyConfig = serviceConfig.currency;
-								if (isValidCurrencyConfig) {
-									prebidCurrencyConfig = ',currency: ' + JSON.stringify(prebidCurrencyConfig);
-								} else {
-									prebidCurrencyConfig = '';
-								}
+							if (isActive) {
+								let { deviceConfig = '', prebidCurrencyConfig = '' } = serviceConfig;
 
 								jsFile = _.replace(jsFile, '__SIZE_CONFIG__', deviceConfig);
 								jsFile = _.replace(jsFile, '__PREBID_CURRENCY_CONFIG__', prebidCurrencyConfig);
@@ -210,9 +173,6 @@ module.exports = function(site, externalData = {}) {
 									'__PREBID_CURRENCY_CONFIG__',
 									prebidCurrencyConfig
 								);
-							} else {
-								jsFile = _.replace(jsFile, '__PREBID_SCRIPT__', '');
-								uncompressedJsFile = _.replace(uncompressedJsFile, '__PREBID_SCRIPT__', '');
 							}
 							return generateFinalInitScript(jsFile, uncompressedJsFile);
 
@@ -342,7 +302,7 @@ module.exports = function(site, externalData = {}) {
 			return getConfigWrapper(site)
 				.then(generatedConfig => bundleGeneration(site, generatedConfig))
 				.spread((generatedConfig, bundles) => {
-					let { apConfigs, adpTagsConfig, finalConfig } = generatedConfig;
+					let { apConfigs, adpTagsConfig, statusesAndAds: finalConfig } = generatedConfig;
 					let { uncompressed, compressed } = bundles;
 
 					if (site.get('medianetId')) apConfigs.medianetId = site.get('medianetId');
@@ -354,16 +314,26 @@ module.exports = function(site, externalData = {}) {
 					uncompressed = _.replace(uncompressed, /__SITE_ID__/g, site.get('siteId'));
 					uncompressed = _.replace(uncompressed, '__COUNTRY__', false);
 
+					// Generate final init script based on the services that are enabled
+					var scripts = generateFinalInitScript(compressed, uncompressed)
+						.addService(CC.SERVICES.ADPTAGS, finalConfig.statuses.ADPTAG_ACTIVE, adpTagsConfig)
+						.addService(CC.SERVICES.HEADER_BIDDING, finalConfig.statuses.HB_ACTIVE, {
+							deviceConfig: config.deviceConfig,
+							prebidCurrencyConfig: config.prebidCurrencyConfig
+						})
+						// .addService(CC.SERVICES.GDPR, gdpr)
+						.done();
+
 					return {
-						default: compressed,
-						uncompressed
+						default: scripts.jsFile,
+						uncompressed: scripts.uncompressedJsFile
 					};
 				});
 		},
-		writeTempFile = function(jsFile) {
+		writeTempFile = function(jsFile, name = 'adpushup.js') {
 			return mkdirpAsync(tempDestPath)
 				.then(function() {
-					return fs.writeFileAsync(path.join(tempDestPath, 'adpushup.js'), jsFile);
+					return fs.writeFileAsync(path.join(tempDestPath, name), jsFile);
 				})
 				.then(() => jsFile);
 		},
@@ -405,6 +375,7 @@ module.exports = function(site, externalData = {}) {
 		}
 		return processing()
 			.then(writeTempFile)
+			.then(() => writeTempFile(fileConfig.default, 'adpushup.min.js'))
 			.then(() => {
 				if (ftp.getConnectionStatus() === 'connected') {
 					ftp.end();

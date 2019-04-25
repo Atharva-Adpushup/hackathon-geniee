@@ -1,23 +1,33 @@
 const path = require('path');
 const webpack = require('webpack');
-const buildPath = '../../public/assets/js/builds/';
+const buildPath = '../../../public/assets/js/builds/';
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = [
 	{
 		//devtool: 'cheap-module-source-map',
-		entry: path.join(__dirname, 'index.js'),
+		entry: {
+			adpushup: path.join(__dirname, 'main.js')
+		},
 		output: {
 			path: path.join(__dirname, buildPath),
-			filename: 'adpInteractiveAds.js',
-			chunkFilename: 'adpInteractiveAds.js',
+			filename: '[name].js',
+			chunkFilename: '[name].js'
+		},
+		resolve: {
+			alias: {
+				interactiveAds: path.resolve(__dirname, '../../interactiveAds/')
+			}
 		},
 		module: {
 			loaders: [
 				{
 					test: /.jsx?$/,
 					loader: 'babel-loader',
-					exclude: /node_modules/
+					exclude: /node_modules/,
+					options: {
+						presets: [['es2015', { loose: true }], 'stage-2']
+					}
 				},
 				{
 					test: /.css?$/,
@@ -31,25 +41,34 @@ module.exports = [
 		},
 		plugins: [
 			// new BundleAnalyzerPlugin({
-			// 	analyzerPort: 8083
+			// 	analyzerPort: 8082
 			// })
 		]
-
 	},
 	{
 		//devtool: 'cheap-module-source-map',
-		entry: path.join(__dirname, 'index.js'),
+		entry: {
+			adpushup: path.join(__dirname, 'main.js')
+		},
 		output: {
 			path: path.join(__dirname, buildPath),
-			filename: 'adpInteractiveAds.min.js',
-			chunkFilename: 'adpInteractiveAds.min.js'
+			filename: '[name].min.js',
+			chunkFilename: '[name].min.js'
+		},
+		resolve: {
+			alias: {
+				interactiveAds: path.resolve(__dirname, '../../interactiveAds/')
+			}
 		},
 		module: {
 			loaders: [
 				{
 					test: /.jsx?$/,
 					loader: 'babel-loader',
-					exclude: /node_modules/
+					exclude: /node_modules/,
+					options: {
+						presets: [['es2015', { loose: true }], 'stage-2']
+					}
 				},
 				{
 					test: /.css?$/,

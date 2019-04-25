@@ -5,10 +5,10 @@ const couchbase = require('../../../helpers/couchBaseService');
 const { getHbAdsApTag } = require('./generateAPTagConfig');
 const { isValidThirdPartyDFPAndCurrency } = require('../../../helpers/commonFunctions');
 
-function getHbConfig() {
+function getHbConfig(siteId) {
 	return couchbase
 		.connectToAppBucket()
-		.then(appBucket => appBucket.getAsync(`hbcf::${site.get('siteId')}`, {}))
+		.then(appBucket => appBucket.getAsync(`hbcf::${siteId}`, {}))
 		.catch(err => Promise.resolve({}));
 }
 
@@ -27,7 +27,7 @@ function HbProcessing(site, apConfigs) {
 	const isManual = site.get('isManual');
 
 	return Promise.join(
-		getHbConfig(),
+		getHbConfig(siteId),
 		siteModel.getIncontentAndHbAds(siteId),
 		getHbAdsApTag(siteId, isManual),
 		(hbcf, incontentAndHbAds, hbAdsApTag) => {
@@ -95,8 +95,12 @@ function init(site, computedConfig) {
 	const { apConfigs, adpTagsConfig } = computedConfig;
 	let statusesAndAds = {
 		statuses: {
-			APTAG_ACTIVE: !!apConfigs.manualModeActive,
-			INNOVATIVE_ADS_ACTIVE: !!apConfigs.innovativeModeActive,
+			APTAG_ACTIVE: !!(apConfigs.manualModeActive && apConfigs.manualAds && apConfigs.manualAds.length),
+			INNOVATIVE_ADS_ACTIVE: !!(
+				apConfigs.innovativeModeActive &&
+				apConfigs.innovativeAds &&
+				apConfigs.innovativeAds.length
+			),
 			LAYOUT_ACTIVE: !!apConfigs.mode || false,
 			ADPTAG_ACTIVE: !!adpTagsConfig,
 			SPA_ACTIVE: !!apConfigs.isSPA,

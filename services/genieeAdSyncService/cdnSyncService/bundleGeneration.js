@@ -19,7 +19,7 @@ function init(site, config) {
 		const compiler = webpack([
 			{
 				entry: {
-					bundle: path.join(__dirname, '..', 'genieeAp', 'main.js')
+					bundle: path.join(__dirname, '..', 'adpushup.js', 'main.js')
 				},
 				output: {
 					path: path.join(__dirname, buildPath),
@@ -47,7 +47,7 @@ function init(site, config) {
 			},
 			{
 				entry: {
-					bundle: path.join(__dirname, '..', 'genieeAp', 'main.js')
+					bundle: path.join(__dirname, '..', 'adpushup.js', 'main.js')
 				},
 				output: {
 					path: path.join(__dirname, buildPath),
@@ -90,8 +90,8 @@ function init(site, config) {
 	})
 		.then(() => {
 			return Promise.join(
-				fs.readFileAsync(path.join(__dirname, buildPath, 'bundle.js')),
-				fs.readFileAsync(path.join(__dirname, buildPath, 'bundle.min.js')),
+				fs.readFileAsync(path.join(__dirname, buildPath, 'bundle.js'), 'utf-8'),
+				fs.readFileAsync(path.join(__dirname, buildPath, 'bundle.min.js'), 'utf-8'),
 				(uncompressed, compressed) => {
 					return [
 						config,

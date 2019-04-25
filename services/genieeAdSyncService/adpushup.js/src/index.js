@@ -12,14 +12,7 @@ var hookAndInit = require('./hooksAndBlockList');
 var control = require('./control')();
 var adCodeGenerator = require('./adCodeGenerator');
 var session = require('../libs/session');
-
-/**
- * Should we set initial values to all variables/modules required optionally?
- * Selected Variation is only required when layout is active
- * 	- Mode: 1 | Layout Active
- * 	- Mode: 2 | Layout Paused but in this selected variation won't work so innovative ads won't work too
- * Should we make Refresh Ad module optional?
- */
+var refreshAdSlot = require('./refreshAdSlot');
 
 if (LAYOUT_ACTIVE) {
 	var selectVariation = require('./variationSelectionModels/index');
@@ -28,17 +21,18 @@ if (LAYOUT_ACTIVE) {
 if (GENIEE_ACTIVE) {
 	var genieeObject = require('./genieeObject');
 }
-if (APTAG_ACTIVE) {
-	var triggerAd = require('./trigger');
-}
 if (SPA_ACTIVE) {
 	var spaHandler = require('./spaHandler');
 }
-// if (INNOVATIVE_ADS_ACTIVE) {
-// 	var processInnovativeAds = require('../');
-// }
-
-var refreshAdSlot = require('./refreshAdSlot');
+if (APTAG_ACTIVE) {
+	var triggerAd = require('./trigger');
+}
+if (INNOVATIVE_ADS_ACTIVE) {
+	var processInnovativeAds = require('../modules/interactiveAds/index');
+}
+if (ADPTAG_ACTIVE) {
+	require('../modules/adpTags/hbScript/index');
+}
 
 // var	Tracker = require('../libs/tracker');
 // var	heartBeat = require('../libs/heartBeat');
@@ -107,7 +101,10 @@ function initAdpConfig() {
 			LAYOUT_ACTIVE: LAYOUT_ACTIVE,
 			ADPTAG_ACTIVE: ADPTAG_ACTIVE,
 			SPA_ACTIVE: SPA_ACTIVE,
-			GENIEE_ACTIVE: GENIEE_ACTIVE
+			GENIEE_ACTIVE: GENIEE_ACTIVE,
+			HB_ACTIVE: HB_ACTIVE,
+			GDPR_ACTIVE: GDPR_ACTIVE,
+			INCONTENT_ACTIVE: INCONTENT_ACTIVE
 		}
 	});
 
@@ -168,7 +165,7 @@ function triggerControl(mode, errorCode) {
 }
 
 function selectVariationWrapper() {
-	if (LAYOUT_ACTIVE && selectVariation) {
+	if (w.adpushup.services.LAYOUT_ACTIVE && selectVariation) {
 		return selectVariation(config);
 	}
 	return Promise.resolve({
@@ -230,8 +227,13 @@ function startCreation(forced) {
 			var finalInteractiveAds = !isControlVariation
 				? innovativeInteractiveAds.concat(layoutAndManualInteractiveAds)
 				: layoutAndManualInteractiveAds;
+			var shouldRunInnovatibeAds = !!(
+				w.adpushup.services.INNOVATIVE_ADS_ACTIVE &&
+				finalInteractiveAds &&
+				finalInteractiveAds.length
+			);
 
-			if (finalInteractiveAds && finalInteractiveAds.length) {
+			if (shouldRunInnovatibeAds) {
 				try {
 					function refreshSlotProcessing() {
 						var ads = finalInteractiveAds;
@@ -248,7 +250,7 @@ function startCreation(forced) {
 							}
 						}
 					}
-					w.adpushup.processInnovativeAds(finalInteractiveAds, refreshSlotProcessing);
+					processInnovativeAds(finalInteractiveAds, refreshSlotProcessing);
 				} catch (e) {
 					console.log('Innovative Ads Failed', e);
 				}
