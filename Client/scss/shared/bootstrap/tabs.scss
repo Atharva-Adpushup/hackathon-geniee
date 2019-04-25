@@ -32,6 +32,10 @@
 
 			a {
 				border-bottom: 3px solid $primaryColor;
+
+				.svg-inline--fa {
+					pointer-events: all;
+				}
 			}
 
 			a:hover,

@@ -263,7 +263,11 @@ class AdElement extends Component {
 
 	render() {
 		const { identifier } = this.props;
-		return <tr key={identifier}>{this.renderAdDetails()}</tr>;
+		return (
+			<tr key={identifier} className="ad-tr">
+				{this.renderAdDetails()}
+			</tr>
+		);
 	}
 }
 

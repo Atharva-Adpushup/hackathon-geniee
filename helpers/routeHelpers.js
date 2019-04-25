@@ -136,7 +136,7 @@ function masterSave(req, res, adUpdateProcessing, directDBUpdate, docKey, mode =
 			res
 		);
 	}
-	return adUpdateProcessing(req, res, docWithCas => {
+	return adUpdateProcessing(req, res, docKey, docWithCas => {
 		const doc = docWithCas.value;
 		const { siteId } = req.body;
 		if (doc.ownerEmail !== req.user.email) {

@@ -42,7 +42,7 @@ class ControlTagConversion extends Component {
 	}
 
 	getConvertedAdCode() {
-		const { siteId, inputCode } = this.state;
+		const { siteId, inputCode, selectedNetwork } = this.state;
 		const {
 			medianet: { adId, adWidth, adHeight, crId, versionId, cId }
 		} = this.state;
@@ -54,15 +54,21 @@ class ControlTagConversion extends Component {
 		const isValidMedianetNetworkData = !!(adId && adWidth && adHeight && crId && versionId && cId);
 		const computedNetworkNumber = isMedianetNetworkSelection ? 2 : 1;
 
-		if (!isValidNetworkSelection || (isNotMedianetNetworkSelection && !isValidAllNetworksData)) {
+		if (!isValidNetworkSelection) {
 			// eslint-disable-next-line no-alert
-			window.alert('Please fill All networks related UI fields');
+			window.alert('Please select the ad network type to transform code');
+			return false;
+		}
+
+		if (isNotMedianetNetworkSelection && !isValidAllNetworksData) {
+			// eslint-disable-next-line no-alert
+			window.alert(`Please enter ${selectedNetwork} ad code`);
 			return false;
 		}
 
 		if (isMedianetNetworkSelection && !isValidMedianetNetworkData) {
 			// eslint-disable-next-line no-alert
-			window.alert('Please fill Medianet network related UI fields');
+			window.alert(`Please fill ${selectedNetwork} network related fields`);
 			return false;
 		}
 
@@ -116,9 +122,8 @@ class ControlTagConversion extends Component {
 	handleInputChangeHandler(inputParam) {
 		const isInputParam = !!inputParam;
 		const isElement = !!(isInputParam && inputParam.target);
-		const isValue = !!(isElement && inputParam.target.value);
 
-		if (isValue) {
+		if (isElement) {
 			const {
 				target: { name, value }
 			} = inputParam;
@@ -135,27 +140,27 @@ class ControlTagConversion extends Component {
 					break;
 
 				case 'adWidth':
-					medianet.adWidth = Number(value);
+					medianet.adWidth = value;
 					this.setState({ medianet });
 					break;
 
 				case 'adHeight':
-					medianet.adHeight = Number(value);
+					medianet.adHeight = value;
 					this.setState({ medianet });
 					break;
 
 				case 'crId':
-					medianet.crId = Number(value);
+					medianet.crId = value;
 					this.setState({ medianet });
 					break;
 
 				case 'versionId':
-					medianet.versionId = Number(value);
+					medianet.versionId = value;
 					this.setState({ medianet });
 					break;
 
 				case 'cId':
-					medianet.cId = Number(value);
+					medianet.cId = value;
 					this.setState({ medianet });
 					break;
 

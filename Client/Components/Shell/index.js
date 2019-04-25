@@ -5,6 +5,7 @@ import Header from './Header';
 import Sidebar from './Sidebar';
 import Loader from '../Loader/index';
 import { domanize } from '../../helpers/commonFunctions';
+import { ROUTES } from '../../constants/others';
 
 import NotificationContainer from '../../Containers/NotificationContainer';
 
@@ -37,9 +38,22 @@ class Shell extends React.Component {
 		</div>
 	);
 
+	isBlackListedRoute = path => {
+		const { BLACK_LIST: blackListedArray } = ROUTES;
+		const isValid = !!(blackListedArray.indexOf(path) > -1);
+
+		return isValid;
+	};
+
 	getRoutes = (collection, location, user) => {
-		const dynamicParamsArray = [':siteId'];
+		const { DYNAMIC_PARAMS: dynamicParamsArray } = ROUTES;
 		const userSites = user && user.sites;
+		const { pathname } = location;
+		const isBlackListedRoute = this.isBlackListedRoute(pathname);
+
+		if (isBlackListedRoute) {
+			return false;
+		}
 
 		return collection.reduce((accumulator, value) => {
 			const { path } = value.props;
@@ -47,15 +61,15 @@ class Shell extends React.Component {
 
 			dynamicParamsArray.forEach(param => {
 				const isParamInPath = !!path.match(param);
-				const siteIdInEndMatch = location.pathname.match('/[0-9]{1,10}$');
-				const siteIdInBetweenMatch = location.pathname.match('/[0-9]{1,10}/');
+				const siteIdInEndMatch = pathname.match('/[0-9]{1,10}$');
+				const siteIdInBetweenMatch = pathname.match('/[0-9]{1,10}/');
 
 				if (!isParamInPath) {
 					return true;
 				}
 
 				if (siteIdInEndMatch) {
-					const siteId = location.pathname.substring(siteIdInEndMatch.index + 1);
+					const siteId = pathname.substring(siteIdInEndMatch.index + 1);
 					const siteName = userSites && user.sites[siteId] && user.sites[siteId].domain;
 
 					if (siteName) {
@@ -98,7 +112,7 @@ class Shell extends React.Component {
 				<Row className="sidebar-main-wrap">
 					<Sidebar show={isSidebarOpen} />
 					<main className="main-content">
-						<Breadcrumbs mappedRoutes={routes} />
+						{routes ? <Breadcrumbs mappedRoutes={routes} /> : null}
 						{fetched ? children : this.renderLoader()}
 					</main>
 				</Row>

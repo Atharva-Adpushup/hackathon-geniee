@@ -23,15 +23,12 @@ import ResetPassword from './Pages/ResetPassword';
 const Dashboard = lazy(() => import(/* webpackChunkName: "dashboard" */ './Pages/Dashboard'));
 const Sites = lazy(() => import(/* webpackChunkName: "sites" */ './Pages/Sites'));
 const Integrations = lazy(() =>
-	import(/* webpackChunkName: "integrations" */ './Pages/Integrations')
+	import(/* webpackChunkName: "integrations" */ './Pages/Integrations/index')
 );
 const AdsTxtManagement = lazy(() =>
 	import(/* webpackChunkName: "adsTxtManagement" */ './Pages/AdsTxtManagement')
 );
 const Payment = lazy(() => import(/* webpackChunkName: "payment" */ './Pages/Payment'));
-const PaymentSettings = lazy(() =>
-	import(/* webpackChunkName: "paymentSettings" */ './Pages/PaymentSettings')
-);
 const ApTag = lazy(() => import(/* webpackChunkName: "apTag" */ './Apps/ApTag/index'));
 const InnovativeAds = lazy(() =>
 	import(/* webpackChunkName: "innovativeAds" */ './Apps/InnovativeAds/index')
@@ -46,9 +43,6 @@ const ErrorPage = lazy(() => import(/* webpackChunkName: "error" */ './Pages/Err
 const OnBoarding = lazy(() => import(/* webpackChunkName: "onBoarding" */ './Pages/OnBoarding'));
 const AddNewSite = lazy(() => import(/* webpackChunkName: "addNewSite" */ './Pages/AddNewSite'));
 const Layout = lazy(() => import(/* webpackChunkName: "layout" */ './Apps/Layout/index'));
-const SiteSettings = lazy(() =>
-	import(/* webpackChunkName: "siteSettings" */ './Pages/SiteSettings/index')
-);
 
 const Routes = () => (
 	<Router history={history}>
@@ -153,7 +147,22 @@ const Routes = () => (
 					/>
 					<PrivateRoute exact name=":siteId" path="/reporting/:siteId" component={Reporting} />
 
-					<PrivateRoute exact name="Integrations" path="/integrations" component={Integrations} />
+					{/** Integrations (Connect Google etc.) */}
+					<PrivateRoute
+						exact
+						customProps={{ activeTab: 'google' }}
+						name="Integrations"
+						path="/integrations"
+						component={Integrations}
+					/>
+					<PrivateRoute
+						exact
+						customProps={{ activeTab: 'google' }}
+						name="Google"
+						path="/integrations/google"
+						component={Integrations}
+					/>
+
 					<PrivateRoute
 						exact
 						name="AdsTxt Authenticator"
