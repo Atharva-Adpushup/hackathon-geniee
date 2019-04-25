@@ -3,7 +3,6 @@ import apLineChartConfig from '../configs/line-ap-data.json';
 import Datatable from 'react-bs-datatable';
 
 export default () => {
-	console.log(apLineChartConfig);
 	return (
 		<Datatable
 			tableHeader={apLineChartConfig.tableHeader}
