@@ -12,7 +12,7 @@ const ADSTXT_STATUS = {
 };
 
 const ROUTES = {
-	BLACK_LIST: ['/addSite', '/onboarding'],
+	BLACK_LIST: ['/addSite', '/onboarding', '/dashboard'],
 	DYNAMIC_PARAMS: [':siteId']
 };
 
