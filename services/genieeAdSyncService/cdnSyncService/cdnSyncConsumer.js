@@ -156,7 +156,14 @@ module.exports = function(site, externalData = {}) {
 						case CC.SERVICES.ADPTAGS:
 							if (isActive) {
 								jsFile = _.replace(jsFile, '__INVENTORY__', JSON.stringify(serviceConfig));
+								jsFile = _.replace(jsFile, '__SITE_ID__', site.get('siteId'));
+
 								uncompressedJsFile = _.replace(uncompressedJsFile, '__SITE_ID__', site.get('siteId'));
+								uncompressedJsFile = _.replace(
+									uncompressedJsFile,
+									'__INVENTORY__',
+									JSON.stringify(serviceConfig)
+								);
 							}
 							return generateFinalInitScript(jsFile, uncompressedJsFile);
 
@@ -179,16 +186,24 @@ module.exports = function(site, externalData = {}) {
 						case CC.SERVICES.GDPR:
 							var gdpr = serviceConfig;
 
-							if (gdpr && gdpr.compliance) {
+							if (IS_ACTIVE && gdpr && gdpr.compliance) {
 								var cookieControlConfig = gdpr.cookieControlConfig;
 
 								if (cookieControlConfig) {
-									var cookieScript = CC.COOKIE_CONTROL_SCRIPT_TMPL.replace(
+									// var cookieScript = CC.COOKIE_CONTROL_SCRIPT_TMPL.replace(
+									// 	'__COOKIE_CONTROL_CONFIG__',
+									// 	JSON.stringify(cookieControlConfig)
+									// );
+									jsFile = _.replace(
+										jsFile,
 										'__COOKIE_CONTROL_CONFIG__',
 										JSON.stringify(cookieControlConfig)
 									);
-									jsFile = `${cookieScript}${jsFile}`;
-									uncompressedJsFile = `${cookieScript}${uncompressedJsFile}`;
+									uncompressedJsFile = _.replace(
+										uncompressedJsFile,
+										'__COOKIE_CONTROL_CONFIG__',
+										JSON.stringify(cookieControlConfig)
+									);
 								}
 							}
 							return generateFinalInitScript(jsFile, uncompressedJsFile);
@@ -321,7 +336,7 @@ module.exports = function(site, externalData = {}) {
 							deviceConfig: config.deviceConfig,
 							prebidCurrencyConfig: config.prebidCurrencyConfig
 						})
-						// .addService(CC.SERVICES.GDPR, gdpr)
+						.addService(CC.SERVICES.GDPR, finalConfig.statuses.GDPR_ACTIVE, finalConfig.config.gdpr)
 						.done();
 
 					return {

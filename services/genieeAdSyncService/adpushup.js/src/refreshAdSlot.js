@@ -4,7 +4,7 @@ var utils = require('../libs/utils'),
 	commonConsts = require('../config/commonConsts'),
 	adCodeGenerator = require('./adCodeGenerator'),
 	adp = window.adpushup,
-	_ = require('lodash.debounce'),
+	debounce = require('lodash.debounce'),
 	$ = adp.$,
 	ads = [],
 	inViewAds = [],
@@ -147,7 +147,7 @@ var utils = require('../libs/utils'),
 		}
 	},
 	init = function () {
-		$(window).on('scroll', _.debounce(onScroll, 50));
+		$(window).on('scroll', debounce(onScroll, 50));
 		$(window).on('focus', onFocus);
 	},
 	refreshSlot = function (container, ad) {

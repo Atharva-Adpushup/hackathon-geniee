@@ -33,6 +33,9 @@ if (INNOVATIVE_ADS_ACTIVE) {
 if (ADPTAG_ACTIVE) {
 	require('../modules/adpTags/hbScript/index');
 }
+if (GDPR_ACTIVE) {
+	require('../modules/gdpr/index');
+}
 
 // var	Tracker = require('../libs/tracker');
 // var	heartBeat = require('../libs/heartBeat');
@@ -59,7 +62,7 @@ function destroyAdpSlots() {
 
 // Reset adpTags config and destroy all ADP slots
 function resetAdpTagsConfig() {
-	if (w.adpTags) {
+	if (w.adpTags && w.adpTags.config) {
 		w.adpTags.config.INVENTORY = $.extend(true, {}, w.adpTags.defaultInventory);
 		w.adpTags.adpBatches = [];
 		w.adpTags.batchPrebiddingComplete = false;
@@ -186,7 +189,7 @@ function startCreation(forced) {
 		var layoutAndManualInteractiveAds = [];
 		var isControlVariation = false;
 
-		if (config.services.INNOVATIVE_ADS_ACTIVE && w.adpushup.config.innovativeAds.length) {
+		if (w.adpushup.services.INNOVATIVE_ADS_ACTIVE && w.adpushup.config.innovativeAds.length) {
 			var channel = config.platform.toUpperCase() + ':' + config.pageGroup.toUpperCase();
 			innovativeInteractiveAds = utils.filterInteractiveAds(w.adpushup.config.innovativeAds, true, channel);
 		}

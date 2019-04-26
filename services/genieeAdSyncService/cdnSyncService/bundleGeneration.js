@@ -43,7 +43,7 @@ function init(site, config) {
 						}
 					]
 				},
-				plugins: [new webpack.DefinePlugin(statuses)]
+				plugins: [new webpack.DefinePlugin({ ...statuses, SITE_ID: JSON.stringify(siteId) })]
 			},
 			{
 				entry: {
@@ -79,7 +79,7 @@ function init(site, config) {
 						mangle: false,
 						sourceMap: true
 					}),
-					new webpack.DefinePlugin(statuses)
+					new webpack.DefinePlugin({ ...statuses, SITE_ID: JSON.stringify(siteId) })
 				]
 			}
 		]);
