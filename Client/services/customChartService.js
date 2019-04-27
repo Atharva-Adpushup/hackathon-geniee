@@ -21,8 +21,8 @@ function tickPositioner() {
 	const increment = Math.ceil((this.dataMax - this.dataMin) / 6 / tickRoundOff) * tickRoundOff;
 
 	if (this.dataMax !== null && this.dataMin !== null) {
-		for (tick; tick - increment <= this.dataMax; tick += increment) {
-			positions.push(tick);
+		for (tick; tick <= this.dataMax + increment; tick += increment) {
+			positions.push(parseFloat(tick.toFixed(2)));
 		}
 	}
 	return positions;

@@ -22,8 +22,8 @@ function tickPositioner() {
 	const increment = Math.ceil((this.dataMax - this.dataMin) / 6 / tickRoundOff) * tickRoundOff;
 
 	if (this.dataMax !== null && this.dataMin !== null) {
-		for (tick; tick - increment <= this.dataMax; tick += increment) {
-			positions.push(tick);
+		for (tick; tick <= this.dataMax + increment; tick += increment) {
+			positions.push(parseFloat(tick.toFixed(2)));
 		}
 	}
 	return positions;
@@ -41,6 +41,7 @@ const defaultChartConfig = {
 	lang: {
 		thousandsSep: ','
 	},
+	title: { text: undefined },
 	legend: {
 		enabled: false
 	},
@@ -66,6 +67,12 @@ const defaultChartConfig = {
 	},
 	colors: ['#d9d332', '#d97f3e', '#50a4e2', '#2e3b7c', '#bf4b9b', '#4eba6e', '#eb575c', '#ca29f3']
 };
+
+function getLocaleDateXAxis(datesArr) {
+	return {
+		categories: [...datesArr]
+	};
+}
 
 function getGroupedYAxisAndSeries(chartType, yAxisGroups, existingSeries) {
 	const yAxis = [];
@@ -136,7 +143,7 @@ function getGroupedYAxisAndSeries(chartType, yAxisGroups, existingSeries) {
 export function getCustomChartConfig(
 	type,
 	series,
-	xAxis,
+	categories,
 	customConfig,
 	yAxisGroups,
 	activeLegendItems
@@ -144,9 +151,8 @@ export function getCustomChartConfig(
 	let chartConfig = {
 		...defaultChartConfig,
 		chart: { ...defaultChartConfig.chart, type },
-		title: { text: undefined },
+		xAxis: { categories },
 		series,
-		xAxis,
 		...customConfig
 	};
 
@@ -182,10 +188,9 @@ export function getCustomChartConfig(
 	switch (type) {
 		case 'line': {
 			chartConfig.plotOptions = {
-				...chartConfig.plotOptions,
-				line: { className: 'myLineClass' }
+				...chartConfig.plotOptions
 			};
-			chartConfig.xAxis.className = 'myXAxisClass';
+			chartConfig.xAxis = getLocaleDateXAxis(categories);
 
 			// Set yAxis Groups for Line Chart
 			if (yAxisGroups && yAxisGroups.length) {
@@ -208,10 +213,9 @@ export function getCustomChartConfig(
 		}
 		case 'spline': {
 			chartConfig.plotOptions = {
-				...chartConfig.plotOptions,
-				spline: { className: 'mySplineClass' }
+				...chartConfig.plotOptions
 			};
-			chartConfig.xAxis.className = 'myXAxisClass';
+			chartConfig.xAxis = getLocaleDateXAxis(categories);
 
 			// Set yAxis Groups for Line Chart
 			if (yAxisGroups && yAxisGroups.length) {
