@@ -539,6 +539,8 @@
 
 			window.intervalId = setInterval(imgReadyLoop, 100);
 		};
+
+		this.bindJQueryPluginMethods();
 	}
 
 	function init($selector, placementConfig, doneCallback) {
