@@ -391,7 +391,7 @@ function IncontentAnalyzer(initOptions) {
 					isSecondaryCss: false
 				};
 
-				if (adObj.css.float && adObj.css.float !== 'none') {
+				if (adObj.float && adObj.float !== 'none') {
 					ref.distanceAddFactor = adObj.height;
 				} else {
 					ref.distanceAddFactor = 0;
@@ -428,7 +428,7 @@ function IncontentAnalyzer(initOptions) {
 							isSecondaryCss: false
 						};
 
-						if (adObj.css.float && adObj.css.float !== 'none') {
+						if (adObj.float && adObj.float !== 'none') {
 							ref.distanceAddFactor = adObj.height;
 						} else {
 							ref.distanceAddFactor = 0;
@@ -474,7 +474,7 @@ function IncontentAnalyzer(initOptions) {
 						}
 
 						$selector
-							.createAds(adObj.width, adObj.height, adObj.css.float)
+							.createAds(adObj.width, adObj.height, adObj.float)
 							.selectBetween(
 								sectionBracketRange.lower,
 								sectionBracketRange.upper,
@@ -504,12 +504,14 @@ function IncontentAnalyzer(initOptions) {
 					placeFn();
 
 					if (!ref.placements[sectionNumber]) {
-						adObj.css.float = 'none';
+						adObj.float = 'none';
 						placeFn();
 
 						if (ref.placements[sectionNumber]) {
 							ref.placements[sectionNumber].isSecondaryCss = true;
 						}
+					} else {
+						setFloatCSS(adObj);
 					}
 				});
 
@@ -527,6 +529,18 @@ function IncontentAnalyzer(initOptions) {
 					clearInterval(window.intervalId);
 					bootstrapPlacements();
 				}
+			},
+			setFloatCSS = function(adObj) {
+				var isLeftFloat = !!(adObj.float === 'left');
+				var isRightFloat = !!(adObj.float === 'right');
+
+				if (isLeftFloat) {
+					adObj.css['margin-right'] = '10px';
+				} else if (isRightFloat) {
+					adObj.css['margin-left'] = '10px';
+				}
+
+				adObj.css.float = adObj.float;
 			};
 
 		$(document).ready(function() {
