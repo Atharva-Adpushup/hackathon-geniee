@@ -132,23 +132,23 @@ var utils = require('../helpers/utils'),
 		var customSlotLevelTargetingMap = window.adpushup.customSlotLevelTargetingMap;
 		if (customSlotLevelTargetingMap) {
 			var slotIds = Object.keys(customSlotLevelTargetingMap);
-	
-			if(slotIds.length) {
+
+			if (slotIds.length) {
 				slotIds.forEach(function(slotId) {
 					if (slotId === slot.containerId) {
 						var slotTargeting = customSlotLevelTargetingMap[slotId];
-						
-						if(slotTargeting) {
+
+						if (slotTargeting) {
 							var targetingKeys = Object.keys(slotTargeting);
 
-							if(targetingKeys.length) {
+							if (targetingKeys.length) {
 								targetingKeys.forEach(function(key) {
 									slot.gSlot.setTargeting(key, String(slotTargeting[key]));
 								});
 							}
 						}
 					}
-				});	
+				});
 			}
 		}
 	},
@@ -307,7 +307,7 @@ var utils = require('../helpers/utils'),
 				googletag.pubads().setTargeting(key, String(config.PAGE_KEY_VALUES[key]));
 			}
 
-			if (config.SITE_ID === 32142) {
+			if (config.SITE_ID === 39041) {
 				setUTMWiseTargeting();
 			}
 
