@@ -1,4 +1,4 @@
-var adSizeConsts = require('../../../../helpers/adSizeMappingConsts'),
+var adSizeConsts = require('../../../../../../../helpers/adSizeMappingConsts'),
 	utils = require('../helpers/utils'),
 	AdpError = require('../helpers/error'),
 	$ = require('./adp').$,

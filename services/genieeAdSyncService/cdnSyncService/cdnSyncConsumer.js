@@ -186,14 +186,10 @@ module.exports = function(site, externalData = {}) {
 						case CC.SERVICES.GDPR:
 							var gdpr = serviceConfig;
 
-							if (IS_ACTIVE && gdpr && gdpr.compliance) {
+							if (isActive && gdpr && gdpr.compliance) {
 								var cookieControlConfig = gdpr.cookieControlConfig;
 
 								if (cookieControlConfig) {
-									// var cookieScript = CC.COOKIE_CONTROL_SCRIPT_TMPL.replace(
-									// 	'__COOKIE_CONTROL_CONFIG__',
-									// 	JSON.stringify(cookieControlConfig)
-									// );
 									jsFile = _.replace(
 										jsFile,
 										'__COOKIE_CONTROL_CONFIG__',

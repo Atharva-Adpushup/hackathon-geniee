@@ -30,6 +30,7 @@ function init(w, d) {
 	} else {
 		// Execute prebid script
 		if (HB_ACTIVE) {
+			// require('./prebid');
 			(function() {
 				require('../../Prebid.js/build/dist/prebid');
 			})();

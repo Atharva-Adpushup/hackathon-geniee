@@ -195,7 +195,8 @@ var utils = require('../helpers/utils'),
 			isResponsive = slot.isResponsive,
 			computedSizes = slot.computedSizes,
 			isComputedSizes = !!(computedSizes && computedSizes.length),
-			responsiveAdsData;
+			responsiveAdsData,
+			size;
 
 		if (isResponsive) {
 			responsiveAdsData = responsiveAds.getAdSizes(slot.containerId);

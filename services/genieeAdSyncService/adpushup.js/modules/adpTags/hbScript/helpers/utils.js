@@ -6,8 +6,9 @@ var config = require('../src/config'),
 module.exports = {
 	hashCode: function(str) {
 		var hash = 0;
+		var char;
 		if (str.length === 0) return hash;
-		for (i = 0; i < str.length; i++) {
+		for (var i = 0; i < str.length; i++) {
 			char = str.charCodeAt(i);
 			hash = (hash << 5) - hash + char;
 			hash = hash & hash; // Convert to 32bit integer
@@ -42,8 +43,8 @@ module.exports = {
 
 		// Check for MSIE v7-10 in UA string
 		if (ua.indexOf('MSIE') !== -1) {
-			var re = new RegExp('MSIE ([0-9]{1,}[.0-9]{0,})'),
-				ieVersion = Number(re.exec(ua)[1]);
+			var re = new RegExp('MSIE ([0-9]{1,}[.0-9]{0,})');
+			var ieVersion = Number(re.exec(ua)[1]);
 
 			return ieVersion >= 9 ? true : false;
 		}

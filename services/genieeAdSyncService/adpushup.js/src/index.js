@@ -30,13 +30,6 @@ if (APTAG_ACTIVE) {
 if (INNOVATIVE_ADS_ACTIVE) {
 	var processInnovativeAds = require('../modules/interactiveAds/index');
 }
-if (ADPTAG_ACTIVE) {
-	require('../modules/adpTags/hbScript/index');
-}
-if (GDPR_ACTIVE) {
-	require('../modules/gdpr/index');
-}
-
 // var	Tracker = require('../libs/tracker');
 // var	heartBeat = require('../libs/heartBeat');
 // var	ampInit = require('./ampInit');
@@ -80,42 +73,56 @@ function resetAdpConfig() {
 
 // Resets and initialises the adpushup config object
 function initAdpConfig() {
-	resetAdpConfig();
-	resetAdpTagsConfig();
+	return new Promise(function(resolve) {
+		resetAdpConfig();
+		resetAdpTagsConfig();
 
-	// Extend adpushup object
-	$.extend(adp, {
-		creationProcessStarted: false,
-		afterJSExecuted: false,
-		err: [],
-		utils: utils,
-		control: control,
-		// tracker: new Tracker(),
-		nodewatcher: nodewatcher,
-		geniee: genieeObject,
-		triggerAd: triggerAd,
-		session: session,
-		generateAdCode: adCodeGenerator.generateAdCode,
-		executeAdpTagsHeadCode: adCodeGenerator.executeAdpTagsHeadCode,
-		executeAfterJS: adCreater.executeAfterJS,
-		services: {
-			APTAG_ACTIVE: APTAG_ACTIVE,
-			INNOVATIVE_ADS_ACTIVE: INNOVATIVE_ADS_ACTIVE,
-			LAYOUT_ACTIVE: LAYOUT_ACTIVE,
-			ADPTAG_ACTIVE: ADPTAG_ACTIVE,
-			SPA_ACTIVE: SPA_ACTIVE,
-			GENIEE_ACTIVE: GENIEE_ACTIVE,
-			HB_ACTIVE: HB_ACTIVE,
-			GDPR_ACTIVE: GDPR_ACTIVE,
-			INCONTENT_ACTIVE: INCONTENT_ACTIVE
+		// Extend adpushup object
+		$.extend(adp, {
+			creationProcessStarted: false,
+			afterJSExecuted: false,
+			err: [],
+			utils: utils,
+			control: control,
+			// tracker: new Tracker(),
+			nodewatcher: nodewatcher,
+			geniee: genieeObject,
+			triggerAd: triggerAd,
+			session: session,
+			generateAdCode: adCodeGenerator.generateAdCode,
+			executeAdpTagsHeadCode: adCodeGenerator.executeAdpTagsHeadCode,
+			executeAfterJS: adCreater.executeAfterJS,
+			services: {
+				APTAG_ACTIVE: APTAG_ACTIVE,
+				INNOVATIVE_ADS_ACTIVE: INNOVATIVE_ADS_ACTIVE,
+				LAYOUT_ACTIVE: LAYOUT_ACTIVE,
+				ADPTAG_ACTIVE: ADPTAG_ACTIVE,
+				SPA_ACTIVE: SPA_ACTIVE,
+				GENIEE_ACTIVE: GENIEE_ACTIVE,
+				HB_ACTIVE: HB_ACTIVE,
+				GDPR_ACTIVE: GDPR_ACTIVE,
+				INCONTENT_ACTIVE: INCONTENT_ACTIVE
+			},
+			configExtended: false
+		});
+
+		// Extend the settings with generated settings
+		// eslint-disable-next-line no-undef
+		$.extend(adp.config, __AP_CONFIG__, {
+			platform: browserConfig.platform,
+			packetId: utils.uniqueId(__SITE_ID__)
+		});
+		resolve();
+	}).then(function() {
+		if (!window.adpushup.configExtended) {
+			if (ADPTAG_ACTIVE) {
+				require('../modules/adpTags/hbScript/index');
+			}
+			if (GDPR_ACTIVE) {
+				require('../modules/gdpr/index');
+			}
+			window.adpushup.configExtended = true;
 		}
-	});
-
-	// Extend the settings with generated settings
-	// eslint-disable-next-line no-undef
-	$.extend(adp.config, __AP_CONFIG__, {
-		platform: browserConfig.platform,
-		packetId: utils.uniqueId(__SITE_ID__)
 	});
 }
 
