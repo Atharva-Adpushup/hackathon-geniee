@@ -100,7 +100,8 @@ var utils = require('../helpers/utils'),
 		return null;
 	},
 	setUTMWiseTargeting = function() {
-		var urlParams = adp.utils.queryParams;
+		var urlParams = adp.utils.queryParams,
+			separator = ':';
 
 		if (!Object.keys(urlParams).length) {
 			var utmSessionCookie = adp.session.getCookie(config.UTM_SESSION_COOKIE);
@@ -111,6 +112,7 @@ var utils = require('../helpers/utils'),
 			}
 		}
 
+		// Set standard UTM targeting
 		Object.keys(config.UTM_WISE_TARGETING.STANDARD).forEach(function(key) {
 			var keyVal = config.UTM_WISE_TARGETING.STANDARD[key],
 				utmParam = urlParams[keyVal];
@@ -118,6 +120,28 @@ var utils = require('../helpers/utils'),
 			googletag
 				.pubads()
 				.setTargeting(keyVal.trim().toLowerCase(), String(utmParam ? utmParam.trim().substr(0, 40) : null));
+		});
+
+		// Set custom UTM targeting
+		Object.keys(config.UTM_WISE_TARGETING.CUSTOM).forEach(function(key) {
+			var keyName = key,
+				keyTargets = config.UTM_WISE_TARGETING.CUSTOM[key].TARGET,
+				keyCombination = '';
+
+			Object.keys(keyTargets).forEach(function(keyTarget) {
+				var keyVal = keyTargets[keyTarget],
+					utmParam = urlParams[keyVal];
+
+				keyCombination += (utmParam ? utmParam : null) + separator;
+			});
+
+			keyCombination = keyCombination.substr(0, keyCombination.length - 1);
+			googletag
+				.pubads()
+				.setTargeting(
+					keyName.trim().toLowerCase(),
+					String(keyCombination ? keyCombination.trim().substr(0, 40) : null)
+				);
 		});
 	},
 	setCustomSlotLevelTargeting = function(slot) {
