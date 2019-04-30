@@ -10,9 +10,7 @@ var $ = require('jquery'),
 	shouldPushToADP = function(ad) {
 		return (
 			(ad.network === 'adpTags' && ad.networkData) ||
-			(ad.network === 'geniee' &&
-				ad.networkData &&
-				ad.networkData.dynamicAllocation)
+			(ad.network === 'geniee' && ad.networkData && ad.networkData.dynamicAllocation)
 		);
 	},
 	segregateAds = function(ads) {
@@ -42,16 +40,12 @@ var $ = require('jquery'),
 					zoneContainerId: ad.networkData.zoneContainerId
 				});
 			// 'isADPTags' will be true if atleast one ADP tag is present
-			shouldPushToADP(ad)
-				? (adpTagUnits.push(ad), (window.adpushup.config.isADPTags = true))
-				: null;
+			shouldPushToADP(ad) ? (adpTagUnits.push(ad), (window.adpushup.config.isADPTags = true)) : null;
 
 			// Push ads to structural ad array only if ad is not interactive or not incontent
 			if (
 				ad.type == commonConsts.AD_TYPES.STRUCTURAL ||
-				(!ad.formatData &&
-					!ad.isIncontent &&
-					ad.type !== commonConsts.AD_TYPES.INTERACTIVE_AD) ||
+				(!ad.formatData && !ad.isIncontent && ad.type !== commonConsts.AD_TYPES.INTERACTIVE_AD) ||
 				ad.type == commonConsts.AD_TYPES.DOCKED_STRUCTURAL
 			) {
 				structuredAds.push(ad);
@@ -78,19 +72,11 @@ var $ = require('jquery'),
 			el = $(ad.xpath);
 		}
 		var isGenieePartner = !!(ad.network === 'geniee' && !ad.networkData.adCode),
-			isGenieeWithoutDFP = !!(
-				isGenieePartner && !ad.networkData.dynamicAllocation
-			),
+			isGenieeWithoutDFP = !!(isGenieePartner && !ad.networkData.dynamicAllocation),
 			isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length),
-			isGenieeNetwork = !!(
-				ad.network === 'geniee' &&
-				ad.networkData &&
-				ad.networkData.zoneId
-			),
+			isGenieeNetwork = !!(ad.network === 'geniee' && ad.networkData && ad.networkData.zoneId),
 			isZoneContainerId = !!(isGenieeNetwork && ad.networkData.zoneContainerId),
-			computedSSPContainerId = isZoneContainerId
-				? ad.networkData.zoneContainerId
-				: ad.networkData.zoneId,
+			computedSSPContainerId = isZoneContainerId ? ad.networkData.zoneContainerId : ad.networkData.zoneId,
 			defaultAdProperties = {
 				display: isGenieeWithoutDFP ? 'none' : 'block',
 				clear: ad.isIncontent ? null : 'both'
@@ -167,10 +153,7 @@ var $ = require('jquery'),
 			container.append(adCodeGenerator.generateAdCode(ad));
 			$.ajaxSettings.cache = false;
 
-			if (
-				ad.type &&
-				Number(ad.type) === commonConsts.AD_TYPES.DOCKED_STRUCTURAL
-			) {
+			if (ad.type && Number(ad.type) === commonConsts.AD_TYPES.DOCKED_STRUCTURAL) {
 				// Type 4 is DOCKED
 				utils.dockify.dockifyAd('#' + ad.id, ad.formatData, utils);
 			}
@@ -197,10 +180,7 @@ var $ = require('jquery'),
 	},
 	filterNonInteractiveAds = function(ads) {
 		return ads.filter(function(ad) {
-			return (
-				!ad.type ||
-				(ad.type && ad.type !== commonConsts.AD_TYPES.INTERACTIVE_AD)
-			);
+			return !ad.type || (ad.type && ad.type !== commonConsts.AD_TYPES.INTERACTIVE_AD);
 		});
 	},
 	createAds = function(adp, variation) {
@@ -221,9 +201,7 @@ var $ = require('jquery'),
 				variationId: variation.id // set the chosenVariation variation in feedback data;
 			},
 			placeGenieeHeadCode = function(genieeIdCollection) {
-				var genieeHeadCode = adCodeGenerator.generateGenieeHeaderCode(
-					genieeIdCollection
-				);
+				var genieeHeadCode = adCodeGenerator.generateGenieeHeaderCode(genieeIdCollection);
 				genieeHeadCode && $('head').append(genieeHeadCode);
 			},
 			handleContentSelectorFailure = function(inContentAds) {
@@ -234,9 +212,20 @@ var $ = require('jquery'),
 				});
 			},
 			next = function(adObj, data) {
+				var isContainerVisible;
+
 				if (displayCounter) {
 					displayCounter--;
 					if (data.success) {
+						// Below 'isContainerVisible' check is added for boundary cases where ad can be successfully placed
+						// but its container is hidden from layout (.i.e., display none) and thus ad placement and server feedback
+						// functionality should not work
+						isContainerVisible = !!(data.container && data.container.is(':visible'));
+
+						if (!isContainerVisible) {
+							return false;
+						}
+
 						feedbackData.xpathMiss = [];
 						feedbackData.ads = [adObj.id];
 						placeAd(data.container, adObj);
@@ -250,11 +239,7 @@ var $ = require('jquery'),
 				}
 				if (!displayCounter && !finished) {
 					finished = true;
-					if (
-						variation.customJs &&
-						variation.customJs.afterAp &&
-						!adp.afterJSExecuted
-					) {
+					if (variation.customJs && variation.customJs.afterAp && !adp.afterJSExecuted) {
 						executeAfterJS(variation);
 					}
 					//utils.sendFeedback(feedbackData);
@@ -290,9 +275,7 @@ var $ = require('jquery'),
 				});
 			},
 			placeInContentAds = function($incontentElm, inContentAds) {
-				incontentAnalyser($incontentElm, inContentAds, function(
-					sectionsWithTargetElm
-				) {
+				incontentAnalyser($incontentElm, inContentAds, function(sectionsWithTargetElm) {
 					$(inContentAds).each(function(index, ad) {
 						var sectionObj = sectionsWithTargetElm[ad.section],
 							$containerElement,
@@ -311,12 +294,8 @@ var $ = require('jquery'),
 							//feedbackData.ads.push(ad.id);
 
 							$containerElement = getContainer(ad, sectionObj.elem);
-							isContainerElement = !!(
-								$containerElement && $containerElement.length
-							);
-							containerId = isContainerElement
-								? $containerElement.get(0).id
-								: '';
+							isContainerElement = !!($containerElement && $containerElement.length);
+							containerId = isContainerElement ? $containerElement.get(0).id : '';
 
 							next(ad, { success: true, container: $containerElement });
 						} else {
@@ -347,10 +326,7 @@ var $ = require('jquery'),
 			}
 
 			if (ads.adpTagUnits.length) {
-				adCodeGenerator.executeAdpTagsHeadCode(
-					ads.adpTagUnits,
-					variation.adpKeyValues
-				);
+				adCodeGenerator.executeAdpTagsHeadCode(ads.adpTagUnits, variation.adpKeyValues);
 			}
 
 			if (ads.medianetAds.length) {
