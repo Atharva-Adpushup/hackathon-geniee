@@ -36,6 +36,9 @@ var utils = require('../libs/utils'),
 				var slot = getAdpSlot(ad);
 				slot.hasRendered = false;
 				slot.toBeRefresh = true;
+				slot.biddingComplete = false;
+				slot.feedbackSent = false;
+				slot.hasTimedOut = false;
 				removeBidderTargeting(slot);
 				adp.adpTags.queSlotForBidding(slot);
 				setRefreshTimeOut(container, ad);
@@ -90,7 +93,9 @@ var utils = require('../libs/utils'),
 	getAllInViewAds = function() {
 		inViewAds = [];
 		for (var i = 0; i < ads.length; i++) {
-			if (utils.checkElementInViewPercent(ads[i].container)) inViewAds.push(ads[i]);
+			if (utils.checkElementInViewPercent(ads[i].container)) {
+				inViewAds.push(ads[i]);
+			}
 		}
 	},
 	onScroll = function() {
@@ -159,7 +164,10 @@ var utils = require('../libs/utils'),
 	refreshSlot = function(container, ad) {
 		setRefreshTimeOut(container, ad);
 
-		ads.push({ container: container, ad: ad });
+		ads.push({
+			container: container,
+			ad: ad
+		});
 	};
 
 module.exports = {

@@ -11,11 +11,28 @@ module.exports = {
 	},
 	UTM_SESSION_COOKIE: '_adp_utm_session_',
 	UTM_WISE_TARGETING: {
-		UTM_SOURCE: 'utm_source',
-		UTM_CAMPAIGN: 'utm_campaign',
-		UTM_MEDIUM: 'utm_medium',
-		UTM_TERM: 'utm_term',
-		UTM_CONTENT: 'utm_content'
+		STANDARD: {
+			UTM_SOURCE: 'utm_source',
+			UTM_CAMPAIGN: 'utm_campaign',
+			UTM_MEDIUM: 'utm_medium',
+			UTM_TERM: 'utm_term',
+			UTM_CONTENT: 'utm_content'
+		},
+		CUSTOM: {
+			UTM_SCM: {
+				TARGET: {
+					UTM_SOURCE: 'utm_source',
+					UTM_CAMPAIGN: 'utm_campaign',
+					UTM_MEDIUM: 'utm_medium'
+				}
+			},
+			UTM_SOURCE_CAMPAIGN: {
+				TARGET: {
+					UTM_SOURCE: 'utm_source',
+					UTM_CAMPAIGN: 'utm_campaign'
+				}
+			}
+		}
 	},
 	GPT_REFRESH_INTERVAL: 30000,
 	SLOT_INTERVAL: 50,

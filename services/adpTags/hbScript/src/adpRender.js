@@ -100,7 +100,8 @@ var utils = require('../helpers/utils'),
 		return null;
 	},
 	setUTMWiseTargeting = function() {
-		var urlParams = adp.utils.queryParams;
+		var urlParams = adp.utils.queryParams,
+			separator = ':';
 
 		if (!Object.keys(urlParams).length) {
 			var utmSessionCookie = adp.session.getCookie(config.UTM_SESSION_COOKIE);
@@ -111,13 +112,36 @@ var utils = require('../helpers/utils'),
 			}
 		}
 
-		Object.keys(config.UTM_WISE_TARGETING).forEach(function(key) {
-			var keyVal = config.UTM_WISE_TARGETING[key],
+		// Set standard UTM targeting
+		Object.keys(config.UTM_WISE_TARGETING.STANDARD).forEach(function(key) {
+			var keyVal = config.UTM_WISE_TARGETING.STANDARD[key],
 				utmParam = urlParams[keyVal];
 
 			googletag
 				.pubads()
 				.setTargeting(keyVal.trim().toLowerCase(), String(utmParam ? utmParam.trim().substr(0, 40) : null));
+		});
+
+		// Set custom UTM targeting
+		Object.keys(config.UTM_WISE_TARGETING.CUSTOM).forEach(function(key) {
+			var keyName = key,
+				keyTargets = config.UTM_WISE_TARGETING.CUSTOM[key].TARGET,
+				keyCombination = '';
+
+			Object.keys(keyTargets).forEach(function(keyTarget) {
+				var keyVal = keyTargets[keyTarget],
+					utmParam = urlParams[keyVal];
+
+				keyCombination += (utmParam ? utmParam : null) + separator;
+			});
+
+			keyCombination = keyCombination.substr(0, keyCombination.length - 1);
+			googletag
+				.pubads()
+				.setTargeting(
+					keyName.trim().toLowerCase(),
+					String(keyCombination ? keyCombination.trim().substr(0, 40) : null)
+				);
 		});
 	},
 	setCustomSlotLevelTargeting = function(slot) {
@@ -132,23 +156,23 @@ var utils = require('../helpers/utils'),
 		var customSlotLevelTargetingMap = window.adpushup.customSlotLevelTargetingMap;
 		if (customSlotLevelTargetingMap) {
 			var slotIds = Object.keys(customSlotLevelTargetingMap);
-	
-			if(slotIds.length) {
+
+			if (slotIds.length) {
 				slotIds.forEach(function(slotId) {
 					if (slotId === slot.containerId) {
 						var slotTargeting = customSlotLevelTargetingMap[slotId];
-						
-						if(slotTargeting) {
+
+						if (slotTargeting) {
 							var targetingKeys = Object.keys(slotTargeting);
 
-							if(targetingKeys.length) {
+							if (targetingKeys.length) {
 								targetingKeys.forEach(function(key) {
 									slot.gSlot.setTargeting(key, String(slotTargeting[key]));
 								});
 							}
 						}
 					}
-				});	
+				});
 			}
 		}
 	},
@@ -307,7 +331,7 @@ var utils = require('../helpers/utils'),
 				googletag.pubads().setTargeting(key, String(config.PAGE_KEY_VALUES[key]));
 			}
 
-			if (config.SITE_ID === 32142) {
+			if (config.SITE_ID === 39041) {
 				setUTMWiseTargeting();
 			}
 
