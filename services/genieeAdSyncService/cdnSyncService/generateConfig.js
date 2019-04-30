@@ -1,5 +1,7 @@
 const Promise = require('bluebird');
+const _ = require('lodash');
 
+const { PREBID_ADAPTERS } = require('../../../configs/commonConsts');
 const siteModel = require('../../../models/siteModel');
 const couchbase = require('../../../helpers/couchBaseService');
 const { getHbAdsApTag } = require('./generateAPTagConfig');
@@ -10,6 +12,22 @@ function getHbConfig(siteId) {
 		.connectToAppBucket()
 		.then(appBucket => appBucket.getAsync(`hbcf::${siteId}`, {}))
 		.catch(err => Promise.resolve({}));
+}
+
+function getPrebidModules(hbcf) {
+	const { hbConfig: { bidderAdUnits = {} } = {} } = hbcf.value;
+	const modules = new Set();
+
+	_.forEach(bidderAdUnits, adUnits => {
+		_.forEach(adUnits, adUnit => {
+			_.forEach(adUnit, values => {
+				const adpater = PREBID_ADAPTERS[values.bidder];
+				adpater ? modules.add(adpater) : console.log(`Prebid Adapter not found for ${values.bidder}`);
+			});
+		});
+	});
+
+	return Array.from(modules).join(',');
 }
 
 function gdprProcessing(site) {
@@ -36,6 +54,7 @@ function HbProcessing(site, apConfigs) {
 			let computedPrebidCurrencyConfig = {};
 			let deviceConfig = false;
 			let prebidCurrencyConfig = false;
+			const prebidAdapters = getPrebidModules(hbcf);
 
 			// Final Hb Ads
 			hbAds = hbAds.concat(hbAdsApTag);
@@ -84,7 +103,8 @@ function HbProcessing(site, apConfigs) {
 				config: {
 					deviceConfig: deviceConfig ? deviceConfig : '',
 					prebidCurrencyConfig: prebidCurrencyConfig ? prebidCurrencyConfig : '',
-					hbcf
+					hbcf,
+					prebidAdapters: prebidAdapters
 				}
 			};
 		}
@@ -136,7 +156,8 @@ function init(site, computedConfig) {
 			statusesAndAds
 		};
 	}).catch(err => {
-		console.log(err);
+		console.log(`Error while creating generate config for site ${site.get('siteId')} and Error is ${err}`);
+		throw err;
 	});
 }
 

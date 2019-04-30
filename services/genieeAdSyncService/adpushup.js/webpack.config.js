@@ -26,7 +26,8 @@ module.exports = [
 					loader: 'babel-loader',
 					exclude: /node_modules/,
 					options: {
-						presets: [['es2015', { loose: true }], 'stage-2']
+						presets: [['es2015', { loose: true }], 'stage-2'],
+						plugins: ['transform-object-assign', require('prebid.js/plugins/pbjsGlobals.js')]
 					}
 				},
 				{
@@ -67,7 +68,8 @@ module.exports = [
 					loader: 'babel-loader',
 					exclude: /node_modules/,
 					options: {
-						presets: [['es2015', { loose: true }], 'stage-2']
+						presets: [['es2015', { loose: true }], 'stage-2'],
+						plugins: ['transform-object-assign', require('prebid.js/plugins/pbjsGlobals.js')]
 					}
 				},
 				{

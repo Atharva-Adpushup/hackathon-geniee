@@ -363,5 +363,23 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 			adCode: '',
 			forceByPass: true
 		}
+	},
+	PREBID_ADAPTERS: {
+		openx: 'openxBidAdapter',
+		districtmDMX: 'districtmDMXBidAdapter',
+		medianet: 'medianetBidAdapter',
+		conversant: 'conversantBidAdapter',
+		c1x: 'c1xBidAdapter',
+		pulsepoint: 'pulsepointBidAdapter',
+		'33across': '33acrossBidAdapter',
+		ix: 'ixBidAdapter',
+		oftmedia: 'appnexusBidAdapter',
+		rubicon: 'rubiconBidAdapter'
 	}
 };
+
+/**
+	"districtm",
+	"criteoBidAdapter",
+	"currency"
+ */
