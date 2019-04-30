@@ -111,8 +111,8 @@ var utils = require('../helpers/utils'),
 			}
 		}
 
-		Object.keys(config.UTM_WISE_TARGETING).forEach(function(key) {
-			var keyVal = config.UTM_WISE_TARGETING[key],
+		Object.keys(config.UTM_WISE_TARGETING.STANDARD).forEach(function(key) {
+			var keyVal = config.UTM_WISE_TARGETING.STANDARD[key],
 				utmParam = urlParams[keyVal];
 
 			googletag
