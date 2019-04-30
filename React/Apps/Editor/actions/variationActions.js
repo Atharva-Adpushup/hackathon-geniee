@@ -55,6 +55,12 @@ const getLastVariationNumber = function(variations) {
 		variationId,
 		channelId
 	}),
+	initIncontentAdsPreview = (channelId, contentSelector, ads) => ({
+		type: variationActions.INIT_INCONTENT_ADS_PREVIEW,
+		channelId,
+		contentSelector,
+		ads
+	}),
 	updateInContentTreeSelectorsLevel = (variationId, selectorsTreeLevel) => dispatch => {
 		dispatch({
 			type: variationActions.UPDATE_INCONTENT_SELECTORS_TREE_LEVEL,
@@ -294,5 +300,6 @@ export {
 	saveKeyValues,
 	updateContentSelector,
 	updateInContentTreeSelectorsLevel,
+	initIncontentAdsPreview,
 	savePersonalizationInfo
 };

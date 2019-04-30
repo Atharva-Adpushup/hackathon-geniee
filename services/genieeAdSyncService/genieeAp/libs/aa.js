@@ -537,10 +537,9 @@
 					var isLeftFloat = !!(adObj.float === 'left');
 					var isRightFloat = !!(adObj.float === 'right');
 
-					if (isLeftFloat) {
-						adObj.css['margin-right'] = '10px';
-					} else if (isRightFloat) {
+					if (isLeftFloat || isRightFloat) {
 						adObj.css['margin-left'] = '10px';
+						adObj.css['margin-right'] = '10px';
 					}
 
 					adObj.css.float = adObj.float;

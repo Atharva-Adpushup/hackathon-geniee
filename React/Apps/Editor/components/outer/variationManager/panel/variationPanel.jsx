@@ -23,11 +23,11 @@ class VariationPanel extends React.Component {
 			toShow = window.isGeniee && window.gcfg.upkv ? true : !window.isGeniee,
 			label = isGeniee ? 'Geniee Key Values' : 'ADP Key Values';
 
-		return toShow
-			? <div tabTitle={label}>
-					<KeyValuesPanel channelId={channelId} variation={variation} sections={sections} ui={ui} />
-				</div>
-			: null;
+		return toShow ? (
+			<div tabTitle={label}>
+				<KeyValuesPanel channelId={channelId} variation={variation} sections={sections} ui={ui} />
+			</div>
+		) : null;
 		// if (window.isGeniee) {
 		// 	if (window.gcfg.upkv) {
 		// 		return (
@@ -47,22 +47,45 @@ class VariationPanel extends React.Component {
 
 	render() {
 		const {
-			variation,
-			channelId,
-			sections,
-			ui,
-			reporting,
-			onUpdateContentSelector,
-			disabledVariationsCount,
-			controlVariationsCount,
-			zonesData,
-			networkConfig
-		} = this.props,
+				variation,
+				channelId,
+				sections,
+				ui,
+				reporting,
+				onUpdateContentSelector,
+				disabledVariationsCount,
+				controlVariationsCount,
+				onInitIncontentAdsPreview,
+				zonesData,
+				networkConfig
+			} = this.props,
 			// Geniee UI access before/after js feature visibility condition
-			isBeforeAfterJSHide = !!(window.isGeniee &&
+			isBeforeAfterJSHide = !!(
+				window.isGeniee &&
 				window.gcfg &&
 				window.gcfg.hasOwnProperty('ubajf') &&
-				!window.gcfg.ubajf);
+				!window.gcfg.ubajf
+			),
+			incontentSections = sections
+				.filter(section => !!section.isIncontent)
+				.map(sectionData => {
+					const adObj = sectionData.ads[0];
+
+					sectionData = {
+						...sectionData,
+						css: adObj.css,
+						customCSS: adObj.customCSS,
+						height: adObj.height,
+						width: adObj.width,
+						section: sectionData.sectionNo
+					};
+
+					delete sectionData.sectionNo;
+					delete sectionData.ads;
+					delete sectionData.id;
+					delete sectionData.name;
+					return sectionData;
+				});
 
 		return (
 			<div className="variation-settings">
@@ -81,13 +104,15 @@ class VariationPanel extends React.Component {
 					<div tabTitle="Info">
 						<VariationOptions
 							onUpdateContentSelector={onUpdateContentSelector}
+							onInitIncontentAdsPreview={onInitIncontentAdsPreview}
 							channelId={channelId}
 							variation={variation}
+							incontentSections={incontentSections}
 							disabledVariationsCount={disabledVariationsCount}
 							controlVariationsCount={controlVariationsCount}
 						/>
 					</div>
-					<div tabTitle="Add Incontent Variation">
+					<div tabTitle="Add Incontent Section">
 						<IncontentAdder
 							activeChannel={this.props.activeChannel}
 							channelId={channelId}
@@ -95,11 +120,11 @@ class VariationPanel extends React.Component {
 							zonesData={zonesData}
 						/>
 					</div>
-					{isBeforeAfterJSHide
-						? null
-						: <div tabTitle="Before/After JS">
-								<BeforeAfterJsPanel channelId={channelId} variation={variation} ui={ui} />
-							</div>}
+					{isBeforeAfterJSHide ? null : (
+						<div tabTitle="Before/After JS">
+							<BeforeAfterJsPanel channelId={channelId} variation={variation} ui={ui} />
+						</div>
+					)}
 					{this.renderKeyValuesOptions()}
 					<div tabTitle="Interactive Ads">
 						<InteractiveAds

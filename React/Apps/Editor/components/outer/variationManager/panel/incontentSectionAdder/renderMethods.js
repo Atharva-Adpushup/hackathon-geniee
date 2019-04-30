@@ -22,8 +22,9 @@ const renderField = field => {
 								{...field.input}
 								className="inputMinimal"
 							/>
-							{field.meta.touched &&
-								field.meta.error && <div className="error-message">{field.meta.error}</div>}
+							{field.meta.touched && field.meta.error && (
+								<div className="error-message">{field.meta.error}</div>
+							)}
 						</Col>
 					</Row>
 				</Col>
@@ -45,8 +46,9 @@ const renderField = field => {
 								rows="6"
 								className="inputMinimal"
 							/>
-							{field.meta.touched &&
-								field.meta.error && <div className="error-message">{field.meta.error}</div>}
+							{field.meta.touched && field.meta.error && (
+								<div className="error-message">{field.meta.error}</div>
+							)}
 						</Col>
 					</Row>
 				</Col>
@@ -156,7 +158,7 @@ const renderField = field => {
 	renderInContentAdder = (that, getSupportedSizes) => {
 		return (
 			<form>
-				<h1 className="variation-section-heading">Add Incontent Variation</h1>
+				<h1 className="variation-section-heading">Add Incontent Section</h1>
 				<div style={{ width: '65%', borderRight: '1px solid rgba(85, 85, 85, 0.3)', display: 'inline-block' }}>
 					<Field
 						placeholder="Please enter section"

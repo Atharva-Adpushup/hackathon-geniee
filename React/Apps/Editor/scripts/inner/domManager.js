@@ -92,12 +92,9 @@ const selectorator = new Selectorator(),
 			.parent()
 			.css(sizeObject);
 
-		// For testing
-		placeIncontentAds();
-
 		return true;
 	},
-	placeIncontentAds = () => {
+	placeIncontentAds = (contentSelector, ads) => {
 		const placeAd = function(adObject, $element) {
 			var $container = $('<div/>');
 			var css = $.extend({}, adObject.css, adObject.customCSS, {
@@ -135,129 +132,8 @@ const selectorator = new Selectorator(),
 
 		const parameters = {
 			$,
-			$selector: $('.region-content-inner'),
-			placementConfig: [
-				{
-					id: 'd010f958-1466-4244-b8e5-875db679e3d4',
-					network: 'custom',
-					css: {
-						'margin-left': 'auto',
-						'margin-right': 'auto',
-						'margin-top': '0px',
-						'margin-bottom': '0px',
-						clear: 'both'
-					},
-					height: 250,
-					width: 300,
-					isIncontent: true,
-					float: 'none',
-					minDistanceFromPrevAd: '200',
-					selectorsTreeLevel: 'any',
-					section: 1,
-					customCSS: { 'margin-top': '10px', 'margin-bottom': '10px' },
-					networkData: { adCode: 'c29tZSBhZCBjb2RlIDEuLi4=', refreshSlot: false, logWritten: true }
-				},
-				{
-					id: '95281ad5-783f-429e-9337-b974760bbafb',
-					network: 'custom',
-					css: {
-						'margin-left': 'auto',
-						'margin-right': 'auto',
-						'margin-top': '0px',
-						'margin-bottom': '0px',
-						clear: 'both'
-					},
-					height: 250,
-					width: 300,
-					isIncontent: true,
-					float: 'right',
-					minDistanceFromPrevAd: '200',
-					selectorsTreeLevel: 'any',
-					section: 2,
-					customCSS: { 'margin-top': '10px', 'margin-bottom': '10px' },
-					networkData: { adCode: 'c29tZSBhZCBjb2RlIDIuLi4=', refreshSlot: false, logWritten: true }
-				},
-				{
-					id: '95281ad5-783f-429e-9337-b974760bbafb',
-					network: 'custom',
-					css: {
-						'margin-left': 'auto',
-						'margin-right': 'auto',
-						'margin-top': '0px',
-						'margin-bottom': '0px',
-						clear: 'both'
-					},
-					height: 250,
-					width: 300,
-					isIncontent: true,
-					float: 'left',
-					minDistanceFromPrevAd: '200',
-					selectorsTreeLevel: 'any',
-					section: 3,
-					customCSS: { 'margin-top': '10px', 'margin-bottom': '10px' },
-					networkData: { adCode: 'c29tZSBhZCBjb2RlIDIuLi4=', refreshSlot: false, logWritten: true }
-				},
-				{
-					id: '95281ad5-783f-429e-9337-b974760bbafb',
-					network: 'custom',
-					css: {
-						'margin-left': 'auto',
-						'margin-right': 'auto',
-						'margin-top': '0px',
-						'margin-bottom': '0px',
-						clear: 'both'
-					},
-					height: 250,
-					width: 300,
-					isIncontent: true,
-					float: 'left',
-					minDistanceFromPrevAd: '200',
-					selectorsTreeLevel: 'any',
-					section: 4,
-					customCSS: { 'margin-top': '10px', 'margin-bottom': '10px' },
-					networkData: { adCode: 'c29tZSBhZCBjb2RlIDIuLi4=', refreshSlot: false, logWritten: true }
-				},
-				{
-					id: '95281ad5-783f-429e-9337-b974760bbafb',
-					network: 'custom',
-					css: {
-						'margin-left': 'auto',
-						'margin-right': 'auto',
-						'margin-top': '0px',
-						'margin-bottom': '0px',
-						clear: 'both'
-					},
-					height: 250,
-					width: 300,
-					isIncontent: true,
-					float: 'left',
-					minDistanceFromPrevAd: '200',
-					selectorsTreeLevel: 'any',
-					section: 5,
-					customCSS: { 'margin-top': '10px', 'margin-bottom': '10px' },
-					networkData: { adCode: 'c29tZSBhZCBjb2RlIDIuLi4=', refreshSlot: false, logWritten: true }
-				},
-				{
-					id: '95281ad5-783f-429e-9337-b974760bbafb',
-					network: 'custom',
-					css: {
-						'margin-left': 'auto',
-						'margin-right': 'auto',
-						'margin-top': '0px',
-						'margin-bottom': '0px',
-						clear: 'both'
-					},
-					height: 250,
-					width: 300,
-					isIncontent: true,
-					float: 'left',
-					minDistanceFromPrevAd: '200',
-					selectorsTreeLevel: 'any',
-					section: 6,
-					customCSS: { 'margin-top': '10px', 'margin-bottom': '10px' },
-					networkData: { adCode: 'c29tZSBhZCBjb2RlIDIuLi4=', refreshSlot: false, logWritten: true }
-				}
-			],
+			$selector: $(contentSelector),
+			placementConfig: ads,
 			doneCallback: placementData => {
 				const isPlacementData = !!(placementData && Object.keys(placementData).length);
 
@@ -343,4 +219,4 @@ const selectorator = new Selectorator(),
 			});
 	};
 
-export { initDomEvents, getAdpVitals, getAllXPaths, isValidXPath, scrollToView, updateAdSize };
+export { initDomEvents, getAdpVitals, getAllXPaths, isValidXPath, scrollToView, updateAdSize, placeIncontentAds };

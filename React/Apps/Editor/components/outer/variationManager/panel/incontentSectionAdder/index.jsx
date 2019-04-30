@@ -94,7 +94,7 @@ class inContentForm extends React.Component {
 					renderInContentAdder(this, getSupportedSizes)
 				) : (
 					<div>
-						<h1 className="variation-section-heading">Add Incontent Variation</h1>
+						<h1 className="variation-section-heading">Add Incontent Section</h1>
 						<p className="error-message" style={{ fontSize: '1em' }}>
 							Please set your <strong>Content Selector</strong> in Info settings panel first to create
 							in-content sections.
