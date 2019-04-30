@@ -17,6 +17,10 @@ module.exports = {
 			UTM_MEDIUM: 'utm_medium',
 			UTM_TERM: 'utm_term',
 			UTM_CONTENT: 'utm_content'
+		},
+		CUSTOM: {
+			UTM_SCM: 'utm_scm',
+			UTM_SOURCE_CAMPAIGN: 'utm_source_campaign'
 		}
 	},
 	GPT_REFRESH_INTERVAL: 30000,
