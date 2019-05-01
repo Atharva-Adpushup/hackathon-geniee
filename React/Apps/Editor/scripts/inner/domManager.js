@@ -95,6 +95,21 @@ const selectorator = new Selectorator(),
 		return true;
 	},
 	placeIncontentAds = (contentSelector, ads) => {
+		const resultData = {
+			placement: {
+				count: 0,
+				sectionNumbers: []
+			},
+			xpathMiss: {
+				count: 0,
+				sectionNumbers: []
+			}
+		};
+		const parameters = {
+			$,
+			$selector: $(contentSelector),
+			placementConfig: ads
+		};
 		const placeAd = function(adObject, $element) {
 			var $container = $('<div/>');
 			var css = $.extend({}, adObject.css, adObject.customCSS, {
@@ -129,38 +144,95 @@ const selectorator = new Selectorator(),
 		const removeExistingAds = function($element) {
 			$('._ap_apex_ad', $element).remove();
 		};
+		const pushDataInXpathMissFeedback = sectionNumber => {
+			resultData.xpathMiss.count++;
+			resultData.xpathMiss.sectionNumbers.push(sectionNumber);
+		};
+		const pushDataInPlacementFeedback = sectionNumber => {
+			resultData.placement.count++;
+			resultData.placement.sectionNumbers.push(sectionNumber);
+		};
+		const computeXpathMissFeedback = inputData => {
+			inputData.forEach(adObject => {
+				pushDataInXpathMissFeedback(adObject.section);
+			});
+		};
+		const successCallback = placementData => {
+			const isPlacementData = !!(placementData && Object.keys(placementData).length);
 
-		const parameters = {
-			$,
-			$selector: $(contentSelector),
-			placementConfig: ads,
-			doneCallback: placementData => {
-				const isPlacementData = !!(placementData && Object.keys(placementData).length);
+			if (!isPlacementData) {
+				computeXpathMissFeedback(ads);
+				return resultData;
+			}
 
-				if (!isPlacementData) {
-					return false;
+			ads.forEach(adObject => {
+				const isAdSectionNumberPresent = placementData.hasOwnProperty(adObject.section);
+
+				if (!isAdSectionNumberPresent) {
+					pushDataInXpathMissFeedback(adObject.section);
+					return true;
 				}
 
-				Object.keys(placementData).forEach(placementId => {
-					const placementObject = placementData[placementId];
-					const $el = placementObject.elem;
-					const adObject = parameters.placementConfig.filter(
-						object => Number(object.section) === Number(placementId)
-					);
-					const isValidDataToPlaceAd = !!($el && adObject && adObject.length);
+				const placementObject = placementData[adObject.section];
+				const $el = placementObject.elem;
+				const isValidDataToPlaceAd = !!(placementObject && Object.keys(placementObject).length && $el);
 
-					if (isValidDataToPlaceAd) {
-						placeAd(adObject[0], $el);
-					}
-				});
+				if (!isValidDataToPlaceAd) {
+					return true;
+				}
 
-				setContentOverlayHeight(parameters.$selector);
+				placeAd(adObject, $el);
+				pushDataInPlacementFeedback(adObject.section);
+			});
+
+			setContentOverlayHeight(parameters.$selector);
+			return resultData;
+		};
+		const transformResultData = result => {
+			const transformedResult = {
+				type: 'info',
+				message: `Ad placed ✅: __placedAdsCount__, section numbers: __placedAdsSectionNumbers__, 
+Ad xpathMiss ❌: __xpathMissAdsCount__, section numbers: __xpathMissAdsSectionNumbers__`
+			};
+			const isResult = !!(result && Object.keys(result).length);
+			const isValidPlacement = !!(
+				isResult &&
+				result.placement &&
+				result.placement.count &&
+				result.placement.sectionNumbers.length
+			);
+			const isValidXPathMiss = !!(
+				isResult &&
+				result.xpathMiss &&
+				result.xpathMiss.count &&
+				result.xpathMiss.sectionNumbers.length
+			);
+			const isResultSuccess = !!(isValidPlacement && !isValidXPathMiss);
+			const isResultInfo = !!(isValidPlacement && isValidXPathMiss);
+			const isResultFailure = !!(!isValidPlacement && isValidXPathMiss);
+
+			if (isResultSuccess) {
+				transformedResult.type = 'success';
+			} else if (isResultInfo) {
+				transformedResult.type = 'info';
+			} else if (isResultFailure) {
+				transformedResult.type = 'error';
 			}
+
+			transformedResult.message = transformedResult.message
+				.replace('__placedAdsCount__', result.placement.count)
+				.replace('__placedAdsSectionNumbers__', result.placement.sectionNumbers.join(', '))
+				.replace('__xpathMissAdsCount__', result.xpathMiss.count)
+				.replace('__xpathMissAdsSectionNumbers__', result.xpathMiss.sectionNumbers.join(', '));
+
+			return transformedResult;
 		};
 
 		removeExistingAds(parameters.$selector);
 		setContentOverlayHeight(parameters.$selector);
-		IncontentAnalyzer(parameters);
+		return IncontentAnalyzer(parameters)
+			.then(successCallback)
+			.then(transformResultData);
 	},
 	scrollToView = adId => {
 		let id = `#ad-${adId}`,

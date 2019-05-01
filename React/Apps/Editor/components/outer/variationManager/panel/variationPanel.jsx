@@ -70,6 +70,9 @@ class VariationPanel extends React.Component {
 				.filter(section => !!section.isIncontent)
 				.map(sectionData => {
 					const adObj = sectionData.ads[0];
+					const isSelectorsTreeLevel = !!(
+						variation.selectorsTreeLevel && Number(variation.selectorsTreeLevel)
+					);
 
 					sectionData = {
 						...sectionData,
@@ -79,6 +82,10 @@ class VariationPanel extends React.Component {
 						width: adObj.width,
 						section: sectionData.sectionNo
 					};
+
+					if (isSelectorsTreeLevel) {
+						sectionData.selectorsTreeLevel = variation.selectorsTreeLevel;
+					}
 
 					delete sectionData.sectionNo;
 					delete sectionData.ads;

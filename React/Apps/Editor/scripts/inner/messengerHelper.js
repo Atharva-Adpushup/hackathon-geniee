@@ -58,7 +58,16 @@ const messenger = new Messenger(),
 					break;
 
 				case messengerCommands.INIT_INCONTENT_ADS_PREVIEW:
-					placeIncontentAds(data.contentSelector, data.ads);
+					placeIncontentAds(data.contentSelector, data.ads)
+						.then(result => {
+							sendMessage(messengerCommands.SHOW_INCONTENT_ADS_PREVIEW_RESULT, {
+								type: result.type,
+								message: result.message
+							});
+						})
+						.fail(error => {
+							console.error('Error in running IncontentAnalyzer: ', error);
+						});
 					break;
 
 				case messengerCommands.VALIDATE_XPATH_SECTION:

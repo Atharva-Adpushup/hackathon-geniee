@@ -1,6 +1,6 @@
 (function() {
 	function IncontentAnalyzer(initOptions) {
-		this.$ = window.adpushup.$;
+		this.$ = initOptions.$;
 		this.selectedElems = [];
 		this.containerWidth;
 		this.floatVar;
@@ -68,8 +68,8 @@
 			};
 
 			/** If word is too long it cannot be wrapped alongside float and results in blank space.
-			It's best to ignore such words that cannot be wrapped.
-		 */
+				It's best to ignore such words that cannot be wrapped.
+			 */
 			var isWrappable = function(text, reqLength) {
 				var maxWordLength = Math.max.apply(
 					this,
@@ -124,14 +124,14 @@
 						}
 
 						/* Floating multiple elements is hard espicially when one of them can be
-					modestly large. Better to ignore and go ahead. */
+						modestly large. Better to ignore and go ahead. */
 						if (cssFloat === 'right' || cssFloat === 'left') {
 							break;
 						}
 
 						/* In case the the following elment is of different background, floating will
-					wrap the text but without background. This results in an obvious overlap.
-					which can be prevented by checking the background */
+						wrap the text but without background. This results in an obvious overlap.
+						which can be prevented by checking the background */
 						if (ref.rootBackgroundColor !== ref.computeBackgroundColor(nextElem)) {
 							console.log(
 								'Break Because Different background.',
@@ -320,7 +320,7 @@
 						if ($xpathOffset.top > selectedOffset.top) {
 							// if xpath element is below selected element
 							/* Currently choosing to ignore this because
-			in case  of wrapping, mostly the elmenents that matter are the ones above */
+				in case  of wrapping, mostly the elmenents that matter are the ones above */
 							if ($xpathOffset.top - (selectedOffset.top + selectedHeight) <= minGap) {
 								ref.selectedElems.splice(ref.selectedElems.indexOf(selectedElem), 1);
 							}
@@ -447,10 +447,10 @@
 			};
 		};
 
-		this.findSelectorPlacements = function($selector, placementConfig, doneCallback) {
+		this.findSelectorPlacements = function($selector, placementConfig) {
 			var ref = this;
 			var $ = ref.$;
-
+			var deferred = $.Deferred();
 			var bootstrapPlacements = function() {
 					if (ref.started) {
 						return false;
@@ -518,7 +518,7 @@
 						}
 					});
 
-					doneCallback(ref.placements);
+					deferred.resolve(ref.placements);
 				},
 				imgReadyLoop = function() {
 					// Check what image tags haven't been loaded.
@@ -551,16 +551,17 @@
 			});
 
 			window.intervalId = setInterval(imgReadyLoop, 100);
+			return deferred.promise();
 		};
 
 		this.bindJQueryPluginMethods();
 	}
 
-	function init($selector, placementConfig, doneCallback) {
-		var options = { isEvenSpacingAlgo: true, sectionBracket: 600 };
+	function init(params) {
+		var options = { isEvenSpacingAlgo: true, sectionBracket: 600, $: params.$ };
 		var instance = new IncontentAnalyzer(options);
 
-		instance.findSelectorPlacements($selector, placementConfig, doneCallback);
+		return instance.findSelectorPlacements(params.$selector, params.placementConfig);
 	}
 
 	return init;

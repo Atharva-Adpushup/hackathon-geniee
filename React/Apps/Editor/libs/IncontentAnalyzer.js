@@ -444,10 +444,10 @@ function IncontentAnalyzer(initOptions) {
 		};
 	};
 
-	this.findSelectorPlacements = function($selector, placementConfig, doneCallback) {
+	this.findSelectorPlacements = function($selector, placementConfig) {
 		var ref = this;
 		var $ = ref.$;
-
+		var deferred = $.Deferred();
 		var bootstrapPlacements = function() {
 				if (ref.started) {
 					return false;
@@ -515,7 +515,7 @@ function IncontentAnalyzer(initOptions) {
 					}
 				});
 
-				doneCallback(ref.placements);
+				deferred.resolve(ref.placements);
 			},
 			imgReadyLoop = function() {
 				// Check what image tags haven't been loaded.
@@ -548,6 +548,7 @@ function IncontentAnalyzer(initOptions) {
 		});
 
 		window.intervalId = setInterval(imgReadyLoop, 100);
+		return deferred.promise();
 	};
 
 	this.bindJQueryPluginMethods();
@@ -557,7 +558,7 @@ function init(params) {
 	var options = { isEvenSpacingAlgo: true, sectionBracket: 600, $: params.$ };
 	var instance = new IncontentAnalyzer(options);
 
-	instance.findSelectorPlacements(params.$selector, params.placementConfig, params.doneCallback);
+	return instance.findSelectorPlacements(params.$selector, params.placementConfig);
 }
 
 export default init;
