@@ -142,7 +142,7 @@ const selectorator = new Selectorator(),
 			$contentOverlayEl.css({ height: `${$element.height()}px` });
 		};
 		const removeExistingAds = function($element) {
-			$('._ap_apex_ad', $element).remove();
+			$('._ap_apex_ad', $element || $(window.document.body)).remove();
 		};
 		const pushDataInXpathMissFeedback = sectionNumber => {
 			resultData.xpathMiss.count++;
@@ -166,7 +166,9 @@ const selectorator = new Selectorator(),
 			}
 
 			ads.forEach(adObject => {
-				const isAdSectionNumberPresent = placementData.hasOwnProperty(adObject.section);
+				const isAdSectionNumberPresent = !!(
+					placementData.hasOwnProperty(adObject.section) && placementData[adObject.section]
+				);
 
 				if (!isAdSectionNumberPresent) {
 					pushDataInXpathMissFeedback(adObject.section);
@@ -174,7 +176,7 @@ const selectorator = new Selectorator(),
 				}
 
 				const placementObject = placementData[adObject.section];
-				const $el = placementObject.elem;
+				const $el = placementObject && placementObject.elem;
 				const isValidDataToPlaceAd = !!(placementObject && Object.keys(placementObject).length && $el);
 
 				if (!isValidDataToPlaceAd) {
