@@ -50,11 +50,33 @@ const sites = [
 		name: 'xyz.com'
 	}
 ];
+const yAxisGroups = [
+	{
+		seriesNames: ['AdPushup Variation Page RPM', 'Original Variation Page RPM'],
+		yAxisConfig: {
+			labels: {
+				format: '${value}'
+			}
+		}
+	}
+];
+const tableHeader = [
+	{ title: 'Website', prop: 'siteName' },
+	{ title: 'AdPushup Page views', prop: 'adpushup_page_views' },
+	{ title: 'Page RPM ($)', prop: 'page_cpm' },
+	{ title: 'AdPushup Impressions', prop: 'adpushup_impressions' },
+	{ title: 'Ad eCPM', prop: 'ad_ecpm' },
+	{ title: 'Network Net Revenue', prop: 'network_net_revenue' },
+	{ title: 'Network Gross Revenue', prop: 'network_gross_revenue' },
+	{ title: 'XPath Miss', prop: 'adpushup_xpath_miss' }
+];
 
 export {
 	DASHBOARD_NAV_ITEMS_INDEXES,
 	DASHBOARD_NAV_ITEMS_VALUES,
 	DASHBOARD_NAV_ITEMS,
 	quickDates,
-	sites
+	sites,
+	yAxisGroups,
+	tableHeader
 };

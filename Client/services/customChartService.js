@@ -241,7 +241,11 @@ export function getCustomChartConfig(
 						allowPointSelect: true,
 						cursor: 'pointer',
 						dataLabels: {
-							enabled: false
+							enabled: true,
+							format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+							style: {
+								color: 'black'
+							}
 						},
 						showInLegend: true
 					}
