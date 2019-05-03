@@ -1,17 +1,34 @@
 import React from 'react';
-import { convertObjToArr } from '../helpers/utils';
+import { getDateRange } from '../helpers/utils';
 import Selectbox from '../../../Components/Selectbox/index';
 import CustomChart from '../../../Components/CustomChart';
 import data from '../configs/data.json';
 import { Row, Col } from 'react-bootstrap';
-import { quickDates } from '../configs/commonConsts';
-let dates = Object.assign({}, quickDates);
-console.log(dates);
+import { quickDates, yAxisGroups } from '../configs/commonConsts';
+import { Link } from 'react-router-dom';
+import reportService from '../../../services/reportService';
 class SitewiseReport extends React.Component {
 	state = {
 		quickDates: quickDates,
-		selectedDate: quickDates[0].value
+		selectedDate: quickDates[0].value,
+		series: [],
+		xAxis: {}
 	};
+	componentDidMount() {
+		this.getGraphData();
+	}
+	getGraphData() {
+		let { selectedDate } = this.state,
+			params = getDateRange(selectedDate),
+			{ path, reportType } = this.props;
+		if (reportType == 'site') params.siteid = this.props.siteId;
+		reportService.getWidgetData(path, params).then(response => {
+			if (response.status == 200) {
+				let data = response.data && response.data.data ? response.data.data.result : [];
+				this.computeGraphData(data);
+			}
+		});
+	}
 	renderControl() {
 		return (
 			<div className="aligner aligner--hEnd">
@@ -22,35 +39,40 @@ class SitewiseReport extends React.Component {
 						wrapperClassName="display-inline"
 						isClearable={false}
 						isSearchable={false}
-						selected={this.state.selectedDate || ''}
+						selected={this.state.selectedDate}
 						options={this.state.quickDates}
 						onSelect={selectedDate => {
-							console.log(selectedDate);
-							this.setState({ selectedDate });
+							this.setState({ selectedDate }, this.getGraphData);
 						}}
 					/>
 				</div>
 			</div>
 		);
 	}
-	renderChart() {
-		const yAxisGroups = [
-			{
-				seriesNames: ['Page RPM (Original)', 'Page RPM (AdPushup)'],
-				yAxisConfig: {
-					labels: {
-						format: '${value}'
-					}
+	computeGraphData = results => {
+		let series = [
+				{
+					name: 'Revenue',
+					colorByPoint: true,
+					data: []
 				}
-			}
-		];
-
-		const type = 'pie';
-		const series = data.pieData;
-		const xAxis = data.xAxis;
+			],
+			data = [];
+		results.forEach(result => {
+			data.push({
+				name: result.network,
+				y: Math.round(result.revenue * 100) / 100
+			});
+		});
+		series[0].data = data;
+		this.setState({ series });
+	};
+	renderChart() {
+		let type = 'pie',
+			{ series } = this.state;
 		return (
 			<div>
-				<CustomChart type={type} series={series} xAxis={xAxis} yAxisGroups={yAxisGroups} />
+				<CustomChart type={type} xAxis={data.xAxis} series={series} yAxisGroups={yAxisGroups} />
 			</div>
 		);
 	}
@@ -59,6 +81,11 @@ class SitewiseReport extends React.Component {
 			<Row>
 				<Col sm={12}>{this.renderControl()}</Col>
 				<Col sm={12}>{this.renderChart()}</Col>
+				<Col sm={12}>
+					<Link to="/reports" className="float-right">
+						View Reports
+					</Link>
+				</Col>
 			</Row>
 		);
 	}

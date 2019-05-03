@@ -21,19 +21,22 @@
 }
 
 .width-100 {
-	width: 100%;
+	width: 100% !important;
 }
 
 .width-50 {
-	width: 50%;
+	width: 50% !important;
 }
 
 .width-70 {
-	width: 70%;
+	width: 70% !important;
+}
+.width-90 {
+	width: 90% !important;
 }
 
 .width-30 {
-	width: 30%;
+	width: 30% !important;
 }
 
 .card-color {
@@ -44,4 +47,16 @@
 .display-inline {
 	display: inline-block;
 	width: auto;
+}
+
+.float-right {
+	float: right;
+}
+.u-margin-lr-auto {
+	margin-left: auto !important;
+	margin-right: auto !important;
+}
+
+.font-small {
+	font-size: 14px;
 }
