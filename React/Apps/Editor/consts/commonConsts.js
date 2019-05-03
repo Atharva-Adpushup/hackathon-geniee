@@ -189,6 +189,7 @@ const status = {
 		CLOSE_VARIATION_PANEL: 'CLOSE_VARIATION_PANEL',
 		UPDATE_CONTENT_SELECTOR: 'UPDATE_CONTENT_SELECTOR',
 		UPDATE_INCONTENT_SELECTORS_TREE_LEVEL: 'UPDATE_INCONTENT_SELECTORS_TREE_LEVEL',
+		UPDATE_INCONTENT_SECTION_BRACKET: 'UPDATE_INCONTENT_SECTION_BRACKET',
 		INIT_INCONTENT_ADS_PREVIEW: 'INIT_INCONTENT_ADS_PREVIEW',
 		SAVE_KEY_VALUES: 'SAVE_KEY_VALUES',
 		SAVE_PERSONALIZATION_INFO: 'SAVE_PERSONALIZATION_INFO',
@@ -335,23 +336,23 @@ const status = {
 	defaultSectionCss = {
 		'margin-left': 'auto',
 		'margin-right': 'auto',
-		'margin-top': '0px',
-		'margin-bottom': '0px',
+		'margin-top': '10px',
+		'margin-bottom': '10px',
 		clear: 'both'
 	},
 	leftSectionCss = {
 		float: 'left',
-		'margin-left': '0px',
-		'margin-right': '5px',
-		'margin-top': '0px',
-		'margin-bottom': '5px'
+		'margin-left': '10px',
+		'margin-right': '10px',
+		'margin-top': '10px',
+		'margin-bottom': '10px'
 	},
 	rightSectionCss = {
 		float: 'right',
-		'margin-left': '5px',
-		'margin-right': '0px',
-		'margin-top': '0px',
-		'margin-bottom': '5px'
+		'margin-left': '10px',
+		'margin-right': '10px',
+		'margin-top': '10px',
+		'margin-bottom': '10px'
 	},
 	uiModes = {
 		EDITOR_MODE: 1,
@@ -497,7 +498,11 @@ const status = {
 		}
 	},
 	incontentSectionSettings = {
-		SELECTORS_TREE_LEVEL: ['any', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
+		SELECTORS_TREE_LEVEL: ['any', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
+		SECTION_BRACKETS: {
+			DESKTOP: 600,
+			MOBILE: 450
+		}
 	},
 	refreshIntervals = [30, 60, 90, 120, 180, 240, 300, 360];
 

@@ -263,23 +263,20 @@ var $ = require('jquery'),
 						});
 				});
 			},
-			placeInContentAds = function($incontentElm, inContentAds) {
+			placeInContentAds = function($incontentElm, inContentAds, globalConfig) {
 				var parameters = {
 					$: $,
 					$selector: $incontentElm,
-					placementConfig: inContentAds
+					placementConfig: inContentAds,
+					sectionBracket: globalConfig.sectionBracket,
+					selectorsTreeLevel: globalConfig.selectorsTreeLevel
 				};
 				var successCallback = function(sectionsWithTargetElm) {
 					$(inContentAds).each(function(index, ad) {
 						var sectionObj = sectionsWithTargetElm[ad.section],
-							$containerElement,
-							isContainerElement;
+							$containerElement;
 
 						if (sectionObj && sectionObj.elem) {
-							if (!!sectionObj.isSecondaryCss) {
-								ad.css = $.extend(true, {}, ad.secondaryCss);
-							}
-
 							if (ad.customCSS) {
 								ad.css = $.extend(true, {}, ad.css, ad.customCSS);
 							}
@@ -287,7 +284,6 @@ var $ = require('jquery'),
 							//feedbackData.ads.push(ad.id);
 
 							$containerElement = getContainer(ad, sectionObj.elem);
-							isContainerElement = !!($containerElement && $containerElement.length);
 
 							next(ad, { success: true, container: $containerElement });
 						} else {
@@ -334,11 +330,11 @@ var $ = require('jquery'),
 			// If incontent ads thr but no xpath given for content area
 			if (ads.inContentAds.length && !contentSelector) {
 				handleContentSelectorFailure(ads.inContentAds);
-			} else if (ads.inContentAds.length) {
+			} else if (ads.inContentAds.length && variation.incontentSectionConfig) {
 				nodewatcher
 					.watch(contentSelector, config.xpathWaitTimeout)
 					.done(function($incontentElm) {
-						placeInContentAds($incontentElm, ads.inContentAds);
+						placeInContentAds($incontentElm, ads.inContentAds, variation.incontentSectionConfig);
 					})
 					.fail(function() {
 						handleContentSelectorFailure(ads.inContentAds);

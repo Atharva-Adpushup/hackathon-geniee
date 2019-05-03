@@ -55,11 +55,12 @@ const getLastVariationNumber = function(variations) {
 		variationId,
 		channelId
 	}),
-	initIncontentAdsPreview = (channelId, contentSelector, ads) => ({
+	initIncontentAdsPreview = (channelId, contentSelector, ads, config) => ({
 		type: variationActions.INIT_INCONTENT_ADS_PREVIEW,
 		channelId,
 		contentSelector,
-		ads
+		ads,
+		config
 	}),
 	updateInContentTreeSelectorsLevel = (variationId, selectorsTreeLevel) => dispatch => {
 		dispatch({
@@ -72,6 +73,19 @@ const getLastVariationNumber = function(variations) {
 			mode: 'success',
 			title: 'Operation Successful',
 			message: 'Variation incontent selectors tree level setting saved'
+		});
+	},
+	updateInContentSectionBracket = (variationId, incontentSectionBracket) => dispatch => {
+		dispatch({
+			type: variationActions.UPDATE_INCONTENT_SECTION_BRACKET,
+			variationId,
+			incontentSectionBracket
+		});
+		dispatch({
+			type: uiActions.SHOW_NOTIFICATION,
+			mode: 'success',
+			title: 'Operation Successful',
+			message: 'Variation incontent section bracket setting saved'
 		});
 	},
 	copyVariation = (variationId, channelId) => (dispatch, getState) => {
@@ -300,6 +314,7 @@ export {
 	saveKeyValues,
 	updateContentSelector,
 	updateInContentTreeSelectorsLevel,
+	updateInContentSectionBracket,
 	initIncontentAdsPreview,
 	savePersonalizationInfo
 };

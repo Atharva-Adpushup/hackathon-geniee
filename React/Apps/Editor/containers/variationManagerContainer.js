@@ -42,8 +42,8 @@ const mapStateToProps = state => ({
 		updateContentSelector: (variationId, channelId, contentSelector) => {
 			dispatch(updateContentSelector(variationId, channelId, contentSelector));
 		},
-		initIncontentAdsPreview: (channelId, contentSelector, ads) => {
-			dispatch(initIncontentAdsPreview(channelId, contentSelector, ads));
+		initIncontentAdsPreview: (channelId, contentSelector, ads, config) => {
+			dispatch(initIncontentAdsPreview(channelId, contentSelector, ads, config));
 		},
 		setActiveVariation: (variationId, channelId) => {
 			dispatch(setActiveVariation(variationId, channelId));

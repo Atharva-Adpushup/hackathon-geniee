@@ -3,6 +3,7 @@ import TabPanel from 'react-tab-panel';
 import $ from 'jquery';
 import 'react-tab-panel/index.css';
 import './variationPanel.scss';
+import { incontentSectionSettings } from '../../../../consts/commonConsts';
 import IncontentAdder from './incontentSectionAdder/index';
 import VariationOptions from './variationOptions';
 import VariationSections from './variationSections/index';
@@ -49,6 +50,7 @@ class VariationPanel extends React.Component {
 		const {
 				variation,
 				channelId,
+				activeChannel,
 				sections,
 				ui,
 				reporting,
@@ -92,7 +94,13 @@ class VariationPanel extends React.Component {
 					delete sectionData.id;
 					delete sectionData.name;
 					return sectionData;
-				});
+				}),
+			incontentSectionsConfig = {
+				selectorsTreeLevel: variation.selectorsTreeLevel || '',
+				sectionBracket:
+					variation.incontentSectionBracket ||
+					incontentSectionSettings.SECTION_BRACKETS[activeChannel.platform.toUpperCase()]
+			};
 
 		return (
 			<div className="variation-settings">
@@ -104,7 +112,7 @@ class VariationPanel extends React.Component {
 							sections={sections}
 							ui={ui}
 							reporting={reporting}
-							platform={this.props.activeChannel.platform}
+							platform={activeChannel.platform}
 							networkConfig={networkConfig}
 						/>
 					</div>
@@ -115,13 +123,15 @@ class VariationPanel extends React.Component {
 							channelId={channelId}
 							variation={variation}
 							incontentSections={incontentSections}
+							incontentSectionsConfig={incontentSectionsConfig}
+							platform={activeChannel.platform}
 							disabledVariationsCount={disabledVariationsCount}
 							controlVariationsCount={controlVariationsCount}
 						/>
 					</div>
 					<div tabTitle="Add Incontent Section">
 						<IncontentAdder
-							activeChannel={this.props.activeChannel}
+							activeChannel={activeChannel}
 							channelId={channelId}
 							variation={variation}
 							zonesData={zonesData}
@@ -139,7 +149,7 @@ class VariationPanel extends React.Component {
 							variation={variation}
 							sections={sections}
 							ui={ui}
-							platform={this.props.activeChannel.platform}
+							platform={activeChannel.platform}
 						/>
 					</div>
 					<div tabTitle="Personalization">

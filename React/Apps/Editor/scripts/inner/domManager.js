@@ -94,7 +94,7 @@ const selectorator = new Selectorator(),
 
 		return true;
 	},
-	placeIncontentAds = (contentSelector, ads) => {
+	placeIncontentAds = (contentSelector, ads, globalConfig) => {
 		const resultData = {
 			placement: {
 				count: 0,
@@ -108,7 +108,8 @@ const selectorator = new Selectorator(),
 		const parameters = {
 			$,
 			$selector: $(contentSelector),
-			placementConfig: ads
+			placementConfig: ads,
+			...globalConfig
 		};
 		const placeAd = function(adObject, $element) {
 			var $container = $('<div/>');

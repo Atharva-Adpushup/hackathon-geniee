@@ -9,7 +9,8 @@ import {
 	editTrafficDistribution,
 	disableVariation,
 	tagcontrolVariation,
-	updateInContentTreeSelectorsLevel
+	updateInContentTreeSelectorsLevel,
+	updateInContentSectionBracket
 } from 'actions/variationActions.js';
 import InlineEdit from '../../../shared/inlineEdit/index.jsx';
 import CustomToggleSwitch from '../../../shared/customToggleSwitch.jsx';
@@ -24,6 +25,8 @@ const variationOtions = props => {
 			variation,
 			channelId,
 			incontentSections,
+			incontentSectionsConfig,
+			platform,
 			disabledVariationsCount,
 			controlVariationsCount,
 			onDisableVariation,
@@ -31,7 +34,8 @@ const variationOtions = props => {
 			onEditTrafficDistribution,
 			onUpdateContentSelector,
 			onInitIncontentAdsPreview,
-			onUpdateInContentTreeSelectorsLevel
+			onUpdateInContentTreeSelectorsLevel,
+			onUpdateInContentSectionBracket
 		} = props,
 		variationId = variation.id,
 		hasDisabledVariationsReachedLimit = !!(
@@ -46,7 +50,15 @@ const variationOtions = props => {
 		contentSelector = variation.contentSelector,
 		computedToggleSwitchValue = hasDisabledVariationsReachedLimit ? false : !!variation.disable,
 		incontentSelectorsTreeLevelValue = variation.selectorsTreeLevel || '',
-		shouldIncontentAnalyzerPreviewBeShown = !!(contentSelector && incontentSections && incontentSections.length);
+		incontentDefaultSectionBracketValue = incontentSectionSettings.SECTION_BRACKETS[platform.toUpperCase()],
+		incontentSectionBracketValue = variation.incontentSectionBracket || incontentDefaultSectionBracketValue,
+		shouldIncontentAnalyzerPreviewBeShown = !!(
+			contentSelector &&
+			incontentSections &&
+			incontentSections.length &&
+			incontentSectionsConfig &&
+			Object.keys(incontentSectionsConfig).length
+		);
 
 	function copyVariationConfirmation(fn, variationId, channelId) {
 		let confirm = window.confirm('Are you sure you want to copy this variation?');
@@ -104,7 +116,7 @@ const variationOtions = props => {
 							placement="top"
 							overlay={
 								<Tooltip id="incontent-children-tree-level-info-tooltip">
-									Select the children (selectors) tree level number upto which Incontent Sections
+									Select the children (selectors) tree level number upto which IncontentAnalyzer
 									library will choose valid HTML selectors to place sections/ads. This is a variation
 									level setting that will be applicable on all sections.
 								</Tooltip>
@@ -135,6 +147,40 @@ const variationOtions = props => {
 				</Row>
 			) : null}
 
+			{/*IncontentAnalyzer - section bracket UI*/}
+			{contentSelector ? (
+				<Row className="u-margin-b15px">
+					<Col className="u-padding-r10px" xs={2}>
+						Incontent section Bracket
+						<OverlayTrigger
+							placement="top"
+							overlay={
+								<Tooltip id="incontent-section-bracket-info-tooltip">
+									Enter the incontent section bracket number that IncontentAnalyzer library will use
+									to place sections/ads. A non-zero value will override default values for different
+									platforms (DESKTOP: 600, MOBILE: 450). This is a variation level setting that will
+									be applicable on all sections.
+								</Tooltip>
+							}
+						>
+							<span className="variation-settings-icon">
+								<i className="fa fa-info" />
+							</span>
+						</OverlayTrigger>
+					</Col>
+					<Col className="u-padding-l10px" xs={4}>
+						<InlineEdit
+							type="number"
+							validate
+							value={incontentSectionBracketValue}
+							submitHandler={onUpdateInContentSectionBracket.bind(null, variationId)}
+							text="Section bracket"
+							errorMessage="Section bracket cannot be empty"
+						/>
+					</Col>
+				</Row>
+			) : null}
+
 			{/*IncontentAnalyzer - show preview UI*/}
 			{shouldIncontentAnalyzerPreviewBeShown ? (
 				<Row>
@@ -144,10 +190,10 @@ const variationOtions = props => {
 							placement="top"
 							overlay={
 								<Tooltip id="incontent-ads-preview-info-tooltip">
-									Click adjacent button to show Incontent ads placement preview. This preview tries to
-									simulate how incontent ads will appear inside selected container based on your
-									setup. Please ensure that your incontent ads setup is complete before you run this
-									preview.
+									Click adjacent button to show IncontentAnalyzer ads placement preview. This preview
+									tries to simulate how incontent ads will appear inside selected container based on
+									your setup. Please ensure that your incontent ads setup is complete before you run
+									this preview.
 								</Tooltip>
 							}
 						>
@@ -163,7 +209,8 @@ const variationOtions = props => {
 								null,
 								channelId,
 								contentSelector,
-								incontentSections
+								incontentSections,
+								incontentSectionsConfig
 							)}
 							type="submit"
 						>
@@ -295,6 +342,8 @@ variationOtions.propTypes = {
 	disabledVariationsCount: PropTypes.num,
 	controlVariationsCount: PropTypes.num,
 	incontentSections: PropTypes.array,
+	incontentSectionsConfig: PropTypes.object,
+	platform: PropTypes.string.isRequired,
 	onCopyVariation: PropTypes.func.isRequired,
 	onDeleteVariation: PropTypes.func.isRequired,
 	onEditVariationName: PropTypes.func.isRequired,
@@ -302,6 +351,7 @@ variationOtions.propTypes = {
 	onUpdateInContentTreeSelectorsLevel: PropTypes.func.isRequired,
 	onUpdateContentSelector: PropTypes.func.isRequired,
 	onInitIncontentAdsPreview: PropTypes.func,
+	onUpdateInContentSectionBracket: PropTypes.func,
 	onDisableVariation: PropTypes.func,
 	onTagcontrolVariation: PropTypes.func
 };
@@ -317,7 +367,8 @@ export default connect(
 				onEditTrafficDistribution: editTrafficDistribution,
 				onDisableVariation: disableVariation,
 				onTagcontrolVariation: tagcontrolVariation,
-				onUpdateInContentTreeSelectorsLevel: updateInContentTreeSelectorsLevel
+				onUpdateInContentTreeSelectorsLevel: updateInContentTreeSelectorsLevel,
+				onUpdateInContentSectionBracket: updateInContentSectionBracket
 			},
 			dispatch
 		)

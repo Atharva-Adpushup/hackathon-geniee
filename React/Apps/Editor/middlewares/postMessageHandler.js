@@ -88,7 +88,8 @@ const getData = state => {
 			} else if (isActionInitIncontentAdsPreview) {
 				sendMessage(nextState.activeChannelId, messengerCommands.INIT_INCONTENT_ADS_PREVIEW, {
 					contentSelector: action.contentSelector,
-					ads: action.ads
+					ads: action.ads,
+					config: action.config
 				});
 			}
 		}

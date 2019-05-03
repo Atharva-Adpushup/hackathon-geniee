@@ -52,7 +52,7 @@ const _ = require('lodash'),
 			ADPTags.push(adData);
 		}
 	},
-	getSectionsPayload = function(variationSections, platform, pagegroup, selectorsTreeLevel) {
+	getSectionsPayload = function(variationSections, platform, pagegroup) {
 		var ads = [],
 			ad = null,
 			json,
@@ -112,9 +112,6 @@ const _ = require('lodash'),
 				if (section.notNear) {
 					json.notNear = section.notNear;
 				}
-				if (selectorsTreeLevel) {
-					json.selectorsTreeLevel = selectorsTreeLevel;
-				}
 			} else {
 				_.extend(json, {
 					xpath: section.xpath,
@@ -140,7 +137,7 @@ const _ = require('lodash'),
 			return true;
 		}
 
-		var ads = getSectionsPayload(variation.sections, platform, pageGroup, variation.selectorsTreeLevel),
+		var ads = getSectionsPayload(variation.sections, platform, pageGroup),
 			computedVariationObj,
 			contentSelector = variation.contentSelector,
 			isContentSelector = !!contentSelector;
@@ -157,6 +154,10 @@ const _ = require('lodash'),
 			adpKeyValues: variation.adpKeyValues,
 			contentSelector: isContentSelector ? contentSelector : '',
 			ads: ads,
+			incontentSectionConfig: {
+				selectorsTreeLevel: variation.selectorsTreeLevel || '',
+				sectionBracket: variation.incontentSectionBracket
+			},
 			personalization: variation.personalization,
 			// Data required for auto optimiser model
 			// Page revenue is mapped as sum

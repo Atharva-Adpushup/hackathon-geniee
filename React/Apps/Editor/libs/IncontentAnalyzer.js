@@ -1,6 +1,15 @@
 function IncontentAnalyzer(initOptions) {
 	this.$ = initOptions.$;
 	this.selectedElems = [];
+	this.defaultSectionCSS = {
+		'margin-left': 'auto',
+		'margin-right': 'auto',
+		'margin-top': '10px',
+		'margin-bottom': '10px',
+		clear: 'both',
+		float: 'none'
+	};
+
 	this.containerWidth;
 	this.floatVar;
 	this.width;
@@ -10,7 +19,8 @@ function IncontentAnalyzer(initOptions) {
 	this.placements = {};
 	this.started = false;
 	this.isEvenSpacingAlgo = initOptions.isEvenSpacingAlgo || true;
-	this.defaultSectionBracket = initOptions.sectionBracket || 600;
+	this.defaultSectionBracket = Number(initOptions.sectionBracket) || 600;
+	this.selectorsTreeLevel = Number(initOptions.selectorsTreeLevel) || '';
 
 	if (!window.console || !console.log) {
 		window.console = {};
@@ -344,8 +354,7 @@ function IncontentAnalyzer(initOptions) {
 							isValidInputData &&
 							config[placementNumber] &&
 							Object.keys(config[placementNumber]).length &&
-							config[placementNumber].elem &&
-							config[placementNumber].hasOwnProperty('isSecondaryCss')
+							config[placementNumber].elem
 						),
 						resultData = null,
 						placementId,
@@ -367,8 +376,7 @@ function IncontentAnalyzer(initOptions) {
 							config &&
 							config[placementId] &&
 							Object.keys(config[placementId]).length &&
-							config[placementId].elem &&
-							config[placementId].hasOwnProperty('isSecondaryCss')
+							config[placementId].elem
 						);
 
 						if (isValidPlacement) {
@@ -387,8 +395,7 @@ function IncontentAnalyzer(initOptions) {
 
 			if ($.isEmptyObject(ref.placements) && ref.selectedElems.length) {
 				ref.placements[section] = {
-					elem: ref.selectedElems[0],
-					isSecondaryCss: false
+					elem: ref.selectedElems[0]
 				};
 
 				if (adObj.float && adObj.float !== 'none') {
@@ -412,8 +419,7 @@ function IncontentAnalyzer(initOptions) {
 					// If last section didn't have any placement, then there is enough gap for one element
 					if (!lastPlacement) {
 						ref.placements[section] = {
-							elem: currElem,
-							isSecondaryCss: false
+							elem: currElem
 						};
 
 						break;
@@ -424,8 +430,7 @@ function IncontentAnalyzer(initOptions) {
 						(minDistance || 200) + ref.distanceAddFactor
 					) {
 						ref.placements[section] = {
-							elem: currElem,
-							isSecondaryCss: false
+							elem: currElem
 						};
 
 						if (adObj.float && adObj.float !== 'none') {
@@ -478,7 +483,7 @@ function IncontentAnalyzer(initOptions) {
 							.selectBetween(
 								sectionBracketRange.lower,
 								sectionBracketRange.upper,
-								adObj.selectorsTreeLevel
+								ref.selectorsTreeLevel
 							);
 
 						if (isIgnoreXpaths) {
@@ -505,13 +510,9 @@ function IncontentAnalyzer(initOptions) {
 
 					if (!ref.placements[sectionNumber]) {
 						adObj.float = 'none';
-						placeFn();
+						adObj.css = $.extend({}, adObj.css, ref.defaultSectionCSS);
 
-						if (ref.placements[sectionNumber]) {
-							ref.placements[sectionNumber].isSecondaryCss = true;
-						}
-					} else {
-						setFloatCSS(adObj);
+						placeFn();
 					}
 				});
 
@@ -529,17 +530,6 @@ function IncontentAnalyzer(initOptions) {
 					clearInterval(window.intervalId);
 					bootstrapPlacements();
 				}
-			},
-			setFloatCSS = function(adObj) {
-				var isLeftFloat = !!(adObj.float === 'left');
-				var isRightFloat = !!(adObj.float === 'right');
-
-				if (isLeftFloat || isRightFloat) {
-					adObj.css['margin-left'] = '10px';
-					adObj.css['margin-right'] = '10px';
-				}
-
-				adObj.css.float = adObj.float;
 			};
 
 		$(document).ready(function() {
@@ -555,7 +545,12 @@ function IncontentAnalyzer(initOptions) {
 }
 
 function init(params) {
-	var options = { isEvenSpacingAlgo: true, sectionBracket: 600, $: params.$ };
+	var options = {
+		isEvenSpacingAlgo: true,
+		sectionBracket: params.sectionBracket,
+		selectorsTreeLevel: params.selectorsTreeLevel,
+		$: params.$
+	};
 	var instance = new IncontentAnalyzer(options);
 
 	return instance.findSelectorPlacements(params.$selector, params.placementConfig);

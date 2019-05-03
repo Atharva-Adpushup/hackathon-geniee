@@ -119,7 +119,7 @@ const mapStateToProps = (state, ownProps) => ({
 			float: 'none',
 			minDistanceFromPrevAd: 200,
 			adSize: getSupportedSizes()[0],
-			customCSS: '{"margin-top": "0px", "margin-bottom": "0px"}'
+			customCSS: '{"margin-top": "10px", "margin-bottom": "10px"}'
 		}
 	}),
 	mapDispatchToProps = (dispatch, ownProps) => ({

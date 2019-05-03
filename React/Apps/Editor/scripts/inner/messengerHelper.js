@@ -58,7 +58,7 @@ const messenger = new Messenger(),
 					break;
 
 				case messengerCommands.INIT_INCONTENT_ADS_PREVIEW:
-					placeIncontentAds(data.contentSelector, data.ads)
+					placeIncontentAds(data.contentSelector, data.ads, data.config)
 						.then(result => {
 							sendMessage(messengerCommands.SHOW_INCONTENT_ADS_PREVIEW_RESULT, {
 								type: result.type,
