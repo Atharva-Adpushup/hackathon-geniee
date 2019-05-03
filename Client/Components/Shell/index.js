@@ -7,25 +7,13 @@ import Loader from '../Loader/index';
 import { domanize } from '../../helpers/commonFunctions';
 import { ROUTES } from '../../constants/others';
 
-import NotificationContainer from '../../Containers/NotificationContainer';
-
 class Shell extends React.Component {
 	state = { isSidebarOpen: true };
 
 	componentDidMount() {
-		const { fetched, fetchGlobalData, showNotification } = this.props;
-		if (!fetched)
-			fetchGlobalData().then(() => {
-				const { user } = this.props;
-				if (!user.isPaymentDetailsComplete && !window.location.pathname.includes('payment'))
-					showNotification({
-						mode: 'error',
-						title: 'Payments Error',
-						message: `Please complete your Payment Profile, for timely payments.
-							<a href='/payment'>Go to payments</a>`,
-						autoDismiss: 0
-					});
-			});
+		console.log(this.props);
+		const { userFetched, reportsFetched, fetchGlobalData } = this.props;
+		if (!reportsFetched || !userFetched) fetchGlobalData();
 	}
 
 	sidebarToggle = () => {
@@ -99,7 +87,7 @@ class Shell extends React.Component {
 
 	render() {
 		const { isSidebarOpen } = this.state;
-		const { children, fetched, user, location } = this.props;
+		const { children, userFetched, reportsFetched, user, location } = this.props;
 		const routes = this.getRoutes(children, location, user);
 
 		return (
@@ -113,10 +101,9 @@ class Shell extends React.Component {
 					<Sidebar show={isSidebarOpen} />
 					<main className="main-content">
 						{routes ? <Breadcrumbs mappedRoutes={routes} /> : null}
-						{fetched ? children : this.renderLoader()}
+						{reportsFetched && userFetched ? children : this.renderLoader()}
 					</main>
 				</Row>
-				<NotificationContainer />
 			</Grid>
 		);
 	}

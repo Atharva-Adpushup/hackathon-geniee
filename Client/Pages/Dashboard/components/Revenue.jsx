@@ -7,12 +7,14 @@ import { Row, Col } from 'react-bootstrap';
 import { quickDates, yAxisGroups } from '../configs/commonConsts';
 import { Link } from 'react-router-dom';
 import reportService from '../../../services/reportService';
+import Loader from '../../../Components/Loader/index';
 class SitewiseReport extends React.Component {
 	state = {
 		quickDates: quickDates,
 		selectedDate: quickDates[0].value,
 		series: [],
-		xAxis: {}
+		xAxis: {},
+		isLoading: true
 	};
 	componentDidMount() {
 		this.getGraphData();
@@ -22,10 +24,12 @@ class SitewiseReport extends React.Component {
 			params = getDateRange(selectedDate),
 			{ path, reportType } = this.props;
 		if (reportType == 'site') params.siteid = this.props.siteId;
+		this.setState({ isLoading: true });
 		reportService.getWidgetData(path, params).then(response => {
 			if (response.status == 200) {
 				let data = response.data && response.data.data ? response.data.data.result : [];
 				this.computeGraphData(data);
+				this.setState({ isLoading: false });
 			}
 		});
 	}
@@ -76,11 +80,17 @@ class SitewiseReport extends React.Component {
 			</div>
 		);
 	}
+	renderLoader = () => (
+		<div style={{ position: 'relative', width: '100%', height: '30%' }}>
+			<Loader />
+		</div>
+	);
 	render() {
+		const { isLoading } = this.state;
 		return (
 			<Row>
 				<Col sm={12}>{this.renderControl()}</Col>
-				<Col sm={12}>{this.renderChart()}</Col>
+				<Col sm={12}>{isLoading ? this.renderLoader() : this.renderChart()}</Col>
 				<Col sm={12}>
 					<Link to="/reports" className="float-right">
 						View Reports
