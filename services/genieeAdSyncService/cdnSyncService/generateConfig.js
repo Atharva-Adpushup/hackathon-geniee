@@ -49,6 +49,8 @@ function HbProcessing(site, apConfigs) {
 		siteModel.getIncontentAndHbAds(siteId),
 		getHbAdsApTag(siteId, isManual),
 		(hbcf, incontentAndHbAds, hbAdsApTag) => {
+			let { incontentAds = [], hbAds = [] } = incontentAndHbAds;
+			hbAds = hbAds.concat(hbAdsApTag); // Final Hb Ads
 			const isValidHBConfig = !!(hbcf.value && hbcf.value.hbConfig && hbAds.length);
 
 			if (!isValidHBConfig) {
@@ -62,15 +64,11 @@ function HbProcessing(site, apConfigs) {
 				};
 			}
 
-			let { incontentAds, hbAds } = incontentAndHbAds;
 			let isValidCurrencyCnfg = isValidThirdPartyDFPAndCurrency(apConfigs);
 			let computedPrebidCurrencyConfig = {};
 			let deviceConfig = '';
 			let prebidCurrencyConfig = '';
 			let prebidAdapters = getPrebidModules(hbcf);
-
-			// Final Hb Ads
-			hbAds = hbAds.concat(hbAdsApTag);
 
 			if (isValidCurrencyCnfg) {
 				computedPrebidCurrencyConfig = {
