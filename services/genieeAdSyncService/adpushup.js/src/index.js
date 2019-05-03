@@ -35,6 +35,7 @@ if (INNOVATIVE_ADS_ACTIVE) {
 // var	ampInit = require('./ampInit');
 
 var isGenieeSite;
+window.adpushup.configExtended = false;
 
 // Destroy ADP slots and their associated GPT slots
 function destroyAdpSlots() {
@@ -102,8 +103,7 @@ function initAdpConfig() {
 				HB_ACTIVE: HB_ACTIVE,
 				GDPR_ACTIVE: GDPR_ACTIVE,
 				INCONTENT_ACTIVE: INCONTENT_ACTIVE
-			},
-			configExtended: false
+			}
 		});
 
 		// Extend the settings with generated settings
