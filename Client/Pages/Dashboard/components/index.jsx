@@ -6,11 +6,22 @@ import PerformanceOverviewContainer from '../containers/PerformanceOverviewConta
 import PerformanceApOriginalContainer from '../containers/PerformanceApOriginalContainer';
 import Revenue from './Revenue';
 import _ from 'lodash';
-
+import NotificationContainer from '../../../Containers/NotificationContainer';
 class Dashboard extends React.Component {
 	state = {
 		widgets: this.props.widget
 	};
+	componentDidMount() {
+		const { showNotification, user } = this.props;
+		if (!user.isPaymentDetailsComplete && !window.location.pathname.includes('payment'))
+			showNotification({
+				mode: 'error',
+				title: 'Payments Error',
+				message: `Please complete your Payment Profile, for timely payments.
+				<a href='/payment'>Go to payments</a>`,
+				autoDismiss: 0
+			});
+	}
 	getWidgetComponent = widget => {
 		let { path } = widget;
 		switch (widget.name) {
@@ -31,7 +42,7 @@ class Dashboard extends React.Component {
 		let { widgets } = this.state,
 			widgetsArray = _.sortBy(widgets, widget => widget.position),
 			content = [];
-		widgetsArray.forEach(widget => {
+		widgetsArray.forEach((widget, index) => {
 			let widgetComponent = this.getWidgetComponent(widget);
 			content.push(
 				<Card
@@ -40,7 +51,7 @@ class Dashboard extends React.Component {
 							? 'u-margin-b4 width-100 card-color'
 							: 'u-margin-b4 width-100'
 					}
-					key={`card`}
+					key={index}
 					type={widget.name !== 'estimated_earnings' ? 'danger' : ''}
 					headerClassName="card-header"
 					headerChildren={
@@ -50,6 +61,7 @@ class Dashboard extends React.Component {
 					}
 					bodyClassName="card-body"
 					bodyChildren={widgetComponent}
+					footerChildren={''}
 				/>
 			);
 		});
@@ -57,7 +69,12 @@ class Dashboard extends React.Component {
 		return content;
 	};
 	render() {
-		return <Fragment>{this.renderContent()}</Fragment>;
+		return (
+			<Fragment>
+				{this.renderContent()}
+				<NotificationContainer />
+			</Fragment>
+		);
 	}
 }
 

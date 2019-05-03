@@ -6,11 +6,13 @@ import { quickDates, sites } from '../configs/commonConsts';
 import Datatable from 'react-bs-datatable';
 import { Link } from 'react-router-dom';
 import reportService from '../../../services/reportService';
+import Loader from '../../../Components/Loader/index';
 class SitewiseReport extends React.Component {
 	state = {
 		quickDates: quickDates,
 		selectedDate: quickDates[0].value,
-		tableHeader: []
+		tableHeader: [],
+		isLoading: true
 	};
 	componentDidMount() {
 		this.getGraphData();
@@ -19,10 +21,12 @@ class SitewiseReport extends React.Component {
 		let { selectedDate } = this.state,
 			params = getDateRange(selectedDate),
 			{ path } = this.props;
+		this.setState({ isLoading: true });
 		reportService.getWidgetData(path, params).then(response => {
 			if (response.status == 200) {
 				let data = response.data && response.data.data ? response.data.data : [];
 				this.computeTableData(data);
+				this.setState({ isLoading: false });
 			}
 		});
 	}
@@ -79,11 +83,17 @@ class SitewiseReport extends React.Component {
 			/>
 		);
 	}
+	renderLoader = () => (
+		<div style={{ position: 'relative', width: '100%', height: '30%' }}>
+			<Loader />
+		</div>
+	);
 	render() {
+		const { isLoading } = this.state;
 		return (
 			<Row>
 				<Col sm={12}>{this.renderControl()}</Col>
-				<Col sm={12}>{this.renderTable()}</Col>
+				<Col sm={12}>{isLoading ? this.renderLoader() : this.renderTable()}</Col>
 				<Col sm={12}>
 					<Link to="/reports" className="float-right">
 						View Reports
