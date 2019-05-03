@@ -4,6 +4,7 @@ import { Router, Route, Redirect, Switch } from 'react-router-dom';
 import { NAV_ITEMS_INDEXES } from './Pages/ManageSite/constants/index';
 import { IA_NAV_ITEMS_INDEXES } from './Apps/InnovativeAds/configs/commonConsts';
 import { APT_NAV_ITEMS_INDEXES } from './Apps/ApTag/configs/commonConsts';
+import { REPORTS_NAV_ITEMS_INDEXES } from './Apps/Reporting/configs/commonConsts';
 import { PAYMENT_NAV_ITEMS_INDEXES } from './Pages/Payment/configs/commonConsts';
 import { ADSTXT_NAV_ITEMS_INDEXES } from './Pages/AdsTxtManagement/configs/commonConsts';
 
@@ -21,7 +22,6 @@ import ResetPassword from './Pages/ResetPassword';
 
 const Dashboard = lazy(() => import(/* webpackChunkName: "dashboard" */ './Pages/Dashboard'));
 const Sites = lazy(() => import(/* webpackChunkName: "sites" */ './Pages/Sites'));
-const Reporting = lazy(() => import(/* webpackChunkName: "reporting" */ './Pages/Reporting'));
 const Integrations = lazy(() =>
 	import(/* webpackChunkName: "integrations" */ './Pages/Integrations/index')
 );
@@ -32,6 +32,9 @@ const Payment = lazy(() => import(/* webpackChunkName: "payment" */ './Pages/Pay
 const ApTag = lazy(() => import(/* webpackChunkName: "apTag" */ './Apps/ApTag/index'));
 const InnovativeAds = lazy(() =>
 	import(/* webpackChunkName: "innovativeAds" */ './Apps/InnovativeAds/index')
+);
+const Reporting = lazy(() =>
+	import(/* webpackChunkName: "innovativeAds" */ './Apps/Reporting/index')
 );
 const ManageSite = lazy(() =>
 	import(/* webpackChunkName: "manageSite" */ './Pages/ManageSite/index')
@@ -128,7 +131,20 @@ const Routes = () => (
 						component={InnovativeAds}
 					/>
 
-					<PrivateRoute exact name="Reporting" path="/reporting" component={Reporting} />
+					<PrivateRoute
+						exact
+						name=" Account Reports"
+						path="/reports"
+						customProps={{ activeTab: REPORTS_NAV_ITEMS_INDEXES.ACCOUNT }}
+						component={Reporting}
+					/>
+					<PrivateRoute
+						exact
+						name="Site Level Reports"
+						path="/reports/site"
+						customProps={{ activeTab: REPORTS_NAV_ITEMS_INDEXES.SITE }}
+						component={Reporting}
+					/>
 					<PrivateRoute exact name=":siteId" path="/reporting/:siteId" component={Reporting} />
 
 					{/** Integrations (Connect Google etc.) */}

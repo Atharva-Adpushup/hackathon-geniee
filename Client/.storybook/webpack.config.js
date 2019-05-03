@@ -2,6 +2,8 @@ const path = require('path');
 console.log(path.resolve('../'));
 
 module.exports = {
+	mode: 'development',
+	devtool: 'source-map',
 	module: {
 		rules: [
 			{

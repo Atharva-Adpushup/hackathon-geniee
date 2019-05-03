@@ -5,6 +5,7 @@ import ActionCard from '../../../Components/ActionCard/index';
 import ManageAppsContainer from '../containers/ManageAppsContainer';
 import { NAV_ITEMS, NAV_ITEMS_INDEXES, NAV_ITEMS_VALUES } from '../constants/index';
 import SiteSettings from '../../SiteSettings/index';
+import QuickSnapshotContainer from '../containers/QuickSnapshotContainer';
 
 class ManageSite extends React.Component {
 	state = {
@@ -60,7 +61,7 @@ class ManageSite extends React.Component {
 		switch (activeTab) {
 			default:
 			case NAV_ITEMS_INDEXES.QUICK_SNAPSHOT:
-				return <div className="u-padding-v5 u-padding-h5">Quick Snap hoga yahan</div>;
+				return <QuickSnapshotContainer siteId={'29752'} />;
 			case NAV_ITEMS_INDEXES.SITE_SETTINGS:
 				return <SiteSettings {...this.props} />;
 			case NAV_ITEMS_INDEXES.MANAGE_APPS:
