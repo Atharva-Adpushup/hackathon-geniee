@@ -48,18 +48,28 @@ class AdsTxtManager extends Component {
 				.verifyAdsTxtCode(sites[site].siteDomain)
 				.then(res => {
 					console.log(res);
-					if (res.status == 200)
+					if (res.status != 200)
 						return {
 							domain: sites[site].siteDomain,
-							status: res.data.errorCode,
-							adsTxt: res.data.ourAdsTxt
+							statusText: res.statusText,
+							adsTxt: res.data.ourAdsTxt,
+							status: res.status
 						};
+					else {
+						return {
+							domain: sites[site].siteDomain,
+							statusText: 'Entries Upto Date',
+							adsTxt: res.data.ourAdsTxt,
+							status: res.status
+						};
+					}
 				})
 				.catch(err => {
 					return {
 						domain: sites[site].siteDomain,
-						status: 3,
-						adsTxt: err.response.data.ourAdsTxt
+						statusText: 'No Ads.txt Found',
+						adsTxt: err.response.data.ourAdsTxt,
+						status: 400
 					};
 				});
 		});
@@ -157,7 +167,7 @@ class AdsTxtManager extends Component {
 						{sites.map((site, index) => (
 							<tr key={index}>
 								<td>{site.domain}</td>
-								<td>{ADSTXT_STATUS[site.status]}</td>
+								<td>{site.statusText}</td>
 								<td>
 									<CustomButton
 										onClick={() => {
@@ -169,7 +179,7 @@ class AdsTxtManager extends Component {
 										variant="secondary"
 										className="snippet-btn apbtn-main-line apbtn-small"
 										style={{ width: '170px' }}
-										disabled={site.status == 0}
+										disabled={site.status == 200}
 									>
 										Get Entries
 									</CustomButton>
