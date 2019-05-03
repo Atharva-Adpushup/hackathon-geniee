@@ -15,7 +15,6 @@ const fetchGlobalData = () => dispatch =>
 		})
 	])
 		.then(response => {
-			console.log(response);
 			let metaData = {},
 				analyticsMetaInfo = {};
 			const { data } = response[0];

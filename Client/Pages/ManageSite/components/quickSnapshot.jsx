@@ -31,7 +31,7 @@ class QuickSnapshot extends React.Component {
 			widgetsArray = _.sortBy(widgets, widget => widget.position),
 			content = [],
 			{ site, siteId } = this.props;
-		widgetsArray.forEach(widget => {
+		widgetsArray.forEach((widget, index) => {
 			let widgetComponent = this.getWidgetComponent(widget);
 			if (widgetComponent)
 				content.push(
@@ -41,7 +41,7 @@ class QuickSnapshot extends React.Component {
 								? 'u-margin-4 u-margin-lr-auto  width-90 card-color'
 								: 'u-margin-4 u-margin-lr-auto  width-90'
 						}
-						key={`card`}
+						key={index}
 						type={widget.name !== 'estimated_earnings' ? 'danger' : ''}
 						headerClassName="card-header"
 						headerChildren={
@@ -52,6 +52,7 @@ class QuickSnapshot extends React.Component {
 						}
 						bodyClassName="card-body"
 						bodyChildren={widgetComponent}
+						footerChildren={null}
 					/>
 				);
 		});

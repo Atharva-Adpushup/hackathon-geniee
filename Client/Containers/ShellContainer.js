@@ -4,10 +4,11 @@ import { fetchGlobalData } from '../actions/globalActions';
 import { showNotification } from '../actions/uiActions';
 
 const mapStateToProps = (state, ownProps) => {
-	const { user } = state.global;
+	const { user,reports } = state.global;
 	return {
-		fetched: user.fetched,
+		userFetched: user.fetched,
 		user: user.data,
+		reportsFetched:reports.fetched,
 		...ownProps
 	};
 };

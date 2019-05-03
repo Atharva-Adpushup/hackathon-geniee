@@ -5,6 +5,7 @@ import { Row, Col, Button } from 'react-bootstrap';
 import reportService from '../../../services/reportService';
 import Selectbox from '../../../Components/Selectbox/index';
 import { Link } from 'react-router-dom';
+import Loader from '../../../Components/Loader/index';
 class PerformanceOverview extends React.Component {
 	constructor(props) {
 		super(props);
@@ -15,7 +16,8 @@ class PerformanceOverview extends React.Component {
 			selectedDate: quickDates[0].value,
 			sites,
 			selectedSite: sites[0].value,
-			displayData: {}
+			displayData: {},
+			isLoading: true
 		};
 	}
 	componentDidMount() {
@@ -26,9 +28,11 @@ class PerformanceOverview extends React.Component {
 			params = getDateRange(selectedDate),
 			{ path } = this.props;
 		params.siteid = selectedSite;
+		this.setState({ isLoading: true });
 		reportService.getWidgetData(path, params).then(response => {
 			if (response.status == 200) {
 				let data = response.data && response.data.data ? response.data.data : [];
+				this.setState({ isLoading: false });
 				this.computeData(data);
 			}
 		});
@@ -54,6 +58,11 @@ class PerformanceOverview extends React.Component {
 		});
 		this.setState({ displayData });
 	};
+	renderLoader = () => (
+		<div style={{ position: 'relative', width: '100%', height: '30%' }}>
+			<Loader />
+		</div>
+	);
 	renderControl() {
 		let { reportType } = this.props;
 		return (
@@ -93,26 +102,30 @@ class PerformanceOverview extends React.Component {
 		);
 	}
 	render() {
-		const { displayData } = this.state;
+		const { displayData, isLoading } = this.state;
 		return (
 			<Row>
 				<Col sm={12}>{this.renderControl()}</Col>
 				<Col sm={12}>
-					<div className="u-margin-t4 u-margin-b4">
-						{Object.keys(displayData).map((key, index) => {
-							return (
-								<div className="col-sm-4 u-margin-b4 text-center" key={index}>
-									<div className="font-small">{displayData[key]['name']}</div>
-									<div className="estimatedEarning">
-										<span>
-											{displayData[key]['name'].includes('Revenue') ? '$' : ''}
-											{Math.round(displayData[key]['value'] * 100) / 100}
-										</span>
+					{isLoading ? (
+						this.renderLoader()
+					) : (
+						<div className="u-margin-t4 u-margin-b4">
+							{Object.keys(displayData).map((key, index) => {
+								return (
+									<div className="col-sm-4 u-margin-b4 text-center" key={index}>
+										<div className="font-small">{displayData[key]['name']}</div>
+										<div className="estimatedEarning">
+											<span>
+												{displayData[key]['name'].includes('Revenue') ? '$' : ''}
+												{Math.round(displayData[key]['value'] * 100) / 100}
+											</span>
+										</div>
 									</div>
-								</div>
-							);
-						})}
-					</div>
+								);
+							})}
+						</div>
+					)}
 				</Col>
 				<Col sm={12}>
 					<Link to="/reports" className="float-right">
