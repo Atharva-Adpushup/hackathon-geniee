@@ -33,7 +33,7 @@ function getPrebidModules(hbcf) {
 function gdprProcessing(site) {
 	const config = site.get('gdpr');
 	return {
-		status: !!config,
+		status: config && config.compliance,
 		config: {
 			gdpr: config
 		}
@@ -49,12 +49,25 @@ function HbProcessing(site, apConfigs) {
 		siteModel.getIncontentAndHbAds(siteId),
 		getHbAdsApTag(siteId, isManual),
 		(hbcf, incontentAndHbAds, hbAdsApTag) => {
+			const isValidHBConfig = !!(hbcf.value && hbcf.value.hbConfig && hbAds.length);
+
+			if (!isValidHBConfig) {
+				// Returning default response if HB is not active
+				return {
+					status: false,
+					ads: {
+						incontentAds
+					},
+					config: {}
+				};
+			}
+
 			let { incontentAds, hbAds } = incontentAndHbAds;
 			let isValidCurrencyCnfg = isValidThirdPartyDFPAndCurrency(apConfigs);
 			let computedPrebidCurrencyConfig = {};
-			let deviceConfig = false;
-			let prebidCurrencyConfig = false;
-			const prebidAdapters = getPrebidModules(hbcf);
+			let deviceConfig = '';
+			let prebidCurrencyConfig = '';
+			let prebidAdapters = getPrebidModules(hbcf);
 
 			// Final Hb Ads
 			hbAds = hbAds.concat(hbAdsApTag);
@@ -71,7 +84,6 @@ function HbProcessing(site, apConfigs) {
 				};
 			}
 
-			const isValidHBConfig = !!(hbcf.value && hbcf.value.hbConfig && hbAds.length);
 			const isValidCurrencyConfig = !!(
 				isValidHBConfig &&
 				computedPrebidCurrencyConfig &&
@@ -89,9 +101,11 @@ function HbProcessing(site, apConfigs) {
 					deviceConfig && deviceConfig.sizeConfig.length
 						? ',sizeConfig: ' + JSON.stringify(deviceConfig.sizeConfig)
 						: '';
-				prebidCurrencyConfig = isValidCurrencyConfig
-					? ',currency: ' + JSON.stringify(prebidCurrencyConfig)
-					: '';
+
+				if (isValidCurrencyConfig) {
+					prebidCurrencyConfig = ',currency: ' + JSON.stringify(prebidCurrencyConfig);
+					prebidAdapters = `${prebidAdapters},currency`;
+				}
 			}
 
 			return {

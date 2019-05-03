@@ -1,6 +1,7 @@
 const path = require('path');
 const Promise = require('bluebird');
 const PromiseFtp = require('promise-ftp');
+const _ = require('lodash');
 
 // const universalReportService = require('../../../reports/universal/index');
 const { getReportData, getMediationData } = require('../../../reports/universal/index');

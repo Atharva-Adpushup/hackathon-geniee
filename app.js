@@ -33,7 +33,7 @@ var express = require('express'),
 // Set Node process environment
 process.env.NODE_ENV = config.environment.HOST_ENV;
 
-if (process.env.NODE_ENV === consts.environment.production || true) {
+if (process.env.NODE_ENV === consts.environment.production) {
 	require('./services/genieeAdSyncService/index');
 	//require('./services/hbSyncService/index');
 }
@@ -42,11 +42,13 @@ if (process.env.NODE_ENV === consts.environment.production || true) {
 app.use(compression());
 // Locale support
 app.use(locale(languageSupport));
-app.use(helmet({
-	hsts: {
-		setIf: () => false
-	}
-}));
+app.use(
+	helmet({
+		hsts: {
+			setIf: () => false
+		}
+	})
+);
 process.on('uncaughtException', function(err) {
 	// handle the error safely
 	console.log(err);

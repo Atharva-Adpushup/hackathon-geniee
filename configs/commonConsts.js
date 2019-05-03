@@ -374,12 +374,9 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		'33across': '33acrossBidAdapter',
 		ix: 'ixBidAdapter',
 		oftmedia: 'appnexusBidAdapter',
-		rubicon: 'rubiconBidAdapter'
+		rubicon: 'rubiconBidAdapter',
+		districtm: 'appnexusBidAdapter',
+		criteo: 'criteoBidAdapter',
+		currency: 'currency'
 	}
 };
-
-/**
-	"districtm",
-	"criteoBidAdapter",
-	"currency"
- */
