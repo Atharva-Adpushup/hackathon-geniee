@@ -167,6 +167,12 @@ block bodyContent
 				}
 			});
 		}
+		setTimeout(function() {
+			var url = 'http://' + window.location.host + '/user/dashboard';
+			window.location.replace(url);
+		}, 3000);
+
+
 		//- setTimeout(function() {
 		//- 	var url = 'http://' + window.location.host + '/tagManager/' + #{user.primarySiteId};
 		//- 	window.location.replace(url);
