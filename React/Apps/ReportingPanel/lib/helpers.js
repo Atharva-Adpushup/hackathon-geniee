@@ -239,7 +239,8 @@ const apiQueryGenerator = params => {
 					header[i].title === commonConsts.DATA_LABELS.platform ||
 					header[i].title === commonConsts.DATA_LABELS.pageGroup ||
 					header[i].title === commonConsts.DATA_LABELS.variation ||
-					header[i].title === commonConsts.DATA_LABELS.pageViews
+					header[i].title === commonConsts.DATA_LABELS.pageViews ||
+					header[i].title === commonConsts.DATA_LABELS.pageCpm
 				) {
 					csvHeader.push(header[i].title);
 				}
