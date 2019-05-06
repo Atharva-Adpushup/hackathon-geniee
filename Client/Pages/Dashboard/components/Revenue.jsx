@@ -29,7 +29,6 @@ class SitewiseReport extends React.Component {
 			if (response.status == 200) {
 				let data = response.data && response.data.data ? response.data.data.result : [];
 				this.computeGraphData(data);
-				this.setState({ isLoading: false });
 			}
 		});
 	}
@@ -69,7 +68,7 @@ class SitewiseReport extends React.Component {
 			});
 		});
 		series[0].data = data;
-		this.setState({ series });
+		this.setState({ series, isLoading: false });
 	};
 	renderChart() {
 		let type = 'pie',
