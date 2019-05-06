@@ -36,7 +36,6 @@ class PerformanceApOriginal extends React.Component {
 		reportService.getWidgetData(path, params).then(response => {
 			if (response.status == 200) {
 				let data = response.data && response.data.data ? response.data.data.result : [];
-				this.setState({ isLoading: false });
 				this.computeGraphData(data);
 			}
 		});
@@ -68,7 +67,8 @@ class PerformanceApOriginal extends React.Component {
 		];
 		this.setState({
 			series,
-			xAxis
+			xAxis,
+			isLoading: false
 		});
 	};
 	renderControl() {

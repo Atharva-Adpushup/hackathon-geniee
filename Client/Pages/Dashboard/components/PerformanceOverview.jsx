@@ -32,7 +32,6 @@ class PerformanceOverview extends React.Component {
 		reportService.getWidgetData(path, params).then(response => {
 			if (response.status == 200) {
 				let data = response.data && response.data.data ? response.data.data : [];
-				this.setState({ isLoading: false });
 				this.computeData(data);
 			}
 		});
@@ -56,7 +55,7 @@ class PerformanceOverview extends React.Component {
 					if (displayData[col]) displayData[col]['value'] += row[col];
 				}
 		});
-		this.setState({ displayData });
+		this.setState({ displayData, isLoading: false });
 	};
 	renderLoader = () => (
 		<div style={{ position: 'relative', width: '100%', height: '30%' }}>
