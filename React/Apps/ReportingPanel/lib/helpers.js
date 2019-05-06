@@ -9,7 +9,7 @@ import { filter } from 'lodash';
 
 const apiQueryGenerator = params => {
 		let where = {
-				siteid: 31000, //commonConsts.SITE_ID,
+				siteid: commonConsts.SITE_ID,
 				from: moment(params.startDate).format('YYYY-MM-DD'),
 				to: moment(params.endDate).format('YYYY-MM-DD')
 			},
