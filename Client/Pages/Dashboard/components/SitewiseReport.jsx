@@ -26,7 +26,6 @@ class SitewiseReport extends React.Component {
 			if (response.status == 200) {
 				let data = response.data && response.data.data ? response.data.data : [];
 				this.computeTableData(data);
-				this.setState({ isLoading: false });
 			}
 		});
 	}
@@ -50,7 +49,7 @@ class SitewiseReport extends React.Component {
 		tableHeader.sort(function(a, b) {
 			return a.position - b.position;
 		});
-		this.setState({ tableHeader, tableBody: result });
+		this.setState({ tableHeader, tableBody: result, isLoading: false });
 	};
 	renderControl() {
 		return (
