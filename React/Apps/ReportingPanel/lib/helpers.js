@@ -9,7 +9,7 @@ import { filter } from 'lodash';
 
 const apiQueryGenerator = params => {
 		let where = {
-				siteid: commonConsts.SITE_ID,
+				siteid: 31000, //commonConsts.SITE_ID,
 				from: moment(params.startDate).format('YYYY-MM-DD'),
 				to: moment(params.endDate).format('YYYY-MM-DD')
 			},
@@ -156,10 +156,10 @@ const apiQueryGenerator = params => {
 		} else {
 			csvRow.push(
 				row[commonConsts.DATA_LABELS.date].props.children,
+				row[commonConsts.DATA_LABELS.pageCpm].props.children,
 				sumNetworkDataProp(row[commonConsts.DATA_LABELS.impressions]),
 				calculateCSVRowCPM(row),
-				sumNetworkDataProp(row[commonConsts.DATA_LABELS.revenue]).toFixed(2),
-				row[commonConsts.DATA_LABELS.pageViews].props.children
+				sumNetworkDataProp(row[commonConsts.DATA_LABELS.revenue]).toFixed(2)
 			);
 		}
 	},
@@ -180,10 +180,10 @@ const apiQueryGenerator = params => {
 		} else {
 			csvRow.push(
 				row[commonConsts.DATA_LABELS.date],
+				row[commonConsts.DATA_LABELS.pageCpm],
 				sumNetworkDataProp(row[commonConsts.DATA_LABELS.impressions]),
 				calculateCSVRowCPM(row),
-				sumNetworkDataProp(row[commonConsts.DATA_LABELS.revenue]).toFixed(2),
-				row[commonConsts.DATA_LABELS.pageCpm]
+				sumNetworkDataProp(row[commonConsts.DATA_LABELS.revenue]).toFixed(2)
 			);
 		}
 	},
@@ -286,12 +286,12 @@ const apiQueryGenerator = params => {
 			} else {
 				csvBody.push([
 					totalsRow[commonConsts.DATA_LABELS.date].props.children,
+					totalsRow[commonConsts.DATA_LABELS.pageCpm].props.children,
 					sumNetworkDataProp(totalsRow[commonConsts.DATA_LABELS.impressions]),
 					calculateCSVRowCPM(totalsRow),
 					sumNetworkDataProp(
 						totalsRow[commonConsts.DATA_LABELS.revenue]
-					).toFixed(2),
-					totalsRow[commonConsts.DATA_LABELS.pageViews].props.children
+					).toFixed(2)
 				]);
 			}
 		}
