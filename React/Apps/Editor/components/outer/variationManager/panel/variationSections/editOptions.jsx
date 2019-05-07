@@ -15,7 +15,8 @@ class EditOptions extends Component {
 			float: this.props.section.float,
 			editNetwork: false,
 			editInteractiveAdData: false,
-			toggleCustomCSSEditor: false
+			toggleCustomCSSEditor: false,
+			toggleNotNearCSSEditor: false
 		};
 
 		this.onFloatSelectChange = this.onFloatSelectChange.bind(this);
@@ -24,9 +25,11 @@ class EditOptions extends Component {
 		this.submitHandler = this.submitHandler.bind(this);
 		this.toggleNetworkEditor = this.toggleNetworkEditor.bind(this);
 		this.toggleCustomCSSEditor = this.toggleCustomCSSEditor.bind(this);
+		this.toggleNotNearCSSEditor = this.toggleNotNearCSSEditor.bind(this);
 		this.toggleEditInteractiveAd = this.toggleEditInteractiveAd.bind(this);
 		this.adpushupSubmitHandler = this.adpushupSubmitHandler.bind(this);
 		this.customCSSEditorSubmit = this.customCSSEditorSubmit.bind(this);
+		this.notNearEditorSubmit = this.notNearEditorSubmit.bind(this);
 	}
 
 	onFloatSelectChange(float) {
@@ -75,6 +78,10 @@ class EditOptions extends Component {
 		this.setState({ toggleCustomCSSEditor: !this.state.toggleCustomCSSEditor });
 	}
 
+	toggleNotNearCSSEditor() {
+		this.setState({ toggleNotNearCSSEditor: !this.state.toggleNotNearCSSEditor });
+	}
+
 	customCSSEditorSubmit(adId, customCSS) {
 		this.props.showNotification({
 			mode: 'success',
@@ -83,6 +90,16 @@ class EditOptions extends Component {
 		});
 		this.props.onUpdateCustomCss(adId, customCSS);
 		this.toggleCustomCSSEditor();
+	}
+
+	notNearEditorSubmit(sectionId, notNear) {
+		this.props.showNotification({
+			mode: 'success',
+			title: 'Operation Successful',
+			message: 'Section not near saved successfully'
+		});
+		this.props.onUpdateInContentNotNear(sectionId, notNear);
+		this.toggleNotNearCSSEditor();
 	}
 
 	renderContent() {
@@ -141,7 +158,7 @@ class EditOptions extends Component {
 				props: { section },
 				state
 			} = this,
-			{ toggleCustomCSSEditor } = state,
+			{ toggleCustomCSSEditor, toggleNotNearCSSEditor } = state,
 			{ isIncontent, ads, id, notNear, minDistanceFromPrevAd } = section,
 			isInContentAds = !!(isIncontent && ads && ads.length),
 			adProps = isInContentAds && ads[0],
@@ -153,8 +170,15 @@ class EditOptions extends Component {
 				'margin-left': '0px'
 			},
 			inContentAdCustomCSS = isInContentCustomCSS ? ads[0].customCSS : defaultCustomCSS,
-			isValidNotNear = !!(notNear && notNear.length);
-		let computedCustomCSSElem = inContentAdCustomCSS ? (
+			computedNotNear = notNear && notNear.length ? notNear : [];
+		let computedCustomCSSElem = toggleCustomCSSEditor ? (
+			<CssEditor
+				compact
+				css={inContentAdCustomCSS}
+				onSave={this.customCSSEditorSubmit.bind(null, adProps.id)}
+				onCancel={this.toggleCustomCSSEditor}
+			/>
+		) : (
 			<pre id="adDetails">
 				<OverlayTrigger placement="bottom" overlay={<Tooltip id="edit-custom-css">Edit Custom CSS</Tooltip>}>
 					<span className="adDetails-icon" onClick={this.toggleCustomCSSEditor}>
@@ -171,18 +195,62 @@ class EditOptions extends Component {
 					);
 				})}
 			</pre>
-		) : null;
+		);
+		let computedNotNearElem = toggleNotNearCSSEditor ? (
+			<CssEditor
+				compact
+				css={computedNotNear}
+				onSave={this.notNearEditorSubmit.bind(null, id)}
+				onCancel={this.toggleNotNearCSSEditor}
+			/>
+		) : (
+			<pre id="adDetails">
+				<OverlayTrigger placement="bottom" overlay={<Tooltip id="edit-not-near">Edit Not Near</Tooltip>}>
+					<span className="adDetails-icon" onClick={this.toggleNotNearCSSEditor}>
+						<i className="btn-icn-edit" />
+					</span>
+				</OverlayTrigger>
+				{computedNotNear.map((object, key) => {
+					const propertyKey = Object.keys(object)[0];
+					const propertyValue = object[propertyKey];
 
-		if (computedCustomCSSElem && toggleCustomCSSEditor) {
-			computedCustomCSSElem = (
-				<CssEditor
-					compact
-					css={inContentAdCustomCSS}
-					onSave={this.customCSSEditorSubmit.bind(null, adProps.id)}
-					onCancel={this.toggleCustomCSSEditor}
-				/>
-			);
-		}
+					return (
+						<p key={key} style={{ margin: 0, fontWeight: 'bold' }}>
+							{propertyKey} : {propertyValue}
+						</p>
+					);
+				})}
+			</pre>
+		);
+
+		computedCustomCSSElem = (
+			<div>
+				<Row>
+					<Col className="u-padding-0px mB-5 mT-5" xs={12}>
+						Custom CSS
+					</Col>
+				</Row>
+				<Row>
+					<Col className="u-padding-0px mB-10" xs={12}>
+						{computedCustomCSSElem}
+					</Col>
+				</Row>
+			</div>
+		);
+		computedNotNearElem = (
+			<div>
+				<Row>
+					<Col className="u-padding-0px mB-5 mT-5" xs={12}>
+						Not Near
+					</Col>
+				</Row>
+				<Row>
+					<Col className="u-padding-0px mB-10" xs={12}>
+						{computedNotNearElem}
+					</Col>
+				</Row>
+			</div>
+		);
 
 		return (
 			<div>
@@ -204,17 +272,8 @@ class EditOptions extends Component {
 						/>
 					</Col>
 				</Row>
-				<Row>
-					<Col className="u-padding-0px mB-5 mT-5" xs={12}>
-						Custom CSS
-					</Col>
-				</Row>
-				<Row>
-					<Col className="u-padding-0px mB-10" xs={12}>
-						{computedCustomCSSElem}
-					</Col>
-				</Row>
-
+				{computedCustomCSSElem}
+				{computedNotNearElem}
 				<Row>
 					<Col className="u-padding-r10px" xs={4}>
 						Float
