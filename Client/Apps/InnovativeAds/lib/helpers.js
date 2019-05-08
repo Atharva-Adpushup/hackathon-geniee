@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 import clipboard from 'clipboard-polyfill';
 import { INTERACTIVE_ADS_TYPES } from '../configs/commonConsts';
 

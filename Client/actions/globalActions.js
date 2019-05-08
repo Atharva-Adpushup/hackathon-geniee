@@ -7,6 +7,7 @@ import {
 import axiosInstance from '../helpers/axiosInstance';
 import { errorHandler } from '../helpers/commonFunctions';
 import config from '../config/config';
+
 const fetchGlobalData = () => dispatch =>
 	Promise.all([
 		axiosInstance.get('/globalData'),
@@ -15,9 +16,11 @@ const fetchGlobalData = () => dispatch =>
 		})
 	])
 		.then(response => {
-			let metaData = {},
-				analyticsMetaInfo = {};
+			let metaData = {};
+			let analyticsMetaInfo = {};
+
 			const { data } = response[0];
+
 			dispatch({
 				type: USER_ACTIONS.REPLACE_USER_DATA,
 				data: data.user
@@ -30,7 +33,8 @@ const fetchGlobalData = () => dispatch =>
 				type: SITE_ACTIONS.REPLACE_SITE_DATA,
 				data: data.sites
 			});
-			if (response[1].status == 200) {
+
+			if (response[1].status === 200) {
 				metaData = response[1].data && response[1].data.data ? response[1].data.data : {};
 				analyticsMetaInfo = {};
 				analyticsMetaInfo.dashboard = { widget: metaData.dashboard.widget };
@@ -44,4 +48,4 @@ const fetchGlobalData = () => dispatch =>
 		})
 		.catch(err => errorHandler(err));
 
-export { fetchGlobalData };
+export default fetchGlobalData;

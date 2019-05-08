@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 import clipboard from 'clipboard-polyfill';
 
 // const deferred = $.Deferred();
@@ -8,7 +9,7 @@ function makeFirstLetterCapitalize(word) {
 
 function copyToClipBoard(content) {
 	clipboard.writeText(content);
-	alert('Successfully Copied');
+	window.alert('Successfully Copied');
 }
 // function getData(url, data) {
 // 	return $.get(url, data);

@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 import { AD_ACTIONS, GLOBAL_ACTIONS, API_PATHS } from '../../../constants/innovativeAds';
 import axiosInstance from '../../../helpers/axiosInstance';
 import { errorHandler } from '../../../helpers/commonFunctions';
