@@ -357,18 +357,12 @@ class AdCodeGenerator extends Component {
 		);
 	}
 
-	renderLoader = () => (
-		<div style={{ position: 'relative', minHeight: '200px' }}>
-			<Loader />
-		</div>
-	);
-
 	render() {
 		const { codeGenerated } = this.props;
 		const { loading } = this.state;
 		return (
 			<Row className="options-wrapper">
-				{loading && !codeGenerated ? this.renderLoader() : this.renderMainContent()}
+				{loading && !codeGenerated ? <Loader height="300px" /> : this.renderMainContent()}
 			</Row>
 		);
 	}

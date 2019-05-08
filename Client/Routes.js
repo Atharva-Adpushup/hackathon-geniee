@@ -46,7 +46,7 @@ const Layout = lazy(() => import(/* webpackChunkName: "layout" */ './Apps/Layout
 
 const UserRoutes = () => (
 	<Router history={history}>
-		<Suspense fallback={<Loader />}>
+		<Suspense fallback={<Loader height="100vh" />}>
 			<Switch>
 				{/* Public Routes */}
 				<Route
