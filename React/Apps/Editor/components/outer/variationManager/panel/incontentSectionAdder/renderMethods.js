@@ -143,11 +143,30 @@ const renderField = field => {
 			</div>
 		);
 	},
+	renderCustomAdSizeInfo = () => {
+		return (
+			<div>
+				<p>
+					If valid custom ad size <strong>width</strong> and <strong>height</strong> values are entered,
+					<mark>Ad Size</mark> dropdown value will be ignored.
+				</p>
+			</div>
+		);
+	},
 	renderInfo = that => {
 		let fn;
-		if (that.state.selectedElement == 'section') {
+		const selectedElement = that.state.selectedElement;
+		const isSectionElement = !!(selectedElement === 'section');
+		const isCustomAdSizeElement = !!(
+			selectedElement === 'customAdSizeWidth' || selectedElement === 'customAdSizeHeight'
+		);
+
+		if (isSectionElement) {
 			fn = renderSectionInfo();
+		} else if (isCustomAdSizeElement) {
+			fn = renderCustomAdSizeInfo();
 		}
+
 		return (
 			<div>
 				<h1 className="variation-section-heading">Information</h1>
@@ -183,7 +202,7 @@ const renderField = field => {
 						name="minDistanceFromPrevAd"
 						component={renderField}
 						type="number"
-						label="minDistanceFromPrevAd"
+						label="Minimum distance from previous ad"
 					/>
 					<Row>
 						<Col xs={12} className="u-padding-r10px">
@@ -203,6 +222,25 @@ const renderField = field => {
 							</Row>
 						</Col>
 					</Row>
+					<Field
+						placeholder="Please enter custom ad size width"
+						name="customAdSizeWidth"
+						component={renderField}
+						type="number"
+						label="Custom ad size width"
+						onFocus={that.setFocusElement.bind(that)}
+						onBlur={that.setFocusElement.bind(that)}
+					/>
+					<Field
+						placeholder="Please enter custom ad size height"
+						name="customAdSizeHeight"
+						component={renderField}
+						type="number"
+						label="Custom ad size height"
+						onFocus={that.setFocusElement.bind(that)}
+						onBlur={that.setFocusElement.bind(that)}
+					/>
+
 					{that.props.activeChannel.platform !== 'MOBILE' ? (
 						<Row>
 							<Col xs={12} className="u-padding-r10px">

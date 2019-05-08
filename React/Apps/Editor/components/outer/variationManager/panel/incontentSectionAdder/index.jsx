@@ -139,7 +139,11 @@ const mapStateToProps = (state, ownProps) => ({
 				isValues = !!values,
 				isCustomCSS = !!(isValues && values.customCSS),
 				isAdpTagsNetwork = !!(networkInfo.network && networkInfo.network === 'adpTags'),
+				isCustomAdSize = !!(isValues && Number(values.customAdSizeWidth) && Number(values.customAdSizeHeight)),
 				isAdSize = !!(isValues && values.adSize),
+				computedAdSize = isCustomAdSize
+					? `${values.customAdSizeWidth} x ${values.customAdSizeHeight}`
+					: values.adSize,
 				networkData = !!networkInfo.networkData && networkInfo.networkData,
 				shouldMultipleAdSizesBeComputed = !!(
 					networkData &&
@@ -147,7 +151,7 @@ const mapStateToProps = (state, ownProps) => ({
 					networkData.multipleAdSizes &&
 					!networkData.multipleAdSizes.length &&
 					isAdpTagsNetwork &&
-					isAdSize
+					(isAdSize || isCustomAdSize)
 				),
 				isMultipleAdSizes = !!(
 					networkData &&
@@ -163,7 +167,7 @@ const mapStateToProps = (state, ownProps) => ({
 				},
 				adPayload = {
 					adCode: btoa(values.adCode),
-					adSize: values.adSize,
+					adSize: computedAdSize,
 					network: networkInfo.network,
 					networkData: {}
 				};
@@ -171,7 +175,7 @@ const mapStateToProps = (state, ownProps) => ({
 			isCustomCSS ? (adPayload.customCSS = JSON.parse(values.customCSS)) : null;
 
 			if (shouldMultipleAdSizesBeComputed) {
-				let adSize = values.adSize.replace(' x ', ',');
+				let adSize = computedAdSize.replace(' x ', ',');
 
 				adPayload.multipleAdSizes = getMultipleAdSizesOfPrimaryAdSize(
 					adSize,
