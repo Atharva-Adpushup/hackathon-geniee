@@ -1,16 +1,33 @@
+/* eslint-disable react/no-array-index-key */
+/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 import React from 'react';
 import { Col } from 'react-bootstrap';
 
 const CustomList = props => {
+	const {
+		tabbedList,
+		leftSize,
+		rightSize,
+		heading,
+		subHeading,
+		listHeaders,
+		platform,
+		selectPlatform,
+		toMatch,
+		options,
+		simpleList,
+		onClick
+	} = props;
 	function renderTabbedHeaders() {
-		return Object.keys(props.tabbedList.list)
+		return Object.keys(tabbedList.list)
 			.map((item, key) => {
-				const toMatch = props.tabbedList.list[item].key;
-				return props.tabbedList.allowed.indexOf(props.tabbedList.list[item].key) != -1 ? (
+				const matchIt = tabbedList.list[item].key;
+				return tabbedList.allowed.indexOf(tabbedList.list[item].key) !== -1 ? (
 					<li
-						key={`${key}-${toMatch}`}
-						className={`simpleOption ${props.platform == toMatch ? 'active' : ''}`}
-						onClick={props.selectPlatform.bind(null, toMatch)}
+						key={`${key}-${matchIt}`}
+						className={`simpleOption ${platform === matchIt ? 'active' : ''}`}
+						onClick={selectPlatform.bind(null, matchIt)}
 					>
 						{props.tabbedList.list[item].header}
 					</li>
@@ -18,17 +35,17 @@ const CustomList = props => {
 					false
 				);
 			})
-			.filter(ele => ele != false);
+			.filter(ele => ele !== false);
 	}
 
 	function renderTabbedOptions() {
-		return props.platform && props.tabbedList.list[props.platform].options ? (
+		return platform && tabbedList.list[platform].options ? (
 			<ul className="options">
-				{props.tabbedList.list[props.platform].options.map((option, key) => (
+				{tabbedList.list[platform].options.map((option, key) => (
 					<li
 						key={`${key}-${option}`}
-						className={`simpleOption ${props.toMatch == option ? 'active' : ''}`}
-						onClick={props.onClick.bind(null, option)}
+						className={`simpleOption ${toMatch === option ? 'active' : ''}`}
+						onClick={onClick.bind(null, option)}
 					>
 						{option}
 					</li>
@@ -38,13 +55,13 @@ const CustomList = props => {
 	}
 
 	function renderIconList() {
-		return props.options.map((option, key) => (
+		return options.map(option => (
 			<li
 				key={option.key}
-				className={`option ${props.toMatch == option.key ? 'active' : ''}`}
-				onClick={props.onClick.bind(null, option.key)}
+				className={`option ${toMatch === option.key ? 'active' : ''}`}
+				onClick={onClick.bind(null, option.key)}
 			>
-				<img src={option.image} />
+				<img src={option.image} alt={option.name} />
 				<div className="information">
 					<p className="header">{option.name}</p>
 					{option.description ? <p className="description">{option.description}</p> : null}
@@ -54,11 +71,11 @@ const CustomList = props => {
 	}
 
 	function renderSimpleList() {
-		return props.options.map((option, key) => (
+		return options.map((option, key) => (
 			<li
 				key={key}
-				className={`simpleOption ${props.toMatch == option ? 'active' : ''}`}
-				onClick={props.onClick.bind(null, option)}
+				className={`simpleOption ${toMatch === option ? 'active' : ''}`}
+				onClick={onClick.bind(null, option)}
 			>
 				{option}
 			</li>
@@ -66,31 +83,31 @@ const CustomList = props => {
 	}
 
 	function renderList() {
-		if (props.simpleList) {
+		if (simpleList) {
 			return <ul className="options">{renderSimpleList()}</ul>;
-		} else if (props.tabbedList) {
+		}
+		if (tabbedList) {
 			return (
 				<div>
 					<ul className="options">{renderTabbedHeaders()}</ul>
 					{renderTabbedOptions()}
 				</div>
 			);
-		} else {
-			return <ul className="options">{renderIconList()}</ul>;
 		}
+		return <ul className="options">{renderIconList()}</ul>;
 	}
 
 	return (
 		<div>
-			<Col md={props.leftSize}>
-				<h3>{props.heading}</h3>
-				<h4>{props.subHeading}</h4>
+			<Col md={leftSize}>
+				<h3>{heading}</h3>
+				<h4>{subHeading}</h4>
 			</Col>
-			<Col md={props.rightSize}>
-				{props.listHeaders ? (
+			<Col md={rightSize}>
+				{listHeaders ? (
 					<div className="list-heading">
-						<h3>{props.listHeaders.heading}</h3>
-						{props.listHeaders.subHeading ? <h4>{props.listHeaders.subHeading}</h4> : null}
+						<h3>{listHeaders.heading}</h3>
+						{listHeaders.subHeading ? <h4>{listHeaders.subHeading}</h4> : null}
 					</div>
 				) : null}
 				{renderList()}
