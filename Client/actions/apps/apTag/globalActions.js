@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 import { GLOBAL_ACTIONS } from '../../../constants/apTag';
 import axiosInstance from '../../../helpers/axiosInstance';
 import { errorHandler } from '../../../helpers/commonFunctions';

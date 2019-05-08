@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 import React, { Component } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Col, OverlayTrigger, Tooltip, Button } from 'react-bootstrap';
@@ -52,7 +54,9 @@ class AdElement extends Component {
 
 	updateWrapper(data) {
 		const { updateAd, modifyAdOnServer, user, ad, match } = this.props;
-		return user.isSuperUser ? updateAd(ad.id, data) : modifyAdOnServer(match.params.siteId, ad.id, data);
+		return user.isSuperUser
+			? updateAd(ad.id, data)
+			: modifyAdOnServer(match.params.siteId, ad.id, data);
 	}
 
 	renderInformation = (label, value) => (
@@ -79,7 +83,8 @@ class AdElement extends Component {
 					user={user}
 				/>
 			);
-		} else if (editName) {
+		}
+		if (editName) {
 			return (
 				<EditBox
 					label="Ad Name"
@@ -91,7 +96,8 @@ class AdElement extends Component {
 					rightSize={9}
 				/>
 			);
-		} else if (showLazyload) {
+		}
+		if (showLazyload) {
 			return (
 				<LazyLoadSettings
 					checked={ad.enableLazyLoading}
