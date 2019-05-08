@@ -51,6 +51,7 @@ const Sidebar = ({ show }) => {
 				{getNavItem('My Sites', '/sites', 'list', !show)}
 				{getNavItem('Reports', '/reports', 'chart-area', !show)}
 				{getNavItem('Integrations', '/integrations', 'desktop', !show)}
+				{getNavItem('Ops Panel', '/ops-panel', 'tools', !show)}
 			</ul>
 
 			<div className="cta-btn-wrap">

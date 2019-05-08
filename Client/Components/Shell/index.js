@@ -11,7 +11,6 @@ class Shell extends React.Component {
 	state = { isSidebarOpen: true };
 
 	componentDidMount() {
-		console.log(this.props);
 		const { userFetched, reportsFetched, fetchGlobalData } = this.props;
 		if (!reportsFetched || !userFetched) fetchGlobalData();
 	}
@@ -19,12 +18,6 @@ class Shell extends React.Component {
 	sidebarToggle = () => {
 		this.setState(state => ({ isSidebarOpen: !state.isSidebarOpen }));
 	};
-
-	renderLoader = () => (
-		<div style={{ position: 'relative', width: '100%', height: '100%' }}>
-			<Loader />
-		</div>
-	);
 
 	isBlackListedRoute = path => {
 		const { BLACK_LIST: blackListedArray } = ROUTES;
@@ -101,7 +94,7 @@ class Shell extends React.Component {
 					<Sidebar show={isSidebarOpen} />
 					<main className="main-content">
 						{routes ? <Breadcrumbs mappedRoutes={routes} /> : null}
-						{reportsFetched && userFetched ? children : this.renderLoader()}
+						{reportsFetched && userFetched ? children : <Loader minHeight="100vh" />}
 					</main>
 				</Row>
 			</Grid>

@@ -211,11 +211,7 @@ class AdList extends Component {
 		const customStyle = {};
 
 		if (loading) {
-			return (
-				<div style={{ position: 'relative', minHeight: '200px' }}>
-					<Loader />
-				</div>
-			);
+			return <Loader />;
 		}
 		if (!adsToRender.length) {
 			return (
