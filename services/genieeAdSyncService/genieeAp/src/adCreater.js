@@ -240,7 +240,7 @@ var $ = require('jquery'),
 				$.each(structuredAds, function(index, ad) {
 					getAdContainer(ad, config.xpathWaitTimeout)
 						.done(function(data) {
-							if (ad.enableLazyLoading == true) {
+							if (ad.enableLazyLoading === true) {
 								isAdContainerInView(data.container).done(function() {
 									next(ad, data);
 								});
@@ -274,18 +274,27 @@ var $ = require('jquery'),
 				var successCallback = function(sectionsWithTargetElm) {
 					$(inContentAds).each(function(index, ad) {
 						var sectionObj = sectionsWithTargetElm[ad.section],
-							$containerElement;
+							isValidPlacement = !!(sectionObj && sectionObj.elem),
+							isAdCustomCSS = !!ad.customCSS,
+							isLazyLoadingEnabled = !!(ad.enableLazyLoading === true),
+							$containerElement,
+							placementParams;
 
-						if (sectionObj && sectionObj.elem) {
-							if (ad.customCSS) {
+						if (isValidPlacement) {
+							if (isAdCustomCSS) {
 								ad.css = $.extend(true, {}, ad.css, ad.customCSS);
 							}
 
-							//feedbackData.ads.push(ad.id);
-
 							$containerElement = getContainer(ad, sectionObj.elem);
+							placementParams = { success: true, container: $containerElement };
 
-							next(ad, { success: true, container: $containerElement });
+							if (isLazyLoadingEnabled) {
+								isAdContainerInView($containerElement).done(function() {
+									next(ad, placementParams);
+								});
+							} else {
+								next(ad, placementParams);
+							}
 						} else {
 							//feedbackData.xpathMiss.push(ad.id);
 							next(ad, { success: false, container: null });
