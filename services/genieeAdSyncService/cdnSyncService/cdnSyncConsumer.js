@@ -110,7 +110,7 @@ module.exports = function(site, externalData = {}) {
 				addService: (serviceName, serviceConfig = {}, serviceScript = null) => {
 					switch (serviceName) {
 						case CC.SERVICES.INCONTENT_ANALYSER:
-							serviceScript = serviceScript.substring(0, serviceScript.trim().length - 1);
+							serviceScript = serviceScript.substring(0, serviceScript.trim().length - 1).substring(17);
 
 							if (serviceConfig.length) {
 								jsFile = _.replace(jsFile, '__IN_CONTENT_ANALYSER_SCRIPT__', serviceScript);

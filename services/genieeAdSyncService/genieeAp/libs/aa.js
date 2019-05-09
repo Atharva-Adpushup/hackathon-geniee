@@ -1,4 +1,6 @@
-(function() {
+module.exports = (function() {
+	// TODO: Do not change above written text `module.exports = ` as this text is removed in cdnSyncConsumer
+	// by exact index count (17). If you wish to change below text, please update this script injection code in cdnSyncConsumer file
 	function IncontentAnalyzer(initOptions) {
 		this.$ = initOptions.$;
 		this.selectedElems = [];

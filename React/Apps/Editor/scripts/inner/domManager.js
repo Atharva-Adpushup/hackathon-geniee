@@ -5,7 +5,7 @@ import { uiModes } from 'consts/commonConsts';
 import { highlightElement, setElementSelectorCords, hideHighlighter } from '../../actions/inner/actions';
 import { sendMessage } from './messengerHelper';
 import { messengerCommands } from '../../consts/commonConsts';
-import IncontentAnalyzer from 'libs/IncontentAnalyzer';
+const IncontentAnalyzer = require('../../../../../services/genieeAdSyncService/genieeAp/libs/aa');
 
 const selectorator = new Selectorator(),
 	events = 'click mouseup mouseleave mousedown mouseover',
