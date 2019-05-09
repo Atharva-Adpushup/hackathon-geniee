@@ -295,9 +295,6 @@ var $ = require('jquery'),
 							} else {
 								next(ad, placementParams);
 							}
-						} else {
-							//feedbackData.xpathMiss.push(ad.id);
-							next(ad, { success: false, container: null });
 						}
 					});
 				};
