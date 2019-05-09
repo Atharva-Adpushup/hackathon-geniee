@@ -111,6 +111,7 @@ const renderField = field => {
 								showNotification={that.props.showNotification}
 								isInsertMode={true}
 								zonesData={that.props.zonesData}
+								networkConfig={that.props.networkConfig}
 							/>
 						</Col>
 					</Row>

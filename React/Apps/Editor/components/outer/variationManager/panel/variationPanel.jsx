@@ -135,6 +135,7 @@ class VariationPanel extends React.Component {
 							channelId={channelId}
 							variation={variation}
 							zonesData={zonesData}
+							networkConfig={networkConfig}
 						/>
 					</div>
 					{isBeforeAfterJSHide ? null : (
