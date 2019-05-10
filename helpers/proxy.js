@@ -113,7 +113,15 @@ API = {
 				return method(requestArgs);
 			})
 			.then(function(result) {
-				return result.PayeePayableResult && result.PayeePayableResult.b;
+				if (result.PayeePayableResult) {
+					if (
+						result.PayeePayableResult.s == 'Below own threshold' ||
+						result.PayeePayableResult.b
+					)
+						return true;
+					else return false;
+				}
+				return false;
 			})
 			.catch(function() {
 				return 'some error occured';
