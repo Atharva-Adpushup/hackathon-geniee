@@ -1,54 +1,57 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import reportService from '../../../services/reportService';
 import moment from 'moment';
+import reportService from '../../../services/reportService';
 import Loader from '../../../Components/Loader/index';
+
 class EstimatedEarnings extends React.Component {
 	state = {
-		data: {},
 		isLoading: true
 	};
+
 	componentDidMount() {
-		let params = {
-				fromDate: moment()
-					.subtract(7, 'days')
-					.startOf('day')
-					.format('YYYY-MM-DD'),
-				toDate: moment()
-					.startOf('day')
-					.subtract(1, 'day')
-					.format('YYYY-MM-DD')
-			},
-			{ path, reportType } = this.props;
-		if (reportType == 'site') params.siteid = this.props.siteId;
+		const params = {
+			fromDate: moment()
+				.subtract(7, 'days')
+				.startOf('day')
+				.format('YYYY-MM-DD'),
+			toDate: moment()
+				.startOf('day')
+				.subtract(1, 'day')
+				.format('YYYY-MM-DD')
+		};
+		const { path, reportType, siteId } = this.props;
+		if (reportType === 'site') params.siteid = siteId;
 		this.setState({ isLoading: true });
 		reportService.getWidgetData(path, params).then(response => {
-			if (response.status == 200) {
-				let data = response.data && response.data.data ? response.data.data.result[0] : {};
+			if (response.status === 200) {
+				const data = response.data && response.data.data ? response.data.data.result[0] : {};
 				this.setState({ ...data, isLoading: false });
 			}
 		});
 	}
+
 	renderLoader = () => (
 		<div style={{ position: 'relative', width: '100%', height: '30%' }}>
 			<Loader />
 		</div>
 	);
+
 	render() {
-		let {
-				yesterday,
-				sameDayLastWeek,
-				lastSevenDays,
-				previousSevenDays,
-				lastThirtyDays,
-				previousThirtyDays,
-				isLoading
-			} = this.state,
-			dayProgress = Math.round(((yesterday - sameDayLastWeek) / yesterday) * 10000) / 100,
-			weekProgress =
-				Math.round(((lastSevenDays - previousSevenDays) / lastSevenDays) * 10000) / 100,
-			monthProgress =
-				Math.round(((lastThirtyDays - previousThirtyDays) / lastThirtyDays) * 10000) / 100;
+		const {
+			yesterday,
+			sameDayLastWeek,
+			lastSevenDays,
+			previousSevenDays,
+			lastThirtyDays,
+			previousThirtyDays,
+			isLoading
+		} = this.state;
+		const dayProgress = Math.round(((yesterday - sameDayLastWeek) / yesterday) * 10000) / 100;
+		const weekProgress =
+			Math.round(((lastSevenDays - previousSevenDays) / lastSevenDays) * 10000) / 100;
+		const monthProgress =
+			Math.round(((lastThirtyDays - previousThirtyDays) / lastThirtyDays) * 10000) / 100;
 		return isLoading ? (
 			this.renderLoader()
 		) : (
