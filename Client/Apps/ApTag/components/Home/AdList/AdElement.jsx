@@ -3,7 +3,7 @@
 import React, { Component } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Col, OverlayTrigger, Tooltip, Button } from 'react-bootstrap';
-import { makeFirstLetterCapitalize, copyToClipBoard } from '../../../lib/helpers';
+import { makeFirstLetterCapitalize, copyToClipBoard } from '../../../../../helpers/commonFunctions';
 import { ADCODE, AMP_MESSAGE } from '../../../configs/commonConsts';
 import CustomButton from '../../../../../Components/CustomButton/index';
 import AdNetworkDetails from './AdNetworkDetails';
