@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import PagegroupTrafficEdit from './PagegroupTrafficEdit';
 import FormatEdit from './FormatEdit';
-import { makeFirstLetterCapitalize, copyToClipBoard } from '../../../lib/helpers';
+import { makeFirstLetterCapitalize, copyToClipBoard } from '../../../../../helpers/commonFunctions';
 import {
 	AD_LIST_ACTIONS,
 	USER_AD_LIST_ACTIONS,

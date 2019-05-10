@@ -1,3 +1,7 @@
+/* eslint-disable prefer-destructuring */
+/* eslint-disable no-console */
+/* eslint-disable no-alert */
+import clipboard from 'clipboard-polyfill';
 import history from './history';
 
 function errorHandler(err, userMessage = 'Operation Failed') {
@@ -19,6 +23,29 @@ function errorHandler(err, userMessage = 'Operation Failed') {
 		return window.alert(userMessage);
 	}
 	return history.push('/error');
+}
+
+function makeFirstLetterCapitalize(word) {
+	return word.charAt(0).toUpperCase() + word.slice(1).replace(/([A-Z])/g, ' $1');
+}
+
+function copyToClipBoard(content) {
+	clipboard.writeText(content);
+	window.alert('Successfully Copied');
+}
+
+function formatDate(date) {
+	const toFormat = new Date(date);
+
+	if (toFormat === 'Invalid Date') {
+		throw new Error('Invalid Date provided to format');
+	}
+
+	const day = String(toFormat.getDate());
+	const month = String(toFormat.getMonth() + 1);
+	const year = String(toFormat.getFullYear());
+
+	return `${day.length === 1 ? '0' : ''}${day}-${month.length === 1 ? '0' : ''}${month}-${year}`;
 }
 
 const getDuplicatesInArray = array =>
@@ -44,7 +71,7 @@ const getTruthyArray = array => array.filter(value => !!value);
 
 const isItemInArray = (item, array) => array.indexOf(item) > -1;
 
-const rightTrim = (string, s) => (string ? string.replace(new RegExp(s + '*$'), '') : '');
+const rightTrim = (string, s) => (string ? string.replace(new RegExp(`${s}*$`), '') : '');
 
 const domanize = domain =>
 	domain
@@ -57,4 +84,13 @@ const domanize = domain =>
 		  )
 		: '';
 
-export { errorHandler, getDuplicatesInArray, getTruthyArray, isItemInArray, domanize };
+export {
+	errorHandler,
+	getDuplicatesInArray,
+	getTruthyArray,
+	isItemInArray,
+	domanize,
+	makeFirstLetterCapitalize,
+	copyToClipBoard,
+	formatDate
+};

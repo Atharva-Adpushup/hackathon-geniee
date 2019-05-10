@@ -7,6 +7,7 @@ import { APT_NAV_ITEMS_INDEXES } from './Apps/ApTag/configs/commonConsts';
 import { REPORTS_NAV_ITEMS_INDEXES } from './Apps/Reporting/configs/commonConsts';
 import { PAYMENT_NAV_ITEMS_INDEXES } from './Pages/Payment/configs/commonConsts';
 import { ADSTXT_NAV_ITEMS_INDEXES } from './Pages/AdsTxtManagement/configs/commonConsts';
+import { OP_NAV_ITEMS_INDEXES } from './Apps/OpsPanel/configs/commonConsts';
 
 import history from './helpers/history';
 import PublicOnlyRoute from './Components/PublicOnlyRoute';
@@ -43,6 +44,7 @@ const ErrorPage = lazy(() => import(/* webpackChunkName: "error" */ './Pages/Err
 const OnBoarding = lazy(() => import(/* webpackChunkName: "onBoarding" */ './Pages/OnBoarding'));
 const AddNewSite = lazy(() => import(/* webpackChunkName: "addNewSite" */ './Pages/AddNewSite'));
 const Layout = lazy(() => import(/* webpackChunkName: "layout" */ './Apps/Layout/index'));
+const OpsPanel = lazy(() => import(/* webpackChunkName: "opsPanel" */ './Apps/OpsPanel/index'));
 
 const UserRoutes = () => (
 	<Router history={history}>
@@ -191,6 +193,22 @@ const UserRoutes = () => (
 						path="/payment/history"
 						customProps={{ activeTab: PAYMENT_NAV_ITEMS_INDEXES.HISTORY }}
 						component={Payment}
+					/>
+
+					{/** Ops Panel */}
+					<PrivateRoute
+						exact
+						customProps={{ activeTab: OP_NAV_ITEMS_INDEXES.SITES_MAPPING }}
+						name="Ops Panel"
+						path="/ops-panel"
+						component={OpsPanel}
+					/>
+					<PrivateRoute
+						exact
+						customProps={{ activeTab: OP_NAV_ITEMS_INDEXES.LIVE_SITES_MAPPING }}
+						name="Live Sites"
+						path="/ops-panel/live-sites"
+						component={OpsPanel}
 					/>
 
 					<PrivateRoute exact name="User OnBoarding" path="/onboarding" component={OnBoarding} />

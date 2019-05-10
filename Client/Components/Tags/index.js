@@ -1,8 +1,12 @@
+/* eslint-disable react/forbid-prop-types */
+/* eslint-disable jsx-a11y/anchor-is-valid */
+/* eslint-disable react/no-array-index-key */
 import React from 'react';
+import PropTypes from 'prop-types';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 const Tags = props => {
-	const { labels = [] } = props;
+	const { labels, classNames, clickHandler, additionalProps } = props;
 	if (!labels.length) {
 		return null;
 	}
@@ -17,7 +21,15 @@ const Tags = props => {
 						}
 						key={`custom-overlay-${key}-${label}}`}
 					>
-						<a href="#" className="tag" onClick={e => e.preventDefault()}>
+						<a
+							href="#"
+							className={`tag ${classNames}`}
+							onClick={e => {
+								e.preventDefault();
+								clickHandler();
+							}}
+							{...additionalProps}
+						>
 							{label}
 						</a>
 					</OverlayTrigger>
@@ -25,6 +37,19 @@ const Tags = props => {
 			))}
 		</ul>
 	);
+};
+
+Tags.defaultProps = {
+	classNames: '',
+	clickHandler: () => {},
+	additionalProps: {}
+};
+
+Tags.propTypes = {
+	labels: PropTypes.array.isRequired,
+	classNames: PropTypes.string,
+	clickHandler: PropTypes.func,
+	additionalProps: PropTypes.object
 };
 
 export default Tags;
