@@ -4,10 +4,9 @@ import { Router, Route, Redirect, Switch } from 'react-router-dom';
 import { NAV_ITEMS_INDEXES } from './Pages/ManageSite/constants/index';
 import { IA_NAV_ITEMS_INDEXES } from './Apps/InnovativeAds/configs/commonConsts';
 import { APT_NAV_ITEMS_INDEXES } from './Apps/ApTag/configs/commonConsts';
-import { REPORTS_NAV_ITEMS_INDEXES } from './Apps/Reporting/configs/commonConsts';
 import { PAYMENT_NAV_ITEMS_INDEXES } from './Pages/Payment/configs/commonConsts';
 import { ADSTXT_NAV_ITEMS_INDEXES } from './Pages/AdsTxtManagement/configs/commonConsts';
-import { OP_NAV_ITEMS_INDEXES } from './Apps/OpsPanel/configs/commonConsts';
+import { NAV_ITEMS_INDEXES as HB_NAV_ITEMS_INDEXES } from './Apps/HeaderBidding/constants';
 
 import history from './helpers/history';
 import PublicOnlyRoute from './Components/PublicOnlyRoute';
@@ -23,6 +22,7 @@ import ResetPassword from './Pages/ResetPassword';
 
 const Dashboard = lazy(() => import(/* webpackChunkName: "dashboard" */ './Pages/Dashboard'));
 const Sites = lazy(() => import(/* webpackChunkName: "sites" */ './Pages/Sites'));
+const Reporting = lazy(() => import(/* webpackChunkName: "reporting" */ './Pages/Reporting'));
 const Integrations = lazy(() =>
 	import(/* webpackChunkName: "integrations" */ './Pages/Integrations/index')
 );
@@ -34,11 +34,11 @@ const ApTag = lazy(() => import(/* webpackChunkName: "apTag" */ './Apps/ApTag/in
 const InnovativeAds = lazy(() =>
 	import(/* webpackChunkName: "innovativeAds" */ './Apps/InnovativeAds/index')
 );
-const Reporting = lazy(() =>
-	import(/* webpackChunkName: "innovativeAds" */ './Apps/Reporting/index')
-);
 const ManageSite = lazy(() =>
 	import(/* webpackChunkName: "manageSite" */ './Pages/ManageSite/index')
+);
+const HeaderBidding = lazy(() =>
+	import(/* webpackChunkName: "headerBidding" */ './Apps/HeaderBidding')
 );
 const ErrorPage = lazy(() => import(/* webpackChunkName: "error" */ './Pages/ErrorPage/index'));
 const OnBoarding = lazy(() => import(/* webpackChunkName: "onBoarding" */ './Pages/OnBoarding'));
@@ -133,20 +133,44 @@ const UserRoutes = () => (
 						component={InnovativeAds}
 					/>
 
+					{/* Manage Header Bidding */}
 					<PrivateRoute
 						exact
-						name=" Account Reports"
-						path="/reports"
-						customProps={{ activeTab: REPORTS_NAV_ITEMS_INDEXES.ACCOUNT }}
-						component={Reporting}
+						customProps={{ activeTab: HB_NAV_ITEMS_INDEXES.TAB_1 }}
+						name="Header Bidding"
+						path="/sites/:siteId/apps/header-bidding"
+						component={HeaderBidding}
 					/>
 					<PrivateRoute
 						exact
-						name="Site Level Reports"
-						path="/reports/site"
-						customProps={{ activeTab: REPORTS_NAV_ITEMS_INDEXES.SITE }}
-						component={Reporting}
+						customProps={{ activeTab: HB_NAV_ITEMS_INDEXES.TAB_2 }}
+						name="Tab 2"
+						path="/sites/:siteId/apps/header-bidding/tab-2"
+						component={HeaderBidding}
 					/>
+					<PrivateRoute
+						exact
+						customProps={{ activeTab: HB_NAV_ITEMS_INDEXES.TAB_3 }}
+						name="Tab 3"
+						path="/sites/:siteId/apps/header-bidding/tab-3"
+						component={HeaderBidding}
+					/>
+					<PrivateRoute
+						exact
+						customProps={{ activeTab: HB_NAV_ITEMS_INDEXES.TAB_4 }}
+						name="Tab 4"
+						path="/sites/:siteId/apps/header-bidding/tab-4"
+						component={HeaderBidding}
+					/>
+					<PrivateRoute
+						exact
+						customProps={{ activeTab: HB_NAV_ITEMS_INDEXES.TAB_5 }}
+						name="Tab 5"
+						path="/sites/:siteId/apps/header-bidding/tab-5"
+						component={HeaderBidding}
+					/>
+
+					<PrivateRoute exact name="Reporting" path="/reporting" component={Reporting} />
 					<PrivateRoute exact name=":siteId" path="/reporting/:siteId" component={Reporting} />
 
 					{/** Integrations (Connect Google etc.) */}
