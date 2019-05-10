@@ -42,7 +42,7 @@ module.exports = function(site, externalData = {}) {
 		setAllConfigs = function(combinedConfig) {
 			let apConfigs = site.get('apConfigs');
 			let isAdPartner = !!site.get('partner');
-			let { experiment, adpTagsConfig, manualAds, innovativeAds } = combinedConfig;
+			let { experiment, adpTagsConfig, manualAds, innovativeAds, isLegacyInnovativeAds } = combinedConfig;
 
 			isAdPartner ? (apConfigs.partner = site.get('partner')) : null;
 			apConfigs.autoOptimise = isAutoOptimise ? true : false;
@@ -53,8 +53,11 @@ module.exports = function(site, externalData = {}) {
 				? apConfigs.spaPageTransitionTimeout
 				: 0;
 			apConfigs.activeDFPNetwork = apConfigs.activeDFPNetwork ? apConfigs.activeDFPNetwork : null;
-			apConfigs.manualModeActive = site.get('isManual') ? site.get('isManual') : false;
-			apConfigs.innovativeModeActive = site.get('isInnovative') ? site.get('isInnovative') : false;
+			apConfigs.manualModeActive = site.get('isManual') && manualAds && manualAds.length ? true : false;
+			apConfigs.innovativeModeActive =
+				(site.get('isInnovative') && innovativeAds && innovativeAds.length) || isLegacyInnovativeAds
+					? true
+					: false;
 			// Default 'draft' mode is selected if config mode is not present
 			apConfigs.mode = !apConfigs.mode ? 2 : apConfigs.mode;
 
@@ -66,15 +69,16 @@ module.exports = function(site, externalData = {}) {
 
 			return { apConfigs, adpTagsConfig };
 		},
-		generateCombinedJson = (experiment, adpTags, manualAds, innovativeAds) => {
+		generateCombinedJson = (experiment, adpTags, manualAds, innovativeAds, isLegacyInnovativeAds) => {
 			if (!(Array.isArray(adpTags) && adpTags.length)) {
-				return { experiment, adpTagsConfig: false, manualAds, innovativeAds };
+				return { experiment, adpTagsConfig: false, manualAds, innovativeAds, isLegacyInnovativeAds };
 			}
 			return generateADPTagsConfig(adpTags, site.get('siteId')).then(adpTagsConfig => ({
 				adpTagsConfig,
 				experiment,
 				manualAds,
-				innovativeAds
+				innovativeAds,
+				isLegacyInnovativeAds
 			}));
 		},
 		generateFinalInitScript = (jsFile, uncompressedJsFile) => {

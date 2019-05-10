@@ -1,5 +1,6 @@
 let ADPTags = [];
 let finalJson = {};
+let isLegacyInnovativeAds = false;
 
 const Promise = require('bluebird'),
 	_ = require('lodash'),
@@ -77,6 +78,9 @@ const Promise = require('bluebird'),
 			}
 
 			const isResponsive = !!ad.networkData.isResponsive;
+			if (section.type === 3) {
+				isLegacyInnovativeAds = true;
+			}
 
 			json = {
 				id: sectionId,
@@ -263,6 +267,7 @@ const Promise = require('bluebird'),
 		//Empty finaJson and dfpAunits
 		finalJson = {};
 		ADPTags = [];
+		isLegacyInnovativeAds = false;
 		// let manualAds = [];
 		const pageGroupPattern = site.get('apConfigs').pageGroupPattern;
 
@@ -280,7 +285,7 @@ const Promise = require('bluebird'),
 					getAdsAndPushToAdp('isManual', `tgmr::${site.get('siteId')}`, site),
 					getAdsAndPushToAdp('isInnovative', `fmrt::${site.get('siteId')}`, site),
 					(manualAds, innovativeAds) => {
-						return [finalJson, ADPTags, manualAds, innovativeAds];
+						return [finalJson, ADPTags, manualAds, innovativeAds, isLegacyInnovativeAds];
 					}
 				);
 			});
