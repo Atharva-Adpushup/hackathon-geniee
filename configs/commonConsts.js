@@ -32,11 +32,13 @@ module.exports = {
 		INCONTENT_ANALYSER: 'INCONTENT_ANALYSER',
 		ADPTAGS: 'ADPTAGS',
 		HEADER_BIDDING: 'HEADER_BIDDING',
-		GDPR: 'GDPR'
+		GDPR: 'GDPR',
+		INNOVATIVE_ADS: 'INNOVATIVE_ADS'
 	},
 	INJECTION_TECHNIQUES: {
 		LAYOUT: 1,
-		TAG: 2
+		TAG: 2,
+		INNOVATIVE_AD: 3
 	},
 	MANUAL_ADS: {
 		VARIATION: 'manual'
@@ -334,6 +336,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 	},
 	docKeys: {
 		tagManager: 'tgmr::',
+		interactiveAds: 'fmrt::',
 		user: 'user::'
 	},
 	tagManagerInitialDoc: {
@@ -342,11 +345,53 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		siteDomain: null,
 		ads: []
 	},
+	interactiveAdsInitialDoc: {
+		siteId: null,
+		ownerEmail: null,
+		siteDomain: null,
+		ads: [],
+		meta: {
+			pagegroups: [],
+			custom: []
+		}
+	},
+	defaultMeta: {
+		pagegroups: [],
+		custom: []
+	},
+	INTERACTIVE_ADS_TYPES: {
+		VERTICAL: ['stickyLeft', 'stickyRight', 'docked'],
+		HORIZONTAL: ['stickyTop', 'stickyBottom'],
+		OTHER: ['inView']
+	},
+	interactiveAdsRules: {
+		vertical: {
+			noOfAdsAllowed: 1
+		},
+		horizontal: {
+			noOfAdsAllowed: 1
+		}
+	},
 	videoNetworkInfo: {
 		network: 'custom',
 		networkData: {
 			adCode: '',
 			forceByPass: true
 		}
+	},
+	PREBID_ADAPTERS: {
+		openx: 'openxBidAdapter',
+		districtmDMX: 'districtmDMXBidAdapter',
+		medianet: 'medianetBidAdapter',
+		conversant: 'conversantBidAdapter',
+		c1x: 'c1xBidAdapter',
+		pulsepoint: 'pulsepointBidAdapter',
+		'33across': '33acrossBidAdapter',
+		ix: 'ixBidAdapter',
+		oftmedia: 'appnexusBidAdapter',
+		rubicon: 'rubiconBidAdapter',
+		districtm: 'appnexusBidAdapter',
+		criteo: 'criteoBidAdapter',
+		currency: 'currency'
 	}
 };

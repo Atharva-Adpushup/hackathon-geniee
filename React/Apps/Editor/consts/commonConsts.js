@@ -365,7 +365,7 @@ const status = {
 	reportingUrl = '/user/reports/generate',
 	jsWrapper = `(function($){ \n\n })(adpushup.$)`,
 	interactiveAds = {
-		events: ['DOMContentLoaded', 'scriptLoaded'], //load', 'scroll', 'onMills',
+		events: ['DOMContentLoaded', 'scriptLoaded', 'scroll'],
 		sizes: {
 			DESKTOP: {
 				sticky: {
@@ -376,6 +376,9 @@ const status = {
 				},
 				video: {
 					custom: ['336x280']
+				},
+				inview: {
+					custom: ['300x50', '300x100', '320x100', '728x90', '336x280', '300x250', '320x50']
 				}
 			},
 			MOBILE: {
@@ -385,6 +388,9 @@ const status = {
 				},
 				video: {
 					custom: ['336x280']
+				},
+				inview: {
+					custom: ['336x280', '300x250', '300x50', '320x100', '300x100', '320x50']
 				}
 			},
 			TABLET: {
@@ -398,9 +404,9 @@ const status = {
 			}
 		},
 		types: {
-			DESKTOP: ['stickyTop', 'stickyBottom', 'stickyLeft', 'stickyRight'],
-			MOBILE: ['stickyTop', 'stickyBottom'],
-			TABLET: ['stickyTop', 'stickyBottom', 'stickyLeft', 'stickyRight']
+			DESKTOP: ['stickyTop', 'stickyBottom', 'stickyLeft', 'stickyRight', 'inviewCustom'],
+			MOBILE: ['stickyTop', 'stickyBottom', 'inviewCustom'],
+			TABLET: ['stickyTop', 'stickyBottom', 'stickyLeft', 'stickyRight', 'inviewCustom']
 		}
 	},
 	personalizationTypes = ['not', 'in'],

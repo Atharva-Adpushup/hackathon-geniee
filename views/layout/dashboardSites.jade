@@ -19,13 +19,18 @@
                                         i.fa.fa-area-chart
                                 if site.isManual
                                     a.btn.btn-lightBg.btn-default(id="site-tag-manager-" + siteId, href='/tagmanager/#{siteId}') AP Tag
-
-                                if !disableUiControls
-                                    .dropdown.btn-dropdown
-                                        button.btn.btn-lightBg#dropdownMenu1.btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='true')
-                                            span.caret
-                                        |   
-                                        ul.dropdown-menu.btn-dd-menu(aria-labelledby='dropdownMenu1')
+                                if site.isInnovative
+                                    a.btn.btn-lightBg.btn-default(id="site-innovative-ads-manager-" + siteId, href='/innovative-ads-manager/#{siteId}') Innovative Ads
+                                .dropdown.btn-dropdown
+                                    button.btn.btn-lightBg#dropdownMenu1.btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='true')
+                                        span.caret
+                                    |   
+                                    ul.dropdown-menu.btn-dd-menu(aria-labelledby='dropdownMenu1')
+                                        li
+                                            a(title="View site pagegroups" href='/user/site/#{siteId}/pagegroups') 
+                                                i.fa.fa-th-list
+                                                |  PageGroups 
+                                        if isSuperUser
                                             li
                                                 a(title="View site pagegroups" href='/user/site/#{siteId}/pagegroups') 
                                                     i.fa.fa-th-list
@@ -199,4 +204,8 @@
                             span.label Manual Mode
                             .toggle-switch
                                 input(type="checkbox" id="switch-#{siteId}" checked=site.isManual ? true : undefined)
-                                label(for="switch-#{siteId}" data-id="switch-#{siteId}" data-site-id="#{siteId}")
+                                label(for="switch-#{siteId}", data-key="isManual" data-id="switch-#{siteId}" data-site-id="#{siteId}")
+                            span.label(style="margin-left: 20px") Innovative Ads
+                            .toggle-switch
+                                input.service-toggle(type="checkbox" id="switch-innovative-#{siteId}" checked=site.isInnovative ? true : undefined)
+                                label(for="switch-innovative-#{siteId}" data-key="isInnovative" data-id="switch-#{siteId}" data-site-id="#{siteId}")

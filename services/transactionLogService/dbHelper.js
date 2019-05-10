@@ -53,12 +53,11 @@ function updateLayout(ads) {
 	);
 }
 
-function updateTagManager(siteId, ads) {
+function customDocProcessing(ads, docKey) {
 	if (!ads || !ads.length) {
 		return Promise.resolve();
 	}
-	const dockey = `tgmr::${siteId}`;
-	return dbHelper.getDoc(dockey).then(docWithCas => {
+	return dbHelper.getDoc(docKey).then(docWithCas => {
 		let adsFromDoc = _.cloneDeep(docWithCas.value.ads);
 		_.forEach(adsFromDoc, ad => {
 			_.forEach(ads, currentAd => {
@@ -69,13 +68,22 @@ function updateTagManager(siteId, ads) {
 			});
 		});
 		docWithCas.value.ads = adsFromDoc;
-		return dbHelper.updateDoc(dockey, docWithCas.value, docWithCas.cas);
+		return dbHelper.updateDoc(docKey, docWithCas.value, docWithCas.cas);
 	});
 }
 
-function updateDb(siteId, layoutAds, apTagAds) {
+function updateTagManager(siteId, ads) {
+	return customDocProcessing(ads, `tgmr::${siteId}`);
+}
+
+function updateInnovativeAdsManager(siteId, ads) {
+	return customDocProcessing(ads, `fmrt::${siteId}`);
+}
+
+function updateDb(siteId, layoutAds, apTagAds, innovativeAds) {
 	return updateLayout(layoutAds)
 		.then(() => updateTagManager(siteId, apTagAds))
+		.then(() => updateInnovativeAdsManager(siteId, innovativeAds))
 		.then(() => console.log(`Docs updated for site: ${siteId}`));
 }
 

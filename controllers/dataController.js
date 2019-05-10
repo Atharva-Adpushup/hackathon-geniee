@@ -473,10 +473,10 @@ router
 		return res.json({ message });
 	})
 	.get('/adpushup.js', function(req, res) {
-		let siteId = req.baseUrl.replace('/', ''),
-			countryHeader = req.headers['x-cf-geodata'] || false,
-			country = countryHeader ? countryHeader.replace('country_code=', '').replace(/"/g, '') : false,
-			noCountry = country ? false : true;
+		const siteId = req.baseUrl.replace('/', '');
+		const countryHeader = req.headers['x-cf-geodata'] || false;
+		const country = countryHeader ? countryHeader.replace('country_code=', '').replace(/"/g, '') : false;
+		const noCountry = country ? false : true;
 
 		return siteModel
 			.getSiteById(siteId)
@@ -503,5 +503,5 @@ router
 				return res.sendStatus(400);
 			});
 	});
-
+	
 module.exports = router;

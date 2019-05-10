@@ -29,6 +29,7 @@ var model = require('../helpers/model'),
 			'adsensePublisherId',
 			'adNetworkSettings',
 			'isManual',
+			'isInnovative',
 			'gdpr',
 			'ampSettings'
 		];
@@ -44,6 +45,7 @@ var model = require('../helpers/model'),
 			'genieeMediaId',
 			'adsensePublisherId',
 			'isManual',
+			'isInnovative',
 			'gdpr',
 			'ampSettings'
 		];
@@ -393,6 +395,7 @@ function apiModule() {
 						? parseInt(otherSettings.adpushupPercentage, 10)
 						: commonConsts.apConfigDefaults.adpushupPercentage,
 					autoOptimise: settings.autoOptimise === 'false' ? false : true,
+          poweredByBanner: settings.poweredByBanner === 'false' ? false : true,
 					activeDFPNetwork: settings.activeDFPNetwork ? settings.activeDFPNetwork : '',
 					activeDFPParentId: settings.activeDFPParentId ? settings.activeDFPParentId : '',
 					activeDFPCurrencyCode: settings.activeDFPCurrencyCode || '',
