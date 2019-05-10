@@ -91,7 +91,7 @@ API = {
 			),
 			payer = tipaltiConfig.payerName,
 			date = Math.floor(+new Date() / 1000),
-			paramsStr = payer + payeeId + date + '100',
+			paramsStr = payer + payeeId + date + '25',
 			key = tipaltiConfig.key,
 			hash = crypto
 				.createHmac('sha256', key)
