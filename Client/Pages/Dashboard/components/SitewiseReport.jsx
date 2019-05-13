@@ -1,44 +1,48 @@
 import React from 'react';
-import Selectbox from '../../../Components/Selectbox/index';
-import { getDateRange } from '../helpers/utils';
 import { Row, Col } from 'react-bootstrap';
-import { quickDates, sites } from '../configs/commonConsts';
 import Datatable from 'react-bs-datatable';
 import { Link } from 'react-router-dom';
+import Selectbox from '../../../Components/Selectbox/index';
+import { getDateRange } from '../helpers/utils';
+import { dates } from '../configs/commonConsts';
 import reportService from '../../../services/reportService';
 import Loader from '../../../Components/Loader/index';
+
 class SitewiseReport extends React.Component {
 	state = {
-		quickDates: quickDates,
-		selectedDate: quickDates[0].value,
+		quickDates: dates,
+		selectedDate: dates[0].value,
 		tableHeader: [],
 		isLoading: true
 	};
+
 	componentDidMount() {
 		this.getGraphData();
 	}
+
 	getGraphData() {
-		let { selectedDate } = this.state,
-			params = getDateRange(selectedDate),
-			{ path } = this.props;
+		const { selectedDate } = this.state;
+		const params = getDateRange(selectedDate);
+		const { path } = this.props;
 		this.setState({ isLoading: true });
 		reportService.getWidgetData(path, params).then(response => {
-			if (response.status == 200) {
-				let data = response.data && response.data.data ? response.data.data : [];
+			if (response.status === 200) {
+				const data = response.data && response.data.data ? response.data.data : [];
 				this.computeTableData(data);
 			}
 		});
 	}
+
 	computeTableData = data => {
-		let { result, columns } = data,
-			tableHeader = [],
-			{ metrics } = this.props;
+		const { result, columns } = data;
+		const tableHeader = [];
+		const { metrics } = this.props;
 		columns.forEach(col => {
 			if (metrics[col])
 				tableHeader.push({
-					title: metrics[col]['display_name'],
+					title: metrics[col].display_name,
 					prop: col,
-					position: metrics[col]['position'] + 1
+					position: metrics[col].position + 1
 				});
 		});
 		tableHeader.push({
@@ -46,33 +50,36 @@ class SitewiseReport extends React.Component {
 			prop: 'siteName',
 			position: 1
 		});
-		tableHeader.sort(function(a, b) {
-			return a.position - b.position;
-		});
+		tableHeader.sort((a, b) => a.position - b.position);
 		this.setState({ tableHeader, tableBody: result, isLoading: false });
 	};
+
 	renderControl() {
+		const { selectedDate, quickDates } = this.state;
 		return (
 			<div className="aligner aligner--hEnd">
 				<div className="u-margin-r4">
+					{/* eslint-disable */}
 					<label className="u-text-normal u-margin-r2">Quick Dates</label>
 					<Selectbox
 						id="sitewisereport-date"
 						wrapperClassName="display-inline"
 						isClearable={false}
 						isSearchable={false}
-						selected={this.state.selectedDate}
-						options={this.state.quickDates}
-						onSelect={selectedDate => {
-							this.setState({ selectedDate }, this.getGraphData);
+						selected={selectedDate}
+						options={quickDates}
+						onSelect={date => {
+							this.setState({ selectedDate: date }, this.getGraphData);
 						}}
 					/>
+					{/* eslint-enable */}
 				</div>
 			</div>
 		);
 	}
+
 	renderTable() {
-		let { tableBody, tableHeader } = this.state;
+		const { tableBody, tableHeader } = this.state;
 		return (
 			<Datatable
 				tableHeader={tableHeader}
@@ -82,11 +89,13 @@ class SitewiseReport extends React.Component {
 			/>
 		);
 	}
+
 	renderLoader = () => (
 		<div style={{ position: 'relative', width: '100%', height: '30%' }}>
 			<Loader />
 		</div>
 	);
+
 	render() {
 		const { isLoading } = this.state;
 		return (

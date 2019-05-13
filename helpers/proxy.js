@@ -89,12 +89,18 @@ var request = require('request-promise'),
 
 			let normalizedEntries = stringArr.map(str => {
 				const arr = str.trim().split(',');
-
-				const normalizedEntry = `${
-					arr[0] && arr[0][0] !== '#' ? arr[0].trim().toLowerCase() : ''
-				},${arr[1] && arr[1][0] !== '#' ? arr[1].trim().toLowerCase() : ''},${
-					arr[2] && arr[2][0] !== '#' ? arr[2].trim().toUpperCase() : ''
-				}`;
+				let normalizedEntry = '';
+				for (let i = 0; i < arr.length; i++) {
+					if (arr[i] && arr[i][0] !== '#') {
+						normalizedEntry += arr[i].trim().toLowerCase();
+						if (i !== arr.length - 1) normalizedEntry += ',';
+					}
+				}
+				// const normalizedEntry = `${
+				// 	arr[0] && arr[0][0] !== '#' ? arr[0].trim().toLowerCase() : ''
+				// },${arr[1] && arr[1][0] !== '#' ? arr[1].trim().toLowerCase() : ''},${
+				// 	arr[2] && arr[2][0] !== '#' ? arr[2].trim().toUpperCase() : ''
+				// }`;
 
 				return normalizedEntry;
 			});

@@ -1,14 +1,13 @@
 import React, { Component, Fragment } from 'react';
 import { Helmet } from 'react-helmet';
-import Promise from 'bluebird';
-import { FormControl, Col, Alert, Table, Button, Modal, Nav, NavItem } from 'react-bootstrap';
+import { Col, Table, Modal, Nav, NavItem } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
 import ActionCard from '../../Components/ActionCard/index';
 import proxyService from '../../services/proxyService';
 import { showNotification } from '../../actions/uiActions';
 import Loader from '../../Components/Loader/index';
-import { ADSTXT_SITE_LIST_HEADERS, ADSTXT_STATUS } from '../../constants/others';
+import { ADSTXT_SITE_LIST_HEADERS } from '../../constants/others';
 import CustomButton from '../../Components/CustomButton';
 import CustomMessage from '../../Components/CustomMessage/index';
 import { copyToClipBoard } from '../../Apps/ApTag/lib/helpers';
@@ -33,12 +32,12 @@ class AdsTxtManager extends Component {
 	};
 
 	componentDidMount() {
-		Promise.all([proxyService.getAdsTxt(), this.getSitesAdstxtStatus()]).spread((res, sites) => {
-			let adsTxtSnippet = '';
-			if ((res.status = 200)) adsTxtSnippet = res.data.adsTxtSnippet;
+		Promise.all([proxyService.getAdsTxt(), this.getSitesAdstxtStatus()]).then(response => {
+			let snippet;
+			if (response[0].status === 200) snippet = response[0].data.adsTxtSnippet;
 			this.setState({
-				adsTxtSnippet,
-				sites,
+				adsTxtSnippet: snippet,
+				sites: response[1],
 				isLoading: false
 			});
 		});
@@ -46,37 +45,49 @@ class AdsTxtManager extends Component {
 
 	getSitesAdstxtStatus = () => {
 		const { sites } = this.props;
-		console.log(sites);
-		return Promise.map(Object.keys(sites), site =>
-			proxyService
-				.verifyAdsTxtCode(sites[site].siteDomain)
-				.then(res => {
-					console.log(res);
-					if (res.status != 200)
-						return {
-							domain: sites[site].siteDomain,
-							statusText: res.statusText,
-							adsTxt: res.data.ourAdsTxt,
-							status: res.status
-						};
-					else {
-						return {
-							domain: sites[site].siteDomain,
-							statusText: 'Entries Upto Date',
-							adsTxt: res.data.ourAdsTxt,
-							status: res.status
-						};
-					}
-				})
-				.catch(err => {
-					return {
-						domain: sites[site].siteDomain,
-						statusText: 'No Ads.txt Found',
-						adsTxt: err.response.data.ourAdsTxt,
-						status: 400
-					};
-				})
-		);
+		const promiseSerial = funcs =>
+			funcs.reduce(
+				(promise, obj) =>
+					promise.then(all => {
+						const { func, site } = obj;
+						return func()
+							.then(res => {
+								let result;
+								if (res.status !== 200)
+									result = {
+										domain: sites[site].siteDomain,
+										statusText: res.statusText,
+										adsTxt: res.data.ourAdsTxt,
+										status: res.status
+									};
+								else {
+									result = {
+										domain: sites[site].siteDomain,
+										statusText: 'Entries Upto Date',
+										adsTxt: res.data.ourAdsTxt,
+										status: res.status
+									};
+								}
+								return all.concat(result);
+							})
+							.catch(err => {
+								const result = {
+									domain: sites[site].siteDomain,
+									statusText: 'No Ads.txt Found',
+									adsTxt: err.response.data.ourAdsTxt,
+									status: 400
+								};
+								return all.concat(result);
+							});
+					}),
+				Promise.resolve([])
+			);
+		const funcs = Object.keys(sites).map(site => ({
+			func: () => proxyService.verifyAdsTxtCode(sites[site].siteDomain),
+			site
+		}));
+
+		return promiseSerial(funcs).then(res => res);
 	};
 
 	renderLoader = () => (
@@ -94,9 +105,9 @@ class AdsTxtManager extends Component {
 	};
 
 	renderModal = () => {
-		const { showSendCodeByEmailModal, modalAdsTxt } = this.state;
+		const { showSendCodeByEmailModal, modalAdsTxt, showModal } = this.state;
 		return (
-			<Modal show={this.state.showModal} onHide={this.handleClose}>
+			<Modal show={showModal} onHide={this.handleClose}>
 				<Modal.Header closeButton>
 					<Modal.Title>Missing Entries</Modal.Title>
 				</Modal.Header>
@@ -151,9 +162,10 @@ class AdsTxtManager extends Component {
 	};
 
 	onCopyToClipBoard = () => {
+		const { adsTxtSnippet } = this.state;
 		document.getElementById('adsTxtSnippetTextarea').focus();
 		document.getElementById('adsTxtSnippetTextarea').select();
-		copyToClipBoard(this.state.adsTxtSnippet);
+		copyToClipBoard(adsTxtSnippet);
 	};
 
 	renderSiteStatusTable = () => {
@@ -170,8 +182,8 @@ class AdsTxtManager extends Component {
 						</tr>
 					</thead>
 					<tbody>
-						{sites.map((site, index) => (
-							<tr key={index}>
+						{sites.map(site => (
+							<tr key={site.domain}>
 								<td>{site.domain}</td>
 								<td>{site.statusText}</td>
 								<td>
@@ -185,7 +197,7 @@ class AdsTxtManager extends Component {
 										variant="secondary"
 										className="snippet-btn apbtn-main-line apbtn-small"
 										style={{ width: '170px' }}
-										disabled={site.status == 200}
+										disabled={site.status === 200}
 									>
 										Get Entries
 									</CustomButton>

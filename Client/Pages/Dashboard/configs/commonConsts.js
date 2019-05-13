@@ -31,7 +31,7 @@ const DASHBOARD_NAV_ITEMS = {
 	}
 };
 
-const quickDates = [
+const dates = [
 	{ value: 'last7Days', name: 'Last 7 Days' },
 	{ value: 'last30Days', name: 'Last 30 Days' },
 	{ value: 'month', name: 'This Month' }
@@ -55,7 +55,7 @@ const yAxisGroups = [
 		seriesNames: ['AdPushup Variation Page RPM', 'Original Variation Page RPM'],
 		yAxisConfig: {
 			labels: {
-				format: '${value}'
+				format: 'value'
 			}
 		}
 	}
@@ -75,7 +75,7 @@ export {
 	DASHBOARD_NAV_ITEMS_INDEXES,
 	DASHBOARD_NAV_ITEMS_VALUES,
 	DASHBOARD_NAV_ITEMS,
-	quickDates,
+	dates,
 	sites,
 	yAxisGroups,
 	tableHeader
