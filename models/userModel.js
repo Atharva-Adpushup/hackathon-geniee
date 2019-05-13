@@ -186,8 +186,27 @@ var modelAPI = (module.exports = apiModule()),
 					me.set('adNetworkSettings', []);
 				}
 				var adNetworkSettings = me.get('adNetworkSettings');
-				adNetworkSettings.push(data);
-				me.set('adNetworkSettings', adNetworkSettings);
+				var isExist = false;
+				if(data.networkName === "ADSENSE" || data.networkName === "DFP"){
+					for (var i = 0; i <= adNetworkSettings.length; i++){
+						switch(data.networkName){
+							case "ADSENSE": {
+								isExist = data.networkName === adNetworkSettings[i].networkName && data.adsenseEmail === adNetworkSettings[i].adsenseEmail && data.pubId === adNetworkSettings[i].pubId 
+								break;
+							}
+							case "DFP": {
+								isExist = data.networkName === adNetworkSettings[i].networkName && data.userInfo.email === adNetworkSettings[i].userInfo.email
+								break;
+							}
+						}
+					}
+				}
+
+				if(!isExist){
+					adNetworkSettings.push(data);
+					me.set('adNetworkSettings', adNetworkSettings);
+				}
+
 				return me
 					.save()
 					.then(function() {
