@@ -50,6 +50,11 @@ var prebidAdTemplate =
 	'bidCpmAdjustment: function(bidCpm) {' +
 	'return bidCpm - (bidCpm * (12/100));' +
 	'}' +
+	'},' +
+	'rubicon: {' +
+	'bidCpmAdjustment: function(bidCpm) {' +
+	'return bidCpm - (bidCpm * (20/100));' +
+	'}' +
 	'}' +
 	'};' +
 	'pbjs.aliasBidder("appnexus", "springserve");' +
