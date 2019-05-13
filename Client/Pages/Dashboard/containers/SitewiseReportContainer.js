@@ -4,7 +4,7 @@ import SitewiseReport from '../components/SitewiseReport';
 const mapStateToProps = (state, ownProps) => {
 	const {
 		reports: {
-			data: { metrics: metrics }
+			data: { metrics }
 		}
 	} = state.global;
 	return {

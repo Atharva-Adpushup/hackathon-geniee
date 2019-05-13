@@ -1,14 +1,15 @@
 import { connect } from 'react-redux';
 import Dashboard from '../components/index';
 import { showNotification } from '../../../actions/uiActions';
+
 const mapStateToProps = (state, ownProps) => {
 	const {
 		reports: {
 			data: {
-				dashboard: { widget: widget }
+				dashboard: { widget }
 			}
 		},
-		user: user
+		user
 	} = state.global;
 	return {
 		...ownProps,

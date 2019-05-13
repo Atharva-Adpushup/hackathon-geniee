@@ -92,54 +92,20 @@ var API = {
 				arr[1] && arr[1][0] !== '#' ? arr[1].trim().toLowerCase() : ''
 			},${arr[2] && arr[2][0] !== '#' ? arr[2].trim().toUpperCase() : ''}`;
 
-			return normalizedEntry;
-		});
-
-		// filter out duplicate entries
-		normalizedEntries = normalizedEntries.filter(
-			(item, pos, currArray) => currArray.indexOf(item) === pos
-		);
-
-		return normalizedEntries;
-	},
-	verifyAdsTxt(url, ourAdsTxt) {
-		return API.load(`${utils.rightTrim(url, '/')}/ads.txt`)
-			.then(existingAdsTxt => {
-				const existingAdsTxtArr = API.normalizeAdsTxtEntries(existingAdsTxt);
-				const ourAdsTxtArr = API.normalizeAdsTxtEntries(ourAdsTxt);
-
-				const entriesNotFound = ourAdsTxtArr.filter(
-					value => existingAdsTxtArr.indexOf(value) === -1
-				);
-
-				if (entriesNotFound.length) {
-					throw new AdPushupError({
-						httpCode: 404,
-						error:
-							'Few ads.txt entries not found on your site. Please include these ads.txt entries in your ads.txt file.',
-						ourAdsTxt: entriesNotFound.join('\n')
-					});
+			let normalizedEntries = stringArr.map(str => {
+				const arr = str.trim().split(',');
+				let normalizedEntry = '';
+				for (let i = 0; i < arr.length; i++) {
+					if (arr[i] && arr[i][0] !== '#') {
+						normalizedEntry += arr[i].trim().toLowerCase();
+						if (i !== arr.length - 1) normalizedEntry += ',';
+					}
 				}
-
-				return true;
-			})
-			.catch(err => {
-				if (!(err instanceof AdPushupError) && err.statusCode === 404) {
-					throw new AdPushupError({
-						httpCode: 404,
-						error:
-							'ads.txt file not found on your site. Please upload our ads.txt file on your site.',
-						ourAdsTxt
-					});
-				}
-
-				if (!(err instanceof AdPushupError) && err.error.code === 'ENOTFOUND') {
-					throw new AdPushupError({
-						httpCode: 404,
-						error: 'Unable to reach your site!',
-						ourAdsTxt
-					});
-				}
+				// const normalizedEntry = `${
+				// 	arr[0] && arr[0][0] !== '#' ? arr[0].trim().toLowerCase() : ''
+				// },${arr[1] && arr[1][0] !== '#' ? arr[1].trim().toLowerCase() : ''},${
+				// 	arr[2] && arr[2][0] !== '#' ? arr[2].trim().toUpperCase() : ''
+				// }`;
 
 				throw err;
 			});

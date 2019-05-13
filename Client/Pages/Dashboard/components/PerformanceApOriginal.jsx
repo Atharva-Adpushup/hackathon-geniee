@@ -1,21 +1,21 @@
 import React from 'react';
+import { Row, Col } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 import { convertObjToArr, getDateRange } from '../helpers/utils';
 import Selectbox from '../../../Components/Selectbox/index';
 import CustomChart from '../../../Components/CustomChart';
-import { Row, Col } from 'react-bootstrap';
-import { quickDates, yAxisGroups } from '../configs/commonConsts';
+import { dates, yAxisGroups } from '../configs/commonConsts';
 import reportService from '../../../services/reportService';
-import { Link } from 'react-router-dom';
 import Loader from '../../../Components/Loader/index';
 
 class PerformanceApOriginal extends React.Component {
 	constructor(props) {
 		super(props);
-		let { site } = this.props,
-			sites = convertObjToArr(site);
+		const { site } = this.props;
+		const sites = convertObjToArr(site);
 		this.state = {
-			quickDates: quickDates,
-			selectedDate: quickDates[0].value,
+			quickDates: dates,
+			selectedDate: dates[0].value,
 			sites,
 			selectedSite: sites[0].value,
 			series: [],
@@ -23,31 +23,34 @@ class PerformanceApOriginal extends React.Component {
 			isLoading: true
 		};
 	}
+
 	componentDidMount() {
 		this.getGraphData();
 	}
+
 	getGraphData() {
-		let { selectedDate, selectedSite } = this.state,
-			params = getDateRange(selectedDate),
-			{ path, reportType } = this.props;
-		if (reportType == 'site') params.siteid = this.props.siteId;
+		const { selectedDate, selectedSite } = this.state;
+		const params = getDateRange(selectedDate);
+		const { path, reportType, siteId } = this.props;
+		if (reportType === 'site') params.siteid = siteId;
 		else params.siteid = selectedSite;
 		this.setState({ isLoading: true });
 		reportService.getWidgetData(path, params).then(response => {
-			if (response.status == 200) {
-				let data = response.data && response.data.data ? response.data.data.result : [];
+			if (response.status === 200) {
+				const data = response.data && response.data.data ? response.data.data.result : [];
 				this.computeGraphData(data);
 			}
 		});
 	}
+
 	computeGraphData = results => {
-		let series = [],
-			adpushupSeriesData = [],
-			baselineSeriesData = [],
-			xAxis = { categories: [] };
-		results.sort(function(a, b) {
-			var dateA = a.report_date;
-			var dateB = b.report_date;
+		let series = [];
+		const adpushupSeriesData = [];
+		const baselineSeriesData = [];
+		const xAxis = { categories: [] };
+		results.sort((a, b) => {
+			const dateA = a.report_date;
+			const dateB = b.report_date;
 			if (dateA < dateB) {
 				return -1;
 			}
@@ -57,9 +60,9 @@ class PerformanceApOriginal extends React.Component {
 			return 0;
 		});
 		results.forEach(result => {
-			adpushupSeriesData.push(result['adpushup_variation_page_cpm']);
-			baselineSeriesData.push(result['original_variation_page_cpm']);
-			xAxis.categories.push(result['report_date']);
+			adpushupSeriesData.push(result.adpushup_variation_page_cpm);
+			baselineSeriesData.push(result.original_variation_page_cpm);
+			xAxis.categories.push(result.report_date);
 		});
 		series = [
 			{ data: adpushupSeriesData, name: 'AdPushup Variation Page RPM' },
@@ -71,37 +74,46 @@ class PerformanceApOriginal extends React.Component {
 			isLoading: false
 		});
 	};
+
 	renderControl() {
-		let { reportType } = this.props;
+		const { reportType } = this.props;
+		const { selectedDate, quickDates, selectedSite, sites } = this.state;
 		return (
 			<div className="aligner aligner--hEnd">
 				<div className="u-margin-r4">
+					{/* eslint-disable */}
 					<label className="u-text-normal u-margin-r2">Quick Dates</label>
 					<Selectbox
 						id="performance-date"
 						wrapperClassName="display-inline"
 						isClearable={false}
 						isSearchable={false}
-						selected={this.state.selectedDate}
-						options={this.state.quickDates}
-						onSelect={selectedDate => {
-							this.setState({ selectedDate }, this.getGraphData);
+						selected={selectedDate}
+						options={quickDates}
+						onSelect={date => {
+							this.setState({ selectedDate: date }, this.getGraphData);
 						}}
 					/>
+
+					{/* eslint-enable */}
 				</div>
-				{reportType != 'site' ? (
+				{reportType !== 'site' ? (
 					<div className="u-margin-r4">
+						{/* eslint-disable */}
 						<label className="u-text-normal u-margin-r2">Website</label>
 						<Selectbox
+							id="performance-site"
 							isClearable={false}
 							isSearchable={false}
 							wrapperClassName="display-inline"
-							selected={this.state.selectedSite}
-							options={this.state.sites}
-							onSelect={selectedSite => {
-								this.setState({ selectedSite }, this.getGraphData);
+							selected={selectedSite}
+							options={sites}
+							onSelect={site => {
+								this.setState({ selectedSite: site }, this.getGraphData);
 							}}
 						/>
+
+						{/* eslint-enable */}
 					</div>
 				) : (
 					''
@@ -109,22 +121,25 @@ class PerformanceApOriginal extends React.Component {
 			</div>
 		);
 	}
+
 	renderChart() {
-		let type = 'spline',
-			{ series, xAxis } = this.state;
+		const type = 'spline';
+		const { series, xAxis } = this.state;
 		return (
 			<div>
 				<CustomChart type={type} series={series} xAxis={xAxis} yAxisGroups={yAxisGroups} />
 			</div>
 		);
 	}
+
 	renderLoader = () => (
 		<div style={{ position: 'relative', width: '100%', height: '30%' }}>
 			<Loader />
 		</div>
 	);
+
 	render() {
-		let { isLoading } = this.state;
+		const { isLoading } = this.state;
 		return (
 			<Row>
 				<Col sm={12}>{this.renderControl()}</Col>
