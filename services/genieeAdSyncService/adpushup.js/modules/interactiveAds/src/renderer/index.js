@@ -71,18 +71,18 @@ const createParentNode = (appendTo, interactiveAd, css = {}, operation = 'append
 		if (interactiveAd && interactiveAd.formatData) {
 			const adp = window.adpushup;
 
-			// if (adp.config.mode === 16) {
-			if (
-				adp.utils.isUrlMatching() &&
-				adp.config.platform.toUpperCase() === interactiveAd.formatData.platform.toUpperCase()
-			) {
+			// Uncomment the below code when new dashboard + Innovative App is live
+			// if (
+			// 	adp.utils.isUrlMatching() &&
+			// 	adp.config.platform.toUpperCase() === interactiveAd.formatData.platform.toUpperCase()
+			// ) {
+
+			// Legacy Check for old Editor Interactive Ads
+			if (adp.utils.isUrlMatching()) {
 				renderAd(interactiveAd, adInstance);
 			} else {
 				return false;
 			}
-			// } else {
-			// 	renderAd(interactiveAd, adInstance);
-			// }
 		}
 	};
 

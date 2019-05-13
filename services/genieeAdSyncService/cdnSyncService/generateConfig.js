@@ -128,11 +128,19 @@ function init(site, computedConfig) {
 	let statusesAndAds = {
 		statuses: {
 			APTAG_ACTIVE: !!(apConfigs.manualModeActive && apConfigs.manualAds && apConfigs.manualAds.length),
-			INNOVATIVE_ADS_ACTIVE: !!(
-				apConfigs.innovativeModeActive &&
-				apConfigs.innovativeAds &&
-				apConfigs.innovativeAds.length
-			),
+			// Adding Innovative Ads Module based on flag value set in site doc "isInnovative", done to support legacy
+			// Adpushup Editor Interactive Ads
+			// Remove when new dashboard is live
+			INNOVATIVE_ADS_ACTIVE: !!apConfigs.innovativeModeActive,
+
+			// Below is the new condition which is compatible with new dashboard
+			// Uncomment the below code when new dashboard is live
+			// INNOVATIVE_ADS_ACTIVE: !!(
+			// 	apConfigs.innovativeModeActive &&
+			// 	apConfigs.innovativeAds &&
+			// 	apConfigs.innovativeAds.length
+			// ),
+
 			LAYOUT_ACTIVE: !!apConfigs.mode || false,
 			ADPTAG_ACTIVE: !!adpTagsConfig,
 			SPA_ACTIVE: !!apConfigs.isSPA,
