@@ -47,46 +47,6 @@ function init(site, config) {
 					]
 				},
 				plugins: [new webpack.DefinePlugin({ ...statuses, SITE_ID: JSON.stringify(siteId) })]
-			},
-			{
-				entry: {
-					bundle: path.join(__dirname, '..', 'adpushup.js', 'main.js')
-				},
-				output: {
-					path: path.join(__dirname, buildPath),
-					filename: '[name].min.js',
-					chunkFilename: '[name].min.js'
-				},
-				module: {
-					loaders: [
-						{
-							test: /.jsx?$/,
-							loader: 'babel-loader',
-							exclude: /node_modules/,
-							options: {
-								presets: [['es2015', { loose: true }], 'stage-2']
-							}
-						},
-						{
-							test: /.css?$/,
-							loader: ['style-loader', 'css-loader']
-						},
-						{
-							test: /\.(eot|svg|ttf|woff|woff2)$/,
-							loader: 'url-loader'
-						}
-					]
-				},
-				plugins: [
-					new webpack.optimize.UglifyJsPlugin({
-						compress: {
-							warnings: false
-						},
-						mangle: false,
-						sourceMap: true
-					}),
-					new webpack.DefinePlugin({ ...statuses, SITE_ID: JSON.stringify(siteId) })
-				]
 			}
 		]);
 		new webpack.ProgressPlugin().apply(compiler);
@@ -97,15 +57,8 @@ function init(site, config) {
 		.then(() => {
 			return Promise.join(
 				fs.readFileAsync(path.join(__dirname, buildPath, 'bundle.js'), 'utf-8'),
-				fs.readFileAsync(path.join(__dirname, buildPath, 'bundle.min.js'), 'utf-8'),
-				(uncompressed, compressed) => {
-					return [
-						config,
-						{
-							compressed,
-							uncompressed
-						}
-					];
+				uncompressed => {
+					return [config, uncompressed];
 				}
 			);
 		})

@@ -2,6 +2,7 @@ const path = require('path');
 const Promise = require('bluebird');
 const PromiseFtp = require('promise-ftp');
 const _ = require('lodash');
+const uglifyJS = require('uglify-js');
 
 // const universalReportService = require('../../../reports/universal/index');
 const { getReportData, getMediationData } = require('../../../reports/universal/index');
@@ -81,43 +82,16 @@ module.exports = function(site, externalData = {}) {
 				isLegacyInnovativeAds
 			}));
 		},
-		generateFinalInitScript = (jsFile, uncompressedJsFile) => {
+		generateFinalInitScript = jsFile => {
 			return {
 				addService: (serviceName, isActive, serviceConfig = {}) => {
 					switch (serviceName) {
-						case CC.SERVICES.INCONTENT_ANALYSER:
-							serviceScript = serviceScript.substring(0, serviceScript.trim().length - 1).substring(17);
-
-							if (serviceConfig.length) {
-								jsFile = _.replace(jsFile, '__IN_CONTENT_ANALYSER_SCRIPT__', serviceScript);
-								uncompressedJsFile = _.replace(
-									uncompressedJsFile,
-									'__IN_CONTENT_ANALYSER_SCRIPT__',
-									serviceScript
-								);
-							} else {
-								jsFile = _.replace(jsFile, '__IN_CONTENT_ANALYSER_SCRIPT__', noop);
-								uncompressedJsFile = _.replace(
-									uncompressedJsFile,
-									'__IN_CONTENT_ANALYSER_SCRIPT__',
-									noop
-								);
-							}
-							return generateFinalInitScript(jsFile, uncompressedJsFile);
-
 						case CC.SERVICES.ADPTAGS:
 							if (isActive) {
 								jsFile = _.replace(jsFile, '__INVENTORY__', JSON.stringify(serviceConfig));
 								jsFile = _.replace(jsFile, '__SITE_ID__', site.get('siteId'));
-
-								uncompressedJsFile = _.replace(uncompressedJsFile, '__SITE_ID__', site.get('siteId'));
-								uncompressedJsFile = _.replace(
-									uncompressedJsFile,
-									'__INVENTORY__',
-									JSON.stringify(serviceConfig)
-								);
 							}
-							return generateFinalInitScript(jsFile, uncompressedJsFile);
+							return generateFinalInitScript(jsFile);
 
 						case CC.SERVICES.HEADER_BIDDING:
 							if (isActive) {
@@ -125,15 +99,8 @@ module.exports = function(site, externalData = {}) {
 
 								jsFile = _.replace(jsFile, '__SIZE_CONFIG__', deviceConfig);
 								jsFile = _.replace(jsFile, '__PREBID_CURRENCY_CONFIG__', prebidCurrencyConfig);
-
-								uncompressedJsFile = _.replace(uncompressedJsFile, '__SIZE_CONFIG__', deviceConfig);
-								uncompressedJsFile = _.replace(
-									uncompressedJsFile,
-									'__PREBID_CURRENCY_CONFIG__',
-									prebidCurrencyConfig
-								);
 							}
-							return generateFinalInitScript(jsFile, uncompressedJsFile);
+							return generateFinalInitScript(jsFile);
 
 						case CC.SERVICES.GDPR:
 							var gdpr = serviceConfig;
@@ -147,28 +114,16 @@ module.exports = function(site, externalData = {}) {
 										'__COOKIE_CONTROL_CONFIG__',
 										JSON.stringify(cookieControlConfig)
 									);
-									uncompressedJsFile = _.replace(
-										uncompressedJsFile,
-										'__COOKIE_CONTROL_CONFIG__',
-										JSON.stringify(cookieControlConfig)
-									);
 								}
 							}
-							return generateFinalInitScript(jsFile, uncompressedJsFile);
-
-						case CC.SERVICES.INNOVATIVE_ADS:
-							if (serviceConfig) {
-								jsFile = `${jsFile};${serviceScript}`;
-								uncompressedJsFile = `${uncompressedJsFile};${serviceScript}`;
-							}
-							return generateFinalInitScript(jsFile, uncompressedJsFile);
+							return generateFinalInitScript(jsFile);
 
 						default:
-							return generateFinalInitScript(jsFile, uncompressedJsFile);
+							return generateFinalInitScript(jsFile);
 					}
 				},
 				done: () => {
-					return { jsFile, uncompressedJsFile };
+					return jsFile;
 				}
 			};
 		},
@@ -193,21 +148,17 @@ module.exports = function(site, externalData = {}) {
 			return getConfigWrapper(site)
 				.then(generatedConfig => prebidGeneration(generatedConfig))
 				.then(generatedConfig => bundleGeneration(site, generatedConfig))
-				.spread((generatedConfig, bundles) => {
+				.spread((generatedConfig, bundle) => {
 					let { apConfigs, adpTagsConfig, statusesAndAds: finalConfig } = generatedConfig;
-					let { uncompressed, compressed } = bundles;
 
 					if (site.get('medianetId')) apConfigs.medianetId = site.get('medianetId');
 
-					compressed = _.replace(compressed, '__AP_CONFIG__', JSON.stringify(apConfigs));
-					compressed = _.replace(compressed, /__SITE_ID__/g, site.get('siteId'));
-					compressed = _.replace(compressed, '__COUNTRY__', false);
-					uncompressed = _.replace(uncompressed, '__AP_CONFIG__', JSON.stringify(apConfigs));
-					uncompressed = _.replace(uncompressed, /__SITE_ID__/g, site.get('siteId'));
-					uncompressed = _.replace(uncompressed, '__COUNTRY__', false);
+					bundle = _.replace(bundle, '__AP_CONFIG__', JSON.stringify(apConfigs));
+					bundle = _.replace(bundle, /__SITE_ID__/g, site.get('siteId'));
+					bundle = _.replace(bundle, '__COUNTRY__', false);
 
 					// Generate final init script based on the services that are enabled
-					var scripts = generateFinalInitScript(compressed, uncompressed)
+					var uncompressed = generateFinalInitScript(bundle)
 						.addService(CC.SERVICES.ADPTAGS, finalConfig.statuses.ADPTAG_ACTIVE, adpTagsConfig)
 						.addService(CC.SERVICES.HEADER_BIDDING, finalConfig.statuses.HB_ACTIVE, {
 							deviceConfig: config.deviceConfig,
@@ -215,10 +166,24 @@ module.exports = function(site, externalData = {}) {
 						})
 						.addService(CC.SERVICES.GDPR, finalConfig.statuses.GDPR_ACTIVE, finalConfig.config.gdpr)
 						.done();
+					var compressed = '';
+
+					try {
+						var output = uglifyJS.minify(uncompressed, {
+							compress: true,
+							mangle: false,
+							sourceMap: true
+						});
+						if (output.error) throw output.error;
+						compressed = output.code;
+					} catch (e) {
+						console.log(e);
+						return Promise.reject(new Error('CDN Sync failed while compressing the file'));
+					}
 
 					return {
-						default: scripts.jsFile,
-						uncompressed: scripts.uncompressedJsFile
+						default: compressed,
+						uncompressed
 					};
 				});
 		},
