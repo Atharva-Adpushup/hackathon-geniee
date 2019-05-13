@@ -285,6 +285,7 @@ const Promise = require('bluebird'),
 					getAdsAndPushToAdp('isManual', `tgmr::${site.get('siteId')}`, site),
 					getAdsAndPushToAdp('isInnovative', `fmrt::${site.get('siteId')}`, site),
 					(manualAds, innovativeAds) => {
+						console.log('isLegacyInnovativeAds: ', isLegacyInnovativeAds);
 						return [finalJson, ADPTags, manualAds, innovativeAds, isLegacyInnovativeAds];
 					}
 				);
