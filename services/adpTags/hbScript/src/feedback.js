@@ -51,8 +51,7 @@ var config = require('./config'),
 					sectionName: slot.sectionName,
 					pageGroup: slot.pageGroup,
 					platform: slot.platform,
-					packetId: window.adpushup.config.packetId,
-					newFeedback: true
+					packetId: window.adpushup.config.packetId
 				}
 			};
 
