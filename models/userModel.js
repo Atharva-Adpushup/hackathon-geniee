@@ -188,7 +188,7 @@ var modelAPI = (module.exports = apiModule()),
 				var adNetworkSettings = me.get('adNetworkSettings');
 				var isExist = false;
 				if(adNetworkSettings.length && data.networkName === "ADSENSE" || data.networkName === "DFP"){
-					for (var i = 0; i <= adNetworkSettings.length; i++){
+					for (var i = 0; i < adNetworkSettings.length; i++){
 						switch(data.networkName){
 							case "ADSENSE": {
 								isExist = data.networkName === adNetworkSettings[i].networkName && data.adsenseEmail === adNetworkSettings[i].adsenseEmail && data.pubId === adNetworkSettings[i].pubId 
