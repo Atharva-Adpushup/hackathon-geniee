@@ -88,7 +88,7 @@ module.exports = {
 		$.post(config.FEEDBACK_URL_OLD, JSON.stringify(feedback.data));
 
 		feedback.data.newFeedback = true;
-		$.get(config.FEEDBACK_URL + adp.utils.base64Decode(JSON.stringify(feedback.data)));
+		$.get(config.FEEDBACK_URL + adp.utils.base64Encode(JSON.stringify(feedback.data)));
 	},
 	getBatchAdUnits: function(adpSlots) {
 		var adUnits = [];
