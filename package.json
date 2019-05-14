@@ -15,7 +15,7 @@
 	},
 	"lint-staged": {
 		"*.{js,jsx,scss,html}": [
-			"./node_modules/.bin/eslint --fix",
+			"./node_modules/.bin/eslint --ignore-path .eslintignore --fix",
 			"git add"
 		]
 	},

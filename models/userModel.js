@@ -187,11 +187,15 @@ var modelAPI = (module.exports = apiModule()),
 				}
 				var adNetworkSettings = me.get('adNetworkSettings');
 				var isExist = false;
+<<<<<<< HEAD
 				if(adNetworkSettings.length && data.networkName && data.networkName === "ADSENSE" || data.networkName === "DFP"){
+=======
+				if(adNetworkSettings.length && data.networkName === "ADSENSE" || data.networkName === "DFP"){
+>>>>>>> OAuth localhost setup
 					for (var i = 0; i < adNetworkSettings.length; i++){
 						switch(data.networkName){
 							case "ADSENSE": {
-								isExist = data.networkName === adNetworkSettings[i].networkName && data.adsenseEmail === adNetworkSettings[i].adsenseEmail && data.pubId === adNetworkSettings[i].pubId 
+								isExist = data.networkName === adNetworkSettings[i].networkName && data.adsenseEmail === adNetworkSettings[i].adsenseEmail && data.pubId === adNetworkSettings[i].pubId
 								break;
 							}
 							case "DFP": {
@@ -942,26 +946,9 @@ function apiModule() {
 			return proxy.checkIfBillingProfileComplete(email).then(status => {
 				return API.getUserByEmail(email).then(user => {
 					user.set('isPaymentDetailsComplete', status);
-<<<<<<< HEAD
-					user.save();
-					console.log({ email, status });
-					return {
-						email,
-						status
-					};
-				});
-			});
-		},
-		getAllUsers: () => {
-			allUsers.reduce(false);
-			return couchbase.queryViewFromAppBucket(allUsers).then(function(results) {
-				return _.map(results, 'key');
-			});
-=======
 					return user.save();
 				});
 			});
->>>>>>> payment page bug fixes
 		}
 	};
 
