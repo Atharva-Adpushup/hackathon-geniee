@@ -51,4 +51,4 @@ const fetchGlobalData = () => dispatch =>
 		})
 		.catch(err => errorHandler(err));
 
-export default { fetchGlobalData };
+export default fetchGlobalData;
