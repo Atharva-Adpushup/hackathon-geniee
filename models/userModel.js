@@ -187,7 +187,7 @@ var modelAPI = (module.exports = apiModule()),
 				}
 				var adNetworkSettings = me.get('adNetworkSettings');
 				var isExist = false;
-				if(adNetworkSettings.length && data.networkName && data.networkName === "ADSENSE" || data.networkName === "DFP"){
+				if(adNetworkSettings.length && data.networkName === "ADSENSE" || data.networkName === "DFP"){
 					for (var i = 0; i < adNetworkSettings.length; i++){
 						switch(data.networkName){
 							case "ADSENSE": {
