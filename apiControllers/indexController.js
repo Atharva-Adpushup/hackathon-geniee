@@ -1,3 +1,4 @@
+/* eslint-disable */
 const Promise = require('bluebird');
 const express = require('express');
 const md5 = require('md5');
@@ -14,6 +15,7 @@ const httpStatus = require('../configs/httpStatusConsts');
 const formValidator = require('../helpers/FormValidator');
 const schema = require('../helpers/schema');
 const { getNetworkConfig } = require('../helpers/commonFunctions');
+const { fetchOurAdsTxt } = require('../helpers/proxy');
 
 const router = express.Router();
 const AdPushupError = require('../helpers/AdPushupError');
@@ -122,24 +124,30 @@ router
 		return userModel
 			.getUserByEmail(email)
 			.then(user =>
-				Promise.join(getNetworkConfig(), getUserSites(user), (networkConfig, sites) => {
-					const userData = user.cleanData();
+				Promise.join(
+					getNetworkConfig(),
+					getUserSites(user),
+					fetchOurAdsTxt(),
+					(networkConfig, sites, adsTxt) => {
+						const userData = user.cleanData();
 
-					const sitesArray = [...userData.sites];
-					const sitesArrayLength = sitesArray.length;
-					userData.sites = {};
+						const sitesArray = [...userData.sites];
+						const sitesArrayLength = sitesArray.length;
+						userData.sites = {};
 
-					for (let i = 0; i < sitesArrayLength; i += 1) {
-						const site = sitesArray[i];
-						userData.sites[site.siteId] = site;
+						for (let i = 0; i < sitesArrayLength; i += 1) {
+							const site = sitesArray[i];
+							userData.sites[site.siteId] = site;
+						}
+
+						return res.status(httpStatus.OK).json({
+							user: { ...userData, isSuperUser },
+							networkConfig,
+							sites,
+							adsTxt
+						});
 					}
-
-					return res.status(httpStatus.OK).json({
-						user: { ...userData, isSuperUser },
-						networkConfig,
-						sites
-					});
-				})
+				)
 			)
 			.catch(err => {
 				console.log(err);

@@ -43,7 +43,7 @@ class AdsTxtManager extends Component {
 		});
 	}
 	getSitesAdstxtStatus = () => {
-		const { sites } = this.props;
+		const { sites, adsTxt } = this.props;
 		const promiseSerial = funcs =>
 			funcs.reduce(
 				(promise, obj) =>
@@ -52,28 +52,28 @@ class AdsTxtManager extends Component {
 						return func()
 							.then(res => {
 								let result;
-								if (res.status !== 200)
-									result = {
-										domain: sites[site].siteDomain,
-										statusText: res.statusText,
-										adsTxt: res.data.ourAdsTxt,
-										status: res.status
-									};
-								else {
+								if (res.status === 200)
 									result = {
 										domain: sites[site].siteDomain,
 										statusText: 'Entries Upto Date',
 										adsTxt: res.data.ourAdsTxt,
 										status: res.status
 									};
+								else {
+									result = {
+										domain: sites[site].siteDomain,
+										statusText: res.statusText,
+										adsTxt,
+										status: res.status
+									};
 								}
 								return all.concat(result);
 							})
-							.catch(err => {
+							.catch(() => {
 								const result = {
 									domain: sites[site].siteDomain,
 									statusText: 'No Ads.txt Found',
-									adsTxt: err.response.data.ourAdsTxt,
+									adsTxt,
 									status: 400
 								};
 								return all.concat(result);
@@ -330,8 +330,8 @@ class AdsTxtManager extends Component {
 }
 
 const mapStateToProps = state => {
-	const { sites } = state.global;
-	return { sites: sites.data };
+	const { sites, adsTxt } = state.global;
+	return { sites: sites.data, adsTxt: adsTxt.data };
 };
 
 export default connect(
