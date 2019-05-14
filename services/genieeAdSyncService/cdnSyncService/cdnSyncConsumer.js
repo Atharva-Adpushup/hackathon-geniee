@@ -161,8 +161,8 @@ module.exports = function(site, externalData = {}) {
 					var uncompressed = generateFinalInitScript(bundle)
 						.addService(CC.SERVICES.ADPTAGS, finalConfig.statuses.ADPTAG_ACTIVE, adpTagsConfig)
 						.addService(CC.SERVICES.HEADER_BIDDING, finalConfig.statuses.HB_ACTIVE, {
-							deviceConfig: config.deviceConfig,
-							prebidCurrencyConfig: config.prebidCurrencyConfig
+							deviceConfig: finalConfig.config.deviceConfig,
+							prebidCurrencyConfig: finalConfig.config.prebidCurrencyConfig
 						})
 						.addService(CC.SERVICES.GDPR, finalConfig.statuses.GDPR_ACTIVE, finalConfig.config.gdpr)
 						.done();
