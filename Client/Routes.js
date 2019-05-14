@@ -7,6 +7,7 @@ import { APT_NAV_ITEMS_INDEXES } from './Apps/ApTag/configs/commonConsts';
 import { REPORTS_NAV_ITEMS_INDEXES } from './Apps/Reporting/configs/commonConsts';
 import { PAYMENT_NAV_ITEMS_INDEXES } from './Pages/Payment/configs/commonConsts';
 import { ADSTXT_NAV_ITEMS_INDEXES } from './Pages/AdsTxtManagement/configs/commonConsts';
+import { NAV_ITEMS_INDEXES as HB_NAV_ITEMS_INDEXES } from './Apps/HeaderBidding/constants';
 
 import history from './helpers/history';
 import PublicOnlyRoute from './Components/PublicOnlyRoute';
@@ -38,6 +39,9 @@ const Reporting = lazy(() =>
 );
 const ManageSite = lazy(() =>
 	import(/* webpackChunkName: "manageSite" */ './Pages/ManageSite/index')
+);
+const HeaderBidding = lazy(() =>
+	import(/* webpackChunkName: "headerBidding" */ './Apps/HeaderBidding')
 );
 const ErrorPage = lazy(() => import(/* webpackChunkName: "error" */ './Pages/ErrorPage/index'));
 const OnBoarding = lazy(() => import(/* webpackChunkName: "onBoarding" */ './Pages/OnBoarding'));
@@ -129,6 +133,43 @@ const Routes = () => (
 						name="Manage"
 						path="/sites/:siteId/apps/innovative-ads/manage"
 						component={InnovativeAds}
+					/>
+
+					{/* Manage Header Bidding */}
+					<PrivateRoute
+						exact
+						customProps={{ activeTab: HB_NAV_ITEMS_INDEXES.TAB_1 }}
+						name="Header Bidding"
+						path="/sites/:siteId/apps/header-bidding"
+						component={HeaderBidding}
+					/>
+					<PrivateRoute
+						exact
+						customProps={{ activeTab: HB_NAV_ITEMS_INDEXES.TAB_2 }}
+						name="Tab 2"
+						path="/sites/:siteId/apps/header-bidding/tab-2"
+						component={HeaderBidding}
+					/>
+					<PrivateRoute
+						exact
+						customProps={{ activeTab: HB_NAV_ITEMS_INDEXES.TAB_3 }}
+						name="Tab 3"
+						path="/sites/:siteId/apps/header-bidding/tab-3"
+						component={HeaderBidding}
+					/>
+					<PrivateRoute
+						exact
+						customProps={{ activeTab: HB_NAV_ITEMS_INDEXES.TAB_4 }}
+						name="Tab 4"
+						path="/sites/:siteId/apps/header-bidding/tab-4"
+						component={HeaderBidding}
+					/>
+					<PrivateRoute
+						exact
+						customProps={{ activeTab: HB_NAV_ITEMS_INDEXES.TAB_5 }}
+						name="Tab 5"
+						path="/sites/:siteId/apps/header-bidding/tab-5"
+						component={HeaderBidding}
 					/>
 
 					<PrivateRoute
