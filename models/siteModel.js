@@ -505,7 +505,11 @@ function apiModule() {
 												
 												const ad = section.ads[adKey];
 
+<<<<<<< HEAD
 												if (ad.network === 'adpTags') {
+=======
+												if (ad.network) {
+>>>>>>> Added inventory check functionality
 													inventoryFound = true;
 													break;
 												}
@@ -525,6 +529,7 @@ function apiModule() {
 
 					if (inventoryFound) return inventoryFound;
 					throw new AdPushupError('Inventory Not Found');
+<<<<<<< HEAD
 				});
 		},
 		getLayoutInventorySizes: siteId => {
@@ -571,6 +576,9 @@ function apiModule() {
 
 					return sizesArray;
 				});
+=======
+				})
+>>>>>>> Added inventory check functionality
 		},
 		isApTagInventoryExist: siteId => {
 			return couchbase
@@ -582,7 +590,11 @@ function apiModule() {
 					let apTagInventoryFound = false;
 					if (value.ads.length) {
 						for (const ad of value.ads) {
+<<<<<<< HEAD
 							apTagInventoryFound = ad.network === 'adpTags';
+=======
+							apTagInventoryFound = !!ad.network;
+>>>>>>> Added inventory check functionality
 							if (apTagInventoryFound) break;
 						}
 					}
@@ -598,6 +610,7 @@ function apiModule() {
 					throw err;
 				});
 		},
+<<<<<<< HEAD
 		getApTagInventorySizes: siteId => {
 			return couchbase
 				.connectToAppBucket()
@@ -628,6 +641,8 @@ function apiModule() {
 					throw err;
 				});
 		},
+=======
+>>>>>>> Added inventory check functionality
 		isInnovativeAdInventoryExist: siteId => {
 			return couchbase
 				.connectToAppBucket()
@@ -638,7 +653,11 @@ function apiModule() {
 					let innovativeAdInventoryFound = false;
 					if (value.ads.length) {
 						for (const ad of value.ads) {
+<<<<<<< HEAD
 							innovativeAdInventoryFound = ad.network === 'adpTags';
+=======
+							innovativeAdInventoryFound = !!ad.network;
+>>>>>>> Added inventory check functionality
 							if (innovativeAdInventoryFound) break;
 						}
 					}
@@ -654,6 +673,7 @@ function apiModule() {
 					throw err;
 				});
 		},
+<<<<<<< HEAD
 		getInnovativeAdInventorySizes: siteId => {
 			return couchbase
 				.connectToAppBucket()
@@ -696,6 +716,8 @@ function apiModule() {
 					return [...new Set([...layoutInventorySizes, ...apTagInventorySizes, ...innovativeAdInventorySizes])]
 				});
 		},
+=======
+>>>>>>> Added inventory check functionality
 		setSiteStep: function(siteId, onboardingStage, step) {
 			return API.getSiteById(siteId)
 				.then(function(site) {

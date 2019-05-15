@@ -82,59 +82,34 @@ class HeaderBidding extends React.Component {
 		this.setState({ redirectUrl });
 	};
 
-	renderContent = () => {
+	renderContent() {
 		const {
 			match: {
 				params: { siteId }
 			},
 			checkInventoryAction,
-			inventoryFound,
-			bidders,
-			fetchAllBiddersAction,
-			setupStatus,
-			addBidderAction,
-			updateBidderAction,
-			inventories,
-			fetchInventoriesAction,
-			updateInventoriesHbStatus,
-			showNotification
+			inventoryFound
 		} = this.props;
 
 		const activeTab = this.getActiveTab();
 
 		function getContent() {
 			switch (activeTab) {
-				case 'setup':
+				case NAV_ITEMS_INDEXES.TAB_1:
 					return (
 						<Setup
 							siteId={siteId}
 							checkInventoryAction={checkInventoryAction}
 							inventoryFound={inventoryFound}
-							setupStatus={setupStatus}
 						/>
 					);
-				case 'bidders':
-					return (
-						<BiddersTab
-							siteId={siteId}
-							bidders={bidders}
-							fetchAllBiddersAction={fetchAllBiddersAction}
-							addBidderAction={addBidderAction}
-							updateBidderAction={updateBidderAction}
-						/>
-					);
-				case 'inventory':
-					return (
-						<InventoryTab
-							siteId={siteId}
-							inventories={inventories}
-							fetchInventoriesAction={fetchInventoriesAction}
-							updateInventoriesHbStatus={updateInventoriesHbStatus}
-						/>
-					);
-				case 'prebid-settings':
-					return <PrebidSettingsTab siteId={siteId} showNotification={showNotification} />;
-				case 'optimization':
+				case NAV_ITEMS_INDEXES.TAB_2:
+					return 'Tab 2';
+				case NAV_ITEMS_INDEXES.TAB_3:
+					return 'Tab 3';
+				case NAV_ITEMS_INDEXES.TAB_4:
+					return 'Tab 4';
+				case NAV_ITEMS_INDEXES.TAB_5:
 					return 'Tab 5';
 				default:
 					return null;

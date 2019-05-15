@@ -29,6 +29,12 @@ class Setup extends React.Component {
 		);
 	};
 
+	checkInventory = () => {
+		const { siteId, checkInventoryAction } = this.props;
+
+		checkInventoryAction(siteId);
+	};
+
 	// eslint-disable-next-line class-methods-use-this
 	handlePostMessageHandler(event) {
 		const isStringData = !!(typeof event.data === 'string');
@@ -52,86 +58,22 @@ class Setup extends React.Component {
 	}
 
 	renderMainContent = () => {
-		const {
-			setupStatus: { dfpConnected, adServerSetupCompleted, inventoryFound, biddersFound }
-		} = this.props;
+		const { inventoryFound } = this.props;
 
 		return (
-			<Row className="options-wrapper hb-setup">
+			<Row className="options-wrapper">
 				<p>
 					Lorem ipsum dolor sit amet, consectetur adipisicing elit. Numquam necessitatibus odit
 					omnis laboriosam voluptatum incidunt quasi delectus, repudiandae, aspernatur, ullam rem
 					culpa nihil quos aut optio beatae reprehenderit vitae iure.
 				</p>
-				<ul className="u-padding-l0 u-margin-t5">
-					<li>
-						<span className="name">Google Ad Manager</span>
-						<span className="status">
-							{dfpConnected ? (
-								<FontAwesomeIcon icon="check" />
-							) : (
-								<FontAwesomeIcon icon="info-circle" title="Google DFP not connected!" />
-							)}
-						</span>
-						{!dfpConnected && (
-							<span className="btn-wrap">
-								<CustomButton
-									variant="secondary"
-									name="connectDfpBtn"
-									onClick={this.openGoogleOauthWindow}
-								>
-									Connect
-								</CustomButton>
-							</span>
-						)}
-					</li>
-					<li>
-						<span className="name">AdServer Setup</span>
-						<span className="status">
-							{adServerSetupCompleted ? (
-								<FontAwesomeIcon icon="check" />
-							) : (
-								<FontAwesomeIcon icon="info-circle" title="AdServer Setup is pending!" />
-							)}
-						</span>
-						{!adServerSetupCompleted && (
-							<span className="btn-wrap">
-								<CustomButton variant="secondary" name="setupAdServer">
-									Setup
-								</CustomButton>
-							</span>
-						)}
-					</li>
-					<li>
-						<span className="name">Inventory</span>
-						<span className="status">
-							{inventoryFound ? (
-								<FontAwesomeIcon icon="check" />
-							) : (
-								<FontAwesomeIcon icon="info-circle" title="Inventory not found!" />
-							)}
-						</span>
-					</li>
-					<li>
-						<span className="name">Bidders</span>
-						<span className="status">
-							{biddersFound ? (
-								<FontAwesomeIcon icon="check" />
-							) : (
-								<FontAwesomeIcon icon="info-circle" title="Bidders Not found!" />
-							)}
-						</span>
-						{!biddersFound && (
-							<span className="btn-wrap">
-								<Link to="header-bidding/bidders">
-									<CustomButton variant="secondary" name="addBidders">
-										Add Bidders
-									</CustomButton>
-								</Link>
-							</span>
-						)}
-					</li>
-				</ul>
+				<CustomButton variant="primary" name="connectDfpBtn" onClick={this.openGoogleOauthWindow}>
+					Connect
+				</CustomButton>
+				<CustomButton variant="secondary" name="checkInventory" onClick={this.checkInventory}>
+					Check Inventory
+				</CustomButton>
+				inventoryFound: {inventoryFound !== null ? inventoryFound.toString() : 'not checked yet!'}
 			</Row>
 		);
 	};
