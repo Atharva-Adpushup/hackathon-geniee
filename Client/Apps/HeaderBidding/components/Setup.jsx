@@ -27,6 +27,12 @@ class Setup extends React.Component {
 		);
 	};
 
+	checkInventory = () => {
+		const { siteId, checkInventoryAction } = this.props;
+
+		checkInventoryAction(siteId);
+	};
+
 	// eslint-disable-next-line class-methods-use-this
 	handlePostMessageHandler(event) {
 		const isStringData = !!(typeof event.data === 'string');
@@ -49,19 +55,26 @@ class Setup extends React.Component {
 		return true;
 	}
 
-	renderMainContent = () => (
-		<Row className="options-wrapper">
-			<p>
-				Lorem ipsum dolor sit amet, consectetur adipisicing elit. Numquam necessitatibus odit omnis
-				laboriosam voluptatum incidunt quasi delectus, repudiandae, aspernatur, ullam rem culpa
-				nihil quos aut optio beatae reprehenderit vitae iure.
-			</p>
+	renderMainContent = () => {
+		const { inventoryFound } = this.props;
 
-			<CustomButton variant="primary" name="connectDfpBtn" onClick={this.openGoogleOauthWindow}>
-				Connect
-			</CustomButton>
-		</Row>
-	);
+		return (
+			<Row className="options-wrapper">
+				<p>
+					Lorem ipsum dolor sit amet, consectetur adipisicing elit. Numquam necessitatibus odit
+					omnis laboriosam voluptatum incidunt quasi delectus, repudiandae, aspernatur, ullam rem
+					culpa nihil quos aut optio beatae reprehenderit vitae iure.
+				</p>
+				<CustomButton variant="primary" name="connectDfpBtn" onClick={this.openGoogleOauthWindow}>
+					Connect
+				</CustomButton>
+				<CustomButton variant="secondary" name="checkInventory" onClick={this.checkInventory}>
+					Check Inventory
+				</CustomButton>
+				inventoryFound: {inventoryFound !== null ? inventoryFound.toString() : 'not checked yet!'}
+			</Row>
+		);
+	};
 
 	render() {
 		return this.renderMainContent();
