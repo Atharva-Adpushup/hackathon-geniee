@@ -478,6 +478,107 @@ function apiModule() {
 				});
 		},
 		getSiteChannels: siteId => API.getSiteById(siteId).then(site => site.get('channels')),
+		isLayoutInventoryExist: siteId => {
+			return API.getSiteById(siteId)
+				.then(site => site.getAllChannels())
+				.then(channels => {
+					let inventoryFound = false;
+					// eslint-disable-next-line no-restricted-syntax
+					for (const channel of channels) {
+						if (inventoryFound) break;
+						// eslint-disable-next-line no-restricted-syntax
+						if (channel.variations && Object.keys(channel.variations).length) {
+							for (const variationKey in channel.variations) {
+								if (inventoryFound) break;
+
+								const variation = channel.variations[variationKey];
+
+								if (variation.sections && Object.keys(variation.sections).length) {
+									for (const sectionKey in variation.sections) {
+										if (inventoryFound) break;
+
+										const section = variation.sections[sectionKey];
+
+										if (section.ads && Object.keys(section.ads).length) {
+											for (const adKey in section.ads) {
+												if (inventoryFound) break;
+												
+												const ad = section.ads[adKey];
+
+												if (ad.network) {
+													inventoryFound = true;
+													break;
+												}
+											}
+										} else {
+											continue;
+										}
+									}
+								} else {
+									continue;
+								}
+							}
+						} else {
+							continue;
+						}
+					}
+
+					if (inventoryFound) return inventoryFound;
+					throw new AdPushupError('Inventory Not Found');
+				})
+		},
+		isApTagInventoryExist: siteId => {
+			return couchbase
+				.connectToAppBucket()
+				.then(function (appBucket) {
+					return appBucket.getAsync('tgmr::' + siteId, {});
+				})
+				.then(({ value }) => {
+					let apTagInventoryFound = false;
+					if (value.ads.length) {
+						for (const ad of value.ads) {
+							apTagInventoryFound = !!ad.network;
+							if (apTagInventoryFound) break;
+						}
+					}
+
+					if (apTagInventoryFound) return apTagInventoryFound;
+					throw new AdPushupError('Inventory Not Found');
+				})
+				.catch(err => {
+					if (err.code === 13) {
+						throw new AdPushupError('Inventory Not Found');
+					}
+
+					throw err;
+				});
+		},
+		isInnovativeAdInventoryExist: siteId => {
+			return couchbase
+				.connectToAppBucket()
+				.then(function (appBucket) {
+					return appBucket.getAsync('fmrt::' + siteId, {});
+				})
+				.then(({ value }) => {
+					let innovativeAdInventoryFound = false;
+					if (value.ads.length) {
+						for (const ad of value.ads) {
+							innovativeAdInventoryFound = !!ad.network;
+							if (innovativeAdInventoryFound) break;
+						}
+					}
+
+					if (innovativeAdInventoryFound) return innovativeAdInventoryFound;
+					throw new AdPushupError('Inventory Not Found');
+				})
+				.catch(err => {
+					if (err.code === 13) {
+						throw new AdPushupError('Inventory Not Found');
+					}
+					
+					throw err;
+				});
+		},
 		setSiteStep: function(siteId, onboardingStage, step) {
 			return API.getSiteById(siteId)
 				.then(function(site) {

@@ -1,5 +1,4 @@
 const express = require('express');
-const _ = require('lodash');
 
 const router = express.Router();
 const userController = require('./userController');
@@ -9,7 +8,7 @@ const apTagController = require('./apTagController');
 const siteController = require('./siteController');
 const dataController = require('./dataController');
 const innovativeAdsController = require('./innovativeAdsController');
-const siteController = require('./siteController');
+const headerBiddingController = require('./headerBiddingController');
 
 const apiAuthMiddleware = require('../middlewares/apiAuthMiddleware');
 
@@ -20,7 +19,7 @@ router.use('/user', userController);
 router.use('/proxy', proxyController);
 router.use('/apTag', apTagController);
 router.use('/innovativeAds', innovativeAdsController);
-router.use('/site', siteController);
+router.use('/headerBidding', headerBiddingController);
 router.use('/', indexController);
 
 module.exports = router;
