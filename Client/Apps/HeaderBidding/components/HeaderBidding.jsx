@@ -60,12 +60,26 @@ class HeaderBidding extends React.Component {
 	};
 
 	renderContent() {
+		const {
+			match: {
+				params: { siteId }
+			},
+			checkInventoryAction,
+			inventoryFound
+		} = this.props;
+
 		const activeTab = this.getActiveTab();
 
 		function getContent() {
 			switch (activeTab) {
 				case NAV_ITEMS_INDEXES.TAB_1:
-					return <Setup />;
+					return (
+						<Setup
+							siteId={siteId}
+							checkInventoryAction={checkInventoryAction}
+							inventoryFound={inventoryFound}
+						/>
+					);
 				case NAV_ITEMS_INDEXES.TAB_2:
 					return 'Tab 2';
 				case NAV_ITEMS_INDEXES.TAB_3:
