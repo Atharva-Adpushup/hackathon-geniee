@@ -74,11 +74,7 @@ function HbProcessing(site, apConfigs) {
 				computedPrebidCurrencyConfig = {
 					adServerCurrency: apConfigs.activeDFPCurrencyCode,
 					granularityMultiplier: Number(apConfigs.prebidGranularityMultiplier),
-					rates: {
-						USD: {
-							[apConfigs.activeDFPCurrencyCode]: Number(apConfigs.activeDFPCurrencyExchangeRate)
-						}
-					}
+					rates: apConfigs.activeDFPCurrencyExchangeRate
 				};
 			}
 
