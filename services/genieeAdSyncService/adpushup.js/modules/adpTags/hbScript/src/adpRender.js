@@ -132,23 +132,23 @@ var utils = require('../helpers/utils'),
 		var customSlotLevelTargetingMap = window.adpushup.customSlotLevelTargetingMap;
 		if (customSlotLevelTargetingMap) {
 			var slotIds = Object.keys(customSlotLevelTargetingMap);
-	
-			if(slotIds.length) {
+
+			if (slotIds.length) {
 				slotIds.forEach(function(slotId) {
 					if (slotId === slot.containerId) {
 						var slotTargeting = customSlotLevelTargetingMap[slotId];
-						
-						if(slotTargeting) {
+
+						if (slotTargeting) {
 							var targetingKeys = Object.keys(slotTargeting);
 
-							if(targetingKeys.length) {
+							if (targetingKeys.length) {
 								targetingKeys.forEach(function(key) {
 									slot.gSlot.setTargeting(key, String(slotTargeting[key]));
 								});
 							}
 						}
 					}
-				});	
+				});
 			}
 		}
 	},
@@ -233,7 +233,7 @@ var utils = require('../helpers/utils'),
 			size;
 
 		if (isResponsive) {
-			responsiveAdsData = responsiveAds.getAdSizes(slot.containerId);
+			responsiveAdsData = responsiveAds.getAdSizes(slot.optionalParam.adId);
 			size = responsiveAdsData.collection.concat([]).reverse();
 		} else {
 			// reverse() is added below as multiple ad size mapping originates from our common

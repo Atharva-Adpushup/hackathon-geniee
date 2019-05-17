@@ -80,17 +80,23 @@ var adp = window.adpushup,
 
 				return getContainer(ad)
 					.done(function(container) {
+						var isLazyLoadingAd = !!(ad.enableLazyLoading === true);
+						var isAdNetworkAdpTag = !!(ad.network === commonConsts.NETWORKS.ADPTAGS);
+						var isAdNetworkMedianet = !!(
+							!isMedianetHeaderCodePlaced && ad.network === commonConsts.NETWORKS.MEDIANET
+						);
+
 						adp.config.renderedTagAds = adp.config.renderedTagAds || [];
 						adp.config.renderedTagAds.push({ newId: newAdId, oldId: adId });
 						// Once container has been found, execute adp head code if ad network is "adpTags"
-						if (ad.network === commonConsts.NETWORKS.ADPTAGS) {
+						if (isAdNetworkAdpTag) {
 							executeAdpTagsHeadCode([ad], {}); // This function expects an array of adpTags and optional adpKeyValues
 						}
-						if (!isMedianetHeaderCodePlaced && ad.network === commonConsts.NETWORKS.MEDIANET) {
+						if (isAdNetworkMedianet) {
 							generateMediaNetHeadCode();
 							isMedianetHeaderCodePlaced = true;
 						}
-						if (ad.enableLazyLoading === true) {
+						if (isLazyLoadingAd) {
 							isAdContainerInView(container).done(function() {
 								// Send feedback call
 								utils.sendFeedback(feedbackData);

@@ -150,6 +150,7 @@ module.exports = {
 			}
 
 			var feedbackObj = {
+				createdTS: +new Date(),
 				packetId: adpConfig.packetId,
 				siteId: adpConfig.siteId,
 				siteDomain: adpConfig.siteDomain,

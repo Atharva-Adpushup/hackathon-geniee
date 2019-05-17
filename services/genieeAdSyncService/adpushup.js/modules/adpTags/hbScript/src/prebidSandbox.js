@@ -14,7 +14,7 @@ var prebidAdTemplate = require('./prebidAdTemplate'),
 		adpSlotsBatch.forEach(function(adpSlot) {
 			var responsiveSizes = [];
 			if (adpSlot.isResponsive) {
-				responsiveSizes = responsiveAds.getAdSizes(adpSlot.containerId).collection;
+				responsiveSizes = responsiveAds.getAdSizes(adpSlot.optionalParam.adId).collection;
 				adpSlot.computedSizes = responsiveSizes;
 			}
 

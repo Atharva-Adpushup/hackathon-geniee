@@ -106,9 +106,8 @@ var adSizeConsts = require('../../../../../../../helpers/adSizeMappingConsts'),
 
 		return resultObject;
 	},
-	getRecursiveParentData = function(selector) {
-		var element = document.getElementById(selector).parentNode.parentNode,
-			elStyles = getElComputedStyles(element),
+	getRecursiveParentData = function(element) {
+		var elStyles = getElComputedStyles(element),
 			inlineRegex = /inline/g,
 			isInlineLevelEl = !!(inlineRegex.test(elStyles.display) && (!elStyles.width || !elStyles.height));
 
@@ -121,9 +120,8 @@ var adSizeConsts = require('../../../../../../../helpers/adSizeMappingConsts'),
 
 		return elStyles;
 	},
-	getImmediateParentData = function(elementSelector) {
-		var element = document.getElementById(elementSelector).parentNode.parentNode,
-			inlineRegex = /inline$/g,
+	getImmediateParentData = function(element) {
+		var inlineRegex = /inline$/g,
 			inlineStylesObject = element.style,
 			computedStylesObject = getElComputedStyles(element),
 			isValidInlineStyles = !!(
@@ -168,8 +166,9 @@ var adSizeConsts = require('../../../../../../../helpers/adSizeMappingConsts'),
 		return inputData;
 	},
 	getComputedAdSizes = function(elementSelector) {
-		var immediateParentData = getImmediateParentData(elementSelector),
-			recursiveParentData = getRecursiveParentData(elementSelector),
+		var computedElement = document.getElementById(elementSelector).parentNode,
+			immediateParentData = getImmediateParentData(computedElement),
+			recursiveParentData = getRecursiveParentData(computedElement),
 			isValidImmediateParentData = !!(
 				immediateParentData &&
 				Object.keys(immediateParentData).length &&
