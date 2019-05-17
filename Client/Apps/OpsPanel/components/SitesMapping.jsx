@@ -6,7 +6,7 @@ import React, { Component } from 'react';
 // import _ from 'lodash';
 // import clipboard from 'clipboard-polyfill';
 // import moment from 'moment';
-import { Row, Col, Breadcrumb } from 'react-bootstrap';
+import { Col, Breadcrumb } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import Datatable from 'react-bs-datatable';
 import { copyToClipBoard, formatDate } from '../../../helpers/commonFunctions';
@@ -45,12 +45,15 @@ class SitesMapping extends Component {
 				.then(response => {
 					const { data } = response;
 					this.setState({
-						sites: data
+						fetched: true,
+						error: false,
+						sites: data.data
 					});
 				})
 				.catch(err => {
 					console.log(err);
 					this.setState({
+						fetched: true,
 						error: true
 					});
 				});
@@ -98,8 +101,7 @@ class SitesMapping extends Component {
 			toCopy = `user::${value}`;
 		}
 
-		copyToClipBoard(toCopy);
-		return window.alert(`Text Copied: ${toCopy}`);
+		return copyToClipBoard(toCopy, `Text Copied: ${toCopy}`);
 	};
 
 	generateClickableSpan = (type, value, clickHandler) => (
