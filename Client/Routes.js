@@ -210,7 +210,6 @@ const Routes = () => (
 						path="/ops-panel/live-sites"
 						component={OpsPanel}
 					/>
-
 					<PrivateRoute exact name="User OnBoarding" path="/onboarding" component={OnBoarding} />
 				</ShellContainer>
 			</Switch>
