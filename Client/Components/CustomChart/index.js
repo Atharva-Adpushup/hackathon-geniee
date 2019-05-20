@@ -14,7 +14,8 @@ const CustomChart = ({
 	customConfig,
 	yAxisGroups,
 	activeLegendItems,
-	containerClass
+	containerClass,
+	updateChartData
 }) => {
 	if (type === 'line' || type === 'spline') {
 		const chartConfig = getCustomChartConfig(
@@ -26,7 +27,7 @@ const CustomChart = ({
 			activeLegendItems
 		);
 
-		if (chartConfig.yAxis && chartConfig.yAxis.length) {
+		if (chartConfig.yAxis) {
 			chartConfig.chart = {
 				...chartConfig.chart,
 				events: {
@@ -35,7 +36,12 @@ const CustomChart = ({
 
 						const node = document.getElementById('chart-legend-wrap');
 						ReactDOM.render(
-							<ChartLegend chart={chart} legends={legends} activeLegendItems={activeLegendItems} />,
+							<ChartLegend
+								chart={chart}
+								legends={legends}
+								activeLegendItems={activeLegendItems}
+								updateChartData={updateChartData}
+							/>,
 							node
 						);
 					}
@@ -99,7 +105,6 @@ CustomChart.propTypes = {
 		})
 	).isRequired,
 	xAxis: PropTypes.shape({ categories: PropTypes.array.isRequired, className: PropTypes.string }),
-	legends: PropTypes.shape({ description: PropTypes.string, total: PropTypes.string }),
 	customConfig: PropTypes.object,
 	yAxisGroups: PropTypes.arrayOf(
 		PropTypes.shape({
@@ -107,7 +112,6 @@ CustomChart.propTypes = {
 			yAxisConfig: PropTypes.object
 		})
 	),
-	activeLegendItems: PropTypes.arrayOf(PropTypes.string),
 	containerClass: PropTypes.string
 };
 
