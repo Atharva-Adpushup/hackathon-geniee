@@ -26,8 +26,10 @@ import {
 	faArrowUp,
 	faArrowDown,
 	faTools,
-	faSort
+	faSort,
+	faCheck
 } from '@fortawesome/free-solid-svg-icons';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import 'bootstrap-sass/assets/stylesheets/_bootstrap.scss';
 import ErrorBoundary from './Components/ErrorBoundary';
 import Routes from './Routes';
@@ -57,7 +59,8 @@ library.add(
 	faArrowUp,
 	faArrowDown,
 	faTools,
-	faSort
+	faSort,
+	faCheck
 );
 
 const App = () => (

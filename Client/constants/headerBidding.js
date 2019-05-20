@@ -1,4 +1,5 @@
-/* eslint-disable import/prefer-default-export */
 const CHECK_INVENTORY = 'CHECK_INVENTORY';
+const FETCH_ALL_BIDDERS = 'FETCH_ALL_BIDDERS';
+const GET_SETUP_STATUS = 'GET_SETUP_STATUS';
 
-export { CHECK_INVENTORY };
+export { CHECK_INVENTORY, FETCH_ALL_BIDDERS, GET_SETUP_STATUS };

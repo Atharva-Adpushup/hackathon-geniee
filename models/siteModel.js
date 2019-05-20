@@ -544,6 +544,11 @@ function apiModule() {
 					throw err;
 				});
 		},
+		isInventoryExist: siteId => {
+			return API.isLayoutInventoryExist(siteId)
+				.catch(() => API.isApTagInventoryExist(siteId))
+				.catch(() => API.isInnovativeAdInventoryExist(siteId));
+		},
 		setSiteStep: function(siteId, onboardingStage, step) {
 			return API.getSiteById(siteId)
 				.then(function(site) {
