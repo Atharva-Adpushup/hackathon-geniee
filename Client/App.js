@@ -25,9 +25,9 @@ import {
 	faExternalLinkAlt,
 	faArrowUp,
 	faArrowDown,
-	faTools,
-	faSort
+	faCheck
 } from '@fortawesome/free-solid-svg-icons';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import 'bootstrap-sass/assets/stylesheets/_bootstrap.scss';
 import ErrorBoundary from './Components/ErrorBoundary';
 import Routes from './Routes';
@@ -56,8 +56,7 @@ library.add(
 	faExternalLinkAlt,
 	faArrowUp,
 	faArrowDown,
-	faTools,
-	faSort
+	faCheck
 );
 
 const App = () => (

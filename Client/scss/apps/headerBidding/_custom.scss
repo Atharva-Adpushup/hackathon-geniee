@@ -1,0 +1,36 @@
+.hb-setup {
+	ul {
+		li {
+			list-style: none;
+			margin: 15px 0;
+			span {
+				display: inline-block;
+				&.name {
+					min-width: 200px;
+				}
+				&.status {
+					width: 100px;
+				}
+				&.btn-wrap {
+					width: 200px;
+				}
+			}
+		}
+	}
+}
+
+.hb-add-bidder {
+	header {
+		display: flex;
+		justify-content: space-between;
+		h3 {
+			align-self: flex-start;
+		}
+		span.back {
+			align-self: flex-end;
+		}
+	}
+	.hb-input {
+		max-width: 250px;
+	}
+}

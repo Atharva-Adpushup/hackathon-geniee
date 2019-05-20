@@ -148,28 +148,28 @@ const UserRoutes = () => (
 						exact
 						customProps={{ activeTab: HB_NAV_ITEMS_INDEXES.TAB_2 }}
 						name="Tab 2"
-						path="/sites/:siteId/apps/header-bidding/tab-2"
+						path={`/sites/:siteId/apps/header-bidding/${HB_NAV_ITEMS_INDEXES.TAB_2}`}
 						component={HeaderBidding}
 					/>
 					<PrivateRoute
 						exact
 						customProps={{ activeTab: HB_NAV_ITEMS_INDEXES.TAB_3 }}
 						name="Tab 3"
-						path="/sites/:siteId/apps/header-bidding/tab-3"
+						path={`/sites/:siteId/apps/header-bidding/${HB_NAV_ITEMS_INDEXES.TAB_3}`}
 						component={HeaderBidding}
 					/>
 					<PrivateRoute
 						exact
 						customProps={{ activeTab: HB_NAV_ITEMS_INDEXES.TAB_4 }}
 						name="Tab 4"
-						path="/sites/:siteId/apps/header-bidding/tab-4"
+						path={`/sites/:siteId/apps/header-bidding/${HB_NAV_ITEMS_INDEXES.TAB_4}`}
 						component={HeaderBidding}
 					/>
 					<PrivateRoute
 						exact
 						customProps={{ activeTab: HB_NAV_ITEMS_INDEXES.TAB_5 }}
 						name="Tab 5"
-						path="/sites/:siteId/apps/header-bidding/tab-5"
+						path={`/sites/:siteId/apps/header-bidding/${HB_NAV_ITEMS_INDEXES.TAB_5}`}
 						component={HeaderBidding}
 					/>
 
