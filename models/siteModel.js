@@ -502,14 +502,10 @@ function apiModule() {
 										if (section.ads && Object.keys(section.ads).length) {
 											for (const adKey in section.ads) {
 												if (inventoryFound) break;
-												
+
 												const ad = section.ads[adKey];
 
-<<<<<<< HEAD
-												if (ad.network === 'adpTags') {
-=======
 												if (ad.network) {
->>>>>>> Added inventory check functionality
 													inventoryFound = true;
 													break;
 												}
@@ -529,56 +525,7 @@ function apiModule() {
 
 					if (inventoryFound) return inventoryFound;
 					throw new AdPushupError('Inventory Not Found');
-<<<<<<< HEAD
-				});
-		},
-		getLayoutInventorySizes: siteId => {
-			return API.getSiteById(siteId)
-				.then(site => site.getAllChannels())
-				.then(channels => {
-					const sizesArray = [];
-
-					// eslint-disable-next-line no-restricted-syntax
-					for (const channel of channels) {
-						// eslint-disable-next-line no-restricted-syntax
-						if (channel.variations && Object.keys(channel.variations).length) {
-							for (const variationKey in channel.variations) {
-								const variation = channel.variations[variationKey];
-
-								if (variation.sections && Object.keys(variation.sections).length) {
-									for (const sectionKey in variation.sections) {
-										const section = variation.sections[sectionKey];
-
-										if (section.ads && Object.keys(section.ads).length) {
-											for (const adKey in section.ads) {												
-												const ad = section.ads[adKey];
-
-												if (ad.network === 'adpTags') {
-													if(ad.width === 'responsive') {
-														sizesArray.push(ad.width);
-														continue;
-													}
-													sizesArray.push(`${ad.width}x${ad.height}`);
-												}
-											}
-										} else {
-											continue;
-										}
-									}
-								} else {
-									continue;
-								}
-							}
-						} else {
-							continue;
-						}
-					}
-
-					return sizesArray;
-				});
-=======
 				})
->>>>>>> Added inventory check functionality
 		},
 		isApTagInventoryExist: siteId => {
 			return couchbase
@@ -590,11 +537,7 @@ function apiModule() {
 					let apTagInventoryFound = false;
 					if (value.ads.length) {
 						for (const ad of value.ads) {
-<<<<<<< HEAD
-							apTagInventoryFound = ad.network === 'adpTags';
-=======
 							apTagInventoryFound = !!ad.network;
->>>>>>> Added inventory check functionality
 							if (apTagInventoryFound) break;
 						}
 					}
@@ -610,39 +553,6 @@ function apiModule() {
 					throw err;
 				});
 		},
-<<<<<<< HEAD
-		getApTagInventorySizes: siteId => {
-			return couchbase
-				.connectToAppBucket()
-				.then(function (appBucket) {
-					return appBucket.getAsync('tgmr::' + siteId, {});
-				})
-				.then(({ value }) => {
-					const sizesArray = [];
-					if (value.ads.length) {
-						for (const ad of value.ads) {
-							if (ad.network === 'adpTags') {
-								if(ad.width === 'responsive') {
-									sizesArray.push(ad.width);
-									continue;
-								}
-								sizesArray.push(`${ad.width}x${ad.height}`);
-							}
-						}
-					}
-
-					return sizesArray;
-				})
-				.catch(err => {
-					if (err.code === 13) {
-						throw new AdPushupError('Inventory Not Found');
-					}
-
-					throw err;
-				});
-		},
-=======
->>>>>>> Added inventory check functionality
 		isInnovativeAdInventoryExist: siteId => {
 			return couchbase
 				.connectToAppBucket()
@@ -653,11 +563,7 @@ function apiModule() {
 					let innovativeAdInventoryFound = false;
 					if (value.ads.length) {
 						for (const ad of value.ads) {
-<<<<<<< HEAD
-							innovativeAdInventoryFound = ad.network === 'adpTags';
-=======
 							innovativeAdInventoryFound = !!ad.network;
->>>>>>> Added inventory check functionality
 							if (innovativeAdInventoryFound) break;
 						}
 					}
@@ -669,10 +575,11 @@ function apiModule() {
 					if (err.code === 13) {
 						throw new AdPushupError('Inventory Not Found');
 					}
-					
+
 					throw err;
 				});
 		},
+<<<<<<< HEAD
 <<<<<<< HEAD
 		getInnovativeAdInventorySizes: siteId => {
 			return couchbase
@@ -700,15 +607,18 @@ function apiModule() {
 					if (err.code === 13) {
 						throw new AdPushupError('Inventory Not Found');
 					}
-					
+
 					throw err;
 				});
 		},
+=======
+>>>>>>> Added bidders tab
 		isInventoryExist: siteId => {
 			return API.isLayoutInventoryExist(siteId)
 				.catch(() => API.isApTagInventoryExist(siteId))
 				.catch(() => API.isInnovativeAdInventoryExist(siteId));
 		},
+<<<<<<< HEAD
 		getUniqueInventorySizes: siteId => {
 			return Promise
 				.all([API.getLayoutInventorySizes(siteId), API.getApTagInventorySizes(siteId), API.getInnovativeAdInventorySizes(siteId)])
@@ -718,6 +628,8 @@ function apiModule() {
 		},
 =======
 >>>>>>> Added inventory check functionality
+=======
+>>>>>>> Added bidders tab
 		setSiteStep: function(siteId, onboardingStage, step) {
 			return API.getSiteById(siteId)
 				.then(function(site) {

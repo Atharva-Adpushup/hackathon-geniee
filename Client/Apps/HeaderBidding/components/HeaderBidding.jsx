@@ -7,8 +7,6 @@ import ActionCard from '../../../Components/ActionCard/index';
 import { NAV_ITEMS, NAV_ITEMS_INDEXES, NAV_ITEMS_VALUES } from '../constants';
 import Setup from './Setup';
 import BiddersTab from './BiddersTab';
-import InventoryTab from './InventoryTab';
-import PrebidSettingsTab from './PrebidSettingsTab';
 
 class HeaderBidding extends React.Component {
 	state = {
@@ -60,8 +58,7 @@ class HeaderBidding extends React.Component {
 				break;
 
 			case 2:
-				// eslint-disable-next-line no-constant-condition
-				if (/*! (!adServerSetupCompleted || !inventoryFound) */ false) return false;
+				if (!(!adServerSetupCompleted || !inventoryFound)) return false;
 				redirectUrl = `${computedRedirectUrl}/${NAV_ITEMS_INDEXES.TAB_2}`;
 				break;
 
@@ -82,34 +79,44 @@ class HeaderBidding extends React.Component {
 		this.setState({ redirectUrl });
 	};
 
-	renderContent() {
+	renderContent = () => {
 		const {
 			match: {
 				params: { siteId }
 			},
 			checkInventoryAction,
-			inventoryFound
+			inventoryFound,
+			bidders,
+			fetchAllBiddersAction,
+			setupStatus
 		} = this.props;
 
 		const activeTab = this.getActiveTab();
 
 		function getContent() {
 			switch (activeTab) {
-				case NAV_ITEMS_INDEXES.TAB_1:
+				case 'setup':
 					return (
 						<Setup
 							siteId={siteId}
 							checkInventoryAction={checkInventoryAction}
 							inventoryFound={inventoryFound}
+							setupStatus={setupStatus}
 						/>
 					);
-				case NAV_ITEMS_INDEXES.TAB_2:
-					return 'Tab 2';
-				case NAV_ITEMS_INDEXES.TAB_3:
+				case 'bidders':
+					return (
+						<BiddersTab
+							siteId={siteId}
+							bidders={bidders}
+							fetchAllBiddersAction={fetchAllBiddersAction}
+						/>
+					);
+				case 'inventory':
 					return 'Tab 3';
-				case NAV_ITEMS_INDEXES.TAB_4:
+				case 'prebid-settings':
 					return 'Tab 4';
-				case NAV_ITEMS_INDEXES.TAB_5:
+				case 'optimization':
 					return 'Tab 5';
 				default:
 					return null;
@@ -135,8 +142,7 @@ class HeaderBidding extends React.Component {
 					)}
 					<NavItem
 						eventKey={2}
-						// eslint-disable-next-line no-constant-condition
-						className={/*! (!adServerSetupCompleted || !inventoryFound) */ false ? 'disabled' : ''}
+						className={!(!adServerSetupCompleted || !inventoryFound) ? 'disabled' : ''}
 					>
 						{NAV_ITEMS_VALUES.TAB_2}
 					</NavItem>
