@@ -1,16 +1,14 @@
 import React, { Fragment } from 'react';
+import { sortBy } from 'lodash';
 import Card from '../../../Components/Layout/Card';
 import EstimatedEarnings from './EstimatedEarnings';
 import SitewiseReportContainer from '../containers/SitewiseReportContainer';
 import PerformanceOverviewContainer from '../containers/PerformanceOverviewContainer';
 import PerformanceApOriginalContainer from '../containers/PerformanceApOriginalContainer';
 import Revenue from './Revenue';
-import _ from 'lodash';
 import NotificationContainer from '../../../Containers/NotificationContainer';
+
 class Dashboard extends React.Component {
-	state = {
-		widgets: this.props.widget
-	};
 	componentDidMount() {
 		const { showNotification, user } = this.props;
 		if (!user.isPaymentDetailsComplete && !window.location.pathname.includes('payment'))
@@ -22,10 +20,10 @@ class Dashboard extends React.Component {
 				autoDismiss: 0
 			});
 	}
+
 	getWidgetComponent = widget => {
-		let { path } = widget;
+		const { path } = widget;
 		switch (widget.name) {
-			default:
 			case 'estimated_earnings':
 				return <EstimatedEarnings path={path} />;
 			case 'per_ap_original':
@@ -36,38 +34,42 @@ class Dashboard extends React.Component {
 				return <SitewiseReportContainer path={path} />;
 			case 'rev_by_network':
 				return <Revenue path={path} />;
+			default:
+				return '';
 		}
 	};
+
 	renderContent = () => {
-		let { widgets } = this.state,
-			widgetsArray = _.sortBy(widgets, widget => widget.position),
-			content = [];
-		widgetsArray.forEach((widget, index) => {
-			let widgetComponent = this.getWidgetComponent(widget);
+		const { widget } = this.props;
+		const widgetsArray = sortBy(widget, wid => wid.position);
+		const content = [];
+		widgetsArray.forEach(wid => {
+			const widgetComponent = this.getWidgetComponent(wid);
 			content.push(
 				<Card
 					rootClassName={
-						widget.name == 'estimated_earnings'
+						wid.name === 'estimated_earnings'
 							? 'u-margin-b4 width-100 card-color'
 							: 'u-margin-b4 width-100'
 					}
-					key={index}
-					type={widget.name !== 'estimated_earnings' ? 'danger' : ''}
+					key={wid.name}
+					type={wid.name !== 'estimated_earnings' ? 'danger' : ''}
 					headerClassName="card-header"
 					headerChildren={
 						<div className="aligner aligner--row">
-							<span className="aligner-item card-header-title">{widget.display_name}</span>
+							<span className="aligner-item card-header-title">{wid.display_name}</span>
 						</div>
 					}
 					bodyClassName="card-body"
 					bodyChildren={widgetComponent}
-					footerChildren={''}
+					footerChildren=""
 				/>
 			);
 		});
 
 		return content;
 	};
+
 	render() {
 		return (
 			<Fragment>

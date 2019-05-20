@@ -8,6 +8,17 @@
 		"build": "webpack --config webpack.prod.js",
 		"storybook": "start-storybook -p 9001 -c ./Client/.storybook"
 	},
+	"husky": {
+		"hooks": {
+			"pre-commit": "lint-staged"
+		}
+	},
+	"lint-staged": {
+		"*.{js,jsx,scss,html}": [
+			"./node_modules/.bin/eslint --ignore-path .eslintignore --fix",
+			"git add"
+		]
+	},
 	"dependencies": {
 		"@fortawesome/fontawesome-svg-core": "^1.2.12",
 		"@fortawesome/free-solid-svg-icons": "^5.6.3",
@@ -129,6 +140,8 @@
 		"eslint-plugin-react": "^7.12.4",
 		"html-loader": "^0.5.5",
 		"html-webpack-plugin": "^3.2.0",
+		"husky": "^2.2.0",
+		"lint-staged": "^8.1.6",
 		"mini-css-extract-plugin": "^0.5.0",
 		"node-sass": "^4.11.0",
 		"optimize-css-assets-webpack-plugin": "^5.0.1",

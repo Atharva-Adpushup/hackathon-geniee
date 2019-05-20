@@ -4,7 +4,7 @@ import PerformanceApOriginal from '../components/PerformanceApOriginal';
 const mapStateToProps = (state, ownProps) => {
 	const {
 		reports: {
-			data: { site: site, metrics: metrics }
+			data: { site, metrics }
 		}
 	} = state.global;
 	return {
