@@ -2,15 +2,18 @@ import React, { Component, Fragment } from 'react';
 import { Helmet } from 'react-helmet';
 import { Redirect } from 'react-router-dom';
 import { Nav, NavItem, Row, Col } from 'react-bootstrap';
-import ActionCard from '../../../Components/ActionCard/index';
-import Control from './Control';
-import Chart from './Chart';
-import Table from './Table';
 import moment from 'moment';
+import { Object } from 'es6-shim';
+import ActionCard from '../../../Components/ActionCard/index';
+import ControlContainer from '../containers/ControlContainer';
+import TableContainer from '../containers/TableContainer';
+import reportService from '../../../services/reportService';
+import Chart from './Chart';
 import {
 	REPORTS_NAV_ITEMS,
 	REPORTS_NAV_ITEMS_INDEXES,
-	REPORTS_NAV_ITEMS_VALUES
+	REPORTS_NAV_ITEMS_VALUES,
+	REPORT_PATH
 } from '../configs/commonConsts';
 
 class Panel extends Component {
@@ -27,7 +30,7 @@ class Panel extends Component {
 			intervalsList: [],
 			metricsList: [],
 			reportLoading: true,
-			selectedDimensions: [{}],
+			selectedDimension: '',
 			selectedFilters: {},
 			selectedMetrics: [],
 			activeProductDetails: {},
@@ -48,9 +51,11 @@ class Panel extends Component {
 				.startOf('day'),
 			endDate: moment()
 				.startOf('day')
-				.subtract(1, 'day')
+				.subtract(1, 'day'),
+			tableData: {}
 		};
 	}
+
 	getActiveTab = () => {
 		const {
 			customProps: { activeTab }
@@ -58,6 +63,12 @@ class Panel extends Component {
 
 		return activeTab;
 	};
+
+	componentDidMount() {
+		const { startDate, endDate } = this.state;
+		this.generateButtonHandler({ startDate, endDate });
+	}
+
 	handleNavSelect = value => {
 		const computedRedirectUrl = `/reports`;
 		let redirectUrl = '';
@@ -74,8 +85,34 @@ class Panel extends Component {
 			redirectUrl
 		});
 	};
+
+	formateReportParams = data => {
+		const { startDate, endDate, selectedDimension, selectedFilters } = data;
+		const params = {
+			fromDate: moment(startDate).format('YYYY-MM-DD'),
+			toDate: moment(endDate).format('YYYY-MM-DD')
+		};
+		params.dimension = selectedDimension || null;
+		for (const filter in selectedFilters) {
+			const filters = Object.keys(selectedFilters[filter]);
+			params[filter] = filters.length > 0 ? filters.toString() : null;
+		}
+		params.interval = 'daily';
+		return params;
+	};
+
+	generateButtonHandler = data => {
+		const params = this.formateReportParams(data);
+		this.setState(data);
+		reportService.getWidgetData(REPORT_PATH, params).then(response => {
+			if (response.status === 200) {
+				this.setState({ tableData: response.data.data });
+			}
+		});
+	};
+
 	renderContent = () => {
-		let {
+		const {
 			reportLoading,
 			productList,
 			dimensionList,
@@ -85,31 +122,37 @@ class Panel extends Component {
 			endDate,
 			chartConfig,
 			tableConfig,
-			selectedDimensions,
+			selectedDimension,
 			selectedFilters,
 			selectedMetrics,
 			selectedInterval,
-			activeProductDetails
+			activeProductDetails,
+			tableData
 		} = this.state;
 		return (
 			<Row>
 				<Col sm={12}>
-					<Control
+					<ControlContainer
 						startDate={startDate}
 						endDate={endDate}
 						dimensionList={dimensionList}
 						filterList={filterList}
 						generateButtonHandler={this.generateButtonHandler}
-						selectedDimensions={selectedDimensions}
+						selectedDimension={selectedDimension}
 						selectedFilters={selectedFilters}
 						selectedMetrics={selectedMetrics}
 					/>
 				</Col>
 				<Col sm={12} className="u-margin-t5">
-					<Chart />
+					<Chart
+						tableData={tableData}
+						selectedDimension={selectedDimension}
+						startDate={startDate}
+						endDate={endDate}
+					/>
 				</Col>
 				<Col sm={12} className="u-margin-t5">
-					<Table />
+					<TableContainer tableData={tableData} startDate={startDate} endDate={endDate} />
 				</Col>
 			</Row>
 		);

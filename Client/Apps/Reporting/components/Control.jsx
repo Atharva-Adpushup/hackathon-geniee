@@ -6,24 +6,22 @@ import 'react-dates/initialize';
 import AsyncGroupSelect from '../../../Components/AsyncGroupSelect/index';
 import PresetDateRangePicker from '../../../Components/PresetDateRangePicker/index';
 import Selectbox from '../../../Components/Selectbox/index';
-import { dimensions, filters, filtersValues } from '../configs/commonConsts';
+import config from '../../../config/config';
 import { convertObjToArr } from '../helpers/utils';
+import reportService from '../../../services/reportService';
 
 class Control extends Component {
 	constructor(props) {
 		super(props);
+		const dimension = Object.assign({}, props.dimension);
 		this.state = {
-			dimensionList: convertObjToArr(dimensions),
-			filterList: convertObjToArr(filters),
+			dimensionList: convertObjToArr(dimension),
+			filterList: convertObjToArr(props.filter),
 			metricsList: [
 				{ value: 'Overview', isSelected: true },
 				{ value: 'Layout Editor', isDisabled: true },
 				{ value: 'AP Tag', isDisabled: true },
-				{ value: 'Innovative Ads', isDisabled: true },
-				{ value: 'Mediation', isDisabled: true },
-				{ value: 'Header Bidding', isDisabled: true },
-				{ value: 'AMP', isDisabled: true },
-				{ value: 'AdRecover', isDisabled: true }
+				{ value: 'Innovative Ads', isDisabled: true }
 			],
 			startDate: props.startDate,
 			endDate: props.endDate,
@@ -70,53 +68,30 @@ class Control extends Component {
 		this.setState({ dimensionList: filteredDimensionList, filterList: mappedFilterList });
 	};
 
-	getSelectedFilter = filter =>
-		// ajax({
-		// 	method: 'GET',
-		// 	url: `http://staging.adpushup.com/CentralReportingWebService${filter.path}`
-		// }).then(res => {
-		// 	return res.data.result;
-		// });
-		filtersValues[filter.value];
+	getSelectedFilter = filter => reportService.getWidgetData(filter.path).then(res => res.data.data);
 
 	onFilterValueChange = selectedFilters => {
 		this.setState({ selectedFilters });
 	};
 
-	datesUpdated({ startDate, endDate }) {
+	datesUpdated = ({ startDate, endDate }) => {
 		this.setState({ startDate, endDate });
-	}
+	};
 
-	removeDimension(index) {
-		const { selectedDimensions } = this.state;
-		selectedDimensions.splice(index, 1);
-		this.setState({
-			selectedDimensions
-		});
-	}
-
-	addNewDimension() {
-		const { selectedDimensions } = this.state;
-		selectedDimensions.push({});
-		this.setState({
-			selectedDimensions
-		});
-	}
-
-	generateButtonHandler() {
-		const { startDate, endDate, selectedDimensions, selectedFilters, selectedMetrics } = this.state;
+	generateButtonHandler = () => {
+		const { startDate, endDate, selectedDimension, selectedFilters, selectedMetrics } = this.state;
 		const { generateButtonHandler } = this.props;
 		generateButtonHandler({
 			startDate,
 			endDate,
-			selectedDimensions,
+			selectedDimension,
 			selectedFilters,
 			selectedMetrics
 		});
-		this.setState({
-			disableGenerateButton: true
-		});
-	}
+		// this.setState({
+		// 	disableGenerateButton: true
+		// });
+	};
 
 	render() {
 		const tooltip = <Tooltip id="tooltip">Please select any site.</Tooltip>;
@@ -198,6 +173,7 @@ class Control extends Component {
 							presets={presets}
 							startDate={state.startDate}
 							endDate={state.endDate}
+							datesUpdated={this.datesUpdated}
 							autoFocus
 						/>
 						{/* eslint-enable */}

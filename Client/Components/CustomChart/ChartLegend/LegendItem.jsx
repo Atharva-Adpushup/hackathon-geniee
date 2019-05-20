@@ -6,23 +6,29 @@ import { indexOf } from 'lodash';
 class LegendItem extends Component {
 	constructor(props) {
 		super(props);
-		this.state = { visible: props.serie.visible };
+		this.state = { visible: props.legend.value === props.activeLegendItems.value };
 		this.toggleSerie = this.toggleSerie.bind(this);
 	}
 
 	toggleSerie() {
-		const { activeLegendItems, serie } = this.props;
-
-		if (serie.visible) {
-			const index = indexOf(activeLegendItems, serie.name);
-			activeLegendItems.splice(index, 1);
-			serie.hide();
+		let { activeLegendItems, legend } = this.props;
+		const { visible } = this.state;
+		if (!visible) {
+			activeLegendItems = { name: legend.name, value: legend.value };
+			this.props.updateChartData(activeLegendItems);
+			this.setState({ visible: true });
 		} else {
-			activeLegendItems.push(serie.name);
-			serie.show();
+			this.setState({ visible: false });
 		}
 
-		this.setState({ visible: serie.visible });
+		// if (serie.visible) {
+		// 	const index = indexOf(activeLegendItems, serie.name);
+		// 	activeLegendItems.splice(index, 1);
+		// 	serie.hide();
+		// } else {
+		// 	activeLegendItems.push(serie.name);
+		// 	serie.show();
+		// }
 	}
 
 	render() {
@@ -32,7 +38,7 @@ class LegendItem extends Component {
 
 		if (visible) {
 			style = {
-				borderBottom: `2px solid ${serie.color}`
+				borderBottom: `2px solid blue`
 			};
 		}
 
@@ -42,28 +48,16 @@ class LegendItem extends Component {
 				onClick={this.toggleSerie}
 				style={style}
 			>
-				<OverlayTrigger
-					trigger={['hover', 'focus']}
-					placement="bottom"
-					overlay={
-						<Popover id="moreInfo" title={serie.name}>
-							{legend.description}
-						</Popover>
-					}
-				>
-					<span className="legend-info" />
-				</OverlayTrigger>
-
-				<div className="name">{serie.name}</div>
-				<div className="total">{legend.total}</div>
+				<div className="name">{legend.name}</div>
+				<div className="total">{legend.value}</div>
 			</div>
 		);
 	}
 }
 
-LegendItem.propTypes = {
-	serie: PropTypes.object.isRequired,
-	activeLegendItems: PropTypes.arrayOf(PropTypes.string).isRequired
-};
+// LegendItem.propTypes = {
+// 	serie: PropTypes.object.isRequired,
+// 	activeLegendItems: PropTypes.arrayOf(PropTypes.string).isRequired
+// };
 
 export default LegendItem;

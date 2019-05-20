@@ -149,24 +149,19 @@ export function getCustomChartConfig(
 		...customConfig
 	};
 
-	if (
-		activeLegendItems &&
-		activeLegendItems.length &&
-		chartConfig.series &&
-		chartConfig.series.length
-	) {
+	if (activeLegendItems && chartConfig.series && chartConfig.series.length) {
 		let i;
 		const len1 = series.length;
 		for (i = 0; i < len1; i += 1) {
 			const singleSeries = series[i];
 
-			let j;
-			const len2 = activeLegendItems.length;
-			for (j = 0; j < len2; j += 1) {
-				const activeLegendItem = activeLegendItems[j];
-				singleSeries.visible = singleSeries.name === activeLegendItem;
-				if (singleSeries.name === activeLegendItem) break;
-			}
+			// let j;
+			// const len2 = activeLegendItems.length;
+			// for (j = 0; j < len2; j += 1) {
+			// const activeLegendItem = activeLegendItems[j];
+			singleSeries.visible = true; // singleSeries.name === activeLegendItems.name;
+			// if (singleSeries.name === activeLegendItems.name) break;
+			// }
 		}
 	} else if (chartConfig.series && chartConfig.series.length) {
 		let i;
@@ -213,19 +208,19 @@ export function getCustomChartConfig(
 			chartConfig.xAxis.className = 'myXAxisClass';
 
 			// Set yAxis Groups for Line Chart
-			if (yAxisGroups && yAxisGroups.length) {
-				const { yAxis, seriesForChart } = getGroupedYAxisAndSeries(
-					type,
-					yAxisGroups,
-					chartConfig.series
-				);
-				if (yAxis.length && seriesForChart.length) {
-					chartConfig.yAxis = yAxis;
-					chartConfig.series = seriesForChart;
-				}
+			// if (yAxisGroups && yAxisGroups.length) {
+			const { yAxis, seriesForChart } = getGroupedYAxisAndSeries(
+				type,
+				yAxisGroups,
+				chartConfig.series
+			);
+			// if (yAxis.length && seriesForChart.length) {
+			chartConfig.yAxis = { title: 'Revenue' }; // yAxis;
+			chartConfig.series = chartConfig.series;
+			// }
 
-				break;
-			}
+			break;
+			// }
 
 			chartConfig.series = [];
 
