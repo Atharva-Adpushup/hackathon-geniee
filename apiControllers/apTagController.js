@@ -7,7 +7,7 @@ const { sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFun
 const { docKeys, tagManagerInitialDoc } = require('../configs/commonConsts');
 const {
 	appBucket,
-	errorHander,
+	errorHandler,
 	verifyOwner,
 	sendDataToZapier,
 	emitEventAndSendResponse,
@@ -71,7 +71,7 @@ const fn = {
 			.getDoc(`${key}${req.body.siteId}`)
 			.then(docWithCas => processing(docWithCas))
 			.then(() => emitEventAndSendResponse(req.body.siteId, res))
-			.catch(err => errorHander(err, res))
+			.catch(err => errorHandler(err, res))
 };
 
 router
@@ -109,7 +109,7 @@ router
 					res
 				)
 			)
-			.catch(err => errorHander(err, res));
+			.catch(err => errorHandler(err, res));
 	})
 	.post('/masterSave', (req, res) =>
 		masterSave(req, res, fn.adUpdateProcessing, fn.directDBUpdate, docKeys.apTag, 1)
