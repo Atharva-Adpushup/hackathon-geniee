@@ -24,7 +24,6 @@ class Dashboard extends React.Component {
 	getWidgetComponent = widget => {
 		const { path } = widget;
 		switch (widget.name) {
-			default:
 			case 'estimated_earnings':
 				return <EstimatedEarnings path={path} />;
 			case 'per_ap_original':
@@ -35,6 +34,8 @@ class Dashboard extends React.Component {
 				return <SitewiseReportContainer path={path} />;
 			case 'rev_by_network':
 				return <Revenue path={path} />;
+			default:
+				return '';
 		}
 	};
 
