@@ -1,14 +1,28 @@
+/* eslint-disable guard-for-in */
+/* eslint-disable no-restricted-syntax */
 import React from 'react';
 import { Redirect } from 'react-router-dom';
 import { Nav, NavItem } from 'react-bootstrap';
 import ActionCard from '../../../Components/ActionCard/index';
 import { NAV_ITEMS, NAV_ITEMS_INDEXES, NAV_ITEMS_VALUES } from '../constants';
 import Setup from './Setup';
+import BiddersTab from './BiddersTab';
 
 class HeaderBidding extends React.Component {
 	state = {
 		redirectUrl: ''
 	};
+
+	componentDidMount() {
+		const {
+			match: {
+				params: { siteId }
+			},
+			getSetupStatusAction
+		} = this.props;
+
+		getSetupStatusAction(siteId);
+	}
 
 	getActiveTab = () => {
 		const {
@@ -28,7 +42,12 @@ class HeaderBidding extends React.Component {
 		return siteId;
 	};
 
+	// eslint-disable-next-line consistent-return
 	handleNavSelect = value => {
+		const {
+			// eslint-disable-next-line no-unused-vars
+			setupStatus: { dfpConnected, adServerSetupCompleted, inventoryFound, biddersFound }
+		} = this.props;
 		const siteId = this.getSiteId();
 		const computedRedirectUrl = `/sites/${siteId}/apps/header-bidding`;
 		let redirectUrl = '';
@@ -39,17 +58,18 @@ class HeaderBidding extends React.Component {
 				break;
 
 			case 2:
-				redirectUrl = `${computedRedirectUrl}/tab-2`;
+				if (!(!adServerSetupCompleted || !inventoryFound)) return false;
+				redirectUrl = `${computedRedirectUrl}/${NAV_ITEMS_INDEXES.TAB_2}`;
 				break;
 
 			case 3:
-				redirectUrl = `${computedRedirectUrl}/tab-3`;
+				redirectUrl = `${computedRedirectUrl}/${NAV_ITEMS_INDEXES.TAB_3}`;
 				break;
 			case 4:
-				redirectUrl = `${computedRedirectUrl}/tab-4`;
+				redirectUrl = `${computedRedirectUrl}/${NAV_ITEMS_INDEXES.TAB_4}`;
 				break;
 			case 5:
-				redirectUrl = `${computedRedirectUrl}/tab-5`;
+				redirectUrl = `${computedRedirectUrl}/${NAV_ITEMS_INDEXES.TAB_5}`;
 				break;
 
 			default:
@@ -59,34 +79,44 @@ class HeaderBidding extends React.Component {
 		this.setState({ redirectUrl });
 	};
 
-	renderContent() {
+	renderContent = () => {
 		const {
 			match: {
 				params: { siteId }
 			},
 			checkInventoryAction,
-			inventoryFound
+			inventoryFound,
+			bidders,
+			fetchAllBiddersAction,
+			setupStatus
 		} = this.props;
 
 		const activeTab = this.getActiveTab();
 
 		function getContent() {
 			switch (activeTab) {
-				case NAV_ITEMS_INDEXES.TAB_1:
+				case 'setup':
 					return (
 						<Setup
 							siteId={siteId}
 							checkInventoryAction={checkInventoryAction}
 							inventoryFound={inventoryFound}
+							setupStatus={setupStatus}
 						/>
 					);
-				case NAV_ITEMS_INDEXES.TAB_2:
-					return 'Tab 2';
-				case NAV_ITEMS_INDEXES.TAB_3:
+				case 'bidders':
+					return (
+						<BiddersTab
+							siteId={siteId}
+							bidders={bidders}
+							fetchAllBiddersAction={fetchAllBiddersAction}
+						/>
+					);
+				case 'inventory':
 					return 'Tab 3';
-				case NAV_ITEMS_INDEXES.TAB_4:
+				case 'prebid-settings':
 					return 'Tab 4';
-				case NAV_ITEMS_INDEXES.TAB_5:
+				case 'optimization':
 					return 'Tab 5';
 				default:
 					return null;
@@ -94,22 +124,28 @@ class HeaderBidding extends React.Component {
 		}
 
 		return <div className="u-padding-v5 u-padding-h5">{getContent()}</div>;
-	}
+	};
 
-	render() {
+	renderTabsLayout = () => {
 		const activeTab = this.getActiveTab();
 		const activeItem = NAV_ITEMS[activeTab];
-		const { redirectUrl } = this.state;
-
-		if (redirectUrl) {
-			return <Redirect to={{ pathname: redirectUrl }} />;
-		}
+		const {
+			// eslint-disable-next-line no-unused-vars
+			setupStatus: { dfpConnected, adServerSetupCompleted, inventoryFound, biddersFound }
+		} = this.props;
 
 		return (
 			<ActionCard>
 				<Nav bsStyle="tabs" activeKey={activeItem.INDEX} onSelect={this.handleNavSelect}>
-					<NavItem eventKey={1}>{NAV_ITEMS_VALUES.TAB_1}</NavItem>
-					<NavItem eventKey={2}>{NAV_ITEMS_VALUES.TAB_2}</NavItem>
+					{(!inventoryFound || !biddersFound) && (
+						<NavItem eventKey={1}>{NAV_ITEMS_VALUES.TAB_1}</NavItem>
+					)}
+					<NavItem
+						eventKey={2}
+						className={!(!adServerSetupCompleted || !inventoryFound) ? 'disabled' : ''}
+					>
+						{NAV_ITEMS_VALUES.TAB_2}
+					</NavItem>
 					<NavItem eventKey={3}>{NAV_ITEMS_VALUES.TAB_3}</NavItem>
 					<NavItem eventKey={4}>{NAV_ITEMS_VALUES.TAB_4}</NavItem>
 					<NavItem eventKey={5}>{NAV_ITEMS_VALUES.TAB_5}</NavItem>
@@ -117,6 +153,17 @@ class HeaderBidding extends React.Component {
 				{this.renderContent()}
 			</ActionCard>
 		);
+	};
+
+	render() {
+		const { redirectUrl } = this.state;
+		const { setupStatus } = this.props;
+
+		if (redirectUrl) {
+			return <Redirect to={{ pathname: redirectUrl }} />;
+		}
+
+		return setupStatus && this.renderTabsLayout();
 	}
 }
 

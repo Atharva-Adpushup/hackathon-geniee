@@ -24,8 +24,10 @@ import {
 	faCheckCircle,
 	faExternalLinkAlt,
 	faArrowUp,
-	faArrowDown
+	faArrowDown,
+	faCheck
 } from '@fortawesome/free-solid-svg-icons';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import 'bootstrap-sass/assets/stylesheets/_bootstrap.scss';
 import ErrorBoundary from './Components/ErrorBoundary';
 import Routes from './Routes';
@@ -53,7 +55,8 @@ library.add(
 	faCheckCircle,
 	faExternalLinkAlt,
 	faArrowUp,
-	faArrowDown
+	faArrowDown,
+	faCheck
 );
 
 const App = () => (
