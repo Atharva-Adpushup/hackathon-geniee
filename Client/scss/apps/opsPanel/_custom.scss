@@ -7,7 +7,7 @@
 	border: 1px solid $borderColor;
 
 	.table-datatable {
-		table-layout: fixed !important;
+		// table-layout: fixed !important;
 	}
 
 	.col-md-4 {
@@ -36,7 +36,7 @@
 }
 .report-table .tbody-td-default,
 .report-table .thead-th-default {
-	width: auto;
+	width: 100%;
 	max-width: 250px;
 	word-wrap: break-word;
 }

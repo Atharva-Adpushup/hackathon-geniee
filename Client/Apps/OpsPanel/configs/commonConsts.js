@@ -21,18 +21,30 @@ const OP_NAV_ITEMS = {
 };
 
 const SITES_MAPPING = {
-	LABELS: {
-		siteId: 'Site Id',
-		siteDomain: 'Site Domain',
-		ownerEmail: 'Owner Email',
-		channels: 'Channels',
-		mode: 'Mode',
-		step: 'Status',
-		customSizes: 'Custom Sizes',
-		dateCreated: 'Date Created',
-		pubId: 'Publisher Id',
-		adsenseEmail: 'Adsense Email'
-	},
+	LABELS: [
+		'Site Id',
+		'Site Domain',
+		'Owner Email',
+		'Channels',
+		'Mode',
+		'Status',
+		'Custom Sizes',
+		'Date Created',
+		'Publisher Id',
+		'Adsense Email'
+	],
+	// LABELS: {
+	// 	siteId: 'Site Id',
+	// 	siteDomain: 'Site Domain',
+	// 	ownerEmail: 'Owner Email',
+	// 	channels: 'Channels',
+	// 	mode: 'Mode',
+	// 	step: 'Status',
+	// 	customSizes: 'Custom Sizes',
+	// 	dateCreated: 'Date Created',
+	// 	pubId: 'Publisher Id',
+	// 	adsenseEmail: 'Adsense Email'
+	// },
 	HEADERS: [
 		{
 			title: 'Site Id',
