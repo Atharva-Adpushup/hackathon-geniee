@@ -9,9 +9,9 @@ const { sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFun
 const { docKeys, INNOVATIVE_ADS_INITIAL_DOC, DEFAULT_META } = require('../configs/commonConsts');
 const {
 	appBucket,
-	errorHander,
+	errorHandler,
 	verifyOwner,
-	sendDataToZapier,
+	// sendDataToZapier,
 	emitEventAndSendResponse,
 	fetchAds,
 	createNewDocAndDoProcessing,
@@ -62,7 +62,7 @@ const fn = {
 		value.ownerEmail = value.ownerEmail || payload.ownerEmail;
 
 		// if (config.environment.HOST_ENV === 'production' && !fn.isSuperUser) {
-		// 	sendDataToZapier('URL HERE',{
+		// 	sendDataToZapier('URL HERE', {
 		// 		email: value.ownerEmail,
 		// 		website: value.siteDomain,
 		// 		platform: ad.formatData.platform,
@@ -91,7 +91,7 @@ const fn = {
 			.getDoc(`${key}${req.body.siteId}`)
 			.then(docWithCas => processing(docWithCas))
 			.then(() => emitEventAndSendResponse(req.body.siteId, res))
-			.catch(err => errorHander(err, res))
+			.catch(err => errorHandler(err, res))
 };
 
 router
@@ -125,7 +125,7 @@ router
 						res
 					);
 				})
-		).catch(err => errorHander(err, res));
+		).catch(err => errorHandler(err, res));
 	})
 	.post('/createAd', (req, res) => {
 		if (!req.body || !req.body.siteId || !req.body.ad) {
@@ -152,7 +152,7 @@ router
 			)
 			.spread(fn.dbWrapper)
 			.then(data => emitEventAndSendResponse(req.body.siteId, res, data))
-			.catch(err => errorHander(err, res));
+			.catch(err => errorHandler(err, res));
 	})
 	.post('/masterSave', (req, res) =>
 		masterSave(req, res, fn.adUpdateProcessing, fn.directDBUpdate, docKeys.interactiveAds, 2)

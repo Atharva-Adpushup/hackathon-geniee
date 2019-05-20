@@ -1,3 +1,4 @@
+/* eslint-disable react/destructuring-assignment */
 import React, { Component, Fragment } from 'react';
 import { Helmet } from 'react-helmet';
 import { connect } from 'react-redux';
@@ -7,7 +8,7 @@ import AuthShell from '../../Components/AuthShell';
 import AuthFormWrap from '../../Components/AuthFormWrap';
 import FormInput from '../../Components/FormInput';
 import CustomButton from '../../Components/CustomButton';
-import { loginAction, logoutAction } from '../../actions/userActions';
+import { loginAction, logout } from '../../actions/userActions';
 import formValidator from '../../helpers/formValidator';
 import validationSchema from '../../helpers/validationSchema';
 
@@ -20,7 +21,7 @@ class Login extends Component {
 	};
 
 	componentDidMount() {
-		const { logoutAction } = this.props;
+		const { logout: logoutAction } = this.props;
 
 		logoutAction();
 	}
@@ -71,7 +72,7 @@ class Login extends Component {
 			const { loginAction: login } = this.props;
 
 			login(email, password)
-				.then(resp => history.push('/dashboard'))
+				.then(() => history.push('/dashboard'))
 				.catch(({ response }) => {
 					let newState = { isLoggingIn: false };
 
@@ -184,5 +185,5 @@ class Login extends Component {
 
 export default connect(
 	null,
-	{ loginAction, logoutAction }
+	{ loginAction, logout }
 )(Login);

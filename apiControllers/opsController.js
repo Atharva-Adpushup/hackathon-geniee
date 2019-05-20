@@ -3,7 +3,7 @@ const express = require('express');
 const { couchBase } = require('../configs/config');
 const HTTP_STATUSES = require('../configs/httpStatusConsts');
 const { sendSuccessResponse } = require('../helpers/commonFunctions');
-const { appBucket, errorHander } = require('../helpers/routeHelpers');
+const { appBucket, errorHandler } = require('../helpers/routeHelpers');
 
 const router = express.Router();
 
@@ -22,7 +22,7 @@ router.get('/getAllSites', (req, res) =>
 	helpers
 		.getAllSitesFromCouchbase()
 		.then(sites => sendSuccessResponse(sites, res))
-		.catch(err => errorHander(err, res, HTTP_STATUSES.INTERNAL_SERVER_ERROR))
+		.catch(err => errorHandler(err, res, HTTP_STATUSES.INTERNAL_SERVER_ERROR))
 );
 
 module.exports = router;

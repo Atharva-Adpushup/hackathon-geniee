@@ -80,14 +80,29 @@ class Shell extends React.Component {
 
 	render() {
 		const { isSidebarOpen } = this.state;
-		const { children, userFetched, reportsFetched, user, location } = this.props;
+		const {
+			children,
+			userFetched,
+			reportsFetched,
+			user,
+			location,
+			logout,
+			switchUser,
+			findUsers
+		} = this.props;
 		const routes = this.getRoutes(children, location, user);
 
 		return (
 			<Grid fluid>
 				<Row>
 					<Col>
-						<Header sidebarToggle={this.sidebarToggle} />
+						<Header
+							sidebarToggle={this.sidebarToggle}
+							user={user}
+							logout={logout}
+							switchUser={switchUser}
+							findUsers={findUsers}
+						/>
 					</Col>
 				</Row>
 				<Row className="sidebar-main-wrap">

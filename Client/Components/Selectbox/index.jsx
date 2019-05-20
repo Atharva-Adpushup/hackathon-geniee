@@ -1,3 +1,6 @@
+/* eslint-disable react/no-unused-state */
+/* eslint-disable react/no-array-index-key */
+/* eslint-disable prefer-destructuring */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { DropdownButton, MenuItem } from 'react-bootstrap';
@@ -5,7 +8,6 @@ import { DropdownButton, MenuItem } from 'react-bootstrap';
 const findSelected = props => {
 	const { selected, title, options } = props;
 	let name = title;
-	console.log(selected);
 	if (selected) {
 		for (let i = 0; i < options.length; i += 1) {
 			const option = options[i];
@@ -15,7 +17,6 @@ const findSelected = props => {
 			}
 		}
 	}
-	console.log(selected, name);
 	return { selected, name };
 };
 
@@ -29,7 +30,7 @@ class SelectBox extends Component {
 		const { onSelect } = this.props;
 		this.setState(
 			{
-				selected: value,
+				// selected: value,
 				name: e.target.getAttribute('data-name')
 			},
 			() => onSelect(value)
