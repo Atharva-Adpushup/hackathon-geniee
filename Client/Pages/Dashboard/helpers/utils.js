@@ -12,20 +12,20 @@ const getDateRange = value => {
 		default:
 		case 'last7Days':
 			return {
-				fromDate: moment()
-					.subtract(7, 'days')
-					.startOf('day')
+				fromDate: moment('01-05-2019')
+					// .subtract(7, 'days')
+					// .startOf('day')
 					.format('YYYY-MM-DD'),
 				toDate: moment()
 					.startOf('day')
-					.subtract(1, 'day')
+					.subtract(14, 'day')
 					.format('YYYY-MM-DD')
 			};
 		case 'last30Days':
 			return {
-				fromDate: moment()
-					.subtract(30, 'days')
-					.startOf('day')
+				fromDate: moment('07-05-2019')
+					// .subtract(1, 'days')
+					// .startOf('day')
 					.format('YYYY-MM-DD'),
 				toDate: moment()
 					.startOf('day')
