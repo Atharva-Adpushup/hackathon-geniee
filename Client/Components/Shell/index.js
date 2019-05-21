@@ -109,7 +109,7 @@ class Shell extends React.Component {
 					<Sidebar show={isSidebarOpen} />
 					<main className="main-content">
 						{routes ? <Breadcrumbs mappedRoutes={routes} /> : null}
-						{reportsFetched && userFetched ? children : <Loader minHeight="100vh" />}
+						{reportsFetched && userFetched ? children : <Loader />}
 					</main>
 				</Row>
 			</Grid>
