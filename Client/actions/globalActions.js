@@ -21,6 +21,7 @@ const fetchGlobalData = () => dispatch =>
 
 			let analyticsMetaInfo = {};
 			const { data } = response[0];
+
 			dispatch({
 				type: USER_ACTIONS.REPLACE_USER_DATA,
 				data: data.user

@@ -1,3 +1,6 @@
+/* eslint-disable jsx-a11y/label-has-for */
+/* eslint-disable jsx-a11y/label-has-associated-control */
+/* eslint-disable no-alert */
 import React, { Component } from 'react';
 import { Col } from 'react-bootstrap';
 import { TYPE_OF_ADS, EVENTS } from '../../../configs/commonConsts';

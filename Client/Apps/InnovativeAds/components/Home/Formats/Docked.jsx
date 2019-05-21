@@ -1,3 +1,6 @@
+/* eslint-disable jsx-a11y/label-has-for */
+/* eslint-disable jsx-a11y/label-has-associated-control */
+/* eslint-disable no-alert */
 import React, { Component } from 'react';
 import { Col } from 'react-bootstrap';
 import SelectBox from '../../../../../Components/Selectbox/index';

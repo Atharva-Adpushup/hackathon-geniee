@@ -1,10 +1,23 @@
+/* eslint-disable no-console */
+/* eslint-disable no-alert */
 import userService from '../services/userService';
 import history from '../helpers/history';
 import { USER_ACTIONS } from '../constants/global';
 
-export const loginAction = (email, password) => dispatch => userService.login(email, password);
-export const signupAction = user => dispatch => userService.signup(user);
-export const logoutAction = () => dispatch =>
+export const loginAction = (email, password) => () => userService.login(email, password);
+export const findUsers = () => () => userService.findUsers();
+export const switchUser = email => dispatch =>
+	userService
+		.switchUser(email)
+		.then(() => {
+			dispatch({
+				type: USER_ACTIONS.RESET_STATE
+			});
+			return window.location.reload();
+		})
+		.catch(() => window.alert('User Switch Failed'));
+export const signupAction = user => () => userService.signup(user);
+export const logout = () => dispatch =>
 	userService
 		.logout()
 		.then(() => {
@@ -17,10 +30,10 @@ export const logoutAction = () => dispatch =>
 			// TODO: handle logout failure
 			console.log('unable to logout');
 		});
-export const forgotPasswordAction = email => dispatch => userService.forgotPassword(email);
-export const resetPasswordAction = (email, key, password) => dispatch =>
+export const forgotPasswordAction = email => () => userService.forgotPassword(email);
+export const resetPasswordAction = (email, key, password) => () =>
 	userService.resetPassword(email, key, password);
-export const paymentsAction = () => dispatch => userService.payments();
+export const paymentsAction = () => () => userService.payments();
 export const updateAdNetworkSettingsAction = data => dispatch =>
 	dispatch({
 		type: USER_ACTIONS.UPDATE_AD_NETWORK_SETTINGS,

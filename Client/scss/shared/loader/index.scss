@@ -29,6 +29,12 @@ $LOSpinBeforeBorderWid: 5px;
 		z-index: 5;
 	}
 }
+
+.loader-container {
+	position: relative;
+	width: 100%;
+}
+
 .loaderwrapper {
 	background: rgba(0, 0, 0, 0.2);
 	height: 100%;

@@ -148,12 +148,6 @@ class ManageApps extends React.Component {
 		);
 	};
 
-	renderLoader = () => (
-		<div style={{ position: 'relative', width: '100%', height: '100%' }}>
-			<Loader />
-		</div>
-	);
-
 	render() {
 		const { site } = this.props;
 		const { appStatuses = false } = site;
@@ -175,7 +169,7 @@ class ManageApps extends React.Component {
 						</Row>
 					</div>
 				) : (
-					this.renderLoader()
+					<Loader />
 				)}
 			</React.Fragment>
 		);

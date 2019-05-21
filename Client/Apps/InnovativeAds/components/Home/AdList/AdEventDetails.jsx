@@ -56,7 +56,7 @@ class EventDetails extends Component {
 					onSelect={ev => this.setState({ event: ev })}
 					title="Select Event"
 					id="event-selection-selectbox"
-					options={interactiveAdEvents.map((item, index) => ({
+					options={interactiveAdEvents.map(item => ({
 						name: item.toUpperCase(),
 						value: item
 					}))}

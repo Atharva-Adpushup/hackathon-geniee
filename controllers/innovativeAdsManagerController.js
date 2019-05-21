@@ -6,12 +6,7 @@ const { couchbaseService } = require('node-utils');
 const request = require('request-promise');
 const config = require('../configs/config');
 const { sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFunctions');
-const {
-	docKeys,
-	INNOVATIVE_ADS_INITIAL_DOC,
-	DEFAULT_META,
-	INTERACTIVE_ADS_TYPES
-} = require('../configs/commonConsts');
+const { docKeys, INNOVATIVE_ADS_INITIAL_DOC, DEFAULT_META } = require('../configs/commonConsts');
 const adpushup = require('../helpers/adpushupEvent');
 const siteModel = require('../models/siteModel');
 
@@ -35,9 +30,9 @@ const fn = {
 		});
 		options.uri = options.uri.slice(0, -1);
 
-		return request(options)
-			.then(response => console.log('Ad Creation. Called made to Zapier'))
-			.catch(err => console.log('Ad creation call to Zapier failed'));
+		// return request(options)
+		// 	.then(response => console.log('Ad Creation. Called made to Zapier'))
+		// 	.catch(err => console.log('Ad creation call to Zapier failed'));
 	},
 	createNewDocAndDoProcessing: payload => {
 		const innovativeAdDefault = _.cloneDeep(INNOVATIVE_ADS_INITIAL_DOC);
@@ -77,18 +72,18 @@ const fn = {
 		value.siteId = value.siteId || payload.siteId;
 		value.ownerEmail = value.ownerEmail || payload.ownerEmail;
 
-		// if (config.environment.HOST_ENV === 'production') {
-		// 	fn.sendDataToZapier({
-		// 		email: value.ownerEmail,
-		// 		website: value.siteDomain,
-		// 		platform: ad.formatData.platform,
-		// 		size: `${ad.width}x${ad.height}`,
-		// 		adId: ad.id,
-		// 		type: 'action',
-		// 		message: 'New Section Created. Please Check',
-		// 		createdOn: moment(ad.createdOn).format('dddd, MMMM Do YYYY, h:mm:ss a')
-		// 	});
-		// }
+		if (config.environment.HOST_ENV === 'production') {
+			fn.sendDataToZapier({
+				email: value.ownerEmail,
+				website: value.siteDomain,
+				platform: ad.formatData.platform,
+				size: `${ad.width}x${ad.height}`,
+				adId: ad.id,
+				type: 'action',
+				message: 'New Section Created. Please Check',
+				createdOn: moment(ad.createdOn).format('dddd, MMMM Do YYYY, h:mm:ss a')
+			});
+		}
 
 		return Promise.resolve([cas, value, { ads: newAds, logs }, payload.siteId]);
 	},
@@ -102,7 +97,7 @@ const fn = {
 		}
 		return process().then(() => toReturn);
 	},
-	errorHander: (err, res) => {
+	errorHandler: (err, res) => {
 		console.log(err);
 		return sendErrorResponse({ message: 'Opertion Failed' }, res);
 	},
@@ -122,7 +117,7 @@ const fn = {
 			.getDoc(`${docKeys.interactiveAds}${req.body.siteId}`)
 			.then(docWithCas => processing(docWithCas))
 			.then(() => fn.emitEventAndSendResponse(req.body.siteId, res))
-			.catch(err => fn.errorHander(err, res))
+			.catch(err => fn.errorHandler(err, res))
 };
 
 router
@@ -153,7 +148,7 @@ router
 							},
 							res
 					  )
-					: fn.errorHander(err, res)
+					: fn.errorHandler(err, res)
 			);
 	})
 	.get(['/', '/:siteId'], (req, res) => {
@@ -214,7 +209,7 @@ router
 			)
 			.spread(fn.dbWrapper)
 			.then(data => fn.emitEventAndSendResponse(req.body.siteId, res, data))
-			.catch(err => fn.errorHander(err, res));
+			.catch(err => fn.errorHandler(err, res));
 	})
 	.post('/masterSave', (req, res) => {
 		if (

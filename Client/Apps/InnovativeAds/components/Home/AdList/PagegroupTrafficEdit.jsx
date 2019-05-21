@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 import React, { Component } from 'react';
 import CustomButton from '../../../../../Components/CustomButton/index';
 import CustomList from '../CustomList';

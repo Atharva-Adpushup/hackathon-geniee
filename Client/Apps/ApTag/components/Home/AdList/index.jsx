@@ -1,3 +1,4 @@
+/* eslint-disable react/no-array-index-key */
 import React, { Component } from 'react';
 import AdElement from './AdElement';
 import CustomButton from '../../../../../Components/CustomButton/index';
@@ -24,11 +25,7 @@ class AdList extends Component {
 		const customStyle = user.isSuperUser ? { minHeight: '540px' } : { minHeight: '440px' };
 
 		if (loading) {
-			return (
-				<div style={{ height: '100%', minHeight: '600px' }}>
-					<Loader />
-				</div>
-			);
+			return <Loader />;
 		}
 		if (!ads.length) {
 			return <Empty message="Seems kind of empty here" />;

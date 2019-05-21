@@ -45,7 +45,7 @@ function verifyOwner(siteId, userEmail) {
 		});
 }
 
-function errorHander(err, res, code = HTTP_STATUS.BAD_REQUEST) {
+function errorHandler(err, res, code = HTTP_STATUS.BAD_REQUEST) {
 	const customMessage = err.message || err;
 	const errorCode = customMessage.code || code;
 	console.log(err);
@@ -106,7 +106,7 @@ function fetchAds(req, res, docKey) {
 						},
 						res
 				  )
-				: errorHander(err, res)
+				: errorHandler(err, res)
 		);
 }
 
@@ -303,7 +303,7 @@ function fetchCustomStatuses(site) {
 
 module.exports = {
 	verifyOwner,
-	errorHander,
+	errorHandler,
 	appBucket,
 	sendDataToZapier,
 	emitEventAndSendResponse,

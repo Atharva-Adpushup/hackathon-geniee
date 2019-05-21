@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const Promise = require('bluebird');
 const uuid = require('node-uuid');
 const request = require('request-promise');
+
 const userModel = require('../models/userModel');
 const siteModel = require('../models/siteModel');
 const utils = require('../helpers/utils');
@@ -14,6 +15,9 @@ const oauthHelper = require('../helpers/googleOauth');
 const config = require('../configs/config');
 // eslint-disable-next-line no-unused-vars
 const AdpushupError = require('../helpers/AdPushupError');
+const { sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFunctions');
+const authToken = require('../helpers/authToken');
+const { errorHandler, appBucket } = require('../helpers/routeHelpers');
 
 const router = express.Router();
 
@@ -281,6 +285,57 @@ router
 				googleOAuthUniqueString = '';
 				return true;
 			});
+	})
+	.get('/findUsers', (req, res) =>
+		appBucket
+			.queryDB('select email from AppBucket where meta().id like "user::%"')
+			.then(users =>
+				sendSuccessResponse(
+					{
+						users
+					},
+					res
+				)
+			)
+			.catch(err => errorHandler(err, res))
+	)
+	.post('/switchUser', (req, res) => {
+		let { email } = req.body;
+		email = utils.htmlEntities(utils.sanitiseString(email));
+
+		if (!req.user.isSuperUser || !email) {
+			return sendErrorResponse(
+				{
+					message: 'Permission Denined'
+				},
+				res,
+				httpStatus.PERMISSION_DENIED
+			);
+		}
+		return userModel
+			.setSitePageGroups(email)
+			.then(user => {
+				const token = authToken.getAuthToken({
+					email: user.get('email'),
+					isSuperUser: true
+				});
+
+				return res
+					.status(httpStatus.OK)
+					.cookie(
+						'user',
+						JSON.stringify({
+							authToken: token,
+							isSuperUser: true
+						}),
+						{ maxAge: 86400000, path: '/' }
+					)
+					.send({
+						success: 'Changed User',
+						authToken: token
+					});
+			})
+			.catch(err => errorHandler(err, res));
 	});
 
 module.exports = router;
