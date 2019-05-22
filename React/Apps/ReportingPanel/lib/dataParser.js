@@ -138,10 +138,12 @@ const dataLabels = commonConsts.DATA_LABELS,
 
 		return yAxis;
 	},
-	mergeParams = (row1, row2) => {
+	mergeParams = (row1, row2, groupByParam) => {
 		const API_DATA_PARAMS = commonConsts.API_DATA_PARAMS;
 		row1[API_DATA_PARAMS.impressions] += row2[API_DATA_PARAMS.impressions];
-		row1[API_DATA_PARAMS.pageviews] = row2[API_DATA_PARAMS.pageviews];
+		if (groupByParam)
+			row1[API_DATA_PARAMS.pageviews] += row2[API_DATA_PARAMS.pageviews];
+		else row1[API_DATA_PARAMS.pageviews] = row2[API_DATA_PARAMS.pageviews];
 		row1[API_DATA_PARAMS.revenue] += row2[API_DATA_PARAMS.revenue];
 		row1[API_DATA_PARAMS.grossRevenue] += row2[API_DATA_PARAMS.grossRevenue];
 		row1[API_DATA_PARAMS.xpathMiss] = row2[API_DATA_PARAMS.xpathMiss];
@@ -157,7 +159,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 				let row1 = arr[j];
 				for (let k = j + 1; k < arr.length; k++) {
 					let row2 = arr[k];
-					row1 = mergeParams(row1, row2);
+					row1 = mergeParams(row1, row2, groupByParam);
 				}
 				updatedRows.push(row1);
 				break;
@@ -302,7 +304,7 @@ const dataLabels = commonConsts.DATA_LABELS,
 				xpathMiss
 			);
 		} else {
-			series.push(pageCpm,impressions, cpm, revenue);
+			series.push(pageCpm, impressions, cpm, revenue);
 		}
 
 		return series;

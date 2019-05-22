@@ -50,7 +50,8 @@ var config = require('./config'),
 					variationId: slot.variationId,
 					sectionName: slot.sectionName,
 					pageGroup: slot.pageGroup,
-					platform: slot.platform
+					platform: slot.platform,
+					packetId: window.adpushup.config.packetId
 				}
 			};
 

@@ -20,7 +20,7 @@ class Component {
 
 	sendFeedback(options) {
 		if (adp && adp.utils && adp.utils.sendFeedback) {
-			adp.utils.sendFeedback(options);
+			adp.utils.sendFeedbackOld(options);
 		}
 	}
 
@@ -54,6 +54,8 @@ class Component {
 		const { formatData, width, height, id, css: customCSS } = this.interactiveAd;
 		const { POWERED_BY_BANNER } = commonConsts;
 
+		adp.interactiveAds.ads[id] = this.interactiveAd;
+
 		if (this.interactiveAd.network === commonConsts.NETWORKS.ADPTAGS) {
 			window.adpushup.executeAdpTagsHeadCode([this.interactiveAd], {}); // This function expects an array of adpTags and optional adpKeyValues
 		}
@@ -63,17 +65,27 @@ class Component {
 			$banner = null,
 			$closeButton = this.createCloseButton(formatData),
 			feedbackOptions = {
-				ads: [this.interactiveAd],
+				// ads: [this.interactiveAd],
 				xpathMiss: [],
-				eventType: commonConsts.ERROR_CODES.NO_ERROR,
-				mode: window.adpushup.config.mode,
+				// eventType: commonConsts.ERROR_CODES.NO_ERROR,
+				// mode: window.adpushup.config.mode,
 				referrer: adp.config.referrer,
 				tracking: false,
 				variationId: !adp.config.manualModeActive
 					? adp.config.selectedVariation
 					: commonConsts.MANUAL_ADS.VARIATION
 			},
-			$frame = $('<div />');
+			$frame = $('<div />'),
+			newFeedbackAdObj = $.extend({}, this.interactiveAd);
+
+		// New feedback
+		newFeedbackAdObj.status = 1;
+		newFeedbackAdObj.ads = [newFeedbackAdObj];
+		feedbackOptions.newFeedbackAdObj = newFeedbackAdObj;
+
+		feedbackOptions.eventType = 1;
+		feedbackOptions.mode = 1;
+		feedbackOptions.ads = [this.interactiveAd.id];
 
 		$format.attr({ id, 'data-section': id, class: '_ap_apex_ad' });
 		$frame.css({
@@ -171,7 +183,7 @@ class Component {
 			}
 
 			if (variation.customJs.afterAp) {
-				window.adpushup.executeAfterJS(variation);
+				adp.executeAfterJS(variation);
 			}
 		}
 		return this.sendFeedback(feedbackOptions);

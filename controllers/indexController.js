@@ -248,7 +248,7 @@ function preOnboardingPageRedirection(page, req, res) {
 		firstName = req.session.tempObj && req.session.tempObj.firstName ? req.session.tempObj.firstName : null,
 		email = req.session.tempObj && req.session.tempObj.email ? req.session.tempObj.email : null,
 		stage = req.session.stage ? req.session.stage : null,
-		requestDemo = req.session.user && req.session.user.requestDemo ? req.session.user.requestDemo : true,
+		requestDemo = req.session.user && req.session.user.requestDemo ? req.session.user.requestDemo : false,
 		userObj = {
 			name: firstName,
 			email: email,
@@ -317,7 +317,7 @@ router
 							};
 							req.session.primarySiteDetails = primarySiteDetails;
 
-							return setSessionData(user, req, res, 1);
+							return setSessionData(user, req, res, 2);
 
 							// Commented for Tag Manager
 							// if (parseInt(user.data.revenueUpperLimit) <= consts.onboarding.revenueLowerBound) {

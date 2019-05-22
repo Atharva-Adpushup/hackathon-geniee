@@ -161,6 +161,18 @@ var $ = require('jquery'),
 				utils.dockify.dockifyAd('#' + ad.id, ad.formatData, utils);
 			}
 
+			// adp.tracker.add(
+			// 	container,
+			// 	function(id) {
+			// 		utils.sendBeacon(
+			// 			adp.config.feedbackUrl,
+			// 			{ eventType: 2, click: true, id: id },
+			// 			{},
+			// 			commonConsts.BEACON_TYPE.AD_FEEDBACK
+			// 		);
+			// 	}.bind(adp, ad.id)
+			// );
+
 			var currentTime = new Date().getTime();
 			container.attr('data-render-time', currentTime);
 			console.log('rendered slot ', ad.id, ' ', new Date(), ' ', document.hasFocus());
@@ -207,20 +219,59 @@ var $ = require('jquery'),
 				});
 			},
 			next = function(adObj, data) {
+				var newFeedbackAdObj = $.extend({}, adObj),
+					isContainerVisible;
+
 				if (displayCounter) {
 					displayCounter--;
 					if (data.success) {
+						// Below 'isContainerVisible' check is added for boundary cases where ad can be successfully placed
+						// but its container is hidden from layout (.i.e., display none) and thus ad placement and server feedback
+						// functionality should not work
+						isContainerVisible = !!(data.container && data.container.is(':visible'));
+
+						if (!isContainerVisible) {
+							return false;
+						}
+
 						// feedbackData.xpathMiss = [];
-						adObj.status = commonConsts.AD_STATUS.IMPRESSION;
-						feedbackData.ads = [adObj];
+						// New feedback
+						newFeedbackAdObj.status = commonConsts.AD_STATUS.IMPRESSION;
+						newFeedbackAdObj.ads = [newFeedbackAdObj];
+						feedbackData.newFeedbackAdObj = newFeedbackAdObj;
+						feedbackData.eventType = 1;
+						feedbackData.mode = 1;
+
+						feedbackData.xpathMiss = [];
+						feedbackData.ads = [adObj.id];
 						placeAd(data.container, adObj);
-						utils.sendFeedback(feedbackData);
+						utils.sendFeedbackOld(feedbackData);
+
+						// Old feedback
+						// feedbackData.eventType = 1;
+						// feedbackData.mode = 1;
+						// feedbackData.ads = [adObj.id];
+						// utils.sendFeedbackOld(feedbackData);
 					} else {
-						adObj.xpathMiss = true;
-						adObj.status = commonConsts.AD_STATUS.XPATH_MISS;
-						feedbackData.ads = [adObj];
-						// feedbackData.xpathMiss = [adObj];
-						utils.sendFeedback(feedbackData);
+						// New feedback
+						newFeedbackAdObj.xpathMiss = true;
+						newFeedbackAdObj.status = commonConsts.AD_STATUS.XPATH_MISS;
+						newFeedbackAdObj.ads = [newFeedbackAdObj];
+						feedbackData.newFeedbackAdObj = newFeedbackAdObj;
+
+						feedbackData.ads = [];
+						feedbackData.eventType = 1;
+						feedbackData.mode = 1;
+						feedbackData.xpathMiss = [adObj.id];
+						utils.sendFeedbackOld(feedbackData);
+
+						// Old feedback
+						// var oldFeedbackData = $.extend({}, feedbackData);
+						// oldFeedbackData.ads = [];
+						// oldFeedbackData.eventType = 1;
+						// oldFeedbackData.mode = 1;
+						// oldFeedbackData.xpathMiss = [adObj.id];
+						// utils.sendFeedbackOld(oldFeedbackData);
 					}
 				}
 				if (!displayCounter && !finished) {

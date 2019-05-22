@@ -156,10 +156,10 @@ const apiQueryGenerator = params => {
 		} else {
 			csvRow.push(
 				row[commonConsts.DATA_LABELS.date].props.children,
+				row[commonConsts.DATA_LABELS.pageCpm].props.children,
 				sumNetworkDataProp(row[commonConsts.DATA_LABELS.impressions]),
 				calculateCSVRowCPM(row),
-				sumNetworkDataProp(row[commonConsts.DATA_LABELS.revenue]).toFixed(2),
-				row[commonConsts.DATA_LABELS.pageViews].props.children
+				sumNetworkDataProp(row[commonConsts.DATA_LABELS.revenue]).toFixed(2)
 			);
 		}
 	},
@@ -180,10 +180,10 @@ const apiQueryGenerator = params => {
 		} else {
 			csvRow.push(
 				row[commonConsts.DATA_LABELS.date],
+				row[commonConsts.DATA_LABELS.pageCpm],
 				sumNetworkDataProp(row[commonConsts.DATA_LABELS.impressions]),
 				calculateCSVRowCPM(row),
-				sumNetworkDataProp(row[commonConsts.DATA_LABELS.revenue]).toFixed(2),
-				row[commonConsts.DATA_LABELS.pageCpm]
+				sumNetworkDataProp(row[commonConsts.DATA_LABELS.revenue]).toFixed(2)
 			);
 		}
 	},
@@ -239,7 +239,8 @@ const apiQueryGenerator = params => {
 					header[i].title === commonConsts.DATA_LABELS.platform ||
 					header[i].title === commonConsts.DATA_LABELS.pageGroup ||
 					header[i].title === commonConsts.DATA_LABELS.variation ||
-					header[i].title === commonConsts.DATA_LABELS.pageViews
+					header[i].title === commonConsts.DATA_LABELS.pageViews ||
+					header[i].title === commonConsts.DATA_LABELS.pageCpm
 				) {
 					csvHeader.push(header[i].title);
 				}
@@ -285,12 +286,12 @@ const apiQueryGenerator = params => {
 			} else {
 				csvBody.push([
 					totalsRow[commonConsts.DATA_LABELS.date].props.children,
+					totalsRow[commonConsts.DATA_LABELS.pageCpm].props.children,
 					sumNetworkDataProp(totalsRow[commonConsts.DATA_LABELS.impressions]),
 					calculateCSVRowCPM(totalsRow),
 					sumNetworkDataProp(
 						totalsRow[commonConsts.DATA_LABELS.revenue]
-					).toFixed(2),
-					totalsRow[commonConsts.DATA_LABELS.pageViews].props.children
+					).toFixed(2)
 				]);
 			}
 		}

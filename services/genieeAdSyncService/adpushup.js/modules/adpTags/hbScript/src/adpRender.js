@@ -60,10 +60,10 @@ var utils = require('../helpers/utils'),
 		googletag.cmd.push(function() {
 			googletag.display(slot.containerId);
 
-			/* 
+			/*
 				If multiple DFP implementations exist on the page, then explicitly refresh ADP ad slot, to fetch the ad. This makes sure that the ad is fetched in all cases, even if disableInitialLoad() is used by the publisher for his own DFP implementation.
 			*/
-			if (googletag.pubads().isInitialLoadDisabled() || slot.toBeRefresh) {
+			if (googletag.pubads().isInitialLoadDisabled() || slot.toBeRefreshed) {
 				refreshGPTSlot(slot.gSlot);
 			}
 		});
@@ -100,7 +100,8 @@ var utils = require('../helpers/utils'),
 		return null;
 	},
 	setUTMWiseTargeting = function() {
-		var urlParams = adp.utils.queryParams;
+		var urlParams = adp.utils.queryParams,
+			separator = ':';
 
 		if (!Object.keys(urlParams).length) {
 			var utmSessionCookie = adp.session.getCookie(config.UTM_SESSION_COOKIE);
@@ -111,18 +112,41 @@ var utils = require('../helpers/utils'),
 			}
 		}
 
-		Object.keys(config.UTM_WISE_TARGETING).forEach(function(key) {
-			var keyVal = config.UTM_WISE_TARGETING[key],
+		// Set standard UTM targeting
+		Object.keys(config.UTM_WISE_TARGETING.STANDARD).forEach(function(key) {
+			var keyVal = config.UTM_WISE_TARGETING.STANDARD[key],
 				utmParam = urlParams[keyVal];
 
 			googletag
 				.pubads()
 				.setTargeting(keyVal.trim().toLowerCase(), String(utmParam ? utmParam.trim().substr(0, 40) : null));
 		});
+
+		// Set custom UTM targeting
+		Object.keys(config.UTM_WISE_TARGETING.CUSTOM).forEach(function(key) {
+			var keyName = key,
+				keyTargets = config.UTM_WISE_TARGETING.CUSTOM[key].TARGET,
+				keyCombination = '';
+
+			Object.keys(keyTargets).forEach(function(keyTarget) {
+				var keyVal = keyTargets[keyTarget],
+					utmParam = urlParams[keyVal];
+
+				keyCombination += (utmParam ? utmParam : null) + separator;
+			});
+
+			keyCombination = keyCombination.substr(0, keyCombination.length - 1);
+			googletag
+				.pubads()
+				.setTargeting(
+					keyName.trim().toLowerCase(),
+					String(keyCombination ? keyCombination.trim().substr(0, 40) : null)
+				);
+		});
 	},
 	setCustomSlotLevelTargeting = function(slot) {
 		/*
-		Example (to be set in before js) - 
+		Example (to be set in before js) -
 			window.adpushup.customSlotLevelTargetingMap = {
 				"ADP_37646_728X90_dca57618-e924-48f4-9993-d1274128f36c": {
 					"adp_geo": window.adp_geo
@@ -180,10 +204,7 @@ var utils = require('../helpers/utils'),
 			if (dfpAdunitCodes.indexOf(slot.optionalParam.dfpAdunitCode) !== -1) {
 				var currentTargetingObject =
 						config.TARGETING[
-							'/' +
-								networkCodes[slot.optionalParam.dfpAdunitCode] +
-								'/' +
-								slot.optionalParam.dfpAdunitCode
+							'/' + networkCodes[slot.optionalParam.dfpAdunitCode] + '/' + slot.optionalParam.dfpAdunitCode
 						],
 					currentTargetingObject = setPageLevelTargeting(currentTargetingObject, slot);
 				Object.keys(currentTargetingObject).forEach(function(dfpKey, index) {
@@ -251,7 +272,7 @@ var utils = require('../helpers/utils'),
 			);
 
 		setGPTargeting(slot);
-		if (!slot.toBeRefresh) slot.gSlot.addService(googletag.pubads());
+		if (!slot.toBeRefreshed) slot.gSlot.addService(googletag.pubads());
 	},
 	nonDFPSlotRenderSwitch = function(slot) {
 		var type = slot.type;
@@ -308,7 +329,7 @@ var utils = require('../helpers/utils'),
 				googletag.pubads().setTargeting(key, String(config.PAGE_KEY_VALUES[key]));
 			}
 
-			if (config.SITE_ID === 32142) {
+			if (config.SITE_ID === 39041) {
 				setUTMWiseTargeting();
 			}
 

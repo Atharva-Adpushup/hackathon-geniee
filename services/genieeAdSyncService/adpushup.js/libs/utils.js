@@ -51,6 +51,13 @@ module.exports = {
 			commonConsts.BEACON_TYPE.AD_FEEDBACK
 		);
 	},
+	sendFeedbackOld: function(options) {
+		var adp = window.adpushup;
+
+		return this.sendBeaconOld(adp.config.feedbackUrlOld, options, {
+			method: 'image'
+		});
+	},
 	getRandomNumberBetween: function(min, max) {
 		min = Math.ceil(min);
 		max = Math.floor(max);
@@ -138,6 +145,124 @@ module.exports = {
 		}
 		return false;
 	},
+	fireImagePixel: function(src) {
+		var imgEl = document.createElement('img');
+		imgEl.src = src;
+	},
+	sendBeaconOld: function(url, data, options) {
+		if (typeof url !== 'string' || typeof data !== 'object') {
+			return false;
+		}
+
+		var toFeedback,
+			request,
+			evt,
+			adpConfig = window.adpushup.config,
+			newFeedback = {};
+
+		if (data.newFeedbackAdObj) {
+			newFeedback = {
+				packetId: adpConfig.packetId,
+				siteId: adpConfig.siteId,
+				siteDomain: adpConfig.siteDomain,
+				url: adpConfig.pageUrl,
+				mode: data.mode, // Denotes which mode is running (adpushup or fallback)
+				errorCode: data.eventType, // Denotes the error code (no error, pagegroup not found etc.)
+				pageGroup: adpConfig.pageGroup,
+				pageVariationId: adpConfig.selectedVariation,
+				pageVariationName: adpConfig.selectedVariationName,
+				pageVariationType: adpConfig.selectedVariationType,
+				platform: adpConfig.platform,
+				isGeniee: adpConfig.isGeniee || false,
+				sections:
+					data.newFeedbackAdObj.ads && data.newFeedbackAdObj.ads.length
+						? data.newFeedbackAdObj.ads.map(
+								function(ad) {
+									if (this.isHBActiveForAd(ad)) {
+										ad.services.push(commonConsts.SERVICES.HB);
+									}
+
+									return {
+										sectionId: ad.isManual ? ad.originalId : ad.id,
+										sectionName: ad.sectionName,
+										status: ad.status,
+										network: ad.network,
+										networkAdUnitId: this.getNetworkAdUnitIdForAd(ad),
+										services: ad.services
+									};
+								}.bind(this)
+						  )
+						: null
+			};
+			data.newFeedback = this.base64Encode(JSON.stringify(newFeedback));
+		}
+
+		delete data.newFeedbackAdObj;
+		data.packetId = adpConfig.packetId;
+		data.siteId = adpConfig.siteId;
+		data.pageGroup = adpConfig.pageGroup;
+		data.platform = adpConfig.platform;
+		data.url = adpConfig.pageUrl;
+		data.isGeniee = adpConfig.isGeniee || false;
+
+		if (!data.packetId || !data.siteId) {
+			if (console && console.log()) {
+				console.log('Required params for feedback missing');
+			}
+			return false;
+		}
+
+		options = options || {};
+
+		data = this.objToUrl(data);
+
+		toFeedback = url + '?ts=' + +new Date() + data;
+
+		if (options.method === 'image') {
+			this.fireImagePixel(toFeedback);
+			return true;
+		}
+
+		switch (browserConfig.dataSendingMethod) {
+			case 'sendBeacon':
+				request = navigator.sendBeacon(toFeedback);
+				!request && this.fireImagePixel(toFeedback);
+				break;
+			case 'ping':
+				if (document.createEvent !== 'undefined') {
+					try {
+						evt = document.createEvent('MouseEvent');
+						evt.initMouseEvent(
+							'click',
+							true,
+							true,
+							window,
+							0,
+							0,
+							0,
+							0,
+							0,
+							false,
+							false,
+							false,
+							false,
+							0,
+							null
+						);
+						browserConfig.$pingEl
+							.attr('ping', toFeedback)
+							.get(0)
+							.dispatchEvent(evt);
+					} catch (e) {} // eslint-disable-line no-empty
+				} else {
+					this.fireImagePixel(toFeedback);
+				}
+				break;
+			default:
+				this.fireImagePixel(toFeedback);
+		}
+		return true;
+	},
 	sendBeacon: function(url, data, options, beaconType) {
 		var toFeedback,
 			request,
@@ -196,7 +321,7 @@ module.exports = {
 
 			options = options || {};
 			if (options.method === 'image') {
-				new Image().src = toFeedback;
+				this.fireImagePixel(toFeedback);
 				return true;
 			}
 		} else {
@@ -206,7 +331,7 @@ module.exports = {
 		switch (browserConfig.dataSendingMethod) {
 			case 'sendBeacon':
 				request = navigator.sendBeacon(toFeedback);
-				!request && (new Image().src = toFeedback);
+				!request && this.fireImagePixel(toFeedback);
 				break;
 			case 'ping':
 				if (document.createEvent !== 'undefined') {
@@ -235,11 +360,11 @@ module.exports = {
 							.dispatchEvent(evt);
 					} catch (e) {} // eslint-disable-line no-empty
 				} else {
-					new Image().src = toFeedback;
+					this.fireImagePixel(toFeedback);
 				}
 				break;
 			default:
-				new Image().src = toFeedback;
+				this.fireImagePixel(toFeedback);
 		}
 		return true;
 	},

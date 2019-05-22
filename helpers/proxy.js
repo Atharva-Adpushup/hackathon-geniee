@@ -91,7 +91,7 @@ API = {
 			),
 			payer = tipaltiConfig.payerName,
 			date = Math.floor(+new Date() / 1000),
-			paramsStr = payer + payeeId + date + '100',
+			paramsStr = payer + payeeId + date + '50',
 			key = tipaltiConfig.key,
 			hash = crypto
 				.createHmac('sha256', key)
@@ -102,7 +102,7 @@ API = {
 				idap: payeeId,
 				timestamp: date,
 				key: hash,
-				amount: '100'
+				amount: '50'
 			},
 			createClient = Promise.promisify(soap.createClient);
 
@@ -113,7 +113,15 @@ API = {
 				return method(requestArgs);
 			})
 			.then(function(result) {
-				return result.PayeePayableResult && result.PayeePayableResult.b;
+				if (result.PayeePayableResult) {
+					if (
+						result.PayeePayableResult.s == 'Below own threshold' ||
+						result.PayeePayableResult.b
+					)
+						return true;
+					else return false;
+				}
+				return false;
 			})
 			.catch(function() {
 				return 'some error occured';

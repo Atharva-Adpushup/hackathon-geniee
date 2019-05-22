@@ -22,9 +22,7 @@ var w = window,
 			availableSlots = inventory.dfpAdUnits[size],
 			bidders = null;
 
-		if (
-			optionalParam.headerBidding && inventory.hbConfig && Array.isArray(inventory.hbConfig.bidderAdUnits[size])
-		) {
+		if (optionalParam.headerBidding && inventory.hbConfig && Array.isArray(inventory.hbConfig.bidderAdUnits[size])) {
 			var overrideSize = size;
 			if (
 				optionalParam.overrideActive &&
@@ -99,7 +97,8 @@ var w = window,
 		return adpTags.adpSlots[containerId];
 	},
 	processBatchForBidding = function() {
-		var batchId = adpTags.currentBatchId, adpSlots = adpTags.currentBatchAdpSlots;
+		var batchId = adpTags.currentBatchId,
+			adpSlots = adpTags.currentBatchAdpSlots;
 
 		adpTags.adpBatches.push({
 			batchId: batchId,
@@ -135,7 +134,8 @@ var w = window,
 		},
 		// Function to define new adp slot
 		defineSlot: function(containerId, size, placement, optionalParam) {
-			var optionalParam = optionalParam || {}, slot = createSlot(containerId, size, placement, optionalParam);
+			var optionalParam = optionalParam || {},
+				slot = createSlot(containerId, size, placement, optionalParam);
 
 			if (utils.isSupportedBrowser()) {
 				// && adpTags.shouldRun(optionalParam)) {
@@ -165,6 +165,16 @@ var w = window,
 			return this.adpSlots[containerId];
 		},
 		queSlotForBidding: function(slot) {
+			if (slot.toBeRefreshed) {
+				slot.hasRendered = false;
+				slot.biddingComplete = false;
+				slot.feedbackSent = false;
+				slot.hasTimedOut = false;
+				slot.feedback = {
+					winner: config.DEFAULT_WINNER
+				};
+			}
+
 			if (!adpTags.slotInterval) {
 				adpTags.currentBatchId = !adpTags.currentBatchId
 					? Math.abs(utils.hashCode(+new Date() + ''))
