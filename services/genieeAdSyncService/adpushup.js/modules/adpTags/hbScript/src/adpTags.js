@@ -164,15 +164,18 @@ var w = window,
 			this.queSlotForBidding(this.adpSlots[containerId]);
 			return this.adpSlots[containerId];
 		},
+		resetSlotFeedback: function(slot) {
+			slot.hasRendered = false;
+			slot.biddingComplete = false;
+			slot.feedbackSent = false;
+			slot.hasTimedOut = false;
+			slot.feedback = {
+				winner: config.DEFAULT_WINNER
+			};
+		},
 		queSlotForBidding: function(slot) {
 			if (slot.toBeRefreshed) {
-				slot.hasRendered = false;
-				slot.biddingComplete = false;
-				slot.feedbackSent = false;
-				slot.hasTimedOut = false;
-				slot.feedback = {
-					winner: config.DEFAULT_WINNER
-				};
+				this.resetSlotFeedback(slot);
 			}
 
 			if (!adpTags.slotInterval) {
