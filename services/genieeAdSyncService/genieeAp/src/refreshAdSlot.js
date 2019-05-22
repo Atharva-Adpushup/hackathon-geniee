@@ -34,11 +34,8 @@ var utils = require('../libs/utils'),
 			} else if (ad.network === commonConsts.NETWORKS.ADPTAGS && ad.networkData.headerBidding) {
 				//container.children().remove();
 				var slot = getAdpSlot(ad);
-				slot.hasRendered = false;
-				slot.toBeRefresh = true;
-				slot.biddingComplete = false;
-				slot.feedbackSent = false;
-				slot.hasTimedOut = false;
+				slot.toBeRefreshed = true;
+
 				removeBidderTargeting(slot);
 				adp.adpTags.queSlotForBidding(slot);
 				setRefreshTimeOut(container, ad);

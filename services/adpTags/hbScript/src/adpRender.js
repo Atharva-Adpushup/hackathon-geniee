@@ -60,10 +60,10 @@ var utils = require('../helpers/utils'),
 		googletag.cmd.push(function() {
 			googletag.display(slot.containerId);
 
-			/* 
+			/*
 				If multiple DFP implementations exist on the page, then explicitly refresh ADP ad slot, to fetch the ad. This makes sure that the ad is fetched in all cases, even if disableInitialLoad() is used by the publisher for his own DFP implementation.
 			*/
-			if (googletag.pubads().isInitialLoadDisabled() || slot.toBeRefresh) {
+			if (googletag.pubads().isInitialLoadDisabled() || slot.toBeRefreshed) {
 				refreshGPTSlot(slot.gSlot);
 			}
 		});
@@ -146,7 +146,7 @@ var utils = require('../helpers/utils'),
 	},
 	setCustomSlotLevelTargeting = function(slot) {
 		/*
-		Example (to be set in before js) - 
+		Example (to be set in before js) -
 			window.adpushup.customSlotLevelTargetingMap = {
 				"ADP_37646_728X90_dca57618-e924-48f4-9993-d1274128f36c": {
 					"adp_geo": window.adp_geo
@@ -204,10 +204,7 @@ var utils = require('../helpers/utils'),
 			if (dfpAdunitCodes.indexOf(slot.optionalParam.dfpAdunitCode) !== -1) {
 				var currentTargetingObject =
 						config.TARGETING[
-							'/' +
-								networkCodes[slot.optionalParam.dfpAdunitCode] +
-								'/' +
-								slot.optionalParam.dfpAdunitCode
+							'/' + networkCodes[slot.optionalParam.dfpAdunitCode] + '/' + slot.optionalParam.dfpAdunitCode
 						],
 					currentTargetingObject = setPageLevelTargeting(currentTargetingObject, slot);
 				Object.keys(currentTargetingObject).forEach(function(dfpKey, index) {
@@ -274,7 +271,7 @@ var utils = require('../helpers/utils'),
 			);
 
 		setGPTargeting(slot);
-		if (!slot.toBeRefresh) slot.gSlot.addService(googletag.pubads());
+		if (!slot.toBeRefreshed) slot.gSlot.addService(googletag.pubads());
 	},
 	nonDFPSlotRenderSwitch = function(slot) {
 		var type = slot.type;
