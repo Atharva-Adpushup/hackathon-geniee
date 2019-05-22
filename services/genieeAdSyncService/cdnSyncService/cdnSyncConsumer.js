@@ -17,7 +17,14 @@ var path = require('path'),
 	siteModel = require('../../../models/siteModel'),
 	couchbase = require('../../../helpers/couchBaseService'),
 	config = require('../../../configs/config'),
-	prodEnv = config.environment.HOST_ENV === 'production';
+	prodEnv = config.environment.HOST_ENV === 'production',
+	disableSiteCdnSyncList = [38333, 37780, 37066];
+// TODO: Please remove above logic once testing is done
+// NOTE: Above 'disableSiteCdnSyncList' array is added to prevent site specific JavaScript CDN sync
+// as custom generated Javascript files will replace their existing live files for new feature testing purposes.
+// Websites: autocarindia (38333, It is running adpushup lite for which script is uploaded to CDN manually, for now)
+// Websites: javatpoint (37780)
+// Websites: ancient-code (37066)
 
 module.exports = function(site, externalData = {}) {
 	ftp = new PromiseFtp();
@@ -317,8 +324,11 @@ module.exports = function(site, externalData = {}) {
 			});
 		},
 		uploadJS = function(fileConfig) {
-			// Disable CDN upload for autocarindia (It is running adpushup lite for which script is uploaded to CDN manually, for now)
-			if (site.get('siteId') === 38333) {
+			var siteId = site.get('siteId');
+			var shouldJSCdnSyncBeDisabled = !!(disableSiteCdnSyncList.indexOf(siteId) > -1);
+
+			// Disable CDN upload for specific websites where generated JavaScript is added manually for testing purposes
+			if (shouldJSCdnSyncBeDisabled) {
 				return Promise.resolve();
 			} else {
 				if (prodEnv) {
