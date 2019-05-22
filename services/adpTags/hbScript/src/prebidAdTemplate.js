@@ -27,6 +27,7 @@ var prebidAdTemplate =
 	'}, PREBID_TIMEOUT);' +
 	'pbjs.que.push(function(){' +
 	'pbjs.setConfig({' +
+	'rubicon: {singleRequest: true},' +
 	'publisherDomain: parent.adpushup.config.siteDomain,' +
 	'bidderSequence: "random",' +
 	'priceGranularity: "dense"' +
@@ -35,10 +36,6 @@ var prebidAdTemplate =
 	'});' +
 	'pbjs.addAdUnits(__AD_UNIT_CODE__);' +
 	'pbjs.bidderSettings = {' +
-	'c1x: {' +
-	'pixelId: __C1X_PIXEL_ID__,' +
-	'siteId: __C1X_SITE_ID__' +
-	'},' +
 	'openx: {' +
 	'bidCpmAdjustment: function(bidCpm) {' +
 	'return bidCpm - (bidCpm * (10/100));' +
@@ -52,6 +49,11 @@ var prebidAdTemplate =
 	'oftmedia: {' +
 	'bidCpmAdjustment: function(bidCpm) {' +
 	'return bidCpm - (bidCpm * (12/100));' +
+	'}' +
+	'},' +
+	'rubicon: {' +
+	'bidCpmAdjustment: function(bidCpm) {' +
+	'return bidCpm - (bidCpm * (20/100));' +
 	'}' +
 	'}' +
 	'};' +

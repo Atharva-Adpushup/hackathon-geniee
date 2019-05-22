@@ -1,6 +1,8 @@
 const _ = require('lodash');
 const siteModel = require('../../models/siteModel');
 const couchBaseService = require('../../helpers/couchBaseService');
+const logger = require('../../helpers/globalBucketLogger');
+const AdPushupError = require('../../helpers/AdPushupError');
 const couchbasePromise = require('couchbase');
 const viewParameterQuery = couchbasePromise.ViewQuery.from('app', 'liveSitesByValidThirdPartyDFPAndCurrency');
 const Promise = require('bluebird');
@@ -20,16 +22,22 @@ function getAllSiteModels(results) {
 
 function getValidResult(data) {
 	const parsedData = data && typeof data === 'string' ? JSON.parse(data) : data,
-		isValidRootObject = !!(
-			parsedData &&
-			parsedData.dataAsOf &&
-			parsedData.conversions &&
-			parsedData.conversions.USD &&
-			parsedData.conversions.GBP
-		),
-		isValidUSOBject = !!(isValidRootObject && Object.keys(parsedData.conversions.USD).length),
-		computedObject = isValidUSOBject ? { ...parsedData.conversions.USD } : {};
+		isValidRootObject = !!(parsedData && parsedData.conversions && Object.keys(parsedData.conversions).length),
+		isValidUSOBject = !!(isValidRootObject && Object.keys(parsedData.conversions.USD).length);
 
+	if (!isValidUSOBject) {
+		logger({
+			source: 'THIRD PARTY DFP CURRENCY LOGS',
+			message: 'Invalid data received while fetching currency exchange rate from Prebid JSON url',
+			debugData: '',
+			details: `${JSON.stringify(data)}`
+		});
+		throw new AdPushupError(
+			'THIRD PARTY DFP CURRENCY LOGS: Invalid data received while fetching currency exchange rate from Prebid JSON url'
+		);
+	}
+
+	const computedObject = { USD: { ...parsedData.conversions.USD } };
 	return computedObject;
 }
 
@@ -53,9 +61,7 @@ function updateCurrencyExchangeData(sitesArray, currencyData) {
 				);
 
 			if (isSameCurrencyExchangeRate) {
-				let currencyExchangeValue = Number(currencyData[siteConfig.currencyCode]);
-
-				apConfigs.activeDFPCurrencyExchangeRate = currencyExchangeValue;
+				apConfigs.activeDFPCurrencyExchangeRate = currencyData;
 				siteConfig.model.set('apConfigs', apConfigs);
 				return siteConfig.model.save().then(() => siteConfig.model);
 			}
@@ -78,11 +84,7 @@ function successHandler(resultData) {
 			)} liveSitesByValidThirdPartyDFPAndCurrency`
 		);
 	} else {
-		console.log(
-			'No valid sites to update during module execution: ',
-			resultData,
-			', liveSitesByValidThirdPartyDFPAndCurrency'
-		);
+		console.log('No valid sites to update during module execution, liveSitesByValidThirdPartyDFPAndCurrency');
 	}
 
 	return resultData;
@@ -91,6 +93,12 @@ function successHandler(resultData) {
 function errorHandler(err) {
 	console.log('Error in liveSitesByValidThirdPartyDFPAndCurrency module: ', err);
 
+	logger({
+		source: 'THIRD PARTY DFP CURRENCY LOGS',
+		message: 'Error occurred while processing this module',
+		debugData: '',
+		details: `${JSON.stringify(err)}`
+	});
 	throw err;
 }
 

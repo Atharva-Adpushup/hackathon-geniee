@@ -155,12 +155,12 @@ function startCreation(forced) {
 		}
 
 		return selectVariation(config).then(function(variationData) {
-			var selectedVariation = variationData.selectedVariation,
+			var selectedVariation = variationData && variationData.selectedVariation,
 				moduleConfig = variationData.config,
 				isGenieeModeSelected = !!(adp && adp.geniee && adp.geniee.sendSelectedModeFeedback);
 
-			config = adp.config = moduleConfig;
 			if (selectedVariation) {
+				config = adp.config = moduleConfig;
 				adp.creationProcessStarted = true;
 				clearTimeout(pageGroupTimer);
 				config.selectedVariation = selectedVariation.id;
@@ -191,7 +191,6 @@ function startCreation(forced) {
 											container = $('#' + slotId);
 										var currentTime = new Date();
 										container.attr('data-render-time', currentTime.getTime());
-										console.log('rendered slot ', id, ' ', currentTime, ' ', document.hasFocus());
 										if (ads[id].networkData && ads[id].networkData.refreshSlot) {
 											refreshAdSlot.refreshSlot(container, ads[id]);
 										}

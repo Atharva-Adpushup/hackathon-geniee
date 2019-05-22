@@ -263,11 +263,7 @@ module.exports = function(site, externalData = {}) {
 					computedPrebidCurrencyConfig = {
 						adServerCurrency: apConfigs.activeDFPCurrencyCode,
 						granularityMultiplier: Number(apConfigs.prebidGranularityMultiplier),
-						rates: {
-							USD: {
-								[apConfigs.activeDFPCurrencyCode]: Number(apConfigs.activeDFPCurrencyExchangeRate)
-							}
-						}
+						rates: apConfigs.activeDFPCurrencyExchangeRate
 					};
 				}
 
@@ -321,17 +317,22 @@ module.exports = function(site, externalData = {}) {
 			});
 		},
 		uploadJS = function(fileConfig) {
-			if (prodEnv) {
-				return connectToServer()
-					.then(cwd)
-					.then(function() {
-						return ftp.put(fileConfig.default, 'adpushup.js');
-					})
-					.then(function() {
-						return Promise.resolve(fileConfig.uncompressed);
-					});
+			// Disable CDN upload for autocarindia (It is running adpushup lite for which script is uploaded to CDN manually, for now)
+			if (site.get('siteId') === 38333) {
+				return Promise.resolve();
+			} else {
+				if (prodEnv) {
+					return connectToServer()
+						.then(cwd)
+						.then(function() {
+							return ftp.put(fileConfig.default, 'adpushup.js');
+						})
+						.then(function() {
+							return Promise.resolve(fileConfig.uncompressed);
+						});
+				}
+				return Promise.resolve(fileConfig.uncompressed);
 			}
-			return Promise.resolve(fileConfig.uncompressed);
 		},
 		getFinalConfigWrapper = () => getFinalConfig.then(fileConfig => fileConfig);
 

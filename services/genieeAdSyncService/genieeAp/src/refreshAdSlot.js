@@ -4,13 +4,16 @@ var utils = require('../libs/utils'),
 	commonConsts = require('../config/commonConsts'),
 	adCodeGenerator = require('./adCodeGenerator'),
 	adp = window.adpushup,
-	_ = require('lodash'),
+	debounce = require('lodash.debounce'),
 	$ = adp.$,
 	ads = [],
 	inViewAds = [],
-	setRefreshTimeOut = function (container, ad, refreshInterval) {
+	setRefreshTimeOut = function(container, ad, refreshInterval) {
 		if (utils.checkElementInViewPercent(container)) {
-			var refreshInterval = refreshInterval !== undefined ? refreshInterval : commonConsts.AD_REFRESH_INTERVAL;
+			var refreshInterval =
+				refreshInterval !== undefined
+					? refreshInterval
+					: parseInt(ad.networkData.refreshInterval) * 1000 || commonConsts.AD_REFRESH_INTERVAL;
 			var currentTime = new Date().getTime();
 			container.attr('data-refresh-time', currentTime);
 			var oldTimeoutId = container.attr('data-timeout');
@@ -19,9 +22,8 @@ var utils = require('../libs/utils'),
 			container.attr('data-timeout', newTimeoutId);
 		}
 	},
-	refreshAd = function (container, ad) {
+	refreshAd = function(container, ad) {
 		if (utils.checkElementInViewPercent(container)) {
-			console.log('refreshed slot ', ad.id, ' ', new Date(), ' ', document.hasFocus());
 			var currentTime = new Date().getTime();
 			container.attr('data-refresh-time', currentTime);
 			if (ad.network === commonConsts.NETWORKS.ADPTAGS && !ad.networkData.headerBidding) {
@@ -32,8 +34,8 @@ var utils = require('../libs/utils'),
 			} else if (ad.network === commonConsts.NETWORKS.ADPTAGS && ad.networkData.headerBidding) {
 				//container.children().remove();
 				var slot = getAdpSlot(ad);
-				slot.hasRendered = false;
-				slot.toBeRefresh = true;
+				slot.toBeRefreshed = true;
+
 				removeBidderTargeting(slot);
 				adp.adpTags.queSlotForBidding(slot);
 				setRefreshTimeOut(container, ad);
@@ -45,7 +47,7 @@ var utils = require('../libs/utils'),
 			}
 		}
 	},
-	removeBidderTargeting = function (slot) {
+	removeBidderTargeting = function(slot) {
 		var targetingKeys = slot.gSlot.getTargetingKeys();
 		for (var i = 0; i < targetingKeys.length; i++) {
 			if (targetingKeys[i].match(/^hb_/g)) {
@@ -53,7 +55,7 @@ var utils = require('../libs/utils'),
 			}
 		}
 	},
-	getAdpSlot = function (ad) {
+	getAdpSlot = function(ad) {
 		var adSize = ad.width + 'X' + ad.height,
 			adSize1 = ad.width + 'x' + ad.height,
 			siteId = adp.config.siteId,
@@ -68,7 +70,7 @@ var utils = require('../libs/utils'),
 		slot = adpSlots[slotId] || adpSlots[slotId1];
 		return slot;
 	},
-	sendFeedback = function (ad) {
+	sendFeedback = function(ad) {
 		var feedbackData = {
 			ads: [],
 			xpathMiss: [],
@@ -82,16 +84,18 @@ var utils = require('../libs/utils'),
 		feedbackData.variationId = adp.config.selectedVariation;
 		utils.sendFeedback(feedbackData);
 	},
-	refreshGPTSlot = function (gSlot) {
+	refreshGPTSlot = function(gSlot) {
 		googletag.pubads().refresh([gSlot]);
 	},
-	getAllInViewAds = function () {
+	getAllInViewAds = function() {
 		inViewAds = [];
 		for (var i = 0; i < ads.length; i++) {
-			if (utils.checkElementInViewPercent(ads[i].container)) inViewAds.push(ads[i]);
+			if (utils.checkElementInViewPercent(ads[i].container)) {
+				inViewAds.push(ads[i]);
+			}
 		}
 	},
-	onScroll = function () {
+	onScroll = function() {
 		getAllInViewAds();
 
 		for (var i = 0; i < inViewAds.length; i++) {
@@ -101,12 +105,13 @@ var utils = require('../libs/utils'),
 				adRenderTime = container.attr('data-render-time'),
 				lastRefreshTime = container.attr('data-refresh-time'),
 				currentTime = new Date().getTime(),
+				adRefreshInterval = parseInt(ad.networkData.refreshInterval) * 1000 || commonConsts.AD_REFRESH_INTERVAL,
 				timeDifferenceInSec,
 				refreshInterval;
 			if (lastRefreshTime) {
 				// if Ad has been rendered before
 				timeDifferenceInSec = currentTime - lastRefreshTime;
-				if (timeDifferenceInSec > commonConsts.AD_REFRESH_INTERVAL) {
+				if (timeDifferenceInSec > adRefreshInterval) {
 					// if last refresh turn has been missed
 					refreshInterval = 0;
 					setRefreshTimeOut(container, ad, refreshInterval);
@@ -115,15 +120,17 @@ var utils = require('../libs/utils'),
 			} else {
 				// If ad is rendering for the first time.
 				timeDifferenceInSec = currentTime - adRenderTime;
-				if (timeDifferenceInSec > commonConsts.AD_REFRESH_INTERVAL) {
+				if (timeDifferenceInSec > adRefreshInterval) {
 					// wait for 2 sec to count the impression of ad renedered first time.
 					refreshInterval = 2000;
-				} else refreshInterval = commonConsts.AD_REFRESH_INTERVAL; // lazyloading case (if ad has just rendered, refreesh it after 30sec.)
+				} else {
+					refreshInterval = adRefreshInterval;
+				} // lazyloading case (if ad has just rendered, refreesh it after 30sec.)
 				setRefreshTimeOut(container, ad, refreshInterval);
 			}
 		}
 	},
-	onFocus = function () {
+	onFocus = function() {
 		getAllInViewAds();
 
 		for (var i = 0; i < inViewAds.length; i++) {
@@ -132,12 +139,13 @@ var utils = require('../libs/utils'),
 				ad = inViewAd.ad,
 				lastRefreshTime = container.attr('data-refresh-time'),
 				currentTime = new Date().getTime(),
+				adRefreshInterval = parseInt(ad.networkData.refreshInterval) * 1000 || commonConsts.AD_REFRESH_INTERVAL,
 				timeDifferenceInSec,
 				refreshInterval;
 			if (lastRefreshTime) {
 				// if Ad has been rendered before
 				timeDifferenceInSec = currentTime - lastRefreshTime;
-				if (timeDifferenceInSec > commonConsts.AD_REFRESH_INTERVAL) {
+				if (timeDifferenceInSec > adRefreshInterval) {
 					// if last refresh turn has been missed
 					refreshInterval = 0;
 					setRefreshTimeOut(container, ad, refreshInterval);
@@ -146,14 +154,17 @@ var utils = require('../libs/utils'),
 			}
 		}
 	},
-	init = function () {
-		$(window).on('scroll', _.debounce(onScroll, 50));
+	init = function() {
+		$(window).on('scroll', debounce(onScroll, 50));
 		$(window).on('focus', onFocus);
 	},
-	refreshSlot = function (container, ad) {
+	refreshSlot = function(container, ad) {
 		setRefreshTimeOut(container, ad);
 
-		ads.push({ container: container, ad: ad });
+		ads.push({
+			container: container,
+			ad: ad
+		});
 	};
 
 module.exports = {

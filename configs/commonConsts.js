@@ -3,11 +3,27 @@ module.exports = {
 	BASE_URL: 'http://console.adpushup.com',
 	DFP_WEB_SERVICE_ENDPOINT: 'http://staging.adpushup.com/DfpWebService/info',
 	TRANSACTION_LOG_ENDPOINT: 'https://api.adpushup.com/SetupLogWebService/log',
-	REPORT_STATUS: 'https://staging.adpushup.com/InternalOpsWebService/stats',
+	REPORT_STATUS: 'https://api.adpushup.com/OpsWebService/ops',
 	PROXY_ORIGIN: '//proxy.app.adpushup.com',
 	DEMO_ACCOUNT_EMAIL: 'demo@adpushup.com',
-	DEMO_REPORT_SITE_ID: 31764,
-	DEMO_PAGEGROUPS: ['HOME', 'IMAGE', 'POST', 'PHPBB3', 'NEW', 'CATEGORY'],
+	AMP_SETTINGS_ACCESS_EMAILS: ['genieeamp@adpushup.com'],
+	DEMO_REPORT_SITE_ID: 31000,
+	DEMO_PAGEGROUPS: [
+		'HOME',
+		'CALC',
+		'FAQ',
+		'PHONEDATABASE',
+		'PHONEINFO',
+		'LATESTPHONE',
+		'ARTICLE',
+		'DEVICE_INFO',
+		'CARRIER',
+		'CARRIER NETWORK',
+		'CARRIER COUNTRY',
+		'NEWS_ARTICLE',
+		'CHECK',
+		'DOWNLOAD_FIRMWARE'
+	],
 	REPORT_API: {
 		SELECT_PARAMS: ['total_requests', 'total_impressions', 'total_revenue', 'report_date', 'siteid'],
 		DATE_FORMAT: 'YYYY-MM-DD'
@@ -316,7 +332,6 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 			USD: 'USD'
 		}
 	},
-	dummy: 'test',
 	docKeys: {
 		tagManager: 'tgmr::',
 		user: 'user::'

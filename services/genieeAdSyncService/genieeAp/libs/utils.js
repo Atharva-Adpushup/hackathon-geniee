@@ -437,9 +437,32 @@ module.exports = {
 			}
 		};
 	},
+	getUrlObject: function(url) {
+		var link = document.createElement('a'),
+			computedObject = {};
+
+		link.href = url;
+		computedObject.href = link.href;
+		computedObject.protocol = link.protocol;
+		computedObject.host = link.host;
+		computedObject.hostname = link.hostname;
+		computedObject.port = link.port;
+		computedObject.pathname = link.pathname;
+		computedObject.search = link.search;
+		computedObject.hash = link.hash;
+		computedObject.origin = link.origin;
+
+		return computedObject;
+	},
 	removeUrlParameter: function(url, parameter) {
-		// Snippet from https://stackoverflow.com/a/4893927
-		var urlParts = url.split('?');
+		// Code Snippet from https://stackoverflow.com/a/4893927
+		// Added custom url hash functionality
+		var urlParts = url.split('?'),
+			originalUrlObject = this.getUrlObject(url),
+			hasOriginalUrlHash = !!(originalUrlObject && originalUrlObject.hash),
+			computedUrlObject,
+			hasComputedUrlHash,
+			isNoUrlHashAfterComputation;
 
 		if (urlParts.length >= 2) {
 			// Get first part, and remove from array
@@ -467,7 +490,15 @@ module.exports = {
 		}
 
 		if (url.charAt(url.length - 1) === '?') {
-			return url.substr(0, url.length - 1);
+			url = url.substr(0, url.length - 1);
+		}
+
+		computedUrlObject = this.getUrlObject(url);
+		hasComputedUrlHash = !!(computedUrlObject && computedUrlObject.hash);
+		isNoUrlHashAfterComputation = !!(hasOriginalUrlHash && !hasComputedUrlHash);
+
+		if (isNoUrlHashAfterComputation) {
+			url += originalUrlObject.hash;
 		}
 
 		return url;

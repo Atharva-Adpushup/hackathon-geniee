@@ -36,7 +36,10 @@ var $ = require('jquery'),
 				ad.networkData &&
 				!ad.networkData.dynamicAllocation &&
 				!ad.networkData.adCode &&
-				genieeIds.push({ zoneId: ad.networkData.zoneId, zoneContainerId: ad.networkData.zoneContainerId });
+				genieeIds.push({
+					zoneId: ad.networkData.zoneId,
+					zoneContainerId: ad.networkData.zoneContainerId
+				});
 			// 'isADPTags' will be true if atleast one ADP tag is present
 			shouldPushToADP(ad) ? (adpTagUnits.push(ad), (window.adpushup.config.isADPTags = true)) : null;
 
@@ -135,7 +138,11 @@ var $ = require('jquery'),
 		try {
 			utils.runScript(utils.base64Decode(variation.customJs.afterAp));
 		} catch (e) {
-			window.adpushup.err.push({ msg: 'Error in afterAp js.', js: variation.customJs.afterAp, error: e });
+			window.adpushup.err.push({
+				msg: 'Error in afterAp js.',
+				js: variation.customJs.afterAp,
+				error: e
+			});
 		}
 		window.adpushup.afterJSExecuted = true;
 	},
@@ -210,19 +217,30 @@ var $ = require('jquery'),
 				});
 			},
 			next = function(adObj, data) {
-				var newFeedbackAdObj = $.extend({}, adObj);
+				var newFeedbackAdObj = $.extend({}, adObj),
+					isContainerVisible;
 
 				if (displayCounter) {
 					displayCounter--;
 					if (data.success) {
+						// Below 'isContainerVisible' check is added for boundary cases where ad can be successfully placed
+						// but its container is hidden from layout (.i.e., display none) and thus ad placement and server feedback
+						// functionality should not work
+						isContainerVisible = !!(data.container && data.container.is(':visible'));
+
+						if (!isContainerVisible) {
+							return false;
+						}
+
 						// feedbackData.xpathMiss = [];
 						// New feedback
 						newFeedbackAdObj.status = commonConsts.AD_STATUS.IMPRESSION;
 						newFeedbackAdObj.ads = [newFeedbackAdObj];
 						feedbackData.newFeedbackAdObj = newFeedbackAdObj;
-
 						feedbackData.eventType = 1;
 						feedbackData.mode = 1;
+
+						feedbackData.xpathMiss = [];
 						feedbackData.ads = [adObj.id];
 						placeAd(data.container, adObj);
 						utils.sendFeedbackOld(feedbackData);
@@ -328,7 +346,11 @@ var $ = require('jquery'),
 				try {
 					utils.runScript(utils.base64Decode(variation.customJs.beforeAp));
 				} catch (e) {
-					err.push({ msg: 'Error in beforeAp js.', js: variation.customJs.beforeAp, error: e });
+					err.push({
+						msg: 'Error in beforeAp js.',
+						js: variation.customJs.beforeAp,
+						error: e
+					});
 				}
 			}
 

@@ -24,6 +24,8 @@ class ModalWrapper extends React.Component {
 		const openx = findBidder(data, 'openx');
 		const conversant = findBidder(data, 'conversant');
 		const thirtyThreeAcross = findBidder(data, '33across');
+		const ix = findBidder(data, 'ix');
+		const rubicon = findBidder(data, 'rubicon');
 
 		this.state = {
 			partnersSelected: props.data.map(obj => obj.bidder) || [],
@@ -61,6 +63,15 @@ class ModalWrapper extends React.Component {
 				siteId: thirtyThreeAcross ? thirtyThreeAcross.params.siteId : '',
 				productId: thirtyThreeAcross ? thirtyThreeAcross.params.productId : ''
 			},
+			ix: {
+				siteId: ix ? ix.params.siteId : '',
+				size: ix ? JSON.stringify(ix.params.size) : ''
+			},
+			rubicon: {
+				accountId: rubicon ? rubicon.params.accountId : '',
+				siteId: rubicon ? rubicon.params.siteId : '',
+				zoneId: rubicon ? rubicon.params.zoneId : ''
+			},
 			error: ''
 		};
 
@@ -96,6 +107,8 @@ class ModalWrapper extends React.Component {
 		const openx = findBidder(data, 'openx');
 		const conversant = findBidder(data, 'conversant');
 		const thirtyThreeAcross = findBidder(data, '33across');
+		const ix = findBidder(data, 'ix');
+		const rubicon = findBidder(data, 'rubicon');
 
 		this.setState({
 			partnersSelected: nextProps.data.map(obj => ({ value: obj.bidder, label: obj.bidder })) || [],
@@ -133,6 +146,15 @@ class ModalWrapper extends React.Component {
 				siteId: thirtyThreeAcross ? thirtyThreeAcross.params.siteId : '',
 				productId: thirtyThreeAcross ? thirtyThreeAcross.params.productId : ''
 			},
+			ix: {
+				siteId: ix ? ix.params.siteId : '',
+				size: ix ? JSON.stringify(ix.params.size) : ''
+			},
+			rubicon: {
+				accountId: rubicon ? rubicon.params.accountId : '',
+				siteId: rubicon ? rubicon.params.siteId : '',
+				zoneId: rubicon ? rubicon.params.zoneId : ''
+			},
 			error: ''
 		});
 	}
@@ -147,9 +169,14 @@ class ModalWrapper extends React.Component {
 				}
 			});
 
+			let params = this.state[partner.value];
+			if (partner.value === 'ix' && params && params.size) {
+				params.size = JSON.parse(params.size);
+			}
+
 			return {
 				bidder: partner.value,
-				params: this.state[partner.value]
+				params
 			};
 		});
 

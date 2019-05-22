@@ -6,7 +6,11 @@ import ActionCard from '../../../Components/ActionCard.jsx';
 import ReportControls from './ReportControls.jsx';
 import '../styles.scss';
 import commonConsts from '../lib/commonConsts';
-import { apiQueryGenerator, dataGenerator, csvDataGenerator } from '../lib/helpers';
+import {
+	apiQueryGenerator,
+	dataGenerator,
+	csvDataGenerator
+} from '../lib/helpers';
 import { ajax } from '../../../common/helpers';
 import moment from 'moment';
 import PaneLoader from '../../../Components/PaneLoader.jsx';
@@ -17,6 +21,7 @@ class ReportingPanel extends React.Component {
 
 		this.state = {
 			updateStatusText: '',
+			updateStatusTime: '',
 			reportLoading: true,
 			reportError: false,
 			emptyData: false,
@@ -31,8 +36,12 @@ class ReportingPanel extends React.Component {
 			responseData: null,
 			networkWiseData: false,
 			activeLegendItems: props.activeLegendItems || commonConsts.LEGEND,
-			startDate: moment().subtract(7, 'days').startOf('day'),
-			endDate: moment().startOf('day').subtract(1, 'day')
+			startDate: moment()
+				.subtract(7, 'days')
+				.startOf('day'),
+			endDate: moment()
+				.startOf('day')
+				.subtract(1, 'day')
 		};
 		this.generateReport = this.generateReport.bind(this);
 		this.updateReportParams = this.updateReportParams.bind(this);
@@ -44,7 +53,9 @@ class ReportingPanel extends React.Component {
 	fetchVariations(pageGroup, platform) {
 		ajax({
 			method: 'GET',
-			url: `${commonConsts.VARIATIONS_ENDPOINT}?siteId=${commonConsts.SITE_ID}&pageGroup=${pageGroup}&platform=${platform}`
+			url: `${commonConsts.VARIATIONS_ENDPOINT}?siteId=${
+				commonConsts.SITE_ID
+			}&pageGroup=${pageGroup}&platform=${platform}`
 		})
 			.then(res => {
 				const variations = this.state.variations.concat(res.data);
@@ -58,17 +69,19 @@ class ReportingPanel extends React.Component {
 	getReportStatus() {
 		ajax({
 			method: 'GET',
-			url: `${commonConsts.REPORT_STATUS}?fromDate=${this.state.startDate}&toDate=${this.state.endDate}`
+			url: `${commonConsts.REPORT_STATUS}?fromDate=${
+				this.state.startDate
+			}&toDate=${this.state.endDate}`
 		}).then(res => {
 			if (res.status) {
 				if (res.status == 'Stopped') {
 					let updatedDate = res.lastRunTimePST;
 					this.setState({
-						updateStatusText: `Note - The reports were last updated on ${updatedDate}.`
+						updateStatusTime: `Note - The reports were last updated on ${updatedDate}.`
 					});
 				} else if (res.status == 'Running') {
 					this.setState({
-						updateStatusText: `Note - The network reporting data is being crunched and you will see updated data shortly.`
+						updateStatusText: `Note - The network reporting data is being crunched right now. Please check back in 15 minutes.`
 					});
 				}
 			}
@@ -82,16 +95,16 @@ class ReportingPanel extends React.Component {
 		});
 
 		const {
-			startDate,
-			endDate,
-			pageGroup,
-			platform,
-			variation,
-			groupBy,
-			variations,
-			activeLegendItems,
-			tagManager
-		} = this.state,
+				startDate,
+				endDate,
+				pageGroup,
+				platform,
+				variation,
+				groupBy,
+				variations,
+				activeLegendItems,
+				tagManager
+			} = this.state,
 			params = {
 				startDate,
 				endDate,
@@ -116,7 +129,13 @@ class ReportingPanel extends React.Component {
 				this.getReportStatus();
 				if (!res.error && res.rows.length) {
 					const responseData = $.extend(true, {}, res),
-						data = dataGenerator(res, groupBy, variations, null, activeLegendItems);
+						data = dataGenerator(
+							res,
+							groupBy,
+							variations,
+							null,
+							activeLegendItems
+						);
 					this.setState({
 						...state,
 						reportError: false,
@@ -155,7 +174,10 @@ class ReportingPanel extends React.Component {
 					variation: null
 				});
 			}
-			if ((params.pageGroup && !params.platform) || (params.platform && !params.pageGroup)) {
+			if (
+				(params.pageGroup && !params.platform) ||
+				(params.platform && !params.pageGroup)
+			) {
 				this.setState({
 					variations: [],
 					variation: null
@@ -190,49 +212,63 @@ class ReportingPanel extends React.Component {
 
 	render() {
 		const {
-			startDate,
-			endDate,
-			reportLoading,
-			disableGenerateButton,
-			reportError,
-			emptyData,
-			chartConfig,
-			tableConfig,
-			platform,
-			variations,
-			variation,
-			groupBy,
-			updateStatusText
-		} = this.state,
+				startDate,
+				endDate,
+				reportLoading,
+				disableGenerateButton,
+				reportError,
+				emptyData,
+				chartConfig,
+				tableConfig,
+				platform,
+				variations,
+				variation,
+				groupBy,
+				updateStatusText,
+				updateStatusTime
+			} = this.state,
 			customToggle = {
 				toggleText: 'Network wise data',
 				toggleChecked: false,
 				toggleName: 'networkWiseData',
 				toggleCallback: this.tableToggleCallback
 			},
-			reportPane = reportError
-				? <PaneLoader
-						message={!emptyData ? 'Error occurred while fetching report data!' : 'No report data present!'}
-						state="error"
-						styles={{ height: 'auto' }}
-					/>
-				: <div>
-						<div id="chart-legend" />
-						<ReactHighcharts config={chartConfig} />
-						<div className="report-table">
-							{tableConfig
-								? <Datatable
-										tableHeader={tableConfig.header}
-										tableBody={tableConfig.body}
-										keyName="reportTable"
-										rowsPerPage={10}
-										customToggle={customToggle}
-										rowsPerPageOption={[20, 30, 40, 50]}
-										customGroupByNonAggregatedData={groupBy}
-									/>
-								: ''}
-						</div>
-					</div>;
+			reportPane = reportError ? (
+				<PaneLoader
+					message={
+						!emptyData
+							? 'Error occurred while fetching report data!'
+							: 'No report data present!'
+					}
+					state="error"
+					styles={{ height: 'auto' }}
+				/>
+			) : (
+				<div>
+					<div id="chart-legend" />
+					<ReactHighcharts config={chartConfig} />
+					<div className="report-table">
+						{tableConfig ? (
+							<Datatable
+								tableHeader={tableConfig.header}
+								tableBody={tableConfig.body}
+								keyName="reportTable"
+								rowsPerPage={10}
+								customToggle={customToggle}
+								rowsPerPageOption={[20, 30, 40, 50]}
+								customGroupByNonAggregatedData={groupBy}
+							/>
+						) : (
+							''
+						)}
+					</div>
+				</div>
+			),
+			reportContent = updateStatusText ? (
+				<PaneLoader message={updateStatusText} />
+			) : (
+				reportPane
+			);
 
 		let csvData = '';
 		if (tableConfig) {
@@ -256,9 +292,16 @@ class ReportingPanel extends React.Component {
 						/>
 					</Col>
 					<Col sm={12} className="updateStatusDiv">
-						{updateStatusText}
+						{updateStatusTime ? <span>{updateStatusTime}</span> : ''}
 					</Col>
-					<Col sm={12}>{reportLoading ? <PaneLoader message="Loading report data..." /> : reportPane}</Col>
+
+					<Col sm={12}>
+						{reportLoading ? (
+							<PaneLoader message="Loading report data..." />
+						) : (
+							reportContent
+						)}
+					</Col>
 				</Row>
 			</ActionCard>
 		);

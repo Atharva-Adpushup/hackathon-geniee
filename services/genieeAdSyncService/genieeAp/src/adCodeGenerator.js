@@ -2,7 +2,7 @@ var utils = require('../libs/utils'),
 	$ = require('jquery'),
 	config = window.adpushup.config,
 	consts = require('../config/commonConsts'),
-	generateGenieeBodyTag = function(ad) {
+	generateGenieeBodyTag = function (ad) {
 		var adCode,
 			genieeRef = window.adpushup && window.adpushup.geniee,
 			isSendBeforeBodyTags = genieeRef && genieeRef.sendBeforeBodyTagsFeedback,
@@ -45,12 +45,12 @@ var utils = require('../libs/utils'),
 		}
 		return adCode;
 	},
-	executeNoramlAdpTagsHeadCode = function(adpTagUnits, adpKeyValues) {
+	executeNoramlAdpTagsHeadCode = function (adpTagUnits, adpKeyValues) {
 		if (!adpTagUnits || !adpTagUnits.length) {
 			return false;
 		}
-		var doIt = function(adpTagUnits) {
-			return function() {
+		var doIt = function (adpTagUnits) {
+			return function () {
 				for (var i = 0; i < adpTagUnits.length; i++) {
 					var ad = adpTagUnits[i],
 						isNetworkData = !!ad.networkData,
@@ -72,8 +72,7 @@ var utils = require('../libs/utils'),
 						headerBidding: networkData.headerBidding,
 						keyValues: networkData.keyValues,
 						network: ad.network,
-						refreshSlot: networkData.refreshSlot,
-						enableLazyLoading:networkData.enableLazyLoading,
+						enableLazyLoading: networkData.enableLazyLoading,
 						overrideActive: networkData.overrideActive,
 						overrideSizeTo: networkData.overrideSizeTo,
 						multipleAdSizes: isMultipleAdSizes ? ad.multipleAdSizes : null,
@@ -94,7 +93,7 @@ var utils = require('../libs/utils'),
 		window.adpushup.adpTags.que.push(doIt(adpTagUnits));
 		return true;
 	},
-	executeAmpHeadCode = function() {
+	executeAmpHeadCode = function () {
 		var adCode = [];
 		adCode.push('<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">');
 		adCode.push(
@@ -120,7 +119,7 @@ var utils = require('../libs/utils'),
 		$el.append(adCode.join('\n'));
 		return true;
 	},
-	executeMediaNetHeadCode = function() {
+	executeMediaNetHeadCode = function () {
 		var adCode = [];
 		var cid = window.adpushup.config.medianetId || consts.ADPUSHUP_MEDIANET_ID;
 		adCode.push('<scr' + 'ipt type="text/javascript">');
@@ -138,7 +137,7 @@ var utils = require('../libs/utils'),
 		$el.append(adCode.join('\n'));
 		return true;
 	},
-	genrateAdpBodyTag = function(ad) {
+	genrateAdpBodyTag = function (ad) {
 		var adCode,
 			isZoneContainerId = !!ad.networkData.zoneContainerId,
 			computedDFPAdUnitId = isZoneContainerId ? ad.networkData.zoneContainerId : ad.networkData.dfpAdunit;
@@ -170,7 +169,7 @@ var utils = require('../libs/utils'),
 	};
 
 module.exports = {
-	generateAdCode: function(ad) {
+	generateAdCode: function (ad) {
 		var adCode = '';
 		if (!ad.networkData && ad.adCode) {
 			return utils.base64Decode(ad.adCode);
@@ -193,16 +192,12 @@ module.exports = {
 		}
 		return typeof adCode === 'string' ? adCode : adCode.join('\n');
 	},
-	generateGenieeHeaderCode: function(genieeIdCollection) {
+	generateGenieeHeaderCode: function (genieeIdCollection) {
 		if (!genieeIdCollection || !genieeIdCollection.length) {
 			return false;
 		}
 
-		var adCode = [],
-			i,
-			iteratorObject,
-			containerId,
-			zoneId;
+		var adCode = [], i, iteratorObject, containerId, zoneId;
 
 		adCode.push('<scr' + 'ipt type="text/javascript">');
 		adCode.push('var gnsmod = gnsmod || {};');
@@ -224,7 +219,7 @@ module.exports = {
 		);
 		return adCode.join('\n');
 	},
-	executeAdpTagsHeadCode: function(adpTagUnits, adpKeyValues) {
+	executeAdpTagsHeadCode: function (adpTagUnits, adpKeyValues) {
 		if (config.serveAmpTagsForAdp) {
 			executeAmpHeadCode();
 		} else {
@@ -233,7 +228,7 @@ module.exports = {
 
 		return true;
 	},
-	generateMediaNetHeadCode: function() {
+	generateMediaNetHeadCode: function () {
 		return executeMediaNetHeadCode();
 	}
 };

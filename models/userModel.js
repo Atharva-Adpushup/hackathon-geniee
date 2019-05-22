@@ -2,6 +2,7 @@ var modelAPI = (module.exports = apiModule()),
 	model = require('../helpers/model'),
 	couchbase = require('../helpers/couchBaseService'),
 	query = require('couchbase').ViewQuery.from('app', 'sitesByUser'),
+	allUsers = require('couchbase').ViewQuery.from('app', 'allUsers'),
 	networkSettings = require('../models/subClasses/user/networkSettings'),
 	globalModel = require('../models/globalModel'),
 	siteModel = require('../models/siteModel'),
@@ -22,6 +23,7 @@ var modelAPI = (module.exports = apiModule()),
 	pipedriveAPI = require('../misc/vendors/pipedrive'),
 	mailService = require('../services/mailService/index'),
 	{ mailService } = require('node-utils'),
+	proxy = require('../helpers/proxy'),
 	User = model.extend(function() {
 		this.keys = [
 			'firstName',
@@ -51,7 +53,8 @@ var modelAPI = (module.exports = apiModule()),
 			'adnetworkCredentials',
 			'miscellaneous',
 			'billingInfoComplete',
-			'paymentInfoComplete'
+			'paymentInfoComplete',
+			'isPaymentDetailsComplete'
 		];
 		this.validations = schema.user.validations;
 		this.classMap = {
@@ -62,7 +65,7 @@ var modelAPI = (module.exports = apiModule()),
 			adNetworkSettings: [],
 			// requestDemo: true
 			// Commented for Tag Manager
-			requestDemo: true
+			requestDemo: false
 		};
 		this.ignore = ['password', 'oldPassword', 'confirmPassword', 'site'];
 
@@ -93,8 +96,16 @@ var modelAPI = (module.exports = apiModule()),
 					return site;
 				}
 				return globalModel.incrSiteIdInApAppBucket().then(function(siteId) {
-					me.get('sites').push({ siteId: siteId, domain: normalizedDomain, isManual: isManual });
-					return { siteId: siteId, domain: normalizedDomain, isManual: isManual };
+					me.get('sites').push({
+						siteId: siteId,
+						domain: normalizedDomain,
+						isManual: isManual
+					});
+					return {
+						siteId: siteId,
+						domain: normalizedDomain,
+						isManual: isManual
+					};
 				});
 			});
 		};
@@ -566,7 +577,9 @@ function apiModule() {
 				.then(API.getUserByEmail.bind(null, json.email))
 				.then(function(user) {
 					if (user) {
-						var error = { email: ['User with email ' + json.email + ' already exists'] };
+						var error = {
+							email: ['User with email ' + json.email + ' already exists']
+						};
 						throw new AdPushupError(error);
 					}
 				})
@@ -657,7 +670,11 @@ function apiModule() {
 					headerCode +
 					'</div>' +
 					mailFooter,
-				obj = { to: json.email, subject: 'AdPushup Header Snippet', html: content };
+				obj = {
+					to: json.email,
+					subject: 'AdPushup Header Snippet',
+					html: content
+				};
 
 			return mailer.send(obj);
 		},
@@ -686,7 +703,11 @@ function apiModule() {
 				.then(function(html) {
 					var stringifiedHtml = html.toString(),
 						mailer = new Mailer(Config.email, 'html'),
-						obj = { to: json.email, subject: 'Password Recovery', html: stringifiedHtml };
+						obj = {
+							to: json.email,
+							subject: 'Password Recovery',
+							html: stringifiedHtml
+						};
 
 					return mailer.send(obj);
 				});
@@ -714,7 +735,9 @@ function apiModule() {
 						if (config && typeof config === 'object' && Object.keys(config).length > 0) {
 							resolve(config);
 						} else if (!config) {
-							throw new AdPushupError({ keyNotFound: ['Email or key not found'] });
+							throw new AdPushupError({
+								keyNotFound: ['Email or key not found']
+							});
 						}
 					});
 				});
@@ -748,7 +771,9 @@ function apiModule() {
 
 						return user;
 					}
-					throw new AdPushupError({ oldPassword: ["Old Password doesn't match your current password"] });
+					throw new AdPushupError({
+						oldPassword: ["Old Password doesn't match your current password"]
+					});
 				})
 				.then(function(user) {
 					_.forOwn(json, function(value, key) {
@@ -857,6 +882,25 @@ function apiModule() {
 				user.set('revenueUpperLimit', data.revenueUpperLimit);
 				user.save();
 				return user;
+			});
+		},
+		updateUserPaymentStatus: email => {
+			return proxy.checkIfBillingProfileComplete(email).then(status => {
+				return API.getUserByEmail(email).then(user => {
+					user.set('isPaymentDetailsComplete', status);
+					user.save();
+					console.log({ email, status });
+					return {
+						email,
+						status
+					};
+				});
+			});
+		},
+		getAllUsers: () => {
+			allUsers.reduce(false);
+			return couchbase.queryViewFromAppBucket(allUsers).then(function(results) {
+				return _.map(results, 'key');
 			});
 		}
 	};
