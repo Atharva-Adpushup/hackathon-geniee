@@ -4,7 +4,11 @@ import userService from '../services/userService';
 import history from '../helpers/history';
 import { USER_ACTIONS } from '../constants/global';
 
-export const loginAction = (email, password) => () => userService.login(email, password);
+export const loginAction = (email, password) => () =>
+	userService.login(email, password).then(response => {
+		window.cookieProcessing();
+		return response;
+	});
 export const findUsers = () => () => userService.findUsers();
 export const switchUser = email => dispatch =>
 	userService
@@ -16,11 +20,16 @@ export const switchUser = email => dispatch =>
 			return window.location.reload();
 		})
 		.catch(() => window.alert('User Switch Failed'));
-export const signupAction = user => () => userService.signup(user);
+export const signupAction = user => () =>
+	userService.signup(user).then(response => {
+		window.cookieProcessing();
+		return response;
+	});
 export const logout = () => dispatch =>
 	userService
 		.logout()
 		.then(() => {
+			window.resetCookieValues();
 			dispatch({
 				type: USER_ACTIONS.LOGOUT_USER
 			});
