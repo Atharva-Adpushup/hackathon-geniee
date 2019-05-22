@@ -145,6 +145,10 @@ module.exports = {
 		}
 		return false;
 	},
+	fireImagePixel: function(src) {
+		var imgEl = document.createElement('img');
+		imgEl.src = src;
+	},
 	sendBeaconOld: function(url, data, options) {
 		if (typeof url !== 'string' || typeof data !== 'object') {
 			return false;
@@ -215,14 +219,14 @@ module.exports = {
 		toFeedback = url + '?ts=' + +new Date() + data;
 
 		if (options.method === 'image') {
-			new Image().src = toFeedback;
+			this.fireImagePixel(toFeedback);
 			return true;
 		}
 
 		switch (browserConfig.dataSendingMethod) {
 			case 'sendBeacon':
 				request = navigator.sendBeacon(toFeedback);
-				!request && (new Image().src = toFeedback);
+				!request && this.fireImagePixel(toFeedback);
 				break;
 			case 'ping':
 				if (document.createEvent !== 'undefined') {
@@ -251,11 +255,11 @@ module.exports = {
 							.dispatchEvent(evt);
 					} catch (e) {} // eslint-disable-line no-empty
 				} else {
-					new Image().src = toFeedback;
+					this.fireImagePixel(toFeedback);
 				}
 				break;
 			default:
-				new Image().src = toFeedback;
+				this.fireImagePixel(toFeedback);
 		}
 		return true;
 	},
@@ -316,7 +320,7 @@ module.exports = {
 
 			options = options || {};
 			if (options.method === 'image') {
-				new Image().src = toFeedback;
+				this.fireImagePixel(toFeedback);
 				return true;
 			}
 		} else {
@@ -326,7 +330,7 @@ module.exports = {
 		switch (browserConfig.dataSendingMethod) {
 			case 'sendBeacon':
 				request = navigator.sendBeacon(toFeedback);
-				!request && (new Image().src = toFeedback);
+				!request && this.fireImagePixel(toFeedback);
 				break;
 			case 'ping':
 				if (document.createEvent !== 'undefined') {
@@ -355,11 +359,11 @@ module.exports = {
 							.dispatchEvent(evt);
 					} catch (e) {} // eslint-disable-line no-empty
 				} else {
-					new Image().src = toFeedback;
+					this.fireImagePixel(toFeedback);
 				}
 				break;
 			default:
-				new Image().src = toFeedback;
+				this.fireImagePixel(toFeedback);
 		}
 		return true;
 	},
