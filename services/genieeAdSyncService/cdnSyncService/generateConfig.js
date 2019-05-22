@@ -89,7 +89,6 @@ function HbProcessing(site, apConfigs) {
 
 			if (isValidHBConfig) {
 				deviceConfig = hbcf.value.deviceConfig;
-				prebidCurrencyConfig = computedPrebidCurrencyConfig;
 
 				deviceConfig =
 					deviceConfig && deviceConfig.sizeConfig.length
@@ -97,7 +96,7 @@ function HbProcessing(site, apConfigs) {
 						: '';
 
 				if (isValidCurrencyConfig) {
-					prebidCurrencyConfig = ',currency: ' + JSON.stringify(prebidCurrencyConfig);
+					prebidCurrencyConfig = ',currency: ' + JSON.stringify(computedPrebidCurrencyConfig);
 					prebidAdapters = `${prebidAdapters},currency`;
 				}
 			}
