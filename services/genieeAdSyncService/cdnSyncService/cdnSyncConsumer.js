@@ -18,7 +18,7 @@ var path = require('path'),
 	couchbase = require('../../../helpers/couchBaseService'),
 	config = require('../../../configs/config'),
 	prodEnv = config.environment.HOST_ENV === 'production',
-	disableSiteCdnSyncList = [38333, 37780, 37066];
+	disableSiteCdnSyncList = [38333, 37066];
 // TODO: Please remove above logic once testing is done
 // NOTE: Above 'disableSiteCdnSyncList' array is added to prevent site specific JavaScript CDN sync
 // as custom generated Javascript files will replace their existing live files for new feature testing purposes.
