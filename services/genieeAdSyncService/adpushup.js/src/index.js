@@ -157,8 +157,17 @@ function triggerControl(mode, errorCode) {
 	if (config.partner === 'geniee' && !config.isAdPushupControlWithPartnerSSP) {
 		if (w.gnsmod && !w.gnsmod.creationProcessStarted && w.gnsmod.triggerAds) {
 			w.gnsmod.triggerAds();
+
+			// New feedback
 			utils.sendFeedback({
 				eventType: errorCode ? errorCode : commonConsts.ERROR_CODES.PAGEGROUP_NOT_FOUND,
+				mode: mode,
+				referrer: config.referrer
+			});
+
+			// Old feedback
+			utils.sendFeedbackOld({
+				eventType: 3,
 				mode: mode,
 				referrer: config.referrer
 			});
@@ -166,8 +175,17 @@ function triggerControl(mode, errorCode) {
 	} else {
 		adp.creationProcessStarted = true;
 		control.trigger();
+
+		// New feedback
 		utils.sendFeedback({
 			eventType: errorCode ? errorCode : commonConsts.ERROR_CODES.PAGEGROUP_NOT_FOUND,
+			mode: mode,
+			referrer: config.referrer
+		});
+
+		// Old feedback
+		utils.sendFeedbackOld({
+			eventType: 3,
 			mode: mode,
 			referrer: config.referrer
 		});
