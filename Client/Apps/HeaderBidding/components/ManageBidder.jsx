@@ -3,7 +3,6 @@
 import React from 'react';
 import { Row, Col } from 'react-bootstrap';
 import AddManageSizelessBidder from './AddManageSizelessBidder';
-import AddManageNonResponsiveBidder from './AddManageNonResponsiveBidder';
 
 export default class ManageBidder extends React.Component {
 	onBidderUpdate = (bidderConfig, params) => {
@@ -20,34 +19,27 @@ export default class ManageBidder extends React.Component {
 	};
 
 	render() {
-		const { bidderConfig, siteId } = this.props;
+		const { bidderConfig } = this.props;
 
 		return (
-			<div className="options-wrapper hb-bidder hb-manage-bidder">
+			<div className="options-wrapper hb-add-bidder">
 				<header>
-					<h3>Manage {bidderConfig.name}</h3>
+					<h3>Add {bidderConfig.name}</h3>
+					<span className="back" onClick={this.openBiddersListView}>
+						Back
+					</span>
 				</header>
 				<Row>
 					<Col md={4}>
 						<h4>Partner Configuration</h4>
 					</Col>
 					<Col md={8}>
-						{bidderConfig.sizeLess ? (
-							<AddManageSizelessBidder
-								formType="manage"
-								bidderConfig={bidderConfig}
-								openBiddersListView={this.openBiddersListView}
-								onBidderUpdate={this.onBidderUpdate}
-							/>
-						) : (
-							<AddManageNonResponsiveBidder
-								formType="manage"
-								siteId={siteId}
-								bidderConfig={bidderConfig}
-								openBiddersListView={this.openBiddersListView}
-								onBidderUpdate={this.onBidderUpdate}
-							/>
-						)}
+						<AddManageSizelessBidder
+							formType="manage"
+							bidderConfig={bidderConfig}
+							openBiddersListView={this.openBiddersListView}
+							onBidderUpdate={this.onBidderUpdate}
+						/>
 					</Col>
 				</Row>
 			</div>

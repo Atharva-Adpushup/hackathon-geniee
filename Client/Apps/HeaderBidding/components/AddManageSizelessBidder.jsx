@@ -7,19 +7,12 @@ import { Col, Form, FormGroup } from 'react-bootstrap';
 import CustomButton from '../../../Components/CustomButton';
 import getCommonBidderFields from '../config/commonBidderFields';
 import BidderFormFields from './BidderFormFields';
-import formValidator from '../../../helpers/formValidator';
-import getValidationSchema from '../helpers/getValidationSchema';
 
 class AddManageSizelessBidder extends React.Component {
 	state = {
 		formFields: {},
-		validationSchema: {},
 		bidderConfig: {},
-		params: {},
-		errors: {
-			bidderConfig: {},
-			params: {}
-		}
+		params: {}
 	};
 
 	componentDidMount() {
@@ -58,11 +51,6 @@ class AddManageSizelessBidder extends React.Component {
 						}
 
 						newState.bidderConfig = { key, name, sizeLess, reusable, ...newState.bidderConfig };
-						newState.validationSchema = getValidationSchema({
-							...formFields.bidderConfig,
-							...formFields.params
-						});
-
 						return newState;
 					});
 				}
@@ -79,7 +67,6 @@ class AddManageSizelessBidder extends React.Component {
 						reusable,
 						isApRelation,
 						config: params,
-						paramsFormFields,
 						isPaused,
 						relation,
 						bids,
@@ -96,7 +83,7 @@ class AddManageSizelessBidder extends React.Component {
 						},
 						newFields: { isPaused }
 					}),
-					params: paramsFormFields
+					params
 				};
 
 				if (formFields && Object.keys(formFields).length) {
@@ -107,46 +94,12 @@ class AddManageSizelessBidder extends React.Component {
 							newState[collectionKey] = {};
 
 							for (const paramKey in formFields[collectionKey]) {
-								let value;
-								if (collectionKey === 'params') {
-									value = params[paramKey];
-								}
-								if (collectionKey === 'bidderConfig') {
-									switch (paramKey) {
-										case 'relation':
-											value = relation;
-											break;
-										case 'bids':
-											value = bids;
-											break;
-										case 'revenueShare':
-											value = revenueShare;
-											break;
-										case 'status':
-											value = isPaused ? 'paused' : 'active';
-											break;
-										default:
-									}
-								}
+								const { value } = formFields[collectionKey][paramKey];
 								newState[collectionKey][paramKey] = value || '';
 							}
 						}
 
-						newState.bidderConfig = {
-							key,
-							name,
-							sizeLess,
-							reusable,
-							relation,
-							bids,
-							revenueShare,
-							...newState.bidderConfig
-						};
-						newState.validationSchema = getValidationSchema({
-							...formFields.bidderConfig,
-							...formFields.params
-						});
-
+						newState.bidderConfig = { key, name, sizeLess, reusable, ...newState.bidderConfig };
 						return newState;
 					});
 				}
@@ -162,45 +115,15 @@ class AddManageSizelessBidder extends React.Component {
 		e.preventDefault();
 
 		const { onBidderAdd, onBidderUpdate } = this.props;
-		const { bidderConfig, params, validationSchema } = this.state;
+		const { bidderConfig, params } = this.state;
 
-		const validationResult = formValidator.validate(
-			{ ...bidderConfig, ...params },
-			validationSchema
-		);
-
-		if (validationResult.isValid) {
-			this.setState({ errors: {} });
-
-			// eslint-disable-next-line no-unused-expressions
-			(onBidderAdd && onBidderAdd(bidderConfig, params)) ||
-				(onBidderUpdate && onBidderUpdate(bidderConfig, params));
-		} else {
-			this.setState({ errors: validationResult.errors });
-		}
+		// eslint-disable-next-line no-unused-expressions
+		(onBidderAdd && onBidderAdd(bidderConfig, params)) ||
+			(onBidderUpdate && onBidderUpdate(bidderConfig, params));
 	};
 
 	setFormFieldValueInState = (stateKey, paramKey, value) => {
-		this.setState(state => {
-			const newState = { [stateKey]: { ...state[stateKey], [paramKey]: value } };
-			const newErrors = { ...state.errors };
-			const error = newErrors[paramKey];
-			const { validationSchema } = state;
-
-			const validationResult = formValidator.validate({ [paramKey]: value }, validationSchema);
-
-			if (validationResult.isValid) {
-				if (error) {
-					delete newErrors[paramKey];
-				}
-			} else {
-				newErrors[paramKey] = validationResult.errors[paramKey];
-			}
-
-			newState.errors = newErrors;
-
-			return newState;
-		});
+		this.setState(state => ({ [stateKey]: { ...state[stateKey], [paramKey]: value } }));
 	};
 
 	getCurrentFieldValue = (stateKey, paramKey) => {
@@ -213,7 +136,7 @@ class AddManageSizelessBidder extends React.Component {
 
 	render() {
 		const { openBiddersListView, formType } = this.props;
-		const { formFields, errors } = this.state;
+		const { formFields } = this.state;
 
 		return (
 			<Form horizontal onSubmit={this.onSubmit}>
@@ -222,16 +145,17 @@ class AddManageSizelessBidder extends React.Component {
 					formType={formType}
 					setFormFieldValueInState={this.setFormFieldValueInState}
 					getCurrentFieldValue={this.getCurrentFieldValue}
-					errors={errors}
 				/>
 				<FormGroup>
-					<Col md={12} className="u-margin-t4">
-						<CustomButton type="submit" variant="primary" className="u-margin-r3">
+					<Col>
+						<CustomButton type="submit" variant="primary">
 							{formType === 'add' ? 'Add' : 'Update'}
 						</CustomButton>
-						<CustomButton type="button" variant="secondary" onClick={openBiddersListView}>
-							Cancel
-						</CustomButton>
+						{formType === 'add' && (
+							<CustomButton type="button" variant="secondary" onClick={openBiddersListView}>
+								Cancel
+							</CustomButton>
+						)}
 					</Col>
 				</FormGroup>
 			</Form>

@@ -3,48 +3,27 @@
 /* eslint-disable react/prefer-stateless-function */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Col, FormGroup, ControlLabel, HelpBlock } from 'react-bootstrap';
+import { Col, FormGroup, ControlLabel } from 'react-bootstrap';
 import Selectbox from '../../../Components/Selectbox';
 import InputBox from '../../../Components/InputBox';
 
 class BidderFormFields extends React.Component {
-	getBidderInputField = (
-		/* paramConfig */ { inputType, options, dataType },
-		paramKey,
-		stateKey
-	) => {
-		const {
-			setFormFieldValueInState,
-			setParamInTempState,
-			getCurrentFieldValue,
-			getCurrentParamValue,
-			adSize
-		} = this.props;
-
+	getBidderInputField = (/* paramConfig */ { inputType, options }, paramKey, stateKey) => {
+		const { setFormFieldValueInState, getCurrentFieldValue } = this.props;
 		if (!inputType || !paramKey) return false;
 
-		let currValue;
-		if (adSize) {
-			currValue = getCurrentParamValue ? getCurrentParamValue(adSize, paramKey) : '';
-		} else {
-			currValue = getCurrentFieldValue ? getCurrentFieldValue(stateKey, paramKey, adSize) : '';
-		}
+		const currValue = getCurrentFieldValue(stateKey, paramKey);
 
 		switch (inputType) {
 			case 'selectBox': {
 				return (
 					<Selectbox
-						key={adSize}
 						id={`hb-${paramKey}`}
 						wrapperClassName="hb-input"
 						selected={currValue}
 						options={options}
 						onSelect={value => {
-							if (adSize) {
-								setParamInTempState(adSize, paramKey, value);
-							} else {
-								setFormFieldValueInState(stateKey, paramKey, value, adSize);
-							}
+							setFormFieldValueInState(stateKey, paramKey, value);
 						}}
 					/>
 				);
@@ -53,16 +32,12 @@ class BidderFormFields extends React.Component {
 			case 'text': {
 				return (
 					<InputBox
-						type={dataType === 'number' ? 'number' : 'text'}
+						type="text"
 						name={`hb-${paramKey}`}
 						classNames="hb-input"
 						value={currValue || ''}
 						onChange={({ target: { value } }) => {
-							if (adSize) {
-								setParamInTempState(adSize, paramKey, value);
-							} else {
-								setFormFieldValueInState(stateKey, paramKey, value, adSize);
-							}
+							setFormFieldValueInState(stateKey, paramKey, value);
 						}}
 					/>
 				);
@@ -73,28 +48,10 @@ class BidderFormFields extends React.Component {
 		}
 	};
 
-	renderErrorMsg = (collectionKey, fieldKey, errors, adSize) => {
-		if (
-			adSize &&
-			typeof errors === 'object' &&
-			errors !== null &&
-			errors[adSize] &&
-			errors[adSize][fieldKey]
-		) {
-			return <HelpBlock>{errors[adSize][fieldKey]}</HelpBlock>;
-		}
-
-		if (!adSize && typeof errors === 'object' && errors !== null && errors[fieldKey]) {
-			return <HelpBlock>{errors[fieldKey]}</HelpBlock>;
-		}
-
-		return false;
-	};
-
 	renderFormFields = () => {
 		const formFieldsJSX = [];
 
-		const { formFields, errors, tempParamsErrors, adSize } = this.props;
+		const { formFields } = this.props;
 
 		for (const collectionKey in formFields) {
 			const collection = formFields[collectionKey];
@@ -104,16 +61,10 @@ class BidderFormFields extends React.Component {
 
 				formFieldsJSX.push(
 					<FormGroup key={fieldKey} controlId={`hb-${fieldKey}`}>
-						<Col componentClass={ControlLabel} sm={6}>
-							{fieldConfig.name + (!fieldConfig.isRequired ? ' (optional)' : '')}
+						<Col componentClass={ControlLabel} sm={4}>
+							{fieldConfig.name}
 						</Col>
-						<Col sm={6}>{this.getBidderInputField(fieldConfig, fieldKey, collectionKey)}</Col>
-						{this.renderErrorMsg(
-							collectionKey,
-							fieldKey,
-							adSize ? tempParamsErrors : errors,
-							adSize
-						)}
+						<Col sm={8}>{this.getBidderInputField(fieldConfig, fieldKey, collectionKey)}</Col>
 					</FormGroup>
 				);
 			}
@@ -131,21 +82,10 @@ class BidderFormFields extends React.Component {
 BidderFormFields.propTypes = {
 	// eslint-disable-next-line react/forbid-prop-types
 	formFields: PropTypes.object.isRequired,
-	setFormFieldValueInState: PropTypes.func,
-	setParamInTempState: PropTypes.func,
-	getCurrentFieldValue: PropTypes.func,
-	getCurrentParamValue: PropTypes.func,
+	setFormFieldValueInState: PropTypes.func.isRequired,
+	getCurrentFieldValue: PropTypes.func.isRequired,
 	// eslint-disable-next-line react/no-unused-prop-types
-	formType: PropTypes.oneOf(['add', 'manage']).isRequired,
-	adSize: PropTypes.string
-};
-
-BidderFormFields.defaultProps = {
-	setFormFieldValueInState: () => {},
-	setParamInTempState: () => {},
-	getCurrentFieldValue: () => {},
-	getCurrentParamValue: () => {},
-	adSize: ''
+	formType: PropTypes.oneOf(['add', 'manage']).isRequired
 };
 
 export default BidderFormFields;

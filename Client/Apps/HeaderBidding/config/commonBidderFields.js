@@ -60,6 +60,7 @@ export default function getCommonBidderFields(isApRelation, manageBidderData) {
 					dataType: 'string',
 					inputType: 'selectBox',
 					options: [{ name: 'Active', value: 'active' }, { name: 'Paused', value: 'paused' }],
+					value: newFields.isPaused ? 'paused' : 'active',
 					isRequired: true,
 					isEditable: true
 				},
