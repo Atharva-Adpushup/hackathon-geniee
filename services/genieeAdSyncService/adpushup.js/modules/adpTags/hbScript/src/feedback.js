@@ -39,11 +39,11 @@ var config = require('./config'),
 					containerId: slot.containerId,
 					type: slot.type,
 					url: window.location.href,
-					bids: getBidDataForFeedback(slot.containerId) || [],
+					bids: [],
 					winner: slot.feedback.winner || config.DEFAULT_WINNER,
 					winningRevenue: slot.feedback.winningRevenue || 0,
 					winnerAdUnitId: slot.feedback.winnerAdUnitId || null,
-					timedOutBidders: slot.feedback.timedOutBidders || [],
+					timedOutBidders: [],
 					timeout: slot.feedback.timeout || slot.timeout,
 					status: null,
 					sectionId: slot.sectionId,
@@ -60,10 +60,10 @@ var config = require('./config'),
 				Object.assign(feedback.data, {
 					status: 'Type 1: Prebid rendered!'
 				});
-				feedback.data.bids.push({
-					adId: slot.slotId,
-					bidder: 'adx'
-				});
+				// feedback.data.bids.push({
+				// 	adId: slot.slotId,
+				// 	bidder: 'adx'
+				// });
 				break;
 			case 2:
 				Object.assign(feedback.data, {
