@@ -8,13 +8,29 @@ const FormValidator = require('../helpers/FormValidator');
 const utils = require('../helpers/utils');
 
 const HeaderBidding = model.extend(function() {
-	this.keys = ['hbConfig', 'deviceConfig', 'siteId', 'siteDomain', 'email'];
-	this.clientKeys = ['hbConfig', 'deviceConfig', 'siteId', 'siteDomain', 'email'];
+	this.keys = [
+		'hbcf',
+		'deviceConfig',
+		'countryConfig',
+		'siteId',
+		'siteDomain',
+		'email',
+		'prebidConfig'
+	];
+	this.clientKeys = [
+		'hbcf',
+		'deviceConfig',
+		'countryConfig',
+		'siteId',
+		'siteDomain',
+		'email',
+		'prebidConfig'
+	];
 	this.validations = {
 		required: []
 	};
 	this.classMap = {};
-	this.defaults = { hbConfig: {}, deviceConfig: {} };
+	this.defaults = { hbcf: {}, deviceConfig: {} };
 	this.constructor = function(data, cas) {
 		if (!(data.siteId && data.siteDomain && data.email)) {
 			throw new Error('siteId, siteDomain and publisher email required for header bidding doc');
@@ -24,15 +40,23 @@ const HeaderBidding = model.extend(function() {
 		this.casValue = cas; // if user is loaded from database which will be almost every time except first, this value will be thr
 	};
 	this.getUsedBidders = function() {
-		// TODO: get used bidders
-
-		return Promise.reject('bidders not found');
+		return this.get('hbcf');
+	};
+	this.saveBidderConfig = function(bidderKey, bidderConfig) {
+		const hbcf = this.get('hbcf');
+		hbcf[bidderKey] = bidderConfig;
+		return Promise.resolve(this);
 	};
 });
 
 function apiModule() {
 	const API = {
-		getAllBidders() {
+		createHBConfigFromJson(json, bidderKey, bidderConfig) {
+			return Promise.resolve(new HeaderBidding(json))
+				.then(hbConfig => hbConfig.saveBidderConfig(bidderKey, bidderConfig))
+				.then(hbConfig => hbConfig.save());
+		},
+		getAllBiddersFromNetworkConfig() {
 			return couchbase
 				.connectToAppBucket()
 				.then(appBucket => appBucket.getAsync('data::apNetwork'))
@@ -46,8 +70,46 @@ function apiModule() {
 					return hbBidders;
 				});
 		},
+		getUsedBidders(siteId) {
+			return API.getHbConfig(siteId)
+				.then(hbConfig => hbConfig.getUsedBidders())
+				.then(bidders => bidders);
+		},
 		getMergedBidders(siteId) {
-			return API.getAllBidders().then(bidders => ({ notAddedBidders: bidders }));
+			return Promise.all([API.getAllBiddersFromNetworkConfig(), API.getUsedBidders(siteId)])
+				.then(([allBidders, addedBidders]) => {
+					const notAddedBidders = { ...allBidders };
+
+					// delete added bidders keys from all bidders
+					for (const addedBidderKey in addedBidders) {
+						addedBidders[addedBidderKey].config = API.mergeBidderParams(
+							{
+								...notAddedBidders[addedBidderKey].params.global,
+								...notAddedBidders[addedBidderKey].params.siteLevel
+							},
+							addedBidders[addedBidderKey].config
+						);
+
+						delete notAddedBidders[addedBidderKey];
+					}
+
+					return { addedBidders, notAddedBidders };
+				})
+				.catch(err => {
+					console.log(err);
+				});
+		},
+		mergeBidderParams(networkConfigBidderparams, addedBidderParams) {
+			const mergedBidderparams = { ...addedBidderParams };
+			for (const paramKey in mergedBidderparams) {
+				const value = mergedBidderparams[paramKey];
+				mergedBidderparams[paramKey] = {
+					value,
+					...networkConfigBidderparams[paramKey]
+				};
+			}
+
+			return mergedBidderparams;
 		},
 		getHbConfig(siteId) {
 			return couchbase
@@ -56,9 +118,10 @@ function apiModule() {
 				.then(json => new HeaderBidding(json.value, json.cas))
 				.catch(err => {
 					if (err.code === 13) {
-						throw new AdPushupError([
-							{ status: 404, message: 'Header Bidding Config does not exist' }
-						]);
+						throw new AdPushupError({
+							status: 404,
+							message: 'Header Bidding Config does not exist'
+						});
 					}
 
 					return false;

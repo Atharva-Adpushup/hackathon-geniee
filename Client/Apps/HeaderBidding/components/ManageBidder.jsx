@@ -4,11 +4,11 @@ import React from 'react';
 import { Row, Col } from 'react-bootstrap';
 import AddManageSizelessBidder from './AddManageSizelessBidder';
 
-export default class AddBidder extends React.Component {
-	onBidderAdd = (bidderConfig, params) => {
-		const { siteId, addBidderAction, bidderConfig: fieldsConfig, openView } = this.props;
+export default class ManageBidder extends React.Component {
+	onBidderUpdate = (bidderConfig, params) => {
+		const { siteId, updateBidderAction, bidderConfig: fieldsConfig, openView } = this.props;
 
-		addBidderAction(siteId, { key: fieldsConfig.key, ...bidderConfig }, params).then(() => {
+		updateBidderAction(siteId, { key: fieldsConfig.key, ...bidderConfig }, params).then(() => {
 			openView('biddersList');
 		});
 	};
@@ -35,10 +35,10 @@ export default class AddBidder extends React.Component {
 					</Col>
 					<Col md={8}>
 						<AddManageSizelessBidder
-							formType="add"
+							formType="manage"
 							bidderConfig={bidderConfig}
 							openBiddersListView={this.openBiddersListView}
-							onBidderAdd={this.onBidderAdd}
+							onBidderUpdate={this.onBidderUpdate}
 						/>
 					</Col>
 				</Row>
