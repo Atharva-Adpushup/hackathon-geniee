@@ -102,7 +102,11 @@ function getGroupedYAxisAndSeries(chartType, yAxisGroups, existingSeries) {
 						},
 						_colorIndex: colorIndex,
 						...existingSeries[index],
-						yAxis: i
+						yAxis: i,
+						tooltip: {
+							enabled: true,
+							format: '${value}'
+						}
 					};
 
 					seriesForChart.push(singleSeries);
@@ -150,25 +154,33 @@ export function getCustomChartConfig(
 	};
 
 	if (activeLegendItems && chartConfig.series && chartConfig.series.length) {
-		let i;
-		const len1 = series.length;
-		for (i = 0; i < len1; i += 1) {
-			const singleSeries = series[i];
+		if (Array.isArray(activeLegendItems)) {
+			let i;
+			const len1 = series.length;
+			for (i = 0; i < len1; i += 1) {
+				const singleSeries = series[i];
 
-			// let j;
-			// const len2 = activeLegendItems.length;
-			// for (j = 0; j < len2; j += 1) {
-			// const activeLegendItem = activeLegendItems[j];
-			singleSeries.visible = true; // singleSeries.name === activeLegendItems.name;
-			// if (singleSeries.name === activeLegendItems.name) break;
-			// }
+				let j;
+				const len2 = activeLegendItems.length;
+				for (j = 0; j < len2; j += 1) {
+					const activeLegendItem = activeLegendItems[j];
+					singleSeries.visible = singleSeries.value === activeLegendItem.value;
+					if (singleSeries.value === activeLegendItem.value) break;
+				}
+			}
+		} else {
+			let i;
+			const len1 = series.length;
+			for (i = 0; i < len1; i += 1) {
+				const singleSeries = series[i];
+				singleSeries.visible = true;
+			}
 		}
 	} else if (chartConfig.series && chartConfig.series.length) {
 		let i;
 		const len1 = series.length;
 		for (i = 0; i < len1; i += 1) {
 			const singleSeries = series[i];
-
 			singleSeries.visible = true;
 		}
 	}
@@ -194,6 +206,13 @@ export function getCustomChartConfig(
 				}
 
 				break;
+			} else if (
+				!Array.isArray(activeLegendItems) &&
+				chartConfig.series &&
+				chartConfig.series.length
+			) {
+				chartConfig.yAxis = { title: activeLegendItems.name };
+				break;
 			}
 
 			chartConfig.series = [];
@@ -208,19 +227,38 @@ export function getCustomChartConfig(
 			chartConfig.xAxis.className = 'myXAxisClass';
 
 			// Set yAxis Groups for Line Chart
-			// if (yAxisGroups && yAxisGroups.length) {
-			const { yAxis, seriesForChart } = getGroupedYAxisAndSeries(
-				type,
-				yAxisGroups,
-				chartConfig.series
-			);
-			// if (yAxis.length && seriesForChart.length) {
-			chartConfig.yAxis = { title: 'Revenue' }; // yAxis;
-			chartConfig.series = chartConfig.series;
-			// }
+			if (yAxisGroups && yAxisGroups.length) {
+				const { yAxis, seriesForChart } = getGroupedYAxisAndSeries(
+					type,
+					yAxisGroups,
+					chartConfig.series
+				);
+				if (yAxis.length && seriesForChart.length) {
+					chartConfig.yAxis = yAxis;
+					chartConfig.series = seriesForChart;
+				}
+				chartConfig = {
+					...chartConfig,
+					plotOptions: {
+						...chartConfig.plotOptions,
+						spline: {
+							...chartConfig.plotOptions.pie,
+							tooltip: {
+								format: '${value}'
+							}
+						}
+					}
+				};
 
-			break;
-			// }
+				break;
+			} else if (
+				!Array.isArray(activeLegendItems) &&
+				chartConfig.series &&
+				chartConfig.series.length
+			) {
+				chartConfig.yAxis = { title: activeLegendItems.name };
+				break;
+			}
 
 			chartConfig.series = [];
 

@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import Control from '../components/Control';
+import Chart from '../components/Chart';
 
 const mapStateToProps = (state, ownProps) => {
 	const {
@@ -15,4 +15,4 @@ const mapStateToProps = (state, ownProps) => {
 	};
 };
 
-export default connect(mapStateToProps)(Control);
+export default connect(mapStateToProps)(Chart);
