@@ -83,6 +83,19 @@ const filtersValues = {
 };
 const REPORT_PATH = '/site/report?report_name=get_stats_by_custom';
 
+const displayMetrics = [
+	{ value: 'network_net_revenue', name: 'Network Net Revenue', type: 'money' },
+	{ value: 'network_impressions', name: 'Network Impressions', type: 'number' },
+	{ value: 'network_ad_ecpm', name: 'Network Ad eCPM', type: 'money' },
+	{ value: 'adpushup_page_cpm', name: 'Page RPM', type: 'money' },
+	{ value: 'adpushup_page_views', name: 'AdPushup PageViews', type: 'number' }
+];
+const activeLegendItem = { value: 'network_net_revenue', name: 'Network Net Revenue' };
+const activeLegendItems = [
+	{ value: 'network_net_revenue', name: 'Network Net Revenue' },
+	{ value: 'network_impressions', name: 'Network Impressions' },
+	{ value: 'network_ad_ecpm', name: 'Network Ad eCPM' }
+];
 export {
 	REPORTS_NAV_ITEMS,
 	REPORTS_NAV_ITEMS_INDEXES,
@@ -90,5 +103,8 @@ export {
 	dimensions,
 	filters,
 	filtersValues,
-	REPORT_PATH
+	REPORT_PATH,
+	displayMetrics,
+	activeLegendItem,
+	activeLegendItems
 };

@@ -33,6 +33,19 @@
 			"total": "12345"
 		}
 	},
+	"defaultYAxisGroups": [
+		{
+			"seriesNames": ["AdPushup PageViews", "Network Impressions"]
+		},
+		{
+			"seriesNames": ["Page RPM", "Network Ad eCPM", "Network Net Revenue"],
+			"yAxisConfig": {
+				"labels": {
+					"format": "${value}"
+				}
+			}
+		}
+	],
 	"series": [
 		{
 			"data": [117703, 99286, 97314, 102554, 106781, 106772, 101014],

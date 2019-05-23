@@ -7,13 +7,14 @@ import { Object } from 'es6-shim';
 import ActionCard from '../../../Components/ActionCard/index';
 import ControlContainer from '../containers/ControlContainer';
 import TableContainer from '../containers/TableContainer';
+import ChartContainer from '../containers/ChartContainer';
 import reportService from '../../../services/reportService';
-import Chart from './Chart';
 import {
 	REPORTS_NAV_ITEMS,
 	REPORTS_NAV_ITEMS_INDEXES,
 	REPORTS_NAV_ITEMS_VALUES,
-	REPORT_PATH
+	REPORT_PATH,
+	displayMetrics
 } from '../configs/commonConsts';
 
 class Panel extends Component {
@@ -47,11 +48,11 @@ class Panel extends Component {
 			responseData: null,
 			networkWiseData: false,
 			startDate: moment()
-				.subtract(7, 'days')
+				.subtract(20, 'days')
 				.startOf('day'),
 			endDate: moment()
 				.startOf('day')
-				.subtract(1, 'day'),
+				.subtract(15, 'day'),
 			tableData: {}
 		};
 	}
@@ -88,6 +89,7 @@ class Panel extends Component {
 
 	formateReportParams = data => {
 		const { startDate, endDate, selectedDimension, selectedFilters } = data;
+		const selectedMetrics = displayMetrics.map(metric => metric.value);
 		const params = {
 			fromDate: moment(startDate).format('YYYY-MM-DD'),
 			toDate: moment(endDate).format('YYYY-MM-DD')
@@ -97,6 +99,7 @@ class Panel extends Component {
 			const filters = Object.keys(selectedFilters[filter]);
 			params[filter] = filters.length > 0 ? filters.toString() : null;
 		}
+		params.metrics = selectedMetrics.toString();
 		params.interval = 'daily';
 		return params;
 	};
@@ -144,7 +147,7 @@ class Panel extends Component {
 					/>
 				</Col>
 				<Col sm={12} className="u-margin-t5">
-					<Chart
+					<ChartContainer
 						tableData={tableData}
 						selectedDimension={selectedDimension}
 						startDate={startDate}

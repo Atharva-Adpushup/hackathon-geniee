@@ -11,6 +11,7 @@ const ChartLegend = ({ chart: { series }, legends, activeLegendItems, updateChar
 				legend={legend}
 				activeLegendItems={activeLegendItems}
 				updateChartData={updateChartData}
+				series={series}
 			/>
 		))}
 	</div>
