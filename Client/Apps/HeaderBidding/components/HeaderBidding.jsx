@@ -58,7 +58,8 @@ class HeaderBidding extends React.Component {
 				break;
 
 			case 2:
-				if (!(!adServerSetupCompleted || !inventoryFound)) return false;
+				// eslint-disable-next-line no-constant-condition
+				if (/*! (!adServerSetupCompleted || !inventoryFound) */ false) return false;
 				redirectUrl = `${computedRedirectUrl}/${NAV_ITEMS_INDEXES.TAB_2}`;
 				break;
 
@@ -88,7 +89,9 @@ class HeaderBidding extends React.Component {
 			inventoryFound,
 			bidders,
 			fetchAllBiddersAction,
-			setupStatus
+			setupStatus,
+			addBidderAction,
+			updateBidderAction
 		} = this.props;
 
 		const activeTab = this.getActiveTab();
@@ -110,6 +113,8 @@ class HeaderBidding extends React.Component {
 							siteId={siteId}
 							bidders={bidders}
 							fetchAllBiddersAction={fetchAllBiddersAction}
+							addBidderAction={addBidderAction}
+							updateBidderAction={updateBidderAction}
 						/>
 					);
 				case 'inventory':
@@ -137,12 +142,13 @@ class HeaderBidding extends React.Component {
 		return (
 			<ActionCard>
 				<Nav bsStyle="tabs" activeKey={activeItem.INDEX} onSelect={this.handleNavSelect}>
-					{(!inventoryFound || !biddersFound) && (
+					{/*! inventoryFound || !biddersFound */ true && (
 						<NavItem eventKey={1}>{NAV_ITEMS_VALUES.TAB_1}</NavItem>
 					)}
 					<NavItem
 						eventKey={2}
-						className={!(!adServerSetupCompleted || !inventoryFound) ? 'disabled' : ''}
+						// eslint-disable-next-line no-constant-condition
+						className={/*! (!adServerSetupCompleted || !inventoryFound) */ false ? 'disabled' : ''}
 					>
 						{NAV_ITEMS_VALUES.TAB_2}
 					</NavItem>
