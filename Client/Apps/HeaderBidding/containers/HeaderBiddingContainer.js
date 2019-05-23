@@ -4,7 +4,9 @@ import HeaderBidding from '../components/HeaderBidding';
 import {
 	checkInventoryAction,
 	fetchAllBiddersAction,
-	getSetupStatusAction
+	getSetupStatusAction,
+	addBidderAction,
+	updateBidderAction
 } from '../../../actions/apps/headerBidding/hbActions';
 
 const HeaderBiddingContainer = props => <HeaderBidding {...props} />;
@@ -15,5 +17,11 @@ export default connect(
 
 		return { inventoryFound, bidders, setupStatus };
 	},
-	{ checkInventoryAction, fetchAllBiddersAction, getSetupStatusAction }
+	{
+		checkInventoryAction,
+		fetchAllBiddersAction,
+		getSetupStatusAction,
+		addBidderAction,
+		updateBidderAction
+	}
 )(HeaderBiddingContainer);

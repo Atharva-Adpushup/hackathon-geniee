@@ -3,7 +3,9 @@
 import {
 	CHECK_INVENTORY,
 	FETCH_ALL_BIDDERS,
-	GET_SETUP_STATUS
+	GET_SETUP_STATUS,
+	ADD_BIDDER,
+	UPDATE_BIDDER
 } from '../../constants/headerBidding';
 
 const defaultState = { inventoryFound: null, bidders: null, setupStatus: null };
@@ -32,6 +34,30 @@ export default function(state = defaultState, action) {
 			return {
 				...state,
 				setupStatus
+			};
+		}
+		case ADD_BIDDER: {
+			const { bidderKey, bidderConfig } = action;
+			const bidders = { ...state.bidders };
+
+			delete bidders.notAddedBidders[bidderKey];
+			if (!bidders.addedBidders) bidders.addedBidders = {};
+			bidders.addedBidders[bidderKey] = bidderConfig;
+
+			return {
+				...state,
+				bidders
+			};
+		}
+		case UPDATE_BIDDER: {
+			const { bidderKey, bidderConfig } = action;
+			const bidders = { ...state.bidders };
+
+			bidders.addedBidders[bidderKey] = bidderConfig;
+
+			return {
+				...state,
+				bidders
 			};
 		}
 		default:

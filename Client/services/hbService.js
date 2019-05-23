@@ -11,3 +11,11 @@ export function fetchBiddersList(siteId) {
 export function getSetupStatus(siteId) {
 	return axiosInstance.get(`/headerBidding/setupStatus/${siteId}`);
 }
+
+export function addBidder(siteId, bidderConfig, params) {
+	return axiosInstance.post(`/headerBidding/bidder/${siteId}`, { bidderConfig, params });
+}
+
+export function updateBidder(siteId, bidderConfig, params) {
+	return axiosInstance.put(`/headerBidding/bidder/${siteId}`, { bidderConfig, params });
+}
