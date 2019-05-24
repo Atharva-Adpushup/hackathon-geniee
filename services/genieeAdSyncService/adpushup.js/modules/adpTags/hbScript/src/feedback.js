@@ -39,7 +39,12 @@ var config = require('./config'),
 					containerId: slot.containerId,
 					type: slot.type,
 					url: window.location.href,
-					bids: [],
+					bids: [
+						{
+							bidder: slot.feedback.winner || config.DEFAULT_WINNER,
+							revenue: slot.feedback.winningRevenue || 0
+						}
+					],
 					winner: slot.feedback.winner || config.DEFAULT_WINNER,
 					winningRevenue: slot.feedback.winningRevenue || 0,
 					winnerAdUnitId: slot.feedback.winnerAdUnitId || null,
