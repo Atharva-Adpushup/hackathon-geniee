@@ -51,14 +51,14 @@ class AdElement extends Component {
 
 	disableAd() {
 		const { isActive } = this.state;
-		const { ad, archiveAd, user, match } = this.props;
+		const { ad, archiveAd, user, siteId } = this.props;
 		const message = isActive
 			? 'Are you sure you want to archive this ad?'
 			: 'Are you sure you want to unarchive this ad?';
 		if (window.confirm(message)) {
 			archiveAd(
 				ad.id,
-				match.params.siteId,
+				siteId,
 				{
 					format: ad.formatData.format,
 					platform: ad.formatData.platform,
@@ -108,7 +108,7 @@ class AdElement extends Component {
 	}
 
 	editTraffic() {
-		const { ad, meta, modalToggle, updateTraffic, user, channels } = this.props;
+		const { ad, meta, modalToggle, updateTraffic, user, channels, siteId } = this.props;
 		const hasPagegroups = !!(ad.pagegroups && ad.pagegroups.length);
 
 		let body = <p>Custom Traffic Edit would be here</p>;
@@ -126,6 +126,7 @@ class AdElement extends Component {
 					updateWrapper={this.updateWrapper}
 					onCancel={modalToggle}
 					isSuperUser={this.isSuperUser}
+					siteId={siteId}
 				/>
 			);
 		}
@@ -137,10 +138,8 @@ class AdElement extends Component {
 	}
 
 	updateWrapper(data) {
-		const { user, ad, updateAd, modifyAdOnServer, match } = this.props;
-		return user.isSuperUser
-			? updateAd(ad.id, data)
-			: modifyAdOnServer(ad.id, match.params.siteId, data);
+		const { user, ad, updateAd, modifyAdOnServer, siteId } = this.props;
+		return user.isSuperUser ? updateAd(ad.id, siteId, data) : modifyAdOnServer(ad.id, siteId, data);
 	}
 
 	userActionsHandler(action) {

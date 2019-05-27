@@ -30,8 +30,10 @@ function makeFirstLetterCapitalize(word) {
 }
 
 function copyToClipBoard(content, message = 'Successfully Copied') {
+	const toAlert = typeof message === 'string' ? message : 'Successfully Copied';
+
 	clipboard.writeText(content);
-	window.alert(message);
+	window.alert(toAlert);
 }
 
 function formatDate(date) {

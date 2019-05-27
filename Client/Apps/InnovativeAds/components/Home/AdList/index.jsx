@@ -203,7 +203,8 @@ class AdList extends Component {
 			updateTraffic,
 			user,
 			channels,
-			match
+			match,
+			siteId
 		} = this.props;
 		const { show, modalData, filters } = this.state;
 		const HEADERS = user.isSuperUser ? OPS_AD_LIST_HEADERS : USER_AD_LIST_HEADERS;
@@ -250,6 +251,7 @@ class AdList extends Component {
 									archiveAd={archiveAd}
 									updateTraffic={updateTraffic}
 									match={match}
+									siteId={siteId}
 								/>
 							)
 							// ) : null
