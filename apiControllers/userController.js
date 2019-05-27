@@ -292,7 +292,7 @@ router
 			.then(users => {
 				let response = [];
 				if (users && Array.isArray(users) && users.length) {
-					response = users.filter(user => CC.EMAIL_REGEX.test(user));
+					response = users.filter(user => CC.EMAIL_REGEX.test(user.email));
 				}
 				return sendSuccessResponse(
 					{
