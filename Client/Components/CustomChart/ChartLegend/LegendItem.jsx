@@ -75,7 +75,7 @@ class LegendItem extends Component {
 				<div className="name">{legend.name}</div>
 				<div className="total">
 					{legend.type === 'money' ? '$' : ''}
-					{Math.round(legend.total * 100) / 100 || 'N/A'}
+					{legend.total >= 0 ? Math.round(legend.total * 100) / 100 : 'N/A'}
 				</div>
 			</div>
 		);

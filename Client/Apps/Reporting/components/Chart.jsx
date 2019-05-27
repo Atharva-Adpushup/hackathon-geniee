@@ -13,6 +13,7 @@ class Chart extends React.Component {
 		startDate: this.props.startDate,
 		endDate: this.props.endDate,
 		selectedDimension: this.props.selectedDimension,
+		selectedInterval: this.props.selectedInterval,
 		legends: displayMetrics,
 		activeLegendItems: this.props.selectedDimension ? activeLegendItem : activeLegendItems,
 		series: [],
@@ -20,16 +21,30 @@ class Chart extends React.Component {
 	};
 
 	enumerateDaysBetweenDates = () => {
-		const { startDate, endDate, xAxis } = this.state;
+		const { startDate, endDate, xAxis, selectedInterval } = this.state;
 		const dates = [];
 
 		const currDate = moment(startDate).startOf('day');
 		const lastDate = moment(endDate).startOf('day');
 
-		while (currDate.diff(lastDate) <= 0) {
-			console.log(currDate.toDate());
-			dates.push(currDate.clone().format('YYYY-MM-DD'));
-			currDate.add(1, 'days');
+		switch (selectedInterval) {
+			default:
+			case 'daily':
+				while (currDate.diff(lastDate) <= 0) {
+					dates.push(currDate.clone().format('ll'));
+					currDate.add(1, 'days');
+				}
+				break;
+			case 'monthly':
+				while (currDate.diff(lastDate, 'months') <= 0) {
+					dates.push(currDate.format('MMM, YYYY'));
+					console.log(currDate.format('MMM, YYYY'));
+					currDate.add(1, 'month');
+				}
+				break;
+			case 'cumulative':
+				dates.push(currDate.format('ll') + ' to ' + lastDate.format('ll'));
+				break;
 		}
 
 		xAxis.categories = dates;
@@ -38,7 +53,7 @@ class Chart extends React.Component {
 
 	componentDidUpdate(prevProps) {
 		if (prevProps.tableData !== this.props.tableData) {
-			const { tableData, selectedDimension } = this.props;
+			const { tableData, selectedDimension, selectedInterval, startDate, endDate } = this.props;
 			let { legends } = this.state;
 			if (tableData.result && tableData.result.length > 0) {
 				const totalRow = tableData.total;
@@ -49,8 +64,11 @@ class Chart extends React.Component {
 			this.setState(
 				{
 					legends,
-					tableData: tableData,
-					selectedDimension: selectedDimension,
+					tableData,
+					selectedDimension,
+					selectedInterval,
+					startDate,
+					endDate,
 					activeLegendItems: selectedDimension ? activeLegendItem : activeLegendItems
 				},
 				() => {
@@ -84,16 +102,11 @@ class Chart extends React.Component {
 				const groupByResult = groupBy(rows, row => row[selectedDimension]);
 				activeLegendItems = activeLegendItem || activeLegendItems;
 				for (const results in groupByResult) {
+					const { valueType } = metrics[activeLegendItems.value];
 					const serie = {
 						data: [],
 						name: results,
-						value: results,
-						tooltip: {
-							enabled: true,
-							formatter: function() {
-								return '$' + this.y;
-							}
-						}
+						valueType
 					};
 					groupByResult[results] = sortBy(groupByResult[results], result => result.date);
 					for (let i = 0; i < xAxis.categories.length; i++) {
@@ -117,14 +130,12 @@ class Chart extends React.Component {
 					});
 				});
 				for (let col in groupByResult) {
-					const displayName = metrics[col]['display_name'];
+					const { display_name, valueType } = metrics[col];
 					let serie = {
-						name: displayName,
+						name: display_name,
 						value: col,
 						data: groupByResult[col],
-						tooltip: {
-							format: '${value}'
-						}
+						valueType
 					};
 					series.push(serie);
 				}
@@ -134,21 +145,23 @@ class Chart extends React.Component {
 	};
 
 	render() {
-		const { type, series, xAxis, legends, activeLegendItems } = this.state;
+		const { type, series, xAxis, legends, activeLegendItems, tableData } = this.state;
 		const { selectedDimension } = this.props;
-		return (
-			<div>
-				<CustomChart
-					type={type}
-					series={series}
-					xAxis={xAxis}
-					legends={legends}
-					activeLegendItems={activeLegendItems}
-					updateChartData={this.updateChartData}
-					yAxisGroups={selectedDimension ? [] : apLineChartConfig.defaultYAxisGroups}
-				/>
-			</div>
-		);
+		if (tableData && tableData.result && tableData.result.length > 0)
+			return (
+				<div>
+					<CustomChart
+						type={type}
+						series={series}
+						xAxis={xAxis}
+						legends={legends}
+						activeLegendItems={activeLegendItems}
+						updateChartData={this.updateChartData}
+						yAxisGroups={selectedDimension ? [] : apLineChartConfig.defaultYAxisGroups}
+					/>
+				</div>
+			);
+		else return '';
 	}
 }
 

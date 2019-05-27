@@ -17,6 +17,7 @@ class Control extends Component {
 		this.state = {
 			dimensionList: convertObjToArr(dimension),
 			filterList: convertObjToArr(props.filter),
+			intervalList: convertObjToArr(props.interval),
 			metricsList: [
 				{ value: 'Overview', isSelected: true },
 				{ value: 'Layout Editor', isDisabled: true },
@@ -26,6 +27,7 @@ class Control extends Component {
 			startDate: props.startDate,
 			endDate: props.endDate,
 			selectedDimension: props.selectedDimension || '',
+			selectedInterval: props.selectedInterval || '',
 			selectedMetrics: props.selectedMetrics,
 			selectedFilters: props.selectedFilters || {},
 			disableGenerateButton: false
@@ -79,14 +81,22 @@ class Control extends Component {
 	};
 
 	generateButtonHandler = () => {
-		const { startDate, endDate, selectedDimension, selectedFilters, selectedMetrics } = this.state;
+		const {
+			startDate,
+			endDate,
+			selectedDimension,
+			selectedInterval,
+			selectedFilters,
+			selectedMetrics
+		} = this.state;
 		const { generateButtonHandler } = this.props;
 		generateButtonHandler({
 			startDate,
 			endDate,
 			selectedDimension,
 			selectedFilters,
-			selectedMetrics
+			selectedMetrics,
+			selectedInterval
 		});
 		// this.setState({
 		// 	disableGenerateButton: true
@@ -163,6 +173,20 @@ class Control extends Component {
 							selectedFilters={state.selectedFilters}
 							onFilterValueChange={this.onFilterValueChange}
 							getSelectedFilter={this.getSelectedFilter}
+						/>
+						{/* eslint-enable */}
+					</div>
+					<div className="aligner-item u-margin-r4">
+						{/* eslint-disable */}
+						<label className="u-text-normal">Interval</label>
+						<Selectbox
+							isClearable={false}
+							isSearchable={false}
+							selected={state.selectedInterval || ''}
+							options={state.intervalList}
+							onSelect={selectedInterval => {
+								this.setState({ selectedInterval });
+							}}
 						/>
 						{/* eslint-enable */}
 					</div>
