@@ -24,7 +24,9 @@
 				if (cookie.match(/user=/)) {
 					// If current user cookie is not equal to original user cookie then reload
 					if (originalCookie && originalCookie !== cookie) {
-						return window.location.reload();
+						var url = window.location.origin + '/dashboard';
+						window.location.href = url;
+						return true;
 					}
 					// If original user cookie not found
 					// First time on the webpage
