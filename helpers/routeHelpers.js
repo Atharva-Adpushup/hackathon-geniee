@@ -208,19 +208,24 @@ function fetchStatusesFromReporting(site) {
 	const options = {
 		method: 'GET',
 		uri: PRODUCT_LIST_API,
-		qs: { siteId: site.get('siteId') },
+		qs: { siteid: site.get('siteId') },
 		json: true
 	};
 
 	return request(options)
 		.then(response => {
-			const { data } = response;
-			const { products = [] } = data;
+			const { data = {}, code } = response;
 			const output = {};
 
-			_.forEach(products, product => {
-				const { key } = product;
-				key ? (output[key] = APP_KEYS[key]) : null;
+			if (!code || code !== 1) {
+				throw new Error(`APP Status API Failed and err is ${data}`);
+			}
+
+			_.forEach(data, (isActive, product) => {
+				if (isActive) {
+					const productInfo = APP_KEYS[product.toLowerCase()];
+					output[productInfo.key] = productInfo;
+				}
 			});
 			return output;
 		})
