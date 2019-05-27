@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import React, { Component } from 'react';
@@ -53,10 +54,8 @@ class AdElement extends Component {
 	}
 
 	updateWrapper(data) {
-		const { updateAd, modifyAdOnServer, user, ad, match } = this.props;
-		return user.isSuperUser
-			? updateAd(ad.id, data)
-			: modifyAdOnServer(match.params.siteId, ad.id, data);
+		const { updateAd, modifyAdOnServer, user, ad, siteId } = this.props;
+		return user.isSuperUser ? updateAd(ad.id, siteId, data) : modifyAdOnServer(siteId, ad.id, data);
 	}
 
 	renderInformation = (label, value) => (
@@ -66,7 +65,7 @@ class AdElement extends Component {
 	);
 
 	renderAdDetails() {
-		const { ad, updateAd, networkConfig, user } = this.props;
+		const { ad, updateAd, networkConfig, user, siteId } = this.props;
 		const { showLazyload, showNetworkDetails, editName, isActive } = this.state;
 		const isAMP = ad.formatData.type === 'amp';
 
@@ -77,6 +76,7 @@ class AdElement extends Component {
 			return (
 				<AdNetworkDetails
 					ad={ad}
+					siteId={siteId}
 					onCancel={() => this.toggleHandler('showNetworkDetails')}
 					onSubmit={updateAd}
 					networkConfig={networkConfig}
@@ -102,7 +102,7 @@ class AdElement extends Component {
 				<LazyLoadSettings
 					checked={ad.enableLazyLoading}
 					id={ad.id}
-					onChange={payload => updateAd(ad.id, payload)}
+					onChange={payload => updateAd(ad.id, siteId, payload)}
 					onCancel={() => this.toggleHandler('showLazyload')}
 				/>
 			);

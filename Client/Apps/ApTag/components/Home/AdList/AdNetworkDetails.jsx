@@ -8,7 +8,7 @@ class AdNetworkDetails extends Component {
 	}
 
 	submitHanlder(networkInfo) {
-		const { ad, onSubmit, onCancel } = this.props;
+		const { ad, onSubmit, onCancel, siteId } = this.props;
 		const dataObject = {
 			network: networkInfo.network,
 			networkData:
@@ -27,7 +27,7 @@ class AdNetworkDetails extends Component {
 		}
 		delete networkData.multipleAdSizes;
 		delete networkData.isBackwardCompatibleSizes;
-		onSubmit(ad.id, dataObject);
+		onSubmit(ad.id, siteId, dataObject);
 		onCancel();
 	}
 

@@ -7,8 +7,16 @@ const createAd = params => dispatch =>
 		.post('/apTag/createAd', params)
 		.then(response => {
 			const { data } = response.data;
-			dispatch({ type: AD_ACTIONS.UPDATE_ADS_LIST, data: { ...params.ad, id: data.id } });
-			return dispatch({ type: GLOBAL_ACTIONS.SET_CURRENT_AD, currentAd: data.id });
+			dispatch({
+				type: AD_ACTIONS.UPDATE_ADS_LIST,
+				data: { ...params.ad, id: data.id },
+				siteId: params.siteId
+			});
+			return dispatch({
+				type: GLOBAL_ACTIONS.SET_CURRENT_AD,
+				currentAd: data.id,
+				siteId: params.siteId
+			});
 		})
 		.catch(err => errorHandler(err, 'Ad Creation Failed. Please contact AdPushup Operations Team'));
 
@@ -17,23 +25,24 @@ const fetchAds = params => dispatch =>
 		.get('/apTag/fetchAds', { params })
 		.then(response => {
 			const { data } = response.data;
-			return dispatch({ type: AD_ACTIONS.REPLACE_ADS_LIST, data: data.ads });
+			return dispatch({ type: AD_ACTIONS.REPLACE_ADS_LIST, data: data.ads, siteId: params.siteId });
 		})
 		.catch(err => errorHandler(err, 'Ad Fetching Failed'));
 
 const deleteAd = params => dispatch =>
 	axiosInstance
 		.post('/apTag/deleteAd', { params })
-		.then(() => dispatch({ type: AD_ACTIONS.DELETE_AD, adId: params.adId }))
+		.then(() => dispatch({ type: AD_ACTIONS.DELETE_AD, adId: params.adId, siteId: params.siteId }))
 		.catch(err => errorHandler(err, 'Ad Deletion Failed'));
 
-const updateAd = (adId, data) => dispatch =>
+const updateAd = (adId, siteId, data) => dispatch =>
 	dispatch({
 		type: AD_ACTIONS.UPDATE_AD,
 		data: {
 			id: adId,
 			updateThis: data
-		}
+		},
+		siteId
 	});
 
 const modifyAdOnServer = (siteId, adId, data) => dispatch =>
@@ -45,7 +54,8 @@ const modifyAdOnServer = (siteId, adId, data) => dispatch =>
 				data: {
 					id: adId,
 					updateThis: data
-				}
+				},
+				siteId
 			})
 		)
 		.catch(err => errorHandler(err));

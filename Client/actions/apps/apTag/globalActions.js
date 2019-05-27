@@ -2,16 +2,24 @@
 import { GLOBAL_ACTIONS } from '../../../constants/apTag';
 import axiosInstance from '../../../helpers/axiosInstance';
 import { errorHandler } from '../../../helpers/commonFunctions';
+import { getAdsAndGlobal } from '../../../Apps/ApTag/lib/helpers';
 
 const masterSave = siteId => (_, getState) => {
-	const data = { siteId, ads: getState().apps.apTag.ads.content };
+	const { ads } = getAdsAndGlobal(getState(), {
+		match: {
+			params: {
+				siteId
+			}
+		}
+	});
+	const data = { siteId, ads: ads.content };
 	return axiosInstance
 		.post('/apTag/masterSave', data)
 		.then(() => window.alert('Save successful'))
 		.catch(err => errorHandler(err, 'Master Save Failed'));
 };
 
-const resetCurrentAd = () => dispatch =>
-	dispatch({ type: GLOBAL_ACTIONS.SET_CURRENT_AD, currentAd: null });
+const resetCurrentAd = siteId => dispatch =>
+	dispatch({ type: GLOBAL_ACTIONS.SET_CURRENT_AD, currentAd: null, siteId });
 
 export { masterSave, resetCurrentAd };
