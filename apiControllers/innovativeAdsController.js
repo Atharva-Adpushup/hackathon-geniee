@@ -91,7 +91,16 @@ const fn = {
 			.getDoc(`${key}${req.body.siteId}`)
 			.then(docWithCas => processing(docWithCas))
 			.then(() => emitEventAndSendResponse(req.body.siteId, res))
-			.catch(err => errorHandler(err, res))
+			.catch(err => {
+				let error = err;
+				if (err && err.code && err.code === 13) {
+					error = new AdPushupError({
+						message: 'No Doc Found',
+						code: HTTP_STATUS.BAD_REQUEST
+					});
+				}
+				return errorHandler(error, res);
+			})
 };
 
 router
