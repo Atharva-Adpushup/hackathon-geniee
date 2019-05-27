@@ -104,8 +104,19 @@ function getGroupedYAxisAndSeries(chartType, yAxisGroups, existingSeries) {
 						...existingSeries[index],
 						yAxis: i,
 						tooltip: {
-							enabled: true,
-							format: '${value}'
+							pointFormatter: function() {
+								var point = this;
+								return (
+									'<span style="color:' +
+									point.color +
+									'">\u25CF</span> ' +
+									point.series.name +
+									': <b>' +
+									(point.series.userOptions.valueType === 'money' ? '$' : '') +
+									point.y +
+									'</b><br/>'
+								);
+							}
 						}
 					};
 
@@ -118,7 +129,7 @@ function getGroupedYAxisAndSeries(chartType, yAxisGroups, existingSeries) {
 
 		if (yAxisGroupNameArray.length) {
 			yAxisGroupForChart.title = { text: yAxisGroupNameArray.join(' / ') };
-			yAxisGroupForChart.tickPositioner = tickPositioner;
+			//yAxisGroupForChart.tickPositioner = tickPositioner;
 			yAxisGroupForChart.index = i;
 			yAxisGroupForChart.opposite = i > 0;
 
@@ -174,6 +185,21 @@ export function getCustomChartConfig(
 			for (i = 0; i < len1; i += 1) {
 				const singleSeries = series[i];
 				singleSeries.visible = true;
+				singleSeries.tooltip = {
+					pointFormatter: function() {
+						var point = this;
+						return (
+							'<span style="color:' +
+							point.color +
+							'">\u25CF</span> ' +
+							point.series.name +
+							': <b>' +
+							(point.series.userOptions.valueType === 'money' ? '$' : '') +
+							point.y +
+							'</b><br/>'
+						);
+					}
+				};
 			}
 		}
 	} else if (chartConfig.series && chartConfig.series.length) {
@@ -237,18 +263,6 @@ export function getCustomChartConfig(
 					chartConfig.yAxis = yAxis;
 					chartConfig.series = seriesForChart;
 				}
-				chartConfig = {
-					...chartConfig,
-					plotOptions: {
-						...chartConfig.plotOptions,
-						spline: {
-							...chartConfig.plotOptions.pie,
-							tooltip: {
-								format: '${value}'
-							}
-						}
-					}
-				};
 
 				break;
 			} else if (
@@ -290,6 +304,5 @@ export function getCustomChartConfig(
 			break;
 		}
 	}
-
 	return chartConfig;
 }

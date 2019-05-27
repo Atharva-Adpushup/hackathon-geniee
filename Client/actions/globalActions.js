@@ -46,6 +46,7 @@ const fetchGlobalData = () => dispatch =>
 				analyticsMetaInfo.site = metaData.site;
 				analyticsMetaInfo.filter = metaData.filter;
 				analyticsMetaInfo.dimension = metaData.dimension;
+				analyticsMetaInfo.interval = metaData.interval;
 			}
 			dispatch({
 				type: REPORTS_ACTIONS.REPLACE_REPORTS_DATA,

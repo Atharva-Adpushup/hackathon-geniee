@@ -48,11 +48,11 @@ class Panel extends Component {
 			responseData: null,
 			networkWiseData: false,
 			startDate: moment()
-				.subtract(20, 'days')
+				.subtract(8, 'days')
 				.startOf('day'),
 			endDate: moment()
 				.startOf('day')
-				.subtract(15, 'day'),
+				.subtract(1, 'day'),
 			tableData: {}
 		};
 	}
@@ -88,7 +88,7 @@ class Panel extends Component {
 	};
 
 	formateReportParams = data => {
-		const { startDate, endDate, selectedDimension, selectedFilters } = data;
+		const { startDate, endDate, selectedDimension, selectedFilters, selectedInterval } = data;
 		const selectedMetrics = displayMetrics.map(metric => metric.value);
 		const params = {
 			fromDate: moment(startDate).format('YYYY-MM-DD'),
@@ -100,7 +100,7 @@ class Panel extends Component {
 			params[filter] = filters.length > 0 ? filters.toString() : null;
 		}
 		params.metrics = selectedMetrics.toString();
-		params.interval = 'daily';
+		params.interval = selectedInterval || 'daily';
 		return params;
 	};
 
@@ -128,6 +128,7 @@ class Panel extends Component {
 			selectedDimension,
 			selectedFilters,
 			selectedMetrics,
+
 			selectedInterval,
 			activeProductDetails,
 			tableData
@@ -144,6 +145,7 @@ class Panel extends Component {
 						selectedDimension={selectedDimension}
 						selectedFilters={selectedFilters}
 						selectedMetrics={selectedMetrics}
+						selectedInterval={selectedInterval}
 					/>
 				</Col>
 				<Col sm={12} className="u-margin-t5">
@@ -152,6 +154,7 @@ class Panel extends Component {
 						selectedDimension={selectedDimension}
 						startDate={startDate}
 						endDate={endDate}
+						selectedInterval={selectedInterval}
 					/>
 				</Col>
 				<Col sm={12} className="u-margin-t5">
@@ -165,7 +168,6 @@ class Panel extends Component {
 		const { redirectUrl } = this.state;
 		const activeTab = this.getActiveTab();
 		const activeItem = REPORTS_NAV_ITEMS[activeTab];
-		console.log(activeTab, activeItem);
 		if (redirectUrl) {
 			return <Redirect to={{ pathname: redirectUrl }} />;
 		}
