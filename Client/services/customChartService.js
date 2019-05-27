@@ -102,7 +102,22 @@ function getGroupedYAxisAndSeries(chartType, yAxisGroups, existingSeries) {
 						},
 						_colorIndex: colorIndex,
 						...existingSeries[index],
-						yAxis: i
+						yAxis: i,
+						tooltip: {
+							pointFormatter: function() {
+								var point = this;
+								return (
+									'<span style="color:' +
+									point.color +
+									'">\u25CF</span> ' +
+									point.series.name +
+									': <b>' +
+									(point.series.userOptions.valueType === 'money' ? '$' : '') +
+									point.y +
+									'</b><br/>'
+								);
+							}
+						}
 					};
 
 					seriesForChart.push(singleSeries);
@@ -114,7 +129,7 @@ function getGroupedYAxisAndSeries(chartType, yAxisGroups, existingSeries) {
 
 		if (yAxisGroupNameArray.length) {
 			yAxisGroupForChart.title = { text: yAxisGroupNameArray.join(' / ') };
-			yAxisGroupForChart.tickPositioner = tickPositioner;
+			//yAxisGroupForChart.tickPositioner = tickPositioner;
 			yAxisGroupForChart.index = i;
 			yAxisGroupForChart.opposite = i > 0;
 
@@ -149,23 +164,42 @@ export function getCustomChartConfig(
 		...customConfig
 	};
 
-	if (
-		activeLegendItems &&
-		activeLegendItems.length &&
-		chartConfig.series &&
-		chartConfig.series.length
-	) {
-		let i;
-		const len1 = series.length;
-		for (i = 0; i < len1; i += 1) {
-			const singleSeries = series[i];
+	if (activeLegendItems && chartConfig.series && chartConfig.series.length) {
+		if (Array.isArray(activeLegendItems)) {
+			let i;
+			const len1 = series.length;
+			for (i = 0; i < len1; i += 1) {
+				const singleSeries = series[i];
 
-			let j;
-			const len2 = activeLegendItems.length;
-			for (j = 0; j < len2; j += 1) {
-				const activeLegendItem = activeLegendItems[j];
-				singleSeries.visible = singleSeries.name === activeLegendItem;
-				if (singleSeries.name === activeLegendItem) break;
+				let j;
+				const len2 = activeLegendItems.length;
+				for (j = 0; j < len2; j += 1) {
+					const activeLegendItem = activeLegendItems[j];
+					singleSeries.visible = singleSeries.value === activeLegendItem.value;
+					if (singleSeries.value === activeLegendItem.value) break;
+				}
+			}
+		} else {
+			let i;
+			const len1 = series.length;
+			for (i = 0; i < len1; i += 1) {
+				const singleSeries = series[i];
+				singleSeries.visible = true;
+				singleSeries.tooltip = {
+					pointFormatter: function() {
+						var point = this;
+						return (
+							'<span style="color:' +
+							point.color +
+							'">\u25CF</span> ' +
+							point.series.name +
+							': <b>' +
+							(point.series.userOptions.valueType === 'money' ? '$' : '') +
+							point.y +
+							'</b><br/>'
+						);
+					}
+				};
 			}
 		}
 	} else if (chartConfig.series && chartConfig.series.length) {
@@ -173,7 +207,6 @@ export function getCustomChartConfig(
 		const len1 = series.length;
 		for (i = 0; i < len1; i += 1) {
 			const singleSeries = series[i];
-
 			singleSeries.visible = true;
 		}
 	}
@@ -198,6 +231,13 @@ export function getCustomChartConfig(
 					chartConfig.series = seriesForChart;
 				}
 
+				break;
+			} else if (
+				!Array.isArray(activeLegendItems) &&
+				chartConfig.series &&
+				chartConfig.series.length
+			) {
+				chartConfig.yAxis = { title: activeLegendItems.name };
 				break;
 			}
 
@@ -224,6 +264,13 @@ export function getCustomChartConfig(
 					chartConfig.series = seriesForChart;
 				}
 
+				break;
+			} else if (
+				!Array.isArray(activeLegendItems) &&
+				chartConfig.series &&
+				chartConfig.series.length
+			) {
+				chartConfig.yAxis = { title: activeLegendItems.name };
 				break;
 			}
 
@@ -257,6 +304,5 @@ export function getCustomChartConfig(
 			break;
 		}
 	}
-
 	return chartConfig;
 }

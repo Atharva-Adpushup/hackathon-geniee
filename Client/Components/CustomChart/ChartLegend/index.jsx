@@ -3,22 +3,23 @@ import PropTypes from 'prop-types';
 import { Row } from 'react-bootstrap';
 import LegendItem from './LegendItem';
 
-const ChartLegend = ({ chart: { series }, legends, activeLegendItems }) => (
+const ChartLegend = ({ chart: { series }, legends, activeLegendItems, updateChartData }) => (
 	<div className="text-center chart-legend u-margin-v3">
-		{series.map((serie, key) => (
+		{legends.map((legend, key) => (
 			<LegendItem
 				key={key}
-				serie={serie}
-				legend={legends[serie.name]}
+				legend={legend}
 				activeLegendItems={activeLegendItems}
+				updateChartData={updateChartData}
+				series={series}
 			/>
 		))}
 	</div>
 );
 
-ChartLegend.propTypes = {
-	chart: PropTypes.shape({ series: PropTypes.arrayOf(PropTypes.object).isRequired }).isRequired,
-	activeLegendItems: PropTypes.arrayOf(PropTypes.string).isRequired
-};
+// ChartLegend.propTypes = {
+// 	chart: PropTypes.shape({ series: PropTypes.arrayOf(PropTypes.object).isRequired }).isRequired,
+// 	activeLegendItems: PropTypes.arrayOf(PropTypes.string).isRequired
+// };
 
 export default ChartLegend;

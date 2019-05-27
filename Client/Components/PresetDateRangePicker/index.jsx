@@ -96,7 +96,7 @@ class DateRangePickerWrapper extends React.Component {
 	constructor(props) {
 		super(props);
 
-		let focusedInput = null;
+		const focusedInput = null;
 
 		this.state = {
 			focusedInput,
@@ -110,6 +110,7 @@ class DateRangePickerWrapper extends React.Component {
 	}
 
 	onDatesChange({ startDate, endDate }) {
+		this.props.datesUpdated({ startDate, endDate });
 		this.setState({ startDate, endDate });
 	}
 
@@ -166,11 +167,11 @@ class DateRangePickerWrapper extends React.Component {
 					focusedInput={focusedInput}
 					startDate={startDate}
 					endDate={endDate}
-					showDefaultInputIcon={true}
-					hideKeyboardShortcutsPanel={true}
-					showClearDates={true}
+					showDefaultInputIcon
+					hideKeyboardShortcutsPanel
+					showClearDates
 					minimumNights={0}
-					displayFormat={'DD-MM-YYYY'}
+					displayFormat="DD-MM-YYYY"
 					isOutsideRange={() => {}}
 				/>
 			</div>

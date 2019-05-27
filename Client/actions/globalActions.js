@@ -44,6 +44,9 @@ const fetchGlobalData = () => dispatch =>
 				analyticsMetaInfo.dashboard = { widget: metaData.dashboard.widget };
 				analyticsMetaInfo.metrics = metaData.metrics;
 				analyticsMetaInfo.site = metaData.site;
+				analyticsMetaInfo.filter = metaData.filter;
+				analyticsMetaInfo.dimension = metaData.dimension;
+				analyticsMetaInfo.interval = metaData.interval;
 			}
 			dispatch({
 				type: REPORTS_ACTIONS.REPLACE_REPORTS_DATA,
