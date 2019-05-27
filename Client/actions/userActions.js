@@ -17,7 +17,8 @@ export const switchUser = email => dispatch =>
 			dispatch({
 				type: USER_ACTIONS.RESET_STATE
 			});
-			return window.location.reload();
+			return true;
+			// return window.location.reload();
 		})
 		.catch(() => window.alert('User Switch Failed'));
 export const signupAction = user => () =>
