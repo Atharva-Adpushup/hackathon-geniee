@@ -7,8 +7,8 @@ import Loader from '../../../../../Components/Loader';
 
 class AdList extends Component {
 	componentDidMount() {
-		const { loading, fetchAds, match } = this.props;
-		if (loading) fetchAds({ siteId: match.params.siteId });
+		const { loading, fetchAds, siteId } = this.props;
+		if (loading) fetchAds({ siteId });
 	}
 
 	render() {
@@ -20,7 +20,7 @@ class AdList extends Component {
 			modifyAdOnServer,
 			user,
 			networkConfig,
-			match
+			siteId
 		} = this.props;
 		const customStyle = user.isSuperUser ? { minHeight: '540px' } : { minHeight: '440px' };
 
@@ -37,7 +37,7 @@ class AdList extends Component {
 						<CustomButton
 							variant="primary"
 							className="u-margin-t3 u-margin-r2 pull-right"
-							onClick={() => masterSave(match.params.siteId, user.isSuperUser)}
+							onClick={() => masterSave(siteId, user.isSuperUser)}
 						>
 							Master Save
 						</CustomButton>
@@ -56,6 +56,7 @@ class AdList extends Component {
 									updateAd={updateAd}
 									modifyAdOnServer={modifyAdOnServer}
 									networkConfig={networkConfig}
+									siteId={siteId}
 								/>
 							</li>
 						</div>

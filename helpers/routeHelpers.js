@@ -48,8 +48,9 @@ function verifyOwner(siteId, userEmail) {
 function errorHandler(err, res, code = HTTP_STATUS.BAD_REQUEST) {
 	const customMessage = err.message || err;
 	const errorCode = customMessage.code || code;
+	const message = customMessage.message || 'Opertion Failed';
 	console.log(err);
-	return sendErrorResponse({ message: 'Opertion Failed' }, res, errorCode);
+	return sendErrorResponse({ message, code: errorCode }, res, errorCode);
 }
 
 function sendDataToZapier(uri, data) {

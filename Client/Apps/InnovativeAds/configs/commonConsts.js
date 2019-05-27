@@ -243,6 +243,12 @@ const FORMAT_FILTER_OPTIONS = [
 		value: 'inView'
 	}
 ];
+const DEFAULT_ADS_RESPONSE = { fetched: false, content: [] };
+const DEFAULT_GLOBAL_RESPONSE = {
+	meta: { fetched: false, content: {} },
+	channels: [],
+	currentAd: null
+};
 
 export {
 	EVENTS,
@@ -265,5 +271,7 @@ export {
 	FORMAT_FILTER_OPTIONS,
 	IA_NAV_ITEMS,
 	IA_NAV_ITEMS_INDEXES,
-	IA_NAV_ITEMS_VALUES
+	IA_NAV_ITEMS_VALUES,
+	DEFAULT_ADS_RESPONSE,
+	DEFAULT_GLOBAL_RESPONSE
 };
