@@ -301,7 +301,7 @@ router
 			.then(users => {
 				let response = [];
 				if (users && Array.isArray(users) && users.length) {
-					response = users.map(user => CC.test(user));
+					response = users.filter(user => CC.test(user));
 				}
 				return sendSuccessResponse(
 					{
