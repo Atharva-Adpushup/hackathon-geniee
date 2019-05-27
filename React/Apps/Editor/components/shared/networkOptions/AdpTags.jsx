@@ -282,18 +282,19 @@ class AdpTags extends Component {
 			? <Row className="mT-10">
 					<Col xs={12} className={props.fromPanel ? 'u-padding-0px mB-10' : 'mB-10'}>
 						<SelectBox
-							value={this.state.dfpAdunitId}
-							label="Select a DFP AdUnit Id"
-							onChange={this.handleDFPAdUnitIdChange}
-						>
-							{Object.keys(props.dfpAdUnitObject).map((value, index) => {
-								return (
-									<option key={index} title={value} value={value}>
-										{value}
-									</option>
-								);
-							})}
-						</SelectBox>
+							id="dfp-id-selectbox"
+							title="Select a DFP AdUnit Id"
+							onSelect={this.handleDFPAdUnitIdChange}
+							wrapperClassName={"mb-10 u-margin-b2"}
+							options={Object.keys(props.dfpAdUnitObject).map((value, index) => {
+									return {
+										name: value,
+										value:value
+									}
+								}
+							)}
+							selected={this.state.dfpAdunitId}
+						/>
 					</Col>
 				</Row>
 			: null;
@@ -315,21 +316,22 @@ class AdpTags extends Component {
 					<strong>Override size to</strong>
 				</Col>
 				<Col xs={6} className={this.props.fromPanel ? 'u-padding-l10px' : ''}>
-					<SelectBox
-						className="size-override-selectbox"
-						value={this.state.overrideSizeTo}
-						label="Select size"
-						showClear={false}
-						onChange={overrideSizeTo => {
-							this.setState({ overrideSizeTo });
-						}}
-					>
-						{getSupportedAdSizes().map((size, index) => (
-							<option key={index} value={`${size.width}x${size.height}`}>
-								{`${size.width}x${size.height}`}
-							</option>
-						))}
-					</SelectBox>
+				<SelectBox
+					id="size-override-selectbox"
+					title="Select size"
+					onSelect={overrideSizeTo => {
+						this.setState({ overrideSizeTo });
+					}}
+					wrapperClassName={"mb-10 u-margin-b2"}
+					options={getSupportedAdSizes().map((size, index) => {
+							return {
+								name: `${size.width}x${size.height}`,
+								value:`${size.width}x${size.height}`
+							}
+						}
+					)}
+					selected={this.state.overrideSizeTo}
+				/>
 				</Col>
 			</Row>
 		);
