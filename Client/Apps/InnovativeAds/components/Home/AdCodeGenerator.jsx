@@ -174,7 +174,7 @@ class AdCodeGenerator extends Component {
 	}
 
 	resetHandler() {
-		const { resetCurrentAd } = this.props;
+		const { resetCurrentAd, siteId } = this.props;
 		this.setState(
 			{
 				progress: 0,
@@ -182,7 +182,7 @@ class AdCodeGenerator extends Component {
 				size: null,
 				loading: false
 			},
-			() => resetCurrentAd()
+			() => resetCurrentAd(siteId)
 		);
 	}
 

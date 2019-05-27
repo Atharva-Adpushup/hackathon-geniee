@@ -2,7 +2,7 @@
 import { AD_ACTIONS, GLOBAL_ACTIONS, API_PATHS } from '../../../constants/innovativeAds';
 import axiosInstance from '../../../helpers/axiosInstance';
 import { errorHandler } from '../../../helpers/commonFunctions';
-import { pagegroupFiltering } from '../../../Apps/InnovativeAds/lib/helpers';
+import { pagegroupFiltering, getAdsAndGlobal } from '../../../Apps/InnovativeAds/lib/helpers';
 
 const helpers = {
 	makeAPICall: (adId, siteId, isSuperUser, toUpdate, updatedLogs) => {
@@ -44,14 +44,16 @@ const helpers = {
 					data: {
 						id: adId,
 						updateThis: toUpdate
-					}
+					},
+					siteId
 				});
 				dispatch({
 					type: logType,
 					value: {
 						mode,
 						logs: updatedLogs
-					}
+					},
+					siteId
 				});
 				return true;
 			})
@@ -63,14 +65,19 @@ const createAd = params => dispatch =>
 		.post(API_PATHS.CREATE_AD, params)
 		.then(response => {
 			const { data } = response.data;
-			dispatch({ type: AD_ACTIONS.UPDATE_ADS_LIST, data: data.ads });
-			dispatch({ type: GLOBAL_ACTIONS.SET_CURRENT_AD, currentAd: data.ads[0].id });
+			dispatch({ type: AD_ACTIONS.UPDATE_ADS_LIST, data: data.ads, siteId: params.siteId });
+			dispatch({
+				type: GLOBAL_ACTIONS.SET_CURRENT_AD,
+				currentAd: data.ads[0].id,
+				siteId: params.siteId
+			});
 			return dispatch({
 				type: GLOBAL_ACTIONS.UPDATE_AD_TRACKING_LOGS,
 				value: {
 					mode: 'pagegroups',
 					logs: data.logs
-				}
+				},
+				siteId: params.siteId
 			});
 		})
 		.catch(err => errorHandler(err, 'Ad creation failed'));
@@ -79,7 +86,7 @@ const fetchAds = params => dispatch =>
 		.get(API_PATHS.FETCH_ADS, { params })
 		.then(response => {
 			const { data } = response.data;
-			return dispatch({ type: AD_ACTIONS.REPLACE_ADS_LIST, data: data.ads });
+			return dispatch({ type: AD_ACTIONS.REPLACE_ADS_LIST, data: data.ads, siteId: params.siteId });
 		})
 		.catch(err => errorHandler(err, 'Ad Fetching Failed'));
 const deleteAd = params => dispatch =>
@@ -89,13 +96,14 @@ const deleteAd = params => dispatch =>
 		}
 		return dispatch({ type: AD_ACTIONS.DELETE_AD, adId: params.adId });
 	});
-const updateAd = (adId, data) => dispatch =>
+const updateAd = (adId, siteId, data) => dispatch =>
 	dispatch({
 		type: AD_ACTIONS.UPDATE_AD,
 		data: {
 			id: adId,
 			updateThis: data
-		}
+		},
+		siteId
 	});
 const modifyAdOnServer = (adId, siteId, data) => dispatch =>
 	axiosInstance.post(API_PATHS.MODIFY_AD, { siteId, adId, data }).then(response => {
@@ -107,12 +115,17 @@ const modifyAdOnServer = (adId, siteId, data) => dispatch =>
 			data: {
 				id: adId,
 				updateThis: data
-			}
+			},
+			siteId
 		});
 	});
 const archiveAd = (adId, siteId, data, isSuperUser) => (dispatch, getState) => {
-	const { innovativeAds } = getState().apps;
-	const globalAdLogs = innovativeAds.global.meta.content.pagegroups;
+	const { global } = getAdsAndGlobal(getState(), {
+		match: {
+			params: { siteId }
+		}
+	});
+	const globalAdLogs = global.meta.content.pagegroups;
 	const { format, platform, pagegroups, isActive, archivedOn, networkData } = data;
 	const currentAdLogs = pagegroups.map(pg => `${platform}-${format}-${pg}`);
 	const mode = 'pagegroups';
@@ -130,10 +143,10 @@ const archiveAd = (adId, siteId, data, isSuperUser) => (dispatch, getState) => {
 			return Promise.resolve(false);
 		}
 		const { disabled } = pagegroupFiltering(
-			innovativeAds.global.channels,
+			global.channels,
 			platform,
 			format,
-			innovativeAds.global.meta.content,
+			global.meta.content,
 			false,
 			pagegroups
 		);
@@ -168,10 +181,14 @@ const updateTraffic = (
 	{ networkData, pagegroups, platform, format },
 	isSuperUser
 ) => (dispatch, getState) => {
-	const { innovativeAds } = getState().apps;
+	const { ads, global } = getAdsAndGlobal(getState(), {
+		match: {
+			params: { siteId }
+		}
+	});
 	const currentAdLogs = pagegroups.map(pg => `${platform}-${format}-${pg}`);
-	const globalAdLogs = innovativeAds.global.meta.content.pagegroups;
-	const currentAd = innovativeAds.ads.content.filter(ad => ad.id === adId)[0];
+	const globalAdLogs = global.meta.content.pagegroups;
+	const currentAd = ads.content.filter(ad => ad.id === adId)[0];
 	const currentPagegroups = currentAd.pagegroups;
 	const toRemove = currentPagegroups.map(
 		pg => `${currentAd.formatData.platform}-${currentAd.formatData.format}-${pg}`

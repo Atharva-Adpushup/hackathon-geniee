@@ -1,6 +1,10 @@
 /* eslint-disable no-alert */
 import clipboard from 'clipboard-polyfill';
-import { INTERACTIVE_ADS_TYPES } from '../configs/commonConsts';
+import {
+	INTERACTIVE_ADS_TYPES,
+	DEFAULT_ADS_RESPONSE,
+	DEFAULT_GLOBAL_RESPONSE
+} from '../configs/commonConsts';
 
 function makeFirstLetterCapitalize(word) {
 	return word.charAt(0).toUpperCase() + word.slice(1).replace(/([A-Z])/g, ' $1');
@@ -82,4 +86,20 @@ function pagegroupFiltering(
 	};
 }
 
-export { makeFirstLetterCapitalize, copyToClipBoard, pagegroupFiltering };
+function getAdsAndGlobal(state, props) {
+	const { innovativeAds } = state.apps;
+	const {
+		match: { params }
+	} = props;
+	const { siteId } = params;
+	const ads = innovativeAds.ads[siteId] || DEFAULT_ADS_RESPONSE;
+	const global = innovativeAds.global[siteId] || DEFAULT_GLOBAL_RESPONSE;
+
+	return {
+		siteId,
+		ads,
+		global
+	};
+}
+
+export { makeFirstLetterCapitalize, copyToClipBoard, pagegroupFiltering, getAdsAndGlobal };
