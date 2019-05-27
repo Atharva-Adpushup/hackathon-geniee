@@ -11,14 +11,9 @@ import {
 } from '../../configs/commonConsts';
 
 class Home extends Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			redirectUrl: ''
-		};
-		this.handleNavSelect = this.handleNavSelect.bind(this);
-		this.renderContent = this.renderContent.bind(this);
-	}
+	state = {
+		redirectUrl: ''
+	};
 
 	getActiveTab = () => {
 		const {

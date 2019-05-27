@@ -316,6 +316,10 @@ const IAB_SIZES = {
 		]
 	}
 };
+const DEFAULT_ADS_RESPONSE = { fetched: false, content: [] };
+const DEFAULT_GLOBAL_RESPONSE = {
+	currentAd: null
+};
 
 export {
 	PLATFORMS,
@@ -333,5 +337,7 @@ export {
 	PRICE_FLOOR_KEYS,
 	DEFAULT_PRICE_FLOOR_KEY,
 	PARTNERS,
-	IAB_SIZES
+	IAB_SIZES,
+	DEFAULT_ADS_RESPONSE,
+	DEFAULT_GLOBAL_RESPONSE
 };
