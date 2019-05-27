@@ -298,14 +298,18 @@ router
 	.get('/findUsers', (req, res) =>
 		appBucket
 			.queryDB('select email from AppBucket where meta().id like "user::%"')
-			.then(users =>
-				sendSuccessResponse(
+			.then(users => {
+				let response = [];
+				if (users && Array.isArray(users) && users.length) {
+					response = users.map(user => CC.test(user));
+				}
+				return sendSuccessResponse(
 					{
-						users
+						users: response
 					},
 					res
-				)
-			)
+				);
+			})
 			.catch(err => errorHandler(err, res))
 	)
 	.post('/switchUser', (req, res) => {
