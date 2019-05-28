@@ -3,7 +3,7 @@ const Promise = require('bluebird');
 const genieeZoneSyncService = require('../../../genieeZoneSyncService/index');
 const config = require('../../../../../configs/config');
 const { docKeys } = require('../../../../../configs/commonConsts');
-const { couchbaseService } = require('node-utils');
+const { couchbaseService, promiseForeach } = require('node-utils');
 const { checkForLog } = require('../../../../../helpers/commonFunctions');
 
 const appBucket = couchbaseService(
@@ -108,56 +108,53 @@ function generateSiteChannelJSON(channelAndZones, siteModelItem) {
 	});
 }
 
-function tagManagerAdsSyncing(currentDataForSyncing, site) {
-	/**
-	 * FLOW:
-	 * 1. Read Tag Manager Doc
-	 * 2. Fetch Ads
-	 * 3. Filter Unsynced Ads
-	 * 4. Set Dummy values to some variables to compliment current working flow
-	 * 5. Concat ads from Tag manager to current adp.ads
-	 */
+function unSyncedAdsWrapper(unSyncedAds, logUnsyncedAds, cb, ad) {
+	function processCallback(cb) {
+		return cb ? cb(ad) : Promise.resolve({});
+	}
+
+	return processCallback(cb).then(appSpecficData => {
+		if (checkForLog(ad)) {
+			const computedData = {
+				sectionName: ad.name,
+				...appSpecficData,
+				...ad
+			};
+			logUnsyncedAds.push(computedData);
+		}
+		let unsyncedZone =
+			ad.network && ad.network == 'adpTags' ? genieeZoneSyncService.checkAdpTagsUnsyncedZones(ad, ad) : false;
+		if (unsyncedZone) {
+			if (ad.formatData && ad.formatData.platform) {
+				unsyncedZone.platform = ad.formatData.platform;
+			}
+			unSyncedAds.push({
+				sectionName: ad.name,
+				...appSpecficData,
+				...unsyncedZone
+			});
+		}
+		return true;
+	});
+}
+
+function adGeneration(docKey, currentDataForSyncing, cb = false) {
+	let logUnsyncedAds = [];
+	let unSyncedAds = [];
 	return appBucket
-		.getDoc(`${docKeys.tagManager}${site.get('siteId')}`)
+		.getDoc(docKey)
 		.then(docWithCas => {
-			let logUnsyncedAds = [];
-
 			const ads = docWithCas.value.ads;
-			const unSyncedAds = _.compact(
-				_.map(ads, ad => {
-					if (checkForLog(ad)) {
-						const computedData = {
-							variationName: 'manual',
-							sectionName: ad.name,
-							...ad
-						};
-						logUnsyncedAds.push(computedData);
-					}
-					let unsyncedZone =
-						ad.network && ad.network == 'adpTags'
-							? genieeZoneSyncService.checkAdpTagsUnsyncedZones(ad, ad)
-							: false;
 
-					if (unsyncedZone) {
-						if (ad.formatData && ad.formatData.platform) {
-							unsyncedZone.platform = ad.formatData.platform;
-						}
-
-						return {
-							variationName: 'manual',
-							sectionName: ad.name,
-							...unsyncedZone
-						};
-					}
-
-					return unsyncedZone;
-				})
-			);
-
+			return promiseForeach(ads, unSyncedAdsWrapper.bind(null, unSyncedAds, logUnsyncedAds, cb), (data, err) => {
+				console.log(err);
+				return false;
+			});
+		})
+		.then(() => {
 			currentDataForSyncing.adp.ads = unSyncedAds.length
 				? _.concat(currentDataForSyncing.adp.ads, unSyncedAds)
 				: currentDataForSyncing.adp.ads;
-
 			currentDataForSyncing.logs.ads = logUnsyncedAds.length
 				? _.concat(currentDataForSyncing.logs.ads, logUnsyncedAds)
 				: currentDataForSyncing.logs.ads;
@@ -171,11 +168,93 @@ function tagManagerAdsSyncing(currentDataForSyncing, site) {
 		});
 }
 
+function tagManagerAdsSyncing(currentDataForSyncing, site) {
+	/**
+	 * FLOW:
+	 * 1. Read Tag Manager Doc
+	 * 2. Fetch Ads
+	 * 3. Filter Unsynced Ads
+	 * 4. Set Dummy values to some variables to compliment current working flow
+	 * 5. Concat ads from Tag manager to current adp.ads
+	 */
+	return adGeneration(`${docKeys.tagManager}${site.get('siteId')}`, currentDataForSyncing, ad =>
+		Promise.resolve({
+			variations: [
+				{ variationName: 'manual', variationId: 'manual', pageGroup: null, platform: ad.formatData.platform }
+			]
+		})
+	);
+}
+
+function innovativeAdsSyncing(currentDataForSyncing, site) {
+	let hasInnovativeAds = false;
+	function generateLogData(site, ad) {
+		return site
+			.getAllChannels()
+			.then(channels =>
+				_.compact(
+					_.flatMap(
+						_.map(channels, channel => {
+							const pagegroupAssignedToAd = ad.pagegroups.includes(
+								`${channel.platform}:${channel.pageGroup}`
+							);
+							if (pagegroupAssignedToAd) {
+								const variationsExist = channel.variations && Object.keys(channel.variations).length;
+								const common = {
+									channel: `${channel.platform}:${channel.pageGroup}`,
+									pageGroup: channel.pageGroup,
+									platform: channel.platform
+								};
+								if (variationsExist) {
+									return _.map(channel.variations, variation => {
+										return !variation.isControl
+											? {
+													...common,
+													variationId: variation.id,
+													variationName: variation.name
+											  }
+											: false;
+									});
+								}
+								return {
+									...common,
+									variationId: null,
+									variationName: null
+								};
+							}
+							return false;
+						})
+					)
+				)
+			)
+			.then(variationsData => {
+				return { variations: variationsData };
+			})
+			.catch(err => {
+				console.log(err.message);
+				return Promise.reject(
+					new Error(
+						`Error while fetching variations for ad - ${ad.id} and site - ${site.get(
+							'siteId'
+						)} | Innovative Ads`
+					)
+				);
+			});
+	}
+
+	return adGeneration(
+		`${docKeys.interactiveAds}${site.get('siteId')}`,
+		currentDataForSyncing,
+		generateLogData.bind(null, site)
+	);
+}
+
 function getGeneratedPromises(siteModelItem) {
 	return genieeZoneSyncService
 		.getAllUnsyncedZones(siteModelItem)
 		.then(channelAndZones => generateSiteChannelJSON(channelAndZones, siteModelItem))
-		.then(currentDataForSyncing => tagManagerAdsSyncing(currentDataForSyncing, siteModelItem));
+		.then(currentDataForSyncing => tagManagerAdsSyncing(currentDataForSyncing, siteModelItem))
+		.then(currentDataForSyncing => innovativeAdsSyncing(currentDataForSyncing, siteModelItem));
 }
 
 module.exports = {

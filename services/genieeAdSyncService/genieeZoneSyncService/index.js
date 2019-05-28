@@ -32,8 +32,6 @@ module.exports = {
 					adId: ad.id,
 					zoneName: ad.id,
 					sectionId: section.id,
-					variationId: variationId,
-					variationName: variationName,
 					sizeWidth: parseInt(ad.width, 10),
 					sizeHeight: parseInt(ad.height, 10),
 					zoneType: 1,
@@ -42,6 +40,12 @@ module.exports = {
 					useFriendlyIFrameFlag: ad.asyncTag ? Number(ad.asyncTag) : 1,
 					dynamicAllocation: ad.networkData.dynamicAllocation ? ad.networkData.dynamicAllocation : 0,
 					zoneId: ad.networkData && ad.networkData.zoneId ? ad.networkData.zoneId : false,
+					variations: [
+						{
+							variationId: variationId,
+							variationName: variationName
+						}
+					],
 					network: ad.network,
 					networkData: {
 						dynamicAllocation: ad.hasOwnProperty('dynamicAllocation')
@@ -74,6 +78,7 @@ module.exports = {
 						sectionName: section.name,
 						type: section.formatData && section.formatData.type ? section.formatData.type : false,
 						isManual: ad.isManual || false,
+						isInnovativeAd: ad.isInnovativeAd || false,
 						isNative: isNative,
 						network: ad.network,
 						networkData: {
@@ -116,13 +121,17 @@ module.exports = {
 				if (checkForLog(ad)) {
 					unsyncedZones.logsUnsyncedZones.push({
 						...ad,
-						variationId,
-						variationName,
+						variations: [
+							{
+								variationId: variationId,
+								variationName: variationName,
+								platform: additionalInfo.platform,
+								pageGroup: additionalInfo.pageGroup
+							}
+						],
 						channelKey,
 						id: sectionId,
 						adId: ad.id,
-						platform: additionalInfo.platform,
-						pageGroup: additionalInfo.pageGroup,
 						isControl,
 						sectionName: section.name
 					});
@@ -131,6 +140,11 @@ module.exports = {
 					case 'geniee':
 						var unsyncedZone = self.checkGenieeUnsyncedZones(variationId, variationName, section, ad);
 						if (unsyncedZone) {
+							unsyncedZone.variations[0] = {
+								...unsyncedZone.variations[0],
+								platform: additionalInfo.platform,
+								pageGroup: additionalInfo.pageGroup
+							};
 							unsyncedZone.forZoneSyncing
 								? unsyncedZones.genieeUnsyncedZones.push(unsyncedZone.zone)
 								: null;
@@ -142,11 +156,19 @@ module.exports = {
 					case 'adpTags':
 						var unsyncedZone = self.checkAdpTagsUnsyncedZones(section, ad);
 						if (unsyncedZone) {
-							unsyncedZone.variationId = variationId;
-							unsyncedZone.variationName = variationName;
+							unsyncedZone.variations = [
+								{
+									variationId: variationId,
+									variationName: variationName,
+									platform: additionalInfo.platform,
+									pageGroup: additionalInfo.pageGroup
+								}
+							];
+							// unsyncedZone.variationId = variationId;
+							// unsyncedZone.variationName = variationName;
+							// unsyncedZone.pageGroup = additionalInfo.pageGroup;
+							// unsyncedZone.platform = additionalInfo.platform;
 							unsyncedZone.channelKey = channelKey;
-							unsyncedZone.pageGroup = additionalInfo.pageGroup;
-							unsyncedZone.platform = additionalInfo.platform;
 							unsyncedZones.adpTagsUnsyncedZones.push(unsyncedZone);
 						}
 						break;

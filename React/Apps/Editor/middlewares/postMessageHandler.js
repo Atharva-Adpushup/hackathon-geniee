@@ -41,6 +41,7 @@ const getData = state => {
 
 		const nextState = getData(store.getState());
 		const isActionUpdateContentSelector = !!(action.type === variationActions.UPDATE_CONTENT_SELECTOR),
+			isActionInitIncontentAdsPreview = !!(action.type === variationActions.INIT_INCONTENT_ADS_PREVIEW),
 			isValidActionData = !!(action.hasOwnProperty('contentSelector') && action.channelId && action.variationId),
 			isValidActionUpdateContentSelector = !!(isActionUpdateContentSelector && isValidActionData),
 			difference = Utils.deepDiffMapper.test(nextState.layout, prevState.layout),
@@ -84,6 +85,12 @@ const getData = state => {
 				sendMessage(nextState.activeChannelId, messengerCommands.SCROLL_TO_VIEW, { adId: action.adId });
 			} else if (action.type == uiActions.SET_MODE) {
 				sendMessage(nextState.activeChannelId, messengerCommands.SET_MODE, { mode: action.mode });
+			} else if (isActionInitIncontentAdsPreview) {
+				sendMessage(nextState.activeChannelId, messengerCommands.INIT_INCONTENT_ADS_PREVIEW, {
+					contentSelector: action.contentSelector,
+					ads: action.ads,
+					config: action.config
+				});
 			}
 		}
 
