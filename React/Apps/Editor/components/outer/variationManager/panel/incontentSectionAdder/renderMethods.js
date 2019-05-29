@@ -187,7 +187,7 @@ const renderField = field => {
 	renderInfo = that => {
 		let fn;
 		const selectedElement = that.state.selectedElement;
-		const isSectionElement = !!(selectedElement === 'section');
+		const isSectionElement = !!(selectedElement === 'section' || selectedElement === 'name');
 		const isCustomAdSizeElement = !!(
 			selectedElement === 'customAdSizeWidth' || selectedElement === 'customAdSizeHeight'
 		);

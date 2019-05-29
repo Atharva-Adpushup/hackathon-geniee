@@ -94,6 +94,10 @@ const selectorator = new Selectorator(),
 
 		return true;
 	},
+	removeExistingIncontentAds = function($element) {
+		const $computedWrapperEl = $element || $(window.document.body);
+		$('._ap_apex_ad._ap_incontent_ads', $computedWrapperEl).remove();
+	},
 	placeIncontentAds = (contentSelector, ads, globalConfig) => {
 		const resultData = {
 			placement: {
@@ -120,7 +124,8 @@ const selectorator = new Selectorator(),
 				boxShadow: 'rgb(0, 0, 0) 0px 0px 0px 2px inset',
 				display: 'flex',
 				alignItems: 'center',
-				justifyContent: 'center'
+				justifyContent: 'center',
+				fontFamily: 'sans-serif'
 			});
 			var attributes = {
 				sectionNumber: adObject.section,
@@ -133,7 +138,7 @@ const selectorator = new Selectorator(),
 			$container
 				.css(css)
 				.attr(attributes)
-				.addClass('_ap_apex_ad')
+				.addClass('_ap_apex_ad _ap_incontent_ads')
 				.append($strongEl);
 			$element.after($container);
 		};
@@ -141,9 +146,6 @@ const selectorator = new Selectorator(),
 			const $contentOverlayEl = $('._ap_contentOverlay._ap_reject');
 
 			$contentOverlayEl.css({ height: `${$element.height()}px` });
-		};
-		const removeExistingAds = function($element) {
-			$('._ap_apex_ad', $element || $(window.document.body)).remove();
 		};
 		const pushDataInXpathMissFeedback = sectionNumber => {
 			resultData.xpathMiss.count++;
@@ -231,7 +233,7 @@ Ad xpathMiss ❌: __xpathMissAdsCount__, section numbers: __xpathMissAdsSectionN
 			return transformedResult;
 		};
 
-		removeExistingAds(parameters.$selector);
+		removeExistingIncontentAds(parameters.$selector);
 		setContentOverlayHeight(parameters.$selector);
 		return IncontentAnalyzer(parameters)
 			.then(successCallback)
@@ -294,4 +296,13 @@ Ad xpathMiss ❌: __xpathMissAdsCount__, section numbers: __xpathMissAdsSectionN
 			});
 	};
 
-export { initDomEvents, getAdpVitals, getAllXPaths, isValidXPath, scrollToView, updateAdSize, placeIncontentAds };
+export {
+	initDomEvents,
+	getAdpVitals,
+	getAllXPaths,
+	isValidXPath,
+	scrollToView,
+	updateAdSize,
+	placeIncontentAds,
+	removeExistingIncontentAds
+};
