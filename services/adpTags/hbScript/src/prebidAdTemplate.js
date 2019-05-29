@@ -28,6 +28,14 @@ var prebidAdTemplate =
 	'pbjs.que.push(function(){' +
 	'pbjs.setConfig({' +
 	'rubicon: {singleRequest: true},' +
+	'userSync: {' +
+	'filterSettings: {' +
+	'iframe: {' +
+	'bidders: "*",' +
+	'filter: "include"' +
+	'}' +
+	'}' +
+	'},' +
 	'publisherDomain: parent.adpushup.config.siteDomain,' +
 	'bidderSequence: "random",' +
 	'priceGranularity: "dense"' +
