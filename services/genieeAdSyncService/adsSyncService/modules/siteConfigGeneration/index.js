@@ -13,7 +13,7 @@ const appBucket = couchbaseService(
 	config.couchBase.DEFAULT_USER_PASSWORD
 );
 
-function generateSiteChannelJSON(channelWithAds, site) {
+function generateSiteChannelJSON(channelsWithAds, site) {
 	const userEmail = site.get('ownerEmail');
 	const siteId = site.get('siteId');
 	const siteDomain = site.get('siteDomain');
@@ -30,9 +30,9 @@ function generateSiteChannelJSON(channelWithAds, site) {
 		},
 		ads: []
 	};
-	let adsenseUsyncedAds = {};
+	let adsenseUnsyncedAds = {};
 
-	function doIt() {
+	function doIt(channelWithAds) {
 		const noAdsFound = !(
 			channelWithAds &&
 			channelWithAds.unsyncedAds &&
@@ -65,7 +65,7 @@ function generateSiteChannelJSON(channelWithAds, site) {
 					pageGroupId
 				});
 			}
-			if (Object.keys(zones.adpTagsUnsyncedAds).length) {
+			if (zones.adpTagsUnsyncedAds && zones.adpTagsUnsyncedAds.length) {
 				const apConfigs = site.get('apConfigs') || false;
 				const activeDFPNetwork = apConfigs && apConfigs.activeDFPNetwork ? apConfigs.activeDFPNetwork : false;
 				const activeDFPParentId =
@@ -78,8 +78,8 @@ function generateSiteChannelJSON(channelWithAds, site) {
 				}
 				adpTagsUnsyncedAds.ads = _.concat(adpTagsUnsyncedAds.ads, zones.adpTagsUnsyncedAds);
 			}
-			if (Object.keys(zones.adsenseUsyncedAds).length) {
-				adsenseUsyncedAds.ads = _.concat(adsenseUsyncedAds.ads, zones.adpTagsUnsyncedAds);
+			if (zones.adsenseUnsyncedAds && zones.adsenseUnsyncedAds.length) {
+				adsenseUnsyncedAds.ads = _.concat(adsenseUnsyncedAds.ads, zones.adsenseUnsyncedAds);
 			}
 		});
 	}
@@ -97,14 +97,14 @@ function generateSiteChannelJSON(channelWithAds, site) {
 			id: pubId
 		};
 
-		adsenseUsyncedAds = { ...adpTagsUnsyncedAds };
+		adsenseUnsyncedAds = { ...adpTagsUnsyncedAds };
 
-		return Promise.map(channelWithAds, doIt).then(() => {
+		return Promise.map(channelsWithAds, doIt).then(() => {
 			return {
 				geniee: unsyncedGenieeZones,
 				adp: adpTagsUnsyncedAds,
 				genieeDFP: unsyncedGenieeDFPCreationZones,
-				adsense: adsenseUsyncedAds
+				adsense: adsenseUnsyncedAds
 			};
 		});
 	});
