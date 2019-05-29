@@ -37,7 +37,8 @@ function publishToQueueWrapper(siteConfigItems, site) {
 		adpUnsynced ? jobs.push(adpTagPublisherWrapper(adp)) : null;
 		adsenseUnsynced ? jobs.push(adsensePublisherWrapper(adsense)) : null;
 
-		const shouldPushToCdn = !(genieeUnsynced || adpUnsynced || genieeDFPUnsynced) || !jobs.length;
+		const shouldPushToCdn =
+			!(genieeUnsynced || adpUnsynced || genieeDFPUnsynced || adsenseUnsynced) || !jobs.length;
 		if (shouldPushToCdn) {
 			return Promise.resolve(response);
 		}
