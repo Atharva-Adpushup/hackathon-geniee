@@ -26,6 +26,8 @@ class ModalWrapper extends React.Component {
 		const thirtyThreeAcross = findBidder(data, '33across');
 		const ix = findBidder(data, 'ix');
 		const rubicon = findBidder(data, 'rubicon');
+		const adyoulike = findBidder(data, 'adyoulike');
+		const pubmatic = findBidder(data, 'pubmatic');
 
 		this.state = {
 			partnersSelected: props.data.map(obj => obj.bidder) || [],
@@ -72,6 +74,12 @@ class ModalWrapper extends React.Component {
 				siteId: rubicon ? rubicon.params.siteId : '',
 				zoneId: rubicon ? rubicon.params.zoneId : ''
 			},
+			adyoulike: {
+				placement: adyoulike ? adyoulike.params.placement : ''
+			},
+			pubmatic: {
+				publisherId: pubmatic ? pubmatic.params.publisherId : ''
+			},
 			error: ''
 		};
 
@@ -109,6 +117,8 @@ class ModalWrapper extends React.Component {
 		const thirtyThreeAcross = findBidder(data, '33across');
 		const ix = findBidder(data, 'ix');
 		const rubicon = findBidder(data, 'rubicon');
+		const adyoulike = findBidder(data, 'adyoulike');
+		const pubmatic = findBidder(data, 'pubmatic');
 
 		this.setState({
 			partnersSelected: nextProps.data.map(obj => ({ value: obj.bidder, label: obj.bidder })) || [],
@@ -154,6 +164,12 @@ class ModalWrapper extends React.Component {
 				accountId: rubicon ? rubicon.params.accountId : '',
 				siteId: rubicon ? rubicon.params.siteId : '',
 				zoneId: rubicon ? rubicon.params.zoneId : ''
+			},
+			adyoulike: {
+				placement: adyoulike ? adyoulike.params.placement : ''
+			},
+			pubmatic: {
+				publisherId: pubmatic ? pubmatic.params.publisherId : ''
 			},
 			error: ''
 		});
