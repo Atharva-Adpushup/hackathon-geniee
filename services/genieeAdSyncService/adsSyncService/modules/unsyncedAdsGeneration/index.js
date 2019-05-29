@@ -1,5 +1,3 @@
-// const { checkForLog } = require('../../../helpers/commonFunctions');
-
 module.exports = {
 	checkGenieeUnsyncedZones: function(variationId, variationName, section, ad) {
 		const isValidUnsyncedZone = !!(ad.network === 'geniee' && ad.networkData && !ad.networkData.zoneId);
@@ -89,6 +87,31 @@ module.exports = {
 		}
 		return false;
 	},
+	checkAdsenseUnsyncedAds: function(section, ad) {
+		const hasNetworkData = ad.networkData && Object.keys(ad.networkData).length;
+		if (hasNetworkData) {
+			const { adunitId, adCode, shouldSync } = ad.networkData;
+			const isUnsynced = !adCode && !adunitId && shouldSync;
+			if (isUnsynced) {
+				const isResponsive = !!(ad.width === 'responsive');
+				const defaultAdData = {
+					adId: ad.id,
+					isResponsive: isResponsive,
+					sizeWidth: isResponsive ? 'responsive' : parseInt(ad.width, 10),
+					sizeHeight: isResponsive ? 'responsive' : parseInt(ad.height, 10),
+					sectionId: section.id,
+					sectionName: section.name,
+					isManual: ad.isManual || false,
+					isInnovativeAd: ad.isInnovativeAd || false,
+					network: ad.network,
+					networkData: ad.networkData || {}
+				};
+				return defaultAdData;
+			}
+			return false;
+		}
+		return false;
+	},
 	getVariationUnsyncedAds: function(
 		variationId,
 		variationName,
@@ -104,29 +127,10 @@ module.exports = {
 			adpTagsUnsyncedAds: [],
 			genieeDFPCreationZones: [],
 			adsenseUnsyncedAds: []
-			// logsUnsyncedZones: []
 		};
 		const self = this;
 		_.each(variationSections, function(section, sectionId) {
 			_.each(section.ads, function(ad) {
-				// if (checkForLog(ad)) {
-				// 	unsyncedAds.logsUnsyncedZones.push({
-				// 		...ad,
-				// 		variations: [
-				// 			{
-				// 				variationId: variationId,
-				// 				variationName: variationName,
-				// 				platform: additionalInfo.platform,
-				// 				pageGroup: additionalInfo.pageGroup
-				// 			}
-				// 		],
-				// 		channelKey,
-				// 		id: sectionId,
-				// 		adId: ad.id,
-				// 		isControl,
-				// 		sectionName: section.name
-				// 	});
-				// }
 				switch (ad.network) {
 					case 'geniee':
 						let unsyncedZone = self.checkGenieeUnsyncedZones(variationId, variationName, section, ad);
@@ -144,8 +148,17 @@ module.exports = {
 								: null;
 						}
 						break;
+					case 'adsense':
 					case 'adpTags':
-						let unsyncedAd = self.checkAdpTagsUnsyncedAds(section, ad);
+						let fn = self.checkAdpTagsUnsyncedAds;
+						let container = 'adpTagsUnsyncedAds';
+
+						if (ad.network === 'adsense') {
+							fn = self.checkAdsenseUnsyncedAds;
+							container = 'adsenseUnsyncedAds';
+						}
+
+						let unsyncedAd = fn(section, ad);
 						if (unsyncedAd) {
 							unsyncedAd.variations = [
 								{
@@ -156,7 +169,7 @@ module.exports = {
 								}
 							];
 							unsyncedAd.channelKey = channelKey;
-							unsyncedAds.adpTagsUnsyncedAds.push(unsyncedAd);
+							unsyncedAds[container].push(unsyncedAd);
 						}
 						break;
 				}
