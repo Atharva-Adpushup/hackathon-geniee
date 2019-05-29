@@ -1,22 +1,16 @@
-var adpushup = require('../../helpers/adpushupEvent'),
-	syncGeneratedFileWithCdn = require('./service'),
-	siteModeMailTriggerService = require('../siteModeMailTriggerService/index'),
-	Promise = require('bluebird'),
-	utils = require('../../helpers/utils'),
-	moment = require('moment'),
-	cron = require('node-cron'),
-	{ fileLogger } = require('../../helpers/logger/file/index'),
-	getAutoOptimisedLiveSites = require('../../misc/scripts/adhoc/autoOptimisedLiveSites/service');
+const adpushup = require('../../helpers/adpushupEvent');
+const syncGeneratedFileWithCdn = require('./service');
+const Promise = require('bluebird');
+const utils = require('../../helpers/utils');
+const moment = require('moment');
+const cron = require('node-cron');
+const { fileLogger } = require('../../helpers/logger/file/index');
+const getAutoOptimisedLiveSites = require('../../misc/scripts/adhoc/autoOptimisedLiveSites/service');
 
 function onSiteSaved(site) {
 	// save only after 5 second of siteSaved event as still channels are not saved as siteSaved called first and then channel data is saved.
 	// so to roughly bypassing this situation run the generator only after 5 seconds, assuming all is saved in 5 seconds
-	setTimeout(() => {
-		syncGeneratedFileWithCdn.init(site);
-		// siteModeMailTriggerService.init(site)
-		// .then(console.log)
-		// .catch(console.log);
-	}, 3000);
+	setTimeout(() => syncGeneratedFileWithCdn.init(site), 3000);
 }
 
 function updateGeneratedScriptsForLiveSites() {

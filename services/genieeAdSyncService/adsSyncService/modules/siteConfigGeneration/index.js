@@ -1,9 +1,10 @@
 const _ = require('lodash');
 const Promise = require('bluebird');
-const genieeZoneSyncService = require('../../../genieeZoneSyncService/index');
+const { couchbaseService, promiseForeach } = require('node-utils');
+
+const unsyncedAdsGeneration = require('../unsyncedAdsGeneration/index');
 const config = require('../../../../../configs/config');
 const { docKeys } = require('../../../../../configs/commonConsts');
-const { couchbaseService, promiseForeach } = require('node-utils');
 const { checkForLog } = require('../../../../../helpers/commonFunctions');
 
 const appBucket = couchbaseService(
@@ -122,16 +123,16 @@ function unSyncedAdsWrapper(unSyncedAds, logUnsyncedAds, cb, ad) {
 			};
 			logUnsyncedAds.push(computedData);
 		}
-		let unsyncedZone =
-			ad.network && ad.network == 'adpTags' ? genieeZoneSyncService.checkAdpTagsUnsyncedZones(ad, ad) : false;
-		if (unsyncedZone) {
+		let unsyncedAd =
+			ad.network && ad.network == 'adpTags' ? unsyncedAdsGeneration.checkAdpTagsUnsyncedAds(ad, ad) : false;
+		if (unsyncedAd) {
 			if (ad.formatData && ad.formatData.platform) {
-				unsyncedZone.platform = ad.formatData.platform;
+				unsyncedAd.platform = ad.formatData.platform;
 			}
 			unSyncedAds.push({
 				sectionName: ad.name,
 				...appSpecficData,
-				...unsyncedZone
+				...unsyncedAd
 			});
 		}
 		return true;
@@ -187,7 +188,6 @@ function tagManagerAdsSyncing(currentDataForSyncing, site) {
 }
 
 function innovativeAdsSyncing(currentDataForSyncing, site) {
-	let hasInnovativeAds = false;
 	function generateLogData(site, ad) {
 		return site
 			.getAllChannels()
@@ -249,12 +249,12 @@ function innovativeAdsSyncing(currentDataForSyncing, site) {
 	);
 }
 
-function getGeneratedPromises(siteModelItem) {
-	return genieeZoneSyncService
-		.getAllUnsyncedZones(siteModelItem)
-		.then(channelAndZones => generateSiteChannelJSON(channelAndZones, siteModelItem))
-		.then(currentDataForSyncing => tagManagerAdsSyncing(currentDataForSyncing, siteModelItem))
-		.then(currentDataForSyncing => innovativeAdsSyncing(currentDataForSyncing, siteModelItem));
+function getGeneratedPromises(site) {
+	return unsyncedAdsGeneration
+		.getAllUnsyncedAds(site)
+		.then(channelAndZones => generateSiteChannelJSON(channelAndZones, site))
+		.then(currentDataForSyncing => tagManagerAdsSyncing(currentDataForSyncing, site))
+		.then(currentDataForSyncing => innovativeAdsSyncing(currentDataForSyncing, site));
 }
 
 module.exports = {
