@@ -59,7 +59,8 @@ class Adsense extends Component {
 		const { isLink } = this.state;
 		submitHandler({
 			shouldSync: true,
-			isLink
+			isLink,
+			type: 'display'
 		});
 	}
 
