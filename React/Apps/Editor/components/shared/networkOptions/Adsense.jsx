@@ -56,8 +56,10 @@ class Adsense extends Component {
 
 	syncSubmitHanlder() {
 		const { submitHandler } = this.props;
+		const { isLink } = this.state;
 		submitHandler({
-			shouldSync: true
+			shouldSync: true,
+			isLink
 		});
 	}
 
