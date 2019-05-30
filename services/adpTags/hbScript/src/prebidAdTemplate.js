@@ -44,11 +44,6 @@ var prebidAdTemplate =
 	'});' +
 	'pbjs.addAdUnits(__AD_UNIT_CODE__);' +
 	'pbjs.bidderSettings = {' +
-	'openx: {' +
-	'bidCpmAdjustment: function(bidCpm) {' +
-	'return bidCpm - (bidCpm * (10/100));' +
-	'}' +
-	'},' +
 	'districtm: {' +
 	'bidCpmAdjustment: function(bidCpm) {' +
 	'return bidCpm - (bidCpm * (10/100));' +
