@@ -14,12 +14,17 @@ import { INTG_NAV_ITEMS, INTG_NAV_ITEMS_INDEXES, INTG_NAV_ITEMS_VALUES } from '.
 library.add(faCheckCircle);
 
 class Integrations extends Component {
+	// TODO: Identify how to successfully apply destructuring for below properties
 	isGoogleOauthConnected =
 		!!(
 			this.props &&
+			// eslint-disable-next-line react/destructuring-assignment
 			this.props.user &&
+			// eslint-disable-next-line react/destructuring-assignment
 			this.props.user.adNetworkSettings &&
+			// eslint-disable-next-line react/destructuring-assignment
 			Array.isArray(this.props.user.adNetworkSettings) &&
+			// eslint-disable-next-line react/destructuring-assignment
 			this.props.user.adNetworkSettings.length
 		) || false;
 
@@ -34,11 +39,21 @@ class Integrations extends Component {
 		this.addPostMessageListener();
 	}
 
+	componentWillUnmount() {
+		this.removePostMessageListener();
+	}
+
 	addPostMessageListener = () => {
 		const { $window } = this;
 
 		// TODO: Implement an elegant way to bind class object to its method than .bind(this)
 		$window.addEventListener('message', this.handlePostMessageHandler.bind(this), false);
+	};
+
+	removePostMessageListener = () => {
+		const { $window } = this;
+
+		$window.removeEventListener('message', this.handlePostMessageHandler.bind(this), false);
 	};
 
 	getActiveTab = () => {
