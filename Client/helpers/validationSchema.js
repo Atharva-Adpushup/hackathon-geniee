@@ -49,5 +49,25 @@ module.exports = {
 				}
 			]
 		}
+	},
+	hbApp: {
+		validations: {
+			isNull: [{ name: 'name', message: 'Please fill out name', value: '' }],
+			isLength: [
+				{ name: 'name', message: 'Enter name between 1 and 150', value: { min: 1, max: 150 } }
+			],
+			isEmail: [{ name: 'email', message: 'Enter email in name@example.com format', value: '' }],
+			isURL: [
+				{ name: 'site', message: 'Enter url in valid format', value: { require_protocol: true } }
+			],
+			equals: [
+				{
+					name: 'password',
+					message: 'Passwords do not match',
+					value: '',
+					matchAgainst: 'confirmPassword'
+				}
+			]
+		}
 	}
 };

@@ -14,7 +14,7 @@ module.exports = {
 					if (rule.name === key) {
 						switch (validation) {
 							case 'isNull':
-								!json[key] ? (errors[key] = rule.message) : '';
+								json[key] !== 0 && !json[key] ? (errors[key] = rule.message) : '';
 								break;
 							case 'isURL':
 								!validator.isURL(json[key], rule.value) ? (errors[key] = rule.message) : '';

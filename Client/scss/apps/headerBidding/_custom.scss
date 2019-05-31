@@ -19,17 +19,16 @@
 	}
 }
 
-.hb-add-bidder {
-	header {
-		display: flex;
-		justify-content: space-between;
-		h3 {
-			align-self: flex-start;
-		}
-		span.back {
-			align-self: flex-end;
+.hb-bidders-list {
+	.added-bidders,
+	.not-added-bidders {
+		.u-cursor-pointer:hover {
+			background: rgba($color: #000000, $alpha: 0.05);
 		}
 	}
+}
+
+.hb-add-bidder {
 	.hb-input {
 		max-width: 250px;
 	}

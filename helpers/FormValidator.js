@@ -32,6 +32,9 @@ module.exports = {
 									? errors.push({ message: rule.message, status: rule.status })
 									: '';
 								break;
+							case 'isBoolean':
+								if (!validator.isBoolean(json[key])) errors[key] = rule.message;
+								break;
 							case 'isSameDomain':
 								if (!sampleUrlForced) {
 									if (
