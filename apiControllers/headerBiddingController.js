@@ -28,6 +28,20 @@ router
 					.json({ error: 'Internal Server Error!' });
 			});
 	})
+	.get('/getInventorySizes/:siteId', (req, res) => {
+		const { siteId } = req.params;
+		const { email } = req.user;
+		return (
+			userModel
+				.verifySiteOwner(email, siteId)
+				.then(() => siteModel.getUniqueInventorySizes(siteId))
+				.then(sizesArray => res.status(httpStatus.OK).json(sizesArray))
+				// eslint-disable-next-line no-unused-vars
+				.catch(err =>
+					res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error!' })
+				)
+		);
+	})
 	.get('/getBiddersList/:siteId', (req, res) => {
 		const { siteId } = req.params;
 		const { email } = req.user;
@@ -148,13 +162,10 @@ router
 				.then(hbConfig => hbConfig.save())
 				.then(() => headerBiddingModel.getAllBiddersFromNetworkConfig())
 				.then(biddersFromNetworkConfig => {
-					bidderConfig.config = headerBiddingModel.mergeBidderParams(
-						{
-							...biddersFromNetworkConfig[key].params.global,
-							...biddersFromNetworkConfig[key].params.siteLevel
-						},
-						bidderConfig.config
-					);
+					bidderConfig.paramsFormFields = {
+						...biddersFromNetworkConfig[key].params.global,
+						...biddersFromNetworkConfig[key].params.siteLevel
+					};
 
 					return res.status(httpStatus.OK).json({ bidderKey: key, bidderConfig });
 				})
@@ -241,13 +252,10 @@ router
 				.then(hbConfig => hbConfig.save())
 				.then(() => headerBiddingModel.getAllBiddersFromNetworkConfig())
 				.then(biddersFromNetworkConfig => {
-					bidderConfig.config = headerBiddingModel.mergeBidderParams(
-						{
-							...biddersFromNetworkConfig[key].params.global,
-							...biddersFromNetworkConfig[key].params.siteLevel
-						},
-						bidderConfig.config
-					);
+					bidderConfig.paramsFormFields = {
+						...biddersFromNetworkConfig[key].params.global,
+						...biddersFromNetworkConfig[key].params.siteLevel
+					};
 
 					return res.status(httpStatus.OK).json({ bidderKey: key, bidderConfig });
 				})
