@@ -64,7 +64,7 @@ function apiModule() {
 					const hbBidders = {};
 
 					for (const key in networks) {
-						if (networks[key].isHb && networks[key].isActive) hbBidders[key] = networks[key];
+						if (key !== 'adpTags' && networks[key].isHb && networks[key].isActive) hbBidders[key] = networks[key];
 					}
 
 					return hbBidders;
@@ -82,13 +82,10 @@ function apiModule() {
 
 					// delete added bidders keys from all bidders
 					for (const addedBidderKey in addedBidders) {
-						addedBidders[addedBidderKey].config = API.mergeBidderParams(
-							{
-								...notAddedBidders[addedBidderKey].params.global,
-								...notAddedBidders[addedBidderKey].params.siteLevel
-							},
-							addedBidders[addedBidderKey].config
-						);
+						addedBidders[addedBidderKey].paramsFormFields = {
+							...notAddedBidders[addedBidderKey].params.global,
+							...notAddedBidders[addedBidderKey].params.siteLevel
+						};
 
 						delete notAddedBidders[addedBidderKey];
 					}

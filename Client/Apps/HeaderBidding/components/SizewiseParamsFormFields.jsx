@@ -173,15 +173,13 @@ class SizewiseParamsFormFields extends React.Component {
 	render() {
 		const { activeKey } = this.state;
 		return (
-			<Row className="clearfix non-sizeless-params u-margin-v5">
-				<Col sm={2} className="size-tabs">
+			<Row className="clearfix">
+				<Col sm={4}>
 					<Nav bsStyle="pills" stacked activeKey={activeKey} onSelect={this.handleNavSelect}>
 						{this.renderTabs()}
 					</Nav>
 				</Col>
-				<Col sm={10} className="size-tab-content">
-					{this.renderTabContent()}
-				</Col>
+				<Col sm={8}>{this.renderTabContent()}</Col>
 			</Row>
 		);
 	}

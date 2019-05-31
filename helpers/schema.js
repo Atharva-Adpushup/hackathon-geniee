@@ -116,8 +116,6 @@ module.exports = {
 				 */
 				{ name: 'key', message: 'Bidder Key cannot be blank', value: '', status: 403 },
 				{ name: 'name', message: 'Bidder Name cannot be blank', value: '', status: 403 },
-				{ name: 'sizeLess', message: 'sizeLess property cannot be blank', value: '', status: 403 },
-				{ name: 'reusable', message: 'reusable property cannot be blank', value: '', status: 403 },
 				{ name: 'relation', message: 'relation property cannot be blank', value: '', status: 403 },
 				{ name: 'bids', message: 'bids property cannot be blank', value: '', status: 403 },
 				{ name: 'status', message: 'status property cannot be blank', value: '', status: 403 }

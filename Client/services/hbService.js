@@ -19,3 +19,7 @@ export function addBidder(siteId, bidderConfig, params) {
 export function updateBidder(siteId, bidderConfig, params) {
 	return axiosInstance.put(`/headerBidding/bidder/${siteId}`, { bidderConfig, params });
 }
+
+export function fetchInventorySizes(siteId) {
+	return axiosInstance.get(`/headerBidding/getInventorySizes/${siteId}`);
+}
