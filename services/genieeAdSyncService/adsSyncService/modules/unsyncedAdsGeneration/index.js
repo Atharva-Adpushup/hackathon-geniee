@@ -90,13 +90,14 @@ module.exports = {
 	checkAdsenseUnsyncedAds: function(section, ad) {
 		const hasNetworkData = ad.networkData && Object.keys(ad.networkData).length;
 		if (hasNetworkData) {
-			const { adunitId, adCode, shouldSync } = ad.networkData;
+			const { adunitId, adCode, shouldSync, isLink = false } = ad.networkData;
 			const isUnsynced = !adCode && !adunitId && shouldSync;
 			if (isUnsynced) {
 				const isResponsive = !!(ad.width === 'responsive');
 				const defaultAdData = {
 					adId: ad.id,
-					isResponsive: isResponsive,
+					isResponsive,
+					isLink,
 					sizeWidth: isResponsive ? 'responsive' : parseInt(ad.width, 10),
 					sizeHeight: isResponsive ? 'responsive' : parseInt(ad.height, 10),
 					sectionId: section.id,
