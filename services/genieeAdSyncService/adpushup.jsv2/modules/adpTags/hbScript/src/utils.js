@@ -1,8 +1,16 @@
 // Common utility functions
 
+var adp = require('./adp');
+var constants = require('./constants');
 var utils = {
+    ajax: function (data, type) {
+        switch (type.toLowerCase()) {
+            case 'get':
+                return adp.$.get(constants.FEEDBACK_URL + adp.utils.base64Encode(JSON.stringify(data)));
+        }
+    },
     isValidThirdPartyDFPAndCurrencyConfig: function (inputObject) {
-        var inputObject = inputObject || window.adpushup.config,
+        var inputObject = inputObject || adp.config,
             isActiveDFPNetwork = !!(inputObject.activeDFPNetwork && inputObject.activeDFPNetwork.length),
             isActiveDFPCurrencyCode = !!(
                 inputObject.activeDFPCurrencyCode &&

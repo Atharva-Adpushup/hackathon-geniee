@@ -6,7 +6,11 @@ var constants = {
             SLOT_RENDER_ENDED: 'slotRenderEnded'
         }
     },
-    NETWORK_ID: 103512698
+    ERROR_CODES: {
+        NO_ERROR: 1
+    },
+    NETWORK_ID: 103512698,
+    DEFAULT_WINNER: 'adx'
 };
 
 module.exports = constants;

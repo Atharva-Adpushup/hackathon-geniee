@@ -1,6 +1,8 @@
 // GPT interfacing module
 
 var constants = require('./constants');
+var feedback = require('./feedback');
+var adp = require('./adp');
 var gpt = {
     setSlotRenderListener: function (w) {
         w.googletag.cmd.push(function () {
@@ -11,7 +13,7 @@ var gpt = {
                 var adUnitDFPAdunitCode = adUnitArray[adUnitArray.length - 1];
                 var networkCode = constants.NETWORK_ID;
 
-                Object.keys(w.adpushup.adpTags.adpSlots).forEach(function (adpSlot) {
+                Object.keys(adp.adpTags.adpSlots).forEach(function (adpSlot) {
                     var currentSlot = adp.adpTags.adpSlots[adpSlot];
                     var slotMatched = !!(currentSlot.optionalParam.dfpAdunitCode == adUnitDFPAdunitCode &&
                         currentSlot.activeDFPNetwork);
@@ -25,7 +27,7 @@ var gpt = {
                 });
 
                 if (slot) {
-                    return feedback(slot);
+                    return feedback.send(slot);
                 }
             });
         });
