@@ -105,7 +105,8 @@ function getGroupedYAxisAndSeries(chartType, yAxisGroups, existingSeries) {
 						yAxis: i,
 						tooltip: {
 							pointFormatter: function() {
-								var point = this;
+								let point = this;
+								let num = Math.round(point.y * 100) / 100;
 								return (
 									'<span style="color:' +
 									point.color +
@@ -113,7 +114,7 @@ function getGroupedYAxisAndSeries(chartType, yAxisGroups, existingSeries) {
 									point.series.name +
 									': <b>' +
 									(point.series.userOptions.valueType === 'money' ? '$' : '') +
-									point.y +
+									numberWithCommas(num) +
 									'</b><br/>'
 								);
 							}
@@ -145,6 +146,10 @@ function getGroupedYAxisAndSeries(chartType, yAxisGroups, existingSeries) {
 	}
 
 	return { yAxis, seriesForChart };
+}
+
+function numberWithCommas(x) {
+	return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
 export function getCustomChartConfig(
@@ -187,7 +192,8 @@ export function getCustomChartConfig(
 				singleSeries.visible = true;
 				singleSeries.tooltip = {
 					pointFormatter: function() {
-						var point = this;
+						let point = this;
+						let num = Math.round(point.y * 100) / 100;
 						return (
 							'<span style="color:' +
 							point.color +
@@ -195,7 +201,7 @@ export function getCustomChartConfig(
 							point.series.name +
 							': <b>' +
 							(point.series.userOptions.valueType === 'money' ? '$' : '') +
-							point.y +
+							numberWithCommas(num) +
 							'</b><br/>'
 						);
 					}

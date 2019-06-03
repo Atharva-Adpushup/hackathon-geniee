@@ -6,6 +6,9 @@ module.exports = {
 	REPORT_STATUS: 'https://staging.adpushup.com/InternalOpsWebService/stats',
 	PROXY_ORIGIN: '//proxy.app.adpushup.com',
 	PRODUCT_LIST_API: 'https://staging.adpushup.com/CentralReportingWebService/common/productList',
+	ANALYTICS_API_ROOT: 'https://staging.adpushup.com/CentralReportingWebService',
+	ANALYTICS_METAINFO_URL: '/common/metaInfo',
+	REPORT_PATH: '/site/report?report_name=get_stats_by_custom',
 	DEMO_ACCOUNT_EMAIL: 'demo@adpushup.com',
 	DEMO_REPORT_SITE_ID: 31764,
 	DEMO_PAGEGROUPS: ['HOME', 'IMAGE', 'POST', 'PHPBB3', 'NEW', 'CATEGORY'],
@@ -307,7 +310,8 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 	},
 	onboarding: {
 		steps: ['Add Site', 'Add AP code', 'Setup Passback'],
-		adsTxtDocUrl: 'https://docs.google.com/feeds/download/documents/export/Export?id=1qu0IfKRGdq7Go6ABvqaoh0-9tM7hyGsCucPoRlDZiNI&exportFormat=txt',
+		adsTxtDocUrl:
+			'https://docs.google.com/feeds/download/documents/export/Export?id=1qu0IfKRGdq7Go6ABvqaoh0-9tM7hyGsCucPoRlDZiNI&exportFormat=txt',
 		revenueLowerBound: 1000,
 		initialStep: 1,
 		totalSteps: 3

@@ -1,11 +1,11 @@
 import React, { Fragment } from 'react';
 import { sortBy } from 'lodash';
 import Card from '../../../Components/Layout/Card';
-import EstimatedEarnings from './EstimatedEarnings';
+import EstimatedEarningsContainer from '../containers/EstimatedEarningsContainer';
 import SitewiseReportContainer from '../containers/SitewiseReportContainer';
 import PerformanceOverviewContainer from '../containers/PerformanceOverviewContainer';
 import PerformanceApOriginalContainer from '../containers/PerformanceApOriginalContainer';
-import Revenue from './Revenue';
+import RevenueContainer from '../containers/RevenueContainer';
 import NotificationContainer from '../../../Containers/NotificationContainer';
 
 class Dashboard extends React.Component {
@@ -26,7 +26,7 @@ class Dashboard extends React.Component {
 		switch (widget.name) {
 			default:
 			case 'estimated_earnings':
-				return <EstimatedEarnings path={path} />;
+				return <EstimatedEarningsContainer path={path} />;
 			case 'per_ap_original':
 				return <PerformanceApOriginalContainer path={path} />;
 			case 'per_overview':
@@ -34,7 +34,7 @@ class Dashboard extends React.Component {
 			case 'per_site_wise':
 				return <SitewiseReportContainer path={path} />;
 			case 'rev_by_network':
-				return <Revenue path={path} />;
+				return <RevenueContainer path={path} />;
 		}
 	};
 
@@ -52,7 +52,7 @@ class Dashboard extends React.Component {
 							: 'u-margin-b4 width-100'
 					}
 					key={wid.name}
-					type={wid.name !== 'estimated_earnings' ? 'danger' : ''}
+					type={wid.name !== 'estimated_earnings' ? 'danger' : 'default'}
 					headerClassName="card-header"
 					headerChildren={
 						<div className="aligner aligner--row">
@@ -61,7 +61,7 @@ class Dashboard extends React.Component {
 					}
 					bodyClassName="card-body"
 					bodyChildren={widgetComponent}
-					footerChildren=""
+					footerChildren={null}
 				/>
 			);
 		});

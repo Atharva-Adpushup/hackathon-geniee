@@ -57,11 +57,11 @@ class ManageSite extends React.Component {
 
 	renderContent() {
 		const activeTab = this.getActiveTab();
-
+		const siteId = this.getSiteId();
 		switch (activeTab) {
 			default:
 			case NAV_ITEMS_INDEXES.QUICK_SNAPSHOT:
-				return <QuickSnapshotContainer siteId={'29752'} />;
+				return <QuickSnapshotContainer siteId={siteId} />;
 			case NAV_ITEMS_INDEXES.SITE_SETTINGS:
 				return <SiteSettings {...this.props} />;
 			case NAV_ITEMS_INDEXES.MANAGE_APPS:

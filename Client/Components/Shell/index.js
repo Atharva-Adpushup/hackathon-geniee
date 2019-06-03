@@ -11,7 +11,6 @@ class Shell extends React.Component {
 	state = { isSidebarOpen: true };
 
 	componentDidMount() {
-		console.log(this.props);
 		const { userFetched, reportsFetched, fetchGlobalData } = this.props;
 		if (!reportsFetched || !userFetched) fetchGlobalData();
 	}

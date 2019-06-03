@@ -4,7 +4,7 @@ import Control from '../components/Control';
 const mapStateToProps = (state, ownProps) => {
 	const {
 		reports: {
-			data: { filter, metrics, dimension, interval }
+			data: { filter, metrics, dimension, interval, site }
 		}
 	} = state.global;
 	return {
@@ -12,6 +12,7 @@ const mapStateToProps = (state, ownProps) => {
 		metrics,
 		dimension,
 		interval,
+		site,
 		...ownProps
 	};
 };

@@ -7,20 +7,12 @@ import {
 } from '../constants/global';
 import axiosInstance from '../helpers/axiosInstance';
 import { errorHandler } from '../helpers/commonFunctions';
-import config from '../config/config';
 
 const fetchGlobalData = () => dispatch =>
-	Promise.all([
-		axiosInstance.get('/globalData'),
-		axiosInstance.get(config.ANALYTICS_API_ROOT + config.ANALYTICS_METAINFO_URL, {
-			withCredentials: false
-		})
-	])
+	axiosInstance
+		.get('/globalData')
 		.then(response => {
-			let metaData = {};
-
-			let analyticsMetaInfo = {};
-			const { data } = response[0];
+			const { data } = response;
 			dispatch({
 				type: USER_ACTIONS.REPLACE_USER_DATA,
 				data: data.user
@@ -37,21 +29,13 @@ const fetchGlobalData = () => dispatch =>
 				type: SITE_ACTIONS.REPLACE_SITE_DATA,
 				data: data.sites
 			});
-			if (response[1].status === 200) {
-				metaData = response[1].data && response[1].data.data ? response[1].data.data : {};
-				analyticsMetaInfo = {};
-				analyticsMetaInfo.dashboard = { widget: metaData.dashboard.widget };
-				analyticsMetaInfo.metrics = metaData.metrics;
-				analyticsMetaInfo.site = metaData.site;
-				analyticsMetaInfo.filter = metaData.filter;
-				analyticsMetaInfo.dimension = metaData.dimension;
-				analyticsMetaInfo.interval = metaData.interval;
-			}
 			dispatch({
 				type: REPORTS_ACTIONS.REPLACE_REPORTS_DATA,
-				data: analyticsMetaInfo
+				data: data.reports
 			});
 		})
-		.catch(err => errorHandler(err));
+		.catch(err => {
+			return errorHandler(err);
+		});
 
 export default fetchGlobalData;

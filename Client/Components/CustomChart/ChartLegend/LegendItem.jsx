@@ -34,37 +34,48 @@ class LegendItem extends Component {
 
 	toggleSerie() {
 		let { activeLegendItems, legend, series } = this.props;
-		const { visible } = this.state;
-		this.setState({ visible: !visible });
-		if (Array.isArray(activeLegendItems)) {
-			const serie = series.find(s =>
-				s.userOptions ? s.userOptions.value === legend.value : false
-			);
-			if (visible) {
-				const index = indexOf(activeLegendItems, legend.value);
+		if (!legend.isDisabled) {
+			const { visible } = this.state;
+			this.setState({ visible: !visible });
+			if (Array.isArray(activeLegendItems)) {
+				const serie = series.find(s =>
+					s.userOptions ? s.userOptions.value === legend.value : false
+				);
+				if (visible) {
+					const index = indexOf(activeLegendItems, legend.value);
 
-				activeLegendItems.splice(index, 1);
-				serie.hide();
+					activeLegendItems.splice(index, 1);
+					serie.hide();
+				} else {
+					activeLegendItems.push(legend);
+					serie.show();
+				}
 			} else {
-				activeLegendItems.push({ name: legend.name, value: legend.value });
-				serie.show();
+				activeLegendItems = legend;
+				this.props.updateChartData(activeLegendItems);
 			}
-		} else {
-			activeLegendItems = { name: legend.name, value: legend.value };
-			this.props.updateChartData(activeLegendItems);
 		}
 	}
 
+	numberWithCommas = x => {
+		return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+	};
+
 	render() {
 		const { visible } = this.state;
-		const { legend } = this.props;
+		const { legend, series } = this.props;
+		const serie = series.find(s => (s.userOptions ? s.userOptions.value === legend.value : false));
 		let style = {};
 
 		if (visible) {
 			style = {
-				borderBottom: `2px solid blue`
+				borderBottom: `2px solid ${serie ? serie.color : 'blue'}`
 			};
 		}
+		if (legend.isDisabled)
+			style = {
+				cursor: 'not-allowed'
+			};
 
 		return (
 			<div
@@ -75,7 +86,7 @@ class LegendItem extends Component {
 				<div className="name">{legend.name}</div>
 				<div className="total">
 					{legend.type === 'money' ? '$' : ''}
-					{legend.total >= 0 ? Math.round(legend.total * 100) / 100 : 'N/A'}
+					{legend.total >= 0 ? this.numberWithCommas(Math.round(legend.total * 100) / 100) : 'N/A'}
 				</div>
 			</div>
 		);

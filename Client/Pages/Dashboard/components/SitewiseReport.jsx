@@ -23,12 +23,15 @@ class SitewiseReport extends React.Component {
 	getGraphData() {
 		const { selectedDate } = this.state;
 		const params = getDateRange(selectedDate);
-		const { path } = this.props;
+		const { path, site } = this.props;
+		const siteIds = Object.keys(site);
+		params['siteid'] = siteIds.toString();
+		params['interval'] = 'cumulative';
+		params['dimension'] = 'siteid';
 		this.setState({ isLoading: true });
-		reportService.getWidgetData(path, params).then(response => {
-			if (response.status === 200) {
-				const data = response.data && response.data.data ? response.data.data : [];
-				this.computeTableData(data);
+		reportService.getWidgetData({ path, params }).then(response => {
+			if (response.status == 200 && response.data) {
+				this.computeTableData(response.data);
 			}
 		});
 	}
@@ -36,7 +39,7 @@ class SitewiseReport extends React.Component {
 	computeTableData = data => {
 		const { result, columns } = data;
 		const tableHeader = [];
-		const { metrics } = this.props;
+		const { metrics, site } = this.props;
 		columns.forEach(col => {
 			if (metrics[col])
 				tableHeader.push({
@@ -51,6 +54,10 @@ class SitewiseReport extends React.Component {
 			position: 1
 		});
 		tableHeader.sort((a, b) => a.position - b.position);
+		result.forEach(row => {
+			const { siteid } = row;
+			row['siteName'] = site[siteid] ? site[siteid]['siteName'] : 'Not Found';
+		});
 		this.setState({ tableHeader, tableBody: result, isLoading: false });
 	};
 

@@ -5,7 +5,6 @@ import { DropdownButton, MenuItem } from 'react-bootstrap';
 const findSelected = props => {
 	const { selected, title, options } = props;
 	let name = title;
-	console.log(selected);
 	if (selected) {
 		for (let i = 0; i < options.length; i += 1) {
 			const option = options[i];
@@ -15,7 +14,6 @@ const findSelected = props => {
 			}
 		}
 	}
-	console.log(selected, name);
 	return { selected, name };
 };
 

@@ -20,13 +20,21 @@ class EstimatedEarnings extends React.Component {
 				.subtract(1, 'day')
 				.format('YYYY-MM-DD')
 		};
-		const { path, reportType, siteId } = this.props;
+		const { path, reportType, siteId, site } = this.props;
 		if (reportType === 'site') params.siteid = siteId;
+		else {
+			const siteIds = Object.keys(site);
+			params.siteid = siteIds.toString();
+		}
 		this.setState({ isLoading: true });
-		reportService.getWidgetData(path, params).then(response => {
-			if (response.status === 200) {
-				const data = response.data && response.data.data ? response.data.data.result[0] : {};
-				this.setState({ ...data, isLoading: false });
+		reportService.getWidgetData({ path, params }).then(response => {
+			if (
+				response.status == 200 &&
+				response.data &&
+				response.data.result &&
+				response.data.result.length > 0
+			) {
+				this.setState({ ...response.data.result[0], isLoading: false });
 			}
 		});
 	}
@@ -47,11 +55,24 @@ class EstimatedEarnings extends React.Component {
 			previousThirtyDays,
 			isLoading
 		} = this.state;
-		const dayProgress = Math.round(((yesterday - sameDayLastWeek) / yesterday) * 10000) / 100;
+		const dayProgress =
+			yesterday > 0
+				? Math.round(((yesterday - sameDayLastWeek) / yesterday) * 10000) / 100
+				: sameDayLastWeek > 0
+				? -100
+				: 0;
 		const weekProgress =
-			Math.round(((lastSevenDays - previousSevenDays) / lastSevenDays) * 10000) / 100;
+			lastSevenDays > 0
+				? Math.round(((lastSevenDays - previousSevenDays) / lastSevenDays) * 10000) / 100
+				: previousSevenDays > 0
+				? -100
+				: 0;
 		const monthProgress =
-			Math.round(((lastThirtyDays - previousThirtyDays) / lastThirtyDays) * 10000) / 100;
+			lastThirtyDays > 0
+				? Math.round(((lastThirtyDays - previousThirtyDays) / lastThirtyDays) * 10000) / 100
+				: previousThirtyDays > 0
+				? -100
+				: 0;
 		return isLoading ? (
 			this.renderLoader()
 		) : (

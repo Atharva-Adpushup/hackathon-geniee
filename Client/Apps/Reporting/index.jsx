@@ -1,7 +1,7 @@
 import React from 'react';
-import Panel from './components/Panel';
+import PanelContainer from './containers/PanelContainer';
 import '../../scss/apps/reporting/index.scss';
 
-const App = props => <Panel {...props} />;
+const App = props => <PanelContainer {...props} />;
 
 export default App;

@@ -50,7 +50,7 @@ class QuickSnapshot extends React.Component {
 						headerChildren={
 							<div className="aligner aligner--row">
 								<span className="aligner-item card-header-title">{wid.display_name}</span>
-								<span className="float-right">{site[siteId].siteName}</span>
+								<span className="float-right">{site[siteId] ? site[siteId].siteName : siteId}</span>
 							</div>
 						}
 						bodyClassName="card-body"

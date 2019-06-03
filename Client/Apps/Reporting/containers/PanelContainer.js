@@ -1,17 +1,16 @@
 import { connect } from 'react-redux';
-import SitewiseReport from '../components/SitewiseReport';
+import Panel from '../components/Panel';
 
 const mapStateToProps = (state, ownProps) => {
 	const {
 		reports: {
-			data: { metrics, site }
+			data: { site }
 		}
 	} = state.global;
 	return {
 		...ownProps,
-		metrics,
 		site
 	};
 };
 
-export default connect(mapStateToProps)(SitewiseReport);
+export default connect(mapStateToProps)(Panel);
