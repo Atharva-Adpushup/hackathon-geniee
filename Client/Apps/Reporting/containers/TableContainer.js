@@ -7,7 +7,6 @@ const mapStateToProps = (state, ownProps) => {
 			data: { metrics, dimension }
 		}
 	} = state.global;
-	console.log(metrics, dimension);
 	return {
 		metrics,
 		dimension,

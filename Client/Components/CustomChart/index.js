@@ -35,15 +35,16 @@ const CustomChart = ({
 						const chart = event.target;
 
 						const node = document.getElementById('chart-legend-wrap');
-						ReactDOM.render(
-							<ChartLegend
-								chart={chart}
-								legends={legends}
-								activeLegendItems={activeLegendItems}
-								updateChartData={updateChartData}
-							/>,
-							node
-						);
+						if (legends && legends.length > 0)
+							ReactDOM.render(
+								<ChartLegend
+									chart={chart}
+									legends={legends}
+									activeLegendItems={activeLegendItems}
+									updateChartData={updateChartData}
+								/>,
+								node
+							);
 					}
 				}
 			};

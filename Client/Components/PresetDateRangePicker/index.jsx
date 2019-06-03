@@ -12,9 +12,6 @@ import { DateRangePickerPhrases } from './lib/defaultPhrases';
 import 'react-dates/lib/css/_datepicker.css';
 
 const propTypes = {
-	...withStylesPropTypes,
-
-	// example props for the demo
 	autoFocus: PropTypes.bool,
 	autoFocusEndDate: PropTypes.bool,
 	initialStartDate: momentPropTypes.momentObj,
@@ -26,6 +23,7 @@ const propTypes = {
 			end: momentPropTypes.momentObj
 		})
 	),
+	datesUpdated: PropTypes.func,
 
 	...omit(DateRangePickerShape, [
 		'startDate',
@@ -59,7 +57,6 @@ const defaultProps = {
 	customCloseIcon: null,
 
 	// calendar presentation and interaction related props
-	renderMonthText: null,
 	orientation: 'horizontal',
 	anchorDirection: 'left',
 	horizontalMargin: 0,
@@ -79,7 +76,6 @@ const defaultProps = {
 	onClose() {},
 
 	// day presentation and interaction related props
-	renderDayContents: null,
 	minimumNights: 0,
 	enableOutsideDays: false,
 	isDayBlocked: () => false,
@@ -87,7 +83,7 @@ const defaultProps = {
 	isDayHighlighted: () => false,
 
 	// internationalization
-	displayFormat: () => moment.localeData().longDateFormat('L'),
+	displayFormat: () => moment.localeData().longDateFormat('ll'),
 	monthFormat: 'MMMM YYYY',
 	phrases: DateRangePickerPhrases
 };
@@ -171,7 +167,7 @@ class DateRangePickerWrapper extends React.Component {
 					hideKeyboardShortcutsPanel
 					showClearDates
 					minimumNights={0}
-					displayFormat="DD-MM-YYYY"
+					displayFormat="ll"
 					isOutsideRange={() => {}}
 				/>
 			</div>

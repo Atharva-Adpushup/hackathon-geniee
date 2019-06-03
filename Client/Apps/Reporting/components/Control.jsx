@@ -1,4 +1,5 @@
 import React, { Component, Fragment } from 'react';
+import { sortBy } from 'lodash';
 import { Glyphicon, OverlayTrigger, Tooltip, Button } from 'react-bootstrap';
 import moment from 'moment';
 import 'react-dates/lib/css/_datepicker.css';
@@ -6,24 +7,21 @@ import 'react-dates/initialize';
 import AsyncGroupSelect from '../../../Components/AsyncGroupSelect/index';
 import PresetDateRangePicker from '../../../Components/PresetDateRangePicker/index';
 import Selectbox from '../../../Components/Selectbox/index';
-import config from '../../../config/config';
-import { convertObjToArr } from '../helpers/utils';
+import { convertObjToArr, arrayUnique } from '../helpers/utils';
 import reportService from '../../../services/reportService';
+import { accountFilter } from '../configs/commonConsts';
+import { Object } from 'es6-shim';
 
 class Control extends Component {
 	constructor(props) {
 		super(props);
 		const dimension = Object.assign({}, props.dimension);
+
 		this.state = {
 			dimensionList: convertObjToArr(dimension),
 			filterList: convertObjToArr(props.filter),
 			intervalList: convertObjToArr(props.interval),
-			metricsList: [
-				{ value: 'Overview', isSelected: true },
-				{ value: 'Layout Editor', isDisabled: true },
-				{ value: 'AP Tag', isDisabled: true },
-				{ value: 'Innovative Ads', isDisabled: true }
-			],
+			metricsList: props.metricsList,
 			startDate: props.startDate,
 			endDate: props.endDate,
 			selectedDimension: props.selectedDimension || '',
@@ -34,46 +32,124 @@ class Control extends Component {
 		};
 	}
 
-	// focusUpdated(focusedInput) {
-	// 	this.setState({ focusedInput });
-	// }
+	componentDidMount() {
+		const { reportType, filter } = this.props;
+		if (reportType === 'account') {
+			let updatedFilterList = [];
+			for (let fil in filter) {
+				let index = accountFilter.indexOf(fil);
+				if (index >= 0) {
+					updatedFilterList.push(filter[fil]);
+				}
+			}
+			updatedFilterList = sortBy(updatedFilterList, filter => filter.position);
 
-	onMetricsChange(metric) {
-		const { selectedMetrics } = this.state;
-
-		const metricsIndex = selectedMetrics.indexOf(metric);
-		if (metricsIndex !== -1) selectedMetrics.splice(metricsIndex, 1);
-		else selectedMetrics.push(metric);
-		this.setState({ selectedMetrics });
+			this.setState({ filterList: updatedFilterList });
+		} else {
+			this.setState({ filterList: convertObjToArr(filter) });
+		}
 	}
 
-	formatFilterAndDimensionList = () => {
-		const { dimensionList, filterList } = this.state;
-		const filteredDimensions = Object.keys(dimensionList).map(dimension => ({
-			value: dimension,
-			name: dimensionList[dimension].display_name,
-			isDisabled: dimensionList[dimension].isDisabled,
-			position: dimensionList[dimension].position
-		}));
+	componentDidUpdate(prevProps) {
+		if (prevProps.selectedFilters !== this.props.selectedFilters) {
+			this.setState({ selectedFilters: this.props.selectedFilters });
+		}
+		if (prevProps.reportType !== this.props.reportType) {
+			const { reportType, filter } = this.props;
+			if (reportType === 'account') {
+				let updatedFilterList = [];
+				for (let fil in filter) {
+					let index = accountFilter.indexOf(fil);
+					if (index >= 0) {
+						updatedFilterList.push(filter[fil]);
+					}
+				}
+				updatedFilterList = sortBy(updatedFilterList, filter => filter.position);
+				this.setState({ filterList: updatedFilterList });
+			} else {
+				this.setState({ filterList: convertObjToArr(filter) });
+			}
+		}
+	}
 
-		const filteredDimensionList = filteredDimensions.sort((a, b) => a.position - b.position);
-
-		const mappedFilters = Object.keys(filterList).map(filter => ({
-			value: filter,
-			name: filterList[filter].display_name,
-			path: filterList[filter].path,
-			isDisabled: filterList[filter].isDisabled,
-			position: filterList[filter].position
-		}));
-
-		const mappedFilterList = mappedFilters.sort((a, b) => a.position - b.position);
-		this.setState({ dimensionList: filteredDimensionList, filterList: mappedFilterList });
+	getSelectedFilter = filter => {
+		const { reportType } = this.props;
+		const { selectedFilters } = this.state;
+		let siteIds;
+		if (reportType === 'account') {
+			const { site } = this.props;
+			siteIds = Object.keys(site);
+		} else {
+			siteIds = selectedFilters['siteid'] ? Object.keys(selectedFilters['siteid']) : [];
+		}
+		const params = { siteid: siteIds.toString() };
+		return reportService.getWidgetData({ path: filter.path, params });
 	};
 
-	getSelectedFilter = filter => reportService.getWidgetData(filter.path).then(res => res.data.data);
+	disableControl = (disabledFilter, disabledDimension, disabledMetrics) => {
+		let { dimensionList, filterList, metricsList } = this.state;
+		if (disabledFilter && disabledFilter.length > 0) {
+			filterList.map(filter => {
+				let found = disabledFilter.find(fil => fil === filter.value);
+				if (found) filter.isDisabled = true;
+			});
+		}
+		if (disabledDimension && disabledDimension.length > 0) {
+			dimensionList.map(dimension => {
+				let found = disabledDimension.find(dim => dim === dimension.value);
+				if (found) dimension.isDisabled = true;
+			});
+		}
+		if (disabledMetrics && disabledMetrics.length > 0) {
+			metricsList.map(metrics => {
+				let found = disabledMetrics.find(metric => metric === metrics.value);
+				if (found) metrics.isDisabled = true;
+			});
+		}
+		this.setState({ filterList, metricsList, dimensionList });
+	};
 
-	onFilterValueChange = selectedFilters => {
+	onFilterChange = selectedFilters => {
+		let { filterList } = this.state;
+		let selectedFilterKeys = selectedFilters ? Object.keys(selectedFilters) : [];
+		let filterObj;
+		let disabledFilter = [];
+		let disabledDimension = [];
+		let disabledMetrics = [];
+		selectedFilterKeys.map(key => {
+			let found = filterList.find(filter => filter.value === key);
+			if (found) {
+				if (!filterObj) {
+					filterObj = { ...found };
+					disabledFilter = filterObj['disabled_filter'] || [];
+					disabledDimension = filterObj['disabled_dimension'] || [];
+					disabledMetrics = filterObj['disabled_metrics'] || [];
+				} else {
+					disabledFilter = found['disabled_filter']
+						? arrayUnique(disabledFilter.concat(found['disabled_filter']))
+						: disabledFilter;
+					disabledDimension = found['disabled_dimension']
+						? arrayUnique(disabledDimension.concat(found['disabled_dimension']))
+						: disabledDimension;
+					disabledMetrics = found['disabled_metrics']
+						? arrayUnique(disabledMetrics.concat(found['disabled_metrics']))
+						: disabledMetrics;
+				}
+			}
+		});
+
+		this.disableControl(disabledFilter, disabledDimension, disabledMetrics);
 		this.setState({ selectedFilters });
+	};
+
+	onDimensionChange = selectedDimension => {
+		let { dimensionList } = this.state;
+		let dimensionObj = dimensionList.find(dimension => dimension.value === selectedDimension);
+		let disabledFilter = dimensionObj['disabled_filter'];
+		let disabledDimension = dimensionObj['disabled_dimension'];
+		let disabledMetrics = dimensionObj['disabled_metrics'];
+		this.disableControl(disabledFilter, disabledDimension, disabledMetrics);
+		this.setState({ selectedDimension });
 	};
 
 	datesUpdated = ({ startDate, endDate }) => {
@@ -87,7 +163,8 @@ class Control extends Component {
 			selectedDimension,
 			selectedInterval,
 			selectedFilters,
-			selectedMetrics
+			selectedMetrics,
+			metricsList
 		} = this.state;
 		const { generateButtonHandler } = this.props;
 		generateButtonHandler({
@@ -96,7 +173,8 @@ class Control extends Component {
 			selectedDimension,
 			selectedFilters,
 			selectedMetrics,
-			selectedInterval
+			selectedInterval,
+			metricsList
 		});
 		// this.setState({
 		// 	disableGenerateButton: true
@@ -155,31 +233,21 @@ class Control extends Component {
 						{/* eslint-disable */}
 						<label className="u-text-normal">Report By</label>
 						<Selectbox
+							id="report-by"
 							isClearable={false}
 							isSearchable={false}
 							selected={state.selectedDimension || ''}
 							options={state.dimensionList}
-							onSelect={selectedDimension => {
-								this.setState({ selectedDimension });
-							}}
+							onSelect={this.onDimensionChange}
 						/>
 						{/* eslint-enable */}
 					</div>
-					<div className="aligner-item u-margin-r4">
-						{/* eslint-disable */}
-						<label className="u-text-normal">Filter</label>
-						<AsyncGroupSelect
-							filterList={state.filterList}
-							selectedFilters={state.selectedFilters}
-							onFilterValueChange={this.onFilterValueChange}
-							getSelectedFilter={this.getSelectedFilter}
-						/>
-						{/* eslint-enable */}
-					</div>
+
 					<div className="aligner-item u-margin-r4">
 						{/* eslint-disable */}
 						<label className="u-text-normal">Interval</label>
 						<Selectbox
+							id="interval"
 							isClearable={false}
 							isSearchable={false}
 							selected={state.selectedInterval || ''}
@@ -203,8 +271,18 @@ class Control extends Component {
 						{/* eslint-enable */}
 					</div>
 				</div>
-				<div className="aligner aligner--wrap aligner--hEnd u-margin-t4">
-					<div className="u-margin-r4">
+				<div className="aligner aligner--wrap aligner--hSpaceBetween u-margin-t4">
+					<div className="aligner-item aligner-item--grow5 u-margin-r4">
+						{/* eslint-disable */}
+						<AsyncGroupSelect
+							filterList={state.filterList}
+							selectedFilters={state.selectedFilters}
+							onFilterValueChange={this.onFilterChange}
+							getSelectedFilter={this.getSelectedFilter}
+						/>
+						{/* eslint-enable */}
+					</div>
+					<div className="aligner-item u-margin-r4 aligner--hEnd">
 						<Button
 							bsStyle="primary"
 							onClick={this.generateButtonHandler}
@@ -214,46 +292,12 @@ class Control extends Component {
 							Generate Report
 						</Button>
 					</div>
-					<div>
+					<div className="aligner-item ">
 						<Button onClick={this.generateButtonHandler} disabled={state.disableGenerateButton}>
 							<Glyphicon glyph="download-alt u-margin-r2" />
 							Export Report
 						</Button>
 					</div>
-				</div>
-				<div className="aligner aligner--wrap aligner--hSpaceBetween metricsRow u-margin-t5">
-					{state.metricsList.map(metric =>
-						metric.isDisabled ? (
-							<OverlayTrigger placement="top" overlay={tooltip}>
-								{/* eslint-disable */}
-								<div
-									className="metrics disabledMetrics aligner-item aligner aligner--vCenter aligner--hCenter u-margin-r2"
-									key={metric}
-									onClick={() => {
-										this.onMetricsChange(metric);
-									}}
-								>
-									{metric.value}
-								</div>
-								{/* eslint-enable */}
-							</OverlayTrigger>
-						) : (
-							/* eslint-disable */
-							<div
-								className={`${metric.isSelected ? 'selectedMetrics' : 'metrics'} 
-											${
-												metric.isDisabled ? 'disabledMetrics' : ''
-											} aligner-item aligner aligner--vCenter aligner--hCenter u-margin-r2`}
-								key={metric}
-								onClick={() => {
-									this.onMetricsChange(metric);
-								}}
-							>
-								{metric.value}
-							</div>
-							/* eslint-enable */
-						)
-					)}
 				</div>
 			</Fragment>
 		);

@@ -172,22 +172,15 @@ const UserRoutes = () => (
 						path={`/sites/:siteId/apps/header-bidding/${HB_NAV_ITEMS_INDEXES.TAB_5}`}
 						component={HeaderBidding}
 					/>
+					<PrivateRoute exact name="Reports" path="/reports" component={Reporting} />
 
 					<PrivateRoute
 						exact
-						name=" Account Reports"
-						path="/reports"
+						name=":siteId"
+						path="/reports/:siteId"
 						customProps={{ activeTab: REPORTS_NAV_ITEMS_INDEXES.ACCOUNT }}
 						component={Reporting}
 					/>
-					<PrivateRoute
-						exact
-						name="Site Level Reports"
-						path="/reports/site"
-						customProps={{ activeTab: REPORTS_NAV_ITEMS_INDEXES.SITE }}
-						component={Reporting}
-					/>
-					<PrivateRoute exact name=":siteId" path="/reporting/:siteId" component={Reporting} />
 
 					{/** Integrations (Connect Google etc.) */}
 					<PrivateRoute

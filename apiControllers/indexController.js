@@ -4,6 +4,7 @@ const express = require('express');
 const md5 = require('md5');
 const _ = require('lodash');
 const { promiseForeach } = require('node-utils');
+const request = require('request-promise');
 
 const userModel = require('../models/userModel');
 const siteModel = require('../models/siteModel');
@@ -111,6 +112,16 @@ function getUserSites(user) {
 	}).then(() => sites);
 }
 
+function getReportsMetaData(params) {
+	return request({
+		uri: `${consts.ANALYTICS_API_ROOT}${consts.ANALYTICS_METAINFO_URL}`,
+		json: true,
+		qs: params
+	}).then(response => {
+		return response.code == 1 ? response.data : {};
+	});
+}
+
 // Set user session data and redirects to relevant screen based on provided parameters
 /*
 	Type defines where the call is coming from
@@ -133,18 +144,24 @@ router
 
 						const sitesArray = [...userData.sites];
 						const sitesArrayLength = sitesArray.length;
+						const siteIds = [];
 						userData.sites = {};
 
 						for (let i = 0; i < sitesArrayLength; i += 1) {
 							const site = sitesArray[i];
 							userData.sites[site.siteId] = site;
+							siteIds.push(site.siteId);
 						}
+						let params = { siteid: ['37780', '37066', '29752'].toString() };
 
-						return res.status(httpStatus.OK).json({
-							user: { ...userData, isSuperUser },
-							networkConfig,
-							sites,
-							adsTxt
+						return getReportsMetaData(params).then(reports => {
+							return res.status(httpStatus.OK).json({
+								user: { ...userData, isSuperUser },
+								networkConfig,
+								sites,
+								adsTxt,
+								reports
+							});
 						});
 					}
 				)

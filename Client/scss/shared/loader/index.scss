@@ -1,5 +1,6 @@
 //Loader ($LO)
 $LOSpinBeforeHeiWidth: 100px;
+$LOSpinSmallBeforeHeiWidth: 50px;
 $LOSpinBeforeBorderWid: 5px;
 
 @include keyframes(spinner) {
@@ -29,12 +30,28 @@ $LOSpinBeforeBorderWid: 5px;
 		z-index: 5;
 	}
 }
-
-.loader-container {
-	position: relative;
-	width: 100%;
+.spinner-small {
+	min-width: 30px;
+	min-height: 30px;
+	&::before {
+		content: 'Loading�';
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: $LOSpinSmallBeforeHeiWidth;
+		height: $LOSpinSmallBeforeHeiWidth;
+		margin-top: -25px;
+		margin-left: -25px;
+	}
+	&:not(:required):before {
+		content: '';
+		@include border-radius(50%);
+		border: $LOSpinBeforeBorderWid solid $whiteColor;
+		border-top-color: $primaryColor;
+		@include animation(spinner 0.7s linear infinite);
+		z-index: 5;
+	}
 }
-
 .loaderwrapper {
 	background: rgba(0, 0, 0, 0.2);
 	height: 100%;
