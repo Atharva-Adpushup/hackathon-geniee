@@ -54,11 +54,7 @@ class MySites extends Component {
 					const computedReportingUrl = `/reporting/${siteId}`;
 					const computedManageSiteUrl = `/sites/${siteId}`;
 					const isSiteBlock = !!(statusObject.site && Object.keys(statusObject.site).length);
-					// TODO: Remove card flex wrap implementation with grid-col implementation
-					// so that fixed height hacks are not required. Every card container will be available
-					// to take dynamic height based on content
-					const computedFixedHeightClassName = siteStep < 3 ? ' card--height-fixed ' : '';
-					const computedRootClassName = `u-margin-r4 u-margin-b4 ${computedFixedHeightClassName}`;
+					const computedRootClassName = `u-margin-r4 u-margin-b4`;
 
 					const computedOnboardingBlock = () => (
 						<Panel className="panel--transparent u-margin-b4">
@@ -161,7 +157,7 @@ class MySites extends Component {
 				<div className="u-padding-h4 u-padding-v5 aligner aligner--row aligner--wrap">
 					{this.renderStatusCards()}
 
-					<Link to="/addSite" className="u-link-reset">
+					<Link to="/addSite" className="u-link-reset aligner u-margin-b4">
 						<div className="card card--theme-dotted aligner aligner--vCenter aligner--hCenter u-cursor-pointer">
 							<div className="aligner aligner--column aligner--vCenter aligner--hCenter">
 								<FontAwesomeIcon size="2x" icon="plus-circle" className="u-margin-b3" />
