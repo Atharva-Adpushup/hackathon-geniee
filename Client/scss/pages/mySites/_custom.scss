@@ -1,3 +1,4 @@
+//eslint-disable
 .card {
 	> .card-body {
 		.panel-heading {
@@ -34,7 +35,7 @@
 	}
 
 	&.panel {
-		width: ($fullPercentage - 70);
+		width: ($fullPercentage - 68);
 
 		&.panel-success {
 			> .card-body {
