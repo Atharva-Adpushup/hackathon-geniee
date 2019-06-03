@@ -10,7 +10,8 @@ var constants = {
         NO_ERROR: 1
     },
     NETWORK_ID: 103512698,
-    DEFAULT_WINNER: 'adx'
+    DEFAULT_WINNER: 'adx',
+    FEEDBACK_URL: '//e3.adpushup.com/AdPushupFeedbackWebService/feedback/aphb?data='
 };
 
 module.exports = constants;

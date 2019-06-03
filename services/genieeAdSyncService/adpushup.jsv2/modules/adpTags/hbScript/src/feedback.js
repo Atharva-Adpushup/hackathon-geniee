@@ -27,15 +27,15 @@ var feedback = {
             timedOutBidders: [],
             sectionId: slot.sectionId,
             sectionName: slot.sectionName,
-            pageGroup: slot.pageGroup,
-            pageVariationId: slot.variationId,
-            pageVariationName: slot.variationName,
-            pageVariationType: slot.pageVariationType,
-            platform: slot.platform,
+            pageGroup: adp.config.pageGroup,
+            pageVariationId: adp.config.selectedVariation,
+            pageVariationName: adp.config.selectedVariationName,
+            pageVariationType: adp.config.selectedVariationType,
+            platform: adp.config.platform,
             packetId: adp.config.packetId
         };
 
-        return utils.ajax(feedbackData, 'get');
+        return utils.ajax('get', constants.FEEDBACK_URL, feedbackData);
     }
 };
 
