@@ -7,8 +7,13 @@ import Loader from '../Loader/index';
 import { domanize } from '../../helpers/commonFunctions';
 import { ROUTES } from '../../constants/others';
 
+function shouldWeOpenSidebar(location = { pathname: false }) {
+	if (!location.pathname) return true;
+	return !ROUTES.SIDEBAR_CLOSE.some(route => route.test(location.pathname));
+}
+
 class Shell extends React.Component {
-	state = { isSidebarOpen: true };
+	state = {};
 
 	componentDidMount() {
 		const { userFetched, reportsFetched, fetchGlobalData } = this.props;
@@ -91,6 +96,7 @@ class Shell extends React.Component {
 			findUsers
 		} = this.props;
 		const routes = this.getRoutes(children, location, user);
+		const sidebarOpen = isSidebarOpen !== undefined ? isSidebarOpen : shouldWeOpenSidebar(location);
 
 		return (
 			<Grid fluid>
@@ -106,7 +112,7 @@ class Shell extends React.Component {
 					</Col>
 				</Row>
 				<Row className="sidebar-main-wrap">
-					<Sidebar show={isSidebarOpen} />
+					<Sidebar show={sidebarOpen} />
 					<main className="main-content">
 						{routes ? <Breadcrumbs mappedRoutes={routes} /> : null}
 						{reportsFetched && userFetched ? children : <Loader />}
