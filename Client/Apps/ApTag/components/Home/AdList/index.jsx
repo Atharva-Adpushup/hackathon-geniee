@@ -1,3 +1,4 @@
+/* eslint-disable react/no-array-index-key */
 import React, { Component } from 'react';
 import AdElement from './AdElement';
 import CustomButton from '../../../../../Components/CustomButton/index';
@@ -6,8 +7,8 @@ import Loader from '../../../../../Components/Loader';
 
 class AdList extends Component {
 	componentDidMount() {
-		const { loading, fetchAds, match } = this.props;
-		if (loading) fetchAds({ siteId: match.params.siteId });
+		const { loading, fetchAds, siteId } = this.props;
+		if (loading) fetchAds({ siteId });
 	}
 
 	render() {
@@ -19,16 +20,12 @@ class AdList extends Component {
 			modifyAdOnServer,
 			user,
 			networkConfig,
-			match
+			siteId
 		} = this.props;
 		const customStyle = user.isSuperUser ? { minHeight: '540px' } : { minHeight: '440px' };
 
 		if (loading) {
-			return (
-				<div style={{ height: '100%', minHeight: '600px' }}>
-					<Loader />
-				</div>
-			);
+			return <Loader />;
 		}
 		if (!ads.length) {
 			return <Empty message="Seems kind of empty here" />;
@@ -40,7 +37,7 @@ class AdList extends Component {
 						<CustomButton
 							variant="primary"
 							className="u-margin-t3 u-margin-r2 pull-right"
-							onClick={() => masterSave(match.params.siteId, user.isSuperUser)}
+							onClick={() => masterSave(siteId, user.isSuperUser)}
 						>
 							Master Save
 						</CustomButton>
@@ -59,6 +56,7 @@ class AdList extends Component {
 									updateAd={updateAd}
 									modifyAdOnServer={modifyAdOnServer}
 									networkConfig={networkConfig}
+									siteId={siteId}
 								/>
 							</li>
 						</div>

@@ -1,7 +1,10 @@
+/* eslint-disable no-alert */
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 import React, { Component } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Col, OverlayTrigger, Tooltip, Button } from 'react-bootstrap';
-import { makeFirstLetterCapitalize, copyToClipBoard } from '../../../lib/helpers';
+import { makeFirstLetterCapitalize, copyToClipBoard } from '../../../../../helpers/commonFunctions';
 import { ADCODE, AMP_MESSAGE } from '../../../configs/commonConsts';
 import CustomButton from '../../../../../Components/CustomButton/index';
 import AdNetworkDetails from './AdNetworkDetails';
@@ -51,8 +54,8 @@ class AdElement extends Component {
 	}
 
 	updateWrapper(data) {
-		const { updateAd, modifyAdOnServer, user, ad, match } = this.props;
-		return user.isSuperUser ? updateAd(ad.id, data) : modifyAdOnServer(match.params.siteId, ad.id, data);
+		const { updateAd, modifyAdOnServer, user, ad, siteId } = this.props;
+		return user.isSuperUser ? updateAd(ad.id, siteId, data) : modifyAdOnServer(siteId, ad.id, data);
 	}
 
 	renderInformation = (label, value) => (
@@ -62,7 +65,7 @@ class AdElement extends Component {
 	);
 
 	renderAdDetails() {
-		const { ad, updateAd, networkConfig, user } = this.props;
+		const { ad, updateAd, networkConfig, user, siteId } = this.props;
 		const { showLazyload, showNetworkDetails, editName, isActive } = this.state;
 		const isAMP = ad.formatData.type === 'amp';
 
@@ -73,13 +76,15 @@ class AdElement extends Component {
 			return (
 				<AdNetworkDetails
 					ad={ad}
+					siteId={siteId}
 					onCancel={() => this.toggleHandler('showNetworkDetails')}
 					onSubmit={updateAd}
 					networkConfig={networkConfig}
 					user={user}
 				/>
 			);
-		} else if (editName) {
+		}
+		if (editName) {
 			return (
 				<EditBox
 					label="Ad Name"
@@ -91,12 +96,13 @@ class AdElement extends Component {
 					rightSize={9}
 				/>
 			);
-		} else if (showLazyload) {
+		}
+		if (showLazyload) {
 			return (
 				<LazyLoadSettings
 					checked={ad.enableLazyLoading}
 					id={ad.id}
-					onChange={payload => updateAd(ad.id, payload)}
+					onChange={payload => updateAd(ad.id, siteId, payload)}
 					onCancel={() => this.toggleHandler('showLazyload')}
 				/>
 			);

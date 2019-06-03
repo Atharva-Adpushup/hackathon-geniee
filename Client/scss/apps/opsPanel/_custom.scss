@@ -1,0 +1,54 @@
+.json-text {
+	height: 200px;
+}
+.report-table {
+	margin: 20px;
+	font-size: 1.2em;
+	border: 1px solid $borderColor;
+
+	.table-datatable {
+		// table-layout: fixed !important;
+	}
+
+	.col-md-4 {
+		padding: 20px 20px;
+
+		&:nth-child(2) {
+			text-align: center;
+		}
+	}
+	.col-xs-12:nth-of-type(4) {
+		padding: 0px;
+	}
+
+	input[id='select-filter-reportTable'] {
+		padding: 16px;
+		font-size: 1em;
+	}
+	thead {
+		background-color: $borderColor;
+		border-top: 2px solid $borderColor;
+	}
+	.tag {
+		font-size: 12px !important;
+		font-weight: bold;
+	}
+}
+.report-table .tbody-td-default,
+.report-table .thead-th-default {
+	width: 100%;
+	max-width: 250px;
+	word-wrap: break-word;
+}
+.onboarded,
+.live {
+	background-color: $GreenColor !important;
+}
+.pre-onboarding,
+.draft {
+	background-color: $primaryRed !important;
+}
+.channels,
+.onboarding {
+	background-color: $lightBlue !important;
+}

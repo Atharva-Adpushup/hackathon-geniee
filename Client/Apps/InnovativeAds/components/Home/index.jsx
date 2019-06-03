@@ -90,9 +90,7 @@ class Home extends Component {
 		return (
 			<ActionCard>
 				{!meta.fetched ? (
-					<div style={{ position: 'relative', minHeight: '200px' }}>
-						<Loader />
-					</div>
+					<Loader />
 				) : (
 					<React.Fragment>
 						<Nav bsStyle="tabs" activeKey={activeItem.INDEX} onSelect={this.handleNavSelect}>

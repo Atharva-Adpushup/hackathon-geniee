@@ -2,8 +2,8 @@ const express = require('express');
 const crypto = require('crypto');
 const Promise = require('bluebird');
 const uuid = require('node-uuid');
-const _ = require('lodash');
 const request = require('request-promise');
+
 const userModel = require('../models/userModel');
 const siteModel = require('../models/siteModel');
 const utils = require('../helpers/utils');
@@ -13,7 +13,12 @@ const formValidator = require('../helpers/FormValidator');
 const schema = require('../helpers/schema');
 const oauthHelper = require('../helpers/googleOauth');
 const config = require('../configs/config');
+// eslint-disable-next-line no-unused-vars
 const AdpushupError = require('../helpers/AdPushupError');
+const { sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFunctions');
+const authToken = require('../helpers/authToken');
+const { errorHandler, appBucket } = require('../helpers/routeHelpers');
+
 const router = express.Router();
 
 let googleOAuthUniqueString = '';
@@ -30,6 +35,7 @@ router
 			.then(() => userModel.addSite(req.user.email, site))
 			.spread((user, siteId) => {
 				const userSites = user.get('sites');
+				// eslint-disable-next-line no-restricted-syntax
 				for (const i in userSites) {
 					if (userSites[i].siteId === siteId) {
 						userSites[i].onboardingStage = 'onboarding';
@@ -37,6 +43,7 @@ router
 						user.set('sites', userSites);
 						user.save();
 
+						// eslint-disable-next-line no-shadow
 						const { siteId, domain, onboardingStage, step } = userSites[i];
 
 						return res.status(httpStatus.OK).json({ siteId, site: domain, onboardingStage, step });
@@ -47,10 +54,12 @@ router
 					.json({ error: 'Error while Adding site' });
 			})
 			.catch(err => {
+				// eslint-disable-next-line no-console
 				console.log('Error while Adding site', err);
 				if (err.message.status === 409) {
 					return res.status(409).json({ error: err.message.message });
 				}
+				// eslint-disable-next-line no-undef
 				if (err instanceof AdPushupError && Array.isArray(err.message)) {
 					return res.status(httpStatus.BAD_REQUEST).json({ error: err.message[0].message });
 				}
@@ -83,7 +92,7 @@ router
 				email
 			)}`;
 
-			const key = tipaltiConfig.key;
+			const { key } = tipaltiConfig;
 
 			const hash = crypto
 				.createHmac('sha256', key)
@@ -100,12 +109,13 @@ router
 		const { email } = req.user;
 		return Promise.all([getTipaltiUrls(email), userModel.updateUserPaymentStatus(email)])
 			.spread(tipaltiUrls => {
+				// eslint-disable-next-line no-console
 				console.log(tipaltiUrls);
 				res.send({
 					tipaltiUrls
 				});
 			})
-			.catch(err => res.status(500).send({ error: 'Some error occurred' }));
+			.catch(() => res.status(500).send({ error: 'Some error occurred' }));
 	})
 	.post('/setSiteStep', (req, res) => {
 		const { siteId, onboardingStage, step } = req.body;
@@ -162,6 +172,7 @@ router
 
 		const getAccessToken = oauthHelper.getAccessTokens(req.query.code).then(tokenObject => {
 			const {
+				// eslint-disable-next-line camelcase
 				tokens: { access_token, id_token, expiry_date }
 			} = tokenObject;
 			const computedObject = { access_token, id_token, expiry_date };
@@ -187,6 +198,7 @@ router
 				})
 		);
 		const getUserDFPInfo = getAccessToken.then(token => {
+			// eslint-disable-next-line camelcase
 			const { id_token } = token;
 			const { OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET } = config.googleOauth;
 
@@ -223,6 +235,7 @@ router
 			getUserInfo,
 			getUserDFPInfo,
 			(user, token, adsenseAccounts, userInfo, userDFPInfo) => {
+				// eslint-disable-next-line camelcase
 				const { id_token, access_token, expiry_date } = token;
 
 				return Promise.all([
@@ -252,7 +265,7 @@ router
 					window.opener.postMessage({
 						"cmd":"SAVE_GOOGLE_OAUTH_INFO",
 						"data": ${postMessageData}
-					}, "https://app.staging.adpushup.com");
+					}, "http://localhost:8080");
 					window.close();
 					</script>`;
 
@@ -272,6 +285,61 @@ router
 				googleOAuthUniqueString = '';
 				return true;
 			});
+	})
+	.get('/findUsers', (req, res) =>
+		appBucket
+			.queryDB('select email from AppBucket where meta().id like "user::%"')
+			.then(users => {
+				let response = [];
+				if (users && Array.isArray(users) && users.length) {
+					response = users.filter(user => CC.EMAIL_REGEX.test(user.email));
+				}
+				return sendSuccessResponse(
+					{
+						users: response
+					},
+					res
+				);
+			})
+			.catch(err => errorHandler(err, res))
+	)
+	.post('/switchUser', (req, res) => {
+		let { email } = req.body;
+		email = utils.htmlEntities(utils.sanitiseString(email));
+
+		if (!req.user.isSuperUser || !email) {
+			return sendErrorResponse(
+				{
+					message: 'Permission Denined'
+				},
+				res,
+				httpStatus.PERMISSION_DENIED
+			);
+		}
+		return userModel
+			.setSitePageGroups(email)
+			.then(user => {
+				const token = authToken.getAuthToken({
+					email: user.get('email'),
+					isSuperUser: true
+				});
+
+				return res
+					.status(httpStatus.OK)
+					.cookie(
+						'user',
+						JSON.stringify({
+							authToken: token,
+							isSuperUser: true
+						}),
+						{ maxAge: 86400000, path: '/' }
+					)
+					.send({
+						success: 'Changed User',
+						authToken: token
+					});
+			})
+			.catch(err => errorHandler(err, res));
 	});
 
 module.exports = router;

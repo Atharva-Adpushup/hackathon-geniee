@@ -60,6 +60,7 @@ class AdList extends Component {
 				if (condition === false) break;
 				if (filter.value !== null) {
 					const container = filter.inFormatData ? ad.formatData : ad;
+					const toMatch = filter.value !== 'false';
 					switch (filter.type) {
 						case 'array':
 							condition = condition && container[filter.key].includes(filter.value);
@@ -69,7 +70,6 @@ class AdList extends Component {
 							condition = condition && container[filter.key] === filter.value;
 							break;
 						case 'boolean':
-							const toMatch = filter.value === "false" ? false : true;
 							condition = condition && container[filter.key] === toMatch;
 							break;
 					}
@@ -146,11 +146,15 @@ class AdList extends Component {
 			<React.Fragment>
 				<Row>
 					{user.isSuperUser ? (
-							<CustomButton variant="primary" className="pull-right" onClick={this.saveWrapper}>
-								Master Save
-							</CustomButton>
-						) : null}
-					<CustomButton variant="secondary" className="u-margin-r3 pull-right" onClick={this.resetFilters}>
+						<CustomButton variant="primary" className="pull-right" onClick={this.saveWrapper}>
+							Master Save
+						</CustomButton>
+					) : null}
+					<CustomButton
+						variant="secondary"
+						className="u-margin-r3 pull-right"
+						onClick={this.resetFilters}
+					>
 						Reset Filters
 					</CustomButton>
 				</Row>
@@ -199,7 +203,8 @@ class AdList extends Component {
 			updateTraffic,
 			user,
 			channels,
-			match
+			match,
+			siteId
 		} = this.props;
 		const { show, modalData, filters } = this.state;
 		const HEADERS = user.isSuperUser ? OPS_AD_LIST_HEADERS : USER_AD_LIST_HEADERS;
@@ -207,12 +212,9 @@ class AdList extends Component {
 		const customStyle = {};
 
 		if (loading) {
-			return (
-				<div style={{ position: 'relative', minHeight: '200px' }}>
-					<Loader />
-				</div>
-			);
-		} else if (!adsToRender.length) {
+			return <Loader />;
+		}
+		if (!adsToRender.length) {
 			return (
 				<div className="u-padding-4">
 					{this.renderFilters()}
@@ -232,8 +234,9 @@ class AdList extends Component {
 						</tr>
 					</thead>
 					<tbody>
-						{adsToRender.map(ad =>
-							// ad.isActive || user.isSuperUser ? (
+						{adsToRender.map(
+							ad => (
+								// ad.isActive || user.isSuperUser ? (
 								<AdElement
 									key={`adElement-${ad.id}`}
 									identifier={ad.id}
@@ -248,7 +251,9 @@ class AdList extends Component {
 									archiveAd={archiveAd}
 									updateTraffic={updateTraffic}
 									match={match}
+									siteId={siteId}
 								/>
+							)
 							// ) : null
 						)}
 					</tbody>

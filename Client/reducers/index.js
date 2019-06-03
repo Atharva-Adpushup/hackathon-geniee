@@ -6,11 +6,12 @@ import routes from './routes/index';
 
 const appReducer = combineReducers({ apps, global, routes });
 const rootReducer = (state, action) => {
-	if (action.type === USER_ACTIONS.LOGOUT_USER) {
-		state = undefined;
+	let newState = { ...state };
+	if (action.type === USER_ACTIONS.LOGOUT_USER || action.type === USER_ACTIONS.RESET_STATE) {
+		newState = undefined;
 	}
 
-	return appReducer(state, action);
+	return appReducer(newState, action);
 };
 
 export default rootReducer;

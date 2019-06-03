@@ -1,3 +1,6 @@
+/* eslint-disable react/no-unused-state */
+/* eslint-disable react/no-array-index-key */
+/* eslint-disable prefer-destructuring */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { DropdownButton, MenuItem } from 'react-bootstrap';
@@ -27,7 +30,7 @@ class SelectBox extends Component {
 		const { onSelect } = this.props;
 		this.setState(
 			{
-				selected: value,
+				// selected: value,
 				name: e.target.getAttribute('data-name')
 			},
 			() => onSelect(value)

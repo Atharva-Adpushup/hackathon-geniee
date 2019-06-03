@@ -1,13 +1,22 @@
+/* eslint-disable no-alert */
 import { GLOBAL_ACTIONS } from '../../../constants/innovativeAds';
 import axiosInstance from '../../../helpers/axiosInstance';
 import { errorHandler } from '../../../helpers/commonFunctions';
+import { getAdsAndGlobal } from '../../../Apps/InnovativeAds/lib/helpers';
 
 const masterSave = siteId => (_, getState) => {
-	const { innovativeAds } = getState().apps;
+	const props = {
+		match: {
+			params: {
+				siteId
+			}
+		}
+	};
+	const { ads, global } = getAdsAndGlobal(getState(), props);
 	const data = {
 		siteId,
-		ads: innovativeAds.ads.content,
-		meta: innovativeAds.global.meta.content
+		ads: ads.content,
+		meta: global.meta.content
 	};
 	return axiosInstance
 		.post('/innovativeAds/masterSave', data)
@@ -15,8 +24,8 @@ const masterSave = siteId => (_, getState) => {
 		.catch(err => errorHandler(err, 'Master Save Failed'));
 };
 
-const resetCurrentAd = () => dispatch =>
-	dispatch({ type: GLOBAL_ACTIONS.SET_CURRENT_AD, currentAd: null });
+const resetCurrentAd = siteId => dispatch =>
+	dispatch({ type: GLOBAL_ACTIONS.SET_CURRENT_AD, siteId, currentAd: null });
 
 const fetchMeta = siteId => dispatch =>
 	axiosInstance
@@ -29,13 +38,15 @@ const fetchMeta = siteId => dispatch =>
 			const { data } = response.data;
 			dispatch({
 				type: GLOBAL_ACTIONS.SET_CHANNELS,
-				data: data.channels
+				data: data.channels,
+				siteId
 			});
 			dispatch({
 				type: GLOBAL_ACTIONS.REPLACE_META,
-				data: data.meta
+				data: data.meta,
+				siteId
 			});
 		})
-		.catch(err => errorHandler(err, 'Master Save Failed'));
+		.catch(err => errorHandler(err, 'App Initialization Failed'));
 
 export { masterSave, resetCurrentAd, fetchMeta };

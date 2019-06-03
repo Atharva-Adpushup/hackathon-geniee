@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 import React, { Component } from 'react';
 import CustomButton from '../../../../../Components/CustomButton/index';
 import CustomList from '../CustomList';
@@ -38,7 +39,7 @@ class PagegroupTrafficEdit extends Component {
 			isSuperUser,
 			meta,
 			channels,
-			match
+			siteId
 		} = this.props;
 		const { pagegroups } = this.state;
 
@@ -71,7 +72,7 @@ class PagegroupTrafficEdit extends Component {
 							if (ad.isActive) {
 								updateTraffic(
 									ad.id,
-									match.params.siteId,
+									siteId,
 									{
 										platform: ad.formatData.platform,
 										format: ad.formatData.format,

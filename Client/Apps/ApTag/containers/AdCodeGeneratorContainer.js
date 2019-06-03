@@ -2,20 +2,22 @@ import { connect } from 'react-redux';
 import { createAd } from '../../../actions/apps/apTag/adActions';
 import { resetCurrentAd } from '../../../actions/apps/apTag/globalActions';
 import AdCodeGenerator from '../components/Home/AdCodeGenerator';
+import { getAdsAndGlobal } from '../lib/helpers';
 
 const mapStateToProps = (state, ownProps) => {
-	const { apTag } = state.apps;
+	const { global, siteId } = getAdsAndGlobal(state, ownProps);
 	return {
-		currentAd: apTag.global.currentAd,
-		codeGenerated: !!apTag.global.currentAd,
-		adId: apTag.global.currentAd,
+		currentAd: global.currentAd,
+		codeGenerated: !!global.currentAd,
+		adId: global.currentAd,
+		siteId,
 		...ownProps
 	};
 };
 
 const mapDispatchToProps = dispatch => ({
 	createAd: payload => dispatch(createAd(payload)),
-	resetCurrentAd: () => dispatch(resetCurrentAd())
+	resetCurrentAd: siteId => dispatch(resetCurrentAd(siteId))
 });
 
 export default connect(

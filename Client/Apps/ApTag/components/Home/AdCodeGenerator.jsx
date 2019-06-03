@@ -54,7 +54,7 @@ class AdCodeGenerator extends Component {
 	}
 
 	saveHandler() {
-		const { createAd, match } = this.props;
+		const { createAd, siteId } = this.props;
 		const { type, platform, size } = this.state;
 		const isResponsive = size === 'responsive';
 		const sizesArray = isResponsive ? 'responsive' : size.split('x');
@@ -70,7 +70,7 @@ class AdCodeGenerator extends Component {
 			},
 			() =>
 				createAd({
-					siteId: match.params.siteId,
+					siteId,
 					ad: {
 						width,
 						height,
@@ -95,7 +95,7 @@ class AdCodeGenerator extends Component {
 	}
 
 	resetHandler() {
-		const { resetCurrentAd } = this.props;
+		const { resetCurrentAd, siteId } = this.props;
 		this.setState(
 			{
 				progress: 0,
@@ -104,7 +104,7 @@ class AdCodeGenerator extends Component {
 				size: null,
 				loading: false
 			},
-			() => resetCurrentAd()
+			() => resetCurrentAd(siteId)
 		);
 	}
 

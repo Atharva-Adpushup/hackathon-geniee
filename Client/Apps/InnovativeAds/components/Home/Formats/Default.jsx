@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/label-has-associated-control */
+/* eslint-disable no-console */
 /* eslint-disable no-alert */
 /* eslint-disable jsx-a11y/label-has-for */
 /* eslint-disable jsx-a11y/href-no-hash */

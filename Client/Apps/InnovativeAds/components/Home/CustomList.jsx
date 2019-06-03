@@ -1,3 +1,6 @@
+/* eslint-disable react/no-array-index-key */
+/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 import React from 'react';
 import { Col } from 'react-bootstrap';
 import CustomMessage from '../../../../Components/CustomMessage/index';
@@ -61,7 +64,7 @@ const CustomList = props => {
 		return options.map(option => (
 			<li
 				key={option.key}
-				className={`option ${toMatch == option.key ? 'active' : ''}`}
+				className={`option ${toMatch === option.key ? 'active' : ''}`}
 				onClick={onClick.bind(null, option.key)}
 			>
 				<img src={option.image} alt={option.key} />

@@ -385,45 +385,55 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		totalSteps: 3
 	},
 	APP_KEYS: {
-		0: {
+		unknown: {
 			app: 'UNKNOWN',
-			key: 0
+			key: 0,
+			alias: 'unknown'
 		},
-		1: {
+		layout: {
 			app: 'LAYOUT',
-			key: 1
+			key: 1,
+			alias: 'layout'
 		},
-		2: {
+		tag: {
 			app: 'TAG',
-			key: 2
+			key: 2,
+			alisa: 'tag'
 		},
-		3: {
+		hb: {
 			app: 'HB',
-			key: 3
+			key: 3,
+			alias: 'hb'
 		},
-		4: {
+		mediation: {
 			app: 'MEDIATION',
-			key: 4
+			key: 4,
+			alias: 'mediation'
 		},
-		5: {
+		ia: {
 			app: 'INTERACTIVE_AD',
-			key: 5
+			key: 5,
+			alias: 'ia'
 		},
-		6: {
+		amp: {
 			app: 'AMP',
-			key: 6
+			key: 6,
+			alias: 'amp'
 		},
-		7: {
+		adrecover: {
 			app: 'AdRecover',
-			key: 7
+			key: 7,
+			alias: 'adrecover'
 		},
-		8: {
+		manageadstxt: {
 			app: 'Manage Ads.txt',
-			key: 8
+			key: 8,
+			alias: 'manageadstxt'
 		}
 	},
 	ADS_TXT_REDIRECT_PATTERN: 'manageadstxt.com',
 	GOOGLE_BOT_USER_AGENT:
 		'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html).',
-	DEFAULT_APP_STATUS_RESPONSE: {}
+	DEFAULT_APP_STATUS_RESPONSE: {},
+	EMAIL_REGEX: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 };

@@ -19,12 +19,6 @@ class Shell extends React.Component {
 		this.setState(state => ({ isSidebarOpen: !state.isSidebarOpen }));
 	};
 
-	renderLoader = () => (
-		<div style={{ position: 'relative', width: '100%', height: '100%' }}>
-			<Loader />
-		</div>
-	);
-
 	isBlackListedRoute = path => {
 		const { BLACK_LIST: blackListedArray } = ROUTES;
 		const isValid = !!(blackListedArray.indexOf(path) > -1);
@@ -86,21 +80,36 @@ class Shell extends React.Component {
 
 	render() {
 		const { isSidebarOpen } = this.state;
-		const { children, userFetched, reportsFetched, user, location } = this.props;
+		const {
+			children,
+			userFetched,
+			reportsFetched,
+			user,
+			location,
+			logout,
+			switchUser,
+			findUsers
+		} = this.props;
 		const routes = this.getRoutes(children, location, user);
 
 		return (
 			<Grid fluid>
 				<Row>
 					<Col>
-						<Header sidebarToggle={this.sidebarToggle} />
+						<Header
+							sidebarToggle={this.sidebarToggle}
+							user={user}
+							logout={logout}
+							switchUser={switchUser}
+							findUsers={findUsers}
+						/>
 					</Col>
 				</Row>
 				<Row className="sidebar-main-wrap">
 					<Sidebar show={isSidebarOpen} />
 					<main className="main-content">
 						{routes ? <Breadcrumbs mappedRoutes={routes} /> : null}
-						{reportsFetched && userFetched ? children : this.renderLoader()}
+						{reportsFetched && userFetched ? children : <Loader />}
 					</main>
 				</Row>
 			</Grid>

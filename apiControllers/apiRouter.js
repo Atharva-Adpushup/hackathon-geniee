@@ -10,6 +10,7 @@ const siteController = require('./siteController');
 const dataController = require('./dataController');
 const innovativeAdsController = require('./innovativeAdsController');
 const reportsController = require('./reportsController');
+const opsController = require('./opsController');
 
 const apiAuthMiddleware = require('../middlewares/apiAuthMiddleware');
 
@@ -24,6 +25,7 @@ router.use('/data', dataController);
 router.use('/proxy', proxyController);
 router.use('/innovativeAds', innovativeAdsController);
 router.use('/reports', reportsController);
+router.use('/ops', opsController);
 router.use('/', indexController);
 
 module.exports = router;

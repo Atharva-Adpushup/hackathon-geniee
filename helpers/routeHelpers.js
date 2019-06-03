@@ -45,11 +45,12 @@ function verifyOwner(siteId, userEmail) {
 		});
 }
 
-function errorHander(err, res, code = HTTP_STATUS.BAD_REQUEST) {
+function errorHandler(err, res, code = HTTP_STATUS.BAD_REQUEST) {
 	const customMessage = err.message || err;
 	const errorCode = customMessage.code || code;
+	const message = customMessage.message || 'Opertion Failed';
 	console.log(err);
-	return sendErrorResponse({ message: 'Opertion Failed' }, res, errorCode);
+	return sendErrorResponse({ message, code: errorCode }, res, errorCode);
 }
 
 function sendDataToZapier(uri, data) {
@@ -106,7 +107,7 @@ function fetchAds(req, res, docKey) {
 						},
 						res
 				  )
-				: errorHander(err, res)
+				: errorHandler(err, res)
 		);
 }
 
@@ -208,19 +209,24 @@ function fetchStatusesFromReporting(site) {
 	const options = {
 		method: 'GET',
 		uri: PRODUCT_LIST_API,
-		qs: { siteId: site.get('siteId') },
+		qs: { siteid: site.get('siteId') },
 		json: true
 	};
 
 	return request(options)
 		.then(response => {
-			const { data } = response;
-			const { products = [] } = data;
+			const { data = {}, code } = response;
 			const output = {};
 
-			_.forEach(products, product => {
-				const { key } = product;
-				key ? (output[key] = APP_KEYS[key]) : null;
+			if (!code || code !== 1) {
+				throw new Error(`APP Status API Failed and err is ${data}`);
+			}
+
+			_.forEach(data, (isActive, product) => {
+				if (isActive) {
+					const productInfo = APP_KEYS[product.toLowerCase()];
+					output[productInfo.key] = productInfo;
+				}
 			});
 			return output;
 		})
@@ -303,7 +309,7 @@ function fetchCustomStatuses(site) {
 
 module.exports = {
 	verifyOwner,
-	errorHander,
+	errorHandler,
 	appBucket,
 	sendDataToZapier,
 	emitEventAndSendResponse,
