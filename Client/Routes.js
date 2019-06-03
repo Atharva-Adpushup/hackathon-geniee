@@ -7,7 +7,8 @@ import { APT_NAV_ITEMS_INDEXES } from './Apps/ApTag/configs/commonConsts';
 import { REPORTS_NAV_ITEMS_INDEXES } from './Apps/Reporting/configs/commonConsts';
 import { PAYMENT_NAV_ITEMS_INDEXES } from './Pages/Payment/configs/commonConsts';
 import { ADSTXT_NAV_ITEMS_INDEXES } from './Pages/AdsTxtManagement/configs/commonConsts';
-// import { OP_NAV_ITEMS_INDEXES } from './Apps/OpsPanel/configs/commonConsts';
+import { OP_NAV_ITEMS_INDEXES } from './Apps/OpsPanel/configs/commonConsts';
+import { NAV_ITEMS_INDEXES as HB_NAV_ITEMS_INDEXES } from './Apps/HeaderBidding/constants';
 
 import history from './helpers/history';
 import PublicOnlyRoute from './Components/PublicOnlyRoute';
@@ -47,7 +48,7 @@ const ErrorPage = lazy(() => import(/* webpackChunkName: "error" */ './Pages/Err
 const OnBoarding = lazy(() => import(/* webpackChunkName: "onBoarding" */ './Pages/OnBoarding'));
 const AddNewSite = lazy(() => import(/* webpackChunkName: "addNewSite" */ './Pages/AddNewSite'));
 const Layout = lazy(() => import(/* webpackChunkName: "layout" */ './Apps/Layout/index'));
-// const OpsPanel = lazy(() => import(/* webpackChunkName: "opsPanel" */ './Apps/OpsPanel/index'));
+const OpsPanel = lazy(() => import(/* webpackChunkName: "opsPanel" */ './Apps/OpsPanel/index'));
 
 const UserRoutes = () => (
 	<Router history={history}>
@@ -229,20 +230,41 @@ const UserRoutes = () => (
 					/>
 
 					{/** Ops Panel */}
-					{/* <PrivateRoute
+					<PrivateRoute
 						exact
-						customProps={{ activeTab: OP_NAV_ITEMS_INDEXES.SITES_MAPPING }}
+						customProps={{ activeTab: OP_NAV_ITEMS_INDEXES.SETTINGS }}
 						name="Ops Panel"
 						path="/ops-panel"
 						component={OpsPanel}
 					/>
 					<PrivateRoute
 						exact
-						customProps={{ activeTab: OP_NAV_ITEMS_INDEXES.LIVE_SITES_MAPPING }}
-						name="Live Sites"
-						path="/ops-panel/live-sites"
+						customProps={{ activeTab: OP_NAV_ITEMS_INDEXES.SETTINGS }}
+						name="Settings"
+						path="/ops-panel/settings"
 						component={OpsPanel}
-					/> */}
+					/>
+					<PrivateRoute
+						exact
+						customProps={{ activeTab: OP_NAV_ITEMS_INDEXES.INFO_PANEL }}
+						name="Info Panel"
+						path="/ops-panel/info-panel"
+						component={OpsPanel}
+					/>
+					<PrivateRoute
+						exact
+						customProps={{ activeTab: OP_NAV_ITEMS_INDEXES.SITES_MAPPING }}
+						name="Sites Mapping"
+						path="/ops-panel/sites-mapping"
+						component={OpsPanel}
+					/>
+					<PrivateRoute
+						exact
+						customProps={{ activeTab: OP_NAV_ITEMS_INDEXES.TOOLS }}
+						name="Tools"
+						path="/ops-panel/tools"
+						component={OpsPanel}
+					/>
 					<PrivateRoute exact name="User OnBoarding" path="/onboarding" component={OnBoarding} />
 				</ShellContainer>
 			</Switch>
