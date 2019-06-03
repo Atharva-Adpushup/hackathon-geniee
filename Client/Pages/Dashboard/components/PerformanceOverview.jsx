@@ -32,10 +32,9 @@ class PerformanceOverview extends React.Component {
 		const params = getDateRange(selectedDate);
 		params.siteid = selectedSite;
 		this.setState({ isLoading: true });
-		reportService.getWidgetData(path, params).then(response => {
-			if (response.status === 200) {
-				const data = response.data && response.data.data ? response.data.data : [];
-				this.computeData(data);
+		reportService.getWidgetData({ path, params }).then(response => {
+			if (response.status == 200 && response.data) {
+				this.computeData(response.data);
 			}
 		});
 	}
@@ -79,7 +78,7 @@ class PerformanceOverview extends React.Component {
 					{/* eslint-disable */}
 					<label className="u-text-normal u-margin-r2">Quick Dates</label>
 					<Selectbox
-						id="performance-date"
+						id="performance-overview-date"
 						wrapperClassName="display-inline"
 						isClearable={false}
 						isSearchable={false}
@@ -96,6 +95,7 @@ class PerformanceOverview extends React.Component {
 						{/* eslint-disable */}
 						<label className="u-text-normal u-margin-r2">Website</label>
 						<Selectbox
+							id="performance-overview-website"
 							isClearable={false}
 							isSearchable={false}
 							wrapperClassName="display-inline"

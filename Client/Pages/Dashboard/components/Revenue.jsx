@@ -24,12 +24,16 @@ class SitewiseReport extends React.Component {
 	getGraphData() {
 		const { selectedDate } = this.state;
 		const params = getDateRange(selectedDate);
-		const { path, reportType, siteId } = this.props;
+		const { path, reportType, siteId, site } = this.props;
 		if (reportType === 'site') params.siteid = siteId;
+		else {
+			const siteIds = Object.keys(site);
+			params.siteid = siteIds.toString();
+		}
 		this.setState({ isLoading: true });
-		reportService.getWidgetData(path, params).then(response => {
-			if (response.status === 200) {
-				const result = response.data && response.data.data ? response.data.data.result : [];
+		reportService.getWidgetData({ path, params }).then(response => {
+			if (response.status == 200 && response.data) {
+				const result = response.data.result;
 				this.computeGraphData(result);
 			}
 		});

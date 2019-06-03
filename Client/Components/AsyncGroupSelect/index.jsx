@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Glyphicon, Button, Checkbox, DropdownButton } from 'react-bootstrap';
+import { Glyphicon, Button, Checkbox, DropdownButton, Label, InputGroup } from 'react-bootstrap';
+import { isEmpty } from 'lodash';
 // import '../../../../Components/SelectBox/styles.scss';
 // import { ajax } from '../../../../common/helpers';
 
@@ -13,7 +14,8 @@ class AsyncGroupSelect extends Component {
 			filterResult: [],
 			selectedFilters: props.selectedFilters,
 			selectedFilterKey: '',
-			selectBoxLabel: '+Add'
+			selectBoxLabel: '+Add',
+			isLoading: false
 		};
 		this.toggleList = this.toggleList.bind(this);
 		this.fetchSelectedFilterValues = this.fetchSelectedFilterValues.bind(this);
@@ -21,16 +23,28 @@ class AsyncGroupSelect extends Component {
 		this.handleSearchTextChange = this.handleSearchTextChange.bind(this);
 		this.handleFilterValueSelect = this.handleFilterValueSelect.bind(this);
 	}
+	componentDidUpdate(prevProps) {
+		if (prevProps.selectedFilters !== this.props.selectedFilters) {
+			this.setState({ selectedFilters: this.props.selectedFilters });
+		}
+	}
 
 	toggleList() {
 		this.setState({ open: !this.state.open });
 	}
+	loader = () => (
+		<div className="loaderwrapper spinner-small" data-id="loader" style={{ display: 'block' }}>
+			<i className="fa fa-spinner" />
+		</div>
+	);
 
 	handleFilterValueSelect(checked, key) {
 		const { selectedFilters, selectedFilterKey } = this.state;
-		if (selectedFilters[selectedFilterKey]) {
-			if (checked) selectedFilters[selectedFilterKey][key] = true;
-			else delete selectedFilters[selectedFilterKey][key];
+		selectedFilters[selectedFilterKey] = selectedFilters[selectedFilterKey] || {};
+		if (checked) selectedFilters[selectedFilterKey][key] = true;
+		else delete selectedFilters[selectedFilterKey][key];
+		for (let filter in selectedFilters) {
+			if (_.isEmpty(selectedFilters[filter])) delete selectedFilters[filter];
 		}
 		this.setState(
 			{
@@ -45,15 +59,21 @@ class AsyncGroupSelect extends Component {
 	fetchSelectedFilterValues(filter) {
 		const { props } = this;
 		const { selectedFilters } = this.state;
+		this.setState({ isLoading: true });
 		props.getSelectedFilter(filter).then(response => {
-			if (response && response.result && response.result.length > 0) {
-				selectedFilters[filter.value] = selectedFilters[filter.value] || {};
+			if (
+				response.status == 200 &&
+				response.data &&
+				response.data.result &&
+				response.data.result.length > 0
+			) {
 				this.setState({
-					filterValues: response.result,
-					filterResult: response.result,
+					filterValues: response.data.result,
+					filterResult: response.data.result,
 					selectedFilterKey: filter.value,
 					selectedFilters,
-					showFilterValues: true
+					showFilterValues: true,
+					isLoading: false
 				});
 			}
 		});
@@ -94,68 +114,100 @@ class AsyncGroupSelect extends Component {
 
 	render() {
 		const { state, props } = this;
-		let selectBoxLabel = '';
+		let selectBoxLabels = [];
 		for (const filterKey in state.selectedFilters) {
-			if (Object.keys(state.selectedFilters[filterKey]).length)
-				selectBoxLabel += `${filterKey} ${
+			if (Object.keys(state.selectedFilters[filterKey]).length) {
+				let selectBoxLabelText = `${filterKey} ${
 					Object.keys(state.selectedFilters[filterKey]).length
-				} selected, \t `;
-		}
-		selectBoxLabel = selectBoxLabel || '+Add';
-		return (
-			<div className="custom-select-box-wrapper">
-				<DropdownButton className="custom-select-box" aria-hidden="true" title={selectBoxLabel}>
-					<div className={`react-select-box-off-screen  ${state.showFilterValues ? 'u-hide' : ''}`}>
-						{props.filterList.map(filter => (
-							<Button
-								className="react-select-box-option"
-								key={filter.value}
-								disabled={filter.isDisabled}
-								onClick={() => {
-									this.fetchSelectedFilterValues(filter);
-								}}
-							>
-								{filter.name}
-								<Glyphicon glyph="menu-right" className="mR-5 float-right" />
-							</Button>
-						))}
-					</div>
-					<div
-						className={`react-select-box-off-screen-1  ${!state.showFilterValues ? 'u-hide' : ''}`}
-						aria-hidden="true"
-					>
-						<a
-							className="react-select-box-option"
-							style={{ cursor: 'pointer' }}
-							onClick={this.hideFilterValues}
-						>
-							<Glyphicon glyph="menu-left" className="mR-5" />
-							Back to filters
-						</a>
-						<input
-							type="text"
-							className="input inputSearch"
-							placeholder="Search..."
-							onChange={this.handleSearchTextChange}
-							onSelect={e => e.stopPropagation()}
+				} selected`;
+				selectBoxLabels.push(
+					<Label bsStyle="info" className="u-margin-r2" style={{ height: '19px' }}>
+						{selectBoxLabelText}
+						<Glyphicon
+							glyph="remove"
+							className="u-margin-l1"
+							onClick={e => {
+								e.stopPropagation();
+								let { selectedFilters } = state;
+								selectedFilters[filterKey] = {};
+								this.setState({ selectedFilters });
+							}}
 						/>
-						<div className="filterValues">
-							{state.filterValues.map(filterValue => (
-								<Checkbox
-									className="col-sm-12"
-									key={filterValue.id}
-									onChange={e => {
-										this.handleFilterValueSelect(e.target.checked, filterValue.id);
+					</Label>
+				);
+			}
+		}
+		selectBoxLabels = selectBoxLabels.length ? selectBoxLabels : '+Add';
+		return (
+			<InputGroup>
+				<InputGroup.Addon>Filter</InputGroup.Addon>
+				<div className="custom-select-box-wrapper">
+					<DropdownButton
+						id="async-group-select-dropdown"
+						className=" custom-select-box u-padding-l2 "
+						aria-hidden="true"
+						title={<div className="aligner aligner--hStart  aligner--wrap">{selectBoxLabels}</div>}
+					>
+						{state.isLoading ? this.loader() : ''}
+						<div
+							className={`react-select-box-off-screen  ${state.showFilterValues ? 'u-hide' : ''}`}
+						>
+							{props.filterList.map(filter => (
+								<Button
+									className="react-select-box-option"
+									style={{ border: 'none' }}
+									key={filter.value}
+									disabled={filter.isDisabled}
+									onClick={() => {
+										this.fetchSelectedFilterValues(filter);
 									}}
-									checked={state.selectedFilters[state.selectedFilterKey][filterValue.id] || false}
 								>
-									{filterValue.value}
-								</Checkbox>
+									{filter.name}
+									<Glyphicon glyph="menu-right" className="mR-5 float-right" />
+								</Button>
 							))}
 						</div>
-					</div>
-				</DropdownButton>
-			</div>
+						<div
+							className={`react-select-box-off-screen-1  ${
+								!state.showFilterValues ? 'u-hide' : ''
+							}`}
+							aria-hidden="true"
+						>
+							<div>
+								<a onClick={this.hideFilterValues} style={{ cursor: 'pointer' }}>
+									<Glyphicon glyph="menu-left" className="mR-5" />
+									Back to filters
+								</a>
+							</div>
+							<input
+								type="text"
+								className="input inputSearch"
+								placeholder="Search..."
+								onChange={this.handleSearchTextChange}
+								onSelect={e => e.stopPropagation()}
+							/>
+							<div className="filterValues">
+								{state.filterValues.map(filterValue => (
+									<Checkbox
+										className="col-sm-12"
+										key={filterValue.id}
+										onChange={e => {
+											this.handleFilterValueSelect(e.target.checked, filterValue.id);
+										}}
+										checked={
+											state.selectedFilters[state.selectedFilterKey]
+												? state.selectedFilters[state.selectedFilterKey][filterValue.id]
+												: false
+										}
+									>
+										{filterValue.value}
+									</Checkbox>
+								))}
+							</div>
+						</div>
+					</DropdownButton>
+				</div>
+			</InputGroup>
 		);
 	}
 }
