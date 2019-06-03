@@ -4,6 +4,7 @@ import { Nav, NavItem } from 'react-bootstrap';
 
 import { OP_NAV_ITEMS, OP_NAV_ITEMS_INDEXES, OP_NAV_ITEMS_VALUES } from '../configs/commonConsts';
 import ActionCard from '../../../Components/ActionCard';
+import Settings from './Settings/index';
 
 class OpsPanel extends Component {
 	state = {
@@ -50,7 +51,7 @@ class OpsPanel extends Component {
 		switch (activeTab) {
 			default:
 			case OP_NAV_ITEMS_INDEXES.SETTINGS:
-				return 'Settings';
+				return <Settings {...this.props} />;
 			case OP_NAV_ITEMS_INDEXES.INFO_PANEL:
 				return 'Info Panel';
 			case OP_NAV_ITEMS_INDEXES.SITES_MAPPING:

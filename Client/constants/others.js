@@ -13,7 +13,8 @@ const ADSTXT_STATUS = {
 
 const ROUTES = {
 	BLACK_LIST: ['/addSite', '/onboarding', '/dashboard'],
-	DYNAMIC_PARAMS: [':siteId']
+	DYNAMIC_PARAMS: [':siteId'],
+	SIDEBAR_CLOSE: [/ops-panel.*/]
 };
 
 export { ADSTXT_SITE_LIST_HEADERS, ADSTXT_STATUS, ROUTES };
