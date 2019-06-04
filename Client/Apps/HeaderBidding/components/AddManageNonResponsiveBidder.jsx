@@ -269,8 +269,8 @@ class AddManageNonResponsiveBidder extends React.Component {
 							errors={errors}
 						/>
 						<FormGroup>
-							<Col>
-								<CustomButton type="submit" variant="primary">
+							<Col md={12} className="footer-btns">
+								<CustomButton type="submit" variant="primary" className="u-margin-r3">
 									{formType === 'add' ? 'Add Bidder' : 'Update Bidder'}
 								</CustomButton>
 								<CustomButton type="button" variant="secondary" onClick={openBiddersListView}>

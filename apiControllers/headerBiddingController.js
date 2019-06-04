@@ -269,6 +269,62 @@ router
 					return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: err.message });
 				})
 		);
+	})
+	.get('/inventory/:siteId', (req, res) => {
+		const { siteId } = req.params;
+		const { email } = req.user;
+		return (
+			userModel
+				.verifySiteOwner(email, siteId)
+				.then(() => headerBiddingModel.getInventoriesForHB(siteId))
+				.then(inventories => res.status(httpStatus.OK).json(inventories))
+				// eslint-disable-next-line no-unused-vars
+				.catch(err =>
+					res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error!' })
+				)
+		);
+	})
+	.put('/updateHbStatus/:siteId', (req, res) => {
+		const { siteId } = req.params;
+		const { email } = req.user;
+
+		const categorizedJSON = { layoutEditor: [], apTag: [], innovativeAds: [] };
+		for (const json of req.body) {
+			const {
+				target: { app, adUnit },
+				enableHB
+			} = json;
+
+			if (!app || !adUnit || typeof enableHB !== 'boolean' || !siteId) {
+				return res.status(httpStatus.BAD_REQUEST).json({ error: 'Invalid data received' });
+			}
+
+			switch (app) {
+				case 'Layout Editor': {
+					categorizedJSON.layoutEditor.push(json);
+					break;
+				}
+				case 'AP Tag': {
+					categorizedJSON.apTag.push(json);
+					break;
+				}
+				case 'Innovative Ads': {
+					categorizedJSON.innovativeAds.push(json);
+					break;
+				}
+				default:
+			}
+		}
+
+		return userModel
+			.verifySiteOwner(email, siteId)
+			.then(() => headerBiddingModel.updateHbStatus(siteId, categorizedJSON))
+			.then(() =>
+				res.status(httpStatus.OK).json({ success: 'HB Status has been updated successfully' })
+			)
+			.catch(() =>
+				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error!' })
+			);
 	});
 
 module.exports = router;

@@ -225,8 +225,8 @@ class AddManageSizelessBidder extends React.Component {
 					errors={errors}
 				/>
 				<FormGroup>
-					<Col>
-						<CustomButton type="submit" variant="primary">
+					<Col md={12} className="u-margin-t4">
+						<CustomButton type="submit" variant="primary" className="u-margin-r3">
 							{formType === 'add' ? 'Add' : 'Update'}
 						</CustomButton>
 						<CustomButton type="button" variant="secondary" onClick={openBiddersListView}>

@@ -23,7 +23,7 @@ export default class ManageBidder extends React.Component {
 		const { bidderConfig, siteId } = this.props;
 
 		return (
-			<div className="options-wrapper hb-add-bidder">
+			<div className="options-wrapper hb-bidder hb-manage-bidder">
 				<header>
 					<h3>Manage {bidderConfig.name}</h3>
 				</header>
