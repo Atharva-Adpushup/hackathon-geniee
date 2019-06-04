@@ -104,10 +104,10 @@ class BidderFormFields extends React.Component {
 
 				formFieldsJSX.push(
 					<FormGroup key={fieldKey} controlId={`hb-${fieldKey}`}>
-						<Col componentClass={ControlLabel} sm={4}>
+						<Col componentClass={ControlLabel} sm={6}>
 							{fieldConfig.name + (!fieldConfig.isRequired ? ' (optional)' : '')}
 						</Col>
-						<Col sm={8}>{this.getBidderInputField(fieldConfig, fieldKey, collectionKey)}</Col>
+						<Col sm={6}>{this.getBidderInputField(fieldConfig, fieldKey, collectionKey)}</Col>
 						{this.renderErrorMsg(
 							collectionKey,
 							fieldKey,

@@ -5,6 +5,19 @@
 import React from 'react';
 import { Row, Col, Panel } from 'react-bootstrap';
 
+function importAll(r) {
+	const images = {};
+	// eslint-disable-next-line array-callback-return
+	r.keys().map(item => {
+		images[item.replace('./', '')] = r(item);
+	});
+	return images;
+}
+
+const images = importAll(
+	require.context('../../../public/assets/images/bidders', false, /\.(png|jpe?g|svg)$/)
+);
+
 const BiddersList = ({ bidders: { notAddedBidders, addedBidders }, openAddManageBidderView }) => {
 	const notAddedBiddersJSX = [];
 	const addedBiddersJSX = [];
@@ -13,14 +26,16 @@ const BiddersList = ({ bidders: { notAddedBidders, addedBidders }, openAddManage
 		const { name } = notAddedBidders[bidderKey];
 
 		notAddedBiddersJSX.push(
-			<Col md={4} key={bidderKey}>
+			<Col md={3} key={bidderKey}>
 				<Panel>
 					<Panel.Heading className="aligner aligner--hSpaceBetween">
 						<Panel.Title componentClass="h3" className="aligner-item--vSelfStart">
 							{name}
 						</Panel.Title>
 					</Panel.Heading>
-					<Panel.Body>img</Panel.Body>
+					<Panel.Body>
+						<img src={images[`${bidderKey}.jpg`]} alt={bidderKey} />
+					</Panel.Body>
 					<Panel.Footer className="u-padding-0">
 						<span
 							className="u-block text-center u-padding-3 u-cursor-pointer"
@@ -43,7 +58,7 @@ const BiddersList = ({ bidders: { notAddedBidders, addedBidders }, openAddManage
 		const { name, isApRelation, isPaused } = addedBidders[bidderKey];
 
 		addedBiddersJSX.push(
-			<Col md={4} key={bidderKey}>
+			<Col md={3} key={bidderKey}>
 				<Panel>
 					<Panel.Heading className="aligner aligner--hSpaceBetween">
 						<Panel.Title componentClass="h3" className="aligner-item--vSelfStart">
@@ -51,7 +66,9 @@ const BiddersList = ({ bidders: { notAddedBidders, addedBidders }, openAddManage
 						</Panel.Title>
 						<span className="aligner-item--vSelfEnd">{isApRelation ? 'AP' : 'Direct'}</span>
 					</Panel.Heading>
-					<Panel.Body>img</Panel.Body>
+					<Panel.Body>
+						<img src={images[`${bidderKey}.jpg`]} alt={bidderKey} />
+					</Panel.Body>
 					<Panel.Footer className="u-padding-0">
 						<Row>
 							<Col md={6} className="u-padding-3">
@@ -78,7 +95,7 @@ const BiddersList = ({ bidders: { notAddedBidders, addedBidders }, openAddManage
 			{!!addedBiddersJSX.length && (
 				<Row>
 					<Col md={12} className="added-bidders">
-						<h3>Added Bidders</h3>
+						<h3 className="heading">Added Bidders</h3>
 						<Row>{addedBiddersJSX}</Row>
 					</Col>
 				</Row>
@@ -86,7 +103,7 @@ const BiddersList = ({ bidders: { notAddedBidders, addedBidders }, openAddManage
 			{!!notAddedBiddersJSX.length && (
 				<Row>
 					<Col md={12} className="not-added-bidders">
-						<h3>Available Bidders</h3>
+						<h3 className="heading">Available Bidders</h3>
 						<Row>{notAddedBiddersJSX}</Row>
 					</Col>
 				</Row>
