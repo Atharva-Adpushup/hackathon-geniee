@@ -4,6 +4,9 @@ var constants = {
     EVENTS: {
         GPT: {
             SLOT_RENDER_ENDED: 'slotRenderEnded'
+        },
+        PREBID: {
+            BID_WON: 'bidWon'
         }
     },
     ERROR_CODES: {
