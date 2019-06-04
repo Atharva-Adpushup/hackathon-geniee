@@ -3,7 +3,15 @@
 var adp = require('./adp');
 var config = require('./config');
 var adpTags = {
-    module: {},
+    module: {
+        adpSlots: {},
+        que: [],
+        processQue: function () {
+            while (this.que.length) {
+                this.que.shift().call(this);
+            }
+        }
+    },
     init: function (w) {
         w.adpTags = w.adpTags || {};
 
