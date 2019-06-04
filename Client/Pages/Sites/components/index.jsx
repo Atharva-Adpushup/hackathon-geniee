@@ -157,7 +157,7 @@ class MySites extends Component {
 				<div className="u-padding-h4 u-padding-v5 aligner aligner--row aligner--wrap">
 					{this.renderStatusCards()}
 
-					<Link to="/addSite" className="u-link-reset aligner u-margin-b4">
+					<Link to="/addSite" className="aligner card-wrapper u-link-reset u-margin-b4">
 						<div className="card card--theme-dotted aligner aligner--vCenter aligner--hCenter u-cursor-pointer">
 							<div className="aligner aligner--column aligner--vCenter aligner--hCenter">
 								<FontAwesomeIcon size="2x" icon="plus-circle" className="u-margin-b3" />

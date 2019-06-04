@@ -1,4 +1,9 @@
-//eslint-disable
+$cardWidth: ($fullPercentage - 68);
+
+.card-wrapper {
+	width: $cardWidth;
+}
+
 .card {
 	> .card-body {
 		.panel-heading {
@@ -34,8 +39,12 @@
 		}
 	}
 
+	&.card--theme-dotted {
+		width: $fullPercentage;
+	}
+
 	&.panel {
-		width: ($fullPercentage - 68);
+		width: $cardWidth;
 
 		&.panel-success {
 			> .card-body {
