@@ -6,6 +6,7 @@ import Sidebar from './Sidebar';
 import Loader from '../Loader/index';
 import { domanize } from '../../helpers/commonFunctions';
 import { ROUTES } from '../../constants/others';
+import NotificationContainer from '../../Containers/NotificationContainer';
 
 function shouldWeOpenSidebar(location = { pathname: false }) {
 	if (!location.pathname) return true;
@@ -115,7 +116,14 @@ class Shell extends React.Component {
 					<Sidebar show={sidebarOpen} />
 					<main className="main-content">
 						{routes ? <Breadcrumbs mappedRoutes={routes} /> : null}
-						{reportsFetched && userFetched ? children : <Loader />}
+						{reportsFetched && userFetched ? (
+							<div>
+								<NotificationContainer />
+								{children}
+							</div>
+						) : (
+							<Loader />
+						)}
 					</main>
 				</Row>
 			</Grid>
