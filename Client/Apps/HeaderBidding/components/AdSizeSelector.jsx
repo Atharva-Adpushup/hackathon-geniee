@@ -69,13 +69,15 @@ class AdSizeSelector extends React.Component {
 	render() {
 		const { activeKey } = this.state;
 		return (
-			<Row className="clearfix">
-				<Col sm={4}>
+			<Row className="clearfix add-size-wrap">
+				<Col sm={4} className="add-size-tabs">
 					<Nav bsStyle="pills" stacked activeKey={activeKey} onSelect={this.handleNavSelect}>
 						{this.renderTabs()}
 					</Nav>
 				</Col>
-				<Col sm={8}>{this.renderTabContent()}</Col>
+				<Col sm={8} className="add-size-content">
+					{this.renderTabContent()}
+				</Col>
 			</Row>
 		);
 	}
