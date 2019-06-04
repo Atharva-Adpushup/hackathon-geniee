@@ -1,6 +1,8 @@
 $cardWidth: ($fullPercentage - 68);
+$cardMinHeight: 237px;
 
 .card-wrapper {
+	min-height: $cardMinHeight;
 	width: $cardWidth;
 }
 
