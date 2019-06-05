@@ -7,6 +7,7 @@ import ActionCard from '../../../Components/ActionCard/index';
 import { NAV_ITEMS, NAV_ITEMS_INDEXES, NAV_ITEMS_VALUES } from '../constants';
 import Setup from './Setup';
 import BiddersTab from './BiddersTab';
+import InventoryTab from './InventoryTab';
 
 class HeaderBidding extends React.Component {
 	state = {
@@ -91,7 +92,9 @@ class HeaderBidding extends React.Component {
 			fetchAllBiddersAction,
 			setupStatus,
 			addBidderAction,
-			updateBidderAction
+			updateBidderAction,
+			inventories,
+			fetchInventoriesAction
 		} = this.props;
 
 		const activeTab = this.getActiveTab();
@@ -118,7 +121,13 @@ class HeaderBidding extends React.Component {
 						/>
 					);
 				case 'inventory':
-					return 'Tab 3';
+					return (
+						<InventoryTab
+							siteId={siteId}
+							inventories={inventories}
+							fetchInventoriesAction={fetchInventoriesAction}
+						/>
+					);
 				case 'prebid-settings':
 					return 'Tab 4';
 				case 'optimization':

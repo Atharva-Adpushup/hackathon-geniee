@@ -23,3 +23,19 @@ export function updateBidder(siteId, bidderConfig, params) {
 export function fetchInventorySizes(siteId) {
 	return axiosInstance.get(`/headerBidding/getInventorySizes/${siteId}`);
 }
+
+export function fetchInventories(siteId) {
+	return axiosInstance.get(`/headerBidding/inventory/${siteId}`).then(({ data: inventories }) => {
+		inventories.map(inventory => {
+			const { app, adUnit, device, pageGroup } = inventory;
+			const uniqueKey = window.btoa(app + adUnit + device + pageGroup);
+			const inventoryCopy = { ...inventory };
+
+			inventoryCopy.tempId = uniqueKey;
+
+			return inventoryCopy;
+		});
+
+		return { data: inventories };
+	});
+}

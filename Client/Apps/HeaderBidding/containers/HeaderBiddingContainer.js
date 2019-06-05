@@ -6,22 +6,24 @@ import {
 	fetchAllBiddersAction,
 	getSetupStatusAction,
 	addBidderAction,
-	updateBidderAction
+	updateBidderAction,
+	fetchInventoriesAction
 } from '../../../actions/apps/headerBidding/hbActions';
 
 const HeaderBiddingContainer = props => <HeaderBidding {...props} />;
 
 export default connect(
 	state => {
-		const { inventoryFound, bidders, setupStatus } = state.apps.headerBidding;
+		const { inventoryFound, bidders, setupStatus, inventories } = state.apps.headerBidding;
 
-		return { inventoryFound, bidders, setupStatus };
+		return { inventoryFound, bidders, setupStatus, inventories };
 	},
 	{
 		checkInventoryAction,
 		fetchAllBiddersAction,
 		getSetupStatusAction,
 		addBidderAction,
-		updateBidderAction
+		updateBidderAction,
+		fetchInventoriesAction
 	}
 )(HeaderBiddingContainer);
