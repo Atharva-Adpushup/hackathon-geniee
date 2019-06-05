@@ -1,0 +1,17 @@
+{
+	"name": "hbscript",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"dependencies": {},
+	"devDependencies": {
+		"lodash.find": "^4.6.0",
+		"webpack": "^4.32.2",
+		"webpack-cli": "^3.3.2"
+	},
+	"scripts": {
+		"build": "./node_modules/.bin/webpack ./src/index -o ./dist/adpTags.js --mode=development"
+	},
+	"author": "",
+	"license": "ISC"
+}
