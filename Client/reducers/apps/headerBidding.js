@@ -5,7 +5,8 @@ import {
 	FETCH_ALL_BIDDERS,
 	GET_SETUP_STATUS,
 	ADD_BIDDER,
-	UPDATE_BIDDER
+	UPDATE_BIDDER,
+	FETCH_INVENTORIES
 } from '../../constants/headerBidding';
 
 const defaultState = { inventoryFound: null, bidders: null, setupStatus: null };
@@ -58,6 +59,14 @@ export default function(state = defaultState, action) {
 			return {
 				...state,
 				bidders
+			};
+		}
+		case FETCH_INVENTORIES: {
+			const { inventories } = action;
+
+			return {
+				...state,
+				inventories
 			};
 		}
 		default:
