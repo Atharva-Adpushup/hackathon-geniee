@@ -59,6 +59,26 @@ var utils = {
         return find(adpBatches, function (batch) {
             return batch.batchId === batchId;
         }).adpSlots;
+    },
+    removeElementArrayFromCollection: function (collection, elArray) {
+        var inputCollection = collection.concat([]),
+            isValidCollection = !!inputCollection.length,
+            isElArray = !!(elArray && elArray.length);
+
+        if (!isValidCollection) {
+            return null;
+        }
+
+        inputCollection.forEach(function (item, idx) {
+            var isElArrayMatch = !!(item && isElArray && item[0] === elArray[0] && item[1] === elArray[1]);
+
+            if (isElArrayMatch) {
+                collection.splice(idx, 1);
+                return false;
+            }
+        });
+
+        return collection;
     }
 }
 

@@ -4,6 +4,8 @@ var adp = require('./adp');
 var config = require('./config');
 var constants = require('./constants');
 var utils = require('./utils');
+var hb = require('./hb');
+var inventory = config.INVENTORY;
 var adpTags = {
     module: {
         adpSlots: {},
@@ -14,7 +16,7 @@ var adpTags = {
         currentBatchAdpSlots: [],
         adpBatches: [],
         prebidBatching: function (adpSlotsBatch) {
-            // return prebidSandbox.createPrebidContainer(adpSlotsBatch);
+            return hb.createPrebidSlots(adpSlotsBatch);
         },
         processBatchForBidding: function () {
             var batchId = this.currentBatchId;
@@ -59,6 +61,51 @@ var adpTags = {
             }
             this.currentBatchAdpSlots.push(slot);
             this.slotInterval = setTimeout(this.processBatchForBidding, constants.SLOT_INTERVAL);
+        },
+        inventoryMapper: function (size, optionalParam) {
+            // Reset inventory as default if site is SPA
+            if (adp.config.isSPA) {
+                inventory = adp.$.extend(true, {}, adp.adpTags.defaultInventory);
+            }
+
+            var width = size[0];
+            var height = size[1];
+            var size = width + 'x' + height;
+            var dfpAdUnit = null;
+            var availableSlots = inventory.dfpAdUnits[size];
+            var bidders = null;
+
+            if (optionalParam.headerBidding && inventory.hbConfig && Array.isArray(inventory.hbConfig.bidderAdUnits[size])) {
+                var overrideSize = size;
+                if (
+                    optionalParam.overrideActive &&
+                    optionalParam.overrideSizeTo &&
+                    Array.isArray(inventory.hbConfig.bidderAdUnits[optionalParam.overrideSizeTo])
+                ) {
+                    overrideSize = optionalParam.overrideSizeTo;
+                }
+
+                bidders = inventory.hbConfig.bidderAdUnits[overrideSize]
+                    ? inventory.hbConfig.bidderAdUnits[overrideSize].pop()
+                    : null;
+            }
+
+            if (availableSlots.length) {
+                if (optionalParam.dfpAdunit && availableSlots.indexOf(optionalParam.dfpAdunit) !== -1) {
+                    if (optionalParam.isManual) {
+                        dfpAdUnit = optionalParam.dfpAdunit;
+                    } else {
+                        dfpAdUnit = availableSlots.splice(availableSlots.indexOf(optionalParam.dfpAdunit), 1)[0];
+                    }
+                } else {
+                    dfpAdUnit = inventory.dfpAdUnits[size].pop();
+                }
+            }
+
+            return {
+                dfpAdUnit: dfpAdUnit,
+                bidders: bidders
+            };
         },
         createSlot: function (containerId, size, placement, optionalParam) {
             var adUnits = this.inventoryMapper(size, optionalParam);
