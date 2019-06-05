@@ -4,7 +4,8 @@ import {
 	FETCH_ALL_BIDDERS,
 	GET_SETUP_STATUS,
 	ADD_BIDDER,
-	UPDATE_BIDDER
+	UPDATE_BIDDER,
+	FETCH_INVENTORIES
 } from '../../../constants/headerBidding';
 import * as service from '../../../services/hbService';
 
@@ -52,6 +53,18 @@ export const updateBidderAction = (siteId, bidderConfig, params) => dispatch =>
 		.then(({ data: { bidderConfig: bidderConfigFromDB, bidderKey } }) =>
 			// Save bidder config in store
 			dispatch({ type: UPDATE_BIDDER, bidderKey, bidderConfig: bidderConfigFromDB })
+		)
+		.catch(err => {
+			// eslint-disable-next-line no-console
+			console.log(err);
+		});
+
+export const fetchInventoriesAction = siteId => dispatch =>
+	service
+		.fetchInventories(siteId)
+		.then(({ data: inventories }) =>
+			// Save bidder config in store
+			dispatch({ type: FETCH_INVENTORIES, inventories })
 		)
 		.catch(err => {
 			// eslint-disable-next-line no-console
