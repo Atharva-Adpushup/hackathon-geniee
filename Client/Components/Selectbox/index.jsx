@@ -1,4 +1,3 @@
-/* eslint-disable react/no-unused-state */
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable prefer-destructuring */
 import React, { Component } from 'react';
@@ -8,7 +7,7 @@ import { DropdownButton, MenuItem } from 'react-bootstrap';
 const findSelected = props => {
 	const { selected, title, options } = props;
 	let name = title;
-	if (selected) {
+	if (selected === 0 || selected) {
 		for (let i = 0; i < options.length; i += 1) {
 			const option = options[i];
 			if (option.value === selected) {
@@ -26,21 +25,42 @@ class SelectBox extends Component {
 	};
 
 	selectWrapper = (key, e) => {
-		const value = e.target.getAttribute('data-value');
-		const { onSelect } = this.props;
+		const { onSelect, options } = this.props;
+		const optionValueType = typeof options[0].value;
+		const dataKey = e.target.getAttribute('data-key');
+		let value;
+		switch (optionValueType) {
+			case 'number': {
+				value = Number(e.target.getAttribute('data-value'));
+				break;
+			}
+			default:
+			case 'string': {
+				value = String(e.target.getAttribute('data-value'));
+				break;
+			}
+		}
 		this.setState(
 			{
-				// selected: value,
 				name: e.target.getAttribute('data-name')
 			},
-			() => onSelect(value)
+			() => onSelect(value, dataKey)
 		);
 	};
 
 	render() {
 		const { name } = this.state;
-		const { selected, options, id, title, wrapperClassName, dropdownClassName, type } = this.props;
-		const buttonTitle = selected ? name : title;
+		const {
+			selected,
+			options,
+			id,
+			title,
+			wrapperClassName,
+			dropdownClassName,
+			type,
+			dataKey
+		} = this.props;
+		const buttonTitle = selected === 0 || selected ? name : title;
 		return (
 			<div className={`custom-select-box-wrapper ${wrapperClassName}`}>
 				<DropdownButton
@@ -53,9 +73,10 @@ class SelectBox extends Component {
 					{options.map((option, key) => (
 						<MenuItem
 							eventKey={`id-${key}`}
-							key={key}
+							key={option.value}
 							data-value={option.value}
 							data-name={option.name}
+							data-key={dataKey}
 							active={selected === option.value}
 						>
 							{option.name}
@@ -76,7 +97,7 @@ SelectBox.propTypes = {
 			value: PropTypes.oneOfType([PropTypes.string, PropTypes.bool, PropTypes.number])
 		})
 	).isRequired,
-	selected: PropTypes.oneOfType([PropTypes.string, PropTypes.bool, PropTypes.number]),
+	selected: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 	dropdownClassName: PropTypes.string,
 	wrapperClassName: PropTypes.string,
 	title: PropTypes.string,

@@ -21,13 +21,21 @@ const FieldGroup = ({
 	onChange,
 	value,
 	isTextOnly,
+	dataKey,
+	toggleGroupType,
 	...props
 }) => {
 	const isToggleButtonGroup = !!(type === 'toggle-button-group' && itemCollection);
 	const isDropDownButton = !!(type === 'toggle-dropdown-button' && itemCollection);
 	const buttonGroup = isToggleButtonGroup ? (
 		<ButtonToolbar>
-			<ToggleButtonGroup onChange={onChange} type="radio" name="options" defaultValue={1}>
+			<ToggleButtonGroup
+				onChange={onChange}
+				type={toggleGroupType}
+				name="options"
+				value={value}
+				defaultValue={1}
+			>
 				{map(itemCollection, (itemObject, key) => (
 					<ToggleButton key={`toggle-button-${key}`} value={itemObject.value}>
 						{itemObject.text}
@@ -43,6 +51,7 @@ const FieldGroup = ({
 			title={label}
 			id={id}
 			options={itemCollection}
+			dataKey={dataKey}
 		/>
 	) : null;
 
@@ -78,7 +87,9 @@ FieldGroup.propTypes = {
 	type: PropTypes.string,
 	itemCollection: PropTypes.array,
 	isTextOnly: PropTypes.bool,
-	value: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+	value: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
+	dataKey: PropTypes.string,
+	toggleGroupType: PropTypes.string
 };
 
 FieldGroup.defaultProps = {
@@ -87,6 +98,8 @@ FieldGroup.defaultProps = {
 	itemCollection: [],
 	isTextOnly: false,
 	value: '',
+	dataKey: '',
+	toggleGroupType: 'radio',
 	onChange: () => {}
 };
 

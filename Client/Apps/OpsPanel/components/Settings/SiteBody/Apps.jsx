@@ -13,9 +13,7 @@ class Apps extends Component {
 	};
 
 	render() {
-		// const { sites, showNotification, saveSettings } = this.props;
 		const { activeKey } = this.state;
-		// const siteIds = Object.keys(sites);
 
 		return (
 			<Col xs={8}>
