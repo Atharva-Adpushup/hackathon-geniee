@@ -31,6 +31,7 @@ import {
 import 'bootstrap-sass/assets/stylesheets/_bootstrap.scss';
 import ErrorBoundary from './Components/ErrorBoundary';
 import Routes from './Routes';
+import NotificationContainer from './Containers/NotificationContainer';
 
 library.add(
 	faBars,
@@ -64,6 +65,7 @@ const App = () => (
 	// <div id="app">
 	// </div>
 	<ErrorBoundary>
+		<NotificationContainer />
 		<Routes />
 	</ErrorBoundary>
 );

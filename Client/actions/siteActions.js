@@ -1,4 +1,4 @@
-import { SITE_ACTIONS } from '../constants/global';
+import { SITE_ACTIONS, UI_ACTIONS } from '../constants/global';
 import axiosInstance from '../helpers/axiosInstance';
 import { errorHandler } from '../helpers/commonFunctions';
 
@@ -28,8 +28,32 @@ const updateSiteStep = (siteId, step, onboardingStage) => dispatch =>
 
 const updateApConfig = (siteId, apConfigs) => dispatch =>
 	dispatch({
-		type: SITE_ACTIONS.UPDATE_SITE_APCONFIG,
-		data: { siteId, apConfigs }
+		type: SITE_ACTIONS.UPDATE_SITE_DATA_KEY,
+		data: { siteId, key: 'apConfigs', value: apConfigs }
 	});
 
-export { fetchAppStatuses, addNewSite, updateSiteStep, updateApConfig };
+const saveSettings = (siteId, siteData) => dispatch =>
+	axiosInstance
+		.post('/site/saveSettings', { siteId, ...siteData })
+		.then(() => {
+			const { apConfigs, adNetworkSettings } = siteData;
+			dispatch({
+				type: SITE_ACTIONS.UPDATE_SITE_DATA_KEY,
+				data: { siteId, key: 'apConfigs', value: apConfigs }
+			});
+			dispatch({
+				type: SITE_ACTIONS.UPDATE_SITE_DATA_KEY,
+				data: { siteId, key: 'adNetworkSettings', value: adNetworkSettings }
+			});
+
+			return dispatch({
+				type: UI_ACTIONS.SHOW_NOTIFICATION,
+				mode: 'success',
+				title: 'Operation Successful',
+				autoDismiss: 5,
+				message: 'Site settings saved successfully'
+			});
+		})
+		.catch(err => errorHandler(err));
+
+export { fetchAppStatuses, addNewSite, updateSiteStep, updateApConfig, saveSettings };

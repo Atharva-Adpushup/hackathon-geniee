@@ -78,7 +78,7 @@ FieldGroup.propTypes = {
 	type: PropTypes.string,
 	itemCollection: PropTypes.array,
 	isTextOnly: PropTypes.bool,
-	value: PropTypes.string
+	value: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
 };
 
 FieldGroup.defaultProps = {
