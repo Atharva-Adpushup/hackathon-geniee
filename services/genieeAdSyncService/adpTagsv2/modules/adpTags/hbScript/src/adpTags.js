@@ -75,19 +75,11 @@ var adpTags = {
             var availableSlots = inventory.dfpAdUnits[size];
             var bidders = null;
 
-            if (optionalParam.headerBidding && inventory.hbConfig && Array.isArray(inventory.hbConfig.bidderAdUnits[size])) {
-                var overrideSize = size;
-                if (
-                    optionalParam.overrideActive &&
-                    optionalParam.overrideSizeTo &&
-                    Array.isArray(inventory.hbConfig.bidderAdUnits[optionalParam.overrideSizeTo])
-                ) {
-                    overrideSize = optionalParam.overrideSizeTo;
+            if (optionalParam.headerBidding && inventory.hbConfig && Object.keys(inventory.hbConfig).length) {
+                var updatedSize = size;
+                if (optionalParam.overrideActive && optionalParam.overrideSizeTo) {
+                    updatedSize = optionalParam.overrideSizeTo;
                 }
-
-                bidders = inventory.hbConfig.bidderAdUnits[overrideSize]
-                    ? inventory.hbConfig.bidderAdUnits[overrideSize].pop()
-                    : null;
             }
 
             if (availableSlots.length) {

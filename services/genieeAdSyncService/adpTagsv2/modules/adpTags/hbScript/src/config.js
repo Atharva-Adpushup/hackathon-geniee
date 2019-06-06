@@ -25,7 +25,7 @@ var config = {
                     }
                 }
             },
-            "33Across": {
+            "33across": {
                 "name": "33 Across",
                 "isApRelation": true,
                 "isPaused": false,
