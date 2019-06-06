@@ -152,4 +152,33 @@ const SITES_MAPPING = {
 	]
 };
 
-export { OP_NAV_ITEMS, OP_NAV_ITEMS_INDEXES, OP_NAV_ITEMS_VALUES, SITES_MAPPING };
+const TABLET_LAYOUT_OPTIONS = [
+	{
+		name: 'Desktop',
+		value: 'desktop',
+		text: 'Desktop'
+	},
+	{
+		name: 'Mobile',
+		value: 'mobile',
+		text: 'Mobile'
+	}
+];
+
+const PAGEGROUP_DEVICE_OPTIONS = [
+	...TABLET_LAYOUT_OPTIONS,
+	{
+		name: 'Tablet',
+		value: 'tablet',
+		text: 'Tabet'
+	}
+];
+
+export {
+	OP_NAV_ITEMS,
+	OP_NAV_ITEMS_INDEXES,
+	OP_NAV_ITEMS_VALUES,
+	SITES_MAPPING,
+	TABLET_LAYOUT_OPTIONS,
+	PAGEGROUP_DEVICE_OPTIONS
+};

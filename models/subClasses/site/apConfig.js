@@ -21,7 +21,9 @@ const ApConfig = {
 		'isThirdPartyAdx',
 		'spaPageTransitionTimeout',
 		'isManual',
-		'isInnovative'
+		'isInnovative',
+		'adsLabel',
+		'isAdsLabelOn'
 	],
 	override: [
 		'mode',
@@ -45,7 +47,9 @@ const ApConfig = {
 		'isThirdPartyAdx',
 		'spaPageTransitionTimeout',
 		'isManual',
-		'isInnovative'
+		'isInnovative',
+		'adsLabel',
+		'isAdsLabelOn'
 	],
 	merge: []
 };
