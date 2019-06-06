@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/label-has-for */
+/* eslint-disable jsx-a11y/label-has-associated-control */
 import React from 'react';
 import PropTypes from 'prop-types';
 import Row from 'react-bootstrap/lib/Row';
@@ -33,11 +35,11 @@ class customToggleSwitch extends React.Component {
 		}
 	}
 
-	setValue() {
+	setValue(e) {
 		const { disabled, onChange } = this.props;
 		const { value } = this.state;
 		if (!disabled) {
-			if (onChange) onChange(!value);
+			if (onChange) onChange(!value, e);
 			this.setState({
 				value: !value
 			});
