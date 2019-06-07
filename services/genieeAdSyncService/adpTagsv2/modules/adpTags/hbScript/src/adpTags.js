@@ -73,13 +73,34 @@ var adpTags = {
             var size = width + 'x' + height;
             var dfpAdUnit = null;
             var availableSlots = inventory.dfpAdUnits[size];
-            var bidders = null;
+            var bidders = [];
+            var hbConfig = inventory.hbConfig;
 
-            if (optionalParam.headerBidding && inventory.hbConfig && Object.keys(inventory.hbConfig).length) {
+            if (optionalParam.headerBidding && hbConfig && Object.keys(hbConfig).length) {
                 var updatedSize = size;
                 if (optionalParam.overrideActive && optionalParam.overrideSizeTo) {
                     updatedSize = optionalParam.overrideSizeTo;
                 }
+
+                Object.keys(hbConfig).forEach(function (bidder) {
+                    var bidderData = hbConfig[bidder];
+
+                    if (!bidderData.isPaused) {
+                        if (bidderData.sizeLess) {
+                            bidders.push({
+                                bidder: bidder,
+                                params: bidderData.config
+                            });
+                        }
+
+                        if (!bidderData.sizeLess && bidderData.reusable) {
+                            bidders.push({
+                                bidder: bidder,
+                                params: bidderData.config[updatedSize]
+                            });
+                        }
+                    }
+                });
             }
 
             if (availableSlots.length) {
@@ -163,7 +184,7 @@ var adpTags = {
         adp.adpTags = existingAdpTags.adpSlots ? existingAdpTags : adpTagsModule;
 
         // Keep deep copy of inventory in adpTags module
-        adp.adpTags.defaultInventory = adp.$.extend(true, {}, config.INVENTORY);
+        adp.adpTags.defaultInventory = adp.$.extend(true, {}, inventory);
 
         // Merge adpQue with any existing que items if present
         adp.adpTags.que = adp.adpTags.que.concat(adpQue).concat(w.adpTags.que);
