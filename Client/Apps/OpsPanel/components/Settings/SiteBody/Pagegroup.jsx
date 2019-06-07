@@ -1,7 +1,8 @@
 /* eslint-disable jsx-a11y/label-has-for */
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import React, { Component, Fragment } from 'react';
+import React, { Component, Fragment, memo } from 'react';
 import { Panel, PanelGroup, Table, Form, FormControl } from 'react-bootstrap';
+import memoize from 'memoize-one';
 import CustomToggleSwitch from '../../../../../Components/CustomToggleSwitch/index';
 import CustomButton from '../../../../../Components/CustomButton/index';
 import FieldGroup from '../../../../../Components/Layout/FieldGroup';
@@ -19,22 +20,22 @@ const DEFAULT_STATE = {
 };
 
 class Pagegroups extends Component {
-	constructor(props) {
-		super(props);
-		const { site } = this.props;
-		const { channels = [] } = site;
+	state = DEFAULT_STATE;
 
-		const pagegroups = [
-			...new Set(
-				channels.map(channel => {
-					const pagegroup = channel.split(':')[1];
-					return pagegroup;
-				})
-			)
-		];
+	getPagegroups = memoize(channels => [
+		...new Set(
+			channels.map(channel => {
+				const pagegroup = channel.split(':')[1];
+				return pagegroup;
+			})
+		)
+	]);
 
-		this.state = { ...DEFAULT_STATE, exisitingPagegroups: pagegroups };
-	}
+	updateView = e => {
+		this.setState({
+			view: e.target.getAttribute('data-view')
+		});
+	};
 
 	handleSelect = value => {
 		this.setState({
@@ -126,12 +127,6 @@ class Pagegroups extends Component {
 		console.log('All fine');
 	};
 
-	updateView = e => {
-		this.setState({
-			view: e.target.getAttribute('data-view')
-		});
-	};
-
 	renderPagegroupList = () => {
 		const { site } = this.props;
 		return (
@@ -171,15 +166,9 @@ class Pagegroups extends Component {
 
 	renderPagegroupCreate = () => {
 		const { site } = this.props;
-		const { siteId, siteDomain } = site;
-		const {
-			forceUrl,
-			sampleUrl,
-			device,
-			tabletLayout,
-			pagegroupName,
-			exisitingPagegroups
-		} = this.state;
+		const { siteId, siteDomain, channels } = site;
+		const { forceUrl, sampleUrl, device, tabletLayout, pagegroupName } = this.state;
+		const exisitingPagegroups = this.getPagegroups(channels);
 
 		return (
 			<Fragment>
