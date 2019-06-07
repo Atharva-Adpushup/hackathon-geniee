@@ -15,7 +15,7 @@ var config = {
                 "reusable": true,
                 "bids": "net",
                 "config": {
-                    "300x50": {
+                    "300x250": {
                         "secure": 1,
                         "site_id": "565"
                     },

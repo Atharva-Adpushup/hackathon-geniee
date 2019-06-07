@@ -5,6 +5,7 @@ var config = require('./config');
 var constants = require('./constants');
 var utils = require('./utils');
 var hb = require('./hb');
+var inventoryMapper = require('./inventoryMapper');
 var inventory = config.INVENTORY;
 var adpTags = {
     module: {
@@ -22,10 +23,7 @@ var adpTags = {
             var batchId = this.currentBatchId;
             var adpSlots = this.currentBatchAdpSlots;
 
-            this.adpBatches.push({
-                batchId: batchId,
-                adpSlots: adpSlots
-            });
+            this.adpBatches.push({ batchId: batchId, adpSlots: adpSlots });
 
             // Add batch id to all batched adpSlots
             utils.addBatchIdToAdpSlots(adpSlots, batchId);
@@ -60,68 +58,10 @@ var adpTags = {
                 clearTimeout(this.slotInterval);
             }
             this.currentBatchAdpSlots.push(slot);
-            this.slotInterval = setTimeout(this.processBatchForBidding, constants.SLOT_INTERVAL);
-        },
-        inventoryMapper: function (size, optionalParam) {
-            // Reset inventory as default if site is SPA
-            if (adp.config.isSPA) {
-                inventory = adp.$.extend(true, {}, adp.adpTags.defaultInventory);
-            }
-
-            var width = size[0];
-            var height = size[1];
-            var size = width + 'x' + height;
-            var dfpAdUnit = null;
-            var availableSlots = inventory.dfpAdUnits[size];
-            var bidders = [];
-            var hbConfig = inventory.hbConfig;
-
-            if (optionalParam.headerBidding && hbConfig && Object.keys(hbConfig).length) {
-                var updatedSize = size;
-                if (optionalParam.overrideActive && optionalParam.overrideSizeTo) {
-                    updatedSize = optionalParam.overrideSizeTo;
-                }
-
-                Object.keys(hbConfig).forEach(function (bidder) {
-                    var bidderData = hbConfig[bidder];
-
-                    if (!bidderData.isPaused) {
-                        if (bidderData.sizeLess) {
-                            bidders.push({
-                                bidder: bidder,
-                                params: bidderData.config
-                            });
-                        }
-
-                        if (!bidderData.sizeLess && bidderData.reusable) {
-                            bidders.push({
-                                bidder: bidder,
-                                params: bidderData.config[updatedSize]
-                            });
-                        }
-                    }
-                });
-            }
-
-            if (availableSlots.length) {
-                if (optionalParam.dfpAdunit && availableSlots.indexOf(optionalParam.dfpAdunit) !== -1) {
-                    if (optionalParam.isManual) {
-                        dfpAdUnit = optionalParam.dfpAdunit;
-                    } else {
-                        dfpAdUnit = availableSlots.splice(availableSlots.indexOf(optionalParam.dfpAdunit), 1)[0];
-                    }
-                } else {
-                    dfpAdUnit = inventory.dfpAdUnits[size].pop();
-                }
-            }
-
-            return {
-                dfpAdUnit: dfpAdUnit,
-                bidders: bidders
-            };
+            this.slotInterval = setTimeout(this.processBatchForBidding, constants.BATCHING_INTERVAL);
         },
         createSlot: function (containerId, size, placement, optionalParam) {
-            var adUnits = this.inventoryMapper(size, optionalParam);
+            var adUnits = inventoryMapper.set(inventory, size, optionalParam);
             var slotId = adUnits.dfpAdUnit;
             var bidders = optionalParam.headerBidding ? adUnits.bidders : [];
             var isResponsive = optionalParam.isResponsive;
@@ -147,7 +87,7 @@ var adpTags = {
                 feedbackSent: false,
                 hasTimedOut: false,
                 feedback: {
-                    winner: constants.DEFAULT_WINNER
+                    winner: constants.FEEDBACK.DEFAULT_WINNER
                 }
             };
 

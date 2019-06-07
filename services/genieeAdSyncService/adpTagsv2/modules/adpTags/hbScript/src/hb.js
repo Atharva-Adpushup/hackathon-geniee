@@ -7,7 +7,7 @@ var utils = require('./utils');
 var auction = require('./auction');
 var hb = {
 	createPrebidSlots: function (adpSlotsBatch) {
-		var adUnitCodeForPrebid = [];
+		var prebidSlots = [];
 		var adpBatchId = adpSlotsBatch[0].batchId;
 
 		adpSlotsBatch.forEach(function (adpSlot) {
@@ -28,7 +28,7 @@ var hb = {
 				size = adpSlot.optionalParam.overrideSizeTo.split('x');
 			}
 
-			adUnitCodeForPrebid.push({
+			prebidSlots.push({
 				code: adpSlot.containerId,
 				mediaTypes: {
 					banner: {
@@ -39,9 +39,7 @@ var hb = {
 			});
 		});
 
-		if (!adUnitCodeForPrebid.length) {
-			return auction.end(adpBatchId);
-		}
+		return !prebidSlots.length ? auction.end(adpBatchId) : auction.start();
 	},
 	setBidWonListener: function (w) {
 		w.pbjs.que.push(function () {
@@ -49,7 +47,7 @@ var hb = {
 				console.log('===BidWon====', bidData);
 
 				var slot = adp.adpTags.adpSlots[bidData.adUnitCode];
-				var computedCPMValue = utils.isValidThirdPartyDFPAndCurrencyConfig(adp.config) ? 'originalCpm' : 'cpm';
+				var computedCPMValue = utils.currencyConversionActive(adp.config) ? 'originalCpm' : 'cpm';
 
 				slot.feedback.winner = bidData.bidder;
 				slot.feedback.winningRevenue = bidData[computedCPMValue] / 1000;

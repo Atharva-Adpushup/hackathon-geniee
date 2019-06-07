@@ -1,11 +1,11 @@
 // AdpTags entry point
 
-(function(w, d) {
-	var hb = require('./hb');
+(function (w, d) {
 	var gpt = require('./gpt');
+	var hb = require('./hb');
 	var adpTags = require('./adpTags');
 
-	hb.init(w);
 	gpt.init(w, d);
+	hb.init(w);
 	adpTags.init(w);
 })(window, document);

@@ -7,16 +7,15 @@ var gpt = {
     setSlotRenderListener: function (w) {
         w.googletag.cmd.push(function () {
             w.googletag.pubads().addEventListener(constants.EVENTS.GPT.SLOT_RENDER_ENDED, function (event) {
-                var slot;
+                var slot = null;
                 var adUnitPath = event.slot.getAdUnitPath();
-                var adUnitArray = adUnitPath.split('/');
-                var adUnitDFPAdunitCode = adUnitArray[adUnitArray.length - 1];
+                var adUnitPathArray = adUnitPath.split('/');
+                var adUnitCode = adUnitPathArray[adUnitPathArray.length - 1];
                 var networkCode = constants.NETWORK_ID;
 
                 Object.keys(adp.adpTags.adpSlots).forEach(function (adpSlot) {
                     var currentSlot = adp.adpTags.adpSlots[adpSlot];
-                    var slotMatched = !!(currentSlot.optionalParam.dfpAdunitCode == adUnitDFPAdunitCode &&
-                        currentSlot.activeDFPNetwork);
+                    var slotMatched = !!(currentSlot.optionalParam.dfpAdunitCode == adUnitCode && currentSlot.activeDFPNetwork);
 
                     if (slotMatched) {
                         networkCode = currentSlot.activeDFPNetwork;

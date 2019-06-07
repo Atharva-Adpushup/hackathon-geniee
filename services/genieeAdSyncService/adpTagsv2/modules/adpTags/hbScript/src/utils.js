@@ -9,7 +9,7 @@ var utils = {
                 return adp.$.get(url + adp.utils.base64Encode(JSON.stringify(data)));
         }
     },
-    isValidThirdPartyDFPAndCurrencyConfig: function (inputObject) {
+    currencyConversionActive: function (inputObject) {
         var inputObject = inputObject || adp.config,
             isActiveDFPNetwork = !!(inputObject.activeDFPNetwork && inputObject.activeDFPNetwork.length),
             isActiveDFPCurrencyCode = !!(
@@ -37,6 +37,7 @@ var utils = {
         if (adp && adp.config) {
             return adp.config.activeDFPNetwork;
         }
+
         return null;
     },
     hashCode: function (str) {
@@ -48,6 +49,7 @@ var utils = {
             hash = (hash << 5) - hash + char;
             hash = hash & hash; // Convert to 32bit integer
         }
+
         return hash;
     },
     addBatchIdToAdpSlots: function (adpSlots, batchId) {

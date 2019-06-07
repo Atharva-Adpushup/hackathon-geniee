@@ -12,11 +12,10 @@ var constants = {
     ERROR_CODES: {
         NO_ERROR: 1
     },
-    NETWORK_ID: 103512698,
-    DEFAULT_WINNER: 'adx',
-    FEEDBACK_URL: '//e3.adpushup.com/AdPushupFeedbackWebService/feedback/aphb?data=',
-    PREBID_TIMEOUT: 3000,
-    SLOT_INTERVAL: 50,
+    FEEDBACK: {
+        DEFAULT_WINNER: 'adx',
+        URL: '//e3.adpushup.com/AdPushupFeedbackWebService/feedback/aphb?data='
+    },
     AD_SIZE_MAPPING: {
         IAB_SIZES: {
             ALL: [
@@ -79,7 +78,10 @@ var constants = {
             },
             BLACK_LIST: [[120, 600], [160, 600], [300, 600]]
         }
-    }
+    },
+    NETWORK_ID: 103512698,
+    PREBID_TIMEOUT: 3000,
+    BATCHING_INTERVAL: 50
 };
 
 module.exports = constants;

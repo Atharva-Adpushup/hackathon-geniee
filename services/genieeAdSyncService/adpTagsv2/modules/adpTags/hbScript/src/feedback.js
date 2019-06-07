@@ -3,14 +3,10 @@
 var constants = require('./constants');
 var config = require('./config');
 var adp = require('./adp');
+var utils = require('./utils');
 var feedback = {
-    send: function (slot) {
-        if (slot.feedbackSent || slot.feedback.winner === constants.DEFAULT_WINNER) {
-            return;
-        }
-
-        slot.feedbackSent = true;
-        var winner = slot.feedback.winner || constants.DEFAULT_WINNER;
+    getFeedbackData: function (slot) {
+        var winner = slot.feedback.winner || defaultWinner;
         var winningRevenue = slot.feedback.winningRevenue || 0;
         var feedbackData = {
             siteId: config.SITE_ID,
@@ -37,7 +33,18 @@ var feedback = {
             packetId: adp.config.packetId
         };
 
-        return utils.ajax('get', constants.FEEDBACK_URL, feedbackData);
+        return feedbackData;
+    },
+    send: function (slot) {
+        var defaultWinner = constants.FEEDBACK.DEFAULT_WINNER;
+
+        if (slot.feedbackSent || slot.feedback.winner === defaultWinner) {
+            return;
+        }
+        slot.feedbackSent = true;
+        var feedbackData = this.getFeedbackData(slot);
+
+        return utils.ajax('get', constants.FEEDBACK.URL, feedbackData);
     }
 };
 
