@@ -170,7 +170,7 @@ const PAGEGROUP_DEVICE_OPTIONS = [
 	{
 		name: 'Tablet',
 		value: 'tablet',
-		text: 'Tabet'
+		text: 'Tablet'
 	}
 ];
 
