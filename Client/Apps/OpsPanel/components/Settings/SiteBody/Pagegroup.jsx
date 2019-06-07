@@ -1,9 +1,12 @@
-import React, { Component } from 'react';
-import { Panel, PanelGroup, Table, Form } from 'react-bootstrap';
+/* eslint-disable jsx-a11y/label-has-for */
+/* eslint-disable jsx-a11y/label-has-associated-control */
+import React, { Component, Fragment } from 'react';
+import { Panel, PanelGroup, Table, Form, FormControl } from 'react-bootstrap';
 import CustomToggleSwitch from '../../../../../Components/CustomToggleSwitch/index';
 import CustomButton from '../../../../../Components/CustomButton/index';
 import FieldGroup from '../../../../../Components/Layout/FieldGroup';
 import { TABLET_LAYOUT_OPTIONS, PAGEGROUP_DEVICE_OPTIONS } from '../../../configs/commonConsts';
+import { domanize } from '../../../../../helpers/commonFunctions';
 
 const DEFAULT_STATE = {
 	view: 'list',
@@ -16,7 +19,22 @@ const DEFAULT_STATE = {
 };
 
 class Pagegroups extends Component {
-	state = DEFAULT_STATE;
+	constructor(props) {
+		super(props);
+		const { site } = this.props;
+		const { channels = [] } = site;
+
+		const pagegroups = [
+			...new Set(
+				channels.map(channel => {
+					const pagegroup = channel.split(':')[1];
+					return pagegroup;
+				})
+			)
+		];
+
+		this.state = { ...DEFAULT_STATE, exisitingPagegroups: pagegroups };
+	}
 
 	handleSelect = value => {
 		this.setState({
@@ -46,7 +64,66 @@ class Pagegroups extends Component {
 
 	handleSave = e => {
 		e.preventDefault();
-		console.log('Save Called');
+		const { site, showNotification, createPagegroups } = this.props;
+		const { pagegroupName, forceUrl, sampleUrl, device, tabletLayout } = this.state;
+		const { siteDomain, channels, siteId } = site;
+		const notificationData = {
+			mode: 'error',
+			title: 'Operation Failed',
+			autoDismiss: 5,
+			message: ''
+		};
+		const sampleUrlError =
+			!sampleUrl ||
+			!sampleUrl.trim().length ||
+			(!forceUrl && domanize(sampleUrl) !== domanize(siteDomain));
+		const pagegroupNameError = !pagegroupName;
+		const deviceError = !device || !device.length;
+		const tabletLayoutError =
+			device && device.length && device.indexOf('tablet') === -1 && !tabletLayout;
+		let duplicateError = false;
+
+		if (!deviceError && !pagegroupNameError) {
+			let i;
+			for (i = 0; i < device.length; i += 1) {
+				const currentDevice = device[i];
+				if (channels.indexOf(`${currentDevice.toUpperCase()}:${pagegroupName}`) !== -1) {
+					notificationData.message = `Channel ${currentDevice.toUpperCase()}:${pagegroupName} already exists`;
+					duplicateError = true;
+					break;
+				}
+			}
+		}
+
+		const hasError =
+			sampleUrlError || pagegroupNameError || deviceError || tabletLayoutError || duplicateError;
+
+		if (hasError) {
+			if (duplicateError) {
+				notificationData.message = notificationData.message;
+			} else if (pagegroupNameError) {
+				notificationData.message = 'Invalid Pagegroup name';
+			} else if (sampleUrlError) {
+				notificationData.message =
+					'Invalid Sample Url. Please make sure it is a valid url and domain should be same as site domain';
+			} else if (deviceError) {
+				notificationData.message = 'Invalid Device';
+			} else if (tabletLayoutError) {
+				notificationData.message = 'Invalid Tablet Layout';
+			}
+
+			return showNotification(notificationData);
+		}
+
+		// return createPagegroups(siteId, {
+		// 	device: device.toUpperCase(),
+		// 	pageGroupName: pagegroupName,
+		// 	sampleUrl,
+		// 	forceSampleUrl: forceUrl ? 'on' : 'off',
+		// 	siteId
+		// });
+
+		console.log('All fine');
 	};
 
 	updateView = e => {
@@ -58,7 +135,7 @@ class Pagegroups extends Component {
 	renderPagegroupList = () => {
 		const { site } = this.props;
 		return (
-			<React.Fragment>
+			<Fragment>
 				<CustomButton
 					variant="secondary"
 					className="pull-right u-margin-b3"
@@ -88,31 +165,24 @@ class Pagegroups extends Component {
 						</tr>
 					</tbody>
 				</Table>
-			</React.Fragment>
+			</Fragment>
 		);
 	};
 
 	renderPagegroupCreate = () => {
 		const { site } = this.props;
-		const { siteId, siteDomain, channels = [] } = site;
-		const { forceUrl, sampleUrl, device, tabletLayout, pagegroupName } = this.state;
-
-		let pagegroups = [
-			...new Set(
-				channels.map(channel => {
-					const pagegroup = channel.split(':')[0];
-					return pagegroup;
-				})
-			)
-		];
-
-		pagegroups = pagegroups.map(pg => ({
-			name: pg,
-			value: pg
-		}));
+		const { siteId, siteDomain } = site;
+		const {
+			forceUrl,
+			sampleUrl,
+			device,
+			tabletLayout,
+			pagegroupName,
+			exisitingPagegroups
+		} = this.state;
 
 		return (
-			<div>
+			<Fragment>
 				<CustomButton
 					variant="secondary"
 					className="pull-right u-margin-b3"
@@ -122,35 +192,26 @@ class Pagegroups extends Component {
 					Pagegroup List
 				</CustomButton>
 				<Form style={{ clear: 'both' }}>
-					{pagegroups.length ? (
-						<FieldGroup
-							name="pagegroupName"
-							value={pagegroupName}
-							type="toggle-dropdown-button"
-							label="Pagegroup Name"
-							onChange={this.handleSelectChange}
-							size={6}
-							dataKey="pagegroupName"
-							itemCollection={pagegroups}
-							id={`pagegroupName-${siteId}-${siteDomain}`}
-							placeholder="Pagegroup Name"
-							className="u-padding-v3 u-padding-h3"
-						/>
-					) : (
-						<FieldGroup
-							name="pagegroupName"
-							value={pagegroupName}
+					<div className="u-padding-v4">
+						<label htmlFor="pagegroupName" className="u-margin-b3">
+							Pagegroup Name
+						</label>
+						<FormControl
 							type="text"
-							label="Pagegroup Name"
+							name="pagegroupName"
+							value={pagegroupName}
 							onChange={this.handleChange}
-							size={6}
-							dataKey="pagegroupName"
-							itemCollection={TABLET_LAYOUT_OPTIONS}
-							id={`pagegroupName-${siteId}-${siteDomain}`}
+							list={`pagegroups-list-${siteId}-${siteDomain}`}
 							placeholder="Pagegroup Name"
-							className="u-padding-v3 u-padding-h3"
 						/>
-					)}
+						{exisitingPagegroups.length && (
+							<datalist id={`pagegroups-list-${siteId}-${siteDomain}`}>
+								{exisitingPagegroups.map(pagegroup => (
+									<option key={pagegroup} value={pagegroup} />
+								))}
+							</datalist>
+						)}
+					</div>
 					<FieldGroup
 						name="sampleUrl"
 						value={sampleUrl}
@@ -189,7 +250,7 @@ class Pagegroups extends Component {
 						placeholder="Device"
 						className="u-padding-v3 u-padding-h3"
 					/>
-					{device.indexOf('tablet') !== -1 && (
+					{device.indexOf('tablet') === -1 && (
 						<FieldGroup
 							name="tabletLayout"
 							value={tabletLayout}
@@ -213,7 +274,7 @@ class Pagegroups extends Component {
 						Create
 					</CustomButton>
 				</Form>
-			</div>
+			</Fragment>
 		);
 	};
 

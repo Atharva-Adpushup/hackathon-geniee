@@ -9,11 +9,11 @@ const SiteBody = props => {
 	return (
 		<React.Fragment>
 			<Row>
-				<Settings site={site} showNotificatio={showNotification} saveSettings={saveSettings} />
+				<Settings site={site} showNotification={showNotification} saveSettings={saveSettings} />
 				<Apps />
 			</Row>
 			<Row>
-				<Pagegroup site={site} showNotificatio={showNotification} />
+				<Pagegroup site={site} showNotification={showNotification} />
 			</Row>
 		</React.Fragment>
 	);
