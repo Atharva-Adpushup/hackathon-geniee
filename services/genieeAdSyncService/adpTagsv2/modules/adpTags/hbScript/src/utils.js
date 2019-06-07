@@ -55,11 +55,6 @@ var utils = {
             adpSlots[slot].batchId = batchId;
         });
     },
-    getCurrentAdpSlotBatch: function (adpBatches, batchId) {
-        return find(adpBatches, function (batch) {
-            return batch.batchId === batchId;
-        }).adpSlots;
-    },
     removeElementArrayFromCollection: function (collection, elArray) {
         var inputCollection = collection.concat([]),
             isValidCollection = !!inputCollection.length,
@@ -79,6 +74,11 @@ var utils = {
         });
 
         return collection;
+    },
+    getCurrentAdpSlotBatch: function (adpBatches, batchId) {
+        return find(adpBatches, function (batch) {
+            return batch.batchId === batchId;
+        }).adpSlots;
     }
 }
 

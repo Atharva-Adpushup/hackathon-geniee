@@ -4,6 +4,7 @@ var constants = require('./constants');
 var responsiveAds = require('./responsiveAds');
 var adp = require('./adp');
 var utils = require('./utils');
+var auction = require('./auction');
 var hb = {
 	createPrebidSlots: function (adpSlotsBatch) {
 		var adUnitCodeForPrebid = [];
@@ -39,8 +40,7 @@ var hb = {
 		});
 
 		if (!adUnitCodeForPrebid.length) {
-			// auction.end
-			// return prebidFinishCallback(adpBatchId);
+			return auction.end(adpBatchId);
 		}
 	},
 	setBidWonListener: function (w) {
