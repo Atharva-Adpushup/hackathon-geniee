@@ -56,7 +56,7 @@ class SiteSettings extends Component {
 					mode: 'success',
 					title: 'Settings Saved',
 					message: 'Successfully saved blocklist setting',
-					autoDismiss: 1
+					autoDismiss: 3
 				})
 			)
 			.catch(err => errorHandler(err));
@@ -135,6 +135,7 @@ class SiteSettings extends Component {
 					emptyCollectionPlaceHolder="No blocklist added"
 					inputPlaceholder="Enter comma separated URLs or URLs pattern to block AdPushup ads"
 					saveButtonText="Add"
+					itemUpdateSaveButtonText="Update"
 					sticky
 					validate
 					plugins={['url-remove-protocol-prefix']}
