@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/label-has-for */
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import React, { Component, Fragment, memo } from 'react';
+import React, { Component, Fragment } from 'react';
 import { Panel, PanelGroup, Table, Form, FormControl } from 'react-bootstrap';
 import memoize from 'memoize-one';
 import CustomToggleSwitch from '../../../../../Components/CustomToggleSwitch/index';
@@ -10,17 +10,15 @@ import { TABLET_LAYOUT_OPTIONS, PAGEGROUP_DEVICE_OPTIONS } from '../../../config
 import { domanize } from '../../../../../helpers/commonFunctions';
 
 const DEFAULT_STATE = {
-	view: 'list',
 	pagegroupName: '',
 	forceUrl: '',
 	sampleUrl: '',
 	device: [],
-	tabletLayout: null,
-	activeKey: null
+	tabletLayout: null
 };
 
 class Pagegroups extends Component {
-	state = DEFAULT_STATE;
+	state = { ...DEFAULT_STATE, view: 'list' };
 
 	getPagegroups = memoize(channels => [
 		...new Set(
@@ -77,7 +75,7 @@ class Pagegroups extends Component {
 		const sampleUrlError =
 			!sampleUrl ||
 			!sampleUrl.trim().length ||
-			(!forceUrl && domanize(sampleUrl) !== domanize(siteDomain));
+			(!forceUrl && domanize(sampleUrl).match(new RegExp(domanize(siteDomain), 'ig')) === null);
 		const pagegroupNameError = !pagegroupName;
 		const deviceError = !device || !device.length;
 		const tabletLayoutError =
@@ -116,15 +114,27 @@ class Pagegroups extends Component {
 			return showNotification(notificationData);
 		}
 
-		// return createPagegroups(siteId, {
-		// 	device: device.toUpperCase(),
-		// 	pageGroupName: pagegroupName,
-		// 	sampleUrl,
-		// 	forceSampleUrl: forceUrl ? 'on' : 'off',
-		// 	siteId
-		// });
-
-		console.log('All fine');
+		return createPagegroups(siteId, {
+			device,
+			common: {
+				pageGroupName: pagegroupName,
+				sampleUrl,
+				forceSampleUrl: forceUrl ? 'on' : 'off',
+				siteId
+			}
+		}).then(response => {
+			const {
+				failed = {
+					channels: []
+				}
+			} = response;
+			let reset = null;
+			if (!failed.channels.length) {
+				reset = { ...DEFAULT_STATE, view: 'list' };
+				return this.setState(reset);
+			}
+			return true;
+		});
 	};
 
 	renderPagegroupList = () => {

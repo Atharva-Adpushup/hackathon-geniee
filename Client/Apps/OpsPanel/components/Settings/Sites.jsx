@@ -16,7 +16,7 @@ class Sites extends Component {
 	};
 
 	render() {
-		const { sites, showNotification, saveSettings } = this.props;
+		const { sites, showNotification, saveSettings, createPagegroups } = this.props;
 		const { activeKey } = this.state;
 		const siteIds = Object.keys(sites);
 
@@ -37,6 +37,7 @@ class Sites extends Component {
 									site={site}
 									showNotification={showNotification}
 									saveSettings={saveSettings}
+									createPagegroups={createPagegroups}
 								/>
 							</Panel.Body>
 						</Panel>

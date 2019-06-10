@@ -5,7 +5,7 @@ import Apps from './Apps';
 import Pagegroup from './Pagegroup';
 
 const SiteBody = props => {
-	const { site, showNotification, saveSettings } = props;
+	const { site, showNotification, saveSettings, createPagegroups } = props;
 	return (
 		<React.Fragment>
 			<Row>
@@ -13,7 +13,11 @@ const SiteBody = props => {
 				<Apps />
 			</Row>
 			<Row>
-				<Pagegroup site={site} showNotification={showNotification} />
+				<Pagegroup
+					site={site}
+					showNotification={showNotification}
+					createPagegroups={createPagegroups}
+				/>
 			</Row>
 		</React.Fragment>
 	);

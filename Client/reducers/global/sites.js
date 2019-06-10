@@ -44,7 +44,7 @@ const sites = (state = { fetched: false, data: {} }, action) => {
 				}
 			};
 
-		case SITE_ACTIONS.UPDATE_SITE_DATA_KEY:
+		case SITE_ACTIONS.UPDATE_SITE_DATA_KEY_OBJ:
 			return {
 				...state,
 				data: {
@@ -55,6 +55,21 @@ const sites = (state = { fetched: false, data: {} }, action) => {
 							...state.data[action.data.siteId][action.data.key],
 							...action.data.value
 						}
+					}
+				}
+			};
+
+		case SITE_ACTIONS.UPDATE_SITE_DATA_KEY_ARRAY:
+			return {
+				...state,
+				data: {
+					...state.data,
+					[action.data.siteId]: {
+						...state.data[action.data.siteId],
+						[action.data.key]: [
+							...state.data[action.data.siteId][action.data.key],
+							...action.data.value
+						]
 					}
 				}
 			};
