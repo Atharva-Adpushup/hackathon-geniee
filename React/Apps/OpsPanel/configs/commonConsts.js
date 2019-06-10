@@ -379,6 +379,10 @@ const siteMappingActions = {
 		{
 			value: 'pubmatic',
 			label: 'pubmatic'
+		},
+		{
+			value: 'aardvark',
+			label: 'aardvark'
 		}
 	],
 	devicesList = [
@@ -498,6 +502,16 @@ const siteMappingActions = {
 		pubmatic: [
 			{
 				name: 'publisherId',
+				type: 'string'
+			}
+		],
+		aardvark: [
+			{
+				name: 'ai',
+				type: 'string'
+			},
+			{
+				name: 'sc',
 				type: 'string'
 			}
 		]
