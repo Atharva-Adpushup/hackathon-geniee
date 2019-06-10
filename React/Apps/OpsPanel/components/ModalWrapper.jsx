@@ -28,6 +28,7 @@ class ModalWrapper extends React.Component {
 		const rubicon = findBidder(data, 'rubicon');
 		const adyoulike = findBidder(data, 'adyoulike');
 		const pubmatic = findBidder(data, 'pubmatic');
+		const aardvark = findBidder(data, 'aardvark');
 
 		this.state = {
 			partnersSelected: props.data.map(obj => obj.bidder) || [],
@@ -80,6 +81,10 @@ class ModalWrapper extends React.Component {
 			pubmatic: {
 				publisherId: pubmatic ? pubmatic.params.publisherId : ''
 			},
+			aardvark: {
+				ai: aardvark ? aardvark.params.ai : '',
+				sc: aardvark ? aardvark.params.sc : ''
+			},
 			error: ''
 		};
 
@@ -119,6 +124,7 @@ class ModalWrapper extends React.Component {
 		const rubicon = findBidder(data, 'rubicon');
 		const adyoulike = findBidder(data, 'adyoulike');
 		const pubmatic = findBidder(data, 'pubmatic');
+		const aardvark = findBidder(data, 'aardvark');
 
 		this.setState({
 			partnersSelected: nextProps.data.map(obj => ({ value: obj.bidder, label: obj.bidder })) || [],
@@ -167,6 +173,10 @@ class ModalWrapper extends React.Component {
 			},
 			adyoulike: {
 				placement: adyoulike ? adyoulike.params.placement : ''
+			},
+			aardvark: {
+				ai: aardvark ? aardvark.params.ai : '',
+				sc: aardvark ? aardvark.params.sc : ''
 			},
 			pubmatic: {
 				publisherId: pubmatic ? pubmatic.params.publisherId : ''
