@@ -54,6 +54,11 @@ var prebidAdTemplate =
 	'return bidCpm - (bidCpm * (12/100));' +
 	'}' +
 	'},' +
+	'aardvark: {' +
+	'bidCpmAdjustment: function(bidCpm) {' +
+	'return bidCpm - (bidCpm * (20/100));' +
+	'}' +
+	'},' +
 	'rubicon: {' +
 	'bidCpmAdjustment: function(bidCpm) {' +
 	'return bidCpm - (bidCpm * (20/100));' +
