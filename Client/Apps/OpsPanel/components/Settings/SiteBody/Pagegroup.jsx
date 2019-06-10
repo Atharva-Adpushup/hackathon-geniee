@@ -6,7 +6,10 @@ import memoize from 'memoize-one';
 import CustomToggleSwitch from '../../../../../Components/CustomToggleSwitch/index';
 import CustomButton from '../../../../../Components/CustomButton/index';
 import FieldGroup from '../../../../../Components/Layout/FieldGroup';
-import { TABLET_LAYOUT_OPTIONS, PAGEGROUP_DEVICE_OPTIONS } from '../../../configs/commonConsts';
+import {
+	// TABLET_LAYOUT_OPTIONS,
+	PAGEGROUP_DEVICE_OPTIONS
+} from '../../../configs/commonConsts';
 import { domanize } from '../../../../../helpers/commonFunctions';
 
 const DEFAULT_STATE = {
@@ -78,8 +81,15 @@ class Pagegroups extends Component {
 			(!forceUrl && domanize(sampleUrl).match(new RegExp(domanize(siteDomain), 'ig')) === null);
 		const pagegroupNameError = !pagegroupName;
 		const deviceError = !device || !device.length;
-		const tabletLayoutError =
-			device && device.length && device.indexOf('tablet') === -1 && !tabletLayout;
+		// const tabletPagegroupAlreadyExists = channels.some(
+		// 	channel => channel === `TABLET:${pagegroupName}`
+		// );
+		// const tabletLayoutError =
+		// 	device &&
+		// 	device.length &&
+		// 	!tabletPagegroupAlreadyExists &&
+		// 	device.indexOf('tablet') === -1 &&
+		// 	!tabletLayout;
 		let duplicateError = false;
 
 		if (!deviceError && !pagegroupNameError) {
@@ -94,8 +104,8 @@ class Pagegroups extends Component {
 			}
 		}
 
-		const hasError =
-			sampleUrlError || pagegroupNameError || deviceError || tabletLayoutError || duplicateError;
+		// Add tabletLayoutError when uncommenting the above tabletError condition
+		const hasError = sampleUrlError || pagegroupNameError || deviceError || duplicateError;
 
 		if (hasError) {
 			if (duplicateError) {
@@ -107,9 +117,10 @@ class Pagegroups extends Component {
 					'Invalid Sample Url. Please make sure it is a valid url and domain should be same as site domain';
 			} else if (deviceError) {
 				notificationData.message = 'Invalid Device';
-			} else if (tabletLayoutError) {
-				notificationData.message = 'Invalid Tablet Layout';
 			}
+			// else if (tabletLayoutError) {
+			// 	notificationData.message = 'Invalid Tablet Layout';
+			// }
 
 			return showNotification(notificationData);
 		}
@@ -121,6 +132,7 @@ class Pagegroups extends Component {
 				sampleUrl,
 				forceSampleUrl: forceUrl ? 'on' : 'off',
 				siteId
+				// tabletLayout
 			}
 		}).then(response => {
 			const {
@@ -177,7 +189,8 @@ class Pagegroups extends Component {
 	renderPagegroupCreate = () => {
 		const { site } = this.props;
 		const { siteId, siteDomain, channels } = site;
-		const { forceUrl, sampleUrl, device, tabletLayout, pagegroupName } = this.state;
+		const { forceUrl, sampleUrl, device, pagegroupName } = this.state;
+		// const { forceUrl, sampleUrl, device, tabletLayout, pagegroupName } = this.state;
 		const exisitingPagegroups = this.getPagegroups(channels);
 
 		return (
@@ -203,13 +216,13 @@ class Pagegroups extends Component {
 							list={`pagegroups-list-${siteId}-${siteDomain}`}
 							placeholder="Pagegroup Name"
 						/>
-						{exisitingPagegroups.length && (
+						{exisitingPagegroups.length ? (
 							<datalist id={`pagegroups-list-${siteId}-${siteDomain}`}>
 								{exisitingPagegroups.map(pagegroup => (
 									<option key={pagegroup} value={pagegroup} />
 								))}
 							</datalist>
-						)}
+						) : null}
 					</div>
 					<FieldGroup
 						name="sampleUrl"
@@ -249,7 +262,7 @@ class Pagegroups extends Component {
 						placeholder="Device"
 						className="u-padding-v3 u-padding-h3"
 					/>
-					{device.indexOf('tablet') === -1 && (
+					{/* {device.indexOf('tablet') === -1 && (
 						<FieldGroup
 							name="tabletLayout"
 							value={tabletLayout}
@@ -263,7 +276,7 @@ class Pagegroups extends Component {
 							placeholder="Tablet Layout"
 							className="u-padding-v3 u-padding-h3"
 						/>
-					)}
+					)} */}
 					<CustomButton
 						variant="primary"
 						type="submit"

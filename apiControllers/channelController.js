@@ -17,7 +17,8 @@ const hlprs = {
 
 		return channelModel
 			.createPageGroup(encodedChannel)
-			.then(() => userModel.setSitePageGroups(userEmail).then(user => user.save()))
+			.then(() => userModel.setSitePageGroups(userEmail))
+			.then(user => user.save())
 			.then(() => {
 				if (successful.cmsInfo.created.indexOf(channel.pageGroupName) === -1) {
 					successful.cmsInfo.created.push(channel.pageGroupName);
