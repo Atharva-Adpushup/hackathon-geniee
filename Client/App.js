@@ -26,7 +26,9 @@ import {
 	faArrowUp,
 	faArrowDown,
 	faTools,
-	faSort
+	faSort,
+	faTrash,
+	faCode
 } from '@fortawesome/free-solid-svg-icons';
 import 'bootstrap-sass/assets/stylesheets/_bootstrap.scss';
 import ErrorBoundary from './Components/ErrorBoundary';
@@ -58,7 +60,9 @@ library.add(
 	faArrowUp,
 	faArrowDown,
 	faTools,
-	faSort
+	faSort,
+	faTrash,
+	faCode
 );
 
 const App = () => (

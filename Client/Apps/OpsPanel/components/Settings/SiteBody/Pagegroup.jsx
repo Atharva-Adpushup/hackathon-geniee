@@ -3,8 +3,11 @@
 import React, { Component, Fragment } from 'react';
 import { Panel, PanelGroup, Table, Form, FormControl } from 'react-bootstrap';
 import memoize from 'memoize-one';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
 import CustomToggleSwitch from '../../../../../Components/CustomToggleSwitch/index';
 import CustomButton from '../../../../../Components/CustomButton/index';
+import Loader from '../../../../../Components/Loader';
 import FieldGroup from '../../../../../Components/Layout/FieldGroup';
 import {
 	// TABLET_LAYOUT_OPTIONS,
@@ -31,6 +34,14 @@ class Pagegroups extends Component {
 			})
 		)
 	]);
+
+	componentDidMount() {
+		const { site, fetchChannelsInfo } = this.props;
+		const { cmsInfo, siteId } = site;
+		const { channelsInfo } = cmsInfo;
+
+		if (!channelsInfo) fetchChannelsInfo(siteId);
+	}
 
 	updateView = e => {
 		this.setState({
@@ -66,7 +77,7 @@ class Pagegroups extends Component {
 
 	handleSave = e => {
 		e.preventDefault();
-		const { site, showNotification, createPagegroups } = this.props;
+		const { site, showNotification, createChannels } = this.props;
 		const { pagegroupName, forceUrl, sampleUrl, device, tabletLayout } = this.state;
 		const { siteDomain, channels, siteId } = site;
 		const notificationData = {
@@ -125,7 +136,7 @@ class Pagegroups extends Component {
 			return showNotification(notificationData);
 		}
 
-		return createPagegroups(siteId, {
+		return createChannels(siteId, {
 			device,
 			common: {
 				pageGroupName: pagegroupName,
@@ -151,6 +162,14 @@ class Pagegroups extends Component {
 
 	renderPagegroupList = () => {
 		const { site } = this.props;
+		const { cmsInfo } = site;
+		const { channelsInfo } = cmsInfo;
+		const keys = channelsInfo ? Object.keys(channelsInfo) : false;
+
+		if (!keys) {
+			return <Loader height="100px" />;
+		}
+
 		return (
 			<Fragment>
 				<CustomButton
@@ -173,13 +192,43 @@ class Pagegroups extends Component {
 						</tr>
 					</thead>
 					<tbody>
-						<tr>
-							<td>Post</td>
-							<td>Desktop</td>
-							<td>3</td>
-							<td>www.rentdigs.com</td>
-							<td>Delete | Editor</td>
-						</tr>
+						{keys.map(key => {
+							const channel = channelsInfo[key];
+							return (
+								<tr key={`${site.siteId}-${channel.pageGroup}-${channel.platform}`}>
+									<td>{channel.pageGroup}</td>
+									<td>{channel.platform}</td>
+									<td>{channel.variationsCount}</td>
+									<td>
+										www.rentdigs.com
+										<FontAwesomeIcon
+											icon="edit"
+											className="u-text-red u-margin-l2"
+											onClick={() => {
+												console.log('Regex Edit Clicked Clicked');
+											}}
+										/>
+									</td>
+									<td>
+										<FontAwesomeIcon
+											icon="code"
+											className="u-text-red u-margin-r2"
+											onClick={() => {
+												console.log('Editor Clicked');
+											}}
+										/>
+										|
+										<FontAwesomeIcon
+											icon="trash"
+											className="u-text-red u-margin-l2"
+											onClick={() => {
+												console.log('Trash Clicked');
+											}}
+										/>
+									</td>
+								</tr>
+							);
+						})}
 					</tbody>
 				</Table>
 			</Fragment>
