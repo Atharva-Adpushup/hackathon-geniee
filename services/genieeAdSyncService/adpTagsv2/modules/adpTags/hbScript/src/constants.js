@@ -16,6 +16,11 @@ var constants = {
         DEFAULT_WINNER: 'adx',
         URL: '//e3.adpushup.com/AdPushupFeedbackWebService/feedback/aphb?data='
     },
+    PREBID: {
+        TIMEOUT: 3000,
+        BIDDER_SEQUENCE: 'random',
+        PRICE_GRANULARITY: 'dense'
+    },
     AD_SIZE_MAPPING: {
         IAB_SIZES: {
             ALL: [
@@ -80,7 +85,6 @@ var constants = {
         }
     },
     NETWORK_ID: 103512698,
-    PREBID_TIMEOUT: 3000,
     BATCHING_INTERVAL: 50
 };
 

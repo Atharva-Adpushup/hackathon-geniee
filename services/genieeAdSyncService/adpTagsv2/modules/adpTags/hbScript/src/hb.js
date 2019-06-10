@@ -6,6 +6,24 @@ var adp = require('./adp');
 var utils = require('./utils');
 var auction = require('./auction');
 var hb = {
+	setPrebidConfig: function () {
+		var PREBID = constants.PREBID;
+
+		window.pbjs.que.push(function () {
+			window.pbjs.setConfig({
+				rubicon: {
+					singleRequest: true
+				},
+				publisherDomain: adp.config.siteDomain,
+				bidderSequence: PREBID.BIDDER_SEQUENCE,
+				priceGranularity: PREBID.PRICE_GRANULARITY
+				__SIZE_CONFIG___
+				_PREBID_CURRENCY_CONFIG__
+			});
+
+			pbjs.addAdUnits(__AD_UNIT_CODE__);
+		});
+	},
 	createPrebidSlots: function (adpSlotsBatch) {
 		var prebidSlots = [];
 		var adpBatchId = adpSlotsBatch[0].batchId;
@@ -39,7 +57,8 @@ var hb = {
 			});
 		});
 
-		return !prebidSlots.length ? auction.end(adpBatchId) : auction.start();
+		this.setPrebidConfig();
+		return !prebidSlots.length ? auction.end(adpBatchId) : auction.start(adpBatchId);
 	},
 	setBidWonListener: function (w) {
 		w.pbjs.que.push(function () {

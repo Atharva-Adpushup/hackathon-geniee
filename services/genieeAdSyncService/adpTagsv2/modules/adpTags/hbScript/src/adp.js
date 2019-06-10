@@ -1,4 +1,4 @@
-// Adpushup namespace module
+// Adpushup namespace reference
 
 var adp = {
 	config: window.adpushup.config,

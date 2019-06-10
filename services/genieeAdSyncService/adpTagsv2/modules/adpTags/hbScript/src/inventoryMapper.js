@@ -1,4 +1,4 @@
-// Inventory mapping module
+// Slot inventory mapper
 
 var adp = require('./adp');
 var inventoryMapper = {

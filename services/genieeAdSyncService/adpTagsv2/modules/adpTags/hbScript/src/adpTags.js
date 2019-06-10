@@ -16,6 +16,7 @@ var adpTags = {
         currentBatchId: null,
         currentBatchAdpSlots: [],
         adpBatches: [],
+        batchPrebiddingComplete: false,
         prebidBatching: function (adpSlotsBatch) {
             return hb.createPrebidSlots(adpSlotsBatch);
         },
@@ -79,7 +80,7 @@ var adpTags = {
                 computedSizes: multipleAdSizes ? multipleAdSizes : [],
                 isResponsive: isResponsive,
                 containerId: containerId,
-                timeout: constants.PREBID_TIMEOUT,
+                timeout: constants.PREBID.TIMEOUT,
                 gSlot: null,
                 hasRendered: false,
                 biddingComplete: false,

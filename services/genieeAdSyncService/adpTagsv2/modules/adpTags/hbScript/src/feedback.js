@@ -1,4 +1,4 @@
-// Feedback module
+// Slot feedback initiator
 
 var constants = require('./constants');
 var config = require('./config');
