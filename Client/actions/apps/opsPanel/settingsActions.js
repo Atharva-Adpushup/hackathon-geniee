@@ -14,9 +14,22 @@ const createPagegroups = (siteId, channels) => (dispatch, getState) =>
 			const { cmsInfo } = site;
 
 			if (successful && successful.channels.length) {
+				const set = new Set();
+				cmsInfo.pageGroups.forEach(pg => set.add(`${pg.sampleUrl}-break-${pg.pageGroup}`));
+				successful.cmsInfo.pagegroups.forEach(pg =>
+					set.add(`${pg.sampleUrl}-break-${pg.pageGroup}`)
+				);
+				const pgArray = Array.from(set);
+				const updatedPagegroups = pgArray.map(sampleUrlWithPg => {
+					const [sampleUrl, pageGroup] = sampleUrlWithPg.split('-break-');
+					return {
+						sampleUrl,
+						pageGroup
+					};
+				});
 				const updatedCMSInfo = {
 					...cmsInfo,
-					pageGroups: [...cmsInfo.pageGroups, ...successful.cmsInfo.pagegroups]
+					pageGroups: updatedPagegroups
 				};
 
 				// Update Site Channels | This will appended to existing channels
