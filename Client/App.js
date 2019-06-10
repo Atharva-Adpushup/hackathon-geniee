@@ -25,7 +25,10 @@ import {
 	faExternalLinkAlt,
 	faArrowUp,
 	faArrowDown,
-	faCheck
+	faTools,
+	faSort,
+	faTrash,
+	faCode
 } from '@fortawesome/free-solid-svg-icons';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import 'bootstrap-sass/assets/stylesheets/_bootstrap.scss';
@@ -57,7 +60,10 @@ library.add(
 	faExternalLinkAlt,
 	faArrowUp,
 	faArrowDown,
-	faCheck
+	faTools,
+	faSort,
+	faTrash,
+	faCode
 );
 
 const App = () => (

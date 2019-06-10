@@ -3,7 +3,7 @@ import { SITE_ACTIONS, UI_ACTIONS } from '../../../constants/global';
 import axiosInstance from '../../../helpers/axiosInstance';
 import { errorHandler } from '../../../helpers/commonFunctions';
 
-const createPagegroups = (siteId, channels) => (dispatch, getState) =>
+const createChannels = (siteId, channels) => (dispatch, getState) =>
 	axiosInstance
 		.post('/channel/createChannels', { siteId, channels })
 		.then(response => {
@@ -82,6 +82,35 @@ const createPagegroups = (siteId, channels) => (dispatch, getState) =>
 				successful
 			};
 		})
-		.catch(err => errorHandler(err, 'Ad Creation Failed. Please contact AdPushup Operations Team'));
+		.catch(err =>
+			errorHandler(err, 'Pagegroup Creation Failed. Please contact AdPushup Operations/Tech Team')
+		);
 
-export { createPagegroups };
+const fetchChannelsInfo = siteId => dispatch =>
+	axiosInstance
+		.get('/channel/fetchChannelsInfo', { params: { siteId } })
+		.then(response => {
+			const { data } = response.data;
+			const { channels } = data;
+
+			if (channels && Object.keys(channels).length) {
+				dispatch({
+					type: SITE_ACTIONS.UPDATE_SITE_DATA_KEY_OBJ,
+					data: {
+						siteId,
+						key: 'cmsInfo',
+						value: {
+							channelsInfo: channels
+						}
+					}
+				});
+			}
+		})
+		.catch(err =>
+			errorHandler(
+				err,
+				'Pagegroups information fetching failed. Please contact AdPushup Operations/Tech Team'
+			)
+		);
+
+export { createChannels, fetchChannelsInfo };
