@@ -28,7 +28,7 @@ const updateSiteStep = (siteId, step, onboardingStage) => dispatch =>
 
 const updateApConfig = (siteId, apConfigs) => dispatch =>
 	dispatch({
-		type: SITE_ACTIONS.UPDATE_SITE_DATA_KEY,
+		type: SITE_ACTIONS.UPDATE_SITE_DATA_KEY_OBJ,
 		data: { siteId, key: 'apConfigs', value: apConfigs }
 	});
 
@@ -38,11 +38,11 @@ const saveSettings = (siteId, siteData) => dispatch =>
 		.then(() => {
 			const { apConfigs, adNetworkSettings } = siteData;
 			dispatch({
-				type: SITE_ACTIONS.UPDATE_SITE_DATA_KEY,
+				type: SITE_ACTIONS.UPDATE_SITE_DATA_KEY_OBJ,
 				data: { siteId, key: 'apConfigs', value: apConfigs }
 			});
 			dispatch({
-				type: SITE_ACTIONS.UPDATE_SITE_DATA_KEY,
+				type: SITE_ACTIONS.UPDATE_SITE_DATA_KEY_OBJ,
 				data: { siteId, key: 'adNetworkSettings', value: adNetworkSettings }
 			});
 
