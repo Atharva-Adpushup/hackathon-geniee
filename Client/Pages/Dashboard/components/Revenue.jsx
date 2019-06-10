@@ -91,7 +91,7 @@ class SitewiseReport extends React.Component {
 					<CustomChart type={type} xAxis={data.xAxis} series={series} yAxisGroups={yAxisGroups} />
 				</div>
 			);
-		else return <div className="text-center">No Record Found.</div>;
+		return <div className="text-center">No Record Found.</div>;
 	}
 
 	renderLoader = () => (

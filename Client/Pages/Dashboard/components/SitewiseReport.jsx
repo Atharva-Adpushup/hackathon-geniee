@@ -27,9 +27,9 @@ class SitewiseReport extends React.Component {
 		const siteIds = Object.keys(site);
 		if (reportType === 'site') params.siteid = siteId;
 		else {
-			params['siteid'] = siteIds.toString();
-			params['interval'] = 'cumulative';
-			params['dimension'] = 'siteid';
+			params.siteid = siteIds.toString();
+			params.interval = 'cumulative';
+			params.dimension = 'siteid';
 		}
 		this.setState({ isLoading: true });
 		reportService.getWidgetData({ path, params }).then(response => {
@@ -66,7 +66,7 @@ class SitewiseReport extends React.Component {
 		tableHeader.sort((a, b) => a.position - b.position);
 		result.forEach(row => {
 			const { siteid } = row;
-			row['siteName'] = site[siteid] ? site[siteid]['siteName'] : 'Not Found';
+			row.siteName = site[siteid] ? site[siteid].siteName : 'Not Found';
 		});
 		this.setState({ tableHeader, tableBody: result, isLoading: false });
 	};
