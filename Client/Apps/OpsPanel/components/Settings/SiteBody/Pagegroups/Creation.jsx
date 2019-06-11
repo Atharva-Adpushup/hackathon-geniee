@@ -140,7 +140,7 @@ class Creation extends Component {
 	};
 
 	render() {
-		const { site } = this.props;
+		const { site, updateView } = this.props;
 		const { siteId, siteDomain, channels } = site;
 		const { forceUrl, sampleUrl, device, pagegroupName } = this.state;
 		// const { forceUrl, sampleUrl, device, tabletLayout, pagegroupName } = this.state;
@@ -152,7 +152,7 @@ class Creation extends Component {
 					variant="secondary"
 					className="pull-right u-margin-b3"
 					data-view="list"
-					onClick={this.updateView}
+					onClick={updateView}
 				>
 					Pagegroup List
 				</CustomButton>

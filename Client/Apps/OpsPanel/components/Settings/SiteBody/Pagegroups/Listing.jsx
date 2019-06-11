@@ -20,9 +20,7 @@ class Listing extends Component {
 		const { channelsInfo } = cmsInfo;
 		const keys = channelsInfo ? Object.keys(channelsInfo) : false;
 
-		if (!keys) {
-			return <Loader height="100px" />;
-		}
+		if (!keys) return <Loader height="100px" />;
 
 		return (
 			<Fragment>
