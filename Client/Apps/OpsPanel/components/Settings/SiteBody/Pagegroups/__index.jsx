@@ -5,15 +5,15 @@ import { Panel, PanelGroup, Table, Form, FormControl } from 'react-bootstrap';
 import memoize from 'memoize-one';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import CustomToggleSwitch from '../../../../../Components/CustomToggleSwitch/index';
-import CustomButton from '../../../../../Components/CustomButton/index';
-import Loader from '../../../../../Components/Loader';
-import FieldGroup from '../../../../../Components/Layout/FieldGroup';
+import CustomToggleSwitch from '../../../../../../Components/CustomToggleSwitch/index';
+import CustomButton from '../../../../../../Components/CustomButton/index';
+import Loader from '../../../../../../Components/Loader';
+import FieldGroup from '../../../../../../Components/Layout/FieldGroup';
 import {
 	// TABLET_LAYOUT_OPTIONS,
 	PAGEGROUP_DEVICE_OPTIONS
-} from '../../../configs/commonConsts';
-import { domanize } from '../../../../../helpers/commonFunctions';
+} from '../../../../configs/commonConsts';
+import { domanize } from '../../../../../../helpers/commonFunctions';
 
 const DEFAULT_STATE = {
 	pagegroupName: '',

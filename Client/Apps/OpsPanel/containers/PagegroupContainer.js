@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import Pagegroup from '../components/Settings/SiteBody/Pagegroup';
+import Pagegroup from '../components/Settings/SiteBody/Pagegroups/index';
 import { createChannels, fetchChannelsInfo } from '../../../actions/apps/opsPanel/pagegroupActions';
 
 const mapStateToProps = (state, ownProps) => ({
