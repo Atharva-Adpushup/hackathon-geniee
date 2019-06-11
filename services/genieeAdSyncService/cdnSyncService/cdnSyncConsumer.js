@@ -167,20 +167,21 @@ module.exports = function(site, externalData = {}) {
 						})
 						.addService(CC.SERVICES.GDPR, finalConfig.statuses.GDPR_ACTIVE, finalConfig.config.gdpr)
 						.done();
-					var compressed = '';
+					var compressed = uncompressed;
+					// var compressed = '';
 
-					try {
-						var output = uglifyJS.minify(uncompressed, {
-							compress: true,
-							mangle: false,
-							sourceMap: true
-						});
-						if (output.error) throw output.error;
-						compressed = output.code;
-					} catch (e) {
-						console.log(e);
-						return Promise.reject(new Error('CDN Sync failed while compressing the file'));
-					}
+					// try {
+					// 	var output = uglifyJS.minify(uncompressed, {
+					// 		compress: true,
+					// 		mangle: false,
+					// 		sourceMap: true
+					// 	});
+					// 	if (output.error) throw output.error;
+					// 	compressed = output.code;
+					// } catch (e) {
+					// 	console.log(e);
+					// 	return Promise.reject(new Error('CDN Sync failed while compressing the file'));
+					// }
 
 					return {
 						default: compressed,
