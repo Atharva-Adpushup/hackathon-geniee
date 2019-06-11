@@ -371,6 +371,18 @@ const siteMappingActions = {
 		{
 			value: 'rubicon',
 			label: 'rubicon'
+		},
+		{
+			value: 'adyoulike',
+			label: 'adyoulike'
+		},
+		{
+			value: 'pubmatic',
+			label: 'pubmatic'
+		},
+		{
+			value: 'aardvark',
+			label: 'aardvark'
 		}
 	],
 	devicesList = [
@@ -478,6 +490,28 @@ const siteMappingActions = {
 			},
 			{
 				name: 'zoneId',
+				type: 'string'
+			}
+		],
+		adyoulike: [
+			{
+				name: 'placement',
+				type: 'string'
+			}
+		],
+		pubmatic: [
+			{
+				name: 'publisherId',
+				type: 'string'
+			}
+		],
+		aardvark: [
+			{
+				name: 'ai',
+				type: 'string'
+			},
+			{
+				name: 'sc',
 				type: 'string'
 			}
 		]

@@ -76,7 +76,7 @@ var $ = require('jquery'),
 		}
 		var isGenieePartner = !!(ad.network === 'geniee' && !ad.networkData.adCode),
 			isGenieeWithoutDFP = !!(isGenieePartner && !ad.networkData.dynamicAllocation),
-			isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length),
+			isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length && ad.multipleAdSizes.length > 1),
 			isGenieeNetwork = !!(ad.network === 'geniee' && ad.networkData && ad.networkData.zoneId),
 			isZoneContainerId = !!(isGenieeNetwork && ad.networkData.zoneContainerId),
 			computedSSPContainerId = isZoneContainerId ? ad.networkData.zoneContainerId : ad.networkData.zoneId,
