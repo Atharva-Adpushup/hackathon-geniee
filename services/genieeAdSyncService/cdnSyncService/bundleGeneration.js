@@ -23,8 +23,7 @@ function init(site, config) {
 				},
 				output: {
 					path: path.join(__dirname, buildPath),
-					filename: '[name].js',
-					chunkFilename: '[name].js'
+					filename: 'bundle.js'
 				},
 				module: {
 					rules: [
