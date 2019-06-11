@@ -29,6 +29,12 @@ const hlprs = {
 						pageGroup: channel.pageGroupName
 					});
 				}
+				successful.cmsInfo.channelsInfo[`${channel.device}:${channel.pageGroupName}`] = {
+					id: `chnl:${channel.siteId}:${channel.device}:${channel.pageGroupName}`,
+					variationsCount: 0,
+					platform: channel.device,
+					pageGroup: channel.pageGroupName
+				};
 				successful.channels.push(`${channel.device}:${channel.pageGroupName}`);
 				return true;
 			});
@@ -78,7 +84,8 @@ router
 			channels: [],
 			cmsInfo: {
 				pagegroups: [],
-				created: []
+				created: [],
+				channelsInfo: {}
 			}
 		};
 		if (!channels || !siteId) {
