@@ -4,7 +4,13 @@ import { Row, Col } from 'react-bootstrap';
 import SplitScreen from '../../../../Components/Layout/SplitScreen';
 import FieldGroup from '../../../../Components/Layout/FieldGroup';
 import CustomButton from '../../../../Components/CustomButton/index';
-import { CONTROL_CONVERSION_NETWORKS, NETWORKS_COLLECTION } from '../../constants/index';
+import {
+	CONTROL_CONVERSION_NETWORKS,
+	NETWORK_COLLECTION,
+	NETWORKS_NAME,
+	NETWORK_PLACEHOLDERS,
+	NETWORK_MEDIANET_INPUT_CODE_REGEXES
+} from '../../constants/index';
 import { getRandomString, getEncodedData, getCompiledTemplate } from '../../lib/helpers';
 import { copyToClipBoard } from '../../../ApTag/lib/helpers';
 
@@ -41,6 +47,50 @@ class ControlTagConversion extends Component {
 		this.setState(defaultState);
 	}
 
+	setMedianetParamsData(state) {
+		const { inputCode } = state;
+		const { height, width, versionId, cid, crid } = NETWORK_MEDIANET_INPUT_CODE_REGEXES;
+		let heightMatch = inputCode.match(height);
+		let widthMatch = inputCode.match(width);
+		let versionIdMatch = inputCode.match(versionId);
+		let cidMatch = inputCode.match(cid);
+		let cridMatch = inputCode.match(crid);
+		const isValidMatches = !!(
+			heightMatch &&
+			heightMatch.length &&
+			widthMatch &&
+			widthMatch.length &&
+			versionIdMatch &&
+			versionIdMatch.length &&
+			cidMatch &&
+			cidMatch.length &&
+			cridMatch &&
+			cridMatch.length
+		);
+
+		if (isValidMatches) {
+			heightMatch = heightMatch[0].split(' = ')[1].replace(/"/g, '');
+			widthMatch = widthMatch[0].split(' = ')[1].replace(/"/g, '');
+			versionIdMatch = versionIdMatch[0].split(' = ')[1].replace(/"/g, '');
+			cidMatch = cidMatch[0].split('=')[1].replace(/"/g, '');
+			cridMatch = cridMatch[0].split(' = ')[1].replace(/"/g, '');
+		}
+
+		const computedState = {
+			...state,
+			medianet: {
+				...state.medianet,
+				adHeight: heightMatch,
+				adWidth: widthMatch,
+				versionId: versionIdMatch,
+				cId: cidMatch,
+				crId: cridMatch
+			}
+		};
+
+		this.setState(computedState);
+	}
+
 	getConvertedAdCode() {
 		const { siteId, inputCode, selectedNetwork } = this.state;
 		const {
@@ -68,7 +118,7 @@ class ControlTagConversion extends Component {
 
 		if (isMedianetNetworkSelection && !isValidMedianetNetworkData) {
 			// eslint-disable-next-line no-alert
-			window.alert(`Please fill ${selectedNetwork} network related fields`);
+			window.alert(`Please enter ${selectedNetwork} ad code as per mentioned format in textbox`);
 			return false;
 		}
 
@@ -103,25 +153,64 @@ class ControlTagConversion extends Component {
 
 	isNotMedianetNetworkSelection() {
 		const { selectedNetwork } = this.state;
-		const isValid = !!(selectedNetwork && selectedNetwork !== 'medianet');
+		const { MEDIANET } = NETWORKS_NAME;
+		const isValid = !!(selectedNetwork && selectedNetwork !== MEDIANET);
 
 		return isValid;
 	}
 
-	isMedianetNetworkSelection() {
+	isMedianetNetworkSelection(network) {
 		const { selectedNetwork } = this.state;
-		const isValid = !!(selectedNetwork && selectedNetwork === 'medianet');
+		const computedNetworkValue = network || selectedNetwork;
+		const { MEDIANET } = NETWORKS_NAME;
+		const isValid = !!(computedNetworkValue && computedNetworkValue === MEDIANET);
+
+		return isValid;
+	}
+
+	isAdSenseNetworkSelection() {
+		const { selectedNetwork } = this.state;
+		const { ADSENSE } = NETWORKS_NAME;
+		const isValid = !!(selectedNetwork && selectedNetwork === ADSENSE);
+
+		return isValid;
+	}
+
+	isAdXNetworkSelection() {
+		const { selectedNetwork } = this.state;
+		const { ADX } = NETWORKS_NAME;
+		const isValid = !!(selectedNetwork && selectedNetwork === ADX);
+
+		return isValid;
+	}
+
+	isDFPNetworkSelection() {
+		const { selectedNetwork } = this.state;
+		const { DFP } = NETWORKS_NAME;
+		const isValid = !!(selectedNetwork && selectedNetwork === DFP);
 
 		return isValid;
 	}
 
 	handleSelectChangeHandler(value) {
+		const { medianet, inputCode } = this.state;
+		const isMedianetNetworkSelected = this.isMedianetNetworkSelection(value);
+		const isValidMedianetData = !!(isMedianetNetworkSelected && inputCode);
+
+		if (isValidMedianetData) {
+			this.setMedianetParamsData({ selectedNetwork: value, inputCode, medianet });
+			return false;
+		}
+
 		this.setState({ selectedNetwork: value });
+		return false;
 	}
 
 	handleInputChangeHandler(inputParam) {
 		const isInputParam = !!inputParam;
 		const isElement = !!(isInputParam && inputParam.target);
+		const isMedianetNetworkSelected = this.isMedianetNetworkSelection();
+		const computedStateObject = {};
 
 		if (isElement) {
 			const {
@@ -131,37 +220,13 @@ class ControlTagConversion extends Component {
 
 			switch (name) {
 				case 'inputCode':
-					this.setState({ inputCode: value });
-					break;
+					if (isMedianetNetworkSelected) {
+						this.setMedianetParamsData({ inputCode: value, medianet });
+						break;
+					}
 
-				case 'adId':
-					medianet.adId = value;
-					this.setState({ medianet });
-					break;
-
-				case 'adWidth':
-					medianet.adWidth = value;
-					this.setState({ medianet });
-					break;
-
-				case 'adHeight':
-					medianet.adHeight = value;
-					this.setState({ medianet });
-					break;
-
-				case 'crId':
-					medianet.crId = value;
-					this.setState({ medianet });
-					break;
-
-				case 'versionId':
-					medianet.versionId = value;
-					this.setState({ medianet });
-					break;
-
-				case 'cId':
-					medianet.cId = value;
-					this.setState({ medianet });
+					computedStateObject.inputCode = value;
+					this.setState(computedStateObject);
 					break;
 
 				default:
@@ -198,84 +263,23 @@ class ControlTagConversion extends Component {
 		return false;
 	}
 
-	renderMedianetNetworkUI() {
-		const {
-			medianet: { adId, adWidth, adHeight, crId, versionId, cId }
-		} = this.state;
-
-		return (
-			<div className="clearfix">
-				<FieldGroup
-					id="input-text-adId"
-					label="Enter ad incremental id"
-					type="text"
-					placeholder="Random alphanumeric values of 5 digits like 12wsa, 6hw5n etc."
-					className=""
-					name="adId"
-					onChange={this.handleInputChangeHandler}
-					value={adId}
-				/>
-
-				<FieldGroup
-					id="input-number-adWidth"
-					label="Enter ad width"
-					type="number"
-					placeholder="For example 728, 300, 320, 480, 160, 900 etc."
-					className=""
-					name="adWidth"
-					onChange={this.handleInputChangeHandler}
-					value={adWidth}
-				/>
-
-				<FieldGroup
-					id="input-number-adHeight"
-					label="Enter ad height"
-					type="number"
-					placeholder="For example 60, 200, 250, 600 etc."
-					className=""
-					name="adHeight"
-					onChange={this.handleInputChangeHandler}
-					value={adHeight}
-				/>
-
-				<FieldGroup
-					id="input-number-crId"
-					label="Enter ad customer relationship id (crid)"
-					type="number"
-					placeholder="For example 12345678 etc."
-					className=""
-					name="crId"
-					onChange={this.handleInputChangeHandler}
-					value={crId}
-				/>
-
-				<FieldGroup
-					id="input-number-versionId"
-					label="Enter ad version id (versionId)"
-					type="number"
-					placeholder="For example 87654321 etc."
-					className=""
-					name="versionId"
-					onChange={this.handleInputChangeHandler}
-					value={versionId}
-				/>
-
-				<FieldGroup
-					id="input-number-cId"
-					label="Enter ad customer id (cId)"
-					type="number"
-					placeholder="For example 12348765 etc."
-					className=""
-					name="cId"
-					onChange={this.handleInputChangeHandler}
-					value={cId}
-				/>
-			</div>
-		);
-	}
-
 	renderAllAdNetworksUI() {
 		const { siteId, inputCode } = this.state;
+		const isAdSenseNetworkSelected = this.isAdSenseNetworkSelection();
+		const isDFPNetworkSelected = this.isDFPNetworkSelection();
+		const isAdXNetworkSelected = this.isAdXNetworkSelection();
+		const isMedianetNetworkSelected = this.isMedianetNetworkSelection();
+		let computedPlaceholder = '';
+
+		if (isAdSenseNetworkSelected) {
+			computedPlaceholder = NETWORK_PLACEHOLDERS.ADSENSE;
+		} else if (isDFPNetworkSelected) {
+			computedPlaceholder = NETWORK_PLACEHOLDERS.DFP;
+		} else if (isAdXNetworkSelected) {
+			computedPlaceholder = NETWORK_PLACEHOLDERS.ADX;
+		} else if (isMedianetNetworkSelected) {
+			computedPlaceholder = NETWORK_PLACEHOLDERS.MEDIANET;
+		}
 
 		return (
 			<div className="clearfix">
@@ -284,16 +288,7 @@ class ControlTagConversion extends Component {
 				<FieldGroup
 					id="textarea-input-code"
 					label="Enter code"
-					placeholder={`For example, AdSense ad code: 
-<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-<ins class="adsbygoogle"
-	style="display:block"
-	data-ad-client="ca-pub-XXXXXXXXXXXX"
-	data-ad-slot="XXXXXXXX"
-	data-full-width-responsive="true"></ins>
-<script>
-(adsbygoogle = window.adsbygoogle || []).push({});
-</script> `}
+					placeholder={computedPlaceholder}
 					rows="12"
 					cols="10"
 					className=""
@@ -308,16 +303,7 @@ class ControlTagConversion extends Component {
 
 	renderControlConversionLeftPanel() {
 		const { selectedNetwork } = this.state;
-		const isValidNetworkSelection = this.isValidNetworkSelection();
-		const isMedianetNetworkSelection = this.isMedianetNetworkSelection();
-		const isNotMedianetNetworkSelection = this.isNotMedianetNetworkSelection();
-		let computedRenderUI;
-
-		if (!isValidNetworkSelection || isNotMedianetNetworkSelection) {
-			computedRenderUI = this.renderAllAdNetworksUI();
-		} else if (isMedianetNetworkSelection) {
-			computedRenderUI = this.renderMedianetNetworkUI();
-		}
+		const computedRenderUI = this.renderAllAdNetworksUI();
 
 		return (
 			<div className="clearfix">
@@ -327,7 +313,7 @@ class ControlTagConversion extends Component {
 					type="toggle-dropdown-button"
 					onChange={this.handleSelectChangeHandler}
 					value={selectedNetwork}
-					itemCollection={NETWORKS_COLLECTION}
+					itemCollection={NETWORK_COLLECTION}
 				/>
 
 				{computedRenderUI}
