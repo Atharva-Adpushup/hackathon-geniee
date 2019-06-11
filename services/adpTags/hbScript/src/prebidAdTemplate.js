@@ -65,9 +65,7 @@ var prebidAdTemplate =
 	'}' +
 	'}' +
 	'};' +
-	'pbjs.aliasBidder("appnexus", "springserve");' +
 	'pbjs.aliasBidder("appnexus", "districtm");' +
-	'pbjs.aliasBidder("appnexus", "brealtime");' +
 	'pbjs.aliasBidder("appnexus", "oftmedia");' +
 	'pbjs.onEvent("bidTimeout", function(timedOutBidders) {' +
 	'parent.__prebidTimeoutCallback(ADP_BATCH_ID, timedOutBidders, PREBID_TIMEOUT);' +
