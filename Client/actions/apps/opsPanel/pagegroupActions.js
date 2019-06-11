@@ -15,10 +15,15 @@ const createChannels = (siteId, channels) => (dispatch, getState) =>
 
 			if (successful && successful.channels.length) {
 				const set = new Set();
+				let { channelsInfo = {} } = cmsInfo;
+				channelsInfo = {
+					...channelsInfo,
+					...successful.cmsInfo.channelsInfo
+				};
 				cmsInfo.pageGroups.forEach(pg => set.add(`${pg.sampleUrl}-break-${pg.pageGroup}`));
-				successful.cmsInfo.pagegroups.forEach(pg =>
-					set.add(`${pg.sampleUrl}-break-${pg.pageGroup}`)
-				);
+				successful.cmsInfo.pagegroups.forEach(pg => {
+					set.add(`${pg.sampleUrl}-break-${pg.pageGroup}`);
+				});
 				const pgArray = Array.from(set);
 				const updatedPagegroups = pgArray.map(sampleUrlWithPg => {
 					const [sampleUrl, pageGroup] = sampleUrlWithPg.split('-break-');
@@ -29,6 +34,7 @@ const createChannels = (siteId, channels) => (dispatch, getState) =>
 				});
 				const updatedCMSInfo = {
 					...cmsInfo,
+					channelsInfo,
 					pageGroups: updatedPagegroups
 				};
 
