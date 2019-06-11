@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 import React from 'react';
 import {
 	Row,
@@ -33,7 +34,7 @@ class UiList extends React.Component {
 				URL_REMOVE_PROTOCOL_PREFIX: 'url-remove-protocol-prefix'
 			},
 			regex: {
-				URL: /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/,
+				URL: /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/,
 				HTTPS_PREFIX: /^https:\/\//,
 				HTTP_PREFIX: /^http:\/\//
 			}
@@ -412,7 +413,8 @@ class UiList extends React.Component {
 			saveButtonText,
 			sticky,
 			separateSaveButtonText,
-			isSeparateSaveButton
+			isSeparateSaveButton,
+			itemUpdateSaveButtonText
 		} = this.props;
 		const { activeItemValue, activeItemKey } = this.state;
 		const isActiveItem = !!(
@@ -422,6 +424,7 @@ class UiList extends React.Component {
 		);
 		const isValidSeparateSaveButtonProp = !!(isSeparateSaveButton && separateSaveButtonText);
 		const computedActiveFormControlClassName = isActiveItem ? 'u-box-shadow-active' : '';
+		const computedSaveButtonText = isActiveItem ? itemUpdateSaveButtonText : saveButtonText;
 		const computedStickyClassName = sticky ? 'u-position-sticky u-bg-color-white' : '';
 		const computedFormGroupMarginClassName = isValidSeparateSaveButtonProp ? 'u-margin-b3' : '';
 		const computedRootElClassName = `u-margin-b4 ${computedStickyClassName}`;
@@ -447,10 +450,8 @@ class UiList extends React.Component {
 								data-key="0-save"
 								onClick={this.handleClickHandler}
 							>
-								{saveButtonText}
+								{computedSaveButtonText}
 							</CustomButton>
-
-							{/* <Button>Before</Button> */}
 						</InputGroup.Button>
 					</InputGroup>
 				</FormGroup>
@@ -489,9 +490,11 @@ class UiList extends React.Component {
 	}
 }
 
+/* eslint-disable react/forbid-prop-types */
 UiList.propTypes = {
 	rootClassName: PropTypes.string,
 	separateSaveButtonText: PropTypes.string,
+	itemUpdateSaveButtonText: PropTypes.string,
 	sticky: PropTypes.bool,
 	validate: PropTypes.bool,
 	isSeparateSaveButton: PropTypes.bool,
@@ -509,7 +512,8 @@ UiList.defaultProps = {
 	sticky: false,
 	validate: true,
 	isSeparateSaveButton: false,
-	plugins: []
+	plugins: [],
+	itemUpdateSaveButtonText: 'Update'
 };
 
 // Example props values
