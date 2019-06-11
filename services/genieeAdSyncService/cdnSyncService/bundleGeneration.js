@@ -27,13 +27,20 @@ function init(site, config) {
 					chunkFilename: '[name].js'
 				},
 				module: {
-					loaders: [
+					rules: [
 						{
 							test: /.jsx?$/,
 							loader: 'babel-loader',
 							exclude: /node_modules/,
 							options: {
-								presets: [['es2015', { loose: true }], 'stage-2']
+								presets: ['@babel/preset-env', '@babel/preset-react'],
+								plugins: [
+									'@babel/plugin-syntax-dynamic-import',
+									'@babel/plugin-proposal-class-properties',
+									'@babel/plugin-proposal-export-namespace-from',
+									'@babel/plugin-proposal-throw-expressions',
+									'@babel/plugin-transform-react-jsx-source'
+								]
 							}
 						},
 						{
