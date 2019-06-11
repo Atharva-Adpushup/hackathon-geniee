@@ -5,6 +5,7 @@ import { uiModes } from 'consts/commonConsts';
 import { highlightElement, setElementSelectorCords, hideHighlighter } from '../../actions/inner/actions';
 import { sendMessage } from './messengerHelper';
 import { messengerCommands } from '../../consts/commonConsts';
+const IncontentAnalyzer = require('../../../../../services/genieeAdSyncService/adpushup.js/libs/aa');
 
 const selectorator = new Selectorator(),
 	events = 'click mouseup mouseleave mousedown mouseover',
@@ -93,6 +94,151 @@ const selectorator = new Selectorator(),
 
 		return true;
 	},
+	removeExistingIncontentAds = function($element) {
+		const $computedWrapperEl = $element || $(window.document.body);
+		$('._ap_apex_ad._ap_incontent_ads', $computedWrapperEl).remove();
+	},
+	placeIncontentAds = (contentSelector, ads, globalConfig) => {
+		const resultData = {
+			placement: {
+				count: 0,
+				sectionNumbers: []
+			},
+			xpathMiss: {
+				count: 0,
+				sectionNumbers: []
+			}
+		};
+		const parameters = {
+			$,
+			$selector: $(contentSelector),
+			placementConfig: ads,
+			...globalConfig
+		};
+		const placeAd = function(adObject, $element) {
+			var $container = $('<div/>');
+			var css = $.extend({}, adObject.css, adObject.customCSS, {
+				width: adObject.width + 'px',
+				height: adObject.height + 'px',
+				background: '#ffff0040',
+				boxShadow: 'rgb(0, 0, 0) 0px 0px 0px 2px inset',
+				display: 'flex',
+				alignItems: 'center',
+				justifyContent: 'center',
+				fontFamily: 'sans-serif'
+			});
+			var attributes = {
+				sectionNumber: adObject.section,
+				minDistanceFromPrevAd: adObject.minDistanceFromPrevAd,
+				selectorsTreeLevel: adObject.selectorsTreeLevel
+			};
+			var htmlString = adObject.section + ', ' + adObject.width + 'x' + adObject.height;
+			var $strongEl = $('<strong />').text(htmlString);
+
+			$container
+				.css(css)
+				.attr(attributes)
+				.addClass('_ap_apex_ad _ap_incontent_ads')
+				.append($strongEl);
+			$element.after($container);
+		};
+		const setContentOverlayHeight = function($element) {
+			const $contentOverlayEl = $('._ap_contentOverlay._ap_reject');
+
+			$contentOverlayEl.css({ height: `${$element.height()}px` });
+		};
+		const pushDataInXpathMissFeedback = sectionNumber => {
+			resultData.xpathMiss.count++;
+			resultData.xpathMiss.sectionNumbers.push(sectionNumber);
+		};
+		const pushDataInPlacementFeedback = sectionNumber => {
+			resultData.placement.count++;
+			resultData.placement.sectionNumbers.push(sectionNumber);
+		};
+		const computeXpathMissFeedback = inputData => {
+			inputData.forEach(adObject => {
+				pushDataInXpathMissFeedback(adObject.section);
+			});
+		};
+		const successCallback = placementData => {
+			const isPlacementData = !!(placementData && Object.keys(placementData).length);
+
+			if (!isPlacementData) {
+				computeXpathMissFeedback(ads);
+				return resultData;
+			}
+
+			ads.forEach(adObject => {
+				const isAdSectionNumberPresent = !!(
+					placementData.hasOwnProperty(adObject.section) && placementData[adObject.section]
+				);
+
+				if (!isAdSectionNumberPresent) {
+					pushDataInXpathMissFeedback(adObject.section);
+					return true;
+				}
+
+				const placementObject = placementData[adObject.section];
+				const $el = placementObject && placementObject.elem;
+				const isValidDataToPlaceAd = !!(placementObject && Object.keys(placementObject).length && $el);
+
+				if (!isValidDataToPlaceAd) {
+					return true;
+				}
+
+				placeAd(adObject, $el);
+				pushDataInPlacementFeedback(adObject.section);
+			});
+
+			setContentOverlayHeight(parameters.$selector);
+			return resultData;
+		};
+		const transformResultData = result => {
+			const transformedResult = {
+				type: 'info',
+				message: `Ad placed ✅: __placedAdsCount__, section numbers: __placedAdsSectionNumbers__, 
+Ad xpathMiss ❌: __xpathMissAdsCount__, section numbers: __xpathMissAdsSectionNumbers__`
+			};
+			const isResult = !!(result && Object.keys(result).length);
+			const isValidPlacement = !!(
+				isResult &&
+				result.placement &&
+				result.placement.count &&
+				result.placement.sectionNumbers.length
+			);
+			const isValidXPathMiss = !!(
+				isResult &&
+				result.xpathMiss &&
+				result.xpathMiss.count &&
+				result.xpathMiss.sectionNumbers.length
+			);
+			const isResultSuccess = !!(isValidPlacement && !isValidXPathMiss);
+			const isResultInfo = !!(isValidPlacement && isValidXPathMiss);
+			const isResultFailure = !!(!isValidPlacement && isValidXPathMiss);
+
+			if (isResultSuccess) {
+				transformedResult.type = 'success';
+			} else if (isResultInfo) {
+				transformedResult.type = 'info';
+			} else if (isResultFailure) {
+				transformedResult.type = 'error';
+			}
+
+			transformedResult.message = transformedResult.message
+				.replace('__placedAdsCount__', result.placement.count)
+				.replace('__placedAdsSectionNumbers__', result.placement.sectionNumbers.join(', '))
+				.replace('__xpathMissAdsCount__', result.xpathMiss.count)
+				.replace('__xpathMissAdsSectionNumbers__', result.xpathMiss.sectionNumbers.join(', '));
+
+			return transformedResult;
+		};
+
+		removeExistingIncontentAds(parameters.$selector);
+		setContentOverlayHeight(parameters.$selector);
+		return IncontentAnalyzer(parameters)
+			.then(successCallback)
+			.then(transformResultData);
+	},
 	scrollToView = adId => {
 		let id = `#ad-${adId}`,
 			ele = $(id);
@@ -150,4 +296,13 @@ const selectorator = new Selectorator(),
 			});
 	};
 
-export { initDomEvents, getAdpVitals, getAllXPaths, isValidXPath, scrollToView, updateAdSize };
+export {
+	initDomEvents,
+	getAdpVitals,
+	getAllXPaths,
+	isValidXPath,
+	scrollToView,
+	updateAdSize,
+	placeIncontentAds,
+	removeExistingIncontentAds
+};

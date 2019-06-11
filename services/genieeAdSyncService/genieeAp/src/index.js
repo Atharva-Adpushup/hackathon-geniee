@@ -109,7 +109,14 @@ function triggerControl(mode) {
 	if (config.partner === 'geniee' && !config.isAdPushupControlWithPartnerSSP) {
 		if (w.gnsmod && !w.gnsmod.creationProcessStarted && w.gnsmod.triggerAds) {
 			w.gnsmod.triggerAds();
+
 			utils.sendFeedback({
+				eventType: 3,
+				mode: mode,
+				referrer: config.referrer
+			});
+
+			utils.sendFeedbackOld({
 				eventType: 3,
 				mode: mode,
 				referrer: config.referrer
@@ -118,7 +125,14 @@ function triggerControl(mode) {
 	} else {
 		adp.creationProcessStarted = true;
 		control.trigger();
+
 		utils.sendFeedback({
+			eventType: 3,
+			mode: mode,
+			referrer: config.referrer
+		});
+
+		utils.sendFeedbackOld({
 			eventType: 3,
 			mode: mode,
 			referrer: config.referrer
@@ -144,6 +158,10 @@ function startCreation(forced) {
 				adp.creationProcessStarted = true;
 				clearTimeout(pageGroupTimer);
 				config.selectedVariation = selectedVariation.id;
+				config.selectedVariationName = selectedVariation.name;
+				config.selectedVariationType = selectedVariation.isControl
+					? commonConsts.PAGE_VARIATION_TYPE.BENCHMARK
+					: commonConsts.PAGE_VARIATION_TYPE.NON_BENCHMARK;
 
 				//Geniee method call for chosen variation id
 				if (isGenieeModeSelected) {
@@ -264,7 +282,11 @@ function main() {
 
 	if (!config.pageGroup) {
 		pageGroupTimer = setTimeout(function() {
+<<<<<<< HEAD
 			!config.pageGroup ? triggerControl(3) : clearTimeout(pageGroupTimer);
+=======
+			!config.pageGroup ? triggerControl(commonConsts.MODE.FALLBACK) : clearTimeout(pageGroupTimer);
+>>>>>>> feedback-changes
 		}, config.pageGroupTimeout);
 	} else {
 		// start heartBeat

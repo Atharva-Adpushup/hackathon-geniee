@@ -54,7 +54,8 @@ function dashboardRedirection(req, res, allUserSites, type) {
 				.getSiteById(obj.siteId)
 				.then(function(site) {
 					return Object.assign(obj, {
-						isManual: site.get('isManual') || false
+						isManual: site.get('isManual') || false,
+						isInnovative: site.get('isInnovative') || false
 					});
 				})
 				.catch(function() {
@@ -104,6 +105,7 @@ function dashboardRedirection(req, res, allUserSites, type) {
 						siteId: site.siteId,
 						step: site.step,
 						isManual: site.isManual,
+						isInnovative: site.isInnovative,
 						reportData
 					};
 				});

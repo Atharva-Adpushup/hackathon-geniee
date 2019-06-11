@@ -9,7 +9,15 @@ import {
 	hideElementSelector,
 	setViewingMode
 } from '../../actions/inner/actions';
-import { getAdpVitals, getAllXPaths, isValidXPath, scrollToView, updateAdSize } from './domManager';
+import {
+	getAdpVitals,
+	getAllXPaths,
+	isValidXPath,
+	scrollToView,
+	updateAdSize,
+	placeIncontentAds,
+	removeExistingIncontentAds
+} from './domManager';
 
 const messenger = new Messenger(),
 	sendMessage = (cmd, data) => {
@@ -26,6 +34,7 @@ const messenger = new Messenger(),
 		messenger.onMessage.add((cmd, data) => {
 			switch (cmd) {
 				case messengerCommands.UPDATE_LAYOUT:
+					removeExistingIncontentAds();
 					dispatch(updateLayout(data));
 					break;
 
@@ -55,6 +64,19 @@ const messenger = new Messenger(),
 
 				case messengerCommands.UPDATE_AD_SIZE:
 					updateAdSize(data);
+					break;
+
+				case messengerCommands.INIT_INCONTENT_ADS_PREVIEW:
+					placeIncontentAds(data.contentSelector, data.ads, data.config)
+						.then(result =>
+							sendMessage(messengerCommands.SHOW_INCONTENT_ADS_PREVIEW_RESULT, {
+								type: result.type,
+								message: result.message
+							})
+						)
+						.fail(error => {
+							console.error('Error in running IncontentAnalyzer: ', error);
+						});
 					break;
 
 				case messengerCommands.VALIDATE_XPATH_SECTION:

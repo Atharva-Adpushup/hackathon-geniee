@@ -22,8 +22,9 @@ const renderField = field => {
 								{...field.input}
 								className="inputMinimal"
 							/>
-							{field.meta.touched &&
-								field.meta.error && <div className="error-message">{field.meta.error}</div>}
+							{field.meta.touched && field.meta.error && (
+								<div className="error-message">{field.meta.error}</div>
+							)}
 						</Col>
 					</Row>
 				</Col>
@@ -45,8 +46,9 @@ const renderField = field => {
 								rows="6"
 								className="inputMinimal"
 							/>
-							{field.meta.touched &&
-								field.meta.error && <div className="error-message">{field.meta.error}</div>}
+							{field.meta.touched && field.meta.error && (
+								<div className="error-message">{field.meta.error}</div>
+							)}
 						</Col>
 					</Row>
 				</Col>
@@ -109,6 +111,7 @@ const renderField = field => {
 								showNotification={that.props.showNotification}
 								isInsertMode={true}
 								zonesData={that.props.zonesData}
+								networkConfig={that.props.networkConfig}
 							/>
 						</Col>
 					</Row>
@@ -119,33 +122,82 @@ const renderField = field => {
 	renderSectionInfo = () => {
 		return (
 			<div>
+				<p className="u-margin-b15px">
+					Each <strong>Section no</strong> maps to a minimum bracket of default pixels (600 on DESKTOP, 450 on
+					MOBILE) with reference to the content selector. Every section is calculated using either of two
+					techniques named <strong>Even Spacing</strong> and <strong>Equal Brackets</strong>.{' '}
+					<i>
+						Even Spacing is applied first and Equal Brackets is applied as fallback if the former gets
+						failed.
+					</i>
+				</p>
 				<p>
-					Each <strong>Section no</strong> maps to a minimum bracket of 600 pixels in reference to the content
-					selector. The bracket increases by 100 pixels for successive section numbers. i.e.
+					<strong>Even Spacing</strong> technique divides <mark>content selector height</mark> with{' '}
+					<mark>number of sections</mark> defined in configuration. If resulting value is greater than or
+					equal to user defined section bracket value, only then this technique is applied. <br />
+					For example, computed section brackets for <mark>content selector height of 2500px</mark> with{' '}
+					<mark>4 sections</mark> and <mark>default section bracket of 600px</mark> are as follows
+				</p>
+				<ul>
+					<li>
+						Section No 1 : <strong>(0 - 625) pixels</strong>
+					</li>
+					<li>
+						Section No 2 : <strong>(625 - 1250) pixels</strong>
+					</li>
+					<li>
+						Section No 3 : <strong>(1250 - 1875) pixels</strong>
+					</li>
+					<li>
+						Section No 4 : <strong>(1875 - 2500) pixels</strong>
+					</li>
+				</ul>
+
+				<p className="u-margin-t15px">
+					<strong>Equal Brackets</strong> technique uses <mark>section bracket</mark> value defined in
+					configuration. This technique is applied when <strong>Even Spacing</strong> technique fails.
+					<br />
+					For example, computed section brackets for <mark>content selector height of 2100px</mark> with{' '}
+					<mark>4 sections</mark> and <mark>default section bracket of 600px</mark> are as follows
 				</p>
 				<ul>
 					<li>
 						Section No 1 : <strong>(0 - 600) pixels</strong>
 					</li>
 					<li>
-						Section No 2 : <strong>(500 - 1200) pixels</strong>
+						Section No 2 : <strong>(600 - 1200) pixels</strong>
 					</li>
 					<li>
-						Section No 3 : <strong>(1000 - 1800) pixels</strong>
+						Section No 3 : <strong>(1200 - 1800) pixels</strong>
 					</li>
-					<li>
-						Section No 4 : <strong>(1500 - 2400) pixels</strong>
-					</li>
-					<li>...and so on</li>
 				</ul>
+			</div>
+		);
+	},
+	renderCustomAdSizeInfo = () => {
+		return (
+			<div>
+				<p>
+					If valid custom ad size <strong>width</strong> and <strong>height</strong> values are entered,
+					<mark>Ad Size</mark> dropdown value will be ignored.
+				</p>
 			</div>
 		);
 	},
 	renderInfo = that => {
 		let fn;
-		if (that.state.selectedElement == 'section') {
+		const selectedElement = that.state.selectedElement;
+		const isSectionElement = !!(selectedElement === 'section' || selectedElement === 'name');
+		const isCustomAdSizeElement = !!(
+			selectedElement === 'customAdSizeWidth' || selectedElement === 'customAdSizeHeight'
+		);
+
+		if (isSectionElement) {
 			fn = renderSectionInfo();
+		} else if (isCustomAdSizeElement) {
+			fn = renderCustomAdSizeInfo();
 		}
+
 		return (
 			<div>
 				<h1 className="variation-section-heading">Information</h1>
@@ -156,7 +208,7 @@ const renderField = field => {
 	renderInContentAdder = (that, getSupportedSizes) => {
 		return (
 			<form>
-				<h1 className="variation-section-heading">Add Incontent Variation</h1>
+				<h1 className="variation-section-heading">Add Incontent Section</h1>
 				<div style={{ width: '65%', borderRight: '1px solid rgba(85, 85, 85, 0.3)', display: 'inline-block' }}>
 					<Field
 						placeholder="Please enter section"
@@ -181,7 +233,7 @@ const renderField = field => {
 						name="minDistanceFromPrevAd"
 						component={renderField}
 						type="number"
-						label="minDistanceFromPrevAd"
+						label="Minimum distance from previous ad"
 					/>
 					<Row>
 						<Col xs={12} className="u-padding-r10px">
@@ -201,6 +253,25 @@ const renderField = field => {
 							</Row>
 						</Col>
 					</Row>
+					<Field
+						placeholder="Please enter custom ad size width"
+						name="customAdSizeWidth"
+						component={renderField}
+						type="number"
+						label="Custom ad size width"
+						onFocus={that.setFocusElement.bind(that)}
+						onBlur={that.setFocusElement.bind(that)}
+					/>
+					<Field
+						placeholder="Please enter custom ad size height"
+						name="customAdSizeHeight"
+						component={renderField}
+						type="number"
+						label="Custom ad size height"
+						onFocus={that.setFocusElement.bind(that)}
+						onBlur={that.setFocusElement.bind(that)}
+					/>
+
 					{that.props.activeChannel.platform !== 'MOBILE' ? (
 						<Row>
 							<Col xs={12} className="u-padding-r10px">
