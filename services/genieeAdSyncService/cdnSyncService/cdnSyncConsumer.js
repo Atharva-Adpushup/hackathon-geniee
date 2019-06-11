@@ -148,6 +148,7 @@ module.exports = function(site, externalData = {}) {
 		},
 		getFinalConfig = () => {
 			return getConfigWrapper(site)
+				.then(generatedConfig => prebidGeneration(generatedConfig))
 				.then(generatedConfig => bundleGeneration(site, generatedConfig))
 				.spread((generatedConfig, bundle) => {
 					let { apConfigs, adpTagsConfig, statusesAndAds: finalConfig } = generatedConfig;
