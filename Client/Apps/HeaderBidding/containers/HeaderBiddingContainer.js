@@ -7,8 +7,11 @@ import {
 	getSetupStatusAction,
 	addBidderAction,
 	updateBidderAction,
-	fetchInventoriesAction
+	fetchInventoriesAction,
+	updateInventoriesHbStatus
 } from '../../../actions/apps/headerBidding/hbActions';
+
+import { showNotification, hideNotification } from '../../../actions/uiActions';
 
 const HeaderBiddingContainer = props => <HeaderBidding {...props} />;
 
@@ -24,6 +27,9 @@ export default connect(
 		getSetupStatusAction,
 		addBidderAction,
 		updateBidderAction,
-		fetchInventoriesAction
+		fetchInventoriesAction,
+		updateInventoriesHbStatus,
+		showNotification,
+		hideNotification
 	}
 )(HeaderBiddingContainer);

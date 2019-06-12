@@ -138,54 +138,238 @@
 	}
 }
 
-.filterbox-wrap {
-	position: relative;
-
-	ul {
-		list-style: none;
-		padding-left: 0;
-		margin-bottom: 0;
+.hb-inventories {
+	.toggle-hb-status-for-site {
+		.icon {
+			width: 25px;
+			height: 25px;
+			&.disabled {
+				color: #ccc;
+			}
+			&.active {
+				color: $primaryColor;
+				cursor: pointer;
+			}
+		}
 	}
 
-	.applied-filters {
-	}
+	.inventory-wrap {
+		position: relative;
+		&.disabled::before {
+			position: absolute;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			content: 'Header Bidding is paused on this site. Please enable it first to manage inventories.';
+			font-size: 1.2em;
+			background: rgba(255, 255, 255, 0.9);
+			z-index: 3;
+		}
+		.updt-inv-hb-status {
+			.lds-ring {
+				vertical-align: middle;
+			}
+		}
+		.filterbox-wrap {
+			position: relative;
+			border: 1px solid #ccc;
+			border-radius: 3px;
+			display: flex;
+			height: 35px;
 
-	.filterbox {
-		position: absolute;
-		box-shadow: 0px 2px 3px 0px rgba(#000, 0.25);
-		min-width: 200px;
-		border: 1px solid rgba(#000, 0.15);
-		border-top: none;
-		background: #fff;
-		z-index: 1;
-		.list-view {
 			ul {
-				max-height: 200px;
-				overflow-y: auto;
-				&::-webkit-scrollbar {
-					width: 8px;
-				}
-				&::-webkit-scrollbar-track {
-					background: #fff;
-					&:hover {
-						background: #eee;
-					}
-				}
-				&::-webkit-scrollbar-thumb {
-					background: #ccc;
-					&:hover {
-						background: #999;
-					}
-				}
+				list-style: none;
+				padding-left: 0;
+				margin-bottom: 0;
+			}
 
-				li {
-					padding: 8px 15px;
-					cursor: pointer;
-					&:hover {
-						background-color: rgba(#000, 0.05);
+			.filter-label {
+				background-color: #eee;
+				line-height: 33px;
+				padding: 0 20px;
+				border-right: 1px solid #ccc;
+				border-radius: 3px 0 0 3px;
+			}
+
+			.applied-filters {
+				display: flex;
+				align-items: center;
+				padding-left: 7px;
+				.filter {
+					display: inline-block;
+					background-color: lighten($primaryColor, 25%);
+					margin-right: 7px;
+					border-radius: 3px;
+					overflow: hidden;
+					&:last-child {
+						margin-right: 0;
+					}
+					.filter-name {
+						padding: 2px 7px;
+					}
+					.filter-clear {
+						padding: 2px 7px;
+						cursor: pointer;
+						&:hover {
+							background-color: $primaryColor;
+							color: #fff;
+						}
 					}
 				}
 			}
+			.add-new-filter {
+				flex-grow: 1;
+				display: flex;
+				align-items: center;
+				cursor: pointer;
+				.add-new-filter-btn {
+					height: 100%;
+					padding-left: 7px;
+					flex-grow: 1;
+					line-height: 33px;
+				}
+
+				.filterbox {
+					position: absolute;
+					top: 34;
+					font-size: 0.9em;
+					box-shadow: 0px 2px 3px 0px rgba(#000, 0.25);
+					min-width: 200px;
+					border: 1px solid rgba(#000, 0.15);
+					border-top: none;
+					background: #fff;
+					z-index: 1;
+					.list-view {
+						ul {
+							max-height: 230px;
+							overflow-y: auto;
+							&::-webkit-scrollbar {
+								width: 8px;
+							}
+							&::-webkit-scrollbar-track {
+								background: #fff;
+								&:hover {
+									background: #eee;
+								}
+							}
+							&::-webkit-scrollbar-thumb {
+								background: #ccc;
+								&:hover {
+									background: #999;
+								}
+							}
+
+							li {
+								padding: 8px 15px;
+								cursor: pointer;
+								&:hover {
+									background-color: rgba(#000, 0.05);
+								}
+							}
+						}
+
+						&.titles-view {
+							.fb-title {
+								display: flex;
+								.text {
+									flex-grow: 1;
+								}
+								.icon {
+									align-self: center;
+								}
+							}
+						}
+
+						&.values-view {
+							.values {
+								li {
+									padding: 0;
+									.checkbox {
+										margin: 0;
+										label {
+											width: 100%;
+											padding: 8px 15px 8px 35px;
+										}
+									}
+								}
+							}
+							.list-btns {
+								span {
+									color: $primaryColor;
+									cursor: pointer;
+									&:hover {
+										color: darken($primaryColor, 20%);
+									}
+									&.active {
+										color: darken($primaryColor, 20%);
+										cursor: default;
+									}
+								}
+							}
+							.search-box {
+								position: relative;
+								.clear-btn {
+									position: absolute;
+									top: 6px;
+									right: 12px;
+									font-size: 1.1em;
+									color: $primaryColor;
+									cursor: pointer;
+									&:hover {
+										color: darken($primaryColor, 20%);
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		.table-datatable {
+			margin-top: 30px;
+			.thead-default {
+				.thead-tr-default {
+					.thead-th-default {
+						&.sortable {
+							&:hover {
+								background: #eee;
+								cursor: pointer;
+							}
+						}
+						.checkbox {
+							display: inline-block;
+							margin: 0;
+						}
+					}
+				}
+			}
+
+			.tbody-default {
+				.tbody-tr-default {
+					.tbody-td-default {
+						.checkbox {
+							display: inline-block;
+							margin: 0;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+.hb-prebid-settings {
+	form {
+		.form-row {
+			margin-bottom: 15px;
+		}
+		.footer-btns {
+			margin-left: 15px;
 		}
 	}
 }

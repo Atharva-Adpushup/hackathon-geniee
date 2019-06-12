@@ -1,6 +1,7 @@
 import React from 'react';
 import { Row } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Link } from 'react-router-dom';
 import CustomButton from '../../../Components/CustomButton';
 
 class Setup extends React.Component {
@@ -122,13 +123,11 @@ class Setup extends React.Component {
 						</span>
 						{!biddersFound && (
 							<span className="btn-wrap">
-								<CustomButton
-									variant="secondary"
-									name="addBidders"
-									onClick={this.openGoogleOauthWindow}
-								>
-									Add Bidders
-								</CustomButton>
+								<Link to="header-bidding/bidders">
+									<CustomButton variant="secondary" name="addBidders">
+										Add Bidders
+									</CustomButton>
+								</Link>
 							</span>
 						)}
 					</li>

@@ -8,6 +8,7 @@ import { NAV_ITEMS, NAV_ITEMS_INDEXES, NAV_ITEMS_VALUES } from '../constants';
 import Setup from './Setup';
 import BiddersTab from './BiddersTab';
 import InventoryTab from './InventoryTab';
+import PrebidSettingsTab from './PrebidSettingsTab';
 
 class HeaderBidding extends React.Component {
 	state = {
@@ -94,7 +95,9 @@ class HeaderBidding extends React.Component {
 			addBidderAction,
 			updateBidderAction,
 			inventories,
-			fetchInventoriesAction
+			fetchInventoriesAction,
+			updateInventoriesHbStatus,
+			showNotification
 		} = this.props;
 
 		const activeTab = this.getActiveTab();
@@ -126,10 +129,11 @@ class HeaderBidding extends React.Component {
 							siteId={siteId}
 							inventories={inventories}
 							fetchInventoriesAction={fetchInventoriesAction}
+							updateInventoriesHbStatus={updateInventoriesHbStatus}
 						/>
 					);
 				case 'prebid-settings':
-					return 'Tab 4';
+					return <PrebidSettingsTab siteId={siteId} showNotification={showNotification} />;
 				case 'optimization':
 					return 'Tab 5';
 				default:
@@ -151,7 +155,7 @@ class HeaderBidding extends React.Component {
 		return (
 			<ActionCard>
 				<Nav bsStyle="tabs" activeKey={activeItem.INDEX} onSelect={this.handleNavSelect}>
-					{/*! inventoryFound || !biddersFound */ true && (
+					{(!inventoryFound || !biddersFound) && (
 						<NavItem eventKey={1}>{NAV_ITEMS_VALUES.TAB_1}</NavItem>
 					)}
 					<NavItem
