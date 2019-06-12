@@ -8,9 +8,10 @@ var auction = require('./auction');
 var hb = {
 	setPrebidConfig: function () {
 		var PREBID = constants.PREBID;
+		var pbjs = window.pbjs;
 
-		window.pbjs.que.push(function () {
-			window.pbjs.setConfig({
+		pbjs.que.push(function () {
+			pbjs.setConfig({
 				rubicon: {
 					singleRequest: true
 				},
