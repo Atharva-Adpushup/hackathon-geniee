@@ -6,7 +6,6 @@
 		"start": "node ./bin/www"
 	},
 	"dependencies": {
-		"@babel/core": "^7.4.4",
 		"@fdaciuk/ajax": "^2.1.2",
 		"Base64": "^1.0.1",
 		"amqplib": "^0.5.1",
