@@ -25,14 +25,15 @@ import {
 	faExternalLinkAlt,
 	faArrowUp,
 	faArrowDown,
-	faTools,
-	faSort,
-	faTrash,
-	faCode
+	faCheck,
+	faChevronRight,
+	faPlay,
+	faPause
 } from '@fortawesome/free-solid-svg-icons';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import 'bootstrap-sass/assets/stylesheets/_bootstrap.scss';
 import ErrorBoundary from './Components/ErrorBoundary';
+import NotificationContainer from './Containers/NotificationContainer';
 import Routes from './Routes';
 import NotificationContainer from './Containers/NotificationContainer';
 
@@ -60,10 +61,10 @@ library.add(
 	faExternalLinkAlt,
 	faArrowUp,
 	faArrowDown,
-	faTools,
-	faSort,
-	faTrash,
-	faCode
+	faCheck,
+	faChevronRight,
+	faPlay,
+	faPause
 );
 
 const App = () => (

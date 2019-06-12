@@ -18,6 +18,13 @@ function getBody(inventories, selectedInventories, handleInventorySelect) {
 	return inventories.map(inventory => {
 		const inventoryCopy = { ...inventory };
 
+		inventoryCopy.adUnit = (
+			<span title={inventoryCopy.adUnit}>
+				{inventoryCopy.adUnit.length > 25
+					? `${inventoryCopy.adUnit.substring(0, 25)}...`
+					: inventoryCopy.adUnit}
+			</span>
+		);
 		inventoryCopy.checkBox = (
 			<Checkbox
 				checked={selectedInventories.indexOf(inventoryCopy.tempId) > -1}
@@ -25,7 +32,6 @@ function getBody(inventories, selectedInventories, handleInventorySelect) {
 			/>
 		);
 
-		inventoryCopy.headerBidding = inventoryCopy.headerBidding ? 'Enabled' : 'Disabled';
 		return inventoryCopy;
 	});
 }
@@ -51,8 +57,8 @@ const InventoriesTable = ({
 		tableBody={getBody(inventories, selectedInventories, handleInventorySelect)}
 		keyName="userTable"
 		tableClass="striped hover responsive"
-		rowsPerPage={5}
-		rowsPerPageOption={[5, 10, 15, 20]}
+		rowsPerPage={10}
+		rowsPerPageOption={[10, 25, 50, 100]}
 		initialSort={{ prop: 'adUnit', isAscending: true }}
 		labels={customLabels}
 	/>

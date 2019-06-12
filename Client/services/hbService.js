@@ -29,13 +29,43 @@ export function fetchInventories(siteId) {
 		inventories.map(inventory => {
 			const { app, adUnit, device, pageGroup } = inventory;
 			const uniqueKey = window.btoa(app + adUnit + device + pageGroup);
-			const inventoryCopy = { ...inventory };
 
-			inventoryCopy.tempId = uniqueKey;
+			// eslint-disable-next-line no-param-reassign
+			inventory.tempId = uniqueKey;
 
-			return inventoryCopy;
+			return inventory;
 		});
 
 		return { data: inventories };
 	});
+}
+
+export function updateInventoriesHbStatus(siteId, inventoriesToUpdate) {
+	const payload = inventoriesToUpdate.map(inventory => {
+		const { app, pageGroup, device, adUnit, headerBidding } = inventory;
+
+		return { target: { app, pageGroup, device, adUnit }, enableHB: headerBidding === 'Enabled' };
+	});
+
+	return axiosInstance.put(`/headerBidding/updateHbStatus/${siteId}`, payload);
+}
+
+export function fetchPrebidSettings(siteId) {
+	return axiosInstance
+		.get(`/headerBidding/prebidSettings/${siteId}`)
+		.then(({ data: prebidSettings }) => prebidSettings);
+}
+
+export function updatePrebidSettings(siteId, newPrebidSettings) {
+	return axiosInstance.put(`/headerBidding/prebidSettings/${siteId}`, newPrebidSettings);
+}
+
+export function getHbStatusForSite(siteId) {
+	return axiosInstance.get(`/headerBidding/hbStatusForSite/${siteId}`).then(({ data }) => data);
+}
+
+export function toggleHbStatusForSite(siteId) {
+	return axiosInstance
+		.put(`/headerBidding/toggleHbStatusForSite/${siteId}`)
+		.then(({ data }) => data);
 }

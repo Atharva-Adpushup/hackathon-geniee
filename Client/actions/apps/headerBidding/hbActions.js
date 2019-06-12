@@ -5,7 +5,8 @@ import {
 	GET_SETUP_STATUS,
 	ADD_BIDDER,
 	UPDATE_BIDDER,
-	FETCH_INVENTORIES
+	FETCH_INVENTORIES,
+	UPDATE_INVENTORIES_HB_STATUS
 } from '../../../constants/headerBidding';
 import * as service from '../../../services/hbService';
 
@@ -66,6 +67,15 @@ export const fetchInventoriesAction = siteId => dispatch =>
 			// Save bidder config in store
 			dispatch({ type: FETCH_INVENTORIES, inventories })
 		)
+		.catch(err => {
+			// eslint-disable-next-line no-console
+			console.log(err);
+		});
+
+export const updateInventoriesHbStatus = (siteId, inventoriesToUpdate) => dispatch =>
+	service
+		.updateInventoriesHbStatus(siteId, inventoriesToUpdate)
+		.then(() => dispatch({ type: UPDATE_INVENTORIES_HB_STATUS, inventoriesToUpdate }))
 		.catch(err => {
 			// eslint-disable-next-line no-console
 			console.log(err);
