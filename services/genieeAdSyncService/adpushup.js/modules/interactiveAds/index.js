@@ -67,4 +67,4 @@ const createInViewAd = interactiveAd => {
 window.adpushup = window.adpushup || {};
 window.adpushup.processInnovativeAds = processInteractiveAds;
 
-module.exports = processInteractiveAds;
+export default processInteractiveAds;

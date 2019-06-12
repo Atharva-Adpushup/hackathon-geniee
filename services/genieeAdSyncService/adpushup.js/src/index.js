@@ -28,7 +28,7 @@ if (APTAG_ACTIVE) {
 	var triggerAd = require('./trigger');
 }
 if (INNOVATIVE_ADS_ACTIVE) {
-	var processInnovativeAds = require('../modules/interactiveAds/index');
+	var processInnovativeAds = require('../modules/interactiveAds/index').default;
 }
 // var	Tracker = require('../libs/tracker');
 // var	heartBeat = require('../libs/heartBeat');
