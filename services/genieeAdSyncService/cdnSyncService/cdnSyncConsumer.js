@@ -148,6 +148,7 @@ module.exports = function(site, externalData = {}) {
 		},
 		getFinalConfig = () => {
 			return getConfigWrapper(site)
+				.then(generatedConfig => prebidGeneration(generatedConfig))
 				.then(generatedConfig => bundleGeneration(site, generatedConfig))
 				.spread((generatedConfig, bundle) => {
 					let { apConfigs, adpTagsConfig, statusesAndAds: finalConfig } = generatedConfig;
@@ -215,10 +216,11 @@ module.exports = function(site, externalData = {}) {
 		uploadJS = function(fileConfig) {
 			var siteId = site.get('siteId');
 			var shouldJSCdnSyncBeDisabled = !!(disableSiteCdnSyncList.indexOf(siteId) > -1);
+			var isStaging = !!config.environment.IS_STAGING;
 
 			// Disable CDN upload for specific websites where generated JavaScript is added manually for testing purposes
-			if (shouldJSCdnSyncBeDisabled) {
-				return Promise.resolve();
+			if (shouldJSCdnSyncBeDisabled || isStaging) {
+				return Promise.resolve(fileConfig.uncompressed);
 			} else {
 				if (prodEnv) {
 					return connectToServer()
