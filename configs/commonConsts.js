@@ -392,6 +392,9 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		rubicon: 'rubiconBidAdapter',
 		districtm: 'appnexusBidAdapter',
 		criteo: 'criteoBidAdapter',
-		currency: 'currency'
+		currency: 'currency',
+		pubmatic: 'pubmaticBidAdapter',
+		aardvark: 'aardvarkBidAdapter',
+		adyoulike: 'adyoulikeBidAdapter'
 	}
 };
