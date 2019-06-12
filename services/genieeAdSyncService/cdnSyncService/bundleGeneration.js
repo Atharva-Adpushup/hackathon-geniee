@@ -26,7 +26,7 @@ function init(site, config) {
 				rules: [
 					{
 						test: /.jsx?$/,
-						loader: 'babel-loader?cacheDirectory=true',
+						loader: 'babel-loader',
 						exclude: /node_modules/,
 						options: {
 							presets: ['@babel/preset-env', '@babel/preset-react'],
