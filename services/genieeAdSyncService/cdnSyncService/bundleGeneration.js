@@ -36,7 +36,8 @@ function init(site, config) {
 								'@babel/plugin-proposal-export-namespace-from',
 								'@babel/plugin-proposal-throw-expressions',
 								'@babel/plugin-transform-react-jsx-source'
-							]
+							],
+							cacheDirectory: true
 						}
 					},
 					{
