@@ -26,7 +26,7 @@ function init(site, config) {
 				rules: [
 					{
 						test: /.jsx?$/,
-						loader: 'babel-loader',
+						loader: 'babel-loader?cacheDirectory=true',
 						exclude: /node_modules/,
 						options: {
 							presets: ['@babel/preset-env', '@babel/preset-react'],
@@ -36,8 +36,7 @@ function init(site, config) {
 								'@babel/plugin-proposal-export-namespace-from',
 								'@babel/plugin-proposal-throw-expressions',
 								'@babel/plugin-transform-react-jsx-source'
-							],
-							cacheDirectory: true
+							]
 						}
 					},
 					{
