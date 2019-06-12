@@ -81,7 +81,7 @@
 		"react": "^16.8.3",
 		"react-addons-shallow-compare": "15.6.2",
 		"react-bootstrap": "^0.32.4",
-		"react-bs-datatable": "^1.2.6",
+		"react-bs-datatable": "git://github.com/RaviAdPushup/react-bs-datatable.git",
 		"react-codemirror": "^1.0.0",
 		"react-dates": "13.0.6",
 		"react-dom": "^16.8.3",
