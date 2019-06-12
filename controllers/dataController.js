@@ -472,7 +472,6 @@ router
 		liveSitesService.init();
 		return res.json({ message });
 	});
-	/*
 	.get('/adpushup.js', function(req, res) {
 		const siteId = req.baseUrl.replace('/', '');
 		const countryHeader = req.headers['x-cf-geodata'] || false;
@@ -504,6 +503,5 @@ router
 				return res.sendStatus(400);
 			});
 	});
-	*/
 	
 module.exports = router;
