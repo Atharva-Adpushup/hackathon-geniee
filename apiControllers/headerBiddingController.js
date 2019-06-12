@@ -82,7 +82,7 @@ router
 					return Promise.join(
 						biddersFound,
 						inventoryFound,
-						Promise.resolve(false),
+						Promise.resolve(true),
 						!!user.getNetworkDataObj('DFP')
 					);
 				}
@@ -122,7 +122,13 @@ router
 			siteId,
 			siteDomain: null,
 			email,
-			prebidConfig: {}
+			prebidConfig: {
+				timeOut: 3000,
+				currency: {
+					enabled: false
+				},
+				formats: ['display']
+			}
 		};
 
 		const bidderConfig = {
@@ -322,6 +328,68 @@ router
 			.then(() =>
 				res.status(httpStatus.OK).json({ success: 'HB Status has been updated successfully' })
 			)
+			.catch(() =>
+				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error!' })
+			);
+	})
+	.get('/prebidSettings/:siteId', (req, res) => {
+		const { siteId } = req.params;
+		const { email } = req.user;
+
+		return userModel
+			.verifySiteOwner(email, siteId)
+			.then(() => headerBiddingModel.getPrebidConfig(siteId))
+			.then(prebidConfig => res.status(httpStatus.OK).json(prebidConfig))
+			.catch(() =>
+				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error!' })
+			);
+	})
+	.put('/prebidSettings/:siteId', (req, res) => {
+		const { siteId } = req.params;
+		const { email } = req.user;
+		const newPrebidConfig = req.body;
+		const { timeOut, currency, formats } = newPrebidConfig;
+
+		if (
+			!(
+				!Number.isNaN(timeOut) &&
+				timeOut >= 500 &&
+				timeOut <= 10000 &&
+				typeof currency.enabled === 'boolean' &&
+				formats.indexOf('display') > -1
+			)
+		) {
+			return res.status(httpStatus.BAD_REQUEST).json({ error: 'Invalid data' });
+		}
+
+		return userModel
+			.verifySiteOwner(email, siteId)
+			.then(() => headerBiddingModel.updatePrebidConfig(siteId, newPrebidConfig))
+			.then(prebidConfig => res.status(httpStatus.OK).json(prebidConfig))
+			.catch(() =>
+				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error!' })
+			);
+	})
+	.get('/hbStatusForSite/:siteId', (req, res) => {
+		const { siteId } = req.params;
+		const { email } = req.user;
+
+		return userModel
+			.verifySiteOwner(email, siteId)
+			.then(() => headerBiddingModel.getHbStatusForSite(siteId))
+			.then(hbStatus => res.status(httpStatus.OK).json(hbStatus))
+			.catch(() =>
+				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error!' })
+			);
+	})
+	.put('/toggleHbStatusForSite/:siteId', (req, res) => {
+		const { siteId } = req.params;
+		const { email } = req.user;
+
+		return userModel
+			.verifySiteOwner(email, siteId)
+			.then(() => headerBiddingModel.toggleHbStatusForSite(siteId))
+			.then(hbStatus => res.status(httpStatus.OK).json(hbStatus))
 			.catch(() =>
 				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error!' })
 			);

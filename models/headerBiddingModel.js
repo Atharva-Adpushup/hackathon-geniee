@@ -155,7 +155,7 @@ function apiModule() {
 
 												if (ad.network === 'adpTags') {
 													const { headerBidding, dfpAdunit: adUnit } = ad.networkData;
-													inventory.headerBidding = headerBidding;
+													inventory.headerBidding = headerBidding ? 'Enabled' : 'Disabled';
 													inventory.adUnit = adUnit;
 													inventories.push({ ...inventory });
 												}
@@ -192,7 +192,7 @@ function apiModule() {
 
 							if (ad.network === 'adpTags') {
 								const { headerBidding, dfpAdunit: adUnit } = ad.networkData;
-								inventory.headerBidding = headerBidding;
+								inventory.headerBidding = headerBidding ? 'Enabled' : 'Disabled';
 								inventory.adUnit = adUnit;
 
 								inventories.push({ ...inventory });
@@ -222,7 +222,7 @@ function apiModule() {
 
 							if (ad.network === 'adpTags') {
 								const { headerBidding, dfpAdunit: adUnit } = ad.networkData;
-								inventory.headerBidding = headerBidding;
+								inventory.headerBidding = headerBidding ? 'Enabled' : 'Disabled';
 								inventory.adUnit = adUnit;
 
 								inventories.push({ ...inventory });
@@ -402,7 +402,50 @@ function apiModule() {
 				API.updateHbStatusOnLayoutInventory(siteId, json.layoutEditor),
 				API.updateHbStatusOnApTagInventory(siteId, json.apTag),
 				API.updateHbStatusOnInnovAdInventory(siteId, json.innovativeAds)
-			])
+			]),
+		getPrebidConfig: siteId =>
+			Promise.all([API.getHbConfig(siteId), siteModel.getSiteById(siteId)]).then(
+				([hbConfig, site]) => {
+					const prebidConfig = hbConfig.get('prebidConfig');
+					const { activeDFPNetwork, activeDFPCurrencyCode } = site.get('apConfigs');
+					const mergedPrebidConfig = { ...prebidConfig };
+
+					mergedPrebidConfig.adServer = activeDFPNetwork ? 'AP' : 'Publisher';
+					mergedPrebidConfig.currency.code = activeDFPCurrencyCode;
+					mergedPrebidConfig.availableFormats = [
+						{ name: 'Display', value: 'display' },
+						{ name: 'Native', value: 'native' },
+						{ name: 'Video', value: 'video' }
+					];
+
+					return mergedPrebidConfig;
+				}
+			),
+		updatePrebidConfig: (siteId, newPrebidConfig) =>
+			API.getHbConfig(siteId)
+				.then(hbConfig => {
+					hbConfig.set('prebidConfig', newPrebidConfig);
+					return hbConfig.save();
+				})
+				.then(({ data: { prebidConfig } }) => prebidConfig),
+		getHbStatusForSite: siteId =>
+			siteModel.getSiteById(siteId).then(site => {
+				const { headerBidding } = site.get('apps');
+				return { headerBidding };
+			}),
+		toggleHbStatusForSite: siteId =>
+			siteModel
+				.getSiteById(siteId)
+				.then(site => {
+					const apps = site.get('apps');
+					apps.headerBidding = !apps.headerBidding;
+					site.set('apps', apps);
+					return site.save();
+				})
+				.then(site => {
+					const { headerBidding } = site.get('apps');
+					return { headerBidding };
+				})
 	};
 
 	return API;
