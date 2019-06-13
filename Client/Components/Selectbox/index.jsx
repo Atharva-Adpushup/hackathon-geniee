@@ -19,6 +19,7 @@ const findSelected = props => {
 			}
 		}
 	}
+
 	return { selected, name };
 };
 
