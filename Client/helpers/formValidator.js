@@ -1,3 +1,5 @@
+/* eslint-disable array-callback-return */
+/* eslint-disable no-unused-expressions */
 /* eslint-disable default-case */
 
 const validator = require('validator');
@@ -12,7 +14,7 @@ module.exports = {
 					if (rule.name === key) {
 						switch (validation) {
 							case 'isNull':
-								!json[key] ? (errors[key] = rule.message) : '';
+								json[key] !== 0 && !json[key] ? (errors[key] = rule.message) : '';
 								break;
 							case 'isURL':
 								!validator.isURL(json[key], rule.value) ? (errors[key] = rule.message) : '';
@@ -21,6 +23,9 @@ module.exports = {
 								!validator.isIn(json[key].toUpperCase(), rule.allowedValues)
 									? (errors[key] = rule.message)
 									: '';
+								break;
+							case 'isBoolean':
+								if (!validator.isBoolean(json[key])) errors[key] = rule.message;
 								break;
 							case 'isEmail':
 								if (!validator.isEmail(json[key], rule.value)) errors[key] = rule.message;
