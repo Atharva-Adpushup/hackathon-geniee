@@ -8,6 +8,7 @@ import TableContainer from '../containers/TableContainer';
 import ChartContainer from '../containers/ChartContainer';
 import reportService from '../../../services/reportService';
 import { displayMetrics } from '../configs/commonConsts';
+import Loader from '../../../Components/Loader';
 
 class Panel extends Component {
 	constructor(props) {
@@ -25,7 +26,8 @@ class Panel extends Component {
 				.startOf('day')
 				.subtract(1, 'day'),
 			tableData: {},
-			reportType: 'account'
+			reportType: 'account',
+			isLoading: true
 		};
 	}
 
@@ -75,6 +77,7 @@ class Panel extends Component {
 	};
 
 	generateButtonHandler = data => {
+		this.setState({ isLoading: true });
 		this.setState(data, () => {
 			const params = this.formateReportParams();
 
@@ -82,6 +85,7 @@ class Panel extends Component {
 				if (response.status == 200 && response.data) {
 					this.setState({ tableData: response.data });
 				}
+				this.setState({ isLoading: false });
 			});
 		});
 	};
@@ -136,7 +140,12 @@ class Panel extends Component {
 	};
 
 	render() {
-		return <ActionCard title="AdPushup Reports">{this.renderContent()}</ActionCard>;
+		let { isLoading } = this.state;
+		return isLoading ? (
+			<Loader />
+		) : (
+			<ActionCard title="AdPushup Reports">{this.renderContent()}</ActionCard>
+		);
 	}
 }
 

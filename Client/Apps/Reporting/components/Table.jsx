@@ -1,5 +1,6 @@
 import React from 'react';
 import Datatable from 'react-bs-datatable';
+import { Col } from 'react-bootstrap';
 import { sortBy } from 'lodash';
 import moment from 'moment';
 class Table extends React.Component {
@@ -8,7 +9,8 @@ class Table extends React.Component {
 		metrics: this.props.metrics,
 		tableData: this.props.tableData,
 		tableHeader: [],
-		tableBody: []
+		tableBody: [],
+		grandTotal: {}
 	};
 
 	componentDidMount() {
@@ -62,7 +64,8 @@ class Table extends React.Component {
 					tableHeader.push({
 						title: metrics[header].display_name,
 						position: metrics[header].position + 1,
-						prop: header
+						prop: header,
+						sortable: true
 					});
 				}
 			});
@@ -98,23 +101,65 @@ class Table extends React.Component {
 				delete grandTotal[key];
 			});
 			grandTotal[tableHeader[0].prop] = 'Total';
-			tableBody.push(grandTotal);
+			//tableBody.push(grandTotal);
 			tableBody = this.formatTableData(tableBody);
-			this.setState({ tableBody, tableHeader });
+			this.setState({ tableBody, tableHeader, grandTotal });
 		}
 	};
+	renderFooter() {
+		let { tableHeader, grandTotal } = this.state;
+		let footerComponent = [];
+		for (let i = 0; i < tableHeader.length; i++) {
+			let value = grandTotal[tableHeader[i].prop];
+			if (typeof value == 'number') {
+				value = Math.round(value * 100) / 100;
+				value = this.numberWithCommas(value);
+			}
+
+			footerComponent.push(
+				<td className="tbody-td-default" style={{ fontWeight: 'bold' }}>
+					{value}
+				</td>
+			);
+		}
+		return (
+			<table className="table table-datatable">
+				<tbody className="tbody-default">
+					<tr className="tbody-tr-default">{footerComponent}</tr>
+				</tbody>
+			</table>
+		);
+	}
 
 	render() {
 		const { tableBody, tableHeader, tableData } = this.state;
+		const onSortFunction = {
+			network_net_revenue(columnValue) {
+				if (typeof columnValue === 'string') return parseFloat(columnValue.replace(/,/g, ''));
+				else return columnValue;
+			},
+			adpushup_page_views(columnValue) {
+				if (typeof columnValue === 'string') return parseFloat(columnValue.replace(/,/g, ''));
+				else return columnValue;
+			},
+			network_impressions(columnValue) {
+				if (typeof columnValue === 'string') return parseFloat(columnValue.replace(/,/g, ''));
+				else return columnValue;
+			}
+		};
 		if (tableData && tableData.result && tableData.result.length > 0)
 			return (
-				<Datatable
-					tableHeader={tableHeader}
-					tableBody={tableBody}
-					keyName="reportTable"
-					rowsPerPage={10}
-					rowsPerPageOption={[20, 30, 40, 50]}
-				/>
+				<React.Fragment>
+					<Datatable
+						tableHeader={tableHeader}
+						tableBody={tableBody}
+						keyName="reportTable"
+						rowsPerPage={10}
+						rowsPerPageOption={[20, 30, 40, 50]}
+						onSort={onSortFunction}
+					/>
+					<Col sm={12}>{this.renderFooter()}</Col>
+				</React.Fragment>
 			);
 		else return '';
 	}
