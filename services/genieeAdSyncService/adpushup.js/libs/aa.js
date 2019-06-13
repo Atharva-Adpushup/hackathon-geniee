@@ -200,7 +200,11 @@ module.exports = (function() {
 			var isValidPlacementConfig = !!(placementConfig && placementConfig.length);
 			var evenSpacingAlgoSectionBracket = Math.round(selectorHeight / placementConfig.length);
 			var isValidEvenSpacingAlgoSectionBracket = evenSpacingAlgoSectionBracket > defaultSectionBracket;
-			var isValidEvenSpacingAlgo = !!(isValidPlacementConfig && isValidEvenSpacingAlgoSectionBracket);
+			var isValidEvenSpacingAlgo = !!(
+				this.isEvenSpacingAlgo &&
+				isValidPlacementConfig &&
+				isValidEvenSpacingAlgoSectionBracket
+			);
 
 			if (isValidEvenSpacingAlgo) {
 				sectionCount = placementConfig.length;
@@ -551,7 +555,7 @@ module.exports = (function() {
 
 	function init(params) {
 		var options = {
-			isEvenSpacingAlgo: true,
+			isEvenSpacingAlgo: params.isEvenSpacingAlgo || true,
 			sectionBracket: params.sectionBracket,
 			selectorsTreeLevel: params.selectorsTreeLevel,
 			$: params.$
