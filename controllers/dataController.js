@@ -472,36 +472,36 @@ router
 		liveSitesService.init();
 		return res.json({ message });
 	});
-	.get('/adpushup.js', function(req, res) {
-		const siteId = req.baseUrl.replace('/', '');
-		const countryHeader = req.headers['x-cf-geodata'] || false;
-		const country = countryHeader ? countryHeader.replace('country_code=', '').replace(/"/g, '') : false;
-		const noCountry = country ? false : true;
+	// .get('/adpushup.js', function(req, res) {
+	// 	const siteId = req.baseUrl.replace('/', '');
+	// 	const countryHeader = req.headers['x-cf-geodata'] || false;
+	// 	const country = countryHeader ? countryHeader.replace('country_code=', '').replace(/"/g, '') : false;
+	// 	const noCountry = country ? false : true;
 
-		return siteModel
-			.getSiteById(siteId)
-			.then(site => {
-				return syncCDNService(site, {
-					externalRequest: true,
-					country: country,
-					siteId: siteId,
-					noCountry: noCountry
-				});
-			})
-			.then(apJs => {
-				res
-					.status(200)
-					.set('x-cf-geodata', country)
-					.set('Content-Type', 'application/javascript')
-					.set('Cache-Control', 'max-age=900');
+	// 	return siteModel
+	// 		.getSiteById(siteId)
+	// 		.then(site => {
+	// 			return syncCDNService(site, {
+	// 				externalRequest: true,
+	// 				country: country,
+	// 				siteId: siteId,
+	// 				noCountry: noCountry
+	// 			});
+	// 		})
+	// 		.then(apJs => {
+	// 			res
+	// 				.status(200)
+	// 				.set('x-cf-geodata', country)
+	// 				.set('Content-Type', 'application/javascript')
+	// 				.set('Cache-Control', 'max-age=900');
 
-				apJs = apJs.replace('__COUNTRY__', country);
-				return res.send(apJs);
-			})
-			.catch(err => {
-				console.log(err);
-				return res.sendStatus(400);
-			});
-	});
+	// 			apJs = apJs.replace('__COUNTRY__', country);
+	// 			return res.send(apJs);
+	// 		})
+	// 		.catch(err => {
+	// 			console.log(err);
+	// 			return res.sendStatus(400);
+	// 		});
+	// });
 	
 module.exports = router;
