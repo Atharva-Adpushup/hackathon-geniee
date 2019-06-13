@@ -31,7 +31,8 @@ var model = require('../helpers/model'),
 			'isManual',
 			'isInnovative',
 			'gdpr',
-			'ampSettings'
+			'ampSettings',
+			'isRefreshSlotsEnabled'
 		];
 		this.clientKeys = [
 			'siteId',
@@ -47,7 +48,8 @@ var model = require('../helpers/model'),
 			'isManual',
 			'isInnovative',
 			'gdpr',
-			'ampSettings'
+			'ampSettings',
+			'isRefreshSlotsEnabled'
 		];
 		this.validations = {
 			required: []
@@ -87,7 +89,9 @@ var model = require('../helpers/model'),
 		};
 
 		this.getNetwork = function(networkName) {
-			return Promise.resolve(_.find(this.get('adNetworks'), { name: networkName }));
+			return Promise.resolve(
+				_.find(this.get('adNetworks'), { name: networkName })
+			);
 		};
 
 		this.deleteChannel = function(platform, pageGroup) {
@@ -130,7 +134,11 @@ var model = require('../helpers/model'),
 				this.get('channels'),
 				function(channel) {
 					var channelArr = channel.split(':'); // channel[0] is platform and channel[1] is pagegroup
-					return channelModel.getChannel(this.get('siteId'), channelArr[0], channelArr[1]);
+					return channelModel.getChannel(
+						this.get('siteId'),
+						channelArr[0],
+						channelArr[1]
+					);
 				}.bind(this)
 			);
 			return Promise.all(allChannels).then(function(data) {
@@ -146,8 +154,14 @@ var model = require('../helpers/model'),
 			return Promise.resolve(this.getAllChannels()).then(function(channelsArr) {
 				if (Array.isArray(channelsArr) && channelsArr.length) {
 					_.forEach(channelsArr, function(channelObj, channelKey) {
-						if (channelObj.hasOwnProperty('variations') && channelObj.variations) {
-							_.forOwn(channelObj.variations, function(variationObj, variationKey) {
+						if (
+							channelObj.hasOwnProperty('variations') &&
+							channelObj.variations
+						) {
+							_.forOwn(channelObj.variations, function(
+								variationObj,
+								variationKey
+							) {
 								computedConfig[variationObj.id] = {
 									id: variationObj.id,
 									name: variationObj.name,
@@ -249,7 +263,9 @@ function apiModule() {
 			}
 
 			if (!json.genieeMediaId) {
-				throw new AdPushupError([{ status: 403, message: 'Please provide a valid Geniee Media id' }]);
+				throw new AdPushupError([
+					{ status: 403, message: 'Please provide a valid Geniee Media id' }
+				]);
 			}
 
 			if (!json.apConfigs.hasOwnProperty('isAdPushupControlWithPartnerSSP')) {
@@ -272,7 +288,9 @@ function apiModule() {
 				})
 				.catch(function(err) {
 					if (err.code === 13) {
-						throw new AdPushupError([{ status: 404, message: 'Site does not exist' }]);
+						throw new AdPushupError([
+							{ status: 404, message: 'Site does not exist' }
+						]);
 					}
 
 					return false;
@@ -294,10 +312,14 @@ function apiModule() {
 				})
 				.catch(function(err) {
 					if (err.message[0].status === 404) {
-						throw new AdPushupError([{ status: 404, message: 'Site does not exist' }]);
+						throw new AdPushupError([
+							{ status: 404, message: 'Site does not exist' }
+						]);
 					}
 
-					throw new AdPushupError([{ status: 500, message: 'Some error occurred' }]);
+					throw new AdPushupError([
+						{ status: 500, message: 'Some error occurred' }
+					]);
 				});
 		},
 		createSiteFromJson: function(json) {
@@ -321,7 +343,9 @@ function apiModule() {
 							return platform + ':' + pageGroup;
 						})
 						.catch(function() {
-							throw new AdPushupError('getDeleteChannelsPromises: Channel is not deleted');
+							throw new AdPushupError(
+								'getDeleteChannelsPromises: Channel is not deleted'
+							);
 						});
 				});
 			}
@@ -337,14 +361,16 @@ function apiModule() {
 						return channelArr;
 					})
 					.catch(function() {
-						throw new AdPushupError('deleteAllChannels: Channels are not deleted');
+						throw new AdPushupError(
+							'deleteAllChannels: Channels are not deleted'
+						);
 					});
 			}
 
-			return Promise.all([API.getSiteById(siteId), couchbase.connectToAppBucket()]).spread(function(
-				site,
-				appBucket
-			) {
+			return Promise.all([
+				API.getSiteById(siteId),
+				couchbase.connectToAppBucket()
+			]).spread(function(site, appBucket) {
 				return (
 					Promise.resolve(deleteAllChannels(site))
 						// .then(function(deleteChannelsArr) {
@@ -370,7 +396,9 @@ function apiModule() {
 			};
 
 			const settings = json.settings,
-				pageGroupPattern = setPagegroupPattern(JSON.parse(settings.pageGroupPattern)),
+				pageGroupPattern = setPagegroupPattern(
+					JSON.parse(settings.pageGroupPattern)
+				),
 				blocklist = JSON.parse(settings.blocklist);
 			let otherSettings = JSON.parse(settings.otherSettings),
 				encodedOtherSettings = Object.assign({}, otherSettings);
@@ -395,15 +423,23 @@ function apiModule() {
 						? parseInt(otherSettings.adpushupPercentage, 10)
 						: commonConsts.apConfigDefaults.adpushupPercentage,
 					autoOptimise: settings.autoOptimise === 'false' ? false : true,
-          poweredByBanner: settings.poweredByBanner === 'false' ? false : true,
-					activeDFPNetwork: settings.activeDFPNetwork ? settings.activeDFPNetwork : '',
-					activeDFPParentId: settings.activeDFPParentId ? settings.activeDFPParentId : '',
+					poweredByBanner: settings.poweredByBanner === 'false' ? false : true,
+					activeDFPNetwork: settings.activeDFPNetwork
+						? settings.activeDFPNetwork
+						: '',
+					activeDFPParentId: settings.activeDFPParentId
+						? settings.activeDFPParentId
+						: '',
 					activeDFPCurrencyCode: settings.activeDFPCurrencyCode || '',
 					blocklist: blocklist.length ? blocklist : '',
 					isSPA: settings.isSPA === 'false' ? false : true,
 					isThirdPartyAdx: settings.isThirdPartyAdx === 'false' ? false : true,
-					spaPageTransitionTimeout: parseInt(settings.spaPageTransitionTimeout, 10),
-					isAdPushupControlWithPartnerSSP: !!site.get('apConfigs').isAdPushupControlWithPartnerSSP
+					spaPageTransitionTimeout: parseInt(
+						settings.spaPageTransitionTimeout,
+						10
+					),
+					isAdPushupControlWithPartnerSSP: !!site.get('apConfigs')
+						.isAdPushupControlWithPartnerSSP
 						? site.get('apConfigs').isAdPushupControlWithPartnerSSP
 						: commonConsts.apConfigDefaults.isAdPushupControlWithPartnerSSP
 				};
@@ -432,7 +468,8 @@ function apiModule() {
 					throw new AdPushupError('Cannot get cms data');
 				});
 		},
-		getSiteChannels: siteId => API.getSiteById(siteId).then(site => site.get('channels')),
+		getSiteChannels: siteId =>
+			API.getSiteById(siteId).then(site => site.get('channels')),
 		setSiteStep: function(siteId, step) {
 			return API.getSiteById(siteId)
 				.then(function(site) {
@@ -451,7 +488,9 @@ function apiModule() {
 					channelsList.forEach(channel => {
 						const platform = channel.split(':')[0],
 							pageGroup = channel.split(':')[1];
-						sectionPromises.push(channelModel.getChannelSections(siteId, platform, pageGroup));
+						sectionPromises.push(
+							channelModel.getChannelSections(siteId, platform, pageGroup)
+						);
 					});
 
 					return Promise.all(sectionPromises);
@@ -483,9 +522,11 @@ function apiModule() {
 			return API.getSiteById(parseInt(siteId)).then(function(site) {
 				var pageGroupPromises = _.map(site.get('channels'), function(channel) {
 					var pageGroup = channel.split(':');
-					return channelModel.getChannel(siteId, pageGroup[0], pageGroup[1]).then(function(channel) {
-						return channel.data;
-					});
+					return channelModel
+						.getChannel(siteId, pageGroup[0], pageGroup[1])
+						.then(function(channel) {
+							return channel.data;
+						});
 				});
 
 				return Promise.all(pageGroupPromises).then(function(pageGroups) {
