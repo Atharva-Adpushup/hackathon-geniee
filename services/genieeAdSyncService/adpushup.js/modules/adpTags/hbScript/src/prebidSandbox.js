@@ -60,13 +60,13 @@ var prebidAdTemplate = require('./prebidAdTemplate'),
 			//window['__adp_frame_context_' + Math.abs(utils.hashCode(containerId))] = iframeEl.contentWindow;
 
 			if (iframeEl._adp_loaded === undefined) {
+				iframeEl._adp_loaded = true;
+
 				var iframeDoc = iframeEl.contentDocument;
 				iframeDoc.open();
 				iframeDoc.write(prebidHtml);
 				iframeDoc.close();
 			}
-
-			iframeEl._adp_loaded = true;
 		};
 
 		var waitUntil = setInterval(function() {
