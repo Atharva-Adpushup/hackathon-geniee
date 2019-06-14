@@ -15,11 +15,7 @@ var prebidAdTemplate =
 	'if( serverRenderCode.isExecuted === undefined ) {' +
 	'serverRenderCode.isExecuted = true;' +
 	'console.log(pbjs.getBidResponses());' +
-	'if( Number.isInteger(timeout) ) {' +
-	'parent.__prebidFinishCallback(ADP_BATCH_ID, timeout);' +
-	'} else {' +
 	'parent.__prebidFinishCallback(ADP_BATCH_ID);' +
-	'}' +
 	'}' +
 	'}' +
 	'setTimeout(function(){' +
