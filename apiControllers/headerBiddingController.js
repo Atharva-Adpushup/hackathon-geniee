@@ -412,66 +412,6 @@ router
 			.catch(() =>
 				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error!' })
 			);
-	})
-	.post('/bidderRule/:siteId', (req, res) => {
-		const { siteId } = req.params;
-		const { email } = req.user;
-		const bidderRule = req.body;
-
-		return userModel
-			.verifySiteOwner(email, siteId)
-			.then(() => {
-				const { bidder, device, status } = bidderRule;
-				const json = { bidder, status };
-				if (device) json.device = device;
-
-				return FormValidator.validate(json, schema.hbOptimization.validations);
-			})
-			.then(() => {
-				const { device, sizesSupported } = bidderRule;
-				const errors = [];
-				if (device && (!Array.isArray(sizesSupported) || !sizesSupported.length)) {
-					errors.push({ message: 'Ad Sizes are required' });
-				}
-
-				if (errors.length) {
-					throw new AdPushupError(errors);
-				}
-			})
-			.then(() => headerBiddingModel.saveBidderRule(siteId, bidderRule))
-			.then(() => res.status(httpStatus.OK).json({ success: 'Bidder Rule Saved' }))
-			.catch(err => {
-				if (err instanceof AdPushupError) {
-					return res.status(httpStatus.BAD_REQUEST).json({ error: err.message });
-				}
-
-				return res
-					.status(httpStatus.INTERNAL_SERVER_ERROR)
-					.json({ error: 'Internal Server Error!' });
-			});
-	})
-	.delete('/bidderRule/:siteId', (req, res) => {
-		const { siteId } = req.params;
-		const { email } = req.user;
-		const { bidder } = req.body;
-
-		return userModel
-			.verifySiteOwner(email, siteId)
-			.then(() => {
-				if (!bidder) throw new AdPushupError('Bidder is required');
-
-				return headerBiddingModel.deleteBidderRule(siteId, bidder);
-			})
-			.then(() => res.status(httpStatus.OK).json({ success: 'Bidder rule deleted successfully' }))
-			.catch(err => {
-				if (err instanceof AdPushupError) {
-					return res.status(httpStatus.BAD_REQUEST).json({ error: err.message });
-				}
-
-				return res
-					.status(httpStatus.INTERNAL_SERVER_ERROR)
-					.json({ error: 'Internal Server Error!' });
-			});
 	});
 
 module.exports = router;

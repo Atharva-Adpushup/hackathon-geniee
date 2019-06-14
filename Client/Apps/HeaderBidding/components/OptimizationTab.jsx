@@ -7,11 +7,7 @@ import BidderRules from './BidderRules';
 class OptimizationTab extends React.Component {
 	render() {
 		const { siteId } = this.props;
-		return (
-			<div className="options-wrapper hb-optimization">
-				<BidderRules siteId={siteId} />
-			</div>
-		);
+		return <BidderRules siteId={siteId} />;
 	}
 }
 
