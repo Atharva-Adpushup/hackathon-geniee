@@ -80,7 +80,8 @@ class ModalWrapper extends React.Component {
 				placement: adyoulike ? adyoulike.params.placement : ''
 			},
 			pubmatic: {
-				publisherId: pubmatic ? pubmatic.params.publisherId : ''
+				publisherId: pubmatic ? pubmatic.params.publisherId : '',
+				adSlot: pubmatic ? pubmatic.params.adSlot : ''
 			},
 			aardvark: {
 				ai: aardvark ? aardvark.params.ai : '',
@@ -184,7 +185,8 @@ class ModalWrapper extends React.Component {
 				sc: aardvark ? aardvark.params.sc : ''
 			},
 			pubmatic: {
-				publisherId: pubmatic ? pubmatic.params.publisherId : ''
+				publisherId: pubmatic ? pubmatic.params.publisherId : '',
+				adSlot: pubmatic ? pubmatic.params.adSlot : ''
 			},
 			criteo: {
 				zoneId: criteo ? criteo.params.zoneId : ''
