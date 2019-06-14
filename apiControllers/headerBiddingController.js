@@ -393,6 +393,25 @@ router
 			.catch(() =>
 				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error!' })
 			);
+	})
+	.get('/optimizationTabInitData/:siteId', (req, res) => {
+		const { siteId } = req.params;
+		const { email } = req.user;
+
+		return userModel
+			.verifySiteOwner(email, siteId)
+			.then(() =>
+				Promise.all([
+					headerBiddingModel.getBidderRules(siteId),
+					headerBiddingModel.getAddedBiddersNames(siteId)
+				])
+			)
+			.then(([bidderRules, addedBidders]) =>
+				res.status(httpStatus.OK).json({ bidderRules, addedBidders })
+			)
+			.catch(() =>
+				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error!' })
+			);
 	});
 
 module.exports = router;

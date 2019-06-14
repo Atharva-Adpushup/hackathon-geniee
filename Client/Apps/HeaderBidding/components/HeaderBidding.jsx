@@ -9,6 +9,7 @@ import Setup from './Setup';
 import BiddersTab from './BiddersTab';
 import InventoryTab from './InventoryTab';
 import PrebidSettingsTab from './PrebidSettingsTab';
+import OptimizationTab from './OptimizationTab';
 
 class HeaderBidding extends React.Component {
 	state = {
@@ -135,7 +136,7 @@ class HeaderBidding extends React.Component {
 				case 'prebid-settings':
 					return <PrebidSettingsTab siteId={siteId} showNotification={showNotification} />;
 				case 'optimization':
-					return 'Tab 5';
+					return <OptimizationTab siteId={siteId} />;
 				default:
 					return null;
 			}
