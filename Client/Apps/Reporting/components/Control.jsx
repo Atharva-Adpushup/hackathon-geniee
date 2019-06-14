@@ -7,10 +7,9 @@ import 'react-dates/initialize';
 import AsyncGroupSelect from '../../../Components/AsyncGroupSelect/index';
 import PresetDateRangePicker from '../../../Components/PresetDateRangePicker/index';
 import Selectbox from '../../../Components/Selectbox/index';
-import { convertObjToArr, arrayUnique } from '../helpers/utils';
+import { convertObjToArr, arrayUnique, getPresets } from '../helpers/utils';
 import reportService from '../../../services/reportService';
-import { accountFilter } from '../configs/commonConsts';
-import { Object } from 'es6-shim';
+import { accountFilter, REPORT_DOWNLOAD_ENDPOINT } from '../configs/commonConsts';
 
 class Control extends Component {
 	constructor(props) {
@@ -182,50 +181,9 @@ class Control extends Component {
 	};
 
 	render() {
-		const tooltip = <Tooltip id="tooltip">Please select any site.</Tooltip>;
-		const today = moment();
-		const yesterday = moment().subtract(1, 'day');
-		const last7Days = moment()
-			.subtract(1, 'week')
-			.subtract(1, 'day');
-		const presets = [
-			{
-				text: 'Today',
-				start: today,
-				end: today
-			},
-			{
-				text: 'Yesterday',
-				start: yesterday,
-				end: yesterday
-			},
-			{
-				text: 'Last 7 Days',
-				start: last7Days,
-				end: yesterday
-			},
-			{
-				text: 'Last 30 Days',
-				start: moment().subtract(30, 'day'),
-				end: yesterday
-			},
-			{
-				text: 'This Month',
-				start: moment().startOf('month'),
-				end: today
-			},
-			{
-				text: 'Last Month',
-				start: moment()
-					.subtract(1, 'months')
-					.startOf('month'),
-				end: moment()
-					.subtract(1, 'months')
-					.endOf('month')
-			}
-		];
-
-		const { state } = this;
+		const { state, props } = this;
+		let csvData = btoa(JSON.stringify(props.csvData));
+		const downloadLink = `${REPORT_DOWNLOAD_ENDPOINT}?data=${csvData}`;
 		return (
 			<Fragment>
 				<div className="aligner aligner--wrap aligner--hSpaceBetween u-margin-t4">
@@ -262,7 +220,7 @@ class Control extends Component {
 						{/* eslint-disable */}
 						<label className="u-text-normal">Date Range</label>
 						<PresetDateRangePicker
-							presets={presets}
+							presets={getPresets()}
 							startDate={state.startDate}
 							endDate={state.endDate}
 							datesUpdated={this.datesUpdated}
@@ -293,10 +251,22 @@ class Control extends Component {
 						</Button>
 					</div>
 					<div className="aligner-item ">
-						<Button onClick={this.generateButtonHandler} disabled={state.disableGenerateButton}>
+						<a
+							href={downloadLink}
+							style={{
+								display: 'block',
+								height: 33,
+								paddingTop: 8
+							}}
+							className="btn btn-lightBg btn-default btn-blue-line"
+						>
 							<Glyphicon glyph="download-alt u-margin-r2" />
 							Export Report
-						</Button>
+						</a>
+						{/* <Button onClick={this.generateButtonHandler} disabled={state.disableGenerateButton}>
+							<Glyphicon glyph="download-alt u-margin-r2" />
+							Export Report
+						</Button> */}
 					</div>
 				</div>
 			</Fragment>

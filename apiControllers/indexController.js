@@ -152,7 +152,7 @@ router
 							userData.sites[site.siteId] = site;
 							siteIds.push(site.siteId);
 						}
-						let params = { siteid: ['37780', '37066', '29752'].toString() };
+						let params = { siteid: siteIds.toString() };
 
 						return getReportsMetaData(params).then(reports => {
 							return res.status(httpStatus.OK).json({
