@@ -3,6 +3,7 @@ import Datatable from 'react-bs-datatable';
 import { Col } from 'react-bootstrap';
 import { sortBy } from 'lodash';
 import moment from 'moment';
+import { numberWithCommas } from '../helpers/utils';
 class Table extends React.Component {
 	state = {
 		dimension: this.props.dimension,
@@ -27,9 +28,6 @@ class Table extends React.Component {
 			);
 		}
 	}
-	numberWithCommas = x => {
-		return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-	};
 
 	formatTableData = tableBody => {
 		const { metrics } = this.state;
@@ -37,7 +35,7 @@ class Table extends React.Component {
 			for (let col in row) {
 				if (metrics[col]) {
 					let num = Math.round(row[col] * 100) / 100;
-					row[col] = this.numberWithCommas(num);
+					row[col] = numberWithCommas(num);
 				}
 			}
 		});
@@ -46,7 +44,7 @@ class Table extends React.Component {
 
 	updateTableData = () => {
 		const { dimension, metrics, tableData } = this.state;
-		const { selectedInterval, startDate, endDate } = this.props;
+		const { selectedInterval, startDate, endDate, getTableData } = this.props;
 		if (tableData.columns && tableData.result.length > 0) {
 			let tableHeader = [];
 			const grandTotal = tableData.total;
@@ -81,10 +79,26 @@ class Table extends React.Component {
 			tableBody.forEach(row => {
 				if (selectedInterval === 'daily') row.date = moment(row.date).format('ll');
 				if (selectedInterval === 'monthly') {
-					if (row.month == startDate.format('M') && row.year == startDate.format('Y')) {
-						row.date = startDate.format('ll') + ' to ' + startDate.endOf('month').format('ll');
-					} else if (row.month == endDate.format('M') && row.year == endDate.format('Y')) {
-						row.date = endDate.startOf('month').format('ll') + ' to ' + endDate.format('ll');
+					if (
+						row.month == moment(startDate).format('M') &&
+						row.year == moment(startDate).format('Y')
+					) {
+						row.date =
+							moment(startDate).format('ll') +
+							' to ' +
+							moment(startDate)
+								.endOf('month')
+								.format('ll');
+					} else if (
+						row.month == moment(endDate).format('M') &&
+						row.year == moment(endDate).format('Y')
+					) {
+						row.date =
+							moment(endDate)
+								.startOf('month')
+								.format('ll') +
+							' to ' +
+							moment(endDate).format('ll');
 					} else {
 						let fromDate = moment([row.year, row.month - 1]);
 						let toDate = moment(fromDate).endOf('month');
@@ -92,18 +106,23 @@ class Table extends React.Component {
 					}
 				}
 				if (selectedInterval === 'cumulative')
-					row.date = startDate.format('ll') + ' to ' + endDate.format('ll');
+					row.date = moment(startDate).format('ll') + ' to ' + moment(endDate).format('ll');
 			});
 
 			Object.keys(grandTotal).forEach(key => {
 				const newkey = key.replace('total_', '');
-				grandTotal[newkey] = grandTotal[key];
+				if (metrics[newkey]) {
+					let num = Math.round(grandTotal[key] * 100) / 100;
+					grandTotal[newkey] = numberWithCommas(num);
+				} else grandTotal[newkey] = grandTotal[key];
 				delete grandTotal[key];
 			});
 			grandTotal[tableHeader[0].prop] = 'Total';
 			//tableBody.push(grandTotal);
 			tableBody = this.formatTableData(tableBody);
-			this.setState({ tableBody, tableHeader, grandTotal });
+			this.setState({ tableBody, tableHeader, grandTotal }, () => {
+				getTableData({ tableBody, tableHeader, grandTotal });
+			});
 		}
 	};
 	renderFooter() {
@@ -113,7 +132,7 @@ class Table extends React.Component {
 			let value = grandTotal[tableHeader[i].prop];
 			if (typeof value == 'number') {
 				value = Math.round(value * 100) / 100;
-				value = this.numberWithCommas(value);
+				value = numberWithCommas(value);
 			}
 
 			footerComponent.push(
