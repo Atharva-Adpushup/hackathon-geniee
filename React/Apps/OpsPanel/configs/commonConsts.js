@@ -507,6 +507,10 @@ const siteMappingActions = {
 			{
 				name: 'publisherId',
 				type: 'string'
+			},
+			{
+				name: 'adSlot',
+				type: 'string'
 			}
 		],
 		aardvark: [
