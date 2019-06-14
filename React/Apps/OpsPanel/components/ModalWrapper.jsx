@@ -29,6 +29,7 @@ class ModalWrapper extends React.Component {
 		const adyoulike = findBidder(data, 'adyoulike');
 		const pubmatic = findBidder(data, 'pubmatic');
 		const aardvark = findBidder(data, 'aardvark');
+		const criteo = findBidder(data, 'criteo');
 
 		this.state = {
 			partnersSelected: props.data.map(obj => obj.bidder) || [],
@@ -85,6 +86,9 @@ class ModalWrapper extends React.Component {
 				ai: aardvark ? aardvark.params.ai : '',
 				sc: aardvark ? aardvark.params.sc : ''
 			},
+			criteo: {
+				zoneId: criteo ? criteo.params.zoneId : ''
+			},
 			error: ''
 		};
 
@@ -125,6 +129,7 @@ class ModalWrapper extends React.Component {
 		const adyoulike = findBidder(data, 'adyoulike');
 		const pubmatic = findBidder(data, 'pubmatic');
 		const aardvark = findBidder(data, 'aardvark');
+		const criteo = findBidder(data, 'criteo');
 
 		this.setState({
 			partnersSelected: nextProps.data.map(obj => ({ value: obj.bidder, label: obj.bidder })) || [],
@@ -180,6 +185,9 @@ class ModalWrapper extends React.Component {
 			},
 			pubmatic: {
 				publisherId: pubmatic ? pubmatic.params.publisherId : ''
+			},
+			criteo: {
+				zoneId: criteo ? criteo.params.zoneId : ''
 			},
 			error: ''
 		});

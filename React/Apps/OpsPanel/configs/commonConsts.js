@@ -383,6 +383,10 @@ const siteMappingActions = {
 		{
 			value: 'aardvark',
 			label: 'aardvark'
+		},
+		{
+			value: 'criteo',
+			label: 'criteo'
 		}
 	],
 	devicesList = [
@@ -513,6 +517,12 @@ const siteMappingActions = {
 			{
 				name: 'sc',
 				type: 'string'
+			}
+		],
+		criteo: [
+			{
+				name: 'zoneId',
+				type: 'integer'
 			}
 		]
 	},
