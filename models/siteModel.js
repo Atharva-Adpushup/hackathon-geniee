@@ -31,8 +31,7 @@ var model = require('../helpers/model'),
 			'isManual',
 			'isInnovative',
 			'gdpr',
-			'ampSettings',
-			'isRefreshSlotsEnabled'
+			'ampSettings'
 		];
 		this.clientKeys = [
 			'siteId',
@@ -48,8 +47,7 @@ var model = require('../helpers/model'),
 			'isManual',
 			'isInnovative',
 			'gdpr',
-			'ampSettings',
-			'isRefreshSlotsEnabled'
+			'ampSettings'
 		];
 		this.validations = {
 			required: []

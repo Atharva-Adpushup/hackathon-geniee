@@ -339,7 +339,6 @@ router
 				apConfigs: { mode: parsedData.siteMode },
 				siteId: parsedData.siteId,
 				siteDomain: parsedData.siteDomain,
-				isRefreshSlotsEnabled: checkIfRefreshEnabled(),
 				customSizes: parsedData.customSizes || [],
 				channels: lodash.map(parsedData.channels, function(channel) {
 					return channel.platform + ':' + channel.pageGroup;
@@ -376,34 +375,6 @@ router
 
 				return Promise.resolve(true);
 			});
-		}
-
-		function checkIfRefreshEnabled() {
-			let { channels } = parsedData;
-			if (channels && channels.length) {
-				for (let channel of channels) {
-					let { variations } = channel;
-					if (variations) {
-						for (let variationId in variations) {
-							let { sections } = variations[variationId];
-							if (sections) {
-								for (let sectionId in sections) {
-									let { ads } = sections[sectionId];
-									if (ads) {
-										for (let adId in ads) {
-											let { networkData } = ads[adId];
-											if (networkData && networkData.refreshSlot) {
-												return true;
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-			return false;
 		}
 
 		return checkChannelsExistence(siteData.siteId, siteData.channels)
