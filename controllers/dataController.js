@@ -26,13 +26,25 @@ var express = require('express'),
 	N1qlQuery = require('couchbase').N1qlQuery;
 
 function getReportingData(channels, siteId) {
-	if (config && config.hasOwnProperty('reporting') && !config.reporting.activated) {
+	if (
+		config &&
+		config.hasOwnProperty('reporting') &&
+		!config.reporting.activated
+	) {
 		return Promise.resolve({});
 	}
 	let channelNames = lodash.map(channels, 'pageGroup');
-	let variationNames = lodash.flatten(lodash.map(channels, channel => Object.keys(channel.variations)));
+	let variationNames = lodash.flatten(
+		lodash.map(channels, channel => Object.keys(channel.variations))
+	);
 	let reportingParams = {
-		select: ['total_xpath_miss', 'total_impressions', 'total_revenue', 'report_date', 'siteid'],
+		select: [
+			'total_xpath_miss',
+			'total_impressions',
+			'total_revenue',
+			'report_date',
+			'siteid'
+		],
 		where: {
 			siteid: siteId,
 			pagegroup: channelNames,
@@ -40,26 +52,34 @@ function getReportingData(channels, siteId) {
 		},
 		groupBy: ['section']
 	};
-	return sqlReporting.generate(reportingParams).then(queryResultProcessing).catch(err => {
-		console.log(err);
-		return {};
-	});
+	return sqlReporting
+		.generate(reportingParams)
+		.then(queryResultProcessing)
+		.catch(err => {
+			console.log(err);
+			return {};
+		});
 }
 
 function isPipeDriveAPIActivated() {
-	return !!(config.hasOwnProperty('analytics') &&
+	return !!(
+		config.hasOwnProperty('analytics') &&
 		config.analytics.hasOwnProperty('pipedriveActivated') &&
-		config.analytics.pipedriveActivated);
+		config.analytics.pipedriveActivated
+	);
 }
 
 function isEmailInAnalyticsBlockList(email) {
-	const blockList = CC.analytics.emailBlockList, isEmailInBLockList = blockList.indexOf(email) > -1;
+	const blockList = CC.analytics.emailBlockList,
+		isEmailInBLockList = blockList.indexOf(email) > -1;
 
 	return isEmailInBLockList;
 }
 
 function getSiteLevelPipeDriveData(user, inputData) {
-	let allSites = user.get('sites'), isAllSites = !!(allSites && allSites.length), resultData = {};
+	let allSites = user.get('sites'),
+		isAllSites = !!(allSites && allSites.length),
+		resultData = {};
 
 	if (!isAllSites) {
 		throw new AdPushupError('getSiteLevelPipeDriveData: User sites are empty');
@@ -75,7 +95,10 @@ function getSiteLevelPipeDriveData(user, inputData) {
 			return true;
 		}
 
-		isPipeDriveData = siteObject.pipeDrive && siteObject.pipeDrive.dealId && siteObject.pipeDrive.dealTitle;
+		isPipeDriveData =
+			siteObject.pipeDrive &&
+			siteObject.pipeDrive.dealId &&
+			siteObject.pipeDrive.dealTitle;
 		resultData = {
 			dealId: isPipeDriveData ? siteObject.pipeDrive.dealId : null,
 			dealTitle: isPipeDriveData ? siteObject.pipeDrive.dealTitle : null
@@ -96,7 +119,9 @@ function getNetworkConfigData() {
 		})
 		.catch(function(err) {
 			if (err.code === 13) {
-				throw new AdPushupError([{ status: 404, message: 'Doc does not exist' }]);
+				throw new AdPushupError([
+					{ status: 404, message: 'Doc does not exist' }
+				]);
 			}
 
 			return false;
@@ -105,7 +130,8 @@ function getNetworkConfigData() {
 
 router
 	.get('/getData', function(req, res) {
-		var siteId = req.query.siteId, computedJSON = {};
+		var siteId = req.query.siteId,
+			computedJSON = {};
 
 		return siteModel
 			.getSiteById(siteId, 'GET')
@@ -138,7 +164,8 @@ router
 			});
 	})
 	.post('/saveSite', function(req, res) {
-		var data = req.body, siteId = parseInt(req.body.siteId, 10);
+		var data = req.body,
+			siteId = parseInt(req.body.siteId, 10);
 		userModel
 			.verifySiteOwner(req.session.user.email, siteId)
 			.then(function() {
@@ -153,7 +180,8 @@ router
 					templates: [],
 					apConfigs: {
 						mode: CC.site.mode.DRAFT,
-						isAdPushupControlWithPartnerSSP: CC.apConfigDefaults.isAdPushupControlWithPartnerSSP
+						isAdPushupControlWithPartnerSSP:
+							CC.apConfigDefaults.isAdPushupControlWithPartnerSSP
 					}
 				};
 				return siteData;
@@ -191,7 +219,10 @@ router
 				return res.send({ error: false, data: variations });
 			})
 			.catch(err => {
-				return res.send({ error: true, message: 'Error while fetching result. Please try later.' });
+				return res.send({
+					error: true,
+					message: 'Error while fetching result. Please try later.'
+				});
 			});
 	})
 	.get('/getPageGroupVariationRPM', function(req, res) {
@@ -209,12 +240,22 @@ router
 		const getSqlReportData = sqlQueryModule.getMetricsData(sqlReportConfig),
 			getTabularMetricsData = getSqlReportData.then(sqlReportData => {
 				return singleChannelVariationQueryHelper
-					.getMatchedVariations(apexConfig.siteId, apexConfig.channelName, sqlReportData)
+					.getMatchedVariations(
+						apexConfig.siteId,
+						apexConfig.channelName,
+						sqlReportData
+					)
 					.then(apexSingleChannelVariationModule.transformData);
 			}),
-			getVariationRPMData = getTabularMetricsData.then(tableFormatReportData => {
-				return apexVariationRpmService.getReportData(apexConfig, email, tableFormatReportData);
-			});
+			getVariationRPMData = getTabularMetricsData.then(
+				tableFormatReportData => {
+					return apexVariationRpmService.getReportData(
+						apexConfig,
+						email,
+						tableFormatReportData
+					);
+				}
+			);
 
 		return getVariationRPMData
 			.then(function(reportData) {
@@ -231,18 +272,26 @@ router
 		var data = JSON.parse(req.body.data);
 
 		function saveChannelData(variationObj) {
-			return channelModel.saveChannel(data.siteId, data.platform, data.pageGroup, variationObj);
+			return channelModel.saveChannel(
+				data.siteId,
+				data.platform,
+				data.pageGroup,
+				variationObj
+			);
 		}
 
 		function getTrafficDistribution(channel) {
-			var variationsObj = channel.get('variations') ? channel.get('variations') : {},
+			var variationsObj = channel.get('variations')
+					? channel.get('variations')
+					: {},
 				computedObj = extend(true, {}, variationsObj),
 				clientKey = data.variationKey,
 				finalVariationObj;
 
 			lodash.forOwn(computedObj, function(variationObj, variationKey) {
 				if (clientKey === variationKey && computedObj[variationKey]) {
-					computedObj[variationKey].trafficDistribution = data.trafficDistribution;
+					computedObj[variationKey].trafficDistribution =
+						data.trafficDistribution;
 				}
 			});
 
@@ -282,7 +331,10 @@ router
 			});
 	})
 	.post('/saveData', function(req, res) {
-		var parsedData = typeof req.body.data === 'string' ? JSON.parse(req.body.data) : req.body.data,
+		var parsedData =
+				typeof req.body.data === 'string'
+					? JSON.parse(req.body.data)
+					: req.body.data,
 			siteData = {
 				apConfigs: { mode: parsedData.siteMode },
 				siteId: parsedData.siteId,
@@ -301,7 +353,10 @@ router
 		 * @returns {boolean} When there is no deleted array
 		 */
 		function checkChannelsExistence(siteId, channelNames) {
-			var deletedChannelsArr = lodash.map(channelNames, function(channelNameVal, key) {
+			var deletedChannelsArr = lodash.map(channelNames, function(
+				channelNameVal,
+				key
+			) {
 				var channelKey = 'chnl::' + siteId + ':' + channelNameVal;
 
 				return channelModel.isChannelExist(channelKey).then(function(isExist) {
@@ -313,7 +368,9 @@ router
 				var compactedArr = lodash.compact(channelsArr);
 
 				if (compactedArr && compactedArr.length) {
-					throw new AdPushupError('One or more channels are deleted. Site will not be saved!');
+					throw new AdPushupError(
+						'One or more channels are deleted. Site will not be saved!'
+					);
 				}
 
 				return Promise.resolve(true);
@@ -321,8 +378,16 @@ router
 		}
 
 		return checkChannelsExistence(siteData.siteId, siteData.channels)
-			.then(siteModel.saveSiteData.bind(null, siteData.siteId, 'POST', siteData))
-			.then(channelModel.saveChannels.bind(null, parsedData.siteId, parsedData.channels))
+			.then(
+				siteModel.saveSiteData.bind(null, siteData.siteId, 'POST', siteData)
+			)
+			.then(
+				channelModel.saveChannels.bind(
+					null,
+					parsedData.siteId,
+					parsedData.channels
+				)
+			)
 			.then(function() {
 				return res.json({
 					success: 1,
@@ -347,7 +412,8 @@ router
 				if (!json) {
 					res.json({ success: 2 });
 				}
-				var ad = json.ad, site = json.site;
+				var ad = json.ad,
+					site = json.site;
 
 				res.json({
 					success: 1,
@@ -414,7 +480,11 @@ router
 			.verifySiteOwner(req.session.user.email, req.query.siteId)
 			.then(function() {
 				return channelModel
-					.deleteChannel(req.query.siteId, req.body.platform, req.body.pageGroup)
+					.deleteChannel(
+						req.query.siteId,
+						req.body.platform,
+						req.body.pageGroup
+					)
 					.then(function() {
 						res.json({ success: 1 });
 					});
@@ -439,25 +509,33 @@ router
 				if (!isUser) {
 					return Promise.reject('UpdateCrmDealStatus: User does not exist');
 				} else if (!isValidParameters) {
-					return Promise.reject('UpdateCrmDealStatus: Invalid request body parameters');
+					return Promise.reject(
+						'UpdateCrmDealStatus: Invalid request body parameters'
+					);
 				} else if (!isAPIActivated || isEmailInBLockList) {
 					return user;
 				}
 
-				return getSiteLevelPipeDriveData(user, { domain: siteDomain }).then(pipeDriveData => {
-					const isValidData = !!(pipeDriveData && pipeDriveData.dealId && pipeDriveData.dealTitle);
-
-					if (!isValidData) {
-						return Promise.reject(
-							`UpdateCrmDealStatus: Invalid PipeDrive deal id for siteDomain: ${siteDomain}`
+				return getSiteLevelPipeDriveData(user, { domain: siteDomain }).then(
+					pipeDriveData => {
+						const isValidData = !!(
+							pipeDriveData &&
+							pipeDriveData.dealId &&
+							pipeDriveData.dealTitle
 						);
-					}
 
-					return pipedriveAPI('updateDeal', {
-						deal_id: pipeDriveData.dealId,
-						stage_id: stageId
-					});
-				});
+						if (!isValidData) {
+							return Promise.reject(
+								`UpdateCrmDealStatus: Invalid PipeDrive deal id for siteDomain: ${siteDomain}`
+							);
+						}
+
+						return pipedriveAPI('updateDeal', {
+							deal_id: pipeDriveData.dealId,
+							stage_id: stageId
+						});
+					}
+				);
 			})
 			.then(() => res.send({ success: 1 }))
 			.catch(err => {
@@ -472,36 +550,36 @@ router
 		liveSitesService.init();
 		return res.json({ message });
 	});
-	// .get('/adpushup.js', function(req, res) {
-	// 	const siteId = req.baseUrl.replace('/', '');
-	// 	const countryHeader = req.headers['x-cf-geodata'] || false;
-	// 	const country = countryHeader ? countryHeader.replace('country_code=', '').replace(/"/g, '') : false;
-	// 	const noCountry = country ? false : true;
+// .get('/adpushup.js', function(req, res) {
+// 	const siteId = req.baseUrl.replace('/', '');
+// 	const countryHeader = req.headers['x-cf-geodata'] || false;
+// 	const country = countryHeader ? countryHeader.replace('country_code=', '').replace(/"/g, '') : false;
+// 	const noCountry = country ? false : true;
 
-	// 	return siteModel
-	// 		.getSiteById(siteId)
-	// 		.then(site => {
-	// 			return syncCDNService(site, {
-	// 				externalRequest: true,
-	// 				country: country,
-	// 				siteId: siteId,
-	// 				noCountry: noCountry
-	// 			});
-	// 		})
-	// 		.then(apJs => {
-	// 			res
-	// 				.status(200)
-	// 				.set('x-cf-geodata', country)
-	// 				.set('Content-Type', 'application/javascript')
-	// 				.set('Cache-Control', 'max-age=900');
+// 	return siteModel
+// 		.getSiteById(siteId)
+// 		.then(site => {
+// 			return syncCDNService(site, {
+// 				externalRequest: true,
+// 				country: country,
+// 				siteId: siteId,
+// 				noCountry: noCountry
+// 			});
+// 		})
+// 		.then(apJs => {
+// 			res
+// 				.status(200)
+// 				.set('x-cf-geodata', country)
+// 				.set('Content-Type', 'application/javascript')
+// 				.set('Cache-Control', 'max-age=900');
 
-	// 			apJs = apJs.replace('__COUNTRY__', country);
-	// 			return res.send(apJs);
-	// 		})
-	// 		.catch(err => {
-	// 			console.log(err);
-	// 			return res.sendStatus(400);
-	// 		});
-	// });
-	
+// 			apJs = apJs.replace('__COUNTRY__', country);
+// 			return res.send(apJs);
+// 		})
+// 		.catch(err => {
+// 			console.log(err);
+// 			return res.sendStatus(400);
+// 		});
+// });
+
 module.exports = router;
