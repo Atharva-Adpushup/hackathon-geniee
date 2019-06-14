@@ -445,7 +445,85 @@ function apiModule() {
 				.then(site => {
 					const { headerBidding } = site.get('apps');
 					return { headerBidding };
-				})
+				}),
+		getBidderRules: siteId =>
+			API.getHbConfig(siteId).then(hbConfig => {
+				const deviceConfig = hbConfig.get('deviceConfig');
+				const countryConfig = hbConfig.get('countryConfig');
+
+				const { sizeConfig } = deviceConfig;
+				const bidderRuleSchema = {
+					bidder: '',
+					device: '',
+					sizesSupported: null,
+					country: '',
+					status: null
+				};
+				const bidderRulesObj = {};
+
+				// {
+				// 	bidder: 'index',
+				// 	status: {name: 'Enabled', value: true}
+				// 	device: 'desktop',
+				// 	sizesSupported: [[970,90], [728,90], [300,250], [160,600]],
+				// 	country: {name: 'USA', value: 'US' },
+				// }
+
+				for (const config of sizeConfig) {
+					const { bidder, status, sizesSupported, labels } = config;
+
+					if (!bidderRulesObj[bidder]) {
+						bidderRulesObj[bidder] = {
+							...bidderRuleSchema,
+							bidder,
+							device: labels[0],
+							sizesSupported,
+							status
+						};
+					}
+				}
+
+				for (const config of countryConfig) {
+					const { bidder, status, labels } = config;
+					const bidderRule = bidderRulesObj[bidder];
+
+					if (!bidderRule) {
+						bidderRulesObj[bidder] = {
+							...bidderRuleSchema,
+							bidder,
+							country: labels[0],
+							status
+						};
+					}
+
+					if (bidderRule) {
+						if (bidderRule.status !== status) {
+							throw new AdPushupError("device and country bidder config status didn't match");
+						}
+
+						bidderRulesObj[bidder] = {
+							...bidderRule,
+							country: labels[0]
+						};
+					}
+				}
+
+				const bidderRulesArr = Object.keys(bidderRulesObj).map(
+					bidderKey => bidderRulesObj[bidderKey]
+				);
+
+				return bidderRulesArr;
+			}),
+		getAddedBiddersNames: siteId =>
+			API.getUsedBidders(siteId).then(addedBidders => {
+				const addedBiddersNames = {};
+
+				for (const [bidderCode, { name: bidderName }] of Object.entries(addedBidders)) {
+					addedBiddersNames[bidderCode] = bidderName;
+				}
+
+				return addedBiddersNames;
+			})
 	};
 
 	return API;

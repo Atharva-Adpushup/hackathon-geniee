@@ -69,3 +69,9 @@ export function toggleHbStatusForSite(siteId) {
 		.put(`/headerBidding/toggleHbStatusForSite/${siteId}`)
 		.then(({ data }) => data);
 }
+
+export function fetchOptimizationTabInitData(siteId) {
+	return axiosInstance
+		.get(`/headerBidding/optimizationTabInitData/${siteId}`)
+		.then(({ data }) => data);
+}
