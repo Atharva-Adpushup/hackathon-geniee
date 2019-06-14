@@ -58,7 +58,9 @@ class Pagegroups extends Component {
 						<Panel.Heading>
 							<Panel.Title toggle>Pagegroups</Panel.Title>
 						</Panel.Heading>
-						<Panel.Body collapsible>{this.renderView()}</Panel.Body>
+						{activeKey === 'pagegroups' ? (
+							<Panel.Body collapsible>{this.renderView()}</Panel.Body>
+						) : null}
 					</Panel>
 				</PanelGroup>
 			</div>

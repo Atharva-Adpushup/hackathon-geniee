@@ -32,13 +32,15 @@ class Sites extends Component {
 									{domanize(siteDomain)} - {siteId}
 								</Panel.Title>
 							</Panel.Heading>
-							<Panel.Body collapsible>
-								<SiteBody
-									site={site}
-									showNotification={showNotification}
-									saveSettings={saveSettings}
-								/>
-							</Panel.Body>
+							{activeKey === siteId ? (
+								<Panel.Body collapsible>
+									<SiteBody
+										site={site}
+										showNotification={showNotification}
+										saveSettings={saveSettings}
+									/>
+								</Panel.Body>
+							) : null}
 						</Panel>
 					);
 				})}
