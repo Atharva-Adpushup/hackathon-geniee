@@ -21,7 +21,7 @@ module.exports = (function() {
 		this.rootBackgroundColor;
 		this.placements = {};
 		this.started = false;
-		this.isEvenSpacingAlgo = initOptions.isEvenSpacingAlgo || true;
+		this.isEvenSpacingAlgo = initOptions.hasOwnProperty('isEvenSpacingAlgo') ? initOptions.isEvenSpacingAlgo : true;
 		this.defaultSectionBracket = Number(initOptions.sectionBracket) || 600;
 		this.selectorsTreeLevel = Number(initOptions.selectorsTreeLevel) || '';
 
@@ -555,7 +555,7 @@ module.exports = (function() {
 
 	function init(params) {
 		var options = {
-			isEvenSpacingAlgo: params.isEvenSpacingAlgo || true,
+			isEvenSpacingAlgo: params.hasOwnProperty('isEvenSpacingAlgo') ? params.isEvenSpacingAlgo : true,
 			sectionBracket: params.sectionBracket,
 			selectorsTreeLevel: params.selectorsTreeLevel,
 			$: params.$
