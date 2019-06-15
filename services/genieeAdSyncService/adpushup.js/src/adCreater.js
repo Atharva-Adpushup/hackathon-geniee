@@ -306,9 +306,9 @@ var $ = require('jquery'),
 					$selector: $incontentElm,
 					placementConfig: inContentAds,
 					sectionBracket: globalConfig.sectionBracket,
-					selectorsTreeLevel: globalConfig.selectorsTreeLevel
+					selectorsTreeLevel: globalConfig.selectorsTreeLevel,
+					isEvenSpacingAlgo: false
 				};
-				var javatPointSiteId = window.adpushup.config.siteId == '37780';
 				var successCallback = function(sectionsWithTargetElm) {
 					$(inContentAds).each(function(index, ad) {
 						var sectionObj = sectionsWithTargetElm[ad.section],
@@ -336,10 +336,6 @@ var $ = require('jquery'),
 						}
 					});
 				};
-
-				if (javatPointSiteId) {
-					parameters.isEvenSpacingAlgo = false;
-				}
 
 				incontentAnalyser(parameters).then(successCallback);
 			};
