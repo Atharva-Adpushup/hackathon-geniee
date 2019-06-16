@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import moment from 'moment';
 import reportService from '../../../services/reportService';
 import Loader from '../../../Components/Loader/index';
+import { numberWithCommas } from '../helpers/utils';
 
 class EstimatedEarnings extends React.Component {
 	state = {
@@ -73,6 +74,12 @@ class EstimatedEarnings extends React.Component {
 				: previousThirtyDays > 0
 				? -100
 				: 0;
+		const displayYestarday = numberWithCommas(Math.round(yesterday * 100) / 100);
+		const displaySameDayLastWeek = numberWithCommas(Math.round(sameDayLastWeek * 100) / 100);
+		const displayLastSevenDays = numberWithCommas(Math.round(lastSevenDays * 100) / 100);
+		const displayPreviousSevenDays = numberWithCommas(Math.round(previousSevenDays * 100) / 100);
+		const displayLastThirtyDays = numberWithCommas(Math.round(lastThirtyDays * 100) / 100);
+		const displayPreviousThirtyDays = numberWithCommas(Math.round(previousThirtyDays * 100) / 100);
 		return isLoading ? (
 			this.renderLoader()
 		) : (
@@ -84,9 +91,9 @@ class EstimatedEarnings extends React.Component {
 						<span>Same Day Last Week</span>
 					</div>
 					<div className="estimatedEarning">
-						<span>${Math.round(yesterday * 100) / 100}</span>
+						<span>${displayYestarday}</span>
 						<span> / </span>
-						<span>${Math.round(sameDayLastWeek * 100) / 100}</span>
+						<span>${displaySameDayLastWeek}</span>
 					</div>
 					<div>
 						(<span>{dayProgress}% </span>
@@ -100,9 +107,9 @@ class EstimatedEarnings extends React.Component {
 						<span>Previous 7 days</span>
 					</div>
 					<div className="estimatedEarning">
-						<span>${Math.round(lastSevenDays * 100) / 100}</span>
+						<span>${displayLastSevenDays}</span>
 						<span> / </span>
-						<span>${Math.round(previousSevenDays * 100) / 100}</span>
+						<span>${displayPreviousSevenDays}</span>
 					</div>
 					<div>
 						(<span>{weekProgress}% </span>
@@ -117,9 +124,9 @@ class EstimatedEarnings extends React.Component {
 					</div>
 
 					<div className="estimatedEarning">
-						<span>${Math.round(lastThirtyDays * 100) / 100}</span>
+						<span>${displayLastThirtyDays}</span>
 						<span> / </span>
-						<span>${Math.round(previousThirtyDays * 100) / 100}</span>
+						<span>${displayPreviousThirtyDays}</span>
 					</div>
 					<div>
 						(<span>{monthProgress}% </span>
