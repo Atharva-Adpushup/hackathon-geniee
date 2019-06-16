@@ -17,7 +17,7 @@ class PerformanceApOriginal extends React.Component {
 			quickDates: dates,
 			selectedDate: dates[0].value,
 			sites,
-			selectedSite: sites[0].value,
+			selectedSite: sites[0] ? sites[0].value : '',
 			series: [],
 			xAxis: {},
 			isLoading: true
