@@ -158,5 +158,28 @@ module.exports = {
 				}
 			]
 		}
+	},
+	hbOptimization: {
+		validations: {
+			isNull: [{ name: 'bidder', message: 'Bidder Code cannot be blank', value: '', status: 403 }],
+			isIn: [
+				{
+					name: 'device',
+					message: 'Please provide a valid Device. Supported values - desktop, tablet, phone',
+					value: '',
+					status: 403,
+					allowedValues: ['DESKTOP', 'TABLET', 'PHONE']
+				}
+			],
+			isBoolean: [
+				{
+					name: 'status',
+					message: 'status property should be a boolean',
+					value: '',
+					status: 403
+				}
+			],
+			isLength: [{ name: 'country', message: 'Country Code is invalid', value: { min: 2, max: 2 } }]
+		}
 	}
 };
