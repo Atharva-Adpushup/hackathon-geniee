@@ -51,6 +51,10 @@ module.exports = {
 								if (!validator.isEmail(json[key], rule.value))
 									errors.push({ message: rule.message, status: rule.status });
 								break;
+							case 'isLength':
+								if (!validator.isLength(json[key], rule.value))
+									errors.push({ message: rule.message, status: rule.status });
+								break;
 						}
 					}
 				});

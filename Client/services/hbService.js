@@ -69,3 +69,19 @@ export function toggleHbStatusForSite(siteId) {
 		.put(`/headerBidding/toggleHbStatusForSite/${siteId}`)
 		.then(({ data }) => data);
 }
+
+export function fetchOptimizationTabInitData(siteId) {
+	return axiosInstance
+		.get(`/headerBidding/optimizationTabInitData/${siteId}`)
+		.then(({ data }) => data);
+}
+
+export function saveBidderRule(siteId, rule) {
+	return axiosInstance.post(`/headerBidding/bidderRule/${siteId}`, rule).then(({ data }) => data);
+}
+
+export function deleteBidderRule(siteId, bidder) {
+	return axiosInstance
+		.delete(`/headerBidding/bidderRule/${siteId}`, { data: { bidder } })
+		.then(({ data }) => data);
+}
