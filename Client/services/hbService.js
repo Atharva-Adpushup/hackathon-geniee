@@ -75,3 +75,13 @@ export function fetchOptimizationTabInitData(siteId) {
 		.get(`/headerBidding/optimizationTabInitData/${siteId}`)
 		.then(({ data }) => data);
 }
+
+export function saveBidderRule(siteId, rule) {
+	return axiosInstance.post(`/headerBidding/bidderRule/${siteId}`, rule).then(({ data }) => data);
+}
+
+export function deleteBidderRule(siteId, bidder) {
+	return axiosInstance
+		.delete(`/headerBidding/bidderRule/${siteId}`, { data: { bidder } })
+		.then(({ data }) => data);
+}

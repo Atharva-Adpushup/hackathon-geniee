@@ -461,14 +461,6 @@ function apiModule() {
 				};
 				const bidderRulesObj = {};
 
-				// {
-				// 	bidder: 'index',
-				// 	status: {name: 'Enabled', value: true}
-				// 	device: 'desktop',
-				// 	sizesSupported: [[970,90], [728,90], [300,250], [160,600]],
-				// 	country: {name: 'USA', value: 'US' },
-				// }
-
 				for (const config of sizeConfig) {
 					const { bidder, status, sizesSupported, labels } = config;
 
@@ -523,6 +515,79 @@ function apiModule() {
 				}
 
 				return addedBiddersNames;
+			}),
+		saveBidderRule: (siteId, bidderRule) => {
+			const { bidder, device, sizesSupported, country, status } = bidderRule;
+			const mediaQueries = {
+				desktop: '(min-width: 1200px)',
+				tablet: '(min-width: 768px) and (max-width: 1199px)',
+				phone: '(min-width: 0px) and (max-width: 767px)'
+			};
+
+			return API.getHbConfig(siteId).then(hbConfig => {
+				const { sizeConfig } = hbConfig.get('deviceConfig');
+				const countryConfig = hbConfig.get('countryConfig');
+
+				const sizeRuleIndex = sizeConfig.findIndex(obj => obj.bidder === bidder);
+				const countryRuleIndex = countryConfig.findIndex(obj => obj.bidder === bidder);
+
+				if (sizeRuleIndex > -1) {
+					if (device)
+						sizeConfig[sizeRuleIndex] = {
+							bidder,
+							status,
+							mediaQuery: mediaQueries[device],
+							sizesSupported,
+							labels: [device]
+						};
+
+					if (!device) sizeConfig.splice(sizeRuleIndex, 1);
+				}
+
+				if (sizeRuleIndex === -1 && device) {
+					sizeConfig.push({
+						bidder,
+						status,
+						mediaQuery: mediaQueries[device],
+						sizesSupported,
+						labels: [device]
+					});
+				}
+
+				if (countryRuleIndex > -1) {
+					if (country)
+						countryConfig[countryRuleIndex] = {
+							bidder,
+							status,
+							labels: [country]
+						};
+					if (!country) countryConfig.splice(countryRuleIndex, 1);
+				}
+
+				if (countryRuleIndex === -1 && country) {
+					countryConfig.push({
+						bidder,
+						status,
+						labels: [country]
+					});
+				}
+
+				return hbConfig.save();
+			});
+		},
+		deleteBidderRule: (siteId, bidder) =>
+			API.getHbConfig(siteId).then(hbConfig => {
+				const { sizeConfig } = hbConfig.get('deviceConfig');
+				const countryConfig = hbConfig.get('countryConfig');
+
+				const sizeRuleIndex = sizeConfig.findIndex(obj => obj.bidder === bidder);
+				const countryRuleIndex = countryConfig.findIndex(obj => obj.bidder === bidder);
+
+				if (sizeRuleIndex > -1) sizeConfig.splice(sizeRuleIndex, 1);
+
+				if (countryRuleIndex > -1) countryConfig.splice(countryRuleIndex, 1);
+
+				return hbConfig.save();
 			})
 	};
 
