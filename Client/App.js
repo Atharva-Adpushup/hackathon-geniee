@@ -30,7 +30,8 @@ import {
 	faCheck,
 	faChevronRight,
 	faPlay,
-	faPause
+	faPause,
+	faTrash
 } from '@fortawesome/free-solid-svg-icons';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import 'bootstrap-sass/assets/stylesheets/_bootstrap.scss';
@@ -67,7 +68,8 @@ library.add(
 	faCheck,
 	faChevronRight,
 	faPlay,
-	faPause
+	faPause,
+	faTrash
 );
 
 const App = () => (

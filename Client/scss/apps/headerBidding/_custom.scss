@@ -373,3 +373,44 @@
 		}
 	}
 }
+
+.hb-optimization {
+	table {
+		tbody {
+			tr {
+				.action-icon {
+					color: $primaryColor;
+				}
+			}
+			tr.table-footer {
+				td {
+					font-size: 16px;
+					font-weight: bold;
+					padding: 8px;
+					&.link {
+						background: #eee;
+						color: #888;
+						text-shadow: 0px 1px 1px rgba(255, 255, 255, 0.5);
+						cursor: pointer;
+						&:hover {
+							background: #ddd;
+							color: #666;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+.bidder-rule-form {
+	label {
+		text-align: left !important;
+	}
+	.countries-list-selectbox {
+		.dropdown-menu {
+			max-height: 300px;
+			overflow-y: scroll;
+		}
+	}
+}
