@@ -254,8 +254,8 @@ module.exports = function(site, externalData = {}) {
 			return isExternalRequest ? Promise.resolve(fileConfig.uncompressed) : uploadJS(fileConfig);
 		}
 		return processing()
-			.then(startIETesting)
 			.then(writeTempFile)
+			.then(startIETesting)
 			.then(() => writeTempFile(fileConfig.default, 'adpushup.min.js'))
 			.then(() => {
 				if (ftp.getConnectionStatus() === 'connected') {
