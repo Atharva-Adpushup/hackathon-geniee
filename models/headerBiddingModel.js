@@ -76,7 +76,13 @@ function apiModule() {
 		getUsedBidders(siteId) {
 			return API.getHbConfig(siteId)
 				.then(hbConfig => hbConfig.getUsedBidders())
-				.then(bidders => bidders);
+				.catch(err => {
+					if (err instanceof AdPushupError && err.message.status === 404) {
+						return {};
+					}
+
+					throw err;
+				});
 		},
 		getMergedBidders(siteId) {
 			return Promise.all([API.getAllBiddersFromNetworkConfig(), API.getUsedBidders(siteId)])
