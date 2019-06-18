@@ -72,7 +72,7 @@ class HeaderBidding extends React.Component {
 				break;
 
 			case 2:
-				if (!adServerSetupCompleted || !inventoryFound) return false;
+				if (!adServerSetupCompleted) return false;
 				redirectUrl = `${computedRedirectUrl}/${NAV_ITEMS_INDEXES.TAB_2}`;
 				break;
 
@@ -175,7 +175,7 @@ class HeaderBidding extends React.Component {
 					<NavItem
 						eventKey={2}
 						// eslint-disable-next-line no-constant-condition
-						className={!adServerSetupCompleted || !inventoryFound ? 'disabled' : ''}
+						className={!adServerSetupCompleted ? 'disabled' : ''}
 					>
 						{NAV_ITEMS_VALUES.TAB_2}
 					</NavItem>
