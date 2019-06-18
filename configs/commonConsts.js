@@ -4,7 +4,7 @@ module.exports = {
 	DFP_WEB_SERVICE_ENDPOINT: 'http://staging.adpushup.com/DfpWebService/info',
 	TRANSACTION_LOG_ENDPOINT: 'https://api.adpushup.com/SetupLogWebService/log',
 	REPORT_STATUS: 'https://api.adpushup.com/OpsWebService/ops',
-	IE_TESTING_ENDPOINT: 'http://apdc1n-central5.eastus2.cloudapp.azure.com:8081/api/ie-testing',
+	IE_TESTING_ENDPOINT: 'http://apdc1n-central5.eastus2.cloudapp.azure.com:8081/api/health-report',
 	PROXY_ORIGIN: '//proxy.app.adpushup.com',
 	DEMO_ACCOUNT_EMAIL: 'demo@adpushup.com',
 	AMP_SETTINGS_ACCESS_EMAILS: ['genieeamp@adpushup.com'],
