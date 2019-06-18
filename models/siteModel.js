@@ -32,7 +32,8 @@ var model = require('../helpers/model'),
 			'isManual',
 			'isInnovative',
 			'gdpr',
-			'ampSettings'
+			'ampSettings',
+			'apps'
 		];
 		this.clientKeys = [
 			'siteId',
@@ -48,7 +49,8 @@ var model = require('../helpers/model'),
 			'isManual',
 			'isInnovative',
 			'gdpr',
-			'ampSettings'
+			'ampSettings',
+			'apps'
 		];
 		this.validations = {
 			required: []
@@ -68,7 +70,8 @@ var model = require('../helpers/model'),
 				cmsName: '',
 				pageGroups: []
 			},
-			adNetworkSettings: commonConsts.DEFAULT_AD_NETWORK_SETTINGS
+			adNetworkSettings: commonConsts.DEFAULT_AD_NETWORK_SETTINGS,
+			apps: {}
 		};
 		this.ignore = [];
 		this.classMap = { apConfigs: apConfigSchema };
