@@ -32,7 +32,7 @@ const HeaderBidding = model.extend(function() {
 		required: []
 	};
 	this.classMap = {};
-	this.defaults = { hbcf: {}, deviceConfig: {} };
+	this.defaults = { hbcf: {}, deviceConfig: { sizeConfig: [] }, countryConfig: [] };
 	this.constructor = function(data, cas) {
 		if (!(data.siteId && data.siteDomain && data.email)) {
 			throw new Error('siteId, siteDomain and publisher email required for header bidding doc');
