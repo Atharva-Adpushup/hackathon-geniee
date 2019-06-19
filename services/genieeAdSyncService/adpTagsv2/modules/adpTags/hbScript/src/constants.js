@@ -36,6 +36,11 @@ var constants = {
                     }
                 }
             }
+        },
+        ADX_FLOOR: {
+            priceFloorKeys: ['FP_S_A', 'FP_S', 'FP_B', 'FP_B_A', 'FP_A'],
+            cpm: 0.01,
+            key: 'FP_S_A'
         }
     },
     ERROR_CODES: {
