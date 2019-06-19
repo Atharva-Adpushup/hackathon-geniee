@@ -117,8 +117,8 @@ router
 
 		const hbConfig = {
 			hbcf: {},
-			deviceConfig: {},
-			countryConfig: {},
+			deviceConfig: { sizeConfig: [] },
+			countryConfig: [],
 			siteId,
 			siteDomain: null,
 			email,

@@ -38,7 +38,7 @@ const BiddersList = ({ bidders: { notAddedBidders, addedBidders }, openAddManage
 					</Panel.Body>
 					<Panel.Footer className="u-padding-0">
 						<span
-							className="u-block text-center u-padding-3 u-cursor-pointer"
+							className="text-center u-padding-3 u-cursor-pointer"
 							onClick={openAddManageBidderView.bind(
 								null,
 								'addBidder',

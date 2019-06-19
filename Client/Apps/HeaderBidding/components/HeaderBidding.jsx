@@ -19,12 +19,23 @@ class HeaderBidding extends React.Component {
 	componentDidMount() {
 		const {
 			match: {
-				params: { siteId }
+				params: { siteId },
+				url
 			},
 			getSetupStatusAction
 		} = this.props;
 
-		getSetupStatusAction(siteId);
+		getSetupStatusAction(siteId).then(() => {
+			const {
+				setupStatus: { inventoryFound, biddersFound }
+			} = this.props;
+
+			if (url === `/sites/${siteId}/apps/header-bidding` && inventoryFound && biddersFound) {
+				this.setState({
+					redirectUrl: `/sites/${siteId}/apps/header-bidding/${NAV_ITEMS_INDEXES.TAB_2}`
+				});
+			}
+		});
 	}
 
 	getActiveTab = () => {
@@ -61,18 +72,20 @@ class HeaderBidding extends React.Component {
 				break;
 
 			case 2:
-				// eslint-disable-next-line no-constant-condition
-				if (/*! (!adServerSetupCompleted || !inventoryFound) */ false) return false;
+				if (!adServerSetupCompleted) return false;
 				redirectUrl = `${computedRedirectUrl}/${NAV_ITEMS_INDEXES.TAB_2}`;
 				break;
 
 			case 3:
+				if (!adServerSetupCompleted || !inventoryFound) return false;
 				redirectUrl = `${computedRedirectUrl}/${NAV_ITEMS_INDEXES.TAB_3}`;
 				break;
 			case 4:
+				if (!biddersFound) return false;
 				redirectUrl = `${computedRedirectUrl}/${NAV_ITEMS_INDEXES.TAB_4}`;
 				break;
 			case 5:
+				if (!biddersFound) return false;
 				redirectUrl = `${computedRedirectUrl}/${NAV_ITEMS_INDEXES.TAB_5}`;
 				break;
 
@@ -162,13 +175,22 @@ class HeaderBidding extends React.Component {
 					<NavItem
 						eventKey={2}
 						// eslint-disable-next-line no-constant-condition
-						className={/*! (!adServerSetupCompleted || !inventoryFound) */ false ? 'disabled' : ''}
+						className={!adServerSetupCompleted ? 'disabled' : ''}
 					>
 						{NAV_ITEMS_VALUES.TAB_2}
 					</NavItem>
-					<NavItem eventKey={3}>{NAV_ITEMS_VALUES.TAB_3}</NavItem>
-					<NavItem eventKey={4}>{NAV_ITEMS_VALUES.TAB_4}</NavItem>
-					<NavItem eventKey={5}>{NAV_ITEMS_VALUES.TAB_5}</NavItem>
+					<NavItem
+						eventKey={3}
+						className={!adServerSetupCompleted || !inventoryFound ? 'disabled' : ''}
+					>
+						{NAV_ITEMS_VALUES.TAB_3}
+					</NavItem>
+					<NavItem eventKey={4} className={!biddersFound ? 'disabled' : ''}>
+						{NAV_ITEMS_VALUES.TAB_4}
+					</NavItem>
+					<NavItem eventKey={5} className={!biddersFound ? 'disabled' : ''}>
+						{NAV_ITEMS_VALUES.TAB_5}
+					</NavItem>
 				</Nav>
 				{this.renderContent()}
 			</ActionCard>

@@ -2,12 +2,13 @@ const express = require('express');
 const Promise = require('bluebird');
 
 const router = express.Router();
+// eslint-disable-next-line no-unused-vars
+const woodlotCustomLogger = require('woodlot').customLogger;
 const userModel = require('../models/userModel');
 const siteModel = require('../models/siteModel');
 const schema = require('../helpers/schema');
 const CC = require('../configs/commonConsts');
 const FormValidator = require('../helpers/FormValidator');
-const woodlotCustomLogger = require('woodlot').customLogger;
 const httpStatus = require('../configs/httpStatusConsts');
 const { sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFunctions');
 const {
@@ -36,12 +37,12 @@ router
 		}
 		const partnerEmail = `${json.partner}@adpushup.com`;
 
-		let siteId;
 		json.ownerEmail = partnerEmail;
 		json.apConfigs = {
 			mode: CC.site.mode.DRAFT,
 			isAdPushupControlWithPartnerSSP: CC.apConfigDefaults.isAdPushupControlWithPartnerSSP
 		};
+		json.apps = {};
 
 		if (adsensePublisherId) {
 			json.adsensePublisherId = adsensePublisherId;
@@ -97,10 +98,10 @@ router
 					} else {
 						return res.status(500).send({ error: 'Some error occurred' });
 					}
-				} else {
-					const error = err.message[0];
-					return res.status(error.status).send({ error: error.message });
 				}
+
+				const error = err.message[0];
+				return res.status(error.status).send({ error: error.message });
 			});
 	})
 	.get('/onboarding', (req, res) => {
@@ -125,7 +126,7 @@ router
 
 		return userModel
 			.verifySiteOwner(email, siteId)
-			.then(({ user, site }) => {
+			.then(({ site }) => {
 				const { domain, onboardingStage, step } = site;
 				return res.status(httpStatus.OK).json({
 					isOnboarding: onboardingStage === 'preOnboarding',
@@ -135,7 +136,7 @@ router
 					step
 				});
 			})
-			.catch(err => res.status(httpStatus.NOT_FOUND).json({ error: 'Site not found!' }));
+			.catch(() => res.status(httpStatus.NOT_FOUND).json({ error: 'Site not found!' }));
 	})
 
 	.get('/fetchAppStatuses', (req, res) => {
@@ -184,7 +185,7 @@ router
 			)
 			.catch(err => {
 				console.log(err);
-				sendErrorResponse(err, res);
+				return sendErrorResponse(err, res);
 			});
 	})
 	.post('/saveApConfigs', (req, res) => {
@@ -201,11 +202,31 @@ router
 				});
 
 				site.set('apConfigs', { ...siteApConfigs });
-				return site.save().then(() => sendSuccessResponse({ success: 1 }, res));
+				return site.save();
 			})
+			.then(() => sendSuccessResponse({ success: 1 }, res))
 			.catch(err => {
 				console.log(err);
-				sendErrorResponse(err, res);
+				return sendErrorResponse(err, res);
+			});
+	})
+	.post('/saveSettings', (req, res) => {
+		const { email } = req.user;
+		const { siteId, apConfigs, adNetworkSettings } = req.body;
+
+		return verifyOwner(siteId, email)
+			.then(site => {
+				const siteApConfigs = { ...site.get('apConfigs'), ...apConfigs };
+				const siteAdNetworkSettings = { ...site.get('adNetworkSettings'), ...adNetworkSettings };
+
+				site.set('apConfigs', siteApConfigs);
+				site.set('adNetworkSettings', siteAdNetworkSettings);
+				return site.save();
+			})
+			.then(() => sendSuccessResponse({ success: 1 }, res))
+			.catch(err => {
+				console.log(err);
+				return sendErrorResponse(err, res);
 			});
 	});
 
