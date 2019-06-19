@@ -4,6 +4,7 @@ import Card from '../../../Components/Layout/Card';
 import EstimatedEarnings from '../../Dashboard/components/EstimatedEarnings';
 import PerformanceOverviewContainer from '../../Dashboard/containers/PerformanceOverviewContainer';
 import PerformanceApOriginalContainer from '../../Dashboard/containers/PerformanceApOriginalContainer';
+import SitewiseReportContainer from '../../Dashboard/containers/SitewiseReportContainer';
 import Revenue from '../../Dashboard/components/Revenue';
 import '../../../scss/pages/dashboard/index.scss';
 
@@ -21,6 +22,8 @@ class QuickSnapshot extends React.Component {
 				return <PerformanceOverviewContainer path={path} siteId={siteId} reportType="site" />;
 			case 'rev_by_network':
 				return <Revenue path={path} siteId={siteId} reportType="site" />;
+			case 'per_site_wise':
+				return <SitewiseReportContainer path={path} siteId={siteId} reportType="site" />;
 			default:
 				return '';
 		}

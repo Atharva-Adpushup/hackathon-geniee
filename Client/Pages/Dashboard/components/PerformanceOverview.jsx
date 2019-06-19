@@ -6,6 +6,7 @@ import { dates } from '../configs/commonConsts';
 import reportService from '../../../services/reportService';
 import Selectbox from '../../../Components/Selectbox/index';
 import Loader from '../../../Components/Loader/index';
+import { numberWithCommas } from '../helpers/utils';
 
 class PerformanceOverview extends React.Component {
 	constructor(props) {
@@ -16,7 +17,7 @@ class PerformanceOverview extends React.Component {
 			quickDates: dates,
 			selectedDate: dates[0].value,
 			sites,
-			selectedSite: sites[0].value,
+			selectedSite: sites[0] ? sites[0].value : '',
 			displayData: {},
 			isLoading: true
 		};
@@ -130,7 +131,7 @@ class PerformanceOverview extends React.Component {
 									<div className="estimatedEarning">
 										<span>
 											{displayData[key].name.includes('Revenue') ? '$' : ''}
-											{Math.round(displayData[key].value * 100) / 100}
+											{numberWithCommas(Math.round(displayData[key].value * 100) / 100)}
 										</span>
 									</div>
 								</div>

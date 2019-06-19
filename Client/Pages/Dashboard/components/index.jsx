@@ -6,19 +6,19 @@ import SitewiseReportContainer from '../containers/SitewiseReportContainer';
 import PerformanceOverviewContainer from '../containers/PerformanceOverviewContainer';
 import PerformanceApOriginalContainer from '../containers/PerformanceApOriginalContainer';
 import RevenueContainer from '../containers/RevenueContainer';
-import NotificationContainer from '../../../Containers/NotificationContainer';
 
 class Dashboard extends React.Component {
 	componentDidMount() {
 		const { showNotification, user } = this.props;
-		if (!user.isPaymentDetailsComplete && !window.location.pathname.includes('payment'))
+		if (!user.isPaymentDetailsComplete && !window.location.pathname.includes('payment')) {
 			showNotification({
 				mode: 'error',
 				title: 'Payments Error',
 				message: `Please complete your Payment Profile, for timely payments.
-				<a href='/payment'>Go to payments</a>`,
+					<a href='/payment'>Go to payments</a>`,
 				autoDismiss: 0
 			});
+		}
 	}
 
 	getWidgetComponent = widget => {
@@ -69,12 +69,7 @@ class Dashboard extends React.Component {
 	};
 
 	render() {
-		return (
-			<Fragment>
-				{this.renderContent()}
-				<NotificationContainer />
-			</Fragment>
-		);
+		return <Fragment>{this.renderContent()}</Fragment>;
 	}
 }
 

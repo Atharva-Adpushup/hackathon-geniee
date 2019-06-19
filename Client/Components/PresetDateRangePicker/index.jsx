@@ -96,8 +96,8 @@ class DateRangePickerWrapper extends React.Component {
 
 		this.state = {
 			focusedInput,
-			startDate: props.startDate,
-			endDate: props.endDate
+			startDate: moment(props.startDate),
+			endDate: moment(props.endDate)
 		};
 
 		this.onDatesChange = this.onDatesChange.bind(this);
@@ -105,8 +105,21 @@ class DateRangePickerWrapper extends React.Component {
 		this.renderDatePresets = this.renderDatePresets.bind(this);
 	}
 
+	componentWillReceiveProps(nextProps) {
+		let { startDate, endDate } = this.props;
+		if (
+			moment(startDate).format('YYYY-MM-DD') !== nextProps.startDate ||
+			moment(endDate).format('YYYY-MM-DD') !== nextProps.endDate
+		) {
+			this.setState({ startDate: moment(nextProps.startDate), endDate: moment(nextProps.endDate) });
+		}
+	}
+
 	onDatesChange({ startDate, endDate }) {
-		this.props.datesUpdated({ startDate, endDate });
+		this.props.datesUpdated({
+			startDate: moment(startDate).format('YYYY-MM-DD'),
+			endDate: moment(endDate).format('YYYY-MM-DD')
+		});
 		this.setState({ startDate, endDate });
 	}
 
@@ -115,7 +128,7 @@ class DateRangePickerWrapper extends React.Component {
 	}
 
 	renderDatePresets() {
-		const { presets, styles } = this.props;
+		const { presets } = this.props;
 		const { startDate, endDate } = this.state;
 		return (
 			<div className="PresetDateRangePicker_div">

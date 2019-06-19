@@ -1,5 +1,4 @@
 const express = require('express');
-const _ = require('lodash');
 
 const router = express.Router();
 const userController = require('./userController');
@@ -12,6 +11,7 @@ const innovativeAdsController = require('./innovativeAdsController');
 const reportsController = require('./reportsController');
 const opsController = require('./opsController');
 const channelController = require('./channelController');
+const headerBiddingController = require('./headerBiddingController');
 
 const apiAuthMiddleware = require('../middlewares/apiAuthMiddleware');
 
@@ -28,6 +28,7 @@ router.use('/innovativeAds', innovativeAdsController);
 router.use('/reports', reportsController);
 router.use('/ops', opsController);
 router.use('/channel', channelController);
+router.use('/headerBidding', headerBiddingController);
 router.use('/', indexController);
 
 module.exports = router;

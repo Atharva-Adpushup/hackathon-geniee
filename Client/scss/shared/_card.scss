@@ -2,15 +2,13 @@ $transition: $all 0.2s $ease;
 
 .card {
 	box-shadow: $boxShadowOne;
+	display: $displayFlex;
+	flex-direction: $layoutColumn;
 	width: 360px;
 	transition: $transition;
 
 	&:hover {
 		box-shadow: $boxShadowTwo;
-	}
-
-	&.card--height-fixed {
-		height: $cardHeight;
 	}
 
 	.card-header-title {
@@ -22,6 +20,10 @@ $transition: $all 0.2s $ease;
 		height: ($numberOne + ($numberOne/$numberTwo) + em);
 	}
 
+	> .card-body {
+		flex: $numberOne;
+	}
+
 	> .card-footer {
 		border: $numberZero;
 	}
@@ -30,7 +32,6 @@ $transition: $all 0.2s $ease;
 		border: 2px $dashed $dottedBorderColor;
 		border-radius: 4px;
 		box-shadow: $none;
-		height: $cardHeight;
 		opacity: $defaultOpacity;
 		transition: $all 0.2s $ease;
 

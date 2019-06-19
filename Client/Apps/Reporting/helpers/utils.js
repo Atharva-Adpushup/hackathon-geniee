@@ -1,4 +1,5 @@
 import { sortBy } from 'lodash';
+import moment from 'moment';
 
 const convertObjToArr = obj => {
 	const clone = Object.assign({}, obj);
@@ -23,4 +24,72 @@ const arrayUnique = array => {
 	return a;
 };
 
-export { convertObjToArr, arrayUnique };
+const computeCsvData = data => {
+	let { tableBody, tableHeader, grandTotal } = data;
+	let csvData = [];
+	let csvHeaders = [];
+	tableHeader.forEach(header => {
+		csvHeaders.push(header.title);
+	});
+	csvData.push(csvHeaders);
+	tableBody.forEach(row => {
+		let csvBody = [];
+		tableHeader.forEach(header => {
+			csvBody.push(row[header.prop]);
+		});
+		csvData.push(csvBody);
+	});
+	let csvBody = [];
+	tableHeader.forEach(header => {
+		csvBody.push(grandTotal[header.prop]);
+	});
+	csvData.push(csvBody);
+	return csvData;
+};
+const numberWithCommas = x => {
+	return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+};
+const getPresets = () => {
+	const today = moment();
+	const yesterday = moment().subtract(1, 'day');
+	const last7Days = moment()
+		.subtract(1, 'week')
+		.subtract(1, 'day');
+	return [
+		{
+			text: 'Today',
+			start: today,
+			end: today
+		},
+		{
+			text: 'Yesterday',
+			start: yesterday,
+			end: yesterday
+		},
+		{
+			text: 'Last 7 Days',
+			start: last7Days,
+			end: yesterday
+		},
+		{
+			text: 'Last 30 Days',
+			start: moment().subtract(30, 'day'),
+			end: yesterday
+		},
+		{
+			text: 'This Month',
+			start: moment().startOf('month'),
+			end: today
+		},
+		{
+			text: 'Last Month',
+			start: moment()
+				.subtract(1, 'months')
+				.startOf('month'),
+			end: moment()
+				.subtract(1, 'months')
+				.endOf('month')
+		}
+	];
+};
+export { convertObjToArr, arrayUnique, computeCsvData, numberWithCommas, getPresets };

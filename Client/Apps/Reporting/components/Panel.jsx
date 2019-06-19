@@ -8,6 +8,8 @@ import TableContainer from '../containers/TableContainer';
 import ChartContainer from '../containers/ChartContainer';
 import reportService from '../../../services/reportService';
 import { displayMetrics } from '../configs/commonConsts';
+import Loader from '../../../Components/Loader';
+import { computeCsvData } from '../helpers/utils';
 
 class Panel extends Component {
 	constructor(props) {
@@ -19,13 +21,17 @@ class Panel extends Component {
 			selectedMetrics: [],
 			selectedInterval: 'daily',
 			startDate: moment()
+				.startOf('day')
 				.subtract(8, 'days')
-				.startOf('day'),
+				.format('YYYY-MM-DD'),
 			endDate: moment()
 				.startOf('day')
-				.subtract(1, 'day'),
+				.subtract(1, 'day')
+				.format('YYYY-MM-DD'),
 			tableData: {},
-			reportType: 'account'
+			csvData: [],
+			reportType: 'account',
+			isLoading: true
 		};
 	}
 
@@ -35,15 +41,21 @@ class Panel extends Component {
 				params: { siteId }
 			}
 		} = this.props;
-		const { startDate, endDate } = this.state;
+		const { startDate, endDate, metricsList, selectedInterval } = this.state;
 		if (siteId) {
 			let selectedFilters = { siteid: { [siteId]: true } };
-			this.generateButtonHandler({ startDate, endDate, selectedFilters });
+			this.generateButtonHandler({
+				startDate,
+				endDate,
+				selectedFilters,
+				metricsList,
+				selectedInterval
+			});
 			this.setState({ reportType: 'site' });
-		} else this.generateButtonHandler(startDate, endDate);
+		} else this.generateButtonHandler({ startDate, endDate, metricsList, selectedInterval });
 	}
 
-	formateReportParams = () => {
+	formateReportParams = data => {
 		const {
 			startDate,
 			endDate,
@@ -51,15 +63,18 @@ class Panel extends Component {
 			selectedFilters,
 			selectedInterval,
 			metricsList
-		} = this.state;
+		} = data;
 		const { site } = this.props;
-		const selectedMetrics = metricsList
-			.filter(metric => !metric.isDisabled)
-			.map(metric => metric.value);
+		let selectedMetrics;
+		if (metricsList) {
+			selectedMetrics = metricsList
+				.filter(metric => !metric.isDisabled)
+				.map(metric => metric.value);
+		}
 		const params = {
 			fromDate: moment(startDate).format('YYYY-MM-DD'),
 			toDate: moment(endDate).format('YYYY-MM-DD'),
-			metrics: selectedMetrics.toString(),
+			metrics: selectedMetrics ? selectedMetrics.toString() : null,
 			interval: selectedInterval,
 			dimension: selectedDimension || null
 		};
@@ -75,17 +90,21 @@ class Panel extends Component {
 	};
 
 	generateButtonHandler = data => {
-		this.setState(data, () => {
-			const params = this.formateReportParams();
+		this.setState({ isLoading: true });
+		const params = this.formateReportParams(data);
 
-			reportService.getCustomStats(params).then(response => {
-				if (response.status == 200 && response.data) {
-					this.setState({ tableData: response.data });
-				}
-			});
+		reportService.getCustomStats(params).then(response => {
+			if (response.status == 200 && response.data) {
+				this.setState({ tableData: response.data, ...data });
+			} else this.setState({ ...data });
+			this.setState({ isLoading: false });
 		});
 	};
 
+	getFinalTableData = tableData => {
+		let csvData = computeCsvData(tableData);
+		this.setState({ csvData });
+	};
 	renderContent = () => {
 		const {
 			startDate,
@@ -96,7 +115,8 @@ class Panel extends Component {
 			selectedInterval,
 			metricsList,
 			tableData,
-			reportType
+			reportType,
+			csvData
 		} = this.state;
 		return (
 			<Row>
@@ -111,6 +131,7 @@ class Panel extends Component {
 						selectedMetrics={selectedMetrics}
 						selectedInterval={selectedInterval}
 						reportType={reportType}
+						csvData={csvData}
 					/>
 				</Col>
 				<Col sm={12} className="u-margin-t5">
@@ -129,6 +150,7 @@ class Panel extends Component {
 						startDate={startDate}
 						endDate={endDate}
 						selectedInterval={selectedInterval}
+						getTableData={this.getFinalTableData}
 					/>
 				</Col>
 			</Row>
@@ -136,7 +158,12 @@ class Panel extends Component {
 	};
 
 	render() {
-		return <ActionCard title="AdPushup Reports">{this.renderContent()}</ActionCard>;
+		let { isLoading } = this.state;
+		return isLoading ? (
+			<Loader />
+		) : (
+			<ActionCard title="AdPushup Reports">{this.renderContent()}</ActionCard>
+		);
 	}
 }
 

@@ -7,6 +7,7 @@ import { getDateRange } from '../helpers/utils';
 import { dates } from '../configs/commonConsts';
 import reportService from '../../../services/reportService';
 import Loader from '../../../Components/Loader/index';
+import { numberWithCommas } from '../helpers/utils';
 
 class SitewiseReport extends React.Component {
 	state = {
@@ -23,11 +24,14 @@ class SitewiseReport extends React.Component {
 	getGraphData() {
 		const { selectedDate } = this.state;
 		const params = getDateRange(selectedDate);
-		const { path, site } = this.props;
+		const { path, site, reportType, siteId } = this.props;
 		const siteIds = Object.keys(site);
-		params['siteid'] = siteIds.toString();
-		params['interval'] = 'cumulative';
-		params['dimension'] = 'siteid';
+		if (reportType === 'site') params.siteid = siteId;
+		else {
+			params.siteid = siteIds.toString();
+			params.interval = 'cumulative';
+			params.dimension = 'siteid';
+		}
 		this.setState({ isLoading: true });
 		reportService.getWidgetData({ path, params }).then(response => {
 			if (response.status == 200 && response.data) {
@@ -36,10 +40,23 @@ class SitewiseReport extends React.Component {
 		});
 	}
 
+	formatTableData = tableBody => {
+		const { metrics } = this.props;
+		tableBody.forEach(row => {
+			for (let col in row) {
+				if (metrics[col]) {
+					let num = Math.round(row[col] * 100) / 100;
+					row[col] = numberWithCommas(num);
+				}
+			}
+		});
+		return tableBody;
+	};
+
 	computeTableData = data => {
 		const { result, columns } = data;
 		const tableHeader = [];
-		const { metrics, site } = this.props;
+		const { metrics, site, reportType } = this.props;
 		columns.forEach(col => {
 			if (metrics[col])
 				tableHeader.push({
@@ -48,16 +65,24 @@ class SitewiseReport extends React.Component {
 					position: metrics[col].position + 1
 				});
 		});
-		tableHeader.push({
-			title: 'Website',
-			prop: 'siteName',
-			position: 1
-		});
+		if (reportType === 'site')
+			tableHeader.push({
+				title: 'Date',
+				prop: 'date',
+				position: 1
+			});
+		else
+			tableHeader.push({
+				title: 'Website',
+				prop: 'siteName',
+				position: 1
+			});
 		tableHeader.sort((a, b) => a.position - b.position);
 		result.forEach(row => {
 			const { siteid } = row;
-			row['siteName'] = site[siteid] ? site[siteid]['siteName'] : 'Not Found';
+			row.siteName = site[siteid] ? site[siteid].siteName : 'Not Found';
 		});
+		let tableBody = this.formatTableData(result);
 		this.setState({ tableHeader, tableBody: result, isLoading: false });
 	};
 
@@ -91,7 +116,8 @@ class SitewiseReport extends React.Component {
 			<Datatable
 				tableHeader={tableHeader}
 				tableBody={tableBody}
-				rowsPerPageOption={[]}
+				rowsPerPage={10}
+				rowsPerPageOption={[20, 30, 40, 50]}
 				keyName="reportTable"
 			/>
 		);

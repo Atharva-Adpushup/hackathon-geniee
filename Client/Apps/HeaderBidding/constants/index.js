@@ -15,11 +15,11 @@ export const DEFAULT_ITEM = {
 };
 
 export const NAV_ITEMS_INDEXES = {
-	TAB_1: 'tab-1',
-	TAB_2: 'tab-2',
-	TAB_3: 'tab-3',
-	TAB_4: 'tab-4',
-	TAB_5: 'tab-5'
+	TAB_1: 'setup',
+	TAB_2: 'bidders',
+	TAB_3: 'inventory',
+	TAB_4: 'prebid-settings',
+	TAB_5: 'optimization'
 };
 
 export const NAV_ITEMS_VALUES = {

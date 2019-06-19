@@ -83,6 +83,8 @@ const filtersValues = {
 };
 const REPORT_PATH = '/site/report?report_name=get_stats_by_custom';
 
+const REPORT_DOWNLOAD_ENDPOINT = '/api/reports/downloadAdpushupReport';
+
 const displayMetrics = [
 	{ value: 'network_net_revenue', name: 'Network Net Revenue', valueType: 'money' },
 	{ value: 'adpushup_page_views', name: 'AdPushup PageViews', valueType: 'number' },
@@ -112,5 +114,6 @@ export {
 	displayMetrics,
 	activeLegendItem,
 	activeLegendItems,
-	accountFilter
+	accountFilter,
+	REPORT_DOWNLOAD_ENDPOINT
 };

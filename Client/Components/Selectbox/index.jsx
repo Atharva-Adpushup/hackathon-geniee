@@ -7,15 +7,18 @@ import { DropdownButton, MenuItem } from 'react-bootstrap';
 const findSelected = props => {
 	const { selected, title, options } = props;
 	let name = title;
+
 	if (selected === 0 || selected) {
 		for (let i = 0; i < options.length; i += 1) {
 			const option = options[i];
 			if (option.value === selected) {
+				// eslint-disable-next-line prefer-destructuring
 				name = option.name;
 				break;
 			}
 		}
 	}
+
 	return { selected, name };
 };
 

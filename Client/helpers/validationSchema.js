@@ -49,5 +49,48 @@ module.exports = {
 				}
 			]
 		}
+	},
+	hbApp: {
+		validations: {
+			isNull: [{ name: 'name', message: 'Please fill out name', value: '' }],
+			isLength: [
+				{ name: 'name', message: 'Enter name between 1 and 150', value: { min: 1, max: 150 } }
+			],
+			isEmail: [{ name: 'email', message: 'Enter email in name@example.com format', value: '' }],
+			isURL: [
+				{ name: 'site', message: 'Enter url in valid format', value: { require_protocol: true } }
+			],
+			equals: [
+				{
+					name: 'password',
+					message: 'Passwords do not match',
+					value: '',
+					matchAgainst: 'confirmPassword'
+				}
+			]
+		}
+	},
+	hbOptimization: {
+		validations: {
+			isNull: [{ name: 'bidder', message: 'Bidder Code cannot be blank', value: '', status: 403 }],
+			isIn: [
+				{
+					name: 'device',
+					message: 'Please provide a valid Device. Supported values - desktop, tablet, phone',
+					value: '',
+					status: 403,
+					allowedValues: ['DESKTOP', 'TABLET', 'PHONE']
+				}
+			],
+			isBoolean: [
+				{
+					name: 'status',
+					message: 'status property should be a boolean',
+					value: '',
+					status: 403
+				}
+			],
+			isLength: [{ name: 'country', message: 'Country Code is invalid', value: { min: 2, max: 2 } }]
+		}
 	}
 };

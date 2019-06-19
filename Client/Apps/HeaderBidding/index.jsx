@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import { Helmet } from 'react-helmet';
-import HeaderBidding from './components/HeaderBidding';
-// import '../../scss/pages/headerBidding/index.scss';
+import HeaderBiddingContainer from './containers/HeaderBiddingContainer';
+import '../../scss/apps/headerBidding/index.scss';
 
 const HeaderBiddingWrap = props => (
 	<Fragment>
@@ -9,7 +9,7 @@ const HeaderBiddingWrap = props => (
 			<title>Header Bidding</title>
 		</Helmet>
 
-		<HeaderBidding {...props} />
+		<HeaderBiddingContainer {...props} />
 	</Fragment>
 );
 

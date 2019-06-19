@@ -14,7 +14,7 @@
 		}
 	},
 	"lint-staged": {
-		"*.{js,jsx,scss,html}": [
+		"*.{js,jsx,html}": [
 			"./node_modules/.bin/eslint --ignore-path .eslintignore --fix",
 			"git add"
 		]
@@ -82,7 +82,7 @@
 		"react": "^16.8.3",
 		"react-addons-shallow-compare": "15.6.2",
 		"react-bootstrap": "^0.32.4",
-		"react-bs-datatable": "^1.2.6",
+		"react-bs-datatable": "git://github.com/RaviAdPushup/react-bs-datatable.git",
 		"react-codemirror": "^1.0.0",
 		"react-dates": "13.0.6",
 		"react-dom": "^16.8.3",
@@ -151,7 +151,7 @@
 		"style-loader": "^0.23.1",
 		"swagger-ui-express": "^4.0.2",
 		"url-loader": "^1.1.2",
-		"webpack": "^4.28.4",
+		"webpack": "4.28.2",
 		"webpack-bundle-analyzer": "^3.0.3",
 		"webpack-cli": "^3.2.1",
 		"webpack-dev-middleware": "^3.5.1",

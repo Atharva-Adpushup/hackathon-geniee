@@ -17,7 +17,7 @@ InputBox.propTypes = {
 	type: PropTypes.string.isRequired,
 	name: PropTypes.string.isRequired,
 	classNames: PropTypes.string,
-	value: PropTypes.string,
+	value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 	placeholder: PropTypes.string,
 	onChange: PropTypes.func
 };

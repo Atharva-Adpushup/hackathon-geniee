@@ -58,23 +58,86 @@ const CONTROL_CONVERSION_NETWORKS = {
 	}
 };
 
-const NETWORKS_COLLECTION = [
+const NETWORKS_NAME = {
+	ADSENSE: 'adsense',
+	ADX: 'adx',
+	DFP: 'dfp',
+	MEDIANET: 'medianet'
+};
+
+const NETWORK_PLACEHOLDERS = {
+	ADSENSE: `For example, enter AdSense ad code in below mentioned format: 
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<ins class="adsbygoogle"
+	style="display:block"
+	data-ad-client="ca-pub-XXXXXXXXXXXX"
+	data-ad-slot="XXXXXXXX"
+	data-full-width-responsive="true"></ins>
+<script>
+	(adsbygoogle = window.adsbygoogle || []).push({});
+</script>`,
+	ADX: `For example, enter AdX ad code in below mentioned format:
+<script type="text/javascript"><!--
+	google_ad_client = "ca-pub-XXXXXXXXXXXXXXXX";
+	/* Name_XXXxXXX */
+	google_ad_slot = "Name_XXXxXXX";
+	google_ad_width = XXX;
+	google_ad_height = XXX;
+	//-->
+</script>
+<script type="text/javascript"
+src="//pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>`,
+	DFP: `For example, enter DFP ad code in below mentioned format:
+<!-- /Ad-Name -->
+<div id='div-gpt-ad-XXXXXXXXXXXXX' style='height:XXXpx; width:XXXpx;'>
+<script>
+	googletag.cmd.push(function() { googletag.display('div-gpt-ad-XXXXXXXXXXXXX'); });
+</script>
+</div>`,
+	MEDIANET: `For example, enter Medianet ad code in below mentioned format:
+<script id="mNCC" language="javascript">
+    medianet_width = "XXX";
+    medianet_height = "XX";
+    medianet_crid = "XXXXXXXXX";
+    medianet_versionId = "XXXXXXX"; 
+</script>
+<script src="//contextual.media.net/nmedianet.js?cid=XXXXXXXXX"></script>
+`
+};
+
+const NETWORK_MEDIANET_INPUT_CODE_REGEXES = {
+	height: /medianet_height = "\w+"/gi,
+	width: /medianet_width = "\w+"/gi,
+	crid: /medianet_crid = "\w+"/gi,
+	versionId: /medianet_versionId = "\w+"/gi,
+	cid: /cid=\w+/gi
+};
+
+const NETWORK_COLLECTION = [
 	{
 		name: 'Adsense',
-		value: 'adsense'
+		value: NETWORKS_NAME.ADSENSE
 	},
 	{
 		name: 'AdX',
-		value: 'adx'
+		value: NETWORKS_NAME.ADX
 	},
 	{
 		name: 'DFP',
-		value: 'dfp'
+		value: NETWORKS_NAME.DFP
 	},
 	{
 		name: 'Medianet',
-		value: 'medianet'
+		value: NETWORKS_NAME.MEDIANET
 	}
 ];
 
-module.exports = { COMPONENT_TITLES, CONTROL_CONVERSION_NETWORKS, NETWORKS_COLLECTION };
+module.exports = {
+	COMPONENT_TITLES,
+	CONTROL_CONVERSION_NETWORKS,
+	NETWORK_COLLECTION,
+	NETWORKS_NAME,
+	NETWORK_PLACEHOLDERS,
+	NETWORK_MEDIANET_INPUT_CODE_REGEXES
+};

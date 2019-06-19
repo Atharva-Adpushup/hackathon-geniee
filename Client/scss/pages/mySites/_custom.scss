@@ -1,3 +1,11 @@
+$cardWidth: ($fullPercentage - 70);
+$cardMinHeight: 237px;
+
+.card-wrapper {
+	min-height: $cardMinHeight;
+	width: $cardWidth;
+}
+
 .card {
 	> .card-body {
 		.panel-heading {
@@ -33,8 +41,12 @@
 		}
 	}
 
+	&.card--theme-dotted {
+		width: $fullPercentage;
+	}
+
 	&.panel {
-		width: ($fullPercentage - 70);
+		width: $cardWidth;
 
 		&.panel-success {
 			> .card-body {

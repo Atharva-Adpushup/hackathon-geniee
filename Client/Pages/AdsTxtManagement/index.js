@@ -12,6 +12,7 @@ import CustomButton from '../../Components/CustomButton';
 import CustomMessage from '../../Components/CustomMessage/index';
 import { copyToClipBoard } from '../../Apps/ApTag/lib/helpers';
 import SendCodeByEmailModal from '../../Components/SendCodeByEmailModal';
+import '../../scss/pages/adsTxtManagement/index.scss';
 import {
 	ADSTXT_NAV_ITEMS,
 	ADSTXT_NAV_ITEMS_INDEXES,

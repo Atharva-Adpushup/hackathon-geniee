@@ -32,7 +32,8 @@ var model = require('../helpers/model'),
 			'isManual',
 			'isInnovative',
 			'gdpr',
-			'ampSettings'
+			'ampSettings',
+			'apps'
 		];
 		this.clientKeys = [
 			'siteId',
@@ -48,7 +49,8 @@ var model = require('../helpers/model'),
 			'isManual',
 			'isInnovative',
 			'gdpr',
-			'ampSettings'
+			'ampSettings',
+			'apps'
 		];
 		this.validations = {
 			required: []
@@ -68,7 +70,8 @@ var model = require('../helpers/model'),
 				cmsName: '',
 				pageGroups: []
 			},
-			adNetworkSettings: commonConsts.DEFAULT_AD_NETWORK_SETTINGS
+			adNetworkSettings: commonConsts.DEFAULT_AD_NETWORK_SETTINGS,
+			apps: {}
 		};
 		this.ignore = [];
 		this.classMap = { apConfigs: apConfigSchema };
@@ -443,6 +446,224 @@ function apiModule() {
 				});
 		},
 		getSiteChannels: siteId => API.getSiteById(siteId).then(site => site.get('channels')),
+		isLayoutInventoryExist: siteId => {
+			return API.getSiteById(siteId)
+				.then(site => site.getAllChannels())
+				.then(channels => {
+					let inventoryFound = false;
+					// eslint-disable-next-line no-restricted-syntax
+					for (const channel of channels) {
+						if (inventoryFound) break;
+						// eslint-disable-next-line no-restricted-syntax
+						if (channel.variations && Object.keys(channel.variations).length) {
+							for (const variationKey in channel.variations) {
+								if (inventoryFound) break;
+
+								const variation = channel.variations[variationKey];
+
+								if (variation.sections && Object.keys(variation.sections).length) {
+									for (const sectionKey in variation.sections) {
+										if (inventoryFound) break;
+
+										const section = variation.sections[sectionKey];
+
+										if (section.ads && Object.keys(section.ads).length) {
+											for (const adKey in section.ads) {
+												if (inventoryFound) break;
+												
+												const ad = section.ads[adKey];
+
+												if (ad.network === 'adpTags') {
+													inventoryFound = true;
+													break;
+												}
+											}
+										} else {
+											continue;
+										}
+									}
+								} else {
+									continue;
+								}
+							}
+						} else {
+							continue;
+						}
+					}
+
+					if (inventoryFound) return inventoryFound;
+					throw new AdPushupError('Inventory Not Found');
+				});
+		},
+		getLayoutInventorySizes: siteId => {
+			return API.getSiteById(siteId)
+				.then(site => site.getAllChannels())
+				.then(channels => {
+					const sizesArray = [];
+
+					// eslint-disable-next-line no-restricted-syntax
+					for (const channel of channels) {
+						// eslint-disable-next-line no-restricted-syntax
+						if (channel.variations && Object.keys(channel.variations).length) {
+							for (const variationKey in channel.variations) {
+								const variation = channel.variations[variationKey];
+
+								if (variation.sections && Object.keys(variation.sections).length) {
+									for (const sectionKey in variation.sections) {
+										const section = variation.sections[sectionKey];
+
+										if (section.ads && Object.keys(section.ads).length) {
+											for (const adKey in section.ads) {												
+												const ad = section.ads[adKey];
+
+												if (ad.network === 'adpTags') {
+													if(ad.width === 'responsive') {
+														sizesArray.push(ad.width);
+														continue;
+													}
+													sizesArray.push(`${ad.width}x${ad.height}`);
+												}
+											}
+										} else {
+											continue;
+										}
+									}
+								} else {
+									continue;
+								}
+							}
+						} else {
+							continue;
+						}
+					}
+
+					return sizesArray;
+				});
+		},
+		isApTagInventoryExist: siteId => {
+			return couchbase
+				.connectToAppBucket()
+				.then(function (appBucket) {
+					return appBucket.getAsync('tgmr::' + siteId, {});
+				})
+				.then(({ value }) => {
+					let apTagInventoryFound = false;
+					if (value.ads.length) {
+						for (const ad of value.ads) {
+							apTagInventoryFound = ad.network === 'adpTags';
+							if (apTagInventoryFound) break;
+						}
+					}
+
+					if (apTagInventoryFound) return apTagInventoryFound;
+					throw new AdPushupError('Inventory Not Found');
+				})
+				.catch(err => {
+					if (err.code === 13) {
+						throw new AdPushupError('Inventory Not Found');
+					}
+
+					throw err;
+				});
+		},
+		getApTagInventorySizes: siteId => {
+			return couchbase
+				.connectToAppBucket()
+				.then(function (appBucket) {
+					return appBucket.getAsync('tgmr::' + siteId, {});
+				})
+				.then(({ value }) => {
+					const sizesArray = [];
+					if (value.ads.length) {
+						for (const ad of value.ads) {
+							if (ad.network === 'adpTags') {
+								if(ad.width === 'responsive') {
+									sizesArray.push(ad.width);
+									continue;
+								}
+								sizesArray.push(`${ad.width}x${ad.height}`);
+							}
+						}
+					}
+
+					return sizesArray;
+				})
+				.catch(err => {
+					if (err.code === 13) {
+						throw new AdPushupError('Inventory Not Found');
+					}
+
+					throw err;
+				});
+		},
+		isInnovativeAdInventoryExist: siteId => {
+			return couchbase
+				.connectToAppBucket()
+				.then(function (appBucket) {
+					return appBucket.getAsync('fmrt::' + siteId, {});
+				})
+				.then(({ value }) => {
+					let innovativeAdInventoryFound = false;
+					if (value.ads.length) {
+						for (const ad of value.ads) {
+							innovativeAdInventoryFound = ad.network === 'adpTags';
+							if (innovativeAdInventoryFound) break;
+						}
+					}
+
+					if (innovativeAdInventoryFound) return innovativeAdInventoryFound;
+					throw new AdPushupError('Inventory Not Found');
+				})
+				.catch(err => {
+					if (err.code === 13) {
+						throw new AdPushupError('Inventory Not Found');
+					}
+					
+					throw err;
+				});
+		},
+		getInnovativeAdInventorySizes: siteId => {
+			return couchbase
+				.connectToAppBucket()
+				.then(function (appBucket) {
+					return appBucket.getAsync('fmrt::' + siteId, {});
+				})
+				.then(({ value }) => {
+					const sizesArray = [];
+					if (value.ads.length) {
+						for (const ad of value.ads) {
+							if (ad.network === 'adpTags') {
+								if(ad.width === 'responsive') {
+									sizesArray.push(ad.width);
+									continue;
+								}
+								sizesArray.push(`${ad.width}x${ad.height}`);
+							}
+						}
+					}
+
+					return sizesArray;
+				})
+				.catch(err => {
+					if (err.code === 13) {
+						throw new AdPushupError('Inventory Not Found');
+					}
+					
+					throw err;
+				});
+		},
+		isInventoryExist: siteId => {
+			return API.isLayoutInventoryExist(siteId)
+				.catch(() => API.isApTagInventoryExist(siteId))
+				.catch(() => API.isInnovativeAdInventoryExist(siteId));
+		},
+		getUniqueInventorySizes: siteId => {
+			return Promise
+				.all([API.getLayoutInventorySizes(siteId), API.getApTagInventorySizes(siteId), API.getInnovativeAdInventorySizes(siteId)])
+				.then(([layoutInventorySizes, apTagInventorySizes, innovativeAdInventorySizes]) => {
+					return [...new Set([...layoutInventorySizes, ...apTagInventorySizes, ...innovativeAdInventorySizes])]
+				});
+		},
 		setSiteStep: function(siteId, onboardingStage, step) {
 			return API.getSiteById(siteId)
 				.then(function(site) {
