@@ -203,23 +203,24 @@ function apiModule() {
 						var data = result[0].value;
 
 						return API.deleteChannel(data.siteId, data.platform, data.pageGroup)
-							.then(function() {
-								return siteModel.getSitePageGroups(data.siteId);
-							})
-							.then(function(pageGroups) {
-								var selectedPagegroups = _.filter(pageGroups, { pageGroup: data.pageGroup });
+							.then(() => siteModel.getSitePageGroups(data.siteId))
+							.then((pageGroups) => {
+								// I didn't understand why did we find selectedPagegroups and if result is empty
+								// then resolving without any value which would break the next then callback
+								// so I am commenting the following code and returning the siteModel
+								
+								// var selectedPagegroups = _.filter(pageGroups, { pageGroup: data.pageGroup });
+								// return selectedPagegroups.length === 0 ? siteModel.getSiteById(data.siteId) : resolve();
 
-								return selectedPagegroups.length === 0 ? siteModel.getSiteById(data.siteId) : resolve();
+								return siteModel.getSiteById(data.siteId);
 							})
-							.then(function(site) {
+							.then(site => {
 								var cmsPageGroups = site.get('cmsInfo').pageGroups;
-								_.remove(cmsPageGroups, function(p) {
-									return p.pageGroup === data.pageGroup;
-								});
+								_.remove(cmsPageGroups, p => p.pageGroup === data.pageGroup);
 
 								site.set('cmsInfo', { cmsName: '', pageGroups: cmsPageGroups });
 								site.save();
-								return resolve();
+								return resolve(site);
 							});
 					});
 				});

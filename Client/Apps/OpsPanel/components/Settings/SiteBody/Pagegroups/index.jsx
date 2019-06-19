@@ -28,7 +28,8 @@ class Pagegroups extends Component {
 			fetchChannelsInfo,
 			createChannels,
 			showNotification,
-			updatePagegroupPattern
+			updatePagegroupPattern,
+			deletePagegroup
 		} = this.props;
 		switch (view) {
 			default:
@@ -40,6 +41,7 @@ class Pagegroups extends Component {
 						fetchChannelsInfo={fetchChannelsInfo}
 						showNotification={showNotification}
 						updatePagegroupPattern={updatePagegroupPattern}
+						deletePagegroup={deletePagegroup}
 					/>
 				);
 			case 'create':

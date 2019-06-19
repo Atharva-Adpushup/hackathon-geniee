@@ -176,4 +176,46 @@ const updatePagegroupPattern = (siteId, params) => (dispatch, getState) => {
 		.catch(err => errorHandler(err, 'Pagegroup pattern updation failed'));
 };
 
-export { createChannels, fetchChannelsInfo, updatePagegroupPattern };
+const deletePagegroup = (siteId, params) => (dispatch, getState) =>
+	axiosInstance
+		.post('/channel/deleteChannel', { siteId, channelId: params.channelId })
+		.then(response => {
+			const {
+				global: { sites }
+			} = getState();
+			const { data } = response.data;
+			const { channels, cmsInfo } = data;
+			const site = sites.data[siteId];
+			const { cmsInfo: siteCMSInfo } = site;
+			const { channelsInfo } = siteCMSInfo;
+
+			delete channelsInfo[params.channelKey];
+			cmsInfo.channelsInfo = channelsInfo;
+
+			dispatch({
+				type: SITE_ACTIONS.UPDATE_SITE_DATA_KEY_OBJ,
+				data: {
+					siteId,
+					key: 'cmsInfo',
+					value: cmsInfo
+				}
+			});
+			dispatch({
+				type: SITE_ACTIONS.UPDATE_SITE_DATA_KEY_ARRAY,
+				data: {
+					siteId,
+					key: 'channels',
+					value: channels
+				}
+			});
+			dispatch({
+				type: UI_ACTIONS.SHOW_NOTIFICATION,
+				mode: 'success',
+				title: 'Operation Successful',
+				autoDismiss: 5,
+				message: `Pagegroup -- ${params.channelKey} Deleted`
+			});
+		})
+		.catch(err => errorHandler(err, 'Pagegroup deletion failed'));
+
+export { createChannels, fetchChannelsInfo, updatePagegroupPattern, deletePagegroup };

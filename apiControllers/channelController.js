@@ -1,3 +1,4 @@
+const Promise = require('bluebird');
 const { promiseForeach } = require('node-utils');
 const express = require('express');
 
@@ -17,27 +18,30 @@ const hlprs = {
 		const encodedChannel = utils.getHtmlEncodedJSON(channel);
 		encodedChannel.siteId = channel.siteId;
 
-		return channelModel
-			.createPageGroup(encodedChannel)
-			.then(() => userModel.setSitePageGroups(userEmail))
-			.then(user => user.save())
-			.then(() => {
-				if (successful.cmsInfo.created.indexOf(channel.pageGroupName) === -1) {
-					successful.cmsInfo.created.push(channel.pageGroupName);
-					successful.cmsInfo.pagegroups.push({
-						sampleUrl: channel.sampleUrl,
+		return Promise.join(channelModel.createPageGroup(encodedChannel), response => {
+			const { id: channelId } = response;
+			return userModel
+				.setSitePageGroups(userEmail)
+				.then(user => user.save())
+				.then(() => {
+					if (successful.cmsInfo.created.indexOf(channel.pageGroupName) === -1) {
+						successful.cmsInfo.created.push(channel.pageGroupName);
+						successful.cmsInfo.pagegroups.push({
+							sampleUrl: channel.sampleUrl,
+							pageGroup: channel.pageGroupName
+						});
+					}
+					successful.cmsInfo.channelsInfo[`${channel.device}:${channel.pageGroupName}`] = {
+						id: `chnl::${channel.siteId}:${channel.device}:${channel.pageGroupName}`,
+						channelId,
+						variationsCount: 0,
+						platform: channel.device,
 						pageGroup: channel.pageGroupName
-					});
-				}
-				successful.cmsInfo.channelsInfo[`${channel.device}:${channel.pageGroupName}`] = {
-					id: `chnl:${channel.siteId}:${channel.device}:${channel.pageGroupName}`,
-					variationsCount: 0,
-					platform: channel.device,
-					pageGroup: channel.pageGroupName
-				};
-				successful.channels.push(`${channel.device}:${channel.pageGroupName}`);
-				return true;
-			});
+					};
+					successful.channels.push(`${channel.device}:${channel.pageGroupName}`);
+					return true;
+				});
+		});
 	}
 };
 
@@ -55,7 +59,7 @@ router
 		return verifyOwner(siteId, req.user.email)
 			.then(() =>
 				appBucket.queryDB(
-					`select  meta().id, object_length(variations) as variationsCount, platform, pageGroup from ${
+					`select  meta().id, id as channelId, object_length(variations) as variationsCount, platform, pageGroup from ${
 						config.couchBase.DEFAULT_BUCKET
 					} where meta().id like 'chnl::%' and siteId = ${siteId};`
 				)
@@ -131,6 +135,32 @@ router
 				)
 			)
 			.catch(err => errorHandler(err, res, HTTP_STATUS.BAD_REQUEST, { failed, successful }));
+	})
+	.post('/deleteChannel', (req, res) => {
+		const { channelId, siteId } = req.body;
+		if (!channelId || !siteId) {
+			return sendErrorResponse(
+				{
+					message: 'Missing params. ChannelId and SiteId are required params.',
+					code: HTTP_STATUS.BAD
+				},
+				res
+			);
+		}
+
+		return verifyOwner(siteId, req.user.email)
+			.then(() => channelModel.deletePagegroupById(channelId))
+			.then(site => {
+				sendSuccessResponse(
+					{
+						message: 'Pagegroup successfully deleted',
+						channels: site.get('channels'),
+						cmsInfo: site.get('cmsInfo')
+					},
+					res
+				);
+			})
+			.catch(err => errorHandler(err, res, HTTP_STATUS.INTERNAL_SERVER_ERROR));
 	});
 
 module.exports = router;

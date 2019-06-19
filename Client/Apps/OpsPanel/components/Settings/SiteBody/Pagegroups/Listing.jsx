@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 import React, { Component, Fragment } from 'react';
 import { Table, Modal } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -54,7 +55,7 @@ class Listing extends Component {
 	};
 
 	editRegex = value => {
-		const [pattern, pageGroup, platform, siteId] = value.split('-');
+		const { pattern, pageGroup, platform, siteId } = value;
 		return this.modalToggle({
 			header: 'Edit Pagegroup Pattern',
 			body: (
@@ -75,6 +76,22 @@ class Listing extends Component {
 			),
 			footer: false
 		});
+	};
+
+	deletePagegroup = value => {
+		const { deletePagegroup } = this.props;
+		const { channelId, siteId, platform, pageGroup } = value;
+		if (
+			window.confirm(
+				`Are you sure you want to delete ${platform}:${pageGroup} for siteId -- ${siteId}`
+			)
+		) {
+			return deletePagegroup(siteId, {
+				channelId,
+				channelKey: `${platform.toUpperCase()}:${pageGroup}`
+			});
+		}
+		return false;
 	};
 
 	render() {
@@ -133,23 +150,34 @@ class Listing extends Component {
 											icon="edit"
 											className="u-text-red u-margin-l3 u-cursor-pointer"
 											onClick={this.editRegex}
-											toReturn={`${pattern}-${channel.pageGroup}-${channel.platform}-${
-												site.siteId
-											}`}
+											toReturn={{
+												pattern,
+												pageGroup: channel.pageGroup,
+												platform: channel.platform,
+												siteId: site.siteId
+											}}
 											title="Edit Pagegroup Pattern"
 										/>
 									</td>
 									<td>
 										<Link to={`/user/site/${site.siteId}/editor`}>
-											<FontAwesomeIcon icon="code" className="u-text-red u-margin-r2" />
+											<FontAwesomeIcon
+												icon="code"
+												className="u-text-red u-margin-r2 u-cursor-pointer"
+											/>
 										</Link>
 										|
-										<FontAwesomeIcon
+										<CustomIcon
 											icon="trash"
-											className="u-text-red u-margin-l2"
-											onClick={() => {
-												console.log('Trash Clicked');
+											className="u-text-red u-margin-l2 u-cursor-pointer"
+											onClick={this.deletePagegroup}
+											toReturn={{
+												pageGroup: channel.pageGroup,
+												platform: channel.platform,
+												channelId: channel.channelId,
+												siteId: site.siteId
 											}}
+											title="Delete Pagegroup Pattern"
 										/>
 									</td>
 								</tr>
@@ -157,7 +185,7 @@ class Listing extends Component {
 						})}
 					</tbody>
 				</Table>
-				<Modal show={show} onHide={this.modalToggle}>
+				<Modal show={show} onHide={this.modalToggle} bsSize="large">
 					<Modal.Header>
 						<Modal.Title>{modalData.header}</Modal.Title>
 					</Modal.Header>
