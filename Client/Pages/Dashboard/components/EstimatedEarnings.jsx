@@ -41,8 +41,8 @@ class EstimatedEarnings extends React.Component {
 	}
 
 	renderLoader = () => (
-		<div style={{ position: 'relative', width: '100%', height: '30%' }}>
-			<Loader />
+		<div style={{ position: 'relative', width: '100%' }}>
+			<Loader height="20vh" />
 		</div>
 	);
 

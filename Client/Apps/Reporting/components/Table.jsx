@@ -43,10 +43,11 @@ class Table extends React.Component {
 	};
 
 	updateTableData = () => {
-		const { dimension, metrics, tableData } = this.state;
+		let { dimension, metrics, tableData } = this.state;
 		const { selectedInterval, startDate, endDate, getTableData } = this.props;
 		if (tableData.columns && tableData.result.length > 0) {
 			let tableHeader = [];
+			let displayTableData = [];
 			const grandTotal = tableData.total;
 			let tableBody = tableData.result;
 			const headers = tableData.columns;
@@ -77,36 +78,38 @@ class Table extends React.Component {
 			if (selectedInterval === 'monthly')
 				tableBody = sortBy(sortBy(tableBody, row => row.month), row => row.year);
 			tableBody.forEach(row => {
-				if (selectedInterval === 'daily') row.date = moment(row.date).format('ll');
+				let tableRow = { ...row };
+				if (selectedInterval === 'daily') tableRow.date = moment(tableRow.date).format('ll');
 				if (selectedInterval === 'monthly') {
 					if (
-						row.month == moment(startDate).format('M') &&
-						row.year == moment(startDate).format('Y')
+						tableRow.month == moment(startDate).format('M') &&
+						tableRow.year == moment(startDate).format('Y')
 					) {
-						row.date =
+						tableRow.date =
 							moment(startDate).format('ll') +
 							' to ' +
 							moment(startDate)
 								.endOf('month')
 								.format('ll');
 					} else if (
-						row.month == moment(endDate).format('M') &&
-						row.year == moment(endDate).format('Y')
+						tableRow.month == moment(endDate).format('M') &&
+						tableRow.year == moment(endDate).format('Y')
 					) {
-						row.date =
+						tableRow.date =
 							moment(endDate)
 								.startOf('month')
 								.format('ll') +
 							' to ' +
 							moment(endDate).format('ll');
 					} else {
-						let fromDate = moment([row.year, row.month - 1]);
+						let fromDate = moment([tableRow.year, tableRow.month - 1]);
 						let toDate = moment(fromDate).endOf('month');
-						row.date = fromDate.format('ll') + ' to ' + toDate.format('ll');
+						tableRow.date = fromDate.format('ll') + ' to ' + toDate.format('ll');
 					}
 				}
 				if (selectedInterval === 'cumulative')
 					row.date = moment(startDate).format('ll') + ' to ' + moment(endDate).format('ll');
+				displayTableData.push(tableRow);
 			});
 
 			Object.keys(grandTotal).forEach(key => {
@@ -118,10 +121,10 @@ class Table extends React.Component {
 				delete grandTotal[key];
 			});
 			grandTotal[tableHeader[0].prop] = 'Total';
-			//tableBody.push(grandTotal);
-			tableBody = this.formatTableData(tableBody);
-			this.setState({ tableBody, tableHeader, grandTotal }, () => {
-				getTableData({ tableBody, tableHeader, grandTotal });
+
+			displayTableData = this.formatTableData(displayTableData);
+			this.setState({ tableBody: displayTableData, tableHeader, grandTotal }, () => {
+				getTableData({ tableBody: displayTableData, tableHeader, grandTotal });
 			});
 		}
 	};

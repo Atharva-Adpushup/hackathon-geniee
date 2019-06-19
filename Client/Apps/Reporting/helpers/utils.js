@@ -52,9 +52,7 @@ const numberWithCommas = x => {
 const getPresets = () => {
 	const today = moment();
 	const yesterday = moment().subtract(1, 'day');
-	const last7Days = moment()
-		.subtract(1, 'week')
-		.subtract(1, 'day');
+	const last7Days = moment().subtract(1, 'week');
 	return [
 		{
 			text: 'Today',
@@ -79,7 +77,7 @@ const getPresets = () => {
 		{
 			text: 'This Month',
 			start: moment().startOf('month'),
-			end: today
+			end: yesterday
 		},
 		{
 			text: 'Last Month',

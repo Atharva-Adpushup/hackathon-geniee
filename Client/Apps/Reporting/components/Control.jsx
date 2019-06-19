@@ -14,25 +14,51 @@ import { accountFilter, REPORT_DOWNLOAD_ENDPOINT } from '../configs/commonConsts
 class Control extends Component {
 	constructor(props) {
 		super(props);
-		const dimension = Object.assign({}, props.dimension);
 
 		this.state = {
-			dimensionList: convertObjToArr(dimension),
-			filterList: convertObjToArr(props.filter),
-			intervalList: convertObjToArr(props.interval),
+			dimensionList: props.dimensionList,
+			filterList: props.filterList,
+			intervalList: props.intervalList,
 			metricsList: props.metricsList,
 			startDate: props.startDate,
 			endDate: props.endDate,
+			reportType: props.reportType,
 			selectedDimension: props.selectedDimension || '',
 			selectedInterval: props.selectedInterval || '',
-			selectedMetrics: props.selectedMetrics,
 			selectedFilters: props.selectedFilters || {},
 			disableGenerateButton: false
 		};
 	}
 
 	componentDidMount() {
-		const { reportType, filter } = this.props;
+		this.updateFilterList(this.props.reportType);
+	}
+
+	componentDidUpdate(prevProps) {
+		const { selectedDimension, selectedFilters, selectedInterval, startDate, endDate } = this.props;
+		if (prevProps.selectedFilters !== selectedFilters) {
+			this.setState({ selectedFilters });
+		}
+		if (prevProps.selectedDimension !== selectedDimension) {
+			this.setState({ selectedDimension });
+		}
+		if (prevProps.selectedInterval !== selectedInterval) {
+			this.setState({ selectedInterval });
+		}
+		if (prevProps.startDate !== startDate) {
+			this.setState({ startDate });
+		}
+		if (prevProps.endDate !== endDate) {
+			this.setState({ endDate });
+		}
+		if (prevProps.reportType !== this.props.reportType) {
+			this.updateFilterList(this.props.reportType);
+		}
+	}
+
+	updateFilterList = reportType => {
+		const { filter } = this.props;
+		let { filterList } = this.state;
 		if (reportType === 'account') {
 			let updatedFilterList = [];
 			for (let fil in filter) {
@@ -43,33 +69,12 @@ class Control extends Component {
 			}
 			updatedFilterList = sortBy(updatedFilterList, filter => filter.position);
 
-			this.setState({ filterList: updatedFilterList });
+			filterList = updatedFilterList;
 		} else {
-			this.setState({ filterList: convertObjToArr(filter) });
+			filterList = convertObjToArr(filter);
 		}
-	}
-
-	componentDidUpdate(prevProps) {
-		if (prevProps.selectedFilters !== this.props.selectedFilters) {
-			this.setState({ selectedFilters: this.props.selectedFilters });
-		}
-		if (prevProps.reportType !== this.props.reportType) {
-			const { reportType, filter } = this.props;
-			if (reportType === 'account') {
-				let updatedFilterList = [];
-				for (let fil in filter) {
-					let index = accountFilter.indexOf(fil);
-					if (index >= 0) {
-						updatedFilterList.push(filter[fil]);
-					}
-				}
-				updatedFilterList = sortBy(updatedFilterList, filter => filter.position);
-				this.setState({ filterList: updatedFilterList });
-			} else {
-				this.setState({ filterList: convertObjToArr(filter) });
-			}
-		}
-	}
+		this.setState({ filterList });
+	};
 
 	getSelectedFilter = filter => {
 		const { reportType } = this.props;
@@ -108,51 +113,20 @@ class Control extends Component {
 		this.setState({ filterList, metricsList, dimensionList });
 	};
 
-	onFilterChange = selectedFilters => {
-		let { filterList } = this.state;
-		let selectedFilterKeys = selectedFilters ? Object.keys(selectedFilters) : [];
-		let filterObj;
-		let disabledFilter = [];
-		let disabledDimension = [];
-		let disabledMetrics = [];
-		selectedFilterKeys.map(key => {
-			let found = filterList.find(filter => filter.value === key);
-			if (found) {
-				if (!filterObj) {
-					filterObj = { ...found };
-					disabledFilter = filterObj['disabled_filter'] || [];
-					disabledDimension = filterObj['disabled_dimension'] || [];
-					disabledMetrics = filterObj['disabled_metrics'] || [];
-				} else {
-					disabledFilter = found['disabled_filter']
-						? arrayUnique(disabledFilter.concat(found['disabled_filter']))
-						: disabledFilter;
-					disabledDimension = found['disabled_dimension']
-						? arrayUnique(disabledDimension.concat(found['disabled_dimension']))
-						: disabledDimension;
-					disabledMetrics = found['disabled_metrics']
-						? arrayUnique(disabledMetrics.concat(found['disabled_metrics']))
-						: disabledMetrics;
-				}
-			}
-		});
-
-		this.disableControl(disabledFilter, disabledDimension, disabledMetrics);
-		this.setState({ selectedFilters });
-	};
-
 	onDimensionChange = selectedDimension => {
 		let { dimensionList } = this.state;
 		let dimensionObj = dimensionList.find(dimension => dimension.value === selectedDimension);
-		let disabledFilter = dimensionObj['disabled_filter'];
-		let disabledDimension = dimensionObj['disabled_dimension'];
-		let disabledMetrics = dimensionObj['disabled_metrics'];
-		this.disableControl(disabledFilter, disabledDimension, disabledMetrics);
-		this.setState({ selectedDimension });
+		if (dimensionObj) {
+			let disabledFilter = dimensionObj['disabled_filter'];
+			let disabledDimension = dimensionObj['disabled_dimension'];
+			let disabledMetrics = dimensionObj['disabled_metrics'];
+			this.disableControl(disabledFilter, disabledDimension, disabledMetrics);
+		}
 	};
 
-	datesUpdated = ({ startDate, endDate }) => {
-		this.setState({ startDate, endDate });
+	onFilterChange = selectedFilters => {
+		if (selectedFilters && selectedFilters['siteid']) this.updateFilterList('site');
+		this.setState({ selectedFilters });
 	};
 
 	generateButtonHandler = () => {
@@ -162,7 +136,6 @@ class Control extends Component {
 			selectedDimension,
 			selectedInterval,
 			selectedFilters,
-			selectedMetrics,
 			metricsList
 		} = this.state;
 		const { generateButtonHandler } = this.props;
@@ -171,7 +144,6 @@ class Control extends Component {
 			endDate,
 			selectedDimension,
 			selectedFilters,
-			selectedMetrics,
 			selectedInterval,
 			metricsList
 		});
@@ -196,7 +168,10 @@ class Control extends Component {
 							isSearchable={false}
 							selected={state.selectedDimension || ''}
 							options={state.dimensionList}
-							onSelect={this.onDimensionChange}
+							onSelect={selectedDimension => {
+								this.onDimensionChange();
+								this.setState({ selectedDimension });
+							}}
 						/>
 						{/* eslint-enable */}
 					</div>
@@ -223,7 +198,7 @@ class Control extends Component {
 							presets={getPresets()}
 							startDate={state.startDate}
 							endDate={state.endDate}
-							datesUpdated={this.datesUpdated}
+							datesUpdated={({ startDate, endDate }) => this.setState({ startDate, endDate })}
 							autoFocus
 						/>
 						{/* eslint-enable */}

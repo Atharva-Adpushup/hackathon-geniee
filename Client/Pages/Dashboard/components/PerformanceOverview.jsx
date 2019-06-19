@@ -1,6 +1,8 @@
 import React from 'react';
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col, Button } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
+import moment from 'moment';
 import { convertObjToArr, getDateRange } from '../helpers/utils';
 import { dates } from '../configs/commonConsts';
 import reportService from '../../../services/reportService';
@@ -19,7 +21,15 @@ class PerformanceOverview extends React.Component {
 			sites,
 			selectedSite: sites[0] ? sites[0].value : '',
 			displayData: {},
-			isLoading: true
+			isLoading: true,
+			startDate: moment()
+				.startOf('day')
+				.subtract(7, 'days')
+				.format('YYYY-MM-DD'),
+			endDate: moment()
+				.startOf('day')
+				.subtract(1, 'day')
+				.format('YYYY-MM-DD')
 		};
 	}
 
@@ -32,7 +42,7 @@ class PerformanceOverview extends React.Component {
 		const { path } = this.props;
 		const params = getDateRange(selectedDate);
 		params.siteid = selectedSite;
-		this.setState({ isLoading: true });
+		this.setState({ isLoading: true, startDate: params['fromDate'], endDate: params['toDate'] });
 		reportService.getWidgetData({ path, params }).then(response => {
 			if (response.status == 200 && response.data) {
 				this.computeData(response.data);
@@ -65,8 +75,8 @@ class PerformanceOverview extends React.Component {
 	};
 
 	renderLoader = () => (
-		<div style={{ position: 'relative', width: '100%', height: '30%' }}>
-			<Loader />
+		<div style={{ position: 'relative', width: '100%' }}>
+			<Loader height="20vh" />
 		</div>
 	);
 
@@ -116,7 +126,7 @@ class PerformanceOverview extends React.Component {
 	}
 
 	render() {
-		const { displayData, isLoading } = this.state;
+		const { displayData, isLoading, selectedSite, startDate, endDate } = this.state;
 		return (
 			<Row>
 				<Col sm={12}>{this.renderControl()}</Col>
@@ -140,8 +150,18 @@ class PerformanceOverview extends React.Component {
 					)}
 				</Col>
 				<Col sm={12}>
-					<Link to="/reports" className="float-right">
-						View Reports
+					<Link
+						to={
+							selectedSite
+								? `/reports/${selectedSite}?fromDate=${startDate}&toDate=${endDate}`
+								: `/reports?fromDate=${startDate}&toDate=${endDate}`
+						}
+						className="u-link-reset aligner aligner-item float-right"
+					>
+						<Button className="aligner-item aligner aligner--vCenter">
+							View Reports
+							<FontAwesomeIcon icon="chart-area" className="u-margin-l2" />
+						</Button>
 					</Link>
 				</Col>
 			</Row>
