@@ -1,4 +1,3 @@
-/* eslint-disable react/no-unused-state */
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable prefer-destructuring */
 import React, { Component } from 'react';
@@ -31,6 +30,7 @@ class SelectBox extends Component {
 	selectWrapper = (key, e) => {
 		const { onSelect, options } = this.props;
 		const optionValueType = typeof options[0].value;
+		const dataKey = e.target.getAttribute('data-key');
 		let value;
 		switch (optionValueType) {
 			case 'number': {
@@ -45,16 +45,24 @@ class SelectBox extends Component {
 		}
 		this.setState(
 			{
-				// selected: value,
 				name: e.target.getAttribute('data-name')
 			},
-			() => onSelect(value)
+			() => onSelect(value, dataKey)
 		);
 	};
 
 	render() {
 		const { name } = this.state;
-		const { selected, options, id, title, wrapperClassName, dropdownClassName, type } = this.props;
+		const {
+			selected,
+			options,
+			id,
+			title,
+			wrapperClassName,
+			dropdownClassName,
+			type,
+			dataKey
+		} = this.props;
 		const buttonTitle = selected === 0 || selected ? name : title;
 		return (
 			<div className={`custom-select-box-wrapper ${wrapperClassName}`}>
@@ -68,10 +76,10 @@ class SelectBox extends Component {
 					{options.map((option, key) => (
 						<MenuItem
 							eventKey={`id-${key}`}
-							// eslint-disable-next-line react/no-array-index-key
-							key={key}
+							key={option.value}
 							data-value={option.value}
 							data-name={option.name}
+							data-key={dataKey}
 							active={selected === option.value}
 						>
 							{option.name}

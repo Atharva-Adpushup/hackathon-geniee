@@ -184,7 +184,8 @@ router
 				)
 			)
 			.catch(err => {
-				sendErrorResponse(err, res);
+				console.log(err);
+				return sendErrorResponse(err, res);
 			});
 	})
 	.post('/saveApConfigs', (req, res) => {
@@ -201,10 +202,31 @@ router
 				});
 
 				site.set('apConfigs', { ...siteApConfigs });
-				return site.save().then(() => sendSuccessResponse({ success: 1 }, res));
+				return site.save();
 			})
+			.then(() => sendSuccessResponse({ success: 1 }, res))
 			.catch(err => {
-				sendErrorResponse(err, res);
+				console.log(err);
+				return sendErrorResponse(err, res);
+			});
+	})
+	.post('/saveSettings', (req, res) => {
+		const { email } = req.user;
+		const { siteId, apConfigs, adNetworkSettings } = req.body;
+
+		return verifyOwner(siteId, email)
+			.then(site => {
+				const siteApConfigs = { ...site.get('apConfigs'), ...apConfigs };
+				const siteAdNetworkSettings = { ...site.get('adNetworkSettings'), ...adNetworkSettings };
+
+				site.set('apConfigs', siteApConfigs);
+				site.set('adNetworkSettings', siteAdNetworkSettings);
+				return site.save();
+			})
+			.then(() => sendSuccessResponse({ success: 1 }, res))
+			.catch(err => {
+				console.log(err);
+				return sendErrorResponse(err, res);
 			});
 	});
 

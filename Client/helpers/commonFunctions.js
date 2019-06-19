@@ -1,8 +1,13 @@
 /* eslint-disable prefer-destructuring */
 /* eslint-disable no-console */
 /* eslint-disable no-alert */
+/* eslint-disable no-restricted-syntax */
 import clipboard from 'clipboard-polyfill';
+import Entities from 'html-entities';
 import history from './history';
+
+const { XmlEntities } = Entities;
+const entities = new XmlEntities();
 
 function errorHandler(err, userMessage = 'Operation Failed') {
 	const { response = false } = err;
@@ -36,14 +41,25 @@ function copyToClipBoard(content, message = 'Successfully Copied') {
 	window.alert(toAlert);
 }
 
-function formatDate(date) {
+function formatDate(date, operation, value = 0) {
 	const toFormat = new Date(date);
 
 	if (toFormat === 'Invalid Date') {
 		throw new Error('Invalid Date provided to format');
 	}
 
-	const day = String(toFormat.getDate());
+	let day;
+	switch (operation) {
+		case 'add':
+			day = String(toFormat.getDate() + value);
+			break;
+		case 'subtract':
+			day = String(toFormat.getDate() - value);
+			break;
+		default:
+			day = String(toFormat.getDate());
+	}
+
 	const month = String(toFormat.getMonth() + 1);
 	const year = String(toFormat.getFullYear());
 
@@ -54,7 +70,7 @@ const getDuplicatesInArray = array =>
 	array.reduce(
 		(accumulator, value) => {
 			const isValueInObject = !!(
-				accumulator.object.hasOwnProperty(value) && accumulator.object[value]
+				Object.prototype.hasOwnProperty.call(accumulator, value) && accumulator.object[value]
 			);
 			const isValueInArray = !!accumulator.duplicates.includes(value);
 
@@ -86,6 +102,30 @@ const domanize = domain =>
 		  )
 		: '';
 
+const getHtmlEncodedJSON = config => {
+	const encodedData = {};
+
+	if (!config) {
+		return encodedData;
+	}
+
+	for (const property in config) {
+		if (Object.prototype.hasOwnProperty.call(config, property)) {
+			const value = config[property];
+			const isStringValue = !!(value && typeof value === 'string');
+
+			let encodedValue;
+
+			if (isStringValue) {
+				encodedValue = entities.encode(value);
+				encodedData[property] = encodedValue;
+			}
+		}
+	}
+
+	return encodedData;
+};
+
 export {
 	errorHandler,
 	getDuplicatesInArray,
@@ -94,5 +134,6 @@ export {
 	domanize,
 	makeFirstLetterCapitalize,
 	copyToClipBoard,
-	formatDate
+	formatDate,
+	getHtmlEncodedJSON
 };

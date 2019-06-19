@@ -52,3 +52,15 @@
 .onboarding {
 	background-color: $lightBlue !important;
 }
+
+.ap-nav-pills a {
+	color: $primaryRed;
+}
+
+.ap-nav-pills > li.active > a,
+.ap-nav-pills > li.active > a:focus,
+.ap-nav-pills > li.active > a:hover {
+	color: $whiteColor !important;
+	background-color: $primaryRed !important;
+	font-weight: bold;
+}
