@@ -23,12 +23,24 @@ class Pagegroups extends Component {
 
 	renderView = () => {
 		const { view } = this.state;
-		const { site, fetchChannelsInfo, createChannels, showNotification } = this.props;
+		const {
+			site,
+			fetchChannelsInfo,
+			createChannels,
+			showNotification,
+			updatePagegroupPattern
+		} = this.props;
 		switch (view) {
 			default:
 			case 'list':
 				return (
-					<Listing site={site} updateView={this.updateView} fetchChannelsInfo={fetchChannelsInfo} />
+					<Listing
+						site={site}
+						updateView={this.updateView}
+						fetchChannelsInfo={fetchChannelsInfo}
+						showNotification={showNotification}
+						updatePagegroupPattern={updatePagegroupPattern}
+					/>
 				);
 			case 'create':
 				return (
