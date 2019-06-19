@@ -4,13 +4,20 @@ var targeting = require('./targeting');
 var config = require('./config');
 var gpt = require('./gpt');
 var render = {
+    renderGPTSlots: function (googletag, adpSlots) {
+        googletag.pubads().enableSingleRequest();
+        googletag.enableServices();
+
+        adpSlots.forEach(function (adpSlot) {
+            gpt.renderSlot(googletag, adpSlot);
+        });
+    },
     createGPTSlots: function (googletag, adpSlots) {
         adpSlots.forEach(function (adpSlot) {
             gpt.defineSlot(googletag, adpSlot);
         });
 
-        googletag.pubads().enableSingleRequest();
-        googletag.enableServices();
+        return this.renderGPTSlots(googletag, adpSlots);
     },
     setTargeting: function (googletag) {
         targeting.setPageLevel(googletag);

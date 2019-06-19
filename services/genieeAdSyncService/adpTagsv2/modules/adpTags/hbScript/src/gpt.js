@@ -6,6 +6,20 @@ var adp = require('./adp');
 var responsiveAds = require('./responsiveAds');
 var targeting = require('./targeting');
 var gpt = {
+	refreshGPTSlot: function (googletag, gSlot) {
+		return googletag.pubads().refresh([gSlot]);
+	},
+	renderSlot: function (googletag, adpSlot) {
+		if (!adpSlot.containerPresent || !adpSlot.biddingComplete || adpSlot.hasRendered) {
+			return;
+		}
+		adpSlot.hasRendered = true;
+
+		googletag.display(adpSlot.containerId);
+		if (googletag.pubads().isInitialLoadDisabled() || adpSlot.toBeRefreshed) {
+			this.refreshGPTSlot(googletag, adpSlot.gSlot);
+		}
+	},
 	defineSlot: function (googletag, adpSlot) {
 		var networkId = adpSlot.activeDFPNetwork ? adpSlot.activeDFPNetwork : constants.NETWORK_ID;
 		var isResponsive = adpSlot.isResponsive;
