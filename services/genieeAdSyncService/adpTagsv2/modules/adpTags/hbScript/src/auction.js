@@ -4,85 +4,78 @@ var utils = require('./utils');
 var adp = require('./adp');
 var constants = require('./constants');
 var auction = {
-	//     var head = document.getElementsByTagName('head')[0];
-	//     var pbjs = pbjs || {};
-	//     pbjs.que = pbjs.que || [];
-	//     var PREBID_TIMEOUT = __PB_TIMEOUT__;
-	//     var PAGE_URL = '__PAGE_URL__';
-	//     var ADP_BATCH_ID = __ADP_BATCH_ID__;
-	//     var pbjs = parent.pbjs;
-
-	//     function serverRenderCode(timeout) {
-	//         if (serverRenderCode.isExecuted === undefined) {
-	//     serverRenderCode.isExecuted = true;
-	//     console.log(pbjs.getBidResponses());
-	//     if (Number.isInteger(timeout)) {
-	//         parent.__prebidFinishCallback(ADP_BATCH_ID, timeout);
-	//     } else {
-	//         parent.__prebidFinishCallback(ADP_BATCH_ID);
-	//     }
-	// }
-	// }
-	// setTimeout(function () {
-	//     serverRenderCode(PREBID_TIMEOUT);
-	// }, PREBID_TIMEOUT);
-
-	// serverRenderCode: function () {
-	//     pbjs.que.push(function () {
-	//         pbjs.addAdUnits(__AD_UNIT_CODE__);
-	//         pbjs.bidderSettings = {
-	//             openx: {
-	//                 bidCpmAdjustment: function (bidCpm) {
-	//                     return bidCpm - (bidCpm * (10 / 100));
-	//                 }
-	//             },
-	//             districtm: {
-	//                 bidCpmAdjustment: function (bidCpm) {
-	//                     return bidCpm - (bidCpm * (10 / 100));
-	//                 }
-	//             },
-	//             oftmedia: {
-	//                 bidCpmAdjustment: function (bidCpm) {
-	//                     return bidCpm - (bidCpm * (12 / 100));
-	//                 }
-	//             },
-	//             rubicon: {
-	//                 bidCpmAdjustment: function (bidCpm) {
-	//                     return bidCpm - (bidCpm * (20 / 100));
-	//                 }
-	//             }
-	//         };
-	//         pbjs.aliasBidder("appnexus", "springserve");
-	//         pbjs.aliasBidder("appnexus", "districtm");
-	//         pbjs.aliasBidder("appnexus", "brealtime");
-	//         pbjs.aliasBidder("appnexus", "oftmedia");
-	//         pbjs.onEvent("bidTimeout", function (timedOutBidders) {
-	//             parent.__prebidTimeoutCallback(ADP_BATCH_ID, timedOutBidders, PREBID_TIMEOUT);
-	//         });
-	//         pbjs.requestBids({
-	//             timeout: PREBID_TIMEOUT,
-	//             bidsBackHandler: serverRenderCode
-	//         });
-	//     });
-	// },
-	start: function(adpBatchId) {
-		setTimeout(
-			function() {
-				this.serverRenderCode();
-			}.bind(this),
-			constants.PREBID_TIMEOUT
-		);
-	},
-	end: function(adpBatchId) {
+	end: function (adpBatchId) {
 		var adpSlots = utils.getCurrentAdpSlotBatch(adp.adpTags.adpBatches, adpBatchId);
 
 		adp.adpTags.batchPrebiddingComplete = true;
 		if (Object.keys(adpSlots).length) {
-			// render()
-			// adpRender.afterBiddingProcessor(adpSlots);
+			return render.init();
 		}
 
 		return;
+	},
+	response: function (adpBatchId) {
+		console.log(window.pbjs.getBidResponses());
+
+		return this.end(adpBatchId);
+	},
+	requestBids: function (pbjs, adpBatchId) {
+		var that = this;
+
+		pbjs.requestBids({
+			timeout: constants.PREBID.TIMEOUT,
+			bidsBackHandler: that.response.bind(that, adpBatchId)
+		});
+	},
+	setPrebidConfig: function (pbjs) {
+		pbjs.setConfig({
+			rubicon: {
+				singleRequest: true
+			},
+			publisherDomain: adp.config.siteDomain,
+			bidderSequence: constants.PREBID.BIDDER_SEQUENCE,
+			priceGranularity: constants.PREBID.PRICE_GRANULARITY
+				__SIZE_CONFIG___
+				_PREBID_CURRENCY_CONFIG__
+		});
+
+		pbjs.addAdUnits(__AD_UNIT_CODE__);
+
+		pbjs.bidderSettings = {
+			openx: {
+				bidCpmAdjustment: function (bidCpm) {
+					return bidCpm - (bidCpm * (10 / 100));
+				}
+			},
+			districtm: {
+				bidCpmAdjustment: function (bidCpm) {
+					return bidCpm - (bidCpm * (10 / 100));
+				}
+			},
+			oftmedia: {
+				bidCpmAdjustment: function (bidCpm) {
+					return bidCpm - (bidCpm * (12 / 100));
+				}
+			},
+			rubicon: {
+				bidCpmAdjustment: function (bidCpm) {
+					return bidCpm - (bidCpm * (20 / 100));
+				}
+			}
+		};
+
+		pbjs.aliasBidder("appnexus", "springserve");
+		pbjs.aliasBidder("appnexus", "districtm");
+		pbjs.aliasBidder("appnexus", "brealtime");
+		pbjs.aliasBidder("appnexus", "oftmedia");
+	},
+	start: function (adpBatchId) {
+		var pbjs = window.pbjs;
+
+		pbjs.que.push(function () {
+			this.setPrebidConfig(pbjs);
+			this.requestBids(pbjs, adpBatchId);
+		}.bind(this));
 	}
 };
 
