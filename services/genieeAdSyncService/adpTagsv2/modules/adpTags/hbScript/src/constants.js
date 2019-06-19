@@ -12,6 +12,30 @@ var constants = {
     TARGETING: {
         PAGE_LEVEL: {
             DA: 'adx'
+        },
+        UTM_LEVEL: {
+            STANDARD: {
+                UTM_SOURCE: 'utm_source',
+                UTM_CAMPAIGN: 'utm_campaign',
+                UTM_MEDIUM: 'utm_medium',
+                UTM_TERM: 'utm_term',
+                UTM_CONTENT: 'utm_content'
+            },
+            CUSTOM: {
+                UTM_SCM: {
+                    TARGET: {
+                        UTM_SOURCE: 'utm_source',
+                        UTM_CAMPAIGN: 'utm_campaign',
+                        UTM_MEDIUM: 'utm_medium'
+                    }
+                },
+                UTM_SOURCE_CAMPAIGN: {
+                    TARGET: {
+                        UTM_SOURCE: 'utm_source',
+                        UTM_CAMPAIGN: 'utm_campaign'
+                    }
+                }
+            }
         }
     },
     ERROR_CODES: {
@@ -90,7 +114,8 @@ var constants = {
         }
     },
     NETWORK_ID: 103512698,
-    BATCHING_INTERVAL: 50
+    BATCHING_INTERVAL: 50,
+    UTM_SESSION_COOKIE: '_adp_utm_session_'
 };
 
 module.exports = constants;
