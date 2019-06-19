@@ -36,11 +36,7 @@ router
 
 				res.setHeader('Content-disposition', 'attachment; filename=adpushup-report.csv');
 				res.set('Content-Type', 'text/csv');
-				// res.attachment('filename.csv');
-				//res.set('Content-Type', 'application/octet-stream');
 				return res.status(200).csv(csvData);
-
-				//return res.status(200).csv(csvData);
 			} catch (e) {
 				return res.status(500).send('Some error occurred! Please try again later.');
 			}

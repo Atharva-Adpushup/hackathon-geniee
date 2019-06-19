@@ -1,6 +1,8 @@
 import React from 'react';
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col, Button } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
+import moment from 'moment';
 import { getDateRange } from '../helpers/utils';
 import Selectbox from '../../../Components/Selectbox/index';
 import CustomChart from '../../../Components/CustomChart';
@@ -14,7 +16,15 @@ class SitewiseReport extends React.Component {
 		quickDates: dates,
 		selectedDate: dates[0].value,
 		series: [],
-		isLoading: true
+		isLoading: true,
+		startDate: moment()
+			.startOf('day')
+			.subtract(7, 'days')
+			.format('YYYY-MM-DD'),
+		endDate: moment()
+			.startOf('day')
+			.subtract(1, 'day')
+			.format('YYYY-MM-DD')
 	};
 
 	componentDidMount() {
@@ -30,7 +40,7 @@ class SitewiseReport extends React.Component {
 			const siteIds = Object.keys(site);
 			params.siteid = siteIds.toString();
 		}
-		this.setState({ isLoading: true });
+		this.setState({ isLoading: true, startDate: params['fromDate'], endDate: params['toDate'] });
 		reportService.getWidgetData({ path, params }).then(response => {
 			if (response.status == 200 && response.data) {
 				const result = response.data.result;
@@ -95,20 +105,26 @@ class SitewiseReport extends React.Component {
 	}
 
 	renderLoader = () => (
-		<div style={{ position: 'relative', width: '100%', height: '30%' }}>
-			<Loader />
+		<div style={{ position: 'relative', width: '100%' }}>
+			<Loader height="20vh" />
 		</div>
 	);
 
 	render() {
-		const { isLoading } = this.state;
+		const { isLoading, startDate, endDate } = this.state;
 		return (
 			<Row>
 				<Col sm={12}>{this.renderControl()}</Col>
 				<Col sm={12}>{isLoading ? this.renderLoader() : this.renderChart()}</Col>
 				<Col sm={12}>
-					<Link to="/reports" className="float-right">
-						View Reports
+					<Link
+						to={`/reports?dimension=network&interval=cumulative&fromDate=${startDate}&toDate=${endDate}`}
+						className="u-link-reset aligner aligner-item float-right"
+					>
+						<Button className="aligner-item aligner aligner--vCenter">
+							View Reports
+							<FontAwesomeIcon icon="chart-area" className="u-margin-l2" />
+						</Button>
 					</Link>
 				</Col>
 			</Row>

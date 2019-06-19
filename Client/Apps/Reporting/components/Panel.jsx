@@ -9,12 +9,16 @@ import ChartContainer from '../containers/ChartContainer';
 import reportService from '../../../services/reportService';
 import { displayMetrics } from '../configs/commonConsts';
 import Loader from '../../../Components/Loader';
-import { computeCsvData } from '../helpers/utils';
+import { computeCsvData, convertObjToArr } from '../helpers/utils';
+import qs from 'querystringify';
 
 class Panel extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
+			dimensionList: convertObjToArr(props.dimension),
+			filterList: convertObjToArr(props.filter),
+			intervalList: convertObjToArr(props.interval),
 			metricsList: displayMetrics,
 			selectedDimension: '',
 			selectedFilters: {},
@@ -22,7 +26,7 @@ class Panel extends Component {
 			selectedInterval: 'daily',
 			startDate: moment()
 				.startOf('day')
-				.subtract(8, 'days')
+				.subtract(7, 'days')
 				.format('YYYY-MM-DD'),
 			endDate: moment()
 				.startOf('day')
@@ -39,21 +43,76 @@ class Panel extends Component {
 		const {
 			match: {
 				params: { siteId }
-			}
+			},
+			location: { search: queryParams }
 		} = this.props;
-		const { startDate, endDate, metricsList, selectedInterval } = this.state;
+		const selectedControls = qs.parse(queryParams);
+
+		let {
+			startDate,
+			endDate,
+			metricsList,
+			selectedInterval,
+			selectedDimension,
+			selectedFilters
+		} = this.state;
+		if (Object.keys(selectedControls).length > 0) {
+			let { dimension, interval, fromDate, toDate } = selectedControls;
+			selectedDimension = dimension;
+			selectedInterval = interval || 'daily';
+			startDate = fromDate;
+			endDate = toDate;
+			this.onDimensionChange(selectedDimension);
+			this.setState({ selectedDimension, selectedInterval, startDate, endDate });
+		}
+
 		if (siteId) {
-			let selectedFilters = { siteid: { [siteId]: true } };
-			this.generateButtonHandler({
-				startDate,
-				endDate,
-				selectedFilters,
-				metricsList,
-				selectedInterval
-			});
-			this.setState({ reportType: 'site' });
-		} else this.generateButtonHandler({ startDate, endDate, metricsList, selectedInterval });
+			selectedFilters = { siteid: { [siteId]: true } };
+			this.setState({ reportType: 'site', selectedFilters });
+		}
+		this.generateButtonHandler({
+			startDate,
+			endDate,
+			metricsList,
+			selectedFilters,
+			selectedInterval,
+			selectedDimension
+		});
 	}
+
+	disableControl = (disabledFilter, disabledDimension, disabledMetrics) => {
+		let { dimensionList, filterList, metricsList } = this.state;
+		if (disabledFilter && disabledFilter.length > 0) {
+			filterList.map(filter => {
+				let found = disabledFilter.find(fil => fil === filter.value);
+				if (found) filter.isDisabled = true;
+			});
+		}
+		if (disabledDimension && disabledDimension.length > 0) {
+			dimensionList.map(dimension => {
+				let found = disabledDimension.find(dim => dim === dimension.value);
+				if (found) dimension.isDisabled = true;
+			});
+		}
+		if (disabledMetrics && disabledMetrics.length > 0) {
+			metricsList.map(metrics => {
+				let found = disabledMetrics.find(metric => metric === metrics.value);
+				if (found) metrics.isDisabled = true;
+			});
+		}
+		this.setState({ filterList, metricsList, dimensionList });
+	};
+
+	onDimensionChange = selectedDimension => {
+		let { dimensionList } = this.state;
+		let dimensionObj = dimensionList.find(dimension => dimension.value === selectedDimension);
+		if (dimensionObj) {
+			let disabledFilter = dimensionObj['disabled_filter'];
+			let disabledDimension = dimensionObj['disabled_dimension'];
+			let disabledMetrics = dimensionObj['disabled_metrics'];
+			this.disableControl(disabledFilter, disabledDimension, disabledMetrics);
+		}
+	};
 
 	formateReportParams = data => {
 		const {
@@ -95,8 +154,8 @@ class Panel extends Component {
 
 		reportService.getCustomStats(params).then(response => {
 			if (response.status == 200 && response.data) {
-				this.setState({ tableData: response.data, ...data });
-			} else this.setState({ ...data });
+				this.setState({ tableData: response.data });
+			}
 			this.setState({ isLoading: false });
 		});
 	};
@@ -105,6 +164,7 @@ class Panel extends Component {
 		let csvData = computeCsvData(tableData);
 		this.setState({ csvData });
 	};
+
 	renderContent = () => {
 		const {
 			startDate,
@@ -113,6 +173,9 @@ class Panel extends Component {
 			selectedFilters,
 			selectedMetrics,
 			selectedInterval,
+			dimensionList,
+			filterList,
+			intervalList,
 			metricsList,
 			tableData,
 			reportType,
@@ -125,8 +188,11 @@ class Panel extends Component {
 						startDate={startDate}
 						endDate={endDate}
 						generateButtonHandler={this.generateButtonHandler}
-						selectedDimension={selectedDimension}
+						dimensionList={dimensionList}
+						filterList={filterList}
+						intervalList={intervalList}
 						metricsList={metricsList}
+						selectedDimension={selectedDimension}
 						selectedFilters={selectedFilters}
 						selectedMetrics={selectedMetrics}
 						selectedInterval={selectedInterval}

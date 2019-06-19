@@ -55,7 +55,7 @@ const yAxisGroups = [
 		seriesNames: ['AdPushup Variation Page RPM', 'Original Variation Page RPM'],
 		yAxisConfig: {
 			labels: {
-				format: 'value'
+				format: '${value}'
 			}
 		}
 	}

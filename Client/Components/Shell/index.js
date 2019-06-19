@@ -6,7 +6,6 @@ import Sidebar from './Sidebar';
 import Loader from '../Loader/index';
 import { domanize } from '../../helpers/commonFunctions';
 import { ROUTES } from '../../constants/others';
-import NotificationContainer from '../../Containers/NotificationContainer';
 
 class Shell extends React.Component {
 	state = { isSidebarOpen: true };
@@ -110,14 +109,7 @@ class Shell extends React.Component {
 					<Sidebar show={isSidebarOpen} />
 					<main className="main-content">
 						{routes ? <Breadcrumbs mappedRoutes={routes} /> : null}
-						{reportsFetched && userFetched ? (
-							<div>
-								<NotificationContainer />
-								{children}
-							</div>
-						) : (
-							<Loader />
-						)}
+						{reportsFetched && userFetched ? <div>{children}</div> : <Loader />}
 					</main>
 				</Row>
 			</Grid>

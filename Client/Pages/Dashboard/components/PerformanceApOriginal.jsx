@@ -1,6 +1,8 @@
 import React from 'react';
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col, Button } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
+import moment from 'moment';
 import { convertObjToArr, getDateRange } from '../helpers/utils';
 import Selectbox from '../../../Components/Selectbox/index';
 import CustomChart from '../../../Components/CustomChart';
@@ -20,7 +22,15 @@ class PerformanceApOriginal extends React.Component {
 			selectedSite: sites[0] ? sites[0].value : '',
 			series: [],
 			xAxis: {},
-			isLoading: true
+			isLoading: true,
+			startDate: moment()
+				.startOf('day')
+				.subtract(7, 'days')
+				.format('YYYY-MM-DD'),
+			endDate: moment()
+				.startOf('day')
+				.subtract(1, 'day')
+				.format('YYYY-MM-DD')
 		};
 	}
 
@@ -34,7 +44,7 @@ class PerformanceApOriginal extends React.Component {
 		const { path, reportType, siteId } = this.props;
 		if (reportType === 'site') params.siteid = siteId;
 		else params.siteid = selectedSite;
-		this.setState({ isLoading: true });
+		this.setState({ isLoading: true, startDate: params['fromDate'], endDate: params['toDate'] });
 		reportService.getWidgetData({ path, params }).then(response => {
 			if (response.status == 200 && response.data && response.data.result) {
 				this.computeGraphData(response.data.result);
@@ -62,7 +72,7 @@ class PerformanceApOriginal extends React.Component {
 			results.forEach(result => {
 				adpushupSeriesData.push(result.adpushup_variation_page_cpm);
 				baselineSeriesData.push(result.original_variation_page_cpm);
-				xAxis.categories.push(result.report_date);
+				xAxis.categories.push(moment(result.report_date).format('ll'));
 			});
 			series = [
 				{ data: adpushupSeriesData, name: 'AdPushup Variation Page RPM' },
@@ -136,20 +146,30 @@ class PerformanceApOriginal extends React.Component {
 	}
 
 	renderLoader = () => (
-		<div style={{ position: 'relative', width: '100%', height: '30%' }}>
-			<Loader />
+		<div style={{ position: 'relative', width: '100%' }}>
+			<Loader height="20vh" />
 		</div>
 	);
 
 	render() {
-		const { isLoading } = this.state;
+		const { isLoading, selectedSite, startDate, endDate } = this.state;
 		return (
 			<Row>
 				<Col sm={12}>{this.renderControl()}</Col>
 				<Col sm={12}>{isLoading ? this.renderLoader() : this.renderChart()}</Col>
 				<Col sm={12}>
-					<Link to="/reports" className="float-right">
-						View Reports
+					<Link
+						to={
+							selectedSite
+								? `/reports/${selectedSite}?dimension=page_variation_type&fromDate=${startDate}&toDate=${endDate}`
+								: `/reports?dimension=page_variation_type&fromDate=${startDate}&toDate=${endDate}`
+						}
+						className="u-link-reset aligner aligner-item float-right"
+					>
+						<Button className="aligner-item aligner aligner--vCenter">
+							View Reports
+							<FontAwesomeIcon icon="chart-area" className="u-margin-l2" />
+						</Button>
 					</Link>
 				</Col>
 			</Row>

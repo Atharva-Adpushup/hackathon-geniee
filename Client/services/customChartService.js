@@ -63,7 +63,7 @@ const defaultChartConfig = {
 			}
 		]
 	},
-	colors: ['#d9d332', '#d97f3e', '#50a4e2', '#2e3b7c', '#bf4b9b', '#4eba6e', '#eb575c', '#ca29f3']
+	colors: ['#2e3b7c', '#d97f3e', '#50a4e2', '#bf4b9b', '#d9d332', '#4eba6e', '#eb575c', '#ca29f3']
 };
 
 function getGroupedYAxisAndSeries(chartType, yAxisGroups, existingSeries) {
@@ -95,11 +95,6 @@ function getGroupedYAxisAndSeries(chartType, yAxisGroups, existingSeries) {
 					const singleSeries = {
 						type: chartType === 'spline' ? 'spline' : 'line',
 						lineWidth: 1.5,
-						marker: {
-							enabled: chartType !== 'spline',
-							symbol: 'circle',
-							radius: 3.2
-						},
 						_colorIndex: colorIndex,
 						...existingSeries[index],
 						yAxis: i,
@@ -191,6 +186,7 @@ export function getCustomChartConfig(
 				const singleSeries = series[i];
 				singleSeries.visible = true;
 				singleSeries.tooltip = {
+					followPointer: true,
 					pointFormatter: function() {
 						let point = this;
 						let num = Math.round(point.y * 100) / 100;
