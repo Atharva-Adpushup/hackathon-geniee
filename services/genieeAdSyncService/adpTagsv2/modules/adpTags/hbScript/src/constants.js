@@ -9,6 +9,11 @@ var constants = {
             BID_WON: 'bidWon'
         }
     },
+    TARGETING: {
+        PAGE_LEVEL: {
+            DA: 'adx'
+        }
+    },
     ERROR_CODES: {
         NO_ERROR: 1
     },

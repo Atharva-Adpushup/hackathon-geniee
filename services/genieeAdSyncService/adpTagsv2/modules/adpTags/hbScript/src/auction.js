@@ -3,13 +3,14 @@
 var utils = require('./utils');
 var adp = require('./adp');
 var constants = require('./constants');
+var render = require('./render');
 var auction = {
 	end: function (adpBatchId) {
 		var adpSlots = utils.getCurrentAdpSlotBatch(adp.adpTags.adpBatches, adpBatchId);
 
 		adp.adpTags.batchPrebiddingComplete = true;
 		if (Object.keys(adpSlots).length) {
-			return render.init();
+			return render.init(adpSlots);
 		}
 
 		return;
