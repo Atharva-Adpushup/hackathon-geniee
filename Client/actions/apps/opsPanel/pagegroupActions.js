@@ -1,7 +1,7 @@
 // import { PAGEGROUP_ACTIONS } from '../../../constants/opsPanel';
 import { SITE_ACTIONS, UI_ACTIONS } from '../../../constants/global';
 import axiosInstance from '../../../helpers/axiosInstance';
-import { errorHandler } from '../../../helpers/commonFunctions';
+import { errorHandler, getHtmlEncodedJSON } from '../../../helpers/commonFunctions';
 
 const createChannels = (siteId, channels) => (dispatch, getState) =>
 	axiosInstance
@@ -119,4 +119,61 @@ const fetchChannelsInfo = siteId => dispatch =>
 			)
 		);
 
-export { createChannels, fetchChannelsInfo };
+const updatePagegroupPattern = (siteId, params) => (dispatch, getState) => {
+	const {
+		global: { sites }
+	} = getState();
+	const site = sites.data[siteId];
+	let updatedPagegroupData = {
+		pageGroup: params.pageGroup,
+		pattern: params.pattern
+	};
+	updatedPagegroupData = getHtmlEncodedJSON(updatedPagegroupData);
+
+	let { pageGroupPattern = {} } = site.apConfigs;
+	let pagegroupsByDevice = pageGroupPattern[params.platform.toUpperCase()] || [];
+	let found = false;
+
+	pagegroupsByDevice = pagegroupsByDevice.map(pg => {
+		if (pg.pageGroup === params.pageGroup) {
+			found = true;
+			return {
+				...pg,
+				...updatedPagegroupData
+			};
+		}
+		return pg;
+	});
+
+	if (!found) pagegroupsByDevice.push(updatedPagegroupData);
+
+	pageGroupPattern = {
+		...pageGroupPattern,
+		[params.platform.toUpperCase()]: pagegroupsByDevice
+	};
+
+	return axiosInstance
+		.post('/site/saveSettings', { siteId, apConfigs: { pageGroupPattern } })
+		.then(() => {
+			dispatch({
+				type: SITE_ACTIONS.UPDATE_SITE_DATA_KEY_OBJ,
+				data: {
+					siteId,
+					key: 'apConfigs',
+					value: {
+						pageGroupPattern
+					}
+				}
+			});
+			dispatch({
+				type: UI_ACTIONS.SHOW_NOTIFICATION,
+				mode: 'success',
+				title: 'Operation Successful',
+				autoDismiss: 5,
+				message: `Pagegroup Pattern Udpated`
+			});
+		})
+		.catch(err => errorHandler(err, 'Pagegroup pattern updation failed'));
+};
+
+export { createChannels, fetchChannelsInfo, updatePagegroupPattern };

@@ -1,3 +1,4 @@
+/* eslint-disable react/forbid-prop-types */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Col } from 'react-bootstrap';
@@ -29,7 +30,8 @@ class EditBox extends Component {
 			name,
 			placeholder,
 			onSave,
-			onCancel
+			onCancel,
+			extras
 		} = this.props;
 		const { value } = this.state;
 		return (
@@ -53,7 +55,8 @@ class EditBox extends Component {
 						className="u-margin-r3 u-margin-t4 pull-right"
 						onClick={() => {
 							onSave({
-								name: value
+								name: value,
+								extras
 							});
 							return onCancel();
 						}}
@@ -74,6 +77,12 @@ EditBox.propTypes = {
 	classNames: PropTypes.string,
 	type: PropTypes.string,
 	placeholder: PropTypes.string,
+	extras: PropTypes.oneOfType([
+		PropTypes.string,
+		PropTypes.number,
+		PropTypes.object,
+		PropTypes.bool
+	]),
 	name: PropTypes.string.isRequired,
 	onSave: PropTypes.func.isRequired,
 	onCancel: PropTypes.func.isRequired
@@ -85,7 +94,8 @@ EditBox.defaultProps = {
 	label: 'Label',
 	classNames: '',
 	type: 'text',
-	placeholder: 'Enter value here'
+	placeholder: 'Enter value here',
+	extras: null
 };
 
 export default EditBox;
