@@ -6,6 +6,7 @@ var constants = require('./constants');
 var utils = require('./utils');
 var hb = require('./hb');
 var inventoryMapper = require('./inventoryMapper');
+var gpt = require('./gpt');
 var inventory = config.INVENTORY;
 var adpTags = {
     module: {
@@ -108,6 +109,20 @@ var adpTags = {
         },
         extendConfig: function (newConfig) {
             Object.assign(config, newConfig);
+        },
+        display: function (containerId) {
+            var slot = this.adpSlots[containerId];
+
+            if (slot && !slot.containerPresent) {
+                slot.containerPresent = true;
+                slot.sectionId = utils.getSectionId(containerId);
+                slot.variationId = adp.config.selectedVariation;
+                slot.variationName = adp.config.selectedVariationName;
+                slot.pageGroup = adp.config.pageGroup;
+                slot.platform = adp.config.platform;
+
+                gpt.renderSlot(window.googletag, slot);
+            }
         }
     },
     init: function (w) {

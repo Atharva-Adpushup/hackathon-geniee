@@ -40,6 +40,16 @@ var utils = {
 
         return null;
     },
+    getSectionId: function (containerId) {
+        if (document.getElementById(containerId)) {
+            var parent = document.getElementById(containerId).parentNode;
+
+            if (parent && parent.hasAttribute('data-section')) {
+                return parent.getAttribute('data-section');
+            }
+        }
+        return null;
+    },
     hashCode: function (str) {
         var hash = 0;
         var char;
@@ -51,11 +61,6 @@ var utils = {
         }
 
         return hash;
-    },
-    addBatchIdToAdpSlots: function (adpSlots, batchId) {
-        Object.keys(adpSlots).forEach(function (slot) {
-            adpSlots[slot].batchId = batchId;
-        });
     },
     removeElementArrayFromCollection: function (collection, elArray) {
         var inputCollection = collection.concat([]),
@@ -76,6 +81,11 @@ var utils = {
         });
 
         return collection;
+    },
+    addBatchIdToAdpSlots: function (adpSlots, batchId) {
+        Object.keys(adpSlots).forEach(function (slot) {
+            adpSlots[slot].batchId = batchId;
+        });
     },
     getCurrentAdpSlotBatch: function (adpBatches, batchId) {
         return find(adpBatches, function (batch) {
