@@ -105,6 +105,9 @@ var adpTags = {
             while (this.que.length) {
                 this.que.shift().call(this);
             }
+        },
+        extendConfig: function (newConfig) {
+            Object.assign(config, newConfig);
         }
     },
     init: function (w) {
