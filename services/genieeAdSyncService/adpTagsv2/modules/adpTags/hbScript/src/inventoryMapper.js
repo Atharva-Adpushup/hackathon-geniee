@@ -60,7 +60,7 @@ var inventoryMapper = {
     //             bidders: bidders
     //         };
     //     },
-    set: function (inventory, size, optionalParam) {
+    get: function (inventory, size, optionalParam) {
         // Reset inventory as default if site is SPA
         if (adp.config.isSPA) {
             inventory = adp.$.extend(true, {}, adp.adpTags.defaultInventory);

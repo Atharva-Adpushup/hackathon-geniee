@@ -5,7 +5,7 @@ var config = require('./config');
 var adp = require('./adp');
 var utils = require('./utils');
 var feedback = {
-    getFeedbackData: function (slot) {
+    getFeedbackData: function (slot, defaultWinner) {
         var winner = slot.feedback.winner || defaultWinner;
         var winningRevenue = slot.feedback.winningRevenue || 0;
         var feedbackData = {
@@ -42,7 +42,7 @@ var feedback = {
             return;
         }
         slot.feedbackSent = true;
-        var feedbackData = this.getFeedbackData(slot);
+        var feedbackData = this.getFeedbackData(slot, defaultWinner);
 
         return utils.ajax('get', constants.FEEDBACK.URL, feedbackData);
     }

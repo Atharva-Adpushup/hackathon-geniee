@@ -11,7 +11,7 @@ var constants = {
     },
     TARGETING: {
         PAGE_LEVEL: {
-            DA: 'adx'
+            da: 'adx'
         },
         UTM_LEVEL: {
             STANDARD: {

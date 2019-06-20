@@ -15,7 +15,7 @@ var auction = {
 
 		return;
 	},
-	response: function (adpBatchId) {
+	getAuctionResponse: function (adpBatchId) {
 		console.log(window.pbjs.getBidResponses());
 
 		return this.end(adpBatchId);
@@ -25,10 +25,10 @@ var auction = {
 
 		pbjs.requestBids({
 			timeout: constants.PREBID.TIMEOUT,
-			bidsBackHandler: that.response.bind(that, adpBatchId)
+			bidsBackHandler: that.getAuctionResponse.bind(that, adpBatchId)
 		});
 	},
-	setPrebidConfig: function (pbjs) {
+	setPrebidConfig: function (pbjs, prebidSlots) {
 		pbjs.setConfig({
 			rubicon: {
 				singleRequest: true
@@ -36,11 +36,11 @@ var auction = {
 			publisherDomain: adp.config.siteDomain,
 			bidderSequence: constants.PREBID.BIDDER_SEQUENCE,
 			priceGranularity: constants.PREBID.PRICE_GRANULARITY
-				__SIZE_CONFIG___
-				_PREBID_CURRENCY_CONFIG__
+			// __SIZE_CONFIG___
+			// _PREBID_CURRENCY_CONFIG__
 		});
 
-		pbjs.addAdUnits(__AD_UNIT_CODE__);
+		pbjs.addAdUnits(prebidSlots);
 
 		pbjs.bidderSettings = {
 			openx: {
@@ -70,11 +70,11 @@ var auction = {
 		pbjs.aliasBidder("appnexus", "brealtime");
 		pbjs.aliasBidder("appnexus", "oftmedia");
 	},
-	start: function (adpBatchId) {
+	start: function (prebidSlots, adpBatchId) {
 		var pbjs = window.pbjs;
 
 		pbjs.que.push(function () {
-			this.setPrebidConfig(pbjs);
+			this.setPrebidConfig(pbjs, prebidSlots);
 			this.requestBids(pbjs, adpBatchId);
 		}.bind(this));
 	}

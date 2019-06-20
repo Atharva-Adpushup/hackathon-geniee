@@ -27,7 +27,7 @@ var render = {
         }
     },
     init: function (adpSlots) {
-        if (!Array.isArray(slots) || !slots.length) {
+        if (!Array.isArray(adpSlots) || !adpSlots.length) {
             return;
         }
 

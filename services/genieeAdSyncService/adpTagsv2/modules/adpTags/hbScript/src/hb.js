@@ -39,7 +39,7 @@ var hb = {
 			});
 		});
 
-		return !prebidSlots.length ? auction.end(adpBatchId) : auction.start(adpBatchId);
+		return !prebidSlots.length ? auction.end(adpBatchId) : auction.start(prebidSlots, adpBatchId);
 	},
 	setBidWonListener: function (w) {
 		w.pbjs.que.push(function () {

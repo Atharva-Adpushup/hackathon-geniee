@@ -4,7 +4,7 @@ var constants = require('./constants');
 var config = require('./config');
 var adp = require('./adp');
 var targeting = {
-    getFloorWithGranularity = function (floor) {
+    getFloorWithGranularity: function (floor) {
         var val = parseFloat(Math.abs(floor).toFixed(2));
 
         if (val > 20) {
@@ -16,7 +16,7 @@ var targeting = {
         console.log('Sent floor : ' + val);
         return val;
     },
-    setCustomSlotLevelTargeting = function (adpSlot) {
+    setCustomSlotLevelTargeting: function (adpSlot) {
 		/*
 		Example (to be set in before js) -
 			window.adpushup.customSlotLevelTargetingMap = {
@@ -48,7 +48,7 @@ var targeting = {
             }
         }
     },
-    getAdserverTargeting = function (adpSlot) {
+    getAdserverTargeting: function (adpSlot) {
         if (adpSlot.optionalParam.headerBidding && adpSlot.bidders.length) {
             return window.pbjs.getAdserverTargeting()[adpSlot.containerId];
         }
@@ -89,13 +89,6 @@ var targeting = {
 
             adpSlot.gSlot.setTargeting(key, String(targeting[key]));
         }.bind(this));
-    },
-    setPageLevel: function (googletag) {
-        var pageLevelTargeting = constants.TARGETING.PAGE_LEVEL;
-
-        for (var key in pageLevelTargeting) {
-            googletag.pubads().setTargeting(key, String(pageLevelTargeting[key]));
-        }
     },
     setUTMLevel: function (googletag) {
         var urlParams = adp.utils.queryParams;
@@ -143,6 +136,13 @@ var targeting = {
                     String(keyCombination ? keyCombination.trim().substr(0, 40) : null)
                 );
         });
+    },
+    setPageLevel: function (googletag) {
+        var pageLevelTargeting = constants.TARGETING.PAGE_LEVEL;
+
+        for (var key in pageLevelTargeting) {
+            googletag.pubads().setTargeting(key, String(pageLevelTargeting[key]));
+        }
     }
 };
 

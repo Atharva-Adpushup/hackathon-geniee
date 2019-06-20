@@ -18,7 +18,7 @@ var adpTags = {
         adpBatches: [],
         batchPrebiddingComplete: false,
         prebidBatching: function (adpSlotsBatch) {
-            return hb.createPrebidSlots(adpSlotsBatch);
+            hb.createPrebidSlots(adpSlotsBatch);
         },
         processBatchForBidding: function () {
             var batchId = this.currentBatchId;
@@ -43,7 +43,7 @@ var adpTags = {
             slot.feedbackSent = false;
             slot.hasTimedOut = false;
             slot.feedback = {
-                winner: constants.DEFAULT_WINNER
+                winner: constants.FEEDBACK.DEFAULT_WINNER
             };
         },
         queSlotForBidding: function (slot) {
@@ -62,7 +62,7 @@ var adpTags = {
             this.slotInterval = setTimeout(this.processBatchForBidding, constants.BATCHING_INTERVAL);
         },
         createSlot: function (containerId, size, placement, optionalParam) {
-            var adUnits = inventoryMapper.set(inventory, size, optionalParam);
+            var adUnits = inventoryMapper.get(inventory, size, optionalParam);
             var slotId = adUnits.dfpAdUnit;
             var bidders = optionalParam.headerBidding ? adUnits.bidders : [];
             var isResponsive = optionalParam.isResponsive;
