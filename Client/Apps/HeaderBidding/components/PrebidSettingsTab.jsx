@@ -153,13 +153,15 @@ class PrebidSettingsTab extends React.Component {
 				</Row>
 
 				<Row className="form-row">
-					<Col sm={6}>AdServer Currency</Col>
+					<Col componentClass={ControlLabel} sm={6}>
+						AdServer Currency
+					</Col>
 					<Col sm={6}>{currencyCode || 'N/A'}</Col>
 				</Row>
 
-				<FormGroup controlId="pb-currency-conversion" className="form-row clearfix">
+				<FormGroup controlId="pb-formats" className="form-row clearfix">
 					<Col componentClass={ControlLabel} sm={6}>
-						Currency Conversion
+						Formats
 					</Col>
 					<Col sm={6}>
 						<ButtonToolbar>

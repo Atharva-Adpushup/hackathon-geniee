@@ -16,4 +16,16 @@
 			width: 100%;
 		}
 	}
+	.selectbox-reset {
+		position: absolute;
+		right: 50px;
+		top: 11px;
+		color: $primaryColor;
+		cursor: pointer;
+		z-index: 2;
+		font-size: 14px;
+		&:hover {
+			color: darken($primaryColor, 20%);
+		}
+	}
 }

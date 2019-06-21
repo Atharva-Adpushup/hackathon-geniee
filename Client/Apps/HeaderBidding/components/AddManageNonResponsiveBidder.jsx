@@ -1,6 +1,5 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable guard-for-in */
-/* eslint-disable react/prefer-stateless-function */
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Col, Form, FormGroup } from 'react-bootstrap';
@@ -17,6 +16,7 @@ class AddManageNonResponsiveBidder extends React.Component {
 		formFields: {},
 		validationSchema: {},
 		bidderConfig: {},
+		globalParams: {},
 		params: {},
 		sizes: [],
 		errors: {},
@@ -24,44 +24,46 @@ class AddManageNonResponsiveBidder extends React.Component {
 	};
 
 	componentDidMount() {
-		const { formType, siteId } = this.props;
+		const { formType, siteId, showNotification } = this.props;
 
 		fetchInventorySizes(siteId)
 			.then(({ data: sizes }) => {
 				switch (formType) {
 					case 'add': {
 						const {
-							bidderConfig: {
-								key,
-								name,
-								sizeLess,
-								reusable,
-								isApRelation,
-								params: { global: globalParams, siteLevel: siteLevelParams }
-							}
+							bidderConfig: { key, name, sizeLess, reusable, isApRelation, params }
 						} = this.props;
 
 						const formFields = {
 							bidderConfig: getCommonBidderFields(isApRelation),
-							params: {
-								...globalParams,
-								...siteLevelParams
-							}
+							params
 						};
 
 						if (Object.keys(formFields).length) {
 							this.setState(() => {
-								const newState = { formFields, fetchingSizes: false, params: {}, sizes };
+								const newState = {
+									bidderConfig: {},
+									globalParams: {},
+									params: {},
+									formFields,
+									sizes,
+									fetchingSizes: false
+								};
 
-								newState.bidderConfig = {};
 								for (const paramKey in formFields.bidderConfig) {
 									newState.bidderConfig[paramKey] = '';
+								}
+
+								for (const globalParamKey in formFields.params.global) {
+									newState.globalParams[globalParamKey] = '';
 								}
 
 								newState.bidderConfig = { key, name, sizeLess, reusable, ...newState.bidderConfig };
 								newState.validationSchema = getValidationSchema({
 									...formFields.bidderConfig,
-									...formFields.params
+									...formFields.params.global,
+									...formFields.params.siteLevel,
+									...formFields.params.adUnitLevel
 								});
 
 								return newState;
@@ -102,17 +104,30 @@ class AddManageNonResponsiveBidder extends React.Component {
 
 						if (formFields && Object.keys(formFields).length) {
 							this.setState(() => {
+								// move global params from params obj  to globalParams obj
+
 								const newState = {
 									formFields,
 									fetchingSizes: false,
-									sizes: [...new Set([...sizes, ...Object.keys(params)])]
+									sizes: [...new Set([...sizes, ...Object.keys(params)])],
+									params: {},
+									globalParams: {}
 								};
 
 								for (const collectionKey in formFields) {
 									newState[collectionKey] = {};
 
 									if (collectionKey === 'params') {
-										newState[collectionKey] = params;
+										// remove globalParams from params obj
+										const newParams = { ...params };
+										for (const [size, paramsObj] of Object.entries(newParams)) {
+											for (const paramKey of Object.keys(formFields[collectionKey].global)) {
+												newState.globalParams[paramKey] = paramsObj[paramKey];
+												delete newParams[size][paramKey];
+											}
+										}
+
+										newState[collectionKey] = newParams;
 
 										// eslint-disable-next-line no-continue
 										continue;
@@ -146,7 +161,9 @@ class AddManageNonResponsiveBidder extends React.Component {
 								newState.bidderConfig = { key, name, sizeLess, reusable, ...newState.bidderConfig };
 								newState.validationSchema = getValidationSchema({
 									...formFields.bidderConfig,
-									...formFields.params
+									...formFields.params.global,
+									...formFields.params.siteLevel,
+									...formFields.params.adUnitLevel
 								});
 
 								return newState;
@@ -159,9 +176,15 @@ class AddManageNonResponsiveBidder extends React.Component {
 					default:
 				}
 			})
-			.catch(err => {
-				// eslint-disable-next-line no-console
-				console.log(err);
+			.catch(() => {
+				this.setState({ fetchingSizes: false }, () => {
+					showNotification({
+						mode: 'error',
+						title: 'Error',
+						message: 'Unable to fetch inventory sizes',
+						autoDismiss: 0
+					});
+				});
 			});
 	}
 
@@ -173,16 +196,27 @@ class AddManageNonResponsiveBidder extends React.Component {
 		e.preventDefault();
 
 		const { onBidderAdd, onBidderUpdate } = this.props;
-		const { bidderConfig, params, validationSchema } = this.state;
+		const { bidderConfig, globalParams, params, validationSchema } = this.state;
 
-		const validationResult = formValidator.validate({ ...bidderConfig }, validationSchema);
+		const validationResult = formValidator.validate(
+			{ ...bidderConfig, ...globalParams },
+			validationSchema
+		);
 
 		if (validationResult.isValid) {
+			const mergedParams = { ...params };
+
 			this.setState({ errors: {} });
 
+			if (Object.keys(mergedParams).length) {
+				for (const [size, paramsObj] of Object.entries(mergedParams)) {
+					mergedParams[size] = { ...paramsObj, ...globalParams };
+				}
+			}
+
 			// eslint-disable-next-line no-unused-expressions
-			(onBidderAdd && onBidderAdd(bidderConfig, params)) ||
-				(onBidderUpdate && onBidderUpdate(bidderConfig, params));
+			(onBidderAdd && onBidderAdd(bidderConfig, mergedParams)) ||
+				(onBidderUpdate && onBidderUpdate(bidderConfig, mergedParams));
 		} else {
 			this.setState({ errors: validationResult.errors });
 		}
@@ -249,7 +283,10 @@ class AddManageNonResponsiveBidder extends React.Component {
 				{!fetchingSizes && (
 					<Form horizontal onSubmit={this.onSubmit}>
 						<BidderFormFields
-							formFields={{ bidderConfig: formFields.bidderConfig }}
+							formFields={{
+								bidderConfig: formFields.bidderConfig,
+								globalParams: formFields.params.global
+							}}
 							formType={formType}
 							setFormFieldValueInState={this.setFormFieldValueInState}
 							getCurrentFieldValue={this.getCurrentFieldValue}

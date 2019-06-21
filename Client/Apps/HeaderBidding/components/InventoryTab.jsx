@@ -28,14 +28,11 @@ export default class InventoryTab extends React.Component {
 		});
 	}
 
-	static getDerivedStateFromProps(props, state) {
-		if (!state.filteredInventories && props.inventories) {
-			return {
-				filteredInventories: props.inventories
-			};
+	componentWillReceiveProps({ inventories }) {
+		const { filteredInventories } = this.state;
+		if (!filteredInventories && inventories) {
+			this.setState({ filteredInventories: inventories });
 		}
-
-		return null;
 	}
 
 	handleSelectAllInventories = ({ target: { checked } }) => {
