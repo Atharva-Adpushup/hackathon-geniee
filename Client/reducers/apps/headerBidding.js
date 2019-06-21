@@ -7,7 +7,8 @@ import {
 	ADD_BIDDER,
 	UPDATE_BIDDER,
 	FETCH_INVENTORIES,
-	UPDATE_INVENTORIES_HB_STATUS
+	UPDATE_INVENTORIES_HB_STATUS,
+	SET_DFP_SETUP_STATUS
 } from '../../constants/headerBidding';
 
 const defaultState = { inventoryFound: null, bidders: null, setupStatus: null };
@@ -37,6 +38,9 @@ export default function(state = defaultState, action) {
 				...state,
 				setupStatus
 			};
+		}
+		case SET_DFP_SETUP_STATUS: {
+			return { ...state, setupStatus: { ...state.setupStatus, dfpConnected: true } };
 		}
 		case ADD_BIDDER: {
 			const { bidderKey, bidderConfig } = action;

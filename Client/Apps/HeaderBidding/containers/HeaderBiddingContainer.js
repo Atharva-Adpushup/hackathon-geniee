@@ -8,7 +8,8 @@ import {
 	addBidderAction,
 	updateBidderAction,
 	fetchInventoriesAction,
-	updateInventoriesHbStatus
+	updateInventoriesHbStatus,
+	setDfpSetupStatusAction
 } from '../../../actions/apps/headerBidding/hbActions';
 
 import { showNotification, hideNotification } from '../../../actions/uiActions';
@@ -30,6 +31,7 @@ export default connect(
 		fetchInventoriesAction,
 		updateInventoriesHbStatus,
 		showNotification,
-		hideNotification
+		hideNotification,
+		setDfpSetupStatusAction
 	}
 )(HeaderBiddingContainer);

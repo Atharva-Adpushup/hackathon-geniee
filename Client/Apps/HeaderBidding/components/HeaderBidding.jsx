@@ -106,6 +106,7 @@ class HeaderBidding extends React.Component {
 			bidders,
 			fetchAllBiddersAction,
 			setupStatus,
+			setDfpSetupStatusAction,
 			addBidderAction,
 			updateBidderAction,
 			inventories,
@@ -125,6 +126,7 @@ class HeaderBidding extends React.Component {
 							checkInventoryAction={checkInventoryAction}
 							inventoryFound={inventoryFound}
 							setupStatus={setupStatus}
+							setDfpSetupStatusAction={setDfpSetupStatusAction}
 						/>
 					);
 				case 'bidders':

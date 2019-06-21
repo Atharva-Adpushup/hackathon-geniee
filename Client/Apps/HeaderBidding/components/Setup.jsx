@@ -17,6 +17,12 @@ class Setup extends React.Component {
 		$window.addEventListener('message', this.handlePostMessageHandler.bind(this), false);
 	};
 
+	removePostMessageListener = () => {
+		const { $window } = this;
+
+		$window.removeEventListener('message', this.handlePostMessageHandler.bind(this), false);
+	};
+
 	openGoogleOauthWindow = () => {
 		const { $window } = this;
 		const { screen } = $window;
@@ -41,12 +47,16 @@ class Setup extends React.Component {
 			parsedData.data.length
 		);
 
-		if (!isValidData) {
-			return false;
-		}
+		if (!isValidData) return false;
 
-		// eslint-disable-next-line no-console
-		console.log(parsedData.data);
+		const dfpNetwork = parsedData.data.find(network => network.networkName === 'DFP');
+		const isDfpConnected = !!dfpNetwork && !!dfpNetwork.dfpAccounts.length;
+
+		if (!isDfpConnected) return false;
+
+		const { setDfpSetupStatusAction } = this.props;
+
+		setDfpSetupStatusAction();
 
 		return true;
 	}
