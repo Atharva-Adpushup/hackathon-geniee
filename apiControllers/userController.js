@@ -188,6 +188,15 @@ router
 
 			return computedObject;
 		});
+		const getRefreshToken = oauthHelper.getAccessTokens(req.query.code).then(tokenObject => {
+			const {
+				// eslint-disable-next-line camelcase
+				tokens: { refresh_token, id_token, expiry_date }
+			} = tokenObject;
+			const computedObject = { refresh_token, id_token, expiry_date };
+
+			return computedObject;
+		});
 		const getAdsenseAccounts = getAccessToken.then(token =>
 			request({
 				strictSSL: false,
@@ -206,9 +215,9 @@ router
 					throw err;
 				})
 		);
-		const getUserDFPInfo = getAccessToken.then(token => {
+		const getUserDFPInfo = getRefreshToken.then(token => {
 			// eslint-disable-next-line camelcase
-			const { id_token } = token;
+			const { refresh_token } = token;
 			const { OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET } = config.googleOauth;
 
 			return request({
@@ -217,7 +226,7 @@ router
 				body: {
 					clientCode: OAUTH_CLIENT_ID,
 					clientSecret: OAUTH_CLIENT_SECRET,
-					refreshToken: id_token
+					refreshToken: refresh_token
 				},
 				json: true
 			}).then(response => {

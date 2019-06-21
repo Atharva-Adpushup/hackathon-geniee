@@ -6,7 +6,8 @@ import {
 	ADD_BIDDER,
 	UPDATE_BIDDER,
 	FETCH_INVENTORIES,
-	UPDATE_INVENTORIES_HB_STATUS
+	UPDATE_INVENTORIES_HB_STATUS,
+	SET_DFP_SETUP_STATUS
 } from '../../../constants/headerBidding';
 import * as service from '../../../services/hbService';
 
@@ -35,6 +36,8 @@ export const getSetupStatusAction = siteId => dispatch =>
 			// eslint-disable-next-line no-console
 			console.log(err);
 		});
+
+export const setDfpSetupStatusAction = () => dispatch => dispatch({ type: SET_DFP_SETUP_STATUS });
 
 export const addBidderAction = (siteId, bidderConfig, params) => dispatch =>
 	service
