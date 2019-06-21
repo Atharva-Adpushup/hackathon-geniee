@@ -135,6 +135,7 @@ class HeaderBidding extends React.Component {
 							fetchAllBiddersAction={fetchAllBiddersAction}
 							addBidderAction={addBidderAction}
 							updateBidderAction={updateBidderAction}
+							showNotification={showNotification}
 						/>
 					);
 				case 'inventory':

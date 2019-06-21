@@ -27,40 +27,36 @@ class AddManageSizelessBidder extends React.Component {
 		switch (formType) {
 			case 'add': {
 				const {
-					bidderConfig: {
-						key,
-						name,
-						sizeLess,
-						reusable,
-						isApRelation,
-						params: { global: globalParams, siteLevel: siteLevelParams }
-					}
+					bidderConfig: { key, name, sizeLess, reusable, isApRelation, params }
 				} = this.props;
 
 				const formFields = {
 					bidderConfig: getCommonBidderFields(isApRelation),
-					params: {
-						...globalParams,
-						...siteLevelParams
-					}
+					params
 				};
 
 				if (Object.keys(formFields).length) {
 					this.setState(() => {
-						const newState = { formFields };
+						const newState = { formFields, bidderConfig: {}, params: {} };
 
-						for (const collectionKey in formFields) {
-							newState[collectionKey] = {};
+						for (const paramKey in formFields.bidderConfig) {
+							newState.bidderConfig[paramKey] = '';
+						}
 
-							for (const paramKey in formFields[collectionKey]) {
-								newState[collectionKey][paramKey] = '';
-							}
+						for (const paramKey in {
+							...formFields.params.global,
+							...formFields.params.siteLevel,
+							...formFields.params.adUnitLevel
+						}) {
+							newState.params[paramKey] = '';
 						}
 
 						newState.bidderConfig = { key, name, sizeLess, reusable, ...newState.bidderConfig };
 						newState.validationSchema = getValidationSchema({
 							...formFields.bidderConfig,
-							...formFields.params
+							...formFields.params.global,
+							...formFields.params.siteLevel,
+							...formFields.params.adUnitLevel
 						});
 
 						return newState;
@@ -101,35 +97,36 @@ class AddManageSizelessBidder extends React.Component {
 
 				if (formFields && Object.keys(formFields).length) {
 					this.setState(() => {
-						const newState = { formFields };
+						const newState = { formFields, bidderConfig: {}, params: {} };
+						const mergedParams = {
+							...formFields.params.global,
+							...formFields.params.siteLevel,
+							...formFields.params.adUnitLevel
+						};
 
-						for (const collectionKey in formFields) {
-							newState[collectionKey] = {};
-
-							for (const paramKey in formFields[collectionKey]) {
-								let value;
-								if (collectionKey === 'params') {
-									value = params[paramKey];
-								}
-								if (collectionKey === 'bidderConfig') {
-									switch (paramKey) {
-										case 'relation':
-											value = relation;
-											break;
-										case 'bids':
-											value = bids;
-											break;
-										case 'revenueShare':
-											value = revenueShare;
-											break;
-										case 'status':
-											value = isPaused ? 'paused' : 'active';
-											break;
-										default:
-									}
-								}
-								newState[collectionKey][paramKey] = value || '';
+						for (const paramKey in formFields.bidderConfig) {
+							let value;
+							switch (paramKey) {
+								case 'relation':
+									value = relation;
+									break;
+								case 'bids':
+									value = bids;
+									break;
+								case 'revenueShare':
+									value = revenueShare;
+									break;
+								case 'status':
+									value = isPaused ? 'paused' : 'active';
+									break;
+								default:
 							}
+
+							newState.bidderConfig[paramKey] = value;
+						}
+
+						for (const paramKey in mergedParams) {
+							newState.params[paramKey] = params[paramKey];
 						}
 
 						newState.bidderConfig = {
@@ -144,7 +141,9 @@ class AddManageSizelessBidder extends React.Component {
 						};
 						newState.validationSchema = getValidationSchema({
 							...formFields.bidderConfig,
-							...formFields.params
+							...formFields.params.global,
+							...formFields.params.siteLevel,
+							...formFields.params.adUnitLevel
 						});
 
 						return newState;
@@ -216,25 +215,36 @@ class AddManageSizelessBidder extends React.Component {
 		const { formFields, errors } = this.state;
 
 		return (
-			<Form horizontal onSubmit={this.onSubmit}>
-				<BidderFormFields
-					formFields={formFields}
-					formType={formType}
-					setFormFieldValueInState={this.setFormFieldValueInState}
-					getCurrentFieldValue={this.getCurrentFieldValue}
-					errors={errors}
-				/>
-				<FormGroup>
-					<Col md={12} className="u-margin-t4">
-						<CustomButton type="submit" variant="primary" className="u-margin-r3">
-							{formType === 'add' ? 'Add' : 'Update'}
-						</CustomButton>
-						<CustomButton type="button" variant="secondary" onClick={openBiddersListView}>
-							Cancel
-						</CustomButton>
-					</Col>
-				</FormGroup>
-			</Form>
+			<React.Fragment>
+				{!!Object.keys(formFields).length && (
+					<Form horizontal onSubmit={this.onSubmit}>
+						<BidderFormFields
+							formFields={{
+								bidderConfig: formFields.bidderConfig,
+								params: {
+									...formFields.params.global,
+									...formFields.params.siteLevel,
+									...formFields.params.adUnitLevel
+								}
+							}}
+							formType={formType}
+							setFormFieldValueInState={this.setFormFieldValueInState}
+							getCurrentFieldValue={this.getCurrentFieldValue}
+							errors={errors}
+						/>
+						<FormGroup>
+							<Col md={12} className="u-margin-t4">
+								<CustomButton type="submit" variant="primary" className="u-margin-r3">
+									{formType === 'add' ? 'Add' : 'Update'}
+								</CustomButton>
+								<CustomButton type="button" variant="secondary" onClick={openBiddersListView}>
+									Cancel
+								</CustomButton>
+							</Col>
+						</FormGroup>
+					</Form>
+				)}
+			</React.Fragment>
 		);
 	}
 }

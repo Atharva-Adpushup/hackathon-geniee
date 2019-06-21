@@ -26,7 +26,7 @@ class SizewiseParamsFormFields extends React.Component {
 			for (const adSize of sizes) {
 				const params = {};
 
-				for (const paramKey in formFields.params) {
+				for (const paramKey in formFields.params.siteLevel) {
 					const value = savedParams[adSize] && savedParams[adSize][paramKey];
 					params[paramKey] = value || '';
 				}
@@ -44,7 +44,7 @@ class SizewiseParamsFormFields extends React.Component {
 		this.setState(state => {
 			const params = {};
 
-			for (const paramKey in formFields.params) {
+			for (const paramKey in formFields.params.siteLevel) {
 				params[paramKey] = '';
 			}
 
@@ -152,7 +152,7 @@ class SizewiseParamsFormFields extends React.Component {
 		return (
 			<React.Fragment>
 				<BidderFormFields
-					formFields={{ params: formFields.params }}
+					formFields={{ params: formFields.params.siteLevel }}
 					formType={formType}
 					setParamInTempState={this.setParamInTempState}
 					adSize={adSize}

@@ -42,11 +42,11 @@ class BidderRuleModal extends React.Component {
 	};
 
 	onSelect = (key, value) =>
-		this.setState(state => ({ bidderRule: { ...state.bidderRule, [key]: value } }));
+		this.setState(state => ({ bidderRule: { ...state.bidderRule, [key]: value || '' } }));
 
 	onDeviceSelect = value =>
 		this.setState(state => ({
-			bidderRule: { ...state.bidderRule, device: value, sizesSupported: [] }
+			bidderRule: { ...state.bidderRule, device: value || '', sizesSupported: [] }
 		}));
 
 	onStatusSelect = value =>
@@ -109,6 +109,7 @@ class BidderRuleModal extends React.Component {
 				options={options}
 				selected={bidderRule ? bidderRule.country : null}
 				onSelect={selectedValue => this.onSelect('country', selectedValue)}
+				reset
 			/>
 		);
 	};
@@ -127,6 +128,7 @@ class BidderRuleModal extends React.Component {
 				options={options}
 				selected={bidderRule ? bidderRule.device : null}
 				onSelect={this.onDeviceSelect}
+				reset
 			/>
 		);
 	};
