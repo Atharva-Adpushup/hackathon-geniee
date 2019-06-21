@@ -1,9 +1,11 @@
 import React, { PropTypes } from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
+import Utils from 'libs/utils';
 import CssEditor from 'shared/cssEditor/cssEditor.jsx';
 import CodeBox from 'shared/codeBox.jsx';
 import NetworkOptions from 'shared/networkOptions/NetworkOptions';
 import AdDetails from './AdDetails';
+import { iabSizes } from 'consts/commonConsts';
 
 const initialState = {
 	isEditingCss: false,
@@ -46,32 +48,35 @@ class adDescriptor extends React.Component {
 	}
 
 	submitHandler(params) {
-		this.props.updateNetwork(this.props.ad.id, params);
+		const { ad } = this.props;
+
+		Utils.updateMultipleAdSizes(ad, params, iabSizes, this);
+		this.props.updateNetwork(ad.id, params);
 	}
 
 	render() {
 		const {
-			ad,
-			updateCss,
-			updateAdCode,
-			section,
-			updateSettings,
-			showNotification,
-			onUpdateXPath,
-			onUpdateOperation,
-			onSectionAllXPaths,
-			onValidateXPath,
-			onResetErrors,
-			onRenameSection,
-			onSetSectionType,
-			onFormatDataUpdate,
-			ui,
-			variationId,
-			updateAdSize,
-			channelId,
-			onToggleLazyLoad,
-			networkConfig
-		} = this.props,
+				ad,
+				updateCss,
+				updateAdCode,
+				section,
+				updateSettings,
+				showNotification,
+				onUpdateXPath,
+				onUpdateOperation,
+				onSectionAllXPaths,
+				onValidateXPath,
+				onResetErrors,
+				onRenameSection,
+				onSetSectionType,
+				onFormatDataUpdate,
+				ui,
+				variationId,
+				updateAdSize,
+				channelId,
+				onToggleLazyLoad,
+				networkConfig
+			} = this.props,
 			adCode = ad.adCode,
 			number = 12;
 
@@ -126,19 +131,19 @@ class adDescriptor extends React.Component {
 						onToggleLazyLoad={onToggleLazyLoad}
 					/>
 				</Row>
-				{this.state.showButton
-					? <Row className="butttonsRow">
-							<Col xs={number} className="mT-10">
-								<Button
-									className="btn-lightBg btn-cancel"
-									onClick={this.deleteSectionWithAd.bind(this)}
-									style={{ width: '100%' }}
-								>
-									Delete Ad
-								</Button>
-							</Col>
-						</Row>
-					: null}
+				{this.state.showButton ? (
+					<Row className="butttonsRow">
+						<Col xs={number} className="mT-10">
+							<Button
+								className="btn-lightBg btn-cancel"
+								onClick={this.deleteSectionWithAd.bind(this)}
+								style={{ width: '100%' }}
+							>
+								Delete Ad
+							</Button>
+						</Col>
+					</Row>
+				) : null}
 			</div>
 		);
 	}

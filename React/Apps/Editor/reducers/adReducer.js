@@ -161,6 +161,9 @@ const adsByIds = (state = {}, action) => {
 		case adActions.UPDATE_AD:
 			return { ...state, [action.adId]: { ...state[action.adId], ...action.params } };
 
+		case adActions.UPDATE_MULTIPLE_AD_SIZES:
+			return { ...state, [action.adId]: { ...state[action.adId], multipleAdSizes: action.multipleAdSizes } };
+
 		case sectionActions.UPDATE_INCONTENT_FLOAT:
 			return { ...state, [action.adId]: { ...state[action.adId], css: action.floatCss } };
 

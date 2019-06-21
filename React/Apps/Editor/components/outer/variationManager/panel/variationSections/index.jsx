@@ -20,7 +20,7 @@ import {
 	updateFormatData,
 	toggleLazyLoad
 } from 'actions/sectionActions.js';
-import { updateNetwork, updateAdCode, updateAd, updateCustomCss } from 'actions/adActions';
+import { updateNetwork, updateAdCode, updateAd, updateCustomCss, updateMultipleAdSizes } from 'actions/adActions';
 import { resetErrors, showNotification } from 'actions/uiActions';
 import { generateReport } from 'actions/reportingActions';
 import Filters from './filters.jsx';
@@ -104,6 +104,7 @@ class variationSections extends Component {
 			onSectionXPathValidate,
 			onScrollSectionIntoView,
 			updateAd,
+			updateMultipleAdSizes,
 			updateSection,
 			showNotification,
 			updateType,
@@ -158,6 +159,7 @@ class variationSections extends Component {
 									onScrollSectionIntoView={onScrollSectionIntoView}
 									updateSection={updateSection}
 									updateAd={updateAd}
+									updateMultipleAdSizes={updateMultipleAdSizes}
 									ui={ui}
 									reporting={reporting}
 									showNotification={showNotification}
@@ -197,6 +199,7 @@ variationSections.propTypes = {
 	generateReport: PropTypes.func,
 	showNotification: PropTypes.func,
 	updateAd: PropTypes.func,
+	updateMultipleAdSizes: PropTypes.func,
 	updateSection: PropTypes.func,
 	ui: PropTypes.object,
 	reporting: PropTypes.object
@@ -228,6 +231,7 @@ export default connect(
 				showNotification: showNotification,
 				updateSection: updateSection,
 				updateAd: updateAd,
+				updateMultipleAdSizes: updateMultipleAdSizes,
 				updateType: updateType,
 				updateFormatData: updateFormatData,
 				toggleLazyLoad: toggleLazyLoad
