@@ -169,8 +169,7 @@ router
 				.then(() => headerBiddingModel.getAllBiddersFromNetworkConfig())
 				.then(biddersFromNetworkConfig => {
 					bidderConfig.paramsFormFields = {
-						...biddersFromNetworkConfig[key].params.global,
-						...biddersFromNetworkConfig[key].params.siteLevel
+						...biddersFromNetworkConfig[key].params
 					};
 
 					return res.status(httpStatus.OK).json({ bidderKey: key, bidderConfig });
@@ -259,8 +258,7 @@ router
 				.then(() => headerBiddingModel.getAllBiddersFromNetworkConfig())
 				.then(biddersFromNetworkConfig => {
 					bidderConfig.paramsFormFields = {
-						...biddersFromNetworkConfig[key].params.global,
-						...biddersFromNetworkConfig[key].params.siteLevel
+						...biddersFromNetworkConfig[key].params
 					};
 
 					return res.status(httpStatus.OK).json({ bidderKey: key, bidderConfig });
@@ -338,7 +336,7 @@ router
 
 		return userModel
 			.verifySiteOwner(email, siteId)
-			.then(() => headerBiddingModel.getPrebidConfig(siteId))
+			.then(() => headerBiddingModel.getPrebidConfig(siteId, email))
 			.then(prebidConfig => res.status(httpStatus.OK).json(prebidConfig))
 			.catch(() =>
 				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error!' })
