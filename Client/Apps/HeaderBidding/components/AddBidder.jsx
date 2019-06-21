@@ -7,11 +7,32 @@ import AddManageNonResponsiveBidder from './AddManageNonResponsiveBidder';
 
 export default class AddBidder extends React.Component {
 	onBidderAdd = (bidderConfig, params) => {
-		const { siteId, addBidderAction, bidderConfig: fieldsConfig, openView } = this.props;
+		const {
+			siteId,
+			addBidderAction,
+			bidderConfig: fieldsConfig,
+			openView,
+			showNotification
+		} = this.props;
 
-		addBidderAction(siteId, { key: fieldsConfig.key, ...bidderConfig }, params).then(() => {
-			openView('biddersList');
-		});
+		addBidderAction(siteId, { key: fieldsConfig.key, ...bidderConfig }, params)
+			.then(() => {
+				openView('biddersList');
+				showNotification({
+					mode: 'success',
+					title: 'Success',
+					message: 'Bidder added successfully',
+					autoDismiss: 0
+				});
+			})
+			.catch(() => {
+				showNotification({
+					mode: 'error',
+					title: 'Error',
+					message: 'Unable to add bidder',
+					autoDismiss: 0
+				});
+			});
 	};
 
 	openBiddersListView = () => {
@@ -20,7 +41,7 @@ export default class AddBidder extends React.Component {
 	};
 
 	render() {
-		const { bidderConfig, siteId } = this.props;
+		const { bidderConfig, siteId, showNotification } = this.props;
 
 		return (
 			<div className="options-wrapper hb-bidder hb-add-bidder">
@@ -38,6 +59,7 @@ export default class AddBidder extends React.Component {
 								bidderConfig={bidderConfig}
 								openBiddersListView={this.openBiddersListView}
 								onBidderAdd={this.onBidderAdd}
+								showNotification={showNotification}
 							/>
 						) : (
 							<AddManageNonResponsiveBidder
@@ -46,6 +68,7 @@ export default class AddBidder extends React.Component {
 								bidderConfig={bidderConfig}
 								openBiddersListView={this.openBiddersListView}
 								onBidderAdd={this.onBidderAdd}
+								showNotification={showNotification}
 							/>
 						)}
 					</Col>
