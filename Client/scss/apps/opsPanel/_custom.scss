@@ -64,3 +64,9 @@
 	background-color: $primaryRed !important;
 	font-weight: bold;
 }
+
+.custom-table th,
+.custom-table tr {
+	min-width: 150px !important;
+	word-break: break-word !important;
+}

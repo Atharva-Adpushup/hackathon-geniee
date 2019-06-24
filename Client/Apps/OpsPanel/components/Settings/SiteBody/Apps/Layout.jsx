@@ -1,3 +1,4 @@
+/* eslint-disable react/no-danger */
 /* eslint-disable no-shadow */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-case-declarations */
@@ -73,16 +74,24 @@ class Layout extends Component {
 						platform,
 						pageGroup
 					} = current;
-					let traffic = 'No Variation Found';
+					let traffic = '';
+					const keys = Object.keys(variations);
+					const isAutoOptimiseDisabled = !!(
+						channelAutoOptimise === false ||
+						channelAutoOptimise === 'false' ||
+						channelAutoOptimise === undefined
+					);
+					const hasVariations = !!keys.length;
 
-					if (channelAutoOptimise === false) {
-						const keys = Object.keys(variations);
-						traffic = keys.map(variationId => {
+					if (isAutoOptimiseDisabled && hasVariations) {
+						keys.forEach(variationId => {
 							const variation = variations[variationId];
-							return `${variation.name}:${variation.trafficDistribution}%`;
+							traffic += `<p><span class="u-text-bold">${variation.name}</span> -- ${
+								variation.trafficDistribution
+							}%</p>`;
 						});
-
-						traffic = Array.isArray(traffic) ? traffic.join(', ') : traffic;
+					} else {
+						traffic = 'No Variation Found';
 					}
 					return (
 						<tr>
@@ -98,10 +107,10 @@ class Layout extends Component {
 									off="No"
 									defaultLayout
 									name={`autoOptimise-channel-${siteId}-${platform}-${pageGroup}`}
-									id={`js-autoOptimise-${siteId}-${siteDomain}-${platform}-${pageGroup}`}
+									id={`js-autoOptimise-${siteId}-${channelId}-${platform}-${pageGroup}`}
 								/>
 							</td>
-							<td>{channelAutoOptimise ? 'N/A' : traffic}</td>
+							<td dangerouslySetInnerHTML={{ __html: channelAutoOptimise ? 'N/A' : traffic }} />
 						</tr>
 					);
 				})}
@@ -141,7 +150,7 @@ class Layout extends Component {
 					id={`js-appStatus-${siteId}-${siteDomain}`}
 				/>
 				<CustomToggleSwitch
-					labelText="Auto Optimize"
+					labelText="Auto Optimize (Site)"
 					className="u-margin-b4 negative-toggle"
 					checked={apConfigs.autoOptimise}
 					onChange={this.handleToggle}
@@ -153,7 +162,7 @@ class Layout extends Component {
 					name={`autoOptimise-site-${siteId}-${siteDomain}`}
 					id={`js-autoOptimise-${siteId}-${siteDomain}`}
 				/>
-				<Table striped bordered hover>
+				<Table striped bordered hover className="custom-table">
 					<thead>
 						<tr>
 							<th>Page Group</th>
