@@ -60,7 +60,7 @@ class customToggleSwitch extends React.Component {
 		rootClassName += disabled ? ' toggle--disabled' : '';
 
 		return (
-			<div className={rootClassName}>
+			<div className={rootClassName} key={`${id}-${name}`}>
 				<input id={id} name={name} type="checkbox" checked={value} onChange={this.setValue} />
 				<label style={leftAlignedStyles} htmlFor={id}>
 					<div className="toggleSwitch" data-on={on} data-off={off} />
@@ -127,7 +127,8 @@ class customToggleSwitch extends React.Component {
 			customComponentClass,
 			labelBold,
 			labelText,
-			name
+			name,
+			id
 		} = this.props;
 
 		const options = {
@@ -153,14 +154,14 @@ class customToggleSwitch extends React.Component {
 		if (isLayoutVertical) {
 			options.layoutClassName += ` form-group--vertical ${options.classNamesProps}`;
 			renderBlocks.push(
-				<Row key={name} className={options.layoutClassName}>
+				<Row key={id || name} className={options.layoutClassName}>
 					{this.renderVerticalLayout(options)}
 				</Row>
 			);
 		} else if (isLayoutHorizontal) {
 			options.layoutClassName += ` form-group--horizontal ${options.classNamesProps}`;
 			renderBlocks.push(
-				<Row key={name} className={options.layoutClassName}>
+				<Row key={id || name} className={options.layoutClassName}>
 					{this.renderHorizontalLayout(options)}
 				</Row>
 			);
