@@ -18,7 +18,7 @@ class Layout extends Component {
 		const attributeValue = event.target.getAttribute('name');
 		const values = attributeValue.split('-');
 		const name = values[0];
-		const { updateChannelAutoOptimise } = this.props;
+		const { updateChannelAutoOptimise, updateSiteAutoOptimise } = this.props;
 
 		switch (name) {
 			case 'autoOptimise':
@@ -33,7 +33,11 @@ class Layout extends Component {
 						autoOptimise: value
 					});
 				} else if (mode === 'site') {
+					const [name, key, siteId] = values;
 					// update Site
+					updateSiteAutoOptimise(siteId, {
+						autoOptimise: value
+					});
 				}
 				break;
 
@@ -63,9 +67,9 @@ class Layout extends Component {
 					const {
 						variations = {},
 						autoOptimise: channelAutoOptimise,
-						channelId,
 						platform,
-						pageGroup
+						pageGroup,
+						channelId
 					} = current;
 					let traffic = 'No Variation Found';
 
@@ -79,7 +83,7 @@ class Layout extends Component {
 						traffic = Array.isArray(traffic) ? traffic.join(', ') : traffic;
 					}
 					return (
-						<tr>
+						<tr key={`channel-row-${siteId}-${channelId}`}>
 							<td>{channel}</td>
 							<td>
 								<CustomToggleSwitch

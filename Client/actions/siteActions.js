@@ -68,11 +68,66 @@ const getAppStatuses = siteId => dispatch =>
 		})
 		.catch(err => errorHandler(err));
 
+const updateSiteAutoOptimise = (siteId, params) => (dispatch, getState) =>
+	axiosInstance
+		.post('/site/updateSite', {
+			siteId,
+			key: 'apConfigs',
+			value: { autoOptimise: params.autoOptimise }
+		})
+		.then(() =>
+			axiosInstance.post('/channel/updateChannels', {
+				siteId,
+				key: 'autoOptimise',
+				value: params.autoOptimise
+			})
+		)
+		.then(() => {
+			const {
+				global: { sites }
+			} = getState();
+			const site = sites.data[siteId];
+			const { cmsInfo } = site;
+			const { channelsInfo } = cmsInfo;
+			const channels = Object.keys(channelsInfo);
+
+			channels.forEach(channel => {
+				channelsInfo[channel].autoOptimise = params.autoOptimise;
+			});
+
+			dispatch({
+				type: SITE_ACTIONS.UPDATE_SITE_DATA_KEY_OBJ,
+				data: { siteId, key: 'apConfigs', value: { autoOptimise: params.autoOptimise } }
+			});
+
+			dispatch({
+				type: SITE_ACTIONS.UPDATE_SITE_DATA_KEY_OBJ,
+				data: {
+					siteId,
+					key: 'cmsInfo',
+					value: {
+						...cmsInfo,
+						channelsInfo
+					}
+				}
+			});
+
+			return dispatch({
+				type: UI_ACTIONS.SHOW_NOTIFICATION,
+				mode: 'success',
+				title: 'Operation Successful',
+				autoDismiss: 5,
+				message: 'Settings Updated'
+			});
+		})
+		.catch(err => errorHandler(err));
+
 export {
 	fetchAppStatuses,
 	addNewSite,
 	updateSiteStep,
 	updateApConfig,
 	saveSettings,
-	getAppStatuses
+	getAppStatuses,
+	updateSiteAutoOptimise
 };

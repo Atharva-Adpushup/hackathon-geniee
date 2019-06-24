@@ -7,6 +7,7 @@ const config = require('../configs/config');
 const HTTP_STATUS = require('../configs/httpStatusConsts');
 const userModel = require('../models/userModel');
 const channelModel = require('../models/channelModel');
+const siteModel = require('../models/siteModel');
 const AdPushupError = require('../helpers/AdPushupError');
 const { sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFunctions');
 const { errorHandler, verifyOwner, appBucket, checkParams } = require('../helpers/routeHelpers');
@@ -42,6 +43,19 @@ const hlprs = {
 					return true;
 				});
 		});
+	},
+	updateChannel: (channel, key, value) => {
+		let data = channel.get(key);
+		if (typeof data === 'object' && !Array.isArray(data)) {
+			data = {
+				...data,
+				...value
+			};
+		} else {
+			data = value;
+		}
+		channel.set(key, data);
+		return channel.save();
 	}
 };
 
@@ -181,23 +195,40 @@ router
 		return checkParams(['siteId', 'pageGroup', 'platform', 'key', 'value'], req, 'post')
 			.then(() => verifyOwner(siteId, req.user.email))
 			.then(() => channelModel.getChannel(siteId, platform, pageGroup))
-			.then(channel => {
-				let data = channel.get(key);
-				if (typeof data === 'object' && !Array.isArray(data)) {
-					data = {
-						...data,
-						...value
-					};
-				} else {
-					data = value;
-				}
-				channel.set(key, data);
-				return channel.save();
-			})
+			.then(channel => hlprs.updateChannel(channel, key, value))
 			.then(() =>
 				sendSuccessResponse(
 					{
 						message: 'Channel Updated'
+					},
+					res
+				)
+			)
+			.catch(err => errorHandler(err, res, HTTP_STATUS.INTERNAL_SERVER_ERROR));
+	})
+	.post('/updateChannels', (req, res) => {
+		const { siteId, key, value } = req.body;
+
+		function channelProcessing(channelKey) {
+			const [platform, pageGroup] = channelKey.split(':');
+			return channelModel
+				.getChannel(siteId, platform, pageGroup)
+				.then(channel => hlprs.updateChannel(channel, key, value));
+		}
+
+		return checkParams(['siteId', 'key', 'value'], req, 'post')
+			.then(() => verifyOwner(siteId, req.user.email))
+			.then(() => siteModel.getSiteChannels(siteId))
+			.then(channels =>
+				promiseForeach(channels, channelProcessing, (data, err) => {
+					console.log(`${err.message} | Data: ${data}`);
+					return false;
+				})
+			)
+			.then(() =>
+				sendSuccessResponse(
+					{
+						message: 'Channels Updated'
 					},
 					res
 				)

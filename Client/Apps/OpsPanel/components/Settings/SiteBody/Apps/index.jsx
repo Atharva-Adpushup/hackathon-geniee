@@ -22,7 +22,13 @@ class Apps extends Component {
 
 	renderPanel() {
 		const { activeKey } = this.state;
-		const { site, fetchChannelsInfo, showNotification, updateChannelAutoOptimise } = this.props;
+		const {
+			site,
+			fetchChannelsInfo,
+			showNotification,
+			updateChannelAutoOptimise,
+			updateSiteAutoOptimise
+		} = this.props;
 		const common = {
 			activeKey,
 			site,
@@ -44,6 +50,7 @@ class Apps extends Component {
 							{...common}
 							fetchChannelsInfo={fetchChannelsInfo}
 							updateChannelAutoOptimise={updateChannelAutoOptimise}
+							updateSiteAutoOptimise={updateSiteAutoOptimise}
 						/>
 					) : null}
 				</Panel>
