@@ -22,11 +22,19 @@ class Apps extends Component {
 
 	renderPanel() {
 		const { activeKey } = this.state;
-		const { site, fetchChannelsInfo, showNotification, updateChannelAutoOptimise } = this.props;
+		const {
+			site,
+			fetchChannelsInfo,
+			showNotification,
+			updateChannelAutoOptimise,
+			updateSiteAutoOptimise,
+			updateAppStatus
+		} = this.props;
 		const common = {
 			activeKey,
 			site,
-			showNotification
+			showNotification,
+			updateAppStatus
 		};
 		return (
 			<PanelGroup

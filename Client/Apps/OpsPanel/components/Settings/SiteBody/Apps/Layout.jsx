@@ -1,3 +1,5 @@
+/* eslint-disable no-shadow */
+/* eslint-disable no-unused-vars */
 /* eslint-disable no-case-declarations */
 import React, { Component, Fragment } from 'react';
 import { Panel, Table } from 'react-bootstrap';
@@ -18,7 +20,7 @@ class Layout extends Component {
 		const attributeValue = event.target.getAttribute('name');
 		const values = attributeValue.split('-');
 		const name = values[0];
-		const { updateChannelAutoOptimise } = this.props;
+		const { updateChannelAutoOptimise, updateSiteAutoOptimise, updateAppStatus } = this.props;
 
 		switch (name) {
 			case 'autoOptimise':
@@ -33,13 +35,17 @@ class Layout extends Component {
 						autoOptimise: value
 					});
 				} else if (mode === 'site') {
+					const siteId = values[2];
 					// update Site
 				}
 				break;
 
 			case 'appStatus':
 				const siteId = values[1];
-				// update Site
+				updateAppStatus(siteId, {
+					app: 'layout',
+					value
+				});
 				break;
 
 			default:
