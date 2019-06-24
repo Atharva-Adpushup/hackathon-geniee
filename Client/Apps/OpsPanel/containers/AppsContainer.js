@@ -14,8 +14,7 @@ const mapStateToProps = (state, ownProps) => ({
 const mapDispatchToProps = dispatch => ({
 	getAppStatuses: siteId => dispatch(getAppStatuses(siteId)),
 	fetchChannelsInfo: siteId => dispatch(fetchChannelsInfo(siteId)),
-	updateChannelAutoOptimise: (siteId, channelId, params) =>
-		dispatch(updateChannelAutoOptimise(siteId, channelId, params))
+	updateChannelAutoOptimise: (siteId, params) => dispatch(updateChannelAutoOptimise(siteId, params))
 });
 
 export default connect(

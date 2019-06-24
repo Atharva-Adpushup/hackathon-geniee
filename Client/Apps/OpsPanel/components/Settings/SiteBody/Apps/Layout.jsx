@@ -24,11 +24,12 @@ class Layout extends Component {
 			case 'autoOptimise':
 				const mode = values[1];
 				if (mode === 'channel') {
-					const [name, key, channelId, siteId, platform, pageGroup] = values;
+					const [name, key, siteId, platform, pageGroup] = values;
 					// update Channel
 					updateChannelAutoOptimise(siteId, {
 						channelKey: `${platform}:${pageGroup}`,
-						channelId,
+						platform,
+						pageGroup,
 						autoOptimise: value
 					});
 				} else if (mode === 'site') {
@@ -69,7 +70,7 @@ class Layout extends Component {
 					let traffic = 'No Variation Found';
 
 					if (channelAutoOptimise === false) {
-						const keys = Object.keys(variations).length;
+						const keys = Object.keys(variations);
 						traffic = keys.map(variationId => {
 							const variation = variations[variationId];
 							return `${variation.name}:${variation.trafficDistribution}%`;
@@ -90,7 +91,7 @@ class Layout extends Component {
 									on="Yes"
 									off="No"
 									defaultLayout
-									name={`autoOptimise-channel-${channelId}-${siteId}-${platform}-${pageGroup}`}
+									name={`autoOptimise-channel-${siteId}-${platform}-${pageGroup}`}
 									id={`js-autoOptimise-${siteId}-${siteDomain}-${platform}-${pageGroup}`}
 								/>
 							</td>
