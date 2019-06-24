@@ -190,6 +190,22 @@ router
 				sendErrorResponse(err, res);
 			});
 	})
+	.get('/getAppStatuses', (req, res) => {
+		const { email } = req.user;
+		const { siteId } = req.body;
+
+		if (!siteId) return sendErrorResponse({ message: 'Missing Params' }, res);
+
+		return verifyOwner(siteId, email)
+			.then(site => {
+				const apps = site.get('apps') || {};
+				return sendSuccessResponse({ apps }, res);
+			})
+			.catch(err => {
+				console.log(err);
+				return sendErrorResponse(err, res);
+			});
+	})
 	.post('/saveApConfigs', (req, res) => {
 		const { email } = req.user;
 		const { siteId, apConfigs } = req.body;

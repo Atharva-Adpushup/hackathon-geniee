@@ -8,6 +8,7 @@ import CustomButton from '../../../../../../Components/CustomButton/index';
 import CustomIcon from '../../../../../../Components/CustomIcon/index';
 import Edit from '../../../../../../Components/EditBox/index';
 import Loader from '../../../../../../Components/Loader';
+import Empty from '../../../../../../Components/Empty';
 import { copyToClipBoard } from '../../../../../../helpers/commonFunctions';
 
 const DEFAULT_REGEX = 'No Pattern Set';
@@ -114,85 +115,92 @@ class Listing extends Component {
 					Create Pagegroup
 				</CustomButton>
 
-				<Table striped bordered hover>
-					<thead>
-						<tr>
-							<th>Name</th>
-							<th>Platform</th>
-							<th>Variations</th>
-							<th>Regex Pattern</th>
-							<th>Action</th>
-						</tr>
-					</thead>
-					<tbody>
-						{keys.map(key => {
-							const channel = channelsInfo[key];
-							const { pageGroupPattern = [] } = apConfigs;
-							const pagegroupByDevice = pageGroupPattern[channel.platform] || [];
-							const pagegroup =
-								pagegroupByDevice.filter(pg => pg.pageGroup === channel.pageGroup)[0] || {};
-							const { pattern = DEFAULT_REGEX } = pagegroup;
-							return (
-								<tr key={`${site.siteId}-${channel.pageGroup}-${channel.platform}`}>
-									<td>{channel.pageGroup}</td>
-									<td>{channel.platform}</td>
-									<td>{channel.variationsCount}</td>
-									<td>
-										{pattern}
-										<CustomIcon
-											icon="copy"
-											className="u-text-red u-margin-l3 u-cursor-pointer"
-											onClick={copyToClipBoard}
-											toReturn={pattern}
-											title="Copy Pagegroup Pattern"
-										/>
-										<CustomIcon
-											icon="edit"
-											className="u-text-red u-margin-l3 u-cursor-pointer"
-											onClick={this.editRegex}
-											toReturn={{
-												pattern,
-												pageGroup: channel.pageGroup,
-												platform: channel.platform,
-												siteId: site.siteId
-											}}
-											title="Edit Pagegroup Pattern"
-										/>
-									</td>
-									<td>
-										<Link to={`/user/site/${site.siteId}/editor`}>
-											<FontAwesomeIcon
-												icon="code"
-												className="u-text-red u-margin-r2 u-cursor-pointer"
-											/>
-										</Link>
-										|
-										<CustomIcon
-											icon="trash"
-											className="u-text-red u-margin-l2 u-cursor-pointer"
-											onClick={this.deletePagegroup}
-											toReturn={{
-												pageGroup: channel.pageGroup,
-												platform: channel.platform,
-												channelId: channel.channelId,
-												siteId: site.siteId
-											}}
-											title="Delete Pagegroup Pattern"
-										/>
-									</td>
+				{keys.length === 0 ? (
+					<Empty style={{ clear: 'both' }} />
+				) : (
+					<Fragment>
+						<Table striped bordered hover>
+							<thead>
+								<tr>
+									<th>Name</th>
+									<th>Platform</th>
+									<th>Variations</th>
+									<th>Regex Pattern</th>
+									<th>Action</th>
 								</tr>
-							);
-						})}
-					</tbody>
-				</Table>
-				<Modal show={show} onHide={this.modalToggle} bsSize="large">
-					<Modal.Header>
-						<Modal.Title>{modalData.header}</Modal.Title>
-					</Modal.Header>
-					<Modal.Body>{modalData.body}</Modal.Body>
-					{modalData.footer ? <Modal.Body>{modalData.footer}</Modal.Body> : null}
-					<div style={{ clear: 'both' }}>&nbsp;</div>
-				</Modal>
+							</thead>
+							<tbody>
+								{keys.map(key => {
+									const channel = channelsInfo[key];
+									const { pageGroupPattern = [] } = apConfigs;
+									const pagegroupByDevice = pageGroupPattern[channel.platform] || [];
+									const pagegroup =
+										pagegroupByDevice.filter(pg => pg.pageGroup === channel.pageGroup)[0] || {};
+									const { pattern = DEFAULT_REGEX } = pagegroup;
+									return (
+										<tr key={`${site.siteId}-${channel.pageGroup}-${channel.platform}`}>
+											<td>{channel.pageGroup}</td>
+											<td>{channel.platform}</td>
+											<td>{channel.variationsCount}</td>
+											<td>
+												{pattern}
+												<CustomIcon
+													icon="copy"
+													className="u-text-red u-margin-l3 u-cursor-pointer"
+													onClick={copyToClipBoard}
+													toReturn={pattern}
+													title="Copy Pagegroup Pattern"
+												/>
+												<CustomIcon
+													icon="edit"
+													className="u-text-red u-margin-l3 u-cursor-pointer"
+													onClick={this.editRegex}
+													toReturn={{
+														pattern,
+														pageGroup: channel.pageGroup,
+														platform: channel.platform,
+														siteId: site.siteId
+													}}
+													title="Edit Pagegroup Pattern"
+												/>
+											</td>
+											<td>
+												<Link to={`/user/site/${site.siteId}/editor`}>
+													<FontAwesomeIcon
+														icon="code"
+														className="u-text-red u-margin-r2 u-cursor-pointer"
+														title="Open Editor"
+													/>
+												</Link>
+												|
+												<CustomIcon
+													icon="trash"
+													className="u-text-red u-margin-l2 u-cursor-pointer"
+													onClick={this.deletePagegroup}
+													toReturn={{
+														pageGroup: channel.pageGroup,
+														platform: channel.platform,
+														channelId: channel.channelId,
+														siteId: site.siteId
+													}}
+													title="Delete Pagegroup Pattern"
+												/>
+											</td>
+										</tr>
+									);
+								})}
+							</tbody>
+						</Table>
+						<Modal show={show} onHide={this.modalToggle} bsSize="large">
+							<Modal.Header>
+								<Modal.Title>{modalData.header}</Modal.Title>
+							</Modal.Header>
+							<Modal.Body>{modalData.body}</Modal.Body>
+							{modalData.footer ? <Modal.Body>{modalData.footer}</Modal.Body> : null}
+							<div style={{ clear: 'both' }}>&nbsp;</div>
+						</Modal>
+					</Fragment>
+				)}
 			</Fragment>
 		);
 	}
