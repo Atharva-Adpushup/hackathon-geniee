@@ -217,7 +217,7 @@ const deletePagegroup = (siteId, params) => (dispatch, getState) =>
 		})
 		.catch(err => errorHandler(err, 'Pagegroup deletion failed'));
 
-const updateChannelAutoOptimise = (siteId, channelId, params) => (dispatch, getState) => {
+const updateChannelAutoOptimise = (siteId, params) => (dispatch, getState) => {
 	const {
 		global: { sites }
 	} = getState();
@@ -231,7 +231,13 @@ const updateChannelAutoOptimise = (siteId, channelId, params) => (dispatch, getS
 	};
 
 	return axiosInstance
-		.post('/channel/updateChannel', { siteId, apConfigs: { pageGroupPattern } })
+		.post('/channel/updateChannel', {
+			siteId,
+			platform: params.platform,
+			pageGroup: params.pageGroup,
+			key: 'autoOptimise',
+			value: params.autoOptimise
+		})
 		.then(() => {
 			dispatch({
 				type: SITE_ACTIONS.UPDATE_SITE_DATA_KEY_OBJ,

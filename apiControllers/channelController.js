@@ -176,10 +176,33 @@ router
 			})
 			.catch(err => errorHandler(err, res, HTTP_STATUS.INTERNAL_SERVER_ERROR));
 	})
-	.post('/updateAutoOptimise', (req, res) =>
-		checkParams(['siteId', 'channelId', 'key', 'value'], req, 'post')
-			.then(() => {})
-			.catch(err => errorHandler(err, res, HTTP_STATUS.INTERNAL_SERVER_ERROR))
-	);
+	.post('/updateChannel', (req, res) => {
+		const { siteId, pageGroup, platform, key, value } = req.body;
+		return checkParams(['siteId', 'pageGroup', 'platform', 'key', 'value'], req, 'post')
+			.then(() => verifyOwner(siteId, req.user.email))
+			.then(() => channelModel.getChannel(siteId, platform, pageGroup))
+			.then(channel => {
+				let data = channel.get(key);
+				if (typeof data === 'object' && !Array.isArray(data)) {
+					data = {
+						...data,
+						...value
+					};
+				} else {
+					data = value;
+				}
+				channel.set(key, data);
+				return channel.save();
+			})
+			.then(() =>
+				sendSuccessResponse(
+					{
+						message: 'Channel Updated'
+					},
+					res
+				)
+			)
+			.catch(err => errorHandler(err, res, HTTP_STATUS.INTERNAL_SERVER_ERROR));
+	});
 
 module.exports = router;
