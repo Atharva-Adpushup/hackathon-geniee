@@ -27,12 +27,14 @@ class Apps extends Component {
 			fetchChannelsInfo,
 			showNotification,
 			updateChannelAutoOptimise,
-			updateSiteAutoOptimise
+			updateSiteAutoOptimise,
+			updateAppStatus
 		} = this.props;
 		const common = {
 			activeKey,
 			site,
-			showNotification
+			showNotification,
+			updateAppStatus
 		};
 		return (
 			<PanelGroup

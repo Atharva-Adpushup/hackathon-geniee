@@ -1,6 +1,10 @@
 import { connect } from 'react-redux';
 
-import { getAppStatuses, updateSiteAutoOptimise } from '../../../actions/siteActions';
+import {
+	getAppStatuses,
+	updateSiteAutoOptimise,
+	updateAppStatus
+} from '../../../actions/siteActions';
 import {
 	fetchChannelsInfo,
 	updateChannelAutoOptimise
@@ -16,7 +20,8 @@ const mapDispatchToProps = dispatch => ({
 	fetchChannelsInfo: siteId => dispatch(fetchChannelsInfo(siteId)),
 	updateChannelAutoOptimise: (siteId, params) =>
 		dispatch(updateChannelAutoOptimise(siteId, params)),
-	updateSiteAutoOptimise: (siteId, params) => dispatch(updateSiteAutoOptimise(siteId, params))
+	updateSiteAutoOptimise: (siteId, params) => dispatch(updateSiteAutoOptimise(siteId, params)),
+	updateAppStatus: (siteId, params) => dispatch(updateAppStatus(siteId, params))
 });
 
 export default connect(
