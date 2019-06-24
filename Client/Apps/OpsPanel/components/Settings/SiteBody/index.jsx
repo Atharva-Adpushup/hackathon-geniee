@@ -1,8 +1,8 @@
 import React from 'react';
 import { Row } from 'react-bootstrap';
 import Settings from './Settings';
-import Apps from './Apps';
 import PagegroupContainer from '../../../containers/PagegroupContainer';
+import AppsContainer from '../../../containers/AppsContainer';
 
 const SiteBody = props => {
 	const { site, showNotification, saveSettings } = props;
@@ -10,7 +10,7 @@ const SiteBody = props => {
 		<React.Fragment>
 			<Row>
 				<Settings site={site} showNotification={showNotification} saveSettings={saveSettings} />
-				<Apps />
+				<AppsContainer site={site} showNotification={showNotification} />
 			</Row>
 			<Row>
 				<PagegroupContainer site={site} showNotification={showNotification} />

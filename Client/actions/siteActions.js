@@ -56,4 +56,23 @@ const saveSettings = (siteId, siteData) => dispatch =>
 		})
 		.catch(err => errorHandler(err));
 
-export { fetchAppStatuses, addNewSite, updateSiteStep, updateApConfig, saveSettings };
+const getAppStatuses = siteId => dispatch =>
+	axiosInstance
+		.get('/site/getAppStatuses', { params: { siteId } })
+		.then(response => {
+			const { data } = response.data;
+			dispatch({
+				type: SITE_ACTIONS.UPDATE_SITE_DATA,
+				data
+			});
+		})
+		.catch(err => errorHandler(err));
+
+export {
+	fetchAppStatuses,
+	addNewSite,
+	updateSiteStep,
+	updateApConfig,
+	saveSettings,
+	getAppStatuses
+};

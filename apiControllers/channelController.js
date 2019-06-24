@@ -9,7 +9,7 @@ const userModel = require('../models/userModel');
 const channelModel = require('../models/channelModel');
 const AdPushupError = require('../helpers/AdPushupError');
 const { sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFunctions');
-const { errorHandler, verifyOwner, appBucket } = require('../helpers/routeHelpers');
+const { errorHandler, verifyOwner, appBucket, checkParams } = require('../helpers/routeHelpers');
 
 const router = express.Router();
 
@@ -59,15 +59,29 @@ router
 		return verifyOwner(siteId, req.user.email)
 			.then(() =>
 				appBucket.queryDB(
-					`select  meta().id, id as channelId, object_length(variations) as variationsCount, platform, pageGroup from ${
-						config.couchBase.DEFAULT_BUCKET
-					} where meta().id like 'chnl::%' and siteId = ${siteId};`
+					`select meta().id, id as channelId, object_length(variations) as variationsCount, platform, pageGroup, variations, autoOptimise
+					from ${config.couchBase.DEFAULT_BUCKET} where meta().id like 'chnl::%' and siteId = ${siteId};`
 				)
 			)
 			.then(channels => {
 				const response = {};
 				channels.forEach(channel => {
-					response[`${channel.platform}:${channel.pageGroup}`] = channel;
+					const { variations = {} } = channel;
+					const variationsData = {};
+					const keys = Object.keys(variations);
+
+					keys.forEach(variationId => {
+						const current = variations[variationId];
+						variationsData[variationId] = {
+							variationId,
+							name: current.name,
+							trafficDistribution: current.trafficDistribution
+						};
+					});
+					response[`${channel.platform}:${channel.pageGroup}`] = {
+						...channel,
+						variations: variationsData
+					};
 				});
 				return sendSuccessResponse(
 					{
@@ -161,6 +175,11 @@ router
 				);
 			})
 			.catch(err => errorHandler(err, res, HTTP_STATUS.INTERNAL_SERVER_ERROR));
-	});
+	})
+	.post('/updateAutoOptimise', (req, res) =>
+		checkParams(['siteId', 'channelId', 'key', 'value'], req, 'post')
+			.then(() => {})
+			.catch(err => errorHandler(err, res, HTTP_STATUS.INTERNAL_SERVER_ERROR))
+	);
 
 module.exports = router;
