@@ -34,8 +34,11 @@ class Table extends React.Component {
 		tableBody.forEach(row => {
 			for (let col in row) {
 				if (metrics[col]) {
-					let num = Math.round(row[col] * 100) / 100;
-					row[col] = numberWithCommas(num);
+					let num = metrics[col]['valueType'] == 'money' ? row[col].toFixed(2) : row[col];
+					row[col] =
+						metrics[col]['valueType'] == 'money'
+							? '$' + numberWithCommas(num)
+							: numberWithCommas(num);
 				}
 			}
 		});
@@ -108,16 +111,13 @@ class Table extends React.Component {
 					}
 				}
 				if (selectedInterval === 'cumulative')
-					row.date = moment(startDate).format('ll') + ' to ' + moment(endDate).format('ll');
+					tableRow.date = moment(startDate).format('ll') + ' to ' + moment(endDate).format('ll');
 				displayTableData.push(tableRow);
 			});
 
 			Object.keys(grandTotal).forEach(key => {
 				const newkey = key.replace('total_', '');
-				if (metrics[newkey]) {
-					let num = Math.round(grandTotal[key] * 100) / 100;
-					grandTotal[newkey] = numberWithCommas(num);
-				} else grandTotal[newkey] = grandTotal[key];
+				grandTotal[newkey] = grandTotal[key];
 				delete grandTotal[key];
 			});
 			grandTotal[tableHeader[0].prop] = 'Total';
@@ -129,13 +129,17 @@ class Table extends React.Component {
 		}
 	};
 	renderFooter() {
-		let { tableHeader, grandTotal } = this.state;
+		let { tableHeader, grandTotal, metrics } = this.state;
 		let footerComponent = [];
 		for (let i = 0; i < tableHeader.length; i++) {
-			let value = grandTotal[tableHeader[i].prop];
-			if (typeof value == 'number') {
-				value = Math.round(value * 100) / 100;
-				value = numberWithCommas(value);
+			let col = tableHeader[i].prop;
+			let value = grandTotal[col];
+			if (metrics[col]) {
+				let num = metrics[col]['valueType'] == 'money' ? value.toFixed(2) : value;
+				value =
+					metrics[col]['valueType'] == 'money'
+						? '$' + numberWithCommas(num)
+						: numberWithCommas(num);
 			}
 
 			footerComponent.push(

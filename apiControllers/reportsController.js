@@ -43,6 +43,16 @@ router
 		} else {
 			return res.status(403).send('CSV data to be generated is undefined.');
 		}
+	})
+	.get('/getLastUpdateStatus', (req, res) => {
+		return request({
+			method: 'GET',
+			uri: `${CC.REPORT_STATUS}?fromDate=${req.params.fromDate}&toDate=${
+				req.params.toDate
+			}&report=GETADPTAGREPORTSTATUS`
+		}).then(result => {
+			return res.send(result);
+		});
 	});
 
 module.exports = router;

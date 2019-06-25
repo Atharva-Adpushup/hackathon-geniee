@@ -9,7 +9,7 @@ import PresetDateRangePicker from '../../../Components/PresetDateRangePicker/ind
 import Selectbox from '../../../Components/Selectbox/index';
 import { convertObjToArr, arrayUnique, getPresets } from '../helpers/utils';
 import reportService from '../../../services/reportService';
-import { accountFilter, REPORT_DOWNLOAD_ENDPOINT } from '../configs/commonConsts';
+import { accountFilter, REPORT_DOWNLOAD_ENDPOINT, REPORT_STATUS } from '../configs/commonConsts';
 
 class Control extends Component {
 	constructor(props) {
@@ -26,12 +26,14 @@ class Control extends Component {
 			selectedDimension: props.selectedDimension || '',
 			selectedInterval: props.selectedInterval || '',
 			selectedFilters: props.selectedFilters || {},
-			disableGenerateButton: false
+			disableGenerateButton: false,
+			updateStatusText: ''
 		};
 	}
 
 	componentDidMount() {
 		this.updateFilterList(this.props.reportType);
+		this.getReportStatus();
 	}
 
 	componentDidUpdate(prevProps) {
@@ -129,6 +131,27 @@ class Control extends Component {
 		this.setState({ selectedFilters });
 	};
 
+	getReportStatus() {
+		reportService
+			.getLastUpdateStatus({
+				params: { fromDate: this.state.startDate, toDate: this.state.endDate }
+			})
+			.then(res => {
+				if (res.status == 200 && res.data) {
+					if (res.data.status == 'Stopped') {
+						let updatedDate = res.data.lastRunTimePST;
+						this.setState({
+							updateStatusText: `Last updated on ${updatedDate}.`
+						});
+					} else if (res.data.status == 'Running') {
+						this.setState({
+							updateStatusText: `Data is being compiled, please check back later` //`Note - The network reporting data is being crunched and you will see updated data shortly.`
+						});
+					}
+				}
+			});
+	}
+
 	generateButtonHandler = () => {
 		const {
 			startDate,
@@ -169,7 +192,7 @@ class Control extends Component {
 							selected={state.selectedDimension || ''}
 							options={state.dimensionList}
 							onSelect={selectedDimension => {
-								this.onDimensionChange();
+								this.onDimensionChange(selectedDimension);
 								this.setState({ selectedDimension });
 							}}
 						/>
@@ -201,6 +224,7 @@ class Control extends Component {
 							datesUpdated={({ startDate, endDate }) => this.setState({ startDate, endDate })}
 							autoFocus
 						/>
+						<div className="updateStatusDiv">{state.updateStatusText}</div>
 						{/* eslint-enable */}
 					</div>
 				</div>

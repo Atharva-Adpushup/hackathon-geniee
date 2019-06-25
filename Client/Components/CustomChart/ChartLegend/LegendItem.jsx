@@ -1,6 +1,4 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { OverlayTrigger, Popover } from 'react-bootstrap';
 import { indexOf } from 'lodash';
 
 class LegendItem extends Component {
@@ -85,8 +83,11 @@ class LegendItem extends Component {
 			>
 				<div className="name">{legend.name}</div>
 				<div className="total">
-					{legend.type === 'money' ? '$' : ''}
-					{legend.total >= 0 ? this.numberWithCommas(Math.round(legend.total * 100) / 100) : 'N/A'}
+					{legend.total >= 0
+						? legend.valueType === 'money'
+							? '$' + this.numberWithCommas(legend.total.toFixed(2))
+							: this.numberWithCommas(legend.total)
+						: 'N/A'}
 				</div>
 			</div>
 		);

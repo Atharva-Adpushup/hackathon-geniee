@@ -84,23 +84,24 @@ const filtersValues = {
 const REPORT_PATH = '/site/report?report_name=get_stats_by_custom';
 
 const REPORT_DOWNLOAD_ENDPOINT = '/api/reports/downloadAdpushupReport';
+const REPORT_STATUS = '/api/reports/getLastUpdateStatus';
 
 const displayMetrics = [
-	{ value: 'network_net_revenue', name: 'Network Net Revenue', valueType: 'money' },
-	{ value: 'adpushup_page_views', name: 'AdPushup PageViews', valueType: 'number' },
+	{ value: 'network_net_revenue', name: 'Net Revenue', valueType: 'money' },
+	{ value: 'adpushup_page_views', name: 'Page Views', valueType: 'number' },
 	{ value: 'adpushup_page_cpm', name: 'Page RPM', valueType: 'money' },
-	{ value: 'network_impressions', name: 'Network Impressions', valueType: 'number' },
-	{ value: 'network_ad_ecpm', name: 'Network Ad eCPM', valueType: 'money' }
+	{ value: 'network_impressions', name: 'Impressions', valueType: 'number' },
+	{ value: 'network_ad_ecpm', name: 'Ad eCPM', valueType: 'money' }
 ];
 const activeLegendItem = {
 	value: 'network_net_revenue',
-	name: 'Network Net Revenue',
+	name: 'Net Revenue',
 	valueType: 'money'
 };
 const activeLegendItems = [
-	{ value: 'network_net_revenue', name: 'Network Net Revenue', valueType: 'money' },
-	{ value: 'network_impressions', name: 'Network Impressions', valueType: 'number' },
-	{ value: 'network_ad_ecpm', name: 'Network Ad eCPM', valueType: 'money' }
+	{ value: 'network_net_revenue', name: 'Net Revenue', valueType: 'money' },
+	{ value: 'network_impressions', name: 'Impressions', valueType: 'number' },
+	{ value: 'network_ad_ecpm', name: 'Ad eCPM', valueType: 'money' }
 ];
 const accountFilter = ['country', 'siteid', 'device_type', 'network'];
 export {
@@ -115,5 +116,6 @@ export {
 	activeLegendItem,
 	activeLegendItems,
 	accountFilter,
-	REPORT_DOWNLOAD_ENDPOINT
+	REPORT_DOWNLOAD_ENDPOINT,
+	REPORT_STATUS
 };
