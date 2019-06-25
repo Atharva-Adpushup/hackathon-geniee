@@ -35,10 +35,18 @@
 	},
 	"defaultYAxisGroups": [
 		{
-			"seriesNames": ["AdPushup PageViews", "Network Impressions"]
+			"seriesNames": ["Page Views", "Impressions"]
 		},
 		{
-			"seriesNames": ["Page RPM", "Network Ad eCPM", "Network Net Revenue"],
+			"seriesNames": ["Net Revenue"],
+			"yAxisConfig": {
+				"labels": {
+					"format": "${value}"
+				}
+			}
+		},
+		{
+			"seriesNames": ["Page RPM", "Ad eCPM"],
 			"yAxisConfig": {
 				"labels": {
 					"format": "${value}"

@@ -75,6 +75,15 @@ class AsyncGroupSelect extends Component {
 					showFilterValues: true,
 					isLoading: false
 				});
+			} else {
+				this.setState({
+					filterValues: [],
+					filterResult: [],
+					selectedFilterKey: filter.value,
+					selectedFilters,
+					showFilterValues: true,
+					isLoading: false
+				});
 			}
 		});
 	}
@@ -111,6 +120,64 @@ class AsyncGroupSelect extends Component {
 			filterValues: newList
 		});
 	}
+
+	renderFilters = () => {
+		let { filterValues, selectedFilters, selectedFilterKey } = this.state;
+		let filters = [];
+
+		filterValues.map(filterValue =>
+			filters.push(
+				<Checkbox
+					className="col-sm-12"
+					key={filterValue.id}
+					onChange={e => {
+						this.handleFilterValueSelect(e.target.checked, filterValue.id);
+					}}
+					checked={
+						selectedFilters[selectedFilterKey]
+							? selectedFilters[selectedFilterKey][filterValue.id]
+							: false
+					}
+				>
+					{filterValue.value}
+				</Checkbox>
+			)
+		);
+		return filters;
+	};
+
+	selectAll = () => {
+		const { selectedFilters, selectedFilterKey, filterValues } = this.state;
+		selectedFilters[selectedFilterKey] = selectedFilters[selectedFilterKey] || {};
+		// if (checked) selectedFilters[selectedFilterKey][key] = true;
+		// else delete selectedFilters[selectedFilterKey][key];
+		// for (let filter in selectedFilters) {
+		// 	if (_.isEmpty(selectedFilters[filter])) delete selectedFilters[filter];
+		// }
+		filterValues.map(filterValue => {
+			selectedFilters[selectedFilterKey][filterValue.id] = true;
+		});
+		this.setState(
+			{
+				selectedFilters
+			},
+			() => {
+				this.props.onFilterValueChange(selectedFilters);
+			}
+		);
+	};
+	selectNone = () => {
+		const { selectedFilters, selectedFilterKey } = this.state;
+		selectedFilters[selectedFilterKey] = {};
+		this.setState(
+			{
+				selectedFilters
+			},
+			() => {
+				this.props.onFilterValueChange(selectedFilters);
+			}
+		);
+	};
 
 	render() {
 		const { state, props } = this;
@@ -175,7 +242,7 @@ class AsyncGroupSelect extends Component {
 						>
 							<div>
 								<a onClick={this.hideFilterValues} style={{ cursor: 'pointer' }}>
-									<Glyphicon glyph="menu-left" className="mR-5" />
+									<Glyphicon glyph="menu-left" className="u-magin-r1" />
 									Back to filters
 								</a>
 							</div>
@@ -186,24 +253,24 @@ class AsyncGroupSelect extends Component {
 								onChange={this.handleSearchTextChange}
 								onSelect={e => e.stopPropagation()}
 							/>
-							<div className="filterValues">
-								{state.filterValues.map(filterValue => (
-									<Checkbox
-										className="col-sm-12"
-										key={filterValue.id}
-										onChange={e => {
-											this.handleFilterValueSelect(e.target.checked, filterValue.id);
-										}}
-										checked={
-											state.selectedFilters[state.selectedFilterKey]
-												? state.selectedFilters[state.selectedFilterKey][filterValue.id]
-												: false
-										}
-									>
-										{filterValue.value}
-									</Checkbox>
-								))}
+							<div>
+								<a
+									onClick={this.selectAll}
+									style={{ cursor: 'pointer' }}
+									className="u-margin-l3 u-margin-r2"
+								>
+									Select All
+								</a>
+								<a onClick={this.selectNone} style={{ cursor: 'pointer' }}>
+									None
+								</a>
 							</div>
+
+							{state.filterValues && state.filterValues.length > 0 ? (
+								<div className="filterValues">{this.renderFilters()}</div>
+							) : (
+								<div className="inputSearch text-center">No Value Found</div>
+							)}
 						</div>
 					</DropdownButton>
 				</div>

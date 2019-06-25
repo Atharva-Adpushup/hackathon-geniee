@@ -8,5 +8,9 @@ export default {
 	getWidgetData: params => {
 		let url = config.ANALYTICS_API_WIDGET_DATA;
 		return axiosInstance.get(url, { params });
+	},
+	getLastUpdateStatus: params => {
+		let url = config.ANALYTICS_API_UPDATE_STATUS;
+		return axiosInstance.get(url, { params });
 	}
 };

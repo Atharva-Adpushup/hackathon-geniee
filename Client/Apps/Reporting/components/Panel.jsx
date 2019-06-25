@@ -156,7 +156,7 @@ class Panel extends Component {
 			if (response.status == 200 && response.data) {
 				this.setState({ tableData: response.data });
 			}
-			this.setState({ isLoading: false });
+			this.setState({ isLoading: false, ...data });
 		});
 	};
 
