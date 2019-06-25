@@ -249,12 +249,12 @@ router
 			});
 	})
 	.post('/updateSite', (req, res) => {
-		const { siteId, key, value } = req.body;
+		const { siteId, key, value, replace = false } = req.body;
 		return checkParams(['siteId', 'key', 'value'], req, 'post')
 			.then(() => verifyOwner(siteId, req.user.email))
 			.then(site => {
 				let data = site.get(key);
-				if (typeof data === 'object' && !Array.isArray(data)) {
+				if (typeof data === 'object' && !Array.isArray(data) && !replace) {
 					data = {
 						...data,
 						...value

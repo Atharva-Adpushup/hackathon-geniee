@@ -145,6 +145,28 @@ const updateAppStatus = (siteId, params) => dispatch =>
 		})
 		.catch(err => errorHandler(err));
 
+const updateSite = (siteId, params) => dispatch =>
+	axiosInstance
+		.post('/site/updateSite', {
+			siteId,
+			...params
+		})
+		.then(() => {
+			dispatch({
+				type: SITE_ACTIONS.UPDATE_SITE_DATA,
+				data: { siteId, data: { [params.key]: params.value } }
+			});
+
+			return dispatch({
+				type: UI_ACTIONS.SHOW_NOTIFICATION,
+				mode: 'success',
+				title: 'Operation Successful',
+				autoDismiss: 5,
+				message: 'Site Updated'
+			});
+		})
+		.catch(err => errorHandler(err));
+
 export {
 	fetchAppStatuses,
 	addNewSite,
@@ -153,5 +175,6 @@ export {
 	saveSettings,
 	getAppStatuses,
 	updateSiteAutoOptimise,
-	updateAppStatus
+	updateAppStatus,
+	updateSite
 };

@@ -46,7 +46,34 @@ class ConsentManagement extends Component {
 	};
 
 	handleSave = () => {
-		console.log('Saved');
+		const { status, config } = this.state;
+		const { updateAppStatus, updateSite, showNotification, site } = this.props;
+		const { siteId } = site;
+
+		let parsedConfig;
+
+		try {
+			parsedConfig = JSON.parse(config);
+		} catch (e) {
+			return showNotification({
+				mode: 'error',
+				title: 'Operation Failed',
+				autoDismiss: 5,
+				message: 'Invalid config value'
+			});
+		}
+
+		return updateAppStatus(siteId, {
+			app: 'consentManagement',
+			status
+		}).then(() => {
+			parsedConfig.compliance = status;
+			return updateSite(siteId, {
+				key: 'gdpr',
+				value: parsedConfig,
+				replace: true
+			});
+		});
 	};
 
 	render() {
