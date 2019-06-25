@@ -3,6 +3,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { DropdownButton, MenuItem } from 'react-bootstrap';
+import CustomIcon from '../CustomIcon';
 
 const findSelected = props => {
 	const { selected, title, options } = props;
@@ -28,9 +29,14 @@ class SelectBox extends Component {
 	};
 
 	selectWrapper = (key, e) => {
-		const { onSelect, options } = this.props;
+		const { onSelect, options, title } = this.props;
 		const optionValueType = typeof options[0].value;
 		const dataKey = e.target.getAttribute('data-key');
+
+		if (!e.target.getAttribute('data-value')) {
+			return this.setState({ name: title }, () => onSelect(null));
+		}
+
 		let value;
 		switch (optionValueType) {
 			case 'number': {
@@ -43,7 +49,7 @@ class SelectBox extends Component {
 				break;
 			}
 		}
-		this.setState(
+		return this.setState(
 			{
 				name: e.target.getAttribute('data-name')
 			},
@@ -61,7 +67,8 @@ class SelectBox extends Component {
 			wrapperClassName,
 			dropdownClassName,
 			type,
-			dataKey
+			dataKey,
+			reset
 		} = this.props;
 		const buttonTitle = selected === 0 || selected ? name : title;
 		return (
@@ -86,6 +93,9 @@ class SelectBox extends Component {
 						</MenuItem>
 					))}
 				</DropdownButton>
+				{reset && selected && (
+					<CustomIcon classNames="selectbox-reset" icon="times" onClick={this.selectWrapper} />
+				)}
 			</div>
 		);
 	}
@@ -104,7 +114,8 @@ SelectBox.propTypes = {
 	dropdownClassName: PropTypes.string,
 	wrapperClassName: PropTypes.string,
 	title: PropTypes.string,
-	type: PropTypes.string
+	type: PropTypes.string,
+	reset: PropTypes.bool
 };
 
 SelectBox.defaultProps = {
@@ -112,7 +123,8 @@ SelectBox.defaultProps = {
 	dropdownClassName: '',
 	wrapperClassName: '',
 	type: 'default',
-	selected: null
+	selected: null,
+	reset: false
 };
 
 export default SelectBox;

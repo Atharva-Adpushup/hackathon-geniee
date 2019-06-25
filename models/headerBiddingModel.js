@@ -7,6 +7,7 @@ const schema = require('../helpers/schema');
 const FormValidator = require('../helpers/FormValidator');
 const utils = require('../helpers/utils');
 const siteModel = require('./siteModel');
+const userModel = require('./userModel');
 const channelModel = require('./channelModel');
 
 const HeaderBidding = model.extend(function() {
@@ -92,8 +93,7 @@ function apiModule() {
 					// delete added bidders keys from all bidders
 					for (const addedBidderKey in addedBidders) {
 						addedBidders[addedBidderKey].paramsFormFields = {
-							...notAddedBidders[addedBidderKey].params.global,
-							...notAddedBidders[addedBidderKey].params.siteLevel
+							...notAddedBidders[addedBidderKey].params
 						};
 
 						delete notAddedBidders[addedBidderKey];
@@ -409,15 +409,20 @@ function apiModule() {
 				API.updateHbStatusOnApTagInventory(siteId, json.apTag),
 				API.updateHbStatusOnInnovAdInventory(siteId, json.innovativeAds)
 			]),
-		getPrebidConfig: siteId =>
-			Promise.all([API.getHbConfig(siteId), siteModel.getSiteById(siteId)]).then(
-				([hbConfig, site]) => {
+		getPrebidConfig: (siteId, email) =>
+			Promise.all([API.getHbConfig(siteId), userModel.getUserByEmail(email)]).then(
+				([hbConfig, user]) => {
 					const prebidConfig = hbConfig.get('prebidConfig');
-					const { activeDFPNetwork, activeDFPCurrencyCode } = site.get('apConfigs');
+					// const { activeDFPNetwork, activeDFPCurrencyCode } = site.get('apConfigs');
+					const adNetworkSettings = user.getNetworkDataObj('DFP');
+					const currencyCode =
+						adNetworkSettings &&
+						adNetworkSettings.dfpAccounts &&
+						adNetworkSettings.dfpAccounts[0].currencyCode;
 					const mergedPrebidConfig = { ...prebidConfig };
 
-					mergedPrebidConfig.adServer = activeDFPNetwork ? 'AP' : 'Publisher';
-					mergedPrebidConfig.currency.code = activeDFPCurrencyCode;
+					mergedPrebidConfig.adServer = adNetworkSettings ? 'AP' : 'Publisher';
+					mergedPrebidConfig.currency.code = currencyCode || '';
 					mergedPrebidConfig.availableFormats = [
 						{ name: 'Display', value: 'display' },
 						{ name: 'Native', value: 'native' },
