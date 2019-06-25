@@ -245,6 +245,33 @@ router
 			.catch(err => {
 				sendErrorResponse(err, res);
 			});
+	})
+	.post('/updateSite', (req, res) => {
+		const { siteId, key, value, replace = false } = req.body;
+		return checkParams(['siteId', 'key', 'value'], req, 'post')
+			.then(() => verifyOwner(siteId, req.user.email))
+			.then(site => {
+				let data = site.get(key);
+				if (typeof data === 'object' && !Array.isArray(data) && !replace) {
+					data = {
+						...data,
+						...value
+					};
+				} else {
+					data = value;
+				}
+				site.set(key, data);
+				return site.save();
+			})
+			.then(() =>
+				sendSuccessResponse(
+					{
+						message: 'Site Updated'
+					},
+					res
+				)
+			)
+			.catch(err => errorHandler(err, res, HTTP_STATUS.INTERNAL_SERVER_ERROR));
 	});
 
 module.exports = router;

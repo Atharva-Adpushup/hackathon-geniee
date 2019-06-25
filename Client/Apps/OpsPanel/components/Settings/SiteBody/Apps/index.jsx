@@ -29,7 +29,8 @@ class Apps extends Component {
 			showNotification,
 			updateChannelAutoOptimise,
 			updateSiteAutoOptimise,
-			updateAppStatus
+			updateAppStatus,
+			updateSite
 		} = this.props;
 		const common = {
 			activeKey,
@@ -60,7 +61,9 @@ class Apps extends Component {
 					<Panel.Heading>
 						<Panel.Title toggle>Consent Management App</Panel.Title>
 					</Panel.Heading>
-					{activeKey === 'consentManagement' ? <ConsentManagement {...common} /> : null}
+					{activeKey === 'consentManagement' ? (
+						<ConsentManagement {...common} updateSite={updateSite} />
+					) : null}
 				</Panel>
 			</PanelGroup>
 		);
