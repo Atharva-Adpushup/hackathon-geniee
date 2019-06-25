@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { PanelGroup, Panel, Col } from 'react-bootstrap';
 import Loader from '../../../../../../Components/Loader';
 import Layout from './Layout';
+import ConsentManagement from './ConsentManagement';
 
 class Apps extends Component {
 	state = {
@@ -54,6 +55,12 @@ class Apps extends Component {
 							updateChannelAutoOptimise={updateChannelAutoOptimise}
 						/>
 					) : null}
+				</Panel>
+				<Panel eventKey="consentManagement">
+					<Panel.Heading>
+						<Panel.Title toggle>Consent Management App</Panel.Title>
+					</Panel.Heading>
+					{activeKey === 'consentManagement' ? <ConsentManagement {...common} /> : null}
 				</Panel>
 			</PanelGroup>
 		);
