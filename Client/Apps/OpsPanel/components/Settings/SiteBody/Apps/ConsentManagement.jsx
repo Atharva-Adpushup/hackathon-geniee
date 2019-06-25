@@ -65,7 +65,7 @@ class ConsentManagement extends Component {
 
 		return updateAppStatus(siteId, {
 			app: 'consentManagement',
-			status
+			value: status
 		}).then(() => {
 			parsedConfig.compliance = status;
 			return updateSite(siteId, {
