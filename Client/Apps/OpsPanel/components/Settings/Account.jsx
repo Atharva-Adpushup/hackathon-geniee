@@ -1,3 +1,5 @@
+/* eslint-disable no-alert */
+/* eslint-disable no-else-return */
 /* eslint-disable prefer-destructuring */
 import React, { Component, Fragment } from 'react';
 import { Col } from 'react-bootstrap';
@@ -84,6 +86,14 @@ class Account extends Component {
 				message: 'Please select an active DFP',
 				autoDimiss: 10
 			});
+		} else if (originalactiveDFP === null && activeDFP !== null) {
+			if (
+				!window.confirm(
+					'Setting Active DFP is an irrevocable action. Are you sure about the selected Active DFP? '
+				)
+			) {
+				return false;
+			}
 		}
 
 		const [activeDFPNetwork, activeDFPParentId] = activeDFP.split('-');
@@ -102,12 +112,18 @@ class Account extends Component {
 		return updateUser({
 			key: 'dfpSettings',
 			value: updatedDFPSettings
-		}).then(() =>
-			updateUser({
-				key: 'adNetworkSettings',
-				value: adNetworkSettings
-			})
-		);
+		})
+			.then(() =>
+				updateUser({
+					key: 'adNetworkSettings',
+					value: adNetworkSettings
+				})
+			)
+			.then(() =>
+				this.setState({
+					originalactiveDFP: activeDFP
+				})
+			);
 	};
 
 	render() {
