@@ -52,10 +52,12 @@ var config = require('./config'),
 					timeout: slot.feedback.timeout || slot.timeout,
 					status: null,
 					sectionId: slot.sectionId,
-					variationId: slot.variationId,
 					sectionName: slot.sectionName,
 					pageGroup: slot.pageGroup,
 					platform: slot.platform,
+					pageVariationId: window.adpushup.config.selectedVariation,
+					pageVariationName: window.adpushup.config.selectedVariationName,
+					pageVariationType: window.adpushup.config.selectedVariationType,
 					packetId: window.adpushup.config.packetId
 				}
 			};
