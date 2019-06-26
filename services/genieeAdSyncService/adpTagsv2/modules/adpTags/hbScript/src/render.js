@@ -14,6 +14,8 @@ var render = {
     },
     createGPTSlots: function (googletag, adpSlots) {
         adpSlots.forEach(function (adpSlot) {
+            adpSlot.biddingComplete = true;
+
             gpt.defineSlot(googletag, adpSlot);
         });
 

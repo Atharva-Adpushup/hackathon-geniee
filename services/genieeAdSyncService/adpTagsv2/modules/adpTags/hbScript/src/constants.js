@@ -48,7 +48,8 @@ var constants = {
     },
     FEEDBACK: {
         DEFAULT_WINNER: 'adx',
-        URL: '//e3.adpushup.com/AdPushupFeedbackWebService/feedback/aphb?data='
+        URL: '//e3.adpushup.com/AdPushupFeedbackWebService/feedback/aphb?data=',
+        URL_OLD: '//e3.adpushup.com/ApHbWebService/feedback'
     },
     PREBID: {
         TIMEOUT: 3000,

@@ -5,7 +5,7 @@ var inventoryMapper = {
     //  inventoryMapper: function (size, optionalParam) {
     //         // Reset inventory as default if site is SPA
     //         if (adp.config.isSPA) {
-    //             inventory = adp.$.extend(true, {}, adp.adpTags.defaultInventory);
+    //             inventory = adp.$.extend(true, {}, window.adpushup.adpTags.defaultInventory);
     //         }
 
     //         var width = size[0];
@@ -63,7 +63,7 @@ var inventoryMapper = {
     get: function (inventory, size, optionalParam) {
         // Reset inventory as default if site is SPA
         if (adp.config.isSPA) {
-            inventory = adp.$.extend(true, {}, adp.adpTags.defaultInventory);
+            inventory = adp.$.extend(true, {}, window.adpushup.adpTags.defaultInventory);
         }
 
         var size = size[0] + 'x' + size[1];

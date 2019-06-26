@@ -3,12 +3,6 @@
 var adp = require('./adp');
 var find = require('lodash.find');
 var utils = {
-    ajax: function (type, url, data) {
-        switch (type.toLowerCase()) {
-            case 'get':
-                return adp.$.get(url + adp.utils.base64Encode(JSON.stringify(data)));
-        }
-    },
     currencyConversionActive: function (inputObject) {
         var inputObject = inputObject || adp.config,
             isActiveDFPNetwork = !!(inputObject.activeDFPNetwork && inputObject.activeDFPNetwork.length),

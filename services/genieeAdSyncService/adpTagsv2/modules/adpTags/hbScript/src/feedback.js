@@ -3,7 +3,6 @@
 var constants = require('./constants');
 var config = require('./config');
 var adp = require('./adp');
-var utils = require('./utils');
 var feedback = {
     getFeedbackData: function (slot, defaultWinner) {
         var winner = slot.feedback.winner || defaultWinner;
@@ -44,7 +43,10 @@ var feedback = {
         slot.feedbackSent = true;
         var feedbackData = this.getFeedbackData(slot, defaultWinner);
 
-        return utils.ajax('get', constants.FEEDBACK.URL, feedbackData);
+        // Old feedback
+        adp.$.post(constants.FEEDBACK.URL_OLD, JSON.stringify(feedbackData));
+
+        return adp.$.get(constants.FEEDBACK.URL + adp.utils.base64Encode(JSON.stringify(feedbackData)));
     }
 };
 

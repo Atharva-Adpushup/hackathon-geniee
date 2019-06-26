@@ -6,9 +6,9 @@ var constants = require('./constants');
 var render = require('./render');
 var auction = {
 	end: function (adpBatchId) {
-		var adpSlots = utils.getCurrentAdpSlotBatch(adp.adpTags.adpBatches, adpBatchId);
+		var adpSlots = utils.getCurrentAdpSlotBatch(window.adpushup.adpTags.adpBatches, adpBatchId);
 
-		adp.adpTags.batchPrebiddingComplete = true;
+		window.adpushup.adpTags.batchPrebiddingComplete = true;
 		if (Object.keys(adpSlots).length) {
 			return render.init(adpSlots);
 		}
@@ -36,8 +36,6 @@ var auction = {
 			publisherDomain: adp.config.siteDomain,
 			bidderSequence: constants.PREBID.BIDDER_SEQUENCE,
 			priceGranularity: constants.PREBID.PRICE_GRANULARITY
-			// __SIZE_CONFIG___
-			// _PREBID_CURRENCY_CONFIG__
 		});
 
 		pbjs.addAdUnits(prebidSlots);

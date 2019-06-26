@@ -60,7 +60,7 @@ var adpTags = {
                 clearTimeout(this.slotInterval);
             }
             this.currentBatchAdpSlots.push(slot);
-            this.slotInterval = setTimeout(this.processBatchForBidding, constants.BATCHING_INTERVAL);
+            this.slotInterval = setTimeout(this.processBatchForBidding.bind(this), constants.BATCHING_INTERVAL);
         },
         createSlot: function (containerId, size, placement, optionalParam) {
             var adUnits = inventoryMapper.get(inventory, size, optionalParam);
@@ -130,29 +130,29 @@ var adpTags = {
         w.adpTags.que = w.adpTags.que || [];
 
         var adpQue;
-        if (adp.adpTags) {
-            adpQue = adp.adpTags.que;
+        if (w.adpushup.adpTags) {
+            adpQue = w.adpushup.adpTags.que;
         } else {
             adpQue = [];
         }
 
-        var existingAdpTags = Object.assign({}, adp.adpTags);
+        var existingAdpTags = Object.assign({}, w.adpushup.adpTags);
         var adpTagsModule = this.module;
 
         // Set adpTags if already present else initialise module
-        adp.adpTags = existingAdpTags.adpSlots ? existingAdpTags : adpTagsModule;
+        w.adpushup.adpTags = existingAdpTags.adpSlots ? existingAdpTags : adpTagsModule;
 
         // Keep deep copy of inventory in adpTags module
-        adp.adpTags.defaultInventory = adp.$.extend(true, {}, inventory);
+        w.adpushup.adpTags.defaultInventory = w.adpushup.$.extend(true, {}, inventory);
 
         // Merge adpQue with any existing que items if present
-        adp.adpTags.que = adp.adpTags.que.concat(adpQue).concat(w.adpTags.que);
-        w.adpTags = adp.adpTags;
+        w.adpushup.adpTags.que = w.adpushup.adpTags.que.concat(adpQue).concat(w.adpTags.que);
+        w.adpTags = w.adpushup.adpTags;
 
-        adp.adpTags.processQue();
-        adp.adpTags.que.push = function (queFunc) {
-            [].push.call(adp.adpTags.que, queFunc);
-            adp.adpTags.processQue();
+        w.adpushup.adpTags.processQue();
+        w.adpushup.adpTags.que.push = function (queFunc) {
+            [].push.call(w.adpushup.adpTags.que, queFunc);
+            w.adpushup.adpTags.processQue();
         };
     }
 };

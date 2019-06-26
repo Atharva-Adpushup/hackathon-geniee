@@ -2,7 +2,6 @@
 
 var constants = require('./constants');
 var feedback = require('./feedback');
-var adp = require('./adp');
 var responsiveAds = require('./responsiveAds');
 var targeting = require('./targeting');
 var gpt = {
@@ -61,8 +60,8 @@ var gpt = {
 				var adUnitCode = adUnitPathArray[adUnitPathArray.length - 1];
 				var networkCode = constants.NETWORK_ID;
 
-				Object.keys(adp.adpTags.adpSlots).forEach(function (adpSlot) {
-					var currentSlot = adp.adpTags.adpSlots[adpSlot];
+				Object.keys(window.adpushup.adpTags.adpSlots).forEach(function (adpSlot) {
+					var currentSlot = window.adpushup.adpTags.adpSlots[adpSlot];
 					var slotMatched = !!(
 						currentSlot.optionalParam.dfpAdunitCode == adUnitCode && currentSlot.activeDFPNetwork
 					);
