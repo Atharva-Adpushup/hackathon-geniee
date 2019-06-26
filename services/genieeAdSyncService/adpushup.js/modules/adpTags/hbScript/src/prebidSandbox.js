@@ -32,7 +32,8 @@ var prebidAdTemplate = require('./prebidAdTemplate'),
 			// Set custom sub id for criteo
 			var updatedBidders = adpSlot.bidders.map(function(bidder) {
 				if (bidder.bidder === 'criteo') {
-					bidder.params.publisherSubId = window.adpushup.config.siteId;
+					bidder.params.publisherSubId =
+						'AP/' + adp.config.siteId + '_' + adp.utils.domanize(adp.config.siteDomain);
 				}
 
 				return bidder;
