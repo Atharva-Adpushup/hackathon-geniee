@@ -54,9 +54,9 @@ class Setup extends React.Component {
 
 		if (!isDfpConnected) return false;
 
-		const { setDfpSetupStatusAction } = this.props;
+		const { siteId, setDfpSetupStatusAction } = this.props;
 
-		setDfpSetupStatusAction();
+		setDfpSetupStatusAction(siteId);
 
 		return true;
 	}
