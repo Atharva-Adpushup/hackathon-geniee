@@ -122,7 +122,9 @@ class Table extends React.Component {
 					tableRow.date = moment(startDate).format('ll') + ' to ' + moment(endDate).format('ll');
 				if (tableRow['siteid']) {
 					const { siteid } = tableRow;
-					tableRow['siteName'] = site[siteid] ? site[siteid]['siteName'] : 'Not Found';
+					tableRow['siteName'] = site[siteid]
+						? React.cloneElement(<a href={`/reports/${siteid}`}>{site[siteid]['siteName']}</a>)
+						: 'Not Found';
 					delete tableRow['siteid'];
 				}
 				displayTableData.push(tableRow);

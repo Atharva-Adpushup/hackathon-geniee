@@ -93,7 +93,9 @@ class SitewiseReport extends React.Component {
 		tableHeader.sort((a, b) => a.position - b.position);
 		result.forEach(row => {
 			const { siteid } = row;
-			row.siteName = site[siteid] ? site[siteid].siteName : 'Not Found';
+			row['siteName'] = site[siteid]
+				? React.cloneElement(<a href={`/reports/${siteid}`}>{site[siteid]['siteName']}</a>)
+				: 'Not Found';
 		});
 		let tableBody = this.formatTableData(result);
 		this.setState({ tableHeader, tableBody: result, isLoading: false });
