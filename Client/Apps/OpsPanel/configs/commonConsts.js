@@ -249,6 +249,13 @@ const GDPR = {
 	}
 };
 
+const DFP_ACCOUNTS_DEFAULT = [
+	{
+		name: '103512698 - AdPushup, Inc',
+		value: '103512698-103512698'
+	}
+];
+
 export {
 	OP_NAV_ITEMS,
 	OP_NAV_ITEMS_INDEXES,
@@ -256,5 +263,6 @@ export {
 	SITES_MAPPING,
 	TABLET_LAYOUT_OPTIONS,
 	PAGEGROUP_DEVICE_OPTIONS,
+	DFP_ACCOUNTS_DEFAULT,
 	GDPR
 };

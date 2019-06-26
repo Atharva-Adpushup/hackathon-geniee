@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Tab, Nav, NavItem, Row, Col } from 'react-bootstrap';
 import SitesContainer from '../../containers/SitesContainer';
-import Account from './Account';
+import AccountContainer from '../../containers/AccountContainer';
 
 class Settings extends Component {
 	state = {
@@ -34,7 +34,7 @@ class Settings extends Component {
 							<Tab.Content animation>
 								{activeKey === 'account' ? (
 									<Tab.Pane eventKey="account">
-										<Account />
+										<AccountContainer />
 									</Tab.Pane>
 								) : (
 									<Tab.Pane eventKey="sites">
