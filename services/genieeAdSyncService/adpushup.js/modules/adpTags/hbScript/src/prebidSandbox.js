@@ -29,6 +29,15 @@ var prebidAdTemplate = require('./prebidAdTemplate'),
 				size = adpSlot.optionalParam.overrideSizeTo.split('x');
 			}
 
+			// Set custom sub id for criteo
+			var updatedBidders = adpSlot.bidders.map(function(bidder) {
+				if (bidder.bidder === 'criteo') {
+					bidder.params.publisherSubId = window.adpushup.config.siteId;
+				}
+
+				return bidder;
+			});
+
 			adUnitCodeForPrebid.push({
 				code: adpSlot.containerId,
 				mediaTypes: {
@@ -36,7 +45,7 @@ var prebidAdTemplate = require('./prebidAdTemplate'),
 						sizes: prebidSizes
 					}
 				},
-				bids: adpSlot.bidders
+				bids: updatedBidders
 			});
 		});
 
