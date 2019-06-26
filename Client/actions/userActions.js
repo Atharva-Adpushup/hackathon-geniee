@@ -58,7 +58,7 @@ export const updateUser = params => dispatch =>
 			const { data } = response;
 			dispatch({
 				type: USER_ACTIONS.UPDATE_USER,
-				data: { key: data.key, value: data.data.toSend }
+				data: { key: params.key, value: data.data.toSend }
 			});
 
 			return dispatch({
