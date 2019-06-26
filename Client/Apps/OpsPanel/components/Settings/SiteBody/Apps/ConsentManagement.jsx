@@ -18,7 +18,7 @@ class ConsentManagement extends Component {
 		const {
 			site: { apps = {}, gdpr = GDPR }
 		} = props;
-		let stringifiedGdpr;
+		let stringifiedGdpr = '{}';
 
 		try {
 			stringifiedGdpr = JSON.stringify(gdpr);
