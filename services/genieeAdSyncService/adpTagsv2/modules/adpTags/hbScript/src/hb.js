@@ -6,11 +6,11 @@ var adp = require('./adp');
 var utils = require('./utils');
 var auction = require('./auction');
 var hb = {
-	createPrebidSlots: function (adpSlotsBatch) {
+	createPrebidSlots: function(adpSlotsBatch) {
 		var prebidSlots = [];
 		var adpBatchId = adpSlotsBatch[0].batchId;
 
-		adpSlotsBatch.forEach(function (adpSlot) {
+		adpSlotsBatch.forEach(function(adpSlot) {
 			var responsiveSizes = [];
 			if (adpSlot.isResponsive) {
 				responsiveSizes = responsiveAds.getAdSizes(adpSlot.optionalParam.adId).collection;
@@ -33,6 +33,10 @@ var hb = {
 				mediaTypes: {
 					banner: {
 						sizes: prebidSizes
+					},
+					video: {
+						context: constants.PREBID.VIDEO_FORMAT_TYPE,
+						playerSize: prebidSizes[0]
 					}
 				},
 				bids: adpSlot.bidders
@@ -41,9 +45,9 @@ var hb = {
 
 		return !prebidSlots.length ? auction.end(adpBatchId) : auction.start(prebidSlots, adpBatchId);
 	},
-	setBidWonListener: function (w) {
-		w.pbjs.que.push(function () {
-			w.pbjs.onEvent(constants.EVENTS.PREBID.BID_WON, function (bidData) {
+	setBidWonListener: function(w) {
+		w.pbjs.que.push(function() {
+			w.pbjs.onEvent(constants.EVENTS.PREBID.BID_WON, function(bidData) {
 				console.log('===BidWon====', bidData);
 
 				var slot = window.adpushup.adpTags.adpSlots[bidData.adUnitCode];
@@ -55,20 +59,20 @@ var hb = {
 			});
 		});
 	},
-	loadPrebid: function (w) {
+	loadPrebid: function(w) {
 		/* 
             HB flag passed as a global constant to the webpack config using DefinePlugin 
             (https://webpack.js.org/plugins/define-plugin/#root) 
         */
 		if (HB_ACTIVE) {
-			(function () {
+			(function() {
 				require('../../Prebid.js/build/dist/prebid');
 			})();
 		}
 
 		return this.setBidWonListener(w);
 	},
-	init: function (w) {
+	init: function(w) {
 		w.pbjs = w.pbjs || {};
 		w.pbjs.que = w.pbjs.que || [];
 
