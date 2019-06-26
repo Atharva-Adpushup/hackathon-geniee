@@ -69,8 +69,9 @@ const createChannels = (siteId, channels) => (dispatch, getState) =>
 				let message = 'Additional Details --- ';
 				failedChannels.forEach(channel => {
 					const current = details[channel];
-					message += `<br />${current.device.toUpperCase()}:${current.pageGroupName} -- ${current
-						.additionalData.message || 'No error message found'}`;
+					message += `<br />${current.device.toUpperCase()}:${current.pageGroupName} -- ${
+						current.additionalData[0] ? current.additionalData[0].message : 'No error message found'
+					}`;
 				});
 				dispatch({
 					type: UI_ACTIONS.SHOW_NOTIFICATION,
@@ -99,18 +100,16 @@ const fetchChannelsInfo = siteId => dispatch =>
 			const { data } = response.data;
 			const { channels } = data;
 
-			if (channels && Object.keys(channels).length) {
-				dispatch({
-					type: SITE_ACTIONS.UPDATE_SITE_DATA_KEY_OBJ,
-					data: {
-						siteId,
-						key: 'cmsInfo',
-						value: {
-							channelsInfo: channels
-						}
+			dispatch({
+				type: SITE_ACTIONS.UPDATE_SITE_DATA_KEY_OBJ,
+				data: {
+					siteId,
+					key: 'cmsInfo',
+					value: {
+						channelsInfo: channels
 					}
-				});
-			}
+				}
+			});
 		})
 		.catch(err =>
 			errorHandler(
@@ -218,4 +217,54 @@ const deletePagegroup = (siteId, params) => (dispatch, getState) =>
 		})
 		.catch(err => errorHandler(err, 'Pagegroup deletion failed'));
 
-export { createChannels, fetchChannelsInfo, updatePagegroupPattern, deletePagegroup };
+const updateChannelAutoOptimise = (siteId, params) => (dispatch, getState) => {
+	const {
+		global: { sites }
+	} = getState();
+	const site = sites.data[siteId];
+	const { cmsInfo } = site;
+	const { channelsInfo } = cmsInfo;
+
+	channelsInfo[params.channelKey] = {
+		...channelsInfo[params.channelKey],
+		autoOptimise: params.autoOptimise
+	};
+
+	return axiosInstance
+		.post('/channel/updateChannel', {
+			siteId,
+			platform: params.platform,
+			pageGroup: params.pageGroup,
+			key: 'autoOptimise',
+			value: params.autoOptimise
+		})
+		.then(() => {
+			dispatch({
+				type: SITE_ACTIONS.UPDATE_SITE_DATA_KEY_OBJ,
+				data: {
+					siteId,
+					key: 'cmsInfo',
+					value: {
+						...cmsInfo,
+						channelsInfo
+					}
+				}
+			});
+			dispatch({
+				type: UI_ACTIONS.SHOW_NOTIFICATION,
+				mode: 'success',
+				title: 'Operation Successful',
+				autoDismiss: 5,
+				message: `Auto Optimise updated for ${params.channelKey}`
+			});
+		})
+		.catch(err => errorHandler(err, 'Pagegroup pattern updation failed'));
+};
+
+export {
+	createChannels,
+	fetchChannelsInfo,
+	updatePagegroupPattern,
+	deletePagegroup,
+	updateChannelAutoOptimise
+};

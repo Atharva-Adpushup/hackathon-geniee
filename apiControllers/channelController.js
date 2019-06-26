@@ -7,9 +7,10 @@ const config = require('../configs/config');
 const HTTP_STATUS = require('../configs/httpStatusConsts');
 const userModel = require('../models/userModel');
 const channelModel = require('../models/channelModel');
+const siteModel = require('../models/siteModel');
 const AdPushupError = require('../helpers/AdPushupError');
 const { sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFunctions');
-const { errorHandler, verifyOwner, appBucket } = require('../helpers/routeHelpers');
+const { errorHandler, verifyOwner, appBucket, checkParams } = require('../helpers/routeHelpers');
 
 const router = express.Router();
 
@@ -42,6 +43,19 @@ const hlprs = {
 					return true;
 				});
 		});
+	},
+	updateChannel: (channel, key, value) => {
+		let data = channel.get(key);
+		if (typeof data === 'object' && !Array.isArray(data)) {
+			data = {
+				...data,
+				...value
+			};
+		} else {
+			data = value;
+		}
+		channel.set(key, data);
+		return channel.save();
 	}
 };
 
@@ -59,15 +73,29 @@ router
 		return verifyOwner(siteId, req.user.email)
 			.then(() =>
 				appBucket.queryDB(
-					`select  meta().id, id as channelId, object_length(variations) as variationsCount, platform, pageGroup from ${
-						config.couchBase.DEFAULT_BUCKET
-					} where meta().id like 'chnl::%' and siteId = ${siteId};`
+					`select meta().id, id as channelId, object_length(variations) as variationsCount, platform, pageGroup, variations, autoOptimise
+					from ${config.couchBase.DEFAULT_BUCKET} where meta().id like 'chnl::%' and siteId = ${siteId};`
 				)
 			)
 			.then(channels => {
 				const response = {};
 				channels.forEach(channel => {
-					response[`${channel.platform}:${channel.pageGroup}`] = channel;
+					const { variations = {} } = channel;
+					const variationsData = {};
+					const keys = Object.keys(variations);
+
+					keys.forEach(variationId => {
+						const current = variations[variationId];
+						variationsData[variationId] = {
+							variationId,
+							name: current.name,
+							trafficDistribution: current.trafficDistribution
+						};
+					});
+					response[`${channel.platform}:${channel.pageGroup}`] = {
+						...channel,
+						variations: variationsData
+					};
 				});
 				return sendSuccessResponse(
 					{
@@ -160,6 +188,51 @@ router
 					res
 				);
 			})
+			.catch(err => errorHandler(err, res, HTTP_STATUS.INTERNAL_SERVER_ERROR));
+	})
+	.post('/updateChannel', (req, res) => {
+		const { siteId, pageGroup, platform, key, value } = req.body;
+		return checkParams(['siteId', 'pageGroup', 'platform', 'key', 'value'], req, 'post')
+			.then(() => verifyOwner(siteId, req.user.email))
+			.then(() => channelModel.getChannel(siteId, platform, pageGroup))
+			.then(channel => hlprs.updateChannel(channel, key, value))
+			.then(() =>
+				sendSuccessResponse(
+					{
+						message: 'Channel Updated'
+					},
+					res
+				)
+			)
+			.catch(err => errorHandler(err, res, HTTP_STATUS.INTERNAL_SERVER_ERROR));
+	})
+	.post('/updateChannels', (req, res) => {
+		const { siteId, key, value } = req.body;
+
+		function channelProcessing(channelKey) {
+			const [platform, pageGroup] = channelKey.split(':');
+			return channelModel
+				.getChannel(siteId, platform, pageGroup)
+				.then(channel => hlprs.updateChannel(channel, key, value));
+		}
+
+		return checkParams(['siteId', 'key', 'value'], req, 'post')
+			.then(() => verifyOwner(siteId, req.user.email))
+			.then(() => siteModel.getSiteChannels(siteId))
+			.then(channels =>
+				promiseForeach(channels, channelProcessing, (data, err) => {
+					console.log(`${err.message} | Data: ${data}`);
+					return false;
+				})
+			)
+			.then(() =>
+				sendSuccessResponse(
+					{
+						message: 'Channels Updated'
+					},
+					res
+				)
+			)
 			.catch(err => errorHandler(err, res, HTTP_STATUS.INTERNAL_SERVER_ERROR));
 	});
 

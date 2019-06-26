@@ -5,7 +5,7 @@ module.exports = {
 	TRANSACTION_LOG_ENDPOINT: 'https://api.adpushup.com/SetupLogWebService/log',
 	REPORT_STATUS: 'https://api.adpushup.com/OpsWebService/ops?report=getNetworkImportServiceStatus',
 	PROXY_ORIGIN: '//proxy.app.adpushup.com',
-	PRODUCT_LIST_API: 'https://staging.adpushup.com/CentralReportingWebService/common/productList',
+	PRODUCT_LIST_API: 'https://staging.adpushup.com/CentralReportingWebService/common/activeProducts',
 	ANALYTICS_API_ROOT: 'https://staging.adpushup.com/CentralReportingWebService',
 	ANALYTICS_METAINFO_URL: '/common/metaInfo',
 	REPORT_PATH: '/site/report?report_name=get_stats_by_custom',

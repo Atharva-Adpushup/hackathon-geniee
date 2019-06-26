@@ -1,3 +1,4 @@
+/* eslint-disable react/forbid-prop-types */
 import React from 'react';
 import { map } from 'lodash';
 import {
@@ -21,6 +22,7 @@ const FieldGroup = ({
 	onChange,
 	value,
 	isTextOnly,
+	textOnlyStyles,
 	dataKey,
 	toggleGroupType,
 	...props
@@ -56,7 +58,9 @@ const FieldGroup = ({
 	) : null;
 
 	const textComponent =
-		isTextOnly && !type ? <span style={{ display: 'block' }}>{value}</span> : null;
+		isTextOnly && !type ? (
+			<span style={{ display: 'block', ...textOnlyStyles }}>{value}</span>
+		) : null;
 	let computedComponent = null;
 
 	if (isToggleButtonGroup) {
@@ -89,7 +93,8 @@ FieldGroup.propTypes = {
 	isTextOnly: PropTypes.bool,
 	value: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
 	dataKey: PropTypes.string,
-	toggleGroupType: PropTypes.string
+	toggleGroupType: PropTypes.string,
+	textOnlyStyles: PropTypes.object
 };
 
 FieldGroup.defaultProps = {
@@ -100,7 +105,8 @@ FieldGroup.defaultProps = {
 	value: '',
 	dataKey: '',
 	toggleGroupType: 'radio',
-	onChange: () => {}
+	onChange: () => {},
+	textOnlyStyles: {}
 };
 
 export default FieldGroup;

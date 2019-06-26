@@ -2,9 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 const Empty = props => {
-	const { message } = props;
+	const { message, ...rest } = props;
 	return (
-		<div className="empty-state">
+		<div className="empty-state" {...rest}>
 			<img src="/assets/images/empty.png" alt="Empty" />
 			{message ? <h2>{message}</h2> : null}
 		</div>
