@@ -14,13 +14,39 @@ import {
 
 import { showNotification, hideNotification } from '../../../actions/uiActions';
 
-const HeaderBiddingContainer = props => <HeaderBidding {...props} />;
+const HeaderBiddingContainer = props => {
+	const { currSiteHbData, ...rest } = props;
+	const finalCurrSiteHbData = {
+		inventoryFound: null,
+		bidders: null,
+		setupStatus: null,
+		inventories: null,
+		...currSiteHbData
+	};
+	const { inventoryFound, bidders, setupStatus, inventories } = finalCurrSiteHbData;
+
+	return (
+		<HeaderBidding
+			inventoryFound={inventoryFound}
+			inventories={inventories}
+			bidders={bidders}
+			setupStatus={setupStatus}
+			{...rest}
+		/>
+	);
+};
 
 export default connect(
-	state => {
-		const { inventoryFound, bidders, setupStatus, inventories } = state.apps.headerBidding;
+	(state, ownProps) => {
+		const {
+			match: {
+				params: { siteId }
+			}
+		} = ownProps;
+		// const { inventoryFound, bidders, setupStatus, inventories } = state.apps.headerBidding;
+		const { [siteId]: currSiteHbData } = state.apps.headerBidding;
 
-		return { inventoryFound, bidders, setupStatus, inventories };
+		return { currSiteHbData };
 	},
 	{
 		checkInventoryAction,

@@ -11,40 +11,57 @@ import {
 	SET_DFP_SETUP_STATUS
 } from '../../constants/headerBidding';
 
-const defaultState = { inventoryFound: null, bidders: null, setupStatus: null };
+const defaultState = {};
 
 export default function(state = defaultState, action) {
 	switch (action.type) {
 		case CHECK_INVENTORY: {
-			const { inventoryFound } = action;
+			const { siteId, inventoryFound } = action;
 
 			return {
 				...state,
-				inventoryFound
+				[siteId]: {
+					...state[siteId],
+					inventoryFound
+				}
 			};
 		}
 		case FETCH_ALL_BIDDERS: {
-			const { bidders } = action;
+			const { siteId, bidders } = action;
 
 			return {
 				...state,
-				bidders
+				[siteId]: {
+					...state[siteId],
+					bidders
+				}
 			};
 		}
 		case GET_SETUP_STATUS: {
-			const { setupStatus } = action;
+			const { siteId, setupStatus } = action;
 
 			return {
 				...state,
-				setupStatus
+				[siteId]: {
+					...state[siteId],
+					setupStatus
+				}
 			};
 		}
 		case SET_DFP_SETUP_STATUS: {
-			return { ...state, setupStatus: { ...state.setupStatus, dfpConnected: true } };
+			const { siteId } = action;
+
+			return {
+				...state,
+				[siteId]: {
+					...state[siteId],
+					setupStatus: { ...state.setupStatus, dfpConnected: true }
+				}
+			};
 		}
 		case ADD_BIDDER: {
-			const { bidderKey, bidderConfig } = action;
-			const bidders = { ...state.bidders };
+			const { siteId, bidderKey, bidderConfig } = action;
+			const bidders = { ...state[siteId].bidders };
 
 			delete bidders.notAddedBidders[bidderKey];
 			if (!bidders.addedBidders) bidders.addedBidders = {};
@@ -52,32 +69,41 @@ export default function(state = defaultState, action) {
 
 			return {
 				...state,
-				bidders,
-				setupStatus: { ...state.setupStatus, biddersFound: true }
+				[siteId]: {
+					...state[siteId],
+					bidders,
+					setupStatus: { ...state.setupStatus, biddersFound: true }
+				}
 			};
 		}
 		case UPDATE_BIDDER: {
-			const { bidderKey, bidderConfig } = action;
-			const bidders = { ...state.bidders };
+			const { siteId, bidderKey, bidderConfig } = action;
+			const bidders = { ...state[siteId].bidders };
 
 			bidders.addedBidders[bidderKey] = bidderConfig;
 
 			return {
 				...state,
-				bidders
+				[siteId]: {
+					...state[siteId],
+					bidders
+				}
 			};
 		}
 		case FETCH_INVENTORIES: {
-			const { inventories } = action;
+			const { siteId, inventories } = action;
 
 			return {
 				...state,
-				inventories
+				[siteId]: {
+					...state[siteId],
+					inventories
+				}
 			};
 		}
 		case UPDATE_INVENTORIES_HB_STATUS: {
-			const { inventoriesToUpdate } = action;
-			const inventories = [...state.inventories];
+			const { siteId, inventoriesToUpdate } = action;
+			const inventories = [...state[siteId].inventories];
 
 			inventories.map(inventory => {
 				const index = inventoriesToUpdate.findIndex(obj => obj.tempId === inventory.tempId);
@@ -92,7 +118,10 @@ export default function(state = defaultState, action) {
 
 			return {
 				...state,
-				inventories
+				[siteId]: {
+					...state[siteId],
+					inventories
+				}
 			};
 		}
 		default:
