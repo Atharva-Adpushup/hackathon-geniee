@@ -71,6 +71,14 @@ const tableHeader = [
 	{ title: 'XPath Miss', prop: 'adpushup_xpath_miss' }
 ];
 
+const displayMetrics = [
+	{ value: 'network_net_revenue', name: 'Net Revenue', valueType: 'money' },
+	{ value: 'adpushup_page_views', name: 'Page Views', valueType: 'number' },
+	{ value: 'adpushup_page_cpm', name: 'Page RPM', valueType: 'money' },
+	{ value: 'network_impressions', name: 'Impressions', valueType: 'number' },
+	{ value: 'network_ad_ecpm', name: 'Ad eCPM', valueType: 'money' }
+];
+
 export {
 	DASHBOARD_NAV_ITEMS_INDEXES,
 	DASHBOARD_NAV_ITEMS_VALUES,
@@ -78,5 +86,6 @@ export {
 	dates,
 	sites,
 	yAxisGroups,
-	tableHeader
+	tableHeader,
+	displayMetrics
 };

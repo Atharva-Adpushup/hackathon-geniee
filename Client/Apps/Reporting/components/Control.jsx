@@ -132,24 +132,20 @@ class Control extends Component {
 	};
 
 	getReportStatus() {
-		reportService
-			.getLastUpdateStatus({
-				params: { fromDate: this.state.startDate, toDate: this.state.endDate }
-			})
-			.then(res => {
-				if (res.status == 200 && res.data) {
-					if (res.data.status == 'Stopped') {
-						let updatedDate = res.data.lastRunTimePST;
-						this.setState({
-							updateStatusText: `Last updated on ${updatedDate}.`
-						});
-					} else if (res.data.status == 'Running') {
-						this.setState({
-							updateStatusText: `Data is being compiled, please check back later` //`Note - The network reporting data is being crunched and you will see updated data shortly.`
-						});
-					}
+		reportService.getLastUpdateStatus().then(res => {
+			if (res.status == 200 && res.data) {
+				if (res.data.status == 'Stopped') {
+					let updatedDate = res.data.lastRunTimePST;
+					this.setState({
+						updateStatusText: `Last updated on ${updatedDate}.`
+					});
+				} else if (res.data.status == 'Running') {
+					this.setState({
+						updateStatusText: `Data is being compiled, please check back later` //`Note - The network reporting data is being crunched and you will see updated data shortly.`
+					});
 				}
-			});
+			}
+		});
 	}
 
 	generateButtonHandler = () => {
