@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
 import moment from 'moment';
 import { convertObjToArr, getDateRange } from '../helpers/utils';
-import { dates } from '../configs/commonConsts';
+import { dates, displayMetrics } from '../configs/commonConsts';
 import reportService from '../../../services/reportService';
 import Selectbox from '../../../Components/Selectbox/index';
 import Loader from '../../../Components/Loader/index';
@@ -15,11 +15,12 @@ class PerformanceOverview extends React.Component {
 		super(props);
 		const { site } = this.props;
 		const sites = convertObjToArr(site);
+		const selectedSite = sites && sites.length ? sites.find(site => site['isTopPerforming']) : {};
 		this.state = {
 			quickDates: dates,
 			selectedDate: dates[0].value,
 			sites,
-			selectedSite: sites[0] ? sites[0].value : '',
+			selectedSite: selectedSite.value,
 			displayData: {},
 			isLoading: true,
 			startDate: moment()
@@ -41,7 +42,9 @@ class PerformanceOverview extends React.Component {
 		const { selectedDate, selectedSite } = this.state;
 		const { path } = this.props;
 		const params = getDateRange(selectedDate);
+		const dimensions = displayMetrics.map(dimension => dimension.value);
 		params.siteid = selectedSite;
+		params.dimension = dimensions.toString();
 		this.setState({ isLoading: true, startDate: params['fromDate'], endDate: params['toDate'] });
 		reportService.getWidgetData({ path, params }).then(response => {
 			if (response.status == 200 && response.data) {

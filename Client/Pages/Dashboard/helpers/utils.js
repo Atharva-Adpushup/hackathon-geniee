@@ -4,6 +4,8 @@ const convertObjToArr = obj =>
 	Object.keys(obj).map(key => {
 		const newObj = {};
 		newObj.name = obj[key].siteName;
+		newObj['product'] = obj[key]['product'];
+		newObj['isTopPerforming'] = obj[key]['isTopPerforming'];
 		newObj.value = key;
 		return newObj;
 	});

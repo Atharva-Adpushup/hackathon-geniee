@@ -3,7 +3,7 @@ module.exports = {
 	BASE_URL: 'http://localhost:8080',
 	DFP_WEB_SERVICE_ENDPOINT: 'http://staging.adpushup.com/DfpWebService/info',
 	TRANSACTION_LOG_ENDPOINT: 'https://api.adpushup.com/SetupLogWebService/log',
-	REPORT_STATUS: 'https://staging.adpushup.com/InternalOpsWebService/stats',
+	REPORT_STATUS: 'https://api.adpushup.com/OpsWebService/ops?report=getNetworkImportServiceStatus',
 	PROXY_ORIGIN: '//proxy.app.adpushup.com',
 	PRODUCT_LIST_API: 'https://staging.adpushup.com/CentralReportingWebService/common/productList',
 	ANALYTICS_API_ROOT: 'https://staging.adpushup.com/CentralReportingWebService',

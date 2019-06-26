@@ -15,11 +15,12 @@ class PerformanceApOriginal extends React.Component {
 		super(props);
 		const { site } = this.props;
 		const sites = convertObjToArr(site);
+		const selectedSite = sites && sites.length ? sites.find(site => site['isTopPerforming']) : {};
 		this.state = {
 			quickDates: dates,
 			selectedDate: dates[0].value,
 			sites,
-			selectedSite: sites[0] ? sites[0].value : '',
+			selectedSite: selectedSite.value,
 			series: [],
 			xAxis: {},
 			isLoading: true,

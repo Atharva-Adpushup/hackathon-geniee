@@ -4,12 +4,13 @@ import Table from '../components/Table';
 const mapStateToProps = (state, ownProps) => {
 	const {
 		reports: {
-			data: { metrics, dimension }
+			data: { metrics, dimension, site }
 		}
 	} = state.global;
 	return {
 		metrics,
 		dimension,
+		site,
 		...ownProps
 	};
 };
