@@ -9,6 +9,10 @@ import CustomToggleSwitch from '../../../../../../Components/CustomToggleSwitch/
 import CustomMessage from '../../../../../../Components/CustomMessage/index';
 
 class Layout extends Component {
+	state = {
+		loading: false
+	};
+
 	componentDidMount() {
 		const { site, fetchChannelsInfo } = this.props;
 		const { cmsInfo, siteId } = site;
@@ -21,7 +25,14 @@ class Layout extends Component {
 		const attributeValue = event.target.getAttribute('name');
 		const values = attributeValue.split('-');
 		const name = values[0];
-		const { updateChannelAutoOptimise, updateSiteAutoOptimise, updateAppStatus } = this.props;
+		const {
+			updateChannelAutoOptimise,
+			updateSiteAutoOptimise,
+			updateAppStatus,
+			showNotification
+		} = this.props;
+
+		this.setState({ loading: true });
 
 		switch (name) {
 			case 'autoOptimise':
@@ -34,10 +45,13 @@ class Layout extends Component {
 						platform,
 						pageGroup,
 						autoOptimise: value
-					});
+					}).then(() => this.setState({ loading: false }));
 				} else if (mode === 'site') {
 					const siteId = values[2];
 					// update Site
+					updateSiteAutoOptimise(siteId, {
+						autoOptimise: value
+					}).then(() => this.setState({ loading: false }));
 				}
 				break;
 
@@ -46,7 +60,7 @@ class Layout extends Component {
 				updateAppStatus(siteId, {
 					app: 'layout',
 					value
-				});
+				}).then(() => this.setState({ loading: false }));
 				break;
 
 			default:
@@ -119,11 +133,12 @@ class Layout extends Component {
 	}
 
 	render() {
+		const { loading } = this.state;
 		const { site } = this.props;
 		const { cmsInfo, apConfigs, siteId, siteDomain, apps } = site;
 		const { channelsInfo } = cmsInfo;
 
-		return !channelsInfo ? (
+		return !channelsInfo || loading ? (
 			<Loader height="100px" classNames="u-margin-v3" />
 		) : (
 			<Panel.Body collapsible>
