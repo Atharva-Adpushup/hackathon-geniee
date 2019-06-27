@@ -250,7 +250,7 @@ const updateChannelAutoOptimise = (siteId, params) => (dispatch, getState) => {
 					}
 				}
 			});
-			dispatch({
+			return dispatch({
 				type: UI_ACTIONS.SHOW_NOTIFICATION,
 				mode: 'success',
 				title: 'Operation Successful',
