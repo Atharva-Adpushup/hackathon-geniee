@@ -17,12 +17,14 @@ class Account extends Component {
 		const { user } = this.props;
 		const {
 			adNetworkSettings = [],
-			dfpSettings: {
-				activeDFPParentId = false,
-				activeDFPNetwork = false,
-				isThirdPartyAdx = false,
-				activeDFPCurrencyCode = 'Not Set'
-			}
+			adServerSettings: {
+				dfp: {
+					activeDFPParentId = false,
+					activeDFPNetwork = false,
+					isThirdPartyAdx = false,
+					activeDFPCurrencyCode = 'Not Set'
+				} = {}
+			} = {}
 		} = user;
 		const adsense = adNetworkSettings[0] || null;
 		const adsensePubId = adsense ? adsense.pubId : null;
@@ -77,7 +79,7 @@ class Account extends Component {
 	handleSave = () => {
 		const { adsensePubId, activeDFP, originalactiveDFP, isThirdPartyAdx } = this.state;
 		const { showNotification, updateUser, user } = this.props;
-		const { adNetworkSettings = [], dfpSettings = {} } = user;
+		const { adNetworkSettings = [], adServerSettings = {} } = user;
 
 		if (originalactiveDFP === null && activeDFP === null) {
 			return showNotification({
@@ -97,21 +99,17 @@ class Account extends Component {
 		}
 
 		const [activeDFPNetwork, activeDFPParentId] = activeDFP.split('-');
-		let updatedDFPSettings = { ...dfpSettings, isThirdPartyAdx };
-		if (originalactiveDFP === null) {
-			updatedDFPSettings = {
-				...updatedDFPSettings,
-				activeDFPNetwork,
-				activeDFPParentId
-			};
-		}
+		const updatedadServerSettings = {
+			...adServerSettings,
+			dfp: { ...adNetworkSettings.dfp, isThirdPartyAdx, activeDFPNetwork, activeDFPParentId }
+		};
 		adNetworkSettings[0] = adNetworkSettings[0] || [];
 		adNetworkSettings[0].pubId = adsensePubId;
 		adNetworkSettings[0].networkName = adNetworkSettings[0].networkName || 'ADSENSE';
 
 		return updateUser({
-			key: 'dfpSettings',
-			value: updatedDFPSettings
+			key: 'adServerSettings',
+			value: updatedadServerSettings
 		})
 			.then(() =>
 				updateUser({
