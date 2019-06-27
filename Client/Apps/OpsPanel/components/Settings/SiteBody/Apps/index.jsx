@@ -33,7 +33,8 @@ class Apps extends Component {
 			updateSiteAutoOptimise,
 			updateAppStatus,
 			updateSite,
-			fetchAllBiddersAction
+			fetchAllBiddersAction,
+			updateBidderAction
 		} = this.props;
 		const common = {
 			activeKey,
@@ -68,18 +69,19 @@ class Apps extends Component {
 						<ConsentManagement {...common} updateSite={updateSite} />
 					) : null}
 				</Panel>
-				{/* <Panel eventKey="headerBidding">
+				<Panel eventKey="headerBidding">
 					<Panel.Heading>
 						<Panel.Title toggle>Header Bidding</Panel.Title>
 					</Panel.Heading>
 					{activeKey === 'headerBidding' ? (
 						<HeaderBidding
 							{...common}
-							fetchAllBiddersAction={fetchAllBiddersAction}
 							bidders={bidders}
+							fetchAllBiddersAction={fetchAllBiddersAction}
+							updateBidderAction={updateBidderAction}
 						/>
 					) : null}
-				</Panel> */}
+				</Panel>
 			</PanelGroup>
 		);
 	}
