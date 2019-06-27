@@ -12,16 +12,15 @@ import FieldGroup from '../../../../../../Components/Layout/FieldGroup';
 import CustomButton from '../../../../../../Components/CustomButton/index';
 
 class HeaderBidding extends Component {
+	componentDidMount() {
+		const { bidders, fetchAllBiddersAction, site } = this.props;
+
+		if (!bidders) fetchAllBiddersAction(site.siteId);
+	}
+
 	handleToggle = value => {
 		this.setState({
 			status: value
-		});
-	};
-
-	handleChange = event => {
-		const { value } = event.target;
-		this.setState({
-			config: value
 		});
 	};
 
@@ -67,7 +66,7 @@ class HeaderBidding extends Component {
 					<CustomMessage
 						type="error"
 						header="Information"
-						message="Consent Management Status not found. Please set app status"
+						message="Header Bidding Status not found. Please set app status"
 						rootClassNames="u-margin-b4"
 						dismissible
 					/>
@@ -84,18 +83,6 @@ class HeaderBidding extends Component {
 					defaultLayout
 					name={`appStatus-${siteId}-${siteDomain}`}
 					id={`js-appStatus-${siteId}-${siteDomain}`}
-				/>
-				<FieldGroup
-					id={`gdpr-${siteId}-${siteDomain}`}
-					label="Cookie Control Config"
-					type="text"
-					name={`gdpr-${siteId}-${siteDomain}`}
-					placeholder="Cookie Control Config"
-					className="u-padding-v3 u-padding-h3"
-					onChange={this.handleChange}
-					value={config}
-					componentClass="textarea"
-					style={{ minHeight: '200px' }}
 				/>
 				<CustomButton variant="primary" className="pull-right" onClick={this.handleSave}>
 					Save
