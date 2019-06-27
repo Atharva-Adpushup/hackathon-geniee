@@ -154,6 +154,11 @@ function triggerControl(mode, errorCode) {
 		return false;
 	}
 	config.mode = mode;
+
+	if (!errorCode) {
+		mode = 3;
+		config.mode = 3;
+	}
 	if (config.partner === 'geniee' && !config.isAdPushupControlWithPartnerSSP) {
 		if (w.gnsmod && !w.gnsmod.creationProcessStarted && w.gnsmod.triggerAds) {
 			w.gnsmod.triggerAds();
