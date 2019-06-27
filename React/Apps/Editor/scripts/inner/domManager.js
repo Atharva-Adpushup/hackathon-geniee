@@ -110,7 +110,6 @@ const selectorator = new Selectorator(),
 			}
 		};
 		const parameters = {
-			isEvenSpacingAlgo: false,
 			$,
 			$selector: $(contentSelector),
 			placementConfig: ads,

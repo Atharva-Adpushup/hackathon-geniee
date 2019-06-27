@@ -313,7 +313,7 @@ var $ = require('jquery'),
 					placementConfig: inContentAds,
 					sectionBracket: globalConfig.sectionBracket,
 					selectorsTreeLevel: globalConfig.selectorsTreeLevel,
-					isEvenSpacingAlgo: false
+					isEvenSpacingAlgo: globalConfig.isEvenSpacingAlgo
 				};
 				var successCallback = function(sectionsWithTargetElm) {
 					$(inContentAds).each(function(index, ad) {

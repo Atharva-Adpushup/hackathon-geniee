@@ -149,6 +149,15 @@ const variation = (state = {}, action) => {
 					}
 				};
 
+			case variationActions.TOGGLE_INCONTENT_EVEN_SPACING_ALGO:
+				return {
+					...state,
+					[action.variationId]: {
+						...state[action.variationId],
+						enableIncontentEvenSpacingAlgo: action.incontentEvenSpacingAlgo
+					}
+				};
+
 			case variationActions.UPDATE_CONTENT_SELECTOR:
 				return {
 					...state,
