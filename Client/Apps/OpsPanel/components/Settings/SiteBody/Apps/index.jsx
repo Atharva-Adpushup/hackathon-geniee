@@ -69,7 +69,7 @@ class Apps extends Component {
 						<ConsentManagement {...common} updateSite={updateSite} />
 					) : null}
 				</Panel>
-				<Panel eventKey="headerBidding">
+				{/* <Panel eventKey="headerBidding">
 					<Panel.Heading>
 						<Panel.Title toggle>Header Bidding</Panel.Title>
 					</Panel.Heading>
@@ -80,7 +80,7 @@ class Apps extends Component {
 							bidders={bidders}
 						/>
 					) : null}
-				</Panel>
+				</Panel> */}
 			</PanelGroup>
 		);
 	}

@@ -16,18 +16,14 @@ import Apps from '../components/Settings/SiteBody/Apps/index';
 const mapStateToProps = (state, ownProps) => {
 	const { headerBidding } = state.apps;
 	const {
-		match: { params }
+		site: { siteId }
 	} = ownProps;
-	const { siteId } = params;
 	const siteData = headerBidding[siteId] || {};
-	const {
-		bidders: { addedBidders = null }
-	} = siteData;
+	const { bidders: { addedBidders = null } = {} } = siteData;
 
 	return {
 		...ownProps,
-		bidders: addedBidders,
-		siteId
+		bidders: addedBidders
 	};
 };
 
