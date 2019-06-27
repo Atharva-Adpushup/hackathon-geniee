@@ -149,9 +149,16 @@ const APPS = [
 		image: '/assets/images/manageSites/header-bidding.png',
 		description:
 			'Open up your ad inventory for bidding by multiple demand sources in real-time. Our system automatically selects the optimal number of demand partners, so that you get the best yield for every single impression.',
-		full: {
+		left: {
 			type: TYPE.TEXT,
 			text: 'Status: __STATUS__'
+		},
+		right: {
+			type: TYPE.LINK,
+			text: 'Manage App',
+			link: LINK_TYPE.INAPP,
+			destination: '/sites/__SITE_ID__/apps/header-bidding',
+			icon: 'cog'
 		}
 	}
 ];
