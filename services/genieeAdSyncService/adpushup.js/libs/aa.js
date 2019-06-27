@@ -23,6 +23,7 @@ module.exports = (function() {
 		this.started = false;
 		this.isEvenSpacingAlgo = initOptions.hasOwnProperty('isEvenSpacingAlgo') ? initOptions.isEvenSpacingAlgo : true;
 		this.defaultSectionBracket = Number(initOptions.sectionBracket) || 600;
+		this.defaultAdPushupAdsPixelDifferences = { top: 0, bottom: 0 };
 		this.selectorsTreeLevel = Number(initOptions.selectorsTreeLevel) || '';
 		this.minimumAdDistance = 200;
 
@@ -202,10 +203,7 @@ module.exports = (function() {
 			var containerSelectorOffsets = $containerSelector.offset();
 			var containerSelectorHeight = $containerSelector.height();
 			var maximumAdDistance = this.minimumAdDistance;
-			var resultObject = {
-				top: 0,
-				bottom: 0
-			};
+			var resultObject = $.extend({}, this.defaultAdPushupAdsPixelDifferences);
 
 			if (!isValidContainerSelector) {
 				return resultObject;
@@ -309,17 +307,22 @@ module.exports = (function() {
 				isValidContentSelectorHeight,
 				sectionlowerRange,
 				sectionUpperRange,
-				sectionRange;
+				sectionRange,
+				isValidTopOffsetInSectionLowerRange,
+				isValidBottomOffsetInSectionUpperRange;
 
 			for (i = 1; i <= count; i++) {
 				isLastIndex = i === count;
 				isFirstIndex = i === 1;
 				isValidContentSelectorHeight = !!(isLastIndex && contentSelectorHeight);
+				isValidTopOffsetInSectionLowerRange = !!(isValidTopOffset && isFirstIndex);
+				isValidBottomOffsetInSectionUpperRange = !!(isLastIndex && isValidBottomOffset);
 
-				sectionlowerRange = isValidTopOffset && isFirstIndex ? options.top : (i - 1) * sectionBracket;
+				sectionlowerRange = isValidTopOffsetInSectionLowerRange ? options.top : (i - 1) * sectionBracket;
 				sectionUpperRange = isValidContentSelectorHeight ? options.contentSelectorHeight : i * sectionBracket;
-				sectionUpperRange =
-					isLastIndex && isValidBottomOffset ? sectionUpperRange - options.bottom : sectionUpperRange;
+				sectionUpperRange = isValidBottomOffsetInSectionUpperRange
+					? sectionUpperRange - options.bottom
+					: sectionUpperRange;
 				sectionRange = { lower: sectionlowerRange, upper: sectionUpperRange };
 
 				rangeObject[i] = sectionRange;
@@ -550,15 +553,18 @@ module.exports = (function() {
 		this.findSelectorPlacements = function($selector, placementConfig) {
 			var ref = this;
 			var $ = ref.$;
+			var isEvenSpacingAlgo = ref.isEvenSpacingAlgo;
 			var deferred = $.Deferred();
 			var bootstrapPlacements = function() {
 					if (ref.started) {
 						return false;
 					}
 
-					var adpushupAdsPixelDifferences = ref.getAdPushupAdsPixelDifferences({
-						$containerSelector: $selector
-					});
+					var adpushupAdsPixelDifferences = isEvenSpacingAlgo
+						? ref.getAdPushupAdsPixelDifferences({
+								$containerSelector: $selector
+						  })
+						: $.extend({}, ref.defaultAdPushupAdsPixelDifferences);
 					var computedBracketRangeOptions = {
 						$selector: $selector,
 						placementConfig: placementConfig,
@@ -570,7 +576,7 @@ module.exports = (function() {
 					$(placementConfig).each(function(i, adObj) {
 						var sectionNumber = adObj.section;
 						var placeFn = function() {
-							var computedSectionNumber = ref.isEvenSpacingAlgo ? i + 1 : adObj.section;
+							var computedSectionNumber = isEvenSpacingAlgo ? i + 1 : adObj.section;
 							var isNotNear = !!(adObj.notNear && adObj.notNear.length);
 							var isIgnoreXpaths = !!(adObj.ignoreXpaths && adObj.ignoreXpaths.length);
 							var sectionBracketRange = allSectionsBracketRange[computedSectionNumber];
