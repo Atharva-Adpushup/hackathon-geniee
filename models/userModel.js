@@ -54,7 +54,7 @@ var modelAPI = (module.exports = apiModule()),
 			'billingInfoComplete',
 			'paymentInfoComplete',
 			'isPaymentDetailsComplete',
-			"dfpSettings"
+			"adServerSettings"
 		];
 		this.clientKeys = [
 			'firstName',
@@ -77,7 +77,7 @@ var modelAPI = (module.exports = apiModule()),
 			'billingInfoComplete',
 			'paymentInfoComplete',
 			'isPaymentDetailsComplete',
-			"dfpSettings"
+			"adServerSettings"
 		];
 		this.validations = schema.user.validations;
 		this.classMap = {
@@ -86,7 +86,7 @@ var modelAPI = (module.exports = apiModule()),
 		this.defaults = {
 			sites: [],
 			adNetworkSettings: [],
-			dfpSettings: {},
+			adServerSettings: {},
 			requestDemo: true
 		};
 		this.ignore = ['password', 'oldPassword', 'confirmPassword', 'site'];
