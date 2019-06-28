@@ -79,7 +79,8 @@ var utils = require('../libs/utils'),
 						isResponsive: isResponsive,
 						isManual: isManual,
 						sectionName: sectionName,
-						adId: ad.id
+						adId: ad.id,
+						services: ad.services
 					});
 				}
 				//Extend variation wise keyvalues if any for adpTags. These will be page level targeting keys
