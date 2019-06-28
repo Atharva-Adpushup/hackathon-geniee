@@ -1,5 +1,6 @@
 import React from 'react';
 import SelectBox from '../../../../../Components/Selectbox/index';
+import Pagegroups from './Pagegroups';
 
 class RegexVerification extends React.Component {
 	constructor(props) {
@@ -16,21 +17,28 @@ class RegexVerification extends React.Component {
 
 		this.state = {
 			currentSite: null,
-			sites: options
+			options
 		};
 	}
 
+	handleSelect = value => this.setState({ currentSite: value });
+
 	render() {
-		const { currentSite, sites } = this.state;
+		const { currentSite, options } = this.state;
+		const { sites } = this.props;
+		const site = currentSite ? sites[currentSite] : null;
 
 		return (
-			<SelectBox
-				selected={currentSite}
-				options={sites}
-				onSelect={() => {}}
-				id="regex-verification-select-site"
-				title="Select Site"
-			/>
+			<React.Fragment>
+				<SelectBox
+					selected={currentSite}
+					options={options}
+					onSelect={this.handleSelect}
+					id="regex-verification-select-site"
+					title="Select Site"
+				/>
+				{site !== null ? <Pagegroups site={site} /> : null}
+			</React.Fragment>
 		);
 	}
 }
