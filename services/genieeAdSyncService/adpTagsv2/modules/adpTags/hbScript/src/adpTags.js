@@ -69,6 +69,7 @@ var adpTags = {
             var isResponsive = optionalParam.isResponsive;
             var sectionName = optionalParam.sectionName;
             var multipleAdSizes = optionalParam.multipleAdSizes;
+            var services = optionalParam.services;
 
             this.adpSlots[containerId] = {
                 slotId: slotId,
@@ -88,6 +89,7 @@ var adpTags = {
                 containerPresent: false,
                 feedbackSent: false,
                 hasTimedOut: false,
+                services: services,
                 feedback: {
                     winner: constants.FEEDBACK.DEFAULT_WINNER
                 }

@@ -22,6 +22,7 @@ var feedback = {
             winningRevenue: winningRevenue,
             winnerAdUnitId: slot.feedback.winnerAdUnitId || null,
             timedOutBidders: [],
+            services: slot.services,
             sectionId: slot.sectionId,
             sectionName: slot.sectionName,
             pageGroup: adp.config.pageGroup,
