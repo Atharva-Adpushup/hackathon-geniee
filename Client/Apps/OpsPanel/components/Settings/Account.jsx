@@ -3,6 +3,7 @@
 /* eslint-disable prefer-destructuring */
 import React, { Component, Fragment } from 'react';
 import { Col } from 'react-bootstrap';
+import memoize from 'memoize-one';
 
 import { DFP_ACCOUNTS_DEFAULT } from '../../configs/commonConsts';
 import CustomToggleSwitch from '../../../../Components/CustomToggleSwitch/index';
@@ -52,6 +53,22 @@ class Account extends Component {
 			dfpAccounts
 		};
 	}
+
+	getActiveDFPName = memoize((adNetworkSettings, code) => {
+		let response = 'N/A';
+		adNetworkSettings.forEach(network => {
+			if (network.networkName === 'DFP') {
+				const { dfpAccounts } = network;
+				const filteredAccounts = dfpAccounts.filter(
+					account => `${account.code}-${account.dfpParentId}` === code
+				);
+				if (filteredAccounts.length) {
+					response = `${filteredAccounts[0].code} - ${filteredAccounts[0].name || 'N/A'}`;
+				}
+			}
+		});
+		return response;
+	});
 
 	handleToggle = (value, extra) => {
 		let toUpdate = {};
@@ -133,6 +150,9 @@ class Account extends Component {
 			activeDFPCurrencyCode,
 			originalactiveDFP
 		} = this.state;
+		const { user } = this.props;
+		const { adNetworkSettings = [] } = user;
+		const activeDFPName = this.getActiveDFPName(adNetworkSettings, activeDFP);
 
 		const isDFPSetup = !!activeDFP;
 
@@ -161,7 +181,7 @@ class Account extends Component {
 				{isDFPSetup && originalactiveDFP !== null ? (
 					<FieldGroup
 						name="Active DFP"
-						value={activeDFP}
+						value={activeDFPName}
 						isTextOnly
 						textOnlyStyles={{
 							display: 'inline-block',

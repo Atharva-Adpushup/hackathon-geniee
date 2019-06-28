@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Tab, Nav, NavItem, Row, Col } from 'react-bootstrap';
 import { TOOLS_IDENTIFIERS } from '../../configs/commonConsts';
+import RegexVerification from './RegexVerification/index';
 
 class Tools extends Component {
 	state = {
@@ -23,7 +24,7 @@ class Tools extends Component {
 			case TOOLS_IDENTIFIERS.ENABLE_HB_BIDDER:
 				return 'Enable HB Bidder';
 			case TOOLS_IDENTIFIERS.REGEX_VERIFICATION:
-				return 'Regex Verification';
+				return <RegexVerification {...this.props} />;
 			case TOOLS_IDENTIFIERS.REGEX_GENERATION:
 				return 'Regex Generation';
 		}

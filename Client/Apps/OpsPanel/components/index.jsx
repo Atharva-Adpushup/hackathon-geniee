@@ -5,7 +5,7 @@ import { Nav, NavItem } from 'react-bootstrap';
 import { OP_NAV_ITEMS, OP_NAV_ITEMS_INDEXES, OP_NAV_ITEMS_VALUES } from '../configs/commonConsts';
 import ActionCard from '../../../Components/ActionCard';
 import Settings from './Settings/index';
-import Tools from './Tools/index';
+import ToolsContainer from '../containers/ToolsContainer';
 
 class OpsPanel extends Component {
 	state = {
@@ -58,7 +58,7 @@ class OpsPanel extends Component {
 			case OP_NAV_ITEMS_INDEXES.SITES_MAPPING:
 				return 'Sites mapping';
 			case OP_NAV_ITEMS_INDEXES.TOOLS:
-				return <Tools {...this.props} />;
+				return <ToolsContainer {...this.props} />;
 		}
 	}
 
