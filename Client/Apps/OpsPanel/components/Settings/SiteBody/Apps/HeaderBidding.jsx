@@ -11,6 +11,7 @@ import CustomToggleSwitch from '../../../../../../Components/CustomToggleSwitch/
 import CustomMessage from '../../../../../../Components/CustomMessage/index';
 import CustomButton from '../../../../../../Components/CustomButton/index';
 import Loader from '../../../../../../Components/Loader';
+import Empty from '../../../../../../Components/Empty';
 
 class HeaderBidding extends Component {
 	constructor(props) {
@@ -124,6 +125,7 @@ class HeaderBidding extends Component {
 		const keys = bidders ? Object.keys(bidders) : [];
 
 		if (loading || bidders === null) return <Loader height="150px" />;
+		if (!keys.length) return <Empty message="No Bidders Found" />;
 
 		if (keys.length) {
 			return (
