@@ -263,6 +263,44 @@ const TOOLS_IDENTIFIERS = {
 	REGEX_GENERATION: 'REGEX_GENERATION'
 };
 
+const ICONS = {
+	0: {
+		isVisible: false,
+		icon: 'question',
+		styles: { display: 'none' },
+		className: '',
+		title: 'Status Unknown'
+	},
+	1: {
+		isVisible: true,
+		icon: 'times',
+		styles: {},
+		className: 'u-text-error',
+		title: 'Pagegroup pattern not found'
+	},
+	2: {
+		isVisible: true,
+		icon: 'check',
+		styles: {},
+		className: 'u-text-success',
+		title: 'All fine'
+	},
+	3: {
+		isVisible: true,
+		icon: 'times',
+		styles: {},
+		className: 'u-text-yellow',
+		title: 'Url matching multiple pagegroup patterns'
+	},
+	4: {
+		isVisible: true,
+		icon: 'times',
+		styles: {},
+		className: 'u-text-error',
+		title: 'Url does not match the corresponding pagegroup pattern'
+	}
+};
+
 export {
 	OP_NAV_ITEMS,
 	OP_NAV_ITEMS_INDEXES,
@@ -272,5 +310,6 @@ export {
 	PAGEGROUP_DEVICE_OPTIONS,
 	DFP_ACCOUNTS_DEFAULT,
 	GDPR,
-	TOOLS_IDENTIFIERS
+	TOOLS_IDENTIFIERS,
+	ICONS
 };
