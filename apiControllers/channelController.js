@@ -44,17 +44,20 @@ const hlprs = {
 				});
 		});
 	},
-	updateChannel: (channel, key, value) => {
-		let data = channel.get(key);
-		if (typeof data === 'object' && !Array.isArray(data)) {
-			data = {
-				...data,
-				...value
-			};
-		} else {
-			data = value;
-		}
-		channel.set(key, data);
+	updateChannel: (channel, toUpdate) => {
+		toUpdate.forEach(content => {
+			const { key, value } = content;
+			let data = channel.get(key);
+			if (typeof data === 'object' && !Array.isArray(data)) {
+				data = {
+					...data,
+					...value
+				};
+			} else {
+				data = value;
+			}
+			channel.set(key, data);
+		});
 		return channel.save();
 	}
 };
@@ -191,11 +194,11 @@ router
 			.catch(err => errorHandler(err, res, HTTP_STATUS.INTERNAL_SERVER_ERROR));
 	})
 	.post('/updateChannel', (req, res) => {
-		const { siteId, pageGroup, platform, key, value } = req.body;
-		return checkParams(['siteId', 'pageGroup', 'platform', 'key', 'value'], req, 'post')
+		const { siteId, pageGroup, platform, toUpdate } = req.body;
+		return checkParams(['siteId', 'pageGroup', 'platform', 'toUpdate'], req, 'post')
 			.then(() => verifyOwner(siteId, req.user.email))
 			.then(() => channelModel.getChannel(siteId, platform, pageGroup))
-			.then(channel => hlprs.updateChannel(channel, key, value))
+			.then(channel => hlprs.updateChannel(channel, toUpdate))
 			.then(() =>
 				sendSuccessResponse(
 					{
@@ -207,16 +210,16 @@ router
 			.catch(err => errorHandler(err, res, HTTP_STATUS.INTERNAL_SERVER_ERROR));
 	})
 	.post('/updateChannels', (req, res) => {
-		const { siteId, key, value } = req.body;
+		const { siteId, toUpdate } = req.body;
 
 		function channelProcessing(channelKey) {
 			const [platform, pageGroup] = channelKey.split(':');
 			return channelModel
 				.getChannel(siteId, platform, pageGroup)
-				.then(channel => hlprs.updateChannel(channel, key, value));
+				.then(channel => hlprs.updateChannel(channel, toUpdate));
 		}
 
-		return checkParams(['siteId', 'key', 'value'], req, 'post')
+		return checkParams(['siteId', 'toUpdate'], req, 'post')
 			.then(() => verifyOwner(siteId, req.user.email))
 			.then(() => siteModel.getSiteChannels(siteId))
 			.then(channels =>

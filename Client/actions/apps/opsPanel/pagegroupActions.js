@@ -235,8 +235,12 @@ const updateChannelAutoOptimise = (siteId, params) => (dispatch, getState) => {
 			siteId,
 			platform: params.platform,
 			pageGroup: params.pageGroup,
-			key: 'autoOptimise',
-			value: params.autoOptimise
+			toUpdate: [
+				{
+					key: 'autoOptimise',
+					value: params.autoOptimise
+				}
+			]
 		})
 		.then(() => {
 			dispatch({

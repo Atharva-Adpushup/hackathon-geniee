@@ -11,6 +11,7 @@ import FieldGroup from '../../../../Components/Layout/FieldGroup';
 import CustomButton from '../../../../Components/CustomButton/index';
 import CustomMessage from '../../../../Components/CustomMessage/index';
 import Selectbox from '../../../../Components/Selectbox';
+import Loader from '../../../../Components/Loader/index';
 
 class Account extends Component {
 	constructor(props) {
@@ -50,7 +51,8 @@ class Account extends Component {
 			isThirdPartyAdx,
 			activeDFPCurrencyCode,
 			adsensePubId,
-			dfpAccounts
+			dfpAccounts,
+			loading: false
 		};
 	}
 
@@ -124,21 +126,23 @@ class Account extends Component {
 		adNetworkSettings[0].pubId = adsensePubId;
 		adNetworkSettings[0].networkName = adNetworkSettings[0].networkName || 'ADSENSE';
 
-		return updateUser({
-			key: 'adServerSettings',
-			value: updatedadServerSettings
-		})
-			.then(() =>
-				updateUser({
-					key: 'adNetworkSettings',
-					value: adNetworkSettings
-				})
-			)
-			.then(() =>
-				this.setState({
-					originalactiveDFP: activeDFP
-				})
-			);
+		this.setState({ loading: true });
+
+		return updateUser([
+			{
+				key: 'adServerSettings',
+				value: updatedadServerSettings
+			},
+			{
+				key: 'adNetworkSettings',
+				value: adNetworkSettings
+			}
+		]).then(() =>
+			this.setState({
+				originalactiveDFP: activeDFP,
+				loading: false
+			})
+		);
 	};
 
 	render() {
@@ -148,13 +152,16 @@ class Account extends Component {
 			activeDFP,
 			isThirdPartyAdx,
 			activeDFPCurrencyCode,
-			originalactiveDFP
+			originalactiveDFP,
+			loading
 		} = this.state;
 		const { user } = this.props;
 		const { adNetworkSettings = [] } = user;
 		const activeDFPName = this.getActiveDFPName(adNetworkSettings, activeDFP);
 
 		const isDFPSetup = !!activeDFP;
+
+		if (loading) return <Loader height="200px" />;
 
 		return (
 			<Col xs={12} style={{ margin: '0 auto' }}>
