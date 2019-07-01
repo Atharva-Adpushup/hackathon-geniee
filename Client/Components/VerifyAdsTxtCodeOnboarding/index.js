@@ -13,6 +13,7 @@ class VerifyAdsTxtCodeOnboarding extends Component {
 		showSendCodeByEmailModal: false,
 		ourAdsTxt: 'loading...',
 		verifyingAdsTxt: false,
+		skippingAdsTxtVerification: false,
 		success: '',
 		error: ''
 	};
@@ -38,10 +39,12 @@ class VerifyAdsTxtCodeOnboarding extends Component {
 
 		proxyService
 			.verifyAdsTxtCode(site)
+			// eslint-disable-next-line consistent-return
 			.then(resp => {
 				if (resp.status !== 200) {
 					if (resp.status === 204) {
 						return proxyService.getAdsTxt().then(response =>
+							// eslint-disable-next-line prefer-promise-reject-errors
 							Promise.reject({
 								response: {
 									...resp,
@@ -53,6 +56,7 @@ class VerifyAdsTxtCodeOnboarding extends Component {
 							})
 						);
 					}
+					// eslint-disable-next-line prefer-promise-reject-errors
 					return Promise.reject({ response: resp });
 				}
 			})
@@ -86,6 +90,44 @@ class VerifyAdsTxtCodeOnboarding extends Component {
 			});
 	};
 
+	skipVerification = () => {
+		const { siteId, site, onComplete } = this.props;
+		const onboardingStage = 'onboarded';
+		const step = 3;
+
+		this.setState({ skippingAdsTxtVerification: true });
+
+		userService
+			.setSiteStep(siteId, onboardingStage, step)
+			.then(() => siteService.saveSite(siteId, site, onboardingStage, step))
+			.then(() =>
+				this.setState(
+					() => ({
+						ourAdsTxt: '',
+						skippingAdsTxtVerification: false,
+						success: 'Ads.txt verification skipped. Redirecting to My Sites Page...'
+					}),
+					() => setTimeout(() => onComplete(), 3000)
+				)
+			)
+			.catch(err => {
+				if (err.response) {
+					const {
+						status,
+						data: { error, ourAdsTxt }
+					} = err.response;
+
+					return this.setState(() => {
+						if (status === 204 || status === 206 || status === 404)
+							return { error, skippingAdsTxtVerification: false, ourAdsTxt };
+						return { error, skippingAdsTxtVerification: false };
+					});
+				}
+
+				return this.setState({ error: 'Something went wrong!', skippingAdsTxtVerification: false });
+			});
+	};
+
 	toggleShowSendCodeByEmailModal = () => {
 		this.setState(state => ({ showSendCodeByEmailModal: !state.showSendCodeByEmailModal }));
 	};
@@ -96,8 +138,15 @@ class VerifyAdsTxtCodeOnboarding extends Component {
 	};
 
 	render() {
-		const { siteId, site, isActive, completed, forwardedRef } = this.props;
-		const { showSendCodeByEmailModal, ourAdsTxt, verifyingAdsTxt, success, error } = this.state;
+		const { site, isActive, completed, forwardedRef, isSuperUser } = this.props;
+		const {
+			showSendCodeByEmailModal,
+			ourAdsTxt,
+			verifyingAdsTxt,
+			skippingAdsTxtVerification,
+			success,
+			error
+		} = this.state;
 
 		const mailHeader = `Hi, <br/> Please find below the Ads.txt entries, append the following entries on the root domain of your website: <strong>${site}/ads.txt</strong>\n\n`;
 		const mailFooter = '<br/><br/>Thanks,<br/>Team AdPushup';
@@ -153,9 +202,22 @@ class VerifyAdsTxtCodeOnboarding extends Component {
 								</div>
 							</div>
 
-							<CustomButton onClick={this.verify} showSpinner={verifyingAdsTxt}>
+							<CustomButton
+								onClick={this.verify}
+								showSpinner={verifyingAdsTxt}
+								className="u-margin-r3"
+							>
 								Verify
 							</CustomButton>
+
+							{!!isSuperUser && (
+								<CustomButton
+									onClick={this.skipVerification}
+									showSpinner={skippingAdsTxtVerification}
+								>
+									Skip
+								</CustomButton>
+							)}
 
 							{success && <div className="u-text-success u-margin-t3">{success}</div>}
 							{error && <div className="u-text-error u-margin-t3">{error}</div>}
