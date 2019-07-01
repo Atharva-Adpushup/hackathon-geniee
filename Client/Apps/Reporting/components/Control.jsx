@@ -1,15 +1,14 @@
 import React, { Component, Fragment } from 'react';
 import { sortBy } from 'lodash';
-import { Glyphicon, OverlayTrigger, Tooltip, Button } from 'react-bootstrap';
-import moment from 'moment';
+import { Glyphicon, Button } from 'react-bootstrap';
 import 'react-dates/lib/css/_datepicker.css';
 import 'react-dates/initialize';
 import AsyncGroupSelect from '../../../Components/AsyncGroupSelect/index';
 import PresetDateRangePicker from '../../../Components/PresetDateRangePicker/index';
 import Selectbox from '../../../Components/Selectbox/index';
-import { convertObjToArr, arrayUnique, getPresets } from '../helpers/utils';
+import { convertObjToArr, getPresets } from '../helpers/utils';
 import reportService from '../../../services/reportService';
-import { accountFilter, REPORT_DOWNLOAD_ENDPOINT, REPORT_STATUS } from '../configs/commonConsts';
+import { accountFilter, REPORT_DOWNLOAD_ENDPOINT } from '../configs/commonConsts';
 
 class Control extends Component {
 	constructor(props) {
@@ -134,16 +133,10 @@ class Control extends Component {
 	getReportStatus() {
 		reportService.getLastUpdateStatus().then(res => {
 			if (res.status == 200 && res.data) {
-				if (res.data.status == 'Stopped') {
-					let updatedDate = res.data.lastRunTimePST;
-					this.setState({
-						updateStatusText: `Last updated on ${updatedDate}.`
-					});
-				} else if (res.data.status == 'Running') {
-					this.setState({
-						updateStatusText: `Data is being compiled, please check back later` //`Note - The network reporting data is being crunched and you will see updated data shortly.`
-					});
-				}
+				let updatedDate = res.data.lastRunTimePST;
+				this.setState({
+					updateStatusText: `Last updated on ${updatedDate}.`
+				});
 			}
 		});
 	}

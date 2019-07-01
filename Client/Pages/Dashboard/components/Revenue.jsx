@@ -13,40 +13,12 @@ import Loader from '../../../Components/Loader/index';
 
 class SitewiseReport extends React.Component {
 	state = {
-		quickDates: dates,
-		selectedDate: dates[0].value,
-		series: [],
-		isLoading: true,
-		startDate: moment()
-			.startOf('day')
-			.subtract(7, 'days')
-			.format('YYYY-MM-DD'),
-		endDate: moment()
-			.startOf('day')
-			.subtract(1, 'day')
-			.format('YYYY-MM-DD')
+		series: []
 	};
 
 	componentDidMount() {
-		this.getGraphData();
-	}
-
-	getGraphData() {
-		const { selectedDate } = this.state;
-		const params = getDateRange(selectedDate);
-		const { path, reportType, siteId, site } = this.props;
-		if (reportType === 'site') params.siteid = siteId;
-		else {
-			const siteIds = Object.keys(site);
-			params.siteid = siteIds.toString();
-		}
-		this.setState({ isLoading: true, startDate: params['fromDate'], endDate: params['toDate'] });
-		reportService.getWidgetData({ path, params }).then(response => {
-			if (response.status == 200 && response.data) {
-				const result = response.data.result;
-				this.computeGraphData(result);
-			}
-		});
+		let { displayData } = this.props;
+		this.computeGraphData(displayData.result);
 	}
 
 	computeGraphData = results => {
@@ -65,32 +37,8 @@ class SitewiseReport extends React.Component {
 			});
 		});
 		series[0].data = seriesData;
-		this.setState({ series, isLoading: false });
+		this.setState({ series });
 	};
-
-	renderControl() {
-		const { selectedDate, quickDates } = this.state;
-		return (
-			<div className="aligner aligner--hEnd">
-				<div className="u-margin-r4">
-					{/* eslint-disable */}
-					<label className="u-text-normal u-margin-r2">Quick Dates</label>
-					<Selectbox
-						id="revenue-date"
-						wrapperClassName="display-inline"
-						isClearable={false}
-						isSearchable={false}
-						selected={selectedDate}
-						options={quickDates}
-						onSelect={date => {
-							this.setState({ selectedDate: date }, this.getGraphData);
-						}}
-					/>
-					{/* eslint-enable */}
-				</div>
-			</div>
-		);
-	}
 
 	renderChart() {
 		const type = 'pie';
@@ -104,31 +52,8 @@ class SitewiseReport extends React.Component {
 		return <div className="text-center">No Record Found.</div>;
 	}
 
-	renderLoader = () => (
-		<div style={{ position: 'relative', width: '100%' }}>
-			<Loader height="20vh" />
-		</div>
-	);
-
 	render() {
-		const { isLoading, startDate, endDate } = this.state;
-		return (
-			<Row>
-				<Col sm={12}>{this.renderControl()}</Col>
-				<Col sm={12}>{isLoading ? this.renderLoader() : this.renderChart()}</Col>
-				<Col sm={12}>
-					<Link
-						to={`/reports?dimension=network&interval=cumulative&fromDate=${startDate}&toDate=${endDate}`}
-						className="u-link-reset aligner aligner-item float-right"
-					>
-						<Button className="aligner-item aligner aligner--vCenter">
-							View Reports
-							<FontAwesomeIcon icon="chart-area" className="u-margin-l2" />
-						</Button>
-					</Link>
-				</Col>
-			</Row>
-		);
+		return this.renderChart();
 	}
 }
 
