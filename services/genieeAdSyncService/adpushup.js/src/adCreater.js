@@ -228,7 +228,13 @@ var $ = require('jquery'),
 						// Below 'isContainerVisible' check is added for boundary cases where ad can be successfully placed
 						// but its container is hidden from layout (.i.e., display none) and thus ad placement and server feedback
 						// functionality should not work
-						isContainerVisible = !!(data.container && data.container.is(':visible'));
+						// NOTE: We have not incorporated recursive DOM parent level checks here for `opacity:0` and `visibility:hidden` properties
+						// as we think that they are not a real and frequent use case and OPS team will most probably catch them while placing ads on websites.
+						isContainerVisible = !!(
+							data.container &&
+							data.container.length &&
+							data.container.css('display') !== 'none'
+						);
 
 						if (!isContainerVisible) {
 							return false;
@@ -307,7 +313,7 @@ var $ = require('jquery'),
 					placementConfig: inContentAds,
 					sectionBracket: globalConfig.sectionBracket,
 					selectorsTreeLevel: globalConfig.selectorsTreeLevel,
-					isEvenSpacingAlgo: false
+					isEvenSpacingAlgo: globalConfig.isEvenSpacingAlgo
 				};
 				var successCallback = function(sectionsWithTargetElm) {
 					$(inContentAds).each(function(index, ad) {

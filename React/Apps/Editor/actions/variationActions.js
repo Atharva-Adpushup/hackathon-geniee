@@ -88,6 +88,19 @@ const getLastVariationNumber = function(variations) {
 			message: 'Variation incontent section bracket setting saved'
 		});
 	},
+	updateInContentEvenSpacingAlgo = (variationId, incontentEvenSpacingAlgo) => dispatch => {
+		dispatch({
+			type: variationActions.TOGGLE_INCONTENT_EVEN_SPACING_ALGO,
+			variationId,
+			incontentEvenSpacingAlgo
+		});
+		dispatch({
+			type: uiActions.SHOW_NOTIFICATION,
+			mode: 'success',
+			title: 'Operation Successful',
+			message: 'Variation incontent even spacing technique setting saved'
+		});
+	},
 	copyVariation = (variationId, channelId) => (dispatch, getState) => {
 		const newVariationId = Utils.getRandomNumber(),
 			ads = [],
@@ -315,6 +328,7 @@ export {
 	updateContentSelector,
 	updateInContentTreeSelectorsLevel,
 	updateInContentSectionBracket,
+	updateInContentEvenSpacingAlgo,
 	initIncontentAdsPreview,
 	savePersonalizationInfo
 };
