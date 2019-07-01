@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Tab, Nav, NavItem, Row, Col } from 'react-bootstrap';
 import { TOOLS_IDENTIFIERS } from '../../configs/commonConsts';
 import RegexVerification from './RegexVerification/index';
+import EnableHbBidder from './EnableHbBidder';
 
 class Tools extends Component {
 	state = {
@@ -16,15 +17,18 @@ class Tools extends Component {
 
 	renderContent = () => {
 		const { activeKey } = this.state;
+		const { networkConfig, sites, showNotificaiton, updateNetworkConfig } = this.props;
 
 		switch (activeKey) {
 			default:
 			case TOOLS_IDENTIFIERS.BACKUP_ADS:
 				return 'Back Up Ads';
 			case TOOLS_IDENTIFIERS.ENABLE_HB_BIDDER:
-				return 'Enable HB Bidder';
+				return (
+					<EnableHbBidder networkConfig={networkConfig} updateNetworkConfig={updateNetworkConfig} />
+				);
 			case TOOLS_IDENTIFIERS.REGEX_VERIFICATION:
-				return <RegexVerification {...this.props} />;
+				return <RegexVerification sites={sites} showNotificaiton={showNotificaiton} />;
 			case TOOLS_IDENTIFIERS.REGEX_GENERATION:
 				return 'Regex Generation';
 		}
