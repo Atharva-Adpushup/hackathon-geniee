@@ -42,6 +42,22 @@ const hlprs = {
 					return true;
 				});
 		});
+	},
+	updateChannel: (channel, toUpdate) => {
+		toUpdate.forEach(content => {
+			const { key, value } = content;
+			let data = channel.get(key);
+			if (typeof data === 'object' && !Array.isArray(data)) {
+				data = {
+					...data,
+					...value
+				};
+			} else {
+				data = value;
+			}
+			channel.set(key, data);
+		});
+		return channel.save();
 	}
 };
 
@@ -177,27 +193,44 @@ router
 			.catch(err => errorHandler(err, res, HTTP_STATUS.INTERNAL_SERVER_ERROR));
 	})
 	.post('/updateChannel', (req, res) => {
-		const { siteId, pageGroup, platform, key, value } = req.body;
-		return checkParams(['siteId', 'pageGroup', 'platform', 'key', 'value'], req, 'post')
+		const { siteId, pageGroup, platform, toUpdate } = req.body;
+		return checkParams(['siteId', 'pageGroup', 'platform', 'toUpdate'], req, 'post')
 			.then(() => verifyOwner(siteId, req.user.email))
 			.then(() => channelModel.getChannel(siteId, platform, pageGroup))
-			.then(channel => {
-				let data = channel.get(key);
-				if (typeof data === 'object' && !Array.isArray(data)) {
-					data = {
-						...data,
-						...value
-					};
-				} else {
-					data = value;
-				}
-				channel.set(key, data);
-				return channel.save();
-			})
+			.then(channel => hlprs.updateChannel(channel, toUpdate))
 			.then(() =>
 				sendSuccessResponse(
 					{
 						message: 'Channel Updated'
+					},
+					res
+				)
+			)
+			.catch(err => errorHandler(err, res, HTTP_STATUS.INTERNAL_SERVER_ERROR));
+	})
+	.post('/updateChannels', (req, res) => {
+		const { siteId, toUpdate } = req.body;
+
+		function channelProcessing(channelKey) {
+			const [platform, pageGroup] = channelKey.split(':');
+			return channelModel
+				.getChannel(siteId, platform, pageGroup)
+				.then(channel => hlprs.updateChannel(channel, toUpdate));
+		}
+
+		return checkParams(['siteId', 'toUpdate'], req, 'post')
+			.then(() => verifyOwner(siteId, req.user.email))
+			.then(() => siteModel.getSiteChannels(siteId))
+			.then(channels =>
+				promiseForeach(channels, channelProcessing, (data, err) => {
+					console.log(`${err.message} | Data: ${data}`);
+					return false;
+				})
+			)
+			.then(() =>
+				sendSuccessResponse(
+					{
+						message: 'Channels Updated'
 					},
 					res
 				)

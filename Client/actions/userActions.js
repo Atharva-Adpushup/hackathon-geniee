@@ -53,12 +53,19 @@ export const updateAdNetworkSettingsAction = data => dispatch =>
 	});
 export const updateUser = params => dispatch =>
 	axiosInstance
-		.post('/user/updateUser', params)
+		.post('/user/updateUser', { toUpdate: params })
 		.then(response => {
-			const { data } = response;
-			dispatch({
-				type: USER_ACTIONS.UPDATE_USER,
-				data: { key: params.key, value: data.data.toSend }
+			const {
+				data: {
+					data: { toUpdate = [] }
+				}
+			} = response;
+
+			toUpdate.forEach(content => {
+				dispatch({
+					type: USER_ACTIONS.UPDATE_USER,
+					data: { key: content.key, value: content.value }
+				});
 			});
 
 			return dispatch({

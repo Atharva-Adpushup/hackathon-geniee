@@ -360,29 +360,32 @@ router
 			.catch(err => errorHandler(err, res));
 	})
 	.post('/updateUser', (req, res) => {
-		const { key, value, replace = false } = req.body;
-		let toSend = value;
-		return checkParams(['key', 'value'], req, 'post')
+		const { toUpdate } = req.body;
+		const toSend = [];
+		return checkParams(['toUpdate'], req, 'post')
 			.then(() => userModel.getUserByEmail(req.user.email))
 			.then(user => {
-				let data = user.get(key);
-				if (typeof data === 'object' && !Array.isArray(data) && !replace) {
-					data = {
-						...data,
-						...value
-					};
-				} else {
-					data = value;
-				}
-				user.set(key, data);
-				toSend = data;
+				toUpdate.forEach(content => {
+					const { key, value, replace = false } = content;
+					let data = user.get(key);
+					if (typeof data === 'object' && !Array.isArray(data) && !replace) {
+						data = {
+							...data,
+							...value
+						};
+					} else {
+						data = value;
+					}
+					user.set(key, data);
+					toSend.push({ key, value: data });
+				});
 				return user.save();
 			})
 			.then(() =>
 				sendSuccessResponse(
 					{
 						message: 'User Updated',
-						toSend
+						toUpdate: toSend
 					},
 					res
 				)
