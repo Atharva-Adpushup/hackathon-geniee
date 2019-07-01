@@ -387,6 +387,10 @@ const siteMappingActions = {
 		{
 			value: 'criteo',
 			label: 'criteo'
+		},
+		{
+			value: 'sovrn',
+			label: 'sovrn'
 		}
 	],
 	devicesList = [
@@ -527,6 +531,12 @@ const siteMappingActions = {
 			{
 				name: 'zoneId',
 				type: 'integer'
+			}
+		],
+		sovrn: [
+			{
+				name: 'tagid',
+				type: 'string'
 			}
 		]
 	},
