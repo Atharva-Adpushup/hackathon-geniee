@@ -1,15 +1,7 @@
 import React from 'react';
-import { Row, Col, Button } from 'react-bootstrap';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Link } from 'react-router-dom';
-import moment from 'moment';
-import { getDateRange } from '../helpers/utils';
-import Selectbox from '../../../Components/Selectbox/index';
 import CustomChart from '../../../Components/CustomChart';
 import data from '../configs/data.json';
-import { dates, yAxisGroups } from '../configs/commonConsts';
-import reportService from '../../../services/reportService';
-import Loader from '../../../Components/Loader/index';
+import { yAxisGroups } from '../configs/commonConsts';
 
 class SitewiseReport extends React.Component {
 	state = {

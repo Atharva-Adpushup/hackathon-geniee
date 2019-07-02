@@ -1,14 +1,7 @@
 import React from 'react';
-import { Row, Col, Button } from 'react-bootstrap';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Link } from 'react-router-dom';
 import moment from 'moment';
-import { convertObjToArr, getDateRange } from '../helpers/utils';
-import Selectbox from '../../../Components/Selectbox/index';
 import CustomChart from '../../../Components/CustomChart';
-import { dates, yAxisGroups } from '../configs/commonConsts';
-import reportService from '../../../services/reportService';
-import Loader from '../../../Components/Loader/index';
+import { yAxisGroups } from '../configs/commonConsts';
 
 class PerformanceApOriginal extends React.Component {
 	constructor(props) {
@@ -49,8 +42,8 @@ class PerformanceApOriginal extends React.Component {
 				xAxis.categories.push(moment(result.report_date).format('ll'));
 			});
 			series = [
-				{ data: adpushupSeriesData, name: 'AdPushup Variation Page RPM' },
-				{ data: baselineSeriesData, name: 'Original Variation Page RPM' }
+				{ data: adpushupSeriesData, name: 'AdPushup Variation Page RPM', valueType: 'money' },
+				{ data: baselineSeriesData, name: 'Original Variation Page RPM', valueType: 'money' }
 			];
 		}
 		this.setState({
@@ -64,13 +57,14 @@ class PerformanceApOriginal extends React.Component {
 		const type = 'spline';
 		const { series, xAxis } = this.state;
 		const { isDataSufficient } = this.props;
-		if (series && series.length > 0 && isDataSufficient)
+		if (series && series.length > 0 && isDataSufficient) {
+			console.log(yAxisGroups, xAxis, series);
 			return (
 				<div>
 					<CustomChart type={type} series={series} xAxis={xAxis} yAxisGroups={yAxisGroups} />
 				</div>
 			);
-		else return <div className="text-center">Insufficient Data.</div>;
+		} else return <div className="text-center">Insufficient Data.</div>;
 	}
 
 	render() {

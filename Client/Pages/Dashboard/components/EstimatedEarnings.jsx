@@ -1,6 +1,6 @@
-import React, { Component, Fragment } from 'react';
+import React, { Fragment } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { convertObjToArr, numberWithCommas } from '../helpers/utils';
+import { numberWithCommas } from '../helpers/utils';
 
 function EstimatedEarnings(props) {
 	let { displayData } = props;

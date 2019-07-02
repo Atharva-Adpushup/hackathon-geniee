@@ -181,7 +181,7 @@ class DateRangePickerWrapper extends React.Component {
 					showClearDates
 					minimumNights={0}
 					displayFormat="ll"
-					isOutsideRange={() => {}}
+					isOutsideRange={day => day.isAfter(moment())}
 				/>
 			</div>
 		);

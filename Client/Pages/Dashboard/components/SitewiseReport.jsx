@@ -1,14 +1,5 @@
 import React from 'react';
-import { Row, Col, Button } from 'react-bootstrap';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Datatable from 'react-bs-datatable';
-import { Link } from 'react-router-dom';
-import moment from 'moment';
-import Selectbox from '../../../Components/Selectbox/index';
-import { getDateRange } from '../helpers/utils';
-import { dates } from '../configs/commonConsts';
-import reportService from '../../../services/reportService';
-import Loader from '../../../Components/Loader/index';
 import { numberWithCommas } from '../helpers/utils';
 
 class SitewiseReport extends React.Component {
