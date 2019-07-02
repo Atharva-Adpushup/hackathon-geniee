@@ -52,7 +52,7 @@ class Tools extends Component {
 								<NavItem eventKey={TOOLS_IDENTIFIERS.REGEX_VERIFICATION}>
 									Regex Verification
 								</NavItem>
-								<NavItem eventKey={TOOLS_IDENTIFIERS.REGEX_GENERATION}>Regex Generation</NavItem>
+								{/* <NavItem eventKey={TOOLS_IDENTIFIERS.REGEX_GENERATION}>Regex Generation</NavItem> */}
 							</Nav>
 						</Col>
 						<Col sm={10}>
