@@ -19,7 +19,7 @@ class Dashboard extends React.Component {
 	constructor(props) {
 		super(props);
 		const { site } = this.props;
-		const sites = [{ name: 'Select All', value: 'all' }, ...convertObjToArr(site)];
+		const sites = [{ name: 'All', value: 'all' }, ...convertObjToArr(site)];
 		const topPerformingSite = sites.find(site => site['isTopPerforming']);
 		const selectedSite = topPerformingSite ? topPerformingSite['value'] : 'all';
 		const widgets = sortBy(this.props.widget, wid => wid.position);
@@ -209,32 +209,40 @@ class Dashboard extends React.Component {
 
 	renderContent = () => {
 		let { widgetsConfig } = this.state;
+		const { site, reportType, siteId } = this.props;
 		const content = [];
 		for (let wid in widgetsConfig) {
 			const widget = widgetsConfig[wid];
 			const widgetComponent = this.getWidgetComponent(widget);
-
-			content.push(
-				<Card
-					rootClassName={
-						widget.name === 'estimated_earnings'
-							? 'u-margin-b4 width-100 card-color'
-							: 'u-margin-b4 width-100'
-					}
-					key={widget.name}
-					type={widget.name !== 'estimated_earnings' ? 'danger' : 'default'}
-					headerClassName="card-header"
-					headerChildren={
-						<div className="aligner aligner--row">
-							<span className="aligner-item card-header-title">{widget.display_name}</span>
-							{this.renderControl(wid)}
-						</div>
-					}
-					bodyClassName="card-body"
-					bodyChildren={widgetComponent}
-					footerChildren={this.renderViewReportButton(wid)}
-				/>
-			);
+			if (
+				widget.name != 'per_ap_original' ||
+				reportType != 'site' ||
+				!site[siteId] ||
+				site[siteId]['product']['Layout'] == 1
+			)
+				content.push(
+					<Card
+						rootClassName={
+							widget.name === 'estimated_earnings'
+								? 'u-margin-b4 width-100 card-color'
+								: 'u-margin-b4 width-100'
+						}
+						key={widget.name}
+						type={widget.name !== 'estimated_earnings' ? 'danger' : 'default'}
+						headerClassName="card-header"
+						headerChildren={
+							<div className="aligner aligner--row">
+								<span className="aligner-item card-header-title">{widget.display_name}</span>
+								{this.renderControl(wid)}
+							</div>
+						}
+						bodyClassName="card-body"
+						bodyChildren={widgetComponent}
+						footerChildren={
+							widget.name !== 'estimated_earnings' ? this.renderViewReportButton(wid) : ''
+						}
+					/>
+				);
 		}
 
 		return content;
