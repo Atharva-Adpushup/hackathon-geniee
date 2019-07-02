@@ -4,6 +4,8 @@ import Loader from '../../../../../../Components/Loader';
 import Layout from './Layout';
 import ConsentManagement from './ConsentManagement';
 import HeaderBidding from './HeaderBidding';
+import ApTag from './ApTag';
+import InnovativeAds from './InnovativeAds';
 
 class Apps extends Component {
 	state = {
@@ -34,7 +36,8 @@ class Apps extends Component {
 			updateAppStatus,
 			updateSite,
 			fetchAllBiddersAction,
-			updateBidderAction
+			updateBidderAction,
+			saveSettings
 		} = this.props;
 		const common = {
 			activeKey,
@@ -80,6 +83,33 @@ class Apps extends Component {
 							bidders={bidders}
 							fetchAllBiddersAction={fetchAllBiddersAction}
 							updateBidderAction={updateBidderAction}
+						/>
+					) : null}
+				</Panel>
+				<Panel eventKey="apTag">
+					<Panel.Heading>
+						<Panel.Title toggle>AP Tag</Panel.Title>
+					</Panel.Heading>
+					{activeKey === 'apTag' ? (
+						<ApTag
+							{...common}
+							// fetchChannelsInfo={fetchChannelsInfo}
+							// updateChannelAutoOptimise={updateChannelAutoOptimise}
+							// updateSiteAutoOptimise={updateSiteAutoOptimise}
+						/>
+					) : null}
+				</Panel>
+				<Panel eventKey="innovativeAds">
+					<Panel.Heading>
+						<Panel.Title toggle>Innovative Ads</Panel.Title>
+					</Panel.Heading>
+					{activeKey === 'innovativeAds' ? (
+						<InnovativeAds
+							{...common}
+							saveSettings={saveSettings}
+							// fetchChannelsInfo={fetchChannelsInfo}
+							// updateChannelAutoOptimise={updateChannelAutoOptimise}
+							// updateSiteAutoOptimise={updateSiteAutoOptimise}
 						/>
 					) : null}
 				</Panel>
