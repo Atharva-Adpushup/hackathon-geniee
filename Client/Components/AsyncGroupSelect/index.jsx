@@ -70,7 +70,7 @@ class AsyncGroupSelect extends Component {
 				this.setState({
 					filterValues: response.data.result,
 					filterResult: response.data.result,
-					selectedFilterKey: filter.value,
+					selectedFilterKey: filter.name,
 					selectedFilters,
 					showFilterValues: true,
 					isLoading: false

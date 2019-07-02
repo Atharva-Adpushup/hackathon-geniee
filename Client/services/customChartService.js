@@ -33,7 +33,7 @@ const defaultChartConfig = {
 		ignoreHiddenSeries: false,
 		spacingTop: 35,
 		style: {
-			fontFamily: 'Karla'
+			fontFamily: 'Helvetica Neue,Helvetica,Arial,sans-serif'
 		},
 		events: {}
 	},
@@ -63,7 +63,28 @@ const defaultChartConfig = {
 			}
 		]
 	},
-	colors: ['#2e3b7c', '#d97f3e', '#50a4e2', '#bf4b9b', '#d9d332', '#4eba6e', '#eb575c', '#ca29f3']
+	colors: [
+		'#d97f3e',
+		'#2e3b7c',
+		'#50a4e2',
+		'#bf4b9b',
+		'#d9d332',
+		'#4eba6e',
+		'#eb575c',
+		'#ca29f3',
+		'#cbe958',
+		'#9b6f76',
+		'#6b9c8a',
+		'#5fa721',
+		'#c78cf2',
+		'#866004',
+		'#6a05bb',
+		'#5c760b',
+		'#b2a01e',
+		'#3a609f',
+		'#265043',
+		'#8fa5f0'
+	]
 };
 
 function getGroupedYAxisAndSeries(chartType, yAxisGroups, existingSeries) {
@@ -99,6 +120,8 @@ function getGroupedYAxisAndSeries(chartType, yAxisGroups, existingSeries) {
 						...existingSeries[index],
 						yAxis: i,
 						tooltip: {
+							useHTML: true,
+							headerFormat: '<span style="font-size:14px;font-weight:bold">{point.key}</span><br/>',
 							pointFormatter: function() {
 								let point = this;
 								let num = Math.round(point.y * 100) / 100;
@@ -186,7 +209,8 @@ export function getCustomChartConfig(
 				const singleSeries = series[i];
 				singleSeries.visible = true;
 				singleSeries.tooltip = {
-					followPointer: true,
+					useHTML: true,
+					headerFormat: '<span style="font-size:14px;font-weight:bold">{point.key}</span><br/>',
 					pointFormatter: function() {
 						let point = this;
 						let num = Math.round(point.y * 100) / 100;
