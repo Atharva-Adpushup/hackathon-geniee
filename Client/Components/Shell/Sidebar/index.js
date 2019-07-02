@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { NavLink } from 'react-router-dom';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 
-const Sidebar = ({ show }) => {
+const Sidebar = ({ show, user }) => {
 	const getNavItem = (name, link, icon, showTooltip, tooltipText) => {
 		const navItem = (
 			<NavLink to={link} className="clearfix" activeClassName="active">
@@ -51,7 +51,7 @@ const Sidebar = ({ show }) => {
 				{getNavItem('My Sites', '/sites', 'list', !show)}
 				{getNavItem('Reports', '/reports', 'chart-area', !show)}
 				{getNavItem('Integrations', '/integrations', 'desktop', !show)}
-				{/* {getNavItem('Ops Panel', '/ops-panel', 'tools', !show)} */}
+				{user.isSuperUser ? getNavItem('Ops Panel', '/ops-panel', 'tools', !show) : null}
 			</ul>
 
 			<div className="cta-btn-wrap">
