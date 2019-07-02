@@ -301,6 +301,24 @@ const ICONS = {
 	}
 };
 
+const BACKUP_ADS_FORMATS = [
+	{
+		name: 'JS',
+		value: 'js',
+		text: 'JS'
+	},
+	{
+		name: 'HTML',
+		value: 'html',
+		text: 'HTML'
+	},
+	{
+		name: 'TEXT',
+		value: 'txt',
+		text: 'TEXT'
+	}
+];
+
 export {
 	OP_NAV_ITEMS,
 	OP_NAV_ITEMS_INDEXES,
@@ -311,5 +329,6 @@ export {
 	DFP_ACCOUNTS_DEFAULT,
 	GDPR,
 	TOOLS_IDENTIFIERS,
-	ICONS
+	ICONS,
+	BACKUP_ADS_FORMATS
 };
