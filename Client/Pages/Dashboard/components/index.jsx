@@ -61,6 +61,7 @@ class Dashboard extends React.Component {
 	}
 
 	getWidgetComponent = widget => {
+		const { reportType } = this.props;
 		switch (widget.name) {
 			case 'estimated_earnings':
 				if (widget.isLoading) return this.renderLoader();
@@ -79,7 +80,7 @@ class Dashboard extends React.Component {
 				else return <PerformanceOverviewContainer displayData={widget.data} />;
 			case 'per_site_wise':
 				if (widget.isLoading) return this.renderLoader();
-				else return <SitewiseReportContainer displayData={widget.data} />;
+				else return <SitewiseReportContainer displayData={widget.data} reportType={reportType} />;
 			case 'rev_by_network':
 				if (widget.isLoading) return this.renderLoader();
 				else return <RevenueContainer displayData={widget.data} />;
@@ -178,11 +179,14 @@ class Dashboard extends React.Component {
 		const { selectedDate, selectedSite, path, name } = widgetsConfig[wid];
 		const params = getDateRange(selectedDate);
 		const { reportType, siteId, site } = this.props;
-		if (reportType === 'site') params['siteid'] = siteId;
-		else if (selectedSite != 'all') params['siteid'] = selectedSite;
+		if (reportType === 'site') {
+			params['siteid'] = siteId;
+			params['interval'] = 'daily';
+		} else if (selectedSite != 'all') params['siteid'] = selectedSite;
 		else {
 			const siteIds = Object.keys(site);
 			params['siteid'] = siteIds.toString();
+			params['interval'] = 'cumulative';
 		}
 		widgetsConfig[wid]['isLoading'] = true;
 		widgetsConfig[wid]['startDate'] = params['fromDate'];
