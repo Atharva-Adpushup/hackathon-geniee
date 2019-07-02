@@ -249,26 +249,32 @@ router
 			});
 	})
 	.post('/updateSite', (req, res) => {
-		const { siteId, key, value, replace = false } = req.body;
-		return checkParams(['siteId', 'key', 'value'], req, 'post')
+		const { siteId, toUpdate } = req.body;
+		const toSend = [];
+		return checkParams(['siteId', 'toUpdate'], req, 'post')
 			.then(() => verifyOwner(siteId, req.user.email))
 			.then(site => {
-				let data = site.get(key);
-				if (typeof data === 'object' && !Array.isArray(data) && !replace) {
-					data = {
-						...data,
-						...value
-					};
-				} else {
-					data = value;
-				}
-				site.set(key, data);
+				toUpdate.forEach(content => {
+					const { key, value, replace = false, requireResponse = true } = content;
+					let data = site.get(key);
+					if (typeof data === 'object' && !Array.isArray(data) && !replace) {
+						data = {
+							...data,
+							...value
+						};
+					} else {
+						data = value;
+					}
+					site.set(key, data);
+					if (requireResponse) toSend.push({ key, value: data });
+				});
 				return site.save();
 			})
 			.then(() =>
 				sendSuccessResponse(
 					{
-						message: 'Site Updated'
+						message: 'Site Updated',
+						toUpdate: toSend
 					},
 					res
 				)

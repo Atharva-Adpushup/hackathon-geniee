@@ -3,6 +3,7 @@
 /* eslint-disable prefer-destructuring */
 import React, { Component, Fragment } from 'react';
 import { Col } from 'react-bootstrap';
+import memoize from 'memoize-one';
 
 import { DFP_ACCOUNTS_DEFAULT } from '../../configs/commonConsts';
 import CustomToggleSwitch from '../../../../Components/CustomToggleSwitch/index';
@@ -10,6 +11,7 @@ import FieldGroup from '../../../../Components/Layout/FieldGroup';
 import CustomButton from '../../../../Components/CustomButton/index';
 import CustomMessage from '../../../../Components/CustomMessage/index';
 import Selectbox from '../../../../Components/Selectbox';
+import Loader from '../../../../Components/Loader/index';
 
 class Account extends Component {
 	constructor(props) {
@@ -17,12 +19,14 @@ class Account extends Component {
 		const { user } = this.props;
 		const {
 			adNetworkSettings = [],
-			dfpSettings: {
-				activeDFPParentId = false,
-				activeDFPNetwork = false,
-				isThirdPartyAdx = false,
-				activeDFPCurrencyCode = 'Not Set'
-			}
+			adServerSettings: {
+				dfp: {
+					activeDFPParentId = false,
+					activeDFPNetwork = false,
+					isThirdPartyAdx = false,
+					activeDFPCurrencyCode = 'Not Set'
+				} = {}
+			} = {}
 		} = user;
 		const adsense = adNetworkSettings[0] || null;
 		const adsensePubId = adsense ? adsense.pubId : null;
@@ -47,9 +51,26 @@ class Account extends Component {
 			isThirdPartyAdx,
 			activeDFPCurrencyCode,
 			adsensePubId,
-			dfpAccounts
+			dfpAccounts,
+			loading: false
 		};
 	}
+
+	getActiveDFPName = memoize((adNetworkSettings, code) => {
+		let response = 'N/A';
+		adNetworkSettings.forEach(network => {
+			if (network.networkName === 'DFP') {
+				const { dfpAccounts } = network;
+				const filteredAccounts = dfpAccounts.filter(
+					account => `${account.code}-${account.dfpParentId}` === code
+				);
+				if (filteredAccounts.length) {
+					response = `${filteredAccounts[0].code} - ${filteredAccounts[0].name || 'N/A'}`;
+				}
+			}
+		});
+		return response;
+	});
 
 	handleToggle = (value, extra) => {
 		let toUpdate = {};
@@ -77,7 +98,7 @@ class Account extends Component {
 	handleSave = () => {
 		const { adsensePubId, activeDFP, originalactiveDFP, isThirdPartyAdx } = this.state;
 		const { showNotification, updateUser, user } = this.props;
-		const { adNetworkSettings = [], dfpSettings = {} } = user;
+		const { adNetworkSettings = [], adServerSettings = {} } = user;
 
 		if (originalactiveDFP === null && activeDFP === null) {
 			return showNotification({
@@ -97,33 +118,31 @@ class Account extends Component {
 		}
 
 		const [activeDFPNetwork, activeDFPParentId] = activeDFP.split('-');
-		let updatedDFPSettings = { ...dfpSettings, isThirdPartyAdx };
-		if (originalactiveDFP === null) {
-			updatedDFPSettings = {
-				...updatedDFPSettings,
-				activeDFPNetwork,
-				activeDFPParentId
-			};
-		}
+		const updatedadServerSettings = {
+			...adServerSettings,
+			dfp: { ...adNetworkSettings.dfp, isThirdPartyAdx, activeDFPNetwork, activeDFPParentId }
+		};
 		adNetworkSettings[0] = adNetworkSettings[0] || [];
 		adNetworkSettings[0].pubId = adsensePubId;
 		adNetworkSettings[0].networkName = adNetworkSettings[0].networkName || 'ADSENSE';
 
-		return updateUser({
-			key: 'dfpSettings',
-			value: updatedDFPSettings
-		})
-			.then(() =>
-				updateUser({
-					key: 'adNetworkSettings',
-					value: adNetworkSettings
-				})
-			)
-			.then(() =>
-				this.setState({
-					originalactiveDFP: activeDFP
-				})
-			);
+		this.setState({ loading: true });
+
+		return updateUser([
+			{
+				key: 'adServerSettings',
+				value: updatedadServerSettings
+			},
+			{
+				key: 'adNetworkSettings',
+				value: adNetworkSettings
+			}
+		]).then(() =>
+			this.setState({
+				originalactiveDFP: activeDFP,
+				loading: false
+			})
+		);
 	};
 
 	render() {
@@ -133,10 +152,16 @@ class Account extends Component {
 			activeDFP,
 			isThirdPartyAdx,
 			activeDFPCurrencyCode,
-			originalactiveDFP
+			originalactiveDFP,
+			loading
 		} = this.state;
+		const { user } = this.props;
+		const { adNetworkSettings = [] } = user;
+		const activeDFPName = this.getActiveDFPName(adNetworkSettings, activeDFP);
 
 		const isDFPSetup = !!activeDFP;
+
+		if (loading) return <Loader height="200px" />;
 
 		return (
 			<Col xs={12} style={{ margin: '0 auto' }}>
@@ -163,7 +188,7 @@ class Account extends Component {
 				{isDFPSetup && originalactiveDFP !== null ? (
 					<FieldGroup
 						name="Active DFP"
-						value={activeDFP}
+						value={activeDFPName}
 						isTextOnly
 						textOnlyStyles={{
 							display: 'inline-block',

@@ -11,6 +11,7 @@ import CustomToggleSwitch from '../../../../../../Components/CustomToggleSwitch/
 import CustomMessage from '../../../../../../Components/CustomMessage/index';
 import FieldGroup from '../../../../../../Components/Layout/FieldGroup';
 import CustomButton from '../../../../../../Components/CustomButton/index';
+import Loader from '../../../../../../Components/Loader/index';
 
 class ConsentManagement extends Component {
 	constructor(props) {
@@ -27,8 +28,11 @@ class ConsentManagement extends Component {
 		}
 
 		this.state = {
-			status: apps.consentManagement || undefined,
-			config: stringifiedGdpr
+			status: Object.prototype.hasOwnProperty.call(apps, 'consentManagement')
+				? apps.consentManagement
+				: undefined,
+			config: stringifiedGdpr,
+			loading: false
 		};
 	}
 
@@ -54,6 +58,7 @@ class ConsentManagement extends Component {
 
 		try {
 			parsedConfig = JSON.parse(config);
+			parsedConfig.compliance = status;
 		} catch (e) {
 			return showNotification({
 				mode: 'error',
@@ -63,23 +68,26 @@ class ConsentManagement extends Component {
 			});
 		}
 
+		this.setState({ loading: true });
+
 		return updateAppStatus(siteId, {
 			app: 'consentManagement',
 			value: status
-		}).then(() => {
-			parsedConfig.compliance = status;
-			return updateSite(siteId, {
-				key: 'gdpr',
-				value: parsedConfig,
-				replace: true
-			});
-		});
+		})
+			.then(() =>
+				updateSite(siteId, [
+					{ key: 'gdpr', value: parsedConfig, replace: true, requireResponse: false }
+				])
+			)
+			.then(() => this.setState({ loading: false }));
 	};
 
 	render() {
 		const { site } = this.props;
 		const { siteId, siteDomain } = site;
-		const { status, config } = this.state;
+		const { status, config, loading } = this.state;
+
+		if (loading) return <Loader height="150px" />;
 
 		return (
 			<Panel.Body collapsible>

@@ -3,7 +3,8 @@ import {
 	NETWORK_CONFIG_ACTIONS,
 	SITE_ACTIONS,
 	REPORTS_ACTIONS,
-	ADS_TXT_ACTIONS
+	ADS_TXT_ACTIONS,
+	UI_ACTIONS
 } from '../constants/global';
 import axiosInstance from '../helpers/axiosInstance';
 import { errorHandler } from '../helpers/commonFunctions';
@@ -34,8 +35,25 @@ const fetchGlobalData = () => dispatch =>
 				data: data.reports
 			});
 		})
-		.catch(err => {
-			return errorHandler(err);
-		});
+		.catch(err => errorHandler(err));
 
-export default fetchGlobalData;
+const updateNetworkConfig = config => dispatch =>
+	axiosInstance
+		.post('/updateNetworkConfig', { config })
+		.then(response => {
+			const { data } = response;
+			dispatch({
+				type: NETWORK_CONFIG_ACTIONS.REPLACE_NETWORK_CONFIG,
+				data: data.data.networkConfig
+			});
+			return dispatch({
+				type: UI_ACTIONS.SHOW_NOTIFICATION,
+				mode: 'success',
+				title: 'Operation Successful',
+				autoDismiss: 5,
+				message: 'Network Config Updated Updated'
+			});
+		})
+		.catch(err => errorHandler(err));
+
+export { fetchGlobalData, updateNetworkConfig };
