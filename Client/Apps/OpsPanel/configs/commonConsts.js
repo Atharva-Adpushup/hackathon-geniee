@@ -256,6 +256,69 @@ const DFP_ACCOUNTS_DEFAULT = [
 	}
 ];
 
+const TOOLS_IDENTIFIERS = {
+	BACKUP_ADS: 'BACKUP_ADS',
+	ENABLE_HB_BIDDER: 'ENABLE_HB_BIDDER',
+	REGEX_VERIFICATION: 'REGEX_VERIFICATION',
+	REGEX_GENERATION: 'REGEX_GENERATION'
+};
+
+const ICONS = {
+	0: {
+		isVisible: false,
+		icon: 'question',
+		styles: { display: 'none' },
+		className: '',
+		title: 'Status Unknown'
+	},
+	1: {
+		isVisible: true,
+		icon: 'times',
+		styles: {},
+		className: 'u-text-error',
+		title: 'Pagegroup pattern not found'
+	},
+	2: {
+		isVisible: true,
+		icon: 'check',
+		styles: {},
+		className: 'u-text-success',
+		title: 'All fine'
+	},
+	3: {
+		isVisible: true,
+		icon: 'times',
+		styles: {},
+		className: 'u-text-yellow',
+		title: 'Url matching multiple pagegroup patterns'
+	},
+	4: {
+		isVisible: true,
+		icon: 'times',
+		styles: {},
+		className: 'u-text-error',
+		title: 'Url does not match the corresponding pagegroup pattern'
+	}
+};
+
+const BACKUP_ADS_FORMATS = [
+	{
+		name: 'JS',
+		value: 'js',
+		text: 'JS'
+	},
+	{
+		name: 'HTML',
+		value: 'html',
+		text: 'HTML'
+	},
+	{
+		name: 'TEXT',
+		value: 'txt',
+		text: 'TEXT'
+	}
+];
+
 export {
 	OP_NAV_ITEMS,
 	OP_NAV_ITEMS_INDEXES,
@@ -264,5 +327,8 @@ export {
 	TABLET_LAYOUT_OPTIONS,
 	PAGEGROUP_DEVICE_OPTIONS,
 	DFP_ACCOUNTS_DEFAULT,
-	GDPR
+	GDPR,
+	TOOLS_IDENTIFIERS,
+	ICONS,
+	BACKUP_ADS_FORMATS
 };

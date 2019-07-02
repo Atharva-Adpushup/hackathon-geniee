@@ -235,8 +235,12 @@ const updateChannelAutoOptimise = (siteId, params) => (dispatch, getState) => {
 			siteId,
 			platform: params.platform,
 			pageGroup: params.pageGroup,
-			key: 'autoOptimise',
-			value: params.autoOptimise
+			toUpdate: [
+				{
+					key: 'autoOptimise',
+					value: params.autoOptimise
+				}
+			]
 		})
 		.then(() => {
 			dispatch({
@@ -250,7 +254,7 @@ const updateChannelAutoOptimise = (siteId, params) => (dispatch, getState) => {
 					}
 				}
 			});
-			dispatch({
+			return dispatch({
 				type: UI_ACTIONS.SHOW_NOTIFICATION,
 				mode: 'success',
 				title: 'Operation Successful',

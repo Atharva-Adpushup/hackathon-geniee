@@ -72,14 +72,23 @@ const updateSiteAutoOptimise = (siteId, params) => (dispatch, getState) =>
 	axiosInstance
 		.post('/site/updateSite', {
 			siteId,
-			key: 'apConfigs',
-			value: { autoOptimise: params.autoOptimise }
+			toUpdate: [
+				{
+					key: 'apConfigs',
+					value: { autoOptimise: params.autoOptimise },
+					requireResponse: false
+				}
+			]
 		})
 		.then(() =>
 			axiosInstance.post('/channel/updateChannels', {
 				siteId,
-				key: 'autoOptimise',
-				value: params.autoOptimise
+				toUpdate: [
+					{
+						key: 'autoOptimise',
+						value: params.autoOptimise
+					}
+				]
 			})
 		)
 		.then(() => {
@@ -126,8 +135,13 @@ const updateAppStatus = (siteId, params) => dispatch =>
 	axiosInstance
 		.post('/site/updateSite', {
 			siteId,
-			key: 'apps',
-			value: { [params.app]: params.value }
+			toUpdate: [
+				{
+					key: 'apps',
+					value: { [params.app]: params.value },
+					requireResponse: false
+				}
+			]
 		})
 		.then(() => {
 			dispatch({
@@ -149,12 +163,14 @@ const updateSite = (siteId, params) => dispatch =>
 	axiosInstance
 		.post('/site/updateSite', {
 			siteId,
-			...params
+			toUpdate: [...params]
 		})
 		.then(() => {
-			dispatch({
-				type: SITE_ACTIONS.UPDATE_SITE_DATA,
-				data: { siteId, data: { [params.key]: params.value } }
+			params.forEach(data => {
+				dispatch({
+					type: SITE_ACTIONS.UPDATE_SITE_DATA,
+					data: { siteId, data: { [data.key]: data.value } }
+				});
 			});
 
 			return dispatch({

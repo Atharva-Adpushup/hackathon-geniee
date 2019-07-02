@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import Shell from '../Components/Shell/index';
-import fetchGlobalData from '../actions/globalActions';
+import { fetchGlobalData } from '../actions/globalActions';
 import { showNotification } from '../actions/uiActions';
 import { switchUser, logout, findUsers } from '../actions/userActions';
 

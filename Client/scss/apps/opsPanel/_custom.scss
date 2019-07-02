@@ -70,3 +70,18 @@
 	min-width: 150px !important;
 	word-break: break-word !important;
 }
+
+.regex-url-wrapper {
+	display: flex;
+	flex-direction: row;
+	align-items: baseline;
+}
+.regex-url-wrapper > div {
+	flex-grow: 1;
+}
+.regex-url-wrapper svg {
+	font-size: 20px;
+}
+.pagegroup-row:nth-last-of-type(1) {
+	margin-bottom: 10px !important;
+}

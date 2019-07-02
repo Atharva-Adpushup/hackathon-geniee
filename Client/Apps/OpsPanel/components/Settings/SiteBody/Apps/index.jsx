@@ -3,6 +3,7 @@ import { PanelGroup, Panel, Col } from 'react-bootstrap';
 import Loader from '../../../../../../Components/Loader';
 import Layout from './Layout';
 import ConsentManagement from './ConsentManagement';
+import HeaderBidding from './HeaderBidding';
 
 class Apps extends Component {
 	state = {
@@ -25,12 +26,15 @@ class Apps extends Component {
 		const { activeKey } = this.state;
 		const {
 			site,
+			bidders,
 			fetchChannelsInfo,
 			showNotification,
 			updateChannelAutoOptimise,
 			updateSiteAutoOptimise,
 			updateAppStatus,
-			updateSite
+			updateSite,
+			fetchAllBiddersAction,
+			updateBidderAction
 		} = this.props;
 		const common = {
 			activeKey,
@@ -47,7 +51,7 @@ class Apps extends Component {
 			>
 				<Panel eventKey="layout">
 					<Panel.Heading>
-						<Panel.Title toggle>Layout App</Panel.Title>
+						<Panel.Title toggle>Layout</Panel.Title>
 					</Panel.Heading>
 					{activeKey === 'layout' ? (
 						<Layout
@@ -60,10 +64,23 @@ class Apps extends Component {
 				</Panel>
 				<Panel eventKey="consentManagement">
 					<Panel.Heading>
-						<Panel.Title toggle>Consent Management App</Panel.Title>
+						<Panel.Title toggle>Consent Management</Panel.Title>
 					</Panel.Heading>
 					{activeKey === 'consentManagement' ? (
 						<ConsentManagement {...common} updateSite={updateSite} />
+					) : null}
+				</Panel>
+				<Panel eventKey="headerBidding">
+					<Panel.Heading>
+						<Panel.Title toggle>Header Bidding</Panel.Title>
+					</Panel.Heading>
+					{activeKey === 'headerBidding' ? (
+						<HeaderBidding
+							{...common}
+							bidders={bidders}
+							fetchAllBiddersAction={fetchAllBiddersAction}
+							updateBidderAction={updateBidderAction}
+						/>
 					) : null}
 				</Panel>
 			</PanelGroup>

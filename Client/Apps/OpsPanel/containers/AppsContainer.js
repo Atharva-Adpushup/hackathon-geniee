@@ -10,11 +10,25 @@ import {
 	fetchChannelsInfo,
 	updateChannelAutoOptimise
 } from '../../../actions/apps/opsPanel/pagegroupActions';
+import {
+	fetchAllBiddersAction,
+	updateBidderAction
+} from '../../../actions/apps/headerBidding/hbActions';
 import Apps from '../components/Settings/SiteBody/Apps/index';
 
-const mapStateToProps = (state, ownProps) => ({
-	...ownProps
-});
+const mapStateToProps = (state, ownProps) => {
+	const { headerBidding } = state.apps;
+	const {
+		site: { siteId }
+	} = ownProps;
+	const siteData = headerBidding[siteId] || {};
+	const { bidders: { addedBidders = null } = {} } = siteData;
+
+	return {
+		...ownProps,
+		bidders: addedBidders
+	};
+};
 
 const mapDispatchToProps = dispatch => ({
 	getAppStatuses: siteId => dispatch(getAppStatuses(siteId)),
@@ -23,7 +37,10 @@ const mapDispatchToProps = dispatch => ({
 		dispatch(updateChannelAutoOptimise(siteId, params)),
 	updateSiteAutoOptimise: (siteId, params) => dispatch(updateSiteAutoOptimise(siteId, params)),
 	updateAppStatus: (siteId, params) => dispatch(updateAppStatus(siteId, params)),
-	updateSite: (siteId, params) => dispatch(updateSite(siteId, params))
+	updateSite: (siteId, params) => dispatch(updateSite(siteId, params)),
+	fetchAllBiddersAction: siteId => dispatch(fetchAllBiddersAction(siteId)),
+	updateBidderAction: (siteId, data, params = {}) =>
+		dispatch(updateBidderAction(siteId, data, params))
 });
 
 export default connect(

@@ -75,7 +75,7 @@ const FieldGroup = ({
 
 	return (
 		<FormGroup controlId={id} className="u-margin-b4">
-			<ControlLabel className="u-margin-b3">{label}</ControlLabel>
+			{label ? <ControlLabel className="u-margin-b3">{label}</ControlLabel> : null}
 			{computedComponent}
 
 			{help && <HelpBlock>{help}</HelpBlock>}
