@@ -12,17 +12,13 @@ class InnovativeAds extends Component {
 	constructor(props) {
 		super(props);
 		const {
-			site: {
-				apConfigs: { poweredByBanner = false },
-				apps = {}
-			}
+			site: { apps = {} }
 		} = props;
 		const status = Object.prototype.hasOwnProperty.call(apps, 'innovativeAds')
 			? apps.innovativeAds
 			: undefined;
 
 		this.state = {
-			poweredByBanner,
 			status,
 			isLoading: false
 		};
@@ -38,7 +34,7 @@ class InnovativeAds extends Component {
 	};
 
 	handleSave = () => {
-		const { poweredByBanner, status } = this.state;
+		const { status } = this.state;
 		const { site, updateSite } = this.props;
 
 		this.setState({ isLoading: true });
@@ -49,18 +45,12 @@ class InnovativeAds extends Component {
 				value: {
 					innovativeAds: status
 				}
-			},
-			{
-				key: 'apConfigs',
-				value: {
-					poweredByBanner
-				}
 			}
 		]).then(() => this.setState({ isLoading: false }));
 	};
 
 	render() {
-		const { poweredByBanner, status, isLoading } = this.state;
+		const { status, isLoading } = this.state;
 
 		const { site } = this.props;
 		const { siteId, siteDomain } = site;
@@ -89,20 +79,6 @@ class InnovativeAds extends Component {
 					name={`status-${siteId}-${siteDomain}`}
 					id={`js-status-${siteId}-${siteDomain}`}
 				/>
-				<CustomToggleSwitch
-					labelText="Powered By AdPushup"
-					className="u-margin-b4 negative-toggle"
-					checked={poweredByBanner}
-					onChange={this.handleToggle}
-					layout="horizontal"
-					size="m"
-					on="Yes"
-					off="No"
-					defaultLayout
-					name={`poweredByBanner-${siteId}-${siteDomain}-poweredByBanner`}
-					id={`js-poweredByBanner-${siteId}-${siteDomain}-poweredByBanner`}
-				/>
-
 				<CustomButton
 					variant="primary"
 					className="pull-right"
