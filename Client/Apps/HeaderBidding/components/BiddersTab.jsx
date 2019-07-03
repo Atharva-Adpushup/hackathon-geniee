@@ -35,7 +35,11 @@ export default class BiddersTab extends React.Component {
 	openAddManageBidderView = (view, bidderKey, bidderConfig) => {
 		const { currView } = this.state;
 
-		if (['addBidder', 'manageBidder'].indexOf(view) > -1 && currView !== view) {
+		if (
+			bidderConfig.isActive &&
+			[('addBidder', 'manageBidder')].indexOf(view) > -1 &&
+			currView !== view
+		) {
 			this.setState({ currView: view, bidderConfig: { key: bidderKey, ...bidderConfig } });
 		}
 	};

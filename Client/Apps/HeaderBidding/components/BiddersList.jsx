@@ -55,11 +55,11 @@ const BiddersList = ({ bidders: { notAddedBidders, addedBidders }, openAddManage
 	}
 
 	for (const bidderKey in addedBidders) {
-		const { name, isApRelation, isPaused } = addedBidders[bidderKey];
+		const { name, isApRelation, isPaused, isActive } = addedBidders[bidderKey];
 
 		addedBiddersJSX.push(
 			<Col md={3} key={bidderKey}>
-				<Panel>
+				<Panel className={!isActive ? 'disabled' : ''}>
 					<Panel.Heading className="aligner aligner--hSpaceBetween">
 						<Panel.Title componentClass="h3" className="aligner-item--vSelfStart">
 							{name}
