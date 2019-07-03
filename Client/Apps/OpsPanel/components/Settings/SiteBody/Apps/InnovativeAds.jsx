@@ -2,22 +2,28 @@
 /* eslint-disable no-shadow */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-case-declarations */
-import React, { Component, Fragment } from 'react';
-import { Panel, Table } from 'react-bootstrap';
-import Loader from '../../../../../../Components/Loader';
+import React, { Component } from 'react';
+import { Panel } from 'react-bootstrap';
+import CustomMessage from '../../../../../../Components/CustomMessage';
 import CustomToggleSwitch from '../../../../../../Components/CustomToggleSwitch/index';
 import CustomButton from '../../../../../../Components/CustomButton/index';
 
 class InnovativeAds extends Component {
 	constructor(props) {
 		super(props);
-		const { site } = props;
-		// const { poweredByBanner = false } = site.apConfigs || {};
-		// const { innovativeAds = false } = site.apps || {};
+		const {
+			site: {
+				apConfigs: { poweredByBanner = false },
+				apps = {}
+			}
+		} = props;
+		const status = Object.prototype.hasOwnProperty.call(apps, 'innovativeAds')
+			? apps.innovativeAds
+			: undefined;
 
 		this.state = {
-			poweredByBanner: false,
-			innovativeAds: false,
+			poweredByBanner,
+			status,
 			isLoading: false
 		};
 	}
@@ -32,48 +38,57 @@ class InnovativeAds extends Component {
 	};
 
 	handleSave = () => {
-		const { poweredByBanner, innovativeAds } = this.state;
-		const { saveSettings, site, updateAppStatus } = this.props;
+		const { poweredByBanner, status } = this.state;
+		const { site, updateSite } = this.props;
 
 		this.setState({ isLoading: true });
 
-		return updateAppStatus(site.siteId, {
-			app: 'innovativeAds',
-			innovativeAds
-		})
-			.then(() =>
-				saveSettings(site.siteId, {
-					apConfigs: {
-						poweredByBanner
-					},
-					adNetworkSettings: {}
-				})
-			)
-			.then(this.setState({ isLoading: false }));
+		return updateSite(site.siteId, [
+			{
+				key: 'apps',
+				value: {
+					innovativeAds: status
+				}
+			},
+			{
+				key: 'apConfigs',
+				value: {
+					poweredByBanner
+				}
+			}
+		]).then(() => this.setState({ isLoading: false }));
 	};
 
 	render() {
-		const { poweredByBanner, innovativeAds, isLoading } = this.state;
+		const { poweredByBanner, status, isLoading } = this.state;
 
 		const { site } = this.props;
-		const { cmsInfo, apConfigs, siteId, siteDomain, apps } = site;
+		const { siteId, siteDomain } = site;
 
 		return (
 			<Panel.Body collapsible>
+				{status === undefined ? (
+					<CustomMessage
+						type="error"
+						header="Information"
+						message="Innovative Ads Status not found. Please set app status"
+						rootClassNames="u-margin-b4"
+						dismissible
+					/>
+				) : null}
 				<CustomToggleSwitch
 					labelText="App Status"
 					className="u-margin-b4 negative-toggle"
-					checked={innovativeAds}
+					checked={status}
 					onChange={this.handleToggle}
 					layout="horizontal"
 					size="m"
 					on="Yes"
 					off="No"
 					defaultLayout
-					name={`appStatus-${siteId}-${siteDomain}`}
-					id={`js-appStatus-${siteId}-${siteDomain}`}
+					name={`status-${siteId}-${siteDomain}`}
+					id={`js-status-${siteId}-${siteDomain}`}
 				/>
-
 				<CustomToggleSwitch
 					labelText="Powered By AdPushup"
 					className="u-margin-b4 negative-toggle"
