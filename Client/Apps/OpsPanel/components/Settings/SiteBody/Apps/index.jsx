@@ -36,8 +36,7 @@ class Apps extends Component {
 			updateAppStatus,
 			updateSite,
 			fetchAllBiddersAction,
-			updateBidderAction,
-			saveSettings
+			updateBidderAction
 		} = this.props;
 		const common = {
 			activeKey,
@@ -90,7 +89,7 @@ class Apps extends Component {
 					<Panel.Heading>
 						<Panel.Title toggle>AP Tag</Panel.Title>
 					</Panel.Heading>
-					{activeKey === 'apTag' ? <ApTag {...common} /> : null}
+					{activeKey === 'apTag' ? <ApTag {...common} updateSite={updateSite} /> : null}
 				</Panel>
 				<Panel eventKey="innovativeAds">
 					<Panel.Heading>

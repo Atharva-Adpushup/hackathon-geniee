@@ -4,36 +4,55 @@
 /* eslint-disable no-case-declarations */
 import React, { Component } from 'react';
 import { Panel, Table } from 'react-bootstrap';
-import Loader from '../../../../../../Components/Loader';
+
 import CustomMessage from '../../../../../../Components/CustomMessage';
+import CustomButton from '../../../../../../Components/CustomButton';
+
 import CustomToggleSwitch from '../../../../../../Components/CustomToggleSwitch/index';
 
 class ApTag extends Component {
-	state = {
-		loading: false
+	constructor(props) {
+		super(props);
+		const {
+			site: { apps = {} }
+		} = props;
+		const status = Object.prototype.hasOwnProperty.call(apps, 'apTag') ? apps.apTag : undefined;
+
+		this.state = {
+			isLoading: false,
+			status
+		};
+	}
+
+	handleToggle = (value, event) => {
+		const attributeValue = event.target.getAttribute('name');
+		const name = attributeValue.split('-')[0];
+
+		this.setState({
+			[name]: value
+		});
 	};
 
-	handleToggle = value => {
-		const {
-			updateAppStatus,
-			site: { siteId }
-		} = this.props;
+	handleSave = () => {
+		const { status } = this.state;
+		const { site, updateSite } = this.props;
 
-		this.setState({ loading: true });
+		this.setState({ isLoading: true });
 
-		return updateAppStatus(siteId, {
-			app: 'apTag',
-			value
-		}).then(() => this.setState({ loading: false }));
+		return updateSite(site.siteId, [
+			{
+				key: 'apps',
+				value: {
+					apTag: status
+				}
+			}
+		]).then(() => this.setState({ isLoading: false }));
 	};
 
 	render() {
 		const { site } = this.props;
 		const { siteId, siteDomain, apps = {} } = site;
-		const { loading } = this.state;
-		const status = Object.prototype.hasOwnProperty.call(apps, 'apTag') ? apps.apTag : undefined;
-
-		if (loading) return <Loader height="100px" />;
+		const { status, isLoading } = this.state;
 
 		return (
 			<Panel.Body collapsible>
@@ -49,16 +68,25 @@ class ApTag extends Component {
 				<CustomToggleSwitch
 					labelText="App Status"
 					className="u-margin-b4 negative-toggle"
-					checked={apps.apTag}
+					checked={status}
 					onChange={this.handleToggle}
 					layout="horizontal"
 					size="m"
 					on="Yes"
 					off="No"
 					defaultLayout
-					name={`appStatus-${siteId}-${siteDomain}`}
-					id={`js-appStatus-${siteId}-${siteDomain}`}
+					name={`status-${siteId}-${siteDomain}`}
+					id={`js-status-${siteId}-${siteDomain}`}
 				/>
+
+				<CustomButton
+					variant="primary"
+					className="pull-right"
+					onClick={this.handleSave}
+					showSpinner={isLoading}
+				>
+					Save
+				</CustomButton>
 			</Panel.Body>
 		);
 	}
