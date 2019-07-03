@@ -100,14 +100,14 @@ var adp = window.adpushup,
 							isAdContainerInView(container).done(function() {
 								// Send feedback call
 								utils.sendFeedback(feedbackData);
-								utils.sendBeaconOld(feedbackData);
+								utils.sendFeedbackOld(feedbackData);
 								// Place the ad in the container
 								return placeAd(container, ad);
 							});
 						} else {
 							// Send feedback call
 							utils.sendFeedback(feedbackData);
-							utils.sendBeaconOld(feedbackData);
+							utils.sendFeedbackOld(feedbackData);
 							// Place the ad in the container
 							return placeAd(container, ad);
 						}
