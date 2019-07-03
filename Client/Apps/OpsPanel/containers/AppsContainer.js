@@ -4,7 +4,8 @@ import {
 	getAppStatuses,
 	updateSiteAutoOptimise,
 	updateAppStatus,
-	updateSite
+	updateSite,
+	saveSettings
 } from '../../../actions/siteActions';
 import {
 	fetchChannelsInfo,
@@ -40,7 +41,8 @@ const mapDispatchToProps = dispatch => ({
 	updateSite: (siteId, params) => dispatch(updateSite(siteId, params)),
 	fetchAllBiddersAction: siteId => dispatch(fetchAllBiddersAction(siteId)),
 	updateBidderAction: (siteId, data, params = {}) =>
-		dispatch(updateBidderAction(siteId, data, params))
+		dispatch(updateBidderAction(siteId, data, params)),
+	saveSettings: (siteId, siteData) => dispatch(saveSettings(siteId, siteData))
 });
 
 export default connect(
