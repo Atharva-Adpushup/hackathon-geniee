@@ -67,7 +67,7 @@ function apiModule() {
 					const hbBidders = {};
 
 					for (const key in networks) {
-						if (key !== 'adpTags' && networks[key].isHb && networks[key].isActive)
+						if (key !== 'adpTags' && networks[key].isHb && networks[key])
 							hbBidders[key] = networks[key];
 					}
 
@@ -92,17 +92,23 @@ function apiModule() {
 
 					// delete added bidders keys from all bidders
 					for (const addedBidderKey in addedBidders) {
+						if (!notAddedBidders[addedBidderKey]) throw new AdPushupError('Invalid bidders added');
+
 						addedBidders[addedBidderKey].paramsFormFields = {
 							...notAddedBidders[addedBidderKey].params
 						};
+						addedBidders[addedBidderKey].isActive = notAddedBidders[addedBidderKey].isActive;
 
 						delete notAddedBidders[addedBidderKey];
 					}
 
+					for (const key in notAddedBidders) {
+						if (notAddedBidders.hasOwnProperty(key) && !notAddedBidders[key].isActive) {
+							delete notAddedBidders[key];
+						}
+					}
+
 					return { addedBidders, notAddedBidders };
-				})
-				.catch(err => {
-					console.log(err);
 				});
 		},
 		mergeBidderParams(networkConfigBidderparams, addedBidderParams) {
