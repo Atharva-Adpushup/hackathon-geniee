@@ -86,8 +86,8 @@ function apiModule() {
 				});
 		},
 		getMergedBidders(siteId) {
-			return Promise.all([API.getAllBiddersFromNetworkConfig(), API.getUsedBidders(siteId)])
-				.then(([allBidders, addedBidders]) => {
+			return Promise.all([API.getAllBiddersFromNetworkConfig(), API.getUsedBidders(siteId)]).then(
+				([allBidders, addedBidders]) => {
 					const notAddedBidders = { ...allBidders };
 
 					// delete added bidders keys from all bidders
@@ -109,7 +109,8 @@ function apiModule() {
 					}
 
 					return { addedBidders, notAddedBidders };
-				});
+				}
+			);
 		},
 		mergeBidderParams(networkConfigBidderparams, addedBidderParams) {
 			const mergedBidderparams = { ...addedBidderParams };
@@ -524,11 +525,11 @@ function apiModule() {
 				return bidderRulesArr;
 			}),
 		getAddedBiddersNames: siteId =>
-			API.getUsedBidders(siteId).then(addedBidders => {
+			API.getMergedBidders(siteId).then(({ addedBidders }) => {
 				const addedBiddersNames = {};
 
-				for (const [bidderCode, { name: bidderName }] of Object.entries(addedBidders)) {
-					addedBiddersNames[bidderCode] = bidderName;
+				for (const [bidderCode, { name: bidderName, isActive }] of Object.entries(addedBidders)) {
+					if (isActive) addedBiddersNames[bidderCode] = bidderName;
 				}
 
 				return addedBiddersNames;

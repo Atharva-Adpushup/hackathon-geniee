@@ -63,10 +63,6 @@ class BidderRules extends React.Component {
 		const currBidderKey = currBidderRule ? currBidderRule.bidder : null;
 		const filteredBidders = { ...bidders };
 
-		/*
-		all bidders - rule bidders + curr bidder
-		*/
-
 		Object.keys(bidders).forEach(bidderKey => {
 			if (bidderRules.find(rule => rule.bidder !== currBidderKey && rule.bidder === bidderKey)) {
 				delete filteredBidders[bidderKey];
