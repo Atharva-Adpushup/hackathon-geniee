@@ -8,7 +8,7 @@ function init(generatedConfig) {
 	return new Promise((resolve, reject) => {
 		const { statusesAndAds: { statuses = {}, config = {} } = {} } = generatedConfig;
 		if (!statuses.HB_ACTIVE) {
-			return resolve(generatedConfig);
+			return resolve(generatedConfig);																	
 		}
 		exec(`gulp build --modules=${config.prebidAdapters}`, { cwd: prebidDir }, (e, stdout, stderr) => {
 			if (e instanceof Error) {

@@ -18,7 +18,8 @@ const couchBase = require('../../../configs/config').couchBase,
 		return { dfpAdUnits: json };
 	},
 	generateHBConfig = siteId => {
-		const emptyResponse = { bidderAdUnits: {} };
+		// TODO: HB: review empty hbConfig
+		const emptyResponse = { hbcf: {} };
 		return dbHelper
 			.getDoc(`hbcf::${siteId}`)
 			.then(hbDoc => {

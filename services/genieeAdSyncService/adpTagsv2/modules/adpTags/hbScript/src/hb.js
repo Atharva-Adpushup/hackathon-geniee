@@ -13,7 +13,9 @@ var hb = {
 		adpSlotsBatch.forEach(function(adpSlot) {
 			var responsiveSizes = [];
 			if (adpSlot.isResponsive) {
-				responsiveSizes = responsiveAds.getAdSizes(adpSlot.optionalParam.adId).collection;
+				responsiveSizes = responsiveAds.getAdSizes(
+					adpSlot.optionalParam.adId
+				).collection;
 				adpSlot.computedSizes = responsiveSizes;
 			}
 
@@ -22,28 +24,49 @@ var hb = {
 			}
 
 			var size = adpSlot.size;
-			var computedSizes = adpSlot.isResponsive ? responsiveSizes : adpSlot.computedSizes;
+			var computedSizes = adpSlot.isResponsive
+				? responsiveSizes
+				: adpSlot.computedSizes;
 			var prebidSizes = computedSizes.length ? computedSizes : [size];
-			if (adpSlot.optionalParam.overrideActive && adpSlot.optionalParam.overrideSizeTo) {
+			if (
+				adpSlot.optionalParam.overrideActive &&
+				adpSlot.optionalParam.overrideSizeTo
+			) {
 				size = adpSlot.optionalParam.overrideSizeTo.split('x');
 			}
 
-			prebidSlots.push({
+			var prebidSlot = {
 				code: adpSlot.containerId,
-				mediaTypes: {
-					banner: {
-						sizes: prebidSizes
-					},
-					video: {
-						context: constants.PREBID.VIDEO_FORMAT_TYPE,
-						playerSize: prebidSizes[0]
-					}
-				},
+				mediaTypes: {},
 				bids: adpSlot.bidders
+			}
+
+			adpSlot.formats.forEach(function (format) {
+				switch (format) {
+					case 'display': {
+						prebidSlot.mediaTypes.banner = { sizes: prebidSizes };
+						break;
+					}
+					case 'video': {
+						prebidSlot.mediaTypes.video = {
+							context: constants.PREBID.VIDEO_FORMAT_TYPE,
+							playerSize: prebidSizes[0]
+						};
+						break;
+					}
+					case 'native': {
+						// TODO: add native format in prebid config
+						break;
+					}					
+				}
 			});
+
+			prebidSlots.push(prebidSlot);
 		});
 
-		return !prebidSlots.length ? auction.end(adpBatchId) : auction.start(prebidSlots, adpBatchId);
+		return !prebidSlots.length
+			? auction.end(adpBatchId)
+			: auction.start(prebidSlots, adpBatchId);
 	},
 	setBidWonListener: function(w) {
 		w.pbjs.que.push(function() {
@@ -51,7 +74,11 @@ var hb = {
 				console.log('===BidWon====', bidData);
 
 				var slot = window.adpushup.adpTags.adpSlots[bidData.adUnitCode];
-				var computedCPMValue = utils.currencyConversionActive(adp.config) ? 'originalCpm' : 'cpm';
+				var computedCPMValue = utils.currencyConversionActive(
+					adp.config
+				)
+					? 'originalCpm'
+					: 'cpm';
 
 				slot.feedback.winner = bidData.bidder;
 				slot.feedback.winningRevenue = bidData[computedCPMValue] / 1000;
@@ -66,7 +93,7 @@ var hb = {
         */
 		if (HB_ACTIVE) {
 			(function() {
-				require('../../Prebid.js/build/dist/prebid');
+				require('../../../../../adpushup.js/modules/adpTags/Prebid.js/build/dist/prebid');
 			})();
 		}
 

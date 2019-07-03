@@ -65,7 +65,8 @@ var adpTags = {
         createSlot: function (containerId, size, placement, optionalParam) {
             var adUnits = inventoryMapper.get(inventory, size, optionalParam);
             var slotId = adUnits.dfpAdUnit;
-            var bidders = optionalParam.headerBidding ? adUnits.bidders : [];
+			var bidders = optionalParam.headerBidding ? adUnits.bidders : [];
+			var formats = config.PREBID_CONFIG.formats || ["display"];
             var isResponsive = optionalParam.isResponsive;
             var sectionName = optionalParam.sectionName;
             var multipleAdSizes = optionalParam.multipleAdSizes;
@@ -74,7 +75,8 @@ var adpTags = {
             this.adpSlots[containerId] = {
                 slotId: slotId,
                 optionalParam: optionalParam,
-                bidders: bidders || [],
+				bidders: bidders || [],
+				formats: formats,
                 placement: placement,
                 activeDFPNetwork: utils.getActiveDFPNetwork(),
                 size: size,
@@ -82,7 +84,7 @@ var adpTags = {
                 computedSizes: multipleAdSizes ? multipleAdSizes : [],
                 isResponsive: isResponsive,
                 containerId: containerId,
-                timeout: constants.PREBID.TIMEOUT,
+                timeout: config.PREBID_CONFIG.timeOut,
                 gSlot: null,
                 hasRendered: false,
                 biddingComplete: false,
@@ -91,7 +93,7 @@ var adpTags = {
                 hasTimedOut: false,
                 services: services,
                 feedback: {
-                    winner: constants.FEEDBACK.DEFAULT_WINNER
+                    winner: constants.FEEDBACK.DEFAULT__WINNER
                 }
             };
 

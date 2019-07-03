@@ -14,7 +14,7 @@ var inventoryMapper = {
 		var dfpAdUnit = null;
 		var availableSlots = inventory.dfpAdUnits[size];
 		var bidders = [];
-		var hbConfig = inventory.hbConfig;
+		var hbConfig = inventory.hbcf;
 
 		if (optionalParam.headerBidding && hbConfig && Object.keys(hbConfig).length) {
 			var updatedSize = size;
