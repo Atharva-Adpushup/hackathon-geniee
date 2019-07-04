@@ -49,11 +49,6 @@ var auction = {
 		pbjs.addAdUnits(prebidSlots);
 
 		pbjs.bidderSettings = {
-			openx: {
-				bidCpmAdjustment: function(bidCpm) {
-					return bidCpm - bidCpm * (10 / 100);
-				}
-			},
 			districtm: {
 				bidCpmAdjustment: function(bidCpm) {
 					return bidCpm - bidCpm * (10 / 100);
