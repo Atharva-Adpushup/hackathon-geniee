@@ -1,5 +1,5 @@
 var utils = require('../libs/utils'),
-	$ = require('jquery'),
+	$ = require('../libs/jquery'),
 	config = window.adpushup.config,
 	consts = require('../config/commonConsts'),
 	generateGenieeBodyTag = function(ad) {

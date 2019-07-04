@@ -1,7 +1,7 @@
 if (INCONTENT_ACTIVE) {
 	var incontentAnalyser = require('../libs/aa');
 }
-var $ = require('jquery'),
+var $ = require('../libs/jquery'),
 	nodewatcher = require('../libs/nodeWatcher'),
 	utils = require('../libs/utils'),
 	isAdContainerInView = require('../libs/lazyload'),

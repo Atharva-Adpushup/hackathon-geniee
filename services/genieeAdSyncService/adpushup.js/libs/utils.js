@@ -1,6 +1,6 @@
 var browserConfig = require('./browserConfig.js'),
 	// eslint-disable-next-line no-undef
-	$ = require('jquery'),
+	$ = require('./jquery'),
 	dockify = require('./dockify'),
 	commonConsts = require('../config/commonConsts'),
 	Base64 = require('Base64');
