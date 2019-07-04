@@ -5,7 +5,7 @@ var adp = require('./adp');
 var constants = require('./constants');
 var render = require('./render');
 var auction = {
-	end: function (adpBatchId) {
+	end: function(adpBatchId) {
 		var adpSlots = utils.getCurrentAdpSlotBatch(window.adpushup.adpTags.adpBatches, adpBatchId);
 
 		window.adpushup.adpTags.batchPrebiddingComplete = true;
@@ -15,12 +15,12 @@ var auction = {
 
 		return;
 	},
-	getAuctionResponse: function (adpBatchId) {
+	getAuctionResponse: function(adpBatchId) {
 		console.log(window.pbjs.getBidResponses());
 
 		return this.end(adpBatchId);
 	},
-	requestBids: function (pbjs, adpBatchId) {
+	requestBids: function(pbjs, adpBatchId) {
 		var that = this;
 
 		pbjs.requestBids({
@@ -28,10 +28,18 @@ var auction = {
 			bidsBackHandler: that.getAuctionResponse.bind(that, adpBatchId)
 		});
 	},
-	setPrebidConfig: function (pbjs, prebidSlots) {
+	setPrebidConfig: function(pbjs, prebidSlots) {
 		pbjs.setConfig({
 			rubicon: {
 				singleRequest: true
+			},
+			userSync: {
+				filterSettings: {
+					iframe: {
+						bidders: '*',
+						filter: 'include'
+					}
+				}
 			},
 			publisherDomain: adp.config.siteDomain,
 			bidderSequence: constants.PREBID.BIDDER_SEQUENCE,
@@ -42,39 +50,41 @@ var auction = {
 
 		pbjs.bidderSettings = {
 			openx: {
-				bidCpmAdjustment: function (bidCpm) {
-					return bidCpm - (bidCpm * (10 / 100));
+				bidCpmAdjustment: function(bidCpm) {
+					return bidCpm - bidCpm * (10 / 100);
 				}
 			},
 			districtm: {
-				bidCpmAdjustment: function (bidCpm) {
-					return bidCpm - (bidCpm * (10 / 100));
+				bidCpmAdjustment: function(bidCpm) {
+					return bidCpm - bidCpm * (10 / 100);
 				}
 			},
 			oftmedia: {
-				bidCpmAdjustment: function (bidCpm) {
-					return bidCpm - (bidCpm * (12 / 100));
+				bidCpmAdjustment: function(bidCpm) {
+					return bidCpm - bidCpm * (12 / 100);
 				}
 			},
 			rubicon: {
-				bidCpmAdjustment: function (bidCpm) {
-					return bidCpm - (bidCpm * (20 / 100));
+				bidCpmAdjustment: function(bidCpm) {
+					return bidCpm - bidCpm * (20 / 100);
 				}
 			}
 		};
 
-		pbjs.aliasBidder("appnexus", "springserve");
-		pbjs.aliasBidder("appnexus", "districtm");
-		pbjs.aliasBidder("appnexus", "brealtime");
-		pbjs.aliasBidder("appnexus", "oftmedia");
+		pbjs.aliasBidder('appnexus', 'springserve');
+		pbjs.aliasBidder('appnexus', 'districtm');
+		pbjs.aliasBidder('appnexus', 'brealtime');
+		pbjs.aliasBidder('appnexus', 'oftmedia');
 	},
-	start: function (prebidSlots, adpBatchId) {
+	start: function(prebidSlots, adpBatchId) {
 		var pbjs = window.pbjs;
 
-		pbjs.que.push(function () {
-			this.setPrebidConfig(pbjs, prebidSlots);
-			this.requestBids(pbjs, adpBatchId);
-		}.bind(this));
+		pbjs.que.push(
+			function() {
+				this.setPrebidConfig(pbjs, prebidSlots);
+				this.requestBids(pbjs, adpBatchId);
+			}.bind(this)
+		);
 	}
 };
 
