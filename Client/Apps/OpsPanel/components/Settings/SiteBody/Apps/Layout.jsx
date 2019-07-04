@@ -7,6 +7,7 @@ import { Panel, Table } from 'react-bootstrap';
 import Loader from '../../../../../../Components/Loader';
 import CustomToggleSwitch from '../../../../../../Components/CustomToggleSwitch/index';
 import CustomMessage from '../../../../../../Components/CustomMessage/index';
+import CustomButton from '../../../../../../Components/CustomButton/index';
 
 class Layout extends Component {
 	state = {
@@ -15,52 +16,73 @@ class Layout extends Component {
 
 	componentDidMount() {
 		const { site, fetchChannelsInfo } = this.props;
-		const { cmsInfo, siteId } = site;
+		const {
+			cmsInfo,
+			siteId,
+			apConfigs: { autoOptimise = false },
+			apps = {}
+		} = site;
 		const { channelsInfo } = cmsInfo;
+		const status = Object.prototype.hasOwnProperty.call(apps, 'layout') ? apps.layout : undefined;
 
-		if (!channelsInfo) fetchChannelsInfo(siteId);
+		if (!channelsInfo) {
+			return fetchChannelsInfo(siteId).then(channels => {
+				this.setState({
+					siteAutoOptimise: autoOptimise,
+					status,
+					channels
+				});
+			});
+		}
+		return this.setState({
+			siteAutoOptimise: autoOptimise,
+			status,
+			channels: channelsInfo
+		});
 	}
 
 	handleToggle = (value, event) => {
 		const attributeValue = event.target.getAttribute('name');
 		const values = attributeValue.split('-');
 		const name = values[0];
-		const {
-			updateChannelAutoOptimise,
-			updateSiteAutoOptimise,
-			updateAppStatus,
-			showNotification
-		} = this.props;
-
-		this.setState({ loading: true });
 
 		switch (name) {
 			case 'autoOptimise':
 				const mode = values[1];
 				if (mode === 'channel') {
 					const [name, key, siteId, platform, pageGroup] = values;
+					const channelKey = `${platform}:${pageGroup}`;
 					// update Channel
-					updateChannelAutoOptimise(siteId, {
-						channelKey: `${platform}:${pageGroup}`,
-						platform,
-						pageGroup,
-						autoOptimise: value
-					}).then(() => this.setState({ loading: false }));
+					this.setState(state => ({
+						...state,
+						channels: {
+							...state.channels,
+							[channelKey]: {
+								...state.channels[channelKey],
+								autoOptimise: value
+							}
+						}
+					}));
 				} else if (mode === 'site') {
-					const siteId = values[2];
 					// update Site
-					updateSiteAutoOptimise(siteId, {
-						autoOptimise: value
-					}).then(() => this.setState({ loading: false }));
+					this.setState(state => {
+						const { channels = {} } = state;
+						const keys = Object.keys(channels);
+
+						keys.forEach(key => {
+							channels[key].autoOptimise = value;
+						});
+
+						return {
+							siteAutoOptimise: value,
+							channels
+						};
+					});
 				}
 				break;
 
 			case 'appStatus':
-				const siteId = values[1];
-				updateAppStatus(siteId, {
-					app: 'layout',
-					value
-				}).then(() => this.setState({ loading: false }));
+				this.setState({ status: value });
 				break;
 
 			default:
@@ -68,13 +90,53 @@ class Layout extends Component {
 		}
 	};
 
-	renderChannels() {
-		const { site } = this.props;
+	handleSave = () => {
+		const { status = undefined, channels = undefined, siteAutoOptimise = undefined } = this.state;
 		const {
-			cmsInfo: { channelsInfo },
-			siteId,
-			siteDomain
-		} = site;
+			site: { siteId },
+			updateAppStatus,
+			updateSiteAutoOptimise,
+			updateChannelAutoOptimise
+		} = this.props;
+		const promises = [];
+
+		if (status !== undefined) {
+			promises.push(updateAppStatus.bind(null, siteId, { app: 'layout', value: status }));
+		}
+		if (siteAutoOptimise !== undefined) {
+			promises.push(updateSiteAutoOptimise.bind(null, siteId, { autoOptimise: siteAutoOptimise }));
+		}
+		if (channels !== undefined) {
+			const keys = Object.keys(channels);
+			keys.forEach(key => {
+				const current = channels[key];
+				promises.push(
+					updateChannelAutoOptimise.bind(null, siteId, {
+						...current,
+						channelKey: `${current.platform}:${current.pageGroup}`
+					})
+				);
+			});
+		}
+
+		if (promises.length) {
+			this.setState({ loading: true });
+			return promises
+				.reduce(
+					(p, cb) => p.then(() => (typeof cb === 'function' ? cb() : true)),
+					Promise.resolve()
+				)
+				.then(() => this.setState({ loading: false }));
+		}
+		return true;
+	};
+
+	renderChannels() {
+		const {
+			site: { siteId }
+		} = this.props;
+		const { channels: channelsInfo } = this.state;
+
 		const channels = Object.keys(channelsInfo);
 
 		return (
@@ -133,16 +195,17 @@ class Layout extends Component {
 	}
 
 	render() {
-		const { loading } = this.state;
-		const { site } = this.props;
-		const { cmsInfo, apConfigs, siteId, siteDomain, apps } = site;
-		const { channelsInfo } = cmsInfo;
+		const { loading, status, siteAutoOptimise, channels } = this.state;
+		const {
+			site: { siteId, siteDomain },
+			resetTab
+		} = this.props;
 
-		return !channelsInfo || loading ? (
-			<Loader height="100px" classNames="u-margin-v3" />
-		) : (
+		if (!channels || loading) return <Loader height="100px" classNames="u-margin-v3" />;
+
+		return (
 			<Panel.Body collapsible>
-				{!Object.prototype.hasOwnProperty.call(apps, 'layout') ? (
+				{status === undefined ? (
 					<CustomMessage
 						type="error"
 						header="Information"
@@ -154,7 +217,7 @@ class Layout extends Component {
 				<CustomToggleSwitch
 					labelText="App Status"
 					className="u-margin-b4 negative-toggle"
-					checked={apps.layout}
+					checked={status}
 					onChange={this.handleToggle}
 					layout="horizontal"
 					size="m"
@@ -167,7 +230,7 @@ class Layout extends Component {
 				<CustomToggleSwitch
 					labelText="Auto Optimize (Site)"
 					className="u-margin-b4 negative-toggle"
-					checked={apConfigs.autoOptimise}
+					checked={siteAutoOptimise}
 					onChange={this.handleToggle}
 					layout="horizontal"
 					size="m"
@@ -187,6 +250,17 @@ class Layout extends Component {
 					</thead>
 					<tbody>{this.renderChannels()}</tbody>
 				</Table>
+				<CustomButton variant="secondary" className="pull-right" onClick={resetTab}>
+					Cancel
+				</CustomButton>
+				<CustomButton
+					variant="primary"
+					className="pull-right u-margin-r3"
+					onClick={this.handleSave}
+					showSpinner={loading}
+				>
+					Save
+				</CustomButton>
 			</Panel.Body>
 		);
 	}

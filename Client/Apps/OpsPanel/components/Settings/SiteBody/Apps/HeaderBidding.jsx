@@ -176,8 +176,10 @@ class HeaderBidding extends Component {
 	};
 
 	render() {
-		const { site } = this.props;
-		const { siteId, siteDomain } = site;
+		const {
+			site: { siteId, siteDomain },
+			resetTab
+		} = this.props;
 		const { status } = this.state;
 
 		return (
@@ -205,7 +207,14 @@ class HeaderBidding extends Component {
 					id={`js-appStatus-${siteId}-${siteDomain}`}
 				/>
 				{this.renderContent()}
-				<CustomButton variant="primary" className="pull-right" onClick={this.handleSave}>
+				<CustomButton variant="secondary" className="pull-right" onClick={resetTab}>
+					Cancel
+				</CustomButton>
+				<CustomButton
+					variant="primary"
+					className="pull-right u-margin-r3"
+					onClick={this.handleSave}
+				>
 					Save
 				</CustomButton>
 			</Panel.Body>
