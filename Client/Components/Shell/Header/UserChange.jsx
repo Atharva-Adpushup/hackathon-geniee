@@ -9,8 +9,7 @@ import CustomButton from '../../CustomButton/index';
 class UserChange extends Component {
 	state = {
 		email: '',
-		users: [],
-		errors: {}
+		users: []
 	};
 
 	onValChange = e => {
@@ -58,11 +57,11 @@ class UserChange extends Component {
 		if (formValidationCheck.isValid) {
 			return switchUser(email);
 		}
-		return this.setState({ errors: formValidationCheck.error });
+		return window.alert(formValidationCheck.error);
 	};
 
 	render() {
-		const { email, users, errors } = this.state;
+		const { email, users } = this.state;
 
 		return (
 			<Form onSubmit={this.onFormSubmit} className="change-user-form">
@@ -92,15 +91,6 @@ class UserChange extends Component {
 				>
 					Change User
 				</CustomButton>
-				{Object.keys(errors).length ? (
-					<ul>
-						{Object.keys(errors).map(errorKey => (
-							<li key={errorKey}>{errors[errorKey]}</li>
-						))}
-					</ul>
-				) : (
-					''
-				)}
 			</Form>
 		);
 	}

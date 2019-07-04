@@ -15,7 +15,9 @@ export default class BiddersTab extends React.Component {
 	availableViews = ['biddersList', 'addBidder', 'manageBidder'];
 
 	componentDidMount() {
-		const { fetchAllBiddersAction, siteId } = this.props;
+		const { fetchAllBiddersAction, siteId, bidders } = this.props;
+
+		if (bidders) return;
 
 		fetchAllBiddersAction(siteId);
 	}
@@ -33,7 +35,11 @@ export default class BiddersTab extends React.Component {
 	openAddManageBidderView = (view, bidderKey, bidderConfig) => {
 		const { currView } = this.state;
 
-		if (['addBidder', 'manageBidder'].indexOf(view) > -1 && currView !== view) {
+		if (
+			bidderConfig.isActive &&
+			[('addBidder', 'manageBidder')].indexOf(view) > -1 &&
+			currView !== view
+		) {
 			this.setState({ currView: view, bidderConfig: { key: bidderKey, ...bidderConfig } });
 		}
 	};

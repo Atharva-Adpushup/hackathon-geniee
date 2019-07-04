@@ -2,7 +2,9 @@
 /* eslint-disable no-alert */
 import userService from '../services/userService';
 import history from '../helpers/history';
-import { USER_ACTIONS } from '../constants/global';
+import { USER_ACTIONS, UI_ACTIONS } from '../constants/global';
+import axiosInstance from '../helpers/axiosInstance';
+import { errorHandler } from '../helpers/commonFunctions';
 
 export const loginAction = (email, password) => () =>
 	userService.login(email, password).then(response => {
@@ -49,3 +51,29 @@ export const updateAdNetworkSettingsAction = data => dispatch =>
 		type: USER_ACTIONS.UPDATE_AD_NETWORK_SETTINGS,
 		data
 	});
+export const updateUser = params => dispatch =>
+	axiosInstance
+		.post('/user/updateUser', { toUpdate: params })
+		.then(response => {
+			const {
+				data: {
+					data: { toUpdate = [] }
+				}
+			} = response;
+
+			toUpdate.forEach(content => {
+				dispatch({
+					type: USER_ACTIONS.UPDATE_USER,
+					data: { key: content.key, value: content.value }
+				});
+			});
+
+			return dispatch({
+				type: UI_ACTIONS.SHOW_NOTIFICATION,
+				mode: 'success',
+				title: 'Operation Successful',
+				autoDismiss: 5,
+				message: 'User Updated'
+			});
+		})
+		.catch(err => errorHandler(err));

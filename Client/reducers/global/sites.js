@@ -11,8 +11,8 @@ const sites = (state = { fetched: false, data: {} }, action) => {
 				data: {
 					...state.data,
 					[action.data.siteId]: {
-						...action.data,
-						...state.data[action.data.siteId]
+						...state.data[action.data.siteId],
+						...action.data
 					}
 				}
 			};

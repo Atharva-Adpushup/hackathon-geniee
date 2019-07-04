@@ -6,6 +6,7 @@ const mapStateToProps = (state, ownProps) => {
 	const {
 		reports: {
 			data: {
+				site,
 				dashboard: { widget }
 			}
 		},
@@ -14,7 +15,8 @@ const mapStateToProps = (state, ownProps) => {
 	return {
 		...ownProps,
 		widget,
-		user
+		user,
+		site
 	};
 };
 

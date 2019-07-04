@@ -47,9 +47,7 @@ router
 	.get('/getLastUpdateStatus', (req, res) => {
 		return request({
 			method: 'GET',
-			uri: `${CC.REPORT_STATUS}?fromDate=${req.params.fromDate}&toDate=${
-				req.params.toDate
-			}&report=GETADPTAGREPORTSTATUS`
+			uri: `${CC.REPORT_STATUS}`
 		}).then(result => {
 			return res.send(result);
 		});

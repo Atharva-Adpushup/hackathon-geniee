@@ -52,6 +52,15 @@ const user = (state = { fetched: false, data: {} }, action) => {
 				}
 			};
 		}
+		case USER_ACTIONS.UPDATE_USER: {
+			return {
+				...state,
+				data: {
+					...state.data,
+					[action.data.key]: action.data.value
+				}
+			};
+		}
 		default:
 			return state;
 	}

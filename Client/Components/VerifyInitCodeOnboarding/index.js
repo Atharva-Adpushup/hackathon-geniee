@@ -9,13 +9,18 @@ import siteService from '../../services/siteService';
 import userService from '../../services/userService';
 
 class VerifyInitCodeOnboarding extends Component {
-	state = { showSendCodeByEmailModal: false, verifyingInitCode: false, success: '', error: '' };
+	state = {
+		showSendCodeByEmailModal: false,
+		verifyingInitCode: false,
+		skippingInitCodeVerification: false,
+		success: '',
+		error: ''
+	};
 
 	apCodeRef = React.createRef();
 
 	verify = () => {
 		const { siteId, site, onComplete } = this.props;
-		console.log(site, siteId);
 		this.setState({ verifyingInitCode: true });
 
 		const onboardingStage = 'onboarding';
@@ -44,6 +49,37 @@ class VerifyInitCodeOnboarding extends Component {
 			});
 	};
 
+	skipVerification = () => {
+		const { siteId, site, onComplete } = this.props;
+		const onboardingStage = 'onboarding';
+		const step = 2;
+
+		this.setState({ skippingInitCodeVerification: true });
+
+		userService
+			.setSiteStep(siteId, onboardingStage, step)
+			.then(() => siteService.saveSite(siteId, site, onboardingStage, step))
+			.then(() => {
+				this.setState({
+					skippingInitCodeVerification: false,
+					success: 'AP Head code verification skipped.'
+				});
+
+				return onComplete();
+			})
+			.catch(err => {
+				if (err.response) {
+					const { error } = err.response.data;
+					return this.setState({ skippingInitCodeVerification: false, error });
+				}
+
+				return this.setState({
+					skippingInitCodeVerification: false,
+					error: 'Something went wrong!'
+				});
+			});
+	};
+
 	toggleShowSendCodeByEmailModal = () => {
 		this.setState(state => ({ showSendCodeByEmailModal: !state.showSendCodeByEmailModal }));
 	};
@@ -54,8 +90,14 @@ class VerifyInitCodeOnboarding extends Component {
 	};
 
 	render() {
-		const { siteId, isActive, completed, forwardedRef } = this.props;
-		const { showSendCodeByEmailModal, verifyingInitCode, success, error } = this.state;
+		const { siteId, isActive, completed, forwardedRef, isSuperUser } = this.props;
+		const {
+			showSendCodeByEmailModal,
+			verifyingInitCode,
+			skippingInitCodeVerification,
+			success,
+			error
+		} = this.state;
 		const apHeadCode = `<script data-cfasync="false" type="text/javascript">(function(w, d) { var s = d.createElement('script'); s.src = '//cdn.adpushup.com/${siteId}/adpushup.js'; s.type = 'text/javascript'; s.async = true; (d.getElementsByTagName('head')[0] || d.getElementsByTagName('body')[0]).appendChild(s); })(window, document);</script>`;
 
 		const mailHeader =
@@ -117,9 +159,22 @@ class VerifyInitCodeOnboarding extends Component {
 								</div>
 							</div>
 
-							<CustomButton showSpinner={verifyingInitCode} onClick={this.verify}>
+							<CustomButton
+								showSpinner={verifyingInitCode}
+								onClick={this.verify}
+								className="u-margin-r3"
+							>
 								Verify
 							</CustomButton>
+
+							{!!isSuperUser && (
+								<CustomButton
+									showSpinner={skippingInitCodeVerification}
+									onClick={this.skipVerification}
+								>
+									Skip
+								</CustomButton>
+							)}
 
 							{success && <div className="u-text-success u-margin-t3">{success}</div>}
 							{error && <div className="u-text-error u-margin-t3">{error}</div>}

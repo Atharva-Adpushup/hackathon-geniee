@@ -53,7 +53,8 @@ var modelAPI = (module.exports = apiModule()),
 			'miscellaneous',
 			'billingInfoComplete',
 			'paymentInfoComplete',
-			'isPaymentDetailsComplete'
+			'isPaymentDetailsComplete',
+			"adServerSettings"
 		];
 		this.clientKeys = [
 			'firstName',
@@ -75,7 +76,8 @@ var modelAPI = (module.exports = apiModule()),
 			'adnetworkCredentials',
 			'billingInfoComplete',
 			'paymentInfoComplete',
-			'isPaymentDetailsComplete'
+			'isPaymentDetailsComplete',
+			"adServerSettings"
 		];
 		this.validations = schema.user.validations;
 		this.classMap = {
@@ -84,8 +86,7 @@ var modelAPI = (module.exports = apiModule()),
 		this.defaults = {
 			sites: [],
 			adNetworkSettings: [],
-			// requestDemo: true
-			// Commented for Tag Manager
+			adServerSettings: {},
 			requestDemo: true
 		};
 		this.ignore = ['password', 'oldPassword', 'confirmPassword', 'site'];

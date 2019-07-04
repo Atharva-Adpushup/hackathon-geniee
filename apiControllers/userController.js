@@ -17,7 +17,7 @@ const config = require('../configs/config');
 const AdpushupError = require('../helpers/AdPushupError');
 const { sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFunctions');
 const authToken = require('../helpers/authToken');
-const { errorHandler, appBucket } = require('../helpers/routeHelpers');
+const { errorHandler, appBucket, checkParams } = require('../helpers/routeHelpers');
 
 const router = express.Router();
 
@@ -349,6 +349,39 @@ router
 					});
 			})
 			.catch(err => errorHandler(err, res));
+	})
+	.post('/updateUser', (req, res) => {
+		const { toUpdate } = req.body;
+		const toSend = [];
+		return checkParams(['toUpdate'], req, 'post')
+			.then(() => userModel.getUserByEmail(req.user.email))
+			.then(user => {
+				toUpdate.forEach(content => {
+					const { key, value, replace = false } = content;
+					let data = user.get(key);
+					if (typeof data === 'object' && !Array.isArray(data) && !replace) {
+						data = {
+							...data,
+							...value
+						};
+					} else {
+						data = value;
+					}
+					user.set(key, data);
+					toSend.push({ key, value: data });
+				});
+				return user.save();
+			})
+			.then(() =>
+				sendSuccessResponse(
+					{
+						message: 'User Updated',
+						toUpdate: toSend
+					},
+					res
+				)
+			)
+			.catch(err => errorHandler(err, res, httpStatus.INTERNAL_SERVER_ERROR));
 	});
 
 module.exports = router;

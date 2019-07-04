@@ -22,13 +22,15 @@ class HeaderBidding extends React.Component {
 				params: { siteId },
 				url
 			},
+			setupStatus,
 			getSetupStatusAction
 		} = this.props;
 
+		if (setupStatus) return;
+
 		getSetupStatusAction(siteId).then(() => {
-			const {
-				setupStatus: { inventoryFound, biddersFound }
-			} = this.props;
+			const { setupStatus: updatedSetupStatus } = this.props;
+			const { inventoryFound, biddersFound } = updatedSetupStatus;
 
 			if (url === `/sites/${siteId}/apps/header-bidding` && inventoryFound && biddersFound) {
 				this.setState({

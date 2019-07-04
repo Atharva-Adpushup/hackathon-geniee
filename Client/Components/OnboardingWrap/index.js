@@ -9,6 +9,7 @@ import { addNewSite, updateSiteStep } from '../../actions/siteActions';
 
 class OnBoardingWrap extends Component {
 	state = {
+		// eslint-disable-next-line react/no-unused-state
 		isOnboarding: null,
 		siteId: null,
 		existingSite: '',
@@ -37,10 +38,13 @@ class OnBoardingWrap extends Component {
 		if (site && !prevProps.site) newState.site = site;
 		if (onboardingStage && prevProps.onboardingStage !== onboardingStage)
 			newState.onboardingStage = onboardingStage;
+		// eslint-disable-next-line react/destructuring-assignment
 		if (step && step > this.state.step) newState.step = step;
 
+		// eslint-disable-next-line react/no-did-update-set-state
 		if (Object.keys(newState).length) this.setState(newState);
 
+		// eslint-disable-next-line react/destructuring-assignment
 		if (!this.state.step && step) {
 			if (step === 3) {
 				history.push('/sites');
@@ -70,6 +74,7 @@ class OnBoardingWrap extends Component {
 		const { addNewSite: addNewSiteAction } = this.props;
 
 		this.setState(
+			// eslint-disable-next-line react/no-unused-state
 			() => ({ isOnboarding: false, siteId, site, onboardingStage, step }),
 			() => {
 				addNewSiteAction(siteObj);
@@ -107,7 +112,7 @@ class OnBoardingWrap extends Component {
 
 	onAdsTxtVerify = () => {
 		this.setState(
-			() => ({ step: 3 }),
+			() => ({ step: 3, onboardingStage: 'onboarded' }),
 			() => {
 				const { updateSiteStep: updateSiteStepAction } = this.props;
 				const { siteId, step, onboardingStage } = this.state;
@@ -120,6 +125,7 @@ class OnBoardingWrap extends Component {
 	};
 
 	render() {
+		const { isSuperUser } = this.props;
 		const { siteId, existingSite, site, step } = this.state;
 
 		return (
@@ -141,6 +147,7 @@ class OnBoardingWrap extends Component {
 					onComplete={this.onInitCodeVerify}
 					isActive={step === 1}
 					completed={step >= 2}
+					isSuperUser={isSuperUser}
 				/>
 				<VerifyAdsTxtCodeOnboarding
 					forwardedRef={this.verifyAdsTxtRef}
@@ -149,6 +156,7 @@ class OnBoardingWrap extends Component {
 					onComplete={this.onAdsTxtVerify}
 					isActive={step === 2}
 					completed={step === 3}
+					isSuperUser={isSuperUser}
 				/>
 			</div>
 		);
@@ -173,6 +181,8 @@ OnBoardingWrap.defaultProps = {
 	step: 0
 };
 export default connect(
-	null,
+	state => ({
+		isSuperUser: state.global.user.data.isSuperUser
+	}),
 	{ addNewSite, updateSiteStep }
 )(OnBoardingWrap);

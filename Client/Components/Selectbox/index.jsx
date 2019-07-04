@@ -2,7 +2,7 @@
 /* eslint-disable prefer-destructuring */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { DropdownButton, MenuItem } from 'react-bootstrap';
+import { DropdownButton, MenuItem, Glyphicon } from 'react-bootstrap';
 import CustomIcon from '../CustomIcon';
 
 const findSelected = props => {
@@ -31,9 +31,9 @@ class SelectBox extends Component {
 	selectWrapper = (key, e) => {
 		const { onSelect, options, title } = this.props;
 		const optionValueType = typeof options[0].value;
-		const dataKey = e.target.getAttribute('data-key');
+		const dataKey = e && e.target ? e.target.getAttribute('data-key') : '';
 
-		if (!e.target.getAttribute('data-value')) {
+		if (!e || !e.target || !e.target.getAttribute('data-value')) {
 			return this.setState({ name: title }, () => onSelect(null));
 		}
 
@@ -70,7 +70,26 @@ class SelectBox extends Component {
 			dataKey,
 			reset
 		} = this.props;
-		const buttonTitle = selected === 0 || selected ? name : title;
+		const selectedTilte = reset ? (
+			<div
+				className="aligner aligner--hSpaceBetween width-100  aligner--wrap"
+				style={{ width: '100%' }}
+			>
+				{name}
+
+				<Glyphicon
+					glyph="remove"
+					className="u-margin-r3"
+					onClick={e => {
+						e.stopPropagation();
+						this.selectWrapper();
+					}}
+				/>
+			</div>
+		) : (
+			name
+		);
+		const buttonTitle = selected === 0 || selected ? selectedTilte : title;
 		return (
 			<div className={`custom-select-box-wrapper ${wrapperClassName}`}>
 				<DropdownButton
@@ -93,9 +112,6 @@ class SelectBox extends Component {
 						</MenuItem>
 					))}
 				</DropdownButton>
-				{reset && selected && (
-					<CustomIcon classNames="selectbox-reset" icon="times" onClick={this.selectWrapper} />
-				)}
 			</div>
 		);
 	}

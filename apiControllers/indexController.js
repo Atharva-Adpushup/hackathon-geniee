@@ -16,8 +16,13 @@ const httpStatus = require('../configs/httpStatusConsts');
 const formValidator = require('../helpers/FormValidator');
 const schema = require('../helpers/schema');
 const AdPushupError = require('../helpers/AdPushupError');
-const { getNetworkConfig } = require('../helpers/commonFunctions');
+const {
+	getNetworkConfig,
+	sendErrorResponse,
+	sendSuccessResponse
+} = require('../helpers/commonFunctions');
 const { fetchOurAdsTxt } = require('../helpers/proxy');
+const { appBucket, errorHandler, checkParams } = require('../helpers/routeHelpers');
 
 const router = express.Router();
 
@@ -320,6 +325,50 @@ router
 					res.status(httpStatus.NOT_FOUND).json({ error: 'User not found!' });
 				}
 			});
+	})
+	.post('/updateNetworkConfig', (req, res) => {
+		if (!req.user.isSuperUser) {
+			return sendErrorResponse(
+				{
+					message: 'Unauthorized Request'
+				},
+				res,
+				httpStatus.UNAUTHORIZED
+			);
+		}
+
+		let toSend = {};
+
+		return checkParams(['config'], req, 'post')
+			.then(() => appBucket.getDoc(consts.docKeys.networkConfig))
+			.then(docWithCase => {
+				const { value, cas } = docWithCase;
+				const { config } = req.body;
+				const networks = Object.keys(config);
+
+				networks.forEach(network => {
+					const networkDataFromDoc = value[network];
+					if (networkDataFromDoc) {
+						value[network] = {
+							...networkDataFromDoc,
+							...config[network]
+						};
+					}
+				});
+
+				toSend = value;
+				return appBucket.updateDoc(consts.docKeys.networkConfig, value, cas);
+			})
+			.then(() =>
+				sendSuccessResponse(
+					{
+						message: 'Operation successful',
+						networkConfig: toSend
+					},
+					res
+				)
+			)
+			.catch(err => errorHandler(err, res, httpStatus.INTERNAL_SERVER_ERROR));
 	});
 
 module.exports = router;

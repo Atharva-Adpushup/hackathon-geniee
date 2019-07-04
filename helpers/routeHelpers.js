@@ -307,6 +307,28 @@ function fetchCustomStatuses(site) {
 	});
 }
 
+function checkParams(toCheck, req, mode, checkLight = false) {
+	return new Promise((resolve, reject) => {
+		const container = mode === 'post' ? req.body : req.query;
+		if (container) {
+			if (checkLight === false) {
+				_.forEach(toCheck, (value, key) => {
+					if (!(value in container)) {
+						return reject(
+							new AdPushupError({
+								message: `Missing params. ${value} is required.`,
+								code: HTTP_STATUS.BAD_REQUEST
+							})
+						);
+					}
+				});
+			}
+			return resolve();
+		}
+		return reject(new customError('Missing params'));
+	});
+}
+
 module.exports = {
 	verifyOwner,
 	errorHandler,
@@ -318,5 +340,6 @@ module.exports = {
 	masterSave,
 	modifyAd,
 	fetchStatusesFromReporting,
-	fetchCustomStatuses
+	fetchCustomStatuses,
+	checkParams
 };

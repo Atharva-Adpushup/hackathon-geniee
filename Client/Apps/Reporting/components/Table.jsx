@@ -47,7 +47,7 @@ class Table extends React.Component {
 
 	updateTableData = () => {
 		let { dimension, metrics, tableData } = this.state;
-		const { selectedInterval, startDate, endDate, getTableData } = this.props;
+		const { selectedInterval, startDate, endDate, getTableData, site } = this.props;
 		if (tableData.columns && tableData.result.length > 0) {
 			let tableHeader = [];
 			let displayTableData = [];
@@ -56,11 +56,19 @@ class Table extends React.Component {
 			const headers = tableData.columns;
 			headers.forEach(header => {
 				if (dimension[header]) {
-					tableHeader.push({
-						title: dimension[header].display_name,
-						position: 1,
-						prop: header
-					});
+					if (header == 'siteid') {
+						tableHeader.push({
+							title: 'Site Name',
+							position: 1,
+							prop: 'siteName'
+						});
+					} else {
+						tableHeader.push({
+							title: dimension[header].display_name,
+							position: 1,
+							prop: header
+						});
+					}
 				}
 				if (metrics[header]) {
 					tableHeader.push({
@@ -112,6 +120,13 @@ class Table extends React.Component {
 				}
 				if (selectedInterval === 'cumulative')
 					tableRow.date = moment(startDate).format('ll') + ' to ' + moment(endDate).format('ll');
+				if (tableRow['siteid']) {
+					const { siteid } = tableRow;
+					tableRow['siteName'] = site[siteid]
+						? React.cloneElement(<a href={`/reports/${siteid}`}>{site[siteid]['siteName']}</a>)
+						: 'Not Found';
+					delete tableRow['siteid'];
+				}
 				displayTableData.push(tableRow);
 			});
 
@@ -161,7 +176,7 @@ class Table extends React.Component {
 		const { tableBody, tableHeader, tableData } = this.state;
 		const onSortFunction = {
 			network_net_revenue(columnValue) {
-				if (typeof columnValue === 'string') return parseFloat(columnValue.replace(/,/g, ''));
+				if (typeof columnValue === 'string') return parseFloat(columnValue.replace(/[,$]/g, ''));
 				else return columnValue;
 			},
 			adpushup_page_views(columnValue) {
@@ -170,6 +185,14 @@ class Table extends React.Component {
 			},
 			network_impressions(columnValue) {
 				if (typeof columnValue === 'string') return parseFloat(columnValue.replace(/,/g, ''));
+				else return columnValue;
+			},
+			network_ad_ecpm(columnValue) {
+				if (typeof columnValue === 'string') return parseFloat(columnValue.replace(/[,$]/g, ''));
+				else return columnValue;
+			},
+			adpushup_page_cpm(columnValue) {
+				if (typeof columnValue === 'string') return parseFloat(columnValue.replace(/[,$]/g, ''));
 				else return columnValue;
 			}
 		};
