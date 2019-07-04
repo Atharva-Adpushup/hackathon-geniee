@@ -18,7 +18,7 @@ class Apps extends Component {
 		if (!apps) getAppStatuses(site.siteId);
 	}
 
-	handleSelect = value => {
+	handleSelect = (value = null) => {
 		this.setState({
 			activeKey: value
 		});
@@ -42,7 +42,8 @@ class Apps extends Component {
 			activeKey,
 			site,
 			showNotification,
-			updateAppStatus
+			updateAppStatus,
+			resetTab: this.handleSelect
 		};
 		return (
 			<PanelGroup

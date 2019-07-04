@@ -110,6 +110,8 @@ const fetchChannelsInfo = siteId => dispatch =>
 					}
 				}
 			});
+
+			return channels;
 		})
 		.catch(err =>
 			errorHandler(

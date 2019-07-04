@@ -83,7 +83,7 @@ class ConsentManagement extends Component {
 	};
 
 	render() {
-		const { site } = this.props;
+		const { site, resetTab } = this.props;
 		const { siteId, siteDomain } = site;
 		const { status, config, loading } = this.state;
 
@@ -125,7 +125,14 @@ class ConsentManagement extends Component {
 					componentClass="textarea"
 					style={{ minHeight: '200px' }}
 				/>
-				<CustomButton variant="primary" className="pull-right" onClick={this.handleSave}>
+				<CustomButton variant="secondary" className="pull-right" onClick={resetTab}>
+					Cancel
+				</CustomButton>
+				<CustomButton
+					variant="primary"
+					className="pull-right u-margin-r3"
+					onClick={this.handleSave}
+				>
 					Save
 				</CustomButton>
 			</Panel.Body>

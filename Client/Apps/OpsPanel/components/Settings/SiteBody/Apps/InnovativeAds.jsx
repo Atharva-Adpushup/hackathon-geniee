@@ -52,8 +52,10 @@ class InnovativeAds extends Component {
 	render() {
 		const { status, isLoading } = this.state;
 
-		const { site } = this.props;
-		const { siteId, siteDomain } = site;
+		const {
+			site: { siteId, siteDomain },
+			resetTab
+		} = this.props;
 
 		return (
 			<Panel.Body collapsible>
@@ -79,9 +81,12 @@ class InnovativeAds extends Component {
 					name={`status-${siteId}-${siteDomain}`}
 					id={`js-status-${siteId}-${siteDomain}`}
 				/>
+				<CustomButton variant="secondary" className="pull-right" onClick={resetTab}>
+					Cancel
+				</CustomButton>
 				<CustomButton
 					variant="primary"
-					className="pull-right"
+					className="pull-right u-margin-r3"
 					onClick={this.handleSave}
 					showSpinner={isLoading}
 				>
