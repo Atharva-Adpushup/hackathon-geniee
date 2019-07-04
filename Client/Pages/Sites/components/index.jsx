@@ -20,8 +20,9 @@ import Card from '../../../Components/Layout/Card';
 import {
 	SITE_SETUP_STATUS,
 	domanize,
-	LAST_ONBOARDING_STEP,
-	FIRST_ONBOARDING_STEP
+	ADPUSHUP_RUNNING_SUCCESSFULLY_STEP,
+	FIRST_ONBOARDING_STEP,
+	USER_ONBOARDING_COMPLETE_STEP
 } from '../constants/index';
 
 library.add(
@@ -50,7 +51,7 @@ class MySites extends React.Component {
 			const isValidAppStatusInReportData = ref.checkValidAppStatusInReportData(siteIdKey);
 			const isAppStatuses = ref.checkSiteAppStatuses(site);
 			const siteStep = !site.step ? FIRST_ONBOARDING_STEP : site.step;
-			const isStepOnboardingComplete = !!(siteStep >= 3);
+			const isStepOnboardingComplete = ref.checkSiteStepOnboardingComplete(siteStep);
 			const shouldFetchAppStatuses = ref.shouldFetchSiteAppStatuses(
 				isStepOnboardingComplete,
 				isValidAppStatusInReportData,
@@ -64,6 +65,8 @@ class MySites extends React.Component {
 
 		return false;
 	}
+
+	checkSiteStepOnboardingComplete = step => !!(Number(step) === USER_ONBOARDING_COMPLETE_STEP);
 
 	checkSiteAppStatuses = siteModel => !!siteModel.appStatuses;
 
@@ -99,15 +102,19 @@ class MySites extends React.Component {
 					const isAppStatuses = ref.checkSiteAppStatuses(site);
 					const isValidAppStatuses = !!(isAppStatuses && Object.keys(site.appStatuses).length > 0);
 					const isValidAppStatusInReportData = ref.checkValidAppStatusInReportData(siteIdKey);
-					const isStepOnboardingComplete = !!(siteStep >= 3);
+					const isStepOnboardingComplete = ref.checkSiteStepOnboardingComplete(siteStep);
 					const isUserOnBoardingComplete = !!(
 						isStepOnboardingComplete &&
 						(isValidAppStatuses || isValidAppStatusInReportData)
 					);
-					const isStepLastOnboarding = !!(siteStep >= LAST_ONBOARDING_STEP);
+					const isStepAdPushupRunningSuccessfully = !!(
+						siteStep >= ADPUSHUP_RUNNING_SUCCESSFULLY_STEP
+					);
 
 					siteStep =
-						isStepLastOnboarding || isUserOnBoardingComplete ? LAST_ONBOARDING_STEP : siteStep;
+						isStepAdPushupRunningSuccessfully || isUserOnBoardingComplete
+							? ADPUSHUP_RUNNING_SUCCESSFULLY_STEP
+							: siteStep;
 
 					const showSiteStatusLoader = ref.shouldFetchSiteAppStatuses(
 						isStepOnboardingComplete,
