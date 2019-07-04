@@ -93,6 +93,13 @@ const domanize = domain =>
 		  )
 		: '';
 
+const FIRST_ONBOARDING_STEP = 0;
 const LAST_ONBOARDING_STEP = 4;
 
-module.exports = { SITE_SETUP_STATUS, rightTrim, domanize, LAST_ONBOARDING_STEP };
+module.exports = {
+	SITE_SETUP_STATUS,
+	rightTrim,
+	domanize,
+	LAST_ONBOARDING_STEP,
+	FIRST_ONBOARDING_STEP
+};
