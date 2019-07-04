@@ -71,9 +71,7 @@ var auction = {
 			}
 		};
 
-		pbjs.aliasBidder('appnexus', 'springserve');
 		pbjs.aliasBidder('appnexus', 'districtm');
-		pbjs.aliasBidder('appnexus', 'brealtime');
 		pbjs.aliasBidder('appnexus', 'oftmedia');
 	},
 	start: function(prebidSlots, adpBatchId) {
