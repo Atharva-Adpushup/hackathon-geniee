@@ -66,7 +66,7 @@ var hb = {
         */
 		if (HB_ACTIVE) {
 			(function() {
-				require('../../Prebid.js/build/dist/prebid');
+				require('../../../../../adpushup.js/modules/adpTags/Prebid.js/build/dist/prebid');
 			})();
 		}
 

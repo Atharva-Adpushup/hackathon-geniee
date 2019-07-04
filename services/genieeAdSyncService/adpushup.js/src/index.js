@@ -116,7 +116,7 @@ function initAdpConfig() {
 	}).then(function() {
 		if (!window.adpushup.configExtended) {
 			if (ADPTAG_ACTIVE) {
-				require('../modules/adpTags/hbScript/index');
+				require('../../adpTagsv2/modules/adpTags/hbScript/src/index');
 			}
 			if (GDPR_ACTIVE) {
 				require('../modules/gdpr/index');
