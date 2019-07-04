@@ -1,0 +1,3 @@
+[submodule "services/genieeAdSyncService/adpushup.js/libs/jquery"]
+	path = services/genieeAdSyncService/adpushup.js/libs/jquery
+	url = https://github.com/jquery/jquery

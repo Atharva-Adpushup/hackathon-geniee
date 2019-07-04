@@ -16,6 +16,7 @@ logs/
 .DS_Store
 *.log
 *.map
+services/genieeAdSyncService/adpushup.js/libs/jquery
 fabfile.pyc
 composer.phar
 composer.lock

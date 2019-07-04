@@ -20,6 +20,7 @@ class Component {
 
 	sendFeedback(options) {
 		if (adp && adp.utils && adp.utils.sendFeedback) {
+			adp.utils.sendFeedback(options);
 			adp.utils.sendFeedbackOld(options);
 		}
 	}

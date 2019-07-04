@@ -68,16 +68,18 @@ var adp = window.adpushup,
 			ad.originalId = adId;
 			if (isAdElement) {
 				var feedbackData = {
-					ads: [ad],
-					xpathMiss: [],
-					eventType: commonConsts.ERROR_CODES.NO_ERROR,
-					// mode: 16,
-					mode: commonConsts.MODE.ADPUSHUP, // Sending Mode 1 in Manual Ads
-					referrer: config.referrer,
-					tracking: browserConfig.trackerSupported,
-					variationId: commonConsts.MANUAL_ADS.VARIATION
-				};
+						ads: [ad],
+						xpathMiss: [],
+						eventType: commonConsts.ERROR_CODES.NO_ERROR,
+						// mode: 16,
+						mode: commonConsts.MODE.ADPUSHUP, // Sending Mode 1 in Manual Ads
+						referrer: config.referrer,
+						tracking: browserConfig.trackerSupported,
+						variationId: commonConsts.MANUAL_ADS.VARIATION
+					},
+					oldFeedbackData = feedbackData;
 
+				oldFeedbackData.ads = [ad.originalId];
 				return getContainer(ad)
 					.done(function(container) {
 						var isLazyLoadingAd = !!(ad.enableLazyLoading === true);
@@ -100,12 +102,14 @@ var adp = window.adpushup,
 							isAdContainerInView(container).done(function() {
 								// Send feedback call
 								utils.sendFeedback(feedbackData);
+								utils.sendFeedbackOld(oldFeedbackData);
 								// Place the ad in the container
 								return placeAd(container, ad);
 							});
 						} else {
 							// Send feedback call
 							utils.sendFeedback(feedbackData);
+							utils.sendFeedbackOld(oldFeedbackData);
 							// Place the ad in the container
 							return placeAd(container, ad);
 						}
