@@ -54,6 +54,11 @@ var auction = {
 					return bidCpm - bidCpm * (10 / 100);
 				}
 			},
+			aardvark: {
+				bidCpmAdjustment: function(bidCpm) {
+					return bidCpm - bidCpm * (20 / 100);
+				}
+			},
 			oftmedia: {
 				bidCpmAdjustment: function(bidCpm) {
 					return bidCpm - bidCpm * (12 / 100);
