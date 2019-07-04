@@ -76,7 +76,7 @@ var $ = require('../libs/jquery'),
 		}
 		var isGenieePartner = !!(ad.network === 'geniee' && !ad.networkData.adCode),
 			isGenieeWithoutDFP = !!(isGenieePartner && !ad.networkData.dynamicAllocation),
-			isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length),
+			isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length && ad.multipleAdSizes.length > 1),
 			isGenieeNetwork = !!(ad.network === 'geniee' && ad.networkData && ad.networkData.zoneId),
 			isZoneContainerId = !!(isGenieeNetwork && ad.networkData.zoneContainerId),
 			computedSSPContainerId = isZoneContainerId ? ad.networkData.zoneContainerId : ad.networkData.zoneId,
@@ -228,7 +228,13 @@ var $ = require('../libs/jquery'),
 						// Below 'isContainerVisible' check is added for boundary cases where ad can be successfully placed
 						// but its container is hidden from layout (.i.e., display none) and thus ad placement and server feedback
 						// functionality should not work
-						isContainerVisible = !!(data.container && data.container.is(':visible'));
+						// NOTE: We have not incorporated recursive DOM parent level checks here for `opacity:0` and `visibility:hidden` properties
+						// as we think that they are not a real and frequent use case and OPS team will most probably catch them while placing ads on websites.
+						isContainerVisible = !!(
+							data.container &&
+							data.container.length &&
+							data.container.css('display') !== 'none'
+						);
 
 						if (!isContainerVisible) {
 							return false;
@@ -306,7 +312,8 @@ var $ = require('../libs/jquery'),
 					$selector: $incontentElm,
 					placementConfig: inContentAds,
 					sectionBracket: globalConfig.sectionBracket,
-					selectorsTreeLevel: globalConfig.selectorsTreeLevel
+					selectorsTreeLevel: globalConfig.selectorsTreeLevel,
+					isEvenSpacingAlgo: globalConfig.isEvenSpacingAlgo
 				};
 				var successCallback = function(sectionsWithTargetElm) {
 					$(inContentAds).each(function(index, ad) {

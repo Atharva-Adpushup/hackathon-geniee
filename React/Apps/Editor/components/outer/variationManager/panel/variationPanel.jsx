@@ -99,7 +99,8 @@ class VariationPanel extends React.Component {
 				selectorsTreeLevel: variation.selectorsTreeLevel || '',
 				sectionBracket:
 					variation.incontentSectionBracket ||
-					incontentSectionSettings.SECTION_BRACKETS[activeChannel.platform.toUpperCase()]
+					incontentSectionSettings.SECTION_BRACKETS[activeChannel.platform.toUpperCase()],
+				isEvenSpacingAlgo: variation.enableIncontentEvenSpacingAlgo || false
 			};
 
 		return (

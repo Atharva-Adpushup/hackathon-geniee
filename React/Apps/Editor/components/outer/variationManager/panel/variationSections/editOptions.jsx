@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import { Row, Col, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import Utils from 'libs/utils';
 import InlineEdit from 'shared/inlineEdit/index.jsx';
 import SelectBox from 'shared/select/select.js';
 import CssEditor from 'shared/cssEditor/cssEditor.jsx';
-import { floats, networks } from 'consts/commonConsts';
+import { floats, networks, iabSizes } from 'consts/commonConsts';
 import NetworkOptions from 'shared/networkOptions/NetworkOptions';
 import AdDetails from '../../../editMenu/AdDetails';
 import AdPushupAds from '../interactiveAds/adpushupAds';
@@ -50,7 +51,11 @@ class EditOptions extends Component {
 	}
 
 	submitHandler = networkData => {
-		this.props.updateNetwork(this.props.section.ads[0].id, networkData);
+		const { section } = this.props;
+		const [ad] = section.ads;
+
+		Utils.updateMultipleAdSizes(ad, networkData, iabSizes, this);
+		this.props.updateNetwork(ad.id, networkData);
 		this.props.showNotification({
 			mode: 'success',
 			title: 'Operation Successful',
