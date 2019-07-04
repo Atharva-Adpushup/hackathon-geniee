@@ -25,8 +25,6 @@ const user = (state = { fetched: false, data: {} }, action) => {
 		}
 		case SITE_ACTIONS.UPDATE_SITE_STEP: {
 			const site = { ...action.data };
-			site.domain = site.siteDomain;
-			delete site.siteDomain;
 
 			return {
 				...state,
