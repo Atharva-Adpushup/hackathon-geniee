@@ -14,7 +14,7 @@ const ADSTXT_STATUS = {
 const ROUTES = {
 	BLACK_LIST: ['/addSite', '/onboarding', '/dashboard'],
 	DYNAMIC_PARAMS: [':siteId'],
-	SIDEBAR_CLOSE: [/ops-panel.*/]
+	SIDEBAR_CLOSE: [/admin-panel.*/, /innovative-ads.*/]
 };
 
 export { ADSTXT_SITE_LIST_HEADERS, ADSTXT_STATUS, ROUTES };

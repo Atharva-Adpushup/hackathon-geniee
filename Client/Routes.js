@@ -229,40 +229,40 @@ const UserRoutes = () => (
 						component={Payment}
 					/>
 
-					{/** Ops Panel */}
+					{/** Admin Panel */}
 					<PrivateRoute
 						exact
 						customProps={{ activeTab: OP_NAV_ITEMS_INDEXES.SETTINGS }}
-						name="Ops Panel"
-						path="/ops-panel"
+						name="Admin Panel"
+						path="/admin-panel"
 						component={OpsPanel}
 					/>
 					<PrivateRoute
 						exact
 						customProps={{ activeTab: OP_NAV_ITEMS_INDEXES.SETTINGS }}
 						name="Settings"
-						path="/ops-panel/settings"
+						path="/admin-panel/settings"
 						component={OpsPanel}
 					/>
 					<PrivateRoute
 						exact
 						customProps={{ activeTab: OP_NAV_ITEMS_INDEXES.INFO_PANEL }}
 						name="Info Panel"
-						path="/ops-panel/info-panel"
+						path="/admin-panel/info-panel"
 						component={OpsPanel}
 					/>
 					<PrivateRoute
 						exact
 						customProps={{ activeTab: OP_NAV_ITEMS_INDEXES.SITES_MAPPING }}
 						name="Sites Mapping"
-						path="/ops-panel/sites-mapping"
+						path="/admin-panel/sites-mapping"
 						component={OpsPanel}
 					/>
 					<PrivateRoute
 						exact
 						customProps={{ activeTab: OP_NAV_ITEMS_INDEXES.TOOLS }}
 						name="Tools"
-						path="/ops-panel/tools"
+						path="/admin-panel/tools"
 						component={OpsPanel}
 					/>
 					<PrivateRoute exact name="User OnBoarding" path="/onboarding" component={OnBoarding} />
