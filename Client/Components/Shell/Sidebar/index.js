@@ -51,7 +51,7 @@ const Sidebar = ({ show, user }) => {
 				{getNavItem('My Sites', '/sites', 'list', !show)}
 				{getNavItem('Reports', '/reports', 'chart-area', !show)}
 				{getNavItem('Integrations', '/integrations', 'desktop', !show)}
-				{user.isSuperUser ? getNavItem('Ops Panel', '/ops-panel', 'tools', !show) : null}
+				{user.isSuperUser ? getNavItem('Admin Panel', '/admin-panel', 'tools', !show) : null}
 			</ul>
 
 			<div className="cta-btn-wrap">

@@ -7,7 +7,7 @@ import '../../scss/apps/innovativeAds/index.scss';
 const App = props => (
 	<React.Fragment>
 		<Helmet>
-			<title>innovative Ads</title>
+			<title>Innovative Ads</title>
 		</Helmet>
 		<HomeContainer {...props} />
 	</React.Fragment>
