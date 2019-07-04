@@ -10,7 +10,8 @@ import {
 	disableVariation,
 	tagcontrolVariation,
 	updateInContentTreeSelectorsLevel,
-	updateInContentSectionBracket
+	updateInContentSectionBracket,
+	updateInContentEvenSpacingAlgo
 } from 'actions/variationActions.js';
 import InlineEdit from '../../../shared/inlineEdit/index.jsx';
 import CustomToggleSwitch from '../../../shared/customToggleSwitch.jsx';
@@ -35,7 +36,8 @@ const variationOtions = props => {
 			onUpdateContentSelector,
 			onInitIncontentAdsPreview,
 			onUpdateInContentTreeSelectorsLevel,
-			onUpdateInContentSectionBracket
+			onUpdateInContentSectionBracket,
+			onUpdateInContentEvenSpacingAlgo
 		} = props,
 		variationId = variation.id,
 		hasDisabledVariationsReachedLimit = !!(
@@ -50,6 +52,7 @@ const variationOtions = props => {
 		contentSelector = variation.contentSelector,
 		computedToggleSwitchValue = hasDisabledVariationsReachedLimit ? false : !!variation.disable,
 		incontentSelectorsTreeLevelValue = variation.selectorsTreeLevel || '',
+		incontentEvenSpacingAlgoValue = !!variation.enableIncontentEvenSpacingAlgo || false,
 		incontentDefaultSectionBracketValue = incontentSectionSettings.SECTION_BRACKETS[platform.toUpperCase()],
 		incontentSectionBracketValue = variation.incontentSectionBracket || incontentDefaultSectionBracketValue,
 		shouldIncontentAnalyzerPreviewBeShown = !!(
@@ -176,6 +179,51 @@ const variationOtions = props => {
 							submitHandler={onUpdateInContentSectionBracket.bind(null, variationId)}
 							text="Section bracket"
 							errorMessage="Section bracket cannot be empty"
+						/>
+					</Col>
+				</Row>
+			) : null}
+
+			{/*IncontentAnalyzer - Enable EvenSpacing Algorithm UI*/}
+			{contentSelector ? (
+				<Row className="u-margin-b15px">
+					<Col className="u-padding-r10px" xs={2}>
+						Enable EvenSpacing Technique
+						<OverlayTrigger
+							placement="top"
+							overlay={
+								<Tooltip id="enable-incontent-even-spacing-algo-info-tooltip">
+									Even Spacing technique divides content selector height with number of sections
+									defined in configuration. If resulting value is greater than or equal to user
+									defined section bracket value, only then this technique is applied. Otherwise Equal
+									Brackets technique is applied which supports Skipping Sections feature. Please note
+									that if this technique is enabled, Skipping Sections (section numbers like 1,3,5,7
+									etc.) feature will not work.
+								</Tooltip>
+							}
+						>
+							<span className="variation-settings-icon">
+								<i className="fa fa-info" />
+							</span>
+						</OverlayTrigger>
+					</Col>
+					<Col className="u-padding-l10px" xs={4}>
+						<CustomToggleSwitch
+							labelText=""
+							className="mB-10"
+							checked={incontentEvenSpacingAlgoValue}
+							disabled={false}
+							onChange={val => {
+								onUpdateInContentEvenSpacingAlgo(variationId, val);
+							}}
+							layout="nolabel"
+							size="m"
+							on="Yes"
+							off="No"
+							defaultLayout={true}
+							name={'enableIncontentEvenSpacingAlgo'}
+							id={'js-enable-incontent-even-spacing-algo-switch'}
+							customComponentClass={'u-padding-0px'}
 						/>
 					</Col>
 				</Row>
@@ -352,6 +400,7 @@ variationOtions.propTypes = {
 	onUpdateContentSelector: PropTypes.func.isRequired,
 	onInitIncontentAdsPreview: PropTypes.func,
 	onUpdateInContentSectionBracket: PropTypes.func,
+	onUpdateInContentEvenSpacingAlgo: PropTypes.func,
 	onDisableVariation: PropTypes.func,
 	onTagcontrolVariation: PropTypes.func
 };
@@ -368,7 +417,8 @@ export default connect(
 				onDisableVariation: disableVariation,
 				onTagcontrolVariation: tagcontrolVariation,
 				onUpdateInContentTreeSelectorsLevel: updateInContentTreeSelectorsLevel,
-				onUpdateInContentSectionBracket: updateInContentSectionBracket
+				onUpdateInContentSectionBracket: updateInContentSectionBracket,
+				onUpdateInContentEvenSpacingAlgo: updateInContentEvenSpacingAlgo
 			},
 			dispatch
 		)

@@ -371,6 +371,26 @@ const siteMappingActions = {
 		{
 			value: 'rubicon',
 			label: 'rubicon'
+		},
+		{
+			value: 'adyoulike',
+			label: 'adyoulike'
+		},
+		{
+			value: 'pubmatic',
+			label: 'pubmatic'
+		},
+		{
+			value: 'aardvark',
+			label: 'aardvark'
+		},
+		{
+			value: 'criteo',
+			label: 'criteo'
+		},
+		{
+			value: 'sovrn',
+			label: 'sovrn'
 		}
 	],
 	devicesList = [
@@ -478,6 +498,44 @@ const siteMappingActions = {
 			},
 			{
 				name: 'zoneId',
+				type: 'string'
+			}
+		],
+		adyoulike: [
+			{
+				name: 'placement',
+				type: 'string'
+			}
+		],
+		pubmatic: [
+			{
+				name: 'publisherId',
+				type: 'string'
+			},
+			{
+				name: 'adSlot',
+				type: 'string'
+			}
+		],
+		aardvark: [
+			{
+				name: 'ai',
+				type: 'string'
+			},
+			{
+				name: 'sc',
+				type: 'string'
+			}
+		],
+		criteo: [
+			{
+				name: 'zoneId',
+				type: 'integer'
+			}
+		],
+		sovrn: [
+			{
+				name: 'tagid',
 				type: 'string'
 			}
 		]

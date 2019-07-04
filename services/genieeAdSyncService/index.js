@@ -51,4 +51,4 @@ cron.schedule(
 	true
 );
 
-updateGeneratedScriptsForLiveSites();
+// updateGeneratedScriptsForLiveSites();

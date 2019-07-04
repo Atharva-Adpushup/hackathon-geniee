@@ -4,6 +4,7 @@ module.exports = {
 	DFP_WEB_SERVICE_ENDPOINT: 'http://staging.adpushup.com/DfpWebService/info',
 	TRANSACTION_LOG_ENDPOINT: 'https://api.adpushup.com/SetupLogWebService/log',
 	REPORT_STATUS: 'https://api.adpushup.com/OpsWebService/ops',
+	IE_TESTING_ENDPOINT: 'http://apdc1n-central5.eastus2.cloudapp.azure.com:8081/api/health-report',
 	PROXY_ORIGIN: '//proxy.app.adpushup.com',
 	DEMO_ACCOUNT_EMAIL: 'demo@adpushup.com',
 	AMP_SETTINGS_ACCESS_EMAILS: ['genieeamp@adpushup.com'],
@@ -392,6 +393,9 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		rubicon: 'rubiconBidAdapter',
 		districtm: 'appnexusBidAdapter',
 		criteo: 'criteoBidAdapter',
-		currency: 'currency'
+		currency: 'currency',
+		pubmatic: 'pubmaticBidAdapter',
+		aardvark: 'aardvarkBidAdapter',
+		adyoulike: 'adyoulikeBidAdapter'
 	}
 };
