@@ -65,11 +65,13 @@ class MySites extends React.Component {
 		return false;
 	}
 
-	checkSiteAppStatuses(siteModel) {
-		/* eslint-disable no-unused-vars */
-		const ref = this;
-		return !!siteModel.appStatuses;
-	}
+	checkSiteAppStatuses = siteModel => !!siteModel.appStatuses;
+
+	shouldFetchSiteAppStatuses = (
+		isOnboardingComplete,
+		isValidAppStatusInReportData,
+		isSiteAppStatuses
+	) => !!(isOnboardingComplete && !isValidAppStatusInReportData && !isSiteAppStatuses);
 
 	checkValidAppStatusInReportData(siteId) {
 		const { reportSites } = this.props;
@@ -84,16 +86,6 @@ class MySites extends React.Component {
 		);
 
 		return isValidAppStatusInReportData;
-	}
-
-	shouldFetchSiteAppStatuses(
-		isOnboardingComplete,
-		isValidAppStatusInReportData,
-		isSiteAppStatuses
-	) {
-		/* eslint-disable no-unused-vars */
-		const ref = this;
-		return !!(isOnboardingComplete && !isValidAppStatusInReportData && !isSiteAppStatuses);
 	}
 
 	renderStatusCards() {
