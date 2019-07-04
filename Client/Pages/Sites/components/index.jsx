@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { Panel, Button } from 'react-bootstrap';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
@@ -8,7 +8,8 @@ import {
 	faCog,
 	faExclamationCircle,
 	faExclamationTriangle,
-	faPlusCircle
+	faPlusCircle,
+	faSpinner
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
@@ -16,7 +17,12 @@ import { Link } from 'react-router-dom';
 import ActionCard from '../../../Components/ActionCard/index';
 import OverlayTooltip from '../../../Components/OverlayTooltip/index';
 import Card from '../../../Components/Layout/Card';
-import { SITE_SETUP_STATUS, domanize, LAST_ONBOARDING_STEP } from '../constants/index';
+import {
+	SITE_SETUP_STATUS,
+	domanize,
+	LAST_ONBOARDING_STEP,
+	FIRST_ONBOARDING_STEP
+} from '../constants/index';
 
 library.add(
 	faCheckCircle,
@@ -25,29 +31,97 @@ library.add(
 	faCog,
 	faExclamationCircle,
 	faExclamationTriangle,
-	faPlusCircle
+	faPlusCircle,
+	faSpinner
 );
 
-class MySites extends Component {
-	constructor(props) {
-		super(props);
-		this.state = {};
+class MySites extends React.Component {
+	componentDidMount() {
+		const ref = this;
+		const { sites, fetchAppStatuses } = ref.props;
+		const isSites = !!(sites && Object.keys(sites).length);
+
+		if (!isSites) {
+			return false;
+		}
+
+		Object.keys(sites).forEach(siteIdKey => {
+			const site = sites[siteIdKey];
+			const isValidAppStatusInReportData = ref.checkValidAppStatusInReportData(siteIdKey);
+			const isAppStatuses = ref.checkSiteAppStatuses(site);
+			const siteStep = !site.step ? FIRST_ONBOARDING_STEP : site.step;
+			const isStepOnboardingComplete = !!(siteStep >= 3);
+			const shouldFetchAppStatuses = ref.shouldFetchSiteAppStatuses(
+				isStepOnboardingComplete,
+				isValidAppStatusInReportData,
+				isAppStatuses
+			);
+
+			if (shouldFetchAppStatuses) {
+				fetchAppStatuses(siteIdKey);
+			}
+		});
+
+		return false;
+	}
+
+	checkSiteAppStatuses(siteModel) {
+		/* eslint-disable no-unused-vars */
+		const ref = this;
+		return !!siteModel.appStatuses;
+	}
+
+	checkValidAppStatusInReportData(siteId) {
+		const { reportSites } = this.props;
+		const isReportData = !!(reportSites && Object.keys(reportSites).length);
+		const isValidAppStatusInReportData = !!(
+			isReportData &&
+			reportSites[siteId] &&
+			reportSites[siteId].product &&
+			Object.values(reportSites[siteId].product) &&
+			Object.values(reportSites[siteId].product).length &&
+			Object.values(reportSites[siteId].product).find(status => status > 0)
+		);
+
+		return isValidAppStatusInReportData;
+	}
+
+	shouldFetchSiteAppStatuses(
+		isOnboardingComplete,
+		isValidAppStatusInReportData,
+		isSiteAppStatuses
+	) {
+		/* eslint-disable no-unused-vars */
+		const ref = this;
+		return !!(isOnboardingComplete && !isValidAppStatusInReportData && !isSiteAppStatuses);
 	}
 
 	renderStatusCards() {
-		const { sites } = this.props;
+		const ref = this;
+		const { sites } = ref.props;
 		const isSites = !!(sites && Object.keys(sites).length);
 		const computedCards = isSites
 			? Object.keys(sites).map(siteIdKey => {
 					const site = sites[siteIdKey];
-					let siteStep;
+					let siteStep = !site.step ? FIRST_ONBOARDING_STEP : site.step;
+					const isAppStatuses = ref.checkSiteAppStatuses(site);
+					const isValidAppStatuses = !!(isAppStatuses && Object.keys(site.appStatuses).length > 0);
+					const isValidAppStatusInReportData = ref.checkValidAppStatusInReportData(siteIdKey);
+					const isStepOnboardingComplete = !!(siteStep >= 3);
+					const isUserOnBoardingComplete = !!(
+						isStepOnboardingComplete &&
+						(isValidAppStatuses || isValidAppStatusInReportData)
+					);
+					const isStepLastOnboarding = !!(siteStep >= LAST_ONBOARDING_STEP);
 
-					if (!site.step) {
-						siteStep = 0;
-					} else {
-						siteStep = site.step >= LAST_ONBOARDING_STEP ? LAST_ONBOARDING_STEP : site.step;
-					}
+					siteStep =
+						isStepLastOnboarding || isUserOnBoardingComplete ? LAST_ONBOARDING_STEP : siteStep;
 
+					const showSiteStatusLoader = ref.shouldFetchSiteAppStatuses(
+						isStepOnboardingComplete,
+						isValidAppStatusInReportData,
+						isAppStatuses
+					);
 					const { siteId } = site;
 					const statusObject = SITE_SETUP_STATUS[siteStep];
 					const domanizeDomain = domanize(site.domain);
@@ -77,21 +151,33 @@ class MySites extends Component {
 							</Panel.Body>
 						</Panel>
 					);
+					const computedSiteStatusText = showSiteStatusLoader ? (
+						<span className="aligner-item">
+							<FontAwesomeIcon icon="spinner" spin className="u-margin-r2" />
+							Loading data...
+						</span>
+					) : (
+						<span className="aligner-item">
+							<FontAwesomeIcon icon={statusObject.site.icon} className="u-margin-r2" />
+							{statusObject.site.text}
+						</span>
+					);
+					let computedSiteStatusLink =
+						isSiteBlock && !statusObject.site.isComplete ? (
+							<Link to={statusObject.site.link.replace('__SITEID__', siteId)} className="">
+								{statusObject.site.linkText}
+							</Link>
+						) : null;
+					computedSiteStatusLink = showSiteStatusLoader ? null : computedSiteStatusLink;
+
 					const computeSiteBlock = () =>
 						isSiteBlock ? (
 							<Panel className="panel--transparent u-margin-b3">
 								<Panel.Heading className="u-margin-0 u-padding-0">Site status</Panel.Heading>
 								<Panel.Body className="u-padding-h0 u-padding-b0 u-padding-t2">
 									<div className="aligner aligner--row">
-										<span className="aligner-item">
-											<FontAwesomeIcon icon={statusObject.site.icon} className="u-margin-r2" />
-											{statusObject.site.text}
-										</span>
-										{!statusObject.site.isComplete ? (
-											<Link to={statusObject.site.link.replace('__SITEID__', siteId)} className="">
-												{statusObject.site.linkText}
-											</Link>
-										) : null}
+										<span className="aligner-item">{computedSiteStatusText}</span>
+										{computedSiteStatusLink}
 									</div>
 								</Panel.Body>
 							</Panel>
