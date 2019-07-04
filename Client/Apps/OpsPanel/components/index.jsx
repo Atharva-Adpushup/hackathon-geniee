@@ -21,7 +21,7 @@ class OpsPanel extends Component {
 	};
 
 	handleNavSelect = value => {
-		const computedRedirectUrl = `/ops-panel`;
+		const computedRedirectUrl = `/admin-panel`;
 		let redirectUrl = '';
 
 		switch (Number(value)) {

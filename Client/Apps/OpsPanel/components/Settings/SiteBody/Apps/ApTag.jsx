@@ -50,8 +50,8 @@ class ApTag extends Component {
 	};
 
 	render() {
-		const { site } = this.props;
-		const { siteId, siteDomain, apps = {} } = site;
+		const { site, resetTab } = this.props;
+		const { siteId, siteDomain } = site;
 		const { status, isLoading } = this.state;
 
 		return (
@@ -78,10 +78,12 @@ class ApTag extends Component {
 					name={`status-${siteId}-${siteDomain}`}
 					id={`js-status-${siteId}-${siteDomain}`}
 				/>
-
+				<CustomButton variant="secondary" className="pull-right" onClick={resetTab}>
+					Cancel
+				</CustomButton>
 				<CustomButton
 					variant="primary"
-					className="pull-right"
+					className="pull-right u-margin-r3"
 					onClick={this.handleSave}
 					showSpinner={isLoading}
 				>
