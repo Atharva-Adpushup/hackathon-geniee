@@ -9,12 +9,14 @@ const mapStateToProps = (state, ownProps) => {
 		},
 		reports: {
 			data: { site: reportSites }
-		}
+		},
+		sites: { data: globalSites }
 	} = state.global;
 
 	return {
 		sites,
 		reportSites,
+		globalSites,
 		...ownProps
 	};
 };
