@@ -17,6 +17,9 @@ import { Link } from 'react-router-dom';
 import ActionCard from '../../../Components/ActionCard/index';
 import OverlayTooltip from '../../../Components/OverlayTooltip/index';
 import Card from '../../../Components/Layout/Card';
+import OnboardingCard from '../../../Components/OnboardingCard';
+import CustomButton from '../../../Components/CustomButton';
+
 import {
 	SITE_SETUP_STATUS,
 	domanize,
@@ -37,10 +40,17 @@ library.add(
 );
 
 class MySites extends React.Component {
+	constructor(props) {
+		super(props);
+		const sites = this.getValidSites(props);
+		this.state = { sites };
+	}
+
 	componentDidMount() {
 		const ref = this;
-		const { sites, fetchAppStatuses } = ref.props;
-		const isSites = !!(sites && Object.keys(sites).length);
+		const { sites } = this.state;
+		const { fetchAppStatuses } = ref.props;
+		const isSites = ref.getValidObject(sites);
 
 		if (!isSites) {
 			return false;
@@ -66,9 +76,41 @@ class MySites extends React.Component {
 		return false;
 	}
 
+	componentWillReceiveProps(props) {
+		const sites = this.getValidSites(props);
+		this.setState({ sites });
+	}
+
 	checkSiteStepOnboardingComplete = step => !!(Number(step) === USER_ONBOARDING_COMPLETE_STEP);
 
 	checkSiteAppStatuses = siteModel => !!siteModel.appStatuses;
+
+	getValidObject = obj => !!(obj && Object.keys(obj).length);
+
+	getValidSites = props => {
+		const { sites, globalSites } = props || this.props;
+		const resultObj = {};
+		const isValidUserSites = this.getValidObject(sites);
+		const isValidGlobalSites = this.getValidObject(globalSites);
+		const isInvalidSites = !!(!isValidUserSites && !isValidGlobalSites);
+
+		if (isInvalidSites) {
+			return resultObj;
+		}
+
+		Object.keys(sites).forEach(siteIdKey => {
+			const isValidSite = !!(sites[siteIdKey] && globalSites[siteIdKey]);
+
+			if (!isValidSite) {
+				return true;
+			}
+
+			resultObj[siteIdKey] = { ...sites[siteIdKey] };
+			return false;
+		});
+
+		return resultObj;
+	};
 
 	shouldFetchSiteAppStatuses = (
 		isOnboardingComplete,
@@ -78,7 +120,7 @@ class MySites extends React.Component {
 
 	checkValidAppStatusInReportData(siteId) {
 		const { reportSites } = this.props;
-		const isReportData = !!(reportSites && Object.keys(reportSites).length);
+		const isReportData = this.getValidObject(reportSites);
 		const isValidAppStatusInReportData = !!(
 			isReportData &&
 			reportSites[siteId] &&
@@ -93,14 +135,14 @@ class MySites extends React.Component {
 
 	renderStatusCards() {
 		const ref = this;
-		const { sites } = ref.props;
-		const isSites = !!(sites && Object.keys(sites).length);
+		const { sites } = ref.state;
+		const isSites = ref.getValidObject(sites);
 		const computedCards = isSites
 			? Object.keys(sites).map(siteIdKey => {
 					const site = sites[siteIdKey];
 					let siteStep = !site.step ? FIRST_ONBOARDING_STEP : site.step;
 					const isAppStatuses = ref.checkSiteAppStatuses(site);
-					const isValidAppStatuses = !!(isAppStatuses && Object.keys(site.appStatuses).length > 0);
+					const isValidAppStatuses = !!(isAppStatuses && ref.getValidObject(site.appStatuses));
 					const isValidAppStatusInReportData = ref.checkValidAppStatusInReportData(siteIdKey);
 					const isStepOnboardingComplete = ref.checkSiteStepOnboardingComplete(siteStep);
 					const isUserOnBoardingComplete = !!(
@@ -126,7 +168,7 @@ class MySites extends React.Component {
 					const domanizeDomain = domanize(site.domain);
 					const computedReportingUrl = `/reports/${siteId}`;
 					const computedManageSiteUrl = `/sites/${siteId}`;
-					const isSiteBlock = !!(statusObject.site && Object.keys(statusObject.site).length);
+					const isSiteBlock = ref.getValidObject(statusObject.site);
 					const computedRootClassName = `u-margin-r4 u-margin-b4`;
 
 					const computedOnboardingBlock = () => (
@@ -236,20 +278,49 @@ class MySites extends React.Component {
 		return computedCards;
 	}
 
+	renderAddNewSiteCard = () => (
+		<Link to="/addSite" className="aligner card-wrapper u-link-reset u-margin-b4">
+			<div className="card card--theme-dotted aligner aligner--vCenter aligner--hCenter u-cursor-pointer">
+				<div className="aligner aligner--column aligner--vCenter aligner--hCenter">
+					<FontAwesomeIcon size="2x" icon="plus-circle" className="u-margin-b3" />
+					<span>ADD NEW SITE</span>
+				</div>
+			</div>
+		</Link>
+	);
+
+	renderOnboardingCard() {
+		const { sites } = this.props;
+		const site = sites[Object.keys(sites)[0]];
+		const computedLinkUrl = `/onboarding?siteId=${site.siteId}`;
+		const computedButtonText = `Continue with ${site.domain}`;
+
+		return (
+			<OnboardingCard
+				className="add-site-card"
+				isActiveStep
+				expanded
+				count={1}
+				imgPath="/assets/images/ob_add_site.png"
+				heading="Complete Onboarding Setup"
+				description="Please complete your site onboarding setup by clicking below."
+			>
+				<Link to={computedLinkUrl} className="u-link-reset u-margin-t4 aligner aligner-item">
+					<CustomButton>{computedButtonText}</CustomButton>
+				</Link>
+			</OnboardingCard>
+		);
+	}
+
 	render() {
+		const { sites } = this.state;
+		const isValidUserSites = this.getValidObject(sites);
+
 		return (
 			<ActionCard title="My Sites">
 				<div className="u-padding-h4 u-padding-v5 aligner aligner--row aligner--wrap">
-					{this.renderStatusCards()}
-
-					<Link to="/addSite" className="aligner card-wrapper u-link-reset u-margin-b4">
-						<div className="card card--theme-dotted aligner aligner--vCenter aligner--hCenter u-cursor-pointer">
-							<div className="aligner aligner--column aligner--vCenter aligner--hCenter">
-								<FontAwesomeIcon size="2x" icon="plus-circle" className="u-margin-b3" />
-								<span>ADD NEW SITE</span>
-							</div>
-						</div>
-					</Link>
+					{isValidUserSites ? this.renderStatusCards() : this.renderOnboardingCard()}
+					{isValidUserSites ? this.renderAddNewSiteCard() : null}
 				</div>
 			</ActionCard>
 		);
