@@ -17,6 +17,6 @@ export default {
 	isLoggedin: () => !!cookies.get(authCookieName),
 	isOps: () => {
 		const authCookie = cookies.get(authCookieName);
-		return !!authCookie && authCookie.isOps;
+		return !!authCookie && authCookie.isSuperUser;
 	}
 };
