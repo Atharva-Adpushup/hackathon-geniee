@@ -193,7 +193,7 @@ router
 									'user',
 									JSON.stringify({
 										authToken: token,
-										isOps: false
+										isSuperUser: false
 									}),
 									{ maxAge: 86400000, path: '/' }
 								)
@@ -266,7 +266,7 @@ router
 									'user',
 									JSON.stringify({
 										authToken: token,
-										isOps: false
+										isSuperUser
 									}),
 									{ maxAge: 86400000, path: '/' }
 								)
