@@ -15,5 +15,8 @@ export default {
 		return Promise.reject();
 	},
 	isLoggedin: () => !!cookies.get(authCookieName),
-	isOps: () => cookies.get(authCookieName).isOps
+	isOps: () => {
+		const authCookie = cookies.get(authCookieName);
+		return !!authCookie && authCookie.isOps;
+	}
 };
