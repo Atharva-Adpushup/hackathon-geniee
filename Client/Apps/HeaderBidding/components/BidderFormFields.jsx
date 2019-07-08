@@ -81,11 +81,11 @@ class BidderFormFields extends React.Component {
 			errors[adSize] &&
 			errors[adSize][fieldKey]
 		) {
-			return <HelpBlock>{errors[adSize][fieldKey]}</HelpBlock>;
+			return <HelpBlock className="u-text-error">{errors[adSize][fieldKey]}</HelpBlock>;
 		}
 
 		if (!adSize && typeof errors === 'object' && errors !== null && errors[fieldKey]) {
-			return <HelpBlock>{errors[fieldKey]}</HelpBlock>;
+			return <HelpBlock className="u-text-error">{errors[fieldKey]}</HelpBlock>;
 		}
 
 		return false;
@@ -107,13 +107,15 @@ class BidderFormFields extends React.Component {
 						<Col componentClass={ControlLabel} sm={6}>
 							{fieldConfig.name + (!fieldConfig.isRequired ? ' (optional)' : '')}
 						</Col>
-						<Col sm={6}>{this.getBidderInputField(fieldConfig, fieldKey, collectionKey)}</Col>
-						{this.renderErrorMsg(
-							collectionKey,
-							fieldKey,
-							adSize ? tempParamsErrors : errors,
-							adSize
-						)}
+						<Col sm={6}>
+							{this.getBidderInputField(fieldConfig, fieldKey, collectionKey)}
+							{this.renderErrorMsg(
+								collectionKey,
+								fieldKey,
+								adSize ? tempParamsErrors : errors,
+								adSize
+							)}
+						</Col>
 					</FormGroup>
 				);
 			}

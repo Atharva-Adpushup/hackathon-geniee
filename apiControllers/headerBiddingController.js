@@ -140,7 +140,8 @@ router
 			relation,
 			bids,
 			revenueShare,
-			config: params
+			config: params,
+			isActive: true
 		};
 
 		return (
@@ -221,7 +222,8 @@ router
 			relation,
 			bids,
 			revenueShare,
-			config: params
+			config: params,
+			isActive: true
 		};
 
 		return (

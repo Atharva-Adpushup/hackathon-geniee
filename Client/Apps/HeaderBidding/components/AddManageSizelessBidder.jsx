@@ -182,6 +182,7 @@ class AddManageSizelessBidder extends React.Component {
 	setFormFieldValueInState = (stateKey, paramKey, value) => {
 		this.setState(state => {
 			const newState = { [stateKey]: { ...state[stateKey], [paramKey]: value } };
+			if (paramKey === 'bids' && value === 'net') newState[stateKey].revenueShare = '';
 			const newErrors = { ...state.errors };
 			const error = newErrors[paramKey];
 			const { validationSchema } = state;
@@ -210,23 +211,40 @@ class AddManageSizelessBidder extends React.Component {
 		return currValue;
 	};
 
+	getFormFieldsToRender = (formFields, isGrossBid) => {
+		const computedFormFields = {
+			bidderConfig: {},
+			params: {
+				...formFields.params.global,
+				...formFields.params.siteLevel,
+				...formFields.params.adUnitLevel
+			}
+		};
+
+		if (isGrossBid) {
+			computedFormFields.bidderConfig = formFields.bidderConfig;
+			return computedFormFields;
+		}
+
+		const { revenueShare, ...rest } = formFields.bidderConfig;
+		computedFormFields.bidderConfig = rest;
+		return computedFormFields;
+	};
+
 	render() {
 		const { openBiddersListView, formType } = this.props;
-		const { formFields, errors } = this.state;
+		const {
+			formFields,
+			bidderConfig: { bids },
+			errors
+		} = this.state;
 
 		return (
 			<React.Fragment>
 				{!!Object.keys(formFields).length && (
 					<Form horizontal onSubmit={this.onSubmit}>
 						<BidderFormFields
-							formFields={{
-								bidderConfig: formFields.bidderConfig,
-								params: {
-									...formFields.params.global,
-									...formFields.params.siteLevel,
-									...formFields.params.adUnitLevel
-								}
-							}}
+							formFields={this.getFormFieldsToRender(formFields, bids === 'gross')}
 							formType={formType}
 							setFormFieldValueInState={this.setFormFieldValueInState}
 							getCurrentFieldValue={this.getCurrentFieldValue}

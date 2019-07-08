@@ -5,6 +5,7 @@ import React from 'react';
 import BiddersList from './BiddersList';
 import AddBidder from './AddBidder';
 import ManageBidder from './ManageBidder';
+import Loader from '../../../Components/Loader/index';
 
 export default class BiddersTab extends React.Component {
 	state = {
@@ -37,7 +38,7 @@ export default class BiddersTab extends React.Component {
 
 		if (
 			bidderConfig.isActive &&
-			[('addBidder', 'manageBidder')].indexOf(view) > -1 &&
+			['addBidder', 'manageBidder'].indexOf(view) > -1 &&
 			currView !== view
 		) {
 			this.setState({ currView: view, bidderConfig: { key: bidderKey, ...bidderConfig } });
@@ -49,28 +50,28 @@ export default class BiddersTab extends React.Component {
 		const { siteId, bidders, addBidderAction, updateBidderAction, showNotification } = this.props;
 
 		return (
-			bidders &&
-			((currView === 'biddersList' && (
-				<BiddersList bidders={bidders} openAddManageBidderView={this.openAddManageBidderView} />
-			)) ||
-				(currView === 'addBidder' && (
-					<AddBidder
-						siteId={siteId}
-						bidderConfig={bidderConfig}
-						addBidderAction={addBidderAction}
-						openView={this.openView}
-						showNotification={showNotification}
-					/>
+			(bidders &&
+				((currView === 'biddersList' && (
+					<BiddersList bidders={bidders} openAddManageBidderView={this.openAddManageBidderView} />
 				)) ||
-				(currView === 'manageBidder' && (
-					<ManageBidder
-						siteId={siteId}
-						bidderConfig={bidderConfig}
-						updateBidderAction={updateBidderAction}
-						openView={this.openView}
-						showNotification={showNotification}
-					/>
-				)))
+					(currView === 'addBidder' && (
+						<AddBidder
+							siteId={siteId}
+							bidderConfig={bidderConfig}
+							addBidderAction={addBidderAction}
+							openView={this.openView}
+							showNotification={showNotification}
+						/>
+					)) ||
+					(currView === 'manageBidder' && (
+						<ManageBidder
+							siteId={siteId}
+							bidderConfig={bidderConfig}
+							updateBidderAction={updateBidderAction}
+							openView={this.openView}
+							showNotification={showNotification}
+						/>
+					)))) || <Loader />
 		);
 	}
 }
