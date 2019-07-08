@@ -27,10 +27,18 @@
 		}
 		.panel {
 			.panel-body {
-				padding: 0;
+				width: 100%;
+				padding-top: 75%;
+				position: relative;
 				img {
 					width: 100%;
-					height: auto;
+					height: 100%;
+					object-fit: cover;
+					position: absolute;
+					top: 0;
+					right: 0;
+					bottom: 0;
+					left: 0;
 				}
 			}
 			.panel-footer {
@@ -55,7 +63,7 @@
 				left: 0;
 				display: flex;
 				align-items: center;
-				justify-content: center;
+				text-align: center;
 				background: #eee;
 				opacity: 0.9;
 				z-index: 1;

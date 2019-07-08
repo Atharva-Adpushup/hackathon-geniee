@@ -573,7 +573,8 @@ function apiModule() {
 					}
 
 					return sizesArray;
-				});
+				})
+				.catch(err => []);
 		},
 		isApTagInventoryExist: siteId => {
 			return couchbase
@@ -623,13 +624,7 @@ function apiModule() {
 
 					return sizesArray;
 				})
-				.catch(err => {
-					if (err.code === 13) {
-						throw new AdPushupError('Inventory Not Found');
-					}
-
-					throw err;
-				});
+				.catch(err => []);
 		},
 		isInnovativeAdInventoryExist: siteId => {
 			return couchbase

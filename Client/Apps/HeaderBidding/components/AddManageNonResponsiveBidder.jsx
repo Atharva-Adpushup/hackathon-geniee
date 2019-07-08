@@ -231,6 +231,8 @@ class AddManageNonResponsiveBidder extends React.Component {
 				}
 			};
 
+			if (paramKey === 'bids' && value === 'net') newState[stateKey].revenueShare = '';
+
 			const newErrors = { ...state.errors };
 
 			const error = newErrors[paramKey];
@@ -274,19 +276,40 @@ class AddManageNonResponsiveBidder extends React.Component {
 		return currValue;
 	};
 
+	getFormFieldsToRender = (formFields, isGrossBid) => {
+		const computedFormFields = {
+			bidderConfig: {},
+			globalParams: formFields.params.global
+		};
+
+		if (isGrossBid) {
+			computedFormFields.bidderConfig = formFields.bidderConfig;
+			return computedFormFields;
+		}
+
+		const { revenueShare, ...rest } = formFields.bidderConfig;
+		computedFormFields.bidderConfig = rest;
+		return computedFormFields;
+	};
+
 	render() {
 		const { openBiddersListView, formType } = this.props;
-		const { formFields, errors, fetchingSizes, validationSchema, sizes, params } = this.state;
+		const {
+			formFields,
+			bidderConfig: { bids },
+			errors,
+			fetchingSizes,
+			validationSchema,
+			sizes,
+			params
+		} = this.state;
 
 		return (
 			<React.Fragment>
 				{!fetchingSizes && (
 					<Form horizontal onSubmit={this.onSubmit}>
 						<BidderFormFields
-							formFields={{
-								bidderConfig: formFields.bidderConfig,
-								globalParams: formFields.params.global
-							}}
+							formFields={this.getFormFieldsToRender(formFields, bids === 'gross')}
 							formType={formType}
 							setFormFieldValueInState={this.setFormFieldValueInState}
 							getCurrentFieldValue={this.getCurrentFieldValue}
