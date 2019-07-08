@@ -38,9 +38,9 @@ function generateSiteChannelJSON(channelsWithAds, site) {
 			channelWithAds.unsyncedAds &&
 			Object.keys(channelWithAds.unsyncedAds).length
 		);
-		if (noAdsFound) {
-			return false;
-		}
+
+		if (noAdsFound) return false;
+
 		const isChannel = !!channelWithAds.channel;
 		const isPageGroupId = !!(isChannel && channelWithAds.channel.genieePageGroupId);
 		const { unsyncedAds, channel } = channelWithAds;
@@ -86,15 +86,28 @@ function generateSiteChannelJSON(channelsWithAds, site) {
 
 	return appBucket.getDoc(`${docKeys.user}${userEmail}`).then(docWithCas => {
 		const userData = docWithCas.value;
-		const pubId =
-			userData.adNetworkSettings && userData.adNetworkSettings.length
-				? userData.adNetworkSettings[0].pubId
-				: null;
+		const { adNetworkSettings = [], firstName, lastName } = userData;
+		const hasAdNetworkSettings = !!adNetworkSettings.length;
+		let pubId = null;
+		let refreshToken = null;
+
+		if (hasAdNetworkSettings) {
+			pubId = adNetworkSettings[0].pubId;
+			_.some(adNetworkSettings, network => {
+				if (network.networkName === 'DFP') {
+					refreshToken = network.refreshToken;
+					return true;
+				}
+				return false;
+			});
+		}
 
 		adpTagsUnsyncedAds.publisher = {
 			...adpTagsUnsyncedAds.publisher,
-			name: `${userData.firstName} ${userData.lastName}`,
-			id: pubId
+			...adpTagsUnsyncedAds.currentDFP,
+			name: `${firstName} ${lastName}`,
+			id: pubId,
+			refreshToken
 		};
 
 		adsenseUnsyncedAds = { ...adpTagsUnsyncedAds };
