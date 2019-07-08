@@ -315,10 +315,14 @@ class MySites extends React.Component {
 	render() {
 		const { sites } = this.state;
 		const isValidUserSites = this.getValidObject(sites);
+		let computedRootFlexboxClasses = isValidUserSites
+			? 'aligner aligner--row aligner--wrap'
+			: 'aligner aligner--vCenter aligner--hCenter';
+		computedRootFlexboxClasses = `u-padding-h4 u-padding-v5 my-sites-wrapper ${computedRootFlexboxClasses}`;
 
 		return (
 			<ActionCard title="My Sites">
-				<div className="u-padding-h4 u-padding-v5 aligner aligner--row aligner--wrap">
+				<div className={computedRootFlexboxClasses}>
 					{isValidUserSites ? this.renderStatusCards() : this.renderOnboardingCard()}
 					{isValidUserSites ? this.renderAddNewSiteCard() : null}
 				</div>

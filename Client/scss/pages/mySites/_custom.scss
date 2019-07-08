@@ -73,3 +73,9 @@ $cardMinHeight: 237px;
 		}
 	}
 }
+
+.my-sites-wrapper {
+	.onboarding-step > .counter-icon {
+		display: none !important;
+	}
+}
