@@ -5,6 +5,7 @@ var responsiveAds = require('./responsiveAds');
 var adp = require('./adp');
 var utils = require('./utils');
 var auction = require('./auction');
+var config = require('./config');
 var hb = {
 	createPrebidSlots: function(adpSlotsBatch) {
 		var prebidSlots = [];
@@ -35,10 +36,29 @@ var hb = {
 				size = adpSlot.optionalParam.overrideSizeTo.split('x');
 			}
 
+			var computedBidders = adpSlot.bidders.slice();
+			var sizeConfig = config.INVENTORY.deviceConfig.sizeConfig;
+
+			computedBidders.forEach(function (val, i) { 
+				var index;
+				for (index = 0; index < sizeConfig.length; index++){
+					var element = sizeConfig[index];
+					if(element.bidder === val.bidder) {
+						break;
+					}
+				}
+
+				if (!isNaN(index) && sizeConfig[index]) {
+					computedBidders[i].labelAny = sizeConfig[index].labels;
+				}
+
+			});
+			
+			
 			var prebidSlot = {
 				code: adpSlot.containerId,
 				mediaTypes: {},
-				bids: adpSlot.bidders
+				bids: computedBidders
 			}
 
 			adpSlot.formats.forEach(function (format) {

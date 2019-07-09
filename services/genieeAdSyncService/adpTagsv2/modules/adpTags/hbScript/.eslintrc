@@ -2,7 +2,7 @@
   "extends": ["prettier"],
   "plugins": ["prettier"],
   "parserOptions": {
-    "ecmaVersion": 5
+    "ecmaVersion": 6
   },
   "rules": {
 	  "prettier/prettier": 0

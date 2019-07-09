@@ -29,6 +29,49 @@ var auction = {
 			bidsBackHandler: that.getAuctionResponse.bind(that, adpBatchId)
 		});
 	},
+	getSizeConfig: function () {
+		var sizeConfigFromDB = config.INVENTORY.deviceConfig.sizeConfig;
+		var pbSizeConfig = [];
+		var labelIndexTracker = {};
+
+		sizeConfigFromDB.forEach(obj => {
+			// if label doesn't exist in pbSizeConfig
+			if (!labelIndexTracker[obj.labels[0]]) {
+				labelIndexTracker[obj.labels[0]] = pbSizeConfig.length;
+				pbSizeConfig.push({ mediaQuery: obj.mediaQuery, sizesSupported: obj.sizesSupported, labels: obj.labels });
+			}
+			// otherwise merge sizesSupported
+			else {
+				var deviceConfig = pbSizeConfig[labelIndexTracker[obj.labels[0]]];
+				var newSizes = deviceConfig.sizesSupported.concat(obj.sizesSupported);
+				var newUniqueSizes = newSizes.filter(function (value, index, self) {
+					return self.indexOf(value) === index;
+				});
+
+				deviceConfig.sizesSupported = newUniqueSizes;
+			}
+		});
+
+		return pbSizeConfig;
+	},
+	getBidderSettings: function () {
+		var bidders = config.INVENTORY.hbcf;
+		var bidderSettings = {};
+
+		for (var bidderCode in bidders) {
+			var revenueShare = parseFloat(bidders[bidderCode].revenueShare);
+
+			if (bidders.hasOwnProperty(bidderCode) && bidders[bidderCode].bids === 'gross' && !isNaN(revenueShare) ) {
+				bidderSettings[bidderCode] = {
+					bidCpmAdjustment: function (bidCpm) {
+						return bidCpm - bidCpm * (revenueShare / 100);
+					}
+				}
+			}
+		}
+
+		return bidderSettings;
+	},
 	setPrebidConfig: function(pbjs, prebidSlots) {
 		pbjs.setConfig({
 			rubicon: {
@@ -36,33 +79,13 @@ var auction = {
 			},
 			publisherDomain: adp.config.siteDomain,
 			bidderSequence: constants.PREBID.BIDDER_SEQUENCE,
-			priceGranularity: constants.PREBID.PRICE_GRANULARITY
+			priceGranularity: constants.PREBID.PRICE_GRANULARITY,
+			sizeConfig: this.getSizeConfig()
 		});
 
 		pbjs.addAdUnits(prebidSlots);
 
-		pbjs.bidderSettings = {
-			openx: {
-				bidCpmAdjustment: function(bidCpm) {
-					return bidCpm - bidCpm * (10 / 100);
-				}
-			},
-			districtm: {
-				bidCpmAdjustment: function(bidCpm) {
-					return bidCpm - bidCpm * (10 / 100);
-				}
-			},
-			oftmedia: {
-				bidCpmAdjustment: function(bidCpm) {
-					return bidCpm - bidCpm * (12 / 100);
-				}
-			},
-			rubicon: {
-				bidCpmAdjustment: function(bidCpm) {
-					return bidCpm - bidCpm * (20 / 100);
-				}
-			}
-		};
+		pbjs.bidderSettings = this.getBidderSettings();
 
 		pbjs.aliasBidder('appnexus', 'springserve');
 		pbjs.aliasBidder('appnexus', 'districtm');
