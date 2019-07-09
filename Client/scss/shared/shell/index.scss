@@ -7,6 +7,7 @@
 	flex-direction: column;
 	.sidebar-main-wrap {
 		height: calc(100vh - 55px);
+		min-height: 460px;
 		display: flex;
 		flex-grow: 1;
 		.main-content {
