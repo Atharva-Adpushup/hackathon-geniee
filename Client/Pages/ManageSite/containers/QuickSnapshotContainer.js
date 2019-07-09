@@ -4,10 +4,7 @@ import QuickSnapshot from '../components/quickSnapshot';
 const mapStateToProps = (state, ownProps) => {
 	const {
 		reports: {
-			data: {
-				dashboard: { widget: widget },
-				site: site
-			}
+			data: { widget, site }
 		}
 	} = state.global;
 	return {

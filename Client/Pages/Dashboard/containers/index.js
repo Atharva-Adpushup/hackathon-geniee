@@ -5,10 +5,7 @@ import { showNotification } from '../../../actions/uiActions';
 const mapStateToProps = (state, ownProps) => {
 	const {
 		reports: {
-			data: {
-				site,
-				dashboard: { widget }
-			}
+			data: { site, widget }
 		},
 		user
 	} = state.global;

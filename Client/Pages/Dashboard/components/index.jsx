@@ -18,34 +18,21 @@ import { convertObjToArr, getDateRange } from '../helpers/utils';
 class Dashboard extends React.Component {
 	constructor(props) {
 		super(props);
-		const { site } = this.props;
+		const { site, widget, reportType, siteId } = props;
 		const sites = [{ name: 'All', value: 'all' }, ...convertObjToArr(site)];
 		const topPerformingSite = sites.find(site => site['isTopPerforming']);
-		const selectedSite = topPerformingSite ? topPerformingSite['value'] : 'all';
-		const widgets = sortBy(this.props.widget, wid => wid.position);
-		for (let wid in widgets) {
-			widgets[wid]['isLoading'] = true;
-			widgets[wid]['selectedDate'] = dates[0].value;
-			if (widgets[wid]['name'] == 'per_ap_original') {
-				widgets[wid]['selectedSite'] = selectedSite;
-				widgets[wid]['selectedDimension'] = 'page_variation_type';
-			} else widgets[wid]['selectedSite'] = 'all';
-			if (widgets[wid]['name'] == 'rev_by_network') {
-				widgets[wid]['selectedDimension'] = 'network';
-			}
-			if (widgets[wid]['name'] == 'per_site_wise') {
-				widgets[wid]['selectedDimension'] = 'siteid';
-			}
-		}
+		const selectedSite =
+			reportType == 'site' ? siteId : topPerformingSite ? topPerformingSite['value'] : 'all';
+		const widgetsConfig = this.getWidgetConfig(widget, selectedSite, reportType);
 		this.state = {
 			quickDates: dates,
 			sites,
-			widgetsConfig: widgets
+			widgetsConfig
 		};
 	}
 	componentDidMount() {
 		const { showNotification, user } = this.props;
-		let { widgetsConfig } = this.state;
+		const { widgetsConfig } = this.state;
 		if (!user.isPaymentDetailsComplete && !window.location.pathname.includes('payment')) {
 			showNotification({
 				mode: 'error',
@@ -60,46 +47,67 @@ class Dashboard extends React.Component {
 		}
 	}
 
+	getWidgetConfig = (widgets, selectedSite, reportType) => {
+		const sortedWidgets = sortBy(widgets, ['position', 'name']);
+		const widgetsConfig = [];
+		for (let wid in sortedWidgets) {
+			let widget = { ...sortedWidgets[wid] };
+			widget['isLoading'] = true;
+			widget['selectedDate'] = dates[0].value;
+			if (reportType == 'site' || widget['name'] == 'per_ap_original')
+				widget['selectedSite'] = selectedSite;
+			else widget['selectedSite'] = 'all';
+			if (widget['name'] == 'per_ap_original') {
+				widget['selectedDimension'] = 'page_variation_type';
+			}
+			if (widget['name'] == 'rev_by_network') {
+				widget['selectedDimension'] = 'network';
+			}
+			if (widget['name'] == 'per_site_wise') {
+				widget['selectedDimension'] = 'siteid';
+			}
+			widgetsConfig.push(widget);
+		}
+		return widgetsConfig;
+	};
+
 	getWidgetComponent = widget => {
 		const { reportType } = this.props;
-		switch (widget.name) {
-			case 'estimated_earnings':
-				if (widget.isLoading) return this.renderLoader();
-				else return <EstimatedEarningsContainer displayData={widget.data} />;
-			case 'per_ap_original':
-				if (widget.isLoading) return this.renderLoader();
-				else
+		if (widget.isLoading) return <Loader height="20vh" />;
+		else
+			switch (widget.name) {
+				case 'estimated_earnings':
+					return <EstimatedEarningsContainer displayData={widget.data} />;
+				case 'per_ap_original':
 					return (
 						<PerformanceApOriginalContainer
 							displayData={widget.data}
 							isDataSufficient={widget.isDataSufficient}
 						/>
 					);
-			case 'per_overview':
-				if (widget.isLoading) return this.renderLoader();
-				else return <PerformanceOverviewContainer displayData={widget.data} />;
-			case 'per_site_wise':
-				if (widget.isLoading) return this.renderLoader();
-				else return <SitewiseReportContainer displayData={widget.data} reportType={reportType} />;
-			case 'rev_by_network':
-				if (widget.isLoading) return this.renderLoader();
-				else return <RevenueContainer displayData={widget.data} />;
-		}
+				case 'per_overview':
+					return <PerformanceOverviewContainer displayData={widget.data} />;
+				case 'per_site_wise':
+					if (reportType != 'site') {
+						return <SitewiseReportContainer displayData={widget.data} />;
+					} else return;
+				case 'per_site_wise_daily':
+					if (reportType == 'site') {
+						return <SitewiseReportContainer displayData={widget.data} reportType="site" />;
+					} else return;
+				case 'rev_by_network':
+					return <RevenueContainer displayData={widget.data} />;
+			}
 	};
-	renderLoader = () => (
-		<div style={{ position: 'relative', width: '100%' }}>
-			<Loader height="20vh" />
-		</div>
-	);
 
 	renderControl(wid) {
 		const { reportType } = this.props;
 		const { widgetsConfig, quickDates, sites } = this.state;
 		const { selectedDate, selectedSite, name } = widgetsConfig[wid];
-		let layoutSites;
-		if (name == 'per_ap_original') {
-			layoutSites = sites.filter(site => site['product'] && site['product']['Layout'] == 1);
-		}
+		const sitesToShow =
+			name == 'per_ap_original'
+				? sites.filter(site => site['product'] && site['product']['Layout'] == 1)
+				: sites;
 		return (
 			<div className="aligner aligner--hEnd">
 				{name !== 'estimated_earnings' ? (
@@ -134,7 +142,7 @@ class Dashboard extends React.Component {
 							isSearchable={false}
 							wrapperClassName="display-inline"
 							selected={selectedSite}
-							options={name == 'per_ap_original' ? layoutSites : sites}
+							options={sitesToShow}
 							onSelect={site => {
 								widgetsConfig[wid]['selectedSite'] = site;
 								this.setState({ widgetsConfig }, () => this.getDisplayData(wid));
@@ -177,26 +185,20 @@ class Dashboard extends React.Component {
 	getDisplayData = wid => {
 		const { widgetsConfig } = this.state;
 		const { selectedDate, selectedSite, path, name } = widgetsConfig[wid];
+		const { site } = this.props;
+		const siteIds = Object.keys(site);
 		const params = getDateRange(selectedDate);
-		const { reportType, siteId, site } = this.props;
-		if (reportType === 'site') {
-			params['siteid'] = siteId;
-			params['interval'] = 'daily';
-		} else if (selectedSite != 'all') params['siteid'] = selectedSite;
-		else {
-			const siteIds = Object.keys(site);
-			params['siteid'] = siteIds.toString();
-			params['interval'] = 'cumulative';
-		}
+		const hidPerApOriginData =
+			name == 'per_ap_original' &&
+			selectedSite != 'all' &&
+			site[selectedSite] &&
+			site[selectedSite]['dataAvailableOutOfLast30Days'] < 21;
+		params['siteid'] = selectedSite == 'all' ? siteIds.toString() : selectedSite;
 		widgetsConfig[wid]['isLoading'] = true;
 		widgetsConfig[wid]['startDate'] = params['fromDate'];
 		widgetsConfig[wid]['endDate'] = params['toDate'];
 		this.setState({ widgetsConfig });
-		if (
-			name == 'per_ap_original' &&
-			selectedSite != 'all' &&
-			site[selectedSite]['dataAvailableOutOfLast30Days'] < 21
-		) {
+		if (hidPerApOriginData) {
 			widgetsConfig[wid]['isDataSufficient'] = false;
 			widgetsConfig[wid]['isLoading'] = false;
 			this.setState({ widgetsConfig });
