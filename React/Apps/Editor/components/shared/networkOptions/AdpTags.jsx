@@ -1,9 +1,8 @@
 import React, { Component, PropTypes } from 'react';
-import ReactDOM from 'react-dom';
 import { Row, Col, Button, OverlayTrigger, Tooltip, Alert } from 'react-bootstrap';
 import CodeBox from '../codeBox';
-import { priceFloorKeys, iabSizes, refreshIntervals } from '../../../consts/commonConsts';
-import SelectBox from '../select/select.js';
+import { priceFloorKeys, iabSizes } from '../../../consts/commonConsts';
+import SelectBox from '../select/index';
 import CustomToggleSwitch from '../customToggleSwitch.jsx';
 import { getSupportedAdSizes } from '../../../../OpsPanel/lib/helpers';
 import MultipleAdSizeSelector from '../../outer/insertMenu/multipleAdSizeSelector.jsx';
@@ -17,7 +16,6 @@ class AdpTags extends Component {
 			headerBidding,
 			code,
 			refreshSlot,
-			refreshInterval,
 			overrideActive,
 			overrideSizeTo,
 			primaryAdSize
@@ -48,7 +46,6 @@ class AdpTags extends Component {
 			multipleAdSizes: [],
 			dfpAdunitId: '',
 			refreshSlot,
-			refreshInterval,
 			isBackwardCompatibleSizes: true,
 			isResponsive: isResponsiveAdSize,
 			overrideActive,
@@ -100,7 +97,6 @@ class AdpTags extends Component {
 			pf,
 			keyValues,
 			refreshSlot,
-			refreshInterval,
 			overrideActive,
 			overrideSizeTo,
 			multipleAdSizes,
@@ -116,6 +112,7 @@ class AdpTags extends Component {
 		if (shouldMultipleAdSizesBeComputed) {
 			computedMultipleAdSizes = this.getMultipleAdSizesOfPrimaryAdSize(isBackwardCompatibleSizes);
 		}
+
 		this.props.submitHandler({
 			headerBidding: !!hbAcivated,
 			keyValues: {
@@ -123,7 +120,6 @@ class AdpTags extends Component {
 				[fpKey]: pf
 			},
 			refreshSlot,
-			refreshInterval,
 			overrideActive,
 			overrideSizeTo: overrideActive ? overrideSizeTo : null,
 			multipleAdSizes: computedMultipleAdSizes,
@@ -286,18 +282,19 @@ class AdpTags extends Component {
 			? <Row className="mT-10">
 					<Col xs={12} className={props.fromPanel ? 'u-padding-0px mB-10' : 'mB-10'}>
 						<SelectBox
-							value={this.state.dfpAdunitId}
-							label="Select a DFP AdUnit Id"
-							onChange={this.handleDFPAdUnitIdChange}
-						>
-							{Object.keys(props.dfpAdUnitObject).map((value, index) => {
-								return (
-									<option key={index} title={value} value={value}>
-										{value}
-									</option>
-								);
-							})}
-						</SelectBox>
+							id="dfp-id-selectbox"
+							title="Select a DFP AdUnit Id"
+							onSelect={this.handleDFPAdUnitIdChange}
+							wrapperClassName={"mb-10 u-margin-b2"}
+							options={Object.keys(props.dfpAdUnitObject).map((value, index) => {
+									return {
+										name: value,
+										value:value
+									}
+								}
+							)}
+							selected={this.state.dfpAdunitId}
+						/>
 					</Col>
 				</Row>
 			: null;
@@ -319,21 +316,22 @@ class AdpTags extends Component {
 					<strong>Override size to</strong>
 				</Col>
 				<Col xs={6} className={this.props.fromPanel ? 'u-padding-l10px' : ''}>
-					<SelectBox
-						className="size-override-selectbox"
-						value={this.state.overrideSizeTo}
-						label="Select size"
-						showClear={false}
-						onChange={overrideSizeTo => {
-							this.setState({ overrideSizeTo });
-						}}
-					>
-						{getSupportedAdSizes().map((size, index) => (
-							<option key={index} value={`${size.width}x${size.height}`}>
-								{`${size.width}x${size.height}`}
-							</option>
-						))}
-					</SelectBox>
+				<SelectBox
+					id="size-override-selectbox"
+					title="Select size"
+					onSelect={overrideSizeTo => {
+						this.setState({ overrideSizeTo });
+					}}
+					wrapperClassName={"mb-10 u-margin-b2"}
+					options={getSupportedAdSizes().map((size, index) => {
+							return {
+								name: `${size.width}x${size.height}`,
+								value:`${size.width}x${size.height}`
+							}
+						}
+					)}
+					selected={this.state.overrideSizeTo}
+				/>
 				</Col>
 			</Row>
 		);
@@ -481,7 +479,7 @@ class AdpTags extends Component {
 			isGenieeEditableMode = !!(this.props.geniee && !isInsertMode);
 
 		return (
-			<div>
+			<div className="adpTag-wrapper">
 				{isGenieeEditableMode ? this.renderGenieeNote() : null}
 				{this.props.geniee
 					? null
@@ -492,19 +490,20 @@ class AdpTags extends Component {
 								</Col>
 								<Col xs={6} className={this.props.fromPanel ? 'u-padding-l10px' : ''}>
 									<SelectBox
-										value={this.state.fpKey}
-										label="Select Floor Price Key"
-										showClear={false}
-										onChange={fpKey => {
+										id="price-floor-key-selection"
+										title="Select Floor Price Key"
+										onSelect={fpKey => {
 											this.setState({ fpKey });
 										}}
-									>
-										{priceFloorKeys.map((item, index) => (
-											<option key={item} value={item}>
-												{item}
-											</option>
-										))}
-									</SelectBox>
+										selected={this.state.fpKey}
+										options={priceFloorKeys.map((item, index) => {
+											return {
+												name: item,
+												value: item
+											}
+										}
+										)}
+									/>
 								</Col>
 							</Row>
 							<Row className="mT-10">
@@ -530,53 +529,30 @@ class AdpTags extends Component {
 				{this.props.geniee ? this.renderManageMultipleAdSizeBlock() : null}
 				{!this.props.geniee ? this.renderOverrideSettings(isGenieeEditableMode) : null}
 				{!this.props.geniee && this.props.networkConfig && this.props.networkConfig.enableRefreshSlot
-					? <div>
-							<Row>
-								<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px' : ''}>
-									<CustomToggleSwitch
-										labelText="Refresh Slot"
-										className="mB-10"
-										checked={this.state.refreshSlot}
-										onChange={val => {
-											this.setState({ refreshSlot: !!val });
-										}}
-										layout="horizontal"
-										size="m"
-										on="Yes"
-										off="No"
-										defaultLayout={this.props.fromPanel ? false : true}
-										name={this.props.id ? `refreshSlotSwitch-${this.props.id}` : 'refreshSlotSwitch'}
-										id={
-											this.props.id
-												? `js-refresh-slot-switch-${this.props.id}`
-												: 'js-refresh-slot-switch'
-										}
-										customComponentClass={this.props.fromPanel ? 'u-padding-0px' : ''}
-									/>
-								</Col>
-							</Row>
-							<Row>
-								<Col xs={6} className={this.props.fromPanel ? 'u-padding-r10px' : ''}>
-									<strong>Refresh Interval</strong>
-								</Col>
-								<Col xs={6} className={this.props.fromPanel ? 'u-padding-l10px' : ''}>
-									<SelectBox
-										className="mB-10"
-										value={this.state.refreshInterval || refreshIntervals[0]}
-										showClear={false}
-										onChange={refreshInterval => {
-											this.setState({ refreshInterval });
-										}}
-									>
-										{refreshIntervals.map((item, index) => (
-											<option key={item} value={item}>
-												{item}
-											</option>
-										))}
-									</SelectBox>
-								</Col>
-							</Row>
-						</div>
+					? <Row>
+							<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px' : ''}>
+								<CustomToggleSwitch
+									labelText="Refresh Slot"
+									className="mB-10"
+									checked={this.state.refreshSlot}
+									onChange={val => {
+										this.setState({ refreshSlot: !!val });
+									}}
+									layout="horizontal"
+									size="m"
+									on="Yes"
+									off="No"
+									defaultLayout={this.props.fromPanel ? false : true}
+									name={this.props.id ? `refreshSlotSwitch-${this.props.id}` : 'refreshSlotSwitch'}
+									id={
+										this.props.id
+											? `js-refresh-slot-switch-${this.props.id}`
+											: 'js-refresh-slot-switch'
+									}
+									customComponentClass={this.props.fromPanel ? 'u-padding-0px' : ''}
+								/>
+							</Col>
+						</Row>
 					: null}
 				{this.renderAdvancedBlock()}
 				<div>{this.renderButtons(buttonType, showButtons, this.save, onCancel)}</div>

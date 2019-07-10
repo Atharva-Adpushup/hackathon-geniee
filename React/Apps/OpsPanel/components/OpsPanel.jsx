@@ -38,9 +38,6 @@ class OpsPanel extends React.Component {
 			deviceConfigString: JSON.stringify({
 				sizeConfig: []
 			}),
-			countryConfig: {
-				labels: []
-			},
 			sizesSelected: [],
 			currentSize: null,
 			isModalOpen: false,
@@ -183,22 +180,9 @@ class OpsPanel extends React.Component {
 
 		if (!this.state.errorMessage) {
 			const parsedConfig = JSON.parse(configs);
-
-			switch (configName) {
-				case 'deviceConfig':
-					this.setState({
-						deviceConfig: {
-							sizeConfig: parsedConfig.sizeConfig.filter(data => data.sizesSupported.length > 0)
-						}
-					});
-					break;
-
-				case 'countryConfig':
-					this.setState({
-						countryConfig: parsedConfig.concat([])
-					});
-					break;
-			}
+			this.setState({
+				deviceConfig: { sizeConfig: parsedConfig.sizeConfig.filter(data => data.sizesSupported.length > 0) }
+			});
 
 			return true;
 		}

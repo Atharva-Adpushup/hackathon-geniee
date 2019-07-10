@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
-import SelectBox from 'shared/select/select.js';
+import SelectBox from '../../shared/select/index';
 import CustomToggleSwitch from 'components/shared/customToggleSwitch.jsx';
 import LabelWithButton from 'components/shared/labelWithButton.jsx';
 import CodeBox from 'shared/codeBox';

@@ -13,14 +13,13 @@ import {
 	updateIncontentFloat,
 	updatePartnerData,
 	updateInContentMinDistanceFromPrevAd,
-	updateInContentNotNear,
 	scrollSectionIntoView,
 	updateSection,
 	updateType,
 	updateFormatData,
 	toggleLazyLoad
 } from 'actions/sectionActions.js';
-import { updateNetwork, updateAdCode, updateAd, updateCustomCss, updateMultipleAdSizes } from 'actions/adActions';
+import { updateNetwork, updateAdCode, updateAd, updateCustomCss } from 'actions/adActions';
 import { resetErrors, showNotification } from 'actions/uiActions';
 import { generateReport } from 'actions/reportingActions';
 import Filters from './filters.jsx';
@@ -56,8 +55,7 @@ class variationSections extends Component {
 	}
 
 	datesUpdated(e) {
-		let target = e.target,
-			type = target.getAttribute('name');
+		let target = e.target, type = target.getAttribute('name');
 
 		this.setState({
 			[type]: target.value
@@ -93,7 +91,6 @@ class variationSections extends Component {
 			onUpdateOperation,
 			onUpdateCustomCss,
 			onUpdateInContentMinDistanceFromPrevAd,
-			onUpdateInContentNotNear,
 			onSectionAllXPaths,
 			onValidateXPath,
 			onIncontentFloatUpdate,
@@ -104,7 +101,6 @@ class variationSections extends Component {
 			onSectionXPathValidate,
 			onScrollSectionIntoView,
 			updateAd,
-			updateMultipleAdSizes,
 			updateSection,
 			showNotification,
 			updateType,
@@ -118,60 +114,56 @@ class variationSections extends Component {
 				<span>
 					<h1 className="variation-section-heading">Variation Sections</h1>
 				</span>
-				{ui.variationPanel.expanded ? (
-					<Filters
-						generateReport={this.generateReportWrapper}
-						datesUpdated={this.datesUpdated}
-						startDate={this.state.startDate}
-						endDate={this.state.endDate}
-					/>
-				) : null}
+				{ui.variationPanel.expanded
+					? <Filters
+							generateReport={this.generateReportWrapper}
+							datesUpdated={this.datesUpdated}
+							startDate={this.state.startDate}
+							endDate={this.state.endDate}
+						/>
+					: null}
 				{!sections.length ? <span>No Sections</span> : ''}
 				<ul className="section-list row">
-					{this.state.loadingReport ? (
-						<PaneLoader
-							message="Loading Data!"
-							state="load"
-							styles={{ height: '500px', background: '#ebebeb' }}
-						/>
-					) : (
-						sections.map((section, key) => (
-							<div key={key} className="col-sm-6">
-								<VariationSectionElement
-									section={section}
-									key={key}
-									variation={variation}
-									onDeleteSection={onDeleteSection}
-									onRenameSection={onRenameSection}
-									updateAdCode={updateAdCode}
-									updateNetwork={updateNetwork}
-									onUpdatePartnerData={onUpdatePartnerData}
-									onUpdateXPath={onUpdateXPath}
-									onUpdateOperation={onUpdateOperation}
-									onUpdateCustomCss={onUpdateCustomCss}
-									onUpdateInContentMinDistanceFromPrevAd={onUpdateInContentMinDistanceFromPrevAd}
-									onUpdateInContentNotNear={onUpdateInContentNotNear}
-									onSectionAllXPaths={onSectionAllXPaths}
-									onValidateXPath={onValidateXPath}
-									onResetErrors={onResetErrors}
-									onSectionXPathValidate={onSectionXPathValidate}
-									onIncontentFloatUpdate={onIncontentFloatUpdate}
-									onScrollSectionIntoView={onScrollSectionIntoView}
-									updateSection={updateSection}
-									updateAd={updateAd}
-									updateMultipleAdSizes={updateMultipleAdSizes}
-									ui={ui}
-									reporting={reporting}
-									showNotification={showNotification}
-									platform={platform}
-									onSetSectionType={updateType}
-									onFormatDataUpdate={updateFormatData}
-									onToggleLazyLoad={toggleLazyLoad}
-									networkConfig={networkConfig}
-								/>
-							</div>
-						))
-					)}
+					{this.state.loadingReport
+						? <PaneLoader
+								message="Loading Data!"
+								state="load"
+								styles={{ height: '500px', background: '#ebebeb' }}
+							/>
+						: sections.map((section, key) => (
+								<div key={key} className="col-sm-6">
+									<VariationSectionElement
+										section={section}
+										key={key}
+										variation={variation}
+										onDeleteSection={onDeleteSection}
+										onRenameSection={onRenameSection}
+										updateAdCode={updateAdCode}
+										updateNetwork={updateNetwork}
+										onUpdatePartnerData={onUpdatePartnerData}
+										onUpdateXPath={onUpdateXPath}
+										onUpdateOperation={onUpdateOperation}
+										onUpdateCustomCss={onUpdateCustomCss}
+										onUpdateInContentMinDistanceFromPrevAd={onUpdateInContentMinDistanceFromPrevAd}
+										onSectionAllXPaths={onSectionAllXPaths}
+										onValidateXPath={onValidateXPath}
+										onResetErrors={onResetErrors}
+										onSectionXPathValidate={onSectionXPathValidate}
+										onIncontentFloatUpdate={onIncontentFloatUpdate}
+										onScrollSectionIntoView={onScrollSectionIntoView}
+										updateSection={updateSection}
+										updateAd={updateAd}
+										ui={ui}
+										reporting={reporting}
+										showNotification={showNotification}
+										platform={platform}
+										onSetSectionType={updateType}
+										onFormatDataUpdate={updateFormatData}
+										onToggleLazyLoad={toggleLazyLoad}
+										networkConfig={networkConfig}
+									/>
+								</div>
+							))}
 				</ul>
 			</div>
 		);
@@ -189,7 +181,6 @@ variationSections.propTypes = {
 	onUpdateOperation: PropTypes.func,
 	onUpdateCustomCss: PropTypes.func,
 	onUpdateInContentMinDistanceFromPrevAd: PropTypes.func,
-	onUpdateInContentNotNear: PropTypes.func,
 	onSectionAllXPaths: PropTypes.func,
 	onValidateXPath: PropTypes.func,
 	onSectionXPathValidate: PropTypes.func,
@@ -199,7 +190,6 @@ variationSections.propTypes = {
 	generateReport: PropTypes.func,
 	showNotification: PropTypes.func,
 	updateAd: PropTypes.func,
-	updateMultipleAdSizes: PropTypes.func,
 	updateSection: PropTypes.func,
 	ui: PropTypes.object,
 	reporting: PropTypes.object
@@ -218,7 +208,6 @@ export default connect(
 				onUpdateXPath: updateXPath,
 				onUpdateOperation: updateOperation,
 				onUpdateInContentMinDistanceFromPrevAd: updateInContentMinDistanceFromPrevAd,
-				onUpdateInContentNotNear: updateInContentNotNear,
 				onSectionAllXPaths: sectionAllXPaths,
 				onValidateXPath: validateXPath,
 				onResetErrors: resetErrors,
@@ -231,7 +220,6 @@ export default connect(
 				showNotification: showNotification,
 				updateSection: updateSection,
 				updateAd: updateAd,
-				updateMultipleAdSizes: updateMultipleAdSizes,
 				updateType: updateType,
 				updateFormatData: updateFormatData,
 				toggleLazyLoad: toggleLazyLoad

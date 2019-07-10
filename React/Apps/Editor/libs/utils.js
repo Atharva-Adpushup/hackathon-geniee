@@ -471,34 +471,6 @@ const randomStore = [],
 					}
 				});
 			});
-		},
-		isMultipleAdSizeWithNonSupportedNetwork: (ad, adNetwork, iabSizes) => {
-			const { multipleAdSizes } = ad;
-			const { MULTIPLE_AD_SIZES_SUPPORTED_NETWORKS: supportedNetworks } = iabSizes;
-			const isMultipleAdSizes = !!(multipleAdSizes && multipleAdSizes.length);
-			const isNonSupportedNetwork = !!(supportedNetworks.indexOf(adNetwork) === -1);
-			const isValid = !!(ad && adNetwork && isMultipleAdSizes && isNonSupportedNetwork);
-
-			return isValid;
-		},
-		updateMultipleAdSizes: (ad, inputData, iabSizes, ref) => {
-			const {
-				networkData: { multipleAdSizes }
-			} = inputData;
-			const isMultipleAdSizesInInputData = Array.isArray(multipleAdSizes);
-			// Below 'isMultipleAdSizeWithNonSupportedNetwork' check is added to ensure that ad 'multipleAdSizes' property
-			// value gets null if ad network gets changed to a non-supported (like adsense, medianet, custom etc) one.
-			const isMultipleAdSizeWithNonSupportedNetwork = Utils.isMultipleAdSizeWithNonSupportedNetwork(
-				ad,
-				inputData.network,
-				iabSizes
-			);
-
-			if (isMultipleAdSizeWithNonSupportedNetwork) {
-				return ref.props.updateMultipleAdSizes(ad.id, null);
-			} else if (isMultipleAdSizesInInputData) {
-				return ref.props.updateMultipleAdSizes(ad.id, multipleAdSizes);
-			}
 		}
 	};
 

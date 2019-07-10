@@ -1,7 +1,7 @@
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import AdsDescriptor from 'editMenu/adDescriptor.jsx';
-import { updateCss, updateAdCode, updateNetwork, updateAd, updateMultipleAdSizes } from '../actions/adActions';
+import { updateCss, updateAdCode, updateNetwork } from '../actions/adActions';
 import { showNotification } from '../actions/uiActions';
 import { resetErrors } from 'actions/uiActions';
 import {
@@ -25,8 +25,6 @@ export default connect(
 				updateCss: updateCss,
 				updateAdCode: updateAdCode,
 				updateNetwork: updateNetwork,
-				updateAd: updateAd,
-				updateMultipleAdSizes: updateMultipleAdSizes,
 				onUpdateXPath: updateXPath,
 				onUpdateOperation: updateOperation,
 				onSectionAllXPaths: sectionAllXPaths,

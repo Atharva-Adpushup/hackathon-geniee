@@ -21,22 +21,7 @@ const createAd = payload => ({
 		adId,
 		params
 	}),
-	updateMultipleAdSizes = (adId, multipleAdSizes) => ({
-		type: adActions.UPDATE_MULTIPLE_AD_SIZES,
-		adId,
-		multipleAdSizes
-	}),
 	updateAdCode = (adId, adCode, network) => ({ type: adActions.UPDATE_ADCODE, adId, adCode, network }),
 	updateLogWritten = (adId, isLogWritten) => ({ type: adActions.UPDATE_LOG_WRITTEN, adId, isLogWritten });
 
-export {
-	createAd,
-	deleteAd,
-	updateCss,
-	updateCustomCss,
-	updateAdCode,
-	updateNetwork,
-	updateAd,
-	updateMultipleAdSizes,
-	updateLogWritten
-};
+export { createAd, deleteAd, updateCss, updateCustomCss, updateAdCode, updateNetwork, updateAd, updateLogWritten };

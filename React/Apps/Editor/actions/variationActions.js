@@ -55,13 +55,6 @@ const getLastVariationNumber = function(variations) {
 		variationId,
 		channelId
 	}),
-	initIncontentAdsPreview = (channelId, contentSelector, ads, config) => ({
-		type: variationActions.INIT_INCONTENT_ADS_PREVIEW,
-		channelId,
-		contentSelector,
-		ads,
-		config
-	}),
 	updateInContentTreeSelectorsLevel = (variationId, selectorsTreeLevel) => dispatch => {
 		dispatch({
 			type: variationActions.UPDATE_INCONTENT_SELECTORS_TREE_LEVEL,
@@ -75,32 +68,6 @@ const getLastVariationNumber = function(variations) {
 			message: 'Variation incontent selectors tree level setting saved'
 		});
 	},
-	updateInContentSectionBracket = (variationId, incontentSectionBracket) => dispatch => {
-		dispatch({
-			type: variationActions.UPDATE_INCONTENT_SECTION_BRACKET,
-			variationId,
-			incontentSectionBracket
-		});
-		dispatch({
-			type: uiActions.SHOW_NOTIFICATION,
-			mode: 'success',
-			title: 'Operation Successful',
-			message: 'Variation incontent section bracket setting saved'
-		});
-	},
-	updateInContentEvenSpacingAlgo = (variationId, incontentEvenSpacingAlgo) => dispatch => {
-		dispatch({
-			type: variationActions.TOGGLE_INCONTENT_EVEN_SPACING_ALGO,
-			variationId,
-			incontentEvenSpacingAlgo
-		});
-		dispatch({
-			type: uiActions.SHOW_NOTIFICATION,
-			mode: 'success',
-			title: 'Operation Successful',
-			message: 'Variation incontent even spacing technique setting saved'
-		});
-	},
 	copyVariation = (variationId, channelId) => (dispatch, getState) => {
 		const newVariationId = Utils.getRandomNumber(),
 			ads = [],
@@ -108,9 +75,6 @@ const getLastVariationNumber = function(variations) {
 			copyFromVariation = getVariationSectionsWithAds(state, { variationId }),
 			sectionIds = [],
 			newName = `Variation ${getLastVariationNumber(getChannelVariationsWithAds(state, { channelId })) + 1}`;
-
-		// Delete 'isControl' property from copied data as only one variation can be tagged as 'control/baseline'
-		delete copyFromVariation.isControl;
 
 		dispatch({
 			type: variationActions.COPY_VARIATION,
@@ -214,17 +178,17 @@ const getLastVariationNumber = function(variations) {
 			),
 			computedMessage = isControl ? 'tagged as' : 'removed the tag',
 			computedConfirmationMessage = `Are you sure you want to ${
-				isControl ? 'tag this variation as Baseline?' : 'remove Baseline tag from this variation'
+				isControl ? 'tag this variation as Control?' : 'remove Control tag from this variation'
 			}`,
-			notificationMessage = `Successfully ${computedMessage} Baseline Variation`,
+			notificationMessage = `Successfully ${computedMessage} Control Variation`,
 			isCurrentVariationSections = !!(currentVariationObj.sections && currentVariationObj.sections.length);
 
 		if (hasControlVariationsReachedLimit) {
 			dispatch({
 				type: uiActions.SHOW_NOTIFICATION,
 				mode: 'error',
-				title: 'Baseline Variations Limit',
-				message: 'Cannot create more than 1 baseline variation!'
+				title: 'Control Variations Limit',
+				message: 'Cannot create more than 1 control variation!'
 			});
 			return;
 		}
@@ -327,8 +291,5 @@ export {
 	saveKeyValues,
 	updateContentSelector,
 	updateInContentTreeSelectorsLevel,
-	updateInContentSectionBracket,
-	updateInContentEvenSpacingAlgo,
-	initIncontentAdsPreview,
 	savePersonalizationInfo
 };

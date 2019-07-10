@@ -24,13 +24,6 @@ class ModalWrapper extends React.Component {
 		const openx = findBidder(data, 'openx');
 		const conversant = findBidder(data, 'conversant');
 		const thirtyThreeAcross = findBidder(data, '33across');
-		const ix = findBidder(data, 'ix');
-		const rubicon = findBidder(data, 'rubicon');
-		const adyoulike = findBidder(data, 'adyoulike');
-		const pubmatic = findBidder(data, 'pubmatic');
-		const aardvark = findBidder(data, 'aardvark');
-		const criteo = findBidder(data, 'criteo');
-		const sovrn = findBidder(data, 'sovrn');
 
 		this.state = {
 			partnersSelected: props.data.map(obj => obj.bidder) || [],
@@ -68,32 +61,6 @@ class ModalWrapper extends React.Component {
 				siteId: thirtyThreeAcross ? thirtyThreeAcross.params.siteId : '',
 				productId: thirtyThreeAcross ? thirtyThreeAcross.params.productId : ''
 			},
-			ix: {
-				siteId: ix ? ix.params.siteId : '',
-				size: ix ? JSON.stringify(ix.params.size) : ''
-			},
-			rubicon: {
-				accountId: rubicon ? rubicon.params.accountId : '',
-				siteId: rubicon ? rubicon.params.siteId : '',
-				zoneId: rubicon ? rubicon.params.zoneId : ''
-			},
-			adyoulike: {
-				placement: adyoulike ? adyoulike.params.placement : ''
-			},
-			pubmatic: {
-				publisherId: pubmatic ? pubmatic.params.publisherId : '',
-				adSlot: pubmatic ? pubmatic.params.adSlot : ''
-			},
-			aardvark: {
-				ai: aardvark ? aardvark.params.ai : '',
-				sc: aardvark ? aardvark.params.sc : ''
-			},
-			criteo: {
-				zoneId: criteo ? criteo.params.zoneId : ''
-			},
-			sovrn: {
-				tagid: sovrn ? sovrn.params.tagid : ''
-			},
 			error: ''
 		};
 
@@ -129,13 +96,6 @@ class ModalWrapper extends React.Component {
 		const openx = findBidder(data, 'openx');
 		const conversant = findBidder(data, 'conversant');
 		const thirtyThreeAcross = findBidder(data, '33across');
-		const ix = findBidder(data, 'ix');
-		const rubicon = findBidder(data, 'rubicon');
-		const adyoulike = findBidder(data, 'adyoulike');
-		const pubmatic = findBidder(data, 'pubmatic');
-		const aardvark = findBidder(data, 'aardvark');
-		const criteo = findBidder(data, 'criteo');
-		const sovrn = findBidder(data, 'sovrn');
 
 		this.setState({
 			partnersSelected: nextProps.data.map(obj => ({ value: obj.bidder, label: obj.bidder })) || [],
@@ -173,32 +133,6 @@ class ModalWrapper extends React.Component {
 				siteId: thirtyThreeAcross ? thirtyThreeAcross.params.siteId : '',
 				productId: thirtyThreeAcross ? thirtyThreeAcross.params.productId : ''
 			},
-			ix: {
-				siteId: ix ? ix.params.siteId : '',
-				size: ix ? JSON.stringify(ix.params.size) : ''
-			},
-			rubicon: {
-				accountId: rubicon ? rubicon.params.accountId : '',
-				siteId: rubicon ? rubicon.params.siteId : '',
-				zoneId: rubicon ? rubicon.params.zoneId : ''
-			},
-			adyoulike: {
-				placement: adyoulike ? adyoulike.params.placement : ''
-			},
-			aardvark: {
-				ai: aardvark ? aardvark.params.ai : '',
-				sc: aardvark ? aardvark.params.sc : ''
-			},
-			pubmatic: {
-				publisherId: pubmatic ? pubmatic.params.publisherId : '',
-				adSlot: pubmatic ? pubmatic.params.adSlot : ''
-			},
-			criteo: {
-				zoneId: criteo ? criteo.params.zoneId : ''
-			},
-			sovrn: {
-				tagid: sovrn ? sovrn.params.tagid : ''
-			},
 			error: ''
 		});
 	}
@@ -213,14 +147,9 @@ class ModalWrapper extends React.Component {
 				}
 			});
 
-			let params = this.state[partner.value];
-			if (partner.value === 'ix' && params && params.size) {
-				params.size = JSON.parse(params.size);
-			}
-
 			return {
 				bidder: partner.value,
-				params
+				params: this.state[partner.value]
 			};
 		});
 

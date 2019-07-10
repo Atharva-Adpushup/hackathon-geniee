@@ -3,7 +3,7 @@ import Messenger from 'libs/messenger';
 import { openChannelSuccess, contentSelectorMissing, contentSelectorWorked } from 'actions/channelActions';
 import { deleteAd } from 'actions/adActions';
 import { deleteSection } from 'actions/sectionActions';
-import { showEditMenu, showInsertMenu, showNotification } from '../actions/uiActions';
+import { showEditMenu, showInsertMenu } from '../actions/uiActions';
 
 const messenger = new Messenger(),
 	getTarget = channelId => {
@@ -40,16 +40,6 @@ const messenger = new Messenger(),
 						isValidXPath: data.isValidXPath,
 						xpath: data.xpath
 					});
-					break;
-
-				case messengerCommands.SHOW_INCONTENT_ADS_PREVIEW_RESULT:
-					dispatch(
-						showNotification({
-							mode: data.type,
-							title: 'IncontentAnalyzer Preview Result',
-							message: data.message
-						})
-					);
 					break;
 
 				case messengerCommands.XPATH_SECTION_VALIDATED:

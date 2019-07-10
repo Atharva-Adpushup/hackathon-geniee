@@ -140,24 +140,6 @@ const variation = (state = {}, action) => {
 					}
 				};
 
-			case variationActions.UPDATE_INCONTENT_SECTION_BRACKET:
-				return {
-					...state,
-					[action.variationId]: {
-						...state[action.variationId],
-						incontentSectionBracket: action.incontentSectionBracket
-					}
-				};
-
-			case variationActions.TOGGLE_INCONTENT_EVEN_SPACING_ALGO:
-				return {
-					...state,
-					[action.variationId]: {
-						...state[action.variationId],
-						enableIncontentEvenSpacingAlgo: action.incontentEvenSpacingAlgo
-					}
-				};
-
 			case variationActions.UPDATE_CONTENT_SELECTOR:
 				return {
 					...state,

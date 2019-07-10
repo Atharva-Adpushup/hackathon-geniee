@@ -68,26 +68,20 @@ const createSection = (sectionPayload, adPayload, variationId) => dispatch => {
 			return;
 		}
 
-		const adId = Utils.getRandomNumber();
-		const sectionId = Utils.getRandomNumber();
-		const float = sectionPayload.float;
-		const css = float !== 'none' ? (float === 'left' ? leftSectionCss : rightSectionCss) : defaultSectionCss;
-		const customCSS = adPayload.customCSS || '';
-		const multipleAdSizes = adPayload.multipleAdSizes || null;
-		const adData = {};
-		const network =
-			currentUser.userType === 'partner' ? 'geniee' : adPayload.network ? adPayload.network : 'custom';
-		const isAdPayload = !!adPayload;
-		const isAdNetworkData = !!(isAdPayload && adPayload.networkData);
-		const isZoneId = !!(isAdNetworkData && adPayload.networkData.zoneId);
-		const isCreateZoneContainerId = !!(isZoneId && adPayload.networkData.createZoneContainerId);
-		let adWidth = adPayload.adSize.substr(0, adPayload.adSize.indexOf('x')).trim();
-		let adHeight = adPayload.adSize.substr(adPayload.adSize.indexOf('x') + 1).trim();
-		let isAdWidthNotANumber = isNaN(adWidth);
-		let isAdHeightNotANumber = isNaN(adHeight);
-
-		adWidth = isAdWidthNotANumber ? adWidth : parseInt(adWidth, 10);
-		adHeight = isAdHeightNotANumber ? adHeight : parseInt(adHeight, 10);
+		const adId = Utils.getRandomNumber(),
+			sectionId = Utils.getRandomNumber(),
+			float = sectionPayload.float,
+			css = float !== 'none' ? (float === 'left' ? leftSectionCss : rightSectionCss) : defaultSectionCss,
+			customCSS = adPayload.customCSS || '',
+			multipleAdSizes = adPayload.multipleAdSizes || null,
+			adData = {},
+			adWidth = parseInt(adPayload.adSize.substr(0, adPayload.adSize.indexOf('x')).trim(), 10),
+			adHeight = parseInt(adPayload.adSize.substr(adPayload.adSize.indexOf('x') + 1).trim(), 10),
+			network = currentUser.userType === 'partner' ? 'geniee' : adPayload.network ? adPayload.network : 'custom',
+			isAdPayload = !!adPayload,
+			isAdNetworkData = !!(isAdPayload && adPayload.networkData),
+			isZoneId = !!(isAdNetworkData && adPayload.networkData.zoneId),
+			isCreateZoneContainerId = !!(isZoneId && adPayload.networkData.createZoneContainerId);
 
 		if (isCreateZoneContainerId) {
 			adPayload.networkData.zoneContainerId = `${adPayload.networkData.zoneId}-${adId}`;
@@ -215,13 +209,6 @@ const createSection = (sectionPayload, adPayload, variationId) => dispatch => {
 			minDistanceFromPrevAd
 		};
 	},
-	updateInContentNotNear = (sectionId, notNear) => {
-		return {
-			type: sectionActions.UPDATE_INCONTENT_NOT_NEAR,
-			sectionId,
-			notNear
-		};
-	},
 	updateType = (sectionId, value) => {
 		return {
 			type: sectionActions.UPDATE_TYPE,
@@ -304,7 +291,6 @@ export {
 	updateXPath,
 	updateOperation,
 	updateInContentMinDistanceFromPrevAd,
-	updateInContentNotNear,
 	sectionAllXPaths,
 	validateXPath,
 	validateSectionXPath,

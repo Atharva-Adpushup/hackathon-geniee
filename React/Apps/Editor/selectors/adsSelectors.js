@@ -8,7 +8,7 @@ const getAllAds = state => state.adByIds,
 			return (
 				ad.network != 'geniee' &&
 				ad.network != 'adpTags' &&
-				((!ad.networkData.adCode || !ad.networkData.adCode.length) && !ad.networkData.shouldSync)
+				(!ad.networkData.adCode || !ad.networkData.adCode.length)
 			);
 		});
 	};
