@@ -24,13 +24,7 @@ module.exports = [
 				React: path.resolve('./node_modules/react')
 			},
 			// root: path.resolve('./Editor'),
-			modules: [
-				'./Apps/Editor',
-				'./components/',
-				'./components/outer',
-				'./components/shared',
-				'node_modules'
-			],
+			modules: ['./Apps/Editor', './components/', './components/outer', './components/shared', 'node_modules'],
 			extensions: ['.js', '.jsx', '.css']
 		},
 		externals: {
@@ -87,13 +81,7 @@ module.exports = [
 				React: path.resolve('./node_modules/react')
 			},
 			// root: path.resolve('./Editor'),
-			modules: [
-				'./Apps/Editor',
-				'./components/',
-				'./components/outer',
-				'./components/shared',
-				'node_modules'
-			],
+			modules: ['./Apps/Editor', './components/', './components/outer', './components/shared', 'node_modules'],
 			extensions: ['.js', '.jsx', '.css']
 		},
 		module: {

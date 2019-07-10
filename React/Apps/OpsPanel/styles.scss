@@ -1,0 +1,123 @@
+$SBContainerWidth: 100%;
+$SBPaddingTB: 5px;
+$SBPaddingLR: 8px;
+$whiteColor: #fff;
+$SBBorderColor: #e6e6e6;
+$FMInputBorderColorActive: #ccc;
+$SBArrowRight: 10px;
+$SBArrowBorder: 5px;
+$SBArrowColor: #555555;
+$fontColor: #555555;
+$SBBorderColorActive: #ccc;
+$primaryColor: #eb575c;
+
+.hb-settings-text {
+	color: $fontColor;
+	font-size: 1.2em;
+}
+
+.hb-additional-options {
+	input {
+		font-size: 1.1em;
+		border: 1px solid $SBBorderColor;
+	}
+}
+
+.hb-config-creator {
+	padding: 20px;
+	border: 1px solid $SBBorderColor;
+	border-radius: 3px;
+	margin-bottom: 15px;
+
+	.hb-setup-creator {
+		padding: 20px;
+		border: 1px solid $SBBorderColor;
+		position: relative;
+		border-radius: 3px;
+		margin-bottom: 20px;
+
+		input {
+			font-size: 1.1em;
+			border: 1px solid $SBBorderColor;
+		}
+
+		.hb-partner-options-creator {
+			background: $SBBorderColor;
+			padding: 15px 15px 12px;
+			background: $SBBorderColor;
+			border-bottom: 1px solid $FMInputBorderColorActive;
+		}
+
+		.hb-remove {
+			width: auto;
+			padding: 0;
+			background: none;
+			border: none;
+			color: $primaryColor;
+			text-decoration: underline;
+			margin-top: 2px;
+		}
+
+		.setup-gap {
+			height: 200px;
+			background: lighten($SBBorderColor, 5%);
+			border: 2px dashed darken($SBBorderColor, 5%);
+			border-radius: 3px;
+			text-align: center;
+			position: relative;
+
+			span {
+				color: $fontColor;
+				font-size: 1.1em;
+				position: absolute;
+				display: block;
+				text-align: center;
+				width: 100%;
+				left: 0;
+				top: 20%;
+				padding: 45px;
+			}
+		}
+	}
+
+	.btn-add-setup {
+		height: 275px;
+		background: $whiteColor;
+		border: 2px dashed darken($SBBorderColor, 5%) !important;
+		color: $fontColor;
+		font-size: 1.1em;
+
+		&:hover {
+			box-shadow: none;
+			color: $fontColor;
+		}
+	}
+
+	.partner-creator {
+		height: 200px;
+		overflow-y: scroll;
+	}
+}
+
+.inputMinimal {
+	width: 100%;
+	padding: 6px 10px;
+	border-radius: 3px;
+	border: 2px solid rgb(204, 204, 204);
+}
+
+.live-sites-filters {
+	.DateRangePicker.DateRangePicker_1 {
+		width: 100% !important;
+	}
+}
+
+.hb-config-input {
+	height: 400px;
+	overflow-x: hidden;
+	overflow-y: scroll;
+	&,
+	&:focus {
+		border-color: #999;
+	}
+}
