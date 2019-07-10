@@ -5,7 +5,7 @@ const uuid = require('node-uuid');
 const request = require('request-promise');
 
 const userModel = require('../models/userModel');
-const Promise = require('bluebird');
+const siteModel = require('../models/siteModel');
 const utils = require('../helpers/utils');
 const CC = require('../configs/commonConsts');
 const httpStatus = require('../configs/httpStatusConsts');
@@ -30,7 +30,7 @@ router
 	.post('/addSite', (req, res) => {
 		const site = req.body.site ? utils.getSafeUrl(req.body.site) : req.body.site;
 
-		formValidator
+		return formValidator
 			.validate({ site }, schema.user.validations)
 			.then(() => userModel.addSite(req.user.email, site))
 			.spread((user, siteId) => {
@@ -46,24 +46,12 @@ router
 						// eslint-disable-next-line no-shadow
 						const { siteId, domain, onboardingStage, step } = userSites[i];
 
-								return res
-									.status(httpStatus.OK)
-									.json({ siteId, site: domain, onboardingStage, step });
-							}
-						}
-						return res
-							.status(httpStatus.INTERNAL_SERVER_ERROR)
-							.json({ error: 'Error while Adding site' });
-					})
-					.catch(err => {
-						console.log('Error while Adding site', err);
-						if (err.message.status === 409) {
-							return res.status(409).json({ error: err.message.message });
-						}
-						return res
-							.status(httpStatus.INTERNAL_SERVER_ERROR)
-							.json({ error: 'Error while Adding site' });
-					});
+						return res.status(httpStatus.OK).json({ siteId, site: domain, onboardingStage, step });
+					}
+				}
+				return res
+					.status(httpStatus.INTERNAL_SERVER_ERROR)
+					.json({ error: 'Error while Adding site' });
 			})
 			.catch(err => {
 				// eslint-disable-next-line no-console
@@ -82,40 +70,43 @@ router
 	})
 	.get('/payment', (req, res) => {
 		const getTipaltiUrls = email => {
-				const tipaltiConfig = config.tipalti;
+			const tipaltiConfig = config.tipalti;
 
-				let tipaltiUrl = '';
+			let tipaltiUrl = '';
 
-				const tipaltiBaseUrl = tipaltiConfig.baseUrl;
+			const tipaltiBaseUrl = tipaltiConfig.baseUrl;
 
-				const payeeId = encodeURIComponent(
-					crypto
-						.createHash('md5')
-						.update(email)
-						.digest('hex')
-						.substr(0, 64)
-				);
+			const payeeId = encodeURIComponent(
+				crypto
+					.createHash('md5')
+					.update(email)
+					.digest('hex')
+					.substr(0, 64)
+			);
 
-				const payer = tipaltiConfig.payerName;
+			const payer = tipaltiConfig.payerName;
 
-				const date = Math.floor(+new Date() / 1000);
+			const date = Math.floor(+new Date() / 1000);
+
+			const paramsStr = `idap=${payeeId}&payer=${payer}&ts=${date}&email=${encodeURIComponent(
+				email
+			)}`;
 
 			const { key } = tipaltiConfig;
 
-				const key = tipaltiConfig.key;
+			const hash = crypto
+				.createHmac('sha256', key)
+				.update(paramsStr.toString('utf-8'))
+				.digest('hex');
 
-				const hash = crypto
-					.createHmac('sha256', key)
-					.update(paramsStr.toString('utf-8'))
-					.digest('hex');
+			const paymentHistoryUrl = `${tipaltiConfig.paymentHistoryUrl + paramsStr}&hashkey=${hash}`;
 
-				const paymentHistoryUrl = `${tipaltiConfig.paymentHistoryUrl + paramsStr}&hashkey=${hash}`;
+			tipaltiUrl = `${tipaltiBaseUrl + paramsStr}&hashkey=${hash}`;
 
-				tipaltiUrl = `${tipaltiBaseUrl + paramsStr}&hashkey=${hash}`;
+			return { paymentHistoryUrl, tipaltiUrl };
+		};
 
-				return { paymentHistoryUrl, tipaltiUrl };
-			},
-			{ email } = req.user;
+		const { email } = req.user;
 		return Promise.all([getTipaltiUrls(email), userModel.updateUserPaymentStatus(email)])
 			.spread(tipaltiUrls => {
 				// eslint-disable-next-line no-console

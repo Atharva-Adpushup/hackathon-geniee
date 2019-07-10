@@ -505,7 +505,11 @@ function apiModule() {
 										if (section.ads && Object.keys(section.ads).length) {
 											for (const adKey in section.ads) {
 												if (inventoryFound) break;
+<<<<<<< HEAD
 
+=======
+												
+>>>>>>> acf4b5b5f73efb26120936d47ce9b7e42b1f26b1
 												const ad = section.ads[adKey];
 
 												if (ad.network === 'adpTags') {
@@ -548,7 +552,11 @@ function apiModule() {
 										const section = variation.sections[sectionKey];
 
 										if (section.ads && Object.keys(section.ads).length) {
+<<<<<<< HEAD
 											for (const adKey in section.ads) {
+=======
+											for (const adKey in section.ads) {												
+>>>>>>> acf4b5b5f73efb26120936d47ce9b7e42b1f26b1
 												const ad = section.ads[adKey];
 
 												if (ad.network === 'adpTags') {
@@ -648,11 +656,18 @@ function apiModule() {
 					if (err.code === 13) {
 						throw new AdPushupError('Inventory Not Found');
 					}
+<<<<<<< HEAD
 
 					throw err;
 				});
 		},
 
+=======
+					
+					throw err;
+				});
+		},
+>>>>>>> acf4b5b5f73efb26120936d47ce9b7e42b1f26b1
 		getInnovativeAdInventorySizes: siteId => {
 			return couchbase
 				.connectToAppBucket()
@@ -675,6 +690,7 @@ function apiModule() {
 
 					return sizesArray;
 				})
+<<<<<<< HEAD
 				.catch(err => {
 					if (err.code === 13) {
 						throw new AdPushupError('Inventory Not Found');
@@ -682,6 +698,9 @@ function apiModule() {
 
 					throw err;
 				});
+=======
+				.catch(err => []);
+>>>>>>> acf4b5b5f73efb26120936d47ce9b7e42b1f26b1
 		},
 		isInventoryExist: siteId => {
 			return API.isLayoutInventoryExist(siteId)

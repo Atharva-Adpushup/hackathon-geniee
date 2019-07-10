@@ -4,7 +4,6 @@ import { Col, Table, Modal, Nav, NavItem } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
 import ActionCard from '../../Components/ActionCard/index';
-import { Col, Alert, Table, Button, Modal, Nav, NavItem } from 'react-bootstrap';
 import proxyService from '../../services/proxyService';
 import { showNotification } from '../../actions/uiActions';
 import Loader from '../../Components/Loader/index';
@@ -307,24 +306,30 @@ class AdsTxtManager extends Component {
 			return <Redirect to={{ pathname: redirectUrl }} />;
 		}
 		return (
-			<ActionCard title="Ads.txt Manager">
-				{this.renderModal()}
-				{isLoading ? (
-					this.renderLoader()
-				) : (
-					<div>
-						<Nav bsStyle="tabs" activeKey={activeItem.INDEX} onSelect={this.handleNavSelect}>
-							<NavItem eventKey={1}>{ADSTXT_NAV_ITEMS_VALUES.AUTHENTICATOR}</NavItem>
-							<NavItem eventKey={2}>{ADSTXT_NAV_ITEMS_VALUES.ENTRIES}</NavItem>
-						</Nav>
-						{this.renderContent()}
-						<Col xs={12}>
-							<CustomMessage header="Bonus" type="info" message={BONUS_MESSAGE} />
-							<CustomMessage header="Note" type="info" message={NOTE_MESSAGE} />
-						</Col>
-					</div>
-				)}
-			</ActionCard>
+			<Fragment>
+				<Helmet>
+					<title>Ads.txt Management</title>
+				</Helmet>
+
+				<ActionCard title="Ads.txt Manager">
+					{this.renderModal()}
+					{isLoading ? (
+						this.renderLoader()
+					) : (
+						<div>
+							<Nav bsStyle="tabs" activeKey={activeItem.INDEX} onSelect={this.handleNavSelect}>
+								<NavItem eventKey={1}>{ADSTXT_NAV_ITEMS_VALUES.AUTHENTICATOR}</NavItem>
+								<NavItem eventKey={2}>{ADSTXT_NAV_ITEMS_VALUES.ENTRIES}</NavItem>
+							</Nav>
+							{this.renderContent()}
+							<Col xs={12}>
+								<CustomMessage header="Bonus" type="info" message={BONUS_MESSAGE} />
+								<CustomMessage header="Note" type="info" message={NOTE_MESSAGE} />
+							</Col>
+						</div>
+					)}
+				</ActionCard>
+			</Fragment>
 		);
 	}
 }

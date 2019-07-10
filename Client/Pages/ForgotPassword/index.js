@@ -1,4 +1,5 @@
 import React, { Component, Fragment } from 'react';
+import { Helmet } from 'react-helmet';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import AuthShell from '../../Components/AuthShell';
@@ -106,47 +107,53 @@ class ForgotPassword extends Component {
 			isSendingMail
 		} = this.state;
 		return (
-			<AuthShell>
-				<AuthFormWrap formType="forgotPassword" onSubmit={this.onSubmit}>
-					<Fragment>
-						{success && <div className="success-message top">{success}</div>}
-						{error && <div className="error-message top">{error}</div>}
+			<Fragment>
+				<Helmet>
+					<title>Forgot Password</title>
+				</Helmet>
 
-						<div className="AuthForm ForgotPasswordForm u-padding-h4 u-padding-v3">
-							<FormInput
-								type="email"
-								name="email"
-								onChange={this.onChange}
-								onBlur={this.onInputBlur}
-								icon="envelope"
-							/>
-							{emailError && <div className="error-message">{emailError}</div>}
-						</div>
+				<AuthShell>
+					<AuthFormWrap formType="forgotPassword" onSubmit={this.onSubmit}>
+						<Fragment>
+							{success && <div className="success-message top">{success}</div>}
+							{error && <div className="error-message top">{error}</div>}
 
-						<div className="AuthFooter ForgotPswFooter row">
-							<div className="col-xs-6">
-								<CustomButton
-									type="submit"
-									showSpinner={isSendingMail}
-									id="forgotPassword-submit"
-									variant="secondary"
-								>
-									Reset Password
-								</CustomButton>
+							<div className="AuthForm ForgotPasswordForm u-padding-h4 u-padding-v3">
+								<FormInput
+									type="email"
+									name="email"
+									onChange={this.onChange}
+									onBlur={this.onInputBlur}
+									icon="envelope"
+								/>
+								{emailError && <div className="error-message">{emailError}</div>}
 							</div>
-							<div className="col-xs-6">
-								<Link
-									to="/login"
-									id="forgotPassword-auth-redirect-link"
-									className="btn btn--secondary"
-								>
-									Or, Go Back
-								</Link>
+
+							<div className="AuthFooter ForgotPswFooter row">
+								<div className="col-xs-6">
+									<CustomButton
+										type="submit"
+										showSpinner={isSendingMail}
+										id="forgotPassword-submit"
+										variant="secondary"
+									>
+										Reset Password
+									</CustomButton>
+								</div>
+								<div className="col-xs-6">
+									<Link
+										to="/login"
+										id="forgotPassword-auth-redirect-link"
+										className="btn btn--secondary"
+									>
+										Or, Go Back
+									</Link>
+								</div>
 							</div>
-						</div>
-					</Fragment>
-				</AuthFormWrap>
-			</AuthShell>
+						</Fragment>
+					</AuthFormWrap>
+				</AuthShell>
+			</Fragment>
 		);
 	}
 }

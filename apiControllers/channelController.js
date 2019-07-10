@@ -7,6 +7,7 @@ const config = require('../configs/config');
 const HTTP_STATUS = require('../configs/httpStatusConsts');
 const userModel = require('../models/userModel');
 const channelModel = require('../models/channelModel');
+const siteModel = require('../models/siteModel');
 const AdPushupError = require('../helpers/AdPushupError');
 const { sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFunctions');
 const { errorHandler, verifyOwner, appBucket, checkParams } = require('../helpers/routeHelpers');

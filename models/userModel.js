@@ -188,12 +188,19 @@ var modelAPI = (module.exports = apiModule()),
 				}
 				var adNetworkSettings = me.get('adNetworkSettings');
 				var isExist = false;
+<<<<<<< HEAD
 
+=======
+>>>>>>> acf4b5b5f73efb26120936d47ce9b7e42b1f26b1
 				if(adNetworkSettings.length && data.networkName === "ADSENSE" || data.networkName === "DFP"){
 					for (var i = 0; i < adNetworkSettings.length; i++){
 						switch(data.networkName){
 							case "ADSENSE": {
+<<<<<<< HEAD
 								isExist = data.networkName === adNetworkSettings[i].networkName && data.adsenseEmail === adNetworkSettings[i].adsenseEmail && data.pubId === adNetworkSettings[i].pubId
+=======
+								isExist = data.networkName === adNetworkSettings[i].networkName && data.adsenseEmail === adNetworkSettings[i].adsenseEmail && data.pubId === adNetworkSettings[i].pubId 
+>>>>>>> acf4b5b5f73efb26120936d47ce9b7e42b1f26b1
 								break;
 							}
 							case "DFP": {

@@ -18,12 +18,12 @@ import { convertObjToArr, getDateRange } from '../helpers/utils';
 class Dashboard extends React.Component {
 	constructor(props) {
 		super(props);
-		const { site, widget, reportType, siteId } = props;
+		const { site, widget, reportType, siteId, widgetsList } = props;
 		const sites = [{ name: 'All', value: 'all' }, ...convertObjToArr(site)];
 		const topPerformingSite = sites.find(site => site['isTopPerforming']);
 		const selectedSite =
 			reportType == 'site' ? siteId : topPerformingSite ? topPerformingSite['value'] : 'all';
-		const widgetsConfig = this.getWidgetConfig(widget, selectedSite, reportType);
+		const widgetsConfig = this.getWidgetConfig(widget, selectedSite, reportType, widgetsList);
 		this.state = {
 			quickDates: dates,
 			sites,
@@ -33,7 +33,7 @@ class Dashboard extends React.Component {
 	componentDidMount() {
 		const { showNotification, user } = this.props;
 		const { widgetsConfig } = this.state;
-		if (!user.isPaymentDetailsComplete && !window.location.pathname.includes('payment')) {
+		if (!user.data.isPaymentDetailsComplete && !window.location.pathname.includes('payment')) {
 			showNotification({
 				mode: 'error',
 				title: 'Payments Error',
@@ -47,26 +47,28 @@ class Dashboard extends React.Component {
 		}
 	}
 
-	getWidgetConfig = (widgets, selectedSite, reportType) => {
+	getWidgetConfig = (widgets, selectedSite, reportType, widgetsList) => {
 		const sortedWidgets = sortBy(widgets, ['position', 'name']);
 		const widgetsConfig = [];
 		for (let wid in sortedWidgets) {
 			let widget = { ...sortedWidgets[wid] };
-			widget['isLoading'] = true;
-			widget['selectedDate'] = dates[0].value;
-			if (reportType == 'site' || widget['name'] == 'per_ap_original')
-				widget['selectedSite'] = selectedSite;
-			else widget['selectedSite'] = 'all';
-			if (widget['name'] == 'per_ap_original') {
-				widget['selectedDimension'] = 'page_variation_type';
+			if (widgetsList.indexOf(widget['name']) > -1) {
+				widget['isLoading'] = true;
+				widget['selectedDate'] = dates[0].value;
+				if (reportType == 'site' || widget['name'] == 'per_ap_original')
+					widget['selectedSite'] = selectedSite;
+				else widget['selectedSite'] = 'all';
+				if (widget['name'] == 'per_ap_original') {
+					widget['selectedDimension'] = 'page_variation_type';
+				}
+				if (widget['name'] == 'rev_by_network') {
+					widget['selectedDimension'] = 'network';
+				}
+				if (widget['name'] == 'per_site_wise') {
+					widget['selectedDimension'] = 'siteid';
+				}
+				widgetsConfig.push(widget);
 			}
-			if (widget['name'] == 'rev_by_network') {
-				widget['selectedDimension'] = 'network';
-			}
-			if (widget['name'] == 'per_site_wise') {
-				widget['selectedDimension'] = 'siteid';
-			}
-			widgetsConfig.push(widget);
 		}
 		return widgetsConfig;
 	};

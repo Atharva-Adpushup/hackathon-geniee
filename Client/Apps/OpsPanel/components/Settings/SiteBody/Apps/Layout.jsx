@@ -146,9 +146,9 @@ class Layout extends Component {
 					const {
 						variations = {},
 						autoOptimise: channelAutoOptimise,
-						channelId,
 						platform,
-						pageGroup
+						pageGroup,
+						channelId
 					} = current;
 					let traffic = '';
 					const keys = Object.keys(variations);
@@ -170,7 +170,7 @@ class Layout extends Component {
 						traffic = 'No Variation Found';
 					}
 					return (
-						<tr>
+						<tr key={`channel-row-${siteId}-${channelId}`}>
 							<td>{channel}</td>
 							<td>
 								<CustomToggleSwitch

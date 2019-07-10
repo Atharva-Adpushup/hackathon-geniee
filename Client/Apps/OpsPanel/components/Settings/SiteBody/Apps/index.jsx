@@ -61,6 +61,7 @@ class Apps extends Component {
 							{...common}
 							fetchChannelsInfo={fetchChannelsInfo}
 							updateChannelAutoOptimise={updateChannelAutoOptimise}
+							updateSiteAutoOptimise={updateSiteAutoOptimise}
 						/>
 					) : null}
 				</Panel>

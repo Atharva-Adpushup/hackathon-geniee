@@ -10,6 +10,7 @@ const dataController = require('./dataController');
 const innovativeAdsController = require('./innovativeAdsController');
 const reportsController = require('./reportsController');
 const opsController = require('./opsController');
+const channelController = require('./channelController');
 const headerBiddingController = require('./headerBiddingController');
 
 const apiAuthMiddleware = require('../middlewares/apiAuthMiddleware');
@@ -20,9 +21,13 @@ router.use(apiAuthMiddleware);
 router.use('/user', userController);
 router.use('/proxy', proxyController);
 router.use('/apTag', apTagController);
+router.use('/site', siteController);
+router.use('/data', dataController);
+router.use('/proxy', proxyController);
 router.use('/innovativeAds', innovativeAdsController);
 router.use('/reports', reportsController);
 router.use('/ops', opsController);
+router.use('/channel', channelController);
 router.use('/headerBidding', headerBiddingController);
 router.use('/', indexController);
 

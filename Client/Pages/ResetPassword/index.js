@@ -1,6 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 import AuthShell from '../../Components/AuthShell';
 import AuthFormWrap from '../../Components/AuthFormWrap';
 import FormInput from '../../Components/FormInput';
@@ -174,58 +175,66 @@ class ResetPassword extends Component {
 			isResettingPassword
 		} = this.state;
 		return (
-			<AuthShell>
-				<AuthFormWrap formType="resetPassword" onSubmit={this.onSubmit}>
-					<Fragment>
-						{success && <div className="success-message top">{success}</div>}
-						{error && <div className="error-message top">{error}</div>}
+			<Fragment>
+				<Helmet>
+					<title>Reset Password</title>
+				</Helmet>
 
-						<div className="AuthForm ResetPasswordForm u-padding-h4 u-padding-v3">
-							<FormInput
-								type="password"
-								name="password"
-								onChange={this.onChange}
-								onBlur={this.onInputBlur}
-								icon="envelope"
-								placeholder="New Password"
-							/>
-							{passwordError && <div className="error-message">{passwordError}</div>}
+				<AuthShell>
+					<AuthFormWrap formType="resetPassword" onSubmit={this.onSubmit}>
+						<Fragment>
+							{success && <div className="success-message top">{success}</div>}
+							{error && <div className="error-message top">{error}</div>}
 
-							<FormInput
-								type="password"
-								name="confirmPassword"
-								onChange={this.onChange}
-								onBlur={this.onInputBlur}
-								icon="envelope"
-								placeholder="Confirm Password"
-							/>
-							{confirmPasswordError && <div className="error-message">{confirmPasswordError}</div>}
-						</div>
+							<div className="AuthForm ResetPasswordForm u-padding-h4 u-padding-v3">
+								<FormInput
+									type="password"
+									name="password"
+									onChange={this.onChange}
+									onBlur={this.onInputBlur}
+									icon="envelope"
+									placeholder="New Password"
+								/>
+								{passwordError && <div className="error-message">{passwordError}</div>}
 
-						<div className="AuthFooter ForgotPswFooter row">
-							<div className="col-xs-6">
-								<CustomButton
-									type="submit"
-									showSpinner={isResettingPassword}
-									id="forgotPassword-submit"
-									variant="secondary"
-								>
-									Reset Password
-								</CustomButton>
+								<FormInput
+									type="password"
+									name="confirmPassword"
+									onChange={this.onChange}
+									onBlur={this.onInputBlur}
+									icon="envelope"
+									placeholder="Confirm Password"
+								/>
+								{confirmPasswordError && (
+									<div className="error-message">{confirmPasswordError}</div>
+								)}
 							</div>
-							<div className="col-xs-6">
-								<Link
-									to="/login"
-									id="forgotPassword-auth-redirect-link"
-									className="btn btn--secondary"
-								>
-									Or, Go Back
-								</Link>
+
+							<div className="AuthFooter ForgotPswFooter row">
+								<div className="col-xs-6">
+									<CustomButton
+										type="submit"
+										showSpinner={isResettingPassword}
+										id="forgotPassword-submit"
+										variant="secondary"
+									>
+										Reset Password
+									</CustomButton>
+								</div>
+								<div className="col-xs-6">
+									<Link
+										to="/login"
+										id="forgotPassword-auth-redirect-link"
+										className="btn btn--secondary"
+									>
+										Or, Go Back
+									</Link>
+								</div>
 							</div>
-						</div>
-					</Fragment>
-				</AuthFormWrap>
-			</AuthShell>
+						</Fragment>
+					</AuthFormWrap>
+				</AuthShell>
+			</Fragment>
 		);
 	}
 }

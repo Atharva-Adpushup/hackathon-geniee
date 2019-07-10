@@ -112,7 +112,11 @@ module.exports = {
 		validations: {
 			isNull: [
 				/**
+<<<<<<< HEAD
 
+=======
+				 
+>>>>>>> acf4b5b5f73efb26120936d47ce9b7e42b1f26b1
 				 */
 				{ name: 'key', message: 'Bidder Key cannot be blank', value: '', status: 403 },
 				{ name: 'name', message: 'Bidder Name cannot be blank', value: '', status: 403 },

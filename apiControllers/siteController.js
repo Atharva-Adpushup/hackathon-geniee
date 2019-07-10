@@ -1,25 +1,25 @@
-const Promise = require('bluebird');
 const express = require('express');
 const Promise = require('bluebird');
 
-const router = express.Router();
 // eslint-disable-next-line no-unused-vars
 const woodlotCustomLogger = require('woodlot').customLogger;
 const userModel = require('../models/userModel');
 const siteModel = require('../models/siteModel');
 const schema = require('../helpers/schema');
 const CC = require('../configs/commonConsts');
+const HTTP_STATUS = require('../configs/httpStatusConsts');
 const FormValidator = require('../helpers/FormValidator');
-const httpStatus = require('../configs/httpStatusConsts');
 const { sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFunctions');
 const {
 	verifyOwner,
 	fetchStatusesFromReporting,
-	fetchCustomStatuses
+	fetchCustomStatuses,
+	errorHandler,
+	checkParams
 } = require('../helpers/routeHelpers');
-const httpStatus = require('../configs/httpStatusConsts');
 
 const router = express.Router();
+
 // Initialise woodlot module for geniee api custom logging
 // const woodlot = new woodlotCustomLogger({
 // 	streams: ['./logs/geniee-api-custom.log'],
@@ -115,7 +115,7 @@ router
 			return userModel.getUserByEmail(email).then(user => {
 				const { sites } = user.data;
 				if (sites[0].onboardingStage === 'preOnboarding' && sites.length === 1) {
-					return res.status(httpStatus.OK).json({
+					return res.status(HTTP_STATUS.OK).json({
 						isOnboarding: true,
 						onboardingStage: sites[0].onboardingStage,
 						siteId: sites[0].siteId,
@@ -123,7 +123,7 @@ router
 					});
 				}
 
-				return res.status(httpStatus.OK).json({ isOnboarding: false });
+				return res.status(HTTP_STATUS.OK).json({ isOnboarding: false });
 			});
 		}
 
@@ -131,7 +131,7 @@ router
 			.verifySiteOwner(email, siteId)
 			.then(({ site }) => {
 				const { domain, onboardingStage, step } = site;
-				return res.status(httpStatus.OK).json({
+				return res.status(HTTP_STATUS.OK).json({
 					isOnboarding: onboardingStage === 'preOnboarding',
 					siteId,
 					site: domain,
@@ -139,7 +139,7 @@ router
 					step
 				});
 			})
-			.catch(() => res.status(httpStatus.NOT_FOUND).json({ error: 'Site not found!' }));
+			.catch(() => res.status(HTTP_STATUS.NOT_FOUND).json({ error: 'Site not found!' }));
 	})
 
 	.get('/fetchAppStatuses', (req, res) => {
@@ -152,7 +152,7 @@ router
 					message: 'Incomplete params. Site Id is necessary'
 				},
 				res,
-				httpStatus.BAD_REQUEST
+				HTTP_STATUS.BAD_REQUEST
 			);
 		}
 		/*
@@ -187,7 +187,8 @@ router
 				)
 			)
 			.catch(err => {
-				sendErrorResponse(err, res);
+				console.log(err);
+				return sendErrorResponse(err, res);
 			});
 	})
 	.get('/getAppStatuses', (req, res) => {
@@ -243,7 +244,8 @@ router
 			})
 			.then(() => sendSuccessResponse({ success: 1 }, res))
 			.catch(err => {
-				sendErrorResponse(err, res);
+				console.log(err);
+				return sendErrorResponse(err, res);
 			});
 	})
 	.post('/updateSite', (req, res) => {

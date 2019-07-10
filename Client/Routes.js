@@ -50,7 +50,7 @@ const AddNewSite = lazy(() => import(/* webpackChunkName: "addNewSite" */ './Pag
 const Layout = lazy(() => import(/* webpackChunkName: "layout" */ './Apps/Layout/index'));
 const OpsPanel = lazy(() => import(/* webpackChunkName: "opsPanel" */ './Apps/OpsPanel/index'));
 
-const UserRoutes = () => (
+const Routes = () => (
 	<Router history={history}>
 		<Suspense fallback={<Loader height="100vh" />}>
 			<Switch>
@@ -272,4 +272,4 @@ const UserRoutes = () => (
 	</Router>
 );
 
-export default UserRoutes;
+export default Routes;

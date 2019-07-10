@@ -25,7 +25,6 @@ const { fetchOurAdsTxt } = require('../helpers/proxy');
 const { appBucket, errorHandler, checkParams } = require('../helpers/routeHelpers');
 
 const router = express.Router();
-const AdPushupError = require('../helpers/AdPushupError');
 
 function createNewUser(params) {
 	const origName = utils.trimString(params.name);
@@ -158,7 +157,7 @@ router
 							userData.sites[site.siteId] = site;
 							siteIds.push(site.siteId);
 						}
-						let params = { siteid: siteIds.toString() };
+						let params = { siteid: siteIds.toString(), isSuperUser };
 
 						return getReportsMetaData(params).then(reports => {
 							return res.status(httpStatus.OK).json({

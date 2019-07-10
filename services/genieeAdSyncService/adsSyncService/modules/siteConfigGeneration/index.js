@@ -179,7 +179,7 @@ function apTagAdsSyncing(currentDataForSyncing, site) {
 	 * 4. Set Dummy values to some variables to compliment current working flow
 	 * 5. Concat ads from Tag manager to current adp.ads
 	 */
-	return adGeneration(`${docKeys.tagManager}${site.get('siteId')}`, currentDataForSyncing, ad =>
+	return adGeneration(`${docKeys.apTag}${site.get('siteId')}`, currentDataForSyncing, ad =>
 		Promise.resolve({
 			variations: [
 				{ variationName: 'manual', variationId: 'manual', pageGroup: null, platform: ad.formatData.platform }

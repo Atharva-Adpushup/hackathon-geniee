@@ -62,6 +62,37 @@ class Component {
 		}
 
 		const css = {
+<<<<<<< HEAD
+=======
+			width,
+			height: parseInt(height) + POWERED_BY_BANNER.HEIGHT,
+			...formatData.css,
+			...customCSS
+		};
+
+		const $format = $('<div />');
+
+		let $banner = null;
+
+		const $closeButton = this.createCloseButton(formatData);
+
+		const feedbackOptions = {
+			ads: [id],
+			xpathMiss: [],
+			eventType: 1,
+			mode: 1, // Changed it 1 because Innovative Ad is now completely independent of AdPushup Layout Testing
+			referrer: adp.config.referrer,
+			tracking: false,
+			variationId: !adp.config.manualModeActive
+				? adp.config.selectedVariation
+				: commonConsts.MANUAL_ADS.VARIATION
+		};
+
+		const $frame = $('<div />');
+
+		$format.attr({ id, 'data-section': id, class: '_ap_apex_ad' });
+		$frame.css({
+>>>>>>> acf4b5b5f73efb26120936d47ce9b7e42b1f26b1
 			width,
 			height: parseInt(height) + POWERED_BY_BANNER.HEIGHT,
 			...formatData.css,

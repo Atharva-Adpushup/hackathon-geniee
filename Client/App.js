@@ -28,6 +28,8 @@ import {
 	faArrowDown,
 	faTools,
 	faSort,
+	faTrash,
+	faCode,
 	faCheck,
 	faChevronRight,
 	faPlay,
@@ -39,7 +41,6 @@ import 'bootstrap-sass/assets/stylesheets/_bootstrap.scss';
 import ErrorBoundary from './Components/ErrorBoundary';
 import NotificationContainer from './Containers/NotificationContainer';
 import Routes from './Routes';
-import NotificationContainer from './Containers/NotificationContainer';
 
 library.add(
 	faBars,
@@ -67,6 +68,8 @@ library.add(
 	faArrowDown,
 	faTools,
 	faSort,
+	faTrash,
+	faCode,
 	faCheck,
 	faChevronRight,
 	faPlay,

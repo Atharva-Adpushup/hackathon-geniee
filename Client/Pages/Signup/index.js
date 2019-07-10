@@ -2,11 +2,12 @@ import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { Row, Col } from 'react-bootstrap';
+import { Helmet } from 'react-helmet';
 import history from '../../helpers/history';
 import AuthShell from '../../Components/AuthShell';
 import AuthFormWrap from '../../Components/AuthFormWrap';
 import FormInput from '../../Components/FormInput';
-import ApButton from '../../Components/ApButton';
+import CustomButton from '../../Components/CustomButton';
 import formValidator from '../../helpers/formValidator';
 import validationSchema from '../../helpers/validationSchema';
 import { signupAction } from '../../actions/userActions';
@@ -157,140 +158,146 @@ class Signup extends Component {
 		} = this.state;
 
 		return (
-			<AuthShell>
-				<AuthFormWrap formType="signup" onSubmit={this.onSubmit}>
-					<Fragment>
-						{error && <div className="error-message top">{error}</div>}
-						<div className="AuthForm SignupForm u-padding-h4 u-padding-v3">
-							<Row>
-								<Col md={6}>
-									<FormInput
-										type="text"
-										name="name"
-										placeholder="Name"
-										onChange={this.onChange}
-										onBlur={this.onInputBlur}
-										icon="user"
-									/>
-									{nameError && <div className="error-message">{nameError}</div>}
-								</Col>
-								<Col md={6}>
-									<FormInput
-										type="url"
-										name="site"
-										placeholder="Website"
-										onChange={this.onChange}
-										onBlur={this.onInputBlur}
-										icon="link"
-									/>
-									{siteError && <div className="error-message">{siteError}</div>}
-								</Col>
-							</Row>
+			<Fragment>
+				<Helmet>
+					<title>Signup</title>
+				</Helmet>
 
-							<Row>
-								<Col md={6}>
-									<FormInput
-										type="email"
-										name="email"
-										placeholder="Email"
-										onChange={this.onChange}
-										onBlur={this.onInputBlur}
-										icon="envelope"
-									/>
-									{emailError && <div className="error-message">{emailError}</div>}
-								</Col>
-								<Col md={6}>
-									<FormInput
-										type="password"
-										name="password"
-										placeholder="password"
-										onChange={this.onChange}
-										onBlur={this.onInputBlur}
-										icon="key"
-									/>
-									{passwordError && <div className="error-message">{passwordError}</div>}
-								</Col>
-							</Row>
-
-							<Row>
-								<Col md={12}>
-									<div className="form-group">
-										<SelectBox
-											id="websiteRevenue"
-											dropdownClassName="form-control websiteRevenue"
-											title="Monthly Ad Revenue (in USD)"
-											onSelect={this.onRevenueSelect}
-											options={this.websiteRevenueOptions}
-											selected={websiteRevenueValue}
+				<AuthShell>
+					<AuthFormWrap formType="signup" onSubmit={this.onSubmit}>
+						<Fragment>
+							{error && <div className="error-message top">{error}</div>}
+							<div className="AuthForm SignupForm u-padding-h4 u-padding-v3">
+								<Row>
+									<Col md={6}>
+										<FormInput
+											type="text"
+											name="name"
+											placeholder="Name"
+											onChange={this.onChange}
+											onBlur={this.onInputBlur}
+											icon="user"
 										/>
-										{websiteRevenueError && (
-											<div className="error-message">{websiteRevenueError}</div>
-										)}
-									</div>
-								</Col>
-							</Row>
+										{nameError && <div className="error-message">{nameError}</div>}
+									</Col>
+									<Col md={6}>
+										<FormInput
+											type="url"
+											name="site"
+											placeholder="Website"
+											onChange={this.onChange}
+											onBlur={this.onInputBlur}
+											icon="link"
+										/>
+										{siteError && <div className="error-message">{siteError}</div>}
+									</Col>
+								</Row>
 
-							<div className="form-group clearfix">
-								<div className="col-md-12 u-padding-0">
-									<div className="col-md-6 u-padding-0">
-										<div className="input-group input-group--minimal">
-											<span className="input-group-addon signup-termsPolicy-wrap">
-												<input
-													type="checkbox"
-													id="signup-termsPolicy"
-													name="termsPolicy"
-													onChange={this.onCheckboxToggle}
-												/>
-											</span>
-											<div className="input-group-text">
-												I agree to{' '}
-												<a target="_blank" href="http://www.adpushup.com/tos.php">
-													Terms of Service{' '}
-												</a>
-												&amp;{' '}
-												<a target="_blank" href="http://www.adpushup.com/privacy.php">
-													Privacy Policy
-												</a>
-											</div>
+								<Row>
+									<Col md={6}>
+										<FormInput
+											type="email"
+											name="email"
+											placeholder="Email"
+											onChange={this.onChange}
+											onBlur={this.onInputBlur}
+											icon="envelope"
+										/>
+										{emailError && <div className="error-message">{emailError}</div>}
+									</Col>
+									<Col md={6}>
+										<FormInput
+											type="password"
+											name="password"
+											placeholder="password"
+											onChange={this.onChange}
+											onBlur={this.onInputBlur}
+											icon="key"
+										/>
+										{passwordError && <div className="error-message">{passwordError}</div>}
+									</Col>
+								</Row>
+
+								<Row>
+									<Col md={12}>
+										<div className="form-group">
+											<SelectBox
+												id="websiteRevenue"
+												dropdownClassName="form-control websiteRevenue"
+												title="Monthly Ad Revenue (in USD)"
+												onSelect={this.onRevenueSelect}
+												options={this.websiteRevenueOptions}
+												selected={websiteRevenueValue}
+											/>
+											{websiteRevenueError && (
+												<div className="error-message">{websiteRevenueError}</div>
+											)}
 										</div>
-										{termsPolicyError && <div className="error-message">{termsPolicyError}</div>}
-									</div>
+									</Col>
+								</Row>
 
-									<div className="col-md-6 u-padding-0">
-										<ApButton
-											variant="primary"
-											showSpinner={isSigningUp}
-											type="submit"
-											id="signup-submit"
-											className="u-margin-0px btn btn-lightBg btn-red pull-right"
-										>
-											Create an account
-										</ApButton>
+								<div className="form-group clearfix">
+									<div className="col-md-12 u-padding-0">
+										<div className="col-md-6 u-padding-0">
+											<div className="input-group input-group--minimal">
+												<span className="input-group-addon signup-termsPolicy-wrap">
+													<input
+														type="checkbox"
+														id="signup-termsPolicy"
+														name="termsPolicy"
+														onChange={this.onCheckboxToggle}
+													/>
+												</span>
+												<div className="input-group-text">
+													I agree to{' '}
+													<a target="_blank" href="http://www.adpushup.com/tos.php">
+														Terms of Service{' '}
+													</a>
+													&amp;{' '}
+													<a target="_blank" href="http://www.adpushup.com/privacy.php">
+														Privacy Policy
+													</a>
+												</div>
+											</div>
+											{termsPolicyError && <div className="error-message">{termsPolicyError}</div>}
+										</div>
+
+										<div className="col-md-6 u-padding-0">
+											<CustomButton
+												variant="primary"
+												showSpinner={isSigningUp}
+												type="submit"
+												id="signup-submit"
+												className="u-margin-0px btn btn-lightBg btn-red pull-right"
+											>
+												Create an account
+											</CustomButton>
+										</div>
 									</div>
 								</div>
 							</div>
-						</div>
 
-						<div className="AuthFooter SignupFooter row text-center">
-							<div className="u-margin-b4">
-								Already have an account?
-								<Link to="/login" id="signup-auth-redirect-btn" className="btn btn--secondary">
-									Login!
-								</Link>
+							<div className="AuthFooter SignupFooter row text-center">
+								<div className="u-margin-b4">
+									Already have an account?
+									<Link to="/login" id="signup-auth-redirect-btn" className="btn btn--secondary">
+										Login!
+									</Link>
+								</div>
+								<span className="u-padding-0 label label--text-faded">
+									Have any questions? Please email our Sales Team -{' '}
+									<a
+										href="mailto:sales@adpushup.com"
+										className="u-padding-0 u-margin-0 link link--primary"
+									>
+										sales@adpushup.com
+									</a>
+								</span>
 							</div>
-							<span className="u-padding-0 label label--text-faded">
-								Have any questions? Please email our Sales Team -{' '}
-								<a
-									href="mailto:sales@adpushup.com"
-									className="u-padding-0 u-margin-0 link link--primary"
-								>
-									sales@adpushup.com
-								</a>
-							</span>
-						</div>
-					</Fragment>
-				</AuthFormWrap>
-			</AuthShell>
+						</Fragment>
+					</AuthFormWrap>
+				</AuthShell>
+			</Fragment>
 		);
 	}
 }
