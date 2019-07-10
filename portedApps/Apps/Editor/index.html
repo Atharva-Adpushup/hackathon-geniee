@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<title>__DOMANIZE_DOMAIN__ | AdPushup Console</title>
+		<link
+			href="//fonts.googleapis.com/css?family=Karla:400,700,400italic,700italic&subset=latin,latin-ext"
+			rel="stylesheet"
+			type="text/css"
+		/>
+		<link rel="stylesheet" href="/assets/css/third-party/dataTables.css" />
+		<link rel="stylesheet" href="/assets/css/builds/editor.min.css" />
+		<link rel="stylesheet" href="/assets/css/third-party/c3.css" />
+		<!-- Google Tag Manager -->
+		<script>
+			(function(w, d, s, l, i) {
+				w[l] = w[l] || [];
+				w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+				var f = d.getElementsByTagName(s)[0],
+					j = d.createElement(s),
+					dl = l != 'dataLayer' ? '&l=' + l : '';
+				j.async = true;
+				j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+				f.parentNode.insertBefore(j, f);
+			})(window, document, 'script', 'dataLayer', 'GTM-NMS9P3Q');
+		</script>
+		<script>
+			window.ADP_BASEURL = '__BASE_URL__';
+			window.ADP_ORIGIN = '__PROXY_ORIGIN__';
+			window.ADP_SITE_DOMAIN = '__SITE_DOMAIN__';
+			window.ADP_SITE_ID = '__SITE_ID__';
+			window.ADP_ENVIRONMENT = '__ENVIRONMENT__';
+			window.isSuperUser = Boolean('__IS_SUPER_USER__');
+			window.isGeniee = Boolean('__IS_GENIEE__');
+			window.gcfg = {
+				usn: 1,
+				ubajf: 1,
+				upkv: 1,
+				uadkv: 1,
+				uud: 1
+			};
+		</script>
+		<script src="/assets/js/react-15.js"></script>
+		<script src="/assets/js/react-dom.js"></script>
+		<script src="/assets/js/builds/outer.js?v=1512052159832"></script>
+		<link
+			rel="chrome-webstore-item"
+			href="https://chrome.google.com/webstore/detail/lbfaiagkagpgeefmnpefcibmpeccpjpi"
+		/>
+	</head>
+	<body>
+		<div class="loaderwrapper spinner" data-id="loader" style="display: block">
+			<img src="/assets/images/loaderLogo.png" />
+		</div>
+		<div id="editor"></div>
+
+		<script>
+			var cookieRefreshTimer = null;
+			var originalCookie = null;
+			var COOKIE_REFRESH_INTERVAL = 2000;
+
+			function resetCookieValues() {
+				clearInterval(cookieRefreshTimer);
+				originalCookie = null;
+			}
+
+			function cookieProcessing() {
+				// Fetch all cookies
+				var cookies = document.cookie.split('; ');
+
+				cookies.some(function(cookie) {
+					// Check all the cookies and process if user cookie is found
+					if (cookie.match(/user=/)) {
+						// If current user cookie is not equal to original user cookie then reload
+						if (originalCookie && originalCookie !== cookie) {
+							var url = window.location.origin + '/dashboard';
+							window.location.href = url;
+							return true;
+						}
+						// If original user cookie not found
+						// First time on the webpage
+						// Cookie Expired
+						// Explicitly deleted cookie
+						// then set current cookie as original and set a timer which will call the current function in every 2 secs.
+						originalCookie = cookie;
+						if (cookieRefreshTimer === null) {
+							cookieRefreshTimer = setInterval(function() {
+								cookieProcessing();
+							}, COOKIE_REFRESH_INTERVAL);
+						}
+						return true;
+					}
+					return false;
+				});
+			}
+			cookieProcessing();
+		</script>
+	</body>
+</html>

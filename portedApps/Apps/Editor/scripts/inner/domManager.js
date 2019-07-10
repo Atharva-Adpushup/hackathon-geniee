@@ -9,7 +9,7 @@ import {
 } from '../../actions/inner/actions';
 import { sendMessage } from './messengerHelper';
 import { messengerCommands } from '../../consts/commonConsts';
-// const IncontentAnalyzer = require('../../../../../services/genieeAdSyncService/adpushup.js/libs/aa');
+const IncontentAnalyzer = require('../../../../../services/genieeAdSyncService/adpushup.js/libs/aa');
 
 const selectorator = new Selectorator(),
 	events = 'click mouseup mouseleave mousedown mouseover',
