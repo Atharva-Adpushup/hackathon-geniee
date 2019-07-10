@@ -33,7 +33,7 @@ class Dashboard extends React.Component {
 	componentDidMount() {
 		const { showNotification, user } = this.props;
 		const { widgetsConfig } = this.state;
-		if (!user.isPaymentDetailsComplete && !window.location.pathname.includes('payment')) {
+		if (!user.data.isPaymentDetailsComplete && !window.location.pathname.includes('payment')) {
 			showNotification({
 				mode: 'error',
 				title: 'Payments Error',
