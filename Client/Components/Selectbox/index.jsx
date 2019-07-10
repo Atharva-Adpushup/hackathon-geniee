@@ -1,400 +1,146 @@
-const React = require('react');
+/* eslint-disable react/no-array-index-key */
+/* eslint-disable prefer-destructuring */
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { DropdownButton, MenuItem, Glyphicon } from 'react-bootstrap';
+import CustomIcon from '../CustomIcon';
 
-import './styles.scss';
+const findSelected = props => {
+	const { selected, title, options } = props;
+	let name = title;
 
-const div = React.createElement.bind(null, 'div');
-const button = React.createElement.bind(null, 'button');
-const a = React.createElement.bind(null, 'a');
-const select = React.createElement.bind(null, 'select');
-const option = React.createElement.bind(null, 'option');
-const label = React.createElement.bind(null, 'label');
+	if (selected === 0 || selected) {
+		for (let i = 0; i < options.length; i += 1) {
+			const option = options[i];
+			if (option.value === selected) {
+				// eslint-disable-next-line prefer-destructuring
+				name = option.name;
+				break;
+			}
+		}
+	}
 
-let idInc = 0;
-
-const keyHandlers = {
-	38: 'handleUpKey',
-	40: 'handleDownKey',
-	32: 'handleSpaceKey',
-	13: 'handleEnterKey',
-	27: 'handleEscKey',
-	74: 'handleDownKey',
-	75: 'handleUpKey'
+	return { selected, name };
 };
 
-function interceptEvent(event) {
-	if (event) {
-		event.preventDefault();
-		event.stopPropagation();
+class SelectBox extends Component {
+	state = {
+		...findSelected(this.props)
+	};
+
+	selectWrapper = (key, e) => {
+		const { onSelect, options, title } = this.props;
+		const optionValueType = typeof options[0].value;
+		const dataKey = e && e.target ? e.target.getAttribute('data-key') : '';
+
+		if (!e || !e.target || !e.target.getAttribute('data-value')) {
+			return this.setState({ name: title }, () => onSelect(null));
+		}
+
+		let value;
+		switch (optionValueType) {
+			case 'number': {
+				value = Number(e.target.getAttribute('data-value'));
+				break;
+			}
+			default:
+			case 'string': {
+				value = String(e.target.getAttribute('data-value'));
+				break;
+			}
+		}
+		return this.setState(
+			{
+				name: e.target.getAttribute('data-name')
+			},
+			() => onSelect(value, dataKey)
+		);
+	};
+
+	render() {
+		const { name } = this.state;
+		const {
+			selected,
+			options,
+			id,
+			title,
+			wrapperClassName,
+			dropdownClassName,
+			type,
+			dataKey,
+			reset
+		} = this.props;
+		const selectedTilte = reset ? (
+			<div
+				className="aligner aligner--hSpaceBetween width-100  aligner--wrap"
+				style={{ width: '100%' }}
+			>
+				{name}
+
+				<Glyphicon
+					glyph="remove"
+					className="u-margin-r3"
+					onClick={e => {
+						e.stopPropagation();
+						this.selectWrapper();
+					}}
+				/>
+			</div>
+		) : (
+			name
+		);
+		const buttonTitle = selected === 0 || selected ? selectedTilte : title;
+		return (
+			<div className={`custom-select-box-wrapper ${wrapperClassName}`}>
+				<DropdownButton
+					title={buttonTitle}
+					bsStyle={type}
+					className={`custom-select-box ${dropdownClassName}`}
+					id={id}
+					onSelect={this.selectWrapper}
+				>
+					{options.map((option, key) => (
+						<MenuItem
+							eventKey={`id-${key}`}
+							key={option.value}
+							data-value={option.value}
+							data-name={option.name}
+							data-key={dataKey}
+							active={selected === option.value}
+						>
+							{option.name}
+						</MenuItem>
+					))}
+				</DropdownButton>
+			</div>
+		);
 	}
 }
 
-module.exports = React.createClass({
-	displayName: 'exports',
-	getInitialState() {
-		return {
-			id: `react-select-box-${++idInc}`,
-			open: false,
-			focusedIndex: -1,
-			pedningValue: []
-		};
-	},
+SelectBox.propTypes = {
+	id: PropTypes.string.isRequired,
+	onSelect: PropTypes.func.isRequired,
+	options: PropTypes.arrayOf(
+		PropTypes.shape({
+			name: PropTypes.string,
+			value: PropTypes.oneOfType([PropTypes.string, PropTypes.bool, PropTypes.number])
+		})
+	).isRequired,
+	selected: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+	dropdownClassName: PropTypes.string,
+	wrapperClassName: PropTypes.string,
+	title: PropTypes.string,
+	type: PropTypes.string,
+	reset: PropTypes.bool
+};
 
-	getDefaultProps() {
-		return {
-			closeText: 'Close',
-			showClear: true
-		};
-	},
+SelectBox.defaultProps = {
+	title: 'Select Value',
+	dropdownClassName: '',
+	wrapperClassName: '',
+	type: 'default',
+	selected: null,
+	reset: false
+};
 
-	changeOnClose() {
-		return this.isMultiple() && String(this.props.changeOnClose) === 'true';
-	},
-
-	updatePendingValue(value, cb) {
-		if (this.changeOnClose()) {
-			this.setState({ pendingValue: value }, cb);
-			return true;
-		}
-		return false;
-	},
-
-	componentWillMount() {
-		this.updatePendingValue(this.props.value);
-	},
-
-	componentWillReceiveProps(next) {
-		this.updatePendingValue(next.value);
-	},
-
-	clickingOption: false,
-
-	blurTimeout: null,
-
-	handleFocus() {
-		clearTimeout(this.blurTimeout);
-	},
-
-	handleBlur() {
-		clearTimeout(this.blurTimeout);
-		this.blurTimeout = setTimeout(this.handleClose, 0);
-	},
-
-	handleMouseDown() {
-		this.clickingOption = true;
-	},
-
-	handleChange(val, cb) {
-		return function(event) {
-			this.clickingOption = false;
-			interceptEvent(event);
-			if (this.isMultiple()) {
-				let selected = [];
-				if (val != null) {
-					selected = this.value().slice(0);
-					const index = selected.indexOf(val);
-					if (index !== -1) {
-						selected.splice(index, 1);
-					} else {
-						selected.push(val);
-					}
-				}
-				this.updatePendingValue(selected, cb) || this.props.onChange(selected, event);
-			} else {
-				this.updatePendingValue(val, cb) || this.props.onChange(val, event);
-				this.handleClose();
-				this.refs.button.focus();
-			}
-		}.bind(this);
-	},
-
-	handleNativeChange(event) {
-		let val = event.target.value;
-		if (this.isMultiple()) {
-			const children = [].slice.call(event.target.childNodes, 0);
-			val = children.reduce((memo, child) => {
-				if (child.selected) {
-					memo.push(child.value);
-				}
-				return memo;
-			}, []);
-		}
-		this.props.onChange(val, event);
-	},
-
-	handleClear(event) {
-		interceptEvent(event);
-		this.handleChange(null, function() {
-			// only called when change="true"
-			this.props.onChange(this.state.pendingValue);
-		})(event);
-	},
-
-	toggleOpenClose(event) {
-		interceptEvent(event);
-		this.setState({ open: !this.state.open });
-	},
-
-	handleOpen(event) {
-		interceptEvent(event);
-		this.setState({ open: true }, function() {
-			this.refs.menu.focus();
-		});
-	},
-
-	handleClose(event) {
-		interceptEvent(event);
-		if (!this.clickingOption) {
-			this.setState({ open: false, focusedIndex: -1 });
-		}
-		if (this.changeOnClose()) {
-			this.props.onChange(this.state.pendingValue);
-		}
-	},
-
-	moveFocus(move) {
-		const len = React.Children.count(this.props.children);
-		const idx = (this.state.focusedIndex + move + len) % len;
-		this.setState({ focusedIndex: idx });
-	},
-
-	handleKeyDown(event) {
-		if (keyHandlers[event.which]) {
-			this[keyHandlers[event.which]](event);
-		}
-	},
-
-	handleUpKey(event) {
-		interceptEvent(event);
-		this.moveFocus(-1);
-	},
-
-	handleDownKey(event) {
-		interceptEvent(event);
-		if (!this.state.open) {
-			this.handleOpen(event);
-		}
-		this.moveFocus(1);
-	},
-
-	handleSpaceKey(event) {
-		interceptEvent(event);
-		if (!this.state.open) {
-			this.handleOpen(event);
-		} else if (this.state.focusedIndex !== -1) {
-			this.handleEnterKey();
-		}
-	},
-
-	handleEnterKey(event) {
-		if (this.state.focusedIndex !== -1) {
-			this.handleChange(this.options()[this.state.focusedIndex].value)(event);
-		}
-	},
-
-	handleEscKey(event) {
-		if (this.state.open) {
-			this.handleClose(event);
-		} else {
-			this.handleClear(event);
-		}
-	},
-
-	label() {
-		const selected = this.options()
-			.filter(option => this.isSelected(option.value))
-			.map(option => option.label);
-		return selected.length > 0 ? selected.join(', ') : this.props.label;
-	},
-
-	isMultiple() {
-		return String(this.props.multiple) === 'true';
-	},
-
-	options() {
-		const options = [];
-		React.Children.forEach(this.props.children, option => {
-			options.push({
-				value: option.props.value,
-				label: option.props.children
-			});
-		});
-		return options;
-	},
-
-	value() {
-		const value = this.changeOnClose() ? this.state.pendingValue : this.props.value;
-
-		if (!this.isMultiple() || Array.isArray(value)) {
-			return value;
-		}
-		if (value != null) {
-			return [value];
-		}
-		return [];
-	},
-
-	hasValue() {
-		if (this.isMultiple()) {
-			return this.value().length > 0;
-		}
-		return this.value() != null;
-	},
-
-	isSelected(value) {
-		if (this.isMultiple()) {
-			return this.value().indexOf(value) !== -1;
-		}
-		return this.value() === value;
-	},
-	onFocus() {
-		if (this.props.onFocus) {
-			this.props.onFocus();
-		}
-	},
-	render() {
-		let className = 'react-select-box-container',
-			disabledStyles = {};
-		if (this.props.className) {
-			className += ` ${this.props.className}`;
-		}
-		if (this.isMultiple()) {
-			className += ' react-select-box-multi';
-		}
-		if (!this.hasValue()) {
-			className += ' react-select-box-empty';
-		}
-		if (this.hasValue()) {
-			className += ' react-select-box-selected';
-		}
-		if (this.props.disabled) {
-			disabledStyles = {
-				pointerEvents: 'none',
-				opacity: 0.65
-			};
-		}
-		return div(
-			{
-				onKeyDown: this.handleKeyDown,
-				className,
-				onFocus: this.onFocus,
-				style: disabledStyles
-			},
-			button(
-				{
-					id: this.state.id,
-					ref: 'button',
-					className: 'react-select-box',
-					onClick: this.toggleOpenClose,
-					onBlur: this.handleBlur,
-					tabIndex: '0',
-					'aria-hidden': true
-				},
-				div({ className: 'react-select-box-label' }, this.label())
-			),
-			this.renderOptionMenu(),
-			this.renderClearButton(),
-			this.renderNativeSelect()
-		);
-	},
-
-	renderNativeSelect() {
-		const id = `${this.state.id}-native-select`;
-		const multiple = this.isMultiple();
-		const empty = multiple ? null : option({ key: '', value: '' }, 'No Selection');
-		const options = [empty].concat(this.props.children);
-		return div(
-			{ className: 'react-select-box-native' },
-			label({ htmlFor: id }, this.props.label),
-			select(
-				{
-					id,
-					multiple,
-					onKeyDown(e) {
-						e.stopPropagation();
-					},
-					value: this.props.value || (multiple ? [] : ''),
-					onChange: this.handleNativeChange
-				},
-				options
-			)
-		);
-	},
-
-	renderOptionMenu() {
-		let className = 'react-select-box-options';
-		if (!this.state.open) {
-			className += ' react-select-box-hidden';
-		}
-		/*
-		 var active = null
-		 if (this.state.focusedIndex !== -1) {
-		 active = this.state.id + '-' + this.state.focusedIndex
-		 }
-		 */
-		return div(
-			{
-				className,
-				onBlur: this.handleBlur,
-				onFocus: this.handleFocus,
-				'aria-hidden': true,
-				ref: 'menu',
-				tabIndex: 0
-			},
-			div(
-				{
-					className: 'react-select-box-off-screen'
-				},
-				this.options().map(this.renderOption)
-			),
-			this.renderCloseButton()
-		);
-	},
-
-	renderOption(option, i) {
-		let className = 'react-select-box-option';
-		if (i === this.state.focusedIndex) {
-			className += ' react-select-box-option-focused';
-		}
-		if (this.isSelected(option.value)) {
-			className += ' react-select-box-option-selected';
-		}
-		return a(
-			{
-				id: `${this.state.id}-${i}`,
-				href: '#',
-				onClick: this.handleChange(option.value),
-				onMouseDown: this.handleMouseDown,
-				className,
-				tabIndex: -1,
-				key: option.value,
-				onBlur: this.handleBlur,
-				onFocus: this.handleFocus
-			},
-			option.label
-		);
-	},
-
-	renderClearButton() {
-		if (this.hasValue() && this.props.showClear) {
-			return button({
-				className: 'react-select-box-clear',
-				'aria-hidden': true,
-				onClick: this.handleClear
-			});
-		}
-	},
-
-	renderCloseButton() {
-		if (this.isMultiple() && this.props.closeText) {
-			return button(
-				{
-					onClick: this.handleClose,
-					className: 'react-select-box-close',
-					onBlur: this.handleBlur,
-					onFocus: this.handleFocus
-				},
-				this.props.closeText
-			);
-		}
-	}
-});
+export default SelectBox;
