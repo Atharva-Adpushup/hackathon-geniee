@@ -16,19 +16,10 @@ const ApConfig = {
 		'blocklist',
 		'isAdPushupControlWithPartnerSSP',
 		'isSPA',
-<<<<<<< HEAD
 		'isManual',
 		'isInnovative',
 		'isThirdPartyAdx',
 		'spaPageTransitionTimeout',
-		'isManual',
-		'isInnovative',
-=======
-		'isThirdPartyAdx',
-		'spaPageTransitionTimeout',
-		'isManual',
-		'isInnovative',
->>>>>>> acf4b5b5f73efb26120936d47ce9b7e42b1f26b1
 		'adsLabel',
 		'isAdsLabelOn'
 	],
@@ -49,19 +40,10 @@ const ApConfig = {
 		'blocklist',
 		'isAdPushupControlWithPartnerSSP',
 		'isSPA',
-<<<<<<< HEAD
 		'isManual',
 		'isInnovative',
 		'isThirdPartyAdx',
 		'spaPageTransitionTimeout',
-		'isManual',
-		'isInnovative',
-=======
-		'isThirdPartyAdx',
-		'spaPageTransitionTimeout',
-		'isManual',
-		'isInnovative',
->>>>>>> acf4b5b5f73efb26120936d47ce9b7e42b1f26b1
 		'adsLabel',
 		'isAdsLabelOn'
 	],

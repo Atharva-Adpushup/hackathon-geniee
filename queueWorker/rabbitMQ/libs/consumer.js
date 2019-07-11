@@ -3,13 +3,13 @@ const Promise = require('bluebird');
 const moment = require('moment');
 const mailService = require('../../../services/mailService/index');
 const globalConfig = require('../../../configs/config');
+const prodEnv = globalConfig.environment.HOST_ENV === 'production';
 
 function Consumer(config) {
 	this.config = config;
 	this.channel = null;
 	this.connection = null;
 	this.negCounter = 0;
-	this.isStaging = !!globalConfig.environment.IS_STAGING;
 	this.getQueueMessage = function(queueName) {
 		const self = this;
 
@@ -101,7 +101,7 @@ Consumer.prototype.getMessage = function(queueName) {
 };
 
 Consumer.prototype.sendMail = function(data) {
-	if (this.isStaging) {
+	if (prodEnv) {
 		console.log(
 			'Staging environment found. Moking Mail sent. You will not receive any mail. This is the mail'
 		);

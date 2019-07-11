@@ -662,7 +662,7 @@ router
 
 			if (email.trim() && req.body.status) {
 				var status = true; // By default user would be inactive
-				/* 
+				/*
                     By Default requestDemo would be True | User is inactive
                     To make user active | Need to set requestDemo False
                     If value in request is 0 | User should be active | Set requestDemo to be False
@@ -976,22 +976,6 @@ router
 				return res.render('payment', {
 					error: 'Some error occurred!'
 				});
-			});
-	})
-	.get('/updatePaymentStatusAllUser', function(req, res) {
-		var userPromises = function(users) {
-			return _.map(users, user => {
-				return userModel.updateUserPaymentStatus(user);
-			});
-		};
-		return userModel
-			.getAllUsers()
-			.then(users => {
-				Promise.all(userPromises(users));
-				return res.send('done');
-			})
-			.catch(err => {
-				console.log(err);
 			});
 	});
 

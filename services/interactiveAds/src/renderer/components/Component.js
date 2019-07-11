@@ -13,12 +13,14 @@ class Component {
 		this.interactiveAd = interactiveAd;
 		this.adCode = adCode;
 		this.sendFeedback = this.sendFeedback.bind(this);
+		this.createPoweredByBanner = this.createPoweredByBanner.bind(this);
+		this.createCloseButton = this.createCloseButton.bind(this);
+		this.closeAd = this.closeAd.bind(this);
 	}
 
 	sendFeedback(options) {
 		if (adp && adp.utils && adp.utils.sendFeedback) {
 			adp.utils.sendFeedback(options);
-			adp.utils.sendFeedbackOld(options);
 		}
 	}
 
@@ -54,16 +56,14 @@ class Component {
 	}
 
 	render() {
-		const { formatData, width, height, id } = this.interactiveAd;
-		adp.interactiveAds.ads[id] = this.interactiveAd;
+		const { formatData, width, height, id, css: customCSS } = this.interactiveAd;
+		const { POWERED_BY_BANNER } = commonConsts;
 
 		if (this.interactiveAd.network === commonConsts.NETWORKS.ADPTAGS) {
 			executeAdpTagsHeadCode([this.interactiveAd], {}); // This function expects an array of adpTags and optional adpKeyValues
 		}
 
 		const css = {
-<<<<<<< HEAD
-=======
 			width,
 			height: parseInt(height) + POWERED_BY_BANNER.HEIGHT,
 			...formatData.css,
@@ -92,34 +92,18 @@ class Component {
 
 		$format.attr({ id, 'data-section': id, class: '_ap_apex_ad' });
 		$frame.css({
->>>>>>> acf4b5b5f73efb26120936d47ce9b7e42b1f26b1
 			width,
-			height: parseInt(height) + POWERED_BY_BANNER.HEIGHT,
-			...formatData.css,
-			...customCSS
-		};
+			...commonConsts.FRAME.CSS.COMMON,
+			...commonConsts.FRAME.CSS[formatData.placement.toUpperCase()]
+		});
 
-		const $format = $('<div />');
-
-		let $banner = null;
-
-		const $closeButton = this.createCloseButton(formatData);
-
-		const feedbackOptions = {
-			ads: [id],
-			xpathMiss: [],
-			eventType: 1,
-			mode: 1, // Changed it 1 because Innovative Ad is now completely independent of AdPushup Layout Testing
-			referrer: adp.config.referrer,
-			tracking: false,
-			variationId: !adp.config.manualModeActive
-				? adp.config.selectedVariation
-				: commonConsts.MANUAL_ADS.VARIATION
-		};
-
-		const $frame = $('<div />');
-
-		$format.attr({ id, 'data-section': id, class: '_ap_apex_ad' });
+		if (adp.config.poweredByBanner) {
+			$banner = this.createPoweredByBanner(formatData);
+			$frame.append($banner);
+		}
+		$frame.append($closeButton);
+		$frame.append('<div style="clear:both">&nbsp;</div>');
+		$format.append($frame);
 
 		adp.tracker.add(
 			$format,
@@ -132,10 +116,35 @@ class Component {
 			case commonConsts.FORMATS.STICKY.NAME:
 				$format.css({
 					...css,
+					...commonConsts.FORMAT_CSS,
 					...commonConsts.FORMATS.STICKY.BASE_STYLES,
 					...this.getPlacementCSS(formatData)
 				});
+				formatData.placement.toLowerCase() === 'top' ? this.pushContent(formatData) : null;
 				this.parentNode.append($format.append(this.adCode));
+				break;
+
+			case commonConsts.FORMATS.IN_VIEW.NAME:
+				$format.css({
+					...css,
+					...commonConsts.FORMAT_CSS,
+					...commonConsts.FORMATS.IN_VIEW.BASE_STYLES
+				});
+				this.parentNode.append(
+					$format
+						.append(this.adCode)
+						.hide()
+						.fadeIn()
+				);
+				break;
+
+			case commonConsts.FORMATS.DOCKED.NAME:
+				$format.css({
+					...css,
+					...commonConsts.FORMAT_CSS
+				});
+				this.parentNode.append($format.append(this.adCode));
+				window.adpushup.utils.dockify.dockifyAd(`#${id}`, formatData, window.adpushup.utils);
 				break;
 
 			case commonConsts.FORMATS.VIDEO.NAME:

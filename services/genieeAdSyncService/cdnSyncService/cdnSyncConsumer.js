@@ -226,8 +226,12 @@ module.exports = function(site, externalData = {}) {
 			});
 		},
 		uploadJS = function(fileConfig) {
-			const shouldUpload = prodEnv && !config.environment.IS_STAGING;
-			if (shouldUpload) {
+			const siteId = site.get('siteId'),
+			 shouldJSCdnSyncBeDisabled = !!(disableSiteCdnSyncList.indexOf(siteId) > -1);
+
+			 if (shouldJSCdnSyncBeDisabled || !prodEnv) {
+				return Promise.resolve(fileConfig.uncompressed);
+			}else{
 				return connectToServer()
 					.then(cwd)
 					.then(function() {
