@@ -9,6 +9,7 @@ import {
 	UPDATE_INVENTORIES_HB_STATUS,
 	SET_DFP_SETUP_STATUS
 } from '../../../constants/headerBidding';
+import history from '../../../helpers/history';
 import * as service from '../../../services/hbService';
 
 export const checkInventoryAction = siteId => dispatch =>
@@ -23,18 +24,16 @@ export const fetchAllBiddersAction = siteId => dispatch =>
 	service
 		.fetchBiddersList(siteId)
 		.then(({ data: bidders }) => dispatch({ type: FETCH_ALL_BIDDERS, siteId, bidders }))
-		.catch(err => {
-			// eslint-disable-next-line no-console
-			console.log(err);
+		.catch(() => {
+			history.push('/error');
 		});
 
 export const getSetupStatusAction = siteId => dispatch =>
 	service
 		.getSetupStatus(siteId)
 		.then(({ data: setupStatus }) => dispatch({ type: GET_SETUP_STATUS, siteId, setupStatus }))
-		.catch(err => {
-			// eslint-disable-next-line no-console
-			console.log(err);
+		.catch(() => {
+			history.push('/error');
 		});
 
 export const setDfpSetupStatusAction = siteId => dispatch =>
@@ -46,11 +45,7 @@ export const addBidderAction = (siteId, bidderConfig, params) => dispatch =>
 		.then(({ data: { bidderConfig: bidderConfigFromDB, bidderKey } }) =>
 			// Save bidder config in store
 			dispatch({ type: ADD_BIDDER, siteId, bidderKey, bidderConfig: bidderConfigFromDB })
-		)
-		.catch(err => {
-			// eslint-disable-next-line no-console
-			console.log(err);
-		});
+		);
 
 export const updateBidderAction = (siteId, bidderConfig, params) => dispatch =>
 	service
@@ -58,11 +53,7 @@ export const updateBidderAction = (siteId, bidderConfig, params) => dispatch =>
 		.then(({ data: { bidderConfig: bidderConfigFromDB, bidderKey } }) =>
 			// Save bidder config in store
 			dispatch({ type: UPDATE_BIDDER, siteId, bidderKey, bidderConfig: bidderConfigFromDB })
-		)
-		.catch(err => {
-			// eslint-disable-next-line no-console
-			console.log(err);
-		});
+		);
 
 export const fetchInventoriesAction = siteId => dispatch =>
 	service
@@ -71,16 +62,11 @@ export const fetchInventoriesAction = siteId => dispatch =>
 			// Save bidder config in store
 			dispatch({ type: FETCH_INVENTORIES, siteId, inventories })
 		)
-		.catch(err => {
-			// eslint-disable-next-line no-console
-			console.log(err);
+		.catch(() => {
+			history.push('/error');
 		});
 
 export const updateInventoriesHbStatus = (siteId, inventoriesToUpdate) => dispatch =>
 	service
 		.updateInventoriesHbStatus(siteId, inventoriesToUpdate)
-		.then(() => dispatch({ type: UPDATE_INVENTORIES_HB_STATUS, siteId, inventoriesToUpdate }))
-		.catch(err => {
-			// eslint-disable-next-line no-console
-			console.log(err);
-		});
+		.then(() => dispatch({ type: UPDATE_INVENTORIES_HB_STATUS, siteId, inventoriesToUpdate }));

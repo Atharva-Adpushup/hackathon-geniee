@@ -32,7 +32,7 @@ export default function getCommonBidderFields(isApRelation, manageBidderData) {
 		},
 		revenueShare: {
 			name: 'Revenue Share',
-			dataType: 'string',
+			dataType: 'number',
 			inputType: 'text',
 			isRequired: false,
 			isEditable: true

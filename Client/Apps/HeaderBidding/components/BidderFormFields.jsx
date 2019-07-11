@@ -59,9 +59,18 @@ class BidderFormFields extends React.Component {
 						value={currValue || ''}
 						onChange={({ target: { value } }) => {
 							if (adSize) {
-								setParamInTempState(adSize, paramKey, value);
+								setParamInTempState(
+									adSize,
+									paramKey,
+									dataType === 'number' ? parseFloat(value) : value
+								);
 							} else {
-								setFormFieldValueInState(stateKey, paramKey, value, adSize);
+								setFormFieldValueInState(
+									stateKey,
+									paramKey,
+									dataType === 'number' ? parseFloat(value) : value,
+									adSize
+								);
 							}
 						}}
 					/>
@@ -99,8 +108,9 @@ class BidderFormFields extends React.Component {
 		for (const collectionKey in formFields) {
 			const collection = formFields[collectionKey];
 			for (const fieldKey in collection) {
-				if (!fieldKey) return;
 				const fieldConfig = collection[fieldKey];
+				// eslint-disable-next-line no-continue
+				if (fieldConfig.visible === false) continue;
 
 				formFieldsJSX.push(
 					<FormGroup key={fieldKey} controlId={`hb-${fieldKey}`}>

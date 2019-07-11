@@ -76,7 +76,7 @@ class PrebidSettingsTab extends React.Component {
 							mode: 'success',
 							title: 'Success',
 							message: 'Prebid Settings Saved Successfully',
-							autoDismiss: 0
+							autoDismiss: 5
 						});
 					});
 				})
@@ -86,7 +86,7 @@ class PrebidSettingsTab extends React.Component {
 							mode: 'error',
 							title: 'Error',
 							message: 'Unable to save Prebid settings',
-							autoDismiss: 0
+							autoDismiss: 5
 						});
 					});
 				});

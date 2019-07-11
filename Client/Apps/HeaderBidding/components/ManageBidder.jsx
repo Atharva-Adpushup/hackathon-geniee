@@ -22,7 +22,7 @@ export default class ManageBidder extends React.Component {
 					mode: 'success',
 					title: 'Success',
 					message: 'Bidder updated successfully',
-					autoDismiss: 0
+					autoDismiss: 5
 				});
 			})
 			.catch(() => {
@@ -30,7 +30,7 @@ export default class ManageBidder extends React.Component {
 					mode: 'error',
 					title: 'Error',
 					message: 'Unable to update bidder',
-					autoDismiss: 0
+					autoDismiss: 5
 				});
 			});
 	};
