@@ -3,12 +3,8 @@ module.exports = {
 	BASE_URL: 'http://localhost:8080',
 	DFP_WEB_SERVICE_ENDPOINT: 'http://staging.adpushup.com/DfpWebService/info',
 	TRANSACTION_LOG_ENDPOINT: 'https://api.adpushup.com/SetupLogWebService/log',
-<<<<<<< HEAD
-	REPORT_STATUS: 'https://api.adpushup.com/OpsWebService/ops',
-	IE_TESTING_ENDPOINT: 'http://apdc1n-central5.eastus2.cloudapp.azure.com:8081/api/health-report',
-=======
 	REPORT_STATUS: 'https://api.adpushup.com/OpsWebService/ops?report=getNetworkImportServiceStatus',
->>>>>>> acf4b5b5f73efb26120936d47ce9b7e42b1f26b1
+	IE_TESTING_ENDPOINT: 'http://apdc1n-central5.eastus2.cloudapp.azure.com:8081/api/health-report',
 	PROXY_ORIGIN: '//proxy.app.adpushup.com',
 	PRODUCT_LIST_API: 'https://staging.adpushup.com/CentralReportingWebService/common/activeProducts',
 	ANALYTICS_API_ROOT: 'https://staging.adpushup.com/CentralReportingWebService',
