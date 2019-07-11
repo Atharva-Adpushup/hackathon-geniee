@@ -43,11 +43,20 @@ class AddManageSizelessBidder extends React.Component {
 							newState.bidderConfig[paramKey] = '';
 						}
 
-						for (const paramKey in {
+						const formFieldsParams = {
 							...formFields.params.global,
 							...formFields.params.siteLevel,
 							...formFields.params.adUnitLevel
-						}) {
+						};
+
+						for (const paramKey in formFieldsParams) {
+							if (formFieldsParams[paramKey].dataType === 'number') {
+								newState.params[paramKey] = null;
+
+								// eslint-disable-next-line no-continue
+								continue;
+							}
+
 							newState.params[paramKey] = '';
 						}
 
@@ -181,7 +190,15 @@ class AddManageSizelessBidder extends React.Component {
 
 	setFormFieldValueInState = (stateKey, paramKey, value) => {
 		this.setState(state => {
-			const newState = { [stateKey]: { ...state[stateKey], [paramKey]: value } };
+			const newState = {
+				[stateKey]: {
+					...state[stateKey],
+					[paramKey]:
+						state[stateKey][paramKey] === null || typeof state[stateKey][paramKey] === 'number'
+							? parseFloat(value)
+							: value
+				}
+			};
 			if (paramKey === 'bids' && value === 'net') newState[stateKey].revenueShare = '';
 			const newErrors = { ...state.errors };
 			const error = newErrors[paramKey];

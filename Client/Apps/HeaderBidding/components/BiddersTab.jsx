@@ -47,7 +47,14 @@ export default class BiddersTab extends React.Component {
 
 	render() {
 		const { currView, bidderConfig } = this.state;
-		const { siteId, bidders, addBidderAction, updateBidderAction, showNotification } = this.props;
+		const {
+			siteId,
+			bidders,
+			addBidderAction,
+			updateBidderAction,
+			showNotification,
+			domain
+		} = this.props;
 
 		return (
 			(bidders &&
@@ -57,6 +64,7 @@ export default class BiddersTab extends React.Component {
 					(currView === 'addBidder' && (
 						<AddBidder
 							siteId={siteId}
+							domain={domain}
 							bidderConfig={bidderConfig}
 							addBidderAction={addBidderAction}
 							openView={this.openView}

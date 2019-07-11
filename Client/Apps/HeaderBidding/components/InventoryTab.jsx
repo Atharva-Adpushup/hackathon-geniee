@@ -97,7 +97,7 @@ export default class InventoryTab extends React.Component {
 
 	updateInventoriesHbStatus = enableHB => {
 		this.setState({ updatingInventoryHbStatus: true });
-		const { inventories, siteId, updateInventoriesHbStatus } = this.props;
+		const { inventories, siteId, updateInventoriesHbStatus, showNotification } = this.props;
 		const { selectedInventories } = this.state;
 
 		const inventoriesToUpdate = [];
@@ -111,9 +111,16 @@ export default class InventoryTab extends React.Component {
 			}
 		}
 
-		updateInventoriesHbStatus(siteId, inventoriesToUpdate).then(() =>
-			this.setState({ updatingInventoryHbStatus: false })
-		);
+		updateInventoriesHbStatus(siteId, inventoriesToUpdate)
+			.then(() => this.setState({ updatingInventoryHbStatus: false }))
+			.catch(() => {
+				showNotification({
+					mode: 'error',
+					title: 'Error',
+					message: 'Unable to update inventories hb status',
+					autoDismiss: 5
+				});
+			});
 	};
 
 	toggleHbStatusForSiteState = newHbStatus => {
