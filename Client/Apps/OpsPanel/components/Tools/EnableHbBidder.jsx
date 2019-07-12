@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 import React from 'react';
 import { Table } from 'react-bootstrap';
 import CustomToggleSwitch from '../../../../Components/CustomToggleSwitch/index';
