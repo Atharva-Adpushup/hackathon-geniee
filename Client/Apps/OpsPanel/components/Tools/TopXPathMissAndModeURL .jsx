@@ -1,31 +1,21 @@
 import React, { Component, Fragment } from 'react';
-import { Col, Row } from 'react-bootstrap';
-import FieldGroup from '../../../../Components/Layout/FieldGroup';
+import { Row } from 'react-bootstrap';
 import moment from 'moment';
-import { Table } from 'react-bootstrap';
-import CustomToggleSwitch from '../../../../Components/CustomToggleSwitch/index';
-import CustomButton from '../../../../Components/CustomButton/index';
-import Loader from '../../../../Components/Loader/index';
-import SelectBox from '../../../../Components/SelectBox/index';
-import axiosInstance from '../../../../helpers/axiosInstance';
 import 'react-dates/initialize';
 import { DateRangePicker } from 'react-dates';
 import 'react-dates/lib/css/_datepicker.css';
+import FieldGroup from '../../../../Components/Layout/FieldGroup';
+import { XPATH_MODE_URL } from '../../configs/commonConsts';
 
-// import { getPresets } from  '../../../Reporting/helpers/utils';
-// import PresetDateRangePicker from '../../../../Components/PresetDateRangePicker/index';
+import CustomButton from '../../../../Components/CustomButton/index';
+import Loader from '../../../../Components/Loader/index';
+import SelectBox from '../../../../Components/SelectBox/index';
 
 class TopXPathMissAndModeURL extends Component {
 	constructor(props) {
 		super(props);
 
-		const devices = [
-			{ name: 'Desktop', value: 'Desktop' },
-			{ name: 'Mobile', value: 'Mobile' },
-			{ name: 'Tablet', value: 'Tablet' }
-		];
-
-		const modes = [{ name: 'Mode 1', value: 'Mode 1' }, { name: 'Mode 2', value: 'Mode 2' }];
+		const { devices, modes } = XPATH_MODE_URL;
 
 		this.state = {
 			siteId: '',
@@ -34,7 +24,9 @@ class TopXPathMissAndModeURL extends Component {
 			pageGroups: '',
 			devices,
 			modes,
-			currentSelcted: null,
+			currentSelectedDevice: null,
+			currentSelectedMode: null,
+
 			errorCode: '',
 			loading: false,
 			startDate: moment()
@@ -43,7 +35,7 @@ class TopXPathMissAndModeURL extends Component {
 			endDate: moment()
 				.startOf('day')
 				.subtract(1, 'day'),
-				focusedInput: null
+			focusedInput: null
 		};
 	}
 
@@ -53,7 +45,9 @@ class TopXPathMissAndModeURL extends Component {
 		});
 	};
 
-	handleSelect = value => this.setState({ currentSelcted: value });
+	handleSelectDevice = value => this.setState({ currentSelectedDevice: value });
+
+	handleSelectMode = value => this.setState({ currentSelectedMode: value });
 
 	handleGenerate = () => {};
 
@@ -63,17 +57,25 @@ class TopXPathMissAndModeURL extends Component {
 			topURLCount: '',
 			emailId: '',
 			pageGroups: '',
-			errorCode: ''
+			errorCode: '',
+			currentSelectedDevice: null,
+			currentSelectedMode: null,
+			startDate: moment()
+				.subtract(7, 'days')
+				.startOf('day'),
+			endDate: moment()
+				.startOf('day')
+				.subtract(1, 'day')
 		});
 	};
 
-	datesUpdated({ startDate, endDate }) {
+	datesUpdated = ({ startDate, endDate }) => {
 		this.setState({ startDate, endDate });
-	}
+	};
 
-	focusUpdated(focusedInput) {
+	focusUpdated = focusedInput => {
 		this.setState({ focusedInput });
-	}
+	};
 
 	render() {
 		const {
@@ -81,62 +83,64 @@ class TopXPathMissAndModeURL extends Component {
 			topURLCount,
 			emailId,
 			devices,
-			currentSelcted,
+			currentSelectedDevice,
+			currentSelectedMode,
 			pageGroups,
 			modes,
 			errorCode,
-			loading
+			loading,
+			startDate,
+			endDate,
+			focusedInput
 		} = this.state;
 
 		if (loading) return <Loader height="250px" />;
 
 		return (
 			<Row className="row">
-				<Col xs={12} style={{ margin: '0 auto' }}>
-					<FieldGroup
-						name="siteId"
-						value={siteId}
-						type="text"
-						label="Site Id"
-						onChange={this.handleChange}
-						size={6}
-						id="siteId-input"
-						placeholder="Site Id"
-						className="u-padding-v4 u-padding-h4"
-					/>
-				</Col>
-				<Col xs={12} style={{ margin: '0 auto' }}>
-					<FieldGroup
-						name="topURLCount"
-						value={topURLCount}
-						type="text"
-						label="Top URL Count"
-						onChange={this.handleChange}
-						size={6}
-						id="topURLCount-input"
-						placeholder="Top URL Count"
-						className="u-padding-v4 u-padding-h4"
-					/>
-				</Col>
+				<FieldGroup
+					name="siteId"
+					value={siteId}
+					type="text"
+					label="Site Id"
+					onChange={this.handleChange}
+					size={6}
+					id="siteId-input"
+					placeholder="Site Id"
+					className="u-padding-v4 u-padding-h4"
+				/>
 
-			 <Col xs ={12} style = {{ margin : '0 auto'}}>
-				<label className="u-text-bold">Dates</label>
-				<DateRangePicker
+				<FieldGroup
+					name="topURLCount"
+					value={topURLCount}
+					type="text"
+					label="Top URL Count"
+					onChange={this.handleChange}
+					size={6}
+					id="topURLCount-input"
+					placeholder="Top URL Count"
+					className="u-padding-v4 u-padding-h4"
+				/>
+
+				<Fragment>
+					<p className="u-text-bold">Dates</p>
+
+					<DateRangePicker
+						startDate={startDate}
+						endDate={endDate}
 						onDatesChange={this.datesUpdated}
+						focusedInput={focusedInput}
 						onFocusChange={this.focusUpdated}
-						focusedInput={this.state.focusedInput}
-						startDate={this.state.startDate}
-						endDate={this.state.endDate}
-						showDefaultInputIcon={true}
-						hideKeyboardShortcutsPanel={true}
-						showClearDates={true}
+						showDefaultInputIcon
+						hideKeyboardShortcutsPanel
+						showClearDates
 						minimumNights={0}
-						displayFormat={'DD-MM-YYYY'}
+						displayFormat="DD-MM-YYYY"
 						isOutsideRange={() => {}}
 					/>
-				</Col>
+				</Fragment>
 
-				<Col xs={12} style={{ margin: '0 auto' }}>
+				<div className="u-margin-t4">
 					<FieldGroup
 						name="emailId"
 						value={emailId}
@@ -148,21 +152,19 @@ class TopXPathMissAndModeURL extends Component {
 						placeholder="Email Id"
 						className="u-padding-v4 u-padding-h4"
 					/>
-				</Col>
-				<Col xs={12} style={{ margin: '0 auto' }}>
-					<Fragment>
-						<p className="u-text-bold">Device</p>
-						<SelectBox
-							selected={currentSelcted}
-							options={devices}
-							onSelect={this.handleSelect}
-							id="select-device"
-							title="Select Device"
-						/>
-					</Fragment>
-				</Col>
+				</div>
 
-				<Col xs={12} style={{ margin: '0 auto', marginTop: '2rem' }}>
+				<Fragment>
+					<p className="u-text-bold">Device</p>
+					<SelectBox
+						selected={currentSelectedDevice}
+						options={devices}
+						onSelect={this.handleSelectDevice}
+						id="select-device"
+						title="Select Device"
+					/>
+				</Fragment>
+				<div className="u-margin-t4">
 					<FieldGroup
 						name="pageGroups"
 						value={pageGroups}
@@ -174,22 +176,20 @@ class TopXPathMissAndModeURL extends Component {
 						placeholder="Page Groups"
 						className="u-padding-v4 u-padding-h4"
 					/>
-				</Col>
+				</div>
 
-				<Col xs={12} style={{ margin: '0 auto' }}>
-					<Fragment>
-						<p className="u-text-bold">Mode</p>
-						<SelectBox
-							selected={currentSelcted}
-							options={modes}
-							onSelect={this.handleSelect}
-							id="select-mode"
-							title="Select Mode"
-						/>
-					</Fragment>
-				</Col>
+				<Fragment>
+					<p className="u-text-bold">Mode</p>
+					<SelectBox
+						selected={currentSelectedMode}
+						options={modes}
+						onSelect={this.handleSelectMode}
+						id="select-mode"
+						title="Select Mode"
+					/>
+				</Fragment>
 
-				<Col xs={12} style={{ margin: '0 auto', marginTop: '2rem' }}>
+				<div className="u-margin-t4">
 					<FieldGroup
 						name="errorCode"
 						value={errorCode}
@@ -201,25 +201,23 @@ class TopXPathMissAndModeURL extends Component {
 						placeholder="Error Code"
 						className="u-padding-v4 u-padding-h4"
 					/>
-				</Col>
+				</div>
 
-				<Col xs={12} style={{ margin: '0 auto' }}>
-					<CustomButton
-						variant="primary"
-						className="pull-right u-margin-r3"
-						onClick={this.handleGenerate}
-					>
-						Generate
-					</CustomButton>
+				<CustomButton
+					variant="primary"
+					className="pull-right u-margin-r3"
+					onClick={this.handleGenerate}
+				>
+					Generate
+				</CustomButton>
 
-					<CustomButton
-						variant="secondary"
-						className="pull-right u-margin-r3"
-						onClick={this.handleReset}
-					>
-						Reset
-					</CustomButton>
-				</Col>
+				<CustomButton
+					variant="secondary"
+					className="pull-right u-margin-r3"
+					onClick={this.handleReset}
+				>
+					Reset
+				</CustomButton>
 			</Row>
 		);
 	}
