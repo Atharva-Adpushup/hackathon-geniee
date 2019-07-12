@@ -28,9 +28,10 @@ class EnableHbBidder extends React.Component {
 		const { updateNetworkConfig } = this.props;
 		const { networks } = this.state;
 
-		this.setState({ loading: true });
-
-		updateNetworkConfig(networks).then(() => this.setState({ loading: false }));
+		if (window.confirm('Are you want to save settings?')) {
+			this.setState({ loading: true });
+			updateNetworkConfig(networks).then(() => this.setState({ loading: false }));
+		}
 	};
 
 	render() {
