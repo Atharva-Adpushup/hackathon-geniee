@@ -3,7 +3,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { DropdownButton, MenuItem, Glyphicon } from 'react-bootstrap';
-import CustomIcon from '../CustomIcon';
 
 const findSelected = props => {
 	const { selected, title, options } = props;
