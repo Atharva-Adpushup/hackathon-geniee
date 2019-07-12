@@ -10,7 +10,7 @@ import CustomToggleSwitch from '../../../../Components/CustomToggleSwitch/index'
 import FieldGroup from '../../../../Components/Layout/FieldGroup';
 import CustomButton from '../../../../Components/CustomButton/index';
 import CustomMessage from '../../../../Components/CustomMessage/index';
-import Selectbox from '../../../../Components/Selectbox';
+import SelectBox from '../../../../Components/SelectBox';
 import Loader from '../../../../Components/Loader/index';
 
 class Account extends Component {
@@ -205,7 +205,7 @@ class Account extends Component {
 				) : (
 					<Fragment>
 						<p className="u-text-bold">Select DFP</p>
-						<Selectbox
+						<SelectBox
 							onSelect={this.handleToggle}
 							options={dfpAccounts}
 							title="Select DFP Account"

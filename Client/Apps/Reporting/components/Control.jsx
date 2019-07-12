@@ -5,7 +5,7 @@ import 'react-dates/lib/css/_datepicker.css';
 import 'react-dates/initialize';
 import AsyncGroupSelect from '../../../Components/AsyncGroupSelect/index';
 import PresetDateRangePicker from '../../../Components/PresetDateRangePicker/index';
-import Selectbox from '../../../Components/SelectBox/index';
+import SelectBox from '../../../Components/SelectBox/index';
 import { convertObjToArr, getPresets } from '../helpers/utils';
 import reportService from '../../../services/reportService';
 import { accountFilter, REPORT_DOWNLOAD_ENDPOINT } from '../configs/commonConsts';
@@ -174,7 +174,7 @@ class Control extends Component {
 					<div className="aligner-item u-margin-r4">
 						{/* eslint-disable */}
 						<label className="u-text-normal">Report By</label>
-						<Selectbox
+						<SelectBox
 							id="report-by"
 							isClearable={false}
 							isSearchable={false}
@@ -192,7 +192,7 @@ class Control extends Component {
 					<div className="aligner-item u-margin-r4">
 						{/* eslint-disable */}
 						<label className="u-text-normal">Interval</label>
-						<Selectbox
+						<SelectBox
 							id="interval"
 							reset={true}
 							isClearable={false}
