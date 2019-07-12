@@ -6,7 +6,7 @@ export default function getValidationSchema(formFields) {
 	for (const paramKey in formFields) {
 		const formField = formFields[paramKey];
 
-		if (formField.isRequired) {
+		if (formField.visible !== false && formField.isRequired) {
 			if (!Array.isArray(validationSchema.isNull)) validationSchema.isNull = [];
 
 			validationSchema.isNull.push({

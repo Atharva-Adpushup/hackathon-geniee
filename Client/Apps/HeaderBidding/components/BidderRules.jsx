@@ -11,6 +11,7 @@ import {
 	saveBidderRule as saveBidderRuleToDB,
 	deleteBidderRule as deleteBidderRuleFromDB
 } from '../../../services/hbService';
+import history from '../../../helpers/history';
 import Loader from '../../../Components/Loader';
 import CustomButton from '../../../Components/CustomButton';
 import BidderRuleModal from './BidderRuleModal';
@@ -30,9 +31,13 @@ class BidderRules extends React.Component {
 	componentDidMount() {
 		const { siteId } = this.props;
 
-		fetchOptimizationTabInitData(siteId).then(({ bidderRules, addedBidders }) => {
-			this.setState({ bidderRules, bidders: addedBidders });
-		});
+		fetchOptimizationTabInitData(siteId)
+			.then(({ bidderRules, addedBidders }) => {
+				this.setState({ bidderRules, bidders: addedBidders });
+			})
+			.catch(() => {
+				history.push('/error');
+			});
 	}
 
 	hideBidderRuleModal = () => {
@@ -73,7 +78,7 @@ class BidderRules extends React.Component {
 	};
 
 	deleteBidderRule = bidder => {
-		const { siteId } = this.props;
+		const { siteId, showNotification } = this.props;
 
 		this.setState({ deletingBidderRule: { bidder, status: true } });
 
@@ -92,12 +97,19 @@ class BidderRules extends React.Component {
 				})
 			)
 			.catch(err => {
-				this.setState({ deletingBidderRule: { bidder: '', status: false } });
+				this.setState({ deletingBidderRule: { bidder: '', status: false } }, () => {
+					showNotification({
+						mode: 'error',
+						title: 'Error',
+						message: 'Unable to delete bidder rule',
+						autoDismiss: 5
+					});
+				});
 			});
 	};
 
 	saveBidderRule = rule => {
-		const { siteId } = this.props;
+		const { siteId, showNotification } = this.props;
 		const { bidderRules } = { ...this.state };
 
 		this.setState({ savingBidderRule: true });
@@ -117,7 +129,14 @@ class BidderRules extends React.Component {
 				this.setState({ bidderRules, savingBidderRule: false }, () => this.hideBidderRuleModal());
 			})
 			.catch(err => {
-				this.setState({ savingBidderRule: false });
+				this.setState({ savingBidderRule: false }, () => {
+					showNotification({
+						mode: 'error',
+						title: 'Error',
+						message: 'Unable to save bidder rule',
+						autoDismiss: 5
+					});
+				});
 			});
 	};
 
