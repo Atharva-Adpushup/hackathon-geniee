@@ -10,18 +10,33 @@ class Chart extends React.Component {
 	state = {
 		type: 'spline',
 		xAxis: { categories: [] },
-		startDate: this.props.startDate,
-		endDate: this.props.endDate,
-		selectedDimension: this.props.selectedDimension,
-		selectedInterval: this.props.selectedInterval,
 		legends: this.props.metricsList,
 		activeLegendItems: this.props.selectedDimension ? activeLegendItem : activeLegendItems,
 		series: [],
-		tableData: this.props.tableData
+		tableData: this.props.tableData,
+		selectedDimension: this.props.selectedDimension
 	};
 
+	componentDidMount() {
+		const { legends } = this.state;
+		const { tableData } = this.props;
+		if (tableData.result && tableData.result.length > 0) {
+			const totalRow = tableData.total;
+			legends.forEach(legend => {
+				legend.total = totalRow[`total_${legend.value}`];
+			});
+		}
+		this.setState({ legends });
+		this.updateChartData();
+	}
+
+	shouldComponentUpdate(nextProps) {
+		return this.props.tableData != nextProps.tableData;
+	}
+
 	enumerateDaysBetweenDates = () => {
-		const { startDate, endDate, xAxis, selectedInterval } = this.state;
+		const { xAxis } = this.state;
+		const { startDate, endDate, selectedInterval } = this.props;
 		const dates = [];
 
 		const currDate = moment(startDate).startOf('day');
@@ -42,7 +57,7 @@ class Chart extends React.Component {
 				}
 				break;
 			case 'cumulative':
-				dates.push(currDate.format('ll') + ' to ' + lastDate.format('ll'));
+				dates.push(`${currDate.format('ll')} to ${lastDate.format('ll')}`);
 				break;
 		}
 
@@ -50,64 +65,22 @@ class Chart extends React.Component {
 		this.setState(xAxis);
 	};
 
-	componentDidUpdate(prevProps) {
-		if (prevProps.tableData !== this.props.tableData) {
-			const { tableData, selectedDimension, selectedInterval, startDate, endDate } = this.props;
-			let { legends } = this.state;
-			if (tableData.result && tableData.result.length > 0) {
-				const totalRow = tableData.total;
-				legends.forEach(legend => {
-					legend.total = totalRow['total_' + legend.value];
-				});
-			}
-			this.setState(
-				{
-					legends,
-					tableData,
-					selectedDimension,
-					selectedInterval,
-					startDate,
-					endDate,
-					activeLegendItems: selectedDimension ? activeLegendItem : activeLegendItems
-				},
-				() => {
-					this.updateChartData();
-				}
-			);
-		}
-	}
-
-	componentDidMount() {
-		let { legends } = this.state;
-		const { tableData } = this.props;
-		if (tableData.result && tableData.result.length > 0) {
-			const totalRow = tableData.total;
-			legends.forEach(legend => {
-				legend.total = totalRow['total_' + legend.value];
-			});
-		}
-		this.setState({ legends });
-		this.updateChartData();
-	}
-
 	updateChartData = activeLegendItem => {
 		this.enumerateDaysBetweenDates();
 		const { selectedDimension, metricsList, selectedInterval } = this.props;
-		let { xAxis, tableData, activeLegendItems } = this.state;
+		const { xAxis, tableData, activeLegendItems } = this.state;
 		const series = [];
 		const rows = tableData.result;
 		if (tableData.result && tableData.result.length > 0) {
 			if (selectedDimension) {
 				activeLegendItems = activeLegendItem || activeLegendItems;
-				let groupByResult = rows.map(row => {
-					return {
-						date: row.date,
-						month: row.month,
-						year: row.year,
-						[activeLegendItems.value]: row[activeLegendItems.value],
-						[selectedDimension]: row[selectedDimension]
-					};
-				});
+				let groupByResult = rows.map(row => ({
+					date: row.date,
+					month: row.month,
+					year: row.year,
+					[activeLegendItems.value]: row[activeLegendItems.value],
+					[selectedDimension]: row[selectedDimension]
+				}));
 				groupByResult = groupBy(groupByResult, result => result[selectedDimension]);
 				const { valueType } = activeLegendItems;
 				for (const results in groupByResult) {
@@ -120,7 +93,7 @@ class Chart extends React.Component {
 						const found = find(groupByResult[results], result => {
 							if (selectedInterval === 'daily')
 								return result.date === moment(xAxis.categories[i]).format('YYYY-MM-DD');
-							else if (selectedInterval === 'monthly')
+							if (selectedInterval === 'monthly')
 								return (
 									result.month == moment(xAxis.categories[i]).format('M') &&
 									result.year == moment(xAxis.categories[i]).format('Y')
@@ -133,19 +106,19 @@ class Chart extends React.Component {
 					series.push(serie);
 				}
 			} else {
-				let sortedResult = rows;
+				const sortedResult = rows;
 				const groupByResult = {};
 				sortedResult.map(result => {
 					metricsList.forEach(metric => {
 						if (!metricsList.isDisabled) {
-							let metricType = metric.value;
-							let metricName = metric.name;
-							let valueType = metric.valueType;
-							let data = {
+							const metricType = metric.value;
+							const metricName = metric.name;
+							const valueType = metric.valueType;
+							const data = {
 								value: result[metricType],
-								date: result['date'],
-								month: result['month'],
-								year: result['year'],
+								date: result.date,
+								month: result.month,
+								year: result.year,
 								valueType,
 								metricName
 							};
@@ -165,14 +138,14 @@ class Chart extends React.Component {
 						const found = find(groupByResult[results], result => {
 							if (selectedInterval === 'daily')
 								return result.date === moment(xAxis.categories[i]).format('YYYY-MM-DD');
-							else if (selectedInterval === 'monthly')
+							if (selectedInterval === 'monthly')
 								return (
 									result.month == moment(xAxis.categories[i]).format('M') &&
 									result.year == moment(xAxis.categories[i]).format('Y')
 								);
 							return true;
 						});
-						if (found) serie.data.push(found['value']);
+						if (found) serie.data.push(found.value);
 						else serie.data.push(0);
 					}
 					series.push(serie);
@@ -183,9 +156,7 @@ class Chart extends React.Component {
 	};
 
 	render() {
-		const { type, series, xAxis, legends, activeLegendItems, tableData } = this.state;
-		const { selectedDimension } = this.props;
-		//if (tableData && tableData.result && tableData.result.length > 0)
+		const { type, series, xAxis, legends, activeLegendItems, selectedDimension } = this.state;
 		return (
 			<div>
 				<CustomChart
@@ -199,7 +170,7 @@ class Chart extends React.Component {
 				/>
 			</div>
 		);
-		//else return '';
+		// else return '';
 	}
 }
 

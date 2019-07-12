@@ -3,31 +3,39 @@ import Datatable from 'react-bs-datatable';
 import { Col } from 'react-bootstrap';
 import { sortBy } from 'lodash';
 import moment from 'moment';
-import { numberWithCommas } from '../helpers/utils';
+import { numberWithCommas, computeCsvData } from '../helpers/utils';
 class Table extends React.Component {
-	state = {
-		dimension: this.props.dimension,
-		metrics: this.props.metrics,
-		tableData: this.props.tableData,
-		tableHeader: [],
-		tableBody: [],
-		grandTotal: {}
-	};
-
-	componentDidMount() {
-		this.updateTableData();
+	constructor(props) {
+		super(props);
+		const { tableHeader, tableBody, grandTotal, csvData } = this.updateTableData();
+		this.state = {
+			dimension: this.props.dimension,
+			metrics: this.props.metrics,
+			tableData: this.props.tableData,
+			tableHeader,
+			tableBody,
+			grandTotal,
+			csvData
+		};
 	}
 
-	componentDidUpdate(prevProps) {
-		if (prevProps.tableData !== this.props.tableData) {
-			this.setState(
-				{
-					tableData: this.props.tableData
-				},
-				this.updateTableData
-			);
-		}
+	// componentDidMount() {
+	// 	this.updateTableData();
+	// }
+	shouldComponentUpdate(nextProps) {
+		return this.props.tableData !== nextProps.tableData;
 	}
+
+	// componentDidUpdate(prevProps) {
+	// 	if (prevProps.tableData !== this.props.tableData) {
+	// 		this.setState(
+	// 			{
+	// 				tableData: this.props.tableData
+	// 			},
+	// 			this.updateTableData
+	// 		);
+	// 	}
+	// }
 
 	formatTableData = tableBody => {
 		const { metrics } = this.state;
@@ -46,8 +54,16 @@ class Table extends React.Component {
 	};
 
 	updateTableData = () => {
-		let { dimension, metrics, tableData } = this.state;
-		const { selectedInterval, startDate, endDate, getTableData, site } = this.props;
+		//let { dimension, metrics, tableData } = this.state;
+		const {
+			selectedInterval,
+			startDate,
+			endDate,
+			site,
+			dimension,
+			metrics,
+			tableData
+		} = this.props;
 		if (tableData.columns && tableData.result.length > 0) {
 			let tableHeader = [];
 			let displayTableData = [];
@@ -138,10 +154,13 @@ class Table extends React.Component {
 			grandTotal[tableHeader[0].prop] = 'Total';
 
 			displayTableData = this.formatTableData(displayTableData);
-			this.setState({ tableBody: displayTableData, tableHeader, grandTotal }, () => {
-				getTableData({ tableBody: displayTableData, tableHeader, grandTotal });
-			});
+			csvData = this.getTableData({ tableBody: displayTableData, tableHeader, grandTotal });
+			return { tableBody: displayTableData, tableHeader, grandTotal, csvData };
 		}
+	};
+	getTableData = tableData => {
+		let csvData = computeCsvData(tableData);
+		this.setState({ csvData });
 	};
 	renderFooter() {
 		let { tableHeader, grandTotal, metrics } = this.state;

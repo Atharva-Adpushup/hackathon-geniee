@@ -1,13 +1,14 @@
 import React, { Component, Fragment } from 'react';
-import { sortBy } from 'lodash';
+import { sortBy, isEmpty, union } from 'lodash';
 import { Glyphicon, Button } from 'react-bootstrap';
 import 'react-dates/lib/css/_datepicker.css';
 import 'react-dates/initialize';
 import AsyncGroupSelect from '../../../Components/AsyncGroupSelect/index';
 import PresetDateRangePicker from '../../../Components/PresetDateRangePicker/index';
-import Selectbox from '../../../Components/SelectBox/index';
+import Selectbox from '../../../Components/Selectbox/index';
 import { convertObjToArr, getPresets } from '../helpers/utils';
 import reportService from '../../../services/reportService';
+import { displayMetrics } from '../configs/commonConsts';
 import { accountFilter, REPORT_DOWNLOAD_ENDPOINT } from '../configs/commonConsts';
 
 class Control extends Component {
@@ -26,36 +27,38 @@ class Control extends Component {
 			selectedInterval: props.selectedInterval || '',
 			selectedFilters: props.selectedFilters || {},
 			disableGenerateButton: false,
-			updateStatusText: ''
+			updateStatusText: '',
+			csvData: props.csvData
 		};
 	}
 
 	componentDidMount() {
-		this.updateFilterList(this.props.reportType);
+		//this.updateFilterList(this.props.reportType);
 		this.getReportStatus();
 	}
 
-	componentDidUpdate(prevProps) {
-		const { selectedDimension, selectedFilters, selectedInterval, startDate, endDate } = this.props;
-		if (prevProps.selectedFilters !== selectedFilters) {
-			this.setState({ selectedFilters });
-		}
-		if (prevProps.selectedDimension !== selectedDimension) {
-			this.setState({ selectedDimension });
-		}
-		if (prevProps.selectedInterval !== selectedInterval) {
-			this.setState({ selectedInterval });
-		}
-		if (prevProps.startDate !== startDate) {
-			this.setState({ startDate });
-		}
-		if (prevProps.endDate !== endDate) {
-			this.setState({ endDate });
-		}
-		if (prevProps.reportType !== this.props.reportType) {
-			this.updateFilterList(this.props.reportType);
-		}
+	shouldComponentUpdate() {
+		return false;
 	}
+
+	onControlChange = () => {
+		let {
+			startDate,
+			endDate,
+			selectedInterval,
+			selectedDimension,
+			selectedFilters,
+			reportType
+		} = this.state;
+		this.props.onControlChange({
+			startDate,
+			endDate,
+			selectedInterval,
+			selectedDimension,
+			selectedFilters,
+			reportType
+		});
+	};
 
 	updateFilterList = reportType => {
 		const { filter } = this.props;
@@ -78,8 +81,7 @@ class Control extends Component {
 	};
 
 	getSelectedFilter = filter => {
-		const { reportType } = this.props;
-		const { selectedFilters } = this.state;
+		const { reportType, selectedFilters } = this.props;
 		let siteIds;
 		if (reportType === 'account') {
 			const { site } = this.props;
@@ -89,45 +91,6 @@ class Control extends Component {
 		}
 		const params = { siteid: siteIds.toString() };
 		return reportService.getWidgetData({ path: filter.path, params });
-	};
-
-	disableControl = (disabledFilter, disabledDimension, disabledMetrics) => {
-		let { dimensionList, filterList, metricsList } = this.state;
-		if (disabledFilter && disabledFilter.length > 0) {
-			filterList.map(filter => {
-				let found = disabledFilter.find(fil => fil === filter.value);
-				if (found) filter.isDisabled = true;
-			});
-		}
-		if (disabledDimension && disabledDimension.length > 0) {
-			dimensionList.map(dimension => {
-				let found = disabledDimension.find(dim => dim === dimension.value);
-				if (found) dimension.isDisabled = true;
-			});
-		}
-		if (disabledMetrics && disabledMetrics.length > 0) {
-			metricsList.map(metrics => {
-				let found = disabledMetrics.find(metric => metric === metrics.value);
-				if (found) metrics.isDisabled = true;
-			});
-		}
-		this.setState({ filterList, metricsList, dimensionList });
-	};
-
-	onDimensionChange = selectedDimension => {
-		let { dimensionList } = this.state;
-		let dimensionObj = dimensionList.find(dimension => dimension.value === selectedDimension);
-		if (dimensionObj) {
-			let disabledFilter = dimensionObj['disabled_filter'];
-			let disabledDimension = dimensionObj['disabled_dimension'];
-			let disabledMetrics = dimensionObj['disabled_metrics'];
-			this.disableControl(disabledFilter, disabledDimension, disabledMetrics);
-		}
-	};
-
-	onFilterChange = selectedFilters => {
-		if (selectedFilters && selectedFilters['siteid']) this.updateFilterList('site');
-		this.setState({ selectedFilters });
 	};
 
 	getReportStatus() {
@@ -141,32 +104,9 @@ class Control extends Component {
 		});
 	}
 
-	generateButtonHandler = () => {
-		const {
-			startDate,
-			endDate,
-			selectedDimension,
-			selectedInterval,
-			selectedFilters,
-			metricsList
-		} = this.state;
-		const { generateButtonHandler } = this.props;
-		generateButtonHandler({
-			startDate,
-			endDate,
-			selectedDimension,
-			selectedFilters,
-			selectedInterval,
-			metricsList
-		});
-		// this.setState({
-		// 	disableGenerateButton: true
-		// });
-	};
-
 	render() {
-		const { state, props } = this;
-		let csvData = btoa(JSON.stringify(props.csvData));
+		const { state } = this;
+		let csvData = btoa(JSON.stringify(state.csvData));
 		const downloadLink = `${REPORT_DOWNLOAD_ENDPOINT}?data=${csvData}`;
 		return (
 			<Fragment>
@@ -182,8 +122,7 @@ class Control extends Component {
 							selected={state.selectedDimension || ''}
 							options={state.dimensionList}
 							onSelect={selectedDimension => {
-								this.onDimensionChange(selectedDimension);
-								this.setState({ selectedDimension });
+								this.setState({ selectedDimension }, this.onControlChange);
 							}}
 						/>
 						{/* eslint-enable */}
@@ -200,7 +139,7 @@ class Control extends Component {
 							selected={state.selectedInterval || ''}
 							options={state.intervalList}
 							onSelect={selectedInterval => {
-								this.setState({ selectedInterval });
+								this.setState({ selectedInterval }, this.onControlChange);
 							}}
 						/>
 						{/* eslint-enable */}
@@ -212,7 +151,9 @@ class Control extends Component {
 							presets={getPresets()}
 							startDate={state.startDate}
 							endDate={state.endDate}
-							datesUpdated={({ startDate, endDate }) => this.setState({ startDate, endDate })}
+							datesUpdated={({ startDate, endDate }) =>
+								this.setState({ startDate, endDate }, this.onControlChange)
+							}
 							autoFocus
 						/>
 						<div className="updateStatusDiv">{state.updateStatusText}</div>
@@ -225,7 +166,9 @@ class Control extends Component {
 						<AsyncGroupSelect
 							filterList={state.filterList}
 							selectedFilters={state.selectedFilters}
-							onFilterValueChange={this.onFilterChange}
+							onFilterValueChange={selectedFilters => {
+								this.setState({ selectedFilters }, this.onControlChange);
+							}}
 							getSelectedFilter={this.getSelectedFilter}
 						/>
 						{/* eslint-enable */}
@@ -234,7 +177,7 @@ class Control extends Component {
 					<div className="aligner-item u-margin-r4 aligner--hEnd">
 						<Button
 							bsStyle="primary"
-							onClick={this.generateButtonHandler}
+							onClick={this.props.generateButtonHandler}
 							disabled={state.disableGenerateButton}
 						>
 							<Glyphicon glyph="cog u-margin-r2" />

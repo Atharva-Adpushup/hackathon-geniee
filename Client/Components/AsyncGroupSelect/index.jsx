@@ -70,7 +70,7 @@ class AsyncGroupSelect extends Component {
 				this.setState({
 					filterValues: response.data.result,
 					filterResult: response.data.result,
-					selectedFilterKey: filter.name,
+					selectedFilterKey: filter.value,
 					selectedFilters,
 					showFilterValues: true,
 					isLoading: false
@@ -149,11 +149,6 @@ class AsyncGroupSelect extends Component {
 	selectAll = () => {
 		const { selectedFilters, selectedFilterKey, filterValues } = this.state;
 		selectedFilters[selectedFilterKey] = selectedFilters[selectedFilterKey] || {};
-		// if (checked) selectedFilters[selectedFilterKey][key] = true;
-		// else delete selectedFilters[selectedFilterKey][key];
-		// for (let filter in selectedFilters) {
-		// 	if (_.isEmpty(selectedFilters[filter])) delete selectedFilters[filter];
-		// }
 		filterValues.map(filterValue => {
 			selectedFilters[selectedFilterKey][filterValue.id] = true;
 		});
@@ -197,7 +192,14 @@ class AsyncGroupSelect extends Component {
 								e.stopPropagation();
 								let { selectedFilters } = state;
 								selectedFilters[filterKey] = {};
-								this.setState({ selectedFilters });
+								this.setState(
+									{
+										selectedFilters
+									},
+									() => {
+										this.props.onFilterValueChange(selectedFilters);
+									}
+								);
 							}}
 						/>
 					</Label>
