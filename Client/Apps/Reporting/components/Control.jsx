@@ -5,7 +5,7 @@ import 'react-dates/lib/css/_datepicker.css';
 import 'react-dates/initialize';
 import AsyncGroupSelect from '../../../Components/AsyncGroupSelect/index';
 import PresetDateRangePicker from '../../../Components/PresetDateRangePicker/index';
-import Selectbox from '../../../Components/Selectbox/index';
+import Selectbox from '../../../Components/SelectBox/index';
 import { convertObjToArr, getPresets } from '../helpers/utils';
 import reportService from '../../../services/reportService';
 import { accountFilter, REPORT_DOWNLOAD_ENDPOINT } from '../configs/commonConsts';

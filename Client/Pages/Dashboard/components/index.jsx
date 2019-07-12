@@ -11,7 +11,7 @@ import PerformanceApOriginalContainer from '../containers/PerformanceApOriginalC
 import RevenueContainer from '../containers/RevenueContainer';
 import Loader from '../../../Components/Loader/index';
 import { dates } from '../configs/commonConsts';
-import Selectbox from '../../../Components/Selectbox/index';
+import Selectbox from '../../../Components/SelectBox/index';
 import reportService from '../../../services/reportService';
 import { convertObjToArr, getDateRange } from '../helpers/utils';
 

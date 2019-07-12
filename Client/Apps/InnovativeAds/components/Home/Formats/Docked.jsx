@@ -3,7 +3,7 @@
 /* eslint-disable no-alert */
 import React, { Component } from 'react';
 import { Col } from 'react-bootstrap';
-import SelectBox from '../../../../../Components/Selectbox/index';
+import SelectBox from '../../../../../Components/SelectBox/index';
 import { AD_OPERATIONS, TYPE_OF_ADS, EVENTS } from '../../../configs/commonConsts';
 import CodeBox from '../../../../../Components/CodeBox/index';
 import CustomInput from '../../shared/index';

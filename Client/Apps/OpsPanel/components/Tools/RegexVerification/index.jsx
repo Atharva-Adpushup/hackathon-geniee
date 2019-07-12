@@ -1,5 +1,5 @@
 import React from 'react';
-import SelectBox from '../../../../../Components/Selectbox/index';
+import SelectBox from '../../../../../Components/SelectBox/index';
 import Pagegroups from './Pagegroups';
 
 class RegexVerification extends React.Component {

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import SelectBox from '../../../../../Components/Selectbox/index';
+import SelectBox from '../../../../../Components/SelectBox/index';
 import { interactiveAdEvents } from '../../../configs/commonConsts';
 import CodeBox from '../../../../../Components/CodeBox/index';
 import CustomButton from '../../../../../Components/CustomButton/index';

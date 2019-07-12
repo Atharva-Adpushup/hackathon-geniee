@@ -11,7 +11,7 @@ import {
 	ToggleButton
 } from 'react-bootstrap';
 import PropTypes from 'prop-types';
-import SelectBox from '../Selectbox/index';
+import SelectBox from '../SelectBox/index';
 
 const FieldGroup = ({
 	id,
