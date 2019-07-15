@@ -1,14 +1,17 @@
-const config = require('./config'),
-prodEnv = config.environment.HOST_ENV === 'production';
+const config = require('./config');
+
+const prodEnv = config.environment.HOST_ENV === 'production';
+
 module.exports = {
 	SALT: '_ADP_RANDOMIZER_',
-	BASE_URL: prodEnv ?'https://console.adpushup.com': 'http://localhost:8080',
+	BASE_URL: prodEnv ? 'https://console.adpushup.com' : 'http://localhost:8080',
 	DFP_WEB_SERVICE_ENDPOINT: 'http://staging.adpushup.com/DfpWebService/info',
 	TRANSACTION_LOG_ENDPOINT: 'https://api.adpushup.com/SetupLogWebService/log',
 	REPORT_STATUS: 'https://api.adpushup.com/OpsWebService/ops?report=getNetworkImportServiceStatus',
 	IE_TESTING_ENDPOINT: 'http://apdc1n-central5.eastus2.cloudapp.azure.com:8081/api/health-report',
 	PROXY_ORIGIN: '//proxy.app.adpushup.com',
 	PRODUCT_LIST_API: 'https://staging.adpushup.com/CentralReportingWebService/common/activeProducts',
+	ACTIVE_SITES_API: 'https://staging.adpushup.com/CentralReportingWebService/site/activeSiteList',
 	ANALYTICS_API_ROOT: 'https://staging.adpushup.com/CentralReportingWebService',
 	ANALYTICS_METAINFO_URL: '/common/metaInfo',
 	REPORT_PATH: '/site/report?report_name=get_stats_by_custom',
