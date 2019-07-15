@@ -31,6 +31,28 @@ router
 			.catch(err => errorHandler(err, res, HTTP_STATUSES.INTERNAL_SERVER_ERROR))
 	)
 	.get('/getSiteStats', (req, res) => {
+		if (!req.user.isSuperUser) {
+			return sendErrorResponse(
+				{
+					message: 'Unauthorized Request',
+					code: HTTP_STATUSES.UNAUTHORIZED
+				},
+				res
+			);
+		}
+		const { params } = req.body;
+		let parsedData;
+		try {
+			parsedData = JSON.parse(atob(params));
+		} catch (e) {
+			return sendErrorResponse(
+				{
+					message: 'Invalid Params Received',
+					code: HTTP_STATUSES.BAD_REQUEST
+				},
+				res
+			);
+		}
 		const DEFAULT_OPERATION = {
 			operation: 'subtract',
 			unit: 'days'
@@ -70,17 +92,17 @@ router
 
 			return request(options);
 		}
-
-		const { params } = req.body;
-		let parsedData;
-		try {
-			parsedData = JSON.parse(atob(params));
-		} catch (e) {
-			return sendErrorResponse({
-				message: 'Invalid Params Received'
-			});
-		}
-		return checkParams(['pageviewsThreshold', 'last', 'current'], req, 'get')
+		return new Promise((resolve, reject) => {
+			if (!parsedData.pageviewsThreshold || !parsedData.last || !parsedData.current) {
+				return reject(
+					new Error({
+						message: 'Missing Params',
+						code: HTTP_STATUSES.BAD_REQUEST
+					})
+				);
+			}
+			return resolve();
+		})
 			.then(() => {
 				const { pageviewsThreshold = 10000, last = {}, current = {} } = parsedData;
 				const currentTo = processDate(current.to, moment(), 1);
