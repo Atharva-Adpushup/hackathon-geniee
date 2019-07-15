@@ -8,7 +8,7 @@ const { couchBase } = require('../configs/config');
 const HTTP_STATUSES = require('../configs/httpStatusConsts');
 const { ACTIVE_SITES_API } = require('../configs/commonConsts');
 const { sendSuccessResponse, sendErrorResponse } = require('../helpers/commonFunctions');
-const { appBucket, errorHandler } = require('../helpers/routeHelpers');
+const { appBucket, errorHandler, checkParams } = require('../helpers/routeHelpers');
 
 const router = express.Router();
 
@@ -80,39 +80,28 @@ router
 				message: 'Invalid Params Received'
 			});
 		}
-		/*
-		{
-			pageviewsThreshold: 10000, >=10000
-			last: {
-				from: 26-06-2019,
-				to: 02-07-2019
-			},
-			current: {
-				from: 03-07-2019,
-				to: 09-07-2019
-			}
-		}
-		*/
-		const { pageviewsThreshold = 10000, last = {}, current = {} } = parsedData;
-		const currentTo = processDate(current.to, moment(), 1);
-		const currentFrom = processDate(current.from, currentTo, 7);
-		const lastTo = processDate(last.to, currentFrom, 1);
-		const lastFrom = processDate(last.from, lastTo, 7);
+		return checkParams(['pageviewsThreshold', 'last', 'current'], req, 'get')
+			.then(() => {
+				const { pageviewsThreshold = 10000, last = {}, current = {} } = parsedData;
+				const currentTo = processDate(current.to, moment(), 1);
+				const currentFrom = processDate(current.from, currentTo, 7);
+				const lastTo = processDate(last.to, currentFrom, 1);
+				const lastFrom = processDate(last.from, lastTo, 7);
 
-		const promises = [
-			makeAPIRequest({
-				fromDate: lastFrom,
-				toDate: lastTo,
-				minPageViews: pageviewsThreshold
-			}),
-			makeAPIRequest({
-				fromDate: currentFrom,
-				toDate: currentTo,
-				minPageViews: pageviewsThreshold
+				const promises = [
+					makeAPIRequest({
+						fromDate: lastFrom,
+						toDate: lastTo,
+						minPageViews: pageviewsThreshold
+					}),
+					makeAPIRequest({
+						fromDate: currentFrom,
+						toDate: currentTo,
+						minPageViews: pageviewsThreshold
+					})
+				];
+				return Promise.all(promises);
 			})
-		];
-
-		return Promise.all(promises)
 			.spread((lastWeekData, currentWeekData) => {
 				if (lastWeekData.code !== 1 || currentWeekData.code !== 1) {
 					return Promise.reject(new Error('Invalid Data Found in either of the date rangers'));
