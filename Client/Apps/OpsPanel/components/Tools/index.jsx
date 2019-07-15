@@ -5,6 +5,7 @@ import RegexVerification from './RegexVerification/index';
 import EnableHbBidder from './EnableHbBidder';
 import BackupAds from './BackupAds/index';
 import TopXPathMissAndModeURL from './TopXPathMissAndModeURL ';
+import LostFoundLiveSites from './LostFoundLiveSites/index';
 
 class Tools extends Component {
 	state = {
@@ -33,6 +34,9 @@ class Tools extends Component {
 				return <RegexVerification sites={sites} showNotification={showNotification} />;
 			case TOOLS_IDENTIFIERS.TOP_XPATH_MISS_MODE_URL:
 				return <TopXPathMissAndModeURL />;
+
+			case TOOLS_IDENTIFIERS.LOST_FOUND_LIVE_SITES:
+				return <LostFoundLiveSites />;
 			case TOOLS_IDENTIFIERS.REGEX_GENERATION:
 				return 'Regex Generation';
 		}
@@ -57,6 +61,10 @@ class Tools extends Component {
 								</NavItem>
 								<NavItem eventKey={TOOLS_IDENTIFIERS.TOP_XPATH_MISS_MODE_URL}>
 									Top Xpath Miss and Mode URLs
+								</NavItem>
+
+								<NavItem eventKey={TOOLS_IDENTIFIERS.LOST_FOUND_LIVE_SITES}>
+									Lost And Found Live Sites Chart
 								</NavItem>
 								{/* <NavItem eventKey={TOOLS_IDENTIFIERS.REGEX_GENERATION}>Regex Generation</NavItem> */}
 							</Nav>
