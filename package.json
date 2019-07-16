@@ -20,10 +20,10 @@
 		]
 	},
 	"dependencies": {
-		"Base64": "^1.0.1",
 		"@fortawesome/fontawesome-svg-core": "^1.2.12",
 		"@fortawesome/free-solid-svg-icons": "^5.6.3",
 		"@fortawesome/react-fontawesome": "^0.1.4",
+		"Base64": "^1.0.1",
 		"amqplib": "^0.5.1",
 		"atob": "^2.1.2",
 		"axios": "^0.18.0",
@@ -109,6 +109,7 @@
 		"reactcss": "^1.0.3",
 		"redux": "^4.0.1",
 		"redux-thunk": "^2.3.0",
+		"request": "^2.88.0",
 		"request-promise": "^2.0.1",
 		"serve-favicon": "^2.5.0",
 		"simple-jade-parser": "0.0.4",
