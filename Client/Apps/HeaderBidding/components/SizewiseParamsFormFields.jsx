@@ -21,9 +21,9 @@ class SizewiseParamsFormFields extends React.Component {
 		const { sizes, formFields, savedParams } = this.props;
 
 		this.setState(() => {
-			const newState = { activeKey: sizes[0], tempParams: {} };
+			const newState = { activeKey: sizes[0].downwardIABSize, tempParams: {} };
 
-			for (const adSize of sizes) {
+			for (const { downwardIABSize: adSize } of sizes) {
 				const params = {};
 
 				for (const paramKey in formFields.params.siteLevel) {
@@ -117,10 +117,10 @@ class SizewiseParamsFormFields extends React.Component {
 		const { tempParams } = this.state;
 		const tabsJSX = [];
 
-		for (const size of sizes) {
+		for (const { downwardIABSize: size, originalSize } of sizes) {
 			tabsJSX.push(
 				<NavItem key={size} eventKey={size}>
-					{size}
+					{`${size} (${originalSize})`}
 					{tempParams[size] && tempParams[size].saved ? ' [added]' : ''}
 				</NavItem>
 			);
@@ -140,7 +140,10 @@ class SizewiseParamsFormFields extends React.Component {
 		const { activeKey: adSize, tempParamsErrors, tempParams } = this.state;
 
 		if (adSize === 'add-size') {
-			const filteredAdSizes = getFilteredAdSizes(allAdSizes, sizes);
+			const filteredAdSizes = getFilteredAdSizes(
+				allAdSizes,
+				sizes.map(({ downwardIABSize: size }) => size)
+			);
 
 			return (
 				<React.Fragment>

@@ -24,7 +24,7 @@ export default class AddBidder extends React.Component {
 				for (const size in params) {
 					// eslint-disable-next-line no-prototype-builtins
 					if (params.hasOwnProperty(size)) {
-						params[size].size = size.split('x');
+						params[size].size = size.split('x').map(val => parseInt(val, 10));
 					}
 				}
 
