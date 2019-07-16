@@ -1,41 +1,46 @@
 import React from 'react';
 
-import { groupBy, sortBy, find, chain } from 'lodash';
+import { groupBy } from 'lodash';
 import moment from 'moment';
 import CustomChart from '../../../Components/CustomChart';
-import { activeLegendItem, activeLegendItems } from '../configs/commonConsts';
+import { activeLegendItem, activeLegendItemArray } from '../configs/commonConsts';
 import apLineChartConfig from '../configs/line-ap-data.json';
 
 class Chart extends React.Component {
-	state = {
-		type: 'spline',
-		xAxis: { categories: [] },
-		legends: this.props.metricsList,
-		activeLegendItems: this.props.selectedDimension ? activeLegendItem : activeLegendItems,
-		series: [],
-		tableData: this.props.tableData,
-		selectedDimension: this.props.selectedDimension
-	};
+	constructor(props) {
+		super(props);
+		const { selectedDimension } = props;
+		const xAxis = this.enumerateDaysBetweenDates();
+		const { series, activeLegendItems } = this.updateChartData(xAxis);
+		const legends = this.computeLegends();
+		this.state = {
+			type: 'spline',
+			xAxis,
+			legends,
+			activeLegendItems,
+			series,
+			selectedDimension
+		};
+	}
 
-	componentDidMount() {
-		const { legends } = this.state;
-		const { tableData } = this.props;
+	shouldComponentUpdate() {
+		return false;
+	}
+
+	computeLegends = () => {
+		const { tableData, metricsList } = this.props;
+		const legends = [...metricsList];
 		if (tableData.result && tableData.result.length > 0) {
 			const totalRow = tableData.total;
 			legends.forEach(legend => {
 				legend.total = totalRow[`total_${legend.value}`];
 			});
 		}
-		this.setState({ legends });
-		this.updateChartData();
-	}
-
-	shouldComponentUpdate(nextProps) {
-		return this.props.tableData != nextProps.tableData;
-	}
+		return legends;
+	};
 
 	enumerateDaysBetweenDates = () => {
-		const { xAxis } = this.state;
+		const xAxis = { categories: [] };
 		const { startDate, endDate, selectedInterval } = this.props;
 		const dates = [];
 
@@ -62,97 +67,84 @@ class Chart extends React.Component {
 		}
 
 		xAxis.categories = dates;
-		this.setState(xAxis);
+		return xAxis;
 	};
 
-	updateChartData = activeLegendItem => {
-		this.enumerateDaysBetweenDates();
-		const { selectedDimension, metricsList, selectedInterval } = this.props;
-		const { xAxis, tableData, activeLegendItems } = this.state;
-		const series = [];
-		const rows = tableData.result;
-		if (tableData.result && tableData.result.length > 0) {
+	getGroupByResult = rows => {
+		let groupByResult = {};
+
+		if (rows && rows.length > 0) {
+			const { selectedDimension, metricsList } = this.props;
 			if (selectedDimension) {
-				activeLegendItems = activeLegendItem || activeLegendItems;
-				let groupByResult = rows.map(row => ({
-					date: row.date,
-					month: row.month,
-					year: row.year,
-					[activeLegendItems.value]: row[activeLegendItems.value],
-					[selectedDimension]: row[selectedDimension]
-				}));
-				groupByResult = groupBy(groupByResult, result => result[selectedDimension]);
-				const { valueType } = activeLegendItems;
-				for (const results in groupByResult) {
-					const serie = {
-						data: [],
-						name: results,
-						valueType
-					};
-					for (let i = 0; i < xAxis.categories.length; i++) {
-						const found = find(groupByResult[results], result => {
-							if (selectedInterval === 'daily')
-								return result.date === moment(xAxis.categories[i]).format('YYYY-MM-DD');
-							if (selectedInterval === 'monthly')
-								return (
-									result.month == moment(xAxis.categories[i]).format('M') &&
-									result.year == moment(xAxis.categories[i]).format('Y')
-								);
-							return true;
-						});
-						if (found) serie.data.push(found[activeLegendItems.value]);
-						else serie.data.push(0);
-					}
-					series.push(serie);
-				}
+				groupByResult = groupBy(rows, selectedDimension);
 			} else {
-				const sortedResult = rows;
-				const groupByResult = {};
-				sortedResult.map(result => {
+				rows.map(result => {
 					metricsList.forEach(metric => {
-						if (!metricsList.isDisabled) {
-							const metricType = metric.value;
-							const metricName = metric.name;
-							const valueType = metric.valueType;
+						if (!metric.isDisabled) {
+							const { value, name, valueType } = metric;
 							const data = {
-								value: result[metricType],
 								date: result.date,
 								month: result.month,
 								year: result.year,
+								name,
 								valueType,
-								metricName
+								value: result[value]
 							};
-							if (!groupByResult[metricType]) groupByResult[metricType] = [];
-							groupByResult[metricType].push(data);
+							if (!groupByResult[value]) groupByResult[value] = [];
+							groupByResult[value].push(data);
 						}
 					});
 				});
-				for (const results in groupByResult) {
-					const serie = {
-						data: [],
-						value: results,
-						valueType: groupByResult[results][0].valueType,
-						name: groupByResult[results][0].metricName
-					};
-					for (let i = 0; i < xAxis.categories.length; i++) {
-						const found = find(groupByResult[results], result => {
-							if (selectedInterval === 'daily')
-								return result.date === moment(xAxis.categories[i]).format('YYYY-MM-DD');
-							if (selectedInterval === 'monthly')
-								return (
-									result.month == moment(xAxis.categories[i]).format('M') &&
-									result.year == moment(xAxis.categories[i]).format('Y')
-								);
-							return true;
-						});
-						if (found) serie.data.push(found.value);
-						else serie.data.push(0);
+			}
+			return groupByResult;
+		}
+	};
+
+	getSeriesData = (groupByResult, xAxis) => {
+		const { selectedDimension, selectedInterval } = this.props;
+		const activeLegendItems = selectedDimension ? activeLegendItem : activeLegendItemArray;
+		const series = [];
+		Object.keys(groupByResult).forEach(results => {
+			let j = 0;
+			const serie = {
+				data: [],
+				name: selectedDimension ? results : groupByResult[results][0].name,
+				value: results,
+				valueType: selectedDimension
+					? activeLegendItems.valueType
+					: groupByResult[results][0].valueType
+			};
+			for (let i = 0; i < xAxis.categories.length; i += 1) {
+				const column = groupByResult[results][j];
+				const xAxisMomentObj = moment(xAxis.categories[i]);
+				const seriesValue = selectedDimension ? column[activeLegendItems.value] : column.value;
+				if (selectedInterval === 'daily' || selectedInterval === 'monthly')
+					if (
+						column.date === xAxisMomentObj.format('YYYY-MM-DD') ||
+						(column.month === xAxisMomentObj.format('M') &&
+							column.year === xAxisMomentObj.format('Y'))
+					) {
+						serie.data.push(seriesValue);
+						j += 1;
+					} else {
+						serie.data.push(0);
 					}
-					series.push(serie);
+				else {
+					serie.data.push(seriesValue);
 				}
 			}
-		}
-		this.setState({ series, activeLegendItems });
+			series.push(serie);
+		});
+		return series;
+	};
+
+	updateChartData = xAxisData => {
+		const { selectedDimension, tableData } = this.props;
+		const activeLegendItems = selectedDimension ? activeLegendItem : activeLegendItemArray;
+		const xAxis = xAxisData || this.state.xAxis;
+		const groupByResult = this.getGroupByResult(tableData.result);
+		const series = this.getSeriesData(groupByResult, xAxis);
+		return { series, activeLegendItems };
 	};
 
 	render() {

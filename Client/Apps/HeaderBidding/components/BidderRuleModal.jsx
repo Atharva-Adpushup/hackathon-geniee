@@ -2,7 +2,7 @@ import React from 'react';
 import { Form, Modal, FormGroup, Col, ControlLabel, HelpBlock } from 'react-bootstrap';
 import Select from 'react-select';
 import CustomButton from '../../../Components/CustomButton';
-import Selectbox from '../../../Components/Selectbox';
+import SelectBox from '../../../Components/SelectBox';
 import countries from '../constants/countries';
 import deviceWiseAdSizes from '../constants/deviceWiseAdSizes';
 
@@ -88,7 +88,7 @@ class BidderRuleModal extends React.Component {
 		const options = Object.entries(getFilteredBidders()).map(([value, name]) => ({ name, value }));
 
 		return (
-			<Selectbox
+			<SelectBox
 				id="bidder-rule-partner"
 				options={options}
 				selected={bidderRule ? bidderRule.bidder : null}
@@ -103,7 +103,7 @@ class BidderRuleModal extends React.Component {
 		const options = Object.entries(countries).map(([value, name]) => ({ name, value }));
 
 		return (
-			<Selectbox
+			<SelectBox
 				id="bidder-rule-countries"
 				wrapperClassName="countries-list-selectbox"
 				options={options}
@@ -123,7 +123,7 @@ class BidderRuleModal extends React.Component {
 		];
 
 		return (
-			<Selectbox
+			<SelectBox
 				id="bidder-rule-device"
 				options={options}
 				selected={bidderRule ? bidderRule.device : null}
@@ -165,7 +165,7 @@ class BidderRuleModal extends React.Component {
 		];
 
 		return (
-			<Selectbox
+			<SelectBox
 				id="bidder-rule-status"
 				options={options}
 				selected={bidderRule ? String(bidderRule.status) : null}

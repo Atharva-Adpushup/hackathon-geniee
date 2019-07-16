@@ -11,7 +11,7 @@ import PerformanceApOriginalContainer from '../containers/PerformanceApOriginalC
 import RevenueContainer from '../containers/RevenueContainer';
 import Loader from '../../../Components/Loader/index';
 import { dates } from '../configs/commonConsts';
-import Selectbox from '../../../Components/SelectBox/index';
+import SelectBox from '../../../Components/SelectBox/index';
 import reportService from '../../../services/reportService';
 import { convertObjToArr, getDateRange } from '../helpers/utils';
 
@@ -116,7 +116,7 @@ class Dashboard extends React.Component {
 					<div className="u-margin-r4">
 						{/* eslint-disable */}
 						<label className="u-text-normal u-margin-r2">Quick Dates</label>
-						<Selectbox
+						<SelectBox
 							id="performance-date"
 							wrapperClassName="display-inline"
 							isClearable={false}
@@ -138,7 +138,7 @@ class Dashboard extends React.Component {
 					<div className="u-margin-r4">
 						{/* eslint-disable */}
 						<label className="u-text-normal u-margin-r2">Website</label>
-						<Selectbox
+						<SelectBox
 							id="performance-site"
 							isClearable={false}
 							isSearchable={false}

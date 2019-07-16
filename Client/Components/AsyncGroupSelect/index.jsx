@@ -1,8 +1,14 @@
 import React, { Component } from 'react';
-import { Glyphicon, Button, Checkbox, DropdownButton, Label, InputGroup } from 'react-bootstrap';
-import { isEmpty } from 'lodash';
-// import '../../../../Components/SelectBox/styles.scss';
-// import { ajax } from '../../../../common/helpers';
+import {
+	Glyphicon,
+	Button,
+	Checkbox,
+	DropdownButton,
+	Label,
+	InputGroup,
+	OverlayTrigger,
+	Tooltip
+} from 'react-bootstrap';
 
 class AsyncGroupSelect extends Component {
 	constructor(props) {
@@ -23,6 +29,7 @@ class AsyncGroupSelect extends Component {
 		this.handleSearchTextChange = this.handleSearchTextChange.bind(this);
 		this.handleFilterValueSelect = this.handleFilterValueSelect.bind(this);
 	}
+
 	componentDidUpdate(prevProps) {
 		if (prevProps.selectedFilters !== this.props.selectedFilters) {
 			this.setState({ selectedFilters: this.props.selectedFilters });
@@ -32,6 +39,7 @@ class AsyncGroupSelect extends Component {
 	toggleList() {
 		this.setState({ open: !this.state.open });
 	}
+
 	loader = () => (
 		<div className="loaderwrapper spinner-small" data-id="loader" style={{ display: 'block' }}>
 			<i className="fa fa-spinner" />
@@ -43,7 +51,7 @@ class AsyncGroupSelect extends Component {
 		selectedFilters[selectedFilterKey] = selectedFilters[selectedFilterKey] || {};
 		if (checked) selectedFilters[selectedFilterKey][key] = true;
 		else delete selectedFilters[selectedFilterKey][key];
-		for (let filter in selectedFilters) {
+		for (const filter in selectedFilters) {
 			if (_.isEmpty(selectedFilters[filter])) delete selectedFilters[filter];
 		}
 		this.setState(
@@ -122,8 +130,8 @@ class AsyncGroupSelect extends Component {
 	}
 
 	renderFilters = () => {
-		let { filterValues, selectedFilters, selectedFilterKey } = this.state;
-		let filters = [];
+		const { filterValues, selectedFilters, selectedFilterKey } = this.state;
+		const filters = [];
 
 		filterValues.map(filterValue =>
 			filters.push(
@@ -161,6 +169,7 @@ class AsyncGroupSelect extends Component {
 			}
 		);
 	};
+
 	selectNone = () => {
 		const { selectedFilters, selectedFilterKey } = this.state;
 		selectedFilters[selectedFilterKey] = {};
@@ -177,9 +186,10 @@ class AsyncGroupSelect extends Component {
 	render() {
 		const { state, props } = this;
 		let selectBoxLabels = [];
-		for (const filterKey in state.selectedFilters) {
+		Object.keys(state.selectedFilters).forEach(filterKey => {
 			if (Object.keys(state.selectedFilters[filterKey]).length) {
-				let selectBoxLabelText = `${filterKey} ${
+				const filterName = props.filterList.find(filter => filter.value === filterKey);
+				const selectBoxLabelText = `${filterName.name} ${
 					Object.keys(state.selectedFilters[filterKey]).length
 				} selected`;
 				selectBoxLabels.push(
@@ -190,14 +200,14 @@ class AsyncGroupSelect extends Component {
 							className="u-margin-l1"
 							onClick={e => {
 								e.stopPropagation();
-								let { selectedFilters } = state;
+								const { selectedFilters } = state;
 								selectedFilters[filterKey] = {};
 								this.setState(
 									{
 										selectedFilters
 									},
 									() => {
-										this.props.onFilterValueChange(selectedFilters);
+										props.onFilterValueChange(selectedFilters);
 									}
 								);
 							}}
@@ -205,8 +215,9 @@ class AsyncGroupSelect extends Component {
 					</Label>
 				);
 			}
-		}
+		});
 		selectBoxLabels = selectBoxLabels.length ? selectBoxLabels : '+Add';
+		const tooltip = <Tooltip id="tooltip">Please select a website.</Tooltip>;
 		return (
 			<InputGroup>
 				<InputGroup.Addon>Filter</InputGroup.Addon>
@@ -221,20 +232,40 @@ class AsyncGroupSelect extends Component {
 						<div
 							className={`react-select-box-off-screen  ${state.showFilterValues ? 'u-hide' : ''}`}
 						>
-							{props.filterList.map(filter => (
-								<Button
-									className="react-select-box-option"
-									style={{ border: 'none' }}
-									key={filter.value}
-									disabled={filter.isDisabled}
-									onClick={() => {
-										this.fetchSelectedFilterValues(filter);
-									}}
-								>
-									{filter.name}
-									<Glyphicon glyph="menu-right" className="mR-5 float-right" />
-								</Button>
-							))}
+							{props.filterList.map(filter => {
+								if (filter.isDisabled) {
+									return (
+										<OverlayTrigger overlay={tooltip} id="2">
+											<Button
+												className="react-select-box-option"
+												style={{ border: 'none', marginLeft: 0 }}
+												key={filter.value}
+												disabled={filter.isDisabled}
+												onClick={() => {
+													this.fetchSelectedFilterValues(filter);
+												}}
+											>
+												{filter.name}
+												<Glyphicon glyph="menu-right" className="mR-5 float-right" />
+											</Button>
+										</OverlayTrigger>
+									);
+								}
+								return (
+									<Button
+										className="react-select-box-option"
+										style={{ border: 'none', marginLeft: 0 }}
+										key={filter.value}
+										disabled={filter.isDisabled}
+										onClick={() => {
+											this.fetchSelectedFilterValues(filter);
+										}}
+									>
+										{filter.name}
+										<Glyphicon glyph="menu-right" className="mR-5 float-right" />
+									</Button>
+								);
+							})}
 						</div>
 						<div
 							className={`react-select-box-off-screen-1  ${

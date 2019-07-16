@@ -3,6 +3,7 @@ import { Row, Col } from 'react-bootstrap';
 import moment from 'moment';
 import { Object } from 'es6-shim';
 import qs from 'querystringify';
+import { isEmpty, union } from 'lodash';
 import ActionCard from '../../../Components/ActionCard/index';
 import ControlContainer from '../containers/ControlContainer';
 import TableContainer from '../containers/TableContainer';
@@ -10,7 +11,7 @@ import ChartContainer from '../containers/ChartContainer';
 import reportService from '../../../services/reportService';
 import { displayMetrics } from '../configs/commonConsts';
 import Loader from '../../../Components/Loader';
-import { computeCsvData, convertObjToArr } from '../helpers/utils';
+import { convertObjToArr } from '../helpers/utils';
 
 class Panel extends Component {
 	constructor(props) {
@@ -110,6 +111,15 @@ class Panel extends Component {
 		};
 	};
 
+	getReportType = selectedFilters => {
+		let reportType = 'account';
+		const selectedSiteFilters = selectedFilters.siteid;
+		if (selectedSiteFilters && Object.keys(selectedSiteFilters).length === 1) {
+			reportType = 'site';
+		}
+		return reportType;
+	};
+
 	onControlChange = controlParams => {
 		const {
 			startDate,
@@ -119,6 +129,7 @@ class Panel extends Component {
 			selectedFilters,
 			reportType
 		} = controlParams;
+		//	const reportType = this.getReportType(selectedFilters);
 		const { dimensionList, filterList } = this.state;
 		let disabledFilter = [];
 		let disabledDimension = [];
@@ -202,8 +213,7 @@ class Panel extends Component {
 		});
 	};
 
-	getFinalTableData = tableData => {
-		const csvData = computeCsvData(tableData);
+	getCsvData = csvData => {
 		this.setState({ csvData });
 	};
 
@@ -259,7 +269,7 @@ class Panel extends Component {
 						startDate={startDate}
 						endDate={endDate}
 						selectedInterval={selectedInterval}
-						getTableData={this.getFinalTableData}
+						getCsvData={this.getCsvData}
 					/>
 				</Col>
 			</Row>

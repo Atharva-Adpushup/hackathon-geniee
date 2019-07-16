@@ -4,7 +4,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Col, FormGroup, ControlLabel, HelpBlock } from 'react-bootstrap';
-import Selectbox from '../../../Components/Selectbox';
+import SelectBox from '../../../Components/SelectBox';
 import InputBox from '../../../Components/InputBox';
 
 class BidderFormFields extends React.Component {
@@ -33,7 +33,7 @@ class BidderFormFields extends React.Component {
 		switch (inputType) {
 			case 'selectBox': {
 				return (
-					<Selectbox
+					<SelectBox
 						key={adSize}
 						id={`hb-${paramKey}`}
 						wrapperClassName="hb-input"
