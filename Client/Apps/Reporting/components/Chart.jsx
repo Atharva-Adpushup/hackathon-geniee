@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { groupBy } from 'lodash';
+import { groupBy, sortBy } from 'lodash';
 import moment from 'moment';
 import CustomChart from '../../../Components/CustomChart';
 import { activeLegendItem, activeLegendItemArray } from '../configs/commonConsts';
@@ -11,7 +11,8 @@ class Chart extends React.Component {
 		super(props);
 		const { selectedDimension } = props;
 		const xAxis = this.enumerateDaysBetweenDates();
-		const { series, activeLegendItems } = this.updateChartData(xAxis);
+		const activeLegendItems = selectedDimension ? activeLegendItem : activeLegendItemArray;
+		const series = this.updateChartData(activeLegendItems, xAxis);
 		const legends = this.computeLegends();
 		this.state = {
 			type: 'spline',
@@ -23,8 +24,8 @@ class Chart extends React.Component {
 		};
 	}
 
-	shouldComponentUpdate() {
-		return false;
+	shouldComponentUpdate(nextProps, nextState) {
+		return this.state.activeLegendItems !== nextState.activeLegendItems;
 	}
 
 	computeLegends = () => {
@@ -100,9 +101,14 @@ class Chart extends React.Component {
 		}
 	};
 
-	getSeriesData = (groupByResult, xAxis) => {
+	getSortedResult = (data, selectedInterval) => {
+		if (selectedInterval === 'daily') return sortBy(data, 'date');
+		if (selectedInterval === 'monthly') return sortBy(sortBy(data, 'month'), 'year');
+		return data;
+	};
+
+	getSeriesData = (groupByResult, xAxis, activeLegendItems) => {
 		const { selectedDimension, selectedInterval } = this.props;
-		const activeLegendItems = selectedDimension ? activeLegendItem : activeLegendItemArray;
 		const series = [];
 		Object.keys(groupByResult).forEach(results => {
 			let j = 0;
@@ -114,8 +120,10 @@ class Chart extends React.Component {
 					? activeLegendItems.valueType
 					: groupByResult[results][0].valueType
 			};
+			const sortedResult = this.getSortedResult(groupByResult[results], selectedInterval);
 			for (let i = 0; i < xAxis.categories.length; i += 1) {
-				const column = groupByResult[results][j];
+				if (!sortedResult[j]) break;
+				const column = sortedResult[j];
 				const xAxisMomentObj = moment(xAxis.categories[i]);
 				const seriesValue = selectedDimension ? column[activeLegendItems.value] : column.value;
 				if (selectedInterval === 'daily' || selectedInterval === 'monthly')
@@ -138,13 +146,20 @@ class Chart extends React.Component {
 		return series;
 	};
 
-	updateChartData = xAxisData => {
-		const { selectedDimension, tableData } = this.props;
-		const activeLegendItems = selectedDimension ? activeLegendItem : activeLegendItemArray;
+	onLegendChange = activeLegendItems => {
+		const series = this.updateChartData(activeLegendItems);
+		this.setState({
+			series,
+			activeLegendItems
+		});
+	};
+
+	updateChartData = (activeLegendItems, xAxisData) => {
+		const { tableData } = this.props;
 		const xAxis = xAxisData || this.state.xAxis;
 		const groupByResult = this.getGroupByResult(tableData.result);
-		const series = this.getSeriesData(groupByResult, xAxis);
-		return { series, activeLegendItems };
+		const series = this.getSeriesData(groupByResult, xAxis, activeLegendItems);
+		return series;
 	};
 
 	render() {
@@ -157,7 +172,7 @@ class Chart extends React.Component {
 					xAxis={xAxis}
 					legends={legends}
 					activeLegendItems={activeLegendItems}
-					updateChartData={this.updateChartData}
+					onLegendChange={this.onLegendChange}
 					yAxisGroups={selectedDimension ? [] : apLineChartConfig.defaultYAxisGroups}
 				/>
 			</div>
