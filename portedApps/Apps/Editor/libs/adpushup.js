@@ -42,7 +42,8 @@ $(document).ready(function() {
 					})
 					.attr({
 						role: 'alert',
-						class: 'alert ' + (type == 1 ? 'alert-success' : type == 2 ? 'alert-danger' : 'alert-info')
+						class:
+							'alert ' + (type == 1 ? 'alert-success' : type == 2 ? 'alert-danger' : 'alert-info')
 					})
 					.html(message)
 			);

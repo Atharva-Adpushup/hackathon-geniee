@@ -11,6 +11,11 @@
 		<link rel="stylesheet" href="/assets/css/third-party/dataTables.css" />
 		<link rel="stylesheet" href="/assets/css/builds/editor.min.css" />
 		<link rel="stylesheet" href="/assets/css/third-party/c3.css" />
+		<script
+			src="https://code.jquery.com/jquery-3.4.1.js"
+			integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+			crossorigin="anonymous"
+		></script>
 		<!-- Google Tag Manager -->
 		<script>
 			(function(w, d, s, l, i) {
@@ -25,20 +30,24 @@
 			})(window, document, 'script', 'dataLayer', 'GTM-NMS9P3Q');
 		</script>
 		<script>
-			window.ADP_BASEURL = '__BASE_URL__';
-			window.ADP_ORIGIN = '__PROXY_ORIGIN__';
-			window.ADP_SITE_DOMAIN = '__SITE_DOMAIN__';
-			window.ADP_SITE_ID = '__SITE_ID__';
-			window.ADP_ENVIRONMENT = '__ENVIRONMENT__';
-			window.isSuperUser = Boolean('__IS_SUPER_USER__');
-			window.isGeniee = Boolean('__IS_GENIEE__');
-			window.gcfg = {
-				usn: 1,
-				ubajf: 1,
-				upkv: 1,
-				uadkv: 1,
-				uud: 1
+			var globals = {
+				ADP_BASEURL: '__BASE_URL__',
+				ADP_ORIGIN: '__PROXY_ORIGIN__',
+				ADP_SITE_DOMAIN: '__SITE_DOMAIN__',
+				ADP_SITE_ID: '__SITE_ID__',
+				ADP_ENVIRONMENT: '__ENVIRONMENT__',
+				isSuperUser: Boolean('__IS_SUPER_USER__'),
+				isGeniee: Boolean('__IS_GENIEE__'),
+				gcfg: {
+					usn: 1,
+					ubajf: 1,
+					upkv: 1,
+					uadkv: 1,
+					uud: 1
+				},
+				currentUser: {}
 			};
+			Object.assign(window, globals);
 		</script>
 		<script src="/assets/js/react-15.js"></script>
 		<script src="/assets/js/react-dom.js"></script>

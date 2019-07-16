@@ -4,7 +4,9 @@
 /* eslint-disable no-restricted-syntax */
 import clipboard from 'clipboard-polyfill';
 import Entities from 'html-entities';
+import sortBy from 'lodash/sortBy';
 import history from './history';
+import { supportedAdSizes } from '../constants/visualEditor';
 
 const { XmlEntities } = Entities;
 const entities = new XmlEntities();
@@ -126,6 +128,28 @@ const getHtmlEncodedJSON = config => {
 	return encodedData;
 };
 
+const getSupportedAdSizes = () => {
+	const allAdSizes = supportedAdSizes.concat([]);
+	const adSizes = [];
+
+	allAdSizes.forEach(layout => {
+		layout.sizes.forEach(size => {
+			const isSizeInResultArray = adSizes.find(
+				adSize => adSize.width === size.width && adSize.height === size.height
+			);
+
+			if (!isSizeInResultArray) {
+				adSizes.push({
+					width: size.width,
+					height: size.height
+				});
+			}
+		});
+	});
+
+	return sortBy(adSizes, size => size.width);
+};
+
 export {
 	errorHandler,
 	getDuplicatesInArray,
@@ -135,5 +159,6 @@ export {
 	makeFirstLetterCapitalize,
 	copyToClipBoard,
 	formatDate,
-	getHtmlEncodedJSON
+	getHtmlEncodedJSON,
+	getSupportedAdSizes
 };

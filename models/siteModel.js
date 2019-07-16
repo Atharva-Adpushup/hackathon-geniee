@@ -253,7 +253,9 @@ function apiModule() {
 			}
 
 			if (!json.genieeMediaId) {
-				throw new AdPushupError([{ status: 403, message: 'Please provide a valid Geniee Media id' }]);
+				throw new AdPushupError([
+					{ status: 403, message: 'Please provide a valid Geniee Media id' }
+				]);
 			}
 
 			if (!json.apConfigs.hasOwnProperty('isAdPushupControlWithPartnerSSP')) {
@@ -265,7 +267,7 @@ function apiModule() {
 				return API.saveSiteData(siteId, 'POST', json);
 			});
 		},
-		getSiteById: function(siteId, requestMethod) {
+		getSiteById: function(siteId) {
 			return couchbase
 				.connectToAppBucket()
 				.then(function(appBucket) {
@@ -425,13 +427,13 @@ function apiModule() {
 					throw new AdPushupError('Cannot get setup step');
 				});
 		},
-		getSetupStage: function (siteId) {
+		getSetupStage: function(siteId) {
 			return API.getSiteById(siteId)
-				.then(function (site) {
+				.then(function(site) {
 					var onboardingStage = site.get('onboardingStage');
 					return onboardingStage;
 				})
-				.catch(function (err) {
+				.catch(function(err) {
 					throw new AdPushupError('Cannot get setup onboarding stage');
 				});
 		},
@@ -470,7 +472,7 @@ function apiModule() {
 										if (section.ads && Object.keys(section.ads).length) {
 											for (const adKey in section.ads) {
 												if (inventoryFound) break;
-												
+
 												const ad = section.ads[adKey];
 
 												if (ad.network === 'adpTags') {
@@ -513,11 +515,11 @@ function apiModule() {
 										const section = variation.sections[sectionKey];
 
 										if (section.ads && Object.keys(section.ads).length) {
-											for (const adKey in section.ads) {												
+											for (const adKey in section.ads) {
 												const ad = section.ads[adKey];
 
 												if (ad.network === 'adpTags') {
-													if(ad.width === 'responsive') {
+													if (ad.width === 'responsive') {
 														sizesArray.push(ad.width);
 														continue;
 													}
@@ -544,7 +546,7 @@ function apiModule() {
 		isApTagInventoryExist: siteId => {
 			return couchbase
 				.connectToAppBucket()
-				.then(function (appBucket) {
+				.then(function(appBucket) {
 					return appBucket.getAsync('tgmr::' + siteId, {});
 				})
 				.then(({ value }) => {
@@ -570,7 +572,7 @@ function apiModule() {
 		getApTagInventorySizes: siteId => {
 			return couchbase
 				.connectToAppBucket()
-				.then(function (appBucket) {
+				.then(function(appBucket) {
 					return appBucket.getAsync('tgmr::' + siteId, {});
 				})
 				.then(({ value }) => {
@@ -578,7 +580,7 @@ function apiModule() {
 					if (value.ads.length) {
 						for (const ad of value.ads) {
 							if (ad.network === 'adpTags') {
-								if(ad.width === 'responsive') {
+								if (ad.width === 'responsive') {
 									sizesArray.push(ad.width);
 									continue;
 								}
@@ -594,7 +596,7 @@ function apiModule() {
 		isInnovativeAdInventoryExist: siteId => {
 			return couchbase
 				.connectToAppBucket()
-				.then(function (appBucket) {
+				.then(function(appBucket) {
 					return appBucket.getAsync('fmrt::' + siteId, {});
 				})
 				.then(({ value }) => {
@@ -613,14 +615,14 @@ function apiModule() {
 					if (err.code === 13) {
 						throw new AdPushupError('Inventory Not Found');
 					}
-					
+
 					throw err;
 				});
 		},
 		getInnovativeAdInventorySizes: siteId => {
 			return couchbase
 				.connectToAppBucket()
-				.then(function (appBucket) {
+				.then(function(appBucket) {
 					return appBucket.getAsync('fmrt::' + siteId, {});
 				})
 				.then(({ value }) => {
@@ -628,7 +630,7 @@ function apiModule() {
 					if (value.ads.length) {
 						for (const ad of value.ads) {
 							if (ad.network === 'adpTags') {
-								if(ad.width === 'responsive') {
+								if (ad.width === 'responsive') {
 									sizesArray.push(ad.width);
 									continue;
 								}
@@ -647,11 +649,19 @@ function apiModule() {
 				.catch(() => API.isInnovativeAdInventoryExist(siteId));
 		},
 		getUniqueInventorySizes: siteId => {
-			return Promise
-				.all([API.getLayoutInventorySizes(siteId), API.getApTagInventorySizes(siteId), API.getInnovativeAdInventorySizes(siteId)])
-				.then(([layoutInventorySizes, apTagInventorySizes, innovativeAdInventorySizes]) => {
-					return [...new Set([...layoutInventorySizes, ...apTagInventorySizes, ...innovativeAdInventorySizes])]
-				});
+			return Promise.all([
+				API.getLayoutInventorySizes(siteId),
+				API.getApTagInventorySizes(siteId),
+				API.getInnovativeAdInventorySizes(siteId)
+			]).then(([layoutInventorySizes, apTagInventorySizes, innovativeAdInventorySizes]) => {
+				return [
+					...new Set([
+						...layoutInventorySizes,
+						...apTagInventorySizes,
+						...innovativeAdInventorySizes
+					])
+				];
+			});
 		},
 		setSiteStep: function(siteId, onboardingStage, step) {
 			return API.getSiteById(siteId)
@@ -704,9 +714,11 @@ function apiModule() {
 			return API.getSiteById(parseInt(siteId)).then(function(site) {
 				var pageGroupPromises = _.map(site.get('channels'), function(channel) {
 					var pageGroup = channel.split(':');
-					return channelModel.getChannel(siteId, pageGroup[0], pageGroup[1]).then(function(channel) {
-						return channel.data;
-					});
+					return channelModel
+						.getChannel(siteId, pageGroup[0], pageGroup[1])
+						.then(function(channel) {
+							return channel.data;
+						});
 				});
 
 				return Promise.all(pageGroupPromises).then(function(pageGroups) {

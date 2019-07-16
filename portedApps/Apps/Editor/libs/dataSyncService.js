@@ -7,8 +7,10 @@ import { openPageGroupIfPresent } from '../misc/beforeEditorInit';
 
 const save = (url, data) => $.ajax({ type: 'POST', url, data, dataType: 'json' }),
 	getData = (url, data) => $.get(url, data),
-	isApInstalled = (url, siteId) => $.getJSON(`/proxy/detectAp?url=${encodeURI(url)}&site=${siteId}`),
-	changeSiteMode = (siteId, mode) => save('/data/changeMode', { siteId, mode }).then(response => !!response.success),
+	isApInstalled = (url, siteId) =>
+		$.getJSON(`/api/proxy/detectAp?url=${encodeURI(url)}&site=${siteId}`),
+	changeSiteMode = (siteId, mode) =>
+		save('/data/changeMode', { siteId, mode }).then(response => !!response.success),
 	/***TODO: Optimise and reduce below function***/
 	loadInitialData = siteId => {
 		const deferred = $.Deferred(),
@@ -52,7 +54,9 @@ const save = (url, data) => $.ajax({ type: 'POST', url, data, dataType: 'json' }
 
 				// Change 'ads' keys object to keys array
 				_.forOwn(computedResult.sectionByIds, (sectionData, sectionName) => {
-					computedResult.sectionByIds[sectionName].ads = _.keys(computedResult.sectionByIds[sectionName].ads);
+					computedResult.sectionByIds[sectionName].ads = _.keys(
+						computedResult.sectionByIds[sectionName].ads
+					);
 				});
 
 				computedResult.reporting = rawData.reporting;
@@ -63,16 +67,18 @@ const save = (url, data) => $.ajax({ type: 'POST', url, data, dataType: 'json' }
 				return deferred.promise();
 			};
 
-		return getData('/data/getData', { siteId }).then(rawData => processData(rawData)).fail((jqXHR, textStatus) => {
-			const initialData = { channels: [] };
+		return getData('/api/data/getData', { siteId })
+			.then(rawData => processData(rawData))
+			.fail((jqXHR, textStatus) => {
+				const initialData = { channels: [] };
 
-			console.log('Error while loading data: ', textStatus);
-			console.log('Initial data will be loaded');
-			return processData(initialData);
-		});
+				console.log('Error while loading data: ', textStatus);
+				console.log('Initial data will be loaded');
+				return processData(initialData);
+			});
 	},
 	masterSave = data =>
-		save('/data/saveData', {
+		save('/api/data/saveData', {
 			data: JSON.stringify(data)
 		});
 

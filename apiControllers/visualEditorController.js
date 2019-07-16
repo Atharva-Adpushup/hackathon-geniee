@@ -1,58 +1,45 @@
-const fs = require('fs');
+const Promise = require('bluebird');
+const fs = Promise.promisifyAll(require('fs'));
 const path = require('path');
 const express = require('express');
 
 const router = express.Router();
-// const { sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFunctions');
 const { verifyOwner, errorHandler } = require('../helpers/routeHelpers');
+const { BASE_URL, PROXY_ORIGIN } = require('../configs/commonConsts');
+const {
+	environment: { HOST_ENV }
+} = require('../configs/config');
+const { domanize } = require('../helpers/utils');
 
 router.get('/get', (req, res) => {
-	const userEmail = 'devtest257@mailinator.com';
-	const siteId = '45';
+	const userEmail = 'cnsdevtest9@mailinator.com';
+	const siteId = '14';
 	const htmlFilePath = path.resolve(__dirname, '../portedApps/Apps/Editor/', 'index.html');
+	const {
+		user: { isSuperUser }
+	} = req;
 
-	return verifyOwner(userEmail, siteId)
-		.then(() =>
-			fs.readFile(htmlFilePath, (err, result) => {
+	return verifyOwner(siteId, userEmail)
+		.then(site =>
+			fs.readFileAsync(htmlFilePath, 'utf8').then(result => {
+				const siteDomain = site.get('siteDomain');
+				const domanizedDomain = domanize(siteDomain);
+				const resultString = result
+					.replace('__BASE_URL__', BASE_URL)
+					.replace('__PROXY_ORIGIN__', PROXY_ORIGIN)
+					.replace('__DOMANIZE_DOMAIN__', domanizedDomain)
+					.replace('__SITE_DOMAIN__', siteDomain)
+					.replace('__SITE_ID__', site.get('siteId'))
+					.replace('__ENVIRONMENT__', HOST_ENV)
+					.replace('__IS_SUPER_USER__', isSuperUser)
+					.replace('__IS_GENIEE__', 0);
+
 				res.set('content-type', 'text/html');
-				res.send(result);
+				res.send(resultString);
 				res.end();
 			})
 		)
 		.catch(error => errorHandler(error, res));
 });
-
-// return res.render('editor', {
-// 	isChrome: true,
-// 	domain: data.site.get('siteDomain'),
-// 	siteId: data.site.get('siteId'),
-// 	channels: data.site.get('channels'),
-// 	environment: config.environment.HOST_ENV,
-// 	currentSiteId: req.params.siteId,
-// 	isSuperUser: req.session.isSuperUser || false,
-// 	// Geniee UI access config values
-// 	config: {
-// 		usn:
-// 			isSessionGenieeUIAccess && genieeUIAccess.hasOwnProperty('selectNetwork')
-// 				? Number(genieeUIAccess.selectNetwork)
-// 				: 1,
-// 		ubajf:
-// 			isSessionGenieeUIAccess && genieeUIAccess.hasOwnProperty('beforeAfterJs')
-// 				? Number(genieeUIAccess.beforeAfterJs)
-// 				: 1,
-// 		upkv:
-// 			isSessionGenieeUIAccess && genieeUIAccess.hasOwnProperty('pageKeyValue')
-// 				? Number(genieeUIAccess.pageKeyValue)
-// 				: 1,
-// 		uadkv:
-// 			isSessionGenieeUIAccess && genieeUIAccess.hasOwnProperty('adunitKeyValue')
-// 				? Number(genieeUIAccess.adunitKeyValue)
-// 				: 1,
-// 		uud:
-// 			isSessionGenieeUIAccess && genieeUIAccess.hasOwnProperty('useDfp')
-// 				? Number(genieeUIAccess.useDfp)
-// 				: 1
-// 	}
-// });
 
 module.exports = router;

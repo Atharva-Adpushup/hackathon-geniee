@@ -197,7 +197,9 @@ module.exports = React.createClass({
 				<MenuItem
 					icon="fa fa-cog"
 					contentHeading="AdTypes Configuration"
-					contentComponent={<AdTypes onSave={this.saveAdtypes} adNetworkActions={adNetworkActions} />}
+					contentComponent={
+						<AdTypes onSave={this.saveAdtypes} adNetworkActions={adNetworkActions} />
+					}
 				/>
 				<MenuItem
 					icon="fa fa-retweet"
