@@ -106,6 +106,11 @@ function initAdpConfig() {
 		resetAdpConfig();
 		resetAdpTagsConfig();
 
+		$.extend(adp, {
+			creationProcessStarted: false,
+			afterJSExecuted: false,
+			err: []
+		});
 		// Extend the settings with generated settings
 		// eslint-disable-next-line no-undef
 		$.extend(adp.config, __AP_CONFIG__, {
