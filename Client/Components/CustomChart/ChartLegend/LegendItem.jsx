@@ -50,7 +50,7 @@ class LegendItem extends Component {
 				}
 			} else {
 				activeLegendItems = legend;
-				this.props.updateChartData(activeLegendItems);
+				this.props.onLegendChange(activeLegendItems);
 			}
 		}
 	}
