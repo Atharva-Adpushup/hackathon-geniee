@@ -37,6 +37,34 @@ if (INNOVATIVE_ADS_ACTIVE) {
 var isGenieeSite;
 window.adpushup.configExtended = false;
 
+// Extend adpushup object
+$.extend(adp, {
+	creationProcessStarted: false,
+	afterJSExecuted: false,
+	err: [],
+	utils: utils,
+	control: control,
+	// tracker: new Tracker(),
+	nodewatcher: nodewatcher,
+	geniee: genieeObject,
+	triggerAd: triggerAd,
+	session: session,
+	generateAdCode: adCodeGenerator.generateAdCode,
+	executeAdpTagsHeadCode: adCodeGenerator.executeAdpTagsHeadCode,
+	executeAfterJS: adCreater.executeAfterJS,
+	services: {
+		APTAG_ACTIVE: APTAG_ACTIVE,
+		INNOVATIVE_ADS_ACTIVE: INNOVATIVE_ADS_ACTIVE,
+		LAYOUT_ACTIVE: LAYOUT_ACTIVE,
+		ADPTAG_ACTIVE: ADPTAG_ACTIVE,
+		SPA_ACTIVE: SPA_ACTIVE,
+		GENIEE_ACTIVE: GENIEE_ACTIVE,
+		HB_ACTIVE: HB_ACTIVE,
+		GDPR_ACTIVE: GDPR_ACTIVE,
+		INCONTENT_ACTIVE: INCONTENT_ACTIVE
+	}
+});
+
 // Destroy ADP slots and their associated GPT slots
 function destroyAdpSlots() {
 	var adpSlots = Object.keys(w.adpTags.adpSlots);
@@ -77,34 +105,6 @@ function initAdpConfig() {
 	return new Promise(function(resolve) {
 		resetAdpConfig();
 		resetAdpTagsConfig();
-
-		// Extend adpushup object
-		$.extend(adp, {
-			creationProcessStarted: false,
-			afterJSExecuted: false,
-			err: [],
-			utils: utils,
-			control: control,
-			// tracker: new Tracker(),
-			nodewatcher: nodewatcher,
-			geniee: genieeObject,
-			triggerAd: triggerAd,
-			session: session,
-			generateAdCode: adCodeGenerator.generateAdCode,
-			executeAdpTagsHeadCode: adCodeGenerator.executeAdpTagsHeadCode,
-			executeAfterJS: adCreater.executeAfterJS,
-			services: {
-				APTAG_ACTIVE: APTAG_ACTIVE,
-				INNOVATIVE_ADS_ACTIVE: INNOVATIVE_ADS_ACTIVE,
-				LAYOUT_ACTIVE: LAYOUT_ACTIVE,
-				ADPTAG_ACTIVE: ADPTAG_ACTIVE,
-				SPA_ACTIVE: SPA_ACTIVE,
-				GENIEE_ACTIVE: GENIEE_ACTIVE,
-				HB_ACTIVE: HB_ACTIVE,
-				GDPR_ACTIVE: GDPR_ACTIVE,
-				INCONTENT_ACTIVE: INCONTENT_ACTIVE
-			}
-		});
 
 		// Extend the settings with generated settings
 		// eslint-disable-next-line no-undef
