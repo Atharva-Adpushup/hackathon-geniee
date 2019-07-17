@@ -1,5 +1,6 @@
 import React from 'react';
 import SelectBox from '../../../../../Components/SelectBox/index';
+import Empty from '../../../../../Components/Empty/index';
 import Pagegroups from './Pagegroups';
 
 class RegexVerification extends React.Component {
@@ -27,6 +28,8 @@ class RegexVerification extends React.Component {
 		const { currentSite, options } = this.state;
 		const { sites } = this.props;
 		const site = currentSite ? sites[currentSite] : null;
+
+		if (!currentSite) return <Empty message="Seems like you haven't added any website" />;
 
 		return (
 			<React.Fragment>
