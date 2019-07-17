@@ -109,10 +109,21 @@ class AddManageNonResponsiveBidder extends React.Component {
 								const newState = {
 									formFields,
 									fetchingSizes: false,
-									sizes: [...new Set([...sizes, ...Object.keys(params)])],
+									sizes,
 									params: {},
 									globalParams: {}
 								};
+
+								// merge param sizes with inventory sizes
+								const paramSizes = Object.keys(params);
+								newState.sizes = [
+									...newState.sizes,
+									...paramSizes
+										.filter(
+											paramSize => !newState.sizes.find(size => paramSize === size.downwardIABSize)
+										)
+										.map(paramSize => ({ originalSize: paramSize, downwardIABSize: paramSize }))
+								];
 
 								for (const collectionKey in formFields) {
 									newState[collectionKey] = {};
@@ -189,7 +200,9 @@ class AddManageNonResponsiveBidder extends React.Component {
 	}
 
 	addNewSizeInState = adSize => {
-		this.setState(state => ({ sizes: [...state.sizes, adSize] }));
+		this.setState(state => ({
+			sizes: [...state.sizes, { originalSize: adSize, downwardIABSize: adSize }]
+		}));
 	};
 
 	onSubmit = e => {
@@ -213,7 +226,7 @@ class AddManageNonResponsiveBidder extends React.Component {
 					mergedParams[size] = { ...paramsObj, ...globalParams };
 				}
 			} else {
-				sizes.forEach(size => {
+				sizes.forEach(({ downwardIABSize: size }) => {
 					mergedParams[size] = globalParams;
 				});
 			}

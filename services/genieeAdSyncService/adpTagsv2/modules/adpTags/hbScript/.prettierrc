@@ -1,0 +1,10 @@
+{
+	"useTabs": true,
+	"tabWidth": 4,
+	"singleQuote": true,
+	"eslintIntegration": true,
+	"printWidth": 100,
+	"eslint.enable": true,
+	"eslint.autoFixOnSave": false,
+	"eslint.alwaysShowStatus": true
+}
