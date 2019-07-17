@@ -122,8 +122,7 @@ function getGroupedYAxisAndSeries(chartType, yAxisGroups, existingSeries) {
 				const point = this;
 				const num = point.y.toFixed(2);
 				return `<span style="color:${point.color}">\u25CF</span> ${point.series.name}: <b>${
-					point.series.userOptions.valueType === 'money' ? '$' : ''
-				}${numberWithCommas(num)}</b><br/>`;
+					point.series.userOptions.valueType === 'money' ? '$'+numberWithCommas(num) : numberWithCommas(point.y)}</b><br/>`;
 			}
 		};
 		seriesForChart.push(singleSeries);
@@ -244,7 +243,7 @@ export function getCustomChartConfig(
 						const num = point.y.toFixed(2);
 						return `<span style="color:${point.color}">\u25CF</span> ${point.series.name}: <b>${
 							point.series.userOptions.valueType === 'money' ? '$'+numberWithCommas(num) : numberWithCommas(point.y)
-						}}</b><br/>`;
+						}</b><br/>`;
 					}
 				};
 			}
