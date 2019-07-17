@@ -2,14 +2,13 @@
 import React, { Component, Fragment } from 'react';
 import { Table, Modal } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Link } from 'react-router-dom';
 
 import CustomButton from '../../../../../../Components/CustomButton/index';
 import CustomIcon from '../../../../../../Components/CustomIcon/index';
 import Edit from '../../../../../../Components/EditBox/index';
 import Loader from '../../../../../../Components/Loader';
 import Empty from '../../../../../../Components/Empty';
-import { copyToClipBoard } from '../../../../../../helpers/commonFunctions';
+import { copyToClipBoard, getPageGroupHash } from '../../../../../../helpers/commonFunctions';
 
 const DEFAULT_REGEX = 'No Pattern Set';
 class Listing extends Component {
@@ -137,6 +136,11 @@ class Listing extends Component {
 									const pagegroup =
 										pagegroupByDevice.filter(pg => pg.pageGroup === channel.pageGroup)[0] || {};
 									const { pattern = DEFAULT_REGEX } = pagegroup;
+									const pageGroupHash = getPageGroupHash(channel.pageGroup, channel.platform);
+									const computedEditorLink = `/api/visualEditor/${
+										site.siteId
+									}?updateHash=${pageGroupHash}`;
+
 									return (
 										<tr key={`${site.siteId}-${channel.pageGroup}-${channel.platform}`}>
 											<td>{channel.pageGroup}</td>
@@ -165,13 +169,13 @@ class Listing extends Component {
 												/>
 											</td>
 											<td>
-												<Link to={`/user/site/${site.siteId}/editor`}>
+												<a target="_blank" rel="noopener noreferrer" href={computedEditorLink}>
 													<FontAwesomeIcon
 														icon="code"
 														className="u-text-red u-margin-r2 u-cursor-pointer"
 														title="Open Editor"
 													/>
-												</Link>
+												</a>
 												|
 												<CustomIcon
 													icon="trash"

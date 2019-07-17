@@ -15,14 +15,17 @@ const emptyScreen = () => <div className="tabContentbg" />,
 			tabPane.props.handleClick(tabPane.key);
 		}
 	},
-	dashboardLink = currentUser.userType === 'partner' ? `/user/site/${window.currentSiteId}/dashboard` : `/user/dashboard`,
+	dashboardLink = '/dashboard',
 	// eslint-disable-next-line react/no-multi-comp
 	Tab = props => (
 		<div className="tabAreaWrap">
 			<div className="tabArea">
 				<div className="borderBot" />
 				<div className="tabBar">
-					<OverlayTrigger placement="right" overlay={<Tooltip id="goToDashboard">Goto Dashboard</Tooltip>}>
+					<OverlayTrigger
+						placement="right"
+						overlay={<Tooltip id="goToDashboard">Goto Dashboard</Tooltip>}
+					>
 						<Button className="btn btn-sm btn-flat" href={dashboardLink}>
 							<i className="fa fa-arrow-left" />
 						</Button>
@@ -33,7 +36,12 @@ const emptyScreen = () => <div className="tabContentbg" />,
 							overlay={<Tooltip id="createLoadPageGroup">Create/Load PageGroup</Tooltip>}
 						>
 							<li className={props.children.length === 0 ? 'pulseAnimate' : null}>
-								<a id="adNewChannel" href="#" onClick={props.handleNewChannelMenu} className="addnew">
+								<a
+									id="adNewChannel"
+									href="#"
+									onClick={props.handleNewChannelMenu}
+									className="addnew"
+								>
 									+
 								</a>
 							</li>
@@ -42,7 +50,9 @@ const emptyScreen = () => <div className="tabContentbg" />,
 							<OverlayTrigger
 								key={`trig_${tabPane.key}`}
 								placement="bottom"
-								overlay={<Tooltip id="pageGroupOptionsTooltip">Click for Page Group options</Tooltip>}
+								overlay={
+									<Tooltip id="pageGroupOptionsTooltip">Click for Page Group options</Tooltip>
+								}
 							>
 								<li
 									key={`tab_${tabPane.key}`}
@@ -70,7 +80,7 @@ const emptyScreen = () => <div className="tabContentbg" />,
 									id: `tab_content_${tabPane.key}`,
 									selected: props.activeKey === tabPane.key
 								})
-							)}
+						  )}
 				</div>
 			</div>
 		</div>

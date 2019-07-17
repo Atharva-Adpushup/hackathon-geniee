@@ -150,6 +150,13 @@ const getSupportedAdSizes = () => {
 	return sortBy(adSizes, size => size.width);
 };
 
+const getPageGroupHash = (pageGroup, platform) => {
+	const name = `${pageGroup}_${platform}`;
+	const object = { pageGroups: [name] };
+
+	return window.btoa(window.encodeURIComponent(JSON.stringify(object)));
+};
+
 export {
 	errorHandler,
 	getDuplicatesInArray,
@@ -160,5 +167,6 @@ export {
 	copyToClipBoard,
 	formatDate,
 	getHtmlEncodedJSON,
-	getSupportedAdSizes
+	getSupportedAdSizes,
+	getPageGroupHash
 };

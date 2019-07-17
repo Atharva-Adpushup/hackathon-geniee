@@ -11,12 +11,11 @@ const {
 } = require('../configs/config');
 const { domanize } = require('../helpers/utils');
 
-router.get('/get', (req, res) => {
-	const userEmail = 'cnsdevtest9@mailinator.com';
-	const siteId = '14';
+router.get('/:siteId', (req, res) => {
 	const htmlFilePath = path.resolve(__dirname, '../portedApps/Apps/Editor/', 'index.html');
 	const {
-		user: { isSuperUser }
+		user: { isSuperUser, email: userEmail },
+		params: { siteId }
 	} = req;
 
 	return verifyOwner(siteId, userEmail)
