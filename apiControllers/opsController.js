@@ -67,10 +67,10 @@ router
 			if (value) {
 				date = moment(value);
 				date = moment.isValid() ? date : moment();
-				if (options) {
-					const { operation, value: number, unit } = options;
-					date = date[operation](number, unit);
-				}
+			}
+			if (options) {
+				const { operation, value: number, unit } = options;
+				date = date[operation](number, unit);
 			}
 			return date.format(DEFAULT_DATE_FORMAT);
 		}
