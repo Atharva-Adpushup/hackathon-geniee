@@ -1,10 +1,17 @@
+const config = require('./config'),
+prodEnv = config.environment.HOST_ENV === 'production';
 module.exports = {
 	SALT: '_ADP_RANDOMIZER_',
-	BASE_URL: 'http://console.adpushup.com',
+	BASE_URL: prodEnv ?'https://console.adpushup.com': 'http://localhost:8080',
 	DFP_WEB_SERVICE_ENDPOINT: 'http://staging.adpushup.com/DfpWebService/info',
 	TRANSACTION_LOG_ENDPOINT: 'https://api.adpushup.com/SetupLogWebService/log',
-	REPORT_STATUS: 'https://api.adpushup.com/OpsWebService/ops',
+	REPORT_STATUS: 'https://api.adpushup.com/OpsWebService/ops?report=getNetworkImportServiceStatus',
+	IE_TESTING_ENDPOINT: 'http://apdc1n-central5.eastus2.cloudapp.azure.com:8081/api/health-report',
 	PROXY_ORIGIN: '//proxy.app.adpushup.com',
+	PRODUCT_LIST_API: 'https://staging.adpushup.com/CentralReportingWebService/common/activeProducts',
+	ANALYTICS_API_ROOT: 'https://staging.adpushup.com/CentralReportingWebService',
+	ANALYTICS_METAINFO_URL: '/common/metaInfo',
+	REPORT_PATH: '/site/report?report_name=get_stats_by_custom',
 	DEMO_ACCOUNT_EMAIL: 'demo@adpushup.com',
 	AMP_SETTINGS_ACCESS_EMAILS: ['genieeamp@adpushup.com'],
 	DEMO_REPORT_SITE_ID: 31000,
@@ -25,7 +32,13 @@ module.exports = {
 		'DOWNLOAD_FIRMWARE'
 	],
 	REPORT_API: {
-		SELECT_PARAMS: ['total_requests', 'total_impressions', 'total_revenue', 'report_date', 'siteid'],
+		SELECT_PARAMS: [
+			'total_requests',
+			'total_impressions',
+			'total_revenue',
+			'report_date',
+			'siteid'
+		],
 		DATE_FORMAT: 'YYYY-MM-DD'
 	},
 	SERVICES: {
@@ -77,8 +90,10 @@ module.exports = {
 					description:
 						'The storage of information, or access to information that is already stored, on your device such as advertising identifiers, device identifiers, cookies, and similar technologies.',
 					cookies: [],
+					/* eslint-disable */
 					onAccept: function() {},
 					onRevoke: function() {}
+					/* eslint-enable */
 				},
 				{
 					name: 'personalisation',
@@ -86,8 +101,10 @@ module.exports = {
 					description:
 						'The collection and processing of information about your use of this service to subsequently personalise advertising and/or content for you in other contexts, such as on other websites or apps, over time. Typically, the content of the site or app is used to make inferences about your interests, which inform future selection of advertising and/or content.',
 					cookies: [],
+					/* eslint-disable */
 					onAccept: function() {},
 					onRevoke: function() {}
+					/* eslint-enable */
 				},
 				{
 					name: 'ad selection, delivery, reporting',
@@ -95,8 +112,10 @@ module.exports = {
 					description:
 						'The collection of information, and combination with previously collected information, to select and deliver advertisements for you, and to measure the delivery and effectiveness of such advertisements. This includes using previously collected information about your interests to select ads, processing data about what advertisements were shown, how often they were shown, when and where they were shown, and whether you took any action related to the advertisement, including for example clicking an ad or making a purchase. This does not include personalisation, which is the collection and processing of information about your use of this service to subsequently personalise advertising and/or content for you in other contexts, such as websites or apps, over time.',
 					cookies: [],
+					/* eslint-disable */
 					onAccept: function() {},
 					onRevoke: function() {}
+					/* eslint-enable */
 				},
 				{
 					name: 'content selection, delivery, reporting',
@@ -104,8 +123,10 @@ module.exports = {
 					description:
 						'The collection of information, and combination with previously collected information, to select and deliver content for you, and to measure the delivery and effectiveness of such content. This includes using previously collected information about your interests to select content, processing data about what content was shown, how often or how long it was shown, when and where it was shown, and whether the you took any action related to the content, including for example clicking on content. This does not include personalisation, which is the collection and processing of information about your use of this service to subsequently personalise content and/or advertising for you in other contexts, such as websites or apps, over time.',
 					cookies: [],
+					/* eslint-disable */
 					onAccept: function() {},
 					onRevoke: function() {}
+					/* eslint-enable */
 				},
 				{
 					name: 'measurement',
@@ -113,8 +134,10 @@ module.exports = {
 					description:
 						'The collection of information about your use of the content, and combination with previously collected information, used to measure, understand, and report on your usage of the service. This does not include personalisation, the collection of information about your use of this service to subsequently personalise content and/or advertising for you in other contexts, i.e. on other service, such as websites or apps, over time.',
 					cookies: [],
+					/* eslint-disable */
 					onAccept: function() {},
 					onRevoke: function() {}
+					/* eslint-enable */
 				}
 			],
 			position: 'LEFT',
@@ -317,6 +340,8 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 	},
 	onboarding: {
 		steps: ['Add Site', 'Add AP code', 'Setup Passback'],
+		adsTxtDocUrl:
+			'https://docs.google.com/feeds/download/documents/export/Export?id=1qu0IfKRGdq7Go6ABvqaoh0-9tM7hyGsCucPoRlDZiNI&exportFormat=txt',
 		revenueLowerBound: 1000,
 		initialStep: 1,
 		totalSteps: 3
@@ -335,7 +360,8 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		}
 	},
 	docKeys: {
-		tagManager: 'tgmr::',
+		apTag: 'tgmr::',
+		networkConfig: 'data::apNetwork',
 		interactiveAds: 'fmrt::',
 		user: 'user::'
 	},
@@ -345,7 +371,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		siteDomain: null,
 		ads: []
 	},
-	interactiveAdsInitialDoc: {
+	INNOVATIVE_ADS_INITIAL_DOC: {
 		siteId: null,
 		ownerEmail: null,
 		siteDomain: null,
@@ -355,7 +381,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 			custom: []
 		}
 	},
-	defaultMeta: {
+	DEFAULT_META: {
 		pagegroups: [],
 		custom: []
 	},
@@ -392,6 +418,61 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		rubicon: 'rubiconBidAdapter',
 		districtm: 'appnexusBidAdapter',
 		criteo: 'criteoBidAdapter',
-		currency: 'currency'
-	}
+		currency: 'currency',
+		pubmatic: 'pubmaticBidAdapter',
+		aardvark: 'aardvarkBidAdapter',
+		adyoulike: 'adyoulikeBidAdapter'
+	},
+	APP_KEYS: {
+		unknown: {
+			app: 'UNKNOWN',
+			key: 0,
+			alias: 'unknown'
+		},
+		layout: {
+			app: 'LAYOUT',
+			key: 1,
+			alias: 'layout'
+		},
+		tag: {
+			app: 'TAG',
+			key: 2,
+			alisa: 'tag'
+		},
+		hb: {
+			app: 'HB',
+			key: 3,
+			alias: 'hb'
+		},
+		mediation: {
+			app: 'MEDIATION',
+			key: 4,
+			alias: 'mediation'
+		},
+		ia: {
+			app: 'INTERACTIVE_AD',
+			key: 5,
+			alias: 'ia'
+		},
+		amp: {
+			app: 'AMP',
+			key: 6,
+			alias: 'amp'
+		},
+		adrecover: {
+			app: 'AdRecover',
+			key: 7,
+			alias: 'adrecover'
+		},
+		manageadstxt: {
+			app: 'Manage Ads.txt',
+			key: 8,
+			alias: 'manageadstxt'
+		}
+	},
+	ADS_TXT_REDIRECT_PATTERN: 'manageadstxt.com',
+	GOOGLE_BOT_USER_AGENT:
+		'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html).',
+	DEFAULT_APP_STATUS_RESPONSE: {},
+	EMAIL_REGEX: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 };

@@ -9,13 +9,12 @@ import {
 	editTrafficDistribution,
 	disableVariation,
 	tagcontrolVariation,
-	updateInContentTreeSelectorsLevel,
-	updateInContentSectionBracket
+	updateInContentTreeSelectorsLevel
 } from 'actions/variationActions.js';
 import InlineEdit from '../../../shared/inlineEdit/index.jsx';
 import CustomToggleSwitch from '../../../shared/customToggleSwitch.jsx';
 import SelectBox from '../../../shared/select/select';
-import { incontentSectionSettings } from '../../../../consts/commonConsts';
+import { incontentSections } from '../../../../consts/commonConsts';
 
 const variationOtions = props => {
 	const {
@@ -24,18 +23,13 @@ const variationOtions = props => {
 			onEditVariationName,
 			variation,
 			channelId,
-			incontentSections,
-			incontentSectionsConfig,
-			platform,
 			disabledVariationsCount,
 			controlVariationsCount,
 			onDisableVariation,
 			onTagcontrolVariation,
 			onEditTrafficDistribution,
 			onUpdateContentSelector,
-			onInitIncontentAdsPreview,
-			onUpdateInContentTreeSelectorsLevel,
-			onUpdateInContentSectionBracket
+			onUpdateInContentTreeSelectorsLevel
 		} = props,
 		variationId = variation.id,
 		hasDisabledVariationsReachedLimit = !!(
@@ -43,22 +37,13 @@ const variationOtions = props => {
 			disabledVariationsCount >= 10 &&
 			!variation.disable
 		),
-		// 'isDifferentControlVariation' variable checks whether a different baseline/control variation exists in same page group
+		// 'isDifferentControlVariation' variable checks whether a different control variation exists in same page group
 		isDifferentControlVariation = !!controlVariationsCount,
 		isControlVariation = variation.isControl || false,
 		shouldDeleteButtonBeDisabled = !!isControlVariation,
 		contentSelector = variation.contentSelector,
 		computedToggleSwitchValue = hasDisabledVariationsReachedLimit ? false : !!variation.disable,
-		incontentSelectorsTreeLevelValue = variation.selectorsTreeLevel || '',
-		incontentDefaultSectionBracketValue = incontentSectionSettings.SECTION_BRACKETS[platform.toUpperCase()],
-		incontentSectionBracketValue = variation.incontentSectionBracket || incontentDefaultSectionBracketValue,
-		shouldIncontentAnalyzerPreviewBeShown = !!(
-			contentSelector &&
-			incontentSections &&
-			incontentSections.length &&
-			incontentSectionsConfig &&
-			Object.keys(incontentSectionsConfig).length
-		);
+		incontentSelectorsTreeLevelValue = variation.selectorsTreeLevel || '';
 
 	function copyVariationConfirmation(fn, variationId, channelId) {
 		let confirm = window.confirm('Are you sure you want to copy this variation?');
@@ -107,7 +92,7 @@ const variationOtions = props => {
 				</Col>
 			</Row>
 
-			{/*IncontentAnalyzer - children tree level UI*/}
+			{/*Incontent children tree level UI*/}
 			{contentSelector ? (
 				<Row className="u-margin-b15px">
 					<Col className="u-padding-r10px" xs={2}>
@@ -116,7 +101,7 @@ const variationOtions = props => {
 							placement="top"
 							overlay={
 								<Tooltip id="incontent-children-tree-level-info-tooltip">
-									Select the children (selectors) tree level number upto which IncontentAnalyzer
+									Select the children (selectors) tree level number upto which Incontent Sections
 									library will choose valid HTML selectors to place sections/ads. This is a variation
 									level setting that will be applicable on all sections.
 								</Tooltip>
@@ -137,7 +122,7 @@ const variationOtions = props => {
 								onUpdateInContentTreeSelectorsLevel(variationId, selectorsTreeLevel);
 							}}
 						>
-							{incontentSectionSettings.SELECTORS_TREE_LEVEL.map((item, index) => (
+							{incontentSections.SELECTORS_TREE_LEVEL.map((item, index) => (
 								<option key={index} value={item}>
 									{item}
 								</option>
@@ -147,90 +132,17 @@ const variationOtions = props => {
 				</Row>
 			) : null}
 
-			{/*IncontentAnalyzer - section bracket UI*/}
-			{contentSelector ? (
-				<Row className="u-margin-b15px">
-					<Col className="u-padding-r10px" xs={2}>
-						Incontent section Bracket
-						<OverlayTrigger
-							placement="top"
-							overlay={
-								<Tooltip id="incontent-section-bracket-info-tooltip">
-									Enter the incontent section bracket number that IncontentAnalyzer library will use
-									to place sections/ads. A non-zero value will override default values for different
-									platforms (DESKTOP: 600, MOBILE: 450). This is a variation level setting that will
-									be applicable on all sections.
-								</Tooltip>
-							}
-						>
-							<span className="variation-settings-icon">
-								<i className="fa fa-info" />
-							</span>
-						</OverlayTrigger>
-					</Col>
-					<Col className="u-padding-l10px" xs={4}>
-						<InlineEdit
-							type="number"
-							validate
-							value={incontentSectionBracketValue}
-							submitHandler={onUpdateInContentSectionBracket.bind(null, variationId)}
-							text="Section bracket"
-							errorMessage="Section bracket cannot be empty"
-						/>
-					</Col>
-				</Row>
-			) : null}
-
-			{/*IncontentAnalyzer - show preview UI*/}
-			{shouldIncontentAnalyzerPreviewBeShown ? (
-				<Row>
-					<Col className="u-padding-r10px" xs={2}>
-						Show Incontent Ads Preview
-						<OverlayTrigger
-							placement="top"
-							overlay={
-								<Tooltip id="incontent-ads-preview-info-tooltip">
-									Click adjacent button to show IncontentAnalyzer ads placement preview. This preview
-									tries to simulate how incontent ads will appear inside selected container based on
-									your setup. Please ensure that your incontent ads setup is complete before you run
-									this preview.
-								</Tooltip>
-							}
-						>
-							<span className="variation-settings-icon">
-								<i className="fa fa-info" />
-							</span>
-						</OverlayTrigger>
-					</Col>
-					<Col className="u-padding-l10px" xs={4}>
-						<Button
-							className="btn-lightBg"
-							onClick={onInitIncontentAdsPreview.bind(
-								null,
-								channelId,
-								contentSelector,
-								incontentSections,
-								incontentSectionsConfig
-							)}
-							type="submit"
-						>
-							Run Preview
-						</Button>
-					</Col>
-				</Row>
-			) : null}
-
 			{/*Control Variation Tag UI*/}
 			{!isDifferentControlVariation ? (
 				<Row>
 					<Col className="u-padding-r10px" xs={2}>
-						Set as Baseline Variation
+						Set as Control Variation
 						<OverlayTrigger
 							placement="top"
 							overlay={
 								<Tooltip id="control-variation-tag-info-tooltip">
-									Only one variation can be tagged as <b>Baseline Variation</b> per page group. The
-									existing tagged variation must be deleted in order to baseline tag a different
+									Only one variation can be tagged as <b>Control Variation</b> per page group. The
+									existing tagged variation must be deleted in order to control tag a different
 									variation in same page group.
 								</Tooltip>
 							}
@@ -341,17 +253,12 @@ variationOtions.propTypes = {
 	channelId: PropTypes.string.isRequired,
 	disabledVariationsCount: PropTypes.num,
 	controlVariationsCount: PropTypes.num,
-	incontentSections: PropTypes.array,
-	incontentSectionsConfig: PropTypes.object,
-	platform: PropTypes.string.isRequired,
 	onCopyVariation: PropTypes.func.isRequired,
 	onDeleteVariation: PropTypes.func.isRequired,
 	onEditVariationName: PropTypes.func.isRequired,
 	onEditTrafficDistribution: PropTypes.func.isRequired,
 	onUpdateInContentTreeSelectorsLevel: PropTypes.func.isRequired,
 	onUpdateContentSelector: PropTypes.func.isRequired,
-	onInitIncontentAdsPreview: PropTypes.func,
-	onUpdateInContentSectionBracket: PropTypes.func,
 	onDisableVariation: PropTypes.func,
 	onTagcontrolVariation: PropTypes.func
 };
@@ -367,8 +274,7 @@ export default connect(
 				onEditTrafficDistribution: editTrafficDistribution,
 				onDisableVariation: disableVariation,
 				onTagcontrolVariation: tagcontrolVariation,
-				onUpdateInContentTreeSelectorsLevel: updateInContentTreeSelectorsLevel,
-				onUpdateInContentSectionBracket: updateInContentSectionBracket
+				onUpdateInContentTreeSelectorsLevel: updateInContentTreeSelectorsLevel
 			},
 			dispatch
 		)

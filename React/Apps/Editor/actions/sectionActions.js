@@ -209,13 +209,6 @@ const createSection = (sectionPayload, adPayload, variationId) => dispatch => {
 			minDistanceFromPrevAd
 		};
 	},
-	updateInContentNotNear = (sectionId, notNear) => {
-		return {
-			type: sectionActions.UPDATE_INCONTENT_NOT_NEAR,
-			sectionId,
-			notNear
-		};
-	},
 	updateType = (sectionId, value) => {
 		return {
 			type: sectionActions.UPDATE_TYPE,
@@ -298,7 +291,6 @@ export {
 	updateXPath,
 	updateOperation,
 	updateInContentMinDistanceFromPrevAd,
-	updateInContentNotNear,
 	sectionAllXPaths,
 	validateXPath,
 	validateSectionXPath,

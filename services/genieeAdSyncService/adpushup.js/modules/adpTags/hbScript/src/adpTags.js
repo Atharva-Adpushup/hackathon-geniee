@@ -22,7 +22,11 @@ var w = window,
 			availableSlots = inventory.dfpAdUnits[size],
 			bidders = null;
 
-		if (optionalParam.headerBidding && inventory.hbConfig && Array.isArray(inventory.hbConfig.bidderAdUnits[size])) {
+		if (
+			optionalParam.headerBidding &&
+			inventory.hbConfig &&
+			Array.isArray(inventory.hbConfig.bidderAdUnits[size])
+		) {
 			var overrideSize = size;
 			if (
 				optionalParam.overrideActive &&
@@ -70,7 +74,8 @@ var w = window,
 			bidders = optionalParam.headerBidding ? adUnits.bidders : [],
 			isResponsive = optionalParam.isResponsive,
 			sectionName = optionalParam.sectionName,
-			multipleAdSizes = optionalParam.multipleAdSizes;
+			multipleAdSizes = optionalParam.multipleAdSizes,
+			services = optionalParam.services;
 
 		adpTags.adpSlots[containerId] = {
 			slotId: slotId,
@@ -90,6 +95,7 @@ var w = window,
 			containerPresent: false,
 			feedbackSent: false,
 			hasTimedOut: false,
+			services: services,
 			feedback: {
 				winner: config.DEFAULT_WINNER
 			}

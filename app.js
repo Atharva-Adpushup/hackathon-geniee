@@ -1,3 +1,8 @@
+require('dotenv').config();
+
+// Set Base Directory
+global.__basedir = __dirname;
+
 var express = require('express'),
 	app = express(),
 	fs = require('fs'),
@@ -53,6 +58,7 @@ process.on('uncaughtException', function(err) {
 });
 
 // set static directory
+app.use(express.static(path.join(__dirname, 'clientDist')));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // view engine setup
@@ -156,7 +162,7 @@ couchBaseService
 		app.locals.consts = consts;
 
 		// Use main controller module as router init
-		require('./controllers/router')(app);
+		require('./apiControllers/router')(app);
 
 		// error handlers
 

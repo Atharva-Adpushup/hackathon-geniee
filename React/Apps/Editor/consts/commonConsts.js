@@ -91,9 +91,7 @@ const status = {
 		VALIDATE_XPATH_SECTION: 'VALIDATE_XPATH_SECTION',
 		XPATH_SECTION_VALIDATED: 'XPATH_SECTION_VALIDATED',
 		SCROLL_TO_VIEW: 'SCROLL_TO_VIEW',
-		SET_MODE: 'SET_MODE',
-		INIT_INCONTENT_ADS_PREVIEW: 'INIT_INCONTENT_ADS_PREVIEW',
-		SHOW_INCONTENT_ADS_PREVIEW_RESULT: 'SHOW_INCONTENT_ADS_PREVIEW_RESULT'
+		SET_MODE: 'SET_MODE'
 	},
 	siteModes = {
 		DRAFT: 2,
@@ -189,8 +187,6 @@ const status = {
 		CLOSE_VARIATION_PANEL: 'CLOSE_VARIATION_PANEL',
 		UPDATE_CONTENT_SELECTOR: 'UPDATE_CONTENT_SELECTOR',
 		UPDATE_INCONTENT_SELECTORS_TREE_LEVEL: 'UPDATE_INCONTENT_SELECTORS_TREE_LEVEL',
-		UPDATE_INCONTENT_SECTION_BRACKET: 'UPDATE_INCONTENT_SECTION_BRACKET',
-		INIT_INCONTENT_ADS_PREVIEW: 'INIT_INCONTENT_ADS_PREVIEW',
 		SAVE_KEY_VALUES: 'SAVE_KEY_VALUES',
 		SAVE_PERSONALIZATION_INFO: 'SAVE_PERSONALIZATION_INFO',
 		DISABLE_VARIATION: 'DISABLE_VARIATION',
@@ -206,7 +202,6 @@ const status = {
 		UPDATE_PARTNER_DATA: 'UPDATE_PARTNER_DATA',
 		UPDATE_XPATH: 'UPDATE_XPATH',
 		UPDATE_INCONTENT_MIN_DISTANCE_FROM_PREV_AD: 'UPDATE_INCONTENT_MIN_DISTANCE_FROM_PREV_AD',
-		UPDATE_INCONTENT_NOT_NEAR: 'UPDATE_INCONTENT_NOT_NEAR',
 		GET_ALL_XPATHS: 'GET_ALL_XPATHS',
 		VALIDATE_XPATH: 'VALIDATE_XPATH',
 		VALIDATE_XPATH_SECTION: 'VALIDATE_XPATH_SECTION',
@@ -337,23 +332,23 @@ const status = {
 	defaultSectionCss = {
 		'margin-left': 'auto',
 		'margin-right': 'auto',
-		'margin-top': '10px',
-		'margin-bottom': '10px',
+		'margin-top': '0px',
+		'margin-bottom': '0px',
 		clear: 'both'
 	},
 	leftSectionCss = {
 		float: 'left',
-		'margin-left': '10px',
-		'margin-right': '10px',
-		'margin-top': '10px',
-		'margin-bottom': '10px'
+		'margin-left': '0px',
+		'margin-right': '5px',
+		'margin-top': '0px',
+		'margin-bottom': '5px'
 	},
 	rightSectionCss = {
 		float: 'right',
-		'margin-left': '10px',
-		'margin-right': '10px',
-		'margin-top': '10px',
-		'margin-bottom': '10px'
+		'margin-left': '5px',
+		'margin-right': '0px',
+		'margin-top': '0px',
+		'margin-bottom': '5px'
 	},
 	uiModes = {
 		EDITOR_MODE: 1,
@@ -504,14 +499,9 @@ const status = {
 			]
 		}
 	},
-	incontentSectionSettings = {
-		SELECTORS_TREE_LEVEL: ['any', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
-		SECTION_BRACKETS: {
-			DESKTOP: 600,
-			MOBILE: 450
-		}
-	},
-	refreshIntervals = [30, 60, 90, 120, 180, 240, 300, 360];
+	incontentSections = {
+		SELECTORS_TREE_LEVEL: ['any', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
+	};
 
 export {
 	status,
@@ -557,6 +547,5 @@ export {
 	personalizationTypes,
 	typeOfAds,
 	iabSizes,
-	incontentSectionSettings,
-	refreshIntervals
+	incontentSections
 };

@@ -1,0 +1,73 @@
+.estimatedEarningPreviousText {
+	color: $lightBlue;
+}
+
+.estimatedEarningLastText {
+	color: $darkBlue;
+}
+.estimatedEarning {
+	font-size: 3rem;
+}
+
+.textBold {
+	font-weight: $textBold;
+}
+
+.textGreen {
+	color: $GreenColor;
+}
+.textRed {
+	color: $primaryRed;
+}
+
+.width-100 {
+	width: 100% !important;
+}
+
+.width-50 {
+	width: 50% !important;
+}
+
+.width-70 {
+	width: 70% !important;
+}
+.width-90 {
+	width: 90% !important;
+}
+
+.width-30 {
+	width: 30% !important;
+}
+
+.card-color {
+	color: #fff;
+	background: #eb575c;
+}
+.card-color .panel-heading {
+	color: #fff !important;
+	background: #eb575c !important;
+	border: #eb575c !important;
+}
+
+.card-color .panel-footer {
+	color: #fff !important;
+	background: #eb575c !important;
+	border-top: #eb575c !important;
+}
+
+.display-inline {
+	display: inline-block;
+	width: auto;
+}
+
+.float-right {
+	float: right;
+}
+.u-margin-lr-auto {
+	margin-left: auto !important;
+	margin-right: auto !important;
+}
+
+.font-small {
+	font-size: 14px;
+}

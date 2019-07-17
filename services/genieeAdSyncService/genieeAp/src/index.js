@@ -282,11 +282,7 @@ function main() {
 
 	if (!config.pageGroup) {
 		pageGroupTimer = setTimeout(function() {
-<<<<<<< HEAD
-			!config.pageGroup ? triggerControl(3) : clearTimeout(pageGroupTimer);
-=======
 			!config.pageGroup ? triggerControl(commonConsts.MODE.FALLBACK) : clearTimeout(pageGroupTimer);
->>>>>>> feedback-changes
 		}, config.pageGroupTimeout);
 	} else {
 		// start heartBeat

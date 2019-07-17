@@ -76,8 +76,9 @@ var adp = window.adpushup,
 					referrer: config.referrer,
 					tracking: browserConfig.trackerSupported,
 					variationId: commonConsts.MANUAL_ADS.VARIATION
-				};
-
+				}, oldFeedbackData = feedbackData;
+				
+				oldFeedbackData.ads = [ad.originalId];
 				return getContainer(ad)
 					.done(function(container) {
 						var isLazyLoadingAd = !!(ad.enableLazyLoading === true);
@@ -100,12 +101,14 @@ var adp = window.adpushup,
 							isAdContainerInView(container).done(function() {
 								// Send feedback call
 								utils.sendFeedback(feedbackData);
+								utils.sendFeedbackOld(oldFeedbackData);
 								// Place the ad in the container
 								return placeAd(container, ad);
 							});
 						} else {
 							// Send feedback call
 							utils.sendFeedback(feedbackData);
+							utils.sendFeedbackOld(oldFeedbackData);
 							// Place the ad in the container
 							return placeAd(container, ad);
 						}

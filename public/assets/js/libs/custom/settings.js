@@ -17,7 +17,9 @@ $(document).ready(function() {
 			// Function to generate header code
 			generateHeaderCode: function() {
 				$('#header-code').text(
-					'<script data-cfasync="false" type="text/javascript">' + this.templates.headerCode + '</script>'
+					'<script data-cfasync="false" type="text/javascript">' +
+						this.templates.headerCode +
+						'</script>'
 				);
 			},
 
@@ -264,7 +266,8 @@ $(document).ready(function() {
 				return newAdCode.join('\n');
 			},
 			isNonEmpty: function(val) {
-				if (!val || typeof val == 'undefined' || val == null || (val.trim && val.trim() == '')) return false;
+				if (!val || typeof val == 'undefined' || val == null || (val.trim && val.trim() == ''))
+					return false;
 				return true;
 			},
 			runCode: function(data) {
@@ -306,7 +309,8 @@ $(document).ready(function() {
 				if (((scriptsWithoutSrc.length == scriptsWithSrc.length) == ins.length) == 1) {
 					scriptsWithSrc = scriptsWithSrc.get(0);
 					return (
-						scriptsWithSrc.src.indexOf('pagead2.googlesyndication.com/pagead/js/adsbygoogle.js') > -1 &&
+						scriptsWithSrc.src.indexOf('pagead2.googlesyndication.com/pagead/js/adsbygoogle.js') >
+							-1 &&
 						this.isNonEmpty(ins.attr('data-ad-client')) &&
 						this.isNonEmpty(ins.attr('data-ad-slot'))
 					);
@@ -316,7 +320,9 @@ $(document).ready(function() {
 			getAdsenseAsyncCode: function(adConfig) {
 				var adCode = [];
 				adCode.push(
-					'<scr' + 'ipt async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></scr' + 'ipt>'
+					'<scr' +
+						'ipt async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></scr' +
+						'ipt>'
 				);
 				adCode.push(
 					'<ins class="adsbygoogle" style="display:inline-block;width:' +
@@ -329,7 +335,9 @@ $(document).ready(function() {
 						adConfig.adslot +
 						'"></ins>'
 				);
-				adCode.push('<scr' + 'ipt> (adsbygoogle = window.adsbygoogle || []).push({}); </scr' + 'ipt>');
+				adCode.push(
+					'<scr' + 'ipt> (adsbygoogle = window.adsbygoogle || []).push({}); </scr' + 'ipt>'
+				);
 				return adCode.join('\n');
 			},
 			changeSyncToAsync: function() {
@@ -367,7 +375,10 @@ $(document).ready(function() {
 				} else if (this.isSyncAdsense()) {
 					var adCode = this.changeSyncToAsync();
 					return !adCode
-						? { error: 1, message: 'There was some issue in control conversion plz contact support' }
+						? {
+								error: 1,
+								message: 'There was some issue in control conversion plz contact support'
+						  }
 						: { error: 0, code: adCode };
 				} else {
 					return {

@@ -1,0 +1,38 @@
+.u-text-uppercase {
+	text-transform: $textUppercase !important;
+}
+.u-text-normal {
+	font-weight: $textNormal !important;
+}
+.u-text-bold {
+	font-weight: $textBold !important;
+}
+
+.u-text-underline {
+	text-decoration: $textUnderline !important;
+}
+
+.u-text-underline-none {
+	text-decoration: $none !important;
+}
+
+.u-text-info {
+	color: $blackColor !important;
+}
+
+.u-text-red,
+.u-text-error {
+	color: $errorText !important;
+}
+
+.u-text-success {
+	color: $successText !important;
+}
+
+.u-text-yellow {
+	color: $darkYellow !important;
+}
+
+.u-text-break-all {
+	word-break: break-all !important;
+}

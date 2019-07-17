@@ -1,15 +1,12 @@
-var Promise = require('bluebird'),
-	retry = require('bluebird-retry'),
-	configPublishService = require('./apV2SiteConfigPublishService/index');
+const adsSyncService = require('./adsSyncService/index');
 
-function publishCDNWrapper(site) {
-	return configPublishService
+function init(site) {
+	return adsSyncService
 		.publish(site)
-		.then(
-			response =>
-				response && response.hasOwnProperty('empty') ? console.log(response.message) : console.log(response)
+		.then(response =>
+			response && response.hasOwnProperty('empty') ? console.log(response.message) : console.log(response)
 		)
 		.catch(console.log);
 }
 
-module.exports = { init: site => publishCDNWrapper(site) };
+module.exports = { init: site => init(site) };

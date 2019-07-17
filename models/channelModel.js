@@ -75,13 +75,11 @@ function apiModule() {
 					{ sampleUrl: json.sampleUrl, sampleUrlForced: sampleUrlForced },
 					schema.api.validations,
 					site.data.siteDomain
-				).then(function(data) {
-					var channel = json.device.toUpperCase() + ':' + json.pageGroupName.toUpperCase(),
-						channelData,
-						channels = site.get('channels');
+				).then(() => {
+					var channel = json.device.toUpperCase() + ':' + json.pageGroupName.toUpperCase();
+					var channelData;
+					var channels = site.get('channels');
 
-					console.log('createPageGroup JSON: ', JSON.stringify(json));
-					console.log('siteJSON before createPageGroup: ', JSON.stringify(site.toJSON()));
 					if (!site.get('cmsInfo')) {
 						site.set('cmsInfo', { cmsName: '', pageGroups: [] });
 					}
@@ -92,23 +90,21 @@ function apiModule() {
 							pageGroup: json.pageGroupName.toUpperCase()
 						});
 					} else {
-						var existingPageGroup = _.find(site.get('cmsInfo').pageGroups, ['sampleUrl', json.sampleUrl])
-								.pageGroup,
-							existingChannel = json.device.toUpperCase() + ':' + existingPageGroup;
+						var existingPageGroup = _.find(site.get('cmsInfo').pageGroups, ['sampleUrl', json.sampleUrl]).pageGroup;
+						var existingChannel = json.device.toUpperCase() + ':' + existingPageGroup;
 
 						if (_.includes(channels, existingChannel)) {
-							throw new AdPushupError([
+							throw new AdPushupError(
 								{ status: 403, message: 'A pagegroup with this Sample URL and device already exists.' }
-							]);
+							);
 						}
 					}
 
 					if (_.includes(channels, channel)) {
-						throw new AdPushupError([{ status: 403, message: 'This pagegroup type already exists' }]);
+						throw new AdPushupError({ status: 403, message: 'This pagegroup type already exists' });
 					}
 					channels.push(channel);
 					site.set('channels', channels);
-					console.log('siteJSON after createPageGroup before db save: ', JSON.stringify(site.toJSON()));
 
 					const siteApConfigs = site.get('apConfigs') || false;
 					const siteAutoOptimise =
@@ -130,15 +126,6 @@ function apiModule() {
 					};
 					return site
 						.save()
-						.then(() => {
-							return siteModel.getSiteById(json.siteId).then(site => {
-								console.log(
-									'siteJSON loaded from db after createPageGroup: ',
-									JSON.stringify(site.toJSON())
-								);
-								return true;
-							});
-						})
 						.then(() => API.saveChannel(json.siteId, json.device, json.pageGroupName, channelData))
 						.then(res => res.data);
 				});
@@ -216,23 +203,24 @@ function apiModule() {
 						var data = result[0].value;
 
 						return API.deleteChannel(data.siteId, data.platform, data.pageGroup)
-							.then(function() {
-								return siteModel.getSitePageGroups(data.siteId);
-							})
-							.then(function(pageGroups) {
-								var selectedPagegroups = _.filter(pageGroups, { pageGroup: data.pageGroup });
+							.then(() => siteModel.getSitePageGroups(data.siteId))
+							.then((pageGroups) => {
+								// I didn't understand why did we find selectedPagegroups and if result is empty
+								// then resolving without any value which would break the next then callback
+								// so I am commenting the following code and returning the siteModel
+								
+								// var selectedPagegroups = _.filter(pageGroups, { pageGroup: data.pageGroup });
+								// return selectedPagegroups.length === 0 ? siteModel.getSiteById(data.siteId) : resolve();
 
-								return selectedPagegroups.length === 0 ? siteModel.getSiteById(data.siteId) : resolve();
+								return siteModel.getSiteById(data.siteId);
 							})
-							.then(function(site) {
+							.then(site => {
 								var cmsPageGroups = site.get('cmsInfo').pageGroups;
-								_.remove(cmsPageGroups, function(p) {
-									return p.pageGroup === data.pageGroup;
-								});
+								_.remove(cmsPageGroups, p => p.pageGroup === data.pageGroup);
 
 								site.set('cmsInfo', { cmsName: '', pageGroups: cmsPageGroups });
 								site.save();
-								return resolve();
+								return resolve(site);
 							});
 					});
 				});
@@ -277,16 +265,12 @@ function apiModule() {
 		},
 		saveChannel: function(siteId, platform, pageGroup, channelData) {
 			return API.getChannel(siteId, platform, pageGroup)
-				.then(
-					function(channel) {
-						channel.setAll(channelData);
-						return channel;
-					},
-					function() {
-						return new Channel(channelData);
-					}
-				)
-				.then(function(channel) {
+				.then(channel => {
+					channel.setAll(channelData);
+					return channel;
+				})
+				.catch(() => new Channel(channelData))
+				.then(channel => {
 					return channel.save();
 				});
 		},

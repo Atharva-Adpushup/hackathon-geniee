@@ -17,7 +17,7 @@ function getHbAdsApTag(siteId = 0, isManual = false) {
 		return Promise.resolve(response);
 	}
 	return appBucket
-		.getDoc(`${docKeys.tagManager}${siteId}`)
+		.getDoc(`${docKeys.apTag}${siteId}`)
 		.then(docWithCas => {
 			const doc = docWithCas.value;
 			const ads = doc.ads || false;

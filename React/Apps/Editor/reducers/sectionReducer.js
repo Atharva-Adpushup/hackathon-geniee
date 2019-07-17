@@ -93,24 +93,15 @@ const sectionByIds = (state = {}, action) => {
 				[action.sectionId]: { ...state[action.sectionId], minDistanceFromPrevAd: action.minDistanceFromPrevAd }
 			};
 
-		case sectionActions.UPDATE_INCONTENT_NOT_NEAR:
-			return {
-				...state,
-				[action.sectionId]: { ...state[action.sectionId], notNear: action.notNear }
-			};
-
 		case sectionActions.UPDATE_TYPE:
 			return {
 				...state,
 				[action.sectionId]: {
 					...state[action.sectionId],
 					type: action.value,
-					formatData:
-						action.type != state[action.sectionId].type
-							? {}
-							: !state[action.sectionId].formatData
-							? {}
-							: state[action.sectionId].formatData
+					formatData: action.type != state[action.sectionId].type
+						? {}
+						: !state[action.sectionId].formatData ? {} : state[action.sectionId].formatData
 				}
 			};
 
@@ -144,7 +135,7 @@ const sectionByIds = (state = {}, action) => {
 
 		case variationActions.COPY_VARIATION:
 			const sections = {};
-			_.each(action.sections, section => (sections[section.id] = section));
+			_.each(action.sections, section => sections[section.id] = section);
 			return { ...state, ...sections };
 
 		case sectionActions.ENABLE_LAZYLOAD:

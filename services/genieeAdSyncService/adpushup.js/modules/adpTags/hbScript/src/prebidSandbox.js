@@ -29,6 +29,16 @@ var prebidAdTemplate = require('./prebidAdTemplate'),
 				size = adpSlot.optionalParam.overrideSizeTo.split('x');
 			}
 
+			// Set custom sub id for criteo
+			var updatedBidders = adpSlot.bidders.map(function(bidder) {
+				if (bidder.bidder === 'criteo') {
+					bidder.params.publisherSubId =
+						'AP/' + adp.config.siteId + '_' + adp.utils.domanize(adp.config.siteDomain);
+				}
+
+				return bidder;
+			});
+
 			adUnitCodeForPrebid.push({
 				code: adpSlot.containerId,
 				mediaTypes: {
@@ -36,7 +46,7 @@ var prebidAdTemplate = require('./prebidAdTemplate'),
 						sizes: prebidSizes
 					}
 				},
-				bids: adpSlot.bidders
+				bids: updatedBidders
 			});
 		});
 
@@ -60,13 +70,13 @@ var prebidAdTemplate = require('./prebidAdTemplate'),
 			//window['__adp_frame_context_' + Math.abs(utils.hashCode(containerId))] = iframeEl.contentWindow;
 
 			if (iframeEl._adp_loaded === undefined) {
+				iframeEl._adp_loaded = true;
+
 				var iframeDoc = iframeEl.contentDocument;
 				iframeDoc.open();
 				iframeDoc.write(prebidHtml);
 				iframeDoc.close();
 			}
-
-			iframeEl._adp_loaded = true;
 		};
 
 		var waitUntil = setInterval(function() {

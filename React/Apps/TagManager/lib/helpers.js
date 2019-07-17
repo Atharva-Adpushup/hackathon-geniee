@@ -12,13 +12,8 @@ function getData(url, data) {
 	return $.get(url, data);
 }
 function getInitData() {
-	return getData('/tagManager/networkConfig').then(result => {
-		if (result.error) {
-			deferred.resolve({ global: { currentAd: null } });
-			return deferred.promise();
-		}
-
-		deferred.resolve({ global: { networkConfig: result.networkConfig } });
+	return getData('/tagManager/networkConfig').then(networkConfig => {
+		deferred.resolve({ global: { networkConfig: networkConfig } });
 		return deferred.promise();
 	});
 }

@@ -230,22 +230,3 @@ body {
 	text-align: right;
 	padding-right: 30px;
 }
-.runningStatus {
-	font-weight: bold;
-	font-size: 14px;
-	background-color: #ffff00;
-	color: #ff0000;
-	animation: fontbulger 2s infinite;
-}
-
-@keyframes fontbulger {
-	0% {
-		opacity: 0;
-	}
-	50% {
-		opacity: 0.5;
-	}
-	100% {
-		opacity: 1;
-	}
-}

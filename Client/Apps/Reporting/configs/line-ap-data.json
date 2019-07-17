@@ -1,0 +1,149 @@
+{
+	"legends": {
+		"Pageviews": {
+			"description": "xyz",
+			"total": "12345"
+		},
+		"Page CPM ($)": {
+			"description": "xyz",
+			"total": "$12345"
+		},
+		"Adpushup Requests": {
+			"description": "xyz",
+			"total": "12345"
+		},
+		"Impressions": {
+			"description": "xyz",
+			"total": "12345"
+		},
+		"CPM ($)": {
+			"description": "xyz",
+			"total": "$12345"
+		},
+		"Revenue ($)": {
+			"description": "xyz",
+			"total": "$12345"
+		},
+		"Gross Revenue ($)": {
+			"description": "xyz",
+			"total": "$12345"
+		},
+		"Xpath Miss": {
+			"description": "xyz",
+			"total": "12345"
+		}
+	},
+	"defaultYAxisGroups": [
+		{
+			"seriesNames": ["Page Views", "Impressions"]
+		},
+		{
+			"seriesNames": ["Net Revenue"],
+			"yAxisConfig": {
+				"labels": {
+					"format": "${value}"
+				}
+			}
+		},
+		{
+			"seriesNames": ["Page RPM", "Ad eCPM"],
+			"yAxisConfig": {
+				"labels": {
+					"format": "${value}"
+				}
+			}
+		}
+	],
+	"series": [
+		{
+			"data": [117703, 99286, 97314, 102554, 106781, 106772, 101014],
+			"name": "Home"
+		},
+		{
+			"data": [17.48, 18.43, 19.15, 19.31, 19.69, 19.4, 17.15],
+			"name": "Post"
+		},
+		{
+			"data": [405054, 342328, 335528, 353812, 377393, 382559, 373103],
+			"name": "Page"
+		}
+	],
+	"xAxis": {
+		"categories": [
+			"28-02-2019",
+			"01-03-2019",
+			"02-03-2019",
+			"03-03-2019",
+			"04-03-2019",
+			"05-03-2019",
+			"06-03-2019"
+		]
+	},
+
+	"tableHeader": [
+		{ "title": "Date", "prop": "date", "sortable": true, "filterable": true },
+		{ "title": "Pageviews", "prop": "pageviews", "sortable": true, "filterable": true },
+		{ "title": "Page CPM ($)", "prop": "page_cpm", "sortable": true, "filterable": true },
+		{ "title": "Adpushup Requests", "prop": "requests", "filterable": true },
+		{ "title": "Impressions", "prop": "impressions", "filterable": true },
+		{ "title": "CPM ($)", "prop": "cpm", "sortable": true, "filterable": true }
+	],
+	"tableBody": [
+		{
+			"date": "28-02-2019",
+			"pageviews": 117703,
+			"page_cpm": 17.48,
+			"requests": 405054,
+			"impressions": 362783,
+			"cpm": 5.67
+		},
+		{
+			"date": "01-03-2019",
+			"pageviews": 99286,
+			"page_cpm": 18.43,
+			"requests": 342328,
+			"impressions": 362783,
+			"cpm": 5.75
+		},
+		{
+			"date": "02-03-2019",
+			"pageviews": 997703,
+			"page_cpm": 15.48,
+			"requests": 408054,
+			"impressions": 323783,
+			"cpm": 4.67
+		},
+		{
+			"date": "03-03-2019",
+			"pageviews": 997703,
+			"page_cpm": 15.48,
+			"requests": 408054,
+			"impressions": 323783,
+			"cpm": 4.67
+		},
+		{
+			"date": "04-03-2019",
+			"pageviews": 997703,
+			"page_cpm": 15.48,
+			"requests": 408054,
+			"impressions": 323783,
+			"cpm": 4.67
+		},
+		{
+			"date": "05-03-2019",
+			"pageviews": 997703,
+			"page_cpm": 15.48,
+			"requests": 408054,
+			"impressions": 323783,
+			"cpm": 4.67
+		},
+		{
+			"date": "06-03-2019",
+			"pageviews": 997703,
+			"page_cpm": 15.48,
+			"requests": 408054,
+			"impressions": 323783,
+			"cpm": 4.67
+		}
+	]
+}
