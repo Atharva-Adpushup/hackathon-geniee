@@ -40,6 +40,7 @@ var hb = {
 			var sizeConfig = config.INVENTORY.deviceConfig.sizeConfig;
 
 			computedBidders.forEach(function (val, i) { 
+				// find size config of current bidder
 				var index;
 				for (index = 0; index < sizeConfig.length; index++){
 					var element = sizeConfig[index];
@@ -48,13 +49,14 @@ var hb = {
 					}
 				}
 
+				// if found then set its labels as labelAny in current bidder object
 				if (!isNaN(index) && sizeConfig[index]) {
 					computedBidders[i].labelAny = sizeConfig[index].labels;
 				}
 
 			});
 			
-			
+
 			var prebidSlot = {
 				code: adpSlot.containerId,
 				mediaTypes: {},
