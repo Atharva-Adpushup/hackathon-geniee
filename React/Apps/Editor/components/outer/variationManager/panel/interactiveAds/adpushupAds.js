@@ -12,10 +12,8 @@ import NetworkOptions from 'shared/networkOptions/NetworkOptions';
 class AdPushupAds extends Component {
 	constructor(props) {
 		super(props);
-
-		const isFormatDataPresent = this.props.section && this.props.section.formatData;
-		const formatData = isFormatDataPresent ? this.props.section.formatData : false;
-
+		let isFormatDataPresent = this.props.section && this.props.section.formatData,
+			formatData = isFormatDataPresent ? this.props.section.formatData : false;
 		this.state = {
 			event: isFormatDataPresent ? formatData.event : false,
 			eventData: {
@@ -205,22 +203,20 @@ class AdPushupAds extends Component {
 	}
 
 	renderNetwork(leftWidth, rightWidth) {
-		const { networkConfig, fromEditSection, showNotification } = this.props;
 		return (
 			<Row className="mT-15">
-				<Col xs={leftWidth} className={fromEditSection ? 'u-padding-r10px' : ''}>
+				<Col xs={leftWidth} className={this.props.fromEditSection ? 'u-padding-r10px' : ''}>
 					<strong>Network</strong>
 				</Col>
-				<Col xs={rightWidth} className={fromEditSection ? 'u-padding-l10px' : ''}>
+				<Col xs={rightWidth} className={this.props.fromEditSection ? 'u-padding-l10px' : ''}>
 					<NetworkOptions
 						onSubmit={this.submitHandler}
 						onCancel={() => {}}
 						buttonType={2}
 						fromPanel={true}
-						showNotification={showNotification}
+						showNotification={this.props.showNotification}
 						reset={this.state.reset}
 						isInsertMode={true}
-						networkConfig={networkConfig}
 					/>
 				</Col>
 			</Row>
@@ -228,23 +224,22 @@ class AdPushupAds extends Component {
 	}
 
 	submitHandler(networkInfo) {
-		const { css, event, format, size, eventData, showButtons, type, placement } = this.state;
-		const { showNetworkOptions, showNotification, submitHandler } = this.props;
-		let parsedCss;
-
-		try {
-			parsedCss = typeof css === 'string' && css.length ? JSON.parse(css) : Object.keys(css).length ? css : {};
-		} catch (e) {
-			console.log('CSS parsing in Interactive Ad failed');
-			parsedCss = {};
-		}
-		const majorPropertiesWrong = !event || !format || !size; // Checking if any of ad's event, format, size is missing
-		const eventDataWrong = (event === 'scroll' || event === 'onMills') && !eventData.value.trim().length; // this check is not valid now because we have removed these events
-		const networkDataWrong =
-			showNetworkOptions && !showButtons && (!networkInfo.network || !networkInfo.networkData); // if demand assignment is allowed but network & networkData is missing then true
-		const videoDataWrong = format == 'videoCustom' && !eventData.value.trim().length; // deprecated
-		if (majorPropertiesWrong || eventDataWrong || networkDataWrong || videoDataWrong) {
-			showNotification({
+		let css =
+			typeof this.state.css == 'string' && this.state.css.length
+				? JSON.parse(this.state.css)
+				: Object.keys(this.state.css).length
+					? this.state.css
+					: {};
+		if (
+			!this.state.event ||
+			!this.state.format ||
+			!this.state.size ||
+			(this.props.showNetworkOptions &&
+				(!networkInfo.network || !networkInfo.networkData) &&
+				!this.state.showButtons) ||
+			(this.state.format == 'videoCustom' && !this.state.eventData.value.trim().length)
+		) {
+			this.props.showNotification({
 				mode: 'error',
 				title: 'Invalid Values',
 				message: 'Please check entered details'
@@ -253,31 +248,31 @@ class AdPushupAds extends Component {
 		}
 		const sectionPayload = {
 				formatData: {
-					event: event,
-					eventData: eventData,
-					type: type,
-					placement: placement
+					event: this.state.event,
+					eventData: this.state.eventData,
+					type: this.state.type,
+					placement: this.state.placement
 				},
 				type: 3
 			},
-			sizes = size.split('x'),
+			sizes = this.state.size.split('x'),
 			adPayload = {
 				width: Number(sizes[0]),
 				height: Number(sizes[1]),
-				css: parsedCss
+				css: css
 			};
 
-		showNetworkOptions && networkInfo
+		this.props.showNetworkOptions && networkInfo
 			? ((adPayload.networkData = networkInfo.networkData), (adPayload.network = networkInfo.network))
 			: null;
 
-		if (format == 'videoCustom') {
+		if (this.state.format == 'videoCustom') {
 			adPayload.network = 'custom';
 			adPayload.networkData = {
 				adCode: '',
 				forceByPass: true
 			};
-			sectionPayload.xpath = eventData.value.trim();
+			sectionPayload.xpath = this.state.eventData.value.trim();
 			sectionPayload.operation = 'Append';
 		}
 
@@ -295,7 +290,7 @@ class AdPushupAds extends Component {
 				reset: true,
 				showButtons: false
 			},
-			() => submitHandler(sectionPayload, adPayload)
+			() => this.props.submitHandler(sectionPayload, adPayload)
 		);
 	}
 
@@ -317,24 +312,21 @@ class AdPushupAds extends Component {
 	}
 
 	render() {
-		const { fromEditSection, showNetworkOptions } = this.props;
-		const { event, format } = this.state;
-		const parentStyle = { padding: fromEditSection ? '0px 0px' : '20px 0px' };
-		const colStyle = { padding: fromEditSection ? '0px 0px' : '' };
-		const overAllWidth = fromEditSection ? 12 : 7;
-		const leftWidth = fromEditSection ? 4 : 5;
-		const rightWidth = fromEditSection ? 8 : 7;
-
+		let parentStyle = { padding: this.props.fromEditSection ? '0px 0px' : '20px 0px' },
+			colStyle = { padding: this.props.fromEditSection ? '0px 0px' : '' },
+			overAllWidth = this.props.fromEditSection ? 12 : 7,
+			leftWidth = this.props.fromEditSection ? 4 : 5,
+			rightWidth = this.props.fromEditSection ? 8 : 7;
 		return (
 			<div style={parentStyle}>
 				<Col xs={overAllWidth} style={colStyle}>
 					<Row>
-						<Col xs={leftWidth} className={fromEditSection ? 'u-padding-r10px' : ''}>
+						<Col xs={leftWidth} className={this.props.fromEditSection ? 'u-padding-r10px' : ''}>
 							<strong>Event</strong>
 						</Col>
-						<Col xs={rightWidth} className={fromEditSection ? 'u-padding-l10px' : ''}>
+						<Col xs={rightWidth} className={this.props.fromEditSection ? 'u-padding-l10px' : ''}>
 							<div className="interactiveAdsRow">
-								<SelectBox value={event} label="Event" onChange={this.eventChangeHandler}>
+								<SelectBox value={this.state.event} label="Event" onChange={this.eventChangeHandler}>
 									{interactiveAds.events.map((item, index) => (
 										<option key={index} value={item}>
 											{item.toUpperCase()}
@@ -344,11 +336,13 @@ class AdPushupAds extends Component {
 							</div>
 						</Col>
 					</Row>
-					{event ? this.renderEventOptions(leftWidth, rightWidth) : null}
-					{event ? this.renderFormatSelect(leftWidth, rightWidth) : null}
-					{event && format ? this.renderFormatOptions(leftWidth, rightWidth) : null}
-					{showNetworkOptions && !this.state.showButtons ? this.renderNetwork(leftWidth, rightWidth) : null}
-					{this.state.showButtons || this.props.showButtons
+					{this.state.event ? this.renderEventOptions(leftWidth, rightWidth) : null}
+					{this.state.event ? this.renderFormatSelect(leftWidth, rightWidth) : null}
+					{this.state.event && this.state.format ? this.renderFormatOptions(leftWidth, rightWidth) : null}
+					{this.props.showNetworkOptions && !this.state.showButtons
+						? this.renderNetwork(leftWidth, rightWidth)
+						: null}
+					{this.props.showButtons || this.state.showButtons
 						? this.renderButtons(leftWidth, rightWidth)
 						: null}
 				</Col>

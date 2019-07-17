@@ -57,7 +57,7 @@ class InteractiveAds extends Component {
 }
 
 export default connect(
-	(state, ownProps) => ({ networkConfig: state.networkConfig, ...ownProps }),
+	(state, ownProps) => ({ ...ownProps }),
 	dispatch =>
 		bindActionCreators(
 			{

@@ -2,8 +2,6 @@ import React from 'react';
 import CodeBox from '../codeBox';
 import { Row, Col } from 'react-bootstrap';
 import CustomToggleSwitch from '../customToggleSwitch.jsx';
-import SelectBox from '../select/select.js';
-import { refreshIntervals } from '../../../consts/commonConsts';
 
 const FormWrapper = (adCodeCheck, name, adUnitRegex) => {
 	return class extends React.Component {
@@ -13,15 +11,13 @@ const FormWrapper = (adCodeCheck, name, adUnitRegex) => {
 				error: false,
 				adunitId: this.props.code.adunitId || '',
 				adCode: this.props.code.adCode || '',
-				refreshSlot: !!this.props.code.refreshSlot,
-				refreshInterval: this.props.code.refreshInterval
+				refreshSlot: !!this.props.code.refreshSlot
 			};
 			this.checkAdCode = this.checkAdCode.bind(this);
 			this.getAdUnitId = this.getAdUnitId.bind(this);
 			this.submitHandler = this.submitHandler.bind(this);
 			this.inputChange = this.inputChange.bind(this);
 			this.toggleRefreshSlot = this.toggleRefreshSlot.bind(this);
-			this.onRefreshIntervalChange = this.onRefreshIntervalChange.bind(this);
 		}
 
 		checkAdCode(value) {
@@ -65,8 +61,7 @@ const FormWrapper = (adCodeCheck, name, adUnitRegex) => {
 			this.props.submitHandler({
 				adCode: value,
 				adunitId: this.state.adunitId,
-				refreshSlot: this.state.refreshSlot,
-				refreshInterval: this.state.refreshInterval
+				refreshSlot: this.state.refreshSlot
 			});
 		}
 
@@ -79,21 +74,13 @@ const FormWrapper = (adCodeCheck, name, adUnitRegex) => {
 			});
 		}
 
-		onRefreshIntervalChange(value) {
-			this.setState({
-				refreshInterval: value
-			});
-		}
-
 		render() {
 			return (
 				<Form
 					adunitId={this.state.adunitId}
 					inputChange={this.inputChange}
 					refreshSlot={this.state.refreshSlot}
-					refreshInterval={this.state.refreshInterval}
 					toggleRefreshSlot={this.toggleRefreshSlot}
-					onRefreshIntervalChange={this.onRefreshIntervalChange}
 					adCode={this.state.adCode}
 					onCodeBoxChange={this.checkAdCode}
 					onCancel={this.props.onCancel}
@@ -128,44 +115,23 @@ const FormWrapper = (adCodeCheck, name, adUnitRegex) => {
 					</Col>
 				</Row>
 				{props.networkConfig && props.networkConfig.enableRefreshSlot
-					? <div>
-							<Row>
-								<Col xs={12}>
-									<CustomToggleSwitch
-										labelText="Refresh Ad"
-										className="mB-10"
-										checked={props.refreshSlot}
-										onChange={props.toggleRefreshSlot}
-										layout="horizontal"
-										size="m"
-										on="Yes"
-										off="No"
-										defaultLayout={true}
-										name="Refresh Ad"
-										id={props.id ? `js-refresh-slot-switch-${props.id}` : 'js-refresh-slot-switch'}
-									/>
-								</Col>
-							</Row>
-							<Row>
-								<Col xs={6}>
-									<strong>Refresh Interval</strong>
-								</Col>
-								<Col xs={6}>
-									<SelectBox
-										className="mB-10"
-										value={props.refreshInterval || refreshIntervals[0]}
-										showClear={false}
-										onChange={props.onRefreshIntervalChange}
-									>
-										{refreshIntervals.map((item, index) => (
-											<option key={item} value={item}>
-												{item}
-											</option>
-										))}
-									</SelectBox>
-								</Col>
-							</Row>
-						</div>
+					? <Row>
+							<Col xs={12}>
+								<CustomToggleSwitch
+									labelText="Refresh Ad"
+									className="mB-10"
+									checked={props.refreshSlot}
+									onChange={props.toggleRefreshSlot}
+									layout="horizontal"
+									size="m"
+									on="Yes"
+									off="No"
+									defaultLayout={true}
+									name="Refresh Ad"
+									id={props.id ? `js-refresh-slot-switch-${props.id}` : 'js-refresh-slot-switch'}
+								/>
+							</Col>
+						</Row>
 					: null}
 				<div>
 					<CodeBox

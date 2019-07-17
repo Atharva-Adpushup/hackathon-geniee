@@ -3,7 +3,6 @@ const Promise = require('bluebird');
 const PromiseFtp = require('promise-ftp');
 const _ = require('lodash');
 const uglifyJS = require('uglify-js');
-
 const { getReportData, getMediationData } = require('../../../reports/universal/index');
 const mkdirpAsync = Promise.promisifyAll(require('mkdirp')).mkdirpAsync;
 const fs = Promise.promisifyAll(require('fs'));
@@ -15,13 +14,12 @@ const generateStatusesAndConfig = require('./generateConfig');
 const bundleGeneration = require('./bundleGeneration');
 const prebidGeneration = require('./prebidGeneration');
 const prodEnv = config.environment.HOST_ENV === 'production';
-const disableSiteCdnSyncList = [38333, 37066, 37780];
-// TODO: Please remove above logic once testing is done
+const request = require('request-promise');
+const disableSiteCdnSyncList = [38333];
 // NOTE: Above 'disableSiteCdnSyncList' array is added to prevent site specific JavaScript CDN sync
-// as custom generated Javascript files will replaczzace their existing live files for new feature testing purposes.
+// as custom generated Javascript files will replace their existing live files for new feature testing purposes.
 // Websites: autocarindia (38333, It is running adpushup lite for which script is uploaded to CDN manually, for now)
-// Websites: javatpoint (37780)
-// Websites: ancient-code (37066)
+const ieTestingSiteList = [38903]; // iaai.com
 
 module.exports = function(site, externalData = {}) {
 	ftp = new PromiseFtp();
@@ -207,6 +205,17 @@ module.exports = function(site, externalData = {}) {
 				})
 				.then(() => jsFile);
 		},
+		startIETesting = uncompressedFile => {
+			const siteId = site.get('siteId');
+			const enableIETesting = !!(ieTestingSiteList.indexOf(siteId) > -1);
+
+			return enableIETesting
+				? request
+						.get(CC.IE_TESTING_ENDPOINT)
+						.then(() => uncompressedFile)
+						.catch(() => uncompressedFile)
+				: Promise.resolve(uncompressedFile);
+		},
 		cwd = function() {
 			return ftp.cwd('/' + site.get('siteId')).catch(function() {
 				return ftp.mkdir(site.get('siteId')).then(function() {
@@ -225,24 +234,20 @@ module.exports = function(site, externalData = {}) {
 			});
 		},
 		uploadJS = function(fileConfig) {
-			var siteId = site.get('siteId');
-			var shouldJSCdnSyncBeDisabled = !!(disableSiteCdnSyncList.indexOf(siteId) > -1);
+			const siteId = site.get('siteId'),
+			 shouldJSCdnSyncBeDisabled = !!(disableSiteCdnSyncList.indexOf(siteId) > -1);
 
-			// Disable CDN upload for specific websites where generated JavaScript is added manually for testing purposes
-			if (shouldJSCdnSyncBeDisabled) {
-				return Promise.resolve();
-			} else {
-				if (prodEnv) {
-					return connectToServer()
-						.then(cwd)
-						.then(function() {
-							return ftp.put(fileConfig.default, 'adpushup.js');
-						})
-						.then(function() {
-							return Promise.resolve(fileConfig.uncompressed);
-						});
-				}
+			 if (shouldJSCdnSyncBeDisabled || !prodEnv) {
 				return Promise.resolve(fileConfig.uncompressed);
+			}else{
+				return connectToServer()
+					.then(cwd)
+					.then(function() {
+						return ftp.put(fileConfig.default, 'adpushup.js');
+					})
+					.then(function() {
+						return Promise.resolve(fileConfig.uncompressed);
+					});
 			}
 		},
 		getFinalConfigWrapper = () => getFinalConfig().then(fileConfig => fileConfig);
@@ -253,6 +258,7 @@ module.exports = function(site, externalData = {}) {
 		}
 		return processing()
 			.then(writeTempFile)
+			.then(startIETesting)
 			.then(() => writeTempFile(fileConfig.default, 'adpushup.min.js'))
 			.then(() => {
 				if (ftp.getConnectionStatus() === 'connected') {

@@ -1,0 +1,41 @@
+// bootstrap button outline style reset
+button:focus {
+	outline: none !important;
+	box-shadow: none !important;
+}
+
+.btn {
+	padding: 7px 20px;
+	transition: all 0.2s ease;
+	&:hover {
+		box-shadow: 0 6px 10px rgba(0, 0, 0, 0.23), 0 10px 30px rgba(0, 0, 0, 0.19);
+	}
+	&.btn--primary {
+		background: $primaryColor;
+		color: $whiteColor;
+		&:focus,
+		&:active {
+			background: $primaryColor;
+			color: $whiteColor;
+		}
+
+		&:active {
+			box-shadow: none;
+		}
+	}
+
+	&.btn--secondary {
+		color: $primaryColor;
+		border-color: $primaryColor;
+		&:hover,
+		&:focus,
+		&:active {
+			background: $whiteColor;
+			color: $primaryColor;
+		}
+
+		&:active {
+			box-shadow: none;
+		}
+	}
+}

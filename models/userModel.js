@@ -2,7 +2,6 @@ var modelAPI = (module.exports = apiModule()),
 	model = require('../helpers/model'),
 	couchbase = require('../helpers/couchBaseService'),
 	query = require('couchbase').ViewQuery.from('app', 'sitesByUser'),
-	allUsers = require('couchbase').ViewQuery.from('app', 'allUsers'),
 	networkSettings = require('../models/subClasses/user/networkSettings'),
 	globalModel = require('../models/globalModel'),
 	siteModel = require('../models/siteModel'),
@@ -22,7 +21,7 @@ var modelAPI = (module.exports = apiModule()),
 	request = require('request-promise'),
 	pipedriveAPI = require('../misc/vendors/pipedrive'),
 	mailService = require('../services/mailService/index'),
-	{ mailService } = require('node-utils'),
+	{ mailService: nodeUtilsMailService } = require('node-utils'),
 	proxy = require('../helpers/proxy'),
 	User = model.extend(function() {
 		this.keys = [
@@ -54,7 +53,31 @@ var modelAPI = (module.exports = apiModule()),
 			'miscellaneous',
 			'billingInfoComplete',
 			'paymentInfoComplete',
-			'isPaymentDetailsComplete'
+			'isPaymentDetailsComplete',
+			"adServerSettings"
+		];
+		this.clientKeys = [
+			'firstName',
+			'lastName',
+			'email',
+			'sites',
+			'adNetworkSettings',
+			'createdAt',
+			'requestDemo',
+			'requestDemoData',
+			'adNetworks',
+			'pageviewRange',
+			'userType',
+			'websiteRevenue',
+			'revenueUpperLimit',
+			'preferredModeOfReach',
+			'revenueLowerLimit',
+			'revenueAverage',
+			'adnetworkCredentials',
+			'billingInfoComplete',
+			'paymentInfoComplete',
+			'isPaymentDetailsComplete',
+			"adServerSettings"
 		];
 		this.validations = schema.user.validations;
 		this.classMap = {
@@ -63,9 +86,8 @@ var modelAPI = (module.exports = apiModule()),
 		this.defaults = {
 			sites: [],
 			adNetworkSettings: [],
-			// requestDemo: true
-			// Commented for Tag Manager
-			requestDemo: false
+			adServerSettings: {},
+			requestDemo: true
 		};
 		this.ignore = ['password', 'oldPassword', 'confirmPassword', 'site'];
 
@@ -93,19 +115,26 @@ var modelAPI = (module.exports = apiModule()),
 
 			return this.getSiteByDomain(normalizedDomain).then(function(site) {
 				if (site) {
-					return site;
+					return siteModel
+						.getSiteById(site.siteId)
+						.then(() => {
+							throw new AdPushupError({ status: 409, message: 'Site already exists!' });
+						})
+						.catch(err => {
+							if (
+								err instanceof AdPushupError &&
+								err.message.length &&
+								err.message[0].status === 404
+							) {
+								return site;
+							}
+
+							throw err;
+						});
 				}
 				return globalModel.incrSiteIdInApAppBucket().then(function(siteId) {
-					me.get('sites').push({
-						siteId: siteId,
-						domain: normalizedDomain,
-						isManual: isManual
-					});
-					return {
-						siteId: siteId,
-						domain: normalizedDomain,
-						isManual: isManual
-					};
+					me.get('sites').push({ siteId: siteId, domain: normalizedDomain, isManual: isManual });
+					return { siteId: siteId, domain: normalizedDomain, isManual: isManual };
 				});
 			});
 		};
@@ -158,8 +187,29 @@ var modelAPI = (module.exports = apiModule()),
 					me.set('adNetworkSettings', []);
 				}
 				var adNetworkSettings = me.get('adNetworkSettings');
-				adNetworkSettings.push(data);
-				me.set('adNetworkSettings', adNetworkSettings);
+				var isExist = false;
+				if(adNetworkSettings.length && data.networkName === "ADSENSE" || data.networkName === "DFP"){
+					for (var i = 0; i < adNetworkSettings.length; i++){
+						switch(data.networkName){
+							case "ADSENSE": {
+								isExist = data.networkName === adNetworkSettings[i].networkName && data.adsenseEmail === adNetworkSettings[i].adsenseEmail && data.pubId === adNetworkSettings[i].pubId
+								break;
+							}
+							case "DFP": {
+								isExist = data.networkName === adNetworkSettings[i].networkName && data.userInfo.email === adNetworkSettings[i].userInfo.email
+								break;
+							}
+						}
+
+						if(isExist) break;
+					}
+				}
+
+				if(!isExist){
+					adNetworkSettings.push(data);
+					me.set('adNetworkSettings', adNetworkSettings);
+				}
+
 				return me
 					.save()
 					.then(function() {
@@ -243,6 +293,17 @@ var modelAPI = (module.exports = apiModule()),
 					return ad ? { ad: ad, site: activeSite } : false;
 				});
 		};
+
+		this.cleanData = () => {
+			const { data } = this;
+			const filteredData = {};
+			_.forEach(data, (value, key) => {
+				if (this.clientKeys.includes(key)) {
+					filteredData[key] = value;
+				}
+			});
+			return filteredData;
+		};
 	});
 
 function isPipeDriveAPIActivated() {
@@ -297,7 +358,7 @@ function setSiteLevelPipeDriveData(user, inputData) {
 }
 
 function sendUserSignupMail(json) {
-	const Mailer = new mailService({
+	const Mailer = new nodeUtilsMailService({
 			MAIL_FROM: 'services.daemon@adpushup.com',
 			MAIL_FROM_NAME: 'AdPushup Mailer',
 			SMTP_SERVER: Config.email.SMTP_SERVER,
@@ -565,7 +626,8 @@ function apiModule() {
 						[consts.analytics.pipedriveCustomFields.utmName]: miscellaneousData.utmName,
 						[consts.analytics.pipedriveCustomFields.utmContent]: miscellaneousData.utmContent,
 						[consts.analytics.pipedriveCustomFields.utmFirstHit]: miscellaneousData.utmFirstHit,
-						[consts.analytics.pipedriveCustomFields.utmFirstReferrer]: miscellaneousData.utmFirstReferrer,
+						[consts.analytics.pipedriveCustomFields.utmFirstReferrer]:
+							miscellaneousData.utmFirstReferrer,
 						currency: 'USD'
 					}
 				};
@@ -577,9 +639,7 @@ function apiModule() {
 				.then(API.getUserByEmail.bind(null, json.email))
 				.then(function(user) {
 					if (user) {
-						var error = {
-							email: ['User with email ' + json.email + ' already exists']
-						};
+						const error = [{ email: `User with email ${json.email} already exists` }];
 						throw new AdPushupError(error);
 					}
 				})
@@ -655,28 +715,16 @@ function apiModule() {
 				});
 		},
 		sendCodeToDev: function(json) {
-			var mailer = new Mailer(Config.email, 'html'),
-				mailHeader =
-					'Hi, <br/> Please find below the code snippet for your AdPushup setup. Paste this into the <strong>&lt;head&gt;</strong> section of your page - \n\n',
-				mailFooter = '<br/><br/>Thanks,<br/>Team AdPushup',
-				headerCode = json.code;
+			return FormValidator.validate({ email: json.email }, schema.user.validations).then(() => {
+				var mailer = new Mailer(Config.email, 'html'),
+					email = json.email,
+					subject = utils.htmlEntities(utils.trimString(json.subject)),
+					content = json.body;
 
-			headerCode = headerCode.replace(/</g, '&lt;');
-			headerCode = headerCode.replace(/>/g, '&gt;');
+				var obj = { to: email, subject: subject, html: content };
 
-			var content =
-					mailHeader +
-					'<div style="background-color: #eaeaea; padding: 20px; margin-top: 10px;">' +
-					headerCode +
-					'</div>' +
-					mailFooter,
-				obj = {
-					to: json.email,
-					subject: 'AdPushup Header Snippet',
-					html: content
-				};
-
-			return mailer.send(obj);
+				return mailer.send(obj);
+			});
 		},
 		forgotPassword: function(json) {
 			return FormValidator.validate(json, schema.user.validations)
@@ -703,11 +751,7 @@ function apiModule() {
 				.then(function(html) {
 					var stringifiedHtml = html.toString(),
 						mailer = new Mailer(Config.email, 'html'),
-						obj = {
-							to: json.email,
-							subject: 'Password Recovery',
-							html: stringifiedHtml
-						};
+						obj = { to: json.email, subject: 'Password Recovery', html: stringifiedHtml };
 
 					return mailer.send(obj);
 				});
@@ -722,7 +766,10 @@ function apiModule() {
 						user.get('passwordResetKeyCreatedAt') &&
 						user.get('passwordResetKey') === options.key
 					) {
-						if (parseInt(user.get('passwordResetKeyCreatedAt'), 10) + 60 * 60 * 24 * 1000 < +new Date()) {
+						if (
+							parseInt(user.get('passwordResetKeyCreatedAt'), 10) + 60 * 60 * 24 * 1000 <
+							+new Date()
+						) {
 							config = { keyExpired: true };
 						} else {
 							config = { email: options.email, key: options.key };
@@ -735,9 +782,7 @@ function apiModule() {
 						if (config && typeof config === 'object' && Object.keys(config).length > 0) {
 							resolve(config);
 						} else if (!config) {
-							throw new AdPushupError({
-								keyNotFound: ['Email or key not found']
-							});
+							throw new AdPushupError({ keyNotFound: ['Email or key not found'] });
 						}
 					});
 				});
@@ -847,15 +892,23 @@ function apiModule() {
 			function setPageGroupsPromises(user) {
 				return _(user.get('sites')).map(function(site) {
 					var uniquePageGroups = siteModel.getUniquePageGroups(site.siteId),
+						setupStage = siteModel.getSetupStage(site.siteId),
 						setupStep = siteModel.getSetupStep(site.siteId),
 						cmsData = siteModel.getCmsData(site.siteId);
-					return Promise.join(uniquePageGroups, setupStep, cmsData, function(pageGroups, step, cms) {
+					return Promise.join(uniquePageGroups, setupStage, setupStep, cmsData, function(
+						pageGroups,
+						onboardingStage,
+						step,
+						cms
+					) {
+						site.onboardingStage = onboardingStage;
 						site.step = step;
 						site.cmsInfo = cms;
 						site.pageGroups = pageGroups;
 						return site;
 					}).catch(function(err) {
 						site.pageGroups = [];
+						site.onboardingStage = site.onboardingStage || 'preOnboarding';
 						site.step = site.step || false;
 						return site;
 					});
@@ -888,19 +941,8 @@ function apiModule() {
 			return proxy.checkIfBillingProfileComplete(email).then(status => {
 				return API.getUserByEmail(email).then(user => {
 					user.set('isPaymentDetailsComplete', status);
-					user.save();
-					console.log({ email, status });
-					return {
-						email,
-						status
-					};
+					return user.save();
 				});
-			});
-		},
-		getAllUsers: () => {
-			allUsers.reduce(false);
-			return couchbase.queryViewFromAppBucket(allUsers).then(function(results) {
-				return _.map(results, 'key');
 			});
 		}
 	};

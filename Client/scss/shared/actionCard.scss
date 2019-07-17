@@ -1,0 +1,21 @@
+@import './bootstrap/tabs.scss';
+
+.action-card {
+	margin: 0px;
+	padding: 0px;
+	background: $whiteColor;
+	border: 1px solid $borderColor;
+	position: relative;
+	box-shadow: $boxShadowThree;
+
+	.row {
+		margin: 0px;
+	}
+
+	.title {
+		color: $primaryColor;
+		margin: 0px;
+		padding: 14px 20px;
+		border-bottom: 1px solid #e6e6e6;
+	}
+}

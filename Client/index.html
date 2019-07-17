@@ -1,0 +1,63 @@
+<html>
+	<head>
+		<title>AdPushup Console</title>
+		<!-- Google Tag Manager -->
+		<script>
+			(function(w, d, s, l, i) {
+				w[l] = w[l] || [];
+				w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+				var f = d.getElementsByTagName(s)[0],
+					j = d.createElement(s),
+					dl = l != 'dataLayer' ? '&l=' + l : '';
+				j.async = true;
+				j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+				f.parentNode.insertBefore(j, f);
+			})(window, document, 'script', 'dataLayer', 'GTM-NMS9P3Q');
+		</script>
+		<!-- End Google Tag Manager -->
+	</head>
+	<body>
+		<div id="root"></div>
+	</body>
+	<script>
+		var cookieRefreshTimer = null;
+		var originalCookie = null;
+		var COOKIE_REFRESH_INTERVAL = 2000;
+
+		function resetCookieValues() {
+			clearInterval(cookieRefreshTimer);
+			originalCookie = null;
+		}
+
+		function cookieProcessing() {
+			// Fetch all cookies
+			var cookies = document.cookie.split('; ');
+
+			cookies.some(function(cookie) {
+				// Check all the cookies and process if user cookie is found
+				if (cookie.match(/user=/)) {
+					// If current user cookie is not equal to original user cookie then reload
+					if (originalCookie && originalCookie !== cookie) {
+						var url = window.location.origin + '/dashboard';
+						window.location.href = url;
+						return true;
+					}
+					// If original user cookie not found
+					// First time on the webpage
+					// Cookie Expired
+					// Explicitly deleted cookie
+					// then set current cookie as original and set a timer which will call the current function in every 2 secs.
+					originalCookie = cookie;
+					if (cookieRefreshTimer === null) {
+						cookieRefreshTimer = setInterval(function() {
+							cookieProcessing();
+						}, COOKIE_REFRESH_INTERVAL);
+					}
+					return true;
+				}
+				return false;
+			});
+		}
+		cookieProcessing();
+	</script>
+</html>

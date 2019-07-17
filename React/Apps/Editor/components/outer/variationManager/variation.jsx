@@ -15,10 +15,10 @@ const Variation = ({ variation, toggleVariationPanel, onClick, active }) => {
 			{variation.isControl ? (
 				<OverlayTrigger
 					placement="top"
-					overlay={<Tooltip id="baseline-variation-tooltip">This is Baseline Variation</Tooltip>}
+					overlay={<Tooltip id="control-variation-tooltip">This variation is Control Variation</Tooltip>}
 				>
 					<span className="variation-settings-icon">
-						<i className="text-bold">B</i>
+						<i className="text-bold">C</i>
 					</span>
 				</OverlayTrigger>
 			) : null}

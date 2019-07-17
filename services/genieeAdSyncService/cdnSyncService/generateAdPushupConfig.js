@@ -164,7 +164,8 @@ const Promise = require('bluebird'),
 			ads: ads,
 			incontentSectionConfig: {
 				selectorsTreeLevel: variation.selectorsTreeLevel || '',
-				sectionBracket: variation.incontentSectionBracket
+				sectionBracket: variation.incontentSectionBracket,
+				isEvenSpacingAlgo: variation.enableIncontentEvenSpacingAlgo || false
 			},
 			personalization: variation.personalization,
 			isControl: !!variation.isControl,

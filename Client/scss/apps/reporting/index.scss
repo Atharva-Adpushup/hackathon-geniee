@@ -1,0 +1,576 @@
+$primaryColor: #eb575c;
+$borderColor: #ddd;
+$greyBg: #eee;
+$greyBorder: #e6e6e6;
+$fontColor: #555;
+$legendBg: #fafafa;
+$SBBorderColorActive: #ccc;
+$linkBlue: #47b6e4;
+$SBContainerWidth: 100%;
+$SBPaddingTB: 5px;
+$SBPaddingLR: 8px;
+$whiteColor: #fff;
+$SBBorderColor: #e6e6e6;
+$FMInputBorderColorActive: #ccc;
+$SBArrowRight: 10px;
+$SBArrowBorder: 5px;
+$SBArrowColor: #555555;
+$fontColor: #555555;
+$SBBorderColorActive: #ccc;
+$primaryColor: #eb575c;
+$linkBlue: #47b6e4;
+
+html,
+body {
+	overflow-x: hidden;
+}
+
+.report-table {
+	margin: 20px;
+	font-size: 1.2em;
+	border: 1px solid $borderColor;
+
+	.col-md-4 {
+		padding: 15px 25px;
+
+		&:nth-child(2) {
+			text-align: center;
+		}
+	}
+
+	input[id='select-filter-reportTable'] {
+		padding: 16px;
+		font-size: 1em;
+	}
+
+	thead {
+		background-color: $greyBg;
+		border-top: 2px solid $borderColor;
+	}
+}
+
+.report-controls-wrapper {
+	margin: 20px 0;
+
+	.control-label {
+		font-size: 1.2em;
+		text-transform: capitalize;
+		font-weight: 700;
+		border-bottom: 1px solid $greyBorder;
+		margin-bottom: 10px;
+		padding-bottom: 5px;
+		display: block;
+		color: lighten($fontColor, 10%);
+	}
+
+	button.btn.btn-lightBg {
+		width: 100%;
+		padding: 7px 10px;
+	}
+
+	.dimensions-label {
+		font-size: 16px;
+		font-weight: normal;
+		margin-right: 5px;
+	}
+}
+
+.react-select-box-container .react-select-box {
+	padding: 8px;
+	border-radius: 3px;
+}
+
+.DateRangePicker {
+	display: block;
+
+	.DateRangePickerInput {
+		background-color: lighten($linkBlue, 37%);
+		display: block;
+		border: 2px solid $linkBlue;
+		border-radius: 3px;
+
+		.DateRangePickerInput_calendarIcon,
+		.DateRangePickerInput_clearDates {
+			width: auto;
+			padding: 0 8px;
+
+			&:hover {
+				background: none;
+			}
+		}
+
+		.DateInput {
+			padding: 0;
+			text-align: center;
+			font-size: 14px !important;
+			width: 105px;
+			font-family: 'Karla', sans-serif;
+			background-color: lighten($linkBlue, 37%);
+
+			input {
+				cursor: pointer;
+			}
+		}
+	}
+
+	.DayPickerNavigation_button__default {
+		width: 50px;
+	}
+}
+
+.DateRangePicker_picker {
+	top: 45px !important;
+}
+
+.DateInput__openDown_3.DateInput__openDown_3.DateInput__openDown_3:after {
+	top: 36px;
+}
+
+.DateInput__openDown_3.DateInput__openDown_3.DateInput__openDown_3:before {
+	top: 35px;
+}
+
+.DateInput_displayText__focused_3.DateInput_displayText__focused_3.DateInput_displayText__focused_3,
+.DateInput_displayText__focused_2.DateInput_displayText__focused_2 {
+	color: #fff;
+	border-radius: 0;
+	background-color: lighten($linkBlue, 7%);
+	border-color: lighten($linkBlue, 7%);
+}
+
+.CalendarDay__hovered_span.CalendarDay__hovered_span_2 {
+	&,
+	&:hover {
+		background-color: lighten($linkBlue, 7%);
+		color: #fff;
+		border-color: lighten($linkBlue, 7%);
+	}
+}
+
+.CalendarDay__selected_span_2.CalendarDay__selected_span_2,
+.CalendarDay__selected_span_3.CalendarDay__selected_span_3.CalendarDay__selected_span_3,
+.CalendarDay__selected_4.CalendarDay__selected_4.CalendarDay__selected_4.CalendarDay__selected_4 {
+	background-color: lighten($linkBlue, 7%);
+	border-color: lighten($linkBlue, 7%);
+
+	&:hover {
+		background-color: lighten($linkBlue, 10%);
+		border-color: lighten($linkBlue, 10%);
+	}
+}
+
+.CalendarDay__selected_2.CalendarDay__selected_2,
+.CalendarDay__selected_3.CalendarDay__selected_3.CalendarDay__selected_3,
+.CalendarDay__hovered_span.CalendarDay__hovered_span_3.CalendarDay__selected.CalendarDay__selected_4 {
+	&,
+	&:hover {
+		background-color: $linkBlue;
+		border-color: $linkBlue;
+	}
+}
+
+.pane-loader-icon {
+	display: block;
+	color: $primaryColor;
+	font-size: 2.5em;
+	margin-bottom: 20px;
+}
+
+.react-select-box-container .react-select-box-clear {
+	top: 9px;
+}
+
+.variation-alert {
+	width: 70%;
+	margin: 0 auto;
+	font-size: 1.2em;
+}
+
+._collapse-panel {
+	.panel {
+		border: none;
+		margin: 0;
+		margin-top: 3px;
+		box-shadow: none;
+		border-radius: 0;
+
+		.panel-body {
+			padding: 5px 0;
+			border-top: 1px solid darken($greyBorder, 10%);
+		}
+	}
+}
+
+.DateRangePickerInput_calendarIcon_svg_1,
+.DateRangePickerInput_arrow_svg_1,
+.DateRangePickerInput_clearDates_svg_1 {
+	fill: darken($linkBlue, 40%);
+}
+
+.DateInput_displayText__hasInput_2.DateInput_displayText__hasInput_2 {
+	color: darken($linkBlue, 40%);
+}
+
+.toggle input[type='checkbox']:checked ~ label .toggleSwitch {
+	background-color: darken($linkBlue, 25%);
+}
+
+.toggle input[type='checkbox']:checked ~ label .toggleSwitch:after {
+	color: darken($linkBlue, 25%);
+	box-shadow: 0 2px 2px 0 rgba(71, 182, 228, 0.4);
+}
+
+.panel-heading .panel-title a:after {
+	/* symbol for "opening" panels */
+	font-family: 'Glyphicons Halflings'; /* essential for enabling glyphicon */
+	content: '\e114'; /* adjust as needed, taken from bootstrap.css */
+	float: right; /* adjust as needed */
+	color: grey; /* adjust as needed */
+}
+.panel-heading .panel-title a.collapsed:after {
+	/* symbol for "collapsed" panels */
+	content: '\e080'; /* adjust as needed, taken from bootstrap.css */
+}
+
+.reportType:hover {
+	background-color: #f0f0f0;
+}
+.productName:hover {
+	background-color: #f0f0f0;
+}
+
+.reportType {
+	font-size: 16px;
+	padding-left: 48px;
+}
+
+.productName {
+	background-color: #ffffff !important;
+}
+
+.groupStyles {
+	display: 'flex';
+	align-items: 'center';
+	justify-content: 'space-between';
+}
+.groupBadgeStyles {
+	background-color: '#EBECF0';
+	border-radius: '2em';
+	color: '#172B4D';
+	display: 'inline-block';
+	font-size: 12;
+	font-weight: 'normal';
+	line-height: '1';
+	min-width: 1;
+	padding: '0.16666666666667em 0.5em';
+	text-align: 'center';
+}
+
+.metricsRow {
+	border-bottom: 1px solid #d9d9d9;
+}
+
+.selectedMetrics {
+	background: #fff;
+	border: 1px solid #d9d9d9;
+	border-bottom: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+	padding: 6px 10px;
+	border-radius: 2px 2px 0 0;
+	cursor: pointer;
+}
+
+.metrics {
+	background: #f5f5f5;
+	border: 1px solid #d9d9d9;
+	border-bottom: none;
+	border-radius: 2px 2px 0 0;
+	cursor: pointer;
+	padding: 6px 10px;
+	text-align: center;
+}
+
+.disabledMetrics {
+	cursor: not-allowed;
+	opacity: 0.5;
+}
+
+.dimension-dropdown {
+	display: -webkit-box;
+	display: -moz-box;
+	display: -ms-flexbox;
+	display: -webkit-flex;
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+}
+.dimension {
+	display: -webkit-box;
+	display: -moz-box;
+	display: -ms-flexbox;
+	display: -webkit-flex;
+	display: flex;
+	align-items: center;
+}
+
+.addNew {
+	color: #a9a9a9;
+	font-size: 13px;
+	cursor: pointer;
+}
+
+.removeDimension {
+	border-left: none;
+	border-top-left-radius: 0px;
+	border-bottom-left-radius: 0;
+	margin-top: -2px;
+}
+
+.float-right {
+	float: right;
+}
+
+.inputSearch {
+	width: 95%;
+	margin: 5px 10px;
+	padding: 2px 5px;
+}
+
+.filterValues {
+	max-height: 200px;
+	overflow: scroll;
+	display: block;
+}
+
+.list-group-item.active,
+.list-group-item.active:focus,
+.list-group-item.active:hover {
+	color: #555;
+	text-decoration: none;
+	background-color: #f5f5f5;
+}
+
+.intervalRow {
+	float: right;
+	margin: 15px 0;
+}
+
+.intervalCol {
+	display: inline-block;
+	background: #f5f5f5;
+	border: 1px solid #d9d9d9;
+	border-radius: 2px 2px 0 0;
+	color: #444;
+	cursor: pointer;
+	font-weight: bold;
+	margin-right: 4px;
+	padding: 6px 10px;
+	text-align: center;
+	min-width: 80px;
+}
+
+.intervalColSelected {
+	display: inline-block;
+	background: #fff;
+	border: 1px solid #d9d9d9;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+	padding: 6px 10px;
+	margin-right: 4px;
+	border-radius: 2px 2px 0 0;
+	min-width: 80px;
+	cursor: pointer;
+}
+
+.react-select-box-container {
+	position: relative;
+	width: $SBContainerWidth;
+	display: inline-block;
+	.react-select-box {
+		border-left: none;
+		border-top-left-radius: 0;
+		border-bottom-left-radius: 0;
+		padding: $SBPaddingTB $SBPaddingLR;
+		display: inline-block;
+		cursor: pointer;
+		width: 100%;
+		text-align: left;
+		background-color: $whiteColor;
+		border: 1px solid $SBBorderColor;
+		&:focus {
+			outline: 0;
+			border: 1px solid $FMInputBorderColorActive;
+		}
+		&:after {
+			content: ' ';
+			position: absolute;
+			z-index: 1;
+			top: 48%;
+			right: $SBArrowRight;
+			border-top: $SBArrowBorder solid $SBArrowColor;
+			border-left: $SBArrowBorder solid transparent;
+			border-right: $SBArrowBorder solid transparent;
+		}
+		.react-select-box-label {
+			line-height: 16px;
+			font-size: 13px;
+			padding: 0 10px 0 0;
+			font-weight: bold;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			text-transform: capitalize;
+			color: $fontColor;
+		}
+	}
+	.react-select-box-options {
+		margin: 2px 0 0;
+		position: absolute;
+		padding: 5px 0;
+		width: $SBContainerWidth;
+		top: 100%;
+		left: 0;
+		z-index: 4;
+		background-color: $whiteColor;
+		border: 1px solid $SBBorderColorActive;
+		font-size: 13px;
+		&.react-select-box-hidden {
+			display: none;
+		}
+		.react-select-box-option {
+			padding: 3px 15px;
+			margin: 0;
+			cursor: pointer;
+			display: block;
+			line-height: 1.2;
+			text-decoration: none;
+			text-transform: capitalize;
+			color: $fontColor;
+			.react-select-box-option:hover {
+				background-color: rgba(85, 85, 85, 0.03);
+			}
+		}
+		.react-select-box-option {
+			border: none;
+			width: 100%;
+			text-align: left;
+			.react-select-box-option:hover {
+				background-color: rgba(85, 85, 85, 0.03);
+			}
+		}
+	}
+	.react-select-box-clear {
+		position: absolute;
+		top: 5px;
+		right: 4px;
+		width: 15px;
+		height: 20px;
+		background-color: $whiteColor;
+		text-indent: -9999em;
+		z-index: 3;
+		border: none;
+		&:before {
+			content: '\f00d';
+			position: absolute;
+			font: normal normal normal 12px/1 FontAwesome;
+			top: 2px;
+			left: 0;
+			z-index: 1;
+			border-radius: 100%;
+			color: $SBArrowColor;
+			line-height: 1;
+			text-indent: 0;
+		}
+		&:hover,
+		&:focus {
+			outline: 0;
+		}
+	}
+}
+
+.PresetDateRangePicker_button {
+	position: relative !important;
+	height: 100% !important;
+	text-align: center !important;
+	color: rgb(84, 195, 234) !important;
+	margin-right: 8px !important;
+	box-sizing: border-box !important;
+	cursor: pointer !important;
+	background: none !important;
+	border-width: 2px !important;
+	border-style: solid !important;
+	border-color: rgb(84, 195, 234) !important;
+	border-image: initial !important;
+	padding: 4px 12px !important;
+	font: inherit !important;
+	overflow: visible !important;
+}
+
+.PresetDateRangePicker_div {
+	padding: 0px 22px 11px !important;
+}
+
+.table-datatable {
+	.thead-default {
+		.thead-tr-default {
+			.thead-th-default {
+				width: 15%;
+				.fa-sort::after {
+					font-size: 14px;
+					font-style: normal;
+					font-family: 'Glyphicons Halflings';
+					content: '\e150';
+					cursor: pointer; // Changes the cursor into a pointer on hover
+				}
+				.fa-sort-asc::after {
+					font-size: 14px;
+					font-style: normal;
+					font-family: 'Glyphicons Halflings';
+					content: '\e155';
+					cursor: pointer; // Changes the cursor into a pointer on hover
+				}
+				.fa-sort-desc::after {
+					font-size: 14px;
+					font-style: normal;
+					font-family: 'Glyphicons Halflings';
+					content: '\e156';
+					cursor: pointer; // Changes the cursor into a pointer on hover
+				}
+				&.sortable {
+					// If and only if a column is sortable
+					&:hover {
+						color: #333;
+						background-color: #e6e6e6;
+						background-image: none;
+						border-color: #adadad;
+						cursor: pointer;
+					}
+				}
+			}
+		}
+	}
+	.tbody-default {
+		.tbody-tr-default {
+			.tbody-td-default {
+				width: 15%;
+			}
+		}
+	}
+}
+
+.fa-times::after {
+	font-size: 14px;
+	font-family: 'Glyphicons Halflings';
+	content: '\e014';
+}
+
+.updateStatusDiv {
+	font-size: 12px;
+}
+
+.width-100 {
+	width: 100% !important;
+}

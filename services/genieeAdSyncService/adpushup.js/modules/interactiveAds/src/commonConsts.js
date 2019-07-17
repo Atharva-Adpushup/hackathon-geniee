@@ -57,7 +57,7 @@ const commonConsts = {
 	POWERED_BY_BANNER: {
 		HEIGHT: 20,
 		TEXT: 'Ads by',
-		IMAGE: 'http://localhost:8080/assets/images/logo-white-200X50.png',
+		IMAGE: 'https://console.adpushup.com/assets/images/logo-white-200X50.png',
 		REDIRECT_URL: 'https://campaign.adpushup.com/get-started/?utm_source=banner&utm_campaign=growth_hack',
 		CSS: {
 			COMMON: {

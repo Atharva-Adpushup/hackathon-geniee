@@ -28,7 +28,7 @@ if (APTAG_ACTIVE) {
 	var triggerAd = require('./trigger');
 }
 if (INNOVATIVE_ADS_ACTIVE) {
-	var processInnovativeAds = require('../modules/interactiveAds/index');
+	var processInnovativeAds = require('../modules/interactiveAds/index').default;
 }
 // var	Tracker = require('../libs/tracker');
 // var	heartBeat = require('../libs/heartBeat');
@@ -155,6 +155,11 @@ function triggerControl(mode, errorCode) {
 		return false;
 	}
 	config.mode = mode;
+
+	if (!errorCode) {
+		mode = 3;
+		config.mode = 3;
+	}
 	if (config.partner === 'geniee' && !config.isAdPushupControlWithPartnerSSP) {
 		if (w.gnsmod && !w.gnsmod.creationProcessStarted && w.gnsmod.triggerAds) {
 			w.gnsmod.triggerAds();

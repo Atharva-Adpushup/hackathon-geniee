@@ -86,7 +86,8 @@ class AdDetails extends Component {
 	}
 
 	getAdSizeObject(string) {
-		const array = string.replace(/ /g, '').split('X'), object = { width: array[0], height: array[1] };
+		const array = string.replace(/ /g, '').split('X'),
+			object = { width: array[0], height: array[1] };
 
 		return object;
 	}
@@ -100,7 +101,9 @@ class AdDetails extends Component {
 	}
 
 	handleSelectAdSizeChange(value) {
-		const { section, ad, updateAdSize, channelId } = this.props, isValue = !!value, isUpdateAdSize = !!updateAdSize;
+		const { section, ad, updateAdSize, channelId } = this.props,
+			isValue = !!value,
+			isUpdateAdSize = !!updateAdSize;
 		let computedAdSize = isValue ? this.getAdSizeObject(value) : { width: ad.width, height: ad.height };
 
 		if (!isUpdateAdSize) {
@@ -126,7 +129,8 @@ class AdDetails extends Component {
 			return null;
 		}
 
-		const insertOptionKeys = Object.keys(adInsertOptions), wellClasses = 'u-padding-5px';
+		const insertOptionKeys = Object.keys(adInsertOptions),
+			wellClasses = 'u-padding-5px';
 
 		return (
 			<div>
@@ -166,7 +170,8 @@ class AdDetails extends Component {
 		if (!isValid) {
 			return null;
 		}
-		const collection = ad.multipleAdSizes, wellClasses = isFromPanel ? 'u-padding-t5px' : '';
+		const collection = ad.multipleAdSizes,
+			wellClasses = isFromPanel ? 'u-padding-t5px' : '';
 
 		return (
 			<div>
@@ -188,25 +193,25 @@ class AdDetails extends Component {
 								);
 							})}
 						</Col>
-						{!isFromPanel
-							? <Col xs={12} className="mB-10">
-									<SelectBox
-										value={this.state.selectedAdSize}
-										label="Change ad size"
-										onChange={this.handleSelectAdSizeChange}
-									>
-										{collection.map((array, index) => {
-											const adSizeString = this.getStringifiedAdSize(array);
+						{!isFromPanel ? (
+							<Col xs={12} className="mB-10">
+								<SelectBox
+									value={this.state.selectedAdSize}
+									label="Change ad size"
+									onChange={this.handleSelectAdSizeChange}
+								>
+									{collection.map((array, index) => {
+										const adSizeString = this.getStringifiedAdSize(array);
 
-											return (
-												<option key={index} value={adSizeString.replace(/ /g, '')}>
-													{adSizeString}
-												</option>
-											);
-										})}
-									</SelectBox>
-								</Col>
-							: null}
+										return (
+											<option key={index} value={adSizeString.replace(/ /g, '')}>
+												{adSizeString}
+											</option>
+										);
+									})}
+								</SelectBox>
+							</Col>
+						) : null}
 					</Row>
 				</Well>
 			</div>
@@ -232,21 +237,21 @@ class AdDetails extends Component {
 		let toShow = window.isGeniee && window.gcfg.uud ? true : !window.isGeniee;
 		return (
 			<div>
-				{showPfDetails
-					? <div>
-							<p>
-								PF Key : <strong>{fpKey}</strong>
-							</p>
-							<p>
-								Price Floor : <strong>{priceFloor}</strong>
-							</p>
-						</div>
-					: null}
-				{toShow
-					? <p>
-							{title}: <strong>{headerBidding}</strong>
+				{showPfDetails ? (
+					<div>
+						<p>
+							PF Key : <strong>{fpKey}</strong>
 						</p>
-					: null}
+						<p>
+							Price Floor : <strong>{priceFloor}</strong>
+						</p>
+					</div>
+				) : null}
+				{toShow ? (
+					<p>
+						{title}: <strong>{headerBidding}</strong>
+					</p>
+				) : null}
 			</div>
 		);
 	}
@@ -270,9 +275,11 @@ class AdDetails extends Component {
 	renderAdCode(adCode) {
 		<div className="mB-10">
 			<span className="mB-10">Ad Code : </span>
-			{adCode
-				? <pre style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{adCode}</pre>
-				: <strong> Not added</strong>}
+			{adCode ? (
+				<pre style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{adCode}</pre>
+			) : (
+				<strong> Not added</strong>
+			)}
 		</div>;
 	}
 
@@ -283,31 +290,30 @@ class AdDetails extends Component {
 				? Object.keys(ad.networkData.keyValues).filter(key => key.match(/FP/g)) || 'FP_SA'
 				: 'FP_SA',
 			priceFloor = pfKeyExists ? ad.networkData.keyValues[fpKey] : 0,
-			headerBidding = ad.networkData && ad.networkData.hasOwnProperty('headerBidding')
-				? String(ad.networkData.headerBidding)
-				: 'true',
-			firstFold = ad.networkData && ad.networkData.hasOwnProperty('firstFold')
-				? String(ad.networkData.firstFold)
-				: 'true',
-			position = ad.networkData &&
+			headerBidding =
+				ad.networkData && ad.networkData.hasOwnProperty('headerBidding')
+					? String(ad.networkData.headerBidding)
+					: 'true',
+			firstFold =
+				ad.networkData && ad.networkData.hasOwnProperty('firstFold')
+					? String(ad.networkData.firstFold)
+					: 'true',
+			position =
+				ad.networkData &&
 				ad.networkData.hasOwnProperty('position') &&
 				String(ad.networkData.position) != '' &&
 				ad.networkData.position != null
-				? ad.networkData.position
-				: 'Not set',
-			dynamicAllocation = ad.networkData && ad.networkData.hasOwnProperty('dynamicAllocation')
-				? String(ad.networkData.dynamicAllocation)
-				: 'true',
-			adCode = ad.networkData && ad.networkData.adCode != null && ad.networkData.adCode.trim().length
-				? atob(ad.networkData.adCode)
-				: false,
-			zoneId = ad.networkData && ad.networkData.hasOwnProperty('zoneId') ? ad.networkData.zoneId : 'Not Set',
-			refreshSlot = ad.networkData && ad.networkData.hasOwnProperty('refreshSlot')
-				? String(ad.networkData.refreshSlot)
-				: 'false',
-			refreshInterval = ad.networkData && ad.networkData.refreshInterval
-				? String(ad.networkData.refreshInterval)
-				: null;
+					? ad.networkData.position
+					: 'Not set',
+			dynamicAllocation =
+				ad.networkData && ad.networkData.hasOwnProperty('dynamicAllocation')
+					? String(ad.networkData.dynamicAllocation)
+					: 'true',
+			adCode =
+				ad.networkData && ad.networkData.adCode != null && ad.networkData.adCode.trim().length
+					? atob(ad.networkData.adCode)
+					: false,
+			zoneId = ad.networkData && ad.networkData.hasOwnProperty('zoneId') ? ad.networkData.zoneId : 'Not Set';
 
 		return (
 			<div>
@@ -322,30 +328,24 @@ class AdDetails extends Component {
 						</span>
 					</OverlayTrigger>
 				</p>
-				<p>
-					Refresh Slot : <strong>{refreshSlot}</strong>
-				</p>
-				{refreshInterval
-					? <p>
-							Refresh Interval : <strong>{refreshInterval}</strong>
-						</p>
-					: ''}
-				{ad.network == 'adpTags'
-					? this.renderCommonDetails(fpKey, priceFloor, headerBidding, 'Header Bidding')
-					: ad.network == 'geniee'
-							? <div>
-									<div>
-										{this.renderCommonDetails(
-											fpKey,
-											priceFloor,
-											dynamicAllocation,
-											'Dynamic Allocation',
-											false
-										)}
-									</div>
-									<div>{this.renderAdCode(adCode)}</div>
-								</div>
-							: this.renderAdCode(adCode)}
+				{ad.network == 'adpTags' ? (
+					this.renderCommonDetails(fpKey, priceFloor, headerBidding, 'Header Bidding')
+				) : ad.network == 'geniee' ? (
+					<div>
+						<div>
+							{this.renderCommonDetails(
+								fpKey,
+								priceFloor,
+								dynamicAllocation,
+								'Dynamic Allocation',
+								false
+							)}
+						</div>
+						<div>{this.renderAdCode(adCode)}</div>
+					</div>
+				) : (
+					this.renderAdCode(adCode)
+				)}
 			</div>
 		);
 	}
@@ -381,11 +381,11 @@ class AdDetails extends Component {
 						</span>
 					</OverlayTrigger>
 				</p>
-				{section.formatData.eventData && Object.keys(section.formatData.eventData).length
-					? <p>
-							Value : <strong>{section.formatData.eventData.value}</strong>
-						</p>
-					: null}
+				{section.formatData.eventData && Object.keys(section.formatData.eventData).length ? (
+					<p>
+						Value : <strong>{section.formatData.eventData.value}</strong>
+					</p>
+				) : null}
 				<p>
 					Format :{' '}
 					<strong>
@@ -407,17 +407,17 @@ class AdDetails extends Component {
 		} else {
 			return (
 				<div>
-					{this.props.ad.network
-						? <div>
-								<div>
-									{!this.props.fromPanel ? this.renderSectionName() : null}
-									{this.renderNetworkDetails()}
-								</div>
-								{this.renderMultipleAdSize()}
-								{this.renderAdOperationBlock()}
-								{!this.props.fromPanel ? this.renderXPathAndCSS() : null}
+					{this.props.ad.network ? (
+						<div>
+							<div>
+								{!this.props.fromPanel ? this.renderSectionName() : null}
+								{this.renderNetworkDetails()}
 							</div>
-						: null}
+							{this.renderMultipleAdSize()}
+							{this.renderAdOperationBlock()}
+							{!this.props.fromPanel ? this.renderXPathAndCSS() : null}
+						</div>
+					) : null}
 					{this.props.showEventData ? this.renderEventData() : null}
 					{!this.props.section.isIncontent && this.props.section.type != typeOfAds.INTERACTIVE_AD
 						? this.renderButton('Docked Settings', this.toggleHandler.bind(null, 'editDock'))

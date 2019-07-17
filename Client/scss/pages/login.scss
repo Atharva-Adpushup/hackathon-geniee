@@ -1,0 +1,39 @@
+@import '../shared/authShell/index';
+
+.LoginForm {
+	.forgetPassword {
+		text-decoration: underline;
+		font-weight: bold;
+		color: $primaryColor;
+		padding-top: $LPForgetPassPadTop;
+		display: block;
+		font-size: $LPForgetPassFontSize;
+	}
+	.btn-lightBg {
+		padding: $LPFormButtonPaddingTB $LPFormButtonPaddingLR;
+		margin-top: $LPFormButtonMarginTop;
+		font-size: 14px;
+	}
+	.form-groupnew {
+		font-size: 14px;
+		.labelheadmain {
+			color: $fontColor;
+			font-size: $LPFormInputSize;
+			font-weight: normal;
+			padding: 7px 10px 0 0;
+		}
+		.radio,
+		.checkbox {
+			padding-left: 10px;
+			color: $LPFormColor;
+		}
+		&.borTop {
+			border-top: 1px dashed $LPFormBorderColor;
+		}
+	}
+	select {
+		border-radius: 0 !important;
+	}
+}
+.LoginFooter {
+}
