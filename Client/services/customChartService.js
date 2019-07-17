@@ -111,6 +111,10 @@ function getGroupedYAxisAndSeries(chartType, yAxisGroups, existingSeries) {
 		if (yAxisCount < 2 && series.visible) {
 			legend.visible = true;
 			legend.opposite = opposite;
+			if (series.valueType == 'money')
+				legend.labels = {
+					format: '${value}'
+				};
 			yAxisCount += 1;
 			opposite = !opposite;
 		}
@@ -122,7 +126,10 @@ function getGroupedYAxisAndSeries(chartType, yAxisGroups, existingSeries) {
 				const point = this;
 				const num = point.y.toFixed(2);
 				return `<span style="color:${point.color}">\u25CF</span> ${point.series.name}: <b>${
-					point.series.userOptions.valueType === 'money' ? '$'+numberWithCommas(num) : numberWithCommas(point.y)}</b><br/>`;
+					point.series.userOptions.valueType === 'money'
+						? `$${numberWithCommas(num)}`
+						: numberWithCommas(point.y)
+				}</b><br/>`;
 			}
 		};
 		seriesForChart.push(singleSeries);
@@ -242,7 +249,9 @@ export function getCustomChartConfig(
 						const point = this;
 						const num = point.y.toFixed(2);
 						return `<span style="color:${point.color}">\u25CF</span> ${point.series.name}: <b>${
-							point.series.userOptions.valueType === 'money' ? '$'+numberWithCommas(num) : numberWithCommas(point.y)
+							point.series.userOptions.valueType === 'money'
+								? `$${numberWithCommas(num)}`
+								: numberWithCommas(point.y)
 						}</b><br/>`;
 					}
 				};
@@ -317,6 +326,10 @@ export function getCustomChartConfig(
 				chartConfig.series.length
 			) {
 				chartConfig.yAxis = { title: activeLegendItems.name };
+				if (activeLegendItems.valueType === 'money')
+					chartConfig.yAxis.labels = {
+						format: '${value}'
+					};
 				break;
 			}
 

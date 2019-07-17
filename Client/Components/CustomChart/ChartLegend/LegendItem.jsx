@@ -40,7 +40,7 @@ class LegendItem extends Component {
 		if (!legend.isDisabled) {
 			const { visible } = this.state;
 			this.setState({ visible: !visible });
-			if (Array.isArray(activeLegendItemsCopy)) {
+			if (Array.isArray(activeLegendItems)) {
 				activeLegendItemsCopy = [...activeLegendItems];
 				if (visible) {
 					const index = activeLegendItemsCopy.findIndex(
