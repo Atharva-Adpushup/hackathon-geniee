@@ -17,6 +17,7 @@ function init(site, config) {
 			return reject(new AdPushupError(`Invalid Service Statuses for site: ${site.get('siteId')}`));
 		}
 		const compiler = webpack({
+            devtool: 'source-map',
 			entry: path.join(__dirname, '..', 'adpushup.js', 'main.js'),
 			output: {
 				path: path.join(__dirname, buildPath),
