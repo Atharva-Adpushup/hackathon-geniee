@@ -100,7 +100,7 @@ var utils = require('../helpers/utils'),
 		return null;
 	},
 	setUTMWiseTargeting = function() {
-		var urlParams = adp.utils.queryParams,
+		var urlParams = adp.utils.getQueryParams(),
 			separator = ':';
 
 		if (!Object.keys(urlParams).length) {
