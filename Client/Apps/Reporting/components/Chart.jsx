@@ -25,6 +25,8 @@ class Chart extends React.Component {
 	}
 
 	shouldComponentUpdate(nextProps, nextState) {
+		if (Array.isArray(this.state.activeLegendItems))
+			return this.state.activeLegendItems.length !== nextState.activeLegendItems.length;
 		return this.state.activeLegendItems !== nextState.activeLegendItems;
 	}
 
@@ -97,8 +99,8 @@ class Chart extends React.Component {
 					});
 				});
 			}
-			return groupByResult;
 		}
+		return groupByResult;
 	};
 
 	getSortedResult = (data, selectedInterval) => {
@@ -112,25 +114,26 @@ class Chart extends React.Component {
 		const series = [];
 		Object.keys(groupByResult).forEach(results => {
 			let j = 0;
+			const row = groupByResult[results];
 			const serie = {
 				data: [],
-				name: selectedDimension ? results : groupByResult[results][0].name,
+				name: selectedDimension ? results : row[0].name,
 				value: results,
-				valueType: selectedDimension
-					? activeLegendItems.valueType
-					: groupByResult[results][0].valueType
+				valueType: selectedDimension ? activeLegendItems.valueType : row[0].valueType
 			};
-			const sortedResult = this.getSortedResult(groupByResult[results], selectedInterval);
+			const sortedResult = this.getSortedResult(row, selectedInterval);
 			for (let i = 0; i < xAxis.categories.length; i += 1) {
 				if (!sortedResult[j]) break;
 				const column = sortedResult[j];
 				const xAxisMomentObj = moment(xAxis.categories[i]);
 				const seriesValue = selectedDimension ? column[activeLegendItems.value] : column.value;
+				//	const num = serie.valueType === 'money' ? seriesValue.toFixed(2) : seriesValue;
+
 				if (selectedInterval === 'daily' || selectedInterval === 'monthly')
 					if (
-						column.date === xAxisMomentObj.format('YYYY-MM-DD') ||
-						(column.month === xAxisMomentObj.format('M') &&
-							column.year === xAxisMomentObj.format('Y'))
+						column.date == xAxisMomentObj.format('YYYY-MM-DD') ||
+						(column.month == xAxisMomentObj.format('M') &&
+							column.year == xAxisMomentObj.format('Y'))
 					) {
 						serie.data.push(seriesValue);
 						j += 1;

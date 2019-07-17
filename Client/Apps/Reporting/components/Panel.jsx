@@ -72,7 +72,7 @@ class Panel extends Component {
 			endDate = toDate;
 		}
 
-		this.onControlChange({
+		const params = this.getControlChangedParams({
 			startDate,
 			endDate,
 			selectedInterval,
@@ -80,7 +80,12 @@ class Panel extends Component {
 			selectedFilters,
 			reportType
 		});
-		this.generateButtonHandler();
+		this.setState(
+			{
+				...params
+			},
+			this.generateButtonHandler
+		);
 	}
 
 	disableControl = (disabledFilter, disabledDimension, disabledMetrics) => {
@@ -120,7 +125,13 @@ class Panel extends Component {
 		return reportType;
 	};
 
-	onControlChange = controlParams => {
+	onControlChange = data => {
+		this.setState({
+			...data
+		});
+	};
+
+	getControlChangedParams = controlParams => {
 		const {
 			startDate,
 			endDate,
@@ -154,7 +165,7 @@ class Panel extends Component {
 			disabledMetrics
 		);
 
-		this.setState({
+		return {
 			startDate,
 			endDate,
 			selectedInterval,
@@ -164,7 +175,7 @@ class Panel extends Component {
 			dimensionList: updatedControlList.dimensionList,
 			filterList: updatedControlList.filterList,
 			metricsList: updatedControlList.metricsList
-		});
+		};
 	};
 
 	formateReportParams = () => {
