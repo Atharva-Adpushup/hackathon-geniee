@@ -19,9 +19,12 @@ class HeaderBidding extends Component {
 		const {
 			site: { apps = {} }
 		} = props;
+		const status = Object.prototype.hasOwnProperty.call(apps, 'headerBidding')
+			? apps.headerBidding
+			: undefined;
 
 		this.state = {
-			status: apps.headerBidding || undefined,
+			status,
 			loading: false,
 			bidders: {}
 		};
