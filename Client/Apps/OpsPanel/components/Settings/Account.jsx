@@ -31,7 +31,9 @@ class Account extends Component {
 		const adsense = adNetworkSettings[0] || null;
 		const adsensePubId = adsense ? adsense.pubId : null;
 		const activeDFP =
-			activeDFPNetwork && activeDFPParentId ? `${activeDFPNetwork}-${activeDFPParentId}` : null;
+			activeDFPNetwork && activeDFPParentId
+				? `${activeDFPNetwork}-${activeDFPParentId}-${activeDFPCurrencyCode}`
+				: null;
 		let dfpAccounts = DFP_ACCOUNTS_DEFAULT;
 
 		adNetworkSettings.forEach(network => {
@@ -39,7 +41,7 @@ class Account extends Component {
 				const { dfpAccounts: DfpAccountsFromDoc } = network;
 				const currentDfpAccounts = DfpAccountsFromDoc.map(account => ({
 					name: `${account.code} - ${account.name || 'N/A'}`,
-					value: `${account.code}-${account.dfpParentId}`
+					value: `${account.code}-${account.dfpParentId}-${account.currencyCode}`
 				}));
 				dfpAccounts = currentDfpAccounts;
 			}
@@ -62,7 +64,7 @@ class Account extends Component {
 			if (network.networkName === 'DFP') {
 				const { dfpAccounts } = network;
 				const filteredAccounts = dfpAccounts.filter(
-					account => `${account.code}-${account.dfpParentId}` === code
+					account => `${account.code}-${account.dfpParentId}-${account.currencyCode}` === code
 				);
 				if (filteredAccounts.length) {
 					response = `${filteredAccounts[0].code} - ${filteredAccounts[0].name || 'N/A'}`;
@@ -75,8 +77,10 @@ class Account extends Component {
 	handleToggle = (value, extra) => {
 		let toUpdate = {};
 		if (typeof extra === 'string') {
+			const activeDFPCurrencyCode = value.split('-')[2];
 			toUpdate = {
-				[extra]: value
+				[extra]: value,
+				activeDFPCurrencyCode
 			};
 		} else {
 			const identifier = extra.target.getAttribute('name').split('-')[0];
@@ -117,10 +121,16 @@ class Account extends Component {
 			}
 		}
 
-		const [activeDFPNetwork, activeDFPParentId] = activeDFP.split('-');
+		const [activeDFPNetwork, activeDFPParentId, activeDFPCurrencyCode] = activeDFP.split('-');
 		const updatedadServerSettings = {
 			...adServerSettings,
-			dfp: { ...adNetworkSettings.dfp, isThirdPartyAdx, activeDFPNetwork, activeDFPParentId }
+			dfp: {
+				...adNetworkSettings.dfp,
+				isThirdPartyAdx,
+				activeDFPNetwork,
+				activeDFPParentId,
+				activeDFPCurrencyCode
+			}
 		};
 		adNetworkSettings[0] = adNetworkSettings[0] || [];
 		adNetworkSettings[0].pubId = adsensePubId;

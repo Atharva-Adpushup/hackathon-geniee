@@ -1,5 +1,3 @@
-const _ = require('lodash');
-const Promise = require('bluebird');
 const { promiseForeach, couchbaseService } = require('node-utils');
 
 const siteModel = require('../../../models/siteModel');
