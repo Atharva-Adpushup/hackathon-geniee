@@ -64,6 +64,22 @@ function gdprProcessing(site) {
 	};
 }
 
+function getActiveUsedBidders(usedBidders) {
+	const activeUsedBidders = {};
+	for (const bidderCode in usedBidders) {
+		if (
+			usedBidders.hasOwnProperty(bidderCode) &&
+			!usedBidders[bidderCode].isPaused &&
+			biddersFromNetworkTree[bidderCode] &&
+			biddersFromNetworkTree[bidderCode].isActive
+		) {
+			activeUsedBidders[bidderCode] = usedBidders[bidderCode];
+		}
+	}
+
+	return activeUsedBidders;
+}
+
 function HbProcessing(site, apConfigs) {
 	const siteId = site.get('siteId');
 	const isManual = site.get('isManual');
@@ -93,20 +109,7 @@ function HbProcessing(site, apConfigs) {
 				};
 			}
 
-			const activeUsedBidders = {};
-			const usedBidders = hbcf.value.hbcf;
-			for (const bidderCode in hbcf.value.hbcf) {
-				if (
-					usedBidders.hasOwnProperty(bidderCode) &&
-					!usedBidders[bidderCode].isPaused &&
-					biddersFromNetworkTree[bidderCode] &&
-					biddersFromNetworkTree[bidderCode].isActive
-				) {
-					activeUsedBidders[bidderCode] = usedBidders[bidderCode];
-				}
-			}
-
-			hbcf.value.hbcf = activeUsedBidders;
+			hbcf.value.hbcf = getActiveUsedBidders(hbcf.value.hbcf);
 
 			let isValidCurrencyCnfg = isValidThirdPartyDFPAndCurrency(
 				apConfigs
