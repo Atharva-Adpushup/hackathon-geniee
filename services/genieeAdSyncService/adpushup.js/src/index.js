@@ -348,7 +348,7 @@ function main() {
 	hookAndInit(adp, startCreation, browserConfig.platform);
 
 	// AdPushup Debug Force Variation
-	if (utils.queryParams && utils.queryParams.forceVariation && !adp.creationProcessStarted) {
+	if (utils.getQueryParams && utils.getQueryParams().forceVariation && !adp.creationProcessStarted) {
 		startCreation(true);
 		return false;
 	}
@@ -358,7 +358,7 @@ function main() {
 	}
 
 	// AdPushup Debug Force Control
-	if (utils.queryParams && utils.queryParams.forceControl) {
+	if (utils.getQueryParams && utils.getQueryParams().forceControl) {
 		triggerControl(commonConsts.MODE.FALLBACK, commonConsts.ERROR_CODES.FALLBACK_FORCED); // Control forced (run fallback)
 		return false;
 	}
