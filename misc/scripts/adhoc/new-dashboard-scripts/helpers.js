@@ -1,3 +1,4 @@
+const { couchbaseService } = require('node-utils');
 const config = require('../../../../configs/config');
 
 const dBHelper = couchbaseService(
@@ -15,8 +16,8 @@ function fetchAllSites() {
 }
 
 function errorHandler(obj, err) {
-	const error = err.message;
-	console.log(`Site : ${obj.siteId} | ${error.message}`);
+	const error = err.message || err;
+	console.log(`Site : ${obj.siteId} | ${error}`);
 	return true;
 }
 
@@ -32,5 +33,6 @@ module.exports = {
 	fetchAllSites,
 	errorHandler,
 	updateDoc,
-	getDoc
+	getDoc,
+	dBHelper
 };

@@ -1,7 +1,7 @@
-const { promiseForeach, couchbaseService } = require('node-utils');
+const { promiseForeach } = require('node-utils');
 
 const siteModel = require('../../../../models/siteModel');
-const { fetchAllSites, errorHandler, updateDoc, getDoc } = require('./helpers');
+const { fetchAllSites, errorHandler, updateDoc, getDoc, dBHelper } = require('./helpers');
 
 function computeStatus(docKey, status, processing) {
 	if (status) return status;
