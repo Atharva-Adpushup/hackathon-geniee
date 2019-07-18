@@ -92,6 +92,12 @@ router
 
 			return request(options);
 		}
+		function cleanData(array) {
+			return array.map(element => ({
+				site: element.site,
+				siteid: element.siteid
+			}));
+		}
 		return new Promise((resolve, reject) => {
 			if (!parsedData.pageviewsThreshold || !parsedData.last || !parsedData.current) {
 				return reject(
@@ -128,19 +134,22 @@ router
 				if (lastWeekData.code !== 1 || currentWeekData.code !== 1) {
 					return Promise.reject(new Error('Invalid Data Found in either of the date rangers'));
 				}
-				const { data: { results: lastWeekSites = [] } = {} } = lastWeekData;
-				const { data: { results: currentWeekSites = [] } = {} } = currentWeekData;
+				let { data: { results: lastWeekSites = [] } = {} } = lastWeekData;
+				let { data: { results: currentWeekSites = [] } = {} } = currentWeekData;
 
-				const lastSiteIds = _.map(lastWeekSites, 'siteId');
-				const currentSiteIds = _.map(currentWeekSites, 'siteId');
+				lastWeekSites = cleanData(lastWeekSites);
+				currentWeekSites = cleanData(currentWeekSites);
+
+				const lastSiteIds = _.map(lastWeekSites, 'siteid');
+				const currentSiteIds = _.map(currentWeekSites, 'siteid');
 
 				const lostIds = _.difference(lastSiteIds, currentSiteIds);
 				const wonIds = _.difference(currentSiteIds, lastSiteIds);
 				const rententionIds = _.intersection(lastSiteIds, currentSiteIds);
 
-				const won = currentWeekSites.filter(site => wonIds.indexOf(site.siteId) !== -1);
-				const lost = lastWeekData.filter(site => lostIds.indexOf(site.siteId) !== -1);
-				const rentention = lastWeekData.filter(site => rententionIds.indexOf(site.siteId) !== -1);
+				const won = currentWeekSites.filter(site => wonIds.indexOf(site.siteid) !== -1);
+				const lost = lastWeekData.filter(site => lostIds.indexOf(site.siteid) !== -1);
+				const rentention = lastWeekData.filter(site => rententionIds.indexOf(site.siteid) !== -1);
 
 				return {
 					won,
