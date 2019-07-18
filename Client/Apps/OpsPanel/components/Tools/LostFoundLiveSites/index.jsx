@@ -42,8 +42,8 @@ class LostFoundLiveSites extends Component {
 		this.setState({ startDate, endDate });
 	};
 
-	currentDatesUpdated = ({ currentStartDate, currentEndDate }) => {
-		this.setState({ currentStartDate, currentEndDate });
+	currentDatesUpdated = ({ startDate, endDate }) => {
+		this.setState({ currentStartDate: startDate, currentEndDate: endDate });
 	};
 
 	focusUpdated = focusedInput => {
