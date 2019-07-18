@@ -18,23 +18,13 @@ var utils = require('../libs/utils'),
 			adCode = utils.base64Decode(ad.networkData.adCode);
 		} else if (ad.network && ad.network === 'geniee' && ad.networkData && ad.networkData.dynamicAllocation) {
 			adCode = [];
-			var adpTags = window.adpushup.adpTags;
-			if (document.getElementById(computedDFPAdUnitId) && adpTags) {
-				var slot = adpTags.adpSlots && adpTags.adpSlots[computedDFPAdUnitId];
-				if (slot && slot.hasRendered && slot.gSlot) {
-					googletag && googletag.pubads().refresh([slot.gSlot]);
-				} else {
-					adpTags.display(computedDFPAdUnitId);
-				}
-			} else {
-				adCode.push('<div id="' + computedDFPAdUnitId + '">');
-				adCode.push('<scr' + 'ipt type="text/javascript">');
-				adCode.push('window.adpushup.adpTags.que.push(function(){');
-				adCode.push('window.adpushup.adpTags.display("' + computedDFPAdUnitId + '");');
-				adCode.push('});');
-				adCode.push('</scr' + 'ipt>');
-				adCode.push('</div>');
-			}
+			adCode.push('<div id="' + computedDFPAdUnitId + '">');
+			adCode.push('<scr' + 'ipt type="text/javascript">');
+			adCode.push('window.adpushup.adpTags.que.push(function(){');
+			adCode.push('window.adpushup.adpTags.display("' + computedDFPAdUnitId + '");');
+			adCode.push('});');
+			adCode.push('</scr' + 'ipt>');
+			adCode.push('</div>');
 		} else {
 			//Check for geniee 'notifyBeforeBodyTags' function
 			//This is done for Geniee-without-DFP tags integration
@@ -167,13 +157,23 @@ var utils = require('../libs/utils'),
 			}
 		} else {
 			adCode = [];
-			adCode.push('<div id="' + computedDFPAdUnitId + '">');
-			adCode.push('<scr' + 'ipt type="text/javascript">');
-			adCode.push('window.adpushup.adpTags.que.push(function(){');
-			adCode.push('window.adpushup.adpTags.display("' + computedDFPAdUnitId + '");');
-			adCode.push('});');
-			adCode.push('</scr' + 'ipt>');
-			adCode.push('</div>');
+			var adpTags = window.adpushup.adpTags;
+			if (document.getElementById(computedDFPAdUnitId) && adpTags) {
+				var slot = adpTags.adpSlots && adpTags.adpSlots[computedDFPAdUnitId];
+				if (slot && slot.hasRendered && slot.gSlot) {
+					googletag && googletag.pubads().refresh([slot.gSlot]);
+				} else {
+					adpTags.display(computedDFPAdUnitId);
+				}
+			} else {
+				adCode.push('<div id="' + computedDFPAdUnitId + '">');
+				adCode.push('<scr' + 'ipt type="text/javascript">');
+				adCode.push('window.adpushup.adpTags.que.push(function(){');
+				adCode.push('window.adpushup.adpTags.display("' + computedDFPAdUnitId + '");');
+				adCode.push('});');
+				adCode.push('</scr' + 'ipt>');
+				adCode.push('</div>');
+			}
 		}
 		return adCode;
 	};
