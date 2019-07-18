@@ -64,6 +64,7 @@ function init(adp, onPageGroupPush, platform) {
 				}
 			}
 		} catch (error) {
+			config.pageGroup = undefined;
 			utils.log('Error while detecting pageGroup', error, experimentPageGroups);
 		}
 	}
