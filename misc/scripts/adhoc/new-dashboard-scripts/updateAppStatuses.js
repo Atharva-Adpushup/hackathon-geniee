@@ -10,7 +10,7 @@ function computeStatus(docKey, status, processing) {
 		.then(docWithCas => processing(docWithCas))
 		.catch(err => {
 			console.log(`Error while processing ${docKey} `);
-			console.log(err);
+			console.log(err.message || err);
 			return false;
 		});
 }
@@ -60,7 +60,19 @@ function getInnovativeAdsStatus(siteId, status) {
 function getHbStatus(siteId) {
 	return computeStatus(`hbcf::${siteId}`, false, docWithCas => {
 		const { value: { hbConfig: { bidderAdUnits = {} } = {} } = {} } = docWithCas;
-		return !!(bidderAdUnits && Object.keys(bidderAdUnits).length);
+		const isbidderAdUnitsConfigPresent = !!(bidderAdUnits && Object.keys(bidderAdUnits).length);
+
+		if (!isbidderAdUnitsConfigPresent) return false;
+
+		const sizes = Object.keys(bidderAdUnits);
+		const response = sizes.some(size => {
+			const slots = bidderAdUnits[size] || [];
+			const adsPresent = !!slots.length;
+
+			if (adsPresent) return true;
+			return false;
+		});
+		return response;
 	});
 }
 
