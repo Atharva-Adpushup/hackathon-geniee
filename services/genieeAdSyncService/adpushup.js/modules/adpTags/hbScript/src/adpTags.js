@@ -11,7 +11,7 @@ var w = window,
 	// Maps a particular adp slot to a dfp ad unit and a prebid bidder config
 	inventoryMapper = function(size, optionalParam) {
 		// Reset inventory as default if site is SPA
-		if (adp.config.isSPA) {
+		if (adp.config.isSPA || adp.config.spaButUsingHook) {
 			inventory = $.extend(true, {}, w.adpTags.defaultInventory);
 		}
 
