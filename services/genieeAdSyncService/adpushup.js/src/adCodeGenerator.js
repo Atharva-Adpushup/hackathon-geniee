@@ -20,8 +20,8 @@ var utils = require('../libs/utils'),
 			adCode = [];
 			var adpTags = window.adpushup.adpTags;
 			if (document.getElementById(computedDFPAdUnitId) && adpTags) {
-				var slot = adpTags.adpSlots[computedDFPAdUnitId];
-				if (slot.hasRendered && slot.gSlot) {
+				var slot = adpTags.adpSlots && adpTags.adpSlots[computedDFPAdUnitId];
+				if (slot && slot.hasRendered && slot.gSlot) {
 					googletag && googletag.pubads().refresh([slot.gSlot]);
 				} else {
 					adpTags.display(computedDFPAdUnitId);
