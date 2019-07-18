@@ -7,7 +7,7 @@ var utils = require('../helpers/utils'),
 	$ = require('./adp').$,
 	adp = require('./adp').adp,
 	getDFPCOntainerFromDom = function(containerId) {
-		return getElementById(containerId);
+		return document.getElementById(containerId);
 	},
 	getFloorWithGranularity = function(floor) {
 		var val = parseFloat(Math.abs(floor).toFixed(2));
