@@ -38,7 +38,7 @@ function getInnovativeAdsStatus(siteId, status) {
 					const sectionIds = Object.keys(sections);
 					sectionIds.some(id => {
 						const section = sections[id];
-						if (section.type === 3) {
+						if (section.type === 3 || section.type === 4) {
 							response = true;
 							return true;
 						}
