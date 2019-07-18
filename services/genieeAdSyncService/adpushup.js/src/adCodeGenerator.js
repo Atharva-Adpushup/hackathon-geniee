@@ -18,13 +18,23 @@ var utils = require('../libs/utils'),
 			adCode = utils.base64Decode(ad.networkData.adCode);
 		} else if (ad.network && ad.network === 'geniee' && ad.networkData && ad.networkData.dynamicAllocation) {
 			adCode = [];
-			adCode.push('<div id="' + computedDFPAdUnitId + '">');
-			adCode.push('<scr' + 'ipt type="text/javascript">');
-			adCode.push('window.adpushup.adpTags.que.push(function(){');
-			adCode.push('window.adpushup.adpTags.display("' + computedDFPAdUnitId + '");');
-			adCode.push('});');
-			adCode.push('</scr' + 'ipt>');
-			adCode.push('</div>');
+			var adpTags = window.adpushup.adpTags;
+			if (document.getElementById(computedDFPAdUnitId) && adpTags) {
+				var slot = adpTags.adpSlots[computedDFPAdUnitId];
+				if (slot.hasRendered && slot.gSlot) {
+					googletag && googletag.pubads().refresh([slot.gSlot]);
+				} else {
+					adpTags.display(computedDFPAdUnitId);
+				}
+			} else {
+				adCode.push('<div id="' + computedDFPAdUnitId + '">');
+				adCode.push('<scr' + 'ipt type="text/javascript">');
+				adCode.push('window.adpushup.adpTags.que.push(function(){');
+				adCode.push('window.adpushup.adpTags.display("' + computedDFPAdUnitId + '");');
+				adCode.push('});');
+				adCode.push('</scr' + 'ipt>');
+				adCode.push('</div>');
+			}
 		} else {
 			//Check for geniee 'notifyBeforeBodyTags' function
 			//This is done for Geniee-without-DFP tags integration
@@ -103,9 +113,7 @@ var utils = require('../libs/utils'),
 		);
 		adCode.push('<scr' + 'ipt async src="https://cdn.ampproject.org/v0.js"></scr' + 'ipt>');
 		adCode.push(
-			'<scr' +
-				'ipt async custom-element="amp-ad" src="https://cdn.ampproject.org/v0/amp-ad-0.1.js"></scr' +
-				'ipt>'
+			'<scr' + 'ipt async custom-element="amp-ad" src="https://cdn.ampproject.org/v0/amp-ad-0.1.js"></scr' + 'ipt>'
 		);
 		adCode.push(
 			'<scr' +
@@ -220,9 +228,7 @@ module.exports = {
 		adCode.push('gnsmod.fetchAds();');
 		adCode.push('});');
 		adCode.push('</scr' + 'ipt>');
-		adCode.push(
-			' <scr' + 'ipt async type="text/javascript"\n src="//js.gsspcln.jp/l/gnsmod.min.js"> \n</scr' + 'ipt>'
-		);
+		adCode.push(' <scr' + 'ipt async type="text/javascript"\n src="//js.gsspcln.jp/l/gnsmod.min.js"> \n</scr' + 'ipt>');
 		return adCode.join('\n');
 	},
 	executeAdpTagsHeadCode: function(adpTagUnits, adpKeyValues) {

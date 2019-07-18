@@ -6,6 +6,9 @@ var utils = require('../helpers/utils'),
 	feedback = require('./feedback').feedback,
 	$ = require('./adp').$,
 	adp = require('./adp').adp,
+	getDFPCOntainerFromDom = function(containerId) {
+		return getElementById(containerId);
+	},
 	getFloorWithGranularity = function(floor) {
 		var val = parseFloat(Math.abs(floor).toFixed(2));
 		if (val > 20) {
@@ -21,7 +24,7 @@ var utils = require('../helpers/utils'),
 		googletag.pubads().refresh([gSlot]);
 	},
 	renderGPT = function(slot) {
-		if (!slot.containerPresent || !slot.biddingComplete || slot.hasRendered) {
+		if (!getDFPCOntainerFromDom(slot.containerId) || !slot.biddingComplete || slot.hasRendered) {
 			return false;
 		}
 		slot.hasRendered = true;
