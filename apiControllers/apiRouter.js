@@ -12,6 +12,7 @@ const reportsController = require('./reportsController');
 const opsController = require('./opsController');
 const channelController = require('./channelController');
 const headerBiddingController = require('./headerBiddingController');
+const visualEditorController = require('./visualEditorController');
 
 const apiAuthMiddleware = require('../middlewares/apiAuthMiddleware');
 
@@ -29,6 +30,7 @@ router.use('/reports', reportsController);
 router.use('/ops', opsController);
 router.use('/channel', channelController);
 router.use('/headerBidding', headerBiddingController);
+router.use('/visualEditor', visualEditorController);
 router.use('/', indexController);
 
 module.exports = router;
