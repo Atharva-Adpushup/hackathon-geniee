@@ -26,10 +26,11 @@ class RegexVerification extends React.Component {
 
 	render() {
 		const { currentSite, options } = this.state;
-		const { sites } = this.props;
+		const { sites = {} } = this.props;
 		const site = currentSite ? sites[currentSite] : null;
+		const hasSites = !!Object.keys(sites).length;
 
-		if (!currentSite) return <Empty message="Seems like you haven't added any website" />;
+		if (!hasSites) return <Empty message="Seems like you haven't added any website" />;
 
 		return (
 			<React.Fragment>
