@@ -40,7 +40,7 @@ router
 				res
 			);
 		}
-		const { params } = req.body;
+		const { params } = req.query;
 		let parsedData;
 		try {
 			parsedData = JSON.parse(atob(params));
@@ -66,7 +66,7 @@ router
 			let date = moment();
 			if (value) {
 				date = moment(value);
-				date = moment.isValid() ? date : moment();
+				date = date.isValid() ? date : moment();
 			}
 			if (options) {
 				const { operation, value: number, unit } = options;
@@ -130,12 +130,12 @@ router
 				];
 				return Promise.all(promises);
 			})
-			.spread((lastWeekData, currentWeekData) => {
+			.then(([lastWeekData, currentWeekData]) => {
 				if (lastWeekData.code !== 1 || currentWeekData.code !== 1) {
 					return Promise.reject(new Error('Invalid Data Found in either of the date rangers'));
 				}
-				let { data: { results: lastWeekSites = [] } = {} } = lastWeekData;
-				let { data: { results: currentWeekSites = [] } = {} } = currentWeekData;
+				let { data: { result: lastWeekSites = [] } = {} } = lastWeekData;
+				let { data: { result: currentWeekSites = [] } = {} } = currentWeekData;
 
 				lastWeekSites = cleanData(lastWeekSites);
 				currentWeekSites = cleanData(currentWeekSites);
@@ -148,14 +148,17 @@ router
 				const rententionIds = _.intersection(lastSiteIds, currentSiteIds);
 
 				const won = currentWeekSites.filter(site => wonIds.indexOf(site.siteid) !== -1);
-				const lost = lastWeekData.filter(site => lostIds.indexOf(site.siteid) !== -1);
-				const rentention = lastWeekData.filter(site => rententionIds.indexOf(site.siteid) !== -1);
+				const lost = lastWeekSites.filter(site => lostIds.indexOf(site.siteid) !== -1);
+				const rentention = lastWeekSites.filter(site => rententionIds.indexOf(site.siteid) !== -1);
 
-				return {
-					won,
-					lost,
-					rentention
-				};
+				return sendSuccessResponse(
+					{
+						won,
+						lost,
+						rentention
+					},
+					res
+				);
 			})
 			.catch(err => errorHandler(err, res));
 	});
