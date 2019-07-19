@@ -55,7 +55,7 @@ export default function(state = defaultState, action) {
 				...state,
 				[siteId]: {
 					...state[siteId],
-					setupStatus: { ...state.setupStatus, dfpConnected: true }
+					setupStatus: { ...state[siteId].setupStatus, dfpConnected: true }
 				}
 			};
 		}
@@ -72,7 +72,7 @@ export default function(state = defaultState, action) {
 				[siteId]: {
 					...state[siteId],
 					bidders,
-					setupStatus: { ...state.setupStatus, biddersFound: true }
+					setupStatus: { ...state[siteId].setupStatus, biddersFound: true }
 				}
 			};
 		}

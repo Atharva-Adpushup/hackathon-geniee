@@ -109,17 +109,28 @@ class AddManageNonResponsiveBidder extends React.Component {
 								const newState = {
 									formFields,
 									fetchingSizes: false,
-									sizes: [...new Set([...sizes, ...Object.keys(params)])],
+									sizes,
 									params: {},
 									globalParams: {}
 								};
+
+								// merge param sizes with inventory sizes
+								const paramSizes = Object.keys(params);
+								newState.sizes = [
+									...newState.sizes,
+									...paramSizes
+										.filter(
+											paramSize => !newState.sizes.find(size => paramSize === size.downwardIABSize)
+										)
+										.map(paramSize => ({ originalSize: paramSize, downwardIABSize: paramSize }))
+								];
 
 								for (const collectionKey in formFields) {
 									newState[collectionKey] = {};
 
 									if (collectionKey === 'params') {
 										// remove globalParams from params obj
-										const newParams = { ...params };
+										const newParams = JSON.parse(JSON.stringify(params));
 										for (const [size, paramsObj] of Object.entries(newParams)) {
 											for (const paramKey of Object.keys(formFields[collectionKey].global)) {
 												newState.globalParams[paramKey] = paramsObj[paramKey];
@@ -182,21 +193,23 @@ class AddManageNonResponsiveBidder extends React.Component {
 						mode: 'error',
 						title: 'Error',
 						message: 'Unable to fetch inventory sizes',
-						autoDismiss: 0
+						autoDismiss: 5
 					});
 				});
 			});
 	}
 
 	addNewSizeInState = adSize => {
-		this.setState(state => ({ sizes: [...state.sizes, adSize] }));
+		this.setState(state => ({
+			sizes: [...state.sizes, { originalSize: adSize, downwardIABSize: adSize }]
+		}));
 	};
 
 	onSubmit = e => {
 		e.preventDefault();
 
 		const { onBidderAdd, onBidderUpdate } = this.props;
-		const { bidderConfig, globalParams, params, validationSchema } = this.state;
+		const { bidderConfig, globalParams, params, validationSchema, sizes } = this.state;
 
 		const validationResult = formValidator.validate(
 			{ ...bidderConfig, ...globalParams },
@@ -212,6 +225,10 @@ class AddManageNonResponsiveBidder extends React.Component {
 				for (const [size, paramsObj] of Object.entries(mergedParams)) {
 					mergedParams[size] = { ...paramsObj, ...globalParams };
 				}
+			} else {
+				sizes.forEach(({ downwardIABSize: size }) => {
+					mergedParams[size] = globalParams;
+				});
 			}
 
 			// eslint-disable-next-line no-unused-expressions
@@ -316,18 +333,26 @@ class AddManageNonResponsiveBidder extends React.Component {
 							errors={errors}
 						/>
 
-						<SizewiseParamsFormFields
-							sizes={sizes}
-							formFields={{ params: formFields.params }}
-							savedParams={params}
-							formType={formType}
-							setFormFieldValueInState={this.setFormFieldValueInState}
-							saveNonSizelessParams={this.saveNonSizelessParams}
-							getCurrentFieldValue={this.getCurrentFieldValue}
-							validationSchema={validationSchema}
-							addNewSizeInState={this.addNewSizeInState}
-							errors={errors}
-						/>
+						{!!(
+							formFields &&
+							formFields.params &&
+							Object.keys(formFields.params.siteLevel).filter(
+								param => formFields.params.siteLevel[param].visible
+							).length
+						) && (
+							<SizewiseParamsFormFields
+								sizes={sizes}
+								formFields={{ params: formFields.params }}
+								savedParams={params}
+								formType={formType}
+								setFormFieldValueInState={this.setFormFieldValueInState}
+								saveNonSizelessParams={this.saveNonSizelessParams}
+								getCurrentFieldValue={this.getCurrentFieldValue}
+								validationSchema={validationSchema}
+								addNewSizeInState={this.addNewSizeInState}
+								errors={errors}
+							/>
+						)}
 						<FormGroup>
 							<Col md={12} className="footer-btns">
 								<CustomButton type="submit" variant="primary" className="u-margin-r3">

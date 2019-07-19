@@ -1,0 +1,48 @@
+// Custom tab styles
+
+.nav-tabs {
+	padding: 0 10px;
+	font-size: 1em;
+
+	li {
+		a {
+			color: $fontColor;
+			font-size: 1.15em;
+			padding: 10px;
+			display: inline-block;
+			margin-right: 30px;
+			border: none;
+			border-radius: 0;
+			border-bottom: 3px solid transparent;
+
+			&:hover {
+				background: none;
+				border-color: $borderColor;
+			}
+		}
+
+		&.active {
+			a,
+			a:hover,
+			a:focus {
+				border: none;
+				background: none;
+				pointer-events: none;
+			}
+
+			a {
+				border-bottom: 3px solid $primaryColor;
+
+				.svg-inline--fa {
+					pointer-events: all;
+				}
+			}
+
+			a:hover,
+			a:focus {
+				border-bottom: 3px solid $primaryColor;
+				border-color: $primaryColor;
+			}
+		}
+	}
+}

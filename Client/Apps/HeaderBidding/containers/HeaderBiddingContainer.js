@@ -45,8 +45,11 @@ export default connect(
 		} = ownProps;
 		// const { inventoryFound, bidders, setupStatus, inventories } = state.apps.headerBidding;
 		const { [siteId]: currSiteHbData } = state.apps.headerBidding;
+		const {
+			[siteId]: { domain }
+		} = state.global.user.data.sites;
 
-		return { currSiteHbData };
+		return { currSiteHbData, domain };
 	},
 	{
 		checkInventoryAction,

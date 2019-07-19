@@ -1,6 +1,7 @@
 const express = require('express'),
 	Promise = require('bluebird'),
 	_ = require('lodash'),
+	moment = require('moment'),
 	{ couchbaseService } = require('node-utils'),
 	config = require('../configs/config'),
 	utils = require('../helpers/utils'),

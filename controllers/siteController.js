@@ -590,12 +590,15 @@ router
 			});
 	})
 	.get('/:siteId/ampSettings', (req, res) => {
-		const isSession = !!req.session,
+		const { AMP_SETTINGS_ACCESS_EMAILS } = commonConsts,
+			currentUserEmail = req.session.user.email,
+			isSession = !!req.session,
 			isSessionUser = !!(isSession && req.session.user),
 			isGenieePartner = !!(isSession && req.session.partner && req.session.partner === 'geniee'),
-			isDemoUserAccount = !!(isSessionUser && req.session.user.email === commonConsts.DEMO_ACCOUNT_EMAIL),
+			isDemoUserAccount = !!(isSessionUser && currentUserEmail === commonConsts.DEMO_ACCOUNT_EMAIL),
+			isAuthorisedUser = !!(_.indexOf(AMP_SETTINGS_ACCESS_EMAILS, currentUserEmail.toLowerCase()) > -1),
 			isSuperUser = !!req.session.isSuperUser,
-			isValidUser = isSuperUser || isGenieePartner || isDemoUserAccount;
+			isValidUser = isSuperUser || isGenieePartner || isDemoUserAccount || isAuthorisedUser;
 
 		if (isValidUser) return res.render('ampSettings');
 		else return res.render('404');

@@ -109,7 +109,14 @@ function triggerControl(mode) {
 	if (config.partner === 'geniee' && !config.isAdPushupControlWithPartnerSSP) {
 		if (w.gnsmod && !w.gnsmod.creationProcessStarted && w.gnsmod.triggerAds) {
 			w.gnsmod.triggerAds();
+
 			utils.sendFeedback({
+				eventType: 3,
+				mode: mode,
+				referrer: config.referrer
+			});
+
+			utils.sendFeedbackOld({
 				eventType: 3,
 				mode: mode,
 				referrer: config.referrer
@@ -118,7 +125,14 @@ function triggerControl(mode) {
 	} else {
 		adp.creationProcessStarted = true;
 		control.trigger();
+
 		utils.sendFeedback({
+			eventType: 3,
+			mode: mode,
+			referrer: config.referrer
+		});
+
+		utils.sendFeedbackOld({
 			eventType: 3,
 			mode: mode,
 			referrer: config.referrer
@@ -134,28 +148,20 @@ function startCreation(forced) {
 			return resolve(false);
 		}
 
-		var innovativeInteractiveAds = [];
-		var layoutAndManualInteractiveAds = [];
-		var layoutRunning = false;
-		var isControlVariation = false;
-
-		if (config.innovativeModeActive && window.adpushup.config.innovativeAds.length) {
-			var channel = config.platform.toUpperCase() + ':' + config.pageGroup.toUpperCase();
-			innovativeInteractiveAds = utils.filterInteractiveAds(window.adpushup.config.innovativeAds, true, channel);
-		}
-
 		return selectVariation(config).then(function(variationData) {
-			var selectedVariation = variationData.selectedVariation,
+			var selectedVariation = variationData && variationData.selectedVariation,
 				moduleConfig = variationData.config,
 				isGenieeModeSelected = !!(adp && adp.geniee && adp.geniee.sendSelectedModeFeedback);
 
-			config = adp.config = moduleConfig;
 			if (selectedVariation) {
+				config = adp.config = moduleConfig;
 				adp.creationProcessStarted = true;
-				layoutRunning = true;
-
 				clearTimeout(pageGroupTimer);
 				config.selectedVariation = selectedVariation.id;
+				config.selectedVariationName = selectedVariation.name;
+				config.selectedVariationType = selectedVariation.isControl
+					? commonConsts.PAGE_VARIATION_TYPE.BENCHMARK
+					: commonConsts.PAGE_VARIATION_TYPE.NON_BENCHMARK;
 
 				//Geniee method call for chosen variation id
 				if (isGenieeModeSelected) {
@@ -163,29 +169,36 @@ function startCreation(forced) {
 				}
 
 				// Load interactive ads script if interactive ads are present in adpushup config
-				layoutAndManualInteractiveAds = utils.getInteractiveAds(config);
-
-				if (selectVariation.isControl) {
-					isControlVariation = true;
+				var interactiveAds = utils.getInteractiveAds(config);
+				if (interactiveAds) {
+					require.ensure(
+						['interactiveAds/index.js'],
+						function(require) {
+							require('interactiveAds/index')(interactiveAds);
+							var interactiveAdsArr = adp.interactiveAds;
+							if (interactiveAdsArr.ads) {
+								var ads = interactiveAdsArr.ads;
+								for (var id in ads) {
+									var hasDfpAdUnit = ads[id].networkData && ads[id].networkData.dfpAdunit;
+									if (hasDfpAdUnit) {
+										var slotId = ads[id].networkData.dfpAdunit,
+											container = $('#' + slotId);
+										var currentTime = new Date();
+										container.attr('data-render-time', currentTime.getTime());
+										if (ads[id].networkData && ads[id].networkData.refreshSlot) {
+											refreshAdSlot.refreshSlot(container, ads[id]);
+										}
+									}
+								}
+							}
+						},
+						'adpInteractiveAds' // Generated script will be named "adpInteractiveAds.js"
+					);
 				}
 
 				createAds(adp, selectedVariation);
 			} else {
 				triggerControl(3);
-			}
-
-			var finalInteractiveAds = !isControlVariation
-				? innovativeInteractiveAds.concat(layoutAndManualInteractiveAds)
-				: layoutAndManualInteractiveAds;
-
-			if (finalInteractiveAds && finalInteractiveAds.length) {
-				require.ensure(
-					['interactiveAds/index.js'],
-					function(require) {
-						require('interactiveAds/index')(finalInteractiveAds);
-					},
-					'adpInteractiveAds' // Generated script will be named "adpInteractiveAds.js"
-				);
 			}
 
 			return resolve(true);
@@ -269,7 +282,7 @@ function main() {
 
 	if (!config.pageGroup) {
 		pageGroupTimer = setTimeout(function() {
-			!config.pageGroup ? triggerControl(3) : clearTimeout(pageGroupTimer);
+			!config.pageGroup ? triggerControl(commonConsts.MODE.FALLBACK) : clearTimeout(pageGroupTimer);
 		}, config.pageGroupTimeout);
 	} else {
 		// start heartBeat

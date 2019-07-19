@@ -192,7 +192,7 @@ var modelAPI = (module.exports = apiModule()),
 					for (var i = 0; i < adNetworkSettings.length; i++){
 						switch(data.networkName){
 							case "ADSENSE": {
-								isExist = data.networkName === adNetworkSettings[i].networkName && data.adsenseEmail === adNetworkSettings[i].adsenseEmail && data.pubId === adNetworkSettings[i].pubId 
+								isExist = data.networkName === adNetworkSettings[i].networkName && data.adsenseEmail === adNetworkSettings[i].adsenseEmail && data.pubId === adNetworkSettings[i].pubId
 								break;
 							}
 							case "DFP": {

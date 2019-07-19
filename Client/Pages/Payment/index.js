@@ -12,7 +12,6 @@ import {
 	PAYMENT_NAV_ITEMS_INDEXES,
 	PAYMENT_NAV_ITEMS_VALUES
 } from './configs/commonConsts';
-
 class Payment extends Component {
 	state = {
 		redirectUrl: '',
@@ -30,7 +29,6 @@ class Payment extends Component {
 			isLoading: true
 		}
 	};
-
 	componentDidMount() {
 		const { paymentsAction: payments } = this.props;
 		payments().then(res => {
@@ -76,7 +74,6 @@ class Payment extends Component {
 			});
 		}
 	};
-
 	renderLoader = () => (
 		<div style={{ position: 'relative', width: '100%', height: '100%' }}>
 			<Loader />
@@ -131,7 +128,6 @@ class Payment extends Component {
 				return this.renderIframe(paymentHistory);
 		}
 	};
-
 	getActiveTab = () => {
 		const {
 			customProps: { activeTab }

@@ -4,7 +4,7 @@ import AdElement from './AdElement';
 import CustomButton from '../../../../../Components/CustomButton/index';
 import Empty from '../../../../../Components/Empty/index';
 import Loader from '../../../../../Components/Loader';
-import SelectBox from '../../../../../Components/Selectbox/index';
+import SelectBox from '../../../../../Components/SelectBox/index';
 import {
 	USER_AD_LIST_HEADERS,
 	OPS_AD_LIST_HEADERS,

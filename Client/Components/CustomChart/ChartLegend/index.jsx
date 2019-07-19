@@ -1,17 +1,16 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { Row } from 'react-bootstrap';
 import LegendItem from './LegendItem';
 
-const ChartLegend = ({ chart: { series }, legends, activeLegendItems, updateChartData }) => (
+const ChartLegend = ({ chart: { series, yAxis }, legends, activeLegendItems, onLegendChange }) => (
 	<div className="text-center chart-legend u-margin-v3">
 		{legends.map((legend, key) => (
 			<LegendItem
 				key={key}
 				legend={legend}
 				activeLegendItems={activeLegendItems}
-				updateChartData={updateChartData}
+				onLegendChange={onLegendChange}
 				series={series}
+				yAxis={yAxis}
 			/>
 		))}
 	</div>

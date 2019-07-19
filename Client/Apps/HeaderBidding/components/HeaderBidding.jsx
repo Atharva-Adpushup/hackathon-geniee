@@ -103,6 +103,7 @@ class HeaderBidding extends React.Component {
 			match: {
 				params: { siteId }
 			},
+			domain,
 			checkInventoryAction,
 			inventoryFound,
 			bidders,
@@ -129,12 +130,14 @@ class HeaderBidding extends React.Component {
 							inventoryFound={inventoryFound}
 							setupStatus={setupStatus}
 							setDfpSetupStatusAction={setDfpSetupStatusAction}
+							showNotification={showNotification}
 						/>
 					);
 				case 'bidders':
 					return (
 						<BiddersTab
 							siteId={siteId}
+							domain={domain}
 							bidders={bidders}
 							fetchAllBiddersAction={fetchAllBiddersAction}
 							addBidderAction={addBidderAction}
@@ -149,12 +152,13 @@ class HeaderBidding extends React.Component {
 							inventories={inventories}
 							fetchInventoriesAction={fetchInventoriesAction}
 							updateInventoriesHbStatus={updateInventoriesHbStatus}
+							showNotification={showNotification}
 						/>
 					);
 				case 'prebid-settings':
 					return <PrebidSettingsTab siteId={siteId} showNotification={showNotification} />;
 				case 'optimization':
-					return <OptimizationTab siteId={siteId} />;
+					return <OptimizationTab siteId={siteId} showNotification={showNotification} />;
 				default:
 					return null;
 			}

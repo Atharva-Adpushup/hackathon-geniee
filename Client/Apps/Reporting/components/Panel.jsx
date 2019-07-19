@@ -1,7 +1,9 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import { Row, Col } from 'react-bootstrap';
 import moment from 'moment';
 import { Object } from 'es6-shim';
+import qs from 'querystringify';
+import { isEmpty, union } from 'lodash';
 import ActionCard from '../../../Components/ActionCard/index';
 import ControlContainer from '../containers/ControlContainer';
 import TableContainer from '../containers/TableContainer';
@@ -9,8 +11,7 @@ import ChartContainer from '../containers/ChartContainer';
 import reportService from '../../../services/reportService';
 import { displayMetrics } from '../configs/commonConsts';
 import Loader from '../../../Components/Loader';
-import { computeCsvData, convertObjToArr } from '../helpers/utils';
-import qs from 'querystringify';
+import { convertObjToArr } from '../helpers/utils';
 
 class Panel extends Component {
 	constructor(props) {
@@ -46,75 +47,138 @@ class Panel extends Component {
 			},
 			location: { search: queryParams }
 		} = this.props;
-		const selectedControls = qs.parse(queryParams);
 
 		let {
 			startDate,
 			endDate,
-			metricsList,
 			selectedInterval,
 			selectedDimension,
-			selectedFilters
+			selectedFilters,
+			reportType
 		} = this.state;
+
+		const selectedControls = qs.parse(queryParams);
+
+		if (siteId) {
+			selectedFilters = { siteid: { [siteId]: true } };
+			reportType = 'site';
+		}
+
 		if (Object.keys(selectedControls).length > 0) {
-			let { dimension, interval, fromDate, toDate } = selectedControls;
+			const { dimension, interval, fromDate, toDate } = selectedControls;
 			selectedDimension = dimension;
 			selectedInterval = interval || 'daily';
 			startDate = fromDate;
 			endDate = toDate;
-			this.onDimensionChange(selectedDimension);
-			this.setState({ selectedDimension, selectedInterval, startDate, endDate });
 		}
 
-		if (siteId) {
-			selectedFilters = { siteid: { [siteId]: true } };
-			this.setState({ reportType: 'site', selectedFilters });
-		}
-		this.generateButtonHandler({
+		const params = this.getControlChangedParams({
 			startDate,
 			endDate,
-			metricsList,
-			selectedFilters,
 			selectedInterval,
-			selectedDimension
+			selectedDimension,
+			selectedFilters,
+			reportType
 		});
+		this.setState(
+			{
+				...params
+			},
+			this.generateButtonHandler
+		);
 	}
 
 	disableControl = (disabledFilter, disabledDimension, disabledMetrics) => {
-		let { dimensionList, filterList, metricsList } = this.state;
-		if (disabledFilter && disabledFilter.length > 0) {
-			filterList.map(filter => {
-				let found = disabledFilter.find(fil => fil === filter.value);
-				if (found) filter.isDisabled = true;
-			});
-		}
-		if (disabledDimension && disabledDimension.length > 0) {
-			dimensionList.map(dimension => {
-				let found = disabledDimension.find(dim => dim === dimension.value);
-				if (found) dimension.isDisabled = true;
-			});
-		}
-		if (disabledMetrics && disabledMetrics.length > 0) {
-			metricsList.map(metrics => {
-				let found = disabledMetrics.find(metric => metric === metrics.value);
-				if (found) metrics.isDisabled = true;
-			});
-		}
-		this.setState({ filterList, metricsList, dimensionList });
+		const { dimensionList, filterList, metricsList } = this.state;
+
+		filterList.map(filter => {
+			const found = disabledFilter.find(fil => fil === filter.value);
+			if (found) filter.isDisabled = true;
+			else filter.isDisabled = false;
+		});
+
+		dimensionList.map(dimension => {
+			const found = disabledDimension.find(dim => dim === dimension.value);
+			if (found) dimension.isDisabled = true;
+			else dimension.isDisabled = false;
+		});
+
+		metricsList.map(metrics => {
+			const found = disabledMetrics.find(metric => metric === metrics.value);
+			if (found) metrics.isDisabled = true;
+			else metrics.isDisabled = false;
+		});
+
+		return {
+			filterList,
+			metricsList,
+			dimensionList
+		};
 	};
 
-	onDimensionChange = selectedDimension => {
-		let { dimensionList } = this.state;
-		let dimensionObj = dimensionList.find(dimension => dimension.value === selectedDimension);
+	getReportType = selectedFilters => {
+		let reportType = 'account';
+		const selectedSiteFilters = selectedFilters.siteid;
+		if (selectedSiteFilters && Object.keys(selectedSiteFilters).length === 1) {
+			reportType = 'site';
+		}
+		return reportType;
+	};
+
+	onControlChange = data => {
+		this.setState({
+			...data
+		});
+	};
+
+	getControlChangedParams = controlParams => {
+		const {
+			startDate,
+			endDate,
+			selectedInterval,
+			selectedDimension,
+			selectedFilters,
+			reportType
+		} = controlParams;
+		//	const reportType = this.getReportType(selectedFilters);
+		const { dimensionList, filterList } = this.state;
+		let disabledFilter = [];
+		let disabledDimension = [];
+		let disabledMetrics = [];
+		const dimensionObj = dimensionList.find(dimension => dimension.value === selectedDimension);
 		if (dimensionObj) {
-			let disabledFilter = dimensionObj['disabled_filter'];
-			let disabledDimension = dimensionObj['disabled_dimension'];
-			let disabledMetrics = dimensionObj['disabled_metrics'];
-			this.disableControl(disabledFilter, disabledDimension, disabledMetrics);
+			disabledFilter = dimensionObj.disabled_filter || disabledFilter;
+			disabledDimension = dimensionObj.disabled_dimension || disabledDimension;
+			disabledMetrics = dimensionObj.disabled_metrics || disabledMetrics;
 		}
+		Object.keys(selectedFilters).forEach(selectedFilter => {
+			const filterObj = filterList.find(filter => filter.value === selectedFilter);
+			if (filterObj && !isEmpty(selectedFilters[selectedFilter])) {
+				disabledFilter = union(filterObj.disabled_filter, disabledFilter);
+				disabledDimension = union(filterObj.disabled_dimension, disabledDimension);
+				disabledMetrics = union(filterObj.disabled_metrics, disabledMetrics);
+			}
+		});
+		const updatedControlList = this.disableControl(
+			disabledFilter,
+			disabledDimension,
+			disabledMetrics
+		);
+
+		return {
+			startDate,
+			endDate,
+			selectedInterval,
+			selectedDimension,
+			selectedFilters,
+			reportType,
+			dimensionList: updatedControlList.dimensionList,
+			filterList: updatedControlList.filterList,
+			metricsList: updatedControlList.metricsList
+		};
 	};
 
-	formateReportParams = data => {
+	formateReportParams = () => {
 		const {
 			startDate,
 			endDate,
@@ -122,7 +186,7 @@ class Panel extends Component {
 			selectedFilters,
 			selectedInterval,
 			metricsList
-		} = data;
+		} = this.state;
 		const { site } = this.props;
 		let selectedMetrics;
 		if (metricsList) {
@@ -137,31 +201,30 @@ class Panel extends Component {
 			interval: selectedInterval,
 			dimension: selectedDimension || null
 		};
-		for (const filter in selectedFilters) {
+		Object.keys(selectedFilters).forEach(filter => {
 			const filters = Object.keys(selectedFilters[filter]);
 			params[filter] = filters.length > 0 ? filters.toString() : null;
-		}
-		if (!params['siteid']) {
+		});
+		if (!params.siteid) {
 			const siteIds = Object.keys(site);
-			params['siteid'] = siteIds.toString();
+			params.siteid = siteIds.toString();
 		}
 		return params;
 	};
 
-	generateButtonHandler = data => {
+	generateButtonHandler = () => {
 		this.setState({ isLoading: true });
-		const params = this.formateReportParams(data);
+		const params = this.formateReportParams();
 
 		reportService.getCustomStats(params).then(response => {
 			if (response.status == 200 && response.data) {
 				this.setState({ tableData: response.data });
 			}
-			this.setState({ isLoading: false, ...data });
+			this.setState({ isLoading: false });
 		});
 	};
 
-	getFinalTableData = tableData => {
-		let csvData = computeCsvData(tableData);
+	getCsvData = csvData => {
 		this.setState({ csvData });
 	};
 
@@ -188,6 +251,7 @@ class Panel extends Component {
 						startDate={startDate}
 						endDate={endDate}
 						generateButtonHandler={this.generateButtonHandler}
+						onControlChange={this.onControlChange}
 						dimensionList={dimensionList}
 						filterList={filterList}
 						intervalList={intervalList}
@@ -216,7 +280,7 @@ class Panel extends Component {
 						startDate={startDate}
 						endDate={endDate}
 						selectedInterval={selectedInterval}
-						getTableData={this.getFinalTableData}
+						getCsvData={this.getCsvData}
 					/>
 				</Col>
 			</Row>
@@ -224,7 +288,7 @@ class Panel extends Component {
 	};
 
 	render() {
-		let { isLoading } = this.state;
+		const { isLoading } = this.state;
 		return isLoading ? (
 			<Loader />
 		) : (

@@ -6,7 +6,6 @@ global.__basedir = __dirname;
 var express = require('express'),
 	app = express(),
 	fs = require('fs'),
-	FileStreamRotator = require('file-stream-rotator'),
 	server = require('http').createServer(app),
 	path = require('path'),
 	compression = require('compression'),
@@ -20,7 +19,6 @@ var express = require('express'),
 	utils = require('./helpers/utils'),
 	couchBaseService = require('./helpers/couchBaseService'),
 	woodlotMiddlewareLogger = require('woodlot').middlewareLogger,
-	woodlotCustomLogger = require('woodlot').customLogger,
 	woodlotEvents = require('woodlot').events,
 	uuid = require('uuid'),
 	locale = require('locale'),
@@ -47,7 +45,13 @@ if (process.env.NODE_ENV === consts.environment.production) {
 app.use(compression());
 // Locale support
 app.use(locale(languageSupport));
-app.use(helmet());
+app.use(
+	helmet({
+		hsts: {
+			setIf: () => false
+		}
+	})
+);
 process.on('uncaughtException', function(err) {
 	// handle the error safely
 	console.log(err);

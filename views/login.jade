@@ -28,8 +28,6 @@ block bodyContent
 					- var errorMessage = error ? error : null;
 					if errorMessage
 						div(class="error-message top") #{errorMessage}
-							|Please try our previous dashboard.
-							a(href="http://app.adpushup.com")  Click here
 
 					div(class="form-group")
 						div(class="input-group")
@@ -50,7 +48,7 @@ block bodyContent
 				// Footer Section Starts Here
 				div(class="LoginFooter row")
 					div(class="pull-right") Don't have an account?
-						a(href="/signup", id="login-signup-redirect-link", class="btn btn-lightBg") Sign up
+						a(href="https://campaign.adpushup.com/get-started", id="login-signup-redirect-link", class="btn btn-lightBg") Sign up
 	
 	script.
 		adpushupAnalyticsEvents.emit('analyticsPage', {

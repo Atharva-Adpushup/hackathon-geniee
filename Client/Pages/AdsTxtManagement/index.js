@@ -20,7 +20,6 @@ import {
 	BONUS_MESSAGE,
 	NOTE_MESSAGE
 } from './configs/commonConsts';
-
 class AdsTxtManager extends Component {
 	state = {
 		adsTxtSnippet: '',
@@ -31,7 +30,6 @@ class AdsTxtManager extends Component {
 		showSendCodeByEmailModal: false,
 		redirectUrl: ''
 	};
-
 	componentDidMount() {
 		Promise.all([proxyService.getAdsTxt(), this.getSitesAdstxtStatus()]).then(response => {
 			let snippet;
@@ -43,7 +41,6 @@ class AdsTxtManager extends Component {
 			});
 		});
 	}
-
 	getSitesAdstxtStatus = () => {
 		const { sites, adsTxt } = this.props;
 		const promiseSerial = funcs =>
@@ -96,7 +93,6 @@ class AdsTxtManager extends Component {
 			<Loader />
 		</div>
 	);
-
 	handleClose = () => {
 		this.setState({ showModal: false });
 	};
@@ -157,7 +153,6 @@ class AdsTxtManager extends Component {
 			</Modal>
 		);
 	};
-
 	toggleShowSendCodeByEmailModal = () => {
 		this.setState(state => ({ showSendCodeByEmailModal: !state.showSendCodeByEmailModal }));
 	};
@@ -293,7 +288,6 @@ class AdsTxtManager extends Component {
 				return this.renderSnippetTextarea();
 		}
 	};
-
 	getActiveTab = () => {
 		const {
 			customProps: { activeTab }

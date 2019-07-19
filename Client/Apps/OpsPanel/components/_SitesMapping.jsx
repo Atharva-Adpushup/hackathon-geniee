@@ -15,7 +15,7 @@ import { copyToClipBoard, formatDate } from '../../../helpers/commonFunctions';
 import { SITES_MAPPING } from '../configs/commonConsts';
 // import Badges from '../../../../Components/Badges.jsx';
 // import SelectBox from '../../../../Components/SelectBox/index.jsx';
-import SelectBox from '../../../Components/Selectbox/index';
+import SelectBox from '../../../Components/SelectBox/index';
 import axiosInstance from '../../../helpers/axiosInstance';
 
 import Loader from '../../../Components/Loader';

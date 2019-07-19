@@ -79,6 +79,14 @@ const displayMetrics = {
 	network_ad_ecpm: { name: 'Ad eCPM', valueType: 'money' }
 };
 
+const dashboardWidgets = [
+	'per_site_wise',
+	'estimated_earnings',
+	'rev_by_network',
+	'per_overview',
+	'per_ap_original'
+];
+
 export {
 	DASHBOARD_NAV_ITEMS_INDEXES,
 	DASHBOARD_NAV_ITEMS_VALUES,
@@ -87,5 +95,6 @@ export {
 	sites,
 	yAxisGroups,
 	tableHeader,
-	displayMetrics
+	displayMetrics,
+	dashboardWidgets
 };

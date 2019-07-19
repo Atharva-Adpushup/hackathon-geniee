@@ -12,14 +12,15 @@
                             a.pull-left(id="site-report-" + siteId, target='_blank').
                                 #{utils.domanize(site.domain)} - #{siteId}
                             .pull-right.site-actions
-                                a.btn.btn-lightBg.btn-default(title="Open editor" id="editor-redirect-link", target='_blank', href='/user/site/#{siteId}/editor') 
-                                    i.fa.fa-code
+                                if !disableUiControls
+                                    a.btn.btn-lightBg.btn-default(title="Open editor" id="editor-redirect-link", target='_blank', href='/user/site/#{siteId}/editor') 
+                                        i.fa.fa-code
                                 a.btn.btn-lightBg.btn-default(title="View site report" target='_blank' id="site-custom-reports-" + siteId, href='/user/site/#{siteId}/reports/adpushupReport')
                                         i.fa.fa-area-chart
                                 if site.isManual
                                     a.btn.btn-lightBg.btn-default(id="site-tag-manager-" + siteId, href='/tagmanager/#{siteId}') AP Tag
-                                if site.isInnovative
-                                    a.btn.btn-lightBg.btn-default(id="site-innovative-ads-manager-" + siteId, href='/innovative-ads-manager/#{siteId}') Innovative Ads
+                                //- if site.isInnovative
+                                //-     a.btn.btn-lightBg.btn-default(id="site-innovative-ads-manager-" + siteId, href='/innovative-ads-manager/#{siteId}') Innovative Ads
                                 .dropdown.btn-dropdown
                                     button.btn.btn-lightBg#dropdownMenu1.btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='true')
                                         span.caret
@@ -28,16 +29,18 @@
                                         li
                                             a(title="View site pagegroups" href='/user/site/#{siteId}/pagegroups') 
                                                 i.fa.fa-th-list
-                                                |  PageGroups 
-                                        if isSuperUser
+                                                |  PageGroups
+                                        li
+                                            a(title="Open site settings" href='/user/site/#{siteId}/settings')
+                                                i.fa.fa-cog
+                                                |  Settings
+
+                                        if (isSuperUser || isAMPSettingsUIVisible)
                                             li
                                                 a(title="Open AMP Settings" href='/user/site/#{siteId}/ampSettings') 
                                                     i.fa.fa-th-list
-                                                    |  AMP Settings  
-                                        li
-                                            a(title="Open site settings" href='/user/site/#{siteId}/settings') 
-                                                i.fa.fa-cog
-                                                |  Settings   
+                                                    |  AMP Settings
+
                                         if isSuperUser 
                                             li
                                                 a(title="Open site info panel" href='/ops/settings/#{siteId}') 

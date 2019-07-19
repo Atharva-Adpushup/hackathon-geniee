@@ -31,6 +31,7 @@ module.exports = {
 			'728': [[728, 90], [728, 250], [728, 280]],
 			'970': [[970, 90], [970, 250]]
 		},
+		MULTIPLE_AD_SIZES_SUPPORTED_NETWORKS: ['adpTags'],
 		// The backward compatible size array for every ad size contains itself as well
 		BACKWARD_COMPATIBLE_MAPPING: {
 			// MOBILE sizes

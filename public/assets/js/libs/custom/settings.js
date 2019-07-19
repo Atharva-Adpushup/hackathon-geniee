@@ -105,6 +105,7 @@ $(document).ready(function() {
 					);
 				} else {
 					var parsedFormValues = this.parseFormData(formValues, 'other'),
+            poweredByBanner = parsedFormValues.poweredByBanner ? true : false,
 						activeDFPNetwork = parsedFormValues.activeDFPNetwork,
 						activeDFPCurrencyCode = parsedFormValues.activeDFPCurrencyCode,
 						autoOpt = parsedFormValues.autoOptimise ? true : false,

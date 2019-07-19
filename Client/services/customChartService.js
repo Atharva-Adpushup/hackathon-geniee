@@ -91,77 +91,111 @@ function getGroupedYAxisAndSeries(chartType, yAxisGroups, existingSeries) {
 	const yAxis = [];
 	const seriesForChart = [];
 	let colorIndex = 0;
+	let opposite = false;
+	let yAxisCount = 0;
 
-	let i;
-	const len1 = yAxisGroups.length;
-
-	for (i = 0; i < len1; i += 1) {
-		const yAxisGroup = yAxisGroups[i];
-		const yAxisGroupNameArray = [];
-		let yAxisGroupForChart = {};
-
-		if (yAxisGroup.seriesNames && yAxisGroup.seriesNames.length) {
-			let j;
-			const len2 = yAxisGroup.seriesNames.length;
-
-			for (j = 0; j < len2; j += 1) {
-				const yAxisGroupSeriesName = yAxisGroup.seriesNames[j];
-				const index = existingSeries.findIndex(
-					singleSeries => singleSeries.name === yAxisGroupSeriesName
-				);
-
-				if (index !== -1) {
-					yAxisGroupNameArray.push(yAxisGroupSeriesName);
-
-					const singleSeries = {
-						type: chartType === 'spline' ? 'spline' : 'line',
-						lineWidth: 1.5,
-						_colorIndex: colorIndex,
-						...existingSeries[index],
-						yAxis: i,
-						tooltip: {
-							useHTML: true,
-							headerFormat: '<span style="font-size:14px;font-weight:bold">{point.key}</span><br/>',
-							pointFormatter: function() {
-								let point = this;
-								let num = Math.round(point.y * 100) / 100;
-								return (
-									'<span style="color:' +
-									point.color +
-									'">\u25CF</span> ' +
-									point.series.name +
-									': <b>' +
-									(point.series.userOptions.valueType === 'money' ? '$' : '') +
-									numberWithCommas(num) +
-									'</b><br/>'
-								);
-							}
-						}
-					};
-
-					seriesForChart.push(singleSeries);
-
-					colorIndex += 1;
-				}
-			}
-		}
-
-		if (yAxisGroupNameArray.length) {
-			yAxisGroupForChart.title = { text: yAxisGroupNameArray.join(' / ') };
-			//yAxisGroupForChart.tickPositioner = tickPositioner;
-			yAxisGroupForChart.index = i;
-			yAxisGroupForChart.opposite = i > 0;
-
-			if (yAxisGroup.yAxisConfig) {
-				yAxisGroupForChart = {
-					...yAxisGroupForChart,
-					...yAxisGroup.yAxisConfig
+	existingSeries.forEach((series, index) => {
+		const singleSeries = {
+			type: chartType === 'spline' ? 'spline' : 'line',
+			lineWidth: 1.5,
+			_colorIndex: colorIndex,
+			...series,
+			yAxis: index
+		};
+		const legend = {
+			title: { text: series.name },
+			index,
+			visible: false,
+			value: series.value
+		};
+		if (yAxisCount < 2 && series.visible) {
+			legend.visible = true;
+			legend.opposite = opposite;
+			if (series.valueType == 'money')
+				legend.labels = {
+					format: '${value}'
 				};
-			}
-
-			yAxis.push(yAxisGroupForChart);
+			yAxisCount += 1;
+			opposite = !opposite;
 		}
-	}
+		yAxis.push(legend);
+		singleSeries.tooltip = {
+			useHTML: true,
+			headerFormat: '<span style="font-size:14px;font-weight:bold">{point.key}</span><br/>',
+			pointFormatter() {
+				const point = this;
+				const num = point.y.toFixed(2);
+				return `<span style="color:${point.color}">\u25CF</span> ${point.series.name}: <b>${
+					point.series.userOptions.valueType === 'money'
+						? `$${numberWithCommas(num)}`
+						: numberWithCommas(point.y)
+				}</b><br/>`;
+			}
+		};
+		seriesForChart.push(singleSeries);
+		colorIndex += 1;
+	});
+
+	// for (i = 0; i < len1; i += 1) {
+	// 	const yAxisGroup = yAxisGroups[i];
+	// 	const yAxisGroupNameArray = [];
+	// 	let yAxisGroupForChart = {};
+
+	// 	if (yAxisGroup.seriesNames && yAxisGroup.seriesNames.length) {
+	// 		let j;
+	// 		const len2 = yAxisGroup.seriesNames.length;
+
+	// 		for (j = 0; j < len2; j += 1) {
+	// 			const yAxisGroupSeriesName = yAxisGroup.seriesNames[j];
+	// 			const index = existingSeries.findIndex(
+	// 				singleSeries => singleSeries.name === yAxisGroupSeriesName
+	// 			);
+
+	// 			if (index !== -1) {
+	// 				yAxisGroupNameArray.push(yAxisGroupSeriesName);
+
+	// 				const singleSeries = {
+	// 					type: chartType === 'spline' ? 'spline' : 'line',
+	// 					lineWidth: 1.5,
+	// 					_colorIndex: colorIndex,
+	// 					...existingSeries[index],
+	// 					yAxis: i,
+	// 					tooltip: {
+	// 						useHTML: true,
+	// 						headerFormat: '<span style="font-size:14px;font-weight:bold">{point.key}</span><br/>',
+	// 						pointFormatter: () => {
+	// 							const point = this;
+	// 							const num = Math.round(point.y * 100) / 100;
+	// 							return `<span style="color:${point.color}">\u25CF</span> ${point.series.name}: <b>${
+	// 								point.series.userOptions.valueType === 'money' ? '$' : ''
+	// 							}${numberWithCommas(num)}</b><br/>`;
+	// 						}
+	// 					}
+	// 				};
+
+	// 				seriesForChart.push(singleSeries);
+
+	// 				colorIndex += 1;
+	// 			}
+	// 		}
+	// 	}
+
+	// 	if (yAxisGroupNameArray.length) {
+	// 		yAxisGroupForChart.title = { text: yAxisGroupNameArray.join(' / ') };
+	// 		// yAxisGroupForChart.tickPositioner = tickPositioner;
+	// 		yAxisGroupForChart.index = i;
+	// 		yAxisGroupForChart.opposite = i > 0;
+
+	// 		if (yAxisGroup.yAxisConfig) {
+	// 			yAxisGroupForChart = {
+	// 				...yAxisGroupForChart,
+	// 				...yAxisGroup.yAxisConfig
+	// 			};
+	// 		}
+
+	// 		yAxis.push(yAxisGroupForChart);
+	// 	}
+	// }
 
 	return { yAxis, seriesForChart };
 }
@@ -211,19 +245,14 @@ export function getCustomChartConfig(
 				singleSeries.tooltip = {
 					useHTML: true,
 					headerFormat: '<span style="font-size:14px;font-weight:bold">{point.key}</span><br/>',
-					pointFormatter: function() {
-						let point = this;
-						let num = Math.round(point.y * 100) / 100;
-						return (
-							'<span style="color:' +
-							point.color +
-							'">\u25CF</span> ' +
-							point.series.name +
-							': <b>' +
-							(point.series.userOptions.valueType === 'money' ? '$' : '') +
-							numberWithCommas(num) +
-							'</b><br/>'
-						);
+					pointFormatter() {
+						const point = this;
+						const num = point.y.toFixed(2);
+						return `<span style="color:${point.color}">\u25CF</span> ${point.series.name}: <b>${
+							point.series.userOptions.valueType === 'money'
+								? `$${numberWithCommas(num)}`
+								: numberWithCommas(point.y)
+						}</b><br/>`;
 					}
 				};
 			}
@@ -297,6 +326,10 @@ export function getCustomChartConfig(
 				chartConfig.series.length
 			) {
 				chartConfig.yAxis = { title: activeLegendItems.name };
+				if (activeLegendItems.valueType === 'money')
+					chartConfig.yAxis.labels = {
+						format: '${value}'
+					};
 				break;
 			}
 

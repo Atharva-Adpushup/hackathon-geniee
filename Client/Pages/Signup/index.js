@@ -11,7 +11,7 @@ import CustomButton from '../../Components/CustomButton';
 import formValidator from '../../helpers/formValidator';
 import validationSchema from '../../helpers/validationSchema';
 import { signupAction } from '../../actions/userActions';
-import SelectBox from '../../Components/Selectbox';
+import SelectBox from '../../Components/SelectBox';
 
 class Signup extends Component {
 	state = {

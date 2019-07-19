@@ -203,6 +203,14 @@ const NAV_ITEMS = {
 	}
 };
 
+const siteWidgets = [
+	'per_site_wise_daily',
+	'estimated_earnings',
+	'rev_by_network',
+	'per_overview',
+	'per_ap_original'
+];
+
 export {
 	APPS,
 	STATUSES,
@@ -211,5 +219,6 @@ export {
 	DEFAULT_ITEM,
 	NAV_ITEMS,
 	NAV_ITEMS_INDEXES,
-	NAV_ITEMS_VALUES
+	NAV_ITEMS_VALUES,
+	siteWidgets
 };

@@ -128,8 +128,8 @@ function getReportsMetaData(params) {
 }
 
 // Set user session data and redirects to relevant screen based on provided parameters
-/* 
-	Type defines where the call is coming from 
+/*
+	Type defines where the call is coming from
 	1 : Sign up
 	2 : Login
 */
@@ -157,7 +157,7 @@ router
 							userData.sites[site.siteId] = site;
 							siteIds.push(site.siteId);
 						}
-						let params = { siteid: siteIds.toString() };
+						let params = { siteid: siteIds.toString(), isSuperUser };
 
 						return getReportsMetaData(params).then(reports => {
 							return res.status(httpStatus.OK).json({

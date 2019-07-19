@@ -4,7 +4,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Col, FormGroup, ControlLabel, HelpBlock } from 'react-bootstrap';
-import Selectbox from '../../../Components/Selectbox';
+import SelectBox from '../../../Components/SelectBox';
 import InputBox from '../../../Components/InputBox';
 
 class BidderFormFields extends React.Component {
@@ -33,7 +33,7 @@ class BidderFormFields extends React.Component {
 		switch (inputType) {
 			case 'selectBox': {
 				return (
-					<Selectbox
+					<SelectBox
 						key={adSize}
 						id={`hb-${paramKey}`}
 						wrapperClassName="hb-input"
@@ -59,9 +59,18 @@ class BidderFormFields extends React.Component {
 						value={currValue || ''}
 						onChange={({ target: { value } }) => {
 							if (adSize) {
-								setParamInTempState(adSize, paramKey, value);
+								setParamInTempState(
+									adSize,
+									paramKey,
+									dataType === 'number' ? parseFloat(value) : value
+								);
 							} else {
-								setFormFieldValueInState(stateKey, paramKey, value, adSize);
+								setFormFieldValueInState(
+									stateKey,
+									paramKey,
+									dataType === 'number' ? parseFloat(value) : value,
+									adSize
+								);
 							}
 						}}
 					/>
@@ -99,8 +108,9 @@ class BidderFormFields extends React.Component {
 		for (const collectionKey in formFields) {
 			const collection = formFields[collectionKey];
 			for (const fieldKey in collection) {
-				if (!fieldKey) return;
 				const fieldConfig = collection[fieldKey];
+				// eslint-disable-next-line no-continue
+				if (fieldConfig.visible === false) continue;
 
 				formFieldsJSX.push(
 					<FormGroup key={fieldKey} controlId={`hb-${fieldKey}`}>

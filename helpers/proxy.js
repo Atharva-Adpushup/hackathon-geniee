@@ -64,12 +64,6 @@ var request = require('request-promise'),
 				return finalData;
 			});
 		},
-		detectCustomAp(url, siteId) {
-			return API.load(url).then(body => {
-				const apCodeDetected = body.match(`//.+.adpushup.com/${siteId}/adpushup.js`);
-				return !!apCodeDetected;
-			});
-		},
 		fetchOurAdsTxt() {
 			return API.load(commonConst.onboarding.adsTxtDocUrl);
 		},

@@ -9,6 +9,7 @@ var model = require('../helpers/model'),
 	apConfigSchema = require('./subClasses/site/apConfig'),
 	Promise = require('bluebird'),
 	commonConsts = require('../configs/commonConsts'),
+	adSizeMappingConsts = require('../helpers/adSizeMappingConsts'),
 	_ = require('lodash'),
 	Site = model.extend(function() {
 		this.keys = [
@@ -401,6 +402,7 @@ function apiModule() {
 						? parseInt(otherSettings.adpushupPercentage, 10)
 						: commonConsts.apConfigDefaults.adpushupPercentage,
 					autoOptimise: settings.autoOptimise === 'false' ? false : true,
+					poweredByBanner: settings.poweredByBanner === 'false' ? false : true,
 					activeDFPNetwork: settings.activeDFPNetwork ? settings.activeDFPNetwork : '',
 					activeDFPParentId: settings.activeDFPParentId ? settings.activeDFPParentId : '',
 					activeDFPCurrencyCode: settings.activeDFPCurrencyCode || '',
@@ -648,20 +650,40 @@ function apiModule() {
 				.catch(() => API.isApTagInventoryExist(siteId))
 				.catch(() => API.isInnovativeAdInventoryExist(siteId));
 		},
-		getUniqueInventorySizes: siteId => {
-			return Promise.all([
-				API.getLayoutInventorySizes(siteId),
-				API.getApTagInventorySizes(siteId),
-				API.getInnovativeAdInventorySizes(siteId)
-			]).then(([layoutInventorySizes, apTagInventorySizes, innovativeAdInventorySizes]) => {
-				return [
-					...new Set([
-						...layoutInventorySizes,
-						...apTagInventorySizes,
-						...innovativeAdInventorySizes
-					])
-				];
+		getDownwardIABSize: originalSize => {
+			const [width, height] = originalSize.split('x').map(val => parseInt(val, 10));
+
+			const downwardSizes =
+				adSizeMappingConsts.IAB_SIZES.BACKWARD_COMPATIBLE_MAPPING[`${width},${height}`];
+			if (downwardSizes && downwardSizes[0]) {
+				return downwardSizes[0].join('x');
+			}
+
+			// loop through allIabSizes and find the downward size with min diff
+			const allIABSizes = adSizeMappingConsts.IAB_SIZES.ALL;
+			const minDownwardDiff = { diff: null, size: '' };
+			allIABSizes.forEach(([iabWidth, iabHeight], index) => {
+				if (iabWidth <= width && iabHeight <= height) {
+					const diff = width - iabWidth + (height - iabHeight);
+					if (isNaN(minDownwardDiff.diff) || minDownwardDiff.diff > diff) {
+						minDownwardDiff.diff = diff;
+						minDownwardDiff.size = `${iabWidth}x${iabHeight}`;
+					}
+				}
 			});
+
+			return minDownwardDiff.size || false;
+		},
+		getUniqueInventorySizes: siteId => {
+			return Promise
+				.all([API.getLayoutInventorySizes(siteId), API.getApTagInventorySizes(siteId), API.getInnovativeAdInventorySizes(siteId)])
+				.then(([layoutInventorySizes, apTagInventorySizes, innovativeAdInventorySizes]) => {
+					const uniqueSizes = [...new Set([...layoutInventorySizes, ...apTagInventorySizes, ...innovativeAdInventorySizes])];
+					return uniqueSizes.map(originalSize => {
+						const downwardIABSize = API.getDownwardIABSize(originalSize);
+						return { originalSize, downwardIABSize };
+					});
+				});
 		},
 		setSiteStep: function(siteId, onboardingStage, step) {
 			return API.getSiteById(siteId)

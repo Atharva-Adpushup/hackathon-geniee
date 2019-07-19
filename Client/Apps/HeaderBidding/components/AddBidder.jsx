@@ -1,19 +1,42 @@
+/* eslint-disable no-param-reassign */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import React from 'react';
 import { Row, Col } from 'react-bootstrap';
 import AddManageSizelessBidder from './AddManageSizelessBidder';
 import AddManageNonResponsiveBidder from './AddManageNonResponsiveBidder';
+import { domanize } from '../../../helpers/commonFunctions';
 
 export default class AddBidder extends React.Component {
 	onBidderAdd = (bidderConfig, params) => {
 		const {
 			siteId,
+			domain,
 			addBidderAction,
 			bidderConfig: fieldsConfig,
 			openView,
 			showNotification
 		} = this.props;
+
+		switch (bidderConfig.key) {
+			case 'ix': {
+				// eslint-disable-next-line no-restricted-syntax
+				for (const size in params) {
+					// eslint-disable-next-line no-prototype-builtins
+					if (params.hasOwnProperty(size)) {
+						params[size].size = size.split('x').map(val => parseInt(val, 10));
+					}
+				}
+
+				break;
+			}
+			case 'criteo': {
+				params.publisherSubId = `AP/${siteId}_${domanize(domain)}`;
+				break;
+			}
+			default:
+				break;
+		}
 
 		addBidderAction(siteId, { key: fieldsConfig.key, ...bidderConfig }, params)
 			.then(() => {
@@ -22,7 +45,7 @@ export default class AddBidder extends React.Component {
 					mode: 'success',
 					title: 'Success',
 					message: 'Bidder added successfully',
-					autoDismiss: 0
+					autoDismiss: 5
 				});
 			})
 			.catch(() => {
@@ -30,7 +53,7 @@ export default class AddBidder extends React.Component {
 					mode: 'error',
 					title: 'Error',
 					message: 'Unable to add bidder',
-					autoDismiss: 0
+					autoDismiss: 5
 				});
 			});
 	};

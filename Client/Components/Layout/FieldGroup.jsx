@@ -11,7 +11,7 @@ import {
 	ToggleButton
 } from 'react-bootstrap';
 import PropTypes from 'prop-types';
-import SelectBox from '../Selectbox/index';
+import SelectBox from '../SelectBox/index';
 
 const FieldGroup = ({
 	id,
@@ -82,7 +82,6 @@ const FieldGroup = ({
 		</FormGroup>
 	);
 };
-
 FieldGroup.propTypes = {
 	id: PropTypes.string.isRequired,
 	label: PropTypes.string.isRequired,
@@ -96,7 +95,6 @@ FieldGroup.propTypes = {
 	toggleGroupType: PropTypes.string,
 	textOnlyStyles: PropTypes.object
 };
-
 FieldGroup.defaultProps = {
 	help: '',
 	type: '',
@@ -108,5 +106,4 @@ FieldGroup.defaultProps = {
 	onChange: () => {},
 	textOnlyStyles: {}
 };
-
 export default FieldGroup;

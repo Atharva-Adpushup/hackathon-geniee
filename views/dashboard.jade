@@ -54,5 +54,10 @@ block bodyContent
 
                     .notification-wrapper
                     // Control v/s Adpushp Starts here
+                    if isPaymentDetailsComplete == false
+                        div(class="alert alert-danger alert-dismissible" style="font-size:15px" role="alert")
+                            button(type="button" class="close" data-dismiss="alert" aria-label="Close")
+                                span(aria-hidden="true") &times;
+                            strong  Please complete your Payment Profile, which is required to transfer your ad revenue.
                     #widgetsArea.row
                         include layout/dashboardSites

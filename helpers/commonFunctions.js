@@ -653,14 +653,13 @@ const Promise = require('bluebird'),
 			isActiveDFPCurrencyCode = !!(
 				config.activeDFPCurrencyCode &&
 				config.activeDFPCurrencyCode.length &&
-				config.activeDFPCurrencyCode.length === 3 &&
-				config.activeDFPCurrencyCode !== commonConsts.CURRENCY_EXCHANGE.CODES.USD
+				config.activeDFPCurrencyCode.length === 3
 			),
 			isPrebidGranularityMultiplier = !!(
 				config.prebidGranularityMultiplier && Number(config.prebidGranularityMultiplier)
 			),
 			isActiveDFPCurrencyExchangeRate = !!(
-				config.activeDFPCurrencyExchangeRate && Number(config.activeDFPCurrencyExchangeRate)
+				config.activeDFPCurrencyExchangeRate && Object.keys(config.activeDFPCurrencyExchangeRate).length
 			),
 			isValidResult = !!(
 				isActiveDFPNetwork &&
