@@ -17,17 +17,20 @@ class LostFoundLiveSites extends Component {
 		super(props);
 
 		const currentFrom = moment()
-				.subtract(7, 'days')
-				.startOf('day'),
-			CurrentTo = moment()
-				.subtract(1, 'days')
-				.startOf('day'),
-			LastFrom = moment()
-				.subtract(14, 'days')
-				.startOf('day'),
-			lastTo = moment()
-				.subtract(8, 'days')
-				.startOf('day');
+			.subtract(7, 'days')
+			.startOf('day');
+
+		const CurrentTo = moment()
+			.subtract(1, 'days')
+			.startOf('day');
+
+		const LastFrom = moment()
+			.subtract(14, 'days')
+			.startOf('day');
+
+		const lastTo = moment()
+			.subtract(8, 'days')
+			.startOf('day');
 
 		this.state = {
 			activeKey: null,
@@ -56,7 +59,7 @@ class LostFoundLiveSites extends Component {
 	};
 
 	datesUpdated = ({ startDate, endDate }) => {
-		this.setState({ lastStartDate : startDate, lastEndDate : endDate });
+		this.setState({ lastStartDate: startDate, lastEndDate: endDate });
 	};
 
 	currentDatesUpdated = ({ startDate, endDate }) => {
@@ -81,11 +84,16 @@ class LostFoundLiveSites extends Component {
 			sitesData
 		} = this.state;
 
-		if(pageviewsThreshold < 10000) {
-			console.log('Minimum pageviews should be 10,000')
-		}
+		const { showNotification } = this.props;
 
-		else {
+		if (pageviewsThreshold < 10000) {
+			return showNotification({
+				mode: 'error',
+				title: 'Operation Failed',
+				message: 'Page Views Should not be less than 10,000 ',
+				autoDimiss: 5
+			});
+		}
 
 		const qs = {
 			pageviewsThreshold,
@@ -98,7 +106,6 @@ class LostFoundLiveSites extends Component {
 				to: currentEndDate
 			}
 		};
-
 
 		this.setState({ isLoading: true });
 		axiosInstance
@@ -114,7 +121,6 @@ class LostFoundLiveSites extends Component {
 				this.setState({ isLoading: false });
 				console.log(err);
 			});
-		}
 	};
 
 	renderHeader() {
@@ -151,7 +157,7 @@ class LostFoundLiveSites extends Component {
 								showClearDates
 								minimumNights={0}
 								displayFormat="DD-MM-YYYY"
-								isOutsideRange={day => !isInclusivelyBeforeDay(day,  lastEndDate)}
+								isOutsideRange={day => !isInclusivelyBeforeDay(day, lastEndDate)}
 							/>
 						</Fragment>
 
@@ -169,7 +175,7 @@ class LostFoundLiveSites extends Component {
 								showClearDates
 								minimumNights={0}
 								displayFormat="DD-MM-YYYY"
-								isOutsideRange={day => !isInclusivelyBeforeDay(day,  currentEndDate)}
+								isOutsideRange={day => !isInclusivelyBeforeDay(day, currentEndDate)}
 							/>
 						</Fragment>
 
