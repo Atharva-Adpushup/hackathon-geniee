@@ -2,7 +2,7 @@ import React from 'react';
 import { Table } from 'react-bootstrap';
 
 const LostSites = ({ data }) => (
-	<div>
+	<div className="u-padding-2">
 		<Table striped bordered hover>
 			<thead>
 				<tr>

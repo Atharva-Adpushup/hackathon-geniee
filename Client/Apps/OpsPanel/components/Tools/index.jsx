@@ -36,7 +36,7 @@ class Tools extends Component {
 				return <TopXPathMissAndModeURL />;
 
 			case TOOLS_IDENTIFIERS.LOST_FOUND_LIVE_SITES:
-				return <LostFoundLiveSites />;
+				return <LostFoundLiveSites showNotification={showNotification} />;
 			case TOOLS_IDENTIFIERS.REGEX_GENERATION:
 				return 'Regex Generation';
 		}
