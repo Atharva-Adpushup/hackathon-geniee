@@ -18,19 +18,6 @@ function siteProcessing(site) {
 				return true;
 			}
 
-			/**
-				"adServerSettings": {
-					"dfp": {
-						"isThirdPartyAdx": true,
-						"activeDFPNetwork": "103512698",
-						"activeDFPParentId": "102512818",
-						"activeDFPCurrencyCode": "USD",
-						"prebidGranularityMultiplier": "71.3403,
-						"activeDFPCurrencyExchangeRate": {"USD":{"INR":69.1559932868}}
-					}
-				}
-			 */
-
 			const { apConfigs } = siteDoc;
 			userDoc.adServerSettings = {
 				dfp: {
