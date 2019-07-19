@@ -59,7 +59,7 @@ class Account extends Component {
 	}
 
 	getActiveDFPName = memoize((adNetworkSettings, code) => {
-		let response = 'N/A';
+		let response = '103512698 - AdPushup Inc.';
 		adNetworkSettings.forEach(network => {
 			if (network.networkName === 'DFP') {
 				const { dfpAccounts } = network;
@@ -125,16 +125,22 @@ class Account extends Component {
 		const updatedadServerSettings = {
 			...adServerSettings,
 			dfp: {
-				...adNetworkSettings.dfp,
+				...adServerSettings.dfp,
 				isThirdPartyAdx,
 				activeDFPNetwork,
 				activeDFPParentId,
 				activeDFPCurrencyCode
 			}
 		};
-		adNetworkSettings[0] = adNetworkSettings[0] || [];
-		adNetworkSettings[0].pubId = adsensePubId;
-		adNetworkSettings[0].networkName = adNetworkSettings[0].networkName || 'ADSENSE';
+
+		const originalAdsensePubId = adNetworkSettings[0] ? adNetworkSettings[0].pubId : null;
+		const shouldUpdateAdNetworkSettings = !!(originalAdsensePubId || adsensePubId);
+
+		if (shouldUpdateAdNetworkSettings) {
+			adNetworkSettings[0] = adNetworkSettings[0] || {};
+			adNetworkSettings[0].pubId = adsensePubId;
+			adNetworkSettings[0].networkName = adNetworkSettings[0].networkName || 'ADSENSE';
+		}
 
 		this.setState({ loading: true });
 
