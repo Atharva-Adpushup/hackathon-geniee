@@ -3,32 +3,49 @@ import { PanelGroup, Panel, Col, Badge, Row } from 'react-bootstrap';
 import moment from 'moment';
 import 'react-dates/initialize';
 import { DateRangePicker } from 'react-dates';
+import { isInclusivelyBeforeDay } from 'react-dates';
 import 'react-dates/lib/css/_datepicker.css';
 import LostSites from './LostSites';
 import NewSites from './NewSites';
 import RetentionSites from './RetentionSites';
+import CustomButton from '../../../../../Components/CustomButton/index';
+import Loader from '../../../../../Components/Loader/index';
+import axiosInstance from '../../../../../helpers/axiosInstance';
 
 class LostFoundLiveSites extends Component {
-
 	constructor(props) {
 		super(props);
-  
-		const currentFrom  = moment().subtract(7 , 'days').startOf('day'),
-			  CurrentTo = moment().subtract(1 , 'days').startOf('day'),
-			  LastFrom = moment().subtract(14 , 'days').startOf('day'),
-			  lastTo = moment().subtract(8 , 'days').startOf('day');
+
+		const currentFrom = moment()
+				.subtract(7, 'days')
+				.startOf('day'),
+			CurrentTo = moment()
+				.subtract(1, 'days')
+				.startOf('day'),
+			LastFrom = moment()
+				.subtract(14, 'days')
+				.startOf('day'),
+			lastTo = moment()
+				.subtract(8, 'days')
+				.startOf('day');
 
 		this.state = {
 			activeKey: null,
-			startDate: LastFrom ,
-			endDate:lastTo,
-			currentStartDate :currentFrom,
-			currentEndDate : CurrentTo,
+			lastStartDate: LastFrom,
+			lastEndDate: lastTo,
+			currentStartDate: currentFrom,
+			currentEndDate: CurrentTo,
 			focusedInput: null,
-			currentFocusedInput: null
+			currentFocusedInput: null,
+			isLoading: false,
+			pageviewsThreshold: 10000,
+			sitesData: {
+				lost: [],
+				won: [],
+				rentention: []
+			}
 		};
 	}
-
 
 	componentDidMount() {}
 
@@ -39,7 +56,7 @@ class LostFoundLiveSites extends Component {
 	};
 
 	datesUpdated = ({ startDate, endDate }) => {
-		this.setState({ startDate, endDate });
+		this.setState({ lastStartDate : startDate, lastEndDate : endDate });
 	};
 
 	currentDatesUpdated = ({ startDate, endDate }) => {
@@ -51,104 +68,169 @@ class LostFoundLiveSites extends Component {
 	};
 
 	currentFocusUpdated = currentFocusedInput => {
-		this.setState({currentFocusedInput})
-	}
+		this.setState({ currentFocusedInput });
+	};
+
+	handleGenerate = () => {
+		const {
+			lastStartDate,
+			lastEndDate,
+			currentStartDate,
+			currentEndDate,
+			pageviewsThreshold,
+			sitesData
+		} = this.state;
+
+		if(pageviewsThreshold < 10000) {
+			console.log('Minimum pageviews should be 10,000')
+		}
+
+		else {
+
+		const qs = {
+			pageviewsThreshold,
+			last: {
+				from: lastStartDate,
+				to: lastEndDate
+			},
+			current: {
+				from: currentStartDate,
+				to: currentEndDate
+			}
+		};
+
+
+		this.setState({ isLoading: true });
+		axiosInstance
+			.get('/ops/getSiteStats', {
+				params: {
+					params: window.btoa(JSON.stringify(qs))
+				}
+			})
+			.then(res => {
+				this.setState({ sitesData: res.data.data, isLoading: false });
+			})
+			.catch(err => {
+				this.setState({ isLoading: false });
+				console.log(err);
+			});
+		}
+	};
 
 	renderHeader() {
-		const { startDate, endDate, focusedInput ,currentStartDate ,currentEndDate ,currentFocusedInput } = this.state;
-		return(
+		const {
+			lastStartDate,
+			lastEndDate,
+			focusedInput,
+			currentStartDate,
+			currentEndDate,
+			currentFocusedInput,
+			pageviewsThreshold,
+			sitesData
+		} = this.state;
 
-		<Row>
-			<Col sm={12}>
-				<Col sm={6} style= {{textAlign : 'center'}}>
-					<p className="h3">Page Views</p>
-					<label>10000</label>
+		return (
+			<Row>
+				<Col sm={12}>
+					<Col sm={6} style={{ textAlign: 'center' }}>
+						<p className="h3">Page Views</p>
+						<label>{pageviewsThreshold}</label>
+					</Col>
+					<Col sm={6}>
+						<Fragment>
+							<p className="u-text-bold">Last week</p>
+
+							<DateRangePicker
+								startDate={lastStartDate}
+								endDate={lastEndDate}
+								onDatesChange={this.datesUpdated}
+								focusedInput={focusedInput}
+								onFocusChange={this.focusUpdated}
+								showDefaultInputIcon
+								hideKeyboardShortcutsPanel
+								showClearDates
+								minimumNights={0}
+								displayFormat="DD-MM-YYYY"
+								isOutsideRange={day => !isInclusivelyBeforeDay(day,  lastEndDate)}
+							/>
+						</Fragment>
+
+						<Fragment>
+							<p className="u-text-bold u-margin-t4">Current week</p>
+
+							<DateRangePicker
+								startDate={currentStartDate}
+								endDate={currentEndDate}
+								onDatesChange={this.currentDatesUpdated}
+								focusedInput={currentFocusedInput}
+								onFocusChange={this.currentFocusUpdated}
+								showDefaultInputIcon
+								hideKeyboardShortcutsPanel
+								showClearDates
+								minimumNights={0}
+								displayFormat="DD-MM-YYYY"
+								isOutsideRange={day => !isInclusivelyBeforeDay(day,  currentEndDate)}
+							/>
+						</Fragment>
+
+						<CustomButton
+							variant="primary"
+							className="pull-right u-margin-r3"
+							onClick={this.handleGenerate}
+						>
+							Generate
+						</CustomButton>
+					</Col>
 				</Col>
-				<Col sm={6}>
-				
-					<Fragment>
-						<p className="u-text-bold">Last week</p>
-
-						<DateRangePicker
-							startDate={startDate}
-							endDate={endDate}
-							onDatesChange={this.datesUpdated}
-							focusedInput={focusedInput}
-							onFocusChange={this.focusUpdated}
-							showDefaultInputIcon
-							hideKeyboardShortcutsPanel
-							showClearDates
-							minimumNights={0}
-							displayFormat="DD-MM-YYYY"
-							isOutsideRange={() => {}}
-						/>
-					</Fragment>
-
- <Fragment>
-						<p className="u-text-bold u-margin-t4">Current week</p>
-
-						<DateRangePicker
-							startDate={currentStartDate}
-							endDate={currentEndDate}
-							onDatesChange={this.currentDatesUpdated}
-							focusedInput={currentFocusedInput}
-							onFocusChange={this.currentFocusUpdated}
-							showDefaultInputIcon
-							hideKeyboardShortcutsPanel
-							showClearDates
-							minimumNights={0}
-							displayFormat="DD-MM-YYYY"
-							isOutsideRange={() => {}}
-						/>
-					</Fragment> 
-					
-				</Col>
-			</Col>
-		</Row>
-	
+			</Row>
 		);
 	}
 
 	renderPanel() {
-		const { activeKey } = this.state;
+		const { activeKey, sitesData } = this.state;
 
 		return (
 			<PanelGroup accordion id="sites" activeKey={activeKey} onSelect={this.handleSelect}>
 				<Panel eventKey="lost">
 					<Panel.Heading>
 						<Panel.Title toggle>
-							Lost <Badge> 10 </Badge>
+							Lost <Badge> {sitesData.lost.length} </Badge>
 						</Panel.Title>
 					</Panel.Heading>
-					{activeKey === 'lost' ? <LostSites /> : null}
+					{activeKey === 'lost' ? <LostSites data={sitesData.lost} /> : null}
 				</Panel>
 
 				<Panel eventKey="new">
 					<Panel.Heading>
 						<Panel.Title toggle>
-							New <Badge> 99 </Badge>
+							New <Badge> {sitesData.won.length} </Badge>
 						</Panel.Title>
 					</Panel.Heading>
-					{activeKey === 'new' ? <NewSites /> : null}
+					{activeKey === 'new' ? <NewSites data={sitesData.won} /> : null}
 				</Panel>
 
 				<Panel eventKey="retention">
 					<Panel.Heading>
 						<Panel.Title toggle>
-							Retention <Badge> 50 </Badge>
+							Retention <Badge>{sitesData.rentention.length}</Badge>
 						</Panel.Title>
 					</Panel.Heading>
-					{activeKey === 'retention' ? <RetentionSites /> : null}
+					{activeKey === 'retention' ? <RetentionSites data={sitesData.rentention} /> : null}
 				</Panel>
 			</PanelGroup>
 		);
 	}
 
 	render() {
+		const { isLoading } = this.state;
+
+		if (isLoading) return <Loader height="100px" classNames="u-margin-v3" />;
 		return (
 			<div>
-				<Col className ="u-margin-b4" xs={12}>{this.renderHeader()}</Col>
-                
+				<Col className="u-margin-b4" xs={12}>
+					{this.renderHeader()}
+				</Col>
+
 				<Col xs={12}>{this.renderPanel()}</Col>
 			</div>
 		);
