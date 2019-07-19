@@ -23,6 +23,7 @@ router.get('/:siteId', (req, res) => {
 			fs.readFileAsync(htmlFilePath, 'utf8').then(result => {
 				const siteDomain = site.get('siteDomain');
 				const domanizedDomain = domanize(siteDomain);
+				const hasChannels = !!(site.get('channels') && site.get('channels').length);
 				const resultString = result
 					.replace('__BASE_URL__', BASE_URL)
 					.replace('__PROXY_ORIGIN__', PROXY_ORIGIN)
@@ -31,7 +32,9 @@ router.get('/:siteId', (req, res) => {
 					.replace('__SITE_ID__', site.get('siteId'))
 					.replace('__ENVIRONMENT__', HOST_ENV)
 					.replace('__IS_SUPER_USER__', isSuperUser)
-					.replace('__IS_GENIEE__', 0);
+					.replace('__IS_GENIEE__', 0)
+					.replace('__HAS_CHANNELS__', hasChannels)
+					.replace('__CREATE_PAGEGROUP_URL__', '/admin-panel/settings');
 
 				res.set('content-type', 'text/html');
 				res.send(resultString);

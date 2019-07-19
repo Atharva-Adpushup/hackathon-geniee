@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import ActionCard from '../../../../Components/ActionCard/index';
 import OverlayTooltip from '../../../../Components/OverlayTooltip/index';
 import ControlTagConversion from './ControlTagConversion';
+import Loader from '../../../../Components/Loader';
 
 library.add(faInfoCircle, faExternalLinkAlt);
 
@@ -45,7 +46,7 @@ class Home extends Component {
 			case 1:
 				return <ControlTagConversion siteId={siteId} />;
 			case 2:
-				return <p />;
+				return <Loader />;
 		}
 	}
 
