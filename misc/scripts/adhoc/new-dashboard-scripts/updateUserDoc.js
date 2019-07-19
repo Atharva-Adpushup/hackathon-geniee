@@ -1,7 +1,7 @@
 const { promiseForeach } = require('node-utils');
 
 const { ADPUSHUP_DFP_INFO } = require('../../../../configs/config');
-const { fetchAllSites, errorHandler, updateDoc, getDoc } = require('./helpers');
+const { fetchAllSites, updateDoc, getDoc, errorHandler } = require('./helpers');
 
 function siteProcessing(site) {
 	let siteDoc;
