@@ -126,8 +126,9 @@ class Panel extends Component {
 	};
 
 	onControlChange = data => {
+		const params = this.getControlChangedParams(data);
 		this.setState({
-			...data
+			...params
 		});
 	};
 
@@ -280,6 +281,7 @@ class Panel extends Component {
 						startDate={startDate}
 						endDate={endDate}
 						selectedInterval={selectedInterval}
+						selectedDimension={selectedDimension}
 						getCsvData={this.getCsvData}
 					/>
 				</Col>
