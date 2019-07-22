@@ -26,7 +26,9 @@ const Header = ({ sidebarToggle, logout, user, switchUser, findUsers }) => (
 					href="https://support.adpushup.com/portal/home"
 					target="_blank"
 					rel="noopener noreferrer"
-				/>
+				>
+					Support
+				</MenuItem>
 				<MenuItem
 					eventKey="4"
 					onClick={() =>
