@@ -5,6 +5,7 @@ const prodEnv = config.environment.HOST_ENV === 'production';
 module.exports = {
 	SALT: '_ADP_RANDOMIZER_',
 	BASE_URL: prodEnv ? 'https://console.adpushup.com' : 'http://localhost:8080',
+	INTEGRATION_BASE_URL: prodEnv ? 'https://app.staging.adpushup.com/' : 'http://localhost:8080',
 	DFP_WEB_SERVICE_ENDPOINT: 'http://staging.adpushup.com/DfpWebService/info',
 	TRANSACTION_LOG_ENDPOINT: 'https://api.adpushup.com/SetupLogWebService/log',
 	REPORT_STATUS: 'https://api.adpushup.com/OpsWebService/ops?report=getNetworkImportServiceStatus',

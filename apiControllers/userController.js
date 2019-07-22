@@ -139,24 +139,11 @@ router
 		googleOAuthUniqueString = uniqueString;
 		return res.redirect(oauthHelper.getRedirectUrl(uniqueString));
 	})
-	.get('/requestGoogleOAuth2', (req, res) => {
-		const postMessageScriptTemplate = `<script type="text/javascript">
-		window.opener.postMessage({
-			"cmd":"SAVE_GOOGLE_OAUTH_INFO",
-			"data": {
-				"adsenseEmail": "zahin@adpushup.com",
-				"pubId": "ca-pub12345670"
-			}
-		}, "http://localhost:8080");
-		window.close();
-		</script>`;
-
-		return res.status(httpStatus.OK).send(postMessageScriptTemplate);
-	})
 	.get('/oauth2callback', (req, res) => {
 		const { state: queryState, error: queryError } = req.query;
 		const isNotMatchingUniqueString = !!(googleOAuthUniqueString !== queryState);
 		const isErrorAccessDenied = !!(queryError === 'access_denied');
+		const { INTEGRATION_BASE_URL } = CC;
 
 		if (isNotMatchingUniqueString) {
 			return res.status(500).send('Fake Request');
@@ -274,7 +261,7 @@ router
 					window.opener.postMessage({
 						"cmd":"SAVE_GOOGLE_OAUTH_INFO",
 						"data": ${postMessageData}
-					}, "http://localhost:8080");
+					}, ${INTEGRATION_BASE_URL});
 					window.close();
 					</script>`;
 
