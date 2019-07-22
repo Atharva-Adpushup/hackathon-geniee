@@ -147,7 +147,7 @@ class Integrations extends Component {
 				name="connectGoogleAccountButton"
 				onClick={this.handleClickHandler}
 			>
-				Get Started
+				Connect
 			</CustomButton>
 		</React.Fragment>
 	);
