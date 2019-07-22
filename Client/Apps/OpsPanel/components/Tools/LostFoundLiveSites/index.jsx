@@ -47,7 +47,7 @@ class LostFoundLiveSites extends Component {
 				won: [],
 				rentention: []
 			},
-			numberOfDays : 7
+			numberOfDays: 7
 		};
 	}
 
