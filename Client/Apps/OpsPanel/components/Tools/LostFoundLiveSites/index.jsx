@@ -46,11 +46,10 @@ class LostFoundLiveSites extends Component {
 				lost: [],
 				won: [],
 				rentention: []
-			}
+			},
+			numberOfDays : 7
 		};
 	}
-
-	componentDidMount() {}
 
 	handleSelect = (value = null) => {
 		this.setState({
@@ -76,12 +75,11 @@ class LostFoundLiveSites extends Component {
 
 	handleGenerate = () => {
 		const {
-			lastStartDate,
-			lastEndDate,
 			currentStartDate,
 			currentEndDate,
 			pageviewsThreshold,
-			sitesData
+
+			numberOfDays
 		} = this.state;
 
 		const { showNotification } = this.props;
@@ -97,14 +95,11 @@ class LostFoundLiveSites extends Component {
 
 		const qs = {
 			pageviewsThreshold,
-			last: {
-				from: lastStartDate,
-				to: lastEndDate
-			},
 			current: {
 				from: currentStartDate,
 				to: currentEndDate
-			}
+			},
+			numberOfDays
 		};
 
 		this.setState({ isLoading: true });
@@ -125,14 +120,10 @@ class LostFoundLiveSites extends Component {
 
 	renderHeader() {
 		const {
-			lastStartDate,
-			lastEndDate,
-			focusedInput,
 			currentStartDate,
 			currentEndDate,
 			currentFocusedInput,
-			pageviewsThreshold,
-			sitesData
+			pageviewsThreshold
 		} = this.state;
 
 		return (
@@ -144,25 +135,7 @@ class LostFoundLiveSites extends Component {
 					</Col>
 					<Col sm={6}>
 						<Fragment>
-							<p className="u-text-bold">Last week</p>
-
-							<DateRangePicker
-								startDate={lastStartDate}
-								endDate={lastEndDate}
-								onDatesChange={this.datesUpdated}
-								focusedInput={focusedInput}
-								onFocusChange={this.focusUpdated}
-								showDefaultInputIcon
-								hideKeyboardShortcutsPanel
-								showClearDates
-								minimumNights={0}
-								displayFormat="DD-MM-YYYY"
-								isOutsideRange={day => !isInclusivelyBeforeDay(day, lastEndDate)}
-							/>
-						</Fragment>
-
-						<Fragment>
-							<p className="u-text-bold u-margin-t4">Current week</p>
+							<p className="u-text-bold u-margin-t4">Select Date Range</p>
 
 							<DateRangePicker
 								startDate={currentStartDate}

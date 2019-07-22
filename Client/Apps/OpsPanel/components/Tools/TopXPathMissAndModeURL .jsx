@@ -10,6 +10,7 @@ import { XPATH_MODE_URL } from '../../configs/commonConsts';
 import CustomButton from '../../../../Components/CustomButton/index';
 import Loader from '../../../../Components/Loader/index';
 import SelectBox from '../../../../Components/SelectBox/index';
+import validator from 'validator';
 
 class TopXPathMissAndModeURL extends Component {
 	constructor(props) {
@@ -26,7 +27,6 @@ class TopXPathMissAndModeURL extends Component {
 			modes,
 			currentSelectedDevice: null,
 			currentSelectedMode: null,
-
 			errorCode: '',
 			loading: false,
 			startDate: moment()
@@ -45,9 +45,6 @@ class TopXPathMissAndModeURL extends Component {
 		});
 	};
 
-	handleSelectDevice = value => this.setState({ currentSelectedDevice: value });
-
-	handleSelectMode = value => this.setState({ currentSelectedMode: value });
 
 	handleGenerate = () => {};
 
@@ -101,7 +98,7 @@ class TopXPathMissAndModeURL extends Component {
 				<FieldGroup
 					name="siteId"
 					value={siteId}
-					type="text"
+					type="number"
 					label="Site Id"
 					onChange={this.handleChange}
 					size={6}
@@ -113,7 +110,7 @@ class TopXPathMissAndModeURL extends Component {
 				<FieldGroup
 					name="topURLCount"
 					value={topURLCount}
-					type="text"
+					type="number"
 					label="Top URL Count"
 					onChange={this.handleChange}
 					size={6}
@@ -159,7 +156,9 @@ class TopXPathMissAndModeURL extends Component {
 					<SelectBox
 						selected={currentSelectedDevice}
 						options={devices}
-						onSelect={this.handleSelectDevice}
+						onSelect={currentSelectedDevice => {
+							this.setState({ currentSelectedDevice });
+						}}
 						id="select-device"
 						title="Select Device"
 					/>
@@ -183,7 +182,10 @@ class TopXPathMissAndModeURL extends Component {
 					<SelectBox
 						selected={currentSelectedMode}
 						options={modes}
-						onSelect={this.handleSelectMode}
+						// onSelect={this.handleSelectMode}
+						onSelect={currentSelectedMode => {
+							this.setState({ currentSelectedMode });
+						}}
 						id="select-mode"
 						title="Select Mode"
 					/>
@@ -193,7 +195,7 @@ class TopXPathMissAndModeURL extends Component {
 					<FieldGroup
 						name="errorCode"
 						value={errorCode}
-						type="text"
+						type="number"
 						label="Error Code"
 						onChange={this.handleChange}
 						size={6}
