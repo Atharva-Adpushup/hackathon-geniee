@@ -9,6 +9,7 @@ import formValidator from '../../../helpers/formValidator';
 import allAdSizes from '../constants/adSizes';
 import AdSizeSelector from './AdSizeSelector';
 import { getFilteredAdSizes } from '../helpers/commonHelpers';
+import CustomIcon from '../../../Components/CustomIcon';
 
 class SizewiseParamsFormFields extends React.Component {
 	state = {
@@ -121,7 +122,7 @@ class SizewiseParamsFormFields extends React.Component {
 			tabsJSX.push(
 				<NavItem key={size} eventKey={size}>
 					{`${size} (${originalSize})`}
-					{tempParams[size] && tempParams[size].saved ? ' [added]' : ''}
+					{tempParams[size] && tempParams[size].saved ? <CustomIcon icon="check" /> : ''}
 				</NavItem>
 			);
 		}
