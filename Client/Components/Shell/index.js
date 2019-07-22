@@ -90,6 +90,7 @@ class Shell extends React.Component {
 			userFetched,
 			reportsFetched,
 			user,
+			sites,
 			location,
 			logout,
 			switchUser,
@@ -112,7 +113,7 @@ class Shell extends React.Component {
 					</Col>
 				</Row>
 				<Row className="sidebar-main-wrap">
-					<Sidebar show={sidebarOpen} user={user} />
+					<Sidebar show={sidebarOpen} user={user} sites={sites} />
 					<main className="main-content">
 						{routes ? <Breadcrumbs mappedRoutes={routes} /> : null}
 						{reportsFetched && userFetched ? <div>{children}</div> : <Loader />}
