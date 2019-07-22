@@ -44,9 +44,9 @@ class ManageSite extends React.Component {
 				redirectUrl = `${computedRedirectUrl}/settings`;
 				break;
 
-			// case 3:
-			// 	redirectUrl = `${computedRedirectUrl}/apps`;
-			// 	break;
+			case 3:
+				redirectUrl = `${computedRedirectUrl}/apps`;
+				break;
 
 			default:
 				break;
@@ -64,8 +64,8 @@ class ManageSite extends React.Component {
 				return <QuickSnapshotContainer siteId={siteId} />;
 			case NAV_ITEMS_INDEXES.SITE_SETTINGS:
 				return <SiteSettings {...this.props} />;
-			// case NAV_ITEMS_INDEXES.MANAGE_APPS:
-			// 	return <ManageAppsContainer {...this.props} />;
+			case NAV_ITEMS_INDEXES.MANAGE_APPS:
+				return <ManageAppsContainer {...this.props} />;
 		}
 	}
 
@@ -73,6 +73,7 @@ class ManageSite extends React.Component {
 		const activeTab = this.getActiveTab();
 		const activeItem = NAV_ITEMS[activeTab];
 		const { redirectUrl } = this.state;
+		const { user } = this.props;
 
 		if (redirectUrl) {
 			return <Redirect to={{ pathname: redirectUrl }} />;
@@ -83,7 +84,7 @@ class ManageSite extends React.Component {
 				<Nav bsStyle="tabs" activeKey={activeItem.INDEX} onSelect={this.handleNavSelect}>
 					<NavItem eventKey={1}>{NAV_ITEMS_VALUES.QUICK_SNAPSHOT}</NavItem>
 					<NavItem eventKey={2}>{NAV_ITEMS_VALUES.SITE_SETTINGS}</NavItem>
-					{/* <NavItem eventKey={3}>{NAV_ITEMS_VALUES.MANAGE_APPS}</NavItem> */}
+					{user.isSuperUser && <NavItem eventKey={3}>{NAV_ITEMS_VALUES.MANAGE_APPS}</NavItem>}
 				</Nav>
 				{this.renderContent()}
 			</ActionCard>
