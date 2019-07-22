@@ -4,13 +4,13 @@ import moment from 'moment';
 import 'react-dates/initialize';
 import { DateRangePicker } from 'react-dates';
 import 'react-dates/lib/css/_datepicker.css';
+import validator from 'validator';
 import FieldGroup from '../../../../Components/Layout/FieldGroup';
 import { XPATH_MODE_URL } from '../../configs/commonConsts';
 
 import CustomButton from '../../../../Components/CustomButton/index';
 import Loader from '../../../../Components/Loader/index';
 import SelectBox from '../../../../Components/SelectBox/index';
-import validator from 'validator';
 
 class TopXPathMissAndModeURL extends Component {
 	constructor(props) {
@@ -44,7 +44,6 @@ class TopXPathMissAndModeURL extends Component {
 			[e.target.name]: e.target.value
 		});
 	};
-
 
 	handleGenerate = () => {};
 
