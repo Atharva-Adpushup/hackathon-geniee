@@ -84,7 +84,7 @@ class ManageSite extends React.Component {
 				<Nav bsStyle="tabs" activeKey={activeItem.INDEX} onSelect={this.handleNavSelect}>
 					<NavItem eventKey={1}>{NAV_ITEMS_VALUES.QUICK_SNAPSHOT}</NavItem>
 					<NavItem eventKey={2}>{NAV_ITEMS_VALUES.SITE_SETTINGS}</NavItem>
-					{user.isSuperuser && <NavItem eventKey={3}>{NAV_ITEMS_VALUES.MANAGE_APPS}</NavItem>}
+					{user.isSuperUser && <NavItem eventKey={3}>{NAV_ITEMS_VALUES.MANAGE_APPS}</NavItem>}
 				</Nav>
 				{this.renderContent()}
 			</ActionCard>
