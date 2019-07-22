@@ -261,7 +261,7 @@ router
 					window.opener.postMessage({
 						"cmd":"SAVE_GOOGLE_OAUTH_INFO",
 						"data": ${postMessageData}
-					}, ${INTEGRATION_BASE_URL});
+					}, '${INTEGRATION_BASE_URL}');
 					window.close();
 					</script>`;
 
