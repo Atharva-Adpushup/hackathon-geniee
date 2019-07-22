@@ -45,11 +45,11 @@ function processing(sites) {
 	return promiseForeach(sites, siteProcessing, errorHandler);
 }
 
-function init() {
-	return fetchAllSites()
-		.then(processing)
-		.catch(err => console.log('Error occured : ', err));
-}
+// function init() {
+// 	return fetchAllSites()
+// 		.then(processing)
+// 		.catch(err => console.log('Error occured : ', err));
+// }
 
 // init()
 // 	.then(() => console.log('Processing over'))
