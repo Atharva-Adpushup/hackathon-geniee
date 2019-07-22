@@ -54,7 +54,7 @@ function init(site, config) {
 		});
 		new webpack.ProgressPlugin().apply(compiler);
 		compiler.run((err, stats) => {
-			return err ? reject(err) : resolve();
+			return err || stats.hasErrors() ? reject(err || stats.compilation.errors) : resolve();
 		});
 	})
 		.then(() => {
