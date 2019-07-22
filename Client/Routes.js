@@ -2,13 +2,13 @@ import React, { Suspense, lazy } from 'react';
 import { Router, Route, Redirect, Switch } from 'react-router-dom';
 
 import { NAV_ITEMS_INDEXES } from './Pages/ManageSite/constants/index';
-import { IA_NAV_ITEMS_INDEXES } from './Apps/InnovativeAds/configs/commonConsts';
-import { APT_NAV_ITEMS_INDEXES } from './Apps/ApTag/configs/commonConsts';
+// import { IA_NAV_ITEMS_INDEXES } from './Apps/InnovativeAds/configs/commonConsts';
+// import { APT_NAV_ITEMS_INDEXES } from './Apps/ApTag/configs/commonConsts';
 import { REPORTS_NAV_ITEMS_INDEXES } from './Apps/Reporting/configs/commonConsts';
 import { PAYMENT_NAV_ITEMS_INDEXES } from './Pages/Payment/configs/commonConsts';
 import { ADSTXT_NAV_ITEMS_INDEXES } from './Pages/AdsTxtManagement/configs/commonConsts';
 import { OP_NAV_ITEMS_INDEXES } from './Apps/OpsPanel/configs/commonConsts';
-import { NAV_ITEMS_INDEXES as HB_NAV_ITEMS_INDEXES } from './Apps/HeaderBidding/constants';
+// import { NAV_ITEMS_INDEXES as HB_NAV_ITEMS_INDEXES } from './Apps/HeaderBidding/constants';
 
 import history from './helpers/history';
 import PublicOnlyRoute from './Components/PublicOnlyRoute';
@@ -31,23 +31,23 @@ const AdsTxtManagement = lazy(() =>
 	import(/* webpackChunkName: "adsTxtManagement" */ './Pages/AdsTxtManagement')
 );
 const Payment = lazy(() => import(/* webpackChunkName: "payment" */ './Pages/Payment'));
-const ApTag = lazy(() => import(/* webpackChunkName: "apTag" */ './Apps/ApTag/index'));
-const InnovativeAds = lazy(() =>
-	import(/* webpackChunkName: "innovativeAds" */ './Apps/InnovativeAds/index')
-);
+// const ApTag = lazy(() => import(/* webpackChunkName: "apTag" */ './Apps/ApTag/index'));
+// const InnovativeAds = lazy(() =>
+// 	import(/* webpackChunkName: "innovativeAds" */ './Apps/InnovativeAds/index')
+// );
 const Reporting = lazy(() =>
 	import(/* webpackChunkName: "innovativeAds" */ './Apps/Reporting/index')
 );
 const ManageSite = lazy(() =>
 	import(/* webpackChunkName: "manageSite" */ './Pages/ManageSite/index')
 );
-const HeaderBidding = lazy(() =>
-	import(/* webpackChunkName: "headerBidding" */ './Apps/HeaderBidding')
-);
+// const HeaderBidding = lazy(() =>
+// 	import(/* webpackChunkName: "headerBidding" */ './Apps/HeaderBidding')
+// );
 const ErrorPage = lazy(() => import(/* webpackChunkName: "error" */ './Pages/ErrorPage/index'));
 const OnBoarding = lazy(() => import(/* webpackChunkName: "onBoarding" */ './Pages/OnBoarding'));
 const AddNewSite = lazy(() => import(/* webpackChunkName: "addNewSite" */ './Pages/AddNewSite'));
-const Layout = lazy(() => import(/* webpackChunkName: "layout" */ './Apps/Layout/index'));
+// const Layout = lazy(() => import(/* webpackChunkName: "layout" */ './Apps/Layout/index'));
 const OpsPanel = lazy(() => import(/* webpackChunkName: "opsPanel" */ './Apps/OpsPanel/index'));
 
 const Routes = () => (
@@ -89,24 +89,24 @@ const Routes = () => (
 						path="/sites/:siteId/settings"
 						component={ManageSite}
 					/>
-					<PrivateRoute
+					{/* <PrivateRoute
 						exact
 						customProps={{ activeTab: NAV_ITEMS_INDEXES.MANAGE_APPS }}
 						name="Apps"
 						path="/sites/:siteId/apps"
 						component={ManageSite}
-					/>
+					/> */}
 
 					{/** App Layout */}
-					<PrivateRoute
+					{/* <PrivateRoute
 						exact
 						name="Transform Code"
 						path="/sites/:siteId/apps/layout"
 						component={Layout}
-					/>
+					/> */}
 
 					{/** App ApTag */}
-					<PrivateRoute
+					{/* <PrivateRoute
 						exact
 						customProps={{ activeTab: APT_NAV_ITEMS_INDEXES.CREATE_ADS }}
 						name="Ap Tag"
@@ -119,10 +119,10 @@ const Routes = () => (
 						name="Manage"
 						path="/sites/:siteId/apps/ap-tag/manage"
 						component={ApTag}
-					/>
+					/> */}
 
 					{/** Innovative Ads */}
-					<PrivateRoute
+					{/* <PrivateRoute
 						exact
 						customProps={{ activeTab: IA_NAV_ITEMS_INDEXES.CREATE_ADS }}
 						name="Innovative Ads"
@@ -135,10 +135,10 @@ const Routes = () => (
 						name="Manage"
 						path="/sites/:siteId/apps/innovative-ads/manage"
 						component={InnovativeAds}
-					/>
+					/> */}
 
 					{/* Manage Header Bidding */}
-					<PrivateRoute
+					{/* <PrivateRoute
 						exact
 						customProps={{ activeTab: HB_NAV_ITEMS_INDEXES.TAB_1 }}
 						name="Header Bidding"
@@ -172,7 +172,7 @@ const Routes = () => (
 						name="Optimization"
 						path={`/sites/:siteId/apps/header-bidding/${HB_NAV_ITEMS_INDEXES.TAB_5}`}
 						component={HeaderBidding}
-					/>
+					/> */}
 					<PrivateRoute exact name="Reports" path="/reports" component={Reporting} />
 
 					<PrivateRoute
