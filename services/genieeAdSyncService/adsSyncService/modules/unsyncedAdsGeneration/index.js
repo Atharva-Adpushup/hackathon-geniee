@@ -1,3 +1,5 @@
+const _ = require('lodash');
+
 module.exports = {
 	checkGenieeUnsyncedZones: function(variationId, variationName, section, ad) {
 		const isValidUnsyncedZone = !!(ad.network === 'geniee' && ad.networkData && !ad.networkData.zoneId);
@@ -163,7 +165,7 @@ module.exports = {
 						if (unsyncedAd) {
 							unsyncedAd.variations = [
 								{
-									variationId: variationId,
+									variationId: variationId, 
 									variationName: variationName,
 									platform: additionalInfo.platform,
 									pageGroup: additionalInfo.pageGroup
