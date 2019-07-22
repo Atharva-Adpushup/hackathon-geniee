@@ -110,6 +110,7 @@
 		"reactcss": "^1.0.3",
 		"redux": "^4.0.1",
 		"redux-thunk": "^2.3.0",
+		"request": "^2.88.0",
 		"request-promise": "^2.0.1",
 		"serve-favicon": "^2.5.0",
 		"simple-jade-parser": "0.0.4",

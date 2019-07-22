@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { PanelGroup, Panel } from 'react-bootstrap';
 
 import SiteBody from './SiteBody/index';
+import Empty from '../../../../Components/Empty/index';
 import { domanize } from '../../../../helpers/commonFunctions';
 
 class Sites extends Component {
@@ -19,6 +20,8 @@ class Sites extends Component {
 		const { sites, showNotification, saveSettings } = this.props;
 		const { activeKey } = this.state;
 		const siteIds = Object.keys(sites);
+
+		if (!siteIds.length) return <Empty message="Seems like you haven't added any website" />;
 
 		return (
 			<PanelGroup accordion id="sites-accordion" activeKey={activeKey} onSelect={this.handleSelect}>

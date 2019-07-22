@@ -1,5 +1,6 @@
 import React from 'react';
 import SelectBox from '../../../../../Components/SelectBox/index';
+import Empty from '../../../../../Components/Empty/index';
 import Content from './Content';
 
 class BackupAds extends React.Component {
@@ -25,8 +26,11 @@ class BackupAds extends React.Component {
 
 	render() {
 		const { currentSite, options } = this.state;
-		const { sites, showNotification } = this.props;
+		const { sites = {}, showNotification } = this.props;
 		const site = currentSite ? sites[currentSite] : null;
+		const hasSites = !!Object.keys(sites).length;
+
+		if (!hasSites) return <Empty message="Seems like you haven't added any website" />;
 
 		return (
 			<React.Fragment>
