@@ -181,8 +181,8 @@ class Dashboard extends React.Component {
 		if (reportType == 'account') {
 			const hasLayoutSite = this.getLayoutSites(sites, reportingSites);
 			if (hasLayoutSite.length > 0) return true;
-			return false;
 		}
+		return false;
 	};
 
 	renderControl(wid) {

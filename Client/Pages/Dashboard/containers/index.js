@@ -15,7 +15,8 @@ const mapStateToProps = (state, ownProps) => {
 		widget,
 		user,
 		reportingSites: site,
-		sites: sites.fetched ? sites.data : []
+		sites: sites.fetched ? sites.data : [],
+		reportType: 'account'
 	};
 };
 
