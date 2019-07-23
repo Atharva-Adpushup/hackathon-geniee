@@ -10,6 +10,7 @@ import UiList from '../../../Components/Layout/UiList';
 import CustomButton from '../../../Components/CustomButton/index';
 import ActionCard from '../../../Components/ActionCard/index';
 import SendCodeByEmailModal from '../../../Components/SendCodeByEmailModal';
+import Empty from '../../../Components/Empty';
 import { copyToClipBoard } from '../../../Apps/ApTag/lib/helpers';
 import siteService from '../../../services/siteService';
 import { errorHandler } from '../../../helpers/commonFunctions';
@@ -25,6 +26,14 @@ class SiteSettings extends Component {
 			}
 		} = props;
 		const siteData = props.sites[siteId];
+		const isSiteData = !!(
+			siteData &&
+			Object.keys(siteData).length &&
+			siteData.apConfigs &&
+			Object.keys(siteData.apConfigs).length &&
+			siteData.apConfigs.blocklist
+		);
+		const invalidSiteData = !isSiteData;
 
 		this.state = {
 			codeText: `<script data-cfasync="false" type="text/javascript">
@@ -37,7 +46,8 @@ class SiteSettings extends Component {
 </script>`,
 			siteData,
 			siteId,
-			showSendCodeByEmailModal: false
+			showSendCodeByEmailModal: false,
+			invalidSiteData
 		};
 	}
 
@@ -121,17 +131,16 @@ class SiteSettings extends Component {
 	renderRightPanel() {
 		const {
 			siteData: {
-				apConfigs: { blocklist }
+				apConfigs: { blocklist = [] }
 			}
 		} = this.state;
-		const computedBlocklist = blocklist || [];
 
 		return (
 			<div className="clearfix">
 				<h4 className="u-margin-t3 u-margin-b4 u-text-bold">Manage Blocklist</h4>
 				<p className="u-margin-b4">Block AdPushup ads on selected URLs of the website</p>
 				<UiList
-					itemCollection={computedBlocklist}
+					itemCollection={blocklist}
 					emptyCollectionPlaceHolder="No blocklist added"
 					inputPlaceholder="Enter comma separated URLs or URLs pattern to block AdPushup ads"
 					saveButtonText="Add"
@@ -147,17 +156,32 @@ class SiteSettings extends Component {
 		);
 	}
 
-	render() {
+	renderInvalidDataAlert = () => (
+		<Empty message="Seems like you have entered an invalid siteid in url. Please check." />
+	);
+
+	renderRootSplitScreen() {
 		return (
-			<ActionCard title="My Sites">
-				<SplitScreen
-					rootClassName="u-padding-h4 u-padding-v5"
-					leftChildren={this.renderLeftPanel()}
-					rightChildren={this.renderRightPanel()}
-					rightChildrenClassName="wrapper wrapper--blocklist"
-				/>
-			</ActionCard>
+			<SplitScreen
+				rootClassName="u-padding-h4 u-padding-v5"
+				leftChildren={this.renderLeftPanel()}
+				rightChildren={this.renderRightPanel()}
+				rightChildrenClassName="wrapper wrapper--blocklist"
+			/>
 		);
+	}
+
+	renderRootComponent() {
+		const { invalidSiteData } = this.state;
+		const computedComponent = invalidSiteData
+			? this.renderInvalidDataAlert()
+			: this.renderRootSplitScreen();
+
+		return computedComponent;
+	}
+
+	render() {
+		return <ActionCard title="My Sites">{this.renderRootComponent()}</ActionCard>;
 	}
 }
 
