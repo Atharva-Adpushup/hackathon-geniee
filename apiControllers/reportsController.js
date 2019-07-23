@@ -10,7 +10,7 @@ router
 	.get('/getCustomStats', (req, res) => {
 		const siteIds = req.query && req.query.siteid ? req.query.siteid : '';
 		if (siteIds)
-			request({
+			return request({
 				uri: `${CC.ANALYTICS_API_ROOT}${CC.REPORT_PATH}`,
 				json: true,
 				qs: req.query
