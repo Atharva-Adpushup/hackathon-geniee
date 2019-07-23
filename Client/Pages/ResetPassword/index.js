@@ -49,6 +49,7 @@ class ResetPassword extends Component {
 		this.setState(state => ({ [name]: { ...state[name], value } }));
 	};
 
+	// eslint-disable-next-line consistent-return
 	onInputBlur = e => {
 		const { name, value } = e.target;
 
@@ -117,6 +118,7 @@ class ResetPassword extends Component {
 			const { resetPasswordAction: resetPassword } = this.props;
 
 			resetPassword(email, key, password)
+				// eslint-disable-next-line no-unused-vars
 				.then(resp => {
 					this.setState(
 						() => ({
@@ -131,7 +133,8 @@ class ResetPassword extends Component {
 				.catch(({ response }) => {
 					const newState = { isResettingPassword: false };
 
-					if (response.status === 400) {
+					// eslint-disable-next-line no-prototype-builtins
+					if (response.status === 400 && response.data.hasOwnProperty('errors')) {
 						const errors = response.data.errors.reduce((accumulator, currValue) => ({
 							...accumulator,
 							...currValue
@@ -140,12 +143,14 @@ class ResetPassword extends Component {
 
 						for (let i = 0; i < errorKeys.length; i += 1) {
 							newState[errorKeys[i]] = {
+								// eslint-disable-next-line react/destructuring-assignment
 								...this.state[errorKeys[i]],
 								error: errors[errorKeys[i]]
 							};
 						}
 					}
-					if (response.status === 404) newState.error = response.data.error;
+					// eslint-disable-next-line no-prototype-builtins
+					if (response.data.hasOwnProperty('error')) newState.error = response.data.error;
 
 					this.setState(newState);
 				});
