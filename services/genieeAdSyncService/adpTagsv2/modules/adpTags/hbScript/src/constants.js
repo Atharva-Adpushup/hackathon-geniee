@@ -55,7 +55,8 @@ var constants = {
 		TIMEOUT: 3000,
 		BIDDER_SEQUENCE: 'random',
 		PRICE_GRANULARITY: 'dense',
-		VIDEO_FORMAT_TYPE: 'outstream'
+		VIDEO_FORMAT_TYPE: 'outstream',
+		DEFAULT_FORMATS: ['display']
 	},
 	AD_SIZE_MAPPING: {
 		IAB_SIZES: {
