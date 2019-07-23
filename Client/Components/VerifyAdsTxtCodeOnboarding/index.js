@@ -67,7 +67,8 @@ class VerifyAdsTxtCodeOnboarding extends Component {
 					() => ({
 						ourAdsTxt: '',
 						verifyingAdsTxt: false,
-						success: 'Ads.txt verified successfully. Redirecting to My Sites Page...'
+						success: 'Ads.txt verified successfully. Redirecting to My Sites Page...',
+						error: ''
 					}),
 					() => setTimeout(() => onComplete(), 3000)
 				)
@@ -105,7 +106,8 @@ class VerifyAdsTxtCodeOnboarding extends Component {
 					() => ({
 						ourAdsTxt: '',
 						skippingAdsTxtVerification: false,
-						success: 'Ads.txt verification skipped. Redirecting to My Sites Page...'
+						success: 'Ads.txt verification skipped. Redirecting to My Sites Page...',
+						error: ''
 					}),
 					() => setTimeout(() => onComplete(), 3000)
 				)

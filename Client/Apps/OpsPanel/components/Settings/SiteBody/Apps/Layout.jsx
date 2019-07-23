@@ -10,9 +10,17 @@ import CustomMessage from '../../../../../../Components/CustomMessage/index';
 import CustomButton from '../../../../../../Components/CustomButton/index';
 
 class Layout extends Component {
-	state = {
-		loading: false
-	};
+	constructor(props) {
+		super(props);
+		const {
+			site: { apps = {} }
+		} = props;
+		const status = Object.prototype.hasOwnProperty.call(apps, 'layout') ? apps.layout : undefined;
+		this.state = {
+			loading: false,
+			status
+		};
+	}
 
 	componentDidMount() {
 		const { site, fetchChannelsInfo } = this.props;

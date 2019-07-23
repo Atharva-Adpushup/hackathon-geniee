@@ -100,7 +100,7 @@ const Routes = () => (
 					{/** App Layout */}
 					<PrivateRoute
 						exact
-						name="Layout Editor"
+						name="Transform Code"
 						path="/sites/:siteId/apps/layout"
 						component={Layout}
 					/>
