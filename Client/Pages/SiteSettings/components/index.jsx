@@ -30,8 +30,7 @@ class SiteSettings extends Component {
 			siteData &&
 			Object.keys(siteData).length &&
 			siteData.apConfigs &&
-			Object.keys(siteData.apConfigs).length &&
-			siteData.apConfigs.blocklist
+			Object.keys(siteData.apConfigs).length
 		);
 		const invalidSiteData = !isSiteData;
 
