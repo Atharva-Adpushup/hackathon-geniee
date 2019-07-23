@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { sortBy,isEmpty } from 'lodash';
+import { sortBy, isEmpty } from 'lodash';
 import { Link } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -207,6 +207,7 @@ class Dashboard extends React.Component {
 						<SelectBox
 							id="performance-date"
 							wrapperClassName="display-inline"
+							pullRight
 							isClearable={false}
 							isSearchable={false}
 							selected={selectedDate}
@@ -229,6 +230,7 @@ class Dashboard extends React.Component {
 						<SelectBox
 							id="performance-site"
 							isClearable={false}
+							pullRight
 							isSearchable={false}
 							wrapperClassName="display-inline"
 							selected={selectedSite}
