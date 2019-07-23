@@ -72,7 +72,7 @@ const getDuplicatesInArray = array =>
 	array.reduce(
 		(accumulator, value) => {
 			const isValueInObject = !!(
-				Object.prototype.hasOwnProperty.call(accumulator, value) && accumulator.object[value]
+				Object.prototype.hasOwnProperty.call(accumulator.object, value) && accumulator.object[value]
 			);
 			const isValueInArray = !!accumulator.duplicates.includes(value);
 
