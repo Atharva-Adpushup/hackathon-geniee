@@ -168,33 +168,26 @@ class Dashboard extends React.Component {
 		return layoutSites;
 	};
 
-	renderViewReportButton(wid) {
-		const { widgetsConfig } = this.state;
-		const { startDate, endDate, selectedSite, selectedDimension } = widgetsConfig[wid];
-		const { reportType, siteId } = this.props;
-		let siteSelected;
-		if (reportType === 'site') siteSelected = siteId;
-		else if (selectedSite != 'all') siteSelected = selectedSite;
-		return (
-			<Link
-				to={
-					siteSelected
-						? `/reports/${siteSelected}?fromDate=${startDate}&toDate=${endDate}&dimension=${selectedDimension}`
-						: `/reports?fromDate=${startDate}&toDate=${endDate}&dimension=${selectedDimension}`
-				}
-				className="u-link-reset aligner aligner-item float-right"
-			>
-				<Button className="aligner-item aligner aligner--vCenter">
-					View Reports
-					<FontAwesomeIcon icon="chart-area" className="u-margin-l2" />
-				</Button>
-			</Link>
-		);
-	}
+	showApBaselineWidget = () => {
+		const { siteId, reportType, reportingSites } = this.props;
+		const { sites } = this.state;
+		if (
+			reportType == 'site' &&
+			reportingSites &&
+			reportingSites[siteId] &&
+			reportingSites[siteId].product.Layout == 1
+		)
+			return true;
+		if (reportType == 'account') {
+			const hasLayoutSite = this.getLayoutSites(sites, reportingSites);
+			if (hasLayoutSite.length > 0) return true;
+			return false;
+		}
+	};
 
 	renderControl(wid) {
-		const { reportType } = this.props;
-		const { widgetsConfig, quickDates, sites, reportingSites } = this.state;
+		const { reportType, reportingSites } = this.props;
+		const { widgetsConfig, quickDates, sites } = this.state;
 		const { selectedDate, selectedSite, name } = widgetsConfig[wid];
 		const layoutSites = reportingSites ? this.getLayoutSites(sites, reportingSites) : [];
 		const sitesToShow = name == 'per_ap_original' ? layoutSites : sites;
@@ -250,20 +243,38 @@ class Dashboard extends React.Component {
 		);
 	}
 
+	renderViewReportButton(wid) {
+		const { widgetsConfig } = this.state;
+		const { startDate, endDate, selectedSite, selectedDimension } = widgetsConfig[wid];
+		const { reportType, siteId } = this.props;
+		let siteSelected;
+		if (reportType === 'site') siteSelected = siteId;
+		else if (selectedSite != 'all') siteSelected = selectedSite;
+		return (
+			<Link
+				to={
+					siteSelected
+						? `/reports/${siteSelected}?fromDate=${startDate}&toDate=${endDate}&dimension=${selectedDimension}`
+						: `/reports?fromDate=${startDate}&toDate=${endDate}&dimension=${selectedDimension}`
+				}
+				className="u-link-reset aligner aligner-item float-right"
+			>
+				<Button className="aligner-item aligner aligner--vCenter">
+					View Reports
+					<FontAwesomeIcon icon="chart-area" className="u-margin-l2" />
+				</Button>
+			</Link>
+		);
+	}
+
 	renderContent = () => {
 		const { widgetsConfig } = this.state;
-		const { reportingSites, reportType, siteId } = this.props;
 		const content = [];
+		const hasLayoutSite = this.showApBaselineWidget();
 		Object.keys(widgetsConfig).forEach(wid => {
 			const widget = widgetsConfig[wid];
 			const widgetComponent = this.getWidgetComponent(widget);
-			if (
-				widget.name != 'per_ap_original' ||
-				reportType != 'site' ||
-				!reportingSites ||
-				!reportingSites[siteId] ||
-				reportingSites[siteId].product.Layout == 1
-			)
+			if ((widget.name == 'per_ap_original' && hasLayoutSite) || widget.name != 'per_ap_original')
 				content.push(
 					<Card
 						rootClassName={
