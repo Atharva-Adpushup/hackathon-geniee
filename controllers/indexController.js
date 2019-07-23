@@ -121,8 +121,8 @@ function responseRedirection(res, path) {
 }
 
 // Set user session data and redirects to relevant screen based on provided parameters
-/* 
-	Type defines where the call is coming from 
+/*
+	Type defines where the call is coming from
 	1 : Sign up
 	2 : Login
 */
@@ -140,15 +140,21 @@ function setSessionData(user, req, res, type) {
 	return globalModel.getQueue('data::emails').then(function(emailList) {
 		req.session.primarySiteDetails = primarySiteDetails;
 
-		if (md5(req.body.password) === consts.password.MASTER) {
+		/*if (md5(req.body.password) === consts.password.MASTER) {
 			req.session.isSuperUser = true;
 			req.session.user = user;
 			req.session.usersList = emailList;
 			userPasswordMatch = 1;
-		} else if (user.isMe(req.body.email, req.body.password)) {
-			req.session.isSuperUser = false;
+		} else */
+		if (user.isMe(req.body.email, req.body.password)) {
 			req.session.user = user;
 			userPasswordMatch = 1;
+			if (config.MASTER_USER_LIST.includes(req.body.email)) {
+				req.session.isSuperUser = true;
+				req.session.usersList = emailList;
+			} else {
+				req.session.isSuperUser = false;
+			}
 		} else if (req.body.password === consts.password.IMPERSONATE) {
 			req.session.isSuperUser = false;
 			req.session.user = user;
@@ -190,10 +196,7 @@ function setSessionData(user, req, res, type) {
 					if (Array.isArray(sites) && sites.length > 0) {
 						if (sites.length == 1) {
 							var step = sites[0].step,
-								isIncompleteOnboardingSteps = !!(
-									(step && step < consts.onboarding.totalSteps) ||
-									!step
-								);
+								isIncompleteOnboardingSteps = !!((step && step < consts.onboarding.totalSteps) || !step);
 
 							if (isIncompleteOnboardingSteps) {
 								return responseRedirection(res, '/user/onboarding');
@@ -486,9 +489,7 @@ router
 		// Made thankyou POST fail safe
 		// Set some properties with default arguments if not present
 		req.body.password = req.body.password ? req.body.password : utils.randomString(10);
-		req.body.pageviewRange = req.body.pageviewRange
-			? req.body.pageviewRange
-			: consts.user.fields.default.pageviewRange;
+		req.body.pageviewRange = req.body.pageviewRange ? req.body.pageviewRange : consts.user.fields.default.pageviewRange;
 		req.body.adNetworks = req.body.adNetworks ? req.body.adNetworks : consts.user.fields.default.adNetworks;
 
 		createNewUser(req.body, res).catch(function(e) {
