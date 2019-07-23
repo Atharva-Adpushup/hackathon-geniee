@@ -60,6 +60,11 @@ const yAxisGroups = [
 		}
 	}
 ];
+
+const activeLegendItemArray = [
+	{ value: 'adpushup_variation_page_cpm', name: 'AdPushup Variation Page RPM', valueType: 'money' },
+	{ value: 'original_variation_page_cpm', name: 'Original Variation Page RPM', valueType: 'number' }
+];
 const tableHeader = [
 	{ title: 'Website', prop: 'siteName' },
 	{ title: 'AdPushup Page views', prop: 'adpushup_page_views' },
@@ -96,5 +101,6 @@ export {
 	yAxisGroups,
 	tableHeader,
 	displayMetrics,
-	dashboardWidgets
+	dashboardWidgets,
+	activeLegendItemArray
 };
