@@ -34,6 +34,7 @@ already have one. Else please follow the intsructions provided here :
 <a
 	className="u-text-underline"
 	href="https://support.google.com/admanager/answer/7441288?hl=en"
+	target="_blank"
 >
 	https://support.google.com/admanager/answer/7441288?hl=en
 </a>.

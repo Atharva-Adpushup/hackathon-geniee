@@ -43,7 +43,7 @@ class AdsTxtManager extends Component {
 			});
 		});
 	}
-	
+
 	getSitesAdstxtStatus = () => {
 		const { sites, adsTxt } = this.props;
 		const promiseSerial = funcs =>
@@ -157,7 +157,7 @@ class AdsTxtManager extends Component {
 			</Modal>
 		);
 	};
-	
+
 	toggleShowSendCodeByEmailModal = () => {
 		this.setState(state => ({ showSendCodeByEmailModal: !state.showSendCodeByEmailModal }));
 	};
@@ -293,6 +293,7 @@ class AdsTxtManager extends Component {
 				return this.renderSnippetTextarea();
 		}
 	};
+
 	getActiveTab = () => {
 		const {
 			customProps: { activeTab }
