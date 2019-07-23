@@ -19,15 +19,17 @@ const ADSTXT_NAV_ITEMS = {
 	}
 };
 
-const BONUS_MESSAGE = `<strong>Bonus: </strong> Manage ads.txt for all yourpartners with AdPushup&#8217;s 
+const BONUS_MESSAGE = `<strong>Bonus: </strong> Manage ads.txt for all your partners with AdPushup&#8217;s 
 <a
 	className="u-text-underline"
 	href="http://manageadstxt.com/?utm_source=adpushup&utm_medium=ads.txt_management"
+	target="_blank"
 >
 	ads.txt management solution
 </a>
-.`,
-	NOTE_MESSAGE = `<strong>Note: </strong> Ads.txt is mandatory. It needs to be updated incase you
+.`;
+
+const NOTE_MESSAGE = `<strong>Note: </strong> Ads.txt is mandatory. It needs to be updated incase you
 already have one. Else please follow the intsructions provided here :
 <a
 	className="u-text-underline"
