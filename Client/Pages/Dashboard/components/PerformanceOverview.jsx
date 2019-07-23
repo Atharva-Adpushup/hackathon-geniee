@@ -11,7 +11,7 @@ class PerformanceOverview extends React.Component {
 	}
 
 	componentDidMount() {
-		let { displayData } = this.props;
+		const { displayData } = this.props;
 		this.computeData(displayData);
 	}
 
@@ -43,22 +43,21 @@ class PerformanceOverview extends React.Component {
 		const { displayData } = this.state;
 		return (
 			<div className="u-margin-t4 u-margin-b4">
-				{Object.keys(displayData).map(key => {
-					console.log(displayMetrics);
-					return displayMetrics[key] ? (
+				{Object.keys(displayData).map(key =>
+					displayMetrics[key] ? (
 						<div className="col-sm-4 u-margin-b4 text-center" key={key}>
 							<div className="font-small">{displayData[key].name}</div>
 							<div className="estimatedEarning">
 								<span>
-									{displayMetrics[key]['valueType'] == 'money' ? '$' : ''}
+									{displayMetrics[key].valueType == 'money' ? '$' : ''}
 									{numberWithCommas(Math.round(displayData[key].value * 100) / 100)}
 								</span>
 							</div>
 						</div>
 					) : (
 						''
-					);
-				})}
+					)
+				)}
 			</div>
 		);
 	}

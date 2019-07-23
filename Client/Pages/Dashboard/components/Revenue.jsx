@@ -9,7 +9,7 @@ class SitewiseReport extends React.Component {
 	};
 
 	componentDidMount() {
-		let { displayData } = this.props;
+		const { displayData } = this.props;
 		this.computeGraphData(displayData.result);
 	}
 

@@ -9,19 +9,19 @@ class SitewiseReport extends React.Component {
 	};
 
 	componentDidMount() {
-		let { displayData } = this.props;
+		const { displayData } = this.props;
 		this.computeTableData(displayData);
 	}
 
 	formatTableData = tableBody => {
 		const { metrics } = this.props;
 		tableBody.forEach(row => {
-			for (let col in row) {
+			for (const col in row) {
 				if (metrics[col]) {
-					let num = row[col];
+					const num = row[col];
 					row[col] =
-						metrics[col]['valueType'] == 'money'
-							? '$' + numberWithCommas(num.toFixed(2))
+						metrics[col].valueType == 'money'
+							? `$${numberWithCommas(num.toFixed(2))}`
 							: numberWithCommas(num);
 				}
 			}
@@ -55,8 +55,8 @@ class SitewiseReport extends React.Component {
 		tableHeader.sort((a, b) => a.position - b.position);
 		result.forEach(row => {
 			const { siteid } = row;
-			row['siteName'] = site[siteid]
-				? React.cloneElement(<a href={`/reports/${siteid}`}>{site[siteid]['siteName']}</a>)
+			row.siteName = site[siteid]
+				? React.cloneElement(<a href={`/reports/${siteid}`}>{site[siteid].siteName}</a>)
 				: 'Not Found';
 		});
 		this.formatTableData(result);

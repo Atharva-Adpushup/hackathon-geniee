@@ -87,7 +87,7 @@ const defaultChartConfig = {
 	]
 };
 
-function getGroupedYAxisAndSeries(chartType, yAxisGroups, existingSeries) {
+function getGroupedYAxisAndSeries(chartType, existingSeries) {
 	const yAxis = [];
 	const seriesForChart = [];
 	let colorIndex = 0;
@@ -135,67 +135,6 @@ function getGroupedYAxisAndSeries(chartType, yAxisGroups, existingSeries) {
 		seriesForChart.push(singleSeries);
 		colorIndex += 1;
 	});
-
-	// for (i = 0; i < len1; i += 1) {
-	// 	const yAxisGroup = yAxisGroups[i];
-	// 	const yAxisGroupNameArray = [];
-	// 	let yAxisGroupForChart = {};
-
-	// 	if (yAxisGroup.seriesNames && yAxisGroup.seriesNames.length) {
-	// 		let j;
-	// 		const len2 = yAxisGroup.seriesNames.length;
-
-	// 		for (j = 0; j < len2; j += 1) {
-	// 			const yAxisGroupSeriesName = yAxisGroup.seriesNames[j];
-	// 			const index = existingSeries.findIndex(
-	// 				singleSeries => singleSeries.name === yAxisGroupSeriesName
-	// 			);
-
-	// 			if (index !== -1) {
-	// 				yAxisGroupNameArray.push(yAxisGroupSeriesName);
-
-	// 				const singleSeries = {
-	// 					type: chartType === 'spline' ? 'spline' : 'line',
-	// 					lineWidth: 1.5,
-	// 					_colorIndex: colorIndex,
-	// 					...existingSeries[index],
-	// 					yAxis: i,
-	// 					tooltip: {
-	// 						useHTML: true,
-	// 						headerFormat: '<span style="font-size:14px;font-weight:bold">{point.key}</span><br/>',
-	// 						pointFormatter: () => {
-	// 							const point = this;
-	// 							const num = Math.round(point.y * 100) / 100;
-	// 							return `<span style="color:${point.color}">\u25CF</span> ${point.series.name}: <b>${
-	// 								point.series.userOptions.valueType === 'money' ? '$' : ''
-	// 							}${numberWithCommas(num)}</b><br/>`;
-	// 						}
-	// 					}
-	// 				};
-
-	// 				seriesForChart.push(singleSeries);
-
-	// 				colorIndex += 1;
-	// 			}
-	// 		}
-	// 	}
-
-	// 	if (yAxisGroupNameArray.length) {
-	// 		yAxisGroupForChart.title = { text: yAxisGroupNameArray.join(' / ') };
-	// 		// yAxisGroupForChart.tickPositioner = tickPositioner;
-	// 		yAxisGroupForChart.index = i;
-	// 		yAxisGroupForChart.opposite = i > 0;
-
-	// 		if (yAxisGroup.yAxisConfig) {
-	// 			yAxisGroupForChart = {
-	// 				...yAxisGroupForChart,
-	// 				...yAxisGroup.yAxisConfig
-	// 			};
-	// 		}
-
-	// 		yAxis.push(yAxisGroupForChart);
-	// 	}
-	// }
 
 	return { yAxis, seriesForChart };
 }
@@ -276,11 +215,7 @@ export function getCustomChartConfig(
 
 			// Set yAxis Groups for Line Chart
 			if (yAxisGroups && yAxisGroups.length) {
-				const { yAxis, seriesForChart } = getGroupedYAxisAndSeries(
-					type,
-					yAxisGroups,
-					chartConfig.series
-				);
+				const { yAxis, seriesForChart } = getGroupedYAxisAndSeries(type, chartConfig.series);
 				if (yAxis.length && seriesForChart.length) {
 					chartConfig.yAxis = yAxis;
 					chartConfig.series = seriesForChart;
@@ -309,11 +244,7 @@ export function getCustomChartConfig(
 
 			// Set yAxis Groups for Line Chart
 			if (yAxisGroups && yAxisGroups.length) {
-				const { yAxis, seriesForChart } = getGroupedYAxisAndSeries(
-					type,
-					yAxisGroups,
-					chartConfig.series
-				);
+				const { yAxis, seriesForChart } = getGroupedYAxisAndSeries(type, chartConfig.series);
 				if (yAxis.length && seriesForChart.length) {
 					chartConfig.yAxis = yAxis;
 					chartConfig.series = seriesForChart;

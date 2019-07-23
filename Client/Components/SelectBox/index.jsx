@@ -92,12 +92,12 @@ class SelectBox extends Component {
 		const buttonTitle = selected === 0 || selected ? selectedTitle : title;
 		const tooltip = <Tooltip id="tooltip">Please select a website.</Tooltip>;
 		return (
-			<div className={`custom-select-box-wrapper ${wrapperClassName}`}>
+			<div className={wrapperClassName}>
 				<DropdownButton
 					title={buttonTitle}
 					bsStyle={type}
-					className={`custom-select-box ${dropdownClassName}`}
-					id={id}
+					pullRight
+					id="split-button-pull-right"
 					onSelect={this.selectWrapper}
 				>
 					{options.map((option, key) => {
