@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { numberWithCommas } from '../helpers/utils';
 
 function EstimatedEarnings(props) {
-	let { displayData } = props;
+	const { displayData } = props;
 	const {
 		yesterday,
 		sameDayLastWeek,
@@ -108,7 +108,6 @@ function EstimatedEarnings(props) {
 			</div>
 		</div>
 	);
-	//}
 }
 
 export default EstimatedEarnings;
