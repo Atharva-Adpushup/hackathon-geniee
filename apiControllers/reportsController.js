@@ -7,18 +7,21 @@ const utils = require('../helpers/utils');
 const router = express.Router();
 
 router
-	.get('/getCustomStats', (req, res) =>
-		request({
-			uri: `${CC.ANALYTICS_API_ROOT}${CC.REPORT_PATH}`,
-			json: true,
-			qs: req.query
-		})
-			.then(response => {
-				if (response.code == 1) return res.send(response.data);
-				return res.send({});
+	.get('/getCustomStats', (req, res) => {
+		const siteIds = req.query && req.query.siteid ? req.query.siteid : '';
+		if (siteIds)
+			request({
+				uri: `${CC.ANALYTICS_API_ROOT}${CC.REPORT_PATH}`,
+				json: true,
+				qs: req.query
 			})
-			.catch(err => res.send({}))
-	)
+				.then(response => {
+					if (response.code == 1) return res.send(response.data);
+					return res.send({});
+				})
+				.catch(err => res.send({}));
+		return res.send({});
+	})
 	.get('/getWidgetData', (req, res) => {
 		const reqParams = req.query.params ? JSON.parse(req.query.params) : {};
 		const siteIds = reqParams.siteid;
