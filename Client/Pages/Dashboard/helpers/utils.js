@@ -3,9 +3,9 @@ import moment from 'moment';
 const convertObjToArr = obj =>
 	Object.keys(obj).map(key => {
 		const newObj = {};
-		newObj.name = obj[key].siteName;
-		newObj['product'] = obj[key]['product'];
-		newObj['isTopPerforming'] = obj[key]['isTopPerforming'];
+		newObj.name = obj[key].siteDomain;
+		// newObj.product = obj[key].product;
+		// newObj.isTopPerforming = obj[key].isTopPerforming;
 		newObj.value = key;
 		return newObj;
 	});
@@ -47,8 +47,6 @@ const getDateRange = value => {
 	}
 };
 
-const numberWithCommas = x => {
-	return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-};
+const numberWithCommas = x => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
 export { convertObjToArr, getDateRange, numberWithCommas };
