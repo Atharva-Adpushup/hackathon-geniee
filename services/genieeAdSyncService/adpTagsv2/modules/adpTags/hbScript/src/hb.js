@@ -14,9 +14,7 @@ var hb = {
 		adpSlotsBatch.forEach(function(adpSlot) {
 			var responsiveSizes = [];
 			if (adpSlot.isResponsive) {
-				responsiveSizes = responsiveAds.getAdSizes(
-					adpSlot.optionalParam.adId
-				).collection;
+				responsiveSizes = responsiveAds.getAdSizes(adpSlot.optionalParam.adId).collection;
 				adpSlot.computedSizes = responsiveSizes;
 			}
 
@@ -25,26 +23,21 @@ var hb = {
 			}
 
 			var size = adpSlot.size;
-			var computedSizes = adpSlot.isResponsive
-				? responsiveSizes
-				: adpSlot.computedSizes;
+			var computedSizes = adpSlot.isResponsive ? responsiveSizes : adpSlot.computedSizes;
 			var prebidSizes = computedSizes.length ? computedSizes : [size];
-			if (
-				adpSlot.optionalParam.overrideActive &&
-				adpSlot.optionalParam.overrideSizeTo
-			) {
+			if (adpSlot.optionalParam.overrideActive && adpSlot.optionalParam.overrideSizeTo) {
 				size = adpSlot.optionalParam.overrideSizeTo.split('x');
 			}
 
 			var computedBidders = adpSlot.bidders.slice();
 			var sizeConfig = config.INVENTORY.deviceConfig.sizeConfig;
 
-			computedBidders.forEach(function (val, i) { 
+			computedBidders.forEach(function(val, i) {
 				// find size config of current bidder
 				var index;
-				for (index = 0; index < sizeConfig.length; index++){
+				for (index = 0; index < sizeConfig.length; index++) {
 					var element = sizeConfig[index];
-					if(element.bidder === val.bidder) {
+					if (element.bidder === val.bidder) {
 						break;
 					}
 				}
@@ -53,17 +46,15 @@ var hb = {
 				if (!isNaN(index) && sizeConfig[index]) {
 					computedBidders[i].labelAny = sizeConfig[index].labels;
 				}
-
 			});
-			
 
 			var prebidSlot = {
 				code: adpSlot.containerId,
 				mediaTypes: {},
 				bids: computedBidders
-			}
+			};
 
-			adpSlot.formats.forEach(function (format) {
+			adpSlot.formats.forEach(function(format) {
 				switch (format) {
 					case 'display': {
 						prebidSlot.mediaTypes.banner = { sizes: prebidSizes };
@@ -79,7 +70,7 @@ var hb = {
 					case 'native': {
 						// TODO: add native format in prebid config
 						break;
-					}					
+					}
 				}
 			});
 
@@ -96,9 +87,7 @@ var hb = {
 				console.log('===BidWon====', bidData);
 
 				var slot = window.adpushup.adpTags.adpSlots[bidData.adUnitCode];
-				var computedCPMValue = utils.currencyConversionActive(
-					adp.config
-				)
+				var computedCPMValue = utils.currencyConversionActive(adp.config)
 					? 'originalCpm'
 					: 'cpm';
 
