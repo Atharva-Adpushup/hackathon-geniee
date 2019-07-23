@@ -21,7 +21,7 @@ const CustomMessage = props => {
 
 	return visible ? (
 		<div
-			className={`custom-message u-margin-b2 u-padding-v4 u-padding-h3 ${classNames} ${rootClassNames}`}
+			className={`custom-message u-margin-b4 u-padding-v4 u-padding-h3 ${classNames} ${rootClassNames}`}
 		>
 			<h3 className="aligner aligner--row u-padding-h4 u-text-bold u-margin-0">
 				<span className="aligner-item aligner aligner--hStart">{header}</span>
