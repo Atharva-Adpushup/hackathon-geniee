@@ -1,4 +1,13 @@
 /*****Normalize bootstrap CSS according to our product*****/
+a {
+	color: #1f91de;
+}
+
+a > button.btn {
+	color: inherit;
+	border: none;
+	background: none;
+}
 .list-group-item {
 	&.is-active {
 		border: 1px solid $borderColor;
@@ -12,18 +21,22 @@
 }
 
 .breadcrumb {
-	background: $whiteColor;
-	border: 1px solid $borderColor;
-	border-radius: $numberZero;
-	box-shadow: $boxShadowThree;
-	color: $primaryColor;
-	margin: 0;
+	background-color: transparent;
+	margin: 0 0 10px;
+	padding: 0;
+
+	> li + li:before {
+		padding: 0 5px;
+		color: #ccc;
+		content: '> ';
+	}
 
 	.breadcrumb-item {
-		font-size: $designDimensionMD;
+		font-size: 1.8rem;
+		color: inherit;
 
-		a {
-			color: $primaryColor;
-		}
+		// a {
+		// 	color: $primaryColor;
+		// }
 	}
 }

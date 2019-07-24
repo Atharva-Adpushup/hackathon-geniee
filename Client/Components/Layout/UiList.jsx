@@ -480,12 +480,12 @@ class UiList extends React.Component {
 		const actionInputGroup = this.renderActionInputGroup();
 
 		return (
-			<Row className={computedRootClassName}>
+			<div className={computedRootClassName}>
 				<Col className="u-margin-0 u-padding-0 layout-uiList-cols">
 					{actionInputGroup}
 					{uiListItems}
 				</Col>
-			</Row>
+			</div>
 		);
 	}
 }
