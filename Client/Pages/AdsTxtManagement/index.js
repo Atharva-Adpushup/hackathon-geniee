@@ -58,24 +58,30 @@ class AdsTxtManager extends Component {
 									result = {
 										domain: sites[site].siteDomain,
 										statusText: 'Entries Upto Date',
-										adsTxt: res.data.ourAdsTxt,
 										status: res.status
 									};
-								else {
+								else if (res.status === 204)
 									result = {
 										domain: sites[site].siteDomain,
 										statusText: res.statusText,
 										adsTxt,
 										status: res.status
 									};
+								else {
+									result = {
+										domain: sites[site].siteDomain,
+										statusText: res.statusText,
+										adsTxt: res.data.ourAdsTxt,
+										status: res.status
+									};
 								}
 								return all.concat(result);
 							})
-							.catch(() => {
+							.catch(error => {
 								const result = {
 									domain: sites[site].siteDomain,
 									statusText: 'No Ads.txt Found',
-									adsTxt,
+									adsTxt: error.response.data.ourAdsTxt,
 									status: 400
 								};
 								return all.concat(result);
