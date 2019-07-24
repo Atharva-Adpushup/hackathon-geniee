@@ -27,7 +27,8 @@ function getState(props) {
 
 	return {
 		pagegroups,
-		siteDomain: props.site.siteDomain
+		siteDomain: props.site.siteDomain,
+		showSpinner: false
 	};
 }
 class Pagegroups extends React.Component {
@@ -89,6 +90,9 @@ class Pagegroups extends React.Component {
 				this.setState(state => {
 					const urls = state.pagegroups[pagegroup] ? state.pagegroups[pagegroup].urls : {};
 					const currentUrl = urls[index] || {};
+
+					if (!value) currentUrl.icon = ICONS[0];
+
 					return {
 						...state,
 						pagegroups: {
@@ -120,6 +124,8 @@ class Pagegroups extends React.Component {
 	};
 
 	handleVerify = () => {
+		this.setState({ showSpinner: true });
+
 		const { pagegroups } = this.state;
 		const channels = Object.keys(pagegroups);
 
@@ -153,12 +159,12 @@ class Pagegroups extends React.Component {
 			});
 		});
 
-		this.setState({ pagegroups });
+		this.setState({ pagegroups, showSpinner: false });
 	};
 
 	render() {
 		const { site } = this.props;
-		const { pagegroups } = this.state;
+		const { pagegroups, showSpinner } = this.state;
 		const { apConfigs: { pageGroupPattern = {} } = {} } = site;
 		const keys = Object.keys(pageGroupPattern);
 
@@ -228,6 +234,7 @@ class Pagegroups extends React.Component {
 					type="submit"
 					className="pull-right u-margin-b2 u-margin-r4"
 					onClick={this.handleVerify}
+					showSpinner={showSpinner}
 				>
 					Verify
 				</CustomButton>

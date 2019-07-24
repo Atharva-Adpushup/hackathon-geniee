@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { sortBy,isEmpty } from 'lodash';
+import { sortBy, isEmpty } from 'lodash';
 import { Link } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -168,6 +168,81 @@ class Dashboard extends React.Component {
 		return layoutSites;
 	};
 
+	showApBaselineWidget = () => {
+		const { siteId, reportType, reportingSites } = this.props;
+		const { sites } = this.state;
+		if (
+			reportType == 'site' &&
+			reportingSites &&
+			reportingSites[siteId] &&
+			reportingSites[siteId].product.Layout == 1
+		)
+			return true;
+		if (reportType == 'account') {
+			const hasLayoutSite = this.getLayoutSites(sites, reportingSites);
+			if (hasLayoutSite.length > 0) return true;
+		}
+		return false;
+	};
+
+	renderControl(wid) {
+		const { reportType, reportingSites } = this.props;
+		const { widgetsConfig, quickDates, sites } = this.state;
+		const { selectedDate, selectedSite, name } = widgetsConfig[wid];
+		const layoutSites = reportingSites ? this.getLayoutSites(sites, reportingSites) : [];
+		const sitesToShow = name == 'per_ap_original' ? layoutSites : sites;
+		return (
+			<div className="aligner aligner--hEnd">
+				{name !== 'estimated_earnings' ? (
+					<div className="u-margin-r4">
+						{/* eslint-disable */}
+						<label className="u-text-normal u-margin-r2">Quick Dates</label>
+						<SelectBox
+							id="performance-date"
+							wrapperClassName="display-inline"
+							pullRight
+							isClearable={false}
+							isSearchable={false}
+							selected={selectedDate}
+							options={quickDates}
+							onSelect={date => {
+								widgetsConfig[wid]['selectedDate'] = date;
+								this.setState({ widgetsConfig }, () => this.getDisplayData(wid));
+							}}
+						/>
+
+						{/* eslint-enable */}
+					</div>
+				) : (
+					''
+				)}
+				{reportType !== 'site' && name !== 'per_site_wise' ? (
+					<div className="u-margin-r4">
+						{/* eslint-disable */}
+						<label className="u-text-normal u-margin-r2">Website</label>
+						<SelectBox
+							id="performance-site"
+							isClearable={false}
+							pullRight
+							isSearchable={false}
+							wrapperClassName="display-inline"
+							selected={selectedSite}
+							options={sitesToShow}
+							onSelect={site => {
+								widgetsConfig[wid]['selectedSite'] = site;
+								this.setState({ widgetsConfig }, () => this.getDisplayData(wid));
+							}}
+						/>
+
+						{/* eslint-enable */}
+					</div>
+				) : (
+					''
+				)}
+			</div>
+		);
+	}
+
 	renderViewReportButton(wid) {
 		const { widgetsConfig } = this.state;
 		const { startDate, endDate, selectedSite, selectedDimension } = widgetsConfig[wid];
@@ -192,76 +267,14 @@ class Dashboard extends React.Component {
 		);
 	}
 
-	renderControl(wid) {
-		const { reportType } = this.props;
-		const { widgetsConfig, quickDates, sites, reportingSites } = this.state;
-		const { selectedDate, selectedSite, name } = widgetsConfig[wid];
-		const layoutSites = reportingSites ? this.getLayoutSites(sites, reportingSites) : [];
-		const sitesToShow = name == 'per_ap_original' ? layoutSites : sites;
-		return (
-			<div className="aligner aligner--hEnd">
-				{name !== 'estimated_earnings' ? (
-					<div className="u-margin-r4">
-						{/* eslint-disable */}
-						<label className="u-text-normal u-margin-r2">Quick Dates</label>
-						<SelectBox
-							id="performance-date"
-							wrapperClassName="display-inline"
-							isClearable={false}
-							isSearchable={false}
-							selected={selectedDate}
-							options={quickDates}
-							onSelect={date => {
-								widgetsConfig[wid]['selectedDate'] = date;
-								this.setState({ widgetsConfig }, () => this.getDisplayData(wid));
-							}}
-						/>
-
-						{/* eslint-enable */}
-					</div>
-				) : (
-					''
-				)}
-				{reportType !== 'site' && name !== 'per_site_wise' ? (
-					<div className="u-margin-r4">
-						{/* eslint-disable */}
-						<label className="u-text-normal u-margin-r2">Website</label>
-						<SelectBox
-							id="performance-site"
-							isClearable={false}
-							isSearchable={false}
-							wrapperClassName="display-inline"
-							selected={selectedSite}
-							options={sitesToShow}
-							onSelect={site => {
-								widgetsConfig[wid]['selectedSite'] = site;
-								this.setState({ widgetsConfig }, () => this.getDisplayData(wid));
-							}}
-						/>
-
-						{/* eslint-enable */}
-					</div>
-				) : (
-					''
-				)}
-			</div>
-		);
-	}
-
 	renderContent = () => {
 		const { widgetsConfig } = this.state;
-		const { reportingSites, reportType, siteId } = this.props;
 		const content = [];
+		const hasLayoutSite = this.showApBaselineWidget();
 		Object.keys(widgetsConfig).forEach(wid => {
 			const widget = widgetsConfig[wid];
 			const widgetComponent = this.getWidgetComponent(widget);
-			if (
-				widget.name != 'per_ap_original' ||
-				reportType != 'site' ||
-				!reportingSites ||
-				!reportingSites[siteId] ||
-				reportingSites[siteId].product.Layout == 1
-			)
+			if ((widget.name == 'per_ap_original' && hasLayoutSite) || widget.name != 'per_ap_original')
 				content.push(
 					<Card
 						rootClassName={
