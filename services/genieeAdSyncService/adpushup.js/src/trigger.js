@@ -111,7 +111,7 @@ var adp = window.adpushup,
 							});
 						} else {
 							// Send feedback call
-							utils.sendFeedback(feedbackData);
+							// utils.sendFeedback(feedbackData);
 							utils.sendFeedbackOld(oldFeedbackData);
 							// Place the ad in the container
 							return placeAd(container, ad);
