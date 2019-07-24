@@ -203,6 +203,8 @@ class UiList extends React.Component {
 			inputCollection.push(activeItemValue);
 		}
 
+		inputCollection = this.applyPlugins(inputCollection);
+
 		const duplicateItems = getDuplicatesInArray(inputCollection).duplicates;
 		const isValidDuplicateItems = !!(validate && duplicateItems && duplicateItems.length);
 
@@ -217,8 +219,6 @@ class UiList extends React.Component {
 			window.alert(duplicateItemsMessage);
 			return false;
 		}
-
-		inputCollection = this.applyPlugins(inputCollection);
 
 		return this.setState(
 			{ collection: inputCollection, activeItemKey: '', activeItemValue: '' },

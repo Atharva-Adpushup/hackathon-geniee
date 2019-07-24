@@ -163,6 +163,7 @@ class Control extends Component {
 							id="report-by"
 							isClearable={false}
 							isSearchable={false}
+							wrapperClassName="custom-select-box-wrapper"
 							reset={true}
 							selected={state.selectedDimension}
 							options={state.dimensionList}
@@ -178,7 +179,7 @@ class Control extends Component {
 						<label className="u-text-normal">Interval</label>
 						<SelectBox
 							id="interval"
-							reset={true}
+							wrapperClassName="custom-select-box-wrapper"
 							isClearable={false}
 							isSearchable={false}
 							selected={state.selectedInterval}

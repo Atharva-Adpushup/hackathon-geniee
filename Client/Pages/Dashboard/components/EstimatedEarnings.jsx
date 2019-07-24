@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { numberWithCommas } from '../helpers/utils';
 
 function EstimatedEarnings(props) {
-	let { displayData } = props;
+	const { displayData } = props;
 	const {
 		yesterday,
 		sameDayLastWeek,
@@ -25,7 +25,7 @@ function EstimatedEarnings(props) {
 		lastThirtyDays > 0 && previousThirtyDays > 0
 			? Math.round(((lastThirtyDays - previousThirtyDays) / lastThirtyDays) * 10000) / 100
 			: 'N/A';
-	const displayYestarday = numberWithCommas(Math.round(yesterday * 100) / 100);
+	const displayYesterday = numberWithCommas(Math.round(yesterday * 100) / 100);
 	const displaySameDayLastWeek = numberWithCommas(Math.round(sameDayLastWeek * 100) / 100);
 	const displayLastSevenDays = numberWithCommas(Math.round(lastSevenDays * 100) / 100);
 	const displayPreviousSevenDays = numberWithCommas(Math.round(previousSevenDays * 100) / 100);
@@ -35,12 +35,12 @@ function EstimatedEarnings(props) {
 		<div className="aligner u-margin-t4 u-margin-b4">
 			<div className="aligner-item text-center">
 				<div className="font-small">
-					<span>Yestarday</span>
+					<span>Yesterday</span>
 					<span> VS </span>
 					<span>Same Day Last Week</span>
 				</div>
 				<div className="estimatedEarning">
-					<span>${displayYestarday}</span>
+					<span>${displayYesterday}</span>
 					<span> / </span>
 					<span>${displaySameDayLastWeek}</span>
 				</div>
@@ -108,7 +108,6 @@ function EstimatedEarnings(props) {
 			</div>
 		</div>
 	);
-	//}
 }
 
 export default EstimatedEarnings;

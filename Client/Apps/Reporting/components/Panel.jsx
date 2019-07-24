@@ -5,6 +5,7 @@ import { Object } from 'es6-shim';
 import qs from 'querystringify';
 import { isEmpty, union } from 'lodash';
 import ActionCard from '../../../Components/ActionCard/index';
+import Empty from '../../../Components/Empty/index';
 import ControlContainer from '../containers/ControlContainer';
 import TableContainer from '../containers/TableContainer';
 import ChartContainer from '../containers/ChartContainer';
@@ -36,7 +37,8 @@ class Panel extends Component {
 			tableData: {},
 			csvData: [],
 			reportType: 'account',
-			isLoading: true
+			isLoading: true,
+			isValidSite: true
 		};
 	}
 
@@ -45,8 +47,11 @@ class Panel extends Component {
 			match: {
 				params: { siteId }
 			},
-			location: { search: queryParams }
+			location: { search: queryParams },
+			sites
 		} = this.props;
+
+		const isValidSite = !!(sites[siteId] && sites[siteId].siteDomain);
 
 		let {
 			startDate,
@@ -60,8 +65,13 @@ class Panel extends Component {
 		const selectedControls = qs.parse(queryParams);
 
 		if (siteId) {
-			selectedFilters = { siteid: { [siteId]: true } };
 			reportType = 'site';
+			if (isValidSite) {
+				selectedFilters = { siteid: { [siteId]: true } };
+			} else {
+				this.setState({ isLoading: false, isValidSite: false, reportType });
+				return;
+			}
 		}
 
 		if (Object.keys(selectedControls).length > 0) {
@@ -116,15 +126,6 @@ class Panel extends Component {
 		};
 	};
 
-	getReportType = selectedFilters => {
-		let reportType = 'account';
-		const selectedSiteFilters = selectedFilters.siteid;
-		if (selectedSiteFilters && Object.keys(selectedSiteFilters).length === 1) {
-			reportType = 'site';
-		}
-		return reportType;
-	};
-
 	onControlChange = data => {
 		const params = this.getControlChangedParams(data);
 		this.setState({
@@ -141,7 +142,6 @@ class Panel extends Component {
 			selectedFilters,
 			reportType
 		} = controlParams;
-		//	const reportType = this.getReportType(selectedFilters);
 		const { dimensionList, filterList } = this.state;
 		let disabledFilter = [];
 		let disabledDimension = [];
@@ -188,7 +188,7 @@ class Panel extends Component {
 			selectedInterval,
 			metricsList
 		} = this.state;
-		const { site } = this.props;
+		const { sites } = this.props;
 		let selectedMetrics;
 		if (metricsList) {
 			selectedMetrics = metricsList
@@ -207,7 +207,7 @@ class Panel extends Component {
 			params[filter] = filters.length > 0 ? filters.toString() : null;
 		});
 		if (!params.siteid) {
-			const siteIds = Object.keys(site);
+			const siteIds = Object.keys(sites);
 			params.siteid = siteIds.toString();
 		}
 		return params;
@@ -229,6 +229,10 @@ class Panel extends Component {
 		this.setState({ csvData });
 	};
 
+	renderEmptyMessage = () => (
+		<Empty message="Seems like you have entered an invalid siteid in url. Please check." />
+	);
+
 	renderContent = () => {
 		const {
 			startDate,
@@ -243,9 +247,12 @@ class Panel extends Component {
 			metricsList,
 			tableData,
 			reportType,
-			csvData
+			csvData,
+			isValidSite
 		} = this.state;
-		return (
+		return reportType == 'site' && !isValidSite ? (
+			this.renderEmptyMessage()
+		) : (
 			<Row>
 				<Col sm={12}>
 					<ControlContainer

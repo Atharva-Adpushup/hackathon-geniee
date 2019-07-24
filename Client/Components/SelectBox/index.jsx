@@ -68,7 +68,8 @@ class SelectBox extends Component {
 			dropdownClassName,
 			type,
 			dataKey,
-			reset
+			reset,
+			pullRight
 		} = this.props;
 		const selectedTitle = reset ? (
 			<div
@@ -96,6 +97,7 @@ class SelectBox extends Component {
 				<DropdownButton
 					title={buttonTitle}
 					bsStyle={type}
+					pullRight={pullRight}
 					className={`custom-select-box ${dropdownClassName}`}
 					id={id}
 					onSelect={this.selectWrapper}
@@ -152,7 +154,8 @@ SelectBox.propTypes = {
 	wrapperClassName: PropTypes.string,
 	title: PropTypes.string,
 	type: PropTypes.string,
-	reset: PropTypes.bool
+	reset: PropTypes.bool,
+	pullRight: PropTypes.bool
 };
 
 SelectBox.defaultProps = {
@@ -161,7 +164,8 @@ SelectBox.defaultProps = {
 	wrapperClassName: '',
 	type: 'default',
 	selected: null,
-	reset: false
+	reset: false,
+	pullRight: false
 };
 
 export default SelectBox;

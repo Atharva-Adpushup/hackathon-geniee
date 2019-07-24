@@ -85,6 +85,14 @@ class MySites extends React.Component {
 
 	checkSiteAppStatuses = siteModel => !!siteModel.appStatuses;
 
+	shouldHideActivateAppsLink = (
+		isSuperUser,
+		isStepOnboardingComplete,
+		isAppStatuses,
+		isValidAppStatusInReportData
+	) =>
+		!!(!isSuperUser && isStepOnboardingComplete && isAppStatuses && !isValidAppStatusInReportData);
+
 	getValidObject = obj => !!(obj && Object.keys(obj).length);
 
 	getValidSites = props => {
@@ -135,6 +143,7 @@ class MySites extends React.Component {
 
 	renderStatusCards() {
 		const ref = this;
+		const { isSuperUser } = ref.props;
 		const { sites } = ref.state;
 		const isSites = ref.getValidObject(sites);
 		const computedCards = isSites
@@ -163,6 +172,16 @@ class MySites extends React.Component {
 						isValidAppStatusInReportData,
 						isAppStatuses
 					);
+					// NOTE: This check is added since 'Manage Apps' component is only visible to superuser so
+					// a link to it should only be visible to superuser
+					// TODO: Remove this variable and its usage logic once 'Manage Apps' component is released
+					const shouldHideActivateAppsLink = ref.shouldHideActivateAppsLink(
+						isSuperUser,
+						isStepOnboardingComplete,
+						isAppStatuses,
+						isValidAppStatusInReportData
+					);
+
 					const { siteId } = site;
 					const statusObject = SITE_SETUP_STATUS[siteStep];
 					const domanizeDomain = domanize(site.domain);
@@ -209,7 +228,8 @@ class MySites extends React.Component {
 								{statusObject.site.linkText}
 							</Link>
 						) : null;
-					computedSiteStatusLink = showSiteStatusLoader ? null : computedSiteStatusLink;
+					computedSiteStatusLink =
+						showSiteStatusLoader || shouldHideActivateAppsLink ? null : computedSiteStatusLink;
 
 					const computeSiteBlock = () =>
 						isSiteBlock ? (
