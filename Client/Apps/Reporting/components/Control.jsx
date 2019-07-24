@@ -44,7 +44,7 @@ class Control extends Component {
 	}
 
 	shouldComponentUpdate(nextProps, nextState) {
-		return this.state.reportType !== nextState.reportType;
+		return this.state.reportType !== nextState.reportType || this.state.updateStatusText !== nextState.updateStatusText;
 	}
 
 	onFilteChange = selectedFilters => {
@@ -102,7 +102,7 @@ class Control extends Component {
 		return reportService.getWidgetData({ path: filter.path, params });
 	};
 
-	getReportStatus() {
+	getReportStatus = () => {
 		reportService.getLastUpdateStatus().then(res => {
 			if (res.status == 200 && res.data) {
 				const updatedDate = res.data.lastRunTimePST;
@@ -111,7 +111,7 @@ class Control extends Component {
 				});
 			}
 		});
-	}
+	};
 
 	removeOpsFilterDimension = (filterList, dimensionList) => {
 		const updatedFilterList = [];
