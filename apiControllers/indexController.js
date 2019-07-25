@@ -159,7 +159,7 @@ router
 							userData.sites[site.siteId] = site;
 							siteIds.push(site.siteId);
 						}
-						let params = { siteid: '31000,36679', isSuperUser };
+						let params = { siteid: siteIds.toString(), isSuperUser };
 
 						return getReportsMetaData(params).then(reports => {
 							return res.status(httpStatus.OK).json({
