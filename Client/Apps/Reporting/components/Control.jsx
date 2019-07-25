@@ -44,7 +44,10 @@ class Control extends Component {
 	}
 
 	shouldComponentUpdate(nextProps, nextState) {
-		return this.state.reportType !== nextState.reportType || this.state.updateStatusText !== nextState.updateStatusText;
+		return (
+			this.state.reportType !== nextState.reportType ||
+			this.state.updateStatusText !== nextState.updateStatusText
+		);
 	}
 
 	onFilteChange = selectedFilters => {
