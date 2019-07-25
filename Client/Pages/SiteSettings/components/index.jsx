@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import SplitScreen from '../../../Components/Layout/SplitScreen';
 import UiList from '../../../Components/Layout/UiList';
 import CustomButton from '../../../Components/CustomButton/index';
-// import ActionCard from '../../../Components/ActionCard/index';
+import ActionCard from '../../../Components/ActionCard/index';
 import SendCodeByEmailModal from '../../../Components/SendCodeByEmailModal';
 import Empty from '../../../Components/Empty';
 import { copyToClipBoard } from '../../../Apps/ApTag/lib/helpers';
