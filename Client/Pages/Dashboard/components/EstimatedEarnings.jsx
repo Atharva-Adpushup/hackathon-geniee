@@ -4,14 +4,23 @@ import { numberWithCommas } from '../helpers/utils';
 
 function EstimatedEarnings(props) {
 	const { displayData } = props;
-	const {
-		yesterday,
-		sameDayLastWeek,
-		lastSevenDays,
-		previousSevenDays,
-		lastThirtyDays,
-		previousThirtyDays
-	} = displayData && displayData.result && displayData.result[0];
+
+	let yesterday = 0;
+	let sameDayLastWeek = 0;
+	let lastSevenDays = 0;
+	let previousSevenDays = 0;
+	let lastThirtyDays = 0;
+	let previousThirtyDays = 0;
+
+	if (displayData && displayData.result && displayData.result.length > 0) {
+		const overAlData = displayData.result[0];
+		yesterday = overAlData.yesterday;
+		sameDayLastWeek = overAlData.sameDayLastWeek;
+		lastSevenDays = overAlData.lastSevenDays;
+		previousSevenDays = overAlData.previousSevenDays;
+		lastThirtyDays = overAlData.lastThirtyDays;
+		previousThirtyDays = overAlData.previousThirtyDays;
+	}
 
 	const dayProgress =
 		yesterday > 0 && sameDayLastWeek > 0
