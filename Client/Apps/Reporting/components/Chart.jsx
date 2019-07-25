@@ -110,14 +110,17 @@ class Chart extends React.Component {
 	};
 
 	getSeriesData = (groupByResult, xAxis, activeLegendItems) => {
-		const { selectedDimension, selectedInterval } = this.props;
+		const { selectedDimension, selectedInterval, site } = this.props;
 		const series = [];
 		Object.keys(groupByResult).forEach(results => {
 			let j = 0;
+			let seriesName;
 			const row = groupByResult[results];
+			if (selectedDimension == 'siteid')
+				seriesName = site && site[results] ? site[results].siteName : 'Not Found';
 			const serie = {
 				data: [],
-				name: selectedDimension ? results : row[0].name,
+				name: selectedDimension ? seriesName : row[0].name,
 				value: results,
 				valueType: selectedDimension ? activeLegendItems.valueType : row[0].valueType
 			};
