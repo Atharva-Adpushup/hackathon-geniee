@@ -12,7 +12,7 @@ const Header = ({ sidebarToggle, logout, user, switchUser, findUsers }) => (
 			<FontAwesomeIcon icon="bars" />
 		</span>
 		<span className="ap-logo">
-			<img src="assets/images/adpushup-logo-small.png" alt="AdPushup" />
+			<img src="/assets/images/adpushup-logo-small.png" alt="AdPushup" />
 		</span>
 
 		<div className="header-nav">
