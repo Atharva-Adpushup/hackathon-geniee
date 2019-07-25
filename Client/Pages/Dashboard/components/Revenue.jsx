@@ -22,12 +22,13 @@ class SitewiseReport extends React.Component {
 			}
 		];
 		const seriesData = [];
-		results.forEach(result => {
-			seriesData.push({
-				name: result.network,
-				y: Math.round(result.revenue * 100) / 100
+		if (results)
+			results.forEach(result => {
+				seriesData.push({
+					name: result.network,
+					y: Math.round(result.revenue * 100) / 100
+				});
 			});
-		});
 		series[0].data = seriesData;
 		this.setState({ series });
 	};

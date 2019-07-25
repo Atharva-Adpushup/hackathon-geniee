@@ -19,7 +19,10 @@ router
 					if (response.code == 1) return res.send(response.data);
 					return res.send({});
 				})
-				.catch(err => res.send({}));
+				.catch(err => {
+					console.log(err);
+					return res.send({});
+				});
 		return res.send({});
 	})
 	.get('/getWidgetData', (req, res) => {
@@ -35,7 +38,10 @@ router
 					if (response.code == 1) return res.send(response.data);
 					return res.send({});
 				})
-				.catch(err => res.send({}));
+				.catch(err => {
+					console.log(err);
+					return res.send({});
+				});
 		return res.send({});
 	})
 	.get('/downloadAdpushupReport', (req, res) => {
@@ -61,7 +67,10 @@ router
 			uri: `${CC.REPORT_STATUS}`
 		})
 			.then(result => res.send(result))
-			.catch(err => res.send({}))
+			.catch(err => {
+				console.log(err);
+				return res.send({});
+			})
 	);
 
 module.exports = router;
