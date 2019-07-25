@@ -144,14 +144,13 @@ class Dashboard extends React.Component {
 			reportService.getWidgetData({ path, params }).then(response => {
 				if (response.status == 200 && !isEmpty(response.data)) {
 					widgetsConfig[wid].data = response.data;
-				}
-				widgetsConfig[wid].data = {}
+				} else widgetsConfig[wid].data = {};
 				widgetsConfig[wid].isDataSufficient = true;
 				widgetsConfig[wid].isLoading = false;
 				this.setState({ widgetsConfig });
 			});
 		else {
-			widgetsConfig[wid].data = {}
+			widgetsConfig[wid].data = {};
 			widgetsConfig[wid].isDataSufficient = true;
 			widgetsConfig[wid].isLoading = false;
 			this.setState({ widgetsConfig });
