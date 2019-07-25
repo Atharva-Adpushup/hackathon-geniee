@@ -99,7 +99,7 @@ router
 			}));
 		}
 		return new Promise((resolve, reject) => {
-			if (!parsedData.pageviewsThreshold || !parsedData.last || !parsedData.current) {
+			if (!parsedData.pageviewsThreshold || !parsedData.current) {
 				return reject(
 					new Error({
 						message: 'Missing Params',
@@ -110,11 +110,14 @@ router
 			return resolve();
 		})
 			.then(() => {
-				const { pageviewsThreshold = 10000, last = {}, current = {} } = parsedData;
+				const { pageviewsThreshold = 10000, current = {} } = parsedData;
+
+				const numberOfDays = Math.ceil(moment(current.to).diff(moment(current.from), 'days', true));
 				const currentTo = processDate(current.to, moment(), 1);
-				const currentFrom = processDate(current.from, currentTo, 7);
-				const lastTo = processDate(last.to, currentFrom, 1);
-				const lastFrom = processDate(last.from, lastTo, 7);
+				const currentFrom = processDate(current.from, currentTo, numberOfDays);
+
+				const lastTo = processDate(null, currentFrom, 1);
+				const lastFrom = processDate(null, lastTo, numberOfDays);
 
 				const promises = [
 					makeAPIRequest({
