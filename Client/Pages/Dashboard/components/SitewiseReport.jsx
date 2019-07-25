@@ -32,35 +32,37 @@ class SitewiseReport extends React.Component {
 		const { result, columns } = data;
 		const tableHeader = [];
 		const { metrics, site, reportType } = this.props;
-		columns.forEach(col => {
-			if (metrics[col])
+		if ((result, columns)) {
+			columns.forEach(col => {
+				if (metrics[col])
+					tableHeader.push({
+						title: metrics[col].display_name,
+						prop: col,
+						position: metrics[col].position + 1
+					});
+			});
+			if (reportType === 'site')
 				tableHeader.push({
-					title: metrics[col].display_name,
-					prop: col,
-					position: metrics[col].position + 1
+					title: 'Date',
+					prop: 'date',
+					position: 1
 				});
-		});
-		if (reportType === 'site')
-			tableHeader.push({
-				title: 'Date',
-				prop: 'date',
-				position: 1
+			else
+				tableHeader.push({
+					title: 'Website',
+					prop: 'siteName',
+					position: 1
+				});
+			tableHeader.sort((a, b) => a.position - b.position);
+			result.forEach(row => {
+				const { siteid } = row;
+				row.siteName = site[siteid]
+					? React.cloneElement(<a href={`/reports/${siteid}`}>{site[siteid].siteName}</a>)
+					: 'Not Found';
 			});
-		else
-			tableHeader.push({
-				title: 'Website',
-				prop: 'siteName',
-				position: 1
-			});
-		tableHeader.sort((a, b) => a.position - b.position);
-		result.forEach(row => {
-			const { siteid } = row;
-			row.siteName = site[siteid]
-				? React.cloneElement(<a href={`/reports/${siteid}`}>{site[siteid].siteName}</a>)
-				: 'Not Found';
-		});
-		this.formatTableData(result);
-		this.setState({ tableHeader, tableBody: result, isLoading: false });
+			this.formatTableData(result);
+		}
+		this.setState({ tableHeader, tableBody: result || [] });
 	};
 
 	renderTable() {
