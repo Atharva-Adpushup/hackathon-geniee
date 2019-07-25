@@ -85,13 +85,12 @@ class SiteSettings extends Component {
 
 		return (
 			<div className="clearfix">
-				<h4 className="u-margin-t3 u-margin-b4 u-text-bold">AP Head Code</h4>
+				<h4 className="u-margin-t0 u-margin-b4 u-text-bold">AP Head Code</h4>
 				<p className="u-margin-b4">Copy and paste this snippet in the head tag of your website</p>
-				<Row className="u-margin-b4">
-					<Col xs={12} md={12} className="u-padding-r4 u-padding-l0">
-						<pre className="u-margin-0">{codeText}</pre>
-					</Col>
-				</Row>
+
+				<Col xs={12} md={12} className="u-padding-r0 u-padding-l0 u-margin-b4">
+					<pre className="u-margin-0">{codeText}</pre>
+				</Col>
 
 				<CustomButton
 					variant="secondary"
@@ -136,7 +135,7 @@ class SiteSettings extends Component {
 
 		return (
 			<div className="clearfix">
-				<h4 className="u-margin-t3 u-margin-b4 u-text-bold">Manage Blocklist</h4>
+				<h4 className="u-margin-t0 u-margin-b4 u-text-bold">Manage Blocklist</h4>
 				<p className="u-margin-b4">Block AdPushup ads on selected URLs of the website</p>
 				<UiList
 					itemCollection={blocklist}
@@ -161,12 +160,15 @@ class SiteSettings extends Component {
 
 	renderRootSplitScreen() {
 		return (
-			<SplitScreen
-				rootClassName="u-padding-h4 u-padding-v5"
-				leftChildren={this.renderLeftPanel()}
-				rightChildren={this.renderRightPanel()}
-				rightChildrenClassName="wrapper wrapper--blocklist"
-			/>
+			<div title="My Sites" style={{ background: '#fff', padding: '0 15px' }}>
+				<SplitScreen
+					rootClassName="u-padding-0"
+					leftChildren={this.renderLeftPanel()}
+					rightChildren={this.renderRightPanel()}
+					leftChildrenClassName="u-padding-4"
+					rightChildrenClassName="u-padding-4 wrapper wrapper--blocklist"
+				/>
+			</div>
 		);
 	}
 

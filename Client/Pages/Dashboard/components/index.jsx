@@ -218,7 +218,7 @@ class Dashboard extends React.Component {
 					''
 				)}
 				{reportType !== 'site' && name !== 'per_site_wise' ? (
-					<div className="u-margin-r4">
+					<div className="">
 						{/* eslint-disable */}
 						<label className="u-text-normal u-margin-r2">Website</label>
 						<SelectBox
@@ -284,7 +284,7 @@ class Dashboard extends React.Component {
 								: 'u-margin-b4 width-100'
 						}
 						key={widget.name}
-						type={widget.name !== 'estimated_earnings' ? 'danger' : 'default'}
+						type="default"
 						headerClassName="card-header"
 						headerChildren={
 							<div className="aligner aligner--row">
@@ -294,6 +294,7 @@ class Dashboard extends React.Component {
 						}
 						bodyClassName="card-body"
 						bodyChildren={widgetComponent}
+						footerClassName="card-footer"
 						footerChildren={
 							widget.name !== 'estimated_earnings' ? this.renderViewReportButton(wid) : <span />
 						}
