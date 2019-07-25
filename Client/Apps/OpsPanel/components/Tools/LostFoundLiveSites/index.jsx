@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import { PanelGroup, Panel, Col, Badge, Row } from 'react-bootstrap';
+import FieldGroup from '../../../../../Components/Layout/FieldGroup';
 import moment from 'moment';
 import 'react-dates/initialize';
 import { DateRangePicker } from 'react-dates';
@@ -24,18 +25,8 @@ class LostFoundLiveSites extends Component {
 			.subtract(1, 'days')
 			.startOf('day');
 
-		const LastFrom = moment()
-			.subtract(14, 'days')
-			.startOf('day');
-
-		const lastTo = moment()
-			.subtract(8, 'days')
-			.startOf('day');
-
 		this.state = {
 			activeKey: null,
-			lastStartDate: LastFrom,
-			lastEndDate: lastTo,
 			currentStartDate: currentFrom,
 			currentEndDate: CurrentTo,
 			focusedInput: null,
@@ -46,8 +37,7 @@ class LostFoundLiveSites extends Component {
 				lost: [],
 				won: [],
 				rentention: []
-			},
-			numberOfDays: 7
+			}
 		};
 	}
 
@@ -57,30 +47,22 @@ class LostFoundLiveSites extends Component {
 		});
 	};
 
-	datesUpdated = ({ startDate, endDate }) => {
-		this.setState({ lastStartDate: startDate, lastEndDate: endDate });
-	};
-
 	currentDatesUpdated = ({ startDate, endDate }) => {
 		this.setState({ currentStartDate: startDate, currentEndDate: endDate });
-	};
-
-	focusUpdated = focusedInput => {
-		this.setState({ focusedInput });
 	};
 
 	currentFocusUpdated = currentFocusedInput => {
 		this.setState({ currentFocusedInput });
 	};
 
-	handleGenerate = () => {
-		const {
-			currentStartDate,
-			currentEndDate,
-			pageviewsThreshold,
+	handleChange = e => {
+		this.setState({
+			pageviewsThreshold: e.target.value
+		});
+	};
 
-			numberOfDays
-		} = this.state;
+	handleGenerate = () => {
+		const { currentStartDate, currentEndDate, pageviewsThreshold } = this.state;
 
 		const { showNotification } = this.props;
 
@@ -98,8 +80,7 @@ class LostFoundLiveSites extends Component {
 			current: {
 				from: currentStartDate,
 				to: currentEndDate
-			},
-			numberOfDays
+			}
 		};
 
 		this.setState({ isLoading: true });
@@ -130,12 +111,21 @@ class LostFoundLiveSites extends Component {
 			<Row>
 				<Col sm={12}>
 					<Col sm={6} style={{ textAlign: 'center' }}>
-						<p className="h3">Page Views</p>
-						<label>{pageviewsThreshold}</label>
+						<FieldGroup
+							name="pageviewsThreshold"
+							value={pageviewsThreshold}
+							type="number"
+							label="Enter Page Views"
+							onChange={this.handleChange}
+							size={6}
+							id="pageviewsThreshold-input"
+							placeholder="Enter Page Views"
+							className="u-padding-v4 u-padding-h4"
+						/>
 					</Col>
 					<Col sm={6}>
 						<Fragment>
-							<p className="u-text-bold u-margin-t4">Select Date Range</p>
+							<p className="u-text-bold ">Select Date Range</p>
 
 							<DateRangePicker
 								startDate={currentStartDate}
@@ -148,17 +138,18 @@ class LostFoundLiveSites extends Component {
 								showClearDates
 								minimumNights={0}
 								displayFormat="DD-MM-YYYY"
-								isOutsideRange={day => !isInclusivelyBeforeDay(day, currentEndDate)}
+								isOutsideRange={day => !isInclusivelyBeforeDay(day, moment())}
 							/>
 						</Fragment>
-
-						<CustomButton
-							variant="primary"
-							className="pull-right u-margin-r3"
-							onClick={this.handleGenerate}
-						>
-							Generate
-						</CustomButton>
+						
+							<CustomButton
+								variant="primary"
+								className="pull-right u-margin-r3"
+								onClick={this.handleGenerate}
+							>
+								Generate
+							</CustomButton>
+				
 					</Col>
 				</Col>
 			</Row>
