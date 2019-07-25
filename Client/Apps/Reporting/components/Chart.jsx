@@ -114,7 +114,7 @@ class Chart extends React.Component {
 		const series = [];
 		Object.keys(groupByResult).forEach(results => {
 			let j = 0;
-			let seriesName;
+			let seriesName = results;
 			const row = groupByResult[results];
 			if (selectedDimension == 'siteid')
 				seriesName = site && site[results] ? site[results].siteName : 'Not Found';
