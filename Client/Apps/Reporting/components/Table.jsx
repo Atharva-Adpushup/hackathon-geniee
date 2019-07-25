@@ -30,7 +30,6 @@ import {
 } from '../helpers/utils';
 
 const getChildRows = (row, rootRows) => (row ? row.items : rootRows);
-
 const CurrencyFormatter = ({ value }) => `$${numberWithCommas(value.toFixed(2))}`;
 const NumberFormatter = ({ value }) => numberWithCommas(value);
 const CurrencyTypeProvider = props => (
@@ -52,12 +51,14 @@ class Table extends React.Component {
 	constructor(props) {
 		super(props);
 		const { tableHeader, tableBody, grandTotal } = this.updateTableData();
+		const expandedRowsId = tableBody.map(row => row.id);
 		const { tableData } = props;
 		this.state = {
 			tableData,
 			tableHeader,
 			tableBody,
-			grandTotal
+			grandTotal,
+			expandedRowsId
 		};
 	}
 
@@ -112,8 +113,15 @@ class Table extends React.Component {
 		const displayTableData = [];
 		const { selectedInterval, site, selectedDimension } = this.props;
 		tableData = this.getSortedTableData(tableData);
-		if (selectedDimension && selectedInterval == 'daily') {
-			const groupByResult = groupBy(tableData, 'date');
+		if (selectedDimension) {
+			let groupByResult;
+			if (selectedInterval == 'daily')
+				groupByResult = groupBy(tableData, row => this.formatDailyDate(row.date));
+			if (selectedInterval == 'monthly')
+				groupByResult = groupBy(tableData, row => this.formatMonthlyDate(row.month, row.year));
+
+			if (selectedInterval == 'cumulative')
+				groupByResult = groupBy(tableData, () => this.formatCumulativeDate());
 
 			Object.keys(groupByResult).forEach((results, index) => {
 				const {
@@ -125,12 +133,13 @@ class Table extends React.Component {
 				} = this.getParentRowGroupedTableData(groupByResult[results]);
 				const parentRow = {
 					id: index,
+					parentId: null,
 					adpushup_page_views: totalPageviews,
 					adpushup_page_cpm: totalPageRpm,
 					network_ad_ecpm: totalAdeCpm,
 					network_net_revenue: totalNetRevenue,
 					network_impressions: totalImpressions,
-					date: this.formatDailyDate(results),
+					date: results,
 					[selectedDimension]: '',
 					items: this.formatTableGroupChildData(groupByResult[results])
 				};
@@ -217,7 +226,7 @@ class Table extends React.Component {
 	};
 
 	updateTableData = () => {
-		const { tableData, selectedDimension, selectedInterval } = this.props;
+		const { tableData } = this.props;
 		let grandTotal = {};
 		let tableHeader = [];
 		let tableBody = [];
@@ -227,7 +236,6 @@ class Table extends React.Component {
 			tableBody = this.getTableBody(result);
 			grandTotal = this.getTableFooter(total, tableHeader);
 			this.setCsvData({ tableBody, tableHeader, grandTotal });
-			if (!selectedDimension || selectedInterval != 'daily') tableBody.push(grandTotal);
 		}
 		return { tableBody, tableHeader, grandTotal };
 	};
@@ -244,8 +252,8 @@ class Table extends React.Component {
 	};
 
 	render() {
-		const { tableBody, tableHeader, tableData, grandTotal } = this.state;
-		const { selectedDimension, selectedInterval } = this.props;
+		const { tableBody, tableHeader, tableData, grandTotal, expandedRowsId } = this.state;
+		const { selectedDimension } = this.props;
 		const tableColumnExtensions = [
 			{ columnName: 'date', wordWrapEnabled: true },
 			{ columnName: selectedDimension, wordWrapEnabled: true }
@@ -253,39 +261,31 @@ class Table extends React.Component {
 		const pageSizes = [10, 20, 40, 0];
 		const numberColumns = ['adpushup_page_views', 'network_impressions'];
 		const currencyColumns = ['network_net_revenue', 'adpushup_page_cpm', 'network_ad_ecpm'];
-		const expandedRowsId = tableBody.map(row => row.id);
 
 		if (tableData && tableData.result && tableData.result.length > 0)
 			return (
 				<React.Fragment>
-					{selectedDimension && selectedInterval == 'daily' ? (
-						<React.Fragment>
-							<Grid rows={tableBody} columns={tableHeader}>
-								<SortingState />
-								<CurrencyTypeProvider for={currencyColumns} />
-								<NumberTypeProvider for={numberColumns} />
-								<TreeDataState defaultExpandedRowIds={expandedRowsId} />
-								<IntegratedSorting />
-								<CustomTreeData getChildRows={getChildRows} />
-								<Datatable columnExtensions={tableColumnExtensions} />
-								<TableHeaderRow showSortingControls />
-								<TableTreeColumn for="date" />
-							</Grid>
-							<Grid rows={[grandTotal]} columns={tableHeader}>
-								<CurrencyTypeProvider for={currencyColumns} />
-								<NumberTypeProvider for={numberColumns} />
-								<TreeDataState defaultExpandedRowIds={expandedRowsId} />
-								<CustomTreeData getChildRows={getChildRows} />
-								<Datatable columnExtensions={tableColumnExtensions} rowComponent={TotalTableRow} />
-								<TableTreeColumn for="date" />
-							</Grid>
-						</React.Fragment>
+					{selectedDimension ? (
+						<Grid rows={tableBody} columns={tableHeader}>
+							<SortingState />
+							<CurrencyTypeProvider for={currencyColumns} />
+							<NumberTypeProvider for={numberColumns} />
+							<PagingState defaultCurrentPage={0} defaultPageSize={pageSizes[0]} />
+							<TreeDataState defaultExpandedRowIds={expandedRowsId} />
+							<IntegratedSorting />
+							<IntegratedPaging />
+							<CustomTreeData getChildRows={getChildRows} />
+							<Datatable columnExtensions={tableColumnExtensions} />
+							<TableHeaderRow showSortingControls />
+							<TableTreeColumn for="date" />
+							<PagingPanel pageSizes={pageSizes} />
+						</Grid>
 					) : (
 						<Grid rows={tableBody} columns={tableHeader}>
 							<SortingState />
 							<CurrencyTypeProvider for={currencyColumns} />
 							<NumberTypeProvider for={numberColumns} />
-							<PagingState defaultCurrentPage={0} defaultPageSize={10} />
+							<PagingState defaultCurrentPage={0} defaultPageSize={pageSizes[0]} />
 							<IntegratedPaging />
 							<IntegratedSorting rows={[1, 2, 3, 4]} />
 							<Datatable
@@ -297,6 +297,14 @@ class Table extends React.Component {
 							<PagingPanel pageSizes={pageSizes} />
 						</Grid>
 					)}
+					<Grid rows={[grandTotal]} columns={tableHeader}>
+						<CurrencyTypeProvider for={currencyColumns} />
+						<NumberTypeProvider for={numberColumns} />
+						<TreeDataState defaultExpandedRowIds={expandedRowsId} />
+						<CustomTreeData getChildRows={getChildRows} />
+						<Datatable columnExtensions={tableColumnExtensions} rowComponent={TotalTableRow} />
+						<TableTreeColumn for="date" />
+					</Grid>
 				</React.Fragment>
 			);
 		return '';
