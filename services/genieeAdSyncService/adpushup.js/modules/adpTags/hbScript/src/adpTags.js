@@ -11,7 +11,7 @@ var w = window,
 	// Maps a particular adp slot to a dfp ad unit and a prebid bidder config
 	inventoryMapper = function(size, optionalParam) {
 		// Reset inventory as default if site is SPA
-		if (adp.config.isSPA) {
+		if (adp.config.isSPA || adp.config.spaButUsingHook) {
 			inventory = $.extend(true, {}, w.adpTags.defaultInventory);
 		}
 
@@ -22,11 +22,7 @@ var w = window,
 			availableSlots = inventory.dfpAdUnits[size],
 			bidders = null;
 
-		if (
-			optionalParam.headerBidding &&
-			inventory.hbConfig &&
-			Array.isArray(inventory.hbConfig.bidderAdUnits[size])
-		) {
+		if (optionalParam.headerBidding && inventory.hbConfig && Array.isArray(inventory.hbConfig.bidderAdUnits[size])) {
 			var overrideSize = size;
 			if (
 				optionalParam.overrideActive &&
@@ -92,7 +88,6 @@ var w = window,
 			gSlot: null,
 			hasRendered: false,
 			biddingComplete: false,
-			containerPresent: false,
 			feedbackSent: false,
 			hasTimedOut: false,
 			services: services,
@@ -209,8 +204,7 @@ var w = window,
 		display: function(containerId) {
 			var slot = this.adpSlots[containerId];
 
-			if (slot && !slot.containerPresent) {
-				slot.containerPresent = true;
+			if (slot) {
 				slot.sectionId = utils.getSectionId(containerId);
 				slot.variationId = utils.getVariationId();
 				slot.variationName = utils.getVariationName();

@@ -1,10 +1,10 @@
 const _ = require('lodash');
 const Promise = require('bluebird');
-const genieeZoneSyncService = require('../../../genieeZoneSyncService/index');
+const { couchbaseService, promiseForeach } = require('node-utils');
+
+const unsyncedAdsGeneration = require('../unsyncedAdsGeneration/index');
 const config = require('../../../../../configs/config');
 const { docKeys } = require('../../../../../configs/commonConsts');
-const { couchbaseService, promiseForeach } = require('node-utils');
-const { checkForLog } = require('../../../../../helpers/commonFunctions');
 
 const appBucket = couchbaseService(
 	`couchbase://${config.couchBase.HOST}/${config.couchBase.DEFAULT_BUCKET}`,
@@ -13,125 +13,132 @@ const appBucket = couchbaseService(
 	config.couchBase.DEFAULT_USER_PASSWORD
 );
 
-function generateSiteChannelJSON(channelAndZones, siteModelItem) {
-	const userEmail = siteModelItem.get('ownerEmail');
+function generateSiteChannelJSON(channelsWithAds, site) {
+	const userEmail = site.get('ownerEmail');
+	const siteId = site.get('siteId');
+	const siteDomain = site.get('siteDomain');
+
 	let unsyncedGenieeZones = [];
 	let unsyncedGenieeDFPCreationZones = [];
-	let adpTagsUnsyncedZones = {
-		siteId: siteModelItem.get('siteId'),
-		siteDomain: siteModelItem.get('siteDomain'),
-		publisherEmailAddress: userEmail,
-		publisherName: '',
+	let adpTagsUnsyncedAds = {
+		siteId,
+		siteDomain,
+		publisher: {
+			email: userEmail,
+			name: null,
+			id: null
+		},
 		ads: []
 	};
-	let logsUnsyncedZones = {
-		siteId: siteModelItem.get('siteId'),
-		siteDomain: siteModelItem.get('siteDomain'),
-		publisherEmailAddress: userEmail,
-		publisherName: '',
-		ads: []
-	};
-	function doIt(channelWithZones) {
-		if (
-			!(channelWithZones && channelWithZones.unsyncedZones && Object.keys(channelWithZones.unsyncedZones).length)
-		) {
-			return false;
-		}
-		var isChannel = !!channelWithZones.channel,
-			isPageGroupId = !!(isChannel && channelWithZones.channel.genieePageGroupId);
+	let adsenseUnsyncedAds = {};
 
-		_.forEach(channelWithZones.unsyncedZones, (zones, index) => {
+	function doIt(channelWithAds) {
+		const noAdsFound = !(
+			channelWithAds &&
+			channelWithAds.unsyncedAds &&
+			Object.keys(channelWithAds.unsyncedAds).length
+		);
+
+		if (noAdsFound) return false;
+
+		const isChannel = !!channelWithAds.channel;
+		const isPageGroupId = !!(isChannel && channelWithAds.channel.genieePageGroupId);
+		const { unsyncedAds, channel } = channelWithAds;
+		const channelKey = isChannel ? 'chnl::' + siteId + ':' + channel.platform + ':' + channel.pageGroup : '';
+		const pageGroupId = isPageGroupId ? channel.genieePageGroupId : '';
+
+		_.forEach(unsyncedAds, zones => {
 			if (Object.keys(zones.genieeUnsyncedZones).length) {
 				unsyncedGenieeZones.push({
 					zones: zones.genieeUnsyncedZones,
-					siteId: siteModelItem.get('siteId'),
-					pageGroupId: isPageGroupId ? channelWithZones.channel.genieePageGroupId : '',
-					channelKey: isChannel
-						? 'chnl::' +
-						  siteModelItem.get('siteId') +
-						  ':' +
-						  channelWithZones.channel.platform +
-						  ':' +
-						  channelWithZones.channel.pageGroup
-						: ''
+					siteId,
+					channelKey,
+					pageGroupId
 				});
 			}
 			if (Object.keys(zones.genieeDFPCreationZones).length) {
 				unsyncedGenieeDFPCreationZones.push({
 					zones: zones.genieeDFPCreationZones,
-					siteId: siteModelItem.get('siteId'),
-					siteDomain: siteModelItem.get('siteDomain'),
-					pageGroupId: isPageGroupId ? channelWithZones.channel.genieePageGroupId : '',
-					channelKey: isChannel
-						? 'chnl::' +
-						  siteModelItem.get('siteId') +
-						  ':' +
-						  channelWithZones.channel.platform +
-						  ':' +
-						  channelWithZones.channel.pageGroup
-						: ''
+					siteId,
+					siteDomain,
+					channelKey,
+					pageGroupId
 				});
 			}
-			if (Object.keys(zones.adpTagsUnsyncedZones).length) {
-				const apConfigs = siteModelItem.get('apConfigs') || false;
+			if (zones.adpTagsUnsyncedAds && zones.adpTagsUnsyncedAds.length) {
+				const apConfigs = site.get('apConfigs') || false;
 				const activeDFPNetwork = apConfigs && apConfigs.activeDFPNetwork ? apConfigs.activeDFPNetwork : false;
 				const activeDFPParentId =
 					apConfigs && apConfigs.activeDFPParentId ? apConfigs.activeDFPParentId : false;
 				if (activeDFPNetwork && activeDFPParentId) {
-					adpTagsUnsyncedZones.currentDFP = {
+					adpTagsUnsyncedAds.currentDFP = {
 						activeDFPNetwork,
 						activeDFPParentId
 					};
 				}
-				adpTagsUnsyncedZones.ads = _.concat(adpTagsUnsyncedZones.ads, zones.adpTagsUnsyncedZones);
+				adpTagsUnsyncedAds.ads = _.concat(adpTagsUnsyncedAds.ads, zones.adpTagsUnsyncedAds);
 			}
-			if (zones.logsUnsyncedZones && zones.logsUnsyncedZones.length) {
-				logsUnsyncedZones.ads = _.concat(logsUnsyncedZones.ads, zones.logsUnsyncedZones);
+			if (zones.adsenseUnsyncedAds && zones.adsenseUnsyncedAds.length) {
+				adsenseUnsyncedAds.ads = _.concat(adsenseUnsyncedAds.ads, zones.adsenseUnsyncedAds);
 			}
 		});
 	}
 
 	return appBucket.getDoc(`${docKeys.user}${userEmail}`).then(docWithCas => {
 		const userData = docWithCas.value;
+		const { adNetworkSettings = [], firstName, lastName } = userData;
+		const hasAdNetworkSettings = !!adNetworkSettings.length;
+		let pubId = null;
+		let refreshToken = null;
 
-		logsUnsyncedZones.publisherName = `${userData.firstName} ${userData.lastName}`;
-		adpTagsUnsyncedZones.publisherName = `${userData.firstName} ${userData.lastName}`;
+		if (hasAdNetworkSettings) {
+			pubId = adNetworkSettings[0].pubId;
+			_.some(adNetworkSettings, network => {
+				if (network.networkName === 'DFP') {
+					refreshToken = network.refreshToken;
+					return true;
+				}
+				return false;
+			});
+		}
 
-		return Promise.map(channelAndZones, doIt).then(() => {
+		adpTagsUnsyncedAds.publisher = {
+			...adpTagsUnsyncedAds.publisher,
+			...adpTagsUnsyncedAds.currentDFP,
+			name: `${firstName} ${lastName}`,
+			id: pubId,
+			refreshToken
+		};
+
+		adsenseUnsyncedAds = { ...adpTagsUnsyncedAds };
+
+		return Promise.map(channelsWithAds, doIt).then(() => {
 			return {
 				geniee: unsyncedGenieeZones,
-				adp: adpTagsUnsyncedZones,
+				adp: adpTagsUnsyncedAds,
 				genieeDFP: unsyncedGenieeDFPCreationZones,
-				logs: logsUnsyncedZones
+				adsense: adsenseUnsyncedAds
 			};
 		});
 	});
 }
 
-function unSyncedAdsWrapper(unSyncedAds, logUnsyncedAds, cb, ad) {
+function unSyncedAdsWrapper(unSyncedAds, cb, ad) {
 	function processCallback(cb) {
 		return cb ? cb(ad) : Promise.resolve({});
 	}
 
 	return processCallback(cb).then(appSpecficData => {
-		if (checkForLog(ad)) {
-			const computedData = {
-				sectionName: ad.name,
-				...appSpecficData,
-				...ad
-			};
-			logUnsyncedAds.push(computedData);
-		}
-		let unsyncedZone =
-			ad.network && ad.network == 'adpTags' ? genieeZoneSyncService.checkAdpTagsUnsyncedZones(ad, ad) : false;
-		if (unsyncedZone) {
+		let unsyncedAd =
+			ad.network && ad.network == 'adpTags' ? unsyncedAdsGeneration.checkAdpTagsUnsyncedAds(ad, ad) : false;
+		if (unsyncedAd) {
 			if (ad.formatData && ad.formatData.platform) {
-				unsyncedZone.platform = ad.formatData.platform;
+				unsyncedAd.platform = ad.formatData.platform;
 			}
 			unSyncedAds.push({
 				sectionName: ad.name,
 				...appSpecficData,
-				...unsyncedZone
+				...unsyncedAd
 			});
 		}
 		return true;
@@ -139,14 +146,12 @@ function unSyncedAdsWrapper(unSyncedAds, logUnsyncedAds, cb, ad) {
 }
 
 function adGeneration(docKey, currentDataForSyncing, cb = false) {
-	let logUnsyncedAds = [];
 	let unSyncedAds = [];
 	return appBucket
 		.getDoc(docKey)
 		.then(docWithCas => {
 			const ads = docWithCas.value.ads;
-
-			return promiseForeach(ads, unSyncedAdsWrapper.bind(null, unSyncedAds, logUnsyncedAds, cb), (data, err) => {
+			return promiseForeach(ads, unSyncedAdsWrapper.bind(null, unSyncedAds, cb), (data, err) => {
 				console.log(err);
 				return false;
 			});
@@ -155,9 +160,6 @@ function adGeneration(docKey, currentDataForSyncing, cb = false) {
 			currentDataForSyncing.adp.ads = unSyncedAds.length
 				? _.concat(currentDataForSyncing.adp.ads, unSyncedAds)
 				: currentDataForSyncing.adp.ads;
-			currentDataForSyncing.logs.ads = logUnsyncedAds.length
-				? _.concat(currentDataForSyncing.logs.ads, logUnsyncedAds)
-				: currentDataForSyncing.logs.ads;
 
 			return currentDataForSyncing;
 		})
@@ -168,7 +170,7 @@ function adGeneration(docKey, currentDataForSyncing, cb = false) {
 		});
 }
 
-function tagManagerAdsSyncing(currentDataForSyncing, site) {
+function apTagAdsSyncing(currentDataForSyncing, site) {
 	/**
 	 * FLOW:
 	 * 1. Read Tag Manager Doc
@@ -187,7 +189,6 @@ function tagManagerAdsSyncing(currentDataForSyncing, site) {
 }
 
 function innovativeAdsSyncing(currentDataForSyncing, site) {
-	let hasInnovativeAds = false;
 	function generateLogData(site, ad) {
 		return site
 			.getAllChannels()
@@ -249,12 +250,12 @@ function innovativeAdsSyncing(currentDataForSyncing, site) {
 	);
 }
 
-function getGeneratedPromises(siteModelItem) {
-	return genieeZoneSyncService
-		.getAllUnsyncedZones(siteModelItem)
-		.then(channelAndZones => generateSiteChannelJSON(channelAndZones, siteModelItem))
-		.then(currentDataForSyncing => tagManagerAdsSyncing(currentDataForSyncing, siteModelItem))
-		.then(currentDataForSyncing => innovativeAdsSyncing(currentDataForSyncing, siteModelItem));
+function getGeneratedPromises(site) {
+	return unsyncedAdsGeneration
+		.getAllUnsyncedAds(site)
+		.then(channelWithAds => generateSiteChannelJSON(channelWithAds, site))
+		.then(currentDataForSyncing => apTagAdsSyncing(currentDataForSyncing, site))
+		.then(currentDataForSyncing => innovativeAdsSyncing(currentDataForSyncing, site));
 }
 
 module.exports = {

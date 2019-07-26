@@ -7,12 +7,9 @@ var browserConfig = require('./browserConfig.js'),
 
 module.exports = {
 	log: function() {
-		var isQueryParams = !!(
-				this.queryParams &&
-				$.isPlainObject(this.queryParams) &&
-				!$.isEmptyObject(this.queryParams)
-			),
-			isapDebugParam = !!(isQueryParams && this.queryParams.apDebug);
+		var queryParams = this.getQueryParams();
+		var isQueryParams = !!(queryParams && $.isPlainObject(queryParams) && !$.isEmptyObject(queryParams)),
+			isapDebugParam = !!(isQueryParams && queryParams.apDebug);
 
 		if (typeof console !== 'undefined' && console.log && isapDebugParam) console.log.apply(console, arguments);
 	},
@@ -232,23 +229,7 @@ module.exports = {
 				if (document.createEvent !== 'undefined') {
 					try {
 						evt = document.createEvent('MouseEvent');
-						evt.initMouseEvent(
-							'click',
-							true,
-							true,
-							window,
-							0,
-							0,
-							0,
-							0,
-							0,
-							false,
-							false,
-							false,
-							false,
-							0,
-							null
-						);
+						evt.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
 						browserConfig.$pingEl
 							.attr('ping', toFeedback)
 							.get(0)
@@ -337,23 +318,7 @@ module.exports = {
 				if (document.createEvent !== 'undefined') {
 					try {
 						evt = document.createEvent('MouseEvent');
-						evt.initMouseEvent(
-							'click',
-							true,
-							true,
-							window,
-							0,
-							0,
-							0,
-							0,
-							0,
-							false,
-							false,
-							false,
-							false,
-							0,
-							null
-						);
+						evt.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
 						browserConfig.$pingEl
 							.attr('ping', toFeedback)
 							.get(0)
@@ -483,11 +448,12 @@ module.exports = {
 				}
 			}
 
-			if (Object.keys(this.queryParams).length >= 1) {
+			url = urlBase + (parts.length > 0 ? '?' + parts.join('&') : '');
+			/*if (Object.keys(this.queryParams).length >= 1) {
 				url = urlBase + '?' + parts.join('&');
 			} else {
 				url = urlBase;
-			}
+			}*/
 		}
 
 		if (url.charAt(url.length - 1) === '?') {
@@ -580,7 +546,7 @@ module.exports = {
 		}
 		return false;
 	},
-	queryParams: (function() {
+	getQueryParams: function() {
 		var str = window.location.search,
 			objURL = {};
 
@@ -592,6 +558,6 @@ module.exports = {
 		});
 
 		return objURL;
-	})(),
+	},
 	dockify: dockify
 };
