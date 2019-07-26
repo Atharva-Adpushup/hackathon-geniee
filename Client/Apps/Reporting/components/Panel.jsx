@@ -203,7 +203,9 @@ class Panel extends Component {
 			dimension: selectedDimension || null
 		};
 		Object.keys(selectedFilters).forEach(filter => {
-			const filters = Object.keys(selectedFilters[filter]);
+			const filters = Object.keys(selectedFilters[filter]).filter(
+				key => selectedFilters[filter][key]
+			);
 			params[filter] = filters.length > 0 ? filters.toString() : null;
 		});
 		if (!params.siteid) {

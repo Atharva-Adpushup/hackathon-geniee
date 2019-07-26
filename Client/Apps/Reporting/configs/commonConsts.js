@@ -104,8 +104,8 @@ const activeLegendItemArray = [
 	{ value: 'adpushup_page_cpm', name: 'Page RPM', valueType: 'money' }
 ];
 const accountFilter = ['siteid', 'device_type', 'network'];
-const opsFilter = ['mode', 'error_code'];
-const opsDimension = ['mode', 'error_code'];
+const opsFilter = ['mode', 'error_code', 'country'];
+const opsDimension = ['mode', 'error_code', 'country'];
 const accountDimension = ['siteid', 'device_type', 'network'];
 export {
 	REPORTS_NAV_ITEMS,

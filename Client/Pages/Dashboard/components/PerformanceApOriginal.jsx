@@ -1,7 +1,7 @@
 import React from 'react';
 import moment from 'moment';
 import CustomChart from '../../../Components/CustomChart';
-import { yAxisGroups, activeLegendItemArray } from '../configs/commonConsts';
+import { yAxisGroups } from '../configs/commonConsts';
 
 class PerformanceApOriginal extends React.Component {
 	constructor(props) {
@@ -69,13 +69,7 @@ class PerformanceApOriginal extends React.Component {
 		if (series && series.length > 0 && isDataSufficient) {
 			return (
 				<div>
-					<CustomChart
-						type={type}
-						series={series}
-						xAxis={xAxis}
-						yAxisGroups={yAxisGroups}
-						activeLegendItems={activeLegendItemArray}
-					/>
+					<CustomChart type={type} series={series} xAxis={xAxis} yAxisGroups={yAxisGroups} />
 				</div>
 			);
 		}

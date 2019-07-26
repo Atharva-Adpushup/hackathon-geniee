@@ -1,5 +1,5 @@
 import React from 'react';
-import { numberWithCommas } from '../helpers/utils';
+import { numberWithCommas, roundOffTwoDecimal } from '../helpers/utils';
 import { displayMetrics } from '../configs/commonConsts';
 
 class PerformanceOverview extends React.Component {
@@ -53,7 +53,7 @@ class PerformanceOverview extends React.Component {
 								<div className="estimatedEarning">
 									<span>
 										{displayMetrics[key].valueType == 'money' ? '$' : ''}
-										{numberWithCommas(Math.round(displayData[key].value * 100) / 100)}
+										{numberWithCommas(roundOffTwoDecimal(displayData[key].value))}
 									</span>
 								</div>
 							</div>

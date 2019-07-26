@@ -12,6 +12,11 @@ function getTickRoundOff(min, max) {
 	return 1000;
 }
 
+function roundOffTwoDecimal(value) {
+	const roundedNum = Math.round(value * 100) / 100;
+	return roundedNum.toFixed(2);
+}
+
 function tickPositioner() {
 	const tickRoundOff = getTickRoundOff(this.dataMin, this.dataMax);
 	const positions = [];
@@ -22,7 +27,7 @@ function tickPositioner() {
 
 	if (this.dataMax !== null && this.dataMin !== null) {
 		for (tick; tick <= this.dataMax + increment; tick += increment) {
-			positions.push(parseFloat(tick.toFixed(2)));
+			positions.push(parseFloat(roundOffTwoDecimal(tick)));
 		}
 	}
 	return positions;
@@ -87,7 +92,7 @@ const defaultChartConfig = {
 	]
 };
 
-function getGroupedYAxisAndSeries(chartType, existingSeries) {
+function getGroupedYAxisAndSeries(chartType, existingSeries, yAxisGroups) {
 	const yAxis = [];
 	const seriesForChart = [];
 	let colorIndex = 0;
@@ -100,31 +105,33 @@ function getGroupedYAxisAndSeries(chartType, existingSeries) {
 			lineWidth: 1.5,
 			_colorIndex: colorIndex,
 			...series,
-			yAxis: index
+			yAxis: yAxisGroups && yAxisGroups.length ? 0 : index
 		};
-		const legend = {
-			title: { text: series.name },
-			index,
-			visible: false,
-			value: series.value
-		};
-		if (yAxisCount < 2 && series.visible) {
-			legend.visible = true;
-			legend.opposite = opposite;
-			if (series.valueType == 'money')
-				legend.labels = {
-					format: '${value}'
-				};
-			yAxisCount += 1;
-			opposite = !opposite;
+		if (!yAxisGroups) {
+			const legend = {
+				title: { text: series.name },
+				index,
+				visible: false,
+				value: series.value
+			};
+			if (yAxisCount < 2 && series.visible) {
+				legend.visible = true;
+				legend.opposite = opposite;
+				if (series.valueType == 'money')
+					legend.labels = {
+						format: '${value}'
+					};
+				yAxisCount += 1;
+				opposite = !opposite;
+			}
+			yAxis.push(legend);
 		}
-		yAxis.push(legend);
 		singleSeries.tooltip = {
 			useHTML: true,
 			headerFormat: '<span style="font-size:14px;font-weight:bold">{point.key}</span><br/>',
 			pointFormatter() {
 				const point = this;
-				const num = point.y.toFixed(2);
+				const num = roundOffTwoDecimal(point.y);
 				return `<span style="color:${point.color}">\u25CF</span> ${point.series.name}: <b>${
 					point.series.userOptions.valueType === 'money'
 						? `$${numberWithCommas(num)}`
@@ -135,6 +142,15 @@ function getGroupedYAxisAndSeries(chartType, existingSeries) {
 		seriesForChart.push(singleSeries);
 		colorIndex += 1;
 	});
+
+	if (yAxisGroups && yAxisGroups.length) {
+		yAxis.push({
+			title: { text: yAxisGroups[0].seriesNames.join(' / ') },
+			index: 0,
+			visible: true,
+			...yAxisGroups[0].yAxisConfig
+		});
+	}
 
 	return { yAxis, seriesForChart };
 }
@@ -160,48 +176,88 @@ export function getCustomChartConfig(
 		...customConfig
 	};
 
-	if (activeLegendItems && chartConfig.series && chartConfig.series.length) {
-		if (Array.isArray(activeLegendItems)) {
+	let validateActiveLegendItems;
+	if (
+		(Array.isArray(activeLegendItems) && activeLegendItems.length > 0) ||
+		typeof activeLegendItems === 'object'
+	) {
+		validateActiveLegendItems = true;
+	} else {
+		validateActiveLegendItems = false;
+	}
+	if (type == 'line' || type == 'spline') {
+		if (validateActiveLegendItems && chartConfig.series && chartConfig.series.length) {
+			if (Array.isArray(activeLegendItems)) {
+				let i;
+				const len1 = series.length;
+				for (i = 0; i < len1; i += 1) {
+					const singleSeries = series[i];
+
+					let j;
+					const len2 = activeLegendItems.length;
+					for (j = 0; j < len2; j += 1) {
+						const activeLegendItem = activeLegendItems[j];
+						singleSeries.visible = singleSeries.value === activeLegendItem.value;
+						if (singleSeries.value === activeLegendItem.value) break;
+					}
+				}
+			} else {
+				let i;
+				const len1 = series.length;
+				for (i = 0; i < len1; i += 1) {
+					const singleSeries = series[i];
+					singleSeries.visible = true;
+					singleSeries.tooltip = {
+						useHTML: true,
+						headerFormat: '<span style="font-size:14px;font-weight:bold">{point.key}</span><br/>',
+						pointFormatter() {
+							const point = this;
+							const num = roundOffTwoDecimal(point.y);
+							return `<span style="color:${point.color}">\u25CF</span> ${point.series.name}: <b>${
+								point.series.userOptions.valueType === 'money'
+									? `$${numberWithCommas(num)}`
+									: numberWithCommas(point.y)
+							}</b><br/>`;
+						}
+					};
+				}
+			}
+		} else if (
+			yAxisGroups &&
+			yAxisGroups.length &&
+			chartConfig.series &&
+			chartConfig.series.length
+		) {
 			let i;
 			const len1 = series.length;
 			for (i = 0; i < len1; i += 1) {
 				const singleSeries = series[i];
-
-				let j;
-				const len2 = activeLegendItems.length;
-				for (j = 0; j < len2; j += 1) {
-					const activeLegendItem = activeLegendItems[j];
-					singleSeries.visible = singleSeries.value === activeLegendItem.value;
-					if (singleSeries.value === activeLegendItem.value) break;
-				}
+				singleSeries.visible = true;
 			}
 		} else {
 			let i;
 			const len1 = series.length;
 			for (i = 0; i < len1; i += 1) {
 				const singleSeries = series[i];
-				singleSeries.visible = true;
-				singleSeries.tooltip = {
-					useHTML: true,
-					headerFormat: '<span style="font-size:14px;font-weight:bold">{point.key}</span><br/>',
-					pointFormatter() {
-						const point = this;
-						const num = point.y.toFixed(2);
-						return `<span style="color:${point.color}">\u25CF</span> ${point.series.name}: <b>${
-							point.series.userOptions.valueType === 'money'
-								? `$${numberWithCommas(num)}`
-								: numberWithCommas(point.y)
-						}</b><br/>`;
-					}
-				};
+				singleSeries.visible = false;
 			}
 		}
-	} else if (chartConfig.series && chartConfig.series.length) {
+	} else if (type == 'pie') {
 		let i;
 		const len1 = series.length;
 		for (i = 0; i < len1; i += 1) {
 			const singleSeries = series[i];
 			singleSeries.visible = true;
+			singleSeries.tooltip = {
+				useHTML: true,
+				headerFormat: '<span style="font-size:14px;font-weight:bold">{point.key}</span><br/>',
+				pointFormatter() {
+					const point = this;
+					return `<span style="color:${point.color}">\u25CF</span> ${point.series.name}: <b>$${
+						point.y
+					}</b><br/>`;
+				}
+			};
 		}
 	}
 
@@ -214,8 +270,12 @@ export function getCustomChartConfig(
 			chartConfig.xAxis.className = 'myXAxisClass';
 
 			// Set yAxis Groups for Line Chart
-			if (yAxisGroups && yAxisGroups.length) {
-				const { yAxis, seriesForChart } = getGroupedYAxisAndSeries(type, chartConfig.series);
+			if (Array.isArray(activeLegendItems) || (yAxisGroups && yAxisGroups.length)) {
+				const { yAxis, seriesForChart } = getGroupedYAxisAndSeries(
+					type,
+					chartConfig.series,
+					yAxisGroups
+				);
 				if (yAxis.length && seriesForChart.length) {
 					chartConfig.yAxis = yAxis;
 					chartConfig.series = seriesForChart;
@@ -243,8 +303,12 @@ export function getCustomChartConfig(
 			chartConfig.xAxis.className = 'myXAxisClass';
 
 			// Set yAxis Groups for Line Chart
-			if (yAxisGroups && yAxisGroups.length) {
-				const { yAxis, seriesForChart } = getGroupedYAxisAndSeries(type, chartConfig.series);
+			if (Array.isArray(activeLegendItems) || (yAxisGroups && yAxisGroups.length)) {
+				const { yAxis, seriesForChart } = getGroupedYAxisAndSeries(
+					type,
+					chartConfig.series,
+					yAxisGroups
+				);
 				if (yAxis.length && seriesForChart.length) {
 					chartConfig.yAxis = yAxis;
 					chartConfig.series = seriesForChart;

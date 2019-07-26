@@ -69,6 +69,7 @@ class Dashboard extends React.Component {
 			if (widgetsList.indexOf(widget.name) > -1) {
 				widget.isLoading = true;
 				widget.selectedDate = dates[0].value;
+				widget.isDataSufficient = false;
 				if (reportType == 'site' || widget.name == 'per_ap_original')
 					widget.selectedSite = selectedSite;
 				else widget.selectedSite = 'all';
@@ -127,31 +128,36 @@ class Dashboard extends React.Component {
 		const params = getDateRange(selectedDate);
 		const hidPerApOriginData =
 			name == 'per_ap_original' &&
-			selectedSite != 'all' &&
 			reportingSites &&
 			reportingSites[selectedSite] &&
 			reportingSites[selectedSite].dataAvailableOutOfLast30Days < 21;
 		params.siteid = selectedSite == 'all' ? siteIds.toString() : selectedSite;
-		widgetsConfig[wid].isLoading = true;
 		widgetsConfig[wid].startDate = params.fromDate;
 		widgetsConfig[wid].endDate = params.toDate;
-		this.setState({ widgetsConfig });
 		if (hidPerApOriginData) {
 			widgetsConfig[wid].isDataSufficient = false;
 			widgetsConfig[wid].isLoading = false;
 			this.setState({ widgetsConfig });
 		} else if (params.siteid)
 			reportService.getWidgetData({ path, params }).then(response => {
-				if (response.status == 200 && !isEmpty(response.data)) {
+				if (
+					response.status == 200 &&
+					!isEmpty(response.data) &&
+					response.data.result &&
+					response.data.result.length > 0
+				) {
 					widgetsConfig[wid].data = response.data;
-				} else widgetsConfig[wid].data = {};
-				widgetsConfig[wid].isDataSufficient = true;
+					widgetsConfig[wid].isDataSufficient = true;
+				} else {
+					widgetsConfig[wid].data = {};
+					widgetsConfig[wid].isDataSufficient = false;
+				}
 				widgetsConfig[wid].isLoading = false;
 				this.setState({ widgetsConfig });
 			});
 		else {
 			widgetsConfig[wid].data = {};
-			widgetsConfig[wid].isDataSufficient = true;
+			widgetsConfig[wid].isDataSufficient = false;
 			widgetsConfig[wid].isLoading = false;
 			this.setState({ widgetsConfig });
 		}
@@ -246,7 +252,9 @@ class Dashboard extends React.Component {
 
 	renderViewReportButton(wid) {
 		const { widgetsConfig } = this.state;
-		const { startDate, endDate, selectedSite, selectedDimension } = widgetsConfig[wid];
+		const { startDate, endDate, selectedSite, selectedDimension, isDataSufficient } = widgetsConfig[
+			wid
+		];
 		const { reportType, siteId } = this.props;
 		let siteSelected;
 		if (reportType === 'site') siteSelected = siteId;
@@ -260,7 +268,7 @@ class Dashboard extends React.Component {
 				}
 				className="u-link-reset aligner aligner-item float-right"
 			>
-				<Button className="aligner-item aligner aligner--vCenter">
+				<Button className="aligner-item aligner aligner--vCenter" disabled={!isDataSufficient}>
 					View Reports
 					<FontAwesomeIcon icon="chart-area" className="u-margin-l2" />
 				</Button>
