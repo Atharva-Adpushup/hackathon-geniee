@@ -22,18 +22,18 @@ module.exports = {
 				},
 				{
 					name: 'oldPassword',
-					message: 'Enter old password between 6 and 32',
-					value: { min: 6, max: 32 }
+					message: 'Enter old password between 6 and 50',
+					value: { min: 6, max: 50 }
 				},
 				{
 					name: 'password',
-					message: 'Enter password between 6 and 32',
-					value: { min: 6, max: 32 }
+					message: 'Enter password between 6 and 50',
+					value: { min: 6, max: 50 }
 				},
 				{
 					name: 'confirmPassword',
-					message: 'Enter confirm password between 6 and 32',
-					value: { min: 6, max: 32 }
+					message: 'Enter confirm password between 6 and 50',
+					value: { min: 6, max: 50 }
 				}
 			],
 			isEmail: [{ name: 'email', message: 'Enter email in name@example.com format', value: '' }],
