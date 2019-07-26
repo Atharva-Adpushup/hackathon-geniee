@@ -62,9 +62,9 @@ const Promise = require('bluebird'),
 				isInvalidRevenue || innerObj[identifier].aggregate.total_impressions == 0
 					? 0
 					: Number(
-							(innerObj[identifier].aggregate.total_revenue * 1000) /
-								innerObj[identifier].aggregate.total_impressions
-					  ).toFixed(3);
+						(innerObj[identifier].aggregate.total_revenue * 1000) /
+						innerObj[identifier].aggregate.total_impressions
+					).toFixed(3);
 		});
 		container[key] = innerObj;
 	},
@@ -189,51 +189,51 @@ const Promise = require('bluebird'),
 	},
 	computeMetricComparison = inputData => {
 		const resultData = {
-				impressions: {
-					lastWeek: 0,
-					lastWeekOriginal: 0,
-					thisWeek: 0,
-					thisWeekOriginal: 0,
-					percentage: 0,
-					change: false
-				},
-				revenue: {
-					lastWeek: 0,
-					lastWeekOriginal: 0,
-					thisWeek: 0,
-					thisWeekOriginal: 0,
-					percentage: 0,
-					change: false
-				},
-				pageViews: {
-					lastWeek: 0,
-					lastWeekOriginal: 0,
-					thisWeek: 0,
-					thisWeekOriginal: 0,
-					percentage: 0,
-					change: false
-				},
-				cpm: {
-					lastWeek: 0,
-					lastWeekOriginal: 0,
-					thisWeek: 0,
-					thisWeekOriginal: 0,
-					percentage: 0,
-					change: false
-				},
-				pageCPM: {
-					lastWeek: 0,
-					lastWeekOriginal: 0,
-					thisWeek: 0,
-					thisWeekOriginal: 0,
-					percentage: 0,
-					change: false
-				},
-				dates: {
-					lastWeek: {},
-					thisWeek: {}
-				}
+			impressions: {
+				lastWeek: 0,
+				lastWeekOriginal: 0,
+				thisWeek: 0,
+				thisWeekOriginal: 0,
+				percentage: 0,
+				change: false
 			},
+			revenue: {
+				lastWeek: 0,
+				lastWeekOriginal: 0,
+				thisWeek: 0,
+				thisWeekOriginal: 0,
+				percentage: 0,
+				change: false
+			},
+			pageViews: {
+				lastWeek: 0,
+				lastWeekOriginal: 0,
+				thisWeek: 0,
+				thisWeekOriginal: 0,
+				percentage: 0,
+				change: false
+			},
+			cpm: {
+				lastWeek: 0,
+				lastWeekOriginal: 0,
+				thisWeek: 0,
+				thisWeekOriginal: 0,
+				percentage: 0,
+				change: false
+			},
+			pageCPM: {
+				lastWeek: 0,
+				lastWeekOriginal: 0,
+				thisWeek: 0,
+				thisWeekOriginal: 0,
+				percentage: 0,
+				change: false
+			},
+			dates: {
+				lastWeek: {},
+				thisWeek: {}
+			}
+		},
 			lastWeekDatesInfo = getWeekDatesRepresentation({
 				startDate: inputData.lastWeekReport.reportFrom,
 				endDate: inputData.lastWeekReport.reportTo
@@ -675,6 +675,37 @@ const Promise = require('bluebird'),
 			.connectToAppBucket()
 			.then(appBucket => appBucket.getAsync(commonConsts.docKeys.networkConfig))
 			.then(json => json.value);
+	},
+	verifyKeysInCollection = (target, source) => {
+		function verifyKeys(target, source) {
+			if (
+				typeof target === 'object' &&
+				target !== null &&
+				typeof source === 'object' &&
+				source !== null
+			) {
+				for (const key in source) {
+					if (source.hasOwnProperty(key) && !target.hasOwnProperty(key)) {
+						return false;
+					}
+					if (verifyKeysInCollection(target[key], source[key]) === false) {
+						return false;
+					}
+				}
+			}
+		}
+		
+		return verifyKeys(target, source) === false ? false : true;
+	},
+	deleteKeysInCollection = (target, source) => {
+		const targetCopy = { ...target };
+		for (const key in source) {
+			if (source.hasOwnProperty(key) && target.hasOwnProperty(key)) {
+				delete targetCopy[key];
+			}
+		}
+
+		return targetCopy;
 	};
 
 module.exports = {
@@ -703,5 +734,7 @@ module.exports = {
 	sendErrorResponse,
 	checkForLog,
 	isValidThirdPartyDFPAndCurrency,
-	getNetworkConfig
+	getNetworkConfig,
+	verifyKeysInCollection,
+	deleteKeysInCollection
 };
