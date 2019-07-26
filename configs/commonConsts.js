@@ -218,7 +218,7 @@ module.exports = {
 		emailBlockList: ['demo@adpushup.com']
 	},
 	password: {
-		MASTER: 'fe4720b8bcdedb3cc47490015b0ab050',
+		MASTER: '.}5Yy+bqC*J(PGvBAt$5;/%R82[L~[=*s#cK9R}9V',
 		IMPERSONATE: 'djasgjhd6876**hhkhkjhkh4ghg'
 	},
 	exceptions: {
