@@ -22,7 +22,10 @@ class SizewiseParamsFormFields extends React.Component {
 		const { sizes, formFields, savedParams } = this.props;
 
 		this.setState(() => {
-			const newState = { activeKey: sizes[0].downwardIABSize, tempParams: {} };
+			const newState = {
+				activeKey: (!!sizes.length && sizes[0].downwardIABSize) || '',
+				tempParams: {}
+			};
 
 			for (const { downwardIABSize: adSize } of sizes) {
 				const params = {};
