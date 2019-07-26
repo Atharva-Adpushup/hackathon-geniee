@@ -9,6 +9,8 @@ const utils = require('../helpers/utils');
 const siteModel = require('./siteModel');
 const userModel = require('./userModel');
 const channelModel = require('./channelModel');
+const hbVideoParamsMap = require('../configs/hbVideoParamsMap');
+const commonFunctions = require('../helpers/commonFunctions');
 
 const HeaderBidding = model.extend(function() {
 	this.keys = [
@@ -123,6 +125,174 @@ function apiModule() {
 			}
 
 			return mergedBidderparams;
+		},
+		addVideoParams(bidderCode, bidderParams) {
+			bidderParams = { ...bidderParams };
+			switch (bidderCode) {
+				case 'conversant': {
+					// sizewise
+					for (const size in bidderParams) {
+						if (bidderParams.hasOwnProperty(size)) {
+							const isParamsExist = commonFunctions.verifyKeysInCollection(
+								bidderParams[size],
+								hbVideoParamsMap.conversant.params
+							);
+
+							if (!isParamsExist) bidderParams[size] = {
+								...bidderParams[size],
+								...hbVideoParamsMap.conversant.params
+							};
+						}
+					}
+					
+					break;
+				}
+				case 'rubicon': {
+					const isParamsExist = commonFunctions.verifyKeysInCollection(
+						bidderParams,
+						hbVideoParamsMap.rubicon.params
+					);
+
+					if (!isParamsExist){
+						bidderParams = {
+							...bidderParams,
+							...hbVideoParamsMap.rubicon.params
+						};
+					}
+
+					// TODO: set player size
+					
+					break;
+				}
+				case 'ix': {
+					// sizewise
+					for (const size in bidderParams) {
+						if (bidderParams.hasOwnProperty(size)) {
+							const isParamsExist = commonFunctions.verifyKeysInCollection(
+								bidderParams[size],
+								hbVideoParamsMap.ix.params
+							);
+
+							if (!isParamsExist){
+								bidderParams[size] = {
+									...bidderParams[size],
+									...hbVideoParamsMap.ix.params
+								};
+							}
+						}
+					}
+
+					break;
+				}
+				case 'pubmatic': {
+					// sizewise
+					for (const size in bidderParams) {
+						if (bidderParams.hasOwnProperty(size)) {
+							const isParamsExist = commonFunctions.verifyKeysInCollection(
+								bidderParams[size],
+								hbVideoParamsMap.pubmatic.params
+							);
+
+							if (!isParamsExist) {
+								bidderParams[size] = {
+									...bidderParams[size],
+									...hbVideoParamsMap.pubmatic.params
+								};
+							}
+						}
+					}
+
+					break;
+				}
+				default: {}
+			}
+
+			return bidderParams;
+		},
+		removeVideoParams(bidderCode, bidderParams) {
+			bidderParams = { ...bidderParams };
+			switch (bidderCode) {
+				case 'conversant': {
+					// sizewise
+					for (const size in bidderParams) {
+						if (bidderParams.hasOwnProperty(size)) {
+							const isParamsExist = commonFunctions.verifyKeysInCollection(
+								bidderParams[size],
+								hbVideoParamsMap.conversant.params
+							);
+
+							if (isParamsExist){
+								bidderParams[size] = commonFunctions.deleteKeysInCollection(
+									bidderParams[size],
+									hbVideoParamsMap.conversant.params
+								);
+							}
+						}
+					}
+
+					break;
+				}
+				case 'rubicon': {
+					const isParamsExist = commonFunctions.verifyKeysInCollection(
+						bidderParams,
+						hbVideoParamsMap.rubicon.params
+					);
+
+					if (isParamsExist) {
+						bidderParams = commonFunctions.deleteKeysInCollection(
+							bidderParams,
+							hbVideoParamsMap.rubicon.params
+						);
+					}
+
+					// TODO: set player size
+
+					break;
+				}
+				case 'ix': {
+					// sizewise
+					for (const size in bidderParams) {
+						if (bidderParams.hasOwnProperty(size)) {
+							const isParamsExist = commonFunctions.verifyKeysInCollection(
+								bidderParams[size],
+								hbVideoParamsMap.ix.params
+							);
+
+							if (isParamsExist) {
+								bidderParams[size] = commonFunctions.deleteKeysInCollection(
+									bidderParams[size],
+									hbVideoParamsMap.ix.params
+								);
+							}
+						}
+					}
+
+					break;
+				}
+				case 'pubmatic': {
+					// sizewise
+					for (const size in bidderParams) {
+						if (bidderParams.hasOwnProperty(size)) {
+							const isParamsExist = commonFunctions.verifyKeysInCollection(
+								bidderParams[size],
+								hbVideoParamsMap.pubmatic.params
+							);
+
+							if (isParamsExist) {
+								bidderParams[size] = commonFunctions.deleteKeysInCollection(
+									bidderParams[size],
+									hbVideoParamsMap.pubmatic.params
+								);
+							}
+						}
+					}
+
+					break;
+				}
+				default: { }
+			}
+
+			return bidderParams;
 		},
 		getHbConfig(siteId) {
 			return couchbase
