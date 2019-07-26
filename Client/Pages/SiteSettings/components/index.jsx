@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col } from 'react-bootstrap';
+import { Col } from 'react-bootstrap';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faCopy, faEnvelope } from '@fortawesome/free-solid-svg-icons';
