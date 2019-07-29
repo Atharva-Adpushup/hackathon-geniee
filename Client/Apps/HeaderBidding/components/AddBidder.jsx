@@ -41,7 +41,14 @@ export default class AddBidder extends React.Component {
 				break;
 			}
 			case 'criteo': {
-				params.publisherSubId = `AP/${siteId}_${domanize(domain)}`;
+				// eslint-disable-next-line no-restricted-syntax
+				for (const size in params) {
+					// eslint-disable-next-line no-prototype-builtins
+					if (params.hasOwnProperty(size)) {
+						params[size].publisherSubId = `AP/${siteId}_${domanize(domain)}`;
+					}
+				}
+
 				break;
 			}
 			default:
