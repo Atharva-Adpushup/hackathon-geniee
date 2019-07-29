@@ -156,6 +156,10 @@ class SizewiseParamsFormFields extends React.Component {
 			);
 		}
 
+		if (!sizes.length) {
+			return <p className="no-inventory-warning">Please add an Inventory size first</p>;
+		}
+
 		return (
 			<React.Fragment>
 				<BidderFormFields
