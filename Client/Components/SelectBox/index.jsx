@@ -105,7 +105,7 @@ class SelectBox extends Component {
 					{options.map((option, key) => {
 						if (option.isDisabled) {
 							return (
-								<OverlayTrigger overlay={tooltip} id="1">
+								<OverlayTrigger overlay={tooltip} key={`id-${key}`}>
 									<MenuItem
 										eventKey={`id-${key}`}
 										key={option.value}

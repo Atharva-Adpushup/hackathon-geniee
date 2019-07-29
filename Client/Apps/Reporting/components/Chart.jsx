@@ -130,7 +130,6 @@ class Chart extends React.Component {
 				const column = sortedResult[j];
 				const xAxisMomentObj = moment(xAxis.categories[i]);
 				const seriesValue = selectedDimension ? column[activeLegendItems.value] : column.value;
-				//	const num = serie.valueType === 'money' ? seriesValue.toFixed(2) : seriesValue;
 
 				if (selectedInterval === 'daily' || selectedInterval === 'monthly')
 					if (
@@ -179,7 +178,7 @@ class Chart extends React.Component {
 					legends={legends}
 					activeLegendItems={activeLegendItems}
 					onLegendChange={this.onLegendChange}
-					yAxisGroups={selectedDimension ? [] : apLineChartConfig.defaultYAxisGroups}
+					yAxisGroups={selectedDimension ? [] : null}
 				/>
 			</div>
 		);

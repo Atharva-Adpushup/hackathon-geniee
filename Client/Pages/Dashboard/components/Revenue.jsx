@@ -2,6 +2,7 @@ import React from 'react';
 import CustomChart from '../../../Components/CustomChart';
 import data from '../configs/data.json';
 import { yAxisGroups } from '../configs/commonConsts';
+import { roundOffTwoDecimal } from '../helpers/utils';
 
 class SitewiseReport extends React.Component {
 	state = {
@@ -26,7 +27,7 @@ class SitewiseReport extends React.Component {
 			results.forEach(result => {
 				seriesData.push({
 					name: result.network,
-					y: Math.round(result.revenue * 100) / 100
+					y: parseFloat(roundOffTwoDecimal(result.revenue))
 				});
 			});
 		series[0].data = seriesData;
