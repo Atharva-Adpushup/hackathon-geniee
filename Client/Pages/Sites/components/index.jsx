@@ -49,7 +49,6 @@ class MySites extends React.Component {
 
 	componentDidMount() {
 		const ref = this;
-		const { updateSiteData } = ref.props;
 		const { sites } = ref.state;
 		const isSites = ref.getValidObject(sites);
 
@@ -59,37 +58,7 @@ class MySites extends React.Component {
 
 		const siteIds = Object.keys(sites);
 
-		Promise.all(
-			siteIds.map(siteId => {
-				const site = sites[siteId];
-				const isValidAppStatusInReportData = ref.checkValidAppStatusInReportData(siteId);
-				const isAppStatuses = ref.checkSiteAppStatuses(site);
-				const siteStep = !site.step ? FIRST_ONBOARDING_STEP : site.step;
-				const isStepOnboardingComplete = ref.checkSiteStepOnboardingComplete(siteStep);
-				const shouldFetchAppStatuses = ref.shouldFetchSiteAppStatuses(
-					isStepOnboardingComplete,
-					isValidAppStatusInReportData,
-					isAppStatuses
-				);
-
-				if (!shouldFetchAppStatuses) {
-					return siteId;
-				}
-
-				return axiosInstance
-					.get(FETCH_SITE_APP_STATUS_URL, { params: { siteId } })
-					.then(response => {
-						const { data } = response.data;
-						updateSiteData(data);
-					})
-					.catch(() => {
-						const { domain } = site;
-						const defaultData = { siteId, siteDomain: domain, appStatuses: {} };
-
-						updateSiteData(defaultData);
-					});
-			})
-		);
+		Promise.all(siteIds.map(ref.fetchSiteAppStatusesCallback));
 
 		return false;
 	}
@@ -143,6 +112,38 @@ class MySites extends React.Component {
 		isValidAppStatusInReportData,
 		isSiteAppStatuses
 	) => !!(isOnboardingComplete && !isValidAppStatusInReportData && !isSiteAppStatuses);
+
+	fetchSiteAppStatusesCallback = siteId => {
+		const { sites } = this.state;
+		const { updateSiteData } = this.props;
+		const site = sites[siteId];
+		const isValidAppStatusInReportData = this.checkValidAppStatusInReportData(siteId);
+		const isAppStatuses = this.checkSiteAppStatuses(site);
+		const siteStep = !site.step ? FIRST_ONBOARDING_STEP : site.step;
+		const isStepOnboardingComplete = this.checkSiteStepOnboardingComplete(siteStep);
+		const shouldFetchAppStatuses = this.shouldFetchSiteAppStatuses(
+			isStepOnboardingComplete,
+			isValidAppStatusInReportData,
+			isAppStatuses
+		);
+
+		if (!shouldFetchAppStatuses) {
+			return siteId;
+		}
+
+		return axiosInstance
+			.get(FETCH_SITE_APP_STATUS_URL, { params: { siteId } })
+			.then(response => {
+				const { data } = response.data;
+				updateSiteData(data);
+			})
+			.catch(() => {
+				const { domain } = site;
+				const defaultData = { siteId, siteDomain: domain, appStatuses: {} };
+
+				updateSiteData(defaultData);
+			});
+	};
 
 	checkValidAppStatusInReportData(siteId) {
 		const { reportSites } = this.props;
