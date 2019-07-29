@@ -27,7 +27,7 @@ var adp = window.adpushup,
 			return cookieFound;
 		},
 		getUTMParams: function() {
-			var queryParams = adp.utils.queryParams,
+			var queryParams = adp.utils.getQueryParams(),
 				currentQueryParams = {};
 
 			if (Object.keys(queryParams).length) {
