@@ -189,28 +189,32 @@ class AdsTxtManager extends Component {
 						</tr>
 					</thead>
 					<tbody>
-						{sites.map(site => (
-							<tr key={site.domain}>
-								<td>{site.domain}</td>
-								<td>{site.statusText}</td>
-								<td>
-									<CustomButton
-										onClick={() => {
-											this.setState({
-												showModal: true,
-												modalAdsTxt: site.adsTxt
-											});
-										}}
-										variant="secondary"
-										className="snippet-btn apbtn-main-line apbtn-small"
-										style={{ width: '170px' }}
-										disabled={site.status === 200}
-									>
-										Get Entries
-									</CustomButton>
-								</td>
-							</tr>
-						))}
+						{sites && sites.length > 0 ? (
+							sites.map(site => (
+								<tr key={site.domain}>
+									<td>{site.domain}</td>
+									<td>{site.statusText}</td>
+									<td>
+										<CustomButton
+											onClick={() => {
+												this.setState({
+													showModal: true,
+													modalAdsTxt: site.adsTxt
+												});
+											}}
+											variant="secondary"
+											className="snippet-btn apbtn-main-line apbtn-small"
+											style={{ width: '170px' }}
+											disabled={site.status === 200}
+										>
+											Get Entries
+										</CustomButton>
+									</td>
+								</tr>
+							))
+						) : (
+							<div className="text-center">No Record Found.</div>
+						)}
 					</tbody>
 				</Table>
 			</div>
@@ -323,7 +327,7 @@ class AdsTxtManager extends Component {
 					<title>Ads.txt Management</title>
 				</Helmet>
 
-				<ActionCard title="Ads.txt Manager">
+				<div title="Ads.txt Manager">
 					{this.renderModal()}
 					{isLoading ? (
 						this.renderLoader()
@@ -340,7 +344,7 @@ class AdsTxtManager extends Component {
 							</Col>
 						</div>
 					)}
-				</ActionCard>
+				</div>
 			</Fragment>
 		);
 	}

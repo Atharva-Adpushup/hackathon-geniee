@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { numberWithCommas } from '../helpers/utils';
+import { numberWithCommas, roundOffTwoDecimal } from '../helpers/utils';
 
 function EstimatedEarnings(props) {
 	const { displayData } = props;
@@ -24,22 +24,22 @@ function EstimatedEarnings(props) {
 
 	const dayProgress =
 		yesterday > 0 && sameDayLastWeek > 0
-			? Math.round(((yesterday - sameDayLastWeek) / yesterday) * 10000) / 100
+			? roundOffTwoDecimal(((yesterday - sameDayLastWeek) / yesterday) * 100)
 			: 'N/A';
 	const weekProgress =
 		lastSevenDays > 0 && previousSevenDays > 0
-			? Math.round(((lastSevenDays - previousSevenDays) / lastSevenDays) * 10000) / 100
+			? roundOffTwoDecimal(((lastSevenDays - previousSevenDays) / lastSevenDays) * 100)
 			: 'N/A';
 	const monthProgress =
 		lastThirtyDays > 0 && previousThirtyDays > 0
-			? Math.round(((lastThirtyDays - previousThirtyDays) / lastThirtyDays) * 10000) / 100
+			? roundOffTwoDecimal(((lastThirtyDays - previousThirtyDays) / lastThirtyDays) * 100)
 			: 'N/A';
-	const displayYesterday = numberWithCommas(Math.round(yesterday * 100) / 100);
-	const displaySameDayLastWeek = numberWithCommas(Math.round(sameDayLastWeek * 100) / 100);
-	const displayLastSevenDays = numberWithCommas(Math.round(lastSevenDays * 100) / 100);
-	const displayPreviousSevenDays = numberWithCommas(Math.round(previousSevenDays * 100) / 100);
-	const displayLastThirtyDays = numberWithCommas(Math.round(lastThirtyDays * 100) / 100);
-	const displayPreviousThirtyDays = numberWithCommas(Math.round(previousThirtyDays * 100) / 100);
+	const displayYesterday = numberWithCommas(roundOffTwoDecimal(yesterday));
+	const displaySameDayLastWeek = numberWithCommas(roundOffTwoDecimal(sameDayLastWeek));
+	const displayLastSevenDays = numberWithCommas(roundOffTwoDecimal(lastSevenDays));
+	const displayPreviousSevenDays = numberWithCommas(roundOffTwoDecimal(previousSevenDays));
+	const displayLastThirtyDays = numberWithCommas(roundOffTwoDecimal(lastThirtyDays));
+	const displayPreviousThirtyDays = numberWithCommas(roundOffTwoDecimal(previousThirtyDays));
 	return (
 		<div className="aligner u-margin-t4 u-margin-b4">
 			<div className="aligner-item text-center">

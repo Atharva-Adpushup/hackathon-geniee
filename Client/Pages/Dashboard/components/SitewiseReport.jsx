@@ -1,6 +1,6 @@
 import React from 'react';
 import Datatable from 'react-bs-datatable';
-import { numberWithCommas } from '../helpers/utils';
+import { numberWithCommas, roundOffTwoDecimal } from '../helpers/utils';
 
 class SitewiseReport extends React.Component {
 	state = {
@@ -21,7 +21,7 @@ class SitewiseReport extends React.Component {
 					const num = row[col];
 					row[col] =
 						metrics[col].valueType == 'money'
-							? `$${numberWithCommas(num.toFixed(2))}`
+							? `$${numberWithCommas(roundOffTwoDecimal(num))}`
 							: numberWithCommas(num);
 				}
 			}
@@ -67,7 +67,7 @@ class SitewiseReport extends React.Component {
 
 	renderTable() {
 		const { tableBody, tableHeader } = this.state;
-		return (
+		return tableBody && tableBody.length > 0 ? (
 			<Datatable
 				tableHeader={tableHeader}
 				tableBody={tableBody}
@@ -75,6 +75,8 @@ class SitewiseReport extends React.Component {
 				rowsPerPageOption={[20, 30, 40, 50]}
 				keyName="reportTable"
 			/>
+		) : (
+			<div className="text-center">No Record Found.</div>
 		);
 	}
 

@@ -2,9 +2,13 @@ import { connect } from 'react-redux';
 import ManageSite from '../components/index';
 
 const mapStateToProps = (state, ownProps) => {
-	const { user } = state.global;
+	const {
+		user: { data },
+		sites
+	} = state.global;
 	return {
-		user: user.data,
+		user: data,
+		userSites: { ...sites.data },
 		...ownProps
 	};
 };

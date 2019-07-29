@@ -14,7 +14,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
 
-import ActionCard from '../../../Components/ActionCard/index';
+// import ActionCard from '../../../Components/ActionCard/index';
 import OverlayTooltip from '../../../Components/OverlayTooltip/index';
 import Card from '../../../Components/Layout/Card';
 import OnboardingCard from '../../../Components/OnboardingCard';
@@ -338,15 +338,15 @@ class MySites extends React.Component {
 		let computedRootFlexboxClasses = isValidUserSites
 			? 'aligner aligner--row aligner--wrap'
 			: 'aligner aligner--vCenter aligner--hCenter';
-		computedRootFlexboxClasses = `u-padding-h4 u-padding-v5 my-sites-wrapper ${computedRootFlexboxClasses}`;
+		computedRootFlexboxClasses = `my-sites-wrapper ${computedRootFlexboxClasses}`;
 
 		return (
-			<ActionCard title="My Sites">
+			<div title="My Sites">
 				<div className={computedRootFlexboxClasses}>
 					{isValidUserSites ? this.renderStatusCards() : this.renderOnboardingCard()}
 					{isValidUserSites ? this.renderAddNewSiteCard() : null}
 				</div>
-			</ActionCard>
+			</div>
 		);
 	}
 }

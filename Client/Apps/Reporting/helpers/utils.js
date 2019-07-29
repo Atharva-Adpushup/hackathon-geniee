@@ -113,6 +113,11 @@ const calculatePageRpm = (totalNetRevenue, totalPageviews) =>
 const calculateAdeCpm = (totalNetRevenue, totalImpressions) =>
 	totalImpressions > 0 ? (totalNetRevenue * 1000) / totalImpressions : 0;
 
+const roundOffTwoDecimal = value => {
+	const roundedNum = Math.round(value * 100) / 100;
+	return roundedNum.toFixed(2);
+};
+
 export {
 	convertObjToArr,
 	arrayUnique,
@@ -123,5 +128,6 @@ export {
 	calculateTotalNetRevenues,
 	calculateTotalImpressions,
 	calculatePageRpm,
-	calculateAdeCpm
+	calculateAdeCpm,
+	roundOffTwoDecimal
 };

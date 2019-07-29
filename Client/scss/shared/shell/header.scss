@@ -2,8 +2,9 @@
 .ap-page-header {
 	padding: 10px 15px;
 	display: flex;
-	background: $primaryColor;
-	color: #fff;
+	color: $primaryColor;
+	background: #fff;
+	box-shadow: $boxShadowOne;
 	.nav-toggle {
 		font-size: 20px;
 		margin-right: 20px;
@@ -14,6 +15,10 @@
 		font-size: 20px;
 		font-weight: bold;
 		line-height: 1.6em;
+		max-height: 33px;
+		> img {
+			height: 100%;
+		}
 	}
 	.header-nav {
 		margin-left: auto;
@@ -26,11 +31,12 @@
 			margin-left: auto;
 			&.open button,
 			button {
-				background: rgba(#000, 0.1);
-				border: 1px solid rgba(#000, 0.1);
+				background: $primaryColor;
+				//border: 1px solid #e62930;
 				color: #fff;
-				&:active:hover {
-					background: rgba(#000, 0.1);
+				&:active,
+				&:hover {
+					background: #e62930;
 				}
 			}
 		}

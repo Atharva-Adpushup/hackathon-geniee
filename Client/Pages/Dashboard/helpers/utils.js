@@ -47,6 +47,11 @@ const getDateRange = value => {
 	}
 };
 
+const roundOffTwoDecimal = value => {
+	const roundedNum = Math.round(value * 100) / 100;
+	return roundedNum.toFixed(2);
+};
+
 const numberWithCommas = x => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
-export { convertObjToArr, getDateRange, numberWithCommas };
+export { convertObjToArr, getDateRange, numberWithCommas, roundOffTwoDecimal };

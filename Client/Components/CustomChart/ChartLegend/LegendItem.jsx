@@ -34,6 +34,11 @@ class LegendItem extends Component {
 
 	numberWithCommas = x => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
+	roundOffTwoDecimal = value => {
+		const roundedNum = Math.round(value * 100) / 100;
+		return roundedNum.toFixed(2);
+	};
+
 	toggleSerie() {
 		const { activeLegendItems, legend, series, yAxis } = this.props;
 		let activeLegendItemsCopy;
@@ -90,7 +95,7 @@ class LegendItem extends Component {
 				<div className="total">
 					{legend.total >= 0
 						? legend.valueType === 'money'
-							? `$${this.numberWithCommas(legend.total.toFixed(2))}`
+							? `$${this.numberWithCommas(this.roundOffTwoDecimal(legend.total))}`
 							: this.numberWithCommas(legend.total)
 						: 'N/A'}
 				</div>

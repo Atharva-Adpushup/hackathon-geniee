@@ -44,7 +44,10 @@ class Control extends Component {
 	}
 
 	shouldComponentUpdate(nextProps, nextState) {
-		return this.state.reportType !== nextState.reportType || this.state.updateStatusText !== nextState.updateStatusText;
+		return (
+			this.state.reportType !== nextState.reportType ||
+			this.state.updateStatusText !== nextState.updateStatusText
+		);
 	}
 
 	onFilteChange = selectedFilters => {
@@ -161,6 +164,7 @@ class Control extends Component {
 						<label className="u-text-normal">Report By</label>
 						<SelectBox
 							id="report-by"
+							key="report-by"
 							isClearable={false}
 							isSearchable={false}
 							wrapperClassName="custom-select-box-wrapper"
@@ -179,6 +183,7 @@ class Control extends Component {
 						<label className="u-text-normal">Interval</label>
 						<SelectBox
 							id="interval"
+							key="interval"
 							wrapperClassName="custom-select-box-wrapper"
 							isClearable={false}
 							isSearchable={false}
@@ -210,6 +215,7 @@ class Control extends Component {
 					<div className="aligner-item aligner-item--grow5 u-margin-r4">
 						{/* eslint-disable */}
 						<AsyncGroupSelect
+							key="filter list"
 							filterList={state.filterList}
 							selectedFilters={state.selectedFilters}
 							onFilterValueChange={this.onFilteChange}
@@ -241,10 +247,6 @@ class Control extends Component {
 							<Glyphicon glyph="download-alt u-margin-r2" />
 							Export Report
 						</a>
-						{/* <Button onClick={this.generateButtonHandler} disabled={state.disableGenerateButton}>
-							<Glyphicon glyph="download-alt u-margin-r2" />
-							Export Report
-						</Button> */}
 					</div>
 				</div>
 			</Fragment>

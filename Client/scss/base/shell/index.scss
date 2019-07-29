@@ -12,8 +12,10 @@
 		flex-grow: 1;
 		.main-content {
 			flex-grow: 1;
-			background: #eee;
+			//background: #eee;
+			background: #ebf1f2;
 			padding: 30px;
+			position: relative;
 			overflow-y: auto;
 		}
 	}
