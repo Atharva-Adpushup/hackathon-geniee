@@ -203,7 +203,9 @@ class MySites extends React.Component {
 
 					const { siteId } = site;
 					const statusObject = SITE_SETUP_STATUS[siteStep];
-					const domanizeDomain = domanize(site.domain);
+					const domanizeDomain = isSuperUser
+						? `${domanize(site.domain)} - ${siteId}`
+						: domanize(site.domain);
 					const computedReportingUrl = `/reports/${siteId}`;
 					const computedManageSiteUrl = `/sites/${siteId}`;
 					const isSiteBlock = ref.getValidObject(statusObject.site);
