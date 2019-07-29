@@ -33,6 +33,9 @@ var auction = {
 			rubicon: {
 				singleRequest: true
 			},
+			cache: {
+				url: '//prebid.adnxs.com/pbc/v1/cache'
+			},
 			userSync: {
 				filterSettings: {
 					iframe: {
