@@ -35,9 +35,7 @@ const ApTag = lazy(() => import(/* webpackChunkName: "apTag" */ './Apps/ApTag/in
 const InnovativeAds = lazy(() =>
 	import(/* webpackChunkName: "innovativeAds" */ './Apps/InnovativeAds/index')
 );
-const Reporting = lazy(() =>
-	import(/* webpackChunkName: "innovativeAds" */ './Apps/Reporting/index')
-);
+const Reporting = lazy(() => import(/* webpackChunkName: "reporting" */ './Apps/Reporting/index'));
 const ManageSite = lazy(() =>
 	import(/* webpackChunkName: "manageSite" */ './Pages/ManageSite/index')
 );
@@ -100,7 +98,7 @@ const Routes = () => (
 					{/** App Layout */}
 					<PrivateRoute
 						exact
-						name="Layout Editor"
+						name="Transform Code"
 						path="/sites/:siteId/apps/layout"
 						component={Layout}
 					/>

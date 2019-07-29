@@ -2,7 +2,7 @@
 /* eslint-disable prefer-destructuring */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { DropdownButton, MenuItem, Glyphicon } from 'react-bootstrap';
+import { DropdownButton, MenuItem, Glyphicon, OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 const findSelected = props => {
 	const { selected, title, options } = props;
@@ -33,7 +33,7 @@ class SelectBox extends Component {
 		const dataKey = e && e.target ? e.target.getAttribute('data-key') : '';
 
 		if (!e || !e.target || !e.target.getAttribute('data-value')) {
-			return this.setState({ name: title }, () => onSelect(null));
+			return this.setState({ name: title, selected: '' }, () => onSelect(null));
 		}
 
 		let value;
@@ -50,16 +50,17 @@ class SelectBox extends Component {
 		}
 		return this.setState(
 			{
-				name: e.target.getAttribute('data-name')
+				name: e.target.getAttribute('data-name'),
+				selected: value
 			},
 			() => onSelect(value, dataKey)
 		);
 	};
 
 	render() {
-		const { name } = this.state;
+		const { name, selected } = this.state;
 		const {
-			selected,
+			//	selected,
 			options,
 			id,
 			title,
@@ -67,9 +68,10 @@ class SelectBox extends Component {
 			dropdownClassName,
 			type,
 			dataKey,
-			reset
+			reset,
+			pullRight
 		} = this.props;
-		const selectedTilte = reset ? (
+		const selectedTitle = reset ? (
 			<div
 				className="aligner aligner--hSpaceBetween width-100  aligner--wrap"
 				style={{ width: '100%' }}
@@ -88,28 +90,50 @@ class SelectBox extends Component {
 		) : (
 			name
 		);
-		const buttonTitle = selected === 0 || selected ? selectedTilte : title;
+		const buttonTitle = selected === 0 || selected ? selectedTitle : title;
+		const tooltip = <Tooltip id="tooltip">Please select a website.</Tooltip>;
 		return (
 			<div className={`custom-select-box-wrapper ${wrapperClassName}`}>
 				<DropdownButton
 					title={buttonTitle}
 					bsStyle={type}
+					pullRight={pullRight}
 					className={`custom-select-box ${dropdownClassName}`}
 					id={id}
 					onSelect={this.selectWrapper}
 				>
-					{options.map((option, key) => (
-						<MenuItem
-							eventKey={`id-${key}`}
-							key={option.value}
-							data-value={option.value}
-							data-name={option.name}
-							data-key={dataKey}
-							active={selected === option.value}
-						>
-							{option.name}
-						</MenuItem>
-					))}
+					{options.map((option, key) => {
+						if (option.isDisabled) {
+							return (
+								<OverlayTrigger overlay={tooltip} key={`id-${key}`}>
+									<MenuItem
+										eventKey={`id-${key}`}
+										key={option.value}
+										data-value={option.value}
+										data-name={option.name}
+										data-key={dataKey}
+										active={selected === option.value}
+										disabled={option.isDisabled}
+									>
+										{option.name}
+									</MenuItem>
+								</OverlayTrigger>
+							);
+						}
+						return (
+							<MenuItem
+								eventKey={`id-${key}`}
+								key={option.value}
+								data-value={option.value}
+								data-name={option.name}
+								data-key={dataKey}
+								active={selected === option.value}
+								disabled={option.isDisabled}
+							>
+								{option.name}
+							</MenuItem>
+						);
+					})}
 				</DropdownButton>
 			</div>
 		);
@@ -130,7 +154,8 @@ SelectBox.propTypes = {
 	wrapperClassName: PropTypes.string,
 	title: PropTypes.string,
 	type: PropTypes.string,
-	reset: PropTypes.bool
+	reset: PropTypes.bool,
+	pullRight: PropTypes.bool
 };
 
 SelectBox.defaultProps = {
@@ -139,7 +164,8 @@ SelectBox.defaultProps = {
 	wrapperClassName: '',
 	type: 'default',
 	selected: null,
-	reset: false
+	reset: false,
+	pullRight: false
 };
 
 export default SelectBox;

@@ -18,13 +18,23 @@ export default class AddBidder extends React.Component {
 			showNotification
 		} = this.props;
 
+		// if bidder relation is adpushup then add our default values (bid type & revenue share)
+		if (bidderConfig.relation === 'adpushup' && fieldsConfig.bids) {
+			bidderConfig.bids = fieldsConfig.bids;
+			bidderConfig.revenueShare =
+				// eslint-disable-next-line no-restricted-globals
+				fieldsConfig.bids === 'gross' && !isNaN(fieldsConfig.revenueShare)
+					? fieldsConfig.revenueShare
+					: null;
+		}
+
 		switch (bidderConfig.key) {
 			case 'ix': {
 				// eslint-disable-next-line no-restricted-syntax
 				for (const size in params) {
 					// eslint-disable-next-line no-prototype-builtins
 					if (params.hasOwnProperty(size)) {
-						params[size].size = size.split('x');
+						params[size].size = size.split('x').map(val => parseInt(val, 10));
 					}
 				}
 

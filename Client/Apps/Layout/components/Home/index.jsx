@@ -3,11 +3,10 @@ import { Nav, NavItem } from 'react-bootstrap';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faInfoCircle, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
 import ActionCard from '../../../../Components/ActionCard/index';
 import OverlayTooltip from '../../../../Components/OverlayTooltip/index';
 import ControlTagConversion from './ControlTagConversion';
-import { COMPONENT_TITLES } from '../../constants/index';
+import Loader from '../../../../Components/Loader';
 
 library.add(faInfoCircle, faExternalLinkAlt);
 
@@ -16,8 +15,7 @@ class Home extends Component {
 		super(props);
 		const defaultNavItem = 1;
 		this.state = {
-			activeNav: defaultNavItem,
-			title: COMPONENT_TITLES[defaultNavItem]
+			activeNav: defaultNavItem
 		};
 		this.handleNavSelect = this.handleNavSelect.bind(this);
 		this.renderContent = this.renderContent.bind(this);
@@ -33,8 +31,10 @@ class Home extends Component {
 		return siteId;
 	};
 
+	getVisualEditorLink = siteId => `/api/visualEditor/${siteId}`;
+
 	handleNavSelect(value) {
-		this.setState({ activeNav: value, title: COMPONENT_TITLES[value] });
+		this.setState({ activeNav: value });
 	}
 
 	renderContent() {
@@ -46,36 +46,40 @@ class Home extends Component {
 			case 1:
 				return <ControlTagConversion siteId={siteId} />;
 			case 2:
-				return <div>Ad Layout component</div>;
+				return <Loader />;
 		}
 	}
 
 	render() {
-		const { title, activeNav } = this.state;
+		const { activeNav } = this.state;
 		const siteId = this.getSiteId();
-		const computedEditorLink = `/user/site/${siteId}/editor`;
+		const computedEditorLink = this.getVisualEditorLink(siteId);
 
 		return (
-			<ActionCard title={title}>
+			<ActionCard>
 				<Nav bsStyle="tabs" activeKey={activeNav} onSelect={this.handleNavSelect}>
 					<NavItem eventKey={1}>
 						Transform Code
 						<OverlayTooltip
-							id="tooltip-info"
+							id="tooltip-info-transform-code"
 							placement="top"
 							tooltip="Wrap your existing ad codes with AdPushup code wrapper"
 						>
 							<FontAwesomeIcon icon="info-circle" className="u-margin-l3" />
 						</OverlayTooltip>
 					</NavItem>
+					<NavItem eventKey={2} href={computedEditorLink}>
+						Visual Editor
+						<OverlayTooltip
+							id="tooltip-info-visual-editor"
+							placement="top"
+							tooltip="To visit Visual Editor, please click here"
+						>
+							<FontAwesomeIcon icon="info-circle" className="u-margin-l3" />
+						</OverlayTooltip>
+					</NavItem>
 				</Nav>
 				{this.renderContent()}
-				<h4 className="u-padding-h4 u-margin-t3 u-margin-b4 u-text-bold">
-					To visit Visual Editor, please click here
-					<a target="_blank" rel="noopener noreferrer" href={computedEditorLink}>
-						<FontAwesomeIcon icon="external-link-alt" className="u-margin-l2" />
-					</a>
-				</h4>
 			</ActionCard>
 		);
 	}

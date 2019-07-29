@@ -5,12 +5,14 @@ const prodEnv = config.environment.HOST_ENV === 'production';
 module.exports = {
 	SALT: '_ADP_RANDOMIZER_',
 	BASE_URL: prodEnv ? 'https://console.adpushup.com' : 'http://localhost:8080',
+	INTEGRATION_BASE_URL: prodEnv ? 'https://app.staging.adpushup.com/' : 'http://localhost:8080',
 	DFP_WEB_SERVICE_ENDPOINT: 'http://staging.adpushup.com/DfpWebService/info',
 	TRANSACTION_LOG_ENDPOINT: 'https://api.adpushup.com/SetupLogWebService/log',
 	REPORT_STATUS: 'https://api.adpushup.com/OpsWebService/ops?report=getNetworkImportServiceStatus',
 	IE_TESTING_ENDPOINT: 'http://apdc1n-central5.eastus2.cloudapp.azure.com:8081/api/health-report',
 	PROXY_ORIGIN: '//proxy.app.adpushup.com',
 	PRODUCT_LIST_API: 'https://staging.adpushup.com/CentralReportingWebService/common/activeProducts',
+	MAB_REPORTING_API: 'https://staging.adpushup.com/CentralReportingWebService/site/mab',
 	ACTIVE_SITES_API: 'https://staging.adpushup.com/CentralReportingWebService/site/activeSiteList',
 	ANALYTICS_API_ROOT: 'https://staging.adpushup.com/CentralReportingWebService',
 	ANALYTICS_METAINFO_URL: '/common/metaInfo',
@@ -217,8 +219,8 @@ module.exports = {
 		emailBlockList: ['demo@adpushup.com']
 	},
 	password: {
-		MASTER: 'fe4720b8bcdedb3cc47490015b0ab050',
-		IMPERSONATE: 'djasgjhd6876**hhkhkjhkh4ghg'
+		MASTER: 'fd146d7eea32ff77a19987f41081f466',
+		IMPERSONATE: 'cf24e8d8cfcb3e3cf0270ae0f3f1f1c0'
 	},
 	exceptions: {
 		str: {

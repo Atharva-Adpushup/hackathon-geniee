@@ -9,6 +9,7 @@ import formValidator from '../../../helpers/formValidator';
 import allAdSizes from '../constants/adSizes';
 import AdSizeSelector from './AdSizeSelector';
 import { getFilteredAdSizes } from '../helpers/commonHelpers';
+import CustomIcon from '../../../Components/CustomIcon';
 
 class SizewiseParamsFormFields extends React.Component {
 	state = {
@@ -21,9 +22,12 @@ class SizewiseParamsFormFields extends React.Component {
 		const { sizes, formFields, savedParams } = this.props;
 
 		this.setState(() => {
-			const newState = { activeKey: sizes[0], tempParams: {} };
+			const newState = {
+				activeKey: (!!sizes.length && sizes[0].downwardIABSize) || '',
+				tempParams: {}
+			};
 
-			for (const adSize of sizes) {
+			for (const { downwardIABSize: adSize } of sizes) {
 				const params = {};
 
 				for (const paramKey in formFields.params.siteLevel) {
@@ -117,11 +121,11 @@ class SizewiseParamsFormFields extends React.Component {
 		const { tempParams } = this.state;
 		const tabsJSX = [];
 
-		for (const size of sizes) {
+		for (const { downwardIABSize: size, originalSize } of sizes) {
 			tabsJSX.push(
 				<NavItem key={size} eventKey={size}>
-					{size}
-					{tempParams[size] && tempParams[size].saved ? ' [added]' : ''}
+					{`${size} (${originalSize})`}
+					{tempParams[size] && tempParams[size].saved ? <CustomIcon icon="check" /> : ''}
 				</NavItem>
 			);
 		}
@@ -140,13 +144,20 @@ class SizewiseParamsFormFields extends React.Component {
 		const { activeKey: adSize, tempParamsErrors, tempParams } = this.state;
 
 		if (adSize === 'add-size') {
-			const filteredAdSizes = getFilteredAdSizes(allAdSizes, sizes);
+			const filteredAdSizes = getFilteredAdSizes(
+				allAdSizes,
+				sizes.map(({ downwardIABSize: size }) => size)
+			);
 
 			return (
 				<React.Fragment>
 					<AdSizeSelector filteredAdSizes={filteredAdSizes} addNewSize={this.addNewSize} />
 				</React.Fragment>
 			);
+		}
+
+		if (!sizes.length) {
+			return <p className="no-inventory-warning">Please add an Inventory size first</p>;
 		}
 
 		return (

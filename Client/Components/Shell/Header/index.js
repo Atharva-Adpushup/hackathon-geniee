@@ -12,16 +12,23 @@ const Header = ({ sidebarToggle, logout, user, switchUser, findUsers }) => (
 			<FontAwesomeIcon icon="bars" />
 		</span>
 		<span className="ap-logo">
-			<img src="https://console.adpushup.com/assets/images/logo.png" alt="AdPushup" />
+			<img src="/assets/images/adpushup-logo-small.png" alt="AdPushup" />
 		</span>
 
 		<div className="header-nav">
 			{user.isSuperUser ? <UserChange switchUser={switchUser} findUsers={findUsers} /> : null}
 
 			<DropdownButton pullRight title={`Hello ${user.firstName || ''}`} id="dropdown-button">
-				<MenuItem eventKey="1">Profile</MenuItem>
-				<MenuItem eventKey="2">Settings</MenuItem>
-				<MenuItem eventKey="3">Support</MenuItem>
+				{/* <MenuItem eventKey="1">Profile</MenuItem> */}
+				{/* <MenuItem eventKey="2">Settings</MenuItem> */}
+				<MenuItem
+					eventKey="3"
+					href="https://support.adpushup.com/portal/home"
+					target="_blank"
+					rel="noopener noreferrer"
+				>
+					Support
+				</MenuItem>
 				<MenuItem
 					eventKey="4"
 					onClick={() =>

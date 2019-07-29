@@ -1,12 +1,13 @@
 // Custom tab styles
 
 .nav-tabs {
-	padding: 0 10px;
+	padding: 0;
 	font-size: 1em;
+	margin-bottom: 10px;
+	border-bottom: none;
 
 	li {
 		a {
-			color: $fontColor;
 			font-size: 1.15em;
 			padding: 10px;
 			display: inline-block;
@@ -19,6 +20,16 @@
 				background: none;
 				border-color: $borderColor;
 			}
+		}
+
+		&:after {
+			content: '|';
+			position: relative;
+			left: -15px;
+			color: #999;
+		}
+		&:last-child:after {
+			content: '';
 		}
 
 		&.active {

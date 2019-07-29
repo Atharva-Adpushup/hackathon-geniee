@@ -13,7 +13,7 @@ class PerformanceApOriginal extends React.Component {
 	}
 
 	componentDidMount() {
-		let { displayData } = this.props;
+		const { displayData } = this.props;
 		if (displayData && displayData.result) {
 			this.computeGraphData(displayData.result);
 		}
@@ -42,14 +42,23 @@ class PerformanceApOriginal extends React.Component {
 				xAxis.categories.push(moment(result.report_date).format('ll'));
 			});
 			series = [
-				{ data: adpushupSeriesData, name: 'AdPushup Variation Page RPM', valueType: 'money' },
-				{ data: baselineSeriesData, name: 'Original Variation Page RPM', valueType: 'money' }
+				{
+					data: adpushupSeriesData,
+					name: 'AdPushup Variation Page RPM',
+					value: 'adpushup_variation_page_cpm',
+					valueType: 'money'
+				},
+				{
+					data: baselineSeriesData,
+					name: 'Original Variation Page RPM',
+					value: 'original_variation_page_cpm',
+					valueType: 'money'
+				}
 			];
 		}
 		this.setState({
 			series,
-			xAxis,
-			isLoading: false
+			xAxis
 		});
 	};
 
@@ -58,13 +67,13 @@ class PerformanceApOriginal extends React.Component {
 		const { series, xAxis } = this.state;
 		const { isDataSufficient } = this.props;
 		if (series && series.length > 0 && isDataSufficient) {
-			console.log(yAxisGroups, xAxis, series);
 			return (
 				<div>
 					<CustomChart type={type} series={series} xAxis={xAxis} yAxisGroups={yAxisGroups} />
 				</div>
 			);
-		} else return <div className="text-center">Insufficient Data.</div>;
+		}
+		return <div className="text-center">Insufficient Data.</div>;
 	}
 
 	render() {

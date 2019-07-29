@@ -5,7 +5,7 @@ import { fetchAppStatuses } from '../../../actions/siteActions';
 const mapStateToProps = (state, ownProps) => {
 	const {
 		user: {
-			data: { sites }
+			data: { sites, isSuperUser }
 		},
 		reports: {
 			data: { site: reportSites }
@@ -17,6 +17,7 @@ const mapStateToProps = (state, ownProps) => {
 		sites,
 		reportSites,
 		globalSites,
+		isSuperUser,
 		...ownProps
 	};
 };

@@ -5,10 +5,11 @@ import { showNotification } from '../actions/uiActions';
 import { switchUser, logout, findUsers } from '../actions/userActions';
 
 const mapStateToProps = (state, ownProps) => {
-	const { user, reports } = state.global;
+	const { user, reports, sites } = state.global;
 	return {
 		userFetched: user.fetched,
 		user: user.data,
+		sites: sites.data,
 		reportsFetched: reports.fetched,
 		...ownProps
 	};

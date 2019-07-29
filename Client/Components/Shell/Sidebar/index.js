@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { NavLink } from 'react-router-dom';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 
-const Sidebar = ({ show, user }) => {
+const Sidebar = ({ show, user, sites }) => {
 	const getNavItem = (name, link, icon, showTooltip, tooltipText) => {
 		const navItem = (
 			<NavLink to={link} className="clearfix" activeClassName="active">
@@ -54,22 +54,24 @@ const Sidebar = ({ show, user }) => {
 				{user.isSuperUser ? getNavItem('Admin Panel', '/admin-panel', 'tools', !show) : null}
 			</ul>
 
-			<div className="cta-btn-wrap">
-				{show ? (
-					ctaBtn
-				) : (
-					<OverlayTrigger
-						placement="right"
-						overlay={
-							<Tooltip id="addSiteTooltip">
-								<strong>Add New Website</strong>
-							</Tooltip>
-						}
-					>
-						{ctaBtn}
-					</OverlayTrigger>
-				)}
-			</div>
+			{sites && !!Object.keys(sites).length && (
+				<div className="cta-btn-wrap">
+					{show ? (
+						ctaBtn
+					) : (
+						<OverlayTrigger
+							placement="right"
+							overlay={
+								<Tooltip id="addSiteTooltip">
+									<strong>Add New Website</strong>
+								</Tooltip>
+							}
+						>
+							{ctaBtn}
+						</OverlayTrigger>
+					)}
+				</div>
+			)}
 
 			<ul className="sb-nav secondary-nav">
 				{getNavItem('Ads.txt Management', '/adsTxtManagement', 'align-center', !show)}

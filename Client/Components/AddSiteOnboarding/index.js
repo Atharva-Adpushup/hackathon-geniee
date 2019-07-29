@@ -28,6 +28,7 @@ class AddSiteOnboarding extends Component {
 
 		userService
 			.addSite(existingSite)
+			// eslint-disable-next-line no-unused-vars
 			.then(resp => siteService.saveSite(siteId, existingSite, onboardingStage, step))
 			.then(resp => {
 				onSiteAdd(resp.data);
@@ -43,9 +44,6 @@ class AddSiteOnboarding extends Component {
 		e.preventDefault();
 
 		const { onSiteAdd, site } = this.props;
-
-		console.log('site: ', site);
-
 		const validationResult = formValidator.validate({ site }, validationSchema.user.validations);
 
 		if (validationResult.isValid) {

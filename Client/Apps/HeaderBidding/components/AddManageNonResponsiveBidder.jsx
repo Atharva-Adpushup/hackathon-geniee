@@ -10,6 +10,7 @@ import formValidator from '../../../helpers/formValidator';
 import getValidationSchema from '../helpers/getValidationSchema';
 import { fetchInventorySizes } from '../../../services/hbService';
 import SizewiseParamsFormFields from './SizewiseParamsFormFields';
+import { filterValidationSchema } from '../helpers/commonHelpers';
 
 class AddManageNonResponsiveBidder extends React.Component {
 	state = {
@@ -109,10 +110,21 @@ class AddManageNonResponsiveBidder extends React.Component {
 								const newState = {
 									formFields,
 									fetchingSizes: false,
-									sizes: [...new Set([...sizes, ...Object.keys(params)])],
+									sizes,
 									params: {},
 									globalParams: {}
 								};
+
+								// merge param sizes with inventory sizes
+								const paramSizes = Object.keys(params);
+								newState.sizes = [
+									...newState.sizes,
+									...paramSizes
+										.filter(
+											paramSize => !newState.sizes.find(size => paramSize === size.downwardIABSize)
+										)
+										.map(paramSize => ({ originalSize: paramSize, downwardIABSize: paramSize }))
+								];
 
 								for (const collectionKey in formFields) {
 									newState[collectionKey] = {};
@@ -189,7 +201,9 @@ class AddManageNonResponsiveBidder extends React.Component {
 	}
 
 	addNewSizeInState = adSize => {
-		this.setState(state => ({ sizes: [...state.sizes, adSize] }));
+		this.setState(state => ({
+			sizes: [...state.sizes, { originalSize: adSize, downwardIABSize: adSize }]
+		}));
 	};
 
 	onSubmit = e => {
@@ -197,10 +211,11 @@ class AddManageNonResponsiveBidder extends React.Component {
 
 		const { onBidderAdd, onBidderUpdate } = this.props;
 		const { bidderConfig, globalParams, params, validationSchema, sizes } = this.state;
+		const isDirectRelation = bidderConfig.relation === 'direct';
 
 		const validationResult = formValidator.validate(
 			{ ...bidderConfig, ...globalParams },
-			validationSchema
+			isDirectRelation ? validationSchema : filterValidationSchema(validationSchema, ['bids'])
 		);
 
 		if (validationResult.isValid) {
@@ -213,7 +228,7 @@ class AddManageNonResponsiveBidder extends React.Component {
 					mergedParams[size] = { ...paramsObj, ...globalParams };
 				}
 			} else {
-				sizes.forEach(size => {
+				sizes.forEach(({ downwardIABSize: size }) => {
 					mergedParams[size] = globalParams;
 				});
 			}
@@ -280,19 +295,25 @@ class AddManageNonResponsiveBidder extends React.Component {
 		return currValue;
 	};
 
-	getFormFieldsToRender = (formFields, isGrossBid) => {
+	getFormFieldsToRender = (formFields, isDirectRelation, isGrossBid) => {
 		const computedFormFields = {
 			bidderConfig: {},
 			globalParams: formFields.params.global
 		};
 
-		if (isGrossBid) {
-			computedFormFields.bidderConfig = formFields.bidderConfig;
+		if (!isDirectRelation) {
+			const { bids, revenueShare, ...rest } = formFields.bidderConfig;
+			computedFormFields.bidderConfig = rest;
 			return computedFormFields;
 		}
 
-		const { revenueShare, ...rest } = formFields.bidderConfig;
-		computedFormFields.bidderConfig = rest;
+		if (isDirectRelation && !isGrossBid) {
+			const { revenueShare, ...rest } = formFields.bidderConfig;
+			computedFormFields.bidderConfig = rest;
+			return computedFormFields;
+		}
+
+		computedFormFields.bidderConfig = formFields.bidderConfig;
 		return computedFormFields;
 	};
 
@@ -300,7 +321,7 @@ class AddManageNonResponsiveBidder extends React.Component {
 		const { openBiddersListView, formType } = this.props;
 		const {
 			formFields,
-			bidderConfig: { bids },
+			bidderConfig: { bids, relation },
 			errors,
 			fetchingSizes,
 			validationSchema,
@@ -313,7 +334,11 @@ class AddManageNonResponsiveBidder extends React.Component {
 				{!fetchingSizes && (
 					<Form horizontal onSubmit={this.onSubmit}>
 						<BidderFormFields
-							formFields={this.getFormFieldsToRender(formFields, bids === 'gross')}
+							formFields={this.getFormFieldsToRender(
+								formFields,
+								relation === 'direct',
+								bids === 'gross'
+							)}
 							formType={formType}
 							setFormFieldValueInState={this.setFormFieldValueInState}
 							getCurrentFieldValue={this.getCurrentFieldValue}

@@ -9,6 +9,7 @@ var model = require('../helpers/model'),
 	apConfigSchema = require('./subClasses/site/apConfig'),
 	Promise = require('bluebird'),
 	commonConsts = require('../configs/commonConsts'),
+	adSizeMappingConsts = require('../helpers/adSizeMappingConsts'),
 	_ = require('lodash'),
 	Site = model.extend(function() {
 		this.keys = [
@@ -253,7 +254,9 @@ function apiModule() {
 			}
 
 			if (!json.genieeMediaId) {
-				throw new AdPushupError([{ status: 403, message: 'Please provide a valid Geniee Media id' }]);
+				throw new AdPushupError([
+					{ status: 403, message: 'Please provide a valid Geniee Media id' }
+				]);
 			}
 
 			if (!json.apConfigs.hasOwnProperty('isAdPushupControlWithPartnerSSP')) {
@@ -265,7 +268,7 @@ function apiModule() {
 				return API.saveSiteData(siteId, 'POST', json);
 			});
 		},
-		getSiteById: function(siteId, requestMethod) {
+		getSiteById: function(siteId) {
 			return couchbase
 				.connectToAppBucket()
 				.then(function(appBucket) {
@@ -426,13 +429,13 @@ function apiModule() {
 					throw new AdPushupError('Cannot get setup step');
 				});
 		},
-		getSetupStage: function (siteId) {
+		getSetupStage: function(siteId) {
 			return API.getSiteById(siteId)
-				.then(function (site) {
+				.then(function(site) {
 					var onboardingStage = site.get('onboardingStage');
 					return onboardingStage;
 				})
-				.catch(function (err) {
+				.catch(function(err) {
 					throw new AdPushupError('Cannot get setup onboarding stage');
 				});
 		},
@@ -518,7 +521,7 @@ function apiModule() {
 												const ad = section.ads[adKey];
 
 												if (ad.network === 'adpTags') {
-													if(ad.width === 'responsive') {
+													if (ad.width === 'responsive') {
 														sizesArray.push(ad.width);
 														continue;
 													}
@@ -545,7 +548,7 @@ function apiModule() {
 		isApTagInventoryExist: siteId => {
 			return couchbase
 				.connectToAppBucket()
-				.then(function (appBucket) {
+				.then(function(appBucket) {
 					return appBucket.getAsync('tgmr::' + siteId, {});
 				})
 				.then(({ value }) => {
@@ -571,7 +574,7 @@ function apiModule() {
 		getApTagInventorySizes: siteId => {
 			return couchbase
 				.connectToAppBucket()
-				.then(function (appBucket) {
+				.then(function(appBucket) {
 					return appBucket.getAsync('tgmr::' + siteId, {});
 				})
 				.then(({ value }) => {
@@ -579,7 +582,7 @@ function apiModule() {
 					if (value.ads.length) {
 						for (const ad of value.ads) {
 							if (ad.network === 'adpTags') {
-								if(ad.width === 'responsive') {
+								if (ad.width === 'responsive') {
 									sizesArray.push(ad.width);
 									continue;
 								}
@@ -595,7 +598,7 @@ function apiModule() {
 		isInnovativeAdInventoryExist: siteId => {
 			return couchbase
 				.connectToAppBucket()
-				.then(function (appBucket) {
+				.then(function(appBucket) {
 					return appBucket.getAsync('fmrt::' + siteId, {});
 				})
 				.then(({ value }) => {
@@ -621,7 +624,7 @@ function apiModule() {
 		getInnovativeAdInventorySizes: siteId => {
 			return couchbase
 				.connectToAppBucket()
-				.then(function (appBucket) {
+				.then(function(appBucket) {
 					return appBucket.getAsync('fmrt::' + siteId, {});
 				})
 				.then(({ value }) => {
@@ -629,7 +632,7 @@ function apiModule() {
 					if (value.ads.length) {
 						for (const ad of value.ads) {
 							if (ad.network === 'adpTags') {
-								if(ad.width === 'responsive') {
+								if (ad.width === 'responsive') {
 									sizesArray.push(ad.width);
 									continue;
 								}
@@ -647,11 +650,39 @@ function apiModule() {
 				.catch(() => API.isApTagInventoryExist(siteId))
 				.catch(() => API.isInnovativeAdInventoryExist(siteId));
 		},
+		getDownwardIABSize: originalSize => {
+			const [width, height] = originalSize.split('x').map(val => parseInt(val, 10));
+
+			const downwardSizes =
+				adSizeMappingConsts.IAB_SIZES.BACKWARD_COMPATIBLE_MAPPING[`${width},${height}`];
+			if (downwardSizes && downwardSizes[0]) {
+				return downwardSizes[0].join('x');
+			}
+
+			// loop through allIabSizes and find the downward size with min diff
+			const allIABSizes = adSizeMappingConsts.IAB_SIZES.ALL;
+			const minDownwardDiff = { diff: null, size: '' };
+			allIABSizes.forEach(([iabWidth, iabHeight], index) => {
+				if (iabWidth <= width && iabHeight <= height) {
+					const diff = width - iabWidth + (height - iabHeight);
+					if (isNaN(minDownwardDiff.diff) || minDownwardDiff.diff > diff) {
+						minDownwardDiff.diff = diff;
+						minDownwardDiff.size = `${iabWidth}x${iabHeight}`;
+					}
+				}
+			});
+
+			return minDownwardDiff.size || false;
+		},
 		getUniqueInventorySizes: siteId => {
 			return Promise
 				.all([API.getLayoutInventorySizes(siteId), API.getApTagInventorySizes(siteId), API.getInnovativeAdInventorySizes(siteId)])
 				.then(([layoutInventorySizes, apTagInventorySizes, innovativeAdInventorySizes]) => {
-					return [...new Set([...layoutInventorySizes, ...apTagInventorySizes, ...innovativeAdInventorySizes])]
+					const uniqueSizes = [...new Set([...layoutInventorySizes, ...apTagInventorySizes, ...innovativeAdInventorySizes])];
+					return uniqueSizes.map(originalSize => {
+						const downwardIABSize = API.getDownwardIABSize(originalSize);
+						return { originalSize, downwardIABSize };
+					});
 				});
 		},
 		setSiteStep: function(siteId, onboardingStage, step) {
@@ -705,9 +736,11 @@ function apiModule() {
 			return API.getSiteById(parseInt(siteId)).then(function(site) {
 				var pageGroupPromises = _.map(site.get('channels'), function(channel) {
 					var pageGroup = channel.split(':');
-					return channelModel.getChannel(siteId, pageGroup[0], pageGroup[1]).then(function(channel) {
-						return channel.data;
-					});
+					return channelModel
+						.getChannel(siteId, pageGroup[0], pageGroup[1])
+						.then(function(channel) {
+							return channel.data;
+						});
 				});
 
 				return Promise.all(pageGroupPromises).then(function(pageGroups) {

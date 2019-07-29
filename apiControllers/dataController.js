@@ -1,16 +1,19 @@
 const express = require('express');
 const atob = require('atob');
+const _ = require('lodash');
 
 const userModel = require('../models/userModel');
 const siteModel = require('../models/siteModel');
+const channelModel = require('../models/channelModel');
 const utils = require('../helpers/utils');
 const CC = require('../configs/commonConsts');
 const httpStatus = require('../configs/httpStatusConsts');
 const pagegroupCreationAutomation = require('../services/pagegroupCreationAutomation');
 const AdpushupError = require('../helpers/AdPushupError');
 const { checkParams, errorHandler, verifyOwner } = require('../helpers/routeHelpers');
-const { sendSuccessResponse } = require('../helpers/commonFunctions');
+const { sendSuccessResponse, getNetworkConfig } = require('../helpers/commonFunctions');
 const upload = require('../helpers/uploadToCDN');
+const logger = require('../helpers/globalBucketLogger');
 
 const router = express.Router();
 
@@ -34,7 +37,7 @@ router
 					siteId,
 					ownerEmail: req.user.email,
 					onboardingStage: data.onboardingStage,
-					step: parseInt(data.step),
+					step: parseInt(data.step, 10),
 					ads: [],
 					channels: [],
 					templates: [],
@@ -112,6 +115,120 @@ router
 				);
 			})
 			.catch(err => errorHandler(err, res, httpStatus.INTERNAL_SERVER_ERROR));
-	});
+	})
+	.get('/getData', (req, res) => {
+		const {
+			query: { siteId }
+		} = req;
+		const computedJSON = {};
+
+		function sendComputedData(site, channels) {
+			computedJSON.siteId = siteId;
+			computedJSON.channels = channels;
+			computedJSON.site = site.toClientJSON();
+			computedJSON.reporting = {};
+			return getNetworkConfig().then(networkConfig => {
+				computedJSON.networkConfig = networkConfig;
+				return res.json(computedJSON);
+			});
+		}
+
+		function sendEmptyData() {
+			computedJSON.channels = [];
+			computedJSON.site = {};
+			computedJSON.reporting = {};
+			return res.json(computedJSON);
+		}
+
+		return siteModel
+			.getSiteById(siteId)
+			.then(site => site.getAllChannels().then(sendComputedData.bind(null, site)), sendEmptyData)
+			.catch(() => res.json(computedJSON));
+	})
+	.post('/saveData', (req, res) => {
+		const parsedData =
+			typeof req.body.data === 'string' ? JSON.parse(req.body.data) : req.body.data;
+		const siteData = {
+			apConfigs: { mode: parsedData.siteMode },
+			siteId: parsedData.siteId,
+			siteDomain: parsedData.siteDomain,
+			customSizes: parsedData.customSizes || [],
+			channels: _.map(parsedData.channels, channel => `${channel.platform}:${channel.pageGroup}`)
+		};
+
+		/**
+		 * OBJECTIVE: To check whether there is any channel already deleted in database
+		 * IMPLEMENTATION: Compute deleted channels, if any exist, throw an error
+		 * @param {siteId} siteId site document id
+		 * @param {channelNames} channel names array
+		 * @returns {boolean} When there is no deleted array
+		 */
+		function checkChannelsExistence(siteId, channelNames) {
+			const deletedChannelsArr = _.map(channelNames, channelNameVal => {
+				const channelKey = `chnl::${siteId}:${channelNameVal}`;
+
+				return channelModel
+					.isChannelExist(channelKey)
+					.then(isExist => (!isExist ? channelNameVal : false));
+			});
+
+			return Promise.all(deletedChannelsArr).then(channelsArr => {
+				const compactedArr = _.compact(channelsArr);
+
+				if (compactedArr && compactedArr.length) {
+					throw new AdpushupError('One or more channels are deleted. Site will not be saved!');
+				}
+
+				return Promise.resolve(true);
+			});
+		}
+
+		return checkChannelsExistence(siteData.siteId, siteData.channels)
+			.then(siteModel.saveSiteData.bind(null, siteData.siteId, 'POST', siteData))
+			.then(channelModel.saveChannels.bind(null, parsedData.siteId, parsedData.channels))
+			.then(() =>
+				res.json({
+					success: 1,
+					siteId: parsedData.siteId,
+					siteDomain: parsedData.siteDomain
+				})
+			)
+			.catch(err =>
+				res.json({
+					success: 0,
+					message: err.toString()
+				})
+			);
+	})
+	.post('/createLog', (req, res) =>
+		checkParams([['data'], req, 'post'])
+			.then(() => {
+				const { data } = req.body;
+				const decodedData = atob(data);
+
+				return logger({
+					source: 'CONSOLE ERROR LOGS',
+					message: 'UNCAUGHT ERROR BOUNDARY',
+					debugData: decodedData
+				});
+			})
+			.then(() =>
+				sendSuccessResponse(
+					{
+						message: 'Log Written'
+					},
+					res
+				)
+			)
+			.catch(err => {
+				console.log(err);
+				return sendSuccessResponse(
+					{
+						message: `Log Written Failed`
+					},
+					res
+				);
+			})
+	);
 
 module.exports = router;

@@ -122,9 +122,11 @@ function getReportsMetaData(params) {
 		uri: `${consts.ANALYTICS_API_ROOT}${consts.ANALYTICS_METAINFO_URL}`,
 		json: true,
 		qs: params
-	}).then(response => {
-		return response.code == 1 ? response.data : {};
-	});
+	})
+		.then(response => {
+			return response.code == 1 ? response.data : {};
+		})
+		.catch(err => {});
 }
 
 // Set user session data and redirects to relevant screen based on provided parameters

@@ -3,7 +3,7 @@ const Promise = require('bluebird');
 const PromiseFtp = require('promise-ftp');
 const _ = require('lodash');
 const uglifyJS = require('uglify-js');
-const { getReportData, getMediationData } = require('../../../reports/universal/index');
+const getReportData = require('../../../reports/universal/index');
 const mkdirpAsync = Promise.promisifyAll(require('mkdirp')).mkdirpAsync;
 const fs = Promise.promisifyAll(require('fs'));
 const CC = require('../../../configs/commonConsts');
@@ -21,14 +21,13 @@ const disableSiteCdnSyncList = [38333];
 // Websites: autocarindia (38333, It is running adpushup lite for which script is uploaded to CDN manually, for now)
 const ieTestingSiteList = [38903]; // iaai.com
 
-module.exports = function(site, externalData = {}) {
+module.exports = function(site) {
 	ftp = new PromiseFtp();
 
 	var paramConfig = {
 			siteId: site.get('siteId')
 		},
 		noop = 'function() {}',
-		isExternalRequest = externalData && Object.keys(externalData).length && externalData.externalRequest,
 		isAutoOptimise = !!(site.get('apConfigs') && site.get('apConfigs').autoOptimise),
 		poweredByBanner = !!(site.get('apConfigs') && site.get('apConfigs').poweredByBanner),
 		tempDestPath = path.join(
@@ -88,10 +87,18 @@ module.exports = function(site, externalData = {}) {
 		generateFinalInitScript = jsFile => {
 			return {
 				addService: (serviceName, isActive, serviceConfig = {}) => {
+					var prebidConfig = serviceConfig.prebidConfig;
+					var inventory = Object.assign({}, serviceConfig);
+					delete inventory.prebidConfig;
+					delete inventory.dateCreated;
+					delete inventory.dateModified;
+					delete inventory.siteId;
+					
 					switch (serviceName) {
 						case CC.SERVICES.ADPTAGS:
 							if (isActive) {
-								jsFile = _.replace(jsFile, '__INVENTORY__', JSON.stringify(serviceConfig));
+								jsFile = _.replace(jsFile, '__INVENTORY__', JSON.stringify(inventory));
+								jsFile = _.replace(jsFile, '__PREBID_CONFIG__', JSON.stringify(prebidConfig));
 								jsFile = _.replace(jsFile, '__SITE_ID__', site.get('siteId'));
 							}
 							return generateFinalInitScript(jsFile);
@@ -131,10 +138,7 @@ module.exports = function(site, externalData = {}) {
 			};
 		},
 		getComputedConfig = () => {
-			function getData() {
-				return isExternalRequest ? getMediationData(site, externalData) : getReportData(site);
-			}
-			return getData()
+			return getReportData(site)
 				.then(reportData => {
 					if (reportData.status && reportData.data) {
 						return generateAdPushupConfig(site, reportData.data);
@@ -245,10 +249,7 @@ module.exports = function(site, externalData = {}) {
 		getFinalConfigWrapper = () => getFinalConfig().then(fileConfig => fileConfig);
 
 	return Promise.join(getFinalConfigWrapper(), fileConfig => {
-		function processing() {
-			return isExternalRequest ? Promise.resolve(fileConfig.uncompressed) : uploadJS(fileConfig);
-		}
-		return processing()
+		return uploadJS(fileConfig)
 			.then(writeTempFile)
 			.then(startIETesting)
 			.then(() => writeTempFile(fileConfig.default, 'adpushup.min.js'))

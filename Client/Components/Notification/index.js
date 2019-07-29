@@ -31,6 +31,14 @@ class Notification extends Component {
 					left: 'auto',
 					right: '0'
 				}
+			},
+			NotificationItem: {
+				// Override the notification item
+				DefaultStyle: {
+					// Applied to every notification, regardless of the notification level
+					borderTopWidth: '5px',
+					boxShadow: '0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22)'
+				}
 			}
 		};
 		return (

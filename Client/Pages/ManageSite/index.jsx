@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import { Helmet } from 'react-helmet';
-import ManageSite from './components/index';
+import ManageSiteContainer from './containers/ManageSiteContainer';
 import '../../scss/pages/manageSites/index.scss';
 
 const App = props => (
@@ -9,7 +9,7 @@ const App = props => (
 			<title>Manage Site</title>
 		</Helmet>
 
-		<ManageSite {...props} />
+		<ManageSiteContainer {...props} />
 	</Fragment>
 );
 

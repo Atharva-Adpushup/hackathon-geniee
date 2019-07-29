@@ -54,6 +54,9 @@ class PrebidSettingsTab extends React.Component {
 
 	savePrebidSettings = e => {
 		e.preventDefault();
+		const confirmed = window.confirm('Are you sure?');
+
+		if (!confirmed) return;
 
 		const { siteId, showNotification } = this.props;
 		const { timeOut, currency, formats } = this.state;

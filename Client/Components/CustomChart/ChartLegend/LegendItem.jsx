@@ -7,6 +7,7 @@ class LegendItem extends Component {
 		this.state = { visible: false };
 		this.toggleSerie = this.toggleSerie.bind(this);
 	}
+
 	componentDidMount() {
 		const { activeLegendItems, legend } = this.props;
 		let activeLegendItem;
@@ -17,6 +18,7 @@ class LegendItem extends Component {
 		}
 		this.setState({ visible: !!activeLegendItem });
 	}
+
 	componentDidUpdate(prevProps) {
 		if (prevProps.activeLegendItems !== this.props.activeLegendItems) {
 			const { activeLegendItems, legend } = this.props;
@@ -30,34 +32,42 @@ class LegendItem extends Component {
 		}
 	}
 
+	numberWithCommas = x => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+	roundOffTwoDecimal = value => {
+		const roundedNum = Math.round(value * 100) / 100;
+		return roundedNum.toFixed(2);
+	};
+
 	toggleSerie() {
-		let { activeLegendItems, legend, series } = this.props;
+		const { activeLegendItems, legend, series, yAxis } = this.props;
+		let activeLegendItemsCopy;
 		if (!legend.isDisabled) {
 			const { visible } = this.state;
 			this.setState({ visible: !visible });
 			if (Array.isArray(activeLegendItems)) {
-				const serie = series.find(s =>
-					s.userOptions ? s.userOptions.value === legend.value : false
-				);
+				activeLegendItemsCopy = [...activeLegendItems];
 				if (visible) {
-					const index = indexOf(activeLegendItems, legend.value);
-
-					activeLegendItems.splice(index, 1);
-					serie.hide();
+					const index = activeLegendItemsCopy.findIndex(
+						activeLegend => activeLegend.value === legend.value
+					);
+					activeLegendItemsCopy.splice(index, 1);
+					// serie.hide();
+					// const scale = yAxis.find(y => y.value == serie.value);
+					// scale.visible = false;
 				} else {
-					activeLegendItems.push(legend);
-					serie.show();
+					activeLegendItemsCopy.push(legend);
+					// serie.show();
+					// const scale = yAxis.find(y => y.value == serie.value);
+					// scale.visible = false;
 				}
 			} else {
-				activeLegendItems = legend;
-				this.props.updateChartData(activeLegendItems);
+				activeLegendItemsCopy = { ...activeLegendItems };
+				activeLegendItemsCopy = legend;
 			}
+			this.props.onLegendChange(activeLegendItemsCopy);
 		}
 	}
-
-	numberWithCommas = x => {
-		return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-	};
 
 	render() {
 		const { visible } = this.state;
@@ -85,7 +95,7 @@ class LegendItem extends Component {
 				<div className="total">
 					{legend.total >= 0
 						? legend.valueType === 'money'
-							? '$' + this.numberWithCommas(legend.total.toFixed(2))
+							? `$${this.numberWithCommas(this.roundOffTwoDecimal(legend.total))}`
 							: this.numberWithCommas(legend.total)
 						: 'N/A'}
 				</div>

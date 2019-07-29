@@ -147,7 +147,7 @@ class Integrations extends Component {
 				name="connectGoogleAccountButton"
 				onClick={this.handleClickHandler}
 			>
-				Get Started
+				Connect
 			</CustomButton>
 		</React.Fragment>
 	);
@@ -180,8 +180,8 @@ class Integrations extends Component {
 	};
 
 	render() {
-		const activeTab = this.getActiveTab();
-		const activeItem = INTG_NAV_ITEMS[activeTab];
+		// const activeTab = this.getActiveTab();
+		// const activeItem = INTG_NAV_ITEMS[activeTab];
 		const { redirectUrl } = this.state;
 
 		if (redirectUrl) {
@@ -190,9 +190,9 @@ class Integrations extends Component {
 
 		return (
 			<ActionCard>
-				<Nav bsStyle="tabs" activeKey={activeItem.INDEX} onSelect={this.handleNavSelect}>
+				{/* <Nav bsStyle="tabs" activeKey={activeItem.INDEX} onSelect={this.handleNavSelect}>
 					<NavItem eventKey={1}>{INTG_NAV_ITEMS_VALUES.CONNECT_GOOGLE}</NavItem>
-				</Nav>
+				</Nav> */}
 				{this.renderContent()}
 			</ActionCard>
 		);

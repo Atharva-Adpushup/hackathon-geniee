@@ -15,7 +15,7 @@ const CustomChart = ({
 	yAxisGroups,
 	activeLegendItems,
 	containerClass,
-	updateChartData
+	onLegendChange
 }) => {
 	if (type === 'line' || type === 'spline') {
 		const chartConfig = getCustomChartConfig(
@@ -41,7 +41,7 @@ const CustomChart = ({
 									chart={chart}
 									legends={legends}
 									activeLegendItems={activeLegendItems}
-									updateChartData={updateChartData}
+									onLegendChange={onLegendChange}
 								/>,
 								node
 							);
@@ -61,7 +61,6 @@ const CustomChart = ({
 
 	if (type === 'pie') {
 		const chartConfig = getCustomChartConfig(type, series, customConfig);
-
 		if (chartConfig.series && chartConfig.series.length) {
 			chartConfig.chart = {
 				...chartConfig.chart,
@@ -120,7 +119,7 @@ CustomChart.defaultProps = {
 	title: '',
 	type: 'spline',
 	xAxis: {},
-	legends: {},
+	legends: [],
 	customConfig: {},
 	yAxisGroups: [],
 	activeLegendItems: [],

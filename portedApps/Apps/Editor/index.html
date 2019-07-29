@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<title>__DOMANIZE_DOMAIN__ | AdPushup Console</title>
+		<link
+			href="//fonts.googleapis.com/css?family=Karla:400,700,400italic,700italic&subset=latin,latin-ext"
+			rel="stylesheet"
+			type="text/css"
+		/>
+		<link rel="stylesheet" href="/assets/css/third-party/dataTables.css" />
+		<link rel="stylesheet" href="/assets/css/builds/editor.min.css" />
+		<link rel="stylesheet" href="/assets/css/third-party/c3.css" />
+		<script
+			src="https://code.jquery.com/jquery-3.4.1.js"
+			integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+			crossorigin="anonymous"
+		></script>
+		<!-- Google Tag Manager -->
+		<script>
+			(function(w, d, s, l, i) {
+				w[l] = w[l] || [];
+				w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+				var f = d.getElementsByTagName(s)[0],
+					j = d.createElement(s),
+					dl = l != 'dataLayer' ? '&l=' + l : '';
+				j.async = true;
+				j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+				f.parentNode.insertBefore(j, f);
+			})(window, document, 'script', 'dataLayer', 'GTM-NMS9P3Q');
+
+			function loadScript(src, cb) {
+				var s = document.createElement('SCRIPT');
+				s.src = src;
+				s.charset = 'UTF-8';
+				s.async = false;
+				s.onload = function() {
+					if (typeof cb == 'function') {
+						cb();
+					}
+				};
+				(document.head || document.documentElement).appendChild(s);
+			}
+		</script>
+		<script>
+			(function() {
+				var globals = {
+					ADP_BASEURL: '__BASE_URL__',
+					ADP_ORIGIN: '__PROXY_ORIGIN__',
+					ADP_SITE_DOMAIN: '__SITE_DOMAIN__',
+					ADP_SITE_ID: '__SITE_ID__',
+					ADP_ENVIRONMENT: '__ENVIRONMENT__',
+					isSuperUser: Boolean(__IS_SUPER_USER__),
+					isGeniee: Boolean(__IS_GENIEE__),
+					gcfg: {
+						usn: 1,
+						ubajf: 1,
+						upkv: 1,
+						uadkv: 1,
+						uud: 1
+					},
+					currentUser: {},
+					hasChannels: Boolean(__HAS_CHANNELS__)
+				};
+
+				Object.assign(window, globals);
+			})();
+		</script>
+		<link
+			rel="chrome-webstore-item"
+			href="https://chrome.google.com/webstore/detail/lbfaiagkagpgeefmnpefcibmpeccpjpi"
+		/>
+	</head>
+	<body>
+		<script>
+			(function() {
+				var isSuperUser = window.isSuperUser;
+				var $bodyElement = $(document.body);
+				var loaderWithEditorTemplate = $.parseHTML(`<div id="loader-main" class="loaderwrapper spinner" data-id="loader" style="display: block">
+<img src="/assets/images/loaderLogo.png" />
+</div>
+<div id="editor"></div>`);
+				var computedPageGroupLinkSupportText = isSuperUser
+					? `Please create one to access the Visual Editor`
+					: `Please contact your account manager to create one`;
+				var computedCreatePageGroupButton = isSuperUser
+					? '<a href="__CREATE_PAGEGROUP_URL__">Create PageGroup</a>'
+					: '';
+				var createPageGroupLinkTemplate = $.parseHTML(`<div id="create-pagegroup-link" class="errorMain">
+<div class="container">
+	<div class="row">
+		<div class="col-sm-12">
+			<section class="txt-ed animated In fadeInDown">
+				<h4>No Page Group found! ${computedPageGroupLinkSupportText}</h4> ${computedCreatePageGroupButton}
+			</section>
+		</div>
+	</div>
+</div>
+</div>`);
+				// Cookie Processing Code Start
+				var cookieRefreshTimer = null;
+				var originalCookie = null;
+				var COOKIE_REFRESH_INTERVAL = 2000;
+
+				function resetCookieValues() {
+					clearInterval(cookieRefreshTimer);
+					originalCookie = null;
+				}
+
+				function cookieProcessing() {
+					// Fetch all cookies
+					var cookies = document.cookie.split('; ');
+
+					cookies.some(function(cookie) {
+						// Check all the cookies and process if user cookie is found
+						if (cookie.match(/user=/)) {
+							// If current user cookie is not equal to original user cookie then reload
+							if (originalCookie && originalCookie !== cookie) {
+								var url = window.location.origin + '/dashboard';
+								window.location.href = url;
+								return true;
+							}
+							// If original user cookie not found
+							// First time on the webpage
+							// Cookie Expired
+							// Explicitly deleted cookie
+							// then set current cookie as original and set a timer which will call the current function in every 2 secs.
+							originalCookie = cookie;
+							if (cookieRefreshTimer === null) {
+								cookieRefreshTimer = setInterval(function() {
+									cookieProcessing();
+								}, COOKIE_REFRESH_INTERVAL);
+							}
+							return true;
+						}
+						return false;
+					});
+				}
+				cookieProcessing();
+				// Cookie Processing Code End
+
+				if (window.hasChannels) {
+					$bodyElement.prepend(loaderWithEditorTemplate);
+					loadScript('/assets/js/react-15.js');
+					loadScript('/assets/js/react-dom.js');
+					loadScript('/assets/js/builds/outer.js?v=1512052159832');
+				} else {
+					$bodyElement.prepend(createPageGroupLinkTemplate);
+				}
+			})();
+		</script>
+	</body>
+</html>

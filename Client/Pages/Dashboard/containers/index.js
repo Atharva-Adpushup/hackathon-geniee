@@ -7,13 +7,16 @@ const mapStateToProps = (state, ownProps) => {
 		reports: {
 			data: { site, widget }
 		},
-		user
+		user,
+		sites
 	} = state.global;
 	return {
 		...ownProps,
 		widget,
 		user,
-		site
+		reportingSites: site,
+		sites: sites.fetched ? sites.data : [],
+		reportType: ownProps.reportType || 'account'
 	};
 };
 
