@@ -75,7 +75,7 @@ module.exports = (req, res, next) => {
 	return Promise.join(authToken.decodeAuthToken(token), decoded =>
 		userModel.getUserByEmail(decoded.email).then(() => {
 			req.user = decoded;
-			next();
+			return next();
 		})
 	).catch(err => {
 		console.log(err);
