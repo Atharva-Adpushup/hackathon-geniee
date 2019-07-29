@@ -76,6 +76,7 @@ module.exports = (req, res, next) => {
 		userModel.getUserByEmail(decoded.email).then(() => {
 			req.user = decoded;
 			next();
+			return null;
 		})
 	).catch(err => {
 		console.log(err);

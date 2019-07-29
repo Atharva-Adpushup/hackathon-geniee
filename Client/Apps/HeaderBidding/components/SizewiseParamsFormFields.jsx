@@ -9,6 +9,7 @@ import formValidator from '../../../helpers/formValidator';
 import allAdSizes from '../constants/adSizes';
 import AdSizeSelector from './AdSizeSelector';
 import { getFilteredAdSizes } from '../helpers/commonHelpers';
+import CustomIcon from '../../../Components/CustomIcon';
 
 class SizewiseParamsFormFields extends React.Component {
 	state = {
@@ -21,7 +22,10 @@ class SizewiseParamsFormFields extends React.Component {
 		const { sizes, formFields, savedParams } = this.props;
 
 		this.setState(() => {
-			const newState = { activeKey: sizes[0].downwardIABSize, tempParams: {} };
+			const newState = {
+				activeKey: (!!sizes.length && sizes[0].downwardIABSize) || '',
+				tempParams: {}
+			};
 
 			for (const { downwardIABSize: adSize } of sizes) {
 				const params = {};
@@ -121,7 +125,7 @@ class SizewiseParamsFormFields extends React.Component {
 			tabsJSX.push(
 				<NavItem key={size} eventKey={size}>
 					{`${size} (${originalSize})`}
-					{tempParams[size] && tempParams[size].saved ? ' [added]' : ''}
+					{tempParams[size] && tempParams[size].saved ? <CustomIcon icon="check" /> : ''}
 				</NavItem>
 			);
 		}
@@ -150,6 +154,10 @@ class SizewiseParamsFormFields extends React.Component {
 					<AdSizeSelector filteredAdSizes={filteredAdSizes} addNewSize={this.addNewSize} />
 				</React.Fragment>
 			);
+		}
+
+		if (!sizes.length) {
+			return <p className="no-inventory-warning">Please add an Inventory size first</p>;
 		}
 
 		return (

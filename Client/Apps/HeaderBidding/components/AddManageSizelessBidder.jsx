@@ -9,6 +9,7 @@ import getCommonBidderFields from '../config/commonBidderFields';
 import BidderFormFields from './BidderFormFields';
 import formValidator from '../../../helpers/formValidator';
 import getValidationSchema from '../helpers/getValidationSchema';
+import { filterValidationSchema } from '../helpers/commonHelpers';
 
 class AddManageSizelessBidder extends React.Component {
 	state = {
@@ -171,10 +172,11 @@ class AddManageSizelessBidder extends React.Component {
 
 		const { onBidderAdd, onBidderUpdate } = this.props;
 		const { bidderConfig, params, validationSchema } = this.state;
+		const isDirectRelation = bidderConfig.relation === 'direct';
 
 		const validationResult = formValidator.validate(
 			{ ...bidderConfig, ...params },
-			validationSchema
+			isDirectRelation ? validationSchema : filterValidationSchema(validationSchema, ['bids'])
 		);
 
 		if (validationResult.isValid) {
@@ -228,7 +230,7 @@ class AddManageSizelessBidder extends React.Component {
 		return currValue;
 	};
 
-	getFormFieldsToRender = (formFields, isGrossBid) => {
+	getFormFieldsToRender = (formFields, isDirectRelation, isGrossBid) => {
 		const computedFormFields = {
 			bidderConfig: {},
 			params: {
@@ -238,13 +240,19 @@ class AddManageSizelessBidder extends React.Component {
 			}
 		};
 
-		if (isGrossBid) {
-			computedFormFields.bidderConfig = formFields.bidderConfig;
+		if (!isDirectRelation) {
+			const { bids, revenueShare, ...rest } = formFields.bidderConfig;
+			computedFormFields.bidderConfig = rest;
 			return computedFormFields;
 		}
 
-		const { revenueShare, ...rest } = formFields.bidderConfig;
-		computedFormFields.bidderConfig = rest;
+		if (isDirectRelation && !isGrossBid) {
+			const { revenueShare, ...rest } = formFields.bidderConfig;
+			computedFormFields.bidderConfig = rest;
+			return computedFormFields;
+		}
+
+		computedFormFields.bidderConfig = formFields.bidderConfig;
 		return computedFormFields;
 	};
 
@@ -252,7 +260,7 @@ class AddManageSizelessBidder extends React.Component {
 		const { openBiddersListView, formType } = this.props;
 		const {
 			formFields,
-			bidderConfig: { bids },
+			bidderConfig: { bids, relation },
 			errors
 		} = this.state;
 
@@ -261,7 +269,11 @@ class AddManageSizelessBidder extends React.Component {
 				{!!Object.keys(formFields).length && (
 					<Form horizontal onSubmit={this.onSubmit}>
 						<BidderFormFields
-							formFields={this.getFormFieldsToRender(formFields, bids === 'gross')}
+							formFields={this.getFormFieldsToRender(
+								formFields,
+								relation === 'direct',
+								bids === 'gross'
+							)}
 							formType={formType}
 							setFormFieldValueInState={this.setFormFieldValueInState}
 							getCurrentFieldValue={this.getCurrentFieldValue}

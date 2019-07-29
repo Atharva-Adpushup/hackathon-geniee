@@ -1,6 +1,8 @@
+/* eslint-disable no-prototype-builtins */
+/* eslint-disable no-undef */
+/* eslint-disable no-param-reassign */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable guard-for-in */
-/* eslint-disable import/prefer-default-export */
 export function getFilteredAdSizes(allAdSizes, usedAdSizes) {
 	const newAllAdSizes = { ...allAdSizes };
 	for (const adSizeCategory in newAllAdSizes) {
@@ -22,4 +24,29 @@ export function getFilteredAdSizes(allAdSizes, usedAdSizes) {
 	}
 
 	return newAllAdSizes;
+}
+
+export function filterValidationSchema(validationSchema, keysToFilterOut = []) {
+	validationSchema = { ...validationSchema };
+
+	if (
+		typeof validationSchema === 'object' &&
+		Object.keys(validationSchema).length &&
+		Array.isArray(keysToFilterOut) &&
+		keysToFilterOut.length
+	) {
+		for (const key in validationSchema) {
+			if (
+				validationSchema.hasOwnProperty(key) &&
+				Array.isArray(validationSchema[key]) &&
+				validationSchema[key].length
+			) {
+				validationSchema[key] = validationSchema[key].filter(
+					field => keysToFilterOut.indexOf(field.name) === -1
+				);
+			}
+		}
+	}
+
+	return validationSchema;
 }
