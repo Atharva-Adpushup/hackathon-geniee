@@ -14,14 +14,23 @@ button:focus {
 		background-color: #f5f5f5;
 		box-shadow: $boxShadowOne;
 	}
+	&[diasbled]:hover,
+	&[diasbled]:focus,
+	&[diasbled]:active {
+		background-color: #f5f5f5;
+		box-shadow: none;
+	}
+	&.btn-primary,
 	&.btn--primary {
-		background: $primaryColor;
+		background-color: $primaryColor;
+		border-color: $primaryColor;
 		color: $whiteColor;
 		&:focus,
 		&:hover,
 		&:active {
-			background: $primaryColor;
+			background-color: $primaryColor;
 			color: $whiteColor;
+			border-color: $primaryColor;
 		}
 
 		&:active {

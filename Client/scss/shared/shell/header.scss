@@ -32,10 +32,11 @@
 			&.open button,
 			button {
 				background: $primaryColor;
-				border: 1px solid rgba(#000, 0.1);
+				//border: 1px solid #e62930;
 				color: #fff;
-				&:active:hover {
-					background: rgba(#000, 0.1);
+				&:active,
+				&:hover {
+					background: #e62930;
 				}
 			}
 		}

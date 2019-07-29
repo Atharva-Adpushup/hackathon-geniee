@@ -18,11 +18,16 @@ $transition: $all 0.2s $ease;
 		color: #777;
 		font-weight: bold;
 		font-size: ($designDimensionSM + 0.8);
+		max-width: 90%;
+		text-overflow: ellipsis;
+		overflow: hidden;
+		white-space: nowrap;
 	}
 
 	.card-header-icon {
 		flex: ($numberOne / $numberTen);
-		height: ($numberOne + ($numberOne/$numberTwo) + em);
+		height: ($numberOne + em);
+		margin-top: 4px;
 	}
 
 	> .card-header {

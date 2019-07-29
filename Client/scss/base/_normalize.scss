@@ -26,9 +26,10 @@ a > button.btn {
 	padding: 0;
 
 	> li + li:before {
-		padding: 0 $designDimensionXS;
+		padding: 0 $designDimensionSM;
 		color: $lightGrey;
-		content: '> ';
+		content: '>';
+		text-shadow: 1px 1px #fff;
 	}
 
 	.breadcrumb-item {

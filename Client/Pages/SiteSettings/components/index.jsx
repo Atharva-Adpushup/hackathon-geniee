@@ -94,25 +94,24 @@ class SiteSettings extends Component {
 
 				<CustomButton
 					variant="secondary"
-					className=""
-					name="convertButton"
-					onClick={() => copyToClipBoard(codeText)}
-				>
-					<span>
-						Copy to Clipboard
-						<FontAwesomeIcon icon="copy" className="u-margin-l2" />
-					</span>
-				</CustomButton>
-
-				<CustomButton
-					variant="secondary"
-					className="u-margin-l3"
+					className="u-margin-l3 pull-right"
 					name="emailCodeToDevButton"
 					onClick={this.toggleShowSendCodeByEmailModal}
 				>
 					<span>
 						Send Code to Developer
 						<FontAwesomeIcon icon="envelope" className="u-margin-l2" />
+					</span>
+				</CustomButton>
+				<CustomButton
+					variant="secondary"
+					className="pull-right"
+					name="convertButton"
+					onClick={() => copyToClipBoard(codeText)}
+				>
+					<span>
+						Copy to Clipboard
+						<FontAwesomeIcon icon="copy" className="u-margin-l2" />
 					</span>
 				</CustomButton>
 				<SendCodeByEmailModal
