@@ -70,7 +70,7 @@ class LostFoundLiveSites extends Component {
 			return showNotification({
 				mode: 'error',
 				title: 'Operation Failed',
-				message: 'Page Views Should not be less than 10,000 ',
+				message: 'Page Views should not be less than 10,000 ',
 				autoDimiss: 5
 			});
 		}
@@ -108,51 +108,47 @@ class LostFoundLiveSites extends Component {
 		} = this.state;
 
 		return (
-			<Row>
-				<Col sm={12}>
-					<Col sm={6} style={{ textAlign: 'center' }}>
-						<FieldGroup
-							name="pageviewsThreshold"
-							value={pageviewsThreshold}
-							type="number"
-							label="Enter Page Views"
-							onChange={this.handleChange}
-							size={6}
-							id="pageviewsThreshold-input"
-							placeholder="Enter Page Views"
-							className="u-padding-v4 u-padding-h4"
-						/>
-					</Col>
-					<Col sm={6}>
-						<Fragment>
-							<p className="u-text-bold ">Select Date Range</p>
-
-							<DateRangePicker
-								startDate={currentStartDate}
-								endDate={currentEndDate}
-								onDatesChange={this.currentDatesUpdated}
-								focusedInput={currentFocusedInput}
-								onFocusChange={this.currentFocusUpdated}
-								showDefaultInputIcon
-								hideKeyboardShortcutsPanel
-								showClearDates
-								minimumNights={0}
-								displayFormat="DD-MM-YYYY"
-								isOutsideRange={day => !isInclusivelyBeforeDay(day, moment())}
-							/>
-						</Fragment>
-						
-							<CustomButton
-								variant="primary"
-								className="pull-right u-margin-r3"
-								onClick={this.handleGenerate}
-							>
-								Generate
-							</CustomButton>
+			<Fragment>
+				<Row>
 				
+						<Col sm={7}>
+							<FieldGroup
+								name="pageviewsThreshold"
+								value={pageviewsThreshold}
+								type="number"
+								label="Enter Page Views"
+								onChange={this.handleChange}
+								size={6}
+								id="pageviewsThreshold-input"
+								placeholder="Enter Page Views"
+								className="u-padding-v4 u-padding-h4"
+							/>
+						</Col>
+						<Col sm={5}>
+							<Fragment>
+								<p className="u-text-bold ">Select Date Range</p>
+
+								<DateRangePicker
+									startDate={currentStartDate}
+									endDate={currentEndDate}
+									onDatesChange={this.currentDatesUpdated}
+									focusedInput={currentFocusedInput}
+									onFocusChange={this.currentFocusUpdated}
+									showDefaultInputIcon
+									hideKeyboardShortcutsPanel
+									showClearDates
+									minimumNights={0}
+									displayFormat="DD-MM-YYYY"
+									isOutsideRange={day => !isInclusivelyBeforeDay(day, moment())}
+								/>
+							</Fragment>
+						
 					</Col>
-				</Col>
-			</Row>
+				</Row>
+				<CustomButton variant="primary" className=" pull-right u-margin-r3" onClick={this.handleGenerate}>
+					Generate
+				</CustomButton>
+			</Fragment>
 		);
 	}
 
