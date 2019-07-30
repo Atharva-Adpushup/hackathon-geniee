@@ -265,6 +265,20 @@ const TOOLS_IDENTIFIERS = {
 	LOST_FOUND_LIVE_SITES: 'LOST_FOUND_LIVE_SITES'
 };
 
+const INFO_PANEL_IDENTIFIERS = {
+	QUICK_SNAPSHOT: 'QUICK_SNAPSHOT',
+	GLOBAL_VITALS: 'GLOBAL_VITALS',
+	ACCOUNT_VITALS: 'ACCOUNT_VITALS'
+};
+
+const QUICK_SNAPSHOTS_WIDGETS = [
+	'per_site_wise',
+	'estimated_earnings',
+	'rev_by_network',
+	'per_overview',
+	'per_ap_original'
+];
+
 const ICONS = {
 	0: {
 		isVisible: false,
@@ -340,6 +354,8 @@ export {
 	DFP_ACCOUNTS_DEFAULT,
 	GDPR,
 	TOOLS_IDENTIFIERS,
+	INFO_PANEL_IDENTIFIERS,
+	QUICK_SNAPSHOTS_WIDGETS,
 	ICONS,
 	BACKUP_ADS_FORMATS,
 	XPATH_MODE_URL
