@@ -132,7 +132,7 @@ function apiModule() {
 			});
 		},
 		getPageGroupById: function(paramsObj) {
-			var query = ViewQuery.from('app', paramsObj.viewName)
+			var query = ViewQuery.from('app', paramsObj.viewName || 'channelById')
 				.stale(1)
 				.range(paramsObj.id, paramsObj.id, true);
 			return couchbase.connectToAppBucket().then(function(appBucket) {
