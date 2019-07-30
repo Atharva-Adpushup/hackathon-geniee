@@ -201,7 +201,7 @@ router
 			);
 	})
 	.post('/createLog', (req, res) =>
-		checkParams([['data'], req, 'post'])
+		checkParams(['data'], req, 'post')
 			.then(() => {
 				const { data } = req.body;
 				const decodedData = atob(data);
