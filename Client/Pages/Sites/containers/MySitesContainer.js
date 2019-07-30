@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import MySites from '../components/index';
-import { fetchAppStatuses } from '../../../actions/siteActions';
+import { addNewSite } from '../../../actions/siteActions';
 
 const mapStateToProps = (state, ownProps) => {
 	const {
@@ -23,7 +23,7 @@ const mapStateToProps = (state, ownProps) => {
 };
 
 const mapDispatchToProps = dispatch => ({
-	fetchAppStatuses: siteId => dispatch(fetchAppStatuses(siteId))
+	updateSiteData: siteObj => dispatch(addNewSite(siteObj))
 });
 
 export default connect(

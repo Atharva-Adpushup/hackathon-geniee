@@ -15,9 +15,17 @@ function fetchAllSites() {
 	return dBHelper.queryDB(query);
 }
 
+function fetchAllChannels() {
+	const query = `SELECT doc.* FROM ${
+		config.couchBase.DEFAULT_BUCKET
+	} doc where meta().id like "chnl::%"`;
+	return dBHelper.queryDB(query);
+}
+
 function errorHandler(obj, err) {
 	const error = err.message || err;
-	console.log(`Site : ${obj.siteId} | ${error}`);
+	console.log('Id:', obj);
+	console.log('Error: ', error);
 	return true;
 }
 
@@ -31,6 +39,7 @@ function getDoc(key) {
 
 module.exports = {
 	fetchAllSites,
+	fetchAllChannels,
 	errorHandler,
 	updateDoc,
 	getDoc,

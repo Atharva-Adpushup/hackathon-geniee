@@ -165,7 +165,17 @@ router
 					return headerBiddingModel.getHbConfig(siteId);
 				})
 				// hbConfig found OR created new hbConfig
-				.then(hbConfig => hbConfig.saveBidderConfig(key, bidderConfig))
+				.then(hbConfig => {
+					const isVideo = hbConfig.get('prebidConfig').formats.indexOf('video') !== -1;
+					if (isVideo) {
+						bidderConfig.config = headerBiddingModel.addVideoParams(key, bidderConfig.config);
+					}
+					if (!isVideo) {
+						bidderConfig.config = headerBiddingModel.removeVideoParams(key, bidderConfig.config);
+					}
+
+					return hbConfig.saveBidderConfig(key, bidderConfig);
+				})
 				.then(hbConfig => hbConfig.save())
 				.then(() => headerBiddingModel.getAllBiddersFromNetworkConfig())
 				.then(biddersFromNetworkConfig => {
@@ -364,8 +374,45 @@ router
 
 		return userModel
 			.verifySiteOwner(email, siteId)
-			.then(() => headerBiddingModel.updatePrebidConfig(siteId, newPrebidConfig))
-			.then(prebidConfig => res.status(httpStatus.OK).json(prebidConfig))
+			.then(() => headerBiddingModel.getHbConfig(siteId))
+			.then(hbConfig => {
+				const hasVideoBefore = hbConfig.get('prebidConfig').formats.indexOf('video') !== -1;
+				const hasVideoNow = formats.indexOf('video') !== -1;
+				const bidders = hbConfig.get('hbcf');
+
+				if (hasVideoNow && !hasVideoBefore) {
+					// add video params
+					for (const bidderCode in bidders) {
+						// eslint-disable-next-line no-prototype-builtins
+						if (bidders.hasOwnProperty(bidderCode)) {
+							const newParams = headerBiddingModel.addVideoParams(
+								bidderCode,
+								bidders[bidderCode].config
+							);
+
+							bidders[bidderCode].config = newParams;
+						}
+					}
+				}
+
+				if (!hasVideoNow && hasVideoBefore) {
+					// remove video params
+					for (const bidderCode in bidders) {
+						// eslint-disable-next-line no-prototype-builtins
+						if (bidders.hasOwnProperty(bidderCode)) {
+							bidders[bidderCode].config = headerBiddingModel.removeVideoParams(
+								bidderCode,
+								bidders[bidderCode].config
+							);
+						}
+					}
+				}
+
+				if (hasVideoBefore !== hasVideoNow) hbConfig.set('hbcf', bidders);
+				hbConfig.set('prebidConfig', newPrebidConfig);
+				return hbConfig.save();
+			})
+			.then(({ data: { prebidConfig } }) => res.status(httpStatus.OK).json(prebidConfig))
 			.catch(() =>
 				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error!' })
 			);

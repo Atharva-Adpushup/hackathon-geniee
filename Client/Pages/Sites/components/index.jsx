@@ -14,7 +14,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
 
-// import ActionCard from '../../../Components/ActionCard/index';
+import axiosInstance from '../../../helpers/axiosInstance';
 import OverlayTooltip from '../../../Components/OverlayTooltip/index';
 import Card from '../../../Components/Layout/Card';
 import OnboardingCard from '../../../Components/OnboardingCard';
@@ -25,7 +25,8 @@ import {
 	domanize,
 	ADPUSHUP_RUNNING_SUCCESSFULLY_STEP,
 	FIRST_ONBOARDING_STEP,
-	USER_ONBOARDING_COMPLETE_STEP
+	USER_ONBOARDING_COMPLETE_STEP,
+	FETCH_SITE_APP_STATUS_URL
 } from '../constants/index';
 
 library.add(
@@ -48,30 +49,16 @@ class MySites extends React.Component {
 
 	componentDidMount() {
 		const ref = this;
-		const { sites } = this.state;
-		const { fetchAppStatuses } = ref.props;
+		const { sites } = ref.state;
 		const isSites = ref.getValidObject(sites);
 
 		if (!isSites) {
 			return false;
 		}
 
-		Object.keys(sites).forEach(siteIdKey => {
-			const site = sites[siteIdKey];
-			const isValidAppStatusInReportData = ref.checkValidAppStatusInReportData(siteIdKey);
-			const isAppStatuses = ref.checkSiteAppStatuses(site);
-			const siteStep = !site.step ? FIRST_ONBOARDING_STEP : site.step;
-			const isStepOnboardingComplete = ref.checkSiteStepOnboardingComplete(siteStep);
-			const shouldFetchAppStatuses = ref.shouldFetchSiteAppStatuses(
-				isStepOnboardingComplete,
-				isValidAppStatusInReportData,
-				isAppStatuses
-			);
+		const siteIds = Object.keys(sites);
 
-			if (shouldFetchAppStatuses) {
-				fetchAppStatuses(siteIdKey);
-			}
-		});
+		Promise.all(siteIds.map(ref.fetchSiteAppStatusesCallback));
 
 		return false;
 	}
@@ -125,6 +112,38 @@ class MySites extends React.Component {
 		isValidAppStatusInReportData,
 		isSiteAppStatuses
 	) => !!(isOnboardingComplete && !isValidAppStatusInReportData && !isSiteAppStatuses);
+
+	fetchSiteAppStatusesCallback = siteId => {
+		const { sites } = this.state;
+		const { updateSiteData } = this.props;
+		const site = sites[siteId];
+		const isValidAppStatusInReportData = this.checkValidAppStatusInReportData(siteId);
+		const isAppStatuses = this.checkSiteAppStatuses(site);
+		const siteStep = !site.step ? FIRST_ONBOARDING_STEP : site.step;
+		const isStepOnboardingComplete = this.checkSiteStepOnboardingComplete(siteStep);
+		const shouldFetchAppStatuses = this.shouldFetchSiteAppStatuses(
+			isStepOnboardingComplete,
+			isValidAppStatusInReportData,
+			isAppStatuses
+		);
+
+		if (!shouldFetchAppStatuses) {
+			return siteId;
+		}
+
+		return axiosInstance
+			.get(FETCH_SITE_APP_STATUS_URL, { params: { siteId } })
+			.then(response => {
+				const { data } = response.data;
+				updateSiteData(data);
+			})
+			.catch(() => {
+				const { domain } = site;
+				const defaultData = { siteId, siteDomain: domain, appStatuses: {} };
+
+				updateSiteData(defaultData);
+			});
+	};
 
 	checkValidAppStatusInReportData(siteId) {
 		const { reportSites } = this.props;
@@ -184,7 +203,9 @@ class MySites extends React.Component {
 
 					const { siteId } = site;
 					const statusObject = SITE_SETUP_STATUS[siteStep];
-					const domanizeDomain = domanize(site.domain);
+					const domanizeDomain = isSuperUser
+						? `${domanize(site.domain)} - ${siteId}`
+						: domanize(site.domain);
 					const computedReportingUrl = `/reports/${siteId}`;
 					const computedManageSiteUrl = `/sites/${siteId}`;
 					const isSiteBlock = ref.getValidObject(statusObject.site);
