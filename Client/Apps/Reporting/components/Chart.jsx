@@ -1,10 +1,10 @@
 import React from 'react';
 
-import { groupBy, sortBy } from 'lodash';
+import groupBy from 'lodash/groupBy';
+import sortBy from 'lodash/sortBy';
 import moment from 'moment';
 import CustomChart from '../../../Components/CustomChart';
 import { activeLegendItem, activeLegendItemArray } from '../configs/commonConsts';
-import apLineChartConfig from '../configs/line-ap-data.json';
 
 class Chart extends React.Component {
 	constructor(props) {

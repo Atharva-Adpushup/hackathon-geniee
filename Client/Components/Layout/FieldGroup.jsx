@@ -1,6 +1,7 @@
 /* eslint-disable react/forbid-prop-types */
 import React from 'react';
-import { map } from 'lodash';
+import map from 'lodash/map';
+
 import {
 	FormGroup,
 	ControlLabel,

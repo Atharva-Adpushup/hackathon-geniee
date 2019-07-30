@@ -2,6 +2,7 @@ const path = require('path');
 const HtmlWebPackPlugin = require('html-webpack-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const webpack = require('webpack');
 
 module.exports = {
 	context: path.resolve(__dirname, 'Client'),
@@ -62,6 +63,7 @@ module.exports = {
 			favicon: './public/assets/images/favicon.ico',
 			filename: 'index.html'
 		}),
-		new OptimizeCSSAssetsPlugin({})
+		new OptimizeCSSAssetsPlugin({}),
+		new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /en/)
 	]
 };

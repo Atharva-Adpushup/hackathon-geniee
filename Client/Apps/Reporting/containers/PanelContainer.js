@@ -4,9 +4,8 @@ import Panel from '../components/Panel';
 const mapStateToProps = (state, ownProps) => {
 	const {
 		reports: {
-			data: { filter, metrics, dimension, interval }
-		},
-		sites
+			data: { filter, metrics, dimension, interval, sites }
+		}
 	} = state.global;
 	return {
 		...ownProps,
@@ -14,7 +13,7 @@ const mapStateToProps = (state, ownProps) => {
 		metrics,
 		dimension,
 		interval,
-		sites: sites.fetched ? sites.data : []
+		sites
 	};
 };
 

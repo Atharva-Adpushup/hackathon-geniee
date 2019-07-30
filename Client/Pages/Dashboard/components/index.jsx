@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react';
-import { sortBy, isEmpty } from 'lodash';
+import sortBy from 'lodash/sortBy';
+import isEmpty from 'lodash/isEmpty';
 import { Link } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -14,6 +15,8 @@ import { dates } from '../configs/commonConsts';
 import SelectBox from '../../../Components/SelectBox/index';
 import reportService from '../../../services/reportService';
 import { convertObjToArr, getDateRange } from '../helpers/utils';
+import OnboardingCard from '../../../Components/OnboardingCard';
+import CustomButton from '../../../Components/CustomButton';
 
 class Dashboard extends React.Component {
 	constructor(props) {
@@ -313,8 +316,38 @@ class Dashboard extends React.Component {
 		return content;
 	};
 
+	renderOnboardingCard() {
+		const { user, reportType, siteId } = this.props;
+		const userSites = user.data && user.data.sites ? user.data.sites : {};
+		let site;
+		if (reportType == 'site') site = userSites[Object.keys(userSites)[siteId]];
+		else site = userSites[Object.keys(userSites)[0]];
+		const computedLinkUrl = `/onboarding?siteId=${site.siteId}`;
+		const computedButtonText = `Continue with ${site.domain}`;
+
+		return (
+			<OnboardingCard
+				className="add-site-card"
+				isActiveStep
+				expanded
+				count={1}
+				imgPath="/assets/images/ob_add_site.png"
+				heading="Complete Onboarding Setup"
+				description="Please complete your site onboarding setup by clicking below."
+			>
+				<Link to={computedLinkUrl} className="u-link-reset u-margin-t4 aligner aligner-item">
+					<CustomButton>{computedButtonText}</CustomButton>
+				</Link>
+			</OnboardingCard>
+		);
+	}
+
 	render() {
-		return <Fragment>{this.renderContent()}</Fragment>;
+		const { sites } = this.props;
+		const isValidUserSites = Object.keys(sites).length;
+		return (
+			<Fragment>{isValidUserSites ? this.renderContent() : this.renderOnboardingCard()}</Fragment>
+		);
 	}
 }
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import Datatable from 'react-bs-datatable';
 import { Col } from 'react-bootstrap';
-import { sortBy } from 'lodash';
+import sortBy from 'lodash/sortBy';
 import moment from 'moment';
 import { numberWithCommas, computeCsvData, roundOffTwoDecimal } from '../helpers/utils';
 

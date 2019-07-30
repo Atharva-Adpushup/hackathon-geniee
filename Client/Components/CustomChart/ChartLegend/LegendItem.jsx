@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { indexOf } from 'lodash';
 
 class LegendItem extends Component {
 	constructor(props) {
