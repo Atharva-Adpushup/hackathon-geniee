@@ -164,6 +164,57 @@ router
 				);
 			})
 			.catch(err => errorHandler(err, res));
+	})
+
+	.post('/xpathmiss', (req, res) => {
+		if (!req.user.isSuperUser) {
+			return sendErrorResponse(
+				{
+					message: 'Unauthorized Request',
+					code: HTTP_STATUSES.UNAUTHORIZED
+				},
+				res
+			);
+		}
+		const {
+			siteId,
+			topURLCount,
+			emailId,
+			pageGroups,
+			currentSelectedDevice,
+			currentSelectedMode,
+			errorCode,
+			startDate,
+			endDate
+		} = req.body;
+
+		const isDataValid = !!(
+			siteId &&
+			topURLCount &&
+			emailId &&
+			pageGroups &&
+			currentSelectedDevice &&
+			currentSelectedMode &&
+			errorCode &&
+			startDate &&
+			endDate
+		);
+
+		if (!isDataValid) {
+			return sendErrorResponse(
+				{
+					message: 'Missing params.'
+				},
+				res
+			);
+		}
+
+		return sendSuccessResponse(
+			{
+				message: 'Notification will be sent to your entered email address'
+			},
+			res
+		);
 	});
 
 module.exports = router;

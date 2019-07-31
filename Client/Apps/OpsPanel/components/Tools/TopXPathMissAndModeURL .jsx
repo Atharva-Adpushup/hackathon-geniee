@@ -11,6 +11,7 @@ import { XPATH_MODE_URL } from '../../configs/commonConsts';
 import CustomButton from '../../../../Components/CustomButton/index';
 import Loader from '../../../../Components/Loader/index';
 import SelectBox from '../../../../Components/SelectBox/index';
+import axiosInstance from '../../../../helpers/axiosInstance';
 
 class TopXPathMissAndModeURL extends Component {
 	constructor(props) {
@@ -28,14 +29,14 @@ class TopXPathMissAndModeURL extends Component {
 			currentSelectedDevice: null,
 			currentSelectedMode: null,
 			errorCode: '',
-			loading: false,
 			startDate: moment()
 				.subtract(7, 'days')
 				.startOf('day'),
 			endDate: moment()
 				.startOf('day')
 				.subtract(1, 'day'),
-			focusedInput: null
+			focusedInput: null,
+			isLoading: false
 		};
 	}
 
@@ -45,8 +46,6 @@ class TopXPathMissAndModeURL extends Component {
 		});
 	};
 
-	handleGenerate = () => {};
-
 	handleReset = () => {
 		this.setState({
 			siteId: '',
@@ -54,8 +53,6 @@ class TopXPathMissAndModeURL extends Component {
 			emailId: '',
 			pageGroups: '',
 			errorCode: '',
-			currentSelectedDevice: null,
-			currentSelectedMode: null,
 			startDate: moment()
 				.subtract(7, 'days')
 				.startOf('day'),
@@ -64,6 +61,77 @@ class TopXPathMissAndModeURL extends Component {
 				.subtract(1, 'day')
 		});
 	};
+
+	handleGenerate = () => {
+		const {
+			siteId,
+			topURLCount,
+			emailId,
+			pageGroups,
+			currentSelectedDevice,
+			currentSelectedMode,
+			errorCode,
+			startDate,
+			endDate
+		} = this.state;
+
+		const isValid = !!(
+			siteId &&
+			topURLCount &&
+			emailId &&
+			pageGroups &&
+			currentSelectedDevice &&
+			currentSelectedMode &&
+			errorCode &&
+			startDate &&
+			endDate
+		);
+
+		const { showNotification } = this.props;
+
+		if (!isValid) {
+			return showNotification({
+				mode: 'error',
+				title: 'Operation Failed',
+				message: 'Missing or Incorrect params',
+				autoDismiss: 5
+			});
+		}
+		this.setState({ isLoading: true });
+
+		return axiosInstance
+			.post('/ops/xpathmiss', {
+				siteId,
+				topURLCount,
+				emailId,
+				pageGroups,
+				currentSelectedDevice,
+				currentSelectedMode,
+				errorCode,
+				startDate,
+				endDate
+			})
+			.then(res => {
+				showNotification({
+					mode: 'success',
+					title: 'Success',
+					message: res.data.data.message,
+					autoDismiss: 5
+				});
+				this.setState({ isLoading: false });
+				this.handleReset();
+			})
+			.catch(err => {
+				showNotification({
+					mode: 'error',
+					title: 'Operation Failed',
+					message: 'Missing or Incorrect params',
+					autoDismiss: 5
+				});
+				this.setState({ isLoading: false });
+			});
+	};
+
 
 	datesUpdated = ({ startDate, endDate }) => {
 		this.setState({ startDate, endDate });
@@ -84,13 +152,11 @@ class TopXPathMissAndModeURL extends Component {
 			pageGroups,
 			modes,
 			errorCode,
-			loading,
 			startDate,
 			endDate,
+			isLoading,
 			focusedInput
 		} = this.state;
-
-		if (loading) return <Loader height="250px" />;
 
 		return (
 			<Row className="row">
@@ -208,6 +274,7 @@ class TopXPathMissAndModeURL extends Component {
 					variant="primary"
 					className="pull-right u-margin-r3"
 					onClick={this.handleGenerate}
+					showSpinner={isLoading}
 				>
 					Generate
 				</CustomButton>

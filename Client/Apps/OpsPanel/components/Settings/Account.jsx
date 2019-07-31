@@ -29,7 +29,7 @@ class Account extends Component {
 			} = {}
 		} = user;
 		const adsense = adNetworkSettings[0] || null;
-		const adsensePubId = adsense ? adsense.pubId : null;
+		const adsensePubId = adsense ? adsense.pubId : '';
 		const activeDFP =
 			activeDFPNetwork && activeDFPParentId
 				? `${activeDFPNetwork}-${activeDFPParentId}-${activeDFPCurrencyCode}`
