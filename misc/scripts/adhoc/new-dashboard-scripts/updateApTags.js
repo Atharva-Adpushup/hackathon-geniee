@@ -25,10 +25,10 @@ function apTagProcessing(doc) {
 	const docKey = `tgmr::${siteId}`;
 
 	_.forEach(ads, (ad, index) => {
-		const { width, height, id } = ad;
+		const { width, height, id, name } = ad;
 
 		if (name === `Ad-${id}`) {
-			ads[index] = generateSectionName({
+			ads[index].name = generateSectionName({
 				width,
 				height,
 				platform: null,
@@ -40,7 +40,7 @@ function apTagProcessing(doc) {
 
 	doc.ads = ads;
 
-	return updateDoc(docKey, doc).then(() => console.log(`Processed channel: ${docKey}`));
+	return updateDoc(docKey, doc).then(() => console.log(`Processed doc: ${docKey}`));
 }
 
 function processing(docs) {
