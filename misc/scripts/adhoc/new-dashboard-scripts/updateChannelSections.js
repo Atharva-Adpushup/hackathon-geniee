@@ -42,8 +42,9 @@ function channelProcessing(channel) {
 	_.forEach(variations, (variation, variationId) => {
 		const { sections } = variation;
 		_.forEach(sections, (section, sectionId) => {
-			const { name, id, ads = {} } = section;
+			const { name, id, ads = {}, type = -1 } = section;
 			const adIds = Object.keys(ads);
+			const service = type === 3 || type === 4 ? 'I' : 'L';
 
 			if (adIds.length) {
 				const { width, height } = ads[adIds[0]];
@@ -52,8 +53,8 @@ function channelProcessing(channel) {
 						width,
 						height,
 						platform,
-						pagegroup: pageGroup,
-						service: 'L'
+						service,
+						pagegroup: pageGroup
 					});
 				}
 			}
