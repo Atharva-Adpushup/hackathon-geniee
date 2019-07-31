@@ -7,10 +7,10 @@ import CustomToggleSwitch from '../CustomToggleSwitch/index';
 function checkAdCode(value) {
 	const response = { error: false };
 	if (
-		value.indexOf('pagead2.googlesyndication.com') == -1 ||
-		value.indexOf('"adsbygoogle"') == -1 ||
-		value.indexOf('data-ad-slot') == -1 ||
-		value.indexOf('data-ad-client') == -1
+		value.indexOf('pagead2.googlesyndication.com') === -1 ||
+		value.indexOf('"adsbygoogle"') === -1 ||
+		value.indexOf('data-ad-slot') === -1 ||
+		value.indexOf('data-ad-client') === -1
 	) {
 		return {
 			...response,
@@ -20,6 +20,8 @@ function checkAdCode(value) {
 	}
 	return response;
 }
+
+const Creation = FormWrapper(checkAdCode, 'Adsense', /data-ad-slot=\"\d+\"/gi);
 
 class Adsense extends Component {
 	constructor(props) {
@@ -50,11 +52,6 @@ class Adsense extends Component {
 		});
 	}
 
-	renderAdCodeComponent() {
-		const Element = FormWrapper(checkAdCode, 'Adsense', /data-ad-slot=\"\d+\"/gi);
-		return <Element {...this.props} />;
-	}
-
 	syncSubmitHanlder() {
 		const { submitHandler } = this.props;
 		const { isLink } = this.state;
@@ -80,7 +77,7 @@ class Adsense extends Component {
 						size="m"
 						on="Yes"
 						off="No"
-						defaultLayout={true}
+						defaultLayout
 						name="Link Ad"
 						id={id ? `js-link-ad-switch-${id}` : 'js-link-ad-switch'}
 					/>
@@ -110,13 +107,13 @@ class Adsense extends Component {
 							size="m"
 							on="Yes"
 							off="No"
-							defaultLayout={true}
+							defaultLayout
 							name="Ad Syncing"
 							id={id ? `js-ad-syncing-switch-${id}` : 'js-ad-syncing-switch'}
 						/>
 					</Col>
 				</Row>
-				{shouldSync ? this.renderSyncingOptions() : this.renderAdCodeComponent()}
+				{shouldSync ? this.renderSyncingOptions() : <Creation {...this.props} />}
 			</div>
 		);
 	}
