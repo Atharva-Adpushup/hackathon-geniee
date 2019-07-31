@@ -1,4 +1,6 @@
 const { couchbaseService } = require('node-utils');
+const uuid = require('uuid');
+
 const config = require('../../../../configs/config');
 
 const dBHelper = couchbaseService(
@@ -22,6 +24,13 @@ function fetchAllChannels() {
 	return dBHelper.queryDB(query);
 }
 
+function fetchAllTgmrDocs() {
+	const query = `SELECT doc.* FROM ${
+		config.couchBase.DEFAULT_BUCKET
+	} doc where meta().id like "tgmr::%"`;
+	return dBHelper.queryDB(query);
+}
+
 function errorHandler(obj, err) {
 	const error = err.message || err;
 	console.log('Id:', obj);
@@ -37,11 +46,25 @@ function getDoc(key) {
 	return dBHelper.getDoc(key);
 }
 
+function generateSectionName({ service, platform = null, pagegroup = null, width, height }) {
+	const name = ['AP', service];
+
+	if (platform) name.push(platform.toUpperCase().slice(0, 1));
+	if (pagegroup) name.push(pagegroup.toUpperCase().replace(/\s/g, '-'));
+
+	name.push(`${width}X${height}`);
+	name.push(uuid.v4().slice(0, 5));
+
+	return name.join('_');
+}
+
 module.exports = {
 	fetchAllSites,
 	fetchAllChannels,
+	fetchAllTgmrDocs,
 	errorHandler,
 	updateDoc,
 	getDoc,
-	dBHelper
+	dBHelper,
+	generateSectionName
 };
