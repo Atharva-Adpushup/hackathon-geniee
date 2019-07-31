@@ -3,7 +3,8 @@ import { Row, Col } from 'react-bootstrap';
 import moment from 'moment';
 import { Object } from 'es6-shim';
 import qs from 'querystringify';
-import { isEmpty, union } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
+import union from 'lodash/union';
 import ActionCard from '../../../Components/ActionCard/index';
 import Empty from '../../../Components/Empty/index';
 import ControlContainer from '../containers/ControlContainer';
@@ -51,7 +52,7 @@ class Panel extends Component {
 			sites
 		} = this.props;
 
-		const isValidSite = !!(sites[siteId] && sites[siteId].siteDomain);
+		const isValidSite = !!(sites&& sites[siteId] && sites[siteId].siteDomain);
 
 		let {
 			startDate,

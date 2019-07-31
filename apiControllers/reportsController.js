@@ -16,7 +16,7 @@ router
 				qs: req.query
 			})
 				.then(response => {
-					if (response.code == 1) return res.send(response.data);
+					if (response.code == 1 && response.data) return res.send(response.data);
 					return res.send({});
 				})
 				.catch(err => {
@@ -35,7 +35,7 @@ router
 				qs: reqParams
 			})
 				.then(response => {
-					if (response.code == 1) return res.send(response.data);
+					if (response.code == 1 && response.data) return res.send(response.data);
 					return res.send({});
 				})
 				.catch(err => {

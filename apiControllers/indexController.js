@@ -124,7 +124,7 @@ function getReportsMetaData(params) {
 		qs: params
 	})
 		.then(response => {
-			return response.code == 1 ? response.data : {};
+			return response.code == 1 && response.data ? response.data : {};
 		})
 		.catch(err => {});
 }
@@ -151,15 +151,13 @@ router
 
 						const sitesArray = [...userData.sites];
 						const sitesArrayLength = sitesArray.length;
-						const siteIds = [];
 						userData.sites = {};
 
 						for (let i = 0; i < sitesArrayLength; i += 1) {
 							const site = sitesArray[i];
 							userData.sites[site.siteId] = site;
-							siteIds.push(site.siteId);
 						}
-						let params = { siteid: siteIds.toString(), isSuperUser };
+						let params = { siteid: Object.keys(sites).toString(), isSuperUser };
 
 						return getReportsMetaData(params).then(reports => {
 							return res.status(httpStatus.OK).json({
