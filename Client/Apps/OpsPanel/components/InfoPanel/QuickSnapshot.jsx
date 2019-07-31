@@ -19,13 +19,13 @@ import { convertObjToArr, getDateRange } from '../../../../Pages/Dashboard/helpe
 class QuickSnapshot extends React.Component {
 	constructor(props) {
 		super(props);
-		const { widget, reportType, siteId = 14, widgetsList, sites, reportingSites } = props;
+		const { widget, reportType, widgetsList, sites, reportingSites } = props;
 		const allUserSites = [{ name: 'All', value: 'all' }, ...convertObjToArr(sites)];
-		const topPerformingSite = reportingSites
-			? this.getTopPerformingSites(allUserSites, reportingSites)
-			: null;
-		const selectedSite = reportType == 'site' ? siteId : topPerformingSite || 'all';
-		const widgetsConfig = this.getWidgetConfig(widget, selectedSite, reportType, widgetsList);
+		// const topPerformingSite = reportingSites
+		// 	? this.getTopPerformingSites(allUserSites, reportingSites)
+		// 	: null;
+		// const selectedSite = reportType == 'site' ? siteId : topPerformingSite || 'all';
+		const widgetsConfig = this.getWidgetConfig(widget, reportType, widgetsList);
 		this.state = {
 			quickDates: dates,
 			sites: allUserSites,
@@ -34,17 +34,17 @@ class QuickSnapshot extends React.Component {
 	}
 
 	componentDidMount() {
-		const { showNotification, user } = this.props;
 		const { widgetsConfig } = this.state;
-		if (!user.data.isPaymentDetailsComplete && !window.location.pathname.includes('payment')) {
-			showNotification({
-				mode: 'error',
-				title: 'Payments Error',
-				message: `Please complete your Payment Profile, for timely payments.
-					<a href='/payment'>Go to payments</a>`,
-				autoDismiss: 0
-			});
-		}
+		// if (!user.data.isPaymentDetailsComplete && !window.location.pathname.includes('payment')) {
+		// 	showNotification({
+		// 		mode: 'error',
+		// 		title: 'Payments Error',
+		// 		message: `Please complete your Payment Profile, for timely payments.
+		// 			<a href='/payment'>Go to payments</a>`,
+		// 		autoDismiss: 0
+		// 	});
+		// }
+
 		Object.keys(widgetsConfig).forEach(wid => {
 			this.getDisplayData(wid);
 		});
@@ -62,30 +62,39 @@ class QuickSnapshot extends React.Component {
 		return topPerformingSite;
 	};
 
-	getWidgetConfig = (widgets, selectedSite, reportType, widgetsList) => {
+	getWidgetConfig = (widgets, reportType, widgetsList) => {
 		const sortedWidgets = sortBy(widgets, ['position', 'name']);
 		const widgetsConfig = [];
+
 		Object.keys(sortedWidgets).forEach(wid => {
 			const widget = { ...sortedWidgets[wid] };
+
 			if (widgetsList.indexOf(widget.name) > -1) {
 				widget.isLoading = true;
 				widget.selectedDate = dates[0].value;
 				widget.isDataSufficient = false;
-				if (reportType == 'site' || widget.name == 'per_ap_original')
-					widget.selectedSite = selectedSite;
-				else widget.selectedSite = 'all';
-				if (widget.name == 'per_ap_original') {
+
+				// if (reportType == 'site' || widget.name == 'per_ap_original')
+				// 	widget.selectedSite = selectedSite;
+				// else widget.selectedSite = 'all';
+
+				if (widget.name === 'per_ap_original') {
+					widget.selectedSite = 'all';
 					widget.selectedDimension = 'page_variation_type';
 				}
-				if (widget.name == 'rev_by_network') {
+
+				if (widget.name === 'rev_by_network') {
 					widget.selectedDimension = 'network';
 				}
-				if (widget.name == 'per_site_wise') {
+
+				if (widget.name === 'per_site_wise') {
 					widget.selectedDimension = 'siteid';
 				}
+
 				widgetsConfig.push(widget);
 			}
 		});
+
 		return widgetsConfig;
 	};
 
@@ -130,13 +139,15 @@ class QuickSnapshot extends React.Component {
 		const siteIds = Object.keys(sites);
 		const params = getDateRange(selectedDate);
 		const hidPerApOriginData =
-			name == 'per_ap_original' &&
+			name === 'per_ap_original' &&
 			reportingSites &&
 			reportingSites[selectedSite] &&
 			reportingSites[selectedSite].dataAvailableOutOfLast30Days < 21;
-		params.siteid = selectedSite == 'all' ? siteIds.toString() : selectedSite;
+
+		params.siteid = selectedSite === 'all' ? siteIds.toString() : selectedSite;
 		widgetsConfig[wid].startDate = params.fromDate;
 		widgetsConfig[wid].endDate = params.toDate;
+
 		if (hidPerApOriginData) {
 			widgetsConfig[wid].isDataSufficient = false;
 			widgetsConfig[wid].isLoading = false;
