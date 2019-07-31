@@ -145,7 +145,7 @@ SelectBox.propTypes = {
 	onSelect: PropTypes.func.isRequired,
 	options: PropTypes.arrayOf(
 		PropTypes.shape({
-			name: PropTypes.string,
+			name: PropTypes.oneOfType([PropTypes.string, PropTypes.bool, PropTypes.number]),
 			value: PropTypes.oneOfType([PropTypes.string, PropTypes.bool, PropTypes.number])
 		})
 	).isRequired,

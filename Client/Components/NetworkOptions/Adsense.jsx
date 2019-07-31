@@ -36,7 +36,6 @@ class Adsense extends Component {
 		};
 		this.toggleSync = this.toggleSync.bind(this);
 		this.toggleLink = this.toggleLink.bind(this);
-		this.renderAdCodeComponent = this.renderAdCodeComponent.bind(this);
 		this.syncSubmitHanlder = this.syncSubmitHanlder.bind(this);
 	}
 

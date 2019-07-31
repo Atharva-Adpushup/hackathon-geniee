@@ -6,7 +6,7 @@ import Adsense from './Adsense';
 import MediaNet from './MediaNet';
 import OtherNetworks from './OtherNetworks';
 import AdX from './AdX';
-import SectionOptions from './sectionOptions';
+// import SectionOptions from './sectionOptions';
 
 class NetworkOptions extends Component {
 	constructor(props) {
