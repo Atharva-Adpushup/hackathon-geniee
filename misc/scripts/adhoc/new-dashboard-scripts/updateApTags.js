@@ -3,7 +3,7 @@
  *
  * Find all tgmr docs
  * Iterate over each ad
- * 		If ad === 'Section-__SECTION_ID__'
+ * 		If ad === 'Ad-__AD_ID__'
  * 			replace it with 'AP_SERVICE(L|I|T)_DEVICE(D|M|T)_PAGEGROUP_WIDTHXHEIGHT_(4_DIGIT_UNIQUE_IDENTIFIER)'
  * 		else
  * 			continue
