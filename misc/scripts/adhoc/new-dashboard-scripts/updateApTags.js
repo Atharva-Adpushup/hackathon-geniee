@@ -25,13 +25,13 @@ function apTagProcessing(doc) {
 	const docKey = `tgmr::${siteId}`;
 
 	_.forEach(ads, (ad, index) => {
-		const { width, height, id, name } = ad;
+		const { width, height, id, name = null, formatData = {} } = ad;
 
-		if (name === `Ad-${id}`) {
+		if (!name || name === `Ad-${id}`) {
 			ads[index].name = generateSectionName({
 				width,
 				height,
-				platform: null,
+				platform: formatData.platform || null,
 				pagegroup: null,
 				service: 'T'
 			});
@@ -56,7 +56,7 @@ function init() {
 		.catch(err => console.log('Error occured : ', err));
 }
 
-// init().then(() => {
-// 	console.log('Processing Over');
-// 	return process.exit(0);
-// });
+init().then(() => {
+	console.log('Processing Over');
+	return process.exit(0);
+});

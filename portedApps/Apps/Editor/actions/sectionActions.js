@@ -10,7 +10,7 @@ import {
 import { getVariationSectionsWithAds } from 'selectors/variationSelectors';
 import Utils from 'libs/utils';
 import _ from 'lodash';
-import { generateSectionName } from '../../../../helpers/clientServerHelpers';
+import { generateSectionName } from '../../../common/helpers';
 
 const createSection = (sectionPayload, adPayload, variationId) => dispatch => {
 		const adId = Utils.getRandomNumber();
