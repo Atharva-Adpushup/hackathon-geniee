@@ -100,22 +100,13 @@ class variationSectionElement extends Component {
 							errorMessage="Section Name cannot be blank"
 						/>
 					</Col>
+					<Col className="u-padding-r10px section-id-ie" xs={12}>
+						Section Id : <strong>{props.section.id}</strong>
+					</Col>
 				</Row>
 				<Row>
 					{/* Read only Fields starts from here */}
 					<Col xs={6}>
-						<Row>
-							<Col className="u-padding-r10px" xs={12}>
-								<Row>
-									<Col className="u-padding-r10px" xs={7}>
-										Id
-									</Col>
-									<Col xs={5}>
-										<strong>{props.section.id}</strong>
-									</Col>
-								</Row>
-							</Col>
-						</Row>
 						<Row>
 							<Col className="u-padding-r10px" xs={12}>
 								<Row>
