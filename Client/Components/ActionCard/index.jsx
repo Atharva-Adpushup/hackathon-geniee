@@ -2,10 +2,11 @@ import React from 'react';
 import { Row } from 'react-bootstrap';
 
 const ActionCard = props => {
-	const { children } = props;
+	const { children, className: classes } = props;
+	console.log('classes', classes);
 
 	return (
-		<Row className="action-card u-border-top-none">
+		<Row className={`${classes || ''} action-card u-border-top-none`}>
 			<Row className="content">{children}</Row>
 		</Row>
 	);
