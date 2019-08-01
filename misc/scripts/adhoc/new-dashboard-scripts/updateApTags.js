@@ -25,9 +25,9 @@ function apTagProcessing(doc) {
 	const docKey = `tgmr::${siteId}`;
 
 	_.forEach(ads, (ad, index) => {
-		const { width, height, id, name, formatData = {} } = ad;
+		const { width, height, id, name = null, formatData = {} } = ad;
 
-		if (name === `Ad-${id}`) {
+		if (!name || name === `Ad-${id}`) {
 			ads[index].name = generateSectionName({
 				width,
 				height,
