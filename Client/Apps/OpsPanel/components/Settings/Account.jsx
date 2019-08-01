@@ -109,7 +109,7 @@ class Account extends Component {
 				mode: 'error',
 				title: 'Invalid Value',
 				message: 'Please select an active DFP',
-				autoDimiss: 10
+				autoDismiss: 10
 			});
 		} else if (originalactiveDFP === null && activeDFP !== null) {
 			if (

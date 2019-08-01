@@ -76,7 +76,7 @@ class Content extends React.Component {
 				mode: 'error',
 				title: 'Operation Failed',
 				message: 'Please check pasted code',
-				autoDimiss: 5
+				autoDismiss: 5
 			});
 		}
 
