@@ -135,6 +135,7 @@ class AdList extends Component {
 				title={label}
 				id={label.toUpperCase()}
 				options={array}
+				reset
 			/>
 		</div>
 	);
