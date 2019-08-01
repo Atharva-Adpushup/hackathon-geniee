@@ -25,7 +25,7 @@ class QuickSnapshot extends React.Component {
 		// 	? this.getTopPerformingSites(allUserSites, reportingSites)
 		// 	: null;
 		// const selectedSite = reportType == 'site' ? siteId : topPerformingSite || 'all';
-		const widgetsConfig = this.getWidgetConfig(widget, reportType, widgetsList);
+		const widgetsConfig = this.getWidgetConfig(widget, widgetsList);
 		this.state = {
 			quickDates: dates,
 			sites: allUserSites,
@@ -35,20 +35,7 @@ class QuickSnapshot extends React.Component {
 	}
 
 	componentDidMount() {
-		const { widgetsConfig } = this.state;
-		// if (!user.data.isPaymentDetailsComplete && !window.location.pathname.includes('payment')) {
-		// 	showNotification({
-		// 		mode: 'error',
-		// 		title: 'Payments Error',
-		// 		message: `Please complete your Payment Profile, for timely payments.
-		// 			<a href='/payment'>Go to payments</a>`,
-		// 		autoDismiss: 0
-		// 	});
-		// }
-
-		Object.keys(widgetsConfig).forEach(wid => {
-			this.getDisplayData(wid);
-		});
+		this.renderWidgetsUI();
 	}
 
 	getTopPerformingSites = (allUserSites, reportingSites) => {
@@ -63,7 +50,7 @@ class QuickSnapshot extends React.Component {
 		return topPerformingSite;
 	};
 
-	getWidgetConfig = (widgets, reportType, widgetsList) => {
+	getWidgetConfig = (widgets, widgetsList) => {
 		const sortedWidgets = sortBy(widgets, ['position', 'name']);
 		const widgetsConfig = [];
 
@@ -139,26 +126,35 @@ class QuickSnapshot extends React.Component {
 	};
 
 	getDisplayData = wid => {
-		const { widgetsConfig } = this.state;
+		const { widgetsConfig, reportType } = this.state;
+		const isReportTypeAccount = !!(reportType === 'account');
+		const isReportTypeGlobal = !!(reportType === 'global');
 		const { selectedDate, selectedSite, path, name } = widgetsConfig[wid];
 		const { sites, reportingSites } = this.props;
 		const siteIds = Object.keys(sites);
 		const params = getDateRange(selectedDate);
 		const hidPerApOriginData =
+			isReportTypeAccount &&
 			name === 'per_ap_original' &&
 			reportingSites &&
 			reportingSites[selectedSite] &&
 			reportingSites[selectedSite].dataAvailableOutOfLast30Days < 21;
 
 		params.siteid = selectedSite === 'all' ? siteIds.toString() : selectedSite;
+
+		if (isReportTypeGlobal) {
+			delete params.siteid;
+			params.isSuperUser = true;
+		}
+
 		widgetsConfig[wid].startDate = params.fromDate;
 		widgetsConfig[wid].endDate = params.toDate;
+		const validReportParams = !!(params.siteid || params.isSuperUser);
 
 		if (hidPerApOriginData) {
 			widgetsConfig[wid].isDataSufficient = false;
 			widgetsConfig[wid].isLoading = false;
-			this.setState({ widgetsConfig });
-		} else if (params.siteid)
+		} else if (validReportParams) {
 			reportService.getWidgetData({ path, params }).then(response => {
 				if (
 					response.status == 200 &&
@@ -175,12 +171,13 @@ class QuickSnapshot extends React.Component {
 				widgetsConfig[wid].isLoading = false;
 				this.setState({ widgetsConfig });
 			});
-		else {
+		} else {
 			widgetsConfig[wid].data = {};
 			widgetsConfig[wid].isDataSufficient = false;
 			widgetsConfig[wid].isLoading = false;
-			this.setState({ widgetsConfig });
 		}
+
+		this.setState({ widgetsConfig });
 	};
 
 	getLayoutSites = (allUserSites, reportingSites) => {
@@ -196,29 +193,60 @@ class QuickSnapshot extends React.Component {
 	};
 
 	showApBaselineWidget = () => {
-		const { siteId, reportType, reportingSites } = this.props;
+		const { siteId, reportingSites } = this.props;
+		const { reportType } = this.state;
 		const { sites } = this.state;
-		if (
-			reportType == 'site' &&
+		const isReportTypeGlobal = !!(reportType === 'global');
+		const isReportTypeSite = !!(reportType === 'site');
+		const isReportTypeAccount = !!(reportType === 'account');
+		const hasUserSiteProductLayout = !!(
+			isReportTypeSite &&
 			reportingSites &&
 			reportingSites[siteId] &&
-			reportingSites[siteId].product.Layout == 1
-		)
+			Number(reportingSites[siteId].product.Layout) === 1
+		);
+
+		if (isReportTypeGlobal || hasUserSiteProductLayout) {
 			return true;
-		if (reportType == 'account') {
+		}
+		if (isReportTypeAccount) {
 			const hasLayoutSite = this.getLayoutSites(sites, reportingSites);
 			if (hasLayoutSite.length > 0) return true;
 		}
+
 		return false;
 	};
 
+	renderWidgetsUI = inputWidgetsConfig => {
+		const { widgetsConfig } = this.state;
+		const computedWidgetsConfig = inputWidgetsConfig || widgetsConfig;
+
+		Object.keys(computedWidgetsConfig).forEach(wid => {
+			this.getDisplayData(wid);
+		});
+	};
+
+	renderComputedWidgetsUI = () => {
+		const { widget, widgetsList } = this.props;
+		const widgetsConfig = this.getWidgetConfig(widget, widgetsList);
+
+		this.setState({ widgetsConfig }, () => this.renderWidgetsUI(widgetsConfig));
+	};
+
 	renderControl(wid) {
-		const { reportType, reportingSites } = this.props;
-		const { widgetsConfig, quickDates, sites } = this.state;
+		const { reportingSites } = this.props;
+		const { widgetsConfig, quickDates, sites, reportType } = this.state;
 		const { selectedDate, selectedSite, name } = widgetsConfig[wid];
 		const layoutSites = reportingSites ? this.getLayoutSites(sites, reportingSites) : [];
-		const sitesToShow = name == 'per_ap_original' ? layoutSites : sites;
-		return (
+		const isWidgetNamePerAPOriginal = !!(name === 'per_ap_original');
+		const sitesToShow = isWidgetNamePerAPOriginal ? layoutSites : sites;
+		// TODO: Work on show/hide of websites dropdown in every widget once all widgets are implemented successfully
+		// const isReportTypeGlobal = !!(reportType === 'global');
+		// const isWidgetApOriginalInGlobalReport = !!(isReportTypeGlobal && isWidgetNamePerAPOriginal);
+		// const shouldHideControls = isWidgetApOriginalInGlobalReport;
+		const shouldHideControls = false;
+
+		return shouldHideControls ? null : (
 			<div className="aligner aligner--hEnd">
 				{name !== 'estimated_earnings' ? (
 					<div className="u-margin-r4">
@@ -271,11 +299,11 @@ class QuickSnapshot extends React.Component {
 	}
 
 	renderViewReportButton(wid) {
-		const { widgetsConfig } = this.state;
+		const { widgetsConfig, reportType } = this.state;
 		const { startDate, endDate, selectedSite, selectedDimension, isDataSufficient } = widgetsConfig[
 			wid
 		];
-		const { reportType, siteId } = this.props;
+		const { siteId } = this.props;
 		let siteSelected;
 		if (reportType === 'site') siteSelected = siteId;
 		else if (selectedSite != 'all') siteSelected = selectedSite;
@@ -296,18 +324,51 @@ class QuickSnapshot extends React.Component {
 		);
 	}
 
-	renderHeader = () => {};
+	renderHeader = () => {
+		const ref = this;
+		const { reportType } = ref.state;
+		const options = [{ name: 'Account', value: 'account' }, { name: 'Global', value: 'global' }];
+
+		return (
+			<div
+				key={`header-report-${reportType}`}
+				className="aligner aligner--row aligner--vCenter u-margin-b4"
+			>
+				<span className="aligner-item u-text-bold">Key Vitals</span>
+				<div className="aligner aligner--hEnd aligner--vCenter">
+					<b className="u-margin-r3">Report Level</b>
+					<SelectBox
+						id="header-selectbox"
+						isClearable={false}
+						pullRight
+						isSearchable={false}
+						wrapperClassName="display-inline"
+						selected={reportType}
+						options={options}
+						onSelect={item =>
+							ref.setState({ reportType: item }, () => ref.renderComputedWidgetsUI())
+						}
+					/>
+				</div>
+			</div>
+		);
+	};
 
 	renderContent = () => {
 		const { widgetsConfig } = this.state;
-		const content = [];
+		const headerComponent = this.renderHeader();
+		const content = [headerComponent];
 		const hasLayoutSite = this.showApBaselineWidget();
 
 		Object.keys(widgetsConfig).forEach(wid => {
 			const widget = widgetsConfig[wid];
 			const widgetComponent = this.getWidgetComponent(widget);
+			const isValidWidget = !!(
+				(widget.name === 'per_ap_original' && hasLayoutSite) ||
+				widget.name !== 'per_ap_original'
+			);
 
-			if ((widget.name == 'per_ap_original' && hasLayoutSite) || widget.name != 'per_ap_original')
+			if (isValidWidget) {
 				content.push(
 					<Card
 						rootClassName={
@@ -332,6 +393,7 @@ class QuickSnapshot extends React.Component {
 						}
 					/>
 				);
+			}
 		});
 
 		return content;
