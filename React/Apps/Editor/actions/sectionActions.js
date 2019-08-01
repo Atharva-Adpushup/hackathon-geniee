@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 import {
 	sectionActions,
 	defaultSectionCss,
@@ -9,20 +11,25 @@ import {
 } from 'consts/commonConsts';
 import { getVariationSectionsWithAds } from 'selectors/variationSelectors';
 import Utils from 'libs/utils';
-import _ from 'lodash';
+import { generateSectionName } from '../../../../helpers/clientServerHelpers';
 
 const createSection = (sectionPayload, adPayload, variationId) => dispatch => {
-		const adId = Utils.getRandomNumber(),
-			sectionId = Utils.getRandomNumber(),
-			isAdPayload = !!adPayload,
-			isAdNetworkData = !!(isAdPayload && adPayload.networkData),
-			isZoneId = !!(isAdNetworkData && adPayload.networkData.zoneId),
-			isCreateZoneContainerId = !!(isZoneId && adPayload.networkData.createZoneContainerId);
+		const adId = Utils.getRandomNumber();
+		const sectionId = Utils.getRandomNumber();
+		const isAdPayload = !!adPayload;
+		const isAdNetworkData = !!(isAdPayload && adPayload.networkData);
+		const isZoneId = !!(isAdNetworkData && adPayload.networkData.zoneId);
+		const isCreateZoneContainerId = !!(isZoneId && adPayload.networkData.createZoneContainerId);
+		const name = sectionPayload.namingData
+			? generateSectionName({ ...sectionPayload.namingData, id: sectionId })
+			: `Section-${sectionId}`;
 
 		if (isCreateZoneContainerId) {
 			adPayload.networkData.zoneContainerId = `${adPayload.networkData.zoneId}-${adId}`;
 			delete adPayload.networkData.createZoneContainerId;
 		}
+
+		delete sectionPayload.namingData;
 
 		return dispatch({
 			type: sectionActions.CREATE_SECTION,
@@ -32,7 +39,7 @@ const createSection = (sectionPayload, adPayload, variationId) => dispatch => {
 				createTs: Math.floor(Date.now() / 1000)
 			}),
 			sectionPayload: Object.assign(sectionPayload, {
-				name: `Section-${sectionId}`,
+				name,
 				id: sectionId,
 				ads: [adId],
 				createTs: Math.floor(Date.now() / 1000),
