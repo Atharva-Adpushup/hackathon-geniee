@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
 import { Nav, NavItem } from 'react-bootstrap';
-import ActionCard from '../../../../Components/ActionCard/index';
+// import ActionCard from '../../../../Components/ActionCard/index';
 import AdCodeGeneratorContainer from '../../containers/AdCodeGeneratorContainer';
 import AdListContainer from '../../containers/AdListContainer';
 import {
@@ -76,13 +76,13 @@ class Home extends Component {
 		}
 
 		return (
-			<ActionCard>
+			<div>
 				<Nav bsStyle="tabs" activeKey={activeItem.INDEX} onSelect={this.handleNavSelect}>
 					<NavItem eventKey={1}>{APT_NAV_ITEMS_VALUES.CREATE_ADS}</NavItem>
 					<NavItem eventKey={2}>{APT_NAV_ITEMS_VALUES.MANAGE_ADS}</NavItem>
 				</Nav>
 				{this.renderContent()}
-			</ActionCard>
+			</div>
 		);
 	}
 }

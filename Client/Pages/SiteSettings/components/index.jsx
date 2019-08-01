@@ -159,7 +159,7 @@ class SiteSettings extends Component {
 
 	renderRootSplitScreen() {
 		return (
-			<div title="My Sites" className="u-padding-h3">
+			<div className="u-padding-h3">
 				<SplitScreen
 					rootClassName="u-padding-0"
 					leftChildren={this.renderLeftPanel()}

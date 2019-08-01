@@ -28,6 +28,7 @@ $transition: $all 0.2s $ease;
 		flex: ($numberOne / $numberTen);
 		height: ($numberOne + em);
 		margin-top: 4px;
+		vertical-align: top;
 	}
 
 	> .card-header {
