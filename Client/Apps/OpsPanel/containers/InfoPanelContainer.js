@@ -16,7 +16,7 @@ const mapStateToProps = (state, ownProps) => {
 		user,
 		reportingSites: site,
 		sites: sites.fetched ? sites.data : [],
-		reportType: ownProps.reportType || 'account'
+		reportType: ownProps.reportType || 'global'
 	};
 };
 
