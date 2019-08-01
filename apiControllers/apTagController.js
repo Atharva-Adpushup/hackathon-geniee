@@ -32,6 +32,8 @@ const fn = {
 		const name = generateSectionName({
 			width: payload.ad.width,
 			height: payload.ad.height,
+			platform: payload.ad.formatData.platform || null,
+			pagegroup: null,
 			id,
 			service: 'T'
 		});

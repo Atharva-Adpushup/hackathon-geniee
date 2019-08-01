@@ -25,13 +25,13 @@ function apTagProcessing(doc) {
 	const docKey = `tgmr::${siteId}`;
 
 	_.forEach(ads, (ad, index) => {
-		const { width, height, id, name } = ad;
+		const { width, height, id, name, formatData = {} } = ad;
 
 		if (name === `Ad-${id}`) {
 			ads[index].name = generateSectionName({
 				width,
 				height,
-				platform: null,
+				platform: formatData.platform || null,
 				pagegroup: null,
 				service: 'T'
 			});
