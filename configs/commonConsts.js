@@ -14,6 +14,7 @@ module.exports = {
 	PRODUCT_LIST_API: 'https://staging.adpushup.com/CentralReportingWebService/common/activeProducts',
 	MAB_REPORTING_API: 'https://staging.adpushup.com/CentralReportingWebService/site/mab',
 	ACTIVE_SITES_API: 'https://staging.adpushup.com/CentralReportingWebService/site/activeSiteList',
+	XPATH_MISS_MODE_URL_API: 'https://staging.adpushup.com/CentralReportingWebService/site/report',
 	ANALYTICS_API_ROOT: 'https://staging.adpushup.com/CentralReportingWebService',
 	ANALYTICS_METAINFO_URL: '/common/metaInfo',
 	REPORT_PATH: '/site/report?report_name=get_stats_by_custom',

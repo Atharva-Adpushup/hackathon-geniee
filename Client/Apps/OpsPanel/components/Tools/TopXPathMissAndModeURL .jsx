@@ -4,12 +4,10 @@ import moment from 'moment';
 import 'react-dates/initialize';
 import { DateRangePicker } from 'react-dates';
 import 'react-dates/lib/css/_datepicker.css';
-import validator from 'validator';
 import FieldGroup from '../../../../Components/Layout/FieldGroup';
 import { XPATH_MODE_URL } from '../../configs/commonConsts';
 
 import CustomButton from '../../../../Components/CustomButton/index';
-import Loader from '../../../../Components/Loader/index';
 import SelectBox from '../../../../Components/SelectBox/index';
 import axiosInstance from '../../../../helpers/axiosInstance';
 
@@ -58,7 +56,9 @@ class TopXPathMissAndModeURL extends Component {
 				.startOf('day'),
 			endDate: moment()
 				.startOf('day')
-				.subtract(1, 'day')
+				.subtract(1, 'day'),
+			currentSelectedDevice: null,
+			currentSelectedMode: null
 		});
 	};
 
@@ -111,27 +111,27 @@ class TopXPathMissAndModeURL extends Component {
 				startDate,
 				endDate
 			})
-			.then(res => {
+			.then(() => {
 				showNotification({
 					mode: 'success',
 					title: 'Success',
-					message: res.data.data.message,
+					message: `Email will be sent to ${emailId}`,
 					autoDismiss: 5
 				});
-				this.setState({ isLoading: false });
-				this.handleReset();
+				this.setState({ isLoading: false }, this.handleReset);
 			})
-			.catch(err => {
+			.catch((err, res) => {
+				console.log(err);
 				showNotification({
 					mode: 'error',
 					title: 'Operation Failed',
-					message: 'Missing or Incorrect params',
+					message: res.data,
 					autoDismiss: 5
 				});
+
 				this.setState({ isLoading: false });
 			});
 	};
-
 
 	datesUpdated = ({ startDate, endDate }) => {
 		this.setState({ startDate, endDate });
@@ -226,6 +226,7 @@ class TopXPathMissAndModeURL extends Component {
 						}}
 						id="select-device"
 						title="Select Device"
+						reset
 					/>
 				</Fragment>
 				<div className="u-margin-t4">
@@ -247,12 +248,12 @@ class TopXPathMissAndModeURL extends Component {
 					<SelectBox
 						selected={currentSelectedMode}
 						options={modes}
-						// onSelect={this.handleSelectMode}
 						onSelect={currentSelectedMode => {
 							this.setState({ currentSelectedMode });
 						}}
 						id="select-mode"
 						title="Select Mode"
+						reset
 					/>
 				</Fragment>
 

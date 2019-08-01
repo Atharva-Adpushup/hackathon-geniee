@@ -6,9 +6,9 @@ const _ = require('lodash');
 
 const { couchBase } = require('../configs/config');
 const HTTP_STATUSES = require('../configs/httpStatusConsts');
-const { ACTIVE_SITES_API } = require('../configs/commonConsts');
+const { ACTIVE_SITES_API, XPATH_MISS_MODE_URL_API } = require('../configs/commonConsts');
 const { sendSuccessResponse, sendErrorResponse } = require('../helpers/commonFunctions');
-const { appBucket, errorHandler, checkParams } = require('../helpers/routeHelpers');
+const { appBucket, errorHandler } = require('../helpers/routeHelpers');
 
 const router = express.Router();
 
@@ -20,6 +20,16 @@ const helpers = {
 			couchBase.DEFAULT_BUCKET
 		} b on keys 'user::' || a.ownerEmail where meta(a).id like 'site::%'`;
 		return appBucket.queryDB(query);
+	},
+	makeAPIRequest: options => {
+		const DEFAULT_OPTIONS = {
+			method: 'GET',
+			json: true
+		};
+		return request({
+			...DEFAULT_OPTIONS,
+			...options
+		});
 	}
 };
 
@@ -82,16 +92,13 @@ router
 						value
 				  });
 		}
-		function makeAPIRequest(qs) {
-			const options = {
-				method: 'GET',
+		function makeAPIRequestWrapper(qs) {
+			return helpers.makeAPIRequest({
 				uri: ACTIVE_SITES_API,
-				qs,
-				json: true
-			};
-
-			return request(options);
+				qs
+			});
 		}
+
 		function cleanData(array) {
 			return array.map(element => ({
 				site: element.site,
@@ -120,12 +127,12 @@ router
 				const lastFrom = processDate(null, lastTo, numberOfDays);
 
 				const promises = [
-					makeAPIRequest({
+					makeAPIRequestWrapper({
 						fromDate: lastFrom,
 						toDate: lastTo,
 						minPageViews: pageviewsThreshold
 					}),
-					makeAPIRequest({
+					makeAPIRequestWrapper({
 						fromDate: currentFrom,
 						toDate: currentTo,
 						minPageViews: pageviewsThreshold
@@ -188,6 +195,18 @@ router
 			endDate
 		} = req.body;
 
+		const qs = {
+			siteid: siteId,
+			urlCount: topURLCount,
+			email: emailId,
+			page_group: pageGroups,
+			device_type: currentSelectedDevice,
+			mode: currentSelectedMode,
+			error_code: errorCode,
+			fromDate: startDate,
+			toDate: endDate
+		};
+
 		const isDataValid = !!(
 			siteId &&
 			topURLCount &&
@@ -208,13 +227,16 @@ router
 				res
 			);
 		}
-
-		return sendSuccessResponse(
-			{
-				message: 'Notification will be sent to your entered email address'
-			},
-			res
-		);
+		return helpers
+			.makeAPIRequest({
+				uri: XPATH_MISS_MODE_URL_API,
+				qs: { ...qs, report_name: 'get_url_count' }
+			})
+			.then(response => {
+				const { code = -1 } = response;
+				if (code !== 1) return Promise.reject(new Error(response.data));
+				return sendSuccessResponse(response, res);
+			});
 	});
 
 module.exports = router;
