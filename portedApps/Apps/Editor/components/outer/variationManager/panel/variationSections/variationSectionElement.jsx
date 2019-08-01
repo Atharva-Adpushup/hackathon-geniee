@@ -91,6 +91,9 @@ class variationSectionElement extends Component {
 					) : (
 						''
 					)}
+					<Col className="u-padding-r10px section-id-ie" xs={12} style={{ marginBottom: '10px' }}>
+						Section Id : <strong>{props.section.id}</strong>
+					</Col>
 					<Col className="u-padding-r10px section-name-ie" xs={12}>
 						<InlineEdit
 							validate
@@ -99,9 +102,6 @@ class variationSectionElement extends Component {
 							text="Section Name"
 							errorMessage="Section Name cannot be blank"
 						/>
-					</Col>
-					<Col className="u-padding-r10px section-id-ie" xs={12}>
-						Section Id : <strong>{props.section.id}</strong>
 					</Col>
 				</Row>
 				<Row>
