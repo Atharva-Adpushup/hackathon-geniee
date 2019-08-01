@@ -58,6 +58,6 @@ function init() {
 		.catch(err => console.log('Error occured : ', err));
 }
 
-// init()
-// 	.then(() => console.log('Processing over'))
-// 	.then(() => process.exit(0));
+init()
+	.then(() => console.log('Processing over'))
+	.then(() => process.exit(0));
