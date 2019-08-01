@@ -82,7 +82,7 @@ class AdCodeGenerator extends Component {
 							platform, // DESKTOP, MOBILE
 							type // DISPLAY, NATIVE, AMP, LINK
 						},
-						type: 3, // STRUCTURAL
+						type: 1, // STRUCTURAL
 						css: {
 							display: 'block',
 							margin: '10px auto',

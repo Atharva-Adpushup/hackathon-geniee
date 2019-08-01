@@ -10,19 +10,25 @@ import {
 import { getVariationSectionsWithAds } from 'selectors/variationSelectors';
 import Utils from 'libs/utils';
 import _ from 'lodash';
+import { generateSectionName } from '../../../../helpers/clientServerHelpers';
 
 const createSection = (sectionPayload, adPayload, variationId) => dispatch => {
-		const adId = Utils.getRandomNumber(),
-			sectionId = Utils.getRandomNumber(),
-			isAdPayload = !!adPayload,
-			isAdNetworkData = !!(isAdPayload && adPayload.networkData),
-			isZoneId = !!(isAdNetworkData && adPayload.networkData.zoneId),
-			isCreateZoneContainerId = !!(isZoneId && adPayload.networkData.createZoneContainerId);
+		const adId = Utils.getRandomNumber();
+		const sectionId = Utils.getRandomNumber();
+		const isAdPayload = !!adPayload;
+		const isAdNetworkData = !!(isAdPayload && adPayload.networkData);
+		const isZoneId = !!(isAdNetworkData && adPayload.networkData.zoneId);
+		const isCreateZoneContainerId = !!(isZoneId && adPayload.networkData.createZoneContainerId);
+		const name = sectionPayload.namingData
+			? generateSectionName({ ...sectionPayload.namingData, id: sectionId })
+			: `Section-${sectionId}`;
 
 		if (isCreateZoneContainerId) {
 			adPayload.networkData.zoneContainerId = `${adPayload.networkData.zoneId}-${adId}`;
 			delete adPayload.networkData.createZoneContainerId;
 		}
+
+		delete sectionPayload.namingData;
 
 		return dispatch({
 			type: sectionActions.CREATE_SECTION,
@@ -32,7 +38,7 @@ const createSection = (sectionPayload, adPayload, variationId) => dispatch => {
 				createTs: Math.floor(Date.now() / 1000)
 			}),
 			sectionPayload: Object.assign(sectionPayload, {
-				name: `Section-${sectionId}`,
+				name,
 				id: sectionId,
 				ads: [adId],
 				createTs: Math.floor(Date.now() / 1000),
@@ -45,9 +51,7 @@ const createSection = (sectionPayload, adPayload, variationId) => dispatch => {
 	},
 	createIncontentSection = (sectionPayload, adPayload, variationId) => (dispatch, getState) => {
 		const variationSections = getVariationSectionsWithAds(getState(), { variationId }).sections,
-			arr = _.map(variationSections, data => {
-				return data;
-			});
+			arr = _.map(variationSections, data => data);
 
 		if (_.find(arr, { sectionNo: sectionPayload.sectionNo })) {
 			dispatch({
@@ -71,20 +75,25 @@ const createSection = (sectionPayload, adPayload, variationId) => dispatch => {
 		const adId = Utils.getRandomNumber();
 		const sectionId = Utils.getRandomNumber();
 		const float = sectionPayload.float;
-		const css = float !== 'none' ? (float === 'left' ? leftSectionCss : rightSectionCss) : defaultSectionCss;
+		const css =
+			float !== 'none' ? (float === 'left' ? leftSectionCss : rightSectionCss) : defaultSectionCss;
 		const customCSS = adPayload.customCSS || '';
 		const multipleAdSizes = adPayload.multipleAdSizes || null;
 		const adData = {};
 		const network =
-			currentUser.userType === 'partner' ? 'geniee' : adPayload.network ? adPayload.network : 'custom';
+			currentUser.userType === 'partner'
+				? 'geniee'
+				: adPayload.network
+				? adPayload.network
+				: 'custom';
 		const isAdPayload = !!adPayload;
 		const isAdNetworkData = !!(isAdPayload && adPayload.networkData);
 		const isZoneId = !!(isAdNetworkData && adPayload.networkData.zoneId);
 		const isCreateZoneContainerId = !!(isZoneId && adPayload.networkData.createZoneContainerId);
 		let adWidth = adPayload.adSize.substr(0, adPayload.adSize.indexOf('x')).trim();
 		let adHeight = adPayload.adSize.substr(adPayload.adSize.indexOf('x') + 1).trim();
-		let isAdWidthNotANumber = isNaN(adWidth);
-		let isAdHeightNotANumber = isNaN(adHeight);
+		const isAdWidthNotANumber = isNaN(adWidth);
+		const isAdHeightNotANumber = isNaN(adHeight);
 
 		adWidth = isAdWidthNotANumber ? adWidth : parseInt(adWidth, 10);
 		adHeight = isAdHeightNotANumber ? adHeight : parseInt(adHeight, 10);
@@ -105,7 +114,7 @@ const createSection = (sectionPayload, adPayload, variationId) => dispatch => {
 				customCSS,
 				multipleAdSizes,
 				createTs: Math.floor(Date.now() / 1000),
-				network: network,
+				network,
 				secondaryCss: float !== 'none' ? defaultSectionCss : undefined,
 				networkData: adPayload.networkData
 			}),
@@ -144,40 +153,30 @@ const createSection = (sectionPayload, adPayload, variationId) => dispatch => {
 			});
 		}
 	},
-	updatePartnerData = (sectionId, adId, partnerData) => {
-		return {
-			type: sectionActions.UPDATE_PARTNER_DATA,
-			sectionId,
-			adId,
-			partnerData
-		};
-	},
-	sectionAllXPaths = (sectionId, xpath) => {
-		return {
-			type: sectionActions.GET_ALL_XPATHS,
-			sectionId,
-			xpath
-		};
-	},
-	validateXPath = (sectionId, xpath) => {
-		return {
-			type: sectionActions.VALIDATE_XPATH,
-			sectionId,
-			xpath
-		};
-	},
-	validateSectionXPath = (sectionId, xpath) => {
-		return {
-			type: sectionActions.VALIDATE_XPATH_SECTION,
-			sectionId,
-			xpath
-		};
-	},
+	updatePartnerData = (sectionId, adId, partnerData) => ({
+		type: sectionActions.UPDATE_PARTNER_DATA,
+		sectionId,
+		adId,
+		partnerData
+	}),
+	sectionAllXPaths = (sectionId, xpath) => ({
+		type: sectionActions.GET_ALL_XPATHS,
+		sectionId,
+		xpath
+	}),
+	validateXPath = (sectionId, xpath) => ({
+		type: sectionActions.VALIDATE_XPATH,
+		sectionId,
+		xpath
+	}),
+	validateSectionXPath = (sectionId, xpath) => ({
+		type: sectionActions.VALIDATE_XPATH_SECTION,
+		sectionId,
+		xpath
+	}),
 	renameSection = (section, variationId, name) => (dispatch, getState) => {
 		const variationSections = getVariationSectionsWithAds(getState(), { variationId }).sections,
-			arr = _.map(variationSections, data => {
-				return data;
-			});
+			arr = _.map(variationSections, data => data);
 		if (_.find(arr, { name })) {
 			dispatch({
 				type: uiActions.SHOW_NOTIFICATION,
@@ -194,41 +193,31 @@ const createSection = (sectionPayload, adPayload, variationId) => dispatch => {
 			name
 		});
 	},
-	updateXPath = (sectionId, xpath) => {
-		return {
-			type: sectionActions.UPDATE_XPATH,
-			sectionId,
-			xpath
-		};
-	},
-	updateOperation = (sectionId, operation) => {
-		return {
-			type: sectionActions.UPDATE_OPERATION,
-			sectionId,
-			operation
-		};
-	},
-	updateInContentMinDistanceFromPrevAd = (sectionId, minDistanceFromPrevAd) => {
-		return {
-			type: sectionActions.UPDATE_INCONTENT_MIN_DISTANCE_FROM_PREV_AD,
-			sectionId,
-			minDistanceFromPrevAd
-		};
-	},
-	updateInContentNotNear = (sectionId, notNear) => {
-		return {
-			type: sectionActions.UPDATE_INCONTENT_NOT_NEAR,
-			sectionId,
-			notNear
-		};
-	},
-	updateType = (sectionId, value) => {
-		return {
-			type: sectionActions.UPDATE_TYPE,
-			sectionId,
-			value
-		};
-	},
+	updateXPath = (sectionId, xpath) => ({
+		type: sectionActions.UPDATE_XPATH,
+		sectionId,
+		xpath
+	}),
+	updateOperation = (sectionId, operation) => ({
+		type: sectionActions.UPDATE_OPERATION,
+		sectionId,
+		operation
+	}),
+	updateInContentMinDistanceFromPrevAd = (sectionId, minDistanceFromPrevAd) => ({
+		type: sectionActions.UPDATE_INCONTENT_MIN_DISTANCE_FROM_PREV_AD,
+		sectionId,
+		minDistanceFromPrevAd
+	}),
+	updateInContentNotNear = (sectionId, notNear) => ({
+		type: sectionActions.UPDATE_INCONTENT_NOT_NEAR,
+		sectionId,
+		notNear
+	}),
+	updateType = (sectionId, value) => ({
+		type: sectionActions.UPDATE_TYPE,
+		sectionId,
+		value
+	}),
 	updateFormatData = (sectionId, formatData) => (dispatch, getState) => {
 		dispatch({
 			type: uiActions.SHOW_NOTIFICATION,
@@ -281,19 +270,15 @@ const createSection = (sectionPayload, adPayload, variationId) => dispatch => {
 			floatCss
 		};
 	},
-	scrollSectionIntoView = adId => {
-		return {
-			type: sectionActions.SCROLL_TO_VIEW,
-			adId
-		};
-	},
-	toggleLazyLoad = (sectionId, value) => {
-		return {
-			type: sectionActions.ENABLE_LAZYLOAD,
-			sectionId,
-			value
-		};
-	};
+	scrollSectionIntoView = adId => ({
+		type: sectionActions.SCROLL_TO_VIEW,
+		adId
+	}),
+	toggleLazyLoad = (sectionId, value) => ({
+		type: sectionActions.ENABLE_LAZYLOAD,
+		sectionId,
+		value
+	});
 
 export {
 	createSection,

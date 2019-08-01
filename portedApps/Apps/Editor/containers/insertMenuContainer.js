@@ -2,7 +2,7 @@ import { connect } from 'react-redux';
 import InsertMenu from 'insertMenu/index';
 import { hideMenu } from 'actions/insertMenuActions';
 import { createSection } from 'actions/sectionActions';
-import { getActiveChannelId } from 'selectors/channelSelectors';
+import { getActiveChannelId, getActiveChannel } from 'selectors/channelSelectors';
 import { getPartner, getCustomSizes } from 'selectors/siteSelectors';
 import {
 	getActiveChannelActiveVariationId,
@@ -16,19 +16,27 @@ import { messengerCommands } from '../consts/commonConsts';
 import { showNotification } from 'actions/uiActions';
 
 const mapStateToProps = state => {
-	const json = getInsertMenuState(state);
-	return {
-		...json,
-		customSizes: getCustomSizes(state),
-		partner: getPartner(state),
-		isCustomAdCodeInVariationAds: getCustomAdCodeFromActiveVariation(state),
-		variationId: getActiveChannelActiveVariationId(state),
-		channelId: getActiveChannelId(state),
-		zonesData: getZonesDataFromActiveVariation(state),
-		networkConfig: getNetworkConfig(state)
-	};
-},
-	mapDispatchToProps = dispatch => ({
+		const json = getInsertMenuState(state);
+		const channel = state.channelData.activeChannel
+			? getActiveChannel(state)
+			: { id: null, platform: null, pageGroup: null };
+		return {
+			...json,
+			customSizes: getCustomSizes(state),
+			partner: getPartner(state),
+			isCustomAdCodeInVariationAds: getCustomAdCodeFromActiveVariation(state),
+			variationId: getActiveChannelActiveVariationId(state),
+			channelId: channel.id,
+			zonesData: getZonesDataFromActiveVariation(state),
+			networkConfig: getNetworkConfig(state),
+			namingData: {
+				platform: channel.platform,
+				pagegroup: channel.pageGroup,
+				service: 'L'
+			}
+		};
+	},
+	mapDispatchToProps = (dispatch, props) => ({
 		hideMenu: () => {
 			dispatch(hideMenu());
 		},
@@ -44,4 +52,7 @@ const mapStateToProps = state => {
 		showNotification: params => dispatch(showNotification(params))
 	});
 
-export default connect(mapStateToProps, mapDispatchToProps)(InsertMenu);
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps
+)(InsertMenu);

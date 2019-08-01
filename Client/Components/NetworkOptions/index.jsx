@@ -6,18 +6,13 @@ import Adsense from './Adsense';
 import MediaNet from './MediaNet';
 import OtherNetworks from './OtherNetworks';
 import AdX from './AdX';
-// import SectionOptions from './sectionOptions';
 
 class NetworkOptions extends Component {
 	constructor(props) {
 		super(props);
+		const { ad } = this.props;
 		this.state = {
-			network:
-				this.props.ad && this.props.ad.network
-					? this.props.ad.network
-					: this.props.ad && currentUser.userType == 'partner'
-					? 'geniee'
-					: false
+			network: ad && ad.network ? ad.network : false
 		};
 		this.submitHandler = this.submitHandler.bind(this);
 		this.renderNetwork = this.renderNetwork.bind(this);
@@ -31,17 +26,17 @@ class NetworkOptions extends Component {
 		if (onUpdate) onUpdate();
 	}
 
-	componentDidUpdate() {
-		const { onUpdate } = this.props;
-		if (onUpdate) onUpdate();
-	}
-
 	componentWillReceiveProps(nextProps) {
 		if (nextProps.reset) {
 			this.setState({
 				network: false
 			});
 		}
+	}
+
+	componentDidUpdate() {
+		const { onUpdate } = this.props;
+		if (onUpdate) onUpdate();
 	}
 
 	getCode() {

@@ -5,6 +5,7 @@ const moment = require('moment');
 const config = require('../configs/config');
 const { sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFunctions');
 const { docKeys, tagManagerInitialDoc } = require('../configs/commonConsts');
+const { generateSectionName } = require('../helpers/clientServerHelpers');
 const {
 	appBucket,
 	errorHandler,
@@ -30,7 +31,12 @@ const fn = {
 		const ad = {
 			...payload.ad,
 			id,
-			name: `Ad-${id}`,
+			name: generateSectionName({
+				width: payload.ad.width,
+				height: payload.ad.height,
+				id,
+				service: 'T'
+			}),
 			createdOn: +new Date(),
 			formatData: {
 				...payload.ad.formatData
