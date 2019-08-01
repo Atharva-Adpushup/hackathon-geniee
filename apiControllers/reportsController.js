@@ -1,6 +1,7 @@
 const express = require('express');
 const request = require('request-promise');
 const csv = require('express-csv');
+const _ = require('lodash');
 const CC = require('../configs/commonConsts');
 const utils = require('../helpers/utils');
 
@@ -26,11 +27,14 @@ router
 		return res.send({});
 	})
 	.get('/getWidgetData', (req, res) => {
-		const reqParams = req.query.params ? JSON.parse(req.query.params) : {};
-		const siteIds = reqParams.siteid;
-		if (siteIds)
+		const { params, path } = req.query;
+		const reqParams = _.isString(params) ? JSON.parse(params) : {};
+		const { siteid, isSuperUser } = reqParams;
+		const isValidParams = !!(siteid || (isSuperUser && !siteid));
+
+		if (isValidParams)
 			return request({
-				uri: `${CC.ANALYTICS_API_ROOT}${req.query.path}`,
+				uri: `${CC.ANALYTICS_API_ROOT}${path}`,
 				json: true,
 				qs: reqParams
 			})

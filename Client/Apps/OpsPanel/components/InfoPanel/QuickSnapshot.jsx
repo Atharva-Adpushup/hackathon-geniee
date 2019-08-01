@@ -29,7 +29,8 @@ class QuickSnapshot extends React.Component {
 		this.state = {
 			quickDates: dates,
 			sites: allUserSites,
-			widgetsConfig
+			widgetsConfig,
+			reportType
 		};
 	}
 
@@ -73,13 +74,13 @@ class QuickSnapshot extends React.Component {
 				widget.isLoading = true;
 				widget.selectedDate = dates[0].value;
 				widget.isDataSufficient = false;
+				widget.selectedSite = 'all';
 
 				// if (reportType == 'site' || widget.name == 'per_ap_original')
 				// 	widget.selectedSite = selectedSite;
 				// else widget.selectedSite = 'all';
 
 				if (widget.name === 'per_ap_original') {
-					widget.selectedSite = 'all';
 					widget.selectedDimension = 'page_variation_type';
 				}
 
@@ -105,6 +106,7 @@ class QuickSnapshot extends React.Component {
 		switch (widget.name) {
 			case 'estimated_earnings':
 				return <EstimatedEarningsContainer displayData={widget.data} />;
+
 			case 'per_ap_original':
 				return (
 					<PerformanceApOriginalContainer
@@ -112,18 +114,22 @@ class QuickSnapshot extends React.Component {
 						isDataSufficient={widget.isDataSufficient}
 					/>
 				);
+
 			case 'per_overview':
 				return <PerformanceOverviewContainer displayData={widget.data} />;
+
 			case 'per_site_wise':
 				if (reportType != 'site') {
 					return <SitewiseReportContainer displayData={widget.data} />;
 				}
 				return '';
+
 			case 'per_site_wise_daily':
 				if (reportType == 'site') {
 					return <SitewiseReportContainer displayData={widget.data} reportType="site" />;
 				}
 				return '';
+
 			case 'rev_by_network':
 				return <RevenueContainer displayData={widget.data} />;
 			default:
@@ -290,13 +296,17 @@ class QuickSnapshot extends React.Component {
 		);
 	}
 
+	renderHeader = () => {};
+
 	renderContent = () => {
 		const { widgetsConfig } = this.state;
 		const content = [];
 		const hasLayoutSite = this.showApBaselineWidget();
+
 		Object.keys(widgetsConfig).forEach(wid => {
 			const widget = widgetsConfig[wid];
 			const widgetComponent = this.getWidgetComponent(widget);
+
 			if ((widget.name == 'per_ap_original' && hasLayoutSite) || widget.name != 'per_ap_original')
 				content.push(
 					<Card
