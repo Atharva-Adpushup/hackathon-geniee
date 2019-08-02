@@ -29,7 +29,7 @@ var hb = {
 				size = adpSlot.optionalParam.overrideSizeTo.split('x');
 			}
 
-			var computedBidders = adpSlot.bidders.slice();
+			var computedBidders = JSON.parse(JSON.stringify(adpSlot.bidders));
 			var sizeConfig = config.INVENTORY.deviceConfig.sizeConfig;
 
 			computedBidders.forEach(function(val, i) {
@@ -45,6 +45,17 @@ var hb = {
 				// if found then set its labels as labelAny in current bidder object
 				if (!isNaN(index) && sizeConfig[index]) {
 					computedBidders[i].labelAny = sizeConfig[index].labels;
+				}
+
+				if (
+					val.bidder === 'rubicon' &&
+					adpSlot.formats.indexOf('video') !== -1 &&
+					val.params.video
+				) {
+					computedBidders[i].params.video = {
+						playerWidth: `${prebidSizes[0][0]}`,
+						playerHeight: `${prebidSizes[0][1]}`
+					};
 				}
 			});
 
@@ -63,7 +74,12 @@ var hb = {
 					case 'video': {
 						prebidSlot.mediaTypes.video = {
 							context: constants.PREBID.VIDEO_FORMAT_TYPE,
-							playerSize: prebidSizes[0]
+							playerSize: prebidSizes[0],
+							mimes: ['video/mp4', 'video/x-ms-wmv'],
+							protocols: [2,5],
+							maxduration:30,
+							linearity: 1,
+							api: [2]
 						};
 						break;
 					}
@@ -104,7 +120,7 @@ var hb = {
         */
 		if (HB_ACTIVE) {
 			(function() {
-				require('../../../../../adpushup.js/modules/adpTags/Prebid.js/build/dist/prebid');
+				require('../../../../../adpushup.js/modules/adpTags/Prebid-latest/build/dist/prebid');
 			})();
 		}
 
