@@ -2,43 +2,48 @@ require('dotenv').config();
 
 // Set Base Directory
 global.__basedir = __dirname;
+const express = require('express');
+const fs = require('fs');
+const server = require('http').createServer(app);
+const path = require('path');
+const compression = require('compression');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
+const session = require('express-session');
+const CouchbaseStore = require('connect-couchbase')(session);
 
-var express = require('express'),
-	app = express(),
-	fs = require('fs'),
-	server = require('http').createServer(app),
-	path = require('path'),
-	compression = require('compression'),
-	cookieParser = require('cookie-parser'),
-	bodyParser = require('body-parser'),
-	session = require('express-session'),
-	CouchbaseStore = require('connect-couchbase')(session),
-	config = require('./configs/config'),
-	consts = require('./configs/commonConsts'),
-	languageSupport = require('./i18n/language-mapping'),
-	utils = require('./helpers/utils'),
-	couchBaseService = require('./helpers/couchBaseService'),
-	woodlotMiddlewareLogger = require('woodlot').middlewareLogger,
-	woodlotEvents = require('woodlot').events,
-	uuid = require('uuid'),
-	locale = require('locale'),
-	helmet = require('helmet'),
-	// couchbase store
-	couchbaseStore = new CouchbaseStore({
-		db: couchBaseService.cluster.openBucket(config.couchBase.DEFAULT_BUCKET),
-		host: config.couchBase.HOST + ':8091',
-		connectionTimeout: 15000,
-		operationTimeout: 10000,
-		ttl: 86400,
-		prefix: 'sess::'
-	});
+const config = require('./configs/config');
+const consts = require('./configs/commonConsts');
+const languageSupport = require('./i18n/language-mapping');
+const utils = require('./helpers/utils');
+const couchBaseService = require('./helpers/couchBaseService');
+const woodlotMiddlewareLogger = require('woodlot').middlewareLogger;
+const woodlotEvents = require('woodlot').events;
+const uuid = require('uuid');
+const locale = require('locale');
+const helmet = require('helmet');
+
+const app = express();
+
+// couchbase store
+const couchbaseStore = new CouchbaseStore({
+	db: couchBaseService.cluster.openBucket(config.couchBase.DEFAULT_BUCKET),
+	host: `${config.couchBase.HOST}:8091`,
+	connectionTimeout: 15000,
+	operationTimeout: 10000,
+	ttl: 86400,
+	prefix: 'sess::'
+});
 
 // Set Node process environment
 process.env.NODE_ENV = config.environment.HOST_ENV;
 
-if (process.env.NODE_ENV === consts.environment.production) {
+if (
+	process.env.NODE_ENV === consts.environment.production ||
+	process.env.NODE_ENV === consts.environment.staging
+) {
 	require('./services/genieeAdSyncService/index');
-	//require('./services/hbSyncService/index');
+	// require('./services/hbSyncService/index');
 }
 
 // Enable compression at top
@@ -52,7 +57,7 @@ app.use(
 		}
 	})
 );
-process.on('uncaughtException', function(err) {
+process.on('uncaughtException', err => {
 	// handle the error safely
 	console.log(err);
 });
@@ -98,9 +103,9 @@ app.use(
 );
 
 // Write log to couchbase database on woodlot's 'reqErr' event
-woodlotEvents.on('err', function(log) {
+woodlotEvents.on('err', log => {
 	if ('name' in log.message && log.message.name === 'GenieeAPI') {
-		var logData = log.message;
+		const logData = log.message;
 		couchBaseService
 			.connectToBucket('apGlobalBucket')
 			.then(appBucket =>
@@ -114,7 +119,7 @@ woodlotEvents.on('err', function(log) {
 				})
 			)
 			.then(success => {
-				//console.log('Log added');
+				// console.log('Log added');
 			})
 			.catch(err => {
 				console.log('Error writing log to database');
@@ -124,7 +129,7 @@ woodlotEvents.on('err', function(log) {
 
 couchBaseService
 	.connectToAppBucket()
-	.then(function() {
+	.then(() => {
 		// set couchbaseStore for session storage
 		couchbaseStore.on('disconnect', function() {
 			console.log('Couchbase store is disconnected now: ', arguments);
@@ -142,8 +147,8 @@ couchBaseService
 		);
 
 		// Setting template local variables for jade
-		app.use(function(req, res, next) {
-			app.locals.isSuperUser = req.session.isSuperUser ? true : false;
+		app.use((req, res, next) => {
+			app.locals.isSuperUser = !!req.session.isSuperUser;
 			app.locals.usersList = req.session.usersList ? req.session.usersList : [];
 			app.locals.environment = config.environment.HOST_ENV;
 			app.locals.currentUser = req.session.user ? req.session.user : {};
@@ -170,7 +175,7 @@ couchBaseService
 		// will print stacktrace
 		if (app.get('env') === 'development') {
 			app.locals.pretty = true;
-			app.use(function(err, req, res) {
+			app.use((err, req, res) => {
 				res.status(err.status || 500);
 				res.json({
 					message: err.message,
@@ -183,7 +188,7 @@ couchBaseService
 
 		// production error handler
 		// no stacktraces leaked to user
-		app.use(function(err, req, res) {
+		app.use((err, req, res) => {
 			res.status(err.status || 500);
 			res.render('error', {
 				message: err.message,
@@ -192,10 +197,10 @@ couchBaseService
 		});
 
 		server.listen(config.environment.HOST_PORT);
-		console.log('Server listening at port : ' + config.environment.HOST_PORT);
+		console.log(`Server listening at port : ${config.environment.HOST_PORT}`);
 	})
-	.catch(function(err) {
-		console.log('err: ' + err.toString());
+	.catch(err => {
+		console.log(`err: ${err.toString()}`);
 	});
 
 module.exports = app;
