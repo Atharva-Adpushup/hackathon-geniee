@@ -4,7 +4,6 @@ require('dotenv').config();
 global.__basedir = __dirname;
 const express = require('express');
 const fs = require('fs');
-const server = require('http').createServer(app);
 const path = require('path');
 const compression = require('compression');
 const cookieParser = require('cookie-parser');
@@ -24,6 +23,7 @@ const locale = require('locale');
 const helmet = require('helmet');
 
 const app = express();
+const server = require('http').createServer(app);
 
 // couchbase store
 const couchbaseStore = new CouchbaseStore({
