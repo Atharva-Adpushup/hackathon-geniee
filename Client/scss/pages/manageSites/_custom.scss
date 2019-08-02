@@ -1,5 +1,16 @@
 .manage-site-card {
 	width: ($fullPercentage - 70) !important;
+	&.card {
+		button {
+			&:hover,
+			&:active,
+			&:focus {
+				background: #e6e6e6;
+				box-shadow: $none;
+				outline: 0 $none;
+			}
+		}
+	}
 }
 .custom-tooltip {
 	display: inline;

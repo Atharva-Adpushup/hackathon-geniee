@@ -3,6 +3,18 @@ a {
 	color: $linkColor;
 }
 
+.nav > li.disabled {
+	> a {
+		color: #aaa;
+		&:hover,
+		&:active,
+		&:focus {
+			color: #aaa;
+			border-color: transparent;
+		}
+	}
+}
+
 a > button.btn {
 	color: inherit;
 	border: none;

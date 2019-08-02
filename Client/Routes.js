@@ -96,12 +96,7 @@ const Routes = () => (
 					/>
 
 					{/** App Layout */}
-					<PrivateRoute
-						exact
-						name="Transform Code"
-						path="/sites/:siteId/apps/layout"
-						component={Layout}
-					/>
+					<PrivateRoute exact name="Layout" path="/sites/:siteId/apps/layout" component={Layout} />
 
 					{/** App ApTag */}
 					<PrivateRoute

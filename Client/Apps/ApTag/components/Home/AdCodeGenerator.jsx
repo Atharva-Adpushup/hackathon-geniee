@@ -6,6 +6,7 @@ import { copyToClipBoard } from '../../lib/helpers';
 import CustomMessage from '../../../../Components/CustomMessage/index';
 import CustomButton from '../../../../Components/CustomButton/index';
 import Loader from '../../../../Components/Loader';
+import ActionCard from '../../../../Components/ActionCard/index';
 
 class AdCodeGenerator extends Component {
 	constructor(props) {
@@ -229,9 +230,9 @@ class AdCodeGenerator extends Component {
 		const { loading } = this.state;
 		const { codeGenerated } = this.props;
 		return (
-			<Row className="options-wrapper">
+			<ActionCard className="options-wrapper">
 				{loading && !codeGenerated ? <Loader /> : this.renderMainContent()}
-			</Row>
+			</ActionCard>
 		);
 	}
 }

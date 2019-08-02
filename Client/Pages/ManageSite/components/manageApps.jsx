@@ -85,7 +85,7 @@ class ManageApps extends React.Component {
 		const { site } = this.props;
 		const { appStatuses } = site;
 		return (
-			<div className="u-padding-h4 u-padding-v5 aligner aligner--row aligner--wrap">
+			<div className="aligner aligner--row aligner--wrap">
 				{APPS.map(app => {
 					const { name, image, description, key, left, right, full = false } = app;
 					const isAppActive = !!appStatuses[key];

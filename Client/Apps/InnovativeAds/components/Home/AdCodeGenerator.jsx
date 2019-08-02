@@ -7,6 +7,7 @@ import CustomMessage from '../../../../Components/CustomMessage/index';
 import CustomButton from '../../../../Components/CustomButton/index';
 import Loader from '../../../../Components/Loader';
 import { pagegroupFiltering } from '../../lib/helpers';
+import ActionCard from '../../../../Components/ActionCard';
 
 class AdCodeGenerator extends Component {
 	constructor(props) {
@@ -361,9 +362,9 @@ class AdCodeGenerator extends Component {
 		const { codeGenerated } = this.props;
 		const { loading } = this.state;
 		return (
-			<Row className="options-wrapper">
+			<ActionCard className="options-wrapper">
 				{loading && !codeGenerated ? <Loader height="300px" /> : this.renderMainContent()}
-			</Row>
+			</ActionCard>
 		);
 	}
 }
