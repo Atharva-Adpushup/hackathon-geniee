@@ -52,8 +52,9 @@ class PerformanceOverview extends React.Component {
 								<div className="font-small">{displayData[key].name}</div>
 								<div className="estimatedEarning">
 									<span>
-										{displayMetrics[key].valueType == 'money' ? '$' : ''}
-										{numberWithCommas(roundOffTwoDecimal(displayData[key].value))}
+										{displayMetrics[key].valueType == 'money'
+											? `$${numberWithCommas(roundOffTwoDecimal(displayData[key].value))}`
+											: numberWithCommas(displayData[key].value)}
 									</span>
 								</div>
 							</div>

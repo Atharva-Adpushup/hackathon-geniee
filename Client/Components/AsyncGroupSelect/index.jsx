@@ -51,7 +51,8 @@ class AsyncGroupSelect extends Component {
 		const { selectedFilters, selectedFilterKey } = this.state;
 		selectedFilters[selectedFilterKey] = selectedFilters[selectedFilterKey] || {};
 		if (checked) selectedFilters[selectedFilterKey][key] = true;
-		else selectedFilters[selectedFilterKey][key] = false;
+		else if (selectedFilters[selectedFilterKey][key])
+			delete selectedFilters[selectedFilterKey][key];
 		this.setState(
 			{
 				selectedFilters
@@ -179,11 +180,13 @@ class AsyncGroupSelect extends Component {
 	};
 
 	dropdownToggle = newValue => {
+		let { showFilterValues } = this.state;
 		if (this._forceOpen) {
 			this.setState({ menuOpen: true });
 			this._forceOpen = false;
 		} else {
-			this.setState({ menuOpen: newValue });
+			showFilterValues = !newValue ? false : showFilterValues;
+			this.setState({ menuOpen: newValue, showFilterValues });
 		}
 	};
 

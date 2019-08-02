@@ -11,7 +11,13 @@ import ControlContainer from '../containers/ControlContainer';
 import TableContainer from '../containers/TableContainer';
 import ChartContainer from '../containers/ChartContainer';
 import reportService from '../../../services/reportService';
-import { displayMetrics } from '../configs/commonConsts';
+import {
+	displayMetrics,
+	accountDisableFilter,
+	accountDisableDimension,
+	opsDimension,
+	opsFilter
+} from '../configs/commonConsts';
 import Loader from '../../../Components/Loader';
 import { convertObjToArr } from '../helpers/utils';
 
@@ -39,7 +45,8 @@ class Panel extends Component {
 			csvData: [],
 			reportType: 'account',
 			isLoading: true,
-			isValidSite: true
+			isValidSite: true,
+			isReportingSite: true
 		};
 	}
 
@@ -49,10 +56,12 @@ class Panel extends Component {
 				params: { siteId }
 			},
 			location: { search: queryParams },
-			sites
+			userSites,
+			reportingSites
 		} = this.props;
 
-		const isValidSite = !!(sites&& sites[siteId] && sites[siteId].siteDomain);
+		const isValidSite = !!(userSites && userSites[siteId] && userSites[siteId].siteDomain);
+		const isReportingSite = !!(reportingSites && reportingSites[siteId]);
 
 		let {
 			startDate,
@@ -67,10 +76,13 @@ class Panel extends Component {
 
 		if (siteId) {
 			reportType = 'site';
-			if (isValidSite) {
+			if (isValidSite && isReportingSite) {
 				selectedFilters = { siteid: { [siteId]: true } };
+			} else if (isValidSite) {
+				this.setState({ isLoading: false, isValidSite: true, isReportingSite: false, reportType });
+				return;
 			} else {
-				this.setState({ isLoading: false, isValidSite: false, reportType });
+				this.setState({ isLoading: false, isValidSite: false, isReportingSite: false, reportType });
 				return;
 			}
 		}
@@ -99,16 +111,35 @@ class Panel extends Component {
 		);
 	}
 
+	removeOpsFilterDimension = (filterList, dimensionList) => {
+		const updatedFilterList = [];
+		const updatedDimensionList = [];
+		filterList.forEach(fil => {
+			const index = opsFilter.indexOf(fil.value);
+			if (index === -1) updatedFilterList.push(fil);
+		});
+		dimensionList.forEach(dim => {
+			const index = opsDimension.indexOf(dim.value);
+			if (index === -1) updatedDimensionList.push(dim);
+		});
+		return { updatedDimensionList, updatedFilterList };
+	};
+
 	disableControl = (disabledFilter, disabledDimension, disabledMetrics) => {
 		const { dimensionList, filterList, metricsList } = this.state;
 
-		filterList.map(filter => {
+		const { updatedDimensionList, updatedFilterList } = this.removeOpsFilterDimension(
+			filterList,
+			dimensionList
+		);
+
+		updatedFilterList.map(filter => {
 			const found = disabledFilter.find(fil => fil === filter.value);
 			if (found) filter.isDisabled = true;
 			else filter.isDisabled = false;
 		});
 
-		dimensionList.map(dimension => {
+		updatedDimensionList.map(dimension => {
 			const found = disabledDimension.find(dim => dim === dimension.value);
 			if (found) dimension.isDisabled = true;
 			else dimension.isDisabled = false;
@@ -121,9 +152,9 @@ class Panel extends Component {
 		});
 
 		return {
-			filterList,
+			updatedFilterList,
 			metricsList,
-			dimensionList
+			updatedDimensionList
 		};
 	};
 
@@ -161,6 +192,10 @@ class Panel extends Component {
 				disabledMetrics = union(filterObj.disabled_metrics, disabledMetrics);
 			}
 		});
+		if (reportType == 'account') {
+			disabledFilter = union(accountDisableFilter, disabledFilter);
+			disabledDimension = union(accountDisableDimension, disabledDimension);
+		}
 		const updatedControlList = this.disableControl(
 			disabledFilter,
 			disabledDimension,
@@ -174,8 +209,8 @@ class Panel extends Component {
 			selectedDimension,
 			selectedFilters,
 			reportType,
-			dimensionList: updatedControlList.dimensionList,
-			filterList: updatedControlList.filterList,
+			dimensionList: updatedControlList.updatedDimensionList,
+			filterList: updatedControlList.updatedFilterList,
 			metricsList: updatedControlList.metricsList
 		};
 	};
@@ -189,7 +224,7 @@ class Panel extends Component {
 			selectedInterval,
 			metricsList
 		} = this.state;
-		const { sites } = this.props;
+		const { userSites } = this.props;
 		let selectedMetrics;
 		if (metricsList) {
 			selectedMetrics = metricsList
@@ -204,13 +239,11 @@ class Panel extends Component {
 			dimension: selectedDimension || null
 		};
 		Object.keys(selectedFilters).forEach(filter => {
-			const filters = Object.keys(selectedFilters[filter]).filter(
-				key => selectedFilters[filter][key]
-			);
+			const filters = Object.keys(selectedFilters[filter]);
 			params[filter] = filters.length > 0 ? filters.toString() : null;
 		});
 		if (!params.siteid) {
-			const siteIds = Object.keys(sites);
+			const siteIds = Object.keys(userSites);
 			params.siteid = siteIds.toString();
 		}
 		return params;
@@ -232,9 +265,7 @@ class Panel extends Component {
 		this.setState({ csvData });
 	};
 
-	renderEmptyMessage = () => (
-		<Empty message="Seems like you have entered an invalid siteid in url. Please check." />
-	);
+	renderEmptyMessage = msg => <Empty message={msg} />;
 
 	renderContent = () => {
 		const {
@@ -251,11 +282,17 @@ class Panel extends Component {
 			tableData,
 			reportType,
 			csvData,
-			isValidSite
+			isValidSite,
+			isReportingSite
 		} = this.state;
-		return reportType == 'site' && !isValidSite ? (
-			this.renderEmptyMessage()
-		) : (
+		if (reportType == 'site') {
+			if (!isValidSite)
+				return this.renderEmptyMessage(
+					'Seems like you have entered an invalid siteid in url. Please check.'
+				);
+			if (!isReportingSite) return this.renderEmptyMessage('No Data Available');
+		}
+		return (
 			<Row>
 				<Col sm={12}>
 					<ControlContainer

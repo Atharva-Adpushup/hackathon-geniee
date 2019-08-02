@@ -88,7 +88,7 @@ const CustomChart = ({
 				containerClass ? ` ${containerClass}` : ''
 			}`}
 		>
-			<div className="error">No Data Found!</div>
+			<div className="error">No Data Found</div>
 		</div>
 	);
 };

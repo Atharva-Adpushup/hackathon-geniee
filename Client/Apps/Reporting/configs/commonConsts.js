@@ -104,9 +104,11 @@ const activeLegendItemArray = [
 	{ value: 'adpushup_page_cpm', name: 'Page RPM', valueType: 'money' }
 ];
 const accountFilter = ['siteid', 'device_type', 'network'];
+const accountDisableFilter = ['page_variation_type', 'page_variation', 'page_group', 'section'];
 const opsFilter = ['mode', 'error_code', 'country'];
 const opsDimension = ['mode', 'error_code', 'country'];
 const accountDimension = ['siteid', 'device_type', 'network'];
+const accountDisableDimension = ['page_variation_type', 'page_variation', 'page_group', 'section'];
 export {
 	REPORTS_NAV_ITEMS,
 	REPORTS_NAV_ITEMS_INDEXES,
@@ -120,6 +122,8 @@ export {
 	activeLegendItemArray,
 	accountFilter,
 	accountDimension,
+	accountDisableFilter,
+	accountDisableDimension,
 	opsDimension,
 	opsFilter,
 	REPORT_DOWNLOAD_ENDPOINT,

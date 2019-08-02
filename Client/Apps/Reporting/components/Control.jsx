@@ -18,14 +18,14 @@ import {
 class Control extends Component {
 	constructor(props) {
 		super(props);
-		const { updatedDimensionList, updatedFilterList } = this.updateFilterDimensionList(
-			props.reportType,
-			props.filterList,
-			props.dimensionList
-		);
+		// const { updatedDimensionList, updatedFilterList } = this.updateFilterDimensionList(
+		// 	props.reportType,
+		// 	props.filterList,
+		// 	props.dimensionList
+		// );
 		this.state = {
-			dimensionList: updatedDimensionList,
-			filterList: updatedFilterList,
+			dimensionList: props.dimensionList,
+			filterList: props.filterList,
 			intervalList: props.intervalList,
 			startDate: props.startDate,
 			endDate: props.endDate,
@@ -53,7 +53,7 @@ class Control extends Component {
 	onFilteChange = selectedFilters => {
 		let reportType = 'account';
 		const { filterList, dimensionList } = this.props;
-		const selectedSiteFilters = selectedFilters.siteid;
+		const selectedSiteFilters = selectedFilters.siteid || {};
 		if (selectedSiteFilters && Object.keys(selectedSiteFilters).length === 1) {
 			reportType = 'site';
 		}
@@ -147,6 +147,13 @@ class Control extends Component {
 				if (index >= 0) {
 					dim.isDisabled = false;
 				} else dim.isDisabled = true;
+			});
+		} else {
+			updatedFilterList.forEach(fil => {
+				fil.isDisabled = false;
+			});
+			updatedDimensionList.forEach(dim => {
+				dim.isDisabled = false;
 			});
 		}
 		return { updatedFilterList, updatedDimensionList };

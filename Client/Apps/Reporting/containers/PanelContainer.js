@@ -5,7 +5,8 @@ const mapStateToProps = (state, ownProps) => {
 	const {
 		reports: {
 			data: { filter, metrics, dimension, interval, site }
-		}
+		},
+		sites
 	} = state.global;
 	return {
 		...ownProps,
@@ -13,7 +14,8 @@ const mapStateToProps = (state, ownProps) => {
 		metrics,
 		dimension,
 		interval,
-		sites:site
+		reportingSites: site,
+		userSites: sites.fetched ? sites.data : {}
 	};
 };
 
