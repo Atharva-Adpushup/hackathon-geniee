@@ -215,15 +215,21 @@ class AdDetails extends Component {
 
 	renderSectionName() {
 		return (
-			<div className="mB-10">
-				<p style={{ marginBottom: '0px' }}>Section Name</p>
-				<InlineEdit
-					validate
-					value={this.props.section.name}
-					submitHandler={this.props.onRenameSection.bind(null, this.props.section, this.props.variationId)}
-					text="Section Name"
-					errorMessage="Section Name cannot be blank"
-				/>
+			<div>
+				<div className="mB-10">
+					<p style={{ marginBottom: '0px' }}>Section Id</p>
+					<strong>{this.props.section.id}</strong>
+				</div>
+				<div className="mB-10">
+					<p style={{ marginBottom: '0px' }}>Section Name</p>
+					<InlineEdit
+						validate
+						value={this.props.section.name}
+						submitHandler={this.props.onRenameSection.bind(null, this.props.section, this.props.variationId)}
+						text="Section Name"
+						errorMessage="Section Name cannot be blank"
+					/>
+				</div>
 			</div>
 		);
 	}

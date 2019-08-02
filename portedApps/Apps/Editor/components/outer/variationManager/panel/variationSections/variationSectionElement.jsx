@@ -92,7 +92,7 @@ class variationSectionElement extends Component {
 						''
 					)}
 					<Col className="u-padding-r10px section-id-ie" xs={12} style={{ marginBottom: '10px' }}>
-						Section Id : <strong>{props.section.id}</strong>
+						Section Id: <strong>{props.section.id}</strong>
 					</Col>
 					<Col className="u-padding-r10px section-name-ie" xs={12}>
 						<InlineEdit
