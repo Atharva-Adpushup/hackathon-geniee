@@ -41,7 +41,7 @@ module.exports = function router(app) {
 
 	// React Catch All Route
 	app.use((req, res) => {
-		if (process.env.NODE_ENV === 'production') {
+		if (!isDevelopment) {
 			// eslint-disable-next-line no-undef
 			const filePath = path.resolve(__basedir, 'clientDist', 'index.html');
 			res.sendFile(filePath);
