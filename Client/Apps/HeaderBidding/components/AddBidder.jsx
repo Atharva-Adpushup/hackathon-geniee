@@ -51,6 +51,16 @@ export default class AddBidder extends React.Component {
 
 				break;
 			}
+			case 'oftmedia': {
+				params.allowSmallerSizes = true;
+
+				break;
+			}
+			case 'districtm': {
+				params.allowSmallerSizes = true;
+
+				break;
+			}
 			default:
 				break;
 		}
