@@ -64,7 +64,7 @@ function gdprProcessing(site) {
 	};
 }
 
-function getActiveUsedBidders(usedBidders) {
+function getActiveUsedBidders(usedBidders, biddersFromNetworkTree) {
 	const activeUsedBidders = {};
 	for (const bidderCode in usedBidders) {
 		if (
@@ -109,7 +109,7 @@ function HbProcessing(site, apConfigs) {
 				};
 			}
 
-			hbcf.value.hbcf = getActiveUsedBidders(hbcf.value.hbcf);
+			hbcf.value.hbcf = getActiveUsedBidders(hbcf.value.hbcf, biddersFromNetworkTree);
 
 			let isValidCurrencyCnfg = isValidThirdPartyDFPAndCurrency(
 				apConfigs
