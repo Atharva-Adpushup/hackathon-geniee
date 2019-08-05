@@ -49,7 +49,7 @@ const fn = {
 					name: generateSectionName({
 						width,
 						height,
-						pagegroup,
+						pagegroup: pagegroup.split(':')[1],
 						platform: formatData.platform,
 						id,
 						service: 'I'
