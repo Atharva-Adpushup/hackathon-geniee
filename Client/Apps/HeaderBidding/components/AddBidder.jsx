@@ -84,7 +84,7 @@ export default class AddBidder extends React.Component {
 		const { bidderConfig, siteId, showNotification } = this.props;
 
 		return (
-			<div className="options-wrapper hb-bidder hb-add-bidder">
+			<div className="options-wrapper white-tab-container hb-bidder hb-add-bidder">
 				<header>
 					<h3>Add {bidderConfig.name}</h3>
 				</header>
