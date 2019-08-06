@@ -598,7 +598,14 @@ function apiModule() {
 						adNetworkSettings.dfpAccounts[0].currencyCode;
 					const mergedPrebidConfig = { ...prebidConfig };
 
-					mergedPrebidConfig.adServer = adNetworkSettings ? 'AP' : 'Publisher';
+					mergedPrebidConfig.adServer =
+						adNetworkSettings &&
+						adNetworkSettings.dfpAccounts &&
+						adNetworkSettings.dfpAccounts.length
+							? adNetworkSettings.dfpAccounts[0].code === '103512698'
+								? 'AP'
+								: 'Publisher'
+							: 'N/A';
 					mergedPrebidConfig.currency.code = currencyCode || '';
 					mergedPrebidConfig.availableFormats = [
 						{ name: 'Display', value: 'display' },

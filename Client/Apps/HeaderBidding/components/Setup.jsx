@@ -67,7 +67,7 @@ class Setup extends React.Component {
 		} = this.props;
 
 		return (
-			<Row className="options-wrapper hb-setup">
+			<Row className="options-wrapper white-tab-container hb-setup">
 				<p>
 					Lorem ipsum dolor sit amet, consectetur adipisicing elit. Numquam necessitatibus odit
 					omnis laboriosam voluptatum incidunt quasi delectus, repudiandae, aspernatur, ullam rem

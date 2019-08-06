@@ -3,7 +3,6 @@
 import React from 'react';
 import { Redirect } from 'react-router-dom';
 import { Nav, NavItem } from 'react-bootstrap';
-import ActionCard from '../../../Components/ActionCard/index';
 import { NAV_ITEMS, NAV_ITEMS_INDEXES, NAV_ITEMS_VALUES } from '../constants';
 import Setup from './Setup';
 import BiddersTab from './BiddersTab';
@@ -164,7 +163,7 @@ class HeaderBidding extends React.Component {
 			}
 		}
 
-		return <div className="u-padding-v5 u-padding-h5">{getContent()}</div>;
+		return getContent();
 	};
 
 	renderTabsLayout = () => {
@@ -176,7 +175,7 @@ class HeaderBidding extends React.Component {
 		} = this.props;
 
 		return (
-			<ActionCard>
+			<div>
 				<Nav bsStyle="tabs" activeKey={activeItem.INDEX} onSelect={this.handleNavSelect}>
 					{(!inventoryFound || !biddersFound) && (
 						<NavItem eventKey={1}>{NAV_ITEMS_VALUES.TAB_1}</NavItem>
@@ -202,7 +201,7 @@ class HeaderBidding extends React.Component {
 					</NavItem>
 				</Nav>
 				{this.renderContent()}
-			</ActionCard>
+			</div>
 		);
 	};
 
