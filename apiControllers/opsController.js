@@ -236,6 +236,9 @@ router
 				const { code = -1 } = response;
 				if (code !== 1) return Promise.reject(new Error(response.data));
 				return sendSuccessResponse(response, res);
+			})
+			.catch(err => {
+				errorHandler(err, res);
 			});
 	});
 

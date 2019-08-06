@@ -120,17 +120,19 @@ class TopXPathMissAndModeURL extends Component {
 				});
 				this.setState({ isLoading: false }, this.handleReset);
 			})
-			.catch((err, res) => {
-				console.log(err);
+			.catch(err => {
+				const { message } = err.response.data.data;
+				const errResponse = message.split('.')[1];
 				showNotification({
 					mode: 'error',
 					title: 'Operation Failed',
-					message: res.data,
+					message: errResponse,
 					autoDismiss: 5
 				});
 
 				this.setState({ isLoading: false });
-			});
+			})
+			.finally(() => this.setState({ isLoading: false }));
 	};
 
 	datesUpdated = ({ startDate, endDate }) => {
@@ -221,8 +223,8 @@ class TopXPathMissAndModeURL extends Component {
 					<SelectBox
 						selected={currentSelectedDevice}
 						options={devices}
-						onSelect={currentSelectedDevice => {
-							this.setState({ currentSelectedDevice });
+						onSelect={device => {
+							this.setState({ currentSelectedDevice: device });
 						}}
 						id="select-device"
 						title="Select Device"
@@ -248,8 +250,8 @@ class TopXPathMissAndModeURL extends Component {
 					<SelectBox
 						selected={currentSelectedMode}
 						options={modes}
-						onSelect={currentSelectedMode => {
-							this.setState({ currentSelectedMode });
+						onSelect={mode => {
+							this.setState({ currentSelectedMode: mode });
 						}}
 						id="select-mode"
 						title="Select Mode"

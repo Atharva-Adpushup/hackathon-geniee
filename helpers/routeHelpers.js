@@ -47,10 +47,15 @@ function verifyOwner(siteId, userEmail) {
 
 function errorHandler(err, res, code = HTTP_STATUS.BAD_REQUEST, debugData = {}) {
 	const customMessage = err.message || err;
-	const errorCode = customMessage.code || code;
-	const message = customMessage.message || 'Opertion Failed';
-	console.log(err);
-	return sendErrorResponse({ message, code: errorCode, debugData }, res, errorCode);
+	if (typeof customMessage === 'string' && customMessage !== '') {
+		const errorCode = code;
+		const message = customMessage || 'Opertion Failed';
+		return sendErrorResponse({ message, code: errorCode, debugData }, res, errorCode);
+	} else {
+		const errorCode = customMessage.code || code;
+		const message = customMessage.message || 'Opertion Failed';
+		return sendErrorResponse({ message, code: errorCode, debugData }, res, errorCode);
+	}
 }
 
 function sendDataToZapier(uri, data) {
