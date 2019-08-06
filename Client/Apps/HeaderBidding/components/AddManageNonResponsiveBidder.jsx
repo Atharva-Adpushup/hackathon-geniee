@@ -56,6 +56,24 @@ class AddManageNonResponsiveBidder extends React.Component {
 								}
 
 								for (const globalParamKey in formFields.params.global) {
+									if (formFields.params.global[globalParamKey].dataType === 'number') {
+										newState.globalParams[globalParamKey] = null;
+
+										// eslint-disable-next-line no-continue
+										continue;
+									}
+
+									if (
+										!formFields.params.global[globalParamKey].visible &&
+										formFields.params.global[globalParamKey].value !== undefined
+									) {
+										newState.globalParams[globalParamKey] =
+											formFields.params.global[globalParamKey].value;
+
+										// eslint-disable-next-line no-continue
+										continue;
+									}
+
 									newState.globalParams[globalParamKey] = '';
 								}
 
