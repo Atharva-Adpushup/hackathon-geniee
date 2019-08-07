@@ -6,8 +6,11 @@ const user = (state = { fetched: false, data: {} }, action) => {
 			return { fetched: true, data: { ...state.data, ...action.data } };
 		case SITE_ACTIONS.UPDATE_SITE_DATA: {
 			const site = { ...action.data };
-			site.domain = site.siteDomain;
-			delete site.siteDomain;
+
+			if (site.siteDomain) {
+				site.domain = site.siteDomain;
+				delete site.siteDomain;
+			}
 
 			return {
 				...state,

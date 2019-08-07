@@ -95,13 +95,10 @@ function getAdsAndGlobal(state, props) {
 		match: { params }
 	} = props;
 	const { siteId } = params;
-	const { channels: channelsFromSite = [] } = sites.data[siteId] || {};
+	const { channels = [] } = sites.data[siteId] || {};
 	const ads = innovativeAds.ads[siteId] || DEFAULT_ADS_RESPONSE;
 
 	let global = innovativeAds.global[siteId] || DEFAULT_GLOBAL_RESPONSE;
-	let { channels } = global;
-
-	channels = [...new Set([...channels, ...channelsFromSite])];
 
 	global = {
 		...global,
