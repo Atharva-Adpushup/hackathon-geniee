@@ -21,7 +21,6 @@ const {
 	sendErrorResponse,
 	sendSuccessResponse
 } = require('../helpers/commonFunctions');
-const { fetchOurAdsTxt } = require('../helpers/proxy');
 const { appBucket, errorHandler, checkParams } = require('../helpers/routeHelpers');
 
 const router = express.Router();
@@ -142,34 +141,28 @@ router
 		return userModel
 			.getUserByEmail(email)
 			.then(user =>
-				Promise.join(
-					getNetworkConfig(),
-					getUserSites(user),
-					fetchOurAdsTxt(),
-					(networkConfig, sites, adsTxt) => {
-						const userData = user.cleanData();
+				Promise.join(getNetworkConfig(), getUserSites(user), (networkConfig, sites) => {
+					const userData = user.cleanData();
 
-						const sitesArray = [...userData.sites];
-						const sitesArrayLength = sitesArray.length;
-						userData.sites = {};
+					const sitesArray = [...userData.sites];
+					const sitesArrayLength = sitesArray.length;
+					userData.sites = {};
 
-						for (let i = 0; i < sitesArrayLength; i += 1) {
-							const site = sitesArray[i];
-							userData.sites[site.siteId] = site;
-						}
-						let params = { siteid: Object.keys(sites).toString(), isSuperUser };
-
-						return getReportsMetaData(params).then(reports => {
-							return res.status(httpStatus.OK).json({
-								user: { ...userData, isSuperUser },
-								networkConfig,
-								sites,
-								adsTxt,
-								reports
-							});
-						});
+					for (let i = 0; i < sitesArrayLength; i += 1) {
+						const site = sitesArray[i];
+						userData.sites[site.siteId] = site;
 					}
-				)
+					let params = { siteid: Object.keys(sites).toString(), isSuperUser };
+
+					return getReportsMetaData(params).then(reports => {
+						return res.status(httpStatus.OK).json({
+							user: { ...userData, isSuperUser },
+							networkConfig,
+							sites,
+							reports
+						});
+					});
+				})
 			)
 			.catch(err => {
 				console.log(err);

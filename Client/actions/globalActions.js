@@ -3,7 +3,6 @@ import {
 	NETWORK_CONFIG_ACTIONS,
 	SITE_ACTIONS,
 	REPORTS_ACTIONS,
-	ADS_TXT_ACTIONS,
 	UI_ACTIONS
 } from '../constants/global';
 import axiosInstance from '../helpers/axiosInstance';
@@ -21,10 +20,6 @@ const fetchGlobalData = () => dispatch =>
 			dispatch({
 				type: NETWORK_CONFIG_ACTIONS.REPLACE_NETWORK_CONFIG,
 				data: data.networkConfig
-			});
-			dispatch({
-				type: ADS_TXT_ACTIONS.REPLACE_ADS_TXT,
-				data: data.adsTxt
 			});
 			dispatch({
 				type: SITE_ACTIONS.REPLACE_SITE_DATA,
