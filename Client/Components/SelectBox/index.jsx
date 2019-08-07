@@ -28,12 +28,12 @@ class SelectBox extends Component {
 	};
 
 	selectWrapper = (key, e) => {
-		const { onSelect, options, title } = this.props;
+		const { onSelect, options, title, dataKey: dataKeyFromProps } = this.props;
 		const optionValueType = typeof options[0].value;
-		const dataKey = e && e.target ? e.target.getAttribute('data-key') : '';
+		const dataKey = e && e.target ? e.target.getAttribute('data-key') : dataKeyFromProps || '';
 
 		if (!e || !e.target || !e.target.getAttribute('data-value')) {
-			return this.setState({ name: title, selected: '' }, () => onSelect(null));
+			return this.setState({ name: title, selected: '' }, () => onSelect(null, dataKey));
 		}
 
 		let value;

@@ -173,7 +173,7 @@ router
 			.catch(err => errorHandler(err, res));
 	})
 
-	.post('/xpathmiss', (req, res) => {
+	.post('/xpathEmailNotifier', (req, res) => {
 		if (!req.user.isSuperUser) {
 			return sendErrorResponse(
 				{
@@ -195,18 +195,6 @@ router
 			endDate
 		} = req.body;
 
-		const qs = {
-			siteid: siteId,
-			urlCount: topURLCount,
-			email: emailId,
-			page_group: pageGroups,
-			device_type: currentSelectedDevice,
-			mode: currentSelectedMode,
-			error_code: errorCode,
-			fromDate: startDate,
-			toDate: endDate
-		};
-
 		const isDataValid = !!(
 			siteId &&
 			topURLCount &&
@@ -227,6 +215,19 @@ router
 				res
 			);
 		}
+
+		const qs = {
+			siteid: siteId,
+			urlCount: topURLCount,
+			email: emailId,
+			page_group: pageGroups,
+			device_type: currentSelectedDevice,
+			mode: currentSelectedMode,
+			error_code: errorCode,
+			fromDate: startDate,
+			toDate: endDate
+		};
+
 		return helpers
 			.makeAPIRequest({
 				uri: XPATH_MISS_MODE_URL_API,

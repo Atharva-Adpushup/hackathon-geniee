@@ -2,39 +2,42 @@ import React, { Component, Fragment } from 'react';
 import { Row } from 'react-bootstrap';
 import moment from 'moment';
 import 'react-dates/initialize';
-import { DateRangePicker } from 'react-dates';
+import { DateRangePicker, isInclusivelyBeforeDay } from 'react-dates';
 import 'react-dates/lib/css/_datepicker.css';
+
 import FieldGroup from '../../../../Components/Layout/FieldGroup';
 import { XPATH_MODE_URL } from '../../configs/commonConsts';
-
 import CustomButton from '../../../../Components/CustomButton/index';
 import SelectBox from '../../../../Components/SelectBox/index';
 import axiosInstance from '../../../../helpers/axiosInstance';
 
+const { devices, modes } = XPATH_MODE_URL;
+
+const DEFAULT_STATE = {
+	siteId: '',
+	topURLCount: '',
+	emailId: '',
+	pageGroups: '',
+	devices,
+	modes,
+	currentSelectedDevice: null,
+	currentSelectedMode: null,
+	errorCode: '',
+	startDate: moment()
+		.subtract(7, 'days')
+		.startOf('day'),
+	endDate: moment()
+		.startOf('day')
+		.subtract(1, 'day'),
+	focusedInput: null
+};
 class TopXPathMissAndModeURL extends Component {
 	constructor(props) {
 		super(props);
 
-		const { devices, modes } = XPATH_MODE_URL;
-
 		this.state = {
-			siteId: '',
-			topURLCount: '',
-			emailId: '',
-			pageGroups: '',
-			devices,
-			modes,
-			currentSelectedDevice: null,
-			currentSelectedMode: null,
-			errorCode: '',
-			startDate: moment()
-				.subtract(7, 'days')
-				.startOf('day'),
-			endDate: moment()
-				.startOf('day')
-				.subtract(1, 'day'),
-			focusedInput: null,
-			isLoading: false
+			isLoading: false,
+			...DEFAULT_STATE
 		};
 	}
 
@@ -44,23 +47,11 @@ class TopXPathMissAndModeURL extends Component {
 		});
 	};
 
-	handleReset = () => {
-		this.setState({
-			siteId: '',
-			topURLCount: '',
-			emailId: '',
-			pageGroups: '',
-			errorCode: '',
-			startDate: moment()
-				.subtract(7, 'days')
-				.startOf('day'),
-			endDate: moment()
-				.startOf('day')
-				.subtract(1, 'day'),
-			currentSelectedDevice: null,
-			currentSelectedMode: null
-		});
+	handleSelect = (value, key) => {
+		this.setState({ [key]: value });
 	};
+
+	handleReset = () => this.setState(DEFAULT_STATE);
 
 	handleGenerate = () => {
 		const {
@@ -100,7 +91,7 @@ class TopXPathMissAndModeURL extends Component {
 		this.setState({ isLoading: true });
 
 		return axiosInstance
-			.post('/ops/xpathmiss', {
+			.post('/ops/xpathEmailNotifier', {
 				siteId,
 				topURLCount,
 				emailId,
@@ -121,7 +112,10 @@ class TopXPathMissAndModeURL extends Component {
 				this.setState({ isLoading: false }, this.handleReset);
 			})
 			.catch(err => {
-				const { message } = err.response.data.data;
+				const { data = {} } = err.response;
+				const {
+					data: { message = 'Something went Wrong. Please contact AdPushup Support.' } = {}
+				} = data;
 				const errResponse = message.split('.')[1];
 				showNotification({
 					mode: 'error',
@@ -131,8 +125,7 @@ class TopXPathMissAndModeURL extends Component {
 				});
 
 				this.setState({ isLoading: false });
-			})
-			.finally(() => this.setState({ isLoading: false }));
+			});
 	};
 
 	datesUpdated = ({ startDate, endDate }) => {
@@ -200,7 +193,7 @@ class TopXPathMissAndModeURL extends Component {
 						showClearDates
 						minimumNights={0}
 						displayFormat="DD-MM-YYYY"
-						isOutsideRange={() => {}}
+						isOutsideRange={day => !isInclusivelyBeforeDay(day, moment())}
 					/>
 				</Fragment>
 
@@ -223,11 +216,10 @@ class TopXPathMissAndModeURL extends Component {
 					<SelectBox
 						selected={currentSelectedDevice}
 						options={devices}
-						onSelect={device => {
-							this.setState({ currentSelectedDevice: device });
-						}}
+						onSelect={this.handleSelect}
 						id="select-device"
 						title="Select Device"
+						dataKey="currentSelectedDevice"
 						reset
 					/>
 				</Fragment>
@@ -250,11 +242,10 @@ class TopXPathMissAndModeURL extends Component {
 					<SelectBox
 						selected={currentSelectedMode}
 						options={modes}
-						onSelect={mode => {
-							this.setState({ currentSelectedMode: mode });
-						}}
+						onSelect={this.handleSelect}
 						id="select-mode"
 						title="Select Mode"
+						dataKey="currentSelectedMode"
 						reset
 					/>
 				</Fragment>
