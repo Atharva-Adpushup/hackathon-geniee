@@ -154,7 +154,7 @@ class TopXPathMissAndModeURL extends Component {
 		} = this.state;
 
 		return (
-			<Row className="row">
+			<Fragment>
 				<FieldGroup
 					name="siteId"
 					value={siteId}
@@ -280,7 +280,7 @@ class TopXPathMissAndModeURL extends Component {
 				>
 					Reset
 				</CustomButton>
-			</Row>
+			</Fragment>
 		);
 	}
 }
