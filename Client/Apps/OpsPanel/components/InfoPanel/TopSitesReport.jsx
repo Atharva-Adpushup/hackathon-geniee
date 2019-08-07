@@ -1,8 +1,9 @@
 import React from 'react';
 import Datatable from 'react-bs-datatable';
-import { numberWithCommas, roundOffTwoDecimal } from '../helpers/utils';
+import orderBy from 'lodash/orderBy';
+import { numberWithCommas, roundOffTwoDecimal } from '../../../../Pages/Dashboard/helpers/utils';
 
-class SitewiseReport extends React.Component {
+class TopSitesReport extends React.Component {
 	state = {
 		tableHeader: [],
 		tableBody: []
@@ -10,22 +11,36 @@ class SitewiseReport extends React.Component {
 
 	componentDidMount() {
 		const { displayData } = this.props;
-		this.computeTableData(displayData);
+		const transformedData = this.getTransformedData(displayData);
+		this.computeTableData(transformedData);
 	}
 
 	formatTableData = tableBody => {
 		const { metrics } = this.props;
-		tableBody.forEach(row => {
-			for (const col in row) {
-				if (metrics[col]) {
-					const num = row[col];
-					row[col] =
-						metrics[col].valueType == 'money'
+		tableBody.forEach((row, idx) => {
+			const rowKeys = Object.keys(row);
+
+			rowKeys.forEach(key => {
+				let itemValue = row[key];
+
+				if (metrics[key]) {
+					const num = itemValue;
+					itemValue =
+						metrics[key].valueType === 'money'
 							? `$${numberWithCommas(roundOffTwoDecimal(num))}`
 							: numberWithCommas(num);
+
+					tableBody[idx][key] = itemValue;
 				}
-			}
+			});
 		});
+	};
+
+	getTransformedData = displayData => {
+		const computedData = { ...displayData };
+
+		computedData.result = orderBy(computedData.result, ['network_net_revenue'], ['desc']);
+		return computedData;
 	};
 
 	computeTableData = data => {
@@ -87,4 +102,4 @@ class SitewiseReport extends React.Component {
 	}
 }
 
-export default SitewiseReport;
+export default TopSitesReport;

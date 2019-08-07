@@ -272,7 +272,7 @@ const INFO_PANEL_IDENTIFIERS = {
 };
 
 const QUICK_SNAPSHOTS_WIDGETS = [
-	'per_site_wise',
+	'ops_top_sites',
 	'estimated_earnings',
 	'rev_by_network',
 	'per_overview',

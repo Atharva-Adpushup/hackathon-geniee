@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import '../../../../scss/pages/dashboard/index.scss';
 import Card from '../../../../Components/Layout/Card';
 import EstimatedEarningsContainer from '../../../../Pages/Dashboard/containers/EstimatedEarningsContainer';
-import SitewiseReportContainer from '../../../../Pages/Dashboard/containers/SitewiseReportContainer';
+import TopSitesReportContainer from '../../containers/TopSitesReportContainer';
 import PerformanceOverviewContainer from '../../../../Pages/Dashboard/containers/PerformanceOverviewContainer';
 import PerformanceApOriginalContainer from '../../../../Pages/Dashboard/containers/PerformanceApOriginalContainer';
 import RevenueContainer from '../../../../Pages/Dashboard/containers/RevenueContainer';
@@ -75,7 +75,7 @@ class QuickSnapshot extends React.Component {
 					widget.selectedDimension = 'network';
 				}
 
-				if (widget.name === 'per_site_wise') {
+				if (widget.name === 'ops_top_sites') {
 					widget.selectedDimension = 'siteid';
 				}
 
@@ -105,15 +105,12 @@ class QuickSnapshot extends React.Component {
 			case 'per_overview':
 				return <PerformanceOverviewContainer displayData={widget.data} />;
 
-			case 'per_site_wise':
-				if (reportType != 'site') {
-					return <SitewiseReportContainer displayData={widget.data} />;
-				}
-				return '';
+			case 'ops_top_sites':
+				return <TopSitesReportContainer displayData={widget.data} />;
 
-			case 'per_site_wise_daily':
+			case 'ops_top_sites_daily':
 				if (reportType == 'site') {
-					return <SitewiseReportContainer displayData={widget.data} reportType="site" />;
+					return <TopSitesReportContainer displayData={widget.data} reportType="site" />;
 				}
 				return '';
 
@@ -271,7 +268,7 @@ class QuickSnapshot extends React.Component {
 				) : (
 					''
 				)}
-				{reportType !== 'site' && name !== 'per_site_wise' ? (
+				{reportType !== 'site' && name !== 'ops_top_sites' ? (
 					<div className="">
 						{/* eslint-disable */}
 						<label className="u-text-normal u-margin-r2">Website</label>
