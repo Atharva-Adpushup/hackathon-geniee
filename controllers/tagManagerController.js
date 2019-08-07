@@ -1,24 +1,27 @@
-const express = require('express'),
-	Promise = require('bluebird'),
-	_ = require('lodash'),
-	uuid = require('uuid'),
-	moment = require('moment'),
-	{ couchbaseService } = require('node-utils'),
-	request = require('request-promise'),
-	config = require('../configs/config'),
-	utils = require('../helpers/utils'),
-	{ sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFunctions'),
-	{ docKeys, tagManagerInitialDoc, videoNetworkInfo } = require('../configs/commonConsts'),
-	adpushup = require('../helpers/adpushupEvent'),
-	siteModel = require('../models/siteModel'),
-	router = express.Router(),
-	couchbase = require('../helpers/couchBaseService'),
-	appBucket = couchbaseService(
-		`couchbase://${config.couchBase.HOST}/${config.couchBase.DEFAULT_BUCKET}`,
-		config.couchBase.DEFAULT_BUCKET,
-		config.couchBase.DEFAULT_USER_NAME,
-		config.couchBase.DEFAULT_USER_PASSWORD
-	);
+const express = require('express');
+const Promise = require('bluebird');
+const _ = require('lodash');
+const uuid = require('uuid');
+const moment = require('moment');
+const { couchbaseService } = require('node-utils');
+const request = require('request-promise');
+
+const config = require('../configs/config');
+const utils = require('../helpers/utils');
+const { sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFunctions');
+const { docKeys, tagManagerInitialDoc, videoNetworkInfo } = require('../configs/commonConsts');
+const adpushup = require('../helpers/adpushupEvent');
+const siteModel = require('../models/siteModel');
+const router = express.Router();
+const couchbase = require('../helpers/couchBaseService');
+const { generateSectionName } = require('../helpers/clientServerHelpers');
+
+const appBucket = couchbaseService(
+	`couchbase://${config.couchBase.HOST}/${config.couchBase.DEFAULT_BUCKET}`,
+	config.couchBase.DEFAULT_BUCKET,
+	config.couchBase.DEFAULT_USER_NAME,
+	config.couchBase.DEFAULT_USER_PASSWORD
+);
 
 const fn = {
 	isSuperUser: false,
@@ -48,21 +51,29 @@ const fn = {
 			});
 	},
 	processing: (data, payload) => {
-		let cas = data.cas || false,
-			value = data.value || data,
-			id = uuid.v4(),
-			networkInfo = payload.ad.formatData.type == 'video' ? videoNetworkInfo : {},
-			ad = {
-				...payload.ad,
-				id: id,
-				name: `Ad-${id}`,
-				createdOn: +new Date(),
-				formatData: {
-					...payload.ad.formatData,
-					eventData: { value: payload.ad.formatData.type == 'video' ? `#adp_video_${id}` : null }
-				},
-				...networkInfo
-			};
+		const cas = data.cas || false;
+		const value = data.value || data;
+		const id = uuid.v4();
+		const name = generateSectionName({
+			id,
+			width: payload.ad.width,
+			height: payload.ad.height,
+			pagegroup: null,
+			platform: payload.ad.formatData.platform || false,
+			service: 'T'
+		});
+		const networkInfo = payload.ad.formatData.type == 'video' ? videoNetworkInfo : {};
+		const ad = {
+			...payload.ad,
+			id,
+			name,
+			createdOn: +new Date(),
+			formatData: {
+				...payload.ad.formatData,
+				eventData: { value: payload.ad.formatData.type == 'video' ? `#adp_video_${id}` : null }
+			},
+			...networkInfo
+		};
 
 		value.ads.push(ad);
 		value.siteDomain = value.siteDomain || payload.siteDomain;
@@ -82,15 +93,28 @@ const fn = {
 			});
 		}
 
-		return Promise.resolve([cas, value, id, payload.siteId]);
+		return Promise.resolve([
+			cas,
+			value,
+			{
+				id,
+				name
+			},
+			payload.siteId
+		]);
 	},
-	getAndUpdate: (key, value, adId) => {
-		return appBucket.getDoc(key).then(result => appBucket.updateDoc(key, value, result.cas).then(() => adId));
+	getAndUpdate: (key, value) => {
+		return appBucket.getDoc(key).then(result => appBucket.updateDoc(key, value, result.cas));
 	},
-	directDBUpdate: (key, value, cas, adId) => appBucket.updateDoc(key, value, cas).then(() => adId),
-	dbWrapper: (cas, value, adId, siteId) => {
+	directDBUpdate: (key, value, cas) => appBucket.updateDoc(key, value, cas),
+	dbWrapper: (cas, value, toReturn, siteId) => {
 		const key = `${docKeys.tagManager}${siteId}`;
-		return !cas ? fn.getAndUpdate(key, value, adId) : fn.directDBUpdate(key, value, cas, adId);
+
+		function dbOperation() {
+			return !cas ? fn.getAndUpdate(key, value) : fn.directDBUpdate(key, value, cas);
+		}
+
+		return dbOperation().then(() => toReturn);
 	},
 	errorHander: (err, res) => {
 		console.log(err);
@@ -141,7 +165,7 @@ router
 								ads: []
 							},
 							res
-						)
+					  )
 					: fn.errorHander(err, res);
 			});
 	})
@@ -173,7 +197,7 @@ router
 					: res.render('tagManager', {
 							siteId: params.siteId,
 							isSuperUser: !!session.isSuperUser
-						});
+					  });
 			})
 			.catch(err => {
 				console.log(err.message);
@@ -202,11 +226,11 @@ router
 					: Promise.reject(err);
 			})
 			.spread(fn.dbWrapper)
-			.then(id =>
+			.then(toReturn =>
 				sendSuccessResponse(
 					{
 						message: 'Ad created',
-						id: id
+						...toReturn
 					},
 					res
 				)
@@ -223,7 +247,8 @@ router
 			);
 		}
 		return fn.adUpdateProcessing(req, res, docWithCas => {
-			let doc = docWithCas.value, { siteId, siteDomain } = req.body;
+			let doc = docWithCas.value,
+				{ siteId, siteDomain } = req.body;
 
 			if (doc.ownerEmail != req.session.user.email) {
 				return Promise.reject('Owner verfication fail');
@@ -249,7 +274,6 @@ router
 				});
 				doc.ads = newAds;
 			}
-
 			return appBucket.updateDoc(`${docKeys.tagManager}${siteId}`, doc, docWithCas.cas);
 		});
 	})

@@ -8,13 +8,13 @@ import { immutablePush } from 'libs/immutableHelpers';
 import NetworkOptions from 'shared/networkOptions/NetworkOptions';
 
 const initialState = {
-	adSize: null,
-	isCustomSize: false,
-	operation: null,
-	activeItem: 0,
-	prevActiveItem: 0,
-	showNetworkOptions: false
-},
+		adSize: null,
+		isCustomSize: false,
+		operation: null,
+		activeItem: 0,
+		prevActiveItem: 0,
+		showNetworkOptions: false
+	},
 	getInsertOptionClass = function(option) {
 		switch (option) {
 			case adInsertOptions.PREPEND:
@@ -70,18 +70,24 @@ class insertMenu extends React.Component {
 
 	createSectionAndAd(params) {
 		let { position, adCode, firstFold, asyncTag, customZoneId, network, networkData } = params;
-		const props = this.props,
-			isMultipleAdSizes = !!(networkData.multipleAdSizes && networkData.multipleAdSizes.length);
+		const props = this.props;
+		const { namingData } = props;
+		const isMultipleAdSizes = !!(networkData.multipleAdSizes && networkData.multipleAdSizes.length);
 
 		network = network ? network : 'custom';
 		const sectionPayload = {
-			position,
-			firstFold: firstFold || false,
-			asyncTag: asyncTag || false,
-			xpath: props.parents[0].xpath,
-			operation: this.state.operation,
-			customZoneId: customZoneId || ''
-		},
+				position,
+				firstFold: firstFold || false,
+				asyncTag: asyncTag || false,
+				xpath: props.parents[0].xpath,
+				operation: this.state.operation,
+				customZoneId: customZoneId || '',
+				namingData: {
+					...namingData,
+					height: this.state.adSize.height,
+					width: this.state.adSize.width
+				}
+			},
 			adPayload = {
 				isCustomSize: this.state.isCustomSize,
 				network,
