@@ -5,7 +5,7 @@ import React from 'react';
 import { Row, Col } from 'react-bootstrap';
 import AddManageSizelessBidder from './AddManageSizelessBidder';
 import AddManageNonResponsiveBidder from './AddManageNonResponsiveBidder';
-import { domanize } from '../../../helpers/commonFunctions';
+import getCustomParams from '../helpers/getCustomParams';
 
 export default class AddBidder extends React.Component {
 	onBidderAdd = (bidderConfig, params) => {
@@ -28,31 +28,20 @@ export default class AddBidder extends React.Component {
 					: null;
 		}
 
-		switch (bidderConfig.key) {
-			case 'ix': {
-				// eslint-disable-next-line no-restricted-syntax
-				for (const size in params) {
-					// eslint-disable-next-line no-prototype-builtins
-					if (params.hasOwnProperty(size)) {
-						params[size].size = size.split('x').map(val => parseInt(val, 10));
-					}
+		// Inject custom params if any
+		if (!bidderConfig.sizeLess) {
+			// eslint-disable-next-line no-restricted-syntax
+			for (const size in params) {
+				// eslint-disable-next-line no-prototype-builtins
+				if (params.hasOwnProperty(size)) {
+					params[size] = {
+						...params[size],
+						...getCustomParams(bidderConfig, siteId, domain, size)
+					};
 				}
-
-				break;
 			}
-			case 'criteo': {
-				// eslint-disable-next-line no-restricted-syntax
-				for (const size in params) {
-					// eslint-disable-next-line no-prototype-builtins
-					if (params.hasOwnProperty(size)) {
-						params[size].publisherSubId = `AP/${siteId}_${domanize(domain)}`;
-					}
-				}
-
-				break;
-			}
-			default:
-				break;
+		} else {
+			params = { ...params, ...getCustomParams(bidderConfig, siteId, domain, null) };
 		}
 
 		addBidderAction(siteId, { key: fieldsConfig.key, ...bidderConfig }, params)
@@ -84,7 +73,7 @@ export default class AddBidder extends React.Component {
 		const { bidderConfig, siteId, showNotification } = this.props;
 
 		return (
-			<div className="options-wrapper hb-bidder hb-add-bidder">
+			<div className="options-wrapper white-tab-container hb-bidder hb-add-bidder">
 				<header>
 					<h3>Add {bidderConfig.name}</h3>
 				</header>
