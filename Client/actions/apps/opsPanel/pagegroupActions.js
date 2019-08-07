@@ -202,11 +202,10 @@ const deletePagegroup = (siteId, params) => (dispatch, getState) =>
 				}
 			});
 			dispatch({
-				type: SITE_ACTIONS.UPDATE_SITE_DATA_KEY_ARRAY,
+				type: SITE_ACTIONS.UPDATE_SITE_DATA,
 				data: {
 					siteId,
-					key: 'channels',
-					value: channels
+					channels
 				}
 			});
 			dispatch({

@@ -87,13 +87,23 @@ function pagegroupFiltering(
 }
 
 function getAdsAndGlobal(state, props) {
-	const { innovativeAds } = state.apps;
+	const {
+		apps: { innovativeAds },
+		global: { sites }
+	} = state;
 	const {
 		match: { params }
 	} = props;
 	const { siteId } = params;
+	const { channels = [] } = sites.data[siteId] || {};
 	const ads = innovativeAds.ads[siteId] || DEFAULT_ADS_RESPONSE;
-	const global = innovativeAds.global[siteId] || DEFAULT_GLOBAL_RESPONSE;
+
+	let global = innovativeAds.global[siteId] || DEFAULT_GLOBAL_RESPONSE;
+
+	global = {
+		...global,
+		channels
+	};
 
 	return {
 		siteId,

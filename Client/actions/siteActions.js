@@ -169,7 +169,7 @@ const updateSite = (siteId, params) => dispatch =>
 			params.forEach(data => {
 				dispatch({
 					type: SITE_ACTIONS.UPDATE_SITE_DATA,
-					data: { siteId, data: { [data.key]: data.value } }
+					data: { siteId, [data.key]: data.value }
 				});
 			});
 
