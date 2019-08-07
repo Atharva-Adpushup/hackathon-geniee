@@ -39,14 +39,17 @@ class TopSitesReport extends React.Component {
 	getTransformedData = displayData => {
 		const computedData = { ...displayData };
 
-		computedData.result = orderBy(computedData.result, ['network_net_revenue'], ['desc']);
+		computedData.result = orderBy(computedData.result, ['network_net_revenue'], ['desc']).slice(
+			0,
+			10
+		);
 		return computedData;
 	};
 
 	computeTableData = data => {
 		const { result, columns } = data;
 		const tableHeader = [];
-		const { metrics, site, reportType } = this.props;
+		const { metrics, reportType } = this.props;
 
 		if ((result, columns)) {
 			columns.forEach(col => {
@@ -57,25 +60,41 @@ class TopSitesReport extends React.Component {
 						position: metrics[col].position + 1
 					});
 			});
-			if (reportType === 'site')
+
+			if (reportType === 'site') {
 				tableHeader.push({
 					title: 'Date',
 					prop: 'date',
 					position: 1
 				});
-			else
+			} else {
 				tableHeader.push({
 					title: 'Website',
 					prop: 'siteName',
 					position: 1
 				});
+			}
+
 			tableHeader.sort((a, b) => a.position - b.position);
 			result.forEach(row => {
-				const { siteid } = row;
-				row.siteName = site[siteid]
-					? React.cloneElement(<a href={`/reports/${siteid}`}>{site[siteid].siteName}</a>)
+				const { site, siteid } = row;
+				const isValidSite = !!(site && siteid);
+				const computedLinkTitle = `View report for ${site}`;
+
+				row.siteName = isValidSite
+					? React.cloneElement(
+							<a
+								title={computedLinkTitle}
+								target="_blank"
+								rel="noopener noreferrer"
+								href={`/reports/${siteid}`}
+							>
+								{site}
+							</a>
+					  )
 					: 'Not Found';
 			});
+
 			this.formatTableData(result);
 		}
 
@@ -84,14 +103,11 @@ class TopSitesReport extends React.Component {
 
 	renderTable() {
 		const { tableBody, tableHeader } = this.state;
-		return tableBody && tableBody.length > 0 ? (
-			<Datatable
-				tableHeader={tableHeader}
-				tableBody={tableBody}
-				rowsPerPage={10}
-				rowsPerPageOption={[20, 30, 40, 50]}
-				keyName="reportTable"
-			/>
+		const isValidTableBody = !!(tableBody && tableBody.length);
+		const computedDatTableProps = { tableHeader, tableBody };
+
+		return isValidTableBody ? (
+			<Datatable {...computedDatTableProps} />
 		) : (
 			<div className="text-center">No Record Found.</div>
 		);
