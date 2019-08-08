@@ -29,7 +29,7 @@ class Account extends Component {
 			} = {}
 		} = user;
 		const adsense = adNetworkSettings[0] || null;
-		const adsensePubId = adsense ? adsense.pubId : null;
+		const adsensePubId = adsense ? adsense.pubId : '';
 		const activeDFP =
 			activeDFPNetwork && activeDFPParentId
 				? `${activeDFPNetwork}-${activeDFPParentId}-${activeDFPCurrencyCode}`
@@ -109,7 +109,7 @@ class Account extends Component {
 				mode: 'error',
 				title: 'Invalid Value',
 				message: 'Please select an active DFP',
-				autoDimiss: 10
+				autoDismiss: 10
 			});
 		} else if (originalactiveDFP === null && activeDFP !== null) {
 			if (

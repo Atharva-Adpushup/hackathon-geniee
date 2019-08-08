@@ -1,17 +1,16 @@
 import React, { Component, Fragment } from 'react';
-import { PanelGroup, Panel, Col, Badge, Row } from 'react-bootstrap';
-import FieldGroup from '../../../../../Components/Layout/FieldGroup';
 import moment from 'moment';
 import 'react-dates/initialize';
-import { DateRangePicker } from 'react-dates';
-import { isInclusivelyBeforeDay } from 'react-dates';
+import { DateRangePicker, isInclusivelyBeforeDay } from 'react-dates';
 import 'react-dates/lib/css/_datepicker.css';
-import LostSites from './LostSites';
-import NewSites from './NewSites';
-import RetentionSites from './RetentionSites';
+
+import { PanelGroup, Panel, Col, Badge, Row } from 'react-bootstrap';
+import FieldGroup from '../../../../../Components/Layout/FieldGroup';
+import CommonTable from './CommonTable';
 import CustomButton from '../../../../../Components/CustomButton/index';
 import Loader from '../../../../../Components/Loader/index';
 import axiosInstance from '../../../../../helpers/axiosInstance';
+import CustomError from '../../../../../Components/CustomError/index';
 
 class LostFoundLiveSites extends Component {
 	constructor(props) {
@@ -29,9 +28,9 @@ class LostFoundLiveSites extends Component {
 			activeKey: null,
 			currentStartDate: currentFrom,
 			currentEndDate: CurrentTo,
-			focusedInput: null,
 			currentFocusedInput: null,
 			isLoading: false,
+			isError: false,
 			pageviewsThreshold: 10000,
 			sitesData: {
 				lost: [],
@@ -71,7 +70,7 @@ class LostFoundLiveSites extends Component {
 				mode: 'error',
 				title: 'Operation Failed',
 				message: 'Page Views should not be less than 10,000 ',
-				autoDimiss: 5
+				autoDismiss: 5
 			});
 		}
 
@@ -83,8 +82,8 @@ class LostFoundLiveSites extends Component {
 			}
 		};
 
-		this.setState({ isLoading: true });
-		axiosInstance
+		this.setState({ isLoading: true, isError: false });
+		return axiosInstance
 			.get('/ops/getSiteStats', {
 				params: {
 					params: window.btoa(JSON.stringify(qs))
@@ -94,8 +93,8 @@ class LostFoundLiveSites extends Component {
 				this.setState({ sitesData: res.data.data, isLoading: false });
 			})
 			.catch(err => {
-				this.setState({ isLoading: false });
 				console.log(err);
+				this.setState({ isLoading: false, isError: true });
 			});
 	};
 
@@ -110,42 +109,44 @@ class LostFoundLiveSites extends Component {
 		return (
 			<Fragment>
 				<Row>
-				
-						<Col sm={7}>
-							<FieldGroup
-								name="pageviewsThreshold"
-								value={pageviewsThreshold}
-								type="number"
-								label="Enter Page Views"
-								onChange={this.handleChange}
-								size={6}
-								id="pageviewsThreshold-input"
-								placeholder="Enter Page Views"
-								className="u-padding-v4 u-padding-h4"
-							/>
-						</Col>
-						<Col sm={5}>
-							<Fragment>
-								<p className="u-text-bold ">Select Date Range</p>
+					<Col sm={7}>
+						<FieldGroup
+							name="pageviewsThreshold"
+							value={pageviewsThreshold}
+							type="number"
+							label="Enter Page Views"
+							onChange={this.handleChange}
+							size={6}
+							id="pageviewsThreshold-input"
+							placeholder="Enter Page Views"
+							className="u-padding-v4 u-padding-h4"
+						/>
+					</Col>
+					<Col sm={5}>
+						<Fragment>
+							<p className="u-text-bold ">Select Date Range</p>
 
-								<DateRangePicker
-									startDate={currentStartDate}
-									endDate={currentEndDate}
-									onDatesChange={this.currentDatesUpdated}
-									focusedInput={currentFocusedInput}
-									onFocusChange={this.currentFocusUpdated}
-									showDefaultInputIcon
-									hideKeyboardShortcutsPanel
-									showClearDates
-									minimumNights={0}
-									displayFormat="DD-MM-YYYY"
-									isOutsideRange={day => !isInclusivelyBeforeDay(day, moment())}
-								/>
-							</Fragment>
-						
+							<DateRangePicker
+								startDate={currentStartDate}
+								endDate={currentEndDate}
+								onDatesChange={this.currentDatesUpdated}
+								focusedInput={currentFocusedInput}
+								onFocusChange={this.currentFocusUpdated}
+								showDefaultInputIcon
+								hideKeyboardShortcutsPanel
+								showClearDates
+								minimumNights={0}
+								displayFormat="DD-MM-YYYY"
+								isOutsideRange={day => !isInclusivelyBeforeDay(day, moment())}
+							/>
+						</Fragment>
 					</Col>
 				</Row>
-				<CustomButton variant="primary" className=" pull-right u-margin-r3" onClick={this.handleGenerate}>
+				<CustomButton
+					variant="primary"
+					className=" pull-right u-margin-r3"
+					onClick={this.handleGenerate}
+				>
 					Generate
 				</CustomButton>
 			</Fragment>
@@ -163,7 +164,7 @@ class LostFoundLiveSites extends Component {
 							Lost <Badge> {sitesData.lost.length} </Badge>
 						</Panel.Title>
 					</Panel.Heading>
-					{activeKey === 'lost' ? <LostSites data={sitesData.lost} /> : null}
+					{activeKey === 'lost' ? <CommonTable data={sitesData.lost} /> : null}
 				</Panel>
 
 				<Panel eventKey="new">
@@ -172,7 +173,7 @@ class LostFoundLiveSites extends Component {
 							New <Badge> {sitesData.won.length} </Badge>
 						</Panel.Title>
 					</Panel.Heading>
-					{activeKey === 'new' ? <NewSites data={sitesData.won} /> : null}
+					{activeKey === 'new' ? <CommonTable data={sitesData.won} /> : null}
 				</Panel>
 
 				<Panel eventKey="retention">
@@ -181,23 +182,23 @@ class LostFoundLiveSites extends Component {
 							Retention <Badge>{sitesData.rentention.length}</Badge>
 						</Panel.Title>
 					</Panel.Heading>
-					{activeKey === 'retention' ? <RetentionSites data={sitesData.rentention} /> : null}
+					{activeKey === 'retention' ? <CommonTable data={sitesData.rentention} /> : null}
 				</Panel>
 			</PanelGroup>
 		);
 	}
 
 	render() {
-		const { isLoading } = this.state;
+		const { isLoading, isError } = this.state;
 
-		if (isLoading) return <Loader height="100px" classNames="u-margin-v3" />;
+		if (isLoading) return <Loader height="300px" classNames="u-margin-v3" />;
 		return (
 			<div>
 				<Col className="u-margin-b4" xs={12}>
 					{this.renderHeader()}
 				</Col>
 
-				<Col xs={12}>{this.renderPanel()}</Col>
+				<Col xs={12}>{isError ? <CustomError /> : this.renderPanel()}</Col>
 			</div>
 		);
 	}

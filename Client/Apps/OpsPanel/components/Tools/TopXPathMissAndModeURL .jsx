@@ -1,41 +1,42 @@
 import React, { Component, Fragment } from 'react';
-import { Row } from 'react-bootstrap';
 import moment from 'moment';
 import 'react-dates/initialize';
-import { DateRangePicker } from 'react-dates';
+import { DateRangePicker, isInclusivelyBeforeDay } from 'react-dates';
 import 'react-dates/lib/css/_datepicker.css';
-import validator from 'validator';
+
 import FieldGroup from '../../../../Components/Layout/FieldGroup';
 import { XPATH_MODE_URL } from '../../configs/commonConsts';
-
 import CustomButton from '../../../../Components/CustomButton/index';
-import Loader from '../../../../Components/Loader/index';
 import SelectBox from '../../../../Components/SelectBox/index';
+import axiosInstance from '../../../../helpers/axiosInstance';
 
+const { devices, modes } = XPATH_MODE_URL;
+
+const DEFAULT_STATE = {
+	siteId: '',
+	topURLCount: '',
+	emailId: '',
+	pageGroups: '',
+	devices,
+	modes,
+	currentSelectedDevice: null,
+	currentSelectedMode: null,
+	errorCode: '',
+	startDate: moment()
+		.subtract(7, 'days')
+		.startOf('day'),
+	endDate: moment()
+		.startOf('day')
+		.subtract(1, 'day'),
+	focusedInput: null
+};
 class TopXPathMissAndModeURL extends Component {
 	constructor(props) {
 		super(props);
 
-		const { devices, modes } = XPATH_MODE_URL;
-
 		this.state = {
-			siteId: '',
-			topURLCount: '',
-			emailId: '',
-			pageGroups: '',
-			devices,
-			modes,
-			currentSelectedDevice: null,
-			currentSelectedMode: null,
-			errorCode: '',
-			loading: false,
-			startDate: moment()
-				.subtract(7, 'days')
-				.startOf('day'),
-			endDate: moment()
-				.startOf('day')
-				.subtract(1, 'day'),
-			focusedInput: null
+			isLoading: false,
+			...DEFAULT_STATE
 		};
 	}
 
@@ -45,24 +46,87 @@ class TopXPathMissAndModeURL extends Component {
 		});
 	};
 
-	handleGenerate = () => {};
+	handleSelect = (value, key) => {
+		this.setState({ [key]: value });
+	};
 
-	handleReset = () => {
-		this.setState({
-			siteId: '',
-			topURLCount: '',
-			emailId: '',
-			pageGroups: '',
-			errorCode: '',
-			currentSelectedDevice: null,
-			currentSelectedMode: null,
-			startDate: moment()
-				.subtract(7, 'days')
-				.startOf('day'),
-			endDate: moment()
-				.startOf('day')
-				.subtract(1, 'day')
-		});
+	handleReset = () => this.setState(DEFAULT_STATE);
+
+	handleGenerate = e => {
+		e.preventDefault();
+		const {
+			siteId,
+			topURLCount,
+			emailId,
+			pageGroups,
+			currentSelectedDevice,
+			currentSelectedMode,
+			errorCode,
+			startDate,
+			endDate
+		} = this.state;
+
+		const isValid = !!(
+			siteId &&
+			topURLCount &&
+			emailId &&
+			pageGroups &&
+			currentSelectedDevice &&
+			currentSelectedMode &&
+			errorCode &&
+			startDate &&
+			endDate
+		);
+
+		const { showNotification } = this.props;
+
+		if (!isValid) {
+			return showNotification({
+				mode: 'error',
+				title: 'Operation Failed',
+				message: 'Missing or Incorrect params',
+				autoDismiss: 5
+			});
+		}
+		this.setState({ isLoading: true });
+
+		return axiosInstance
+			.post('/ops/xpathEmailNotifier', {
+				siteId,
+				topURLCount,
+				emailId,
+				pageGroups,
+				currentSelectedDevice,
+				currentSelectedMode,
+				errorCode,
+				startDate,
+				endDate
+			})
+			.then(() => {
+				showNotification({
+					mode: 'success',
+					title: 'Success',
+					message: `Email will be sent to ${emailId}`,
+					autoDismiss: 5
+				});
+				this.setState({ isLoading: false }, this.handleReset);
+			})
+			.catch(err => {
+				const { data = {} } = err.response;
+				const {
+					data: { message = 'Something went Wrong. Please contact AdPushup Support.' } = {}
+				} = data;
+
+				const errResponse = message.split('.')[1];
+				showNotification({
+					mode: 'error',
+					title: 'Operation Failed',
+					message: errResponse || message,
+					autoDismiss: 5
+				});
+
+				this.setState({ isLoading: false });
+			});
 	};
 
 	datesUpdated = ({ startDate, endDate }) => {
@@ -78,22 +142,18 @@ class TopXPathMissAndModeURL extends Component {
 			siteId,
 			topURLCount,
 			emailId,
-			devices,
 			currentSelectedDevice,
 			currentSelectedMode,
 			pageGroups,
-			modes,
 			errorCode,
-			loading,
 			startDate,
 			endDate,
+			isLoading,
 			focusedInput
 		} = this.state;
 
-		if (loading) return <Loader height="250px" />;
-
 		return (
-			<Row className="row">
+			<form onSubmit={this.handleGenerate}>
 				<FieldGroup
 					name="siteId"
 					value={siteId}
@@ -105,7 +165,6 @@ class TopXPathMissAndModeURL extends Component {
 					placeholder="Site Id"
 					className="u-padding-v4 u-padding-h4"
 				/>
-
 				<FieldGroup
 					name="topURLCount"
 					value={topURLCount}
@@ -117,7 +176,6 @@ class TopXPathMissAndModeURL extends Component {
 					placeholder="Top URL Count"
 					className="u-padding-v4 u-padding-h4"
 				/>
-
 				<Fragment>
 					<p className="u-text-bold">Dates</p>
 
@@ -132,15 +190,14 @@ class TopXPathMissAndModeURL extends Component {
 						showClearDates
 						minimumNights={0}
 						displayFormat="DD-MM-YYYY"
-						isOutsideRange={() => {}}
+						isOutsideRange={day => !isInclusivelyBeforeDay(day, moment())}
 					/>
 				</Fragment>
-
 				<div className="u-margin-t4">
 					<FieldGroup
 						name="emailId"
 						value={emailId}
-						type="text"
+						type="email"
 						label="Email Id"
 						onChange={this.handleChange}
 						size={6}
@@ -149,17 +206,16 @@ class TopXPathMissAndModeURL extends Component {
 						className="u-padding-v4 u-padding-h4"
 					/>
 				</div>
-
 				<Fragment>
 					<p className="u-text-bold">Device</p>
 					<SelectBox
 						selected={currentSelectedDevice}
 						options={devices}
-						onSelect={currentSelectedDevice => {
-							this.setState({ currentSelectedDevice });
-						}}
+						onSelect={this.handleSelect}
 						id="select-device"
 						title="Select Device"
+						dataKey="currentSelectedDevice"
+						reset
 					/>
 				</Fragment>
 				<div className="u-margin-t4">
@@ -175,21 +231,18 @@ class TopXPathMissAndModeURL extends Component {
 						className="u-padding-v4 u-padding-h4"
 					/>
 				</div>
-
 				<Fragment>
 					<p className="u-text-bold">Mode</p>
 					<SelectBox
 						selected={currentSelectedMode}
 						options={modes}
-						// onSelect={this.handleSelectMode}
-						onSelect={currentSelectedMode => {
-							this.setState({ currentSelectedMode });
-						}}
+						onSelect={this.handleSelect}
 						id="select-mode"
 						title="Select Mode"
+						dataKey="currentSelectedMode"
+						reset
 					/>
 				</Fragment>
-
 				<div className="u-margin-t4">
 					<FieldGroup
 						name="errorCode"
@@ -203,15 +256,14 @@ class TopXPathMissAndModeURL extends Component {
 						className="u-padding-v4 u-padding-h4"
 					/>
 				</div>
-
 				<CustomButton
+					type="submit"
 					variant="primary"
 					className="pull-right u-margin-r3"
-					onClick={this.handleGenerate}
+					showSpinner={isLoading}
 				>
 					Generate
 				</CustomButton>
-
 				<CustomButton
 					variant="secondary"
 					className="pull-right u-margin-r3"
@@ -219,7 +271,7 @@ class TopXPathMissAndModeURL extends Component {
 				>
 					Reset
 				</CustomButton>
-			</Row>
+			</form>
 		);
 	}
 }

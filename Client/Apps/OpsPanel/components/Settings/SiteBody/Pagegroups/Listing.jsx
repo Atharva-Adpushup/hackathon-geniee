@@ -44,7 +44,7 @@ class Listing extends Component {
 				mode: 'error',
 				title: 'Invalid Value',
 				message: 'Please enter valid regex',
-				autoDimiss: 5
+				autoDismiss: 5
 			});
 		}
 		return updatePagegroupPattern(siteId, {
