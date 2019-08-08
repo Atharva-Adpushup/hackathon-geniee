@@ -6,7 +6,11 @@ const _ = require('lodash');
 
 const { couchBase } = require('../configs/config');
 const HTTP_STATUSES = require('../configs/httpStatusConsts');
-const { ACTIVE_SITES_API, XPATH_MISS_MODE_URL_API } = require('../configs/commonConsts');
+const {
+	ACTIVE_SITES_API,
+	XPATH_MISS_MODE_URL_API,
+	EMAIL_REGEX
+} = require('../configs/commonConsts');
 const { sendSuccessResponse, sendErrorResponse } = require('../helpers/commonFunctions');
 const { appBucket, errorHandler } = require('../helpers/routeHelpers');
 
@@ -198,7 +202,6 @@ router
 		const isDataValid = !!(
 			siteId &&
 			topURLCount &&
-			emailId &&
 			pageGroups &&
 			currentSelectedDevice &&
 			currentSelectedMode &&
@@ -207,10 +210,10 @@ router
 			endDate
 		);
 
-		if (!isDataValid) {
+		if (!isDataValid && !EMAIL_REGEX.test(emailId)) {
 			return sendErrorResponse(
 				{
-					message: 'Missing params.'
+					message: 'Missing or Inavalid params.'
 				},
 				res
 			);

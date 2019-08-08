@@ -116,11 +116,12 @@ class TopXPathMissAndModeURL extends Component {
 				const {
 					data: { message = 'Something went Wrong. Please contact AdPushup Support.' } = {}
 				} = data;
+
 				const errResponse = message.split('.')[1];
 				showNotification({
 					mode: 'error',
 					title: 'Operation Failed',
-					message: errResponse,
+					message: errResponse || message,
 					autoDismiss: 5
 				});
 
