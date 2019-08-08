@@ -44,10 +44,10 @@ var hb = {
 					banner: {
 						sizes: prebidSizes
 					},
-					video: {
-						context: constants.PREBID.VIDEO_FORMAT_TYPE,
-						playerSize: prebidSizes[0]
-					}
+					// video: {
+					// 	context: constants.PREBID.VIDEO_FORMAT_TYPE,
+					// 	playerSize: prebidSizes[0]
+					// }
 				},
 				bids: updatedBidders
 			});
