@@ -1,5 +1,4 @@
 import React, { Component, Fragment } from 'react';
-import { Row } from 'react-bootstrap';
 import moment from 'moment';
 import 'react-dates/initialize';
 import { DateRangePicker, isInclusivelyBeforeDay } from 'react-dates';
@@ -53,7 +52,8 @@ class TopXPathMissAndModeURL extends Component {
 
 	handleReset = () => this.setState(DEFAULT_STATE);
 
-	handleGenerate = () => {
+	handleGenerate = e => {
+		e.preventDefault();
 		const {
 			siteId,
 			topURLCount,
@@ -141,11 +141,9 @@ class TopXPathMissAndModeURL extends Component {
 			siteId,
 			topURLCount,
 			emailId,
-			devices,
 			currentSelectedDevice,
 			currentSelectedMode,
 			pageGroups,
-			modes,
 			errorCode,
 			startDate,
 			endDate,
@@ -154,7 +152,7 @@ class TopXPathMissAndModeURL extends Component {
 		} = this.state;
 
 		return (
-			<Fragment>
+			<form onSubmit={this.handleGenerate}>
 				<FieldGroup
 					name="siteId"
 					value={siteId}
@@ -166,7 +164,6 @@ class TopXPathMissAndModeURL extends Component {
 					placeholder="Site Id"
 					className="u-padding-v4 u-padding-h4"
 				/>
-
 				<FieldGroup
 					name="topURLCount"
 					value={topURLCount}
@@ -178,7 +175,6 @@ class TopXPathMissAndModeURL extends Component {
 					placeholder="Top URL Count"
 					className="u-padding-v4 u-padding-h4"
 				/>
-
 				<Fragment>
 					<p className="u-text-bold">Dates</p>
 
@@ -196,12 +192,11 @@ class TopXPathMissAndModeURL extends Component {
 						isOutsideRange={day => !isInclusivelyBeforeDay(day, moment())}
 					/>
 				</Fragment>
-
 				<div className="u-margin-t4">
 					<FieldGroup
 						name="emailId"
 						value={emailId}
-						type="text"
+						type="email"
 						label="Email Id"
 						onChange={this.handleChange}
 						size={6}
@@ -210,7 +205,6 @@ class TopXPathMissAndModeURL extends Component {
 						className="u-padding-v4 u-padding-h4"
 					/>
 				</div>
-
 				<Fragment>
 					<p className="u-text-bold">Device</p>
 					<SelectBox
@@ -236,7 +230,6 @@ class TopXPathMissAndModeURL extends Component {
 						className="u-padding-v4 u-padding-h4"
 					/>
 				</div>
-
 				<Fragment>
 					<p className="u-text-bold">Mode</p>
 					<SelectBox
@@ -249,7 +242,6 @@ class TopXPathMissAndModeURL extends Component {
 						reset
 					/>
 				</Fragment>
-
 				<div className="u-margin-t4">
 					<FieldGroup
 						name="errorCode"
@@ -263,16 +255,14 @@ class TopXPathMissAndModeURL extends Component {
 						className="u-padding-v4 u-padding-h4"
 					/>
 				</div>
-
 				<CustomButton
+					type="submit"
 					variant="primary"
 					className="pull-right u-margin-r3"
-					onClick={this.handleGenerate}
 					showSpinner={isLoading}
 				>
 					Generate
 				</CustomButton>
-
 				<CustomButton
 					variant="secondary"
 					className="pull-right u-margin-r3"
@@ -280,7 +270,7 @@ class TopXPathMissAndModeURL extends Component {
 				>
 					Reset
 				</CustomButton>
-			</Fragment>
+			</form>
 		);
 	}
 }
