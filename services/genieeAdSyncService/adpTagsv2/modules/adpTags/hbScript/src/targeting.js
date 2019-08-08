@@ -58,7 +58,8 @@ var targeting = {
     setSlotLevel: function (adpSlot) {
         var targeting = {
             hb_siteId: config.SITE_ID,
-            hb_ran: 0
+			hb_ran: 0,
+			adpushup_ran: 1
         };
         var adServerTargeting = this.getAdserverTargeting(adpSlot);
 
