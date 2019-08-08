@@ -207,10 +207,11 @@ router
 			currentSelectedMode &&
 			errorCode &&
 			startDate &&
-			endDate
+			endDate &&
+			EMAIL_REGEX.test(emailId)
 		);
 
-		if (!isDataValid && !EMAIL_REGEX.test(emailId)) {
+		if (isDataValid === false) {
 			return sendErrorResponse(
 				{
 					message: 'Missing or Inavalid params.'
@@ -241,9 +242,7 @@ router
 				if (code !== 1) return Promise.reject(new Error(response.data));
 				return sendSuccessResponse(response, res);
 			})
-			.catch(err => {
-				errorHandler(err, res);
-			});
+			.catch(err => errorHandler(err, res));
 	});
 
 module.exports = router;
