@@ -1,7 +1,7 @@
 var w = window;
 var pageGroupTimer;
 var adp = (w.adpushup = w.adpushup || {});
-var $ = (adp.$ = require('jquery'));
+var $ = (adp.$ = require('../libs/jquery'));
 var utils = require('../libs/utils');
 var defaultConfig = $.extend({}, require('../config/config.js'));
 var config = (adp.config = require('../config/config.js'));
@@ -121,7 +121,7 @@ function initAdpConfig() {
 	}).then(function() {
 		if (!window.adpushup.configExtended) {
 			if (ADPTAG_ACTIVE) {
-				require('../modules/adpTags/hbScript/index');
+				require('../../adpTagsv2/modules/adpTags/hbScript/src/index');
 			}
 			if (GDPR_ACTIVE) {
 				require('../modules/gdpr/index');

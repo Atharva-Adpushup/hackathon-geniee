@@ -1,5 +1,5 @@
 var utils = require('../../libs/utils'),
-	$ = require('jquery'),
+	$ = require('../../libs/jquery'),
 	getPersonalizedVariations = require('./personalization'),
 	bayesianBanditModel = require('./bayesianBandit'),
 	randomSelectionModel = require('./randomSelection')();

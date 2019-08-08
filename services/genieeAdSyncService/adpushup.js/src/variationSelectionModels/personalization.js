@@ -1,5 +1,5 @@
 var utils = require('../../libs/utils'),
-	$ = require('jquery'),
+	$ = require('../../libs/jquery'),
 	destroyPublisherDfpAdSlots = function(dfpAdSlotsToDestroy) {
 		googletag.cmd.push(function() {
 			var allDfpAdSlots = googletag.pubads().getSlots(), // Reference to all DFP ad slots on page
