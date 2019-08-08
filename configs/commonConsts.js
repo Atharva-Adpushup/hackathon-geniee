@@ -399,6 +399,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		adyoulike: 'adyoulikeBidAdapter',
 		eplanning: 'eplanningBidAdapter',
 		sovrn: 'sovrnBidAdapter',
-		gumgum: 'gumgumBidAdapter'
+		gumgum: 'gumgumBidAdapter',
+		consumable: 'consumableBidAdapter'
 	}
 };
