@@ -1,4 +1,4 @@
-var $ = require('jquery'),
+var $ = require('./jquery'),
 	commonConsts = require('../config/commonConsts'),
 	getDockedCSS = function(formatData, elComputedStyles) {
 		var computedStyles = {
