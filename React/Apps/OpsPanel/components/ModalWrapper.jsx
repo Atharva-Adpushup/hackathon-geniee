@@ -31,6 +31,9 @@ class ModalWrapper extends React.Component {
 		const aardvark = findBidder(data, 'aardvark');
 		const criteo = findBidder(data, 'criteo');
 		const sovrn = findBidder(data, 'sovrn');
+		const eplanning = findBidder(data, 'eplanning');
+		const gumgum = findBidder(data, 'gumgum');
+		const consumable = findBidder(data, 'consumable');
 
 		this.state = {
 			partnersSelected: props.data.map(obj => obj.bidder) || [],
@@ -94,6 +97,19 @@ class ModalWrapper extends React.Component {
 			sovrn: {
 				tagid: sovrn ? sovrn.params.tagid : ''
 			},
+			eplanning: {
+				ci: eplanning ? eplanning.params.ci : ''
+			},
+			gumgum: {
+				inScreen: gumgum ? gumgum.params.inScreen : '',
+				inSlot: gumgum ? gumgum.params.inSlot : ''
+			},
+			consumable: {
+				siteId: consumable ? consumable.params.siteId : '',
+				networkId: consumable ? consumable.params.networkId : '',
+				unitId: consumable ? consumable.params.unitId : '',
+				unitName: consumable ? consumable.params.unitName : ''
+			},
 			error: ''
 		};
 
@@ -136,6 +152,9 @@ class ModalWrapper extends React.Component {
 		const aardvark = findBidder(data, 'aardvark');
 		const criteo = findBidder(data, 'criteo');
 		const sovrn = findBidder(data, 'sovrn');
+		const eplanning = findBidder(data, 'eplanning');
+		const gumgum = findBidder(data, 'gumgum');
+		const consumable = findBidder(data, 'consumable');
 
 		this.setState({
 			partnersSelected: nextProps.data.map(obj => ({ value: obj.bidder, label: obj.bidder })) || [],
@@ -198,6 +217,19 @@ class ModalWrapper extends React.Component {
 			},
 			sovrn: {
 				tagid: sovrn ? sovrn.params.tagid : ''
+			},
+			eplanning: {
+				ci: eplanning ? eplanning.params.ci : ''
+			},
+			gumgum: {
+				inScreen: gumgum ? gumgum.params.inScreen : '',
+				inSlot: gumgum ? gumgum.params.inSlot : ''
+			},
+			consumable: {
+				siteId: consumable ? consumable.params.siteId : '',
+				networkId: consumable ? consumable.params.networkId : '',
+				unitId: consumable ? consumable.params.unitId : '',
+				unitName: consumable ? consumable.params.unitName : ''
 			},
 			error: ''
 		});

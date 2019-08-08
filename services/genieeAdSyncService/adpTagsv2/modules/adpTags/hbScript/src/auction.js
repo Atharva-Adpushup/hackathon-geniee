@@ -71,6 +71,11 @@ var auction = {
 				bidCpmAdjustment: function(bidCpm) {
 					return bidCpm - bidCpm * (20 / 100);
 				}
+			},
+			eplanning: {
+				bidCpmAdjustment: function(bidCpm) {
+					return bidCpm - bidCpm * (40 / 100);
+				}
 			}
 		};
 
