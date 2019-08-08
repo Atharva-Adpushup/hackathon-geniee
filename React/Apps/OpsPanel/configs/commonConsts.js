@@ -391,6 +391,18 @@ const siteMappingActions = {
 		{
 			value: 'sovrn',
 			label: 'sovrn'
+		},
+		{
+			value: 'eplanning',
+			label: 'eplanning'
+		},
+		{
+			value: 'gumgum',
+			label: 'gumgum'
+		},
+		{
+			value: 'consumable',
+			label: 'consumable'
 		}
 	],
 	devicesList = [
@@ -536,6 +548,40 @@ const siteMappingActions = {
 		sovrn: [
 			{
 				name: 'tagid',
+				type: 'string'
+			}
+		],
+		eplanning: [
+			{
+				name: 'ci',
+				type: 'string'
+			}
+		],
+		gumgum: [
+			{
+				name: 'inScreen',
+				type: 'string'
+			},
+			{
+				name: 'inSlot',
+				type: 'integer'
+			}
+		],
+		consumable: [
+			{
+				name: 'siteId',
+				type: 'integer'
+			},
+			{
+				name: 'networkId',
+				type: 'integer'
+			},
+			{
+				name: 'unitId',
+				type: 'integer'
+			},
+			{
+				name: 'unitName',
 				type: 'string'
 			}
 		]
