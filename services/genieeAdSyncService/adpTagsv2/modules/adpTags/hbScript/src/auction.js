@@ -34,7 +34,7 @@ var auction = {
 		var pbSizeConfig = [];
 		var labelIndexTracker = {};
 
-		sizeConfigFromDB.forEach(obj => {
+		sizeConfigFromDB.forEach(function(obj){
 			// if label doesn't exist in pbSizeConfig
 			if (!labelIndexTracker[obj.labels[0]]) {
 				labelIndexTracker[obj.labels[0]] = pbSizeConfig.length;

@@ -53,8 +53,8 @@ var hb = {
 					val.params.video
 				) {
 					computedBidders[i].params.video = {
-						playerWidth: `${prebidSizes[0][0]}`,
-						playerHeight: `${prebidSizes[0][1]}`
+						playerWidth: prebidSizes[0][0].toString(),
+						playerHeight: prebidSizes[0][1].toString()
 					};
 				}
 			});
