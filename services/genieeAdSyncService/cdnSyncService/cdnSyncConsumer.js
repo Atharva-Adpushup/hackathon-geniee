@@ -86,16 +86,15 @@ module.exports = function(site) {
 		},
 		generateFinalInitScript = jsFile => {
 			return {
-				addService: (serviceName, isActive, serviceConfig = {}) => {
-					var prebidConfig = serviceConfig.prebidConfig;
-					var inventory = Object.assign({}, serviceConfig);
-					delete inventory.prebidConfig;
-					delete inventory.dateCreated;
-					delete inventory.dateModified;
-					delete inventory.siteId;
-					
+				addService: (serviceName, isActive, serviceConfig = {}) => {		
 					switch (serviceName) {
 						case CC.SERVICES.ADPTAGS:
+							var prebidConfig = serviceConfig.prebidConfig;
+							var inventory = Object.assign({}, serviceConfig);
+							delete inventory.prebidConfig;
+							delete inventory.dateCreated;
+							delete inventory.dateModified;
+							delete inventory.siteId;
 							if (isActive) {
 								jsFile = _.replace(jsFile, '__INVENTORY__', JSON.stringify(inventory));
 								jsFile = _.replace(jsFile, '__PREBID_CONFIG__', JSON.stringify(prebidConfig));
