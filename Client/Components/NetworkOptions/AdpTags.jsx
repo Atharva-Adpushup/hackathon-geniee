@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Row, Col, Button, OverlayTrigger, Tooltip, Alert } from 'react-bootstrap';
 import CodeBox from '../CodeBox/index';
 import { priceFloorKeys, iabSizes, refreshIntervals } from '../../constants/visualEditor';
-import SelectBox from '../select/select';
+import SelectBox from '../SelectBox/index';
 import CustomToggleSwitch from '../CustomToggleSwitch/index';
 import { getSupportedAdSizes } from '../../helpers/commonFunctions';
 import MultipleAdSizeSelector from '../MultipleAdSizeSelector';
@@ -11,26 +11,27 @@ class AdpTags extends Component {
 	constructor(props) {
 		super(props);
 		const {
-				fpKey,
-				priceFloor,
-				headerBidding,
-				code,
-				refreshSlot,
-				refreshInterval,
-				overrideActive,
-				overrideSizeTo,
-				primaryAdSize
-			} = props,
-			// Geniee specific UI access feature 'dynamic allocation' property computation
-			isGenieeUIAccessDA = !!(window.isGeniee && window.gcfg && window.gcfg.hasOwnProperty('uud')),
-			isGenieeUIAccessDAActive = !!(isGenieeUIAccessDA && window.gcfg.uud),
-			isGenieeUIAccessDAInActive = !!(isGenieeUIAccessDA && !window.gcfg.uud),
-			isPrimaryAdSize = !!(primaryAdSize && primaryAdSize.width && primaryAdSize.height),
-			isResponsiveAdSize = !!(
-				isPrimaryAdSize &&
-				primaryAdSize.width === 'responsive' &&
-				primaryAdSize.height === 'responsive'
-			);
+			fpKey,
+			priceFloor,
+			headerBidding,
+			code,
+			refreshSlot,
+			refreshInterval,
+			overrideActive,
+			overrideSizeTo,
+			primaryAdSize
+		} = props;
+
+		// Geniee specific UI access feature 'dynamic allocation' property computatio;
+		const isGenieeUIAccessDA = !!(window.isGeniee && window.gcfg && Object.prototype.hasOwnProperty.call(window.gcfg, 'uud'));
+		const isGenieeUIAccessDAActive = !!(isGenieeUIAccessDA && window.gcfg.uud);
+		const isGenieeUIAccessDAInActive = !!(isGenieeUIAccessDA && !window.gcfg.uud);
+		const isPrimaryAdSize = !!(primaryAdSize && primaryAdSize.width && primaryAdSize.height);
+		const isResponsiveAdSize = !!(
+			isPrimaryAdSize &&
+			primaryAdSize.width === 'responsive' &&
+			primaryAdSize.height === 'responsive'
+		);
 
 		this.state = {
 			uiAccess: {
@@ -40,7 +41,7 @@ class AdpTags extends Component {
 					inactive: isGenieeUIAccessDAInActive
 				}
 			},
-			fpKey: fpKey,
+			fpKey,
 			// 'isGenieeUIAccessDAInActive' is added below as a condition because
 			// Dynamic Allocation/Header Bidding property should be false by default
 			// if Geniee UI access 'DA' (window.gcfg.uud) property is present and set to 0
@@ -86,10 +87,10 @@ class AdpTags extends Component {
 		this.handleIsBackCompatibleSizesChange = this.handleIsBackCompatibleSizesChange.bind(this);
 	}
 
-	filterKeyValues(keyValues) {
-		let response = {};
+	filterKeyValues = keyValues => {
+		const response = {};
 		Object.keys(keyValues).forEach((key, value) => {
-			if (priceFloorKeys.indexOf(key) == -1) {
+			if (priceFloorKeys.indexOf(key) === -1) {
 				response[key] = value;
 			}
 		});
@@ -98,30 +99,31 @@ class AdpTags extends Component {
 
 	save() {
 		const {
-				fpKey,
-				hbAcivated,
-				pf,
-				keyValues,
-				refreshSlot,
-				refreshInterval,
-				overrideActive,
-				overrideSizeTo,
-				multipleAdSizes,
-				dfpAdunitId,
-				isBackwardCompatibleSizes,
-				isResponsive
-			} = this.state,
-			shouldMultipleAdSizesBeComputed = !!(
-				isBackwardCompatibleSizes &&
-				multipleAdSizes &&
-				!multipleAdSizes.length
-			);
+			fpKey,
+			hbAcivated,
+			pf,
+			keyValues,
+			refreshSlot,
+			refreshInterval,
+			overrideActive,
+			overrideSizeTo,
+			multipleAdSizes,
+			dfpAdunitId,
+			isBackwardCompatibleSizes,
+			isResponsive
+		} = this.state;
+		const shouldMultipleAdSizesBeComputed = !!(
+			isBackwardCompatibleSizes &&
+			multipleAdSizes &&
+			!multipleAdSizes.length
+		);
+		const { submitHandler } = this.props;
 		let computedMultipleAdSizes = multipleAdSizes;
 
 		if (shouldMultipleAdSizesBeComputed) {
 			computedMultipleAdSizes = this.getMultipleAdSizesOfPrimaryAdSize(isBackwardCompatibleSizes);
 		}
-		this.props.submitHandler({
+		submitHandler({
 			headerBidding: !!hbAcivated,
 			keyValues: {
 				...this.filterKeyValues(keyValues),
@@ -143,34 +145,14 @@ class AdpTags extends Component {
 	}
 
 	toggleAdvance() {
-		this.setState({ advanced: !this.state.advanced });
+		const { advanced } = this.state;
+		this.setState({ advanced: !advanced });
 	}
 
 	advanceSubmit(keyValues) {
-		keyValues = atob(keyValues);
-		keyValues = typeof keyValues != 'object' ? JSON.parse(keyValues) : keyValues;
-		this.setState({ keyValues: keyValues }, this.save);
-	}
-
-	renderEditMenuButtons(showButtons = true, submitHandler, cancelHandler) {
-		return showButtons ? (
-			<div className="containerButtonBar">
-				<Row className="butttonsRow mT-10">
-					<Col xs={6}>
-						<Button className="btn-lightBg btn-save" onClick={submitHandler}>
-							Save
-						</Button>
-					</Col>
-					<Col xs={6}>
-						<Button className="btn-lightBg btn-cancel" onClick={cancelHandler}>
-							Cancel
-						</Button>
-					</Col>
-				</Row>
-			</div>
-		) : (
-			''
-		);
+		keyValues = window.atob(keyValues);
+		keyValues = typeof keyValues !== 'object' ? JSON.parse(keyValues) : keyValues;
+		this.setState({ keyValues }, this.save);
 	}
 
 	renderNormalSaveButton(showButtons = true, submitHandler, cancelHandler) {
@@ -293,28 +275,26 @@ class AdpTags extends Component {
 	}
 
 	renderDFPAdUnitIdSelectBox() {
-		const props = this.props,
-			isUniqObject = !!(props.dfpAdUnitObject && Object.keys(props.dfpAdUnitObject).length),
-			isDynamicAllocation = !!this.state.hbAcivated,
-			isInsertMode = props.isInsertMode,
-			isShowBlock = !!(isDynamicAllocation && isInsertMode && isUniqObject);
+		const { dfpAdUnitObject, isInsertMode, fromPanel } = this.props;
+		const { hbAcivated, dfpAdunitId } = this.state;
+
+		const isUniqObject = !!(dfpAdUnitObject && Object.keys(dfpAdUnitObject).length);
+		const isDynamicAllocation = !!hbAcivated;
+		const isShowBlock = !!(isDynamicAllocation && isInsertMode && isUniqObject);
 
 		return isShowBlock ? (
 			<Row className="mT-10">
-				<Col xs={12} className={props.fromPanel ? 'u-padding-0px mB-10' : 'mB-10'}>
+				<Col xs={12} className={fromPanel ? 'u-padding-0px mB-10' : 'mB-10'}>
 					<SelectBox
-						value={this.state.dfpAdunitId}
-						label="Select a DFP AdUnit Id"
-						onChange={this.handleDFPAdUnitIdChange}
-					>
-						{Object.keys(props.dfpAdUnitObject).map((value, index) => {
-							return (
-								<option key={index} title={value} value={value}>
-									{value}
-								</option>
-							);
-						})}
-					</SelectBox>
+						id="dfp-selection"
+						title="Select DFP"
+						onSelect={this.handleDFPAdUnitIdChange}
+						options={Object.keys(dfpAdUnitObject).map(item => ({
+							name: item,
+							value: item
+						}))}
+						selected={dfpAdunitId}
+					/>
 				</Col>
 			</Row>
 		) : null;
@@ -330,27 +310,26 @@ class AdpTags extends Component {
 	}
 
 	renderSizeOverrideSelectBox() {
+		const { fromPanel } = this.props;
+		const { overrideSizeTo } = this.state;
 		return (
 			<Row className="mb-20">
-				<Col xs={6} className={this.props.fromPanel ? 'u-padding-r10px' : ''}>
+				<Col xs={6} className={fromPanel ? 'u-padding-r10px' : ''}>
 					<strong>Override size to</strong>
 				</Col>
-				<Col xs={6} className={this.props.fromPanel ? 'u-padding-l10px' : ''}>
+				<Col xs={6} className={fromPanel ? 'u-padding-l10px' : ''}>
 					<SelectBox
-						className="size-override-selectbox"
-						value={this.state.overrideSizeTo}
-						label="Select size"
-						showClear={false}
-						onChange={overrideSizeTo => {
-							this.setState({ overrideSizeTo });
+						id="size-override-selectbox"
+						title="Select size"
+						onSelect={val => {
+							this.setState({ overrideSizeTo: val });
 						}}
-					>
-						{getSupportedAdSizes().map((size, index) => (
-							<option key={index} value={`${size.width}x${size.height}`}>
-								{`${size.width}x${size.height}`}
-							</option>
-						))}
-					</SelectBox>
+						options={getSupportedAdSizes().map(size => ({
+							name: `${size.width}x${size.height}`,
+							value: `${size.width}x${size.height}`
+						}))}
+						selected={overrideSizeTo}
+					/>
 				</Col>
 			</Row>
 		);
@@ -394,6 +373,27 @@ class AdpTags extends Component {
 				[];
 
 		return multipleAdSizes;
+	}
+
+	renderEditMenuButtons = (showButtons = true, submitHandler, cancelHandler) => {
+		return showButtons ? (
+			<div className="containerButtonBar">
+				<Row className="butttonsRow mT-10">
+					<Col xs={6}>
+						<Button className="btn-lightBg btn-save" onClick={submitHandler}>
+							Save
+						</Button>
+					</Col>
+					<Col xs={6}>
+						<Button className="btn-lightBg btn-cancel" onClick={cancelHandler}>
+							Cancel
+						</Button>
+					</Col>
+				</Row>
+			</div>
+		) : (
+			''
+		);
 	}
 
 	handleIsBackCompatibleSizesChange(val) {
@@ -504,46 +504,46 @@ class AdpTags extends Component {
 	}
 
 	renderNonAdvanced() {
-		const { showButtons, onCancel, buttonType, isInsertMode } = this.props,
-			code = this.generateCode(),
-			isGenieeEditableMode = !!(this.props.geniee && !isInsertMode);
+		const { showButtons, onCancel, buttonType, isInsertMode, geniee, fromPanel, networkConfig, id } = this.props;
+		const { fpKey, pf, refreshSlot, refreshInterval } = this.state;
+
+		const code = this.generateCode();
+		const isGenieeEditableMode = !!(geniee && !isInsertMode);
 
 		return (
 			<div>
 				{isGenieeEditableMode ? this.renderGenieeNote() : null}
-				{this.props.geniee ? null : (
+				{geniee ? null : (
 					<div>
 						<Row>
-							<Col xs={6} className={this.props.fromPanel ? 'u-padding-r10px' : ''}>
+							<Col xs={6} className={fromPanel ? 'u-padding-r10px' : ''}>
 								<strong>Price Floor Key</strong>
 							</Col>
-							<Col xs={6} className={this.props.fromPanel ? 'u-padding-l10px' : ''}>
+							<Col xs={6} className={fromPanel ? 'u-padding-l10px' : ''}>
 								<SelectBox
-									value={this.state.fpKey}
-									label="Select Floor Price Key"
-									showClear={false}
-									onChange={fpKey => {
-										this.setState({ fpKey });
+									id="floor-price-key-selectbox"
+									title="Select Floor Price Key"
+									onSelect={val => {
+										this.setState({ fpKey: val });
 									}}
-								>
-									{priceFloorKeys.map((item, index) => (
-										<option key={item} value={item}>
-											{item}
-										</option>
-									))}
-								</SelectBox>
+									options={priceFloorKeys.map(item => ({
+										name: item,
+										value: item
+									}))}
+									selected={fpKey}
+								/>
 							</Col>
 						</Row>
 						<Row className="mT-10">
-							<Col xs={6} className={this.props.fromPanel ? 'u-padding-r10px' : ''}>
+							<Col xs={6} className={fromPanel ? 'u-padding-r10px' : ''}>
 								<strong>Price Floor</strong>
 							</Col>
-							<Col xs={6} className={this.props.fromPanel ? 'u-padding-l10px' : ''}>
+							<Col xs={6} className={fromPanel ? 'u-padding-l10px' : ''}>
 								<input
 									type="text"
 									placeholder="Enter Price Floor"
 									className="inputBasic mB-10"
-									value={this.state.pf}
+									value={pf}
 									onChange={ev => {
 										this.setState({ pf: ev.target.value });
 									}}
@@ -553,20 +553,18 @@ class AdpTags extends Component {
 					</div>
 				)}
 				{this.renderDynamicAllocation()}
-				{this.props.geniee ? null : this.renderIsBackwardCompatibleSizesToggleSwitch()}
-				{this.props.geniee ? this.renderDFPAdUnitIdSelectBox() : null}
-				{this.props.geniee ? this.renderManageMultipleAdSizeBlock() : null}
-				{!this.props.geniee ? this.renderOverrideSettings(isGenieeEditableMode) : null}
-				{!this.props.geniee &&
-				this.props.networkConfig &&
-				this.props.networkConfig.enableRefreshSlot ? (
+				{geniee ? null : this.renderIsBackwardCompatibleSizesToggleSwitch()}
+				{geniee ? this.renderDFPAdUnitIdSelectBox() : null}
+				{geniee ? this.renderManageMultipleAdSizeBlock() : null}
+				{!geniee ? this.renderOverrideSettings(isGenieeEditableMode) : null}
+				{!geniee && networkConfig && networkConfig.enableRefreshSlot ? (
 					<div>
 						<Row>
-							<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px' : ''}>
+							<Col xs={12} className={fromPanel ? 'u-padding-0px' : ''}>
 								<CustomToggleSwitch
 									labelText="Refresh Slot"
 									className="mB-10"
-									checked={this.state.refreshSlot}
+									checked={refreshSlot}
 									onChange={val => {
 										this.setState({ refreshSlot: !!val });
 									}}
@@ -574,36 +572,30 @@ class AdpTags extends Component {
 									size="m"
 									on="Yes"
 									off="No"
-									defaultLayout={this.props.fromPanel ? false : true}
-									name={this.props.id ? `refreshSlotSwitch-${this.props.id}` : 'refreshSlotSwitch'}
-									id={
-										this.props.id
-											? `js-refresh-slot-switch-${this.props.id}`
-											: 'js-refresh-slot-switch'
-									}
-									customComponentClass={this.props.fromPanel ? 'u-padding-0px' : ''}
+									defaultLayout={!!fromPanel}
+									name={id ? `refreshSlotSwitch-${id}` : 'refreshSlotSwitch'}
+									id={id ? `js-refresh-slot-switch-${id}` : 'js-refresh-slot-switch'}
+									customComponentClass={fromPanel ? 'u-padding-0px' : ''}
 								/>
 							</Col>
 						</Row>
 						<Row>
-							<Col xs={6} className={this.props.fromPanel ? 'u-padding-r10px' : ''}>
+							<Col xs={6} className={fromPanel ? 'u-padding-r10px' : ''}>
 								<strong>Refresh Interval</strong>
 							</Col>
-							<Col xs={6} className={this.props.fromPanel ? 'u-padding-l10px' : ''}>
+							<Col xs={6} className={fromPanel ? 'u-padding-l10px' : ''}>
 								<SelectBox
-									className="mB-10"
-									value={this.state.refreshInterval || refreshIntervals[0]}
-									showClear={false}
-									onChange={refreshInterval => {
-										this.setState({ refreshInterval });
+									id="refresh-interval-selectbox"
+									title="Select Refresh Interval"
+									onSelect={val => {
+										this.setState({ refreshInterval: val });
 									}}
-								>
-									{refreshIntervals.map((item, index) => (
-										<option key={item} value={item}>
-											{item}
-										</option>
-									))}
-								</SelectBox>
+									options={refreshIntervals.map(item => ({
+										name: item,
+										value: item
+									}))}
+									selected={refreshInterval || refreshIntervals[0]}
+								/>
 							</Col>
 						</Row>
 					</div>
@@ -617,21 +609,23 @@ class AdpTags extends Component {
 	renderAdvanced() {
 		return (
 			<CodeBox
-				showButtons={true}
+				showButtons
 				onSubmit={this.advanceSubmit}
 				onCancel={this.toggleAdvance}
 				size="small"
 				cancelText="Back"
-				code={btoa(this.generateCode())}
+				code={window.btoa(this.generateCode())}
 			/>
 		);
 	}
 
 	render() {
-		const renderBlocks = [],
-			isShowMultipleAdSize = !!(this.props.geniee && this.state.showMultipleAdSizesSelector);
+		const { geniee } = this.props;
+		const { showMultipleAdSizesSelector, advanced } = this.state;
+		const renderBlocks = [];
+		const isShowMultipleAdSize = !!(geniee && showMultipleAdSizesSelector);
 
-		if (this.state.advanced) {
+		if (advanced) {
 			renderBlocks.push(<div key={1}>{this.renderAdvanced()}</div>);
 		} else if (isShowMultipleAdSize) {
 			renderBlocks.push(<div key={1}>{this.renderMultipleAdSizes()}</div>);

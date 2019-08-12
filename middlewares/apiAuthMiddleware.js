@@ -1,3 +1,5 @@
+const Promise = require('bluebird');
+
 const authToken = require('../helpers/authToken');
 const userModel = require('../models/userModel');
 
@@ -54,9 +56,9 @@ module.exports = (req, res, next) => {
 	}
 
 	if (req.session && req.session.partner === 'geniee' && !isAuthorised()) {
-		if (req.url.indexOf('.map') == -1) {
+		if (req.url.indexOf('.map') === -1) {
 			req.session.destroy(() => res.redirect('/403'));
-			return;
+			return false;
 		}
 	} else if (isDifferentGenieeSite) {
 		return res.redirect('/403');
@@ -64,20 +66,21 @@ module.exports = (req, res, next) => {
 
 	const userCookie = req.cookies.user;
 	if (!userCookie) {
-		return res.send('Auth Token not found!');
+		res.clearCookie('user');
+		return res.redirect('/login');
 	}
 
 	const token = JSON.parse(userCookie).authToken;
 
-	authToken
-		.decodeAuthToken(token)
-		.then(decoded => userModel.getUserByEmail(decoded.email).then(() => decoded))
-		.then(decoded => {
+	return Promise.join(authToken.decodeAuthToken(token), decoded =>
+		userModel.getUserByEmail(decoded.email).then(() => {
 			req.user = decoded;
 			next();
+			return null;
 		})
-		.catch(err => {
-			console.log(err);
-			return res.send('Server error!');
-		});
+	).catch(err => {
+		console.log(err);
+		res.clearCookie('user');
+		return res.redirect('/login');
+	});
 };

@@ -7,6 +7,7 @@ import CustomMessage from '../../../../Components/CustomMessage/index';
 import CustomButton from '../../../../Components/CustomButton/index';
 import Loader from '../../../../Components/Loader';
 import { pagegroupFiltering } from '../../lib/helpers';
+import ActionCard from '../../../../Components/ActionCard';
 
 class AdCodeGenerator extends Component {
 	constructor(props) {
@@ -19,7 +20,7 @@ class AdCodeGenerator extends Component {
 			size: null,
 			loading: false,
 			pagegroups: [],
-			isLayoutSetupPresent: !!(channels && channels.length)
+			pagegroupsPresent: !!(channels && channels.length)
 		};
 		this.selectPlatform = this.selectPlatform.bind(this);
 		this.selectFormat = this.selectFormat.bind(this);
@@ -59,11 +60,11 @@ class AdCodeGenerator extends Component {
 	}
 
 	selectSize(size) {
-		const { progress, isLayoutSetupPresent } = this.state;
+		const { progress, pagegroupsPresent } = this.state;
 		let updateProgress = 80;
 		if (progress > 80) {
 			updateProgress = progress;
-		} else if (isLayoutSetupPresent) {
+		} else if (pagegroupsPresent) {
 			updateProgress = 45;
 		} else if (this.formatCheck()) {
 			updateProgress = 60;
@@ -156,7 +157,7 @@ class AdCodeGenerator extends Component {
 				blocklist: [],
 				isActive: true,
 				isInnovativeAd: true,
-				name: `Ad-${platform}-${format}-${width}x${height}-${+new Date()}`,
+				// name: `Ad-${platform}-${format}-${width}x${height}-${+new Date()}`,
 				...data.adData
 			}
 		};
@@ -336,7 +337,7 @@ class AdCodeGenerator extends Component {
 
 	renderMainContent() {
 		const { codeGenerated } = this.props;
-		const { progress, isLayoutSetupPresent } = this.state;
+		const { progress, pagegroupsPresent } = this.state;
 		return (
 			<React.Fragment>
 				<div className="progress-wrapper">
@@ -349,8 +350,8 @@ class AdCodeGenerator extends Component {
 						{this.renderPlatformOptions()}
 						{progress >= 15 ? this.renderFormats() : null}
 						{progress >= 30 ? this.renderSizes() : null}
-						{progress >= 45 && isLayoutSetupPresent ? this.renderPagegroups() : null}
-						{progress >= 60 ? this.renderFormatDetails() : null}
+						{progress >= 45 ? this.renderPagegroups() : null}
+						{progress >= 60 && pagegroupsPresent ? this.renderFormatDetails() : null}
 					</div>
 				)}
 			</React.Fragment>
@@ -361,9 +362,9 @@ class AdCodeGenerator extends Component {
 		const { codeGenerated } = this.props;
 		const { loading } = this.state;
 		return (
-			<Row className="options-wrapper">
+			<ActionCard className="options-wrapper">
 				{loading && !codeGenerated ? <Loader height="300px" /> : this.renderMainContent()}
-			</Row>
+			</ActionCard>
 		);
 	}
 }

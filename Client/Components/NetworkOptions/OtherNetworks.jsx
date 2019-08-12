@@ -2,17 +2,17 @@ import React, { Component } from 'react';
 import { Row, Col } from 'react-bootstrap';
 import CodeBox from '../CodeBox/index';
 import CustomToggleSwitch from '../CustomToggleSwitch/index';
-import SelectBox from '../select/select';
+import SelectBox from '../SelectBox/index';
 import { refreshIntervals } from '../../constants/visualEditor';
 
 class OtherNetworks extends Component {
 	constructor(props) {
 		super(props);
+		const { code } = props;
 		this.state = {
-			error: false,
-			adCode: this.props.code.adCode || '',
-			refreshSlot: !!this.props.code.refreshSlot,
-			refreshInterval: this.props.code.refreshInterval
+			adCode: code.adCode || '',
+			refreshSlot: !!code.refreshSlot,
+			refreshInterval: code.refreshInterval
 		};
 		this.onCodeBoxChange = this.onCodeBoxChange.bind(this);
 		this.submitHandler = this.submitHandler.bind(this);
@@ -20,23 +20,26 @@ class OtherNetworks extends Component {
 	}
 
 	onCodeBoxChange(value) {
-		this.setState({ adCode: btoa(value) });
+		this.setState({ adCode: window.btoa(value) });
 	}
 
 	submitHandler(value) {
+		const { showNotification, submitHandler } = this.props;
+		const { refreshInterval, refreshSlot } = this.state;
 		if (!value || !value.trim().length) {
-			this.props.showNotification({
+			showNotification({
 				mode: 'error',
 				title: 'Invalid AdCode',
 				message: 'AdCode cannot be left blank'
 			});
 			return false;
 		}
-		this.props.submitHandler({
+		submitHandler({
 			adCode: value,
-			refreshSlot: this.state.refreshSlot,
-			refreshInterval: this.state.refreshInterval
+			refreshSlot,
+			refreshInterval
 		});
+		return true;
 	}
 
 	toggleRefreshSlot(value) {
@@ -46,28 +49,26 @@ class OtherNetworks extends Component {
 	}
 
 	render() {
+		const { networkConfig, id, showButtons, onCancel } = this.props;
+		const { refreshSlot, refreshInterval, adCode } = this.state;
 		return (
 			<div>
-				{this.props.networkConfig && this.props.networkConfig.enableRefreshSlot ? (
+				{networkConfig && networkConfig.enableRefreshSlot ? (
 					<div>
 						<Row>
 							<Col xs={12}>
 								<CustomToggleSwitch
 									labelText="Refresh Ad"
 									className="mB-10 mT-10"
-									checked={this.state.refreshSlot}
+									checked={refreshSlot}
 									onChange={this.toggleRefreshSlot}
 									layout="horizontal"
 									size="m"
 									on="Yes"
 									off="No"
-									defaultLayout={true}
+									defaultLayout
 									name="Refresh Ad"
-									id={
-										this.props.id
-											? `js-refresh-slot-switch-${this.props.id}`
-											: 'js-refresh-slot-switch'
-									}
+									id={id ? `js-refresh-slot-switch-${id}` : 'js-refresh-slot-switch'}
 								/>
 							</Col>
 						</Row>
@@ -77,29 +78,28 @@ class OtherNetworks extends Component {
 							</Col>
 							<Col xs={6}>
 								<SelectBox
-									value={this.state.refreshInterval || refreshIntervals[0]}
-									showClear={false}
-									onChange={refreshInterval => {
-										this.setState({ refreshInterval });
+									id="refresh-selection"
+									title="Select Refresh Interval"
+									onSelect={val => {
+										this.setState({ refreshInterval: val });
 									}}
-								>
-									{refreshIntervals.map((item, index) => (
-										<option key={item} value={item}>
-											{item}
-										</option>
-									))}
-								</SelectBox>
+									options={refreshIntervals.map(item => ({
+										name: item,
+										value: item
+									}))}
+									selected={refreshInterval || refreshIntervals[0]}
+								/>
 							</Col>
 						</Row>
 					</div>
 				) : null}
 				<div className="mT-10">
 					<CodeBox
-						showButtons={this.props.showButtons || true}
-						onCancel={this.props.onCancel}
+						showButtons={showButtons || true}
+						onCancel={onCancel}
 						onSubmit={this.submitHandler}
 						onChange={this.onCodeBoxChange}
-						code={this.state.adCode}
+						code={adCode}
 						size="small"
 					/>
 				</div>

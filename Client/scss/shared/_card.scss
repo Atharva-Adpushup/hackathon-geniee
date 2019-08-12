@@ -1,23 +1,39 @@
 $transition: $all 0.2s $ease;
 
 .card {
-	box-shadow: $boxShadowOne;
+	//box-shadow: $boxShadowOne;
+	box-shadow: $boxShadowThree;
+	border: none;
 	display: $displayFlex;
 	flex-direction: $layoutColumn;
 	width: 360px;
 	transition: $transition;
 
 	&:hover {
-		box-shadow: $boxShadowTwo;
+		//box-shadow: $boxShadowTwo;
+		box-shadow: $boxShadowOne;
 	}
 
 	.card-header-title {
+		color: #777;
+		font-weight: bold;
 		font-size: ($designDimensionSM + 0.8);
+		max-width: 90%;
+		text-overflow: ellipsis;
+		overflow: hidden;
+		white-space: nowrap;
 	}
 
 	.card-header-icon {
 		flex: ($numberOne / $numberTen);
-		height: ($numberOne + ($numberOne/$numberTwo) + em);
+		height: ($numberOne + em);
+		margin-top: 4px;
+		vertical-align: top;
+	}
+
+	> .card-header {
+		background: transparent;
+		border: none;
 	}
 
 	> .card-body {
@@ -26,6 +42,8 @@ $transition: $all 0.2s $ease;
 
 	> .card-footer {
 		border: $numberZero;
+		background: #f6f7f8;
+		border: none;
 	}
 
 	&.card--theme-dotted {

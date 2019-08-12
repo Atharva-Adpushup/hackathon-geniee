@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-	Row,
 	Form,
 	Col,
 	FormGroup,
@@ -54,6 +53,7 @@ class PrebidSettingsTab extends React.Component {
 
 	savePrebidSettings = e => {
 		e.preventDefault();
+		// eslint-disable-next-line no-alert
 		const confirmed = window.confirm('Are you sure?');
 
 		if (!confirmed) return;
@@ -148,19 +148,19 @@ class PrebidSettingsTab extends React.Component {
 					</Col>
 				</FormGroup>
 
-				<Row className="form-row">
+				<div className="form-row clearfix">
 					<Col componentClass={ControlLabel} sm={6}>
 						AdServer
 					</Col>
 					<Col sm={6}>{adServer}</Col>
-				</Row>
+				</div>
 
-				<Row className="form-row">
+				<div className="form-row clearfix">
 					<Col componentClass={ControlLabel} sm={6}>
 						AdServer Currency
 					</Col>
 					<Col sm={6}>{currencyCode || 'N/A'}</Col>
-				</Row>
+				</div>
 
 				<FormGroup controlId="pb-formats" className="form-row clearfix">
 					<Col componentClass={ControlLabel} sm={6}>
@@ -199,7 +199,7 @@ class PrebidSettingsTab extends React.Component {
 
 	render() {
 		return (
-			<div className="options-wrapper hb-prebid-settings">
+			<div className="options-wrapper white-tab-container hb-prebid-settings">
 				{Object.keys(this.state).length === 2 ? <Loader /> : this.renderForm()}
 			</div>
 		);

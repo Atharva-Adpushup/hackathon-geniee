@@ -4,6 +4,7 @@ const fs = Promise.promisifyAll(require('fs'));
 const webpack = require('webpack');
 
 const AdPushupError = require('../../../helpers/AdPushupError');
+
 let buildPath = '../../../public/assets/js/builds/geniee/__SITE_ID__/';
 
 function init(site, config) {
@@ -54,18 +55,16 @@ function init(site, config) {
 			plugins: [new webpack.DefinePlugin({ ...statuses, SITE_ID: JSON.stringify(siteId) })]
 		});
 		new webpack.ProgressPlugin().apply(compiler);
-		compiler.run((err, stats) => {
-			return err || stats.hasErrors() ? reject(err || stats.compilation.errors) : resolve();
-		});
+		compiler.run((err, stats) =>
+			err || stats.hasErrors() ? reject(err || stats.compilation.errors) : resolve()
+		);
 	})
-		.then(() => {
-			return Promise.join(
+		.then(() =>
+			Promise.join(
 				fs.readFileAsync(path.join(__dirname, buildPath, 'bundle.js'), 'utf-8'),
-				uncompressed => {
-					return [config, uncompressed];
-				}
-			);
-		})
+				uncompressed => [config, uncompressed]
+			)
+		)
 		.catch(err => {
 			console.log(`Error while creating webpack bundle for siteId ${siteId} and err is ${err}`);
 			throw err;

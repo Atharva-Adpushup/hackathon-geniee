@@ -1,3 +1,10 @@
+/*
+	THIS SCRIPT DIRECTLY MANIPULATES THE DB SO USE IT WISELY.
+
+	To set key: adNetworkSettings: { "dfp": {} } in user doc which would consist of DFP Settings based on
+	dfp settings found in the user's sites, it would only pick DFP settings from the first site where data is present.
+*/
+
 const { promiseForeach } = require('node-utils');
 
 const { ADPUSHUP_DFP_INFO } = require('../../../../configs/config');
@@ -45,12 +52,12 @@ function processing(sites) {
 	return promiseForeach(sites, siteProcessing, errorHandler);
 }
 
-// function init() {
-// 	return fetchAllSites()
-// 		.then(processing)
-// 		.catch(err => console.log('Error occured : ', err));
-// }
+function init() {
+	return fetchAllSites()
+		.then(processing)
+		.catch(err => console.log('Error occured : ', err));
+}
 
-// init()
-// 	.then(() => console.log('Processing over'))
-// 	.then(() => process.exit(0));
+init()
+	.then(() => console.log('Processing over'))
+	.then(() => process.exit(0));

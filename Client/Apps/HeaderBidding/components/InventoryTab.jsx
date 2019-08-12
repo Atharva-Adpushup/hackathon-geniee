@@ -146,7 +146,7 @@ export default class InventoryTab extends React.Component {
 		} = this.state;
 
 		return (
-			<div className="options-wrapper hb-inventories">
+			<div className="options-wrapper white-tab-container hb-inventories">
 				<div className="toggle-hb-status-for-site u-margin-b4 text-right">
 					<FontAwesomeIcon
 						icon="play"
@@ -155,6 +155,11 @@ export default class InventoryTab extends React.Component {
 								? ' disabled'
 								: ' active'
 						}`}
+						title={
+							hbStatusForSite === null || loadingHbStatusForSite || hbStatusForSite
+								? ''
+								: 'Resume Header Bidding'
+						}
 						onClick={() => this.toggleHbStatusForSiteState(true)}
 					/>
 					<FontAwesomeIcon
@@ -164,6 +169,11 @@ export default class InventoryTab extends React.Component {
 								? ' disabled'
 								: ' active'
 						}`}
+						title={
+							hbStatusForSite === null || loadingHbStatusForSite || hbStatusForSite === false
+								? ''
+								: 'Pause Header Bidding'
+						}
 						onClick={() => this.toggleHbStatusForSiteState(false)}
 					/>
 					{loadingHbStatusForSite && <Spinner color="primary" size={20} />}
@@ -204,7 +214,11 @@ export default class InventoryTab extends React.Component {
 							<FilterBox
 								onFilter={this.onFilter}
 								availableFilters={[
-									{ name: 'Ad Unit', prop: 'adUnit', values: this.getFilterBoxValues('adUnit') },
+									{
+										name: 'Ad Unit',
+										prop: 'adUnit',
+										values: this.getFilterBoxValues('adUnit')
+									},
 									{ name: 'App', prop: 'app', values: this.getFilterBoxValues('app') },
 									{
 										name: 'Page Group',

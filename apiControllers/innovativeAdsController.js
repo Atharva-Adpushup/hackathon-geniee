@@ -6,6 +6,7 @@ const uuid = require('uuid');
 const HTTP_STATUS = require('../configs/httpStatusConsts');
 const AdPushupError = require('../helpers/AdPushupError');
 const { sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFunctions');
+const { generateSectionName } = require('../helpers/clientServerHelpers');
 const { docKeys, INNOVATIVE_ADS_INITIAL_DOC, DEFAULT_META } = require('../configs/commonConsts');
 const {
 	appBucket,
@@ -32,7 +33,7 @@ const fn = {
 		),
 	processing: (data, payload) => {
 		const cas = data.cas || false;
-		const { pagegroups, formatData } = payload.ad;
+		const { pagegroups, formatData, width, height } = payload.ad;
 
 		const value = data.value || data;
 		let newAds = [];
@@ -41,9 +42,18 @@ const fn = {
 		if (pagegroups.length) {
 			newAds = _.map(pagegroups, pagegroup => {
 				logs.push(`${formatData.platform}-${formatData.format}-${pagegroup}`);
+				const id = uuid.v4();
 				return {
 					...payload.ad,
-					id: uuid.v4(),
+					id,
+					name: generateSectionName({
+						width,
+						height,
+						pagegroup: pagegroup.split(':')[1],
+						platform: formatData.platform,
+						id,
+						service: 'I'
+					}),
 					createdOn: +new Date(),
 					pagegroups: [pagegroup]
 				};

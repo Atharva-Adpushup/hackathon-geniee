@@ -31,6 +31,11 @@ const DASHBOARD_NAV_ITEMS = {
 	}
 };
 
+const activeLegendItemArray = [
+	{ value: 'adpushup_variation_page_cpm', name: 'AdPushup Variation Page RPM', valueType: 'money' },
+	{ value: 'original_variation_page_cpm', name: 'Original Variation Page RPM', valueType: 'number' }
+];
+
 const dates = [
 	{ value: 'last7Days', name: 'Last 7 Days' },
 	{ value: 'last30Days', name: 'Last 30 Days' },

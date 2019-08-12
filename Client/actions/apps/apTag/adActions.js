@@ -9,7 +9,7 @@ const createAd = params => dispatch =>
 			const { data } = response.data;
 			dispatch({
 				type: AD_ACTIONS.UPDATE_ADS_LIST,
-				data: { ...params.ad, id: data.id },
+				data: { ...params.ad, id: data.id, name: data.name },
 				siteId: params.siteId
 			});
 			return dispatch({

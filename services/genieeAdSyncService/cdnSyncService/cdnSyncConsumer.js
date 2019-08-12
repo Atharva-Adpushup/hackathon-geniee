@@ -13,7 +13,7 @@ const config = require('../../../configs/config');
 const generateStatusesAndConfig = require('./generateConfig');
 const bundleGeneration = require('./bundleGeneration');
 const prebidGeneration = require('./prebidGeneration');
-const prodEnv = config.environment.HOST_ENV === 'production';
+const isNotProduction = config.environment.HOST_ENV === 'development' || config.environment.HOST_ENV === 'staging';
 const request = require('request-promise');
 const disableSiteCdnSyncList = [38333];
 // NOTE: Above 'disableSiteCdnSyncList' array is added to prevent site specific JavaScript CDN sync
@@ -229,10 +229,11 @@ module.exports = function(site) {
 			});
 		},
 		uploadJS = function(fileConfig) {
-			const siteId = site.get('siteId'),
-			 shouldJSCdnSyncBeDisabled = !!(disableSiteCdnSyncList.indexOf(siteId) > -1);
+			const siteId = site.get('siteId');
+			const shouldJSCdnSyncBeDisabled = !!(disableSiteCdnSyncList.indexOf(siteId) > -1);
 
-			 if (shouldJSCdnSyncBeDisabled || !prodEnv) {
+			 if (shouldJSCdnSyncBeDisabled || isNotProduction) {
+				console.log("Either current site's cdn generation is disabled or environment is development/staging. Skipping CDN Upload.");
 				return Promise.resolve(fileConfig.uncompressed);
 			}else{
 				return connectToServer()

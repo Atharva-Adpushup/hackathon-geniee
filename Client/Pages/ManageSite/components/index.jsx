@@ -1,16 +1,22 @@
 import React from 'react';
 import { Redirect } from 'react-router-dom';
 import { Nav, NavItem } from 'react-bootstrap';
-import ActionCard from '../../../Components/ActionCard/index';
+import Empty from '../../../Components/Empty';
 import ManageAppsContainer from '../containers/ManageAppsContainer';
 import { NAV_ITEMS, NAV_ITEMS_INDEXES, NAV_ITEMS_VALUES } from '../constants/index';
 import SiteSettings from '../../SiteSettings/index';
 import QuickSnapshotContainer from '../containers/QuickSnapshotContainer';
 
 class ManageSite extends React.Component {
-	state = {
-		redirectUrl: ''
-	};
+	constructor(props) {
+		super(props);
+		const invalidSiteData = this.checkValidSiteId(props);
+
+		this.state = {
+			redirectUrl: '',
+			invalidSiteData
+		};
+	}
 
 	getActiveTab = () => {
 		const {
@@ -20,12 +26,12 @@ class ManageSite extends React.Component {
 		return activeTab;
 	};
 
-	getSiteId = () => {
+	getSiteId = props => {
 		const {
 			match: {
 				params: { siteId }
 			}
-		} = this.props;
+		} = props || this.props;
 
 		return siteId;
 	};
@@ -55,6 +61,15 @@ class ManageSite extends React.Component {
 		this.setState({ redirectUrl });
 	};
 
+	checkValidSiteId(props) {
+		const siteId = this.getSiteId(props);
+		const siteData = props.userSites[siteId];
+		const isSiteData = !!(siteData && Object.keys(siteData).length);
+		const invalidSiteData = !isSiteData;
+
+		return invalidSiteData;
+	}
+
 	renderContent() {
 		const activeTab = this.getActiveTab();
 		const siteId = this.getSiteId();
@@ -69,25 +84,39 @@ class ManageSite extends React.Component {
 		}
 	}
 
-	render() {
+	renderInvalidDataAlert = () => (
+		<Empty message="Seems like you have entered an invalid siteid in url. Please check." />
+	);
+
+	renderRootComponent() {
 		const activeTab = this.getActiveTab();
 		const activeItem = NAV_ITEMS[activeTab];
 		const { redirectUrl } = this.state;
+		const { user } = this.props;
 
 		if (redirectUrl) {
 			return <Redirect to={{ pathname: redirectUrl }} />;
 		}
 
 		return (
-			<ActionCard>
+			<div>
 				<Nav bsStyle="tabs" activeKey={activeItem.INDEX} onSelect={this.handleNavSelect}>
 					<NavItem eventKey={1}>{NAV_ITEMS_VALUES.QUICK_SNAPSHOT}</NavItem>
 					<NavItem eventKey={2}>{NAV_ITEMS_VALUES.SITE_SETTINGS}</NavItem>
-					<NavItem eventKey={3}>{NAV_ITEMS_VALUES.MANAGE_APPS}</NavItem>
+					{user.isSuperUser && <NavItem eventKey={3}>{NAV_ITEMS_VALUES.MANAGE_APPS}</NavItem>}
 				</Nav>
 				{this.renderContent()}
-			</ActionCard>
+			</div>
 		);
+	}
+
+	render() {
+		const { invalidSiteData } = this.state;
+		const computedComponent = invalidSiteData
+			? this.renderInvalidDataAlert()
+			: this.renderRootComponent();
+
+		return computedComponent;
 	}
 }
 

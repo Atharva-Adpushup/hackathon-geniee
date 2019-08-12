@@ -1,11 +1,11 @@
 import { connect } from 'react-redux';
 import MySites from '../components/index';
-import { fetchAppStatuses } from '../../../actions/siteActions';
+import { addNewSite } from '../../../actions/siteActions';
 
 const mapStateToProps = (state, ownProps) => {
 	const {
 		user: {
-			data: { sites }
+			data: { sites, isSuperUser }
 		},
 		reports: {
 			data: { site: reportSites }
@@ -17,12 +17,13 @@ const mapStateToProps = (state, ownProps) => {
 		sites,
 		reportSites,
 		globalSites,
+		isSuperUser,
 		...ownProps
 	};
 };
 
 const mapDispatchToProps = dispatch => ({
-	fetchAppStatuses: siteId => dispatch(fetchAppStatuses(siteId))
+	updateSiteData: siteObj => dispatch(addNewSite(siteObj))
 });
 
 export default connect(

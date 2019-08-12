@@ -58,6 +58,16 @@ class AddManageSizelessBidder extends React.Component {
 								continue;
 							}
 
+							if (
+								!formFieldsParams[paramKey].visible &&
+								formFieldsParams[paramKey].value !== undefined
+							) {
+								newState.params[paramKey] = formFieldsParams[paramKey].value;
+
+								// eslint-disable-next-line no-continue
+								continue;
+							}
+
 							newState.params[paramKey] = '';
 						}
 

@@ -14,7 +14,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
 
-import ActionCard from '../../../Components/ActionCard/index';
+import axiosInstance from '../../../helpers/axiosInstance';
 import OverlayTooltip from '../../../Components/OverlayTooltip/index';
 import Card from '../../../Components/Layout/Card';
 import OnboardingCard from '../../../Components/OnboardingCard';
@@ -25,7 +25,8 @@ import {
 	domanize,
 	ADPUSHUP_RUNNING_SUCCESSFULLY_STEP,
 	FIRST_ONBOARDING_STEP,
-	USER_ONBOARDING_COMPLETE_STEP
+	USER_ONBOARDING_COMPLETE_STEP,
+	FETCH_SITE_APP_STATUS_URL
 } from '../constants/index';
 
 library.add(
@@ -48,30 +49,16 @@ class MySites extends React.Component {
 
 	componentDidMount() {
 		const ref = this;
-		const { sites } = this.state;
-		const { fetchAppStatuses } = ref.props;
+		const { sites } = ref.state;
 		const isSites = ref.getValidObject(sites);
 
 		if (!isSites) {
 			return false;
 		}
 
-		Object.keys(sites).forEach(siteIdKey => {
-			const site = sites[siteIdKey];
-			const isValidAppStatusInReportData = ref.checkValidAppStatusInReportData(siteIdKey);
-			const isAppStatuses = ref.checkSiteAppStatuses(site);
-			const siteStep = !site.step ? FIRST_ONBOARDING_STEP : site.step;
-			const isStepOnboardingComplete = ref.checkSiteStepOnboardingComplete(siteStep);
-			const shouldFetchAppStatuses = ref.shouldFetchSiteAppStatuses(
-				isStepOnboardingComplete,
-				isValidAppStatusInReportData,
-				isAppStatuses
-			);
+		const siteIds = Object.keys(sites);
 
-			if (shouldFetchAppStatuses) {
-				fetchAppStatuses(siteIdKey);
-			}
-		});
+		Promise.all(siteIds.map(ref.fetchSiteAppStatusesCallback));
 
 		return false;
 	}
@@ -84,6 +71,14 @@ class MySites extends React.Component {
 	checkSiteStepOnboardingComplete = step => !!(Number(step) === USER_ONBOARDING_COMPLETE_STEP);
 
 	checkSiteAppStatuses = siteModel => !!siteModel.appStatuses;
+
+	shouldHideActivateAppsLink = (
+		isSuperUser,
+		isStepOnboardingComplete,
+		isAppStatuses,
+		isValidAppStatusInReportData
+	) =>
+		!!(!isSuperUser && isStepOnboardingComplete && isAppStatuses && !isValidAppStatusInReportData);
 
 	getValidObject = obj => !!(obj && Object.keys(obj).length);
 
@@ -118,6 +113,38 @@ class MySites extends React.Component {
 		isSiteAppStatuses
 	) => !!(isOnboardingComplete && !isValidAppStatusInReportData && !isSiteAppStatuses);
 
+	fetchSiteAppStatusesCallback = siteId => {
+		const { sites } = this.state;
+		const { updateSiteData } = this.props;
+		const site = sites[siteId];
+		const isValidAppStatusInReportData = this.checkValidAppStatusInReportData(siteId);
+		const isAppStatuses = this.checkSiteAppStatuses(site);
+		const siteStep = !site.step ? FIRST_ONBOARDING_STEP : site.step;
+		const isStepOnboardingComplete = this.checkSiteStepOnboardingComplete(siteStep);
+		const shouldFetchAppStatuses = this.shouldFetchSiteAppStatuses(
+			isStepOnboardingComplete,
+			isValidAppStatusInReportData,
+			isAppStatuses
+		);
+
+		if (!shouldFetchAppStatuses) {
+			return siteId;
+		}
+
+		return axiosInstance
+			.get(FETCH_SITE_APP_STATUS_URL, { params: { siteId } })
+			.then(response => {
+				const { data } = response.data;
+				updateSiteData(data);
+			})
+			.catch(() => {
+				const { domain } = site;
+				const defaultData = { siteId, siteDomain: domain, appStatuses: {} };
+
+				updateSiteData(defaultData);
+			});
+	};
+
 	checkValidAppStatusInReportData(siteId) {
 		const { reportSites } = this.props;
 		const isReportData = this.getValidObject(reportSites);
@@ -135,6 +162,7 @@ class MySites extends React.Component {
 
 	renderStatusCards() {
 		const ref = this;
+		const { isSuperUser } = ref.props;
 		const { sites } = ref.state;
 		const isSites = ref.getValidObject(sites);
 		const computedCards = isSites
@@ -163,9 +191,21 @@ class MySites extends React.Component {
 						isValidAppStatusInReportData,
 						isAppStatuses
 					);
+					// NOTE: This check is added since 'Manage Apps' component is only visible to superuser so
+					// a link to it should only be visible to superuser
+					// TODO: Remove this variable and its usage logic once 'Manage Apps' component is released
+					const shouldHideActivateAppsLink = ref.shouldHideActivateAppsLink(
+						isSuperUser,
+						isStepOnboardingComplete,
+						isAppStatuses,
+						isValidAppStatusInReportData
+					);
+
 					const { siteId } = site;
 					const statusObject = SITE_SETUP_STATUS[siteStep];
-					const domanizeDomain = domanize(site.domain);
+					const domanizeDomain = isSuperUser
+						? `${domanize(site.domain)} - ${siteId}`
+						: domanize(site.domain);
 					const computedReportingUrl = `/reports/${siteId}`;
 					const computedManageSiteUrl = `/sites/${siteId}`;
 					const isSiteBlock = ref.getValidObject(statusObject.site);
@@ -209,7 +249,8 @@ class MySites extends React.Component {
 								{statusObject.site.linkText}
 							</Link>
 						) : null;
-					computedSiteStatusLink = showSiteStatusLoader ? null : computedSiteStatusLink;
+					computedSiteStatusLink =
+						showSiteStatusLoader || shouldHideActivateAppsLink ? null : computedSiteStatusLink;
 
 					const computeSiteBlock = () =>
 						isSiteBlock ? (
@@ -318,15 +359,15 @@ class MySites extends React.Component {
 		let computedRootFlexboxClasses = isValidUserSites
 			? 'aligner aligner--row aligner--wrap'
 			: 'aligner aligner--vCenter aligner--hCenter';
-		computedRootFlexboxClasses = `u-padding-h4 u-padding-v5 my-sites-wrapper ${computedRootFlexboxClasses}`;
+		computedRootFlexboxClasses = `my-sites-wrapper ${computedRootFlexboxClasses}`;
 
 		return (
-			<ActionCard title="My Sites">
+			<div title="My Sites">
 				<div className={computedRootFlexboxClasses}>
 					{isValidUserSites ? this.renderStatusCards() : this.renderOnboardingCard()}
 					{isValidUserSites ? this.renderAddNewSiteCard() : null}
 				</div>
-			</ActionCard>
+			</div>
 		);
 	}
 }

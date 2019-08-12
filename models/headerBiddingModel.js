@@ -130,20 +130,15 @@ function apiModule() {
 			bidderParams = { ...bidderParams };
 			switch (bidderCode) {
 				case 'conversant': {
-					// sizewise
-					for (const size in bidderParams) {
-						if (bidderParams.hasOwnProperty(size)) {
-							const isParamsExist = commonFunctions.verifyKeysInCollection(
-								bidderParams[size],
-								hbVideoParamsMap.conversant.params
-							);
+					const isParamsExist = commonFunctions.verifyKeysInCollection(
+						bidderParams,
+						hbVideoParamsMap.conversant.params
+					);
 
-							if (!isParamsExist) bidderParams[size] = {
-								...bidderParams[size],
-								...hbVideoParamsMap.conversant.params
-							};
-						}
-					}
+					if (!isParamsExist) bidderParams = {
+						...bidderParams,
+						...hbVideoParamsMap.conversant.params
+					};
 					
 					break;
 				}
@@ -213,21 +208,16 @@ function apiModule() {
 			bidderParams = { ...bidderParams };
 			switch (bidderCode) {
 				case 'conversant': {
-					// sizewise
-					for (const size in bidderParams) {
-						if (bidderParams.hasOwnProperty(size)) {
-							const isParamsExist = commonFunctions.verifyKeysInCollection(
-								bidderParams[size],
-								hbVideoParamsMap.conversant.params
-							);
+					const isParamsExist = commonFunctions.verifyKeysInCollection(
+						bidderParams,
+						hbVideoParamsMap.conversant.params
+					);
 
-							if (isParamsExist){
-								bidderParams[size] = commonFunctions.deleteKeysInCollection(
-									bidderParams[size],
-									hbVideoParamsMap.conversant.params
-								);
-							}
-						}
+					if (isParamsExist){
+						bidderParams = commonFunctions.deleteKeysInCollection(
+							bidderParams,
+							hbVideoParamsMap.conversant.params
+						);
 					}
 
 					break;
@@ -598,7 +588,14 @@ function apiModule() {
 						adNetworkSettings.dfpAccounts[0].currencyCode;
 					const mergedPrebidConfig = { ...prebidConfig };
 
-					mergedPrebidConfig.adServer = adNetworkSettings ? 'AP' : 'Publisher';
+					mergedPrebidConfig.adServer =
+						adNetworkSettings &&
+						adNetworkSettings.dfpAccounts &&
+						adNetworkSettings.dfpAccounts.length
+							? adNetworkSettings.dfpAccounts[0].code === '103512698'
+								? 'AP'
+								: 'Publisher'
+							: 'N/A';
 					mergedPrebidConfig.currency.code = currencyCode || '';
 					mergedPrebidConfig.availableFormats = [
 						{ name: 'Display', value: 'display' },

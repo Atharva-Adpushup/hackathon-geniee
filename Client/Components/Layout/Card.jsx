@@ -48,8 +48,8 @@ Card.defaultProps = {
 	headerClassName: '',
 	bodyClassName: '',
 	footerClassName: '',
-	headerChildren: false,
-	footerChildren: false
+	headerChildren: null,
+	footerChildren: null
 };
 
 export default Card;

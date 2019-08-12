@@ -17,6 +17,6 @@
 	&.wrapper--blocklist {
 		max-height: ($designDimensionSM * 60);
 		overflow: $hidden;
-		overflow-y: $scroll;
+		overflow-y: $auto;
 	}
 }

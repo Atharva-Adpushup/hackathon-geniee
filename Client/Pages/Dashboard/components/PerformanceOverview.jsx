@@ -1,5 +1,5 @@
 import React from 'react';
-import { numberWithCommas } from '../helpers/utils';
+import { numberWithCommas, roundOffTwoDecimal } from '../helpers/utils';
 import { displayMetrics } from '../configs/commonConsts';
 
 class PerformanceOverview extends React.Component {
@@ -19,23 +19,25 @@ class PerformanceOverview extends React.Component {
 		const { result, columns } = data;
 		const displayData = {};
 		const { metrics, siteId, reportType } = this.props;
-		columns.forEach(col => {
-			if (metrics[col]) {
-				displayData[col] = { name: metrics[col].display_name, value: 0 };
-			}
-		});
-		result.forEach(row => {
-			if (reportType === 'site' && row.siteid === siteId)
-				Object.keys(row).map(col => {
-					if (displayData[col]) displayData[col].value = row[col];
-					return true;
-				});
-			else
-				Object.keys(row).map(col => {
-					if (displayData[col]) displayData[col].value += row[col];
-					return true;
-				});
-		});
+		if (columns && result) {
+			columns.forEach(col => {
+				if (metrics[col]) {
+					displayData[col] = { name: metrics[col].display_name, value: 0 };
+				}
+			});
+			result.forEach(row => {
+				if (reportType === 'site' && row.siteid === siteId)
+					Object.keys(row).map(col => {
+						if (displayData[col]) displayData[col].value = row[col];
+						return true;
+					});
+				else
+					Object.keys(row).map(col => {
+						if (displayData[col]) displayData[col].value += row[col];
+						return true;
+					});
+			});
+		}
 		this.setState({ displayData });
 	};
 
@@ -43,20 +45,25 @@ class PerformanceOverview extends React.Component {
 		const { displayData } = this.state;
 		return (
 			<div className="u-margin-t4 u-margin-b4">
-				{Object.keys(displayData).map(key =>
-					displayMetrics[key] ? (
-						<div className="col-sm-4 u-margin-b4 text-center" key={key}>
-							<div className="font-small">{displayData[key].name}</div>
-							<div className="estimatedEarning">
-								<span>
-									{displayMetrics[key].valueType == 'money' ? '$' : ''}
-									{numberWithCommas(Math.round(displayData[key].value * 100) / 100)}
-								</span>
+				{Object.keys(displayData).length > 0 ? (
+					Object.keys(displayData).map(key =>
+						displayMetrics[key] ? (
+							<div className="col-sm-4 u-margin-b4 text-center" key={key}>
+								<div className="font-small">{displayData[key].name}</div>
+								<div className="estimatedEarning">
+									<span>
+										{displayMetrics[key].valueType == 'money'
+											? `$${numberWithCommas(roundOffTwoDecimal(displayData[key].value))}`
+											: numberWithCommas(displayData[key].value)}
+									</span>
+								</div>
 							</div>
-						</div>
-					) : (
-						''
+						) : (
+							''
+						)
 					)
+				) : (
+					<div className="text-center">No Record Found.</div>
 				)}
 			</div>
 		);

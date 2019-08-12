@@ -5,7 +5,11 @@
 const path = require('path');
 const apiRouter = require('./apiRouter');
 
-if (process.env.NODE_ENV !== 'production') {
+const consts = require('../configs/commonConsts');
+
+const isDevelopment = process.env.NODE_ENV === consts.environment.development;
+
+if (isDevelopment) {
 	var swaggerUi = require('swagger-ui-express');
 	var swaggerDocument = require('../configs/swagger.json');
 
@@ -17,7 +21,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 module.exports = function router(app) {
-	if (process.env.NODE_ENV !== 'production') {
+	if (isDevelopment) {
 		// webpack hmr
 		app.use(
 			webpackDevMiddleware(compiler, {
@@ -37,7 +41,7 @@ module.exports = function router(app) {
 
 	// React Catch All Route
 	app.use((req, res) => {
-		if (process.env.NODE_ENV === 'production') {
+		if (!isDevelopment) {
 			// eslint-disable-next-line no-undef
 			const filePath = path.resolve(__basedir, 'clientDist', 'index.html');
 			res.sendFile(filePath);

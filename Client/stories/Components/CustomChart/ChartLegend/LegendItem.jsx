@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { OverlayTrigger, Popover } from 'react-bootstrap';
-import { indexOf } from 'lodash';
+import indexOf from 'lodash/indexOf';
 
 class LegendItem extends Component {
 	constructor(props) {

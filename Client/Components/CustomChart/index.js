@@ -61,7 +61,6 @@ const CustomChart = ({
 
 	if (type === 'pie') {
 		const chartConfig = getCustomChartConfig(type, series, customConfig);
-
 		if (chartConfig.series && chartConfig.series.length) {
 			chartConfig.chart = {
 				...chartConfig.chart,
@@ -89,7 +88,7 @@ const CustomChart = ({
 				containerClass ? ` ${containerClass}` : ''
 			}`}
 		>
-			<div className="error">No Data Found!</div>
+			<div className="error">No Data Found</div>
 		</div>
 	);
 };
@@ -120,7 +119,7 @@ CustomChart.defaultProps = {
 	title: '',
 	type: 'spline',
 	xAxis: {},
-	legends: {},
+	legends: [],
 	customConfig: {},
 	yAxisGroups: [],
 	activeLegendItems: [],

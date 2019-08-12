@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
 import { Nav, NavItem } from 'react-bootstrap';
-import ActionCard from '../../../../Components/ActionCard';
+// import ActionCard from '../../../../Components/ActionCard';
 import AdCodeGeneratorContainer from '../../containers/AdCodeGeneratorContainer';
 import Loader from '../../../../Components/Loader';
 import AdListContainer from '../../containers/AdListContainer';
@@ -88,7 +88,7 @@ class Home extends Component {
 		}
 
 		return (
-			<ActionCard>
+			<div>
 				{!meta.fetched ? (
 					<Loader />
 				) : (
@@ -100,7 +100,7 @@ class Home extends Component {
 						{this.renderContent()}
 					</React.Fragment>
 				)}
-			</ActionCard>
+			</div>
 		);
 	}
 }

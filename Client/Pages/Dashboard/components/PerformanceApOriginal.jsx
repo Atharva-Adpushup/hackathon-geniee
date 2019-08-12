@@ -58,8 +58,7 @@ class PerformanceApOriginal extends React.Component {
 		}
 		this.setState({
 			series,
-			xAxis,
-			isLoading: false
+			xAxis
 		});
 	};
 

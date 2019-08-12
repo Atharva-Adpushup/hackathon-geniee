@@ -200,7 +200,11 @@ class AdElement extends Component {
 	renderInformation(value, actions = [], maxWidth = '80px') {
 		const { ad } = this.props;
 		return (
-			<td key={`${ad.id}-infoKey-${this.getIdentifier()}`} className="ad-td" style={{ maxWidth }}>
+			<td
+				key={`${ad.id}-infoKey-${this.getIdentifier()}`}
+				className="ad-td"
+				style={{ maxWidth, wordBreak: 'break-word' }}
+			>
 				{value}
 				{actions.length ? this.renderActions(actions) : null}
 			</td>

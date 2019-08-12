@@ -101,7 +101,7 @@ class Shell extends React.Component {
 
 		return (
 			<Grid fluid>
-				<Row>
+				<Row style={{ zIndex: 1 }}>
 					<Col>
 						<Header
 							sidebarToggle={this.sidebarToggle}

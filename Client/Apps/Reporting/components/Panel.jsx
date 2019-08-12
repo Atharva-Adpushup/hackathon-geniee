@@ -3,13 +3,21 @@ import { Row, Col } from 'react-bootstrap';
 import moment from 'moment';
 import { Object } from 'es6-shim';
 import qs from 'querystringify';
-import { isEmpty, union } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
+import union from 'lodash/union';
 import ActionCard from '../../../Components/ActionCard/index';
+import Empty from '../../../Components/Empty/index';
 import ControlContainer from '../containers/ControlContainer';
 import TableContainer from '../containers/TableContainer';
 import ChartContainer from '../containers/ChartContainer';
 import reportService from '../../../services/reportService';
-import { displayMetrics } from '../configs/commonConsts';
+import {
+	displayMetrics,
+	accountDisableFilter,
+	accountDisableDimension,
+	opsDimension,
+	opsFilter
+} from '../configs/commonConsts';
 import Loader from '../../../Components/Loader';
 import { convertObjToArr } from '../helpers/utils';
 
@@ -36,7 +44,9 @@ class Panel extends Component {
 			tableData: {},
 			csvData: [],
 			reportType: 'account',
-			isLoading: true
+			isLoading: true,
+			isValidSite: true,
+			isReportingSite: true
 		};
 	}
 
@@ -45,8 +55,13 @@ class Panel extends Component {
 			match: {
 				params: { siteId }
 			},
-			location: { search: queryParams }
+			location: { search: queryParams },
+			userSites,
+			reportingSites
 		} = this.props;
+
+		const isValidSite = !!(userSites && userSites[siteId] && userSites[siteId].siteDomain);
+		const isReportingSite = !!(reportingSites && reportingSites[siteId]);
 
 		let {
 			startDate,
@@ -60,8 +75,16 @@ class Panel extends Component {
 		const selectedControls = qs.parse(queryParams);
 
 		if (siteId) {
-			selectedFilters = { siteid: { [siteId]: true } };
 			reportType = 'site';
+			if (isValidSite && isReportingSite) {
+				selectedFilters = { siteid: { [siteId]: true } };
+			} else if (isValidSite) {
+				this.setState({ isLoading: false, isValidSite: true, isReportingSite: false, reportType });
+				return;
+			} else {
+				this.setState({ isLoading: false, isValidSite: false, isReportingSite: false, reportType });
+				return;
+			}
 		}
 
 		if (Object.keys(selectedControls).length > 0) {
@@ -88,16 +111,35 @@ class Panel extends Component {
 		);
 	}
 
+	removeOpsFilterDimension = (filterList, dimensionList) => {
+		const updatedFilterList = [];
+		const updatedDimensionList = [];
+		filterList.forEach(fil => {
+			const index = opsFilter.indexOf(fil.value);
+			if (index === -1) updatedFilterList.push(fil);
+		});
+		dimensionList.forEach(dim => {
+			const index = opsDimension.indexOf(dim.value);
+			if (index === -1) updatedDimensionList.push(dim);
+		});
+		return { updatedDimensionList, updatedFilterList };
+	};
+
 	disableControl = (disabledFilter, disabledDimension, disabledMetrics) => {
 		const { dimensionList, filterList, metricsList } = this.state;
 
-		filterList.map(filter => {
+		const { updatedDimensionList, updatedFilterList } = this.removeOpsFilterDimension(
+			filterList,
+			dimensionList
+		);
+
+		updatedFilterList.map(filter => {
 			const found = disabledFilter.find(fil => fil === filter.value);
 			if (found) filter.isDisabled = true;
 			else filter.isDisabled = false;
 		});
 
-		dimensionList.map(dimension => {
+		updatedDimensionList.map(dimension => {
 			const found = disabledDimension.find(dim => dim === dimension.value);
 			if (found) dimension.isDisabled = true;
 			else dimension.isDisabled = false;
@@ -110,19 +152,10 @@ class Panel extends Component {
 		});
 
 		return {
-			filterList,
+			updatedFilterList,
 			metricsList,
-			dimensionList
+			updatedDimensionList
 		};
-	};
-
-	getReportType = selectedFilters => {
-		let reportType = 'account';
-		const selectedSiteFilters = selectedFilters.siteid;
-		if (selectedSiteFilters && Object.keys(selectedSiteFilters).length === 1) {
-			reportType = 'site';
-		}
-		return reportType;
 	};
 
 	onControlChange = data => {
@@ -141,7 +174,6 @@ class Panel extends Component {
 			selectedFilters,
 			reportType
 		} = controlParams;
-		//	const reportType = this.getReportType(selectedFilters);
 		const { dimensionList, filterList } = this.state;
 		let disabledFilter = [];
 		let disabledDimension = [];
@@ -160,6 +192,10 @@ class Panel extends Component {
 				disabledMetrics = union(filterObj.disabled_metrics, disabledMetrics);
 			}
 		});
+		if (reportType == 'account') {
+			disabledFilter = union(accountDisableFilter, disabledFilter);
+			disabledDimension = union(accountDisableDimension, disabledDimension);
+		}
 		const updatedControlList = this.disableControl(
 			disabledFilter,
 			disabledDimension,
@@ -173,8 +209,8 @@ class Panel extends Component {
 			selectedDimension,
 			selectedFilters,
 			reportType,
-			dimensionList: updatedControlList.dimensionList,
-			filterList: updatedControlList.filterList,
+			dimensionList: updatedControlList.updatedDimensionList,
+			filterList: updatedControlList.updatedFilterList,
 			metricsList: updatedControlList.metricsList
 		};
 	};
@@ -188,7 +224,7 @@ class Panel extends Component {
 			selectedInterval,
 			metricsList
 		} = this.state;
-		const { site } = this.props;
+		const { userSites } = this.props;
 		let selectedMetrics;
 		if (metricsList) {
 			selectedMetrics = metricsList
@@ -207,7 +243,7 @@ class Panel extends Component {
 			params[filter] = filters.length > 0 ? filters.toString() : null;
 		});
 		if (!params.siteid) {
-			const siteIds = Object.keys(site);
+			const siteIds = Object.keys(userSites);
 			params.siteid = siteIds.toString();
 		}
 		return params;
@@ -229,6 +265,8 @@ class Panel extends Component {
 		this.setState({ csvData });
 	};
 
+	renderEmptyMessage = msg => <Empty message={msg} />;
+
 	renderContent = () => {
 		const {
 			startDate,
@@ -243,8 +281,17 @@ class Panel extends Component {
 			metricsList,
 			tableData,
 			reportType,
-			csvData
+			csvData,
+			isValidSite,
+			isReportingSite
 		} = this.state;
+		if (reportType == 'site') {
+			if (!isValidSite)
+				return this.renderEmptyMessage(
+					'Seems like you have entered an invalid siteid in url. Please check.'
+				);
+			if (!isReportingSite) return this.renderEmptyMessage('No Data Available');
+		}
 		return (
 			<Row>
 				<Col sm={12}>

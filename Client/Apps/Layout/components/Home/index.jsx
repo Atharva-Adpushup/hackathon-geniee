@@ -3,7 +3,7 @@ import { Nav, NavItem } from 'react-bootstrap';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faInfoCircle, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import ActionCard from '../../../../Components/ActionCard/index';
+// import ActionCard from '../../../../Components/ActionCard/index';
 import OverlayTooltip from '../../../../Components/OverlayTooltip/index';
 import ControlTagConversion from './ControlTagConversion';
 import Loader from '../../../../Components/Loader';
@@ -34,7 +34,7 @@ class Home extends Component {
 	getVisualEditorLink = siteId => `/api/visualEditor/${siteId}`;
 
 	handleNavSelect(value) {
-		this.setState({ activeNav: value });
+		if (value) this.setState({ activeNav: value });
 	}
 
 	renderContent() {
@@ -56,7 +56,7 @@ class Home extends Component {
 		const computedEditorLink = this.getVisualEditorLink(siteId);
 
 		return (
-			<ActionCard>
+			<div>
 				<Nav bsStyle="tabs" activeKey={activeNav} onSelect={this.handleNavSelect}>
 					<NavItem eventKey={1}>
 						Transform Code
@@ -68,19 +68,19 @@ class Home extends Component {
 							<FontAwesomeIcon icon="info-circle" className="u-margin-l3" />
 						</OverlayTooltip>
 					</NavItem>
-					<NavItem eventKey={2} href={computedEditorLink}>
+					<NavItem target="_blank" href={computedEditorLink}>
 						Visual Editor
 						<OverlayTooltip
 							id="tooltip-info-visual-editor"
 							placement="top"
 							tooltip="To visit Visual Editor, please click here"
 						>
-							<FontAwesomeIcon icon="info-circle" className="u-margin-l3" />
+							<FontAwesomeIcon icon="external-link-alt" className="u-margin-l3" />
 						</OverlayTooltip>
 					</NavItem>
 				</Nav>
 				{this.renderContent()}
-			</ActionCard>
+			</div>
 		);
 	}
 }

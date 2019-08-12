@@ -2,9 +2,11 @@ const express = require('express');
 const Promise = require('bluebird');
 const uuid = require('uuid');
 const moment = require('moment');
+
 const config = require('../configs/config');
 const { sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFunctions');
 const { docKeys, tagManagerInitialDoc } = require('../configs/commonConsts');
+const { generateSectionName } = require('../helpers/clientServerHelpers');
 const {
 	appBucket,
 	errorHandler,
@@ -27,10 +29,18 @@ const fn = {
 		const cas = data.cas || false;
 		const value = data.value || data;
 		const id = uuid.v4();
+		const name = generateSectionName({
+			width: payload.ad.width,
+			height: payload.ad.height,
+			platform: payload.ad.formatData.platform || null,
+			pagegroup: null,
+			id,
+			service: 'T'
+		});
 		const ad = {
 			...payload.ad,
 			id,
-			name: `Ad-${id}`,
+			name,
 			createdOn: +new Date(),
 			formatData: {
 				...payload.ad.formatData
@@ -55,16 +65,27 @@ const fn = {
 			});
 		}
 
-		return Promise.resolve([cas, value, id, payload.siteId]);
+		return Promise.resolve([
+			cas,
+			value,
+			{
+				id,
+				name
+			},
+			payload.siteId
+		]);
 	},
-	getAndUpdate: (key, value, adId) =>
-		appBucket
-			.getDoc(key)
-			.then(result => appBucket.updateDoc(key, value, result.cas).then(() => adId)),
-	directDBUpdate: (key, value, cas, adId) => appBucket.updateDoc(key, value, cas).then(() => adId),
-	dbWrapper: (cas, value, adId, siteId) => {
+	getAndUpdate: (key, value) =>
+		appBucket.getDoc(key).then(result => appBucket.updateDoc(key, value, result.cas)),
+	directDBUpdate: (key, value, cas) => appBucket.updateDoc(key, value, cas),
+	dbWrapper: (cas, value, toReturn, siteId) => {
 		const key = `${docKeys.apTag}${siteId}`;
-		return !cas ? fn.getAndUpdate(key, value, adId) : fn.directDBUpdate(key, value, cas, adId);
+
+		function dbOperation() {
+			return !cas ? fn.getAndUpdate(key, value) : fn.directDBUpdate(key, value, cas);
+		}
+
+		return dbOperation().then(() => toReturn);
 	},
 	adUpdateProcessing: (req, res, key, processing) =>
 		appBucket
@@ -100,11 +121,11 @@ router
 					: Promise.reject(err)
 			)
 			.spread(fn.dbWrapper)
-			.then(id =>
+			.then(toReturn =>
 				sendSuccessResponse(
 					{
 						message: 'Ad created',
-						id
+						...toReturn
 					},
 					res
 				)
