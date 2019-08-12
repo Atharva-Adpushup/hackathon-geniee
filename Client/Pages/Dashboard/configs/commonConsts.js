@@ -60,15 +60,11 @@ const yAxisGroups = [
 		seriesNames: ['AdPushup Variation Page RPM', 'Original Variation Page RPM'],
 		yAxisConfig: {
 			labels: {
+				// eslint-disable-next-line no-template-curly-in-string
 				format: '${value}'
 			}
 		}
 	}
-];
-
-const activeLegendItemArray = [
-	{ value: 'adpushup_variation_page_cpm', name: 'AdPushup Variation Page RPM', valueType: 'money' },
-	{ value: 'original_variation_page_cpm', name: 'Original Variation Page RPM', valueType: 'number' }
 ];
 const tableHeader = [
 	{ title: 'Website', prop: 'siteName' },
