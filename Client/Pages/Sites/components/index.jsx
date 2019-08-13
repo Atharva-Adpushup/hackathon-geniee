@@ -70,6 +70,7 @@ class MySites extends React.Component {
 				return false;
 			});
 		else {
+			this.setState({ isLoading: false });
 			Promise.all(siteIds.map(ref.fetchSiteAppStatusesCallback));
 		}
 		return false;
