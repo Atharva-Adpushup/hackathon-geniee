@@ -280,7 +280,7 @@ class AddManageNonResponsiveBidder extends React.Component {
 		);
 
 		if (validationResult.isValid) {
-			this.setState({ errors: {} });
+			this.setState({ errors: {}, formError: '' });
 
 			const siteLevelParamsKeys = Object.keys(formFields.params.siteLevel);
 			const siteLevelParamsCount = siteLevelParamsKeys.length;
@@ -291,16 +291,16 @@ class AddManageNonResponsiveBidder extends React.Component {
 					hiddenParamsCount
 				} = this.getSiteLevelParamsCountByType(formFields.params.siteLevel);
 
-				// if visible siteLevel params exist and params are not added for any size
-				if (visibleParamsCount && !Object.keys(params).length) {
-					this.setState({ formError: 'Please fill params for atleast one size.' });
-					return;
-				}
-
 				// if required visible siteLevel params exist and
 				// not added for all sizes then show error
 				if (requiredVisibleParamsCount && Object.keys(params).length < Object.keys(sizes).length) {
 					this.setState({ formError: 'Please fill params for all sizes.' });
+					return;
+				}
+
+				// if visible siteLevel params exist and params are not added for any size
+				if (visibleParamsCount && !Object.keys(params).length) {
+					this.setState({ formError: 'Please fill params for atleast one size.' });
 					return;
 				}
 

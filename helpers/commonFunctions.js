@@ -677,24 +677,30 @@ const Promise = require('bluebird'),
 			.then(json => json.value);
 	},
 	verifyKeysInCollection = (target, source) => {
+		let recursionLevel = 0;
+
 		function verifyKeys(target, source) {
-			if (
-				typeof target === 'object' &&
-				target !== null &&
-				typeof source === 'object' &&
-				source !== null
-			) {
+			recursionLevel++;
+
+			const isTargetObj = typeof target === 'object' && target !== null;
+			const isSourceObj = typeof source === 'object' && source !== null;
+			
+			if (isTargetObj && isSourceObj) {
 				for (const key in source) {
 					if (source.hasOwnProperty(key) && !target.hasOwnProperty(key)) {
 						return false;
 					}
-					if (verifyKeysInCollection(target[key], source[key]) === false) {
+					if (verifyKeys(target[key], source[key]) === false) {
 						return false;
 					}
 				}
 			}
+			
+			if((!isSourceObj || !isTargetObj) && recursionLevel === 1) return false;
+			
+			if(isSourceObj && !isTargetObj) return false;
 		}
-		
+    
 		return verifyKeys(target, source) === false ? false : true;
 	},
 	deleteKeysInCollection = (target, source) => {
