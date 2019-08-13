@@ -253,9 +253,11 @@ export function getCustomChartConfig(
 				headerFormat: '<span style="font-size:14px;font-weight:bold">{point.key}</span><br/>',
 				pointFormatter() {
 					const point = this;
-					return `<span style="color:${point.color}">\u25CF</span> ${point.series.name}: <b>$${
-						point.y
-					}</b><br/>`;
+					const isMoneyValueType = !!(point.series.valueType === 'money');
+					const computedValuePrefix = isMoneyValueType ? '$' : '';
+					return `<span style="color:${point.color}">\u25CF</span> ${
+						point.series.name
+					}: <b>${computedValuePrefix}${point.y}</b><br/>`;
 				}
 			};
 		}

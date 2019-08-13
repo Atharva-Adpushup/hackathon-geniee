@@ -6,7 +6,8 @@ import { roundOffTwoDecimal } from '../helpers/utils';
 
 class SitewiseReport extends React.Component {
 	state = {
-		series: []
+		series: [],
+		yAxisGroupsData: yAxisGroups
 	};
 
 	componentDidMount() {
@@ -14,33 +15,85 @@ class SitewiseReport extends React.Component {
 		this.computeGraphData(displayData.result);
 	}
 
+	getValidLabels = () => {
+		const { labels } = this.props;
+		const isValid = !!(
+			labels &&
+			labels.legend &&
+			labels.name &&
+			labels.metric &&
+			labels.metricValueType
+		);
+		const resultData = { labels, isValid };
+
+		return resultData;
+	};
+
+	getComputedYAxisGroups = inputData => {
+		const resultData = [...inputData];
+		const firstSeries = resultData[0];
+
+		firstSeries.seriesNames = [];
+		firstSeries.yAxisConfig = {
+			labels: {
+				format: '{value}'
+			}
+		};
+
+		resultData[0] = { ...firstSeries };
+		return resultData;
+	};
+
 	computeGraphData = results => {
+		const { yAxisGroupsData } = this.state;
+		const labelData = this.getValidLabels();
+		const legendLabel = (labelData.isValid && labelData.labels.legend) || 'Revenue';
+		const nameLabel = (labelData.isValid && labelData.labels.name) || 'network';
+		const metricLabel = (labelData.isValid && labelData.labels.metric) || 'revenue';
+		const metricValueType = (labelData.isValid && labelData.labels.metricValueType) || 'money';
+		const isMetricLabelRevenue = !!(metricLabel === 'revenue');
+		const computedYAxisGroups = isMetricLabelRevenue
+			? yAxisGroupsData
+			: this.getComputedYAxisGroups(yAxisGroupsData);
 		const series = [
 			{
-				name: 'Revenue',
+				name: legendLabel,
 				colorByPoint: true,
 				data: []
 			}
 		];
 		const seriesData = [];
-		if (results)
+
+		if (results) {
 			results.forEach(result => {
+				const computedY = isMetricLabelRevenue
+					? parseFloat(roundOffTwoDecimal(result[metricLabel]))
+					: result[metricLabel];
+
 				seriesData.push({
-					name: result.network,
-					y: parseFloat(roundOffTwoDecimal(result.revenue))
+					name: result[nameLabel],
+					y: computedY,
+					valueType: metricValueType
 				});
 			});
+		}
+
 		series[0].data = seriesData;
-		this.setState({ series });
+		this.setState({ series, yAxisGroupsData: computedYAxisGroups });
 	};
 
 	renderChart() {
 		const type = 'pie';
-		const { series } = this.state;
+		const { series, yAxisGroupsData } = this.state;
 		if (series && series.length && series[0].data && series[0].data.length)
 			return (
 				<div>
-					<CustomChart type={type} xAxis={data.xAxis} series={series} yAxisGroups={yAxisGroups} />
+					<CustomChart
+						type={type}
+						xAxis={data.xAxis}
+						series={series}
+						yAxisGroups={yAxisGroupsData}
+					/>
 				</div>
 			);
 		return <div className="text-center">No Record Found.</div>;

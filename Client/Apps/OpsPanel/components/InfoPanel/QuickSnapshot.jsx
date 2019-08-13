@@ -51,6 +51,15 @@ class QuickSnapshot extends React.Component {
 	};
 
 	getWidgetConfig = (widgets, widgetsList) => {
+		const {
+			widgetsName: {
+				PER_AP_ORIGINAL,
+				OPS_TOP_SITES,
+				OPS_COUNTRY_REPORT,
+				OPS_NETWORK_REPORT,
+				OPS_ERROR_REPORT
+			}
+		} = this.props;
 		const sortedWidgets = sortBy(widgets, ['position', 'name']);
 		const widgetsConfig = [];
 
@@ -63,20 +72,26 @@ class QuickSnapshot extends React.Component {
 				widget.isDataSufficient = false;
 				widget.selectedSite = 'all';
 
-				// if (reportType == 'site' || widget.name == 'per_ap_original')
-				// 	widget.selectedSite = selectedSite;
-				// else widget.selectedSite = 'all';
+				switch (widget.name) {
+					case PER_AP_ORIGINAL:
+						widget.selectedDimension = 'page_variation_type';
+						break;
 
-				if (widget.name === 'per_ap_original') {
-					widget.selectedDimension = 'page_variation_type';
-				}
+					case OPS_TOP_SITES:
+						widget.selectedDimension = 'siteid';
+						break;
 
-				if (widget.name === 'rev_by_network') {
-					widget.selectedDimension = 'network';
-				}
+					case OPS_COUNTRY_REPORT:
+						widget.selectedDimension = 'adpushup_page_views';
+						widget.path += `&metrics=adpushup_page_views`;
+						break;
 
-				if (widget.name === 'ops_top_sites') {
-					widget.selectedDimension = 'siteid';
+					case OPS_NETWORK_REPORT:
+						widget.selectedDimension = 'adpushup_page_views';
+						widget.path += `&metrics=network_net_revenue`;
+						break;
+
+					default:
 				}
 
 				widgetsConfig.push(widget);
@@ -86,15 +101,65 @@ class QuickSnapshot extends React.Component {
 		return widgetsConfig;
 	};
 
+	getPieChartLabelData = inputData => {
+		const { metrics, filter } = this.props;
+		const isValidData = !!(
+			inputData.columns &&
+			inputData.columns.length &&
+			inputData.result &&
+			inputData.result.length
+		);
+		const resultObj = {
+			legend: '',
+			name: '',
+			metric: '',
+			metricValueType: ''
+		};
+
+		if (!isValidData) {
+			return resultObj;
+		}
+
+		const metricLabel = inputData.columns[0];
+		const filterLabel = inputData.columns[1];
+		const isValidMetricLabel = !!(metricLabel && metrics[metricLabel]);
+		const isValidFilterLabel = !!(filterLabel && filter[filterLabel]);
+		const isValidLabels = isValidMetricLabel && isValidFilterLabel;
+
+		if (!isValidLabels) {
+			return resultObj;
+		}
+
+		resultObj.legend = metrics[metricLabel].display_name;
+		resultObj.metricValueType = metrics[metricLabel].valueType;
+		resultObj.name = filterLabel;
+		resultObj.metric = metricLabel;
+
+		return resultObj;
+	};
+
 	getWidgetComponent = widget => {
-		const { reportType } = this.props;
+		const {
+			reportType,
+			widgetsName: {
+				ESTIMATED_EARNINGS,
+				PER_AP_ORIGINAL,
+				PER_OVERVIEW,
+				OPS_TOP_SITES,
+				OPS_COUNTRY_REPORT,
+				OPS_NETWORK_REPORT,
+				OPS_ERROR_REPORT
+			}
+		} = this.props;
+		let pieChartLabelNameData;
+
 		if (widget.isLoading) return <Loader height="20vh" />;
 
 		switch (widget.name) {
-			case 'estimated_earnings':
+			case ESTIMATED_EARNINGS:
 				return <EstimatedEarningsContainer displayData={widget.data} />;
 
-			case 'per_ap_original':
+			case PER_AP_ORIGINAL:
 				return (
 					<PerformanceApOriginalContainer
 						displayData={widget.data}
@@ -102,10 +167,10 @@ class QuickSnapshot extends React.Component {
 					/>
 				);
 
-			case 'per_overview':
+			case PER_OVERVIEW:
 				return <PerformanceOverviewContainer displayData={widget.data} />;
 
-			case 'ops_top_sites':
+			case OPS_TOP_SITES:
 				return <TopSitesReportContainer displayData={widget.data} />;
 
 			case 'ops_top_sites_daily':
@@ -114,8 +179,10 @@ class QuickSnapshot extends React.Component {
 				}
 				return '';
 
-			case 'rev_by_network':
-				return <RevenueContainer displayData={widget.data} />;
+			case OPS_COUNTRY_REPORT:
+			case OPS_NETWORK_REPORT:
+				pieChartLabelNameData = this.getPieChartLabelData(widget.data);
+				return <RevenueContainer labels={pieChartLabelNameData} displayData={widget.data} />;
 			default:
 		}
 
@@ -143,6 +210,9 @@ class QuickSnapshot extends React.Component {
 			delete params.siteid;
 			params.isSuperUser = true;
 		}
+
+		params.fromDate = '2019-08-05';
+		params.toDate = '2019-08-06';
 
 		widgetsConfig[wid].startDate = params.fromDate;
 		widgetsConfig[wid].endDate = params.toDate;
