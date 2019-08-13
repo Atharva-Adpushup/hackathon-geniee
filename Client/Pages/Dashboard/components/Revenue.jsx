@@ -12,11 +12,48 @@ class SitewiseReport extends React.Component {
 
 	componentDidMount() {
 		const { displayData } = this.props;
-		this.computeGraphData(displayData.result);
+		this.computeGraphData(displayData);
 	}
 
-	getValidLabels = () => {
-		const { labels } = this.props;
+	getPieChartLabelData = inputData => {
+		const { metrics, filter } = this.props;
+		const isValidData = !!(
+			inputData.columns &&
+			inputData.columns.length &&
+			inputData.result &&
+			inputData.result.length
+		);
+		const resultObj = {
+			legend: '',
+			name: '',
+			metric: '',
+			metricValueType: ''
+		};
+
+		if (!isValidData) {
+			return resultObj;
+		}
+
+		const metricLabel = inputData.columns[0];
+		const filterLabel = inputData.columns[1];
+		const isValidMetricLabel = !!(metricLabel && metrics[metricLabel]);
+		const isValidFilterLabel = !!(filterLabel && filter[filterLabel]);
+		const isValidLabels = isValidMetricLabel && isValidFilterLabel;
+
+		if (!isValidLabels) {
+			return resultObj;
+		}
+
+		resultObj.legend = metrics[metricLabel].display_name;
+		resultObj.metricValueType = metrics[metricLabel].valueType;
+		resultObj.name = filterLabel;
+		resultObj.metric = metricLabel;
+
+		return resultObj;
+	};
+
+	getValidLabels = reportData => {
+		const labels = this.getPieChartLabelData(reportData);
 		const isValid = !!(
 			labels &&
 			labels.legend &&
@@ -44,9 +81,10 @@ class SitewiseReport extends React.Component {
 		return resultData;
 	};
 
-	computeGraphData = results => {
+	computeGraphData = reportData => {
+		const { result: resultData } = reportData;
 		const { yAxisGroupsData } = this.state;
-		const labelData = this.getValidLabels();
+		const labelData = this.getValidLabels(reportData);
 		const legendLabel = (labelData.isValid && labelData.labels.legend) || 'Revenue';
 		const nameLabel = (labelData.isValid && labelData.labels.name) || 'network';
 		const metricLabel = (labelData.isValid && labelData.labels.metric) || 'revenue';
@@ -64,8 +102,8 @@ class SitewiseReport extends React.Component {
 		];
 		const seriesData = [];
 
-		if (results) {
-			results.forEach(result => {
+		if (resultData) {
+			resultData.forEach(result => {
 				const computedY = isMetricLabelRevenue
 					? parseFloat(roundOffTwoDecimal(result[metricLabel]))
 					: result[metricLabel];
