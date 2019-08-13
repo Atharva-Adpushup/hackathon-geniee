@@ -27,11 +27,9 @@ function getBiddersFromNetworkTree() {
 			const biddersFromNetworkTree = {};
 
 			for (const bidderCode in networkTree) {
-				if (networkTree.hasOwnProperty(bidderCode)) {
-					if (networkTree[bidderCode].isHb) {
-						biddersFromNetworkTree[bidderCode] =
-							networkTree[bidderCode];
-					}
+				if (networkTree.hasOwnProperty(bidderCode) && networkTree[bidderCode].isHb) {
+					biddersFromNetworkTree[bidderCode] =
+						networkTree[bidderCode];
 				}
 			}
 
