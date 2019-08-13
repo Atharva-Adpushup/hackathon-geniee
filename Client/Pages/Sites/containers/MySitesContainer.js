@@ -1,21 +1,20 @@
 import { connect } from 'react-redux';
 import MySites from '../components/index';
 import { addNewSite } from '../../../actions/siteActions';
+import { fetchReportingMeta } from '../../../actions/globalActions';
 
 const mapStateToProps = (state, ownProps) => {
 	const {
 		user: {
 			data: { sites, isSuperUser }
 		},
-		reports: {
-			data: { site: reportSites }
-		},
+		reports,
 		sites: { data: globalSites }
 	} = state.global;
 
 	return {
 		sites,
-		reportSites,
+		reportsMeta: reports,
 		globalSites,
 		isSuperUser,
 		...ownProps
@@ -23,7 +22,8 @@ const mapStateToProps = (state, ownProps) => {
 };
 
 const mapDispatchToProps = dispatch => ({
-	updateSiteData: siteObj => dispatch(addNewSite(siteObj))
+	updateSiteData: siteObj => dispatch(addNewSite(siteObj)),
+	fetchReportingMeta: params => dispatch(fetchReportingMeta(params))
 });
 
 export default connect(

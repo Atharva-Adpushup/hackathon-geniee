@@ -154,14 +154,14 @@ router
 					}
 					let params = { siteid: Object.keys(sites).toString(), isSuperUser };
 
-					return getReportsMetaData(params).then(reports => {
-						return res.status(httpStatus.OK).json({
-							user: { ...userData, isSuperUser },
-							networkConfig,
-							sites,
-							reports
-						});
+					//return getReportsMetaData(params).then(reports => {
+					return res.status(httpStatus.OK).json({
+						user: { ...userData, isSuperUser },
+						networkConfig,
+						sites
+						//		reports
 					});
+					//});
 				})
 			)
 			.catch(err => {

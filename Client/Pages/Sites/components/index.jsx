@@ -19,6 +19,8 @@ import OverlayTooltip from '../../../Components/OverlayTooltip/index';
 import Card from '../../../Components/Layout/Card';
 import OnboardingCard from '../../../Components/OnboardingCard';
 import CustomButton from '../../../Components/CustomButton';
+import reportService from '../../../services/reportService';
+import Loader from '../../../Components/Loader/index';
 
 import {
 	SITE_SETUP_STATUS,
@@ -44,22 +46,32 @@ class MySites extends React.Component {
 	constructor(props) {
 		super(props);
 		const sites = this.getValidSites(props);
-		this.state = { sites };
+		this.state = { sites, isLoading: true };
 	}
 
 	componentDidMount() {
 		const ref = this;
 		const { sites } = ref.state;
 		const isSites = ref.getValidObject(sites);
-
+		const { reportsMeta, fetchReportingMeta } = this.props;
 		if (!isSites) {
 			return false;
 		}
 
 		const siteIds = Object.keys(sites);
-
 		Promise.all(siteIds.map(ref.fetchSiteAppStatusesCallback));
 
+		if (!reportsMeta.fetched)
+			reportService.getMetaData({ sites: siteIds }).then(response => {
+				const { data } = response;
+				fetchReportingMeta(data);
+				this.setState({ isLoading: false });
+				Promise.all(siteIds.map(ref.fetchSiteAppStatusesCallback));
+				return false;
+			});
+		else {
+			Promise.all(siteIds.map(ref.fetchSiteAppStatusesCallback));
+		}
 		return false;
 	}
 
@@ -146,7 +158,8 @@ class MySites extends React.Component {
 	};
 
 	checkValidAppStatusInReportData(siteId) {
-		const { reportSites } = this.props;
+		const { reportsMeta } = this.props;
+		const { site: reportSites } = reportsMeta.data;
 		const isReportData = this.getValidObject(reportSites);
 		const isValidAppStatusInReportData = !!(
 			isReportData &&
@@ -354,14 +367,15 @@ class MySites extends React.Component {
 	}
 
 	render() {
-		const { sites } = this.state;
+		const { sites, isLoading } = this.state;
 		const isValidUserSites = this.getValidObject(sites);
 		let computedRootFlexboxClasses = isValidUserSites
 			? 'aligner aligner--row aligner--wrap'
 			: 'aligner aligner--vCenter aligner--hCenter';
 		computedRootFlexboxClasses = `my-sites-wrapper ${computedRootFlexboxClasses}`;
-
-		return (
+		return isLoading ? (
+			<Loader />
+		) : (
 			<div title="My Sites">
 				<div className={computedRootFlexboxClasses}>
 					{isValidUserSites ? this.renderStatusCards() : this.renderOnboardingCard()}

@@ -21,23 +21,17 @@ import CustomButton from '../../../Components/CustomButton';
 class Dashboard extends React.Component {
 	constructor(props) {
 		super(props);
-		const { widget, reportType, siteId, widgetsList, sites, reportingSites } = props;
-		const allUserSites = [{ name: 'All', value: 'all' }, ...convertObjToArr(sites)];
-		const topPerformingSite = reportingSites
-			? this.getTopPerformingSites(allUserSites, reportingSites)
-			: null;
-		const selectedSite = reportType == 'site' ? siteId : topPerformingSite || 'all';
-		const widgetsConfig = this.getWidgetConfig(widget, selectedSite, reportType, widgetsList);
 		this.state = {
 			quickDates: dates,
-			sites: allUserSites,
-			widgetsConfig
+			sites: [],
+			widgetsConfig: [],
+			isLoading: true,
 		};
 	}
 
 	componentDidMount() {
-		const { showNotification, user } = this.props;
-		const { widgetsConfig } = this.state;
+		const { showNotification, user, sites, reportsMeta, fetchReportingMeta } = this.props;
+		const userSitesArr = Object.keys(sites);
 		if (!user.data.isPaymentDetailsComplete && !window.location.pathname.includes('payment')) {
 			showNotification({
 				mode: 'error',
@@ -47,10 +41,37 @@ class Dashboard extends React.Component {
 				autoDismiss: 0
 			});
 		}
-		Object.keys(widgetsConfig).forEach(wid => {
-			this.getDisplayData(wid);
-		});
+		if (!reportsMeta.fetched)
+			reportService.getMetaData({ sites: userSitesArr }).then(response => {
+				const { data } = response;
+				fetchReportingMeta(data);
+				this.getContentInfo(data);
+			});
+		else this.getContentInfo(reportsMeta.data);
 	}
+
+	getContentInfo = reportsMetaData => {
+		const { reportType, siteId, widgetsList, sites } = this.props;
+		const { site: reportingSites, widget } = reportsMetaData;
+		const allUserSites = [{ name: 'All', value: 'all' }, ...convertObjToArr(sites)];
+		const topPerformingSite = reportingSites
+			? this.getTopPerformingSites(allUserSites, reportingSites)
+			: null;
+		const selectedSite = reportType == 'site' ? siteId : topPerformingSite || 'all';
+		const widgetsConfig = this.getWidgetConfig(widget, selectedSite, reportType, widgetsList);
+		this.setState(
+			{
+				sites: allUserSites,
+				widgetsConfig,
+				isLoading:false
+			},
+			() => {
+				widgetsConfig.forEach((wid, index) => {
+					this.getDisplayData(index);
+				});
+			}
+		);
+	};
 
 	getTopPerformingSites = (allUserSites, reportingSites) => {
 		let topPerformingSite;
@@ -126,7 +147,8 @@ class Dashboard extends React.Component {
 	getDisplayData = wid => {
 		const { widgetsConfig } = this.state;
 		const { selectedDate, selectedSite, path, name } = widgetsConfig[wid];
-		const { sites, reportingSites } = this.props;
+		const { sites, reportsMeta } = this.props;
+		const { site:reportingSites } = reportsMeta.data;
 		const siteIds = Object.keys(sites);
 		const params = getDateRange(selectedDate);
 		const hidPerApOriginData =
@@ -179,7 +201,8 @@ class Dashboard extends React.Component {
 	};
 
 	showApBaselineWidget = () => {
-		const { siteId, reportType, reportingSites } = this.props;
+		const { siteId, reportType, reportsMeta } = this.props;
+		const { site:reportingSites } = reportsMeta.data;
 		const { sites } = this.state;
 		if (
 			reportType == 'site' &&
@@ -196,7 +219,8 @@ class Dashboard extends React.Component {
 	};
 
 	renderControl(wid) {
-		const { reportType, reportingSites } = this.props;
+		const { reportType, reportsMeta } = this.props;
+		const { site:reportingSites } = reportsMeta.data;
 		const { widgetsConfig, quickDates, sites } = this.state;
 		const { selectedDate, selectedSite, name } = widgetsConfig[wid];
 		const layoutSites = reportingSites ? this.getLayoutSites(sites, reportingSites) : [];
@@ -283,8 +307,8 @@ class Dashboard extends React.Component {
 		const { widgetsConfig } = this.state;
 		const content = [];
 		const hasLayoutSite = this.showApBaselineWidget();
-		Object.keys(widgetsConfig).forEach(wid => {
-			const widget = widgetsConfig[wid];
+		widgetsConfig.forEach((widget,index) => {
+			//const widget = widgetsConfig[wid];
 			const widgetComponent = this.getWidgetComponent(widget);
 			if ((widget.name == 'per_ap_original' && hasLayoutSite) || widget.name != 'per_ap_original')
 				content.push(
@@ -300,14 +324,14 @@ class Dashboard extends React.Component {
 						headerChildren={
 							<div className="aligner aligner--row">
 								<span className="aligner-item card-header-title">{widget.display_name}</span>
-								{this.renderControl(wid)}
+								{this.renderControl(index)}
 							</div>
 						}
 						bodyClassName="card-body"
 						bodyChildren={widgetComponent}
 						footerClassName="card-footer"
 						footerChildren={
-							widget.name !== 'estimated_earnings' ? this.renderViewReportButton(wid) : <span />
+							widget.name !== 'estimated_earnings' ? this.renderViewReportButton(index) : <span />
 						}
 					/>
 				);
@@ -343,8 +367,12 @@ class Dashboard extends React.Component {
 	}
 
 	render() {
-		const { sites } = this.props;
+		const { sites, reportsMeta } = this.props;
+		const {isLoading}=this.state;
 		const isValidUserSites = Object.keys(sites).length;
+		if (!reportsMeta.fetched|| isLoading) {
+			return <Loader />;
+		}
 		return (
 			<Fragment>{isValidUserSites ? this.renderContent() : this.renderOnboardingCard()}</Fragment>
 		);

@@ -25,9 +25,9 @@ class Panel extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			dimensionList: convertObjToArr(props.dimension),
-			filterList: convertObjToArr(props.filter),
-			intervalList: convertObjToArr(props.interval),
+			dimensionList: [],
+			filterList: [],
+			intervalList: [],
 			metricsList: displayMetrics,
 			selectedDimension: '',
 			selectedFilters: {},
@@ -51,64 +51,15 @@ class Panel extends Component {
 	}
 
 	componentDidMount() {
-		const {
-			match: {
-				params: { siteId }
-			},
-			location: { search: queryParams },
-			userSites,
-			reportingSites
-		} = this.props;
-
-		const isValidSite = !!(userSites && userSites[siteId] && userSites[siteId].siteDomain);
-		const isReportingSite = !!(reportingSites && reportingSites[siteId]);
-
-		let {
-			startDate,
-			endDate,
-			selectedInterval,
-			selectedDimension,
-			selectedFilters,
-			reportType
-		} = this.state;
-
-		const selectedControls = qs.parse(queryParams);
-
-		if (siteId) {
-			reportType = 'site';
-			if (isValidSite && isReportingSite) {
-				selectedFilters = { siteid: { [siteId]: true } };
-			} else if (isValidSite) {
-				this.setState({ isLoading: false, isValidSite: true, isReportingSite: false, reportType });
-				return;
-			} else {
-				this.setState({ isLoading: false, isValidSite: false, isReportingSite: false, reportType });
-				return;
-			}
-		}
-
-		if (Object.keys(selectedControls).length > 0) {
-			const { dimension, interval, fromDate, toDate } = selectedControls;
-			selectedDimension = dimension;
-			selectedInterval = interval || 'daily';
-			startDate = fromDate;
-			endDate = toDate;
-		}
-
-		const params = this.getControlChangedParams({
-			startDate,
-			endDate,
-			selectedInterval,
-			selectedDimension,
-			selectedFilters,
-			reportType
-		});
-		this.setState(
-			{
-				...params
-			},
-			this.generateButtonHandler
-		);
+		const { reportsMeta, userSites, fetchReportingMeta } = this.props;
+		const userSitesArr = Object.keys(userSites);
+		if (!reportsMeta.fetched)
+			reportService.getMetaData({ sites: userSitesArr }).then(response => {
+				const { data } = response;
+				fetchReportingMeta(data);
+				this.getContentInfo(data);
+			});
+		else this.getContentInfo(reportsMeta.data);
 	}
 
 	removeOpsFilterDimension = (filterList, dimensionList) => {
@@ -126,8 +77,11 @@ class Panel extends Component {
 	};
 
 	disableControl = (disabledFilter, disabledDimension, disabledMetrics) => {
-		const { dimensionList, filterList, metricsList } = this.state;
-
+		const { metricsList } = this.state;
+		const { reportsMeta } = this.props;
+		const { dimension: dimensionListObj, filter: filterListObj } = reportsMeta.data;
+		const dimensionList = convertObjToArr(dimensionListObj);
+		const filterList = convertObjToArr(filterListObj);
 		const { updatedDimensionList, updatedFilterList } = this.removeOpsFilterDimension(
 			filterList,
 			dimensionList
@@ -166,26 +120,20 @@ class Panel extends Component {
 	};
 
 	getControlChangedParams = controlParams => {
-		const {
-			startDate,
-			endDate,
-			selectedInterval,
-			selectedDimension,
-			selectedFilters,
-			reportType
-		} = controlParams;
-		const { dimensionList, filterList } = this.state;
+		const { selectedDimension, selectedFilters, reportType } = controlParams;
+		const { reportsMeta } = this.props;
+		const { dimension: dimensionList, filter: filterList } = reportsMeta.data;
 		let disabledFilter = [];
 		let disabledDimension = [];
 		let disabledMetrics = [];
-		const dimensionObj = dimensionList.find(dimension => dimension.value === selectedDimension);
+		const dimensionObj = dimensionList[selectedDimension];
 		if (dimensionObj) {
 			disabledFilter = dimensionObj.disabled_filter || disabledFilter;
 			disabledDimension = dimensionObj.disabled_dimension || disabledDimension;
 			disabledMetrics = dimensionObj.disabled_metrics || disabledMetrics;
 		}
 		Object.keys(selectedFilters).forEach(selectedFilter => {
-			const filterObj = filterList.find(filter => filter.value === selectedFilter);
+			const filterObj = filterList[selectedFilter];
 			if (filterObj && !isEmpty(selectedFilters[selectedFilter])) {
 				disabledFilter = union(filterObj.disabled_filter, disabledFilter);
 				disabledDimension = union(filterObj.disabled_dimension, disabledDimension);
@@ -203,12 +151,6 @@ class Panel extends Component {
 		);
 
 		return {
-			startDate,
-			endDate,
-			selectedInterval,
-			selectedDimension,
-			selectedFilters,
-			reportType,
 			dimensionList: updatedControlList.updatedDimensionList,
 			filterList: updatedControlList.updatedFilterList,
 			metricsList: updatedControlList.metricsList
@@ -250,14 +192,13 @@ class Panel extends Component {
 	};
 
 	generateButtonHandler = () => {
-		this.setState({ isLoading: true });
+		let { tableData } = this.state;
 		const params = this.formateReportParams();
-
 		reportService.getCustomStats(params).then(response => {
 			if (response.status == 200 && response.data) {
-				this.setState({ tableData: response.data });
+				tableData = response.data;
 			}
-			this.setState({ isLoading: false });
+			this.setState({ isLoading: false, tableData });
 		});
 	};
 
@@ -267,23 +208,82 @@ class Panel extends Component {
 
 	renderEmptyMessage = msg => <Empty message={msg} />;
 
-	renderContent = () => {
-		const {
-			startDate,
-			endDate,
+	getContentInfo = reportsMetaData => {
+		let {
 			selectedDimension,
 			selectedFilters,
-			selectedMetrics,
 			selectedInterval,
-			dimensionList,
-			filterList,
-			intervalList,
-			metricsList,
-			tableData,
 			reportType,
+			startDate,
+			endDate
+		} = this.state;
+		const {
+			match: {
+				params: { siteId }
+			},
+			location: { search: queryParams },
+			userSites
+		} = this.props;
+		const { site: reportingSites, interval: intervalsObj } = reportsMetaData;
+		const selectedControls = qs.parse(queryParams);
+		const isValidSite = !!(userSites && userSites[siteId] && userSites[siteId].siteDomain);
+		const isReportingSite = !!(reportingSites && reportingSites[siteId]);
+		if (siteId) {
+			reportType = 'site';
+			if (isValidSite && isReportingSite) {
+				selectedFilters = { siteid: { [siteId]: true } };
+			}
+		}
+		if (Object.keys(selectedControls).length > 0) {
+			const { dimension, interval, fromDate, toDate } = selectedControls;
+			selectedDimension = dimension;
+			selectedInterval = interval || 'daily';
+			startDate = fromDate;
+			endDate = toDate;
+		}
+		const { dimensionList, filterList, metricsList } = this.getControlChangedParams({
+			startDate,
+			endDate,
+			selectedInterval,
+			selectedDimension,
+			selectedFilters,
+			reportType
+		});
+		const intervalList = convertObjToArr(intervalsObj);
+		this.setState(
+			{
+				startDate,
+				endDate,
+				selectedInterval,
+				selectedDimension,
+				selectedFilters,
+				reportType,
+				dimensionList,
+				filterList,
+				metricsList,
+				intervalList
+			},
+			this.generateButtonHandler
+		);
+	};
+
+	renderContent = () => {
+		const {
+			selectedDimension,
+			selectedFilters,
+			selectedInterval,
+			selectedMetrics,
+			reportType,
+			startDate,
+			endDate,
 			csvData,
 			isValidSite,
-			isReportingSite
+			isReportingSite,
+			dimensionList,
+			intervalList,
+			metricsList,
+			filterList,
+			tableData
 		} = this.state;
 		if (reportType == 'site') {
 			if (!isValidSite)
@@ -338,11 +338,11 @@ class Panel extends Component {
 
 	render() {
 		const { isLoading } = this.state;
-		return isLoading ? (
-			<Loader />
-		) : (
-			<ActionCard title="AdPushup Reports">{this.renderContent()}</ActionCard>
-		);
+		const { reportsMeta } = this.props;
+		if (!reportsMeta.fetched || isLoading) {
+			return <Loader />;
+		}
+		return <ActionCard title="AdPushup Reports">{this.renderContent()}</ActionCard>;
 	}
 }
 
