@@ -71,6 +71,20 @@ router
 				console.log(err);
 				return res.send({});
 			})
-	);
+	)
+	.get('/getMetaData', (req, res) => {
+		const { isSuperUser } = req.user;
+		const siteIds = req.query.sites||[];
+		const params = { siteid: siteIds.toString(), isSuperUser };
+		return request({
+			uri: `${CC.ANALYTICS_API_ROOT}${CC.ANALYTICS_METAINFO_URL}`,
+			json: true,
+			qs: params
+		})
+			.then(response =>
+				response.code == 1 && response.data ? res.send(response.data) : res.send({})
+			)
+			.catch(err => res.send({}));
+	});
 
 module.exports = router;
