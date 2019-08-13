@@ -4,6 +4,8 @@ import { Row, Col } from 'react-bootstrap';
 import SplitScreen from '../../../../Components/Layout/SplitScreen';
 import FieldGroup from '../../../../Components/Layout/FieldGroup';
 import CustomButton from '../../../../Components/CustomButton/index';
+import ActionCard from '../../../../Components/ActionCard/index';
+
 import {
 	CONTROL_CONVERSION_NETWORKS,
 	NETWORK_COLLECTION,
@@ -366,11 +368,13 @@ class ControlTagConversion extends Component {
 
 	render() {
 		return (
-			<SplitScreen
-				rootClassName="u-padding-h4 u-padding-v5"
-				leftChildren={this.renderControlConversionLeftPanel()}
-				rightChildren={this.renderControlConversionRightPanel()}
-			/>
+			<ActionCard>
+				<SplitScreen
+					rootClassName="u-padding-h4 u-padding-v4"
+					leftChildren={this.renderControlConversionLeftPanel()}
+					rightChildren={this.renderControlConversionRightPanel()}
+				/>
+			</ActionCard>
 		);
 	}
 }

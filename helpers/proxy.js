@@ -107,7 +107,11 @@ var request = require('request-promise'),
 			return normalizedEntries;
 		},
 		verifyAdsTxt(url, ourAdsTxt) {
-			return API.load(`${utils.rightTrim(url, '/')}/ads.txt`).then(existingAdsTxt => {
+			let tempUrl=url;
+			if(tempUrl.indexOf('http://')==-1&&tempUrl.indexOf('https://')==-1){
+				tempUrl=`http://${tempUrl}`;
+			}
+			return API.load(`${utils.rightTrim(tempUrl, '/')}/ads.txt`).then(existingAdsTxt => {
 				if (typeof existingAdsTxt === 'string') {
 					const existingAdsTxtArr = API.normalizeAdsTxtEntries(existingAdsTxt);
 					const ourAdsTxtArr = API.normalizeAdsTxtEntries(ourAdsTxt);

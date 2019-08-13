@@ -5,6 +5,9 @@
 	overflow: hidden;
 	flex-grow: 0;
 	flex-shrink: 0;
+	a {
+		color: inherit;
+	}
 	&.sb-show {
 		width: $sidebarWidth;
 	}
@@ -98,7 +101,9 @@
 			position: absolute;
 			left: 0;
 			right: 0;
-			bottom: 20px;
+			bottom: 0px;
+			background: #f7f9fb;
+			padding: 20px 0;
 		}
 	}
 	.cta-btn-wrap {

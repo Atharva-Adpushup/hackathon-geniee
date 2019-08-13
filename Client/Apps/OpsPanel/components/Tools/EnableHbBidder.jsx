@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 import React from 'react';
 import { Table } from 'react-bootstrap';
 import CustomToggleSwitch from '../../../../Components/CustomToggleSwitch/index';
@@ -28,9 +29,10 @@ class EnableHbBidder extends React.Component {
 		const { updateNetworkConfig } = this.props;
 		const { networks } = this.state;
 
-		this.setState({ loading: true });
-
-		updateNetworkConfig(networks).then(() => this.setState({ loading: false }));
+		if (window.confirm('Are you want to save settings?')) {
+			this.setState({ loading: true });
+			updateNetworkConfig(networks).then(() => this.setState({ loading: false }));
+		}
 	};
 
 	render() {

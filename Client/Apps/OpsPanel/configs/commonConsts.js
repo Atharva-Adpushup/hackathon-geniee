@@ -260,7 +260,9 @@ const TOOLS_IDENTIFIERS = {
 	BACKUP_ADS: 'BACKUP_ADS',
 	ENABLE_HB_BIDDER: 'ENABLE_HB_BIDDER',
 	REGEX_VERIFICATION: 'REGEX_VERIFICATION',
-	REGEX_GENERATION: 'REGEX_GENERATION'
+	REGEX_GENERATION: 'REGEX_GENERATION',
+	TOP_XPATH_MISS_MODE_URL: 'TOP_XPATH_MISS_MODE_URL',
+	LOST_FOUND_LIVE_SITES: 'LOST_FOUND_LIVE_SITES'
 };
 
 const ICONS = {
@@ -319,6 +321,15 @@ const BACKUP_ADS_FORMATS = [
 	}
 ];
 
+const XPATH_MODE_URL = {
+	devices: [
+		{ name: 'Desktop', value: 'Desktop' },
+		{ name: 'Mobile', value: 'Mobile' },
+		{ name: 'Tablet', value: 'Tablet' }
+	],
+	modes: [{ name: 'Mode 1', value: 'Mode 1' }, { name: 'Mode 2', value: 'Mode 2' }]
+};
+
 export {
 	OP_NAV_ITEMS,
 	OP_NAV_ITEMS_INDEXES,
@@ -330,5 +341,6 @@ export {
 	GDPR,
 	TOOLS_IDENTIFIERS,
 	ICONS,
-	BACKUP_ADS_FORMATS
+	BACKUP_ADS_FORMATS,
+	XPATH_MODE_URL
 };

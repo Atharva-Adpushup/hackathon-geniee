@@ -47,11 +47,11 @@ class variationSectionElement extends Component {
 					placement="bottom"
 					overlay={<Tooltip id="delete-section-tooltip">Delete Section</Tooltip>}
 				>
-					{/*`section.ads[0].id` is temporarily added as 3rd argument to accomodate
-                        * one section and one ad creation/deletion
-                        * TODO: Remove `section.ads[0].id` hard-coded check and remove all ads inside
-                        * a section using its `ads` array
-                    */}
+					{/* `section.ads[0].id` is temporarily added as 3rd argument to accomodate
+					 * one section and one ad creation/deletion
+					 * TODO: Remove `section.ads[0].id` hard-coded check and remove all ads inside
+					 * a section using its `ads` array
+					 */}
 					<Button
 						className="btn-close"
 						onClick={props.onDeleteSection.bind(
@@ -91,6 +91,9 @@ class variationSectionElement extends Component {
 					) : (
 						''
 					)}
+					<Col className="u-padding-r10px section-id-ie" xs={12} style={{ marginBottom: '10px' }}>
+						Section Id: <strong>{props.section.id}</strong>
+					</Col>
 					<Col className="u-padding-r10px section-name-ie" xs={12}>
 						<InlineEdit
 							validate
@@ -205,7 +208,11 @@ class variationSectionElement extends Component {
 					</Col>
 					{/* Editable Fields starts from here */}
 					<Col xs={6}>
-						<EditOptions {...this.props} customZoneId={customZoneId} isCustomZoneId={isCustomZoneId} />
+						<EditOptions
+							{...this.props}
+							customZoneId={customZoneId}
+							isCustomZoneId={isCustomZoneId}
+						/>
 					</Col>
 				</Row>
 			</li>

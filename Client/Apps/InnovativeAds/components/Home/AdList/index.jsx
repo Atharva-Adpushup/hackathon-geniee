@@ -11,6 +11,7 @@ import {
 	STATUS_FILTER_OPTIONS,
 	FORMAT_FILTER_OPTIONS
 } from '../../../configs/commonConsts';
+import ActionCard from '../../../../../Components/ActionCard';
 
 class AdList extends Component {
 	constructor(props) {
@@ -135,6 +136,7 @@ class AdList extends Component {
 				title={label}
 				id={label.toUpperCase()}
 				options={array}
+				reset
 			/>
 		</div>
 	);
@@ -216,14 +218,14 @@ class AdList extends Component {
 		}
 		if (!adsToRender.length) {
 			return (
-				<div className="u-padding-4">
+				<ActionCard className="u-padding-4">
 					{this.renderFilters()}
 					<Empty message="Seems kind of empty here" />
-				</div>
+				</ActionCard>
 			);
 		}
 		return (
-			<div className="u-padding-4">
+			<ActionCard className="u-padding-4">
 				{this.renderFilters()}
 				<Table striped bordered hover>
 					<thead>
@@ -266,7 +268,7 @@ class AdList extends Component {
 					{modalData.footer ? <Modal.Body>{modalData.footer}</Modal.Body> : null}
 					<div style={{ clear: 'both' }}>&nbsp;</div>
 				</Modal>
-			</div>
+			</ActionCard>
 		);
 	}
 }

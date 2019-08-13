@@ -112,13 +112,13 @@ function fetchAds(req, res, docKey) {
 }
 
 function createNewDocAndDoProcessing(payload, initialDoc, docKey, processing) {
-	const innovativeAdDefault = _.cloneDeep(initialDoc);
+	const defaultDocCopy = _.cloneDeep(initialDoc);
 	return appBucket
-		.createDoc(`${docKey}${payload.siteId}`, innovativeAdDefault, {})
+		.createDoc(`${docKey}${payload.siteId}`, defaultDocCopy, {})
 		.then(() => appBucket.getDoc(`site::${payload.siteId}`))
 		.then(docWithCas => {
 			payload.siteDomain = docWithCas.value.siteDomain;
-			return processing(innovativeAdDefault, payload);
+			return processing(defaultDocCopy, payload);
 		});
 }
 

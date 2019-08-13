@@ -8,7 +8,7 @@ class OptimizationTab extends React.Component {
 	render() {
 		const { siteId, showNotification } = this.props;
 		return (
-			<div className="options-wrapper hb-optimization">
+			<div className="options-wrapper white-tab-container hb-optimization">
 				<BidderRules siteId={siteId} showNotification={showNotification} />
 			</div>
 		);

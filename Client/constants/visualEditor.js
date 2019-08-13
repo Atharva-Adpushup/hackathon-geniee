@@ -1,4 +1,4 @@
-const networks = ['adsense', 'adpTags', 'custom', 'geniee', 'medianet'];
+const networks = ['adsense', 'adpTags', 'custom', 'medianet'];
 const defaultPriceFloorKey = 'FP_S_A';
 const partners = {
 	geniee: {

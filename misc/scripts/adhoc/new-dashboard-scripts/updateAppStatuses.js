@@ -1,3 +1,24 @@
+/*
+	THIS SCRIPT DIRECTLY MANIPULATES THE DB SO USE IT WISELY.
+
+	Script to set key: apps in site doc, which would contain appStatuses for all AdPushup services
+
+	Workflow:
+		- Fetch all Sites
+		- Loop over each site and check
+			- isManual --> apTag
+			- isInnovative --> innovativeAds
+			- layout --> layout
+			- hbStatus -> headerBidding
+			- gdpr --> gdpr || consentManagement
+
+			"layout": true, // always
+			"consentManagement": true, // only if gdpr is currently on
+			"headerBidding": true, // if hbcf doc exists and has ads
+			"apTag": true, // if tgmr doc exists and toggle is true
+			"innovativeAds": true // either toggle or channel has at least one innovative ad
+ */
+
 const { promiseForeach } = require('node-utils');
 
 const siteModel = require('../../../../models/siteModel');
@@ -127,22 +148,6 @@ function init() {
 		.catch(err => console.log('Error occured : ', err));
 }
 
-// init()
-// 	.then(() => console.log('Processing over'))
-// 	.then(() => process.exit(0));
-
-/*
-	- Fetch all Sites
-	- Loop over each site and check
-		- isManual --> apTag
-		- isInnovative --> innovativeAds
-		- layout --> layout
-		- hbStatus -> headerBidding
-		- gdpr --> gdpr || consentManagement
-
-		"layout": true, // always
-		"consentManagement": true, // only if gdpr is currently on
-		"headerBidding": true, // if hbcf doc exists and has ads
-		"apTag": true, // if tgmr doc exists and toggle is true
-		"innovativeAds": true // either toggle or channel has at least one innovative ad
- */
+init()
+	.then(() => console.log('Processing over'))
+	.then(() => process.exit(0));

@@ -31,8 +31,31 @@ class SizewiseParamsFormFields extends React.Component {
 				const params = {};
 
 				for (const paramKey in formFields.params.siteLevel) {
-					const value = savedParams[adSize] && savedParams[adSize][paramKey];
-					params[paramKey] = value || '';
+					if (savedParams[adSize]) {
+						params[paramKey] = savedParams[adSize][paramKey];
+
+						// eslint-disable-next-line no-continue
+						continue;
+					}
+
+					if (formFields.params.siteLevel[paramKey].dataType === 'number') {
+						params[paramKey] = null;
+
+						// eslint-disable-next-line no-continue
+						continue;
+					}
+
+					if (
+						!formFields.params.siteLevel[paramKey].visible &&
+						formFields.params.siteLevel[paramKey].value !== undefined
+					) {
+						params[paramKey] = formFields.params.siteLevel[paramKey].value;
+
+						// eslint-disable-next-line no-continue
+						continue;
+					}
+
+					params[paramKey] = '';
 				}
 
 				newState.tempParams[adSize] = { ...params, saved: !!savedParams[adSize] };
@@ -49,6 +72,23 @@ class SizewiseParamsFormFields extends React.Component {
 			const params = {};
 
 			for (const paramKey in formFields.params.siteLevel) {
+				if (formFields.params.siteLevel[paramKey].dataType === 'number') {
+					params[paramKey] = null;
+
+					// eslint-disable-next-line no-continue
+					continue;
+				}
+
+				if (
+					!formFields.params.siteLevel[paramKey].visible &&
+					formFields.params.siteLevel[paramKey].value !== undefined
+				) {
+					params[paramKey] = formFields.params.siteLevel[paramKey].value;
+
+					// eslint-disable-next-line no-continue
+					continue;
+				}
+
 				params[paramKey] = '';
 			}
 

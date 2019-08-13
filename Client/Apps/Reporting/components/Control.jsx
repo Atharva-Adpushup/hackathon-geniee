@@ -18,14 +18,14 @@ import {
 class Control extends Component {
 	constructor(props) {
 		super(props);
-		const { updatedDimensionList, updatedFilterList } = this.updateFilterDimensionList(
-			props.reportType,
-			props.filterList,
-			props.dimensionList
-		);
+		// const { updatedDimensionList, updatedFilterList } = this.updateFilterDimensionList(
+		// 	props.reportType,
+		// 	props.filterList,
+		// 	props.dimensionList
+		// );
 		this.state = {
-			dimensionList: updatedDimensionList,
-			filterList: updatedFilterList,
+			dimensionList: props.dimensionList,
+			filterList: props.filterList,
 			intervalList: props.intervalList,
 			startDate: props.startDate,
 			endDate: props.endDate,
@@ -44,13 +44,16 @@ class Control extends Component {
 	}
 
 	shouldComponentUpdate(nextProps, nextState) {
-		return this.state.reportType !== nextState.reportType;
+		return (
+			this.state.reportType !== nextState.reportType ||
+			this.state.updateStatusText !== nextState.updateStatusText
+		);
 	}
 
 	onFilteChange = selectedFilters => {
 		let reportType = 'account';
 		const { filterList, dimensionList } = this.props;
-		const selectedSiteFilters = selectedFilters.siteid;
+		const selectedSiteFilters = selectedFilters.siteid || {};
 		if (selectedSiteFilters && Object.keys(selectedSiteFilters).length === 1) {
 			reportType = 'site';
 		}
@@ -102,7 +105,7 @@ class Control extends Component {
 		return reportService.getWidgetData({ path: filter.path, params });
 	};
 
-	getReportStatus() {
+	getReportStatus = () => {
 		reportService.getLastUpdateStatus().then(res => {
 			if (res.status == 200 && res.data) {
 				const updatedDate = res.data.lastRunTimePST;
@@ -111,7 +114,7 @@ class Control extends Component {
 				});
 			}
 		});
-	}
+	};
 
 	removeOpsFilterDimension = (filterList, dimensionList) => {
 		const updatedFilterList = [];
@@ -145,6 +148,13 @@ class Control extends Component {
 					dim.isDisabled = false;
 				} else dim.isDisabled = true;
 			});
+		} else {
+			updatedFilterList.forEach(fil => {
+				fil.isDisabled = false;
+			});
+			updatedDimensionList.forEach(dim => {
+				dim.isDisabled = false;
+			});
 		}
 		return { updatedFilterList, updatedDimensionList };
 	};
@@ -161,8 +171,10 @@ class Control extends Component {
 						<label className="u-text-normal">Report By</label>
 						<SelectBox
 							id="report-by"
+							key="report-by"
 							isClearable={false}
 							isSearchable={false}
+							wrapperClassName="custom-select-box-wrapper"
 							reset={true}
 							selected={state.selectedDimension}
 							options={state.dimensionList}
@@ -178,7 +190,8 @@ class Control extends Component {
 						<label className="u-text-normal">Interval</label>
 						<SelectBox
 							id="interval"
-							reset={true}
+							key="interval"
+							wrapperClassName="custom-select-box-wrapper"
 							isClearable={false}
 							isSearchable={false}
 							selected={state.selectedInterval}
@@ -209,6 +222,7 @@ class Control extends Component {
 					<div className="aligner-item aligner-item--grow5 u-margin-r4">
 						{/* eslint-disable */}
 						<AsyncGroupSelect
+							key="filter list"
 							filterList={state.filterList}
 							selectedFilters={state.selectedFilters}
 							onFilterValueChange={this.onFilteChange}
@@ -240,10 +254,6 @@ class Control extends Component {
 							<Glyphicon glyph="download-alt u-margin-r2" />
 							Export Report
 						</a>
-						{/* <Button onClick={this.generateButtonHandler} disabled={state.disableGenerateButton}>
-							<Glyphicon glyph="download-alt u-margin-r2" />
-							Export Report
-						</Button> */}
 					</div>
 				</div>
 			</Fragment>

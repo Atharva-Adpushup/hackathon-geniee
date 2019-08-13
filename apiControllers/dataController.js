@@ -13,6 +13,7 @@ const AdpushupError = require('../helpers/AdPushupError');
 const { checkParams, errorHandler, verifyOwner } = require('../helpers/routeHelpers');
 const { sendSuccessResponse, getNetworkConfig } = require('../helpers/commonFunctions');
 const upload = require('../helpers/uploadToCDN');
+const logger = require('../helpers/globalBucketLogger');
 
 const router = express.Router();
 
@@ -198,6 +199,36 @@ router
 					message: err.toString()
 				})
 			);
-	});
+	})
+	.post('/createLog', (req, res) =>
+		checkParams(['data'], req, 'post')
+			.then(() => {
+				const { data } = req.body;
+				const decodedData = atob(data);
+
+				return logger({
+					source: 'CONSOLE ERROR LOGS',
+					message: 'UNCAUGHT ERROR BOUNDARY',
+					debugData: decodedData
+				});
+			})
+			.then(() =>
+				sendSuccessResponse(
+					{
+						message: 'Log Written'
+					},
+					res
+				)
+			)
+			.catch(err => {
+				console.log(err);
+				return sendSuccessResponse(
+					{
+						message: `Log Written Failed`
+					},
+					res
+				);
+			})
+	);
 
 module.exports = router;

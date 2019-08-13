@@ -1,9 +1,9 @@
 import React from 'react';
 import Datatable from 'react-bs-datatable';
 import { Col } from 'react-bootstrap';
-import { sortBy } from 'lodash';
+import sortBy from 'lodash/sortBy';
 import moment from 'moment';
-import { numberWithCommas, computeCsvData } from '../helpers/utils';
+import { numberWithCommas, computeCsvData, roundOffTwoDecimal } from '../helpers/utils';
 
 class Table extends React.Component {
 	constructor(props) {
@@ -142,7 +142,7 @@ class Table extends React.Component {
 		tableBody.forEach(row => {
 			Object.keys(row).forEach(col => {
 				if (metrics[col]) {
-					const num = metrics[col].valueType === 'money' ? row[col].toFixed(2) : row[col];
+					const num = metrics[col].valueType === 'money' ? roundOffTwoDecimal(row[col]) : row[col];
 					row[col] =
 						metrics[col].valueType === 'money'
 							? `$${numberWithCommas(num)}`
@@ -160,13 +160,13 @@ class Table extends React.Component {
 			const col = tableHeader[i].prop;
 			let value = grandTotal[col];
 			if (metrics[col]) {
-				const num = metrics[col].valueType == 'money' ? value.toFixed(2) : value;
+				const num = metrics[col].valueType == 'money' ? roundOffTwoDecimal(value) : value;
 				value =
 					metrics[col].valueType == 'money' ? `$${numberWithCommas(num)}` : numberWithCommas(num);
 			}
 
 			footerComponent.push(
-				<td className="tbody-td-default" style={{ fontWeight: 'bold' }}>
+				<td className="tbody-td-default" key={i} style={{ fontWeight: 'bold' }}>
 					{value}
 				</td>
 			);

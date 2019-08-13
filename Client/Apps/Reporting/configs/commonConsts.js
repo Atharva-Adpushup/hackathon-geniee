@@ -100,13 +100,15 @@ const activeLegendItem = {
 };
 const activeLegendItemArray = [
 	{ value: 'network_net_revenue', name: 'Net Revenue', valueType: 'money' },
-	{ value: 'network_impressions', name: 'Impressions', valueType: 'number' },
-	{ value: 'network_ad_ecpm', name: 'Ad eCPM', valueType: 'money' }
+	{ value: 'adpushup_page_views', name: 'Page Views', valueType: 'number' },
+	{ value: 'adpushup_page_cpm', name: 'Page RPM', valueType: 'money' }
 ];
 const accountFilter = ['siteid', 'device_type', 'network'];
-const opsFilter = ['mode', 'error_code'];
-const opsDimension = ['mode', 'error_code'];
+const accountDisableFilter = ['page_variation_type', 'page_variation', 'page_group', 'section'];
+const opsFilter = ['mode', 'error_code', 'country'];
+const opsDimension = ['mode', 'error_code', 'country'];
 const accountDimension = ['siteid', 'device_type', 'network'];
+const accountDisableDimension = ['page_variation_type', 'page_variation', 'page_group', 'section'];
 export {
 	REPORTS_NAV_ITEMS,
 	REPORTS_NAV_ITEMS_INDEXES,
@@ -120,6 +122,8 @@ export {
 	activeLegendItemArray,
 	accountFilter,
 	accountDimension,
+	accountDisableFilter,
+	accountDisableDimension,
 	opsDimension,
 	opsFilter,
 	REPORT_DOWNLOAD_ENDPOINT,

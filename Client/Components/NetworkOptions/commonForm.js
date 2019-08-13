@@ -2,7 +2,7 @@ import React from 'react';
 import { Row, Col } from 'react-bootstrap';
 import CodeBox from '../CodeBox/index';
 import CustomToggleSwitch from '../CustomToggleSwitch/index';
-import SelectBox from '../select/select';
+import SelectBox from '../SelectBox/index';
 import { refreshIntervals } from '../../constants/visualEditor';
 
 const FormWrapper = (adCodeCheck, name, adUnitRegex) => {
@@ -152,17 +152,15 @@ const FormWrapper = (adCodeCheck, name, adUnitRegex) => {
 							</Col>
 							<Col xs={6}>
 								<SelectBox
-									className="mB-10"
-									value={props.refreshInterval || refreshIntervals[0]}
-									showClear={false}
-									onChange={props.onRefreshIntervalChange}
-								>
-									{refreshIntervals.map((item, index) => (
-										<option key={item} value={item}>
-											{item}
-										</option>
-									))}
-								</SelectBox>
+									id="refresh-interval-selectbox"
+									title="Select Refresh Interval"
+									onSelect={props.onRefreshIntervalChange}
+									options={refreshIntervals.map(item => ({
+										name: item,
+										value: item
+									}))}
+									selected={props.refreshInterval || refreshIntervals[0]}
+								/>
 							</Col>
 						</Row>
 					</div>

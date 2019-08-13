@@ -47,6 +47,9 @@
 	color: #fff !important;
 	background: #eb575c !important;
 	border: #eb575c !important;
+	.card-header-title {
+		color: #fff;
+	}
 }
 
 .card-color .panel-footer {
@@ -70,4 +73,8 @@
 
 .font-small {
 	font-size: 14px;
+}
+
+.onboarding-step > .counter-icon {
+	display: none !important;
 }

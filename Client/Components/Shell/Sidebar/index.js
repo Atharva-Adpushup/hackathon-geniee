@@ -54,7 +54,7 @@ const Sidebar = ({ show, user, sites }) => {
 				{user.isSuperUser ? getNavItem('Admin Panel', '/admin-panel', 'tools', !show) : null}
 			</ul>
 
-			{!!Object.keys(sites).length && (
+			{sites && !!Object.keys(sites).length && (
 				<div className="cta-btn-wrap">
 					{show ? (
 						ctaBtn

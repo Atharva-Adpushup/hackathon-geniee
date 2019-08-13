@@ -8,13 +8,13 @@ import { immutablePush } from 'libs/immutableHelpers';
 import NetworkOptions from 'shared/networkOptions/NetworkOptions';
 
 const initialState = {
-	adSize: null,
-	isCustomSize: false,
-	operation: null,
-	activeItem: 0,
-	prevActiveItem: 0,
-	showNetworkOptions: false
-},
+		adSize: null,
+		isCustomSize: false,
+		operation: null,
+		activeItem: 0,
+		prevActiveItem: 0,
+		showNetworkOptions: false
+	},
 	getInsertOptionClass = function(option) {
 		switch (option) {
 			case adInsertOptions.PREPEND:
@@ -70,25 +70,31 @@ class insertMenu extends React.Component {
 
 	createSectionAndAd(params) {
 		let { position, adCode, firstFold, asyncTag, customZoneId, network, networkData } = params;
-		const props = this.props,
-			isMultipleAdSizes = !!(networkData.multipleAdSizes && networkData.multipleAdSizes.length);
+		const props = this.props;
+		const { namingData } = props;
+		const isMultipleAdSizes = !!(networkData.multipleAdSizes && networkData.multipleAdSizes.length);
 
-		network = network ? network : 'custom';
+		network = network || 'custom';
 		const sectionPayload = {
 			position,
 			firstFold: firstFold || false,
 			asyncTag: asyncTag || false,
 			xpath: props.parents[0].xpath,
 			operation: this.state.operation,
-			customZoneId: customZoneId || ''
-		},
-			adPayload = {
-				isCustomSize: this.state.isCustomSize,
-				network,
+			customZoneId: customZoneId || '',
+			namingData: {
+				...namingData,
 				height: this.state.adSize.height,
-				width: this.state.adSize.width,
-				networkData: {}
-			};
+				width: this.state.adSize.width
+			}
+		};
+		const adPayload = {
+			isCustomSize: this.state.isCustomSize,
+			network,
+			height: this.state.adSize.height,
+			width: this.state.adSize.width,
+			networkData: {}
+		};
 
 		if (isMultipleAdSizes) {
 			adPayload.multipleAdSizes = networkData.multipleAdSizes;
@@ -122,7 +128,7 @@ class insertMenu extends React.Component {
 	render() {
 		const props = this.props,
 			isShowNetworkOptions = !!this.state.showNetworkOptions,
-			isDefaultScreenValid = !!!isShowNetworkOptions,
+			isDefaultScreenValid = !isShowNetworkOptions,
 			isLastScreenValid = !!isShowNetworkOptions;
 		let items = [];
 		if (!props.isVisible) {
@@ -153,7 +159,7 @@ class insertMenu extends React.Component {
 						onSubmit={this.networkOptionsSubmit}
 						onCancel={this.toggleNetworkOptions}
 						showNotification={this.props.showNotification}
-						isInsertMode={true}
+						isInsertMode
 						primaryAdSize={this.state.adSize}
 						zonesData={props.zonesData}
 						networkConfig={props.networkConfig}

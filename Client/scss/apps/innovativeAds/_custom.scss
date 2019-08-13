@@ -45,6 +45,10 @@ body {
 		margin-bottom: 20px;
 		flex-wrap: wrap;
 
+		li {
+			list-style: none;
+		}
+
 		li.option,
 		li.simpleOption {
 			list-style: none;

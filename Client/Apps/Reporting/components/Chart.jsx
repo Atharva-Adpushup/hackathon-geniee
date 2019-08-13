@@ -1,10 +1,10 @@
 import React from 'react';
 
-import { groupBy, sortBy } from 'lodash';
+import groupBy from 'lodash/groupBy';
+import sortBy from 'lodash/sortBy';
 import moment from 'moment';
 import CustomChart from '../../../Components/CustomChart';
 import { activeLegendItem, activeLegendItemArray } from '../configs/commonConsts';
-import apLineChartConfig from '../configs/line-ap-data.json';
 
 class Chart extends React.Component {
 	constructor(props) {
@@ -110,14 +110,17 @@ class Chart extends React.Component {
 	};
 
 	getSeriesData = (groupByResult, xAxis, activeLegendItems) => {
-		const { selectedDimension, selectedInterval } = this.props;
+		const { selectedDimension, selectedInterval, site } = this.props;
 		const series = [];
 		Object.keys(groupByResult).forEach(results => {
 			let j = 0;
+			let seriesName = results;
 			const row = groupByResult[results];
+			if (selectedDimension == 'siteid')
+				seriesName = site && site[results] ? site[results].siteName : 'Not Found';
 			const serie = {
 				data: [],
-				name: selectedDimension ? results : row[0].name,
+				name: selectedDimension ? seriesName : row[0].name,
 				value: results,
 				valueType: selectedDimension ? activeLegendItems.valueType : row[0].valueType
 			};
@@ -127,7 +130,6 @@ class Chart extends React.Component {
 				const column = sortedResult[j];
 				const xAxisMomentObj = moment(xAxis.categories[i]);
 				const seriesValue = selectedDimension ? column[activeLegendItems.value] : column.value;
-				//	const num = serie.valueType === 'money' ? seriesValue.toFixed(2) : seriesValue;
 
 				if (selectedInterval === 'daily' || selectedInterval === 'monthly')
 					if (
@@ -176,7 +178,7 @@ class Chart extends React.Component {
 					legends={legends}
 					activeLegendItems={activeLegendItems}
 					onLegendChange={this.onLegendChange}
-					yAxisGroups={selectedDimension ? [] : apLineChartConfig.defaultYAxisGroups}
+					yAxisGroups={selectedDimension ? [] : null}
 				/>
 			</div>
 		);
