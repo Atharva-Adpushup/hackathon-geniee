@@ -104,7 +104,11 @@ class TopSitesReport extends React.Component {
 	renderTable() {
 		const { tableBody, tableHeader } = this.state;
 		const isValidTableBody = !!(tableBody && tableBody.length);
-		const computedDatTableProps = { tableHeader, tableBody };
+		const computedDatTableProps = {
+			tableHeader,
+			tableBody,
+			keyName: 'datatable-ops-panel-top-site-report'
+		};
 
 		return isValidTableBody ? (
 			<Datatable {...computedDatTableProps} />

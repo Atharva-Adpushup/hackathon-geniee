@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
 import { Tab, Nav, NavItem, Row, Col } from 'react-bootstrap';
-import { INFO_PANEL_IDENTIFIERS, QUICK_SNAPSHOTS_WIDGETS } from '../../configs/commonConsts';
+import {
+	INFO_PANEL_IDENTIFIERS,
+	QUICK_SNAPSHOTS_WIDGETS,
+	WIDGETS_INFO
+} from '../../configs/commonConsts';
 import QuickSnapshot from './QuickSnapshot';
 // import RegexVerification from './RegexVerification/index';
 // import EnableHbBidder from './EnableHbBidder';
@@ -26,7 +30,13 @@ class InfoPanel extends Component {
 		switch (activeKey) {
 			default:
 			case INFO_PANEL_IDENTIFIERS.QUICK_SNAPSHOT:
-				return <QuickSnapshot {...this.props} widgetsList={QUICK_SNAPSHOTS_WIDGETS} />;
+				return (
+					<QuickSnapshot
+						{...this.props}
+						widgetsName={WIDGETS_INFO}
+						widgetsList={QUICK_SNAPSHOTS_WIDGETS}
+					/>
+				);
 			case INFO_PANEL_IDENTIFIERS.GLOBAL_VITALS:
 				return <div>Global Vitals</div>;
 			case INFO_PANEL_IDENTIFIERS.ACCOUNT_VITALS:

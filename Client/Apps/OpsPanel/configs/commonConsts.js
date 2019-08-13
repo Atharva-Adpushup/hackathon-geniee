@@ -271,12 +271,23 @@ const INFO_PANEL_IDENTIFIERS = {
 	ACCOUNT_VITALS: 'ACCOUNT_VITALS'
 };
 
+const WIDGETS_INFO = {
+	ESTIMATED_EARNINGS: 'estimated_earnings',
+	PER_AP_ORIGINAL: 'per_ap_original',
+	PER_OVERVIEW: 'per_overview',
+	OPS_TOP_SITES: 'ops_top_sites',
+	OPS_COUNTRY_REPORT: 'ops_country_report',
+	OPS_NETWORK_REPORT: 'ops_network_report',
+	OPS_ERROR_REPORT: 'ops_error_report'
+};
+
 const QUICK_SNAPSHOTS_WIDGETS = [
-	'ops_top_sites',
-	'estimated_earnings',
-	'rev_by_network',
-	'per_overview',
-	'per_ap_original'
+	WIDGETS_INFO.ESTIMATED_EARNINGS,
+	WIDGETS_INFO.PER_AP_ORIGINAL,
+	WIDGETS_INFO.PER_OVERVIEW,
+	WIDGETS_INFO.OPS_TOP_SITES,
+	WIDGETS_INFO.OPS_COUNTRY_REPORT,
+	WIDGETS_INFO.OPS_NETWORK_REPORT
 ];
 
 const ICONS = {
@@ -356,6 +367,7 @@ export {
 	TOOLS_IDENTIFIERS,
 	INFO_PANEL_IDENTIFIERS,
 	QUICK_SNAPSHOTS_WIDGETS,
+	WIDGETS_INFO,
 	ICONS,
 	BACKUP_ADS_FORMATS,
 	XPATH_MODE_URL
