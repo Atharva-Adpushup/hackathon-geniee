@@ -20,23 +20,22 @@ function getHbConfig(siteId) {
 function getBiddersFromNetworkTree() {
 	return couchbase
 		.connectToAppBucket()
-		.then(appBucket => {
-			return appBucket
-				.getAsync(`data::apNetwork`, {})
-				.then(({ value: networkTree }) => {
-					const biddersFromNetworkTree = {};
+		.then(appBucket => 
+			appBucket.getAsync(`data::apNetwork`, {})
+		)
+		.then(({ value: networkTree }) => {
+			const biddersFromNetworkTree = {};
 
-					for (const bidderCode in networkTree) {
-						if (networkTree.hasOwnProperty(bidderCode)) {
-							if (networkTree[bidderCode].isHb) {
-								biddersFromNetworkTree[bidderCode] =
-									networkTree[bidderCode];
-							}
-						}
+			for (const bidderCode in networkTree) {
+				if (networkTree.hasOwnProperty(bidderCode)) {
+					if (networkTree[bidderCode].isHb) {
+						biddersFromNetworkTree[bidderCode] =
+							networkTree[bidderCode];
 					}
+				}
+			}
 
-					return biddersFromNetworkTree;
-				});
+			return biddersFromNetworkTree;
 		})
 		.catch(err => Promise.resolve({}));
 }
@@ -114,8 +113,9 @@ function HbProcessing(site, apConfigs) {
 
 			hbcf.value.hbcf = getActiveUsedBidders(hbcf.value.hbcf, biddersFromNetworkTree);
 
-			let isValidCurrencyCnfg = isValidThirdPartyDFPAndCurrency(
-				user.get('adServerSettings').dfp
+			const adServerSettings = user.get('adServerSettings');
+			let isValidCurrencyCnfg = adServerSettings && adServerSettings.dfp &&  isValidThirdPartyDFPAndCurrency(
+				adServerSettings.dfp
 			);
 			let computedPrebidCurrencyConfig = {};
 			let deviceConfig = '';
