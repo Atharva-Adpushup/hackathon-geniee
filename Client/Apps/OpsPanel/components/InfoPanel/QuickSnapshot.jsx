@@ -101,43 +101,6 @@ class QuickSnapshot extends React.Component {
 		return widgetsConfig;
 	};
 
-	getPieChartLabelData = inputData => {
-		const { metrics, filter } = this.props;
-		const isValidData = !!(
-			inputData.columns &&
-			inputData.columns.length &&
-			inputData.result &&
-			inputData.result.length
-		);
-		const resultObj = {
-			legend: '',
-			name: '',
-			metric: '',
-			metricValueType: ''
-		};
-
-		if (!isValidData) {
-			return resultObj;
-		}
-
-		const metricLabel = inputData.columns[0];
-		const filterLabel = inputData.columns[1];
-		const isValidMetricLabel = !!(metricLabel && metrics[metricLabel]);
-		const isValidFilterLabel = !!(filterLabel && filter[filterLabel]);
-		const isValidLabels = isValidMetricLabel && isValidFilterLabel;
-
-		if (!isValidLabels) {
-			return resultObj;
-		}
-
-		resultObj.legend = metrics[metricLabel].display_name;
-		resultObj.metricValueType = metrics[metricLabel].valueType;
-		resultObj.name = filterLabel;
-		resultObj.metric = metricLabel;
-
-		return resultObj;
-	};
-
 	getWidgetComponent = widget => {
 		const {
 			reportType,
@@ -151,7 +114,6 @@ class QuickSnapshot extends React.Component {
 				OPS_ERROR_REPORT
 			}
 		} = this.props;
-		let pieChartLabelNameData;
 
 		if (widget.isLoading) return <Loader height="20vh" />;
 
@@ -181,8 +143,7 @@ class QuickSnapshot extends React.Component {
 
 			case OPS_COUNTRY_REPORT:
 			case OPS_NETWORK_REPORT:
-				pieChartLabelNameData = this.getPieChartLabelData(widget.data);
-				return <RevenueContainer labels={pieChartLabelNameData} displayData={widget.data} />;
+				return <RevenueContainer displayData={widget.data} />;
 			default:
 		}
 

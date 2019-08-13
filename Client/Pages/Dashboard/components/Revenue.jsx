@@ -34,7 +34,7 @@ const DEFAULT_STATE = {
 	series: []
 };
 
-class SitewiseReport extends React.Component {
+class Revenue extends React.Component {
 	state = DEFAULT_STATE;
 
 	static getDerivedStateFromProps(props) {
@@ -55,16 +55,11 @@ class SitewiseReport extends React.Component {
 
 	renderChart() {
 		const type = 'pie';
-		const { series, yAxisGroupsData } = this.state;
+		const { series } = this.state;
 		if (series && series.length && series[0].data && series[0].data.length)
 			return (
 				<div>
-					<CustomChart
-						type={type}
-						xAxis={data.xAxis}
-						series={series}
-						yAxisGroups={yAxisGroupsData}
-					/>
+					<CustomChart type={type} xAxis={data.xAxis} series={series} yAxisGroups={yAxisGroups} />
 				</div>
 			);
 		return <div className="text-center">No Record Found.</div>;
@@ -75,4 +70,4 @@ class SitewiseReport extends React.Component {
 	}
 }
 
-export default SitewiseReport;
+export default Revenue;
