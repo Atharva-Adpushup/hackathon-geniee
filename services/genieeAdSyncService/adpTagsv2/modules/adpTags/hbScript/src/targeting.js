@@ -4,19 +4,19 @@ var constants = require('./constants');
 var config = require('./config');
 var adp = require('./adp');
 var targeting = {
-    getFloorWithGranularity: function (floor) {
-        var val = parseFloat(Math.abs(floor).toFixed(2));
+	getFloorWithGranularity: function(floor) {
+		var val = parseFloat(Math.abs(floor).toFixed(2));
 
-        if (val > 20) {
-            return 20.0;
-        } else if (val == 0) {
-            val = 0.01;
-        }
+		if (val > 20) {
+			return 20.0;
+		} else if (val == 0) {
+			val = 0.01;
+		}
 
-        console.log('Sent floor : ' + val);
-        return val;
-    },
-    setCustomSlotLevelTargeting: function (adpSlot) {
+		console.log('Sent floor : ' + val);
+		return val;
+	},
+	setCustomSlotLevelTargeting: function(adpSlot) {
 		/*
 		Example (to be set in before js) -
 			window.adpushup.customSlotLevelTargetingMap = {
@@ -25,126 +25,128 @@ var targeting = {
 				}
 			};
 		*/
-        var customSlotLevelTargetingMap = window.adpushup.customSlotLevelTargetingMap;
-        if (customSlotLevelTargetingMap) {
-            var slotIds = Object.keys(customSlotLevelTargetingMap);
+		var customSlotLevelTargetingMap = window.adpushup.customSlotLevelTargetingMap;
+		if (customSlotLevelTargetingMap) {
+			var slotIds = Object.keys(customSlotLevelTargetingMap);
 
-            if (slotIds.length) {
-                slotIds.forEach(function (slotId) {
-                    if (slotId === adpSlot.containerId) {
-                        var slotTargeting = customSlotLevelTargetingMap[slotId];
+			if (slotIds.length) {
+				slotIds.forEach(function(slotId) {
+					if (slotId === adpSlot.containerId) {
+						var slotTargeting = customSlotLevelTargetingMap[slotId];
 
-                        if (slotTargeting) {
-                            var targetingKeys = Object.keys(slotTargeting);
+						if (slotTargeting) {
+							var targetingKeys = Object.keys(slotTargeting);
 
-                            if (targetingKeys.length) {
-                                targetingKeys.forEach(function (key) {
-                                    adpSlot.gSlot.setTargeting(key, String(slotTargeting[key]));
-                                });
-                            }
-                        }
-                    }
-                });
-            }
-        }
-    },
-    getAdserverTargeting: function (adpSlot) {
-        if (adpSlot.optionalParam.headerBidding && adpSlot.bidders.length) {
-            return window.pbjs.getAdserverTargeting()[adpSlot.containerId];
-        }
+							if (targetingKeys.length) {
+								targetingKeys.forEach(function(key) {
+									adpSlot.gSlot.setTargeting(key, String(slotTargeting[key]));
+								});
+							}
+						}
+					}
+				});
+			}
+		}
+	},
+	getAdserverTargeting: function(adpSlot) {
+		if (adpSlot.optionalParam.headerBidding && adpSlot.bidders.length) {
+			return window.pbjs.getAdserverTargeting()[adpSlot.containerId];
+		}
 
-        return null;
-    },
-    setSlotLevel: function (adpSlot) {
-        var targeting = {
-            hb_siteId: config.SITE_ID,
+		return null;
+	},
+	setSlotLevel: function(adpSlot) {
+		var targeting = {
+			hb_siteId: config.SITE_ID,
 			hb_ran: 0,
 			adpushup_ran: 1
-        };
-        var adServerTargeting = this.getAdserverTargeting(adpSlot);
+		};
+		var adServerTargeting = this.getAdserverTargeting(adpSlot);
 
-        if (adpSlot.bidders.length) {
-            Object.assign(targeting, { hb_ran: 1 });
-        }
+		if (adpSlot.bidders.length) {
+			Object.assign(targeting, { hb_ran: 1 });
+		}
 
-        if (adServerTargeting) {
-            Object.assign(targeting, adServerTargeting);
-        }
+		if (adServerTargeting) {
+			Object.assign(targeting, adServerTargeting);
+		}
 
-        // Set custom slot level targeting, if present
-        this.setCustomSlotLevelTargeting(adpSlot);
+		// Set custom slot level targeting, if present
+		this.setCustomSlotLevelTargeting(adpSlot);
 
-        if (adpSlot.optionalParam.keyValues && Object.keys(adpSlot.optionalParam.keyValues).length) {
-            Object.assign(targeting, adpSlot.optionalParam.keyValues);
-        }
+		if (adpSlot.optionalParam.keyValues && Object.keys(adpSlot.optionalParam.keyValues).length) {
+			Object.assign(targeting, adpSlot.optionalParam.keyValues);
+		}
 
-        Object.keys(targeting).forEach(function (key) {
-            // Check if any of keys belong to price floor key then set price using granularity function, so that it can match with price rules on server
-            if (constants.TARGETING.ADX_FLOOR.priceFloorKeys.indexOf(key) !== -1) {
-                if (parseInt(targeting[key], 10) === 0) {
-                    return true;
-                }
+		Object.keys(targeting).forEach(
+			function(key) {
+				// Check if any of keys belong to price floor key then set price using granularity function, so that it can match with price rules on server
+				if (constants.TARGETING.ADX_FLOOR.priceFloorKeys.indexOf(key) !== -1) {
+					if (parseInt(targeting[key], 10) === 0) {
+						return true;
+					}
 
-                targeting[key] = this.getFloorWithGranularity(targeting[key]);
-            }
+					targeting[key] = this.getFloorWithGranularity(targeting[key]);
+				}
 
-            adpSlot.gSlot.setTargeting(key, String(targeting[key]));
-        }.bind(this));
-    },
-    setUTMLevel: function (googletag) {
-        var urlParams = adp.utils.queryParams;
-        var separator = ':';
+				adpSlot.gSlot.setTargeting(key, String(targeting[key]));
+			}.bind(this)
+		);
+	},
+	setUTMLevel: function(googletag) {
+		var urlParams = adp.utils.getQueryParams();
+		var separator = ':';
 
-        if (!Object.keys(urlParams).length) {
-            var utmSessionCookie = adp.session.getCookie(constants.UTM_SESSION_COOKIE);
+		if (!Object.keys(urlParams).length) {
+			var utmSessionCookie = adp.session.getCookie(constants.UTM_SESSION_COOKIE);
 
-            if (utmSessionCookie) {
-                var utmSessionCookieValues = adp.utils.base64Decode(utmSessionCookie.split('_=')[1]);
-                urlParams = utmSessionCookieValues ? JSON.parse(utmSessionCookieValues) : {};
-            }
-        }
+			if (utmSessionCookie) {
+				var utmSessionCookieValues = adp.utils.base64Decode(utmSessionCookie.split('_=')[1]);
+				urlParams = utmSessionCookieValues ? JSON.parse(utmSessionCookieValues) : {};
+			}
+		}
 
-        // Set standard UTM targeting
-        var standardTargeting = constants.TARGETING.UTM_LEVEL.STANDARD;
-        Object.keys(standardTargeting).forEach(function (key) {
-            var keyVal = standardTargeting[key],
-                utmParam = urlParams[keyVal];
+		// Set standard UTM targeting
+		var standardTargeting = constants.TARGETING.UTM_LEVEL.STANDARD;
+		Object.keys(standardTargeting).forEach(function(key) {
+			var keyVal = standardTargeting[key],
+				utmParam = urlParams[keyVal];
 
-            googletag
-                .pubads()
-                .setTargeting(keyVal.trim().toLowerCase(), String(utmParam ? utmParam.trim().substr(0, 40) : null));
-        });
+			googletag
+				.pubads()
+				.setTargeting(keyVal.trim().toLowerCase(), String(utmParam ? utmParam.trim().substr(0, 40) : null));
+		});
 
-        // Set custom UTM targeting
-        var customTargeting = constants.TARGETING.UTM_LEVEL.CUSTOM;
-        Object.keys(customTargeting).forEach(function (key) {
-            var keyName = key,
-                keyTargets = customTargeting[key].TARGET,
-                keyCombination = '';
+		// Set custom UTM targeting
+		var customTargeting = constants.TARGETING.UTM_LEVEL.CUSTOM;
+		Object.keys(customTargeting).forEach(function(key) {
+			var keyName = key,
+				keyTargets = customTargeting[key].TARGET,
+				keyCombination = '';
 
-            Object.keys(keyTargets).forEach(function (keyTarget) {
-                var keyVal = keyTargets[keyTarget],
-                    utmParam = urlParams[keyVal];
+			Object.keys(keyTargets).forEach(function(keyTarget) {
+				var keyVal = keyTargets[keyTarget],
+					utmParam = urlParams[keyVal];
 
-                keyCombination += (utmParam ? utmParam : null) + separator;
-            });
+				keyCombination += (utmParam ? utmParam : null) + separator;
+			});
 
-            keyCombination = keyCombination.substr(0, keyCombination.length - 1);
-            googletag
-                .pubads()
-                .setTargeting(
-                    keyName.trim().toLowerCase(),
-                    String(keyCombination ? keyCombination.trim().substr(0, 40) : null)
-                );
-        });
-    },
-    setPageLevel: function (googletag) {
-        var pageLevelTargeting = constants.TARGETING.PAGE_LEVEL;
+			keyCombination = keyCombination.substr(0, keyCombination.length - 1);
+			googletag
+				.pubads()
+				.setTargeting(
+					keyName.trim().toLowerCase(),
+					String(keyCombination ? keyCombination.trim().substr(0, 40) : null)
+				);
+		});
+	},
+	setPageLevel: function(googletag) {
+		var pageLevelTargeting = constants.TARGETING.PAGE_LEVEL;
 
-        for (var key in pageLevelTargeting) {
-            googletag.pubads().setTargeting(key, String(pageLevelTargeting[key]));
-        }
-    }
+		for (var key in pageLevelTargeting) {
+			googletag.pubads().setTargeting(key, String(pageLevelTargeting[key]));
+		}
+	}
 };
 
 module.exports = targeting;
