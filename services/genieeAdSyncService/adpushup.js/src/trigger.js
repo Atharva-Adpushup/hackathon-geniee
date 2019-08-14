@@ -68,16 +68,20 @@ var adp = window.adpushup,
 			ad.originalId = adId;
 			if (isAdElement) {
 				var feedbackData = {
-					ads: [ad],
-					xpathMiss: [],
-					eventType: commonConsts.ERROR_CODES.NO_ERROR,
-					// mode: 16,
-					mode: commonConsts.MODE.ADPUSHUP, // Sending Mode 1 in Manual Ads
-					referrer: config.referrer,
-					tracking: browserConfig.trackerSupported,
-					variationId: commonConsts.MANUAL_ADS.VARIATION
-				}, oldFeedbackData = feedbackData;
-				
+						xpathMiss: [],
+						eventType: commonConsts.ERROR_CODES.NO_ERROR,
+						// mode: 16,
+						mode: commonConsts.MODE.ADPUSHUP, // Sending Mode 1 in Manual Ads
+						referrer: config.referrer,
+						tracking: browserConfig.trackerSupported,
+						variationId: commonConsts.MANUAL_ADS.VARIATION
+					},
+					oldFeedbackData = feedbackData;
+
+				oldFeedbackData.newFeedbackAdObj = {
+					ads: [ad]
+				};
+
 				oldFeedbackData.ads = [ad.originalId];
 				return getContainer(ad)
 					.done(function(container) {
@@ -100,14 +104,14 @@ var adp = window.adpushup,
 						if (isLazyLoadingAd) {
 							isAdContainerInView(container).done(function() {
 								// Send feedback call
-								utils.sendFeedback(feedbackData);
+								// utils.sendFeedback(feedbackData);
 								utils.sendFeedbackOld(oldFeedbackData);
 								// Place the ad in the container
 								return placeAd(container, ad);
 							});
 						} else {
 							// Send feedback call
-							utils.sendFeedback(feedbackData);
+							// utils.sendFeedback(feedbackData);
 							utils.sendFeedbackOld(oldFeedbackData);
 							// Place the ad in the container
 							return placeAd(container, ad);

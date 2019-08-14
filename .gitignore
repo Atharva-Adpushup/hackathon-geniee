@@ -16,6 +16,7 @@ logs/
 .DS_Store
 *.log
 *.map
+services/genieeAdSyncService/adpushup.js/libs/jquery
 fabfile.pyc
 composer.phar
 composer.lock
@@ -30,6 +31,7 @@ public/assets/js/gieneeApEditor/
 Editor/build/
 *.map
 builds
+dist
 public/assets/css/libs/editor.style.css
 public/assets/css/libs/website.style.css
 public/assets/js/libs/custom/base-libs.js

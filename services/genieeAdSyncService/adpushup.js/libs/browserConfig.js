@@ -1,4 +1,4 @@
-var $ = require('jquery'),
+var $ = require('./jquery'),
 	MobileDetect = require('mobile-detect'),
 	browserConfig = {
 		name: 'other',
