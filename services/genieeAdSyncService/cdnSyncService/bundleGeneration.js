@@ -19,7 +19,7 @@ function init(site, config) {
 		}
 		const compiler = webpack({
 			devtool: 'source-map',
-			mode: 'development',
+			mode: 'none',
 			entry: path.join(__dirname, '..', 'adpushup.js', 'main.js'),
 			output: {
 				path: path.join(__dirname, buildPath),
