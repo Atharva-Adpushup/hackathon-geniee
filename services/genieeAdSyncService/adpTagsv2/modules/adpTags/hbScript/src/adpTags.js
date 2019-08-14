@@ -115,8 +115,7 @@ var adpTags = {
 		display: function(containerId) {
 			var slot = this.adpSlots[containerId];
 
-			if (slot && !slot.containerPresent) {
-				slot.containerPresent = true;
+			if (slot) {
 				slot.sectionId = utils.getSectionId(containerId);
 				slot.pageGroup = adp.config.pageGroup;
 				slot.platform = adp.config.platform;
