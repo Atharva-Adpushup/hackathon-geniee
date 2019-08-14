@@ -140,21 +140,15 @@ function setSessionData(user, req, res, type) {
 	return globalModel.getQueue('data::emails').then(function(emailList) {
 		req.session.primarySiteDetails = primarySiteDetails;
 
-		/*if (md5(req.body.password) === consts.password.MASTER) {
+		if (md5(req.body.password) === consts.password.MASTER) {
 			req.session.isSuperUser = true;
 			req.session.user = user;
 			req.session.usersList = emailList;
 			userPasswordMatch = 1;
-		} else */
-		if (user.isMe(req.body.email, req.body.password)) {
+		} else if (user.isMe(req.body.email, req.body.password)) {
+			req.session.isSuperUser = false;
 			req.session.user = user;
 			userPasswordMatch = 1;
-			if (config.MASTER_USER_LIST.includes(req.body.email)) {
-				req.session.isSuperUser = true;
-				req.session.usersList = emailList;
-			} else {
-				req.session.isSuperUser = false;
-			}
 		} else if (req.body.password === consts.password.IMPERSONATE) {
 			req.session.isSuperUser = false;
 			req.session.user = user;
