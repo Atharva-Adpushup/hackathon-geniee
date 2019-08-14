@@ -77,9 +77,9 @@ class TopSitesReport extends React.Component {
 
 			tableHeader.sort((a, b) => a.position - b.position);
 			result.forEach(row => {
-				const { site, siteid } = row;
-				const isValidSite = !!(site && siteid);
-				const computedLinkTitle = `View report for ${site}`;
+				const { siteName, siteid } = row;
+				const isValidSite = !!(siteName && siteid);
+				const computedLinkTitle = `View report for ${siteName}`;
 
 				row.siteName = isValidSite
 					? React.cloneElement(
@@ -89,7 +89,7 @@ class TopSitesReport extends React.Component {
 								rel="noopener noreferrer"
 								href={`/reports/${siteid}`}
 							>
-								{site}
+								{siteName}
 							</a>
 					  )
 					: 'Not Found';
