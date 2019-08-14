@@ -52,13 +52,7 @@ class QuickSnapshot extends React.Component {
 
 	getWidgetConfig = (widgets, widgetsList) => {
 		const {
-			widgetsName: {
-				PER_AP_ORIGINAL,
-				OPS_TOP_SITES,
-				OPS_COUNTRY_REPORT,
-				OPS_NETWORK_REPORT,
-				OPS_ERROR_REPORT
-			}
+			widgetsName: { PER_AP_ORIGINAL, OPS_TOP_SITES, OPS_COUNTRY_REPORT, OPS_NETWORK_REPORT }
 		} = this.props;
 		const sortedWidgets = sortBy(widgets, ['position', 'name']);
 		const widgetsConfig = [];
@@ -82,12 +76,16 @@ class QuickSnapshot extends React.Component {
 						break;
 
 					case OPS_COUNTRY_REPORT:
+						widget.dimension = 'country';
+						widget.metric = 'adpushup_page_views';
 						widget.selectedDimension = 'adpushup_page_views';
 						widget.path += `&metrics=adpushup_page_views`;
 						break;
 
 					case OPS_NETWORK_REPORT:
-						widget.selectedDimension = 'adpushup_page_views';
+						widget.dimension = 'network';
+						widget.metric = 'network_net_revenue';
+						widget.selectedDimension = 'network_net_revenue';
 						widget.path += `&metrics=network_net_revenue`;
 						break;
 
@@ -143,7 +141,8 @@ class QuickSnapshot extends React.Component {
 
 			case OPS_COUNTRY_REPORT:
 			case OPS_NETWORK_REPORT:
-				return <RevenueContainer displayData={widget.data} />;
+			case OPS_ERROR_REPORT:
+				return <RevenueContainer displayData={widget} />;
 			default:
 		}
 
@@ -172,8 +171,8 @@ class QuickSnapshot extends React.Component {
 			params.isSuperUser = true;
 		}
 
-		params.fromDate = '2019-08-05';
-		params.toDate = '2019-08-06';
+		// params.fromDate = '2019-08-05';
+		// params.toDate = '2019-08-06';
 
 		widgetsConfig[wid].startDate = params.fromDate;
 		widgetsConfig[wid].endDate = params.toDate;

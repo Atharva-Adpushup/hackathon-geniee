@@ -82,7 +82,9 @@ class SitewiseReport extends React.Component {
 	};
 
 	computeGraphData = reportData => {
-		const { result: resultData } = reportData;
+		const {
+			data: { result: resultData }
+		} = reportData;
 		const { yAxisGroupsData } = this.state;
 		const labelData = this.getValidLabels(reportData);
 		const legendLabel = (labelData.isValid && labelData.labels.legend) || 'Revenue';

@@ -115,7 +115,7 @@ class Dashboard extends React.Component {
 				}
 				return '';
 			case 'rev_by_network':
-				return <RevenueContainer displayData={widget.data} />;
+				return <RevenueContainer displayData={widget} />;
 			default:
 		}
 	};
