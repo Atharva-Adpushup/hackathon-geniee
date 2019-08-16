@@ -1,16 +1,19 @@
 import axiosInstance from '../helpers/axiosInstance';
 import config from '../config/config';
+import { REPORTS_ACTIONS } from '../constants/global';
+
 export default {
 	getCustomStats: params => {
-		let url = config.ANALYTICS_API_CUSTOM_DATA;
+		const url = config.ANALYTICS_API_CUSTOM_DATA;
 		return axiosInstance.get(url, { params });
 	},
 	getWidgetData: params => {
-		let url = config.ANALYTICS_API_WIDGET_DATA;
+		const url = config.ANALYTICS_API_WIDGET_DATA;
 		return axiosInstance.get(url, { params });
 	},
 	getLastUpdateStatus: params => {
-		let url = config.ANALYTICS_API_UPDATE_STATUS;
+		const url = config.ANALYTICS_API_UPDATE_STATUS;
 		return axiosInstance.get(url, { params });
-	}
+	},
+	getMetaData: params => axiosInstance.get('/reports/getMetaData', { params })
 };

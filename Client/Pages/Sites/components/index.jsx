@@ -19,6 +19,8 @@ import OverlayTooltip from '../../../Components/OverlayTooltip/index';
 import Card from '../../../Components/Layout/Card';
 import OnboardingCard from '../../../Components/OnboardingCard';
 import CustomButton from '../../../Components/CustomButton';
+import reportService from '../../../services/reportService';
+import Loader from '../../../Components/Loader/index';
 
 import {
 	SITE_SETUP_STATUS,
@@ -44,23 +46,34 @@ class MySites extends React.Component {
 	constructor(props) {
 		super(props);
 		const sites = this.getValidSites(props);
-		this.state = { sites };
+		this.state = { sites, isLoading: true };
 	}
 
 	componentDidMount() {
 		const ref = this;
 		const { sites } = ref.state;
 		const isSites = ref.getValidObject(sites);
+		const { reportsMeta, fetchReportingMeta } = this.props;
 
 		if (!isSites) {
 			return false;
 		}
 
 		const siteIds = Object.keys(sites);
+		const siteIdsStr = siteIds.toString();
 
-		Promise.all(siteIds.map(ref.fetchSiteAppStatusesCallback));
+		if (!reportsMeta.fetched) {
+			return reportService.getMetaData({ sites: siteIdsStr }).then(response => {
+				const { data } = response;
 
-		return false;
+				fetchReportingMeta(data);
+				ref.hideUILoader();
+				return ref.fetchAllSitesAppStatuses(siteIds);
+			});
+		}
+
+		this.hideUILoader();
+		return ref.fetchAllSitesAppStatuses(siteIds);
 	}
 
 	componentWillReceiveProps(props) {
@@ -71,6 +84,10 @@ class MySites extends React.Component {
 	checkSiteStepOnboardingComplete = step => !!(Number(step) === USER_ONBOARDING_COMPLETE_STEP);
 
 	checkSiteAppStatuses = siteModel => !!siteModel.appStatuses;
+
+	hideUILoader = () => {
+		this.setState({ isLoading: false });
+	};
 
 	shouldHideActivateAppsLink = (
 		isSuperUser,
@@ -113,6 +130,8 @@ class MySites extends React.Component {
 		isSiteAppStatuses
 	) => !!(isOnboardingComplete && !isValidAppStatusInReportData && !isSiteAppStatuses);
 
+	fetchAllSitesAppStatuses = siteIds => Promise.all(siteIds.map(this.fetchSiteAppStatusesCallback));
+
 	fetchSiteAppStatusesCallback = siteId => {
 		const { sites } = this.state;
 		const { updateSiteData } = this.props;
@@ -146,7 +165,8 @@ class MySites extends React.Component {
 	};
 
 	checkValidAppStatusInReportData(siteId) {
-		const { reportSites } = this.props;
+		const { reportsMeta } = this.props;
+		const { site: reportSites } = reportsMeta.data;
 		const isReportData = this.getValidObject(reportSites);
 		const isValidAppStatusInReportData = !!(
 			isReportData &&
@@ -354,14 +374,15 @@ class MySites extends React.Component {
 	}
 
 	render() {
-		const { sites } = this.state;
+		const { sites, isLoading } = this.state;
 		const isValidUserSites = this.getValidObject(sites);
 		let computedRootFlexboxClasses = isValidUserSites
 			? 'aligner aligner--row aligner--wrap'
 			: 'aligner aligner--vCenter aligner--hCenter';
 		computedRootFlexboxClasses = `my-sites-wrapper ${computedRootFlexboxClasses}`;
-
-		return (
+		return isLoading ? (
+			<Loader />
+		) : (
 			<div title="My Sites">
 				<div className={computedRootFlexboxClasses}>
 					{isValidUserSites ? this.renderStatusCards() : this.renderOnboardingCard()}

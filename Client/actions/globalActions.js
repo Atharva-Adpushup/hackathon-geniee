@@ -3,7 +3,6 @@ import {
 	NETWORK_CONFIG_ACTIONS,
 	SITE_ACTIONS,
 	REPORTS_ACTIONS,
-	ADS_TXT_ACTIONS,
 	UI_ACTIONS
 } from '../constants/global';
 import axiosInstance from '../helpers/axiosInstance';
@@ -23,19 +22,27 @@ const fetchGlobalData = () => dispatch =>
 				data: data.networkConfig
 			});
 			dispatch({
-				type: ADS_TXT_ACTIONS.REPLACE_ADS_TXT,
-				data: data.adsTxt
-			});
-			dispatch({
 				type: SITE_ACTIONS.REPLACE_SITE_DATA,
 				data: data.sites
 			});
-			dispatch({
-				type: REPORTS_ACTIONS.REPLACE_REPORTS_DATA,
-				data: data.reports
-			});
+			// dispatch({
+			// 	type: REPORTS_ACTIONS.REPLACE_REPORTS_DATA,
+			// 	data: data.reports
+			// });
 		})
 		.catch(err => errorHandler(err));
+
+const fetchReportingMeta = data => dispatch =>
+	// axiosInstance
+	// 	.get('/reports/getMetaData', { params: { sites } })
+	// 	.then(response => {
+	// 		const { data } = response;
+	dispatch({
+		type: REPORTS_ACTIONS.REPLACE_REPORTS_DATA,
+		data
+	});
+// })
+// .catch(err => errorHandler(err));
 
 const updateNetworkConfig = config => dispatch =>
 	axiosInstance
@@ -56,4 +63,4 @@ const updateNetworkConfig = config => dispatch =>
 		})
 		.catch(err => errorHandler(err));
 
-export { fetchGlobalData, updateNetworkConfig };
+export { fetchGlobalData, updateNetworkConfig, fetchReportingMeta };

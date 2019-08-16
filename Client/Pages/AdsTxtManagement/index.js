@@ -33,19 +33,26 @@ class AdsTxtManager extends Component {
 	};
 
 	componentDidMount() {
-		Promise.all([proxyService.getAdsTxt(), this.getSitesAdstxtStatus()]).then(response => {
-			let snippet;
-			if (response[0].status === 200) snippet = response[0].data.adsTxtSnippet;
-			this.setState({
-				adsTxtSnippet: snippet,
-				sites: response[1],
-				isLoading: false
-			});
-		});
+		return proxyService
+			.getAdsTxt()
+			.then(res => {
+				let snippet = '';
+				if (res.status === 200) snippet = res.data.adsTxtSnippet;
+				return snippet;
+			})
+			.then(snippet =>
+				this.getSitesAdstxtStatus(snippet).then(response => {
+					this.setState({
+						adsTxtSnippet: snippet,
+						sites: response,
+						isLoading: false
+					});
+				})
+			);
 	}
 
-	getSitesAdstxtStatus = () => {
-		const { sites, adsTxt } = this.props;
+	getSitesAdstxtStatus = adsTxtSnippet => {
+		const { sites } = this.props;
 		const promiseSerial = funcs =>
 			funcs.reduce(
 				(promise, obj) =>
@@ -64,7 +71,7 @@ class AdsTxtManager extends Component {
 									result = {
 										domain: sites[site].siteDomain,
 										statusText: res.statusText,
-										adsTxt,
+										adsTxt: adsTxtSnippet,
 										status: res.status
 									};
 								else {
@@ -351,8 +358,8 @@ class AdsTxtManager extends Component {
 }
 
 const mapStateToProps = state => {
-	const { sites, adsTxt } = state.global;
-	return { sites: sites.data, adsTxt: adsTxt.data };
+	const { sites } = state.global;
+	return { sites: sites.data };
 };
 
 export default connect(

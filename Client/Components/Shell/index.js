@@ -16,8 +16,8 @@ class Shell extends React.Component {
 	state = {};
 
 	componentDidMount() {
-		const { userFetched, reportsFetched, fetchGlobalData } = this.props;
-		if (!reportsFetched || !userFetched) fetchGlobalData();
+		const { userFetched, fetchGlobalData } = this.props;
+		if (!userFetched) fetchGlobalData();
 	}
 
 	sidebarToggle = () => {
@@ -88,7 +88,6 @@ class Shell extends React.Component {
 		const {
 			children,
 			userFetched,
-			reportsFetched,
 			user,
 			sites,
 			location,
@@ -116,7 +115,7 @@ class Shell extends React.Component {
 					<Sidebar show={sidebarOpen} user={user} sites={sites} />
 					<main className="main-content">
 						{routes ? <Breadcrumbs mappedRoutes={routes} /> : null}
-						{reportsFetched && userFetched ? <div>{children}</div> : <Loader />}
+						{userFetched ? <div>{children}</div> : <Loader />}
 					</main>
 				</Row>
 			</Grid>
