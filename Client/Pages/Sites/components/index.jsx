@@ -54,26 +54,26 @@ class MySites extends React.Component {
 		const { sites } = ref.state;
 		const isSites = ref.getValidObject(sites);
 		const { reportsMeta, fetchReportingMeta } = this.props;
+
 		if (!isSites) {
 			return false;
 		}
 
 		const siteIds = Object.keys(sites);
-		Promise.all(siteIds.map(ref.fetchSiteAppStatusesCallback));
+		const siteIdsStr = siteIds.toString();
 
-		if (!reportsMeta.fetched)
-			reportService.getMetaData({ sites: siteIds }).then(response => {
+		if (!reportsMeta.fetched) {
+			return reportService.getMetaData({ sites: siteIdsStr }).then(response => {
 				const { data } = response;
+
 				fetchReportingMeta(data);
-				this.setState({ isLoading: false });
-				Promise.all(siteIds.map(ref.fetchSiteAppStatusesCallback));
-				return false;
+				ref.hideUILoader();
+				return ref.fetchAllSitesAppStatuses(siteIds);
 			});
-		else {
-			this.setState({ isLoading: false });
-			Promise.all(siteIds.map(ref.fetchSiteAppStatusesCallback));
 		}
-		return false;
+
+		this.hideUILoader();
+		return ref.fetchAllSitesAppStatuses(siteIds);
 	}
 
 	componentWillReceiveProps(props) {
@@ -84,6 +84,10 @@ class MySites extends React.Component {
 	checkSiteStepOnboardingComplete = step => !!(Number(step) === USER_ONBOARDING_COMPLETE_STEP);
 
 	checkSiteAppStatuses = siteModel => !!siteModel.appStatuses;
+
+	hideUILoader = () => {
+		this.setState({ isLoading: false });
+	};
 
 	shouldHideActivateAppsLink = (
 		isSuperUser,
@@ -125,6 +129,8 @@ class MySites extends React.Component {
 		isValidAppStatusInReportData,
 		isSiteAppStatuses
 	) => !!(isOnboardingComplete && !isValidAppStatusInReportData && !isSiteAppStatuses);
+
+	fetchAllSitesAppStatuses = siteIds => Promise.all(siteIds.map(this.fetchSiteAppStatusesCallback));
 
 	fetchSiteAppStatusesCallback = siteId => {
 		const { sites } = this.state;

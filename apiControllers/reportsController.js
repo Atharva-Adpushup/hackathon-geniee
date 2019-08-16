@@ -73,9 +73,12 @@ router
 			})
 	)
 	.get('/getMetaData', (req, res) => {
-		const { isSuperUser } = req.user;
-		const siteIds = req.query.sites||[];
-		const params = { siteid: siteIds.toString(), isSuperUser };
+		const {
+			user: { isSuperUser },
+			query: { sites = '' }
+		} = req;
+		const params = { siteid: sites, isSuperUser };
+
 		return request({
 			uri: `${CC.ANALYTICS_API_ROOT}${CC.ANALYTICS_METAINFO_URL}`,
 			json: true,

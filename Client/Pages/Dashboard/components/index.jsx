@@ -25,13 +25,14 @@ class Dashboard extends React.Component {
 			quickDates: dates,
 			sites: [],
 			widgetsConfig: [],
-			isLoading: true,
+			isLoading: true
 		};
 	}
 
 	componentDidMount() {
 		const { showNotification, user, sites, reportsMeta, fetchReportingMeta } = this.props;
-		const userSitesArr = Object.keys(sites);
+		const userSites = Object.keys(sites).toString();
+
 		if (!user.data.isPaymentDetailsComplete && !window.location.pathname.includes('payment')) {
 			showNotification({
 				mode: 'error',
@@ -41,13 +42,16 @@ class Dashboard extends React.Component {
 				autoDismiss: 0
 			});
 		}
-		if (!reportsMeta.fetched)
-			reportService.getMetaData({ sites: userSitesArr }).then(response => {
+
+		if (!reportsMeta.fetched) {
+			return reportService.getMetaData({ sites: userSites }).then(response => {
 				const { data } = response;
 				fetchReportingMeta(data);
-				this.getContentInfo(data);
+				return this.getContentInfo(data);
 			});
-		else this.getContentInfo(reportsMeta.data);
+		}
+
+		return this.getContentInfo(reportsMeta.data);
 	}
 
 	getContentInfo = reportsMetaData => {
@@ -63,7 +67,7 @@ class Dashboard extends React.Component {
 			{
 				sites: allUserSites,
 				widgetsConfig,
-				isLoading:false
+				isLoading: false
 			},
 			() => {
 				widgetsConfig.forEach((wid, index) => {
@@ -148,7 +152,7 @@ class Dashboard extends React.Component {
 		const { widgetsConfig } = this.state;
 		const { selectedDate, selectedSite, path, name } = widgetsConfig[wid];
 		const { sites, reportsMeta } = this.props;
-		const { site:reportingSites } = reportsMeta.data;
+		const { site: reportingSites } = reportsMeta.data;
 		const siteIds = Object.keys(sites);
 		const params = getDateRange(selectedDate);
 		const hidPerApOriginData =
@@ -202,7 +206,7 @@ class Dashboard extends React.Component {
 
 	showApBaselineWidget = () => {
 		const { siteId, reportType, reportsMeta } = this.props;
-		const { site:reportingSites } = reportsMeta.data;
+		const { site: reportingSites } = reportsMeta.data;
 		const { sites } = this.state;
 		if (
 			reportType == 'site' &&
@@ -220,7 +224,7 @@ class Dashboard extends React.Component {
 
 	renderControl(wid) {
 		const { reportType, reportsMeta } = this.props;
-		const { site:reportingSites } = reportsMeta.data;
+		const { site: reportingSites } = reportsMeta.data;
 		const { widgetsConfig, quickDates, sites } = this.state;
 		const { selectedDate, selectedSite, name } = widgetsConfig[wid];
 		const layoutSites = reportingSites ? this.getLayoutSites(sites, reportingSites) : [];
@@ -307,7 +311,7 @@ class Dashboard extends React.Component {
 		const { widgetsConfig } = this.state;
 		const content = [];
 		const hasLayoutSite = this.showApBaselineWidget();
-		widgetsConfig.forEach((widget,index) => {
+		widgetsConfig.forEach((widget, index) => {
 			//const widget = widgetsConfig[wid];
 			const widgetComponent = this.getWidgetComponent(widget);
 			if ((widget.name == 'per_ap_original' && hasLayoutSite) || widget.name != 'per_ap_original')
@@ -368,9 +372,9 @@ class Dashboard extends React.Component {
 
 	render() {
 		const { sites, reportsMeta } = this.props;
-		const {isLoading}=this.state;
+		const { isLoading } = this.state;
 		const isValidUserSites = Object.keys(sites).length;
-		if (!reportsMeta.fetched|| isLoading) {
+		if (!reportsMeta.fetched || isLoading) {
 			return <Loader />;
 		}
 		return (

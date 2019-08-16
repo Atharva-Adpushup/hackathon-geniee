@@ -52,14 +52,17 @@ class Panel extends Component {
 
 	componentDidMount() {
 		const { reportsMeta, userSites, fetchReportingMeta } = this.props;
-		const userSitesArr = Object.keys(userSites);
-		if (!reportsMeta.fetched)
-			reportService.getMetaData({ sites: userSitesArr }).then(response => {
+		const userSitesStr = Object.keys(userSites).toString();
+
+		if (!reportsMeta.fetched) {
+			return reportService.getMetaData({ sites: userSitesStr }).then(response => {
 				const { data } = response;
 				fetchReportingMeta(data);
-				this.getContentInfo(data);
+				return this.getContentInfo(data);
 			});
-		else this.getContentInfo(reportsMeta.data);
+		}
+
+		return this.getContentInfo(reportsMeta.data);
 	}
 
 	removeOpsFilterDimension = (filterList, dimensionList) => {
