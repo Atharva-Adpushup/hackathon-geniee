@@ -165,7 +165,7 @@ module.exports = {
 						if (unsyncedAd) {
 							unsyncedAd.variations = [
 								{
-									variationId: variationId,
+									variationId: variationId, 
 									variationName: variationName,
 									platform: additionalInfo.platform,
 									pageGroup: additionalInfo.pageGroup

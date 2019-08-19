@@ -25,26 +25,30 @@ var auction = {
 		var that = this;
 
 		pbjs.requestBids({
-			timeout: config.PREBID_CONFIG.timeOut,
+			timeout: config.PREBID_CONFIG.timeOut || constants.PREBID.TIMEOUT,
 			bidsBackHandler: that.getAuctionResponse.bind(that, adpBatchId)
 		});
 	},
-	getSizeConfig: function () {
+	getSizeConfig: function() {
 		var sizeConfigFromDB = config.INVENTORY.deviceConfig.sizeConfig;
 		var pbSizeConfig = [];
 		var labelIndexTracker = {};
 
-		sizeConfigFromDB.forEach(obj => {
+		sizeConfigFromDB.forEach(function(obj){
 			// if label doesn't exist in pbSizeConfig
 			if (!labelIndexTracker[obj.labels[0]]) {
 				labelIndexTracker[obj.labels[0]] = pbSizeConfig.length;
-				pbSizeConfig.push({ mediaQuery: obj.mediaQuery, sizesSupported: obj.sizesSupported, labels: obj.labels });
+				pbSizeConfig.push({
+					mediaQuery: obj.mediaQuery,
+					sizesSupported: obj.sizesSupported,
+					labels: obj.labels
+				});
 			}
 			// otherwise merge sizesSupported
 			else {
 				var deviceConfig = pbSizeConfig[labelIndexTracker[obj.labels[0]]];
 				var newSizes = deviceConfig.sizesSupported.concat(obj.sizesSupported);
-				var newUniqueSizes = newSizes.filter(function (value, index, self) {
+				var newUniqueSizes = newSizes.filter(function(value, index, self) {
 					return self.indexOf(value) === index;
 				});
 
@@ -54,42 +58,58 @@ var auction = {
 
 		return pbSizeConfig;
 	},
-	getBidderSettings: function () {
+	getBidderSettings: function() {
 		var bidders = config.INVENTORY.hbcf;
 		var bidderSettings = {};
 
 		for (var bidderCode in bidders) {
 			var revenueShare = parseFloat(bidders[bidderCode].revenueShare);
 
-			if (bidders.hasOwnProperty(bidderCode) && bidders[bidderCode].bids === 'gross' && !isNaN(revenueShare) ) {
+			if (
+				bidders.hasOwnProperty(bidderCode) &&
+				bidders[bidderCode].bids === 'gross' &&
+				!isNaN(revenueShare)
+			) {
 				bidderSettings[bidderCode] = {
-					bidCpmAdjustment: function (bidCpm) {
+					bidCpmAdjustment: function(bidCpm) {
 						return bidCpm - bidCpm * (revenueShare / 100);
 					}
-				}
+				};
 			}
 		}
 
 		return bidderSettings;
 	},
-	setPrebidConfig: function(pbjs, prebidSlots) {
-		pbjs.setConfig({
+	setPrebidConfig: function (pbjs, prebidSlots) {
+		var pbConfig = {
 			rubicon: {
 				singleRequest: true
+			},
+			userSync: {
+				filterSettings: {
+					iframe: {
+						bidders: '*',
+						filter: 'include'
+					}
+				}
 			},
 			publisherDomain: adp.config.siteDomain,
 			bidderSequence: constants.PREBID.BIDDER_SEQUENCE,
 			priceGranularity: constants.PREBID.PRICE_GRANULARITY,
 			sizeConfig: this.getSizeConfig()
-		});
+		};
+
+		if (config.PREBID_CONFIG.currency && config.PREBID_CONFIG.currency.enabled) {
+			pbConfig.currency = config.PREBID_CONFIG.currencyConfig;
+		}
+
+		pbjs.setConfig(pbConfig);
 
 		pbjs.addAdUnits(prebidSlots);
 
 		pbjs.bidderSettings = this.getBidderSettings();
 
-		pbjs.aliasBidder('appnexus', 'springserve');
 		pbjs.aliasBidder('appnexus', 'districtm');
-		pbjs.aliasBidder('appnexus', 'brealtime');
 		pbjs.aliasBidder('appnexus', 'oftmedia');
 	},
 	start: function(prebidSlots, adpBatchId) {

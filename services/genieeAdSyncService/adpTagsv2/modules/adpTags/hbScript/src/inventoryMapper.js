@@ -34,7 +34,11 @@ var inventoryMapper = {
 						});
 					}
 
-					if (!bidderData.sizeLess && bidderData.reusable && bidderData.config[updatedSize]) {
+					if (
+						!bidderData.sizeLess &&
+						bidderData.reusable &&
+						bidderData.config[updatedSize]
+					) {
 						bidders.push({
 							bidder: bidder,
 							params: bidderData.config[updatedSize]
