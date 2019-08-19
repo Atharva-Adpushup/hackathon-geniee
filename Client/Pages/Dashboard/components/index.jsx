@@ -96,7 +96,7 @@ class Dashboard extends React.Component {
 			const widget = { ...sortedWidgets[wid] };
 			if (widgetsList.indexOf(widget.name) > -1) {
 				widget.isLoading = true;
-				widget.selectedDate = dates[0].value;
+				widget.selectedDate = dates[2].value;
 				widget.isDataSufficient = false;
 				if (reportType == 'site' || widget.name == 'per_ap_original')
 					widget.selectedSite = selectedSite;

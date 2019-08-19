@@ -37,6 +37,8 @@ const activeLegendItemArray = [
 ];
 
 const dates = [
+	{ value: 'today', name: 'Today' },
+	{ value: 'yesterday', name: 'Yesterday' },
 	{ value: 'last7Days', name: 'Last 7 Days' },
 	{ value: 'last30Days', name: 'Last 30 Days' },
 	{ value: 'month', name: 'This Month' }
