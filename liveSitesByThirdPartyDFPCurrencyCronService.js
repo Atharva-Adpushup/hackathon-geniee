@@ -3,13 +3,18 @@ var syncGeneratedFileWithCdn = require('./services/genieeAdSyncService/service')
 	utils = require('./helpers/utils'),
 	moment = require('moment'),
 	cron = require('node-cron'),
+	_ = require('lodash'),
 	{ fileLogger } = require('./helpers/logger/file/index'),
 	liveSitesByValidThirdPartyDFPAndCurrencyModule = require('./misc/scripts/liveSitesByValidThirdPartyDFPAndCurrency');
 
 function updateGeneratedScriptsForLiveSites() {
 	var getThirdPartyDFPAndCurrencyLiveSites = liveSitesByValidThirdPartyDFPAndCurrencyModule.init(),
-		uploadValidLiveSites = getThirdPartyDFPAndCurrencyLiveSites.then(function(sitesArr) {
-			return utils.syncArrayPromise(sitesArr, syncGeneratedFileWithCdn.init);
+		uploadValidLiveSites = getThirdPartyDFPAndCurrencyLiveSites.then(function(userConfigsArr) {
+			return _.map(userConfigsArr, userConfig =>
+				utils.syncArrayPromise(userConfig.siteModels, siteModel =>
+					syncGeneratedFileWithCdn.init(siteModel)
+				)
+			);
 		});
 
 	return Promise.resolve(uploadValidLiveSites)

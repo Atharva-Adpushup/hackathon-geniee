@@ -130,20 +130,15 @@ function apiModule() {
 			bidderParams = { ...bidderParams };
 			switch (bidderCode) {
 				case 'conversant': {
-					// sizewise
-					for (const size in bidderParams) {
-						if (bidderParams.hasOwnProperty(size)) {
-							const isParamsExist = commonFunctions.verifyKeysInCollection(
-								bidderParams[size],
-								hbVideoParamsMap.conversant.params
-							);
+					const isParamsExist = commonFunctions.verifyKeysInCollection(
+						bidderParams,
+						hbVideoParamsMap.conversant.params
+					);
 
-							if (!isParamsExist) bidderParams[size] = {
-								...bidderParams[size],
-								...hbVideoParamsMap.conversant.params
-							};
-						}
-					}
+					if (!isParamsExist) bidderParams = {
+						...bidderParams,
+						...hbVideoParamsMap.conversant.params
+					};
 					
 					break;
 				}
@@ -213,21 +208,16 @@ function apiModule() {
 			bidderParams = { ...bidderParams };
 			switch (bidderCode) {
 				case 'conversant': {
-					// sizewise
-					for (const size in bidderParams) {
-						if (bidderParams.hasOwnProperty(size)) {
-							const isParamsExist = commonFunctions.verifyKeysInCollection(
-								bidderParams[size],
-								hbVideoParamsMap.conversant.params
-							);
+					const isParamsExist = commonFunctions.verifyKeysInCollection(
+						bidderParams,
+						hbVideoParamsMap.conversant.params
+					);
 
-							if (isParamsExist){
-								bidderParams[size] = commonFunctions.deleteKeysInCollection(
-									bidderParams[size],
-									hbVideoParamsMap.conversant.params
-								);
-							}
-						}
+					if (isParamsExist){
+						bidderParams = commonFunctions.deleteKeysInCollection(
+							bidderParams,
+							hbVideoParamsMap.conversant.params
+						);
 					}
 
 					break;

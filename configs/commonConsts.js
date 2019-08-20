@@ -2,6 +2,8 @@ const config = require('./config');
 
 const prodEnv = config.environment.HOST_ENV === 'production';
 
+const reportingBaseURL = 'https://staging.adpushup.com/CentralReportingWebService';
+
 module.exports = {
 	SALT: '_ADP_RANDOMIZER_',
 	BASE_URL: prodEnv ? 'https://console.adpushup.com' : 'http://localhost:8080',
@@ -11,16 +13,18 @@ module.exports = {
 	REPORT_STATUS: 'https://api.adpushup.com/OpsWebService/ops?report=getNetworkImportServiceStatus',
 	IE_TESTING_ENDPOINT: 'http://apdc1n-central5.eastus2.cloudapp.azure.com:8081/api/health-report',
 	PROXY_ORIGIN: '//proxy.app.adpushup.com',
-	PRODUCT_LIST_API: 'https://staging.adpushup.com/CentralReportingWebService/common/activeProducts',
-	MAB_REPORTING_API: 'https://staging.adpushup.com/CentralReportingWebService/site/mab',
-	ACTIVE_SITES_API: 'https://staging.adpushup.com/CentralReportingWebService/site/activeSiteList',
-	ANALYTICS_API_ROOT: 'https://staging.adpushup.com/CentralReportingWebService',
+	PRODUCT_LIST_API: `${reportingBaseURL}/common/activeProducts`,
+	MAB_REPORTING_API: `${reportingBaseURL}/site/mab`,
+	ACTIVE_SITES_API: `${reportingBaseURL}/site/activeSiteList`,
+	XPATH_MISS_MODE_URL_API: `${reportingBaseURL}/site/report`,
+	ANALYTICS_API_ROOT: reportingBaseURL,
 	ANALYTICS_METAINFO_URL: '/common/metaInfo',
 	REPORT_PATH: '/site/report?report_name=get_stats_by_custom',
 	DEMO_ACCOUNT_EMAIL: 'demo@adpushup.com',
 	AMP_SETTINGS_ACCESS_EMAILS: ['genieeamp@adpushup.com'],
 	DEMO_REPORT_SITE_ID: 31000,
-	DEMO_PAGEGROUPS: [
+	
+	EMO_PAGEGROUPS: [
 		'HOME',
 		'CALC',
 		'FAQ',

@@ -3,6 +3,7 @@ const _ = require('lodash');
 
 const { PREBID_ADAPTERS } = require('../../../configs/commonConsts');
 const siteModel = require('../../../models/siteModel');
+const userModel = require('../../../models/userModel');
 const couchbase = require('../../../helpers/couchBaseService');
 const { getHbAdsApTag } = require('./generateAPTagConfig');
 const {
@@ -19,23 +20,20 @@ function getHbConfig(siteId) {
 function getBiddersFromNetworkTree() {
 	return couchbase
 		.connectToAppBucket()
-		.then(appBucket => {
-			return appBucket
-				.getAsync(`data::apNetwork`, {})
-				.then(({ value: networkTree }) => {
-					const biddersFromNetworkTree = {};
+		.then(appBucket => 
+			appBucket.getAsync(`data::apNetwork`, {})
+		)
+		.then(({ value: networkTree }) => {
+			const biddersFromNetworkTree = {};
 
-					for (const bidderCode in networkTree) {
-						if (networkTree.hasOwnProperty(bidderCode)) {
-							if (networkTree[bidderCode].isHb) {
-								biddersFromNetworkTree[bidderCode] =
-									networkTree[bidderCode];
-							}
-						}
-					}
+			for (const bidderCode in networkTree) {
+				if (networkTree.hasOwnProperty(bidderCode) && networkTree[bidderCode].isHb) {
+					biddersFromNetworkTree[bidderCode] =
+						networkTree[bidderCode];
+				}
+			}
 
-					return biddersFromNetworkTree;
-				});
+			return biddersFromNetworkTree;
 		})
 		.catch(err => Promise.resolve({}));
 }
@@ -82,6 +80,7 @@ function getActiveUsedBidders(usedBidders, biddersFromNetworkTree) {
 
 function HbProcessing(site, apConfigs) {
 	const siteId = site.get('siteId');
+	const email = site.get('ownerEmail');
 	const isManual = site.get('isManual');
 
 	return Promise.join(
@@ -89,7 +88,8 @@ function HbProcessing(site, apConfigs) {
 		getBiddersFromNetworkTree(),
 		siteModel.getIncontentAndHbAds(siteId),
 		getHbAdsApTag(siteId, isManual),
-		(hbcf, biddersFromNetworkTree, incontentAndHbAds, hbAdsApTag) => {
+		userModel.getUserByEmail(email),
+		(hbcf, biddersFromNetworkTree, incontentAndHbAds, hbAdsApTag, user) => {
 			let { incontentAds = [], hbAds = [] } = incontentAndHbAds;
 			hbAds = hbAds.concat(hbAdsApTag); // Final Hb Ads
 			const isValidHBConfig = !!(
@@ -111,8 +111,9 @@ function HbProcessing(site, apConfigs) {
 
 			hbcf.value.hbcf = getActiveUsedBidders(hbcf.value.hbcf, biddersFromNetworkTree);
 
-			let isValidCurrencyCnfg = isValidThirdPartyDFPAndCurrency(
-				apConfigs
+			const adServerSettings = user.get('adServerSettings');
+			let isValidCurrencyCnfg = adServerSettings && adServerSettings.dfp &&  isValidThirdPartyDFPAndCurrency(
+				adServerSettings.dfp
 			);
 			let computedPrebidCurrencyConfig = {};
 			let deviceConfig = '';
@@ -166,6 +167,7 @@ function HbProcessing(site, apConfigs) {
 					prebidCurrencyConfig: prebidCurrencyConfig
 						? prebidCurrencyConfig
 						: '',
+					prebidCurrencyConfigObj: computedPrebidCurrencyConfig,
 					hbcf,
 					prebidAdapters: prebidAdapters
 				}
@@ -209,6 +211,11 @@ function init(site, computedConfig) {
 		HbProcessing(site, apConfigs),
 		gdprProcessing(site),
 		(hb, gdpr) => {
+			if (adpTagsConfig.prebidConfig) {
+				adpTagsConfig.prebidConfig.currencyConfig = hb.config.prebidCurrencyConfigObj;
+				delete hb.config.prebidCurrencyConfigObj;
+			}
+
 			statusesAndAds = {
 				...statusesAndAds,
 				statuses: {
@@ -237,10 +244,10 @@ function init(site, computedConfig) {
 			};
 		}
 	).catch(err => {
-		console.log(
-			`Error while creating generate config for site ${site.get(
-				'siteId'
-			)} and Error is ${err}`
+			console.log(
+				`Error while creating generate config for site ${site.get(
+					'siteId'
+				)} and Error is ${err}`
 		);
 		throw err;
 	});

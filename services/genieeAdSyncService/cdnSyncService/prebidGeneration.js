@@ -2,7 +2,7 @@ const Promise = require('bluebird');
 const { exec } = require('child_process');
 const path = require('path');
 
-const prebidDir = path.join(__dirname, '../', 'adpushup.js', 'modules', 'adpTags', 'Prebid.js');
+const prebidDir = path.join(__dirname, '../', 'adpushup.js', 'modules', 'adpTags', 'Prebid-latest');
 
 function init(generatedConfig) {
 	return new Promise((resolve, reject) => {

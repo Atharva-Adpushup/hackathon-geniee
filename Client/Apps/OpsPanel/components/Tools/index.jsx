@@ -33,7 +33,7 @@ class Tools extends Component {
 			case TOOLS_IDENTIFIERS.REGEX_VERIFICATION:
 				return <RegexVerification sites={sites} showNotification={showNotification} />;
 			case TOOLS_IDENTIFIERS.TOP_XPATH_MISS_MODE_URL:
-				return <TopXPathMissAndModeURL />;
+				return <TopXPathMissAndModeURL showNotification={showNotification} />;
 
 			case TOOLS_IDENTIFIERS.LOST_FOUND_LIVE_SITES:
 				return <LostFoundLiveSites showNotification={showNotification} />;

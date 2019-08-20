@@ -47,9 +47,17 @@ function verifyOwner(siteId, userEmail) {
 
 function errorHandler(err, res, code = HTTP_STATUS.BAD_REQUEST, debugData = {}) {
 	const customMessage = err.message || err;
-	const errorCode = customMessage.code || code;
-	const message = customMessage.message || 'Opertion Failed';
-	console.log(err);
+	const isCustomMessageNonEmptyString = !!(
+		typeof customMessage === 'string' && customMessage !== ''
+	);
+
+	let errorCode = code;
+	let message = customMessage || 'Opertion Failed';
+
+	if (isCustomMessageNonEmptyString === false) {
+		errorCode = customMessage.code || errorCode;
+		message = customMessage.message || message;
+	}
 	return sendErrorResponse({ message, code: errorCode, debugData }, res, errorCode);
 }
 

@@ -62,6 +62,7 @@ const yAxisGroups = [
 		seriesNames: ['AdPushup Variation Page RPM', 'Original Variation Page RPM'],
 		yAxisConfig: {
 			labels: {
+				// eslint-disable-next-line no-template-curly-in-string
 				format: '${value}'
 			}
 		}
