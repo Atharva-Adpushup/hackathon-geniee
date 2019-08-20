@@ -2,7 +2,7 @@ import React from 'react';
 import CustomChart from '../../../Components/CustomChart';
 import data from '../configs/data.json';
 import { yAxisGroups } from '../configs/commonConsts';
-import { roundOffTwoDecimal } from '../helpers/utils';
+import { roundOffTwoDecimal, getWidgetValidDationState } from '../helpers/utils';
 
 function computeDisplayData(props) {
 	const {
@@ -30,16 +30,23 @@ function computeDisplayData(props) {
 	return series;
 }
 
+const DEFAULT_STATE = {
+	series: []
+};
+
 class SitewiseReport extends React.Component {
-	state = {
-		series: []
-	};
+	state = DEFAULT_STATE;
 
 	static getDerivedStateFromProps(props) {
 		const { displayData } = props;
+		const { isValid, isValidAndEmpty } = getWidgetValidDationState(displayData);
 
-		if (!displayData) {
+		if (!isValid) {
 			return null;
+		}
+
+		if (isValidAndEmpty) {
+			return DEFAULT_STATE;
 		}
 
 		const seriesData = computeDisplayData(props);
