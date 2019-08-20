@@ -1,6 +1,5 @@
 let ADPTags = [];
 let finalJson = {};
-let isLegacyInnovativeAds = false;
 
 const Promise = require('bluebird'),
 	_ = require('lodash'),
@@ -78,9 +77,6 @@ const Promise = require('bluebird'),
 			}
 
 			const isResponsive = !!ad.networkData.isResponsive;
-			if (section.type === 3) {
-				isLegacyInnovativeAds = true;
-			}
 
 			json = {
 				id: sectionId,
@@ -144,7 +140,12 @@ const Promise = require('bluebird'),
 			return true;
 		}
 
-		let ads = getSectionsPayload(variation.sections, platform, pageGroup, variation.selectorsTreeLevel);
+		let ads = getSectionsPayload(
+			variation.sections,
+			platform,
+			pageGroup,
+			variation.selectorsTreeLevel
+		);
 		let computedVariationObj;
 		let contentSelector = variation.contentSelector;
 		let isContentSelector = !!contentSelector;
@@ -222,8 +223,15 @@ const Promise = require('bluebird'),
 		};
 
 		_.each(channel.variations, (variation, id) => {
-			let variationData = pageGroupData && _.isObject(pageGroupData) ? pageGroupData.variations[id] : null;
-			let variationPayload = getVariationPayload(variation, platform, pageGroup, variationData, finalJson);
+			let variationData =
+				pageGroupData && _.isObject(pageGroupData) ? pageGroupData.variations[id] : null;
+			let variationPayload = getVariationPayload(
+				variation,
+				platform,
+				pageGroup,
+				variationData,
+				finalJson
+			);
 			if (typeof variationPayload == 'object' && Object.keys(variationPayload).length) {
 				finalJson[platform][pageGroup].variations.push(variationPayload);
 				finalJson[platform][pageGroup].hasVariationsWithNoData =
@@ -248,10 +256,11 @@ const Promise = require('bluebird'),
 			const ads = docWithCas.value.ads.filter(ad => !ad.hasOwnProperty('isActive') || ad.isActive);
 			return ads;
 		});
-		// .catch(err => Promise.reject(new Error(`Error fetching tgmr doc for ${siteId}`)));
 	},
 	getAdsAndPushToAdp = (identifier, docKey, site) => {
-		if (!site.get(identifier)) {
+		const apps = site.get('apps') || { [identifier]: false };
+
+		if (!apps[identifier]) {
 			return Promise.resolve([]);
 		}
 
@@ -261,15 +270,15 @@ const Promise = require('bluebird'),
 				return ads;
 			})
 			.catch(err =>
-				err.code && err.code === 13 && err.message.includes('key does not exist') ? [] : Promise.reject(err)
+				err.code && err.code === 13 && err.message.includes('key does not exist')
+					? []
+					: Promise.reject(err)
 			);
 	},
 	generatePayload = (site, pageGroupData) => {
 		//Empty finaJson and dfpAunits
 		finalJson = {};
 		ADPTags = [];
-		isLegacyInnovativeAds = false;
-		// let manualAds = [];
 		const pageGroupPattern = site.get('apConfigs').pageGroupPattern;
 
 		return site
@@ -283,10 +292,10 @@ const Promise = require('bluebird'),
 			)
 			.then(() => {
 				return Promise.join(
-					getAdsAndPushToAdp('isManual', `tgmr::${site.get('siteId')}`, site),
-					getAdsAndPushToAdp('isInnovative', `fmrt::${site.get('siteId')}`, site),
+					getAdsAndPushToAdp('apTag', `tgmr::${site.get('siteId')}`, site),
+					getAdsAndPushToAdp('innovativeAds', `fmrt::${site.get('siteId')}`, site),
 					(manualAds, innovativeAds) => {
-						return [finalJson, ADPTags, manualAds, innovativeAds, isLegacyInnovativeAds];
+						return [finalJson, ADPTags, manualAds, innovativeAds];
 					}
 				);
 			});
