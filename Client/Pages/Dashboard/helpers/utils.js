@@ -12,6 +12,20 @@ const convertObjToArr = obj =>
 const getDateRange = value => {
 	switch (value) {
 		default:
+		case 'today':
+			return {
+				fromDate: moment().format('YYYY-MM-DD'),
+				toDate: moment().format('YYYY-MM-DD')
+			};
+		case 'yesterday':
+			return {
+				fromDate: moment()
+					.subtract(1, 'days')
+					.format('YYYY-MM-DD'),
+				toDate: moment()
+					.subtract(1, 'days')
+					.format('YYYY-MM-DD')
+			};
 		case 'last7Days':
 			return {
 				fromDate: moment()

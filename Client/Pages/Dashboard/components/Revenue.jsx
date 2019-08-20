@@ -4,35 +4,47 @@ import data from '../configs/data.json';
 import { yAxisGroups } from '../configs/commonConsts';
 import { roundOffTwoDecimal } from '../helpers/utils';
 
+function computeDisplayData(props) {
+	const {
+		displayData: { result: resultData }
+	} = props;
+	const series = [
+		{
+			name: 'Revenue',
+			colorByPoint: true,
+			data: []
+		}
+	];
+	const seriesData = [];
+
+	if (resultData) {
+		resultData.forEach(result => {
+			seriesData.push({
+				name: result.network,
+				y: parseFloat(roundOffTwoDecimal(result.revenue))
+			});
+		});
+	}
+
+	series[0].data = seriesData;
+	return series;
+}
+
 class SitewiseReport extends React.Component {
 	state = {
 		series: []
 	};
 
-	componentDidMount() {
-		const { displayData } = this.props;
-		this.computeGraphData(displayData.result);
-	}
+	static getDerivedStateFromProps(props) {
+		const { displayData } = props;
 
-	computeGraphData = results => {
-		const series = [
-			{
-				name: 'Revenue',
-				colorByPoint: true,
-				data: []
-			}
-		];
-		const seriesData = [];
-		if (results)
-			results.forEach(result => {
-				seriesData.push({
-					name: result.network,
-					y: parseFloat(roundOffTwoDecimal(result.revenue))
-				});
-			});
-		series[0].data = seriesData;
-		this.setState({ series });
-	};
+		if (!displayData) {
+			return null;
+		}
+
+		const seriesData = computeDisplayData(props);
+		return { series: seriesData };
+	}
 
 	renderChart() {
 		const type = 'pie';

@@ -2,68 +2,85 @@ import React from 'react';
 import Datatable from 'react-bs-datatable';
 import { numberWithCommas, roundOffTwoDecimal } from '../helpers/utils';
 
+function formatTableData(tableBody, props) {
+	const { metrics } = props;
+
+	tableBody.forEach(row => {
+		for (const col in row) {
+			if (metrics[col]) {
+				const num = row[col];
+
+				row[col] =
+					metrics[col].valueType == 'money'
+						? `$${numberWithCommas(roundOffTwoDecimal(num))}`
+						: numberWithCommas(num);
+			}
+		}
+	});
+}
+
+function computeTableData(data, props) {
+	const { result, columns } = data;
+	const tableHeader = [];
+	const { metrics, site, reportType } = props;
+
+	if ((result, columns)) {
+		columns.forEach(col => {
+			if (metrics[col]) {
+				tableHeader.push({
+					title: metrics[col].display_name,
+					prop: col,
+					position: metrics[col].position + 1
+				});
+			}
+		});
+
+		if (reportType === 'site') {
+			tableHeader.push({
+				title: 'Date',
+				prop: 'date',
+				position: 1
+			});
+		} else {
+			tableHeader.push({
+				title: 'Website',
+				prop: 'siteName',
+				position: 1
+			});
+		}
+
+		tableHeader.sort((a, b) => a.position - b.position);
+		result.forEach(row => {
+			const { siteid } = row;
+			row.siteName = site[siteid]
+				? React.cloneElement(<a href={`/reports/${siteid}`}>{site[siteid].siteName}</a>)
+				: 'Not Found';
+		});
+
+		formatTableData(result, props);
+	}
+
+	const computedState = { tableHeader, tableBody: result || [] };
+	return computedState;
+}
+
 class SitewiseReport extends React.Component {
 	state = {
 		tableHeader: [],
 		tableBody: []
 	};
 
-	componentDidMount() {
-		const { displayData } = this.props;
-		this.computeTableData(displayData);
-	}
+	static getDerivedStateFromProps(props) {
+		const { displayData } = props;
+		const isValidDisplayData = !!(displayData && displayData.result && displayData.columns);
 
-	formatTableData = tableBody => {
-		const { metrics } = this.props;
-		tableBody.forEach(row => {
-			for (const col in row) {
-				if (metrics[col]) {
-					const num = row[col];
-					row[col] =
-						metrics[col].valueType == 'money'
-							? `$${numberWithCommas(roundOffTwoDecimal(num))}`
-							: numberWithCommas(num);
-				}
-			}
-		});
-	};
-
-	computeTableData = data => {
-		const { result, columns } = data;
-		const tableHeader = [];
-		const { metrics, site, reportType } = this.props;
-		if ((result, columns)) {
-			columns.forEach(col => {
-				if (metrics[col])
-					tableHeader.push({
-						title: metrics[col].display_name,
-						prop: col,
-						position: metrics[col].position + 1
-					});
-			});
-			if (reportType === 'site')
-				tableHeader.push({
-					title: 'Date',
-					prop: 'date',
-					position: 1
-				});
-			else
-				tableHeader.push({
-					title: 'Website',
-					prop: 'siteName',
-					position: 1
-				});
-			tableHeader.sort((a, b) => a.position - b.position);
-			result.forEach(row => {
-				const { siteid } = row;
-				row.siteName = site[siteid]
-					? React.cloneElement(<a href={`/reports/${siteid}`}>{site[siteid].siteName}</a>)
-					: 'Not Found';
-			});
-			this.formatTableData(result);
+		if (!isValidDisplayData) {
+			return null;
 		}
-		this.setState({ tableHeader, tableBody: result || [] });
-	};
+
+		const computedState = computeTableData(displayData, props);
+		return { ...computedState };
+	}
 
 	renderTable() {
 		const { tableBody, tableHeader } = this.state;
