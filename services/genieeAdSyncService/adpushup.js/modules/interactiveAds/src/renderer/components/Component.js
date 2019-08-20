@@ -90,7 +90,7 @@ class Component {
 
 		$format.attr({ id, 'data-section': id, class: '_ap_apex_ad' });
 		$frame.css({
-			width,
+			// width,
 			...commonConsts.FRAME.CSS.COMMON,
 			...commonConsts.FRAME.CSS[formatData.placement.toUpperCase()]
 		});
@@ -100,7 +100,7 @@ class Component {
 			$frame.append($banner);
 		}
 		$frame.append($closeButton);
-		$frame.append('<div style="clear:both">&nbsp;</div>');
+		// $frame.append('<div style="clear:both">&nbsp;</div>');
 		$format.append($frame);
 
 		// adp.tracker.add(

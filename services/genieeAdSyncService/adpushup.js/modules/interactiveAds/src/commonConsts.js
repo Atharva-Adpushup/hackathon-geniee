@@ -35,10 +35,10 @@ const commonConsts = {
 			'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 15 15"><path d="M3.25,3.25l8.5,8.5M11.75,3.25l-8.5,8.5"></path></svg>',
 		CSS: {
 			COMMON: {
-				// position: 'absolute',
-				// top: 0,
-				// right: 0,
-				float: 'right',
+				position: 'absolute',
+				top: '2px',
+				right: '2px',
+				// float: 'right',
 				height: '15px',
 				width: '15px',
 				stroke: '#fff',
@@ -68,12 +68,14 @@ const commonConsts = {
 				display: 'inline-block',
 				padding: '2px 6px',
 				// position: 'absolute',
-				textDecoration: 'none',
-				float: 'left'
+				textDecoration: 'none'
+				// float: 'left'
 				// left: 0
 			},
 			LOGO: {
-				'max-width': '50px',
+				'max-width': '75px',
+				height: '14px',
+				'vertical-align': 'middle',
 				'margin-left': '2px'
 				// background: '#fff'
 			}
@@ -85,7 +87,8 @@ const commonConsts = {
 				background: 'rgba(0,0,0,0.5)',
 				'padding-bottom': '2px',
 				'max-height': '20px',
-				margin: '0px auto'
+				margin: '0px auto',
+				position: 'relative'
 			},
 			LEFT: {},
 			RIGHT: {},
