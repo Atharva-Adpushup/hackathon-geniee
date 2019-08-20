@@ -245,6 +245,7 @@ class Dashboard extends React.Component {
 							options={quickDates}
 							onSelect={date => {
 								widgetsConfig[wid]['selectedDate'] = date;
+								widgetsConfig[wid].isLoading = true;
 								this.setState({ widgetsConfig }, () => this.getDisplayData(wid));
 							}}
 						/>
@@ -268,6 +269,8 @@ class Dashboard extends React.Component {
 							options={sitesToShow}
 							onSelect={site => {
 								widgetsConfig[wid]['selectedSite'] = site;
+								widgetsConfig[wid].isLoading = true;
+
 								this.setState({ widgetsConfig }, () => this.getDisplayData(wid));
 							}}
 						/>
