@@ -47,10 +47,10 @@ const commonConsts = {
 				top: -15
 			},
 			BOTTOM: {
-				top: -15
+				// top: -15
 			},
 			TOP: {
-				bottom: -15
+				// bottom: -15
 			}
 		}
 	},
