@@ -173,7 +173,7 @@ class Dashboard extends React.Component {
 					response.status == 200 &&
 					!isEmpty(response.data) &&
 					response.data.result &&
-					response.data.result.length > 0
+					response.data.result.length
 				) {
 					widgetsConfig[wid].data = response.data;
 					widgetsConfig[wid].isDataSufficient = true;

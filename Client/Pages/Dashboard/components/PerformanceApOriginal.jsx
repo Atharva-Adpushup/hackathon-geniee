@@ -2,6 +2,7 @@ import React from 'react';
 import moment from 'moment';
 import CustomChart from '../../../Components/CustomChart';
 import { yAxisGroups } from '../configs/commonConsts';
+import { getWidgetValidDationState } from '../helpers/utils';
 
 function computeGraphData(results) {
 	let series = [];
@@ -51,21 +52,27 @@ function computeGraphData(results) {
 	return computedState;
 }
 
+const DEFAULT_STATE = {
+	series: [],
+	xAxis: {}
+};
+
 class PerformanceApOriginal extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = {
-			series: [],
-			xAxis: {}
-		};
+		this.state = DEFAULT_STATE;
 	}
 
 	static getDerivedStateFromProps(props) {
 		const { displayData } = props;
-		const isValidDisplayData = !!(displayData && displayData.result);
+		const { isValid, isValidAndEmpty } = getWidgetValidDationState(displayData);
 
-		if (!isValidDisplayData) {
+		if (!isValid) {
 			return null;
+		}
+
+		if (isValidAndEmpty) {
+			return DEFAULT_STATE;
 		}
 
 		const computedState = computeGraphData(displayData.result);
