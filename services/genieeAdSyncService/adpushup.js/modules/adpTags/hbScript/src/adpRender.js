@@ -6,6 +6,7 @@ var utils = require('../helpers/utils'),
 	feedback = require('./feedback').feedback,
 	$ = require('./adp').$,
 	adp = require('./adp').adp,
+	UTM_REPORTING_SITES = [39041, 39358],
 	getDFPCOntainerFromDom = function(containerId) {
 		return document.getElementById(containerId);
 	},
@@ -207,7 +208,10 @@ var utils = require('../helpers/utils'),
 			if (dfpAdunitCodes.indexOf(slot.optionalParam.dfpAdunitCode) !== -1) {
 				var currentTargetingObject =
 						config.TARGETING[
-							'/' + networkCodes[slot.optionalParam.dfpAdunitCode] + '/' + slot.optionalParam.dfpAdunitCode
+							'/' +
+								networkCodes[slot.optionalParam.dfpAdunitCode] +
+								'/' +
+								slot.optionalParam.dfpAdunitCode
 						],
 					currentTargetingObject = setPageLevelTargeting(currentTargetingObject, slot);
 				Object.keys(currentTargetingObject).forEach(function(dfpKey, index) {
@@ -332,7 +336,7 @@ var utils = require('../helpers/utils'),
 				googletag.pubads().setTargeting(key, String(config.PAGE_KEY_VALUES[key]));
 			}
 
-			if (config.SITE_ID === 39041) {
+			if (config.SITE_ID && UTM_REPORTING_SITES.indexOf(config.SITE_ID) !== -1) {
 				setUTMWiseTargeting();
 			}
 
