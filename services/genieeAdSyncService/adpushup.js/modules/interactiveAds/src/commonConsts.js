@@ -44,7 +44,7 @@ const commonConsts = {
 				stroke: '#fff',
 				cursor: 'pointer',
 				'stroke-width': 1.25,
-				top: -15
+				// top: -15
 			},
 			BOTTOM: {
 				// top: -15
