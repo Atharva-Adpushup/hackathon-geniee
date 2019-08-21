@@ -16,9 +16,7 @@ export default class BiddersTab extends React.Component {
 	availableViews = ['biddersList', 'addBidder', 'manageBidder'];
 
 	componentDidMount() {
-		const { fetchAllBiddersAction, siteId, bidders } = this.props;
-
-		if (bidders) return;
+		const { fetchAllBiddersAction, siteId } = this.props;
 
 		fetchAllBiddersAction(siteId);
 	}

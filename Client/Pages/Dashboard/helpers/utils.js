@@ -12,6 +12,20 @@ const convertObjToArr = obj =>
 const getDateRange = value => {
 	switch (value) {
 		default:
+		case 'today':
+			return {
+				fromDate: moment().format('YYYY-MM-DD'),
+				toDate: moment().format('YYYY-MM-DD')
+			};
+		case 'yesterday':
+			return {
+				fromDate: moment()
+					.subtract(1, 'days')
+					.format('YYYY-MM-DD'),
+				toDate: moment()
+					.subtract(1, 'days')
+					.format('YYYY-MM-DD')
+			};
 		case 'last7Days':
 			return {
 				fromDate: moment()
@@ -54,4 +68,23 @@ const roundOffTwoDecimal = value => {
 
 const numberWithCommas = x => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
-export { convertObjToArr, getDateRange, numberWithCommas, roundOffTwoDecimal };
+const isEmptyObject = object => !!(object && Object.keys(object).length === 0);
+
+const getWidgetValidDationState = displayData => {
+	const isValid = !!displayData;
+	const validationState = {
+		isValid,
+		isValidAndEmpty: !!(isValid && isEmptyObject(displayData))
+	};
+
+	return validationState;
+};
+
+export {
+	convertObjToArr,
+	getDateRange,
+	numberWithCommas,
+	roundOffTwoDecimal,
+	isEmptyObject,
+	getWidgetValidDationState
+};

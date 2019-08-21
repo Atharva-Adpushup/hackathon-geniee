@@ -1,45 +1,64 @@
 import React from 'react';
-import { numberWithCommas, roundOffTwoDecimal } from '../helpers/utils';
+import { numberWithCommas, roundOffTwoDecimal, getWidgetValidDationState } from '../helpers/utils';
 import { displayMetrics } from '../configs/commonConsts';
+
+function computeDisplayData(props) {
+	const {
+		displayData: { result, columns },
+		metrics,
+		siteId,
+		reportType
+	} = props;
+	const resultData = {};
+
+	if (columns && result) {
+		columns.forEach(col => {
+			if (metrics[col]) {
+				resultData[col] = { name: metrics[col].display_name, value: 0 };
+			}
+		});
+		result.forEach(row => {
+			if (reportType === 'site' && row.siteid === siteId)
+				Object.keys(row).map(col => {
+					if (resultData[col]) resultData[col].value = row[col];
+					return true;
+				});
+			else
+				Object.keys(row).map(col => {
+					if (resultData[col]) resultData[col].value += row[col];
+					return true;
+				});
+		});
+	}
+
+	return resultData;
+}
+
+const DEFAULT_STATE = {
+	displayData: {}
+};
 
 class PerformanceOverview extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = {
-			displayData: {}
-		};
+		this.state = DEFAULT_STATE;
 	}
 
-	componentDidMount() {
-		const { displayData } = this.props;
-		this.computeData(displayData);
-	}
+	static getDerivedStateFromProps(props) {
+		const { displayData } = props;
+		const { isValid, isValidAndEmpty } = getWidgetValidDationState(displayData);
 
-	computeData = data => {
-		const { result, columns } = data;
-		const displayData = {};
-		const { metrics, siteId, reportType } = this.props;
-		if (columns && result) {
-			columns.forEach(col => {
-				if (metrics[col]) {
-					displayData[col] = { name: metrics[col].display_name, value: 0 };
-				}
-			});
-			result.forEach(row => {
-				if (reportType === 'site' && row.siteid === siteId)
-					Object.keys(row).map(col => {
-						if (displayData[col]) displayData[col].value = row[col];
-						return true;
-					});
-				else
-					Object.keys(row).map(col => {
-						if (displayData[col]) displayData[col].value += row[col];
-						return true;
-					});
-			});
+		if (!isValid) {
+			return null;
 		}
-		this.setState({ displayData });
-	};
+
+		if (isValidAndEmpty) {
+			return DEFAULT_STATE;
+		}
+
+		const resultData = computeDisplayData(props);
+		return { displayData: resultData };
+	}
 
 	render() {
 		const { displayData } = this.state;

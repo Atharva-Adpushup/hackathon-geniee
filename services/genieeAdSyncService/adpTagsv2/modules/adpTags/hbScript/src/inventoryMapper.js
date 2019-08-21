@@ -17,7 +17,7 @@ var inventoryMapper = {
 		var hbConfig = inventory.hbcf;
 
 		if (optionalParam.headerBidding && hbConfig && Object.keys(hbConfig).length) {
-			var updatedSizeArr = optionalParam.multipleAdSizes[0];
+			var updatedSizeArr = optionalParam.multipleAdSizes ? optionalParam.multipleAdSizes[0] : size;
 			var updatedSize = updatedSizeArr[0] + 'x' + updatedSizeArr[1];
 			if (optionalParam.overrideActive && optionalParam.overrideSizeTo) {
 				updatedSize = optionalParam.overrideSizeTo;

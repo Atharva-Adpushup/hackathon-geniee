@@ -2,65 +2,82 @@ import React from 'react';
 import moment from 'moment';
 import CustomChart from '../../../Components/CustomChart';
 import { yAxisGroups } from '../configs/commonConsts';
+import { getWidgetValidDationState } from '../helpers/utils';
+
+function computeGraphData(results) {
+	let series = [];
+	const adpushupSeriesData = [];
+	const baselineSeriesData = [];
+	const xAxis = { categories: [] };
+
+	if (results.length) {
+		results.sort((a, b) => {
+			const dateA = a.report_date;
+			const dateB = b.report_date;
+			if (dateA < dateB) {
+				return -1;
+			}
+			if (dateA > dateB) {
+				return 1;
+			}
+			return 0;
+		});
+
+		results.forEach(result => {
+			adpushupSeriesData.push(result.adpushup_variation_page_cpm);
+			baselineSeriesData.push(result.original_variation_page_cpm);
+			xAxis.categories.push(moment(result.report_date).format('ll'));
+		});
+
+		series = [
+			{
+				data: adpushupSeriesData,
+				name: 'AdPushup Variation Page RPM',
+				value: 'adpushup_variation_page_cpm',
+				valueType: 'money'
+			},
+			{
+				data: baselineSeriesData,
+				name: 'Original Variation Page RPM',
+				value: 'original_variation_page_cpm',
+				valueType: 'money'
+			}
+		];
+	}
+
+	const computedState = {
+		series,
+		xAxis
+	};
+	return computedState;
+}
+
+const DEFAULT_STATE = {
+	series: [],
+	xAxis: {}
+};
 
 class PerformanceApOriginal extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = {
-			series: [],
-			xAxis: {}
-		};
+		this.state = DEFAULT_STATE;
 	}
 
-	componentDidMount() {
-		const { displayData } = this.props;
-		if (displayData && displayData.result) {
-			this.computeGraphData(displayData.result);
-		}
-	}
+	static getDerivedStateFromProps(props) {
+		const { displayData } = props;
+		const { isValid, isValidAndEmpty } = getWidgetValidDationState(displayData);
 
-	computeGraphData = results => {
-		let series = [];
-		const adpushupSeriesData = [];
-		const baselineSeriesData = [];
-		const xAxis = { categories: [] };
-		if (results.length > 0) {
-			results.sort((a, b) => {
-				const dateA = a.report_date;
-				const dateB = b.report_date;
-				if (dateA < dateB) {
-					return -1;
-				}
-				if (dateA > dateB) {
-					return 1;
-				}
-				return 0;
-			});
-			results.forEach(result => {
-				adpushupSeriesData.push(result.adpushup_variation_page_cpm);
-				baselineSeriesData.push(result.original_variation_page_cpm);
-				xAxis.categories.push(moment(result.report_date).format('ll'));
-			});
-			series = [
-				{
-					data: adpushupSeriesData,
-					name: 'AdPushup Variation Page RPM',
-					value: 'adpushup_variation_page_cpm',
-					valueType: 'money'
-				},
-				{
-					data: baselineSeriesData,
-					name: 'Original Variation Page RPM',
-					value: 'original_variation_page_cpm',
-					valueType: 'money'
-				}
-			];
+		if (!isValid) {
+			return null;
 		}
-		this.setState({
-			series,
-			xAxis
-		});
-	};
+
+		if (isValidAndEmpty) {
+			return DEFAULT_STATE;
+		}
+
+		const computedState = computeGraphData(displayData.result);
+		return { ...computedState };
+	}
 
 	renderChart() {
 		const type = 'spline';

@@ -2,37 +2,56 @@ import React from 'react';
 import CustomChart from '../../../Components/CustomChart';
 import data from '../configs/data.json';
 import { yAxisGroups } from '../configs/commonConsts';
-import { roundOffTwoDecimal } from '../helpers/utils';
+import { roundOffTwoDecimal, getWidgetValidDationState } from '../helpers/utils';
 
-class SitewiseReport extends React.Component {
-	state = {
-		series: []
-	};
+function computeDisplayData(props) {
+	const {
+		displayData: { result: resultData }
+	} = props;
+	const series = [
+		{
+			name: 'Revenue',
+			colorByPoint: true,
+			data: []
+		}
+	];
+	const seriesData = [];
 
-	componentDidMount() {
-		const { displayData } = this.props;
-		this.computeGraphData(displayData.result);
+	if (resultData) {
+		resultData.forEach(result => {
+			seriesData.push({
+				name: result.network,
+				y: parseFloat(roundOffTwoDecimal(result.revenue))
+			});
+		});
 	}
 
-	computeGraphData = results => {
-		const series = [
-			{
-				name: 'Revenue',
-				colorByPoint: true,
-				data: []
-			}
-		];
-		const seriesData = [];
-		if (results)
-			results.forEach(result => {
-				seriesData.push({
-					name: result.network,
-					y: parseFloat(roundOffTwoDecimal(result.revenue))
-				});
-			});
-		series[0].data = seriesData;
-		this.setState({ series });
-	};
+	series[0].data = seriesData;
+	return series;
+}
+
+const DEFAULT_STATE = {
+	series: []
+};
+
+class SitewiseReport extends React.Component {
+	state = DEFAULT_STATE;
+
+	static getDerivedStateFromProps(props) {
+		const { displayData } = props;
+		const { isValid, isValidAndEmpty } = getWidgetValidDationState(displayData);
+
+		if (!isValid) {
+			return null;
+		}
+
+		if (isValidAndEmpty) {
+			return DEFAULT_STATE;
+		}
+
+		const seriesData = computeDisplayData(props);
+		return { series: seriesData };
+	}
 
 	renderChart() {
 		const type = 'pie';
