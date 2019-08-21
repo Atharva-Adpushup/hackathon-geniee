@@ -10,142 +10,146 @@ var request = require('request-promise'),
 	AdPushupError = require('../helpers/AdPushupError'),
 	API = {
 		load(url, userAgent, fullResponse) {
-			userAgent =
-				userAgent ||
-				'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36';
-			return request({
-				uri: url,
-				jar: true,
-				strictSSL: false,
-				resolveWithFullResponse: !!fullResponse,
-				headers: {
-					'User-Agent': userAgent,
-					'Accept-Encoding': 'identity'
-				}
-			}).catch(err => {
-				if (err && err.message.indexOf('I really need an ID for this to work') === -1) {
-					return false;
-				}
-				return true;
-			});
-		},
-		detectCustomAp(url, siteId) {
-			return API.load(url).then(body => {
-				const apCodeDetected = body.match(`//.+.adpushup.com/${siteId}/adpushup.js`);
-				return !!apCodeDetected;
-			});
-		},
-		detectAdPushup(url) {
-			return API.load(url).then(body => {
-				const $ = cheerio.load(body);
+		userAgent =
+			userAgent ||
+			'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36';
+		return request({
+			uri: url,
+			jar: true,
+			strictSSL: false,
+			resolveWithFullResponse: !!fullResponse,
+			headers: {
+				'User-Agent': userAgent,
+				'Accept-Encoding': 'identity'
+			}
+		}).catch(err => {
+			if (err && err.message.indexOf('I really need an ID for this to work') === -1) {
+				return false;
+			}
+			return true;
+		});
+	},
+	detectCustomAp(url, siteId) {
+		return API.load(url).then(body => {
+			const apCodeDetected = body.match(`//.+.adpushup.com/${siteId}/adpushup.js`);
+			return !!apCodeDetected;
+		});
+	},
+	detectAdPushup(url) {
+		return API.load(url).then(body => {
+			const $ = cheerio.load(body);
 
-				let json = null;
+			let json = null;
 
-				let finalData;
-				$('noscript').each((index, el) => {
-					let html = $(el)
-						.text()
-						.trim();
-					if (html.indexOf('_ap_ufes') === -1) {
-						return true;
-					}
-					html = _.trimStart(html, '_ap_ufes');
-					html = _.trimEnd(html, '_ap_ufee');
-					json = JSON.parse(html);
-					return false;
-				});
-				if (!json) {
-					return false;
+			let finalData;
+			$('noscript').each((index, el) => {
+				let html = $(el)
+					.text()
+					.trim();
+				if (html.indexOf('_ap_ufes') === -1) {
+					return true;
 				}
-				finalData = { cmsName: 'wordpress', pageGroups: [] };
-				Object.keys(json.urls).forEach(key => {
-					finalData.pageGroups.push({ pageGroup: key.toUpperCase(), sampleUrl: json.urls[key] });
-				});
-				return finalData;
+				html = _.trimStart(html, '_ap_ufes');
+				html = _.trimEnd(html, '_ap_ufee');
+				json = JSON.parse(html);
+				return false;
 			});
-		},
-		fetchOurAdsTxt() {
-			return API.load(commonConst.onboarding.adsTxtDocUrl);
-		},
-		normalizeAdsTxtEntries: text => {
-			let normalizedText = text.replace(/[, \t]+/g, ',');
+			if (!json) {
+				return false;
+			}
+			finalData = { cmsName: 'wordpress', pageGroups: [] };
+			Object.keys(json.urls).forEach(key => {
+				finalData.pageGroups.push({ pageGroup: key.toUpperCase(), sampleUrl: json.urls[key] });
+			});
+			return finalData;
+		});
+	},
+	fetchOurAdsTxt() {
+		return API.load(commonConst.onboarding.adsTxtDocUrl);
+	},
+	normalizeAdsTxtEntries: text => {
+		let normalizedText = text.replace(/[, \t]+/g, ',');
 
-			// trim Byte Order Mark
-			if (normalizedText.charCodeAt(0) === 65279) {
-				normalizedText = normalizedText.substr(1);
+		// trim Byte Order Mark
+		if (normalizedText.charCodeAt(0) === 65279) {
+			normalizedText = normalizedText.substr(1);
+		}
+
+		// split new lines
+		let stringArr = normalizedText.split(/[\n\r]+/);
+
+		// Filter out comments and empty lines
+		stringArr = stringArr.filter(string => string[0] !== '#' && string !== '' && string !== ',');
+
+		let normalizedEntries = stringArr.map(str => {
+			const arr = str.trim().split(',');
+			const normalizedArray = [];
+
+			for (let i = 0; i < arr.length; i++) {
+				if (arr[i] && arr[i][0] !== '#') {
+					normalizedArray.push(arr[i].trim().toLowerCase());
+				}
 			}
 
-			// split new lines
-			let stringArr = normalizedText.split(/[\n\r]+/);
+			normalizedArray.splice(3);
 
-			// Filter out comments and empty lines
-			stringArr = stringArr.filter(string => string[0] !== '#' && string !== '' && string !== ',');
+			const normalizedEntry = normalizedArray.join(', ');
+			// const normalizedEntry = `${
+			// 	arr[0] && arr[0][0] !== '#' ? arr[0].trim().toLowerCase() : ''
+			// },${arr[1] && arr[1][0] !== '#' ? arr[1].trim().toLowerCase() : ''},${
+			// 	arr[2] && arr[2][0] !== '#' ? arr[2].trim().toUpperCase() : ''
+			// }`;
 
-			let normalizedEntries = stringArr.map(str => {
-				const arr = str.trim().split(',');
-				let normalizedEntry = '';
-				for (let i = 0; i < arr.length; i++) {
-					if (arr[i] && arr[i][0] !== '#') {
-						normalizedEntry += arr[i].trim().toLowerCase();
-						if (i !== arr.length - 1) normalizedEntry += ',';
+			return normalizedEntry;
+		});
+
+		// filter out duplicate entries
+		normalizedEntries = normalizedEntries.filter(
+			(item, pos, currArray) => currArray.indexOf(item) === pos
+		);
+
+		return normalizedEntries;
+	},
+	verifyAdsTxt(url, ourAdsTxt) {
+		let tempUrl = url;
+		if (tempUrl.indexOf('http://') == -1 && tempUrl.indexOf('https://') == -1) {
+			tempUrl = `http://${tempUrl}`;
+		}
+		return API.load(`${utils.rightTrim(tempUrl, '/')}/ads.txt`).then(existingAdsTxt => {
+			if (typeof existingAdsTxt === 'string') {
+				const existingAdsTxtArr = API.normalizeAdsTxtEntries(existingAdsTxt);
+				const ourAdsTxtArr = API.normalizeAdsTxtEntries(ourAdsTxt);
+
+				const entriesNotFound = ourAdsTxtArr.filter(
+					value => existingAdsTxtArr.indexOf(value) === -1
+				);
+
+				if (entriesNotFound.length) {
+					if (entriesNotFound.length == ourAdsTxtArr.length) {
+						throw new AdPushupError({
+							httpCode: 204,
+							error: 'Our Ads.txt entries not found.',
+							ourAdsTxt: entriesNotFound.join('\n')
+						});
+					} else {
+						throw new AdPushupError({
+							httpCode: 206,
+							error: 'Few of our Ads.txt entries not found',
+							ourAdsTxt: entriesNotFound.join('\n')
+						});
 					}
 				}
-				// const normalizedEntry = `${
-				// 	arr[0] && arr[0][0] !== '#' ? arr[0].trim().toLowerCase() : ''
-				// },${arr[1] && arr[1][0] !== '#' ? arr[1].trim().toLowerCase() : ''},${
-				// 	arr[2] && arr[2][0] !== '#' ? arr[2].trim().toUpperCase() : ''
-				// }`;
-
-				return normalizedEntry;
-			});
-
-			// filter out duplicate entries
-			normalizedEntries = normalizedEntries.filter(
-				(item, pos, currArray) => currArray.indexOf(item) === pos
-			);
-
-			return normalizedEntries;
-		},
-		verifyAdsTxt(url, ourAdsTxt) {
-			let tempUrl=url;
-			if(tempUrl.indexOf('http://')==-1&&tempUrl.indexOf('https://')==-1){
-				tempUrl=`http://${tempUrl}`;
+			} else {
+				throw new AdPushupError({
+					httpCode: 404,
+					error:
+						'ads.txt file not found on your site. Please upload our ads.txt file on your site.',
+					ourAdsTxt
+				});
 			}
-			return API.load(`${utils.rightTrim(tempUrl, '/')}/ads.txt`).then(existingAdsTxt => {
-				if (typeof existingAdsTxt === 'string') {
-					const existingAdsTxtArr = API.normalizeAdsTxtEntries(existingAdsTxt);
-					const ourAdsTxtArr = API.normalizeAdsTxtEntries(ourAdsTxt);
-
-					const entriesNotFound = ourAdsTxtArr.filter(
-						value => existingAdsTxtArr.indexOf(value) === -1
-					);
-
-					if (entriesNotFound.length) {
-						if (entriesNotFound.length == ourAdsTxtArr.length) {
-							throw new AdPushupError({
-								httpCode: 204,
-								error: 'Our Ads.txt entries not found.',
-								ourAdsTxt: entriesNotFound.join('\n')
-							});
-						} else {
-							throw new AdPushupError({
-								httpCode: 206,
-								error: 'Few of our Ads.txt entries not found',
-								ourAdsTxt: entriesNotFound.join('\n')
-							});
-						}
-					}
-				} else {
-					throw new AdPushupError({
-						httpCode: 404,
-						error:
-							'ads.txt file not found on your site. Please upload our ads.txt file on your site.',
-						ourAdsTxt
-					});
-				}
-			});
-		},
-		checkIfBillingProfileComplete(email) {
+		});
+	},
+	checkIfBillingProfileComplete(email) {
 			var tipaltiConfig = config.tipalti,
 				url = tipaltiConfig.soapUrl,
 				payeeId = encodeURIComponent(
