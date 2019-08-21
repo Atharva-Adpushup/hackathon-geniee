@@ -67,7 +67,7 @@ var request = require('request-promise'),
 	fetchOurAdsTxt() {
 		return API.load(commonConst.onboarding.adsTxtDocUrl);
 	},
-	normalizeAdsTxtEntries: text => {
+	parseAdsTxtEntries: text => {
 		let normalizedText = text.replace(/[, \t]+/g, ',');
 
 		// trim Byte Order Mark
@@ -81,7 +81,7 @@ var request = require('request-promise'),
 		// Filter out comments and empty lines
 		stringArr = stringArr.filter(string => string[0] !== '#' && string !== '' && string !== ',');
 
-		let normalizedEntries = stringArr.map(str => {
+		let parsedEntries = stringArr.map(str => {
 			const arr = str.trim().split(',');
 			const normalizedArray = [];
 
@@ -91,24 +91,27 @@ var request = require('request-promise'),
 				}
 			}
 
-			normalizedArray.splice(3);
+			const [domain = "", pubId = "", relation = "", authorityId = ""] = normalizedArray;
 
-			const normalizedEntry = normalizedArray.join(', ');
-			// const normalizedEntry = `${
-			// 	arr[0] && arr[0][0] !== '#' ? arr[0].trim().toLowerCase() : ''
-			// },${arr[1] && arr[1][0] !== '#' ? arr[1].trim().toLowerCase() : ''},${
-			// 	arr[2] && arr[2][0] !== '#' ? arr[2].trim().toUpperCase() : ''
-			// }`;
+			const parsedEntry = { domain, pubId, relation, authorityId };
+			parsedEntry.relation = parsedEntry.relation.toUpperCase();
 
-			return normalizedEntry;
+			return parsedEntry;
 		});
 
 		// filter out duplicate entries
-		normalizedEntries = normalizedEntries.filter(
-			(item, pos, currArray) => currArray.indexOf(item) === pos
+		parsedEntries = parsedEntries.filter(
+			({ domain, pubId, relation, authorityId }, index, self) =>
+				self.findIndex(
+					({ domain: domain1, pubId: pubId1, relation: relation1, authorityId: authorityId1 }) =>
+						domain === domain1 &&
+						pubId === pubId1 &&
+						relation === relation1 &&
+						authorityId === authorityId1
+				) === index
 		);
 
-		return normalizedEntries;
+		return parsedEntries;
 	},
 	verifyAdsTxt(url, ourAdsTxt) {
 		let tempUrl = url;
@@ -117,14 +120,23 @@ var request = require('request-promise'),
 		}
 		return API.load(`${utils.rightTrim(tempUrl, '/')}/ads.txt`).then(existingAdsTxt => {
 			if (typeof existingAdsTxt === 'string') {
-				const existingAdsTxtArr = API.normalizeAdsTxtEntries(existingAdsTxt);
-				const ourAdsTxtArr = API.normalizeAdsTxtEntries(ourAdsTxt);
+				const existingAdsTxtArr = API.parseAdsTxtEntries(existingAdsTxt);
+				const ourAdsTxtArr = API.parseAdsTxtEntries(ourAdsTxt);
 
-				const entriesNotFound = ourAdsTxtArr.filter(
-					value => existingAdsTxtArr.indexOf(value) === -1
+				let entriesNotFound = ourAdsTxtArr.filter(
+					({ domain, pubId, relation }) =>
+						existingAdsTxtArr.findIndex(
+							({ domain: domain1, pubId: pubId1, relation: relation1 }) =>
+								domain === domain1 && pubId === pubId1 && relation === relation1
+						) === -1
 				);
 
 				if (entriesNotFound.length) {
+					entriesNotFound = entriesNotFound.map(
+						({ domain, pubId, relation, authorityId }) =>
+							`${domain}, ${pubId}, ${relation}${authorityId ? `, ${authorityId}` : ''}`
+					);
+
 					if (entriesNotFound.length == ourAdsTxtArr.length) {
 						throw new AdPushupError({
 							httpCode: 204,
