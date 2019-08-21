@@ -674,17 +674,44 @@ function apiModule() {
 
 			return minDownwardDiff.size || false;
 		},
-		getUniqueInventorySizes: siteId => {
-			return Promise
-				.all([API.getLayoutInventorySizes(siteId), API.getApTagInventorySizes(siteId), API.getInnovativeAdInventorySizes(siteId)])
-				.then(([layoutInventorySizes, apTagInventorySizes, innovativeAdInventorySizes]) => {
-					const uniqueSizes = [...new Set([...layoutInventorySizes, ...apTagInventorySizes, ...innovativeAdInventorySizes])];
-					return uniqueSizes.map(originalSize => {
+		getUniqueInventorySizes: siteId =>
+			Promise.all([
+				API.getLayoutInventorySizes(siteId),
+				API.getApTagInventorySizes(siteId),
+				API.getInnovativeAdInventorySizes(siteId)
+			]).then(([layoutInventorySizes, apTagInventorySizes, innovativeAdInventorySizes]) => {
+				let uniqueSizes = [
+					...new Set([
+						...layoutInventorySizes,
+						...apTagInventorySizes,
+						...innovativeAdInventorySizes
+					])
+				];
+				uniqueSizes = uniqueSizes
+					.map(originalSize => {
 						const downwardIABSize = API.getDownwardIABSize(originalSize);
 						return { originalSize, downwardIABSize };
 					});
+
+				// get unique downward IAB sizes and merge original sizes
+				const uniqueDownwardIABSizes = [];
+
+				uniqueSizes.forEach((obj, currIndex, self) => {
+					const firstIndex = self.findIndex(
+						({ downwardIABSize }) => obj.downwardIABSize === downwardIABSize
+					);
+
+					if (firstIndex === currIndex) {
+						uniqueDownwardIABSizes.push(obj);
+					} else {
+						uniqueDownwardIABSizes[
+							firstIndex
+						].originalSize = `${uniqueDownwardIABSizes[firstIndex].originalSize}, ${obj.originalSize}`;
+					}
 				});
-		},
+
+				return uniqueDownwardIABSizes;
+			}),
 		setSiteStep: function(siteId, onboardingStage, step) {
 			return API.getSiteById(siteId)
 				.then(function(site) {
