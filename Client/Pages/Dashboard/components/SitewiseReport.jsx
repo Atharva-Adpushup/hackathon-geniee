@@ -1,6 +1,6 @@
 import React from 'react';
 import Datatable from 'react-bs-datatable';
-import { numberWithCommas, roundOffTwoDecimal } from '../helpers/utils';
+import { numberWithCommas, roundOffTwoDecimal, getWidgetValidDationState } from '../helpers/utils';
 
 function formatTableData(tableBody, props) {
 	const { metrics } = props;
@@ -64,18 +64,24 @@ function computeTableData(data, props) {
 	return computedState;
 }
 
+const DEFAULT_STATE = {
+	tableHeader: [],
+	tableBody: []
+};
+
 class SitewiseReport extends React.Component {
-	state = {
-		tableHeader: [],
-		tableBody: []
-	};
+	state = DEFAULT_STATE;
 
 	static getDerivedStateFromProps(props) {
 		const { displayData } = props;
-		const isValidDisplayData = !!(displayData && displayData.result && displayData.columns);
+		const { isValid, isValidAndEmpty } = getWidgetValidDationState(displayData);
 
-		if (!isValidDisplayData) {
+		if (!isValid) {
 			return null;
+		}
+
+		if (isValidAndEmpty) {
+			return DEFAULT_STATE;
 		}
 
 		const computedState = computeTableData(displayData, props);

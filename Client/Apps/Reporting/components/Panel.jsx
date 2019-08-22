@@ -118,7 +118,8 @@ class Panel extends Component {
 	onControlChange = data => {
 		const params = this.getControlChangedParams(data);
 		this.setState({
-			...params
+			...params,
+			...data
 		});
 	};
 
@@ -197,11 +198,14 @@ class Panel extends Component {
 	generateButtonHandler = () => {
 		let { tableData } = this.state;
 		const params = this.formateReportParams();
-		reportService.getCustomStats(params).then(response => {
-			if (response.status == 200 && response.data) {
-				tableData = response.data;
-			}
-			this.setState({ isLoading: false, tableData });
+
+		this.setState({ isLoading: true }, () => {
+			reportService.getCustomStats(params).then(response => {
+				if (Number(response.status) === 200 && response.data) {
+					tableData = response.data;
+				}
+				this.setState({ isLoading: false, tableData });
+			});
 		});
 	};
 

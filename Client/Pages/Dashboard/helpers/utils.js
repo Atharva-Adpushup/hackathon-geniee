@@ -68,4 +68,23 @@ const roundOffTwoDecimal = value => {
 
 const numberWithCommas = x => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
-export { convertObjToArr, getDateRange, numberWithCommas, roundOffTwoDecimal };
+const isEmptyObject = object => !!(object && Object.keys(object).length === 0);
+
+const getWidgetValidDationState = displayData => {
+	const isValid = !!displayData;
+	const validationState = {
+		isValid,
+		isValidAndEmpty: !!(isValid && isEmptyObject(displayData))
+	};
+
+	return validationState;
+};
+
+export {
+	convertObjToArr,
+	getDateRange,
+	numberWithCommas,
+	roundOffTwoDecimal,
+	isEmptyObject,
+	getWidgetValidDationState
+};

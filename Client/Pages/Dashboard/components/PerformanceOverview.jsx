@@ -1,5 +1,5 @@
 import React from 'react';
-import { numberWithCommas, roundOffTwoDecimal } from '../helpers/utils';
+import { numberWithCommas, roundOffTwoDecimal, getWidgetValidDationState } from '../helpers/utils';
 import { displayMetrics } from '../configs/commonConsts';
 
 function computeDisplayData(props) {
@@ -34,20 +34,26 @@ function computeDisplayData(props) {
 	return resultData;
 }
 
+const DEFAULT_STATE = {
+	displayData: {}
+};
+
 class PerformanceOverview extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = {
-			displayData: {}
-		};
+		this.state = DEFAULT_STATE;
 	}
 
 	static getDerivedStateFromProps(props) {
 		const { displayData } = props;
-		const isValidDisplayData = !!(displayData && displayData.result && displayData.columns);
+		const { isValid, isValidAndEmpty } = getWidgetValidDationState(displayData);
 
-		if (!isValidDisplayData) {
+		if (!isValid) {
 			return null;
+		}
+
+		if (isValidAndEmpty) {
+			return DEFAULT_STATE;
 		}
 
 		const resultData = computeDisplayData(props);
