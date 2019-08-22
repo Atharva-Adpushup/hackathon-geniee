@@ -3,7 +3,7 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import InventoriesTable from './InventoriesTable';
-import FilterBox from './FilterBox';
+import FilterBox from '../../../Components/FilterBox';
 import CustomButton from '../../../Components/CustomButton';
 import { getHbStatusForSite, toggleHbStatusForSite } from '../../../services/hbService';
 import Loader from '../../../Components/Loader';
@@ -185,9 +185,7 @@ export default class InventoryTab extends React.Component {
 					<div className={`inventory-wrap${hbStatusForSite === false ? ' disabled' : ' active'}`}>
 						{!!selectedInventories.length && (
 							<div className="updt-inv-hb-status u-margin-b4">
-								<span className="selected-inv-count u-margin-r3">{`${
-									selectedInventories.length
-								} selected`}</span>
+								<span className="selected-inv-count u-margin-r3">{`${selectedInventories.length} selected`}</span>
 								<CustomButton
 									disabled={updatingInventoryHbStatus}
 									variant="secondary"
