@@ -9,7 +9,7 @@ const OP_NAV_ITEMS_INDEXES = {
 const OP_NAV_ITEMS_VALUES = {
 	SETTINGS: 'Settings',
 	INFO_PANEL: 'Info Panel',
-	SITES_MAPPING: 'Sites Mapping',
+	SITES_MAPPING: 'Site Mapping',
 	TOOLS: 'Tools'
 };
 
