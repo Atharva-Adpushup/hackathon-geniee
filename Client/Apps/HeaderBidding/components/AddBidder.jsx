@@ -74,12 +74,15 @@ export default class AddBidder extends React.Component {
 
 		return (
 			<div className="options-wrapper white-tab-container hb-bidder hb-add-bidder">
-				<header>
-					<h3>Add {bidderConfig.name}</h3>
-				</header>
 				<Row>
 					<Col md={4}>
-						<h4>Partner Configuration</h4>
+						<h2 className="u-margin-0">Add {bidderConfig.name}</h2>
+						<h3>Partner Configuration</h3>
+						<p>
+							Lorem ipsum dolor sit amet consectetur adipisicing elit. Quasi vel itaque atque
+							repellat optio magni. Quia, quos! Modi cumque voluptatum ab, quia ad quam quasi
+							doloribus provident, dignissimos minima itaque.
+						</p>
 					</Col>
 					<Col md={8}>
 						{bidderConfig.sizeLess ? (

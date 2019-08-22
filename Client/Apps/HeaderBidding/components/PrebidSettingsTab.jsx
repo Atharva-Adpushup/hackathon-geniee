@@ -111,7 +111,7 @@ class PrebidSettingsTab extends React.Component {
 			<Form onSubmit={this.savePrebidSettings}>
 				<FormGroup controlId="pb-timeout" className="form-row clearfix">
 					<Col componentClass={ControlLabel} sm={6}>
-						Time-Out (mS)
+						Time-Out (ms)
 					</Col>
 					<Col sm={6}>
 						<InputBox
