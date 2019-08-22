@@ -55,11 +55,16 @@ class Revenue extends React.Component {
 
 	renderChart() {
 		const type = 'pie';
-		const { series } = this.state;
+		const { series, yAxisGroupsData } = this.state;
 		if (series && series.length && series[0].data && series[0].data.length)
 			return (
 				<div>
-					<CustomChart type={type} xAxis={data.xAxis} series={series} yAxisGroups={yAxisGroups} />
+					<CustomChart
+						type={type}
+						xAxis={data.xAxis}
+						series={series}
+						yAxisGroups={yAxisGroupsData}
+					/>
 				</div>
 			);
 		return <div className="text-center">No Record Found.</div>;
