@@ -35,13 +35,13 @@ const computeCsvData = data => {
 	tableBody.forEach(row => {
 		const csvBody = [];
 		tableHeader.forEach(header => {
-			csvBody.push(row[header.name]);
+			csvBody.push(row[header.prop]);
 		});
 		csvData.push(csvBody);
 	});
 	const csvBody = [];
 	tableHeader.forEach(header => {
-		csvBody.push(grandTotal[header.name]);
+		csvBody.push(grandTotal[header.prop]);
 	});
 	csvData.push(csvBody);
 	return csvData;

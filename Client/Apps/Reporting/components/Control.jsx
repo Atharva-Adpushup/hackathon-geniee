@@ -50,6 +50,14 @@ class Control extends Component {
 		);
 	}
 
+	componentWillReceiveProps(nextProps) {
+		const isValidNextProps = !!(nextProps && nextProps.csvData);
+
+		if (isValidNextProps) {
+			this.setState({ csvData: nextProps.csvData });
+		}
+	}
+
 	onFilteChange = selectedFilters => {
 		let reportType = 'account';
 		const { filterList, dimensionList } = this.props;
