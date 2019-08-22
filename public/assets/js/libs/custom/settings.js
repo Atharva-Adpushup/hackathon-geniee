@@ -103,7 +103,7 @@ $(document).ready(function() {
 					);
 				} else {
 					var parsedFormValues = this.parseFormData(formValues, 'other'),
-            poweredByBanner = parsedFormValues.poweredByBanner ? true : false,
+						poweredByBanner = parsedFormValues.poweredByBanner ? true : false,
 						activeDFPNetwork = parsedFormValues.activeDFPNetwork,
 						activeDFPCurrencyCode = parsedFormValues.activeDFPCurrencyCode,
 						autoOpt = parsedFormValues.autoOptimise ? true : false,
@@ -136,7 +136,8 @@ $(document).ready(function() {
 							gdprCompliance: gdprCompliance,
 							cookieControlConfig: cookieControlConfig,
 							blocklist: JSON.stringify(w.blocklist),
-							isAutoOptimiseChanged: isAutoOptimiseChanged
+							isAutoOptimiseChanged: isAutoOptimiseChanged,
+							poweredByBanner: poweredByBanner
 						},
 						function(res) {
 							if (res.success) {
