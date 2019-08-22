@@ -43,7 +43,7 @@ const commonConsts = {
 				width: '15px',
 				stroke: '#fff',
 				cursor: 'pointer',
-				'stroke-width': 1.25,
+				'stroke-width': 1.25
 				// top: -15
 			},
 			BOTTOM: {
@@ -89,6 +89,9 @@ const commonConsts = {
 				'max-height': '20px',
 				margin: '0px auto',
 				position: 'relative'
+			},
+			DISABLED_BANNER: {
+				height: '20px'
 			},
 			LEFT: {},
 			RIGHT: {},

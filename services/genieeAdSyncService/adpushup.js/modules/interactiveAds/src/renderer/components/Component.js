@@ -98,6 +98,8 @@ class Component {
 		if (adp.config.poweredByBanner) {
 			$banner = this.createPoweredByBanner(formatData);
 			$frame.append($banner);
+		} else {
+			$frame.css({ ...commonConsts.FRAME.CSS.DISABLED_BANNER });
 		}
 		$frame.append($closeButton);
 		// $frame.append('<div style="clear:both">&nbsp;</div>');
