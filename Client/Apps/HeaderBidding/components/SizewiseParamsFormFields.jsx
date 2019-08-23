@@ -215,9 +215,13 @@ class SizewiseParamsFormFields extends React.Component {
 					getCurrentParamValue={this.getCurrentParamValue}
 					tempParamsErrors={tempParamsErrors}
 				/>
-				<CustomButton type="button" variant="secondary" onClick={() => this.saveParams(adSize)}>
-					{tempParams[adSize] && tempParams[adSize].saved ? 'Update Params' : 'Add Params'}
-				</CustomButton>
+				<Row>
+					<Col sm={6} smPush={6}>
+						<CustomButton type="button" variant="secondary" onClick={() => this.saveParams(adSize)}>
+							{tempParams[adSize] && tempParams[adSize].saved ? 'Update Params' : 'Add Params'}
+						</CustomButton>
+					</Col>
+				</Row>
 			</React.Fragment>
 		);
 	};
