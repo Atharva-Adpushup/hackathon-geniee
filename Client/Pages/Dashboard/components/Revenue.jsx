@@ -6,11 +6,17 @@ import { roundOffTwoDecimal, getWidgetValidDationState } from '../helpers/utils'
 
 function computeDisplayData(props) {
 	const {
-		displayData: { result: resultData }
+		displayData: {
+			data: { result: resultData },
+			chartLegend,
+			chartSeriesLabel,
+			chartSeriesMetric,
+			chartSeriesMetricType
+		}
 	} = props;
 	const series = [
 		{
-			name: 'Revenue',
+			name: chartLegend,
 			colorByPoint: true,
 			data: []
 		}
@@ -20,8 +26,9 @@ function computeDisplayData(props) {
 	if (resultData) {
 		resultData.forEach(result => {
 			seriesData.push({
-				name: result.network,
-				y: parseFloat(roundOffTwoDecimal(result.revenue))
+				name: result[chartSeriesLabel],
+				y: parseFloat(roundOffTwoDecimal(result[chartSeriesMetric])),
+				valueType: chartSeriesMetricType
 			});
 		});
 	}
@@ -55,18 +62,15 @@ class Revenue extends React.Component {
 
 	renderChart() {
 		const type = 'pie';
-		const { series, yAxisGroupsData } = this.state;
+		const { series } = this.state;
+
 		if (series && series.length && series[0].data && series[0].data.length)
 			return (
 				<div>
-					<CustomChart
-						type={type}
-						xAxis={data.xAxis}
-						series={series}
-						yAxisGroups={yAxisGroupsData}
-					/>
+					<CustomChart type={type} xAxis={data.xAxis} series={series} yAxisGroups={yAxisGroups} />
 				</div>
 			);
+
 		return <div className="text-center">No Record Found.</div>;
 	}
 

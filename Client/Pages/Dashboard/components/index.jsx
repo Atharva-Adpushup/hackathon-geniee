@@ -94,22 +94,32 @@ class Dashboard extends React.Component {
 		const widgetsConfig = [];
 		Object.keys(sortedWidgets).forEach(wid => {
 			const widget = { ...sortedWidgets[wid] };
+
 			if (widgetsList.indexOf(widget.name) > -1) {
 				widget.isLoading = true;
 				widget.selectedDate = dates[2].value;
 				widget.isDataSufficient = false;
+
 				if (reportType == 'site' || widget.name == 'per_ap_original')
 					widget.selectedSite = selectedSite;
 				else widget.selectedSite = 'all';
+
 				if (widget.name == 'per_ap_original') {
 					widget.selectedDimension = 'page_variation_type';
 				}
+
 				if (widget.name == 'rev_by_network') {
 					widget.selectedDimension = 'network';
+					widget.chartLegend = 'Revenue';
+					widget.chartSeriesLabel = 'network';
+					widget.chartSeriesMetric = 'revenue';
+					widget.chartSeriesMetricType = 'money';
 				}
+
 				if (widget.name == 'per_site_wise') {
 					widget.selectedDimension = 'siteid';
 				}
+
 				widgetsConfig.push(widget);
 			}
 		});
