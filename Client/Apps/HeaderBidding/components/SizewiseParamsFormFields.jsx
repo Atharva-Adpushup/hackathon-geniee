@@ -164,8 +164,13 @@ class SizewiseParamsFormFields extends React.Component {
 		for (const { downwardIABSize: size, originalSize } of sizes) {
 			tabsJSX.push(
 				<NavItem key={size} eventKey={size}>
-					{`${size} (${originalSize})`}
-					{tempParams[size] && tempParams[size].saved ? <CustomIcon icon="check" /> : ''}
+					<span className="iab-size">{size}</span>
+					<span className="org-size">{`(${originalSize})`}</span>
+					{tempParams[size] && tempParams[size].saved ? (
+						<CustomIcon icon="check" className="check-icon" />
+					) : (
+						''
+					)}
 				</NavItem>
 			);
 		}
@@ -210,9 +215,13 @@ class SizewiseParamsFormFields extends React.Component {
 					getCurrentParamValue={this.getCurrentParamValue}
 					tempParamsErrors={tempParamsErrors}
 				/>
-				<CustomButton type="button" variant="secondary" onClick={() => this.saveParams(adSize)}>
-					{tempParams[adSize] && tempParams[adSize].saved ? 'Update Params' : 'Add Params'}
-				</CustomButton>
+				<Row>
+					<Col sm={6} smPush={6}>
+						<CustomButton type="button" variant="secondary" onClick={() => this.saveParams(adSize)}>
+							{tempParams[adSize] && tempParams[adSize].saved ? 'Update Params' : 'Add Params'}
+						</CustomButton>
+					</Col>
+				</Row>
 			</React.Fragment>
 		);
 	};
@@ -225,12 +234,12 @@ class SizewiseParamsFormFields extends React.Component {
 		const { activeKey } = this.state;
 		return (
 			<Row className="clearfix non-sizeless-params u-margin-v5">
-				<Col sm={2} className="size-tabs">
+				<Col sm={3} className="size-tabs">
 					<Nav bsStyle="pills" stacked activeKey={activeKey} onSelect={this.handleNavSelect}>
 						{this.renderTabs()}
 					</Nav>
 				</Col>
-				<Col sm={10} className="size-tab-content">
+				<Col sm={9} className="size-tab-content">
 					{this.renderTabContent()}
 				</Col>
 			</Row>
