@@ -2,16 +2,12 @@ let ADPTags = [];
 let finalJson = {};
 
 const Promise = require('bluebird');
-
 const _ = require('lodash');
+const { promiseForeach, couchbaseService } = require('node-utils');
 
 const AdPushupError = require('../../../helpers/AdPushupError');
-
 const { ERROR_MESSAGES } = require('../../../configs/commonConsts');
-
 const config = require('../../../configs/config');
-
-const { promiseForeach, couchbaseService } = require('node-utils');
 
 const appBucket = couchbaseService(
 	`couchbase://${config.couchBase.HOST}/${config.couchBase.DEFAULT_BUCKET}`,
