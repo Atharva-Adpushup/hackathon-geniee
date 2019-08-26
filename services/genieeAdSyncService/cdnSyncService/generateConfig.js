@@ -108,7 +108,7 @@ function HbProcessing(site, apConfigs) {
 			hbcf.value.hbcf = getActiveUsedBidders(hbcf.value.hbcf, biddersFromNetworkTree);
 
 			const adServerSettings = user.get('adServerSettings');
-			let isValidCurrencyCnfg =
+			const isValidCurrencyCnfg =
 				adServerSettings &&
 				adServerSettings.dfp &&
 				isValidThirdPartyDFPAndCurrency(adServerSettings.dfp);
@@ -139,11 +139,11 @@ function HbProcessing(site, apConfigs) {
 
 				deviceConfig =
 					deviceConfig && deviceConfig.sizeConfig.length
-						? ',sizeConfig: ' + JSON.stringify(deviceConfig.sizeConfig)
+						? `,sizeConfig: ${JSON.stringify(deviceConfig.sizeConfig)}`
 						: '';
 
 				if (isValidCurrencyConfig) {
-					prebidCurrencyConfig = ',currency: ' + JSON.stringify(computedPrebidCurrencyConfig);
+					prebidCurrencyConfig = `,currency: ${JSON.stringify(computedPrebidCurrencyConfig)}`;
 					prebidAdapters = `${prebidAdapters},currency`;
 				}
 			}
@@ -155,11 +155,11 @@ function HbProcessing(site, apConfigs) {
 					incontentAds
 				},
 				config: {
-					deviceConfig: deviceConfig ? deviceConfig : '',
-					prebidCurrencyConfig: prebidCurrencyConfig ? prebidCurrencyConfig : '',
+					deviceConfig: deviceConfig || '',
+					prebidCurrencyConfig: prebidCurrencyConfig || '',
 					prebidCurrencyConfigObj: computedPrebidCurrencyConfig,
 					hbcf,
-					prebidAdapters: prebidAdapters
+					prebidAdapters
 				}
 			};
 		}
@@ -178,7 +178,7 @@ function init(site, computedConfig) {
 
 			// Below is the new condition which is compatible with new dashboard
 			// Uncomment the below code when new dashboard is live
-			INNOVATIVE_ADS_ACTIVE: apConfigs.innovativeModeActive,
+			INNOVATIVE_ADS_ACTIVE: !!apConfigs.innovativeModeActive,
 
 			LAYOUT_ACTIVE: !!apConfigs.mode || false,
 			ADPTAG_ACTIVE: !!adpTagsConfig,
