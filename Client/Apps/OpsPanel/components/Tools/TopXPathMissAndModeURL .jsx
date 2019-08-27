@@ -8,15 +8,13 @@ import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import FieldGroup from '../../../../Components/Layout/FieldGroup';
-import { XPATH_MODE_URL } from '../../configs/commonConsts';
+import { XPATH_MODE_URL, MODE_TOOLTIP_TEXT, ERROR_TOOLTIP_TEXT } from '../../configs/commonConsts';
 import CustomButton from '../../../../Components/CustomButton/index';
 import SelectBox from '../../../../Components/SelectBox/index';
 import axiosInstance from '../../../../helpers/axiosInstance';
 import OverlayToolTip from '../../../../Components/OverlayTooltip/index';
 
 const { devices, modes } = XPATH_MODE_URL;
-const modeToolTipText = `ADPUSHUP:1 , FALLBACK:2`;
-const errorToolTipText = `NO_ERROR:1, PAGEGROUP_NOT_FOUND:2, FALLBACK_PLANNED:3, FALLBACK_FORCED:4, PAUSED_IN_EDITOR:5`;
 
 const DEFAULT_STATE = {
 	siteId: '',
@@ -130,7 +128,7 @@ class TopXPathMissAndModeURL extends Component {
 	renderLabel = () => (
 		<p className="u-text-bold">
 			Error Code
-			<OverlayToolTip id="tooltip-site-status-info" placement="top" tooltip={errorToolTipText}>
+			<OverlayToolTip id="tooltip-site-status-info" placement="top" tooltip={ERROR_TOOLTIP_TEXT}>
 				<FontAwesomeIcon size="1x" icon={faQuestionCircle} className="u-margin-l2" />
 			</OverlayToolTip>{' '}
 		</p>
@@ -241,7 +239,11 @@ class TopXPathMissAndModeURL extends Component {
 				<Fragment>
 					<p className="u-text-bold">
 						Mode
-						<OverlayToolTip id="tooltip-site-status-info" placement="top" tooltip={modeToolTipText}>
+						<OverlayToolTip
+							id="tooltip-site-status-info"
+							placement="top"
+							tooltip={MODE_TOOLTIP_TEXT}
+						>
 							<FontAwesomeIcon size="1x" icon={faQuestionCircle} className="u-margin-l2" />
 						</OverlayToolTip>
 					</p>
