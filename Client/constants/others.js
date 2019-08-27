@@ -17,4 +17,18 @@ const ROUTES = {
 	SIDEBAR_CLOSE: [/admin-panel.*/, /innovative-ads.*/]
 };
 
-export { ADSTXT_SITE_LIST_HEADERS, ADSTXT_STATUS, ROUTES };
+const DEMO_ACCOUNT_DATA = {
+	EMAIL: 'demo@adpushup.com',
+	DEFAULT_SITE: {
+		NAME: 'example.com',
+		SITE_ID: '37780'
+	},
+	SITES: {
+		38903: 'https://www.iaai.com/',
+		29752: 'https://www.ccna7.com/',
+		37780: 'https://www.javatpoint.com/',
+		25019: 'http://rentdigs.com/'
+	}
+};
+
+export { ADSTXT_SITE_LIST_HEADERS, ADSTXT_STATUS, ROUTES, DEMO_ACCOUNT_DATA };
