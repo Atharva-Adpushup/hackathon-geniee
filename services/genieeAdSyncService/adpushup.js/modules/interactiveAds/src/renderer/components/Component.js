@@ -29,7 +29,9 @@ class Component {
 		const $banner = $('<a />');
 		const $logo = $('<img />');
 
-		$logo.attr({ alt: 'AdPushup', src: POWERED_BY_BANNER.IMAGE }).css({ ...POWERED_BY_BANNER.CSS.LOGO });
+		$logo
+			.attr({ alt: 'AdPushup', src: POWERED_BY_BANNER.IMAGE })
+			.css({ ...POWERED_BY_BANNER.CSS.LOGO });
 
 		return $banner
 			.attr({ href: POWERED_BY_BANNER.REDIRECT_URL, target: '_blank' })
@@ -41,9 +43,12 @@ class Component {
 	createCloseButton(formatData) {
 		const { CLOSE_BUTTON } = commonConsts;
 		const $closeButton = $(CLOSE_BUTTON.IMAGE);
-		const formatDataCSS = formatData.placement === 'top' ? CLOSE_BUTTON.CSS.TOP : CLOSE_BUTTON.CSS.BOTTOM;
+		const formatDataCSS =
+			formatData.placement === 'top' ? CLOSE_BUTTON.CSS.TOP : CLOSE_BUTTON.CSS.BOTTOM;
 
-		return $closeButton.css({ ...CLOSE_BUTTON.CSS.COMMON, ...formatDataCSS }).on('click', this.closeAd);
+		return $closeButton
+			.css({ ...CLOSE_BUTTON.CSS.COMMON, ...formatDataCSS })
+			.on('click', this.closeAd);
 	}
 
 	closeAd() {
@@ -60,23 +65,25 @@ class Component {
 			window.adpushup.executeAdpTagsHeadCode([this.interactiveAd], {}); // This function expects an array of adpTags and optional adpKeyValues
 		}
 
-		let css = { width, height: parseInt(height) + POWERED_BY_BANNER.HEIGHT, ...customCSS },
-			$format = $('<div />'),
-			$banner = null,
-			$closeButton = this.createCloseButton(formatData),
-			feedbackOptions = {
-				// ads: [this.interactiveAd],
-				xpathMiss: [],
-				// eventType: commonConsts.ERROR_CODES.NO_ERROR,
-				// mode: window.adpushup.config.mode,
-				referrer: adp.config.referrer,
-				tracking: false,
-				variationId: !adp.config.manualModeActive
-					? adp.config.selectedVariation
-					: commonConsts.MANUAL_ADS.VARIATION
-			},
-			$frame = $('<div />'),
-			newFeedbackAdObj = $.extend({}, this.interactiveAd);
+		let $banner = null;
+
+		const css = { width, height: parseInt(height) + POWERED_BY_BANNER.HEIGHT, ...customCSS };
+		const $format = $('<div />');
+		const $closeButton = this.createCloseButton(formatData);
+		const feedbackOptions = {
+			// ads: [this.interactiveAd],
+			xpathMiss: [],
+			// eventType: commonConsts.ERROR_CODES.NO_ERROR,
+			// mode: window.adpushup.config.mode,
+			referrer: adp.config.referrer,
+			tracking: false,
+			variationId: !adp.config.manualModeActive
+				? adp.config.selectedVariation
+				: commonConsts.MANUAL_ADS.VARIATION
+		};
+
+		const $frame = $('<div />');
+		const newFeedbackAdObj = $.extend({}, this.interactiveAd);
 
 		// New feedback
 		newFeedbackAdObj.status = 1;
@@ -89,7 +96,7 @@ class Component {
 
 		$format.attr({ id, 'data-section': id, class: '_ap_apex_ad' });
 		$frame.css({
-			width,
+			// width,
 			...commonConsts.FRAME.CSS.COMMON,
 			...commonConsts.FRAME.CSS[formatData.placement.toUpperCase()]
 		});
@@ -97,9 +104,11 @@ class Component {
 		if (adp.config.poweredByBanner) {
 			$banner = this.createPoweredByBanner(formatData);
 			$frame.append($banner);
+		} else {
+			$frame.css({ ...commonConsts.FRAME.CSS.DISABLED_BANNER });
 		}
 		$frame.append($closeButton);
-		$frame.append('<div style="clear:both">&nbsp;</div>');
+		// $frame.append('<div style="clear:both">&nbsp;</div>');
 		$format.append($frame);
 
 		// adp.tracker.add(
@@ -155,17 +164,17 @@ class Component {
 		}
 
 		adp.interactiveAds.adsRendered += 1;
-		const apConfig = adp.config,
-			isConfig = !!apConfig,
-			isExperiment = !!(isConfig && apConfig.experiment),
-			isExperimentPlatform = !!(isExperiment && apConfig.experiment[apConfig.platform]),
-			isExperimentPageGroup = !!(
-				isExperimentPlatform && apConfig.experiment[apConfig.platform][apConfig.pageGroup]
-			),
-			isExperimentVariations = !!(
-				isExperimentPageGroup && apConfig.experiment[apConfig.platform][apConfig.pageGroup].variations
-			),
-			isSelectedVariation = !!apConfig.selectedVariation;
+		const apConfig = adp.config;
+		const isConfig = !!apConfig;
+		const isExperiment = !!(isConfig && apConfig.experiment);
+		const isExperimentPlatform = !!(isExperiment && apConfig.experiment[apConfig.platform]);
+		const isExperimentPageGroup = !!(
+			isExperimentPlatform && apConfig.experiment[apConfig.platform][apConfig.pageGroup]
+		);
+		const isExperimentVariations = !!(
+			isExperimentPageGroup && apConfig.experiment[apConfig.platform][apConfig.pageGroup].variations
+		);
+		const isSelectedVariation = !!apConfig.selectedVariation;
 
 		if (
 			Object.keys(adp.interactiveAds.ads).length === adp.interactiveAds.adsRendered &&
@@ -173,8 +182,8 @@ class Component {
 			isExperimentVariations &&
 			isSelectedVariation
 		) {
-			let variations = apConfig.experiment[apConfig.platform][apConfig.pageGroup].variations,
-				variation = null;
+			const variations = apConfig.experiment[apConfig.platform][apConfig.pageGroup].variations;
+			let variation = null;
 
 			for (let i = 0; i < variations.length; i++) {
 				if (variations[i].id === apConfig.selectedVariation) {
