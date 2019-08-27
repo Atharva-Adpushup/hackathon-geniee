@@ -19,7 +19,9 @@ var adpTags = {
 		adpBatches: [],
 		batchPrebiddingComplete: false,
 		prebidBatching: function(adpSlotsBatch) {
-			hb.createPrebidSlots(adpSlotsBatch);
+			if (adpSlotsBatch && adpSlotsBatch.length) {
+				hb.createPrebidSlots(adpSlotsBatch);
+			}
 		},
 		processBatchForBidding: function() {
 			var batchId = this.currentBatchId;
