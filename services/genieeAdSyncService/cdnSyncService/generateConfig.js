@@ -6,9 +6,7 @@ const siteModel = require('../../../models/siteModel');
 const userModel = require('../../../models/userModel');
 const couchbase = require('../../../helpers/couchBaseService');
 const { getHbAdsApTag } = require('./generateAPTagConfig');
-const {
-	isValidThirdPartyDFPAndCurrency
-} = require('../../../helpers/commonFunctions');
+const { isValidThirdPartyDFPAndCurrency } = require('../../../helpers/commonFunctions');
 
 function getHbConfig(siteId) {
 	return couchbase
@@ -20,16 +18,13 @@ function getHbConfig(siteId) {
 function getBiddersFromNetworkTree() {
 	return couchbase
 		.connectToAppBucket()
-		.then(appBucket => 
-			appBucket.getAsync(`data::apNetwork`, {})
-		)
+		.then(appBucket => appBucket.getAsync(`data::apNetwork`, {}))
 		.then(({ value: networkTree }) => {
 			const biddersFromNetworkTree = {};
 
 			for (const bidderCode in networkTree) {
 				if (networkTree.hasOwnProperty(bidderCode) && networkTree[bidderCode].isHb) {
-					biddersFromNetworkTree[bidderCode] =
-						networkTree[bidderCode];
+					biddersFromNetworkTree[bidderCode] = networkTree[bidderCode];
 				}
 			}
 
@@ -44,9 +39,7 @@ function getPrebidModules(hbcf) {
 
 	for (const bidderCode of Object.keys(hbConfig)) {
 		const adpater = PREBID_ADAPTERS[bidderCode];
-		adpater
-			? modules.add(adpater)
-			: console.log(`Prebid Adapter not found for ${bidderCode}`);
+		adpater ? modules.add(adpater) : console.log(`Prebid Adapter not found for ${bidderCode}`);
 	}
 
 	return Array.from(modules).join(',');
@@ -54,8 +47,9 @@ function getPrebidModules(hbcf) {
 
 function gdprProcessing(site) {
 	const config = site.get('gdpr');
+	const apps = site.get('apps') || { consentManagement: false };
 	return {
-		status: config && config.compliance,
+		status: config && config.compliance && apps.consentManagement,
 		config: {
 			gdpr: config
 		}
@@ -82,6 +76,7 @@ function HbProcessing(site, apConfigs) {
 	const siteId = site.get('siteId');
 	const email = site.get('ownerEmail');
 	const isManual = site.get('isManual');
+	const apps = site.get('apps') || { headerBidding: false };
 
 	return Promise.join(
 		getHbConfig(siteId),
@@ -93,6 +88,7 @@ function HbProcessing(site, apConfigs) {
 			let { incontentAds = [], hbAds = [] } = incontentAndHbAds;
 			hbAds = hbAds.concat(hbAdsApTag); // Final Hb Ads
 			const isValidHBConfig = !!(
+				apps.headerBidding &&
 				hbcf.value &&
 				hbcf.value.hbcf &&
 				hbAds.length
@@ -112,9 +108,10 @@ function HbProcessing(site, apConfigs) {
 			hbcf.value.hbcf = getActiveUsedBidders(hbcf.value.hbcf, biddersFromNetworkTree);
 
 			const adServerSettings = user.get('adServerSettings');
-			let isValidCurrencyCnfg = adServerSettings && adServerSettings.dfp &&  isValidThirdPartyDFPAndCurrency(
-				adServerSettings.dfp
-			);
+			const isValidCurrencyCnfg =
+				adServerSettings &&
+				adServerSettings.dfp &&
+				isValidThirdPartyDFPAndCurrency(adServerSettings.dfp);
 			let computedPrebidCurrencyConfig = {};
 			let deviceConfig = '';
 			let prebidCurrencyConfig = '';
@@ -123,9 +120,7 @@ function HbProcessing(site, apConfigs) {
 			if (isValidCurrencyCnfg) {
 				computedPrebidCurrencyConfig = {
 					adServerCurrency: apConfigs.activeDFPCurrencyCode,
-					granularityMultiplier: Number(
-						apConfigs.prebidGranularityMultiplier
-					),
+					granularityMultiplier: Number(apConfigs.prebidGranularityMultiplier),
 					rates: apConfigs.activeDFPCurrencyExchangeRate
 				};
 			}
@@ -144,14 +139,11 @@ function HbProcessing(site, apConfigs) {
 
 				deviceConfig =
 					deviceConfig && deviceConfig.sizeConfig.length
-						? ',sizeConfig: ' +
-						  JSON.stringify(deviceConfig.sizeConfig)
+						? `,sizeConfig: ${JSON.stringify(deviceConfig.sizeConfig)}`
 						: '';
 
 				if (isValidCurrencyConfig) {
-					prebidCurrencyConfig =
-						',currency: ' +
-						JSON.stringify(computedPrebidCurrencyConfig);
+					prebidCurrencyConfig = `,currency: ${JSON.stringify(computedPrebidCurrencyConfig)}`;
 					prebidAdapters = `${prebidAdapters},currency`;
 				}
 			}
@@ -163,13 +155,11 @@ function HbProcessing(site, apConfigs) {
 					incontentAds
 				},
 				config: {
-					deviceConfig: deviceConfig ? deviceConfig : '',
-					prebidCurrencyConfig: prebidCurrencyConfig
-						? prebidCurrencyConfig
-						: '',
+					deviceConfig: deviceConfig || '',
+					prebidCurrencyConfig: prebidCurrencyConfig || '',
 					prebidCurrencyConfigObj: computedPrebidCurrencyConfig,
 					hbcf,
-					prebidAdapters: prebidAdapters
+					prebidAdapters
 				}
 			};
 		}
@@ -180,23 +170,15 @@ function init(site, computedConfig) {
 	const { apConfigs, adpTagsConfig } = computedConfig;
 	let statusesAndAds = {
 		statuses: {
-			APTAG_ACTIVE: !!(
-				apConfigs.manualModeActive &&
-				apConfigs.manualAds &&
-				apConfigs.manualAds.length
-			),
+			APTAG_ACTIVE: !!apConfigs.manualModeActive,
 			// Adding Innovative Ads Module based on flag value set in site doc "isInnovative", done to support legacy
 			// Adpushup Editor Interactive Ads
 			// Remove when new dashboard is live
-			INNOVATIVE_ADS_ACTIVE: !!apConfigs.innovativeModeActive,
+			// INNOVATIVE_ADS_ACTIVE: !!apConfigs.innovativeModeActive,
 
 			// Below is the new condition which is compatible with new dashboard
 			// Uncomment the below code when new dashboard is live
-			// INNOVATIVE_ADS_ACTIVE: !!(
-			// 	apConfigs.innovativeModeActive &&
-			// 	apConfigs.innovativeAds &&
-			// 	apConfigs.innovativeAds.length
-			// ),
+			INNOVATIVE_ADS_ACTIVE: !!apConfigs.innovativeModeActive,
 
 			LAYOUT_ACTIVE: !!apConfigs.mode || false,
 			ADPTAG_ACTIVE: !!adpTagsConfig,
@@ -207,47 +189,39 @@ function init(site, computedConfig) {
 		config: {}
 	};
 
-	return Promise.join(
-		HbProcessing(site, apConfigs),
-		gdprProcessing(site),
-		(hb, gdpr) => {
-			if (adpTagsConfig.prebidConfig) {
-				adpTagsConfig.prebidConfig.currencyConfig = hb.config.prebidCurrencyConfigObj;
-				delete hb.config.prebidCurrencyConfigObj;
-			}
-
-			statusesAndAds = {
-				...statusesAndAds,
-				statuses: {
-					...statusesAndAds.statuses,
-					HB_ACTIVE: hb.status,
-					GDPR_ACTIVE: gdpr.status,
-					INCONTENT_ACTIVE: !!(
-						hb.ads.incontentAds && hb.ads.incontentAds.length
-					)
-				},
-				ads: {
-					...hb.ads,
-					adpTags: adpTagsConfig,
-					layoutInventory: apConfigs.experiment
-				},
-				config: {
-					...hb.config,
-					...gdpr.config
-				}
-			};
-
-			return {
-				apConfigs,
-				adpTagsConfig,
-				statusesAndAds
-			};
+	return Promise.join(HbProcessing(site, apConfigs), gdprProcessing(site), (hb, gdpr) => {
+		if (adpTagsConfig.prebidConfig) {
+			adpTagsConfig.prebidConfig.currencyConfig = hb.config.prebidCurrencyConfigObj;
+			delete hb.config.prebidCurrencyConfigObj;
 		}
-	).catch(err => {
-			console.log(
-				`Error while creating generate config for site ${site.get(
-					'siteId'
-				)} and Error is ${err}`
+
+		statusesAndAds = {
+			...statusesAndAds,
+			statuses: {
+				...statusesAndAds.statuses,
+				HB_ACTIVE: hb.status,
+				GDPR_ACTIVE: gdpr.status,
+				INCONTENT_ACTIVE: !!(hb.ads.incontentAds && hb.ads.incontentAds.length)
+			},
+			ads: {
+				...hb.ads,
+				adpTags: adpTagsConfig,
+				layoutInventory: apConfigs.experiment
+			},
+			config: {
+				...hb.config,
+				...gdpr.config
+			}
+		};
+
+		return {
+			apConfigs,
+			adpTagsConfig,
+			statusesAndAds
+		};
+	}).catch(err => {
+		console.log(
+			`Error while creating generate config for site ${site.get('siteId')} and Error is ${err}`
 		);
 		throw err;
 	});
