@@ -51,8 +51,8 @@ var express = require('express'),
 
 		const hbcfPromise =
 			editMode === 'update'
-				? appBucket.replaceAsync(`hbcf::${siteId}`, json)
-				: appBucket.insertAsync(`hbcf::${siteId}`, json);
+				? appBucket.replaceAsync(`${commonConsts.docKeys.hb}${siteId}`, json)
+				: appBucket.insertAsync(`${commonConsts.docKeys.hb}${siteId}`, json);
 
 		return [hbcfPromise, site];
 	};
@@ -146,7 +146,7 @@ router
 
 		return couchbase
 			.connectToAppBucket()
-			.then(appBucket => appBucket.getAsync(`hbcf::${siteId}`, {}))
+			.then(appBucket => appBucket.getAsync(`${commonConsts.docKeys.hb}${siteId}`, {}))
 			.then(hbConfig =>
 				res.status(200).send({ success: 1, data: hbConfig.value, message: 'Header bidding config fetched' })
 			)

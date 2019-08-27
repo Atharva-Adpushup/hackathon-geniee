@@ -1,7 +1,7 @@
 const Promise = require('bluebird');
 const _ = require('lodash');
 
-const { PREBID_ADAPTERS } = require('../../../configs/commonConsts');
+const { PREBID_ADAPTERS, docKeys } = require('../../../configs/commonConsts');
 const siteModel = require('../../../models/siteModel');
 const userModel = require('../../../models/userModel');
 const couchbase = require('../../../helpers/couchBaseService');
@@ -11,7 +11,7 @@ const { isValidThirdPartyDFPAndCurrency } = require('../../../helpers/commonFunc
 function getHbConfig(siteId) {
 	return couchbase
 		.connectToAppBucket()
-		.then(appBucket => appBucket.getAsync(`hbcf::${siteId}`, {}))
+		.then(appBucket => appBucket.getAsync(`${docKeys.hb}${siteId}`, {}))
 		.catch(err => Promise.resolve({}));
 }
 

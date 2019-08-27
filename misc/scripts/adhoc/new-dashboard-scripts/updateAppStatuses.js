@@ -23,6 +23,7 @@ const { promiseForeach } = require('node-utils');
 
 const siteModel = require('../../../../models/siteModel');
 const { fetchAllSites, errorHandler, updateDoc, getDoc, dBHelper } = require('./helpers');
+const { docKeys } = require('../../../../configs/commonConsts');
 
 function computeStatus(docKey, status, processing) {
 	if (status) return status;
@@ -79,7 +80,7 @@ function getInnovativeAdsStatus(siteId, status) {
 }
 
 function getHbStatus(siteId) {
-	return computeStatus(`hbcf::${siteId}`, false, docWithCas => {
+	return computeStatus(`${docKeys.hb}${siteId}`, false, docWithCas => {
 		const { value: { hbConfig: { bidderAdUnits = {} } = {} } = {} } = docWithCas;
 		const isbidderAdUnitsConfigPresent = !!(bidderAdUnits && Object.keys(bidderAdUnits).length);
 
