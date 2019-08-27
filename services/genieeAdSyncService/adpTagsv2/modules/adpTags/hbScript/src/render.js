@@ -9,14 +9,18 @@ var render = {
 		googletag.enableServices();
 
 		adpSlots.forEach(function(adpSlot) {
-			gpt.renderSlot(googletag, adpSlot);
+			if (adpSlot && adpSlot.gSlot) {
+				gpt.renderSlot(googletag, adpSlot);
+			}
 		});
 	},
 	createGPTSlots: function(googletag, adpSlots) {
 		adpSlots.forEach(function(adpSlot) {
 			adpSlot.biddingComplete = true;
 
-			gpt.defineSlot(googletag, adpSlot);
+			if (adpSlot) {
+				gpt.defineSlot(googletag, adpSlot);
+			}
 		});
 
 		return this.renderGPTSlots(googletag, adpSlots);

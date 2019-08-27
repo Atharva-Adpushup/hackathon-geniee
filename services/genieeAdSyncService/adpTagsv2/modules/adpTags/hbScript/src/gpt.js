@@ -9,7 +9,9 @@ var getDFPCOntainerFromDom = function(containerId) {
 };
 var gpt = {
 	refreshGPTSlot: function(googletag, gSlot) {
-		return googletag.pubads().refresh([gSlot]);
+		if (gSlot) {
+			return googletag.pubads().refresh([gSlot]);
+		}
 	},
 	renderSlot: function(googletag, adpSlot) {
 		//if (!adpSlot.containerPresent || !adpSlot.biddingComplete || adpSlot.hasRendered) {
