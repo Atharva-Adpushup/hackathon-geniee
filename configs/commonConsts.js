@@ -23,7 +23,7 @@ module.exports = {
 	DEMO_ACCOUNT_EMAIL: 'demo@adpushup.com',
 	AMP_SETTINGS_ACCESS_EMAILS: ['genieeamp@adpushup.com'],
 	DEMO_REPORT_SITE_ID: 31000,
-	
+
 	EMO_PAGEGROUPS: [
 		'HOME',
 		'CALC',
@@ -371,7 +371,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 	},
 	docKeys: {
 		apTag: 'tgmr::',
-		networkConfig: 'data::apNetwork',
+		networkConfig: 'data::apNetworkBeta',
 		interactiveAds: 'fmrt::',
 		user: 'user::'
 	},
