@@ -55,6 +55,7 @@ function validateMessageData(originalMessage) {
 
 function syncCDNWrapper(decodedMessage) {
 	if (!SITES_TO_PROCESS.includes(decodedMessage.siteId)) {
+		console.log(`Skipping cdn processing for ${decodedMessage.siteId}`);
 		return decodedMessage.siteId;
 	}
 
