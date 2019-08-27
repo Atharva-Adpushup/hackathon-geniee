@@ -15,14 +15,15 @@ const queueConfig = {
 	name: 'CDN SYNC Consumer',
 	mail: {
 		ack: {
-			header: 'Alert close for Service: CDN SYN Consumer',
+			header: 'Alert close for Service: CDN SYN Consumer [beta.adpushup.com]',
 			content: '<p>Consumer is up and running.</p>'
 		},
 		nack: {
-			header: 'Alert open for Service: CDN SYN Consumer',
+			header: 'Alert open for Service: CDN SYN Consumer [beta.adpushup.com]',
 			content: '<p>Consumer failed multiple times. Please check on priority.</p>'
 		},
-		emailId: 'yomesh.gupta@adpushup.com, zahin@adpushup.com, shubham.grover@adpushup.com'
+		emailId:
+			'yomesh.gupta@adpushup.com, zahin@adpushup.com, abhinav.choudhri@adpushup.com,prashanth.kumar@adpushup.com, shubham.grover@adpushup.com'
 	}
 };
 const QUEUE = CONFIG.RABBITMQ.CDN_SYNC.QUEUE.name;
