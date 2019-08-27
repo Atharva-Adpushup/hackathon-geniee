@@ -3,7 +3,8 @@
 var adp = {
 	config: window.adpushup.config,
 	utils: window.adpushup.utils,
-	$: window.adpushup.$
+	$: window.adpushup.$,
+	session: window.adpushup.session
 };
 
 module.exports = adp;
