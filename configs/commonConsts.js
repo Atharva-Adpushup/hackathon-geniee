@@ -373,7 +373,8 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		apTag: 'tgmr::',
 		networkConfig: 'data::apNetworkBeta',
 		interactiveAds: 'fmrt::',
-		user: 'user::'
+		user: 'user::',
+		hb: 'hbdc::'
 	},
 	tagManagerInitialDoc: {
 		siteId: null,

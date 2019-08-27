@@ -38,7 +38,7 @@ const HeaderBidding = model.extend(function() {
 		if (!(data.siteId && data.siteDomain && data.email)) {
 			throw new Error('siteId, siteDomain and publisher email required for header bidding doc');
 		}
-		this.key = `hbcf::${data.siteId}`;
+		this.key = `${docKeys.hb}${data.siteId}`;
 		this.super(data, !!cas);
 		this.casValue = cas; // if user is loaded from database which will be almost every time except first, this value will be thr
 	};
@@ -288,7 +288,7 @@ function apiModule() {
 		getHbConfig(siteId) {
 			return couchbase
 				.connectToAppBucket()
-				.then(appBucket => appBucket.getAsync(`hbcf::${siteId}`))
+				.then(appBucket => appBucket.getAsync(`${docKeys.hb}${siteId}`))
 				.then(json => new HeaderBidding(json.value, json.cas))
 				.catch(err => {
 					if (err.code === 13) {
