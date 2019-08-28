@@ -24,6 +24,22 @@ module.exports = {
 	AMP_SETTINGS_ACCESS_EMAILS: ['genieeamp@adpushup.com'],
 	DEMO_REPORT_SITE_ID: 31000,
 	ADPUSHUP_NETWORK_ID: 103512698,
+	GET_ALL_SITES_STATS_QUERY: `SELECT _site.siteId,
+									_site.siteDomain as domain,
+									_site.ownerEmail as accountEmail,
+									_site.adNetworkSettings.revenueShare,
+									_site.step as onboardingStep,
+									_site.dateCreated,
+									_site.apps,
+									_user.adNetworkSettings,
+									_hbcf.hbcf as addedBidders
+								FROM AppBucket _site
+								LEFT JOIN AppBucket _user
+								ON keys ('user::' || _site.ownerEmail)
+								LEFT JOIN AppBucket _hbcf
+								ON keys ('hbcf::' || to_string(_site.siteId))
+								WHERE meta(_site).id LIKE 'site::%'
+								AND meta(_user).id LIKE 'user::%';`,
 
 	EMO_PAGEGROUPS: [
 		'HOME',

@@ -242,7 +242,7 @@ router
 			.catch(err => errorHandler(err, res));
 	})
 
-	.get('/allSitesData', (req, res) => {
+	.get('/allSitesStats', (req, res) => {
 		if (!req.user.isSuperUser) {
 			return sendErrorResponse(
 				{
@@ -254,7 +254,7 @@ router
 		}
 
 		return opsModel
-			.getAllSitesData()
+			.getAllSitesStats()
 			.then(sitesData => sendSuccessResponse(sitesData, res))
 			.catch(err => errorHandler(err, res));
 	});

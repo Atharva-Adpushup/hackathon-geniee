@@ -121,24 +121,9 @@ const commonSiteFunctions = {
 
 function apiModule() {
 	const API = {
-		getAllSitesData() {
+		getAllSitesStats() {
 			const query = N1qlQuery.fromString(
-				`SELECT _site.siteId,
-					_site.siteDomain as domain,
-					_site.ownerEmail as accountEmail,
-					_site.adNetworkSettings.revenueShare,
-					_site.step as onboardingStep,
-					_site.dateCreated,
-					_site.apps,
-					_user.adNetworkSettings,
-					_hbcf.hbcf as addedBidders
-				FROM AppBucket _site
-				LEFT JOIN AppBucket _user
-				ON keys ('user::' || _site.ownerEmail)
-				LEFT JOIN AppBucket _hbcf
-				ON keys ('hbcf::' || to_string(_site.siteId))
-				WHERE meta(_site).id LIKE 'site::%'
-				AND meta(_user).id LIKE 'user::%';`
+				commonConsts.GET_ALL_SITES_STATS_QUERY
 			);
 
 			return couchbase
