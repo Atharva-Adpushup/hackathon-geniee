@@ -160,11 +160,19 @@ const getPageGroupHash = (pageGroup, platform) => {
 
 const getValidObject = object => !!(object && Object.keys(object).length);
 
+const checkDemoUserEmail = email => {
+	const { EMAIL } = DEMO_ACCOUNT_DATA;
+	const isValid = !!(email && EMAIL && email === EMAIL);
+
+	return isValid;
+};
+
 const getDashboardDemoUserSiteIds = (siteIdValue, email) => {
-	const { EMAIL, SITES, DEFAULT_SITE } = DEMO_ACCOUNT_DATA;
+	const { SITES, DEFAULT_SITE } = DEMO_ACCOUNT_DATA;
 	const isValidSiteId = !!siteIdValue;
-	const isDemoUserEmail = !!(email && EMAIL && email === EMAIL);
-	const isSiteIdAll = !!(isValidSiteId && siteIdValue.toString() === 'all');
+	const isMultipleSites = !!(siteIdValue.split(',').length > 1);
+	const isDemoUserEmail = checkDemoUserEmail(email);
+	const isSiteIdAll = !!(isValidSiteId && (siteIdValue.toString() === 'all' || isMultipleSites));
 	const isDemoUserWithAllSites = isDemoUserEmail && isSiteIdAll;
 	const isDemoUserWithSingleSite = isDemoUserEmail && !isSiteIdAll;
 	let computedSiteIds = siteIdValue;
@@ -182,8 +190,7 @@ const getReportingDemoUserValidation = (email, reportType) => {
 	const isReportType = !!reportType;
 	const isReportTypeAccount = !!(isReportType && reportType === 'account');
 	const isReportTypeSite = !!(isReportType && reportType === 'site');
-	const { EMAIL } = DEMO_ACCOUNT_DATA;
-	const isDemoUserEmail = !!(email && EMAIL && email === EMAIL);
+	const isDemoUserEmail = checkDemoUserEmail(email);
 	const isWithAllSites = isDemoUserEmail && isReportTypeAccount;
 	const isWithSingleSite = isDemoUserEmail && isReportTypeSite;
 	const isValid = isWithAllSites || isWithSingleSite;
@@ -292,6 +299,7 @@ export {
 	getHtmlEncodedJSON,
 	getSupportedAdSizes,
 	getPageGroupHash,
+	checkDemoUserEmail,
 	getDashboardDemoUserSiteIds,
 	getReportingDemoUserValidation,
 	getReportingDemoUserSiteIds,
