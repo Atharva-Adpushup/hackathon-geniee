@@ -12,7 +12,7 @@ import PerformanceApOriginalContainer from '../containers/PerformanceApOriginalC
 import RevenueContainer from '../containers/RevenueContainer';
 import Loader from '../../../Components/Loader/index';
 import { dates } from '../configs/commonConsts';
-import { getDashboardDemoUserSiteIds } from '../../../helpers/commonFunctions';
+import { getDashboardDemoUserSiteIds, checkDemoUserEmail } from '../../../helpers/commonFunctions';
 import SelectBox from '../../../Components/SelectBox/index';
 import reportService from '../../../services/reportService';
 import { convertObjToArr, getDateRange } from '../helpers/utils';
@@ -31,10 +31,18 @@ class Dashboard extends React.Component {
 	}
 
 	componentDidMount() {
-		const { showNotification, user, sites, reportsMeta, fetchReportingMeta } = this.props;
+		const {
+			showNotification,
+			user: {
+				data: { isPaymentDetailsComplete }
+			},
+			sites,
+			reportsMeta,
+			fetchReportingMeta
+		} = this.props;
 		const userSites = Object.keys(sites).toString();
 
-		if (!user.data.isPaymentDetailsComplete && !window.location.pathname.includes('payment')) {
+		if (!isPaymentDetailsComplete && !window.location.pathname.includes('payment')) {
 			showNotification({
 				mode: 'error',
 				title: 'Payments Error',
@@ -215,30 +223,54 @@ class Dashboard extends React.Component {
 	};
 
 	showApBaselineWidget = () => {
-		const { siteId, reportType, reportsMeta } = this.props;
+		const {
+			siteId,
+			reportType,
+			reportsMeta,
+			user: {
+				data: { email }
+			}
+		} = this.props;
 		const { site: reportingSites } = reportsMeta.data;
 		const { sites } = this.state;
-		if (
-			reportType == 'site' &&
+		const isDemoUser = checkDemoUserEmail(email);
+		const isLayoutProductInSiteReport = !!(
+			reportType === 'site' &&
 			reportingSites &&
 			reportingSites[siteId] &&
-			reportingSites[siteId].product.Layout == 1
-		)
+			Number(reportingSites[siteId].product.Layout) === 1
+		);
+		const isAccountLevelReport = !!(reportType === 'account');
+
+		if (isLayoutProductInSiteReport || isDemoUser) {
 			return true;
-		if (reportType == 'account') {
+		}
+
+		if (isAccountLevelReport) {
 			const hasLayoutSite = this.getLayoutSites(sites, reportingSites);
 			if (hasLayoutSite.length > 0) return true;
 		}
+
 		return false;
 	};
 
 	renderControl(wid) {
-		const { reportType, reportsMeta } = this.props;
+		const {
+			reportType,
+			reportsMeta,
+			user: {
+				data: { email }
+			}
+		} = this.props;
+		const isDemoUser = checkDemoUserEmail(email);
 		const { site: reportingSites } = reportsMeta.data;
 		const { widgetsConfig, quickDates, sites } = this.state;
 		const { selectedDate, selectedSite, name } = widgetsConfig[wid];
 		const layoutSites = reportingSites ? this.getLayoutSites(sites, reportingSites) : [];
-		const sitesToShow = name == 'per_ap_original' ? layoutSites : sites;
+		let sitesToShow = name == 'per_ap_original' ? layoutSites : sites;
+
+		sitesToShow = isDemoUser ? sites : sitesToShow;
+
 		return (
 			<div className="aligner aligner--hEnd">
 				{name !== 'estimated_earnings' ? (
