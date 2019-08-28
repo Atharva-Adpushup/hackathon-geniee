@@ -34,13 +34,15 @@ class Dashboard extends React.Component {
 		const {
 			showNotification,
 			user: {
-				data: { isPaymentDetailsComplete }
+				data: { isPaymentDetailsComplete, email }
 			},
 			sites,
 			reportsMeta,
 			fetchReportingMeta
 		} = this.props;
-		const userSites = Object.keys(sites).toString();
+		let userSites = Object.keys(sites).toString();
+
+		userSites = getDashboardDemoUserSiteIds(userSites, email);
 
 		if (!isPaymentDetailsComplete && !window.location.pathname.includes('payment')) {
 			showNotification({
