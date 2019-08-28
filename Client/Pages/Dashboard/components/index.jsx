@@ -177,7 +177,7 @@ class Dashboard extends React.Component {
 			reportingSites[selectedSite].dataAvailableOutOfLast30Days < 21;
 
 		params.siteid = selectedSite == 'all' ? siteIds.toString() : selectedSite;
-		params.siteid = getDashboardDemoUserSiteIds(selectedSite, email);
+		params.siteid = getDashboardDemoUserSiteIds(params.siteid, email);
 		widgetsConfig[wid].startDate = params.fromDate;
 		widgetsConfig[wid].endDate = params.toDate;
 
