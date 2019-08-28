@@ -189,7 +189,7 @@ function triggerControl(mode, errorCode) {
 		// New feedback
 		utils.sendFeedback({
 			eventType: errorCode ? errorCode : commonConsts.ERROR_CODES.PAGEGROUP_NOT_FOUND,
-			mode: 2,
+			mode: commonConsts.MODE.FALLBACK,
 			referrer: config.referrer
 		});
 
