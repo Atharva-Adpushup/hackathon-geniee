@@ -242,8 +242,21 @@ router
 			.catch(err => errorHandler(err, res));
 	})
 
-	.get('/allSitesData', () => {
-		opsModel.getAllSitesData();
+	.get('/allSitesData', (req, res) => {
+		if (!req.user.isSuperUser) {
+			return sendErrorResponse(
+				{
+					message: 'Unauthorized Request',
+					code: HTTP_STATUSES.UNAUTHORIZED
+				},
+				res
+			);
+		}
+
+		return opsModel
+			.getAllSitesData()
+			.then(sitesData => sendSuccessResponse(sitesData, res))
+			.catch(err => errorHandler(err, res));
 	});
 
 module.exports = router;

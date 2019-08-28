@@ -54,19 +54,24 @@ const commonSiteFunctions = {
 			default:
 		}
 	},
-	getSitesStatus(siteIds) {
+	getSitesReport(siteIds) {
+		const dateFormat = 'YYYY-MM-DD';
+		const pageviewsThreshold = 10000;
+		const days = 2;
+		const dayOffset = 1;
+
 		return request({
 			method: 'GET',
 			json: true,
 			uri: commonConsts.ACTIVE_SITES_API,
 			qs: {
 				fromDate: moment()
-					.subtract(3, 'days')
-					.format('YYYY-MM-DD'),
+					.subtract(days + dayOffset, 'days')
+					.format(dateFormat),
 				toDate: moment()
-					.subtract(1, 'days')
-					.format('YYYY-MM-DD'),
-				minPageViews: 10000,
+					.subtract(dayOffset, 'days')
+					.format(dateFormat),
+				minPageViews: pageviewsThreshold,
 				siteid: siteIds.join(',')
 			}
 		});
@@ -145,10 +150,10 @@ function apiModule() {
 					return Promise.all([
 						sites,
 						commonSiteFunctions.getNetworkTree().catch(err => null),
-						commonSiteFunctions.getSitesStatus(siteIds)
+						commonSiteFunctions.getSitesReport(siteIds)
 					]);
 				})
-				.then(([sites, networkTree, sitesStatus]) => {
+				.then(([sites, networkTree, sitesReport]) => {
 					const finalSites = sites.map(site => {
 						const { publisherId, publisherEmail } = commonSiteFunctions.getPublisherIdAndEmail(
 							site.adNetworkSettings
@@ -169,7 +174,12 @@ function apiModule() {
 						site.authEmail = publisherEmail;
 						site.adManager = commonSiteFunctions.getAdManager(site.adNetworkSettings);
 
-						// site.activeStatus = sitesStatus.code === 1 && sitesStatus.data.result.length
+						site.activeStatus =
+							sitesReport.code === 1 &&
+							sitesReport.data.result.length &&
+							!!sitesReport.data.result.find(currSite => currSite.siteId === site.siteId)
+								? 'Active'
+								: 'Inactive';
 
 						delete site.addedBidders;
 						delete site.onboardingStep;
@@ -179,10 +189,7 @@ function apiModule() {
 						return site;
 					});
 
-					console.log(finalSites);
-				})
-				.catch(err => {
-					console.log(err);
+					return finalSites;
 				});
 		}
 	};
