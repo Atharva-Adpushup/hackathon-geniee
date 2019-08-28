@@ -7,6 +7,7 @@ import Entities from 'html-entities';
 import sortBy from 'lodash/sortBy';
 import history from './history';
 import { supportedAdSizes } from '../constants/visualEditor';
+import { DEMO_ACCOUNT_DATA } from '../constants/others';
 
 const { XmlEntities } = Entities;
 const entities = new XmlEntities();
@@ -157,6 +158,128 @@ const getPageGroupHash = (pageGroup, platform) => {
 	return window.btoa(window.encodeURIComponent(JSON.stringify(object)));
 };
 
+const getValidObject = object => !!(object && Object.keys(object).length);
+
+const getDashboardDemoUserSiteIds = (siteIdValue, email) => {
+	const { EMAIL, SITES, DEFAULT_SITE } = DEMO_ACCOUNT_DATA;
+	const isValidSiteId = !!siteIdValue;
+	const isDemoUserEmail = !!(email && EMAIL && email === EMAIL);
+	const isSiteIdAll = !!(isValidSiteId && siteIdValue.toString() === 'all');
+	const isDemoUserWithAllSites = isDemoUserEmail && isSiteIdAll;
+	const isDemoUserWithSingleSite = isDemoUserEmail && !isSiteIdAll;
+	let computedSiteIds = siteIdValue;
+
+	if (isDemoUserWithAllSites) {
+		computedSiteIds = Object.keys(SITES).join(',');
+	} else if (isDemoUserWithSingleSite) {
+		computedSiteIds = DEFAULT_SITE.SITE_ID;
+	}
+
+	return computedSiteIds;
+};
+
+const getReportingDemoUserValidation = (email, reportType) => {
+	const isReportType = !!reportType;
+	const isReportTypeAccount = !!(isReportType && reportType === 'account');
+	const isReportTypeSite = !!(isReportType && reportType === 'site');
+	const { EMAIL } = DEMO_ACCOUNT_DATA;
+	const isDemoUserEmail = !!(email && EMAIL && email === EMAIL);
+	const isWithAllSites = isDemoUserEmail && isReportTypeAccount;
+	const isWithSingleSite = isDemoUserEmail && isReportTypeSite;
+	const isValid = isWithAllSites || isWithSingleSite;
+	const resultObject = { isValid, isWithAllSites, isWithSingleSite };
+
+	return resultObject;
+};
+
+const getReportingDemoUserSiteIds = (siteIdValue, email, reportType) => {
+	const { isWithAllSites, isWithSingleSite } = getReportingDemoUserValidation(email, reportType);
+	const { SITES, DEFAULT_SITE } = DEMO_ACCOUNT_DATA;
+	let computedSiteIds = siteIdValue;
+
+	if (isWithAllSites) {
+		computedSiteIds = Object.keys(SITES).join(',');
+	} else if (isWithSingleSite) {
+		computedSiteIds = DEFAULT_SITE.SITE_ID;
+	}
+
+	return computedSiteIds;
+};
+
+const getReportingDemoUserSites = (reportData, email, reportType) => {
+	const inputReportData = Object.assign({}, reportData);
+	const { isValid } = getReportingDemoUserValidation(email, reportType);
+	const isValidReportData = !!(
+		getValidObject(inputReportData) && getValidObject(inputReportData.site)
+	);
+	const isValidDemoUser = !!(isValid && isValidReportData);
+	const {
+		DEFAULT_SITE: { NAME }
+	} = DEMO_ACCOUNT_DATA;
+	const dummySiteName = NAME;
+
+	if (!isValidDemoUser) {
+		return inputReportData;
+	}
+
+	Object.keys(inputReportData.site).forEach(siteId => {
+		const siteObject = inputReportData.site[siteId];
+
+		siteObject.siteName = dummySiteName;
+		inputReportData.site[siteId] = siteObject;
+	});
+
+	return inputReportData;
+};
+
+const getReportingControlDemoUserSites = (responseData, path, isDemoUser) => {
+	const inputResponseData = Object.assign({}, responseData);
+	const inputReportData = Object.assign({}, inputResponseData.data);
+	const isValidReportData = !!(
+		getValidObject(inputReportData) &&
+		inputReportData.result &&
+		inputReportData.columns
+	);
+	const isSitesPath = path.match(/GET_ALL_SITES/);
+	const isPageGroupPath = path.match(/GET_ALL_PAGE_GROUPS/);
+	const isValidDemoUser = !!(isDemoUser && isValidReportData && (isSitesPath || isPageGroupPath));
+	const {
+		DEFAULT_SITE: { NAME, SITE_ID }
+	} = DEMO_ACCOUNT_DATA;
+	const dummySiteName = NAME;
+	const dummySiteId = SITE_ID;
+	const resultData = [];
+
+	if (!isValidDemoUser) {
+		inputResponseData.data = inputReportData;
+		return inputResponseData;
+	}
+
+	if (isSitesPath) {
+		resultData.push({
+			value: dummySiteName,
+			id: dummySiteId
+		});
+	} else if (isPageGroupPath) {
+		inputReportData.result.forEach(itemObject => {
+			const inputItemObject = Object.assign({}, itemObject);
+
+			if (isPageGroupPath) {
+				const pageGroupSplitArr = inputItemObject.value.split('-');
+				const computedPageGroupName = `${dummySiteName}-${pageGroupSplitArr[1]}`;
+
+				inputItemObject.value = computedPageGroupName;
+			}
+
+			resultData.push(inputItemObject);
+		});
+	}
+
+	inputReportData.result = resultData;
+	inputResponseData.data = inputReportData;
+	return inputResponseData;
+};
+
 export {
 	errorHandler,
 	getDuplicatesInArray,
@@ -168,5 +291,10 @@ export {
 	formatDate,
 	getHtmlEncodedJSON,
 	getSupportedAdSizes,
-	getPageGroupHash
+	getPageGroupHash,
+	getDashboardDemoUserSiteIds,
+	getReportingDemoUserValidation,
+	getReportingDemoUserSiteIds,
+	getReportingDemoUserSites,
+	getReportingControlDemoUserSites
 };

@@ -18,8 +18,14 @@ import {
 	opsDimension,
 	opsFilter
 } from '../configs/commonConsts';
+import { DEMO_ACCOUNT_DATA } from '../../../constants/others';
 import Loader from '../../../Components/Loader';
 import { convertObjToArr } from '../helpers/utils';
+import {
+	getReportingDemoUserValidation,
+	getReportingDemoUserSiteIds,
+	getReportingDemoUserSites
+} from '../../../helpers/commonFunctions';
 
 class Panel extends Component {
 	constructor(props) {
@@ -51,18 +57,19 @@ class Panel extends Component {
 	}
 
 	componentDidMount() {
-		const { reportsMeta, userSites, fetchReportingMeta } = this.props;
-		const userSitesStr = Object.keys(userSites).toString();
+		const { userSites, fetchReportingMeta } = this.props;
+		const { email, reportType } = this.getDemoUserParams();
+		let userSitesStr = Object.keys(userSites).toString();
 
-		if (!reportsMeta.fetched) {
-			return reportService.getMetaData({ sites: userSitesStr }).then(response => {
-				const { data } = response;
-				fetchReportingMeta(data);
-				return this.getContentInfo(data);
-			});
-		}
+		userSitesStr = getReportingDemoUserSiteIds(userSitesStr, email, reportType);
 
-		return this.getContentInfo(reportsMeta.data);
+		return reportService.getMetaData({ sites: userSitesStr }).then(response => {
+			let { data: computedData } = response;
+
+			computedData = getReportingDemoUserSites(computedData, email, reportType);
+			fetchReportingMeta(computedData);
+			return this.getContentInfo(computedData);
+		});
 	}
 
 	removeOpsFilterDimension = (filterList, dimensionList) => {
@@ -123,6 +130,18 @@ class Panel extends Component {
 		});
 	};
 
+	getDemoUserParams = () => {
+		const {
+			user: {
+				data: { email }
+			}
+		} = this.props;
+		const { reportType } = this.state;
+		const computedObject = { email, reportType };
+
+		return computedObject;
+	};
+
 	getControlChangedParams = controlParams => {
 		const { selectedDimension, selectedFilters, reportType } = controlParams;
 		const { reportsMeta } = this.props;
@@ -171,12 +190,15 @@ class Panel extends Component {
 			metricsList
 		} = this.state;
 		const { userSites } = this.props;
+		const { email, reportType } = this.getDemoUserParams();
 		let selectedMetrics;
+
 		if (metricsList) {
 			selectedMetrics = metricsList
 				.filter(metric => !metric.isDisabled)
 				.map(metric => metric.value);
 		}
+
 		const params = {
 			fromDate: moment(startDate).format('YYYY-MM-DD'),
 			toDate: moment(endDate).format('YYYY-MM-DD'),
@@ -184,14 +206,18 @@ class Panel extends Component {
 			interval: selectedInterval,
 			dimension: selectedDimension || null
 		};
+
 		Object.keys(selectedFilters).forEach(filter => {
 			const filters = Object.keys(selectedFilters[filter]);
 			params[filter] = filters.length > 0 ? filters.toString() : null;
 		});
+
 		if (!params.siteid) {
 			const siteIds = Object.keys(userSites);
 			params.siteid = siteIds.toString();
 		}
+
+		params.siteid = getReportingDemoUserSiteIds(params.siteid, email, reportType);
 		return params;
 	};
 
@@ -231,14 +257,26 @@ class Panel extends Component {
 			location: { search: queryParams },
 			userSites
 		} = this.props;
+		const { email } = this.getDemoUserParams();
 		const { site: reportingSites, interval: intervalsObj } = reportsMetaData;
 		const selectedControls = qs.parse(queryParams);
 		const isValidSite = !!(userSites && userSites[siteId] && userSites[siteId].siteDomain);
-		const isReportingSite = !!(reportingSites && reportingSites[siteId]);
+		const isReportingData = !!reportingSites;
+		const { isValid } = getReportingDemoUserValidation(email, reportType);
+		const {
+			DEFAULT_SITE: { SITE_ID }
+		} = DEMO_ACCOUNT_DATA;
+		const isDemoUserReportingSite = !!(isValid && isReportingData && reportingSites[SITE_ID]);
+		const isReportingSite = !!(
+			isReportingData &&
+			(reportingSites[siteId] || isDemoUserReportingSite)
+		);
+		const computedSiteId = isDemoUserReportingSite ? SITE_ID : siteId;
+
 		if (siteId) {
 			reportType = 'site';
 			if (isValidSite && isReportingSite) {
-				selectedFilters = { siteid: { [siteId]: true } };
+				selectedFilters = { siteid: { [computedSiteId]: true } };
 			}
 		}
 		if (Object.keys(selectedControls).length > 0) {
@@ -292,6 +330,9 @@ class Panel extends Component {
 			filterList,
 			tableData
 		} = this.state;
+		const { email } = this.getDemoUserParams();
+		const { isValid } = getReportingDemoUserValidation(email, reportType);
+
 		if (reportType == 'site') {
 			if (!isValidSite)
 				return this.renderEmptyMessage(
@@ -299,6 +340,7 @@ class Panel extends Component {
 				);
 			if (!isReportingSite) return this.renderEmptyMessage('No Data Available');
 		}
+
 		return (
 			<Row>
 				<Col sm={12}>
@@ -317,6 +359,7 @@ class Panel extends Component {
 						selectedInterval={selectedInterval}
 						reportType={reportType}
 						csvData={csvData}
+						isDemoUser={isValid}
 					/>
 				</Col>
 				<Col sm={12} className="u-margin-t5">

@@ -14,6 +14,7 @@ import {
 	opsFilter,
 	REPORT_DOWNLOAD_ENDPOINT
 } from '../configs/commonConsts';
+import { getReportingControlDemoUserSites } from '../../../helpers/commonFunctions';
 
 class Control extends Component {
 	constructor(props) {
@@ -101,16 +102,20 @@ class Control extends Component {
 	};
 
 	getSelectedFilter = filter => {
-		const { reportType, selectedFilters } = this.props;
+		const { reportType, selectedFilters, isDemoUser } = this.props;
 		let siteIds;
+
 		if (reportType === 'account') {
 			const { site } = this.props;
 			siteIds = Object.keys(site);
 		} else {
 			siteIds = selectedFilters.siteid ? Object.keys(selectedFilters.siteid) : [];
 		}
+
 		const params = { siteid: siteIds.toString() };
-		return reportService.getWidgetData({ path: filter.path, params });
+		return reportService
+			.getWidgetData({ path: filter.path, params })
+			.then(data => getReportingControlDemoUserSites(data, filter.path, isDemoUser));
 	};
 
 	getReportStatus = () => {

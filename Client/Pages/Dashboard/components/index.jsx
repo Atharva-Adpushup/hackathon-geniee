@@ -12,6 +12,7 @@ import PerformanceApOriginalContainer from '../containers/PerformanceApOriginalC
 import RevenueContainer from '../containers/RevenueContainer';
 import Loader from '../../../Components/Loader/index';
 import { dates } from '../configs/commonConsts';
+import { getDashboardDemoUserSiteIds } from '../../../helpers/commonFunctions';
 import SelectBox from '../../../Components/SelectBox/index';
 import reportService from '../../../services/reportService';
 import { convertObjToArr, getDateRange } from '../helpers/utils';
@@ -151,7 +152,13 @@ class Dashboard extends React.Component {
 	getDisplayData = wid => {
 		const { widgetsConfig } = this.state;
 		const { selectedDate, selectedSite, path, name } = widgetsConfig[wid];
-		const { sites, reportsMeta } = this.props;
+		const {
+			sites,
+			reportsMeta,
+			user: {
+				data: { email }
+			}
+		} = this.props;
 		const { site: reportingSites } = reportsMeta.data;
 		const siteIds = Object.keys(sites);
 		const params = getDateRange(selectedDate);
@@ -160,9 +167,12 @@ class Dashboard extends React.Component {
 			reportingSites &&
 			reportingSites[selectedSite] &&
 			reportingSites[selectedSite].dataAvailableOutOfLast30Days < 21;
+
 		params.siteid = selectedSite == 'all' ? siteIds.toString() : selectedSite;
+		params.siteid = getDashboardDemoUserSiteIds(selectedSite, email);
 		widgetsConfig[wid].startDate = params.fromDate;
 		widgetsConfig[wid].endDate = params.toDate;
+
 		if (hidPerApOriginData) {
 			widgetsConfig[wid].isDataSufficient = false;
 			widgetsConfig[wid].isLoading = false;
