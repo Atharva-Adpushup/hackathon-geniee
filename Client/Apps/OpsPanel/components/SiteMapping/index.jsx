@@ -7,6 +7,8 @@ import axiosInstance from '../../../../helpers/axiosInstance';
 import FilterBox from '../../../../Components/FilterBox';
 import Empty from '../../../../Components/Empty/index.jsx';
 import Loader from '../../../../Components/Loader/index';
+import { copyToClipBoard } from '../../../../helpers/commonFunctions';
+import CustomIcon from '../../../../Components/CustomIcon/index';
 
 class SiteMapping extends Component {
 	state = {
@@ -15,13 +17,13 @@ class SiteMapping extends Component {
 		isLoading: false,
 		selectAll: false,
 		checked: [],
-		selectedData : []
+		selectedData: []
 	};
 
 	componentDidMount() {
 		this.setState({ isLoading: true });
 		return axiosInstance
-			.get('https://jsonplaceholder.typicode.com/comments')
+			.get('/ops/allSitesData')
 			.then(res => this.setState({ data: res.data, filteredData: res.data, isLoading: false }))
 			.catch(err => {
 				console.log(err);
@@ -29,21 +31,22 @@ class SiteMapping extends Component {
 			});
 	}
 
-	handleChange = e => {
-		const { data } = this.state;
+	handleChange = () => {
+		const { filteredData } = this.state;
+		var checkedCopy = [];
 		var selectAll = !this.state.selectAll;
 		this.setState({ selectAll: selectAll });
-		var checkedCopy = [];
-		data.forEach(() => {
+		filteredData.forEach(() => {
 			checkedCopy.push(selectAll);
 		});
 		this.setState({
-			checked: checkedCopy
+			checked: checkedCopy,
+			selectedData: filteredData
 		});
 	};
 
 	handleSingleCheckboxChange = index => {
-		const  { data} = this.state;
+		// const { filteredData } = this.state;
 		var checkedCopy = this.state.checked;
 		checkedCopy[index] = !this.state.checked[index];
 		if (checkedCopy[index] === false) {
@@ -51,12 +54,9 @@ class SiteMapping extends Component {
 		}
 
 		this.setState({
-			checked: checkedCopy,
-			selectedData : data[index] 
-
+			checked: checkedCopy
+			// selectedData: filteredData[index]
 		});
-
-		console.log(this.state.selectedData)
 	};
 
 	getFilterBoxValues = key => {
@@ -79,6 +79,23 @@ class SiteMapping extends Component {
 
 		this.setState({ filteredData });
 	};
+
+	// filteredDataWithICcon = () => {
+	// 	const { filteredData } = this.state;
+
+	// 	return filteredData.map(value =>
+	// 		Object.values(value).map(val => (
+	// 			<span>
+	// 				{val}
+	// 				<CustomIcon
+	// 					icon="copy"
+	// 					className="u-text-red u-margin-l3 u-cursor-pointer"
+	// 					title="copy content"
+	// 				/>
+	// 			</span>
+	// 		))
+	// 	);
+	// };
 
 	renderFilterComponent() {
 		return (
@@ -154,30 +171,61 @@ class SiteMapping extends Component {
 			},
 
 			{
-				Header: 'User ID',
-				accessor: 'postId',
+				Header: 'Site ID',
+				accessor: 'siteId',
 				width: 100,
 				maxWidth: 100,
 				minWidth: 100
 			},
 			{
-				Header: 'ID',
-				accessor: 'id',
+				Header: 'Domain',
+				accessor: 'domain'
+			},
+			{
+				Header: 'Owner Email',
+				accessor: 'accountEmail'
+			},
+			{
+				Header: 'Onboarding Status',
+				accessor: 'onboardingStatus'
+			},
+			{
+				Header: 'Active Status',
+				accessor: 'activeStatus',
 				width: 100,
 				maxWidth: 100,
 				minWidth: 100
 			},
 			{
-				Header: 'Title',
-				accessor: 'name'
+				Header: 'Date Created',
+				accessor: 'dateCreated'
 			},
 			{
-				Header: 'Content',
-				accessor: 'body'
+				Header: 'Active Products',
+				accessor: 'activeProducts'
 			},
 			{
-				Header: 'Email',
-				accessor: 'email'
+				Header: 'Active Bidders',
+				accessor: 'activeBidders'
+			},
+			{
+				Header: 'Rev Share',
+				accessor: 'revenueShare',
+				width: 100,
+				maxWidth: 100,
+				minWidth: 100
+			},
+			{
+				Header: 'Publisher Id',
+				accessor: 'publisherId'
+			},
+			{
+				Header: 'Auth Email',
+				accessor: 'authEmail'
+			},
+			{
+				Header: 'Ad Manager',
+				accessor: 'adManager'
 			}
 		];
 
@@ -189,7 +237,6 @@ class SiteMapping extends Component {
 					<div className="col-md-10">{this.renderFilterComponent()}</div>
 					<div className="col-md-2">{this.exportData()}</div>
 				</Row>
-
 				{!filteredData || filteredData.length === 0 ? (
 					<Empty message=" No Data found " />
 				) : (
@@ -202,6 +249,7 @@ class SiteMapping extends Component {
 						className="u-padding-h3 u-padding-v2"
 					/>
 				)}
+				{/* {this.filteredDataWithICcon()}; */}
 			</React.Fragment>
 		);
 	}
