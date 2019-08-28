@@ -26,7 +26,7 @@ var targeting = {
 			};
 		*/
 		var customSlotLevelTargetingMap = window.adpushup.customSlotLevelTargetingMap;
-		if (customSlotLevelTargetingMap) {
+		if (customSlotLevelTargetingMap && adpSlot.gSlot) {
 			var slotIds = Object.keys(customSlotLevelTargetingMap);
 
 			if (slotIds.length) {

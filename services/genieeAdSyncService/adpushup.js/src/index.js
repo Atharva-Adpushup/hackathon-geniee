@@ -160,7 +160,7 @@ function triggerControl(mode, errorCode) {
 	}
 	config.mode = mode;
 
-	if (!errorCode) {
+	if (!errorCode || errorCode == commonConsts.ERROR_CODES.PAGEGROUP_NOT_FOUND) {
 		mode = 3;
 		config.mode = 3;
 	}
@@ -189,7 +189,7 @@ function triggerControl(mode, errorCode) {
 		// New feedback
 		utils.sendFeedback({
 			eventType: errorCode ? errorCode : commonConsts.ERROR_CODES.PAGEGROUP_NOT_FOUND,
-			mode: mode,
+			mode: commonConsts.MODE.FALLBACK,
 			referrer: config.referrer
 		});
 
@@ -378,7 +378,9 @@ function main() {
 
 	if (!config.pageGroup) {
 		pageGroupTimer = setTimeout(function() {
-			!config.pageGroup ? triggerControl(commonConsts.MODE.FALLBACK) : clearTimeout(pageGroupTimer);
+			!config.pageGroup
+				? triggerControl(commonConsts.MODE.FALLBACK, commonConsts.ERROR_CODES.PAGEGROUP_NOT_FOUND)
+				: clearTimeout(pageGroupTimer);
 		}, config.pageGroupTimeout);
 	} else {
 		// start heartBeat
