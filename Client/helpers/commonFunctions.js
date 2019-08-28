@@ -167,6 +167,32 @@ const checkDemoUserEmail = email => {
 	return isValid;
 };
 
+const getDemoUserSites = (reportData, email) => {
+	const inputReportData = Object.assign({}, reportData);
+	const isDemoUser = checkDemoUserEmail(email);
+	const isValidReportData = !!(
+		getValidObject(inputReportData) && getValidObject(inputReportData.site)
+	);
+	const isValidDemoUser = !!(isDemoUser && isValidReportData);
+	const {
+		DEFAULT_SITE: { NAME }
+	} = DEMO_ACCOUNT_DATA;
+	const dummySiteName = NAME;
+
+	if (!isValidDemoUser) {
+		return inputReportData;
+	}
+
+	Object.keys(inputReportData.site).forEach(siteId => {
+		const siteObject = inputReportData.site[siteId];
+
+		siteObject.siteName = dummySiteName;
+		inputReportData.site[siteId] = siteObject;
+	});
+
+	return inputReportData;
+};
+
 const getDashboardDemoUserSiteIds = (siteIdValue, email) => {
 	const { SITES, DEFAULT_SITE } = DEMO_ACCOUNT_DATA;
 	const isValidSiteId = !!siteIdValue;
@@ -211,32 +237,6 @@ const getReportingDemoUserSiteIds = (siteIdValue, email, reportType) => {
 	}
 
 	return computedSiteIds;
-};
-
-const getReportingDemoUserSites = (reportData, email, reportType) => {
-	const inputReportData = Object.assign({}, reportData);
-	const { isValid } = getReportingDemoUserValidation(email, reportType);
-	const isValidReportData = !!(
-		getValidObject(inputReportData) && getValidObject(inputReportData.site)
-	);
-	const isValidDemoUser = !!(isValid && isValidReportData);
-	const {
-		DEFAULT_SITE: { NAME }
-	} = DEMO_ACCOUNT_DATA;
-	const dummySiteName = NAME;
-
-	if (!isValidDemoUser) {
-		return inputReportData;
-	}
-
-	Object.keys(inputReportData.site).forEach(siteId => {
-		const siteObject = inputReportData.site[siteId];
-
-		siteObject.siteName = dummySiteName;
-		inputReportData.site[siteId] = siteObject;
-	});
-
-	return inputReportData;
 };
 
 const getReportingControlDemoUserSites = (responseData, path, isDemoUser) => {
@@ -303,6 +303,6 @@ export {
 	getDashboardDemoUserSiteIds,
 	getReportingDemoUserValidation,
 	getReportingDemoUserSiteIds,
-	getReportingDemoUserSites,
+	getDemoUserSites,
 	getReportingControlDemoUserSites
 };

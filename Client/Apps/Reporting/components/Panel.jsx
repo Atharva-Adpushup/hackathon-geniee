@@ -24,7 +24,7 @@ import { convertObjToArr } from '../helpers/utils';
 import {
 	getReportingDemoUserValidation,
 	getReportingDemoUserSiteIds,
-	getReportingDemoUserSites
+	getDemoUserSites
 } from '../../../helpers/commonFunctions';
 
 class Panel extends Component {
@@ -66,7 +66,7 @@ class Panel extends Component {
 		return reportService.getMetaData({ sites: userSitesStr }).then(response => {
 			let { data: computedData } = response;
 
-			computedData = getReportingDemoUserSites(computedData, email, reportType);
+			computedData = getDemoUserSites(computedData, email);
 			fetchReportingMeta(computedData);
 			return this.getContentInfo(computedData);
 		});

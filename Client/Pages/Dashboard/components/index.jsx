@@ -12,7 +12,11 @@ import PerformanceApOriginalContainer from '../containers/PerformanceApOriginalC
 import RevenueContainer from '../containers/RevenueContainer';
 import Loader from '../../../Components/Loader/index';
 import { dates } from '../configs/commonConsts';
-import { getDashboardDemoUserSiteIds, checkDemoUserEmail } from '../../../helpers/commonFunctions';
+import {
+	getDashboardDemoUserSiteIds,
+	checkDemoUserEmail,
+	getDemoUserSites
+} from '../../../helpers/commonFunctions';
 import SelectBox from '../../../Components/SelectBox/index';
 import reportService from '../../../services/reportService';
 import { convertObjToArr, getDateRange } from '../helpers/utils';
@@ -56,9 +60,12 @@ class Dashboard extends React.Component {
 
 		if (!reportsMeta.fetched) {
 			return reportService.getMetaData({ sites: userSites }).then(response => {
-				const { data } = response;
-				fetchReportingMeta(data);
-				return this.getContentInfo(data);
+				let { data: computedData } = response;
+
+				computedData = getDemoUserSites(computedData, email);
+
+				fetchReportingMeta(computedData);
+				return this.getContentInfo(computedData);
 			});
 		}
 
@@ -269,7 +276,10 @@ class Dashboard extends React.Component {
 		const { widgetsConfig, quickDates, sites } = this.state;
 		const { selectedDate, selectedSite, name } = widgetsConfig[wid];
 		const layoutSites = reportingSites ? this.getLayoutSites(sites, reportingSites) : [];
-		let sitesToShow = name == 'per_ap_original' ? layoutSites : sites;
+		const isPerfApOriginalWidget = !!(name === 'per_ap_original');
+		const isPerfApOriginalWidgetForDemoUser = !!(isDemoUser && isPerfApOriginalWidget);
+		const computedSelectedSite = isPerfApOriginalWidgetForDemoUser ? sites[1].value : selectedSite;
+		let sitesToShow = isPerfApOriginalWidget ? layoutSites : sites;
 
 		sitesToShow = isDemoUser ? sites : sitesToShow;
 
@@ -309,7 +319,7 @@ class Dashboard extends React.Component {
 							pullRight
 							isSearchable={false}
 							wrapperClassName="display-inline"
-							selected={selectedSite}
+							selected={computedSelectedSite}
 							options={sitesToShow}
 							onSelect={site => {
 								widgetsConfig[wid]['selectedSite'] = site;
