@@ -23,7 +23,8 @@ module.exports = {
 	DEMO_ACCOUNT_EMAIL: 'demo@adpushup.com',
 	AMP_SETTINGS_ACCESS_EMAILS: ['genieeamp@adpushup.com'],
 	DEMO_REPORT_SITE_ID: 31000,
-	
+	ADPUSHUP_NETWORK_ID: 103512698,
+
 	EMO_PAGEGROUPS: [
 		'HOME',
 		'CALC',
@@ -479,6 +480,13 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 			key: 8,
 			alias: 'manageadstxt'
 		}
+	},
+	APP_KEY_NAME_MAPPING: {
+		layout: 'Layout Editor',
+		apTag: 'AP Tag',
+		innovativeAds: 'Innovative Ads',
+		headerBidding: 'Header Bidding',
+		consentManagement: 'Consent Management'
 	},
 	ADS_TXT_REDIRECT_PATTERN: 'manageadstxt.com',
 	GOOGLE_BOT_USER_AGENT:

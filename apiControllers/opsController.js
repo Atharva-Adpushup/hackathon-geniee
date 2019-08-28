@@ -13,16 +13,13 @@ const {
 } = require('../configs/commonConsts');
 const { sendSuccessResponse, sendErrorResponse } = require('../helpers/commonFunctions');
 const { appBucket, errorHandler } = require('../helpers/routeHelpers');
+const opsModel = require('../models/opsModel');
 
 const router = express.Router();
 
 const helpers = {
 	getAllSitesFromCouchbase: () => {
-		const query = `select a.siteId, a.siteDomain, a.adNetworkSettings, a.ownerEmail, a.step, a.channels, a.apConfigs, a.dateCreated, b.adNetworkSettings[0].pubId, b.adNetworkSettings[0].adsenseEmail from ${
-			couchBase.DEFAULT_BUCKET
-		} a join ${
-			couchBase.DEFAULT_BUCKET
-		} b on keys 'user::' || a.ownerEmail where meta(a).id like 'site::%'`;
+		const query = `select a.siteId, a.siteDomain, a.adNetworkSettings, a.ownerEmail, a.step, a.channels, a.apConfigs, a.dateCreated, b.adNetworkSettings[0].pubId, b.adNetworkSettings[0].adsenseEmail from ${couchBase.DEFAULT_BUCKET} a join ${couchBase.DEFAULT_BUCKET} b on keys 'user::' || a.ownerEmail where meta(a).id like 'site::%'`;
 		return appBucket.queryDB(query);
 	},
 	makeAPIRequest: options => {
@@ -243,6 +240,10 @@ router
 				return sendSuccessResponse(response, res);
 			})
 			.catch(err => errorHandler(err, res));
+	})
+
+	.get('/allSitesData', () => {
+		opsModel.getAllSitesData();
 	});
 
 module.exports = router;
