@@ -23,7 +23,7 @@ class SiteMapping extends Component {
 	componentDidMount() {
 		this.setState({ isLoading: true });
 		return axiosInstance
-			.get('/ops/allSitesData')
+			.get('/ops/allSitesStats')
 			.then(res => this.setState({ data: res.data, filteredData: res.data, isLoading: false }))
 			.catch(err => {
 				console.log(err);
@@ -80,22 +80,22 @@ class SiteMapping extends Component {
 		this.setState({ filteredData });
 	};
 
-	// filteredDataWithICcon = () => {
-	// 	const { filteredData } = this.state;
+	filteredDataWithICcon = () => {
+		const { filteredData } = this.state;
 
-	// 	return filteredData.map(value =>
-	// 		Object.values(value).map(val => (
-	// 			<span>
-	// 				{val}
-	// 				<CustomIcon
-	// 					icon="copy"
-	// 					className="u-text-red u-margin-l3 u-cursor-pointer"
-	// 					title="copy content"
-	// 				/>
-	// 			</span>
-	// 		))
-	// 	);
-	// };
+		return filteredData.map(value =>
+			Object.values(value).map(val => (
+				<span>
+					{val}
+					<CustomIcon
+						icon="copy"
+						className="u-text-red u-margin-l3 u-cursor-pointer"
+						title="copy content"
+					/>
+				</span>
+			))
+		);
+	};
 
 	renderFilterComponent() {
 		return (
@@ -103,29 +103,69 @@ class SiteMapping extends Component {
 				onFilter={this.onFilter}
 				availableFilters={[
 					{
-						name: 'User ID',
-						prop: 'postId',
-						values: this.getFilterBoxValues('postId')
+						name: 'Site Id',
+						prop: 'siteId',
+						values: this.getFilterBoxValues('siteId')
 					},
 					{
-						name: 'ID',
-						prop: 'id',
-						values: this.getFilterBoxValues('id')
+						name: 'Domain',
+						prop: 'domain',
+						values: this.getFilterBoxValues('domain')
 					},
 					{
-						name: 'Title',
-						prop: 'name',
-						values: this.getFilterBoxValues('name')
+						name: 'Owner Email',
+						prop: 'accountEmail',
+						values: this.getFilterBoxValues('accountEmail')
 					},
 					{
-						name: 'Content',
-						prop: 'body',
-						values: this.getFilterBoxValues('body')
+						name: 'Onboarding Status',
+						prop: 'onboardingStatus',
+						values: this.getFilterBoxValues('onboardingStatus')
 					},
 					{
-						name: 'Email',
-						prop: 'email',
-						values: this.getFilterBoxValues('email')
+						name: 'Active Status',
+						prop: 'activeStatus',
+						values: this.getFilterBoxValues('activeStatus')
+					},
+					{
+						name: 'Date Created',
+						prop: 'dateCreated',
+						values: this.getFilterBoxValues('dateCreated')
+					},
+					{
+						name: 'Active Products',
+						prop: 'activeProducts',
+						values: this.getFilterBoxValues('activeProducts')
+					},
+					{
+						name: 'Active Bidders',
+						prop: 'activeBidders',
+						values: this.getFilterBoxValues('activeBidders')
+					},
+					{
+						name: 'Inactive Bidders',
+						prop: 'inactiveBidders',
+						values: this.getFilterBoxValues('inactiveBidders')
+					},
+					{
+						name: 'Rev Share',
+						prop: 'revenueShare',
+						values: this.getFilterBoxValues('revenueShare')
+					},
+					{
+						name: 'Publisher Id',
+						prop: 'publisherId',
+						values: this.getFilterBoxValues('publisherId')
+					},
+					{
+						name: 'Auth Email',
+						prop: 'authEmail',
+						values: this.getFilterBoxValues('authEmail')
+					},
+					{
+						name: 'Ad Manager',
+						prop: 'adManager',
+						values: this.getFilterBoxValues('adManager')
 					}
 				]}
 				handleFilters={this.handleFilters}
@@ -207,6 +247,10 @@ class SiteMapping extends Component {
 			{
 				Header: 'Active Bidders',
 				accessor: 'activeBidders'
+			},
+			{
+				Header: 'Inactive Bidders',
+				accessor: 'inactiveBidders'
 			},
 			{
 				Header: 'Rev Share',
