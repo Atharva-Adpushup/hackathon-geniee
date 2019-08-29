@@ -90,17 +90,21 @@ class SiteMapping extends Component {
 		var newArray = [];
 		filteredData.map(val => {
 			for (let key in val) {
-				newObj[key] = (
-					<span>
-						{val[key]}
-						<CustomIcon
-							icon="copy"
-							onClick={copyToClipBoard}
-							className="u-text-red u-margin-l3 u-cursor-pointer"
-							title="copy content"
-						/>
-					</span>
-				);
+				newObj[key] =
+					val[key] === 'N/A' ? (
+						<span>{val[key]}</span>
+					) : (
+						<span>
+							{val[key]}
+							<CustomIcon
+								icon="copy"
+								onClick={copyToClipBoard}
+								toReturn={val[key]}
+								className="u-text-red u-margin-l3 u-cursor-pointer"
+								title="copy content"
+							/>
+						</span>
+					);
 			}
 			newArray.push(newObj);
 		});
@@ -215,9 +219,9 @@ class SiteMapping extends Component {
 				),
 				sortable: false,
 				filterable: false,
-				width: 100,
-				maxWidth: 100,
-				minWidth: 100
+				width: 50,
+				maxWidth: 50,
+				minWidth: 50
 			},
 
 			{
@@ -308,7 +312,7 @@ class SiteMapping extends Component {
 				) : (
 					<ReactTable
 						columns={columns}
-						data={filteredData}
+						data={this.filteredDataWithICcon()}
 						filterable={false}
 						showPaginationTop
 						showPaginationBottom={false}
