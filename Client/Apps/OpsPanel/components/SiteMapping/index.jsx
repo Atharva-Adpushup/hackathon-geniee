@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import ReactTable from 'react-table';
 import 'react-table/react-table.css';
+import moment from 'moment';
+
 import { Glyphicon, Row } from 'react-bootstrap';
 
 import axiosInstance from '../../../../helpers/axiosInstance';
@@ -24,7 +26,10 @@ class SiteMapping extends Component {
 		this.setState({ isLoading: true });
 		return axiosInstance
 			.get('/ops/allSitesStats')
-			.then(res => this.setState({ data: res.data, filteredData: res.data, isLoading: false }))
+			.then(res => {
+				const { data } = res.data;
+				this.setState({ data: data, filteredData: data, isLoading: false });
+			})
 			.catch(err => {
 				console.log(err);
 				this.setState({ isLoading: false });
@@ -79,22 +84,27 @@ class SiteMapping extends Component {
 
 		this.setState({ filteredData });
 	};
-
 	filteredDataWithICcon = () => {
 		const { filteredData } = this.state;
-
-		return filteredData.map(value =>
-			Object.values(value).map(val => (
-				<span>
-					{val}
-					<CustomIcon
-						icon="copy"
-						className="u-text-red u-margin-l3 u-cursor-pointer"
-						title="copy content"
-					/>
-				</span>
-			))
-		);
+		var newObj = {};
+		var newArray = [];
+		filteredData.map(val => {
+			for (let key in val) {
+				newObj[key] = (
+					<span>
+						{val[key]}
+						<CustomIcon
+							icon="copy"
+							onClick={copyToClipBoard}
+							className="u-text-red u-margin-l3 u-cursor-pointer"
+							title="copy content"
+						/>
+					</span>
+				);
+			}
+			newArray.push(newObj);
+		});
+		return newArray;
 	};
 
 	renderFilterComponent() {
@@ -227,37 +237,49 @@ class SiteMapping extends Component {
 			},
 			{
 				Header: 'Onboarding Status',
-				accessor: 'onboardingStatus'
+				accessor: 'onboardingStatus',
+				width: 200,
+				maxWidth: 200,
+				minWidth: 200
 			},
 			{
 				Header: 'Active Status',
 				accessor: 'activeStatus',
-				width: 100,
-				maxWidth: 100,
-				minWidth: 100
+				width: 120,
+				maxWidth: 120,
+				minWidth: 120
 			},
 			{
 				Header: 'Date Created',
-				accessor: 'dateCreated'
+				accessor: 'dateCreated',
+				width: 120,
+				maxWidth: 120,
+				minWidth: 120
 			},
 			{
 				Header: 'Active Products',
-				accessor: 'activeProducts'
+				accessor: 'activeProducts',
+				width: 150,
+				maxWidth: 150,
+				minWidth: 150
 			},
 			{
 				Header: 'Active Bidders',
-				accessor: 'activeBidders'
+				accessor: 'activeBidders',
+				width: 150,
+				maxWidth: 150,
+				minWidth: 150
 			},
 			{
 				Header: 'Inactive Bidders',
-				accessor: 'inactiveBidders'
+				accessor: 'inactiveBidders',
+				width: 150,
+				maxWidth: 150,
+				minWidth: 150
 			},
 			{
 				Header: 'Rev Share',
-				accessor: 'revenueShare',
-				width: 100,
-				maxWidth: 100,
-				minWidth: 100
+				accessor: 'revenueShare'
 			},
 			{
 				Header: 'Publisher Id',
