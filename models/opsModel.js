@@ -79,13 +79,12 @@ const commonSiteFunctions = {
 	getActiveProducts(apps) {
 		const appKeys = Object.keys(apps);
 
-		return appKeys.reduce(
-			(activeProducts, appKey) =>
-				apps[appKey]
-					? `${activeProducts ? ', ' : ''}${commonConsts.APP_KEY_NAME_MAPPING[appKey]}`
-					: '',
-			''
-		);
+		return appKeys.reduce((activeProducts, appKey) => {
+			const currentProduct = apps[appKey]
+				? `${activeProducts ? ', ' : ''}${commonConsts.APP_KEY_NAME_MAPPING[appKey]}`
+				: '';
+			return activeProducts + currentProduct;
+		}, '');
 	},
 	getPublisherIdAndEmail(adNetworkSettings) {
 		if (adNetworkSettings && adNetworkSettings.length) {
@@ -116,6 +115,9 @@ const commonSiteFunctions = {
 			.connectToAppBucket()
 			.then(appBucket => appBucket.getAsync(commonConsts.docKeys.networkConfig))
 			.then(doc => doc.value);
+	},
+	getFormatedDate(date) {
+		return moment(date).format('Do MMM YYYY');
 	}
 };
 
@@ -156,6 +158,7 @@ function apiModule() {
 						site.publisherId = publisherId;
 						site.authEmail = publisherEmail;
 						site.adManager = commonSiteFunctions.getAdManager(site.adNetworkSettings);
+						site.dateCreated = commonSiteFunctions.getFormatedDate(site.dateCreated);
 
 						site.activeStatus =
 							sitesReport.code === 1 &&
