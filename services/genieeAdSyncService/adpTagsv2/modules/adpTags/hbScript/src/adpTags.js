@@ -69,7 +69,10 @@ var adpTags = {
 			var adUnits = inventoryMapper.get(inventory, size, optionalParam);
 			var slotId = adUnits.dfpAdUnit;
 			var bidders = optionalParam.headerBidding ? adUnits.bidders : [];
-			var formats = config.PREBID_CONFIG.formats || constants.PREBID.DEFAULT_FORMATS;
+			var formats =
+				config.PREBID_CONFIG && config.PREBID_CONFIG.formats
+					? config.PREBID_CONFIG.formats
+					: constants.PREBID.DEFAULT_FORMATS;
 			var isResponsive = optionalParam.isResponsive;
 			var sectionName = optionalParam.sectionName;
 			var multipleAdSizes = optionalParam.multipleAdSizes;
@@ -87,7 +90,10 @@ var adpTags = {
 				computedSizes: multipleAdSizes ? multipleAdSizes : [],
 				isResponsive: isResponsive,
 				containerId: containerId,
-				timeout: config.PREBID_CONFIG.timeOut || constants.PREBID.TIMEOUT,
+				timeout:
+					config.PREBID_CONFIG && config.PREBID_CONFIG.timeOut
+						? config.PREBID_CONFIG.timeOut
+						: constants.PREBID.TIMEOUT,
 				gSlot: null,
 				hasRendered: false,
 				biddingComplete: false,
