@@ -85,7 +85,7 @@ const FieldGroup = ({
 };
 FieldGroup.propTypes = {
 	id: PropTypes.string.isRequired,
-	label: PropTypes.string.isRequired,
+	label: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
 	onChange: PropTypes.func,
 	help: PropTypes.string,
 	type: PropTypes.string,

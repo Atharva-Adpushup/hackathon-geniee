@@ -40,6 +40,36 @@ class LostFoundLiveSites extends Component {
 		};
 	}
 
+	componentDidMount() {
+		this.setState({ isLoading: true });
+
+		const qs = this.getQueryString();
+		return axiosInstance
+			.get('/ops/getSiteStats', {
+				params: {
+					params: window.btoa(JSON.stringify(qs))
+				}
+			})
+			.then(res => {
+				this.setState({ sitesData: res.data.data, isLoading: false });
+			})
+			.catch(err => {
+				console.log(err);
+				this.setState({ isLoading: false, isError: true });
+			});
+	}
+
+	getQueryString = () => {
+		const { pageviewsThreshold, currentStartDate, currentEndDate } = this.state;
+		return {
+			pageviewsThreshold,
+			current: {
+				from: currentStartDate,
+				to: currentEndDate
+			}
+		};
+	};
+
 	handleSelect = (value = null) => {
 		this.setState({
 			activeKey: value
@@ -61,9 +91,8 @@ class LostFoundLiveSites extends Component {
 	};
 
 	handleGenerate = () => {
-		const { currentStartDate, currentEndDate, pageviewsThreshold } = this.state;
-
 		const { showNotification } = this.props;
+		const { pageviewsThreshold } = this.state;
 
 		if (pageviewsThreshold < 10000) {
 			return showNotification({
@@ -74,13 +103,7 @@ class LostFoundLiveSites extends Component {
 			});
 		}
 
-		const qs = {
-			pageviewsThreshold,
-			current: {
-				from: currentStartDate,
-				to: currentEndDate
-			}
-		};
+		const qs = this.getQueryString();
 
 		this.setState({ isLoading: true, isError: false });
 		return axiosInstance
