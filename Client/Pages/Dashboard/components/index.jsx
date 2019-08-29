@@ -97,37 +97,48 @@ class Dashboard extends React.Component {
 
 	getTopPerformingSites = (allUserSites, reportingSites) => {
 		let topPerformingSite;
+
 		allUserSites.forEach(site => {
 			const siteId = site.value;
+
 			if (reportingSites[siteId] && reportingSites[siteId].isTopPerforming) {
 				topPerformingSite = siteId;
 				return topPerformingSite;
 			}
 		});
+
 		return topPerformingSite;
 	};
 
 	getWidgetConfig = (widgets, selectedSite, reportType, widgetsList) => {
 		const sortedWidgets = sortBy(widgets, ['position', 'name']);
 		const widgetsConfig = [];
+
 		Object.keys(sortedWidgets).forEach(wid => {
 			const widget = { ...sortedWidgets[wid] };
+
 			if (widgetsList.indexOf(widget.name) > -1) {
 				widget.isLoading = true;
 				widget.selectedDate = dates[2].value;
 				widget.isDataSufficient = false;
+
 				if (reportType == 'site' || widget.name == 'per_ap_original')
 					widget.selectedSite = selectedSite;
 				else widget.selectedSite = 'all';
+
 				if (widget.name == 'per_ap_original') {
 					widget.selectedDimension = 'page_variation_type';
+					widget.selectedChartLegendMetric = 'adpushup_page_cpm';
 				}
+
 				if (widget.name == 'rev_by_network') {
 					widget.selectedDimension = 'network';
 				}
+
 				if (widget.name == 'per_site_wise') {
 					widget.selectedDimension = 'siteid';
 				}
+
 				widgetsConfig.push(widget);
 			}
 		});
@@ -340,22 +351,24 @@ class Dashboard extends React.Component {
 
 	renderViewReportButton(wid) {
 		const { widgetsConfig } = this.state;
-		const { startDate, endDate, selectedSite, selectedDimension, isDataSufficient } = widgetsConfig[
-			wid
-		];
+		const {
+			startDate,
+			endDate,
+			selectedSite,
+			selectedDimension,
+			selectedChartLegendMetric = '',
+			isDataSufficient
+		} = widgetsConfig[wid];
 		const { reportType, siteId } = this.props;
-		let siteSelected;
-		if (reportType === 'site') siteSelected = siteId;
-		else if (selectedSite != 'all') siteSelected = selectedSite;
+		let siteSelected = '';
+
+		if (reportType === 'site') siteSelected = `/${siteId}`;
+		else if (selectedSite !== 'all') siteSelected = `/${selectedSite}`;
+
+		const computedReportLink = `/reports${siteSelected}?fromDate=${startDate}&toDate=${endDate}&dimension=${selectedDimension}&chartLegendMetric=${selectedChartLegendMetric}`;
+
 		return (
-			<Link
-				to={
-					siteSelected
-						? `/reports/${siteSelected}?fromDate=${startDate}&toDate=${endDate}&dimension=${selectedDimension}`
-						: `/reports?fromDate=${startDate}&toDate=${endDate}&dimension=${selectedDimension}`
-				}
-				className="u-link-reset aligner aligner-item float-right"
-			>
+			<Link to={computedReportLink} className="u-link-reset aligner aligner-item float-right">
 				<Button className="aligner-item aligner aligner--vCenter" disabled={!isDataSufficient}>
 					View Reports
 					<FontAwesomeIcon icon="chart-area" className="u-margin-l2" />
