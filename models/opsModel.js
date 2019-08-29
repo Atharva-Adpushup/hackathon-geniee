@@ -172,6 +172,12 @@ function apiModule() {
 						delete site.apps;
 						delete site.adNetworkSettings;
 
+						for (const key in site) {
+							if (site.hasOwnProperty(key) && site[key] === '') {
+								site[key] = 'N/A';
+							}
+						}
+
 						return site;
 					});
 
