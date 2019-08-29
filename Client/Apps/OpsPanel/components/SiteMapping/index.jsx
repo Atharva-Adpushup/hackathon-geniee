@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import ReactTable from 'react-table';
 import 'react-table/react-table.css';
+import moment from 'moment';
+
 import { Glyphicon, Row } from 'react-bootstrap';
 
 import axiosInstance from '../../../../helpers/axiosInstance';
@@ -23,8 +25,11 @@ class SiteMapping extends Component {
 	componentDidMount() {
 		this.setState({ isLoading: true });
 		return axiosInstance
-			.get('/ops/allSitesData')
-			.then(res => this.setState({ data: res.data, filteredData: res.data, isLoading: false }))
+			.get('/ops/allSitesStats')
+			.then(res => {
+				const { data } = res.data;
+				this.setState({ data: data, filteredData: data, isLoading: false });
+			})
 			.catch(err => {
 				console.log(err);
 				this.setState({ isLoading: false });
@@ -79,23 +84,28 @@ class SiteMapping extends Component {
 
 		this.setState({ filteredData });
 	};
-
-	// filteredDataWithICcon = () => {
-	// 	const { filteredData } = this.state;
-
-	// 	return filteredData.map(value =>
-	// 		Object.values(value).map(val => (
-	// 			<span>
-	// 				{val}
-	// 				<CustomIcon
-	// 					icon="copy"
-	// 					className="u-text-red u-margin-l3 u-cursor-pointer"
-	// 					title="copy content"
-	// 				/>
-	// 			</span>
-	// 		))
-	// 	);
-	// };
+	filteredDataWithICcon = () => {
+		const { filteredData } = this.state;
+		var newObj = {};
+		var newArray = [];
+		filteredData.map(val => {
+			for (let key in val) {
+				newObj[key] = (
+					<span>
+						{val[key]}
+						<CustomIcon
+							icon="copy"
+							onClick={copyToClipBoard}
+							className="u-text-red u-margin-l3 u-cursor-pointer"
+							title="copy content"
+						/>
+					</span>
+				);
+			}
+			newArray.push(newObj);
+		});
+		return newArray;
+	};
 
 	renderFilterComponent() {
 		return (
@@ -103,29 +113,69 @@ class SiteMapping extends Component {
 				onFilter={this.onFilter}
 				availableFilters={[
 					{
-						name: 'User ID',
-						prop: 'postId',
-						values: this.getFilterBoxValues('postId')
+						name: 'Site Id',
+						prop: 'siteId',
+						values: this.getFilterBoxValues('siteId')
 					},
 					{
-						name: 'ID',
-						prop: 'id',
-						values: this.getFilterBoxValues('id')
+						name: 'Domain',
+						prop: 'domain',
+						values: this.getFilterBoxValues('domain')
 					},
 					{
-						name: 'Title',
-						prop: 'name',
-						values: this.getFilterBoxValues('name')
+						name: 'Owner Email',
+						prop: 'accountEmail',
+						values: this.getFilterBoxValues('accountEmail')
 					},
 					{
-						name: 'Content',
-						prop: 'body',
-						values: this.getFilterBoxValues('body')
+						name: 'Onboarding Status',
+						prop: 'onboardingStatus',
+						values: this.getFilterBoxValues('onboardingStatus')
 					},
 					{
-						name: 'Email',
-						prop: 'email',
-						values: this.getFilterBoxValues('email')
+						name: 'Active Status',
+						prop: 'activeStatus',
+						values: this.getFilterBoxValues('activeStatus')
+					},
+					{
+						name: 'Date Created',
+						prop: 'dateCreated',
+						values: this.getFilterBoxValues('dateCreated')
+					},
+					{
+						name: 'Active Products',
+						prop: 'activeProducts',
+						values: this.getFilterBoxValues('activeProducts')
+					},
+					{
+						name: 'Active Bidders',
+						prop: 'activeBidders',
+						values: this.getFilterBoxValues('activeBidders')
+					},
+					{
+						name: 'Inactive Bidders',
+						prop: 'inactiveBidders',
+						values: this.getFilterBoxValues('inactiveBidders')
+					},
+					{
+						name: 'Rev Share',
+						prop: 'revenueShare',
+						values: this.getFilterBoxValues('revenueShare')
+					},
+					{
+						name: 'Publisher Id',
+						prop: 'publisherId',
+						values: this.getFilterBoxValues('publisherId')
+					},
+					{
+						name: 'Auth Email',
+						prop: 'authEmail',
+						values: this.getFilterBoxValues('authEmail')
+					},
+					{
+						name: 'Ad Manager',
+						prop: 'adManager',
+						values: this.getFilterBoxValues('adManager')
 					}
 				]}
 				handleFilters={this.handleFilters}
@@ -187,33 +237,49 @@ class SiteMapping extends Component {
 			},
 			{
 				Header: 'Onboarding Status',
-				accessor: 'onboardingStatus'
+				accessor: 'onboardingStatus',
+				width: 200,
+				maxWidth: 200,
+				minWidth: 200
 			},
 			{
 				Header: 'Active Status',
 				accessor: 'activeStatus',
-				width: 100,
-				maxWidth: 100,
-				minWidth: 100
+				width: 120,
+				maxWidth: 120,
+				minWidth: 120
 			},
 			{
 				Header: 'Date Created',
-				accessor: 'dateCreated'
+				accessor: 'dateCreated',
+				width: 120,
+				maxWidth: 120,
+				minWidth: 120
 			},
 			{
 				Header: 'Active Products',
-				accessor: 'activeProducts'
+				accessor: 'activeProducts',
+				width: 150,
+				maxWidth: 150,
+				minWidth: 150
 			},
 			{
 				Header: 'Active Bidders',
-				accessor: 'activeBidders'
+				accessor: 'activeBidders',
+				width: 150,
+				maxWidth: 150,
+				minWidth: 150
+			},
+			{
+				Header: 'Inactive Bidders',
+				accessor: 'inactiveBidders',
+				width: 150,
+				maxWidth: 150,
+				minWidth: 150
 			},
 			{
 				Header: 'Rev Share',
-				accessor: 'revenueShare',
-				width: 100,
-				maxWidth: 100,
-				minWidth: 100
+				accessor: 'revenueShare'
 			},
 			{
 				Header: 'Publisher Id',
