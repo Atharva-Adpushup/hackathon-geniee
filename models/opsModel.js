@@ -122,9 +122,7 @@ const commonSiteFunctions = {
 function apiModule() {
 	const API = {
 		getAllSitesStats() {
-			const query = N1qlQuery.fromString(
-				commonConsts.GET_ALL_SITES_STATS_QUERY
-			);
+			const query = N1qlQuery.fromString(commonConsts.GET_ALL_SITES_STATS_QUERY);
 
 			return couchbase
 				.connectToAppBucket()
@@ -134,7 +132,7 @@ function apiModule() {
 
 					return Promise.all([
 						sites,
-						commonSiteFunctions.getNetworkTree().catch(err => null),
+						commonSiteFunctions.getNetworkTree(),
 						commonSiteFunctions.getSitesReport(siteIds)
 					]);
 				})
@@ -175,6 +173,10 @@ function apiModule() {
 					});
 
 					return finalSites;
+				})
+				.catch(err => {
+					console.log(err);
+					throw new AdPushupError('Something went wrong');
 				});
 		}
 	};
