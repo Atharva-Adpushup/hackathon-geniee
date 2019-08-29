@@ -86,6 +86,14 @@
 	margin-bottom: 10px !important;
 }
 
-.rt-resizable-header-content {
+.site-mapping .rt-resizable-header-content {
 	float: left;
+}
+
+.site-mapping-copy {
+	display: none;
+}
+
+.site-mapping .rt-tr:hover .site-mapping-copy {
+	display: inline-block !important;
 }

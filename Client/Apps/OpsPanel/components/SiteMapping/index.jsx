@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import ReactTable from 'react-table';
 import 'react-table/react-table.css';
-import moment from 'moment';
 
 import { Glyphicon, Row } from 'react-bootstrap';
 
@@ -28,7 +27,7 @@ class SiteMapping extends Component {
 			.get('/ops/allSitesStats')
 			.then(res => {
 				const { data } = res.data;
-				this.setState({ data: data, filteredData: data, isLoading: false });
+				this.setState({ data, filteredData: data, isLoading: false });
 			})
 			.catch(err => {
 				console.log(err);
@@ -38,9 +37,9 @@ class SiteMapping extends Component {
 
 	handleChange = () => {
 		const { filteredData } = this.state;
-		var checkedCopy = [];
-		var selectAll = !this.state.selectAll;
-		this.setState({ selectAll: selectAll });
+		const checkedCopy = [];
+		const selectAll = !this.state.selectAll;
+		this.setState({ selectAll });
 		filteredData.forEach(() => {
 			checkedCopy.push(selectAll);
 		});
@@ -52,7 +51,7 @@ class SiteMapping extends Component {
 
 	handleSingleCheckboxChange = index => {
 		// const { filteredData } = this.state;
-		var checkedCopy = this.state.checked;
+		const checkedCopy = this.state.checked;
 		checkedCopy[index] = !this.state.checked[index];
 		if (checkedCopy[index] === false) {
 			this.setState({ selectAll: false });
@@ -84,12 +83,13 @@ class SiteMapping extends Component {
 
 		this.setState({ filteredData });
 	};
+
 	filteredDataWithICcon = () => {
 		const { filteredData } = this.state;
-		var newObj = {};
-		var newArray = [];
+		const newObj = {};
+		const newArray = [];
 		filteredData.map(val => {
-			for (let key in val) {
+			for (const key in val) {
 				newObj[key] =
 					val[key] === 'N/A' ? (
 						<span>{val[key]}</span>
@@ -100,7 +100,7 @@ class SiteMapping extends Component {
 								icon="copy"
 								onClick={copyToClipBoard}
 								toReturn={val[key]}
-								className="u-text-red u-margin-l3 u-cursor-pointer"
+								className="u-text-red u-margin-l3 u-cursor-pointer site-mapping-copy"
 								title="copy content"
 							/>
 						</span>
@@ -188,20 +188,19 @@ class SiteMapping extends Component {
 		);
 	}
 
-	exportData = () => {
-		return (
-			<a
-				style={{
-					height: 33,
-					paddingTop: 8
-				}}
-				className="btn btn-lightBg btn-default btn-blue-line pull-right u-margin-r2 u-margin-t5"
-			>
-				<Glyphicon glyph="download-alt u-margin-r2" />
-				Export Report
-			</a>
-		);
-	};
+	exportData = () => (
+		<a
+			style={{
+				height: 33,
+				paddingTop: 8
+			}}
+			className="btn btn-lightBg btn-default btn-blue-line pull-right u-margin-r2 u-margin-t5"
+		>
+			<Glyphicon glyph="download-alt u-margin-r2" />
+			Export Report
+		</a>
+	);
+
 	render() {
 		const { isLoading, filteredData } = this.state;
 		const columns = [
@@ -299,7 +298,7 @@ class SiteMapping extends Component {
 			}
 		];
 
-		if (isLoading) return <Loader height="800px" classNames="u-margin-v3" />;
+		if (isLoading) return <Loader height="600px" classNames="u-margin-v3" />;
 
 		return (
 			<React.Fragment>
@@ -316,7 +315,7 @@ class SiteMapping extends Component {
 						filterable={false}
 						showPaginationTop
 						showPaginationBottom={false}
-						className="u-padding-h3 u-padding-v2"
+						className="u-padding-h3 u-padding-v2 site-mapping"
 					/>
 				)}
 				{/* {this.filteredDataWithICcon()}; */}
