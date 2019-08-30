@@ -403,6 +403,10 @@ const siteMappingActions = {
 		{
 			value: 'consumable',
 			label: 'consumable'
+		},
+		{
+			value: 'adsolut',
+			label: 'adsolut'
 		}
 	],
 	devicesList = [
@@ -582,6 +586,16 @@ const siteMappingActions = {
 			},
 			{
 				name: 'unitName',
+				type: 'string'
+			}
+		],
+		adsolut: [
+			{
+				name: 'host',
+				type: 'string'
+			},
+			{
+				name: 'zoneId',
 				type: 'string'
 			}
 		]
