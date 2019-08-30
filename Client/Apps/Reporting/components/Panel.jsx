@@ -39,6 +39,7 @@ class Panel extends Component {
 			selectedFilters: {},
 			selectedMetrics: [],
 			selectedInterval: 'daily',
+			selectedChartLegendMetric: '',
 			startDate: moment()
 				.startOf('day')
 				.subtract(7, 'days')
@@ -57,19 +58,23 @@ class Panel extends Component {
 	}
 
 	componentDidMount() {
-		const { userSites, fetchReportingMeta } = this.props;
+		const { userSites, fetchReportingMeta, reportsMeta } = this.props;
 		const { email, reportType } = this.getDemoUserParams();
 		let userSitesStr = Object.keys(userSites).toString();
 
 		userSitesStr = getReportingDemoUserSiteIds(userSitesStr, email, reportType);
 
-		return reportService.getMetaData({ sites: userSitesStr }).then(response => {
-			let { data: computedData } = response;
+		if (!reportsMeta.fetched) {
+			return reportService.getMetaData({ sites: userSitesStr }).then(response => {
+				let { data: computedData } = response;
 
-			computedData = getDemoUserSites(computedData, email);
-			fetchReportingMeta(computedData);
-			return this.getContentInfo(computedData);
-		});
+				computedData = getDemoUserSites(computedData, email);
+				fetchReportingMeta(computedData);
+				return this.getContentInfo(computedData);
+			});
+		}
+
+		return this.getContentInfo(reportsMeta.data);
 	}
 
 	removeOpsFilterDimension = (filterList, dimensionList) => {
@@ -246,6 +251,7 @@ class Panel extends Component {
 			selectedDimension,
 			selectedFilters,
 			selectedInterval,
+			selectedChartLegendMetric,
 			reportType,
 			startDate,
 			endDate
@@ -280,9 +286,10 @@ class Panel extends Component {
 			}
 		}
 		if (Object.keys(selectedControls).length > 0) {
-			const { dimension, interval, fromDate, toDate } = selectedControls;
+			const { dimension, interval, fromDate, toDate, chartLegendMetric } = selectedControls;
 			selectedDimension = dimension;
 			selectedInterval = interval || 'daily';
+			selectedChartLegendMetric = chartLegendMetric;
 			startDate = fromDate;
 			endDate = toDate;
 		}
@@ -302,6 +309,7 @@ class Panel extends Component {
 				selectedInterval,
 				selectedDimension,
 				selectedFilters,
+				selectedChartLegendMetric,
 				reportType,
 				dimensionList,
 				filterList,
@@ -318,6 +326,7 @@ class Panel extends Component {
 			selectedFilters,
 			selectedInterval,
 			selectedMetrics,
+			selectedChartLegendMetric,
 			reportType,
 			startDate,
 			endDate,
@@ -370,6 +379,7 @@ class Panel extends Component {
 						endDate={endDate}
 						metricsList={metricsList}
 						selectedInterval={selectedInterval}
+						selectedChartLegendMetric={selectedChartLegendMetric}
 					/>
 				</Col>
 				<Col sm={12} className="u-margin-t5">
@@ -389,9 +399,11 @@ class Panel extends Component {
 	render() {
 		const { isLoading } = this.state;
 		const { reportsMeta } = this.props;
+
 		if (!reportsMeta.fetched || isLoading) {
 			return <Loader />;
 		}
+
 		return <ActionCard title="AdPushup Reports">{this.renderContent()}</ActionCard>;
 	}
 }

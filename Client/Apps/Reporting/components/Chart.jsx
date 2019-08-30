@@ -4,14 +4,14 @@ import groupBy from 'lodash/groupBy';
 import sortBy from 'lodash/sortBy';
 import moment from 'moment';
 import CustomChart from '../../../Components/CustomChart';
-import { activeLegendItem, activeLegendItemArray } from '../configs/commonConsts';
+import { activeLegendItem, activeLegendItemArray, displayMetrics } from '../configs/commonConsts';
 
 class Chart extends React.Component {
 	constructor(props) {
 		super(props);
 		const { selectedDimension } = props;
 		const xAxis = this.enumerateDaysBetweenDates();
-		const activeLegendItems = selectedDimension ? activeLegendItem : activeLegendItemArray;
+		const activeLegendItems = this.getActiveLegendItems();
 		const series = this.updateChartData(activeLegendItems, xAxis);
 		const legends = this.computeLegends();
 		this.state = {
@@ -71,6 +71,23 @@ class Chart extends React.Component {
 
 		xAxis.categories = dates;
 		return xAxis;
+	};
+
+	getActiveLegendItems = () => {
+		const { selectedDimension, selectedChartLegendMetric } = this.props;
+		const activeLegendItemsByChartLegendMetric = displayMetrics.filter(
+			legendItem => legendItem.value === selectedChartLegendMetric
+		);
+
+		if (activeLegendItemsByChartLegendMetric.length) {
+			return activeLegendItemsByChartLegendMetric[0];
+		}
+
+		if (selectedDimension) {
+			return activeLegendItem;
+		}
+
+		return activeLegendItemArray;
 	};
 
 	getGroupByResult = rows => {
