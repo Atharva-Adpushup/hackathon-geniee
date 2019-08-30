@@ -126,15 +126,32 @@ class collection extends React.Component {
 	}
 
 	updateSum(sum) {
+		const { maxValue } = this.props;
 		const $collectionSum = $(ReactDOM.findDOMNode(this.refs['collection-sum']));
+		const $remainingSum = $(ReactDOM.findDOMNode(this.refs['remaining-sum']));
+
+		let remaining = maxValue - sum;
+		remaining = remaining < 0 ? 'N/A' : remaining;
+
 		$collectionSum.text(sum);
+		$remainingSum.text(remaining);
 	}
 
 	renderSum() {
+		const { maxValue } = this.props;
+		const sum = this.getCollectionSum(this.getModel());
+		let remaining = maxValue - sum;
+		remaining = remaining < 0 ? 'N/A' : remaining;
+
 		return (
-			<p key="numeric-collection-desc" className="form-group-desc">
-				Total Traffic: <span ref="collection-sum">{this.getCollectionSum(this.getModel())}</span>
-			</p>
+			<strong>
+				<p key="numeric-collection-desc" className="form-group-desc">
+					Allocated Traffic: <span ref="collection-sum">{sum}</span>
+				</p>
+				<p>
+					Remaining Traffic: <span ref="remaining-sum">{remaining}</span>
+				</p>
+			</strong>
 		);
 	}
 
