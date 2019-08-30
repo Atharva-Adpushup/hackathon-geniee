@@ -53,17 +53,12 @@ class AddManageNonResponsiveBidder extends React.Component {
 								};
 
 								for (const paramKey in formFields.bidderConfig) {
-									newState.bidderConfig[paramKey] = '';
+									newState.bidderConfig[paramKey] =
+										formFields.bidderConfig[paramKey].defaultValue ||
+										(formFields.bidderConfig[paramKey].dataType === 'number' ? null : '');
 								}
 
 								for (const globalParamKey in formFields.params.global) {
-									if (formFields.params.global[globalParamKey].dataType === 'number') {
-										newState.globalParams[globalParamKey] = null;
-
-										// eslint-disable-next-line no-continue
-										continue;
-									}
-
 									if (
 										!formFields.params.global[globalParamKey].visible &&
 										formFields.params.global[globalParamKey].value !== undefined
@@ -75,7 +70,9 @@ class AddManageNonResponsiveBidder extends React.Component {
 										continue;
 									}
 
-									newState.globalParams[globalParamKey] = '';
+									newState.globalParams[globalParamKey] =
+										formFields.params.global[globalParamKey].defaultValue ||
+										(formFields.params.global[globalParamKey].dataType === 'number' ? null : '');
 								}
 
 								newState.bidderConfig = { key, name, sizeLess, reusable, ...newState.bidderConfig };

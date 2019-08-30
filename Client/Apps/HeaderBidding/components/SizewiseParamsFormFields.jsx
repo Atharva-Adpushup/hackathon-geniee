@@ -38,13 +38,6 @@ class SizewiseParamsFormFields extends React.Component {
 						continue;
 					}
 
-					if (formFields.params.siteLevel[paramKey].dataType === 'number') {
-						params[paramKey] = null;
-
-						// eslint-disable-next-line no-continue
-						continue;
-					}
-
 					if (
 						!formFields.params.siteLevel[paramKey].visible &&
 						formFields.params.siteLevel[paramKey].value !== undefined
@@ -55,7 +48,9 @@ class SizewiseParamsFormFields extends React.Component {
 						continue;
 					}
 
-					params[paramKey] = '';
+					params[paramKey] =
+						formFields.params.siteLevel[paramKey].defaultValue ||
+						(formFields.params.siteLevel[paramKey].dataType === 'number' ? null : '');
 				}
 
 				newState.tempParams[adSize] = { ...params, saved: !!savedParams[adSize] };
@@ -72,13 +67,6 @@ class SizewiseParamsFormFields extends React.Component {
 			const params = {};
 
 			for (const paramKey in formFields.params.siteLevel) {
-				if (formFields.params.siteLevel[paramKey].dataType === 'number') {
-					params[paramKey] = null;
-
-					// eslint-disable-next-line no-continue
-					continue;
-				}
-
 				if (
 					!formFields.params.siteLevel[paramKey].visible &&
 					formFields.params.siteLevel[paramKey].value !== undefined
@@ -89,7 +77,9 @@ class SizewiseParamsFormFields extends React.Component {
 					continue;
 				}
 
-				params[paramKey] = '';
+				params[paramKey] =
+					formFields.params.siteLevel[paramKey].defaultValue ||
+					(formFields.params.siteLevel[paramKey].dataType === 'number' ? null : '');
 			}
 
 			return {
