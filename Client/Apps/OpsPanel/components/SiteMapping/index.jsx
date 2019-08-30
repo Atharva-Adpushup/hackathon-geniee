@@ -10,6 +10,7 @@ import Empty from '../../../../Components/Empty/index.jsx';
 import Loader from '../../../../Components/Loader/index';
 import { copyToClipBoard } from '../../../../helpers/commonFunctions';
 import CustomIcon from '../../../../Components/CustomIcon/index';
+import { REPORT_DOWNLOAD_ENDPOINT } from '../../../Reporting/configs/commonConsts';
 
 class SiteMapping extends Component {
 	state = {
@@ -111,6 +112,15 @@ class SiteMapping extends Component {
 		return newArray;
 	};
 
+	getDefaultPageSize = () => {
+		const { filteredData: { length = 0 } = {} } = this.state;
+
+		if (length < 5) return 5;
+		else if (length < 20) return 20;
+		else if (length < 50) return 50;
+		else return 50;
+	};
+
 	renderFilterComponent() {
 		return (
 			<FilterBox
@@ -188,21 +198,11 @@ class SiteMapping extends Component {
 		);
 	}
 
-	exportData = () => (
-		<a
-			style={{
-				height: 33,
-				paddingTop: 8
-			}}
-			className="btn btn-lightBg btn-default btn-blue-line pull-right u-margin-r2 u-margin-t5"
-		>
-			<Glyphicon glyph="download-alt u-margin-r2" />
-			Export Report
-		</a>
-	);
-
 	render() {
 		const { isLoading, filteredData } = this.state;
+		const csvData = btoa(JSON.stringify(filteredData));
+		const downloadLink = `${REPORT_DOWNLOAD_ENDPOINT}?data=${csvData}`;
+
 		const columns = [
 			{
 				Header: (
@@ -304,7 +304,19 @@ class SiteMapping extends Component {
 			<React.Fragment>
 				<Row>
 					<div className="col-md-10">{this.renderFilterComponent()}</div>
-					<div className="col-md-2">{this.exportData()}</div>
+					<div className="col-md-2">
+						<a
+							href={downloadLink}
+							style={{
+								height: 33,
+								paddingTop: 8
+							}}
+							className="btn btn-lightBg btn-default btn-blue-line pull-right u-margin-r2 u-margin-t5"
+						>
+							<Glyphicon glyph="download-alt u-margin-r2" />
+							Export Report
+						</a>
+					</div>
 				</Row>
 				{!filteredData || filteredData.length === 0 ? (
 					<Empty message=" No Data found " />
@@ -316,9 +328,10 @@ class SiteMapping extends Component {
 						showPaginationTop
 						showPaginationBottom={false}
 						className="u-padding-h3 u-padding-v2 site-mapping"
+						defaultPageSize={this.getDefaultPageSize()}
+						pageSizeOptions={[5, 10, 20, 25, 50, 100]}
 					/>
 				)}
-				{/* {this.filteredDataWithICcon()}; */}
 			</React.Fragment>
 		);
 	}
