@@ -41,7 +41,9 @@ class AddManageSizelessBidder extends React.Component {
 						const newState = { formFields, bidderConfig: {}, params: {} };
 
 						for (const paramKey in formFields.bidderConfig) {
-							newState.bidderConfig[paramKey] = '';
+							newState.bidderConfig[paramKey] =
+								formFields.bidderConfig[paramKey].defaultValue ||
+								(formFields.bidderConfig[paramKey] === 'number' ? null : '');
 						}
 
 						const formFieldsParams = {
@@ -51,13 +53,6 @@ class AddManageSizelessBidder extends React.Component {
 						};
 
 						for (const paramKey in formFieldsParams) {
-							if (formFieldsParams[paramKey].dataType === 'number') {
-								newState.params[paramKey] = null;
-
-								// eslint-disable-next-line no-continue
-								continue;
-							}
-
 							if (
 								!formFieldsParams[paramKey].visible &&
 								formFieldsParams[paramKey].value !== undefined
@@ -68,7 +63,9 @@ class AddManageSizelessBidder extends React.Component {
 								continue;
 							}
 
-							newState.params[paramKey] = '';
+							newState.params[paramKey] =
+								formFieldsParams[paramKey].defaultValue ||
+								(formFieldsParams[paramKey].dataType === 'number' ? null : '');
 						}
 
 						newState.bidderConfig = { key, name, sizeLess, reusable, ...newState.bidderConfig };
