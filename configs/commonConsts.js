@@ -400,6 +400,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		eplanning: 'eplanningBidAdapter',
 		sovrn: 'sovrnBidAdapter',
 		gumgum: 'gumgumBidAdapter',
-		consumable: 'consumableBidAdapter'
+		consumable: 'consumableBidAdapter',
+		adsolut: 'adkernelBidAdapter'
 	}
 };
