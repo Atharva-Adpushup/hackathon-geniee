@@ -118,6 +118,15 @@ const roundOffTwoDecimal = value => {
 	return roundedNum.toFixed(2);
 };
 
+const getValidObject = value =>
+	!!(typeof value === 'object' && !Array.isArray(value) && Object.keys(value).length);
+
+const getValidArray = value => !!(Array.isArray(value) && value.length);
+
+const getItemFromLocalStorage = key => window.localStorage.getItem(key);
+
+const setItemToLocalStorage = (key, value) => window.localStorage.setItem(key, value);
+
 export {
 	convertObjToArr,
 	arrayUnique,
@@ -129,5 +138,9 @@ export {
 	calculateTotalImpressions,
 	calculatePageRpm,
 	calculateAdeCpm,
-	roundOffTwoDecimal
+	roundOffTwoDecimal,
+	getValidObject,
+	getValidArray,
+	getItemFromLocalStorage,
+	setItemToLocalStorage
 };

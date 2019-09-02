@@ -86,29 +86,52 @@ const REPORT_PATH = '/site/report?report_name=get_stats_by_custom';
 const REPORT_DOWNLOAD_ENDPOINT = '/api/reports/downloadAdpushupReport';
 const REPORT_STATUS = '/api/reports/getLastUpdateStatus';
 
-const displayMetrics = [
-	{ value: 'network_net_revenue', name: 'Net Revenue', valueType: 'money' },
-	{ value: 'adpushup_page_views', name: 'Page Views', valueType: 'number' },
-	{ value: 'adpushup_page_cpm', name: 'Page RPM', valueType: 'money' },
-	{ value: 'network_impressions', name: 'Impressions', valueType: 'number' },
-	{ value: 'network_ad_ecpm', name: 'Ad eCPM', valueType: 'money' }
-];
-const activeLegendItem = {
-	value: 'network_net_revenue',
-	name: 'Net Revenue',
-	valueType: 'money'
+const TERMS = {
+	PAGE_VARIATION_TYPE: 'page_variation_type',
+	PAGE_VARIATION: 'page_variation',
+	PAGEGROUP: 'page_group',
+	SECTION: 'section'
 };
+
+const METRICS = {
+	NETWORK_NET_REVENUE: { value: 'network_net_revenue', name: 'Net Revenue', valueType: 'money' },
+	ADPUSHUP_PAGE_VIEWS: { value: 'adpushup_page_views', name: 'Page Views', valueType: 'number' },
+	ADPUSHUP_PAGE_CPM: { value: 'adpushup_page_cpm', name: 'Page RPM', valueType: 'money' },
+	NETWORK_IMPRESSIONS: { value: 'network_impressions', name: 'Impressions', valueType: 'number' },
+	NETWORK_AD_ECPM: { value: 'network_ad_ecpm', name: 'Ad eCPM', valueType: 'money' }
+};
+
+const displayMetrics = [
+	METRICS.NETWORK_NET_REVENUE,
+	METRICS.ADPUSHUP_PAGE_VIEWS,
+	METRICS.ADPUSHUP_PAGE_CPM,
+	METRICS.NETWORK_IMPRESSIONS,
+	METRICS.NETWORK_AD_ECPM
+];
+const activeLegendItem = METRICS.NETWORK_NET_REVENUE;
 const activeLegendItemArray = [
-	{ value: 'network_net_revenue', name: 'Net Revenue', valueType: 'money' },
-	{ value: 'adpushup_page_views', name: 'Page Views', valueType: 'number' },
-	{ value: 'adpushup_page_cpm', name: 'Page RPM', valueType: 'money' }
+	METRICS.NETWORK_NET_REVENUE,
+	METRICS.ADPUSHUP_PAGE_VIEWS,
+	METRICS.ADPUSHUP_PAGE_CPM
 ];
 const accountFilter = ['siteid', 'device_type', 'network'];
-const accountDisableFilter = ['page_variation_type', 'page_variation', 'page_group', 'section'];
+const accountDisableFilter = [
+	TERMS.PAGE_VARIATION_TYPE,
+	TERMS.PAGE_VARIATION,
+	TERMS.PAGEGROUP,
+	TERMS.SECTION
+];
 const opsFilter = ['mode', 'error_code', 'country'];
 const opsDimension = ['mode', 'error_code', 'country'];
 const accountDimension = ['siteid', 'device_type', 'network'];
-const accountDisableDimension = ['page_variation_type', 'page_variation', 'page_group', 'section'];
+const accountDisableDimension = [
+	TERMS.PAGE_VARIATION_TYPE,
+	TERMS.PAGE_VARIATION,
+	TERMS.PAGEGROUP,
+	TERMS.SECTION
+];
+const AP_REPORTING_ACTIVE_CHART_LEGENDS_STORAGE_KEY = 'ap-reporting-active-chart-legends';
+
 export {
 	REPORTS_NAV_ITEMS,
 	REPORTS_NAV_ITEMS_INDEXES,
@@ -127,5 +150,7 @@ export {
 	opsDimension,
 	opsFilter,
 	REPORT_DOWNLOAD_ENDPOINT,
-	REPORT_STATUS
+	REPORT_STATUS,
+	AP_REPORTING_ACTIVE_CHART_LEGENDS_STORAGE_KEY,
+	TERMS
 };
