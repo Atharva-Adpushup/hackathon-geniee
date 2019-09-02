@@ -280,6 +280,33 @@ router
 				)
 			)
 			.catch(err => errorHandler(err, res, HTTP_STATUS.INTERNAL_SERVER_ERROR));
+	})
+	.post('/deleteSite', (req, res) => {
+		const { siteId } = req.body;
+		const { email } = req.user;
+		return checkParams(['siteId'], req, 'post')
+			.then(() => userModel.verifySiteOwner(email, siteId))
+			.then(({ user }) => {
+				if (!user) return Promise.reject(new Error('No user found. Invalid request'));
+
+				let sites = user.get('sites');
+				if (sites && sites.length) {
+					sites = sites.filter(site => site.siteId !== siteId);
+					user.set('sites', sites);
+					return user.save();
+				}
+				return true;
+			})
+			.then(() => siteModel.deleteSite(siteId))
+			.then(() =>
+				sendSuccessResponse(
+					{
+						message: 'Site deleted successfully'
+					},
+					res
+				)
+			)
+			.catch(err => errorHandler(err, res));
 	});
 
 module.exports = router;
