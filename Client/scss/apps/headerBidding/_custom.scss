@@ -24,6 +24,13 @@
 			}
 		}
 	}
+	ul.text-points {
+		padding-left: 0;
+		li {
+			list-style: disc;
+			list-style-position: inside;
+		}
+	}
 }
 
 .hb-bidders-list {
@@ -33,7 +40,7 @@
 			margin-bottom: 15px;
 		}
 		.bidders-list-card {
-			width: 30% !important;
+			width: 18%;
 			.panel-body {
 				width: 100%;
 				padding-top: 75%;
@@ -67,7 +74,7 @@
 						-webkit-background-clip: text;
 						-moz-background-clip: text;
 						background-clip: text;
-						font-size: 2.5vw;
+						font-size: 1.6vw;
 						font-weight: bold;
 						letter-spacing: 1px;
 						text-align: center;
@@ -142,7 +149,7 @@
 						border-right: none;
 					}
 					.org-size {
-						margin-left: 3px
+						margin-left: 3px;
 					}
 					.check-icon {
 						margin-left: 5px;

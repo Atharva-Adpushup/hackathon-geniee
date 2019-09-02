@@ -75,27 +75,14 @@ router
 					user
 				)
 			)
-			.then(([biddersFound, inventoryFound, user]) => {
-				if (!biddersFound) {
-					// Check DFP In-Line Items automation
-					// sending not found temporarily
-					return Promise.join(
-						biddersFound,
-						inventoryFound,
-						Promise.resolve(true),
-						!!user.getNetworkDataObj('DFP')
-					);
-				}
-
-				// if bidders exist then no need to
-				// check dfp inline items and dfp auth
-				return Promise.join(
+			.then(([biddersFound, inventoryFound, user]) =>
+				Promise.join(
 					biddersFound,
 					inventoryFound,
-					true, // adServerSetupCompleted
-					true // dfpConnected
-				);
-			})
+					Promise.resolve(true), // dfp line items automation (adserver setup) status
+					!!user.getNetworkDataObj('DFP')
+				)
+			)
 			.then(([biddersFound, inventoryFound, adServerSetupCompleted, dfpConnected]) =>
 				res
 					.status(httpStatus.OK)
@@ -104,6 +91,8 @@ router
 			.catch(err => {
 				// eslint-disable-next-line no-console
 				console.log(err);
+
+				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Something went wrong' });
 			});
 	})
 	.post('/bidder/:siteId', (req, res) => {
