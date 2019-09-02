@@ -128,11 +128,26 @@ class Panel extends Component {
 	};
 
 	onControlChange = data => {
-		const params = this.getControlChangedParams(data);
+		let inputData = Object.assign({}, data);
+		const params = this.getControlChangedParams(inputData);
+
+		inputData = this.getUpdatedState(inputData);
 		this.setState({
 			...params,
-			...data
+			...inputData
 		});
+	};
+
+	getUpdatedState = data => {
+		const inputData = Object.assign({}, data);
+		const isSelectedDimension = !!(inputData && inputData.selectedDimension);
+
+		if (!isSelectedDimension) {
+			inputData.selectedChartLegendMetric = '';
+			return inputData;
+		}
+
+		return inputData;
 	};
 
 	getDemoUserParams = () => {
@@ -155,11 +170,13 @@ class Panel extends Component {
 		let disabledDimension = [];
 		let disabledMetrics = [];
 		const dimensionObj = dimensionList[selectedDimension];
+
 		if (dimensionObj) {
 			disabledFilter = dimensionObj.disabled_filter || disabledFilter;
 			disabledDimension = dimensionObj.disabled_dimension || disabledDimension;
 			disabledMetrics = dimensionObj.disabled_metrics || disabledMetrics;
 		}
+
 		Object.keys(selectedFilters).forEach(selectedFilter => {
 			const filterObj = filterList[selectedFilter];
 			if (filterObj && !isEmpty(selectedFilters[selectedFilter])) {
@@ -168,10 +185,12 @@ class Panel extends Component {
 				disabledMetrics = union(filterObj.disabled_metrics, disabledMetrics);
 			}
 		});
+
 		if (reportType == 'account') {
 			disabledFilter = union(accountDisableFilter, disabledFilter);
 			disabledDimension = union(accountDisableDimension, disabledDimension);
 		}
+
 		const updatedControlList = this.disableControl(
 			disabledFilter,
 			disabledDimension,
