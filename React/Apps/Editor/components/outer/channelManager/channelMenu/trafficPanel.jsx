@@ -48,11 +48,12 @@ class TrafficPanel extends Component {
 					/>
 					{!autoOptimise ? (
 						<NumericCollectionManager
+							required
 							description={trafficDistributionConfig.description}
 							sumMismatchErrorMessage={trafficDistributionConfig.sumMismatchErrorMessage}
 							collection={allTrafficDistributions}
 							uiMinimal
-							maxValue={1000}
+							maxValue={100}
 							onSave={a => saveTrafficDistributions(a)}
 						/>
 					) : null}

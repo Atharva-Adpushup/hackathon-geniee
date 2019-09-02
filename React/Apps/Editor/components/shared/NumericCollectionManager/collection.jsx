@@ -16,6 +16,7 @@ class collection extends React.Component {
 			model: props.savedCollection || {}
 		};
 		this.handleInputChange = this.handleInputChange.bind(this);
+		this.renderSum = this.renderSum.bind(this);
 	}
 
 	// Explicitly added to avoid re-rendering
@@ -31,9 +32,9 @@ class collection extends React.Component {
 	}
 
 	getModel() {
-		const modelKeys = Object.keys(this.refs),
-			computedModel = {},
-			self = this;
+		const modelKeys = Object.keys(this.refs);
+		const computedModel = {};
+		const self = this;
 
 		modelKeys.forEach(key => {
 			const $el = $(ReactDOM.findDOMNode(self.refs[key])).find("input[type='number']");
@@ -89,8 +90,8 @@ class collection extends React.Component {
 	}
 
 	toggleSumExtensionErrorMessage(isSumNotEqual) {
-		const $errorMessage = $(ReactDOM.findDOMNode(this.refs['td-error-message'])),
-			$saveBtn = $(ReactDOM.findDOMNode(this.refs['td-save-btn']));
+		const $errorMessage = $(ReactDOM.findDOMNode(this.refs['td-error-message']));
+		const $saveBtn = $(ReactDOM.findDOMNode(this.refs['td-save-btn']));
 
 		if (isSumNotEqual) {
 			$saveBtn.attr({ disabled: true }).addClass('disabled');
@@ -102,14 +103,15 @@ class collection extends React.Component {
 	}
 
 	handleInputChange() {
-		const collectionSum = this.getCollectionSum(this.getModel()),
-			hasSumExtended = collectionSum > this.props.maxValue,
-			hasSumDecremented = collectionSum < this.props.maxValue,
-			isSumNotEqual = hasSumExtended || hasSumDecremented;
+		const collectionSum = this.getCollectionSum(this.getModel());
+		const hasSumExtended = collectionSum > this.props.maxValue;
+		const hasSumDecremented = collectionSum < this.props.maxValue;
+		const isSumNotEqual = hasSumExtended || hasSumDecremented;
 
 		if (this.props && this.props.maxValue && this.props.required) {
 			this.toggleSumExtensionErrorMessage(isSumNotEqual);
 		}
+		this.updateSum(collectionSum);
 	}
 
 	updateModel() {
@@ -123,10 +125,40 @@ class collection extends React.Component {
 		);
 	}
 
+	updateSum(sum) {
+		const { maxValue } = this.props;
+		const $collectionSum = $(ReactDOM.findDOMNode(this.refs['collection-sum']));
+		const $remainingSum = $(ReactDOM.findDOMNode(this.refs['remaining-sum']));
+
+		let remaining = maxValue - sum;
+		remaining = remaining < 0 ? 'N/A' : remaining;
+
+		$collectionSum.text(sum);
+		$remainingSum.text(remaining);
+	}
+
+	renderSum() {
+		const { maxValue } = this.props;
+		const sum = this.getCollectionSum(this.getModel());
+		let remaining = maxValue - sum;
+		remaining = remaining < 0 ? 'N/A' : remaining;
+
+		return (
+			<strong>
+				<p key="numeric-collection-desc" className="form-group-desc">
+					Allocated Traffic: <span ref="collection-sum">{sum}</span>
+				</p>
+				<p>
+					Remaining Traffic: <span ref="remaining-sum">{remaining}</span>
+				</p>
+			</strong>
+		);
+	}
+
 	renderCollectionPanels() {
-		const collectionPanels = [],
-			eventKey = (1).toString(),
-			panelKey = `${eventKey}_${Utils.getRandomNumber()}`;
+		const collectionPanels = [];
+		const eventKey = (1).toString();
+		const panelKey = `${eventKey}_${Utils.getRandomNumber()}`;
 
 		collectionPanels.push(
 			<Panel key={panelKey} eventKey={eventKey}>
@@ -160,10 +192,10 @@ class collection extends React.Component {
 	}
 
 	renderSumExtendedErrorMessage() {
-		const props = this.props,
-			maxValue = props.maxValue ? props.maxValue : 100,
-			defaultMessage = `Sum must equal ${maxValue}`,
-			sumMismatchErrorMessage = props.sumMismatchErrorMessage ? props.sumMismatchErrorMessage : defaultMessage;
+		const props = this.props;
+		const maxValue = props.maxValue ? props.maxValue : 100;
+		const defaultMessage = `Sum must equal ${maxValue}`;
+		const sumMismatchErrorMessage = props.sumMismatchErrorMessage ? props.sumMismatchErrorMessage : defaultMessage;
 
 		return (
 			<div ref="td-error-message" className="error-message hide">
@@ -188,10 +220,10 @@ class collection extends React.Component {
 	}
 
 	render() {
-		const props = this.props,
-			options = {
-				layoutClassName: 'form-group form-group--horizontal form-group--numeric-range'
-			};
+		const props = this.props;
+		const options = {
+			layoutClassName: 'form-group form-group--horizontal form-group--numeric-range'
+		};
 
 		if (props.uiMinimal) {
 			options.layoutClassName = `${options.layoutClassName} is-ui-minimal`;
@@ -202,6 +234,7 @@ class collection extends React.Component {
 				{this.renderDescription()}
 				<Row key={props.name} className={options.layoutClassName}>
 					{this.renderHorizontalLayout()}
+					{this.renderSum()}
 					{this.renderSumExtendedErrorMessage()}
 				</Row>
 				<Row>
