@@ -50,9 +50,9 @@ export default class ManageBidder extends React.Component {
 						<h2 className="u-margin-0">Manage {bidderConfig.name}</h2>
 						<h3>Partner Configuration</h3>
 						<p>
-							Lorem ipsum dolor sit amet consectetur adipisicing elit. Quasi vel itaque atque
-							repellat optio magni. Quia, quos! Modi cumque voluptatum ab, quia ad quam quasi
-							doloribus provident, dignissimos minima itaque.
+							Please fill in all the required fields. If you do not have this data, please contact
+							the demand partner. If you would like AdPushup to get your website approved for this
+							partner, please click here.
 						</p>
 					</Col>
 					<Col md={8}>

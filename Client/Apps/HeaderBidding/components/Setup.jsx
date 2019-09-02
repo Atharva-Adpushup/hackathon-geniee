@@ -69,16 +69,20 @@ class Setup extends React.Component {
 		return (
 			<Row className="options-wrapper white-tab-container hb-setup">
 				<p>
-					Lorem ipsum dolor sit amet, consectetur adipisicing elit. Numquam necessitatibus odit
-					omnis laboriosam voluptatum incidunt quasi delectus, repudiandae, aspernatur, ullam rem
-					culpa nihil quos aut optio beatae reprehenderit vitae iure.
+					Want to get started with Header-bidding, please ensure the following before proceeding any
+					further:
 				</p>
+				<ul className="text-points">
+					<li>Google Ad Manager is connect with AdPushup</li>
+					<li>Line Items, Key Value Pairs, and AdX should be configured with your Ad manager</li>
+					<li>There is ad least one ad unit created on AdPushup</li>
+				</ul>
 				<ul className="u-padding-l0 u-margin-t5">
 					<li>
 						<span className="name">Google Ad Manager</span>
 						<span className="status">
 							{dfpConnected ? (
-								<FontAwesomeIcon icon="check" />
+								<FontAwesomeIcon icon="check" title="Google DFP is connected" />
 							) : (
 								<FontAwesomeIcon icon="info-circle" title="Google DFP not connected!" />
 							)}
@@ -99,7 +103,7 @@ class Setup extends React.Component {
 						<span className="name">AdServer Setup</span>
 						<span className="status">
 							{adServerSetupCompleted ? (
-								<FontAwesomeIcon icon="check" />
+								<FontAwesomeIcon icon="check" title="AdServer Setup is completed" />
 							) : (
 								<FontAwesomeIcon icon="info-circle" title="AdServer Setup is pending!" />
 							)}
@@ -116,7 +120,7 @@ class Setup extends React.Component {
 						<span className="name">Inventory</span>
 						<span className="status">
 							{inventoryFound ? (
-								<FontAwesomeIcon icon="check" />
+								<FontAwesomeIcon icon="check" title="Inventory found" />
 							) : (
 								<FontAwesomeIcon icon="info-circle" title="Inventory not found!" />
 							)}
@@ -126,7 +130,7 @@ class Setup extends React.Component {
 						<span className="name">Bidders</span>
 						<span className="status">
 							{biddersFound ? (
-								<FontAwesomeIcon icon="check" />
+								<FontAwesomeIcon icon="check" title="Bidders found" />
 							) : (
 								<FontAwesomeIcon icon="info-circle" title="Bidders Not found!" />
 							)}
