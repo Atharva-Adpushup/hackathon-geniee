@@ -287,6 +287,16 @@ const getReportingControlDemoUserSites = (responseData, path, isDemoUser) => {
 	return inputResponseData;
 };
 
+const getAppBaseUrls = () => {
+	const { origin, host } = window.location;
+	const resultObject = {
+		default: origin,
+		http: `http://${host}`
+	};
+
+	return resultObject;
+};
+
 export {
 	errorHandler,
 	getDuplicatesInArray,
@@ -304,5 +314,6 @@ export {
 	getReportingDemoUserValidation,
 	getReportingDemoUserSiteIds,
 	getDemoUserSites,
-	getReportingControlDemoUserSites
+	getReportingControlDemoUserSites,
+	getAppBaseUrls
 };

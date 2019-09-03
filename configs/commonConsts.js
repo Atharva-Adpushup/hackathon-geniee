@@ -1,13 +1,13 @@
 const config = require('./config');
 
 const prodEnv = config.environment.HOST_ENV === 'production';
-
 const reportingBaseURL = 'https://staging.adpushup.com/CentralReportingWebService';
+const computedProductionURL = prodEnv ? 'https://beta.adpushup.com' : 'http://localhost:8080';
 
 module.exports = {
 	SALT: '_ADP_RANDOMIZER_',
-	BASE_URL: prodEnv ? 'https://console.adpushup.com' : 'http://localhost:8080',
-	INTEGRATION_BASE_URL: prodEnv ? 'https://app.staging.adpushup.com/' : 'http://localhost:8080',
+	BASE_URL: computedProductionURL,
+	INTEGRATION_BASE_URL: computedProductionURL,
 	DFP_WEB_SERVICE_ENDPOINT: 'http://staging.adpushup.com/DfpWebService/info',
 	TRANSACTION_LOG_ENDPOINT: 'https://api.adpushup.com/SetupLogWebService/log',
 	REPORT_STATUS: 'https://api.adpushup.com/OpsWebService/ops?report=getNetworkImportServiceStatus',
@@ -23,8 +23,7 @@ module.exports = {
 	DEMO_ACCOUNT_EMAIL: 'demo@adpushup.com',
 	AMP_SETTINGS_ACCESS_EMAILS: ['genieeamp@adpushup.com'],
 	DEMO_REPORT_SITE_ID: 31000,
-
-	EMO_PAGEGROUPS: [
+	DEMO_PAGEGROUPS: [
 		'HOME',
 		'CALC',
 		'FAQ',
