@@ -19,7 +19,7 @@ function adsensePublisherWrapper(item) {
 function publishToQueueWrapper(siteConfigItems, site) {
 	const response = {
 		empty: true,
-		message: 'ADS_SYNC_QUEUE_PUBLISH: No unsynced ads for site: ' + site.get('siteId')
+		message: `ADS_SYNC_QUEUE_PUBLISH: No unsynced ads for site: ${site.get('siteId')}`
 	};
 	const jobs = [];
 	if (!Object.keys(siteConfigItems).length) {
@@ -33,7 +33,9 @@ function publishToQueueWrapper(siteConfigItems, site) {
 		const genieeDFPUnsynced = !!(genieeDFP && genieeDFP.length);
 
 		genieeUnsynced ? _.forEach(geniee, item => jobs.push(genieePublishWrapper(item))) : null;
-		genieeDFPUnsynced ? _.forEach(genieeDFP, item => jobs.push(adpTagPublisherWrapper(genieeDFP))) : null;
+		genieeDFPUnsynced
+			? _.forEach(genieeDFP, item => jobs.push(adpTagPublisherWrapper(item)))
+			: null;
 		adpUnsynced ? jobs.push(adpTagPublisherWrapper(adp)) : null;
 		adsenseUnsynced ? jobs.push(adsensePublisherWrapper(adsense)) : null;
 
@@ -43,19 +45,19 @@ function publishToQueueWrapper(siteConfigItems, site) {
 			return Promise.resolve(response);
 		}
 
-		return Promise.all(jobs).then(() => {
-			return {
-				...response,
-				empty: false,
-				message: 'ADS_SYNC_QUEUE_PUBLISH: Successfully published ads into queue for site: ' + site.get('siteId')
-			};
-		});
+		return Promise.all(jobs).then(() => ({
+			...response,
+			empty: false,
+			message: `ADS_SYNC_QUEUE_PUBLISH: Successfully published ads into queue for site: ${site.get(
+				'siteId'
+			)}`
+		}));
 	}
 	return processing().then(response => (response.empty ? syncCdn(site) : response));
 }
 
 module.exports = {
-	publish: function(siteModel) {
+	publish(siteModel) {
 		return siteConfigGenerationModule
 			.generate(siteModel)
 			.then(siteConfigItems => publishToQueueWrapper(siteConfigItems, siteModel));

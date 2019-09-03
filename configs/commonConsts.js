@@ -370,9 +370,10 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 	},
 	docKeys: {
 		apTag: 'tgmr::',
-		networkConfig: 'data::apNetwork',
+		networkConfig: 'data::apNetworkBeta',
 		interactiveAds: 'fmrt::',
-		user: 'user::'
+		user: 'user::',
+		hb: 'hbdc::'
 	},
 	tagManagerInitialDoc: {
 		siteId: null,
