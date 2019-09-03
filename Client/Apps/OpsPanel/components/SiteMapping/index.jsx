@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import ReactTable from 'react-table';
+import clonedeep from 'lodash/cloneDeep';
 import 'react-table/react-table.css';
 
 import { Glyphicon, Row } from 'react-bootstrap';
@@ -8,7 +9,7 @@ import axiosInstance from '../../../../helpers/axiosInstance';
 import FilterBox from '../../../../Components/FilterBox';
 import Empty from '../../../../Components/Empty/index.jsx';
 import Loader from '../../../../Components/Loader/index';
-import { copyToClipBoard } from '../../../../helpers/commonFunctions';
+import { copyToClipBoard, makeFirstLetterCapitalize } from '../../../../helpers/commonFunctions';
 import CustomIcon from '../../../../Components/CustomIcon/index';
 import { REPORT_DOWNLOAD_ENDPOINT } from '../../../Reporting/configs/commonConsts';
 
@@ -19,7 +20,9 @@ class SiteMapping extends Component {
 		isLoading: false,
 		selectAll: false,
 		checked: [],
-		selectedData: []
+		selectedData: [],
+		fileName: 'sites-stats',
+		newArray: []
 	};
 
 	componentDidMount() {
@@ -44,24 +47,52 @@ class SiteMapping extends Component {
 		filteredData.forEach(() => {
 			checkedCopy.push(selectAll);
 		});
-		this.setState({
-			checked: checkedCopy,
-			selectedData: filteredData
-		});
+
+		if (selectAll !== true) {
+			this.setState({
+				checked: checkedCopy,
+				selectedData: []
+			});
+		} else {
+			this.setState({
+				checked: checkedCopy,
+				selectedData: [...filteredData]
+			});
+		}
 	};
 
-	handleSingleCheckboxChange = index => {
-		// const { filteredData } = this.state;
+	handleSingleCheckboxChange = (index, e) => {
 		const checkedCopy = this.state.checked;
-		checkedCopy[index] = !this.state.checked[index];
-		if (checkedCopy[index] === false) {
-			this.setState({ selectAll: false });
+		const select = this.state.selectedData;
+		const { filteredData } = this.state;
+
+		if (e.target.checked) {
+			checkedCopy[index] = e.target.checked;
+			select.push(filteredData[index]);
+
+			this.setState({
+				checked: checkedCopy,
+				selectedData: select
+			});
+		} else {
+			checkedCopy[index] = e.target.checked;
+			select.splice(select.indexOf(filteredData[index]), 1);
+
+			this.setState({
+				checked: checkedCopy,
+				selectedData: select
+			});
 		}
 
-		this.setState({
-			checked: checkedCopy
-			// selectedData: filteredData[index]
-		});
+		if (this.state.selectedData.length === filteredData.length) {
+			this.setState({
+				selectAll: true
+			});
+		} else {
+			this.setState({
+				selectAll: false
+			});
+		}
 	};
 
 	getFilterBoxValues = key => {
@@ -82,17 +113,14 @@ class SiteMapping extends Component {
 				filteredData = filteredData.filter(value => filter.values.indexOf(value[prop]) !== -1);
 		}
 
-		this.setState({ filteredData });
+		this.setState({ filteredData, selectAll: false });
 	};
 
-	filteredDataWithICcon = () => {
-		const { filteredData } = this.state;
-		const newObj = {};
-		const newArray = [];
-		filteredData.map(val => {
+	filteredDataWithICcon = data => {
+		data.map(val => {
 			for (const key in val) {
-				newObj[key] =
-					val[key] === 'N/A' ? (
+				val[key] =
+					val[key] === 'N/A' || (key === 'onboardingStatus' || key === 'dateCreated') ? (
 						<span>{val[key]}</span>
 					) : (
 						<span>
@@ -107,9 +135,8 @@ class SiteMapping extends Component {
 						</span>
 					);
 			}
-			newArray.push(newObj);
 		});
-		return newArray;
+		return data;
 	};
 
 	getDefaultPageSize = () => {
@@ -199,9 +226,16 @@ class SiteMapping extends Component {
 	}
 
 	render() {
-		const { isLoading, filteredData } = this.state;
-		const csvData = btoa(JSON.stringify(filteredData));
-		const downloadLink = `${REPORT_DOWNLOAD_ENDPOINT}?data=${csvData}`;
+		const { isLoading, filteredData, selectedData, fileName } = this.state;
+		let downloadLink;
+		const dataWithICon = clonedeep(filteredData);
+		if (selectedData === [] || selectedData.length === 0) {
+			let csvData = btoa(JSON.stringify(filteredData));
+			downloadLink = `${REPORT_DOWNLOAD_ENDPOINT}?data=${csvData}&fileName=${fileName}`;
+		} else {
+			let csvData = btoa(JSON.stringify(selectedData));
+			downloadLink = `${REPORT_DOWNLOAD_ENDPOINT}?data=${csvData}&fileName=${fileName}`;
+		}
 
 		const columns = [
 			{
@@ -213,7 +247,7 @@ class SiteMapping extends Component {
 						type="checkbox"
 						defaultChecked={this.state.checked[row.index]}
 						checked={this.state.checked[row.index]}
-						onChange={() => this.handleSingleCheckboxChange(row.index)}
+						onChange={e => this.handleSingleCheckboxChange(row.index, e)}
 					/>
 				),
 				sortable: false,
@@ -323,7 +357,7 @@ class SiteMapping extends Component {
 				) : (
 					<ReactTable
 						columns={columns}
-						data={this.filteredDataWithICcon()}
+						data={this.filteredDataWithICcon(dataWithICon)}
 						filterable={false}
 						showPaginationTop
 						showPaginationBottom={false}
