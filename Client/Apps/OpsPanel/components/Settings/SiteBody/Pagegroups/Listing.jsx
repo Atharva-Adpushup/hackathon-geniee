@@ -8,7 +8,11 @@ import CustomIcon from '../../../../../../Components/CustomIcon/index';
 import Edit from '../../../../../../Components/EditBox/index';
 import Loader from '../../../../../../Components/Loader';
 import Empty from '../../../../../../Components/Empty';
-import { copyToClipBoard, getPageGroupHash } from '../../../../../../helpers/commonFunctions';
+import {
+	copyToClipBoard,
+	getPageGroupHash,
+	getAppBaseUrls
+} from '../../../../../../helpers/commonFunctions';
 
 const DEFAULT_REGEX = 'No Pattern Set';
 class Listing extends Component {
@@ -137,7 +141,8 @@ class Listing extends Component {
 										pagegroupByDevice.filter(pg => pg.pageGroup === channel.pageGroup)[0] || {};
 									const { pattern = DEFAULT_REGEX } = pagegroup;
 									const pageGroupHash = getPageGroupHash(channel.pageGroup, channel.platform);
-									const computedEditorLink = `/api/visualEditor/${
+									const { http } = getAppBaseUrls();
+									const computedEditorLink = `${http}/api/visualEditor/${
 										site.siteId
 									}?updateHash=${pageGroupHash}`;
 
