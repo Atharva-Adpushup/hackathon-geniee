@@ -167,8 +167,8 @@ class MySites extends React.Component {
 			});
 	};
 
-	deleteSite = siteId => {
-		if (window.confirm(`Are you sure you want to delete the site -- ${siteId}?`)) {
+	deleteSite = ({ siteId, domanizeDomain }) => {
+		if (window.confirm(`Are you sure you want to delete the site -- ${domanizeDomain}?`)) {
 			const { deleteSite } = this.props;
 			return deleteSite(siteId);
 		}
@@ -330,7 +330,7 @@ class MySites extends React.Component {
 											<CustomIcon
 												icon="trash"
 												onClick={this.deleteSite}
-												toReturn={siteId}
+												toReturn={{ siteId, domanizeDomain }}
 												className="aligner aligner-item aligner--hCenter card-header-icon u-text-info u-cursor-pointer"
 											/>
 										</OverlayTooltip>
