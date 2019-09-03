@@ -23,7 +23,7 @@ module.exports = {
 	DEMO_ACCOUNT_EMAIL: 'demo@adpushup.com',
 	AMP_SETTINGS_ACCESS_EMAILS: ['genieeamp@adpushup.com'],
 	DEMO_REPORT_SITE_ID: 31000,
-	EMO_PAGEGROUPS: [
+	DEMO_PAGEGROUPS: [
 		'HOME',
 		'CALC',
 		'FAQ',
