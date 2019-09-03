@@ -73,18 +73,18 @@ class Setup extends React.Component {
 					further:
 				</p>
 				<ul className="text-points">
-					<li>Google Ad Manager is connect with AdPushup</li>
-					<li>Line Items, Key Value Pairs, and AdX should be configured with your Ad manager</li>
+					<li>Ad Manager is connect with AdPushup</li>
+					<li>Line Items, Key Value Pairs, and AdX should be configured with your Ad Manager</li>
 					<li>There is ad least one ad unit created on AdPushup</li>
 				</ul>
 				<ul className="u-padding-l0 u-margin-t5">
 					<li>
-						<span className="name">Google Ad Manager</span>
+						<span className="name">Ad Manager</span>
 						<span className="status">
 							{dfpConnected ? (
-								<FontAwesomeIcon icon="check" title="Google DFP is connected" />
+								<FontAwesomeIcon icon="check" title="Ad Manager is connected" />
 							) : (
-								<FontAwesomeIcon icon="info-circle" title="Google DFP not connected!" />
+								<FontAwesomeIcon icon="info-circle" title="Ad Manager not connected!" />
 							)}
 						</span>
 						{!dfpConnected && (
