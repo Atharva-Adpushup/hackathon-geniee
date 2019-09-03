@@ -3,8 +3,9 @@
 /* eslint-disable vars-on-top */
 /* eslint-disable no-var */
 const path = require('path');
-const apiRouter = require('./apiRouter');
+const fs = require('fs');
 
+const apiRouter = require('./apiRouter');
 const consts = require('../configs/commonConsts');
 
 const isDevelopment = process.env.NODE_ENV === consts.environment.development;
@@ -44,14 +45,17 @@ module.exports = function router(app) {
 		if (!isDevelopment) {
 			// eslint-disable-next-line no-undef
 			const filePath = path.resolve(__basedir, 'clientDist', 'index.html');
-			res.sendFile(filePath);
-		} else {
-			const filename = path.resolve(compiler.outputPath, 'index.html');
-			compiler.outputFileSystem.readFile(filename, (err, result) => {
-				res.set('content-type', 'text/html');
-				res.send(result);
-				res.end();
-			});
+			if (!fs.existsSync(filePath)) {
+				const fallback = path.resolve(__basedir, 'public', 'assets', 'fallback.html');
+				return res.sendFile(fallback);
+			}
+			return res.sendFile(filePath);
 		}
+		const filename = path.resolve(compiler.outputPath, 'index.html');
+		compiler.outputFileSystem.readFile(filename, (err, result) => {
+			res.set('content-type', 'text/html');
+			res.send(result);
+			res.end();
+		});
 	});
 };

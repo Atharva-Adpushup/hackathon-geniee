@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import MySites from '../components/index';
-import { addNewSite } from '../../../actions/siteActions';
+import { addNewSite, deleteSite } from '../../../actions/siteActions';
 import { fetchReportingMeta } from '../../../actions/globalActions';
 
 const mapStateToProps = (state, ownProps) => {
@@ -23,7 +23,8 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = dispatch => ({
 	updateSiteData: siteObj => dispatch(addNewSite(siteObj)),
-	fetchReportingMeta: params => dispatch(fetchReportingMeta(params))
+	fetchReportingMeta: params => dispatch(fetchReportingMeta(params)),
+	deleteSite: siteId => dispatch(deleteSite(siteId))
 });
 
 export default connect(

@@ -3,6 +3,7 @@ const Promise = require('bluebird');
 const PromiseFtp = require('promise-ftp');
 const _ = require('lodash');
 const uglifyJS = require('uglify-js');
+
 const getReportData = require('../../../reports/universal/index');
 const mkdirpAsync = Promise.promisifyAll(require('mkdirp')).mkdirpAsync;
 const fs = Promise.promisifyAll(require('fs'));
@@ -13,7 +14,8 @@ const config = require('../../../configs/config');
 const generateStatusesAndConfig = require('./generateConfig');
 const bundleGeneration = require('./bundleGeneration');
 const prebidGeneration = require('./prebidGeneration');
-const isNotProduction = config.environment.HOST_ENV === 'development' || config.environment.HOST_ENV === 'staging';
+const isNotProduction =
+	config.environment.HOST_ENV === 'development' || config.environment.HOST_ENV === 'staging';
 const request = require('request-promise');
 const disableSiteCdnSyncList = [38333];
 // NOTE: Above 'disableSiteCdnSyncList' array is added to prevent site specific JavaScript CDN sync
@@ -43,11 +45,13 @@ module.exports = function(site) {
 			site.get('siteId').toString()
 		),
 		setAllConfigs = function(combinedConfig) {
+			let apps = site.get('apps');
 			let apConfigs = site.get('apConfigs');
 			let isAdPartner = !!site.get('partner');
-			let { experiment, adpTagsConfig, manualAds, innovativeAds, isLegacyInnovativeAds } = combinedConfig;
+			let { experiment, adpTagsConfig, manualAds, innovativeAds } = combinedConfig;
 
 			isAdPartner ? (apConfigs.partner = site.get('partner')) : null;
+
 			apConfigs.autoOptimise = isAutoOptimise ? true : false;
 			apConfigs.poweredByBanner = poweredByBanner ? true : false;
 			apConfigs.siteDomain = site.get('siteDomain');
@@ -56,13 +60,16 @@ module.exports = function(site) {
 				? apConfigs.spaPageTransitionTimeout
 				: 0;
 			apConfigs.activeDFPNetwork = apConfigs.activeDFPNetwork ? apConfigs.activeDFPNetwork : null;
-			apConfigs.manualModeActive = site.get('isManual') && manualAds && manualAds.length ? true : false;
-			apConfigs.innovativeModeActive =
-				(site.get('isInnovative') && innovativeAds && innovativeAds.length) || isLegacyInnovativeAds
-					? true
-					: false;
+
+			apConfigs.manualModeActive = !!(apps.apTag && manualAds && manualAds.length);
+			apConfigs.innovativeModeActive = !!(
+				apps.innovativeAds &&
+				innovativeAds &&
+				innovativeAds.length
+			);
+
 			// Default 'draft' mode is selected if config mode is not present
-			apConfigs.mode = !apConfigs.mode ? 2 : apConfigs.mode;
+			apConfigs.mode = apps.layout && apConfigs.mode ? apConfigs.mode : 2;
 
 			apConfigs.manualModeActive ? (apConfigs.manualAds = manualAds || []) : null;
 			apConfigs.innovativeModeActive ? (apConfigs.innovativeAds = innovativeAds || []) : null;
@@ -72,21 +79,25 @@ module.exports = function(site) {
 
 			return { apConfigs, adpTagsConfig };
 		},
-		generateCombinedJson = (experiment, adpTags, manualAds, innovativeAds, isLegacyInnovativeAds) => {
+		generateCombinedJson = (experiment, adpTags, manualAds, innovativeAds) => {
 			if (!(Array.isArray(adpTags) && adpTags.length)) {
-				return { experiment, adpTagsConfig: false, manualAds, innovativeAds, isLegacyInnovativeAds };
+				return {
+					experiment,
+					adpTagsConfig: false,
+					manualAds,
+					innovativeAds
+				};
 			}
 			return generateADPTagsConfig(adpTags, site.get('siteId')).then(adpTagsConfig => ({
 				adpTagsConfig,
 				experiment,
 				manualAds,
-				innovativeAds,
-				isLegacyInnovativeAds
+				innovativeAds
 			}));
 		},
 		generateFinalInitScript = jsFile => {
 			return {
-				addService: (serviceName, isActive, serviceConfig = {}) => {		
+				addService: (serviceName, isActive, serviceConfig = {}) => {
 					switch (serviceName) {
 						case CC.SERVICES.ADPTAGS:
 							var prebidConfig = serviceConfig.prebidConfig;
@@ -148,7 +159,9 @@ module.exports = function(site) {
 				.then(setAllConfigs);
 		},
 		getConfigWrapper = site => {
-			return getComputedConfig().then(computedConfig => generateStatusesAndConfig(site, computedConfig));
+			return getComputedConfig().then(computedConfig =>
+				generateStatusesAndConfig(site, computedConfig)
+			);
 		},
 		getFinalConfig = () => {
 			return getConfigWrapper(site)
@@ -232,10 +245,12 @@ module.exports = function(site) {
 			const siteId = site.get('siteId');
 			const shouldJSCdnSyncBeDisabled = !!(disableSiteCdnSyncList.indexOf(siteId) > -1);
 
-			 if (shouldJSCdnSyncBeDisabled || isNotProduction) {
-				console.log("Either current site's cdn generation is disabled or environment is development/staging. Skipping CDN Upload.");
+			if (shouldJSCdnSyncBeDisabled || isNotProduction) {
+				console.log(
+					"Either current site's cdn generation is disabled or environment is development/staging. Skipping CDN Upload."
+				);
 				return Promise.resolve(fileConfig.uncompressed);
-			}else{
+			} else {
 				return connectToServer()
 					.then(cwd)
 					.then(function() {

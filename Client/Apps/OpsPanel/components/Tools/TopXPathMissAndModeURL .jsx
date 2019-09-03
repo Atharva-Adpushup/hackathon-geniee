@@ -4,11 +4,15 @@ import 'react-dates/initialize';
 import { DateRangePicker, isInclusivelyBeforeDay } from 'react-dates';
 import 'react-dates/lib/css/_datepicker.css';
 
+import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import FieldGroup from '../../../../Components/Layout/FieldGroup';
-import { XPATH_MODE_URL } from '../../configs/commonConsts';
+import { XPATH_MODE_URL, MODE_TOOLTIP_TEXT, ERROR_TOOLTIP_TEXT } from '../../configs/commonConsts';
 import CustomButton from '../../../../Components/CustomButton/index';
 import SelectBox from '../../../../Components/SelectBox/index';
 import axiosInstance from '../../../../helpers/axiosInstance';
+import OverlayToolTip from '../../../../Components/OverlayTooltip/index';
 
 const { devices, modes } = XPATH_MODE_URL;
 
@@ -30,6 +34,8 @@ const DEFAULT_STATE = {
 		.subtract(1, 'day'),
 	focusedInput: null
 };
+
+library.add(faQuestionCircle);
 class TopXPathMissAndModeURL extends Component {
 	constructor(props) {
 		super(props);
@@ -66,17 +72,7 @@ class TopXPathMissAndModeURL extends Component {
 			endDate
 		} = this.state;
 
-		const isValid = !!(
-			siteId &&
-			topURLCount &&
-			emailId &&
-			pageGroups &&
-			currentSelectedDevice &&
-			currentSelectedMode &&
-			errorCode &&
-			startDate &&
-			endDate
-		);
+		const isValid = !!(siteId && topURLCount && emailId && startDate && endDate);
 
 		const { showNotification } = this.props;
 
@@ -129,6 +125,15 @@ class TopXPathMissAndModeURL extends Component {
 			});
 	};
 
+	renderLabel = () => (
+		<p className="u-text-bold">
+			Error Code
+			<OverlayToolTip id="tooltip-site-status-info" placement="top" tooltip={ERROR_TOOLTIP_TEXT}>
+				<FontAwesomeIcon size="1x" icon={faQuestionCircle} className="u-margin-l2" />
+			</OverlayToolTip>{' '}
+		</p>
+	);
+
 	datesUpdated = ({ startDate, endDate }) => {
 		this.setState({ startDate, endDate });
 	};
@@ -158,7 +163,7 @@ class TopXPathMissAndModeURL extends Component {
 					name="siteId"
 					value={siteId}
 					type="number"
-					label="Site Id"
+					label="Site Id *"
 					onChange={this.handleChange}
 					size={6}
 					id="siteId-input"
@@ -169,7 +174,7 @@ class TopXPathMissAndModeURL extends Component {
 					name="topURLCount"
 					value={topURLCount}
 					type="number"
-					label="Top URL Count"
+					label="Top URL Count *"
 					onChange={this.handleChange}
 					size={6}
 					id="topURLCount-input"
@@ -177,7 +182,7 @@ class TopXPathMissAndModeURL extends Component {
 					className="u-padding-v4 u-padding-h4"
 				/>
 				<Fragment>
-					<p className="u-text-bold">Dates</p>
+					<p className="u-text-bold">Dates *</p>
 
 					<DateRangePicker
 						startDate={startDate}
@@ -198,7 +203,7 @@ class TopXPathMissAndModeURL extends Component {
 						name="emailId"
 						value={emailId}
 						type="email"
-						label="Email Id"
+						label="Email Id *"
 						onChange={this.handleChange}
 						size={6}
 						id="emailId-input"
@@ -232,7 +237,16 @@ class TopXPathMissAndModeURL extends Component {
 					/>
 				</div>
 				<Fragment>
-					<p className="u-text-bold">Mode</p>
+					<p className="u-text-bold">
+						Mode
+						<OverlayToolTip
+							id="tooltip-site-status-info"
+							placement="top"
+							tooltip={MODE_TOOLTIP_TEXT}
+						>
+							<FontAwesomeIcon size="1x" icon={faQuestionCircle} className="u-margin-l2" />
+						</OverlayToolTip>
+					</p>
 					<SelectBox
 						selected={currentSelectedMode}
 						options={modes}
@@ -248,7 +262,7 @@ class TopXPathMissAndModeURL extends Component {
 						name="errorCode"
 						value={errorCode}
 						type="number"
-						label="Error Code"
+						label={this.renderLabel()}
 						onChange={this.handleChange}
 						size={6}
 						id="erroCode-input"
