@@ -44,19 +44,19 @@ class Control extends Component {
 		this.getReportStatus();
 	}
 
-	shouldComponentUpdate(nextProps, nextState) {
-		return (
-			this.state.reportType !== nextState.reportType ||
-			this.state.updateStatusText !== nextState.updateStatusText
-		);
-	}
-
 	componentWillReceiveProps(nextProps) {
 		const isValidNextProps = !!(nextProps && nextProps.csvData);
 
 		if (isValidNextProps) {
 			this.setState({ csvData: nextProps.csvData });
 		}
+	}
+
+	shouldComponentUpdate(nextProps, nextState) {
+		return (
+			this.state.reportType !== nextState.reportType ||
+			this.state.updateStatusText !== nextState.updateStatusText
+		);
 	}
 
 	onFilteChange = selectedFilters => {
@@ -82,6 +82,20 @@ class Control extends Component {
 	};
 
 	onControlChange = () => {
+		const resultObject = this.getStateParams();
+		const { onControlChange } = this.props;
+
+		onControlChange(resultObject);
+	};
+
+	onGenerateButtonClick = () => {
+		const resultObject = this.getStateParams();
+		const { generateButtonHandler } = this.props;
+
+		generateButtonHandler(resultObject);
+	};
+
+	getStateParams = () => {
 		const {
 			startDate,
 			endDate,
@@ -90,15 +104,16 @@ class Control extends Component {
 			selectedFilters,
 			reportType
 		} = this.state;
-
-		this.props.onControlChange({
+		const resultObject = {
 			startDate,
 			endDate,
 			selectedInterval,
 			selectedDimension,
 			selectedFilters,
 			reportType
-		});
+		};
+
+		return resultObject;
 	};
 
 	getSelectedFilter = filter => {
@@ -247,7 +262,7 @@ class Control extends Component {
 					<div className="aligner-item u-margin-r4 aligner--hEnd">
 						<Button
 							bsStyle="primary"
-							onClick={this.props.generateButtonHandler}
+							onClick={this.onGenerateButtonClick}
 							disabled={state.disableGenerateButton}
 						>
 							<Glyphicon glyph="cog u-margin-r2" />
