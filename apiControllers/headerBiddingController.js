@@ -519,6 +519,23 @@ router
 					.status(httpStatus.INTERNAL_SERVER_ERROR)
 					.json({ error: 'Internal Server Error!' });
 			});
+	})
+	.get('/adserverSetup/:siteId', (req, res) => {
+		const { siteId } = req.params;
+		const { email } = req.user;
+
+		return userModel
+			.verifySiteOwner(email, siteId)
+			.then(({ user }) => {
+				headerBiddingModel
+					.setupAdserver(siteId, user)
+					// eslint-disable-next-line no-unused-vars
+					.then(status => res.status(202).json({ success: 'Adserver Automation Started' }));
+			})
+			.catch(err => {
+				console.log(err);
+				res.status(202).json({ success: 'Something went wrong!' });
+			});
 	});
 
 module.exports = router;

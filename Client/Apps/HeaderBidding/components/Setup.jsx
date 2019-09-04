@@ -35,6 +35,12 @@ class Setup extends React.Component {
 		);
 	};
 
+	checkOrBeginDfpSetup = () => {
+		const { siteId, checkOrBeginDfpSetupAction } = this.props;
+
+		checkOrBeginDfpSetupAction(siteId);
+	};
+
 	// eslint-disable-next-line class-methods-use-this
 	handlePostMessageHandler(event) {
 		const isStringData = !!(typeof event.data === 'string');
@@ -63,7 +69,7 @@ class Setup extends React.Component {
 
 	renderMainContent = () => {
 		const {
-			setupStatus: { dfpConnected, adServerSetupCompleted, inventoryFound, biddersFound }
+			setupStatus: { dfpConnected, inventoryFound, biddersFound }
 		} = this.props;
 
 		return (
@@ -98,15 +104,19 @@ class Setup extends React.Component {
 					<li>
 						<span className="name">AdServer Setup</span>
 						<span className="status">
-							{adServerSetupCompleted ? (
+							{/* adServerSetupCompleted */ false ? (
 								<FontAwesomeIcon icon="check" />
 							) : (
 								<FontAwesomeIcon icon="info-circle" title="AdServer Setup is pending!" />
 							)}
 						</span>
-						{!adServerSetupCompleted && (
+						{/* !adServerSetupCompleted */ true && (
 							<span className="btn-wrap">
-								<CustomButton variant="secondary" name="setupAdServer">
+								<CustomButton
+									variant="secondary"
+									name="setupAdServer"
+									onClick={this.checkOrBeginDfpSetup}
+								>
 									Setup
 								</CustomButton>
 							</span>
