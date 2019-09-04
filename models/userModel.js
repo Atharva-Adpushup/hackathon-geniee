@@ -153,6 +153,12 @@ var modelAPI = (module.exports = apiModule()),
 			return data;
 		};
 
+		this.getActiveAdServerData = function (networkName) {
+			var data = (this.get('adServerSettings'))[networkName];
+
+			return data || false;
+		};	
+
 		this.getNetworkDataSync = function(networkName, keys) {
 			var data = this.getNetworkDataObj(networkName),
 				dataPubId;

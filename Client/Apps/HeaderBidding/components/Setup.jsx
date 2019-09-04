@@ -35,6 +35,12 @@ class Setup extends React.Component {
 		);
 	};
 
+	checkOrBeginDfpSetup = () => {
+		const { siteId, checkOrBeginDfpSetupAction } = this.props;
+
+		checkOrBeginDfpSetupAction(siteId);
+	};
+
 	// eslint-disable-next-line class-methods-use-this
 	handlePostMessageHandler(event) {
 		const isStringData = !!(typeof event.data === 'string');
@@ -110,7 +116,11 @@ class Setup extends React.Component {
 						</span>
 						{!adServerSetupCompleted && (
 							<span className="btn-wrap">
-								<CustomButton variant="secondary" name="setupAdServer">
+								<CustomButton
+									variant="secondary"
+									name="setupAdServer"
+									onClick={this.checkOrBeginDfpSetup}
+								>
 									Setup
 								</CustomButton>
 							</span>

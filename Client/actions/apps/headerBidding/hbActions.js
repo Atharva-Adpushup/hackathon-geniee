@@ -70,3 +70,8 @@ export const updateInventoriesHbStatus = (siteId, inventoriesToUpdate) => dispat
 	service
 		.updateInventoriesHbStatus(siteId, inventoriesToUpdate)
 		.then(() => dispatch({ type: UPDATE_INVENTORIES_HB_STATUS, siteId, inventoriesToUpdate }));
+
+export const checkOrBeginDfpSetupAction = siteId =>
+	service.checkOrBeginDfpSetup(siteId).then(response => {
+		console.log(response);
+	});

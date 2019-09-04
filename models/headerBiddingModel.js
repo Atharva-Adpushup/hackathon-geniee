@@ -1,5 +1,6 @@
 module.exports = apiModule();
 
+const request = require('request-promise');
 const model = require('../helpers/model');
 const couchbase = require('../helpers/couchBaseService');
 const AdPushupError = require('../helpers/AdPushupError');
@@ -8,7 +9,9 @@ const userModel = require('./userModel');
 const channelModel = require('./channelModel');
 const hbVideoParamsMap = require('../configs/hbVideoParamsMap');
 const commonFunctions = require('../helpers/commonFunctions');
-const { docKeys } = require('../configs/commonConsts');
+const { docKeys, hbGlobalSettingDefaults } = require('../configs/commonConsts');
+const dfpLineItemAutomationReqBody = require('../configs/dfpLineItemAutomationReqBody');
+const config = require('../configs/config');
 
 const HeaderBidding = model.extend(function() {
 	this.keys = [
@@ -593,7 +596,8 @@ function apiModule() {
 						adNetworkSettings &&
 						adNetworkSettings.dfpAccounts &&
 						adNetworkSettings.dfpAccounts.length
-							? adNetworkSettings.dfpAccounts[0].code === '103512698'
+							? adNetworkSettings.dfpAccounts[0].code ===
+							  hbGlobalSettingDefaults.dfpAdUnitTargeting.networkId
 								? 'AP'
 								: 'Publisher'
 							: 'N/A';
@@ -774,7 +778,45 @@ function apiModule() {
 				if (countryRuleIndex > -1) countryConfig.splice(countryRuleIndex, 1);
 
 				return hbConfig.save();
-			})
+			}),
+		setupAdserver: (siteId, user) => {
+			const body = dfpLineItemAutomationReqBody;
+			const dfpNetwork = user.getActiveAdServerData('DFP');
+			if (dfpNetwork) {
+				return getAllBiddersFromNetworkConfig()
+					.then(allHbBidders => {
+						const activeHbBidderCodes = Object.keys(allHbBidders).filter(
+							networkCode => allHbBidders[networkCode].isActive
+						);
+
+						let activeDfpRefreshToken;
+						if (
+							dfpNetwork.activeDFPNetwork === hbGlobalSettingDefaults.dfpAdUnitTargeting.networkId
+						) {
+							activeDfpRefreshToken = config.apDfpData.REFRESH_TOKEN;
+						} else {
+							activeDfpRefreshToken = user.getNetworkDataObj('DFP').refreshToken;
+						}
+
+						body.refreshToken = activeDfpRefreshToken;
+						body.networkCode = dfpNetwork.activeDFPNetwork;
+						body.customKeyValues.hb_ap_bidder.values = activeHbBidderCodes;
+						body.currencyCode = dfpNetwork.activeDFPCurrencyCode;
+						body.granualityMultiplier = dfpNetwork.prebidGranularityMultiplier;
+
+						return body;
+					})
+					.then(body => {
+						console.log(body);
+						// return request({
+						// 	method: 'POST',
+						// 	uri: commonConsts.DFP_LINE_ITEM_AUTOMATION_API,
+						// 	body,
+						// 	json: true
+						// });
+					});
+			}
+		}
 	};
 
 	return API;
