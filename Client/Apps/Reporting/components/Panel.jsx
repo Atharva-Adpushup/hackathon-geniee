@@ -128,26 +128,11 @@ class Panel extends Component {
 	};
 
 	onControlChange = data => {
-		let inputData = Object.assign({}, data);
-		const params = this.getControlChangedParams(inputData);
+		const params = this.getControlChangedParams(data);
 
-		inputData = this.getUpdatedState(inputData);
 		this.setState({
-			...params,
-			...inputData
+			...params
 		});
-	};
-
-	getUpdatedState = data => {
-		const inputData = Object.assign({}, data);
-		const isSelectedDimension = !!(inputData && inputData.selectedDimension);
-
-		if (!isSelectedDimension) {
-			inputData.selectedChartLegendMetric = '';
-			return inputData;
-		}
-
-		return inputData;
 	};
 
 	getDemoUserParams = () => {
@@ -245,11 +230,13 @@ class Panel extends Component {
 		return params;
 	};
 
-	generateButtonHandler = () => {
+	generateButtonHandler = (inputState = {}) => {
 		let { tableData } = this.state;
-		const params = this.formateReportParams();
+		const computedState = Object.assign({ isLoading: true }, inputState);
 
-		this.setState({ isLoading: true }, () => {
+		this.setState(computedState, () => {
+			const params = this.formateReportParams();
+
 			reportService.getCustomStats(params).then(response => {
 				if (Number(response.status) === 200 && response.data) {
 					tableData = response.data;
@@ -304,6 +291,7 @@ class Panel extends Component {
 				selectedFilters = { siteid: { [computedSiteId]: true } };
 			}
 		}
+
 		if (Object.keys(selectedControls).length > 0) {
 			const { dimension, interval, fromDate, toDate, chartLegendMetric } = selectedControls;
 			selectedDimension = dimension;
@@ -312,6 +300,7 @@ class Panel extends Component {
 			startDate = fromDate;
 			endDate = toDate;
 		}
+
 		const { dimensionList, filterList, metricsList } = this.getControlChangedParams({
 			startDate,
 			endDate,
@@ -321,6 +310,7 @@ class Panel extends Component {
 			reportType
 		});
 		const intervalList = convertObjToArr(intervalsObj);
+
 		this.setState(
 			{
 				startDate,

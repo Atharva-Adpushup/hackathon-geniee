@@ -8,7 +8,9 @@ import {
 	activeLegendItem,
 	activeLegendItemArray,
 	displayMetrics,
-	AP_REPORTING_ACTIVE_CHART_LEGENDS_STORAGE_KEY
+	AP_REPORTING_ACTIVE_CHART_LEGENDS_STORAGE_KEY,
+	TERMS,
+	METRICS
 } from '../configs/commonConsts';
 import {
 	getValidArray,
@@ -84,6 +86,26 @@ class Chart extends React.Component {
 		return xAxis;
 	};
 
+	checkValidChartLegendMetric = (
+		selectedDimension,
+		selectedChartLegendMetric,
+		activeItemsByChartLegendMetric
+	) => {
+		const { PAGE_VARIATION_TYPE } = TERMS;
+		const {
+			ADPUSHUP_PAGE_CPM: { value: adpushupPageCPM }
+		} = METRICS;
+		const isValid = !!(
+			selectedDimension &&
+			selectedChartLegendMetric &&
+			(selectedDimension === PAGE_VARIATION_TYPE &&
+				selectedChartLegendMetric === adpushupPageCPM) &&
+			activeItemsByChartLegendMetric.length
+		);
+
+		return isValid;
+	};
+
 	getActiveLegendItems = () => {
 		const { selectedDimension, selectedChartLegendMetric } = this.props;
 		let computedItems = [];
@@ -91,8 +113,10 @@ class Chart extends React.Component {
 		const activeItemsByChartLegendMetric = displayMetrics.filter(
 			legendItem => legendItem.value === selectedChartLegendMetric
 		);
-		const isValidChartLegendMetricItems = !!(
-			selectedDimension && activeItemsByChartLegendMetric.length
+		const isValidChartLegendMetricItems = this.checkValidChartLegendMetric(
+			selectedDimension,
+			selectedChartLegendMetric,
+			activeItemsByChartLegendMetric
 		);
 
 		if (isValidChartLegendMetricItems) {
