@@ -1,29 +1,35 @@
+/* eslint-disable guard-for-in */
+/* eslint-disable no-undef */
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable no-param-reassign */
 import React, { Component } from 'react';
 import ReactTable from 'react-table';
 import clonedeep from 'lodash/cloneDeep';
 import 'react-table/react-table.css';
-
 import { Glyphicon, Row } from 'react-bootstrap';
 
 import axiosInstance from '../../../../helpers/axiosInstance';
 import FilterBox from '../../../../Components/FilterBox';
-import Empty from '../../../../Components/Empty/index.jsx';
+import Empty from '../../../../Components/Empty/index';
 import Loader from '../../../../Components/Loader/index';
-import { copyToClipBoard, makeFirstLetterCapitalize } from '../../../../helpers/commonFunctions';
+import { copyToClipBoard } from '../../../../helpers/commonFunctions';
 import CustomIcon from '../../../../Components/CustomIcon/index';
 import { REPORT_DOWNLOAD_ENDPOINT } from '../../../Reporting/configs/commonConsts';
+import { SITE_MAPPING_COLUMNS } from '../../configs/commonConsts';
 
 class SiteMapping extends Component {
-	state = {
-		data: [],
-		filteredData: [],
-		isLoading: false,
-		selectAll: false,
-		checked: [],
-		selectedData: [],
-		fileName: 'sites-stats',
-		newArray: []
-	};
+	constructor() {
+		super();
+		this.state = {
+			data: [],
+			filteredData: [],
+			isLoading: false,
+			selectAll: false,
+			checked: [],
+			selectedData: [],
+			fileName: 'sites-stats'
+		};
+	}
 
 	componentDidMount() {
 		this.setState({ isLoading: true });
@@ -33,8 +39,7 @@ class SiteMapping extends Component {
 				const { data } = res.data;
 				this.setState({ data, filteredData: data, isLoading: false });
 			})
-			.catch(err => {
-				console.log(err);
+			.catch(() => {
 				this.setState({ isLoading: false });
 			});
 	}
@@ -62,11 +67,12 @@ class SiteMapping extends Component {
 	};
 
 	handleSingleCheckboxChange = (index, e) => {
-		const checkedCopy = this.state.checked;
-		const select = this.state.selectedData;
+		const { checked, selectedData } = this.state;
+		const checkedCopy = checked;
+		const select = selectedData;
 		const { filteredData } = this.state;
 
-		if (e.target.checked) {
+		if (e.target.checked && selectedData.length < filteredData.length) {
 			checkedCopy[index] = e.target.checked;
 			select.push(filteredData[index]);
 
@@ -84,7 +90,7 @@ class SiteMapping extends Component {
 			});
 		}
 
-		if (this.state.selectedData.length === filteredData.length) {
+		if (selectedData.length === filteredData.length) {
 			this.setState({
 				selectAll: true
 			});
@@ -97,7 +103,7 @@ class SiteMapping extends Component {
 
 	getFilterBoxValues = key => {
 		const { data } = this.state;
-		const values = [...new Set([...data].map(data => data[key]))];
+		const values = [...new Set([...data].map(val => val[key]))];
 
 		return values.map(value => ({ name: value }));
 	};
@@ -105,35 +111,50 @@ class SiteMapping extends Component {
 	handleFilters = filters => {
 		const { data } = this.state;
 		let filteredData = [...data];
+		let selectedFilteredData = [];
 
 		for (const prop in filters) {
 			const filter = filters[prop];
-			// eslint-disable-next-line no-continue
-			if (filter.values.length)
-				filteredData = filteredData.filter(value => filter.values.indexOf(value[prop]) !== -1);
-		}
+			// eslint-disable-next-line no-prototype-builtins
+			if (filters.hasOwnProperty(prop) && filter.values.length) {
+				// eslint-disable-next-line no-continue
 
-		this.setState({ filteredData, selectAll: false });
+				filteredData = filteredData.filter(value => filter.values.indexOf(value[prop]) !== -1);
+			}
+
+			this.setState({
+				filteredData,
+				selectedData: [],
+				checked: [],
+				selectAll: false
+			});
+		}
 	};
 
 	filteredDataWithICcon = data => {
-		data.map(val => {
+		data.forEach(val => {
 			for (const key in val) {
-				val[key] =
-					val[key] === 'N/A' || (key === 'onboardingStatus' || key === 'dateCreated') ? (
-						<span>{val[key]}</span>
-					) : (
-						<span>
-							{val[key]}
-							<CustomIcon
-								icon="copy"
-								onClick={copyToClipBoard}
-								toReturn={val[key]}
-								className="u-text-red u-margin-l3 u-cursor-pointer site-mapping-copy"
-								title="copy content"
-							/>
-						</span>
-					);
+				// eslint-disable-next-line no-prototype-builtins
+				if (val.hasOwnProperty(key)) {
+					val[key] === 'N/A' ||
+					(key === 'onboardingStatus' ||
+						key === 'dateCreated' ||
+						key === 'activeStatus' ||
+						key === 'revenueShare')
+						? (val[key] = <span> {val[key]}</span>)
+						: (val[key] = (
+								<span>
+									{val[key]}
+									<CustomIcon
+										icon="copy"
+										onClick={copyToClipBoard}
+										toReturn={val[key]}
+										className="u-text-red u-margin-l3 u-cursor-pointer site-mapping-copy"
+										title="copy content"
+									/>
+								</span>
+						  ));
+				}
 			}
 		});
 		return data;
@@ -143,9 +164,10 @@ class SiteMapping extends Component {
 		const { filteredData: { length = 0 } = {} } = this.state;
 
 		if (length < 5) return 5;
-		else if (length < 20) return 20;
-		else if (length < 50) return 50;
-		else return 50;
+		if (length < 10) return 10;
+		if (length < 20) return 20;
+		if (length < 50) return 50;
+		return 50;
 	};
 
 	renderFilterComponent() {
@@ -226,27 +248,25 @@ class SiteMapping extends Component {
 	}
 
 	render() {
-		const { isLoading, filteredData, selectedData, fileName } = this.state;
+		const { isLoading, filteredData, selectedData, fileName, checked, selectAll } = this.state;
 		let downloadLink;
+		let csvData;
 		const dataWithICon = clonedeep(filteredData);
-		if (selectedData === [] || selectedData.length === 0) {
-			let csvData = btoa(JSON.stringify(filteredData));
+		if (!selectedData || selectedData.length === 0) {
+			csvData = btoa(JSON.stringify(filteredData));
 			downloadLink = `${REPORT_DOWNLOAD_ENDPOINT}?data=${csvData}&fileName=${fileName}`;
 		} else {
-			let csvData = btoa(JSON.stringify(selectedData));
+			csvData = btoa(JSON.stringify(selectedData));
 			downloadLink = `${REPORT_DOWNLOAD_ENDPOINT}?data=${csvData}&fileName=${fileName}`;
 		}
 
 		const columns = [
 			{
-				Header: (
-					<input type="checkbox" onChange={this.handleChange} checked={this.state.selectAll} />
-				),
+				Header: <input type="checkbox" onChange={this.handleChange} checked={selectAll} />,
 				Cell: row => (
 					<input
 						type="checkbox"
-						defaultChecked={this.state.checked[row.index]}
-						checked={this.state.checked[row.index]}
+						checked={checked[row.index]}
 						onChange={e => this.handleSingleCheckboxChange(row.index, e)}
 					/>
 				),
@@ -257,79 +277,7 @@ class SiteMapping extends Component {
 				minWidth: 50
 			},
 
-			{
-				Header: 'Site ID',
-				accessor: 'siteId',
-				width: 100,
-				maxWidth: 100,
-				minWidth: 100
-			},
-			{
-				Header: 'Domain',
-				accessor: 'domain'
-			},
-			{
-				Header: 'Owner Email',
-				accessor: 'accountEmail'
-			},
-			{
-				Header: 'Onboarding Status',
-				accessor: 'onboardingStatus',
-				width: 200,
-				maxWidth: 200,
-				minWidth: 200
-			},
-			{
-				Header: 'Active Status',
-				accessor: 'activeStatus',
-				width: 120,
-				maxWidth: 120,
-				minWidth: 120
-			},
-			{
-				Header: 'Date Created',
-				accessor: 'dateCreated',
-				width: 120,
-				maxWidth: 120,
-				minWidth: 120
-			},
-			{
-				Header: 'Active Products',
-				accessor: 'activeProducts',
-				width: 150,
-				maxWidth: 150,
-				minWidth: 150
-			},
-			{
-				Header: 'Active Bidders',
-				accessor: 'activeBidders',
-				width: 150,
-				maxWidth: 150,
-				minWidth: 150
-			},
-			{
-				Header: 'Inactive Bidders',
-				accessor: 'inactiveBidders',
-				width: 150,
-				maxWidth: 150,
-				minWidth: 150
-			},
-			{
-				Header: 'Rev Share',
-				accessor: 'revenueShare'
-			},
-			{
-				Header: 'Publisher Id',
-				accessor: 'publisherId'
-			},
-			{
-				Header: 'Auth Email',
-				accessor: 'authEmail'
-			},
-			{
-				Header: 'Ad Manager',
-				accessor: 'adManager'
-			}
+			...SITE_MAPPING_COLUMNS
 		];
 
 		if (isLoading) return <Loader height="600px" classNames="u-margin-v3" />;

@@ -330,6 +330,82 @@ const XPATH_MODE_URL = {
 	modes: [{ name: 'Mode 1', value: 'Mode 1' }, { name: 'Mode 2', value: 'Mode 2' }]
 };
 
+const SITE_MAPPING_COLUMNS = [
+	{
+		Header: 'Site ID',
+		accessor: 'siteId',
+		width: 100,
+		maxWidth: 100,
+		minWidth: 100
+	},
+	{
+		Header: 'Domain',
+		accessor: 'domain'
+	},
+	{
+		Header: 'Owner Email',
+		accessor: 'accountEmail'
+	},
+	{
+		Header: 'Onboarding Status',
+		accessor: 'onboardingStatus',
+		width: 200,
+		maxWidth: 200,
+		minWidth: 200
+	},
+	{
+		Header: 'Active Status',
+		accessor: 'activeStatus',
+		width: 120,
+		maxWidth: 120,
+		minWidth: 120
+	},
+	{
+		Header: 'Date Created',
+		accessor: 'dateCreated',
+		width: 120,
+		maxWidth: 120,
+		minWidth: 120
+	},
+	{
+		Header: 'Active Products',
+		accessor: 'activeProducts',
+		width: 150,
+		maxWidth: 150,
+		minWidth: 150
+	},
+	{
+		Header: 'Active Bidders',
+		accessor: 'activeBidders',
+		width: 150,
+		maxWidth: 150,
+		minWidth: 150
+	},
+	{
+		Header: 'Inactive Bidders',
+		accessor: 'inactiveBidders',
+		width: 150,
+		maxWidth: 150,
+		minWidth: 150
+	},
+	{
+		Header: 'Rev Share',
+		accessor: 'revenueShare'
+	},
+	{
+		Header: 'Publisher Id',
+		accessor: 'publisherId'
+	},
+	{
+		Header: 'Auth Email',
+		accessor: 'authEmail'
+	},
+	{
+		Header: 'Ad Manager',
+		accessor: 'adManager'
+	}
+];
+
 export {
 	OP_NAV_ITEMS,
 	OP_NAV_ITEMS_INDEXES,
@@ -342,5 +418,6 @@ export {
 	TOOLS_IDENTIFIERS,
 	ICONS,
 	BACKUP_ADS_FORMATS,
-	XPATH_MODE_URL
+	XPATH_MODE_URL,
+	SITE_MAPPING_COLUMNS
 };
