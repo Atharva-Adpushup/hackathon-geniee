@@ -12,8 +12,13 @@ import CustomInputNumber from 'components/shared/customInputNumber.jsx';
 class collection extends React.Component {
 	constructor(props) {
 		super(props);
+		const { collection, maxValue } = this.props;
+		const sum = collection.reduce((acc, ele) => acc + ele.value, 0);
+		const isValid = sum === maxValue;
+
 		this.state = {
-			model: props.savedCollection || {}
+			model: props.savedCollection || {},
+			hasSumExtended: !isValid
 		};
 		this.handleInputChange = this.handleInputChange.bind(this);
 		this.renderSum = this.renderSum.bind(this);
@@ -138,8 +143,15 @@ class collection extends React.Component {
 	}
 
 	renderSum() {
-		const { maxValue } = this.props;
-		const sum = this.getCollectionSum(this.getModel());
+		const { maxValue, collection } = this.props;
+		let model = this.getModel();
+
+		if (!model || !Object.keys(model).length) {
+			model = {};
+			collection.forEach((ele, index) => (model[index] = ele.value));
+		}
+
+		const sum = this.getCollectionSum(model);
 		let remaining = maxValue - sum;
 		remaining = remaining < 0 ? 'N/A' : remaining;
 
