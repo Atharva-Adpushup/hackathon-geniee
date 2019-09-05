@@ -1,21 +1,23 @@
-var path = require('path'),
-	Promise = require('bluebird'),
-	url = require('url'),
-	retry = require('bluebird-retry'),
-	commonConsts = require('../../configs/commonConsts'),
-	fs = Promise.promisifyAll(require('fs')),
-	mkdirpAsync = Promise.promisifyAll(require('mkdirp')).mkdirpAsync,
-	readFileAsync = Promise.promisify(require('fs').readFile);
+const path = require('path');
+const Promise = require('bluebird');
+const url = require('url');
+const retry = require('bluebird-retry');
+const fs = Promise.promisifyAll(require('fs'));
+const mkdirpAsync = Promise.promisifyAll(require('mkdirp')).mkdirpAsync;
+const readFileAsync = Promise.promisify(require('fs').readFile);
+
+const commonConsts = require('../../configs/commonConsts');
 couchbase = require('../../helpers/couchBaseService');
 
 function constructHBJsFile(jsContents, indiHbConfig, siteData) {
-	var hostname = url.parse(siteData.siteDomain).hostname,
-		domainNames = [hostname];
+	const hostname = url.parse(siteData.siteDomain).hostname;
 
-	var hbGlobalSettings = siteData.hbConfig.settings;
+	const domainNames = [hostname];
+
+	const hbGlobalSettings = siteData.hbConfig.settings;
 
 	if (!hostname.match('^www.')) {
-		domainNames.push('www.' + hostname);
+		domainNames.push(`www.${hostname}`);
 	}
 
 	jsContents = jsContents
@@ -32,47 +34,60 @@ function constructHBJsFile(jsContents, indiHbConfig, siteData) {
 		jsContents = jsContents
 			.replace('__HB_TARGET_ALL_DFP__', false)
 			.replace('__HB_POSTBID_PASSBACKS__', JSON.stringify(hbGlobalSettings.postbidPassbacks || {}))
-			.replace('__HB_AD_UNIT_TARGETING__', JSON.stringify(hbGlobalSettings.dfpAdUnitTargeting || {}));
+			.replace(
+				'__HB_AD_UNIT_TARGETING__',
+				JSON.stringify(hbGlobalSettings.dfpAdUnitTargeting || {})
+			);
 	}
 
 	return jsContents;
 }
 
 module.exports = function(siteId) {
-	var jsTplPath = path.join(__dirname, '..', '..', 'public', 'assets', 'js', 'builds', 'adpushupHB.js'),
-		hbRootPath = path.join('/adpushup', 'hb_files', siteId.toString());
+	const jsTplPath = path.join(
+		__dirname,
+		'..',
+		'..',
+		'public',
+		'assets',
+		'js',
+		'builds',
+		'adpushupHB.js'
+	);
+
+	const hbRootPath = path.join('/adpushup', 'hb_files', siteId.toString());
 
 	return couchbase
 		.connectToBucket('AppBucket')
-		.then(function(appBucket) {
-			return Promise.all([
-				appBucket.getAsync('hbcf::' + siteId, {}),
+		.then(appBucket =>
+			Promise.all([
+				appBucket.getAsync(`${commonConsts.docKeys.hb}${siteId}`, {}),
 				readFileAsync(jsTplPath),
 				mkdirpAsync(hbRootPath)
-			]);
-		})
-		.spread(function(siteData, jsContents) {
+			])
+		)
+		.spread((siteData, jsContents) => {
 			jsContents = jsContents.toString();
 			siteData = siteData.value;
 
 			return Promise.all(
-				siteData.hbConfig.setup.map(function(indiHbConfig) {
+				siteData.hbConfig.setup.map(indiHbConfig => {
 					if (indiHbConfig.type === 'all') {
 						return fs.writeFileAsync(
 							path.join(hbRootPath, 'adpushup.GLOBAL.js'),
 							constructHBJsFile(jsContents, indiHbConfig, siteData)
 						);
-					} else if (indiHbConfig.type === 'continent') {
+					}
+					if (indiHbConfig.type === 'continent') {
 						return fs.writeFileAsync(
-							path.join(hbRootPath, 'adpushup.' + indiHbConfig.continent + '.js'),
-							constructHBJsFile(jsContents, indiHbConfig, siteData)
-						);
-					} else {
-						return fs.writeFileAsync(
-							path.join(hbRootPath, 'adpushup.' + indiHbConfig.country + '.js'),
+							path.join(hbRootPath, `adpushup.${indiHbConfig.continent}.js`),
 							constructHBJsFile(jsContents, indiHbConfig, siteData)
 						);
 					}
+					return fs.writeFileAsync(
+						path.join(hbRootPath, `adpushup.${indiHbConfig.country}.js`),
+						constructHBJsFile(jsContents, indiHbConfig, siteData)
+					);
 				})
 			);
 		});

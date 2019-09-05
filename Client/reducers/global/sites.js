@@ -1,3 +1,4 @@
+/* eslint-disable no-case-declarations */
 import { SITE_ACTIONS } from '../../constants/global';
 
 const sites = (state = { fetched: false, data: {} }, action) => {

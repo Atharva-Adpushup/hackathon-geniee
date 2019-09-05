@@ -1,13 +1,13 @@
 const config = require('./config');
 
 const prodEnv = config.environment.HOST_ENV === 'production';
-
 const reportingBaseURL = 'https://staging.adpushup.com/CentralReportingWebService';
+const computedProductionURL = prodEnv ? 'https://beta.adpushup.com' : 'http://localhost:8080';
 
 module.exports = {
 	SALT: '_ADP_RANDOMIZER_',
-	BASE_URL: prodEnv ? 'https://console.adpushup.com' : 'http://localhost:8080',
-	INTEGRATION_BASE_URL: prodEnv ? 'https://app.staging.adpushup.com/' : 'http://localhost:8080',
+	BASE_URL: computedProductionURL,
+	INTEGRATION_BASE_URL: computedProductionURL,
 	DFP_WEB_SERVICE_ENDPOINT: 'http://staging.adpushup.com/DfpWebService/info',
 	TRANSACTION_LOG_ENDPOINT: 'https://api.adpushup.com/SetupLogWebService/log',
 	REPORT_STATUS: 'https://api.adpushup.com/OpsWebService/ops?report=getNetworkImportServiceStatus',
@@ -40,8 +40,7 @@ module.exports = {
 								ON keys ('hbcf::' || to_string(_site.siteId))
 								WHERE meta(_site).id LIKE 'site::%'
 								AND meta(_user).id LIKE 'user::%';`,
-
-	EMO_PAGEGROUPS: [
+	DEMO_PAGEGROUPS: [
 		'HOME',
 		'CALC',
 		'FAQ',
@@ -388,9 +387,10 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 	},
 	docKeys: {
 		apTag: 'tgmr::',
-		networkConfig: 'data::apNetwork',
+		networkConfig: 'data::apNetworkBeta',
 		interactiveAds: 'fmrt::',
-		user: 'user::'
+		user: 'user::',
+		hb: 'hbdc::'
 	},
 	tagManagerInitialDoc: {
 		siteId: null,

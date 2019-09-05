@@ -199,10 +199,6 @@ router
 		const isDataValid = !!(
 			siteId &&
 			topURLCount &&
-			pageGroups &&
-			currentSelectedDevice &&
-			currentSelectedMode &&
-			errorCode &&
 			startDate &&
 			endDate &&
 			EMAIL_REGEX.test(emailId)

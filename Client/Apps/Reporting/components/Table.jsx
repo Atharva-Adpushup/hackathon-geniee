@@ -28,25 +28,40 @@ class Table extends React.Component {
 		this.props.getCsvData(csvData);
 	};
 
+	getDateIntervalValidators = () => {
+		const { selectedInterval } = this.props;
+		const isDaily = !!(selectedInterval === 'daily');
+		const isMonthly = !!(selectedInterval === 'monthly');
+		const isCumulative = !!(selectedInterval === 'cumulative');
+		const resultObject = { isDaily, isMonthly, isCumulative };
+
+		return resultObject;
+	};
+
 	getTableHeaders = headers => {
 		let tableHeader = [];
 		const { metrics, dimension } = this.props;
+		const { isDaily } = this.getDateIntervalValidators();
+
 		headers.forEach(header => {
 			if (dimension[header]) {
-				if (header == 'siteid') {
+				if (header === 'siteid') {
 					tableHeader.push({
 						title: 'Site Name',
 						position: 1,
-						prop: 'siteName'
+						prop: 'siteName',
+						sortable: true
 					});
 				} else {
 					tableHeader.push({
 						title: dimension[header].display_name,
 						position: 1,
-						prop: header
+						prop: header,
+						sortable: true
 					});
 				}
 			}
+
 			if (metrics[header]) {
 				tableHeader.push({
 					title: metrics[header].display_name,
@@ -56,11 +71,18 @@ class Table extends React.Component {
 				});
 			}
 		});
-		tableHeader.push({
+
+		let computedDate = {
 			title: 'Date',
 			position: 0,
 			prop: 'date'
-		});
+		};
+
+		if (isDaily) {
+			computedDate = { ...computedDate, sortable: true };
+		}
+
+		tableHeader.push(computedDate);
 		tableHeader = sortBy(tableHeader, header => header.position);
 		return tableHeader;
 	};
@@ -68,14 +90,19 @@ class Table extends React.Component {
 	getTableBody = tableBody => {
 		let tableData = [...tableBody];
 		let displayTableData = [];
-		const { selectedInterval, startDate, endDate, site } = this.props;
-		if (selectedInterval === 'daily') tableData = sortBy(tableData, row => row.date);
-		if (selectedInterval === 'monthly')
-			tableData = sortBy(sortBy(tableData, row => row.month), row => row.year);
+		const { startDate, endDate, site } = this.props;
+		const { isDaily, isMonthly, isCumulative } = this.getDateIntervalValidators();
+
+		if (isDaily) tableData = sortBy(tableData, row => row.date);
+
+		if (isMonthly) tableData = sortBy(sortBy(tableData, row => row.month), row => row.year);
+
 		tableData.forEach(row => {
 			const tableRow = { ...row };
-			if (selectedInterval === 'daily') tableRow.date = moment(tableRow.date).format('ll');
-			if (selectedInterval === 'monthly') {
+
+			if (isDaily) tableRow.date = moment(tableRow.date).format('ll');
+
+			if (isMonthly) {
 				if (
 					tableRow.month == moment(startDate).format('M') &&
 					tableRow.year == moment(startDate).format('Y')
@@ -96,17 +123,22 @@ class Table extends React.Component {
 					tableRow.date = `${fromDate.format('ll')} to ${toDate.format('ll')}`;
 				}
 			}
-			if (selectedInterval === 'cumulative')
+
+			if (isCumulative)
 				tableRow.date = `${moment(startDate).format('ll')} to ${moment(endDate).format('ll')}`;
+
 			if (tableRow.siteid) {
 				const { siteid } = tableRow;
+
 				tableRow.siteName = site[siteid]
 					? React.cloneElement(<a href={`/reports/${siteid}`}>{site[siteid].siteName}</a>)
 					: 'Not Found';
 				delete tableRow.siteid;
 			}
+
 			displayTableData.push(tableRow);
 		});
+
 		displayTableData = this.formatTableData(displayTableData);
 		return displayTableData;
 	};
@@ -156,9 +188,11 @@ class Table extends React.Component {
 	renderFooter() {
 		const { tableHeader, grandTotal, metrics } = this.state;
 		const footerComponent = [];
+
 		for (let i = 0; i < tableHeader.length; i++) {
 			const col = tableHeader[i].prop;
 			let value = grandTotal[col];
+
 			if (metrics[col]) {
 				const num = metrics[col].valueType == 'money' ? roundOffTwoDecimal(value) : value;
 				value =
@@ -171,6 +205,7 @@ class Table extends React.Component {
 				</td>
 			);
 		}
+
 		return (
 			<table className="table table-datatable">
 				<tbody className="tbody-default">
@@ -202,6 +237,9 @@ class Table extends React.Component {
 			adpushup_page_cpm(columnValue) {
 				if (typeof columnValue === 'string') return parseFloat(columnValue.replace(/[,$]/g, ''));
 				return columnValue;
+			},
+			date(columnValue) {
+				return moment(columnValue, 'll').valueOf();
 			}
 		};
 		if (tableData && tableData.result && tableData.result.length > 0)

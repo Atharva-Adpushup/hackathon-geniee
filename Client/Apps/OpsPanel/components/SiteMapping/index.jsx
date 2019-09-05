@@ -36,7 +36,7 @@ class SiteMapping extends Component {
 		return axiosInstance
 			.get('/ops/allSitesStats')
 			.then(res => {
-				const { data } = res.data;
+				const { data = [] } = res.data;
 				this.setState({ data, filteredData: data, isLoading: false });
 			})
 			.catch(() => {
@@ -47,58 +47,34 @@ class SiteMapping extends Component {
 	handleChange = () => {
 		const { filteredData } = this.state;
 		const checkedCopy = [];
-		const selectAll = !this.state.selectAll;
-		this.setState({ selectAll });
-		filteredData.forEach(() => {
-			checkedCopy.push(selectAll);
+		this.setState({ selectAll: !this.state.selectAll }, () => {
+			filteredData.forEach(() => {
+				checkedCopy.push(this.state.selectAll);
+			});
+			this.setState({
+				checked: checkedCopy,
+				selectedData: this.state.selectAll ? [...filteredData] : []
+			});
 		});
-
-		if (selectAll !== true) {
-			this.setState({
-				checked: checkedCopy,
-				selectedData: []
-			});
-		} else {
-			this.setState({
-				checked: checkedCopy,
-				selectedData: [...filteredData]
-			});
-		}
 	};
 
 	handleSingleCheckboxChange = (index, e) => {
 		const { checked, selectedData } = this.state;
 		const checkedCopy = checked;
-		const select = selectedData;
+		// const select = selectedData;
 		const { filteredData } = this.state;
-
-		if (e.target.checked && selectedData.length < filteredData.length) {
+		if (e.target.checked) {
 			checkedCopy[index] = e.target.checked;
-			select.push(filteredData[index]);
-
-			this.setState({
-				checked: checkedCopy,
-				selectedData: select
-			});
+			selectedData.push(filteredData[index]);
 		} else {
 			checkedCopy[index] = e.target.checked;
-			select.splice(select.indexOf(filteredData[index]), 1);
-
-			this.setState({
-				checked: checkedCopy,
-				selectedData: select
-			});
+			selectedData.splice(selectedData.indexOf(filteredData[index]), 1);
 		}
-
-		if (selectedData.length === filteredData.length) {
-			this.setState({
-				selectAll: true
-			});
-		} else {
-			this.setState({
-				selectAll: false
-			});
-		}
+		this.setState({
+			checked: checkedCopy,
+			selectedData,
+			selectAll: selectedData.length === filteredData.length ? true : false
+		});
 	};
 
 	getFilterBoxValues = key => {
@@ -111,7 +87,6 @@ class SiteMapping extends Component {
 	handleFilters = filters => {
 		const { data } = this.state;
 		let filteredData = [...data];
-		let selectedFilteredData = [];
 
 		for (const prop in filters) {
 			const filter = filters[prop];

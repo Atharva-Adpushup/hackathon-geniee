@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import OverlayTooltip from '../../../../Components/OverlayTooltip/index';
 import ControlTagConversion from './ControlTagConversion';
 import Loader from '../../../../Components/Loader';
+import { getAppBaseUrls } from '../../../../helpers/commonFunctions';
 
 library.add(faInfoCircle, faExternalLinkAlt);
 
@@ -31,7 +32,12 @@ class Home extends Component {
 		return siteId;
 	};
 
-	getVisualEditorLink = siteId => `/api/visualEditor/${siteId}`;
+	getVisualEditorLink = siteId => {
+		const { http } = getAppBaseUrls();
+		const computedLink = `${http}/api/visualEditor/${siteId}`;
+
+		return computedLink;
+	};
 
 	handleNavSelect(value) {
 		if (value) this.setState({ activeNav: value });

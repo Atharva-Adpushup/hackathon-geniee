@@ -52,7 +52,7 @@ class TrafficPanel extends Component {
 							sumMismatchErrorMessage={trafficDistributionConfig.sumMismatchErrorMessage}
 							collection={allTrafficDistributions}
 							uiMinimal
-							maxValue={1000}
+							maxValue={100}
 							onSave={a => saveTrafficDistributions(a)}
 						/>
 					) : null}

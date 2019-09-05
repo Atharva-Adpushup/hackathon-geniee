@@ -12,6 +12,11 @@ import PerformanceApOriginalContainer from '../containers/PerformanceApOriginalC
 import RevenueContainer from '../containers/RevenueContainer';
 import Loader from '../../../Components/Loader/index';
 import { dates } from '../configs/commonConsts';
+import {
+	getDashboardDemoUserSiteIds,
+	checkDemoUserEmail,
+	getDemoUserSites
+} from '../../../helpers/commonFunctions';
 import SelectBox from '../../../Components/SelectBox/index';
 import reportService from '../../../services/reportService';
 import { convertObjToArr, getDateRange } from '../helpers/utils';
@@ -30,10 +35,20 @@ class Dashboard extends React.Component {
 	}
 
 	componentDidMount() {
-		const { showNotification, user, sites, reportsMeta, fetchReportingMeta } = this.props;
-		const userSites = Object.keys(sites).toString();
+		const {
+			showNotification,
+			user: {
+				data: { isPaymentDetailsComplete, email }
+			},
+			sites,
+			reportsMeta,
+			fetchReportingMeta
+		} = this.props;
+		let userSites = Object.keys(sites).toString();
 
-		if (!user.data.isPaymentDetailsComplete && !window.location.pathname.includes('payment')) {
+		userSites = getDashboardDemoUserSiteIds(userSites, email);
+
+		if (!isPaymentDetailsComplete && !window.location.pathname.includes('payment')) {
 			showNotification({
 				mode: 'error',
 				title: 'Payments Error',
@@ -45,9 +60,12 @@ class Dashboard extends React.Component {
 
 		if (!reportsMeta.fetched) {
 			return reportService.getMetaData({ sites: userSites }).then(response => {
-				const { data } = response;
-				fetchReportingMeta(data);
-				return this.getContentInfo(data);
+				let { data: computedData } = response;
+
+				computedData = getDemoUserSites(computedData, email);
+
+				fetchReportingMeta(computedData);
+				return this.getContentInfo(computedData);
 			});
 		}
 
@@ -79,37 +97,48 @@ class Dashboard extends React.Component {
 
 	getTopPerformingSites = (allUserSites, reportingSites) => {
 		let topPerformingSite;
+
 		allUserSites.forEach(site => {
 			const siteId = site.value;
+
 			if (reportingSites[siteId] && reportingSites[siteId].isTopPerforming) {
 				topPerformingSite = siteId;
 				return topPerformingSite;
 			}
 		});
+
 		return topPerformingSite;
 	};
 
 	getWidgetConfig = (widgets, selectedSite, reportType, widgetsList) => {
 		const sortedWidgets = sortBy(widgets, ['position', 'name']);
 		const widgetsConfig = [];
+
 		Object.keys(sortedWidgets).forEach(wid => {
 			const widget = { ...sortedWidgets[wid] };
+
 			if (widgetsList.indexOf(widget.name) > -1) {
 				widget.isLoading = true;
 				widget.selectedDate = dates[2].value;
 				widget.isDataSufficient = false;
+
 				if (reportType == 'site' || widget.name == 'per_ap_original')
 					widget.selectedSite = selectedSite;
 				else widget.selectedSite = 'all';
+
 				if (widget.name == 'per_ap_original') {
 					widget.selectedDimension = 'page_variation_type';
+					widget.selectedChartLegendMetric = 'adpushup_page_cpm';
 				}
+
 				if (widget.name == 'rev_by_network') {
 					widget.selectedDimension = 'network';
 				}
+
 				if (widget.name == 'per_site_wise') {
 					widget.selectedDimension = 'siteid';
 				}
+
 				widgetsConfig.push(widget);
 			}
 		});
@@ -151,7 +180,13 @@ class Dashboard extends React.Component {
 	getDisplayData = wid => {
 		const { widgetsConfig } = this.state;
 		const { selectedDate, selectedSite, path, name } = widgetsConfig[wid];
-		const { sites, reportsMeta } = this.props;
+		const {
+			sites,
+			reportsMeta,
+			user: {
+				data: { email }
+			}
+		} = this.props;
 		const { site: reportingSites } = reportsMeta.data;
 		const siteIds = Object.keys(sites);
 		const params = getDateRange(selectedDate);
@@ -160,9 +195,12 @@ class Dashboard extends React.Component {
 			reportingSites &&
 			reportingSites[selectedSite] &&
 			reportingSites[selectedSite].dataAvailableOutOfLast30Days < 21;
+
 		params.siteid = selectedSite == 'all' ? siteIds.toString() : selectedSite;
+		params.siteid = getDashboardDemoUserSiteIds(params.siteid, email);
 		widgetsConfig[wid].startDate = params.fromDate;
 		widgetsConfig[wid].endDate = params.toDate;
+
 		if (hidPerApOriginData) {
 			widgetsConfig[wid].isDataSufficient = false;
 			widgetsConfig[wid].isLoading = false;
@@ -205,30 +243,57 @@ class Dashboard extends React.Component {
 	};
 
 	showApBaselineWidget = () => {
-		const { siteId, reportType, reportsMeta } = this.props;
+		const {
+			siteId,
+			reportType,
+			reportsMeta,
+			user: {
+				data: { email }
+			}
+		} = this.props;
 		const { site: reportingSites } = reportsMeta.data;
 		const { sites } = this.state;
-		if (
-			reportType == 'site' &&
+		const isDemoUser = checkDemoUserEmail(email);
+		const isLayoutProductInSiteReport = !!(
+			reportType === 'site' &&
 			reportingSites &&
 			reportingSites[siteId] &&
-			reportingSites[siteId].product.Layout == 1
-		)
+			Number(reportingSites[siteId].product.Layout) === 1
+		);
+		const isAccountLevelReport = !!(reportType === 'account');
+
+		if (isLayoutProductInSiteReport || isDemoUser) {
 			return true;
-		if (reportType == 'account') {
+		}
+
+		if (isAccountLevelReport) {
 			const hasLayoutSite = this.getLayoutSites(sites, reportingSites);
 			if (hasLayoutSite.length > 0) return true;
 		}
+
 		return false;
 	};
 
 	renderControl(wid) {
-		const { reportType, reportsMeta } = this.props;
+		const {
+			reportType,
+			reportsMeta,
+			user: {
+				data: { email }
+			}
+		} = this.props;
+		const isDemoUser = checkDemoUserEmail(email);
 		const { site: reportingSites } = reportsMeta.data;
 		const { widgetsConfig, quickDates, sites } = this.state;
 		const { selectedDate, selectedSite, name } = widgetsConfig[wid];
 		const layoutSites = reportingSites ? this.getLayoutSites(sites, reportingSites) : [];
-		const sitesToShow = name == 'per_ap_original' ? layoutSites : sites;
+		const isPerfApOriginalWidget = !!(name === 'per_ap_original');
+		const isPerfApOriginalWidgetForDemoUser = !!(isDemoUser && isPerfApOriginalWidget);
+		const computedSelectedSite = isPerfApOriginalWidgetForDemoUser ? sites[1].value : selectedSite;
+		let sitesToShow = isPerfApOriginalWidget ? layoutSites : sites;
+
+		sitesToShow = isDemoUser ? sites : sitesToShow;
+
 		return (
 			<div className="aligner aligner--hEnd">
 				{name !== 'estimated_earnings' ? (
@@ -265,7 +330,7 @@ class Dashboard extends React.Component {
 							pullRight
 							isSearchable={false}
 							wrapperClassName="display-inline"
-							selected={selectedSite}
+							selected={computedSelectedSite}
 							options={sitesToShow}
 							onSelect={site => {
 								widgetsConfig[wid]['selectedSite'] = site;
@@ -286,22 +351,24 @@ class Dashboard extends React.Component {
 
 	renderViewReportButton(wid) {
 		const { widgetsConfig } = this.state;
-		const { startDate, endDate, selectedSite, selectedDimension, isDataSufficient } = widgetsConfig[
-			wid
-		];
+		const {
+			startDate,
+			endDate,
+			selectedSite,
+			selectedDimension,
+			selectedChartLegendMetric = '',
+			isDataSufficient
+		} = widgetsConfig[wid];
 		const { reportType, siteId } = this.props;
-		let siteSelected;
-		if (reportType === 'site') siteSelected = siteId;
-		else if (selectedSite != 'all') siteSelected = selectedSite;
+		let siteSelected = '';
+
+		if (reportType === 'site') siteSelected = `/${siteId}`;
+		else if (selectedSite !== 'all') siteSelected = `/${selectedSite}`;
+
+		const computedReportLink = `/reports${siteSelected}?fromDate=${startDate}&toDate=${endDate}&dimension=${selectedDimension}&chartLegendMetric=${selectedChartLegendMetric}`;
+
 		return (
-			<Link
-				to={
-					siteSelected
-						? `/reports/${siteSelected}?fromDate=${startDate}&toDate=${endDate}&dimension=${selectedDimension}`
-						: `/reports?fromDate=${startDate}&toDate=${endDate}&dimension=${selectedDimension}`
-				}
-				className="u-link-reset aligner aligner-item float-right"
-			>
+			<Link to={computedReportLink} className="u-link-reset aligner aligner-item float-right">
 				<Button className="aligner-item aligner aligner--vCenter" disabled={!isDataSufficient}>
 					View Reports
 					<FontAwesomeIcon icon="chart-area" className="u-margin-l2" />

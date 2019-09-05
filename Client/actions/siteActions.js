@@ -1,4 +1,6 @@
-import { SITE_ACTIONS, UI_ACTIONS } from '../constants/global';
+import cloneDeep from 'lodash/cloneDeep';
+
+import { SITE_ACTIONS, UI_ACTIONS, USER_ACTIONS } from '../constants/global';
 import axiosInstance from '../helpers/axiosInstance';
 import { errorHandler } from '../helpers/commonFunctions';
 
@@ -183,6 +185,45 @@ const updateSite = (siteId, params) => dispatch =>
 		})
 		.catch(err => errorHandler(err));
 
+const deleteSite = siteId => (dispatch, getState) =>
+	axiosInstance
+		.post('/site/deleteSite', { siteId })
+		.then(() => {
+			const state = getState();
+			const { user, sites } = state.global;
+			const { data: sitesData } = sites;
+			const {
+				data: { sites: userSites }
+			} = user;
+
+			const sitesDataClone = cloneDeep(sitesData);
+			delete sitesDataClone[siteId];
+
+			const userSitesClone = cloneDeep(userSites);
+			delete userSitesClone[siteId];
+
+			dispatch({
+				type: SITE_ACTIONS.REPLACE_SITE_DATA,
+				data: sitesDataClone
+			});
+
+			dispatch({
+				type: USER_ACTIONS.REPLACE_USER_DATA,
+				data: {
+					sites: userSitesClone
+				}
+			});
+
+			return dispatch({
+				type: UI_ACTIONS.SHOW_NOTIFICATION,
+				mode: 'success',
+				title: 'Operation Successful',
+				autoDismiss: 5,
+				message: 'Site successfully deleted'
+			});
+		})
+		.catch(err => errorHandler(err));
+
 export {
 	fetchAppStatuses,
 	addNewSite,
@@ -192,5 +233,6 @@ export {
 	getAppStatuses,
 	updateSiteAutoOptimise,
 	updateAppStatus,
-	updateSite
+	updateSite,
+	deleteSite
 };
