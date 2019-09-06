@@ -15,7 +15,7 @@ import Loader from '../../../../Components/Loader/index';
 import { copyToClipBoard } from '../../../../helpers/commonFunctions';
 import CustomIcon from '../../../../Components/CustomIcon/index';
 import { REPORT_DOWNLOAD_ENDPOINT } from '../../../Reporting/configs/commonConsts';
-import { SITE_MAPPING_COLUMNS } from '../../configs/commonConsts';
+import { SITE_MAPPING_COLUMNS, SITE_MAPPING_FILTER_COLUMNS } from '../../configs/commonConsts';
 
 class SiteMapping extends Component {
 	constructor() {
@@ -84,6 +84,14 @@ class SiteMapping extends Component {
 		return values.map(value => ({ name: value }));
 	};
 
+	handleFilterValues = arr => {
+		let array = [];
+		arr.map(({ name, prop }) => {
+			array.push({ name, prop, values: this.getFilterBoxValues(prop) });
+		});
+		return array;
+	};
+
 	handleFilters = filters => {
 		const { data } = this.state;
 		let filteredData = [...data];
@@ -145,83 +153,6 @@ class SiteMapping extends Component {
 		return 50;
 	};
 
-	renderFilterComponent() {
-		return (
-			<FilterBox
-				onFilter={this.onFilter}
-				availableFilters={[
-					{
-						name: 'Site Id',
-						prop: 'siteId',
-						values: this.getFilterBoxValues('siteId')
-					},
-					{
-						name: 'Domain',
-						prop: 'domain',
-						values: this.getFilterBoxValues('domain')
-					},
-					{
-						name: 'Owner Email',
-						prop: 'accountEmail',
-						values: this.getFilterBoxValues('accountEmail')
-					},
-					{
-						name: 'Onboarding Status',
-						prop: 'onboardingStatus',
-						values: this.getFilterBoxValues('onboardingStatus')
-					},
-					{
-						name: 'Active Status',
-						prop: 'activeStatus',
-						values: this.getFilterBoxValues('activeStatus')
-					},
-					{
-						name: 'Date Created',
-						prop: 'dateCreated',
-						values: this.getFilterBoxValues('dateCreated')
-					},
-					{
-						name: 'Active Products',
-						prop: 'activeProducts',
-						values: this.getFilterBoxValues('activeProducts')
-					},
-					{
-						name: 'Active Bidders',
-						prop: 'activeBidders',
-						values: this.getFilterBoxValues('activeBidders')
-					},
-					{
-						name: 'Inactive Bidders',
-						prop: 'inactiveBidders',
-						values: this.getFilterBoxValues('inactiveBidders')
-					},
-					{
-						name: 'Rev Share',
-						prop: 'revenueShare',
-						values: this.getFilterBoxValues('revenueShare')
-					},
-					{
-						name: 'Publisher Id',
-						prop: 'publisherId',
-						values: this.getFilterBoxValues('publisherId')
-					},
-					{
-						name: 'Auth Email',
-						prop: 'authEmail',
-						values: this.getFilterBoxValues('authEmail')
-					},
-					{
-						name: 'Ad Manager',
-						prop: 'adManager',
-						values: this.getFilterBoxValues('adManager')
-					}
-				]}
-				handleFilters={this.handleFilters}
-				className="u-margin-v5 u-margin-h4 "
-			/>
-		);
-	}
-
 	render() {
 		const { isLoading, filteredData, selectedData, fileName, checked, selectAll } = this.state;
 		let downloadLink;
@@ -260,7 +191,14 @@ class SiteMapping extends Component {
 		return (
 			<React.Fragment>
 				<Row>
-					<div className="col-md-10">{this.renderFilterComponent()}</div>
+					<div className="col-md-10">
+						<FilterBox
+							onFilter={this.onFilter}
+							availableFilters={this.handleFilterValues(SITE_MAPPING_FILTER_COLUMNS)}
+							handleFilters={this.handleFilters}
+							className="u-margin-v5 u-margin-h4 "
+						/>
+					</div>
 					<div className="col-md-2">
 						<a
 							href={downloadLink}

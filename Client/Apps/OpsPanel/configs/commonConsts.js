@@ -405,6 +405,64 @@ const SITE_MAPPING_COLUMNS = [
 		accessor: 'adManager'
 	}
 ];
+
+
+const SITE_MAPPING_FILTER_COLUMNS = [
+	{
+		name: 'Site Id',
+		prop: 'siteId',
+	
+	},
+	{
+		name: 'Domain',
+		prop: 'domain',
+	},
+	{
+		name: 'Owner Email',
+		prop: 'accountEmail',
+	},
+	{
+		name: 'Onboarding Status',
+		prop: 'onboardingStatus',
+	},
+	{
+		name: 'Active Status',
+		prop: 'activeStatus',
+	},
+	{
+		name: 'Date Created',
+		prop: 'dateCreated',
+	},
+	{
+		name: 'Active Products',
+		prop: 'activeProducts',
+	},
+	{
+		name: 'Active Bidders',
+		prop: 'activeBidders',
+	},
+	{
+		name: 'Inactive Bidders',
+		prop: 'inactiveBidders',
+	},
+	{
+		name: 'Rev Share',
+		prop: 'revenueShare',
+	},
+	{
+		name: 'Publisher Id',
+		prop: 'publisherId',
+	},
+	{
+		name: 'Auth Email',
+		prop: 'authEmail',
+	},
+	{
+		name: 'Ad Manager',
+		prop: 'adManager',
+	}
+]
+
 const MODE_TOOLTIP_TEXT = `ADPUSHUP:1 , FALLBACK:2`;
 const ERROR_TOOLTIP_TEXT = `NO_ERROR:1, PAGEGROUP_NOT_FOUND:2, FALLBACK_PLANNED:3, FALLBACK_FORCED:4, PAUSED_IN_EDITOR:5`;
 
@@ -423,5 +481,6 @@ export {
 	XPATH_MODE_URL,
 	SITE_MAPPING_COLUMNS,
 	MODE_TOOLTIP_TEXT,
-	ERROR_TOOLTIP_TEXT
+	ERROR_TOOLTIP_TEXT,
+	SITE_MAPPING_FILTER_COLUMNS
 };
