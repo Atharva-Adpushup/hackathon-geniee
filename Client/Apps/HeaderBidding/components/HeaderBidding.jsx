@@ -25,19 +25,24 @@ class HeaderBidding extends React.Component {
 			getSetupStatusAction
 		} = this.props;
 
-		if (setupStatus) return;
+		if (setupStatus) {
+			this.handleDefaultTab(url, siteId);
+			return;
+		}
 
-		getSetupStatusAction(siteId).then(() => {
-			const { setupStatus: updatedSetupStatus } = this.props;
-			const { inventoryFound, biddersFound } = updatedSetupStatus;
-
-			if (url === `/sites/${siteId}/apps/header-bidding` && inventoryFound && biddersFound) {
-				this.setState({
-					redirectUrl: `/sites/${siteId}/apps/header-bidding/${NAV_ITEMS_INDEXES.TAB_2}`
-				});
-			}
-		});
+		getSetupStatusAction(siteId).then(() => this.handleDefaultTab(url, siteId));
 	}
+
+	handleDefaultTab = (url, siteId) => {
+		const { setupStatus } = this.props;
+		const { inventoryFound, biddersFound } = setupStatus;
+
+		if (url === `/sites/${siteId}/apps/header-bidding` && inventoryFound && biddersFound) {
+			this.setState({
+				redirectUrl: `/sites/${siteId}/apps/header-bidding/${NAV_ITEMS_INDEXES.TAB_2}`
+			});
+		}
+	};
 
 	getActiveTab = () => {
 		const {
