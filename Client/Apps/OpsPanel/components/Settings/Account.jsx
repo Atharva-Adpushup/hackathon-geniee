@@ -5,7 +5,7 @@ import React, { Component, Fragment } from 'react';
 import { Col } from 'react-bootstrap';
 import memoize from 'memoize-one';
 
-import { DFP_ACCOUNTS_DEFAULT } from '../../configs/commonConsts';
+import { DFP_ACCOUNTS_DEFAULT, ADPUSHUP_DFP } from '../../configs/commonConsts';
 import CustomToggleSwitch from '../../../../Components/CustomToggleSwitch/index';
 import FieldGroup from '../../../../Components/Layout/FieldGroup';
 import CustomButton from '../../../../Components/CustomButton/index';
@@ -35,17 +35,30 @@ class Account extends Component {
 				? `${activeDFPNetwork}-${activeDFPParentId}-${activeDFPCurrencyCode}`
 				: null;
 		let dfpAccounts = DFP_ACCOUNTS_DEFAULT;
+		let foundAdPushupDFP = false;
 
 		adNetworkSettings.forEach(network => {
 			if (network.networkName === 'DFP') {
 				const { dfpAccounts: DfpAccountsFromDoc } = network;
-				const currentDfpAccounts = DfpAccountsFromDoc.map(account => ({
-					name: `${account.code} - ${account.name || 'N/A'}`,
-					value: `${account.code}-${account.dfpParentId}-${account.currencyCode}`
-				}));
+				const currentDfpAccounts = DfpAccountsFromDoc.map(account => {
+					if (!foundAdPushupDFP) {
+						foundAdPushupDFP = !!(
+							account.name &&
+							account.name.toLowerCase() === ADPUSHUP_DFP.name &&
+							account.code &&
+							account.code === ADPUSHUP_DFP.code
+						);
+					}
+					return {
+						name: `${account.code} - ${account.name || 'N/A'}`,
+						value: `${account.code}-${account.dfpParentId}-${account.currencyCode}`
+					};
+				});
 				dfpAccounts = currentDfpAccounts;
 			}
 		});
+
+		if (!foundAdPushupDFP) dfpAccounts = [...dfpAccounts, ...DFP_ACCOUNTS_DEFAULT];
 
 		this.state = {
 			activeDFP,
@@ -104,20 +117,22 @@ class Account extends Component {
 		const { showNotification, updateUser, user } = this.props;
 		const { adNetworkSettings = [], adServerSettings = {} } = user;
 
-		if (originalactiveDFP === null && activeDFP === null) {
-			return showNotification({
-				mode: 'error',
-				title: 'Invalid Value',
-				message: 'Please select an active DFP',
-				autoDismiss: 10
-			});
-		} else if (originalactiveDFP === null && activeDFP !== null) {
-			if (
-				!window.confirm(
-					'Setting Active DFP is an irrevocable action. Are you sure about the selected Active DFP? '
-				)
-			) {
-				return false;
+		if (originalactiveDFP === null) {
+			if (activeDFP === null) {
+				return showNotification({
+					mode: 'error',
+					title: 'Invalid Value',
+					message: 'Please select an active DFP',
+					autoDismiss: 10
+				});
+			} else if (activeDFP !== null) {
+				if (
+					!window.confirm(
+						'Setting Google Ad Manager is an irrevocable action. Are you sure about the selected Google Ad Manager? '
+					)
+				) {
+					return false;
+				}
 			}
 		}
 
@@ -184,8 +199,10 @@ class Account extends Component {
 				{isDFPSetup ? null : (
 					<CustomMessage
 						type="error"
-						header="Information"
-						message="DFP Setup Incomplete. Please setup Publisher's DFP or Select AdPushup DFP below for Ad Syncing."
+						header="Setup Incomplete"
+						message={
+							"<p style='font-size: 16px'>Google Ad Manager Setup Incomplete. Please setup Publisher's Google Ad Manager or select AdPushup's Google Ad Manager below for Ad Syncing. For intergrations, please click <a href='/integrations'>here</a>.<p>"
+						}
 						rootClassNames="u-margin-b4"
 						dismissible
 					/>
@@ -213,18 +230,18 @@ class Account extends Component {
 							border: '1px solid rgb(176, 174, 174)',
 							padding: '5px 15px'
 						}}
-						label="Active DFP"
+						label="Active Google Ad Manager"
 						size={6}
 						id="activeDFP-text"
 						className="u-padding-v4 u-padding-h4"
 					/>
 				) : (
 					<Fragment>
-						<p className="u-text-bold">Select DFP</p>
+						<p className="u-text-bold">Select Google Ad Manager</p>
 						<SelectBox
 							onSelect={this.handleToggle}
 							options={dfpAccounts}
-							title="Select DFP Account"
+							title="Select Google Ad Manager"
 							selected={activeDFP}
 							id="accounts-dfp-select"
 							wrapperClassName="u-margin-v4"
