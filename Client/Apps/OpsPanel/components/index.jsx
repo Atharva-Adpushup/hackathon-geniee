@@ -6,7 +6,8 @@ import { OP_NAV_ITEMS, OP_NAV_ITEMS_INDEXES, OP_NAV_ITEMS_VALUES } from '../conf
 import ActionCard from '../../../Components/ActionCard';
 import Settings from './Settings/index';
 import ToolsContainer from '../containers/ToolsContainer';
-import SiteMapping from './SiteMapping/index';
+import SiteMappingContainer from '../containers/SiteMappingContainer'
+
 
 class OpsPanel extends Component {
 	state = {
@@ -57,7 +58,7 @@ class OpsPanel extends Component {
 			case OP_NAV_ITEMS_INDEXES.INFO_PANEL:
 				return 'Info Panel';
 			case OP_NAV_ITEMS_INDEXES.SITES_MAPPING:
-				return <SiteMapping {...this.props} />;
+				return <SiteMappingContainer {...this.props} />;
 			case OP_NAV_ITEMS_INDEXES.TOOLS:
 				return <ToolsContainer {...this.props} />;
 		}

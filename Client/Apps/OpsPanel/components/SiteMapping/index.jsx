@@ -204,11 +204,21 @@ class SiteMapping extends Component {
 	};
 
 	sendMail = () => {
-		const { selectedData, filteredData } = this.state;
-		const message = 'Are you sure you want to send the bulk mail ?';
-		if (window.confirm(message)) {
-			console.log('we are sending the bulk mail for you');
+		const { selectedData } = this.state;
+		const { showNotification } = this.props;
+
+		if (!selectedData.length) {
+			return showNotification({
+				mode: 'error',
+				title: 'Operation Failed',
+				message: 'Please select atleast 1 entry',
+				autoDismiss: 5
+			});
 		}
+		const message = 'Are you sure you want to send the bulk mail ?';
+		!window.confirm(message)
+			? console.log('You have selected no')
+			: console.log('we are sending the bulk mail for you');
 	};
 
 	render() {
