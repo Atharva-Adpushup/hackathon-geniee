@@ -340,11 +340,17 @@ const SITE_MAPPING_COLUMNS = [
 	},
 	{
 		Header: 'Domain',
-		accessor: 'domain'
+		accessor: 'domain',
+		width: 250,
+		maxWidth: 250,
+		minWidth: 250
 	},
 	{
 		Header: 'Owner Email',
-		accessor: 'accountEmail'
+		accessor: 'accountEmail',
+		width: 250,
+		maxWidth: 250,
+		minWidth: 250
 	},
 	{
 		Header: 'Onboarding Status',
@@ -406,62 +412,60 @@ const SITE_MAPPING_COLUMNS = [
 	}
 ];
 
-
 const SITE_MAPPING_FILTER_COLUMNS = [
 	{
 		name: 'Site Id',
-		prop: 'siteId',
-	
+		prop: 'siteId'
 	},
 	{
 		name: 'Domain',
-		prop: 'domain',
+		prop: 'domain'
 	},
 	{
 		name: 'Owner Email',
-		prop: 'accountEmail',
+		prop: 'accountEmail'
 	},
 	{
 		name: 'Onboarding Status',
-		prop: 'onboardingStatus',
+		prop: 'onboardingStatus'
 	},
 	{
 		name: 'Active Status',
-		prop: 'activeStatus',
+		prop: 'activeStatus'
 	},
 	{
 		name: 'Date Created',
-		prop: 'dateCreated',
+		prop: 'dateCreated'
 	},
 	{
 		name: 'Active Products',
-		prop: 'activeProducts',
+		prop: 'activeProducts'
 	},
 	{
 		name: 'Active Bidders',
-		prop: 'activeBidders',
+		prop: 'activeBidders'
 	},
 	{
 		name: 'Inactive Bidders',
-		prop: 'inactiveBidders',
+		prop: 'inactiveBidders'
 	},
 	{
 		name: 'Rev Share',
-		prop: 'revenueShare',
+		prop: 'revenueShare'
 	},
 	{
 		name: 'Publisher Id',
-		prop: 'publisherId',
+		prop: 'publisherId'
 	},
 	{
 		name: 'Auth Email',
-		prop: 'authEmail',
+		prop: 'authEmail'
 	},
 	{
 		name: 'Ad Manager',
-		prop: 'adManager',
+		prop: 'adManager'
 	}
-]
+];
 
 const MODE_TOOLTIP_TEXT = `ADPUSHUP:1 , FALLBACK:2`;
 const ERROR_TOOLTIP_TEXT = `NO_ERROR:1, PAGEGROUP_NOT_FOUND:2, FALLBACK_PLANNED:3, FALLBACK_FORCED:4, PAUSED_IN_EDITOR:5`;

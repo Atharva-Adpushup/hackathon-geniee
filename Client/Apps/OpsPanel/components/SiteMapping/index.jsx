@@ -67,7 +67,6 @@ class SiteMapping extends Component {
 	handleSingleCheckboxChange = (index, e) => {
 		const { checked, selectedData } = this.state;
 		const checkedCopy = checked;
-		// const select = selectedData;
 		const { filteredData } = this.state;
 		if (e.target.checked) {
 			checkedCopy[index] = e.target.checked;
