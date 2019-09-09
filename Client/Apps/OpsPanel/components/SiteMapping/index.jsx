@@ -18,6 +18,7 @@ import Loader from '../../../../Components/Loader/index';
 import { copyToClipBoard } from '../../../../helpers/commonFunctions';
 import CustomIcon from '../../../../Components/CustomIcon/index';
 import CustomButton from '../../../../Components/CustomButton';
+import CustomError from '../../../../Components/CustomError/index';
 import { REPORT_DOWNLOAD_ENDPOINT } from '../../../Reporting/configs/commonConsts';
 import { SITE_MAPPING_COLUMNS, SITE_MAPPING_FILTER_COLUMNS } from '../../configs/commonConsts';
 
@@ -30,6 +31,7 @@ class SiteMapping extends Component {
 			data: [],
 			filteredData: [],
 			isLoading: false,
+			isError: false,
 			selectAll: false,
 			checked: [],
 			selectedData: [],
@@ -45,9 +47,7 @@ class SiteMapping extends Component {
 				const { data = [] } = res.data;
 				this.setState({ data, filteredData: data, isLoading: false });
 			})
-			.catch(() => {
-				this.setState({ isLoading: false });
-			});
+			.catch(() => this.setState({ isLoading: false, isError: true }));
 	}
 
 	handleChange = () => {
@@ -119,29 +119,32 @@ class SiteMapping extends Component {
 		}
 	};
 
-	filteredDataWithICcon = data => {
+	filteredDataWithIcon = data => {
 		data.forEach(val => {
 			for (const key in val) {
-				// eslint-disable-next-line no-prototype-builtins
-				if (val.hasOwnProperty(key)) {
+				const showCopyIcon = !!(
 					val[key] === 'N/A' ||
 					(key === 'onboardingStatus' ||
 						key === 'dateCreated' ||
 						key === 'activeStatus' ||
 						key === 'revenueShare')
-						? (val[key] = <span> {val[key]}</span>)
-						: (val[key] = (
-								<span>
-									{val[key]}
-									<CustomIcon
-										icon="copy"
-										onClick={copyToClipBoard}
-										toReturn={val[key]}
-										className="u-text-red u-margin-l3 u-cursor-pointer site-mapping-copy"
-										title="copy content"
-									/>
-								</span>
-						  ));
+				);
+				// eslint-disable-next-line no-prototype-builtins
+				if (val.hasOwnProperty(key)) {
+					val[key] = showCopyIcon ? (
+						<span> {val[key]}</span>
+					) : (
+						<span>
+							{val[key]}
+							<CustomIcon
+								icon="copy"
+								onClick={copyToClipBoard}
+								toReturn={val[key]}
+								className="u-text-red u-margin-l3 u-cursor-pointer site-mapping-copy"
+								title="copy content"
+							/>
+						</span>
+					);
 				}
 			}
 		});
@@ -158,27 +161,9 @@ class SiteMapping extends Component {
 		return 50;
 	};
 
-	sendMail = () => {
-		const { selectedData, filteredData } = this.state;
-		const message = 'Are you sure you want to send the bulk mail ?';
-		if (window.confirm(message)) {
-			console.log('we are sending the bulk mail for you');
-		}
-	};
-
-	render() {
-		const { isLoading, filteredData, selectedData, fileName, checked, selectAll } = this.state;
-		let downloadLink;
-		let csvData;
-		const dataWithICon = clonedeep(filteredData);
-		if (!selectedData || selectedData.length === 0) {
-			csvData = btoa(JSON.stringify(filteredData));
-			downloadLink = `${REPORT_DOWNLOAD_ENDPOINT}?data=${csvData}&fileName=${fileName}`;
-		} else {
-			csvData = btoa(JSON.stringify(selectedData));
-			downloadLink = `${REPORT_DOWNLOAD_ENDPOINT}?data=${csvData}&fileName=${fileName}`;
-		}
-
+	renderContent = () => {
+		const { filteredData, isError, selectAll, checked } = this.state;
+		const dataWithIcon = clonedeep(filteredData);
 		const columns = [
 			{
 				Header: <input type="checkbox" onChange={this.handleChange} checked={selectAll} />,
@@ -198,6 +183,46 @@ class SiteMapping extends Component {
 
 			...SITE_MAPPING_COLUMNS
 		];
+		if (isError) {
+			return <CustomError />;
+		}
+		if (filteredData.length === 0) {
+			return <Empty message=" No Data found " />;
+		}
+		return (
+			<ReactTable
+				columns={columns}
+				data={this.filteredDataWithIcon(dataWithIcon)}
+				filterable={false}
+				showPaginationTop
+				showPaginationBottom={false}
+				className="u-padding-h3 u-padding-v2 site-mapping"
+				defaultPageSize={this.getDefaultPageSize()}
+				pageSizeOptions={[5, 10, 20, 25, 50, 100]}
+			/>
+		);
+	};
+
+	sendMail = () => {
+		const { selectedData, filteredData } = this.state;
+		const message = 'Are you sure you want to send the bulk mail ?';
+		if (window.confirm(message)) {
+			console.log('we are sending the bulk mail for you');
+		}
+	};
+
+	render() {
+		const { isLoading, filteredData, selectedData, fileName } = this.state;
+		let csvData, downloadLink;
+		try {
+			csvData =
+				selectedData.length === 0
+					? btoa(JSON.stringify(filteredData))
+					: btoa(JSON.stringify(selectedData));
+			downloadLink = `${REPORT_DOWNLOAD_ENDPOINT}?data=${csvData}&fileName=${fileName}`;
+		} catch (e) {
+			console.lof('Invalid input');
+		}
 
 		if (isLoading) return <Loader height="600px" classNames="u-margin-v3" />;
 
@@ -228,21 +253,7 @@ class SiteMapping extends Component {
 						Send Custom Mail
 					</CustomButton>
 				</Row>
-
-				{!filteredData || filteredData.length === 0 ? (
-					<Empty message=" No Data found " />
-				) : (
-					<ReactTable
-						columns={columns}
-						data={this.filteredDataWithICcon(dataWithICon)}
-						filterable={false}
-						showPaginationTop
-						showPaginationBottom={false}
-						className="u-padding-h3 u-padding-v2 site-mapping"
-						defaultPageSize={this.getDefaultPageSize()}
-						pageSizeOptions={[5, 10, 20, 25, 50, 100]}
-					/>
-				)}
+				{this.renderContent()}
 			</React.Fragment>
 		);
 	}
