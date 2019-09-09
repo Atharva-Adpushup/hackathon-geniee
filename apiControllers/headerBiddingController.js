@@ -9,6 +9,7 @@ const httpStatus = require('../configs/httpStatusConsts');
 const AdPushupError = require('../helpers/AdPushupError');
 const FormValidator = require('../helpers/FormValidator');
 const schema = require('../helpers/schema');
+const commonConsts = require('../configs/commonConsts');
 
 const router = express.Router();
 
@@ -75,18 +76,48 @@ router
 					user
 				)
 			)
-			.then(([biddersFound, inventoryFound, user]) =>
-				Promise.join(
+			.then(([biddersFound, inventoryFound, user]) => {
+				const activeAdServerData = user.getActiveAdServerData('dfp');
+				const isValidAdServer = !!activeAdServerData && !!activeAdServerData.activeDFPNetwork;
+				const isAdpushupDfp =
+					activeAdServerData &&
+					activeAdServerData.activeDFPNetwork ===
+						commonConsts.hbGlobalSettingDefaults.dfpAdUnitTargeting.networkId.toString();
+				const dfpConnected = isAdpushupDfp
+					? undefined
+					: isValidAdServer || !!user.getNetworkDataObj('DFP');
+				const adServerSetupCompleted = isAdpushupDfp
+					? undefined
+					: dfpConnected && Promise.resolve(false); // dfp line items automation (adserver setup) status
+
+				return Promise.join(
 					biddersFound,
 					inventoryFound,
-					Promise.resolve(true), // dfp line items automation (adserver setup) status
-					!!user.getNetworkDataObj('DFP')
-				)
-			)
-			.then(([biddersFound, inventoryFound, adServerSetupCompleted, dfpConnected]) =>
-				res
-					.status(httpStatus.OK)
-					.json({ dfpConnected, adServerSetupCompleted, inventoryFound, biddersFound })
+					isAdpushupDfp,
+					dfpConnected,
+					adServerSetupCompleted,
+					isAdpushupDfp
+						? commonConsts.hbGlobalSettingDefaults.dfpAdUnitTargeting.networkId
+						: undefined
+				);
+			})
+			.then(
+				([
+					biddersFound,
+					inventoryFound,
+					isAdpushupDfp,
+					dfpConnected,
+					adServerSetupCompleted,
+					adpushupNetworkCode
+				]) =>
+					res.status(httpStatus.OK).json({
+						dfpConnected,
+						adServerSetupCompleted,
+						inventoryFound,
+						biddersFound,
+						isAdpushupDfp,
+						adpushupNetworkCode
+					})
 			)
 			.catch(err => {
 				// eslint-disable-next-line no-console

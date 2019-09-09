@@ -8,7 +8,11 @@ class Setup extends React.Component {
 	$window = window;
 
 	componentDidMount() {
-		this.addPostMessageListener();
+		const {
+			setupStatus: { isAdpushupDfp, dfpConnected }
+		} = this.props;
+
+		if (!isAdpushupDfp && !dfpConnected) this.addPostMessageListener();
 	}
 
 	addPostMessageListener = () => {
@@ -69,7 +73,14 @@ class Setup extends React.Component {
 
 	renderMainContent = () => {
 		const {
-			setupStatus: { dfpConnected, adServerSetupCompleted, inventoryFound, biddersFound }
+			setupStatus: {
+				isAdpushupDfp,
+				dfpConnected,
+				adServerSetupCompleted,
+				inventoryFound,
+				biddersFound,
+				adpushupNetworkCode
+			}
 		} = this.props;
 
 		return (
@@ -79,21 +90,34 @@ class Setup extends React.Component {
 					further:
 				</p>
 				<ul className="text-points">
-					<li>Ad Manager is connect with AdPushup</li>
-					<li>Line Items, Key Value Pairs, and AdX should be configured with your Ad Manager</li>
-					<li>There is ad least one ad unit created on AdPushup</li>
+					{!isAdpushupDfp && (
+						<React.Fragment>
+							<li>Ad Manager is connected with AdPushup</li>
+							<li>
+								Line Items, Key Value Pairs, and AdX should be configured with your Ad Manager
+							</li>
+						</React.Fragment>
+					)}
+					<li>
+						There is at least one ad unit created on the AdPushup Tags, or Layout Editor, or
+						Innovative Ads
+					</li>
+					<li>There is atleast one bidder approved and integrated for your website</li>
 				</ul>
 				<ul className="u-padding-l0 u-margin-t5">
 					<li>
 						<span className="name">Ad Manager</span>
-						<span className="status">
-							{dfpConnected ? (
-								<FontAwesomeIcon icon="check" title="Ad Manager is connected" />
-							) : (
-								<FontAwesomeIcon icon="info-circle" title="Ad Manager not connected!" />
-							)}
-						</span>
-						{!dfpConnected && (
+						{isAdpushupDfp && <span>AdPushup Inc ({adpushupNetworkCode})</span>}
+						{!isAdpushupDfp && (
+							<span className="status">
+								{dfpConnected ? (
+									<FontAwesomeIcon icon="check" title="Ad Manager is connected" />
+								) : (
+									<FontAwesomeIcon icon="info-circle" title="Ad Manager not connected!" />
+								)}
+							</span>
+						)}
+						{!isAdpushupDfp && !dfpConnected && (
 							<span className="btn-wrap">
 								<CustomButton
 									variant="secondary"
@@ -105,27 +129,29 @@ class Setup extends React.Component {
 							</span>
 						)}
 					</li>
-					<li>
-						<span className="name">AdServer Setup</span>
-						<span className="status">
-							{adServerSetupCompleted ? (
-								<FontAwesomeIcon icon="check" title="AdServer Setup is completed" />
-							) : (
-								<FontAwesomeIcon icon="info-circle" title="AdServer Setup is pending!" />
-							)}
-						</span>
-						{!adServerSetupCompleted && (
-							<span className="btn-wrap">
-								<CustomButton
-									variant="secondary"
-									name="setupAdServer"
-									onClick={this.checkOrBeginDfpSetup}
-								>
-									Setup
-								</CustomButton>
+					{!isAdpushupDfp && (
+						<li>
+							<span className="name">AdServer Setup</span>
+							<span className="status">
+								{adServerSetupCompleted ? (
+									<FontAwesomeIcon icon="check" title="AdServer Setup is completed" />
+								) : (
+									<FontAwesomeIcon icon="info-circle" title="AdServer Setup is pending!" />
+								)}
 							</span>
-						)}
-					</li>
+							{!adServerSetupCompleted && (
+								<span className="btn-wrap">
+									<CustomButton
+										variant="secondary"
+										name="setupAdServer"
+										onClick={this.checkOrBeginDfpSetup}
+									>
+										Setup
+									</CustomButton>
+								</span>
+							)}
+						</li>
+					)}
 					<li>
 						<span className="name">Inventory</span>
 						<span className="status">
@@ -156,6 +182,9 @@ class Setup extends React.Component {
 						)}
 					</li>
 				</ul>
+				{!isAdpushupDfp && (
+					<p>Note: Ensure that Google AdX is connected and default for dynamic allocation.</p>
+				)}
 			</Row>
 		);
 	};

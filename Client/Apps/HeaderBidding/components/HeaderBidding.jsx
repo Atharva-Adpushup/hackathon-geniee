@@ -35,9 +35,20 @@ class HeaderBidding extends React.Component {
 
 	handleDefaultTab = (url, siteId) => {
 		const { setupStatus } = this.props;
-		const { inventoryFound, biddersFound } = setupStatus;
+		const {
+			isAdpushupDfp,
+			dfpConnected,
+			adServerSetupCompleted,
+			inventoryFound,
+			biddersFound
+		} = setupStatus;
 
-		if (url === `/sites/${siteId}/apps/header-bidding` && inventoryFound && biddersFound) {
+		if (
+			url === `/sites/${siteId}/apps/header-bidding` &&
+			(isAdpushupDfp || (dfpConnected && adServerSetupCompleted)) &&
+			inventoryFound &&
+			biddersFound
+		) {
 			this.setState({
 				redirectUrl: `/sites/${siteId}/apps/header-bidding/${NAV_ITEMS_INDEXES.TAB_2}`
 			});
@@ -66,7 +77,13 @@ class HeaderBidding extends React.Component {
 	handleNavSelect = value => {
 		const {
 			// eslint-disable-next-line no-unused-vars
-			setupStatus: { dfpConnected, adServerSetupCompleted, inventoryFound, biddersFound }
+			setupStatus: {
+				isAdpushupDfp,
+				dfpConnected,
+				adServerSetupCompleted,
+				inventoryFound,
+				biddersFound
+			}
 		} = this.props;
 		const siteId = this.getSiteId();
 		const computedRedirectUrl = `/sites/${siteId}/apps/header-bidding`;
@@ -78,12 +95,13 @@ class HeaderBidding extends React.Component {
 				break;
 
 			case 2:
-				if (!adServerSetupCompleted) return false;
+				if (!isAdpushupDfp && (!dfpConnected || !adServerSetupCompleted)) return false;
 				redirectUrl = `${computedRedirectUrl}/${NAV_ITEMS_INDEXES.TAB_2}`;
 				break;
 
 			case 3:
-				if (!adServerSetupCompleted || !inventoryFound) return false;
+				if ((!isAdpushupDfp && (!dfpConnected || !adServerSetupCompleted)) || !inventoryFound)
+					return false;
 				redirectUrl = `${computedRedirectUrl}/${NAV_ITEMS_INDEXES.TAB_3}`;
 				break;
 			case 4:
@@ -178,25 +196,37 @@ class HeaderBidding extends React.Component {
 		const activeItem = NAV_ITEMS[activeTab];
 		const {
 			// eslint-disable-next-line no-unused-vars
-			setupStatus: { dfpConnected, adServerSetupCompleted, inventoryFound, biddersFound }
+			setupStatus: {
+				isAdpushupDfp,
+				dfpConnected,
+				adServerSetupCompleted,
+				inventoryFound,
+				biddersFound
+			}
 		} = this.props;
 
 		return (
 			<div>
 				<Nav bsStyle="tabs" activeKey={activeItem.INDEX} onSelect={this.handleNavSelect}>
-					{(!inventoryFound || !biddersFound) && (
-						<NavItem eventKey={1}>{NAV_ITEMS_VALUES.TAB_1}</NavItem>
-					)}
+					{((!isAdpushupDfp && (!dfpConnected || !adServerSetupCompleted)) ||
+						!inventoryFound ||
+						!biddersFound) && <NavItem eventKey={1}>{NAV_ITEMS_VALUES.TAB_1}</NavItem>}
 					<NavItem
 						eventKey={2}
 						// eslint-disable-next-line no-constant-condition
-						className={!adServerSetupCompleted ? 'disabled' : ''}
+						className={
+							!isAdpushupDfp && (!dfpConnected || !adServerSetupCompleted) ? 'disabled' : ''
+						}
 					>
 						{NAV_ITEMS_VALUES.TAB_2}
 					</NavItem>
 					<NavItem
 						eventKey={3}
-						className={!adServerSetupCompleted || !inventoryFound ? 'disabled' : ''}
+						className={
+							(!isAdpushupDfp && (!dfpConnected || !adServerSetupCompleted)) || !inventoryFound
+								? 'disabled'
+								: ''
+						}
 					>
 						{NAV_ITEMS_VALUES.TAB_3}
 					</NavItem>
