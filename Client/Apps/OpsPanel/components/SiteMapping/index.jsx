@@ -221,7 +221,7 @@ class SiteMapping extends Component {
 					: btoa(JSON.stringify(selectedData));
 			downloadLink = `${REPORT_DOWNLOAD_ENDPOINT}?data=${csvData}&fileName=${fileName}`;
 		} catch (e) {
-			console.lof('Invalid input');
+			console.log('Invalid input');
 		}
 
 		if (isLoading) return <Loader height="600px" classNames="u-margin-v3" />;
