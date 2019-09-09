@@ -7,6 +7,9 @@ import ReactTable from 'react-table';
 import clonedeep from 'lodash/cloneDeep';
 import 'react-table/react-table.css';
 import { Glyphicon, Row } from 'react-bootstrap';
+import { faMailBulk } from '@fortawesome/free-solid-svg-icons';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import axiosInstance from '../../../../helpers/axiosInstance';
 import FilterBox from '../../../../Components/FilterBox';
@@ -14,8 +17,11 @@ import Empty from '../../../../Components/Empty/index';
 import Loader from '../../../../Components/Loader/index';
 import { copyToClipBoard } from '../../../../helpers/commonFunctions';
 import CustomIcon from '../../../../Components/CustomIcon/index';
+import CustomButton from '../../../../Components/CustomButton';
 import { REPORT_DOWNLOAD_ENDPOINT } from '../../../Reporting/configs/commonConsts';
 import { SITE_MAPPING_COLUMNS, SITE_MAPPING_FILTER_COLUMNS } from '../../configs/commonConsts';
+
+library.add(faMailBulk);
 
 class SiteMapping extends Component {
 	constructor() {
@@ -153,6 +159,14 @@ class SiteMapping extends Component {
 		return 50;
 	};
 
+	sendMail = () => {
+		const { selectedData, filteredData } = this.state;
+		const message = 'Are you sure you want to send the bulk mail ?';
+		if (window.confirm(message)) {
+			console.log('we are sending the bulk mail for you');
+		}
+	};
+
 	render() {
 		const { isLoading, filteredData, selectedData, fileName, checked, selectAll } = this.state;
 		let downloadLink;
@@ -190,29 +204,32 @@ class SiteMapping extends Component {
 
 		return (
 			<React.Fragment>
+				<FilterBox
+					onFilter={this.onFilter}
+					availableFilters={this.handleFilterValues(SITE_MAPPING_FILTER_COLUMNS)}
+					handleFilters={this.handleFilters}
+					className="u-margin-v5 u-margin-h4 "
+				/>
 				<Row>
-					<div className="col-md-10">
-						<FilterBox
-							onFilter={this.onFilter}
-							availableFilters={this.handleFilterValues(SITE_MAPPING_FILTER_COLUMNS)}
-							handleFilters={this.handleFilters}
-							className="u-margin-v5 u-margin-h4 "
-						/>
-					</div>
-					<div className="col-md-2">
-						<a
-							href={downloadLink}
-							style={{
-								height: 33,
-								paddingTop: 8
-							}}
-							className="btn btn-lightBg btn-default btn-blue-line pull-right u-margin-r2 u-margin-t5"
-						>
-							<Glyphicon glyph="download-alt u-margin-r2" />
-							Export Report
-						</a>
-					</div>
+					<CustomButton
+						variant="primary"
+						href={downloadLink}
+						className="btn btn-lightBg btn-default btn-blue-line pull-right u-margin-r3 u-margin-b4 "
+					>
+						<Glyphicon glyph="download-alt u-margin-r2" />
+						Export Report
+					</CustomButton>
+
+					<CustomButton
+						variant="secondary"
+						className=" pull-right u-margin-r3 u-margin-b4 "
+						onClick={this.sendMail}
+					>
+						<FontAwesomeIcon size="1x" icon={faMailBulk} className="u-margin-r3" />
+						Send Custom Mail
+					</CustomButton>
 				</Row>
+
 				{!filteredData || filteredData.length === 0 ? (
 					<Empty message=" No Data found " />
 				) : (
