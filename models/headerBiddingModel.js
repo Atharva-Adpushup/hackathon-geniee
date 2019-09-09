@@ -3,14 +3,12 @@ module.exports = apiModule();
 const model = require('../helpers/model');
 const couchbase = require('../helpers/couchBaseService');
 const AdPushupError = require('../helpers/AdPushupError');
-const schema = require('../helpers/schema');
-const FormValidator = require('../helpers/FormValidator');
-const utils = require('../helpers/utils');
 const siteModel = require('./siteModel');
 const userModel = require('./userModel');
 const channelModel = require('./channelModel');
 const hbVideoParamsMap = require('../configs/hbVideoParamsMap');
 const commonFunctions = require('../helpers/commonFunctions');
+const { docKeys } = require('../configs/commonConsts');
 
 const HeaderBidding = model.extend(function() {
 	this.keys = [
@@ -40,7 +38,7 @@ const HeaderBidding = model.extend(function() {
 		if (!(data.siteId && data.siteDomain && data.email)) {
 			throw new Error('siteId, siteDomain and publisher email required for header bidding doc');
 		}
-		this.key = `hbcf::${data.siteId}`;
+		this.key = `${docKeys.hb}${data.siteId}`;
 		this.super(data, !!cas);
 		this.casValue = cas; // if user is loaded from database which will be almost every time except first, this value will be thr
 	};
@@ -64,7 +62,7 @@ function apiModule() {
 		getAllBiddersFromNetworkConfig() {
 			return couchbase
 				.connectToAppBucket()
-				.then(appBucket => appBucket.getAsync('data::apNetwork'))
+				.then(appBucket => appBucket.getAsync(docKeys.networkConfig))
 				.then(({ value: networks }) => {
 					const hbBidders = {};
 
@@ -135,11 +133,12 @@ function apiModule() {
 						hbVideoParamsMap.conversant.params
 					);
 
-					if (!isParamsExist) bidderParams = {
-						...bidderParams,
-						...hbVideoParamsMap.conversant.params
-					};
-					
+					if (!isParamsExist)
+						bidderParams = {
+							...bidderParams,
+							...hbVideoParamsMap.conversant.params
+						};
+
 					break;
 				}
 				case 'rubicon': {
@@ -148,7 +147,7 @@ function apiModule() {
 						hbVideoParamsMap.rubicon.params
 					);
 
-					if (!isParamsExist){
+					if (!isParamsExist) {
 						bidderParams = {
 							...bidderParams,
 							...hbVideoParamsMap.rubicon.params
@@ -156,7 +155,7 @@ function apiModule() {
 					}
 
 					// TODO: set player size
-					
+
 					break;
 				}
 				case 'ix': {
@@ -168,7 +167,7 @@ function apiModule() {
 								hbVideoParamsMap.ix.params
 							);
 
-							if (!isParamsExist){
+							if (!isParamsExist) {
 								bidderParams[size] = {
 									...bidderParams[size],
 									...hbVideoParamsMap.ix.params
@@ -199,7 +198,8 @@ function apiModule() {
 
 					break;
 				}
-				default: {}
+				default: {
+				}
 			}
 
 			return bidderParams;
@@ -213,7 +213,7 @@ function apiModule() {
 						hbVideoParamsMap.conversant.params
 					);
 
-					if (isParamsExist){
+					if (isParamsExist) {
 						bidderParams = commonFunctions.deleteKeysInCollection(
 							bidderParams,
 							hbVideoParamsMap.conversant.params
@@ -279,7 +279,8 @@ function apiModule() {
 
 					break;
 				}
-				default: { }
+				default: {
+				}
 			}
 
 			return bidderParams;
@@ -287,7 +288,7 @@ function apiModule() {
 		getHbConfig(siteId) {
 			return couchbase
 				.connectToAppBucket()
-				.then(appBucket => appBucket.getAsync(`hbcf::${siteId}`))
+				.then(appBucket => appBucket.getAsync(`${docKeys.hb}${siteId}`))
 				.then(json => new HeaderBidding(json.value, json.cas))
 				.catch(err => {
 					if (err.code === 13) {

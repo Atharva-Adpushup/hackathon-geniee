@@ -35,22 +35,20 @@ const commonConsts = {
 			'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 15 15"><path d="M3.25,3.25l8.5,8.5M11.75,3.25l-8.5,8.5"></path></svg>',
 		CSS: {
 			COMMON: {
-				// position: 'absolute',
-				// top: 0,
-				// right: 0,
-				float: 'right',
+				position: 'absolute',
+				top: '2px',
+				right: '2px',
 				height: '15px',
 				width: '15px',
 				stroke: '#fff',
 				cursor: 'pointer',
-				'stroke-width': 1.25,
-				top: -15
+				'stroke-width': 1.25
 			},
 			BOTTOM: {
-				top: -15
+				// top: -15
 			},
 			TOP: {
-				bottom: -15
+				// bottom: -15
 			}
 		}
 	},
@@ -58,24 +56,22 @@ const commonConsts = {
 		HEIGHT: 20,
 		TEXT: 'Ads by',
 		IMAGE: 'https://console.adpushup.com/assets/images/logo-white-200X50.png',
-		REDIRECT_URL: 'https://campaign.adpushup.com/get-started/?utm_source=banner&utm_campaign=growth_hack',
+		REDIRECT_URL:
+			'https://campaign.adpushup.com/get-started/?utm_source=banner&utm_campaign=growth_hack',
 		CSS: {
 			COMMON: {
 				color: '#fff',
 				fontFamily: 'sans-serif',
 				fontSize: 9,
-				// background: '#222',
 				display: 'inline-block',
 				padding: '2px 6px',
-				// position: 'absolute',
-				textDecoration: 'none',
-				float: 'left'
-				// left: 0
+				textDecoration: 'none'
 			},
 			LOGO: {
-				'max-width': '50px',
+				'max-width': '75px',
+				height: '14px',
+				'vertical-align': 'middle',
 				'margin-left': '2px'
-				// background: '#fff'
 			}
 		}
 	},
@@ -85,7 +81,11 @@ const commonConsts = {
 				background: 'rgba(0,0,0,0.5)',
 				'padding-bottom': '2px',
 				'max-height': '20px',
-				margin: '0px auto'
+				margin: '0px auto',
+				position: 'relative'
+			},
+			DISABLED_BANNER: {
+				height: '20px'
 			},
 			LEFT: {},
 			RIGHT: {},

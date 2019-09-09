@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 import React from 'react';
 import { Panel, Button } from 'react-bootstrap';
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -19,8 +20,10 @@ import OverlayTooltip from '../../../Components/OverlayTooltip/index';
 import Card from '../../../Components/Layout/Card';
 import OnboardingCard from '../../../Components/OnboardingCard';
 import CustomButton from '../../../Components/CustomButton';
+import CustomIcon from '../../../Components/CustomIcon';
 import reportService from '../../../services/reportService';
 import Loader from '../../../Components/Loader/index';
+import { getOnboardingTemplateData } from '../../../helpers/commonFunctions';
 
 import {
 	SITE_SETUP_STATUS,
@@ -56,6 +59,7 @@ class MySites extends React.Component {
 		const { reportsMeta, fetchReportingMeta } = this.props;
 
 		if (!isSites) {
+			this.hideUILoader();
 			return false;
 		}
 
@@ -77,6 +81,7 @@ class MySites extends React.Component {
 	}
 
 	componentWillReceiveProps(props) {
+		// TODO: Remove WillReceiveProps and render sites directly from props, compute validate sites in renderMethod only and test
 		const sites = this.getValidSites(props);
 		this.setState({ sites });
 	}
@@ -162,6 +167,14 @@ class MySites extends React.Component {
 
 				updateSiteData(defaultData);
 			});
+	};
+
+	deleteSite = ({ siteId, domanizeDomain }) => {
+		if (window.confirm(`Are you sure you want to delete the site -- ${domanizeDomain}?`)) {
+			const { deleteSite } = this.props;
+			return deleteSite(siteId);
+		}
+		return null;
 	};
 
 	checkValidAppStatusInReportData(siteId) {
@@ -310,6 +323,20 @@ class MySites extends React.Component {
 											className="aligner aligner-item aligner--hCenter card-header-icon"
 										/>
 									</OverlayTooltip>
+									{(isAppStatuses || isValidAppStatusInReportData) && (
+										<OverlayTooltip
+											id={`tooltip-site-delete-${siteId}`}
+											placement="top"
+											tooltip="Delete Website"
+										>
+											<CustomIcon
+												icon="trash"
+												onClick={this.deleteSite}
+												toReturn={{ siteId, domanizeDomain }}
+												className="aligner aligner-item aligner--hCenter card-header-icon u-text-info u-cursor-pointer"
+											/>
+										</OverlayTooltip>
+									)}
 								</div>
 							}
 							bodyClassName="card-body"
@@ -353,8 +380,7 @@ class MySites extends React.Component {
 	renderOnboardingCard() {
 		const { sites } = this.props;
 		const site = sites[Object.keys(sites)[0]];
-		const computedLinkUrl = `/onboarding?siteId=${site.siteId}`;
-		const computedButtonText = `Continue with ${site.domain}`;
+		const { linkUrl, buttonText } = getOnboardingTemplateData(site);
 
 		return (
 			<OnboardingCard
@@ -366,8 +392,8 @@ class MySites extends React.Component {
 				heading="Complete Onboarding Setup"
 				description="Please complete your site onboarding setup by clicking below."
 			>
-				<Link to={computedLinkUrl} className="u-link-reset u-margin-t4 aligner aligner-item">
-					<CustomButton>{computedButtonText}</CustomButton>
+				<Link to={linkUrl} className="u-link-reset u-margin-t4 aligner aligner-item">
+					<CustomButton>{buttonText}</CustomButton>
 				</Link>
 			</OnboardingCard>
 		);

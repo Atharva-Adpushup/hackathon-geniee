@@ -76,8 +76,8 @@ var hb = {
 							context: constants.PREBID.VIDEO_FORMAT_TYPE,
 							playerSize: prebidSizes[0],
 							mimes: ['video/mp4', 'video/x-ms-wmv'],
-							protocols: [2,5],
-							maxduration:30,
+							protocols: [2, 5],
+							maxduration: 30,
 							linearity: 1,
 							api: [2]
 						};
@@ -120,7 +120,7 @@ var hb = {
         */
 		if (HB_ACTIVE) {
 			(function() {
-				require('../../../../../adpushup.js/modules/adpTags/Prebid-latest/build/dist/prebid');
+				require('../../../../../adpushup.js/modules/adpTags/Prebid.js/build/dist/prebid');
 			})();
 		}
 

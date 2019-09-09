@@ -45,12 +45,15 @@ export default class ManageBidder extends React.Component {
 
 		return (
 			<div className="options-wrapper white-tab-container hb-bidder hb-manage-bidder">
-				<header>
-					<h3>Manage {bidderConfig.name}</h3>
-				</header>
 				<Row>
 					<Col md={4}>
-						<h4>Partner Configuration</h4>
+						<h2 className="u-margin-0">Manage {bidderConfig.name}</h2>
+						<h3>Partner Configuration</h3>
+						<p>
+							Please fill in all the required fields. If you do not have this data, please contact
+							the demand partner. If you would like AdPushup to get your website approved for this
+							partner, please click here.
+						</p>
 					</Col>
 					<Col md={8}>
 						{bidderConfig.sizeLess ? (

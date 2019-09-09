@@ -3,11 +3,12 @@ import { fetchReportingMeta } from '../../../actions/globalActions';
 import Panel from '../components/Panel';
 
 const mapStateToProps = (state, ownProps) => {
-	const { reports, sites } = state.global;
+	const { reports, sites, user } = state.global;
 	return {
 		...ownProps,
 		reportsMeta: reports,
-		userSites: sites.fetched ? sites.data : {}
+		userSites: sites.fetched ? sites.data : {},
+		user
 	};
 };
 

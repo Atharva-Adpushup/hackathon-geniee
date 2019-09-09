@@ -18,8 +18,14 @@ import {
 	opsDimension,
 	opsFilter
 } from '../configs/commonConsts';
+import { DEMO_ACCOUNT_DATA } from '../../../constants/others';
 import Loader from '../../../Components/Loader';
 import { convertObjToArr } from '../helpers/utils';
+import {
+	getReportingDemoUserValidation,
+	getReportingDemoUserSiteIds,
+	getDemoUserSites
+} from '../../../helpers/commonFunctions';
 
 class Panel extends Component {
 	constructor(props) {
@@ -33,6 +39,7 @@ class Panel extends Component {
 			selectedFilters: {},
 			selectedMetrics: [],
 			selectedInterval: 'daily',
+			selectedChartLegendMetric: '',
 			startDate: moment()
 				.startOf('day')
 				.subtract(7, 'days')
@@ -51,14 +58,19 @@ class Panel extends Component {
 	}
 
 	componentDidMount() {
-		const { reportsMeta, userSites, fetchReportingMeta } = this.props;
-		const userSitesStr = Object.keys(userSites).toString();
+		const { userSites, fetchReportingMeta, reportsMeta } = this.props;
+		const { email, reportType } = this.getDemoUserParams();
+		let userSitesStr = Object.keys(userSites).toString();
+
+		userSitesStr = getReportingDemoUserSiteIds(userSitesStr, email, reportType);
 
 		if (!reportsMeta.fetched) {
 			return reportService.getMetaData({ sites: userSitesStr }).then(response => {
-				const { data } = response;
-				fetchReportingMeta(data);
-				return this.getContentInfo(data);
+				let { data: computedData } = response;
+
+				computedData = getDemoUserSites(computedData, email);
+				fetchReportingMeta(computedData);
+				return this.getContentInfo(computedData);
 			});
 		}
 
@@ -117,10 +129,22 @@ class Panel extends Component {
 
 	onControlChange = data => {
 		const params = this.getControlChangedParams(data);
+
 		this.setState({
-			...params,
-			...data
+			...params
 		});
+	};
+
+	getDemoUserParams = () => {
+		const {
+			user: {
+				data: { email }
+			}
+		} = this.props;
+		const { reportType } = this.state;
+		const computedObject = { email, reportType };
+
+		return computedObject;
 	};
 
 	getControlChangedParams = controlParams => {
@@ -131,11 +155,13 @@ class Panel extends Component {
 		let disabledDimension = [];
 		let disabledMetrics = [];
 		const dimensionObj = dimensionList[selectedDimension];
+
 		if (dimensionObj) {
 			disabledFilter = dimensionObj.disabled_filter || disabledFilter;
 			disabledDimension = dimensionObj.disabled_dimension || disabledDimension;
 			disabledMetrics = dimensionObj.disabled_metrics || disabledMetrics;
 		}
+
 		Object.keys(selectedFilters).forEach(selectedFilter => {
 			const filterObj = filterList[selectedFilter];
 			if (filterObj && !isEmpty(selectedFilters[selectedFilter])) {
@@ -144,10 +170,12 @@ class Panel extends Component {
 				disabledMetrics = union(filterObj.disabled_metrics, disabledMetrics);
 			}
 		});
+
 		if (reportType == 'account') {
 			disabledFilter = union(accountDisableFilter, disabledFilter);
 			disabledDimension = union(accountDisableDimension, disabledDimension);
 		}
+
 		const updatedControlList = this.disableControl(
 			disabledFilter,
 			disabledDimension,
@@ -171,12 +199,15 @@ class Panel extends Component {
 			metricsList
 		} = this.state;
 		const { userSites } = this.props;
+		const { email, reportType } = this.getDemoUserParams();
 		let selectedMetrics;
+
 		if (metricsList) {
 			selectedMetrics = metricsList
 				.filter(metric => !metric.isDisabled)
 				.map(metric => metric.value);
 		}
+
 		const params = {
 			fromDate: moment(startDate).format('YYYY-MM-DD'),
 			toDate: moment(endDate).format('YYYY-MM-DD'),
@@ -184,22 +215,28 @@ class Panel extends Component {
 			interval: selectedInterval,
 			dimension: selectedDimension || null
 		};
+
 		Object.keys(selectedFilters).forEach(filter => {
 			const filters = Object.keys(selectedFilters[filter]);
 			params[filter] = filters.length > 0 ? filters.toString() : null;
 		});
+
 		if (!params.siteid) {
 			const siteIds = Object.keys(userSites);
 			params.siteid = siteIds.toString();
 		}
+
+		params.siteid = getReportingDemoUserSiteIds(params.siteid, email, reportType);
 		return params;
 	};
 
-	generateButtonHandler = () => {
+	generateButtonHandler = (inputState = {}) => {
 		let { tableData } = this.state;
-		const params = this.formateReportParams();
+		const computedState = Object.assign({ isLoading: true }, inputState);
 
-		this.setState({ isLoading: true }, () => {
+		this.setState(computedState, () => {
+			const params = this.formateReportParams();
+
 			reportService.getCustomStats(params).then(response => {
 				if (Number(response.status) === 200 && response.data) {
 					tableData = response.data;
@@ -220,6 +257,7 @@ class Panel extends Component {
 			selectedDimension,
 			selectedFilters,
 			selectedInterval,
+			selectedChartLegendMetric,
 			reportType,
 			startDate,
 			endDate
@@ -231,23 +269,38 @@ class Panel extends Component {
 			location: { search: queryParams },
 			userSites
 		} = this.props;
+		const { email } = this.getDemoUserParams();
 		const { site: reportingSites, interval: intervalsObj } = reportsMetaData;
 		const selectedControls = qs.parse(queryParams);
 		const isValidSite = !!(userSites && userSites[siteId] && userSites[siteId].siteDomain);
-		const isReportingSite = !!(reportingSites && reportingSites[siteId]);
+		const isReportingData = !!reportingSites;
+		const { isValid } = getReportingDemoUserValidation(email, reportType);
+		const {
+			DEFAULT_SITE: { SITE_ID }
+		} = DEMO_ACCOUNT_DATA;
+		const isDemoUserReportingSite = !!(isValid && isReportingData && reportingSites[SITE_ID]);
+		const isReportingSite = !!(
+			isReportingData &&
+			(reportingSites[siteId] || isDemoUserReportingSite)
+		);
+		const computedSiteId = isDemoUserReportingSite ? SITE_ID : siteId;
+
 		if (siteId) {
 			reportType = 'site';
 			if (isValidSite && isReportingSite) {
-				selectedFilters = { siteid: { [siteId]: true } };
+				selectedFilters = { siteid: { [computedSiteId]: true } };
 			}
 		}
+
 		if (Object.keys(selectedControls).length > 0) {
-			const { dimension, interval, fromDate, toDate } = selectedControls;
+			const { dimension, interval, fromDate, toDate, chartLegendMetric } = selectedControls;
 			selectedDimension = dimension;
 			selectedInterval = interval || 'daily';
+			selectedChartLegendMetric = chartLegendMetric;
 			startDate = fromDate;
 			endDate = toDate;
 		}
+
 		const { dimensionList, filterList, metricsList } = this.getControlChangedParams({
 			startDate,
 			endDate,
@@ -257,6 +310,7 @@ class Panel extends Component {
 			reportType
 		});
 		const intervalList = convertObjToArr(intervalsObj);
+
 		this.setState(
 			{
 				startDate,
@@ -264,6 +318,7 @@ class Panel extends Component {
 				selectedInterval,
 				selectedDimension,
 				selectedFilters,
+				selectedChartLegendMetric,
 				reportType,
 				dimensionList,
 				filterList,
@@ -280,6 +335,7 @@ class Panel extends Component {
 			selectedFilters,
 			selectedInterval,
 			selectedMetrics,
+			selectedChartLegendMetric,
 			reportType,
 			startDate,
 			endDate,
@@ -292,6 +348,9 @@ class Panel extends Component {
 			filterList,
 			tableData
 		} = this.state;
+		const { email } = this.getDemoUserParams();
+		const { isValid } = getReportingDemoUserValidation(email, reportType);
+
 		if (reportType == 'site') {
 			if (!isValidSite)
 				return this.renderEmptyMessage(
@@ -299,6 +358,7 @@ class Panel extends Component {
 				);
 			if (!isReportingSite) return this.renderEmptyMessage('No Data Available');
 		}
+
 		return (
 			<Row>
 				<Col sm={12}>
@@ -317,6 +377,7 @@ class Panel extends Component {
 						selectedInterval={selectedInterval}
 						reportType={reportType}
 						csvData={csvData}
+						isDemoUser={isValid}
 					/>
 				</Col>
 				<Col sm={12} className="u-margin-t5">
@@ -327,6 +388,7 @@ class Panel extends Component {
 						endDate={endDate}
 						metricsList={metricsList}
 						selectedInterval={selectedInterval}
+						selectedChartLegendMetric={selectedChartLegendMetric}
 					/>
 				</Col>
 				<Col sm={12} className="u-margin-t5">
@@ -346,9 +408,11 @@ class Panel extends Component {
 	render() {
 		const { isLoading } = this.state;
 		const { reportsMeta } = this.props;
+
 		if (!reportsMeta.fetched || isLoading) {
 			return <Loader />;
 		}
+
 		return <ActionCard title="AdPushup Reports">{this.renderContent()}</ActionCard>;
 	}
 }

@@ -4,14 +4,27 @@ import groupBy from 'lodash/groupBy';
 import sortBy from 'lodash/sortBy';
 import moment from 'moment';
 import CustomChart from '../../../Components/CustomChart';
-import { activeLegendItem, activeLegendItemArray } from '../configs/commonConsts';
+import {
+	activeLegendItem,
+	activeLegendItemArray,
+	displayMetrics,
+	AP_REPORTING_ACTIVE_CHART_LEGENDS_STORAGE_KEY,
+	TERMS,
+	METRICS
+} from '../configs/commonConsts';
+import {
+	getValidArray,
+	getValidObject,
+	getItemFromLocalStorage,
+	setItemToLocalStorage
+} from '../helpers/utils';
 
 class Chart extends React.Component {
 	constructor(props) {
 		super(props);
 		const { selectedDimension } = props;
 		const xAxis = this.enumerateDaysBetweenDates();
-		const activeLegendItems = selectedDimension ? activeLegendItem : activeLegendItemArray;
+		const activeLegendItems = this.getActiveLegendItems();
 		const series = this.updateChartData(activeLegendItems, xAxis);
 		const legends = this.computeLegends();
 		this.state = {
@@ -71,6 +84,103 @@ class Chart extends React.Component {
 
 		xAxis.categories = dates;
 		return xAxis;
+	};
+
+	checkValidChartLegendMetric = (
+		selectedDimension,
+		selectedChartLegendMetric,
+		activeItemsByChartLegendMetric
+	) => {
+		const { PAGE_VARIATION_TYPE } = TERMS;
+		const {
+			ADPUSHUP_PAGE_CPM: { value: adpushupPageCPM }
+		} = METRICS;
+		const isValid = !!(
+			selectedDimension &&
+			selectedChartLegendMetric &&
+			(selectedDimension === PAGE_VARIATION_TYPE &&
+				selectedChartLegendMetric === adpushupPageCPM) &&
+			activeItemsByChartLegendMetric.length
+		);
+
+		return isValid;
+	};
+
+	getActiveLegendItems = () => {
+		const { selectedDimension, selectedChartLegendMetric } = this.props;
+		let computedItems = [];
+		const activeItemsFromLocalStorage = this.getActiveLegendItemsFromLocalStorage();
+		const activeItemsByChartLegendMetric = displayMetrics.filter(
+			legendItem => legendItem.value === selectedChartLegendMetric
+		);
+		const isValidChartLegendMetricItems = this.checkValidChartLegendMetric(
+			selectedDimension,
+			selectedChartLegendMetric,
+			activeItemsByChartLegendMetric
+		);
+
+		if (isValidChartLegendMetricItems) {
+			[computedItems] = activeItemsByChartLegendMetric;
+		} else if (activeItemsFromLocalStorage) {
+			computedItems = activeItemsFromLocalStorage;
+		} else if (selectedDimension) {
+			computedItems = activeLegendItem;
+		} else {
+			computedItems = activeLegendItemArray;
+		}
+
+		return computedItems;
+	};
+
+	getTransformedLocalStorageItem = item => {
+		const { selectedDimension } = this.props;
+		const isValidItem = !!item;
+		const isItemArray = !!(isValidItem && getValidArray(item));
+		const isItemObject = !!(isValidItem && getValidObject(item));
+		const isValidLocalStorageItems = !!(isValidItem && (isItemArray || isItemObject));
+		const isItemArrayWithSelectedDimension = !!(isItemArray && selectedDimension);
+		const isItemObjectWithNoSelectedDimension = !!(isItemObject && !selectedDimension);
+
+		if (!isValidLocalStorageItems) {
+			return false;
+		}
+
+		let computedItem = item;
+
+		if (isItemArrayWithSelectedDimension) {
+			computedItem = item.concat([]);
+			[computedItem] = computedItem;
+		} else if (isItemObjectWithNoSelectedDimension) {
+			computedItem = { ...item };
+			computedItem = [computedItem];
+		}
+
+		return computedItem;
+	};
+
+	getActiveLegendItemsFromLocalStorage = () => {
+		let item = getItemFromLocalStorage(AP_REPORTING_ACTIVE_CHART_LEGENDS_STORAGE_KEY);
+
+		try {
+			item = JSON.parse(window.atob(item));
+		} catch (e) {
+			item = false;
+		}
+
+		item = this.getTransformedLocalStorageItem(item);
+
+		if (!item) {
+			return false;
+		}
+
+		return item;
+	};
+
+	setActiveLegendItemsToLocalStorage = item => {
+		let computedItem = this.getTransformedLocalStorageItem(item);
+
+		computedItem = window.btoa(JSON.stringify(computedItem));
+		setItemToLocalStorage(AP_REPORTING_ACTIVE_CHART_LEGENDS_STORAGE_KEY, computedItem);
 	};
 
 	getGroupByResult = rows => {
@@ -153,6 +263,8 @@ class Chart extends React.Component {
 
 	onLegendChange = activeLegendItems => {
 		const series = this.updateChartData(activeLegendItems);
+
+		this.setActiveLegendItemsToLocalStorage(activeLegendItems);
 		this.setState({
 			series,
 			activeLegendItems
@@ -161,9 +273,10 @@ class Chart extends React.Component {
 
 	updateChartData = (activeLegendItems, xAxisData) => {
 		const { tableData } = this.props;
-		const xAxis = xAxisData || this.state.xAxis;
+		const { xAxis } = this.state || {};
+		const computedXAxisData = xAxisData || xAxis;
 		const groupByResult = this.getGroupByResult(tableData.result);
-		const series = this.getSeriesData(groupByResult, xAxis, activeLegendItems);
+		const series = this.getSeriesData(groupByResult, computedXAxisData, activeLegendItems);
 		return series;
 	};
 

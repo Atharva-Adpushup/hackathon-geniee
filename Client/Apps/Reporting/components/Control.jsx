@@ -14,6 +14,7 @@ import {
 	opsFilter,
 	REPORT_DOWNLOAD_ENDPOINT
 } from '../configs/commonConsts';
+import { getReportingControlDemoUserSites } from '../../../helpers/commonFunctions';
 
 class Control extends Component {
 	constructor(props) {
@@ -43,19 +44,19 @@ class Control extends Component {
 		this.getReportStatus();
 	}
 
-	shouldComponentUpdate(nextProps, nextState) {
-		return (
-			this.state.reportType !== nextState.reportType ||
-			this.state.updateStatusText !== nextState.updateStatusText
-		);
-	}
-
 	componentWillReceiveProps(nextProps) {
 		const isValidNextProps = !!(nextProps && nextProps.csvData);
 
 		if (isValidNextProps) {
 			this.setState({ csvData: nextProps.csvData });
 		}
+	}
+
+	shouldComponentUpdate(nextProps, nextState) {
+		return (
+			this.state.reportType !== nextState.reportType ||
+			this.state.updateStatusText !== nextState.updateStatusText
+		);
 	}
 
 	onFilteChange = selectedFilters => {
@@ -81,6 +82,20 @@ class Control extends Component {
 	};
 
 	onControlChange = () => {
+		const resultObject = this.getStateParams();
+		const { onControlChange } = this.props;
+
+		onControlChange(resultObject);
+	};
+
+	onGenerateButtonClick = () => {
+		const resultObject = this.getStateParams();
+		const { generateButtonHandler } = this.props;
+
+		generateButtonHandler(resultObject);
+	};
+
+	getStateParams = () => {
 		const {
 			startDate,
 			endDate,
@@ -89,28 +104,33 @@ class Control extends Component {
 			selectedFilters,
 			reportType
 		} = this.state;
-
-		this.props.onControlChange({
+		const resultObject = {
 			startDate,
 			endDate,
 			selectedInterval,
 			selectedDimension,
 			selectedFilters,
 			reportType
-		});
+		};
+
+		return resultObject;
 	};
 
 	getSelectedFilter = filter => {
-		const { reportType, selectedFilters } = this.props;
+		const { reportType, selectedFilters, isDemoUser } = this.props;
 		let siteIds;
+
 		if (reportType === 'account') {
 			const { site } = this.props;
 			siteIds = Object.keys(site);
 		} else {
 			siteIds = selectedFilters.siteid ? Object.keys(selectedFilters.siteid) : [];
 		}
+
 		const params = { siteid: siteIds.toString() };
-		return reportService.getWidgetData({ path: filter.path, params });
+		return reportService
+			.getWidgetData({ path: filter.path, params })
+			.then(data => getReportingControlDemoUserSites(data, filter.path, isDemoUser));
 	};
 
 	getReportStatus = () => {
@@ -242,7 +262,7 @@ class Control extends Component {
 					<div className="aligner-item u-margin-r4 aligner--hEnd">
 						<Button
 							bsStyle="primary"
-							onClick={this.props.generateButtonHandler}
+							onClick={this.onGenerateButtonClick}
 							disabled={state.disableGenerateButton}
 						>
 							<Glyphicon glyph="cog u-margin-r2" />

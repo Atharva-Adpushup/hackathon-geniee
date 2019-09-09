@@ -53,17 +53,12 @@ class AddManageNonResponsiveBidder extends React.Component {
 								};
 
 								for (const paramKey in formFields.bidderConfig) {
-									newState.bidderConfig[paramKey] = '';
+									newState.bidderConfig[paramKey] =
+										formFields.bidderConfig[paramKey].defaultValue ||
+										(formFields.bidderConfig[paramKey].dataType === 'number' ? null : '');
 								}
 
 								for (const globalParamKey in formFields.params.global) {
-									if (formFields.params.global[globalParamKey].dataType === 'number') {
-										newState.globalParams[globalParamKey] = null;
-
-										// eslint-disable-next-line no-continue
-										continue;
-									}
-
 									if (
 										!formFields.params.global[globalParamKey].visible &&
 										formFields.params.global[globalParamKey].value !== undefined
@@ -75,7 +70,9 @@ class AddManageNonResponsiveBidder extends React.Component {
 										continue;
 									}
 
-									newState.globalParams[globalParamKey] = '';
+									newState.globalParams[globalParamKey] =
+										formFields.params.global[globalParamKey].defaultValue ||
+										(formFields.params.global[globalParamKey].dataType === 'number' ? null : '');
 								}
 
 								newState.bidderConfig = { key, name, sizeLess, reusable, ...newState.bidderConfig };
@@ -90,14 +87,17 @@ class AddManageNonResponsiveBidder extends React.Component {
 								const siteLevelParamsKeys = Object.keys(formFields.params.siteLevel);
 								const siteLevelParamsCount = siteLevelParamsKeys.length;
 								if (siteLevelParamsCount) {
-									const {
-										visibleParamsCount,
-										hiddenParamsCount
-									} = this.getSiteLevelParamsCountByType(formFields.params.siteLevel);
+									const { visibleParamsCount } = this.getSiteLevelParamsCountByType(
+										formFields.params.siteLevel
+									);
 
-									if (!visibleParamsCount && hiddenParamsCount && !Object.keys(sizes).length) {
+									if (!visibleParamsCount && !Object.keys(sizes).length) {
 										newState.formError = 'No inventory found. Please create inventories first.';
 									}
+								}
+
+								if (!siteLevelParamsCount && !Object.keys(sizes).length) {
+									newState.formError = 'No inventory found. Please create inventories first.';
 								}
 
 								return newState;
@@ -288,7 +288,8 @@ class AddManageNonResponsiveBidder extends React.Component {
 				const {
 					requiredVisibleParamsCount,
 					visibleParamsCount,
-					hiddenParamsCount
+					hiddenParamsCount,
+					optionalVisibleParamsCount
 				} = this.getSiteLevelParamsCountByType(formFields.params.siteLevel);
 
 				// if required visible siteLevel params exist and
@@ -298,20 +299,29 @@ class AddManageNonResponsiveBidder extends React.Component {
 					return;
 				}
 
-				// if visible siteLevel params exist and params are not added for any size
-				if (visibleParamsCount && !Object.keys(params).length) {
-					this.setState({ formError: 'Please fill params for atleast one size.' });
-					return;
-				}
-
 				// if only hidden siteLevel params exist and inventory doesn't exist then show error
 				if (!visibleParamsCount && hiddenParamsCount && !Object.keys(sizes).length) {
-					this.setState({ formError: 'No inventory found. Please create inventories first.' });
+					this.setState({
+						formError: 'No inventory found. Please create inventories first.'
+					});
 					return;
 				}
 
-				// if only hidden siteLevel params and inventory found or sizes added by publisher then add all sizes
-				if (!visibleParamsCount && hiddenParamsCount && Object.keys(sizes).length) {
+				if (visibleParamsCount && !Object.keys(sizes).length) {
+					this.setState({
+						formError: 'No inventory found. Please create inventories (or add sizes) first.'
+					});
+					return;
+				}
+
+				// if only hidden or optionalVisible siteLevel params and inventory found or sizes added by publisher then add all sizes
+				if (
+					((!visibleParamsCount && hiddenParamsCount) ||
+						(optionalVisibleParamsCount &&
+							Object.keys(globalParams).length &&
+							!Object.keys(params).length)) &&
+					Object.keys(sizes).length
+				) {
 					// add iab sizes in params if not exist and setState
 					const newParams = { ...params };
 					for (const size in sizes) {
@@ -322,6 +332,13 @@ class AddManageNonResponsiveBidder extends React.Component {
 					}
 					this.setState({ params: newParams });
 				}
+			}
+
+			if (!siteLevelParamsCount && !Object.keys(sizes).length) {
+				this.setState({
+					formError: 'No inventory found. Please create inventories first.'
+				});
+				return;
 			}
 
 			const mergedParams = { ...params };
