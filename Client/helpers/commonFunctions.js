@@ -297,6 +297,15 @@ const getAppBaseUrls = () => {
 	return resultObject;
 };
 
+const getOnboardingTemplateData = site => {
+	const isValidSite = !!(site && Object.keys(site).length);
+	const linkUrl = isValidSite ? `/onboarding?siteId=${site.siteId}` : '/onboarding';
+	const buttonText = isValidSite ? `Continue with ${site.domain}` : 'Complete site onboarding';
+	const resultObject = { linkUrl, buttonText };
+
+	return resultObject;
+};
+
 export {
 	errorHandler,
 	getDuplicatesInArray,
@@ -315,5 +324,6 @@ export {
 	getReportingDemoUserSiteIds,
 	getDemoUserSites,
 	getReportingControlDemoUserSites,
-	getAppBaseUrls
+	getAppBaseUrls,
+	getOnboardingTemplateData
 };
