@@ -23,6 +23,7 @@ import CustomButton from '../../../Components/CustomButton';
 import CustomIcon from '../../../Components/CustomIcon';
 import reportService from '../../../services/reportService';
 import Loader from '../../../Components/Loader/index';
+import { getOnboardingTemplateData } from '../../../helpers/commonFunctions';
 
 import {
 	SITE_SETUP_STATUS,
@@ -58,6 +59,7 @@ class MySites extends React.Component {
 		const { reportsMeta, fetchReportingMeta } = this.props;
 
 		if (!isSites) {
+			this.hideUILoader();
 			return false;
 		}
 
@@ -378,8 +380,7 @@ class MySites extends React.Component {
 	renderOnboardingCard() {
 		const { sites } = this.props;
 		const site = sites[Object.keys(sites)[0]];
-		const computedLinkUrl = `/onboarding?siteId=${site.siteId}`;
-		const computedButtonText = `Continue with ${site.domain}`;
+		const { linkUrl, buttonText } = getOnboardingTemplateData(site);
 
 		return (
 			<OnboardingCard
@@ -391,8 +392,8 @@ class MySites extends React.Component {
 				heading="Complete Onboarding Setup"
 				description="Please complete your site onboarding setup by clicking below."
 			>
-				<Link to={computedLinkUrl} className="u-link-reset u-margin-t4 aligner aligner-item">
-					<CustomButton>{computedButtonText}</CustomButton>
+				<Link to={linkUrl} className="u-link-reset u-margin-t4 aligner aligner-item">
+					<CustomButton>{buttonText}</CustomButton>
 				</Link>
 			</OnboardingCard>
 		);
