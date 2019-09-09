@@ -15,7 +15,8 @@ import { dates } from '../configs/commonConsts';
 import {
 	getDashboardDemoUserSiteIds,
 	checkDemoUserEmail,
-	getDemoUserSites
+	getDemoUserSites,
+	getOnboardingTemplateData
 } from '../../../helpers/commonFunctions';
 import SelectBox from '../../../Components/SelectBox/index';
 import reportService from '../../../services/reportService';
@@ -382,7 +383,7 @@ class Dashboard extends React.Component {
 		const content = [];
 		const hasLayoutSite = this.showApBaselineWidget();
 		widgetsConfig.forEach((widget, index) => {
-			//const widget = widgetsConfig[wid];
+			// const widget = widgetsConfig[wid];
 			const widgetComponent = this.getWidgetComponent(widget);
 			if ((widget.name == 'per_ap_original' && hasLayoutSite) || widget.name != 'per_ap_original')
 				content.push(
@@ -418,10 +419,11 @@ class Dashboard extends React.Component {
 		const { user, reportType, siteId } = this.props;
 		const userSites = user.data && user.data.sites ? user.data.sites : {};
 		let site;
-		if (reportType == 'site') site = userSites[Object.keys(userSites)[siteId]];
+
+		if (reportType === 'site') site = userSites[siteId];
 		else site = userSites[Object.keys(userSites)[0]];
-		const computedLinkUrl = `/onboarding?siteId=${site.siteId}`;
-		const computedButtonText = `Continue with ${site.domain}`;
+
+		const { linkUrl, buttonText } = getOnboardingTemplateData(site);
 
 		return (
 			<OnboardingCard
@@ -433,9 +435,11 @@ class Dashboard extends React.Component {
 				heading="Complete Onboarding Setup"
 				description="Please complete your site onboarding setup by clicking below."
 			>
-				<Link to={computedLinkUrl} className="u-link-reset u-margin-t4 aligner aligner-item">
-					<CustomButton>{computedButtonText}</CustomButton>
-				</Link>
+				{
+					<Link to={linkUrl} className="u-link-reset u-margin-t4 aligner aligner-item">
+						<CustomButton>{buttonText}</CustomButton>
+					</Link>
+				}
 			</OnboardingCard>
 		);
 	}
