@@ -190,7 +190,10 @@ module.exports = {
 		targetAllDFP: false,
 		dfpAdUnitTargeting: {
 			networkId: 103512698
-		}
+		},
+		priceGranularity: 'DENSE',
+		adpushupDfpCurrency: 'USD',
+		adserverSetupCheckInterval: 1000 * 60 * 5
 	},
 	hbContinents: [
 		{ name: 'Europe', code: 'EUR' },

@@ -781,41 +781,63 @@ function apiModule() {
 			}),
 		setupAdserver: (siteId, user) => {
 			const body = dfpLineItemAutomationReqBody;
-			const dfpNetwork = user.getActiveAdServerData('DFP');
-			if (dfpNetwork) {
-				return getAllBiddersFromNetworkConfig()
-					.then(allHbBidders => {
-						const activeHbBidderCodes = Object.keys(allHbBidders).filter(
-							networkCode => allHbBidders[networkCode].isActive
-						);
+			const activeAdServerData = user.getActiveAdServerData('dfp');
+			const isPublisherActiveDfp =
+				activeAdServerData &&
+				activeAdServerData.activeDFPNetwork &&
+				activeAdServerData.activeDFPNetwork !==
+					hbGlobalSettingDefaults.dfpAdUnitTargeting.networkId;
+			const dfpNetworkData = user.getNetworkDataObj('DFP');
+			const isValidDfpNetwork = dfpNetworkData && dfpNetworkData.dfpAccounts.length;
 
-						let activeDfpRefreshToken;
-						if (
-							dfpNetwork.activeDFPNetwork === hbGlobalSettingDefaults.dfpAdUnitTargeting.networkId
-						) {
-							activeDfpRefreshToken = config.apDfpData.REFRESH_TOKEN;
-						} else {
-							activeDfpRefreshToken = user.getNetworkDataObj('DFP').refreshToken;
-						}
-
-						body.refreshToken = activeDfpRefreshToken;
-						body.networkCode = dfpNetwork.activeDFPNetwork;
-						body.customKeyValues.hb_ap_bidder.values = activeHbBidderCodes;
-						body.currencyCode = dfpNetwork.activeDFPCurrencyCode;
-						body.granualityMultiplier = dfpNetwork.prebidGranularityMultiplier;
-
-						return body;
-					})
-					.then(body => {
-						console.log(body);
-						// return request({
-						// 	method: 'POST',
-						// 	uri: commonConsts.DFP_LINE_ITEM_AUTOMATION_API,
-						// 	body,
-						// 	json: true
-						// });
-					});
+			if (!isPublisherActiveDfp || !isValidDfpNetwork) {
+				return Promise.reject(false);
 			}
+
+			return API.getAllBiddersFromNetworkConfig()
+				.then(allHbBidders => {
+					const activeHbBidderCodes = Object.keys(allHbBidders).filter(
+						networkCode => allHbBidders[networkCode].isActive
+					);
+
+					body.customKeyValues.hb_ap_siteid.values = [siteId];
+					body.customKeyValues.hb_ap_bidder.values = activeHbBidderCodes;
+					body.networkCode = activeAdServerData.activeDFPNetwork;
+					body.currencyCode = activeAdServerData.activeDFPCurrencyCode;
+					body.granualityMultiplier = activeAdServerData.prebidGranularityMultiplier;
+					body.refreshToken = dfpNetworkData.refreshToken;
+					body.granularityType = hbGlobalSettingDefaults.priceGranularity;
+
+					return body;
+				})
+				.then(body => {
+					/**
+					 * Status values :
+					 * pending
+					 * in-progress
+					 * failed
+					 * finished
+					 */
+					const sampleResponse = {
+						config: {
+							networkCode: '11111',
+							refreshToken: 'cdss'
+						},
+						createdTs: 1567580929797,
+						key: 'b0baee9d279d34fa1dfd71aadb908c3f',
+						networkCode: '11111',
+						status: 'pending'
+					};
+
+					return sampleResponse;
+
+					// return request({
+					// 	method: 'POST',
+					// 	uri: commonConsts.DFP_LINE_ITEM_AUTOMATION_API,
+					// 	body,
+					// 	json: true
+					// });
+				});
 		}
 	};
 

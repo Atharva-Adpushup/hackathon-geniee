@@ -241,7 +241,8 @@ router
 						user.set('adServerSettings', {
 							...adServerSettings,
 							dfp: {
-								currencyConversion: userDFPInfo[0].currencyCode !== 'USD',
+								currencyConversion:
+									userDFPInfo[0].currencyCode !== CC.hbGlobalSettingDefaults.adpushupDfpCurrency,
 								activeDFPCurrencyCode: userDFPInfo[0].currencyCode
 							}
 						});

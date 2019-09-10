@@ -122,31 +122,10 @@ module.exports = {
 		[980, 360],
 		[980, 400]
 	],
-	keyValues: [
-		{
-			startKey: 0.01,
-			endKey: 3,
-			interval: 0.01
-		},
-		{
-			startKey: 3.05,
-			endKey: 8,
-			interval: 0.05
-		},
-		{
-			startKey: 8.5,
-			endKey: 19.5,
-			interval: 0.5
-		},
-		{
-			startKey: 20,
-			endKey: 20,
-			interval: 1
-		}
-	],
+	granularityType: 'DENSE',
 	lineItemKeyName: 'hb_ap_pb',
 	currencyCode: 'USD',
-	granualityMultiplier: 1,
+	granularityMultiplier: 1,
 	customKeyValues: {
 		hb_ap_bidder: {
 			type: 'predefined',
@@ -191,7 +170,7 @@ module.exports = {
 			type: 'freeform'
 		}
 	},
-	networkCode: '103512698',
+	networkCode: '',
 	refreshToken: '',
-	adUnitId: '4534325'
+	adUnitId: null
 };

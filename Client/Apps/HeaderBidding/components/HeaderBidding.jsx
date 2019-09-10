@@ -38,14 +38,14 @@ class HeaderBidding extends React.Component {
 		const {
 			isAdpushupDfp,
 			dfpConnected,
-			adServerSetupCompleted,
 			inventoryFound,
-			biddersFound
+			biddersFound,
+			adServerSetupStatus
 		} = setupStatus;
 
 		if (
 			url === `/sites/${siteId}/apps/header-bidding` &&
-			(isAdpushupDfp || (dfpConnected && adServerSetupCompleted)) &&
+			(isAdpushupDfp || (dfpConnected && adServerSetupStatus === 2)) &&
 			inventoryFound &&
 			biddersFound
 		) {
@@ -80,9 +80,9 @@ class HeaderBidding extends React.Component {
 			setupStatus: {
 				isAdpushupDfp,
 				dfpConnected,
-				adServerSetupCompleted,
 				inventoryFound,
-				biddersFound
+				biddersFound,
+				adServerSetupStatus
 			}
 		} = this.props;
 		const siteId = this.getSiteId();
@@ -95,12 +95,12 @@ class HeaderBidding extends React.Component {
 				break;
 
 			case 2:
-				if (!isAdpushupDfp && (!dfpConnected || !adServerSetupCompleted)) return false;
+				if (!isAdpushupDfp && (!dfpConnected || adServerSetupStatus !== 2)) return false;
 				redirectUrl = `${computedRedirectUrl}/${NAV_ITEMS_INDEXES.TAB_2}`;
 				break;
 
 			case 3:
-				if ((!isAdpushupDfp && (!dfpConnected || !adServerSetupCompleted)) || !inventoryFound)
+				if ((!isAdpushupDfp && (!dfpConnected || adServerSetupStatus !== 2)) || !inventoryFound)
 					return false;
 				redirectUrl = `${computedRedirectUrl}/${NAV_ITEMS_INDEXES.TAB_3}`;
 				break;
@@ -199,23 +199,23 @@ class HeaderBidding extends React.Component {
 			setupStatus: {
 				isAdpushupDfp,
 				dfpConnected,
-				adServerSetupCompleted,
 				inventoryFound,
-				biddersFound
+				biddersFound,
+				adServerSetupStatus
 			}
 		} = this.props;
 
 		return (
 			<div>
 				<Nav bsStyle="tabs" activeKey={activeItem.INDEX} onSelect={this.handleNavSelect}>
-					{((!isAdpushupDfp && (!dfpConnected || !adServerSetupCompleted)) ||
+					{((!isAdpushupDfp && (!dfpConnected || adServerSetupStatus !== 2)) ||
 						!inventoryFound ||
 						!biddersFound) && <NavItem eventKey={1}>{NAV_ITEMS_VALUES.TAB_1}</NavItem>}
 					<NavItem
 						eventKey={2}
 						// eslint-disable-next-line no-constant-condition
 						className={
-							!isAdpushupDfp && (!dfpConnected || !adServerSetupCompleted) ? 'disabled' : ''
+							!isAdpushupDfp && (!dfpConnected || adServerSetupStatus !== 2) ? 'disabled' : ''
 						}
 					>
 						{NAV_ITEMS_VALUES.TAB_2}
@@ -223,7 +223,7 @@ class HeaderBidding extends React.Component {
 					<NavItem
 						eventKey={3}
 						className={
-							(!isAdpushupDfp && (!dfpConnected || !adServerSetupCompleted)) || !inventoryFound
+							(!isAdpushupDfp && (!dfpConnected || adServerSetupStatus !== 2)) || !inventoryFound
 								? 'disabled'
 								: ''
 						}

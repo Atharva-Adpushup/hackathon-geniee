@@ -3,16 +3,23 @@ import { Row } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
 import CustomButton from '../../../Components/CustomButton';
+import commonConsts from '../../../../configs/commonConsts';
 
 class Setup extends React.Component {
 	$window = window;
 
+	state = {
+		checkingAdserverSetupStatusForFirstTime: false
+	};
+
 	componentDidMount() {
 		const {
-			setupStatus: { isAdpushupDfp, dfpConnected }
+			setupStatus: { isAdpushupDfp, dfpConnected, adServerSetupStatus }
 		} = this.props;
 
 		if (!isAdpushupDfp && !dfpConnected) this.addPostMessageListener();
+
+		if (adServerSetupStatus === 1) this.checkOrBeginDfpSetup();
 	}
 
 	addPostMessageListener = () => {
@@ -42,7 +49,35 @@ class Setup extends React.Component {
 	checkOrBeginDfpSetup = () => {
 		const { siteId, checkOrBeginDfpSetupAction } = this.props;
 
-		checkOrBeginDfpSetupAction(siteId);
+		this.setState({ checkingAdserverSetupStatusForFirstTime: true });
+
+		const timer = setInterval(
+			// eslint-disable-next-line no-use-before-define
+			continuouslyCheck,
+			commonConsts.hbGlobalSettingDefaults.adserverSetupCheckInterval
+		);
+
+		function continuouslyCheck() {
+			checkOrBeginDfpSetupAction(siteId)
+				.then(data => {
+					if (data.adServerSetupStatus === 2 || data.adServerSetupStatus === 3) {
+						clearInterval(timer);
+					}
+
+					this.setState(state => {
+						if (!state.checkingAdserverSetupStatusForFirstTime) return null;
+						return { checkingAdserverSetupStatusForFirstTime: false };
+					});
+				})
+				.catch(err => {
+					console.log(err);
+
+					this.setState(state => {
+						if (!state.checkingAdserverSetupStatusForFirstTime) return null;
+						return { checkingAdserverSetupStatusForFirstTime: false };
+					});
+				});
+		}
 	};
 
 	// eslint-disable-next-line class-methods-use-this
@@ -71,12 +106,73 @@ class Setup extends React.Component {
 		return true;
 	}
 
+	renderAdserverSetup() {
+		const {
+			setupStatus: { dfpConnected, isPublisherActiveDfp, adServerSetupStatus }
+		} = this.props;
+		const { checkingAdserverSetupStatusForFirstTime } = this.state;
+
+		let statusJsx;
+
+		switch (adServerSetupStatus) {
+			case 0: {
+				statusJsx = <FontAwesomeIcon icon="info-circle" title="AdServer Setup is pending!" />;
+				break;
+			}
+			case 1: {
+				statusJsx = <FontAwesomeIcon icon="info-circle" title="AdServer Setup is in progress!" />;
+				break;
+			}
+			case 2: {
+				statusJsx = <FontAwesomeIcon icon="check" title="AdServer Setup is completed" />;
+				break;
+			}
+			case 3: {
+				statusJsx = (
+					<FontAwesomeIcon
+						icon="info-circle"
+						title="AdServer Setup failed. Please contact adpushup support."
+					/>
+				);
+				break;
+			}
+			default:
+		}
+
+		return (
+			<li>
+				<span className="name">AdServer Setup</span>
+				<span className="status">{statusJsx}</span>
+				{dfpConnected && !isPublisherActiveDfp && (
+					<span className="">Ad Server Activation by AdPushup pending</span>
+				)}
+				{dfpConnected && isPublisherActiveDfp && adServerSetupStatus === 0 && (
+					<span className="btn-wrap">
+						<CustomButton
+							variant="secondary"
+							name="setupAdServer"
+							onClick={this.checkOrBeginDfpSetup}
+							showSpinner={checkingAdserverSetupStatusForFirstTime}
+						>
+							Setup
+						</CustomButton>
+					</span>
+				)}
+				{dfpConnected && isPublisherActiveDfp && adServerSetupStatus === 1 && (
+					<span className="">In Progress</span>
+				)}
+				{dfpConnected && isPublisherActiveDfp && adServerSetupStatus === 3 && (
+					<span className="">AdServer Setup failed. Please contact adpushup support.</span>
+				)}
+			</li>
+		);
+	}
+
 	renderMainContent = () => {
 		const {
 			setupStatus: {
 				isAdpushupDfp,
 				dfpConnected,
-				adServerSetupCompleted,
 				inventoryFound,
 				biddersFound,
 				adpushupNetworkCode
@@ -95,6 +191,11 @@ class Setup extends React.Component {
 							<li>Ad Manager is connected with AdPushup</li>
 							<li>
 								Line Items, Key Value Pairs, and AdX should be configured with your Ad Manager
+							</li>
+							<li>
+								Enable API Access per Google Ad Manager. In your Ad Manager account, go to “Global
+								Settings &gt; Network Settings” and enable “API Access”. This will allow AdPushup to
+								programmatically setup your line items using the Ad Manager API.
 							</li>
 						</React.Fragment>
 					)}
@@ -129,29 +230,7 @@ class Setup extends React.Component {
 							</span>
 						)}
 					</li>
-					{!isAdpushupDfp && (
-						<li>
-							<span className="name">AdServer Setup</span>
-							<span className="status">
-								{adServerSetupCompleted ? (
-									<FontAwesomeIcon icon="check" title="AdServer Setup is completed" />
-								) : (
-									<FontAwesomeIcon icon="info-circle" title="AdServer Setup is pending!" />
-								)}
-							</span>
-							{!adServerSetupCompleted && (
-								<span className="btn-wrap">
-									<CustomButton
-										variant="secondary"
-										name="setupAdServer"
-										onClick={this.checkOrBeginDfpSetup}
-									>
-										Setup
-									</CustomButton>
-								</span>
-							)}
-						</li>
-					)}
+					{!isAdpushupDfp && this.renderAdserverSetup()}
 					<li>
 						<span className="name">Inventory</span>
 						<span className="status">
