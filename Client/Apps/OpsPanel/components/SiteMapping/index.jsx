@@ -219,6 +219,8 @@ class SiteMapping extends Component {
 		!window.confirm(message)
 			? console.log('You have selected no')
 			: console.log('we are sending the bulk mail for you');
+
+		this.setState({ checked: [], selectAll: false });
 	};
 
 	render() {
