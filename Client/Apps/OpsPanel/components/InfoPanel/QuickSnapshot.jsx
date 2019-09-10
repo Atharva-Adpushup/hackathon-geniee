@@ -1,12 +1,15 @@
 import React, { Fragment } from 'react';
-import { sortBy, isEmpty } from 'lodash';
+import sortBy from 'lodash/sortBy';
+import isEmpty from 'lodash/isEmpty';
+import orderBy from 'lodash/orderBy';
+import cloneDeep from 'lodash/cloneDeep';
 import { Link } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import '../../../../scss/pages/dashboard/index.scss';
 import Card from '../../../../Components/Layout/Card';
 import EstimatedEarningsContainer from '../../../../Pages/Dashboard/containers/EstimatedEarningsContainer';
-import TopSitesReportContainer from '../../containers/TopSitesReportContainer';
+import SitewiseReportContainer from '../../../../Pages/Dashboard/containers/SitewiseReportContainer';
 import PerformanceOverviewContainer from '../../../../Pages/Dashboard/containers/PerformanceOverviewContainer';
 import PerformanceApOriginalContainer from '../../../../Pages/Dashboard/containers/PerformanceApOriginalContainer';
 import RevenueContainer from '../../../../Pages/Dashboard/containers/RevenueContainer';
@@ -19,23 +22,35 @@ import { convertObjToArr, getDateRange } from '../../../../Pages/Dashboard/helpe
 class QuickSnapshot extends React.Component {
 	constructor(props) {
 		super(props);
-		const { widget, reportType, widgetsList, sites, reportingSites } = props;
+		const { reportType, sites, reportingSites } = props;
 		const allUserSites = [{ name: 'All', value: 'all' }, ...convertObjToArr(sites)];
 		// const topPerformingSite = reportingSites
 		// 	? this.getTopPerformingSites(allUserSites, reportingSites)
 		// 	: null;
 		// const selectedSite = reportType == 'site' ? siteId : topPerformingSite || 'all';
-		const widgetsConfig = this.getWidgetConfig(widget, widgetsList);
 		this.state = {
 			quickDates: dates,
 			sites: allUserSites,
-			widgetsConfig,
-			reportType
+			reportType,
+			widgetsConfig: [],
+			isLoading: true
 		};
 	}
 
 	componentDidMount() {
-		this.renderWidgetsUI();
+		const { sites, isReportsMetaFetched, setReportingMetaData } = this.props;
+		const userSites = Object.keys(sites).toString();
+
+		if (!isReportsMetaFetched) {
+			return reportService.getMetaData({ sites: userSites }).then(response => {
+				const { data } = response;
+
+				setReportingMetaData(data);
+				this.renderComputedWidgetsUI();
+			});
+		}
+
+		return this.renderComputedWidgetsUI();
 	}
 
 	getTopPerformingSites = (allUserSites, reportingSites) => {
@@ -62,13 +77,14 @@ class QuickSnapshot extends React.Component {
 
 			if (widgetsList.indexOf(widget.name) > -1) {
 				widget.isLoading = true;
-				widget.selectedDate = dates[0].value;
+				widget.selectedDate = dates[2].value;
 				widget.isDataSufficient = false;
 				widget.selectedSite = 'all';
 
 				switch (widget.name) {
 					case PER_AP_ORIGINAL:
 						widget.selectedDimension = 'page_variation_type';
+						widget.selectedChartLegendMetric = 'adpushup_page_cpm';
 						break;
 
 					case OPS_TOP_SITES:
@@ -76,16 +92,20 @@ class QuickSnapshot extends React.Component {
 						break;
 
 					case OPS_COUNTRY_REPORT:
-						widget.dimension = 'country';
-						widget.metric = 'adpushup_page_views';
-						widget.selectedDimension = 'adpushup_page_views';
+						widget.selectedDimension = 'country';
+						widget.chartLegend = 'Country';
+						widget.chartSeriesLabel = 'country';
+						widget.chartSeriesMetric = 'adpushup_page_views';
+						widget.chartSeriesMetricType = 'number';
 						widget.path += `&metrics=adpushup_page_views`;
 						break;
 
 					case OPS_NETWORK_REPORT:
-						widget.dimension = 'network';
-						widget.metric = 'network_net_revenue';
-						widget.selectedDimension = 'network_net_revenue';
+						widget.selectedDimension = 'network';
+						widget.chartLegend = 'Network';
+						widget.chartSeriesLabel = 'network';
+						widget.chartSeriesMetric = 'network_net_revenue';
+						widget.chartSeriesMetricType = 'money';
 						widget.path += `&metrics=network_net_revenue`;
 						break;
 
@@ -112,6 +132,7 @@ class QuickSnapshot extends React.Component {
 				OPS_ERROR_REPORT
 			}
 		} = this.props;
+		let computedWidgetData;
 
 		if (widget.isLoading) return <Loader height="20vh" />;
 
@@ -131,11 +152,12 @@ class QuickSnapshot extends React.Component {
 				return <PerformanceOverviewContainer displayData={widget.data} />;
 
 			case OPS_TOP_SITES:
-				return <TopSitesReportContainer displayData={widget.data} />;
+				computedWidgetData = this.getTopSitesWidgetTransformedData(widget.data);
+				return <SitewiseReportContainer disableSiteLevelCheck displayData={computedWidgetData} />;
 
 			case 'ops_top_sites_daily':
 				if (reportType == 'site') {
-					return <TopSitesReportContainer displayData={widget.data} reportType="site" />;
+					return <SitewiseReportContainer displayData={widget.data} reportType="site" />;
 				}
 				return '';
 
@@ -219,6 +241,16 @@ class QuickSnapshot extends React.Component {
 		return layoutSites;
 	};
 
+	getTopSitesWidgetTransformedData = displayData => {
+		const computedData = cloneDeep(displayData);
+
+		computedData.result = orderBy(computedData.result, ['network_net_revenue'], ['desc']).slice(
+			0,
+			10
+		);
+		return computedData;
+	};
+
 	showApBaselineWidget = () => {
 		const { siteId, reportingSites } = this.props;
 		const { reportType } = this.state;
@@ -257,7 +289,7 @@ class QuickSnapshot extends React.Component {
 		const { widget, widgetsList } = this.props;
 		const widgetsConfig = this.getWidgetConfig(widget, widgetsList);
 
-		this.setState({ widgetsConfig }, () => this.renderWidgetsUI(widgetsConfig));
+		this.setState({ widgetsConfig, isLoading: false }, () => this.renderWidgetsUI(widgetsConfig));
 	};
 
 	renderControl(wid) {
@@ -289,6 +321,7 @@ class QuickSnapshot extends React.Component {
 							options={quickDates}
 							onSelect={date => {
 								widgetsConfig[wid]['selectedDate'] = date;
+								widgetsConfig[wid].isLoading = true;
 								this.setState({ widgetsConfig }, () => this.getDisplayData(wid));
 							}}
 						/>
@@ -326,23 +359,25 @@ class QuickSnapshot extends React.Component {
 	}
 
 	renderViewReportButton(wid) {
-		const { widgetsConfig, reportType } = this.state;
-		const { startDate, endDate, selectedSite, selectedDimension, isDataSufficient } = widgetsConfig[
-			wid
-		];
-		const { siteId } = this.props;
-		let siteSelected;
-		if (reportType === 'site') siteSelected = siteId;
-		else if (selectedSite != 'all') siteSelected = selectedSite;
+		const { widgetsConfig } = this.state;
+		const {
+			startDate,
+			endDate,
+			selectedSite,
+			selectedDimension,
+			selectedChartLegendMetric = '',
+			isDataSufficient
+		} = widgetsConfig[wid];
+		const { reportType, siteId } = this.props;
+		let siteSelected = '';
+
+		if (reportType === 'site') siteSelected = `/${siteId}`;
+		else if (selectedSite !== 'all') siteSelected = `/${selectedSite}`;
+
+		const computedReportLink = `/reports${siteSelected}?fromDate=${startDate}&toDate=${endDate}&dimension=${selectedDimension}&chartLegendMetric=${selectedChartLegendMetric}`;
+
 		return (
-			<Link
-				to={
-					siteSelected
-						? `/reports/${siteSelected}?fromDate=${startDate}&toDate=${endDate}&dimension=${selectedDimension}`
-						: `/reports?fromDate=${startDate}&toDate=${endDate}&dimension=${selectedDimension}`
-				}
-				className="u-link-reset aligner aligner-item float-right"
-			>
+			<Link to={computedReportLink} className="u-link-reset aligner aligner-item float-right">
 				<Button className="aligner-item aligner aligner--vCenter" disabled={!isDataSufficient}>
 					View Reports
 					<FontAwesomeIcon icon="chart-area" className="u-margin-l2" />
@@ -427,6 +462,12 @@ class QuickSnapshot extends React.Component {
 	};
 
 	render() {
+		const { isLoading } = this.state;
+
+		if (isLoading) {
+			return <Loader />;
+		}
+
 		return <Fragment>{this.renderContent()}</Fragment>;
 	}
 }
