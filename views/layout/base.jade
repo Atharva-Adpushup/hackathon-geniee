@@ -51,6 +51,12 @@ html(lang="en")
                     script(type='text/javascript').
                         window.apjQuery = window.jQuery;
                         window.currentUser = !{JSON.stringify(currentUser)};
+                        var cookies = document.cookies;
+                        var redirectCookieFound = cookies.some(function(cookie) {
+                            var name = cookie.split('=');
+                            return (name === 'app_redirect');
+                        });
+                        if (!redirectCookieFound) window.location.href = 'https://beta.adpushup.com';
                     
                     if !excludeBaseLibs
                         - var baseLibsStr = "/assets/js/builds/";
@@ -70,6 +76,7 @@ html(lang="en")
 
                                 window.adpushup.user.sites = sites;
                                 window.overrideTrackers();
+
 
     body
 
