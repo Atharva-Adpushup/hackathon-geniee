@@ -3,8 +3,24 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { DropdownButton, MenuItem } from 'react-bootstrap';
+import Cookies from 'universal-cookie';
+import CustomButton from '../../CustomButton/index';
 import history from '../../../helpers/history';
 import UserChange from './UserChange';
+
+const cookies = new Cookies();
+
+function consoleRedirection(e) {
+	e.preventDefault();
+	cookies.set('app_redirect', '0', {
+		path: '/',
+		maxAge: 7200, // expires in 2 hours
+		domain: 'console.adpushup.com,beta.adpushup.com,staging.adpushup.com,adpushup.com'
+	});
+	setTimeout(() => {
+		window.location.href = 'http://staging.adpushup.com:8084/login';
+	}, 200);
+}
 
 const Header = ({ sidebarToggle, logout, user, switchUser, findUsers }) => (
 	<header className="ap-page-header">
@@ -17,6 +33,9 @@ const Header = ({ sidebarToggle, logout, user, switchUser, findUsers }) => (
 
 		<div className="header-nav">
 			{user.isSuperUser ? <UserChange switchUser={switchUser} findUsers={findUsers} /> : null}
+			<CustomButton variant="secondary" onClick={consoleRedirection} className="u-margin-r2">
+				Goto Console
+			</CustomButton>
 
 			<DropdownButton pullRight title={`Hello ${user.firstName || ''}`} id="dropdown-button">
 				{/* <MenuItem eventKey="1">Profile</MenuItem> */}
