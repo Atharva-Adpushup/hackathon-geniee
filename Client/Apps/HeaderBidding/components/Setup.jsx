@@ -51,13 +51,16 @@ class Setup extends React.Component {
 
 		this.setState({ checkingAdserverSetupStatusForFirstTime: true });
 
+		// eslint-disable-next-line no-use-before-define
+		checkDfpStatus();
+
 		const timer = setInterval(
 			// eslint-disable-next-line no-use-before-define
-			continuouslyCheck,
+			checkDfpStatus,
 			commonConsts.hbGlobalSettingDefaults.adserverSetupCheckInterval
 		);
 
-		function continuouslyCheck() {
+		function checkDfpStatus() {
 			checkOrBeginDfpSetupAction(siteId)
 				.then(data => {
 					if (data.adServerSetupStatus === 2 || data.adServerSetupStatus === 3) {
@@ -240,6 +243,31 @@ class Setup extends React.Component {
 								<FontAwesomeIcon icon="info-circle" title="Inventory not found!" />
 							)}
 						</span>
+						{!inventoryFound && (
+							<React.Fragment>
+								<span className="btn-wrap">
+									<Link to="layout">
+										<CustomButton variant="secondary" name="addInv">
+											Layout Editor
+										</CustomButton>
+									</Link>
+								</span>
+								<span className="btn-wrap">
+									<Link to="innovative-ads">
+										<CustomButton variant="secondary" name="addInv">
+											Innovative Ads
+										</CustomButton>
+									</Link>
+								</span>
+								<span className="btn-wrap">
+									<Link to="ap-tag">
+										<CustomButton variant="secondary" name="addInv">
+											AP Tag
+										</CustomButton>
+									</Link>
+								</span>
+							</React.Fragment>
+						)}
 					</li>
 					<li>
 						<span className="name">Bidders</span>

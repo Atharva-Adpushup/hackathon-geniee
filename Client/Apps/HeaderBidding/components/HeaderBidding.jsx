@@ -95,7 +95,6 @@ class HeaderBidding extends React.Component {
 				break;
 
 			case 2:
-				if (!isAdpushupDfp && (!dfpConnected || adServerSetupStatus !== 2)) return false;
 				redirectUrl = `${computedRedirectUrl}/${NAV_ITEMS_INDEXES.TAB_2}`;
 				break;
 
@@ -211,15 +210,7 @@ class HeaderBidding extends React.Component {
 					{((!isAdpushupDfp && (!dfpConnected || adServerSetupStatus !== 2)) ||
 						!inventoryFound ||
 						!biddersFound) && <NavItem eventKey={1}>{NAV_ITEMS_VALUES.TAB_1}</NavItem>}
-					<NavItem
-						eventKey={2}
-						// eslint-disable-next-line no-constant-condition
-						className={
-							!isAdpushupDfp && (!dfpConnected || adServerSetupStatus !== 2) ? 'disabled' : ''
-						}
-					>
-						{NAV_ITEMS_VALUES.TAB_2}
-					</NavItem>
+					<NavItem eventKey={2}>{NAV_ITEMS_VALUES.TAB_2}</NavItem>
 					<NavItem
 						eventKey={3}
 						className={
