@@ -118,6 +118,31 @@ class QuickSnapshot extends React.Component {
 		return isValid;
 	};
 
+	getMetricWidgetValidation = widgetName => {
+		const {
+			widgetsName: { OPS_COUNTRY_REPORT, OPS_NETWORK_REPORT }
+		} = this.props;
+		const isValid = !!(
+			widgetName &&
+			(widgetName === OPS_COUNTRY_REPORT || widgetName === OPS_NETWORK_REPORT)
+		);
+
+		return isValid;
+	};
+
+	getTransformedWidgetMetricArray = widgetMetrics => {
+		const { metrics } = this.props;
+		const resultArray = [];
+
+		widgetMetrics.forEach(metricName => {
+			const metricLabel = metrics[metricName].display_name;
+
+			resultArray.push({ name: metricLabel, value: metricName });
+		});
+
+		return resultArray;
+	};
+
 	getWidgetConfig = (widgets, widgetsList) => {
 		const {
 			widgetsName: { PER_AP_ORIGINAL, OPS_TOP_SITES, OPS_COUNTRY_REPORT, OPS_NETWORK_REPORT }
@@ -150,6 +175,7 @@ class QuickSnapshot extends React.Component {
 
 					case OPS_COUNTRY_REPORT:
 						widget.selectedDimension = 'country';
+						widget.selectedMetric = 'adpushup_page_views';
 						widget.chartLegend = 'Country';
 						widget.chartSeriesLabel = 'country';
 						widget.chartSeriesMetric = 'adpushup_page_views';
@@ -159,6 +185,7 @@ class QuickSnapshot extends React.Component {
 
 					case OPS_NETWORK_REPORT:
 						widget.selectedDimension = 'network';
+						widget.selectedMetric = 'network_net_revenue';
 						widget.chartLegend = 'Network';
 						widget.chartSeriesLabel = 'network';
 						widget.chartSeriesMetric = 'network_net_revenue';
@@ -231,7 +258,7 @@ class QuickSnapshot extends React.Component {
 	getDisplayData = wid => {
 		const { widgetsConfig } = this.state;
 		const { isReportTypeAccount, isReportTypeGlobal } = this.getReportTypeValidation();
-		const { selectedDate, selectedSite, path, name } = widgetsConfig[wid];
+		const { selectedDate, selectedSite, selectedMetric, path, name } = widgetsConfig[wid];
 		const { sites, reportingSites } = this.props;
 		const siteIds = Object.keys(sites);
 		const params = getDateRange(selectedDate);
@@ -241,6 +268,10 @@ class QuickSnapshot extends React.Component {
 			reportingSites &&
 			reportingSites[selectedSite] &&
 			reportingSites[selectedSite].dataAvailableOutOfLast30Days < 21;
+		const isMetricWidget = this.getMetricWidgetValidation(name);
+		const computedWidgetPath = isMetricWidget
+			? path.replace(/&metrics=\w+/, `&metrics=${selectedMetric}`)
+			: path;
 
 		params.siteid = selectedSite === 'all' ? siteIds.toString() : selectedSite;
 
@@ -248,9 +279,6 @@ class QuickSnapshot extends React.Component {
 			delete params.siteid;
 			params.isSuperUser = true;
 		}
-
-		// params.fromDate = '2019-08-05';
-		// params.toDate = '2019-08-06';
 
 		widgetsConfig[wid].startDate = params.fromDate;
 		widgetsConfig[wid].endDate = params.toDate;
@@ -272,7 +300,7 @@ class QuickSnapshot extends React.Component {
 			const getTop10SitesData = shouldFetchWidgetTopSites
 				? this.getTop10SitesData(selectedDate)
 				: Promise.resolve(widgetsConfig[wid].sitesList);
-			const getWidgetData = reportService.getWidgetData({ path, params });
+			const getWidgetData = reportService.getWidgetData({ path: computedWidgetPath, params });
 
 			return Promise.all([getTop10SitesData, getWidgetData])
 				.then(responseData => {
@@ -395,47 +423,67 @@ class QuickSnapshot extends React.Component {
 	renderControl(wid) {
 		const {
 			reportingSites,
-			widgetsName: {
-				ESTIMATED_EARNINGS,
-				PER_AP_ORIGINAL,
-				PER_OVERVIEW,
-				OPS_TOP_SITES,
-				OPS_COUNTRY_REPORT,
-				OPS_NETWORK_REPORT,
-				OPS_ERROR_REPORT
-			}
+			widgetsName: { ESTIMATED_EARNINGS, PER_AP_ORIGINAL }
 		} = this.props;
-		const { widgetsConfig, quickDates, sites, reportType } = this.state;
+		const { widgetsConfig, quickDates, sites } = this.state;
 		const {
 			isReportTypeAccount,
 			isReportTypeGlobal,
 			isReportTypeSite
 		} = this.getReportTypeValidation();
-		const { selectedDate, selectedSite, name, sitesList } = widgetsConfig[wid];
+		const { selectedDate, selectedSite, selectedMetric, name, sitesList, metrics } = widgetsConfig[
+			wid
+		];
 		const layoutSites = reportingSites ? this.getLayoutSites(sites, reportingSites) : [];
 		const isWidgetNamePerAPOriginal = !!(name === PER_AP_ORIGINAL);
 		const shouldShowQuickDatesWidget = !!(name !== ESTIMATED_EARNINGS);
 		const websiteWidgetValidated = this.getWebsiteWidgetValidation(name);
 		const shouldShowWebsiteWidget = !!(!isReportTypeSite && websiteWidgetValidated);
+		const shouldShowMetricWidget = this.getMetricWidgetValidation(name);
+		const computedWidgetMetrics = shouldShowMetricWidget
+			? this.getTransformedWidgetMetricArray(metrics)
+			: [];
 		let sitesToShow = isWidgetNamePerAPOriginal ? layoutSites : sites;
 		const shouldSetGlobalSites = !!(isReportTypeGlobal && sitesList && websiteWidgetValidated);
 
 		if (shouldSetGlobalSites) sitesToShow = sitesList.concat([]);
 
-		// TODO: Work on show/hide of websites dropdown in every widget once all widgets are implemented successfully
-		// const isReportTypeGlobal = !!(reportType === 'global');
-		// const isWidgetApOriginalInGlobalReport = !!(isReportTypeGlobal && isWidgetNamePerAPOriginal);
-		// const shouldHideControls = isWidgetApOriginalInGlobalReport;
 		const shouldHideControls = false;
 
 		return shouldHideControls ? null : (
 			<div className="aligner aligner--hEnd">
+				{shouldShowMetricWidget ? (
+					<div className="">
+						{/* eslint-disable */}
+						<label className="u-text-normal u-margin-r2">Metrics</label>
+						<SelectBox
+							id="metric-selectbox"
+							isClearable={false}
+							pullRight
+							isSearchable={false}
+							wrapperClassName="display-inline"
+							selected={selectedMetric}
+							options={computedWidgetMetrics}
+							onSelect={metric => {
+								widgetsConfig[wid]['selectedMetric'] = metric;
+								widgetsConfig[wid]['chartSeriesMetric'] = metric;
+								widgetsConfig[wid].isLoading = true;
+								this.setState({ widgetsConfig }, () => this.getDisplayData(wid));
+							}}
+						/>
+
+						{/* eslint-enable */}
+					</div>
+				) : (
+					''
+				)}
+
 				{shouldShowQuickDatesWidget ? (
 					<div className="u-margin-r4">
 						{/* eslint-disable */}
 						<label className="u-text-normal u-margin-r2">Quick Dates</label>
 						<SelectBox
-							id="performance-date"
+							id="date-selectbox"
 							wrapperClassName="display-inline"
 							pullRight
 							isClearable={false}
@@ -456,33 +504,31 @@ class QuickSnapshot extends React.Component {
 				) : (
 					''
 				)}
-				{
-					(console.log(`selectedSite: ${selectedSite}, widget name: ${name}`),
-					shouldShowWebsiteWidget ? (
-						<div className="">
-							{/* eslint-disable */}
-							<label className="u-text-normal u-margin-r2">Website</label>
-							<SelectBox
-								id="performance-site"
-								isClearable={false}
-								pullRight
-								isSearchable={false}
-								wrapperClassName="display-inline"
-								selected={selectedSite}
-								options={sitesToShow}
-								onSelect={site => {
-									widgetsConfig[wid]['selectedSite'] = site;
-									widgetsConfig[wid].isLoading = true;
-									this.setState({ widgetsConfig }, () => this.getDisplayData(wid));
-								}}
-							/>
 
-							{/* eslint-enable */}
-						</div>
-					) : (
-						''
-					))
-				}
+				{shouldShowWebsiteWidget ? (
+					<div className="">
+						{/* eslint-disable */}
+						<label className="u-text-normal u-margin-r2">Website</label>
+						<SelectBox
+							id="site-selectbox"
+							isClearable={false}
+							pullRight
+							isSearchable={false}
+							wrapperClassName="display-inline"
+							selected={selectedSite}
+							options={sitesToShow}
+							onSelect={site => {
+								widgetsConfig[wid]['selectedSite'] = site;
+								widgetsConfig[wid].isLoading = true;
+								this.setState({ widgetsConfig }, () => this.getDisplayData(wid));
+							}}
+						/>
+
+						{/* eslint-enable */}
+					</div>
+				) : (
+					''
+				)}
 			</div>
 		);
 	}

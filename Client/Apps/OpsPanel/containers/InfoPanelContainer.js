@@ -6,7 +6,7 @@ import { fetchReportingMeta } from '../../../actions/globalActions';
 const mapStateToProps = (state, ownProps) => {
 	const {
 		reports: {
-			data: { site = {}, widget },
+			data: { site = {}, widget, metrics },
 			fetched: isReportsMetaFetched
 		},
 		user,
@@ -16,6 +16,7 @@ const mapStateToProps = (state, ownProps) => {
 	return {
 		...ownProps,
 		widget,
+		metrics,
 		user,
 		isReportsMetaFetched,
 		sites: sites.fetched ? sites.data : [],
