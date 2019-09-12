@@ -7,29 +7,12 @@ const userModel = require('../../../models/userModel');
 const couchbase = require('../../../helpers/couchBaseService');
 const { getHbAdsApTag } = require('./generateAPTagConfig');
 const { isValidThirdPartyDFPAndCurrency } = require('../../../helpers/commonFunctions');
+const { getBiddersFromNetworkTree } = require('./commonFunctions');
 
 function getHbConfig(siteId) {
 	return couchbase
 		.connectToAppBucket()
 		.then(appBucket => appBucket.getAsync(`${docKeys.hb}${siteId}`, {}))
-		.catch(err => Promise.resolve({}));
-}
-
-function getBiddersFromNetworkTree() {
-	return couchbase
-		.connectToAppBucket()
-		.then(appBucket => appBucket.getAsync(`data::apNetwork`, {}))
-		.then(({ value: networkTree }) => {
-			const biddersFromNetworkTree = {};
-
-			for (const bidderCode in networkTree) {
-				if (networkTree.hasOwnProperty(bidderCode) && networkTree[bidderCode].isHb) {
-					biddersFromNetworkTree[bidderCode] = networkTree[bidderCode];
-				}
-			}
-
-			return biddersFromNetworkTree;
-		})
 		.catch(err => Promise.resolve({}));
 }
 
