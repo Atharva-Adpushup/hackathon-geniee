@@ -51,6 +51,8 @@ html(lang="en")
                     script(type='text/javascript').
                         window.apjQuery = window.jQuery;
                         window.currentUser = !{JSON.stringify(currentUser)};
+
+                    script(type='text/javascript').
                         var cookies = document.cookies;
                         var redirectCookieFound = cookies.some(function(cookie) {
                             var name = cookie.split('=');
