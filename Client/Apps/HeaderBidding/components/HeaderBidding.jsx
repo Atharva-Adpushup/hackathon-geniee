@@ -25,19 +25,35 @@ class HeaderBidding extends React.Component {
 			getSetupStatusAction
 		} = this.props;
 
-		if (setupStatus) return;
+		if (setupStatus) {
+			this.handleDefaultTab(url, siteId);
+			return;
+		}
 
-		getSetupStatusAction(siteId).then(() => {
-			const { setupStatus: updatedSetupStatus } = this.props;
-			const { inventoryFound, biddersFound } = updatedSetupStatus;
-
-			if (url === `/sites/${siteId}/apps/header-bidding` && inventoryFound && biddersFound) {
-				this.setState({
-					redirectUrl: `/sites/${siteId}/apps/header-bidding/${NAV_ITEMS_INDEXES.TAB_2}`
-				});
-			}
-		});
+		getSetupStatusAction(siteId).then(() => this.handleDefaultTab(url, siteId));
 	}
+
+	handleDefaultTab = (url, siteId) => {
+		const { setupStatus } = this.props;
+		const {
+			isAdpushupDfp,
+			dfpConnected,
+			inventoryFound,
+			biddersFound,
+			adServerSetupStatus
+		} = setupStatus;
+
+		if (
+			url === `/sites/${siteId}/apps/header-bidding` &&
+			(isAdpushupDfp || (dfpConnected && adServerSetupStatus === 2)) &&
+			inventoryFound &&
+			biddersFound
+		) {
+			this.setState({
+				redirectUrl: `/sites/${siteId}/apps/header-bidding/${NAV_ITEMS_INDEXES.TAB_2}`
+			});
+		}
+	};
 
 	getActiveTab = () => {
 		const {
@@ -61,7 +77,13 @@ class HeaderBidding extends React.Component {
 	handleNavSelect = value => {
 		const {
 			// eslint-disable-next-line no-unused-vars
-			setupStatus: { dfpConnected, adServerSetupCompleted, inventoryFound, biddersFound }
+			setupStatus: {
+				isAdpushupDfp,
+				dfpConnected,
+				inventoryFound,
+				biddersFound,
+				adServerSetupStatus
+			}
 		} = this.props;
 		const siteId = this.getSiteId();
 		const computedRedirectUrl = `/sites/${siteId}/apps/header-bidding`;
@@ -73,12 +95,12 @@ class HeaderBidding extends React.Component {
 				break;
 
 			case 2:
-				if (!adServerSetupCompleted) return false;
 				redirectUrl = `${computedRedirectUrl}/${NAV_ITEMS_INDEXES.TAB_2}`;
 				break;
 
 			case 3:
-				if (!adServerSetupCompleted || !inventoryFound) return false;
+				if ((!isAdpushupDfp && (!dfpConnected || adServerSetupStatus !== 2)) || !inventoryFound)
+					return false;
 				redirectUrl = `${computedRedirectUrl}/${NAV_ITEMS_INDEXES.TAB_3}`;
 				break;
 			case 4:
@@ -109,6 +131,7 @@ class HeaderBidding extends React.Component {
 			fetchAllBiddersAction,
 			setupStatus,
 			setDfpSetupStatusAction,
+			checkOrBeginDfpSetupAction,
 			addBidderAction,
 			updateBidderAction,
 			inventories,
@@ -129,6 +152,7 @@ class HeaderBidding extends React.Component {
 							inventoryFound={inventoryFound}
 							setupStatus={setupStatus}
 							setDfpSetupStatusAction={setDfpSetupStatusAction}
+							checkOrBeginDfpSetupAction={checkOrBeginDfpSetupAction}
 							showNotification={showNotification}
 						/>
 					);
@@ -171,25 +195,29 @@ class HeaderBidding extends React.Component {
 		const activeItem = NAV_ITEMS[activeTab];
 		const {
 			// eslint-disable-next-line no-unused-vars
-			setupStatus: { dfpConnected, adServerSetupCompleted, inventoryFound, biddersFound }
+			setupStatus: {
+				isAdpushupDfp,
+				dfpConnected,
+				inventoryFound,
+				biddersFound,
+				adServerSetupStatus
+			}
 		} = this.props;
 
 		return (
 			<div>
 				<Nav bsStyle="tabs" activeKey={activeItem.INDEX} onSelect={this.handleNavSelect}>
-					{(!inventoryFound || !biddersFound) && (
-						<NavItem eventKey={1}>{NAV_ITEMS_VALUES.TAB_1}</NavItem>
-					)}
-					<NavItem
-						eventKey={2}
-						// eslint-disable-next-line no-constant-condition
-						className={!adServerSetupCompleted ? 'disabled' : ''}
-					>
-						{NAV_ITEMS_VALUES.TAB_2}
-					</NavItem>
+					{((!isAdpushupDfp && (!dfpConnected || adServerSetupStatus !== 2)) ||
+						!inventoryFound ||
+						!biddersFound) && <NavItem eventKey={1}>{NAV_ITEMS_VALUES.TAB_1}</NavItem>}
+					<NavItem eventKey={2}>{NAV_ITEMS_VALUES.TAB_2}</NavItem>
 					<NavItem
 						eventKey={3}
-						className={!adServerSetupCompleted || !inventoryFound ? 'disabled' : ''}
+						className={
+							(!isAdpushupDfp && (!dfpConnected || adServerSetupStatus !== 2)) || !inventoryFound
+								? 'disabled'
+								: ''
+						}
 					>
 						{NAV_ITEMS_VALUES.TAB_3}
 					</NavItem>

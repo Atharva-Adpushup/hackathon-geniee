@@ -9,6 +9,7 @@ const httpStatus = require('../configs/httpStatusConsts');
 const AdPushupError = require('../helpers/AdPushupError');
 const FormValidator = require('../helpers/FormValidator');
 const schema = require('../helpers/schema');
+const commonConsts = require('../configs/commonConsts');
 
 const router = express.Router();
 
@@ -72,22 +73,37 @@ router
 						.then(bidders => !!Object.keys(bidders).length)
 						.catch(() => false),
 					siteModel.isInventoryExist(siteId).catch(() => false),
-					user
+					user,
+					siteModel.getSiteById(siteId)
 				)
 			)
-			.then(([biddersFound, inventoryFound, user]) =>
-				Promise.join(
-					biddersFound,
+			.then(([biddersFound, inventoryFound, user, site]) => {
+				const activeAdServerData = user.getActiveAdServerData('dfp');
+				const isValidAdServer = !!activeAdServerData && !!activeAdServerData.activeDFPNetwork;
+				const isAdpushupDfp =
+					activeAdServerData &&
+					activeAdServerData.activeDFPNetwork ===
+						commonConsts.hbGlobalSettingDefaults.dfpAdUnitTargeting.networkId.toString();
+				const dfpConnected = isAdpushupDfp ? undefined : !!user.getNetworkDataObj('DFP');
+				const isPublisherActiveDfp =
+					isValidAdServer &&
+					activeAdServerData.activeDFPNetwork !==
+						commonConsts.hbGlobalSettingDefaults.dfpAdUnitTargeting.networkId.toString();
+				const adServerSetupStatus = site.get('adServerSetupStatus') || 0;
+				const adpushupNetworkCode = isAdpushupDfp
+					? commonConsts.hbGlobalSettingDefaults.dfpAdUnitTargeting.networkId
+					: undefined;
+
+				return res.status(httpStatus.OK).json({
+					dfpConnected,
 					inventoryFound,
-					Promise.resolve(true), // dfp line items automation (adserver setup) status
-					!!user.getNetworkDataObj('DFP')
-				)
-			)
-			.then(([biddersFound, inventoryFound, adServerSetupCompleted, dfpConnected]) =>
-				res
-					.status(httpStatus.OK)
-					.json({ dfpConnected, adServerSetupCompleted, inventoryFound, biddersFound })
-			)
+					biddersFound,
+					isAdpushupDfp,
+					adpushupNetworkCode,
+					isPublisherActiveDfp,
+					adServerSetupStatus
+				});
+			})
 			.catch(err => {
 				// eslint-disable-next-line no-console
 				console.log(err);
@@ -507,6 +523,49 @@ router
 				return res
 					.status(httpStatus.INTERNAL_SERVER_ERROR)
 					.json({ error: 'Internal Server Error!' });
+			});
+	})
+	.get('/adserverSetup/:siteId', (req, res) => {
+		const { siteId } = req.params;
+		const { email } = req.user;
+
+		return userModel
+			.verifySiteOwner(email, siteId)
+			.then(({ user }) =>
+				Promise.join(siteModel.getSiteById(siteId), headerBiddingModel.setupAdserver(siteId, user))
+			)
+			.then(([site, resp]) => {
+				let httpStatusCode;
+				let message;
+
+				const adServerSetupStatus = site.get('adServerSetupStatus');
+
+				if (resp.status === 'pending' || resp.status === 'in-progress') {
+					if (adServerSetupStatus !== 1) site.set('adServerSetupStatus', 1);
+					httpStatusCode = 202;
+					message = 'Adserver automation is in progress';
+				}
+
+				if (resp.status === 'failed') {
+					if (adServerSetupStatus !== 3) site.set('adServerSetupStatus', 3);
+					httpStatusCode = 502;
+					message = 'Adserver automation failed';
+				}
+
+				if (resp.status === 'finished') {
+					if (adServerSetupStatus !== 2) site.set('adServerSetupStatus', 2);
+					httpStatusCode = 200;
+					message = 'Adserver automation finished';
+				}
+
+				return Promise.join(httpStatusCode, message, site.save());
+			})
+			.then(([httpStatusCode, message]) => res.status(httpStatusCode).json({ success: message }))
+			.catch(err => {
+				// eslint-disable-next-line no-console
+				console.log(err);
+
+				return res.status(500).json({ success: 'Something went wrong!' });
 			});
 	});
 

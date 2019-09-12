@@ -8,7 +8,8 @@ import {
 	UPDATE_BIDDER,
 	FETCH_INVENTORIES,
 	UPDATE_INVENTORIES_HB_STATUS,
-	SET_DFP_SETUP_STATUS
+	SET_DFP_SETUP_STATUS,
+	UPDATE_ADSERVER_SETUP_STATUS
 } from '../../constants/headerBidding';
 
 const defaultState = {};
@@ -121,6 +122,22 @@ export default function(state = defaultState, action) {
 				[siteId]: {
 					...state[siteId],
 					inventories
+				}
+			};
+		}
+		case UPDATE_ADSERVER_SETUP_STATUS: {
+			const { siteId, adServerSetupStatus } = action;
+			const prevAdServerSetupStatus =
+				state[siteId] && state[siteId].setupStatus && state[siteId].setupStatus.adServerSetupStatus;
+
+			if (prevAdServerSetupStatus === false || prevAdServerSetupStatus === adServerSetupStatus)
+				return state;
+
+			return {
+				...state,
+				[siteId]: {
+					...state[siteId],
+					setupStatus: { ...state[siteId].setupStatus, adServerSetupStatus }
 				}
 			};
 		}

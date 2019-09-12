@@ -12,8 +12,13 @@ import CustomInputNumber from 'components/shared/customInputNumber.jsx';
 class collection extends React.Component {
 	constructor(props) {
 		super(props);
+		const { collection, maxValue } = this.props;
+		const sum = collection.reduce((acc, ele) => acc + ele.value, 0);
+		const isValid = sum === maxValue;
+
 		this.state = {
-			model: props.savedCollection || {}
+			model: props.savedCollection || {},
+			hasSumExtended: !isValid
 		};
 		this.handleInputChange = this.handleInputChange.bind(this);
 		this.renderSum = this.renderSum.bind(this);
@@ -28,7 +33,21 @@ class collection extends React.Component {
 	}
 
 	onSave() {
-		this.updateModel();
+		const { maxValue, collection } = this.props;
+		let model = this.getModel();
+
+		if (!model || !Object.keys(model).length) {
+			model = {};
+			collection.forEach((ele, index) => (model[index] = ele.value));
+		}
+
+		const sum = this.getCollectionSum(model);
+		const isValid = sum === maxValue;
+
+		if (isValid) this.updateModel();
+		else {
+			alert(`All variation sum should be add up to ${maxValue}`);
+		}
 	}
 
 	getModel() {
@@ -94,11 +113,29 @@ class collection extends React.Component {
 		const $saveBtn = $(ReactDOM.findDOMNode(this.refs['td-save-btn']));
 
 		if (isSumNotEqual) {
-			$saveBtn.attr({ disabled: true }).addClass('disabled');
-			$errorMessage.removeClass('hide');
+			this.setState(
+				state => {
+					return {
+						hasSumExtended: true
+					};
+				},
+				() => {
+					$saveBtn.attr({ disabled: true }).addClass('disabled');
+					$errorMessage.removeClass('hide');
+				}
+			);
 		} else {
-			$saveBtn.attr({ disabled: false }).removeClass('disabled');
-			$errorMessage.addClass('hide');
+			this.setState(
+				state => {
+					return {
+						hasSumExtended: false
+					};
+				},
+				() => {
+					$saveBtn.attr({ disabled: false }).removeClass('disabled');
+					$errorMessage.addClass('hide');
+				}
+			);
 		}
 	}
 
@@ -138,8 +175,15 @@ class collection extends React.Component {
 	}
 
 	renderSum() {
-		const { maxValue } = this.props;
-		const sum = this.getCollectionSum(this.getModel());
+		const { maxValue, collection } = this.props;
+		let model = this.getModel();
+
+		if (!model || !Object.keys(model).length) {
+			model = {};
+			collection.forEach((ele, index) => (model[index] = ele.value));
+		}
+
+		const sum = this.getCollectionSum(model);
 		let remaining = maxValue - sum;
 		remaining = remaining < 0 ? 'N/A' : remaining;
 
@@ -221,6 +265,7 @@ class collection extends React.Component {
 
 	render() {
 		const props = this.props;
+		const { hasSumExtended } = this.state;
 		const options = {
 			layoutClassName: 'form-group form-group--horizontal form-group--numeric-range'
 		};
@@ -240,7 +285,7 @@ class collection extends React.Component {
 				<Row>
 					<Col xs={12} className="u-padding-0px">
 						<Button
-							disabled={this.state.hasSumExtended}
+							// disabled={hasSumExtended}
 							ref="td-save-btn"
 							className="btn-lightBg btn-save btn-block"
 							onClick={a => this.onSave(a)}
