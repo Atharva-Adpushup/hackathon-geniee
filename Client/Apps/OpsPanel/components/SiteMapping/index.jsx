@@ -253,9 +253,7 @@ class SiteMapping extends Component {
 							<FontAwesomeIcon size="1x" icon="download" className="u-margin-r3" />
 							Export Report
 						</CustomButton>
-					) : (
-						<span />
-					)}
+					) : null}
 
 					{/* <CustomButton
 						variant="secondary"
