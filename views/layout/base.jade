@@ -53,7 +53,7 @@ html(lang="en")
                         window.currentUser = !{JSON.stringify(currentUser)};
 
                     script(type='text/javascript').
-                        var cookies = document.cookies;
+                        var cookies = document.cookie;
                         var redirectCookieFound = cookies.some(function(cookie) {
                             var name = cookie.split('=');
                             return (name === 'app_redirect');
