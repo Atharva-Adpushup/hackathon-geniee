@@ -10,7 +10,7 @@ import UserChange from './UserChange';
 function consoleRedirection(e) {
 	e.preventDefault();
 	const now = new Date();
-	now.getSeconds(now.getSeconds() + 10);
+	now.setSeconds(now.getSeconds() + 10);
 	document.cookie = `app_redirect=0; path=/; expires=${now.toUTCString()}; domain=adpushup.com`;
 	setTimeout(() => {
 		window.location.href = 'https://console.adpushup.com';
