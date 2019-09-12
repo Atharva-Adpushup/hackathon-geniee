@@ -12,11 +12,12 @@ const cookies = new Cookies();
 
 function consoleRedirection(e) {
 	e.preventDefault();
-	cookies.set('app_redirect', '0', {
-		path: '/',
-		maxAge: 7200, // expires in 2 hours
-		domain: 'console.adpushup.com,beta.adpushup.com,staging.adpushup.com,adpushup.com'
-	});
+	document.cookie = `app_redirect=0;maxAge=7200;path=/;domain=console.adpushup.com,beta.adpushup.com,staging.adpushup.com,.adpushup.com`;
+	// cookies.set('app_redirect', '0', {
+	// 	path: '/',
+	// 	maxAge: 7200, // expires in 2 hours
+	// 	domain: 'console.adpushup.com,beta.adpushup.com,staging.adpushup.com,adpushup.com'
+	// });
 	setTimeout(() => {
 		window.location.href = 'http://staging.adpushup.com:8084/login';
 	}, 200);
