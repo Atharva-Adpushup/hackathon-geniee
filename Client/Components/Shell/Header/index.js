@@ -11,7 +11,7 @@ function consoleRedirection(e) {
 	e.preventDefault();
 	document.cookie = `app_redirect=0; path=/; maxAge=7200; domain=adpushup.com`;
 	setTimeout(() => {
-		window.location.href = 'http://staging.adpushup.com:8084/login';
+		window.location.href = 'https://console.adpushup.com';
 	}, 500);
 }
 
