@@ -27,7 +27,7 @@ const Header = ({ sidebarToggle, logout, user, switchUser, findUsers }) => (
 		<div className="header-nav">
 			{user.isSuperUser ? <UserChange switchUser={switchUser} findUsers={findUsers} /> : null}
 			<CustomButton variant="secondary" onClick={consoleRedirection} className="u-margin-r3">
-				Goto Console
+				Go to Console
 			</CustomButton>
 
 			<DropdownButton pullRight title={`Hello ${user.firstName || ''}`} id="dropdown-button">
