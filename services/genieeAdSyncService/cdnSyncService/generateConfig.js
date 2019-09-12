@@ -91,6 +91,7 @@ function HbProcessing(site, apConfigs) {
 				apps.headerBidding &&
 				hbcf.value &&
 				hbcf.value.hbcf &&
+				Object.keys(hbcf.value.hbcf).length &&
 				hbAds.length
 			);
 

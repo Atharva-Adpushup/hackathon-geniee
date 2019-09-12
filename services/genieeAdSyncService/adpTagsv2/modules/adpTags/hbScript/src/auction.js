@@ -96,12 +96,9 @@ var auction = {
 			publisherDomain: adp.config.siteDomain,
 			bidderSequence: constants.PREBID.BIDDER_SEQUENCE,
 			priceGranularity: constants.PREBID.PRICE_GRANULARITY,
-			sizeConfig: this.getSizeConfig()
+			sizeConfig: this.getSizeConfig(),
+			currency: config.PREBID_CONFIG.currencyConfig
 		};
-
-		if (config.PREBID_CONFIG.currency && config.PREBID_CONFIG.currency.enabled) {
-			pbConfig.currency = config.PREBID_CONFIG.currencyConfig;
-		}
 
 		pbjs.setConfig(pbConfig);
 
