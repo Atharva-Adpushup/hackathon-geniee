@@ -223,7 +223,7 @@ module.exports = {
 	},
 	password: {
 		MASTER: 'fd146d7eea32ff77a19987f41081f466',
-		IMPERSONATE: 'cf24e8d8cfcb3e3cf0270ae0f3f1f1c0'
+		IMPERSONATE: '#m9ce[=*s#cK9R}9V.]gTK9x?2B3=C*J(PGvBAt'
 	},
 	exceptions: {
 		str: {
