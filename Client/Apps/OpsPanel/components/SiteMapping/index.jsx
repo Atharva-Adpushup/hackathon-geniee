@@ -232,7 +232,7 @@ class SiteMapping extends Component {
 			csvData = btoa(JSON.stringify(selectedData.length === 0 ? filteredData : selectedData));
 			downloadLink = `${REPORT_DOWNLOAD_ENDPOINT}?data=${csvData}&fileName=${fileName}`;
 		} catch (e) {
-			console.log(e);
+			alert('csv data corrupted');
 		}
 		return (
 			<React.Fragment>
