@@ -80,7 +80,15 @@ var auction = {
 
 		return bidderSettings;
 	},
-	setPrebidConfig: function (pbjs, prebidSlots) {
+	setBidderAliases(pbjs) {
+		const bidders = config.INVENTORY.hbcf;
+		for (const bidderCode in bidders) {
+			if (bidders.hasOwnProperty(bidderCode) && bidders[bidderCode].alias) {
+				pbjs.aliasBidder(bidders[bidderCode].alias, bidderCode);
+			}
+		}
+	},
+	setPrebidConfig: function(pbjs, prebidSlots) {
 		var pbConfig = {
 			rubicon: {
 				singleRequest: true
@@ -106,8 +114,7 @@ var auction = {
 
 		pbjs.bidderSettings = this.getBidderSettings();
 
-		pbjs.aliasBidder('appnexus', 'districtm');
-		pbjs.aliasBidder('appnexus', 'oftmedia');
+		this.setBidderAliases(pbjs);
 	},
 	start: function(prebidSlots, adpBatchId) {
 		var pbjs = window.pbjs;
