@@ -34,7 +34,8 @@ var model = require('../helpers/model'),
 			'isInnovative',
 			'gdpr',
 			'ampSettings',
-			'apps'
+			'apps',
+			'adServerSetupStatus'
 		];
 		this.clientKeys = [
 			'siteId',
@@ -51,7 +52,8 @@ var model = require('../helpers/model'),
 			'isInnovative',
 			'gdpr',
 			'ampSettings',
-			'apps'
+			'apps',
+			'adServerSetupStatus'
 		];
 		this.validations = {
 			required: []
@@ -72,7 +74,8 @@ var model = require('../helpers/model'),
 				pageGroups: []
 			},
 			adNetworkSettings: commonConsts.DEFAULT_AD_NETWORK_SETTINGS,
-			apps: {}
+			apps: {},
+			adServerSetupStatus: 0
 		};
 		this.ignore = [];
 		this.classMap = { apConfigs: apConfigSchema };
