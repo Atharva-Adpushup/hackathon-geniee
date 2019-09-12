@@ -54,7 +54,7 @@ html(lang="en")
 
                     script(type='text/javascript').
                         var cookies = document.cookie || '';
-                        cookies = cookies.split(',');
+                        cookies = cookies.split(';');
                         var redirectCookieFound = cookies.some(function(cookie) {
                             var name = cookie.split('=');
                             return (name === 'app_redirect');
