@@ -12,7 +12,7 @@ const cookies = new Cookies();
 
 function consoleRedirection(e) {
 	e.preventDefault();
-	document.cookie = `app_redirect=0;maxAge=7200;path=/;domain=console.adpushup.com,beta.adpushup.com,staging.adpushup.com,.adpushup.com`;
+	document.cookie = `app_redirect=0; path=/; maxAge=7200; domain=adpushup.com`;
 	// cookies.set('app_redirect', '0', {
 	// 	path: '/',
 	// 	maxAge: 7200, // expires in 2 hours
@@ -20,7 +20,7 @@ function consoleRedirection(e) {
 	// });
 	setTimeout(() => {
 		window.location.href = 'http://staging.adpushup.com:8084/login';
-	}, 200);
+	}, 500);
 }
 
 const Header = ({ sidebarToggle, logout, user, switchUser, findUsers }) => (
