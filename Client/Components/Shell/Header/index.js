@@ -3,21 +3,13 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { DropdownButton, MenuItem } from 'react-bootstrap';
-import Cookies from 'universal-cookie';
 import CustomButton from '../../CustomButton/index';
 import history from '../../../helpers/history';
 import UserChange from './UserChange';
 
-const cookies = new Cookies();
-
 function consoleRedirection(e) {
 	e.preventDefault();
 	document.cookie = `app_redirect=0; path=/; maxAge=7200; domain=adpushup.com`;
-	// cookies.set('app_redirect', '0', {
-	// 	path: '/',
-	// 	maxAge: 7200, // expires in 2 hours
-	// 	domain: 'console.adpushup.com,beta.adpushup.com,staging.adpushup.com,adpushup.com'
-	// });
 	setTimeout(() => {
 		window.location.href = 'http://staging.adpushup.com:8084/login';
 	}, 500);
