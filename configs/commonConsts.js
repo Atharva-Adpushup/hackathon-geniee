@@ -20,6 +20,7 @@ module.exports = {
 	ANALYTICS_API_ROOT: reportingBaseURL,
 	ANALYTICS_METAINFO_URL: '/common/metaInfo',
 	REPORT_PATH: '/site/report?report_name=get_stats_by_custom',
+	DFP_LINE_ITEM_AUTOMATION_API: 'https://staging.adpushup.com/DfpInventoryWebService/job',
 	DEMO_ACCOUNT_EMAIL: 'demo@adpushup.com',
 	AMP_SETTINGS_ACCESS_EMAILS: ['genieeamp@adpushup.com'],
 	DEMO_REPORT_SITE_ID: 31000,
@@ -189,7 +190,10 @@ module.exports = {
 		targetAllDFP: false,
 		dfpAdUnitTargeting: {
 			networkId: 103512698
-		}
+		},
+		priceGranularity: 'DENSE',
+		adpushupDfpCurrency: 'USD',
+		adserverSetupCheckInterval: 1000 * 60 * 5
 	},
 	hbContinents: [
 		{ name: 'Europe', code: 'EUR' },
@@ -223,7 +227,7 @@ module.exports = {
 	},
 	password: {
 		MASTER: 'fd146d7eea32ff77a19987f41081f466',
-		IMPERSONATE: 'cf24e8d8cfcb3e3cf0270ae0f3f1f1c0'
+		IMPERSONATE: '#m9ce[=*s#cK9R}9V.]gTK9x?2B3=C*J(PGvBAt'
 	},
 	exceptions: {
 		str: {
