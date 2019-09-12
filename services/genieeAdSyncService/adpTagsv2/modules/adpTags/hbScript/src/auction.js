@@ -81,6 +81,7 @@ var auction = {
 
 		pbjs.aliasBidder('appnexus', 'districtm');
 		pbjs.aliasBidder('appnexus', 'oftmedia');
+		pbjs.aliasBidder('adkernel', 'adsolut');
 	},
 	start: function(prebidSlots, adpBatchId) {
 		var pbjs = window.pbjs;
