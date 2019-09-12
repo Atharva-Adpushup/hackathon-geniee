@@ -6,9 +6,7 @@ import React, { Component } from 'react';
 import ReactTable from 'react-table';
 import clonedeep from 'lodash/cloneDeep';
 import 'react-table/react-table.css';
-import { Glyphicon, Row } from 'react-bootstrap';
-import { faMailBulk } from '@fortawesome/free-solid-svg-icons';
-import { library } from '@fortawesome/fontawesome-svg-core';
+import { Row } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import axiosInstance from '../../../../helpers/axiosInstance';
@@ -22,22 +20,23 @@ import CustomError from '../../../../Components/CustomError/index';
 import { REPORT_DOWNLOAD_ENDPOINT } from '../../../Reporting/configs/commonConsts';
 import { SITE_MAPPING_COLUMNS, SITE_MAPPING_FILTER_COLUMNS } from '../../configs/commonConsts';
 
-library.add(faMailBulk);
+const DEFAULT_WIDTH = {
+	width: 50,
+	maxWidth: 50,
+	minWidth: 50
+};
 
 class SiteMapping extends Component {
-	constructor() {
-		super();
-		this.state = {
-			data: [],
-			filteredData: [],
-			isLoading: false,
-			isError: false,
-			selectAll: false,
-			checked: [],
-			selectedData: [],
-			fileName: 'sites-stats'
-		};
-	}
+	state = {
+		data: [],
+		filteredData: [],
+		isLoading: false,
+		isError: false,
+		selectAll: false,
+		checked: [],
+		selectedData: [],
+		fileName: 'sites-stats'
+	};
 
 	componentDidMount() {
 		this.setState({ isLoading: true });
@@ -51,11 +50,12 @@ class SiteMapping extends Component {
 	}
 
 	handleChange = () => {
-		const { filteredData } = this.state;
+		const { filteredData, selectAll } = this.state;
 		const checkedCopy = [];
-		this.setState({ selectAll: !this.state.selectAll }, () => {
+		this.setState({ selectAll: !selectAll }, () => {
+			const { selectAll } = this.state;
 			filteredData.forEach(() => {
-				checkedCopy.push(this.state.selectAll);
+				checkedCopy.push(selectAll);
 			});
 			this.setState({
 				checked: checkedCopy,
@@ -65,9 +65,8 @@ class SiteMapping extends Component {
 	};
 
 	handleSingleCheckboxChange = (index, e) => {
-		const { checked, selectedData } = this.state;
+		const { checked, selectedData, filteredData } = this.state;
 		const checkedCopy = checked;
-		const { filteredData } = this.state;
 		if (e.target.checked) {
 			checkedCopy[index] = e.target.checked;
 			selectedData.push(filteredData[index]);
@@ -84,7 +83,7 @@ class SiteMapping extends Component {
 
 	getFilterBoxValues = key => {
 		const { data } = this.state;
-		const values = [...new Set([...data].map(val => val[key]))];
+		const values = [...new Set(data.map(val => val[key]))];
 
 		return values.map(value => ({ name: value }));
 	};
@@ -176,19 +175,15 @@ class SiteMapping extends Component {
 				),
 				sortable: false,
 				filterable: false,
-				width: 50,
-				maxWidth: 50,
-				minWidth: 50
+				...DEFAULT_WIDTH
 			},
 
 			...SITE_MAPPING_COLUMNS
 		];
-		if (isError) {
-			return <CustomError />;
-		}
-		if (filteredData.length === 0) {
-			return <Empty message=" No Data found " />;
-		}
+
+		if (isError) return <CustomError />;
+		else if (filteredData.length === 0) return <Empty message=" No Data found " />;
+
 		return (
 			<ReactTable
 				columns={columns}
@@ -198,9 +193,15 @@ class SiteMapping extends Component {
 				showPaginationBottom={false}
 				className="u-padding-h3 u-padding-v2 site-mapping"
 				defaultPageSize={this.getDefaultPageSize()}
-				pageSizeOptions={[5, 10, 20, 25, 50, 100]}
+				pageSizeOptions={[50, 100, 150, 200, 250]}
 			/>
 		);
+	};
+
+	handleExport = () => {
+		setTimeout(() => {
+			this.setState({ checked: [], selectedData: [], selectAll: false });
+		}, 0);
 	};
 
 	sendMail = () => {
@@ -220,24 +221,19 @@ class SiteMapping extends Component {
 			? console.log('You have selected no')
 			: console.log('we are sending the bulk mail for you');
 
-		this.setState({ checked: [], selectAll: false });
+		this.setState({ checked: [], selectedData: [], selectAll: false });
 	};
 
 	render() {
 		const { isLoading, filteredData, selectedData, fileName } = this.state;
+		if (isLoading) return <Loader height="600px" classNames="u-margin-v3" />;
 		let csvData, downloadLink;
 		try {
-			csvData =
-				selectedData.length === 0
-					? btoa(JSON.stringify(filteredData))
-					: btoa(JSON.stringify(selectedData));
+			csvData = btoa(JSON.stringify(selectedData.length === 0 ? filteredData : selectedData));
 			downloadLink = `${REPORT_DOWNLOAD_ENDPOINT}?data=${csvData}&fileName=${fileName}`;
 		} catch (e) {
-			console.log('Invalid input');
+			console.log(e);
 		}
-
-		if (isLoading) return <Loader height="600px" classNames="u-margin-v3" />;
-
 		return (
 			<React.Fragment>
 				<FilterBox
@@ -247,23 +243,28 @@ class SiteMapping extends Component {
 					className="u-margin-v5 u-margin-h4 "
 				/>
 				<Row>
-					<CustomButton
-						variant="primary"
-						href={downloadLink}
-						className="btn btn-lightBg btn-default btn-blue-line pull-right u-margin-r3 u-margin-b4 "
-					>
-						<Glyphicon glyph="download-alt u-margin-r2" />
-						Export Report
-					</CustomButton>
+					{csvData ? (
+						<CustomButton
+							variant="primary"
+							href={downloadLink}
+							className="btn btn-lightBg btn-default btn-blue-line pull-right u-margin-r3 u-margin-b4 "
+							onClick={this.handleExport}
+						>
+							<FontAwesomeIcon size="1x" icon="download" className="u-margin-r3" />
+							Export Report
+						</CustomButton>
+					) : (
+						<span />
+					)}
 
-					<CustomButton
+					{/* <CustomButton
 						variant="secondary"
 						className=" pull-right u-margin-r3 u-margin-b4 "
 						onClick={this.sendMail}
 					>
-						<FontAwesomeIcon size="1x" icon={faMailBulk} className="u-margin-r3" />
+						<FontAwesomeIcon size="1x" icon="mail-bulk" className="u-margin-r3" />
 						Send Custom Mail
-					</CustomButton>
+					</CustomButton> */}
 				</Row>
 				{this.renderContent()}
 			</React.Fragment>
