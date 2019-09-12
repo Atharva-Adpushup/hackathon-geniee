@@ -14,7 +14,11 @@ import PerformanceOverviewContainer from '../../../../Pages/Dashboard/containers
 import PerformanceApOriginalContainer from '../../../../Pages/Dashboard/containers/PerformanceApOriginalContainer';
 import RevenueContainer from '../../../../Pages/Dashboard/containers/RevenueContainer';
 import Loader from '../../../../Components/Loader/index';
-import { dates } from '../../../../Pages/Dashboard/configs/commonConsts';
+import {
+	dates,
+	DEFAULT_DATE,
+	ALL_SITES_VALUE
+} from '../../../../Pages/Dashboard/configs/commonConsts';
 import SelectBox from '../../../../Components/SelectBox/index';
 import reportService from '../../../../services/reportService';
 import { convertObjToArr, getDateRange } from '../../../../Pages/Dashboard/helpers/utils';
@@ -23,35 +27,59 @@ class QuickSnapshot extends React.Component {
 	constructor(props) {
 		super(props);
 		const { reportType, sites, reportingSites } = props;
-		const allUserSites = [{ name: 'All', value: 'all' }, ...convertObjToArr(sites)];
+		const allUserSites = [ALL_SITES_VALUE, ...convertObjToArr(sites)];
 		// const topPerformingSite = reportingSites
 		// 	? this.getTopPerformingSites(allUserSites, reportingSites)
 		// 	: null;
 		// const selectedSite = reportType == 'site' ? siteId : topPerformingSite || 'all';
 		this.state = {
+			isLoading: true,
 			quickDates: dates,
-			sites: allUserSites,
 			reportType,
-			widgetsConfig: [],
-			isLoading: true
+			sites: allUserSites,
+			top10Sites: [],
+			widgetsConfig: []
 		};
 	}
 
 	componentDidMount() {
-		const { sites, isReportsMetaFetched, setReportingMetaData } = this.props;
+		const { sites, setReportingMetaData } = this.props;
 		const userSites = Object.keys(sites).toString();
+		const getTop10SitesData = this.getTop10SitesData(DEFAULT_DATE);
+		const getReportMetaData = reportService.getMetaData({ sites: userSites });
 
-		if (!isReportsMetaFetched) {
-			return reportService.getMetaData({ sites: userSites }).then(response => {
-				const { data } = response;
+		return Promise.all([getTop10SitesData, getReportMetaData])
+			.then(responseData => {
+				const [top10SitesData, reportMetaData] = responseData;
+				const { data: metaData } = reportMetaData;
 
-				setReportingMetaData(data);
+				setReportingMetaData(metaData);
+				this.setTop10SitesData(top10SitesData);
 				this.renderComputedWidgetsUI();
-			});
-		}
-
-		return this.renderComputedWidgetsUI();
+			})
+			.catch(() =>
+				getTop10SitesData
+					.then(top10SitesData => {
+						this.setTop10SitesData(top10SitesData);
+						setReportingMetaData({});
+						this.renderComputedWidgetsUI();
+					})
+					.catch(() => {
+						setReportingMetaData({});
+						this.renderComputedWidgetsUI();
+					})
+			);
 	}
+
+	getTop10SitesData = selectedDate => {
+		const params = { ...getDateRange(selectedDate), isSuperUser: true };
+		const path = '/site/report?report_name=top_sites';
+
+		return reportService
+			.getWidgetData({ path, params })
+			.then(({ data }) => this.getTopSitesWidgetTransformedData(data))
+			.then(this.reduceTopSitesDataToArray);
+	};
 
 	getTopPerformingSites = (allUserSites, reportingSites) => {
 		let topPerformingSite;
@@ -65,21 +93,50 @@ class QuickSnapshot extends React.Component {
 		return topPerformingSite;
 	};
 
+	getReportTypeValidation = () => {
+		const { reportType } = this.state;
+		const isReportTypeAccount = !!(reportType === 'account');
+		const isReportTypeGlobal = !!(reportType === 'global');
+		const isReportTypeSite = !!(reportType === 'site');
+		const resultObject = { isReportTypeAccount, isReportTypeGlobal, isReportTypeSite };
+
+		return resultObject;
+	};
+
+	getWebsiteWidgetValidation = widgetName => {
+		const {
+			widgetsName: { OPS_TOP_SITES, OPS_COUNTRY_REPORT, OPS_NETWORK_REPORT, OPS_ERROR_REPORT }
+		} = this.props;
+		const isValid = !!(
+			widgetName &&
+			widgetName !== OPS_TOP_SITES &&
+			widgetName !== OPS_COUNTRY_REPORT &&
+			widgetName !== OPS_NETWORK_REPORT &&
+			widgetName !== OPS_ERROR_REPORT
+		);
+
+		return isValid;
+	};
+
 	getWidgetConfig = (widgets, widgetsList) => {
 		const {
 			widgetsName: { PER_AP_ORIGINAL, OPS_TOP_SITES, OPS_COUNTRY_REPORT, OPS_NETWORK_REPORT }
 		} = this.props;
 		const sortedWidgets = sortBy(widgets, ['position', 'name']);
 		const widgetsConfig = [];
+		const { top10Sites: sitesList } = this.state;
 
 		Object.keys(sortedWidgets).forEach(wid => {
 			const widget = { ...sortedWidgets[wid] };
+			const websiteWidgetValidated = this.getWebsiteWidgetValidation(widget.name);
 
 			if (widgetsList.indexOf(widget.name) > -1) {
 				widget.isLoading = true;
-				widget.selectedDate = dates[2].value;
+				widget.selectedDate = DEFAULT_DATE;
 				widget.isDataSufficient = false;
 				widget.selectedSite = 'all';
+
+				if (websiteWidgetValidated) widget.sitesList = sitesList;
 
 				switch (widget.name) {
 					case PER_AP_ORIGINAL:
@@ -172,9 +229,8 @@ class QuickSnapshot extends React.Component {
 	};
 
 	getDisplayData = wid => {
-		const { widgetsConfig, reportType } = this.state;
-		const isReportTypeAccount = !!(reportType === 'account');
-		const isReportTypeGlobal = !!(reportType === 'global');
+		const { widgetsConfig } = this.state;
+		const { isReportTypeAccount, isReportTypeGlobal } = this.getReportTypeValidation();
 		const { selectedDate, selectedSite, path, name } = widgetsConfig[wid];
 		const { sites, reportingSites } = this.props;
 		const siteIds = Object.keys(sites);
@@ -188,7 +244,7 @@ class QuickSnapshot extends React.Component {
 
 		params.siteid = selectedSite === 'all' ? siteIds.toString() : selectedSite;
 
-		if (isReportTypeGlobal) {
+		if (isReportTypeGlobal && selectedSite === 'all') {
 			delete params.siteid;
 			params.isSuperUser = true;
 		}
@@ -204,29 +260,53 @@ class QuickSnapshot extends React.Component {
 			widgetsConfig[wid].isDataSufficient = false;
 			widgetsConfig[wid].isLoading = false;
 		} else if (validReportParams) {
-			reportService.getWidgetData({ path, params }).then(response => {
-				if (
-					response.status == 200 &&
-					!isEmpty(response.data) &&
-					response.data.result &&
-					response.data.result.length > 0
-				) {
-					widgetsConfig[wid].data = response.data;
-					widgetsConfig[wid].isDataSufficient = true;
-				} else {
+			const isValidSiteList = !!(
+				widgetsConfig[wid].sitesList && widgetsConfig[wid].sitesList.length
+			);
+			const websiteWidgetValidated = this.getWebsiteWidgetValidation(widgetsConfig[wid].name);
+			const shouldFetchWidgetTopSites = !!(
+				isReportTypeGlobal &&
+				!isValidSiteList &&
+				websiteWidgetValidated
+			);
+			const getTop10SitesData = shouldFetchWidgetTopSites
+				? this.getTop10SitesData(selectedDate)
+				: Promise.resolve(widgetsConfig[wid].sitesList);
+			const getWidgetData = reportService.getWidgetData({ path, params });
+
+			return Promise.all([getTop10SitesData, getWidgetData])
+				.then(responseData => {
+					const [top10SitesData, response] = responseData;
+
+					if (
+						response.status == 200 &&
+						!isEmpty(response.data) &&
+						response.data.result &&
+						response.data.result.length > 0
+					) {
+						widgetsConfig[wid].data = response.data;
+						widgetsConfig[wid].isDataSufficient = true;
+						widgetsConfig[wid].sitesList = top10SitesData;
+					} else {
+						widgetsConfig[wid].data = {};
+						widgetsConfig[wid].isDataSufficient = false;
+					}
+
+					widgetsConfig[wid].isLoading = false;
+					return this.setState({ widgetsConfig });
+				})
+				.catch(() => {
 					widgetsConfig[wid].data = {};
 					widgetsConfig[wid].isDataSufficient = false;
-				}
-				widgetsConfig[wid].isLoading = false;
-				this.setState({ widgetsConfig });
-			});
+					return this.setState({ widgetsConfig });
+				});
 		} else {
 			widgetsConfig[wid].data = {};
 			widgetsConfig[wid].isDataSufficient = false;
 			widgetsConfig[wid].isLoading = false;
 		}
 
-		this.setState({ widgetsConfig });
+		return this.setState({ widgetsConfig });
 	};
 
 	getLayoutSites = (allUserSites, reportingSites) => {
@@ -248,16 +328,36 @@ class QuickSnapshot extends React.Component {
 			0,
 			10
 		);
+
 		return computedData;
+	};
+
+	reduceTopSitesDataToArray = resultData =>
+		resultData.result.reduce(
+			(accumulator, object) => {
+				const item = {
+					name: object.siteName,
+					value: String(object.siteid)
+				};
+
+				accumulator.push(item);
+				return accumulator;
+			},
+			[ALL_SITES_VALUE]
+		);
+
+	setTop10SitesData = top10Sites => {
+		this.setState({ top10Sites });
 	};
 
 	showApBaselineWidget = () => {
 		const { siteId, reportingSites } = this.props;
-		const { reportType } = this.state;
+		const {
+			isReportTypeGlobal,
+			isReportTypeSite,
+			isReportTypeAccount
+		} = this.getReportTypeValidation();
 		const { sites } = this.state;
-		const isReportTypeGlobal = !!(reportType === 'global');
-		const isReportTypeSite = !!(reportType === 'site');
-		const isReportTypeAccount = !!(reportType === 'account');
 		const hasUserSiteProductLayout = !!(
 			isReportTypeSite &&
 			reportingSites &&
@@ -293,12 +393,35 @@ class QuickSnapshot extends React.Component {
 	};
 
 	renderControl(wid) {
-		const { reportingSites } = this.props;
+		const {
+			reportingSites,
+			widgetsName: {
+				ESTIMATED_EARNINGS,
+				PER_AP_ORIGINAL,
+				PER_OVERVIEW,
+				OPS_TOP_SITES,
+				OPS_COUNTRY_REPORT,
+				OPS_NETWORK_REPORT,
+				OPS_ERROR_REPORT
+			}
+		} = this.props;
 		const { widgetsConfig, quickDates, sites, reportType } = this.state;
-		const { selectedDate, selectedSite, name } = widgetsConfig[wid];
+		const {
+			isReportTypeAccount,
+			isReportTypeGlobal,
+			isReportTypeSite
+		} = this.getReportTypeValidation();
+		const { selectedDate, selectedSite, name, sitesList } = widgetsConfig[wid];
 		const layoutSites = reportingSites ? this.getLayoutSites(sites, reportingSites) : [];
-		const isWidgetNamePerAPOriginal = !!(name === 'per_ap_original');
-		const sitesToShow = isWidgetNamePerAPOriginal ? layoutSites : sites;
+		const isWidgetNamePerAPOriginal = !!(name === PER_AP_ORIGINAL);
+		const shouldShowQuickDatesWidget = !!(name !== ESTIMATED_EARNINGS);
+		const websiteWidgetValidated = this.getWebsiteWidgetValidation(name);
+		const shouldShowWebsiteWidget = !!(!isReportTypeSite && websiteWidgetValidated);
+		let sitesToShow = isWidgetNamePerAPOriginal ? layoutSites : sites;
+		const shouldSetGlobalSites = !!(isReportTypeGlobal && sitesList && websiteWidgetValidated);
+
+		if (shouldSetGlobalSites) sitesToShow = sitesList.concat([]);
+
 		// TODO: Work on show/hide of websites dropdown in every widget once all widgets are implemented successfully
 		// const isReportTypeGlobal = !!(reportType === 'global');
 		// const isWidgetApOriginalInGlobalReport = !!(isReportTypeGlobal && isWidgetNamePerAPOriginal);
@@ -307,7 +430,7 @@ class QuickSnapshot extends React.Component {
 
 		return shouldHideControls ? null : (
 			<div className="aligner aligner--hEnd">
-				{name !== 'estimated_earnings' ? (
+				{shouldShowQuickDatesWidget ? (
 					<div className="u-margin-r4">
 						{/* eslint-disable */}
 						<label className="u-text-normal u-margin-r2">Quick Dates</label>
@@ -320,8 +443,10 @@ class QuickSnapshot extends React.Component {
 							selected={selectedDate}
 							options={quickDates}
 							onSelect={date => {
+								if (isReportTypeGlobal) widgetsConfig[wid]['selectedSite'] = 'all';
 								widgetsConfig[wid]['selectedDate'] = date;
 								widgetsConfig[wid].isLoading = true;
+								widgetsConfig[wid]['sitesList'] = [];
 								this.setState({ widgetsConfig }, () => this.getDisplayData(wid));
 							}}
 						/>
@@ -331,29 +456,33 @@ class QuickSnapshot extends React.Component {
 				) : (
 					''
 				)}
-				{reportType !== 'site' && name !== 'ops_top_sites' ? (
-					<div className="">
-						{/* eslint-disable */}
-						<label className="u-text-normal u-margin-r2">Website</label>
-						<SelectBox
-							id="performance-site"
-							isClearable={false}
-							pullRight
-							isSearchable={false}
-							wrapperClassName="display-inline"
-							selected={selectedSite}
-							options={sitesToShow}
-							onSelect={site => {
-								widgetsConfig[wid]['selectedSite'] = site;
-								this.setState({ widgetsConfig }, () => this.getDisplayData(wid));
-							}}
-						/>
+				{
+					(console.log(`selectedSite: ${selectedSite}, widget name: ${name}`),
+					shouldShowWebsiteWidget ? (
+						<div className="">
+							{/* eslint-disable */}
+							<label className="u-text-normal u-margin-r2">Website</label>
+							<SelectBox
+								id="performance-site"
+								isClearable={false}
+								pullRight
+								isSearchable={false}
+								wrapperClassName="display-inline"
+								selected={selectedSite}
+								options={sitesToShow}
+								onSelect={site => {
+									widgetsConfig[wid]['selectedSite'] = site;
+									widgetsConfig[wid].isLoading = true;
+									this.setState({ widgetsConfig }, () => this.getDisplayData(wid));
+								}}
+							/>
 
-						{/* eslint-enable */}
-					</div>
-				) : (
-					''
-				)}
+							{/* eslint-enable */}
+						</div>
+					) : (
+						''
+					))
+				}
 			</div>
 		);
 	}
