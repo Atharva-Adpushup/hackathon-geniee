@@ -9,7 +9,7 @@ import UserChange from './UserChange';
 
 function consoleRedirection(e) {
 	e.preventDefault();
-	document.cookie = `app_redirect=0; path=/; maxAge=7200; domain=adpushup.com`;
+	document.cookie = `app_redirect=0; path=/; maxAge=10; domain=adpushup.com`;
 	setTimeout(() => {
 		window.location.href = 'https://console.adpushup.com';
 	}, 500);
