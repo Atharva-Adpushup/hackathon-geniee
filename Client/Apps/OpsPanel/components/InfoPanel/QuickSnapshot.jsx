@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import '../../../../scss/pages/dashboard/index.scss';
+import Empty from '../../../../Components/Empty/index';
 import Card from '../../../../Components/Layout/Card';
 import EstimatedEarningsContainer from '../../../../Pages/Dashboard/containers/EstimatedEarningsContainer';
 import SitewiseReportContainer from '../../../../Pages/Dashboard/containers/SitewiseReportContainer';
@@ -26,7 +27,7 @@ import { convertObjToArr, getDateRange } from '../../../../Pages/Dashboard/helpe
 class QuickSnapshot extends React.Component {
 	constructor(props) {
 		super(props);
-		const { reportType, sites, reportingSites } = props;
+		const { reportType, sites } = props;
 		const allUserSites = [ALL_SITES_VALUE, ...convertObjToArr(sites)];
 		// const topPerformingSite = reportingSites
 		// 	? this.getTopPerformingSites(allUserSites, reportingSites)
@@ -34,6 +35,7 @@ class QuickSnapshot extends React.Component {
 		// const selectedSite = reportType == 'site' ? siteId : topPerformingSite || 'all';
 		this.state = {
 			isLoading: true,
+			isLoadingError: false,
 			quickDates: dates,
 			reportType,
 			sites: allUserSites,
@@ -43,37 +45,48 @@ class QuickSnapshot extends React.Component {
 	}
 
 	componentDidMount() {
-		const { sites, setReportingMetaData } = this.props;
+		const { sites, setReportingMetaData, showNotification } = this.props;
 		const userSites = Object.keys(sites).toString();
-		const getTop10SitesData = this.getTop10SitesData(DEFAULT_DATE);
 		const getReportMetaData = reportService.getMetaData({ sites: userSites });
 
-		return Promise.all([getTop10SitesData, getReportMetaData])
+		return getReportMetaData
 			.then(responseData => {
-				const [top10SitesData, reportMetaData] = responseData;
-				const { data: metaData } = reportMetaData;
+				const { data: metaData } = responseData;
+				const path = this.getTop10SitesWidgetPath(metaData);
+				const getTop10SitesData = this.getTop10SitesData(path, DEFAULT_DATE)
+					.then(top10SitesData => this.setTop10SitesData(top10SitesData))
+					.catch(() => this.setTop10SitesData({}));
 
 				setReportingMetaData(metaData);
-				this.setTop10SitesData(top10SitesData);
-				this.renderComputedWidgetsUI();
+				return Promise.all([getTop10SitesData]).then(() => this.renderComputedWidgetsUI());
 			})
-			.catch(() =>
-				getTop10SitesData
-					.then(top10SitesData => {
-						this.setTop10SitesData(top10SitesData);
-						setReportingMetaData({});
-						this.renderComputedWidgetsUI();
-					})
-					.catch(() => {
-						setReportingMetaData({});
-						this.renderComputedWidgetsUI();
-					})
-			);
+			.catch(() => {
+				showNotification({
+					mode: 'error',
+					title: 'OpsPanel Reporting Error',
+					message: `Something is broken. Please check after some time`,
+					autoDismiss: 0
+				});
+				return this.setState({ isLoadingError: true });
+			});
 	}
 
-	getTop10SitesData = selectedDate => {
+	getTop10SitesWidgetPath = metaData => {
+		const { widget: inputWidget } = metaData || {};
+		const {
+			widget: reportWidget,
+			widgetsName: { OPS_TOP_SITES }
+		} = this.props;
+		const computedWidget = inputWidget || reportWidget;
+		const {
+			[OPS_TOP_SITES]: { path }
+		} = computedWidget;
+
+		return path;
+	};
+
+	getTop10SitesData = (path, selectedDate) => {
 		const params = { ...getDateRange(selectedDate), isSuperUser: true };
-		const path = '/site/report?report_name=top_sites';
 
 		return reportService
 			.getWidgetData({ path, params })
@@ -297,8 +310,9 @@ class QuickSnapshot extends React.Component {
 				!isValidSiteList &&
 				websiteWidgetValidated
 			);
+			const top10SitesWidgetPath = shouldFetchWidgetTopSites ? this.getTop10SitesWidgetPath() : '';
 			const getTop10SitesData = shouldFetchWidgetTopSites
-				? this.getTop10SitesData(selectedDate)
+				? this.getTop10SitesData(top10SitesWidgetPath, selectedDate)
 				: Promise.resolve(widgetsConfig[wid].sitesList);
 			const getWidgetData = reportService.getWidgetData({ path: computedWidgetPath, params });
 
@@ -637,10 +651,16 @@ class QuickSnapshot extends React.Component {
 	};
 
 	render() {
-		const { isLoading } = this.state;
+		const { isLoading, isLoadingError } = this.state;
 
 		if (isLoading) {
 			return <Loader />;
+		}
+
+		if (isLoadingError) {
+			return (
+				<Empty message="Error occurred while loading QuickSnapshot reports. Please check after some time." />
+			);
 		}
 
 		return <Fragment>{this.renderContent()}</Fragment>;
