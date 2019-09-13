@@ -35,6 +35,7 @@ class ModalWrapper extends React.Component {
 		const gumgum = findBidder(data, 'gumgum');
 		const consumable = findBidder(data, 'consumable');
 		const adsolut = findBidder(data, 'adsolut');
+		const appnexus = findBidder(data, 'appnexus');
 
 		this.state = {
 			partnersSelected: props.data.map(obj => obj.bidder) || [],
@@ -115,6 +116,9 @@ class ModalWrapper extends React.Component {
 				host: adsolut ? adsolut.params.host : '',
 				zoneId: adsolut ? adsolut.params.zoneId : ''
 			},
+			appnexus: {
+				placementId: appnexus ? appnexus.params.placementId : ''
+			},
 			error: ''
 		};
 
@@ -161,6 +165,7 @@ class ModalWrapper extends React.Component {
 		const gumgum = findBidder(data, 'gumgum');
 		const consumable = findBidder(data, 'consumable');
 		const adsolut = findBidder(data, 'adsolut');
+		const appnexus = findBidder(data, 'appnexus');
 
 		this.setState({
 			partnersSelected: nextProps.data.map(obj => ({ value: obj.bidder, label: obj.bidder })) || [],
@@ -240,6 +245,9 @@ class ModalWrapper extends React.Component {
 			adsolut: {
 				host: adsolut ? adsolut.params.host : '',
 				zoneId: adsolut ? adsolut.params.zoneId : ''
+			},
+			appnexus: {
+				placementId: appnexus ? appnexus.params.placementId : ''
 			},
 			error: ''
 		});

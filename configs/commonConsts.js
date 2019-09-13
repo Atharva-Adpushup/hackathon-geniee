@@ -401,6 +401,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		sovrn: 'sovrnBidAdapter',
 		gumgum: 'gumgumBidAdapter',
 		consumable: 'consumableBidAdapter',
-		adsolut: 'adkernelBidAdapter'
+		adsolut: 'adkernelBidAdapter',
+		appnexus: 'appnexusBidAdapter'
 	}
 };
