@@ -29,15 +29,12 @@ class QuickSnapshot extends React.Component {
 		super(props);
 		const { reportType, sites } = props;
 		const allUserSites = [ALL_SITES_VALUE, ...convertObjToArr(sites)];
-		// const topPerformingSite = reportingSites
-		// 	? this.getTopPerformingSites(allUserSites, reportingSites)
-		// 	: null;
-		// const selectedSite = reportType == 'site' ? siteId : topPerformingSite || 'all';
 		this.state = {
 			isLoading: true,
 			isLoadingError: false,
 			quickDates: dates,
 			reportType,
+			selectedSite: 'all',
 			sites: allUserSites,
 			top10Sites: [],
 			widgetsConfig: []
@@ -54,8 +51,12 @@ class QuickSnapshot extends React.Component {
 				const { data: metaData } = responseData;
 				const path = this.getTop10SitesWidgetPath(metaData);
 				const getTop10SitesData = this.getTop10SitesData(path, DEFAULT_DATE)
-					.then(top10SitesData => this.setTop10SitesData(top10SitesData))
-					.catch(() => this.setTop10SitesData({}));
+					.then(this.setComputedState)
+					.catch(() => {
+						const stateObject = this.getComputedSitesData([]);
+
+						return this.setComputedState(stateObject);
+					});
 
 				setReportingMetaData(metaData);
 				return Promise.all([getTop10SitesData]).then(() => this.renderComputedWidgetsUI());
@@ -67,9 +68,17 @@ class QuickSnapshot extends React.Component {
 					message: `Something is broken. Please check after some time`,
 					autoDismiss: 0
 				});
-				return this.setState({ isLoadingError: true });
+
+				return this.setState({ isLoading: false, isLoadingError: true });
 			});
 	}
+
+	getComputedSitesData = top10Sites => {
+		const selectedSite = this.getSelectedSite(top10Sites);
+		const stateObject = { top10Sites, selectedSite };
+
+		return stateObject;
+	};
 
 	getTop10SitesWidgetPath = metaData => {
 		const { widget: inputWidget } = metaData || {};
@@ -91,7 +100,8 @@ class QuickSnapshot extends React.Component {
 		return reportService
 			.getWidgetData({ path, params })
 			.then(({ data }) => this.getTopSitesWidgetTransformedData(data))
-			.then(this.reduceTopSitesDataToArray);
+			.then(this.reduceTopSitesDataToArray)
+			.then(this.getComputedSitesData);
 	};
 
 	getTopPerformingSites = (allUserSites, reportingSites) => {
@@ -162,7 +172,7 @@ class QuickSnapshot extends React.Component {
 		} = this.props;
 		const sortedWidgets = sortBy(widgets, ['position', 'name']);
 		const widgetsConfig = [];
-		const { top10Sites: sitesList } = this.state;
+		const { top10Sites: sitesList, selectedSite } = this.state;
 
 		Object.keys(sortedWidgets).forEach(wid => {
 			const widget = { ...sortedWidgets[wid] };
@@ -178,6 +188,7 @@ class QuickSnapshot extends React.Component {
 
 				switch (widget.name) {
 					case PER_AP_ORIGINAL:
+						widget.selectedSite = selectedSite;
 						widget.selectedDimension = 'page_variation_type';
 						widget.selectedChartLegendMetric = 'adpushup_page_cpm';
 						break;
@@ -272,12 +283,17 @@ class QuickSnapshot extends React.Component {
 		const { widgetsConfig } = this.state;
 		const { isReportTypeAccount, isReportTypeGlobal } = this.getReportTypeValidation();
 		const { selectedDate, selectedSite, selectedMetric, path, name } = widgetsConfig[wid];
-		const { sites, reportingSites } = this.props;
+		const {
+			sites,
+			reportingSites,
+			widgetsName: { PER_AP_ORIGINAL }
+		} = this.props;
 		const siteIds = Object.keys(sites);
 		const params = getDateRange(selectedDate);
+		const isWidgetNamePerAPOriginal = !!(name === PER_AP_ORIGINAL);
 		const hidPerApOriginData =
 			isReportTypeAccount &&
-			name === 'per_ap_original' &&
+			isWidgetNamePerAPOriginal &&
 			reportingSites &&
 			reportingSites[selectedSite] &&
 			reportingSites[selectedSite].dataAvailableOutOfLast30Days < 21;
@@ -301,9 +317,8 @@ class QuickSnapshot extends React.Component {
 			widgetsConfig[wid].isDataSufficient = false;
 			widgetsConfig[wid].isLoading = false;
 		} else if (validReportParams) {
-			const isValidSiteList = !!(
-				widgetsConfig[wid].sitesList && widgetsConfig[wid].sitesList.length
-			);
+			const widgetSitesList = widgetsConfig[wid].sitesList;
+			const isValidSiteList = !!(widgetSitesList && widgetSitesList.length);
 			const websiteWidgetValidated = this.getWebsiteWidgetValidation(widgetsConfig[wid].name);
 			const shouldFetchWidgetTopSites = !!(
 				isReportTypeGlobal &&
@@ -313,12 +328,12 @@ class QuickSnapshot extends React.Component {
 			const top10SitesWidgetPath = shouldFetchWidgetTopSites ? this.getTop10SitesWidgetPath() : '';
 			const getTop10SitesData = shouldFetchWidgetTopSites
 				? this.getTop10SitesData(top10SitesWidgetPath, selectedDate)
-				: Promise.resolve(widgetsConfig[wid].sitesList);
+				: Promise.resolve(this.getComputedSitesData(widgetSitesList || []));
 			const getWidgetData = reportService.getWidgetData({ path: computedWidgetPath, params });
 
 			return Promise.all([getTop10SitesData, getWidgetData])
 				.then(responseData => {
-					const [top10SitesData, response] = responseData;
+					const [{ top10Sites, selectedSite: computedSelectedSite }, response] = responseData;
 
 					if (
 						response.status == 200 &&
@@ -328,7 +343,8 @@ class QuickSnapshot extends React.Component {
 					) {
 						widgetsConfig[wid].data = response.data;
 						widgetsConfig[wid].isDataSufficient = true;
-						widgetsConfig[wid].sitesList = top10SitesData;
+						widgetsConfig[wid].sitesList = top10Sites;
+						if (isWidgetNamePerAPOriginal) widgetsConfig[wid].selectedSite = computedSelectedSite;
 					} else {
 						widgetsConfig[wid].data = {};
 						widgetsConfig[wid].isDataSufficient = false;
@@ -338,6 +354,7 @@ class QuickSnapshot extends React.Component {
 					return this.setState({ widgetsConfig });
 				})
 				.catch(() => {
+					widgetsConfig[wid].isLoading = false;
 					widgetsConfig[wid].data = {};
 					widgetsConfig[wid].isDataSufficient = false;
 					return this.setState({ widgetsConfig });
@@ -388,9 +405,26 @@ class QuickSnapshot extends React.Component {
 			[ALL_SITES_VALUE]
 		);
 
-	setTop10SitesData = top10Sites => {
-		this.setState({ top10Sites });
+	getSelectedSite = inputSites => {
+		const { reportingSites } = this.props;
+		const { sites, selectedSite } = this.state;
+		const { isReportTypeGlobal, isReportTypeAccount } = this.getReportTypeValidation();
+		const isValidInputSites = !!(inputSites && inputSites.length);
+		const isValidReportingSites = !!(reportingSites && Object.keys(reportingSites).length);
+		const shouldSetSiteForGlobalReport = !!(isReportTypeGlobal && isValidInputSites);
+		const shouldSetSiteForAccountReport = !!(isReportTypeAccount && isValidReportingSites);
+		let computedSite = selectedSite;
+
+		if (shouldSetSiteForGlobalReport) {
+			computedSite = inputSites[1].value;
+		} else if (shouldSetSiteForAccountReport) {
+			computedSite = this.getTopPerformingSites(sites, reportingSites) || '';
+		}
+
+		return computedSite;
 	};
+
+	setComputedState = state => this.setState(state);
 
 	showApBaselineWidget = () => {
 		const { siteId, reportingSites } = this.props;
@@ -467,7 +501,7 @@ class QuickSnapshot extends React.Component {
 		return shouldHideControls ? null : (
 			<div className="aligner aligner--hEnd">
 				{shouldShowMetricWidget ? (
-					<div className="">
+					<div className="u-margin-r4">
 						{/* eslint-disable */}
 						<label className="u-text-normal u-margin-r2">Metrics</label>
 						<SelectBox

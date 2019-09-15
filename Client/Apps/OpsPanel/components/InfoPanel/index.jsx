@@ -6,11 +6,6 @@ import {
 	WIDGETS_INFO
 } from '../../configs/commonConsts';
 import QuickSnapshot from './QuickSnapshot';
-// import RegexVerification from './RegexVerification/index';
-// import EnableHbBidder from './EnableHbBidder';
-// import BackupAds from './BackupAds/index';
-// import TopXPathMissAndModeURL from './TopXPathMissAndModeURL ';
-// import LostFoundLiveSites from './LostFoundLiveSites/index';
 
 class InfoPanel extends Component {
 	state = {
