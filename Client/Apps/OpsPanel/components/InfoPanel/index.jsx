@@ -32,10 +32,8 @@ class InfoPanel extends Component {
 						widgetsList={QUICK_SNAPSHOTS_WIDGETS}
 					/>
 				);
-			case INFO_PANEL_IDENTIFIERS.GLOBAL_VITALS:
-				return <div>Global Vitals</div>;
-			case INFO_PANEL_IDENTIFIERS.ACCOUNT_VITALS:
-				return <div>Account Vitals</div>;
+			case INFO_PANEL_IDENTIFIERS.REPORT_VITALS:
+				return <div>Report Vitals</div>;
 		}
 	};
 
@@ -52,8 +50,7 @@ class InfoPanel extends Component {
 						<Col sm={2}>
 							<Nav bsStyle="pills" bsClass="ap-nav-pills nav" stacked>
 								<NavItem eventKey={INFO_PANEL_IDENTIFIERS.QUICK_SNAPSHOT}>Quick Snapshot</NavItem>
-								<NavItem eventKey={INFO_PANEL_IDENTIFIERS.GLOBAL_VITALS}>Global Vitals</NavItem>
-								<NavItem eventKey={INFO_PANEL_IDENTIFIERS.ACCOUNT_VITALS}>Account Vitals</NavItem>
+								{/* <NavItem eventKey={INFO_PANEL_IDENTIFIERS.REPORT_VITALS}>Report Vitals</NavItem> */}
 							</Nav>
 						</Col>
 						<Col sm={10}>
