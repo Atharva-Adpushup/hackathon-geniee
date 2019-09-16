@@ -19,11 +19,12 @@ class HeaderBidding extends React.Component {
 		this.handleDefaultTabWrapper();
 	}
 
-	componentDidUpdate() {
-		this.handleDefaultTabWrapper(true);
+	componentDidUpdate(prevProps) {
+		const { setupStatus: prevSetupStatus } = prevProps;
+		this.handleDefaultTabWrapper(prevSetupStatus);
 	}
 
-	handleDefaultTabWrapper = showSetupCompleteMsg => {
+	handleDefaultTabWrapper = prevSetupStatus => {
 		const {
 			match: {
 				params: { siteId },
@@ -34,16 +35,14 @@ class HeaderBidding extends React.Component {
 		} = this.props;
 
 		if (setupStatus) {
-			this.handleDefaultTab(url, siteId, showSetupCompleteMsg);
+			this.handleDefaultTab(url, siteId, prevSetupStatus);
 			return;
 		}
 
-		getSetupStatusAction(siteId).then(() =>
-			this.handleDefaultTab(url, siteId, showSetupCompleteMsg)
-		);
+		getSetupStatusAction(siteId).then(() => this.handleDefaultTab(url, siteId, prevSetupStatus));
 	};
 
-	handleDefaultTab = (url, siteId, showSetupCompleteMsg) => {
+	handleDefaultTab = (url, siteId, prevSetupStatus) => {
 		const { setupStatus, showNotification } = this.props;
 		const {
 			isAdpushupDfp,
@@ -53,18 +52,25 @@ class HeaderBidding extends React.Component {
 			adServerSetupStatus
 		} = setupStatus;
 
-		if (
-			url === `/sites/${siteId}/apps/header-bidding` &&
+		const isSetupAlreadyCompleted =
+			!!prevSetupStatus &&
+			(isAdpushupDfp ||
+				(prevSetupStatus.dfpConnected && prevSetupStatus.adServerSetupStatus === 2)) &&
+			prevSetupStatus.inventoryFound &&
+			prevSetupStatus.biddersFound;
+
+		const isSetupCompleted =
 			(isAdpushupDfp || (dfpConnected && adServerSetupStatus === 2)) &&
 			inventoryFound &&
-			biddersFound
-		) {
+			biddersFound;
+
+		if (url === `/sites/${siteId}/apps/header-bidding` && isSetupCompleted) {
 			this.setState(
 				{
 					redirectUrl: `/sites/${siteId}/apps/header-bidding/${NAV_ITEMS_INDEXES.TAB_2}`
 				},
 				() => {
-					if (showSetupCompleteMsg) {
+					if (!!prevSetupStatus && !isSetupAlreadyCompleted) {
 						showNotification({
 							mode: 'success',
 							title: 'Success',
