@@ -73,11 +73,10 @@ router
 						.then(bidders => !!Object.keys(bidders).length)
 						.catch(() => false),
 					siteModel.isInventoryExist(siteId).catch(() => false),
-					user,
-					siteModel.getSiteById(siteId)
+					user
 				)
 			)
-			.then(([biddersFound, inventoryFound, user, site]) => {
+			.then(([biddersFound, inventoryFound, user]) => {
 				const activeAdServerData = user.getActiveAdServerData('dfp');
 				const isValidAdServer = !!activeAdServerData && !!activeAdServerData.activeDFPNetwork;
 				const isAdpushupDfp =
@@ -89,7 +88,7 @@ router
 					isValidAdServer &&
 					activeAdServerData.activeDFPNetwork !==
 						commonConsts.hbGlobalSettingDefaults.dfpAdUnitTargeting.networkId.toString();
-				const adServerSetupStatus = site.get('adServerSetupStatus') || 0;
+				const adServerSetupStatus = user.get('adServerSetupStatus') || 0;
 				const adpushupNetworkCode = isAdpushupDfp
 					? commonConsts.hbGlobalSettingDefaults.dfpAdUnitTargeting.networkId
 					: undefined;
@@ -532,40 +531,37 @@ router
 					.json({ error: 'Internal Server Error!' });
 			});
 	})
-	.get('/adserverSetup/:siteId', (req, res) => {
-		const { siteId } = req.params;
+	.get('/adserverSetup', (req, res) => {
 		const { email } = req.user;
 
 		return userModel
-			.verifySiteOwner(email, siteId)
-			.then(({ user }) =>
-				Promise.join(siteModel.getSiteById(siteId), headerBiddingModel.setupAdserver(siteId, user))
-			)
-			.then(([site, resp]) => {
+			.getUserByEmail(email)
+			.then(user => Promise.join(user, headerBiddingModel.setupAdserver(user)))
+			.then(([user, resp]) => {
 				let httpStatusCode;
 				let message;
 
-				const adServerSetupStatus = site.get('adServerSetupStatus');
+				const adServerSetupStatus = user.get('adServerSetupStatus');
 
 				if (resp.status === 'pending' || resp.status === 'in-progress') {
-					if (adServerSetupStatus !== 1) site.set('adServerSetupStatus', 1);
+					if (adServerSetupStatus !== 1) user.set('adServerSetupStatus', 1);
 					httpStatusCode = 202;
 					message = 'Adserver automation is in progress';
 				}
 
 				if (resp.status === 'failed') {
-					if (adServerSetupStatus !== 3) site.set('adServerSetupStatus', 3);
+					if (adServerSetupStatus !== 3) user.set('adServerSetupStatus', 3);
 					httpStatusCode = 502;
 					message = 'Adserver automation failed';
 				}
 
 				if (resp.status === 'finished') {
-					if (adServerSetupStatus !== 2) site.set('adServerSetupStatus', 2);
+					if (adServerSetupStatus !== 2) user.set('adServerSetupStatus', 2);
 					httpStatusCode = 200;
 					message = 'Adserver automation finished';
 				}
 
-				return Promise.join(httpStatusCode, message, site.save());
+				return Promise.join(httpStatusCode, message, user.save());
 			})
 			.then(([httpStatusCode, message]) => res.status(httpStatusCode).json({ success: message }))
 			.catch(err => {
