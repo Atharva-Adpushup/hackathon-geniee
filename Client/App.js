@@ -35,7 +35,9 @@ import {
 	faPlay,
 	faPause,
 	faQuestion,
-	faQuestionCircle
+	faQuestionCircle,
+	faMailBulk,
+	faDownload
 } from '@fortawesome/free-solid-svg-icons';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import 'bootstrap-sass/assets/stylesheets/_bootstrap.scss';
@@ -76,7 +78,9 @@ library.add(
 	faPlay,
 	faPause,
 	faQuestion,
-	faQuestionCircle
+	faQuestionCircle,
+	faMailBulk,
+	faDownload
 );
 
 const App = () => (

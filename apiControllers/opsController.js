@@ -13,16 +13,13 @@ const {
 } = require('../configs/commonConsts');
 const { sendSuccessResponse, sendErrorResponse } = require('../helpers/commonFunctions');
 const { appBucket, errorHandler } = require('../helpers/routeHelpers');
+const opsModel = require('../models/opsModel');
 
 const router = express.Router();
 
 const helpers = {
 	getAllSitesFromCouchbase: () => {
-		const query = `select a.siteId, a.siteDomain, a.adNetworkSettings, a.ownerEmail, a.step, a.channels, a.apConfigs, a.dateCreated, b.adNetworkSettings[0].pubId, b.adNetworkSettings[0].adsenseEmail from ${
-			couchBase.DEFAULT_BUCKET
-		} a join ${
-			couchBase.DEFAULT_BUCKET
-		} b on keys 'user::' || a.ownerEmail where meta(a).id like 'site::%'`;
+		const query = `select a.siteId, a.siteDomain, a.adNetworkSettings, a.ownerEmail, a.step, a.channels, a.apConfigs, a.dateCreated, b.adNetworkSettings[0].pubId, b.adNetworkSettings[0].adsenseEmail from ${couchBase.DEFAULT_BUCKET} a join ${couchBase.DEFAULT_BUCKET} b on keys 'user::' || a.ownerEmail where meta(a).id like 'site::%'`;
 		return appBucket.queryDB(query);
 	},
 	makeAPIRequest: options => {
@@ -238,6 +235,23 @@ router
 				if (code !== 1) return Promise.reject(new Error(response.data));
 				return sendSuccessResponse(response, res);
 			})
+			.catch(err => errorHandler(err, res));
+	})
+
+	.get('/allSitesStats', (req, res) => {
+		if (!req.user.isSuperUser) {
+			return sendErrorResponse(
+				{
+					message: 'Unauthorized Request',
+					code: HTTP_STATUSES.UNAUTHORIZED
+				},
+				res
+			);
+		}
+
+		return opsModel
+			.getAllSitesStats()
+			.then(sitesData => sendSuccessResponse(sitesData, res))
 			.catch(err => errorHandler(err, res));
 	});
 

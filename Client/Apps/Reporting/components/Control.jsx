@@ -36,7 +36,8 @@ class Control extends Component {
 			selectedFilters: props.selectedFilters || {},
 			disableGenerateButton: false,
 			updateStatusText: '',
-			csvData: props.csvData
+			csvData: props.csvData,
+			fileName: 'adpushup-report'
 		};
 	}
 
@@ -190,7 +191,7 @@ class Control extends Component {
 	render() {
 		const { state } = this;
 		const csvData = btoa(JSON.stringify(state.csvData));
-		const downloadLink = `${REPORT_DOWNLOAD_ENDPOINT}?data=${csvData}`;
+		const downloadLink = `${REPORT_DOWNLOAD_ENDPOINT}?data=${csvData}&fileName=${state.fileName}`;
 		return (
 			<Fragment>
 				<div className="aligner aligner--wrap aligner--hSpaceBetween u-margin-t4">

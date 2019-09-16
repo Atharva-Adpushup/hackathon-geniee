@@ -14,7 +14,7 @@ CustomButton.propTypes = {
 	variant: PropTypes.oneOf(['primary', 'secondary']),
 	type: PropTypes.oneOf(['submit', 'button']),
 	showSpinner: PropTypes.bool,
-	children: PropTypes.oneOfType([PropTypes.string, PropTypes.element]).isRequired
+	children: PropTypes.oneOfType([PropTypes.string, PropTypes.element, PropTypes.node]).isRequired
 };
 
 CustomButton.defaultProps = {

@@ -380,7 +380,7 @@ class FilterBox extends React.Component {
 
 		return (
 			<div ref={this.filterBoxRef} className={`filterbox-wrap${className ? ` ${className}` : ''}`}>
-				<span className="filter-label">filter</span>
+				<span className="filter-label">Filter</span>
 				{this.renderAppliedFilters()}
 				<div className="add-new-filter">
 					<span onClick={this.showFilterBox} className="add-new-filter-btn">
@@ -405,7 +405,12 @@ FilterBox.propTypes = {
 		PropTypes.shape({
 			name: PropTypes.string.isRequired,
 			prop: PropTypes.string.isRequired,
-			values: PropTypes.arrayOf(PropTypes.shape({ name: PropTypes.string })).isRequired
+			values: PropTypes.arrayOf(
+				PropTypes.oneOfType([
+					PropTypes.shape({ name: PropTypes.string }),
+					PropTypes.shape({ name: PropTypes.number })
+				])
+			).isRequired
 		})
 	).isRequired,
 	handleFilters: PropTypes.func.isRequired
