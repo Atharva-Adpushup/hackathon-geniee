@@ -22,7 +22,7 @@ function formatTableData(tableBody, props) {
 function computeTableData(data, props) {
 	const { result, columns } = data;
 	const tableHeader = [];
-	const { metrics, site, reportType } = props;
+	const { metrics, site, reportType, disableSiteLevelCheck } = props;
 
 	if ((result, columns)) {
 		columns.forEach(col => {
@@ -30,7 +30,8 @@ function computeTableData(data, props) {
 				tableHeader.push({
 					title: metrics[col].display_name,
 					prop: col,
-					position: metrics[col].position + 1
+					position: metrics[col].position + 1,
+					sortable: true
 				});
 			}
 		});
@@ -45,15 +46,19 @@ function computeTableData(data, props) {
 			tableHeader.push({
 				title: 'Website',
 				prop: 'siteName',
-				position: 1
+				position: 1,
+				sortable: true
 			});
 		}
 
 		tableHeader.sort((a, b) => a.position - b.position);
 		result.forEach(row => {
-			const { siteid } = row;
-			row.siteName = site[siteid]
-				? React.cloneElement(<a href={`/reports/${siteid}`}>{site[siteid].siteName}</a>)
+			const { siteid, siteName } = row;
+			const isSiteIdInReportSites = !!(site[siteid] || disableSiteLevelCheck);
+			const computedSiteName = (site[siteid] && site[siteid].siteName) || siteName;
+
+			row.siteName = isSiteIdInReportSites
+				? React.cloneElement(<a href={`/reports/${siteid}`}>{computedSiteName}</a>)
 				: 'Not Found';
 		});
 
@@ -90,6 +95,33 @@ class SitewiseReport extends React.Component {
 
 	renderTable() {
 		const { tableBody, tableHeader } = this.state;
+		const onSortFunction = {
+			network_net_revenue(columnValue) {
+				if (typeof columnValue === 'string') return parseFloat(columnValue.replace(/[,$]/g, ''));
+				return columnValue;
+			},
+			network_gross_revenue(columnValue) {
+				if (typeof columnValue === 'string') return parseFloat(columnValue.replace(/[,$]/g, ''));
+				return columnValue;
+			},
+			adpushup_page_views(columnValue) {
+				if (typeof columnValue === 'string') return parseFloat(columnValue.replace(/,/g, ''));
+				return columnValue;
+			},
+			network_impressions(columnValue) {
+				if (typeof columnValue === 'string') return parseFloat(columnValue.replace(/,/g, ''));
+				return columnValue;
+			},
+			network_ad_ecpm(columnValue) {
+				if (typeof columnValue === 'string') return parseFloat(columnValue.replace(/[,$]/g, ''));
+				return columnValue;
+			},
+			adpushup_page_cpm(columnValue) {
+				if (typeof columnValue === 'string') return parseFloat(columnValue.replace(/[,$]/g, ''));
+				return columnValue;
+			}
+		};
+
 		return tableBody && tableBody.length > 0 ? (
 			<Datatable
 				tableHeader={tableHeader}
@@ -97,6 +129,7 @@ class SitewiseReport extends React.Component {
 				rowsPerPage={10}
 				rowsPerPageOption={[20, 30, 40, 50]}
 				keyName="reportTable"
+				onSort={onSortFunction}
 			/>
 		) : (
 			<div className="text-center">No Record Found.</div>

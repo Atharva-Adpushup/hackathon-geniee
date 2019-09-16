@@ -4,12 +4,14 @@ import Revenue from '../components/Revenue';
 const mapStateToProps = (state, ownProps) => {
 	const {
 		reports: {
-			data: { site }
+			data: { site, metrics, filter }
 		}
 	} = state.global;
 	return {
 		...ownProps,
-		site
+		site,
+		metrics,
+		filter
 	};
 };
 

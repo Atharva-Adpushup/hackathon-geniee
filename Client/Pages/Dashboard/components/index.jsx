@@ -134,6 +134,10 @@ class Dashboard extends React.Component {
 
 				if (widget.name == 'rev_by_network') {
 					widget.selectedDimension = 'network';
+					widget.chartLegend = 'Revenue';
+					widget.chartSeriesLabel = 'network';
+					widget.chartSeriesMetric = 'revenue';
+					widget.chartSeriesMetricType = 'money';
 				}
 
 				if (widget.name == 'per_site_wise') {
@@ -173,7 +177,7 @@ class Dashboard extends React.Component {
 				}
 				return '';
 			case 'rev_by_network':
-				return <RevenueContainer displayData={widget.data} />;
+				return <RevenueContainer displayData={widget} />;
 			default:
 		}
 	};
