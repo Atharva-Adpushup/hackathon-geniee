@@ -16,6 +16,14 @@ class HeaderBidding extends React.Component {
 	};
 
 	componentDidMount() {
+		this.handleDefaultTabWrapper();
+	}
+
+	componentDidUpdate() {
+		this.handleDefaultTabWrapper(true);
+	}
+
+	handleDefaultTabWrapper = showSetupCompleteMsg => {
 		const {
 			match: {
 				params: { siteId },
@@ -26,15 +34,17 @@ class HeaderBidding extends React.Component {
 		} = this.props;
 
 		if (setupStatus) {
-			this.handleDefaultTab(url, siteId);
+			this.handleDefaultTab(url, siteId, showSetupCompleteMsg);
 			return;
 		}
 
-		getSetupStatusAction(siteId).then(() => this.handleDefaultTab(url, siteId));
-	}
+		getSetupStatusAction(siteId).then(() =>
+			this.handleDefaultTab(url, siteId, showSetupCompleteMsg)
+		);
+	};
 
-	handleDefaultTab = (url, siteId) => {
-		const { setupStatus } = this.props;
+	handleDefaultTab = (url, siteId, showSetupCompleteMsg) => {
+		const { setupStatus, showNotification } = this.props;
 		const {
 			isAdpushupDfp,
 			dfpConnected,
@@ -49,9 +59,21 @@ class HeaderBidding extends React.Component {
 			inventoryFound &&
 			biddersFound
 		) {
-			this.setState({
-				redirectUrl: `/sites/${siteId}/apps/header-bidding/${NAV_ITEMS_INDEXES.TAB_2}`
-			});
+			this.setState(
+				{
+					redirectUrl: `/sites/${siteId}/apps/header-bidding/${NAV_ITEMS_INDEXES.TAB_2}`
+				},
+				() => {
+					if (showSetupCompleteMsg) {
+						showNotification({
+							mode: 'success',
+							title: 'Success',
+							message: 'Setup completed successfully',
+							autoDismiss: 5
+						});
+					}
+				}
+			);
 		}
 	};
 

@@ -86,6 +86,6 @@ export function deleteBidderRule(siteId, bidder) {
 		.then(({ data }) => data);
 }
 
-export function checkOrBeginDfpSetup(siteId) {
-	return axiosInstance.get(`/headerBidding/adserverSetup/${siteId}`);
+export function checkOrBeginDfpSetup() {
+	return axiosInstance.get(`/headerBidding/adserverSetup`);
 }
