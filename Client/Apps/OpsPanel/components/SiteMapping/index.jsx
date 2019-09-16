@@ -119,15 +119,10 @@ class SiteMapping extends Component {
 	};
 
 	filteredDataWithIcon = data => {
+		const keysWithoutCopyIcon = ['onboardingStatus', 'dateCreated', 'activeStatus', 'revenueShare'];
 		data.forEach(val => {
 			for (const key in val) {
-				const showCopyIcon = !!(
-					val[key] === 'N/A' ||
-					(key === 'onboardingStatus' ||
-						key === 'dateCreated' ||
-						key === 'activeStatus' ||
-						key === 'revenueShare')
-				);
+				const showCopyIcon = !!(val[key] === 'N/A' || keysWithoutCopyIcon.includes(key));
 				// eslint-disable-next-line no-prototype-builtins
 				if (val.hasOwnProperty(key)) {
 					val[key] = showCopyIcon ? (
@@ -154,9 +149,9 @@ class SiteMapping extends Component {
 		const { filteredData: { length = 0 } = {} } = this.state;
 
 		if (length < 5) return 5;
-		if (length < 10) return 10;
-		if (length < 20) return 20;
-		if (length < 50) return 50;
+		else if (length < 10) return 10;
+		else if (length < 20) return 20;
+		else if (length < 50) return 50;
 		return 50;
 	};
 
