@@ -74,7 +74,7 @@ export const updateInventoriesHbStatus = (siteId, inventoriesToUpdate) => dispat
 
 export const checkOrBeginDfpSetupAction = siteId => dispatch =>
 	service
-		.checkOrBeginDfpSetup(siteId)
+		.checkOrBeginDfpSetup()
 		.then(response => {
 			let adServerSetupStatus;
 			switch (response.status) {
@@ -91,9 +91,10 @@ export const checkOrBeginDfpSetupAction = siteId => dispatch =>
 			return dispatch({ type: UPDATE_ADSERVER_SETUP_STATUS, siteId, adServerSetupStatus });
 		})
 		.catch(err => {
-			if (!err.response || err.response.status !== 502) throw err;
+			if (err.response && err.response.status === 502) {
+				const adServerSetupStatus = 3;
+				return dispatch({ type: UPDATE_ADSERVER_SETUP_STATUS, siteId, adServerSetupStatus });
+			}
 
-			const adServerSetupStatus = 3;
-
-			return dispatch({ type: UPDATE_ADSERVER_SETUP_STATUS, siteId, adServerSetupStatus });
+			return history.push('/error');
 		});

@@ -52,34 +52,25 @@ class Setup extends React.Component {
 		this.setState({ checkingAdserverSetupStatusForFirstTime: true });
 
 		// eslint-disable-next-line no-use-before-define
-		checkDfpStatus();
+		checkDfpStatus.call(this);
 
 		const timer = setInterval(
 			// eslint-disable-next-line no-use-before-define
-			checkDfpStatus,
+			checkDfpStatus.bind(this),
 			commonConsts.hbGlobalSettingDefaults.adserverSetupCheckInterval
 		);
 
 		function checkDfpStatus() {
-			checkOrBeginDfpSetupAction(siteId)
-				.then(data => {
-					if (data.adServerSetupStatus === 2 || data.adServerSetupStatus === 3) {
-						clearInterval(timer);
-					}
+			return checkOrBeginDfpSetupAction(siteId).then(data => {
+				if (data.adServerSetupStatus === 2 || data.adServerSetupStatus === 3) {
+					clearInterval(timer);
+				}
 
-					this.setState(state => {
-						if (!state.checkingAdserverSetupStatusForFirstTime) return null;
-						return { checkingAdserverSetupStatusForFirstTime: false };
-					});
-				})
-				.catch(err => {
-					console.log(err);
-
-					this.setState(state => {
-						if (!state.checkingAdserverSetupStatusForFirstTime) return null;
-						return { checkingAdserverSetupStatusForFirstTime: false };
-					});
+				return this.setState(state => {
+					if (!state.checkingAdserverSetupStatusForFirstTime) return null;
+					return { checkingAdserverSetupStatusForFirstTime: false };
 				});
+			});
 		}
 	};
 
@@ -132,10 +123,7 @@ class Setup extends React.Component {
 			}
 			case 3: {
 				statusJsx = (
-					<FontAwesomeIcon
-						icon="info-circle"
-						title="AdServer Setup failed. Please contact adpushup support."
-					/>
+					<FontAwesomeIcon icon="info-circle" title="AdServer Setup failed. Please retry." />
 				);
 				break;
 			}
@@ -165,7 +153,16 @@ class Setup extends React.Component {
 					<span className="">In Progress</span>
 				)}
 				{dfpConnected && isPublisherActiveDfp && adServerSetupStatus === 3 && (
-					<span className="">AdServer Setup failed. Please contact adpushup support.</span>
+					<span className="btn-wrap">
+						<CustomButton
+							variant="secondary"
+							name="setupAdServer"
+							onClick={this.checkOrBeginDfpSetup}
+							showSpinner={checkingAdserverSetupStatusForFirstTime}
+						>
+							Retry Setup
+						</CustomButton>
+					</span>
 				)}
 			</li>
 		);

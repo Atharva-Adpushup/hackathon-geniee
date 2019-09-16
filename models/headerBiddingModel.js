@@ -785,7 +785,7 @@ function apiModule() {
 
 				return hbConfig.save();
 			}),
-		setupAdserver: (siteId, user) => {
+		setupAdserver: user => {
 			const body = dfpLineItemAutomationReqBody;
 			const activeAdServerData = user.getActiveAdServerData('dfp');
 			const isPublisherActiveDfp =
@@ -802,7 +802,6 @@ function apiModule() {
 
 			return API.getAllBiddersFromNetworkConfig()
 				.then(allHbBidders => {
-					body.customKeyValues.hb_ap_siteid.values = [siteId];
 					body.customKeyValues.hb_ap_bidder.values = allHbBidders;
 					body.networkCode = activeAdServerData.activeDFPNetwork;
 					body.currencyCode = activeAdServerData.activeDFPCurrencyCode;
