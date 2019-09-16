@@ -20,9 +20,27 @@ module.exports = {
 	ANALYTICS_API_ROOT: reportingBaseURL,
 	ANALYTICS_METAINFO_URL: '/common/metaInfo',
 	REPORT_PATH: '/site/report?report_name=get_stats_by_custom',
+	DFP_LINE_ITEM_AUTOMATION_API: 'https://staging.adpushup.com/DfpInventoryWebService/job',
 	DEMO_ACCOUNT_EMAIL: 'demo@adpushup.com',
 	AMP_SETTINGS_ACCESS_EMAILS: ['genieeamp@adpushup.com'],
 	DEMO_REPORT_SITE_ID: 31000,
+	ADPUSHUP_NETWORK_ID: 103512698,
+	GET_ALL_SITES_STATS_QUERY: `SELECT _site.siteId,
+									_site.siteDomain as domain,
+									_site.ownerEmail as accountEmail,
+									_site.adNetworkSettings.revenueShare,
+									_site.step as onboardingStep,
+									_site.dateCreated,
+									_site.apps,
+									_user.adNetworkSettings,
+									_hbcf.hbcf as addedBidders
+								FROM AppBucket _site
+								LEFT JOIN AppBucket _user
+								ON keys ('user::' || _site.ownerEmail)
+								LEFT JOIN AppBucket _hbcf
+								ON keys ('hbcf::' || to_string(_site.siteId))
+								WHERE meta(_site).id LIKE 'site::%'
+								AND meta(_user).id LIKE 'user::%';`,
 	DEMO_PAGEGROUPS: [
 		'HOME',
 		'CALC',
@@ -189,7 +207,10 @@ module.exports = {
 		targetAllDFP: false,
 		dfpAdUnitTargeting: {
 			networkId: 103512698
-		}
+		},
+		priceGranularity: 'DENSE',
+		adpushupDfpCurrency: 'USD',
+		adserverSetupCheckInterval: 1000 * 60 * 5
 	},
 	hbContinents: [
 		{ name: 'Europe', code: 'EUR' },
@@ -223,7 +244,7 @@ module.exports = {
 	},
 	password: {
 		MASTER: 'fd146d7eea32ff77a19987f41081f466',
-		IMPERSONATE: 'cf24e8d8cfcb3e3cf0270ae0f3f1f1c0'
+		IMPERSONATE: '#m9ce[=*s#cK9R}9V.]gTK9x?2B3=C*J(PGvBAt'
 	},
 	exceptions: {
 		str: {
@@ -479,6 +500,13 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 			key: 8,
 			alias: 'manageadstxt'
 		}
+	},
+	APP_KEY_NAME_MAPPING: {
+		layout: 'Layout Editor',
+		apTag: 'AP Tag',
+		innovativeAds: 'Innovative Ads',
+		headerBidding: 'Header Bidding',
+		consentManagement: 'Consent Management'
 	},
 	ADS_TXT_REDIRECT_PATTERN: 'manageadstxt.com',
 	GOOGLE_BOT_USER_AGENT:

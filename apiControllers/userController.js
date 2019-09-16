@@ -233,7 +233,24 @@ router
 			(user, token, adsenseAccounts, userInfo, userDFPInfo) => {
 				// eslint-disable-next-line camelcase
 				const { id_token, access_token, expiry_date } = token;
+				const adServerSettings = user.get('adServerSettings') || {};
+				const activeAdServerData = adServerSettings.dfp;
 
+				function setActiveCurrencyDetails() {
+					if (!activeAdServerData) {
+						user.set('adServerSettings', {
+							...adServerSettings,
+							dfp: {
+								currencyConversion:
+									userDFPInfo[0].currencyCode !== CC.hbGlobalSettingDefaults.adpushupDfpCurrency,
+								activeDFPCurrencyCode: userDFPInfo[0].currencyCode
+							}
+						});
+
+						return user.save();
+					}
+					return false;
+				}
 				return Promise.all([
 					user.addNetworkData({
 						networkName: 'ADSENSE',
@@ -252,7 +269,8 @@ router
 						expiresIn: expiry_date,
 						userInfo,
 						dfpAccounts: userDFPInfo
-					})
+					}),
+					setActiveCurrencyDetails()
 				]).then(() => {
 					const postMessageData = JSON.stringify(user.get('adNetworkSettings'));
 					// TODO: Below mentioned https staging url (https://app.staging.adpushup.com) is for testing purposes.

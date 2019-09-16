@@ -85,3 +85,15 @@
 .pagegroup-row:nth-last-of-type(1) {
 	margin-bottom: 10px !important;
 }
+
+.site-mapping .rt-resizable-header-content {
+	float: left;
+}
+
+.site-mapping-copy {
+	display: none;
+}
+
+.site-mapping .rt-tr:hover .site-mapping-copy {
+	display: inline-block !important;
+}

@@ -7,7 +7,8 @@ import {
 	UPDATE_BIDDER,
 	FETCH_INVENTORIES,
 	UPDATE_INVENTORIES_HB_STATUS,
-	SET_DFP_SETUP_STATUS
+	SET_DFP_SETUP_STATUS,
+	UPDATE_ADSERVER_SETUP_STATUS
 } from '../../../constants/headerBidding';
 import history from '../../../helpers/history';
 import * as service from '../../../services/hbService';
@@ -70,3 +71,29 @@ export const updateInventoriesHbStatus = (siteId, inventoriesToUpdate) => dispat
 	service
 		.updateInventoriesHbStatus(siteId, inventoriesToUpdate)
 		.then(() => dispatch({ type: UPDATE_INVENTORIES_HB_STATUS, siteId, inventoriesToUpdate }));
+
+export const checkOrBeginDfpSetupAction = siteId => dispatch =>
+	service
+		.checkOrBeginDfpSetup(siteId)
+		.then(response => {
+			let adServerSetupStatus;
+			switch (response.status) {
+				case 202: {
+					adServerSetupStatus = 1;
+					break;
+				}
+				case 200: {
+					adServerSetupStatus = 2;
+					break;
+				}
+				default:
+			}
+			return dispatch({ type: UPDATE_ADSERVER_SETUP_STATUS, siteId, adServerSetupStatus });
+		})
+		.catch(err => {
+			if (!err.response || err.response.status !== 502) throw err;
+
+			const adServerSetupStatus = 3;
+
+			return dispatch({ type: UPDATE_ADSERVER_SETUP_STATUS, siteId, adServerSetupStatus });
+		});

@@ -9,7 +9,7 @@ const OP_NAV_ITEMS_INDEXES = {
 const OP_NAV_ITEMS_VALUES = {
 	SETTINGS: 'Settings',
 	INFO_PANEL: 'Info Panel',
-	SITES_MAPPING: 'Sites Mapping',
+	SITES_MAPPING: 'Site Mapping',
 	TOOLS: 'Tools'
 };
 
@@ -359,6 +359,143 @@ const XPATH_MODE_URL = {
 	modes: [{ name: 'Mode 1', value: 'Mode 1' }, { name: 'Mode 2', value: 'Mode 2' }]
 };
 
+const SITE_MAPPING_COLUMNS = [
+	{
+		Header: 'Site ID',
+		accessor: 'siteId',
+		width: 100,
+		maxWidth: 100,
+		minWidth: 100
+	},
+	{
+		Header: 'Domain',
+		accessor: 'domain',
+		width: 250,
+		maxWidth: 250,
+		minWidth: 250
+	},
+	{
+		Header: 'Owner Email',
+		accessor: 'accountEmail',
+		width: 250,
+		maxWidth: 250,
+		minWidth: 250
+	},
+	{
+		Header: 'Onboarding Status',
+		accessor: 'onboardingStatus',
+		width: 200,
+		maxWidth: 200,
+		minWidth: 200
+	},
+	{
+		Header: 'Active Status',
+		accessor: 'activeStatus',
+		width: 120,
+		maxWidth: 120,
+		minWidth: 120
+	},
+	{
+		Header: 'Date Created',
+		accessor: 'dateCreated',
+		width: 120,
+		maxWidth: 120,
+		minWidth: 120
+	},
+	{
+		Header: 'Active Products',
+		accessor: 'activeProducts',
+		width: 150,
+		maxWidth: 150,
+		minWidth: 150
+	},
+	{
+		Header: 'Active Bidders',
+		accessor: 'activeBidders',
+		width: 150,
+		maxWidth: 150,
+		minWidth: 150
+	},
+	{
+		Header: 'Inactive Bidders',
+		accessor: 'inactiveBidders',
+		width: 150,
+		maxWidth: 150,
+		minWidth: 150
+	},
+	{
+		Header: 'Rev Share',
+		accessor: 'revenueShare'
+	},
+	{
+		Header: 'Publisher Id',
+		accessor: 'publisherId'
+	},
+	{
+		Header: 'Auth Email',
+		accessor: 'authEmail'
+	},
+	{
+		Header: 'Ad Manager',
+		accessor: 'adManager'
+	}
+];
+
+const SITE_MAPPING_FILTER_COLUMNS = [
+	{
+		name: 'Site Id',
+		prop: 'siteId'
+	},
+	{
+		name: 'Domain',
+		prop: 'domain'
+	},
+	{
+		name: 'Owner Email',
+		prop: 'accountEmail'
+	},
+	{
+		name: 'Onboarding Status',
+		prop: 'onboardingStatus'
+	},
+	{
+		name: 'Active Status',
+		prop: 'activeStatus'
+	},
+	{
+		name: 'Date Created',
+		prop: 'dateCreated'
+	},
+	{
+		name: 'Active Products',
+		prop: 'activeProducts'
+	},
+	{
+		name: 'Active Bidders',
+		prop: 'activeBidders'
+	},
+	{
+		name: 'Inactive Bidders',
+		prop: 'inactiveBidders'
+	},
+	{
+		name: 'Rev Share',
+		prop: 'revenueShare'
+	},
+	{
+		name: 'Publisher Id',
+		prop: 'publisherId'
+	},
+	{
+		name: 'Auth Email',
+		prop: 'authEmail'
+	},
+	{
+		name: 'Ad Manager',
+		prop: 'adManager'
+	}
+];
+
 const MODE_TOOLTIP_TEXT = `ADPUSHUP:1 , FALLBACK:2`;
 const ERROR_TOOLTIP_TEXT = `NO_ERROR:1, PAGEGROUP_NOT_FOUND:2, FALLBACK_PLANNED:3, FALLBACK_FORCED:4, PAUSED_IN_EDITOR:5`;
 
@@ -378,7 +515,9 @@ export {
 	ICONS,
 	BACKUP_ADS_FORMATS,
 	XPATH_MODE_URL,
+	SITE_MAPPING_COLUMNS,
 	MODE_TOOLTIP_TEXT,
 	ERROR_TOOLTIP_TEXT,
+	SITE_MAPPING_FILTER_COLUMNS,
 	ADPUSHUP_DFP
 };

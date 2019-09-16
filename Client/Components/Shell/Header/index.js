@@ -3,8 +3,19 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { DropdownButton, MenuItem } from 'react-bootstrap';
+import CustomButton from '../../CustomButton/index';
 import history from '../../../helpers/history';
 import UserChange from './UserChange';
+
+function consoleRedirection(e) {
+	e.preventDefault();
+	const now = new Date();
+	now.setHours(now.getHours() + 2);
+	document.cookie = `app_redirect=0; path=/; expires=${now.toUTCString()}; domain=adpushup.com`;
+	setTimeout(() => {
+		window.location.href = 'https://console.adpushup.com';
+	}, 500);
+}
 
 const Header = ({ sidebarToggle, logout, user, switchUser, findUsers }) => (
 	<header className="ap-page-header">
@@ -17,6 +28,9 @@ const Header = ({ sidebarToggle, logout, user, switchUser, findUsers }) => (
 
 		<div className="header-nav">
 			{user.isSuperUser ? <UserChange switchUser={switchUser} findUsers={findUsers} /> : null}
+			<CustomButton variant="secondary" onClick={consoleRedirection} className="u-margin-r3">
+				Go to Console
+			</CustomButton>
 
 			<DropdownButton pullRight title={`Hello ${user.firstName || ''}`} id="dropdown-button">
 				{/* <MenuItem eventKey="1">Profile</MenuItem> */}
