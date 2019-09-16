@@ -170,6 +170,7 @@ class Setup extends React.Component {
 
 	renderMainContent = () => {
 		const {
+			siteId,
 			setupStatus: {
 				isAdpushupDfp,
 				dfpConnected,
@@ -243,7 +244,7 @@ class Setup extends React.Component {
 						{!inventoryFound && (
 							<React.Fragment>
 								<span className="btn-wrap">
-									<Link to="layout">
+									<Link to={`/api/visualEditor/${siteId}`}>
 										<CustomButton variant="secondary" name="addInv">
 											Layout Editor
 										</CustomButton>
