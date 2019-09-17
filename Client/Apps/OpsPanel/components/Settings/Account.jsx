@@ -162,7 +162,7 @@ class Account extends Component {
 		}
 
 		const [activeDFPNetwork, activeDFPParentId, activeDFPCurrencyCode] = activeDFP.split('-');
-		let updatedadServerSettings = {
+		let updatedAdServerSettings = {
 			...adServerSettings,
 			dfp: {
 				...adServerSettings.dfp,
@@ -186,17 +186,17 @@ class Account extends Component {
 
 		return this.getPrebidGranularityMultiplier(activeDFPNetwork, activeDFPCurrencyCode)
 			.then(prebidGranularityMultiplier => {
-				updatedadServerSettings = {
-					...updatedadServerSettings,
+				updatedAdServerSettings = {
+					...updatedAdServerSettings,
 					dfp: {
-						...updatedadServerSettings.dfp,
+						...updatedAdServerSettings.dfp,
 						prebidGranularityMultiplier
 					}
 				};
 				return updateUser([
 					{
 						key: 'adServerSettings',
-						value: updatedadServerSettings
+						value: updatedAdServerSettings
 					},
 					{
 						key: 'adNetworkSettings',
