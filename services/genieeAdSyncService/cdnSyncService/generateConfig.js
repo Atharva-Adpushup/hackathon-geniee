@@ -102,10 +102,11 @@ function HbProcessing(site, apConfigs) {
 			let prebidAdapters = getPrebidModules(hbcf);
 
 			if (isValidCurrencyCnfg) {
+				const activeAdServer = adServerSettings.dfp;
 				computedPrebidCurrencyConfig = {
-					adServerCurrency: apConfigs.activeDFPCurrencyCode,
-					granularityMultiplier: Number(apConfigs.prebidGranularityMultiplier),
-					rates: apConfigs.activeDFPCurrencyExchangeRate
+					adServerCurrency: activeAdServer.activeDFPCurrencyCode,
+					granularityMultiplier: Number(activeAdServer.prebidGranularityMultiplier) || 1,
+					rates: activeAdServer.activeDFPCurrencyExchangeRate
 				};
 			}
 
