@@ -5,7 +5,6 @@ import React, { Component, Fragment } from 'react';
 import { Col } from 'react-bootstrap';
 import memoize from 'memoize-one';
 
-import axios from '../../../../helpers/axiosInstance';
 import {
 	DFP_ACCOUNTS_DEFAULT,
 	ADPUSHUP_DFP,
