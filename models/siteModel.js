@@ -707,9 +707,13 @@ function apiModule() {
 					if (firstIndex === currIndex) {
 						uniqueDownwardIABSizes.push(obj);
 					} else {
+						const index = uniqueDownwardIABSizes.findIndex(
+							({ downwardIABSize }) => obj.downwardIABSize === downwardIABSize
+						);
+
 						uniqueDownwardIABSizes[
-							firstIndex
-						].originalSize = `${uniqueDownwardIABSizes[firstIndex].originalSize}, ${obj.originalSize}`;
+							index
+						].originalSize = `${uniqueDownwardIABSizes[index].originalSize}, ${obj.originalSize}`;
 					}
 				});
 
