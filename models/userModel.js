@@ -106,7 +106,7 @@ var modelAPI = (module.exports = apiModule()),
 		};
 
 		this.getSiteByNormalizedDomain = function (domain) {
-			const regex = /^((http:\/\/)|(https:\/\/))(www\.)*/;
+			const regex = /^((http(s){0,1}:\/\/))(www\.){0,1}/;
 			const normalizedDomain = domain.replace(regex, '');
 
 			return Promise.resolve(_.find(
