@@ -54,25 +54,25 @@ const commonSiteFunctions = {
 			default:
 		}
 	},
-	getSitesReport(siteIds) {
+	getSitesReport() {
 		const dateFormat = 'YYYY-MM-DD';
-		const pageviewsThreshold = 10000;
 		const days = 2;
 		const dayOffset = 1;
 
 		return request({
 			method: 'GET',
 			json: true,
-			uri: commonConsts.ACTIVE_SITES_API,
+			uri: commonConsts.ACTIVE_SITES,
 			qs: {
+				report_name: 'get_stats_by_custom',
+				isSuperUser: true,
+				dimension: 'siteid,mode',
 				fromDate: moment()
 					.subtract(days + dayOffset, 'days')
 					.format(dateFormat),
 				toDate: moment()
 					.subtract(dayOffset, 'days')
-					.format(dateFormat),
-				minPageViews: pageviewsThreshold,
-				siteid: siteIds.join(',')
+					.format(dateFormat)
 			}
 		});
 	},
@@ -130,12 +130,10 @@ function apiModule() {
 				.connectToAppBucket()
 				.then(appBucket => appBucket.queryAsync(query))
 				.then(sites => {
-					const siteIds = sites.map(site => site.siteId);
-
 					return Promise.all([
 						sites,
 						commonSiteFunctions.getNetworkTree(),
-						commonSiteFunctions.getSitesReport(siteIds)
+						commonSiteFunctions.getSitesReport()
 					]);
 				})
 				.then(([sites, networkTree, sitesReport]) => {
