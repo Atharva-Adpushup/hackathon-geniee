@@ -16,6 +16,7 @@ module.exports = {
 	PRODUCT_LIST_API: `${reportingBaseURL}/common/activeProducts`,
 	MAB_REPORTING_API: `${reportingBaseURL}/site/mab`,
 	ACTIVE_SITES_API: `${reportingBaseURL}/site/activeSiteList`,
+	ACTIVE_SITES: `${reportingBaseURL}/site/report`,
 	XPATH_MISS_MODE_URL_API: `${reportingBaseURL}/site/report`,
 	ANALYTICS_API_ROOT: reportingBaseURL,
 	ANALYTICS_METAINFO_URL: '/common/metaInfo',
