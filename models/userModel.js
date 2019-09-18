@@ -105,6 +105,17 @@ var modelAPI = (module.exports = apiModule()),
 			return Promise.resolve(_.find(this.get('sites'), { domain: domain }));
 		};
 
+		this.getSiteByNormalizedDomain = function (domain) {
+			const regex = /^((http:\/\/)|(https:\/\/))(www\.)*/;
+			const normalizedDomain = domain.replace(regex, '');
+
+			return Promise.resolve(_.find(
+				this.get('sites'),
+				site => 
+					site.domain.replace(regex, '') === normalizedDomain
+				));
+		};
+
 		this.getSiteById = function(siteId) {
 			return Promise.resolve(_.find(this.get('sites'), { siteId: siteId }));
 		};
@@ -113,7 +124,7 @@ var modelAPI = (module.exports = apiModule()),
 			var me = this,
 				normalizedDomain = normalizeurl(domain);
 
-			return this.getSiteByDomain(normalizedDomain).then(function(site) {
+			return this.getSiteByNormalizedDomain(normalizedDomain).then(function(site) {
 				if (site) {
 					return siteModel
 						.getSiteById(site.siteId)
