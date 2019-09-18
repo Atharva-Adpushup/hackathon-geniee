@@ -7,6 +7,7 @@ const mapStateToProps = (state, ownProps) => {
 			data: { metrics, site }
 		}
 	} = state.global;
+
 	return {
 		...ownProps,
 		metrics,

@@ -5,7 +5,11 @@ import React, { Component, Fragment } from 'react';
 import { Col } from 'react-bootstrap';
 import memoize from 'memoize-one';
 
-import { DFP_ACCOUNTS_DEFAULT, ADPUSHUP_DFP } from '../../configs/commonConsts';
+import {
+	DFP_ACCOUNTS_DEFAULT,
+	ADPUSHUP_DFP,
+	PREBID_CURRENCY_URL
+} from '../../configs/commonConsts';
 import CustomToggleSwitch from '../../../../Components/CustomToggleSwitch/index';
 import FieldGroup from '../../../../Components/Layout/FieldGroup';
 import CustomButton from '../../../../Components/CustomButton/index';
@@ -87,6 +91,27 @@ class Account extends Component {
 		return response;
 	});
 
+	getPrebidGranularityMultiplier = (activeDFPNetwork, currencyCode) => {
+		if (
+			activeDFPNetwork === ADPUSHUP_DFP.code ||
+			currencyCode.toUpperCase() === ADPUSHUP_DFP.currency.toUpperCase()
+		) {
+			return Promise.resolve(1);
+		}
+
+		return window
+			.fetch(PREBID_CURRENCY_URL)
+			.then(response => response.json())
+			.then(response => {
+				const { conversions: { USD = {} } = {} } = response;
+				return USD[currencyCode.toUpperCase()] || 1;
+			})
+			.catch(err => {
+				console.log('Prebid Granularity Multiplier fetch failed', err);
+				return 1;
+			});
+	};
+
 	handleToggle = (value, extra) => {
 		let toUpdate = {};
 		if (typeof extra === 'string') {
@@ -137,7 +162,7 @@ class Account extends Component {
 		}
 
 		const [activeDFPNetwork, activeDFPParentId, activeDFPCurrencyCode] = activeDFP.split('-');
-		const updatedadServerSettings = {
+		let updatedAdServerSettings = {
 			...adServerSettings,
 			dfp: {
 				...adServerSettings.dfp,
@@ -159,21 +184,32 @@ class Account extends Component {
 
 		this.setState({ loading: true });
 
-		return updateUser([
-			{
-				key: 'adServerSettings',
-				value: updatedadServerSettings
-			},
-			{
-				key: 'adNetworkSettings',
-				value: adNetworkSettings
-			}
-		]).then(() =>
-			this.setState({
-				originalactiveDFP: activeDFP,
-				loading: false
+		return this.getPrebidGranularityMultiplier(activeDFPNetwork, activeDFPCurrencyCode)
+			.then(prebidGranularityMultiplier => {
+				updatedAdServerSettings = {
+					...updatedAdServerSettings,
+					dfp: {
+						...updatedAdServerSettings.dfp,
+						prebidGranularityMultiplier
+					}
+				};
+				return updateUser([
+					{
+						key: 'adServerSettings',
+						value: updatedAdServerSettings
+					},
+					{
+						key: 'adNetworkSettings',
+						value: adNetworkSettings
+					}
+				]);
 			})
-		);
+			.then(() =>
+				this.setState({
+					originalactiveDFP: activeDFP,
+					loading: false
+				})
+			);
 	};
 
 	render() {

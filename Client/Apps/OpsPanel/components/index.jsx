@@ -6,8 +6,8 @@ import { OP_NAV_ITEMS, OP_NAV_ITEMS_INDEXES, OP_NAV_ITEMS_VALUES } from '../conf
 import ActionCard from '../../../Components/ActionCard';
 import Settings from './Settings/index';
 import ToolsContainer from '../containers/ToolsContainer';
+import InfoPanelContainer from '../containers/InfoPanelContainer';
 import SiteMappingContainer from '../containers/SiteMappingContainer'
-
 
 class OpsPanel extends Component {
 	state = {
@@ -56,7 +56,7 @@ class OpsPanel extends Component {
 			case OP_NAV_ITEMS_INDEXES.SETTINGS:
 				return <Settings {...this.props} />;
 			case OP_NAV_ITEMS_INDEXES.INFO_PANEL:
-				return 'Info Panel';
+				return <InfoPanelContainer {...this.props} />;
 			case OP_NAV_ITEMS_INDEXES.SITES_MAPPING:
 				return <SiteMappingContainer {...this.props} />;
 			case OP_NAV_ITEMS_INDEXES.TOOLS:
@@ -76,7 +76,7 @@ class OpsPanel extends Component {
 			<ActionCard>
 				<Nav bsStyle="tabs" activeKey={activeItem.INDEX} onSelect={this.handleNavSelect}>
 					<NavItem eventKey={1}>{OP_NAV_ITEMS_VALUES.SETTINGS}</NavItem>
-					{/* <NavItem eventKey={2}>{OP_NAV_ITEMS_VALUES.INFO_PANEL}</NavItem>*/}
+					<NavItem eventKey={2}>{OP_NAV_ITEMS_VALUES.INFO_PANEL}</NavItem>
 					<NavItem eventKey={4}>{OP_NAV_ITEMS_VALUES.TOOLS}</NavItem>
 					<NavItem eventKey={3}>{OP_NAV_ITEMS_VALUES.SITES_MAPPING}</NavItem>
 				</Nav>

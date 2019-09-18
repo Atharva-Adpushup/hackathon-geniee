@@ -171,6 +171,7 @@ class Table extends React.Component {
 
 	formatTableData = tableBody => {
 		const { metrics } = this.props;
+
 		tableBody.forEach(row => {
 			Object.keys(row).forEach(col => {
 				if (metrics[col]) {
@@ -182,6 +183,7 @@ class Table extends React.Component {
 				}
 			});
 		});
+
 		return tableBody;
 	};
 

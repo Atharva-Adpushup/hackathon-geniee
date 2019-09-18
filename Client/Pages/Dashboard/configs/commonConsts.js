@@ -43,6 +43,7 @@ const dates = [
 	{ value: 'last30Days', name: 'Last 30 Days' },
 	{ value: 'month', name: 'This Month' }
 ];
+const DEFAULT_DATE = dates[2].value;
 const sites = [
 	{
 		value: 1,
@@ -95,12 +96,16 @@ const dashboardWidgets = [
 	'per_ap_original'
 ];
 
+const ALL_SITES_VALUE = { name: 'All', value: 'all' };
+
 export {
 	DASHBOARD_NAV_ITEMS_INDEXES,
 	DASHBOARD_NAV_ITEMS_VALUES,
 	DASHBOARD_NAV_ITEMS,
 	dates,
+	DEFAULT_DATE,
 	sites,
+	ALL_SITES_VALUE,
 	yAxisGroups,
 	tableHeader,
 	displayMetrics,

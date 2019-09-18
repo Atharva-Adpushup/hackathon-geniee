@@ -198,7 +198,14 @@ router
 					if (err instanceof AdPushupError && err.message.status === 404) {
 						return headerBiddingModel
 							.createHBConfigFromJson(hbConfig, key, bidderConfig)
-							.then(() => res.status(httpStatus.OK).json({ bidderKey: key, bidderConfig }));
+							.then(() => headerBiddingModel.getAllBiddersFromNetworkConfig())
+							.then(biddersFromNetworkConfig => {
+								bidderConfig.paramsFormFields = {
+									...biddersFromNetworkConfig[key].params
+								};
+
+								return res.status(httpStatus.OK).json({ bidderKey: key, bidderConfig });
+							});
 					}
 
 					if (err instanceof AdPushupError && Array.isArray(err.message)) {
