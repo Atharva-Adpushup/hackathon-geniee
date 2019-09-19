@@ -26,7 +26,7 @@ const generateDfpConfig = adpTags => {
 
 const generateHBConfig = siteId => {
 	// TODO: HB: review empty hbConfig
-	const emptyResponse = { hbcf: {} };
+	const emptyResponse = { value: { hbcf: {} } };
 
 	return Promise.join(
 		dbHelper.getDoc(`${docKeys.hb}${siteId}`).catch(err => {
