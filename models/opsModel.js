@@ -63,7 +63,7 @@ const commonSiteFunctions = {
 		return request({
 			method: 'GET',
 			json: true,
-			uri: commonConsts.GET_SITES_STATS,
+			uri: commonConsts.GET_SITES_STATS_API,
 			qs: {
 				report_name: 'get_stats_by_custom',
 				isSuperUser: true,
