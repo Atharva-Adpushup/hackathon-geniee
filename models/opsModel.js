@@ -3,6 +3,7 @@ module.exports = apiModule();
 const { N1qlQuery } = require('couchbase');
 const request = require('request-promise');
 const moment = require('moment');
+const _ = require('lodash');
 
 const couchbase = require('../helpers/couchBaseService');
 const AdPushupError = require('../helpers/AdPushupError');
@@ -54,25 +55,25 @@ const commonSiteFunctions = {
 			default:
 		}
 	},
-	getSitesReport(siteIds) {
+	getSitesReport() {
 		const dateFormat = 'YYYY-MM-DD';
-		const pageviewsThreshold = 10000;
 		const days = 2;
 		const dayOffset = 1;
 
 		return request({
 			method: 'GET',
 			json: true,
-			uri: commonConsts.ACTIVE_SITES_API,
+			uri: commonConsts.GET_SITES_STATS_API,
 			qs: {
+				report_name: 'get_stats_by_custom',
+				isSuperUser: true,
+				dimension: 'siteid,mode',
 				fromDate: moment()
 					.subtract(days + dayOffset, 'days')
 					.format(dateFormat),
 				toDate: moment()
 					.subtract(dayOffset, 'days')
-					.format(dateFormat),
-				minPageViews: pageviewsThreshold,
-				siteid: siteIds.join(',')
+					.format(dateFormat)
 			}
 		});
 	},
@@ -121,6 +122,10 @@ const commonSiteFunctions = {
 	}
 };
 
+function getUniqueSites(myArr, prop) {
+	return _.uniq(_.map(myArr, prop));
+}
+
 function apiModule() {
 	const API = {
 		getAllSitesStats() {
@@ -130,12 +135,10 @@ function apiModule() {
 				.connectToAppBucket()
 				.then(appBucket => appBucket.queryAsync(query))
 				.then(sites => {
-					const siteIds = sites.map(site => site.siteId);
-
 					return Promise.all([
 						sites,
 						commonSiteFunctions.getNetworkTree(),
-						commonSiteFunctions.getSitesReport(siteIds)
+						commonSiteFunctions.getSitesReport()
 					]);
 				})
 				.then(([sites, networkTree, sitesReport]) => {
@@ -147,6 +150,7 @@ function apiModule() {
 							activeBidders,
 							inactiveBidders
 						} = commonSiteFunctions.getActiveInactiveBidderNames(site.addedBidders, networkTree);
+						const uniqueSiteIds = getUniqueSites(sitesReport.data.result, 'siteid');
 
 						site.activeBidders = activeBidders;
 						site.inactiveBidders = inactiveBidders;
@@ -162,8 +166,8 @@ function apiModule() {
 
 						site.activeStatus =
 							sitesReport.code === 1 &&
-							sitesReport.data.result.length &&
-							!!sitesReport.data.result.find(currSite => currSite.siteId === site.siteId)
+							uniqueSiteIds &&
+							!!uniqueSiteIds.find(currSiteId => currSiteId === site.siteId)
 								? 'Active'
 								: 'Inactive';
 
