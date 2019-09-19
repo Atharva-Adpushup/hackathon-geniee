@@ -31,9 +31,24 @@ class AdNetworkDetails extends Component {
 
 	handleSelect = val => this.setState({ refreshInterval: val });
 
-	render() {
+	handleSave = () => {
 		const { headerBidding, refreshSlot, refreshInterval } = this.state;
 		const { ad, onSubmit, onCancel } = this.props;
+
+		onSubmit({
+			networkData: {
+				...ad.networkData,
+				headerBidding,
+				refreshSlot,
+				refreshInterval: refreshInterval || DEFAULT_REFRESH_INTERVAL
+			}
+		});
+		return onCancel();
+	};
+
+	render() {
+		const { headerBidding, refreshSlot, refreshInterval } = this.state;
+		const { ad, onCancel } = this.props;
 
 		return (
 			<div>
@@ -78,21 +93,7 @@ class AdNetworkDetails extends Component {
 						/>
 					</Col>
 				</Row>
-				<CustomButton
-					className="u-margin-r3"
-					onClick={() => {
-						onSubmit({
-							networkData: {
-								...ad.networkData,
-								headerBidding,
-								refreshSlot,
-								refreshInterval: refreshInterval || DEFAULT_REFRESH_INTERVAL,
-								logWritten: false
-							}
-						});
-						return onCancel();
-					}}
-				>
+				<CustomButton className="u-margin-r3" onClick={this.handleSave}>
 					Save
 				</CustomButton>
 				<CustomButton variant="secondary" onClick={onCancel}>
