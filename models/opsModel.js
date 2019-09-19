@@ -3,6 +3,7 @@ module.exports = apiModule();
 const { N1qlQuery } = require('couchbase');
 const request = require('request-promise');
 const moment = require('moment');
+const _ = require('lodash');
 
 const couchbase = require('../helpers/couchBaseService');
 const AdPushupError = require('../helpers/AdPushupError');
@@ -121,6 +122,10 @@ const commonSiteFunctions = {
 	}
 };
 
+function getUniqueSites(myArr, prop) {
+	return _.uniq(_.map(myArr, prop));
+}
+
 function apiModule() {
 	const API = {
 		getAllSitesStats() {
@@ -145,6 +150,7 @@ function apiModule() {
 							activeBidders,
 							inactiveBidders
 						} = commonSiteFunctions.getActiveInactiveBidderNames(site.addedBidders, networkTree);
+						const uniqueSiteIds = getUniqueSites(sitesReport.data.result, 'siteid');
 
 						site.activeBidders = activeBidders;
 						site.inactiveBidders = inactiveBidders;
@@ -160,8 +166,8 @@ function apiModule() {
 
 						site.activeStatus =
 							sitesReport.code === 1 &&
-							sitesReport.data.result.length &&
-							!!sitesReport.data.result.find(currSite => currSite.siteId === site.siteId)
+							uniqueSiteIds &&
+							!!uniqueSiteIds.find(currSiteId => currSiteId === site.siteId)
 								? 'Active'
 								: 'Inactive';
 
