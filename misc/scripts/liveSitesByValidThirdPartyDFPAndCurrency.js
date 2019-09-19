@@ -16,7 +16,7 @@ function getAllUserConfigs(results) {
 		userModel
 			.getUserByEmail(userObj.value.email)
 			.then(user => [user, user.get('sites')])
-			.then(([user, sites]) => [user, getAvailableSiteModels(sites)])
+			.then(([user, sites]) => Promise.join(user, getAvailableSiteModels(sites)))
 			.then(([user, siteModels]) => ({
 				...userObj.value,
 				userModel: user,
@@ -31,7 +31,12 @@ function getAvailableSiteModels(sites) {
 
 	return promiseForeach(
 		allSiteModels,
-		((siteModels, siteModel) => siteModel.then(model => siteModels.push(model))).bind(
+		((siteModels, siteModel) => siteModel.then(model => {
+			const apConfigs = model.get('apConfigs');
+			if (apConfigs && apConfigs.mode === 1) {
+				return siteModels.push(model);
+			}
+		})).bind(
 			null,
 			siteModels
 		),
@@ -81,6 +86,7 @@ function updateCurrencyExchangeData(userConfigArray, currencyData) {
 
 			if (isSameCurrencyExchangeRate) {
 				adServerSettings.dfp.activeDFPCurrencyExchangeRate = currencyData;
+				adServerSettings.dfp.prebidGranularityMultiplier = currencyData.USD[userConfig.currencyCode];
 				userConfig.userModel.set('adServerSettings', adServerSettings);
 				return userConfig.userModel.save().then(() => userConfig);
 			}

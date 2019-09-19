@@ -49,4 +49,5 @@ flow.txt
 local-files/
 .eslintrc
 .prettierrc
+Prebid.js
 Prebid-latest
