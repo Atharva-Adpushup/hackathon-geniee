@@ -78,6 +78,8 @@ const commonSiteFunctions = {
 		});
 	},
 	getActiveProducts(apps) {
+		if (!apps) return 'N/A';
+
 		const appKeys = Object.keys(apps);
 
 		return appKeys.reduce((activeProducts, appKey) => {
@@ -134,13 +136,13 @@ function apiModule() {
 			return couchbase
 				.connectToAppBucket()
 				.then(appBucket => appBucket.queryAsync(query))
-				.then(sites => {
-					return Promise.all([
+				.then(sites =>
+					Promise.all([
 						sites,
 						commonSiteFunctions.getNetworkTree(),
 						commonSiteFunctions.getSitesReport()
-					]);
-				})
+					])
+				)
 				.then(([sites, networkTree, sitesReport]) => {
 					const finalSites = sites.map(site => {
 						const { publisherId, publisherEmail } = commonSiteFunctions.getPublisherIdAndEmail(
