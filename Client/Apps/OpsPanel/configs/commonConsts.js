@@ -360,6 +360,12 @@ const XPATH_MODE_URL = {
 	modes: [{ name: 'Mode 1', value: 'Mode 1' }, { name: 'Mode 2', value: 'Mode 2' }]
 };
 
+const DEFAULT_WIDTH = {
+	width: 150,
+	maxWidth: 150,
+	minWidth: 150
+};
+
 const SITE_MAPPING_COLUMNS = [
 	{
 		Header: 'Site ID',
@@ -392,53 +398,49 @@ const SITE_MAPPING_COLUMNS = [
 	{
 		Header: 'Active Status',
 		accessor: 'activeStatus',
-		width: 120,
-		maxWidth: 120,
-		minWidth: 120
+		...DEFAULT_WIDTH
 	},
 	{
 		Header: 'Date Created',
 		accessor: 'dateCreated',
-		width: 120,
-		maxWidth: 120,
-		minWidth: 120
+		...DEFAULT_WIDTH
 	},
 	{
 		Header: 'Active Products',
 		accessor: 'activeProducts',
-		width: 150,
-		maxWidth: 150,
-		minWidth: 150
+		...DEFAULT_WIDTH
 	},
 	{
 		Header: 'Active Bidders',
 		accessor: 'activeBidders',
-		width: 150,
-		maxWidth: 150,
-		minWidth: 150
+		...DEFAULT_WIDTH
 	},
 	{
 		Header: 'Inactive Bidders',
 		accessor: 'inactiveBidders',
-		width: 150,
-		maxWidth: 150,
-		minWidth: 150
+		...DEFAULT_WIDTH
 	},
 	{
-		Header: 'Rev Share',
-		accessor: 'revenueShare'
+		Header: 'Rev Share(in %)',
+		accessor: 'revenueShare',
+		...DEFAULT_WIDTH
 	},
 	{
 		Header: 'Publisher Id',
-		accessor: 'publisherId'
+		accessor: 'publisherId',
+		...DEFAULT_WIDTH
 	},
 	{
 		Header: 'Auth Email',
-		accessor: 'authEmail'
+		accessor: 'authEmail',
+		width: 200,
+		maxWidth: 200,
+		minWidth: 200
 	},
 	{
 		Header: 'Ad Manager',
-		accessor: 'adManager'
+		accessor: 'adManager',
+		...DEFAULT_WIDTH
 	}
 ];
 
