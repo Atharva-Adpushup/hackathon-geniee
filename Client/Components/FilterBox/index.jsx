@@ -44,7 +44,10 @@ class FilterBox extends React.Component {
 	getFilteredValues = (valuesToFilter, valueSearchString) => {
 		if (valueSearchString) {
 			return valuesToFilter.filter(({ name }) =>
-				name.toLowerCase().includes(valueSearchString.toLowerCase())
+				name
+					.toString()
+					.toLowerCase()
+					.includes(valueSearchString.toLowerCase())
 			);
 		}
 
