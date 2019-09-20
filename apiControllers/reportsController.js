@@ -183,7 +183,14 @@ router
 						HTTP_STATUSES.OK
 					);
 
-				result.forEach(section => (sections[section.section_id] = section));
+				result.forEach(section => {
+					sections[section.section_id] = {
+						...section,
+						adpushup_total_cpm: Number(
+							((section.network_net_revenue * 1000) / section.adpushup_impressions).toFixed(2)
+						)
+					};
+				});
 				return sendSuccessResponse(
 					{
 						sections
