@@ -124,8 +124,8 @@ router
 				} = response;
 
 				if (code === -1 || !result.length)
-					return Promise.reject(
-						new Error({
+					throw new Error(
+						JSON.stringify({
 							message: 'No pagegroup found',
 							code: HTTP_STATUSES.BAD_REQUEST
 						})
@@ -136,12 +136,11 @@ router
 			})
 			.then(pagegroupId => {
 				if (!pagegroupId)
-					return sendErrorResponse(
-						{
-							message: 'No pagegroup found'
-						},
-						res,
-						HTTP_STATUSES.BAD_REQUEST
+					throw new Error(
+						JSON.stringify({
+							message: 'No pagegroup found',
+							code: HTTP_STATUSES.BAD_REQUEST
+						})
 					);
 
 				return request({
@@ -167,13 +166,13 @@ router
 				const sections = {};
 
 				if (code === -1)
-					return sendErrorResponse(
-						{
-							message: 'Something went wrong'
-						},
-						res,
-						HTTP_STATUSES.INTERNAL_SERVER_ERROR
+					throw new Error(
+						JSON.stringify({
+							message: 'Something went wrong',
+							code: HTTP_STATUSES.INTERNAL_SERVER_ERROR
+						})
 					);
+
 				if (!result.length)
 					return sendSuccessResponse(
 						{
@@ -200,13 +199,22 @@ router
 				);
 			})
 			.catch(err => {
-				console.log(err);
+				let { message: errorMessage } = err;
+				try {
+					errorMessage = JSON.parse(errorMessage);
+				} catch (e) {
+					errorMessage = 'Something went wrong';
+				}
+				const {
+					message = 'Something went wrong',
+					code = HTTP_STATUSES.INTERNAL_SERVER_ERROR
+				} = errorMessage;
 				return sendErrorResponse(
 					{
-						message: 'Something went wrong'
+						message
 					},
 					res,
-					HTTP_STATUSES.INTERNAL_SERVER_ERROR
+					code
 				);
 			});
 	});

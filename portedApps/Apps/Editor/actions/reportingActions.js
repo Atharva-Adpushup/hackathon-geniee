@@ -9,17 +9,15 @@ const generateReport = ({ from, to }) => (dispatch, getState) => {
 	} = state;
 	const pagegroup = byIds[activeChannel].pageGroup;
 
-	console.log(pagegroup);
-
 	Utils.ajax({
 		method: 'GET',
 		url: reportingUrl,
-		data: JSON.stringify({
+		data: {
 			from,
 			to,
 			pagegroup,
 			siteid: window.ADP_SITE_ID
-		})
+		}
 	})
 		.then(response =>
 			dispatch({
