@@ -9,7 +9,7 @@ const generateReport = ({ from, to }) => (dispatch, getState) => {
 	} = state;
 	const pagegroup = byIds[activeChannel].pageGroup;
 
-	Utils.ajax({
+	return Utils.ajax({
 		method: 'GET',
 		url: reportingUrl,
 		data: {
