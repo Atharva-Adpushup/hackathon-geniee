@@ -20,10 +20,6 @@ export function updateBidder(siteId, bidderConfig, params) {
 	return axiosInstance.put(`/headerBidding/bidder/${siteId}`, { bidderConfig, params });
 }
 
-export function fetchInventorySizes(siteId) {
-	return axiosInstance.get(`/headerBidding/getInventorySizes/${siteId}`);
-}
-
 export function fetchInventories(siteId) {
 	return axiosInstance.get(`/headerBidding/inventory/${siteId}`).then(({ data: inventories }) => {
 		inventories.map(inventory => {
