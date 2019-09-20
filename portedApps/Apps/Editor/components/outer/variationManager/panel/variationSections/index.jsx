@@ -71,6 +71,7 @@ class variationSections extends Component {
 	generateReportWrapper() {
 		const { startDate, endDate } = this.state;
 		const { generateReport, showNotification } = this.props;
+		const self = this;
 
 		if (!startDate || !endDate) {
 			return showNotification({
@@ -83,7 +84,7 @@ class variationSections extends Component {
 			generateReport({
 				from: startDate,
 				to: endDate
-			}).then(() => this.setState({ loadingReport: false }))
+			}).then(() => self.setState({ loadingReport: false }))
 		);
 	}
 

@@ -27,7 +27,7 @@ const generateReport = ({ from, to }) => (dispatch, getState) => {
 		)
 		.catch(err => {
 			console.log('Error', err);
-			alert('Reporting fetching failed. Please contact AdPushup Tech');
+			return alert('Reporting fetching failed. Please contact AdPushup Tech');
 		});
 };
 

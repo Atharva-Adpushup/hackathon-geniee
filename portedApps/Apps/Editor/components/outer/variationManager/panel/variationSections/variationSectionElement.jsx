@@ -175,7 +175,7 @@ class variationSectionElement extends Component {
 										Total CPM
 									</Col>
 									<Col className="u-padding-l10px" xs={5}>
-										<strong>{sectionReport.adpushup_total_cpm}</strong>
+										<strong>{sectionReport.adpushup_total_cpm || 'N/A'}</strong>
 									</Col>
 								</Row>
 								<Row>
