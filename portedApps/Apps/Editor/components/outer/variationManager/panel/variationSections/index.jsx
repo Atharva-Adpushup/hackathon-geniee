@@ -1,7 +1,6 @@
 import React, { PropTypes, Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { Row, Col, Button } from 'react-bootstrap';
 import {
 	deleteSection,
 	renameSection,
@@ -20,7 +19,13 @@ import {
 	updateFormatData,
 	toggleLazyLoad
 } from 'actions/sectionActions.js';
-import { updateNetwork, updateAdCode, updateAd, updateCustomCss, updateMultipleAdSizes } from 'actions/adActions';
+import {
+	updateNetwork,
+	updateAdCode,
+	updateAd,
+	updateCustomCss,
+	updateMultipleAdSizes
+} from 'actions/adActions';
 import { resetErrors, showNotification } from 'actions/uiActions';
 import { generateReport } from 'actions/reportingActions';
 import Filters from './filters.jsx';
@@ -28,12 +33,11 @@ import PaneLoader from '../../../../../../../Components/PaneLoader.jsx';
 import VariationSectionElement from './variationSectionElement';
 
 const getDate = number => {
-	let days = number, // Days you want to subtract
-		date = new Date(),
-		last = new Date(date.getTime() - days * 24 * 60 * 60 * 1000),
-		day = String(last.getDate()),
-		month = String(last.getMonth() + 1),
-		year = String(last.getFullYear());
+	const date = new Date();
+	const last = new Date(date.getTime() - number * 24 * 60 * 60 * 1000);
+	const day = String(last.getDate());
+	const month = String(last.getMonth() + 1);
+	const year = String(last.getFullYear());
 
 	return `${year}-${month.length == 1 ? '0' : ''}${month}-${day.length == 1 ? '0' : ''}${day}`;
 };
@@ -51,13 +55,13 @@ class variationSections extends Component {
 		this.generateReportWrapper = this.generateReportWrapper.bind(this);
 	}
 
-	componentWillReceiveProps() {
-		this.setState({ loadingReport: false });
-	}
+	// componentWillReceiveProps() {
+	// 	this.setState({ loadingReport: false });
+	// }
 
 	datesUpdated(e) {
-		let target = e.target,
-			type = target.getAttribute('name');
+		const target = e.target;
+		const type = target.getAttribute('name');
 
 		this.setState({
 			[type]: target.value
@@ -65,19 +69,22 @@ class variationSections extends Component {
 	}
 
 	generateReportWrapper() {
-		if (!this.state.startDate || !this.state.endDate) {
-			this.props.showNotification({
+		const { startDate, endDate } = this.state;
+		const { generateReport, showNotification } = this.props;
+
+		if (!startDate || !endDate) {
+			return showNotification({
 				mode: 'error',
 				title: 'Operation failed',
 				message: 'Dates cannot be left blank'
 			});
-			return;
 		}
-		this.props.generateReport({
-			from: this.state.startDate,
-			to: this.state.endDate
-		});
-		this.setState({ loadingReport: true });
+		this.setState({ loadingReport: true }, () =>
+			generateReport({
+				from: startDate,
+				to: endDate
+			}).then(() => this.setState({ loadingReport: false }))
+		);
 	}
 
 	render() {
@@ -225,16 +232,16 @@ export default connect(
 				onSectionXPathValidate: validateSectionXPath,
 				onIncontentFloatUpdate: updateIncontentFloat,
 				onScrollSectionIntoView: scrollSectionIntoView,
-				updateAdCode: updateAdCode,
-				updateNetwork: updateNetwork,
-				generateReport: generateReport,
-				showNotification: showNotification,
-				updateSection: updateSection,
-				updateAd: updateAd,
-				updateMultipleAdSizes: updateMultipleAdSizes,
-				updateType: updateType,
-				updateFormatData: updateFormatData,
-				toggleLazyLoad: toggleLazyLoad
+				updateAdCode,
+				updateNetwork,
+				generateReport,
+				showNotification,
+				updateSection,
+				updateAd,
+				updateMultipleAdSizes,
+				updateType,
+				updateFormatData,
+				toggleLazyLoad
 			},
 			dispatch
 		)

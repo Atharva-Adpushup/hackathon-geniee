@@ -1,36 +1,36 @@
 import _ from 'lodash';
-import { reportingActions } from 'consts/commonConsts';
+import { reportingActions, reportingUrl } from 'consts/commonConsts';
 import Utils from '../libs/utils';
-import { reportingUrl } from 'consts/commonConsts';
 
 const generateReport = ({ from, to }) => (dispatch, getState) => {
-	let pagegroupNames = _.uniq(_.map(getState().channelData.byIds, 'pageGroup'));
-	let variationNames = Object.keys(getState().variationByIds);
-	return Utils.ajax({
-		method: 'POST',
+	const state = getState();
+	const {
+		channelData: { activeChannel, byIds }
+	} = state;
+	const pagegroup = byIds[activeChannel].pageGroup;
+
+	console.log(pagegroup);
+
+	Utils.ajax({
+		method: 'GET',
 		url: reportingUrl,
 		data: JSON.stringify({
-			select: ['total_xpath_miss', 'total_impressions', 'total_revenue', 'report_date', 'siteid'],
-			where: {
-				siteid: ADP_SITE_ID,
-				pagegroup: pagegroupNames,
-				variation: variationNames,
-				from: from,
-				to: to
-			},
-			groupBy: ['section'],
-			needAggregated: true
+			from,
+			to,
+			pagegroup,
+			siteid: window.ADP_SITE_ID
 		})
-	}).then(response => {
-		if (response.error) {
-			alert('Some error occured while fetching reports');
-			return;
-		}
-		dispatch({
-			type: reportingActions.SET_REPORT,
-			data: response.data
+	})
+		.then(response =>
+			dispatch({
+				type: reportingActions.SET_REPORT,
+				data: response.data
+			})
+		)
+		.catch(err => {
+			console.log('Error', err);
+			alert('Reporting fetching failed. Please contact AdPushup Tech');
 		});
-	});
 };
 
 export { generateReport };

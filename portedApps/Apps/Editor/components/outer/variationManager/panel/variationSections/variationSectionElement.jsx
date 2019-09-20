@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
 import { Row, Col, Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import InlineEdit from 'shared/inlineEdit/index.jsx';
 import EditOptions from './editOptions.jsx';
-import $ from 'jquery';
 
 const errorBorder = {
 	border: '1px solid #eb575c',
@@ -15,23 +13,31 @@ class variationSectionElement extends Component {
 	}
 
 	componentWillMount() {
-		this.props.section.isIncontent || this.props.section.type == 3
-			? null
-			: this.props.onSectionXPathValidate(this.props.section.id, this.props.section.xpath);
+		const {
+			section: { isIncontent, type, id, xpath },
+			onSectionXPathValidate
+		} = this.props;
+
+		isIncontent || type === 3 ? null : onSectionXPathValidate(id, xpath);
 	}
 
 	render() {
-		const props = this.props,
-			adsObject = props.section.ads[0],
-			isPartnerData = !!(props.section && props.section.partnerData),
-			isCustomZoneId = !!(
-				isPartnerData &&
-				Object.keys(props.section.partnerData).length &&
-				props.section.partnerData.customZoneId &&
-				adsObject.network === 'geniee'
-			),
-			customZoneId = isCustomZoneId ? props.section.partnerData.customZoneId : '',
-			customZoneIdText = isCustomZoneId ? 'Zone ID' : '';
+		const props = this.props;
+		const adsObject = props.section.ads[0];
+		const isPartnerData = !!(props.section && props.section.partnerData);
+		const isCustomZoneId = !!(
+			isPartnerData &&
+			Object.keys(props.section.partnerData).length &&
+			props.section.partnerData.customZoneId &&
+			adsObject.network === 'geniee'
+		);
+		const customZoneId = isCustomZoneId ? props.section.partnerData.customZoneId : '';
+		const customZoneIdText = isCustomZoneId ? 'Zone ID' : '';
+		const hasData =
+			Object.keys(props.reporting).length &&
+			Object.keys(props.reporting.sections).length &&
+			props.reporting.sections[props.section.id];
+		const sectionReport = hasData ? props.reporting.sections[props.section.id] : false;
 
 		return (
 			<li
@@ -144,18 +150,14 @@ class variationSectionElement extends Component {
 								</Row>
 							</div>
 						) : null}
-						{Object.keys(props.reporting).length &&
-						Object.keys(props.reporting.sections).length &&
-						props.reporting.sections[props.section.id] ? (
+						{hasData ? (
 							<div>
 								<Row>
 									<Col className="u-padding-r10px" xs={7}>
-										Total Impressions
+										Total AdPushup Impressions
 									</Col>
 									<Col className="u-padding-l10px" xs={5}>
-										<strong>
-											{props.reporting.sections[props.section.id].aggregate.total_impressions}
-										</strong>
+										<strong>{sectionReport.adpushup_impressions}</strong>
 									</Col>
 								</Row>
 								{window.isSuperUser ? (
@@ -164,9 +166,7 @@ class variationSectionElement extends Component {
 											Total XPath Misses
 										</Col>
 										<Col className="u-padding-l10px" xs={5}>
-											<strong>
-												{props.reporting.sections[props.section.id].aggregate.total_xpath_miss}
-											</strong>
+											<strong>{sectionReport.adpushup_xpath_miss}</strong>
 										</Col>
 									</Row>
 								) : null}
@@ -182,12 +182,10 @@ class variationSectionElement extends Component {
 								</Row>
 								<Row>
 									<Col className="u-padding-r10px" xs={7}>
-										Total Revenue
+										Total Net Network Revenue
 									</Col>
 									<Col className="u-padding-l10px" xs={5}>
-										<strong>
-											{props.reporting.sections[props.section.id].aggregate.total_revenue}
-										</strong>
+										<strong>{sectionReport.network_net_revenue}</strong>
 									</Col>
 								</Row>
 							</div>

@@ -2,6 +2,9 @@ const express = require('express');
 const request = require('request-promise');
 const csv = require('express-csv');
 const _ = require('lodash');
+
+const HTTP_STATUSES = require('../configs/httpStatusConsts');
+const { sendSuccessResponse, sendErrorResponse } = require('../helpers/commonFunctions');
 const CC = require('../configs/commonConsts');
 const utils = require('../helpers/utils');
 
@@ -49,8 +52,7 @@ router
 		return res.send({});
 	})
 	.get('/downloadAdpushupReport', (req, res) => {
-		const { data , fileName} = req.query;
-
+		const { data, fileName } = req.query;
 
 		if (data) {
 			try {
@@ -59,7 +61,7 @@ router
 				res.setHeader('Content-disposition', `attachment; filename=${fileName}.csv`);
 				res.set('Content-Type', 'text/csv');
 
-				var headers = {};
+				const headers = {};
 				for (key in csvData[0]) {
 					headers[key] = key;
 				}
@@ -101,6 +103,105 @@ router
 				response.code == 1 && response.data ? res.send(response.data) : res.send({})
 			)
 			.catch(err => res.send({}));
+	})
+	.get('/sections/generate', (req, res) => {
+		const { from, to, pagegroup } = req.query;
+		const siteid = parseInt(req.query.siteid, 10);
+
+		return request({
+			uri: CC.PAGEGROUP_LIST_API,
+			json: true,
+			qs: {
+				list_name: 'GET_ALL_PAGE_GROUPS',
+				siteid,
+				hideSitePrefix: true
+			}
+		})
+			.then(response => {
+				const {
+					data: { result = [] },
+					code = -1
+				} = response;
+
+				if (code === -1 || !result.length)
+					return Promise.reject(
+						new Error({
+							message: 'No pagegroup found',
+							code: HTTP_STATUSES.BAD_REQUEST
+						})
+					);
+
+				const pagegroups = result.filter(pg => pg.value === pagegroup);
+				return pagegroups.length ? pagegroups[0].id : false;
+			})
+			.then(pagegroupId => {
+				if (!pagegroupId)
+					return sendErrorResponse(
+						{
+							message: 'No pagegroup found'
+						},
+						res,
+						HTTP_STATUSES.BAD_REQUEST
+					);
+
+				return request({
+					uri: `${CC.ANALYTICS_API_ROOT}${CC.REPORT_PATH}`,
+					json: true,
+					qs: {
+						interval: 'daily',
+						dimension: 'siteid,page_group,page_variation_id,page_variation,section_id,section',
+						metrics:
+							'adpushup_xpath_miss,adpushup_impressions,network_impressions,network_net_revenue',
+						fromDate: from,
+						toDate: to,
+						siteid,
+						page_group: pagegroupId
+					}
+				});
+			})
+			.then(response => {
+				const {
+					data: { result = [] },
+					code = -1
+				} = response;
+				const sections = {};
+
+				if (code === -1)
+					return sendErrorResponse(
+						{
+							message: 'Something went wrong'
+						},
+						res,
+						HTTP_STATUSES.INTERNAL_SERVER_ERROR
+					);
+				if (!result.length)
+					return sendSuccessResponse(
+						{
+							message: 'No data found'
+						},
+						res,
+						HTTP_STATUSES.OK
+					);
+
+				result.forEach(section => (sections[section.section_id] = section));
+				return sendSuccessResponse(
+					{
+						sections
+					},
+					res,
+					HTTP_STATUSES.OK
+				);
+			})
+			.catch(err => {
+				console.log(err);
+				return sendErrorResponse(
+					{
+						message: 'Something went wrong'
+					},
+					res,
+					HTTP_STATUSES.INTERNAL_SERVER_ERROR
+				);
+			});
 	});
 
 module.exports = router;
