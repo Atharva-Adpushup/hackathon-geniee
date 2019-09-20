@@ -36,8 +36,10 @@ class variationSectionElement extends Component {
 		const hasData =
 			Object.keys(props.reporting).length &&
 			Object.keys(props.reporting.sections).length &&
-			props.reporting.sections[props.section.id];
-		const sectionReport = hasData ? props.reporting.sections[props.section.id] : false;
+			props.reporting.sections[props.section.id.toUpperCase()];
+		const sectionReport = hasData
+			? props.reporting.sections[props.section.id.toUpperCase()]
+			: false;
 
 		return (
 			<li
