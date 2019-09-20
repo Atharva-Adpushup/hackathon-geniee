@@ -156,7 +156,7 @@ class variationSectionElement extends Component {
 							<div>
 								<Row>
 									<Col className="u-padding-r10px" xs={7}>
-										Total AdPushup Impressions
+										Total Impressions
 									</Col>
 									<Col className="u-padding-l10px" xs={5}>
 										<strong>{sectionReport.adpushup_impressions}</strong>
@@ -182,7 +182,7 @@ class variationSectionElement extends Component {
 								</Row>
 								<Row>
 									<Col className="u-padding-r10px" xs={7}>
-										Total Net Network Revenue
+										Total Net Revenue
 									</Col>
 									<Col className="u-padding-l10px" xs={5}>
 										<strong>{sectionReport.network_net_revenue}</strong>
