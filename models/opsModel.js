@@ -34,6 +34,9 @@ const commonSiteFunctions = {
 		return { activeBidders, inactiveBidders };
 	},
 	getOnboardingStatus(onboardingStep, apps = {}) {
+		if (onboardingStep > 3) {
+			return 'Onboarded';
+		}
 		switch (onboardingStep) {
 			case 1: {
 				return 'AP Head Code is Missing';
@@ -53,6 +56,7 @@ const commonSiteFunctions = {
 			}
 
 			default:
+				return 'N/A';
 		}
 	},
 	getSitesReport() {
@@ -93,7 +97,10 @@ const commonSiteFunctions = {
 		if (adNetworkSettings && adNetworkSettings.length) {
 			const adsenseNetwork = adNetworkSettings.find(network => network.networkName === 'ADSENSE');
 			if (adsenseNetwork) {
-				return { publisherId: adsenseNetwork.pubId, publisherEmail: adsenseNetwork.adsenseEmail };
+				return {
+					publisherId: adsenseNetwork.pubId || '',
+					publisherEmail: adsenseNetwork.adsenseEmail || ''
+				};
 			}
 		}
 
@@ -148,6 +155,9 @@ function apiModule() {
 						const { publisherId, publisherEmail } = commonSiteFunctions.getPublisherIdAndEmail(
 							site.adNetworkSettings
 						);
+						if (!site.revenueShare) {
+							site.revenueShare = 'N/A';
+						}
 						const {
 							activeBidders,
 							inactiveBidders

@@ -148,10 +148,10 @@ class SiteMapping extends Component {
 	getDefaultPageSize = () => {
 		const { filteredData: { length = 0 } = {} } = this.state;
 
-		if (length < 5) return 5;
-		else if (length < 10) return 10;
-		else if (length < 20) return 20;
-		else if (length < 50) return 50;
+		if (length <= 5) return 5;
+		else if (length <= 10) return 10;
+		else if (length <= 20) return 20;
+		else if (length <= 50) return 50;
 		return 50;
 	};
 
@@ -159,19 +159,19 @@ class SiteMapping extends Component {
 		const { filteredData, isError, selectAll, checked } = this.state;
 		const dataWithIcon = clonedeep(filteredData);
 		const columns = [
-			{
-				Header: <input type="checkbox" onChange={this.handleChange} checked={selectAll} />,
-				Cell: row => (
-					<input
-						type="checkbox"
-						checked={checked[row.index]}
-						onChange={e => this.handleSingleCheckboxChange(row.index, e)}
-					/>
-				),
-				sortable: false,
-				filterable: false,
-				...DEFAULT_WIDTH
-			},
+			// {
+			// 	Header: <input type="checkbox" onChange={this.handleChange} checked={selectAll} />,
+			// 	Cell: row => (
+			// 		<input
+			// 			type="checkbox"
+			// 			checked={checked[row.index]}
+			// 			onChange={e => this.handleSingleCheckboxChange(row.index, e)}
+			// 		/>
+			// 	),
+			// 	sortable: false,
+			// 	filterable: false,
+			// 	...DEFAULT_WIDTH
+			// },
 
 			...SITE_MAPPING_COLUMNS
 		];
@@ -187,7 +187,8 @@ class SiteMapping extends Component {
 				showPaginationTop
 				showPaginationBottom={false}
 				className="u-padding-h3 u-padding-v2 site-mapping"
-				defaultPageSize={this.getDefaultPageSize()}
+				// defaultPageSize={this.getDefaultPageSize()}
+				pageSize={this.getDefaultPageSize()}
 				pageSizeOptions={[50, 100, 150, 200, 250]}
 			/>
 		);
