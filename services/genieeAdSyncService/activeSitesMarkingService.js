@@ -20,18 +20,21 @@ function processSite(siteId, key, value, failed) {
 		.getSiteById(siteId)
 		.then(site => {
 			if (!site || site.status === '404') {
-				throw { siteId, error: true };
+				throw {};
 			}
 			site.set(key, value);
 			return site.save();
 		})
-		.then(savedSite =>
-			// console.log(`saved Site:${JSON.stringify(savedSite)}`);
-			({ siteId: savedSite.siteId })
+		.then(
+			savedSite =>
+				// console.log(`saved Site:${JSON.stringify(savedSite)}`);
+
+				savedSite
 		)
 		.catch(e => {
 			console.log(JSON.stringify(e));
 			e.error = true;
+			e.siteId = siteId;
 			return e;
 		});
 }
@@ -81,9 +84,10 @@ function checkforFailedUpdates(updatePromsieList) {
 			// console.log(`obj:${JSON.stringify(obj)}`);
 			if (!obj || obj.error) {
 				failedUpdates.push(obj.siteId);
-				// console.log(`error updating  site:${JSON.stringify(obj)}`);
+				console.log(`error updating  site:${JSON.stringify(obj)}`);
 			} else {
-				console.log(`site updated successfully:${obj.siteId}`);
+				// console.log(`obj123:${JSON.stringify(obj)}`);
+				console.log(`site updated successfully:${obj.data.siteId}`);
 			}
 		});
 

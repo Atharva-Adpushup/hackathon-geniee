@@ -54,7 +54,8 @@ var model = require('../helpers/model'),
 			'gdpr',
 			'ampSettings',
 			'apps',
-			'adServerSetupStatus'
+			'adServerSetupStatus',
+			'dataFeedActive'
 		];
 		this.validations = {
 			required: []
