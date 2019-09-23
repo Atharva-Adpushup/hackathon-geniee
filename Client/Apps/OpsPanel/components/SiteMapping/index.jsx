@@ -77,7 +77,7 @@ class SiteMapping extends Component {
 		this.setState({
 			checked: checkedCopy,
 			selectedData,
-			selectAll: selectedData.length === filteredData.length ? true : false
+			selectAll: selectedData.length === filteredData.length
 		});
 	};
 
@@ -89,7 +89,7 @@ class SiteMapping extends Component {
 	};
 
 	handleFilterValues = arr => {
-		let array = [];
+		const array = [];
 		arr.map(({ name, prop }) => {
 			array.push({ name, prop, values: this.getFilterBoxValues(prop) });
 		});
@@ -148,36 +148,37 @@ class SiteMapping extends Component {
 	getDefaultPageSize = () => {
 		const { filteredData: { length = 0 } = {} } = this.state;
 
-		if (length < 5) return 5;
-		else if (length < 10) return 10;
-		else if (length < 20) return 20;
-		else if (length < 50) return 50;
+		if (length <= 5) return 5;
+		if (length <= 10) return 10;
+		if (length <= 20) return 20;
+		if (length <= 50) return 50;
 		return 50;
 	};
 
 	renderContent = () => {
 		const { filteredData, isError, selectAll, checked } = this.state;
 		const dataWithIcon = clonedeep(filteredData);
+
 		const columns = [
-			{
-				Header: <input type="checkbox" onChange={this.handleChange} checked={selectAll} />,
-				Cell: row => (
-					<input
-						type="checkbox"
-						checked={checked[row.index]}
-						onChange={e => this.handleSingleCheckboxChange(row.index, e)}
-					/>
-				),
-				sortable: false,
-				filterable: false,
-				...DEFAULT_WIDTH
-			},
+			// {
+			// 	Header: <input type="checkbox" onChange={this.handleChange} checked={selectAll} />,
+			// 	Cell: row => (
+			// 		<input
+			// 			type="checkbox"
+			// 			checked={checked[row.index]}
+			// 			onChange={e => this.handleSingleCheckboxChange(row.index, e)}
+			// 		/>
+			// 	),
+			// 	sortable: false,
+			// 	filterable: false,
+			// 	...DEFAULT_WIDTH
+			// },
 
 			...SITE_MAPPING_COLUMNS
 		];
 
 		if (isError) return <CustomError />;
-		else if (filteredData.length === 0) return <Empty message=" No Data found " />;
+		if (filteredData.length === 0) return <Empty message=" No Data found " />;
 
 		return (
 			<ReactTable
@@ -187,7 +188,8 @@ class SiteMapping extends Component {
 				showPaginationTop
 				showPaginationBottom={false}
 				className="u-padding-h3 u-padding-v2 site-mapping"
-				defaultPageSize={this.getDefaultPageSize()}
+				// defaultPageSize={this.getDefaultPageSize()}
+				pageSize={this.getDefaultPageSize()}
 				pageSizeOptions={[50, 100, 150, 200, 250]}
 			/>
 		);
@@ -222,7 +224,8 @@ class SiteMapping extends Component {
 	render() {
 		const { isLoading, filteredData, selectedData, fileName } = this.state;
 		if (isLoading) return <Loader height="600px" classNames="u-margin-v3" />;
-		let csvData, downloadLink;
+		let csvData;
+		let downloadLink;
 		try {
 			csvData = btoa(JSON.stringify(selectedData.length === 0 ? filteredData : selectedData));
 			downloadLink = `${REPORT_DOWNLOAD_ENDPOINT}?data=${csvData}&fileName=${fileName}`;
