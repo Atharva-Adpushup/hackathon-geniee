@@ -60,9 +60,8 @@ class LostFoundLiveSites extends Component {
 	}
 
 	getQueryString = () => {
-		const { pageviewsThreshold, currentStartDate, currentEndDate } = this.state;
+		const { currentStartDate, currentEndDate } = this.state;
 		return {
-			pageviewsThreshold,
 			current: {
 				from: currentStartDate,
 				to: currentEndDate
