@@ -1,6 +1,7 @@
 const { Promise } = require('bluebird');
 const rp = require('request-promise');
 const cron = require('node-cron');
+const { promiseForeach } = require('node-utils');
 
 const { appBucket } = require('../../helpers/routeHelpers');
 const siteModel = require('../../Models/siteModel');
@@ -15,14 +16,15 @@ function getFormattedDate(date, offset) {
 	return `${year}-${month}-${day}`;
 }
 
-function processSite(siteId, key, value, failed) {
+function processSite(data) {
 	return siteModel
-		.getSiteById(siteId)
+		.getSiteById(data.siteId)
 		.then(site => {
 			if (!site || site.status === '404') {
+				console.log(`site not found : ${JSON.stringify(site)}`);
 				throw {};
 			}
-			site.set(key, value);
+			site.set(data.key, data.value);
 			return site.save();
 		})
 		.then(
@@ -34,7 +36,7 @@ function processSite(siteId, key, value, failed) {
 		.catch(e => {
 			console.log(JSON.stringify(e));
 			e.error = true;
-			e.siteId = siteId;
+			e.siteId = data.siteId;
 			return e;
 		});
 }
@@ -76,27 +78,27 @@ function getActiveSites(fromDate, toDate) {
 	return activeSiteListPromise;
 }
 
-function checkforFailedUpdates(updatePromsieList) {
+function checkforFailedUpdates(siteUpdates) {
 	console.log(`checking for any failed updates...`);
 	const failedUpdates = [];
-	Promise.all(updatePromsieList).then(res => {
-		res.forEach(obj => {
-			// console.log(`obj:${JSON.stringify(obj)}`);
-			if (obj.error) {
-				failedUpdates.push(obj.siteId);
-				console.log(`error updating  site:${JSON.stringify(obj)}`);
-			} else {
-				// console.log(`obj123:${JSON.stringify(obj)}`);
-				console.log(`site updated successfully:${obj.data.siteId}`);
-			}
-		});
 
-		if (failedUpdates.length) {
-			console.log(`Following sites could not be updated:${JSON.stringify(failedUpdates)}`);
+	siteUpdates.forEach(obj => {
+		// console.log(`obj:${JSON.stringify(obj)}`);
+		if (obj.error) {
+			failedUpdates.push(obj.siteId);
+			console.log(`error updating  site:${JSON.stringify(obj)}`);
 		} else {
-			console.log(`all sites updated successfully`);
+			// console.log(`obj123:${JSON.stringify(obj)}`);
+			console.log(`site updated successfully:${obj.data.siteId}`);
 		}
 	});
+
+	if (failedUpdates.length) {
+		console.log(`Following sites could not be updated:${JSON.stringify(failedUpdates)}`);
+	} else {
+		console.log(`all sites updated successfully`);
+	}
+	process.exit();
 }
 
 function udpateActiveSitesStaus() {
@@ -127,19 +129,36 @@ function udpateActiveSitesStaus() {
 				}
 			}
 			// console.log(`sitesFound:${JSON.stringify(sitesFound)}`);
-			const siteUpdatePromiseList = [];
+
+			const updateResponse = [];
+			const siteUpdateData = [];
+
 			for (const key in siteList) {
 				const site = siteList[key].apAppBucket;
 				console.log(`updating site id:${site.siteId}`);
-				siteUpdatePromiseList.push(
-					processSite(site.siteId, 'dataFeedActive', !!sitesFound[site.siteId], failed)
-				);
+				siteUpdateData.push({
+					siteId: site.siteId,
+					key: 'dataFeedActive',
+					value: !!sitesFound[site.siteId]
+				});
 			}
 
-			checkforFailedUpdates(siteUpdatePromiseList);
+			promiseForeach(siteUpdateData, processSite, (data, err) => {
+				updateResponse.push(data);
+			})
+				.then(() => {
+					checkforFailedUpdates(updateResponse);
+				})
+				.catch(err => {
+					console.log(err);
+					process.exit();
+				});
+
+			// checkforFailedUpdates(siteUpdatePromiseList);
 		})
 		.catch(err => {
 			console.log(`Exiting.....${JSON.stringify(err)}`);
+			process.exit();
 		});
 }
 
