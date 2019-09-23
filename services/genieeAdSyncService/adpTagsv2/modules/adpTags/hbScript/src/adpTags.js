@@ -71,7 +71,7 @@ var adpTags = {
 			var bidders = optionalParam.headerBidding ? adUnits.bidders : [];
 			var isResponsive = optionalParam.isResponsive;
 			var sectionName = optionalParam.sectionName;
-			var multipleAdSizes = optionalParam.multipleAdSizes;
+			var multipleAdSizes = constants.AD_SIZE_MAPPING.BACKWARD_COMPATIBLE_MAPPING[size.join(',')];
 			var services = optionalParam.services;
 			var formats =
 				config.PREBID_CONFIG && config.PREBID_CONFIG.formats
@@ -91,7 +91,7 @@ var adpTags = {
 				activeDFPNetwork: utils.getActiveDFPNetwork(),
 				size: size,
 				sectionName: sectionName,
-				computedSizes: multipleAdSizes ? multipleAdSizes : [],
+				computedSizes: multipleAdSizes || [],
 				isResponsive: isResponsive,
 				containerId: containerId,
 				timeout: timeout,
