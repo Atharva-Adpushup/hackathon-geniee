@@ -82,7 +82,7 @@ function checkforFailedUpdates(updatePromsieList) {
 	Promise.all(updatePromsieList).then(res => {
 		res.forEach(obj => {
 			// console.log(`obj:${JSON.stringify(obj)}`);
-			if (!obj || obj.error) {
+			if (obj.error) {
 				failedUpdates.push(obj.siteId);
 				console.log(`error updating  site:${JSON.stringify(obj)}`);
 			} else {
