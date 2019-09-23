@@ -150,7 +150,7 @@ router
 			typeof req.body.data === 'string' ? JSON.parse(req.body.data) : req.body.data;
 		const siteData = {
 			apConfigs: { mode: parsedData.siteMode },
-			siteId: parsedData.siteId,
+			siteId: parseInt(parsedData.siteId, 10),
 			siteDomain: parsedData.siteDomain,
 			customSizes: parsedData.customSizes || [],
 			channels: _.map(parsedData.channels, channel => `${channel.platform}:${channel.pageGroup}`)
@@ -185,7 +185,9 @@ router
 
 		return checkChannelsExistence(siteData.siteId, siteData.channels)
 			.then(siteModel.saveSiteData.bind(null, siteData.siteId, 'POST', siteData))
-			.then(channelModel.saveChannels.bind(null, parsedData.siteId, parsedData.channels))
+			.then(
+				channelModel.saveChannels.bind(null, parseInt(parsedData.siteId, 10), parsedData.channels)
+			)
 			.then(() =>
 				res.json({
 					success: 1,
