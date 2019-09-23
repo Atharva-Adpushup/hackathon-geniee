@@ -8,6 +8,7 @@ import clonedeep from 'lodash/cloneDeep';
 import 'react-table/react-table.css';
 import { Row } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { CSVLink } from 'react-csv';
 
 import axiosInstance from '../../../../helpers/axiosInstance';
 import FilterBox from '../../../../Components/FilterBox';
@@ -17,7 +18,6 @@ import { copyToClipBoard } from '../../../../helpers/commonFunctions';
 import CustomIcon from '../../../../Components/CustomIcon/index';
 import CustomButton from '../../../../Components/CustomButton';
 import CustomError from '../../../../Components/CustomError/index';
-import { REPORT_DOWNLOAD_ENDPOINT } from '../../../Reporting/configs/commonConsts';
 import { SITE_MAPPING_COLUMNS, SITE_MAPPING_FILTER_COLUMNS } from '../../configs/commonConsts';
 
 const DEFAULT_WIDTH = {
@@ -34,8 +34,7 @@ class SiteMapping extends Component {
 		isError: false,
 		selectAll: false,
 		checked: [],
-		selectedData: [],
-		fileName: 'sites-stats'
+		selectedData: []
 	};
 
 	componentDidMount() {
@@ -177,7 +176,7 @@ class SiteMapping extends Component {
 		];
 
 		if (isError) return <CustomError />;
-		else if (filteredData.length === 0) return <Empty message=" No Data found " />;
+		else if (!filteredData.length) return <Empty message=" No Data found " />;
 
 		return (
 			<ReactTable
@@ -221,12 +220,11 @@ class SiteMapping extends Component {
 	};
 
 	render() {
-		const { isLoading, filteredData, selectedData, fileName } = this.state;
+		const { isLoading, filteredData, selectedData } = this.state;
 		if (isLoading) return <Loader height="600px" classNames="u-margin-v3" />;
-		let csvData, downloadLink;
+		let csvData;
 		try {
-			csvData = btoa(JSON.stringify(selectedData.length === 0 ? filteredData : selectedData));
-			downloadLink = `${REPORT_DOWNLOAD_ENDPOINT}?data=${csvData}&fileName=${fileName}`;
+			csvData = !selectedData.length ? filteredData : selectedData;
 		} catch (e) {
 			alert('csv data corrupted');
 		}
@@ -240,25 +238,16 @@ class SiteMapping extends Component {
 				/>
 				<Row>
 					{csvData ? (
-						<CustomButton
-							variant="primary"
-							href={downloadLink}
-							className="btn btn-lightBg btn-default btn-blue-line pull-right u-margin-r3 u-margin-b4 "
-							onClick={this.handleExport}
-						>
-							<FontAwesomeIcon size="1x" icon="download" className="u-margin-r3" />
-							Export Report
-						</CustomButton>
+						<CSVLink data={csvData} filename={'site-stats.csv'}>
+							<CustomButton
+								variant="primary"
+								className="btn btn-lightBg btn-default btn-blue-line pull-right u-margin-r3 u-margin-b4 "
+							>
+								<FontAwesomeIcon size="1x" icon="download" className="u-margin-r3" />
+								Export Report
+							</CustomButton>
+						</CSVLink>
 					) : null}
-
-					{/* <CustomButton
-						variant="secondary"
-						className=" pull-right u-margin-r3 u-margin-b4 "
-						onClick={this.sendMail}
-					>
-						<FontAwesomeIcon size="1x" icon="mail-bulk" className="u-margin-r3" />
-						Send Custom Mail
-					</CustomButton> */}
 				</Row>
 				{this.renderContent()}
 			</React.Fragment>
