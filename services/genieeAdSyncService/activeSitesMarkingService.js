@@ -12,7 +12,6 @@ function getFormattedDate(date, offset) {
 	const year = date.getFullYear();
 	const month = date.getMonth() + 1;
 	const day = date.getDate();
-	// console.log('formatted date:' + `${year}-${month}-${day}`);
 	return `${year}-${month}-${day}`;
 }
 
@@ -20,7 +19,6 @@ function processSite(data) {
 	return siteModel
 		.getSiteById(data.siteId)
 		.then(site => {
-			// throw {};
 			if (!site || site.status === '404') {
 				console.log(`site not found : ${JSON.stringify(site)}`);
 				throw {};
@@ -33,7 +31,6 @@ function processSite(data) {
 			console.log(JSON.stringify(e));
 			e.error = true;
 			e.siteId = data.siteId;
-			// return e;
 			throw e;
 		});
 }
@@ -80,7 +77,6 @@ function checkforFailedUpdates(siteUpdates) {
 	const failedUpdates = [];
 
 	siteUpdates.forEach(obj => {
-		// console.log(`obj:${JSON.stringify(obj)}`);
 		if (obj.error) {
 			failedUpdates.push(obj.siteId);
 			console.log(`error updating  site:${JSON.stringify(obj)}`);
@@ -89,8 +85,6 @@ function checkforFailedUpdates(siteUpdates) {
 
 	if (failedUpdates.length) {
 		console.log(`Following sites could not be updated:${JSON.stringify(failedUpdates)}`);
-	} else {
-		console.log(`all sites updated successfully`);
 	}
 }
 
@@ -108,24 +102,20 @@ function udpateActiveSitesStaus() {
 	Promise.all(pendingActions)
 		.then(res => {
 			if (!res[0] || !Object.keys(res[0]).length) {
-				console.log('no sites returned from db');
-				return;
+				throw new Error('no sites returned from db');
 			}
 			const siteList = Object.assign({}, res[0]);
 			const sitesFound = {};
-			// console.log(`siteList:${JSON.stringify(res[0])}`);
 			if (res[1] && Object.keys(res[1]).length) {
 				const activeSiteList = Object.assign({}, res[1]);
 				for (const key in activeSiteList) {
 					sitesFound[activeSiteList[key]] = true;
 				}
 			}
-			// console.log(`sitesFound:${JSON.stringify(sitesFound)}`);
 			const siteUpdateData = [];
 
 			for (const key in siteList) {
 				const site = siteList[key].apAppBucket;
-				// console.log(`updating site id:${site.siteId}`);
 				siteUpdateData.push({
 					siteId: site.siteId,
 					key: 'dataFeedActive',
@@ -137,17 +127,12 @@ function udpateActiveSitesStaus() {
 				updateResponse.push(err);
 				return true;
 			});
-			// checkforFailedUpdates(siteUpdatePromiseList);
 		})
-		.then(() => {
+		.then(res => {
 			checkforFailedUpdates(updateResponse);
 		})
-		// .catch(err => {
-		// 	console.log(err);
-		// 	process.exit();
-		// });
 		.catch(err => {
-			console.log(`Error.....\n ${JSON.stringify(err)}`);
+			console.log(`Error.....\n ${err.message}`);
 		});
 }
 // cron.schedule('* 17 * * *', udpateActiveSitesStaus);
