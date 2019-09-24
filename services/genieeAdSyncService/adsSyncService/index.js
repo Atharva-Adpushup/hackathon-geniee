@@ -5,6 +5,7 @@ const adpTagPublisher = require('../../../queueWorker/rabbitMQ/workers/adpTagAdS
 const adsensePublisher = require('../../../queueWorker/rabbitMQ/workers/adsenseAdSyncQueuePublisher');
 const siteConfigGenerationModule = require('./modules/siteConfigGeneration/index');
 const syncCdn = require('../cdnSyncService/index');
+const siteModelAPI = require('../../../models/siteModel');
 
 // No need for these wrapper functions. Can remove.
 function genieePublishWrapper(item) {
@@ -55,11 +56,20 @@ function publishToQueueWrapper(siteConfigItems, site) {
 	}
 	return processing().then(response => (response.empty ? syncCdn(site) : response));
 }
+function publishWrapper(siteModel) {
+	return siteConfigGenerationModule
+		.generate(siteModel)
+		.then(siteConfigItems => publishToQueueWrapper(siteConfigItems, siteModel));
+}
 
 module.exports = {
-	publish(siteModel) {
-		return siteConfigGenerationModule
-			.generate(siteModel)
-			.then(siteConfigItems => publishToQueueWrapper(siteConfigItems, siteModel));
+	publish(site) {
+		const siteIdNum = parseInt(site, 10);
+		if (!isNaN(siteIdNum)) {
+			const siteId = siteIdNum.toString();
+			return siteModelAPI.getSiteById(siteId).then(siteModel => publishWrapper(siteModel));
+		}
+
+		return publishWrapper(site);
 	}
 };
