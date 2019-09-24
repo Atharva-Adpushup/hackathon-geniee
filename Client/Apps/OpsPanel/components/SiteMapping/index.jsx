@@ -186,7 +186,6 @@ class SiteMapping extends Component {
 				showPaginationTop
 				showPaginationBottom={false}
 				className="u-padding-h3 u-padding-v2 site-mapping"
-				// defaultPageSize={this.getDefaultPageSize()}
 				pageSize={this.getDefaultPageSize()}
 				pageSizeOptions={[50, 100, 150, 200, 250]}
 			/>
@@ -248,7 +247,7 @@ class SiteMapping extends Component {
 							</CustomButton>
 						</CSVLink>
 					) : null}
-					
+
 					{/* <CustomButton
 						variant="secondary"
 						className=" pull-right u-margin-r3 u-margin-b4 "

@@ -398,6 +398,13 @@ const SITE_MAPPING_COLUMNS = [
 	{
 		Header: 'Active Status',
 		accessor: 'activeStatus',
+		getProps: (state, rowInfo, column) => {
+			return {
+				style: {
+					color: rowInfo && rowInfo.row.activeStatus !== 'Active' ? 'red' : 'green'
+				}
+			};
+		},
 		...DEFAULT_WIDTH
 	},
 	{
