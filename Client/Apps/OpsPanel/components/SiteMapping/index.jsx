@@ -234,7 +234,7 @@ class SiteMapping extends Component {
 					onFilter={this.onFilter}
 					availableFilters={this.handleFilterValues(SITE_MAPPING_FILTER_COLUMNS)}
 					handleFilters={this.handleFilters}
-					className="u-margin-v5 u-margin-h4 "
+					className="u-margin-v5 u-margin-h4 site-stats"
 				/>
 				<Row>
 					{csvData ? (
@@ -248,6 +248,15 @@ class SiteMapping extends Component {
 							</CustomButton>
 						</CSVLink>
 					) : null}
+					
+					{/* <CustomButton
+						variant="secondary"
+						className=" pull-right u-margin-r3 u-margin-b4 "
+						onClick={this.sendMail}
+					>
+						<FontAwesomeIcon size="1x" icon="mail-bulk" className="u-margin-r3" />
+						Send Custom Mail
+					</CustomButton> */}
 				</Row>
 				{this.renderContent()}
 			</React.Fragment>

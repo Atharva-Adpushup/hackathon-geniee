@@ -109,3 +109,18 @@
 .ReactTable .rt-thead .rt-th.-sort-desc {
 	background-image: url('../../../../public/assets/images/sort-arrow-down.png');
 }
+.site-mapping .rt-thead {
+	position: sticky;
+	top: 0;
+	z-index: 2;
+	background: white;
+}
+.site-mapping .rt-tbody {
+	overflow: visible !important;
+	min-height: 64vh;
+	max-height: 64vh;
+}
+
+.site-stats .filterbox {
+	z-index: 3 !important;
+}
