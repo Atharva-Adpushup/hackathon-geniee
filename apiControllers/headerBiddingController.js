@@ -127,11 +127,8 @@ router
 			siteDomain: null,
 			email,
 			prebidConfig: {
-				timeOut: 3000,
-				currency: {
-					enabled: false
-				},
-				formats: ['display']
+				timeOut: commonConsts.hbGlobalSettingDefaults.prebidTimeout,
+				formats: commonConsts.hbGlobalSettingDefaults.defaultFormats
 			}
 		};
 
@@ -361,22 +358,23 @@ router
 			.verifySiteOwner(email, siteId)
 			.then(() => headerBiddingModel.getPrebidConfig(siteId, email))
 			.then(prebidConfig => res.status(httpStatus.OK).json(prebidConfig))
-			.catch(() =>
-				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error!' })
-			);
+			.catch(err => {
+				// eslint-disable-next-line no-console
+				console.log(err);
+				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error!' });
+			});
 	})
 	.put('/prebidSettings/:siteId', (req, res) => {
 		const { siteId } = req.params;
 		const { email } = req.user;
 		const newPrebidConfig = req.body;
-		const { timeOut, currency, formats } = newPrebidConfig;
+		const { timeOut, formats } = newPrebidConfig;
 
 		if (
 			!(
 				!Number.isNaN(timeOut) &&
 				timeOut >= 500 &&
 				timeOut <= 10000 &&
-				typeof currency.enabled === 'boolean' &&
 				formats.indexOf('display') > -1
 			)
 		) {

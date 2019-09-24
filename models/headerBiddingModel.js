@@ -590,29 +590,20 @@ function apiModule() {
 			Promise.all([API.getHbConfig(siteId), userModel.getUserByEmail(email)]).then(
 				([hbConfig, user]) => {
 					const prebidConfig = hbConfig.get('prebidConfig');
-					// const { activeDFPNetwork, activeDFPCurrencyCode } = site.get('apConfigs');
-					const adNetworkSettings = user.getNetworkDataObj('DFP');
-					const currencyCode =
-						adNetworkSettings &&
-						adNetworkSettings.dfpAccounts &&
-						adNetworkSettings.dfpAccounts[0].currencyCode;
+					const activeAdServer = user.getActiveAdServerData('dfp');
+
+					const currencyCode = !!activeAdServer && activeAdServer.activeDFPCurrencyCode;
 					const mergedPrebidConfig = { ...prebidConfig };
 
 					mergedPrebidConfig.adServer =
-						adNetworkSettings &&
-						adNetworkSettings.dfpAccounts &&
-						adNetworkSettings.dfpAccounts.length
-							? adNetworkSettings.dfpAccounts[0].code ===
+						activeAdServer && activeAdServer.activeDFPNetwork
+							? activeAdServer.activeDFPNetwork ===
 							  hbGlobalSettingDefaults.dfpAdUnitTargeting.networkId
-								? 'AP'
-								: 'Publisher'
+								? `AP (${activeAdServer.activeDFPNetwork})`
+								: `Publisher (${activeAdServer.activeDFPNetwork})`
 							: 'N/A';
-					mergedPrebidConfig.currency.code = currencyCode || '';
-					mergedPrebidConfig.availableFormats = [
-						{ name: 'Display', value: 'display' },
-						{ name: 'Native', value: 'native' },
-						{ name: 'Video', value: 'video' }
-					];
+					mergedPrebidConfig.currency = { code: currencyCode || 'N/A' };
+					mergedPrebidConfig.availableFormats = hbGlobalSettingDefaults.availableFormats;
 
 					return mergedPrebidConfig;
 				}
