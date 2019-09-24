@@ -20,6 +20,7 @@ function processSite(data) {
 	return siteModel
 		.getSiteById(data.siteId)
 		.then(site => {
+			// throw {};
 			if (!site || site.status === '404') {
 				console.log(`site not found : ${JSON.stringify(site)}`);
 				throw {};
@@ -27,17 +28,13 @@ function processSite(data) {
 			site.set(data.key, data.value);
 			return site.save();
 		})
-		.then(
-			savedSite =>
-				// console.log(`saved Site:${JSON.stringify(savedSite)}`);
-
-				savedSite
-		)
+		.then(() => console.log(`Site saved successfully -- ${data.siteId}`))
 		.catch(e => {
 			console.log(JSON.stringify(e));
 			e.error = true;
 			e.siteId = data.siteId;
-			return e;
+			// return e;
+			throw e;
 		});
 }
 
@@ -98,17 +95,15 @@ function checkforFailedUpdates(siteUpdates) {
 	} else {
 		console.log(`all sites updated successfully`);
 	}
-	process.exit();
 }
 
 function udpateActiveSitesStaus() {
 	const pendingActions = [];
-	const failed = [];
-
 	pendingActions.push(getSitesFromDB());
 
 	const fromDate = getFormattedDate(new Date(), 2);
 	const toDate = getFormattedDate(new Date());
+	const updateResponse = [];
 
 	pendingActions.push(getActiveSites(fromDate, toDate));
 
@@ -129,8 +124,6 @@ function udpateActiveSitesStaus() {
 				}
 			}
 			// console.log(`sitesFound:${JSON.stringify(sitesFound)}`);
-
-			const updateResponse = [];
 			const siteUpdateData = [];
 
 			for (const key in siteList) {
@@ -143,24 +136,22 @@ function udpateActiveSitesStaus() {
 				});
 			}
 
-			promiseForeach(siteUpdateData, processSite, (data, err) => {
-				updateResponse.push(data);
-			})
-				.then(() => {
-					checkforFailedUpdates(updateResponse);
-				})
-				.catch(err => {
-					console.log(err);
-					process.exit();
-				});
-
+			return promiseForeach(siteUpdateData, processSite, (data, err) => {
+				updateResponse.push(err);
+				return true;
+			});
 			// checkforFailedUpdates(siteUpdatePromiseList);
 		})
+		.then(() => {
+			checkforFailedUpdates(updateResponse);
+		})
+		// .catch(err => {
+		// 	console.log(err);
+		// 	process.exit();
+		// });
 		.catch(err => {
-			console.log(`Exiting.....${JSON.stringify(err)}`);
-			process.exit();
+			console.log(`Error.....\n ${JSON.stringify(err)}`);
 		});
 }
-
 // cron.schedule('* 17 * * *', udpateActiveSitesStaus);
 udpateActiveSitesStaus();
