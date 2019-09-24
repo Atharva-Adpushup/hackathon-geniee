@@ -20,8 +20,8 @@ function processSite(data) {
 		.getSiteById(data.siteId)
 		.then(site => {
 			if (!site || site.status === '404') {
-				console.log(`site not found : ${JSON.stringify(site)}`);
-				throw {};
+				console.log(`c : ${JSON.stringify(site)}`);
+				throw { message: 'site not found' };
 			}
 			site.set(data.key, data.value);
 			return site.save();
