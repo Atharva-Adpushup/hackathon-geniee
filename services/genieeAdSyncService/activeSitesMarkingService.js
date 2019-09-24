@@ -84,9 +84,6 @@ function checkforFailedUpdates(siteUpdates) {
 		if (obj.error) {
 			failedUpdates.push(obj.siteId);
 			console.log(`error updating  site:${JSON.stringify(obj)}`);
-		} else {
-			// console.log(`obj123:${JSON.stringify(obj)}`);
-			console.log(`site updated successfully:${obj.data.siteId}`);
 		}
 	});
 
@@ -128,7 +125,7 @@ function udpateActiveSitesStaus() {
 
 			for (const key in siteList) {
 				const site = siteList[key].apAppBucket;
-				console.log(`updating site id:${site.siteId}`);
+				// console.log(`updating site id:${site.siteId}`);
 				siteUpdateData.push({
 					siteId: site.siteId,
 					key: 'dataFeedActive',
