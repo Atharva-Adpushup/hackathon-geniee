@@ -85,6 +85,8 @@ function checkforFailedUpdates(siteUpdates) {
 
 	if (failedUpdates.length) {
 		console.log(`Following sites could not be updated:${JSON.stringify(failedUpdates)}`);
+	} else {
+		console.log('All sites updated successfully');
 	}
 }
 
@@ -135,5 +137,5 @@ function udpateActiveSitesStaus() {
 			console.log(`Error.....\n ${err.message}`);
 		});
 }
-// cron.schedule('* 17 * * *', udpateActiveSitesStaus);
-udpateActiveSitesStaus();
+cron.schedule('* 17 * * *', udpateActiveSitesStaus);
+// udpateActiveSitesStaus();
