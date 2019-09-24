@@ -221,12 +221,8 @@ class SiteMapping extends Component {
 	render() {
 		const { isLoading, filteredData, selectedData } = this.state;
 		if (isLoading) return <Loader height="600px" classNames="u-margin-v3" />;
-		let csvData;
-		try {
-			csvData = !selectedData.length ? filteredData : selectedData;
-		} catch (e) {
-			alert('csv data corrupted');
-		}
+		let csvData = !selectedData.length ? filteredData : selectedData;
+
 		return (
 			<React.Fragment>
 				<FilterBox
