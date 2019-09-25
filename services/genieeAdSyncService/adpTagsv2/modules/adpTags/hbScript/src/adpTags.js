@@ -71,7 +71,7 @@ var adpTags = {
 			var bidders = optionalParam.headerBidding ? adUnits.bidders : [];
 			var isResponsive = optionalParam.isResponsive;
 			var sectionName = optionalParam.sectionName;
-			var multipleAdSizes = constants.AD_SIZE_MAPPING.BACKWARD_COMPATIBLE_MAPPING[size.join(',')];
+			var multipleAdSizes = constants.AD_SIZE_MAPPING.BACKWARD_COMPATIBLE_MAPPING[size.join(',')] || optionalParam.multipleAdSizes;
 			var services = optionalParam.services;
 			var formats =
 				config.PREBID_CONFIG && config.PREBID_CONFIG.formats
