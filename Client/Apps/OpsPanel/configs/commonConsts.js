@@ -401,7 +401,8 @@ const SITE_MAPPING_COLUMNS = [
 		getProps: (state, rowInfo, column) => {
 			return {
 				style: {
-					color: rowInfo && rowInfo.row.activeStatus !== 'Active' ? 'red' : 'green'
+					color:
+						rowInfo && rowInfo.row.activeStatus.props.children.includes('Active') ? 'green' : 'red'
 				}
 			};
 		},
