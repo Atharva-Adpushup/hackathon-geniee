@@ -2,13 +2,13 @@
 import {
 	CHECK_INVENTORY,
 	FETCH_ALL_BIDDERS,
-	GET_SETUP_STATUS,
 	ADD_BIDDER,
 	UPDATE_BIDDER,
 	FETCH_INVENTORIES,
 	UPDATE_INVENTORIES_HB_STATUS,
 	SET_DFP_SETUP_STATUS,
-	UPDATE_ADSERVER_SETUP_STATUS
+	UPDATE_ADSERVER_SETUP_STATUS,
+	GET_HB_INIT_DATA
 } from '../../../constants/headerBidding';
 import history from '../../../helpers/history';
 import * as service from '../../../services/hbService';
@@ -21,18 +21,21 @@ export const checkInventoryAction = siteId => dispatch =>
 			dispatch({ type: CHECK_INVENTORY, siteId, inventoryFound: false });
 		});
 
+export const fetchHBInitDataAction = siteId => dispatch =>
+	service
+		.getHBInitData(siteId)
+		.then(({ data: { setupStatus, bidders } }) =>
+			dispatch({ type: GET_HB_INIT_DATA, siteId, setupStatus, bidders })
+		)
+		.catch(err => {
+			// eslint-disable-next-line no-console
+			console.log(err);
+			history.push('/error');
+		});
 export const fetchAllBiddersAction = siteId => dispatch =>
 	service
 		.fetchBiddersList(siteId)
 		.then(({ data: bidders }) => dispatch({ type: FETCH_ALL_BIDDERS, siteId, bidders }))
-		.catch(() => {
-			history.push('/error');
-		});
-
-export const getSetupStatusAction = siteId => dispatch =>
-	service
-		.getSetupStatus(siteId)
-		.then(({ data: setupStatus }) => dispatch({ type: GET_SETUP_STATUS, siteId, setupStatus }))
 		.catch(() => {
 			history.push('/error');
 		});

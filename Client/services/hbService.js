@@ -8,8 +8,8 @@ export function fetchBiddersList(siteId) {
 	return axiosInstance.get(`/headerBidding/getBiddersList/${siteId}`);
 }
 
-export function getSetupStatus(siteId) {
-	return axiosInstance.get(`/headerBidding/setupStatus/${siteId}`);
+export function getHBInitData(siteId) {
+	return axiosInstance.get(`/headerBidding/hbInitData/${siteId}`);
 }
 
 export function addBidder(siteId, bidderConfig, params) {

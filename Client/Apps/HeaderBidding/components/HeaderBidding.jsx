@@ -16,30 +16,30 @@ class HeaderBidding extends React.Component {
 	};
 
 	componentDidMount() {
-		this.handleDefaultTabWrapper();
+		this.handleDefaultTabWrapper(null, true);
 	}
 
 	componentDidUpdate(prevProps) {
 		const { setupStatus: prevSetupStatus } = prevProps;
-		this.handleDefaultTabWrapper(prevSetupStatus);
+		this.handleDefaultTabWrapper(prevSetupStatus, false);
 	}
 
-	handleDefaultTabWrapper = prevSetupStatus => {
+	handleDefaultTabWrapper = (prevSetupStatus, isFirstLoad) => {
 		const {
 			match: {
 				params: { siteId },
 				url
 			},
 			setupStatus,
-			getSetupStatusAction
+			fetchHBInitDataAction
 		} = this.props;
 
-		if (setupStatus) {
+		if (setupStatus && !isFirstLoad) {
 			this.handleDefaultTab(url, siteId, prevSetupStatus);
 			return;
 		}
 
-		getSetupStatusAction(siteId).then(() => this.handleDefaultTab(url, siteId, prevSetupStatus));
+		fetchHBInitDataAction(siteId);
 	};
 
 	handleDefaultTab = (url, siteId, prevSetupStatus) => {

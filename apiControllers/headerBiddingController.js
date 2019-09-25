@@ -59,57 +59,6 @@ router
 					.json({ error: 'Internal Server Error!' });
 			});
 	})
-	.get('/setupStatus/:siteId', (req, res) => {
-		const { siteId } = req.params;
-		const { email } = req.user;
-
-		return userModel
-			.verifySiteOwner(email, siteId)
-			.then(({ user }) =>
-				Promise.join(
-					headerBiddingModel
-						.getHbConfig(siteId)
-						.then(hbConfig => hbConfig.getUsedBidders())
-						.then(bidders => !!Object.keys(bidders).length)
-						.catch(() => false),
-					siteModel.isInventoryExist(siteId).catch(() => false),
-					user
-				)
-			)
-			.then(([biddersFound, inventoryFound, user]) => {
-				const activeAdServerData = user.getActiveAdServerData('dfp');
-				const isValidAdServer = !!activeAdServerData && !!activeAdServerData.activeDFPNetwork;
-				const isAdpushupDfp =
-					activeAdServerData &&
-					activeAdServerData.activeDFPNetwork ===
-						commonConsts.hbGlobalSettingDefaults.dfpAdUnitTargeting.networkId.toString();
-				const dfpConnected = isAdpushupDfp ? undefined : !!user.getNetworkDataObj('DFP');
-				const isPublisherActiveDfp =
-					isValidAdServer &&
-					activeAdServerData.activeDFPNetwork !==
-						commonConsts.hbGlobalSettingDefaults.dfpAdUnitTargeting.networkId.toString();
-				const adServerSetupStatus = user.get('adServerSetupStatus') || 0;
-				const adpushupNetworkCode = isAdpushupDfp
-					? commonConsts.hbGlobalSettingDefaults.dfpAdUnitTargeting.networkId
-					: undefined;
-
-				return res.status(httpStatus.OK).json({
-					dfpConnected,
-					inventoryFound,
-					biddersFound,
-					isAdpushupDfp,
-					adpushupNetworkCode,
-					isPublisherActiveDfp,
-					adServerSetupStatus
-				});
-			})
-			.catch(err => {
-				// eslint-disable-next-line no-console
-				console.log(err);
-
-				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Something went wrong' });
-			});
-	})
 	.post('/bidder/:siteId', (req, res) => {
 		const { siteId } = req.params;
 		const { email } = req.user;
@@ -567,6 +516,64 @@ router
 				console.log(err);
 
 				return res.status(500).json({ success: 'Something went wrong!' });
+			});
+	})
+	.get('/hbInitData/:siteId', (req, res) => {
+		const { siteId } = req.params;
+		const { email } = req.user;
+
+		return userModel
+			.verifySiteOwner(email, siteId)
+			.then(({ user }) =>
+				Promise.join(
+					headerBiddingModel
+						.getHbConfig(siteId)
+						.then(hbConfig => hbConfig.getUsedBidders())
+						.then(bidders => !!Object.keys(bidders).length)
+						.catch(() => false),
+					siteModel.isInventoryExist(siteId).catch(() => false),
+					headerBiddingModel.getMergedBidders(siteId),
+					user
+				)
+			)
+			.then(([biddersFound, inventoryFound, mergedBidders, user]) => {
+				const activeAdServerData = user.getActiveAdServerData('dfp');
+				const isValidAdServer = !!activeAdServerData && !!activeAdServerData.activeDFPNetwork;
+				const isAdpushupDfp =
+					activeAdServerData &&
+					activeAdServerData.activeDFPNetwork ===
+						commonConsts.hbGlobalSettingDefaults.dfpAdUnitTargeting.networkId.toString();
+				const dfpConnected = isAdpushupDfp ? undefined : !!user.getNetworkDataObj('DFP');
+				const isPublisherActiveDfp =
+					isValidAdServer &&
+					activeAdServerData.activeDFPNetwork !==
+						commonConsts.hbGlobalSettingDefaults.dfpAdUnitTargeting.networkId.toString();
+				const adServerSetupStatus = user.get('adServerSetupStatus') || 0;
+				const adpushupNetworkCode = isAdpushupDfp
+					? commonConsts.hbGlobalSettingDefaults.dfpAdUnitTargeting.networkId
+					: undefined;
+
+				return res.status(httpStatus.OK).json({
+					setupStatus: {
+						dfpConnected,
+						inventoryFound,
+						biddersFound,
+						isAdpushupDfp,
+						adpushupNetworkCode,
+						isPublisherActiveDfp,
+						adServerSetupStatus
+					},
+					bidders: mergedBidders
+				});
+			})
+			.catch(err => {
+				// eslint-disable-next-line no-console
+				console.log(err);
+
+				if (err instanceof AdPushupError)
+					return res.status(httpStatus.NOT_FOUND).json({ error: err.message });
+
+				return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Something went wrong' });
 			});
 	});
 

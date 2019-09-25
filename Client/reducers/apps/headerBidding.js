@@ -2,17 +2,17 @@
 /* eslint-disable default-case */
 import {
 	CHECK_INVENTORY,
-	FETCH_ALL_BIDDERS,
-	GET_SETUP_STATUS,
 	ADD_BIDDER,
 	UPDATE_BIDDER,
 	FETCH_INVENTORIES,
 	UPDATE_INVENTORIES_HB_STATUS,
 	SET_DFP_SETUP_STATUS,
-	UPDATE_ADSERVER_SETUP_STATUS
+	UPDATE_ADSERVER_SETUP_STATUS,
+	GET_HB_INIT_DATA,
+	FETCH_ALL_BIDDERS
 } from '../../constants/headerBidding';
 
-const defaultState = {};
+const defaultState = { sites: {} };
 
 export default function(state = defaultState, action) {
 	switch (action.type) {
@@ -21,9 +21,12 @@ export default function(state = defaultState, action) {
 
 			return {
 				...state,
-				[siteId]: {
-					...state[siteId],
-					inventoryFound
+				sites: {
+					...state.sites,
+					[siteId]: {
+						...state.sites[siteId],
+						inventoryFound
+					}
 				}
 			};
 		}
@@ -38,31 +41,23 @@ export default function(state = defaultState, action) {
 				}
 			};
 		}
-		case GET_SETUP_STATUS: {
-			const { siteId, setupStatus } = action;
-
-			return {
-				...state,
-				[siteId]: {
-					...state[siteId],
-					setupStatus
-				}
-			};
-		}
 		case SET_DFP_SETUP_STATUS: {
 			const { siteId } = action;
 
 			return {
 				...state,
-				[siteId]: {
-					...state[siteId],
-					setupStatus: { ...state[siteId].setupStatus, dfpConnected: true }
+				sites: {
+					...state.sites,
+					[siteId]: {
+						...state.sites[siteId],
+						setupStatus: { ...state.sites[siteId].setupStatus, dfpConnected: true }
+					}
 				}
 			};
 		}
 		case ADD_BIDDER: {
 			const { siteId, bidderKey, bidderConfig } = action;
-			const bidders = { ...state[siteId].bidders };
+			const bidders = { ...state.sites[siteId].bidders };
 
 			delete bidders.notAddedBidders[bidderKey];
 			if (!bidders.addedBidders) bidders.addedBidders = {};
@@ -70,24 +65,30 @@ export default function(state = defaultState, action) {
 
 			return {
 				...state,
-				[siteId]: {
-					...state[siteId],
-					bidders,
-					setupStatus: { ...state[siteId].setupStatus, biddersFound: true }
+				sites: {
+					...state.sites,
+					[siteId]: {
+						...state.sites[siteId],
+						bidders,
+						setupStatus: { ...state.sites[siteId].setupStatus, biddersFound: true }
+					}
 				}
 			};
 		}
 		case UPDATE_BIDDER: {
 			const { siteId, bidderKey, bidderConfig } = action;
-			const bidders = { ...state[siteId].bidders };
+			const bidders = { ...state.sites[siteId].bidders };
 
 			bidders.addedBidders[bidderKey] = bidderConfig;
 
 			return {
 				...state,
-				[siteId]: {
-					...state[siteId],
-					bidders
+				sites: {
+					...state.sites,
+					[siteId]: {
+						...state.sites[siteId],
+						bidders
+					}
 				}
 			};
 		}
@@ -96,15 +97,18 @@ export default function(state = defaultState, action) {
 
 			return {
 				...state,
-				[siteId]: {
-					...state[siteId],
-					inventories
+				sites: {
+					...state.sites,
+					[siteId]: {
+						...state.sites[siteId],
+						inventories
+					}
 				}
 			};
 		}
 		case UPDATE_INVENTORIES_HB_STATUS: {
 			const { siteId, inventoriesToUpdate } = action;
-			const inventories = [...state[siteId].inventories];
+			const inventories = [...state.sites[siteId].inventories];
 
 			inventories.map(inventory => {
 				const index = inventoriesToUpdate.findIndex(obj => obj.tempId === inventory.tempId);
@@ -119,9 +123,12 @@ export default function(state = defaultState, action) {
 
 			return {
 				...state,
-				[siteId]: {
-					...state[siteId],
-					inventories
+				sites: {
+					...state.sites,
+					[siteId]: {
+						...state.sites[siteId],
+						inventories
+					}
 				}
 			};
 		}
@@ -138,6 +145,21 @@ export default function(state = defaultState, action) {
 				[siteId]: {
 					...state[siteId],
 					setupStatus: { ...state[siteId].setupStatus, adServerSetupStatus }
+				}
+			};
+		}
+		case GET_HB_INIT_DATA: {
+			const { siteId, setupStatus, bidders } = action;
+
+			return {
+				...state,
+				sites: {
+					...state.sites,
+					[siteId]: {
+						...state.sites[siteId],
+						setupStatus,
+						bidders
+					}
 				}
 			};
 		}

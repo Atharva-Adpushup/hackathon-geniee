@@ -4,13 +4,13 @@ import HeaderBidding from '../components/HeaderBidding';
 import {
 	checkInventoryAction,
 	fetchAllBiddersAction,
-	getSetupStatusAction,
 	addBidderAction,
 	updateBidderAction,
 	fetchInventoriesAction,
 	updateInventoriesHbStatus,
 	setDfpSetupStatusAction,
-	checkOrBeginDfpSetupAction
+	checkOrBeginDfpSetupAction,
+	fetchHBInitDataAction
 } from '../../../actions/apps/headerBidding/hbActions';
 
 import { showNotification, hideNotification } from '../../../actions/uiActions';
@@ -44,8 +44,7 @@ export default connect(
 				params: { siteId }
 			}
 		} = ownProps;
-		// const { inventoryFound, bidders, setupStatus, inventories } = state.apps.headerBidding;
-		const { [siteId]: currSiteHbData } = state.apps.headerBidding;
+		const currSiteHbData = state.apps.headerBidding.sites && state.apps.headerBidding.sites[siteId];
 		const {
 			[siteId]: { domain }
 		} = state.global.user.data.sites;
@@ -55,7 +54,6 @@ export default connect(
 	{
 		checkInventoryAction,
 		fetchAllBiddersAction,
-		getSetupStatusAction,
 		addBidderAction,
 		updateBidderAction,
 		fetchInventoriesAction,
@@ -63,6 +61,7 @@ export default connect(
 		showNotification,
 		hideNotification,
 		setDfpSetupStatusAction,
-		checkOrBeginDfpSetupAction
+		checkOrBeginDfpSetupAction,
+		fetchHBInitDataAction
 	}
 )(HeaderBiddingContainer);
