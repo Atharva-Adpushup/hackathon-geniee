@@ -9,10 +9,11 @@ import {
 	SET_DFP_SETUP_STATUS,
 	UPDATE_ADSERVER_SETUP_STATUS,
 	GET_HB_INIT_DATA,
-	FETCH_ALL_BIDDERS
+	FETCH_ALL_BIDDERS,
+	SET_UNSAVED_CHANGES
 } from '../../constants/headerBidding';
 
-const defaultState = { sites: {} };
+const defaultState = { hasUnsavedChanges: false, sites: {} };
 
 export default function(state = defaultState, action) {
 	switch (action.type) {
@@ -161,6 +162,15 @@ export default function(state = defaultState, action) {
 						bidders
 					}
 				}
+			};
+		}
+		case SET_UNSAVED_CHANGES: {
+			const { hasUnsavedChanges } = action;
+			if (hasUnsavedChanges === state.hasUnsavedChanges) return state;
+
+			return {
+				...state,
+				hasUnsavedChanges
 			};
 		}
 		default:

@@ -5,11 +5,18 @@ import { showNotification } from '../actions/uiActions';
 import { switchUser, logout, findUsers } from '../actions/userActions';
 
 const mapStateToProps = (state, ownProps) => {
-	const { user, sites } = state.global;
+	const {
+		global: { user, sites },
+		apps: {
+			headerBidding: { hasUnsavedChanges = false }
+		}
+	} = state;
+
 	return {
 		userFetched: user.fetched,
 		user: user.data,
 		sites: sites.data,
+		hasUnsavedChanges,
 		...ownProps
 	};
 };

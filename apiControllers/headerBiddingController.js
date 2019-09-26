@@ -10,6 +10,7 @@ const AdPushupError = require('../helpers/AdPushupError');
 const FormValidator = require('../helpers/FormValidator');
 const schema = require('../helpers/schema');
 const commonConsts = require('../configs/commonConsts');
+const adpushup = require('../helpers/adpushupEvent');
 
 const router = express.Router();
 
@@ -572,6 +573,24 @@ router
 
 				if (err instanceof AdPushupError)
 					return res.status(httpStatus.NOT_FOUND).json({ error: err.message });
+
+				return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Something went wrong' });
+			});
+	})
+	.get('/startCdnSync/:siteId', (req, res) => {
+		const { siteId } = req.params;
+		const { email } = req.user;
+
+		return userModel
+			.verifySiteOwner(email, siteId)
+			.then(() => {
+				adpushup.emit('siteSaved', siteId);
+
+				res.status(httpStatus.OK).json({ success: 'CDN Sync has been Started' });
+			})
+			.catch(err => {
+				// eslint-disable-next-line no-console
+				console.log(err);
 
 				return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Something went wrong' });
 			});

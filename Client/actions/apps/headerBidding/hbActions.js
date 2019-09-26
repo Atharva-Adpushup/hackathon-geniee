@@ -8,7 +8,8 @@ import {
 	UPDATE_INVENTORIES_HB_STATUS,
 	SET_DFP_SETUP_STATUS,
 	UPDATE_ADSERVER_SETUP_STATUS,
-	GET_HB_INIT_DATA
+	GET_HB_INIT_DATA,
+	SET_UNSAVED_CHANGES
 } from '../../../constants/headerBidding';
 import history from '../../../helpers/history';
 import * as service from '../../../services/hbService';
@@ -40,40 +41,40 @@ export const fetchAllBiddersAction = siteId => dispatch =>
 			history.push('/error');
 		});
 
-export const setDfpSetupStatusAction = siteId => dispatch =>
+export const setDfpSetupStatusAction = siteId => dispatch => {
 	dispatch({ type: SET_DFP_SETUP_STATUS, siteId });
+	dispatch({ type: SET_UNSAVED_CHANGES, hasUnsavedChanges: true });
+};
 
 export const addBidderAction = (siteId, bidderConfig, params) => dispatch =>
 	service
 		.addBidder(siteId, bidderConfig, params)
-		.then(({ data: { bidderConfig: bidderConfigFromDB, bidderKey } }) =>
-			// Save bidder config in store
-			dispatch({ type: ADD_BIDDER, siteId, bidderKey, bidderConfig: bidderConfigFromDB })
-		);
+		.then(({ data: { bidderConfig: bidderConfigFromDB, bidderKey } }) => {
+			dispatch({ type: ADD_BIDDER, siteId, bidderKey, bidderConfig: bidderConfigFromDB });
+			dispatch({ type: SET_UNSAVED_CHANGES, hasUnsavedChanges: true });
+		});
 
 export const updateBidderAction = (siteId, bidderConfig, params) => dispatch =>
 	service
 		.updateBidder(siteId, bidderConfig, params)
-		.then(({ data: { bidderConfig: bidderConfigFromDB, bidderKey } }) =>
-			// Save bidder config in store
-			dispatch({ type: UPDATE_BIDDER, siteId, bidderKey, bidderConfig: bidderConfigFromDB })
-		);
+		.then(({ data: { bidderConfig: bidderConfigFromDB, bidderKey } }) => {
+			dispatch({ type: UPDATE_BIDDER, siteId, bidderKey, bidderConfig: bidderConfigFromDB });
+			dispatch({ type: SET_UNSAVED_CHANGES, hasUnsavedChanges: true });
+		});
 
 export const fetchInventoriesAction = siteId => dispatch =>
 	service
 		.fetchInventories(siteId)
-		.then(({ data: inventories }) =>
-			// Save bidder config in store
-			dispatch({ type: FETCH_INVENTORIES, siteId, inventories })
-		)
+		.then(({ data: inventories }) => dispatch({ type: FETCH_INVENTORIES, siteId, inventories }))
 		.catch(() => {
 			history.push('/error');
 		});
 
 export const updateInventoriesHbStatus = (siteId, inventoriesToUpdate) => dispatch =>
-	service
-		.updateInventoriesHbStatus(siteId, inventoriesToUpdate)
-		.then(() => dispatch({ type: UPDATE_INVENTORIES_HB_STATUS, siteId, inventoriesToUpdate }));
+	service.updateInventoriesHbStatus(siteId, inventoriesToUpdate).then(() => {
+		dispatch({ type: UPDATE_INVENTORIES_HB_STATUS, siteId, inventoriesToUpdate });
+		dispatch({ type: SET_UNSAVED_CHANGES, hasUnsavedChanges: true });
+	});
 
 export const checkOrBeginDfpSetupAction = siteId => dispatch =>
 	service
@@ -101,3 +102,11 @@ export const checkOrBeginDfpSetupAction = siteId => dispatch =>
 
 			return history.push('/error');
 		});
+
+export const setUnsavedChangesAction = hasUnsavedChanges => dispatch =>
+	dispatch({ type: SET_UNSAVED_CHANGES, hasUnsavedChanges });
+
+export const masterSaveAction = siteId => dispatch =>
+	service
+		.startCdnSync(siteId)
+		.then(() => dispatch({ type: SET_UNSAVED_CHANGES, hasUnsavedChanges: false }));

@@ -85,3 +85,7 @@ export function deleteBidderRule(siteId, bidder) {
 export function checkOrBeginDfpSetup() {
 	return axiosInstance.get(`/headerBidding/adserverSetup`);
 }
+
+export function startCdnSync(siteId) {
+	return axiosInstance.get(`/headerBidding/startCdnSync/${siteId}`);
+}

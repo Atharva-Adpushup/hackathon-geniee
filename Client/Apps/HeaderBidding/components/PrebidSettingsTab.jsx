@@ -53,7 +53,7 @@ class PrebidSettingsTab extends React.Component {
 
 		if (!confirmed) return;
 
-		const { siteId, showNotification } = this.props;
+		const { siteId, showNotification, setUnsavedChangesAction } = this.props;
 		const { timeOut, formats } = this.state;
 
 		if (
@@ -68,6 +68,8 @@ class PrebidSettingsTab extends React.Component {
 			updatePrebidSettings(siteId, newPrebidSettings)
 				.then(() => {
 					this.setState({ isSavingSettings: false }, () => {
+						setUnsavedChangesAction(true);
+
 						showNotification({
 							mode: 'success',
 							title: 'Success',

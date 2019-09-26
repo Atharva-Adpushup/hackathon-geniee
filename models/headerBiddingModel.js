@@ -591,17 +591,42 @@ function apiModule() {
 				([hbConfig, user]) => {
 					const prebidConfig = hbConfig.get('prebidConfig');
 					const activeAdServer = user.getActiveAdServerData('dfp');
+					const networkData = user.getNetworkDataObj('DFP');
 
 					const currencyCode = !!activeAdServer && activeAdServer.activeDFPCurrencyCode;
 					const mergedPrebidConfig = { ...prebidConfig };
 
-					mergedPrebidConfig.adServer =
-						activeAdServer && activeAdServer.activeDFPNetwork
-							? activeAdServer.activeDFPNetwork ===
-							  hbGlobalSettingDefaults.dfpAdUnitTargeting.networkId
-								? `AP (${activeAdServer.activeDFPNetwork})`
-								: `Publisher (${activeAdServer.activeDFPNetwork})`
-							: 'N/A';
+					if (activeAdServer && activeAdServer.activeDFPNetwork) {
+						if (
+							activeAdServer.activeDFPNetwork !==
+							hbGlobalSettingDefaults.dfpAdUnitTargeting.networkId
+						) {
+							const matchedDfpNetwork = networkData.dfpAccounts.find(
+								dfpAccount => dfpAccount.code === activeAdServer.activeDFPNetwork
+							);
+							const dfpName =
+								matchedDfpNetwork && matchedDfpNetwork.name ? matchedDfpNetwork.name : '';
+
+							mergedPrebidConfig.adServer = `${dfpName ? `${dfpName} ` : ''}(${
+								activeAdServer.activeDFPNetwork
+							})`;
+						} else {
+							mergedPrebidConfig.adServer = `AdPushup (${activeAdServer.activeDFPNetwork})`;
+						}
+					}
+
+					if (!(activeAdServer && activeAdServer.activeDFPNetwork)) {
+						mergedPrebidConfig.adServer = `N/A`;
+					}
+
+					// mergedPrebidConfig.adServer =
+					// 	activeAdServer && activeAdServer.activeDFPNetwork
+					// 		? activeAdServer.activeDFPNetwork ===
+					// 		  hbGlobalSettingDefaults.dfpAdUnitTargeting.networkId
+					// 			? `AP (${activeAdServer.activeDFPNetwork})`
+					// 			: `Publisher (${activeAdServer.activeDFPNetwork})`
+					// 		: 'N/A';
+
 					mergedPrebidConfig.currency = { code: currencyCode || 'N/A' };
 					mergedPrebidConfig.availableFormats = hbGlobalSettingDefaults.availableFormats;
 
