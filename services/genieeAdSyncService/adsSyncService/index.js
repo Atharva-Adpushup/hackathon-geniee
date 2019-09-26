@@ -56,20 +56,20 @@ function publishToQueueWrapper(siteConfigItems, site) {
 	}
 	return processing().then(response => (response.empty ? syncCdn(site) : response));
 }
+function publishWrapper(siteModel) {
+	return siteConfigGenerationModule
+		.generate(siteModel)
+		.then(siteConfigItems => publishToQueueWrapper(siteConfigItems, siteModel));
+}
 
 module.exports = {
 	publish(site) {
 		const siteIdNum = parseInt(site, 10);
 		if (!isNaN(siteIdNum)) {
 			const siteId = siteIdNum.toString();
-			return siteModelAPI
-				.getSiteById(siteId)
-				.then(siteModel => Promise.join(siteModel, siteConfigGenerationModule.generate(siteModel)))
-				.then(([siteModel, siteConfigItems]) => publishToQueueWrapper(siteConfigItems, siteModel));
+			return siteModelAPI.getSiteById(siteId).then(siteModel => publishWrapper(siteModel));
 		}
 
-		return siteConfigGenerationModule
-			.generate(site)
-			.then(siteConfigItems => publishToQueueWrapper(siteConfigItems, site));
+		return publishWrapper(site);
 	}
 };
