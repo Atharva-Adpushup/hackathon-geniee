@@ -93,7 +93,8 @@ class Shell extends React.Component {
 			location,
 			logout,
 			switchUser,
-			findUsers
+			findUsers,
+			hasUnsavedChanges
 		} = this.props;
 		const routes = this.getRoutes(children, location, user);
 		const sidebarOpen = isSidebarOpen !== undefined ? isSidebarOpen : shouldWeOpenSidebar(location);
@@ -108,6 +109,7 @@ class Shell extends React.Component {
 							logout={logout}
 							switchUser={switchUser}
 							findUsers={findUsers}
+							hasUnsavedChanges={hasUnsavedChanges}
 						/>
 					</Col>
 				</Row>

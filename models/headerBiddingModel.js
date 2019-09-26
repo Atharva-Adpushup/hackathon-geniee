@@ -590,29 +590,45 @@ function apiModule() {
 			Promise.all([API.getHbConfig(siteId), userModel.getUserByEmail(email)]).then(
 				([hbConfig, user]) => {
 					const prebidConfig = hbConfig.get('prebidConfig');
-					// const { activeDFPNetwork, activeDFPCurrencyCode } = site.get('apConfigs');
-					const adNetworkSettings = user.getNetworkDataObj('DFP');
-					const currencyCode =
-						adNetworkSettings &&
-						adNetworkSettings.dfpAccounts &&
-						adNetworkSettings.dfpAccounts[0].currencyCode;
+					const activeAdServer = user.getActiveAdServerData('dfp');
+					const networkData = user.getNetworkDataObj('DFP');
+
+					const currencyCode = !!activeAdServer && activeAdServer.activeDFPCurrencyCode;
 					const mergedPrebidConfig = { ...prebidConfig };
 
-					mergedPrebidConfig.adServer =
-						adNetworkSettings &&
-						adNetworkSettings.dfpAccounts &&
-						adNetworkSettings.dfpAccounts.length
-							? adNetworkSettings.dfpAccounts[0].code ===
-							  hbGlobalSettingDefaults.dfpAdUnitTargeting.networkId
-								? 'AP'
-								: 'Publisher'
-							: 'N/A';
-					mergedPrebidConfig.currency.code = currencyCode || '';
-					mergedPrebidConfig.availableFormats = [
-						{ name: 'Display', value: 'display' },
-						{ name: 'Native', value: 'native' },
-						{ name: 'Video', value: 'video' }
-					];
+					if (activeAdServer && activeAdServer.activeDFPNetwork) {
+						if (
+							activeAdServer.activeDFPNetwork !==
+							hbGlobalSettingDefaults.dfpAdUnitTargeting.networkId
+						) {
+							const matchedDfpNetwork = networkData.dfpAccounts.find(
+								dfpAccount => dfpAccount.code === activeAdServer.activeDFPNetwork
+							);
+							const dfpName =
+								matchedDfpNetwork && matchedDfpNetwork.name ? matchedDfpNetwork.name : '';
+
+							mergedPrebidConfig.adServer = `${dfpName ? `${dfpName} ` : ''}(${
+								activeAdServer.activeDFPNetwork
+							})`;
+						} else {
+							mergedPrebidConfig.adServer = `AdPushup (${activeAdServer.activeDFPNetwork})`;
+						}
+					}
+
+					if (!(activeAdServer && activeAdServer.activeDFPNetwork)) {
+						mergedPrebidConfig.adServer = `N/A`;
+					}
+
+					// mergedPrebidConfig.adServer =
+					// 	activeAdServer && activeAdServer.activeDFPNetwork
+					// 		? activeAdServer.activeDFPNetwork ===
+					// 		  hbGlobalSettingDefaults.dfpAdUnitTargeting.networkId
+					// 			? `AP (${activeAdServer.activeDFPNetwork})`
+					// 			: `Publisher (${activeAdServer.activeDFPNetwork})`
+					// 		: 'N/A';
+
+					mergedPrebidConfig.currency = { code: currencyCode || 'N/A' };
+					mergedPrebidConfig.availableFormats = hbGlobalSettingDefaults.availableFormats;
 
 					return mergedPrebidConfig;
 				}
@@ -785,7 +801,7 @@ function apiModule() {
 
 				return hbConfig.save();
 			}),
-		setupAdserver: (siteId, user) => {
+		setupAdserver: user => {
 			const body = dfpLineItemAutomationReqBody;
 			const activeAdServerData = user.getActiveAdServerData('dfp');
 			const isPublisherActiveDfp =
@@ -802,7 +818,6 @@ function apiModule() {
 
 			return API.getAllBiddersFromNetworkConfig()
 				.then(allHbBidders => {
-					body.customKeyValues.hb_ap_siteid.values = [siteId];
 					body.customKeyValues.hb_ap_bidder.values = allHbBidders;
 					body.networkCode = activeAdServerData.activeDFPNetwork;
 					body.currencyCode = activeAdServerData.activeDFPCurrencyCode;

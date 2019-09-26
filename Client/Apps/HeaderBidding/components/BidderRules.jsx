@@ -78,23 +78,28 @@ class BidderRules extends React.Component {
 	};
 
 	deleteBidderRule = bidder => {
-		const { siteId, showNotification } = this.props;
+		const { siteId, showNotification, setUnsavedChangesAction } = this.props;
 
 		this.setState({ deletingBidderRule: { bidder, status: true } });
 
 		deleteBidderRuleFromDB(siteId, bidder)
 			.then(() =>
-				this.setState(state => {
-					const { bidderRules } = { ...state };
-					const bidderIndex = bidderRules.findIndex(bidderRule => bidderRule.bidder === bidder);
+				this.setState(
+					state => {
+						const { bidderRules } = { ...state };
+						const bidderIndex = bidderRules.findIndex(bidderRule => bidderRule.bidder === bidder);
 
-					if (bidderIndex > -1) {
-						bidderRules.splice(bidderIndex, 1);
-						return { bidderRules, deletingBidderRule: { bidder: '', status: false } };
+						if (bidderIndex > -1) {
+							bidderRules.splice(bidderIndex, 1);
+							return { bidderRules, deletingBidderRule: { bidder: '', status: false } };
+						}
+
+						return { deletingBidderRule: { bidder: '', status: false } };
+					},
+					() => {
+						setUnsavedChangesAction(true);
 					}
-
-					return { deletingBidderRule: { bidder: '', status: false } };
-				})
+				)
 			)
 			.catch(err => {
 				this.setState({ deletingBidderRule: { bidder: '', status: false } }, () => {
@@ -109,7 +114,7 @@ class BidderRules extends React.Component {
 	};
 
 	saveBidderRule = rule => {
-		const { siteId, showNotification } = this.props;
+		const { siteId, showNotification, setUnsavedChangesAction } = this.props;
 		const { bidderRules } = { ...this.state };
 
 		this.setState({ savingBidderRule: true });
@@ -126,7 +131,10 @@ class BidderRules extends React.Component {
 					bidderRules.push(rule);
 				}
 
-				this.setState({ bidderRules, savingBidderRule: false }, () => this.hideBidderRuleModal());
+				this.setState({ bidderRules, savingBidderRule: false }, () => {
+					this.hideBidderRuleModal();
+					setUnsavedChangesAction(true);
+				});
 			})
 			.catch(err => {
 				this.setState({ savingBidderRule: false }, () => {

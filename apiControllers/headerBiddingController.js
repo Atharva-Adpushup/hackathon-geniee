@@ -10,6 +10,7 @@ const AdPushupError = require('../helpers/AdPushupError');
 const FormValidator = require('../helpers/FormValidator');
 const schema = require('../helpers/schema');
 const commonConsts = require('../configs/commonConsts');
+const adpushup = require('../helpers/adpushupEvent');
 
 const router = express.Router();
 
@@ -59,58 +60,6 @@ router
 					.json({ error: 'Internal Server Error!' });
 			});
 	})
-	.get('/setupStatus/:siteId', (req, res) => {
-		const { siteId } = req.params;
-		const { email } = req.user;
-
-		return userModel
-			.verifySiteOwner(email, siteId)
-			.then(({ user }) =>
-				Promise.join(
-					headerBiddingModel
-						.getHbConfig(siteId)
-						.then(hbConfig => hbConfig.getUsedBidders())
-						.then(bidders => !!Object.keys(bidders).length)
-						.catch(() => false),
-					siteModel.isInventoryExist(siteId).catch(() => false),
-					user,
-					siteModel.getSiteById(siteId)
-				)
-			)
-			.then(([biddersFound, inventoryFound, user, site]) => {
-				const activeAdServerData = user.getActiveAdServerData('dfp');
-				const isValidAdServer = !!activeAdServerData && !!activeAdServerData.activeDFPNetwork;
-				const isAdpushupDfp =
-					activeAdServerData &&
-					activeAdServerData.activeDFPNetwork ===
-						commonConsts.hbGlobalSettingDefaults.dfpAdUnitTargeting.networkId.toString();
-				const dfpConnected = isAdpushupDfp ? undefined : !!user.getNetworkDataObj('DFP');
-				const isPublisherActiveDfp =
-					isValidAdServer &&
-					activeAdServerData.activeDFPNetwork !==
-						commonConsts.hbGlobalSettingDefaults.dfpAdUnitTargeting.networkId.toString();
-				const adServerSetupStatus = site.get('adServerSetupStatus') || 0;
-				const adpushupNetworkCode = isAdpushupDfp
-					? commonConsts.hbGlobalSettingDefaults.dfpAdUnitTargeting.networkId
-					: undefined;
-
-				return res.status(httpStatus.OK).json({
-					dfpConnected,
-					inventoryFound,
-					biddersFound,
-					isAdpushupDfp,
-					adpushupNetworkCode,
-					isPublisherActiveDfp,
-					adServerSetupStatus
-				});
-			})
-			.catch(err => {
-				// eslint-disable-next-line no-console
-				console.log(err);
-
-				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Something went wrong' });
-			});
-	})
 	.post('/bidder/:siteId', (req, res) => {
 		const { siteId } = req.params;
 		const { email } = req.user;
@@ -128,11 +77,8 @@ router
 			siteDomain: null,
 			email,
 			prebidConfig: {
-				timeOut: 3000,
-				currency: {
-					enabled: false
-				},
-				formats: ['display']
+				timeOut: commonConsts.hbGlobalSettingDefaults.prebidTimeout,
+				formats: commonConsts.hbGlobalSettingDefaults.defaultFormats
 			}
 		};
 
@@ -362,22 +308,23 @@ router
 			.verifySiteOwner(email, siteId)
 			.then(() => headerBiddingModel.getPrebidConfig(siteId, email))
 			.then(prebidConfig => res.status(httpStatus.OK).json(prebidConfig))
-			.catch(() =>
-				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error!' })
-			);
+			.catch(err => {
+				// eslint-disable-next-line no-console
+				console.log(err);
+				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error!' });
+			});
 	})
 	.put('/prebidSettings/:siteId', (req, res) => {
 		const { siteId } = req.params;
 		const { email } = req.user;
 		const newPrebidConfig = req.body;
-		const { timeOut, currency, formats } = newPrebidConfig;
+		const { timeOut, formats } = newPrebidConfig;
 
 		if (
 			!(
 				!Number.isNaN(timeOut) &&
 				timeOut >= 500 &&
 				timeOut <= 10000 &&
-				typeof currency.enabled === 'boolean' &&
 				formats.indexOf('display') > -1
 			)
 		) {
@@ -532,40 +479,37 @@ router
 					.json({ error: 'Internal Server Error!' });
 			});
 	})
-	.get('/adserverSetup/:siteId', (req, res) => {
-		const { siteId } = req.params;
+	.get('/adserverSetup', (req, res) => {
 		const { email } = req.user;
 
 		return userModel
-			.verifySiteOwner(email, siteId)
-			.then(({ user }) =>
-				Promise.join(siteModel.getSiteById(siteId), headerBiddingModel.setupAdserver(siteId, user))
-			)
-			.then(([site, resp]) => {
+			.getUserByEmail(email)
+			.then(user => Promise.join(user, headerBiddingModel.setupAdserver(user)))
+			.then(([user, resp]) => {
 				let httpStatusCode;
 				let message;
 
-				const adServerSetupStatus = site.get('adServerSetupStatus');
+				const adServerSetupStatus = user.get('adServerSetupStatus');
 
 				if (resp.status === 'pending' || resp.status === 'in-progress') {
-					if (adServerSetupStatus !== 1) site.set('adServerSetupStatus', 1);
+					if (adServerSetupStatus !== 1) user.set('adServerSetupStatus', 1);
 					httpStatusCode = 202;
 					message = 'Adserver automation is in progress';
 				}
 
 				if (resp.status === 'failed') {
-					if (adServerSetupStatus !== 3) site.set('adServerSetupStatus', 3);
+					if (adServerSetupStatus !== 3) user.set('adServerSetupStatus', 3);
 					httpStatusCode = 502;
 					message = 'Adserver automation failed';
 				}
 
 				if (resp.status === 'finished') {
-					if (adServerSetupStatus !== 2) site.set('adServerSetupStatus', 2);
+					if (adServerSetupStatus !== 2) user.set('adServerSetupStatus', 2);
 					httpStatusCode = 200;
 					message = 'Adserver automation finished';
 				}
 
-				return Promise.join(httpStatusCode, message, site.save());
+				return Promise.join(httpStatusCode, message, user.save());
 			})
 			.then(([httpStatusCode, message]) => res.status(httpStatusCode).json({ success: message }))
 			.catch(err => {
@@ -573,6 +517,82 @@ router
 				console.log(err);
 
 				return res.status(500).json({ success: 'Something went wrong!' });
+			});
+	})
+	.get('/hbInitData/:siteId', (req, res) => {
+		const { siteId } = req.params;
+		const { email } = req.user;
+
+		return userModel
+			.verifySiteOwner(email, siteId)
+			.then(({ user }) =>
+				Promise.join(
+					headerBiddingModel
+						.getHbConfig(siteId)
+						.then(hbConfig => hbConfig.getUsedBidders())
+						.then(bidders => !!Object.keys(bidders).length)
+						.catch(() => false),
+					siteModel.isInventoryExist(siteId).catch(() => false),
+					headerBiddingModel.getMergedBidders(siteId),
+					user
+				)
+			)
+			.then(([biddersFound, inventoryFound, mergedBidders, user]) => {
+				const activeAdServerData = user.getActiveAdServerData('dfp');
+				const isValidAdServer = !!activeAdServerData && !!activeAdServerData.activeDFPNetwork;
+				const isAdpushupDfp =
+					activeAdServerData &&
+					activeAdServerData.activeDFPNetwork ===
+						commonConsts.hbGlobalSettingDefaults.dfpAdUnitTargeting.networkId.toString();
+				const dfpConnected = isAdpushupDfp ? undefined : !!user.getNetworkDataObj('DFP');
+				const isPublisherActiveDfp =
+					isValidAdServer &&
+					activeAdServerData.activeDFPNetwork !==
+						commonConsts.hbGlobalSettingDefaults.dfpAdUnitTargeting.networkId.toString();
+				const adServerSetupStatus = user.get('adServerSetupStatus') || 0;
+				const adpushupNetworkCode = isAdpushupDfp
+					? commonConsts.hbGlobalSettingDefaults.dfpAdUnitTargeting.networkId
+					: undefined;
+
+				return res.status(httpStatus.OK).json({
+					setupStatus: {
+						dfpConnected,
+						inventoryFound,
+						biddersFound,
+						isAdpushupDfp,
+						adpushupNetworkCode,
+						isPublisherActiveDfp,
+						adServerSetupStatus
+					},
+					bidders: mergedBidders
+				});
+			})
+			.catch(err => {
+				// eslint-disable-next-line no-console
+				console.log(err);
+
+				if (err instanceof AdPushupError)
+					return res.status(httpStatus.NOT_FOUND).json({ error: err.message });
+
+				return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Something went wrong' });
+			});
+	})
+	.get('/startCdnSync/:siteId', (req, res) => {
+		const { siteId } = req.params;
+		const { email } = req.user;
+
+		return userModel
+			.verifySiteOwner(email, siteId)
+			.then(() => {
+				adpushup.emit('siteSaved', siteId);
+
+				res.status(httpStatus.OK).json({ success: 'CDN Sync has been Started' });
+			})
+			.catch(err => {
+				// eslint-disable-next-line no-console
+				console.log(err);
+
+				return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Something went wrong' });
 			});
 	});
 

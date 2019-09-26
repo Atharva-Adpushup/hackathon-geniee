@@ -504,52 +504,7 @@ function apiModule() {
 					throw new AdPushupError('Inventory Not Found');
 				});
 		},
-		getLayoutInventorySizes: siteId => {
-			return API.getSiteById(siteId)
-				.then(site => site.getAllChannels())
-				.then(channels => {
-					const sizesArray = [];
-
-					// eslint-disable-next-line no-restricted-syntax
-					for (const channel of channels) {
-						// eslint-disable-next-line no-restricted-syntax
-						if (channel.variations && Object.keys(channel.variations).length) {
-							for (const variationKey in channel.variations) {
-								const variation = channel.variations[variationKey];
-
-								if (variation.sections && Object.keys(variation.sections).length) {
-									for (const sectionKey in variation.sections) {
-										const section = variation.sections[sectionKey];
-
-										if (section.ads && Object.keys(section.ads).length) {
-											for (const adKey in section.ads) {
-												const ad = section.ads[adKey];
-
-												if (ad.network === 'adpTags') {
-													if (ad.width === 'responsive') {
-														sizesArray.push(ad.width);
-														continue;
-													}
-													sizesArray.push(`${ad.width}x${ad.height}`);
-												}
-											}
-										} else {
-											continue;
-										}
-									}
-								} else {
-									continue;
-								}
-							}
-						} else {
-							continue;
-						}
-					}
-
-					return sizesArray;
-				})
-				.catch(err => []);
-		},
+		
 		isApTagInventoryExist: siteId => {
 			return couchbase
 				.connectToAppBucket()
@@ -575,30 +530,6 @@ function apiModule() {
 
 					throw err;
 				});
-		},
-		getApTagInventorySizes: siteId => {
-			return couchbase
-				.connectToAppBucket()
-				.then(function(appBucket) {
-					return appBucket.getAsync('tgmr::' + siteId, {});
-				})
-				.then(({ value }) => {
-					const sizesArray = [];
-					if (value.ads.length) {
-						for (const ad of value.ads) {
-							if (ad.network === 'adpTags') {
-								if (ad.width === 'responsive') {
-									sizesArray.push(ad.width);
-									continue;
-								}
-								sizesArray.push(`${ad.width}x${ad.height}`);
-							}
-						}
-					}
-
-					return sizesArray;
-				})
-				.catch(err => []);
 		},
 		isInnovativeAdInventoryExist: siteId => {
 			return couchbase
@@ -626,101 +557,11 @@ function apiModule() {
 					throw err;
 				});
 		},
-		getInnovativeAdInventorySizes: siteId => {
-			return couchbase
-				.connectToAppBucket()
-				.then(function(appBucket) {
-					return appBucket.getAsync('fmrt::' + siteId, {});
-				})
-				.then(({ value }) => {
-					const sizesArray = [];
-					if (value.ads.length) {
-						for (const ad of value.ads) {
-							if (ad.network === 'adpTags') {
-								if (ad.width === 'responsive') {
-									sizesArray.push(ad.width);
-									continue;
-								}
-								sizesArray.push(`${ad.width}x${ad.height}`);
-							}
-						}
-					}
-
-					return sizesArray;
-				})
-				.catch(err => []);
-		},
 		isInventoryExist: siteId => {
 			return API.isLayoutInventoryExist(siteId)
 				.catch(() => API.isApTagInventoryExist(siteId))
 				.catch(() => API.isInnovativeAdInventoryExist(siteId));
 		},
-		getDownwardIABSize: originalSize => {
-			const [width, height] = originalSize.split('x').map(val => parseInt(val, 10));
-
-			const downwardSizes =
-				adSizeMappingConsts.IAB_SIZES.BACKWARD_COMPATIBLE_MAPPING[`${width},${height}`];
-			if (downwardSizes && downwardSizes[0]) {
-				return downwardSizes[0].join('x');
-			}
-
-			// loop through allIabSizes and find the downward size with min diff
-			const allIABSizes = adSizeMappingConsts.IAB_SIZES.ALL;
-			const minDownwardDiff = { diff: null, size: '' };
-			allIABSizes.forEach(([iabWidth, iabHeight], index) => {
-				if (iabWidth <= width && iabHeight <= height) {
-					const diff = width - iabWidth + (height - iabHeight);
-					if (isNaN(minDownwardDiff.diff) || minDownwardDiff.diff > diff) {
-						minDownwardDiff.diff = diff;
-						minDownwardDiff.size = `${iabWidth}x${iabHeight}`;
-					}
-				}
-			});
-
-			return minDownwardDiff.size || false;
-		},
-		getUniqueInventorySizes: siteId =>
-			Promise.all([
-				API.getLayoutInventorySizes(siteId),
-				API.getApTagInventorySizes(siteId),
-				API.getInnovativeAdInventorySizes(siteId)
-			]).then(([layoutInventorySizes, apTagInventorySizes, innovativeAdInventorySizes]) => {
-				let uniqueSizes = [
-					...new Set([
-						...layoutInventorySizes,
-						...apTagInventorySizes,
-						...innovativeAdInventorySizes
-					])
-				];
-				uniqueSizes = uniqueSizes
-					.map(originalSize => {
-						const downwardIABSize = API.getDownwardIABSize(originalSize);
-						return { originalSize, downwardIABSize };
-					});
-
-				// get unique downward IAB sizes and merge original sizes
-				const uniqueDownwardIABSizes = [];
-
-				uniqueSizes.forEach((obj, currIndex, self) => {
-					const firstIndex = self.findIndex(
-						({ downwardIABSize }) => obj.downwardIABSize === downwardIABSize
-					);
-
-					if (firstIndex === currIndex) {
-						uniqueDownwardIABSizes.push(obj);
-					} else {
-						const index = uniqueDownwardIABSizes.findIndex(
-							({ downwardIABSize }) => obj.downwardIABSize === downwardIABSize
-						);
-
-						uniqueDownwardIABSizes[
-							index
-						].originalSize = `${uniqueDownwardIABSizes[index].originalSize}, ${obj.originalSize}`;
-					}
-				});
-
-				return uniqueDownwardIABSizes;
-			}),
 		setSiteStep: function(siteId, onboardingStage, step) {
 			return API.getSiteById(siteId)
 				.then(function(site) {

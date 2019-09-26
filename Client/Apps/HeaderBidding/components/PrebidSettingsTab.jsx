@@ -5,7 +5,6 @@ import {
 	FormGroup,
 	ControlLabel,
 	HelpBlock,
-	Radio,
 	ButtonToolbar,
 	ToggleButtonGroup,
 	Checkbox
@@ -43,10 +42,6 @@ class PrebidSettingsTab extends React.Component {
 		}));
 	};
 
-	handleCurrencyConversion = enabled => {
-		this.setState(state => ({ currency: { ...state.currency, enabled } }));
-	};
-
 	handleFormats = formats => {
 		this.setState({ formats });
 	};
@@ -58,23 +53,23 @@ class PrebidSettingsTab extends React.Component {
 
 		if (!confirmed) return;
 
-		const { siteId, showNotification } = this.props;
-		const { timeOut, currency, formats } = this.state;
+		const { siteId, showNotification, setUnsavedChangesAction } = this.props;
+		const { timeOut, formats } = this.state;
 
 		if (
 			!Number.isNaN(timeOut) &&
 			timeOut >= 500 &&
 			timeOut <= 10000 &&
-			typeof currency.enabled === 'boolean' &&
 			formats.indexOf('display') > -1
 		) {
-			const newPrebidSettings = { timeOut, currency, formats };
-			delete newPrebidSettings.currency.code;
+			const newPrebidSettings = { timeOut, formats };
 
 			this.setState({ isSavingSettings: true });
 			updatePrebidSettings(siteId, newPrebidSettings)
 				.then(() => {
 					this.setState({ isSavingSettings: false }, () => {
+						setUnsavedChangesAction(true);
+
 						showNotification({
 							mode: 'success',
 							title: 'Success',
@@ -99,7 +94,7 @@ class PrebidSettingsTab extends React.Component {
 	renderForm = () => {
 		const {
 			timeOut,
-			currency: { enabled: currencyConversion, code: currencyCode },
+			currency: { code: currencyCode },
 			formats,
 			availableFormats,
 			adServer,
@@ -123,29 +118,6 @@ class PrebidSettingsTab extends React.Component {
 						/>
 					</Col>
 					{!!timeOutError && <HelpBlock>{timeOutError}</HelpBlock>}
-				</FormGroup>
-
-				<FormGroup controlId="pb-currency-conversion" className="form-row clearfix">
-					<Col componentClass={ControlLabel} sm={6}>
-						Currency Conversion
-					</Col>
-					<Col sm={6}>
-						<ButtonToolbar>
-							<ToggleButtonGroup
-								type="radio"
-								name="currency-conversion"
-								defaultValue={currencyConversion}
-								onChange={this.handleCurrencyConversion}
-							>
-								<Radio value inline>
-									Enable
-								</Radio>
-								<Radio value={false} inline>
-									Disable
-								</Radio>
-							</ToggleButtonGroup>
-						</ButtonToolbar>
-					</Col>
 				</FormGroup>
 
 				<div className="form-row clearfix">

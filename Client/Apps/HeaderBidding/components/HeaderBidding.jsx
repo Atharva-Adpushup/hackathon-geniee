@@ -1,7 +1,7 @@
 /* eslint-disable guard-for-in */
 /* eslint-disable no-restricted-syntax */
 import React from 'react';
-import { Redirect } from 'react-router-dom';
+import { Redirect, Prompt } from 'react-router-dom';
 import { Nav, NavItem } from 'react-bootstrap';
 import { NAV_ITEMS, NAV_ITEMS_INDEXES, NAV_ITEMS_VALUES } from '../constants';
 import Setup from './Setup';
@@ -9,32 +9,83 @@ import BiddersTab from './BiddersTab';
 import InventoryTab from './InventoryTab';
 import PrebidSettingsTab from './PrebidSettingsTab';
 import OptimizationTab from './OptimizationTab';
+import CustomButton from '../../../Components/CustomButton';
+import config from '../../../config/config';
 
 class HeaderBidding extends React.Component {
 	state = {
-		redirectUrl: ''
+		redirectUrl: '',
+		isMasterSaving: false
 	};
 
 	componentDidMount() {
+		this.handleDefaultTabWrapper(null, true);
+
+		window.addEventListener('beforeunload', this.handleTabClose);
+	}
+
+	componentDidUpdate(prevProps) {
+		const { setupStatus: prevSetupStatus } = prevProps;
+		this.handleDefaultTabWrapper(prevSetupStatus, false);
+	}
+
+	componentWillUnmount() {
+		window.removeEventListener('beforeunload', this.handleTabClose);
+	}
+
+	handleTabClose = e => {
+		e.preventDefault();
+
+		const { hasUnsavedChanges } = this.props;
+
+		if (hasUnsavedChanges) {
+			// eslint-disable-next-line no-param-reassign
+			e.returnValue = config.HB_MSGS.UNSAVED_CHANGES;
+			return;
+		}
+
+		delete e.returnValue;
+	};
+
+	onMasterSave = () => {
+		const {
+			match: {
+				params: { siteId }
+			},
+			masterSaveAction
+		} = this.props;
+
+		this.setState({ isMasterSaving: true });
+
+		masterSaveAction(siteId)
+			.then(() => {
+				this.setState({ isMasterSaving: false });
+			})
+			.catch(() => {
+				this.setState({ isMasterSaving: false });
+			});
+	};
+
+	handleDefaultTabWrapper = (prevSetupStatus, isFirstLoad) => {
 		const {
 			match: {
 				params: { siteId },
 				url
 			},
 			setupStatus,
-			getSetupStatusAction
+			fetchHBInitDataAction
 		} = this.props;
 
-		if (setupStatus) {
-			this.handleDefaultTab(url, siteId);
+		if (setupStatus && !isFirstLoad) {
+			this.handleDefaultTab(url, siteId, prevSetupStatus);
 			return;
 		}
 
-		getSetupStatusAction(siteId).then(() => this.handleDefaultTab(url, siteId));
-	}
+		fetchHBInitDataAction(siteId);
+	};
 
-	handleDefaultTab = (url, siteId) => {
-		const { setupStatus } = this.props;
+	handleDefaultTab = (url, siteId, prevSetupStatus) => {
+		const { setupStatus, showNotification } = this.props;
 		const {
 			isAdpushupDfp,
 			dfpConnected,
@@ -43,15 +94,34 @@ class HeaderBidding extends React.Component {
 			adServerSetupStatus
 		} = setupStatus;
 
-		if (
-			url === `/sites/${siteId}/apps/header-bidding` &&
+		const isSetupAlreadyCompleted =
+			!!prevSetupStatus &&
+			(isAdpushupDfp ||
+				(prevSetupStatus.dfpConnected && prevSetupStatus.adServerSetupStatus === 2)) &&
+			prevSetupStatus.inventoryFound &&
+			prevSetupStatus.biddersFound;
+
+		const isSetupCompleted =
 			(isAdpushupDfp || (dfpConnected && adServerSetupStatus === 2)) &&
 			inventoryFound &&
-			biddersFound
-		) {
-			this.setState({
-				redirectUrl: `/sites/${siteId}/apps/header-bidding/${NAV_ITEMS_INDEXES.TAB_2}`
-			});
+			biddersFound;
+
+		if (url === `/sites/${siteId}/apps/header-bidding` && isSetupCompleted) {
+			this.setState(
+				{
+					redirectUrl: `/sites/${siteId}/apps/header-bidding/${NAV_ITEMS_INDEXES.TAB_2}`
+				},
+				() => {
+					if (!!prevSetupStatus && !isSetupAlreadyCompleted) {
+						showNotification({
+							mode: 'success',
+							title: 'Success',
+							message: 'Setup completed successfully',
+							autoDismiss: 5
+						});
+					}
+				}
+			);
 		}
 	};
 
@@ -137,7 +207,8 @@ class HeaderBidding extends React.Component {
 			inventories,
 			fetchInventoriesAction,
 			updateInventoriesHbStatus,
-			showNotification
+			showNotification,
+			setUnsavedChangesAction
 		} = this.props;
 
 		const activeTab = this.getActiveTab();
@@ -176,12 +247,25 @@ class HeaderBidding extends React.Component {
 							fetchInventoriesAction={fetchInventoriesAction}
 							updateInventoriesHbStatus={updateInventoriesHbStatus}
 							showNotification={showNotification}
+							setUnsavedChangesAction={setUnsavedChangesAction}
 						/>
 					);
 				case 'prebid-settings':
-					return <PrebidSettingsTab siteId={siteId} showNotification={showNotification} />;
+					return (
+						<PrebidSettingsTab
+							siteId={siteId}
+							showNotification={showNotification}
+							setUnsavedChangesAction={setUnsavedChangesAction}
+						/>
+					);
 				case 'optimization':
-					return <OptimizationTab siteId={siteId} showNotification={showNotification} />;
+					return (
+						<OptimizationTab
+							siteId={siteId}
+							showNotification={showNotification}
+							setUnsavedChangesAction={setUnsavedChangesAction}
+						/>
+					);
 				default:
 					return null;
 			}
@@ -201,8 +285,10 @@ class HeaderBidding extends React.Component {
 				inventoryFound,
 				biddersFound,
 				adServerSetupStatus
-			}
+			},
+			hasUnsavedChanges
 		} = this.props;
+		const { isMasterSaving } = this.state;
 
 		return (
 			<div>
@@ -227,6 +313,18 @@ class HeaderBidding extends React.Component {
 					<NavItem eventKey={5} className={!biddersFound ? 'disabled' : ''}>
 						{NAV_ITEMS_VALUES.TAB_5}
 					</NavItem>
+
+					<CustomButton
+						type="button"
+						variant="primary"
+						className="pull-right"
+						showSpinner={isMasterSaving}
+						disabled={!hasUnsavedChanges}
+						onClick={this.onMasterSave}
+					>
+						Master Save
+					</CustomButton>
+					<Prompt when={hasUnsavedChanges} message={config.HB_MSGS.UNSAVED_CHANGES} />
 				</Nav>
 				{this.renderContent()}
 			</div>

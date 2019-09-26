@@ -202,7 +202,7 @@ module.exports = {
 	},
 	bidCpmAdjustments: {},
 	hbGlobalSettingDefaults: {
-		prebidTimeout: 5000,
+		prebidTimeout: 3000,
 		e3FeedbackUrl: '//e3.adpushup.com/ApexWebService/feedback',
 		targetAllDFP: false,
 		dfpAdUnitTargeting: {
@@ -210,7 +210,13 @@ module.exports = {
 		},
 		priceGranularity: 'DENSE',
 		adpushupDfpCurrency: 'USD',
-		adserverSetupCheckInterval: 1000 * 60 * 5
+		adserverSetupCheckInterval: 1000 * 60 * 5,
+		availableFormats: [
+			{ name: 'Display', value: 'display' },
+			{ name: 'Native', value: 'native' },
+			{ name: 'Video', value: 'video' }
+		],
+		defaultFormats: ['display']
 	},
 	hbContinents: [
 		{ name: 'Europe', code: 'EUR' },
