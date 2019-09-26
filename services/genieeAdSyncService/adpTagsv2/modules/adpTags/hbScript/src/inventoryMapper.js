@@ -45,16 +45,14 @@ var inventoryMapper = {
 						if (allSizesParams[inventorySize]) return allSizesParams[inventorySize];
 
 						for (const originalSize in BACKWARD_COMPATIBLE_MAPPING) {
-							const commaSeperatedSize = inventorySize.replace('x', ',');
 							if (
-								BACKWARD_COMPATIBLE_MAPPING.hasOwnProperty(originalSize) &&
-								originalSize === commaSeperatedSize &&
+								originalSize === inventorySize &&
 								BACKWARD_COMPATIBLE_MAPPING[originalSize].length
 							) {
 								const backwardSizes = BACKWARD_COMPATIBLE_MAPPING[originalSize];
 
-								for (let backwardSizeArr of backwardSizes) {
-									const backwardSize = backwardSizeArr.join('x');
+								for (let backwardSize of backwardSizes) {
+									backwardSize = backwardSize.join('x');
 									if (allSizesParams[backwardSize]) return allSizesParams[backwardSize];
 								}
 
