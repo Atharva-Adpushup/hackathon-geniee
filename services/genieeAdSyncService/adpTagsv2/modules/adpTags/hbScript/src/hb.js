@@ -23,7 +23,7 @@ var hb = {
 			}
 
 			var size = adpSlot.size;
-			var computedSizes = adpSlot.isResponsive ? responsiveSizes : adpSlot.computedSizes;
+			var computedSizes = adpSlot.computedSizes;
 			var prebidSizes = computedSizes.length ? computedSizes : [size];
 			if (adpSlot.optionalParam.overrideActive && adpSlot.optionalParam.overrideSizeTo) {
 				size = adpSlot.optionalParam.overrideSizeTo.split('x');
