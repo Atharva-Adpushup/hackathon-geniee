@@ -249,6 +249,41 @@ const DEFAULT_GLOBAL_RESPONSE = {
 	channels: [],
 	currentAd: null
 };
+const REFRESH_INTERVALS = [
+	{
+		name: '30',
+		value: 30
+	},
+	{
+		name: '60',
+		value: 60
+	},
+	{
+		name: '90',
+		value: 90
+	},
+	{
+		name: '120',
+		value: 120
+	},
+	{
+		name: '180',
+		value: 180
+	},
+	{
+		name: '240',
+		value: 240
+	},
+	{
+		name: '300',
+		value: 300
+	},
+	{
+		name: '360',
+		value: 360
+	}
+];
+const DEFAULT_REFRESH_INTERVAL = 30;
 
 export {
 	EVENTS,
@@ -273,5 +308,7 @@ export {
 	IA_NAV_ITEMS_INDEXES,
 	IA_NAV_ITEMS_VALUES,
 	DEFAULT_ADS_RESPONSE,
-	DEFAULT_GLOBAL_RESPONSE
+	DEFAULT_GLOBAL_RESPONSE,
+	REFRESH_INTERVALS,
+	DEFAULT_REFRESH_INTERVAL
 };
