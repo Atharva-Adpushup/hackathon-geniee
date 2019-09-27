@@ -35,7 +35,11 @@ class Apps extends Component {
 			site: { siteId }
 		} = this.props;
 
-		window.location.href = `//${window.location.host}/api/visualEditor/${siteId}`;
+		const a = document.createElement('a');
+		a.href = `//${window.location.host}/api/visualEditor/${siteId}`;
+		a.setAttribute('target', '_blank');
+		document.body.appendChild(a);
+		a.click();
 	};
 
 	renderPanel() {
@@ -68,9 +72,11 @@ class Apps extends Component {
 			>
 				<Panel eventKey="layout">
 					<Panel.Heading>
-						<Panel.Title toggle>Layout</Panel.Title>
+						<Panel.Title toggle className="app-panel-title">
+							Layout
+						</Panel.Title>
 						<section className="app-link">
-							<Link to={`sites/${site.siteId}/apps/layout`} className="u-margin-r3">
+							<Link to={`/sites/${site.siteId}/apps/layout`} className="u-margin-r3">
 								<OverlayTrigger
 									placement="top"
 									overlay={
@@ -117,7 +123,22 @@ class Apps extends Component {
 				</Panel>
 				<Panel eventKey="headerBidding">
 					<Panel.Heading>
-						<Panel.Title toggle>Header Bidding</Panel.Title>
+						<Panel.Title toggle className="app-panel-title">
+							Header Bidding
+						</Panel.Title>
+						<Link to={`/sites/${site.siteId}/apps/header-bidding`} className="u-margin-r3 app-link">
+							<OverlayTrigger
+								placement="top"
+								overlay={
+									<Tooltip id={`tooltip-header-bidding-link-${site.siteId}`}>
+										Go to Header Bidding App
+									</Tooltip>
+								}
+								key={`app-header-bidding-link-${site.siteId}`}
+							>
+								<FontAwesomeIcon icon="link" className="u-text-red" size="lg" />
+							</OverlayTrigger>
+						</Link>
 					</Panel.Heading>
 					{activeKey === 'headerBidding' ? (
 						<HeaderBidding
@@ -130,13 +151,41 @@ class Apps extends Component {
 				</Panel>
 				<Panel eventKey="apTag">
 					<Panel.Heading>
-						<Panel.Title toggle>AP Tag</Panel.Title>
+						<Panel.Title toggle className="app-panel-title">
+							AP Tag
+						</Panel.Title>
+						<Link to={`/sites/${site.siteId}/apps/ap-tag`} className="u-margin-r3 app-link">
+							<OverlayTrigger
+								placement="top"
+								overlay={
+									<Tooltip id={`tooltip-ap-tag-link-${site.siteId}`}>Go to ApTag App</Tooltip>
+								}
+								key={`app-ap-tag-link-${site.siteId}`}
+							>
+								<FontAwesomeIcon icon="link" className="u-text-red" size="lg" />
+							</OverlayTrigger>
+						</Link>
 					</Panel.Heading>
 					{activeKey === 'apTag' ? <ApTag {...common} updateSite={updateSite} /> : null}
 				</Panel>
 				<Panel eventKey="innovativeAds">
 					<Panel.Heading>
-						<Panel.Title toggle>Innovative Ads</Panel.Title>
+						<Panel.Title toggle className="app-panel-title">
+							Innovative Ads
+						</Panel.Title>
+						<Link to={`/sites/${site.siteId}/apps/innovative-ads`} className="u-margin-r3 app-link">
+							<OverlayTrigger
+								placement="top"
+								overlay={
+									<Tooltip id={`tooltip-innovative-ads-link-${site.siteId}`}>
+										Go to Innovative Ads App
+									</Tooltip>
+								}
+								key={`app-innovative-ads-link-${site.siteId}`}
+							>
+								<FontAwesomeIcon icon="link" className="u-text-red" size="lg" />
+							</OverlayTrigger>
+						</Link>
 					</Panel.Heading>
 					{activeKey === 'innovativeAds' ? (
 						<InnovativeAds {...common} updateSite={updateSite} />
