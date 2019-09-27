@@ -38,7 +38,7 @@ class Account extends Component {
 			activeDFPNetwork && activeDFPParentId
 				? `${activeDFPNetwork}-${activeDFPParentId}-${activeDFPCurrencyCode}`
 				: null;
-		let dfpAccounts = DFP_ACCOUNTS_DEFAULT;
+		let dfpAccounts = [];
 		let foundAdPushupDFP = false;
 
 		adNetworkSettings.forEach(network => {
@@ -62,7 +62,8 @@ class Account extends Component {
 			}
 		});
 
-		if (!foundAdPushupDFP) dfpAccounts = [...dfpAccounts, ...DFP_ACCOUNTS_DEFAULT];
+		if (!foundAdPushupDFP || !dfpAccounts.length)
+			dfpAccounts = [...dfpAccounts, ...DFP_ACCOUNTS_DEFAULT];
 
 		this.state = {
 			activeDFP,
