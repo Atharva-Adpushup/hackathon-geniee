@@ -599,7 +599,7 @@ function apiModule() {
 					if (activeAdServer && activeAdServer.activeDFPNetwork) {
 						if (
 							activeAdServer.activeDFPNetwork !==
-							hbGlobalSettingDefaults.dfpAdUnitTargeting.networkId
+							hbGlobalSettingDefaults.dfpAdUnitTargeting.networkId.toString()
 						) {
 							const matchedDfpNetwork = networkData.dfpAccounts.find(
 								dfpAccount => dfpAccount.code === activeAdServer.activeDFPNetwork
