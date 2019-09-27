@@ -14,7 +14,7 @@ function consoleRedirection(e) {
 	now.setHours(now.getHours() + 2);
 	document.cookie = `app_redirect=0; path=/; expires=${now.toUTCString()}; domain=adpushup.com`;
 	setTimeout(() => {
-		window.location.href = 'https://console.adpushup.com';
+		window.location.href = 'http://console.adpushup.com';
 	}, 500);
 }
 

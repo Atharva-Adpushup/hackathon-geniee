@@ -28,7 +28,7 @@ const queueConfig = {
 };
 const QUEUE = CONFIG.RABBITMQ.CDN_SYNC.QUEUE.name;
 const consumer = new Consumer(queueConfig);
-const SITES_TO_PROCESS = [39233, 39403, 39420, 39428, 39451, 39472, 39632];
+const SITES_TO_PROCESS = [39233, 39403, 39420, 39428, 39451, 39472, 39498, 39632];
 let counter = 0;
 
 function validateMessageData(originalMessage) {
