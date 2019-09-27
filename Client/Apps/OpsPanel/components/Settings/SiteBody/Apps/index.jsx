@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
-import { PanelGroup, Panel, Col } from 'react-bootstrap';
+import { PanelGroup, Panel, Col, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
 import Loader from '../../../../../../Components/Loader';
 import Layout from './Layout';
 import ConsentManagement from './ConsentManagement';
@@ -23,6 +25,17 @@ class Apps extends Component {
 		this.setState({
 			activeKey: value
 		});
+	};
+
+	handleEditorRedirection = e => {
+		e.preventDefault();
+		e.stopPropagation();
+
+		const {
+			site: { siteId }
+		} = this.props;
+
+		window.location.href = `//${window.location.host}/api/visualEditor/${siteId}`;
 	};
 
 	renderPanel() {
@@ -55,12 +68,35 @@ class Apps extends Component {
 			>
 				<Panel eventKey="layout">
 					<Panel.Heading>
-						<Panel.Title toggle>
-							Layout
-							<Link to={`sites/${site.id}/apps/layout`} className="app-link">
-								Goto App
+						<Panel.Title toggle>Layout</Panel.Title>
+						<section className="app-link">
+							<Link to={`sites/${site.siteId}/apps/layout`} className="u-margin-r3">
+								<OverlayTrigger
+									placement="top"
+									overlay={
+										<Tooltip id={`tooltip-layout-link-${site.siteId}`}>Go to Layout App</Tooltip>
+									}
+									key={`app-layout-link-${site.siteId}`}
+								>
+									<FontAwesomeIcon icon="link" className="u-text-red" size="lg" />
+								</OverlayTrigger>
 							</Link>
-						</Panel.Title>
+							<a
+								href={`api/visualEditor/${site.siteId}`}
+								className="u-margin-r2"
+								onClick={this.handleEditorRedirection}
+							>
+								<OverlayTrigger
+									placement="top"
+									overlay={
+										<Tooltip id={`tooltip-layout-editor-link-${site.siteId}`}>Go to Editor</Tooltip>
+									}
+									key={`app-layout-editor-link-${site.siteId}`}
+								>
+									<FontAwesomeIcon icon="code" className="u-text-red" size="lg" />
+								</OverlayTrigger>
+							</a>
+						</section>
 					</Panel.Heading>
 					{activeKey === 'layout' ? (
 						<Layout
