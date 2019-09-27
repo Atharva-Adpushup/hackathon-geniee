@@ -40,6 +40,7 @@ class Apps extends Component {
 		a.setAttribute('target', '_blank');
 		document.body.appendChild(a);
 		a.click();
+		a.remove();
 	};
 
 	renderPanel() {
