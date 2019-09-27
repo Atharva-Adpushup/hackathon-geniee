@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { PanelGroup, Panel, Col } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 import Loader from '../../../../../../Components/Loader';
 import Layout from './Layout';
 import ConsentManagement from './ConsentManagement';
@@ -54,7 +55,12 @@ class Apps extends Component {
 			>
 				<Panel eventKey="layout">
 					<Panel.Heading>
-						<Panel.Title toggle>Layout</Panel.Title>
+						<Panel.Title toggle>
+							Layout
+							<Link to={`sites/${site.id}/apps/layout`} className="app-link">
+								Goto App
+							</Link>
+						</Panel.Title>
 					</Panel.Heading>
 					{activeKey === 'layout' ? (
 						<Layout
