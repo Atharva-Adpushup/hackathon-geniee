@@ -80,7 +80,7 @@ var targeting = {
 			Object.assign(targeting, { refreshcount: 0 });
 		}
 
-		Object.assign(targeting, { refreshrate: adpSlot.refreshInterval });
+		Object.assign(targeting, { refreshrate: adpSlot.optionalParam.refreshInterval });
 
         if (adServerTargeting) {
             Object.assign(targeting, adServerTargeting);
