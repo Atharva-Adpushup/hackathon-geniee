@@ -20,7 +20,9 @@ const masterSaveData = mode => (dispatch, getState) => {
 		Hence we added a very dirty and unoptimized check to stringify json and find index of empty ad in json.
 		This will ensure that empty adcode is also in final json and hence then only show empty adcode error.
 		*/
-		if (JSON.stringify(paramData).indexOf(emptyCodes[0].id) !== -1) {
+		const stringifiedData = JSON.stringify(paramData);
+		const emptyCodesFound = emptyCodes.some(ad => stringifiedData.includes(ad.id));
+		if (emptyCodesFound) {
 			return dispatch({
 				type: uiActions.UPDATE_AFTER_SAVE_STATUS,
 				status: status.FAILED,
@@ -51,7 +53,11 @@ const masterSaveData = mode => (dispatch, getState) => {
 	return masterSave(paramData)
 		.done(data => {
 			if (data.success) {
-				dispatch({ type: uiActions.UPDATE_AFTER_SAVE_STATUS, status: status.SUCCESS, updateModeStatus });
+				dispatch({
+					type: uiActions.UPDATE_AFTER_SAVE_STATUS,
+					status: status.SUCCESS,
+					updateModeStatus
+				});
 			} else {
 				dispatch({ type: uiActions.UPDATE_AFTER_SAVE_STATUS, status: status.FAILED });
 			}
