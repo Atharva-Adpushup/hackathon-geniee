@@ -4,22 +4,27 @@
 /* eslint-disable no-case-declarations */
 import React, { Component, Fragment } from 'react';
 import { Panel, Table } from 'react-bootstrap';
+import cloneDeep from 'lodash/cloneDeep';
 import Loader from '../../../../../../Components/Loader';
 import CustomToggleSwitch from '../../../../../../Components/CustomToggleSwitch/index';
 import CustomMessage from '../../../../../../Components/CustomMessage/index';
 import CustomButton from '../../../../../../Components/CustomButton/index';
 
 class Layout extends Component {
+	static resetState = apps => {
+		const status = Object.prototype.hasOwnProperty.call(apps, 'layout') ? apps.layout : undefined;
+		return {
+			loading: false,
+			status
+		};
+	};
+
 	constructor(props) {
 		super(props);
 		const {
 			site: { apps = {} }
 		} = props;
-		const status = Object.prototype.hasOwnProperty.call(apps, 'layout') ? apps.layout : undefined;
-		this.state = {
-			loading: false,
-			status
-		};
+		this.state = { ...Layout.resetState(apps) };
 	}
 
 	componentDidMount() {
@@ -49,6 +54,22 @@ class Layout extends Component {
 		});
 	}
 
+	resetTabWrapper = () => {
+		const {
+			resetTab,
+			site: {
+				apps = {},
+				apConfigs: { autoOptimise = false },
+				cmsInfo: { channelsInfo = {} }
+			}
+		} = this.props;
+
+		this.setState(
+			{ ...Layout.resetState(apps), siteAutoOptimise: autoOptimise, channels: channelsInfo },
+			() => resetTab()
+		);
+	};
+
 	handleToggle = (value, event) => {
 		const attributeValue = event.target.getAttribute('name');
 		const values = attributeValue.split('-');
@@ -74,7 +95,8 @@ class Layout extends Component {
 				} else if (mode === 'site') {
 					// update Site
 					this.setState(state => {
-						const { channels = {} } = state;
+						let { channels = {} } = state;
+						channels = cloneDeep(channels);
 						const keys = Object.keys(channels);
 
 						keys.forEach(key => {
@@ -134,7 +156,11 @@ class Layout extends Component {
 					(p, cb) => p.then(() => (typeof cb === 'function' ? cb() : true)),
 					Promise.resolve()
 				)
-				.then(() => this.setState({ loading: false }));
+				.then(() =>
+					this.setState(() => ({
+						loading: false
+					}))
+				);
 		}
 		return true;
 	};
@@ -205,8 +231,7 @@ class Layout extends Component {
 	render() {
 		const { loading, status, siteAutoOptimise, channels } = this.state;
 		const {
-			site: { siteId, siteDomain },
-			resetTab
+			site: { siteId, siteDomain }
 		} = this.props;
 
 		if (!channels || loading) return <Loader height="100px" classNames="u-margin-v3" />;
@@ -258,7 +283,7 @@ class Layout extends Component {
 					</thead>
 					<tbody>{this.renderChannels()}</tbody>
 				</Table>
-				<CustomButton variant="secondary" className="pull-right" onClick={resetTab}>
+				<CustomButton variant="secondary" className="pull-right" onClick={this.resetTabWrapper}>
 					Cancel
 				</CustomButton>
 				<CustomButton

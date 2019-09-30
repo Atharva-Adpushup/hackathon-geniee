@@ -3,8 +3,7 @@
 /* eslint-disable no-console */
 import React, { Component } from 'react';
 import { Form, FormControl } from 'react-bootstrap';
-
-import CustomButton from '../../CustomButton/index';
+// import CustomButton from '../../CustomButton/index';
 
 class UserChange extends Component {
 	state = {
@@ -72,7 +71,7 @@ class UserChange extends Component {
 					onChange={this.onValChange}
 					onFocus={this.onFocus}
 					list="users-list"
-					placeholder="email"
+					placeholder="Email"
 				/>
 				{users.length ? (
 					<datalist id="users-list">
@@ -84,13 +83,13 @@ class UserChange extends Component {
 					''
 				)}
 
-				<CustomButton
+				{/* <CustomButton
 					type="submit"
 					variant="secondary"
 					className="u-margin-l3 u-margin-r3 pull-right"
 				>
 					Change User
-				</CustomButton>
+				</CustomButton> */}
 			</Form>
 		);
 	}

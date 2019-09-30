@@ -1,5 +1,6 @@
 module.exports = apiModule();
 
+const request = require('request-promise');
 const model = require('../helpers/model');
 const couchbase = require('../helpers/couchBaseService');
 const AdPushupError = require('../helpers/AdPushupError');
@@ -8,7 +9,9 @@ const userModel = require('./userModel');
 const channelModel = require('./channelModel');
 const hbVideoParamsMap = require('../configs/hbVideoParamsMap');
 const commonFunctions = require('../helpers/commonFunctions');
-const { docKeys } = require('../configs/commonConsts');
+const { docKeys, hbGlobalSettingDefaults } = require('../configs/commonConsts');
+const dfpLineItemAutomationReqBody = require('../configs/dfpLineItemAutomationReqBody');
+const config = require('../configs/config');
 
 const HeaderBidding = model.extend(function() {
 	this.keys = [
@@ -328,9 +331,9 @@ function apiModule() {
 												const ad = section.ads[adKey];
 
 												if (ad.network === 'adpTags') {
-													const { headerBidding, dfpAdunit: adUnit } = ad.networkData;
+													const { headerBidding } = ad.networkData;
 													inventory.headerBidding = headerBidding ? 'Enabled' : 'Disabled';
-													inventory.adUnit = adUnit;
+													inventory.adUnit = section.name;
 													inventories.push({ ...inventory });
 												}
 											}
@@ -365,7 +368,10 @@ function apiModule() {
 							};
 
 							if (ad.network === 'adpTags') {
-								const { headerBidding, dfpAdunit: adUnit } = ad.networkData;
+								const {
+									networkData: { headerBidding },
+									name: adUnit
+								} = ad;
 								inventory.headerBidding = headerBidding ? 'Enabled' : 'Disabled';
 								inventory.adUnit = adUnit;
 
@@ -395,7 +401,10 @@ function apiModule() {
 							const inventory = { app: 'Innovative Ads', pageGroup, device, variationName: 'ALL' };
 
 							if (ad.network === 'adpTags') {
-								const { headerBidding, dfpAdunit: adUnit } = ad.networkData;
+								const {
+									networkData: { headerBidding },
+									name: adUnit
+								} = ad;
 								inventory.headerBidding = headerBidding ? 'Enabled' : 'Disabled';
 								inventory.adUnit = adUnit;
 
@@ -476,7 +485,7 @@ function apiModule() {
 													if (
 														ad.network === 'adpTags' &&
 														ad.networkData &&
-														ad.networkData.dfpAdunit === inventory.adUnit &&
+														section.name === inventory.adUnit &&
 														ad.networkData.headerBidding !== inventory.enableHB
 													) {
 														ad.networkData.headerBidding = inventory.enableHB;
@@ -520,7 +529,7 @@ function apiModule() {
 							if (
 								ad.network === 'adpTags' &&
 								ad.networkData &&
-								ad.networkData.dfpAdunit === inventory.target.adUnit &&
+								ad.name === inventory.target.adUnit &&
 								ad.networkData.headerBidding !== inventory.enableHB
 							) {
 								ad.networkData.headerBidding = inventory.enableHB;
@@ -553,7 +562,7 @@ function apiModule() {
 							if (
 								ad.network === 'adpTags' &&
 								ad.networkData &&
-								ad.networkData.dfpAdunit === inventory.target.adUnit &&
+								ad.name === inventory.target.adUnit &&
 								ad.networkData.headerBidding !== inventory.enableHB
 							) {
 								ad.networkData.headerBidding = inventory.enableHB;
@@ -593,7 +602,8 @@ function apiModule() {
 						adNetworkSettings &&
 						adNetworkSettings.dfpAccounts &&
 						adNetworkSettings.dfpAccounts.length
-							? adNetworkSettings.dfpAccounts[0].code === '103512698'
+							? adNetworkSettings.dfpAccounts[0].code ===
+							  hbGlobalSettingDefaults.dfpAdUnitTargeting.networkId
 								? 'AP'
 								: 'Publisher'
 							: 'N/A';
@@ -616,7 +626,7 @@ function apiModule() {
 				.then(({ data: { prebidConfig } }) => prebidConfig),
 		getHbStatusForSite: siteId =>
 			siteModel.getSiteById(siteId).then(site => {
-				const { headerBidding } = site.get('apps');
+				const { headerBidding = false } = site.get('apps');
 				return { headerBidding };
 			}),
 		toggleHbStatusForSite: siteId =>
@@ -774,7 +784,63 @@ function apiModule() {
 				if (countryRuleIndex > -1) countryConfig.splice(countryRuleIndex, 1);
 
 				return hbConfig.save();
-			})
+			}),
+		setupAdserver: (siteId, user) => {
+			const body = dfpLineItemAutomationReqBody;
+			const activeAdServerData = user.getActiveAdServerData('dfp');
+			const isPublisherActiveDfp =
+				activeAdServerData &&
+				activeAdServerData.activeDFPNetwork &&
+				activeAdServerData.activeDFPNetwork !==
+					hbGlobalSettingDefaults.dfpAdUnitTargeting.networkId;
+			const dfpNetworkData = user.getNetworkDataObj('DFP');
+			const isValidDfpNetwork = dfpNetworkData && dfpNetworkData.dfpAccounts.length;
+
+			if (!isPublisherActiveDfp || !isValidDfpNetwork) {
+				return Promise.reject(false);
+			}
+
+			return API.getAllBiddersFromNetworkConfig()
+				.then(allHbBidders => {
+					body.customKeyValues.hb_ap_siteid.values = [siteId];
+					body.customKeyValues.hb_ap_bidder.values = allHbBidders;
+					body.networkCode = activeAdServerData.activeDFPNetwork;
+					body.currencyCode = activeAdServerData.activeDFPCurrencyCode;
+					body.granualityMultiplier = activeAdServerData.prebidGranularityMultiplier;
+					body.refreshToken = dfpNetworkData.refreshToken;
+					body.granularityType = hbGlobalSettingDefaults.priceGranularity;
+
+					return body;
+				})
+				.then(body => {
+					/**
+					 * Status values :
+					 * pending
+					 * in-progress
+					 * failed
+					 * finished
+					 */
+					const sampleResponse = {
+						config: {
+							networkCode: '11111',
+							refreshToken: 'cdss'
+						},
+						createdTs: 1567580929797,
+						key: 'b0baee9d279d34fa1dfd71aadb908c3f',
+						networkCode: '11111',
+						status: 'finished'
+					};
+
+					return sampleResponse;
+
+					// return request({
+					// 	method: 'POST',
+					// 	uri: commonConsts.DFP_LINE_ITEM_AUTOMATION_API,
+					// 	body,
+					// 	json: true
+					// });
+				});
+		}
 	};
 
 	return API;

@@ -49,14 +49,23 @@ router
 		return res.send({});
 	})
 	.get('/downloadAdpushupReport', (req, res) => {
-		const { data } = req.query;
+		const { data , fileName} = req.query;
+
 
 		if (data) {
 			try {
 				const csvData = JSON.parse(utils.atob(data));
 
-				res.setHeader('Content-disposition', 'attachment; filename=adpushup-report.csv');
+				res.setHeader('Content-disposition', `attachment; filename=${fileName}.csv`);
 				res.set('Content-Type', 'text/csv');
+
+				var headers = {};
+				for (key in csvData[0]) {
+					headers[key] = key;
+				}
+
+				csvData.unshift(headers);
+
 				return res.status(200).csv(csvData);
 			} catch (e) {
 				return res.status(500).send('Some error occurred! Please try again later.');
