@@ -104,7 +104,8 @@ var adpTags = {
 				services: services,
 				feedback: {
 					winner: constants.FEEDBACK.DEFAULT_WINNER
-				}
+				},
+				refreshInterval: optionalParam.refreshInterval
 			};
 
 			return this.adpSlots[containerId];

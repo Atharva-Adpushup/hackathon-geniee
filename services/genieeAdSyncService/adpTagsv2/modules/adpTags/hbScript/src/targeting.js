@@ -58,18 +58,36 @@ var targeting = {
     setSlotLevel: function (adpSlot) {
         var targeting = {
             hb_siteId: config.SITE_ID,
-            hb_ran: 0
+			hb_ran: 0
         };
         var adServerTargeting = this.getAdserverTargeting(adpSlot);
 
         if (adpSlot.bidders.length) {
             Object.assign(targeting, { hb_ran: 1 });
-        }
+		}
+		
+		var existingTargeting = (adpSlot.gSlot && adpSlot.gSlot.getTargetingMap()) || {};
+
+		if (existingTargeting.refreshcount && existingTargeting.refreshcount.length) {
+			let refreshCountNum = parseInt(existingTargeting.refreshcount[0], 10);
+
+			if(!isNaN(refreshCountNum) && refreshCountNum < 20) {
+				Object.assign(targeting, { refreshcount: ++refreshCountNum });
+			} else {
+				Object.assign(targeting, { refreshcount: 'more_than_20' });
+			}
+		} else {
+			Object.assign(targeting, { refreshcount: 0 });
+		}
+
+		if (Object.keys(existingTargeting).length) {
+			Object.assign(targeting, { refreshrate: adpSlot.refreshInterval });
+		}
 
         if (adServerTargeting) {
             Object.assign(targeting, adServerTargeting);
-        }
-
+		}
+		
         // Set custom slot level targeting, if present
         this.setCustomSlotLevelTargeting(adpSlot);
 
