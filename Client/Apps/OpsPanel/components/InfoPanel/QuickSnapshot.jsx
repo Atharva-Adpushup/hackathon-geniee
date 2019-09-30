@@ -14,6 +14,7 @@ import SitewiseReportContainer from '../../../../Pages/Dashboard/containers/Site
 import PerformanceOverviewContainer from '../../../../Pages/Dashboard/containers/PerformanceOverviewContainer';
 import PerformanceApOriginalContainer from '../../../../Pages/Dashboard/containers/PerformanceApOriginalContainer';
 import RevenueContainer from '../../../../Pages/Dashboard/containers/RevenueContainer';
+import ModeReport from '../../../../Pages/Dashboard/components/ModeReport';
 import Loader from '../../../../Components/Loader/index';
 import {
 	dates,
@@ -37,6 +38,8 @@ class QuickSnapshot extends React.Component {
 			selectedSite: 'all',
 			sites: allUserSites,
 			top10Sites: [],
+			modeConfig: [],
+			errorCodeConfig: [],
 			widgetsConfig: []
 		};
 	}
@@ -49,17 +52,14 @@ class QuickSnapshot extends React.Component {
 		return getReportMetaData
 			.then(responseData => {
 				const { data: metaData } = responseData;
-				const path = this.getTop10SitesWidgetPath(metaData);
-				const getTop10SitesData = this.getTop10SitesData(path, DEFAULT_DATE)
-					.then(this.setComputedState)
-					.catch(() => {
-						const stateObject = this.getComputedSitesData([]);
-
-						return this.setComputedState(stateObject);
-					});
+				const promiseArray = [
+					this.getTop10Sites(metaData),
+					this.getAllModes(metaData),
+					this.getAllErrorCodes(metaData)
+				];
 
 				setReportingMetaData(metaData);
-				return Promise.all([getTop10SitesData]).then(() => this.renderComputedWidgetsUI());
+				return Promise.all(promiseArray).then(() => this.renderComputedWidgetsUI());
 			})
 			.catch(() => {
 				showNotification({
@@ -78,6 +78,75 @@ class QuickSnapshot extends React.Component {
 		const stateObject = { top10Sites, selectedSite };
 
 		return stateObject;
+	};
+
+	getAllErrorCodes = metaData => {
+		const {
+			filter: {
+				error_code: { path }
+			}
+		} = metaData;
+		const getData = this.getAllErrorCodesData(path).catch(() => {
+			const stateObject = { errorCodeConfig: [] };
+
+			return this.setComputedState(stateObject);
+		});
+
+		return getData;
+	};
+
+	getAllErrorCodesData = path => {
+		const params = { isSuperUser: true };
+
+		return reportService.getWidgetData({ path, params }).then(widgetData => {
+			const {
+				data: { result }
+			} = widgetData;
+			const stateObject = { errorCodeConfig: result };
+
+			return this.setComputedState(stateObject);
+		});
+	};
+
+	getAllModes = metaData => {
+		const {
+			filter: {
+				mode: { path }
+			}
+		} = metaData;
+		const getData = this.getAllModesData(path).catch(() => {
+			const stateObject = { modeConfig: [] };
+
+			return this.setComputedState(stateObject);
+		});
+
+		return getData;
+	};
+
+	getAllModesData = path => {
+		const params = { isSuperUser: true };
+
+		return reportService.getWidgetData({ path, params }).then(widgetData => {
+			const {
+				data: { result }
+			} = widgetData;
+			const stateObject = { modeConfig: result };
+
+			return this.setComputedState(stateObject);
+		});
+	};
+
+	getTop10Sites = metaData => {
+		const path = this.getTop10SitesWidgetPath(metaData);
+		const getData = this.getTop10SitesData(path, DEFAULT_DATE)
+			.then(this.setComputedState)
+			.catch(() => {
+				const stateObject = this.getComputedSitesData([]);
+
+				return this.setComputedState(stateObject);
+			});
+
+		return getData;
 	};
 
 	getTop10SitesWidgetPath = metaData => {
@@ -168,11 +237,17 @@ class QuickSnapshot extends React.Component {
 
 	getWidgetConfig = (widgets, widgetsList) => {
 		const {
-			widgetsName: { PER_AP_ORIGINAL, OPS_TOP_SITES, OPS_COUNTRY_REPORT, OPS_NETWORK_REPORT }
+			widgetsName: {
+				PER_AP_ORIGINAL,
+				OPS_TOP_SITES,
+				OPS_COUNTRY_REPORT,
+				OPS_NETWORK_REPORT,
+				OPS_ERROR_REPORT
+			}
 		} = this.props;
 		const sortedWidgets = sortBy(widgets, ['position', 'name']);
 		const widgetsConfig = [];
-		const { top10Sites: sitesList, selectedSite } = this.state;
+		const { top10Sites: sitesList, selectedSite, modeConfig, errorCodeConfig } = this.state;
 
 		Object.keys(sortedWidgets).forEach(wid => {
 			const widget = { ...sortedWidgets[wid] };
@@ -215,6 +290,12 @@ class QuickSnapshot extends React.Component {
 						widget.chartSeriesMetric = 'network_net_revenue';
 						widget.chartSeriesMetricType = 'money';
 						widget.path += `&metrics=network_net_revenue`;
+						break;
+
+					case OPS_ERROR_REPORT:
+						widget.selectedDimension = 'mode';
+						widget.modeData = modeConfig;
+						widget.errorCodeData = errorCodeConfig;
 						break;
 
 					default:
@@ -271,8 +352,11 @@ class QuickSnapshot extends React.Component {
 
 			case OPS_COUNTRY_REPORT:
 			case OPS_NETWORK_REPORT:
-			case OPS_ERROR_REPORT:
 				return <RevenueContainer displayData={widget} />;
+
+			case OPS_ERROR_REPORT:
+				return <ModeReport displayData={widget} />;
+
 			default:
 		}
 
