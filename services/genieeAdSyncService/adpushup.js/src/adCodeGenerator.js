@@ -80,7 +80,8 @@ var utils = require('../libs/utils'),
 						isManual: isManual,
 						sectionName: sectionName,
 						adId: ad.id,
-						services: ad.services
+						services: ad.services,
+						refreshInterval: networkData.refreshInterval || consts.AD_REFRESH_INTERVAL / 1000
 					});
 				}
 				//Extend variation wise keyvalues if any for adpTags. These will be page level targeting keys
