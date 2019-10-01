@@ -87,10 +87,10 @@ class Layout extends Component {
 
 			if (autoOptimise || !variationKeys || !variationKeys.length) return;
 
-			const total = variationKeys.reduce(
-				(acc, element) => acc + parseInt(element.trafficDistribution, 10),
-				0
-			);
+			const total = variationKeys.reduce((acc, id) => {
+				const variation = variations[id];
+				return acc + parseInt(variation.trafficDistribution, 10);
+			}, 0);
 			isInvalid = isInvalid || total !== 100;
 		});
 
