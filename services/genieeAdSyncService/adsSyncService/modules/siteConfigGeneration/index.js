@@ -86,6 +86,7 @@ function generateSiteChannelJSON(channelsWithAds, site) {
 
 			let pubId = null;
 			let refreshToken = config.ADPUSHUP_GAM.REFRESH_TOKEN;
+			let isThirdPartyDFP = false;
 
 			if (activeDFPNetwork && activeDFPParentId) {
 				adpTagsUnsyncedAds.currentDFP = {
@@ -105,8 +106,8 @@ function generateSiteChannelJSON(channelsWithAds, site) {
 				});
 			}
 
-			if (activeDFPNetwork == config.ADPUSHUP_GAM.ACTIVE_DFP_NETWORK)
-				refreshToken = config.ADPUSHUP_GAM.REFRESH_TOKEN;
+			if (activeDFPNetwork && activeDFPNetwork != config.ADPUSHUP_GAM.ACTIVE_DFP_NETWORK)
+				isThirdPartyDFP = true;
 
 			adpTagsUnsyncedAds.publisher = {
 				...adpTagsUnsyncedAds.publisher,
@@ -114,7 +115,8 @@ function generateSiteChannelJSON(channelsWithAds, site) {
 				name: `${firstName} ${lastName}`,
 				id: pubId,
 				refreshToken,
-				isThirdPartyAdx
+				isThirdPartyAdx,
+				isThirdPartyDFP
 			};
 
 			adsenseUnsyncedAds = { ...adpTagsUnsyncedAds };
