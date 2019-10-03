@@ -9,14 +9,17 @@ import Accordion from 'react-bootstrap/lib/Accordion';
 class siteModesPopover extends React.Component {
 	constructor(props) {
 		super(props);
-		const isPublishMode = props.mode && props.mode === siteModes.PUBLISH,
-			isPartnerGeniee = this.checkPartnerGeniee(props);
+		const isPublishMode = props.mode && props.mode === siteModes.PUBLISH;
+		const isPartnerGeniee = this.checkPartnerGeniee(props);
 
 		this.checkApStatus(props);
+		this.checkLiveStatus();
 		this.state = {
 			apStatus: isPartnerGeniee ? status.SUCCESS : status.PENDING,
-			controlStatus: (isPublishMode || isPartnerGeniee) ? status.TRUE : status.FALSE
+			controlStatus: isPublishMode || isPartnerGeniee ? status.TRUE : status.FALSE
 		};
+		this.showGuider = this.showGuider.bind(this);
+		this.checkLiveStatus = this.checkLiveStatus.bind(this);
 	}
 
 	checkPartnerGeniee(props) {
@@ -28,6 +31,7 @@ class siteModesPopover extends React.Component {
 	}
 
 	componentWillReceiveProps(nextProps) {
+		console.log(nextProps);
 		this.checkApStatus(nextProps);
 	}
 
@@ -64,6 +68,25 @@ class siteModesPopover extends React.Component {
 			});
 	}
 
+	checkLiveStatus() {
+		const self = this;
+		return window
+			.fetch(`/api/site/live`)
+			.then(response => response.json())
+			.then(response => {})
+			.catch(err => {
+				console.log(err);
+				self.setState(
+					{
+						gamStatus: false,
+						adsTxtStatus: false,
+						adsenseStatus: false
+					},
+					() => window.alert('Site live status check fail. Please try again later.')
+				);
+			});
+	}
+
 	getPositionOffsets() {
 		const leftArrowOffset = 7,
 			// Below variable adds the left offset adjustment done to make arrow
@@ -91,7 +114,9 @@ class siteModesPopover extends React.Component {
 				className={
 					this.state.apStatus == status.PENDING
 						? 'pending'
-						: this.state.apStatus == status.SUCCESS ? 'completed' : 'notcompleted'
+						: this.state.apStatus == status.SUCCESS
+						? 'completed'
+						: 'notcompleted'
 				}
 				eventKey={2}
 			>
@@ -117,8 +142,8 @@ class siteModesPopover extends React.Component {
 			>
 				<div>
 					We strongly recommend setting up Control Ads on your site. They can help you track
-					AdPushup performance, act as fallback in case of failure and much more. Please take
-					a moment out to understand them.
+					AdPushup performance, act as fallback in case of failure and much more. Please take a
+					moment out to understand them.
 					<a
 						className="btn btn-sm btn-lightBg publishHelperhelp"
 						onClick={this.showGuider.bind(null, components.CONTROL_CONVERSION_GUIDER)}
@@ -142,19 +167,20 @@ class siteModesPopover extends React.Component {
 	}
 
 	render() {
-		const positionOffsets = this.getPositionOffsets(),
-			style = {
-				position: 'absolute',
-				top: positionOffsets.top,
-				left: positionOffsets.left,
-				zIndex: 10000,
-				backgroundColor: 'white',
-				boxShadow: '0 1px 10px 0 rgba(0, 0, 0, 0.3)',
-				width: '300px'
-			},
-			isPartnerGeniee = this.checkPartnerGeniee(),
-			isNotPendingStatus = this.state.apStatus !== status.PENDING,
-			allDone = this.props.url && this.state.apStatus === status.SUCCESS && this.state.controlStatus;
+		const positionOffsets = this.getPositionOffsets();
+		const style = {
+			position: 'absolute',
+			top: positionOffsets.top,
+			left: positionOffsets.left,
+			zIndex: 10000,
+			backgroundColor: 'white',
+			boxShadow: '0 1px 10px 0 rgba(0, 0, 0, 0.3)',
+			width: '300px'
+		};
+		const isPartnerGeniee = this.checkPartnerGeniee();
+		const isNotPendingStatus = this.state.apStatus !== status.PENDING;
+		const allDone =
+			this.props.url && this.state.apStatus === status.SUCCESS && this.state.controlStatus;
 
 		if (!this.props.isVisible) {
 			return null;
@@ -194,7 +220,8 @@ class siteModesPopover extends React.Component {
 								eventKey={1}
 							>
 								<div>
-									You should have at least one Page Group set up.<a
+									You should have at least one Page Group set up.
+									<a
 										className="btn btn-sm btn-lightBg publishHelperhelp"
 										onClick={this.showGuider.bind(null, components.PAGE_GROUP_GUIDER)}
 									>
