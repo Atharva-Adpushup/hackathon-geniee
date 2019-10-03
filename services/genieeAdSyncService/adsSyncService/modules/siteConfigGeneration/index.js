@@ -81,7 +81,7 @@ function generateSiteChannelJSON(channelsWithAds, site) {
 			const { adNetworkSettings = [], firstName, lastName, adServerSettings = {} } = userData;
 			const hasAdNetworkSettings = !!adNetworkSettings.length;
 			let pubId = null;
-			let refreshToken = null;
+			let refreshToken = config.ADPUSHUP_GAM.REFRESH_TOKEN;
 
 			const activeDFPNetwork =
 				adServerSettings && adServerSettings.dfp ? adServerSettings.dfp.activeDFPNetwork : false;
@@ -105,6 +105,9 @@ function generateSiteChannelJSON(channelsWithAds, site) {
 					return false;
 				});
 			}
+
+			if (activeDFPNetwork == config.ADPUSHUP_GAM.ACTIVE_DFP_NETWORK)
+				refreshToken = config.ADPUSHUP_GAM.REFRESH_TOKEN;
 
 			adpTagsUnsyncedAds.publisher = {
 				...adpTagsUnsyncedAds.publisher,
