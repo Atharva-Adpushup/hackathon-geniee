@@ -81,7 +81,7 @@ function generateSiteChannelJSON(channelsWithAds, site) {
 			const { adNetworkSettings = [], firstName, lastName, adServerSettings = {} } = userData;
 			const hasAdNetworkSettings = !!adNetworkSettings.length;
 			const {
-				dfp: { activeDFPNetwork = false, activeDFPParentId = false, isThirdPartyAdx = false }
+				dfp: { activeDFPNetwork = false, activeDFPParentId = false, isThirdPartyAdx = false } = {}
 			} = adServerSettings;
 
 			let pubId = null;
