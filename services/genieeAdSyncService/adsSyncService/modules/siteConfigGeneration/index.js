@@ -76,6 +76,10 @@ function generateSiteChannelJSON(channelsWithAds, site) {
 						activeDFPParentId,
 						isThirdPartyDFP: !!(activeDFPNetwork != config.ADPUSHUP_GAM.ACTIVE_DFP_NETWORK)
 					};
+					adpTagsUnsyncedAds.publisher = {
+						...adpTagsUnsyncedAds.publisher,
+						...adpTagsUnsyncedAds.currentDFP
+					};
 				}
 				adpTagsUnsyncedAds.ads = _.concat(adpTagsUnsyncedAds.ads, zones.adpTagsUnsyncedAds);
 			}
