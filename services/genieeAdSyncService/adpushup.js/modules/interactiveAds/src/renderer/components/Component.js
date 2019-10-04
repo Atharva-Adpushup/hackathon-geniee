@@ -61,23 +61,21 @@ class Component {
 			window.adpushup.executeAdpTagsHeadCode([this.interactiveAd], {}); // This function expects an array of adpTags and optional adpKeyValues
 		}
 
-		let css = { width, height: parseInt(height) + POWERED_BY_BANNER.HEIGHT, ...customCSS },
-			$format = $('<div />'),
-			$banner = null,
-			$closeButton = this.createCloseButton(formatData),
-			feedbackOptions = {
-				// ads: [this.interactiveAd],
-				xpathMiss: [],
-				// eventType: commonConsts.ERROR_CODES.NO_ERROR,
-				// mode: window.adpushup.config.mode,
-				referrer: adp.config.referrer,
-				tracking: false,
-				variationId: !adp.config.manualModeActive
-					? adp.config.selectedVariation
-					: commonConsts.MANUAL_ADS.VARIATION
-			},
-			$frame = $('<div />'),
-			newFeedbackAdObj = $.extend({}, this.interactiveAd);
+		let css = { width, height: parseInt(height) + POWERED_BY_BANNER.HEIGHT, ...customCSS };
+		let $format = $('<div />');
+		// let $banner = null;
+		// let $closeButton = this.createCloseButton(formatData);
+		let feedbackOptions = {
+			// ads: [this.interactiveAd],
+			xpathMiss: [],
+			// eventType: commonConsts.ERROR_CODES.NO_ERROR,
+			// mode: window.adpushup.config.mode,
+			referrer: adp.config.referrer,
+			tracking: false,
+			variationId: !adp.config.manualModeActive ? adp.config.selectedVariation : commonConsts.MANUAL_ADS.VARIATION
+		};
+		let $frame = $('<div />');
+		let newFeedbackAdObj = $.extend({}, this.interactiveAd);
 
 		// New feedback
 		newFeedbackAdObj.status = 1;
@@ -90,19 +88,17 @@ class Component {
 
 		$format.attr({ id, 'data-section': id, class: '_ap_apex_ad' });
 		$frame.css({
-			// width,
 			...commonConsts.FRAME.CSS.COMMON,
 			...commonConsts.FRAME.CSS[formatData.placement.toUpperCase()]
 		});
 
-		if (adp.config.poweredByBanner) {
-			$banner = this.createPoweredByBanner(formatData);
-			$frame.append($banner);
-		} else {
-			$frame.css({ ...commonConsts.FRAME.CSS.DISABLED_BANNER });
-		}
-		$frame.append($closeButton);
-		// $frame.append('<div style="clear:both">&nbsp;</div>');
+		// if (adp.config.poweredByBanner) {
+		// 	$banner = this.createPoweredByBanner(formatData);
+		// 	$frame.append($banner);
+		// } else {
+		// 	$frame.css({ ...commonConsts.FRAME.CSS.DISABLED_BANNER });
+		// }
+		// $frame.append($closeButton);
 		$format.append($frame);
 
 		// adp.tracker.add(
