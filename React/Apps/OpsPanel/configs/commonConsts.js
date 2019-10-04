@@ -407,6 +407,10 @@ const siteMappingActions = {
 		{
 			value: 'adsolut',
 			label: 'adsolut'
+		},
+		{
+			value: 'appnexus',
+			label: 'appnexus'
 		}
 	],
 	devicesList = [
@@ -597,6 +601,12 @@ const siteMappingActions = {
 			{
 				name: 'zoneId',
 				type: 'string'
+			}
+		],
+		appnexus: [
+			{
+				name: 'placementId',
+				type: 'integer'
 			}
 		]
 	},
