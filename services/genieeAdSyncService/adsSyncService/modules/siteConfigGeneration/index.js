@@ -80,18 +80,18 @@ function generateSiteChannelJSON(channelsWithAds, site) {
 			const userData = docWithCas.value;
 			const { adNetworkSettings = [], firstName, lastName, adServerSettings = {} } = userData;
 			const hasAdNetworkSettings = !!adNetworkSettings.length;
-			let pubId = null;
-			let refreshToken = null;
+			const {
+				dfp: { activeDFPNetwork = false, activeDFPParentId = false, isThirdPartyAdx = false } = {}
+			} = adServerSettings;
 
-			const activeDFPNetwork =
-				adServerSettings && adServerSettings.dfp ? adServerSettings.dfp.activeDFPNetwork : false;
-			const activeDFPParentId =
-				adServerSettings && adServerSettings.dfp ? adServerSettings.dfp.activeDFPParentId : false;
+			let pubId = null;
+			let refreshToken = config.ADPUSHUP_GAM.REFRESH_TOKEN;
 
 			if (activeDFPNetwork && activeDFPParentId) {
 				adpTagsUnsyncedAds.currentDFP = {
 					activeDFPNetwork,
-					activeDFPParentId
+					activeDFPParentId,
+					isThirdPartyDFP: !!(activeDFPNetwork != config.ADPUSHUP_GAM.ACTIVE_DFP_NETWORK)
 				};
 			}
 
@@ -111,7 +111,8 @@ function generateSiteChannelJSON(channelsWithAds, site) {
 				...adpTagsUnsyncedAds.currentDFP,
 				name: `${firstName} ${lastName}`,
 				id: pubId,
-				refreshToken
+				refreshToken,
+				isThirdPartyAdx
 			};
 
 			adsenseUnsyncedAds = { ...adpTagsUnsyncedAds };

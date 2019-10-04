@@ -123,11 +123,13 @@ const commonConsts = {
 					right: 0
 				},
 				LEFT: {
-					left: 0
+					left: 0,
+					'margin-left': '5px'
 					// bottom: 0
 				},
 				RIGHT: {
-					right: 0
+					right: 0,
+					'margin-right': '5px'
 					// bottom: 0
 				}
 			}
