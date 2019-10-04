@@ -76,7 +76,7 @@ const InventoriesTable = ({
 		data={getBody(inventories, selectedInventories, handleInventorySelect)}
 		filterable={false}
 		showPaginationBottom={true}
-		className="-striped -highlight u-padding-h3 u-padding-v2 site-mapping"
+		className="-striped -highlight u-padding-h3 u-padding-v2 inventory-table"
 		pageSizeOptions={[10, 25, 50, 100]}
 		defaultSorting={[
 			{
