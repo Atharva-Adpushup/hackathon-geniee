@@ -63,16 +63,6 @@ function getDefaultPageSize(inventories) {
 	return 50;
 }
 
-const customLabels = {
-	first: '<<',
-	last: '>>',
-	prev: '<',
-	next: '>',
-	show: 'Display',
-	entries: 'rows',
-	noResults: 'There is no data to be displayed'
-};
-
 const InventoriesTable = ({
 	inventories,
 	handleSelectAllInventories,

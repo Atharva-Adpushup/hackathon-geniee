@@ -8,6 +8,7 @@ import CustomButton from '../../../Components/CustomButton';
 import { getHbStatusForSite, toggleHbStatusForSite } from '../../../services/hbService';
 import Loader from '../../../Components/Loader';
 import Spinner from '../../../Components/Spinner';
+import Empty from '../../../Components/Empty/index';
 
 export default class InventoryTab extends React.Component {
 	state = {
@@ -258,15 +259,19 @@ export default class InventoryTab extends React.Component {
 							/>
 						)}
 
-						{filteredInventories && (
-							<InventoriesTable
-								inventories={filteredInventories}
-								selectedInventories={selectedInventories}
-								handleInventorySelect={this.handleInventorySelect}
-								handleSelectAllInventories={this.handleSelectAllInventories}
-								checkedCopy={checkedCopy}
-								selectAll={selectAll}
-							/>
+						{!filteredInventories.length ? (
+							<Empty message="No Data Found" />
+						) : (
+							filteredInventories && (
+								<InventoriesTable
+									inventories={filteredInventories}
+									selectedInventories={selectedInventories}
+									handleInventorySelect={this.handleInventorySelect}
+									handleSelectAllInventories={this.handleSelectAllInventories}
+									checkedCopy={checkedCopy}
+									selectAll={selectAll}
+								/>
+							)
 						)}
 					</div>
 				)}
