@@ -86,12 +86,12 @@ function generateSiteChannelJSON(channelsWithAds, site) {
 
 			let pubId = null;
 			let refreshToken = config.ADPUSHUP_GAM.REFRESH_TOKEN;
-			let isThirdPartyDFP = false;
 
 			if (activeDFPNetwork && activeDFPParentId) {
 				adpTagsUnsyncedAds.currentDFP = {
 					activeDFPNetwork,
-					activeDFPParentId
+					activeDFPParentId,
+					isThirdPartyDFP: !!(activeDFPNetwork != config.ADPUSHUP_GAM.ACTIVE_DFP_NETWORK)
 				};
 			}
 
@@ -106,17 +106,13 @@ function generateSiteChannelJSON(channelsWithAds, site) {
 				});
 			}
 
-			if (activeDFPNetwork && activeDFPNetwork != config.ADPUSHUP_GAM.ACTIVE_DFP_NETWORK)
-				isThirdPartyDFP = true;
-
 			adpTagsUnsyncedAds.publisher = {
 				...adpTagsUnsyncedAds.publisher,
 				...adpTagsUnsyncedAds.currentDFP,
 				name: `${firstName} ${lastName}`,
 				id: pubId,
 				refreshToken,
-				isThirdPartyAdx,
-				isThirdPartyDFP
+				isThirdPartyAdx
 			};
 
 			adsenseUnsyncedAds = { ...adpTagsUnsyncedAds };
