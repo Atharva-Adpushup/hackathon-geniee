@@ -87,8 +87,12 @@ const commonConsts = {
 			DISABLED_BANNER: {
 				height: '20px'
 			},
-			LEFT: {},
-			RIGHT: {},
+			LEFT: {
+				'margin-left': '5px'
+			},
+			RIGHT: {
+				'margin-right': '5px'
+			},
 			BOTTOM: {},
 			TOP: {
 				width: '170px',
