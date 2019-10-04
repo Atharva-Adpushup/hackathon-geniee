@@ -74,7 +74,7 @@ class Component {
 			tracking: false,
 			variationId: !adp.config.manualModeActive ? adp.config.selectedVariation : commonConsts.MANUAL_ADS.VARIATION
 		};
-		let $frame = $('<div />');
+		// let $frame = $('<div />');
 		let newFeedbackAdObj = $.extend({}, this.interactiveAd);
 
 		// New feedback
@@ -87,10 +87,10 @@ class Component {
 		feedbackOptions.ads = [this.interactiveAd.id];
 
 		$format.attr({ id, 'data-section': id, class: '_ap_apex_ad' });
-		$frame.css({
-			...commonConsts.FRAME.CSS.COMMON,
-			...commonConsts.FRAME.CSS[formatData.placement.toUpperCase()]
-		});
+		// $frame.css({
+		// 	...commonConsts.FRAME.CSS.COMMON,
+		// 	...commonConsts.FRAME.CSS[formatData.placement.toUpperCase()]
+		// });
 
 		// if (adp.config.poweredByBanner) {
 		// 	$banner = this.createPoweredByBanner(formatData);
@@ -99,7 +99,7 @@ class Component {
 		// 	$frame.css({ ...commonConsts.FRAME.CSS.DISABLED_BANNER });
 		// }
 		// $frame.append($closeButton);
-		$format.append($frame);
+		// $format.append($frame);
 
 		// adp.tracker.add(
 		// 	$format,
