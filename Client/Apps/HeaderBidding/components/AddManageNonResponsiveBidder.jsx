@@ -223,6 +223,12 @@ class AddManageNonResponsiveBidder extends React.Component {
 		return paramsCountByType;
 	};
 
+	getUniqueInventorySizes = () => {
+		const { inventories } = this.props;
+		const uniqueInventorySizes = [...new Set(inventories.map(inventory => inventory.size))];
+		return uniqueInventorySizes;
+	};
+
 	onSubmit = e => {
 		e.preventDefault();
 
@@ -238,8 +244,12 @@ class AddManageNonResponsiveBidder extends React.Component {
 		if (validationResult.isValid) {
 			this.setState({ errors: {}, formError: '' });
 
+			let mergedParams = {};
+
 			const siteLevelParamsKeys = Object.keys(formFields.params.siteLevel);
 			const siteLevelParamsCount = siteLevelParamsKeys.length;
+			const uniqueInventorySizes = this.getUniqueInventorySizes();
+
 			if (siteLevelParamsCount) {
 				const {
 					requiredVisibleParamsCount,
@@ -256,13 +266,15 @@ class AddManageNonResponsiveBidder extends React.Component {
 				}
 
 				// if only hidden siteLevel params exist and inventory doesn't exist then show error
-				if (!visibleParamsCount && hiddenParamsCount && !sizes.length) {
+
+				if (!visibleParamsCount && hiddenParamsCount && !uniqueInventorySizes.length) {
 					this.setState({
 						formError: 'No inventory found. Please create inventories first.'
 					});
 					return;
 				}
 
+				// if visible params exists and sizes not added
 				if (visibleParamsCount && !sizes.length) {
 					this.setState({
 						formError: 'No inventory found. Please create inventories (or add sizes) first.'
@@ -270,31 +282,49 @@ class AddManageNonResponsiveBidder extends React.Component {
 					return;
 				}
 
-				// if only hidden or optionalVisible siteLevel params and inventory found or sizes added by publisher then add all sizes
+				/**
+				 * # if only hidden params
+				 * # if optionalVisible siteLevel params and inventory found or sizes added by publisher then add all sizes
+				 */
 				if (
 					((!visibleParamsCount && hiddenParamsCount) ||
 						(optionalVisibleParamsCount &&
 							Object.keys(globalParams).length &&
 							!Object.keys(params).length)) &&
-					sizes.length
+					(sizes.length || uniqueInventorySizes.length)
 				) {
 					// add sizes in params if not exist and setState
 					const newParams = { ...params };
-					for (const size of sizes) {
+					const newSizes = sizes.length ? [...sizes] : [...uniqueInventorySizes];
+
+					for (const size of newSizes) {
 						if (!params[size]) newParams[size] = {};
 					}
+
+					mergedParams = { ...newParams };
 					this.setState({ params: newParams });
 				}
 			}
 
-			if (!siteLevelParamsCount && !sizes.length) {
+			if (!siteLevelParamsCount && !uniqueInventorySizes.length) {
 				this.setState({
 					formError: 'No inventory found. Please create inventories first.'
 				});
 				return;
 			}
 
-			const mergedParams = { ...params };
+			if (!siteLevelParamsCount && uniqueInventorySizes.length) {
+				const newParams = { ...params };
+
+				for (const size of uniqueInventorySizes) {
+					if (!params[size]) newParams[size] = {};
+				}
+
+				mergedParams = { ...newParams };
+				this.setState({ params: newParams });
+			}
+
+			if (!Object.keys(mergedParams).length) mergedParams = { ...params };
 
 			if (Object.keys(mergedParams).length) {
 				for (const [size, paramsObj] of Object.entries(mergedParams)) {

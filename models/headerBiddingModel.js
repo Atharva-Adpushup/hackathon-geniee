@@ -331,8 +331,13 @@ function apiModule() {
 												const ad = section.ads[adKey];
 
 												if (ad.network === 'adpTags') {
-													const { headerBidding } = ad.networkData;
+													const {
+														networkData: { headerBidding },
+														width,
+														height
+													} = ad;
 													inventory.headerBidding = headerBidding ? 'Enabled' : 'Disabled';
+													inventory.size = `${width}x${height}`;
 													inventory.adUnit = section.name;
 													inventories.push({ ...inventory });
 												}
@@ -370,9 +375,12 @@ function apiModule() {
 							if (ad.network === 'adpTags') {
 								const {
 									networkData: { headerBidding },
+									width,
+									height,
 									name: adUnit
 								} = ad;
 								inventory.headerBidding = headerBidding ? 'Enabled' : 'Disabled';
+								inventory.size = `${width}x${height}`;
 								inventory.adUnit = adUnit;
 
 								inventories.push({ ...inventory });
@@ -403,9 +411,12 @@ function apiModule() {
 							if (ad.network === 'adpTags') {
 								const {
 									networkData: { headerBidding },
+									width,
+									height,
 									name: adUnit
 								} = ad;
 								inventory.headerBidding = headerBidding ? 'Enabled' : 'Disabled';
+								inventory.size = `${width}x${height}`;
 								inventory.adUnit = adUnit;
 
 								inventories.push({ ...inventory });

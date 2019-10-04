@@ -150,7 +150,7 @@ export default function(state = defaultState, action) {
 			};
 		}
 		case GET_HB_INIT_DATA: {
-			const { siteId, setupStatus, bidders } = action;
+			const { siteId, setupStatus, bidders, inventories } = action;
 
 			return {
 				...state,
@@ -159,7 +159,8 @@ export default function(state = defaultState, action) {
 					[siteId]: {
 						...state.sites[siteId],
 						setupStatus,
-						bidders
+						bidders,
+						inventories
 					}
 				}
 			};
