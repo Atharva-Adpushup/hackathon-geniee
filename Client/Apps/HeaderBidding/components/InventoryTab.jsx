@@ -16,7 +16,9 @@ export default class InventoryTab extends React.Component {
 		selectedInventories: [],
 		hbStatusForSite: null,
 		loadingHbStatusForSite: true,
-		updatingInventoryHbStatus: false
+		updatingInventoryHbStatus: false,
+		checkedCopy: [],
+		selectAll: false
 	};
 
 	componentDidMount() {
@@ -35,39 +37,34 @@ export default class InventoryTab extends React.Component {
 		}
 	}
 
-	handleSelectAllInventories = ({ target: { checked } }) => {
-		this.setState(state => {
-			const { filteredInventories, selectedInventories } = state;
-
-			if (
-				checked &&
-				filteredInventories &&
-				filteredInventories.length !== selectedInventories.length
-			) {
-				return { selectedInventories: [...filteredInventories].map(inventory => inventory.tempId) };
-			}
-
-			if (!checked && selectedInventories.length) {
-				return { selectedInventories: [] };
-			}
-
-			return null;
+	handleSelectAllInventories = () => {
+		const { filteredInventories, selectAll } = this.state;
+		const checked = [];
+		this.setState({ selectAll: !selectAll }, () => {
+			const { selectAll } = this.state;
+			filteredInventories.forEach(() => {
+				checked.push(selectAll);
+			});
+			this.setState({
+				checkedCopy: checked,
+				selectedInventories: this.state.selectAll ? [...filteredInventories] : []
+			});
 		});
 	};
 
-	handleInventorySelect = ({ target: { checked } }, tempId) => {
-		this.setState(state => {
-			if (checked) {
-				if (state.selectedInventories.indexOf(tempId) > -1) return null;
-				return { selectedInventories: [...state.selectedInventories, tempId] };
-			}
-
-			const index = state.selectedInventories.indexOf(tempId);
-			if (index === -1) return null;
-
-			const selectedInventoriesCopy = [...state.selectedInventories];
-			selectedInventoriesCopy.splice(index, 1);
-			return { selectedInventories: selectedInventoriesCopy };
+	handleInventorySelect = (index, e) => {
+		const { selectedInventories, filteredInventories, checkedCopy } = this.state;
+		if (e.target.checked) {
+			checkedCopy[index] = e.target.checked;
+			selectedInventories.push(filteredInventories[index]);
+		} else {
+			checkedCopy[index] = e.target.checked;
+			selectedInventories.splice(selectedInventories.indexOf(filteredInventories[index]), 1);
+		}
+		this.setState({
+			checkedCopy,
+			selectedInventories,
+			selectAll: selectedInventories.length === filteredInventories.length ? true : false
 		});
 	};
 
@@ -92,7 +89,12 @@ export default class InventoryTab extends React.Component {
 			);
 		}
 
-		this.setState({ filteredInventories });
+		this.setState({
+			filteredInventories,
+			selectedInventories: [],
+			checkedCopy: [],
+			selectAll: false
+		});
 	};
 
 	updateInventoriesHbStatus = enableHB => {
@@ -154,7 +156,9 @@ export default class InventoryTab extends React.Component {
 			selectedInventories,
 			hbStatusForSite,
 			loadingHbStatusForSite,
-			updatingInventoryHbStatus
+			updatingInventoryHbStatus,
+			checkedCopy,
+			selectAll
 		} = this.state;
 
 		return (
@@ -260,6 +264,8 @@ export default class InventoryTab extends React.Component {
 								selectedInventories={selectedInventories}
 								handleInventorySelect={this.handleInventorySelect}
 								handleSelectAllInventories={this.handleSelectAllInventories}
+								checkedCopy={checkedCopy}
+								selectAll={selectAll}
 							/>
 						)}
 					</div>

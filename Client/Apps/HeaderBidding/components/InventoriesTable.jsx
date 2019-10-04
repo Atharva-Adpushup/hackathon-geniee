@@ -1,16 +1,55 @@
 import React from 'react';
-import Datatable from 'react-bs-datatable';
+import ReactTable from 'react-table';
 import { Checkbox } from 'react-bootstrap';
 
-function getHeader(handleSelectAllInventories) {
+function getHeader(handleSelectAllInventories, checkedCopy, handleInventorySelect, selectAll) {
 	return [
-		{ title: <Checkbox onChange={handleSelectAllInventories} />, prop: 'checkBox' },
-		{ title: 'Ad Unit', prop: 'adUnit', sortable: true },
-		{ title: 'App', prop: 'app', sortable: true },
-		{ title: 'Device', prop: 'device', sortable: true },
-		{ title: 'PageGroup', prop: 'pageGroup', sortable: true },
-		{ title: 'Variation', prop: 'variationName', sortable: true },
-		{ title: 'HB', prop: 'headerBidding', sortable: true }
+		{
+			Header: (
+				<input
+					type="checkbox"
+					checked={selectAll}
+					onChange={handleSelectAllInventories}
+					style={{ float: 'left' }}
+				/>
+			),
+			Cell: row => (
+				<input
+					type="checkbox"
+					checked={checkedCopy[row.index]}
+					onChange={e => handleInventorySelect(row.index, e)}
+				/>
+			),
+			sortable: false,
+			filterable: false,
+			width: 50,
+			maxWidth: 50,
+			minWidth: 50
+		},
+		{
+			Header: 'Ad Unit',
+			accessor: 'adUnit'
+		},
+		{
+			Header: 'App',
+			accessor: 'app'
+		},
+		{
+			Header: 'Device',
+			accessor: 'device'
+		},
+		{
+			Header: 'PageGroup',
+			accessor: 'pageGroup'
+		},
+		{
+			Header: 'Variation',
+			accessor: 'variationName'
+		},
+		{
+			Header: 'HB',
+			accessor: 'headerBidding'
+		}
 	];
 }
 
@@ -36,6 +75,16 @@ function getBody(inventories, selectedInventories, handleInventorySelect) {
 	});
 }
 
+function getDefaultPageSize(inventories) {
+	const { length } = inventories;
+
+	if (length <= 5) return 5;
+	else if (length <= 10) return 10;
+	else if (length <= 20) return 20;
+	else if (length <= 50) return 50;
+	return 50;
+}
+
 const customLabels = {
 	first: '<<',
 	last: '>>',
@@ -50,17 +99,24 @@ const InventoriesTable = ({
 	inventories,
 	handleSelectAllInventories,
 	handleInventorySelect,
-	selectedInventories
+	selectedInventories,
+	checkedCopy,
+	selectAll
 }) => (
-	<Datatable
-		tableHeader={getHeader(handleSelectAllInventories)}
-		tableBody={getBody(inventories, selectedInventories, handleInventorySelect)}
-		keyName="userTable"
-		tableClass="striped hover responsive"
-		rowsPerPage={10}
-		rowsPerPageOption={[10, 25, 50, 100]}
-		initialSort={{ prop: 'adUnit', isAscending: true }}
-		labels={customLabels}
+	<ReactTable
+		columns={getHeader(handleSelectAllInventories, checkedCopy, handleInventorySelect, selectAll)}
+		data={getBody(inventories, selectedInventories, handleInventorySelect)}
+		filterable={false}
+		showPaginationBottom={true}
+		className="-striped -highlight u-padding-h3 u-padding-v2 site-mapping"
+		pageSizeOptions={[10, 25, 50, 100]}
+		defaultSorting={[
+			{
+				id: 'adUnit',
+				desc: false
+			}
+		]}
+		pageSize={getDefaultPageSize(inventories)}
 	/>
 );
 
