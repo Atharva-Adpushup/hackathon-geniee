@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactTable from 'react-table';
 import { Checkbox } from 'react-bootstrap';
+import { INVENTORY_TABLE_COLUMNS } from '../constants/index';
 
 function getHeader(handleSelectAllInventories, checkedCopy, handleInventorySelect, selectAll) {
 	return [
@@ -26,30 +27,7 @@ function getHeader(handleSelectAllInventories, checkedCopy, handleInventorySelec
 			maxWidth: 50,
 			minWidth: 50
 		},
-		{
-			Header: 'Ad Unit',
-			accessor: 'adUnit'
-		},
-		{
-			Header: 'App',
-			accessor: 'app'
-		},
-		{
-			Header: 'Device',
-			accessor: 'device'
-		},
-		{
-			Header: 'PageGroup',
-			accessor: 'pageGroup'
-		},
-		{
-			Header: 'Variation',
-			accessor: 'variationName'
-		},
-		{
-			Header: 'HB',
-			accessor: 'headerBidding'
-		}
+		...INVENTORY_TABLE_COLUMNS
 	];
 }
 
