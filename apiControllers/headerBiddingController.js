@@ -544,10 +544,11 @@ router
 						.catch(() => false),
 					siteModel.isInventoryExist(siteId).catch(() => false),
 					headerBiddingModel.getMergedBidders(siteId),
+					headerBiddingModel.getInventoriesForHB(siteId),
 					user
 				)
 			)
-			.then(([biddersFound, inventoryFound, mergedBidders, user]) => {
+			.then(([biddersFound, inventoryFound, mergedBidders, hbInventories, user]) => {
 				const activeAdServerData = user.getActiveAdServerData('dfp');
 				const isValidAdServer = !!activeAdServerData && !!activeAdServerData.activeDFPNetwork;
 				const isAdpushupDfp =
@@ -574,7 +575,8 @@ router
 						isPublisherActiveDfp,
 						adServerSetupStatus
 					},
-					bidders: mergedBidders
+					bidders: mergedBidders,
+					inventories: hbInventories
 				});
 			})
 			.catch(err => {
