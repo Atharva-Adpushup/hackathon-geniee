@@ -61,7 +61,9 @@ class Component {
 			window.adpushup.executeAdpTagsHeadCode([this.interactiveAd], {}); // This function expects an array of adpTags and optional adpKeyValues
 		}
 
-		let css = { width, height: parseInt(height) + POWERED_BY_BANNER.HEIGHT, ...customCSS };
+		// let css = { width, height: parseInt(height) + POWERED_BY_BANNER.HEIGHT, ...customCSS };
+		let css = { width, height: parseInt(height), ...customCSS };
+
 		let $format = $('<div />');
 		// let $banner = null;
 		// let $closeButton = this.createCloseButton(formatData);
