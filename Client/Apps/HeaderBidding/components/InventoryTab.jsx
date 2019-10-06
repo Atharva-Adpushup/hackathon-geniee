@@ -23,9 +23,8 @@ export default class InventoryTab extends React.Component {
 	};
 
 	componentDidMount() {
-		const { siteId, fetchInventoriesAction } = this.props;
+		const { siteId } = this.props;
 
-		fetchInventoriesAction(siteId);
 		getHbStatusForSite(siteId).then(({ headerBidding: hbStatusForSite }) => {
 			this.setState({ hbStatusForSite, loadingHbStatusForSite: false });
 		});

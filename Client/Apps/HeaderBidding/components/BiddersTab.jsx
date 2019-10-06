@@ -45,7 +45,8 @@ export default class BiddersTab extends React.Component {
 			addBidderAction,
 			updateBidderAction,
 			showNotification,
-			domain
+			domain,
+			inventories
 		} = this.props;
 
 		return (
@@ -61,6 +62,7 @@ export default class BiddersTab extends React.Component {
 							addBidderAction={addBidderAction}
 							openView={this.openView}
 							showNotification={showNotification}
+							inventories={inventories}
 						/>
 					)) ||
 					(currView === 'manageBidder' && (
@@ -70,6 +72,7 @@ export default class BiddersTab extends React.Component {
 							updateBidderAction={updateBidderAction}
 							openView={this.openView}
 							showNotification={showNotification}
+							inventories={inventories}
 						/>
 					)))) || <Loader />
 		);

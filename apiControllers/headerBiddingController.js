@@ -119,10 +119,18 @@ router
 				.then(hbConfig => {
 					const isVideo = hbConfig.get('prebidConfig').formats.indexOf('video') !== -1;
 					if (isVideo) {
-						bidderConfig.config = headerBiddingModel.addVideoParams(key, bidderConfig.config);
+						bidderConfig.config = headerBiddingModel.addVideoParams(
+							key,
+							bidderConfig.config,
+							bidderConfig.sizeLess
+						);
 					}
 					if (!isVideo) {
-						bidderConfig.config = headerBiddingModel.removeVideoParams(key, bidderConfig.config);
+						bidderConfig.config = headerBiddingModel.removeVideoParams(
+							key,
+							bidderConfig.config,
+							bidderConfig.sizeLess
+						);
 					}
 
 					return hbConfig.saveBidderConfig(key, bidderConfig);
@@ -346,7 +354,8 @@ router
 						if (bidders.hasOwnProperty(bidderCode)) {
 							const newParams = headerBiddingModel.addVideoParams(
 								bidderCode,
-								bidders[bidderCode].config
+								bidders[bidderCode].config,
+								bidders[bidderCode].sizeLess
 							);
 
 							bidders[bidderCode].config = newParams;
@@ -361,7 +370,8 @@ router
 						if (bidders.hasOwnProperty(bidderCode)) {
 							bidders[bidderCode].config = headerBiddingModel.removeVideoParams(
 								bidderCode,
-								bidders[bidderCode].config
+								bidders[bidderCode].config,
+								bidders[bidderCode].sizeLess
 							);
 						}
 					}
@@ -534,10 +544,11 @@ router
 						.catch(() => false),
 					siteModel.isInventoryExist(siteId).catch(() => false),
 					headerBiddingModel.getMergedBidders(siteId),
+					headerBiddingModel.getInventoriesForHB(siteId),
 					user
 				)
 			)
-			.then(([biddersFound, inventoryFound, mergedBidders, user]) => {
+			.then(([biddersFound, inventoryFound, mergedBidders, hbInventories, user]) => {
 				const activeAdServerData = user.getActiveAdServerData('dfp');
 				const isValidAdServer = !!activeAdServerData && !!activeAdServerData.activeDFPNetwork;
 				const isAdpushupDfp =
@@ -564,7 +575,8 @@ router
 						isPublisherActiveDfp,
 						adServerSetupStatus
 					},
-					bidders: mergedBidders
+					bidders: mergedBidders,
+					inventories: hbInventories
 				});
 			})
 			.catch(err => {

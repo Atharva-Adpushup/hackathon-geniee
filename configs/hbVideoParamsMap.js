@@ -25,13 +25,15 @@ module.exports = {
 	},
 	pubmatic: {
 		params: {
-			mimes: ['video/mp4', 'video/x-flv'],
-			skippable: false,
-			minduration: 0,
-			maxduration: 60,
-			playbackmethod: 2,
-			api: [1, 2, 3, 4, 5],
-			protocols: [1, 2, 3, 4, 5, 6]
+			video: {
+				mimes: ['video/mp4', 'video/x-flv'],
+				skippable: false,
+				minduration: 0,
+				maxduration: 60,
+				playbackmethod: 2,
+				api: [1, 2, 3, 4, 5],
+				protocols: [1, 2, 3, 4, 5, 6]
+			}
 		}
 	}
 };

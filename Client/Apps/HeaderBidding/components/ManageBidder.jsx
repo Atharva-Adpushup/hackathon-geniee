@@ -41,7 +41,7 @@ export default class ManageBidder extends React.Component {
 	};
 
 	render() {
-		const { bidderConfig, siteId, showNotification } = this.props;
+		const { bidderConfig, siteId, showNotification, inventories } = this.props;
 
 		return (
 			<div className="options-wrapper white-tab-container hb-bidder hb-manage-bidder">
@@ -72,6 +72,7 @@ export default class ManageBidder extends React.Component {
 								openBiddersListView={this.openBiddersListView}
 								onBidderUpdate={this.onBidderUpdate}
 								showNotification={showNotification}
+								inventories={inventories}
 							/>
 						)}
 					</Col>
