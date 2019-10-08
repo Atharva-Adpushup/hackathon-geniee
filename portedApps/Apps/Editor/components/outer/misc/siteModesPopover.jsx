@@ -31,7 +31,7 @@ class siteModesPopover extends React.Component {
 	}
 
 	componentWillReceiveProps(nextProps) {
-		console.log(nextProps);
+		this.checkLiveStatus();
 		this.checkApStatus(nextProps);
 	}
 
@@ -70,18 +70,27 @@ class siteModesPopover extends React.Component {
 
 	checkLiveStatus() {
 		const self = this;
-		return window
-			.fetch(`/api/site/live`)
-			.then(response => response.json())
-			.then(response => {})
+		return Utils.ajax({
+			method: 'GET',
+			url: '/api/site/live',
+			data: {
+				siteId: window.ADP_SITE_ID
+			}
+		})
+			.then(response => {
+				const { data = {} } = response;
+				self.setState(state => ({
+					...state,
+					...data
+				}));
+			})
 			.catch(err => {
-				console.log(err);
+				const { data = {} } = err;
 				self.setState(
-					{
-						gamStatus: false,
-						adsTxtStatus: false,
-						adsenseStatus: false
-					},
+					state => ({
+						...state,
+						...data
+					}),
 					() => window.alert('Site live status check fail. Please try again later.')
 				);
 			});
