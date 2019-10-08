@@ -21,7 +21,7 @@ function getPrebidModules(hbcf) {
 	const modules = new Set();
 
 	for (const bidderCode of Object.keys(hbConfig)) {
-		const adpater = PREBID_ADAPTERS[bidderCode];
+		const adpater = hbConfig[bidderCode].adapter;
 		adpater ? modules.add(adpater) : console.log(`Prebid Adapter not found for ${bidderCode}`);
 	}
 
@@ -39,7 +39,7 @@ function gdprProcessing(site) {
 	};
 }
 
-function getActiveUsedBidders(usedBidders, biddersFromNetworkTree) {
+function getActiveUsedBiddersWithAdapter(usedBidders, biddersFromNetworkTree) {
 	const activeUsedBidders = {};
 	for (const bidderCode in usedBidders) {
 		if (
@@ -49,6 +49,7 @@ function getActiveUsedBidders(usedBidders, biddersFromNetworkTree) {
 			biddersFromNetworkTree[bidderCode].isActive
 		) {
 			activeUsedBidders[bidderCode] = usedBidders[bidderCode];
+			activeUsedBidders[bidderCode].adapter = biddersFromNetworkTree[bidderCode].adapter;
 		}
 	}
 
@@ -89,7 +90,7 @@ function HbProcessing(site, apConfigs) {
 				};
 			}
 
-			hbcf.value.hbcf = getActiveUsedBidders(hbcf.value.hbcf, biddersFromNetworkTree);
+			hbcf.value.hbcf = getActiveUsedBiddersWithAdapter(hbcf.value.hbcf, biddersFromNetworkTree);
 
 			const adServerSettings = user.get('adServerSettings');
 			const isValidCurrencyCnfg =

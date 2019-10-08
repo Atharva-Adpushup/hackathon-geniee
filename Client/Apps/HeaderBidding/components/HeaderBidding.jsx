@@ -19,7 +19,16 @@ class HeaderBidding extends React.Component {
 	};
 
 	componentDidMount() {
+		const {
+			fetchHBInitDataAction,
+			match: {
+				params: { siteId }
+			}
+		} = this.props;
+
 		this.handleDefaultTabWrapper(null, true);
+
+		fetchHBInitDataAction(siteId);
 
 		window.addEventListener('beforeunload', this.handleTabClose);
 	}
@@ -72,16 +81,12 @@ class HeaderBidding extends React.Component {
 				params: { siteId },
 				url
 			},
-			setupStatus,
-			fetchHBInitDataAction
+			setupStatus
 		} = this.props;
 
 		if (setupStatus && !isFirstLoad) {
 			this.handleDefaultTab(url, siteId, prevSetupStatus);
-			return;
 		}
-
-		fetchHBInitDataAction(siteId);
 	};
 
 	handleDefaultTab = (url, siteId, prevSetupStatus) => {
@@ -205,7 +210,6 @@ class HeaderBidding extends React.Component {
 			addBidderAction,
 			updateBidderAction,
 			inventories,
-			fetchInventoriesAction,
 			updateInventoriesHbStatus,
 			showNotification,
 			setUnsavedChangesAction
@@ -237,6 +241,7 @@ class HeaderBidding extends React.Component {
 							addBidderAction={addBidderAction}
 							updateBidderAction={updateBidderAction}
 							showNotification={showNotification}
+							inventories={inventories}
 						/>
 					);
 				case 'inventory':
@@ -244,7 +249,6 @@ class HeaderBidding extends React.Component {
 						<InventoryTab
 							siteId={siteId}
 							inventories={inventories}
-							fetchInventoriesAction={fetchInventoriesAction}
 							updateInventoriesHbStatus={updateInventoriesHbStatus}
 							showNotification={showNotification}
 							setUnsavedChangesAction={setUnsavedChangesAction}

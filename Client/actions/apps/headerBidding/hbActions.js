@@ -25,8 +25,8 @@ export const checkInventoryAction = siteId => dispatch =>
 export const fetchHBInitDataAction = siteId => dispatch =>
 	service
 		.getHBInitData(siteId)
-		.then(({ data: { setupStatus, bidders } }) =>
-			dispatch({ type: GET_HB_INIT_DATA, siteId, setupStatus, bidders })
+		.then(({ data: { setupStatus, bidders, inventories } }) =>
+			dispatch({ type: GET_HB_INIT_DATA, siteId, setupStatus, bidders, inventories })
 		)
 		.catch(err => {
 			// eslint-disable-next-line no-console

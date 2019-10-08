@@ -105,7 +105,8 @@ var auction = {
 			bidderSequence: constants.PREBID.BIDDER_SEQUENCE,
 			priceGranularity: constants.PREBID.PRICE_GRANULARITY,
 			sizeConfig: this.getSizeConfig(),
-			currency: config.PREBID_CONFIG.currencyConfig
+			currency: config.PREBID_CONFIG.currencyConfig,
+			useBidCache: true
 		};
 
 		pbjs.setConfig(pbConfig);

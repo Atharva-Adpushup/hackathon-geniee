@@ -65,7 +65,8 @@ class Component {
 			window.adpushup.executeAdpTagsHeadCode([this.interactiveAd], {}); // This function expects an array of adpTags and optional adpKeyValues
 		}
 
-		const css = { width, height: parseInt(height) + POWERED_BY_BANNER.HEIGHT, ...customCSS };
+		// const css = { width, height: parseInt(height) + POWERED_BY_BANNER.HEIGHT, ...customCSS };
+		const css = { width, height: parseInt(height), ...customCSS };
 		const $format = $('<div />');
 
 		// uncomment the below when re-thinking poweredByAdPushup logic
