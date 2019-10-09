@@ -131,9 +131,11 @@ class siteModesPopover extends React.Component {
 				return 'AdPushup Ads.txt entries not found';
 			case 3:
 				return 'Some entries are missing';
-			default:
 			case 4:
 				return "Cannot find publisher's ads.txt";
+			default:
+			case 5:
+				return 'Ads.txt status invalid. You can bypass using the checkbox below.';
 		}
 	}
 
@@ -186,7 +188,7 @@ class siteModesPopover extends React.Component {
 					checked={isAdsTxtValid}
 					data-key="adsTxtStatus"
 					onChange={() => {
-						const value = adsTxtStatus == 1 ? 2 : 1;
+						const value = adsTxtStatus == 1 ? 5 : 1;
 						this.setState(state => ({ ...state, adsTxtStatus: value }));
 					}}
 				/>
