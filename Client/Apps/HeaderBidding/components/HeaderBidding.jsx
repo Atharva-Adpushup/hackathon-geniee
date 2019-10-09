@@ -174,7 +174,7 @@ class HeaderBidding extends React.Component {
 				break;
 
 			case 3:
-				if (!(!isAdpushupDfp && (!dfpConnected || adServerSetupStatus !== 2)) || !inventoryFound)
+				if ((!isAdpushupDfp && (!dfpConnected || adServerSetupStatus !== 2)) || !inventoryFound)
 					return false;
 				redirectUrl = `${computedRedirectUrl}/${NAV_ITEMS_INDEXES.TAB_3}`;
 				break;
@@ -304,7 +304,7 @@ class HeaderBidding extends React.Component {
 					<NavItem
 						eventKey={3}
 						className={
-							!(!isAdpushupDfp && (!dfpConnected || adServerSetupStatus !== 2)) || !inventoryFound
+							(!isAdpushupDfp && (!dfpConnected || adServerSetupStatus !== 2)) || !inventoryFound
 								? 'disabled'
 								: ''
 						}
