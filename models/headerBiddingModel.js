@@ -168,7 +168,7 @@ function apiModule() {
 		removeVideoParams(bidderCode, bidderParams, isSizeLess) {
 			bidderParams = { ...bidderParams };
 
-			if (hbVideoParamsMap[bidderCode]) return bidderParams;
+			if (!hbVideoParamsMap[bidderCode]) return bidderParams;
 
 			if (!isSizeLess) {
 				for (const size in bidderParams) {
