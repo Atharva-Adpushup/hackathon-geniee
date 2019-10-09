@@ -20,6 +20,9 @@ class siteModesPopover extends React.Component {
 		};
 		this.showGuider = this.showGuider.bind(this);
 		this.checkLiveStatus = this.checkLiveStatus.bind(this);
+		this.renderGAMPanel = this.renderGAMPanel.bind(this);
+		this.handleStatusOnChange = this.handleStatusOnChange.bind(this);
+		this.computeAdsTxtStatusLabel = this.computeAdsTxtStatusLabel.bind(this);
 	}
 
 	checkPartnerGeniee(props) {
@@ -110,10 +113,28 @@ class siteModesPopover extends React.Component {
 		return positionObj;
 	}
 
-	handleControlStatusOnChange() {
+	handleStatusOnChange(e) {
+		const { target } = e;
+		const key = target.getAttribute('data-key');
+		const value = this.state[key];
+
 		this.setState({
-			controlStatus: !this.state.controlStatus
+			[key]: !value
 		});
+	}
+
+	computeAdsTxtStatusLabel(value) {
+		switch (value) {
+			case 1:
+				return 'All Good';
+			case 2:
+				return 'AdPushup Ads.txt entries not found';
+			case 3:
+				return 'Some entries are missing';
+			default:
+			case 4:
+				return "Cannot find publisher's ads.txt";
+		}
 	}
 
 	renderAdPushupSnippetPanel() {
@@ -142,12 +163,84 @@ class siteModesPopover extends React.Component {
 		);
 	}
 
+	renderAdsTxtPanel() {
+		const { adsTxtStatus } = this.state;
+		const isAdsTxtValid = adsTxtStatus == 1;
+
+		console.log(adsTxtStatus);
+
+		return (
+			<Panel
+				header="AdsTxt Setup"
+				className={isAdsTxtValid ? 'completed' : 'notcompleted'}
+				eventKey={6}
+			>
+				<div>
+					AdsTxt is required for proper functioning. Current AdsTxt Status:{' '}
+					<strong>{this.computeAdsTxtStatusLabel(adsTxtStatus)}</strong>
+				</div>
+				<input
+					type="checkbox"
+					className="maincheckbox"
+					id="adsTxtSetupCheckbox"
+					checked={isAdsTxtValid}
+					data-key="adsTxtStatus"
+					onChange={() => {
+						const value = adsTxtStatus == 1 ? 2 : 1;
+						this.setState(state => ({ ...state, adsTxtStatus: value }));
+					}}
+				/>
+				<label htmlFor="adsTxtSetupCheckbox">Yes, I understand what I am doing.</label>
+			</Panel>
+		);
+	}
+
+	renderAdsensePanel() {
+		const { adsenseStatus } = this.state;
+
+		return (
+			<Panel
+				header="Adsense Setup"
+				className={adsenseStatus ? 'completed' : 'notcompleted'}
+				eventKey={5}
+			>
+				<div>
+					If you are using Adsense as demand partner and wish to ads sync automatically in the
+					Adsense Panel then it is mandatory to add Adsense Publisher Id in the Admin Panel. You can
+					bypass this validation by checking the box below.
+					<br />
+				</div>
+				<input
+					type="checkbox"
+					className="maincheckbox"
+					id="adsenseSetupCheckbox"
+					checked={adsenseStatus}
+					data-key="adsenseStatus"
+					onChange={this.handleStatusOnChange}
+				/>
+				<label htmlFor="adsenseSetupCheckbox">Yes, I understand what I am doing.</label>
+			</Panel>
+		);
+	}
+
+	renderGAMPanel() {
+		const { gamStatus } = this.state;
+		return (
+			<Panel header="GAM Status" className={gamStatus ? 'completed' : 'notcompleted'} eventKey={4}>
+				<div>
+					We can't optimize your site if Google AdManager isn't selected! Please connect AdPushup
+					Operations Team.
+				</div>
+			</Panel>
+		);
+	}
+
 	renderControlTagsConversionPanel() {
 		return (
 			<Panel
 				header="Control Ad Setup"
 				className={this.state.controlStatus ? 'completed' : 'notcompleted'}
-				eventKey={4}
+				eventKey={3}
 			>
 				<div>
 					We strongly recommend setting up Control Ads on your site. They can help you track
@@ -165,8 +258,9 @@ class siteModesPopover extends React.Component {
 					type="checkbox"
 					className="maincheckbox"
 					id="ctrlconverted"
+					data-key="controlStatus"
+					onChange={this.handleStatusOnChange}
 					checked={this.state.controlStatus}
-					onChange={this.handleControlStatusOnChange.bind(this)}
 				/>
 				<label htmlFor="ctrlconverted">
 					Yes, I understand what control ads are, and have set them up.
@@ -187,27 +281,35 @@ class siteModesPopover extends React.Component {
 			width: '300px'
 		};
 		const isPartnerGeniee = this.checkPartnerGeniee();
-		const isNotPendingStatus = this.state.apStatus !== status.PENDING;
-		const allDone =
-			this.props.url && this.state.apStatus === status.SUCCESS && this.state.controlStatus;
+		const { url, mode, isVisible, hideMenu } = this.props;
+		const { apStatus, controlStatus, adsenseStatus, gamStatus, adsTxtStatus } = this.state;
 
-		if (!this.props.isVisible) {
+		const isNotPendingStatus = apStatus !== status.PENDING;
+		const allDone =
+			url &&
+			apStatus === status.SUCCESS &&
+			controlStatus &&
+			adsenseStatus &&
+			gamStatus &&
+			adsTxtStatus == 1;
+
+		if (!isVisible) {
 			return null;
 		}
 
-		if (this.props.mode === siteModes.PUBLISH) {
+		if (mode === siteModes.PUBLISH) {
 			setTimeout(() => {
 				if (confirm('Do you wish to pause AdPushup ?')) {
 					this.masterSave(siteModes.DRAFT);
 				} else {
-					this.props.hideMenu();
+					hideMenu();
 				}
 			}, 0);
 
 			return null;
 		}
 
-		if (this.props.mode === siteModes.DRAFT && allDone && isNotPendingStatus) {
+		if (mode === siteModes.DRAFT && allDone && isNotPendingStatus) {
 			setTimeout(() => {
 				this.masterSave(siteModes.PUBLISH);
 			}, 0);
@@ -240,6 +342,9 @@ class siteModesPopover extends React.Component {
 							</Panel>
 							{isPartnerGeniee ? null : this.renderAdPushupSnippetPanel()}
 							{isPartnerGeniee ? null : this.renderControlTagsConversionPanel()}
+							{this.renderGAMPanel()}
+							{this.renderAdsensePanel()}
+							{this.renderAdsTxtPanel()}
 						</Accordion>
 					</div>
 				</div>
