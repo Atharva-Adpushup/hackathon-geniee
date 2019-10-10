@@ -6,9 +6,14 @@ import Empty from '../../../../Components/Empty/index';
 import { domanize } from '../../../../helpers/commonFunctions';
 
 class Sites extends Component {
-	state = {
-		activeKey: null
-	};
+	constructor(props) {
+		super(props);
+		const { sites = [] } = props;
+		const activeKey = Object.keys(sites)[0] || null;
+		this.state = {
+			activeKey
+		};
+	}
 
 	handleSelect = value => {
 		this.setState({
