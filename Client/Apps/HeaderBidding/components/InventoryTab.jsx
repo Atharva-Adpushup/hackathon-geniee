@@ -43,7 +43,7 @@ export default class InventoryTab extends React.Component {
 				filteredInventories &&
 				filteredInventories.length !== selectedInventories.length
 			) {
-				return { selectedInventories: [...filteredInventories].map(inventory => inventory.tempId) };
+				return { selectedInventories: [...filteredInventories].map(inventory => inventory.adUnit) };
 			}
 
 			if (!checked && selectedInventories.length) {
@@ -54,14 +54,14 @@ export default class InventoryTab extends React.Component {
 		});
 	};
 
-	handleInventorySelect = ({ target: { checked } }, tempId) => {
+	handleInventorySelect = ({ target: { checked } }, adUnit) => {
 		this.setState(state => {
 			if (checked) {
-				if (state.selectedInventories.indexOf(tempId) > -1) return null;
-				return { selectedInventories: [...state.selectedInventories, tempId] };
+				if (state.selectedInventories.indexOf(adUnit) > -1) return null;
+				return { selectedInventories: [...state.selectedInventories, adUnit] };
 			}
 
-			const index = state.selectedInventories.indexOf(tempId);
+			const index = state.selectedInventories.indexOf(adUnit);
 			if (index === -1) return null;
 
 			const selectedInventoriesCopy = [...state.selectedInventories];
@@ -108,7 +108,7 @@ export default class InventoryTab extends React.Component {
 		const inventoriesToUpdate = [];
 
 		for (const inventory of inventories) {
-			if (selectedInventories.indexOf(inventory.tempId) > -1) {
+			if (selectedInventories.indexOf(inventory.adUnit) > -1) {
 				inventoriesToUpdate.push({
 					...inventory,
 					headerBidding: enableHB ? 'Enabled' : 'Disabled'
