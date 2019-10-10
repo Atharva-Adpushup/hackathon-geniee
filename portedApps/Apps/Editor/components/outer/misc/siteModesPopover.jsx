@@ -169,8 +169,6 @@ class siteModesPopover extends React.Component {
 		const { adsTxtStatus } = this.state;
 		const isAdsTxtValid = adsTxtStatus == 1;
 
-		console.log(adsTxtStatus);
-
 		return (
 			<Panel
 				header="AdsTxt Setup"
