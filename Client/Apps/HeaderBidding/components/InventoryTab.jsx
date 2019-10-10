@@ -20,10 +20,14 @@ export default class InventoryTab extends React.Component {
 	};
 
 	componentDidMount() {
-		const { siteId } = this.props;
+		const { siteId, inventories } = this.props;
+		const { filteredInventories } = this.state;
 
 		getHbStatusForSite(siteId).then(({ headerBidding: hbStatusForSite }) => {
-			this.setState({ hbStatusForSite, loadingHbStatusForSite: false });
+			const newState = { hbStatusForSite, loadingHbStatusForSite: false };
+			if (!filteredInventories && inventories) newState.filteredInventories = inventories;
+
+			this.setState(newState);
 		});
 	}
 
