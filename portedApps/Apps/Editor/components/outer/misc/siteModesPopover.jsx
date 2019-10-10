@@ -152,15 +152,7 @@ class siteModesPopover extends React.Component {
 				}
 				eventKey={2}
 			>
-				<div>
-					We can't optimize your site if AdPushup snippet isn't installed! :){' '}
-					<a
-						className="btn btn-sm btn-lightBg publishHelperhelp"
-						onClick={this.showGuider.bind(null, components.ADPUSHUP_INSTALLATION_GUIDER)}
-					>
-						Read more
-					</a>
-				</div>
+				<div>We can't optimize your site if AdPushup snippet isn't installed! :) </div>
 			</Panel>
 		);
 	}
@@ -246,13 +238,6 @@ class siteModesPopover extends React.Component {
 					We strongly recommend setting up Control Ads on your site. They can help you track
 					AdPushup performance, act as fallback in case of failure and much more. Please take a
 					moment out to understand them.
-					<a
-						className="btn btn-sm btn-lightBg publishHelperhelp"
-						onClick={this.showGuider.bind(null, components.CONTROL_CONVERSION_GUIDER)}
-					>
-						Read more
-					</a>
-					<br />
 				</div>
 				<input
 					type="checkbox"
@@ -330,15 +315,7 @@ class siteModesPopover extends React.Component {
 								className={this.props.url ? 'completed' : 'notcompleted'}
 								eventKey={1}
 							>
-								<div>
-									You should have at least one Page Group set up.
-									<a
-										className="btn btn-sm btn-lightBg publishHelperhelp"
-										onClick={this.showGuider.bind(null, components.PAGE_GROUP_GUIDER)}
-									>
-										Read more
-									</a>
-								</div>
+								<div>You should have at least one Page Group set up.</div>
 							</Panel>
 							{isPartnerGeniee ? null : this.renderAdPushupSnippetPanel()}
 							{isPartnerGeniee ? null : this.renderControlTagsConversionPanel()}
