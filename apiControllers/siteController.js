@@ -9,6 +9,7 @@ const schema = require('../helpers/schema');
 const CC = require('../configs/commonConsts');
 const HTTP_STATUS = require('../configs/httpStatusConsts');
 const FormValidator = require('../helpers/FormValidator');
+const AdPushupError = require('../helpers/AdPushupError');
 const { sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFunctions');
 const {
 	verifyOwner,
@@ -17,6 +18,7 @@ const {
 	errorHandler,
 	checkParams
 } = require('../helpers/routeHelpers');
+const proxy = require('../helpers/proxy');
 
 const router = express.Router();
 
@@ -27,6 +29,79 @@ const router = express.Router();
 // });
 
 router
+	.get('/live', (req, res) => {
+		const { email } = req.user;
+		const { siteId } = req.query;
+		const response = {
+			gamStatus: true,
+			adsTxtStatus: 1, // 1: All Good | 2: Not Found | 3: Some are missing | 4: Ads Txt not present
+			adsenseStatus: true
+		};
+
+		function adsTxtProcessing(domain) {
+			return proxy
+				.fetchOurAdsTxt()
+				.then(ourAdsTxt => proxy.verifyAdsTxt(domain, ourAdsTxt))
+				.then(() => {
+					response.adsTxtStatus = true;
+					return true;
+				})
+				.catch(err => {
+					if (err instanceof AdPushupError) {
+						const {
+							message: { httpCode = 404 }
+						} = err;
+						switch (httpCode) {
+							case 204:
+								response.adsTxtStatus = 2;
+								break;
+							case 206:
+								response.adsTxtStatus = 3;
+								break;
+							default:
+							case 404:
+								response.adsTxtStatus = 4;
+								break;
+						}
+						return true;
+					}
+					return Promise.reject(err);
+				});
+		}
+
+		return checkParams(['siteId'], req, 'get')
+			.then(() => verifyOwner(siteId, email))
+			.then(site => {
+				const domain = site.get('siteDomain');
+				return Promise.join(userModel.getUserByEmail(email), adsTxtProcessing(domain), user => {
+					const { dfp: { activeDFPNetwork = false } = {} } = user.get('adServerSettings');
+					const adNetworkSettings = user.get('adNetworkSettings') || [];
+					const { pubId = false } = adNetworkSettings.length ? adNetworkSettings[0] : {};
+
+					if (!activeDFPNetwork) response.gamStatus = false;
+					if (!pubId) response.adsenseStatus = false;
+				});
+			})
+			.then(() =>
+				sendSuccessResponse(
+					{
+						...response
+					},
+					res
+				)
+			)
+			.catch(err => {
+				console.log(err);
+				return sendErrorResponse(
+					{
+						gamStatus: false,
+						adsTxtStatus: 4,
+						adsenseStatus: false
+					},
+					res
+				);
+			});
+	})
 	.post('/create', (req, res) => {
 		// siteDomain
 		const json = req.body;

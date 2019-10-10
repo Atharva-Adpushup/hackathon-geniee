@@ -11,10 +11,12 @@ router
 			.detectCustomAp(req.query.url, req.query.siteId)
 			.then(result =>
 				result
-					? res.status(httpStatus.OK).json({ success: 'Adpushup Code not found!' })
-					: res.status(httpStatus.NOT_FOUND).json({ error: 'Adpushup Code not found!' })
+					? res.status(httpStatus.OK).json({ success: 'Adpushup Code found!', ap: result })
+					: res.status(httpStatus.NOT_FOUND).json({ error: 'Adpushup Code not found!', ap: result })
 			)
-			.catch(() => res.status(httpStatus.NOT_FOUND).json({ error: 'Adpushup Code not found!' }))
+			.catch(() =>
+				res.status(httpStatus.NOT_FOUND).json({ error: 'Adpushup Code not found!', ap: false })
+			)
 	)
 	.get('/verifyAdsTxt', (req, res) =>
 		proxy
