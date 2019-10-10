@@ -23,19 +23,48 @@ export default class InventoryTab extends React.Component {
 		const { siteId, inventories } = this.props;
 		const { filteredInventories } = this.state;
 
+		const inventoriesCopy = JSON.parse(JSON.stringify(inventories));
+
 		getHbStatusForSite(siteId).then(({ headerBidding: hbStatusForSite }) => {
 			const newState = { hbStatusForSite, loadingHbStatusForSite: false };
-			if (!filteredInventories && inventories) newState.filteredInventories = inventories;
+			if (!filteredInventories && inventories) newState.filteredInventories = inventoriesCopy;
 
 			this.setState(newState);
 		});
 	}
 
 	componentWillReceiveProps({ inventories }) {
+		const inventoriesCopy = JSON.parse(JSON.stringify(inventories));
 		const { filteredInventories } = this.state;
 		if (!filteredInventories && inventories) {
-			this.setState({ filteredInventories: inventories });
+			return this.setState({ filteredInventories: inventoriesCopy });
 		}
+		if (filteredInventories && inventories) {
+			const { updated, updatedFilteredInventories } = this.getUpdatedFilteredInventories(
+				inventoriesCopy
+			);
+
+			if (updated) return this.setState({ filteredInventories: updatedFilteredInventories });
+		}
+	}
+
+	getUpdatedFilteredInventories(inventories) {
+		const { filteredInventories } = this.state;
+		let updated = false;
+
+		const updatedFilteredInventories = filteredInventories.map(filteredInventory => {
+			const matchedInventory = inventories.find(
+				inventory => inventory.adUnit === filteredInventory.adUnit
+			);
+
+			if (!updated && filteredInventory.headerBidding !== matchedInventory.headerBidding) {
+				updated = true;
+			}
+
+			return matchedInventory;
+		});
+
+		return { updated, updatedFilteredInventories };
 	}
 
 	handleSelectAllInventories = ({ target: { checked } }) => {
