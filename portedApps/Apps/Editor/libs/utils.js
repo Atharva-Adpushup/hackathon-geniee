@@ -455,7 +455,7 @@ const randomStore = [],
 		ajax: params => {
 			const { method, url, data } = params;
 
-			return new Promise((resolve, resject) => {
+			return new Promise((resolve, reject) => {
 				$.ajax({
 					method,
 					url,
