@@ -7,16 +7,14 @@ function getHeader(handleSelectAllInventories, checkedCopy, handleInventorySelec
 	return [
 		{
 			Header: (
-				<input
-					type="checkbox"
+				<Checkbox
 					checked={selectAll}
 					onChange={handleSelectAllInventories}
 					style={{ float: 'left' }}
 				/>
 			),
 			Cell: row => (
-				<input
-					type="checkbox"
+				<Checkbox
 					checked={checkedCopy[row.index]}
 					onChange={e => handleInventorySelect(row.index, e)}
 				/>
@@ -56,10 +54,9 @@ function getBody(inventories, selectedInventories, handleInventorySelect) {
 function getDefaultPageSize(inventories) {
 	const { length } = inventories;
 
-	if (length <= 5) return 5;
-	else if (length <= 10) return 10;
-	else if (length <= 20) return 20;
-	else if (length <= 50) return 50;
+	if (length <= 10) return 10;
+	if (length <= 20) return 20;
+	if (length <= 50) return 50;
 	return 50;
 }
 
@@ -74,8 +71,6 @@ const InventoriesTable = ({
 	<ReactTable
 		columns={getHeader(handleSelectAllInventories, checkedCopy, handleInventorySelect, selectAll)}
 		data={getBody(inventories, selectedInventories, handleInventorySelect)}
-		filterable={false}
-		showPaginationBottom={true}
 		className="-striped -highlight u-padding-h3 u-padding-v2 inventory-table"
 		pageSizeOptions={[10, 25, 50, 100]}
 		defaultSorting={[
@@ -84,7 +79,7 @@ const InventoriesTable = ({
 				desc: false
 			}
 		]}
-		pageSize={getDefaultPageSize(inventories)}
+		defaultPageSize={getDefaultPageSize(inventories)}
 	/>
 );
 

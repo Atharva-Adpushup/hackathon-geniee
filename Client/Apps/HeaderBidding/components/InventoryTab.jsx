@@ -41,13 +41,14 @@ export default class InventoryTab extends React.Component {
 		const { filteredInventories, selectAll } = this.state;
 		const checked = [];
 		this.setState({ selectAll: !selectAll }, () => {
+			// eslint-disable-next-line no-shadow
 			const { selectAll } = this.state;
 			filteredInventories.forEach(() => {
 				checked.push(selectAll);
 			});
 			this.setState({
 				checkedCopy: checked,
-				selectedInventories: this.state.selectAll ? [...filteredInventories] : []
+				selectedInventories: selectAll ? [...filteredInventories] : []
 			});
 		});
 	};
@@ -64,6 +65,7 @@ export default class InventoryTab extends React.Component {
 		this.setState({
 			checkedCopy,
 			selectedInventories,
+			// eslint-disable-next-line no-unneeded-ternary
 			selectAll: selectedInventories.length === filteredInventories.length ? true : false
 		});
 	};
