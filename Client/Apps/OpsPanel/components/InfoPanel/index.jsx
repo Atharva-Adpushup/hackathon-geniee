@@ -6,10 +6,11 @@ import {
 	WIDGETS_INFO
 } from '../../configs/commonConsts';
 import QuickSnapshot from './QuickSnapshot';
+import ReportVitals from '../../../Reporting/index';
 
 class InfoPanel extends Component {
 	state = {
-		activeKey: INFO_PANEL_IDENTIFIERS.QUICK_SNAPSHOT
+		activeKey: INFO_PANEL_IDENTIFIERS.REPORT_VITALS
 	};
 
 	handleSelect = value => {
@@ -20,7 +21,7 @@ class InfoPanel extends Component {
 
 	renderContent = () => {
 		const { activeKey } = this.state;
-		// const { networkConfig, sites, showNotification, updateNetworkConfig } = this.props;
+		const { reportType } = this.props;
 
 		switch (activeKey) {
 			default:
@@ -33,12 +34,19 @@ class InfoPanel extends Component {
 					/>
 				);
 			case INFO_PANEL_IDENTIFIERS.REPORT_VITALS:
-				return <div>Report Vitals</div>;
+				return (
+					<ReportVitals
+						reportType={reportType}
+						match={{ params: { siteId: '' } }}
+						location={{ search: '' }}
+					/>
+				);
 		}
 	};
 
 	render() {
 		const { activeKey } = this.state;
+
 		return (
 			<div className="u-padding-v4">
 				<Tab.Container
@@ -50,7 +58,7 @@ class InfoPanel extends Component {
 						<Col sm={2}>
 							<Nav bsStyle="pills" bsClass="ap-nav-pills nav" stacked>
 								<NavItem eventKey={INFO_PANEL_IDENTIFIERS.QUICK_SNAPSHOT}>Quick Snapshot</NavItem>
-								{/* <NavItem eventKey={INFO_PANEL_IDENTIFIERS.REPORT_VITALS}>Report Vitals</NavItem> */}
+								<NavItem eventKey={INFO_PANEL_IDENTIFIERS.REPORT_VITALS}>Report Vitals</NavItem>
 							</Nav>
 						</Col>
 						<Col sm={10}>

@@ -4,6 +4,7 @@ import Panel from '../components/Panel';
 
 const mapStateToProps = (state, ownProps) => {
 	const { reports, sites, user } = state.global;
+
 	return {
 		...ownProps,
 		reportsMeta: reports,
