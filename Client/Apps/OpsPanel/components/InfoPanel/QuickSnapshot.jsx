@@ -14,7 +14,7 @@ import SitewiseReportContainer from '../../../../Pages/Dashboard/containers/Site
 import PerformanceOverviewContainer from '../../../../Pages/Dashboard/containers/PerformanceOverviewContainer';
 import PerformanceApOriginalContainer from '../../../../Pages/Dashboard/containers/PerformanceApOriginalContainer';
 import RevenueContainer from '../../../../Pages/Dashboard/containers/RevenueContainer';
-import ModeReport from '../../../../Pages/Dashboard/components/ModeReport';
+import ModeReportContainer from '../../../../Pages/Dashboard/containers/ModeReportContainer';
 import Loader from '../../../../Components/Loader/index';
 import {
 	dates,
@@ -355,7 +355,7 @@ class QuickSnapshot extends React.Component {
 				return <RevenueContainer displayData={widget} />;
 
 			case OPS_ERROR_REPORT:
-				return <ModeReport displayData={widget} />;
+				return <ModeReportContainer displayData={widget} />;
 
 			default:
 		}
