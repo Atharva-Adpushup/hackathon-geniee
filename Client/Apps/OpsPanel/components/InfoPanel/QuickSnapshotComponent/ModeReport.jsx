@@ -146,6 +146,12 @@ class ModeReport extends React.Component {
 						id: 'errorCodes'
 					}
 				],
+				plotOptions: {
+					pie: {
+						allowPointSelect: true,
+						cursor: 'pointer'
+					}
+				},
 				responsive: {
 					rules: [
 						{
