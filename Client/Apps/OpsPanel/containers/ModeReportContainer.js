@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import ModeReport from '../components/ModeReport';
+import ModeReport from '../components/InfoPanel/QuickSnapshotComponent/ModeReport';
 
 const mapStateToProps = (state, ownProps) => {
 	const {

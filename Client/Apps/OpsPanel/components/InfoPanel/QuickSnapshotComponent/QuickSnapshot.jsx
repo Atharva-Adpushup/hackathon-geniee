@@ -6,24 +6,24 @@ import cloneDeep from 'lodash/cloneDeep';
 import { Link } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import '../../../../scss/pages/dashboard/index.scss';
-import Empty from '../../../../Components/Empty/index';
-import Card from '../../../../Components/Layout/Card';
-import EstimatedEarningsContainer from '../../../../Pages/Dashboard/containers/EstimatedEarningsContainer';
-import SitewiseReportContainer from '../../../../Pages/Dashboard/containers/SitewiseReportContainer';
-import PerformanceOverviewContainer from '../../../../Pages/Dashboard/containers/PerformanceOverviewContainer';
-import PerformanceApOriginalContainer from '../../../../Pages/Dashboard/containers/PerformanceApOriginalContainer';
-import RevenueContainer from '../../../../Pages/Dashboard/containers/RevenueContainer';
-import ModeReportContainer from '../../../../Pages/Dashboard/containers/ModeReportContainer';
-import Loader from '../../../../Components/Loader/index';
+import '../../../../../scss/pages/dashboard/index.scss';
+import Empty from '../../../../../Components/Empty/index';
+import Card from '../../../../../Components/Layout/Card';
+import EstimatedEarningsContainer from '../../../../../Pages/Dashboard/containers/EstimatedEarningsContainer';
+import SitewiseReportContainer from '../../../../../Pages/Dashboard/containers/SitewiseReportContainer';
+import PerformanceOverviewContainer from '../../../../../Pages/Dashboard/containers/PerformanceOverviewContainer';
+import PerformanceApOriginalContainer from '../../../../../Pages/Dashboard/containers/PerformanceApOriginalContainer';
+import RevenueContainer from '../../../../../Pages/Dashboard/containers/RevenueContainer';
+import ModeReportContainer from '../../../containers/ModeReportContainer';
+import Loader from '../../../../../Components/Loader/index';
 import {
 	dates,
 	DEFAULT_DATE,
 	ALL_SITES_VALUE
-} from '../../../../Pages/Dashboard/configs/commonConsts';
-import SelectBox from '../../../../Components/SelectBox/index';
-import reportService from '../../../../services/reportService';
-import { convertObjToArr, getDateRange } from '../../../../Pages/Dashboard/helpers/utils';
+} from '../../../../../Pages/Dashboard/configs/commonConsts';
+import SelectBox from '../../../../../Components/SelectBox/index';
+import reportService from '../../../../../services/reportService';
+import { convertObjToArr, getDateRange } from '../../../../../Pages/Dashboard/helpers/utils';
 
 class QuickSnapshot extends React.Component {
 	constructor(props) {
@@ -46,8 +46,14 @@ class QuickSnapshot extends React.Component {
 
 	componentDidMount() {
 		const { sites, setReportingMetaData, showNotification } = this.props;
+		const { reportType } = this.state;
+
 		const userSites = Object.keys(sites).toString();
-		const getReportMetaData = reportService.getMetaData({ sites: userSites });
+
+		const getReportMetaData =
+			reportType === 'global'
+				? reportService.getMetaData({ isSuperUser: true })
+				: reportService.getMetaData({ sites: userSites });
 
 		return getReportMetaData
 			.then(responseData => {
