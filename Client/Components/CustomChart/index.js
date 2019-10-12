@@ -15,7 +15,11 @@ const CustomChart = ({
 	yAxisGroups,
 	activeLegendItems,
 	containerClass,
-	onLegendChange
+	onLegendChange,
+	availableLegends,
+	reportType,
+	isCustomizeChartLegend,
+	updateMetrics
 }) => {
 	if (type === 'line' || type === 'spline') {
 		const chartConfig = getCustomChartConfig(
@@ -40,8 +44,12 @@ const CustomChart = ({
 								<ChartLegend
 									chart={chart}
 									legends={legends}
+									availableLegends={availableLegends}
+									reportType={reportType}
+									isCustomizeChartLegend={isCustomizeChartLegend}
 									activeLegendItems={activeLegendItems}
 									onLegendChange={onLegendChange}
+									updateMetrics={updateMetrics}
 								/>,
 								node
 							);

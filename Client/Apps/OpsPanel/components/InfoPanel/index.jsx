@@ -10,7 +10,7 @@ import ReportVitals from '../../../Reporting/index';
 
 class InfoPanel extends Component {
 	state = {
-		activeKey: INFO_PANEL_IDENTIFIERS.REPORT_VITALS
+		activeKey: INFO_PANEL_IDENTIFIERS.GLOBAL_REPORT_VITALS
 	};
 
 	handleSelect = value => {
@@ -36,7 +36,16 @@ class InfoPanel extends Component {
 			case INFO_PANEL_IDENTIFIERS.REPORT_VITALS:
 				return (
 					<ReportVitals
-						reportType={reportType}
+						reportType={reportType || 'account'}
+						match={{ params: { siteId: '' } }}
+						location={{ search: '' }}
+					/>
+				);
+			case INFO_PANEL_IDENTIFIERS.GLOBAL_REPORT_VITALS:
+				return (
+					<ReportVitals
+						reportType="global"
+						isCustomizeChartLegend
 						match={{ params: { siteId: '' } }}
 						location={{ search: '' }}
 					/>
@@ -59,6 +68,9 @@ class InfoPanel extends Component {
 							<Nav bsStyle="pills" bsClass="ap-nav-pills nav" stacked>
 								<NavItem eventKey={INFO_PANEL_IDENTIFIERS.QUICK_SNAPSHOT}>Quick Snapshot</NavItem>
 								<NavItem eventKey={INFO_PANEL_IDENTIFIERS.REPORT_VITALS}>Report Vitals</NavItem>
+								<NavItem eventKey={INFO_PANEL_IDENTIFIERS.GLOBAL_REPORT_VITALS}>
+									Global Report Vitals
+								</NavItem>
 							</Nav>
 						</Col>
 						<Col sm={10}>
