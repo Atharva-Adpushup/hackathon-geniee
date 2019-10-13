@@ -237,11 +237,42 @@ const Routes = () => (
 						path="/admin-panel/settings"
 						component={OpsPanel}
 					/>
+					{/** Admin Panel - Info Panel */}
 					<PrivateRoute
 						exact
 						customProps={{ activeTab: OP_NAV_ITEMS_INDEXES.INFO_PANEL }}
 						name="Info Panel"
 						path="/admin-panel/info-panel"
+						component={OpsPanel}
+					/>
+					<PrivateRoute
+						exact
+						customProps={{
+							activeTab: OP_NAV_ITEMS_INDEXES.INFO_PANEL,
+							activeComponentTab: OP_NAV_ITEMS_INDEXES.INFO_PANEL_QUICK_SNAPSHOT
+						}}
+						name="Quick Snapshot"
+						path="/admin-panel/info-panel/quick-snapshot"
+						component={OpsPanel}
+					/>
+					<PrivateRoute
+						exact
+						customProps={{
+							activeTab: OP_NAV_ITEMS_INDEXES.INFO_PANEL,
+							activeComponentTab: OP_NAV_ITEMS_INDEXES.INFO_PANEL_REPORT_VITALS
+						}}
+						name="Report Vitals"
+						path="/admin-panel/info-panel/report-vitals"
+						component={OpsPanel}
+					/>
+					<PrivateRoute
+						exact
+						customProps={{
+							activeTab: OP_NAV_ITEMS_INDEXES.INFO_PANEL,
+							activeComponentTab: OP_NAV_ITEMS_INDEXES.INFO_PANEL_REPORT_VITALS
+						}}
+						name="Report Vitals"
+						path="/admin-panel/info-panel/report-vitals/:siteId"
 						component={OpsPanel}
 					/>
 					<PrivateRoute

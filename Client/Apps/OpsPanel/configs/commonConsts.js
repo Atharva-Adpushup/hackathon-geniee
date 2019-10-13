@@ -2,6 +2,8 @@
 const OP_NAV_ITEMS_INDEXES = {
 	SETTINGS: 'settings',
 	INFO_PANEL: 'info-panel',
+	INFO_PANEL_QUICK_SNAPSHOT: 'QUICK_SNAPSHOT',
+	INFO_PANEL_REPORT_VITALS: 'REPORT_VITALS',
 	SITES_MAPPING: 'sites-mapping',
 	TOOLS: 'tools'
 };
