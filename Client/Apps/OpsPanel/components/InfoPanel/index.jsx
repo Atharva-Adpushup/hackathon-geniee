@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Redirect } from 'react-router-dom';
 import { Tab, Nav, NavItem, Row, Col } from 'react-bootstrap';
 import {
 	INFO_PANEL_IDENTIFIERS,
@@ -9,19 +10,53 @@ import QuickSnapshot from './QuickSnapshot';
 import ReportVitals from '../../../Reporting/index';
 
 class InfoPanel extends Component {
-	state = {
-		activeKey: INFO_PANEL_IDENTIFIERS.GLOBAL_REPORT_VITALS
-	};
+	constructor(props) {
+		super(props);
+		const {
+			customProps: { activeComponentTab }
+		} = props;
+		const activeKey = activeComponentTab || INFO_PANEL_IDENTIFIERS.QUICK_SNAPSHOT;
+
+		this.state = {
+			activeKey,
+			redirectUrl: ''
+		};
+	}
 
 	handleSelect = value => {
+		const rootAdminPanelUrl = `/admin-panel/info-panel`;
+		let redirectUrl = '';
+
+		switch (value) {
+			case INFO_PANEL_IDENTIFIERS.QUICK_SNAPSHOT:
+				redirectUrl = `${rootAdminPanelUrl}/quick-snapshot`;
+				break;
+
+			case INFO_PANEL_IDENTIFIERS.REPORT_VITALS:
+				redirectUrl = `${rootAdminPanelUrl}/report-vitals`;
+				break;
+
+			default:
+				break;
+		}
+
 		this.setState({
-			activeKey: value
+			activeKey: value,
+			redirectUrl
 		});
 	};
 
 	renderContent = () => {
-		const { activeKey } = this.state;
-		const { reportType } = this.props;
+		const { activeKey, redirectUrl } = this.state;
+		const {
+			reportType,
+			match = { params: { siteId: '' } },
+			location = { search: '' }
+		} = this.props;
+
+		if (redirectUrl) {
+			return <Redirect to={{ pathname: redirectUrl }} />;
+		}
 
 		switch (activeKey) {
 			default:
@@ -37,8 +72,8 @@ class InfoPanel extends Component {
 				return (
 					<ReportVitals
 						reportType={reportType || 'account'}
-						match={{ params: { siteId: '' } }}
-						location={{ search: '' }}
+						match={match}
+						location={location}
 					/>
 				);
 			case INFO_PANEL_IDENTIFIERS.GLOBAL_REPORT_VITALS:
@@ -46,8 +81,8 @@ class InfoPanel extends Component {
 					<ReportVitals
 						reportType="global"
 						isCustomizeChartLegend
-						match={{ params: { siteId: '' } }}
-						location={{ search: '' }}
+						match={match}
+						location={location}
 					/>
 				);
 		}

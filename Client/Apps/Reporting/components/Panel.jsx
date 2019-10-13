@@ -103,14 +103,19 @@ class Panel extends Component {
 
 	disableControl = (disabledFilter, disabledDimension, disabledMetrics) => {
 		const { metricsList } = this.state;
-		const { reportsMeta } = this.props;
+		const {
+			reportsMeta,
+			user: {
+				data: { isSuperUser }
+			}
+		} = this.props;
+
 		const { dimension: dimensionListObj, filter: filterListObj } = reportsMeta.data;
 		const dimensionList = convertObjToArr(dimensionListObj);
 		const filterList = convertObjToArr(filterListObj);
-		const { updatedDimensionList, updatedFilterList } = this.removeOpsFilterDimension(
-			filterList,
-			dimensionList
-		);
+		const { updatedDimensionList, updatedFilterList } = isSuperUser
+			? { updatedDimensionList: dimensionList, updatedFilterList: filterList }
+			: this.removeOpsFilterDimension(filterList, dimensionList);
 
 		updatedFilterList.map(filter => {
 			const found = disabledFilter.find(fil => fil === filter.value);
