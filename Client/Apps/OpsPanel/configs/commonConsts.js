@@ -500,6 +500,31 @@ const SITE_MAPPING_FILTER_COLUMNS = [
 	}
 ];
 
+const ERROR_REPORT_PROPS = {
+	chart: {
+		type: 'pie',
+		renderTo: 'error-code'
+	},
+	credits: {
+		enabled: false
+	},
+	title: {
+		text: ''
+	},
+	subtitle: {
+		text: ''
+	},
+	plotOptions: {
+		pie: {
+			shadow: false,
+			center: ['50%', '50%']
+		}
+	},
+	tooltip: {
+		valueSuffix: '%'
+	}
+};
+
 const MODE_TOOLTIP_TEXT = `ADPUSHUP:1 , FALLBACK:2`;
 const ERROR_TOOLTIP_TEXT = `NO_ERROR:1, PAGEGROUP_NOT_FOUND:2, FALLBACK_PLANNED:3, FALLBACK_FORCED:4, PAUSED_IN_EDITOR:5`;
 
@@ -523,5 +548,6 @@ export {
 	MODE_TOOLTIP_TEXT,
 	ERROR_TOOLTIP_TEXT,
 	SITE_MAPPING_FILTER_COLUMNS,
-	ADPUSHUP_DFP
+	ADPUSHUP_DFP,
+	ERROR_REPORT_PROPS
 };

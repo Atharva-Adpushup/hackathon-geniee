@@ -6,7 +6,7 @@ import {
 	QUICK_SNAPSHOTS_WIDGETS,
 	WIDGETS_INFO
 } from '../../configs/commonConsts';
-import QuickSnapshot from './QuickSnapshot';
+import QuickSnapshot from './QuickSnapshotComponent/QuickSnapshot';
 import ReportVitals from '../../../Reporting/index';
 
 class InfoPanel extends Component {
