@@ -50,7 +50,7 @@ class Panel extends Component {
 				.format('YYYY-MM-DD'),
 			tableData: {},
 			csvData: [],
-			reportType: 'account',
+			reportType: props.reportType || 'account',
 			isLoading: true,
 			isValidSite: true,
 			isReportingSite: true
@@ -60,12 +60,22 @@ class Panel extends Component {
 	componentDidMount() {
 		const { userSites, fetchReportingMeta, reportsMeta } = this.props;
 		const { email, reportType } = this.getDemoUserParams();
-		let userSitesStr = Object.keys(userSites).toString();
 
-		userSitesStr = getReportingDemoUserSiteIds(userSitesStr, email, reportType);
+		let userSitesStr = '';
+		let isSuperUser = false;
+
+		if (reportType === 'account') {
+			userSitesStr = Object.keys(userSites).toString();
+
+			userSitesStr = getReportingDemoUserSiteIds(userSitesStr, email, reportType);
+		}
+
+		if (reportType === 'global') {
+			isSuperUser = true;
+		}
 
 		if (!reportsMeta.fetched) {
-			return reportService.getMetaData({ sites: userSitesStr }).then(response => {
+			return reportService.getMetaData({ sites: userSitesStr, isSuperUser }).then(response => {
 				let { data: computedData } = response;
 
 				computedData = getDemoUserSites(computedData, email);
@@ -176,7 +186,7 @@ class Panel extends Component {
 			}
 		});
 
-		if (reportType == 'account') {
+		if (reportType === 'account' || reportType === 'global') {
 			disabledFilter = union(accountDisableFilter, disabledFilter);
 			disabledDimension = union(accountDisableDimension, disabledDimension);
 		}
@@ -231,12 +241,21 @@ class Panel extends Component {
 			params.siteid = siteIds.toString();
 		}
 
-		params.siteid = getReportingDemoUserSiteIds(params.siteid, email, reportType);
+		if (reportType === 'global') {
+			params.siteid = '';
+			params.isSuperUser = true;
+		}
+
+		if (reportType === 'account') {
+			params.siteid = getReportingDemoUserSiteIds(params.siteid, email, reportType);
+		}
+
 		return params;
 	};
 
 	generateButtonHandler = (inputState = {}) => {
 		let { tableData } = this.state;
+		const { reportType } = this.props;
 		const computedState = Object.assign({ isLoading: true }, inputState);
 
 		this.setState(computedState, () => {
@@ -245,10 +264,25 @@ class Panel extends Component {
 			reportService.getCustomStats(params).then(response => {
 				if (Number(response.status) === 200 && response.data) {
 					tableData = response.data;
+					if (
+						reportType === 'global' &&
+						!tableData.total &&
+						tableData.columns &&
+						tableData.columns.length
+					) {
+						tableData.total = {};
+						tableData.columns.forEach(column => {
+							tableData.total[`total_${column}`] = 100;
+						});
+					}
 				}
 				this.setState({ isLoading: false, tableData });
 			});
 		});
+	};
+
+	updateMetrics = (newMetrics = []) => {
+		this.setState({ metricsList: newMetrics });
 	};
 
 	getCsvData = csvData => {
@@ -353,6 +387,9 @@ class Panel extends Component {
 			filterList,
 			tableData
 		} = this.state;
+		const { reportsMeta, reportType: defaultReportType, isCustomizeChartLegend } = this.props;
+		const allAvailableMetrics = (reportsMeta && reportsMeta.data && reportsMeta.data.metrics) || [];
+
 		const { email } = this.getDemoUserParams();
 		const { isValid } = getReportingDemoUserValidation(email, reportType);
 
@@ -381,6 +418,7 @@ class Panel extends Component {
 						selectedMetrics={selectedMetrics}
 						selectedInterval={selectedInterval}
 						reportType={reportType}
+						defaultReportType={defaultReportType}
 						csvData={csvData}
 						isDemoUser={isValid}
 					/>
@@ -392,6 +430,10 @@ class Panel extends Component {
 						startDate={startDate}
 						endDate={endDate}
 						metricsList={metricsList}
+						allAvailableMetrics={allAvailableMetrics}
+						reportType={reportType}
+						isCustomizeChartLegend={isCustomizeChartLegend}
+						updateMetrics={this.updateMetrics}
 						selectedInterval={selectedInterval}
 						selectedChartLegendMetric={selectedChartLegendMetric}
 					/>

@@ -69,7 +69,22 @@ class InfoPanel extends Component {
 					/>
 				);
 			case INFO_PANEL_IDENTIFIERS.REPORT_VITALS:
-				return <ReportVitals reportType={reportType} match={match} location={location} />;
+				return (
+					<ReportVitals
+						reportType={reportType || 'account'}
+						match={match}
+						location={location}
+					/>
+				);
+			case INFO_PANEL_IDENTIFIERS.GLOBAL_REPORT_VITALS:
+				return (
+					<ReportVitals
+						reportType="global"
+						isCustomizeChartLegend
+						match={match}
+						location={location}
+					/>
+				);
 		}
 	};
 
@@ -88,6 +103,9 @@ class InfoPanel extends Component {
 							<Nav bsStyle="pills" bsClass="ap-nav-pills nav" stacked>
 								<NavItem eventKey={INFO_PANEL_IDENTIFIERS.QUICK_SNAPSHOT}>Quick Snapshot</NavItem>
 								<NavItem eventKey={INFO_PANEL_IDENTIFIERS.REPORT_VITALS}>Report Vitals</NavItem>
+								<NavItem eventKey={INFO_PANEL_IDENTIFIERS.GLOBAL_REPORT_VITALS}>
+									Global Report Vitals
+								</NavItem>
 							</Nav>
 						</Col>
 						<Col sm={10}>

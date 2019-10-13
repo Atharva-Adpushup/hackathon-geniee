@@ -21,7 +21,7 @@ const mapStateToProps = (state, ownProps) => {
 		isReportsMetaFetched,
 		sites: sites.fetched ? sites.data : [],
 		reportingSites: site,
-		reportType: ownProps.reportType || 'global'
+		reportType: ownProps.reportType
 	};
 };
 
