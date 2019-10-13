@@ -8,8 +8,8 @@ export function fetchBiddersList(siteId) {
 	return axiosInstance.get(`/headerBidding/getBiddersList/${siteId}`);
 }
 
-export function getSetupStatus(siteId) {
-	return axiosInstance.get(`/headerBidding/setupStatus/${siteId}`);
+export function getHBInitData(siteId) {
+	return axiosInstance.get(`/headerBidding/hbInitData/${siteId}`);
 }
 
 export function addBidder(siteId, bidderConfig, params) {
@@ -18,10 +18,6 @@ export function addBidder(siteId, bidderConfig, params) {
 
 export function updateBidder(siteId, bidderConfig, params) {
 	return axiosInstance.put(`/headerBidding/bidder/${siteId}`, { bidderConfig, params });
-}
-
-export function fetchInventorySizes(siteId) {
-	return axiosInstance.get(`/headerBidding/getInventorySizes/${siteId}`);
 }
 
 export function fetchInventories(siteId) {
@@ -86,6 +82,10 @@ export function deleteBidderRule(siteId, bidder) {
 		.then(({ data }) => data);
 }
 
-export function checkOrBeginDfpSetup(siteId) {
-	return axiosInstance.get(`/headerBidding/adserverSetup/${siteId}`);
+export function checkOrBeginDfpSetup() {
+	return axiosInstance.get(`/headerBidding/adserverSetup`);
+}
+
+export function startCdnSync(siteId) {
+	return axiosInstance.get(`/headerBidding/startCdnSync/${siteId}`);
 }

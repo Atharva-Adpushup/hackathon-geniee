@@ -40,7 +40,12 @@ var adp = window.adpushup,
 			return false;
 		}
 
-		if (adp && Array.isArray(adp.config.manualAds) && adp.config.manualAds.length && adp.utils.isUrlMatching()) {
+		if (
+			adp &&
+			Array.isArray(adp.config.manualAds) &&
+			adp.config.manualAds.length &&
+			adp.utils.isUrlMatching()
+		) {
 			var manualAds = adp.config.manualAds,
 				newAdId = utils.uniqueId(),
 				manualAd = manualAds.filter(function(ad) {
@@ -60,7 +65,8 @@ var adp = window.adpushup,
 			document.getElementById(newAdId).setAttribute('data-orig-id', adId);
 			document.getElementById(newAdId).setAttribute('data-render-time', currentTime);
 			if (ad.network === commonConsts.NETWORKS.ADPTAGS) {
-				if (ad.networkData) ad.networkData.zoneContainerId = 'ADP_' + siteId + '_' + adSize + '_' + newAdId;
+				if (ad.networkData)
+					ad.networkData.zoneContainerId = 'ADP_' + siteId + '_' + adSize + '_' + newAdId;
 			}
 
 			ad.status = 1; // Mark ap tag status as successful impression
@@ -68,16 +74,17 @@ var adp = window.adpushup,
 			ad.originalId = adId;
 			if (isAdElement) {
 				var feedbackData = {
-					ads: [ad],
-					xpathMiss: [],
-					eventType: commonConsts.ERROR_CODES.NO_ERROR,
-					// mode: 16,
-					mode: commonConsts.MODE.ADPUSHUP, // Sending Mode 1 in Manual Ads
-					referrer: config.referrer,
-					tracking: browserConfig.trackerSupported,
-					variationId: commonConsts.MANUAL_ADS.VARIATION
-				}, oldFeedbackData = feedbackData;
-				
+						ads: [ad],
+						xpathMiss: [],
+						eventType: commonConsts.ERROR_CODES.NO_ERROR,
+						// mode: 16,
+						mode: commonConsts.MODE.ADPUSHUP, // Sending Mode 1 in Manual Ads
+						referrer: config.referrer,
+						tracking: browserConfig.trackerSupported,
+						variationId: commonConsts.MANUAL_ADS.VARIATION
+					},
+					oldFeedbackData = $.extend(true, {}, feedbackData);
+
 				oldFeedbackData.ads = [ad.originalId];
 				return getContainer(ad)
 					.done(function(container) {

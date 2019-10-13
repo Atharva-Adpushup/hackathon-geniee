@@ -4,19 +4,21 @@ import HeaderBidding from '../components/HeaderBidding';
 import {
 	checkInventoryAction,
 	fetchAllBiddersAction,
-	getSetupStatusAction,
 	addBidderAction,
 	updateBidderAction,
 	fetchInventoriesAction,
 	updateInventoriesHbStatus,
 	setDfpSetupStatusAction,
-	checkOrBeginDfpSetupAction
+	checkOrBeginDfpSetupAction,
+	fetchHBInitDataAction,
+	setUnsavedChangesAction,
+	masterSaveAction
 } from '../../../actions/apps/headerBidding/hbActions';
 
 import { showNotification, hideNotification } from '../../../actions/uiActions';
 
 const HeaderBiddingContainer = props => {
-	const { currSiteHbData, ...rest } = props;
+	const { currSiteHbData, hasUnsavedChanges, ...rest } = props;
 	const finalCurrSiteHbData = {
 		inventoryFound: null,
 		bidders: null,
@@ -32,6 +34,7 @@ const HeaderBiddingContainer = props => {
 			inventories={inventories}
 			bidders={bidders}
 			setupStatus={setupStatus}
+			hasUnsavedChanges={hasUnsavedChanges}
 			{...rest}
 		/>
 	);
@@ -44,18 +47,26 @@ export default connect(
 				params: { siteId }
 			}
 		} = ownProps;
-		// const { inventoryFound, bidders, setupStatus, inventories } = state.apps.headerBidding;
-		const { [siteId]: currSiteHbData } = state.apps.headerBidding;
 		const {
-			[siteId]: { domain }
-		} = state.global.user.data.sites;
-
-		return { currSiteHbData, domain };
+			apps: {
+				headerBidding: { hasUnsavedChanges, sites }
+			},
+			global: {
+				user: {
+					data: {
+						sites: {
+							[siteId]: { domain }
+						}
+					}
+				}
+			}
+		} = state;
+		const currSiteHbData = sites && sites[siteId];
+		return { currSiteHbData, domain, hasUnsavedChanges };
 	},
 	{
 		checkInventoryAction,
 		fetchAllBiddersAction,
-		getSetupStatusAction,
 		addBidderAction,
 		updateBidderAction,
 		fetchInventoriesAction,
@@ -63,6 +74,9 @@ export default connect(
 		showNotification,
 		hideNotification,
 		setDfpSetupStatusAction,
-		checkOrBeginDfpSetupAction
+		checkOrBeginDfpSetupAction,
+		fetchHBInitDataAction,
+		setUnsavedChangesAction,
+		masterSaveAction
 	}
 )(HeaderBiddingContainer);

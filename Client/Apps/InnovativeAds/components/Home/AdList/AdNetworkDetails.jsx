@@ -1,4 +1,8 @@
 import React, { Component } from 'react';
+import { Row, Col } from 'react-bootstrap';
+
+import { REFRESH_INTERVALS, DEFAULT_REFRESH_INTERVAL } from '../../../configs/commonConsts';
+import SelectBox from '../../../../../Components/SelectBox/index';
 import CustomToggleSwitch from '../../../../../Components/CustomToggleSwitch/index';
 import CustomButton from '../../../../../Components/CustomButton/index';
 
@@ -12,13 +16,39 @@ class AdNetworkDetails extends Component {
 
 		this.state = {
 			headerBidding: hasNetworkData ? ad.networkData.headerBidding : false,
-			refreshSlot: hasNetworkData ? ad.networkData.refreshSlot : false
+			refreshSlot: hasNetworkData ? ad.networkData.refreshSlot : false,
+			refreshInterval: hasNetworkData ? ad.networkData.refreshInterval : DEFAULT_REFRESH_INTERVAL
 		};
 	}
 
-	render() {
-		const { headerBidding, refreshSlot } = this.state;
+	handleToggle = (val, e) => {
+		const { target } = e;
+		const key = target.getAttribute('name').split('-')[0];
+		this.setState({
+			[key]: !!val
+		});
+	};
+
+	handleSelect = val => this.setState({ refreshInterval: val });
+
+	handleSave = () => {
+		const { headerBidding, refreshSlot, refreshInterval } = this.state;
 		const { ad, onSubmit, onCancel } = this.props;
+
+		onSubmit({
+			networkData: {
+				...ad.networkData,
+				headerBidding,
+				refreshSlot,
+				refreshInterval: refreshInterval || DEFAULT_REFRESH_INTERVAL
+			}
+		});
+		return onCancel();
+	};
+
+	render() {
+		const { headerBidding, refreshSlot, refreshInterval } = this.state;
+		const { ad, onCancel } = this.props;
 
 		return (
 			<div>
@@ -26,7 +56,7 @@ class AdNetworkDetails extends Component {
 					labelText="Header Bidding"
 					className="u-margin-b3"
 					checked={headerBidding}
-					onChange={val => this.setState({ headerBidding: !!val })}
+					onChange={this.handleToggle}
 					layout="horizontal"
 					size="m"
 					on="Yes"
@@ -39,7 +69,7 @@ class AdNetworkDetails extends Component {
 					labelText="Refresh Slot"
 					className="u-margin-b3"
 					checked={refreshSlot}
-					onChange={val => this.setState({ refreshSlot: !!val })}
+					onChange={this.handleToggle}
 					layout="horizontal"
 					size="m"
 					on="Yes"
@@ -48,20 +78,22 @@ class AdNetworkDetails extends Component {
 					name={`refreshSlot-${ad.id}`}
 					id={`js-refresh-slot-switch-${ad.id}`}
 				/>
-				<CustomButton
-					className="u-margin-r3"
-					onClick={() => {
-						onSubmit({
-							networkData: {
-								...ad.networkData,
-								headerBidding,
-								refreshSlot,
-								logWritten: false
-							}
-						});
-						return onCancel();
-					}}
-				>
+				<Row>
+					<Col xs={6}>
+						<strong>Select Refresh Interval</strong>
+					</Col>
+					<Col xs={6}>
+						<SelectBox
+							selected={refreshInterval}
+							options={REFRESH_INTERVALS}
+							onSelect={this.handleSelect}
+							id={`refresh-interval-select-${ad.id}`}
+							title="Select Refresh Interval"
+							wrapperClassName="u-margin-b3"
+						/>
+					</Col>
+				</Row>
+				<CustomButton className="u-margin-r3" onClick={this.handleSave}>
 					Save
 				</CustomButton>
 				<CustomButton variant="secondary" onClick={onCancel}>

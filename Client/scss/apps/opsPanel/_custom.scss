@@ -97,3 +97,36 @@
 .site-mapping .rt-tr:hover .site-mapping-copy {
 	display: inline-block !important;
 }
+
+.ReactTable .rt-thead .rt-th {
+	background-repeat: no-repeat;
+	background-size: 18px 18px;
+	background-position: right 4px center;
+}
+.ReactTable .rt-thead .rt-th.-sort-asc {
+	background-image: url('../../../../public/assets/images/sort-up-icon.jpg');
+}
+.ReactTable .rt-thead .rt-th.-sort-desc {
+	background-image: url('../../../../public/assets/images/sort-arrow-down.png');
+}
+.site-mapping .rt-thead {
+	position: sticky;
+	top: 0;
+	z-index: 2;
+	background: white;
+}
+.site-mapping .rt-tbody {
+	overflow: visible !important;
+	min-height: 64vh;
+	max-height: 64vh;
+}
+
+.site-stats .filterbox {
+	z-index: 3 !important;
+}
+.app-panel-title {
+	display: inline;
+}
+.app-link {
+	float: right;
+}

@@ -18,9 +18,9 @@ function generateSiteChannelJSON(channelsWithAds, site) {
 	const siteId = site.get('siteId');
 	const siteDomain = site.get('siteDomain');
 
-	let unsyncedGenieeZones = [];
-	let unsyncedGenieeDFPCreationZones = [];
-	let adpTagsUnsyncedAds = {
+	const unsyncedGenieeZones = [];
+	const unsyncedGenieeDFPCreationZones = [];
+	const adpTagsUnsyncedAds = {
 		siteId,
 		siteDomain,
 		publisher: {
@@ -44,7 +44,7 @@ function generateSiteChannelJSON(channelsWithAds, site) {
 		const isChannel = !!channelWithAds.channel;
 		const isPageGroupId = !!(isChannel && channelWithAds.channel.genieePageGroupId);
 		const { unsyncedAds, channel } = channelWithAds;
-		const channelKey = isChannel ? 'chnl::' + siteId + ':' + channel.platform + ':' + channel.pageGroup : '';
+		const channelKey = isChannel ? `chnl::${siteId}:${channel.platform}:${channel.pageGroup}` : '';
 		const pageGroupId = isPageGroupId ? channel.genieePageGroupId : '';
 
 		_.forEach(unsyncedAds, zones => {
@@ -66,16 +66,6 @@ function generateSiteChannelJSON(channelsWithAds, site) {
 				});
 			}
 			if (zones.adpTagsUnsyncedAds && zones.adpTagsUnsyncedAds.length) {
-				const apConfigs = site.get('apConfigs') || false;
-				const activeDFPNetwork = apConfigs && apConfigs.activeDFPNetwork ? apConfigs.activeDFPNetwork : false;
-				const activeDFPParentId =
-					apConfigs && apConfigs.activeDFPParentId ? apConfigs.activeDFPParentId : false;
-				if (activeDFPNetwork && activeDFPParentId) {
-					adpTagsUnsyncedAds.currentDFP = {
-						activeDFPNetwork,
-						activeDFPParentId
-					};
-				}
 				adpTagsUnsyncedAds.ads = _.concat(adpTagsUnsyncedAds.ads, zones.adpTagsUnsyncedAds);
 			}
 			if (zones.adsenseUnsyncedAds && zones.adsenseUnsyncedAds.length) {
@@ -84,43 +74,57 @@ function generateSiteChannelJSON(channelsWithAds, site) {
 		});
 	}
 
-	return appBucket.getDoc(`${docKeys.user}${userEmail}`).then(docWithCas => {
-		const userData = docWithCas.value;
-		const { adNetworkSettings = [], firstName, lastName } = userData;
-		const hasAdNetworkSettings = !!adNetworkSettings.length;
-		let pubId = null;
-		let refreshToken = null;
+	return appBucket
+		.getDoc(`${docKeys.user}${userEmail}`)
+		.then(docWithCas => {
+			const userData = docWithCas.value;
+			const { adNetworkSettings = [], firstName, lastName, adServerSettings = {} } = userData;
+			const hasAdNetworkSettings = !!adNetworkSettings.length;
+			const {
+				dfp: { activeDFPNetwork = false, activeDFPParentId = false, isThirdPartyAdx = false } = {}
+			} = adServerSettings;
 
-		if (hasAdNetworkSettings) {
-			pubId = adNetworkSettings[0].pubId;
-			_.some(adNetworkSettings, network => {
-				if (network.networkName === 'DFP') {
-					refreshToken = network.refreshToken;
-					return true;
-				}
-				return false;
-			});
-		}
+			let pubId = null;
+			let refreshToken = config.ADPUSHUP_GAM.REFRESH_TOKEN;
 
-		adpTagsUnsyncedAds.publisher = {
-			...adpTagsUnsyncedAds.publisher,
-			...adpTagsUnsyncedAds.currentDFP,
-			name: `${firstName} ${lastName}`,
-			id: pubId,
-			refreshToken
-		};
+			if (activeDFPNetwork && activeDFPParentId) {
+				adpTagsUnsyncedAds.currentDFP = {
+					activeDFPNetwork,
+					activeDFPParentId,
+					isThirdPartyDFP: !!(activeDFPNetwork != config.ADPUSHUP_GAM.ACTIVE_DFP_NETWORK)
+				};
+			}
 
-		adsenseUnsyncedAds = { ...adpTagsUnsyncedAds };
+			if (hasAdNetworkSettings) {
+				pubId = adNetworkSettings[0].pubId;
+				_.some(adNetworkSettings, network => {
+					if (network.networkName === 'DFP') {
+						refreshToken = network.refreshToken;
+						return true;
+					}
+					return false;
+				});
+			}
 
-		return Promise.map(channelsWithAds, doIt).then(() => {
-			return {
-				geniee: unsyncedGenieeZones,
-				adp: adpTagsUnsyncedAds,
-				genieeDFP: unsyncedGenieeDFPCreationZones,
-				adsense: adsenseUnsyncedAds
+			adpTagsUnsyncedAds.publisher = {
+				...adpTagsUnsyncedAds.publisher,
+				...adpTagsUnsyncedAds.currentDFP,
+				name: `${firstName} ${lastName}`,
+				id: pubId,
+				refreshToken,
+				isThirdPartyAdx
 			};
-		});
-	});
+
+			adsenseUnsyncedAds = { ...adpTagsUnsyncedAds };
+
+			return Promise.map(channelsWithAds, doIt);
+		})
+		.then(() => ({
+			geniee: unsyncedGenieeZones,
+			adp: adpTagsUnsyncedAds,
+			genieeDFP: unsyncedGenieeDFPCreationZones,
+			adsense: adsenseUnsyncedAds
+		}));
 }
 
 function unSyncedAdsWrapper(unSyncedAds, cb, ad) {
@@ -129,8 +133,10 @@ function unSyncedAdsWrapper(unSyncedAds, cb, ad) {
 	}
 
 	return processCallback(cb).then(appSpecficData => {
-		let unsyncedAd =
-			ad.network && ad.network == 'adpTags' ? unsyncedAdsGeneration.checkAdpTagsUnsyncedAds(ad, ad) : false;
+		const unsyncedAd =
+			ad.network && ad.network == 'adpTags'
+				? unsyncedAdsGeneration.checkAdpTagsUnsyncedAds(ad, ad)
+				: false;
 		if (unsyncedAd) {
 			if (ad.formatData && ad.formatData.platform) {
 				unsyncedAd.platform = ad.formatData.platform;
@@ -146,7 +152,7 @@ function unSyncedAdsWrapper(unSyncedAds, cb, ad) {
 }
 
 function adGeneration(docKey, currentDataForSyncing, cb = false) {
-	let unSyncedAds = [];
+	const unSyncedAds = [];
 	return appBucket
 		.getDoc(docKey)
 		.then(docWithCas => {
@@ -163,11 +169,11 @@ function adGeneration(docKey, currentDataForSyncing, cb = false) {
 
 			return currentDataForSyncing;
 		})
-		.catch(err => {
-			return err.name && err.name == 'CouchbaseError' && err.code == 13
+		.catch(err =>
+			err.name && err.name == 'CouchbaseError' && err.code == 13
 				? currentDataForSyncing
-				: Promise.reject(err);
-		});
+				: Promise.reject(err)
+		);
 }
 
 function apTagAdsSyncing(currentDataForSyncing, site) {
@@ -182,7 +188,12 @@ function apTagAdsSyncing(currentDataForSyncing, site) {
 	return adGeneration(`${docKeys.apTag}${site.get('siteId')}`, currentDataForSyncing, ad =>
 		Promise.resolve({
 			variations: [
-				{ variationName: 'manual', variationId: 'manual', pageGroup: null, platform: ad.formatData.platform }
+				{
+					variationName: 'manual',
+					variationId: 'manual',
+					pageGroup: null,
+					platform: ad.formatData.platform
+				}
 			]
 		})
 	);
@@ -200,22 +211,23 @@ function innovativeAdsSyncing(currentDataForSyncing, site) {
 								`${channel.platform}:${channel.pageGroup}`
 							);
 							if (pagegroupAssignedToAd) {
-								const variationsExist = channel.variations && Object.keys(channel.variations).length;
+								const variationsExist =
+									channel.variations && Object.keys(channel.variations).length;
 								const common = {
 									channel: `${channel.platform}:${channel.pageGroup}`,
 									pageGroup: channel.pageGroup,
 									platform: channel.platform
 								};
 								if (variationsExist) {
-									return _.map(channel.variations, variation => {
-										return !variation.isControl
+									return _.map(channel.variations, variation =>
+										!variation.isControl
 											? {
 													...common,
 													variationId: variation.id,
 													variationName: variation.name
 											  }
-											: false;
-									});
+											: false
+									);
 								}
 								return {
 									...common,
@@ -228,9 +240,7 @@ function innovativeAdsSyncing(currentDataForSyncing, site) {
 					)
 				)
 			)
-			.then(variationsData => {
-				return { variations: variationsData };
-			})
+			.then(variationsData => ({ variations: variationsData }))
 			.catch(err => {
 				console.log(err.message);
 				return Promise.reject(

@@ -127,163 +127,79 @@ function apiModule() {
 
 			return mergedBidderparams;
 		},
-		addVideoParams(bidderCode, bidderParams) {
+		addVideoParams(bidderCode, bidderParams, isSizeLess) {
 			bidderParams = { ...bidderParams };
-			switch (bidderCode) {
-				case 'conversant': {
-					const isParamsExist = commonFunctions.verifyKeysInCollection(
-						bidderParams,
-						hbVideoParamsMap.conversant.params
-					);
 
-					if (!isParamsExist)
-						bidderParams = {
-							...bidderParams,
-							...hbVideoParamsMap.conversant.params
-						};
+			if (!hbVideoParamsMap[bidderCode]) return bidderParams;
 
-					break;
-				}
-				case 'rubicon': {
-					const isParamsExist = commonFunctions.verifyKeysInCollection(
-						bidderParams,
-						hbVideoParamsMap.rubicon.params
-					);
+			if (!isSizeLess) {
+				for (const size in bidderParams) {
+					if (bidderParams.hasOwnProperty(size)) {
+						const isParamsExist = commonFunctions.verifyKeysInCollection(
+							bidderParams[size],
+							hbVideoParamsMap[bidderCode].params
+						);
 
-					if (!isParamsExist) {
-						bidderParams = {
-							...bidderParams,
-							...hbVideoParamsMap.rubicon.params
-						};
-					}
-
-					// TODO: set player size
-
-					break;
-				}
-				case 'ix': {
-					// sizewise
-					for (const size in bidderParams) {
-						if (bidderParams.hasOwnProperty(size)) {
-							const isParamsExist = commonFunctions.verifyKeysInCollection(
-								bidderParams[size],
-								hbVideoParamsMap.ix.params
-							);
-
-							if (!isParamsExist) {
-								bidderParams[size] = {
-									...bidderParams[size],
-									...hbVideoParamsMap.ix.params
-								};
-							}
+						if (!isParamsExist) {
+							bidderParams[size] = {
+								...bidderParams[size],
+								...hbVideoParamsMap[bidderCode].params
+							};
 						}
 					}
-
-					break;
 				}
-				case 'pubmatic': {
-					// sizewise
-					for (const size in bidderParams) {
-						if (bidderParams.hasOwnProperty(size)) {
-							const isParamsExist = commonFunctions.verifyKeysInCollection(
-								bidderParams[size],
-								hbVideoParamsMap.pubmatic.params
-							);
 
-							if (!isParamsExist) {
-								bidderParams[size] = {
-									...bidderParams[size],
-									...hbVideoParamsMap.pubmatic.params
-								};
-							}
-						}
-					}
-
-					break;
-				}
-				default: {
-				}
+				return bidderParams;
 			}
+
+			const isParamsExist = commonFunctions.verifyKeysInCollection(
+				bidderParams,
+				hbVideoParamsMap[bidderCode].params
+			);
+
+			if (!isParamsExist)
+				bidderParams = {
+					...bidderParams,
+					...hbVideoParamsMap[bidderCode].params
+				};
 
 			return bidderParams;
 		},
-		removeVideoParams(bidderCode, bidderParams) {
+		removeVideoParams(bidderCode, bidderParams, isSizeLess) {
 			bidderParams = { ...bidderParams };
-			switch (bidderCode) {
-				case 'conversant': {
-					const isParamsExist = commonFunctions.verifyKeysInCollection(
-						bidderParams,
-						hbVideoParamsMap.conversant.params
-					);
 
-					if (isParamsExist) {
-						bidderParams = commonFunctions.deleteKeysInCollection(
-							bidderParams,
-							hbVideoParamsMap.conversant.params
+			if (!hbVideoParamsMap[bidderCode]) return bidderParams;
+
+			if (!isSizeLess) {
+				for (const size in bidderParams) {
+					if (bidderParams.hasOwnProperty(size)) {
+						const isParamsExist = commonFunctions.verifyKeysInCollection(
+							bidderParams[size],
+							hbVideoParamsMap[bidderCode].params
 						);
-					}
 
-					break;
-				}
-				case 'rubicon': {
-					const isParamsExist = commonFunctions.verifyKeysInCollection(
-						bidderParams,
-						hbVideoParamsMap.rubicon.params
-					);
-
-					if (isParamsExist) {
-						bidderParams = commonFunctions.deleteKeysInCollection(
-							bidderParams,
-							hbVideoParamsMap.rubicon.params
-						);
-					}
-
-					// TODO: set player size
-
-					break;
-				}
-				case 'ix': {
-					// sizewise
-					for (const size in bidderParams) {
-						if (bidderParams.hasOwnProperty(size)) {
-							const isParamsExist = commonFunctions.verifyKeysInCollection(
+						if (isParamsExist) {
+							bidderParams[size] = commonFunctions.deleteKeysInCollection(
 								bidderParams[size],
-								hbVideoParamsMap.ix.params
+								hbVideoParamsMap[bidderCode].params
 							);
-
-							if (isParamsExist) {
-								bidderParams[size] = commonFunctions.deleteKeysInCollection(
-									bidderParams[size],
-									hbVideoParamsMap.ix.params
-								);
-							}
 						}
 					}
-
-					break;
 				}
-				case 'pubmatic': {
-					// sizewise
-					for (const size in bidderParams) {
-						if (bidderParams.hasOwnProperty(size)) {
-							const isParamsExist = commonFunctions.verifyKeysInCollection(
-								bidderParams[size],
-								hbVideoParamsMap.pubmatic.params
-							);
 
-							if (isParamsExist) {
-								bidderParams[size] = commonFunctions.deleteKeysInCollection(
-									bidderParams[size],
-									hbVideoParamsMap.pubmatic.params
-								);
-							}
-						}
-					}
+				return bidderParams;
+			}
 
-					break;
-				}
-				default: {
-				}
+			const isParamsExist = commonFunctions.verifyKeysInCollection(
+				bidderParams,
+				hbVideoParamsMap[bidderCode].params
+			);
+
+			if (isParamsExist) {
+				bidderParams = commonFunctions.deleteKeysInCollection(
+					bidderParams,
+					hbVideoParamsMap[bidderCode].params
+				);
 			}
 
 			return bidderParams;
@@ -331,8 +247,13 @@ function apiModule() {
 												const ad = section.ads[adKey];
 
 												if (ad.network === 'adpTags') {
-													const { headerBidding } = ad.networkData;
+													const {
+														networkData: { headerBidding },
+														width,
+														height
+													} = ad;
 													inventory.headerBidding = headerBidding ? 'Enabled' : 'Disabled';
+													inventory.size = `${width}x${height}`;
 													inventory.adUnit = section.name;
 													inventories.push({ ...inventory });
 												}
@@ -370,9 +291,12 @@ function apiModule() {
 							if (ad.network === 'adpTags') {
 								const {
 									networkData: { headerBidding },
+									width,
+									height,
 									name: adUnit
 								} = ad;
 								inventory.headerBidding = headerBidding ? 'Enabled' : 'Disabled';
+								inventory.size = `${width}x${height}`;
 								inventory.adUnit = adUnit;
 
 								inventories.push({ ...inventory });
@@ -403,9 +327,12 @@ function apiModule() {
 							if (ad.network === 'adpTags') {
 								const {
 									networkData: { headerBidding },
+									width,
+									height,
 									name: adUnit
 								} = ad;
 								inventory.headerBidding = headerBidding ? 'Enabled' : 'Disabled';
+								inventory.size = `${width}x${height}`;
 								inventory.adUnit = adUnit;
 
 								inventories.push({ ...inventory });
@@ -590,29 +517,45 @@ function apiModule() {
 			Promise.all([API.getHbConfig(siteId), userModel.getUserByEmail(email)]).then(
 				([hbConfig, user]) => {
 					const prebidConfig = hbConfig.get('prebidConfig');
-					// const { activeDFPNetwork, activeDFPCurrencyCode } = site.get('apConfigs');
-					const adNetworkSettings = user.getNetworkDataObj('DFP');
-					const currencyCode =
-						adNetworkSettings &&
-						adNetworkSettings.dfpAccounts &&
-						adNetworkSettings.dfpAccounts[0].currencyCode;
+					const activeAdServer = user.getActiveAdServerData('dfp');
+					const networkData = user.getNetworkDataObj('DFP');
+
+					const currencyCode = !!activeAdServer && activeAdServer.activeDFPCurrencyCode;
 					const mergedPrebidConfig = { ...prebidConfig };
 
-					mergedPrebidConfig.adServer =
-						adNetworkSettings &&
-						adNetworkSettings.dfpAccounts &&
-						adNetworkSettings.dfpAccounts.length
-							? adNetworkSettings.dfpAccounts[0].code ===
-							  hbGlobalSettingDefaults.dfpAdUnitTargeting.networkId
-								? 'AP'
-								: 'Publisher'
-							: 'N/A';
-					mergedPrebidConfig.currency.code = currencyCode || '';
-					mergedPrebidConfig.availableFormats = [
-						{ name: 'Display', value: 'display' },
-						{ name: 'Native', value: 'native' },
-						{ name: 'Video', value: 'video' }
-					];
+					if (activeAdServer && activeAdServer.activeDFPNetwork) {
+						if (
+							activeAdServer.activeDFPNetwork !==
+							hbGlobalSettingDefaults.dfpAdUnitTargeting.networkId.toString()
+						) {
+							const matchedDfpNetwork = networkData.dfpAccounts.find(
+								dfpAccount => dfpAccount.code === activeAdServer.activeDFPNetwork
+							);
+							const dfpName =
+								matchedDfpNetwork && matchedDfpNetwork.name ? matchedDfpNetwork.name : '';
+
+							mergedPrebidConfig.adServer = `${dfpName ? `${dfpName} ` : ''}(${
+								activeAdServer.activeDFPNetwork
+							})`;
+						} else {
+							mergedPrebidConfig.adServer = `AdPushup (${activeAdServer.activeDFPNetwork})`;
+						}
+					}
+
+					if (!(activeAdServer && activeAdServer.activeDFPNetwork)) {
+						mergedPrebidConfig.adServer = `N/A`;
+					}
+
+					// mergedPrebidConfig.adServer =
+					// 	activeAdServer && activeAdServer.activeDFPNetwork
+					// 		? activeAdServer.activeDFPNetwork ===
+					// 		  hbGlobalSettingDefaults.dfpAdUnitTargeting.networkId
+					// 			? `AP (${activeAdServer.activeDFPNetwork})`
+					// 			: `Publisher (${activeAdServer.activeDFPNetwork})`
+					// 		: 'N/A';
+
+					mergedPrebidConfig.currency = { code: currencyCode || 'N/A' };
+					mergedPrebidConfig.availableFormats = hbGlobalSettingDefaults.availableFormats;
 
 					return mergedPrebidConfig;
 				}
@@ -785,7 +728,7 @@ function apiModule() {
 
 				return hbConfig.save();
 			}),
-		setupAdserver: (siteId, user) => {
+		setupAdserver: user => {
 			const body = dfpLineItemAutomationReqBody;
 			const activeAdServerData = user.getActiveAdServerData('dfp');
 			const isPublisherActiveDfp =
@@ -802,7 +745,6 @@ function apiModule() {
 
 			return API.getAllBiddersFromNetworkConfig()
 				.then(allHbBidders => {
-					body.customKeyValues.hb_ap_siteid.values = [siteId];
 					body.customKeyValues.hb_ap_bidder.values = allHbBidders;
 					body.networkCode = activeAdServerData.activeDFPNetwork;
 					body.currencyCode = activeAdServerData.activeDFPCurrencyCode;

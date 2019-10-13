@@ -2,18 +2,13 @@ import React, { Component, Fragment } from 'react';
 import { Glyphicon, Button } from 'react-bootstrap';
 import 'react-dates/lib/css/_datepicker.css';
 import 'react-dates/initialize';
+import { CSVLink } from 'react-csv';
 import AsyncGroupSelect from '../../../Components/AsyncGroupSelect/index';
 import PresetDateRangePicker from '../../../Components/PresetDateRangePicker/index';
 import SelectBox from '../../../Components/SelectBox/index';
 import { getPresets } from '../helpers/utils';
 import reportService from '../../../services/reportService';
-import {
-	accountFilter,
-	accountDimension,
-	opsDimension,
-	opsFilter,
-	REPORT_DOWNLOAD_ENDPOINT
-} from '../configs/commonConsts';
+import { accountFilter, accountDimension, opsDimension, opsFilter } from '../configs/commonConsts';
 import { getReportingControlDemoUserSites } from '../../../helpers/commonFunctions';
 
 class Control extends Component {
@@ -126,7 +121,6 @@ class Control extends Component {
 		if (reportType === 'account') {
 			const { site } = this.props;
 			siteIds = Object.keys(site);
-
 		} else if (reportType === 'global') {
 			siteIds = '';
 			isSuperUser = true;
@@ -196,8 +190,7 @@ class Control extends Component {
 
 	render() {
 		const { state } = this;
-		const csvData = btoa(JSON.stringify(state.csvData));
-		const downloadLink = `${REPORT_DOWNLOAD_ENDPOINT}?data=${csvData}&fileName=${state.fileName}`;
+
 		return (
 			<Fragment>
 				<div className="aligner aligner--wrap aligner--hSpaceBetween u-margin-t4">
@@ -277,18 +270,18 @@ class Control extends Component {
 						</Button>
 					</div>
 					<div className="aligner-item ">
-						<a
-							href={downloadLink}
+						<CSVLink
+							data={state.csvData}
+							filename={`${state.fileName}.csv`}
 							style={{
 								display: 'block',
-								height: 33,
 								paddingTop: 8
 							}}
 							className="btn btn-lightBg btn-default btn-blue-line"
 						>
 							<Glyphicon glyph="download-alt u-margin-r2" />
 							Export Report
-						</a>
+						</CSVLink>
 					</div>
 				</div>
 			</Fragment>

@@ -528,6 +528,7 @@ class QuickSnapshot extends React.Component {
 			isReportTypeSite &&
 			reportingSites &&
 			reportingSites[siteId] &&
+			reportingSites[siteId].product &&
 			Number(reportingSites[siteId].product.Layout) === 1
 		);
 

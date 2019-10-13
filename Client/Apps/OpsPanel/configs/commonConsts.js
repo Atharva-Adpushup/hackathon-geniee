@@ -260,7 +260,8 @@ const DFP_ACCOUNTS_DEFAULT = [
 
 const ADPUSHUP_DFP = {
 	name: 'adpushup, inc',
-	code: '103512698'
+	code: '103512698',
+	currency: 'USD'
 };
 
 const TOOLS_IDENTIFIERS = {
@@ -363,6 +364,12 @@ const XPATH_MODE_URL = {
 	modes: [{ name: 'Mode 1', value: 'Mode 1' }, { name: 'Mode 2', value: 'Mode 2' }]
 };
 
+const DEFAULT_WIDTH = {
+	width: 150,
+	maxWidth: 150,
+	minWidth: 150
+};
+
 const SITE_MAPPING_COLUMNS = [
 	{
 		Header: 'Site ID',
@@ -395,53 +402,55 @@ const SITE_MAPPING_COLUMNS = [
 	{
 		Header: 'Active Status',
 		accessor: 'activeStatus',
-		width: 120,
-		maxWidth: 120,
-		minWidth: 120
+		getProps: (state, rowInfo, column) => ({
+			style: {
+				color:
+					rowInfo && rowInfo.row.activeStatus.props.children.includes('Active') ? 'green' : 'red'
+			}
+		}),
+		...DEFAULT_WIDTH
 	},
 	{
 		Header: 'Date Created',
 		accessor: 'dateCreated',
-		width: 120,
-		maxWidth: 120,
-		minWidth: 120
+		...DEFAULT_WIDTH
 	},
 	{
 		Header: 'Active Products',
 		accessor: 'activeProducts',
-		width: 150,
-		maxWidth: 150,
-		minWidth: 150
+		...DEFAULT_WIDTH
 	},
 	{
 		Header: 'Active Bidders',
 		accessor: 'activeBidders',
-		width: 150,
-		maxWidth: 150,
-		minWidth: 150
+		...DEFAULT_WIDTH
 	},
 	{
 		Header: 'Inactive Bidders',
 		accessor: 'inactiveBidders',
-		width: 150,
-		maxWidth: 150,
-		minWidth: 150
+		...DEFAULT_WIDTH
 	},
 	{
-		Header: 'Rev Share',
-		accessor: 'revenueShare'
+		Header: 'Rev Share(in %)',
+		accessor: 'revenueShare',
+		...DEFAULT_WIDTH
 	},
 	{
 		Header: 'Publisher Id',
-		accessor: 'publisherId'
+		accessor: 'publisherId',
+		...DEFAULT_WIDTH
 	},
 	{
 		Header: 'Auth Email',
-		accessor: 'authEmail'
+		accessor: 'authEmail',
+		width: 200,
+		maxWidth: 200,
+		minWidth: 200
 	},
 	{
 		Header: 'Ad Manager',
-		accessor: 'adManager'
+		accessor: 'adManager',
+		...DEFAULT_WIDTH
 	}
 ];
 
@@ -527,6 +536,7 @@ const ERROR_REPORT_PROPS = {
 
 const MODE_TOOLTIP_TEXT = `ADPUSHUP:1 , FALLBACK:2`;
 const ERROR_TOOLTIP_TEXT = `NO_ERROR:1, PAGEGROUP_NOT_FOUND:2, FALLBACK_PLANNED:3, FALLBACK_FORCED:4, PAUSED_IN_EDITOR:5`;
+const PREBID_CURRENCY_URL = '//cdn.jsdelivr.net/gh/prebid/currency-file@1/latest.json';
 
 export {
 	OP_NAV_ITEMS,
@@ -549,5 +559,6 @@ export {
 	ERROR_TOOLTIP_TEXT,
 	SITE_MAPPING_FILTER_COLUMNS,
 	ADPUSHUP_DFP,
-	ERROR_REPORT_PROPS
+	ERROR_REPORT_PROPS,
+	PREBID_CURRENCY_URL
 };

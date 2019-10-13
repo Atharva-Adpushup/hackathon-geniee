@@ -65,11 +65,13 @@ class Component {
 			window.adpushup.executeAdpTagsHeadCode([this.interactiveAd], {}); // This function expects an array of adpTags and optional adpKeyValues
 		}
 
-		let $banner = null;
-
-		const css = { width, height: parseInt(height) + POWERED_BY_BANNER.HEIGHT, ...customCSS };
+		// const css = { width, height: parseInt(height) + POWERED_BY_BANNER.HEIGHT, ...customCSS };
+		const css = { width, height: parseInt(height), ...customCSS };
 		const $format = $('<div />');
-		const $closeButton = this.createCloseButton(formatData);
+
+		// uncomment the below when re-thinking poweredByAdPushup logic
+		// const $closeButton = this.createCloseButton(formatData);
+
 		const feedbackOptions = {
 			// ads: [this.interactiveAd],
 			xpathMiss: [],
@@ -82,7 +84,8 @@ class Component {
 				: commonConsts.MANUAL_ADS.VARIATION
 		};
 
-		const $frame = $('<div />');
+		// uncomment the below when re-thinking poweredByAdPushup logic
+		// const $frame = $('<div />');
 		const newFeedbackAdObj = $.extend({}, this.interactiveAd);
 
 		// New feedback
@@ -95,21 +98,19 @@ class Component {
 		feedbackOptions.ads = [this.interactiveAd.id];
 
 		$format.attr({ id, 'data-section': id, class: '_ap_apex_ad' });
-		$frame.css({
-			// width,
-			...commonConsts.FRAME.CSS.COMMON,
-			...commonConsts.FRAME.CSS[formatData.placement.toUpperCase()]
-		});
-
-		if (adp.config.poweredByBanner) {
-			$banner = this.createPoweredByBanner(formatData);
-			$frame.append($banner);
-		} else {
-			$frame.css({ ...commonConsts.FRAME.CSS.DISABLED_BANNER });
-		}
-		$frame.append($closeButton);
-		// $frame.append('<div style="clear:both">&nbsp;</div>');
-		$format.append($frame);
+		// uncomment the below when re-thinking poweredByAdPushup logic
+		// $frame.css({
+		// 	...commonConsts.FRAME.CSS.COMMON,
+		// 	...commonConsts.FRAME.CSS[formatData.placement.toUpperCase()]
+		// });
+		// if (adp.config.poweredByBanner) {
+		// 	$banner = this.createPoweredByBanner(formatData);
+		// 	$frame.append($banner);
+		// } else {
+		// 	$frame.css({ ...commonConsts.FRAME.CSS.DISABLED_BANNER });
+		// }
+		// $frame.append($closeButton);
+		// $format.append($frame);
 
 		// adp.tracker.add(
 		// 	$format,

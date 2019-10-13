@@ -15,12 +15,12 @@ module.exports = {
 	PROXY_ORIGIN: '//proxy.app.adpushup.com',
 	PRODUCT_LIST_API: `${reportingBaseURL}/common/activeProducts`,
 	MAB_REPORTING_API: `${reportingBaseURL}/site/mab`,
-	ACTIVE_SITES_API: `${reportingBaseURL}/site/activeSiteList`,
-	XPATH_MISS_MODE_URL_API: `${reportingBaseURL}/site/report`,
+	GET_SITES_STATS_API: `${reportingBaseURL}/site/report`,
 	ANALYTICS_API_ROOT: reportingBaseURL,
 	ANALYTICS_METAINFO_URL: '/common/metaInfo',
 	REPORT_PATH: '/site/report?report_name=get_stats_by_custom',
 	DFP_LINE_ITEM_AUTOMATION_API: 'https://staging.adpushup.com/DfpInventoryWebService/job',
+	PAGEGROUP_LIST_API: `${reportingBaseURL}/site/list`,
 	DEMO_ACCOUNT_EMAIL: 'demo@adpushup.com',
 	AMP_SETTINGS_ACCESS_EMAILS: ['genieeamp@adpushup.com'],
 	DEMO_REPORT_SITE_ID: 31000,
@@ -202,7 +202,7 @@ module.exports = {
 	},
 	bidCpmAdjustments: {},
 	hbGlobalSettingDefaults: {
-		prebidTimeout: 5000,
+		prebidTimeout: 3000,
 		e3FeedbackUrl: '//e3.adpushup.com/ApexWebService/feedback',
 		targetAllDFP: false,
 		dfpAdUnitTargeting: {
@@ -210,7 +210,13 @@ module.exports = {
 		},
 		priceGranularity: 'DENSE',
 		adpushupDfpCurrency: 'USD',
-		adserverSetupCheckInterval: 1000 * 60 * 5
+		adserverSetupCheckInterval: 1000 * 60 * 5,
+		availableFormats: [
+			{ name: 'Display', value: 'display' },
+			{ name: 'Native', value: 'native' },
+			{ name: 'Video', value: 'video' }
+		],
+		defaultFormats: ['display']
 	},
 	hbContinents: [
 		{ name: 'Europe', code: 'EUR' },
@@ -371,7 +377,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 	onboarding: {
 		steps: ['Add Site', 'Add AP code', 'Setup Passback'],
 		adsTxtDocUrl:
-			'https://docs.google.com/feeds/download/documents/export/Export?id=1qu0IfKRGdq7Go6ABvqaoh0-9tM7hyGsCucPoRlDZiNI&exportFormat=txt',
+			'https://docs.google.com/feeds/download/documents/export/Export?id=1GyE6r2IUC3B0ITGXyAtCW97vrO9T-EHAvKr2ZM-GoQM&exportFormat=txt',
 		revenueLowerBound: 1000,
 		initialStep: 1,
 		totalSteps: 3

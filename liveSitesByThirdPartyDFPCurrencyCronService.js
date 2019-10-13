@@ -36,7 +36,7 @@ function updateGeneratedScriptsForLiveSites() {
 }
 
 cron.schedule(
-	'0 0 */4 * * *',
+	'0 0 */12 * * *',
 	function() {
 		const infoText = 'Running generated scripts for third party DFP currency live sites task every 4 hours';
 

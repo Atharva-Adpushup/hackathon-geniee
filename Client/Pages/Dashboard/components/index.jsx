@@ -263,6 +263,7 @@ class Dashboard extends React.Component {
 			reportType === 'site' &&
 			reportingSites &&
 			reportingSites[siteId] &&
+			reportingSites[siteId].product &&
 			Number(reportingSites[siteId].product.Layout) === 1
 		);
 		const isAccountLevelReport = !!(reportType === 'account');

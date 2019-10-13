@@ -31,7 +31,7 @@ const status = {
 	proxy = {
 		HTTP_PROXY_URL: `${window.ADP_ORIGIN}/loadFromApProxy/`,
 		SIMULATED_PROXY_URL: `${window.ADP_BASEURL}/proxy/loadPage`,
-		EXTENSION_ID: 'nbbbgcccgkkkemfmbjmbelkcgjlpibon' //'jpncecfhenibcencdmcpkeplacnhpcpp'
+		EXTENSION_ID: 'nbbbgcccgkkkemfmbjmbelkcgjlpibon' // 'jpncecfhenibcencdmcpkeplacnhpcpp'
 	},
 	stores = {
 		SITE_STORE: 'siteStore',
@@ -364,7 +364,7 @@ const status = {
 	networks = ['adsense', 'adpTags', 'custom', 'geniee', 'medianet'],
 	priceFloorKeys = ['FP_S_A', 'FP_B_A', 'FP_S', 'FP_A', 'FP_B'],
 	defaultPriceFloorKey = 'FP_S_A',
-	reportingUrl = '/user/reports/generate',
+	reportingUrl = '/api/reports/sections/generate',
 	jsWrapper = `(function($){ \n\n })(adpushup.$)`,
 	interactiveAds = {
 		events: ['DOMContentLoaded', 'scriptLoaded', 'scroll'],

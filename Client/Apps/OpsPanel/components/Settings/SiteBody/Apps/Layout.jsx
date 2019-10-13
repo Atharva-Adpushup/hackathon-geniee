@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 /* eslint-disable react/no-danger */
 /* eslint-disable no-shadow */
 /* eslint-disable no-unused-vars */
@@ -25,6 +26,7 @@ class Layout extends Component {
 			site: { apps = {} }
 		} = props;
 		this.state = { ...Layout.resetState(apps) };
+		this.shouldDisableSave = false;
 	}
 
 	componentDidMount() {
@@ -68,6 +70,31 @@ class Layout extends Component {
 			{ ...Layout.resetState(apps), siteAutoOptimise: autoOptimise, channels: channelsInfo },
 			() => resetTab()
 		);
+	};
+
+	checkTraffic = () => {
+		const { channels } = this.state;
+		const channelKeys = Object.keys(channels);
+
+		if (!channelKeys || !channelKeys.length) return true;
+
+		let isInvalid = false;
+
+		channelKeys.forEach(channelKey => {
+			const current = channels[channelKey];
+			const { variations = {}, autoOptimise } = current;
+			const variationKeys = Object.keys(variations);
+
+			if (autoOptimise || !variationKeys || !variationKeys.length) return;
+
+			const total = variationKeys.reduce((acc, id) => {
+				const variation = variations[id];
+				return acc + parseInt(variation.trafficDistribution, 10);
+			}, 0);
+			isInvalid = isInvalid || total !== 100;
+		});
+
+		return !isInvalid;
 	};
 
 	handleToggle = (value, event) => {
@@ -121,6 +148,13 @@ class Layout extends Component {
 	};
 
 	handleSave = () => {
+		const isTrafficValid = this.checkTraffic();
+
+		if (!isTrafficValid)
+			return window.alert(
+				'Total variation traffic is less than 100. Please update traffic in Editor/Enable Auto Optimise before save.'
+			);
+
 		const { status = undefined, channels = undefined, siteAutoOptimise = undefined } = this.state;
 		const {
 			site: { siteId },
@@ -172,6 +206,7 @@ class Layout extends Component {
 		const { channels: channelsInfo } = this.state;
 
 		const channels = Object.keys(channelsInfo);
+		let sum = 0;
 
 		return (
 			<Fragment>
@@ -199,10 +234,12 @@ class Layout extends Component {
 							traffic += `<p><span class="u-text-bold">${variation.name}</span> -- ${
 								variation.trafficDistribution
 							}%</p>`;
+							sum += parseInt(variation.trafficDistribution, 10);
 						});
 					} else {
 						traffic = 'No Variation Found';
 					}
+					if (!this.shouldDisableSave && sum < 100) this.shouldDisableSave = true;
 					return (
 						<tr key={`channel-row-${siteId}-${channelId}`}>
 							<td>{channel}</td>

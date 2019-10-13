@@ -7,6 +7,7 @@ const userModel = require('../../../models/userModel');
 const couchbase = require('../../../helpers/couchBaseService');
 const { getHbAdsApTag } = require('./generateAPTagConfig');
 const { isValidThirdPartyDFPAndCurrency } = require('../../../helpers/commonFunctions');
+const { getBiddersFromNetworkTree } = require('./commonFunctions');
 
 function getHbConfig(siteId) {
 	return couchbase
@@ -15,30 +16,12 @@ function getHbConfig(siteId) {
 		.catch(err => Promise.resolve({}));
 }
 
-function getBiddersFromNetworkTree() {
-	return couchbase
-		.connectToAppBucket()
-		.then(appBucket => appBucket.getAsync(`data::apNetwork`, {}))
-		.then(({ value: networkTree }) => {
-			const biddersFromNetworkTree = {};
-
-			for (const bidderCode in networkTree) {
-				if (networkTree.hasOwnProperty(bidderCode) && networkTree[bidderCode].isHb) {
-					biddersFromNetworkTree[bidderCode] = networkTree[bidderCode];
-				}
-			}
-
-			return biddersFromNetworkTree;
-		})
-		.catch(err => Promise.resolve({}));
-}
-
 function getPrebidModules(hbcf) {
 	const hbConfig = hbcf.value.hbcf;
 	const modules = new Set();
 
 	for (const bidderCode of Object.keys(hbConfig)) {
-		const adpater = PREBID_ADAPTERS[bidderCode];
+		const adpater = hbConfig[bidderCode].adapter;
 		adpater ? modules.add(adpater) : console.log(`Prebid Adapter not found for ${bidderCode}`);
 	}
 
@@ -56,7 +39,7 @@ function gdprProcessing(site) {
 	};
 }
 
-function getActiveUsedBidders(usedBidders, biddersFromNetworkTree) {
+function getActiveUsedBiddersWithAdapter(usedBidders, biddersFromNetworkTree) {
 	const activeUsedBidders = {};
 	for (const bidderCode in usedBidders) {
 		if (
@@ -66,6 +49,7 @@ function getActiveUsedBidders(usedBidders, biddersFromNetworkTree) {
 			biddersFromNetworkTree[bidderCode].isActive
 		) {
 			activeUsedBidders[bidderCode] = usedBidders[bidderCode];
+			activeUsedBidders[bidderCode].adapter = biddersFromNetworkTree[bidderCode].adapter;
 		}
 	}
 
@@ -91,6 +75,7 @@ function HbProcessing(site, apConfigs) {
 				apps.headerBidding &&
 				hbcf.value &&
 				hbcf.value.hbcf &&
+				Object.keys(hbcf.value.hbcf).length &&
 				hbAds.length
 			);
 
@@ -105,7 +90,7 @@ function HbProcessing(site, apConfigs) {
 				};
 			}
 
-			hbcf.value.hbcf = getActiveUsedBidders(hbcf.value.hbcf, biddersFromNetworkTree);
+			hbcf.value.hbcf = getActiveUsedBiddersWithAdapter(hbcf.value.hbcf, biddersFromNetworkTree);
 
 			const adServerSettings = user.get('adServerSettings');
 			const isValidCurrencyCnfg =
@@ -118,10 +103,11 @@ function HbProcessing(site, apConfigs) {
 			let prebidAdapters = getPrebidModules(hbcf);
 
 			if (isValidCurrencyCnfg) {
+				const activeAdServer = adServerSettings.dfp;
 				computedPrebidCurrencyConfig = {
-					adServerCurrency: apConfigs.activeDFPCurrencyCode,
-					granularityMultiplier: Number(apConfigs.prebidGranularityMultiplier),
-					rates: apConfigs.activeDFPCurrencyExchangeRate
+					adServerCurrency: activeAdServer.activeDFPCurrencyCode,
+					granularityMultiplier: Number(activeAdServer.prebidGranularityMultiplier) || 1,
+					rates: activeAdServer.activeDFPCurrencyExchangeRate
 				};
 			}
 

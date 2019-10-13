@@ -8,10 +8,10 @@ import { openPageGroupIfPresent } from '../misc/beforeEditorInit';
 const save = (url, data) => $.ajax({ type: 'POST', url, data, dataType: 'json' }),
 	getData = (url, data) => $.get(url, data),
 	isApInstalled = (url, siteId) =>
-		$.getJSON(`/api/proxy/detectAp?url=${encodeURI(url)}&site=${siteId}`),
+		$.getJSON(`/api/proxy/detectAp?url=${encodeURI(url)}&siteId=${siteId}`),
 	changeSiteMode = (siteId, mode) =>
 		save('/data/changeMode', { siteId, mode }).then(response => !!response.success),
-	/***TODO: Optimise and reduce below function***/
+	/** *TODO: Optimise and reduce below function** */
 	loadInitialData = siteId => {
 		const deferred = $.Deferred(),
 			processData = rawData => {

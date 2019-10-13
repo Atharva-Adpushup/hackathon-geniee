@@ -20,9 +20,8 @@ export default class InventoryTab extends React.Component {
 	};
 
 	componentDidMount() {
-		const { siteId, fetchInventoriesAction } = this.props;
+		const { siteId } = this.props;
 
-		fetchInventoriesAction(siteId);
 		getHbStatusForSite(siteId).then(({ headerBidding: hbStatusForSite }) => {
 			this.setState({ hbStatusForSite, loadingHbStatusForSite: false });
 		});
@@ -97,7 +96,13 @@ export default class InventoryTab extends React.Component {
 
 	updateInventoriesHbStatus = enableHB => {
 		this.setState({ updatingInventoryHbStatus: true });
-		const { inventories, siteId, updateInventoriesHbStatus, showNotification } = this.props;
+		const {
+			inventories,
+			siteId,
+			updateInventoriesHbStatus,
+			showNotification,
+			setUnsavedChangesAction
+		} = this.props;
 		const { selectedInventories } = this.state;
 
 		const inventoriesToUpdate = [];
@@ -112,7 +117,11 @@ export default class InventoryTab extends React.Component {
 		}
 
 		updateInventoriesHbStatus(siteId, inventoriesToUpdate)
-			.then(() => this.setState({ updatingInventoryHbStatus: false }))
+			.then(() =>
+				this.setState({ updatingInventoryHbStatus: false }, () => {
+					setUnsavedChangesAction(true);
+				})
+			)
 			.catch(() => {
 				showNotification({
 					mode: 'error',
@@ -128,10 +137,12 @@ export default class InventoryTab extends React.Component {
 
 		if (loadingHbStatusForSite || newHbStatus === currHbStatus) return false;
 
-		const { siteId } = this.props;
+		const { siteId, setUnsavedChangesAction } = this.props;
 		this.setState({ loadingHbStatusForSite: true });
 		return toggleHbStatusForSite(siteId).then(({ headerBidding: hbStatusForSite }) =>
-			this.setState({ hbStatusForSite, loadingHbStatusForSite: false })
+			this.setState({ hbStatusForSite, loadingHbStatusForSite: false }, () =>
+				setUnsavedChangesAction(true)
+			)
 		);
 	};
 
@@ -185,7 +196,9 @@ export default class InventoryTab extends React.Component {
 					<div className={`inventory-wrap${hbStatusForSite === false ? ' disabled' : ' active'}`}>
 						{!!selectedInventories.length && (
 							<div className="updt-inv-hb-status u-margin-b4">
-								<span className="selected-inv-count u-margin-r3">{`${selectedInventories.length} selected`}</span>
+								<span className="selected-inv-count u-margin-r3">{`${
+									selectedInventories.length
+								} selected`}</span>
 								<CustomButton
 									disabled={updatingInventoryHbStatus}
 									variant="secondary"

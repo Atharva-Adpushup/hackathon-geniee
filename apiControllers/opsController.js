@@ -6,11 +6,7 @@ const _ = require('lodash');
 
 const { couchBase } = require('../configs/config');
 const HTTP_STATUSES = require('../configs/httpStatusConsts');
-const {
-	ACTIVE_SITES_API,
-	XPATH_MISS_MODE_URL_API,
-	EMAIL_REGEX
-} = require('../configs/commonConsts');
+const { GET_SITES_STATS_API, EMAIL_REGEX } = require('../configs/commonConsts');
 const { sendSuccessResponse, sendErrorResponse } = require('../helpers/commonFunctions');
 const { appBucket, errorHandler } = require('../helpers/routeHelpers');
 const opsModel = require('../models/opsModel');
@@ -19,7 +15,11 @@ const router = express.Router();
 
 const helpers = {
 	getAllSitesFromCouchbase: () => {
-		const query = `select a.siteId, a.siteDomain, a.adNetworkSettings, a.ownerEmail, a.step, a.channels, a.apConfigs, a.dateCreated, b.adNetworkSettings[0].pubId, b.adNetworkSettings[0].adsenseEmail from ${couchBase.DEFAULT_BUCKET} a join ${couchBase.DEFAULT_BUCKET} b on keys 'user::' || a.ownerEmail where meta(a).id like 'site::%'`;
+		const query = `select a.siteId, a.siteDomain, a.adNetworkSettings, a.ownerEmail, a.step, a.channels, a.apConfigs, a.dateCreated, b.adNetworkSettings[0].pubId, b.adNetworkSettings[0].adsenseEmail from ${
+			couchBase.DEFAULT_BUCKET
+		} a join ${
+			couchBase.DEFAULT_BUCKET
+		} b on keys 'user::' || a.ownerEmail where meta(a).id like 'site::%'`;
 		return appBucket.queryDB(query);
 	},
 	makeAPIRequest: options => {
@@ -95,7 +95,7 @@ router
 		}
 		function makeAPIRequestWrapper(qs) {
 			return helpers.makeAPIRequest({
-				uri: ACTIVE_SITES_API,
+				uri: GET_SITES_STATS_API,
 				qs
 			});
 		}
@@ -106,8 +106,13 @@ router
 				siteid: element.siteid
 			}));
 		}
+
+		function uniqueData(arr) {
+			return _.uniqBy(arr, 'siteid').filter(value => value.adpushup_count >= 10000);
+		}
+
 		return new Promise((resolve, reject) => {
-			if (!parsedData.pageviewsThreshold || !parsedData.current) {
+			if (!parsedData.current) {
 				return reject(
 					new Error({
 						message: 'Missing Params',
@@ -118,7 +123,7 @@ router
 			return resolve();
 		})
 			.then(() => {
-				const { pageviewsThreshold = 10000, current = {} } = parsedData;
+				const { current = {} } = parsedData;
 
 				const numberOfDays = Math.ceil(moment(current.to).diff(moment(current.from), 'days', true));
 				const currentTo = processDate(current.to, moment(), 1);
@@ -131,12 +136,16 @@ router
 					makeAPIRequestWrapper({
 						fromDate: lastFrom,
 						toDate: lastTo,
-						minPageViews: pageviewsThreshold
+						report_name: 'get_stats_by_custom',
+						isSuperUser: true,
+						dimension: 'siteid,mode'
 					}),
 					makeAPIRequestWrapper({
 						fromDate: currentFrom,
 						toDate: currentTo,
-						minPageViews: pageviewsThreshold
+						report_name: 'get_stats_by_custom',
+						isSuperUser: true,
+						dimension: 'siteid,mode'
 					})
 				];
 				return Promise.all(promises);
@@ -145,22 +154,28 @@ router
 				if (lastWeekData.code !== 1 || currentWeekData.code !== 1) {
 					return Promise.reject(new Error('Invalid Data Found in either of the date rangers'));
 				}
-				let { data: { result: lastWeekSites = [] } = {} } = lastWeekData;
-				let { data: { result: currentWeekSites = [] } = {} } = currentWeekData;
 
-				lastWeekSites = cleanData(lastWeekSites);
-				currentWeekSites = cleanData(currentWeekSites);
+				const { data: { result: lastWeekSites = [] } = {} } = lastWeekData;
+				const { data: { result: currentWeekSites = [] } = {} } = currentWeekData;
 
-				const lastSiteIds = _.map(lastWeekSites, 'siteid');
-				const currentSiteIds = _.map(currentWeekSites, 'siteid');
+				let lastWeekEntries = uniqueData(lastWeekSites);
+				let currentWeekEntries = uniqueData(currentWeekSites);
+
+				lastWeekEntries = cleanData(lastWeekEntries);
+				currentWeekEntries = cleanData(currentWeekEntries);
+
+				const lastSiteIds = _.map(lastWeekEntries, 'siteid');
+				const currentSiteIds = _.map(currentWeekEntries, 'siteid');
 
 				const lostIds = _.difference(lastSiteIds, currentSiteIds);
 				const wonIds = _.difference(currentSiteIds, lastSiteIds);
 				const rententionIds = _.intersection(lastSiteIds, currentSiteIds);
 
-				const won = currentWeekSites.filter(site => wonIds.indexOf(site.siteid) !== -1);
-				const lost = lastWeekSites.filter(site => lostIds.indexOf(site.siteid) !== -1);
-				const rentention = lastWeekSites.filter(site => rententionIds.indexOf(site.siteid) !== -1);
+				const won = currentWeekEntries.filter(site => wonIds.indexOf(site.siteid) !== -1);
+				const lost = lastWeekEntries.filter(site => lostIds.indexOf(site.siteid) !== -1);
+				const rentention = lastWeekEntries.filter(
+					site => rententionIds.indexOf(site.siteid) !== -1
+				);
 
 				return sendSuccessResponse(
 					{
@@ -227,7 +242,7 @@ router
 
 		return helpers
 			.makeAPIRequest({
-				uri: XPATH_MISS_MODE_URL_API,
+				uri: GET_SITES_STATS_API,
 				qs: { ...qs, report_name: 'get_url_count' }
 			})
 			.then(response => {

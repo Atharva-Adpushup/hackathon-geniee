@@ -1,6 +1,7 @@
 // Slot inventory mapper
 
 var adp = require('./adp');
+var BACKWARD_COMPATIBLE_MAPPING = require('./constants').AD_SIZE_MAPPING.BACKWARD_COMPATIBLE_MAPPING;
 var inventoryMapper = {
 	get: function(inventory, size, optionalParam) {
 		// Reset inventory as default if site is SPA
@@ -17,8 +18,7 @@ var inventoryMapper = {
 		var hbConfig = inventory.hbcf;
 
 		if (optionalParam.headerBidding && hbConfig && Object.keys(hbConfig).length) {
-			var updatedSizeArr = optionalParam.multipleAdSizes ? optionalParam.multipleAdSizes[0] : size;
-			var updatedSize = updatedSizeArr[0] + 'x' + updatedSizeArr[1];
+			var updatedSize = size;
 			if (optionalParam.overrideActive && optionalParam.overrideSizeTo) {
 				updatedSize = optionalParam.overrideSizeTo;
 			}
@@ -34,15 +34,45 @@ var inventoryMapper = {
 						});
 					}
 
+					function getOriginalOrDownwardSizeBidderParams(allSizesParams, inventorySize) {
+						if (!allSizesParams || !Object.keys(allSizesParams).length) return;
+
+						if (
+							inventorySize === 'responsivexresponsive' &&
+							allSizesParams['responsive']
+						) return allSizesParams['responsive'];
+
+						if (allSizesParams[inventorySize]) return allSizesParams[inventorySize];
+
+						for (const originalSize in BACKWARD_COMPATIBLE_MAPPING) {
+							if (
+								originalSize === inventorySize &&
+								BACKWARD_COMPATIBLE_MAPPING[originalSize].length
+							) {
+								const backwardSizes = BACKWARD_COMPATIBLE_MAPPING[originalSize];
+
+								for (let backwardSize of backwardSizes) {
+									backwardSize = backwardSize.join('x');
+									if (allSizesParams[backwardSize]) return allSizesParams[backwardSize];
+								}
+
+								return;
+							}
+						}
+					}
+
 					if (
 						!bidderData.sizeLess &&
-						bidderData.reusable &&
-						bidderData.config[updatedSize]
+						bidderData.reusable
 					) {
-						bidders.push({
-							bidder: bidder,
-							params: bidderData.config[updatedSize]
-						});
+						const bidderParams = getOriginalOrDownwardSizeBidderParams(bidderData.config, updatedSize);
+						
+						if (bidderParams) {
+							bidders.push({
+								bidder: bidder,
+								params: bidderParams
+							});
+						}
 					}
 				}
 			});

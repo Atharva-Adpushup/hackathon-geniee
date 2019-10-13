@@ -655,16 +655,12 @@ const Promise = require('bluebird'),
 				config.activeDFPCurrencyCode.length &&
 				config.activeDFPCurrencyCode.length === 3
 			),
-			isPrebidGranularityMultiplier = !!(
-				config.prebidGranularityMultiplier && Number(config.prebidGranularityMultiplier)
-			),
 			isActiveDFPCurrencyExchangeRate = !!(
 				config.activeDFPCurrencyExchangeRate && Object.keys(config.activeDFPCurrencyExchangeRate).length
 			),
 			isValidResult = !!(
 				isActiveDFPNetwork &&
 				isActiveDFPCurrencyCode &&
-				isPrebidGranularityMultiplier &&
 				isActiveDFPCurrencyExchangeRate
 			);
 

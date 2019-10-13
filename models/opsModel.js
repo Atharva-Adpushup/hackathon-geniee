@@ -3,6 +3,7 @@ module.exports = apiModule();
 const { N1qlQuery } = require('couchbase');
 const request = require('request-promise');
 const moment = require('moment');
+const _ = require('lodash');
 
 const couchbase = require('../helpers/couchBaseService');
 const AdPushupError = require('../helpers/AdPushupError');
@@ -33,6 +34,9 @@ const commonSiteFunctions = {
 		return { activeBidders, inactiveBidders };
 	},
 	getOnboardingStatus(onboardingStep, apps = {}) {
+		if (onboardingStep > 3) {
+			return 'Onboarded';
+		}
 		switch (onboardingStep) {
 			case 1: {
 				return 'AP Head Code is Missing';
@@ -52,31 +56,34 @@ const commonSiteFunctions = {
 			}
 
 			default:
+				return 'N/A';
 		}
 	},
-	getSitesReport(siteIds) {
+	getSitesReport() {
 		const dateFormat = 'YYYY-MM-DD';
-		const pageviewsThreshold = 10000;
 		const days = 2;
 		const dayOffset = 1;
 
 		return request({
 			method: 'GET',
 			json: true,
-			uri: commonConsts.ACTIVE_SITES_API,
+			uri: commonConsts.GET_SITES_STATS_API,
 			qs: {
+				report_name: 'get_stats_by_custom',
+				isSuperUser: true,
+				dimension: 'siteid,mode',
 				fromDate: moment()
 					.subtract(days + dayOffset, 'days')
 					.format(dateFormat),
 				toDate: moment()
 					.subtract(dayOffset, 'days')
-					.format(dateFormat),
-				minPageViews: pageviewsThreshold,
-				siteid: siteIds.join(',')
+					.format(dateFormat)
 			}
 		});
 	},
 	getActiveProducts(apps) {
+		if (!apps) return 'N/A';
+
 		const appKeys = Object.keys(apps);
 
 		return appKeys.reduce((activeProducts, appKey) => {
@@ -90,7 +97,10 @@ const commonSiteFunctions = {
 		if (adNetworkSettings && adNetworkSettings.length) {
 			const adsenseNetwork = adNetworkSettings.find(network => network.networkName === 'ADSENSE');
 			if (adsenseNetwork) {
-				return { publisherId: adsenseNetwork.pubId, publisherEmail: adsenseNetwork.adsenseEmail };
+				return {
+					publisherId: adsenseNetwork.pubId || '',
+					publisherEmail: adsenseNetwork.adsenseEmail || ''
+				};
 			}
 		}
 
@@ -121,6 +131,10 @@ const commonSiteFunctions = {
 	}
 };
 
+function getUniqueSites(myArr, prop) {
+	return _.uniq(_.map(myArr, prop));
+}
+
 function apiModule() {
 	const API = {
 		getAllSitesStats() {
@@ -129,24 +143,26 @@ function apiModule() {
 			return couchbase
 				.connectToAppBucket()
 				.then(appBucket => appBucket.queryAsync(query))
-				.then(sites => {
-					const siteIds = sites.map(site => site.siteId);
-
-					return Promise.all([
+				.then(sites =>
+					Promise.all([
 						sites,
 						commonSiteFunctions.getNetworkTree(),
-						commonSiteFunctions.getSitesReport(siteIds)
-					]);
-				})
+						commonSiteFunctions.getSitesReport()
+					])
+				)
 				.then(([sites, networkTree, sitesReport]) => {
 					const finalSites = sites.map(site => {
 						const { publisherId, publisherEmail } = commonSiteFunctions.getPublisherIdAndEmail(
 							site.adNetworkSettings
 						);
+						if (!site.revenueShare) {
+							site.revenueShare = 'N/A';
+						}
 						const {
 							activeBidders,
 							inactiveBidders
 						} = commonSiteFunctions.getActiveInactiveBidderNames(site.addedBidders, networkTree);
+						const uniqueSiteIds = getUniqueSites(sitesReport.data.result, 'siteid');
 
 						site.activeBidders = activeBidders;
 						site.inactiveBidders = inactiveBidders;
@@ -162,8 +178,8 @@ function apiModule() {
 
 						site.activeStatus =
 							sitesReport.code === 1 &&
-							sitesReport.data.result.length &&
-							!!sitesReport.data.result.find(currSite => currSite.siteId === site.siteId)
+							uniqueSiteIds &&
+							!!uniqueSiteIds.find(currSiteId => currSiteId === site.siteId)
 								? 'Active'
 								: 'Inactive';
 

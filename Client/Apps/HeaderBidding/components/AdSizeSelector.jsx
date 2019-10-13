@@ -4,17 +4,37 @@
 /* eslint-disable react/destructuring-assignment */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Row, Col, Nav, NavItem } from 'react-bootstrap';
+import { Row, Col, Nav, NavItem, FormGroup, ControlLabel, HelpBlock } from 'react-bootstrap';
+import InputBox from '../../../Components/InputBox';
+import CustomButton from '../../../Components/CustomButton';
 
 class AdSizeSelector extends React.Component {
 	state = {
-		activeKey: ''
+		activeKey: '',
+		customSize: '',
+		customSizeError: ''
 	};
 
 	componentDidMount() {
 		const { filteredAdSizes } = this.props;
 		this.setState({ activeKey: Object.keys(filteredAdSizes)[0] });
 	}
+
+	setCustomSize = ({ target: { value } }) => {
+		this.setState({ customSize: value });
+	};
+
+	onAddCustomSize = () => {
+		const { customSize } = this.state;
+		const { addNewSize } = this.props;
+
+		const regex = /^\d{2,3}x\d{2,3}$/;
+		const isValid = regex.test(customSize);
+
+		if (!isValid) return this.setState({ customSizeError: 'Please enter valid ad size' });
+
+		return addNewSize(customSize);
+	};
 
 	handleNavSelect = value => {
 		this.setState({ activeKey: value });
@@ -67,18 +87,47 @@ class AdSizeSelector extends React.Component {
 	};
 
 	render() {
-		const { activeKey } = this.state;
+		const { activeKey, customSize, customSizeError } = this.state;
 		return (
-			<Row className="clearfix add-size-wrap">
-				<Col sm={4} className="add-size-tabs">
-					<Nav bsStyle="pills" stacked activeKey={activeKey} onSelect={this.handleNavSelect}>
-						{this.renderTabs()}
-					</Nav>
-				</Col>
-				<Col sm={8} className="add-size-content">
-					{this.renderTabContent()}
-				</Col>
-			</Row>
+			<React.Fragment>
+				<Row className="clearfix add-size-wrap">
+					<Col sm={4} className="add-size-tabs">
+						<Nav bsStyle="pills" stacked activeKey={activeKey} onSelect={this.handleNavSelect}>
+							{this.renderTabs()}
+						</Nav>
+					</Col>
+					<Col sm={8} className="add-size-content">
+						{this.renderTabContent()}
+					</Col>
+				</Row>
+				<Row>
+					<Col sm={12}>
+						<FormGroup controlId="hb-custom-size" className="u-margin-t5">
+							<Col componentClass={ControlLabel} sm={3}>
+								Custom Size
+							</Col>
+							<Col sm={4}>
+								<InputBox
+									type="text"
+									name="hb-custom-size"
+									classNames="hb-input"
+									value={customSize}
+									onChange={this.setCustomSize}
+									placeholder="e.g. 728x90"
+								/>
+								{!!customSizeError && (
+									<HelpBlock className="u-text-error">{customSizeError}</HelpBlock>
+								)}
+							</Col>
+							<Col sm={4}>
+								<CustomButton variant="secondary" onClick={this.onAddCustomSize}>
+									Add
+								</CustomButton>
+							</Col>
+						</FormGroup>
+					</Col>
+				</Row>
+			</React.Fragment>
 		);
 	}
 }
