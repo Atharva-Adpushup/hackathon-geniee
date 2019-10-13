@@ -235,7 +235,7 @@ class Dashboard extends React.Component {
 		}
 	};
 
-	getLayoutSites = (allUserSites, reportingSites) => {
+	getLayoutSites = (allUserSites, reportingSites = {}) => {
 		const layoutSites = [];
 		allUserSites.forEach(site => {
 			const siteId = site.value;

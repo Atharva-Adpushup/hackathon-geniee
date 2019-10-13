@@ -56,7 +56,8 @@ class Control extends Component {
 	}
 
 	onFilteChange = selectedFilters => {
-		let reportType = 'account';
+		const { defaultReportType } = this.props;
+		let reportType = defaultReportType || 'account';
 		const { filterList, dimensionList } = this.props;
 		const selectedSiteFilters = selectedFilters.siteid || {};
 		if (selectedSiteFilters && Object.keys(selectedSiteFilters).length === 1) {
@@ -115,15 +116,19 @@ class Control extends Component {
 	getSelectedFilter = filter => {
 		const { reportType, selectedFilters, isDemoUser } = this.props;
 		let siteIds;
+		let isSuperUser = false;
 
 		if (reportType === 'account') {
 			const { site } = this.props;
 			siteIds = Object.keys(site);
+		} else if (reportType === 'global') {
+			siteIds = '';
+			isSuperUser = true;
 		} else {
 			siteIds = selectedFilters.siteid ? Object.keys(selectedFilters.siteid) : [];
 		}
 
-		const params = { siteid: siteIds.toString() };
+		const params = { siteid: siteIds.toString(), isSuperUser };
 		return reportService
 			.getWidgetData({ path: filter.path, params })
 			.then(data => getReportingControlDemoUserSites(data, filter.path, isDemoUser));
@@ -159,7 +164,7 @@ class Control extends Component {
 			filterList,
 			dimensionList
 		);
-		if (reportType === 'account') {
+		if (reportType === 'account' || reportType === 'global') {
 			updatedFilterList.forEach(fil => {
 				const index = accountFilter.indexOf(fil.value);
 				if (index >= 0) {

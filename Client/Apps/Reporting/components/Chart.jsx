@@ -281,6 +281,7 @@ class Chart extends React.Component {
 	};
 
 	render() {
+		const { allAvailableMetrics, reportType, updateMetrics, isCustomizeChartLegend } = this.props;
 		const { type, series, xAxis, legends, activeLegendItems, selectedDimension } = this.state;
 		return (
 			<div>
@@ -292,6 +293,10 @@ class Chart extends React.Component {
 					activeLegendItems={activeLegendItems}
 					onLegendChange={this.onLegendChange}
 					yAxisGroups={selectedDimension ? [] : null}
+					availableLegends={allAvailableMetrics}
+					reportType={reportType}
+					isCustomizeChartLegend={isCustomizeChartLegend}
+					updateMetrics={updateMetrics}
 				/>
 			</div>
 		);
