@@ -9,12 +9,25 @@ const router = express.Router();
 
 router
 	.get('/getCustomStats', (req, res) => {
-		const siteIds = req.query && req.query.siteid ? req.query.siteid : '';
-		if (siteIds)
+		const {
+			query: { siteid = '', isSuperUser = false, fromDate, toDate, metrics, interval }
+		} = req;
+		const isValidParams = !!((siteid || isSuperUser) && fromDate && toDate && metrics && interval);
+
+		if (isValidParams) {
+			const params = {
+				siteid,
+				isSuperUser,
+				fromDate,
+				toDate,
+				metrics,
+				interval
+			};
+
 			return request({
 				uri: `${CC.ANALYTICS_API_ROOT}${CC.REPORT_PATH}`,
 				json: true,
-				qs: req.query
+				qs: params
 			})
 				.then(response => {
 					if (response.code == 1 && response.data) return res.send(response.data);
@@ -24,6 +37,8 @@ router
 					console.log(err);
 					return res.send({});
 				});
+		}
+
 		return res.send({});
 	})
 	.get('/getWidgetData', (req, res) => {
@@ -49,8 +64,7 @@ router
 		return res.send({});
 	})
 	.get('/downloadAdpushupReport', (req, res) => {
-		const { data , fileName} = req.query;
-
+		const { data, fileName } = req.query;
 
 		if (data) {
 			try {
@@ -59,7 +73,7 @@ router
 				res.setHeader('Content-disposition', `attachment; filename=${fileName}.csv`);
 				res.set('Content-Type', 'text/csv');
 
-				var headers = {};
+				const headers = {};
 				for (key in csvData[0]) {
 					headers[key] = key;
 				}
@@ -87,20 +101,25 @@ router
 	)
 	.get('/getMetaData', (req, res) => {
 		const {
-			user: { isSuperUser },
-			query: { sites = '' }
+			query: { sites = '', isSuperUser = false }
 		} = req;
-		const params = { siteid: sites, isSuperUser };
+		const isValidParams = !!(sites || isSuperUser);
 
-		return request({
-			uri: `${CC.ANALYTICS_API_ROOT}${CC.ANALYTICS_METAINFO_URL}`,
-			json: true,
-			qs: params
-		})
-			.then(response =>
-				response.code == 1 && response.data ? res.send(response.data) : res.send({})
-			)
-			.catch(err => res.send({}));
+		if (isValidParams) {
+			const params = { siteid: sites, isSuperUser };
+
+			return request({
+				uri: `${CC.ANALYTICS_API_ROOT}${CC.ANALYTICS_METAINFO_URL}`,
+				json: true,
+				qs: params
+			})
+				.then(response =>
+					response.code == 1 && response.data ? res.send(response.data) : res.send({})
+				)
+				.catch(err => res.send({}));
+		}
+
+		return res.send({});
 	});
 
 module.exports = router;

@@ -687,7 +687,7 @@ class QuickSnapshot extends React.Component {
 		if (reportType === 'site') siteSelected = `/${siteId}`;
 		else if (selectedSite !== 'all') siteSelected = `/${selectedSite}`;
 
-		const computedReportLink = `/reports${siteSelected}?fromDate=${startDate}&toDate=${endDate}&dimension=${selectedDimension}&chartLegendMetric=${selectedChartLegendMetric}`;
+		const computedReportLink = `/admin-panel/info-panel/report-vitals${siteSelected}?fromDate=${startDate}&toDate=${endDate}&dimension=${selectedDimension}&chartLegendMetric=${selectedChartLegendMetric}`;
 
 		return (
 			<Link to={computedReportLink} className="u-link-reset aligner aligner-item float-right">
