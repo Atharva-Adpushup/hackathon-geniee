@@ -269,6 +269,16 @@ const Routes = () => (
 						exact
 						customProps={{
 							activeTab: OP_NAV_ITEMS_INDEXES.INFO_PANEL,
+							activeComponentTab: OP_NAV_ITEMS_INDEXES.INFO_PANEL_GLOBAL_REPORT_VITALS
+						}}
+						name="Global Report Vitals"
+						path="/admin-panel/info-panel/global-report-vitals"
+						component={OpsPanel}
+					/>
+					<PrivateRoute
+						exact
+						customProps={{
+							activeTab: OP_NAV_ITEMS_INDEXES.INFO_PANEL,
 							activeComponentTab: OP_NAV_ITEMS_INDEXES.INFO_PANEL_REPORT_VITALS
 						}}
 						name="Report Vitals"
