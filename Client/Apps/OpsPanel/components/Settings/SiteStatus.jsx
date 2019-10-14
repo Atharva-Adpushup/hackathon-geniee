@@ -14,17 +14,15 @@ class SiteStatus extends Component {
 
 	componentDidMount() {
 		const { site } = this.props;
-		if (site) this.fetchStatuses(site);
-	}
-
-	fetchStatuses(site) {
-		axiosInstance
-			.get(`/site/status?siteId=${site}`)
-			.then(res => {
-				const { data = [] } = res.data;
-				this.setState({ statuses: data, isLoading: false, isError: false });
-			})
-			.catch(() => this.setState({ statuses: null, isLoading: false, isError: true }));
+		if (site) {
+			axiosInstance
+				.get(`/site/status?siteId=${site}`)
+				.then(res => {
+					const { data = [] } = res.data;
+					this.setState({ statuses: data, isLoading: false, isError: false });
+				})
+				.catch(() => this.setState({ statuses: null, isLoading: false, isError: true }));
+		}
 	}
 
 	renderBody() {
@@ -47,7 +45,7 @@ class SiteStatus extends Component {
 					{services.map(key => {
 						const service = statuses[key];
 						const { status, displayText, message = null } = service;
-						const toPrint = message || status ? 'Complete' : 'Incomplete';
+						const toPrint = message || (status ? 'Complete' : 'Incomplete');
 
 						return (
 							<tr key={key}>
