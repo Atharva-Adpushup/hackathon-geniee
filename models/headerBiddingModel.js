@@ -254,7 +254,7 @@ function apiModule() {
 													} = ad;
 													inventory.headerBidding = headerBidding ? 'Enabled' : 'Disabled';
 													inventory.size = `${width}x${height}`;
-													inventory.adUnit = section.name;
+													inventory.adUnit = section.id;
 													inventories.push({ ...inventory });
 												}
 											}
@@ -293,7 +293,7 @@ function apiModule() {
 									networkData: { headerBidding },
 									width,
 									height,
-									name: adUnit
+									id: adUnit
 								} = ad;
 								inventory.headerBidding = headerBidding ? 'Enabled' : 'Disabled';
 								inventory.size = `${width}x${height}`;
@@ -329,7 +329,7 @@ function apiModule() {
 									networkData: { headerBidding },
 									width,
 									height,
-									name: adUnit
+									id: adUnit
 								} = ad;
 								inventory.headerBidding = headerBidding ? 'Enabled' : 'Disabled';
 								inventory.size = `${width}x${height}`;
@@ -412,7 +412,7 @@ function apiModule() {
 													if (
 														ad.network === 'adpTags' &&
 														ad.networkData &&
-														section.name === inventory.adUnit &&
+														section.id === inventory.adUnit &&
 														ad.networkData.headerBidding !== inventory.enableHB
 													) {
 														ad.networkData.headerBidding = inventory.enableHB;
@@ -456,7 +456,7 @@ function apiModule() {
 							if (
 								ad.network === 'adpTags' &&
 								ad.networkData &&
-								ad.name === inventory.target.adUnit &&
+								ad.id === inventory.target.adUnit &&
 								ad.networkData.headerBidding !== inventory.enableHB
 							) {
 								ad.networkData.headerBidding = inventory.enableHB;
@@ -489,7 +489,7 @@ function apiModule() {
 							if (
 								ad.network === 'adpTags' &&
 								ad.networkData &&
-								ad.name === inventory.target.adUnit &&
+								ad.id === inventory.target.adUnit &&
 								ad.networkData.headerBidding !== inventory.enableHB
 							) {
 								ad.networkData.headerBidding = inventory.enableHB;

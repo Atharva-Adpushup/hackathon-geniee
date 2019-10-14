@@ -2,6 +2,8 @@
 const OP_NAV_ITEMS_INDEXES = {
 	SETTINGS: 'settings',
 	INFO_PANEL: 'info-panel',
+	INFO_PANEL_QUICK_SNAPSHOT: 'QUICK_SNAPSHOT',
+	INFO_PANEL_REPORT_VITALS: 'REPORT_VITALS',
 	SITES_MAPPING: 'sites-mapping',
 	TOOLS: 'tools'
 };
@@ -273,7 +275,8 @@ const TOOLS_IDENTIFIERS = {
 
 const INFO_PANEL_IDENTIFIERS = {
 	QUICK_SNAPSHOT: 'QUICK_SNAPSHOT',
-	REPORT_VITALS: 'REPORT_VITALS'
+	REPORT_VITALS: 'REPORT_VITALS',
+	GLOBAL_REPORT_VITALS: 'GLOBAL_REPORT_VITALS'
 };
 
 const WIDGETS_INFO = {
@@ -292,7 +295,8 @@ const QUICK_SNAPSHOTS_WIDGETS = [
 	WIDGETS_INFO.PER_OVERVIEW,
 	WIDGETS_INFO.OPS_TOP_SITES,
 	WIDGETS_INFO.OPS_COUNTRY_REPORT,
-	WIDGETS_INFO.OPS_NETWORK_REPORT
+	WIDGETS_INFO.OPS_NETWORK_REPORT,
+	WIDGETS_INFO.OPS_ERROR_REPORT
 ];
 
 const ICONS = {
@@ -398,14 +402,12 @@ const SITE_MAPPING_COLUMNS = [
 	{
 		Header: 'Active Status',
 		accessor: 'activeStatus',
-		getProps: (state, rowInfo, column) => {
-			return {
-				style: {
-					color:
-						rowInfo && rowInfo.row.activeStatus.props.children.includes('Active') ? 'green' : 'red'
-				}
-			};
-		},
+		getProps: (state, rowInfo, column) => ({
+			style: {
+				color:
+					rowInfo && rowInfo.row.activeStatus.props.children.includes('Active') ? 'green' : 'red'
+			}
+		}),
 		...DEFAULT_WIDTH
 	},
 	{
@@ -507,6 +509,31 @@ const SITE_MAPPING_FILTER_COLUMNS = [
 	}
 ];
 
+const ERROR_REPORT_PROPS = {
+	chart: {
+		type: 'pie',
+		renderTo: 'error-code'
+	},
+	credits: {
+		enabled: false
+	},
+	title: {
+		text: ''
+	},
+	subtitle: {
+		text: ''
+	},
+	plotOptions: {
+		pie: {
+			shadow: false,
+			center: ['50%', '50%']
+		}
+	},
+	tooltip: {
+		valueSuffix: '%'
+	}
+};
+
 const MODE_TOOLTIP_TEXT = `ADPUSHUP:1 , FALLBACK:2`;
 const ERROR_TOOLTIP_TEXT = `NO_ERROR:1, PAGEGROUP_NOT_FOUND:2, FALLBACK_PLANNED:3, FALLBACK_FORCED:4, PAUSED_IN_EDITOR:5`;
 const PREBID_CURRENCY_URL = '//cdn.jsdelivr.net/gh/prebid/currency-file@1/latest.json';
@@ -532,5 +559,6 @@ export {
 	ERROR_TOOLTIP_TEXT,
 	SITE_MAPPING_FILTER_COLUMNS,
 	ADPUSHUP_DFP,
+	ERROR_REPORT_PROPS,
 	PREBID_CURRENCY_URL
 };

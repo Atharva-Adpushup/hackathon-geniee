@@ -42,8 +42,8 @@ function getBody(inventories, selectedInventories, handleInventorySelect) {
 		);
 		inventoryCopy.checkBox = (
 			<Checkbox
-				checked={selectedInventories.indexOf(inventoryCopy.tempId) > -1}
-				onChange={e => handleInventorySelect(e, inventoryCopy.tempId)}
+				checked={selectedInventories.indexOf(inventory.adUnit) > -1}
+				onChange={e => handleInventorySelect(e, inventory.adUnit)}
 			/>
 		);
 

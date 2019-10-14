@@ -22,7 +22,7 @@ function formatTableData(tableBody, props) {
 function computeTableData(data, props) {
 	const { result, columns } = data;
 	const tableHeader = [];
-	const { metrics, site, reportType, disableSiteLevelCheck } = props;
+	const { metrics, site = {}, reportType, disableSiteLevelCheck } = props;
 
 	if ((result, columns)) {
 		columns.forEach(col => {

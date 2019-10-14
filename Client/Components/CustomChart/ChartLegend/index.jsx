@@ -1,7 +1,16 @@
 import React from 'react';
 import LegendItem from './LegendItem';
+import ManageLegendItems from './ManageLegendItems';
 
-const ChartLegend = ({ chart: { series, yAxis }, legends, activeLegendItems, onLegendChange }) => (
+const ChartLegend = ({
+	chart: { series, yAxis },
+	legends,
+	activeLegendItems,
+	onLegendChange,
+	availableLegends,
+	isCustomizeChartLegend,
+	updateMetrics
+}) => (
 	<div className="text-center chart-legend u-margin-v3">
 		{legends.map((legend, key) => (
 			<LegendItem
@@ -13,6 +22,14 @@ const ChartLegend = ({ chart: { series, yAxis }, legends, activeLegendItems, onL
 				yAxis={yAxis}
 			/>
 		))}
+
+		{isCustomizeChartLegend && !!Object.keys(availableLegends).length && (
+			<ManageLegendItems
+				availableLegends={availableLegends}
+				activeLegends={legends}
+				updateMetrics={updateMetrics}
+			/>
+		)}
 	</div>
 );
 

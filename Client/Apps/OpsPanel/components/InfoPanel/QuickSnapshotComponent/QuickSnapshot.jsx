@@ -6,23 +6,24 @@ import cloneDeep from 'lodash/cloneDeep';
 import { Link } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import '../../../../scss/pages/dashboard/index.scss';
-import Empty from '../../../../Components/Empty/index';
-import Card from '../../../../Components/Layout/Card';
-import EstimatedEarningsContainer from '../../../../Pages/Dashboard/containers/EstimatedEarningsContainer';
-import SitewiseReportContainer from '../../../../Pages/Dashboard/containers/SitewiseReportContainer';
-import PerformanceOverviewContainer from '../../../../Pages/Dashboard/containers/PerformanceOverviewContainer';
-import PerformanceApOriginalContainer from '../../../../Pages/Dashboard/containers/PerformanceApOriginalContainer';
-import RevenueContainer from '../../../../Pages/Dashboard/containers/RevenueContainer';
-import Loader from '../../../../Components/Loader/index';
+import '../../../../../scss/pages/dashboard/index.scss';
+import Empty from '../../../../../Components/Empty/index';
+import Card from '../../../../../Components/Layout/Card';
+import EstimatedEarningsContainer from '../../../../../Pages/Dashboard/containers/EstimatedEarningsContainer';
+import SitewiseReportContainer from '../../../../../Pages/Dashboard/containers/SitewiseReportContainer';
+import PerformanceOverviewContainer from '../../../../../Pages/Dashboard/containers/PerformanceOverviewContainer';
+import PerformanceApOriginalContainer from '../../../../../Pages/Dashboard/containers/PerformanceApOriginalContainer';
+import RevenueContainer from '../../../../../Pages/Dashboard/containers/RevenueContainer';
+import ModeReportContainer from '../../../containers/ModeReportContainer';
+import Loader from '../../../../../Components/Loader/index';
 import {
 	dates,
 	DEFAULT_DATE,
 	ALL_SITES_VALUE
-} from '../../../../Pages/Dashboard/configs/commonConsts';
-import SelectBox from '../../../../Components/SelectBox/index';
-import reportService from '../../../../services/reportService';
-import { convertObjToArr, getDateRange } from '../../../../Pages/Dashboard/helpers/utils';
+} from '../../../../../Pages/Dashboard/configs/commonConsts';
+import SelectBox from '../../../../../Components/SelectBox/index';
+import reportService from '../../../../../services/reportService';
+import { convertObjToArr, getDateRange } from '../../../../../Pages/Dashboard/helpers/utils';
 
 class QuickSnapshot extends React.Component {
 	constructor(props) {
@@ -37,29 +38,34 @@ class QuickSnapshot extends React.Component {
 			selectedSite: 'all',
 			sites: allUserSites,
 			top10Sites: [],
+			modeConfig: [],
+			errorCodeConfig: [],
 			widgetsConfig: []
 		};
 	}
 
 	componentDidMount() {
 		const { sites, setReportingMetaData, showNotification } = this.props;
+		const { reportType } = this.state;
+
 		const userSites = Object.keys(sites).toString();
-		const getReportMetaData = reportService.getMetaData({ sites: userSites });
+
+		const getReportMetaData =
+			reportType === 'global'
+				? reportService.getMetaData({ isSuperUser: true })
+				: reportService.getMetaData({ sites: userSites });
 
 		return getReportMetaData
 			.then(responseData => {
 				const { data: metaData } = responseData;
-				const path = this.getTop10SitesWidgetPath(metaData);
-				const getTop10SitesData = this.getTop10SitesData(path, DEFAULT_DATE)
-					.then(this.setComputedState)
-					.catch(() => {
-						const stateObject = this.getComputedSitesData([]);
-
-						return this.setComputedState(stateObject);
-					});
+				const promiseArray = [
+					this.getTop10Sites(metaData),
+					this.getAllModes(metaData),
+					this.getAllErrorCodes(metaData)
+				];
 
 				setReportingMetaData(metaData);
-				return Promise.all([getTop10SitesData]).then(() => this.renderComputedWidgetsUI());
+				return Promise.all(promiseArray).then(() => this.renderComputedWidgetsUI());
 			})
 			.catch(() => {
 				showNotification({
@@ -78,6 +84,75 @@ class QuickSnapshot extends React.Component {
 		const stateObject = { top10Sites, selectedSite };
 
 		return stateObject;
+	};
+
+	getAllErrorCodes = metaData => {
+		const {
+			filter: {
+				error_code: { path }
+			}
+		} = metaData;
+		const getData = this.getAllErrorCodesData(path).catch(() => {
+			const stateObject = { errorCodeConfig: [] };
+
+			return this.setComputedState(stateObject);
+		});
+
+		return getData;
+	};
+
+	getAllErrorCodesData = path => {
+		const params = { isSuperUser: true };
+
+		return reportService.getWidgetData({ path, params }).then(widgetData => {
+			const {
+				data: { result }
+			} = widgetData;
+			const stateObject = { errorCodeConfig: result };
+
+			return this.setComputedState(stateObject);
+		});
+	};
+
+	getAllModes = metaData => {
+		const {
+			filter: {
+				mode: { path }
+			}
+		} = metaData;
+		const getData = this.getAllModesData(path).catch(() => {
+			const stateObject = { modeConfig: [] };
+
+			return this.setComputedState(stateObject);
+		});
+
+		return getData;
+	};
+
+	getAllModesData = path => {
+		const params = { isSuperUser: true };
+
+		return reportService.getWidgetData({ path, params }).then(widgetData => {
+			const {
+				data: { result }
+			} = widgetData;
+			const stateObject = { modeConfig: result };
+
+			return this.setComputedState(stateObject);
+		});
+	};
+
+	getTop10Sites = metaData => {
+		const path = this.getTop10SitesWidgetPath(metaData);
+		const getData = this.getTop10SitesData(path, DEFAULT_DATE)
+			.then(this.setComputedState)
+			.catch(() => {
+				const stateObject = this.getComputedSitesData([]);
+
+				return this.setComputedState(stateObject);
+			});
+
+		return getData;
 	};
 
 	getTop10SitesWidgetPath = metaData => {
@@ -168,11 +243,17 @@ class QuickSnapshot extends React.Component {
 
 	getWidgetConfig = (widgets, widgetsList) => {
 		const {
-			widgetsName: { PER_AP_ORIGINAL, OPS_TOP_SITES, OPS_COUNTRY_REPORT, OPS_NETWORK_REPORT }
+			widgetsName: {
+				PER_AP_ORIGINAL,
+				OPS_TOP_SITES,
+				OPS_COUNTRY_REPORT,
+				OPS_NETWORK_REPORT,
+				OPS_ERROR_REPORT
+			}
 		} = this.props;
 		const sortedWidgets = sortBy(widgets, ['position', 'name']);
 		const widgetsConfig = [];
-		const { top10Sites: sitesList, selectedSite } = this.state;
+		const { top10Sites: sitesList, selectedSite, modeConfig, errorCodeConfig } = this.state;
 
 		Object.keys(sortedWidgets).forEach(wid => {
 			const widget = { ...sortedWidgets[wid] };
@@ -215,6 +296,12 @@ class QuickSnapshot extends React.Component {
 						widget.chartSeriesMetric = 'network_net_revenue';
 						widget.chartSeriesMetricType = 'money';
 						widget.path += `&metrics=network_net_revenue`;
+						break;
+
+					case OPS_ERROR_REPORT:
+						widget.selectedDimension = 'mode';
+						widget.modeData = modeConfig;
+						widget.errorCodeData = errorCodeConfig;
 						break;
 
 					default:
@@ -271,8 +358,11 @@ class QuickSnapshot extends React.Component {
 
 			case OPS_COUNTRY_REPORT:
 			case OPS_NETWORK_REPORT:
-			case OPS_ERROR_REPORT:
 				return <RevenueContainer displayData={widget} />;
+
+			case OPS_ERROR_REPORT:
+				return <ModeReportContainer displayData={widget} />;
+
 			default:
 		}
 
@@ -598,7 +688,7 @@ class QuickSnapshot extends React.Component {
 		if (reportType === 'site') siteSelected = `/${siteId}`;
 		else if (selectedSite !== 'all') siteSelected = `/${selectedSite}`;
 
-		const computedReportLink = `/reports${siteSelected}?fromDate=${startDate}&toDate=${endDate}&dimension=${selectedDimension}&chartLegendMetric=${selectedChartLegendMetric}`;
+		const computedReportLink = `/admin-panel/info-panel/report-vitals${siteSelected}?fromDate=${startDate}&toDate=${endDate}&dimension=${selectedDimension}&chartLegendMetric=${selectedChartLegendMetric}`;
 
 		return (
 			<Link to={computedReportLink} className="u-link-reset aligner aligner-item float-right">

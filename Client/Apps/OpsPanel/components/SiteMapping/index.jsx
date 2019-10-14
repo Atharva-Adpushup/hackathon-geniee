@@ -76,7 +76,7 @@ class SiteMapping extends Component {
 		this.setState({
 			checked: checkedCopy,
 			selectedData,
-			selectAll: selectedData.length === filteredData.length ? true : false
+			selectAll: selectedData.length === filteredData.length
 		});
 	};
 
@@ -88,7 +88,7 @@ class SiteMapping extends Component {
 	};
 
 	handleFilterValues = arr => {
-		let array = [];
+		const array = [];
 		arr.map(({ name, prop }) => {
 			array.push({ name, prop, values: this.getFilterBoxValues(prop) });
 		});
@@ -148,9 +148,9 @@ class SiteMapping extends Component {
 		const { filteredData: { length = 0 } = {} } = this.state;
 
 		if (length <= 5) return 5;
-		else if (length <= 10) return 10;
-		else if (length <= 20) return 20;
-		else if (length <= 50) return 50;
+		if (length <= 10) return 10;
+		if (length <= 20) return 20;
+		if (length <= 50) return 50;
 		return 50;
 	};
 
@@ -176,7 +176,7 @@ class SiteMapping extends Component {
 		];
 
 		if (isError) return <CustomError />;
-		else if (!filteredData.length) return <Empty message=" No Data found " />;
+		if (!filteredData.length) return <Empty message=" No Data found " />;
 
 		return (
 			<ReactTable
@@ -221,7 +221,7 @@ class SiteMapping extends Component {
 	render() {
 		const { isLoading, filteredData, selectedData } = this.state;
 		if (isLoading) return <Loader height="600px" classNames="u-margin-v3" />;
-		let csvData = !selectedData.length ? filteredData : selectedData;
+		const csvData = !selectedData.length ? filteredData : selectedData;
 
 		return (
 			<React.Fragment>
@@ -233,7 +233,7 @@ class SiteMapping extends Component {
 				/>
 				<Row>
 					{csvData ? (
-						<CSVLink data={csvData} filename={'site-stats.csv'}>
+						<CSVLink data={csvData} filename="site-stats.csv">
 							<CustomButton
 								variant="primary"
 								className="btn btn-lightBg btn-default btn-blue-line pull-right u-margin-r3 u-margin-b4 "

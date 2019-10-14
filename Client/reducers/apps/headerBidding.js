@@ -112,7 +112,7 @@ export default function(state = defaultState, action) {
 			const inventories = [...state.sites[siteId].inventories];
 
 			inventories.map(inventory => {
-				const index = inventoriesToUpdate.findIndex(obj => obj.tempId === inventory.tempId);
+				const index = inventoriesToUpdate.findIndex(obj => obj.adUnit === inventory.adUnit);
 
 				if (index > -1) {
 					// eslint-disable-next-line no-param-reassign

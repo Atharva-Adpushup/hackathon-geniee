@@ -23,50 +23,86 @@ export default class InventoryTab extends React.Component {
 	};
 
 	componentDidMount() {
-		const { siteId } = this.props;
+		const { siteId, inventories } = this.props;
+		const { filteredInventories } = this.state;
+
+		const inventoriesCopy = JSON.parse(JSON.stringify(inventories));
 
 		getHbStatusForSite(siteId).then(({ headerBidding: hbStatusForSite }) => {
-			this.setState({ hbStatusForSite, loadingHbStatusForSite: false });
+			const newState = { hbStatusForSite, loadingHbStatusForSite: false };
+			if (!filteredInventories && inventories) newState.filteredInventories = inventoriesCopy;
+
+			this.setState(newState);
 		});
 	}
 
 	componentWillReceiveProps({ inventories }) {
+		const inventoriesCopy = JSON.parse(JSON.stringify(inventories));
 		const { filteredInventories } = this.state;
 		if (!filteredInventories && inventories) {
-			this.setState({ filteredInventories: inventories });
+			return this.setState({ filteredInventories: inventoriesCopy });
+		}
+		if (filteredInventories && inventories) {
+			const { updated, updatedFilteredInventories } = this.getUpdatedFilteredInventories(
+				inventoriesCopy
+			);
+
+			if (updated) return this.setState({ filteredInventories: updatedFilteredInventories });
 		}
 	}
 
-	handleSelectAllInventories = () => {
-		const { filteredInventories, selectAll } = this.state;
-		const checked = [];
-		this.setState({ selectAll: !selectAll }, () => {
-			// eslint-disable-next-line no-shadow
-			const { selectAll } = this.state;
-			filteredInventories.forEach(() => {
-				checked.push(selectAll);
-			});
-			this.setState({
-				checkedCopy: checked,
-				selectedInventories: selectAll ? [...filteredInventories] : []
-			});
+	getUpdatedFilteredInventories(inventories) {
+		const { filteredInventories } = this.state;
+		let updated = false;
+
+		const updatedFilteredInventories = filteredInventories.map(filteredInventory => {
+			const matchedInventory = inventories.find(
+				inventory => inventory.adUnit === filteredInventory.adUnit
+			);
+
+			if (!updated && filteredInventory.headerBidding !== matchedInventory.headerBidding) {
+				updated = true;
+			}
+
+			return matchedInventory;
+		});
+
+		return { updated, updatedFilteredInventories };
+	}
+
+	handleSelectAllInventories = ({ target: { checked } }) => {
+		this.setState(state => {
+			const { filteredInventories, selectedInventories } = state;
+
+			if (
+				checked &&
+				filteredInventories &&
+				filteredInventories.length !== selectedInventories.length
+			) {
+				return { selectedInventories: [...filteredInventories].map(inventory => inventory.adUnit) };
+			}
+
+			if (!checked && selectedInventories.length) {
+				return { selectedInventories: [] };
+			}
+
+			return null;
 		});
 	};
 
-	handleInventorySelect = (index, e) => {
-		const { selectedInventories, filteredInventories, checkedCopy } = this.state;
-		if (e.target.checked) {
-			checkedCopy[index] = e.target.checked;
-			selectedInventories.push(filteredInventories[index]);
-		} else {
-			checkedCopy[index] = e.target.checked;
-			selectedInventories.splice(selectedInventories.indexOf(filteredInventories[index]), 1);
-		}
-		this.setState({
-			checkedCopy,
-			selectedInventories,
-			// eslint-disable-next-line no-unneeded-ternary
-			selectAll: selectedInventories.length === filteredInventories.length ? true : false
+	handleInventorySelect = ({ target: { checked } }, adUnit) => {
+		this.setState(state => {
+			if (checked) {
+				if (state.selectedInventories.indexOf(adUnit) > -1) return null;
+				return { selectedInventories: [...state.selectedInventories, adUnit] };
+			}
+
+			const index = state.selectedInventories.indexOf(adUnit);
+			if (index === -1) return null;
+
+			const selectedInventoriesCopy = [...state.selectedInventories];
+			selectedInventoriesCopy.splice(index, 1);
+			return { selectedInventories: selectedInventoriesCopy };
 		});
 	};
 
@@ -113,7 +149,7 @@ export default class InventoryTab extends React.Component {
 		const inventoriesToUpdate = [];
 
 		for (const inventory of inventories) {
-			if (selectedInventories.indexOf(inventory.tempId) > -1) {
+			if (selectedInventories.indexOf(inventory.adUnit) > -1) {
 				inventoriesToUpdate.push({
 					...inventory,
 					headerBidding: enableHB ? 'Enabled' : 'Disabled'
