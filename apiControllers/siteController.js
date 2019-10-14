@@ -1,5 +1,6 @@
 const express = require('express');
 const Promise = require('bluebird');
+const _ = require('lodash');
 
 // eslint-disable-next-line no-unused-vars
 const woodlotCustomLogger = require('woodlot').customLogger;
@@ -35,52 +36,78 @@ router
 		const response = {
 			gamStatus: true,
 			adsTxtStatus: 1, // 1: All Good | 2: Not Found | 3: Some are missing | 4: Ads Txt not present
-			adsenseStatus: true
+			adsenseStatus: true,
+			apStatus: false,
+			pagegroupRegex: true
 		};
 
 		function adsTxtProcessing(domain) {
 			return proxy
 				.fetchOurAdsTxt()
 				.then(ourAdsTxt => proxy.verifyAdsTxt(domain, ourAdsTxt))
-				.then(() => {
-					response.adsTxtStatus = true;
-					return true;
-				})
+				.then(() => 1)
 				.catch(err => {
 					if (err instanceof AdPushupError) {
 						const {
 							message: { httpCode = 404 }
 						} = err;
+						let output = null;
 						switch (httpCode) {
 							case 204:
-								response.adsTxtStatus = 2;
+								output = 2;
 								break;
 							case 206:
-								response.adsTxtStatus = 3;
+								output = 3;
 								break;
 							default:
 							case 404:
-								response.adsTxtStatus = 4;
+								output = 4;
 								break;
 						}
-						return true;
+						return Promise.resolve(output);
 					}
 					return Promise.reject(err);
 				});
+		}
+
+		function pagegroupProcessing(site) {
+			const { pageGroupPattern = null } = site.get('apConfigs') || {};
+			if (!pageGroupPattern) return Promise.resolve(false);
+
+			let output = true;
+
+			_.forEach(pageGroupPattern, pagegroups => {
+				const regexInvalid = pagegroups.some(pg => !pg.pattern);
+
+				if (regexInvalid) {
+					output = false;
+					return false;
+				}
+				return true;
+			});
+
+			return Promise.resolve(output);
 		}
 
 		return checkParams(['siteId'], req, 'get')
 			.then(() => verifyOwner(siteId, email))
 			.then(site => {
 				const domain = site.get('siteDomain');
-				return Promise.join(userModel.getUserByEmail(email), adsTxtProcessing(domain), user => {
-					const { dfp: { activeDFPNetwork = false } = {} } = user.get('adServerSettings');
-					const adNetworkSettings = user.get('adNetworkSettings') || [];
-					const { pubId = false } = adNetworkSettings.length ? adNetworkSettings[0] : {};
+				return Promise.join(
+					userModel.getUserByEmail(email),
+					pagegroupProcessing(site),
+					adsTxtProcessing(domain),
+					(user, pagegroupRegex, adsTxtStatus) => {
+						const { dfp: { activeDFPNetwork = false } = {} } = user.get('adServerSettings');
+						const adNetworkSettings = user.get('adNetworkSettings') || [];
+						const { pubId = false } = adNetworkSettings.length ? adNetworkSettings[0] : {};
 
-					if (!activeDFPNetwork) response.gamStatus = false;
-					if (!pubId) response.adsenseStatus = false;
-				});
+						if (!activeDFPNetwork) response.gamStatus = false;
+						if (!pubId) response.adsenseStatus = false;
+						if (!pagegroupRegex) response.pagegroupRegex = pagegroupRegex;
+						response.adsTxtStatus = adsTxtStatus;
+					}
+				);
 			})
 			.then(() =>
 				sendSuccessResponse(
@@ -96,7 +123,9 @@ router
 					{
 						gamStatus: false,
 						adsTxtStatus: 4,
-						adsenseStatus: false
+						adsenseStatus: false,
+						apStatus: false,
+						pagegroupRegex: false
 					},
 					res
 				);
