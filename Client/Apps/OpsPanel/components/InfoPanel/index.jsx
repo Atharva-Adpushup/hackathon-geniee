@@ -36,6 +36,10 @@ class InfoPanel extends Component {
 				redirectUrl = `${rootAdminPanelUrl}/report-vitals`;
 				break;
 
+			case INFO_PANEL_IDENTIFIERS.GLOBAL_REPORT_VITALS:
+				redirectUrl = `${rootAdminPanelUrl}/global-report-vitals`;
+				break;
+
 			default:
 				break;
 		}
