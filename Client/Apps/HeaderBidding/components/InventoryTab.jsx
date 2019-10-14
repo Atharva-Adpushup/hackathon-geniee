@@ -70,39 +70,37 @@ export default class InventoryTab extends React.Component {
 		return { updated, updatedFilteredInventories };
 	}
 
-	handleSelectAllInventories = ({ target: { checked } }) => {
-		this.setState(state => {
-			const { filteredInventories, selectedInventories } = state;
-
-			if (
-				checked &&
-				filteredInventories &&
-				filteredInventories.length !== selectedInventories.length
-			) {
-				return { selectedInventories: [...filteredInventories].map(inventory => inventory.adUnit) };
-			}
-
-			if (!checked && selectedInventories.length) {
-				return { selectedInventories: [] };
-			}
-
-			return null;
+	handleSelectAllInventories = () => {
+		const { filteredInventories, selectAll } = this.state;
+		const checked = [];
+		this.setState({ selectAll: !selectAll }, () => {
+			const { selectAll } = this.state;
+			filteredInventories.forEach(() => {
+				checked.push(selectAll);
+			});
+			this.setState({
+				checkedCopy: checked,
+				selectedInventories: selectAll
+					? [...filteredInventories].map(inventory => inventory.adUnit)
+					: []
+			});
 		});
 	};
 
-	handleInventorySelect = ({ target: { checked } }, adUnit) => {
-		this.setState(state => {
-			if (checked) {
-				if (state.selectedInventories.indexOf(adUnit) > -1) return null;
-				return { selectedInventories: [...state.selectedInventories, adUnit] };
-			}
-
-			const index = state.selectedInventories.indexOf(adUnit);
-			if (index === -1) return null;
-
-			const selectedInventoriesCopy = [...state.selectedInventories];
-			selectedInventoriesCopy.splice(index, 1);
-			return { selectedInventories: selectedInventoriesCopy };
+	handleInventorySelect = (index, e) => {
+		const { checkedCopy, selectedInventories, filteredInventories } = this.state;
+		const checked = checkedCopy;
+		if (e.target.checked) {
+			checked[index] = e.target.checked;
+			selectedInventories.push(filteredInventories[index].adUnit);
+		} else {
+			checked[index] = e.target.checked;
+			selectedInventories.splice(selectedInventories.indexOf(filteredInventories[index].adUnit), 1);
+		}
+		this.setState({
+			checkedCopy: checked,
+			selectedInventories,
+			selectAll: selectedInventories.length === filteredInventories.length
 		});
 	};
 

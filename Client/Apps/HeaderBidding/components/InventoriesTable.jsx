@@ -29,7 +29,7 @@ function getHeader(handleSelectAllInventories, checkedCopy, handleInventorySelec
 	];
 }
 
-function getBody(inventories, selectedInventories, handleInventorySelect) {
+function getBody(inventories) {
 	return inventories.map(inventory => {
 		const inventoryCopy = { ...inventory };
 
@@ -39,12 +39,6 @@ function getBody(inventories, selectedInventories, handleInventorySelect) {
 					? `${inventoryCopy.adUnit.substring(0, 25)}...`
 					: inventoryCopy.adUnit}
 			</span>
-		);
-		inventoryCopy.checkBox = (
-			<Checkbox
-				checked={selectedInventories.indexOf(inventory.adUnit) > -1}
-				onChange={e => handleInventorySelect(e, inventory.adUnit)}
-			/>
 		);
 
 		return inventoryCopy;
@@ -64,13 +58,12 @@ const InventoriesTable = ({
 	inventories,
 	handleSelectAllInventories,
 	handleInventorySelect,
-	selectedInventories,
 	checkedCopy,
 	selectAll
 }) => (
 	<ReactTable
 		columns={getHeader(handleSelectAllInventories, checkedCopy, handleInventorySelect, selectAll)}
-		data={getBody(inventories, selectedInventories, handleInventorySelect)}
+		data={getBody(inventories)}
 		className="-striped -highlight u-padding-h3 u-padding-v2 inventory-table"
 		pageSizeOptions={[10, 25, 50, 100]}
 		defaultSorting={[
