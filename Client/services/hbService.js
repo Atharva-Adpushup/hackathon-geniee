@@ -21,19 +21,7 @@ export function updateBidder(siteId, bidderConfig, params) {
 }
 
 export function fetchInventories(siteId) {
-	return axiosInstance.get(`/headerBidding/inventory/${siteId}`).then(({ data: inventories }) => {
-		inventories.map(inventory => {
-			const { app, adUnit, device, pageGroup } = inventory;
-			const uniqueKey = window.btoa(app + adUnit + device + pageGroup);
-
-			// eslint-disable-next-line no-param-reassign
-			inventory.tempId = uniqueKey;
-
-			return inventory;
-		});
-
-		return { data: inventories };
-	});
+	return axiosInstance.get(`/headerBidding/inventory/${siteId}`);
 }
 
 export function updateInventoriesHbStatus(siteId, inventoriesToUpdate) {
