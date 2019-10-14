@@ -37,27 +37,32 @@ router
 			gam: {
 				status: false,
 				isOptional: false,
-				displayText: 'Google Ad Manager'
+				displayText: 'Google Ad Manager',
+				key: 'gamStatus'
 			},
 			adsTxt: {
 				status: 4, // 1: All Good | 2: Not Found | 3: Some are missing | 4: Ads Txt not present
 				isOptional: true,
-				displayText: 'AdsTxt'
+				displayText: 'AdsTxt',
+				key: 'adsTxtStatus'
 			},
 			adsense: {
 				status: false,
 				isOptional: true,
-				displayText: 'Adsense Publisher Id'
+				displayText: 'Adsense Publisher Id',
+				key: 'adsenseStatus'
 			},
 			apHeadCode: {
 				status: false,
 				isOptional: false,
-				displayText: 'AdPushup Head Code'
+				displayText: 'AdPushup Head Code',
+				key: 'apHeadCodeStatus'
 			},
 			pagegroupRegex: {
 				status: false,
 				isOptional: true,
-				displayText: 'Pagegroups Regexes'
+				displayText: 'Pagegroups Regexes',
+				key: 'pagegroupRegexStatus'
 			}
 		};
 		const response = _.cloneDeep(DEFAULT_RESPONSE);
