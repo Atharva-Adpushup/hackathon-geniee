@@ -33,13 +33,29 @@ router
 	.get('/live', (req, res) => {
 		const { email } = req.user;
 		const { siteId } = req.query;
-		const response = {
-			gamStatus: true,
-			adsTxtStatus: 1, // 1: All Good | 2: Not Found | 3: Some are missing | 4: Ads Txt not present
-			adsenseStatus: true,
-			apStatus: false,
-			pagegroupRegex: true
+		const DEFAULT_RESPONSE = {
+			gam: {
+				status: false,
+				isOptional: false
+			},
+			adsTxt: {
+				status: 4, // 1: All Good | 2: Not Found | 3: Some are missing | 4: Ads Txt not present
+				isOptional: true
+			},
+			adsense: {
+				status: false,
+				isOptional: true
+			},
+			apHeadCode: {
+				status: false,
+				isOptional: false
+			},
+			pagegroupRegex: {
+				status: false,
+				isOptional: true
+			}
 		};
+		const response = _.cloneDeep(DEFAULT_RESPONSE);
 
 		function adsTxtProcessing(domain) {
 			return proxy
@@ -89,6 +105,12 @@ router
 			return Promise.resolve(output);
 		}
 
+		function apDetection(site) {
+			const url = site.get('siteDomain');
+
+			return proxy.detectCustomAp(url, siteId);
+		}
+
 		return checkParams(['siteId'], req, 'get')
 			.then(() => verifyOwner(siteId, email))
 			.then(site => {
@@ -97,15 +119,18 @@ router
 					userModel.getUserByEmail(email),
 					pagegroupProcessing(site),
 					adsTxtProcessing(domain),
-					(user, pagegroupRegex, adsTxtStatus) => {
+					apDetection(site),
+					(user, pagegroupRegex, adsTxtStatus, apHeadCodeStatus) => {
 						const { dfp: { activeDFPNetwork = false } = {} } = user.get('adServerSettings');
 						const adNetworkSettings = user.get('adNetworkSettings') || [];
 						const { pubId = false } = adNetworkSettings.length ? adNetworkSettings[0] : {};
 
-						if (!activeDFPNetwork) response.gamStatus = false;
-						if (!pubId) response.adsenseStatus = false;
-						if (!pagegroupRegex) response.pagegroupRegex = pagegroupRegex;
-						response.adsTxtStatus = adsTxtStatus;
+						if (activeDFPNetwork) response.gam.status = true;
+						if (pubId) response.adsense.status = true;
+
+						response.pagegroupRegex.status = pagegroupRegex;
+						response.adsTxt.status = adsTxtStatus;
+						response.apHeadCode.status = apHeadCodeStatus;
 					}
 				);
 			})
@@ -119,16 +144,7 @@ router
 			)
 			.catch(err => {
 				console.log(err);
-				return sendErrorResponse(
-					{
-						gamStatus: false,
-						adsTxtStatus: 4,
-						adsenseStatus: false,
-						apStatus: false,
-						pagegroupRegex: false
-					},
-					res
-				);
+				return sendErrorResponse(DEFAULT_RESPONSE, res);
 			});
 	})
 	.post('/create', (req, res) => {
