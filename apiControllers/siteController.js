@@ -30,29 +30,34 @@ const router = express.Router();
 // });
 
 router
-	.get('/live', (req, res) => {
+	.get('/status', (req, res) => {
 		const { email } = req.user;
 		const { siteId } = req.query;
 		const DEFAULT_RESPONSE = {
 			gam: {
 				status: false,
-				isOptional: false
+				isOptional: false,
+				displayText: 'Google Ad Manager'
 			},
 			adsTxt: {
 				status: 4, // 1: All Good | 2: Not Found | 3: Some are missing | 4: Ads Txt not present
-				isOptional: true
+				isOptional: true,
+				displayText: 'AdsTxt'
 			},
 			adsense: {
 				status: false,
-				isOptional: true
+				isOptional: true,
+				displayText: 'Adsense Publisher Id'
 			},
 			apHeadCode: {
 				status: false,
-				isOptional: false
+				isOptional: false,
+				displayText: 'AdPushup Head Code'
 			},
 			pagegroupRegex: {
 				status: false,
-				isOptional: true
+				isOptional: true,
+				displayText: 'Pagegroups Regexes'
 			}
 		};
 		const response = _.cloneDeep(DEFAULT_RESPONSE);
@@ -61,7 +66,10 @@ router
 			return proxy
 				.fetchOurAdsTxt()
 				.then(ourAdsTxt => proxy.verifyAdsTxt(domain, ourAdsTxt))
-				.then(() => 1)
+				.then(() => ({
+					status: 1,
+					message: 'All fine'
+				}))
 				.catch(err => {
 					if (err instanceof AdPushupError) {
 						const {
@@ -70,14 +78,23 @@ router
 						let output = null;
 						switch (httpCode) {
 							case 204:
-								output = 2;
+								output = {
+									status: 2,
+									message: "Our Ads.txt entries not found in publisher's ads.txt"
+								};
 								break;
 							case 206:
-								output = 3;
+								output = {
+									status: 3,
+									message: "Some entries not found in publisher's ads.txt"
+								};
 								break;
 							default:
 							case 404:
-								output = 4;
+								output = {
+									status: 4,
+									message: "Publisher's ads.txt not found"
+								};
 								break;
 						}
 						return Promise.resolve(output);
@@ -120,7 +137,7 @@ router
 					pagegroupProcessing(site),
 					adsTxtProcessing(domain),
 					apDetection(site),
-					(user, pagegroupRegex, adsTxtStatus, apHeadCodeStatus) => {
+					(user, pagegroupRegex, adsTxtInfo, apHeadCodeStatus) => {
 						const { dfp: { activeDFPNetwork = false } = {} } = user.get('adServerSettings');
 						const adNetworkSettings = user.get('adNetworkSettings') || [];
 						const { pubId = false } = adNetworkSettings.length ? adNetworkSettings[0] : {};
@@ -129,7 +146,7 @@ router
 						if (pubId) response.adsense.status = true;
 
 						response.pagegroupRegex.status = pagegroupRegex;
-						response.adsTxt.status = adsTxtStatus;
+						response.adsTxt = { ...response.adsTxt, ...adsTxtInfo };
 						response.apHeadCode.status = apHeadCodeStatus;
 					}
 				);
