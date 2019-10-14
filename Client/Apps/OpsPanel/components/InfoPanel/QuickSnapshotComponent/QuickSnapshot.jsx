@@ -28,13 +28,13 @@ import { convertObjToArr, getDateRange } from '../../../../../Pages/Dashboard/he
 class QuickSnapshot extends React.Component {
 	constructor(props) {
 		super(props);
-		const { reportType, sites } = props;
+		const { sites } = props;
 		const allUserSites = [ALL_SITES_VALUE, ...convertObjToArr(sites)];
 		this.state = {
 			isLoading: true,
 			isLoadingError: false,
 			quickDates: dates,
-			reportType,
+			reportType: 'global',
 			selectedSite: 'all',
 			sites: allUserSites,
 			top10Sites: [],
@@ -50,10 +50,11 @@ class QuickSnapshot extends React.Component {
 
 		const userSites = Object.keys(sites).toString();
 
-		const getReportMetaData =
+		const params =
 			reportType === 'global'
-				? reportService.getMetaData({ isSuperUser: true })
-				: reportService.getMetaData({ sites: userSites });
+				? { sites: '', isSuperUser: true }
+				: { sites: userSites, isSuperUser: false };
+		const getReportMetaData = reportService.getMetaData(params);
 
 		return getReportMetaData
 			.then(responseData => {
