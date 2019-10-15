@@ -98,6 +98,11 @@ const dashboardWidgets = [
 
 const ALL_SITES_VALUE = { name: 'All', value: 'all' };
 
+const REPORT_LINK = {
+	ACCOUNT: 'report-vitals',
+	GLOBAL: 'global-report-vitals'
+};
+
 export {
 	DASHBOARD_NAV_ITEMS_INDEXES,
 	DASHBOARD_NAV_ITEMS_VALUES,
@@ -110,5 +115,6 @@ export {
 	tableHeader,
 	displayMetrics,
 	dashboardWidgets,
-	activeLegendItemArray
+	activeLegendItemArray,
+	REPORT_LINK
 };
