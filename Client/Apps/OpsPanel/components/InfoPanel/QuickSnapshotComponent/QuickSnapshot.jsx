@@ -19,7 +19,8 @@ import Loader from '../../../../../Components/Loader/index';
 import {
 	dates,
 	DEFAULT_DATE,
-	ALL_SITES_VALUE
+	ALL_SITES_VALUE,
+	REPORT_LINK
 } from '../../../../../Pages/Dashboard/configs/commonConsts';
 import SelectBox from '../../../../../Components/SelectBox/index';
 import reportService from '../../../../../services/reportService';
@@ -683,13 +684,27 @@ class QuickSnapshot extends React.Component {
 			selectedChartLegendMetric = '',
 			isDataSufficient
 		} = widgetsConfig[wid];
-		const { reportType, siteId } = this.props;
-		let siteSelected = '';
+		const { siteId } = this.props;
+		const {
+			isReportTypeSite,
+			isReportTypeAccount,
+			isReportTypeGlobal
+		} = this.getReportTypeValidation();
+		const { ACCOUNT, GLOBAL } = REPORT_LINK;
 
-		if (reportType === 'site') siteSelected = `/${siteId}`;
+		let siteSelected = '';
+		let computedReportLinkRoute = '';
+
+		if (isReportTypeGlobal) {
+			computedReportLinkRoute = GLOBAL;
+		} else if (isReportTypeAccount) {
+			computedReportLinkRoute = ACCOUNT;
+		}
+
+		if (isReportTypeSite) siteSelected = `/${siteId}`;
 		else if (selectedSite !== 'all') siteSelected = `/${selectedSite}`;
 
-		const computedReportLink = `/admin-panel/info-panel/report-vitals${siteSelected}?fromDate=${startDate}&toDate=${endDate}&dimension=${selectedDimension}&chartLegendMetric=${selectedChartLegendMetric}`;
+		const computedReportLink = `/admin-panel/info-panel/${computedReportLinkRoute}${siteSelected}?fromDate=${startDate}&toDate=${endDate}&dimension=${selectedDimension}&chartLegendMetric=${selectedChartLegendMetric}`;
 
 		return (
 			<Link to={computedReportLink} className="u-link-reset aligner aligner-item float-right">
