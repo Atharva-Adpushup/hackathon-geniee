@@ -92,6 +92,8 @@ class Account extends Component {
 		return response;
 	});
 
+	checkAdPushupGAM = value => value.toString().includes(ADPUSHUP_DFP.code);
+
 	getPrebidGranularityMultiplier = (activeDFPNetwork, currencyCode) => {
 		if (
 			activeDFPNetwork === ADPUSHUP_DFP.code ||
@@ -114,14 +116,20 @@ class Account extends Component {
 	};
 
 	handleToggle = (value, extra) => {
+		const { isThirdPartyAdx } = this.state;
+
 		let toUpdate = {};
 		if (typeof extra === 'string') {
+			// GAM case
+			const isAdPushupGAM = this.checkAdPushupGAM(value);
 			const activeDFPCurrencyCode = value.split('-')[2];
 			toUpdate = {
 				[extra]: value,
-				activeDFPCurrencyCode
+				activeDFPCurrencyCode,
+				isThirdPartyAdx: isAdPushupGAM ? false : isThirdPartyAdx
 			};
 		} else {
+			// ThirdParty Adx
 			const identifier = extra.target.getAttribute('name').split('-')[0];
 			toUpdate = {
 				[identifier]: value
@@ -226,8 +234,8 @@ class Account extends Component {
 		const { user } = this.props;
 		const { adNetworkSettings = [] } = user;
 		const activeDFPName = this.getActiveDFPName(adNetworkSettings, activeDFP);
-
 		const isDFPSetup = !!activeDFP;
+		const disableThirdPartyAdx = isDFPSetup && this.checkAdPushupGAM(activeDFP);
 
 		if (loading) return <Loader height="200px" />;
 
@@ -303,7 +311,7 @@ class Account extends Component {
 					className="u-padding-v4 u-padding-h4"
 				/>
 				<CustomToggleSwitch
-					labelText="Third Party AdX"
+					labelText={`Third Party AdX ${disableThirdPartyAdx ? '(Disabled)' : ''}`}
 					className="u-margin-t4 u-margin-b4 negative-toggle u-cursor-pointer"
 					checked={isThirdPartyAdx}
 					onChange={this.handleToggle}
@@ -314,6 +322,7 @@ class Account extends Component {
 					defaultLayout
 					name="isThirdPartyAdx"
 					id="js-isThirdPartyAdx"
+					disabled={disableThirdPartyAdx}
 				/>
 				<CustomButton variant="primary" className="pull-right" onClick={this.handleSave}>
 					Save
