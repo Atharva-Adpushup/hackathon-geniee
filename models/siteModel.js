@@ -76,7 +76,13 @@ var model = require('../helpers/model'),
 				pageGroups: []
 			},
 			adNetworkSettings: commonConsts.DEFAULT_AD_NETWORK_SETTINGS,
-			apps: {},
+			apps: {
+				"layout": true,
+				"apTag": true,
+				"innovativeAds": true,
+				"headerBidding": true,
+				"consentManagement": false
+			},
 			adServerSetupStatus: 0
 		};
 		this.ignore = [];

@@ -1,5 +1,6 @@
 const express = require('express');
 const Promise = require('bluebird');
+const _ = require('lodash');
 
 // eslint-disable-next-line no-unused-vars
 const woodlotCustomLogger = require('woodlot').customLogger;
@@ -29,58 +30,131 @@ const router = express.Router();
 // });
 
 router
-	.get('/live', (req, res) => {
+	.get('/status', (req, res) => {
 		const { email } = req.user;
 		const { siteId } = req.query;
-		const response = {
-			gamStatus: true,
-			adsTxtStatus: 1, // 1: All Good | 2: Not Found | 3: Some are missing | 4: Ads Txt not present
-			adsenseStatus: true
+		const DEFAULT_RESPONSE = {
+			gam: {
+				status: false,
+				isOptional: false,
+				displayText: 'Google Ad Manager',
+				key: 'gamStatus'
+			},
+			adsTxt: {
+				status: 4, // 1: All Good | 2: Not Found | 3: Some are missing | 4: Ads Txt not present
+				isOptional: true,
+				displayText: 'AdsTxt',
+				key: 'adsTxtStatus'
+			},
+			adsense: {
+				status: false,
+				isOptional: true,
+				displayText: 'Adsense Publisher Id',
+				key: 'adsenseStatus'
+			},
+			apHeadCode: {
+				status: false,
+				isOptional: false,
+				displayText: 'AdPushup Head Code',
+				key: 'apStatus'
+			},
+			pagegroupRegex: {
+				status: false,
+				isOptional: true,
+				displayText: 'Pagegroups Regexes',
+				key: 'pagegroupRegexStatus'
+			}
 		};
+		const response = _.cloneDeep(DEFAULT_RESPONSE);
 
 		function adsTxtProcessing(domain) {
 			return proxy
 				.fetchOurAdsTxt()
 				.then(ourAdsTxt => proxy.verifyAdsTxt(domain, ourAdsTxt))
-				.then(() => {
-					response.adsTxtStatus = true;
-					return true;
-				})
+				.then(() => ({
+					status: 1,
+					message: 'All fine'
+				}))
 				.catch(err => {
 					if (err instanceof AdPushupError) {
 						const {
 							message: { httpCode = 404 }
 						} = err;
+						let output = null;
 						switch (httpCode) {
 							case 204:
-								response.adsTxtStatus = 2;
+								output = {
+									status: 2,
+									message: "Our Ads.txt entries not found in publisher's ads.txt"
+								};
 								break;
 							case 206:
-								response.adsTxtStatus = 3;
+								output = {
+									status: 3,
+									message: "Some entries not found in publisher's ads.txt"
+								};
 								break;
 							default:
 							case 404:
-								response.adsTxtStatus = 4;
+								output = {
+									status: 4,
+									message: "Publisher's ads.txt not found"
+								};
 								break;
 						}
-						return true;
+						return Promise.resolve(output);
 					}
 					return Promise.reject(err);
 				});
+		}
+
+		function pagegroupProcessing(site) {
+			const { pageGroupPattern = null } = site.get('apConfigs') || {};
+			if (!pageGroupPattern) return Promise.resolve(false);
+
+			let output = true;
+
+			_.forEach(pageGroupPattern, pagegroups => {
+				const regexInvalid = pagegroups.some(pg => !pg.pattern);
+
+				if (regexInvalid) {
+					output = false;
+					return false;
+				}
+				return true;
+			});
+
+			return Promise.resolve(output);
+		}
+
+		function apDetection(site) {
+			const url = site.get('siteDomain');
+
+			return proxy.detectCustomAp(url, siteId);
 		}
 
 		return checkParams(['siteId'], req, 'get')
 			.then(() => verifyOwner(siteId, email))
 			.then(site => {
 				const domain = site.get('siteDomain');
-				return Promise.join(userModel.getUserByEmail(email), adsTxtProcessing(domain), user => {
-					const { dfp: { activeDFPNetwork = false } = {} } = user.get('adServerSettings');
-					const adNetworkSettings = user.get('adNetworkSettings') || [];
-					const { pubId = false } = adNetworkSettings.length ? adNetworkSettings[0] : {};
+				return Promise.join(
+					userModel.getUserByEmail(email),
+					pagegroupProcessing(site),
+					adsTxtProcessing(domain),
+					apDetection(site),
+					(user, pagegroupRegex, adsTxtInfo, apHeadCodeStatus) => {
+						const { dfp: { activeDFPNetwork = false } = {} } = user.get('adServerSettings');
+						const adNetworkSettings = user.get('adNetworkSettings') || [];
+						const { pubId = false } = adNetworkSettings.length ? adNetworkSettings[0] : {};
 
-					if (!activeDFPNetwork) response.gamStatus = false;
-					if (!pubId) response.adsenseStatus = false;
-				});
+						if (activeDFPNetwork) response.gam.status = true;
+						if (pubId) response.adsense.status = true;
+
+						response.pagegroupRegex.status = pagegroupRegex;
+						response.adsTxt = { ...response.adsTxt, ...adsTxtInfo };
+						response.apHeadCode.status = apHeadCodeStatus;
+					}
+				);
 			})
 			.then(() =>
 				sendSuccessResponse(
@@ -92,14 +166,7 @@ router
 			)
 			.catch(err => {
 				console.log(err);
-				return sendErrorResponse(
-					{
-						gamStatus: false,
-						adsTxtStatus: 4,
-						adsenseStatus: false
-					},
-					res
-				);
+				return sendErrorResponse(DEFAULT_RESPONSE, res);
 			});
 	})
 	.post('/create', (req, res) => {

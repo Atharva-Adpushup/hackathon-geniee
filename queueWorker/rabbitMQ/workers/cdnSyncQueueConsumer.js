@@ -39,7 +39,8 @@ const SITES_TO_PROCESS = [
 	39632,
 	39498,
 	39699,
-	39498
+	39498,
+	39820
 ];
 let counter = 0;
 

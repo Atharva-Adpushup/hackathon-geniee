@@ -12,8 +12,8 @@ class siteModesPopover extends React.Component {
 		const isPublishMode = props.mode && props.mode === siteModes.PUBLISH;
 		const isPartnerGeniee = this.checkPartnerGeniee(props);
 
-		this.checkApStatus(props);
-		this.checkLiveStatus();
+		// this.checkApStatus(props);
+		// this.checkLiveStatus();
 		this.state = {
 			apStatus: isPartnerGeniee ? status.SUCCESS : status.PENDING,
 			controlStatus: isPublishMode || isPartnerGeniee ? status.TRUE : status.FALSE
@@ -34,8 +34,17 @@ class siteModesPopover extends React.Component {
 	}
 
 	componentWillReceiveProps(nextProps) {
-		this.checkLiveStatus();
-		this.checkApStatus(nextProps);
+		this.setState(
+			{
+				apStatus: undefined,
+				controlStatus: undefined,
+				gamStatus: undefined,
+				adsenseStatus: undefined,
+				adsTxtStatus: undefined
+			},
+			() => this.checkLiveStatus()
+		);
+		// this.checkApStatus(nextProps);
 	}
 
 	masterSave(mode) {
@@ -73,30 +82,37 @@ class siteModesPopover extends React.Component {
 
 	checkLiveStatus() {
 		const self = this;
+
+		function updateState(container, cb = false) {
+			const { data = {} } = container;
+			const services = Object.keys(data);
+			const statuses = {};
+
+			services.forEach(key => {
+				const service = data[key];
+				statuses[service.key] = service.status;
+			});
+
+			self.setState(
+				state => ({
+					...state,
+					...statuses
+				}),
+				() => (cb ? cb() : null)
+			);
+		}
+
 		return Utils.ajax({
 			method: 'GET',
-			url: '/api/site/live',
+			url: '/api/site/status',
 			data: {
 				siteId: window.ADP_SITE_ID
 			}
 		})
-			.then(response => {
-				const { data = {} } = response;
-				self.setState(state => ({
-					...state,
-					...data
-				}));
-			})
-			.catch(err => {
-				const { data = {} } = err;
-				self.setState(
-					state => ({
-						...state,
-						...data
-					}),
-					() => window.alert('Site live status check fail. Please try again later.')
-				);
-			});
+			.then(response => updateState(response))
+			.catch(err =>
+				updateState(err, () => window.alert('Site live status check fail. Please try again later.'))
+			);
 	}
 
 	getPositionOffsets() {
@@ -139,19 +155,17 @@ class siteModesPopover extends React.Component {
 		}
 	}
 
+	computeClassName(value) {
+		if (value === undefined) return 'pending';
+		else if (value) return 'completed';
+		return 'notcompleted';
+	}
+
 	renderAdPushupSnippetPanel() {
+		const { apStatus } = this.state;
+
 		return (
-			<Panel
-				header="AdPushup snippet"
-				className={
-					this.state.apStatus == status.PENDING
-						? 'pending'
-						: this.state.apStatus == status.SUCCESS
-						? 'completed'
-						: 'notcompleted'
-				}
-				eventKey={2}
-			>
+			<Panel header="AdPushup snippet" className={this.computeClassName(apStatus)} eventKey={2}>
 				<div>We can't optimize your site if AdPushup snippet isn't installed! :) </div>
 			</Panel>
 		);
@@ -191,11 +205,7 @@ class siteModesPopover extends React.Component {
 		const { adsenseStatus } = this.state;
 
 		return (
-			<Panel
-				header="Adsense Setup"
-				className={adsenseStatus ? 'completed' : 'notcompleted'}
-				eventKey={5}
-			>
+			<Panel header="Adsense Setup" className={this.computeClassName(adsenseStatus)} eventKey={5}>
 				<div>
 					If you are using Adsense as demand partner and wish to ads sync automatically in the
 					Adsense Panel then it is mandatory to add Adsense Publisher Id in the Admin Panel. You can
@@ -218,7 +228,7 @@ class siteModesPopover extends React.Component {
 	renderGAMPanel() {
 		const { gamStatus } = this.state;
 		return (
-			<Panel header="GAM Status" className={gamStatus ? 'completed' : 'notcompleted'} eventKey={4}>
+			<Panel header="GAM Status" className={this.computeClassName(gamStatus)} eventKey={4}>
 				<div>
 					We can't optimize your site if Google AdManager isn't selected! Please connect AdPushup
 					Operations Team.
@@ -230,12 +240,12 @@ class siteModesPopover extends React.Component {
 	renderControlTagsConversionPanel() {
 		return (
 			<Panel
-				header="Control Ad Setup"
+				header="Fallback Ad Setup"
 				className={this.state.controlStatus ? 'completed' : 'notcompleted'}
 				eventKey={3}
 			>
 				<div>
-					We strongly recommend setting up Control Ads on your site. They can help you track
+					We strongly recommend setting up Fallback Ads on your site. They can help you track
 					AdPushup performance, act as fallback in case of failure and much more. Please take a
 					moment out to understand them.
 				</div>
@@ -271,12 +281,7 @@ class siteModesPopover extends React.Component {
 
 		const isNotPendingStatus = apStatus !== status.PENDING;
 		const allDone =
-			url &&
-			apStatus === status.SUCCESS &&
-			controlStatus &&
-			adsenseStatus &&
-			gamStatus &&
-			adsTxtStatus == 1;
+			url && apStatus && controlStatus && adsenseStatus && gamStatus && adsTxtStatus == 1;
 
 		if (!isVisible) {
 			return null;

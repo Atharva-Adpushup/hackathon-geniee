@@ -6,6 +6,7 @@ import { DEFAULT_ADS_RESPONSE } from '../configs/commonConsts';
 const mapStateToProps = (state, ownProps) => {
 	const { innovativeAds } = state.apps;
 	const { global } = innovativeAds;
+	const { global: { user: { data = {} } = {} } = {} } = state;
 	const {
 		match: { params }
 	} = ownProps;
@@ -16,6 +17,7 @@ const mapStateToProps = (state, ownProps) => {
 
 	return {
 		meta,
+		user: data,
 		...ownProps
 	};
 };
