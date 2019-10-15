@@ -101,8 +101,10 @@ class Panel extends Component {
 		return { updatedDimensionList, updatedFilterList };
 	};
 
-	disableControl = (disabledFilter, disabledDimension, disabledMetrics) => {
-		const { metricsList } = this.state;
+	disableControl = (disabledFilter, disabledDimension, disabledMetrics, metricsList) => {
+		const { metricsList: metricsListFromState } = this.state;
+		const computedMetricsList = metricsList || metricsListFromState;
+
 		const {
 			reportsMeta,
 			user: {
@@ -129,7 +131,7 @@ class Panel extends Component {
 			else dimension.isDisabled = false;
 		});
 
-		metricsList.map(metrics => {
+		computedMetricsList.map(metrics => {
 			const found = disabledMetrics.find(metric => metric === metrics.value);
 			if (found) metrics.isDisabled = true;
 			else metrics.isDisabled = false;
@@ -137,7 +139,7 @@ class Panel extends Component {
 
 		return {
 			updatedFilterList,
-			metricsList,
+			metricsList: computedMetricsList,
 			updatedDimensionList
 		};
 	};
@@ -162,7 +164,7 @@ class Panel extends Component {
 		return computedObject;
 	};
 
-	getControlChangedParams = controlParams => {
+	getControlChangedParams = (controlParams, metricsList) => {
 		const { selectedDimension, selectedFilters, reportType } = controlParams;
 		const { reportsMeta } = this.props;
 		const { dimension: dimensionList, filter: filterList } = reportsMeta.data;
@@ -194,7 +196,8 @@ class Panel extends Component {
 		const updatedControlList = this.disableControl(
 			disabledFilter,
 			disabledDimension,
-			disabledMetrics
+			disabledMetrics,
+			metricsList
 		);
 
 		return {
@@ -270,9 +273,21 @@ class Panel extends Component {
 						tableData.columns &&
 						tableData.columns.length
 					) {
-						tableData.total = {};
-						tableData.columns.forEach(column => {
-							tableData.total[`total_${column}`] = 100;
+						tableData.total = tableData.result.reduce((total, tableRow) => {
+							const computedTotal = total || {};
+
+							if (tableRow && typeof tableRow === 'object' && Object.keys(tableRow).length) {
+								// eslint-disable-next-line no-restricted-syntax
+								for (const column in tableRow) {
+									if (column !== 'date' && !Number.isNaN(tableRow[column])) {
+										computedTotal[`total_${column}`] = computedTotal[`total_${column}`]
+											? computedTotal[`total_${column}`] + tableRow[column]
+											: tableRow[column];
+									}
+								}
+							}
+
+							return computedTotal;
 						});
 					}
 				}
@@ -368,6 +383,37 @@ class Panel extends Component {
 		);
 	};
 
+	getAllAvailableMetrics = (
+		isCustomizeChartLegend,
+		reportsMeta,
+		selectedDimension,
+		selectedFilters,
+		reportType
+	) => {
+		let allAvailableMetrics = [];
+		if (
+			isCustomizeChartLegend &&
+			reportsMeta &&
+			reportsMeta.data &&
+			reportsMeta.data.metrics &&
+			typeof reportsMeta.data.metrics === 'object' &&
+			Object.keys(reportsMeta.data.metrics).length
+		) {
+			const allAvailableMetricsArr = Object.keys(reportsMeta.data.metrics).map(key => ({
+				name: reportsMeta.data.metrics[key].display_name,
+				value: key,
+				valueType: reportsMeta.data.metrics[key].valueType
+			}));
+
+			allAvailableMetrics = this.getControlChangedParams(
+				{ selectedDimension, selectedFilters, reportType },
+				allAvailableMetricsArr
+			).metricsList;
+		}
+
+		return allAvailableMetrics;
+	};
+
 	renderContent = () => {
 		const {
 			selectedDimension,
@@ -388,7 +434,14 @@ class Panel extends Component {
 			tableData
 		} = this.state;
 		const { reportsMeta, reportType: defaultReportType, isCustomizeChartLegend } = this.props;
-		const allAvailableMetrics = (reportsMeta && reportsMeta.data && reportsMeta.data.metrics) || [];
+
+		const allAvailableMetrics = this.getAllAvailableMetrics(
+			isCustomizeChartLegend,
+			reportsMeta,
+			selectedDimension,
+			selectedFilters,
+			reportType
+		);
 
 		const { email } = this.getDemoUserParams();
 		const { isValid } = getReportingDemoUserValidation(email, reportType);
