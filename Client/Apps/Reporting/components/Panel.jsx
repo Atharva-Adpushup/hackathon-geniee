@@ -274,21 +274,21 @@ class Panel extends Component {
 						tableData.columns.length
 					) {
 						tableData.total = tableData.result.reduce((total, tableRow) => {
-							const computedTotal = total || {};
+							const totalCopy = { ...total };
 
 							if (tableRow && typeof tableRow === 'object' && Object.keys(tableRow).length) {
 								// eslint-disable-next-line no-restricted-syntax
 								for (const column in tableRow) {
 									if (column !== 'date' && !Number.isNaN(tableRow[column])) {
-										computedTotal[`total_${column}`] = computedTotal[`total_${column}`]
-											? computedTotal[`total_${column}`] + tableRow[column]
+										totalCopy[`total_${column}`] = totalCopy[`total_${column}`]
+											? totalCopy[`total_${column}`] + tableRow[column]
 											: tableRow[column];
 									}
 								}
 							}
 
-							return computedTotal;
-						});
+							return totalCopy;
+						}, {});
 					}
 				}
 				this.setState({ isLoading: false, tableData });
