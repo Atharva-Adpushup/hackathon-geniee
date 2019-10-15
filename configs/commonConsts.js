@@ -402,6 +402,8 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		gumgum: 'gumgumBidAdapter',
 		consumable: 'consumableBidAdapter',
 		adsolut: 'adkernelBidAdapter',
-		appnexus: 'appnexusBidAdapter'
+		appnexus: 'appnexusBidAdapter',
+		fidelity: 'fidelityBidAdapter',
+		lockerdome: 'lockerdomeBidAdapter'
 	}
 };

@@ -36,6 +36,8 @@ class ModalWrapper extends React.Component {
 		const consumable = findBidder(data, 'consumable');
 		const adsolut = findBidder(data, 'adsolut');
 		const appnexus = findBidder(data, 'appnexus');
+		const fidelity = findBidder(data, 'fidelity');
+		const lockerdome = findBidder(data, 'lockerdome');
 
 		this.state = {
 			partnersSelected: props.data.map(obj => obj.bidder) || [],
@@ -119,6 +121,12 @@ class ModalWrapper extends React.Component {
 			appnexus: {
 				placementId: appnexus ? appnexus.params.placementId : ''
 			},
+			fidelity: {
+				zoneid: fidelity ? fidelity.params.zoneid : ''
+			},
+			lockerdome: {
+				adUnitId: lockerdome ? lockerdome.params.adUnitId : ''
+			},
 			error: ''
 		};
 
@@ -166,6 +174,8 @@ class ModalWrapper extends React.Component {
 		const consumable = findBidder(data, 'consumable');
 		const adsolut = findBidder(data, 'adsolut');
 		const appnexus = findBidder(data, 'appnexus');
+		const fidelity = findBidder(data, 'fidelity');
+		const lockerdome = findBidder(data, 'lockerdome');
 
 		this.setState({
 			partnersSelected: nextProps.data.map(obj => ({ value: obj.bidder, label: obj.bidder })) || [],
@@ -248,6 +258,12 @@ class ModalWrapper extends React.Component {
 			},
 			appnexus: {
 				placementId: appnexus ? appnexus.params.placementId : ''
+			},
+			fidelity: {
+				zoneid: fidelity ? fidelity.params.zoneid : ''
+			},
+			lockerdome: {
+				adUnitId: lockerdome ? lockerdome.params.adUnitId : ''
 			},
 			error: ''
 		});

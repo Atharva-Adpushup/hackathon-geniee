@@ -411,6 +411,14 @@ const siteMappingActions = {
 		{
 			value: 'appnexus',
 			label: 'appnexus'
+		},
+		{
+			value: 'fidelity',
+			label: 'fidelity'
+		},
+		{
+			value: 'lockerdome',
+			label: 'lockerdome'
 		}
 	],
 	devicesList = [
@@ -604,6 +612,18 @@ const siteMappingActions = {
 			}
 		],
 		appnexus: [
+			{
+				name: 'placementId',
+				type: 'integer'
+			}
+		],
+		fidelity: [
+			{
+				name: 'placementId',
+				type: 'integer'
+			}
+		],
+		lockerdome: [
 			{
 				name: 'placementId',
 				type: 'integer'
