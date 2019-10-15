@@ -56,7 +56,7 @@ router
 				status: false,
 				isOptional: false,
 				displayText: 'AdPushup Head Code',
-				key: 'apHeadCodeStatus'
+				key: 'apStatus'
 			},
 			pagegroupRegex: {
 				status: false,
