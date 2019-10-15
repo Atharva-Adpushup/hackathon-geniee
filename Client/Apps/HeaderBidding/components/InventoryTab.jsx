@@ -290,7 +290,7 @@ export default class InventoryTab extends React.Component {
 									}
 								]}
 								handleFilters={this.handleFilters}
-								className="u-margin-b5"
+								className="u-margin-b5 inventory-tab"
 							/>
 						)}
 

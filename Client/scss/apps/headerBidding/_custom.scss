@@ -352,3 +352,19 @@
 .inventory-table .rt-resizable-header-content {
 	float: left;
 }
+
+.inventory-table .rt-thead {
+	position: sticky;
+	top: 0;
+	z-index: 2;
+	background: white;
+}
+.inventory-table .rt-tbody {
+	overflow: visible !important;
+	min-height: 64vh;
+	max-height: 64vh;
+}
+
+.inventory-tab .filterbox {
+	z-index: 3 !important;
+}

@@ -45,15 +45,6 @@ function getBody(inventories) {
 	});
 }
 
-function getDefaultPageSize(inventories) {
-	const { length } = inventories;
-
-	if (length <= 10) return 10;
-	if (length <= 20) return 20;
-	if (length <= 50) return 50;
-	return 50;
-}
-
 const InventoriesTable = ({
 	inventories,
 	handleSelectAllInventories,
@@ -72,7 +63,8 @@ const InventoriesTable = ({
 				desc: false
 			}
 		]}
-		defaultPageSize={getDefaultPageSize(inventories)}
+		defaultPageSize={10}
+		minRows={0}
 	/>
 );
 
