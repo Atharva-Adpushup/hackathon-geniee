@@ -228,7 +228,10 @@ const getReportingDemoUserValidation = (email, reportType) => {
 };
 
 const getReportingDemoUserSiteIds = (siteIdValue, email, reportType) => {
-	const { isWithGlobalSites, isWithAllSites, isWithSingleSite } = getReportingDemoUserValidation(email, reportType);
+	const { isWithGlobalSites, isWithAllSites, isWithSingleSite } = getReportingDemoUserValidation(
+		email,
+		reportType
+	);
 	const { SITES, DEFAULT_SITE } = DEMO_ACCOUNT_DATA;
 	let computedSiteIds = siteIdValue;
 
