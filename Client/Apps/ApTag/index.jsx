@@ -1,7 +1,7 @@
 import React from 'react';
 import { Helmet } from 'react-helmet';
 
-import Home from './components/Home/index';
+import HomeContainer from './containers/HomeContainer';
 import '../../scss/apps/apTag/index.scss';
 
 const App = props => (
@@ -10,7 +10,7 @@ const App = props => (
 			<title>ApTag</title>
 		</Helmet>
 
-		<Home {...props} />
+		<HomeContainer {...props} />
 	</React.Fragment>
 );
 
