@@ -69,18 +69,14 @@ class ManageLegendItems extends React.Component {
 		const { selectedLegendKeys } = this.state;
 
 		const selectedLegendKeysCopy = [...selectedLegendKeys];
-		const legendObj = availableLegends[legend];
+		const legendObj = availableLegends.find(availableLegend => availableLegend.value === legend);
 		const index = selectedLegendKeys.findIndex(selectedLegend => selectedLegend.value === legend);
 		const alreadySelected = index !== -1;
 
 		let computedState;
 
 		if (checked && !alreadySelected) {
-			selectedLegendKeysCopy.push({
-				name: legendObj.display_name,
-				value: legend,
-				valueType: legendObj.valueType
-			});
+			selectedLegendKeysCopy.push(legendObj);
 			computedState = { selectedLegendKeys: selectedLegendKeysCopy };
 		}
 
@@ -96,20 +92,19 @@ class ManageLegendItems extends React.Component {
 		const { availableLegends } = this.props;
 		const { selectedLegendKeys } = this.state;
 
-		const availableLegendKeys = Object.keys(availableLegends);
+		// const availableLegendKeys = Object.keys(availableLegends);
 
-		const availableLegendsJSX = availableLegendKeys.map(availableLegendKey => {
-			const { display_name: name } = availableLegends[availableLegendKey];
+		const availableLegendsJSX = availableLegends.map(availableLegend => {
+			const { name, value, isDisabled } = availableLegend;
 			return (
-				<li key={availableLegendKey}>
+				<li key={value} className={isDisabled ? 'disabled' : ''}>
 					<Checkbox
 						checked={
-							selectedLegendKeys.findIndex(
-								selectedLegend => selectedLegend.value === availableLegendKey
-							) !== -1
+							selectedLegendKeys.findIndex(selectedLegend => selectedLegend.value === value) !== -1
 						}
-						data-legend={availableLegendKey}
+						data-legend={value}
 						onChange={this.handleLegendSelect}
+						disabled={isDisabled}
 					>
 						{name}
 					</Checkbox>
