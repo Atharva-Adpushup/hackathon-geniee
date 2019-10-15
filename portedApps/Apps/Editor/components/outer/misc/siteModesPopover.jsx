@@ -281,12 +281,7 @@ class siteModesPopover extends React.Component {
 
 		const isNotPendingStatus = apStatus !== status.PENDING;
 		const allDone =
-			url &&
-			apStatus === status.SUCCESS &&
-			controlStatus &&
-			adsenseStatus &&
-			gamStatus &&
-			adsTxtStatus == 1;
+			url && apStatus && controlStatus && adsenseStatus && gamStatus && adsTxtStatus == 1;
 
 		if (!isVisible) {
 			return null;
