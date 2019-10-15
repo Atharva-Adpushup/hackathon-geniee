@@ -71,6 +71,9 @@
 				li {
 					text-align: left;
 					list-style: none;
+					&.disabled {
+						color: #ccc;
+					}
 				}
 			}
 			footer {

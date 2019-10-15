@@ -23,7 +23,7 @@ const ChartLegend = ({
 			/>
 		))}
 
-		{isCustomizeChartLegend && !!Object.keys(availableLegends).length && (
+		{isCustomizeChartLegend && !!availableLegends.length && (
 			<ManageLegendItems
 				availableLegends={availableLegends}
 				activeLegends={legends}
