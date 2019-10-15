@@ -12,7 +12,7 @@ import InnovativeAds from './InnovativeAds';
 
 class Apps extends Component {
 	state = {
-		activeKey: null
+		activeKey: 'layout'
 	};
 
 	componentDidMount() {

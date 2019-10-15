@@ -31,7 +31,7 @@ var request = require('request-promise'),
 	},
 	detectCustomAp(url, siteId) {
 		return API.load(url).then(body => {
-			const apCodeDetected = body.match(`//.+.adpushup.com/${siteId}/adpushup.js`);
+			const apCodeDetected = body && body.match(`//.+.adpushup.com/${siteId}/adpushup.js`);
 			return !!apCodeDetected;
 		});
 	},
