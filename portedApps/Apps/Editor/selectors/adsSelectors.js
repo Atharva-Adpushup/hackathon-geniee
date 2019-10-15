@@ -9,6 +9,7 @@ const getAllAds = state => state.adByIds,
 			ad =>
 				ad.network !== 'geniee' &&
 				ad.network !== 'adpTags' &&
+				(ad.network === 'adsense' && !ad.networkData.shouldSync) &&
 				(!ad.networkData.adCode || !ad.networkData.adCode.length)
 		);
 
