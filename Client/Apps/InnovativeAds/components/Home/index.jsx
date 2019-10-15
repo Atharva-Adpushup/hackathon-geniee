@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
 import { Nav, NavItem } from 'react-bootstrap';
-// import ActionCard from '../../../../Components/ActionCard';
 import AdCodeGeneratorContainer from '../../containers/AdCodeGeneratorContainer';
 import Loader from '../../../../Components/Loader';
 import AdListContainer from '../../containers/AdListContainer';
+import CustomError from '../../../../Components/CustomError/index';
 import {
 	IA_NAV_ITEMS,
 	IA_NAV_ITEMS_INDEXES,
@@ -67,6 +67,12 @@ class Home extends Component {
 
 	renderContent() {
 		const activeTab = this.getActiveTab();
+		const { user: { adServerSettings: { dfp = null } = {} } = {} } = this.props;
+
+		if (!dfp || !dfp.activeDFPNetwork)
+			return (
+				<CustomError message="To use this app, please select Google Account Manager. Contact AdPushup Ops for the same." />
+			);
 
 		switch (activeTab) {
 			default:
