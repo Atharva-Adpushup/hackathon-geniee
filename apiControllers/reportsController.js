@@ -18,19 +18,10 @@ router
 		const isValidParams = !!((siteid || isSuperUser) && fromDate && toDate && metrics && interval);
 
 		if (isValidParams) {
-			const params = {
-				siteid,
-				isSuperUser,
-				fromDate,
-				toDate,
-				metrics,
-				interval
-			};
-
 			return request({
 				uri: `${CC.ANALYTICS_API_ROOT}${CC.REPORT_PATH}`,
 				json: true,
-				qs: params
+				qs: req.query
 			})
 				.then(response => {
 					if (response.code == 1 && response.data) return res.send(response.data);

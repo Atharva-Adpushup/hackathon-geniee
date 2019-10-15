@@ -20,18 +20,51 @@ export default class InventoryTab extends React.Component {
 	};
 
 	componentDidMount() {
-		const { siteId } = this.props;
+		const { siteId, inventories } = this.props;
+		const { filteredInventories } = this.state;
+
+		const inventoriesCopy = JSON.parse(JSON.stringify(inventories));
 
 		getHbStatusForSite(siteId).then(({ headerBidding: hbStatusForSite }) => {
-			this.setState({ hbStatusForSite, loadingHbStatusForSite: false });
+			const newState = { hbStatusForSite, loadingHbStatusForSite: false };
+			if (!filteredInventories && inventories) newState.filteredInventories = inventoriesCopy;
+
+			this.setState(newState);
 		});
 	}
 
 	componentWillReceiveProps({ inventories }) {
+		const inventoriesCopy = JSON.parse(JSON.stringify(inventories));
 		const { filteredInventories } = this.state;
 		if (!filteredInventories && inventories) {
-			this.setState({ filteredInventories: inventories });
+			return this.setState({ filteredInventories: inventoriesCopy });
 		}
+		if (filteredInventories && inventories) {
+			const { updated, updatedFilteredInventories } = this.getUpdatedFilteredInventories(
+				inventoriesCopy
+			);
+
+			if (updated) return this.setState({ filteredInventories: updatedFilteredInventories });
+		}
+	}
+
+	getUpdatedFilteredInventories(inventories) {
+		const { filteredInventories } = this.state;
+		let updated = false;
+
+		const updatedFilteredInventories = filteredInventories.map(filteredInventory => {
+			const matchedInventory = inventories.find(
+				inventory => inventory.adUnit === filteredInventory.adUnit
+			);
+
+			if (!updated && filteredInventory.headerBidding !== matchedInventory.headerBidding) {
+				updated = true;
+			}
+
+			return matchedInventory;
+		});
+
+		return { updated, updatedFilteredInventories };
 	}
 
 	handleSelectAllInventories = ({ target: { checked } }) => {
@@ -43,7 +76,7 @@ export default class InventoryTab extends React.Component {
 				filteredInventories &&
 				filteredInventories.length !== selectedInventories.length
 			) {
-				return { selectedInventories: [...filteredInventories].map(inventory => inventory.tempId) };
+				return { selectedInventories: [...filteredInventories].map(inventory => inventory.adUnit) };
 			}
 
 			if (!checked && selectedInventories.length) {
@@ -54,14 +87,14 @@ export default class InventoryTab extends React.Component {
 		});
 	};
 
-	handleInventorySelect = ({ target: { checked } }, tempId) => {
+	handleInventorySelect = ({ target: { checked } }, adUnit) => {
 		this.setState(state => {
 			if (checked) {
-				if (state.selectedInventories.indexOf(tempId) > -1) return null;
-				return { selectedInventories: [...state.selectedInventories, tempId] };
+				if (state.selectedInventories.indexOf(adUnit) > -1) return null;
+				return { selectedInventories: [...state.selectedInventories, adUnit] };
 			}
 
-			const index = state.selectedInventories.indexOf(tempId);
+			const index = state.selectedInventories.indexOf(adUnit);
 			if (index === -1) return null;
 
 			const selectedInventoriesCopy = [...state.selectedInventories];
@@ -108,7 +141,7 @@ export default class InventoryTab extends React.Component {
 		const inventoriesToUpdate = [];
 
 		for (const inventory of inventories) {
-			if (selectedInventories.indexOf(inventory.tempId) > -1) {
+			if (selectedInventories.indexOf(inventory.adUnit) > -1) {
 				inventoriesToUpdate.push({
 					...inventory,
 					headerBidding: enableHB ? 'Enabled' : 'Disabled'
