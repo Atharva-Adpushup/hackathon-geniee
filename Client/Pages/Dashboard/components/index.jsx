@@ -43,7 +43,7 @@ class Dashboard extends React.Component {
 			},
 			sites,
 			reportsMeta,
-			fetchReportingMeta
+			updateAccountReportMetaData
 		} = this.props;
 		let userSites = Object.keys(sites).toString();
 
@@ -65,7 +65,7 @@ class Dashboard extends React.Component {
 
 				computedData = getDemoUserSites(computedData, email);
 
-				fetchReportingMeta(computedData);
+				updateAccountReportMetaData(computedData);
 				return this.getContentInfo(computedData);
 			});
 		}

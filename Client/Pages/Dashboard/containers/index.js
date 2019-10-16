@@ -1,13 +1,17 @@
 import { connect } from 'react-redux';
 import Dashboard from '../components/index';
 import { showNotification } from '../../../actions/uiActions';
-import { fetchReportingMeta } from '../../../actions/globalActions';
+import { updateAccountReportMetaData } from '../../../actions/globalActions';
 
 const mapStateToProps = (state, ownProps) => {
-	const { reports, user, sites } = state.global;
+	const {
+		reports: { account: accountReportMetaData },
+		user,
+		sites
+	} = state.global;
 	return {
 		...ownProps,
-		reportsMeta: reports,
+		reportsMeta: accountReportMetaData,
 		// widget: reportingData.widget || {},
 		user,
 		// reportingSites: reportingData.site || {},
@@ -18,7 +22,7 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = dispatch => ({
 	showNotification: data => dispatch(showNotification(data)),
-	fetchReportingMeta: params => dispatch(fetchReportingMeta(params))
+	updateAccountReportMetaData: params => dispatch(updateAccountReportMetaData(params))
 });
 
 export default connect(

@@ -4,7 +4,9 @@ import EstimatedEarnings from '../components/EstimatedEarnings';
 const mapStateToProps = (state, ownProps) => {
 	const {
 		reports: {
-			data: { site }
+			account: {
+				data: { site }
+			}
 		}
 	} = state.global;
 	return {
