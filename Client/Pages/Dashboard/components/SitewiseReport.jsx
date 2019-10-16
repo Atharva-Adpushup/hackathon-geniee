@@ -1,5 +1,4 @@
 import React from 'react';
-import Datatable from 'react-bs-datatable';
 import ReactTable from 'react-table';
 import { numberWithCommas, roundOffTwoDecimal, getWidgetValidDationState } from '../helpers/utils';
 
@@ -30,14 +29,11 @@ function computeTableData(data, props) {
 			tableHeader.push({
 				Header: 'Date',
 				accessor: 'date'
-				// position: 1
 			});
 		} else {
 			tableHeader.push({
 				Header: 'Website',
 				accessor: 'siteName'
-				// position: 1,
-				// sortable: true
 			});
 		}
 
@@ -46,8 +42,6 @@ function computeTableData(data, props) {
 				tableHeader.push({
 					Header: metrics[col].display_name,
 					accessor: col
-					// position: metrics[col].position + 1,
-					// sortable: true
 				});
 			}
 		});
@@ -124,23 +118,15 @@ class SitewiseReport extends React.Component {
 		};
 
 		return tableBody && tableBody.length > 0 ? (
-			// <Datatable
-			// 	tableHeader={tableHeader}
-			// 	tableBody={tableBody}
-			// 	rowsPerPage={10}
-			// 	rowsPerPageOption={[20, 30, 40, 50]}
-			// 	keyName="reportTable"
-			// 	onSort={onSortFunction}
-			// />
 			<ReactTable
 				className="sitewise-report"
 				columns={tableHeader}
 				data={tableBody}
 				showPaginationTop
 				showPaginationBottom={false}
-				// defaultSortMethod={onSortFunction}
 				pageSizeOptions={[20, 30, 40, 50]}
 				defaultPageSize={10}
+				minRows={0}
 			/>
 		) : (
 			<div className="text-center">No Record Found.</div>
