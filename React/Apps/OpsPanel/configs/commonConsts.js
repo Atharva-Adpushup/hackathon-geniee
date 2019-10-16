@@ -619,14 +619,14 @@ const siteMappingActions = {
 		],
 		fidelity: [
 			{
-				name: 'placementId',
-				type: 'integer'
+				name: 'zoneId',
+				type: 'string'
 			}
 		],
 		lockerdome: [
 			{
-				name: 'placementId',
-				type: 'integer'
+				name: 'adUnitId',
+				type: 'string'
 			}
 		]
 	},
