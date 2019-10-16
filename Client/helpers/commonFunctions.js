@@ -214,23 +214,28 @@ const getDashboardDemoUserSiteIds = (siteIdValue, email) => {
 
 const getReportingDemoUserValidation = (email, reportType) => {
 	const isReportType = !!reportType;
+	const isReportTypeGlobal = !!(isReportType && reportType === 'global');
 	const isReportTypeAccount = !!(isReportType && reportType === 'account');
 	const isReportTypeSite = !!(isReportType && reportType === 'site');
 	const isDemoUserEmail = checkDemoUserEmail(email);
+	const isWithGlobalSites = isDemoUserEmail && isReportTypeGlobal;
 	const isWithAllSites = isDemoUserEmail && isReportTypeAccount;
 	const isWithSingleSite = isDemoUserEmail && isReportTypeSite;
-	const isValid = isWithAllSites || isWithSingleSite;
-	const resultObject = { isValid, isWithAllSites, isWithSingleSite };
+	const isValid = isWithGlobalSites || isWithAllSites || isWithSingleSite;
+	const resultObject = { isValid, isWithGlobalSites, isWithAllSites, isWithSingleSite };
 
 	return resultObject;
 };
 
 const getReportingDemoUserSiteIds = (siteIdValue, email, reportType) => {
-	const { isWithAllSites, isWithSingleSite } = getReportingDemoUserValidation(email, reportType);
+	const { isWithGlobalSites, isWithAllSites, isWithSingleSite } = getReportingDemoUserValidation(
+		email,
+		reportType
+	);
 	const { SITES, DEFAULT_SITE } = DEMO_ACCOUNT_DATA;
 	let computedSiteIds = siteIdValue;
 
-	if (isWithAllSites) {
+	if (isWithGlobalSites || isWithAllSites) {
 		computedSiteIds = Object.keys(SITES).join(',');
 	} else if (isWithSingleSite) {
 		computedSiteIds = DEFAULT_SITE.SITE_ID;
