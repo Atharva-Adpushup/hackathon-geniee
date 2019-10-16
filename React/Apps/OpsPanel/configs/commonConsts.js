@@ -619,7 +619,7 @@ const siteMappingActions = {
 		],
 		fidelity: [
 			{
-				name: 'zoneId',
+				name: 'zoneid',
 				type: 'string'
 			}
 		],
