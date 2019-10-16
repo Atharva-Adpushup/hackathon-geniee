@@ -4,7 +4,7 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable guard-for-in */
 export function getFilteredAdSizes(allAdSizes, usedAdSizes) {
-	const newAllAdSizes = { ...allAdSizes };
+	const newAllAdSizes = JSON.parse(JSON.stringify(allAdSizes));
 	for (const adSizeCategory in newAllAdSizes) {
 		const { sizes } = newAllAdSizes[adSizeCategory];
 		const filteredSizes = sizes.filter(adSize => {
