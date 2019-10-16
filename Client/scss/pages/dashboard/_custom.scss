@@ -78,3 +78,26 @@
 .onboarding-step > .counter-icon {
 	display: none !important;
 }
+
+.sitewise-report .rt-thead {
+	position: sticky;
+	top: 0;
+	z-index: 2;
+	background: white;
+}
+.sitewise-report .rt-tbody {
+	overflow: visible !important;
+	min-height: 64vh;
+	max-height: 64vh;
+}
+
+.sitewise-report .rt-thead .rt-th.-sort-asc {
+	background-image: url('../../../../public/assets/images/sort-up-icon.jpg');
+}
+.sitewise-report .rt-thead .rt-th.-sort-desc {
+	background-image: url('../../../../public/assets/images/sort-arrow-down.png');
+}
+
+.sitewise-report .rt-resizable-header-content {
+	float: left;
+}
