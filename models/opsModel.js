@@ -197,7 +197,7 @@ function apiModule() {
 						return site;
 					});
 
-					return finalSites.sort((a, b) => (a.siteId > b.siteId ? 1 : -1));
+					return finalSites.sort((a, b) => a.siteId - b.siteId);
 				})
 				.catch(err => {
 					console.log(err);
