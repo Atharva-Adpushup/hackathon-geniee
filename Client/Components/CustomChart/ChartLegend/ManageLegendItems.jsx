@@ -76,6 +76,7 @@ class ManageLegendItems extends React.Component {
 		let computedState;
 
 		if (checked && !alreadySelected) {
+			delete legendObj.isDisabled;
 			selectedLegendKeysCopy.push(legendObj);
 			computedState = { selectedLegendKeys: selectedLegendKeysCopy };
 		}
