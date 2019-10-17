@@ -132,6 +132,12 @@ const accountDisableDimension = [
 ];
 const AP_REPORTING_ACTIVE_CHART_LEGENDS_STORAGE_KEY = 'ap-reporting-active-chart-legends';
 
+const REPORT_TYPE = {
+	GLOBAL: 'global',
+	ACCOUNT: 'account',
+	SITE: 'site'
+};
+
 export {
 	REPORTS_NAV_ITEMS,
 	REPORTS_NAV_ITEMS_INDEXES,
@@ -153,5 +159,6 @@ export {
 	REPORT_STATUS,
 	AP_REPORTING_ACTIVE_CHART_LEGENDS_STORAGE_KEY,
 	TERMS,
-	METRICS
+	METRICS,
+	REPORT_TYPE
 };

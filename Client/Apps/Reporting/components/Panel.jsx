@@ -58,7 +58,7 @@ class Panel extends Component {
 	}
 
 	componentDidMount() {
-		const { userSites, fetchReportingMeta, reportsMeta } = this.props;
+		const { userSites, updateReportMetaData, reportsMeta } = this.props;
 		const { email, reportType } = this.getDemoUserParams();
 
 		let userSitesStr = '';
@@ -79,7 +79,7 @@ class Panel extends Component {
 				let { data: computedData } = response;
 
 				computedData = getDemoUserSites(computedData, email);
-				fetchReportingMeta(computedData);
+				updateReportMetaData(computedData);
 				return this.getContentInfo(computedData);
 			});
 		}
@@ -499,6 +499,7 @@ class Panel extends Component {
 						selectedInterval={selectedInterval}
 						selectedDimension={selectedDimension}
 						getCsvData={this.getCsvData}
+						reportType={reportType}
 					/>
 				</Col>
 			</Row>
