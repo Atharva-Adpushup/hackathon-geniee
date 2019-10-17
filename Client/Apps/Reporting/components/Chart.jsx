@@ -22,9 +22,9 @@ import {
 class Chart extends React.Component {
 	constructor(props) {
 		super(props);
-		const { selectedDimension } = props;
+		const { selectedDimension, metricsList } = props;
 		const xAxis = this.enumerateDaysBetweenDates();
-		const activeLegendItems = this.getActiveLegendItems();
+		const activeLegendItems = this.getActiveLegendItems(metricsList);
 		const series = this.updateChartData(activeLegendItems, xAxis);
 		const legends = this.computeLegends();
 		this.state = {
@@ -37,10 +37,42 @@ class Chart extends React.Component {
 		};
 	}
 
+	componentWillReceiveProps({ metricsList: nextMetricsList }) {
+		const { metricsList: currMetricsList } = this.props;
+		const { xAxis } = this.state;
+
+		if (currMetricsList.length !== nextMetricsList.length) {
+			const activeLegendItems = this.getActiveLegendItems(nextMetricsList);
+			const series = this.updateChartData(activeLegendItems, xAxis);
+
+			this.setState({ activeLegendItems, series });
+		}
+	}
+
 	shouldComponentUpdate(nextProps, nextState) {
-		if (Array.isArray(this.state.activeLegendItems))
-			return this.state.activeLegendItems.length !== nextState.activeLegendItems.length;
-		return this.state.activeLegendItems !== nextState.activeLegendItems;
+		const { metricsList: currMetricsList, isCustomizeChartLegend } = this.props;
+		const { metricsList: nextMetricsList } = nextProps;
+
+		let shouldUpdate = false;
+
+		if (isCustomizeChartLegend && currMetricsList && nextMetricsList) {
+			shouldUpdate = shouldUpdate || currMetricsList.length !== nextMetricsList.length;
+		}
+
+		if (isCustomizeChartLegend && !(currMetricsList && nextMetricsList)) {
+			shouldUpdate = shouldUpdate || currMetricsList !== nextMetricsList;
+		}
+
+		if (Array.isArray(this.state.activeLegendItems)) {
+			shouldUpdate =
+				shouldUpdate || this.state.activeLegendItems.length !== nextState.activeLegendItems.length;
+		}
+
+		if (!Array.isArray(this.state.activeLegendItems)) {
+			shouldUpdate = shouldUpdate || this.state.activeLegendItems !== nextState.activeLegendItems;
+		}
+
+		return shouldUpdate;
 	}
 
 	computeLegends = () => {
@@ -106,7 +138,7 @@ class Chart extends React.Component {
 		return isValid;
 	};
 
-	getActiveLegendItems = () => {
+	getActiveLegendItems = metricsList => {
 		const { selectedDimension, selectedChartLegendMetric } = this.props;
 		let computedItems = [];
 		const activeItemsFromLocalStorage = this.getActiveLegendItemsFromLocalStorage();
@@ -122,7 +154,13 @@ class Chart extends React.Component {
 		if (isValidChartLegendMetricItems) {
 			[computedItems] = activeItemsByChartLegendMetric;
 		} else if (activeItemsFromLocalStorage) {
-			computedItems = activeItemsFromLocalStorage;
+			computedItems =
+				!selectedDimension && Array.isArray(activeItemsFromLocalStorage)
+					? activeItemsFromLocalStorage.filter(
+							storageLegend =>
+								!!metricsList.find(selectedMetric => selectedMetric.value === storageLegend.value)
+					  )
+					: activeItemsFromLocalStorage;
 		} else if (selectedDimension) {
 			computedItems = activeLegendItem;
 		} else {
@@ -289,7 +327,7 @@ class Chart extends React.Component {
 					type={type}
 					series={series}
 					xAxis={xAxis}
-					legends={legends}
+					legends={this.computeLegends()}
 					activeLegendItems={activeLegendItems}
 					onLegendChange={this.onLegendChange}
 					yAxisGroups={selectedDimension ? [] : null}

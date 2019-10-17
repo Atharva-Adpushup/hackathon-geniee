@@ -131,7 +131,7 @@ class ManageLegendItems extends React.Component {
 						{this.renderLegends()}
 						<footer>
 							<CustomButton onClick={this.handleLegends} className="u-margin-r4">
-								Add
+								Done
 							</CustomButton>
 							<CustomButton variant="secondary" onClick={this.hideManageLegendsBoxManually}>
 								Cancel

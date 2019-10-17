@@ -1,3 +1,4 @@
+/* eslint-disable no-prototype-builtins */
 import React, { Component } from 'react';
 import { Row, Col } from 'react-bootstrap';
 import moment from 'moment';
@@ -16,7 +17,9 @@ import {
 	accountDisableFilter,
 	accountDisableDimension,
 	opsDimension,
-	opsFilter
+	opsFilter,
+	REPORT_TABLE_WHITELISTED_COLUMNS,
+	REPORT_COLUMNS_BLACKLISTED_FOR_TOTAL
 } from '../configs/commonConsts';
 import { DEMO_ACCOUNT_DATA } from '../../../constants/others';
 import Loader from '../../../Components/Loader';
@@ -216,7 +219,7 @@ class Panel extends Component {
 			selectedInterval,
 			metricsList
 		} = this.state;
-		const { userSites } = this.props;
+		const { userSites, isCustomizeChartLegend } = this.props;
 		const { email, reportType } = this.getDemoUserParams();
 		let selectedMetrics;
 
@@ -229,10 +232,13 @@ class Panel extends Component {
 		const params = {
 			fromDate: moment(startDate).format('YYYY-MM-DD'),
 			toDate: moment(endDate).format('YYYY-MM-DD'),
-			metrics: selectedMetrics ? selectedMetrics.toString() : null,
 			interval: selectedInterval,
 			dimension: selectedDimension || null
 		};
+
+		if (!isCustomizeChartLegend) {
+			params.metrics = selectedMetrics ? selectedMetrics.toString() : '';
+		}
 
 		Object.keys(selectedFilters).forEach(filter => {
 			const filters = Object.keys(selectedFilters[filter]);
@@ -258,7 +264,7 @@ class Panel extends Component {
 
 	generateButtonHandler = (inputState = {}) => {
 		let { tableData } = this.state;
-		const { reportType } = this.props;
+		const { reportType, isCustomizeChartLegend } = this.props;
 		const computedState = Object.assign({ isLoading: true }, inputState);
 
 		this.setState(computedState, () => {
@@ -269,31 +275,77 @@ class Panel extends Component {
 					tableData = response.data;
 					if (
 						reportType === 'global' &&
+						isCustomizeChartLegend &&
 						!tableData.total &&
 						tableData.columns &&
 						tableData.columns.length
 					) {
-						tableData.total = tableData.result.reduce((total, tableRow) => {
-							const totalCopy = { ...total };
-
-							if (tableRow && typeof tableRow === 'object' && Object.keys(tableRow).length) {
-								// eslint-disable-next-line no-restricted-syntax
-								for (const column in tableRow) {
-									if (column !== 'date' && !Number.isNaN(tableRow[column])) {
-										totalCopy[`total_${column}`] = totalCopy[`total_${column}`]
-											? totalCopy[`total_${column}`] + tableRow[column]
-											: tableRow[column];
-									}
-								}
-							}
-
-							return totalCopy;
-						}, {});
+						tableData.total = this.computeTotal(tableData.result);
 					}
 				}
 				this.setState({ isLoading: false, tableData });
 			});
 		});
+	};
+
+	computeTotal = tableRows => {
+		const { dimensionList } = this.state;
+		const columnsBlacklistedForAddition = [
+			'adpushup_ad_ecpm',
+			'network_ad_ecpm',
+			'adpushup_page_cpm'
+		];
+
+		const total = tableRows.reduce((totalAccumulator, tableRow) => {
+			const totalCopy = { ...totalAccumulator };
+
+			if (tableRow && typeof tableRow === 'object' && Object.keys(tableRow).length) {
+				// eslint-disable-next-line no-restricted-syntax
+				for (const column in tableRow) {
+					if (
+						REPORT_COLUMNS_BLACKLISTED_FOR_TOTAL.indexOf(column) === -1 &&
+						!Number.isNaN(tableRow[column]) &&
+						!dimensionList.find(dimension => dimension.value === column)
+					) {
+						if (columnsBlacklistedForAddition.indexOf(column) !== -1) {
+							totalCopy[`total_${column}`] = 0;
+						} else {
+							totalCopy[`total_${column}`] = totalCopy[`total_${column}`]
+								? totalCopy[`total_${column}`] + tableRow[column]
+								: tableRow[column];
+						}
+					}
+				}
+			}
+
+			return totalCopy;
+		}, {});
+
+		if (
+			total.hasOwnProperty('total_network_net_revenue') &&
+			total.hasOwnProperty('total_adpushup_impressions')
+		) {
+			if (total.hasOwnProperty('total_adpushup_ad_ecpm')) {
+				total.total_adpushup_ad_ecpm =
+					(total.total_network_net_revenue / total.total_adpushup_impressions) * 1000;
+			}
+
+			if (total.hasOwnProperty('total_network_ad_ecpm')) {
+				total.total_network_ad_ecpm =
+					(total.total_network_net_revenue / total.total_adpushup_impressions) * 1000;
+			}
+		}
+
+		if (
+			total.hasOwnProperty('total_adpushup_page_cpm') &&
+			total.hasOwnProperty('total_network_net_revenue') &&
+			total.hasOwnProperty('total_adpushup_page_views')
+		) {
+			total.total_adpushup_page_cpm =
+				(total.total_network_net_revenue / total.total_adpushup_page_views) * 1000;
+		}
+
+		return total;
 	};
 
 	updateMetrics = (newMetrics = []) => {
@@ -388,7 +440,8 @@ class Panel extends Component {
 		reportsMeta,
 		selectedDimension,
 		selectedFilters,
-		reportType
+		reportType,
+		tableData
 	) => {
 		let allAvailableMetrics = [];
 		if (
@@ -397,21 +450,68 @@ class Panel extends Component {
 			reportsMeta.data &&
 			reportsMeta.data.metrics &&
 			typeof reportsMeta.data.metrics === 'object' &&
-			Object.keys(reportsMeta.data.metrics).length
+			Object.keys(reportsMeta.data.metrics).length &&
+			tableData &&
+			tableData.result &&
+			tableData.result.length
 		) {
-			const allAvailableMetricsArr = Object.keys(reportsMeta.data.metrics).map(key => ({
-				name: reportsMeta.data.metrics[key].display_name,
-				value: key,
-				valueType: reportsMeta.data.metrics[key].valueType
-			}));
+			const allAvailableMetricsArr = Object.keys(reportsMeta.data.metrics)
+				.filter(key => reportsMeta.data.metrics[key].selectable)
+				.map(key => {
+					const { display_name: name, valueType, selectable } = reportsMeta.data.metrics[key];
+					return {
+						name,
+						value: key,
+						valueType,
+						isDisabled: !tableData.result.find(tableRow => tableRow.hasOwnProperty(key))
+					};
+				});
 
-			allAvailableMetrics = this.getControlChangedParams(
-				{ selectedDimension, selectedFilters, reportType },
-				allAvailableMetricsArr
-			).metricsList;
+			allAvailableMetrics = allAvailableMetricsArr;
 		}
 
 		return allAvailableMetrics;
+	};
+
+	filterTableDataBySelectedMetrics = (tableData, metricsList, dimensionList) => {
+		const selectedMetricsTableData = tableData;
+
+		selectedMetricsTableData.columns = selectedMetricsTableData.columns.filter(
+			column =>
+				!!metricsList.find(metric => metric.value === column) ||
+				REPORT_TABLE_WHITELISTED_COLUMNS.indexOf(column) !== -1 ||
+				!!dimensionList.find(dimension => dimension.value === column)
+		);
+
+		selectedMetricsTableData.result = selectedMetricsTableData.result.map(row => {
+			const computedRow = { ...row };
+
+			// eslint-disable-next-line no-restricted-syntax
+			for (const key in computedRow) {
+				if (
+					!metricsList.find(metric => metric.value === key) &&
+					REPORT_TABLE_WHITELISTED_COLUMNS.indexOf(key) === -1 &&
+					!dimensionList.find(dimension => dimension.value === key)
+				) {
+					delete computedRow[key];
+				}
+			}
+
+			return computedRow;
+		});
+
+		const computedTotal = { ...selectedMetricsTableData.total };
+
+		// eslint-disable-next-line no-restricted-syntax
+		for (const key in computedTotal) {
+			if (!metricsList.find(metric => `total_${metric.value}` === key)) {
+				delete computedTotal[key];
+			}
+		}
+
+		selectedMetricsTableData.total = computedTotal;
+
+		return selectedMetricsTableData;
 	};
 
 	renderContent = () => {
@@ -440,7 +540,8 @@ class Panel extends Component {
 			reportsMeta,
 			selectedDimension,
 			selectedFilters,
-			reportType
+			reportType,
+			tableData
 		);
 
 		const { email } = this.getDemoUserParams();
@@ -452,6 +553,16 @@ class Panel extends Component {
 					'Seems like you have entered an invalid siteid in url. Please check.'
 				);
 			if (!isReportingSite) return this.renderEmptyMessage('No Data Available');
+		}
+
+		let selectedMetricsTableData = JSON.parse(JSON.stringify(tableData));
+
+		if (isCustomizeChartLegend) {
+			selectedMetricsTableData = this.filterTableDataBySelectedMetrics(
+				selectedMetricsTableData,
+				metricsList,
+				dimensionList
+			);
 		}
 
 		return (
@@ -493,7 +604,7 @@ class Panel extends Component {
 				</Col>
 				<Col sm={12} className="u-margin-t5">
 					<TableContainer
-						tableData={tableData}
+						tableData={selectedMetricsTableData}
 						startDate={startDate}
 						endDate={endDate}
 						selectedInterval={selectedInterval}
