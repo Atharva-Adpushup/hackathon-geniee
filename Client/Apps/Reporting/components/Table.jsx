@@ -46,11 +46,11 @@ class Table extends React.Component {
 		headers.forEach(header => {
 			if (dimension[header]) {
 				if (header === 'siteid') {
-					tableHeader.push({
+					tableHeader.splice(0, 0, {
 						Header: 'Site Name',
 						accessor: 'siteName',
 						sortable: true
-					})[1];
+					});
 				} else {
 					tableHeader.splice(0, 0, {
 						Header: dimension[header].display_name,
@@ -79,6 +79,7 @@ class Table extends React.Component {
 
 		tableHeader.unshift(computedDate);
 		tableHeader = sortBy(tableHeader, header => header.position);
+
 		return tableHeader;
 	};
 
