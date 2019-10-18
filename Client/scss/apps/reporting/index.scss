@@ -534,3 +534,39 @@ body {
 .width-100 {
 	width: 100% !important;
 }
+
+.reporting .rt-resizable-header-content {
+	float: left;
+}
+.reporting .rt-thead .rt-th {
+	background-repeat: no-repeat;
+	background-size: 18px 18px;
+	background-position: right 4px center;
+	font-weight: bolder;
+}
+
+.reporting .rt-thead .rt-th.-sort-asc {
+	background-image: url('../../../../public/assets/images/sort-up-icon.jpg');
+}
+.reporting .rt-thead .rt-th.-sort-desc {
+	background-image: url('../../../../public/assets/images/sort-arrow-down.png');
+}
+.reporting .rt-thead {
+	position: sticky;
+	top: 0;
+	z-index: 2;
+	background: white;
+}
+.reporting .rt-tbody {
+	overflow: visible !important;
+	min-height: 64vh;
+	max-height: 64vh;
+}
+
+.tbody-default {
+	.tbody-tr-default {
+		.tbody-td-default {
+			width: 14% !important;
+		}
+	}
+}

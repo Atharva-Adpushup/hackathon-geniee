@@ -7,7 +7,7 @@ import Entities from 'html-entities';
 import sortBy from 'lodash/sortBy';
 import history from './history';
 import { supportedAdSizes } from '../constants/visualEditor';
-import { DEMO_ACCOUNT_DATA } from '../constants/others';
+import { DEMO_ACCOUNT_DATA, REPORT_TYPE } from '../constants/others';
 
 const { XmlEntities } = Entities;
 const entities = new XmlEntities();
@@ -228,7 +228,10 @@ const getReportingDemoUserValidation = (email, reportType) => {
 };
 
 const getReportingDemoUserSiteIds = (siteIdValue, email, reportType) => {
-	const { isWithGlobalSites, isWithAllSites, isWithSingleSite } = getReportingDemoUserValidation(email, reportType);
+	const { isWithGlobalSites, isWithAllSites, isWithSingleSite } = getReportingDemoUserValidation(
+		email,
+		reportType
+	);
 	const { SITES, DEFAULT_SITE } = DEMO_ACCOUNT_DATA;
 	let computedSiteIds = siteIdValue;
 
@@ -308,6 +311,14 @@ const getOnboardingTemplateData = site => {
 	return resultObject;
 };
 
+const checkReportTypeGlobal = props => {
+	const { reportType } = props;
+	const { GLOBAL } = REPORT_TYPE;
+	const isValid = !!(reportType && reportType.toLowerCase() === GLOBAL);
+
+	return isValid;
+};
+
 export {
 	errorHandler,
 	getDuplicatesInArray,
@@ -321,6 +332,7 @@ export {
 	getSupportedAdSizes,
 	getPageGroupHash,
 	checkDemoUserEmail,
+	checkReportTypeGlobal,
 	getDashboardDemoUserSiteIds,
 	getReportingDemoUserValidation,
 	getReportingDemoUserSiteIds,

@@ -1,5 +1,5 @@
 import React from 'react';
-import Datatable from 'react-bs-datatable';
+import ReactTable from 'react-table';
 import { numberWithCommas, roundOffTwoDecimal, getWidgetValidDationState } from '../helpers/utils';
 
 function formatTableData(tableBody, props) {
@@ -25,31 +25,26 @@ function computeTableData(data, props) {
 	const { metrics, site = {}, reportType, disableSiteLevelCheck } = props;
 
 	if ((result, columns)) {
-		columns.forEach(col => {
-			if (metrics[col]) {
-				tableHeader.push({
-					title: metrics[col].display_name,
-					prop: col,
-					position: metrics[col].position + 1,
-					sortable: true
-				});
-			}
-		});
-
 		if (reportType === 'site') {
 			tableHeader.push({
-				title: 'Date',
-				prop: 'date',
-				position: 1
+				Header: 'Date',
+				accessor: 'date'
 			});
 		} else {
 			tableHeader.push({
-				title: 'Website',
-				prop: 'siteName',
-				position: 1,
-				sortable: true
+				Header: 'Website',
+				accessor: 'siteName'
 			});
 		}
+
+		columns.forEach(col => {
+			if (metrics[col]) {
+				tableHeader.push({
+					Header: metrics[col].display_name,
+					accessor: col
+				});
+			}
+		});
 
 		tableHeader.sort((a, b) => a.position - b.position);
 		result.forEach(row => {
@@ -123,13 +118,15 @@ class SitewiseReport extends React.Component {
 		};
 
 		return tableBody && tableBody.length > 0 ? (
-			<Datatable
-				tableHeader={tableHeader}
-				tableBody={tableBody}
-				rowsPerPage={10}
-				rowsPerPageOption={[20, 30, 40, 50]}
-				keyName="reportTable"
-				onSort={onSortFunction}
+			<ReactTable
+				className="sitewise-report"
+				columns={tableHeader}
+				data={tableBody}
+				showPaginationTop
+				showPaginationBottom={false}
+				pageSizeOptions={[20, 30, 40, 50]}
+				defaultPageSize={10}
+				minRows={0}
 			/>
 		) : (
 			<div className="text-center">No Record Found.</div>

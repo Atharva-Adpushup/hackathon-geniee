@@ -56,7 +56,7 @@ class MySites extends React.Component {
 		const ref = this;
 		const { sites } = ref.state;
 		const isSites = ref.getValidObject(sites);
-		const { reportsMeta, fetchReportingMeta } = this.props;
+		const { reportsMeta, updateAccountReportMetaData } = this.props;
 
 		if (!isSites) {
 			this.hideUILoader();
@@ -70,7 +70,7 @@ class MySites extends React.Component {
 			return reportService.getMetaData({ sites: siteIdsStr }).then(response => {
 				const { data } = response;
 
-				fetchReportingMeta(data);
+				updateAccountReportMetaData(data);
 				ref.hideUILoader();
 				return ref.fetchAllSitesAppStatuses(siteIds);
 			});

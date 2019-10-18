@@ -65,6 +65,7 @@ class Control extends Component {
 		}
 		const { updatedFilterList, updatedDimensionList } = this.updateFilterDimensionList(
 			reportType,
+			defaultReportType,
 			filterList,
 			dimensionList
 		);
@@ -74,15 +75,15 @@ class Control extends Component {
 				filterList: updatedFilterList,
 				reportType
 			},
-			this.onControlChange
+			() => this.onControlChange(reportType)
 		);
 	};
 
-	onControlChange = () => {
+	onControlChange = reportType => {
 		const resultObject = this.getStateParams();
 		const { onControlChange } = this.props;
 
-		onControlChange(resultObject);
+		onControlChange(resultObject, reportType);
 	};
 
 	onGenerateButtonClick = () => {
@@ -159,11 +160,15 @@ class Control extends Component {
 		return { updatedDimensionList, updatedFilterList };
 	};
 
-	updateFilterDimensionList = (reportType, filterList, dimensionList) => {
-		const { updatedDimensionList, updatedFilterList } = this.removeOpsFilterDimension(
-			filterList,
-			dimensionList
-		);
+	updateFilterDimensionList = (reportType, defaultReportType, filterList, dimensionList) => {
+		let updatedDimensionList = JSON.parse(JSON.stringify(dimensionList));
+		let updatedFilterList = JSON.parse(JSON.stringify(filterList));
+
+		if (defaultReportType !== 'global') {
+			const json = this.removeOpsFilterDimension(filterList, dimensionList);
+			updatedDimensionList = json.updatedDimensionList;
+			updatedFilterList = json.updatedFilterList;
+		}
 		if (reportType === 'account' || reportType === 'global') {
 			updatedFilterList.forEach(fil => {
 				const index = accountFilter.indexOf(fil.value);

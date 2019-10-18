@@ -13,9 +13,9 @@ const router = express.Router();
 router
 	.get('/getCustomStats', (req, res) => {
 		const {
-			query: { siteid = '', isSuperUser = false, fromDate, toDate, metrics, interval }
+			query: { siteid = '', isSuperUser = false, fromDate, toDate, interval }
 		} = req;
-		const isValidParams = !!((siteid || isSuperUser) && fromDate && toDate && metrics && interval);
+		const isValidParams = !!((siteid || isSuperUser) && fromDate && toDate && interval);
 
 		if (isValidParams) {
 			return request({
