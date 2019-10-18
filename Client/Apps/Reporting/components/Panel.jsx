@@ -219,7 +219,7 @@ class Panel extends Component {
 			selectedInterval,
 			metricsList
 		} = this.state;
-		const { userSites, isCustomizeChartLegend } = this.props;
+		const { userSites, isCustomizeChartLegend, defaultReportType } = this.props;
 		const { email, reportType } = this.getDemoUserParams();
 		let selectedMetrics;
 
@@ -250,9 +250,12 @@ class Panel extends Component {
 			params.siteid = siteIds.toString();
 		}
 
+		if (reportType === 'global' || defaultReportType === 'global') {
+			params.isSuperUser = true;
+		}
+
 		if (reportType === 'global') {
 			params.siteid = '';
-			params.isSuperUser = true;
 		}
 
 		if (reportType === 'account') {
@@ -332,7 +335,7 @@ class Panel extends Component {
 
 			if (total.hasOwnProperty('total_network_ad_ecpm')) {
 				total.total_network_ad_ecpm =
-					(total.total_network_net_revenue / total.total_adpushup_impressions) * 1000;
+					(total.total_network_net_revenue / total.total_network_impressions) * 1000;
 			}
 		}
 
