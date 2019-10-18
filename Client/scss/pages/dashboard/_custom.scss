@@ -90,6 +90,12 @@
 	min-height: 64vh;
 	max-height: 64vh;
 }
+.sitewise-report .rt-thead .rt-th {
+	background-repeat: no-repeat;
+	background-size: 18px 18px;
+	background-position: right 4px center;
+	font-weight: bolder;
+}
 
 .sitewise-report .rt-thead .rt-th.-sort-asc {
 	background-image: url('../../../../public/assets/images/sort-up-icon.jpg');
