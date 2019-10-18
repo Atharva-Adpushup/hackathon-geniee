@@ -118,7 +118,7 @@ function udpateActiveSitesStaus() {
 			const siteUpdateData = [];
 
 			for (const key in siteList) {
-				const site = siteList[key].apAppBucket;
+				const site = siteList[key].AppBucket; // for local - apAppBucket
 				siteUpdateData.push({
 					siteId: site.siteId,
 					key: 'dataFeedActive',
