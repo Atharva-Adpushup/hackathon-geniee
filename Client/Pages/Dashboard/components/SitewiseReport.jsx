@@ -119,7 +119,7 @@ class SitewiseReport extends React.Component {
 
 		return tableBody && tableBody.length > 0 ? (
 			<ReactTable
-				className="sitewise-report"
+				className="sitewise-report u-padding-h3 u-padding-v2 -striped -highlight"
 				columns={tableHeader}
 				data={tableBody}
 				showPaginationTop
