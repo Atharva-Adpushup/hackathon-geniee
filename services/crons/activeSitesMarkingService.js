@@ -4,7 +4,7 @@ const cron = require('node-cron');
 const { promiseForeach } = require('node-utils');
 
 const { appBucket } = require('../../helpers/routeHelpers');
-const siteModel = require('../../Models/siteModel');
+const siteModel = require('../../models/siteModel');
 const config = require('../../configs/config');
 const constants = require('../../configs/commonConsts');
 
