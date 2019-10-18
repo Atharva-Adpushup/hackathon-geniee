@@ -76,6 +76,7 @@ class ManageLegendItems extends React.Component {
 		let computedState;
 
 		if (checked && !alreadySelected) {
+			delete legendObj.isDisabled;
 			selectedLegendKeysCopy.push(legendObj);
 			computedState = { selectedLegendKeys: selectedLegendKeysCopy };
 		}
@@ -131,7 +132,7 @@ class ManageLegendItems extends React.Component {
 						{this.renderLegends()}
 						<footer>
 							<CustomButton onClick={this.handleLegends} className="u-margin-r4">
-								Add
+								Done
 							</CustomButton>
 							<CustomButton variant="secondary" onClick={this.hideManageLegendsBoxManually}>
 								Cancel
