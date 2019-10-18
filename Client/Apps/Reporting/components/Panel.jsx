@@ -147,11 +147,12 @@ class Panel extends Component {
 		};
 	};
 
-	onControlChange = data => {
+	onControlChange = (data, reportType) => {
 		const params = this.getControlChangedParams(data);
 
 		this.setState({
-			...params
+			...params,
+			reportType
 		});
 	};
 

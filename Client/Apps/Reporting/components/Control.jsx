@@ -75,15 +75,15 @@ class Control extends Component {
 				filterList: updatedFilterList,
 				reportType
 			},
-			this.onControlChange
+			() => this.onControlChange(reportType)
 		);
 	};
 
-	onControlChange = () => {
+	onControlChange = reportType => {
 		const resultObject = this.getStateParams();
 		const { onControlChange } = this.props;
 
-		onControlChange(resultObject);
+		onControlChange(resultObject, reportType);
 	};
 
 	onGenerateButtonClick = () => {
