@@ -6,6 +6,7 @@ const { promiseForeach } = require('node-utils');
 const { appBucket } = require('../../helpers/routeHelpers');
 const siteModel = require('../../Models/siteModel');
 const config = require('../../configs/config');
+const constants = require('../../configs/commonConsts');
 
 function getFormattedDate(date, offset) {
 	date.setDate(date.getDate() - (offset || 0));
@@ -137,5 +138,5 @@ function udpateActiveSitesStaus() {
 			console.log(`Error.....\n ${err.message}`);
 		});
 }
-cron.schedule('* 17 * * *', udpateActiveSitesStaus);
+cron.schedule(constants.cronSchedule.activeSiteMarkingService, udpateActiveSitesStaus);
 // udpateActiveSitesStaus();
