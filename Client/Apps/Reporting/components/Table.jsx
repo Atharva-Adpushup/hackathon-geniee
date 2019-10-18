@@ -2,14 +2,15 @@ import React from 'react';
 import Datatable from 'react-bs-datatable';
 import { Col } from 'react-bootstrap';
 import sortBy from 'lodash/sortBy';
+import isEqual from 'lodash/isEqual';
 import moment from 'moment';
 import { numberWithCommas, computeCsvData, roundOffTwoDecimal } from '../helpers/utils';
 
 class Table extends React.Component {
 	constructor(props) {
 		super(props);
-		const { tableHeader, tableBody, grandTotal } = this.updateTableData();
 		const { metrics, tableData } = props;
+		const { tableHeader, tableBody, grandTotal } = this.updateTableData(tableData);
 		this.state = {
 			metrics,
 			tableData,
@@ -19,8 +20,13 @@ class Table extends React.Component {
 		};
 	}
 
-	shouldComponentUpdate() {
-		return false;
+	componentWillReceiveProps({ tableData: nextTableData }) {
+		const { tableData: currTableData } = this.props;
+
+		if (!isEqual(currTableData, nextTableData)) {
+			const { tableHeader, tableBody, grandTotal } = this.updateTableData(nextTableData);
+			this.setState({ tableData: nextTableData, tableHeader, tableBody, grandTotal });
+		}
 	}
 
 	setCsvData = data => {
@@ -130,9 +136,10 @@ class Table extends React.Component {
 			if (tableRow.siteid) {
 				const { siteid } = tableRow;
 
-				tableRow.siteName = site[siteid]
-					? React.cloneElement(<a href={`/reports/${siteid}`}>{site[siteid].siteName}</a>)
-					: 'Not Found';
+				tableRow.siteName =
+					site && site[siteid]
+						? React.cloneElement(<a href={`/reports/${siteid}`}>{site[siteid].siteName}</a>)
+						: 'Not Found';
 				delete tableRow.siteid;
 			}
 
@@ -154,8 +161,7 @@ class Table extends React.Component {
 		return displayFooterData;
 	};
 
-	updateTableData = () => {
-		const { tableData } = this.props;
+	updateTableData = tableData => {
 		let grandTotal = {};
 		let tableHeader = [];
 		let tableBody = [];

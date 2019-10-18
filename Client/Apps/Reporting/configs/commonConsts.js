@@ -130,6 +130,8 @@ const accountDisableDimension = [
 	TERMS.PAGEGROUP,
 	TERMS.SECTION
 ];
+const REPORT_TABLE_WHITELISTED_COLUMNS = ['date', 'month', 'year'];
+const REPORT_COLUMNS_BLACKLISTED_FOR_TOTAL = ['date', 'month', 'year'];
 const AP_REPORTING_ACTIVE_CHART_LEGENDS_STORAGE_KEY = 'ap-reporting-active-chart-legends';
 
 export {
@@ -147,6 +149,8 @@ export {
 	accountDimension,
 	accountDisableFilter,
 	accountDisableDimension,
+	REPORT_TABLE_WHITELISTED_COLUMNS,
+	REPORT_COLUMNS_BLACKLISTED_FOR_TOTAL,
 	opsDimension,
 	opsFilter,
 	REPORT_DOWNLOAD_ENDPOINT,
