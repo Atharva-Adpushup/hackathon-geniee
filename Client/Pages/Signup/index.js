@@ -161,6 +161,7 @@ class Signup extends Component {
 			<Fragment>
 				<Helmet>
 					<title>Signup</title>
+					<meta name="robots" content="noindex" />
 				</Helmet>
 
 				<AuthShell>
