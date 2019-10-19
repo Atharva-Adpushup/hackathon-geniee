@@ -29,19 +29,19 @@ const computeCsvData = data => {
 	const csvData = [];
 	const csvHeaders = [];
 	tableHeader.forEach(header => {
-		csvHeaders.push(header.title);
+		csvHeaders.push(header.Header);
 	});
 	csvData.push(csvHeaders);
 	tableBody.forEach(row => {
 		const csvBody = [];
 		tableHeader.forEach(header => {
-			csvBody.push(row[header.prop]);
+			csvBody.push(row[header.accessor]);
 		});
 		csvData.push(csvBody);
 	});
 	const csvBody = [];
 	tableHeader.forEach(header => {
-		csvBody.push(grandTotal[header.prop]);
+		csvBody.push(grandTotal[header.accessor]);
 	});
 	csvData.push(csvBody);
 	return csvData;
