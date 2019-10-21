@@ -520,6 +520,6 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 	DEFAULT_APP_STATUS_RESPONSE: {},
 	EMAIL_REGEX: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
 	cronSchedule: {
-		activeSiteMarkingService: '* */12 * * *'
+		activeSiteMarkingService: '0 */12 * * *'
 	}
 };
