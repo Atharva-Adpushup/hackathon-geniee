@@ -14,7 +14,8 @@ var $ = require('jquery'),
 	},
 	getDockedOffset = function (formatData) {
 		var bottomOffset = formatData && formatData.bottomOffset ? Number(formatData.bottomOffset) : 0;
-		return formatData && formatData.bottomXPath ? $(formatData.bottomXPath).offset().top - bottomOffset : null;
+		var bottomXPath = formatData ? formatData.bottomXpath || formatData.bottomXPath : null;
+		return bottomXPath ? $(bottomXPath).offset().top - bottomOffset : null;
 	},
 	dockifyAd = function (xPath, formatData, utils) {
 		if (!xPath || !$(xPath).length) {
