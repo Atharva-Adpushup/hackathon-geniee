@@ -124,7 +124,7 @@ class SitewiseReport extends React.Component {
 				data={tableBody}
 				showPaginationTop
 				showPaginationBottom={false}
-				pageSizeOptions={[20, 30, 40, 50]}
+				pageSizeOptions={[10, 20, 30, 40, 50]}
 				defaultPageSize={10}
 				minRows={0}
 			/>

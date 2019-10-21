@@ -254,7 +254,7 @@ class Table extends React.Component {
 						columns={tableHeader}
 						data={tableBody}
 						defaultPageSize={10}
-						pageSizeOptions={[20, 30, 40, 50]}
+						pageSizeOptions={[10, 20, 30, 40, 50]}
 						minRows={0}
 						showPaginationTop
 						showPaginationBottom={false}
