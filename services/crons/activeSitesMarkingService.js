@@ -142,5 +142,5 @@ function udpateActiveSitesStaus() {
 			console.log(`Error.....\n ${err.message}`);
 		});
 }
-cron.schedule(constants.cronSchedule.activeSiteMarkingService, udpateActiveSitesStaus);
-// udpateActiveSitesStaus();
+// cron.schedule(constants.cronSchedule.activeSiteMarkingService, udpateActiveSitesStaus);
+udpateActiveSitesStaus();
