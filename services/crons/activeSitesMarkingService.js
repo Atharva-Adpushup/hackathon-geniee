@@ -8,6 +8,9 @@ const siteModel = require('../../models/siteModel');
 const config = require('../../configs/config');
 const constants = require('../../configs/commonConsts');
 
+const activeSiteApiUri =
+	'https://staging.adpushup.com/CentralReportingWebService/site/activeSiteList';
+
 function getFormattedDate(date, offset) {
 	date.setDate(date.getDate() - (offset || 0));
 	const year = date.getFullYear();
@@ -53,7 +56,7 @@ function getSitesFromDB() {
 
 function getActiveSites(fromDate, toDate) {
 	const options = {
-		uri: 'https://staging.adpushup.com/CentralReportingWebService/site/activeSiteList',
+		uri: activeSiteApiUri,
 		qs: {
 			fromDate,
 			toDate
@@ -142,5 +145,5 @@ function udpateActiveSitesStaus() {
 			console.log(`Error.....\n ${err.message}`);
 		});
 }
-// cron.schedule(constants.cronSchedule.activeSiteMarkingService, udpateActiveSitesStaus);
-udpateActiveSitesStaus();
+// udpateActiveSitesStaus();
+cron.schedule(constants.cronSchedule.activeSiteMarkingService, udpateActiveSitesStaus);
