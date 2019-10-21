@@ -28,24 +28,24 @@ const queueConfig = {
 };
 const QUEUE = CONFIG.RABBITMQ.CDN_SYNC.QUEUE.name;
 const consumer = new Consumer(queueConfig);
-const SITES_TO_PROCESS = [
-	39233,
-	39403,
-	39420,
-	39428,
-	39451,
-	39472,
-	39498,
-	39632,
-	39699,
-	39820,
-	37723,
-	37902,
-	38288,
-	39286,
-	35539,
-	39489
-];
+// const SITES_TO_PROCESS = [
+// 	39233,
+// 	39403,
+// 	39420,
+// 	39428,
+// 	39451,
+// 	39472,
+// 	39498,
+// 	39632,
+// 	39699,
+// 	39820,
+// 	37723,
+// 	37902,
+// 	38288,
+// 	39286,
+// 	35539,
+// 	39489
+// ];
 let counter = 0;
 
 function validateMessageData(originalMessage) {
@@ -71,10 +71,10 @@ function validateMessageData(originalMessage) {
 }
 
 function syncCDNWrapper(decodedMessage) {
-	if (!SITES_TO_PROCESS.includes(decodedMessage.siteId)) {
-		console.log(`Skipping cdn processing for ${decodedMessage.siteId}`);
-		return decodedMessage.siteId;
-	}
+	// if (!SITES_TO_PROCESS.includes(decodedMessage.siteId)) {
+	// 	console.log(`Skipping cdn processing for ${decodedMessage.siteId}`);
+	// 	return decodedMessage.siteId;
+	// }
 
 	return siteModel
 		.getSiteById(decodedMessage.siteId)
