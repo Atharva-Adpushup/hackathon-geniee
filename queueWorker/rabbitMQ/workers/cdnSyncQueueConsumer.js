@@ -27,6 +27,7 @@ var Promise = require('bluebird'),
 	},
 	QUEUE = CONFIG.RABBITMQ.CDN_SYNC.QUEUE.name,
 	consumer = new Consumer(queueConfig),
+	SITES_TO_PROCESS = [],
 	counter = 0;
 
 function validateMessageData(originalMessage) {
@@ -52,6 +53,11 @@ function validateMessageData(originalMessage) {
 }
 
 function syncCDNWrapper(decodedMessage) {
+	if (!SITES_TO_PROCESS.includes(decodedMessage.siteId)) {
+		console.log(`Skipping cdn processing for ${decodedMessage.siteId}`);
+		return decodedMessage.siteId;
+	}
+
 	return siteModel
 		.getSiteById(decodedMessage.siteId)
 		.then(site => syncCDNService(site))
