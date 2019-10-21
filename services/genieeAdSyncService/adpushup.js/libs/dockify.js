@@ -1,6 +1,6 @@
 var $ = require('jquery'),
 	commonConsts = require('../config/commonConsts'),
-	getDockedCSS = function(formatData, elComputedStyles) {
+	getDockedCSS = function (formatData, elComputedStyles) {
 		var computedStyles = {
 			bottom: elComputedStyles.bottom,
 			right: elComputedStyles.right,
@@ -9,14 +9,15 @@ var $ = require('jquery'),
 		};
 
 		return formatData && formatData.css
-			? $.extend({}, true, commonConsts.DOCKED_CSS, computedStyles, formatData.css)
+			? $.extend({}, true, commonConsts.DOCKED_CSS, computedStyles, formatData.css, { position: 'fixed' })
 			: $.extend({}, true, commonConsts.DOCKED_CSS, computedStyles);
 	},
-	getDockedOffset = function(formatData) {
+	getDockedOffset = function (formatData) {
 		var bottomOffset = formatData && formatData.bottomOffset ? Number(formatData.bottomOffset) : 0;
-		return formatData && formatData.bottomXPath ? $(formatData.bottomXPath).offset().top - bottomOffset : null;
+		var bottomXPath = formatData ? formatData.bottomXpath || formatData.bottomXPath : null;
+		return bottomXPath ? $(bottomXPath).offset().top - bottomOffset : null;
 	},
-	dockifyAd = function(xPath, formatData, utils) {
+	dockifyAd = function (xPath, formatData, utils) {
 		if (!xPath || !$(xPath).length) {
 			return false;
 		}
@@ -27,7 +28,7 @@ var $ = require('jquery'),
 			offset = getDockedOffset(formatData),
 			elTopOffset = $el.offset().top,
 			windowHeight = $(window).height(),
-			dockifyTrigger = function() {
+			dockifyTrigger = function () {
 				var windowScrollTop = $(window).scrollTop(),
 					scrollLimitReachedWithoutOffset = windowScrollTop > elTopOffset && !offset,
 					scrollLimitReachedWithOffset = windowScrollTop > elTopOffset && offset && windowScrollTop < offset;
@@ -52,17 +53,17 @@ var $ = require('jquery'),
 				}
 			};
 
-		var dockedAdOffsetInterval = setInterval(function() {
+		var dockedAdOffsetInterval = setInterval(function () {
 			elTopOffset = $el.offset().top;
 		}, 500);
 
-		$(window).on('load', function() {
+		$(window).on('load', function () {
 			clearInterval(dockedAdOffsetInterval);
 		});
 
 		$(window).on(
 			'scroll',
-			utils.throttle(function() {
+			utils.throttle(function () {
 				dockifyTrigger();
 			}, 10)
 		);
