@@ -39,7 +39,7 @@ function processSite(data) {
 function getSitesFromDB() {
 	const siteListPromise = appBucket
 		.queryDB(
-			`select *
+			`select raw to_string(siteId) 
 		from ${config.couchBase.DEFAULT_BUCKET} where meta().id like 'site::%';`
 		)
 		.catch(e => {
@@ -101,13 +101,16 @@ function udpateActiveSitesStaus() {
 
 	pendingActions.push(getActiveSites(fromDate, toDate));
 
-	console.log('Please wait... ');
+	// console.log('Please wait... ');
 	Promise.all(pendingActions)
 		.then(res => {
-			if (!res[0] || !Object.keys(res[0]).length) {
+			// if (!res[0] || !Object.keys(res[0]).length) {
+			if (!res[0] || !res[0].length) {
 				throw new Error('no sites returned from db');
 			}
-			const siteList = Object.assign({}, res[0]);
+
+			// const siteList = Object.assign({}, res[0]);
+			const siteList = [...res[0]];
 			const sitesFound = {};
 			if (res[1] && Object.keys(res[1]).length) {
 				const activeSiteList = Object.assign({}, res[1]);
@@ -117,12 +120,13 @@ function udpateActiveSitesStaus() {
 			}
 			const siteUpdateData = [];
 
-			for (const key in siteList) {
-				const site = siteList[key].apAppBucket;
+			// for (const key in siteList) {
+			for (let i = 0; i < siteList.length; i++) {
+				// const site = siteList[key].AppBucket; // for local - apAppBucket
 				siteUpdateData.push({
-					siteId: site.siteId,
+					siteId: parseInt(siteList[i]),
 					key: 'dataFeedActive',
-					value: !!sitesFound[site.siteId]
+					value: !!sitesFound[siteList[i]]
 				});
 			}
 
