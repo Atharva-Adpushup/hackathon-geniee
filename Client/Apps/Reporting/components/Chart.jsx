@@ -2,6 +2,7 @@ import React from 'react';
 
 import groupBy from 'lodash/groupBy';
 import sortBy from 'lodash/sortBy';
+import isEqual from 'lodash/isEqual';
 import moment from 'moment';
 import CustomChart from '../../../Components/CustomChart';
 import {
@@ -11,7 +12,7 @@ import {
 	AP_REPORTING_ACTIVE_CHART_LEGENDS_STORAGE_KEY,
 	TERMS,
 	METRICS,
-	REPORT_TABLE_WHITELISTED_COLUMNS
+	REPORT_INTERVAL_TABLE_KEYS
 } from '../configs/commonConsts';
 import {
 	getValidArray,
@@ -63,13 +64,8 @@ class Chart extends React.Component {
 
 		let shouldUpdate = false;
 
-		if (isCustomizeChartLegend && currMetricsList && nextMetricsList) {
-			shouldUpdate = shouldUpdate || currMetricsList.length !== nextMetricsList.length;
-		}
-
-		if (isCustomizeChartLegend && !(currMetricsList && nextMetricsList)) {
-			shouldUpdate = shouldUpdate || currMetricsList !== nextMetricsList;
-		}
+		shouldUpdate =
+			shouldUpdate || (isCustomizeChartLegend && isEqual(currMetricsList, nextMetricsList));
 
 		if (Array.isArray(this.state.activeLegendItems)) {
 			shouldUpdate =
@@ -204,7 +200,7 @@ class Chart extends React.Component {
 					tableData.columns.find(metric => metric === activeItemsFromLocalStorage.value) ||
 					tableData.columns.find(metric => metric === activeLegendItem.value) ||
 					tableData.columns.filter(
-						metric => REPORT_TABLE_WHITELISTED_COLUMNS.indexOf(metric) === -1 && !dimension[metric]
+						metric => REPORT_INTERVAL_TABLE_KEYS.indexOf(metric) === -1 && !dimension[metric]
 					)[0];
 				const { display_name: name, valueType } = metrics[computedKey];
 				computedItems = { name, valueType, value: computedKey };

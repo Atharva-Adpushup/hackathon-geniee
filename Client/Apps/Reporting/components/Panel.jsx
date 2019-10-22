@@ -6,6 +6,7 @@ import { Object } from 'es6-shim';
 import qs from 'querystringify';
 import isEmpty from 'lodash/isEmpty';
 import union from 'lodash/union';
+import sortBy from 'lodash/sortBy';
 import ActionCard from '../../../Components/ActionCard/index';
 import Empty from '../../../Components/Empty/index';
 import ControlContainer from '../containers/ControlContainer';
@@ -18,8 +19,7 @@ import {
 	accountDisableDimension,
 	opsDimension,
 	opsFilter,
-	REPORT_TABLE_WHITELISTED_COLUMNS,
-	REPORT_COLUMNS_BLACKLISTED_FOR_TOTAL
+	REPORT_INTERVAL_TABLE_KEYS
 } from '../configs/commonConsts';
 import { DEMO_ACCOUNT_DATA } from '../../../constants/others';
 import Loader from '../../../Components/Loader';
@@ -45,7 +45,7 @@ class Panel extends Component {
 			selectedChartLegendMetric: '',
 			startDate: moment()
 				.startOf('day')
-				.subtract(7, 'days')
+				.subtract(2, 'days')
 				.format('YYYY-MM-DD'),
 			endDate: moment()
 				.startOf('day')
@@ -272,6 +272,7 @@ class Panel extends Component {
 		const computedState = Object.assign({ isLoading: true }, inputState);
 
 		this.setState(computedState, () => {
+			let newState = {};
 			const params = this.formateReportParams();
 
 			reportService.getCustomStats(params).then(response => {
@@ -286,10 +287,65 @@ class Panel extends Component {
 					) {
 						tableData.total = this.computeTotal(tableData.result);
 					}
+
+					if (isCustomizeChartLegend && tableData.columns && tableData.columns.length) {
+						const metricsList = this.getMetricsList(tableData);
+						newState = { ...newState, metricsList };
+					}
 				}
-				this.setState({ isLoading: false, tableData });
+
+				newState = { ...newState, isLoading: false, tableData };
+				this.setState(newState);
 			});
 		});
+	};
+
+	getSortedMetaMetrics = metaMetrics => {
+		const metaMetricsArray = Object.keys(metaMetrics).map(value => {
+			const { display_name: name, position, valueType } = metaMetrics[value];
+
+			return {
+				name,
+				value,
+				valueType,
+				position
+			};
+		});
+		return sortBy(metaMetricsArray, ['position']);
+	};
+
+	/**
+	 * Get first 5 metrics from report data
+	 * - remove dimensions and intervals from report columns
+	 * - remove unselectable items (given in meta)
+	 * - sort by position (given in meta)
+	 * - pick first 5
+	 * @memberof Panel
+	 */
+	getMetricsList = tableData => {
+		const { reportsMeta } = this.props;
+
+		const filteredMetrics = tableData.columns.filter(metric => {
+			const isDimension = !!reportsMeta.data.dimension[metric];
+			const isBlacklistedMetric = REPORT_INTERVAL_TABLE_KEYS.indexOf(metric) !== -1;
+			const isSelectableMetric =
+				reportsMeta.data.metrics[metric] && reportsMeta.data.metrics[metric].selectable;
+
+			return !isDimension && !isBlacklistedMetric && isSelectableMetric;
+		});
+
+		const sortedMetaMetrics = this.getSortedMetaMetrics(reportsMeta.data.metrics);
+
+		const computedMetrics = [];
+
+		sortedMetaMetrics.forEach(metaMetric => {
+			const { name, value, valueType } = metaMetric;
+			if (filteredMetrics.indexOf(value) !== -1) computedMetrics.push({ name, value, valueType });
+		});
+
+		computedMetrics.splice(5);
+
+		return computedMetrics;
 	};
 
 	computeTotal = tableRows => {
@@ -307,7 +363,7 @@ class Panel extends Component {
 				// eslint-disable-next-line no-restricted-syntax
 				for (const column in tableRow) {
 					if (
-						REPORT_COLUMNS_BLACKLISTED_FOR_TOTAL.indexOf(column) === -1 &&
+						REPORT_INTERVAL_TABLE_KEYS.indexOf(column) === -1 &&
 						!Number.isNaN(tableRow[column]) &&
 						!dimensionList.find(dimension => dimension.value === column)
 					) {
@@ -353,7 +409,17 @@ class Panel extends Component {
 	};
 
 	updateMetrics = (newMetrics = []) => {
-		this.setState({ metricsList: newMetrics });
+		const { reportsMeta } = this.props;
+		const sortedMetaMetrics = this.getSortedMetaMetrics(reportsMeta.data.metrics);
+		const sortedMetrics = [];
+
+		sortedMetaMetrics.forEach(metaMetric => {
+			const foundMetric = newMetrics.find(newMetric => newMetric.value === metaMetric.value);
+
+			if (foundMetric) sortedMetrics.push(foundMetric);
+		});
+
+		this.setState({ metricsList: sortedMetrics });
 	};
 
 	getCsvData = csvData => {
@@ -483,7 +549,7 @@ class Panel extends Component {
 		selectedMetricsTableData.columns = selectedMetricsTableData.columns.filter(
 			column =>
 				!!metricsList.find(metric => metric.value === column) ||
-				REPORT_TABLE_WHITELISTED_COLUMNS.indexOf(column) !== -1 ||
+				REPORT_INTERVAL_TABLE_KEYS.indexOf(column) !== -1 ||
 				!!dimensionList.find(dimension => dimension.value === column)
 		);
 
@@ -494,7 +560,7 @@ class Panel extends Component {
 			for (const key in computedRow) {
 				if (
 					!metricsList.find(metric => metric.value === key) &&
-					REPORT_TABLE_WHITELISTED_COLUMNS.indexOf(key) === -1 &&
+					REPORT_INTERVAL_TABLE_KEYS.indexOf(key) === -1 &&
 					!dimensionList.find(dimension => dimension.value === key)
 				) {
 					delete computedRow[key];
@@ -615,6 +681,7 @@ class Panel extends Component {
 						selectedDimension={selectedDimension}
 						getCsvData={this.getCsvData}
 						reportType={reportType}
+						defaultReportType={defaultReportType}
 					/>
 				</Col>
 			</Row>

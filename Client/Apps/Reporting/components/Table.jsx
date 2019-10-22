@@ -46,19 +46,28 @@ class Table extends React.Component {
 
 	getTableHeaders = headers => {
 		let tableHeader = [];
+		let sortedMetrics = [];
 		const { metrics, dimension } = this.props;
 		const { isDaily } = this.getDateIntervalValidators();
+
+		const computedDate = {
+			Header: 'Date',
+			accessor: 'date',
+			sortable: isDaily
+		};
+
+		tableHeader.push(computedDate);
 
 		headers.forEach(header => {
 			if (dimension[header]) {
 				if (header === 'siteid') {
-					tableHeader.splice(0, 0, {
+					tableHeader.push({
 						Header: 'Site Name',
 						accessor: 'siteName',
 						sortable: true
 					});
 				} else {
-					tableHeader.splice(0, 0, {
+					tableHeader.push({
 						Header: dimension[header].display_name,
 						accessor: header,
 						sortable: true
@@ -67,24 +76,25 @@ class Table extends React.Component {
 			}
 
 			if (metrics[header]) {
-				tableHeader.splice(metrics[header].position + 1, 0, {
-					Header: metrics[header].display_name,
+				const { display_name: Header, position } = metrics[header];
+
+				sortedMetrics.push({
+					Header,
 					accessor: header,
-					sortable: true
+					sortable: true,
+					position
 				});
 			}
 		});
-		let computedDate = {
-			Header: 'Date',
-			accessor: 'date'
-		};
 
-		if (isDaily) {
-			computedDate = { ...computedDate, sortable: true };
-		}
+		sortedMetrics = sortBy(sortedMetrics, header => header.position).map(header => {
+			const headerCopy = { ...header };
+			delete headerCopy.position;
 
-		tableHeader.unshift(computedDate);
-		tableHeader = sortBy(tableHeader, header => header.position);
+			return headerCopy;
+		});
+
+		tableHeader = [...tableHeader, ...sortedMetrics];
 
 		return tableHeader;
 	};

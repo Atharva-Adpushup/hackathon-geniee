@@ -55,6 +55,11 @@ class Control extends Component {
 		);
 	}
 
+	onReportBySelect = selectedDimension => {
+		const { reportType } = this.props;
+		this.setState({ selectedDimension }, this.onControlChange.bind(null, reportType));
+	};
+
 	onFilteChange = selectedFilters => {
 		const { defaultReportType } = this.props;
 		let reportType = defaultReportType || 'account';
@@ -211,9 +216,7 @@ class Control extends Component {
 							reset={true}
 							selected={state.selectedDimension}
 							options={state.dimensionList}
-							onSelect={selectedDimension => {
-								this.setState({ selectedDimension }, this.onControlChange);
-							}}
+							onSelect={this.onReportBySelect}
 						/>
 						{/* eslint-enable */}
 					</div>
