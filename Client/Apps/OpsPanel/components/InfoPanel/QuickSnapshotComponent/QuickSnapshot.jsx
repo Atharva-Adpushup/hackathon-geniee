@@ -837,6 +837,7 @@ class QuickSnapshot extends React.Component {
 				);
 			}
 		});
+		content.splice(4, 0, content.pop());
 
 		return content;
 	};
