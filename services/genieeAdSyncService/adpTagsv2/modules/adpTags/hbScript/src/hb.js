@@ -19,6 +19,7 @@ var hb = {
 			}
 
 			if (!adpSlot.bidders || !adpSlot.bidders.length) {
+				adpSlot.biddingComplete = true;
 				return;
 			}
 
@@ -114,9 +115,9 @@ var hb = {
 		});
 	},
 	loadPrebid: function(w) {
-		/* 
-            HB flag passed as a global constant to the webpack config using DefinePlugin 
-            (https://webpack.js.org/plugins/define-plugin/#root) 
+		/*
+            HB flag passed as a global constant to the webpack config using DefinePlugin
+            (https://webpack.js.org/plugins/define-plugin/#root)
         */
 		if (HB_ACTIVE) {
 			(function() {
