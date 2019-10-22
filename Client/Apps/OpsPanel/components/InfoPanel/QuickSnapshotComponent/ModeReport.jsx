@@ -125,7 +125,7 @@ class ModeReport extends React.Component {
 					size: '60%',
 					dataLabels: {
 						formatter() {
-							return this.y >= 0 ? this.point.name : null;
+							return this.y > 0 ? this.point.name : null;
 						},
 						color: '#ffffff',
 						distance: -30
@@ -139,7 +139,7 @@ class ModeReport extends React.Component {
 					dataLabels: {
 						formatter() {
 							// display only if larger than or equal to 0
-							return this.y >= 0 ? `<b>${this.point.name}:</b> ${this.y}%` : null;
+							return this.y > 0 ? `<b>${this.point.name}:</b> ${this.y}%` : null;
 						}
 					},
 					id: 'errorCodes'

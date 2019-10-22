@@ -229,14 +229,13 @@ class QuickSnapshot extends React.Component {
 
 	getWebsiteWidgetValidation = widgetName => {
 		const {
-			widgetsName: { OPS_TOP_SITES, OPS_COUNTRY_REPORT, OPS_NETWORK_REPORT, OPS_ERROR_REPORT }
+			widgetsName: { OPS_TOP_SITES, OPS_COUNTRY_REPORT, OPS_NETWORK_REPORT }
 		} = this.props;
 		const isValid = !!(
 			widgetName &&
 			widgetName !== OPS_TOP_SITES &&
 			widgetName !== OPS_COUNTRY_REPORT &&
-			widgetName !== OPS_NETWORK_REPORT &&
-			widgetName !== OPS_ERROR_REPORT
+			widgetName !== OPS_NETWORK_REPORT
 		);
 
 		return isValid;
@@ -403,13 +402,17 @@ class QuickSnapshot extends React.Component {
 	};
 
 	getDisplayData = wid => {
-		const { widgetsConfig, reportingSites } = this.state;
+		const { widgetsConfig, reportingSites, reportType } = this.state;
 		const { isReportTypeAccount, isReportTypeGlobal } = this.getReportTypeValidation();
 		const { selectedDate, selectedSite, selectedMetric, path, name } = widgetsConfig[wid];
 		const {
 			sites,
-			widgetsName: { PER_AP_ORIGINAL }
+			widgetsName: { PER_AP_ORIGINAL },
+			accountReportMetaData,
+			globalReportMetaData
 		} = this.props;
+
+		const metaData = reportType === 'global' ? globalReportMetaData : accountReportMetaData;
 		const siteIds = Object.keys(sites);
 		const params = getDateRange(selectedDate);
 		const isWidgetNamePerAPOriginal = !!(name === PER_AP_ORIGINAL);
@@ -447,7 +450,9 @@ class QuickSnapshot extends React.Component {
 				!isValidSiteList &&
 				websiteWidgetValidated
 			);
-			const top10SitesWidgetPath = shouldFetchWidgetTopSites ? this.getTop10SitesWidgetPath() : '';
+			const top10SitesWidgetPath = shouldFetchWidgetTopSites
+				? this.getTop10SitesWidgetPath(metaData.data)
+				: '';
 			const getTop10SitesData = shouldFetchWidgetTopSites
 				? this.getTop10SitesData(top10SitesWidgetPath, selectedDate)
 				: Promise.resolve(this.getComputedSitesData(widgetSitesList || []));
