@@ -1,15 +1,8 @@
 const Promise = require('bluebird');
 const _ = require('lodash');
-const { couchbaseService } = require('node-utils');
-const config = require('../../../configs/config');
-const { docKeys } = require('../../../configs/commonConsts');
 
-const appBucket = couchbaseService(
-	`couchbase://${config.couchBase.HOST}/${config.couchBase.DEFAULT_BUCKET}`,
-	config.couchBase.DEFAULT_BUCKET,
-	config.couchBase.DEFAULT_USER_NAME,
-	config.couchBase.DEFAULT_USER_PASSWORD
-);
+const { docKeys } = require('../../../configs/commonConsts');
+const { appBucket } = require('../../../helpers/routeHelpers');
 
 function findAds(siteId, isActive, docKey) {
 	const response = [];
@@ -26,9 +19,9 @@ function findAds(siteId, isActive, docKey) {
 				_.forEach(ads, ad => {
 					const networkData =
 						ad.network &&
-							ad.networkData &&
-							typeof ad.networkData === 'object' &&
-							Object.keys(ad.networkData).length
+						ad.networkData &&
+						typeof ad.networkData === 'object' &&
+						Object.keys(ad.networkData).length
 							? ad.networkData
 							: false;
 
@@ -46,7 +39,9 @@ function findAds(siteId, isActive, docKey) {
 		})
 		.catch(err => {
 			console.log(err.message);
-			return response;
+			return err.code && err.code === 13 && err.message.includes('key does not exist')
+				? []
+				: Promise.reject(err);
 		});
 }
 

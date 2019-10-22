@@ -77,8 +77,7 @@ function HbProcessing(site, apConfigs) {
 				hbcf.value &&
 				hbcf.value.hbcf &&
 				Object.keys(hbcf.value.hbcf).length &&
-				hbAds.length,
-				hbAdsInnovativeAds.length
+				(hbAds.length || hbAdsInnovativeAds.length)
 			);
 
 			if (!isValidHBConfig) {
