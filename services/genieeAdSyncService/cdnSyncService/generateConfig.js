@@ -5,7 +5,7 @@ const { PREBID_ADAPTERS, docKeys } = require('../../../configs/commonConsts');
 const siteModel = require('../../../models/siteModel');
 const userModel = require('../../../models/userModel');
 const couchbase = require('../../../helpers/couchBaseService');
-const { getHbAdsApTag } = require('./generateAPTagConfig');
+const { getHbAdsApTag, getHbAdsInnovativeAds } = require('./generateInjectionTechniqueConfig');
 const { isValidThirdPartyDFPAndCurrency } = require('../../../helpers/commonFunctions');
 const { getBiddersFromNetworkTree } = require('./commonFunctions');
 
@@ -59,16 +59,17 @@ function getActiveUsedBiddersWithAdapter(usedBidders, biddersFromNetworkTree) {
 function HbProcessing(site, apConfigs) {
 	const siteId = site.get('siteId');
 	const email = site.get('ownerEmail');
-	const isManual = site.get('isManual');
-	const apps = site.get('apps') || { headerBidding: false };
+	const apps = site.get('apps') || { headerBidding: false, apTag: false, innovativeAds: false };
+	const { apTag, innovativeAds } = apps;
 
 	return Promise.join(
 		getHbConfig(siteId),
 		getBiddersFromNetworkTree(),
 		siteModel.getIncontentAndHbAds(siteId),
-		getHbAdsApTag(siteId, isManual),
 		userModel.getUserByEmail(email),
-		(hbcf, biddersFromNetworkTree, incontentAndHbAds, hbAdsApTag, user) => {
+		getHbAdsApTag(siteId, apTag),
+		getHbAdsInnovativeAds(siteId, innovativeAds),
+		(hbcf, biddersFromNetworkTree, incontentAndHbAds, user, hbAdsApTag, hbAdsInnovativeAds) => {
 			let { incontentAds = [], hbAds = [] } = incontentAndHbAds;
 			hbAds = hbAds.concat(hbAdsApTag); // Final Hb Ads
 			const isValidHBConfig = !!(
@@ -76,7 +77,7 @@ function HbProcessing(site, apConfigs) {
 				hbcf.value &&
 				hbcf.value.hbcf &&
 				Object.keys(hbcf.value.hbcf).length &&
-				hbAds.length
+				(hbAds.length || hbAdsInnovativeAds.length)
 			);
 
 			if (!isValidHBConfig) {
