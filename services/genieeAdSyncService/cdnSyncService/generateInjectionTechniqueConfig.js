@@ -11,13 +11,13 @@ const appBucket = couchbaseService(
 	config.couchBase.DEFAULT_USER_PASSWORD
 );
 
-function getHbAdsApTag(siteId = 0, isManual = false) {
-	let response = [];
-	if (!siteId || !isManual) {
-		return Promise.resolve(response);
-	}
+function findAds(siteId, isActive, docKey) {
+	const response = [];
+
+	if (!siteId || !isActive) return Promise.resolve(response);
+
 	return appBucket
-		.getDoc(`${docKeys.apTag}${siteId}`)
+		.getDoc(`${docKey}${siteId}`)
 		.then(docWithCas => {
 			const doc = docWithCas.value;
 			const ads = doc.ads || false;
@@ -26,9 +26,9 @@ function getHbAdsApTag(siteId = 0, isManual = false) {
 				_.forEach(ads, ad => {
 					const networkData =
 						ad.network &&
-						ad.networkData &&
-						typeof ad.networkData === 'object' &&
-						Object.keys(ad.networkData).length
+							ad.networkData &&
+							typeof ad.networkData === 'object' &&
+							Object.keys(ad.networkData).length
 							? ad.networkData
 							: false;
 
@@ -50,4 +50,12 @@ function getHbAdsApTag(siteId = 0, isManual = false) {
 		});
 }
 
-module.exports = { getHbAdsApTag };
+function getHbAdsApTag(siteId = 0, isActive = false) {
+	return findAds(siteId, isActive, docKeys.apTag);
+}
+
+function getHbAdsInnovativeAds(siteId = 0, isActive = false) {
+	return findAds(siteId, isActive, docKeys.interactiveAds);
+}
+
+module.exports = { getHbAdsApTag, getHbAdsInnovativeAds };
