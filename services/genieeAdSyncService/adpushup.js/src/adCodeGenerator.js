@@ -9,14 +9,23 @@ var utils = require('../libs/utils'),
 			isGlobalADPTags = !!window.adpushup.config.isADPTags,
 			isGenieeNetwork = !!(ad.network === 'geniee' && ad.networkData && ad.networkData.zoneId),
 			isZoneContainerId = !!(isGenieeNetwork && ad.networkData.zoneContainerId),
-			computedDFPAdUnitId = isZoneContainerId ? ad.networkData.zoneContainerId : ad.networkData.dfpAdunit,
-			computedSSPContainerId = isZoneContainerId ? ad.networkData.zoneContainerId : ad.networkData.zoneId;
+			computedDFPAdUnitId = isZoneContainerId
+				? ad.networkData.zoneContainerId
+				: ad.networkData.dfpAdunit,
+			computedSSPContainerId = isZoneContainerId
+				? ad.networkData.zoneContainerId
+				: ad.networkData.zoneId;
 
 		computedSSPContainerId = '_ap_apexGeniee_ad_' + computedSSPContainerId;
 
 		if (ad.networkData.adCode) {
 			adCode = utils.base64Decode(ad.networkData.adCode);
-		} else if (ad.network && ad.network === 'geniee' && ad.networkData && ad.networkData.dynamicAllocation) {
+		} else if (
+			ad.network &&
+			ad.network === 'geniee' &&
+			ad.networkData &&
+			ad.networkData.dynamicAllocation
+		) {
 			adCode = [];
 			adCode.push('<div id="' + computedDFPAdUnitId + '">');
 			adCode.push('<scr' + 'ipt type="text/javascript">');
@@ -64,30 +73,40 @@ var utils = require('../libs/utils'),
 						adHeight = isResponsive ? ad.height : Number(ad.height),
 						defaultAdSizeArray = [adWidth, adHeight],
 						isZoneContainerId = !!networkData.zoneContainerId,
-						computedDFPAdUnitId = isZoneContainerId ? networkData.zoneContainerId : networkData.dfpAdunit;
+						computedDFPAdUnitId = isZoneContainerId
+							? networkData.zoneContainerId
+							: networkData.dfpAdunit;
 
-					window.adpushup.adpTags.defineSlot(computedDFPAdUnitId, defaultAdSizeArray, computedDFPAdUnitId, {
-						dfpAdunit: networkData.dfpAdunit,
-						dfpAdunitCode: networkData.dfpAdunitCode,
-						headerBidding: networkData.headerBidding,
-						keyValues: networkData.keyValues,
-						network: ad.network,
-						enableLazyLoading: networkData.enableLazyLoading,
-						overrideActive: networkData.overrideActive,
-						overrideSizeTo: networkData.overrideSizeTo,
-						multipleAdSizes: isMultipleAdSizes ? ad.multipleAdSizes : null,
-						isResponsive: isResponsive,
-						isManual: isManual,
-						sectionName: sectionName,
-						adId: ad.id,
-						services: ad.services,
-						refreshInterval: networkData.refreshInterval || consts.AD_REFRESH_INTERVAL / 1000
-					});
+					window.adpushup.adpTags.defineSlot(
+						computedDFPAdUnitId,
+						defaultAdSizeArray,
+						computedDFPAdUnitId,
+						{
+							originalId: ad.originalId,
+							dfpAdunit: networkData.dfpAdunit,
+							dfpAdunitCode: networkData.dfpAdunitCode,
+							headerBidding: networkData.headerBidding,
+							keyValues: networkData.keyValues,
+							network: ad.network,
+							enableLazyLoading: networkData.enableLazyLoading,
+							overrideActive: networkData.overrideActive,
+							overrideSizeTo: networkData.overrideSizeTo,
+							multipleAdSizes: isMultipleAdSizes ? ad.multipleAdSizes : null,
+							isResponsive: isResponsive,
+							isManual: isManual,
+							sectionName: sectionName,
+							adId: ad.id,
+							services: ad.services,
+							refreshInterval: networkData.refreshInterval || consts.AD_REFRESH_INTERVAL / 1000
+						}
+					);
 				}
 				//Extend variation wise keyvalues if any for adpTags. These will be page level targeting keys
 				if (adpKeyValues && Object.keys(adpKeyValues).length) {
 					var keyVals = window.adpushup.adpTags.config.PAGE_KEY_VALUES;
-					window.adpushup.adpTags.extendConfig({ PAGE_KEY_VALUES: Object.assign(keyVals, adpKeyValues) });
+					window.adpushup.adpTags.extendConfig({
+						PAGE_KEY_VALUES: Object.assign(keyVals, adpKeyValues)
+					});
 				}
 			};
 		};
@@ -98,7 +117,9 @@ var utils = require('../libs/utils'),
 	},
 	executeAmpHeadCode = function() {
 		var adCode = [];
-		adCode.push('<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">');
+		adCode.push(
+			'<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">'
+		);
 		adCode.push(
 			'<style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>'
 		);
@@ -130,7 +151,9 @@ var utils = require('../libs/utils'),
 		adCode.push('window._mNHandle.queue = window._mNHandle.queue || [];');
 		adCode.push('medianet_versionId = "3121199";');
 		adCode.push('</scr' + 'ipt>');
-		adCode.push('<scr' + 'ipt async  src="//contextual.media.net/dmedianet.js?cid=' + cid + '"></scr' + 'ipt>');
+		adCode.push(
+			'<scr' + 'ipt async  src="//contextual.media.net/dmedianet.js?cid=' + cid + '"></scr' + 'ipt>'
+		);
 		var $el = null;
 		if ($('head').length) {
 			$el = $('head');
@@ -143,7 +166,9 @@ var utils = require('../libs/utils'),
 	genrateAdpBodyTag = function(ad) {
 		var adCode,
 			isZoneContainerId = !!ad.networkData.zoneContainerId,
-			computedDFPAdUnitId = isZoneContainerId ? ad.networkData.zoneContainerId : ad.networkData.dfpAdunit;
+			computedDFPAdUnitId = isZoneContainerId
+				? ad.networkData.zoneContainerId
+				: ad.networkData.dfpAdunit;
 		if (!ad.networkData || !ad.networkData.dfpAdunit) {
 			adCode = '';
 		} else if (config.serveAmpTagsForAdp) {
@@ -222,7 +247,9 @@ module.exports = {
 		adCode.push('});');
 		adCode.push('</scr' + 'ipt>');
 		adCode.push(
-			' <scr' + 'ipt async type="text/javascript"\n src="//js.gsspcln.jp/l/gnsmod.min.js"> \n</scr' + 'ipt>'
+			' <scr' +
+				'ipt async type="text/javascript"\n src="//js.gsspcln.jp/l/gnsmod.min.js"> \n</scr' +
+				'ipt>'
 		);
 		return adCode.join('\n');
 	},
