@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 import React from 'react';
 import { Checkbox } from 'react-bootstrap';
 import CustomButton from '../../CustomButton';
@@ -15,7 +17,9 @@ class ManageLegendItems extends React.Component {
 
 	showManageLegendsBox = () => {
 		const { activeLegends } = this.props;
-		const { selectedLegendKeys } = this.state;
+		const { showManageLegendsBox, selectedLegendKeys } = this.state;
+
+		if (showManageLegendsBox) return;
 
 		const computedState = { showManageLegendsBox: true };
 
@@ -29,7 +33,7 @@ class ManageLegendItems extends React.Component {
 
 		this.setState(
 			() => computedState,
-			() => document.addEventListener('mousedown', this.hideManageLegendsBox)
+			() => document.addEventListener('click', this.hideManageLegendsBox)
 		);
 	};
 
@@ -41,19 +45,23 @@ class ManageLegendItems extends React.Component {
 			this.setState(
 				() => ({ showManageLegendsBox: false }),
 				() => {
-					document.removeEventListener('mousedown', this.hideManageLegendsBox);
+					document.removeEventListener('click', this.hideManageLegendsBox);
 				}
 			);
 		}
 	};
 
-	hideManageLegendsBoxManually = () => {
+	hideManageLegendsBoxManually = e => {
+		if (e) e.stopPropagation();
 		this.hideManageLegendsBox(null, true);
 	};
 
-	handleLegends = () => {
+	handleLegends = e => {
+		e.stopPropagation();
 		const { selectedLegendKeys } = this.state;
 		const { updateMetrics } = this.props;
+
+		if (!selectedLegendKeys.length) return window.alert('Please select at least 1 Legend.');
 
 		updateMetrics(selectedLegendKeys);
 		this.hideManageLegendsBoxManually();
@@ -120,12 +128,12 @@ class ManageLegendItems extends React.Component {
 		const { showManageLegendsBox } = this.state;
 
 		return (
-			<div ref={this.manageLegendsBoxRef} className="legend-item manage-legends-wrap">
-				<CustomIcon
-					classNames="action-icon u-cursor-pointer"
-					icon="edit"
-					onClick={this.showManageLegendsBox}
-				/>
+			<div
+				ref={this.manageLegendsBoxRef}
+				className="legend-item manage-legends-wrap u-cursor-pointer"
+				onClick={this.showManageLegendsBox}
+			>
+				<CustomIcon classNames="action-icon custom-chart-legend-icon" icon="edit" />
 
 				{showManageLegendsBox && (
 					<div className="manage-legends-box">

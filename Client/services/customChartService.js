@@ -179,7 +179,10 @@ export function getCustomChartConfig(
 	let validateActiveLegendItems;
 	if (
 		(Array.isArray(activeLegendItems) && activeLegendItems.length > 0) ||
-		typeof activeLegendItems === 'object'
+		(typeof activeLegendItems === 'object' &&
+			activeLegendItems !== null &&
+			!Array.isArray(activeLegendItems) &&
+			activeLegendItems.value)
 	) {
 		validateActiveLegendItems = true;
 	} else {

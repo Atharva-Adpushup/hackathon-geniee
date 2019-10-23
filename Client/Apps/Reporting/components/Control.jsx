@@ -200,6 +200,7 @@ class Control extends Component {
 
 	render() {
 		const { state } = this;
+		const { reportType } = this.props;
 
 		return (
 			<Fragment>
@@ -233,7 +234,7 @@ class Control extends Component {
 							selected={state.selectedInterval}
 							options={state.intervalList}
 							onSelect={selectedInterval => {
-								this.setState({ selectedInterval }, this.onControlChange);
+								this.setState({ selectedInterval }, this.onControlChange.bind(null, reportType));
 							}}
 						/>
 						{/* eslint-enable */}
@@ -246,7 +247,7 @@ class Control extends Component {
 							startDate={state.startDate}
 							endDate={state.endDate}
 							datesUpdated={({ startDate, endDate }) =>
-								this.setState({ startDate, endDate }, this.onControlChange)
+								this.setState({ startDate, endDate }, this.onControlChange.bind(null, reportType))
 							}
 							autoFocus
 						/>
