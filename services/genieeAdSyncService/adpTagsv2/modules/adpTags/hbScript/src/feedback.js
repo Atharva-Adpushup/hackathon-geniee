@@ -23,7 +23,7 @@ var feedback = {
 			winnerAdUnitId: slot.feedback.winnerAdUnitId || null,
 			timedOutBidders: [],
 			services: slot.services,
-			sectionId: slot.sectionId,
+			sectionId: (slot.optionalParam && slot.optionalParam.originalId) || slot.sectionId,
 			sectionName: slot.sectionName,
 			pageGroup: adp.config.pageGroup,
 			pageVariationId: window.adpushup.config.selectedVariation,

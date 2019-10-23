@@ -32,7 +32,7 @@ function processSite(data) {
 		})
 		.then(() => console.log(`Site saved successfully -- ${data.siteId}`))
 		.catch(e => {
-			console.log(JSON.stringify(e));
+			console.log(e);
 			e.error = true;
 			e.siteId = data.siteId;
 			throw e;
@@ -46,7 +46,7 @@ function getSitesFromDB() {
 		from ${config.couchBase.DEFAULT_BUCKET} where meta().id like 'site::%';`
 		)
 		.catch(e => {
-			console.log(`error in getting site Lists:${JSON.stringify(e)}`);
+			console.log(`error in getting site Lists:${e}`);
 			throw { error: true };
 			// return err;
 		});
@@ -68,7 +68,7 @@ function getActiveSites(fromDate, toDate) {
 		json: true
 	};
 	const activeSiteListPromise = rp(options).catch(e => {
-		console.log(`error in getting active site Lists:${JSON.stringify(e)}`);
+		console.log(`error in getting active site Lists:${e}`);
 		throw { error: true };
 		// return err;
 	});
@@ -92,6 +92,7 @@ function checkforFailedUpdates(siteUpdates) {
 	} else {
 		console.log('All sites updated successfully');
 	}
+	console.log(`Executed at:${new Date()}`);
 }
 
 function udpateActiveSitesStaus() {
@@ -104,7 +105,6 @@ function udpateActiveSitesStaus() {
 
 	pendingActions.push(getActiveSites(fromDate, toDate));
 
-	// console.log('Please wait... ');
 	Promise.all(pendingActions)
 		.then(res => {
 			// if (!res[0] || !Object.keys(res[0]).length) {
@@ -142,7 +142,7 @@ function udpateActiveSitesStaus() {
 			checkforFailedUpdates(updateResponse);
 		})
 		.catch(err => {
-			console.log(`Error.....\n ${err.message}`);
+			console.log(`Error.....\n ${err}`);
 		});
 }
 // udpateActiveSitesStaus();
