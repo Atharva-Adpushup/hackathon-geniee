@@ -87,8 +87,6 @@
 }
 .sitewise-report .rt-tbody {
 	overflow: visible !important;
-	min-height: 64vh;
-	max-height: 64vh;
 }
 .sitewise-report .rt-thead .rt-th {
 	background-repeat: no-repeat;
@@ -106,4 +104,8 @@
 
 .sitewise-report .rt-resizable-header-content {
 	float: left;
+}
+
+.ReactTable .-pagination .-btn {
+	opacity: 1 !important;
 }
