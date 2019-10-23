@@ -26,15 +26,17 @@ var $ = require('jquery'),
 		var elComputedStyles = window.getComputedStyle($el[0]);
 		var dockedCSS = getDockedCSS(formatData, elComputedStyles);
 		var offset = getDockedOffset(formatData);
-		var elTopOffset = $el.offset().top;
 		var windowHeight = $(window).height();
 
 		var dockifyTrigger = function () {
 			var windowScrollTop = $(window).scrollTop();
+			var fixedPoint = $el.attr('data-fixed-point') || null;
+			var elTopOffset = fixedPoint || $el.offset().top;
 			var scrollLimitReachedWithoutOffset = windowScrollTop > elTopOffset && !offset;
 			var scrollLimitReachedWithOffset = windowScrollTop > elTopOffset && offset && windowScrollTop < offset;
 
 			if (scrollLimitReachedWithoutOffset || scrollLimitReachedWithOffset) {
+				$el.attr('data-fixed-point', elTopOffset);
 				$el.css(dockedCSS);
 			} else {
 				$el.css({
@@ -46,6 +48,7 @@ var $ = require('jquery'),
 
 			if (offset && windowScrollTop + windowHeight > offset) {
 				var resetTop = offset - (windowScrollTop + windowHeight);
+				// $el.attr('data-fixed-point', elTopOffset);
 				$el.css({
 					position: 'fixed',
 					top: resetTop, // This goes in negative as the offset is crossed
