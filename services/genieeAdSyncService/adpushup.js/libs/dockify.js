@@ -48,7 +48,6 @@ var $ = require('jquery'),
 
 			if (offset && windowScrollTop + windowHeight > offset) {
 				var resetTop = offset - (windowScrollTop + windowHeight);
-				// $el.attr('data-fixed-point', elTopOffset);
 				$el.css({
 					position: 'fixed',
 					top: resetTop, // This goes in negative as the offset is crossed
@@ -57,13 +56,13 @@ var $ = require('jquery'),
 			}
 		};
 
-		var dockedAdOffsetInterval = setInterval(function () {
-			elTopOffset = $el.offset().top;
-		}, 1000);
+		// var dockedAdOffsetInterval = setInterval(function () {
+		// 	elTopOffset = $el.offset().top;
+		// }, 1000);
 
-		$(window).on('load', function () {
-			clearInterval(dockedAdOffsetInterval);
-		});
+		// $(window).on('load', function () {
+		// 	clearInterval(dockedAdOffsetInterval);
+		// });
 
 		$(window).on(
 			'scroll',
