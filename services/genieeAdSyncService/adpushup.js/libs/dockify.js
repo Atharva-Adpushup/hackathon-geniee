@@ -26,11 +26,11 @@ var $ = require('jquery'),
 		var elComputedStyles = window.getComputedStyle($el[0]);
 		var dockedCSS = getDockedCSS(formatData, elComputedStyles);
 		var offset = getDockedOffset(formatData);
+		var elTopOffset = $el.offset().top;
 		var windowHeight = $(window).height();
 
 		var dockifyTrigger = function () {
 			var windowScrollTop = $(window).scrollTop();
-			var elTopOffset = $el.offset().top;
 			var scrollLimitReachedWithoutOffset = windowScrollTop > elTopOffset && !offset;
 			var scrollLimitReachedWithOffset = windowScrollTop > elTopOffset && offset && windowScrollTop < offset;
 
@@ -54,13 +54,13 @@ var $ = require('jquery'),
 			}
 		};
 
-		// var dockedAdOffsetInterval = setInterval(function () {
-		// 	elTopOffset = $el.offset().top;
-		// }, 500);
+		var dockedAdOffsetInterval = setInterval(function () {
+			elTopOffset = $el.offset().top;
+		}, 1000);
 
-		// $(window).on('load', function () {
-		// 	clearInterval(dockedAdOffsetInterval);
-		// });
+		$(window).on('load', function () {
+			clearInterval(dockedAdOffsetInterval);
+		});
 
 		$(window).on(
 			'scroll',
