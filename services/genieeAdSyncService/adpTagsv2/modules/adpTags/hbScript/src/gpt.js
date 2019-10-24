@@ -18,10 +18,12 @@ var gpt = {
 		}
 		adpSlot.hasRendered = true;
 
-		googletag.display(adpSlot.containerId);
-		if (googletag.pubads().isInitialLoadDisabled() || adpSlot.toBeRefreshed) {
-			this.refreshGPTSlot(googletag, adpSlot.gSlot);
-		}
+		w.googletag.cmd.push(function() {
+			googletag.display(adpSlot.containerId);
+			if (googletag.pubads().isInitialLoadDisabled() || adpSlot.toBeRefreshed) {
+				this.refreshGPTSlot(googletag, adpSlot.gSlot);
+			}
+		});
 	},
 	defineSlot: function(googletag, adpSlot) {
 		var networkId = adpSlot.activeDFPNetwork ? adpSlot.activeDFPNetwork : constants.NETWORK_ID;
