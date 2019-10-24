@@ -18,7 +18,7 @@ var gpt = {
 		}
 		adpSlot.hasRendered = true;
 
-		w.googletag.cmd.push(function() {
+		window.googletag.cmd.push(function() {
 			googletag.display(adpSlot.containerId);
 			if (googletag.pubads().isInitialLoadDisabled() || adpSlot.toBeRefreshed) {
 				this.refreshGPTSlot(googletag, adpSlot.gSlot);
