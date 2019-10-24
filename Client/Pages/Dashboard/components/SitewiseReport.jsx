@@ -22,7 +22,6 @@ function formatTableData(tableBody, props) {
 
 function sortHeadersByPosition(columns, metrics) {
 	const tempArr = [];
-
 	columns.forEach(col => {
 		if (metrics[col]) {
 			tempArr.push({
