@@ -491,7 +491,7 @@ class Panel extends Component {
 
 		if (siteId) {
 			reportType = 'site';
-			if (isValidSite && isReportingSite) {
+			if ((isValidSite || isDemoUserReportingSite) && isReportingSite) {
 				selectedFilters = { siteid: { [computedSiteId]: true } };
 			}
 		}
