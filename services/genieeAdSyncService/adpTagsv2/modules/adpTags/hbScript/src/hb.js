@@ -18,7 +18,11 @@ var hb = {
 				adpSlot.computedSizes = responsiveSizes;
 			}
 
-			if (!adpSlot.bidders || !adpSlot.bidders.length) {
+			if (
+				!window.adpushup.services.HB_ACTIVE ||
+				!adpSlot.bidders ||
+				!adpSlot.bidders.length
+			) {
 				adpSlot.biddingComplete = true;
 				return;
 			}

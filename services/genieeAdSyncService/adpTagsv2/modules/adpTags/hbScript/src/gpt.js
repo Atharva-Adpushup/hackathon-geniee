@@ -9,11 +9,7 @@ var gpt = {
 		return googletag.pubads().refresh([gSlot]);
 	},
 	renderSlot: function(googletag, adpSlot) {
-		if (
-			!adpSlot.containerPresent ||
-			(window.adpushup.services.HB_ACTIVE && !adpSlot.biddingComplete) ||
-			adpSlot.hasRendered
-		) {
+		if (!adpSlot.containerPresent || !adpSlot.biddingComplete || adpSlot.hasRendered) {
 			return;
 		}
 		adpSlot.hasRendered = true;
