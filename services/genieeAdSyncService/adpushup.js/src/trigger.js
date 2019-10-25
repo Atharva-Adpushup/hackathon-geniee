@@ -9,15 +9,15 @@ var adp = window.adpushup,
 	generateMediaNetHeadCode = require('./adCodeGenerator').generateMediaNetHeadCode,
 	isAdContainerInView = require('../libs/lazyload'),
 	browserConfig = require('../libs/browserConfig'),
-	getContainer = function(ad) {
+	getContainer = function (ad) {
 		var defer = $.Deferred(),
 			isResponsive = !!(ad.networkData && ad.networkData.isResponsive),
 			computedStylesObject = isResponsive
 				? {}
 				: {
-						width: ad.width,
-						height: ad.height
-				  };
+					width: ad.width,
+					height: ad.height
+				};
 
 		try {
 			var $adEl = $('#' + ad.id);
@@ -28,7 +28,7 @@ var adp = window.adpushup,
 			return defer.reject('Unable to get adpushup container');
 		}
 	},
-	trigger = function(adId) {
+	trigger = function (adId) {
 		var isDOMElement = !!document.getElementById(adId);
 
 		// NOTE: Stop execution of this module if related DOM element does not exist
@@ -46,9 +46,10 @@ var adp = window.adpushup,
 			adp.config.manualAds.length &&
 			adp.utils.isUrlMatching()
 		) {
+			console.log("APTag running for", adId);
 			var manualAds = adp.config.manualAds,
 				newAdId = utils.uniqueId(),
-				manualAd = manualAds.filter(function(ad) {
+				manualAd = manualAds.filter(function (ad) {
 					return ad.id === adId;
 				})[0],
 				ad = $.extend(true, {}, manualAd),
@@ -58,6 +59,8 @@ var adp = window.adpushup,
 				domElem = document.getElementById(ad.id),
 				currentTime = new Date().getTime(),
 				isAdElement = !!(isAdId && domElem);
+
+			console.log("APTag found ", manualAd, "DOM element", domElem);
 
 			ad.id = newAdId;
 			document.getElementById(adId).setAttribute('id', newAdId);
@@ -74,20 +77,21 @@ var adp = window.adpushup,
 			ad.originalId = adId;
 			if (isAdElement) {
 				var feedbackData = {
-						ads: [ad],
-						xpathMiss: [],
-						eventType: commonConsts.ERROR_CODES.NO_ERROR,
-						// mode: 16,
-						mode: commonConsts.MODE.ADPUSHUP, // Sending Mode 1 in Manual Ads
-						referrer: config.referrer,
-						tracking: browserConfig.trackerSupported,
-						variationId: commonConsts.MANUAL_ADS.VARIATION
-					},
+					ads: [ad],
+					xpathMiss: [],
+					eventType: commonConsts.ERROR_CODES.NO_ERROR,
+					// mode: 16,
+					mode: commonConsts.MODE.ADPUSHUP, // Sending Mode 1 in Manual Ads
+					referrer: config.referrer,
+					tracking: browserConfig.trackerSupported,
+					variationId: commonConsts.MANUAL_ADS.VARIATION
+				},
 					oldFeedbackData = $.extend(true, {}, feedbackData);
 
 				oldFeedbackData.ads = [ad.originalId];
 				return getContainer(ad)
-					.done(function(container) {
+					.done(function (container) {
+						console.log("Container found ", container);
 						var isLazyLoadingAd = !!(ad.enableLazyLoading === true);
 						var isAdNetworkAdpTag = !!(ad.network === commonConsts.NETWORKS.ADPTAGS);
 						var isAdNetworkMedianet = !!(
@@ -105,7 +109,7 @@ var adp = window.adpushup,
 							isMedianetHeaderCodePlaced = true;
 						}
 						if (isLazyLoadingAd) {
-							isAdContainerInView(container).done(function() {
+							isAdContainerInView(container).done(function () {
 								// Send feedback call
 								utils.sendFeedback(feedbackData);
 								utils.sendFeedbackOld(oldFeedbackData);
@@ -120,7 +124,7 @@ var adp = window.adpushup,
 							return placeAd(container, ad);
 						}
 					})
-					.fail(function(err) {
+					.fail(function (err) {
 						throw new Error(err);
 					});
 			}
