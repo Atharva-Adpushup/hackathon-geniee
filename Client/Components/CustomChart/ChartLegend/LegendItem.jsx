@@ -43,7 +43,7 @@ class LegendItem extends Component {
 		let activeLegendItemsCopy;
 		if (!legend.isDisabled) {
 			const { visible } = this.state;
-			this.setState({ visible: !visible });
+
 			if (Array.isArray(activeLegendItems)) {
 				activeLegendItemsCopy = [...activeLegendItems];
 				if (visible) {
@@ -60,6 +60,8 @@ class LegendItem extends Component {
 					// const scale = yAxis.find(y => y.value == serie.value);
 					// scale.visible = false;
 				}
+
+				this.setState({ visible: !visible });
 			} else {
 				activeLegendItemsCopy = { ...activeLegendItems };
 				activeLegendItemsCopy = legend;
