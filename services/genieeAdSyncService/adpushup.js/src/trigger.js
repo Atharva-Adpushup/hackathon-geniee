@@ -30,6 +30,7 @@ var adp = window.adpushup,
 	},
 	trigger = function (adId) {
 		var isDOMElement = !!document.getElementById(adId);
+		console.log("ApTag id ", adId, "DOM Element", isDOMElement);
 
 		// NOTE: Stop execution of this module if related DOM element does not exist
 		// The requirement for this check came up as redundant ad ids are being triggered from adpushup queue sometimes
