@@ -98,7 +98,10 @@ class QuickSnapshot extends React.Component {
 		return reportAPI.then(responseData => {
 			const { data: metaData } = responseData;
 
-			this.setReportingMetaData(metaData, reportType);
+			if (!isValidReportMetaData) {
+				this.setReportingMetaData(metaData, reportType);
+			}
+
 			this.setReportingMetaDataState(metaData);
 			return metaData;
 		});
@@ -732,7 +735,7 @@ class QuickSnapshot extends React.Component {
 			startDate,
 			endDate,
 			selectedSite,
-			selectedDimension,
+			selectedDimension = '',
 			selectedChartLegendMetric = '',
 			isDataSufficient
 		} = widgetsConfig[wid];
