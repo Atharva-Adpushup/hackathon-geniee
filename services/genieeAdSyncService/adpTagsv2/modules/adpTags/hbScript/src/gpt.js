@@ -9,21 +9,15 @@ var gpt = {
 		return googletag.pubads().refresh([gSlot]);
 	},
 	renderSlot: function(googletag, adpSlot) {
-		if (
-			!adpSlot.containerPresent ||
-			(window.adpushup.services.HB_ACTIVE && !adpSlot.biddingComplete) ||
-			adpSlot.hasRendered
-		) {
+		if (!adpSlot.containerPresent || !adpSlot.biddingComplete || adpSlot.hasRendered) {
 			return;
 		}
 		adpSlot.hasRendered = true;
 
-		window.googletag.cmd.push(function() {
-			googletag.display(adpSlot.containerId);
-			if (googletag.pubads().isInitialLoadDisabled() || adpSlot.toBeRefreshed) {
-				this.refreshGPTSlot(googletag, adpSlot.gSlot);
-			}
-		});
+		googletag.display(adpSlot.containerId);
+		if (googletag.pubads().isInitialLoadDisabled() || adpSlot.toBeRefreshed) {
+			this.refreshGPTSlot(googletag, adpSlot.gSlot);
+		}
 	},
 	defineSlot: function(googletag, adpSlot) {
 		var networkId = adpSlot.activeDFPNetwork ? adpSlot.activeDFPNetwork : constants.NETWORK_ID;
