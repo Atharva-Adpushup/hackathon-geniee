@@ -2,6 +2,7 @@ import React from 'react';
 
 import groupBy from 'lodash/groupBy';
 import sortBy from 'lodash/sortBy';
+import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
 import moment from 'moment';
 import CustomChart from '../../../Components/CustomChart';
@@ -172,10 +173,14 @@ class Chart extends React.Component {
 			[computedItems] = activeItemsByChartLegendMetric;
 		} else if (activeItemsFromLocalStorage && isCustomizeChartLegend) {
 			if (!selectedDimension && Array.isArray(activeItemsFromLocalStorage)) {
-				computedItems = activeItemsFromLocalStorage.filter(
+				const computedActiveItemsFromLocalStorage = activeItemsFromLocalStorage.filter(
 					storageLegend =>
 						!!metricsList.find(selectedMetric => selectedMetric.value === storageLegend.value)
 				);
+
+				computedItems = computedActiveItemsFromLocalStorage.length
+					? computedActiveItemsFromLocalStorage
+					: cloneDeep(metricsList).slice(0, 3);
 			} else {
 				computedItems =
 					metricsList.find(
@@ -186,9 +191,13 @@ class Chart extends React.Component {
 			}
 		} else if (activeItemsFromLocalStorage) {
 			if (!selectedDimension && Array.isArray(activeItemsFromLocalStorage)) {
-				computedItems = activeItemsFromLocalStorage.filter(
+				const computedActiveItemsFromLocalStorage = activeItemsFromLocalStorage.filter(
 					storageLegend => !!tableData.columns.find(metric => metric === storageLegend.value)
 				);
+
+				computedItems = computedActiveItemsFromLocalStorage.length
+					? computedActiveItemsFromLocalStorage
+					: cloneDeep(tableData.columns).slice(0, 3);
 			} else {
 				const computedKey =
 					tableData.columns.find(metric => metric === activeItemsFromLocalStorage.value) ||
