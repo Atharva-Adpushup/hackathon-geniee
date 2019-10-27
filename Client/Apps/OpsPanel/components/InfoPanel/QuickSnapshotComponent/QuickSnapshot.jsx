@@ -263,10 +263,14 @@ class QuickSnapshot extends React.Component {
 		widgetMetrics.forEach(metricName => {
 			const metricLabel = metrics[metricName].display_name;
 
-			resultArray.push({ name: metricLabel, value: metricName });
+			resultArray.push({
+				name: metricLabel,
+				value: metricName,
+				position: metrics[metricName].table_position
+			});
 		});
 
-		return resultArray;
+		return _.sortBy(resultArray, o => o.position);
 	};
 
 	getWidgetConfig = (widgets, widgetsList) => {
