@@ -120,14 +120,20 @@ class Control extends Component {
 	};
 
 	getSelectedFilter = filter => {
-		const { reportType, selectedFilters, isDemoUser } = this.props;
+		const { reportType, defaultReportType, selectedFilters, isDemoUser } = this.props;
 		let siteIds;
 		let isSuperUser = false;
 
-		if (reportType === 'account') {
+		if (
+			reportType === 'account' ||
+			(defaultReportType !== 'global' && reportType === 'site' && filter.value === 'siteid')
+		) {
 			const { site } = this.props;
 			siteIds = Object.keys(site);
-		} else if (reportType === 'global') {
+		} else if (
+			reportType === 'global' ||
+			(defaultReportType === 'global' && reportType === 'site' && filter.value === 'siteid')
+		) {
 			siteIds = '';
 			isSuperUser = true;
 		} else {

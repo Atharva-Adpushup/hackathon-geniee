@@ -224,7 +224,11 @@ class Panel extends Component {
 		const { email, reportType } = this.getDemoUserParams();
 		let selectedMetrics;
 
-		if (metricsList) {
+		if (metricsList && !isCustomizeChartLegend) {
+			selectedMetrics = displayMetrics.map(metric => metric.value);
+		}
+
+		if (metricsList && isCustomizeChartLegend) {
 			selectedMetrics = metricsList
 				.filter(metric => !metric.isDisabled)
 				.map(metric => metric.value);
