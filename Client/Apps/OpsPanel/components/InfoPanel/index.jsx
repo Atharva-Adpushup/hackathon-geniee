@@ -76,6 +76,7 @@ class InfoPanel extends Component {
 				return (
 					<ReportVitals
 						reportType={reportType || 'account'}
+						isCustomizeChartLegend
 						match={match}
 						location={location}
 					/>

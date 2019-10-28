@@ -1,6 +1,8 @@
 import React from 'react';
 import ReactTable from 'react-table';
 import { numberWithCommas, roundOffTwoDecimal, getWidgetValidDationState } from '../helpers/utils';
+import sortBy from 'lodash/sortBy';
+import { reactTableSortMethod } from '../../../helpers/commonFunctions';
 
 function formatTableData(tableBody, props) {
 	const { metrics } = props;
@@ -19,34 +21,50 @@ function formatTableData(tableBody, props) {
 	});
 }
 
+function sortHeadersByPosition(columns, metrics) {
+	const tempArr = [];
+	columns.forEach(col => {
+		if (metrics[col]) {
+			tempArr.push({
+				Header: metrics[col].display_name,
+				accessor: col,
+				position: metrics[col].table_position
+			});
+		}
+	});
+
+	return sortBy(tempArr, o => o.position);
+}
+
 function computeTableData(data, props) {
 	const { result, columns } = data;
 	const tableHeader = [];
 	const { metrics, site = {}, reportType, disableSiteLevelCheck } = props;
 
 	if ((result, columns)) {
-		if (reportType === 'site') {
+		const sortedHeaders = sortHeadersByPosition(columns, metrics);
+
+		sortedHeaders.forEach(({ Header, accessor }) => {
 			tableHeader.push({
+				Header,
+				accessor,
+				sortMethod: (a, b) => reactTableSortMethod(a, b)
+			});
+		});
+
+		if (reportType === 'site') {
+			tableHeader.splice(0, 0, {
 				Header: 'Date',
-				accessor: 'date'
+				accessor: 'date',
+				sortMethod: (a, b) => reactTableSortMethod(a, b)
 			});
 		} else {
-			tableHeader.push({
+			tableHeader.splice(0, 0, {
 				Header: 'Website',
 				accessor: 'siteName'
 			});
 		}
 
-		columns.forEach(col => {
-			if (metrics[col]) {
-				tableHeader.push({
-					Header: metrics[col].display_name,
-					accessor: col
-				});
-			}
-		});
-
-		tableHeader.sort((a, b) => a.position - b.position);
 		result.forEach(row => {
 			const { siteid, siteName } = row;
 			const isSiteIdInReportSites = !!(site[siteid] || disableSiteLevelCheck);

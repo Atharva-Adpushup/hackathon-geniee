@@ -1,6 +1,7 @@
 import React from 'react';
 import { numberWithCommas, roundOffTwoDecimal, getWidgetValidDationState } from '../helpers/utils';
 import { displayMetrics } from '../configs/commonConsts';
+import sortBy from 'lodash/sortBy';
 
 function computeDisplayData(props) {
 	const {
@@ -14,7 +15,12 @@ function computeDisplayData(props) {
 	if (columns && result) {
 		columns.forEach(col => {
 			if (metrics[col]) {
-				resultData[col] = { name: metrics[col].display_name, value: 0 };
+				resultData[col] = {
+					name: metrics[col].display_name,
+					value: 0,
+					position: metrics[col].chart_position,
+					col
+				};
 			}
 		});
 		result.forEach(row => {
@@ -31,7 +37,7 @@ function computeDisplayData(props) {
 		});
 	}
 
-	return resultData;
+	return sortBy(resultData, o => o.position);
 }
 
 const DEFAULT_STATE = {
@@ -64,16 +70,16 @@ class PerformanceOverview extends React.Component {
 		const { displayData } = this.state;
 		return (
 			<div className="u-margin-t4 u-margin-b4">
-				{Object.keys(displayData).length > 0 ? (
-					Object.keys(displayData).map(key =>
-						displayMetrics[key] ? (
-							<div className="col-sm-4 u-margin-b4 text-center" key={key}>
-								<div className="font-small">{displayData[key].name}</div>
+				{displayData.length > 0 ? (
+					displayData.map(({ name, value, col }) =>
+						displayMetrics[col] ? (
+							<div className="col-sm-4 u-margin-b4 text-center" key={col}>
+								<div className="font-small">{name}</div>
 								<div className="estimatedEarning">
 									<span>
-										{displayMetrics[key].valueType == 'money'
-											? `$${numberWithCommas(roundOffTwoDecimal(displayData[key].value))}`
-											: numberWithCommas(displayData[key].value)}
+										{displayMetrics[col].valueType == 'money'
+											? `$${numberWithCommas(roundOffTwoDecimal(value))}`
+											: numberWithCommas(value)}
 									</span>
 								</div>
 							</div>
