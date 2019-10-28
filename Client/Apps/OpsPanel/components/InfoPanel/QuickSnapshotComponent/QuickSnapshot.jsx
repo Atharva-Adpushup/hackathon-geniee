@@ -267,7 +267,7 @@ class QuickSnapshot extends React.Component {
 			});
 		});
 
-		return _.sortBy(resultArray, o => o.position);
+		return sortBy(resultArray, o => o.position);
 	};
 
 	getWidgetConfig = (widgets, widgetsList) => {

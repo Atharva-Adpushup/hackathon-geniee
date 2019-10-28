@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactTable from 'react-table';
 import { numberWithCommas, roundOffTwoDecimal, getWidgetValidDationState } from '../helpers/utils';
-import _ from 'lodash';
+import sortBy from 'lodash/sortBy';
 
 function formatTableData(tableBody, props) {
 	const { metrics } = props;
@@ -32,7 +32,7 @@ function sortHeadersByPosition(columns, metrics) {
 		}
 	});
 
-	return _.sortBy(tempArr, o => o.position);
+	return sortBy(tempArr, o => o.position);
 }
 
 function computeTableData(data, props) {

@@ -1,6 +1,7 @@
 import React from 'react';
 import { numberWithCommas, roundOffTwoDecimal, getWidgetValidDationState } from '../helpers/utils';
 import { displayMetrics } from '../configs/commonConsts';
+import sortBy from 'lodash/sortBy';
 
 function computeDisplayData(props) {
 	const {
@@ -36,7 +37,7 @@ function computeDisplayData(props) {
 		});
 	}
 
-	return _.sortBy(resultData, o => o.position);
+	return sortBy(resultData, o => o.position);
 }
 
 const DEFAULT_STATE = {
