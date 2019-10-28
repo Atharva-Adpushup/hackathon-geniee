@@ -101,7 +101,6 @@ class QuickSnapshot extends React.Component {
 			if (!isValidReportMetaData) {
 				this.setReportingMetaData(metaData, reportType);
 			}
-
 			this.setReportingMetaDataState(metaData);
 			return metaData;
 		});
@@ -270,7 +269,7 @@ class QuickSnapshot extends React.Component {
 			});
 		});
 
-		return _.sortBy(resultArray, o => o.position);
+		return sortBy(resultArray, o => o.position);
 	};
 
 	getWidgetConfig = (widgets, widgetsList) => {

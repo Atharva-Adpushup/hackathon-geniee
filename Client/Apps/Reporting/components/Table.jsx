@@ -83,7 +83,13 @@ class Table extends React.Component {
 					Header,
 					accessor: header,
 					sortable: true,
-					table_position
+					table_position,
+					sortMethod: (a, b) => {
+						if (a.length === b.length) {
+							return a > b ? 1 : -1;
+						}
+						return a.length > b.length ? 1 : -1;
+					}
 				});
 			}
 		});
