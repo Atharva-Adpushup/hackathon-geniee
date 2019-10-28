@@ -319,14 +319,6 @@ const checkReportTypeGlobal = props => {
 	return isValid;
 };
 
-const checkDefaultReportTypeGlobal = props => {
-	const { defaultReportType } = props;
-	const { GLOBAL } = REPORT_TYPE;
-	const isValid = !!(defaultReportType && defaultReportType.toLowerCase() === GLOBAL);
-
-	return isValid;
-};
-
 export {
 	errorHandler,
 	getDuplicatesInArray,
@@ -341,7 +333,6 @@ export {
 	getPageGroupHash,
 	checkDemoUserEmail,
 	checkReportTypeGlobal,
-	checkDefaultReportTypeGlobal,
 	getDashboardDemoUserSiteIds,
 	getReportingDemoUserValidation,
 	getReportingDemoUserSiteIds,

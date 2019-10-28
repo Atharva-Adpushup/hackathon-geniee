@@ -46,28 +46,19 @@ class Table extends React.Component {
 
 	getTableHeaders = headers => {
 		let tableHeader = [];
-		let sortedMetrics = [];
 		const { metrics, dimension } = this.props;
 		const { isDaily } = this.getDateIntervalValidators();
-
-		const computedDate = {
-			Header: 'Date',
-			accessor: 'date',
-			sortable: isDaily
-		};
-
-		tableHeader.push(computedDate);
 
 		headers.forEach(header => {
 			if (dimension[header]) {
 				if (header === 'siteid') {
-					tableHeader.push({
+					tableHeader.splice(0, 0, {
 						Header: 'Site Name',
 						accessor: 'siteName',
 						sortable: true
 					});
 				} else {
-					tableHeader.push({
+					tableHeader.splice(0, 0, {
 						Header: dimension[header].display_name,
 						accessor: header,
 						sortable: true
@@ -76,26 +67,29 @@ class Table extends React.Component {
 			}
 
 			if (metrics[header]) {
-				// eslint-disable-next-line camelcase
-				const { display_name: Header, table_position } = metrics[header];
-
-				sortedMetrics.push({
-					Header,
+				tableHeader.splice(metrics[header].position + 1, 0, {
+					Header: metrics[header].display_name,
 					accessor: header,
-					sortable: true,
-					table_position
+					sortMethod: (a, b) => {
+						if (a.length === b.length) {
+							return a > b ? 1 : -1;
+						}
+						return a.length > b.length ? 1 : -1;
+					}
 				});
 			}
 		});
+		let computedDate = {
+			Header: 'Date',
+			accessor: 'date'
+		};
 
-		sortedMetrics = sortBy(sortedMetrics, header => header.table_position).map(header => {
-			const headerCopy = { ...header };
-			delete headerCopy.table_position;
+		if (isDaily) {
+			computedDate = { ...computedDate, sortable: true };
+		}
 
-			return headerCopy;
-		});
-
-		tableHeader = [...tableHeader, ...sortedMetrics];
+		tableHeader.unshift(computedDate);
+		tableHeader = sortBy(tableHeader, header => header.position);
 
 		return tableHeader;
 	};
@@ -188,25 +182,11 @@ class Table extends React.Component {
 		tableBody.forEach(row => {
 			Object.keys(row).forEach(col => {
 				if (metrics[col]) {
-					let num;
-					switch (metrics[col].valueType) {
-						case 'money': {
-							num = roundOffTwoDecimal(row[col]);
-							row[col] = `$${numberWithCommas(num)}`;
-
-							break;
-						}
-						case 'percent': {
-							num = row[col];
-							row[col] = `${numberWithCommas(num)}%`;
-
-							break;
-						}
-						default: {
-							num = row[col];
-							row[col] = numberWithCommas(num);
-						}
-					}
+					const num = metrics[col].valueType === 'money' ? roundOffTwoDecimal(row[col]) : row[col];
+					row[col] =
+						metrics[col].valueType === 'money'
+							? `$${numberWithCommas(num)}`
+							: numberWithCommas(num);
 				}
 			});
 		});
@@ -223,25 +203,9 @@ class Table extends React.Component {
 			let value = grandTotal[col];
 
 			if (metrics[col]) {
-				let num;
-				switch (metrics[col].valueType) {
-					case 'money': {
-						num = roundOffTwoDecimal(value);
-						value = `$${numberWithCommas(num)}`;
-
-						break;
-					}
-					case 'percent': {
-						num = value;
-						value = `${numberWithCommas(num)}%`;
-
-						break;
-					}
-					default: {
-						num = value;
-						value = numberWithCommas(num);
-					}
-				}
+				const num = metrics[col].valueType == 'money' ? roundOffTwoDecimal(value) : value;
+				value =
+					metrics[col].valueType == 'money' ? `$${numberWithCommas(num)}` : numberWithCommas(num);
 			}
 
 			footerComponent.push(
