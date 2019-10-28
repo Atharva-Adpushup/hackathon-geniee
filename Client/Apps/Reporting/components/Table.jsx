@@ -70,7 +70,12 @@ class Table extends React.Component {
 				tableHeader.splice(metrics[header].position + 1, 0, {
 					Header: metrics[header].display_name,
 					accessor: header,
-					sortable: true
+					sortMethod: (a, b) => {
+						if (a.length === b.length) {
+							return a > b ? 1 : -1;
+						}
+						return a.length > b.length ? 1 : -1;
+					}
 				});
 			}
 		});
