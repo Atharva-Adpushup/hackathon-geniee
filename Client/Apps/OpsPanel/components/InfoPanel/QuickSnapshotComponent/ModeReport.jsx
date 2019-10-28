@@ -116,85 +116,91 @@ class ModeReport extends React.Component {
 		const formattedData = this.formatChartData();
 		const { modesData, errorCodesData } = formattedData;
 
-		Highcharts.chart(
-			{
-				...ERROR_REPORT_PROPS,
-				series: [
-					{
-						name: 'Mode',
-						data: modesData,
-						size: '60%',
-						dataLabels: {
-							formatter() {
-								return this.y >= 0 ? this.point.name : null;
-							},
-							color: '#ffffff',
-							distance: -30
-						}
-					},
-					{
-						name: 'Error Code',
-						data: errorCodesData,
-						size: '80%',
-						innerSize: '60%',
-						dataLabels: {
-							formatter() {
-								// display only if larger than or equal to 0
-								return this.y >= 0 ? `<b>${this.point.name}:</b> ${this.y}%` : null;
-							}
+		Highcharts.chart({
+			...ERROR_REPORT_PROPS,
+			series: [
+				{
+					name: 'Mode',
+					data: modesData,
+					size: '60%',
+					dataLabels: {
+						formatter() {
+							return this.y > 0 ? this.point.name : null;
 						},
-						id: 'errorCodes'
-					}
-				],
-				plotOptions: {
-					pie: {
-						allowPointSelect: true,
-						cursor: 'pointer'
+						color: '#ffffff',
+						distance: -30
 					}
 				},
-				responsive: {
-					rules: [
-						{
-							condition: {
-								maxWidth: 400
-							},
-							chartOptions: {
-								series: [
-									{},
-									{
-										id: 'errorCodes',
-										dataLabels: {
-											enabled: false
-										}
-									}
-								]
-							}
+				{
+					name: 'Error Code',
+					data: errorCodesData,
+					size: '80%',
+					innerSize: '60%',
+					dataLabels: {
+						formatter() {
+							// display only if larger than or equal to 0
+							return this.y > 0 ? `<b>${this.point.name}:</b> ${this.y}%` : null;
 						}
-					]
+					},
+					id: 'errorCodes'
+				}
+			],
+			plotOptions: {
+				pie: {
+					allowPointSelect: true,
+					cursor: 'pointer'
 				}
 			},
-			chart => {
-				// on complete
-				if (errorCodesData.length === 0) {
-					// check series is empty
-					chart.renderer
-						.text('No Data Available', 300, 120)
-						.css({
-							color: '#000',
-							fontSize: '32px'
-						})
-						.add();
-				}
+			responsive: {
+				rules: [
+					{
+						condition: {
+							maxWidth: 400
+						},
+						chartOptions: {
+							series: [
+								{},
+								{
+									id: 'errorCodes',
+									dataLabels: {
+										enabled: false
+									}
+								}
+							]
+						}
+					}
+				]
 			}
-		);
+		});
 	}
 
 	componentDidMount() {
-		this.highChartsRender();
+		const { displayData } = this.props;
+
+		const {
+			data: { result = [] }
+		} = displayData;
+
+		if (result.length) {
+			this.highChartsRender();
+		}
 	}
 
 	render() {
-		return <div id="error-code" />;
+		const { displayData } = this.props;
+
+		const {
+			data: { result = [] }
+		} = displayData;
+		return (
+			<React.Fragment>
+				{result.length ? (
+					<div id="error-code" />
+				) : (
+					<div className="text-center">No Record Found.</div>
+				)}
+			</React.Fragment>
+		);
 	}
 }
 

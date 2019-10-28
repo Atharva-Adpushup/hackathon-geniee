@@ -1,15 +1,16 @@
 import React from 'react';
-import Datatable from 'react-bs-datatable';
+import ReactTable from 'react-table';
 import { Col } from 'react-bootstrap';
 import sortBy from 'lodash/sortBy';
+import isEqual from 'lodash/isEqual';
 import moment from 'moment';
 import { numberWithCommas, computeCsvData, roundOffTwoDecimal } from '../helpers/utils';
 
 class Table extends React.Component {
 	constructor(props) {
 		super(props);
-		const { tableHeader, tableBody, grandTotal } = this.updateTableData();
 		const { metrics, tableData } = props;
+		const { tableHeader, tableBody, grandTotal } = this.updateTableData(tableData);
 		this.state = {
 			metrics,
 			tableData,
@@ -19,8 +20,13 @@ class Table extends React.Component {
 		};
 	}
 
-	shouldComponentUpdate() {
-		return false;
+	componentWillReceiveProps({ tableData: nextTableData }) {
+		const { tableData: currTableData } = this.props;
+
+		if (!isEqual(currTableData, nextTableData)) {
+			const { tableHeader, tableBody, grandTotal } = this.updateTableData(nextTableData);
+			this.setState({ tableData: nextTableData, tableHeader, tableBody, grandTotal });
+		}
 	}
 
 	setCsvData = data => {
@@ -46,44 +52,40 @@ class Table extends React.Component {
 		headers.forEach(header => {
 			if (dimension[header]) {
 				if (header === 'siteid') {
-					tableHeader.push({
-						title: 'Site Name',
-						position: 1,
-						prop: 'siteName',
+					tableHeader.splice(0, 0, {
+						Header: 'Site Name',
+						accessor: 'siteName',
 						sortable: true
 					});
 				} else {
-					tableHeader.push({
-						title: dimension[header].display_name,
-						position: 1,
-						prop: header,
+					tableHeader.splice(0, 0, {
+						Header: dimension[header].display_name,
+						accessor: header,
 						sortable: true
 					});
 				}
 			}
 
 			if (metrics[header]) {
-				tableHeader.push({
-					title: metrics[header].display_name,
-					position: metrics[header].position + 1,
-					prop: header,
+				tableHeader.splice(metrics[header].position + 1, 0, {
+					Header: metrics[header].display_name,
+					accessor: header,
 					sortable: true
 				});
 			}
 		});
-
 		let computedDate = {
-			title: 'Date',
-			position: 0,
-			prop: 'date'
+			Header: 'Date',
+			accessor: 'date'
 		};
 
 		if (isDaily) {
 			computedDate = { ...computedDate, sortable: true };
 		}
 
-		tableHeader.push(computedDate);
+		tableHeader.unshift(computedDate);
 		tableHeader = sortBy(tableHeader, header => header.position);
+
 		return tableHeader;
 	};
 
@@ -130,9 +132,10 @@ class Table extends React.Component {
 			if (tableRow.siteid) {
 				const { siteid } = tableRow;
 
-				tableRow.siteName = site[siteid]
-					? React.cloneElement(<a href={`/reports/${siteid}`}>{site[siteid].siteName}</a>)
-					: 'Not Found';
+				tableRow.siteName =
+					site && site[siteid]
+						? React.cloneElement(<a href={`/reports/${siteid}`}>{site[siteid].siteName}</a>)
+						: 'Not Found';
 				delete tableRow.siteid;
 			}
 
@@ -150,12 +153,11 @@ class Table extends React.Component {
 			displayFooterData[newkey] = displayFooterData[key];
 			delete displayFooterData[key];
 		});
-		displayFooterData[tableHeader[0].prop] = 'Total';
+		displayFooterData[tableHeader[0].accessor] = 'Total';
 		return displayFooterData;
 	};
 
-	updateTableData = () => {
-		const { tableData } = this.props;
+	updateTableData = tableData => {
 		let grandTotal = {};
 		let tableHeader = [];
 		let tableBody = [];
@@ -192,7 +194,7 @@ class Table extends React.Component {
 		const footerComponent = [];
 
 		for (let i = 0; i < tableHeader.length; i++) {
-			const col = tableHeader[i].prop;
+			const col = tableHeader[i].accessor;
 			let value = grandTotal[col];
 
 			if (metrics[col]) {
@@ -219,6 +221,7 @@ class Table extends React.Component {
 
 	render() {
 		const { tableBody, tableHeader, tableData } = this.state;
+
 		const onSortFunction = {
 			network_net_revenue(columnValue) {
 				if (typeof columnValue === 'string') return parseFloat(columnValue.replace(/[,$]/g, ''));
@@ -247,13 +250,15 @@ class Table extends React.Component {
 		if (tableData && tableData.result && tableData.result.length > 0)
 			return (
 				<React.Fragment>
-					<Datatable
-						tableHeader={tableHeader}
-						tableBody={tableBody}
-						keyName="reportTable"
-						rowsPerPage={10}
-						rowsPerPageOption={[20, 30, 40, 50]}
-						onSort={onSortFunction}
+					<ReactTable
+						columns={tableHeader}
+						data={tableBody}
+						defaultPageSize={10}
+						pageSizeOptions={[10, 20, 30, 40, 50]}
+						minRows={0}
+						showPaginationTop
+						showPaginationBottom={false}
+						className="reporting u-padding-h3 u-padding-v2 -striped -highlight"
 					/>
 					<Col sm={12}>{this.renderFooter()}</Col>
 				</React.Fragment>

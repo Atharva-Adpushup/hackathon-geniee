@@ -1,33 +1,32 @@
 import { connect } from 'react-redux';
 import InfoPanel from '../components/InfoPanel/index';
 import { showNotification } from '../../../actions/uiActions';
-import { fetchReportingMeta } from '../../../actions/globalActions';
+import {
+	updateAccountReportMetaData,
+	updateGlobalReportMetaData
+} from '../../../actions/globalActions';
 
 const mapStateToProps = (state, ownProps) => {
 	const {
-		reports: {
-			data: { site = {}, widget, metrics },
-			fetched: isReportsMetaFetched
-		},
+		reports: { account: accountReportMetaData, global: globalReportMetaData },
 		user,
 		sites
 	} = state.global;
 
 	return {
 		...ownProps,
-		widget,
-		metrics,
 		user,
-		isReportsMetaFetched,
 		sites: sites.fetched ? sites.data : [],
-		reportingSites: site,
-		reportType: ownProps.reportType
+		reportType: ownProps.reportType,
+		accountReportMetaData,
+		globalReportMetaData
 	};
 };
 
 const mapDispatchToProps = dispatch => ({
 	showNotification: data => dispatch(showNotification(data)),
-	setReportingMetaData: params => dispatch(fetchReportingMeta(params))
+	updateAccountReportMetaData: params => dispatch(updateAccountReportMetaData(params)),
+	updateGlobalReportMetaData: params => dispatch(updateGlobalReportMetaData(params))
 });
 
 export default connect(

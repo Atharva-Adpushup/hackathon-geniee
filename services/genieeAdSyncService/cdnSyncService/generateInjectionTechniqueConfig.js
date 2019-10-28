@@ -1,23 +1,16 @@
 const Promise = require('bluebird');
 const _ = require('lodash');
-const { couchbaseService } = require('node-utils');
-const config = require('../../../configs/config');
+
 const { docKeys } = require('../../../configs/commonConsts');
+const { appBucket } = require('../../../helpers/routeHelpers');
 
-const appBucket = couchbaseService(
-	`couchbase://${config.couchBase.HOST}/${config.couchBase.DEFAULT_BUCKET}`,
-	config.couchBase.DEFAULT_BUCKET,
-	config.couchBase.DEFAULT_USER_NAME,
-	config.couchBase.DEFAULT_USER_PASSWORD
-);
+function findAds(siteId, isActive, docKey) {
+	const response = [];
 
-function getHbAdsApTag(siteId = 0, isManual = false) {
-	let response = [];
-	if (!siteId || !isManual) {
-		return Promise.resolve(response);
-	}
+	if (!siteId || !isActive) return Promise.resolve(response);
+
 	return appBucket
-		.getDoc(`${docKeys.apTag}${siteId}`)
+		.getDoc(`${docKey}${siteId}`)
 		.then(docWithCas => {
 			const doc = docWithCas.value;
 			const ads = doc.ads || false;
@@ -46,8 +39,18 @@ function getHbAdsApTag(siteId = 0, isManual = false) {
 		})
 		.catch(err => {
 			console.log(err.message);
-			return response;
+			return err.code && err.code === 13 && err.message.includes('key does not exist')
+				? []
+				: Promise.reject(err);
 		});
 }
 
-module.exports = { getHbAdsApTag };
+function getHbAdsApTag(siteId = 0, isActive = false) {
+	return findAds(siteId, isActive, docKeys.apTag);
+}
+
+function getHbAdsInnovativeAds(siteId = 0, isActive = false) {
+	return findAds(siteId, isActive, docKeys.interactiveAds);
+}
+
+module.exports = { getHbAdsApTag, getHbAdsInnovativeAds };

@@ -25,24 +25,20 @@ const fetchGlobalData = () => dispatch =>
 				type: SITE_ACTIONS.REPLACE_SITE_DATA,
 				data: data.sites
 			});
-			// dispatch({
-			// 	type: REPORTS_ACTIONS.REPLACE_REPORTS_DATA,
-			// 	data: data.reports
-			// });
 		})
 		.catch(err => errorHandler(err));
 
-const fetchReportingMeta = data => dispatch =>
-	// axiosInstance
-	// 	.get('/reports/getMetaData', { params: { sites } })
-	// 	.then(response => {
-	// 		const { data } = response;
+const updateGlobalReportMetaData = data => dispatch =>
 	dispatch({
-		type: REPORTS_ACTIONS.REPLACE_REPORTS_DATA,
+		type: REPORTS_ACTIONS.REPLACE_GLOBAL_REPORT_DATA,
 		data
 	});
-// })
-// .catch(err => errorHandler(err));
+
+const updateAccountReportMetaData = data => dispatch =>
+	dispatch({
+		type: REPORTS_ACTIONS.REPLACE_ACCOUNT_REPORT_DATA,
+		data
+	});
 
 const updateNetworkConfig = config => dispatch =>
 	axiosInstance
@@ -63,4 +59,9 @@ const updateNetworkConfig = config => dispatch =>
 		})
 		.catch(err => errorHandler(err));
 
-export { fetchGlobalData, updateNetworkConfig, fetchReportingMeta };
+export {
+	fetchGlobalData,
+	updateNetworkConfig,
+	updateGlobalReportMetaData,
+	updateAccountReportMetaData
+};

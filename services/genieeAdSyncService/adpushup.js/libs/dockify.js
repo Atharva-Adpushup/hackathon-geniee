@@ -1,6 +1,6 @@
 var $ = require('jquery'),
 	commonConsts = require('../config/commonConsts'),
-	getDockedCSS = function(formatData, elComputedStyles) {
+	getDockedCSS = function (formatData, elComputedStyles) {
 		var computedStyles = {
 			bottom: elComputedStyles.bottom,
 			right: elComputedStyles.right,
@@ -9,60 +9,64 @@ var $ = require('jquery'),
 		};
 
 		return formatData && formatData.css
-			? $.extend({}, true, commonConsts.DOCKED_CSS, computedStyles, formatData.css)
+			? $.extend({}, true, commonConsts.DOCKED_CSS, computedStyles, formatData.css, { position: 'fixed' })
 			: $.extend({}, true, commonConsts.DOCKED_CSS, computedStyles);
 	},
-	getDockedOffset = function(formatData) {
+	getDockedOffset = function (formatData) {
 		var bottomOffset = formatData && formatData.bottomOffset ? Number(formatData.bottomOffset) : 0;
-		return formatData && formatData.bottomXPath ? $(formatData.bottomXPath).offset().top - bottomOffset : null;
+		var bottomXPath = formatData ? formatData.bottomXpath || formatData.bottomXPath : null;
+		return bottomXPath ? $(bottomXPath).offset().top - bottomOffset : null;
 	},
-	dockifyAd = function(xPath, formatData, utils) {
+	dockifyAd = function (xPath, formatData, utils) {
 		if (!xPath || !$(xPath).length) {
 			return false;
 		}
 
-		var $el = $(xPath),
-			elComputedStyles = window.getComputedStyle($el[0]),
-			dockedCSS = getDockedCSS(formatData, elComputedStyles),
-			offset = getDockedOffset(formatData),
-			elTopOffset = $el.offset().top,
-			windowHeight = $(window).height(),
-			dockifyTrigger = function() {
-				var windowScrollTop = $(window).scrollTop(),
-					scrollLimitReachedWithoutOffset = windowScrollTop > elTopOffset && !offset,
-					scrollLimitReachedWithOffset = windowScrollTop > elTopOffset && offset && windowScrollTop < offset;
+		var $el = $(xPath);
+		var elComputedStyles = window.getComputedStyle($el[0]);
+		var dockedCSS = getDockedCSS(formatData, elComputedStyles);
+		var offset = getDockedOffset(formatData);
+		var windowHeight = $(window).height();
 
-				if (scrollLimitReachedWithoutOffset || scrollLimitReachedWithOffset) {
-					$el.css(dockedCSS);
-				} else {
-					$el.css({
-						position: 'relative',
-						top: '',
-						zIndex: ''
-					});
-				}
+		var dockifyTrigger = function () {
+			var windowScrollTop = $(window).scrollTop();
+			var fixedPoint = $el.attr('data-fixed-point') || null;
+			var elTopOffset = fixedPoint || $el.offset().top;
+			var scrollLimitReachedWithoutOffset = windowScrollTop > elTopOffset && !offset;
+			var scrollLimitReachedWithOffset = windowScrollTop > elTopOffset && offset && windowScrollTop < offset;
 
-				if (offset && windowScrollTop + windowHeight > offset) {
-					var resetTop = offset - (windowScrollTop + windowHeight);
-					$el.css({
-						position: 'fixed',
-						top: resetTop, // This goes in negative as the offset is crossed
-						zIndex: ''
-					});
-				}
-			};
+			if (scrollLimitReachedWithoutOffset || scrollLimitReachedWithOffset) {
+				$el.attr('data-fixed-point', elTopOffset);
+				$el.css(dockedCSS);
+			} else {
+				$el.css({
+					position: 'relative',
+					top: '',
+					zIndex: ''
+				});
+			}
 
-		var dockedAdOffsetInterval = setInterval(function() {
-			elTopOffset = $el.offset().top;
-		}, 500);
+			if (offset && windowScrollTop + windowHeight > offset) {
+				var resetTop = offset - (windowScrollTop + windowHeight);
+				$el.css({
+					position: 'fixed',
+					top: resetTop, // This goes in negative as the offset is crossed
+					zIndex: ''
+				});
+			}
+		};
 
-		$(window).on('load', function() {
-			clearInterval(dockedAdOffsetInterval);
-		});
+		// var dockedAdOffsetInterval = setInterval(function () {
+		// 	elTopOffset = $el.offset().top;
+		// }, 1000);
+
+		// $(window).on('load', function () {
+		// 	clearInterval(dockedAdOffsetInterval);
+		// });
 
 		$(window).on(
 			'scroll',
-			utils.throttle(function() {
+			utils.throttle(function () {
 				dockifyTrigger();
 			}, 10)
 		);

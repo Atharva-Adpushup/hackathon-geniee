@@ -144,16 +144,6 @@ class SiteMapping extends Component {
 		return data;
 	};
 
-	getDefaultPageSize = () => {
-		const { filteredData: { length = 0 } = {} } = this.state;
-
-		if (length <= 5) return 5;
-		if (length <= 10) return 10;
-		if (length <= 20) return 20;
-		if (length <= 50) return 50;
-		return 50;
-	};
-
 	renderContent = () => {
 		const { filteredData, isError, selectAll, checked } = this.state;
 		const dataWithIcon = clonedeep(filteredData);
@@ -185,9 +175,11 @@ class SiteMapping extends Component {
 				filterable={false}
 				showPaginationTop
 				showPaginationBottom={false}
-				className="u-padding-h3 u-padding-v2 site-mapping"
-				pageSize={this.getDefaultPageSize()}
+				className="u-padding-h3 u-padding-v2 site-mapping -striped -highlight"
+				defaultPageSize={50}
 				pageSizeOptions={[50, 100, 150, 200, 250]}
+				minRows={0}
+				sortable={true}
 			/>
 		);
 	};

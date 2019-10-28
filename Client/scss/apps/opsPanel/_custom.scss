@@ -102,6 +102,7 @@
 	background-repeat: no-repeat;
 	background-size: 18px 18px;
 	background-position: right 4px center;
+	font-weight: bolder;
 }
 .ReactTable .rt-thead .rt-th.-sort-asc {
 	background-image: url('../../../../public/assets/images/sort-up-icon.jpg');
@@ -117,8 +118,6 @@
 }
 .site-mapping .rt-tbody {
 	overflow: visible !important;
-	min-height: 64vh;
-	max-height: 64vh;
 }
 
 .site-stats .filterbox {
@@ -129,4 +128,8 @@
 }
 .app-link {
 	float: right;
+}
+
+.ReactTable .-pagination .-btn {
+	opacity: 1 !important;
 }
