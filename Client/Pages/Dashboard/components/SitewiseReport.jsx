@@ -2,6 +2,7 @@ import React from 'react';
 import ReactTable from 'react-table';
 import { numberWithCommas, roundOffTwoDecimal, getWidgetValidDationState } from '../helpers/utils';
 import sortBy from 'lodash/sortBy';
+import { reactTableSortMethod } from '../../../helpers/commonFunctions';
 
 function formatTableData(tableBody, props) {
 	const { metrics } = props;
@@ -47,19 +48,15 @@ function computeTableData(data, props) {
 			tableHeader.push({
 				Header,
 				accessor,
-				sortMethod: (a, b) => {
-					if (a.length === b.length) {
-						return a > b ? 1 : -1;
-					}
-					return a.length > b.length ? 1 : -1;
-				}
+				sortMethod: (a, b) => reactTableSortMethod(a, b)
 			});
 		});
 
 		if (reportType === 'site') {
 			tableHeader.splice(0, 0, {
 				Header: 'Date',
-				accessor: 'date'
+				accessor: 'date',
+				sortMethod: (a, b) => reactTableSortMethod(a, b)
 			});
 		} else {
 			tableHeader.splice(0, 0, {
