@@ -27,7 +27,7 @@ var Promise = require('bluebird'),
 	},
 	QUEUE = CONFIG.RABBITMQ.CDN_SYNC.QUEUE.name,
 	consumer = new Consumer(queueConfig),
-	SITES_TO_PROCESS = [38903],
+	SITES_TO_PROCESS = [38602, 38903],
 	counter = 0;
 
 function validateMessageData(originalMessage) {
