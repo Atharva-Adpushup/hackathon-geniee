@@ -5,6 +5,7 @@ import sortBy from 'lodash/sortBy';
 import isEqual from 'lodash/isEqual';
 import moment from 'moment';
 import { numberWithCommas, computeCsvData, roundOffTwoDecimal } from '../helpers/utils';
+import { reactTableSortMethod } from '../../../helpers/commonFunctions';
 
 class Table extends React.Component {
 	constructor(props) {
@@ -53,7 +54,8 @@ class Table extends React.Component {
 		const computedDate = {
 			Header: 'Date',
 			accessor: 'date',
-			sortable: isDaily
+			sortable: isDaily,
+			sortMethod: (a, b) => reactTableSortMethod(a, b)
 		};
 
 		tableHeader.push(computedDate);
@@ -84,12 +86,7 @@ class Table extends React.Component {
 					accessor: header,
 					sortable: true,
 					table_position,
-					sortMethod: (a, b) => {
-						if (a.length === b.length) {
-							return a > b ? 1 : -1;
-						}
-						return a.length > b.length ? 1 : -1;
-					}
+					sortMethod: (a, b) => reactTableSortMethod(a, b)
 				});
 			}
 		});

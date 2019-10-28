@@ -167,6 +167,13 @@ const checkDemoUserEmail = email => {
 	return isValid;
 };
 
+const reactTableSortMethod = (a, b) => {
+	if (a.length === b.length) {
+		return a > b ? 1 : -1;
+	}
+	return a.length > b.length ? 1 : -1;
+};
+
 const getDemoUserSites = (reportData, email) => {
 	const inputReportData = Object.assign({}, reportData);
 	const isDemoUser = checkDemoUserEmail(email);
@@ -348,5 +355,6 @@ export {
 	getDemoUserSites,
 	getReportingControlDemoUserSites,
 	getAppBaseUrls,
-	getOnboardingTemplateData
+	getOnboardingTemplateData,
+	reactTableSortMethod
 };
