@@ -44,7 +44,16 @@ function computeTableData(data, props) {
 		const sortedHeaders = sortHeadersByPosition(columns, metrics);
 
 		sortedHeaders.forEach(({ Header, accessor }) => {
-			tableHeader.push({ Header, accessor });
+			tableHeader.push({
+				Header,
+				accessor,
+				sortMethod: (a, b) => {
+					if (a.length === b.length) {
+						return a > b ? 1 : -1;
+					}
+					return a.length > b.length ? 1 : -1;
+				}
+			});
 		});
 
 		if (reportType === 'site') {
@@ -59,7 +68,6 @@ function computeTableData(data, props) {
 			});
 		}
 
-		tableHeader.sort((a, b) => a.table_position - b.table_position);
 		result.forEach(row => {
 			const { siteid, siteName } = row;
 			const isSiteIdInReportSites = !!(site[siteid] || disableSiteLevelCheck);
