@@ -385,6 +385,22 @@ module.exports = {
 	rightTrim: function(string, s) {
 		return string ? string.replace(new RegExp(s + '*$'), '') : '';
 	},
+
+	isInCrossDomainIframe: function() {
+		try {
+			window.top.location.toString();
+		} catch (err) {
+			return true;
+		}
+
+		return false;
+	},
+	getTopWindowHref: function() {
+		if (this.isInCrossDomainIframe()) {
+			return document.referrer;
+		}
+		return window.location.href;
+	},
 	domanize: function(domain) {
 		return domain
 			? this.rightTrim(
@@ -396,16 +412,10 @@ module.exports = {
 			  )
 			: '';
 	},
-	isUrlMatching: function() {
-		var config = window.adpushup.config,
-			url = this.domanize(config.siteDomain),
-			href;
-
-		try {
-			href = window.top.location.href;
-		} catch (err) {
-			href = window.location.href;
-		}
+	isUrlMatching: function(siteDomain) {
+		var url = siteDomain || window.adpushup.config.siteDomain,
+			href = this.getTopWindowHref();
+		url = this.domanize(url);
 
 		return href.indexOf(url) !== -1 ? true : false;
 	},
