@@ -361,7 +361,7 @@ class Dashboard extends React.Component {
 			startDate,
 			endDate,
 			selectedSite,
-			selectedDimension,
+			selectedDimension = '',
 			selectedChartLegendMetric = '',
 			isDataSufficient
 		} = widgetsConfig[wid];

@@ -2,16 +2,16 @@ import React from 'react';
 
 import groupBy from 'lodash/groupBy';
 import sortBy from 'lodash/sortBy';
+import cloneDeep from 'lodash/cloneDeep';
+import isEqual from 'lodash/isEqual';
 import moment from 'moment';
 import CustomChart from '../../../Components/CustomChart';
 import {
 	activeLegendItem,
-	activeLegendItemArray,
 	displayMetrics,
 	AP_REPORTING_ACTIVE_CHART_LEGENDS_STORAGE_KEY,
 	TERMS,
-	METRICS,
-	REPORT_TABLE_WHITELISTED_COLUMNS
+	METRICS
 } from '../configs/commonConsts';
 import {
 	getValidArray,
@@ -23,10 +23,10 @@ import {
 class Chart extends React.Component {
 	constructor(props) {
 		super(props);
-		const { selectedDimension, metricsList, allAvailableMetrics } = props;
+		const { selectedDimension, metricsList } = props;
 		const xAxis = this.enumerateDaysBetweenDates();
-		const activeLegendItems = this.getActiveLegendItems(metricsList, allAvailableMetrics);
-		const series = this.updateChartData(activeLegendItems, xAxis);
+		const activeLegendItems = this.getActiveLegendItems(metricsList);
+		const series = this.updateChartData(metricsList, activeLegendItems, xAxis);
 		const legends = this.computeLegends();
 		this.state = {
 			type: 'spline',
@@ -38,13 +38,15 @@ class Chart extends React.Component {
 		};
 	}
 
-	componentWillReceiveProps({ metricsList: nextMetricsList, allAvailableMetrics }) {
+	componentWillReceiveProps({ metricsList: nextMetricsList, metricsList }) {
 		const { metricsList: currMetricsList } = this.props;
-		const { xAxis } = this.state;
 
-		if (currMetricsList.length !== nextMetricsList.length) {
-			const activeLegendItems = this.getActiveLegendItems(nextMetricsList, allAvailableMetrics);
-			const series = this.updateChartData(activeLegendItems, xAxis);
+		if (
+			currMetricsList.length !== nextMetricsList.length ||
+			!isEqual(currMetricsList, nextMetricsList)
+		) {
+			const activeLegendItems = this.getActiveLegendItems(nextMetricsList);
+			const series = this.updateChartData(metricsList, activeLegendItems);
 
 			this.setState({ activeLegendItems, series });
 		}
@@ -63,13 +65,8 @@ class Chart extends React.Component {
 
 		let shouldUpdate = false;
 
-		if (isCustomizeChartLegend && currMetricsList && nextMetricsList) {
-			shouldUpdate = shouldUpdate || currMetricsList.length !== nextMetricsList.length;
-		}
-
-		if (isCustomizeChartLegend && !(currMetricsList && nextMetricsList)) {
-			shouldUpdate = shouldUpdate || currMetricsList !== nextMetricsList;
-		}
+		shouldUpdate =
+			shouldUpdate || (isCustomizeChartLegend && isEqual(currMetricsList, nextMetricsList));
 
 		if (Array.isArray(this.state.activeLegendItems)) {
 			shouldUpdate =
@@ -150,15 +147,11 @@ class Chart extends React.Component {
 		return isValid;
 	};
 
-	getActiveLegendItems = (metricsList, allAvailableMetrics) => {
-		const {
-			selectedDimension,
-			selectedChartLegendMetric,
-			isCustomizeChartLegend,
-			tableData,
-			dimension,
-			metrics
-		} = this.props;
+	getActiveLegendItems = metricsList => {
+		const { selectedDimension, selectedChartLegendMetric } = this.props;
+		const metricsListCopy = cloneDeep(metricsList);
+		const firstThreeMetrics = metricsListCopy.slice(0, 3);
+
 		let computedItems = [];
 		const activeItemsFromLocalStorage = this.getActiveLegendItemsFromLocalStorage();
 		const activeItemsByChartLegendMetric = displayMetrics.filter(
@@ -172,55 +165,30 @@ class Chart extends React.Component {
 
 		if (isValidChartLegendMetricItems) {
 			[computedItems] = activeItemsByChartLegendMetric;
-		} else if (activeItemsFromLocalStorage && isCustomizeChartLegend) {
-			if (!selectedDimension && Array.isArray(activeItemsFromLocalStorage)) {
-				computedItems = activeItemsFromLocalStorage.filter(
-					storageLegend =>
-						!!allAvailableMetrics.find(
-							availableMetric =>
-								!availableMetric.isDisabled && availableMetric.value === storageLegend.value
-						)
-				);
-			} else {
-				computedItems =
-					allAvailableMetrics.find(
-						availableMetric =>
-							!availableMetric.isDisabled &&
-							availableMetric.value === activeItemsFromLocalStorage.value
-					) ||
-					allAvailableMetrics.find(
-						availableMetric =>
-							!availableMetric.isDisabled && availableMetric.value === activeLegendItem.value
-					) ||
-					allAvailableMetrics.find(availableMetric => !availableMetric.isDisabled);
-			}
 		} else if (activeItemsFromLocalStorage) {
 			if (!selectedDimension && Array.isArray(activeItemsFromLocalStorage)) {
-				computedItems = activeItemsFromLocalStorage.filter(
-					storageLegend => !!tableData.columns.find(metric => metric === storageLegend.value)
+				const computedActiveItemsFromLocalStorage = activeItemsFromLocalStorage.filter(
+					storageLegend =>
+						!!metricsListCopy.find(selectedMetric => selectedMetric.value === storageLegend.value)
 				);
+
+				computedItems = computedActiveItemsFromLocalStorage.length
+					? computedActiveItemsFromLocalStorage
+					: firstThreeMetrics;
 			} else {
-				const computedKey =
-					tableData.columns.find(metric => metric === activeItemsFromLocalStorage.value) ||
-					tableData.columns.find(metric => metric === activeLegendItem.value) ||
-					tableData.columns.filter(
-						metric => REPORT_TABLE_WHITELISTED_COLUMNS.indexOf(metric) === -1 && !dimension[metric]
-					)[0];
-				const { display_name: name, valueType } = metrics[computedKey];
-				computedItems = { name, valueType, value: computedKey };
+				computedItems =
+					metricsListCopy.find(
+						selectedMetric => selectedMetric.value === activeItemsFromLocalStorage.value
+					) ||
+					metricsListCopy.find(selectedMetric => selectedMetric.value === activeLegendItem.value) ||
+					metricsListCopy[0];
 			}
-		} else if (selectedDimension && isCustomizeChartLegend) {
-			computedItems =
-				allAvailableMetrics.find(
-					availableMetric =>
-						!availableMetric.isDisabled && availableMetric.value === activeLegendItem.value
-				) ||
-				allAvailableMetrics.find(availableMetric => !availableMetric.isDisabled) ||
-				activeLegendItem;
 		} else if (selectedDimension) {
-			computedItems = activeLegendItem;
+			computedItems =
+				metricsListCopy.find(selectedMetric => selectedMetric.value === activeLegendItem.value) ||
+				metricsListCopy[0];
 		} else {
-			computedItems = activeLegendItemArray;
+			computedItems = firstThreeMetrics;
 		}
 
 		return computedItems;
@@ -277,11 +245,11 @@ class Chart extends React.Component {
 		setItemToLocalStorage(AP_REPORTING_ACTIVE_CHART_LEGENDS_STORAGE_KEY, computedItem);
 	};
 
-	getGroupByResult = rows => {
+	getGroupByResult = (rows, metricsList) => {
 		let groupByResult = {};
 
 		if (rows && rows.length > 0) {
-			const { selectedDimension, metricsList } = this.props;
+			const { selectedDimension } = this.props;
 			if (selectedDimension) {
 				groupByResult = groupBy(rows, selectedDimension);
 			} else {
@@ -356,7 +324,8 @@ class Chart extends React.Component {
 	};
 
 	onLegendChange = activeLegendItems => {
-		const series = this.updateChartData(activeLegendItems);
+		const { metricsList } = this.props;
+		const series = this.updateChartData(metricsList, activeLegendItems);
 
 		this.setActiveLegendItemsToLocalStorage(activeLegendItems);
 		this.setState({
@@ -365,11 +334,11 @@ class Chart extends React.Component {
 		});
 	};
 
-	updateChartData = (activeLegendItems, xAxisData) => {
+	updateChartData = (metricsList, activeLegendItems, xAxisData) => {
 		const { tableData } = this.props;
 		const { xAxis } = this.state || {};
 		const computedXAxisData = xAxisData || xAxis;
-		const groupByResult = this.getGroupByResult(tableData.result);
+		const groupByResult = this.getGroupByResult(tableData.result, metricsList);
 		const series = this.getSeriesData(groupByResult, computedXAxisData, activeLegendItems);
 		return series;
 	};

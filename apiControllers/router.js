@@ -45,13 +45,17 @@ module.exports = function router(app) {
 		if (!isDevelopment) {
 			// eslint-disable-next-line no-undef
 			const filePath = path.resolve(__basedir, 'clientDist', 'index.html');
+
 			if (!fs.existsSync(filePath)) {
 				const fallback = path.resolve(__basedir, 'public', 'assets', 'fallback.html');
 				return res.sendFile(fallback);
 			}
+
 			return res.sendFile(filePath);
 		}
+
 		const filename = path.resolve(compiler.outputPath, 'index.html');
+
 		compiler.outputFileSystem.readFile(filename, (err, result) => {
 			res.set('content-type', 'text/html');
 			res.send(result);

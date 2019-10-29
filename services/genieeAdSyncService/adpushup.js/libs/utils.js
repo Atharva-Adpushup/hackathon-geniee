@@ -14,7 +14,8 @@ module.exports = {
 			),
 			isapDebugParam = !!(isQueryParams && this.queryParams.apDebug);
 
-		if (typeof console !== 'undefined' && console.log && isapDebugParam) console.log.apply(console, arguments);
+		if (typeof console !== 'undefined' && console.log && isapDebugParam)
+			console.log.apply(console, arguments);
 	},
 	base64Encode: function(data) {
 		return Base64.btoa(data);
@@ -397,8 +398,16 @@ module.exports = {
 	},
 	isUrlMatching: function() {
 		var config = window.adpushup.config,
-			url = this.domanize(config.siteDomain);
-		return window.location.href.indexOf(url) !== -1 ? true : false;
+			url = this.domanize(config.siteDomain),
+			href;
+
+		try {
+			href = window.top.location.href;
+		} catch (err) {
+			href = window.location.href;
+		}
+
+		return href.indexOf(url) !== -1 ? true : false;
 	},
 	getObjectByName: function(collection, name) {
 		var isInCollection = false,
@@ -507,7 +516,13 @@ module.exports = {
 	getInteractiveAds: function(config) {
 		var ads = [];
 
-		if (config && config.experiment && config.platform && config.pageGroup && config.selectedVariation) {
+		if (
+			config &&
+			config.experiment &&
+			config.platform &&
+			config.pageGroup &&
+			config.selectedVariation
+		) {
 			var variations = config.experiment[config.platform][config.pageGroup].variations,
 				selectedVariation = config.selectedVariation;
 			variations.forEach(function(variation) {
@@ -526,7 +541,8 @@ module.exports = {
 	filterInteractiveAds: function(ads, isInnovative, channel) {
 		return ads && ads.length
 			? ads.filter(function(ad) {
-					var channelValid = isInnovative && ad.pagegroups ? ad.pagegroups.indexOf(channel) !== -1 : true;
+					var channelValid =
+						isInnovative && ad.pagegroups ? ad.pagegroups.indexOf(channel) !== -1 : true;
 					return channelValid && ad.formatData && ad.formatData.event;
 			  })
 			: [];
@@ -557,7 +573,10 @@ module.exports = {
 		} else if (finalTop > 0 && adTop > viewPort.top && adTop < viewPort.bottom) {
 			return { inViewHeight: $el.height() + finalBottom };
 		} else if (threshhold) {
-			return Math.abs(adTop - viewPort.bottom) <= threshhold || Math.abs(adBottom - viewPort.top) <= threshhold;
+			return (
+				Math.abs(adTop - viewPort.bottom) <= threshhold ||
+				Math.abs(adBottom - viewPort.top) <= threshhold
+			);
 		}
 		return false;
 	},

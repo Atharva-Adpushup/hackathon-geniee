@@ -55,6 +55,11 @@ class Control extends Component {
 		);
 	}
 
+	onReportBySelect = selectedDimension => {
+		const { reportType } = this.props;
+		this.setState({ selectedDimension }, this.onControlChange.bind(null, reportType));
+	};
+
 	onFilteChange = selectedFilters => {
 		const { defaultReportType } = this.props;
 		let reportType = defaultReportType || 'account';
@@ -115,14 +120,20 @@ class Control extends Component {
 	};
 
 	getSelectedFilter = filter => {
-		const { reportType, selectedFilters, isDemoUser } = this.props;
+		const { reportType, defaultReportType, selectedFilters, isDemoUser } = this.props;
 		let siteIds;
 		let isSuperUser = false;
 
-		if (reportType === 'account') {
+		if (
+			reportType === 'account' ||
+			(defaultReportType !== 'global' && reportType === 'site' && filter.value === 'siteid')
+		) {
 			const { site } = this.props;
 			siteIds = Object.keys(site);
-		} else if (reportType === 'global') {
+		} else if (
+			reportType === 'global' ||
+			(defaultReportType === 'global' && reportType === 'site' && filter.value === 'siteid')
+		) {
 			siteIds = '';
 			isSuperUser = true;
 		} else {
@@ -195,6 +206,7 @@ class Control extends Component {
 
 	render() {
 		const { state } = this;
+		const { reportType } = this.props;
 
 		return (
 			<Fragment>
@@ -211,9 +223,7 @@ class Control extends Component {
 							reset={true}
 							selected={state.selectedDimension}
 							options={state.dimensionList}
-							onSelect={selectedDimension => {
-								this.setState({ selectedDimension }, this.onControlChange);
-							}}
+							onSelect={this.onReportBySelect}
 						/>
 						{/* eslint-enable */}
 					</div>
@@ -230,7 +240,7 @@ class Control extends Component {
 							selected={state.selectedInterval}
 							options={state.intervalList}
 							onSelect={selectedInterval => {
-								this.setState({ selectedInterval }, this.onControlChange);
+								this.setState({ selectedInterval }, this.onControlChange.bind(null, reportType));
 							}}
 						/>
 						{/* eslint-enable */}
@@ -243,7 +253,7 @@ class Control extends Component {
 							startDate={state.startDate}
 							endDate={state.endDate}
 							datesUpdated={({ startDate, endDate }) =>
-								this.setState({ startDate, endDate }, this.onControlChange)
+								this.setState({ startDate, endDate }, this.onControlChange.bind(null, reportType))
 							}
 							autoFocus
 						/>
