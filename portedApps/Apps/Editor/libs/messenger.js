@@ -1,9 +1,22 @@
 import $ from 'jquery';
+import _ from 'lodash';
+
 import Utils from './utils';
 import Event from './event';
 
-const Messenger = (function($, Utils, Event) {
-	const Messenger = function(target, origin) {
+function deepParse(data) {
+	_.forEach(data, (value, key) => {
+		try {
+			value = JSON.parse(value);
+		} catch (e) { }
+		if (typeof value === 'object' && !Array.isArray(value)) value = deepParse(value);
+		data[key] = value;
+	});
+	return data;
+}
+
+const Messenger = (function ($, Utils, Event) {
+	const Messenger = function (target, origin) {
 		this.id = Utils.getRandomNumber();
 		this.messageQueue = [];
 		this.responseQueue = [];
@@ -17,23 +30,23 @@ const Messenger = (function($, Utils, Event) {
 		$(window).bind('message', this.messageHandler);
 	};
 
-	Messenger.prototype.setTarget = function(target) {
+	Messenger.prototype.setTarget = function (target) {
 		this.target = target;
 	};
 
-	Messenger.prototype.setOrigin = function(origin) {
+	Messenger.prototype.setOrigin = function (origin) {
 		this.origin = origin;
 	};
 
-	Messenger.prototype.dispose = function() {
+	Messenger.prototype.dispose = function () {
 		$(window).unbind('message', this.handleMessage);
 		this.target = null;
 	};
-	Messenger.prototype.sendMessage = function(cmd, data) {
+	Messenger.prototype.sendMessage = function (cmd, data) {
 		const req = { data: data || {}, cmd, id: this.id };
 		this.target.postMessage(JSON.stringify(req), '*');
 	};
-	Messenger.prototype.isOriginValid = function(e) {
+	Messenger.prototype.isOriginValid = function (e) {
 		return true;
 		return (
 			/.adpushup.com/gi.test(e.origin) ||
@@ -41,13 +54,19 @@ const Messenger = (function($, Utils, Event) {
 		);
 	};
 
-	Messenger.prototype.handleMessage = function(e, s) {
+	Messenger.prototype.handleMessage = function (e, s) {
 		e = e.originalEvent || s;
 		if (this.isOriginValid(e)) {
 			let req = null;
 			try {
+				/**
+				 * There are some websites which custom implements Array.prototype.toJSON which is called by the JSON.stringify
+				 * This leads to either custom/double/nested stringification of the values.
+				 * Hence, we are deep parsing any json received from inner js. 
+				 */
 				req = JSON.parse(e.data);
-			} catch (d) {}
+				req = deepParse(req);
+			} catch (d) { }
 			if (!req || !req.cmd) {
 				// some issue with google.com that's why introduces this check
 				return false;
