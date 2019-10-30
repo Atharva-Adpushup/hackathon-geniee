@@ -104,7 +104,24 @@ class Panel extends Component {
 		return { updatedDimensionList, updatedFilterList };
 	};
 
-	disableControl = (disabledFilter, disabledDimension, disabledMetrics, metricsList) => {
+	isControlItemDisabled = (item, disabledItemsList, reportType) => {
+		const isDisabledByDefault =
+			(reportType === 'account' || reportType === 'global') &&
+			typeof item.default_enabled === 'boolean' &&
+			!item.default_enabled;
+
+		if (isDisabledByDefault) return true;
+
+		return !!disabledItemsList.find(fil => fil === item.value);
+	};
+
+	disableControl = (
+		disabledFilter,
+		disabledDimension,
+		disabledMetrics,
+		metricsList,
+		reportType
+	) => {
 		const { metricsList: metricsListFromState } = this.state;
 		const computedMetricsList = metricsList || metricsListFromState;
 
@@ -122,22 +139,19 @@ class Panel extends Component {
 			? { updatedDimensionList: dimensionList, updatedFilterList: filterList }
 			: this.removeOpsFilterDimension(filterList, dimensionList);
 
-		updatedFilterList.map(filter => {
-			const found = disabledFilter.find(fil => fil === filter.value);
-			if (found) filter.isDisabled = true;
-			else filter.isDisabled = false;
+		updatedFilterList.forEach(filter => {
+			// eslint-disable-next-line no-param-reassign
+			filter.isDisabled = this.isControlItemDisabled(filter, disabledFilter, reportType);
 		});
 
-		updatedDimensionList.map(dimension => {
-			const found = disabledDimension.find(dim => dim === dimension.value);
-			if (found) dimension.isDisabled = true;
-			else dimension.isDisabled = false;
+		updatedDimensionList.forEach(dimension => {
+			// eslint-disable-next-line no-param-reassign
+			dimension.isDisabled = this.isControlItemDisabled(dimension, disabledDimension, reportType);
 		});
 
-		computedMetricsList.map(metrics => {
-			const found = disabledMetrics.find(metric => metric === metrics.value);
-			if (found) metrics.isDisabled = true;
-			else metrics.isDisabled = false;
+		computedMetricsList.forEach(metrics => {
+			// eslint-disable-next-line no-param-reassign
+			metrics.isDisabled = this.isControlItemDisabled(metrics, disabledMetrics, reportType);
 		});
 
 		return {
@@ -148,7 +162,7 @@ class Panel extends Component {
 	};
 
 	onControlChange = (data, reportType) => {
-		const params = this.getControlChangedParams(data);
+		const params = this.getControlChangedParams({ ...data, reportType });
 
 		this.setState({
 			...params,
@@ -192,16 +206,12 @@ class Panel extends Component {
 			}
 		});
 
-		if (reportType === 'account' || reportType === 'global') {
-			disabledFilter = union(accountDisableFilter, disabledFilter);
-			disabledDimension = union(accountDisableDimension, disabledDimension);
-		}
-
 		const updatedControlList = this.disableControl(
 			disabledFilter,
 			disabledDimension,
 			disabledMetrics,
-			metricsList
+			metricsList,
+			reportType
 		);
 
 		return {
