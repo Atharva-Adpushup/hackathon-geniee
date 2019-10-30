@@ -217,7 +217,7 @@ function startCreation(forced) {
 		}
 
 		var innovativeInteractiveAds = [];
-		var layoutAndManualInteractiveAds = [];
+		// var layoutAndManualInteractiveAds = [];
 		var isControlVariation = false;
 
 		if (w.adpushup.services.INNOVATIVE_ADS_ACTIVE && w.adpushup.config.innovativeAds.length) {
@@ -247,7 +247,7 @@ function startCreation(forced) {
 				}
 
 				// Load interactive ads script if interactive ads are present in adpushup config
-				layoutAndManualInteractiveAds = utils.getInteractiveAds(config);
+				// layoutAndManualInteractiveAds = utils.getInteractiveAds(config);
 
 				if (selectedVariation.isControl) {
 					isControlVariation = true;
@@ -258,16 +258,18 @@ function startCreation(forced) {
 				triggerControl(commonConsts.MODE.FALLBACK);
 			}
 
-			var finalInteractiveAds = !isControlVariation
-				? innovativeInteractiveAds.concat(layoutAndManualInteractiveAds)
-				: layoutAndManualInteractiveAds;
-			var shouldRunInnovatibeAds = !!(
+			// var finalInteractiveAds = !isControlVariation
+			// 	? innovativeInteractiveAds.concat(layoutAndManualInteractiveAds)
+			// 	: layoutAndManualInteractiveAds;
+
+			var shouldRunInnovativeAds = !!(
 				w.adpushup.services.INNOVATIVE_ADS_ACTIVE &&
-				finalInteractiveAds &&
-				finalInteractiveAds.length
+				!isControlVariation &&
+				innovativeInteractiveAds &&
+				innovativeInteractiveAds.length
 			);
 
-			if (shouldRunInnovatibeAds) {
+			if (shouldRunInnovativeAds) {
 				try {
 					function refreshSlotProcessing() {
 						var ads = finalInteractiveAds;
