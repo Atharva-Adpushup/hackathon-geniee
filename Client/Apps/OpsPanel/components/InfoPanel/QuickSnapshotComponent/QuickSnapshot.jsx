@@ -35,7 +35,7 @@ class QuickSnapshot extends React.Component {
 			isLoading: true,
 			isLoadingError: false,
 			quickDates: dates,
-			reportType: 'global',
+			reportType: 'account',
 			selectedSite: 'all',
 			sites: allUserSites,
 			top10Sites: [],
@@ -77,14 +77,10 @@ class QuickSnapshot extends React.Component {
 		return this.setState({ isLoading: false, isLoadingError: true });
 	};
 
-	getComputedMetaData = reportType => {
-		const { sites, accountReportMetaData, globalReportMetaData } = this.props;
-		const userSites = Object.keys(sites).toString();
-		const { isReportTypeGlobal } = this.getReportTypeValidation(reportType);
-		const params = isReportTypeGlobal
-			? { sites: '', isSuperUser: true }
-			: { sites: userSites, isSuperUser: false };
-		const inputReportMetaData = isReportTypeGlobal ? globalReportMetaData : accountReportMetaData;
+	getComputedMetaData = () => {
+		const { globalReportMetaData } = this.props;
+		const params = { sites: '', isSuperUser: true };
+		const inputReportMetaData = globalReportMetaData;
 		const isValidReportMetaData = !!(
 			inputReportMetaData &&
 			inputReportMetaData.fetched &&
@@ -99,8 +95,9 @@ class QuickSnapshot extends React.Component {
 			const { data: metaData } = responseData;
 
 			if (!isValidReportMetaData) {
-				this.setReportingMetaData(metaData, reportType);
+				this.setReportingMetaData(metaData);
 			}
+
 			this.setReportingMetaDataState(metaData);
 			return metaData;
 		});
@@ -357,7 +354,7 @@ class QuickSnapshot extends React.Component {
 				OPS_ERROR_REPORT
 			}
 		} = this.props;
-		const { reportType } = this.state;
+		const reportType = 'global';
 		let computedWidgetData;
 
 		if (widget.isLoading) return <Loader height="20vh" />;
@@ -388,12 +385,6 @@ class QuickSnapshot extends React.Component {
 					/>
 				);
 
-			case 'ops_top_sites_daily':
-				if (reportType == 'site') {
-					return <SitewiseReportContainer displayData={widget.data} reportType="site" />;
-				}
-				return '';
-
 			case OPS_COUNTRY_REPORT:
 			case OPS_NETWORK_REPORT:
 				return <RevenueContainer reportType={reportType} displayData={widget} />;
@@ -408,17 +399,16 @@ class QuickSnapshot extends React.Component {
 	};
 
 	getDisplayData = wid => {
-		const { widgetsConfig, reportingSites, reportType } = this.state;
+		const { widgetsConfig, reportingSites } = this.state;
 		const { isReportTypeAccount, isReportTypeGlobal } = this.getReportTypeValidation();
 		const { selectedDate, selectedSite, selectedMetric, path, name } = widgetsConfig[wid];
 		const {
 			sites,
 			widgetsName: { PER_AP_ORIGINAL },
-			accountReportMetaData,
 			globalReportMetaData
 		} = this.props;
 
-		const metaData = reportType === 'global' ? globalReportMetaData : accountReportMetaData;
+		const metaData = globalReportMetaData;
 		const siteIds = Object.keys(sites);
 		const params = getDateRange(selectedDate);
 		const isWidgetNamePerAPOriginal = !!(name === PER_AP_ORIGINAL);
@@ -432,10 +422,12 @@ class QuickSnapshot extends React.Component {
 		const computedWidgetPath = isMetricWidget
 			? path.replace(/&metrics=\w+/, `&metrics=${selectedMetric}`)
 			: path;
+		const isValidSelectedSite = !!selectedSite;
+		const isValidAllSelectedSites = !!(isValidSelectedSite && selectedSite === 'all');
 
-		params.siteid = selectedSite === 'all' ? siteIds.toString() : selectedSite;
+		params.siteid = isValidAllSelectedSites ? siteIds.toString() : selectedSite;
 
-		if (isReportTypeGlobal && selectedSite === 'all') {
+		if (isReportTypeGlobal && (!isValidSelectedSite || isValidAllSelectedSites)) {
 			delete params.siteid;
 			params.isSuperUser = true;
 		}
@@ -559,13 +551,10 @@ class QuickSnapshot extends React.Component {
 
 	setComputedState = state => this.setState(state);
 
-	setReportingMetaData = (metaData, reportType) => {
-		const { updateAccountReportMetaData, updateGlobalReportMetaData } = this.props;
-		const { isReportTypeGlobal } = this.getReportTypeValidation(reportType);
+	setReportingMetaData = metaData => {
+		const { updateGlobalReportMetaData } = this.props;
 
-		isReportTypeGlobal
-			? updateGlobalReportMetaData(metaData)
-			: updateAccountReportMetaData(metaData);
+		updateGlobalReportMetaData(metaData);
 	};
 
 	setReportingMetaDataState = metaData => {
@@ -607,7 +596,7 @@ class QuickSnapshot extends React.Component {
 	};
 
 	renderReportsUI = reportType =>
-		this.getComputedMetaData(reportType)
+		this.getComputedMetaData()
 			.then(() => this.setComputedState({ reportType, isLoading: false }))
 			.then(this.renderComputedWidgetsUI)
 			.catch(this.rootErrorHandler);
@@ -695,7 +684,7 @@ class QuickSnapshot extends React.Component {
 							selected={selectedDate}
 							options={quickDates}
 							onSelect={date => {
-								if (isReportTypeGlobal) widgetsConfig[wid]['selectedSite'] = 'all';
+								// if (isReportTypeGlobal) widgetsConfig[wid]['selectedSite'] = 'all';
 								widgetsConfig[wid]['selectedDate'] = date;
 								widgetsConfig[wid].isLoading = true;
 								widgetsConfig[wid]['sitesList'] = [];
