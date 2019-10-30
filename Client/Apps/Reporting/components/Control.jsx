@@ -3,6 +3,7 @@ import { Glyphicon, Button } from 'react-bootstrap';
 import 'react-dates/lib/css/_datepicker.css';
 import 'react-dates/initialize';
 import { CSVLink } from 'react-csv';
+import isEqual from 'lodash/isEqual';
 import AsyncGroupSelect from '../../../Components/AsyncGroupSelect/index';
 import PresetDateRangePicker from '../../../Components/PresetDateRangePicker/index';
 import SelectBox from '../../../Components/SelectBox/index';
@@ -41,17 +42,29 @@ class Control extends Component {
 	}
 
 	componentWillReceiveProps(nextProps) {
-		const isValidNextProps = !!(nextProps && nextProps.csvData);
+		const { state: currState } = this;
+		const isCsvData = !!(nextProps && nextProps.csvData);
+		const updateDimensionList = !isEqual(currState.dimensionList, nextProps.dimensionList);
+		const updateFilterList = !isEqual(currState.filterList, nextProps.filterList);
 
-		if (isValidNextProps) {
-			this.setState({ csvData: nextProps.csvData });
-		}
+		const newState = {};
+
+		if (isCsvData) newState.csvData = nextProps.csvData;
+		if (updateDimensionList) newState.dimensionList = nextProps.dimensionList;
+		if (updateFilterList) newState.filterList = nextProps.filterList;
+
+		this.setState(newState);
 	}
 
 	shouldComponentUpdate(nextProps, nextState) {
+		const { state: currState } = this;
 		return (
-			this.state.reportType !== nextState.reportType ||
-			this.state.updateStatusText !== nextState.updateStatusText
+			currState.reportType !== nextState.reportType ||
+			currState.updateStatusText !== nextState.updateStatusText ||
+			!isEqual(
+				{ dimensionList: currState.dimensionList, filterList: currState.filterList },
+				{ dimensionList: nextState.dimensionList, filterList: nextState.filterList }
+			)
 		);
 	}
 
