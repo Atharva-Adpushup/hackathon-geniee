@@ -1,69 +1,69 @@
-//- Site addition view
+//- //- Site addition view
 
-extends layout/base
+//- extends layout/base
 
-block getTitle
-	- var titleVar = "Add New Site"
+//- block getTitle
+//- 	- var titleVar = "Add New Site"
 
-block append headCss
-	if environment == 'production'
-		link(href="/assets/css/builds/onboarding.min.css", rel="stylesheet", type="text/css")
-	else
-		link(href="/assets/css/libs/onboarding.css", rel="stylesheet", type="text/css")
+//- block append headCss
+//- 	if environment == 'production'
+//- 		link(href="/assets/css/builds/onboarding.min.css", rel="stylesheet", type="text/css")
+//- 	else
+//- 		link(href="/assets/css/libs/onboarding.css", rel="stylesheet", type="text/css")
 
-block append headScripts
-	if step
-		- continueStep = step;
-		- continueSiteDomain = siteDomain;
-		- continueSiteId = siteId;
-		- introShow = false;
-	else 
-		- continueStep = 1;
-		- siteDomain = null;
-		- siteId = null;
-		- introShow = true;
+//- block append headScripts
+//- 	if step
+//- 		- continueStep = step;
+//- 		- continueSiteDomain = siteDomain;
+//- 		- continueSiteId = siteId;
+//- 		- introShow = false;
+//- 	else 
+//- 		- continueStep = 1;
+//- 		- siteDomain = null;
+//- 		- siteId = null;
+//- 		- introShow = true;
 	
-	- unSavedSite = siteDomain || null
-	- origUnSavedDomain = siteDomain || null
-	- domanizedUrl = utils.domanize(siteDomain) || null
-	- unSavedSiteId = siteId || null
+//- 	- unSavedSite = siteDomain || null
+//- 	- origUnSavedDomain = siteDomain || null
+//- 	- domanizedUrl = utils.domanize(siteDomain) || null
+//- 	- unSavedSiteId = siteId || null
 
-	script.
-		$('document').ready(function() {
-			var step = '#{step}';
-			adpushup.newSite = {
-				viewObjects: {
-					domanizedUrl: '!{domanizedUrl}',
-					unSavedSiteId: '!{unSavedSiteId}',
-					origUnSavedDomain: '!{origUnSavedDomain}'
-				},
-				addedSite: {
-					domain: '!{continueSiteDomain}',
-					siteId: '!{continueSiteId}',
-					step: '!{step}'
-				},
-				totalSteps: 3,
-				defaultStep: !{continueStep},
-				addOtherSite: true,
-				showIntro: !{introShow}
-			};
-		});
+//- 	script.
+//- 		$('document').ready(function() {
+//- 			var step = '#{step}';
+//- 			adpushup.newSite = {
+//- 				viewObjects: {
+//- 					domanizedUrl: '!{domanizedUrl}',
+//- 					unSavedSiteId: '!{unSavedSiteId}',
+//- 					origUnSavedDomain: '!{origUnSavedDomain}'
+//- 				},
+//- 				addedSite: {
+//- 					domain: '!{continueSiteDomain}',
+//- 					siteId: '!{continueSiteId}',
+//- 					step: '!{step}'
+//- 				},
+//- 				totalSteps: 3,
+//- 				defaultStep: !{continueStep},
+//- 				addOtherSite: true,
+//- 				showIntro: !{introShow}
+//- 			};
+//- 		});
 
-	if environment == 'production'
-		+loadAsset("js", [
-			'/assets/js/builds/adpushup-onboarding.min.js'
-		])
-	else
-		+loadAsset("js", [
-			'/assets/js/libs/custom/adpushup-onboarding.js'
-		])
+//- 	if environment == 'production'
+//- 		+loadAsset("js", [
+//- 			'/assets/js/builds/adpushup-onboarding.min.js'
+//- 		])
+//- 	elsess
+//- 		+loadAsset("js", [
+//- 			'/assets/js/libs/custom/adpushup-onboarding.js'
+//- 		])
 
 
-block bodyContent
-	- addOtherSite = true;
-	include layout/sideBar
-	.pageContainer.page-container
-		include layout/header
-		.pageContentWrapper.page-content
-			.pageContentInner.page-content--inner
-				include layout/adPushupSetup
+//- block bodyContent
+//- 	- addOtherSite = true;
+//- 	include layout/sideBar
+//- 	.pageContainer.page-container
+//- 		include layout/header
+//- 		.pageContentWrapper.page-content
+//- 			.pageContentInner.page-content--inner
+//- 				include layout/adPushupSetup
