@@ -4,16 +4,30 @@ import _ from 'lodash';
 import Utils from './utils';
 import Event from './event';
 
-function deepParse(data) {
-	_.forEach(data, (value, key) => {
+
+var isStringParseable = function (str) {
+	return str.indexOf('{') === 0 || str.indexOf("[") === 0;
+};
+
+var deepJsonParse = function (stringifiedData) {
+	var data = null;
+	if (typeof stringifiedData === 'string' && isStringParseable(stringifiedData)) {
 		try {
-			value = JSON.parse(value);
-		} catch (e) { }
-		if (typeof value === 'object' && !Array.isArray(value)) value = deepParse(value);
-		data[key] = value;
-	});
+			data = JSON.parse(stringifiedData);
+		} catch (d) {
+			return null;
+		}
+	} else {
+		data = stringifiedData;
+	}
+
+	if (data && typeof data === 'object' && !Array.isArray(data)) {
+		_.forEach(data, (value, key) => {
+			data[key] = deepJsonParse(value);
+		});
+	}
 	return data;
-}
+};
 
 const Messenger = (function ($, Utils, Event) {
 	const Messenger = function (target, origin) {
@@ -64,8 +78,8 @@ const Messenger = (function ($, Utils, Event) {
 				 * This leads to either custom/double/nested stringification of the values.
 				 * Hence, we are deep parsing any json received from inner js. 
 				 */
-				req = JSON.parse(e.data);
-				req = deepParse(req);
+				// req = JSON.parse(e.data);
+				req = deepJsonParse(e.data);
 			} catch (d) { }
 			if (!req || !req.cmd) {
 				// some issue with google.com that's why introduces this check
