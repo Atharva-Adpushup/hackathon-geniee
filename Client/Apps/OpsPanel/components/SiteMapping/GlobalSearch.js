@@ -28,25 +28,25 @@ class GlobalSearch extends React.Component {
 					.includes(searchInput.toLowerCase());
 			}
 			return (
-				value.accountEmail.toLowerCase().includes(searchInput.toLowerCase()) ||
-				value.domain.toLowerCase().includes(searchInput.toLowerCase()) ||
-				value.onboardingStatus.toLowerCase().includes(searchInput.toLowerCase()) ||
-				value.activeBidders.includes(searchInput.toLowerCase()) ||
-				value.activeProducts.toLowerCase().includes(searchInput.toLowerCase()) ||
-				value.adManager.toLowerCase().includes(searchInput.toLowerCase()) ||
-				value.authEmail.toLowerCase().includes(searchInput.toLowerCase()) ||
-				value.dateCreated.toLowerCase().includes(searchInput.toLowerCase()) ||
-				value.inactiveBidders.includes(searchInput.toLowerCase()) ||
-				value.publisherId.toLowerCase().includes(searchInput.toLowerCase()) ||
-				value.activeStatus.toLowerCase().includes(searchInput.toLowerCase()) ||
+				value.accountEmail.toLowerCase().includes(searchInput.toLowerCase().trim()) ||
+				value.domain.toLowerCase().includes(searchInput.toLowerCase().trim()) ||
+				value.onboardingStatus.toLowerCase().includes(searchInput.toLowerCase().trim()) ||
+				value.activeBidders.includes(searchInput.toLowerCase().trim()) ||
+				value.activeProducts.toLowerCase().includes(searchInput.toLowerCase().trim()) ||
+				value.adManager.toLowerCase().includes(searchInput.toLowerCase().trim()) ||
+				value.authEmail.toLowerCase().includes(searchInput.toLowerCase().trim()) ||
+				value.dateCreated.toLowerCase().includes(searchInput.toLowerCase().trim()) ||
+				value.inactiveBidders.includes(searchInput.toLowerCase().trim()) ||
+				value.publisherId.toLowerCase().includes(searchInput.toLowerCase().trim()) ||
+				value.activeStatus.toLowerCase().includes(searchInput.toLowerCase().trim()) ||
 				value.siteId
 					.toString()
 					.toLowerCase()
-					.includes(searchInput.toLowerCase()) ||
+					.includes(searchInput.toLowerCase().trim()) ||
 				value.revenueShare
 					.toString()
 					.toLowerCase()
-					.includes(searchInput.toLowerCase())
+					.includes(searchInput.toLowerCase().trim())
 			);
 		});
 
@@ -59,13 +59,13 @@ class GlobalSearch extends React.Component {
 
 	render() {
 		const { columns } = this.props;
-		const { columnSearch } = this.state;
+		const { columnSearch, searchInput } = this.state;
 
 		return (
 			<div className="u-margin-v4 u-padding-h4 ">
 				<FieldGroup
 					name="searchInput"
-					value={this.state.searchInput || ''}
+					value={searchInput || ''}
 					label="Quick Search"
 					onChange={this.handleChange}
 					size={6}

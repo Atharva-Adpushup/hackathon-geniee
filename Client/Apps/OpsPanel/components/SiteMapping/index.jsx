@@ -83,10 +83,11 @@ class SiteMapping extends Component {
 			values = filters;
 		} else {
 			const {
-				data: { result: tableRows }
+				data: { result: tableRows },
+				filteredData
 			} = this.state;
 
-			values = [...new Set(tableRows.map(val => val[key]))];
+			values = [...new Set(filteredData.map(val => val[key]))];
 		}
 
 		return values.map(value => ({ name: value }));
@@ -195,7 +196,6 @@ class SiteMapping extends Component {
 								onClick={copyToClipBoard}
 								toReturn={cellValue}
 								className="u-text-red u-margin-l3 u-cursor-pointer site-mapping-copy"
-								title="copy content"
 							/>
 						)}
 					</span>
@@ -292,14 +292,19 @@ class SiteMapping extends Component {
 	};
 
 	render() {
-		const { isLoading, filteredData, selectedData } = this.state;
+		const {
+			isLoading,
+			filteredData,
+			selectedData,
+			data: { result }
+		} = this.state;
 		if (isLoading) return <Loader height="600px" classNames="u-margin-v3" />;
 		const csvData = !selectedData.length ? filteredData : selectedData;
 
 		return (
 			<React.Fragment>
 				<GlobalSearch
-					data={this.state.data.result}
+					data={result}
 					columns={SITE_MAPPING_COLUMNS}
 					handleSetFilteredData={this.handleSetFilteredData}
 					handleSetSearchInput={this.handleSetSearchInput}
