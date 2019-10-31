@@ -299,7 +299,7 @@ class SiteMapping extends Component {
 		return (
 			<React.Fragment>
 				<GlobalSearch
-					data={this.state.data}
+					data={this.state.data.result}
 					columns={SITE_MAPPING_COLUMNS}
 					handleSetFilteredData={this.handleSetFilteredData}
 					handleSetSearchInput={this.handleSetSearchInput}

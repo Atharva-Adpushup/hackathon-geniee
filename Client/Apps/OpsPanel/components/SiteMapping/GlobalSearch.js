@@ -31,12 +31,12 @@ class GlobalSearch extends React.Component {
 				value.accountEmail.toLowerCase().includes(searchInput.toLowerCase()) ||
 				value.domain.toLowerCase().includes(searchInput.toLowerCase()) ||
 				value.onboardingStatus.toLowerCase().includes(searchInput.toLowerCase()) ||
-				value.activeBidders.toLowerCase().includes(searchInput.toLowerCase()) ||
+				value.activeBidders.includes(searchInput.toLowerCase()) ||
 				value.activeProducts.toLowerCase().includes(searchInput.toLowerCase()) ||
 				value.adManager.toLowerCase().includes(searchInput.toLowerCase()) ||
 				value.authEmail.toLowerCase().includes(searchInput.toLowerCase()) ||
 				value.dateCreated.toLowerCase().includes(searchInput.toLowerCase()) ||
-				value.inactiveBidders.toLowerCase().includes(searchInput.toLowerCase()) ||
+				value.inactiveBidders.includes(searchInput.toLowerCase()) ||
 				value.publisherId.toLowerCase().includes(searchInput.toLowerCase()) ||
 				value.activeStatus.toLowerCase().includes(searchInput.toLowerCase()) ||
 				value.siteId
