@@ -72,15 +72,12 @@ const Messenger = (function ($, Utils, Event) {
 		e = e.originalEvent || s;
 		if (this.isOriginValid(e)) {
 			let req = null;
-			try {
-				/**
-				 * There are some websites which custom implements Array.prototype.toJSON which is called by the JSON.stringify
-				 * This leads to either custom/double/nested stringification of the values.
-				 * Hence, we are deep parsing any json received from inner js. 
-				 */
-				// req = JSON.parse(e.data);
-				req = deepJsonParse(e.data);
-			} catch (d) { }
+			/**
+			 * There are some websites which custom implements Array.prototype.toJSON which is called by the JSON.stringify
+			 * This leads to either custom/double/nested stringification of the values.
+			 * Hence, we are deep parsing any json received from inner js. 
+			 */
+			req = deepJsonParse(e.data);
 			if (!req || !req.cmd) {
 				// some issue with google.com that's why introduces this check
 				return false;
