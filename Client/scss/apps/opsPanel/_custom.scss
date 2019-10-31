@@ -90,19 +90,33 @@
 	float: left;
 }
 
-.site-mapping-copy {
-	display: none;
-}
-
-.site-mapping .rt-tr:hover .site-mapping-copy {
-	display: inline-block !important;
-}
-
-.ReactTable .rt-thead .rt-th {
-	background-repeat: no-repeat;
-	background-size: 18px 18px;
-	background-position: right 4px center;
-	font-weight: bolder;
+.ReactTable {
+	.rt-thead .rt-th {
+		background-repeat: no-repeat;
+		background-size: 18px 18px;
+		background-position: right 4px center;
+		font-weight: bolder;
+	}
+	.rt-tbody {
+		.rt-tr {
+			.rt-td {
+				position: relative;
+				.site-mapping-copy {
+					display: none;
+					position: absolute;
+					right: 5px;
+					top: 50%;
+					transform: translateY(-50%);
+					z-index: 5;
+				}
+			}
+			&:hover {
+				.site-mapping-copy {
+					display: inline-block !important;
+				}
+			}
+		}
+	}
 }
 .ReactTable .rt-thead .rt-th.-sort-asc {
 	background-image: url('../../../../public/assets/images/sort-up-icon.jpg');
