@@ -19,12 +19,7 @@ import CustomIcon from '../../../../Components/CustomIcon/index';
 import CustomButton from '../../../../Components/CustomButton';
 import CustomError from '../../../../Components/CustomError/index';
 import { SITE_MAPPING_COLUMNS, SITE_MAPPING_FILTER_COLUMNS } from '../../configs/commonConsts';
-
-const DEFAULT_WIDTH = {
-	width: 50,
-	maxWidth: 50,
-	minWidth: 50
-};
+import GlobalSearch from './GlobalSearch';
 
 class SiteMapping extends Component {
 	state = {
@@ -147,23 +142,7 @@ class SiteMapping extends Component {
 	renderContent = () => {
 		const { filteredData, isError, selectAll, checked } = this.state;
 		const dataWithIcon = clonedeep(filteredData);
-		const columns = [
-			// {
-			// 	Header: <input type="checkbox" onChange={this.handleChange} checked={selectAll} />,
-			// 	Cell: row => (
-			// 		<input
-			// 			type="checkbox"
-			// 			checked={checked[row.index]}
-			// 			onChange={e => this.handleSingleCheckboxChange(row.index, e)}
-			// 		/>
-			// 	),
-			// 	sortable: false,
-			// 	filterable: false,
-			// 	...DEFAULT_WIDTH
-			// },
-
-			...SITE_MAPPING_COLUMNS
-		];
+		const columns = [...SITE_MAPPING_COLUMNS];
 
 		if (isError) return <CustomError />;
 		if (!filteredData.length) return <Empty message=" No Data found " />;
@@ -180,7 +159,40 @@ class SiteMapping extends Component {
 				pageSizeOptions={[50, 100, 150, 200, 250]}
 				minRows={0}
 				sortable={true}
-			/>
+			>
+				{(state, makeTable, instance) => {
+					let recordsInfoText = '';
+
+					const { filtered, pageRows, pageSize, sortedData, page } = state;
+
+					if (sortedData && sortedData.length > 0) {
+						let isFiltered = filtered.length > 0;
+
+						let totalRecords = sortedData.length;
+
+						let recordsCountFrom = page * pageSize + 1;
+
+						let recordsCountTo = recordsCountFrom + pageRows.length - 1;
+
+						if (isFiltered)
+							recordsInfoText = `${recordsCountFrom}-${recordsCountTo} of ${totalRecords} filtered records`;
+						else
+							recordsInfoText = `${recordsCountFrom}-${recordsCountTo} of ${totalRecords} records`;
+					} else recordsInfoText = 'No records';
+
+					return (
+						<div className="main-grid">
+							<div className="above-table text-right">
+								<div className="col-sm-12">
+									<span className="records-info">{recordsInfoText} </span>
+								</div>
+							</div>
+
+							{makeTable()}
+						</div>
+					);
+				}}
+			</ReactTable>
 		);
 	};
 
@@ -190,24 +202,12 @@ class SiteMapping extends Component {
 		}, 0);
 	};
 
-	sendMail = () => {
-		const { selectedData } = this.state;
-		const { showNotification } = this.props;
+	handleSetFilteredData = filteredData => {
+		this.setState({ filteredData });
+	};
 
-		if (!selectedData.length) {
-			return showNotification({
-				mode: 'error',
-				title: 'Operation Failed',
-				message: 'Please select atleast 1 entry',
-				autoDismiss: 5
-			});
-		}
-		const message = 'Are you sure you want to send the bulk mail ?';
-		!window.confirm(message)
-			? console.log('You have selected no')
-			: console.log('we are sending the bulk mail for you');
-
-		this.setState({ checked: [], selectedData: [], selectAll: false });
+	handleSetSearchInput = searchInput => {
+		this.setState({ searchInput });
 	};
 
 	render() {
@@ -217,6 +217,13 @@ class SiteMapping extends Component {
 
 		return (
 			<React.Fragment>
+				<GlobalSearch
+					data={this.state.data}
+					columns={SITE_MAPPING_COLUMNS}
+					handleSetFilteredData={this.handleSetFilteredData}
+					handleSetSearchInput={this.handleSetSearchInput}
+					className="u-margin-v5 u-margin-h4 site-stats"
+				/>
 				<FilterBox
 					onFilter={this.onFilter}
 					availableFilters={this.handleFilterValues(SITE_MAPPING_FILTER_COLUMNS)}
@@ -235,15 +242,6 @@ class SiteMapping extends Component {
 							</CustomButton>
 						</CSVLink>
 					) : null}
-
-					{/* <CustomButton
-						variant="secondary"
-						className=" pull-right u-margin-r3 u-margin-b4 "
-						onClick={this.sendMail}
-					>
-						<FontAwesomeIcon size="1x" icon="mail-bulk" className="u-margin-r3" />
-						Send Custom Mail
-					</CustomButton> */}
 				</Row>
 				{this.renderContent()}
 			</React.Fragment>

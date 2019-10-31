@@ -1,3 +1,4 @@
+import React from 'react';
 // OP abbreviation stands for Ops Panel
 const OP_NAV_ITEMS_INDEXES = {
 	SETTINGS: 'settings',
@@ -371,6 +372,12 @@ const DEFAULT_WIDTH = {
 	minWidth: 150
 };
 
+const CELL_INFO = row => (
+	<div>
+		<span title={row.value.props.children[0]}>{row.value.props.children} </span>
+	</div>
+);
+
 const SITE_MAPPING_COLUMNS = [
 	{
 		Header: 'Site ID',
@@ -384,21 +391,24 @@ const SITE_MAPPING_COLUMNS = [
 		accessor: 'domain',
 		width: 250,
 		maxWidth: 250,
-		minWidth: 250
+		minWidth: 250,
+		Cell: CELL_INFO
 	},
 	{
 		Header: 'Owner Email',
 		accessor: 'accountEmail',
 		width: 250,
 		maxWidth: 250,
-		minWidth: 250
+		minWidth: 250,
+		Cell: CELL_INFO
 	},
 	{
 		Header: 'Onboarding Status',
 		accessor: 'onboardingStatus',
 		width: 200,
 		maxWidth: 200,
-		minWidth: 200
+		minWidth: 200,
+		Cell: CELL_INFO
 	},
 	{
 		Header: 'Active Status',
@@ -419,16 +429,19 @@ const SITE_MAPPING_COLUMNS = [
 	{
 		Header: 'Active Products',
 		accessor: 'activeProducts',
+		Cell: CELL_INFO,
 		...DEFAULT_WIDTH
 	},
 	{
 		Header: 'Active Bidders',
 		accessor: 'activeBidders',
+		Cell: CELL_INFO,
 		...DEFAULT_WIDTH
 	},
 	{
 		Header: 'Inactive Bidders',
 		accessor: 'inactiveBidders',
+		Cell: CELL_INFO,
 		...DEFAULT_WIDTH
 	},
 	{
@@ -439,11 +452,13 @@ const SITE_MAPPING_COLUMNS = [
 	{
 		Header: 'Publisher Id',
 		accessor: 'publisherId',
+		Cell: CELL_INFO,
 		...DEFAULT_WIDTH
 	},
 	{
 		Header: 'Auth Email',
 		accessor: 'authEmail',
+		Cell: CELL_INFO,
 		width: 200,
 		maxWidth: 200,
 		minWidth: 200
@@ -451,6 +466,7 @@ const SITE_MAPPING_COLUMNS = [
 	{
 		Header: 'Ad Manager',
 		accessor: 'adManager',
+		Cell: CELL_INFO,
 		...DEFAULT_WIDTH
 	}
 ];
