@@ -226,13 +226,13 @@ router
 
 		return Promise.join(
 			getUser,
-			getAccessToken,
+			oauthHelper.getAccessTokens(req.query.code),
 			getAdsenseAccounts,
 			getUserInfo,
 			getUserDFPInfo,
-			(user, token, adsenseAccounts, userInfo, userDFPInfo) => {
+			(user, { tokens }, adsenseAccounts, userInfo, userDFPInfo) => {
 				// eslint-disable-next-line camelcase
-				const { id_token, access_token, expiry_date } = token;
+				const { access_token, refresh_token, expiry_date } = tokens;
 				const adServerSettings = user.get('adServerSettings') || {};
 				const activeAdServerData = adServerSettings.dfp;
 
@@ -254,7 +254,7 @@ router
 				return Promise.all([
 					user.addNetworkData({
 						networkName: 'ADSENSE',
-						refreshToken: id_token,
+						refreshToken: refresh_token,
 						accessToken: access_token,
 						expiresIn: expiry_date,
 						pubId: adsenseAccounts[0].id,
@@ -264,7 +264,7 @@ router
 					}),
 					user.addNetworkData({
 						networkName: 'DFP',
-						refreshToken: id_token,
+						refreshToken: refresh_token,
 						accessToken: access_token,
 						expiresIn: expiry_date,
 						userInfo,
