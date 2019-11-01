@@ -185,7 +185,7 @@ const commonSiteFunctions = {
 				name: 'Active Products',
 				key: 'activeProducts',
 				position: 7,
-				filters: allProductNames,
+				filters: [...allProductNames, 'N/A'],
 				isMultiValue: true,
 				showCopyBtn: true,
 				width: 180,
@@ -205,7 +205,7 @@ const commonSiteFunctions = {
 				name: 'Inactive Bidders',
 				key: 'inactiveBidders',
 				position: 9,
-				filters: allBidderNames,
+				filters: [...allBidderNames, 'N/A'],
 				isMultiValue: true,
 				showCopyBtn: true,
 				...DEFAULT_WIDTH
