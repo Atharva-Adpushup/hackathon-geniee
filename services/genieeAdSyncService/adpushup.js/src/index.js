@@ -43,12 +43,12 @@ function destroyAdpSlots() {
 
 	if (adpSlots.length) {
 		var adpGSlots = [];
-		adpSlots.forEach(function(adpSlot) {
+		adpSlots.forEach(function (adpSlot) {
 			adpGSlots.push(w.adpTags.adpSlots[adpSlot].gSlot);
 		});
 
 		w.adpTags.adpSlots = {};
-		w.googletag.cmd.push(function() {
+		w.googletag.cmd.push(function () {
 			w.googletag.destroySlots(adpGSlots);
 		});
 	}
@@ -74,7 +74,7 @@ function resetAdpConfig() {
 
 // Resets and initialises the adpushup config object
 function initAdpConfig() {
-	return new Promise(function(resolve) {
+	return new Promise(function (resolve) {
 		resetAdpConfig();
 		resetAdpTagsConfig();
 
@@ -113,7 +113,7 @@ function initAdpConfig() {
 			packetId: utils.uniqueId(__SITE_ID__)
 		});
 		resolve();
-	}).then(function() {
+	}).then(function () {
 		if (!window.adpushup.configExtended) {
 			if (ADPTAG_ACTIVE) {
 				//TODO: this needs to be changed
@@ -209,7 +209,7 @@ function selectVariationWrapper() {
 }
 
 function startCreation(forced) {
-	return new Promise(function(resolve) {
+	return new Promise(function (resolve) {
 		// ampInit(adp.config);
 		// if config has disable or this function triggered more than once or no pageGroup found then do nothing;
 		if (!forced && (shouldWeNotProceed() || !config.pageGroup || parseInt(config.mode, 10) === 2)) {
@@ -225,7 +225,7 @@ function startCreation(forced) {
 			innovativeInteractiveAds = utils.filterInteractiveAds(w.adpushup.config.innovativeAds, true, channel);
 		}
 
-		return selectVariationWrapper().then(function(variationData) {
+		return selectVariationWrapper().then(function (variationData) {
 			var selectedVariation = variationData.selectedVariation;
 			var moduleConfig = variationData.config;
 			var isGenieeModeSelected = !!(adp && adp.geniee && adp.geniee.sendSelectedModeFeedback);
@@ -249,7 +249,7 @@ function startCreation(forced) {
 				// Load interactive ads script if interactive ads are present in adpushup config
 				layoutAndManualInteractiveAds = utils.getInteractiveAds(config);
 
-				if (selectVariation.isControl) {
+				if (selectedVariation.isControl) {
 					isControlVariation = true;
 				}
 
@@ -309,7 +309,7 @@ function initAdpQue() {
 	}
 
 	processQue();
-	adp.que.push = function(queFunc) {
+	adp.que.push = function (queFunc) {
 		[].push.call(w.adpushup.que, queFunc);
 		processQue();
 	};
@@ -373,7 +373,7 @@ function main() {
 	}
 
 	if (!config.pageGroup) {
-		pageGroupTimer = setTimeout(function() {
+		pageGroupTimer = setTimeout(function () {
 			!config.pageGroup ? triggerControl(commonConsts.MODE.FALLBACK) : clearTimeout(pageGroupTimer);
 		}, config.pageGroupTimeout);
 	} else {

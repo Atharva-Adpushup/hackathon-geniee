@@ -9,33 +9,33 @@ import config from '../config';
 // import { generateAdCode } from '../../../genieeAdSyncService/genieeAp/src/adCodeGenerator';
 
 const createParentNode = (appendTo, interactiveAd, css = {}, operation = 'append') => {
-		const $parentNode = $('<div/>'),
-			{ id } = interactiveAd;
+	const $parentNode = $('<div/>'),
+		{ id } = interactiveAd;
 
-		$parentNode.attr({ class: commonConsts.DEFAULT_CLASSNAME });
+	$parentNode.attr({ class: commonConsts.DEFAULT_CLASSNAME });
 
-		// Set CSS on parent node - required in case of video interactive ad format
-		if (css && Object.keys(css).length) {
-			$parentNode.css(css);
-		}
+	// Set CSS on parent node - required in case of video interactive ad format
+	if (css && Object.keys(css).length) {
+		$parentNode.css(css);
+	}
 
-		switch (operation.toLowerCase()) {
-			case 'prepend':
-				$(appendTo).prepend($parentNode);
-				break;
-			case 'insertbefore':
-				$(appendTo).before($parentNode);
-				break;
-			case 'insertafter':
-				$(appendTo).after($parentNode);
-				break;
-			case 'append':
-			default:
-				$(appendTo).append($parentNode);
-		}
+	switch (operation.toLowerCase()) {
+		case 'prepend':
+			$(appendTo).prepend($parentNode);
+			break;
+		case 'insertbefore':
+			$(appendTo).before($parentNode);
+			break;
+		case 'insertafter':
+			$(appendTo).after($parentNode);
+			break;
+		case 'append':
+		default:
+			$(appendTo).append($parentNode);
+	}
 
-		return $parentNode;
-	},
+	return $parentNode;
+},
 	renderAd = (interactiveAd, adInstance) => {
 		const type = interactiveAd.formatData.type;
 		const adCode = window.adpushup.generateAdCode(interactiveAd);
@@ -71,14 +71,12 @@ const createParentNode = (appendTo, interactiveAd, css = {}, operation = 'append
 		if (interactiveAd && interactiveAd.formatData) {
 			const adp = window.adpushup;
 
-			// Uncomment the below code when new dashboard + Innovative App is live
-			// if (
-			// 	adp.utils.isUrlMatching() &&
-			// 	adp.config.platform.toUpperCase() === interactiveAd.formatData.platform.toUpperCase()
-			// ) {
-
-			// Legacy Check for old Editor Interactive Ads
-			if (adp.utils.isUrlMatching()) {
+			if (
+				adp.utils.isUrlMatching() &&
+				adp.config.platform &&
+				interactiveAd.formatData &&
+				adp.config.platform.toUpperCase() === interactiveAd.formatData.platform.toUpperCase()
+			) {
 				renderAd(interactiveAd, adInstance);
 			} else {
 				return false;
