@@ -61,19 +61,19 @@ class Panel extends Component {
 	}
 
 	componentDidMount() {
-		const { userSites, updateReportMetaData, reportsMeta } = this.props;
+		const { userSites, updateReportMetaData, reportsMeta, isForOps } = this.props;
 		const { email, reportType } = this.getDemoUserParams();
 
 		let userSitesStr = '';
 		let isSuperUser = false;
 
-		if (reportType === 'account') {
+		if (!isForOps && reportType === 'account') {
 			userSitesStr = Object.keys(userSites).toString();
 
 			userSitesStr = getReportingDemoUserSiteIds(userSitesStr, email, reportType);
 		}
 
-		if (reportType === 'global') {
+		if (isForOps || reportType === 'global') {
 			isSuperUser = true;
 		}
 
@@ -645,7 +645,12 @@ class Panel extends Component {
 			filterList,
 			tableData
 		} = this.state;
-		const { reportsMeta, reportType: defaultReportType, isCustomizeChartLegend } = this.props;
+		const {
+			reportsMeta,
+			reportType: defaultReportType,
+			isCustomizeChartLegend,
+			isForOps
+		} = this.props;
 
 		const allAvailableMetrics = this.getAllAvailableMetrics(
 			isCustomizeChartLegend,
@@ -695,6 +700,7 @@ class Panel extends Component {
 						selectedInterval={selectedInterval}
 						reportType={reportType}
 						defaultReportType={defaultReportType}
+						isForOps={isForOps}
 						csvData={csvData}
 						isDemoUser={isValid}
 					/>
@@ -708,6 +714,7 @@ class Panel extends Component {
 						metricsList={metricsList}
 						allAvailableMetrics={allAvailableMetrics}
 						reportType={reportType}
+						isForOps={isForOps}
 						isCustomizeChartLegend={isCustomizeChartLegend}
 						updateMetrics={this.updateMetrics}
 						selectedInterval={selectedInterval}
@@ -724,6 +731,7 @@ class Panel extends Component {
 						getCsvData={this.getCsvData}
 						reportType={reportType}
 						defaultReportType={defaultReportType}
+						isForOps={isForOps}
 					/>
 				</Col>
 			</Row>
