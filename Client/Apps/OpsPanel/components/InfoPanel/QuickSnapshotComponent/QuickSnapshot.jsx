@@ -205,13 +205,25 @@ class QuickSnapshot extends React.Component {
 
 	getTopPerformingSites = (allUserSites, reportingSites) => {
 		let topPerformingSite;
+		let maxPageCPM = 0;
+
 		allUserSites.forEach(site => {
 			const siteId = site.value;
-			if (reportingSites[siteId] && reportingSites[siteId].isTopPerforming) {
+			const reportingSite = reportingSites[siteId];
+
+			if (
+				reportingSite &&
+				reportingSite.adpushup_page_cpm &&
+				reportingSite.adpushup_page_cpm > maxPageCPM
+			) {
 				topPerformingSite = siteId;
+				maxPageCPM = reportingSite.adpushup_page_cpm;
 				return topPerformingSite;
 			}
+
+			return true;
 		});
+
 		return topPerformingSite;
 	};
 
@@ -469,6 +481,7 @@ class QuickSnapshot extends React.Component {
 						widgetsConfig[wid].data = response.data;
 						widgetsConfig[wid].isDataSufficient = true;
 						widgetsConfig[wid].sitesList = top10Sites;
+
 						if (isWidgetNamePerAPOriginal) widgetsConfig[wid].selectedSite = computedSelectedSite;
 					} else {
 						widgetsConfig[wid].data = {};
@@ -650,7 +663,7 @@ class QuickSnapshot extends React.Component {
 						{/* eslint-disable */}
 						<label className="u-text-normal u-margin-r2">Metrics</label>
 						<SelectBox
-							id="metric-selectbox"
+							id={`metric-selectbox-${name}`}
 							isClearable={false}
 							pullRight
 							isSearchable={false}
@@ -676,7 +689,7 @@ class QuickSnapshot extends React.Component {
 						{/* eslint-disable */}
 						<label className="u-text-normal u-margin-r2">Quick Dates</label>
 						<SelectBox
-							id="date-selectbox"
+							id={`date-selectbox-${name}`}
 							wrapperClassName="display-inline"
 							pullRight
 							isClearable={false}
@@ -703,7 +716,7 @@ class QuickSnapshot extends React.Component {
 						{/* eslint-disable */}
 						<label className="u-text-normal u-margin-r2">Website</label>
 						<SelectBox
-							id="site-selectbox"
+							id={`site-selectbox-${name}`}
 							isClearable={false}
 							pullRight
 							isSearchable={false}
