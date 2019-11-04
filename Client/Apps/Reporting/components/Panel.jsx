@@ -6,6 +6,7 @@ import { Object } from 'es6-shim';
 import qs from 'querystringify';
 import isEmpty from 'lodash/isEmpty';
 import union from 'lodash/union';
+import sortBy from 'lodash/sortBy';
 import ActionCard from '../../../Components/ActionCard/index';
 import Empty from '../../../Components/Empty/index';
 import ControlContainer from '../containers/ControlContainer';
@@ -18,8 +19,7 @@ import {
 	accountDisableDimension,
 	opsDimension,
 	opsFilter,
-	REPORT_TABLE_WHITELISTED_COLUMNS,
-	REPORT_COLUMNS_BLACKLISTED_FOR_TOTAL
+	REPORT_INTERVAL_TABLE_KEYS
 } from '../configs/commonConsts';
 import { DEMO_ACCOUNT_DATA } from '../../../constants/others';
 import Loader from '../../../Components/Loader';
@@ -224,7 +224,11 @@ class Panel extends Component {
 		const { email, reportType } = this.getDemoUserParams();
 		let selectedMetrics;
 
-		if (metricsList) {
+		if (metricsList && !isCustomizeChartLegend) {
+			selectedMetrics = displayMetrics.map(metric => metric.value);
+		}
+
+		if (metricsList && isCustomizeChartLegend) {
 			selectedMetrics = metricsList
 				.filter(metric => !metric.isDisabled)
 				.map(metric => metric.value);
@@ -272,6 +276,7 @@ class Panel extends Component {
 		const computedState = Object.assign({ isLoading: true }, inputState);
 
 		this.setState(computedState, () => {
+			let newState = {};
 			const params = this.formateReportParams();
 
 			reportService.getCustomStats(params).then(response => {
@@ -279,17 +284,87 @@ class Panel extends Component {
 					tableData = response.data;
 					if (
 						reportType === 'global' &&
-						isCustomizeChartLegend &&
 						!tableData.total &&
 						tableData.columns &&
 						tableData.columns.length
 					) {
 						tableData.total = this.computeTotal(tableData.result);
+
+						if (tableData.columns.indexOf('adpushup_xpath_miss_percent') !== -1) {
+							tableData.result = tableData.result.map(row => {
+								const rowCopy = JSON.parse(JSON.stringify(row));
+
+								// eslint-disable-next-line no-restricted-syntax
+								for (const column in rowCopy) {
+									if (column === 'adpushup_xpath_miss_percent') {
+										rowCopy[column] = parseFloat(rowCopy[column].toFixed(2));
+									}
+								}
+
+								return rowCopy;
+							});
+						}
+					}
+
+					if (tableData.columns && tableData.columns.length) {
+						const metricsList = this.getMetricsList(tableData);
+						newState = { ...newState, metricsList };
 					}
 				}
-				this.setState({ isLoading: false, tableData });
+
+				newState = { ...newState, isLoading: false, tableData };
+				this.setState(newState);
 			});
 		});
+	};
+
+	getSortedMetaMetrics = metaMetrics => {
+		const metaMetricsArray = Object.keys(metaMetrics).map(value => {
+			// eslint-disable-next-line camelcase
+			const { display_name: name, chart_position, valueType } = metaMetrics[value];
+
+			return {
+				name,
+				value,
+				valueType,
+				chart_position
+			};
+		});
+		return sortBy(metaMetricsArray, ['chart_position']);
+	};
+
+	/**
+	 * Get first 5 metrics from report data
+	 * - remove dimensions and intervals from report columns
+	 * - remove unselectable items (given in meta)
+	 * - sort by chart position (given in meta)
+	 * - pick first 5
+	 * @memberof Panel
+	 */
+	getMetricsList = tableData => {
+		const { reportsMeta } = this.props;
+
+		const filteredMetrics = tableData.columns.filter(metric => {
+			const isDimension = !!reportsMeta.data.dimension[metric];
+			const isBlacklistedMetric = REPORT_INTERVAL_TABLE_KEYS.indexOf(metric) !== -1;
+			const isSelectableMetric =
+				reportsMeta.data.metrics[metric] && reportsMeta.data.metrics[metric].selectable;
+
+			return !isDimension && !isBlacklistedMetric && isSelectableMetric;
+		});
+
+		const sortedMetaMetrics = this.getSortedMetaMetrics(reportsMeta.data.metrics);
+
+		const computedMetrics = [];
+
+		sortedMetaMetrics.forEach(metaMetric => {
+			const { name, value, valueType } = metaMetric;
+			if (filteredMetrics.indexOf(value) !== -1) computedMetrics.push({ name, value, valueType });
+		});
+
+		computedMetrics.splice(5);
+
+		return computedMetrics;
 	};
 
 	computeTotal = tableRows => {
@@ -297,7 +372,8 @@ class Panel extends Component {
 		const columnsBlacklistedForAddition = [
 			'adpushup_ad_ecpm',
 			'network_ad_ecpm',
-			'adpushup_page_cpm'
+			'adpushup_page_cpm',
+			'adpushup_xpath_miss_percent'
 		];
 
 		const total = tableRows.reduce((totalAccumulator, tableRow) => {
@@ -307,7 +383,7 @@ class Panel extends Component {
 				// eslint-disable-next-line no-restricted-syntax
 				for (const column in tableRow) {
 					if (
-						REPORT_COLUMNS_BLACKLISTED_FOR_TOTAL.indexOf(column) === -1 &&
+						REPORT_INTERVAL_TABLE_KEYS.indexOf(column) === -1 &&
 						!Number.isNaN(tableRow[column]) &&
 						!dimensionList.find(dimension => dimension.value === column)
 					) {
@@ -349,11 +425,33 @@ class Panel extends Component {
 				(total.total_network_net_revenue / total.total_adpushup_page_views) * 1000;
 		}
 
+		if (
+			total.hasOwnProperty('total_adpushup_xpath_miss_percent') &&
+			total.hasOwnProperty('total_adpushup_xpath_miss') &&
+			total.hasOwnProperty('total_adpushup_impressions')
+		) {
+			total.total_adpushup_xpath_miss_percent = (
+				(total.total_adpushup_xpath_miss /
+					(total.total_adpushup_xpath_miss + total.total_adpushup_impressions)) *
+				100
+			).toFixed(2);
+		}
+
 		return total;
 	};
 
 	updateMetrics = (newMetrics = []) => {
-		this.setState({ metricsList: newMetrics });
+		const { reportsMeta } = this.props;
+		const sortedMetaMetrics = this.getSortedMetaMetrics(reportsMeta.data.metrics);
+		const sortedMetrics = [];
+
+		sortedMetaMetrics.forEach(metaMetric => {
+			const foundMetric = newMetrics.find(newMetric => newMetric.value === metaMetric.value);
+
+			if (foundMetric) sortedMetrics.push(foundMetric);
+		});
+
+		this.setState({ metricsList: sortedMetrics });
 	};
 
 	getCsvData = csvData => {
@@ -397,7 +495,7 @@ class Panel extends Component {
 
 		if (siteId) {
 			reportType = 'site';
-			if (isValidSite && isReportingSite) {
+			if ((isValidSite || isDemoUserReportingSite) && isReportingSite) {
 				selectedFilters = { siteid: { [computedSiteId]: true } };
 			}
 		}
@@ -483,7 +581,7 @@ class Panel extends Component {
 		selectedMetricsTableData.columns = selectedMetricsTableData.columns.filter(
 			column =>
 				!!metricsList.find(metric => metric.value === column) ||
-				REPORT_TABLE_WHITELISTED_COLUMNS.indexOf(column) !== -1 ||
+				REPORT_INTERVAL_TABLE_KEYS.indexOf(column) !== -1 ||
 				!!dimensionList.find(dimension => dimension.value === column)
 		);
 
@@ -494,7 +592,7 @@ class Panel extends Component {
 			for (const key in computedRow) {
 				if (
 					!metricsList.find(metric => metric.value === key) &&
-					REPORT_TABLE_WHITELISTED_COLUMNS.indexOf(key) === -1 &&
+					REPORT_INTERVAL_TABLE_KEYS.indexOf(key) === -1 &&
 					!dimensionList.find(dimension => dimension.value === key)
 				) {
 					delete computedRow[key];
@@ -561,7 +659,7 @@ class Panel extends Component {
 
 		let selectedMetricsTableData = JSON.parse(JSON.stringify(tableData));
 
-		if (isCustomizeChartLegend) {
+		if (isCustomizeChartLegend && tableData.result && tableData.result.length) {
 			selectedMetricsTableData = this.filterTableDataBySelectedMetrics(
 				selectedMetricsTableData,
 				metricsList,
@@ -615,6 +713,7 @@ class Panel extends Component {
 						selectedDimension={selectedDimension}
 						getCsvData={this.getCsvData}
 						reportType={reportType}
+						defaultReportType={defaultReportType}
 					/>
 				</Col>
 			</Row>

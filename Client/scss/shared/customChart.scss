@@ -49,8 +49,12 @@
 	}
 
 	.manage-legends-wrap {
-		align-self: center;
+		// align-self: center;
 		max-width: 50px;
+		.custom-chart-legend-icon {
+			margin-top: 50%;
+			transform: translateY(calc(-50% - 3px));
+		}
 		.manage-legends-box {
 			position: absolute;
 			right: 19px;

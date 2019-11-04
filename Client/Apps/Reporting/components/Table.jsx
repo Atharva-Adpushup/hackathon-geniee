@@ -5,6 +5,7 @@ import sortBy from 'lodash/sortBy';
 import isEqual from 'lodash/isEqual';
 import moment from 'moment';
 import { numberWithCommas, computeCsvData, roundOffTwoDecimal } from '../helpers/utils';
+import { reactTableSortMethod } from '../../../helpers/commonFunctions';
 
 class Table extends React.Component {
 	constructor(props) {
@@ -46,19 +47,29 @@ class Table extends React.Component {
 
 	getTableHeaders = headers => {
 		let tableHeader = [];
+		let sortedMetrics = [];
 		const { metrics, dimension } = this.props;
 		const { isDaily } = this.getDateIntervalValidators();
+
+		const computedDate = {
+			Header: 'Date',
+			accessor: 'date',
+			sortable: isDaily,
+			sortMethod: (a, b) => reactTableSortMethod(a, b)
+		};
+
+		tableHeader.push(computedDate);
 
 		headers.forEach(header => {
 			if (dimension[header]) {
 				if (header === 'siteid') {
-					tableHeader.splice(0, 0, {
+					tableHeader.push({
 						Header: 'Site Name',
 						accessor: 'siteName',
 						sortable: true
 					});
 				} else {
-					tableHeader.splice(0, 0, {
+					tableHeader.push({
 						Header: dimension[header].display_name,
 						accessor: header,
 						sortable: true
@@ -67,29 +78,36 @@ class Table extends React.Component {
 			}
 
 			if (metrics[header]) {
-				tableHeader.splice(metrics[header].position + 1, 0, {
-					Header: metrics[header].display_name,
+				// eslint-disable-next-line camelcase
+				const { display_name: Header, table_position } = metrics[header];
+
+				sortedMetrics.push({
+					Header,
 					accessor: header,
+<<<<<<< HEAD
 					sortMethod: (a, b) => {
 						if (a.length === b.length) {
 							return a > b ? 1 : -1;
 						}
 						return a.length > b.length ? 1 : -1;
 					}
+=======
+					sortable: true,
+					table_position,
+					sortMethod: (a, b) => reactTableSortMethod(a, b)
+>>>>>>> ed63b5941c2a16e7628b6620c50cf36993ed0aea
 				});
 			}
 		});
-		let computedDate = {
-			Header: 'Date',
-			accessor: 'date'
-		};
 
-		if (isDaily) {
-			computedDate = { ...computedDate, sortable: true };
-		}
+		sortedMetrics = sortBy(sortedMetrics, header => header.table_position).map(header => {
+			const headerCopy = { ...header };
+			delete headerCopy.table_position;
 
-		tableHeader.unshift(computedDate);
-		tableHeader = sortBy(tableHeader, header => header.position);
+			return headerCopy;
+		});
+
+		tableHeader = [...tableHeader, ...sortedMetrics];
 
 		return tableHeader;
 	};
@@ -182,11 +200,25 @@ class Table extends React.Component {
 		tableBody.forEach(row => {
 			Object.keys(row).forEach(col => {
 				if (metrics[col]) {
-					const num = metrics[col].valueType === 'money' ? roundOffTwoDecimal(row[col]) : row[col];
-					row[col] =
-						metrics[col].valueType === 'money'
-							? `$${numberWithCommas(num)}`
-							: numberWithCommas(num);
+					let num;
+					switch (metrics[col].valueType) {
+						case 'money': {
+							num = roundOffTwoDecimal(row[col]);
+							row[col] = `$${numberWithCommas(num)}`;
+
+							break;
+						}
+						case 'percent': {
+							num = row[col];
+							row[col] = `${numberWithCommas(num)}%`;
+
+							break;
+						}
+						default: {
+							num = row[col];
+							row[col] = numberWithCommas(num);
+						}
+					}
 				}
 			});
 		});
@@ -203,9 +235,25 @@ class Table extends React.Component {
 			let value = grandTotal[col];
 
 			if (metrics[col]) {
-				const num = metrics[col].valueType == 'money' ? roundOffTwoDecimal(value) : value;
-				value =
-					metrics[col].valueType == 'money' ? `$${numberWithCommas(num)}` : numberWithCommas(num);
+				let num;
+				switch (metrics[col].valueType) {
+					case 'money': {
+						num = roundOffTwoDecimal(value);
+						value = `$${numberWithCommas(num)}`;
+
+						break;
+					}
+					case 'percent': {
+						num = value;
+						value = `${numberWithCommas(num)}%`;
+
+						break;
+					}
+					default: {
+						num = value;
+						value = numberWithCommas(num);
+					}
+				}
 			}
 
 			footerComponent.push(
