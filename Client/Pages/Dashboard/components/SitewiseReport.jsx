@@ -1,7 +1,9 @@
 import React from 'react';
 import ReactTable from 'react-table';
-import { numberWithCommas, roundOffTwoDecimal, getWidgetValidDationState } from '../helpers/utils';
+import moment from 'moment';
 import sortBy from 'lodash/sortBy';
+
+import { numberWithCommas, roundOffTwoDecimal, getWidgetValidDationState } from '../helpers/utils';
 import { reactTableSortMethod } from '../../../helpers/commonFunctions';
 
 function formatTableData(tableBody, props) {
@@ -56,7 +58,7 @@ function computeTableData(data, props) {
 			tableHeader.splice(0, 0, {
 				Header: 'Date',
 				accessor: 'date',
-				sortMethod: (a, b) => reactTableSortMethod(a, b)
+				Cell: props => <span>{moment(props.value).format('ll')}</span>
 			});
 		} else {
 			tableHeader.splice(0, 0, {
