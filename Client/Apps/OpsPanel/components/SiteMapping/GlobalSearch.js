@@ -28,15 +28,12 @@ class GlobalSearch extends React.Component {
 					.includes(searchInput.toLowerCase());
 			}
 			return (
-				value.accountEmail.toLowerCase().includes(searchInput.toLowerCase().trim()) ||
-				value.domain.toLowerCase().includes(searchInput.toLowerCase().trim()) ||
-				value.onboardingStatus.toLowerCase().includes(searchInput.toLowerCase().trim()) ||
-				value.activeBidders.includes(searchInput.toLowerCase().trim()) ||
-				value.activeProducts.toLowerCase().includes(searchInput.toLowerCase().trim()) ||
-				value.adManager.toLowerCase().includes(searchInput.toLowerCase().trim()) ||
 				value.authEmail.toLowerCase().includes(searchInput.toLowerCase().trim()) ||
+				value.onboardingStatus.toLowerCase().includes(searchInput.toLowerCase().trim()) ||
+				value.accountEmail.toLowerCase().includes(searchInput.toLowerCase().trim()) ||
+				value.adManager.toLowerCase().includes(searchInput.toLowerCase().trim()) ||
+				value.domain.toLowerCase().includes(searchInput.toLowerCase().trim()) ||
 				value.dateCreated.toLowerCase().includes(searchInput.toLowerCase().trim()) ||
-				value.inactiveBidders.includes(searchInput.toLowerCase().trim()) ||
 				value.publisherId.toLowerCase().includes(searchInput.toLowerCase().trim()) ||
 				value.activeStatus.toLowerCase().includes(searchInput.toLowerCase().trim()) ||
 				value.siteId
