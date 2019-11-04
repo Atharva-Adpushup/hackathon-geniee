@@ -43,12 +43,12 @@ function destroyAdpSlots() {
 
 	if (adpSlots.length) {
 		var adpGSlots = [];
-		adpSlots.forEach(function (adpSlot) {
+		adpSlots.forEach(function(adpSlot) {
 			adpGSlots.push(w.adpTags.adpSlots[adpSlot].gSlot);
 		});
 
 		w.adpTags.adpSlots = {};
-		w.googletag.cmd.push(function () {
+		w.googletag.cmd.push(function() {
 			w.googletag.destroySlots(adpGSlots);
 		});
 	}
@@ -74,7 +74,7 @@ function resetAdpConfig() {
 
 // Resets and initialises the adpushup config object
 function initAdpConfig() {
-	return new Promise(function (resolve) {
+	return new Promise(function(resolve) {
 		resetAdpConfig();
 		resetAdpTagsConfig();
 
@@ -113,7 +113,7 @@ function initAdpConfig() {
 			packetId: utils.uniqueId(__SITE_ID__)
 		});
 		resolve();
-	}).then(function () {
+	}).then(function() {
 		if (!window.adpushup.configExtended) {
 			if (ADPTAG_ACTIVE) {
 				//TODO: this needs to be changed
@@ -157,8 +157,7 @@ function triggerControl(mode, errorCode) {
 	config.mode = mode;
 
 	if (!errorCode) {
-		mode = 3;
-		config.mode = 3;
+		errorCode = commonConsts.ERROR_CODES.UNKNOWN;
 	}
 	if (config.partner === 'geniee' && !config.isAdPushupControlWithPartnerSSP) {
 		if (w.gnsmod && !w.gnsmod.creationProcessStarted && w.gnsmod.triggerAds) {
@@ -166,7 +165,7 @@ function triggerControl(mode, errorCode) {
 
 			// New feedback
 			utils.sendFeedback({
-				eventType: errorCode ? errorCode : commonConsts.ERROR_CODES.PAGEGROUP_NOT_FOUND,
+				eventType: errorCode,
 				mode: mode,
 				referrer: config.referrer
 			});
@@ -209,7 +208,7 @@ function selectVariationWrapper() {
 }
 
 function startCreation(forced) {
-	return new Promise(function (resolve) {
+	return new Promise(function(resolve) {
 		// ampInit(adp.config);
 		// if config has disable or this function triggered more than once or no pageGroup found then do nothing;
 		if (!forced && (shouldWeNotProceed() || !config.pageGroup || parseInt(config.mode, 10) === 2)) {
@@ -222,10 +221,14 @@ function startCreation(forced) {
 
 		if (w.adpushup.services.INNOVATIVE_ADS_ACTIVE && w.adpushup.config.innovativeAds.length) {
 			var channel = config.platform.toUpperCase() + ':' + config.pageGroup.toUpperCase();
-			innovativeInteractiveAds = utils.filterInteractiveAds(w.adpushup.config.innovativeAds, true, channel);
+			innovativeInteractiveAds = utils.filterInteractiveAds(
+				w.adpushup.config.innovativeAds,
+				true,
+				channel
+			);
 		}
 
-		return selectVariationWrapper().then(function (variationData) {
+		return selectVariationWrapper().then(function(variationData) {
 			var selectedVariation = variationData.selectedVariation;
 			var moduleConfig = variationData.config;
 			var isGenieeModeSelected = !!(adp && adp.geniee && adp.geniee.sendSelectedModeFeedback);
@@ -255,7 +258,7 @@ function startCreation(forced) {
 
 				adCreater.createAds(adp, selectedVariation);
 			} else {
-				triggerControl(commonConsts.MODE.FALLBACK);
+				triggerControl(commonConsts.MODE.FALLBACK, commonConsts.ERROR_CODES.VARIATION_NOT_SELECTED);
 			}
 
 			var finalInteractiveAds = !isControlVariation
@@ -309,7 +312,7 @@ function initAdpQue() {
 	}
 
 	processQue();
-	adp.que.push = function (queFunc) {
+	adp.que.push = function(queFunc) {
 		[].push.call(w.adpushup.que, queFunc);
 		processQue();
 	};
@@ -373,8 +376,10 @@ function main() {
 	}
 
 	if (!config.pageGroup) {
-		pageGroupTimer = setTimeout(function () {
-			!config.pageGroup ? triggerControl(commonConsts.MODE.FALLBACK) : clearTimeout(pageGroupTimer);
+		pageGroupTimer = setTimeout(function() {
+			!config.pageGroup
+				? triggerControl(commonConsts.MODE.FALLBACK, commonConsts.ERROR_CODES.PAGEGROUP_NOT_FOUND)
+				: clearTimeout(pageGroupTimer);
 		}, config.pageGroupTimeout);
 	} else {
 		// start heartBeat
