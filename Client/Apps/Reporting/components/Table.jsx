@@ -84,18 +84,9 @@ class Table extends React.Component {
 				sortedMetrics.push({
 					Header,
 					accessor: header,
-<<<<<<< HEAD
-					sortMethod: (a, b) => {
-						if (a.length === b.length) {
-							return a > b ? 1 : -1;
-						}
-						return a.length > b.length ? 1 : -1;
-					}
-=======
 					sortable: true,
 					table_position,
 					sortMethod: (a, b) => reactTableSortMethod(a, b)
->>>>>>> ed63b5941c2a16e7628b6620c50cf36993ed0aea
 				});
 			}
 		});
