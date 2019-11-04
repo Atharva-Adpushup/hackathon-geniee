@@ -55,7 +55,8 @@ class Table extends React.Component {
 			Header: 'Date',
 			accessor: 'date',
 			sortable: isDaily,
-			sortMethod: (a, b) => reactTableSortMethod(a, b)
+			Cell: props =>
+				isDaily ? <span>{moment(props.value).format('ll')}</span> : <span>{props.value}</span>
 		};
 
 		tableHeader.push(computedDate);
@@ -116,7 +117,7 @@ class Table extends React.Component {
 		tableData.forEach(row => {
 			const tableRow = { ...row };
 
-			if (isDaily) tableRow.date = moment(tableRow.date).format('ll');
+			if (isDaily) tableRow.date = tableRow.date;
 
 			if (isMonthly) {
 				if (
