@@ -610,7 +610,14 @@ class QuickSnapshot extends React.Component {
 
 	renderReportsUI = reportType =>
 		this.getComputedMetaData()
-			.then(() => this.setComputedState({ reportType, isLoading: false }))
+			.then(() => {
+				const { top10Sites } = this.state;
+
+				return this.getComputedSitesData(top10Sites);
+			})
+			.then(({ selectedSite }) =>
+				this.setComputedState({ selectedSite, reportType, isLoading: false })
+			)
 			.then(this.renderComputedWidgetsUI)
 			.catch(this.rootErrorHandler);
 
