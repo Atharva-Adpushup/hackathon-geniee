@@ -165,6 +165,7 @@ class Panel extends Component {
 		const params = this.getControlChangedParams({ ...data, reportType });
 
 		this.setState({
+			...data,
 			...params,
 			reportType
 		});
@@ -281,8 +282,8 @@ class Panel extends Component {
 	};
 
 	generateButtonHandler = (inputState = {}) => {
-		let { tableData } = this.state;
-		const { reportType, isCustomizeChartLegend } = this.props;
+		let { tableData, selectedDimension, selectedFilters } = this.state;
+		const { reportType, isCustomizeChartLegend, isForOps } = this.props;
 		const computedState = Object.assign({ isLoading: true }, inputState);
 
 		this.setState(computedState, () => {
@@ -292,6 +293,38 @@ class Panel extends Component {
 			reportService.getCustomStats(params).then(response => {
 				if (Number(response.status) === 200 && response.data) {
 					tableData = response.data;
+
+					const shouldAddAdpushupCountPercentColumn =
+						(selectedDimension === 'mode' ||
+							selectedDimension === 'error_code' ||
+							selectedFilters.mode ||
+							selectedFilters.error_code) &&
+						tableData.columns.indexOf('adpushup_count') !== -1;
+
+					// Add columns
+					if (isForOps && shouldAddAdpushupCountPercentColumn) {
+						tableData.columns.push('adpushup_count_percent');
+
+						const adpushupCountTotal = tableData.result.reduce((total, row) => {
+							const adpushupCount = row.adpushup_count;
+							// eslint-disable-next-line no-param-reassign
+							if (typeof adpushupCount === 'number') total += adpushupCount;
+
+							return total;
+						}, 0);
+
+						tableData.result.forEach(row => {
+							const perc = (row.adpushup_count / adpushupCountTotal) * 100;
+							// eslint-disable-next-line no-param-reassign
+							row.adpushup_count_percent = perc;
+						});
+					}
+
+					if (isForOps && reportType === 'account' && shouldAddAdpushupCountPercentColumn) {
+						tableData.total.total_adpushup_count_percent = 100;
+					}
+
+					// Compute data table total
 					if (
 						reportType === 'global' &&
 						!tableData.total &&
@@ -445,6 +478,10 @@ class Panel extends Component {
 					(total.total_adpushup_xpath_miss + total.total_adpushup_impressions)) *
 				100
 			).toFixed(2);
+		}
+
+		if (total.hasOwnProperty('total_adpushup_count_percent')) {
+			total.total_adpushup_count_percent = 100;
 		}
 
 		return total;
@@ -649,7 +686,9 @@ class Panel extends Component {
 			reportsMeta,
 			reportType: defaultReportType,
 			isCustomizeChartLegend,
-			isForOps
+			isForOps,
+			userSites,
+			user
 		} = this.props;
 
 		const allAvailableMetrics = this.getAllAvailableMetrics(
@@ -703,6 +742,8 @@ class Panel extends Component {
 						isForOps={isForOps}
 						csvData={csvData}
 						isDemoUser={isValid}
+						userSites={userSites}
+						user={user}
 					/>
 				</Col>
 				<Col sm={12} className="u-margin-t5">
