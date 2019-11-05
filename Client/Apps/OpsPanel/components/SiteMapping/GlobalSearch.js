@@ -20,6 +20,7 @@ class GlobalSearch extends React.Component {
 
 	globalSearch = () => {
 		const { searchInput, columnSearch } = this.state;
+
 		let filteredData = this.props.data.filter(value => {
 			if (columnSearch) {
 				return value[columnSearch]
@@ -27,24 +28,42 @@ class GlobalSearch extends React.Component {
 					.toLowerCase()
 					.includes(searchInput.toLowerCase());
 			}
-			return (
-				value.authEmail.toLowerCase().includes(searchInput.toLowerCase().trim()) ||
-				value.onboardingStatus.toLowerCase().includes(searchInput.toLowerCase().trim()) ||
-				value.accountEmail.toLowerCase().includes(searchInput.toLowerCase().trim()) ||
-				value.adManager.toLowerCase().includes(searchInput.toLowerCase().trim()) ||
-				value.domain.toLowerCase().includes(searchInput.toLowerCase().trim()) ||
-				value.dateCreated.toLowerCase().includes(searchInput.toLowerCase().trim()) ||
-				value.publisherId.toLowerCase().includes(searchInput.toLowerCase().trim()) ||
-				value.activeStatus.toLowerCase().includes(searchInput.toLowerCase().trim()) ||
-				value.siteId
-					.toString()
-					.toLowerCase()
-					.includes(searchInput.toLowerCase().trim()) ||
-				value.revenueShare
-					.toString()
-					.toLowerCase()
-					.includes(searchInput.toLowerCase().trim())
-			);
+
+			if (typeof value.activeProducts === 'string' && value.activeProducts === 'N/A') {
+				value.activeProducts = [];
+			}
+
+			return value.activeBidders
+				.map(val => val.toLowerCase().includes(searchInput.toLowerCase().trim()))
+				.includes(true)
+				? true
+				: false ||
+				  value.inactiveBidders
+						.map(val => val.toLowerCase().includes(searchInput.toLowerCase().trim()))
+						.includes(true)
+				? true
+				: false ||
+				  value.activeProducts
+						.map(val => val.toLowerCase().includes(searchInput.toLowerCase().trim()))
+						.includes(true)
+				? true
+				: false ||
+				  value.authEmail.toLowerCase().includes(searchInput.toLowerCase().trim()) ||
+				  value.onboardingStatus.toLowerCase().includes(searchInput.toLowerCase().trim()) ||
+				  value.accountEmail.toLowerCase().includes(searchInput.toLowerCase().trim()) ||
+				  value.adManager.toLowerCase().includes(searchInput.toLowerCase().trim()) ||
+				  value.domain.toLowerCase().includes(searchInput.toLowerCase().trim()) ||
+				  value.dateCreated.toLowerCase().includes(searchInput.toLowerCase().trim()) ||
+				  value.publisherId.toLowerCase().includes(searchInput.toLowerCase().trim()) ||
+				  value.activeStatus.toLowerCase().includes(searchInput.toLowerCase().trim()) ||
+				  value.siteId
+						.toString()
+						.toLowerCase()
+						.includes(searchInput.toLowerCase().trim()) ||
+				  value.revenueShare
+						.toString()
+						.toLowerCase()
+						.includes(searchInput.toLowerCase().trim());
 		});
 
 		this.props.handleSetFilteredData(filteredData);
