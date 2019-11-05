@@ -545,6 +545,7 @@ class Panel extends Component {
 			if ((isValidSite || isDemoUserReportingSite) && isReportingSite) {
 				selectedFilters = { siteid: { [computedSiteId]: true } };
 			}
+			selectedFilters = { siteid: { [siteId]: true } };
 		}
 
 		if (Object.keys(selectedControls).length > 0) {
