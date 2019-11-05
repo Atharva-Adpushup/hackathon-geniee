@@ -208,7 +208,7 @@ class Table extends React.Component {
 							break;
 						}
 						case 'percent': {
-							num = row[col];
+							num = roundOffTwoDecimal(row[col]);
 							row[col] = `${numberWithCommas(num)}%`;
 
 							break;
@@ -243,7 +243,7 @@ class Table extends React.Component {
 						break;
 					}
 					case 'percent': {
-						num = value;
+						num = roundOffTwoDecimal(value);
 						value = `${numberWithCommas(num)}%`;
 
 						break;

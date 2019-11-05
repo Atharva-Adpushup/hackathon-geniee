@@ -10,7 +10,10 @@ import SelectBox from '../../../Components/SelectBox/index';
 import { getPresets } from '../helpers/utils';
 import reportService from '../../../services/reportService';
 import { accountFilter, accountDimension, opsDimension, opsFilter } from '../configs/commonConsts';
-import { getReportingControlDemoUserSites } from '../../../helpers/commonFunctions';
+import {
+	getReportingControlDemoUserSites,
+	getReportingDemoUserSiteIds
+} from '../../../helpers/commonFunctions';
 
 class Control extends Component {
 	constructor(props) {
@@ -133,13 +136,27 @@ class Control extends Component {
 	};
 
 	getSelectedFilter = filter => {
-		const { reportType, defaultReportType, selectedFilters, isDemoUser } = this.props;
+		const { reportType, defaultReportType, selectedFilters, isDemoUser, isForOps } = this.props;
 		let siteIds;
 		let isSuperUser = false;
 
 		if (
-			reportType === 'account' ||
-			(defaultReportType !== 'global' && reportType === 'site' && filter.value === 'siteid')
+			isForOps &&
+			(reportType === 'account' ||
+				(defaultReportType !== 'global' && reportType === 'site' && filter.value === 'siteid'))
+		) {
+			const {
+				userSites,
+				user: {
+					data: { email }
+				}
+			} = this.props;
+			siteIds = Object.keys(userSites);
+			siteIds = getReportingDemoUserSiteIds(siteIds, email, reportType);
+		} else if (
+			!isForOps &&
+			(reportType === 'account' ||
+				(defaultReportType !== 'global' && reportType === 'site' && filter.value === 'siteid'))
 		) {
 			const { site } = this.props;
 			siteIds = Object.keys(site);
@@ -188,11 +205,6 @@ class Control extends Component {
 		let updatedDimensionList = JSON.parse(JSON.stringify(dimensionList));
 		let updatedFilterList = JSON.parse(JSON.stringify(filterList));
 
-		if (defaultReportType !== 'global') {
-			const json = this.removeOpsFilterDimension(filterList, dimensionList);
-			updatedDimensionList = json.updatedDimensionList;
-			updatedFilterList = json.updatedFilterList;
-		}
 		if (reportType === 'account' || reportType === 'global') {
 			updatedFilterList.forEach(fil => {
 				const index = accountFilter.indexOf(fil.value);

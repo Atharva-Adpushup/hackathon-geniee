@@ -8,14 +8,14 @@ import { checkReportTypeGlobal } from '../../../helpers/commonFunctions';
 
 const mapStateToProps = (state, ownProps) => {
 	const isReportTypeGlobal = checkReportTypeGlobal(ownProps);
+	const { isForOps } = ownProps;
 	const {
 		reports: { account: accountReportMetaData, global: globalReportMetaData },
 		sites,
 		user
 	} = state.global;
-	const reportsMeta = isReportTypeGlobal
-		? { ...globalReportMetaData }
-		: { ...accountReportMetaData };
+	const reportsMeta =
+		isForOps || isReportTypeGlobal ? { ...globalReportMetaData } : { ...accountReportMetaData };
 
 	return {
 		...ownProps,
@@ -27,9 +27,10 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = (dispatch, ownProps) => {
 	const isReportTypeGlobal = checkReportTypeGlobal(ownProps);
-	const updateReportMetaData = isReportTypeGlobal
-		? updateGlobalReportMetaData
-		: updateAccountReportMetaData;
+	const { isForOps } = ownProps;
+
+	const updateReportMetaData =
+		isForOps || isReportTypeGlobal ? updateGlobalReportMetaData : updateAccountReportMetaData;
 	const computedObject = {
 		updateReportMetaData: params => dispatch(updateReportMetaData(params))
 	};
