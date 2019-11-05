@@ -13,9 +13,9 @@ function getBidderJSX(bidderType, bidderObj, bidderKey, openAddManageBidderView)
 		<Card
 			key={bidderKey}
 			type="primary"
-			rootClassName={`bidders-list-card u-margin-r4 u-margin-b4 ${
-				bidderType === 'ADDED' && !isActive ? 'disabled' : ''
-			}`}
+			rootClassName={`bidders-list-card u-margin-r4 u-margin-b4 u-cursor-pointer ${
+				bidderType === 'NOT_ADDED' ? 'not-added-bidder-card' : 'added-bidder-card'
+			}${bidderType === 'ADDED' && !isActive ? ' disabled' : ''}`}
 			bodyClassName="card-body"
 			bodyChildren={
 				<div className="text-img">
@@ -26,14 +26,17 @@ function getBidderJSX(bidderType, bidderObj, bidderKey, openAddManageBidderView)
 				</div>
 			}
 			footerClassName="card-footer u-padding-0"
+			// eslint-disable-next-line react/jsx-no-bind
+			onClick={openAddManageBidderView.bind(
+				null,
+				bidderType === 'NOT_ADDED' ? 'addBidder' : 'manageBidder',
+				bidderKey,
+				bidderObj
+			)}
 			footerChildren={
 				<div className="aligner aligner--row">
 					{bidderType === 'NOT_ADDED' && (
-						<Button
-							className="aligner aligner-item aligner--hCenter u-padding-3 u-cursor-pointer"
-							// eslint-disable-next-line react/jsx-no-bind
-							onClick={openAddManageBidderView.bind(null, 'addBidder', bidderKey, bidderObj)}
-						>
+						<Button className="aligner aligner-item aligner--hCenter u-padding-3 u-cursor-pointer">
 							Add Bidder
 						</Button>
 					)}
@@ -43,12 +46,7 @@ function getBidderJSX(bidderType, bidderObj, bidderKey, openAddManageBidderView)
 							<span className="aligner aligner-item u-padding-3 aligner--hCenter">
 								Status: {isPaused ? 'Paused' : 'Active'}
 							</span>
-							<Button
-								className="aligner aligner-item u-padding-3 aligner--hCenter u-cursor-pointer"
-								onClick={() => {
-									openAddManageBidderView('manageBidder', bidderKey, bidderObj);
-								}}
-							>
+							<Button className="aligner aligner-item u-padding-3 aligner--hCenter u-cursor-pointer">
 								Manage
 							</Button>
 						</React.Fragment>

@@ -14,12 +14,13 @@ class Card extends React.Component {
 			bodyClassName,
 			bodyChildren,
 			footerClassName,
-			footerChildren
+			footerChildren,
+			...restProps
 		} = this.props;
 		const computedRootClassName = rootClassName ? `card ${rootClassName}` : 'card';
 
 		return (
-			<Panel className={computedRootClassName} bsStyle={type}>
+			<Panel className={computedRootClassName} bsStyle={type} {...restProps}>
 				{headerChildren ? (
 					<Panel.Heading className={headerClassName}>{headerChildren}</Panel.Heading>
 				) : null}

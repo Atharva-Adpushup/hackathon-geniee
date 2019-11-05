@@ -106,20 +106,20 @@ class AdSizeSelector extends React.Component {
 							<Col componentClass={ControlLabel} sm={3}>
 								Custom Size
 							</Col>
-							<Col sm={4}>
+							<Col sm={6}>
 								<InputBox
 									type="text"
 									name="hb-custom-size"
 									classNames="hb-input"
 									value={customSize}
 									onChange={this.setCustomSize}
-									placeholder="e.g. 728x90"
+									placeholder="WIDTHxHEIGHT e.g. 728x90"
 								/>
 								{!!customSizeError && (
 									<HelpBlock className="u-text-error">{customSizeError}</HelpBlock>
 								)}
 							</Col>
-							<Col sm={4}>
+							<Col sm={2}>
 								<CustomButton variant="secondary" onClick={this.onAddCustomSize}>
 									Add
 								</CustomButton>
