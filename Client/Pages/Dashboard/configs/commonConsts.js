@@ -81,6 +81,7 @@ const tableHeader = [
 ];
 
 const displayMetrics = {
+	network_gross_revenue: { name: 'Gross Revenue', valueType: 'money' },
 	network_net_revenue: { name: 'Net Revenue', valueType: 'money' },
 	adpushup_page_views: { name: 'Page Views', valueType: 'number' },
 	adpushup_page_cpm: { name: 'Page RPM', valueType: 'money' },
