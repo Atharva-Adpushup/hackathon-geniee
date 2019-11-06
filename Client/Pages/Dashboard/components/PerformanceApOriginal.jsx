@@ -90,7 +90,7 @@ class PerformanceApOriginal extends React.Component {
 				</div>
 			);
 		}
-		return <div className="text-center">Insufficient Data.</div>;
+		return <div className="text-center">Insufficient Data.Adpushup Optimization is Underway.</div>;
 	}
 
 	render() {
