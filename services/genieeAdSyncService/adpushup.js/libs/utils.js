@@ -402,15 +402,21 @@ module.exports = {
 		return window.location.href;
 	},
 	domanize: function(domain) {
-		return domain
-			? this.rightTrim(
-					domain
-						.replace('http://', '')
-						.replace('https://', '')
-						.replace('www.', ''),
-					'/'
-			  )
-			: '';
+		if(domain){
+			var hostname=this.rightTrim(
+				domain
+					.replace('http://', '')
+					.replace('https://', '')
+					.replace('www.', ''),
+				'/'
+		  );
+		  var indexOfFirstSlash=hostname.indexOf('/');
+		  indexOfFirstSlash=indexOfFirstSlash!==-1?indexOfFirstSlash:hostname.length;
+		  hostname=hostname.substring(0,indexOfFirstSlash);
+		  return hostname;
+		}else{
+			return "";
+		}		
 	},
 	isUrlMatching: function(siteDomain) {
 		var url = siteDomain || window.adpushup.config.siteDomain,
