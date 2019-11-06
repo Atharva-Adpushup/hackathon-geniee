@@ -23,7 +23,7 @@ const disableSiteCdnSyncList = [38333, 39468];
 // Websites: autocarindia (38333, It is running adpushup lite for which script is uploaded to CDN manually, for now)
 const ieTestingSiteList = [38903]; // iaai.com
 
-module.exports = function(site) {
+module.exports = function(site, user) {
 	ftp = new PromiseFtp();
 
 	var paramConfig = {
@@ -47,6 +47,7 @@ module.exports = function(site) {
 		setAllConfigs = function(combinedConfig) {
 			let apps = site.get('apps');
 			let apConfigs = site.get('apConfigs');
+			const adServerSettings = user.get('adServerSettings');
 			let isAdPartner = !!site.get('partner');
 			let { experiment, adpTagsConfig, manualAds, innovativeAds } = combinedConfig;
 
@@ -59,7 +60,7 @@ module.exports = function(site) {
 			apConfigs.spaPageTransitionTimeout = apConfigs.spaPageTransitionTimeout
 				? apConfigs.spaPageTransitionTimeout
 				: 0;
-			apConfigs.activeDFPNetwork = apConfigs.activeDFPNetwork ? apConfigs.activeDFPNetwork : null;
+			apConfigs.activeDFPNetwork = adServerSettings && adServerSettings.dfp && adServerSettings.dfp.activeDFPNetwork || null;
 
 			apConfigs.manualModeActive = !!(apps.apTag && manualAds && manualAds.length);
 			apConfigs.innovativeModeActive = !!(
