@@ -1,6 +1,5 @@
 import React from 'react';
-import FieldGroup from '../../../../Components/Layout/FieldGroup';
-import SelectBox from '../../../../Components/SelectBox/index';
+import { FormGroup, InputGroup, FormControl } from 'react-bootstrap';
 
 class GlobalSearch extends React.Component {
 	constructor(props) {
@@ -79,15 +78,33 @@ class GlobalSearch extends React.Component {
 
 		return (
 			<div className="u-margin-v4 u-padding-h4 ">
-				<FieldGroup
-					name="searchInput"
-					value={searchInput || ''}
-					label="Quick Search"
-					onChange={this.handleChange}
-					size={6}
-					placeholder="Search in the table "
-					className="u-padding-v4 u-padding-h4 "
-				/>
+				<p className="u-text-bold">Quick Search</p>
+				<FormGroup>
+					<InputGroup style={{ display: 'flex' }}>
+						<select
+							onChange={e => {
+								e.persist();
+								this.setColumnSearch(e);
+							}}
+							value={columnSearch}
+							style={{ backgroundColor: '#eee' }}
+						>
+							<option value=""> All columns</option>
+							{columns.map(col => {
+								return <option value={col.accessor}>{col.Header}</option>;
+							})}
+						</select>
+						<FormControl
+							type="text"
+							name="searchInput"
+							value={searchInput || ''}
+							onChange={this.handleChange}
+							size={6}
+							placeholder="Search in the table "
+							className="u-padding-v4 u-padding-h4 "
+						/>
+					</InputGroup>
+				</FormGroup>
 			</div>
 		);
 	}

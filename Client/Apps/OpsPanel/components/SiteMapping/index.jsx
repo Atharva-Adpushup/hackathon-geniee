@@ -19,13 +19,15 @@ import { copyToClipBoard } from '../../../../helpers/commonFunctions';
 import CustomIcon from '../../../../Components/CustomIcon/index';
 import CustomButton from '../../../../Components/CustomButton';
 import CustomError from '../../../../Components/CustomError/index';
-import { SITE_MAPPING_COLUMNS, SITE_MAPPING_FILTER_COLUMNS } from '../../configs/commonConsts';
+import { SITE_MAPPING_COLUMNS } from '../../configs/commonConsts';
+
 import GlobalSearch from './GlobalSearch';
 
 class SiteMapping extends Component {
 	state = {
 		data: [],
 		filteredData: [],
+		filterCopyForSeach: [],
 		isLoading: false,
 		isError: false,
 		selectAll: false,
@@ -139,6 +141,7 @@ class SiteMapping extends Component {
 
 			this.setState({
 				filteredData,
+				filterCopyForSeach: filteredData,
 				selectedData: [],
 				checked: [],
 				selectAll: false
@@ -213,7 +216,43 @@ class SiteMapping extends Component {
 
 		return sortedColumns.map(column => {
 			const { name: Header, key: accessor, width = 150, maxWidth = 150, minWidth = 150 } = column;
-			return { Header, accessor, width, maxWidth, minWidth };
+			const commonProps = { accessor, width, maxWidth, minWidth };
+
+			if (column.key === 'activeProducts')
+				return {
+					Header: () => {
+						return (
+							<span>
+								{Header}
+
+								<FontAwesomeIcon
+									size="1x"
+									icon="info-circle"
+									className="u-margin-r3"
+									style={{ marginLeft: '5' }}
+									className="info"
+									title="This would not match with Mysites>>sitename.com>>Manage Apps active products
+										as this data comes from reporting data"
+								/>
+							</span>
+						);
+					},
+					...commonProps
+				};
+			if (column.key !== 'activeStatus') return { Header, ...commonProps };
+			return {
+				Header,
+
+				getProps: (state, rowInfo, column) => ({
+					style: {
+						color:
+							rowInfo && rowInfo.row.activeStatus.props.children.includes('Active')
+								? 'green'
+								: 'red'
+					}
+				}),
+				...commonProps
+			};
 		});
 	};
 
@@ -296,7 +335,8 @@ class SiteMapping extends Component {
 			isLoading,
 			filteredData,
 			selectedData,
-			data: { result }
+			data: { result },
+			filterCopyForSeach
 		} = this.state;
 		if (isLoading) return <Loader height="600px" classNames="u-margin-v3" />;
 		const csvData = !selectedData.length ? filteredData : selectedData;
@@ -304,7 +344,7 @@ class SiteMapping extends Component {
 		return (
 			<React.Fragment>
 				<GlobalSearch
-					data={result}
+					data={!filterCopyForSeach.length ? result : filterCopyForSeach}
 					columns={SITE_MAPPING_COLUMNS}
 					handleSetFilteredData={this.handleSetFilteredData}
 					handleSetSearchInput={this.handleSetSearchInput}

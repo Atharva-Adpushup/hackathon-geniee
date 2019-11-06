@@ -4,6 +4,7 @@ const { N1qlQuery } = require('couchbase');
 const request = require('request-promise');
 const moment = require('moment');
 const _ = require('lodash');
+const clonedeep = require('lodash.clonedeep');
 
 const couchbase = require('../helpers/couchBaseService');
 const AdPushupError = require('../helpers/AdPushupError');
@@ -187,7 +188,9 @@ const commonSiteFunctions = {
 				filters: allProductNames,
 				isMultiValue: true,
 				showCopyBtn: true,
-				...DEFAULT_WIDTH
+				width: 180,
+				maxWidth: 180,
+				minWidth: 180
 			},
 			{
 				name: 'Active Bidders',
