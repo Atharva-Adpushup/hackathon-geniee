@@ -411,7 +411,8 @@ module.exports = {
 				'/'
 		  );
 		  var indexOfFirstSlash=hostname.indexOf('/');
-		  hostname=hostname.substring(0,(indexOfFirstSlash!==-1?indexOfFirstSlash:hostname.length));
+		  indexOfFirstSlash=indexOfFirstSlash!==-1?indexOfFirstSlash:hostname.length;
+		  hostname=hostname.substring(0,indexOfFirstSlash);
 		  return hostname;
 		}else{
 			return "";
