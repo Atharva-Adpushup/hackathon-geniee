@@ -562,7 +562,7 @@ class QuickSnapshot extends React.Component {
 		return computedSite;
 	};
 
-	setComputedState = state => this.setState(state);
+	setComputedState = (state, callback) => this.setState(state, callback || (() => {}));
 
 	setReportingMetaData = metaData => {
 		const { updateGlobalReportMetaData } = this.props;
@@ -608,16 +608,17 @@ class QuickSnapshot extends React.Component {
 		return false;
 	};
 
-	renderReportsUI = reportType =>
+	renderAsyncReportState = state =>
+		new Promise(resolve => this.setComputedState({ ...state, isLoading: false }, () => resolve()));
+
+	renderReportsUI = () =>
 		this.getComputedMetaData()
 			.then(() => {
 				const { top10Sites } = this.state;
 
 				return this.getComputedSitesData(top10Sites);
 			})
-			.then(({ selectedSite }) =>
-				this.setComputedState({ selectedSite, reportType, isLoading: false })
-			)
+			.then(({ selectedSite }) => this.renderAsyncReportState({ selectedSite }))
 			.then(this.renderComputedWidgetsUI)
 			.catch(this.rootErrorHandler);
 
@@ -809,7 +810,9 @@ class QuickSnapshot extends React.Component {
 						wrapperClassName="display-inline"
 						selected={reportType}
 						options={options}
-						onSelect={item => ref.setState({ isLoading: true }, () => ref.renderReportsUI(item))}
+						onSelect={item =>
+							ref.setState({ isLoading: true, reportType: item }, () => ref.renderReportsUI())
+						}
 					/>
 				</div>
 			</div>
