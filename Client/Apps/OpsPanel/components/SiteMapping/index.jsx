@@ -186,7 +186,9 @@ class SiteMapping extends Component {
 					cellValue = rowCopy[columnKey];
 				}
 
-				cellValue = cellValue || 'N/A';
+				if (!cellValue && cellValue !== 0) {
+					cellValue = 'N/A';
+				}
 
 				const showCopyIcon = cellValue !== 'N/A' && columnsMetaObj[columnKey].showCopyBtn;
 

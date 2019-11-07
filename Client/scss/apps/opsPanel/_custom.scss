@@ -144,11 +144,12 @@
 	float: right;
 }
 
-.ReactTable .-pagination .-btn {
-	opacity: 1 !important;
-}
-
 .records-info {
 	font-size: large;
 	opacity: 0.7;
+}
+
+.ReactTable .-pagination .-btn {
+	color: rgba(0, 0, 0, 0.5);
+	background: rgba(0, 0, 0, 0.18);
 }

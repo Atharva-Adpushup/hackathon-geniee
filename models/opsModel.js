@@ -257,7 +257,7 @@ function apiModule() {
 						const { publisherId, publisherEmail } = commonSiteFunctions.getPublisherIdAndEmail(
 							site.adNetworkSettings
 						);
-						if (!site.revenueShare) {
+						if (!site.revenueShare && site.revenueShare !== 0) {
 							site.revenueShare = 'N/A';
 						}
 						const {
