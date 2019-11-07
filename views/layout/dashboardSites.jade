@@ -58,132 +58,132 @@
 
                                 
 
-                        - siteDomain = (site.domain) ? site.domain : "";
-                        .weekly-report.weekly-report-wrapper
-                            if site.reportData
-                                - lastWeek = site.reportData.lastWeekReport
-                                - thisWeek = site.reportData.thisWeekReport
+                        //- - siteDomain = (site.domain) ? site.domain : "";
+                        //- .weekly-report.weekly-report-wrapper
+                        //-     if site.reportData
+                        //-         - lastWeek = site.reportData.lastWeekReport
+                        //-         - thisWeek = site.reportData.thisWeekReport
 
-                                .row.text-center.metrics-wrapper
-                                    .col-sm-4
-                                        .metric-count
-                                            span.lightBlue!= utils.numberFormatter(lastWeek.reportData.totalImpressions)
-                                            span  / 
-                                            span.darkBlue!= utils.numberFormatter(thisWeek.reportData.totalImpressions)
-                                        .report-mertic Impressions 
-                                            if Number(thisWeek.reportData.totalImpressions) > Number(lastWeek.reportData.totalImpressions)
+                        //-         .row.text-center.metrics-wrapper
+                        //-             .col-sm-4
+                        //-                 .metric-count
+                        //-                     span.lightBlue!= utils.numberFormatter(lastWeek.reportData.totalImpressions)
+                        //-                     span  / 
+                        //-                     span.darkBlue!= utils.numberFormatter(thisWeek.reportData.totalImpressions)
+                        //-                 .report-mertic Impressions 
+                        //-                     if Number(thisWeek.reportData.totalImpressions) > Number(lastWeek.reportData.totalImpressions)
 
-                                                div
-                                                    | (
-                                                    span!=`${(((Number(thisWeek.reportData.totalImpressions) - Number(lastWeek.reportData.totalImpressions)) / Number(lastWeek.reportData.totalImpressions)) * 100).toFixed(2)}%`
-                                                    i.fa.fa-arrow-up.green
-                                                    | )
-                                            else if Number(thisWeek.reportData.totalImpressions) < Number(lastWeek.reportData.totalImpressions)
+                        //-                         div
+                        //-                             | (
+                        //-                             span!=`${(((Number(thisWeek.reportData.totalImpressions) - Number(lastWeek.reportData.totalImpressions)) / Number(lastWeek.reportData.totalImpressions)) * 100).toFixed(2)}%`
+                        //-                             i.fa.fa-arrow-up.green
+                        //-                             | )
+                        //-                     else if Number(thisWeek.reportData.totalImpressions) < Number(lastWeek.reportData.totalImpressions)
 
-                                                div 
-                                                    | (
-                                                    span!=`${(((Number(lastWeek.reportData.totalImpressions) - Number(thisWeek.reportData.totalImpressions)) / Number(thisWeek.reportData.totalImpressions)) * 100).toFixed(2)}%`
-                                                    i.fa.fa-arrow-down.red
-                                                    | )
-                                    .col-sm-4
-                                        .metric-count
-                                            span.lightBlue!= lastWeek.reportData.totalCpm
-                                            span  / 
-                                            span.darkBlue!= thisWeek.reportData.totalCpm
-                                        .report-mertic CPM ($) 
-                                            if Number(thisWeek.reportData.totalCpm) > Number(lastWeek.reportData.totalCpm)
+                        //-                         div 
+                        //-                             | (
+                        //-                             span!=`${(((Number(lastWeek.reportData.totalImpressions) - Number(thisWeek.reportData.totalImpressions)) / Number(thisWeek.reportData.totalImpressions)) * 100).toFixed(2)}%`
+                        //-                             i.fa.fa-arrow-down.red
+                        //-                             | )
+                        //-             .col-sm-4
+                        //-                 .metric-count
+                        //-                     span.lightBlue!= lastWeek.reportData.totalCpm
+                        //-                     span  / 
+                        //-                     span.darkBlue!= thisWeek.reportData.totalCpm
+                        //-                 .report-mertic CPM ($) 
+                        //-                     if Number(thisWeek.reportData.totalCpm) > Number(lastWeek.reportData.totalCpm)
 
-                                                div 
-                                                    | (
-                                                    span!=`${(((Number(thisWeek.reportData.totalCpm) - Number(lastWeek.reportData.totalCpm)) / Number(lastWeek.reportData.totalCpm)) * 100).toFixed(2)}%`
-                                                    i.fa.fa-arrow-up.green
-                                                    | )
-                                            else if Number(thisWeek.reportData.totalCpm) < Number(lastWeek.reportData.totalCpm)
+                        //-                         div 
+                        //-                             | (
+                        //-                             span!=`${(((Number(thisWeek.reportData.totalCpm) - Number(lastWeek.reportData.totalCpm)) / Number(lastWeek.reportData.totalCpm)) * 100).toFixed(2)}%`
+                        //-                             i.fa.fa-arrow-up.green
+                        //-                             | )
+                        //-                     else if Number(thisWeek.reportData.totalCpm) < Number(lastWeek.reportData.totalCpm)
                                                 
-                                                div 
-                                                    | (
-                                                    span!=`${(((Number(lastWeek.reportData.totalCpm) - Number(thisWeek.reportData.totalCpm)) / Number(thisWeek.reportData.totalCpm)) * 100).toFixed(2)}%`
-                                                    i.fa.fa-arrow-down.red
-                                                    | )
-                                    .col-sm-4
-                                        .metric-count
-                                            span.lightBlue!= utils.numberFormatter(lastWeek.reportData.totalRevenue)
-                                            span  / 
-                                            span.darkBlue!= utils.numberFormatter(thisWeek.reportData.totalRevenue)
-                                        .report-mertic Revenue ($) 
-                                            if Number(thisWeek.reportData.totalRevenue) > Number(lastWeek.reportData.totalRevenue)
+                        //-                         div 
+                        //-                             | (
+                        //-                             span!=`${(((Number(lastWeek.reportData.totalCpm) - Number(thisWeek.reportData.totalCpm)) / Number(thisWeek.reportData.totalCpm)) * 100).toFixed(2)}%`
+                        //-                             i.fa.fa-arrow-down.red
+                        //-                             | )
+                        //-             .col-sm-4
+                        //-                 .metric-count
+                        //-                     span.lightBlue!= utils.numberFormatter(lastWeek.reportData.totalRevenue)
+                        //-                     span  / 
+                        //-                     span.darkBlue!= utils.numberFormatter(thisWeek.reportData.totalRevenue)
+                        //-                 .report-mertic Revenue ($) 
+                        //-                     if Number(thisWeek.reportData.totalRevenue) > Number(lastWeek.reportData.totalRevenue)
 
-                                                div 
-                                                    | (
-                                                    span!=`${(((Number(thisWeek.reportData.totalRevenue) - Number(lastWeek.reportData.totalRevenue)) / Number(lastWeek.reportData.totalRevenue)) * 100).toFixed(2)}%`
-                                                    i.fa.fa-arrow-up.green
-                                                    | )
-                                            else if Number(thisWeek.reportData.totalRevenue) < Number(lastWeek.reportData.totalRevenue)
+                        //-                         div 
+                        //-                             | (
+                        //-                             span!=`${(((Number(thisWeek.reportData.totalRevenue) - Number(lastWeek.reportData.totalRevenue)) / Number(lastWeek.reportData.totalRevenue)) * 100).toFixed(2)}%`
+                        //-                             i.fa.fa-arrow-up.green
+                        //-                             | )
+                        //-                     else if Number(thisWeek.reportData.totalRevenue) < Number(lastWeek.reportData.totalRevenue)
 
-                                                div 
-                                                    | (
-                                                    span!=`${(((Number(lastWeek.reportData.totalRevenue) - Number(thisWeek.reportData.totalRevenue)) / Number(thisWeek.reportData.totalRevenue)) * 100).toFixed(2)}%`
-                                                    i.fa.fa-arrow-down.red
-                                                    | )
-                                if isSuperUser
-                                    .row.su-metrics.text-center
-                                        .col-sm-4
-                                            .metric-count
-                                                span.lightBlue!= utils.numberFormatter(lastWeek.reportData.totalPageviews)
-                                                span  / 
-                                                span.darkBlue!= utils.numberFormatter(thisWeek.reportData.totalPageviews)
-                                            .report-mertic Pageviews 
-                                                if Number(thisWeek.reportData.totalPageviews) > Number(lastWeek.reportData.totalPageviews)
+                        //-                         div 
+                        //-                             | (
+                        //-                             span!=`${(((Number(lastWeek.reportData.totalRevenue) - Number(thisWeek.reportData.totalRevenue)) / Number(thisWeek.reportData.totalRevenue)) * 100).toFixed(2)}%`
+                        //-                             i.fa.fa-arrow-down.red
+                        //-                             | )
+                        //-         if isSuperUser
+                        //-             .row.su-metrics.text-center
+                        //-                 .col-sm-4
+                        //-                     .metric-count
+                        //-                         span.lightBlue!= utils.numberFormatter(lastWeek.reportData.totalPageviews)
+                        //-                         span  / 
+                        //-                         span.darkBlue!= utils.numberFormatter(thisWeek.reportData.totalPageviews)
+                        //-                     .report-mertic Pageviews 
+                        //-                         if Number(thisWeek.reportData.totalPageviews) > Number(lastWeek.reportData.totalPageviews)
 
-                                                     div 
-                                                        | (
-                                                        span!=`${(((Number(thisWeek.reportData.totalPageviews) - Number(lastWeek.reportData.totalPageviews)) / Number(lastWeek.reportData.totalPageviews)) * 100).toFixed(2)}%`
-                                                        i.fa.fa-arrow-up.green
-                                                        | )
-                                                else if Number(thisWeek.reportData.totalPageviews) < Number(lastWeek.reportData.totalPageviews)
+                        //-                              div 
+                        //-                                 | (
+                        //-                                 span!=`${(((Number(thisWeek.reportData.totalPageviews) - Number(lastWeek.reportData.totalPageviews)) / Number(lastWeek.reportData.totalPageviews)) * 100).toFixed(2)}%`
+                        //-                                 i.fa.fa-arrow-up.green
+                        //-                                 | )
+                        //-                         else if Number(thisWeek.reportData.totalPageviews) < Number(lastWeek.reportData.totalPageviews)
 
-                                                    div 
-                                                        | (
-                                                        span!=`${(((Number(lastWeek.reportData.totalPageviews) - Number(thisWeek.reportData.totalPageviews)) / Number(thisWeek.reportData.totalPageviews)) * 100).toFixed(2)}%`
-                                                        i.fa.fa-arrow-down.red
-                                                        | )
-                                        .col-sm-4
-                                            .metric-count
-                                                span.lightBlue!= lastWeek.reportData.totalPageCpm
-                                                span  / 
-                                                span.darkBlue!= thisWeek.reportData.totalPageCpm
-                                            .report-mertic Page CPM ($) 
-                                                if Number(thisWeek.reportData.totalPageCpm) > Number(lastWeek.reportData.totalPageCpm)
-                                                        div 
-                                                            | (
-                                                            span!=`${(((Number(thisWeek.reportData.totalPageCpm) - Number(lastWeek.reportData.totalPageCpm)) / Number(lastWeek.reportData.totalPageCpm)) * 100).toFixed(2)}%`
-                                                            i.fa.fa-arrow-up.green
-                                                            | )
-                                                else if Number(thisWeek.reportData.totalPageCpm) < Number(lastWeek.reportData.totalPageCpm)
+                        //-                             div 
+                        //-                                 | (
+                        //-                                 span!=`${(((Number(lastWeek.reportData.totalPageviews) - Number(thisWeek.reportData.totalPageviews)) / Number(thisWeek.reportData.totalPageviews)) * 100).toFixed(2)}%`
+                        //-                                 i.fa.fa-arrow-down.red
+                        //-                                 | )
+                        //-                 .col-sm-4
+                        //-                     .metric-count
+                        //-                         span.lightBlue!= lastWeek.reportData.totalPageCpm
+                        //-                         span  / 
+                        //-                         span.darkBlue!= thisWeek.reportData.totalPageCpm
+                        //-                     .report-mertic Page CPM ($) 
+                        //-                         if Number(thisWeek.reportData.totalPageCpm) > Number(lastWeek.reportData.totalPageCpm)
+                        //-                                 div 
+                        //-                                     | (
+                        //-                                     span!=`${(((Number(thisWeek.reportData.totalPageCpm) - Number(lastWeek.reportData.totalPageCpm)) / Number(lastWeek.reportData.totalPageCpm)) * 100).toFixed(2)}%`
+                        //-                                     i.fa.fa-arrow-up.green
+                        //-                                     | )
+                        //-                         else if Number(thisWeek.reportData.totalPageCpm) < Number(lastWeek.reportData.totalPageCpm)
 
-                                                    div 
-                                                        | (
-                                                        span!=`${(((Number(lastWeek.reportData.totalPageCpm) - Number(thisWeek.reportData.totalPageCpm)) / Number(thisWeek.reportData.totalPageCpm)) * 100).toFixed(2)}%`
-                                                        i.fa.fa-arrow-down.red
-                                                        | )
+                        //-                             div 
+                        //-                                 | (
+                        //-                                 span!=`${(((Number(lastWeek.reportData.totalPageCpm) - Number(thisWeek.reportData.totalPageCpm)) / Number(thisWeek.reportData.totalPageCpm)) * 100).toFixed(2)}%`
+                        //-                                 i.fa.fa-arrow-down.red
+                        //-                                 | )
                             
-                                .report-legend
-                                    .row.text-center
-                                        .col-sm-6.col-sm-offset-3
-                                            .report-label.bglightBlue 
-                                            .report-label-text 
-                                                | Last Week
-                                                strong(style="margin: 0 15px;") VS 
-                                            .report-label.bgdarkBlue 
-                                            .report-label-text This Week
-                                                .report-date
+                        //-         .report-legend
+                        //-             .row.text-center
+                        //-                 .col-sm-6.col-sm-offset-3
+                        //-                     .report-label.bglightBlue 
+                        //-                     .report-label-text 
+                        //-                         | Last Week
+                        //-                         strong(style="margin: 0 15px;") VS 
+                        //-                     .report-label.bgdarkBlue 
+                        //-                     .report-label-text This Week
+                        //-                         .report-date
                                                     
-                            else
-                                section
-                                    .site-status(style="margin-top: -20px; background-color: #fff;")
-                                        h4
-                                            i.fa.fa-exclamation-circle 
-                                            | No report data found for this site
+                        //-     else
+                        //-         section
+                        //-             .site-status(style="margin-top: -20px; background-color: #fff;")
+                        //-                 h4
+                        //-                     i.fa.fa-exclamation-circle 
+                        //-                     | No report data found for this site
                     //- else
                         h3.title.m-All-0.clearfix
                             a.pull-left(id="site-report-" + siteId).
@@ -201,13 +201,13 @@
                                     //- Page Group not found! Please 
                                     //- a(href="/user/site/#{siteId}/createPagegroup") create
                                     //- |  one to access the visual editor.
-                    if isSuperUser  
-                        .mode-setting
-                            span.label Manual Mode
-                            .toggle-switch
-                                input(type="checkbox" id="switch-#{siteId}" checked=site.isManual ? true : undefined)
-                                label(for="switch-#{siteId}", data-key="isManual" data-id="switch-#{siteId}" data-site-id="#{siteId}")
-                            span.label(style="margin-left: 20px") Innovative Ads
-                            .toggle-switch
-                                input.service-toggle(type="checkbox" id="switch-innovative-#{siteId}" checked=site.isInnovative ? true : undefined)
-                                label(for="switch-innovative-#{siteId}" data-key="isInnovative" data-id="switch-#{siteId}" data-site-id="#{siteId}")
+                    //- if isSuperUser  
+                    //-     .mode-setting
+                    //-         span.label Manual Mode
+                    //-         .toggle-switch
+                    //-             input(type="checkbox" id="switch-#{siteId}" checked=site.isManual ? true : undefined)
+                    //-             label(for="switch-#{siteId}", data-key="isManual" data-id="switch-#{siteId}" data-site-id="#{siteId}")
+                    //-         span.label(style="margin-left: 20px") Innovative Ads
+                    //-         .toggle-switch
+                    //-             input.service-toggle(type="checkbox" id="switch-innovative-#{siteId}" checked=site.isInnovative ? true : undefined)
+                    //-             label(for="switch-innovative-#{siteId}" data-key="isInnovative" data-id="switch-#{siteId}" data-site-id="#{siteId}")
