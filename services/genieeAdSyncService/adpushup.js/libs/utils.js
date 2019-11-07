@@ -402,27 +402,31 @@ module.exports = {
 		return window.location.href;
 	},
 	domanize: function(domain) {
-		if(domain){
-			var hostname=this.rightTrim(
+		if (domain) {
+			var hostname = this.rightTrim(
 				domain
 					.replace('http://', '')
 					.replace('https://', '')
 					.replace('www.', ''),
 				'/'
-		  );
-		  var indexOfFirstSlash=hostname.indexOf('/');
-		  indexOfFirstSlash=indexOfFirstSlash!==-1?indexOfFirstSlash:hostname.length;
-		  hostname=hostname.substring(0,indexOfFirstSlash);
-		  return hostname;
-		}else{
-			return "";
-		}		
+			);
+			var indexOfFirstSlash = hostname.indexOf('/');
+			indexOfFirstSlash = indexOfFirstSlash !== -1 ? indexOfFirstSlash : hostname.length;
+			hostname = hostname.substring(0, indexOfFirstSlash);
+			return hostname;
+		} else {
+			return '';
+		}
 	},
 	isUrlMatching: function(siteDomain) {
 		var url = siteDomain || window.adpushup.config.siteDomain,
+			href = '';
+		try {
+			href = window.top.location.toString();
+		} catch (err) {
 			href = this.getTopWindowHref();
+		}
 		url = this.domanize(url);
-
 		return href.indexOf(url) !== -1 ? true : false;
 	},
 	getObjectByName: function(collection, name) {
