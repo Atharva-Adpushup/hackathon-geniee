@@ -275,7 +275,7 @@ function startCreation(forced) {
 			if (shouldRunInnovativeAds) {
 				try {
 					function refreshSlotProcessing() {
-						var ads = finalInteractiveAds;
+						var ads = innovativeInteractiveAds;
 						for (var id in ads) {
 							var hasDfpAdUnit = ads[id].networkData && ads[id].networkData.dfpAdunit;
 							if (hasDfpAdUnit) {
@@ -289,7 +289,7 @@ function startCreation(forced) {
 							}
 						}
 					}
-					processInnovativeAds(finalInteractiveAds, refreshSlotProcessing);
+					processInnovativeAds(innovativeInteractiveAds, refreshSlotProcessing);
 				} catch (e) {
 					console.log('Innovative Ads Failed', e);
 				}
