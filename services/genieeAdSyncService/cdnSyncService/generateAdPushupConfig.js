@@ -151,7 +151,7 @@ const getVariationPayload = (variation, platform, pageGroup, variationData, fina
 	}
 
 	let ads = [];
-	if (Object.keys(variation.sections).length) {
+	if (variation.sections && Object.keys(variation.sections).length){
 		ads = getSectionsPayload(
 			variation.sections,
 			platform,
