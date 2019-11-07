@@ -1,3 +1,4 @@
+import React from 'react';
 // OP abbreviation stands for Ops Panel
 const OP_NAV_ITEMS_INDEXES = {
 	SETTINGS: 'settings',
@@ -365,148 +366,58 @@ const XPATH_MODE_URL = {
 	modes: [{ name: 'Mode 1', value: 'Mode 1' }, { name: 'Mode 2', value: 'Mode 2' }]
 };
 
-const DEFAULT_WIDTH = {
-	width: 150,
-	maxWidth: 150,
-	minWidth: 150
-};
-
 const SITE_MAPPING_COLUMNS = [
 	{
 		Header: 'Site ID',
-		accessor: 'siteId',
-		width: 100,
-		maxWidth: 100,
-		minWidth: 100
+		accessor: 'siteId'
 	},
 	{
 		Header: 'Domain',
-		accessor: 'domain',
-		width: 250,
-		maxWidth: 250,
-		minWidth: 250
+		accessor: 'domain'
 	},
 	{
 		Header: 'Owner Email',
-		accessor: 'accountEmail',
-		width: 250,
-		maxWidth: 250,
-		minWidth: 250
+		accessor: 'accountEmail'
 	},
 	{
 		Header: 'Onboarding Status',
-		accessor: 'onboardingStatus',
-		width: 200,
-		maxWidth: 200,
-		minWidth: 200
+		accessor: 'onboardingStatus'
 	},
 	{
 		Header: 'Active Status',
-		accessor: 'activeStatus',
-		getProps: (state, rowInfo, column) => ({
-			style: {
-				color:
-					rowInfo && rowInfo.row.activeStatus.props.children.includes('Active') ? 'green' : 'red'
-			}
-		}),
-		...DEFAULT_WIDTH
+		accessor: 'activeStatus'
 	},
 	{
 		Header: 'Date Created',
-		accessor: 'dateCreated',
-		...DEFAULT_WIDTH
+		accessor: 'dateCreated'
 	},
 	{
 		Header: 'Active Products',
-		accessor: 'activeProducts',
-		...DEFAULT_WIDTH
+		accessor: 'activeProducts'
 	},
 	{
 		Header: 'Active Bidders',
-		accessor: 'activeBidders',
-		...DEFAULT_WIDTH
+		accessor: 'activeBidders'
 	},
 	{
 		Header: 'Inactive Bidders',
-		accessor: 'inactiveBidders',
-		...DEFAULT_WIDTH
+		accessor: 'inactiveBidders'
 	},
 	{
 		Header: 'Rev Share(in %)',
-		accessor: 'revenueShare',
-		...DEFAULT_WIDTH
+		accessor: 'revenueShare'
 	},
 	{
 		Header: 'Publisher Id',
-		accessor: 'publisherId',
-		...DEFAULT_WIDTH
+		accessor: 'publisherId'
 	},
 	{
 		Header: 'Auth Email',
-		accessor: 'authEmail',
-		width: 200,
-		maxWidth: 200,
-		minWidth: 200
+		accessor: 'authEmail'
 	},
 	{
 		Header: 'Ad Manager',
-		accessor: 'adManager',
-		...DEFAULT_WIDTH
-	}
-];
-
-const SITE_MAPPING_FILTER_COLUMNS = [
-	{
-		name: 'Site Id',
-		prop: 'siteId'
-	},
-	{
-		name: 'Domain',
-		prop: 'domain'
-	},
-	{
-		name: 'Owner Email',
-		prop: 'accountEmail'
-	},
-	{
-		name: 'Onboarding Status',
-		prop: 'onboardingStatus'
-	},
-	{
-		name: 'Active Status',
-		prop: 'activeStatus'
-	},
-	{
-		name: 'Date Created',
-		prop: 'dateCreated'
-	},
-	{
-		name: 'Active Products',
-		prop: 'activeProducts'
-	},
-	{
-		name: 'Active Bidders',
-		prop: 'activeBidders'
-	},
-	{
-		name: 'Inactive Bidders',
-		prop: 'inactiveBidders'
-	},
-	{
-		name: 'Rev Share',
-		prop: 'revenueShare'
-	},
-	{
-		name: 'Publisher Id',
-		prop: 'publisherId'
-	},
-	{
-		name: 'Auth Email',
-		prop: 'authEmail'
-	},
-	{
-		name: 'Ad Manager',
-		prop: 'adManager'
+		accessor: 'adManager'
 	}
 ];
 
@@ -558,7 +469,6 @@ export {
 	SITE_MAPPING_COLUMNS,
 	MODE_TOOLTIP_TEXT,
 	ERROR_TOOLTIP_TEXT,
-	SITE_MAPPING_FILTER_COLUMNS,
 	ADPUSHUP_DFP,
 	ERROR_REPORT_PROPS,
 	PREBID_CURRENCY_URL

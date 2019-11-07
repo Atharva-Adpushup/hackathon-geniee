@@ -5,6 +5,7 @@
 import React, { Component } from 'react';
 import ReactTable from 'react-table';
 import clonedeep from 'lodash/cloneDeep';
+import sortBy from 'lodash/sortBy';
 import 'react-table/react-table.css';
 import { Row } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -18,18 +19,15 @@ import { copyToClipBoard } from '../../../../helpers/commonFunctions';
 import CustomIcon from '../../../../Components/CustomIcon/index';
 import CustomButton from '../../../../Components/CustomButton';
 import CustomError from '../../../../Components/CustomError/index';
-import { SITE_MAPPING_COLUMNS, SITE_MAPPING_FILTER_COLUMNS } from '../../configs/commonConsts';
+import { SITE_MAPPING_COLUMNS } from '../../configs/commonConsts';
 
-const DEFAULT_WIDTH = {
-	width: 50,
-	maxWidth: 50,
-	minWidth: 50
-};
+import GlobalSearch from './GlobalSearch';
 
 class SiteMapping extends Component {
 	state = {
 		data: [],
 		filteredData: [],
+		filterCopyForSeach: [],
 		isLoading: false,
 		isError: false,
 		selectAll: false,
@@ -43,7 +41,7 @@ class SiteMapping extends Component {
 			.get('/ops/allSitesStats')
 			.then(res => {
 				const { data = [] } = res.data;
-				this.setState({ data, filteredData: data, isLoading: false });
+				this.setState({ data, filteredData: data.result, isLoading: false });
 			})
 			.catch(() => this.setState({ isLoading: false, isError: true }));
 	}
@@ -80,36 +78,70 @@ class SiteMapping extends Component {
 		});
 	};
 
-	getFilterBoxValues = key => {
-		const { data } = this.state;
-		const values = [...new Set(data.map(val => val[key]))];
+	getFilterBoxValues = (key, filters) => {
+		let values;
+
+		if (Array.isArray(filters)) {
+			values = filters;
+		} else {
+			const {
+				data: { result: tableRows },
+				filteredData
+			} = this.state;
+
+			values = [...new Set(filteredData.map(val => val[key]))];
+		}
 
 		return values.map(value => ({ name: value }));
 	};
 
-	handleFilterValues = arr => {
-		const array = [];
-		arr.map(({ name, prop }) => {
-			array.push({ name, prop, values: this.getFilterBoxValues(prop) });
-		});
-		return array;
+	handleFilterValues = () => {
+		const {
+			data: { columns }
+		} = this.state;
+
+		if (!columns) return [];
+
+		return columns.map(({ name, key: prop, filters }) => ({
+			name,
+			prop,
+			values: this.getFilterBoxValues(prop, filters)
+		}));
 	};
 
 	handleFilters = filters => {
-		const { data } = this.state;
-		let filteredData = [...data];
+		const {
+			data: { columns: columnsMeta, result }
+		} = this.state;
+		const columnsMetaObj = this.convertColumnsMetaArrToObj(columnsMeta);
+		let filteredData = [...result];
 
 		for (const prop in filters) {
 			const filter = filters[prop];
 			// eslint-disable-next-line no-prototype-builtins
 			if (filters.hasOwnProperty(prop) && filter.values.length) {
-				// eslint-disable-next-line no-continue
+				filteredData = filteredData.filter(row => {
+					let rowFound = false;
 
-				filteredData = filteredData.filter(value => filter.values.indexOf(value[prop]) !== -1);
+					for (const filterValue of filter.values) {
+						if (columnsMetaObj[prop].isMultiValue && filterValue === 'N/A') {
+							rowFound = !row[prop].length;
+						} else if (columnsMetaObj[prop].isMultiValue) {
+							rowFound = row[prop].indexOf(filterValue) !== -1;
+						} else {
+							rowFound = row[prop] === filterValue;
+						}
+
+						if (rowFound) return true;
+					}
+
+					return rowFound;
+				});
 			}
 
 			this.setState({
 				filteredData,
+				filterCopyForSeach: filteredData,
 				selectedData: [],
 				checked: [],
 				selectAll: false
@@ -117,61 +149,130 @@ class SiteMapping extends Component {
 		}
 	};
 
-	filteredDataWithIcon = data => {
-		const keysWithoutCopyIcon = ['onboardingStatus', 'dateCreated', 'activeStatus', 'revenueShare'];
-		data.forEach(val => {
-			for (const key in val) {
-				const showCopyIcon = !!(val[key] === 'N/A' || keysWithoutCopyIcon.includes(key));
-				// eslint-disable-next-line no-prototype-builtins
-				if (val.hasOwnProperty(key)) {
-					val[key] = showCopyIcon ? (
-						<span> {val[key]}</span>
-					) : (
-						<span>
-							{val[key]}
+	convertColumnsMetaArrToObj = columnsMetaArr =>
+		columnsMetaArr.reduce((obj, column) => {
+			const { key, ...value } = column;
+			obj[key] = value;
+			return obj;
+		}, {});
+
+	getTableBody = (data, columnsMeta) => {
+		const columnsMetaObj = this.convertColumnsMetaArrToObj(columnsMeta);
+
+		return data.map(row => {
+			const rowCopy = clonedeep(row);
+			for (const columnKey in rowCopy) {
+				let cellValue = '';
+				if (columnsMetaObj[columnKey].isMultiValue && Array.isArray(rowCopy[columnKey])) {
+					cellValue = rowCopy[columnKey].reduce((accumulatedString, value) => {
+						let stringVal = '';
+
+						switch (typeof value) {
+							case 'string':
+								stringVal = value;
+								break;
+
+							case 'number':
+								stringVal = value.toString();
+								break;
+
+							default:
+								return stringVal;
+						}
+
+						return !accumulatedString ? stringVal : `${accumulatedString}, ${stringVal}`;
+					}, '');
+				} else {
+					cellValue = rowCopy[columnKey];
+				}
+
+				if (!cellValue && cellValue !== 0) {
+					cellValue = 'N/A';
+				}
+
+				const showCopyIcon = cellValue !== 'N/A' && columnsMetaObj[columnKey].showCopyBtn;
+
+				cellValue = (
+					<span title={cellValue}>
+						{cellValue}
+						{!!showCopyIcon && (
 							<CustomIcon
 								icon="copy"
 								onClick={copyToClipBoard}
-								toReturn={val[key]}
+								toReturn={cellValue}
 								className="u-text-red u-margin-l3 u-cursor-pointer site-mapping-copy"
-								title="copy content"
 							/>
-						</span>
-					);
-				}
+						)}
+					</span>
+				);
+
+				rowCopy[columnKey] = cellValue;
 			}
+
+			return rowCopy;
 		});
-		return data;
+	};
+
+	getTableHeaders = columns => {
+		const sortedColumns = sortBy(clonedeep(columns), ['position']);
+
+		return sortedColumns.map(column => {
+			const { name: Header, key: accessor, width = 150, maxWidth = 150, minWidth = 150 } = column;
+			const commonProps = { accessor, width, maxWidth, minWidth };
+
+			if (column.key === 'activeProducts')
+				return {
+					Header: () => {
+						return (
+							<span>
+								{Header}
+
+								<FontAwesomeIcon
+									size="1x"
+									icon="info-circle"
+									className="u-margin-r3"
+									style={{ marginLeft: '5' }}
+									className="info"
+									title="This would not match with Mysites>>sitename.com>>Manage Apps active products
+										as this data comes from reporting data"
+								/>
+							</span>
+						);
+					},
+					...commonProps
+				};
+			if (column.key !== 'activeStatus') return { Header, ...commonProps };
+			return {
+				Header,
+
+				getProps: (state, rowInfo, column) => ({
+					style: {
+						color:
+							rowInfo && rowInfo.row.activeStatus.props.children.includes('Active')
+								? 'green'
+								: 'red'
+					}
+				}),
+				...commonProps
+			};
+		});
 	};
 
 	renderContent = () => {
-		const { filteredData, isError, selectAll, checked } = this.state;
-		const dataWithIcon = clonedeep(filteredData);
-		const columns = [
-			// {
-			// 	Header: <input type="checkbox" onChange={this.handleChange} checked={selectAll} />,
-			// 	Cell: row => (
-			// 		<input
-			// 			type="checkbox"
-			// 			checked={checked[row.index]}
-			// 			onChange={e => this.handleSingleCheckboxChange(row.index, e)}
-			// 		/>
-			// 	),
-			// 	sortable: false,
-			// 	filterable: false,
-			// 	...DEFAULT_WIDTH
-			// },
-
-			...SITE_MAPPING_COLUMNS
-		];
+		const {
+			data: { columns: columnsMeta },
+			filteredData,
+			isError
+		} = this.state;
+		const filteredDataCopy = clonedeep(filteredData);
 
 		if (isError) return <CustomError />;
 		if (!filteredData.length) return <Empty message=" No Data found " />;
 
 		return (
 			<ReactTable
-				columns={columns}
-				data={this.filteredDataWithIcon(dataWithIcon)}
+				columns={this.getTableHeaders(columnsMeta)}
+				data={this.getTableBody(filteredDataCopy, columnsMeta)}
 				filterable={false}
 				showPaginationTop
 				showPaginationBottom={false}
@@ -180,7 +281,40 @@ class SiteMapping extends Component {
 				pageSizeOptions={[50, 100, 150, 200, 250]}
 				minRows={0}
 				sortable={true}
-			/>
+			>
+				{(state, makeTable, instance) => {
+					let recordsInfoText = '';
+
+					const { filtered, pageRows, pageSize, sortedData, page } = state;
+
+					if (sortedData && sortedData.length > 0) {
+						let isFiltered = filtered.length > 0;
+
+						let totalRecords = sortedData.length;
+
+						let recordsCountFrom = page * pageSize + 1;
+
+						let recordsCountTo = recordsCountFrom + pageRows.length - 1;
+
+						if (isFiltered)
+							recordsInfoText = `${recordsCountFrom}-${recordsCountTo} of ${totalRecords} filtered records`;
+						else
+							recordsInfoText = `${recordsCountFrom}-${recordsCountTo} of ${totalRecords} records`;
+					} else recordsInfoText = 'No records';
+
+					return (
+						<div className="main-grid">
+							<div className="above-table text-right">
+								<div className="col-sm-12">
+									<span className="records-info">{recordsInfoText} </span>
+								</div>
+							</div>
+
+							{makeTable()}
+						</div>
+					);
+				}}
+			</ReactTable>
 		);
 	};
 
@@ -190,36 +324,36 @@ class SiteMapping extends Component {
 		}, 0);
 	};
 
-	sendMail = () => {
-		const { selectedData } = this.state;
-		const { showNotification } = this.props;
+	handleSetFilteredData = filteredData => {
+		this.setState({ filteredData });
+	};
 
-		if (!selectedData.length) {
-			return showNotification({
-				mode: 'error',
-				title: 'Operation Failed',
-				message: 'Please select atleast 1 entry',
-				autoDismiss: 5
-			});
-		}
-		const message = 'Are you sure you want to send the bulk mail ?';
-		!window.confirm(message)
-			? console.log('You have selected no')
-			: console.log('we are sending the bulk mail for you');
-
-		this.setState({ checked: [], selectedData: [], selectAll: false });
+	handleSetSearchInput = searchInput => {
+		this.setState({ searchInput });
 	};
 
 	render() {
-		const { isLoading, filteredData, selectedData } = this.state;
+		const {
+			isLoading,
+			filteredData,
+			selectedData,
+			data: { result },
+			filterCopyForSeach
+		} = this.state;
 		if (isLoading) return <Loader height="600px" classNames="u-margin-v3" />;
 		const csvData = !selectedData.length ? filteredData : selectedData;
 
 		return (
 			<React.Fragment>
+				<GlobalSearch
+					data={!filterCopyForSeach.length ? result : filterCopyForSeach}
+					columns={SITE_MAPPING_COLUMNS}
+					handleSetFilteredData={this.handleSetFilteredData}
+					handleSetSearchInput={this.handleSetSearchInput}
+					className="u-margin-v5 u-margin-h4 site-stats"
+				/>
 				<FilterBox
-					onFilter={this.onFilter}
-					availableFilters={this.handleFilterValues(SITE_MAPPING_FILTER_COLUMNS)}
+					availableFilters={this.handleFilterValues()}
 					handleFilters={this.handleFilters}
 					className="u-margin-v5 u-margin-h4 site-stats"
 				/>
@@ -235,15 +369,6 @@ class SiteMapping extends Component {
 							</CustomButton>
 						</CSVLink>
 					) : null}
-
-					{/* <CustomButton
-						variant="secondary"
-						className=" pull-right u-margin-r3 u-margin-b4 "
-						onClick={this.sendMail}
-					>
-						<FontAwesomeIcon size="1x" icon="mail-bulk" className="u-margin-r3" />
-						Send Custom Mail
-					</CustomButton> */}
 				</Row>
 				{this.renderContent()}
 			</React.Fragment>
