@@ -43,7 +43,9 @@ var $ = require('jquery'),
 					zoneContainerId: ad.networkData.zoneContainerId
 				});
 			// 'isADPTags' will be true if atleast one ADP tag is present
-			shouldPushToADP(ad) ? (adpTagUnits.push(ad), (window.adpushup.config.isADPTags = true)) : null;
+			shouldPushToADP(ad)
+				? (adpTagUnits.push(ad), (window.adpushup.config.isADPTags = true))
+				: null;
 
 			// Push ads to structural ad array only if ad is not interactive or not incontent
 			if (
@@ -76,10 +78,16 @@ var $ = require('jquery'),
 		}
 		var isGenieePartner = !!(ad.network === 'geniee' && !ad.networkData.adCode),
 			isGenieeWithoutDFP = !!(isGenieePartner && !ad.networkData.dynamicAllocation),
-			isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length && ad.multipleAdSizes.length > 1),
+			isMultipleAdSizes = !!(
+				ad.multipleAdSizes &&
+				ad.multipleAdSizes.length &&
+				ad.multipleAdSizes.length > 1
+			),
 			isGenieeNetwork = !!(ad.network === 'geniee' && ad.networkData && ad.networkData.zoneId),
 			isZoneContainerId = !!(isGenieeNetwork && ad.networkData.zoneContainerId),
-			computedSSPContainerId = isZoneContainerId ? ad.networkData.zoneContainerId : ad.networkData.zoneId,
+			computedSSPContainerId = isZoneContainerId
+				? ad.networkData.zoneContainerId
+				: ad.networkData.zoneId,
 			defaultAdProperties = {
 				display: isGenieeWithoutDFP ? 'none' : 'block',
 				clear: ad.isIncontent ? null : 'both'
@@ -219,7 +227,8 @@ var $ = require('jquery'),
 				});
 			},
 			next = function(adObj, data) {
-				var newFeedbackAdObj = $.extend({}, adObj),
+				//var newFeedbackAdObj = $.extend({}, adObj),
+				var newFeedbackAdObj = {},
 					isContainerVisible;
 
 				if (displayCounter) {
@@ -242,16 +251,21 @@ var $ = require('jquery'),
 
 						// feedbackData.xpathMiss = [];
 						// New feedback
-						newFeedbackAdObj.status = commonConsts.AD_STATUS.IMPRESSION;
-						newFeedbackAdObj.ads = [newFeedbackAdObj];
-						feedbackData.newFeedbackAdObj = newFeedbackAdObj;
-						feedbackData.eventType = 1;
-						feedbackData.mode = 1;
+						//newFeedbackAdObj.status = commonConsts.AD_STATUS.IMPRESSION;
+						adObj.status = commonConsts.AD_STATUS.IMPRESSION;
+						//newFeedbackAdObj.ads = [newFeedbackAdObj];
+						newFeedbackAdObj.ads = [$.extend({}, adObj)];
+						//feedbackData.newFeedbackAdObj = newFeedbackAdObj;
+						//feedbackData.eventType = 1;
+						newFeedbackAdObj.errorCode = commonConsts.ERROR_CODES.NO_ERROR;
+						//feedbackData.mode = 1;
+						newFeedbackAdObj.mode = commonConsts.MODE.ADPUSHUP;
 
-						feedbackData.xpathMiss = [];
-						feedbackData.ads = [adObj.id];
+						//feedbackData.xpathMiss = [];
+						//feedbackData.ads = [adObj.id];
 						placeAd(data.container, adObj);
-						utils.sendFeedbackOld(feedbackData);
+						// utils.sendFeedbackOld(feedbackData);
+						utils.sendFeedback(newFeedbackAdObj);
 
 						// Old feedback
 						// feedbackData.eventType = 1;
@@ -260,16 +274,21 @@ var $ = require('jquery'),
 						// utils.sendFeedbackOld(feedbackData);
 					} else {
 						// New feedback
-						newFeedbackAdObj.xpathMiss = true;
-						newFeedbackAdObj.status = commonConsts.AD_STATUS.XPATH_MISS;
-						newFeedbackAdObj.ads = [newFeedbackAdObj];
-						feedbackData.newFeedbackAdObj = newFeedbackAdObj;
+						//newFeedbackAdObj.xpathMiss = true;
+						//newFeedbackAdObj.status = commonConsts.AD_STATUS.XPATH_MISS;
+						adObj.status = commonConsts.AD_STATUS.XPATH_MISS;
+						//newFeedbackAdObj.ads = [newFeedbackAdObj];
+						newFeedbackAdObj.ads = [$.extend({}, adObj)];
+						//feedbackData.newFeedbackAdObj = newFeedbackAdObj;
 
-						feedbackData.ads = [];
-						feedbackData.eventType = 1;
-						feedbackData.mode = 1;
-						feedbackData.xpathMiss = [adObj.id];
-						utils.sendFeedbackOld(feedbackData);
+						//feedbackData.ads = [];
+						//feedbackData.eventType = 1;
+						newFeedbackAdObj.errorCode = commonConsts.ERROR_CODES.NO_ERROR;
+						//feedbackData.mode = 1;
+						newFeedbackAdObj.mode = commonConsts.MODE.ADPUSHUP;
+						//feedbackData.xpathMiss = [adObj.id];
+						// utils.sendFeedbackOld(feedbackData);
+						utils.sendFeedback(newFeedbackAdObj);
 
 						// Old feedback
 						// var oldFeedbackData = $.extend({}, feedbackData);

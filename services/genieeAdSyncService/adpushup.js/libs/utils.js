@@ -282,7 +282,9 @@ module.exports = {
 				siteDomain: adpConfig.siteDomain,
 				url: adpConfig.pageUrl,
 				mode: data.mode, // Denotes which mode is running (adpushup or fallback)
-				errorCode: data.eventType, // Denotes the error code (no error, pagegroup not found etc.)
+				//errorCode: data.eventType, // Denotes the error code (no error, pagegroup not found etc.)
+				errorCode: data.errorCode, // Denotes the error code (no error, pagegroup not found etc.)
+				referrer: adpConfig.referrer,
 				pageGroup: adpConfig.pageGroup,
 				pageVariationId: adpConfig.selectedVariation,
 				pageVariationName: adpConfig.selectedVariationName,
