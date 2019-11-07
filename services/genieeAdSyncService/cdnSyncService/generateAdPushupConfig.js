@@ -150,19 +150,23 @@ const getVariationPayload = (variation, platform, pageGroup, variationData, fina
 		return true;
 	}
 
-	const ads = getSectionsPayload(
-		variation.sections,
-		platform,
-		pageGroup,
-		variation.selectorsTreeLevel
-	);
+	let ads = [];
+	if (Object.keys(variation.sections).length) {
+		ads = getSectionsPayload(
+			variation.sections,
+			platform,
+			pageGroup,
+			variation.selectorsTreeLevel
+		);
+	}
+
 	let computedVariationObj;
 	const contentSelector = variation.contentSelector;
 	const isContentSelector = !!contentSelector;
 
-	if (!ads.length) {
+	/*if (!ads.length) {
 		return true;
-	}
+	}*/
 
 	computedVariationObj = {
 		id: variation.id,
