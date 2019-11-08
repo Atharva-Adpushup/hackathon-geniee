@@ -5,8 +5,9 @@ import CustomToggleSwitch from "../../../Components/CustomToggleSwitch.jsx";
 import { Row, Col } from "react-bootstrap";
 import commonConsts from "../lib/commonConsts";
 import "react-dates/initialize";
-import { DateRangePicker } from "react-dates";
+import { DateRangePicker, isInclusivelyBeforeDay } from "react-dates";
 import "react-dates/lib/css/_datepicker.css";
+import moment from "moment";
 
 let groupByArray = commonConsts.GROUP_BY;
 
@@ -328,7 +329,14 @@ class ReportControls extends Component {
                 showClearDates={true}
                 minimumNights={0}
                 displayFormat={"DD-MM-YYYY"}
-                isOutsideRange={() => {}}
+                isOutsideRange={day =>
+                  !isInclusivelyBeforeDay(
+                    day,
+                    moment()
+                      .startOf("month")
+                      .set({ year: 2019, month: 10 })
+                  )
+                }
               />
             </Col>
           </Row>
