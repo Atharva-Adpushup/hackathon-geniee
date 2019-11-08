@@ -165,17 +165,17 @@ function triggerControl(mode, errorCode) {
 
 			// New feedback
 			utils.sendFeedback({
-				eventType: errorCode,
+				errorCode: errorCode,
 				mode: mode,
 				referrer: config.referrer
 			});
 
 			// Old feedback
-			utils.sendFeedbackOld({
+			/*utils.sendFeedbackOld({
 				eventType: 3,
 				mode: mode,
 				referrer: config.referrer
-			});
+			});*/
 		}
 	} else {
 		adp.creationProcessStarted = true;
@@ -183,17 +183,17 @@ function triggerControl(mode, errorCode) {
 
 		// New feedback
 		utils.sendFeedback({
-			eventType: errorCode ? errorCode : commonConsts.ERROR_CODES.PAGEGROUP_NOT_FOUND,
+			errorCode: errorCode ? errorCode : commonConsts.ERROR_CODES.PAGEGROUP_NOT_FOUND,
 			mode: mode,
 			referrer: config.referrer
 		});
 
 		// Old feedback
-		utils.sendFeedbackOld({
+		/*utils.sendFeedbackOld({
 			eventType: 3,
 			mode: mode,
 			referrer: config.referrer
-		});
+		});*/
 	}
 }
 
