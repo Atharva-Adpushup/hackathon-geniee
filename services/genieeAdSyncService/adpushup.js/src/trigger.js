@@ -87,7 +87,7 @@ var adp = window.adpushup,
 						referrer: config.referrer,
 						tracking: browserConfig.trackerSupported,
 						variationId: commonConsts.MANUAL_ADS.VARIATION
-					},
+					};
 					//oldFeedbackData = $.extend(true, {}, feedbackData);
 
 				//oldFeedbackData.ads = [ad.originalId];
