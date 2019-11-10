@@ -45,7 +45,7 @@ var feedback = {
 		var feedbackData = this.getFeedbackData(slot, defaultWinner);
 
 		// Old feedback
-		adp.$.post(constants.FEEDBACK.URL_OLD, JSON.stringify(feedbackData));
+		// adp.$.post(constants.FEEDBACK.URL_OLD, JSON.stringify(feedbackData));
 
 		return adp.$.get(
 			constants.FEEDBACK.URL + adp.utils.base64Encode(JSON.stringify(feedbackData))

@@ -1,6 +1,7 @@
 const Promise = require('bluebird');
 
 const siteModel = require('../../../models/siteModel');
+const userModel = require('../../../models/userModel');
 const CONFIG = require('../../../configs/config');
 const CONSTANTS = require('../constants/constants');
 const Consumer = require('../libs/consumer');
@@ -78,7 +79,8 @@ function syncCDNWrapper(decodedMessage) {
 
 	return siteModel
 		.getSiteById(decodedMessage.siteId)
-		.then(site => syncCDNService(site))
+		.then(site => Promise.join(site, userModel.getUserByEmail(site.get('ownerEmail'))))
+		.then(([site, user]) => syncCDNService(site, user))
 		.then(() => decodedMessage.siteId);
 }
 

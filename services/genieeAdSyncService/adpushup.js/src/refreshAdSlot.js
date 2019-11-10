@@ -74,7 +74,7 @@ var utils = require('../libs/utils'),
 		var feedbackData = {
 			ads: [],
 			xpathMiss: [],
-			eventType: 1,
+			errorCode: 1,
 			mode: 1,
 			referrer: adp.config.referrer,
 			tracking: false
@@ -105,7 +105,8 @@ var utils = require('../libs/utils'),
 				adRenderTime = container.attr('data-render-time'),
 				lastRefreshTime = container.attr('data-refresh-time'),
 				currentTime = new Date().getTime(),
-				adRefreshInterval = parseInt(ad.networkData.refreshInterval) * 1000 || commonConsts.AD_REFRESH_INTERVAL,
+				adRefreshInterval =
+					parseInt(ad.networkData.refreshInterval) * 1000 || commonConsts.AD_REFRESH_INTERVAL,
 				timeDifferenceInSec,
 				refreshInterval;
 			if (lastRefreshTime) {
@@ -139,7 +140,8 @@ var utils = require('../libs/utils'),
 				ad = inViewAd.ad,
 				lastRefreshTime = container.attr('data-refresh-time'),
 				currentTime = new Date().getTime(),
-				adRefreshInterval = parseInt(ad.networkData.refreshInterval) * 1000 || commonConsts.AD_REFRESH_INTERVAL,
+				adRefreshInterval =
+					parseInt(ad.networkData.refreshInterval) * 1000 || commonConsts.AD_REFRESH_INTERVAL,
 				timeDifferenceInSec,
 				refreshInterval;
 			if (lastRefreshTime) {
