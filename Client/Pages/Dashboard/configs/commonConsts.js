@@ -89,6 +89,8 @@ const displayMetrics = {
 	network_ad_ecpm: { name: 'Ad eCPM', valueType: 'money' }
 };
 
+const opsDisplayMetricsKeys = ['network_gross_revenue'];
+
 const dashboardWidgets = [
 	'per_site_wise',
 	'estimated_earnings',
@@ -115,6 +117,7 @@ export {
 	yAxisGroups,
 	tableHeader,
 	displayMetrics,
+	opsDisplayMetricsKeys,
 	dashboardWidgets,
 	activeLegendItemArray,
 	REPORT_LINK
