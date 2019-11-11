@@ -60,8 +60,7 @@ class Settings extends Component {
 		const isTransitionInValid = isSPA && isNaN(Number(spaPageTransitionTimeout));
 		const isAdPushupPercentageInValid =
 			isNaN(Number(adpushupPercentage)) || adpushupPercentage > 100 || adpushupPercentage < 0;
-		const isRevenueShareInValid =
-			isNaN(Number(revenueShare)) || revenueShare > 100 || revenueShare < 0;
+		const isRevenueShareInValid = isNaN(Number(revenueShare)) || revenueShare > 100;
 		const isAdsLabelInValid = isAdsLabelOn && !adsLabel.trim().length;
 		const isDataWrong =
 			isTransitionInValid ||

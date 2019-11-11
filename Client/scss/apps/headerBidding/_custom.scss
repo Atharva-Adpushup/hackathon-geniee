@@ -93,6 +93,18 @@
 					}
 				}
 			}
+			&.added-bidder-card {
+				.text-img {
+					background: #fff;
+					.top-right-text {
+						background: $primaryColor;
+					}
+					.text {
+						background-color: $primaryColor;
+						text-shadow: none;
+					}
+				}
+			}
 		}
 		.u-cursor-pointer:hover {
 			background: rgba($color: #000000, $alpha: 0.05);
@@ -124,7 +136,6 @@
 		text-align: left;
 	}
 	.hb-input {
-		max-width: 250px;
 		height: 35px;
 	}
 	.non-sizeless-params {

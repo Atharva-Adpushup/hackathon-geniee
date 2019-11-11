@@ -157,25 +157,16 @@ router
 				);
 		}
 
-		const getAccessToken = oauthHelper.getAccessTokens(req.query.code).then(tokenObject => {
-			const {
-				// eslint-disable-next-line camelcase
-				tokens: { access_token, id_token, expiry_date }
-			} = tokenObject;
-			const computedObject = { access_token, id_token, expiry_date };
-
-			return computedObject;
-		});
-		const getRefreshToken = oauthHelper.getAccessTokens(req.query.code).then(tokenObject => {
-			const {
-				// eslint-disable-next-line camelcase
-				tokens: { refresh_token, id_token, expiry_date }
-			} = tokenObject;
-			const computedObject = { refresh_token, id_token, expiry_date };
-
-			return computedObject;
-		});
-		const getAdsenseAccounts = getAccessToken.then(token =>
+		const getTokens = oauthHelper
+			.getAccessTokens(req.query.code)
+			// eslint-disable-next-line camelcase
+			.then(({ tokens: { access_token, refresh_token, id_token, expiry_date } }) => ({
+				access_token,
+				refresh_token,
+				id_token,
+				expiry_date
+			}));
+		const getAdsenseAccounts = getTokens.then(token =>
 			request({
 				strictSSL: false,
 				uri: `https://www.googleapis.com/adsense/v1.4/accounts?access_token=${token.access_token}`,
@@ -193,7 +184,7 @@ router
 					throw err;
 				})
 		);
-		const getUserDFPInfo = getRefreshToken.then(token => {
+		const getUserDFPInfo = getTokens.then(token => {
 			// eslint-disable-next-line camelcase
 			const { refresh_token } = token;
 			const { OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET } = config.googleOauth;
@@ -215,7 +206,7 @@ router
 				return [];
 			});
 		});
-		const getUserInfo = getAccessToken.then(token =>
+		const getUserInfo = getTokens.then(token =>
 			request({
 				strictSSL: false,
 				uri: `https://www.googleapis.com/oauth2/v2/userinfo?access_token=${token.access_token}`,
@@ -226,13 +217,13 @@ router
 
 		return Promise.join(
 			getUser,
-			getAccessToken,
+			getTokens,
 			getAdsenseAccounts,
 			getUserInfo,
 			getUserDFPInfo,
-			(user, token, adsenseAccounts, userInfo, userDFPInfo) => {
+			(user, tokens, adsenseAccounts, userInfo, userDFPInfo) => {
 				// eslint-disable-next-line camelcase
-				const { id_token, access_token, expiry_date } = token;
+				const { access_token, refresh_token, expiry_date } = tokens;
 				const adServerSettings = user.get('adServerSettings') || {};
 				const activeAdServerData = adServerSettings.dfp;
 
@@ -254,7 +245,7 @@ router
 				return Promise.all([
 					user.addNetworkData({
 						networkName: 'ADSENSE',
-						refreshToken: id_token,
+						refreshToken: refresh_token,
 						accessToken: access_token,
 						expiresIn: expiry_date,
 						pubId: adsenseAccounts[0].id,
@@ -264,7 +255,7 @@ router
 					}),
 					user.addNetworkData({
 						networkName: 'DFP',
-						refreshToken: id_token,
+						refreshToken: refresh_token,
 						accessToken: access_token,
 						expiresIn: expiry_date,
 						userInfo,

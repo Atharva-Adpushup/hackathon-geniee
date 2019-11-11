@@ -20,7 +20,8 @@ class Component {
 
 	sendFeedback(options) {
 		if (adp && adp.utils && adp.utils.sendFeedback) {
-			adp.utils.sendFeedbackOld(options);
+			//adp.utils.sendFeedbackOld(options);
+			adp.utils.sendFeedback(options);
 		}
 	}
 
@@ -74,11 +75,11 @@ class Component {
 
 		const feedbackOptions = {
 			// ads: [this.interactiveAd],
-			xpathMiss: [],
-			// eventType: commonConsts.ERROR_CODES.NO_ERROR,
-			// mode: window.adpushup.config.mode,
-			referrer: adp.config.referrer,
-			tracking: false,
+			// xpathMiss: [],
+			errorCode: 1,
+			mode: window.adpushup.config.mode,
+			// referrer: adp.config.referrer,
+			// tracking: false,
 			variationId: !adp.config.manualModeActive
 				? adp.config.selectedVariation
 				: commonConsts.MANUAL_ADS.VARIATION
@@ -86,16 +87,17 @@ class Component {
 
 		// uncomment the below when re-thinking poweredByAdPushup logic
 		// const $frame = $('<div />');
-		const newFeedbackAdObj = $.extend({}, this.interactiveAd);
+		// const newFeedbackAdObj = $.extend({}, this.interactiveAd);
+		const adObj = $.extend({}, this.interactiveAd);
 
 		// New feedback
-		newFeedbackAdObj.status = 1;
-		newFeedbackAdObj.ads = [newFeedbackAdObj];
-		feedbackOptions.newFeedbackAdObj = newFeedbackAdObj;
+		adObj.status = 1;
+		//newFeedbackAdObj.ads = [newFeedbackAdObj];
+		feedbackOptions.ads = [adObj];
 
-		feedbackOptions.eventType = 1;
-		feedbackOptions.mode = 1;
-		feedbackOptions.ads = [this.interactiveAd.id];
+		//feedbackOptions.eventType = 1;
+		//feedbackOptions.mode = 1;
+		//feedbackOptions.ads = [this.interactiveAd.id];
 
 		$format.attr({ id, 'data-section': id, class: '_ap_apex_ad' });
 		// uncomment the below when re-thinking poweredByAdPushup logic

@@ -157,8 +157,7 @@ function triggerControl(mode, errorCode) {
 	config.mode = mode;
 
 	if (!errorCode) {
-		mode = 3;
-		config.mode = 3;
+		errorCode = commonConsts.ERROR_CODES.UNKNOWN;
 	}
 	if (config.partner === 'geniee' && !config.isAdPushupControlWithPartnerSSP) {
 		if (w.gnsmod && !w.gnsmod.creationProcessStarted && w.gnsmod.triggerAds) {
@@ -166,17 +165,17 @@ function triggerControl(mode, errorCode) {
 
 			// New feedback
 			utils.sendFeedback({
-				eventType: errorCode ? errorCode : commonConsts.ERROR_CODES.PAGEGROUP_NOT_FOUND,
+				errorCode: errorCode,
 				mode: mode,
 				referrer: config.referrer
 			});
 
 			// Old feedback
-			utils.sendFeedbackOld({
+			/*utils.sendFeedbackOld({
 				eventType: 3,
 				mode: mode,
 				referrer: config.referrer
-			});
+			});*/
 		}
 	} else {
 		adp.creationProcessStarted = true;
@@ -184,17 +183,17 @@ function triggerControl(mode, errorCode) {
 
 		// New feedback
 		utils.sendFeedback({
-			eventType: errorCode ? errorCode : commonConsts.ERROR_CODES.PAGEGROUP_NOT_FOUND,
+			errorCode: errorCode ? errorCode : commonConsts.ERROR_CODES.PAGEGROUP_NOT_FOUND,
 			mode: mode,
 			referrer: config.referrer
 		});
 
 		// Old feedback
-		utils.sendFeedbackOld({
+		/*utils.sendFeedbackOld({
 			eventType: 3,
 			mode: mode,
 			referrer: config.referrer
-		});
+		});*/
 	}
 }
 
@@ -217,12 +216,16 @@ function startCreation(forced) {
 		}
 
 		var innovativeInteractiveAds = [];
-		var layoutAndManualInteractiveAds = [];
+		// var layoutAndManualInteractiveAds = [];
 		var isControlVariation = false;
 
 		if (w.adpushup.services.INNOVATIVE_ADS_ACTIVE && w.adpushup.config.innovativeAds.length) {
 			var channel = config.platform.toUpperCase() + ':' + config.pageGroup.toUpperCase();
-			innovativeInteractiveAds = utils.filterInteractiveAds(w.adpushup.config.innovativeAds, true, channel);
+			innovativeInteractiveAds = utils.filterInteractiveAds(
+				w.adpushup.config.innovativeAds,
+				true,
+				channel
+			);
 		}
 
 		return selectVariationWrapper().then(function(variationData) {
@@ -247,30 +250,32 @@ function startCreation(forced) {
 				}
 
 				// Load interactive ads script if interactive ads are present in adpushup config
-				layoutAndManualInteractiveAds = utils.getInteractiveAds(config);
+				// layoutAndManualInteractiveAds = utils.getInteractiveAds(config);
 
-				if (selectVariation.isControl) {
+				if (selectedVariation.isControl) {
 					isControlVariation = true;
 				}
 
 				adCreater.createAds(adp, selectedVariation);
 			} else {
-				triggerControl(commonConsts.MODE.FALLBACK);
+				triggerControl(commonConsts.MODE.FALLBACK, commonConsts.ERROR_CODES.VARIATION_NOT_SELECTED);
 			}
 
-			var finalInteractiveAds = !isControlVariation
-				? innovativeInteractiveAds.concat(layoutAndManualInteractiveAds)
-				: layoutAndManualInteractiveAds;
-			var shouldRunInnovatibeAds = !!(
+			// var finalInteractiveAds = !isControlVariation
+			// 	? innovativeInteractiveAds.concat(layoutAndManualInteractiveAds)
+			// 	: layoutAndManualInteractiveAds;
+
+			var shouldRunInnovativeAds = !!(
 				w.adpushup.services.INNOVATIVE_ADS_ACTIVE &&
-				finalInteractiveAds &&
-				finalInteractiveAds.length
+				!isControlVariation &&
+				innovativeInteractiveAds &&
+				innovativeInteractiveAds.length
 			);
 
-			if (shouldRunInnovatibeAds) {
+			if (shouldRunInnovativeAds) {
 				try {
 					function refreshSlotProcessing() {
-						var ads = finalInteractiveAds;
+						var ads = innovativeInteractiveAds;
 						for (var id in ads) {
 							var hasDfpAdUnit = ads[id].networkData && ads[id].networkData.dfpAdunit;
 							if (hasDfpAdUnit) {
@@ -284,7 +289,7 @@ function startCreation(forced) {
 							}
 						}
 					}
-					processInnovativeAds(finalInteractiveAds, refreshSlotProcessing);
+					processInnovativeAds(innovativeInteractiveAds, refreshSlotProcessing);
 				} catch (e) {
 					console.log('Innovative Ads Failed', e);
 				}
@@ -374,7 +379,9 @@ function main() {
 
 	if (!config.pageGroup) {
 		pageGroupTimer = setTimeout(function() {
-			!config.pageGroup ? triggerControl(commonConsts.MODE.FALLBACK) : clearTimeout(pageGroupTimer);
+			!config.pageGroup
+				? triggerControl(commonConsts.MODE.FALLBACK, commonConsts.ERROR_CODES.PAGEGROUP_NOT_FOUND)
+				: clearTimeout(pageGroupTimer);
 		}, config.pageGroupTimeout);
 	} else {
 		// start heartBeat

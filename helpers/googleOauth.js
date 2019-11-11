@@ -69,7 +69,7 @@ module.exports = {
 			scope: config.googleOauth.OAUTH_SCOPE, // If you only need one scope you can pass it as string
 			// eslint-disable-next-line new-undef
 			client_id: config.googleOauth.OAUTH_CLIENT_ID,
-			approval_prompt: 'force',
+			prompt: 'consent',
 			state: state // unique long string
 		});
 	},

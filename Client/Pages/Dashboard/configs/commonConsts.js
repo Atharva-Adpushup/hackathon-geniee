@@ -81,12 +81,15 @@ const tableHeader = [
 ];
 
 const displayMetrics = {
+	network_gross_revenue: { name: 'Gross Revenue', valueType: 'money' },
 	network_net_revenue: { name: 'Net Revenue', valueType: 'money' },
 	adpushup_page_views: { name: 'Page Views', valueType: 'number' },
 	adpushup_page_cpm: { name: 'Page RPM', valueType: 'money' },
 	network_impressions: { name: 'Impressions', valueType: 'number' },
 	network_ad_ecpm: { name: 'Ad eCPM', valueType: 'money' }
 };
+
+const opsDisplayMetricsKeys = ['network_gross_revenue'];
 
 const dashboardWidgets = [
 	'per_site_wise',
@@ -114,6 +117,7 @@ export {
 	yAxisGroups,
 	tableHeader,
 	displayMetrics,
+	opsDisplayMetricsKeys,
 	dashboardWidgets,
 	activeLegendItemArray,
 	REPORT_LINK
