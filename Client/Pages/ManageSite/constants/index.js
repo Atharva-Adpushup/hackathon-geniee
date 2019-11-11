@@ -18,12 +18,16 @@ const APPS = [
 		image: '/assets/images/manageSites/layout-optimization.png',
 		description:
 			'Our visual ad manager allows point-and-click creation of new ad units and layouts, while our machine learning based layout optimizer drives sustainable revenue growth using continuous automated A/B testing.',
+		// left: {
+		// 	type: TYPE.LINK,
+		// 	text: 'View Reports',
+		// 	link: LINK_TYPE.INAPP,
+		// 	destination: '/reporting/__SITE_ID__',
+		// 	icon: 'chart-area'
+		// },
 		left: {
-			type: TYPE.LINK,
-			text: 'View Reports',
-			link: LINK_TYPE.INAPP,
-			destination: '/reporting/__SITE_ID__',
-			icon: 'chart-area'
+			type: TYPE.TEXT,
+			text: 'Status: __STATUS__'
 		},
 		right: {
 			type: TYPE.LINK,
@@ -41,11 +45,8 @@ const APPS = [
 		description:
 			'Our ad-reinsertion technology helps web publishers recover the money that they are losing due to ad blocking software. The ads we run adhere to the highest UX standards as laid out by the Acceptable Ads Committee.',
 		left: {
-			type: TYPE.LINK,
-			text: 'View Reports',
-			link: LINK_TYPE.INAPP,
-			destination: '/reporting/__SITE_ID__',
-			icon: 'chart-area'
+			type: TYPE.TEXT,
+			text: 'Status: __STATUS__'
 		},
 		right: {
 			type: TYPE.LINK,
@@ -63,11 +64,8 @@ const APPS = [
 		description:
 			'In addition to standard IAB units, we offer sticky ads, docked ads, in-image ads, and native ads. We fill these ads with premium demand via our partner ad networks and exchanges to maximise publisher revenue.',
 		left: {
-			type: TYPE.LINK,
-			text: 'View Reports',
-			link: LINK_TYPE.INAPP,
-			destination: '/reporting/__SITE_ID__',
-			icon: 'chart-area'
+			type: TYPE.TEXT,
+			text: 'Status: __STATUS__'
 		},
 		right: {
 			type: TYPE.LINK,
@@ -85,11 +83,8 @@ const APPS = [
 		description:
 			'In addition to standard IAB units, we offer sticky ads, docked ads, in-image ads, and native ads. We fill these ads with premium demand via our partner ad networks and exchanges to maximise publisher revenue.',
 		left: {
-			type: TYPE.LINK,
-			text: 'View Reports',
-			link: LINK_TYPE.INAPP,
-			destination: '/reporting/__SITE_ID__',
-			icon: 'chart-area'
+			type: TYPE.TEXT,
+			text: 'Status: __STATUS__'
 		},
 		right: {
 			type: TYPE.LINK,

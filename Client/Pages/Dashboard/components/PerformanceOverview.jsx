@@ -1,7 +1,8 @@
 import React from 'react';
-import { numberWithCommas, roundOffTwoDecimal, getWidgetValidDationState } from '../helpers/utils';
-import { displayMetrics } from '../configs/commonConsts';
 import sortBy from 'lodash/sortBy';
+import cloneDeep from 'lodash/cloneDeep';
+import { numberWithCommas, roundOffTwoDecimal, getWidgetValidDationState } from '../helpers/utils';
+import { displayMetrics, opsDisplayMetricsKeys } from '../configs/commonConsts';
 
 function computeDisplayData(props) {
 	const {
@@ -68,16 +69,25 @@ class PerformanceOverview extends React.Component {
 
 	render() {
 		const { displayData } = this.state;
+		const { isForOps } = this.props;
+		const computedDisplayMetrics = cloneDeep(displayMetrics);
+		if (!isForOps) {
+			Object.keys(computedDisplayMetrics).forEach(displayMetricKey => {
+				const isOpsKey = opsDisplayMetricsKeys.indexOf(displayMetricKey) !== -1;
+				if (isOpsKey) delete computedDisplayMetrics[displayMetricKey];
+			});
+		}
+
 		return (
 			<div className="u-margin-t4 u-margin-b4">
 				{displayData.length > 0 ? (
 					displayData.map(({ name, value, col }) =>
-						displayMetrics[col] ? (
+						computedDisplayMetrics[col] ? (
 							<div className="col-sm-4 u-margin-b4 text-center" key={col}>
 								<div className="font-small">{name}</div>
 								<div className="estimatedEarning">
 									<span>
-										{displayMetrics[col].valueType == 'money'
+										{computedDisplayMetrics[col].valueType == 'money'
 											? `$${numberWithCommas(roundOffTwoDecimal(value))}`
 											: numberWithCommas(value)}
 									</span>

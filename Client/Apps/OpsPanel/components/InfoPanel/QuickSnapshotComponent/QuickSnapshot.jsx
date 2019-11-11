@@ -355,7 +355,8 @@ class QuickSnapshot extends React.Component {
 				OPS_COUNTRY_REPORT,
 				OPS_NETWORK_REPORT,
 				OPS_ERROR_REPORT
-			}
+			},
+			isForOps
 		} = this.props;
 		const { reportType } = this.state;
 		let computedWidgetData;
@@ -376,7 +377,13 @@ class QuickSnapshot extends React.Component {
 				);
 
 			case PER_OVERVIEW:
-				return <PerformanceOverviewContainer reportType={reportType} displayData={widget.data} />;
+				return (
+					<PerformanceOverviewContainer
+						reportType={reportType}
+						displayData={widget.data}
+						isForOps={isForOps}
+					/>
+				);
 
 			case OPS_TOP_SITES:
 				computedWidgetData = this.getTopSitesWidgetTransformedData(widget.data);
