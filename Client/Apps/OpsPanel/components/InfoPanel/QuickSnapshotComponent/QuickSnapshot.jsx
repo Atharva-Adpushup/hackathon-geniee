@@ -482,7 +482,11 @@ class QuickSnapshot extends React.Component {
 						widgetsConfig[wid].isDataSufficient = true;
 						widgetsConfig[wid].sitesList = top10Sites;
 
-						if (isWidgetNamePerAPOriginal) widgetsConfig[wid].selectedSite = computedSelectedSite;
+						const isEmptySiteForApOriginalWidget = !!(isWidgetNamePerAPOriginal && !selectedSite);
+
+						if (isEmptySiteForApOriginalWidget) {
+							widgetsConfig[wid].selectedSite = computedSelectedSite;
+						}
 					} else {
 						widgetsConfig[wid].data = {};
 						widgetsConfig[wid].isDataSufficient = false;
