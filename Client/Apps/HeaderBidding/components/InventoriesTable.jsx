@@ -3,20 +3,31 @@ import ReactTable from 'react-table';
 import { Checkbox } from 'react-bootstrap';
 import { INVENTORY_TABLE_COLUMNS } from '../constants/index';
 
-function getHeader(handleSelectAllInventories, checkedCopy, handleInventorySelect, selectAll) {
+function getHeader(
+	handleSelectAllInventories,
+	handleInventorySelect,
+	selectAllInventories,
+	selectedInventories
+) {
 	return [
 		{
 			Header: (
 				<Checkbox
-					checked={selectAll}
+					checked={selectAllInventories}
 					onChange={handleSelectAllInventories}
 					style={{ float: 'left' }}
 				/>
 			),
-			Cell: row => (
+			Cell: ({
+				original: {
+					adUnit: {
+						props: { title }
+					}
+				}
+			}) => (
 				<Checkbox
-					checked={checkedCopy[row.index]}
-					onChange={e => handleInventorySelect(row.index, e)}
+					checked={selectedInventories.indexOf(title) > -1}
+					onChange={e => handleInventorySelect(e, title)}
 				/>
 			),
 			sortable: false,
@@ -49,11 +60,16 @@ const InventoriesTable = ({
 	inventories,
 	handleSelectAllInventories,
 	handleInventorySelect,
-	checkedCopy,
-	selectAll
+	selectAllInventories,
+	selectedInventories
 }) => (
 	<ReactTable
-		columns={getHeader(handleSelectAllInventories, checkedCopy, handleInventorySelect, selectAll)}
+		columns={getHeader(
+			handleSelectAllInventories,
+			handleInventorySelect,
+			selectAllInventories,
+			selectedInventories
+		)}
 		data={getBody(inventories)}
 		className="-striped -highlight u-padding-h3 u-padding-v2 inventory-table"
 		pageSizeOptions={[10, 25, 50, 100]}

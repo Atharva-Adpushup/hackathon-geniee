@@ -18,8 +18,7 @@ export default class InventoryTab extends React.Component {
 		hbStatusForSite: null,
 		loadingHbStatusForSite: true,
 		updatingInventoryHbStatus: false,
-		checkedCopy: [],
-		selectAll: false
+		selectAllInventories: false
 	};
 
 	componentDidMount() {
@@ -71,36 +70,28 @@ export default class InventoryTab extends React.Component {
 	}
 
 	handleSelectAllInventories = () => {
-		const { filteredInventories, selectAll } = this.state;
-		const checked = [];
-		this.setState({ selectAll: !selectAll }, () => {
-			const { selectAll } = this.state;
-			filteredInventories.forEach(() => {
-				checked.push(selectAll);
-			});
-			this.setState({
-				checkedCopy: checked,
-				selectedInventories: selectAll
-					? [...filteredInventories].map(inventory => inventory.adUnit)
-					: []
-			});
-		});
+		const { filteredInventories, selectAllInventories } = this.state;
+		const newState = {};
+		newState.selectAllInventories = !selectAllInventories;
+		newState.selectedInventories = !selectAllInventories
+			? [...filteredInventories].map(inventory => inventory.adUnit)
+			: [];
+
+		this.setState(newState);
 	};
 
-	handleInventorySelect = (index, e) => {
+	handleInventorySelect = (e, adUnit) => {
 		const { checkedCopy, selectedInventories, filteredInventories } = this.state;
 		const checked = checkedCopy;
 		if (e.target.checked) {
-			checked[index] = e.target.checked;
-			selectedInventories.push(filteredInventories[index].adUnit);
+			selectedInventories.push(adUnit);
 		} else {
-			checked[index] = e.target.checked;
-			selectedInventories.splice(selectedInventories.indexOf(filteredInventories[index].adUnit), 1);
+			selectedInventories.splice(selectedInventories.indexOf(adUnit), 1);
 		}
 		this.setState({
 			checkedCopy: checked,
 			selectedInventories,
-			selectAll: selectedInventories.length === filteredInventories.length
+			selectAllInventories: selectedInventories.length === filteredInventories.length
 		});
 	};
 
@@ -194,7 +185,7 @@ export default class InventoryTab extends React.Component {
 			loadingHbStatusForSite,
 			updatingInventoryHbStatus,
 			checkedCopy,
-			selectAll
+			selectAllInventories
 		} = this.state;
 
 		return (
@@ -304,7 +295,7 @@ export default class InventoryTab extends React.Component {
 									handleInventorySelect={this.handleInventorySelect}
 									handleSelectAllInventories={this.handleSelectAllInventories}
 									checkedCopy={checkedCopy}
-									selectAll={selectAll}
+									selectAllInventories={selectAllInventories}
 								/>
 							)
 						)}
