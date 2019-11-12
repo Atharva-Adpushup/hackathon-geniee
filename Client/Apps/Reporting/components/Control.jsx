@@ -59,18 +59,6 @@ class Control extends Component {
 		this.setState(newState);
 	}
 
-	shouldComponentUpdate(nextProps, nextState) {
-		const { state: currState } = this;
-		return (
-			currState.reportType !== nextState.reportType ||
-			currState.updateStatusText !== nextState.updateStatusText ||
-			!isEqual(
-				{ dimensionList: currState.dimensionList, filterList: currState.filterList },
-				{ dimensionList: nextState.dimensionList, filterList: nextState.filterList }
-			)
-		);
-	}
-
 	onReportBySelect = selectedDimension => {
 		const { reportType } = this.props;
 		this.setState({ selectedDimension }, this.onControlChange.bind(null, reportType));
@@ -136,15 +124,12 @@ class Control extends Component {
 	};
 
 	getSelectedFilter = filter => {
-		const { reportType, defaultReportType, selectedFilters, isDemoUser, isForOps } = this.props;
-		let siteIds;
+		const { reportType, defaultReportType, selectedFilters, isDemoUser } = this.props;
+		let siteIds = [];
 		let isSuperUser = false;
+		const selectedSiteIds = selectedFilters.siteid && Object.keys(selectedFilters.siteid);
 
-		if (
-			isForOps &&
-			(reportType === 'account' ||
-				(defaultReportType !== 'global' && reportType === 'site' && filter.value === 'siteid'))
-		) {
+		if (defaultReportType !== 'global' && filter.value === 'siteid') {
 			const {
 				userSites,
 				user: {
@@ -152,22 +137,31 @@ class Control extends Component {
 				}
 			} = this.props;
 			siteIds = Object.keys(userSites);
-			siteIds = getReportingDemoUserSiteIds(siteIds, email, reportType);
-		} else if (
-			!isForOps &&
-			(reportType === 'account' ||
-				(defaultReportType !== 'global' && reportType === 'site' && filter.value === 'siteid'))
-		) {
-			const { site } = this.props;
-			siteIds = Object.keys(site);
-		} else if (
-			reportType === 'global' ||
-			(defaultReportType === 'global' && reportType === 'site' && filter.value === 'siteid')
-		) {
-			siteIds = '';
+			siteIds = getReportingDemoUserSiteIds(siteIds, email, reportType, true);
+		} else if (defaultReportType === 'global' && filter.value === 'siteid') {
+			isSuperUser = true;
+		} else if (reportType === 'account') {
+			const {
+				userSites,
+				user: {
+					data: { email }
+				}
+			} = this.props;
+
+			if (selectedSiteIds && selectedSiteIds.length) {
+				siteIds = selectedSiteIds;
+			} else {
+				siteIds = Object.keys(userSites);
+				siteIds = getReportingDemoUserSiteIds(siteIds, email, reportType);
+			}
+		} else if (reportType === 'global') {
+			if (selectedSiteIds && selectedSiteIds.length) {
+				siteIds = selectedSiteIds;
+			}
+
 			isSuperUser = true;
 		} else {
-			siteIds = selectedFilters.siteid ? Object.keys(selectedFilters.siteid) : [];
+			siteIds = selectedSiteIds && selectedSiteIds.length ? selectedSiteIds : [];
 		}
 
 		const params = { siteid: siteIds.toString(), isSuperUser };
@@ -202,8 +196,8 @@ class Control extends Component {
 	};
 
 	updateFilterDimensionList = (reportType, defaultReportType, filterList, dimensionList) => {
-		let updatedDimensionList = JSON.parse(JSON.stringify(dimensionList));
-		let updatedFilterList = JSON.parse(JSON.stringify(filterList));
+		const updatedDimensionList = JSON.parse(JSON.stringify(dimensionList));
+		const updatedFilterList = JSON.parse(JSON.stringify(filterList));
 
 		if (reportType === 'account' || reportType === 'global') {
 			updatedFilterList.forEach(fil => {
