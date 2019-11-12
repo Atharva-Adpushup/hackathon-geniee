@@ -30,7 +30,7 @@ var adp = window.adpushup,
 	},
 	trigger = function(adId) {
 		var isDOMElement = !!document.getElementById(adId);
-		// console.log('ApTag id ', adId, 'DOM Element', isDOMElement);
+		// utils.log('ApTag id ', adId, 'DOM Element', isDOMElement);
 
 		// NOTE: Stop execution of this module if related DOM element does not exist
 		// The requirement for this check came up as redundant ad ids are being triggered from adpushup queue sometimes
@@ -47,7 +47,7 @@ var adp = window.adpushup,
 			adp.config.manualAds.length &&
 			adp.utils.isUrlMatching()
 		) {
-			// console.log('APTag running for', adId);
+			// utils.log('APTag running for', adId);
 			var manualAds = adp.config.manualAds,
 				newAdId = utils.uniqueId(),
 				manualAd = manualAds.filter(function(ad) {
@@ -61,7 +61,7 @@ var adp = window.adpushup,
 				currentTime = new Date().getTime(),
 				isAdElement = !!(isAdId && domElem);
 
-			// console.log('APTag found ', manualAd, 'DOM element', domElem);
+			// utils.log('APTag found ', manualAd, 'DOM element', domElem);
 
 			ad.id = newAdId;
 			document.getElementById(adId).setAttribute('id', newAdId);
@@ -93,7 +93,7 @@ var adp = window.adpushup,
 				//oldFeedbackData.ads = [ad.originalId];
 				return getContainer(ad)
 					.done(function(container) {
-						// console.log('Container found ', container);
+						// utils.log('Container found ', container);
 						var isLazyLoadingAd = !!(ad.enableLazyLoading === true);
 						var isAdNetworkAdpTag = !!(ad.network === commonConsts.NETWORKS.ADPTAGS);
 						var isAdNetworkMedianet = !!(

@@ -1,3 +1,5 @@
+var utils = require('../../../../../libs/utils');
+
 var googletag = googletag || {};
 googletag.cmd = googletag.cmd || [];
 
@@ -224,7 +226,7 @@ pbjs.que.push(function() {
 
 pbjs.que.push(function() {
 	pbjs.onEvent('bidWon', function(bidData) {
-		console.log('Prebid winner decided');
+		utils.log('Prebid winner decided');
 		var slot = adpSlots[bidData.adUnitCode];
 		slot.feedback.winner = bidData.bidder;
 		slot.feedback.winningRevenue = bidData.cpm / 1000;
@@ -301,7 +303,7 @@ function sendFeedback(slot) {
 		timeout: PREBID_TIMEOUT,
 		size: slot.size
 	};
-	console.log(feedback);
+	utils.log(feedback);
 	sendDataToKeenIO(feedback);
 }
 
@@ -320,7 +322,7 @@ function sendAdserverRequest() {
 	if (pbjs.adserverRequestSent) return;
 	pbjs.adserverRequestSent = true;
 
-	console.log(pbjs.getBidResponses());
+	utils.log(pbjs.getBidResponses());
 
 	googletag.cmd.push(function() {
 		pbjs.que.push(function() {

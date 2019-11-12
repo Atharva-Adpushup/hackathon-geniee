@@ -2,6 +2,8 @@
 // Url: https://quokkajs.com/
 // NOTE: This abstracted version does not include jQuery or Utils node require
 // and throws an error rather than silent logging and return statement
+var utils = require('../libs/utils');
+
 function pushAdToGenieeConfig(adp, obj, containerId) {
 	var isGenieeAdsObject = !!(adp.geniee && adp.geniee.ads),
 		isGenieeAd = !!(obj && obj.network && obj.network === 'geniee' && obj.networkData),
@@ -65,7 +67,7 @@ function pushAdToGenieeConfig(adp, obj, containerId) {
 	try {
 		pushAdToGenieeConfig(adp, adCode, containerId);
 	} catch (err) {
-		console.log(`TEST #1: ${err}`);
+		utils.log(`TEST #1: ${err}`);
 	}
 	//RESULT: Error: PushToGenieeAdsObject: Non Geniee ad found, will not be added to its ads object​
 }
@@ -95,7 +97,7 @@ function pushAdToGenieeConfig(adp, obj, containerId) {
 	try {
 		pushAdToGenieeConfig(adp, adCode, containerId);
 	} catch (err) {
-		console.log(`TEST #2: ${err}`);
+		utils.log(`TEST #2: ${err}`);
 	}
 	//RESULT: Error: PushToGenieeAdsObject: Invalid zoneId found for Geniee ad, will not be added to its ads object
 }
@@ -107,7 +109,7 @@ function pushAdToGenieeConfig(adp, obj, containerId) {
 			geniee: {
 				ads: {},
 				sendRevenueFeedback: data => {
-					console.log(`GenieeSendRevenueFeedback: Got data for feedback, ${JSON.stringify(data)}`);
+					utils.log(`GenieeSendRevenueFeedback: Got data for feedback, ${JSON.stringify(data)}`);
 				}
 			}
 		},
@@ -133,10 +135,10 @@ function pushAdToGenieeConfig(adp, obj, containerId) {
 		const result = pushAdToGenieeConfig(adp, adCode, containerId);
 
 		if (result) {
-			console.log(`TEST #3: Success: Result is, ${JSON.stringify(result)}`);
+			utils.log(`TEST #3: Success: Result is, ${JSON.stringify(result)}`);
 		}
 	} catch (err) {
-		console.log(`TEST #3: ${err}`);
+		utils.log(`TEST #3: ${err}`);
 	}
 	// RESULT
 	// GenieeSendRevenueFeedback: Got data for feedback, 12345
@@ -169,10 +171,10 @@ function pushAdToGenieeConfig(adp, obj, containerId) {
 		const result = pushAdToGenieeConfig(adp, adCode, containerId);
 
 		if (result) {
-			console.log(`TEST #4: Success: Result is, ${JSON.stringify(result)}`);
+			utils.log(`TEST #4: Success: Result is, ${JSON.stringify(result)}`);
 		}
 	} catch (err) {
-		console.log(err);
+		utils.log(err);
 	}
 	// RESULT
 	//TEST #4: Success: Result is, {"geniee":{"ads":{"12345":{"id":"ae566125-d3e7-48fc-8b9d-966a8c990bdd","adCode":"Some Adx Code","css":{"margin-left":"-100px","margin-right":"auto","margin-top":"0px","margin-bottom":"0px"},"height":90,"width":900,"network":"geniee","networkData":{"zoneId":12345},"containerId":"","success":true,"isImpressionFeedback":false}}}}

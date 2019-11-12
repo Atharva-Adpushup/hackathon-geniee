@@ -96,7 +96,7 @@ function init(w, d) {
 		// Declaring prebid winner, if anyone
 		w.pbjs.que.push(function() {
 			w.pbjs.onEvent('bidWon', function(bidData) {
-				console.log('===BidWon====', bidData);
+				utils.log('===BidWon====', bidData);
 				var slot = adp.adpTags.adpSlots[bidData.adUnitCode],
 					computedCPMValue = utils.isValidThirdPartyDFPAndCurrencyConfig(apConfig) ? 'originalCpm' : 'cpm';
 

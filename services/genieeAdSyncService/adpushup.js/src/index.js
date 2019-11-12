@@ -291,7 +291,7 @@ function startCreation(forced) {
 					}
 					processInnovativeAds(innovativeInteractiveAds, refreshSlotProcessing);
 				} catch (e) {
-					console.log('Innovative Ads Failed', e);
+					utils.log('Innovative Ads Failed', e);
 				}
 			}
 
