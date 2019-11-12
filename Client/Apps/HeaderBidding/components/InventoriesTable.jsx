@@ -44,13 +44,7 @@ function getBody(inventories) {
 	return inventories.map(inventory => {
 		const inventoryCopy = { ...inventory };
 
-		inventoryCopy.adUnit = (
-			<span title={inventoryCopy.adUnit}>
-				{inventoryCopy.adUnit.length > 25
-					? `${inventoryCopy.adUnit.substring(0, 25)}...`
-					: inventoryCopy.adUnit}
-			</span>
-		);
+		inventoryCopy.adUnit = <span title={inventoryCopy.adUnit}>{inventoryCopy.adUnit}</span>;
 
 		return inventoryCopy;
 	});
