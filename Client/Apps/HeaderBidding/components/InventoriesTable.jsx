@@ -1,66 +1,80 @@
 import React from 'react';
-import Datatable from 'react-bs-datatable';
+import ReactTable from 'react-table';
 import { Checkbox } from 'react-bootstrap';
+import { INVENTORY_TABLE_COLUMNS } from '../constants/index';
 
-function getHeader(handleSelectAllInventories) {
+function getHeader(
+	handleSelectAllInventories,
+	handleInventorySelect,
+	selectAllInventories,
+	selectedInventories
+) {
 	return [
-		{ title: <Checkbox onChange={handleSelectAllInventories} />, prop: 'checkBox' },
-		{ title: 'Ad Unit', prop: 'adUnit', sortable: true },
-		{ title: 'App', prop: 'app', sortable: true },
-		{ title: 'Device', prop: 'device', sortable: true },
-		{ title: 'PageGroup', prop: 'pageGroup', sortable: true },
-		{ title: 'Variation', prop: 'variationName', sortable: true },
-		{ title: 'HB', prop: 'headerBidding', sortable: true }
+		{
+			Header: (
+				<Checkbox
+					checked={selectAllInventories}
+					onChange={handleSelectAllInventories}
+					style={{ float: 'left' }}
+				/>
+			),
+			Cell: ({
+				original: {
+					adUnit: {
+						props: { title }
+					}
+				}
+			}) => (
+				<Checkbox
+					checked={selectedInventories.indexOf(title) > -1}
+					onChange={e => handleInventorySelect(e, title)}
+				/>
+			),
+			sortable: false,
+			filterable: false,
+			width: 50,
+			maxWidth: 50,
+			minWidth: 50
+		},
+		...INVENTORY_TABLE_COLUMNS
 	];
 }
 
-function getBody(inventories, selectedInventories, handleInventorySelect) {
+function getBody(inventories) {
 	return inventories.map(inventory => {
 		const inventoryCopy = { ...inventory };
 
-		inventoryCopy.adUnit = (
-			<span title={inventoryCopy.adUnit}>
-				{inventoryCopy.adUnit.length > 25
-					? `${inventoryCopy.adUnit.substring(0, 25)}...`
-					: inventoryCopy.adUnit}
-			</span>
-		);
-		inventoryCopy.checkBox = (
-			<Checkbox
-				checked={selectedInventories.indexOf(inventory.adUnit) > -1}
-				onChange={e => handleInventorySelect(e, inventory.adUnit)}
-			/>
-		);
+		inventoryCopy.adUnit = <span title={inventoryCopy.adUnit}>{inventoryCopy.adUnit}</span>;
 
 		return inventoryCopy;
 	});
 }
 
-const customLabels = {
-	first: '<<',
-	last: '>>',
-	prev: '<',
-	next: '>',
-	show: 'Display',
-	entries: 'rows',
-	noResults: 'There is no data to be displayed'
-};
-
 const InventoriesTable = ({
 	inventories,
 	handleSelectAllInventories,
 	handleInventorySelect,
+	selectAllInventories,
 	selectedInventories
 }) => (
-	<Datatable
-		tableHeader={getHeader(handleSelectAllInventories)}
-		tableBody={getBody(inventories, selectedInventories, handleInventorySelect)}
-		keyName="userTable"
-		tableClass="striped hover responsive"
-		rowsPerPage={10}
-		rowsPerPageOption={[10, 25, 50, 100]}
-		initialSort={{ prop: 'adUnit', isAscending: true }}
-		labels={customLabels}
+	<ReactTable
+		columns={getHeader(
+			handleSelectAllInventories,
+			handleInventorySelect,
+			selectAllInventories,
+			selectedInventories
+		)}
+		data={getBody(inventories)}
+		className="-striped -highlight u-padding-h3 u-padding-v2 inventory-table"
+		pageSizeOptions={[10, 25, 50, 100]}
+		defaultSorting={[
+			{
+				id: 'adUnit',
+				desc: false
+			}
+		]}
+		defaultPageSize={10}
+		minRows={0}
 	/>
 );
 
