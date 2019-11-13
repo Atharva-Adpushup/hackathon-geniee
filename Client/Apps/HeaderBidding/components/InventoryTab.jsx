@@ -8,6 +8,7 @@ import CustomButton from '../../../Components/CustomButton';
 import { getHbStatusForSite, toggleHbStatusForSite } from '../../../services/hbService';
 import Loader from '../../../Components/Loader';
 import Spinner from '../../../Components/Spinner';
+import Empty from '../../../Components/Empty/index';
 
 export default class InventoryTab extends React.Component {
 	state = {
@@ -16,7 +17,8 @@ export default class InventoryTab extends React.Component {
 		selectedInventories: [],
 		hbStatusForSite: null,
 		loadingHbStatusForSite: true,
-		updatingInventoryHbStatus: false
+		updatingInventoryHbStatus: false,
+		selectAllInventories: false
 	};
 
 	componentDidMount() {
@@ -67,39 +69,29 @@ export default class InventoryTab extends React.Component {
 		return { updated, updatedFilteredInventories };
 	}
 
-	handleSelectAllInventories = ({ target: { checked } }) => {
-		this.setState(state => {
-			const { filteredInventories, selectedInventories } = state;
+	handleSelectAllInventories = () => {
+		const { filteredInventories, selectAllInventories } = this.state;
+		const newState = {};
+		newState.selectAllInventories = !selectAllInventories;
+		newState.selectedInventories = !selectAllInventories
+			? [...filteredInventories].map(inventory => inventory.adUnit)
+			: [];
 
-			if (
-				checked &&
-				filteredInventories &&
-				filteredInventories.length !== selectedInventories.length
-			) {
-				return { selectedInventories: [...filteredInventories].map(inventory => inventory.adUnit) };
-			}
-
-			if (!checked && selectedInventories.length) {
-				return { selectedInventories: [] };
-			}
-
-			return null;
-		});
+		this.setState(newState);
 	};
 
-	handleInventorySelect = ({ target: { checked } }, adUnit) => {
-		this.setState(state => {
-			if (checked) {
-				if (state.selectedInventories.indexOf(adUnit) > -1) return null;
-				return { selectedInventories: [...state.selectedInventories, adUnit] };
-			}
-
-			const index = state.selectedInventories.indexOf(adUnit);
-			if (index === -1) return null;
-
-			const selectedInventoriesCopy = [...state.selectedInventories];
-			selectedInventoriesCopy.splice(index, 1);
-			return { selectedInventories: selectedInventoriesCopy };
+	handleInventorySelect = (e, adUnit) => {
+		const { checkedCopy, selectedInventories, filteredInventories } = this.state;
+		const checked = checkedCopy;
+		if (e.target.checked) {
+			selectedInventories.push(adUnit);
+		} else {
+			selectedInventories.splice(selectedInventories.indexOf(adUnit), 1);
+		}
+		this.setState({
+			checkedCopy: checked,
+			selectedInventories,
+			selectAllInventories: selectedInventories.length === filteredInventories.length
 		});
 	};
 
@@ -124,7 +116,12 @@ export default class InventoryTab extends React.Component {
 			);
 		}
 
-		this.setState({ filteredInventories });
+		this.setState({
+			filteredInventories,
+			selectedInventories: [],
+			checkedCopy: [],
+			selectAll: false
+		});
 	};
 
 	updateInventoriesHbStatus = enableHB => {
@@ -186,7 +183,9 @@ export default class InventoryTab extends React.Component {
 			selectedInventories,
 			hbStatusForSite,
 			loadingHbStatusForSite,
-			updatingInventoryHbStatus
+			updatingInventoryHbStatus,
+			checkedCopy,
+			selectAllInventories
 		} = this.state;
 
 		return (
@@ -282,17 +281,23 @@ export default class InventoryTab extends React.Component {
 									}
 								]}
 								handleFilters={this.handleFilters}
-								className="u-margin-b5"
+								className="u-margin-b5 inventory-tab"
 							/>
 						)}
 
-						{filteredInventories && (
-							<InventoriesTable
-								inventories={filteredInventories}
-								selectedInventories={selectedInventories}
-								handleInventorySelect={this.handleInventorySelect}
-								handleSelectAllInventories={this.handleSelectAllInventories}
-							/>
+						{!filteredInventories.length ? (
+							<Empty message="No Data Found" />
+						) : (
+							filteredInventories && (
+								<InventoriesTable
+									inventories={filteredInventories}
+									selectedInventories={selectedInventories}
+									handleInventorySelect={this.handleInventorySelect}
+									handleSelectAllInventories={this.handleSelectAllInventories}
+									checkedCopy={checkedCopy}
+									selectAllInventories={selectAllInventories}
+								/>
+							)
 						)}
 					</div>
 				)}
