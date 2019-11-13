@@ -305,7 +305,14 @@ class Table extends React.Component {
 						showPaginationBottom={false}
 						className="reporting u-padding-h3 u-padding-v2 -striped -highlight"
 					/>
-					<Col sm={12}>{this.renderFooter()}</Col>
+					<Col sm={12}>
+						{this.renderFooter()}
+						<b>Note: </b>
+						<span>
+							Net Revenue is estimated earnings, finalized earnings may vary depending on deductions
+							from the demand partners.
+						</span>
+					</Col>
 				</React.Fragment>
 			);
 		return '';
