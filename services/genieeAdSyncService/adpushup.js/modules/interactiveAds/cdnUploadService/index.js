@@ -1,5 +1,6 @@
 const config = require('../../../configs/config'),
 	path = require('path'),
+	utils = require('../../../libs/utils'),
 	fs = require('fs'),
 	Promise = require('bluebird'),
 	readFile = Promise.promisify(fs.readFile),
@@ -41,7 +42,7 @@ const config = require('../../../configs/config'),
 
 return uploadToCDN()
 	.then(() => {
-		console.log('Adp interactive script uploaded to CDN');
+		utils.log('Adp interactive script uploaded to CDN');
 		process.exit();
 	})
 	.catch(err => {

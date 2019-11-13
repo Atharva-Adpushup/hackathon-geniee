@@ -13,7 +13,7 @@ var utils = require('../helpers/utils'),
 		} else if (val == 0) {
 			val = 0.01;
 		}
-		console.log('Sent floor : ' + val);
+		utils.log('Sent floor : ' + val);
 		return val;
 	},
 	// Please use this refresh functionality within the "googletag.cmd.push" wrapper
