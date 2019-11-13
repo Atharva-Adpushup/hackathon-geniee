@@ -4,6 +4,7 @@ import 'react-dates/lib/css/_datepicker.css';
 import 'react-dates/initialize';
 import { CSVLink } from 'react-csv';
 import isEqual from 'lodash/isEqual';
+import moment from 'moment';
 import AsyncGroupSelect from '../../../Components/AsyncGroupSelect/index';
 import PresetDateRangePicker from '../../../Components/PresetDateRangePicker/index';
 import SelectBox from '../../../Components/SelectBox/index';
@@ -273,6 +274,14 @@ class Control extends Component {
 							endDate={state.endDate}
 							datesUpdated={({ startDate, endDate }) =>
 								this.setState({ startDate, endDate }, this.onControlChange.bind(null, reportType))
+							}
+							isOutsideRange={day =>
+								day.isAfter(moment()) ||
+								day.isBefore(
+									moment()
+										.startOf('month')
+										.set({ year: 2019, month: 7 })
+								)
 							}
 							autoFocus
 						/>

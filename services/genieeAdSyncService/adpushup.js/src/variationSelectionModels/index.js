@@ -144,7 +144,7 @@ module.exports = function(config) {
 		.then(checkForcedVariation)
 		.then(computeChosenVariation)
 		.catch(function(err) {
-			console.log('Failed to choose variation. Error: ', err);
+			utils.log('Failed to choose variation. Error: ', err);
 			return false;
 		});
 };

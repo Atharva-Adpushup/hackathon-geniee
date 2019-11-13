@@ -17,7 +17,7 @@ var auction = {
 		return;
 	},
 	getAuctionResponse: function(adpBatchId) {
-		console.log(window.pbjs.getBidResponses());
+		utils.log(window.pbjs.getBidResponses());
 
 		return this.end(adpBatchId);
 	},

@@ -359,3 +359,34 @@
 		}
 	}
 }
+
+.inventory-table .rt-resizable-header-content {
+	float: left;
+}
+
+.inventory-table .rt-thead {
+	position: sticky;
+	top: 0;
+	z-index: 2;
+	background: white;
+}
+.inventory-table .rt-tbody {
+	overflow: visible !important;
+}
+
+.inventory-tab .filterbox {
+	z-index: 3 !important;
+}
+
+.inventory-table .rt-thead .rt-th.-sort-asc {
+	background-image: url('../../../../public/assets/images/sort-up-icon.jpg');
+}
+.inventory-table .rt-thead .rt-th.-sort-desc {
+	background-image: url('../../../../public/assets/images/sort-arrow-down.png');
+}
+.ReactTable .rt-thead .rt-th {
+	background-repeat: no-repeat;
+	background-size: 18px 18px;
+	background-position: right 4px;
+	font-weight: bolder;
+}

@@ -7,12 +7,13 @@ var browserConfig = require('./browserConfig.js'),
 
 module.exports = {
 	log: function() {
+		var queryParams = this.queryParams;
 		var isQueryParams = !!(
-				this.queryParams &&
-				$.isPlainObject(this.queryParams) &&
-				!$.isEmptyObject(this.queryParams)
+				queryParams &&
+				$.isPlainObject(queryParams) &&
+				!$.isEmptyObject(queryParams)
 			),
-			isapDebugParam = !!(isQueryParams && this.queryParams.apDebug);
+			isapDebugParam = !!(isQueryParams && queryParams.apDebug);
 
 		if (typeof console !== 'undefined' && console.log && isapDebugParam)
 			console.log.apply(console, arguments);

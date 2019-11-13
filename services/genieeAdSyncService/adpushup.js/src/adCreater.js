@@ -183,7 +183,7 @@ var $ = require('jquery'),
 
 			var currentTime = new Date().getTime();
 			container.attr('data-render-time', currentTime);
-			console.log('rendered slot ', ad.id, ' ', new Date(), ' ', document.hasFocus());
+			utils.log('rendered slot ', ad.id, ' ', new Date(), ' ', document.hasFocus());
 
 			if (ad.networkData && ad.networkData.refreshSlot) {
 				refreshAdSlot.refreshSlot(container, ad);

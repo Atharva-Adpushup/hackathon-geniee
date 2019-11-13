@@ -27,6 +27,10 @@ class SelectBox extends Component {
 		...findSelected(this.props)
 	};
 
+	static getDerivedStateFromProps(props) {
+		return { ...findSelected(props) };
+	}
+
 	selectWrapper = (key, e) => {
 		const { onSelect, options, title, dataKey: dataKeyFromProps } = this.props;
 		const optionValueType = typeof options[0].value;

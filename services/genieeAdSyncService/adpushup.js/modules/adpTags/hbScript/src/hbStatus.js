@@ -5,7 +5,7 @@ var config = require('./config'),
 	xhr = require('../helpers/xhr'),
 	adp = require('./adp').adp,
 	responseHandler = function(err, data) {
-		err ? console.log(err) : console.log(data);
+		utils.log(data);
 	},
 	packetId = adp && adp.config && adp.config.packetId ? adp.config.packetId : utils.generateUUID(),
 	platform = adp && adp.config && adp.config.platform ? adp.config.platform : utils.generateUUID(),
