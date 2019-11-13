@@ -41,7 +41,8 @@ const dates = [
 	{ value: 'yesterday', name: 'Yesterday' },
 	{ value: 'last7Days', name: 'Last 7 Days' },
 	{ value: 'last30Days', name: 'Last 30 Days' },
-	{ value: 'month', name: 'This Month' }
+	{ value: 'month', name: 'This Month' },
+	{ value: 'lastMonth', name: 'Last Month' }
 ];
 const DEFAULT_DATE = dates[2].value;
 const sites = [
