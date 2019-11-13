@@ -61,19 +61,19 @@ class Panel extends Component {
 	}
 
 	componentDidMount() {
-		const { userSites, updateReportMetaData, reportsMeta } = this.props;
+		const { userSites, updateReportMetaData, reportsMeta, isForOps } = this.props;
 		const { email, reportType } = this.getDemoUserParams();
 
 		let userSitesStr = '';
 		let isSuperUser = false;
 
-		if (reportType === 'account') {
+		if (!isForOps && reportType === 'account') {
 			userSitesStr = Object.keys(userSites).toString();
 
 			userSitesStr = getReportingDemoUserSiteIds(userSitesStr, email, reportType);
 		}
 
-		if (reportType === 'global') {
+		if (isForOps || reportType === 'global') {
 			isSuperUser = true;
 		}
 
@@ -104,7 +104,24 @@ class Panel extends Component {
 		return { updatedDimensionList, updatedFilterList };
 	};
 
-	disableControl = (disabledFilter, disabledDimension, disabledMetrics, metricsList) => {
+	isControlItemDisabled = (item, disabledItemsList, reportType) => {
+		const isDisabledByDefault =
+			(reportType === 'account' || reportType === 'global') &&
+			typeof item.default_enabled === 'boolean' &&
+			!item.default_enabled;
+
+		if (isDisabledByDefault) return true;
+
+		return !!disabledItemsList.find(fil => fil === item.value);
+	};
+
+	disableControl = (
+		disabledFilter,
+		disabledDimension,
+		disabledMetrics,
+		metricsList,
+		reportType
+	) => {
 		const { metricsList: metricsListFromState } = this.state;
 		const computedMetricsList = metricsList || metricsListFromState;
 
@@ -122,22 +139,19 @@ class Panel extends Component {
 			? { updatedDimensionList: dimensionList, updatedFilterList: filterList }
 			: this.removeOpsFilterDimension(filterList, dimensionList);
 
-		updatedFilterList.map(filter => {
-			const found = disabledFilter.find(fil => fil === filter.value);
-			if (found) filter.isDisabled = true;
-			else filter.isDisabled = false;
+		updatedFilterList.forEach(filter => {
+			// eslint-disable-next-line no-param-reassign
+			filter.isDisabled = this.isControlItemDisabled(filter, disabledFilter, reportType);
 		});
 
-		updatedDimensionList.map(dimension => {
-			const found = disabledDimension.find(dim => dim === dimension.value);
-			if (found) dimension.isDisabled = true;
-			else dimension.isDisabled = false;
+		updatedDimensionList.forEach(dimension => {
+			// eslint-disable-next-line no-param-reassign
+			dimension.isDisabled = this.isControlItemDisabled(dimension, disabledDimension, reportType);
 		});
 
-		computedMetricsList.map(metrics => {
-			const found = disabledMetrics.find(metric => metric === metrics.value);
-			if (found) metrics.isDisabled = true;
-			else metrics.isDisabled = false;
+		computedMetricsList.forEach(metrics => {
+			// eslint-disable-next-line no-param-reassign
+			metrics.isDisabled = this.isControlItemDisabled(metrics, disabledMetrics, reportType);
 		});
 
 		return {
@@ -148,9 +162,10 @@ class Panel extends Component {
 	};
 
 	onControlChange = (data, reportType) => {
-		const params = this.getControlChangedParams(data);
+		const params = this.getControlChangedParams({ ...data, reportType });
 
 		this.setState({
+			...data,
 			...params,
 			reportType
 		});
@@ -192,16 +207,12 @@ class Panel extends Component {
 			}
 		});
 
-		if (reportType === 'account' || reportType === 'global') {
-			disabledFilter = union(accountDisableFilter, disabledFilter);
-			disabledDimension = union(accountDisableDimension, disabledDimension);
-		}
-
 		const updatedControlList = this.disableControl(
 			disabledFilter,
 			disabledDimension,
 			disabledMetrics,
-			metricsList
+			metricsList,
+			reportType
 		);
 
 		return {
@@ -271,8 +282,8 @@ class Panel extends Component {
 	};
 
 	generateButtonHandler = (inputState = {}) => {
-		let { tableData } = this.state;
-		const { reportType, isCustomizeChartLegend } = this.props;
+		let { tableData, selectedDimension, selectedFilters } = this.state;
+		const { reportType, isCustomizeChartLegend, isForOps } = this.props;
 		const computedState = Object.assign({ isLoading: true }, inputState);
 
 		this.setState(computedState, () => {
@@ -282,6 +293,38 @@ class Panel extends Component {
 			reportService.getCustomStats(params).then(response => {
 				if (Number(response.status) === 200 && response.data) {
 					tableData = response.data;
+
+					const shouldAddAdpushupCountPercentColumn =
+						(selectedDimension === 'mode' ||
+							selectedDimension === 'error_code' ||
+							selectedFilters.mode ||
+							selectedFilters.error_code) &&
+						tableData.columns.indexOf('adpushup_count') !== -1;
+
+					// Add columns
+					if (isForOps && shouldAddAdpushupCountPercentColumn) {
+						tableData.columns.push('adpushup_count_percent');
+
+						const adpushupCountTotal = tableData.result.reduce((total, row) => {
+							const adpushupCount = row.adpushup_count;
+							// eslint-disable-next-line no-param-reassign
+							if (typeof adpushupCount === 'number') total += adpushupCount;
+
+							return total;
+						}, 0);
+
+						tableData.result.forEach(row => {
+							const perc = (row.adpushup_count / adpushupCountTotal) * 100;
+							// eslint-disable-next-line no-param-reassign
+							row.adpushup_count_percent = perc;
+						});
+					}
+
+					if (isForOps && reportType === 'account' && shouldAddAdpushupCountPercentColumn) {
+						tableData.total.total_adpushup_count_percent = 100;
+					}
+
+					// Compute data table total
 					if (
 						reportType === 'global' &&
 						!tableData.total &&
@@ -435,6 +478,10 @@ class Panel extends Component {
 					(total.total_adpushup_xpath_miss + total.total_adpushup_impressions)) *
 				100
 			).toFixed(2);
+		}
+
+		if (total.hasOwnProperty('total_adpushup_count_percent')) {
+			total.total_adpushup_count_percent = 100;
 		}
 
 		return total;
@@ -636,7 +683,14 @@ class Panel extends Component {
 			filterList,
 			tableData
 		} = this.state;
-		const { reportsMeta, reportType: defaultReportType, isCustomizeChartLegend } = this.props;
+		const {
+			reportsMeta,
+			reportType: defaultReportType,
+			isCustomizeChartLegend,
+			isForOps,
+			userSites,
+			user
+		} = this.props;
 
 		const allAvailableMetrics = this.getAllAvailableMetrics(
 			isCustomizeChartLegend,
@@ -686,8 +740,11 @@ class Panel extends Component {
 						selectedInterval={selectedInterval}
 						reportType={reportType}
 						defaultReportType={defaultReportType}
+						isForOps={isForOps}
 						csvData={csvData}
 						isDemoUser={isValid}
+						userSites={userSites}
+						user={user}
 					/>
 				</Col>
 				<Col sm={12} className="u-margin-t5">
@@ -699,6 +756,7 @@ class Panel extends Component {
 						metricsList={metricsList}
 						allAvailableMetrics={allAvailableMetrics}
 						reportType={reportType}
+						isForOps={isForOps}
 						isCustomizeChartLegend={isCustomizeChartLegend}
 						updateMetrics={this.updateMetrics}
 						selectedInterval={selectedInterval}
@@ -715,6 +773,7 @@ class Panel extends Component {
 						getCsvData={this.getCsvData}
 						reportType={reportType}
 						defaultReportType={defaultReportType}
+						isForOps={isForOps}
 					/>
 				</Col>
 			</Row>

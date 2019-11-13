@@ -35,7 +35,7 @@ class QuickSnapshot extends React.Component {
 			isLoading: true,
 			isLoadingError: false,
 			quickDates: dates,
-			reportType: 'global',
+			reportType: 'account',
 			selectedSite: 'all',
 			sites: allUserSites,
 			top10Sites: [],
@@ -77,14 +77,10 @@ class QuickSnapshot extends React.Component {
 		return this.setState({ isLoading: false, isLoadingError: true });
 	};
 
-	getComputedMetaData = reportType => {
-		const { sites, accountReportMetaData, globalReportMetaData } = this.props;
-		const userSites = Object.keys(sites).toString();
-		const { isReportTypeGlobal } = this.getReportTypeValidation(reportType);
-		const params = isReportTypeGlobal
-			? { sites: '', isSuperUser: true }
-			: { sites: userSites, isSuperUser: false };
-		const inputReportMetaData = isReportTypeGlobal ? globalReportMetaData : accountReportMetaData;
+	getComputedMetaData = () => {
+		const { globalReportMetaData } = this.props;
+		const params = { sites: '', isSuperUser: true };
+		const inputReportMetaData = globalReportMetaData;
 		const isValidReportMetaData = !!(
 			inputReportMetaData &&
 			inputReportMetaData.fetched &&
@@ -99,8 +95,9 @@ class QuickSnapshot extends React.Component {
 			const { data: metaData } = responseData;
 
 			if (!isValidReportMetaData) {
-				this.setReportingMetaData(metaData, reportType);
+				this.setReportingMetaData(metaData);
 			}
+
 			this.setReportingMetaDataState(metaData);
 			return metaData;
 		});
@@ -208,13 +205,25 @@ class QuickSnapshot extends React.Component {
 
 	getTopPerformingSites = (allUserSites, reportingSites) => {
 		let topPerformingSite;
+		let maxPageCPM = 0;
+
 		allUserSites.forEach(site => {
 			const siteId = site.value;
-			if (reportingSites[siteId] && reportingSites[siteId].isTopPerforming) {
+			const reportingSite = reportingSites[siteId];
+
+			if (
+				reportingSite &&
+				reportingSite.adpushup_page_cpm &&
+				reportingSite.adpushup_page_cpm > maxPageCPM
+			) {
 				topPerformingSite = siteId;
+				maxPageCPM = reportingSite.adpushup_page_cpm;
 				return topPerformingSite;
 			}
+
+			return true;
 		});
+
 		return topPerformingSite;
 	};
 
@@ -358,7 +367,7 @@ class QuickSnapshot extends React.Component {
 			},
 			isForOps
 		} = this.props;
-		const { reportType } = this.state;
+		const reportType = 'global';
 		let computedWidgetData;
 
 		if (widget.isLoading) return <Loader height="20vh" />;
@@ -395,12 +404,6 @@ class QuickSnapshot extends React.Component {
 					/>
 				);
 
-			case 'ops_top_sites_daily':
-				if (reportType == 'site') {
-					return <SitewiseReportContainer displayData={widget.data} reportType="site" />;
-				}
-				return '';
-
 			case OPS_COUNTRY_REPORT:
 			case OPS_NETWORK_REPORT:
 				return <RevenueContainer reportType={reportType} displayData={widget} />;
@@ -415,17 +418,16 @@ class QuickSnapshot extends React.Component {
 	};
 
 	getDisplayData = wid => {
-		const { widgetsConfig, reportingSites, reportType } = this.state;
+		const { widgetsConfig, reportingSites } = this.state;
 		const { isReportTypeAccount, isReportTypeGlobal } = this.getReportTypeValidation();
 		const { selectedDate, selectedSite, selectedMetric, path, name } = widgetsConfig[wid];
 		const {
 			sites,
 			widgetsName: { PER_AP_ORIGINAL },
-			accountReportMetaData,
 			globalReportMetaData
 		} = this.props;
 
-		const metaData = reportType === 'global' ? globalReportMetaData : accountReportMetaData;
+		const metaData = globalReportMetaData;
 		const siteIds = Object.keys(sites);
 		const params = getDateRange(selectedDate);
 		const isWidgetNamePerAPOriginal = !!(name === PER_AP_ORIGINAL);
@@ -439,10 +441,12 @@ class QuickSnapshot extends React.Component {
 		const computedWidgetPath = isMetricWidget
 			? path.replace(/&metrics=\w+/, `&metrics=${selectedMetric}`)
 			: path;
+		const isValidSelectedSite = !!selectedSite;
+		const isValidAllSelectedSites = !!(isValidSelectedSite && selectedSite === 'all');
 
-		params.siteid = selectedSite === 'all' ? siteIds.toString() : selectedSite;
+		params.siteid = isValidAllSelectedSites ? siteIds.toString() : selectedSite;
 
-		if (isReportTypeGlobal && selectedSite === 'all') {
+		if (isReportTypeGlobal && (!isValidSelectedSite || isValidAllSelectedSites)) {
 			delete params.siteid;
 			params.isSuperUser = true;
 		}
@@ -484,7 +488,12 @@ class QuickSnapshot extends React.Component {
 						widgetsConfig[wid].data = response.data;
 						widgetsConfig[wid].isDataSufficient = true;
 						widgetsConfig[wid].sitesList = top10Sites;
-						if (isWidgetNamePerAPOriginal) widgetsConfig[wid].selectedSite = computedSelectedSite;
+
+						const isEmptySiteForApOriginalWidget = !!(isWidgetNamePerAPOriginal && !selectedSite);
+
+						if (isEmptySiteForApOriginalWidget) {
+							widgetsConfig[wid].selectedSite = computedSelectedSite;
+						}
 					} else {
 						widgetsConfig[wid].data = {};
 						widgetsConfig[wid].isDataSufficient = false;
@@ -564,15 +573,12 @@ class QuickSnapshot extends React.Component {
 		return computedSite;
 	};
 
-	setComputedState = state => this.setState(state);
+	setComputedState = (state, callback) => this.setState(state, callback || (() => {}));
 
-	setReportingMetaData = (metaData, reportType) => {
-		const { updateAccountReportMetaData, updateGlobalReportMetaData } = this.props;
-		const { isReportTypeGlobal } = this.getReportTypeValidation(reportType);
+	setReportingMetaData = metaData => {
+		const { updateGlobalReportMetaData } = this.props;
 
-		isReportTypeGlobal
-			? updateGlobalReportMetaData(metaData)
-			: updateAccountReportMetaData(metaData);
+		updateGlobalReportMetaData(metaData);
 	};
 
 	setReportingMetaDataState = metaData => {
@@ -613,9 +619,17 @@ class QuickSnapshot extends React.Component {
 		return false;
 	};
 
-	renderReportsUI = reportType =>
-		this.getComputedMetaData(reportType)
-			.then(() => this.setComputedState({ reportType, isLoading: false }))
+	renderAsyncReportState = state =>
+		new Promise(resolve => this.setComputedState({ ...state, isLoading: false }, () => resolve()));
+
+	renderReportsUI = () =>
+		this.getComputedMetaData()
+			.then(() => {
+				const { top10Sites } = this.state;
+
+				return this.getComputedSitesData(top10Sites);
+			})
+			.then(({ selectedSite }) => this.renderAsyncReportState({ selectedSite }))
 			.then(this.renderComputedWidgetsUI)
 			.catch(this.rootErrorHandler);
 
@@ -668,7 +682,7 @@ class QuickSnapshot extends React.Component {
 						{/* eslint-disable */}
 						<label className="u-text-normal u-margin-r2">Metrics</label>
 						<SelectBox
-							id="metric-selectbox"
+							id={`metric-selectbox-${name}`}
 							isClearable={false}
 							pullRight
 							isSearchable={false}
@@ -694,7 +708,7 @@ class QuickSnapshot extends React.Component {
 						{/* eslint-disable */}
 						<label className="u-text-normal u-margin-r2">Quick Dates</label>
 						<SelectBox
-							id="date-selectbox"
+							id={`date-selectbox-${name}`}
 							wrapperClassName="display-inline"
 							pullRight
 							isClearable={false}
@@ -702,7 +716,7 @@ class QuickSnapshot extends React.Component {
 							selected={selectedDate}
 							options={quickDates}
 							onSelect={date => {
-								if (isReportTypeGlobal) widgetsConfig[wid]['selectedSite'] = 'all';
+								// if (isReportTypeGlobal) widgetsConfig[wid]['selectedSite'] = 'all';
 								widgetsConfig[wid]['selectedDate'] = date;
 								widgetsConfig[wid].isLoading = true;
 								widgetsConfig[wid]['sitesList'] = [];
@@ -721,7 +735,7 @@ class QuickSnapshot extends React.Component {
 						{/* eslint-disable */}
 						<label className="u-text-normal u-margin-r2">Website</label>
 						<SelectBox
-							id="site-selectbox"
+							id={`site-selectbox-${name}`}
 							isClearable={false}
 							pullRight
 							isSearchable={false}
@@ -807,7 +821,9 @@ class QuickSnapshot extends React.Component {
 						wrapperClassName="display-inline"
 						selected={reportType}
 						options={options}
-						onSelect={item => ref.setState({ isLoading: true }, () => ref.renderReportsUI(item))}
+						onSelect={item =>
+							ref.setState({ isLoading: true, reportType: item }, () => ref.renderReportsUI())
+						}
 					/>
 				</div>
 			</div>

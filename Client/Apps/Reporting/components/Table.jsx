@@ -120,25 +120,32 @@ class Table extends React.Component {
 			if (isDaily) tableRow.date = tableRow.date;
 
 			if (isMonthly) {
-				if (
-					tableRow.month == moment(startDate).format('M') &&
-					tableRow.year == moment(startDate).format('Y')
-				) {
-					tableRow.date = `${moment(startDate).format('ll')} to ${moment(startDate)
-						.endOf('month')
-						.format('ll')}`;
-				} else if (
-					tableRow.month == moment(endDate).format('M') &&
-					tableRow.year == moment(endDate).format('Y')
-				) {
-					tableRow.date = `${moment(endDate)
-						.startOf('month')
-						.format('ll')} to ${moment(endDate).format('ll')}`;
+				let monthlyDateRangeStart;
+				let monthlyDateRangeEnd;
+
+				// Compute monthlyDateRangeStart
+				if (`${tableRow.year}-${tableRow.month}` === moment(startDate).format('Y-M')) {
+					monthlyDateRangeStart = moment(startDate).format('ll');
 				} else {
-					const fromDate = moment([tableRow.year, tableRow.month - 1]);
-					const toDate = moment(fromDate).endOf('month');
-					tableRow.date = `${fromDate.format('ll')} to ${toDate.format('ll')}`;
+					monthlyDateRangeStart = moment()
+						.month(tableRow.month - 1) // moment accepts 0-11 months
+						.year(tableRow.year)
+						.startOf('month')
+						.format('ll');
 				}
+
+				// Compute monthlyDateRangeEnd
+				if (`${tableRow.year}-${tableRow.month}` === moment(endDate).format('Y-M')) {
+					monthlyDateRangeEnd = moment(endDate).format('ll');
+				} else {
+					monthlyDateRangeEnd = moment()
+						.month(tableRow.month - 1) // moment accepts 0-11 months
+						.year(tableRow.year)
+						.endOf('month')
+						.format('ll');
+				}
+
+				tableRow.date = `${monthlyDateRangeStart} to ${monthlyDateRangeEnd}`;
 			}
 
 			if (isCumulative)
@@ -201,7 +208,7 @@ class Table extends React.Component {
 							break;
 						}
 						case 'percent': {
-							num = row[col];
+							num = roundOffTwoDecimal(row[col]);
 							row[col] = `${numberWithCommas(num)}%`;
 
 							break;
@@ -236,7 +243,7 @@ class Table extends React.Component {
 						break;
 					}
 					case 'percent': {
-						num = value;
+						num = roundOffTwoDecimal(value);
 						value = `${numberWithCommas(num)}%`;
 
 						break;

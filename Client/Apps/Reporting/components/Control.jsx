@@ -3,6 +3,7 @@ import { Glyphicon, Button } from 'react-bootstrap';
 import 'react-dates/lib/css/_datepicker.css';
 import 'react-dates/initialize';
 import { CSVLink } from 'react-csv';
+import isEqual from 'lodash/isEqual';
 import moment from 'moment';
 import AsyncGroupSelect from '../../../Components/AsyncGroupSelect/index';
 import PresetDateRangePicker from '../../../Components/PresetDateRangePicker/index';
@@ -10,7 +11,10 @@ import SelectBox from '../../../Components/SelectBox/index';
 import { getPresets } from '../helpers/utils';
 import reportService from '../../../services/reportService';
 import { accountFilter, accountDimension, opsDimension, opsFilter } from '../configs/commonConsts';
-import { getReportingControlDemoUserSites } from '../../../helpers/commonFunctions';
+import {
+	getReportingControlDemoUserSites,
+	getReportingDemoUserSiteIds
+} from '../../../helpers/commonFunctions';
 
 class Control extends Component {
 	constructor(props) {
@@ -42,18 +46,18 @@ class Control extends Component {
 	}
 
 	componentWillReceiveProps(nextProps) {
-		const isValidNextProps = !!(nextProps && nextProps.csvData);
+		const { state: currState } = this;
+		const isCsvData = !!(nextProps && nextProps.csvData);
+		const updateDimensionList = !isEqual(currState.dimensionList, nextProps.dimensionList);
+		const updateFilterList = !isEqual(currState.filterList, nextProps.filterList);
 
-		if (isValidNextProps) {
-			this.setState({ csvData: nextProps.csvData });
-		}
-	}
+		const newState = {};
 
-	shouldComponentUpdate(nextProps, nextState) {
-		return (
-			this.state.reportType !== nextState.reportType ||
-			this.state.updateStatusText !== nextState.updateStatusText
-		);
+		if (isCsvData) newState.csvData = nextProps.csvData;
+		if (updateDimensionList) newState.dimensionList = nextProps.dimensionList;
+		if (updateFilterList) newState.filterList = nextProps.filterList;
+
+		this.setState(newState);
 	}
 
 	onReportBySelect = selectedDimension => {
@@ -122,23 +126,43 @@ class Control extends Component {
 
 	getSelectedFilter = filter => {
 		const { reportType, defaultReportType, selectedFilters, isDemoUser } = this.props;
-		let siteIds;
+		let siteIds = [];
 		let isSuperUser = false;
+		const selectedSiteIds = selectedFilters.siteid && Object.keys(selectedFilters.siteid);
 
-		if (
-			reportType === 'account' ||
-			(defaultReportType !== 'global' && reportType === 'site' && filter.value === 'siteid')
-		) {
-			const { site } = this.props;
-			siteIds = Object.keys(site);
-		} else if (
-			reportType === 'global' ||
-			(defaultReportType === 'global' && reportType === 'site' && filter.value === 'siteid')
-		) {
-			siteIds = '';
+		if (defaultReportType !== 'global' && filter.value === 'siteid') {
+			const {
+				userSites,
+				user: {
+					data: { email }
+				}
+			} = this.props;
+			siteIds = Object.keys(userSites);
+			siteIds = getReportingDemoUserSiteIds(siteIds, email, reportType, true);
+		} else if (defaultReportType === 'global' && filter.value === 'siteid') {
+			isSuperUser = true;
+		} else if (reportType === 'account') {
+			const {
+				userSites,
+				user: {
+					data: { email }
+				}
+			} = this.props;
+
+			if (selectedSiteIds && selectedSiteIds.length) {
+				siteIds = selectedSiteIds;
+			} else {
+				siteIds = Object.keys(userSites);
+				siteIds = getReportingDemoUserSiteIds(siteIds, email, reportType);
+			}
+		} else if (reportType === 'global') {
+			if (selectedSiteIds && selectedSiteIds.length) {
+				siteIds = selectedSiteIds;
+			}
+
 			isSuperUser = true;
 		} else {
-			siteIds = selectedFilters.siteid ? Object.keys(selectedFilters.siteid) : [];
+			siteIds = selectedSiteIds && selectedSiteIds.length ? selectedSiteIds : [];
 		}
 
 		const params = { siteid: siteIds.toString(), isSuperUser };
@@ -173,14 +197,9 @@ class Control extends Component {
 	};
 
 	updateFilterDimensionList = (reportType, defaultReportType, filterList, dimensionList) => {
-		let updatedDimensionList = JSON.parse(JSON.stringify(dimensionList));
-		let updatedFilterList = JSON.parse(JSON.stringify(filterList));
+		const updatedDimensionList = JSON.parse(JSON.stringify(dimensionList));
+		const updatedFilterList = JSON.parse(JSON.stringify(filterList));
 
-		if (defaultReportType !== 'global') {
-			const json = this.removeOpsFilterDimension(filterList, dimensionList);
-			updatedDimensionList = json.updatedDimensionList;
-			updatedFilterList = json.updatedFilterList;
-		}
 		if (reportType === 'account' || reportType === 'global') {
 			updatedFilterList.forEach(fil => {
 				const index = accountFilter.indexOf(fil.value);
