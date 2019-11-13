@@ -4,29 +4,28 @@ const { N1qlQuery } = require('couchbase');
 const request = require('request-promise');
 const moment = require('moment');
 const _ = require('lodash');
+const clonedeep = require('lodash.clonedeep');
 
 const couchbase = require('../helpers/couchBaseService');
 const AdPushupError = require('../helpers/AdPushupError');
 const commonConsts = require('../configs/commonConsts');
 
 const commonSiteFunctions = {
+	isActiveHbBidder(network, key) {
+		return network.isActive && network.isHb && key !== 'adpTags';
+	},
 	getActiveInactiveBidderNames(addedBidders = {}, networkTree = {}) {
-		let activeBidders = '';
-		let inactiveBidders = '';
+		const activeBidders = [];
+		const inactiveBidders = [];
 
 		for (const key1 in networkTree) {
 			const network = networkTree[key1];
-			if (
-				networkTree.hasOwnProperty(key1) &&
-				network.isActive &&
-				network.isHb &&
-				key1 !== 'adpTags'
-			) {
+			if (networkTree.hasOwnProperty(key1) && commonSiteFunctions.isActiveHbBidder(network, key1)) {
 				const currentAddedBidder = addedBidders[key1];
 				if (currentAddedBidder && currentAddedBidder.isActive && !currentAddedBidder.isPaused) {
-					activeBidders += `${activeBidders ? ', ' : ''}${currentAddedBidder.name}`;
+					activeBidders.push(currentAddedBidder.name);
 				} else {
-					inactiveBidders += `${inactiveBidders ? ', ' : ''}${network.name}`;
+					inactiveBidders.push(network.name);
 				}
 			}
 		}
@@ -59,39 +58,35 @@ const commonSiteFunctions = {
 				return 'N/A';
 		}
 	},
-	getSitesReport() {
-		const dateFormat = 'YYYY-MM-DD';
-		const days = 2;
-		const dayOffset = 1;
-
+	getProductsMeta() {
 		return request({
 			method: 'GET',
 			json: true,
-			uri: commonConsts.GET_SITES_STATS_API,
-			qs: {
-				report_name: 'get_stats_by_custom',
-				isSuperUser: true,
-				dimension: 'siteid,mode',
-				fromDate: moment()
-					.subtract(days + dayOffset, 'days')
-					.format(dateFormat),
-				toDate: moment()
-					.subtract(dayOffset, 'days')
-					.format(dateFormat)
-			}
+			uri: commonConsts.ALL_PRODUCTS_META_API
 		});
 	},
-	getActiveProducts(apps) {
-		if (!apps) return 'N/A';
+	getActiveProductsForAllSites() {
+		return request({
+			method: 'GET',
+			json: true,
+			uri: commonConsts.ACTIVE_PRODUCTS_FOR_ALL_SITES_API
+		});
+	},
+	getActiveProducts(productNames, productsStatus) {
+		if (!productsStatus) return 'N/A';
 
-		const appKeys = Object.keys(apps);
+		const activeProducts = [];
+		const productKeys = Object.keys(productsStatus);
 
-		return appKeys.reduce((activeProducts, appKey) => {
-			const currentProduct = apps[appKey]
-				? `${activeProducts ? ', ' : ''}${commonConsts.APP_KEY_NAME_MAPPING[appKey]}`
-				: '';
-			return activeProducts + currentProduct;
-		}, '');
+		productKeys.forEach(productKey => {
+			const product = productNames.find(product => product.id === productKey);
+			const isProductActive = !!productsStatus[productKey];
+			if (isProductActive && product) {
+				activeProducts.push(product.value);
+			}
+		});
+
+		return activeProducts;
 	},
 	getPublisherIdAndEmail(adNetworkSettings) {
 		if (adNetworkSettings && adNetworkSettings.length) {
@@ -106,19 +101,25 @@ const commonSiteFunctions = {
 
 		return { publisherId: '', publisherEmail: '' };
 	},
-	getAdManager(adNetworkSettings) {
-		if (adNetworkSettings && adNetworkSettings.length) {
+	getAdManager(adNetworkSettings, adServerSettings) {
+		const networkCode =
+			adServerSettings && adServerSettings.dfp && adServerSettings.dfp.activeDFPNetwork;
+		if (!networkCode) return 'N/A';
+
+		const isAdpushupDfp = Number.parseInt(networkCode) === commonConsts.ADPUSHUP_NETWORK_ID;
+
+		let networkName = '';
+
+		if (!isAdpushupDfp && adNetworkSettings && adNetworkSettings.length) {
 			const dfpNetwork = adNetworkSettings.find(network => network.networkName === 'DFP');
+
 			if (dfpNetwork && dfpNetwork.dfpAccounts.length) {
-				return `${
-					dfpNetwork.dfpAccounts[0].code === commonConsts.ADPUSHUP_NETWORK_ID
-						? 'AdPushup'
-						: 'Publisher'
-				} (${dfpNetwork.dfpAccounts[0].code})`;
+				dfpAccount = dfpNetwork.dfpAccounts.find(dfpAccount => dfpAccount.code === networkCode);
+				networkName = (dfpAccount && dfpAccount.name) || '';
 			}
 		}
 
-		return '';
+		return `${isAdpushupDfp ? 'AdPushup' : networkName} (${networkCode})`;
 	},
 	getNetworkTree() {
 		return couchbase
@@ -128,6 +129,106 @@ const commonSiteFunctions = {
 	},
 	getFormatedDate(date) {
 		return moment(date).format('Do MMM YYYY');
+	},
+	getAllSitesStatColumns(allProductNames = [], allBidderNames = []) {
+		const DEFAULT_WIDTH = {
+			width: 150,
+			maxWidth: 150,
+			minWidth: 150
+		};
+
+		return [
+			{
+				name: 'Site Id',
+				key: 'siteId',
+				position: 1,
+				showCopyBtn: true,
+				width: 100,
+				maxWidth: 100,
+				minWidth: 100
+			},
+			{
+				name: 'Domain',
+				key: 'domain',
+				position: 2,
+				showCopyBtn: true,
+				width: 250,
+				maxWidth: 250,
+				minWidth: 250
+			},
+			{
+				name: 'Owner Email',
+				key: 'accountEmail',
+				position: 3,
+				showCopyBtn: true,
+				width: 250,
+				maxWidth: 250,
+				minWidth: 250
+			},
+			{
+				name: 'Onboarding Status',
+				key: 'onboardingStatus',
+				position: 4,
+				width: 200,
+				maxWidth: 200,
+				minWidth: 200
+			},
+			{
+				name: 'Active Status',
+				key: 'activeStatus',
+				position: 5,
+				filters: ['Active', 'Inactive', 'N/A'],
+				...DEFAULT_WIDTH
+			},
+			{ name: 'Date Created', key: 'dateCreated', position: 6, ...DEFAULT_WIDTH },
+			{
+				name: 'Active Products',
+				key: 'activeProducts',
+				position: 7,
+				filters: allProductNames,
+				isMultiValue: true,
+				showCopyBtn: true,
+				width: 180,
+				maxWidth: 180,
+				minWidth: 180
+			},
+			{
+				name: 'Active Bidders',
+				key: 'activeBidders',
+				position: 8,
+				filters: [...allBidderNames, 'N/A'],
+				isMultiValue: true,
+				showCopyBtn: true,
+				...DEFAULT_WIDTH
+			},
+			{
+				name: 'Inactive Bidders',
+				key: 'inactiveBidders',
+				position: 9,
+				filters: allBidderNames,
+				isMultiValue: true,
+				showCopyBtn: true,
+				...DEFAULT_WIDTH
+			},
+			{ name: 'Rev Share (%)', key: 'revenueShare', position: 10, ...DEFAULT_WIDTH },
+			{
+				name: 'Publisher Id',
+				key: 'publisherId',
+				position: 11,
+				showCopyBtn: true,
+				...DEFAULT_WIDTH
+			},
+			{
+				name: 'Auth Email',
+				key: 'authEmail',
+				position: 12,
+				showCopyBtn: true,
+				width: 200,
+				maxWidth: 200,
+				minWidth: 200
+			},
+			{ name: 'Ad Manager', key: 'adManager', position: 13, showCopyBtn: true, ...DEFAULT_WIDTH }
+		];
 	}
 };
 
@@ -147,22 +248,22 @@ function apiModule() {
 					Promise.all([
 						sites,
 						commonSiteFunctions.getNetworkTree(),
-						commonSiteFunctions.getSitesReport()
+						commonSiteFunctions.getProductsMeta(),
+						commonSiteFunctions.getActiveProductsForAllSites()
 					])
 				)
-				.then(([sites, networkTree, sitesReport]) => {
+				.then(([sites, networkTree, productsMeta, activeProductsForAllSites]) => {
 					const finalSites = sites.map(site => {
 						const { publisherId, publisherEmail } = commonSiteFunctions.getPublisherIdAndEmail(
 							site.adNetworkSettings
 						);
-						if (!site.revenueShare) {
+						if (!site.revenueShare && site.revenueShare !== 0) {
 							site.revenueShare = 'N/A';
 						}
 						const {
 							activeBidders,
 							inactiveBidders
 						} = commonSiteFunctions.getActiveInactiveBidderNames(site.addedBidders, networkTree);
-						const uniqueSiteIds = getUniqueSites(sitesReport.data.result, 'siteid');
 
 						site.activeBidders = activeBidders;
 						site.inactiveBidders = inactiveBidders;
@@ -170,23 +271,30 @@ function apiModule() {
 							site.onboardingStep,
 							site.apps
 						);
-						site.activeProducts = commonSiteFunctions.getActiveProducts(site.apps);
+						site.activeProducts = commonSiteFunctions.getActiveProducts(
+							productsMeta.data.result,
+							activeProductsForAllSites.data[site.siteId]
+						);
 						site.publisherId = publisherId;
 						site.authEmail = publisherEmail;
-						site.adManager = commonSiteFunctions.getAdManager(site.adNetworkSettings);
+						site.adManager = commonSiteFunctions.getAdManager(
+							site.adNetworkSettings,
+							site.adServerSettings
+						);
 						site.dateCreated = commonSiteFunctions.getFormatedDate(site.dateCreated);
 
 						site.activeStatus =
-							sitesReport.code === 1 &&
-							uniqueSiteIds &&
-							!!uniqueSiteIds.find(currSiteId => currSiteId === site.siteId)
-								? 'Active'
-								: 'Inactive';
+							typeof site.activeStatus === 'boolean'
+								? site.activeStatus
+									? 'Active'
+									: 'Inactive'
+								: 'N/A';
 
 						delete site.addedBidders;
 						delete site.onboardingStep;
 						delete site.apps;
 						delete site.adNetworkSettings;
+						delete site.adServerSettings;
 
 						for (const key in site) {
 							if (site.hasOwnProperty(key) && site[key] === '') {
@@ -197,7 +305,20 @@ function apiModule() {
 						return site;
 					});
 
-					return finalSites.sort((a, b) => a.siteId - b.siteId);
+					const sortedFinalSites = finalSites.sort((a, b) => a.siteId - b.siteId);
+					const allProductNames = productsMeta.data.result.map(product => product.value);
+					const allBidderNames = Object.keys(networkTree).reduce((allBidderNames, networkKey) => {
+						const network = networkTree[networkKey];
+						if (commonSiteFunctions.isActiveHbBidder(network, networkKey)) {
+							allBidderNames.push(network.name);
+						}
+
+						return allBidderNames;
+					}, []);
+					return {
+						columns: commonSiteFunctions.getAllSitesStatColumns(allProductNames, allBidderNames),
+						result: sortedFinalSites
+					};
 				})
 				.catch(err => {
 					console.log(err);

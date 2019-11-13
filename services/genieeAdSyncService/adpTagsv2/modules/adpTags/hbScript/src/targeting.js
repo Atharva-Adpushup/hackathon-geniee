@@ -1,5 +1,6 @@
 // DFP targeting module
 
+var utils = require('./utils');
 var constants = require('./constants');
 var config = require('./config');
 var adp = require('./adp');
@@ -13,7 +14,7 @@ var targeting = {
             val = 0.01;
         }
 
-        console.log('Sent floor : ' + val);
+        utils.log('Sent floor : ' + val);
         return val;
     },
     setCustomSlotLevelTargeting: function (adpSlot) {

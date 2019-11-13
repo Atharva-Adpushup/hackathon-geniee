@@ -48,8 +48,13 @@ class Creation extends Component {
 	};
 
 	handleChange = e => {
+		// eslint-disable-next-line prefer-const
+		const { name, value } = e.target;
+		let computedValue = value;
+		if (name === 'pagegroupName') computedValue = value.toUpperCase();
+
 		this.setState({
-			[e.target.name]: e.target.value
+			[name]: computedValue
 		});
 	};
 

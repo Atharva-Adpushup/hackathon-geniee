@@ -16,6 +16,8 @@ module.exports = {
 	PRODUCT_LIST_API: `${reportingBaseURL}/common/activeProducts`,
 	MAB_REPORTING_API: `${reportingBaseURL}/site/mab`,
 	GET_SITES_STATS_API: `${reportingBaseURL}/site/report`,
+	ALL_PRODUCTS_META_API: `${reportingBaseURL}/site/list?list_name=get_all_products`,
+	ACTIVE_PRODUCTS_FOR_ALL_SITES_API: `${reportingBaseURL}/common/activeProducts?isSuperUser=true`,
 	ANALYTICS_API_ROOT: reportingBaseURL,
 	ANALYTICS_METAINFO_URL: '/common/metaInfo',
 	REPORT_PATH: '/site/report?report_name=get_stats_by_custom',
@@ -32,13 +34,15 @@ module.exports = {
 									_site.step as onboardingStep,
 									_site.dateCreated,
 									_site.apps,
+									_site.dataFeedActive as activeStatus,
 									_user.adNetworkSettings,
-									_hbcf.hbcf as addedBidders
+									_user.adServerSettings,
+									_hbdc.hbcf as addedBidders
 								FROM AppBucket _site
 								LEFT JOIN AppBucket _user
 								ON keys ('user::' || _site.ownerEmail)
-								LEFT JOIN AppBucket _hbcf
-								ON keys ('hbcf::' || to_string(_site.siteId))
+								LEFT JOIN AppBucket _hbdc
+								ON keys ('hbdc::' || to_string(_site.siteId))
 								WHERE meta(_site).id LIKE 'site::%'
 								AND meta(_user).id LIKE 'user::%';`,
 	DEMO_PAGEGROUPS: [
@@ -520,6 +524,6 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 	DEFAULT_APP_STATUS_RESPONSE: {},
 	EMAIL_REGEX: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
 	cronSchedule: {
-		activeSiteMarkingService: '0 */12 * * *'
+		activeSiteMarkingService: '50 12,0 * * *'
 	}
 };

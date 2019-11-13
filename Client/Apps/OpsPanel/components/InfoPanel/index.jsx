@@ -70,6 +70,7 @@ class InfoPanel extends Component {
 						{...this.props}
 						widgetsName={WIDGETS_INFO}
 						widgetsList={QUICK_SNAPSHOTS_WIDGETS}
+						isForOps
 					/>
 				);
 			case INFO_PANEL_IDENTIFIERS.REPORT_VITALS:

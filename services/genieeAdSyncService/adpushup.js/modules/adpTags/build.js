@@ -3,14 +3,15 @@
 const fs = require('fs'),
 	path = require('path'),
 	inventories = fs.readdirSync('./hbScript/inventory'),
-	webpack = require('webpack');
+	webpack = require('webpack'),
+	utils = require('../../libs/utils');
 
 let fileList = [];
 
 for (let i in inventories) {
 	if (path.extname(inventories[i]) === '.json') {
 		fileList.push(inventories[i]);
-		console.log(`Generating build for ${inventories[i]}`);
+		utils.log(`Generating build for ${inventories[i]}`);
 	}
 }
 
@@ -19,9 +20,9 @@ const createFinalBuild = (contents, file) => {
 
 	fs.writeFile(filePath, contents, function(err) {
 		if (err) {
-			console.log('Error writing file: ' + err);
+			utils.log('Error writing file: ' + err);
 		}
-		console.log(`Final build generated - ${file}`);
+		utils.log(`Final build generated - ${file}`);
 	});
 };
 
@@ -57,7 +58,7 @@ const generateBuild = file => {
 		},
 		(err, stats) => {
 			if (err) {
-				console.log(err);
+				utils.log(err);
 			}
 			const inventory = fs
 				.readFileSync(`./hbScript/inventory/${file}`)

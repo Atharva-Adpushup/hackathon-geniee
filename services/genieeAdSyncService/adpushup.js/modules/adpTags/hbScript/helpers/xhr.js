@@ -3,7 +3,7 @@
 var utils = require('../helpers/utils'),
 	xhr = function(method, url, payload, callback, option) {
 		if (!method || !url) {
-			console.log('AdpTags: Please provide valid HTTP method and url in xhr module');
+			utils.log('AdpTags: Please provide valid HTTP method and url in xhr module');
 			return;
 		}
 

@@ -7,12 +7,13 @@ var browserConfig = require('./browserConfig.js'),
 
 module.exports = {
 	log: function() {
+		var queryParams = this.queryParams;
 		var isQueryParams = !!(
-				this.queryParams &&
-				$.isPlainObject(this.queryParams) &&
-				!$.isEmptyObject(this.queryParams)
+				queryParams &&
+				$.isPlainObject(queryParams) &&
+				!$.isEmptyObject(queryParams)
 			),
-			isapDebugParam = !!(isQueryParams && this.queryParams.apDebug);
+			isapDebugParam = !!(isQueryParams && queryParams.apDebug);
 
 		if (typeof console !== 'undefined' && console.log && isapDebugParam)
 			console.log.apply(console, arguments);
@@ -282,7 +283,9 @@ module.exports = {
 				siteDomain: adpConfig.siteDomain,
 				url: adpConfig.pageUrl,
 				mode: data.mode, // Denotes which mode is running (adpushup or fallback)
-				errorCode: data.eventType, // Denotes the error code (no error, pagegroup not found etc.)
+				//errorCode: data.eventType, // Denotes the error code (no error, pagegroup not found etc.)
+				errorCode: data.errorCode, // Denotes the error code (no error, pagegroup not found etc.)
+				referrer: adpConfig.referrer,
 				pageGroup: adpConfig.pageGroup,
 				pageVariationId: adpConfig.selectedVariation,
 				pageVariationName: adpConfig.selectedVariationName,
@@ -402,21 +405,31 @@ module.exports = {
 		return window.location.href;
 	},
 	domanize: function(domain) {
-		return domain
-			? this.rightTrim(
-					domain
-						.replace('http://', '')
-						.replace('https://', '')
-						.replace('www.', ''),
-					'/'
-			  )
-			: '';
+		if (domain) {
+			var hostname = this.rightTrim(
+				domain
+					.replace('http://', '')
+					.replace('https://', '')
+					.replace('www.', ''),
+				'/'
+			);
+			var indexOfFirstSlash = hostname.indexOf('/');
+			indexOfFirstSlash = indexOfFirstSlash !== -1 ? indexOfFirstSlash : hostname.length;
+			hostname = hostname.substring(0, indexOfFirstSlash);
+			return hostname;
+		} else {
+			return '';
+		}
 	},
 	isUrlMatching: function(siteDomain) {
 		var url = siteDomain || window.adpushup.config.siteDomain,
+			href = '';
+		try {
+			href = window.top.location.toString();
+		} catch (err) {
 			href = this.getTopWindowHref();
+		}
 		url = this.domanize(url);
-
 		return href.indexOf(url) !== -1 ? true : false;
 	},
 	getObjectByName: function(collection, name) {

@@ -30,6 +30,33 @@ export const NAV_ITEMS_VALUES = {
 	TAB_5: 'Optimization'
 };
 
+export const INVENTORY_TABLE_COLUMNS = [
+	{
+		Header: 'Ad Unit',
+		accessor: 'adUnit'
+	},
+	{
+		Header: 'App',
+		accessor: 'app'
+	},
+	{
+		Header: 'Device',
+		accessor: 'device'
+	},
+	{
+		Header: 'PageGroup',
+		accessor: 'pageGroup'
+	},
+	{
+		Header: 'Variation',
+		accessor: 'variationName'
+	},
+	{
+		Header: 'HB',
+		accessor: 'headerBidding'
+	}
+];
+
 export const NAV_ITEMS = {
 	[NAV_ITEMS_INDEXES.TAB_1]: {
 		NAME: [NAV_ITEMS_VALUES.TAB_1],
