@@ -4,7 +4,7 @@ import { Col } from 'react-bootstrap';
 import sortBy from 'lodash/sortBy';
 import isEqual from 'lodash/isEqual';
 import moment from 'moment';
-import { numberWithCommas, computeCsvData, roundOffTwoDecimal } from '../helpers/utils';
+import { numberWithCommas, computeCsvData } from '../helpers/utils';
 import { reactTableSortMethod } from '../../../helpers/commonFunctions';
 
 class Table extends React.Component {
@@ -199,23 +199,22 @@ class Table extends React.Component {
 		tableBody.forEach(row => {
 			Object.keys(row).forEach(col => {
 				if (metrics[col]) {
-					let num;
 					switch (metrics[col].valueType) {
 						case 'money': {
-							num = roundOffTwoDecimal(row[col]);
-							row[col] = `$${numberWithCommas(num)}`;
+							// eslint-disable-next-line no-param-reassign
+							row[col] = `$${numberWithCommas(row[col])}`;
 
 							break;
 						}
 						case 'percent': {
-							num = roundOffTwoDecimal(row[col]);
-							row[col] = `${numberWithCommas(num)}%`;
+							// eslint-disable-next-line no-param-reassign
+							row[col] = `${numberWithCommas(row[col])}%`;
 
 							break;
 						}
 						default: {
-							num = row[col];
-							row[col] = numberWithCommas(num);
+							// eslint-disable-next-line no-param-reassign
+							row[col] = numberWithCommas(row[col]);
 						}
 					}
 				}
@@ -234,23 +233,19 @@ class Table extends React.Component {
 			let value = grandTotal[col];
 
 			if (metrics[col]) {
-				let num;
 				switch (metrics[col].valueType) {
 					case 'money': {
-						num = roundOffTwoDecimal(value);
-						value = `$${numberWithCommas(num)}`;
+						value = `$${numberWithCommas(value)}`;
 
 						break;
 					}
 					case 'percent': {
-						num = roundOffTwoDecimal(value);
-						value = `${numberWithCommas(num)}%`;
+						value = `${numberWithCommas(value)}%`;
 
 						break;
 					}
 					default: {
-						num = value;
-						value = numberWithCommas(num);
+						value = numberWithCommas(value);
 					}
 				}
 			}
