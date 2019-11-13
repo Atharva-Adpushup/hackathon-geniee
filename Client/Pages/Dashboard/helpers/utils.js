@@ -58,6 +58,18 @@ const getDateRange = value => {
 					.subtract(1, 'day')
 					.format('YYYY-MM-DD')
 			};
+
+		case 'lastMonth':
+			return {
+				fromDate: moment()
+					.startOf('month')
+					.subtract(1, 'month')
+					.format('YYYY-MM-DD'),
+				toDate: moment()
+					.endOf('month')
+					.subtract(1, 'month')
+					.format('YYYY-MM-DD')
+			};
 	}
 };
 
