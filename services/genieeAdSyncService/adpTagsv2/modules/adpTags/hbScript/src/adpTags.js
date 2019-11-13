@@ -72,7 +72,7 @@ var adpTags = {
 			var isResponsive = optionalParam.isResponsive;
 			var sectionName = optionalParam.sectionName;
 			var multipleAdSizes =
-				constants.AD_SIZE_MAPPING.BACKWARD_COMPATIBLE_MAPPING[size.join('x')] ||
+				constants.AD_SIZE_MAPPING.IAB_SIZES.BACKWARD_COMPATIBLE_MAPPING[size.join('x')] ||
 				optionalParam.multipleAdSizes;
 			var services = optionalParam.services;
 			var formats =
