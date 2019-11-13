@@ -105,7 +105,7 @@ var hb = {
 	setBidWonListener: function(w) {
 		w.pbjs.que.push(function() {
 			w.pbjs.onEvent(constants.EVENTS.PREBID.BID_WON, function(bidData) {
-				console.log('===BidWon====', bidData);
+				utils.log('===BidWon====', bidData);
 
 				var slot = window.adpushup.adpTags.adpSlots[bidData.adUnitCode];
 				var computedCPMValue = utils.currencyConversionActive(adp.config)

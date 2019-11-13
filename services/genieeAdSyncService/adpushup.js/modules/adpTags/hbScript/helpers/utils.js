@@ -257,5 +257,30 @@ module.exports = {
 			);
 
 		return isValidResult;
-	}
+	},
+	log: function() {
+		var queryParams = this.queryParams;
+		var isQueryParams = !!(
+				queryParams &&
+				$.isPlainObject(queryParams) &&
+				!$.isEmptyObject(queryParams)
+			),
+			isapDebugParam = !!(isQueryParams && queryParams.apDebug);
+
+		if (typeof console !== 'undefined' && console.log && isapDebugParam)
+			console.log.apply(console, arguments);
+	},
+	queryParams: (function() {
+		var str = window.location.search,
+			objURL = {};
+
+		str.replace(new RegExp('([^?=&]+)(=([^&]*))?', 'g'), function($0, $1, $2, $3) {
+			var queryStringKey = $1 || '',
+				queryStringValue = $3 || '';
+
+			objURL[queryStringKey] = window.decodeURIComponent(queryStringValue.replace(/\+/g, ' '));
+		});
+
+		return objURL;
+	})(),
 };

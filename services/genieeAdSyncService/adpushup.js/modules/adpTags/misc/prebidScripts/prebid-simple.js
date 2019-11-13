@@ -1,5 +1,6 @@
 // Prebid simple setup for tripbuzz.com
 
+var utils = require('../../../../libs/utils');
 var pbjs = pbjs || {};
 pbjs.que = pbjs.que || [];
 
@@ -33,7 +34,7 @@ var adUnits = [
 
 // Callback to be called when all bids have been received
 function getAllBids() {
-	console.log(pbjs.getBidResponses());
+	utils.log(pbjs.getBidResponses());
 }
 
 // Prebid method to request bids
