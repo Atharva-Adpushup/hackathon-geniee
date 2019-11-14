@@ -57,7 +57,7 @@ var targeting = {
         return null;
     },
 	setSlotLevel: function (adpSlot) {
-		var targeting = {};
+		var targeting = { adpushup_ran: 1};
 		var adServerTargeting = this.getAdserverTargeting(adpSlot);
 
 				
