@@ -60,8 +60,47 @@ var auction = {
 	},
 	getBidderSettings: function() {
 		var bidders = config.INVENTORY.hbcf;
-		var bidderSettings = {};
+		var keys = constants.PREBID_TARGETING_KEYS;
 
+		// Set custom default key value pairs
+		var bidderSettings = {
+			standard: {
+				adserverTargeting: [
+					{
+						key: keys.BIDDER,
+						val: function(bidResponse) {
+							return bidResponse.bidderCode;
+						}
+					},
+					{
+						key: keys.AD_ID,
+						val: function(bidResponse) {
+							return bidResponse.adId;
+						}
+					},
+					{
+						key: keys.CPM,
+						val: function(bidResponse) {
+							return bidResponse.pbDg; // Dense granularity
+						}
+					},
+					{
+						key: keys.SITE_ID,
+						val: function() {
+							return String(config.SITE_ID);
+						}
+					},
+					{
+						key: keys.HB_RAN,
+						val: function() {
+							return String(1);
+						}
+					}
+				]
+			}
+		};
+
+		// Adjust Bid CPM according to bidder revenueShare
 		for (var bidderCode in bidders) {
 			var revenueShare = parseFloat(bidders[bidderCode].revenueShare);
 

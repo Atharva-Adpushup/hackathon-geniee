@@ -56,17 +56,11 @@ var targeting = {
 
         return null;
     },
-    setSlotLevel: function (adpSlot) {
-        var targeting = {
-            hb_siteId: config.SITE_ID,
-			hb_ran: 0
-        };
-        var adServerTargeting = this.getAdserverTargeting(adpSlot);
+	setSlotLevel: function (adpSlot) {
+		var targeting = {};
+		var adServerTargeting = this.getAdserverTargeting(adpSlot);
 
-        if (adpSlot.bidders.length) {
-            Object.assign(targeting, { hb_ran: 1 });
-		}
-		
+				
 		var existingTargeting = (adpSlot.gSlot && adpSlot.gSlot.getTargetingMap()) || {};
 
 		if (existingTargeting.refreshcount && existingTargeting.refreshcount.length) {
