@@ -51,7 +51,7 @@ var targeting = {
     },
     getAdserverTargeting: function (adpSlot) {
         if (adpSlot.optionalParam.headerBidding && adpSlot.bidders.length) {
-            return window.pbjs.getAdserverTargeting()[adpSlot.containerId];
+            return window._apHB.getAdserverTargeting()[adpSlot.containerId];
         }
 
         return null;

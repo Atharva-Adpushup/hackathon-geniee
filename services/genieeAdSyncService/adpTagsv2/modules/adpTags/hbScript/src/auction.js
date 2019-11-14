@@ -17,7 +17,7 @@ var auction = {
 		return;
 	},
 	getAuctionResponse: function(adpBatchId) {
-		utils.log(window.pbjs.getBidResponses());
+		utils.log(window._apHB.getBidResponses());
 
 		return this.end(adpBatchId);
 	},
@@ -157,7 +157,7 @@ var auction = {
 		this.setBidderAliases(pbjs);
 	},
 	start: function(prebidSlots, adpBatchId) {
-		var pbjs = window.pbjs;
+		var pbjs = window._apHB;
 
 		pbjs.que.push(
 			function() {

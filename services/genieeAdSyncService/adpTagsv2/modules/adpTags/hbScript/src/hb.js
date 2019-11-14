@@ -103,8 +103,8 @@ var hb = {
 			: auction.start(prebidSlots, adpBatchId);
 	},
 	setBidWonListener: function(w) {
-		w.pbjs.que.push(function() {
-			w.pbjs.onEvent(constants.EVENTS.PREBID.BID_WON, function(bidData) {
+		w._apHB.que.push(function() {
+			w._apHB.onEvent(constants.EVENTS.PREBID.BID_WON, function(bidData) {
 				utils.log('===BidWon====', bidData);
 
 				var slot = window.adpushup.adpTags.adpSlots[bidData.adUnitCode];
@@ -132,8 +132,8 @@ var hb = {
 		return this.setBidWonListener(w);
 	},
 	init: function(w) {
-		w.pbjs = w.pbjs || {};
-		w.pbjs.que = w.pbjs.que || [];
+		w._apHB = w._apHB || {};
+		w._apHB.que = w._apHB.que || [];
 
 		return this.loadPrebid(w);
 	}
