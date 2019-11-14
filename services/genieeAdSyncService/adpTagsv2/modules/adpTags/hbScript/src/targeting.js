@@ -57,25 +57,33 @@ var targeting = {
         return null;
     },
 	setSlotLevel: function (adpSlot) {
-		var targeting = { adpushup_ran: 1};
+		var keys = constants.ADSERVER_TARGETING_KEYS;
+		var targeting = {
+			[keys.ADPUSHUP_RAN]: 1,
+			[keys.SITE_ID]: config.SITE_ID,
+			[keys.HB_RAN]: 0
+		};
 		var adServerTargeting = this.getAdserverTargeting(adpSlot);
 
-				
-		var existingTargeting = (adpSlot.gSlot && adpSlot.gSlot.getTargetingMap()) || {};
-
-		if (existingTargeting.refreshcount && existingTargeting.refreshcount.length) {
-			let refreshCountNum = parseInt(existingTargeting.refreshcount[0], 10);
-
-			if(!isNaN(refreshCountNum) && refreshCountNum < 20) {
-				Object.assign(targeting, { refreshcount: ++refreshCountNum });
-			} else {
-				Object.assign(targeting, { refreshcount: 'more_than_20' });
-			}
-		} else {
-			Object.assign(targeting, { refreshcount: 0 });
+		if (adpSlot.bidders.length) {
+			Object.assign(targeting, { [keys.HB_RAN]: 1 });
 		}
 
-		Object.assign(targeting, { refreshrate: adpSlot.optionalParam.refreshInterval });
+		var existingTargeting = (adpSlot.gSlot && adpSlot.gSlot.getTargetingMap()) || {};
+
+		if (existingTargeting[keys.REFRESH_COUNT] && existingTargeting[keys.REFRESH_COUNT].length) {
+			let refreshCountNum = parseInt(existingTargeting[keys.REFRESH_COUNT][0], 10);
+
+			if(!isNaN(refreshCountNum) && refreshCountNum < 20) {
+				Object.assign(targeting, { [keys.REFRESH_COUNT]: ++refreshCountNum });
+			} else {
+				Object.assign(targeting, { [keys.REFRESH_COUNT]: 'more_than_20' });
+			}
+		} else {
+			Object.assign(targeting, { [keys.REFRESH_COUNT]: 0 });
+		}
+
+		Object.assign(targeting, { [keys.REFRESH_RATE]: adpSlot.optionalParam.refreshInterval });
 
         if (adServerTargeting) {
             Object.assign(targeting, adServerTargeting);

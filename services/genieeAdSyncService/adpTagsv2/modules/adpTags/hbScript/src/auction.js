@@ -60,7 +60,7 @@ var auction = {
 	},
 	getBidderSettings: function() {
 		var bidders = config.INVENTORY.hbcf;
-		var keys = constants.PREBID_TARGETING_KEYS;
+		var keys = constants.ADSERVER_TARGETING_KEYS;
 
 		// Set custom default key value pairs
 		var bidderSettings = {
@@ -82,18 +82,6 @@ var auction = {
 						key: keys.CPM,
 						val: function(bidResponse) {
 							return bidResponse.pbDg; // Dense granularity
-						}
-					},
-					{
-						key: keys.SITE_ID,
-						val: function() {
-							return String(config.SITE_ID);
-						}
-					},
-					{
-						key: keys.HB_RAN,
-						val: function() {
-							return String(1);
 						}
 					}
 				]
