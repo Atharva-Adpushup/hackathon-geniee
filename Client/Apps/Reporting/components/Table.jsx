@@ -311,7 +311,7 @@ class Table extends React.Component {
 						{this.renderFooter()}
 						<b>Note: </b>
 						<span>
-							Net Revenue is estimated earnings, finalized earnings may vary depending on deductions
+							Net Revenue* is estimated earnings, finalized earnings may vary depending on deductions
 							from the demand partners.
 						</span>
 					</Col>
