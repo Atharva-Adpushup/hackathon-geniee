@@ -1,7 +1,8 @@
 // Slot inventory mapper
 
 var adp = require('./adp');
-var BACKWARD_COMPATIBLE_MAPPING = require('./constants').AD_SIZE_MAPPING.BACKWARD_COMPATIBLE_MAPPING;
+var BACKWARD_COMPATIBLE_MAPPING = require('./constants').AD_SIZE_MAPPING.IAB_SIZES
+	.BACKWARD_COMPATIBLE_MAPPING;
 var inventoryMapper = {
 	get: function(inventory, size, optionalParam) {
 		// Reset inventory as default if site is SPA
@@ -40,7 +41,8 @@ var inventoryMapper = {
 						if (
 							inventorySize === 'responsivexresponsive' &&
 							allSizesParams['responsive']
-						) return allSizesParams['responsive'];
+						)
+							return allSizesParams['responsive'];
 
 						if (allSizesParams[inventorySize]) return allSizesParams[inventorySize];
 
@@ -53,7 +55,8 @@ var inventoryMapper = {
 
 								for (let backwardSize of backwardSizes) {
 									backwardSize = backwardSize.join('x');
-									if (allSizesParams[backwardSize]) return allSizesParams[backwardSize];
+									if (allSizesParams[backwardSize])
+										return allSizesParams[backwardSize];
 								}
 
 								return;
@@ -61,12 +64,12 @@ var inventoryMapper = {
 						}
 					}
 
-					if (
-						!bidderData.sizeLess &&
-						bidderData.reusable
-					) {
-						const bidderParams = getOriginalOrDownwardSizeBidderParams(bidderData.config, updatedSize);
-						
+					if (!bidderData.sizeLess && bidderData.reusable) {
+						const bidderParams = getOriginalOrDownwardSizeBidderParams(
+							bidderData.config,
+							updatedSize
+						);
+
 						if (bidderParams) {
 							bidders.push({
 								bidder: bidder,
