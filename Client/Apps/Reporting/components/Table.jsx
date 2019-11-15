@@ -202,13 +202,13 @@ class Table extends React.Component {
 					switch (metrics[col].valueType) {
 						case 'money': {
 							// eslint-disable-next-line no-param-reassign
-							row[col] = `$${numberWithCommas(row[col])}`;
+							row[col] = `$${numberWithCommas(row[col].toFixed(2))}`;
 
 							break;
 						}
 						case 'percent': {
 							// eslint-disable-next-line no-param-reassign
-							row[col] = `${numberWithCommas(row[col])}%`;
+							row[col] = `${numberWithCommas(row[col].toFixed(2))}%`;
 
 							break;
 						}
@@ -235,12 +235,12 @@ class Table extends React.Component {
 			if (metrics[col]) {
 				switch (metrics[col].valueType) {
 					case 'money': {
-						value = `$${numberWithCommas(value)}`;
+						value = `$${numberWithCommas(value.toFixed(2))}`;
 
 						break;
 					}
 					case 'percent': {
-						value = `${numberWithCommas(value)}%`;
+						value = `${numberWithCommas(value.toFixed(2))}%`;
 
 						break;
 					}
@@ -311,8 +311,8 @@ class Table extends React.Component {
 						{this.renderFooter()}
 						<b>Note: </b>
 						<span>
-							Net Revenue* is estimated earnings, finalized earnings may vary depending on deductions
-							from the demand partners.
+							Net Revenue* is estimated earnings, finalized earnings may vary depending on
+							deductions from the demand partners.
 						</span>
 					</Col>
 				</React.Fragment>
