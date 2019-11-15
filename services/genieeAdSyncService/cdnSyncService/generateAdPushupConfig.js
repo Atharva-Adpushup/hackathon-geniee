@@ -59,6 +59,108 @@ const pushToAdpTags = function(ad, json) {
 	}
 };
 
+const getAdConfig = function(adType, section) {
+	const ad =
+		adType === 'layout'
+			? section.ads[Object.keys(section.ads)[0]] // for now we have only one ad inside a section
+			: section;
+
+	const {
+		type,
+		network,
+		networkData: { isResponsive },
+		css,
+		height,
+		width,
+		multipleAdSizes
+	} = ad;
+
+	const { name: sectionName, id, formatData } = section;
+
+	let json = {
+		id,
+		sectionName,
+		network,
+		type, // Format type of ad like, 1 for structural, 2 for incontent
+		css,
+		height: isResponsive ? height : parseInt(height, 10),
+		width: isResponsive ? width : parseInt(width, 10),
+		formatData
+	};
+
+	// Add 'multipleAdSizes' property if exists
+	const isMultipleAdSizes = !!(multipleAdSizes && multipleAdSizes.length);
+
+	if (isMultipleAdSizes) {
+		json.multipleAdSizes = multipleAdSizes.concat([]);
+	}
+
+	switch (adType) {
+		case 'layout': {
+			const { enableLazyLoading } = section;
+
+			json = {
+				...json,
+				enableLazyLoading
+			};
+
+			if (section.isIncontent) {
+				_.extend(json, {
+					isIncontent: true,
+					float: section.float,
+					minDistanceFromPrevAd: section.minDistanceFromPrevAd,
+					ignoreXpaths: section.ignoreXpaths || [],
+					section: parseInt(section.sectionNo, 10)
+				});
+				if (ad.secondaryCss) {
+					json.secondaryCss = ad.secondaryCss;
+				}
+				if (ad.customCSS) {
+					json.customCSS = ad.customCSS;
+				}
+				if (section.notNear) {
+					json.notNear = section.notNear;
+				}
+			} else {
+				_.extend(json, {
+					xpath: section.xpath,
+					operation: section.operation
+				});
+			}
+
+			break;
+		}
+		case 'innovativeAds': {
+			const { isInnovativeAd, networkData, pagegroups } = ad;
+
+			json = {
+				...json,
+				isInnovativeAd,
+				networkData,
+				pagegroups
+			};
+
+			break;
+		}
+		case 'apTag': {
+			const { isManual, networkData } = ad;
+
+			json = {
+				...json,
+				isManual,
+				networkData
+			};
+
+			break;
+		}
+		default:
+	}
+
+	pushToAdpTags(ad, json);
+
+	return json;
+};
+
 const getSectionsPayload = function(variationSections, platform, pagegroup, selectorsTreeLevel) {
 	const ads = [];
 	let ad = null;
@@ -84,53 +186,7 @@ const getSectionsPayload = function(variationSections, platform, pagegroup, sele
 		const isEditorInnovativeSection = !!(section.type === 3 || section.type === 4);
 
 		if (!isEditorInnovativeSection) {
-			const isResponsive = !!ad.networkData.isResponsive;
-
-			json = {
-				id: sectionId,
-				sectionName: section.name,
-				network: ad.network,
-				// Format type of ad like, 1 for structural, 2 for incontent
-				type: section.type,
-				formatData: section.formatData,
-				css: ad.css,
-				height: isResponsive ? ad.height : parseInt(ad.height, 10),
-				width: isResponsive ? ad.width : parseInt(ad.width, 10),
-				enableLazyLoading: section.enableLazyLoading
-			};
-
-			// Add 'multipleAdSizes' property if exists
-			const isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length);
-
-			if (isMultipleAdSizes) {
-				json.multipleAdSizes = ad.multipleAdSizes.concat([]);
-			}
-
-			if (section.isIncontent) {
-				_.extend(json, {
-					isIncontent: true,
-					float: section.float,
-					minDistanceFromPrevAd: section.minDistanceFromPrevAd,
-					ignoreXpaths: section.ignoreXpaths || [],
-					section: parseInt(section.sectionNo, 10)
-				});
-				if (ad.secondaryCss) {
-					json.secondaryCss = ad.secondaryCss;
-				}
-				if (ad.customCSS) {
-					json.customCSS = ad.customCSS;
-				}
-				if (section.notNear) {
-					json.notNear = section.notNear;
-				}
-			} else {
-				_.extend(json, {
-					xpath: section.xpath,
-					operation: section.operation
-				});
-			}
-			// for geniee provide networkData
-			pushToAdpTags(ad, json);
+			json = getAdConfig('layout', section);
 
 			// Sending whole network data object in ad.
 			json.networkData = ad.networkData;
@@ -151,13 +207,8 @@ const getVariationPayload = (variation, platform, pageGroup, variationData, fina
 	}
 
 	let ads = [];
-	if (variation.sections && Object.keys(variation.sections).length){
-		ads = getSectionsPayload(
-			variation.sections,
-			platform,
-			pageGroup,
-			variation.selectorsTreeLevel
-		);
+	if (variation.sections && Object.keys(variation.sections).length) {
+		ads = getSectionsPayload(variation.sections, platform, pageGroup, variation.selectorsTreeLevel);
 	}
 
 	let computedVariationObj;
@@ -264,7 +315,7 @@ const getChannelPayload = (channel, pageGroupData, pageGroupPattern) => {
 	return finalJson;
 };
 
-const getAds = (docKey, siteId) =>
+const getSections = (docKey, siteId) =>
 	appBucket.getDoc(docKey).then(docWithCas => {
 		const ads = docWithCas.value.ads.filter(ad => !ad.hasOwnProperty('isActive') || ad.isActive);
 		return ads;
@@ -277,11 +328,8 @@ const getAdsAndPushToAdp = (identifier, docKey, site) => {
 		return Promise.resolve([]);
 	}
 
-	return getAds(docKey, site.get('siteId'))
-		.then(ads => {
-			_.forEach(ads, ad => pushToAdpTags(ad, ad));
-			return ads;
-		})
+	return getSections(docKey, site.get('siteId'))
+		.then(sections => sections.map(section => getAdConfig(identifier, section)))
 		.catch(err =>
 			err.code && err.code === 13 && err.message.includes('key does not exist')
 				? []
