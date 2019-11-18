@@ -66,7 +66,6 @@ const getAdConfig = function(adType, section) {
 			: section;
 
 	const {
-		type,
 		network,
 		networkData: { isResponsive },
 		css,
@@ -81,7 +80,6 @@ const getAdConfig = function(adType, section) {
 		id,
 		sectionName,
 		network,
-		type, // Format type of ad like, 1 for structural, 2 for incontent
 		css,
 		height: isResponsive ? height : parseInt(height, 10),
 		width: isResponsive ? width : parseInt(width, 10),
@@ -97,11 +95,12 @@ const getAdConfig = function(adType, section) {
 
 	switch (adType) {
 		case 'layout': {
-			const { enableLazyLoading } = section;
+			const { enableLazyLoading, type } = section;
 
 			json = {
 				...json,
-				enableLazyLoading
+				enableLazyLoading,
+				type // Format type of ad like, 1 for structural, 2 for incontent
 			};
 
 			if (section.isIncontent) {
@@ -131,24 +130,26 @@ const getAdConfig = function(adType, section) {
 			break;
 		}
 		case 'innovativeAds': {
-			const { isInnovativeAd, networkData, pagegroups } = ad;
+			const { isInnovativeAd, networkData, pagegroups, type } = ad;
 
 			json = {
 				...json,
 				isInnovativeAd,
 				networkData,
-				pagegroups
+				pagegroups,
+				type
 			};
 
 			break;
 		}
 		case 'apTag': {
-			const { isManual, networkData } = ad;
+			const { isManual, networkData, type } = ad;
 
 			json = {
 				...json,
 				isManual,
-				networkData
+				networkData,
+				type
 			};
 
 			break;
@@ -183,7 +184,7 @@ const getSectionsPayload = function(variationSections, platform, pagegroup, sele
 			});
 		}
 
-		const isEditorInnovativeSection = !!(section.type === 3 || section.type === 4);
+		const isEditorInnovativeSection = !!(section.type === 3 || section.type === 4 || section.type === 5);
 
 		if (!isEditorInnovativeSection) {
 			json = getAdConfig('layout', section);
