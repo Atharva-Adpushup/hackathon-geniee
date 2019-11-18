@@ -70,7 +70,7 @@ function apiModule() {
 					const hbBidders = {};
 
 					for (const key in networks) {
-						if (key !== 'adpTags' && networks[key].isHb && networks[key])
+						if (key !== 'adpTags' && networks[key] && networks[key].isHb && networks[key].reusable)
 							hbBidders[key] = networks[key];
 					}
 
