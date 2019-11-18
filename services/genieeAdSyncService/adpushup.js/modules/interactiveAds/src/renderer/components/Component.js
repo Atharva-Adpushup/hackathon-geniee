@@ -77,7 +77,8 @@ class Component {
 			// ads: [this.interactiveAd],
 			// xpathMiss: [],
 			errorCode: 1,
-			mode: window.adpushup.config.mode,
+			//mode: window.adpushup.config.mode,
+			mode: 1,
 			// referrer: adp.config.referrer,
 			// tracking: false,
 			variationId: !adp.config.manualModeActive
