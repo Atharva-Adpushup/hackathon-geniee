@@ -1,6 +1,6 @@
 /* eslint-disable no-prototype-builtins */
 import React, { Component } from 'react';
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col, Alert } from 'react-bootstrap';
 import moment from 'moment';
 import { Object } from 'es6-shim';
 import qs from 'querystringify';
@@ -30,6 +30,16 @@ import {
 	getDemoUserSites
 } from '../../../helpers/commonFunctions';
 
+function consoleRedirection(e) {
+	e.preventDefault();
+	const now = new Date();
+	now.setHours(now.getHours() + 2);
+	document.cookie = `app_redirect=0; path=/; expires=${now.toUTCString()}; domain=adpushup.com`;
+	setTimeout(() => {
+		window.location.href = 'http://console.adpushup.com';
+	}, 500);
+}
+
 class Panel extends Component {
 	constructor(props) {
 		super(props);
@@ -56,7 +66,8 @@ class Panel extends Component {
 			reportType: props.reportType || 'account',
 			isLoading: true,
 			isValidSite: true,
-			isReportingSite: true
+			isReportingSite: true.index,
+			show: true
 		};
 	}
 
@@ -666,6 +677,10 @@ class Panel extends Component {
 		return selectedMetricsTableData;
 	};
 
+	handleDismiss = () => {
+		this.setState({ show: false });
+	};
+
 	renderContent = () => {
 		const {
 			selectedDimension,
@@ -749,7 +764,7 @@ class Panel extends Component {
 						user={user}
 					/>
 				</Col>
-				<Col sm={12} className="u-margin-t5">
+				<Col sm={12} className='u-margin-t5'>
 					<ChartContainer
 						tableData={tableData}
 						selectedDimension={selectedDimension}
@@ -765,7 +780,7 @@ class Panel extends Component {
 						selectedChartLegendMetric={selectedChartLegendMetric}
 					/>
 				</Col>
-				<Col sm={12} className="u-margin-t5">
+				<Col sm={12} className='u-margin-t5'>
 					<TableContainer
 						tableData={selectedMetricsTableData}
 						startDate={startDate}
@@ -783,14 +798,26 @@ class Panel extends Component {
 	};
 
 	render() {
-		const { isLoading } = this.state;
+		const { isLoading, show } = this.state;
 		const { reportsMeta } = this.props;
 
 		if (!reportsMeta.fetched || isLoading) {
 			return <Loader />;
 		}
 
-		return <ActionCard title="AdPushup Reports">{this.renderContent()}</ActionCard>;
+		return (
+			<React.Fragment>
+				{show ? (
+					<Alert bsStyle='danger' onDismiss={this.handleDismiss}>
+						For old reporting data (before 1st August) go to console by{' '}
+						<a onClick={consoleRedirection} className='alert-link' style={{ cursor: 'pointer' }}>
+							clicking here.
+						</a>
+					</Alert>
+				) : null}
+				<ActionCard title='AdPushup Reports'>{this.renderContent()}</ActionCard>
+			</React.Fragment>
+		);
 	}
 }
 
