@@ -59,52 +59,49 @@ const pushToAdpTags = function(ad, json) {
 	}
 };
 
-const getSectionsPayload = function(variationSections, platform, pagegroup, selectorsTreeLevel) {
-	const ads = [];
-	let ad = null;
-	let json;
+const getAdConfig = function(adType, section) {
+	const ad =
+		adType === 'layout'
+			? section.ads[Object.keys(section.ads)[0]] // for now we have only one ad inside a section
+			: section;
 
-	_.each(variationSections, (section, sectionId) => {
-		if (!Object.keys(section.ads).length) {
-			return true;
-		}
-		ad = section.ads[Object.keys(section.ads)[0]]; // for now we have only one ad inside a section
+	const {
+		network,
+		networkData: { isResponsive },
+		css,
+		height,
+		width,
+		multipleAdSizes
+	} = ad;
 
-		// In case if even one ad inside variation is unsynced then we don't generate JS as unsynced ads will have no impression and hence loss of revenue'
-		if (!isAdSynced(ad)) {
-			throw new AdPushupError({
-				message: ERROR_MESSAGES.MESSAGE.UNSYNCED_SETUP,
-				ad,
-				sectionId,
-				platform: platform || 'Not Present',
-				pagegroup: pagegroup || 'Not Present'
-			});
-		}
+	const { name: sectionName, id, formatData } = section;
 
-		const isEditorInnovativeSection = !!(section.type === 3 || section.type === 4);
+	let json = {
+		id,
+		sectionName,
+		network,
+		css,
+		height: isResponsive ? height : parseInt(height, 10),
+		width: isResponsive ? width : parseInt(width, 10),
+		formatData
+	};
 
-		if (!isEditorInnovativeSection) {
-			const isResponsive = !!ad.networkData.isResponsive;
+	// Add 'multipleAdSizes' property if exists
+	const isMultipleAdSizes = !!(multipleAdSizes && multipleAdSizes.length);
+
+	if (isMultipleAdSizes) {
+		json.multipleAdSizes = multipleAdSizes.concat([]);
+	}
+
+	switch (adType) {
+		case 'layout': {
+			const { enableLazyLoading, type } = section;
 
 			json = {
-				id: sectionId,
-				sectionName: section.name,
-				network: ad.network,
-				// Format type of ad like, 1 for structural, 2 for incontent
-				type: section.type,
-				formatData: section.formatData,
-				css: ad.css,
-				height: isResponsive ? ad.height : parseInt(ad.height, 10),
-				width: isResponsive ? ad.width : parseInt(ad.width, 10),
-				enableLazyLoading: section.enableLazyLoading
+				...json,
+				enableLazyLoading,
+				type // Format type of ad like, 1 for structural, 2 for incontent
 			};
-
-			// Add 'multipleAdSizes' property if exists
-			const isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length);
-
-			if (isMultipleAdSizes) {
-				json.multipleAdSizes = ad.multipleAdSizes.concat([]);
-			}
 
 			if (section.isIncontent) {
 				_.extend(json, {
@@ -129,8 +126,68 @@ const getSectionsPayload = function(variationSections, platform, pagegroup, sele
 					operation: section.operation
 				});
 			}
-			// for geniee provide networkData
-			pushToAdpTags(ad, json);
+
+			break;
+		}
+		case 'innovativeAds': {
+			const { isInnovativeAd, networkData, pagegroups, type } = ad;
+
+			json = {
+				...json,
+				isInnovativeAd,
+				networkData,
+				pagegroups,
+				type
+			};
+
+			break;
+		}
+		case 'apTag': {
+			const { isManual, networkData, type } = ad;
+
+			json = {
+				...json,
+				isManual,
+				networkData,
+				type
+			};
+
+			break;
+		}
+		default:
+	}
+
+	pushToAdpTags(ad, json);
+
+	return json;
+};
+
+const getSectionsPayload = function(variationSections, platform, pagegroup, selectorsTreeLevel) {
+	const ads = [];
+	let ad = null;
+	let json;
+
+	_.each(variationSections, (section, sectionId) => {
+		if (!Object.keys(section.ads).length) {
+			return true;
+		}
+		ad = section.ads[Object.keys(section.ads)[0]]; // for now we have only one ad inside a section
+
+		// In case if even one ad inside variation is unsynced then we don't generate JS as unsynced ads will have no impression and hence loss of revenue'
+		if (!isAdSynced(ad)) {
+			throw new AdPushupError({
+				message: ERROR_MESSAGES.MESSAGE.UNSYNCED_SETUP,
+				ad,
+				sectionId,
+				platform: platform || 'Not Present',
+				pagegroup: pagegroup || 'Not Present'
+			});
+		}
+
+		const isEditorInnovativeSection = !!(section.type === 3 || section.type === 4 || section.type === 5);
+
+		if (!isEditorInnovativeSection) {
+			json = getAdConfig('layout', section);
 
 			// Sending whole network data object in ad.
 			json.networkData = ad.networkData;
@@ -151,13 +208,8 @@ const getVariationPayload = (variation, platform, pageGroup, variationData, fina
 	}
 
 	let ads = [];
-	if (variation.sections && Object.keys(variation.sections).length){
-		ads = getSectionsPayload(
-			variation.sections,
-			platform,
-			pageGroup,
-			variation.selectorsTreeLevel
-		);
+	if (variation.sections && Object.keys(variation.sections).length) {
+		ads = getSectionsPayload(variation.sections, platform, pageGroup, variation.selectorsTreeLevel);
 	}
 
 	let computedVariationObj;
@@ -264,7 +316,7 @@ const getChannelPayload = (channel, pageGroupData, pageGroupPattern) => {
 	return finalJson;
 };
 
-const getAds = (docKey, siteId) =>
+const getSections = (docKey, siteId) =>
 	appBucket.getDoc(docKey).then(docWithCas => {
 		const ads = docWithCas.value.ads.filter(ad => !ad.hasOwnProperty('isActive') || ad.isActive);
 		return ads;
@@ -277,11 +329,8 @@ const getAdsAndPushToAdp = (identifier, docKey, site) => {
 		return Promise.resolve([]);
 	}
 
-	return getAds(docKey, site.get('siteId'))
-		.then(ads => {
-			_.forEach(ads, ad => pushToAdpTags(ad, ad));
-			return ads;
-		})
+	return getSections(docKey, site.get('siteId'))
+		.then(sections => sections.map(section => getAdConfig(identifier, section)))
 		.catch(err =>
 			err.code && err.code === 13 && err.message.includes('key does not exist')
 				? []
