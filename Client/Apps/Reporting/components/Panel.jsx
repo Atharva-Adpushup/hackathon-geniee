@@ -66,7 +66,7 @@ class Panel extends Component {
 			reportType: props.reportType || 'account',
 			isLoading: true,
 			isValidSite: true,
-			isReportingSite: true.index,
+			isReportingSite: true,
 			show: true
 		};
 	}
