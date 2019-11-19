@@ -23,7 +23,7 @@ import {
 } from '../configs/commonConsts';
 import { DEMO_ACCOUNT_DATA } from '../../../constants/others';
 import Loader from '../../../Components/Loader';
-import { convertObjToArr } from '../helpers/utils';
+import { convertObjToArr, roundOffTwoDecimal } from '../helpers/utils';
 import {
 	getReportingDemoUserValidation,
 	getReportingDemoUserSiteIds,
@@ -282,7 +282,7 @@ class Panel extends Component {
 	};
 
 	generateButtonHandler = (inputState = {}) => {
-		let { tableData, selectedDimension, selectedFilters } = this.state;
+		let { tableData, selectedDimension, selectedFilters, dimensionList } = this.state;
 		const { reportType, isCustomizeChartLegend, isForOps } = this.props;
 		const computedState = Object.assign({ isLoading: true }, inputState);
 
@@ -332,22 +332,24 @@ class Panel extends Component {
 						tableData.columns.length
 					) {
 						tableData.total = this.computeTotal(tableData.result);
-
-						if (tableData.columns.indexOf('adpushup_xpath_miss_percent') !== -1) {
-							tableData.result = tableData.result.map(row => {
-								const rowCopy = JSON.parse(JSON.stringify(row));
-
-								// eslint-disable-next-line no-restricted-syntax
-								for (const column in rowCopy) {
-									if (column === 'adpushup_xpath_miss_percent') {
-										rowCopy[column] = parseFloat(rowCopy[column].toFixed(2));
-									}
-								}
-
-								return rowCopy;
-							});
-						}
 					}
+
+					tableData.result.forEach(row => {
+						Object.keys(row).forEach(column => {
+							if (
+								REPORT_INTERVAL_TABLE_KEYS.indexOf(column) === -1 &&
+								!Number.isNaN(row[column]) &&
+								!dimensionList.find(dimension => dimension.value === column)
+							) {
+								// eslint-disable-next-line no-param-reassign
+								row[column] = parseFloat(roundOffTwoDecimal(row[column]));
+							}
+						});
+					});
+
+					Object.keys(tableData.total).forEach(column => {
+						tableData.total[column] = parseFloat(roundOffTwoDecimal(tableData.total[column]));
+					});
 
 					if (tableData.columns && tableData.columns.length) {
 						const metricsList = this.getMetricsList(tableData);

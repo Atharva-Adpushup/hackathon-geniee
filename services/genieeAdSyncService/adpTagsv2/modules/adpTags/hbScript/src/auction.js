@@ -17,7 +17,7 @@ var auction = {
 		return;
 	},
 	getAuctionResponse: function(adpBatchId) {
-		utils.log(window.pbjs.getBidResponses());
+		utils.log(window._apPbJs.getBidResponses());
 
 		return this.end(adpBatchId);
 	},
@@ -60,8 +60,35 @@ var auction = {
 	},
 	getBidderSettings: function() {
 		var bidders = config.INVENTORY.hbcf;
-		var bidderSettings = {};
+		var keys = constants.ADSERVER_TARGETING_KEYS;
 
+		// Set custom default key value pairs
+		var bidderSettings = {
+			standard: {
+				adserverTargeting: [
+					{
+						key: keys.BIDDER,
+						val: function(bidResponse) {
+							return bidResponse.bidderCode;
+						}
+					},
+					{
+						key: keys.AD_ID,
+						val: function(bidResponse) {
+							return bidResponse.adId;
+						}
+					},
+					{
+						key: keys.CPM,
+						val: function(bidResponse) {
+							return bidResponse.pbDg; // Dense granularity
+						}
+					}
+				]
+			}
+		};
+
+		// Adjust Bid CPM according to bidder revenueShare
 		for (var bidderCode in bidders) {
 			var revenueShare = parseFloat(bidders[bidderCode].revenueShare);
 
@@ -118,7 +145,7 @@ var auction = {
 		this.setBidderAliases(pbjs);
 	},
 	start: function(prebidSlots, adpBatchId) {
-		var pbjs = window.pbjs;
+		var pbjs = window._apPbJs;
 
 		pbjs.que.push(
 			function() {
