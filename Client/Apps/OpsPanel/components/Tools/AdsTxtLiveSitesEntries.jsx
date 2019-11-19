@@ -11,7 +11,8 @@ const DEFAULT_STATE = {
 	siteId: '',
 	emailId: '',
 	adsTxtSnippet: '',
-	currentSelectedEntry: null
+	currentSelectedEntry: null,
+	isLoading: false
 };
 
 class AdsTxtLiveSitesEntries extends Component {
@@ -38,7 +39,7 @@ class AdsTxtLiveSitesEntries extends Component {
 
 	handleGenerate = e => {
 		e.preventDefault();
-		const { emailId, currentSelectedEntry, siteId } = this.state;
+		const { emailId, currentSelectedEntry, siteId, adsTxtSnippet } = this.state;
 
 		const isValid = !!(emailId && currentSelectedEntry);
 		const { showNotification } = this.props;
@@ -51,6 +52,38 @@ class AdsTxtLiveSitesEntries extends Component {
 				autoDismiss: 5
 			});
 		}
+
+		return axiosInstance
+			.post('/ops/adsTxtLiveEntries', {
+				siteId,
+				emailId,
+				currentSelectedEntry,
+				adsTxtSnippet
+			})
+			.then(() => {
+				showNotification({
+					mode: 'success',
+					title: 'Success',
+					message: `Email will be sent to ${emailId} in 30 minutes`,
+					autoDismiss: 5
+				});
+				this.setState({ isLoading: false }, this.handleReset);
+			})
+			.catch(err => {
+				const { data = {} } = err.response;
+				const {
+					data: { message = 'Something went Wrong. Please contact AdPushup Support.' } = {}
+				} = data;
+
+				showNotification({
+					mode: 'error',
+					title: 'Operation Failed',
+					message: errResponse || message,
+					autoDismiss: 5
+				});
+
+				this.setState({ isLoading: false });
+			});
 	};
 	render() {
 		const { siteId, emailId, currentSelectedEntry, adsTxtSnippet, isLoading } = this.state;
@@ -58,64 +91,64 @@ class AdsTxtLiveSitesEntries extends Component {
 		return (
 			<form onSubmit={this.handleGenerate}>
 				<Fragment>
-					<p className="u-text-bold">Type Of Entries *</p>
+					<p className='u-text-bold'>Type Of Entries *</p>
 					<SelectBox
 						selected={currentSelectedEntry}
 						options={ADS_TXT_LIVE_SITES_ENTRIES}
 						onSelect={this.handleSelect}
-						id="select-entry"
-						title="Select Entry"
-						dataKey="currentSelectedEntry"
+						id='select-entry'
+						title='Select Entry'
+						dataKey='currentSelectedEntry'
 						reset
 					/>
 				</Fragment>
-				<div className="u-margin-t4">
-					<FormGroup controlId="adsTxtSnippet-input">
+				<div className='u-margin-t4'>
+					<FormGroup controlId='adsTxtSnippet-input'>
 						<ControlLabel>Ads.txt Snippet</ControlLabel>
 						<FormControl
-							componentClass="textarea"
-							placeholder="Ads.txt Snippet"
-							name="adsTxtSnippet"
+							componentClass='textarea'
+							placeholder='Ads.txt Snippet'
+							name='adsTxtSnippet'
 							onChange={this.handleChange}
 							value={adsTxtSnippet}
-							className="u-padding-v4 u-padding-h4"
+							className='u-padding-v4 u-padding-h4'
 						/>
 					</FormGroup>
 				</div>
 				<FieldGroup
-					name="siteId"
+					name='siteId'
 					value={siteId}
-					type="number"
-					label="Site Id "
+					type='number'
+					label='Site Id '
 					onChange={this.handleChange}
 					size={6}
-					id="siteId-input"
-					placeholder="Site Id"
-					className="u-padding-v4 u-padding-h4"
+					id='siteId-input'
+					placeholder='Site Id'
+					className='u-padding-v4 u-padding-h4'
 				/>
 
 				<FieldGroup
-					name="emailId"
+					name='emailId'
 					value={emailId}
-					type="email"
-					label="Email Id *"
+					type='email'
+					label='Email Id *'
 					onChange={this.handleChange}
 					size={6}
-					id="emailId-input"
-					placeholder="Email Id"
-					className="u-padding-v4 u-padding-h4"
+					id='emailId-input'
+					placeholder='Email Id'
+					className='u-padding-v4 u-padding-h4'
 				/>
 				<CustomButton
-					variant="secondary"
-					className="pull-right u-margin-r3"
+					variant='secondary'
+					className='pull-right u-margin-r3'
 					onClick={this.handleReset}
 				>
 					Reset
 				</CustomButton>
 				<CustomButton
-					type="submit"
-					variant="primary"
-					className="pull-right u-margin-r3"
+					type='submit'
+					variant='primary'
+					className='pull-right u-margin-r3'
 					showSpinner={isLoading}
 				>
 					Generate

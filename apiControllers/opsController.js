@@ -253,6 +253,31 @@ router
 			.catch(err => errorHandler(err, res));
 	})
 
+	.post('/adsTxtLiveEntries', (req, res) => {
+		if (!req.user.isSuperUser) {
+			return sendErrorResponse(
+				{
+					message: 'Unauthorized Request',
+					code: HTTP_STATUSES.UNAUTHORIZED
+				},
+				res
+			);
+		}
+
+		const { siteId, emailId, currentSelectedEntry, adsTxtSnippet } = req.body;
+
+		const isDataValid = !!(siteId && EMAIL_REGEX.test(emailId));
+
+		if (isDataValid === false) {
+			return sendErrorResponse(
+				{
+					message: 'Missing or Inavalid params.'
+				},
+				res
+			);
+		}
+	})
+
 	.get('/allSitesStats', (req, res) => {
 		if (!req.user.isSuperUser) {
 			return sendErrorResponse(
