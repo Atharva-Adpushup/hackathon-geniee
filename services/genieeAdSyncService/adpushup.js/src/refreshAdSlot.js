@@ -80,7 +80,7 @@ var utils = require('../libs/utils'),
 			tracking: false
 		};
 		feedbackData.xpathMiss = [];
-		feedbackData.ads = [ad.id];
+		feedbackData.ads = [ad];
 		feedbackData.variationId = adp.config.selectedVariation;
 		utils.sendFeedback(feedbackData);
 	},
