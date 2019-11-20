@@ -73,7 +73,7 @@ class UserChange extends Component {
 					onFocus={this.onFocus}
 					list='users-list'
 					placeholder='Email'
-					style={{ borderRadius: '0' }}
+					style={{ borderRadius: '0', borderTopLeftRadius: 4, borderBottomLeftRadius: 4 }}
 				/>
 				{users.length ? (
 					<datalist id='users-list'>
