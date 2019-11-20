@@ -58,6 +58,19 @@ var constants = {
 		VIDEO_FORMAT_TYPE: 'outstream',
 		DEFAULT_FORMATS: ['display']
 	},
+	ADSERVER_TARGETING_KEYS: {
+		BIDDER: 'hb_ap_bidder',
+		AD_ID: 'hb_ap_adid',
+		CPM: 'hb_ap_pb',
+		SIZE: 'hb_ap_size',
+		SOURCE: 'hb_ap_source',
+		FORMAT: 'hb_ap_format',
+		SITE_ID: 'hb_ap_siteid',
+		HB_RAN: 'hb_ap_ran',
+		ADPUSHUP_RAN: 'adpushup_ran',
+		REFRESH_COUNT: 'refreshcount',
+		REFRESH_RATE: 'refreshrate'
+	},
 	AD_SIZE_MAPPING: {
 		IAB_SIZES: {
 			ALL: [
