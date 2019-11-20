@@ -20,20 +20,22 @@ class CopyButtonWrapper extends React.Component {
 			content,
 			message,
 			autoHideTime,
-			showCopiedNotification: showCopiedNotificationAction
+			showCopiedNotification: showCopiedNotificationAction,
+			callback
 		} = this.props;
 		clipboard.writeText(content);
 
 		showCopiedNotificationAction(message, autoHideTime);
+		callback();
 	};
 
 	timeoutId;
 
 	render() {
-		const { children } = this.props;
+		const { children, className } = this.props;
 
 		return (
-			<span className="u-cursor-pointer" onClick={this.onCopy}>
+			<span className={`u-cursor-pointer${className ? ` ${className}` : ''}`} onClick={this.onCopy}>
 				{children}
 			</span>
 		);
@@ -44,12 +46,16 @@ CopyButtonWrapper.propTypes = {
 	autoHideTime: PropTypes.number,
 	content: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
 	children: PropTypes.element.isRequired,
-	message: PropTypes.string
+	message: PropTypes.string,
+	className: PropTypes.string,
+	callback: PropTypes.func
 };
 
 CopyButtonWrapper.defaultProps = {
 	autoHideTime: 3000,
-	message: 'Successfully Copied!'
+	message: 'Successfully Copied!',
+	className: '',
+	callback: () => {}
 };
 
 export default CopyButtonWrapper;
