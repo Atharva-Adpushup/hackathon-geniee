@@ -231,30 +231,31 @@ class Table extends React.Component {
 		for (let i = 0; i < tableHeader.length; i++) {
 			const col = tableHeader[i].accessor;
 			let value = grandTotal[col];
+			if (value) {
+				if (metrics[col]) {
+					switch (metrics[col].valueType) {
+						case 'money': {
+							value = `$${numberWithCommas(value.toFixed(2))}`;
 
-			if (metrics[col]) {
-				switch (metrics[col].valueType) {
-					case 'money': {
-						value = `$${numberWithCommas(value.toFixed(2))}`;
+							break;
+						}
+						case 'percent': {
+							value = `${numberWithCommas(value.toFixed(2))}%`;
 
-						break;
-					}
-					case 'percent': {
-						value = `${numberWithCommas(value.toFixed(2))}%`;
-
-						break;
-					}
-					default: {
-						value = numberWithCommas(value);
+							break;
+						}
+						default: {
+							value = numberWithCommas(value);
+						}
 					}
 				}
-			}
 
-			footerComponent.push(
-				<td className="tbody-td-default" key={i} style={{ fontWeight: 'bold' }}>
-					{value}
-				</td>
-			);
+				footerComponent.push(
+					<td className="tbody-td-default" key={col} style={{ fontWeight: 'bold' }}>
+						{value}
+					</td>
+				);
+			}
 		}
 
 		return (
