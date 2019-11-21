@@ -11,7 +11,7 @@ import CustomButton from '../../../Components/CustomButton/index';
 import ActionCard from '../../../Components/ActionCard/index';
 import SendCodeByEmailModal from '../../../Components/SendCodeByEmailModal';
 import Empty from '../../../Components/Empty';
-import { copyToClipBoard } from '../../../Apps/ApTag/lib/helpers';
+import CopyButtonWrapperContainer from '../../../Containers/CopyButtonWrapperContainer';
 import siteService from '../../../services/siteService';
 import { errorHandler } from '../../../helpers/commonFunctions';
 
@@ -103,17 +103,14 @@ class SiteSettings extends Component {
 						<FontAwesomeIcon icon="envelope" className="u-margin-l2" />
 					</span>
 				</CustomButton>
-				<CustomButton
-					variant="secondary"
-					className="pull-right"
-					name="convertButton"
-					onClick={() => copyToClipBoard(codeText)}
-				>
-					<span>
-						Copy to Clipboard
-						<FontAwesomeIcon icon="copy" className="u-margin-l2" />
-					</span>
-				</CustomButton>
+				<CopyButtonWrapperContainer content={codeText} className="pull-right">
+					<CustomButton variant="secondary" name="convertButton">
+						<span>
+							Copy to Clipboard
+							<FontAwesomeIcon icon="copy" className="u-margin-l2" />
+						</span>
+					</CustomButton>
+				</CopyButtonWrapperContainer>
 				<SendCodeByEmailModal
 					show={showSendCodeByEmailModal}
 					title="Send Code to Developer"

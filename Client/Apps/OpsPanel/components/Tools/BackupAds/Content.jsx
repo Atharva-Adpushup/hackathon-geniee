@@ -1,11 +1,8 @@
 /* eslint-disable no-alert */
 import React from 'react';
-import { Col } from 'react-bootstrap';
-
 import { BACKUP_ADS_FORMATS } from '../../../configs/commonConsts';
 import axiosInstance from '../../../../../helpers/axiosInstance';
-import { copyToClipBoard } from '../../../../../helpers/commonFunctions';
-
+import CopyButtonWrapperContainer from '../../../../../Containers/CopyButtonWrapperContainer';
 import FieldGroup from '../../../../../Components/Layout/FieldGroup';
 import CustomButton from '../../../../../Components/CustomButton/index';
 import Loader from '../../../../../Components/Loader/index';
@@ -114,13 +111,9 @@ class Content extends React.Component {
 				>
 					Create More
 				</CustomButton>
-				<CustomButton
-					variant="secondary"
-					className="u-margin-t3 u-margin-r3 pull-right"
-					onClick={() => copyToClipBoard(url)}
-				>
-					Copy Url
-				</CustomButton>
+				<CopyButtonWrapperContainer content={url} className="u-margin-t3 u-margin-r3 pull-right">
+					<CustomButton variant="secondary">Copy Url</CustomButton>
+				</CopyButtonWrapperContainer>
 			</div>
 		);
 	};

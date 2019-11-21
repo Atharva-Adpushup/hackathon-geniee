@@ -5,7 +5,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import PagegroupTrafficEdit from './PagegroupTrafficEdit';
 import FormatEdit from './FormatEdit';
-import { makeFirstLetterCapitalize, copyToClipBoard } from '../../../../../helpers/commonFunctions';
+import { makeFirstLetterCapitalize } from '../../../../../helpers/commonFunctions';
+import CopyButtonWrapperContainer from '../../../../../Containers/CopyButtonWrapperContainer';
 import {
 	AD_LIST_ACTIONS,
 	USER_AD_LIST_ACTIONS,
@@ -177,7 +178,7 @@ class AdElement extends Component {
 		return <p>Custom</p>;
 	}
 
-	renderActions(actions) {
+	renderActions(actions, value) {
 		const { ad } = this.props;
 		return actions.map((element, index) => {
 			const action = AD_LIST_ACTIONS[element.name];
@@ -187,11 +188,28 @@ class AdElement extends Component {
 					overlay={<Tooltip id={`ad-${ad.id}-${action.tooltipText}`}>{action.tooltipText}</Tooltip>}
 					key={`ad-${ad.id}-${action.tooltipText}`}
 				>
-					<FontAwesomeIcon
-						icon={action.iconClass}
-						className={`u-text-red adDetails-icon u-margin-r2 ${index === 0 ? 'u-margin-l2' : ''}`}
-						onClick={element.handler}
-					/>
+					<React.Fragment>
+						{element.name === 'copy' && (
+							<CopyButtonWrapperContainer content={value}>
+								<FontAwesomeIcon
+									icon={action.iconClass}
+									className={`u-text-red adDetails-icon u-margin-r2 ${
+										index === 0 ? 'u-margin-l2' : ''
+									}`}
+								/>
+							</CopyButtonWrapperContainer>
+						)}
+
+						{element.name !== 'copy' && (
+							<FontAwesomeIcon
+								icon={action.iconClass}
+								className={`u-text-red adDetails-icon u-margin-r2 ${
+									index === 0 ? 'u-margin-l2' : ''
+								}`}
+								onClick={element.handler}
+							/>
+						)}
+					</React.Fragment>
 				</OverlayTrigger>
 			);
 		});
@@ -206,7 +224,7 @@ class AdElement extends Component {
 				style={{ maxWidth, wordBreak: 'break-word' }}
 			>
 				{value}
-				{actions.length ? this.renderActions(actions) : null}
+				{actions.length ? this.renderActions(actions, value) : null}
 			</td>
 		);
 	}
@@ -232,14 +250,9 @@ class AdElement extends Component {
 		const toRender = [];
 
 		// Rendering tds. Do not change the order of the code below as it depends upon user mode.
+		toRender.push(this.renderInformation(ad.id, [{ name: 'copy' }]));
 		toRender.push(
-			this.renderInformation(ad.id, [{ name: 'copy', handler: copyToClipBoard.bind(null, ad.id) }])
-		);
-		toRender.push(
-			this.renderInformation(ad.name, [
-				{ name: 'copy', handler: copyToClipBoard.bind(null, ad.name) },
-				{ name: 'edit', handler: this.editName }
-			])
+			this.renderInformation(ad.name, [{ name: 'copy' }, { name: 'edit', handler: this.editName }])
 		);
 		toRender.push(this.renderInformation(makeFirstLetterCapitalize(ad.formatData.platform)));
 		toRender.push(this.renderInformation(makeFirstLetterCapitalize(ad.formatData.format)));

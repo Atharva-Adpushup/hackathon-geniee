@@ -11,4 +11,15 @@ const showNotification = params => dispatch =>
 		...params
 	});
 
-export { hideNotification, showNotification };
+const hideCopiedNotification = () => dispatch =>
+	dispatch({
+		type: UI_ACTIONS.HIDE_COPIED_NOTIFICATION
+	});
+
+const showCopiedNotification = (message, autoHideTime) => dispatch =>
+	dispatch({
+		type: UI_ACTIONS.SHOW_COPIED_NOTIFICATION,
+		data: { message, autoHideTime }
+	});
+
+export { hideNotification, showNotification, hideCopiedNotification, showCopiedNotification };

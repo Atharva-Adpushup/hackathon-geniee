@@ -43,6 +43,7 @@ import {
 import 'bootstrap-sass/assets/stylesheets/_bootstrap.scss';
 import ErrorBoundary from './Components/ErrorBoundary';
 import NotificationContainer from './Containers/NotificationContainer';
+import CopiedNotificationContainer from './Containers/CopiedNotificationContainer';
 import Routes from './Routes';
 
 library.add(
@@ -85,8 +86,9 @@ library.add(
 
 const App = () => (
 	<ErrorBoundary>
-		<NotificationContainer />
 		<Routes />
+		<NotificationContainer />
+		<CopiedNotificationContainer />
 	</ErrorBoundary>
 );
 
