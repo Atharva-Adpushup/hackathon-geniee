@@ -25,25 +25,23 @@ const arrayUnique = array => {
 };
 
 const computeCsvData = data => {
-	const { tableBody, tableHeader, grandTotal } = data;
-	const csvData = [];
-	const csvHeaders = [];
-	tableHeader.forEach(header => {
-		csvHeaders.push(header.Header);
+	const { tableBody, tableColumns } = data;
+
+	// Compute CSV Header
+	const csvHeader = tableColumns.map(header => header.Header);
+
+	// Compute CSV Body
+	const csvBody = tableBody.map(row => {
+		// Row cells sorted by tableColumns
+		const csvBodyRow = tableColumns.map(header => row[header.accessor]);
+
+		return csvBodyRow;
 	});
-	csvData.push(csvHeaders);
-	tableBody.forEach(row => {
-		const csvBody = [];
-		tableHeader.forEach(header => {
-			csvBody.push(row[header.accessor]);
-		});
-		csvData.push(csvBody);
-	});
-	const csvBody = [];
-	tableHeader.forEach(header => {
-		csvBody.push(grandTotal[header.accessor]);
-	});
-	csvData.push(csvBody);
+
+	// Compute CSV Footer
+	const csvFooter = tableColumns.map(column => column.Footer);
+
+	const csvData = [csvHeader, ...csvBody, csvFooter];
 	return csvData;
 };
 const numberWithCommas = x => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');

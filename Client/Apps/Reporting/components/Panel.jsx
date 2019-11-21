@@ -497,7 +497,7 @@ class Panel extends Component {
 		}
 
 		if (total.hasOwnProperty('total_adpushup_count_percent')) {
-			total.total_adpushup_count_percent = 100;
+			delete total.total_adpushup_count_percent;
 		}
 
 		return total;
@@ -779,7 +779,7 @@ class Panel extends Component {
 						selectedChartLegendMetric={selectedChartLegendMetric}
 					/>
 				</Col>
-				<Col sm={12} className="u-margin-t5">
+				<Col sm={12} className="u-margin-t5 u-margin-b4">
 					<TableContainer
 						tableData={selectedMetricsTableData}
 						startDate={startDate}

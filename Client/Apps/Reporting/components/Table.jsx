@@ -11,13 +11,12 @@ class Table extends React.Component {
 	constructor(props) {
 		super(props);
 		const { metrics, tableData } = props;
-		const { tableHeader, tableBody, grandTotal } = this.updateTableData(tableData);
+		const { tableColumns, tableBody } = this.updateTableData(tableData);
 		this.state = {
 			metrics,
 			tableData,
-			tableHeader,
-			tableBody,
-			grandTotal
+			tableColumns,
+			tableBody
 		};
 	}
 
@@ -25,8 +24,8 @@ class Table extends React.Component {
 		const { tableData: currTableData } = this.props;
 
 		if (!isEqual(currTableData, nextTableData)) {
-			const { tableHeader, tableBody, grandTotal } = this.updateTableData(nextTableData);
-			this.setState({ tableData: nextTableData, tableHeader, tableBody, grandTotal });
+			const { tableColumns, tableBody } = this.updateTableData(nextTableData);
+			this.setState({ tableData: nextTableData, tableColumns, tableBody });
 		}
 	}
 
@@ -45,8 +44,8 @@ class Table extends React.Component {
 		return resultObject;
 	};
 
-	getTableHeaders = headers => {
-		let tableHeader = [];
+	getTableColumns = (columns, total) => {
+		let tableColumns = [];
 		let sortedMetrics = [];
 		const { metrics, dimension } = this.props;
 		const { isDaily } = this.getDateIntervalValidators();
@@ -56,52 +55,73 @@ class Table extends React.Component {
 			accessor: 'date',
 			sortable: isDaily,
 			Cell: props =>
-				isDaily ? <span>{moment(props.value).format('ll')}</span> : <span>{props.value}</span>
+				isDaily ? <span>{moment(props.value).format('ll')}</span> : <span>{props.value}</span>,
+			Footer: 'Total'
 		};
 
-		tableHeader.push(computedDate);
+		tableColumns.push(computedDate);
 
-		headers.forEach(header => {
-			if (dimension[header]) {
-				if (header === 'siteid') {
-					tableHeader.push({
+		columns.forEach(column => {
+			if (dimension[column]) {
+				if (column === 'siteid') {
+					tableColumns.push({
 						Header: 'Site Name',
 						accessor: 'siteName',
-						sortable: true
+						sortable: true,
+						Footer: ''
 					});
 				} else {
-					tableHeader.push({
-						Header: dimension[header].display_name,
-						accessor: header,
-						sortable: true
+					tableColumns.push({
+						Header: dimension[column].display_name,
+						accessor: column,
+						sortable: true,
+						Footer: ''
 					});
 				}
 			}
 
-			if (metrics[header]) {
+			if (metrics[column]) {
 				// eslint-disable-next-line camelcase
-				const { display_name: Header, table_position } = metrics[header];
+				const { display_name: Header, table_position } = metrics[column];
+				let footerValue = total[`total_${column}`] || '';
+
+				if (footerValue) {
+					switch (metrics[column].valueType) {
+						case 'money': {
+							footerValue = `$${numberWithCommas(footerValue.toFixed(2))}`;
+							break;
+						}
+						case 'percent': {
+							footerValue = `${numberWithCommas(footerValue.toFixed(2))}%`;
+							break;
+						}
+						default: {
+							footerValue = numberWithCommas(footerValue);
+						}
+					}
+				}
 
 				sortedMetrics.push({
 					Header,
-					accessor: header,
+					accessor: column,
 					sortable: true,
 					table_position,
+					Footer: footerValue,
 					sortMethod: (a, b) => reactTableSortMethod(a, b)
 				});
 			}
 		});
 
-		sortedMetrics = sortBy(sortedMetrics, header => header.table_position).map(header => {
-			const headerCopy = { ...header };
+		sortedMetrics = sortBy(sortedMetrics, column => column.table_position).map(column => {
+			const headerCopy = { ...column };
 			delete headerCopy.table_position;
 
 			return headerCopy;
 		});
 
-		tableHeader = [...tableHeader, ...sortedMetrics];
+		tableColumns = [...tableColumns, ...sortedMetrics];
 
-		return tableHeader;
+		return tableColumns;
 	};
 
 	getTableBody = tableBody => {
@@ -168,29 +188,27 @@ class Table extends React.Component {
 		return displayTableData;
 	};
 
-	getTableFooter = (data, tableHeader) => {
+	getTableFooter = (data, tableColumns) => {
 		const displayFooterData = { ...data };
 		Object.keys(displayFooterData).forEach(key => {
 			const newkey = key.replace('total_', '');
 			displayFooterData[newkey] = displayFooterData[key];
 			delete displayFooterData[key];
 		});
-		displayFooterData[tableHeader[0].accessor] = 'Total';
+		displayFooterData[tableColumns[0].accessor] = 'Total';
 		return displayFooterData;
 	};
 
 	updateTableData = tableData => {
-		let grandTotal = {};
-		let tableHeader = [];
+		let tableColumns = [];
 		let tableBody = [];
 		if (tableData.columns && tableData.result.length > 0) {
 			const { columns, result, total } = tableData;
-			tableHeader = this.getTableHeaders(columns);
+			tableColumns = this.getTableColumns(columns, total);
 			tableBody = this.getTableBody(result);
-			grandTotal = this.getTableFooter(total, tableHeader);
-			this.setCsvData({ tableBody, tableHeader, grandTotal });
+			this.setCsvData({ tableBody, tableColumns });
 		}
-		return { tableBody, tableHeader, grandTotal };
+		return { tableBody, tableColumns };
 	};
 
 	formatTableData = tableBody => {
@@ -224,51 +242,8 @@ class Table extends React.Component {
 		return tableBody;
 	};
 
-	renderFooter() {
-		const { tableHeader, grandTotal, metrics } = this.state;
-		const footerComponent = [];
-
-		for (let i = 0; i < tableHeader.length; i++) {
-			const col = tableHeader[i].accessor;
-			let value = grandTotal[col];
-			if (value) {
-				if (metrics[col]) {
-					switch (metrics[col].valueType) {
-						case 'money': {
-							value = `$${numberWithCommas(value.toFixed(2))}`;
-
-							break;
-						}
-						case 'percent': {
-							value = `${numberWithCommas(value.toFixed(2))}%`;
-
-							break;
-						}
-						default: {
-							value = numberWithCommas(value);
-						}
-					}
-				}
-
-				footerComponent.push(
-					<td className="tbody-td-default" key={col} style={{ fontWeight: 'bold' }}>
-						{value}
-					</td>
-				);
-			}
-		}
-
-		return (
-			<table className="table table-datatable">
-				<tbody className="tbody-default">
-					<tr className="tbody-tr-default">{footerComponent}</tr>
-				</tbody>
-			</table>
-		);
-	}
-
 	render() {
-		const { tableBody, tableHeader, tableData } = this.state;
+		const { tableBody, tableColumns, tableData } = this.state;
 
 		const onSortFunction = {
 			network_net_revenue(columnValue) {
@@ -299,7 +274,7 @@ class Table extends React.Component {
 			return (
 				<React.Fragment>
 					<ReactTable
-						columns={tableHeader}
+						columns={tableColumns}
 						data={tableBody}
 						defaultPageSize={10}
 						pageSizeOptions={[10, 20, 30, 40, 50]}
@@ -308,14 +283,10 @@ class Table extends React.Component {
 						showPaginationBottom={false}
 						className="reporting u-padding-h3 u-padding-v2 -striped -highlight"
 					/>
-					<Col sm={12}>
-						{this.renderFooter()}
-						<b>Note: </b>
-						<span>
-							Net Revenue* is estimated earnings, finalized earnings may vary depending on
-							deductions from the demand partners.
-						</span>
-					</Col>
+					<div className="u-margin-t3">
+						<b>Note:</b> Net Revenue* is estimated earnings, finalized earnings may vary depending
+						on deductions from the demand partners.
+					</div>
 				</React.Fragment>
 			);
 		return '';

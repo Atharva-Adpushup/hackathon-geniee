@@ -569,8 +569,17 @@ body {
 	}
 }
 
-.ReactTable .-pagination .-btn {
-	opacity: 1 !important;
+.ReactTable {
+	.-pagination .-btn {
+		opacity: 1 !important;
+	}
+
+	.rt-thead .rt-th {
+		background: #fff;
+	}
+	.rt-tfoot {
+		font-weight: bold;
+	}
 }
 
 .PresetDateRangePicker_button {
