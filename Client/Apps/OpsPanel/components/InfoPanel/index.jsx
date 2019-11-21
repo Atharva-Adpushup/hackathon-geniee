@@ -44,9 +44,15 @@ class InfoPanel extends Component {
 				break;
 		}
 
-		this.setState({
-			activeKey: value,
-			redirectUrl
+		this.setState(state => {
+			if (state.redirectUrl !== redirectUrl) {
+				return {
+					activeKey: value,
+					redirectUrl
+				};
+			}
+
+			return null;
 		});
 	};
 
@@ -58,7 +64,7 @@ class InfoPanel extends Component {
 			location = { search: '' }
 		} = this.props;
 
-		if (redirectUrl) {
+		if (redirectUrl && redirectUrl !== location.pathname) {
 			return <Redirect to={{ pathname: redirectUrl }} />;
 		}
 
