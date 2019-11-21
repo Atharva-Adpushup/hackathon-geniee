@@ -33,7 +33,13 @@ const computeCsvData = data => {
 	// Compute CSV Body
 	const csvBody = tableBody.map(row => {
 		// Row cells sorted by tableColumns
-		const csvBodyRow = tableColumns.map(header => row[header.accessor]);
+		const csvBodyRow = tableColumns.map(header => {
+			if (header.accessor === 'siteName') {
+				// eslint-disable-next-line no-unused-expressions
+				return row[header.accessor].props.children;
+			}
+			return row[header.accessor];
+		});
 
 		return csvBodyRow;
 	});
