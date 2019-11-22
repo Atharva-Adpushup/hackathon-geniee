@@ -10,6 +10,7 @@ const { GET_SITES_STATS_API, EMAIL_REGEX } = require('../configs/commonConsts');
 const { sendSuccessResponse, sendErrorResponse } = require('../helpers/commonFunctions');
 const { appBucket, errorHandler } = require('../helpers/routeHelpers');
 const opsModel = require('../models/opsModel');
+const proxy = require('../helpers/proxy');
 
 const router = express.Router();
 
@@ -265,8 +266,12 @@ router
 		}
 
 		const { siteId, emailId, currentSelectedEntry, adsTxtSnippet } = req.body;
+		opsModel
+			.getActiveSites(siteId, adsTxtSnippet)
+			.then(sitesData => sendSuccessResponse(sitesData, res))
+			.catch(err => errorHandler(err, res));
 
-		const isDataValid = !!(siteId && EMAIL_REGEX.test(emailId));
+		const isDataValid = !!(currentSelectedEntry && EMAIL_REGEX.test(emailId));
 
 		if (isDataValid === false) {
 			return sendErrorResponse(
@@ -276,6 +281,8 @@ router
 				res
 			);
 		}
+
+		res.send({ msg: `Email will be sent to ${emailId} in 30 mins` });
 	})
 
 	.get('/allSitesStats', (req, res) => {

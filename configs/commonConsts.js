@@ -45,6 +45,11 @@ module.exports = {
 								ON keys ('hbdc::' || to_string(_site.siteId))
 								WHERE meta(_site).id LIKE 'site::%'
 								AND meta(_user).id LIKE 'user::%';`,
+
+	GET_ACTIVE_SITES_QUERY: `SELECT _site.siteDomain
+	                        FROM AppBucket _site
+							WHERE meta(_site).id LIKE 'site::%' AND _site.dataFeedActive = true;`,
+
 	DEMO_PAGEGROUPS: [
 		'HOME',
 		'CALC',

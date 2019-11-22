@@ -9,6 +9,7 @@ const clonedeep = require('lodash.clonedeep');
 const couchbase = require('../helpers/couchBaseService');
 const AdPushupError = require('../helpers/AdPushupError');
 const commonConsts = require('../configs/commonConsts');
+const proxy = require('../helpers/proxy');
 
 const commonSiteFunctions = {
 	isActiveHbBidder(network, key) {
@@ -320,6 +321,75 @@ function apiModule() {
 						result: sortedFinalSites
 					};
 				})
+				.catch(err => {
+					console.log(err);
+					throw new AdPushupError('Something went wrong');
+				});
+		},
+
+		getActiveSites() {
+			const query = N1qlQuery.fromString(commonConsts.GET_ACTIVE_SITES_QUERY);
+
+			function adsTxtProcessing(domain) {
+				return proxy
+					.fetchOurAdsTxt()
+					.then(ourAdsTxt => proxy.verifyAdsTxt(domain, ourAdsTxt))
+					.then(() => ({
+						status: 1,
+						message: 'All Entries Available',
+						domain
+					}))
+					.catch(err => {
+						if (err instanceof AdPushupError) {
+							const {
+								message: { httpCode = 404, ourAdsTxt, presentEntries }
+							} = err;
+							let output = null;
+							switch (httpCode) {
+								case 204:
+									output = {
+										status: 2,
+										message: "Our Ads.txt entries not found in publisher's ads.txt",
+										domain
+									};
+									break;
+								case 206:
+									output = {
+										status: 3,
+										message: "Some entries not found in publisher's ads.txt",
+										missigEntries: ourAdsTxt,
+										domain,
+										presentEntries
+									};
+									break;
+								default:
+								case 404:
+									output = {
+										status: 4,
+										message: "Publisher's ads.txt not found"
+									};
+									break;
+							}
+
+							return Promise.resolve(output);
+						}
+						return Promise.reject(err);
+					});
+			}
+
+			return couchbase
+				.connectToAppBucket()
+				.then(appBucket => appBucket.queryAsync(query))
+				.then(sites =>
+					sites.map(value => {
+						adsTxtProcessing(value.siteDomain)
+							.then(data => {
+								console.log(data);
+							})
+							.catch(err => console.log(err));
+					})
+				)
+
 				.catch(err => {
 					console.log(err);
 					throw new AdPushupError('Something went wrong');
