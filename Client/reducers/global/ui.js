@@ -26,4 +26,29 @@ const notifications = (state = { isVisible: false }, action) => {
 			return state;
 	}
 };
-export default combineReducers({ notifications });
+
+const copiedNotification = (
+	state = { isVisible: false, message: '', autoHideTime: null },
+	action
+) => {
+	const { type: actionType, data: actionData } = action;
+	switch (actionType) {
+		case UI_ACTIONS.SHOW_COPIED_NOTIFICATION:
+			return {
+				...state,
+				isVisible: true,
+				message: actionData.message,
+				autoHideTime: actionData.autoHideTime
+			};
+
+		case UI_ACTIONS.HIDE_COPIED_NOTIFICATION:
+			return {
+				...state,
+				isVisible: false
+			};
+
+		default:
+			return state;
+	}
+};
+export default combineReducers({ notifications, copiedNotification });

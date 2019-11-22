@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Row, Col, ProgressBar } from 'react-bootstrap';
 import CustomList from './CustomList';
 import { TYPES, SIZES, DISPLAY_AD_MESSAGE, AMP_MESSAGE, ADCODE } from '../../configs/commonConsts';
-import { copyToClipBoard } from '../../lib/helpers';
+import CopyButtonWrapperContainer from '../../../../Containers/CopyButtonWrapperContainer';
 import CustomMessage from '../../../../Components/CustomMessage/index';
 import CustomButton from '../../../../Components/CustomButton/index';
 import Loader from '../../../../Components/Loader';
@@ -193,13 +193,11 @@ class AdCodeGenerator extends Component {
 					Create More Ads
 				</CustomButton>
 				{isDisplayAd ? (
-					<CustomButton
-						variant="secondary"
-						className="u-margin-t3 u-margin-r3 pull-right"
-						onClick={() => copyToClipBoard(code.replace(/__AD_ID__/g, adId))}
-					>
-						Copy Adcode
-					</CustomButton>
+					<CopyButtonWrapperContainer content={code.replace(/__AD_ID__/g, adId)}>
+						<CustomButton variant="secondary" className="u-margin-t3 u-margin-r3 pull-right">
+							Copy Adcode
+						</CustomButton>
+					</CopyButtonWrapperContainer>
 				) : null}
 			</Col>
 		);

@@ -14,7 +14,7 @@ import {
 	NETWORK_MEDIANET_INPUT_CODE_REGEXES
 } from '../../constants/index';
 import { getRandomString, getEncodedData, getCompiledTemplate } from '../../lib/helpers';
-import { copyToClipBoard } from '../../../ApTag/lib/helpers';
+import CopyButtonWrapperContainer from '../../../../Containers/CopyButtonWrapperContainer';
 
 class ControlTagConversion extends Component {
 	constructor(props) {
@@ -349,13 +349,9 @@ class ControlTagConversion extends Component {
 				{convertedCode ? (
 					<Row>
 						<Col sm={6} md={12} lg={12} className="u-padding-0 u-margin-b4">
-							<CustomButton
-								variant="secondary"
-								className=""
-								onClick={() => copyToClipBoard(convertedCode)}
-							>
-								Copy to Clipboard
-							</CustomButton>
+							<CopyButtonWrapperContainer content={convertedCode}>
+								<CustomButton variant="secondary">Copy to Clipboard</CustomButton>
+							</CopyButtonWrapperContainer>
 						</Col>
 						<Col sm={6} md={12} lg={12} className="u-padding-0">
 							<pre>{convertedCode}</pre>

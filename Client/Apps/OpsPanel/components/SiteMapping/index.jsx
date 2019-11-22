@@ -15,11 +15,11 @@ import axiosInstance from '../../../../helpers/axiosInstance';
 import FilterBox from '../../../../Components/FilterBox';
 import Empty from '../../../../Components/Empty/index';
 import Loader from '../../../../Components/Loader/index';
-import { copyToClipBoard } from '../../../../helpers/commonFunctions';
 import CustomIcon from '../../../../Components/CustomIcon/index';
 import CustomButton from '../../../../Components/CustomButton';
 import CustomError from '../../../../Components/CustomError/index';
 import { SITE_MAPPING_COLUMNS } from '../../configs/commonConsts';
+import CopyButtonWrapperContainer from '../../../../Containers/CopyButtonWrapperContainer';
 
 import GlobalSearch from './GlobalSearch';
 
@@ -196,12 +196,9 @@ class SiteMapping extends Component {
 					<span title={cellValue}>
 						{cellValue}
 						{!!showCopyIcon && (
-							<CustomIcon
-								icon="copy"
-								onClick={copyToClipBoard}
-								toReturn={cellValue}
-								className="u-text-red u-margin-l3 u-cursor-pointer site-mapping-copy"
-							/>
+							<CopyButtonWrapperContainer content={cellValue}>
+								<CustomIcon icon="copy" className="u-text-red u-margin-l3 site-mapping-copy" />
+							</CopyButtonWrapperContainer>
 						)}
 					</span>
 				);
@@ -280,8 +277,7 @@ class SiteMapping extends Component {
 				defaultPageSize={50}
 				pageSizeOptions={[50, 100, 150, 200, 250]}
 				minRows={0}
-				sortable={true}
-			>
+				sortable={true}>
 				{(state, makeTable, instance) => {
 					let recordsInfoText = '';
 
@@ -362,8 +358,7 @@ class SiteMapping extends Component {
 						<CSVLink data={csvData} filename="site-stats.csv">
 							<CustomButton
 								variant="primary"
-								className="btn btn-lightBg btn-default btn-blue-line pull-right u-margin-r3 u-margin-b4 "
-							>
+								className="btn btn-lightBg btn-default btn-blue-line pull-right u-margin-r3 u-margin-b4 ">
 								<FontAwesomeIcon size="1x" icon="download" className="u-margin-r3" />
 								Export Report
 							</CustomButton>
