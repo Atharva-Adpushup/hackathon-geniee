@@ -764,7 +764,7 @@ class Panel extends Component {
 						user={user}
 					/>
 				</Col>
-				<Col sm={12} className='u-margin-t5'>
+				<Col sm={12} className="u-margin-t5">
 					<ChartContainer
 						tableData={tableData}
 						selectedDimension={selectedDimension}
@@ -780,7 +780,7 @@ class Panel extends Component {
 						selectedChartLegendMetric={selectedChartLegendMetric}
 					/>
 				</Col>
-				<Col sm={12} className='u-margin-t5'>
+				<Col sm={12} className="u-margin-t5">
 					<TableContainer
 						tableData={selectedMetricsTableData}
 						startDate={startDate}
@@ -807,15 +807,19 @@ class Panel extends Component {
 
 		return (
 			<React.Fragment>
+				<ActionCard title="AdPushup Reports">{this.renderContent()}</ActionCard>
 				{show ? (
-					<Alert bsStyle='danger' onDismiss={this.handleDismiss}>
+					<Alert bsStyle="info" onDismiss={this.handleDismiss} className="u-margin-t4">
 						For old reporting data (before 1st August) go to console by{' '}
-						<a onClick={consoleRedirection} className='alert-link' style={{ cursor: 'pointer' }}>
+						<a
+							onClick={consoleRedirection}
+							className="alert-link"
+							style={{ cursor: 'pointer', color: '#eb575c' }}
+						>
 							clicking here.
 						</a>
 					</Alert>
 				) : null}
-				<ActionCard title='AdPushup Reports'>{this.renderContent()}</ActionCard>
 			</React.Fragment>
 		);
 	}
