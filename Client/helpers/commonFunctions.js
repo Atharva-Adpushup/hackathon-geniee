@@ -174,6 +174,16 @@ const reactTableSortMethod = (a, b) => {
 	return a.length > b.length ? 1 : -1;
 };
 
+const consoleRedirection = e => {
+	e.preventDefault();
+	const now = new Date();
+	now.setHours(now.getHours() + 2);
+	document.cookie = `app_redirect=0; path=/; expires=${now.toUTCString()}; domain=adpushup.com`;
+	setTimeout(() => {
+		window.location.href = 'http://old-console.adpushup.com';
+	}, 500);
+};
+
 const getDemoUserSites = (reportData, email) => {
 	const inputReportData = Object.assign({}, reportData);
 	const isDemoUser = checkDemoUserEmail(email);
@@ -356,5 +366,6 @@ export {
 	getReportingControlDemoUserSites,
 	getAppBaseUrls,
 	getOnboardingTemplateData,
-	reactTableSortMethod
+	reactTableSortMethod,
+	consoleRedirection
 };

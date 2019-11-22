@@ -29,16 +29,7 @@ import {
 	getReportingDemoUserSiteIds,
 	getDemoUserSites
 } from '../../../helpers/commonFunctions';
-
-function consoleRedirection(e) {
-	e.preventDefault();
-	const now = new Date();
-	now.setHours(now.getHours() + 2);
-	document.cookie = `app_redirect=0; path=/; expires=${now.toUTCString()}; domain=adpushup.com`;
-	setTimeout(() => {
-		window.location.href = 'http://console.adpushup.com';
-	}, 500);
-}
+import { consoleRedirection } from '../../../helpers/commonFunctions';
 
 class Panel extends Component {
 	constructor(props) {
