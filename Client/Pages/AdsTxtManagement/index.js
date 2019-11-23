@@ -3,14 +3,13 @@ import { Helmet } from 'react-helmet';
 import { Col, Table, Modal, Nav, NavItem } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
-import ActionCard from '../../Components/ActionCard/index';
 import proxyService from '../../services/proxyService';
 import { showNotification } from '../../actions/uiActions';
 import Loader from '../../Components/Loader/index';
 import { ADSTXT_SITE_LIST_HEADERS } from '../../constants/others';
 import CustomButton from '../../Components/CustomButton';
 import CustomMessage from '../../Components/CustomMessage/index';
-import { copyToClipBoard } from '../../Apps/ApTag/lib/helpers';
+import CopyButtonWrapperContainer from '../../Containers/CopyButtonWrapperContainer';
 import SendCodeByEmailModal from '../../Components/SendCodeByEmailModal';
 import '../../scss/pages/adsTxtManagement/index.scss';
 import {
@@ -155,15 +154,15 @@ class AdsTxtManager extends Component {
 								subject="AdPushup Ads.txt Entries"
 								emailBody={this.getEmailBody(modalAdsTxt)}
 							/>
-
-							<CustomButton
-								onClick={this.onCopyToClipBoard}
-								variant="secondary"
-								className="snippet-btn apbtn-main-line apbtn-small"
-								style={{ width: '170px' }}
-							>
-								Copy to clipboard
-							</CustomButton>
+							<CopyButtonWrapperContainer content={modalAdsTxt} callback={this.onCopyToClipBoard}>
+								<CustomButton
+									variant="secondary"
+									className="snippet-btn apbtn-main-line apbtn-small"
+									style={{ width: '170px' }}
+								>
+									Copy to clipboard
+								</CustomButton>
+							</CopyButtonWrapperContainer>
 						</div>
 					</div>
 				</Modal.Body>
@@ -176,10 +175,8 @@ class AdsTxtManager extends Component {
 	};
 
 	onCopyToClipBoard = () => {
-		const { adsTxtSnippet } = this.state;
 		document.getElementById('adsTxtSnippetTextarea').focus();
 		document.getElementById('adsTxtSnippetTextarea').select();
-		copyToClipBoard(adsTxtSnippet);
 	};
 
 	renderSiteStatusTable = () => {
@@ -268,15 +265,15 @@ class AdsTxtManager extends Component {
 							subject="AdPushup Ads.txt Entries"
 							emailBody={this.getEmailBody(adsTxtSnippet)}
 						/>
-
-						<CustomButton
-							onClick={this.onCopyToClipBoard}
-							variant="secondary"
-							className="snippet-btn apbtn-main-line apbtn-small"
-							style={{ width: '170px' }}
-						>
-							Copy to clipboard
-						</CustomButton>
+						<CopyButtonWrapperContainer content={adsTxtSnippet} callback={this.onCopyToClipBoard}>
+							<CustomButton
+								variant="secondary"
+								className="snippet-btn apbtn-main-line apbtn-small"
+								style={{ width: '170px' }}
+							>
+								Copy to clipboard
+							</CustomButton>
+						</CopyButtonWrapperContainer>
 					</div>
 				</div>
 			</div>

@@ -305,23 +305,37 @@ class Panel extends Component {
 					if (isForOps && shouldAddAdpushupCountPercentColumn) {
 						tableData.columns.push('adpushup_count_percent');
 
-						const adpushupCountTotal = tableData.result.reduce((total, row) => {
-							const adpushupCount = row.adpushup_count;
-							// eslint-disable-next-line no-param-reassign
-							if (typeof adpushupCount === 'number') total += adpushupCount;
+						// eslint-disable-next-line no-inner-declarations
+						function getComputedIntervalKey(row) {
+							const { date, month, year } = row;
 
-							return total;
-						}, 0);
+							if (date) return date;
+							if (month && year) return `${month}-${year}`;
+							return 'cumulative';
+						}
+
+						const adpushupCountTotalObj = tableData.result.reduce((totalObj, row) => {
+							const { adpushup_count: adpushupCount } = row;
+							const key = getComputedIntervalKey(row);
+
+							if (Number.isInteger(totalObj[key])) {
+								// eslint-disable-next-line no-param-reassign
+								totalObj[key] += adpushupCount;
+							} else {
+								// eslint-disable-next-line no-param-reassign
+								totalObj[key] = adpushupCount;
+							}
+
+							return totalObj;
+						}, {});
 
 						tableData.result.forEach(row => {
-							const perc = (row.adpushup_count / adpushupCountTotal) * 100;
+							const key = getComputedIntervalKey(row);
+
+							const perc = (row.adpushup_count / adpushupCountTotalObj[key]) * 100;
 							// eslint-disable-next-line no-param-reassign
 							row.adpushup_count_percent = perc;
 						});
-					}
-
-					if (isForOps && reportType === 'account' && shouldAddAdpushupCountPercentColumn) {
-						tableData.total.total_adpushup_count_percent = 100;
 					}
 
 					// Compute data table total
@@ -483,7 +497,7 @@ class Panel extends Component {
 		}
 
 		if (total.hasOwnProperty('total_adpushup_count_percent')) {
-			total.total_adpushup_count_percent = 100;
+			delete total.total_adpushup_count_percent;
 		}
 
 		return total;
@@ -765,7 +779,7 @@ class Panel extends Component {
 						selectedChartLegendMetric={selectedChartLegendMetric}
 					/>
 				</Col>
-				<Col sm={12} className="u-margin-t5">
+				<Col sm={12} className="u-margin-t5 u-margin-b4">
 					<TableContainer
 						tableData={selectedMetricsTableData}
 						startDate={startDate}

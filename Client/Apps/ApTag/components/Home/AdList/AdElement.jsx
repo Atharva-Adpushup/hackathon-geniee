@@ -4,7 +4,8 @@
 import React, { Component } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Col, OverlayTrigger, Tooltip, Button } from 'react-bootstrap';
-import { makeFirstLetterCapitalize, copyToClipBoard } from '../../../../../helpers/commonFunctions';
+import { makeFirstLetterCapitalize } from '../../../../../helpers/commonFunctions';
+import CopyButtonWrapperContainer from '../../../../../Containers/CopyButtonWrapperContainer';
 import { ADCODE, AMP_MESSAGE } from '../../../configs/commonConsts';
 import CustomButton from '../../../../../Components/CustomButton/index';
 import AdNetworkDetails from './AdNetworkDetails';
@@ -167,13 +168,9 @@ class AdElement extends Component {
 						>
 							Lazyload Settings
 						</CustomButton>
-						<CustomButton
-							variant="secondary"
-							className="u-margin-t3 pull-right"
-							onClick={() => copyToClipBoard(code)}
-						>
-							Copy AdCode
-						</CustomButton>
+						<CopyButtonWrapperContainer content={code} className="u-margin-t3 pull-right">
+							<CustomButton variant="secondary">Copy AdCode</CustomButton>
+						</CopyButtonWrapperContainer>
 					</React.Fragment>
 				) : null}
 			</div>

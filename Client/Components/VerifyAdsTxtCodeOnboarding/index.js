@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import CustomButton from '../CustomButton';
 import proxyService from '../../services/proxyService';
 import OnboardingCard from '../OnboardingCard';
-import { copyToClipBoard } from '../../Apps/ApTag/lib/helpers';
+import CopyButtonWrapperContainer from '../../Containers/CopyButtonWrapperContainer';
 import SendCodeByEmailModal from '../SendCodeByEmailModal';
 import siteService from '../../services/siteService';
 import userService from '../../services/userService';
@@ -136,7 +136,6 @@ class VerifyAdsTxtCodeOnboarding extends Component {
 
 	onCopyToClipBoard = () => {
 		this.adsTxtRef.current.select();
-		copyToClipBoard(this.adsTxtRef.current.value);
 	};
 
 	render() {
@@ -176,32 +175,37 @@ class VerifyAdsTxtCodeOnboarding extends Component {
 									value={ourAdsTxt}
 								/>
 
-								<div className="snippet-btn-wrapper aligner aligner--hEnd u-padding-v3 u-padding-h3">
-									<CustomButton
-										onClick={this.toggleShowSendCodeByEmailModal}
-										variant="secondary"
-										className="u-margin-r3 snippet-btn apbtn-main-line apbtn-small"
-										style={{ width: '170px' }}
-									>
-										Email Code
-									</CustomButton>
-									<SendCodeByEmailModal
-										show={showSendCodeByEmailModal}
-										title="Send Code to Developer"
-										handleClose={this.toggleShowSendCodeByEmailModal}
-										subject="Adpushup Ads.txt Entries"
-										emailBody={emailBody}
-									/>
-
-									<CustomButton
-										onClick={this.onCopyToClipBoard}
-										variant="secondary"
-										className="snippet-btn apbtn-main-line apbtn-small"
-										style={{ width: '170px' }}
-									>
-										Copy to clipboard
-									</CustomButton>
-								</div>
+								{ourAdsTxt !== 'loading...' && !verifyingAdsTxt && (
+									<div className="snippet-btn-wrapper aligner aligner--hEnd u-padding-v3 u-padding-h3">
+										<CustomButton
+											onClick={this.toggleShowSendCodeByEmailModal}
+											variant="secondary"
+											className="u-margin-r3 snippet-btn apbtn-main-line apbtn-small"
+											style={{ width: '170px' }}
+										>
+											Email Code
+										</CustomButton>
+										<SendCodeByEmailModal
+											show={showSendCodeByEmailModal}
+											title="Send Code to Developer"
+											handleClose={this.toggleShowSendCodeByEmailModal}
+											subject="Adpushup Ads.txt Entries"
+											emailBody={emailBody}
+										/>
+										<CopyButtonWrapperContainer
+											content={ourAdsTxt}
+											callback={this.onCopyToClipBoard}
+										>
+											<CustomButton
+												variant="secondary"
+												style={{ width: '170px' }}
+												className="snippet-btn apbtn-main-line apbtn-small"
+											>
+												Copy to clipboard
+											</CustomButton>
+										</CopyButtonWrapperContainer>
+									</div>
+								)}
 							</div>
 
 							<CustomButton

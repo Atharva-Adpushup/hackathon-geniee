@@ -8,11 +8,8 @@ import CustomIcon from '../../../../../../Components/CustomIcon/index';
 import Edit from '../../../../../../Components/EditBox/index';
 import Loader from '../../../../../../Components/Loader';
 import Empty from '../../../../../../Components/Empty';
-import {
-	copyToClipBoard,
-	getPageGroupHash,
-	getAppBaseUrls
-} from '../../../../../../helpers/commonFunctions';
+import { getPageGroupHash, getAppBaseUrls } from '../../../../../../helpers/commonFunctions';
+import CopyButtonWrapperContainer from '../../../../../../Containers/CopyButtonWrapperContainer';
 
 const DEFAULT_REGEX = 'No Pattern Set';
 class Listing extends Component {
@@ -153,13 +150,12 @@ class Listing extends Component {
 											<td>{channel.variationsCount}</td>
 											<td>
 												{pattern}
-												<CustomIcon
-													icon="copy"
-													className="u-text-red u-margin-l3 u-cursor-pointer"
-													onClick={copyToClipBoard}
-													toReturn={pattern}
-													title="Copy Pagegroup Pattern"
-												/>
+												<CopyButtonWrapperContainer
+													content={pattern}
+													className="u-text-red u-margin-l3"
+												>
+													<CustomIcon icon="copy" title="Copy Pagegroup Pattern" />
+												</CopyButtonWrapperContainer>
 												<CustomIcon
 													icon="edit"
 													className="u-text-red u-margin-l3 u-cursor-pointer"
