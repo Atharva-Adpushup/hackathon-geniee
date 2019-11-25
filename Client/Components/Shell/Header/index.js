@@ -7,7 +7,16 @@ import history from '../../../helpers/history';
 import UserChange from './UserChange';
 import config from '../../../config/config';
 import CustomButton from '../../CustomButton/index';
-import { consoleRedirection } from '../../../helpers/commonFunctions';
+
+function consoleRedirection(e) {
+	e.preventDefault();
+	const now = new Date();
+	now.setHours(now.getHours() + 2);
+	document.cookie = `app_redirect=0; path=/; expires=${now.toUTCString()}; domain=adpushup.com`;
+	setTimeout(() => {
+		window.location.href = 'https://console.adpushup.com';
+	}, 500);
+}
 
 const Header = ({ sidebarToggle, logout, user, switchUser, findUsers, hasUnsavedChanges }) => {
 	function handleLogout() {
