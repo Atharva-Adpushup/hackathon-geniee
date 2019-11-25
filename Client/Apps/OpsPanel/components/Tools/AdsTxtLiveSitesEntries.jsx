@@ -61,14 +61,23 @@ class AdsTxtLiveSitesEntries extends Component {
 				adsTxtSnippet
 			})
 			.then(res => {
-				console.log(res);
-				showNotification({
-					mode: 'success',
-					title: 'Success',
-					message: `Email will be sent to ${emailId} in 30 minutes`,
-					autoDismiss: 5
-				});
-				this.setState({ isLoading: false }, this.handleReset);
+				const { data } = res.data;
+				console.log(data);
+				if (!siteId || data.map(val => val.siteId).includes(parseInt(siteId))) {
+					showNotification({
+						mode: 'success',
+						title: 'Success',
+						message: `Email will be sent to ${emailId} in 30 minutes`,
+						autoDismiss: 5
+					});
+					this.setState({ isLoading: false }, this.handleReset);
+				} else
+					showNotification({
+						mode: 'error',
+						title: 'Operation Failed',
+						message: 'Please Enter Active Site Id',
+						autoDismiss: 5
+					});
 			})
 			.catch(err => {
 				showNotification({

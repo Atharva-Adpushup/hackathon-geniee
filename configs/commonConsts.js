@@ -46,7 +46,7 @@ module.exports = {
 								WHERE meta(_site).id LIKE 'site::%'
 								AND meta(_user).id LIKE 'user::%';`,
 
-	GET_ACTIVE_SITES_QUERY: `SELECT _site.siteDomain
+	GET_ACTIVE_SITES_QUERY: `SELECT _site.siteDomain , _site.siteId
 	                        FROM AppBucket _site
 							WHERE meta(_site).id LIKE 'site::%' AND _site.dataFeedActive = true;`,
 

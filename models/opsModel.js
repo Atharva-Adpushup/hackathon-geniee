@@ -233,10 +233,6 @@ const commonSiteFunctions = {
 	}
 };
 
-function getUniqueSites(myArr, prop) {
-	return _.uniq(_.map(myArr, prop));
-}
-
 function apiModule() {
 	const API = {
 		getAllSitesStats() {
@@ -330,10 +326,22 @@ function apiModule() {
 		getActiveSites() {
 			const query = N1qlQuery.fromString(commonConsts.GET_ACTIVE_SITES_QUERY);
 
-			function adsTxtProcessing(domain) {
+			return couchbase
+				.connectToAppBucket()
+				.then(appBucket => appBucket.queryAsync(query))
+				.then(sites => {
+					return sites.map(value => value);
+				})
+				.catch(err => console.log(err));
+		},
+
+		getAdsTxtEntries(siteId, adsTxtSnippet, currentSelectedEntry) {
+			function adsTxtProcessing(domain, adsTxtSnippet, currentSelectedEntry) {
 				return proxy
 					.fetchOurAdsTxt()
-					.then(ourAdsTxt => proxy.verifyAdsTxt(domain, ourAdsTxt))
+					.then(ourAdsTxt =>
+						proxy.verifyAdsTxt(domain, (ourAdsTxt = adsTxtSnippet ? adsTxtSnippet : ourAdsTxt))
+					)
 					.then(() => ({
 						status: 1,
 						message: 'All Entries Available',
@@ -354,13 +362,29 @@ function apiModule() {
 									};
 									break;
 								case 206:
-									output = {
-										status: 3,
-										message: "Some entries not found in publisher's ads.txt",
-										missigEntries: ourAdsTxt,
-										domain,
-										presentEntries
-									};
+									if (currentSelectedEntry === 'Missing Entries')
+										output = {
+											status: 3,
+											message: "Some entries not found in publisher's ads.txt",
+											missigEntries: ourAdsTxt,
+											domain
+										};
+									else if (currentSelectedEntry === 'Present Entries')
+										output = {
+											status: 3,
+											message: "Present entries found in publisher's ads.txt",
+											domain,
+											presentEntries
+										};
+									else
+										output = {
+											status: 3,
+											message: "Some entries not found in publisher's ads.txt",
+											domain,
+											missigEntries: ourAdsTxt,
+											presentEntries
+										};
+
 									break;
 								default:
 								case 404:
@@ -377,18 +401,21 @@ function apiModule() {
 					});
 			}
 
-			return couchbase
-				.connectToAppBucket()
-				.then(appBucket => appBucket.queryAsync(query))
-				.then(sites =>
-					sites.map(value => {
-						adsTxtProcessing(value.siteDomain)
-							.then(data => {
-								console.log(data);
-							})
-							.catch(err => console.log(err));
-					})
-				)
+			return this.getActiveSites()
+				.then(sites => {
+					if (!siteId) {
+						const sitesPromises = sites.map(value =>
+							adsTxtProcessing(value.siteDomain, adsTxtSnippet, currentSelectedEntry)
+						);
+						return Promise.all(sitesPromises);
+					}
+
+					let domain = sites
+						.filter(val => val.siteId === parseInt(siteId))
+						.map(val => val.siteDomain)[0];
+
+					return adsTxtProcessing(domain, adsTxtSnippet, currentSelectedEntry);
+				})
 
 				.catch(err => {
 					console.log(err);

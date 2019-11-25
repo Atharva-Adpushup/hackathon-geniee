@@ -266,10 +266,6 @@ router
 		}
 
 		const { siteId, emailId, currentSelectedEntry, adsTxtSnippet } = req.body;
-		opsModel
-			.getActiveSites(siteId, adsTxtSnippet)
-			.then(sitesData => sendSuccessResponse(sitesData, res))
-			.catch(err => errorHandler(err, res));
 
 		const isDataValid = !!(currentSelectedEntry && EMAIL_REGEX.test(emailId));
 
@@ -282,7 +278,33 @@ router
 			);
 		}
 
-		res.send({ msg: `Email will be sent to ${emailId} in 30 mins` });
+		opsModel
+			.getAdsTxtEntries(siteId, adsTxtSnippet, currentSelectedEntry)
+			.then(sitesData => {
+				var options = {
+					method: 'POST',
+					uri: 'http://queuepublisher.adpushup.com/publish',
+					body: {
+						queue: 'MAILER',
+						data: {
+							to: emailId,
+							body: sitesData.missigEntries,
+							subject: 'Ads Txt Data'
+						}
+					},
+					json: true
+				};
+
+				return request(options)
+					.then(data => console.log(data))
+					.catch(err => console.log(err));
+			})
+			.catch(err => errorHandler(err, res));
+
+		return opsModel
+			.getActiveSites()
+			.then(sitesData => sendSuccessResponse(sitesData, res))
+			.catch(err => errorHandler(err, res));
 	})
 
 	.get('/allSitesStats', (req, res) => {
