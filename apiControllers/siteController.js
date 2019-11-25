@@ -6,6 +6,7 @@ const _ = require('lodash');
 const woodlotCustomLogger = require('woodlot').customLogger;
 const userModel = require('../models/userModel');
 const siteModel = require('../models/siteModel');
+const channelModel = require('../models/channelModel');
 const schema = require('../helpers/schema');
 const CC = require('../configs/commonConsts');
 const HTTP_STATUS = require('../configs/httpStatusConsts');
@@ -449,6 +450,52 @@ router
 				)
 			)
 			.catch(err => errorHandler(err, res));
+	})
+	.get('/:siteId/ampSettingsData', (req, res) =>
+		siteModel
+			.getSiteById(req.params.siteId)
+			.then(site => {
+				const ampSettings = site.get('ampSettings') || {};
+
+				return channelModel.getAmpSettings(req.params.siteId).then(channels =>
+					res.send({
+						siteId: req.params.siteId,
+						channels,
+						ampSettings,
+						siteDomain: site.get('siteDomain')
+					})
+				);
+			})
+			.catch(() =>
+				res.send({
+					error: true,
+					message: 'Some Error Occured'
+				})
+			)
+	)
+	.post('/:siteId/saveAmpSettings', (req, res) => {
+		const response = {
+			error: true,
+			message: 'Operaiton Failed'
+		};
+		return siteModel
+			.getSiteById(req.params.siteId)
+			.then(site => {
+				if (!site) {
+					return res.send(response);
+				}
+				site.set('ampSettings', req.body);
+				return site.save();
+			})
+			.then(site => {
+				res.send(site);
+			})
+			.catch(() =>
+				res.send({
+					error: true,
+					message: 'Some Error Occured'
+				})
+			);
 	});
 
 module.exports = router;
