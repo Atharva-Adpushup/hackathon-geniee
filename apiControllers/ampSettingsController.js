@@ -7,7 +7,7 @@ const router = express.Router();
 const { verifyOwner, errorHandler } = require('../helpers/routeHelpers');
 
 router.get('/:siteId', (req, res) => {
-	const htmlFilePath = path.resolve(__dirname, '../portedApps/Apps/ampSettings/', 'index.html');
+	const htmlFilePath = path.resolve(__dirname, '../portedApps/Apps/AmpSettings/', 'index.html');
 	const {
 		user: { email: userEmail },
 		params: { siteId }
