@@ -36,7 +36,7 @@ function oldConsoleRedirection(e) {
 	now.setHours(now.getHours() + 2);
 	document.cookie = `app_redirect=0; path=/; expires=${now.toUTCString()}; domain=adpushup.com`;
 	setTimeout(() => {
-		window.location.href = 'https://old-console.adpushup.com';
+		window.open('https://old-console.adpushup.com');
 	}, 500);
 }
 
@@ -826,6 +826,7 @@ class Panel extends Component {
 					<Alert bsStyle="info" onDismiss={this.handleDismiss} className="u-margin-t4">
 						For old reporting data (before 1st August) go to console by{' '}
 						<a
+							target="_blank"
 							onClick={oldConsoleRedirection}
 							className="alert-link"
 							style={{ cursor: 'pointer', color: '#eb575c' }}
