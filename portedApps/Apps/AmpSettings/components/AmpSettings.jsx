@@ -27,16 +27,19 @@ class AmpSettings extends React.Component {
 		};
 	}
 	fetchAmpSettings = () => {
-		let arr = window.location.href.split('/'), siteId = arr[arr.length - 2];
+		let arr = window.location.pathname.split('/'),
+			siteId = arr[arr.length - 1];
 		ajax({
 			method: 'GET',
-			url: '/user/site/' + siteId + '/ampSettingsData'
+			url: '/api/site/' + siteId + '/ampSettingsData'
 		})
 			.then(res => {
 				let { siteId, siteDomain, channels, ampSettings = {} } = res;
-				let selectedAnalytics = [], fetchedAnalyticsData = ampSettings.analytics || [];
+				let selectedAnalytics = [],
+					fetchedAnalyticsData = ampSettings.analytics || [];
 				for (let i = 0; i < fetchedAnalyticsData.length; i++) {
-					let name = fetchedAnalyticsData[i].name, analyticData = fetchedAnalyticsData[i];
+					let name = fetchedAnalyticsData[i].name,
+						analyticData = fetchedAnalyticsData[i];
 					delete analyticData.name;
 					selectedAnalytics.push({ label: name, value: name, fields: analyticData });
 				}
@@ -82,7 +85,8 @@ class AmpSettings extends React.Component {
 						placeholder="URL or RegExp"
 						name="name"
 						value={this.state.blockList[index]}
-					/> <button
+					/>{' '}
+					<button
 						className="fa fa-trash blockListDelete mL-10"
 						type="button"
 						onClick={() => {
@@ -135,7 +139,7 @@ class AmpSettings extends React.Component {
 		});
 		ajax({
 			method: 'POST',
-			url: '/user/site/' + siteId + '/saveAmpSettings',
+			url: '/api/site/' + siteId + '/saveAmpSettings',
 			data: JSON.stringify({
 				samplingPercent: finalData.samplingPercent,
 				blockList: finalData.blockList,
@@ -240,31 +244,31 @@ class AmpSettings extends React.Component {
 						});
 					}}
 				/>
-				{this.state.selectors[key] && this.state.selectors[key].isVisible
-					? <Menu
-							id="channelMenu"
-							position={{ top: 43 }}
-							arrow="none"
-							onGlassClick={() => this.onSelectorGlassClick(key)}
-						>
-							<MenuItem icon={'fa fa-th'} contentHeading="" key={1}>
-								<MarginEditor
-									css={this.state.selectors[key] && this.state.selectors[key].css}
-									onCancel={() => this.onSelectorGlassClick(key)}
-									handleSubmit={css => this.saveSelectorCss({ key, css })}
-								/>
-							</MenuItem>
-							<MenuItem icon={'fa fa-pencil'} contentHeading="" key={2}>
-								<ColorEditor
-									css={this.state.selectors[key] && this.state.selectors[key].css}
-									onCancel={() => this.onSelectorGlassClick(key)}
-									handleSubmit={css => this.saveSelectorCss({ key, css })}
-								/>
-							</MenuItem>
-
-						</Menu>
-					: ''}
-
+				{this.state.selectors[key] && this.state.selectors[key].isVisible ? (
+					<Menu
+						id="channelMenu"
+						position={{ top: 43 }}
+						arrow="none"
+						onGlassClick={() => this.onSelectorGlassClick(key)}
+					>
+						<MenuItem icon={'fa fa-th'} contentHeading="" key={1}>
+							<MarginEditor
+								css={this.state.selectors[key] && this.state.selectors[key].css}
+								onCancel={() => this.onSelectorGlassClick(key)}
+								handleSubmit={css => this.saveSelectorCss({ key, css })}
+							/>
+						</MenuItem>
+						<MenuItem icon={'fa fa-pencil'} contentHeading="" key={2}>
+							<ColorEditor
+								css={this.state.selectors[key] && this.state.selectors[key].css}
+								onCancel={() => this.onSelectorGlassClick(key)}
+								handleSubmit={css => this.saveSelectorCss({ key, css })}
+							/>
+						</MenuItem>
+					</Menu>
+				) : (
+					''
+				)}
 			</RowColSpan>
 		);
 	};
@@ -276,12 +280,17 @@ class AmpSettings extends React.Component {
 		});
 	};
 
+	// render() {
+	// 	return <div>rendered</div>;
+	// }
+
 	render = () => {
 		let analytics = Object.keys(commonConsts.analytics).map(function(key) {
 			return { label: key, value: key, fields: {} };
 		});
 
-		if (this.state.isLoading) return <Loader />;
+		// if (this.state.isLoading) return <Loader />;
+		if (this.state.isLoading) return <div>Loading...</div>;
 		else
 			return (
 				<Row>
@@ -340,7 +349,9 @@ class AmpSettings extends React.Component {
 												<button className="btn-success">Save Settings</button>
 											</div>
 											<div className="col-sm-2">
-												<button type="button" className="btn-default">Cancel</button>
+												<button type="button" className="btn-default">
+													Cancel
+												</button>
 											</div>
 										</div>
 									</form>

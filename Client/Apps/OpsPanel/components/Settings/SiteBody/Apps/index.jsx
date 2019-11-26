@@ -192,6 +192,31 @@ class Apps extends Component {
 						<InnovativeAds {...common} updateSite={updateSite} />
 					) : null}
 				</Panel>
+				<Panel>
+					<Panel.Heading>
+						<Panel.Title toggle className="app-panel-title">
+							AMP Settings
+						</Panel.Title>
+						<a
+							href={`/api/ampSettings/${site.siteId}`}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="u-margin-r3 app-link"
+						>
+							<OverlayTrigger
+								placement="top"
+								overlay={
+									<Tooltip id={`tooltip-innovative-ads-link-${site.siteId}`}>
+										Go to AMP Settings Page
+									</Tooltip>
+								}
+								key={`amp-settings-link-${site.siteId}`}
+							>
+								<FontAwesomeIcon icon="link" className="u-text-red" size="lg" />
+							</OverlayTrigger>
+						</a>
+					</Panel.Heading>
+				</Panel>
 			</PanelGroup>
 		);
 	}
