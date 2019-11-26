@@ -3,7 +3,8 @@
 /* eslint-disable no-console */
 import React, { Component } from 'react';
 import { Form, FormControl } from 'react-bootstrap';
-// import CustomButton from '../../CustomButton/index';
+import CustomButton from '../../CustomButton/index';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 class UserChange extends Component {
 	state = {
@@ -63,18 +64,19 @@ class UserChange extends Component {
 		const { email, users } = this.state;
 
 		return (
-			<Form onSubmit={this.onFormSubmit} className="change-user-form">
+			<Form onSubmit={this.onFormSubmit} className='change-user-form'>
 				<FormControl
-					type="text"
-					name="email"
+					type='text'
+					name='email'
 					value={email}
 					onChange={this.onValChange}
 					onFocus={this.onFocus}
-					list="users-list"
-					placeholder="Email"
+					list='users-list'
+					placeholder='Email'
+					style={{ borderRadius: '0', borderTopLeftRadius: 4, borderBottomLeftRadius: 4 }}
 				/>
 				{users.length ? (
-					<datalist id="users-list">
+					<datalist id='users-list'>
 						{users.map(user => (
 							<option key={user.email} value={user.email} />
 						))}
@@ -83,13 +85,19 @@ class UserChange extends Component {
 					''
 				)}
 
-				{/* <CustomButton
-					type="submit"
-					variant="secondary"
-					className="u-margin-l3 u-margin-r3 pull-right"
+				<CustomButton
+					type='submit'
+					variant='secondary'
+					style={{
+						borderRadius: '0',
+						borderTopRightRadius: 4,
+						borderBottomRightRadius: 4,
+						height: '34'
+					}}
+					title='Change User'
 				>
-					Change User
-				</CustomButton> */}
+					<FontAwesomeIcon size='1x' icon='sign-in-alt' className='u-margin-r3' />
+				</CustomButton>
 			</Form>
 		);
 	}

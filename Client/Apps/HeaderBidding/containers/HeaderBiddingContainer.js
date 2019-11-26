@@ -56,13 +56,14 @@ export default connect(
 					data: {
 						sites: {
 							[siteId]: { domain }
-						}
+						},
+						isSuperUser
 					}
 				}
 			}
 		} = state;
 		const currSiteHbData = sites && sites[siteId];
-		return { currSiteHbData, domain, hasUnsavedChanges };
+		return { currSiteHbData, domain, hasUnsavedChanges, isSuperUser };
 	},
 	{
 		checkInventoryAction,

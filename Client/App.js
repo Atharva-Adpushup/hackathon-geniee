@@ -37,7 +37,8 @@ import {
 	faQuestion,
 	faQuestionCircle,
 	faMailBulk,
-	faDownload
+	faDownload,
+	faSignInAlt
 } from '@fortawesome/free-solid-svg-icons';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import 'bootstrap-sass/assets/stylesheets/_bootstrap.scss';
@@ -81,7 +82,8 @@ library.add(
 	faQuestion,
 	faQuestionCircle,
 	faMailBulk,
-	faDownload
+	faDownload,
+	faSignInAlt
 );
 
 const App = () => (

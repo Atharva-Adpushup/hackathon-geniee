@@ -3,10 +3,10 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { DropdownButton, MenuItem } from 'react-bootstrap';
-import CustomButton from '../../CustomButton/index';
 import history from '../../../helpers/history';
 import UserChange from './UserChange';
 import config from '../../../config/config';
+import CustomButton from '../../CustomButton/index';
 
 function consoleRedirection(e) {
 	e.preventDefault();
@@ -14,7 +14,7 @@ function consoleRedirection(e) {
 	now.setHours(now.getHours() + 2);
 	document.cookie = `app_redirect=0; path=/; expires=${now.toUTCString()}; domain=adpushup.com`;
 	setTimeout(() => {
-		window.location.href = 'http://console.adpushup.com';
+		window.location.href = 'https://console.adpushup.com';
 	}, 500);
 }
 
@@ -44,11 +44,14 @@ const Header = ({ sidebarToggle, logout, user, switchUser, findUsers, hasUnsaved
 			</span>
 
 			<div className="header-nav">
-				{user.isSuperUser ? <UserChange switchUser={switchUser} findUsers={findUsers} /> : null}
-				<CustomButton variant="secondary" onClick={consoleRedirection} className="u-margin-r3">
-					Go to Console
-				</CustomButton>
-
+				{!!user.isSuperUser ? (
+					<React.Fragment>
+						<UserChange switchUser={switchUser} findUsers={findUsers} />
+						<CustomButton variant="secondary" onClick={consoleRedirection} className="u-margin-r3">
+							Go to Console
+						</CustomButton>
+					</React.Fragment>
+				) : null}
 				<DropdownButton pullRight title={`Hello ${user.firstName || ''}`} id="dropdown-button">
 					{/* <MenuItem eventKey="1">Profile</MenuItem> */}
 					{/* <MenuItem eventKey="2">Settings</MenuItem> */}
