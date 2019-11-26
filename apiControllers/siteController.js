@@ -21,6 +21,7 @@ const {
 	checkParams
 } = require('../helpers/routeHelpers');
 const proxy = require('../helpers/proxy');
+const pageGroupController = require('./pageGroupController');
 
 const router = express.Router();
 
@@ -496,6 +497,7 @@ router
 					message: 'Some Error Occured'
 				})
 			);
-	});
+	})
+	.use('/:siteId/pagegroup/', pageGroupController);
 
 module.exports = router;
