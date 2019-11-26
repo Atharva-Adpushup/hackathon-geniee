@@ -281,6 +281,7 @@ router
 		opsModel
 			.getAdsTxtEntries(siteId, adsTxtSnippet, currentSelectedEntry)
 			.then(sitesData => {
+				console.log(sitesData);
 				var options = {
 					method: 'POST',
 					uri: 'http://queuepublisher.adpushup.com/publish',
@@ -288,7 +289,7 @@ router
 						queue: 'MAILER',
 						data: {
 							to: emailId,
-							body: sitesData.missigEntries,
+							body: JSON.stringify(sitesData),
 							subject: 'Ads Txt Data'
 						}
 					},

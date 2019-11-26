@@ -336,16 +336,18 @@ function apiModule() {
 		},
 
 		getAdsTxtEntries(siteId, adsTxtSnippet, currentSelectedEntry) {
-			function adsTxtProcessing(domain, adsTxtSnippet, currentSelectedEntry) {
+			function adsTxtProcessing(domain, siteId, ownerEmail, adsTxtSnippet, currentSelectedEntry) {
 				return proxy
 					.fetchOurAdsTxt()
 					.then(ourAdsTxt =>
 						proxy.verifyAdsTxt(domain, (ourAdsTxt = adsTxtSnippet ? adsTxtSnippet : ourAdsTxt))
 					)
 					.then(() => ({
-						status: 1,
-						message: 'All Entries Available',
-						domain
+						// status: 1,
+						domain,
+						siteId,
+						ownerEmail,
+						message: 'All Entries Available'
 					}))
 					.catch(err => {
 						if (err instanceof AdPushupError) {
@@ -356,31 +358,39 @@ function apiModule() {
 							switch (httpCode) {
 								case 204:
 									output = {
-										status: 2,
-										message: "Our Ads.txt entries not found in publisher's ads.txt",
-										domain
+										// status: 2,
+										domain,
+										siteId,
+										ownerEmail,
+										message: "Our Ads.txt entries not found in publisher's ads.txt"
 									};
 									break;
 								case 206:
 									if (currentSelectedEntry === 'Missing Entries')
 										output = {
-											status: 3,
+											// status: 3,
+											domain,
+											siteId,
+											ownerEmail,
 											message: "Some entries not found in publisher's ads.txt",
-											missigEntries: ourAdsTxt,
-											domain
+											missigEntries: ourAdsTxt
 										};
 									else if (currentSelectedEntry === 'Present Entries')
 										output = {
-											status: 3,
-											message: "Present entries found in publisher's ads.txt",
+											// status: 3,
 											domain,
+											siteId,
+											ownerEmail,
+											message: "Present entries found in publisher's ads.txt",
 											presentEntries
 										};
 									else
 										output = {
 											status: 3,
-											message: "Some entries not found in publisher's ads.txt",
 											domain,
+											siteId,
+											ownerEmail,
+											message: "Some entries not found in publisher's ads.txt",
 											missigEntries: ourAdsTxt,
 											presentEntries
 										};
@@ -389,7 +399,10 @@ function apiModule() {
 								default:
 								case 404:
 									output = {
-										status: 4,
+										// status: 4,
+										domain,
+										siteId,
+										ownerEmail,
 										message: "Publisher's ads.txt not found"
 									};
 									break;
@@ -405,16 +418,31 @@ function apiModule() {
 				.then(sites => {
 					if (!siteId) {
 						const sitesPromises = sites.map(value =>
-							adsTxtProcessing(value.siteDomain, adsTxtSnippet, currentSelectedEntry)
+							adsTxtProcessing(
+								value.domain,
+								value.siteId,
+								value.accountEmail,
+								adsTxtSnippet,
+								currentSelectedEntry
+							)
 						);
 						return Promise.all(sitesPromises);
 					}
 
 					let domain = sites
 						.filter(val => val.siteId === parseInt(siteId))
-						.map(val => val.siteDomain)[0];
+						.map(val => val.domain)[0];
+					let accountEmail = sites
+						.filter(val => val.siteId === parseInt(siteId))
+						.map(val => val.accountEmail)[0];
 
-					return adsTxtProcessing(domain, adsTxtSnippet, currentSelectedEntry);
+					return adsTxtProcessing(
+						domain,
+						parseInt(siteId),
+						accountEmail,
+						adsTxtSnippet,
+						currentSelectedEntry
+					);
 				})
 
 				.catch(err => {
