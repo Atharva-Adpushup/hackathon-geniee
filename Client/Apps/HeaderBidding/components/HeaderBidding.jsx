@@ -212,7 +212,8 @@ class HeaderBidding extends React.Component {
 			inventories,
 			updateInventoriesHbStatus,
 			showNotification,
-			setUnsavedChangesAction
+			setUnsavedChangesAction,
+			isSuperUser
 		} = this.props;
 
 		const activeTab = this.getActiveTab();
@@ -264,11 +265,13 @@ class HeaderBidding extends React.Component {
 					);
 				case 'optimization':
 					return (
-						<OptimizationTab
-							siteId={siteId}
-							showNotification={showNotification}
-							setUnsavedChangesAction={setUnsavedChangesAction}
-						/>
+						isSuperUser && (
+							<OptimizationTab
+								siteId={siteId}
+								showNotification={showNotification}
+								setUnsavedChangesAction={setUnsavedChangesAction}
+							/>
+						)
 					);
 				default:
 					return null;
@@ -290,7 +293,8 @@ class HeaderBidding extends React.Component {
 				biddersFound,
 				adServerSetupStatus
 			},
-			hasUnsavedChanges
+			hasUnsavedChanges,
+			isSuperUser
 		} = this.props;
 		const { isMasterSaving } = this.state;
 
@@ -314,9 +318,11 @@ class HeaderBidding extends React.Component {
 					<NavItem eventKey={4} className={!biddersFound ? 'disabled' : ''}>
 						{NAV_ITEMS_VALUES.TAB_4}
 					</NavItem>
-					<NavItem eventKey={5} className={!biddersFound ? 'disabled' : ''}>
-						{NAV_ITEMS_VALUES.TAB_5}
-					</NavItem>
+					{isSuperUser && (
+						<NavItem eventKey={5} className={!biddersFound ? 'disabled' : ''}>
+							{NAV_ITEMS_VALUES.TAB_5}
+						</NavItem>
+					)}
 
 					<CustomButton
 						type="button"
