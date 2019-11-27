@@ -77,11 +77,11 @@ var model = require('../helpers/model'),
 			},
 			adNetworkSettings: commonConsts.DEFAULT_AD_NETWORK_SETTINGS,
 			apps: {
-				"layout": true,
-				"apTag": true,
-				"innovativeAds": true,
-				"headerBidding": true,
-				"consentManagement": false
+				layout: true,
+				apTag: true,
+				innovativeAds: true,
+				headerBidding: true,
+				consentManagement: false
 			},
 			adServerSetupStatus: 0
 		};
@@ -417,7 +417,7 @@ function apiModule() {
 					activeDFPNetwork: settings.activeDFPNetwork ? settings.activeDFPNetwork : '',
 					activeDFPParentId: settings.activeDFPParentId ? settings.activeDFPParentId : '',
 					activeDFPCurrencyCode: settings.activeDFPCurrencyCode || '',
-					blocklist: blocklist.length ? blocklist : '',
+					blocklist: blocklist.length ? blocklist : [],
 					isSPA: settings.isSPA === 'false' ? false : true,
 					isThirdPartyAdx: settings.isThirdPartyAdx === 'false' ? false : true,
 					spaPageTransitionTimeout: parseInt(settings.spaPageTransitionTimeout, 10),
@@ -510,7 +510,7 @@ function apiModule() {
 					throw new AdPushupError('Inventory Not Found');
 				});
 		},
-		
+
 		isApTagInventoryExist: siteId => {
 			return couchbase
 				.connectToAppBucket()
