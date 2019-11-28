@@ -125,7 +125,7 @@ var hb = {
         */
 		if (HB_ACTIVE) {
 			(function() {
-				require('../../../../../adpushup.js/modules/adpTags/Prebid.js/build/dist/prebid');
+				require('../../Prebid.js/build/dist/prebid');
 			})();
 		}
 
