@@ -1,6 +1,6 @@
 /* eslint-disable no-prototype-builtins */
 import React, { Component } from 'react';
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col, Alert } from 'react-bootstrap';
 import moment from 'moment';
 import { Object } from 'es6-shim';
 import qs from 'querystringify';
@@ -30,6 +30,16 @@ import {
 	getDemoUserSites
 } from '../../../helpers/commonFunctions';
 
+function oldConsoleRedirection(e) {
+	e.preventDefault();
+	const now = new Date();
+	now.setHours(now.getHours() + 2);
+	document.cookie = `app_redirect=0; path=/; expires=${now.toUTCString()}; domain=adpushup.com`;
+	setTimeout(() => {
+		window.open('https://old-console.adpushup.com');
+	}, 500);
+}
+
 class Panel extends Component {
 	constructor(props) {
 		super(props);
@@ -56,7 +66,8 @@ class Panel extends Component {
 			reportType: props.reportType || 'account',
 			isLoading: true,
 			isValidSite: true,
-			isReportingSite: true
+			isReportingSite: true,
+			show: true
 		};
 	}
 
@@ -680,6 +691,10 @@ class Panel extends Component {
 		return selectedMetricsTableData;
 	};
 
+	handleDismiss = () => {
+		this.setState({ show: false });
+	};
+
 	renderContent = () => {
 		const {
 			selectedDimension,
@@ -797,14 +812,31 @@ class Panel extends Component {
 	};
 
 	render() {
-		const { isLoading } = this.state;
+		const { isLoading, show } = this.state;
 		const { reportsMeta } = this.props;
 
 		if (!reportsMeta.fetched || isLoading) {
 			return <Loader />;
 		}
 
-		return <ActionCard title="AdPushup Reports">{this.renderContent()}</ActionCard>;
+		return (
+			<React.Fragment>
+				<ActionCard title="AdPushup Reports">{this.renderContent()}</ActionCard>
+				{show ? (
+					<Alert bsStyle="info" onDismiss={this.handleDismiss} className="u-margin-t4">
+						For old reporting data (before 1st August) go to console by{' '}
+						<a
+							target="_blank"
+							onClick={oldConsoleRedirection}
+							className="alert-link"
+							style={{ cursor: 'pointer', color: '#eb575c' }}
+						>
+							clicking here.
+						</a>
+					</Alert>
+				) : null}
+			</React.Fragment>
+		);
 	}
 }
 

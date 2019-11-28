@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<title>AMP Settings</title>
+		<link
+			href="//fonts.googleapis.com/css?family=Karla:400,700,400italic,700italic&subset=latin,latin-ext"
+			rel="stylesheet"
+			type="text/css"
+		/>
+		<link
+			href="http://console.adpushup.com/assets/css/builds/website.min.css"
+			rel="stylesheet"
+			type="text/css"
+		/>
+		<link
+			href="https://beta.adpushup.com/assets/css/builds/editor.min.css"
+			rel="stylesheet"
+			type="text/css"
+		/>
+
+		<script
+			src="https://code.jquery.com/jquery-3.4.1.js"
+			integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+			crossorigin="anonymous"
+		></script>
+
+		<style type="text/css">
+			.blockListInput {
+				width: 88% !important;
+				border: 1px solid #e6e6e6;
+			}
+
+			.blockListDelete {
+				width: auto !important;
+				line-height: inherit;
+				font-size: 1.2em;
+			}
+
+			.selectorInput {
+				width: 78% !important;
+				border: 1px solid #e6e6e6;
+			}
+
+			.selectorDelete {
+				width: auto !important;
+				line-height: inherit;
+				font-size: 1.2em;
+			}
+
+			.adContainerStyle {
+				background: #f9f9f9;
+				padding: 20px 10px 10px;
+				margin: 10px;
+				border-radius: 4px;
+				border: 1px solid #e9e9e9;
+				position: relative;
+			}
+
+			.deleteAdBtnStyle {
+				position: absolute;
+				right: -8px;
+				top: -8px;
+				cursor: pointer;
+			}
+
+			textarea {
+				resize: auto;
+				overflow: auto;
+			}
+
+			.textCenter {
+				text-align: center;
+			}
+
+			.header {
+				margin-bottom: 10px;
+				font-weight: 700;
+			}
+
+			.marginBottom {
+				margin-bottom: 5px;
+			}
+
+			.rowMargin {
+				margin-bottom: 10px !important;
+			}
+
+			.addButton {
+				width: 50% !important;
+				float: right;
+			}
+
+			.h4FontSize {
+				font-size: 16px;
+			}
+
+			.mediumFontSize {
+				font-size: 15px;
+			}
+
+			.no-border {
+				border: none;
+			}
+
+			#channelMenu .MenuBarInner {
+				overflow-y: inherit !important;
+				overflow-x: inherit !important;
+			}
+
+			.reConversionInput {
+				width: 20% !important;
+				border: 1px solid #e9e9e9;
+				height: 37px;
+				float: right;
+			}
+		</style>
+		<style data-emotion=""></style>
+		<style data-emotion="">
+			@-webkit-keyframes react-select-loading-indicator {
+				0%,
+				80%,
+				100% {
+					opacity: 0;
+				}
+				40% {
+					opacity: 1;
+				}
+			}
+		</style>
+		<style data-emotion="">
+			@keyframes react-select-loading-indicator {
+				0%,
+				80%,
+				100% {
+					opacity: 0;
+				}
+				40% {
+					opacity: 1;
+				}
+			}
+		</style>
+		<style data-emotion="">
+			.css-10nd86i {
+				position: relative;
+				box-sizing: border-box;
+			}
+		</style>
+		<style data-emotion="">
+			.css-1aya2g8 {
+				-webkit-align-items: center;
+				-webkit-box-align: center;
+				-ms-flex-align: center;
+				align-items: center;
+				background-color: hsl(0, 0%, 98%);
+				border-color: hsl(0, 0%, 80%);
+				border-radius: 4px;
+				border-style: solid;
+				border-width: 1px;
+				cursor: default;
+				display: -webkit-box;
+				display: -webkit-flex;
+				display: -ms-flexbox;
+				display: flex;
+				-webkit-flex-wrap: wrap;
+				-ms-flex-wrap: wrap;
+				flex-wrap: wrap;
+				-webkit-box-pack: justify;
+				-webkit-justify-content: space-between;
+				-ms-flex-pack: justify;
+				justify-content: space-between;
+				min-height: 38px;
+				outline: 0 !important;
+				position: relative;
+				-webkit-transition: all 100ms;
+				transition: all 100ms;
+				box-sizing: border-box;
+			}
+		</style>
+		<style data-emotion="">
+			.css-1aya2g8:hover {
+				border-color: hsl(0, 0%, 70%);
+			}
+		</style>
+		<style data-emotion="">
+			.css-1rtrksz {
+				-webkit-align-items: center;
+				-webkit-box-align: center;
+				-ms-flex-align: center;
+				align-items: center;
+				display: -webkit-box;
+				display: -webkit-flex;
+				display: -ms-flexbox;
+				display: flex;
+				-webkit-flex: 1;
+				-ms-flex: 1;
+				flex: 1;
+				-webkit-flex-wrap: wrap;
+				-ms-flex-wrap: wrap;
+				flex-wrap: wrap;
+				padding: 2px 8px;
+				-webkit-overflow-scrolling: touch;
+				position: relative;
+				box-sizing: border-box;
+			}
+		</style>
+		<style data-emotion="">
+			.css-1492t68 {
+				color: hsl(0, 0%, 50%);
+				margin-left: 2px;
+				margin-right: 2px;
+				position: absolute;
+				top: 50%;
+				-webkit-transform: translateY(-50%);
+				-ms-transform: translateY(-50%);
+				transform: translateY(-50%);
+				box-sizing: border-box;
+			}
+		</style>
+		<style data-emotion="">
+			.css-rsyb7x {
+				margin: 2px;
+				padding-bottom: 2px;
+				padding-top: 2px;
+				visibility: visible;
+				color: #222;
+				box-sizing: border-box;
+			}
+		</style>
+		<style data-emotion="">
+			.css-1wy0on6 {
+				-webkit-align-items: center;
+				-webkit-box-align: center;
+				-ms-flex-align: center;
+				align-items: center;
+				-webkit-align-self: stretch;
+				-ms-flex-item-align: stretch;
+				align-self: stretch;
+				display: -webkit-box;
+				display: -webkit-flex;
+				display: -ms-flexbox;
+				display: flex;
+				-webkit-flex-shrink: 0;
+				-ms-flex-negative: 0;
+				flex-shrink: 0;
+				box-sizing: border-box;
+			}
+		</style>
+		<style data-emotion="">
+			.css-d8oujb {
+				-webkit-align-self: stretch;
+				-ms-flex-item-align: stretch;
+				align-self: stretch;
+				background-color: hsl(0, 0%, 80%);
+				margin-bottom: 8px;
+				margin-top: 8px;
+				width: 1px;
+				box-sizing: border-box;
+			}
+		</style>
+		<style data-emotion="">
+			.css-1ep9fjw {
+				color: hsl(0, 0%, 80%);
+				display: -webkit-box;
+				display: -webkit-flex;
+				display: -ms-flexbox;
+				display: flex;
+				padding: 8px;
+				-webkit-transition: color 150ms;
+				transition: color 150ms;
+				box-sizing: border-box;
+			}
+		</style>
+		<style data-emotion="">
+			.css-1ep9fjw:hover {
+				color: hsl(0, 0%, 60%);
+			}
+		</style>
+		<style data-emotion="">
+			.css-19bqh2r {
+				display: inline-block;
+				fill: currentColor;
+				line-height: 1;
+				stroke: currentColor;
+				stroke-width: 0;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="pageContainer page-container">
+			<div class="pageContentWrapper page-content">
+				<div class="pageContentInner page-content--inner" style="padding: 25px 50px;">
+					<div id="ampSettings"></div>
+				</div>
+			</div>
+		</div>
+		<script src="/assets/js/react-15.js"></script>
+		<script src="/assets/js/react-dom.js"></script>
+		<script src="/assets/js/builds/ampSettings.js"></script>
+	</body>
+</html>

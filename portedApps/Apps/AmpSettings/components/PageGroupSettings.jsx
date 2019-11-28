@@ -192,7 +192,7 @@ class PageGroupSettings extends React.Component {
 		}
 		ajax({
 			method: 'POST',
-			url: '/user/site/' + siteId + '/pagegroup/saveAmpSettings',
+			url: '/api/site/' + siteId + '/pagegroup/saveAmpSettings',
 			data: JSON.stringify({
 				platform: 'MOBILE',
 				pageGroup,

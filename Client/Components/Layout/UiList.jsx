@@ -220,16 +220,16 @@ class UiList extends React.Component {
 			return false;
 		}
 
-		return this.setState(
-			{ collection: inputCollection, activeItemKey: '', activeItemValue: '' },
-			() => {
-				if (!isSeparateSaveButton) {
-					this.masterSaveData(inputCollection);
-				}
-			}
-		);
+		if (!isSeparateSaveButton) {
+			return this.masterSaveData(inputCollection).then(isDataSaved => {
+				if (isDataSaved) this.saveUpdatedEntriesInState(inputCollection);
+			});
+		}
+
+		return this.saveUpdatedEntriesInState(inputCollection);
 	};
 
+	// eslint-disable-next-line consistent-return
 	deleteItem = key => {
 		const { collection } = this.state;
 		const { isSeparateSaveButton } = this.props;
@@ -239,11 +239,14 @@ class UiList extends React.Component {
 
 		if (window.confirm(message)) {
 			inputCollection.splice(key, 1);
-			this.setState({ collection: inputCollection, activeItemValue: '', activeItemKey: '' }, () => {
-				if (!isSeparateSaveButton) {
-					this.masterSaveData(inputCollection);
-				}
-			});
+
+			if (!isSeparateSaveButton) {
+				return this.masterSaveData(inputCollection).then(isDataSaved => {
+					if (isDataSaved) this.saveUpdatedEntriesInState(inputCollection);
+				});
+			}
+
+			return this.saveUpdatedEntriesInState(inputCollection);
 		}
 	};
 
@@ -273,9 +276,15 @@ class UiList extends React.Component {
 		const { onSave } = this.props;
 		const computedCollection = inputCollection || collection;
 
-		onSave(computedCollection);
-		return true;
+		return onSave(computedCollection);
 	};
+
+	saveUpdatedEntriesInState = collection =>
+		this.setState({
+			collection,
+			activeItemKey: '',
+			activeItemValue: ''
+		});
 
 	generatePlaceHolder = () => {
 		const { emptyCollectionPlaceHolder } = this.props;

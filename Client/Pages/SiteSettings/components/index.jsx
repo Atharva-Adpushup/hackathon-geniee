@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Col } from 'react-bootstrap';
+import cloneDeep from 'lodash/cloneDeep';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faCopy, faEnvelope } from '@fortawesome/free-solid-svg-icons';
@@ -57,18 +58,25 @@ class SiteSettings extends Component {
 			blocklist: collection
 		};
 
-		updateApConfig(siteId, apConfigs);
-		siteService
+		return siteService
 			.saveApConfigs(siteId, apConfigs)
-			.then(() =>
+			.then(() => {
+				updateApConfig(siteId, apConfigs);
+
 				showNotification({
 					mode: 'success',
 					title: 'Settings Saved',
 					message: 'Successfully saved blocklist setting',
 					autoDismiss: 3
-				})
-			)
-			.catch(err => errorHandler(err));
+				});
+
+				return true;
+			})
+			.catch(err => {
+				errorHandler(err);
+
+				return false;
+			});
 	};
 
 	toggleShowSendCodeByEmailModal = () => {
@@ -129,12 +137,14 @@ class SiteSettings extends Component {
 			}
 		} = this.state;
 
+		const blocklistCopy = Array.isArray(blocklist) ? cloneDeep(blocklist) : [];
+
 		return (
 			<div className="clearfix">
 				<h4 className="u-margin-t0 u-margin-b4 u-text-bold">Manage Blocklist</h4>
 				<p className="u-margin-b4">Block AdPushup ads on selected URLs of the website</p>
 				<UiList
-					itemCollection={blocklist}
+					itemCollection={blocklistCopy}
 					emptyCollectionPlaceHolder="No blocklist added"
 					inputPlaceholder="Enter comma separated URLs or URLs pattern to block AdPushup ads"
 					saveButtonText="Add"
@@ -142,7 +152,6 @@ class SiteSettings extends Component {
 					sticky
 					validate
 					plugins={['url-remove-protocol-prefix']}
-					isSeparateSaveButton
 					separateSaveButtonText="Save Data"
 					onSave={this.uiListSaveHandler}
 				/>
