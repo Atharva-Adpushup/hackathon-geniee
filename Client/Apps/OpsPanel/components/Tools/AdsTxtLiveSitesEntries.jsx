@@ -62,7 +62,6 @@ class AdsTxtLiveSitesEntries extends Component {
 			})
 			.then(res => {
 				const { data } = res.data;
-				console.log(data);
 				if (!siteId || data.map(val => val.siteId).includes(parseInt(siteId))) {
 					showNotification({
 						mode: 'success',

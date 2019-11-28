@@ -343,7 +343,7 @@ function apiModule() {
 						proxy.verifyAdsTxt(domain, (ourAdsTxt = adsTxtSnippet ? adsTxtSnippet : ourAdsTxt))
 					)
 					.then(() => ({
-						// status: 1,
+						status: 1,
 						domain,
 						siteId,
 						ownerEmail,
@@ -358,7 +358,7 @@ function apiModule() {
 							switch (httpCode) {
 								case 204:
 									output = {
-										// status: 2,
+										status: 2,
 										domain,
 										siteId,
 										ownerEmail,
@@ -368,21 +368,21 @@ function apiModule() {
 								case 206:
 									if (currentSelectedEntry === 'Missing Entries')
 										output = {
-											// status: 3,
+											status: 3,
 											domain,
 											siteId,
 											ownerEmail,
 											message: "Some entries not found in publisher's ads.txt",
-											missigEntries: ourAdsTxt
+											adsTxtEntries: ourAdsTxt
 										};
 									else if (currentSelectedEntry === 'Present Entries')
 										output = {
-											// status: 3,
+											status: 3,
 											domain,
 											siteId,
 											ownerEmail,
 											message: "Present entries found in publisher's ads.txt",
-											presentEntries
+											adsTxtEntries: presentEntries
 										};
 									else
 										output = {
@@ -390,16 +390,15 @@ function apiModule() {
 											domain,
 											siteId,
 											ownerEmail,
-											message: "Some entries not found in publisher's ads.txt",
-											missigEntries: ourAdsTxt,
-											presentEntries
+											message: 'All Ads.txt Entries Not Present For this site'
+											// adsTxtEntries: { ourAdsTxt, presentEntries }
 										};
 
 									break;
 								default:
 								case 404:
 									output = {
-										// status: 4,
+										status: 4,
 										domain,
 										siteId,
 										ownerEmail,
