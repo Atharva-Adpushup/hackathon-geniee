@@ -281,6 +281,7 @@ router
 		opsModel
 			.getAdsTxtEntries(siteId, adsTxtSnippet, currentSelectedEntry)
 			.then(sitesData => {
+				console.log(sitesData);
 				let adsData = '';
 				let commonMailFormatIfSiteId = `<div class="mailData">
 			<p><b>Domain :</b> ${sitesData.domain}</p>
@@ -296,7 +297,7 @@ router
 								  <p> <b>${sitesData.message} </b></p>
 					</div>
 				`
-								: `${commonOutput}
+								: `${commonMailFormatIfSiteId}
 				<p> <b>${currentSelectedEntry} :</b> ${sitesData.adsTxtEntries.split('\n').join('<br>')} </p>
 				</div>`)
 					: sitesData.forEach(siteData => {
