@@ -281,46 +281,42 @@ router
 		opsModel
 			.getAdsTxtEntries(siteId, adsTxtSnippet, currentSelectedEntry)
 			.then(sitesData => {
-				const singleSiteEntry =
-					currentSelectedEntry === 'All Entries Present' ||
-					sitesData.status === 1 ||
-					sitesData.status === 2 ||
-					sitesData.status === 4
-						? `<div class="mailData">
-					<p><b>Domain :</b> ${sitesData.domain}</p>
-					<p><b>Site ID :</b> ${siteId}
-					<p> <b>Account Email :</b> ${sitesData.ownerEmail}</p>
-					<p> <b>${sitesData.message} </b></p>
+				let adsData = '';
+				let commonMailFormatIfSiteId = `<div class="mailData">
+			<p><b>Domain :</b> ${sitesData.domain}</p>
+			<p><b>Site ID :</b> ${siteId}
+			<p> <b>Account Email :</b> ${sitesData.accountEmail}</p>`;
+				siteId
+					? (adsData =
+							currentSelectedEntry === 'All Entries Present' ||
+							sitesData.status === 1 ||
+							sitesData.status === 2 ||
+							sitesData.status === 4
+								? `${commonMailFormatIfSiteId}
+								  <p> <b>${sitesData.message} </b></p>
 					</div>
 				`
-						: `<div class="mailData">
-				<p><b>Domain :</b> ${sitesData.domain}</p>
-				<p><b>Site ID :</b> ${siteId}
-				<p> <b>Account Email :</b> ${sitesData.ownerEmail}</p>
+								: `${commonOutput}
 				<p> <b>${currentSelectedEntry} :</b> ${sitesData.adsTxtEntries.split('\n').join('<br>')} </p>
-				</div>`;
-
-				// let formattedDataForAllSites = '';
-				// sitesData.forEach(siteData => {
-				// 	formattedDataForAllSites +=
-				// 		currentSelectedEntry === 'All Entries Present' ||
-				// 		siteData.status === 1 ||
-				// 		siteData.status === 2 ||
-				// 		siteData.status === 4
-				// 			? `<div class="mailData">
-				// 	<p><b>Domain :</b> ${siteData.domain}</p>
-				// 	<p><b>Site ID :</b> ${siteData.siteId}
-				// 	<p> <b>Account Email :</b> ${siteData.ownerEmail}</p>
-				// 	<p> <b>${siteData.message} </b></p>
-				// 	</div><br/>
-				// `
-				// 			: `<div class="mailData">
-				// <p><b>Domain :</b> ${siteData.domain}</p>
-				// <p><b>Site ID :</b> ${siteData.siteId}
-				// <p> <b>Account Email :</b> ${siteData.ownerEmail}</p>
-				// <p> <b>${currentSelectedEntry} :</b> ${siteData.adsTxtEntries.split('\n').join('<br>')} </p>
-				// </div> <br/>`;
-				// });
+				</div>`)
+					: sitesData.forEach(siteData => {
+							let commonMailFormatIfNoSiteId = `<div class="mailData">
+						<p><b>Domain :</b> ${siteData.domain}</p>
+						<p><b>Site ID :</b> ${siteData.siteId}
+						<p> <b>Account Email :</b> ${siteData.accountEmail}</p>`;
+							adsData +=
+								currentSelectedEntry === 'All Entries Present' ||
+								siteData.status === 1 ||
+								siteData.status === 2 ||
+								siteData.status === 4
+									? `${commonMailFormatIfNoSiteId}
+					<p> <b>${siteData.message} </b></p>
+					</div><br/>
+				`
+									: `${commonMailFormatIfNoSiteId}
+				<p> <b>${currentSelectedEntry} :</b> ${siteData.adsTxtEntries.split('\n').join('<br>')} </p>
+				</div> <br/>`;
+					  });
 
 				var options = {
 					method: 'POST',
@@ -329,7 +325,7 @@ router
 						queue: 'MAILER',
 						data: {
 							to: emailId,
-							body: singleSiteEntry,
+							body: adsData,
 							subject: !siteId
 								? `${currentSelectedEntry} list for all the active sites`
 								: `${currentSelectedEntry} list for ${sitesData.domain} `
