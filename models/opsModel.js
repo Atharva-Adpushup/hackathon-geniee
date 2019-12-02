@@ -10,6 +10,7 @@ const couchbase = require('../helpers/couchBaseService');
 const AdPushupError = require('../helpers/AdPushupError');
 const commonConsts = require('../configs/commonConsts');
 const proxy = require('../helpers/proxy');
+const activeSites = require('../activeSites');
 
 const commonSiteFunctions = {
 	isActiveHbBidder(network, key) {
@@ -336,6 +337,8 @@ function apiModule() {
 		},
 
 		getAdsTxtEntries(siteId, adsTxtSnippet, currentSelectedEntry) {
+			const adsTxt = proxy.fetchOurAdsTxt();
+
 			function adsTxtProcessing(params) {
 				const { domain, siteId, accountEmail, adsTxtSnippet, currentSelectedEntry } = params;
 				let commonOutput = {
@@ -343,8 +346,7 @@ function apiModule() {
 					siteId,
 					accountEmail
 				};
-				return proxy
-					.fetchOurAdsTxt()
+				return adsTxt
 					.then(ourAdsTxt =>
 						proxy.verifyAdsTxt(domain, (ourAdsTxt = adsTxtSnippet ? adsTxtSnippet : ourAdsTxt))
 					)
