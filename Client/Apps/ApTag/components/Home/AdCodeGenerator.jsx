@@ -54,7 +54,8 @@ class AdCodeGenerator extends Component {
 			type,
 			platform: '',
 			size: null,
-			progress: 50
+			progress: 50,
+			customFields: {}
 		});
 	}
 
@@ -168,6 +169,7 @@ class AdCodeGenerator extends Component {
 				platform: '',
 				type: '',
 				size: null,
+				customFields: {},
 				loading: false
 			},
 			() => resetCurrentAd(siteId)
