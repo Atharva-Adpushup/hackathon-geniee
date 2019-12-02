@@ -3,9 +3,13 @@ import ReactTable from 'react-table';
 import { Col } from 'react-bootstrap';
 import sortBy from 'lodash/sortBy';
 import isEqual from 'lodash/isEqual';
+import sum from 'lodash/sum';
+import mean from 'lodash/mean';
+
 import moment from 'moment';
 import { numberWithCommas, computeCsvData } from '../helpers/utils';
 import { reactTableSortMethod } from '../../../helpers/commonFunctions';
+import { columnsBlacklistedForAddition } from '../configs/commonConsts';
 
 class Table extends React.Component {
 	constructor(props) {
@@ -84,6 +88,13 @@ class Table extends React.Component {
 				// eslint-disable-next-line camelcase
 				const { display_name: Header, table_position } = metrics[column];
 				let footerValue = total[`total_${column}`] || '';
+				let aggregateValue = 0;
+
+				if (!columnsBlacklistedForAddition.includes(column)) {
+					aggregateValue = vals => numberWithCommas(sum(vals));
+				} else {
+					aggregateValue = vals => mean(vals).toFixed(2);
+				}
 
 				if (footerValue) {
 					switch (metrics[column].valueType) {
@@ -100,13 +111,21 @@ class Table extends React.Component {
 						}
 					}
 				}
-
 				sortedMetrics.push({
 					Header,
 					accessor: column,
 					sortable: true,
 					table_position,
 					Footer: footerValue,
+					aggregate: aggregateValue,
+					Cell: props =>
+						metrics[column].valueType === 'money' ? (
+							<span>${numberWithCommas(props.value)}</span>
+						) : metrics[column].valueType === 'percent' ? (
+							<span>{numberWithCommas(props.value)}%</span>
+						) : (
+							<span>{numberWithCommas(props.value)}</span>
+						),
 					sortMethod: (a, b) => reactTableSortMethod(a, b)
 				});
 			}
@@ -184,19 +203,8 @@ class Table extends React.Component {
 			displayTableData.push(tableRow);
 		});
 
-		displayTableData = this.formatTableData(displayTableData);
+		// displayTableData = this.formatTableData(displayTableData);
 		return displayTableData;
-	};
-
-	getTableFooter = (data, tableColumns) => {
-		const displayFooterData = { ...data };
-		Object.keys(displayFooterData).forEach(key => {
-			const newkey = key.replace('total_', '');
-			displayFooterData[newkey] = displayFooterData[key];
-			delete displayFooterData[key];
-		});
-		displayFooterData[tableColumns[0].accessor] = 'Total';
-		return displayFooterData;
 	};
 
 	updateTableData = tableData => {
@@ -281,6 +289,7 @@ class Table extends React.Component {
 						minRows={0}
 						showPaginationTop
 						showPaginationBottom={false}
+						pivotBy={['date']}
 						className="reporting u-padding-h3 u-padding-v2 -striped -highlight"
 					/>
 					<div className="u-margin-t3">

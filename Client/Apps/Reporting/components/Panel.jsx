@@ -29,6 +29,7 @@ import {
 	getReportingDemoUserSiteIds,
 	getDemoUserSites
 } from '../../../helpers/commonFunctions';
+import { columnsBlacklistedForAddition } from '../configs/commonConsts';
 
 function oldConsoleRedirection(e) {
 	e.preventDefault();
@@ -439,13 +440,6 @@ class Panel extends Component {
 
 	computeTotal = tableRows => {
 		const { dimensionList } = this.state;
-		const columnsBlacklistedForAddition = [
-			'adpushup_ad_ecpm',
-			'network_ad_ecpm',
-			'adpushup_page_cpm',
-			'adpushup_xpath_miss_percent'
-		];
-
 		const total = tableRows.reduce((totalAccumulator, tableRow) => {
 			const totalCopy = { ...totalAccumulator };
 
