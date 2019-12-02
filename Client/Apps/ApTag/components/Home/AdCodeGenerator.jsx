@@ -1,7 +1,15 @@
 import React, { Component } from 'react';
 import { Row, Col, ProgressBar } from 'react-bootstrap';
 import CustomList from './CustomList';
-import { TYPES, SIZES, DISPLAY_AD_MESSAGE, AMP_MESSAGE, ADCODE } from '../../configs/commonConsts';
+import {
+	TYPES,
+	SIZES,
+	CUSTOM_FIELDS,
+	CUSTOM_FIELD_DEFAULT_VALUE,
+	DISPLAY_AD_MESSAGE,
+	AMP_MESSAGE,
+	ADCODE
+} from '../../configs/commonConsts';
 import CopyButtonWrapperContainer from '../../../../Containers/CopyButtonWrapperContainer';
 import CustomMessage from '../../../../Components/CustomMessage/index';
 import CustomButton from '../../../../Components/CustomButton/index';
@@ -16,19 +24,23 @@ class AdCodeGenerator extends Component {
 			platform: '',
 			type: '',
 			size: null,
+			customFields: {},
 			loading: false
 		};
 		this.selectPlatform = this.selectPlatform.bind(this);
 		this.selectType = this.selectType.bind(this);
 		this.selectSize = this.selectSize.bind(this);
+		this.setCustomField = this.setCustomField.bind(this);
 		this.saveHandler = this.saveHandler.bind(this);
 		this.resetHandler = this.resetHandler.bind(this);
 		this.renderTypeOptions = this.renderTypeOptions.bind(this);
 		this.renderSizes = this.renderSizes.bind(this);
 		this.renderMainContent = this.renderMainContent.bind(this);
 		this.renderGeneratedAdcode = this.renderGeneratedAdcode.bind(this);
+		this.getCustomFields = this.getCustomFields.bind(this);
 	}
 
+	// eslint-disable-next-line react/sort-comp
 	selectPlatform(platform) {
 		this.setState({
 			platform,
@@ -54,15 +66,86 @@ class AdCodeGenerator extends Component {
 		});
 	}
 
+	setCustomField({ target, target: { name, value, type, checkValidity, required } }) {
+		let defaultValue;
+		switch (type) {
+			case 'number': {
+				defaultValue = CUSTOM_FIELD_DEFAULT_VALUE.NUMBER;
+				// eslint-disable-next-line no-param-reassign
+				value = parseFloat(value) || defaultValue;
+				break;
+			}
+
+			default: {
+				defaultValue = CUSTOM_FIELD_DEFAULT_VALUE.STRING;
+			}
+		}
+
+		this.setState(state => ({
+			customFields: {
+				...state.customFields,
+				[name]: {
+					value,
+					isValid: (!required && value === defaultValue) || checkValidity.call(target)
+				}
+			}
+		}));
+	}
+
+	getCustomFields() {
+		const { customFields } = this.state;
+		const customFieldsConfig = CUSTOM_FIELDS;
+
+		return customFieldsConfig.map(customFieldConfig => {
+			const { key } = customFieldConfig;
+			const customField = customFields[key] || {};
+			const { value = CUSTOM_FIELD_DEFAULT_VALUE.STRING, isValid = null } = customField;
+
+			return { ...customFieldConfig, value, isValid };
+		});
+	}
+
 	saveHandler() {
+		const { type, platform, size, customFields } = this.state;
+
+		// terminate if Custom Fields are invalid
+		const isCustomFieldsValid = !Object.keys(customFields).find(
+			customFieldKey => !customFields[customFieldKey].isValid
+		);
+		if (!isCustomFieldsValid) return;
+
 		const { createAd, siteId } = this.props;
-		const { type, platform, size } = this.state;
 		const isResponsive = size === 'responsive';
 		const sizesArray = isResponsive ? 'responsive' : size.split('x');
 		const width = isResponsive ? 'responsive' : sizesArray[0];
 		const height = isResponsive ? 'responsive' : sizesArray[1];
 		const typeAndPlacement = type.split(/^([^A-Z]+)/);
 		typeAndPlacement.shift();
+
+		const ad = {
+			width,
+			height,
+			isManual: true,
+			networkData: {
+				isResponsive: !!(width === 'responsive')
+			},
+			formatData: {
+				platform, // DESKTOP, MOBILE
+				type // DISPLAY, NATIVE, AMP, LINK
+			},
+			type: 1, // STRUCTURAL
+			css: {
+				display: 'block',
+				margin: '10px auto',
+				'text-align': 'center'
+			},
+			isActive: true
+		};
+
+		// Add Custom Fields in ad obj
+		Object.keys(customFields).forEach(customFieldKey => {
+			ad[customFieldKey] = customFields[customFieldKey].value;
+		});
 
 		this.setState(
 			{
@@ -72,25 +155,7 @@ class AdCodeGenerator extends Component {
 			() =>
 				createAd({
 					siteId,
-					ad: {
-						width,
-						height,
-						isManual: true,
-						networkData: {
-							isResponsive: !!(width === 'responsive')
-						},
-						formatData: {
-							platform, // DESKTOP, MOBILE
-							type // DISPLAY, NATIVE, AMP, LINK
-						},
-						type: 1, // STRUCTURAL
-						css: {
-							display: 'block',
-							margin: '10px auto',
-							'text-align': 'center'
-						},
-						isActive: true
-					}
+					ad
 				})
 		);
 	}
@@ -126,6 +191,7 @@ class AdCodeGenerator extends Component {
 
 	renderSizes() {
 		const { size, platform, type } = this.state;
+
 		return (
 			<div>
 				<CustomList
@@ -142,7 +208,8 @@ class AdCodeGenerator extends Component {
 							responsive: {
 								header: 'Responsive',
 								key: 'responsive',
-								options: false
+								options: false,
+								customFields: this.getCustomFields()
 							},
 							desktop: {
 								header: 'Desktop',
@@ -158,6 +225,7 @@ class AdCodeGenerator extends Component {
 					}}
 					selectPlatform={this.selectPlatform}
 					onClick={this.selectSize}
+					onCustomFieldValueChange={this.setCustomField}
 				/>
 			</div>
 		);
@@ -177,13 +245,18 @@ class AdCodeGenerator extends Component {
 
 	renderGeneratedAdcode() {
 		const { type } = this.state;
-		const { adId } = this.props;
+		const { adId, maxHeight, siteId } = this.props;
 		const isDisplayAd = type !== 'amp';
-		const code = isDisplayAd ? ADCODE : null;
-		const message = isDisplayAd ? DISPLAY_AD_MESSAGE : AMP_MESSAGE;
+		const customAttributes = maxHeight ? ` max-height="${maxHeight}"` : '';
+		const code = isDisplayAd
+			? ADCODE.replace(/__AD_ID__/g, adId)
+					.replace(/__CUSTOM_ATTRIBS__/, customAttributes)
+					.trim()
+			: null;
+		const message = isDisplayAd ? DISPLAY_AD_MESSAGE.replace(/__SITE_ID__/g, siteId) : AMP_MESSAGE;
 		return (
 			<Col xs={12}>
-				{isDisplayAd ? <pre>{code.replace(/__AD_ID__/g, adId).trim()}</pre> : null}
+				{isDisplayAd ? <pre>{code}</pre> : null}
 				<CustomMessage header="Information" type="info" message={message} />
 				<CustomButton
 					variant="primary"
@@ -193,7 +266,7 @@ class AdCodeGenerator extends Component {
 					Create More Ads
 				</CustomButton>
 				{isDisplayAd ? (
-					<CopyButtonWrapperContainer content={code.replace(/__AD_ID__/g, adId)}>
+					<CopyButtonWrapperContainer content={code}>
 						<CustomButton variant="secondary" className="u-margin-t3 u-margin-r3 pull-right">
 							Copy Adcode
 						</CustomButton>
