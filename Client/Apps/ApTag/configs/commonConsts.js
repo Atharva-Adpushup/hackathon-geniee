@@ -118,6 +118,23 @@ const SIZES = {
 	}
 };
 
+const CUSTOM_FIELDS = [
+	{
+		displayName: 'Max Height',
+		key: 'maxHeight',
+		inputType: 'number',
+		placeholder: '',
+		isRequired: false,
+		attributes: { min: 50, max: 1050 },
+		validationMessage: 'Max Size should be from 50 to 1050'
+	}
+];
+
+const CUSTOM_FIELD_DEFAULT_VALUE = {
+	NUMBER: null,
+	STRING: ''
+};
+
 const DISPLAY_AD_MESSAGE = `<ol style="font-size: 15px;">
 	<li style="margin-bottom: 10px;"><a href="/sites/__SITE_ID__/settings">AdPushup head code</a> needs to be present in the global head of your website.</li>
 	<li style="margin-bottom: 10px;"><a href="/adsTxtManagement">Ads.txt</a>  is mandatory. It needs to be updated incase you already have one. Else please follow the instructions provided here: <a href="https://support.google.com/admanager/answer/7441288?hl=en" target="_blank">https://support.google.com/admanager/answer/7441288?hl=en</a>. AdPushup's ads.txt should be appended alongside your existing partners.</li>
@@ -125,7 +142,7 @@ const DISPLAY_AD_MESSAGE = `<ol style="font-size: 15px;">
 </ol>`;
 const AMP_MESSAGE =
 	'AMP adcode will be sent to your registered e-mail address by your account manager';
-const ADCODE = `<div id="__AD_ID__" class="_ap_apex_ad">
+const ADCODE = `<div id="__AD_ID__" class="_ap_apex_ad"__CUSTOM_ATTRIBS__>
 	<script>
 		var adpushup = adpushup || {};
 		adpushup.que = adpushup.que || [];
@@ -325,6 +342,8 @@ export {
 	PLATFORMS,
 	TYPES,
 	SIZES,
+	CUSTOM_FIELDS,
+	CUSTOM_FIELD_DEFAULT_VALUE,
 	DISPLAY_AD_MESSAGE,
 	ADCODE,
 	ADS_TXT_DATA,

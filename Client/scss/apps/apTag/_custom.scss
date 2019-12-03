@@ -63,6 +63,16 @@ body {
 			margin-bottom: 10px;
 		}
 	}
+
+	.custom-fields {
+		padding-left: 40px;
+		.control-label {
+			text-align: left;
+		}
+		input.form-control {
+			max-width: 350px;
+		}
+	}
 }
 
 .section-list {

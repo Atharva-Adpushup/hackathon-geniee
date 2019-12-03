@@ -15,6 +15,7 @@ const createAd = params => dispatch =>
 			return dispatch({
 				type: GLOBAL_ACTIONS.SET_CURRENT_AD,
 				currentAd: data.id,
+				maxHeight: params.ad.maxHeight,
 				siteId: params.siteId
 			});
 		})

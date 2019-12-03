@@ -10,6 +10,7 @@ const mapStateToProps = (state, ownProps) => {
 		currentAd: global.currentAd,
 		codeGenerated: !!global.currentAd,
 		adId: global.currentAd,
+		maxHeight: global.maxHeight,
 		siteId,
 		...ownProps
 	};
