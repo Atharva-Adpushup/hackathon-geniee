@@ -6,7 +6,7 @@ import EnableHbBidder from './EnableHbBidder';
 import BackupAds from './BackupAds/index';
 import TopXPathMissAndModeURL from './TopXPathMissAndModeURL ';
 import LostFoundLiveSites from './LostFoundLiveSites/index';
-
+import AdsTxtLiveSitesEntries from './AdsTxtLiveSitesEntries';
 class Tools extends Component {
 	state = {
 		activeKey: TOOLS_IDENTIFIERS.BACKUP_ADS
@@ -37,6 +37,10 @@ class Tools extends Component {
 
 			case TOOLS_IDENTIFIERS.LOST_FOUND_LIVE_SITES:
 				return <LostFoundLiveSites showNotification={showNotification} />;
+
+			case TOOLS_IDENTIFIERS.ADS_TXT_LIVE_SITES:
+				return <AdsTxtLiveSitesEntries showNotification={showNotification} />;
+
 			case TOOLS_IDENTIFIERS.REGEX_GENERATION:
 				return 'Regex Generation';
 		}
@@ -66,6 +70,11 @@ class Tools extends Component {
 								<NavItem eventKey={TOOLS_IDENTIFIERS.LOST_FOUND_LIVE_SITES}>
 									Lost And Found Live Sites Chart
 								</NavItem>
+
+								<NavItem eventKey={TOOLS_IDENTIFIERS.ADS_TXT_LIVE_SITES}>
+									Ads.txt Entries Live Sites
+								</NavItem>
+
 								{/* <NavItem eventKey={TOOLS_IDENTIFIERS.REGEX_GENERATION}>Regex Generation</NavItem> */}
 							</Nav>
 						</Col>
