@@ -41,13 +41,8 @@ public/assets/js/builds/geniee/
 TODO
 pipedriveTest.js
 services/adpTags/hbScript/build
-services/adpTags/Prebid.js
 Prebid.js
 __queries.sql
 clientDist
 flow.txt
 local-files/
-.eslintrc
-.prettierrc
-Prebid.js
-Prebid-latest
