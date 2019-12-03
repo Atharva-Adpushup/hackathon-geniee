@@ -237,6 +237,7 @@ var getComputedAdSizes = function(elementSelector) {
 		maxHeight = parseInt(currentEle.getAttribute('max-height'), 10);
 	}
 	finalComputedData = getFilteredData(matchedSizeData, maxHeight);
+	finalComputedData.collection = utils.getUniqueSizesNestedArray(finalComputedData.collection);
 	return finalComputedData;
 };
 
