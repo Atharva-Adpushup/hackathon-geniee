@@ -92,6 +92,10 @@ class Table extends React.Component {
 
 				if (!columnsBlacklistedForAddition.includes(column)) {
 					aggregateValue = vals => numberWithCommas(sum(vals));
+				} else if (column === 'network_ad_ecpm') {
+					aggregateValue = (vals, rows) =>
+						rows.map(({ network_net_revenue }) => network_net_revenue).reduce((a, b) => a + b, 0) /
+						rows.map(({ network_impressions }) => network_impressions).reduce((a, b) => a + b, 0);
 				} else {
 					aggregateValue = vals => mean(vals).toFixed(2);
 				}
@@ -117,7 +121,7 @@ class Table extends React.Component {
 					sortable: true,
 					table_position,
 					Footer: footerValue,
-					aggregate: aggregateValue,
+					aggregate: (values, rows) => mean(values).toFixed(2),
 					Cell: props =>
 						metrics[column].valueType === 'money' ? (
 							<span>${numberWithCommas(props.value)}</span>
