@@ -13,7 +13,7 @@ var utils = {
                 inputObject.activeDFPCurrencyCode.length === 3
             ),
             isPrebidGranularityMultiplier = !!(
-                inputObject.prebidGranularityMultiplier && Number(inputObject.prebidGranularityMultiplier)
+                inputObject.prebidGranularityMultiplier && parseFloat(inputObject.prebidGranularityMultiplier)
             ),
             isActiveDFPCurrencyExchangeRate = !!(
                 inputObject.activeDFPCurrencyExchangeRate &&

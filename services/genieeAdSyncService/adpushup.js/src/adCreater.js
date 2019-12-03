@@ -164,7 +164,7 @@ var $ = require('jquery'),
 			container.append(adCodeGenerator.generateAdCode(ad));
 			$.ajaxSettings.cache = false;
 
-			if (ad.type && Number(ad.type) === commonConsts.AD_TYPES.DOCKED_STRUCTURAL) {
+			if (ad.type && parseFloat(ad.type) === commonConsts.AD_TYPES.DOCKED_STRUCTURAL) {
 				// Type 4 is DOCKED
 				utils.dockify.dockifyAd('#' + ad.id, ad.formatData, utils);
 			}
