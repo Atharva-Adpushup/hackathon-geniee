@@ -10,7 +10,6 @@ const couchbase = require('../helpers/couchBaseService');
 const AdPushupError = require('../helpers/AdPushupError');
 const commonConsts = require('../configs/commonConsts');
 const proxy = require('../helpers/proxy');
-
 const commonSiteFunctions = {
 	isActiveHbBidder(network, key) {
 		return network.isActive && network.isHb && key !== 'adpTags';

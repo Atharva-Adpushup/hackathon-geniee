@@ -66,7 +66,7 @@ class AdsTxtLiveSitesEntries extends Component {
 					showNotification({
 						mode: 'success',
 						title: 'Success',
-						message: `Email will be sent to ${emailId} in 30 minutes`,
+						message: `Email will be sent to ${emailId} within 30 minutes. If you don't see the email in inbox ,please check the spam folder`,
 						autoDismiss: 5
 					});
 					this.setState({ isLoading: false }, this.handleReset);
