@@ -53,7 +53,6 @@ class Table extends React.Component {
 		let sortedMetrics = [];
 		const { metrics, dimension } = this.props;
 		const { isDaily } = this.getDateIntervalValidators();
-
 		const computedDate = {
 			Header: 'Date',
 			accessor: 'date',
@@ -94,8 +93,25 @@ class Table extends React.Component {
 					aggregateValue = vals => numberWithCommas(sum(vals));
 				} else if (column === 'network_ad_ecpm') {
 					aggregateValue = (vals, rows) =>
-						rows.map(({ network_net_revenue }) => network_net_revenue).reduce((a, b) => a + b, 0) /
-						rows.map(({ network_impressions }) => network_impressions).reduce((a, b) => a + b, 0);
+						(
+							(sum(rows.map(({ network_net_revenue }) => network_net_revenue)) /
+								sum(rows.map(({ network_impressions }) => network_impressions))) *
+							1000
+						).toFixed(2);
+				} else if (column === 'adpushup_ad_ecpm') {
+					aggregateValue = (vals, rows) =>
+						(
+							(sum(rows.map(({ network_net_revenue }) => network_net_revenue)) /
+								sum(rows.map(({ adpushup_impressions }) => adpushup_impressions))) *
+							1000
+						).toFixed(2);
+				} else if (column === 'adpushup_page_cpm') {
+					aggregateValue = (vals, rows) =>
+						(
+							(sum(rows.map(({ network_net_revenue }) => network_net_revenue)) /
+								sum(rows.map(({ adpushup_page_views }) => adpushup_page_views))) *
+							1000
+						).toFixed(2);
 				} else {
 					aggregateValue = vals => mean(vals).toFixed(2);
 				}
@@ -121,7 +137,7 @@ class Table extends React.Component {
 					sortable: true,
 					table_position,
 					Footer: footerValue,
-					aggregate: (values, rows) => mean(values).toFixed(2),
+					aggregate: aggregateValue,
 					Cell: props =>
 						metrics[column].valueType === 'money' ? (
 							<span>${numberWithCommas(props.value)}</span>
