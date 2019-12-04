@@ -70,8 +70,8 @@ module.exports = {
 			r,
 			appendMe =
 				!appendNum || (typeof appendNum === 'number' && appendNum < 0)
-					? parseFloat(1).toString(16)
-					: parseFloat(appendNum).toString(16);
+					? Number(1).toString(16)
+					: Number(appendNum).toString(16);
 		appendMe = ('0000000'.substr(0, 8 - appendMe.length) + appendMe).toUpperCase();
 		return (
 			appendMe +

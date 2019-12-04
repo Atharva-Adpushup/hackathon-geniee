@@ -24,9 +24,9 @@ module.exports = (function() {
 		this.placements = {};
 		this.started = false;
 		this.isEvenSpacingAlgo = initOptions.hasOwnProperty('isEvenSpacingAlgo') ? initOptions.isEvenSpacingAlgo : true;
-		this.defaultSectionBracket = parseFloat(initOptions.sectionBracket) || 600;
+		this.defaultSectionBracket = Number(initOptions.sectionBracket) || 600;
 		this.defaultAdPushupAdsPixelDifferences = { top: 0, bottom: 0 };
-		this.selectorsTreeLevel = parseFloat(initOptions.selectorsTreeLevel) || '';
+		this.selectorsTreeLevel = Number(initOptions.selectorsTreeLevel) || '';
 		this.minimumAdDistance = 200;
 
 		if (!window.console || !console.log) {
@@ -344,7 +344,7 @@ module.exports = (function() {
 				var $rootThis = $(this),
 					isValidSelectorsTreeLevel = !!(
 						selectorsTreeLevel &&
-						parseFloat(selectorsTreeLevel) &&
+						Number(selectorsTreeLevel) &&
 						!isNaN(selectorsTreeLevel)
 					);
 
@@ -469,7 +469,7 @@ module.exports = (function() {
 							return config[placementNumber];
 						}
 
-						placementId = parseFloat(placementNumber);
+						placementId = Number(placementNumber);
 
 						while (placementId >= 1) {
 							isValidPlacement = !!(
@@ -492,7 +492,7 @@ module.exports = (function() {
 					},
 					section = adObj.section;
 
-				minDistance = parseFloat(minDistance);
+				minDistance = Number(minDistance);
 
 				if ($.isEmptyObject(ref.placements) && ref.selectedElems.length) {
 					ref.placements[section] = {
@@ -612,7 +612,7 @@ module.exports = (function() {
 								adObj.notNear.forEach(function(collectionItem) {
 									var itemKeyArr = Object.keys(collectionItem),
 										itemKey = itemKeyArr[0],
-										itemValue = parseFloat(collectionItem[itemKey]) || 200;
+										itemValue = Number(collectionItem[itemKey]) || 200;
 
 									$selector.notNear(itemKeyArr, itemValue);
 								});

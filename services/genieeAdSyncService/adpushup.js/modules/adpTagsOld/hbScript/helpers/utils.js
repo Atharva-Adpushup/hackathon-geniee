@@ -44,7 +44,7 @@ module.exports = {
 		// Check for MSIE v7-10 in UA string
 		if (ua.indexOf('MSIE') !== -1) {
 			var re = new RegExp('MSIE ([0-9]{1,}[.0-9]{0,})');
-			var ieVersion = parseFloat(re.exec(ua)[1]);
+			var ieVersion = Number(re.exec(ua)[1]);
 
 			return ieVersion >= 9 ? true : false;
 		}
@@ -243,7 +243,7 @@ module.exports = {
 				inputObject.activeDFPCurrencyCode.length === 3
 			),
 			isPrebidGranularityMultiplier = !!(
-				inputObject.prebidGranularityMultiplier && parseFloat(inputObject.prebidGranularityMultiplier)
+				inputObject.prebidGranularityMultiplier && Number(inputObject.prebidGranularityMultiplier)
 			),
 			isActiveDFPCurrencyExchangeRate = !!(
 				inputObject.activeDFPCurrencyExchangeRate &&
