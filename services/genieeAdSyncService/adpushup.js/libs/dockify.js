@@ -13,7 +13,7 @@ var $ = require('jquery'),
 			: $.extend({}, true, commonConsts.DOCKED_CSS, computedStyles);
 	},
 	getDockedOffset = function (formatData) {
-		var bottomOffset = formatData && formatData.bottomOffset ? Number(formatData.bottomOffset) : 0;
+		var bottomOffset = formatData && formatData.bottomOffset ? parseFloat(formatData.bottomOffset) : 0;
 		var bottomXPath = formatData ? formatData.bottomXpath || formatData.bottomXPath : null;
 		return bottomXPath ? $(bottomXPath).offset().top - bottomOffset : null;
 	},
