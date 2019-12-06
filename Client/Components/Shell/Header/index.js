@@ -44,14 +44,14 @@ const Header = ({ sidebarToggle, logout, user, switchUser, findUsers, hasUnsaved
 			</span>
 
 			<div className="header-nav">
-				{/*	!user.isSuperUser ? (
+				{!user.isSuperUser ? (
 					<React.Fragment>
 						<UserChange switchUser={switchUser} findUsers={findUsers} />
-						<CustomButton variant="secondary" onClick={consoleRedirection} className="u-margin-r3">
+						/* <CustomButton variant="secondary" onClick={consoleRedirection} className="u-margin-r3">
 							Go to Console
-						</CustomButton>
+						</CustomButton> */
 					</React.Fragment>
-				) : null */}
+				) : null}
 				<DropdownButton pullRight title={`Hello ${user.firstName || ''}`} id="dropdown-button">
 					{/* <MenuItem eventKey="1">Profile</MenuItem> */}
 					{/* <MenuItem eventKey="2">Settings</MenuItem> */}
