@@ -824,14 +824,14 @@ class Panel extends Component {
 				<ActionCard title="AdPushup Reports">{this.renderContent()}</ActionCard>
 				{show ? (
 					<Alert bsStyle="info" onDismiss={this.handleDismiss} className="u-margin-t4">
-						For old reporting data (before 1st August) go to console by{' '}
+						For old reporting data <strong>(before 1st August)</strong> go to old console by{' '}
 						<a
 							target="_blank"
 							onClick={oldConsoleRedirection}
-							className="alert-link"
-							style={{ cursor: 'pointer', color: '#eb575c' }}
+							className="u-link-reset"
+							style={{ cursor: 'pointer' }}
 						>
-							clicking here.
+							<strong>clicking here.</strong>
 						</a>
 					</Alert>
 				) : null}
