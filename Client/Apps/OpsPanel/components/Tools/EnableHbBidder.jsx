@@ -1,9 +1,11 @@
 /* eslint-disable no-alert */
 import React from 'react';
 import { Table } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import CustomToggleSwitch from '../../../../Components/CustomToggleSwitch/index';
 import CustomButton from '../../../../Components/CustomButton/index';
 import Loader from '../../../../Components/Loader/index';
+import { HB_BIDDERS_KEYS_NULL_SHOULD_NOT_BE_NULL } from '../../configs/commonConsts';
 
 class EnableHbBidder extends React.Component {
 	state = {
@@ -19,7 +21,7 @@ class EnableHbBidder extends React.Component {
 			networks: {
 				...state.networks,
 				[network]: {
-					isHb: value
+					isActive: value
 				}
 			}
 		}));
@@ -38,7 +40,9 @@ class EnableHbBidder extends React.Component {
 	render() {
 		const { networkConfig } = this.props;
 		const { loading } = this.state;
-		const networks = Object.keys(networkConfig);
+		const hbNetworks = Object.keys(networkConfig).filter(
+			network => typeof networkConfig[network].isHb === 'boolean' && networkConfig[network].isHb
+		);
 
 		if (loading) return <Loader height="200px" />;
 
@@ -48,24 +52,40 @@ class EnableHbBidder extends React.Component {
 					<thead>
 						<tr>
 							<th>Bidder</th>
-							<th>Hb Status</th>
+							<th>Active Status</th>
 						</tr>
 					</thead>
 					<tbody>
-						{networks.map(network => {
+						{hbNetworks.map(network => {
 							const current = networkConfig[network];
+							const isBidderConfigValid = !HB_BIDDERS_KEYS_NULL_SHOULD_NOT_BE_NULL.some(
+								key => current[key] === null
+							);
+
 							return (
 								<tr key={`${current.name}`}>
-									<td>{current.name.toUpperCase()}</td>
+									<td>
+										{current.name.toUpperCase()}
+										{!isBidderConfigValid && (
+											<React.Fragment>
+												{' '}
+												<FontAwesomeIcon
+													icon="info-circle"
+													title="Please contact engineering team with required bidder details to activate this bidder."
+												/>
+											</React.Fragment>
+										)}
+									</td>
 									<td>
 										<CustomToggleSwitch
 											layout="nolabel"
 											className="u-margin-b4 negative-toggle"
-											checked={current.isHb}
+											checked={current.isActive}
 											onChange={this.handleToggle}
 											size="m"
 											on="Yes"
 											off="No"
+											disabled={!isBidderConfigValid}
 											defaultLayout
 											name={network}
 											id={`js-hb-${current.name}`}
