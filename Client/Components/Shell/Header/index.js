@@ -47,9 +47,9 @@ const Header = ({ sidebarToggle, logout, user, switchUser, findUsers, hasUnsaved
 				{!!user.isSuperUser ? (
 					<React.Fragment>
 						<UserChange switchUser={switchUser} findUsers={findUsers} />
-						/* <CustomButton variant="secondary" onClick={consoleRedirection} className="u-margin-r3">
+		{/* <CustomButton variant="secondary" onClick={consoleRedirection} className="u-margin-r3">
 							Go to Console
-						</CustomButton> */
+						</CustomButton> */}
 					</React.Fragment>
 				) : null}
 				<DropdownButton pullRight title={`Hello ${user.firstName || ''}`} id="dropdown-button">
