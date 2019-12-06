@@ -44,7 +44,7 @@ const Header = ({ sidebarToggle, logout, user, switchUser, findUsers, hasUnsaved
 			</span>
 
 			<div className="header-nav">
-				{!user.isSuperUser ? (
+				{!!user.isSuperUser ? (
 					<React.Fragment>
 						<UserChange switchUser={switchUser} findUsers={findUsers} />
 						/* <CustomButton variant="secondary" onClick={consoleRedirection} className="u-margin-r3">
