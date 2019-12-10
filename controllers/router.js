@@ -101,7 +101,10 @@ module.exports = function(app) {
 			return next();
 		}
 
-		if ((req.originalUrl.indexOf('/user') !== -1 || req.originalUrl.indexOf('/proxy') !== -1) && isSessionInvalid) {
+		if (
+			(req.originalUrl.indexOf('/user') !== -1 || req.originalUrl.indexOf('/proxy') !== -1) &&
+			isSessionInvalid
+		) {
 			return res.redirect('/login');
 		}
 

@@ -47,13 +47,10 @@ module.exports = {
 								AND meta(_user).id LIKE 'user::%';`,
 
 	GET_ACTIVE_SITES_QUERY: `SELECT _site.siteId,
-                                	_site.siteDomain as domain,
-									_site.ownerEmail as accountEmail,
-									_hbdc.hbcf as addedBidders
-							FROM AppBucket _site
-							LEFT JOIN AppBucket _hbdc
-							ON keys ('hbdc::' || to_string(_site.siteId))
-							WHERE meta(_site).id LIKE 'site::%' AND _site.dataFeedActive = true;`,
+	    							_site.siteDomain as domain,
+									_site.ownerEmail as accountEmail
+							 FROM AppBucket _site
+							 WHERE meta(_site).id LIKE 'site::%' AND _site.dataFeedActive = true;`,
 
 	DEMO_PAGEGROUPS: [
 		'HOME',
@@ -414,7 +411,8 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		networkConfig: 'data::apNetworkBeta',
 		interactiveAds: 'fmrt::',
 		user: 'user::',
-		hb: 'hbdc::'
+		hb: 'hbdc::',
+		adsTxt: 'adtx::'
 	},
 	tagManagerInitialDoc: {
 		siteId: null,

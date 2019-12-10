@@ -10,6 +10,7 @@ const { GET_SITES_STATS_API, EMAIL_REGEX } = require('../configs/commonConsts');
 const { sendSuccessResponse, sendErrorResponse } = require('../helpers/commonFunctions');
 const { appBucket, errorHandler } = require('../helpers/routeHelpers');
 const opsModel = require('../models/opsModel');
+const adsTxtModel = require('../models/adsTxtModel');
 const proxy = require('../helpers/proxy');
 
 const router = express.Router();
