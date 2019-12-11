@@ -241,10 +241,8 @@ router
 						let userPasswordMatch = 0;
 						let isSuperUser = false;
 
-						if (md5(password) === consts.password.MASTER) {
-							isSuperUser = true;
-							userPasswordMatch = 1;
-						} else if (user.isMe(email, password)) {
+						if (user.isMe(email, password)) {
+							isSuperUser = user.get('isAdmin') === true;
 							userPasswordMatch = 1;
 						} else if (password === consts.password.IMPERSONATE) {
 							userPasswordMatch = 1;
