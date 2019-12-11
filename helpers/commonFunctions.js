@@ -5,6 +5,8 @@ const Promise = require('bluebird'),
 	config = require('../configs/config'),
 	commonConsts = require('../configs/commonConsts'),
 	utils = require('./utils'),
+	couchbase = require('./couchBaseService'),
+	httpStatus = require('../configs/httpStatusConsts'),
 	sqlReportingModule = require('../reports/default/adpTags/index'),
 	siteTopUrlsQuery = require('../reports/default/adpTags/queries/siteTopUrls'),
 	siteModeWiseTopUrlsQuery = require('../reports/default/adpTags/queries/siteModeWiseTopUrls'),
@@ -60,9 +62,9 @@ const Promise = require('bluebird'),
 				isInvalidRevenue || innerObj[identifier].aggregate.total_impressions == 0
 					? 0
 					: Number(
-							(innerObj[identifier].aggregate.total_revenue * 1000) /
-								innerObj[identifier].aggregate.total_impressions
-					  ).toFixed(3);
+						(innerObj[identifier].aggregate.total_revenue * 1000) /
+						innerObj[identifier].aggregate.total_impressions
+					).toFixed(3);
 		});
 		container[key] = innerObj;
 	},
@@ -187,51 +189,51 @@ const Promise = require('bluebird'),
 	},
 	computeMetricComparison = inputData => {
 		const resultData = {
-				impressions: {
-					lastWeek: 0,
-					lastWeekOriginal: 0,
-					thisWeek: 0,
-					thisWeekOriginal: 0,
-					percentage: 0,
-					change: false
-				},
-				revenue: {
-					lastWeek: 0,
-					lastWeekOriginal: 0,
-					thisWeek: 0,
-					thisWeekOriginal: 0,
-					percentage: 0,
-					change: false
-				},
-				pageViews: {
-					lastWeek: 0,
-					lastWeekOriginal: 0,
-					thisWeek: 0,
-					thisWeekOriginal: 0,
-					percentage: 0,
-					change: false
-				},
-				cpm: {
-					lastWeek: 0,
-					lastWeekOriginal: 0,
-					thisWeek: 0,
-					thisWeekOriginal: 0,
-					percentage: 0,
-					change: false
-				},
-				pageCPM: {
-					lastWeek: 0,
-					lastWeekOriginal: 0,
-					thisWeek: 0,
-					thisWeekOriginal: 0,
-					percentage: 0,
-					change: false
-				},
-				dates: {
-					lastWeek: {},
-					thisWeek: {}
-				}
+			impressions: {
+				lastWeek: 0,
+				lastWeekOriginal: 0,
+				thisWeek: 0,
+				thisWeekOriginal: 0,
+				percentage: 0,
+				change: false
 			},
+			revenue: {
+				lastWeek: 0,
+				lastWeekOriginal: 0,
+				thisWeek: 0,
+				thisWeekOriginal: 0,
+				percentage: 0,
+				change: false
+			},
+			pageViews: {
+				lastWeek: 0,
+				lastWeekOriginal: 0,
+				thisWeek: 0,
+				thisWeekOriginal: 0,
+				percentage: 0,
+				change: false
+			},
+			cpm: {
+				lastWeek: 0,
+				lastWeekOriginal: 0,
+				thisWeek: 0,
+				thisWeekOriginal: 0,
+				percentage: 0,
+				change: false
+			},
+			pageCPM: {
+				lastWeek: 0,
+				lastWeekOriginal: 0,
+				thisWeek: 0,
+				thisWeekOriginal: 0,
+				percentage: 0,
+				change: false
+			},
+			dates: {
+				lastWeek: {},
+				thisWeek: {}
+			}
+		},
 			lastWeekDatesInfo = getWeekDatesRepresentation({
 				startDate: inputData.lastWeekReport.reportFrom,
 				endDate: inputData.lastWeekReport.reportTo
@@ -590,14 +592,14 @@ const Promise = require('bluebird'),
 			);
 		});
 	},
-	sendSuccessResponse = (response, res) => {
-		res.send({
+	sendSuccessResponse = (response, res, code = httpStatus.OK) => {
+		return res.status(code).json({
 			error: false,
 			data: response
 		});
 	},
-	sendErrorResponse = (response, res) => {
-		res.send({
+	sendErrorResponse = (response, res, code = httpStatus.BAD_REQUEST) => {
+		return res.status(code).json({
 			error: true,
 			data: response
 		});
@@ -653,20 +655,59 @@ const Promise = require('bluebird'),
 				config.activeDFPCurrencyCode.length &&
 				config.activeDFPCurrencyCode.length === 3
 			),
-			isPrebidGranularityMultiplier = !!(
-				config.prebidGranularityMultiplier && Number(config.prebidGranularityMultiplier)
-			),
 			isActiveDFPCurrencyExchangeRate = !!(
 				config.activeDFPCurrencyExchangeRate && Object.keys(config.activeDFPCurrencyExchangeRate).length
 			),
 			isValidResult = !!(
 				isActiveDFPNetwork &&
 				isActiveDFPCurrencyCode &&
-				isPrebidGranularityMultiplier &&
 				isActiveDFPCurrencyExchangeRate
 			);
 
 		return isValidResult;
+	},
+	getNetworkConfig = () => {
+		return couchbase
+			.connectToAppBucket()
+			.then(appBucket => appBucket.getAsync(commonConsts.docKeys.networkConfig))
+			.then(json => json.value);
+	},
+	verifyKeysInCollection = (target, source) => {
+		let recursionLevel = 0;
+
+		function verifyKeys(target, source) {
+			recursionLevel++;
+
+			const isTargetObj = typeof target === 'object' && target !== null;
+			const isSourceObj = typeof source === 'object' && source !== null;
+			
+			if (isTargetObj && isSourceObj) {
+				for (const key in source) {
+					if (source.hasOwnProperty(key) && !target.hasOwnProperty(key)) {
+						return false;
+					}
+					if (verifyKeys(target[key], source[key]) === false) {
+						return false;
+					}
+				}
+			}
+			
+			if((!isSourceObj || !isTargetObj) && recursionLevel === 1) return false;
+			
+			if(isSourceObj && !isTargetObj) return false;
+		}
+    
+		return verifyKeys(target, source) === false ? false : true;
+	},
+	deleteKeysInCollection = (target, source) => {
+		const targetCopy = { ...target };
+		for (const key in source) {
+			if (source.hasOwnProperty(key) && target.hasOwnProperty(key)) {
+				delete targetCopy[key];
+			}
+		}
+
+		return targetCopy;
 	};
 
 module.exports = {
@@ -694,5 +735,8 @@ module.exports = {
 	sendSuccessResponse,
 	sendErrorResponse,
 	checkForLog,
-	isValidThirdPartyDFPAndCurrency
+	isValidThirdPartyDFPAndCurrency,
+	getNetworkConfig,
+	verifyKeysInCollection,
+	deleteKeysInCollection
 };

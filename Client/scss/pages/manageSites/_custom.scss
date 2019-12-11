@@ -1,0 +1,26 @@
+.manage-site-card {
+	width: ($fullPercentage - 70) !important;
+	&.card {
+		button {
+			&:hover,
+			&:active,
+			&:focus {
+				background: #e6e6e6;
+				box-shadow: $none;
+				outline: 0 $none;
+			}
+		}
+	}
+}
+.custom-tooltip {
+	display: inline;
+	vertical-align: bottom;
+	margin-left: 5px;
+}
+.status-text {
+	padding: 1rem 1.5rem;
+}
+.app-image {
+	max-width: 90%;
+	height: 160px;
+}

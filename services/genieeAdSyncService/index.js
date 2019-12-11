@@ -39,16 +39,16 @@ function updateGeneratedScriptsForLiveSites() {
 }
 
 adpushup.on('siteSaved', onSiteSaved);
-cron.schedule(
-	'0 0 */4 * * *',
-	function() {
-		const infoText = 'Running generated scripts for live sites task every 4 hours';
+// cron.schedule(
+// 	'0 0 */4 * * *',
+// 	function() {
+// 		const infoText = 'Running generated scripts for live sites task every 4 hours';
 
-		fileLogger.info(infoText);
-		console.log(infoText);
-		updateGeneratedScriptsForLiveSites();
-	},
-	true
-);
+// 		fileLogger.info(infoText);
+// 		console.log(infoText);
+// 		updateGeneratedScriptsForLiveSites();
+// 	},
+// 	true
+// );
 
 // updateGeneratedScriptsForLiveSites();

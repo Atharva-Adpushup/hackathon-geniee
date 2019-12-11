@@ -1,6 +1,13 @@
 const uuid = require('uuid');
 
-function generateSectionName({ service, platform = null, pagegroup = null, width, height, id = uuid.v4() }) {
+function generateSectionName({
+	service,
+	platform = null,
+	pagegroup = null,
+	width,
+	height,
+	id = uuid.v4()
+}) {
 	const name = ['AP', service];
 
 	if (platform) name.push(platform.toUpperCase().slice(0, 1));

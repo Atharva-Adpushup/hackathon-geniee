@@ -1,0 +1,17 @@
+// Here, 'INTG' abbreviation prefix stands for Integration Google
+const INTG_NAV_ITEMS_INDEXES = {
+	CONNECT_GOOGLE: 'google'
+};
+
+const INTG_NAV_ITEMS_VALUES = {
+	CONNECT_GOOGLE: 'Google'
+};
+
+const INTG_NAV_ITEMS = {
+	[INTG_NAV_ITEMS_INDEXES.CONNECT_GOOGLE]: {
+		NAME: [INTG_NAV_ITEMS_VALUES.CONNECT_GOOGLE],
+		INDEX: 1
+	}
+};
+
+export { INTG_NAV_ITEMS_INDEXES, INTG_NAV_ITEMS_VALUES, INTG_NAV_ITEMS };

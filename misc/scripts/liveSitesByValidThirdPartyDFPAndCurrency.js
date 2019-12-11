@@ -1,25 +1,49 @@
 const _ = require('lodash');
 const siteModel = require('../../models/siteModel');
+const userModel = require('../../models/userModel');
 const couchBaseService = require('../../helpers/couchBaseService');
 const logger = require('../../helpers/globalBucketLogger');
 const AdPushupError = require('../../helpers/AdPushupError');
 const couchbasePromise = require('couchbase');
-const viewParameterQuery = couchbasePromise.ViewQuery.from('app', 'liveSitesByValidThirdPartyDFPAndCurrency');
+const viewParameterQuery = couchbasePromise.ViewQuery.from('app', 'liveUsersByValidThirdPartyDFPAndCurrency');
 const Promise = require('bluebird');
 const request = require('request-promise');
 const { CURRENCY_EXCHANGE } = require('../../configs/commonConsts');
+const { promiseForeach } = require('node-utils');
 
-function getAllSiteModels(results) {
-	return _.map(results, function(siteObj) {
-		return siteModel.getSiteById(siteObj.value.siteId).then(model => {
-			return {
-				...siteObj.value,
-				model
-			};
-		});
-	});
+function getAllUserConfigs(results) {
+	return _.map(results, userObj =>
+		userModel
+			.getUserByEmail(userObj.value.email)
+			.then(user => [user, user.get('sites')])
+			.then(([user, sites]) => Promise.join(user, getAvailableSiteModels(sites)))
+			.then(([user, siteModels]) => ({
+				...userObj.value,
+				userModel: user,
+				siteModels
+			}))
+	);
 }
 
+function getAvailableSiteModels(sites) {
+	const allSiteModels = _.map(sites, siteObj => siteModel.getSiteById(siteObj.siteId));
+	const siteModels = [];
+
+	return promiseForeach(
+		allSiteModels,
+		((siteModels, siteModel) => siteModel.then(model => {
+			const apConfigs = model.get('apConfigs');
+			if (apConfigs && apConfigs.mode === 1) {
+				return siteModels.push(model);
+			}
+		})).bind(
+			null,
+			siteModels
+		),
+		(data, error) => true
+	).then(() => siteModels);
+}
+				
 function getValidResult(data) {
 	const parsedData = data && typeof data === 'string' ? JSON.parse(data) : data,
 		isValidRootObject = !!(parsedData && parsedData.conversions && Object.keys(parsedData.conversions).length),
@@ -50,20 +74,21 @@ function getCurrencyExchangeRateData() {
 	}).then(getValidResult);
 }
 
-function updateCurrencyExchangeData(sitesArray, currencyData) {
+function updateCurrencyExchangeData(userConfigArray, currencyData) {
 	return Promise.all(
-		_.map(sitesArray, siteConfig => {
-			const apConfigs = { ...siteConfig.model.get('apConfigs') },
+		_.map(userConfigArray, userConfig => {
+			const adServerSettings = { ...userConfig.userModel.get('adServerSettings') },
 				isSameCurrencyExchangeRate = !!(
-					siteConfig.currencyCode &&
-					apConfigs.activeDFPCurrencyCode &&
-					apConfigs.activeDFPCurrencyCode === siteConfig.currencyCode
+					userConfig.currencyCode &&
+					adServerSettings.dfp.activeDFPCurrencyCode &&
+					adServerSettings.dfp.activeDFPCurrencyCode === userConfig.currencyCode
 				);
 
 			if (isSameCurrencyExchangeRate) {
-				apConfigs.activeDFPCurrencyExchangeRate = currencyData;
-				siteConfig.model.set('apConfigs', apConfigs);
-				return siteConfig.model.save().then(() => siteConfig.model);
+				adServerSettings.dfp.activeDFPCurrencyExchangeRate = currencyData;
+				adServerSettings.dfp.prebidGranularityMultiplier = currencyData.USD[userConfig.currencyCode];
+				userConfig.userModel.set('adServerSettings', adServerSettings);
+				return userConfig.userModel.save().then(() => userConfig);
 			}
 
 			return false;
@@ -76,10 +101,10 @@ function successHandler(resultData) {
 	const isValidResult = !!(resultData && resultData.length);
 
 	if (isValidResult) {
-		const allSiteIds = _.map(resultData, modelInstance => modelInstance.get('siteId'));
+		const allUserEmails = _.map(resultData, userConfig => userConfig.email);
 
 		console.log(
-			`Successfully updated currency exchange value for sites: ${allSiteIds.join(
+			`Successfully updated currency exchange value for users: ${allUserEmails.join(
 				', '
 			)} liveSitesByValidThirdPartyDFPAndCurrency`
 		);
@@ -105,7 +130,7 @@ function errorHandler(err) {
 module.exports = {
 	init: function() {
 		const query = viewParameterQuery;
-		const validSitesPromise = Promise.all(couchBaseService.queryViewFromAppBucket(query).then(getAllSiteModels));
+		const validSitesPromise = Promise.all(couchBaseService.queryViewFromAppBucket(query).then(getAllUserConfigs));
 
 		return Promise.join(validSitesPromise, getCurrencyExchangeRateData(), function(validSitesData, currencyData) {
 			return updateCurrencyExchangeData(validSitesData, currencyData).then(successHandler);

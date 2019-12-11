@@ -1,0 +1,699 @@
+{
+	"openapi": "3.0.2",
+	"info": {
+		"title": "AdPushup Console",
+		"description": "Description",
+		"version": "1.0.0",
+		"contact": {
+			"name": "AdPushup",
+			"email": "contact@AdPushup.com",
+			"url": "https://www.adpushup.com/"
+		},
+		"license": {
+			"name": "MIT",
+			"url": "https://opensource.org/licenses/MIT"
+		}
+	},
+	"servers": [
+		{
+			"url": "/api/",
+			"description": "Development Server"
+		}
+	],
+	"tags": [
+		{
+			"name": "indexController",
+			"name": "userController",
+			"name": "dataController",
+			"name": "siteController",
+			"name": "proxyController"
+		}
+	],
+	"paths": {
+		"/login": {
+			"post": {
+				"summary": "Set JWT Token in cookie",
+				"tags": ["indexController"],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"email": {
+										"type": "string",
+										"format": "email"
+									},
+									"password": {
+										"type": "string",
+										"format": "password"
+									}
+								},
+								"required": ["email", "password"]
+							}
+						}
+					}
+				},
+				"security": [],
+				"responses": {
+					"200": {
+						"description": "ok",
+						"headers": {
+							"Set-Cookie": {
+								"schema": {
+									"type": "string",
+									"example": "authToken=abcde12345; Path=/; HttpOnly"
+								}
+							}
+						},
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/SuccessResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "BAD_REQUEST",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FieldValidationErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/signup": {
+			"post": {
+				"summary": "Create new user and set jwt in cookie",
+				"tags": ["indexController"],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"name": {
+										"type": "string"
+									},
+									"email": {
+										"type": "string",
+										"format": "email"
+									},
+									"password": {
+										"type": "string",
+										"format": "password"
+									},
+									"site": {
+										"type": "string",
+										"format": "uri"
+									},
+									"websiteRevenue": {
+										"type": "string",
+										"enum": [
+											"999",
+											"1000-2500",
+											"2500-5000",
+											"5000-10000",
+											"10000-50000",
+											"50000-200000",
+											"200001"
+										]
+									}
+								},
+								"required": ["name", "email", "password", "site", "websiteRevenue"]
+							}
+						}
+					}
+				},
+				"security": [],
+				"responses": {
+					"200": {
+						"description": "success",
+						"headers": {
+							"Set-Cookie": {
+								"schema": {
+									"type": "string",
+									"example": "authToken=abcde12345; Path=/; HttpOnly"
+								}
+							}
+						},
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/SuccessResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "internal server error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "input validation errors",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FieldValidationErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/forgotPassword": {
+			"post": {
+				"summary": "forgot password",
+				"tags": ["indexController"],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"email": {
+										"type": "string",
+										"format": "email"
+									}
+								},
+								"required": ["email"]
+							}
+						}
+					}
+				},
+				"security": [],
+				"responses": {
+					"200": {
+						"description": "email sent",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/SuccessResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "input validation error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FieldValidationErrorResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "user not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/resetPassword": {
+			"post": {
+				"summary": "reset password",
+				"tags": ["indexController"],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"email": {
+										"type": "string",
+										"format": "email"
+									},
+									"key": "string",
+									"password": {
+										"type": "string",
+										"format": "password"
+									}
+								},
+								"required": ["email", "key", "password"]
+							}
+						}
+					}
+				},
+				"security": [],
+				"responses": {
+					"200": {
+						"description": "email sent",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/SuccessResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "input validation error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FieldValidationErrorResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "user not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+
+		"/user/addSite": {
+			"post": {
+				"summary": "add site",
+				"tags": ["userController"],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"site": {
+										"type": "string",
+										"format": "uri"
+									}
+								},
+								"required": ["site"]
+							}
+						}
+					}
+				},
+				"security": [{ "cookieAuth": [] }],
+				"responses": {
+					"200": {
+						"description": "site added",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/SuccessResponse"
+								}
+							}
+						}
+					},
+					"409": {
+						"description": "site already exists!",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Invalid site",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Something went wrong",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+
+		"/data/saveSite": {
+			"post": {
+				"summary": "save site",
+				"tags": ["dataController"],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"siteId": {
+										"type": "string"
+									},
+									"site": {
+										"type": "string",
+										"format": "uri"
+									},
+									"onboardingStage": {
+										"type": "string"
+									},
+									"step": {
+										"type": "integer"
+									}
+								},
+								"required": ["siteId", "site"]
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"cookieAuth": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "site added",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/SuccessResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/site/onboarding": {
+			"get": {
+				"summary": "save site",
+				"tags": ["siteController"],
+				"security": [
+					{
+						"cookieAuth": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "onboarding response",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"isOnboarding": {
+											"type": "boolean"
+										},
+										"siteId": {
+											"type": "integer"
+										},
+										"site": {
+											"type": "string"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/site/create": {
+			"post": {
+				"summary": "create site",
+				"tags": ["siteController"],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"siteDomain": {
+										"type": "string",
+										"format": "uri"
+									}
+								},
+								"required": ["siteDomain"]
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"cookieAuth": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "site created"
+					}
+				}
+			}
+		},
+		"/data/sendCode": {
+			"post": {
+				"summary": "Send code by email. 'emailBody' must be base64 encoded",
+				"tags": ["dataController"],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"developerEmail": {
+										"type": "string",
+										"format": "email"
+									},
+									"subject": {
+										"type": "string"
+									},
+									"emailBody": {
+										"type": "string",
+										"description": "base64 encoded"
+									}
+								},
+								"required": ["siteDomain"]
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"cookieAuth": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "site created"
+					}
+				}
+			}
+		},
+		"/proxy/verifyAdsTxt": {
+			"get": {
+				"summary": "Verify our Ads.txt entries",
+				"tags": ["proxyController"],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "url",
+						"schema": {
+							"type": "string",
+							"format": "uri"
+						},
+						"required": true,
+						"description": "site url to verify ads.txt"
+					}
+				],
+				"security": [
+					{
+						"cookieAuth": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "site created",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/SuccessResponse"
+								}
+							}
+						}
+					},
+					"204": {
+						"description": "Our Ads.txt entries not found.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"error": {
+											"type": "string"
+										},
+										"ourAdsTxt": {
+											"type": "string"
+										}
+									}
+								}
+							}
+						}
+					},
+					"206": {
+						"description": "Few of our Ads.txt entries not found.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"error": {
+											"type": "string"
+										},
+										"ourAdsTxt": {
+											"type": "string"
+										}
+									}
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Ads.txt file not found or entries not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"error": {
+											"type": "string"
+										},
+										"ourAdsTxt": {
+											"type": "string"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "internal server error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"error": {
+											"type": "string"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/proxy/getAdsTxt": {
+			"get": {
+				"summary": "Fetch our ads.txt entries",
+				"tags": ["proxyController"],
+				"security": [
+					{
+						"cookieAuth": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "site created",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"adsTxtSnippet": {
+											"type": "string"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "internal server error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"error": {
+											"type": "string"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"components": {
+		"schemas": {
+			"ErrorResponse": {
+				"type": "object",
+				"properties": {
+					"error": {
+						"type": "string"
+					}
+				}
+			},
+			"FieldValidationErrorResponse": {
+				"type": "object",
+				"properties": {
+					"errors": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						}
+					}
+				}
+			},
+			"SuccessResponse": {
+				"properties": {
+					"success": {
+						"type": "string"
+					}
+				}
+			}
+		},
+		"securitySchemes": {
+			"cookieAuth": {
+				"type": "apiKey",
+				"in": "cookie",
+				"name": "user"
+			}
+		}
+	}
+}

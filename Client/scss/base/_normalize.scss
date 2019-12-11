@@ -1,0 +1,55 @@
+/*****Normalize bootstrap CSS according to our product*****/
+a {
+	color: $linkColor;
+}
+
+.nav > li.disabled {
+	> a {
+		color: #aaa;
+		&:hover,
+		&:active,
+		&:focus {
+			color: #aaa;
+			border-color: transparent;
+		}
+	}
+}
+
+a > button.btn {
+	color: inherit;
+	border: none;
+	background: none;
+}
+.list-group-item {
+	&.is-active {
+		border: 1px solid $borderColor;
+		box-shadow: $boxShadowInsetOne;
+
+		svg,
+		i {
+			color: $primaryColor;
+		}
+	}
+}
+
+.breadcrumb {
+	background-color: transparent;
+	margin: 0 0 $designDimensionSM;
+	padding: 0;
+
+	> li + li:before {
+		padding: 0 $designDimensionSM;
+		color: $lightGrey;
+		content: '>';
+		text-shadow: 1px 1px #fff;
+	}
+
+	.breadcrumb-item {
+		font-size: ($designDimensionMD - 0.2);
+		color: inherit;
+
+		// a {
+		// 	color: $primaryColor;
+		// }
+	}
+}

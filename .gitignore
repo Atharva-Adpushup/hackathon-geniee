@@ -40,11 +40,10 @@ public/assets/js/builds/inner.js
 public/assets/js/builds/outer.js
 public/assets/js/builds/geniee/
 TODO
-package-lock.json
 pipedriveTest.js
 services/adpTags/hbScript/build
-services/adpTags/Prebid.js
 Prebid.js
 __queries.sql
+clientDist
 flow.txt
 local-files/

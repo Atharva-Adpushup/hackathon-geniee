@@ -6,9 +6,10 @@ const { couchbaseService } = require('node-utils');
 const request = require('request-promise');
 const config = require('../configs/config');
 const { sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFunctions');
-const { docKeys, interactiveAdsInitialDoc, defaultMeta, INTERACTIVE_ADS_TYPES } = require('../configs/commonConsts');
+const { docKeys, INNOVATIVE_ADS_INITIAL_DOC, DEFAULT_META } = require('../configs/commonConsts');
 const adpushup = require('../helpers/adpushupEvent');
 const siteModel = require('../models/siteModel');
+
 const router = express.Router();
 const appBucket = couchbaseService(
 	`couchbase://${config.couchBase.HOST}/${config.couchBase.DEFAULT_BUCKET}`,
@@ -19,7 +20,7 @@ const appBucket = couchbaseService(
 
 const fn = {
 	sendDataToZapier: data => {
-		let options = {
+		const options = {
 			method: 'GET',
 			uri: 'https://hooks.zapier.com/hooks/catch/547126/cdt7p8/?',
 			json: true
@@ -29,12 +30,12 @@ const fn = {
 		});
 		options.uri = options.uri.slice(0, -1);
 
-		return request(options)
-			.then(response => console.log('Ad Creation. Called made to Zapier'))
-			.catch(err => console.log('Ad creation call to Zapier failed'));
+		// return request(options)
+		// 	.then(response => console.log('Ad Creation. Called made to Zapier'))
+		// 	.catch(err => console.log('Ad creation call to Zapier failed'));
 	},
 	createNewDocAndDoProcessing: payload => {
-		let innovativeAdDefault = _.cloneDeep(interactiveAdsInitialDoc);
+		const innovativeAdDefault = _.cloneDeep(INNOVATIVE_ADS_INITIAL_DOC);
 		return appBucket
 			.createDoc(`${docKeys.interactiveAds}${payload.siteId}`, innovativeAdDefault, {})
 			.then(() => appBucket.getDoc(`site::${payload.siteId}`))
@@ -47,9 +48,9 @@ const fn = {
 		const cas = data.cas || false;
 		const { pagegroups, formatData } = payload.ad;
 
-		let value = data.value || data;
+		const value = data.value || data;
 		let newAds = [];
-		let logs = [];
+		const logs = [];
 
 		if (pagegroups.length) {
 			newAds = _.map(pagegroups, pagegroup => {
@@ -71,22 +72,23 @@ const fn = {
 		value.siteId = value.siteId || payload.siteId;
 		value.ownerEmail = value.ownerEmail || payload.ownerEmail;
 
-		// if (config.environment.HOST_ENV === 'production') {
-		// 	fn.sendDataToZapier({
-		// 		email: value.ownerEmail,
-		// 		website: value.siteDomain,
-		// 		platform: ad.formatData.platform,
-		// 		size: `${ad.width}x${ad.height}`,
-		// 		adId: ad.id,
-		// 		type: 'action',
-		// 		message: 'New Section Created. Please Check',
-		// 		createdOn: moment(ad.createdOn).format('dddd, MMMM Do YYYY, h:mm:ss a')
-		// 	});
-		// }
+		if (config.environment.HOST_ENV === 'production') {
+			fn.sendDataToZapier({
+				email: value.ownerEmail,
+				website: value.siteDomain,
+				platform: ad.formatData.platform,
+				size: `${ad.width}x${ad.height}`,
+				adId: ad.id,
+				type: 'action',
+				message: 'New Section Created. Please Check',
+				createdOn: moment(ad.createdOn).format('dddd, MMMM Do YYYY, h:mm:ss a')
+			});
+		}
 
 		return Promise.resolve([cas, value, { ads: newAds, logs }, payload.siteId]);
 	},
-	getAndUpdate: (key, value) => appBucket.getDoc(key).then(result => appBucket.updateDoc(key, value, result.cas)),
+	getAndUpdate: (key, value) =>
+		appBucket.getDoc(key).then(result => appBucket.updateDoc(key, value, result.cas)),
 	directDBUpdate: (key, value, cas) => appBucket.updateDoc(key, value, cas),
 	dbWrapper: (cas, value, toReturn, siteId) => {
 		function process() {
@@ -95,12 +97,12 @@ const fn = {
 		}
 		return process().then(() => toReturn);
 	},
-	errorHander: (err, res) => {
+	errorHandler: (err, res) => {
 		console.log(err);
 		return sendErrorResponse({ message: 'Opertion Failed' }, res);
 	},
-	emitEventAndSendResponse: (siteId, res, data = {}) => {
-		return siteModel.getSiteById(siteId).then(site => {
+	emitEventAndSendResponse: (siteId, res, data = {}) =>
+		siteModel.getSiteById(siteId).then(site => {
 			adpushup.emit('siteSaved', site); // Emitting Event for Ad Syncing
 			return sendSuccessResponse(
 				{
@@ -109,15 +111,13 @@ const fn = {
 				},
 				res
 			);
-		});
-	},
-	adUpdateProcessing: (req, res, processing) => {
-		return appBucket
+		}),
+	adUpdateProcessing: (req, res, processing) =>
+		appBucket
 			.getDoc(`${docKeys.interactiveAds}${req.body.siteId}`)
 			.then(docWithCas => processing(docWithCas))
 			.then(() => fn.emitEventAndSendResponse(req.body.siteId, res))
-			.catch(err => fn.errorHander(err, res));
-	}
+			.catch(err => fn.errorHandler(err, res))
 };
 
 router
@@ -140,16 +140,16 @@ router
 					res
 				)
 			)
-			.catch(err => {
-				return err.code && err.code === 13 && err.message.includes('key does not exist')
+			.catch(err =>
+				err.code && err.code === 13 && err.message.includes('key does not exist')
 					? sendSuccessResponse(
 							{
 								ads: []
 							},
 							res
 					  )
-					: fn.errorHander(err, res);
-			});
+					: fn.errorHandler(err, res)
+			);
 	})
 	.get(['/', '/:siteId'], (req, res) => {
 		const { session, params } = req;
@@ -158,27 +158,29 @@ router
 			return res.render('404');
 		}
 
-		return Promise.join(siteModel.getSiteById(params.siteId), site => {
-			return new Promise((resolve, reject) =>
-				site.get('ownerEmail') === session.user.email ? resolve() : reject('Owner verification failed')
+		return Promise.join(siteModel.getSiteById(params.siteId), site =>
+			new Promise((resolve, reject) =>
+				site.get('ownerEmail') === session.user.email
+					? resolve()
+					: reject('Owner verification failed')
 			)
 				.then(() => appBucket.getDoc(`${docKeys.interactiveAds}${params.siteId}`))
 				.then(docWithCas => docWithCas.value.meta)
-				.catch(err => {
-					return err.name && err.name == 'CouchbaseError' && err.code == 13
-						? defaultMeta
-						: Promise.reject(err);
-				})
+				.catch(err =>
+					err.name && err.name == 'CouchbaseError' && err.code == 13
+						? DEFAULT_META
+						: Promise.reject(err)
+				)
 				.then(meta => {
-					let channels = site.get('channels') || [];
+					const channels = site.get('channels') || [];
 					return res.render('interactiveAdsManager', {
 						siteId: params.siteId,
 						isSuperUser: !!session.isSuperUser,
-						channels: channels,
+						channels,
 						meta
 					});
-				});
-		}).catch(err => {
+				})
+		).catch(err => {
 			console.log(err.message);
 			return res.render('404');
 		});
@@ -192,21 +194,31 @@ router
 				res
 			);
 		}
-		let payload = { ad: req.body.ad, siteId: req.body.siteId, ownerEmail: req.session.user.email };
+		const payload = {
+			ad: req.body.ad,
+			siteId: req.body.siteId,
+			ownerEmail: req.session.user.email
+		};
 		return appBucket
 			.getDoc(`${docKeys.interactiveAds}${req.body.siteId}`)
 			.then(docWithCas => fn.processing(docWithCas, payload))
-			.catch(err => {
-				return err.name && err.name == 'CouchbaseError' && err.code == 13
+			.catch(err =>
+				err.name && err.name == 'CouchbaseError' && err.code == 13
 					? fn.createNewDocAndDoProcessing(payload)
-					: Promise.reject(err);
-			})
+					: Promise.reject(err)
+			)
 			.spread(fn.dbWrapper)
 			.then(data => fn.emitEventAndSendResponse(req.body.siteId, res, data))
-			.catch(err => fn.errorHander(err, res));
+			.catch(err => fn.errorHandler(err, res));
 	})
 	.post('/masterSave', (req, res) => {
-		if (!req.body || !req.body.siteId || !req.body.ads || !req.session.isSuperUser || !req.body.meta) {
+		if (
+			!req.body ||
+			!req.body.siteId ||
+			!req.body.ads ||
+			!req.session.isSuperUser ||
+			!req.body.meta
+		) {
 			return sendErrorResponse(
 				{
 					message: 'Invalid Parameters.'
@@ -215,7 +227,7 @@ router
 			);
 		}
 		return fn.adUpdateProcessing(req, res, docWithCas => {
-			let doc = docWithCas.value;
+			const doc = docWithCas.value;
 			const { siteId } = req.body;
 
 			if (doc.ownerEmail != req.session.user.email) {
@@ -224,7 +236,7 @@ router
 			if (!doc.ads.length) {
 				doc.ads = req.body.ads;
 			} else {
-				let newAds = [];
+				const newAds = [];
 
 				_.forEach(doc.ads, adFromDoc => {
 					_.forEach(req.body.ads, adFromClient => {
@@ -257,7 +269,7 @@ router
 			);
 		}
 		return fn.adUpdateProcessing(req, res, docWithCas => {
-			let doc = docWithCas.value;
+			const doc = docWithCas.value;
 			if (doc.ownerEmail != req.session.user.email) {
 				return Promise.reject('Owner verfication fail');
 			}

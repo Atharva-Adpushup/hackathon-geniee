@@ -1,125 +1,56 @@
-// Header bidding feedback module
+// Slot feedback initiator
 
-var config = require('./config'),
-	utils = require('../helpers/utils'),
-	getBidDataForFeedback = function(containerId) {
-		var bidData = [],
-			// Not using getBidResponses() because context of all slot containers is not getting saved in it, instead using getBidResponsesForAdUnitCode(':adUnitCode')
-			slotBids = pbjs.getBidResponsesForAdUnitCode(containerId),
-			computedCPMValue = utils.isValidThirdPartyDFPAndCurrencyConfig() ? 'originalCpm' : 'cpm';
+var constants = require('./constants');
+var config = require('./config');
+var adp = require('./adp');
+var feedback = {
+	getFeedbackData: function(slot, defaultWinner) {
+		var winner = slot.feedback.winner || defaultWinner;
+		var winningRevenue = slot.feedback.winningRevenue || 0;
+		var feedbackData = {
+			siteId: config.SITE_ID,
+			siteDomain: adp.config.siteDomain,
+			bids: [
+				{
+					bidder: winner,
+					revenue: winningRevenue
+				}
+			],
+			mode: adp.config.mode,
+			errorCode: constants.ERROR_CODES.NO_ERROR,
+			winner: winner,
+			winningRevenue: winningRevenue,
+			winnerAdUnitId: slot.feedback.winnerAdUnitId || null,
+			timedOutBidders: [],
+			services: slot.services,
+			sectionId: (slot.optionalParam && slot.optionalParam.originalId) || slot.sectionId,
+			sectionName: slot.sectionName,
+			pageGroup: adp.config.pageGroup,
+			pageVariationId: window.adpushup.config.selectedVariation,
+			pageVariationName: window.adpushup.config.selectedVariationName,
+			pageVariationType: window.adpushup.config.selectedVariationType,
+			platform: adp.config.platform,
+			packetId: adp.config.packetId
+		};
 
-		if (slotBids) {
-			var bids = slotBids.bids;
-			for (var i in bids) {
-				bidData.push({
-					revenue: bids[i][computedCPMValue] / 1000, // Actual revenue for impression = cpm/1000
-					bidder: bids[i].bidder,
-					adId: bids[i].adId,
-					responseTime: bids[i].timeToRespond
-				});
-			}
-			return bidData;
-		}
-		return bidData;
+		return feedbackData;
 	},
-	feedback = function(slot) {
-		if (!slot.type || slot.feedbackSent || slot.feedback.winner === config.DEFAULT_WINNER) {
+	send: function(slot) {
+		var defaultWinner = constants.FEEDBACK.DEFAULT_WINNER;
+
+		if (slot.feedbackSent || slot.feedback.winner === defaultWinner) {
 			return;
 		}
 		slot.feedbackSent = true;
+		var feedbackData = this.getFeedbackData(slot, defaultWinner);
 
-		var type = slot.type,
-			feedback = {
-				success: true,
-				data: {
-					size: slot.size[0] + 'x' + slot.size[1],
-					siteId: config.SITE_ID,
-					siteDomain: window.adpushup.config.siteDomain,
-					placement: slot.placement,
-					containerId: slot.containerId,
-					type: slot.type,
-					url: window.location.href,
-					bids: [
-						{
-							bidder: slot.feedback.winner || config.DEFAULT_WINNER,
-							revenue: slot.feedback.winningRevenue || 0
-						}
-					],
-					winner: slot.feedback.winner || config.DEFAULT_WINNER,
-					winningRevenue: slot.feedback.winningRevenue || 0,
-					winnerAdUnitId: slot.feedback.winnerAdUnitId || null,
-					timedOutBidders: [],
-					timeout: slot.feedback.timeout || slot.timeout,
-					services: slot.services,
-					status: null,
-					sectionId: slot.sectionId,
-					sectionName: slot.sectionName,
-					pageGroup: slot.pageGroup,
-					platform: slot.platform,
-					pageVariationId: window.adpushup.config.selectedVariation,
-					pageVariationName: window.adpushup.config.selectedVariationName,
-					pageVariationType: window.adpushup.config.selectedVariationType,
-					packetId: window.adpushup.config.packetId
-				}
-			};
+		// Old feedback
+		// adp.$.post(constants.FEEDBACK.URL_OLD, JSON.stringify(feedbackData));
 
-		switch (type) {
-			case 1:
-				Object.assign(feedback.data, {
-					status: 'Type 1: Prebid rendered!'
-				});
-				// feedback.data.bids.push({
-				// 	adId: slot.slotId,
-				// 	bidder: 'adx'
-				// });
-				break;
-			case 2:
-				Object.assign(feedback.data, {
-					status: 'Type 2: Postbid rendered!'
-				});
-				break;
-			case 3:
-				Object.assign(feedback.data, {
-					status: 'Type 3: No bid or $0 bid from postbid, collapsing div!',
-					winner: null
-				});
-				break;
-			case 4:
-				Object.assign(feedback.data, {
-					status: 'Type 4: No bidder config present but dfp slot present, rendering adx tag!',
-					winner: null
-				});
-				break;
-			case 5:
-				Object.assign(feedback.data, {
-					status: 'Type 5: No bidder config or dfp slot present, collapsing div!',
-					winner: null
-				});
-				break;
-			case 6:
-				Object.assign(feedback.data, {
-					status: 'Type 6: Browser not supported but dfp slot present, rendering adx tag!',
-					winner: null
-				});
-				break;
-			case 7:
-				Object.assign(feedback.data, {
-					status: 'Type 7: Browser not supported and no dfp slot present, collapsing div!',
-					winner: null
-				});
-				break;
-			case 8:
-				Object.assign(feedback.data, {
-					status: 'Type 8: Adsense fallback won!',
-					winner: config.ADSENSE.bidderName
-				});
-		}
-		//if (feedback.data.winner && feedback.data.winner !== config.DEFAULT_WINNER) {
-		utils.sendFeedback(feedback);
-		//}
-	};
-
-module.exports = {
-	feedback: feedback,
-	getBidDataForFeedback: getBidDataForFeedback
+		return adp.$.get(
+			constants.FEEDBACK.URL + adp.utils.base64Encode(JSON.stringify(feedbackData))
+		);
+	}
 };
+
+module.exports = feedback;

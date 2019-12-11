@@ -30,6 +30,7 @@ var adp = window.adpushup,
 	},
 	trigger = function(adId) {
 		var isDOMElement = !!document.getElementById(adId);
+		// utils.log('ApTag id ', adId, 'DOM Element', isDOMElement);
 
 		// NOTE: Stop execution of this module if related DOM element does not exist
 		// The requirement for this check came up as redundant ad ids are being triggered from adpushup queue sometimes
@@ -40,7 +41,13 @@ var adp = window.adpushup,
 			return false;
 		}
 
-		if (adp && Array.isArray(adp.config.manualAds) && adp.config.manualAds.length && adp.utils.isUrlMatching()) {
+		if (
+			adp &&
+			Array.isArray(adp.config.manualAds) &&
+			adp.config.manualAds.length &&
+			adp.utils.isUrlMatching()
+		) {
+			// utils.log('APTag running for', adId);
 			var manualAds = adp.config.manualAds,
 				newAdId = utils.uniqueId(),
 				manualAd = manualAds.filter(function(ad) {
@@ -54,37 +61,39 @@ var adp = window.adpushup,
 				currentTime = new Date().getTime(),
 				isAdElement = !!(isAdId && domElem);
 
+			// utils.log('APTag found ', manualAd, 'DOM element', domElem);
+
 			ad.id = newAdId;
 			document.getElementById(adId).setAttribute('id', newAdId);
 			document.getElementById(newAdId).setAttribute('data-section', newAdId);
 			document.getElementById(newAdId).setAttribute('data-orig-id', adId);
 			document.getElementById(newAdId).setAttribute('data-render-time', currentTime);
 			if (ad.network === commonConsts.NETWORKS.ADPTAGS) {
-				if (ad.networkData) ad.networkData.zoneContainerId = 'ADP_' + siteId + '_' + adSize + '_' + newAdId;
+				if (ad.networkData)
+					ad.networkData.zoneContainerId = 'ADP_' + siteId + '_' + adSize + '_' + newAdId;
 			}
 
-			ad.status = 1; // Mark ap tag status as successful impression
+			//ad.status = 1; // Mark ap tag status as successful impression
+			ad.status = commonConsts.AD_STATUS.IMPRESSION; // Mark ap tag status as successful impression
 			ad.services = [commonConsts.SERVICES.TAG]; // Set service id for ap tag ads
 			ad.originalId = adId;
 			if (isAdElement) {
 				var feedbackData = {
+						ads: [ad],
 						xpathMiss: [],
-						eventType: commonConsts.ERROR_CODES.NO_ERROR,
+						errorCode: commonConsts.ERROR_CODES.NO_ERROR,
 						// mode: 16,
 						mode: commonConsts.MODE.ADPUSHUP, // Sending Mode 1 in Manual Ads
 						referrer: config.referrer,
 						tracking: browserConfig.trackerSupported,
 						variationId: commonConsts.MANUAL_ADS.VARIATION
-					},
-					oldFeedbackData = feedbackData;
+					};
+					//oldFeedbackData = $.extend(true, {}, feedbackData);
 
-				oldFeedbackData.newFeedbackAdObj = {
-					ads: [ad]
-				};
-
-				oldFeedbackData.ads = [ad.originalId];
+				//oldFeedbackData.ads = [ad.originalId];
 				return getContainer(ad)
 					.done(function(container) {
+						// utils.log('Container found ', container);
 						var isLazyLoadingAd = !!(ad.enableLazyLoading === true);
 						var isAdNetworkAdpTag = !!(ad.network === commonConsts.NETWORKS.ADPTAGS);
 						var isAdNetworkMedianet = !!(
@@ -104,15 +113,15 @@ var adp = window.adpushup,
 						if (isLazyLoadingAd) {
 							isAdContainerInView(container).done(function() {
 								// Send feedback call
-								// utils.sendFeedback(feedbackData);
-								utils.sendFeedbackOld(oldFeedbackData);
+								utils.sendFeedback(feedbackData);
+								//utils.sendFeedbackOld(oldFeedbackData);
 								// Place the ad in the container
 								return placeAd(container, ad);
 							});
 						} else {
 							// Send feedback call
-							// utils.sendFeedback(feedbackData);
-							utils.sendFeedbackOld(oldFeedbackData);
+							utils.sendFeedback(feedbackData);
+							//utils.sendFeedbackOld(oldFeedbackData);
 							// Place the ad in the container
 							return placeAd(container, ad);
 						}

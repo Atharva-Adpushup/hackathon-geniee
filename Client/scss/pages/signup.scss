@@ -1,0 +1,34 @@
+@import '../shared/selectbox';
+
+.SignupForm {
+	.websiteRevenue {
+		font-size: 1em;
+		border-radius: 0;
+		color: #89949b;
+		height: 50;
+		&:hover {
+			box-shadow: none;
+			background: $whiteColor;
+		}
+		&:active,
+		&:focus {
+			background: $whiteColor !important;
+			border-color: #ddd !important;
+		}
+		& + .dropdown-menu {
+			font-size: 1em;
+		}
+	}
+}
+
+.signup-termsPolicy-wrap {
+	background: transparent;
+	border: none;
+}
+.SignupFooter {
+	.label--text-faded {
+		margin-top: $FMLayoutDimension * 2;
+		font-size: 0.7em;
+		color: $greyColor;
+	}
+}

@@ -1,4 +1,4 @@
-var ApConfig = {
+const ApConfig = {
 	keys: [
 		'mode',
 		'pageGroupPattern',
@@ -19,7 +19,9 @@ var ApConfig = {
 		'isManual',
 		'isInnovative',
 		'isThirdPartyAdx',
-		'spaPageTransitionTimeout'
+		'spaPageTransitionTimeout',
+		'adsLabel',
+		'isAdsLabelOn'
 	],
 	override: [
 		'mode',
@@ -41,7 +43,9 @@ var ApConfig = {
 		'isManual',
 		'isInnovative',
 		'isThirdPartyAdx',
-		'spaPageTransitionTimeout'
+		'spaPageTransitionTimeout',
+		'adsLabel',
+		'isAdsLabelOn'
 	],
 	merge: []
 };

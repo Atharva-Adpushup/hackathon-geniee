@@ -1,20 +1,32 @@
 const express = require('express');
+
 const Promise = require('bluebird');
+
 const _ = require('lodash');
+
 const uuid = require('uuid');
+
 const moment = require('moment');
+
 const { couchbaseService } = require('node-utils');
+
 const request = require('request-promise');
 
 const config = require('../configs/config');
+
 const utils = require('../helpers/utils');
+
 const { sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFunctions');
+
 const { docKeys, tagManagerInitialDoc, videoNetworkInfo } = require('../configs/commonConsts');
+
 const adpushup = require('../helpers/adpushupEvent');
+
 const siteModel = require('../models/siteModel');
+
 const router = express.Router();
+
 const couchbase = require('../helpers/couchBaseService');
-const { generateSectionName } = require('../helpers/clientServerHelpers');
 
 const appBucket = couchbaseService(
 	`couchbase://${config.couchBase.HOST}/${config.couchBase.DEFAULT_BUCKET}`,
@@ -26,7 +38,7 @@ const appBucket = couchbaseService(
 const fn = {
 	isSuperUser: false,
 	sendDataToZapier: data => {
-		let options = {
+		const options = {
 			method: 'GET',
 			uri: 'https://hooks.zapier.com/hooks/catch/547126/cdt7p8/?',
 			json: true
@@ -41,9 +53,9 @@ const fn = {
 			.catch(err => console.log('Ad creation call to Zapier failed'));
 	},
 	createNewDocAndDoProcessing: payload => {
-		let tagManagerDefault = _.cloneDeep(tagManagerInitialDoc);
+		const tagManagerDefault = _.cloneDeep(tagManagerInitialDoc);
 		return appBucket
-			.createDoc(`${docKeys.tagManager}${payload.siteId}`, tagManagerDefault, {})
+			.createDoc(`${docKeys.apTag}${payload.siteId}`, tagManagerDefault, {})
 			.then(() => appBucket.getDoc(`site::${payload.siteId}`))
 			.then(docWithCas => {
 				payload.siteDomain = docWithCas.value.siteDomain;
@@ -52,21 +64,17 @@ const fn = {
 	},
 	processing: (data, payload) => {
 		const cas = data.cas || false;
+
 		const value = data.value || data;
+
 		const id = uuid.v4();
-		const name = generateSectionName({
-			id,
-			width: payload.ad.width,
-			height: payload.ad.height,
-			pagegroup: null,
-			platform: payload.ad.formatData.platform || false,
-			service: 'T'
-		});
+
 		const networkInfo = payload.ad.formatData.type == 'video' ? videoNetworkInfo : {};
+
 		const ad = {
 			...payload.ad,
 			id,
-			name,
+			name: `Ad-${id}`,
 			createdOn: +new Date(),
 			formatData: {
 				...payload.ad.formatData,
@@ -103,26 +111,22 @@ const fn = {
 			payload.siteId
 		]);
 	},
-	getAndUpdate: (key, value) => {
-		return appBucket.getDoc(key).then(result => appBucket.updateDoc(key, value, result.cas));
+	getAndUpdate: (key, value, adId) =>
+		appBucket
+			.getDoc(key)
+			.then(result => appBucket.updateDoc(key, value, result.cas).then(() => adId)),
+	directDBUpdate: (key, value, cas, adId) => appBucket.updateDoc(key, value, cas).then(() => adId),
+	dbWrapper: (cas, value, adId, siteId) => {
+		const key = `${docKeys.apTag}${siteId}`;
+		return !cas ? fn.getAndUpdate(key, value, adId) : fn.directDBUpdate(key, value, cas, adId);
 	},
-	directDBUpdate: (key, value, cas) => appBucket.updateDoc(key, value, cas),
-	dbWrapper: (cas, value, toReturn, siteId) => {
-		const key = `${docKeys.tagManager}${siteId}`;
-
-		function dbOperation() {
-			return !cas ? fn.getAndUpdate(key, value) : fn.directDBUpdate(key, value, cas);
-		}
-
-		return dbOperation().then(() => toReturn);
-	},
-	errorHander: (err, res) => {
+	errorHandler: (err, res) => {
 		console.log(err);
 		return sendErrorResponse({ message: 'Opertion Failed' }, res);
 	},
-	adUpdateProcessing: (req, res, processing) => {
-		return appBucket
-			.getDoc(`${docKeys.tagManager}${req.body.siteId}`)
+	adUpdateProcessing: (req, res, processing) =>
+		appBucket
+			.getDoc(`${docKeys.apTag}${req.body.siteId}`)
 			.then(docWithCas => processing(docWithCas))
 			.then(() => siteModel.getSiteById(req.body.siteId))
 			.then(site => {
@@ -134,8 +138,7 @@ const fn = {
 					res
 				);
 			})
-			.catch(err => fn.errorHander(err, res));
-	}
+			.catch(err => fn.errorHandler(err, res))
 };
 
 router
@@ -149,7 +152,7 @@ router
 			);
 		}
 		return appBucket
-			.getDoc(`${docKeys.tagManager}${req.query.siteId}`)
+			.getDoc(`${docKeys.apTag}${req.query.siteId}`)
 			.then(docWithCas =>
 				sendSuccessResponse(
 					{
@@ -158,30 +161,30 @@ router
 					res
 				)
 			)
-			.catch(err => {
-				return err.code && err.code === 13 && err.message.includes('key does not exist')
+			.catch(err =>
+				err.code && err.code === 13 && err.message.includes('key does not exist')
 					? sendSuccessResponse(
 							{
 								ads: []
 							},
 							res
 					  )
-					: fn.errorHander(err, res);
-			});
+					: fn.errorHandler(err, res)
+			);
 	})
-	.get('/networkConfig', (req, res) => {
-		return couchbase
+	.get('/networkConfig', (req, res) =>
+		couchbase
 			.connectToAppBucket()
-			.then(function(appBucket) {
-				return appBucket.getAsync('data::apNetwork');
-			})
-			.then(function(json) {
-				return res.json({ networkConfig: json.value });
-			})
+			.then(appBucket => appBucket.getAsync('data::apNetwork'))
+			.then(json => res.json(json.value))
 			.catch(err => {
-				return fn.errorHander(err, res);
-			});
-	})
+				if (err.code === 13) {
+					throw new AdPushupError([{ status: 404, message: 'Doc does not exist' }]);
+				}
+
+				return res.json(err);
+			})
+	)
 	.get(['/', '/:siteId'], (req, res) => {
 		const { session, params } = req;
 
@@ -191,14 +194,14 @@ router
 
 		return siteModel
 			.getSiteById(params.siteId)
-			.then(site => {
-				return site.get('ownerEmail') != session.user.email
+			.then(site =>
+				site.get('ownerEmail') != session.user.email
 					? res.render('404')
 					: res.render('tagManager', {
 							siteId: params.siteId,
 							isSuperUser: !!session.isSuperUser
-					  });
-			})
+					  })
+			)
 			.catch(err => {
 				console.log(err.message);
 				return res.render('404');
@@ -216,26 +219,30 @@ router
 
 		fn.isSuperUser = req.session.isSuperUser;
 
-		let payload = { ad: req.body.ad, siteId: req.body.siteId, ownerEmail: req.session.user.email };
+		const payload = {
+			ad: req.body.ad,
+			siteId: req.body.siteId,
+			ownerEmail: req.session.user.email
+		};
 		return appBucket
-			.getDoc(`${docKeys.tagManager}${req.body.siteId}`)
+			.getDoc(`${docKeys.apTag}${req.body.siteId}`)
 			.then(docWithCas => fn.processing(docWithCas, payload))
-			.catch(err => {
-				return err.name && err.name == 'CouchbaseError' && err.code == 13
+			.catch(err =>
+				err.name && err.name == 'CouchbaseError' && err.code == 13
 					? fn.createNewDocAndDoProcessing(payload)
-					: Promise.reject(err);
-			})
+					: Promise.reject(err)
+			)
 			.spread(fn.dbWrapper)
 			.then(toReturn =>
 				sendSuccessResponse(
 					{
 						message: 'Ad created',
-						...toReturn
+						id
 					},
 					res
 				)
 			)
-			.catch(err => fn.errorHander(err, res));
+			.catch(err => fn.errorHandler(err, res));
 	})
 	.post('/masterSave', (req, res) => {
 		if (!req.body || !req.body.siteId || !req.body.ads || !req.session.isSuperUser) {
@@ -247,8 +254,9 @@ router
 			);
 		}
 		return fn.adUpdateProcessing(req, res, docWithCas => {
-			let doc = docWithCas.value,
-				{ siteId, siteDomain } = req.body;
+			const doc = docWithCas.value;
+
+			const { siteId, siteDomain } = req.body;
 
 			if (doc.ownerEmail != req.session.user.email) {
 				return Promise.reject('Owner verfication fail');
@@ -256,7 +264,7 @@ router
 			if (!doc.ads.length) {
 				doc.ads = req.body.ads;
 			} else {
-				let newAds = [];
+				const newAds = [];
 
 				_.forEach(doc.ads, adFromDoc => {
 					_.forEach(req.body.ads, adFromClient => {
@@ -274,7 +282,8 @@ router
 				});
 				doc.ads = newAds;
 			}
-			return appBucket.updateDoc(`${docKeys.tagManager}${siteId}`, doc, docWithCas.cas);
+
+			return appBucket.updateDoc(`${docKeys.apTag}${siteId}`, doc, docWithCas.cas);
 		});
 	})
 	.post('/modifyAd', (req, res) => {
@@ -287,7 +296,7 @@ router
 			);
 		}
 		return fn.adUpdateProcessing(req, res, docWithCas => {
-			let doc = docWithCas.value;
+			const doc = docWithCas.value;
 			if (doc.ownerEmail != req.session.user.email) {
 				return Promise.reject('Owner verfication fail');
 			}
@@ -297,7 +306,7 @@ router
 					return false;
 				}
 			});
-			return appBucket.updateDoc(`${docKeys.tagManager}${req.body.siteId}`, doc, docWithCas.cas);
+			return appBucket.updateDoc(`${docKeys.apTag}${req.body.siteId}`, doc, docWithCas.cas);
 		});
 	});
 

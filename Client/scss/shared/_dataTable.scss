@@ -1,0 +1,47 @@
+.table-datatable {
+	.thead-default {
+		.thead-tr-default {
+			.thead-th-default {
+				width: 15%;
+				.fa-sort::after {
+					font-size: 14px;
+					font-style: normal;
+					font-family: 'Glyphicons Halflings';
+					content: '\e150';
+					cursor: pointer; // Changes the cursor into a pointer on hover
+				}
+				.fa-sort-asc::after {
+					font-size: 14px;
+					font-style: normal;
+					font-family: 'Glyphicons Halflings';
+					content: '\e155';
+					cursor: pointer; // Changes the cursor into a pointer on hover
+				}
+				.fa-sort-desc::after {
+					font-size: 14px;
+					font-style: normal;
+					font-family: 'Glyphicons Halflings';
+					content: '\e156';
+					cursor: pointer; // Changes the cursor into a pointer on hover
+				}
+				&.sortable {
+					// If and only if a column is sortable
+					&:hover {
+						color: #333;
+						background-color: #e6e6e6;
+						background-image: none;
+						border-color: #adadad;
+						cursor: pointer;
+					}
+				}
+			}
+		}
+	}
+	.tbody-default {
+		.tbody-tr-default {
+			.tbody-td-default {
+				width: 15%;
+			}
+		}
+	}
+}

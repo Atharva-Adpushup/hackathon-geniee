@@ -1,0 +1,36 @@
+.tags {
+	margin: 0;
+	overflow: hidden;
+	padding: 0;
+	li {
+		float: left;
+		list-style: none;
+	}
+	.tag {
+		font-size: 11px;
+		font-family: sans-serif;
+		background: $primaryColor;
+		border-radius: 3px 0 0 3px;
+		color: $whiteColor;
+		display: inline-block;
+		height: 26px;
+		line-height: 26px;
+		padding: 0px 5px;
+		position: relative;
+		margin: 0 10px 10px 0;
+		text-decoration: none;
+		-webkit-transition: color 0.2s;
+		border-radius: 4px;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		max-width: 175px;
+		overflow: hidden;
+		&:hover {
+			background-color: $primaryColorDark;
+			color: $whiteColor;
+			&:after {
+				border-left-color: $primaryColorDark;
+			}
+		}
+	}
+}

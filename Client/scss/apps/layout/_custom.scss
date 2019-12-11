@@ -1,0 +1,12 @@
+.layout-splitScreen {
+	input,
+	.dropdown.btn-group {
+		width: 80%;
+	}
+	textarea {
+		width: 90%;
+	}
+	pre {
+		max-width: ($designDimensionXXL * 4);
+	}
+}

@@ -1,0 +1,267 @@
+// Variables
+$RowHoverBg: rgba(85, 85, 85, 0.05);
+$MBButtonRowBorder: #dfdfe0;
+// $primaryColor: #eb575c; //Main Adpushup Red Color
+// $primaryColorDark: #cf474b; //Red Dark Color
+// $primaryColorLight: #fb9fa2;
+
+/*Extra Space ($ES)*/
+// $ESBg: #f6f7f8;
+// $ESPadding: 20px;
+
+body {
+	min-width: 1280px !important;
+	height: auto;
+}
+
+.br-0 {
+	border: 0px !important;
+}
+
+.options-wrapper {
+	margin: 0 !important;
+	padding: 30px 10px;
+	-webkit-transition: 0.4s;
+	transition: 0.35s;
+
+	h3 {
+		font-size: 18px !important;
+	}
+	h4 {
+		font-size: 14px !important;
+		color: #5d5d5d;
+		margin-top: 5px;
+		font-style: italic;
+	}
+
+	.progress-wrapper {
+		padding: 0px 15px;
+		margin-bottom: 25px;
+	}
+
+	ul.options {
+		display: flex;
+		flex-direction: row;
+		margin-bottom: 20px;
+		flex-wrap: wrap;
+
+		li {
+			list-style: none;
+		}
+
+		li.option,
+		li.simpleOption {
+			list-style: none;
+			justify-content: start;
+			align-self: center;
+			text-align: center;
+			padding: 20px;
+			font-weight: bold;
+			font-size: 16px;
+			cursor: pointer;
+
+			&:hover,
+			&.active {
+				border: 2px solid #5d5d5d;
+			}
+			&.disabled {
+				cursor: not-allowed !important;
+				pointer-events: none !important;
+				opacity: 0.5;
+			}
+		}
+		li.option {
+			min-width: 200px;
+			max-width: 250px;
+			flex-grow: 1;
+			border: 2px solid transparent;
+
+			img {
+				width: 50%;
+			}
+		}
+		li.simpleOption {
+			min-width: 100px;
+			border: 2px solid #ebebeb;
+			margin-right: 10px;
+			margin-bottom: 10px;
+		}
+	}
+
+	.react-select-box-container .react-select-box {
+		padding: 10px 15px;
+	}
+	label {
+		font-size: 14px;
+		margin-bottom: 10px;
+	}
+}
+
+.containerButtonBar {
+	padding-bottom: 20px !important;
+}
+
+.section-list .section-list-item {
+	min-height: 420px;
+
+	& {
+		padding: 20px 0px;
+		border: 1px solid lighten(#b2bec3, 5%);
+		border-radius: 4px;
+		margin-bottom: 20px;
+		position: relative;
+		font-size: 16px !important;
+	}
+
+	&,
+	.btn.btn-lightBg {
+		font-size: 0.9em;
+	}
+
+	.btn-close {
+		background-color: firebrick;
+		color: #fff;
+		position: absolute;
+		right: -10px;
+		top: -7px;
+		border: none;
+		font-weight: 700;
+		border-radius: 50%;
+		padding: 2px 7.2px;
+	}
+	.ad-image {
+		text-align: center;
+
+		img {
+			width: 80%;
+		}
+		p {
+			font-weight: bold;
+			margin: 10px 0px;
+		}
+	}
+	.ad-details {
+		font-size: 14px !important;
+		pre {
+			tab-size: 4;
+			white-space: pre-wrap;
+		}
+	}
+}
+
+.ad-tr:hover {
+	.ad-td .adDetails-icon {
+		visibility: visible;
+	}
+}
+
+.ad-td {
+	.adDetails-icon {
+		visibility: hidden;
+		cursor: pointer;
+	}
+	.action-button {
+		border: 1px solid rgb(0, 0, 0);
+		margin-right: 10px;
+		margin-bottom: 10px;
+		display: inline-block;
+		padding: 5px;
+		color: #000;
+
+		&:hover {
+			color: #fff;
+			font-weight: bold;
+			border-color: #eb575c;
+			background: #eb575c;
+		}
+	}
+}
+
+#edit-traffic-pagegroups {
+	padding: 0px !important;
+	.options {
+		margin: 0px !important;
+		padding: 0px !important;
+		ul {
+			li.simpleOption {
+				padding: 10px !important;
+			}
+		}
+	}
+}
+
+.bg-transparent {
+	background: transparent !important;
+}
+
+.custom-btn {
+	display: inline;
+	float: right;
+	margin: 10px 0px 0px 10px;
+}
+
+// Network Options Styling
+.CodeMirror {
+	transition: all 1s;
+}
+
+.codeEditor-small {
+	.CodeMirror {
+		height: 110px;
+	}
+}
+
+.codeEditor-large {
+	.CodeMirror {
+		height: 300px;
+	}
+}
+
+.containerButtonBar {
+	padding-bottom: 120px;
+	position: relative;
+	input[type='number'] {
+		width: 60px;
+	}
+	.row {
+		margin: 0px !important;
+	}
+	.networkOptionsRow {
+		width: 90%;
+		margin: 0px auto;
+		display: block;
+		z-index: 10;
+	}
+	.butttonsRow {
+		padding: $ESPadding 0 !important;
+		background: $ESBg;
+		position: absolute;
+		bottom: 0;
+		z-index: 3;
+		width: 100%;
+		border: 1px solid $MBButtonRowBorder;
+		border-radius: 0 0 3px 3px;
+	}
+	&.sectionOptions {
+		padding-bottom: 200px;
+	}
+}
+
+.list-heading {
+	border-bottom: 1px solid #ebebeb;
+	margin-bottom: 15px;
+}
+.information {
+	margin: 10px 0px;
+	.description {
+		font-size: 12px;
+		font-weight: lighter;
+		color: grey;
+	}
+}
+
+.custom-label {
+	background: $primaryColor;
+	font-size: 14px;
+	padding: 5px;
+}

@@ -5,6 +5,7 @@ const adpTagPublisher = require('../../../queueWorker/rabbitMQ/workers/adpTagAdS
 const adsensePublisher = require('../../../queueWorker/rabbitMQ/workers/adsenseAdSyncQueuePublisher');
 const siteConfigGenerationModule = require('./modules/siteConfigGeneration/index');
 const syncCdn = require('../cdnSyncService/index');
+const siteModelAPI = require('../../../models/siteModel');
 
 // No need for these wrapper functions. Can remove.
 function genieePublishWrapper(item) {
@@ -19,7 +20,7 @@ function adsensePublisherWrapper(item) {
 function publishToQueueWrapper(siteConfigItems, site) {
 	const response = {
 		empty: true,
-		message: 'ADS_SYNC_QUEUE_PUBLISH: No unsynced ads for site: ' + site.get('siteId')
+		message: `ADS_SYNC_QUEUE_PUBLISH: No unsynced ads for site: ${site.get('siteId')}`
 	};
 	const jobs = [];
 	if (!Object.keys(siteConfigItems).length) {
@@ -33,7 +34,9 @@ function publishToQueueWrapper(siteConfigItems, site) {
 		const genieeDFPUnsynced = !!(genieeDFP && genieeDFP.length);
 
 		genieeUnsynced ? _.forEach(geniee, item => jobs.push(genieePublishWrapper(item))) : null;
-		genieeDFPUnsynced ? _.forEach(genieeDFP, item => jobs.push(adpTagPublisherWrapper(genieeDFP))) : null;
+		genieeDFPUnsynced
+			? _.forEach(genieeDFP, item => jobs.push(adpTagPublisherWrapper(item)))
+			: null;
 		adpUnsynced ? jobs.push(adpTagPublisherWrapper(adp)) : null;
 		adsenseUnsynced ? jobs.push(adsensePublisherWrapper(adsense)) : null;
 
@@ -43,21 +46,30 @@ function publishToQueueWrapper(siteConfigItems, site) {
 			return Promise.resolve(response);
 		}
 
-		return Promise.all(jobs).then(() => {
-			return {
-				...response,
-				empty: false,
-				message: 'ADS_SYNC_QUEUE_PUBLISH: Successfully published ads into queue for site: ' + site.get('siteId')
-			};
-		});
+		return Promise.all(jobs).then(() => ({
+			...response,
+			empty: false,
+			message: `ADS_SYNC_QUEUE_PUBLISH: Successfully published ads into queue for site: ${site.get(
+				'siteId'
+			)}`
+		}));
 	}
 	return processing().then(response => (response.empty ? syncCdn(site) : response));
 }
+function publishWrapper(siteModel) {
+	return siteConfigGenerationModule
+		.generate(siteModel)
+		.then(siteConfigItems => publishToQueueWrapper(siteConfigItems, siteModel));
+}
 
 module.exports = {
-	publish: function(siteModel) {
-		return siteConfigGenerationModule
-			.generate(siteModel)
-			.then(siteConfigItems => publishToQueueWrapper(siteConfigItems, siteModel));
+	publish(site) {
+		const siteIdNum = parseInt(site, 10);
+		if (!isNaN(siteIdNum)) {
+			const siteId = siteIdNum.toString();
+			return siteModelAPI.getSiteById(siteId).then(siteModel => publishWrapper(siteModel));
+		}
+
+		return publishWrapper(site);
 	}
 };

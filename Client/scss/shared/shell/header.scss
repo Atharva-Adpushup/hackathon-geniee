@@ -1,0 +1,44 @@
+// Header
+.ap-page-header {
+	padding: 10px 15px;
+	display: flex;
+	color: $primaryColor;
+	background: #fff;
+	box-shadow: $boxShadowOne;
+	.nav-toggle {
+		font-size: 20px;
+		margin-right: 20px;
+		margin-top: 5px;
+		cursor: pointer;
+	}
+	.ap-logo {
+		font-size: 20px;
+		font-weight: bold;
+		line-height: 1.6em;
+		max-height: 33px;
+		> img {
+			height: 100%;
+		}
+	}
+	.header-nav {
+		margin-left: auto;
+		display: flex;
+		.change-user-form {
+			margin-right: 10px;
+			display: inline-flex;
+		}
+		.dropdown {
+			margin-left: auto;
+			&.open button,
+			button {
+				background: $primaryColor;
+				//border: 1px solid #e62930;
+				color: #fff;
+				&:active,
+				&:hover {
+					background: #e62930;
+				}
+			}
+		}
+	}
+}
