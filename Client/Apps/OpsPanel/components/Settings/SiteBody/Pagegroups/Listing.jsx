@@ -40,7 +40,8 @@ class Listing extends Component {
 	saveRegex = ({ name, extras }) => {
 		const { showNotification, updatePagegroupPattern } = this.props;
 		const { siteId, pageGroup, platform } = extras;
-		if (!name || !name.trim().length || name === DEFAULT_REGEX) {
+		const pattern = name.trim();
+		if (!pattern.length || pattern === DEFAULT_REGEX) {
 			return showNotification({
 				mode: 'error',
 				title: 'Invalid Value',
@@ -51,7 +52,7 @@ class Listing extends Component {
 		return updatePagegroupPattern(siteId, {
 			pageGroup,
 			platform,
-			pattern: name
+			pattern
 		});
 	};
 
