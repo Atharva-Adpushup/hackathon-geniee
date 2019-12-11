@@ -7,6 +7,7 @@
 		"clipboard-polyfill": "^2.3.0",
 		"clipboard.js": "^1.0.1",
 		"cssbeautify": "0.3.1",
+		"grunt": "^1.0.4",
 		"jquery": "^3.2.1",
 		"lodash": "^4.17.4",
 		"normalizr": "2.2.1",

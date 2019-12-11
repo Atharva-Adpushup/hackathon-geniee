@@ -5,10 +5,10 @@
 		- report_data, siteid, total_cpm, total_impressions, total_xpath_miss
 		(More fields can be fetched but schema needs to append accordingly)
 		
-		It joins three tables : ApexHourlySiteReport, ApexSectionReport, AdpTagReport
+		It joins three tables : ApexDailySiteReport, ApexSectionReport, AdpTagReport
 		Revenue from AdpTagReport
 		Impressions, Xpath_miss from ApexSectionReport
-		Siteid, Date from ApexHourlySiteReport  
+		Siteid, Date from ApexDailySiteReport  
 
 Select							WHERE						GROUP BY
 
@@ -23,7 +23,7 @@ total_impressions				section						section
 
 const SITE_TOP_URLS = `
 SELECT TOP @__count__ c.url, sum(b.count) AS 'count'
-FROM apexhourlysitereport a, apextopurlreport b, apextopurl c
+FROM ApexHourlySiteReport a, apextopurlreport b, apextopurl c
 WHERE a.axhsrid = b.axhsrid
 	AND b.axtuid = c.axtuid
 	AND report_date BETWEEN @__fromDate__ AND @__toDate__
@@ -83,7 +83,7 @@ const GLOBAL_METRICS_PERFORMANCE = `
 SELECT a.report_date, a.device_type, total_page_views, impressions, revenue
 FROM (
 SELECT report_date, device_type, sum(total_requests) AS total_page_views
-FROM ApexHourlySiteReport
+FROM ApexDailySiteReport
 WHERE report_date BETWEEN @__fromDate__ AND @__toDate__
 GROUP BY report_date, device_type
 ) a
@@ -100,7 +100,7 @@ const SITE_METRICS_PERFORMANCE = `
 SELECT a.report_date, a.device_type, total_page_views, impressions, revenue
 FROM (
 SELECT report_date, device_type, sum(total_requests) AS total_page_views
-FROM ApexHourlySiteReport
+FROM ApexDailySiteReport
 WHERE report_date BETWEEN @__fromDate__ AND @__toDate__
 AND siteid = @__siteId__
 GROUP BY report_date, device_type
@@ -117,7 +117,7 @@ ORDER BY report_date, device_type
 
 const GLOBAL_MODE_WISE_TRAFFIC_PERFORMANCE = `
 SELECT a.siteid, b.name as siteName, a.report_date, a.mode, sum(a.total_requests) as total_page_views
-FROM ApexHourlySiteReport a,  Site b
+FROM ApexDailySiteReport a,  Site b
 WHERE report_date BETWEEN @__fromDate__ AND @__toDate__
 AND a.siteid = b.siteid AND a.siteid > 25000
 GROUP BY a.report_date, a.mode, a.siteid, b.name
@@ -126,7 +126,7 @@ ORDER BY a.report_date, a.mode, sum(total_requests) DESC
 
 const SITE_MODE_WISE_TRAFFIC_PERFORMANCE = `
 SELECT a.siteid, b.name as siteName, a.report_date, a.mode, sum(a.total_requests) as total_page_views
-FROM ApexHourlySiteReport a,  Site b
+FROM ApexDailySiteReport a,  Site b
 WHERE report_date BETWEEN @__fromDate__ AND @__toDate__
 @__deviceTypeClause__
 AND a.siteid = @__siteId__
@@ -140,7 +140,7 @@ SELECT report_date, a.cid, country, total_page_views
 FROM (
 SELECT report_date, a.cid, NAME country, sum(total_requests) AS total_page_views
 ,ROW_NUMBER() OVER (PARTITION BY report_date ORDER BY sum(total_requests) DESC) AS rn
-FROM ApexHourlySiteReport a, country b
+FROM ApexDailySiteReport a, country b
 WHERE a.cid = b.cid AND report_date BETWEEN @__fromDate__ AND @__toDate__
 GROUP BY report_date, a.cid, NAME
 ) a
@@ -153,7 +153,7 @@ SELECT report_date, a.cid, country, total_page_views
 FROM (
 SELECT report_date, a.cid, NAME country, sum(total_requests) AS total_page_views
 ,ROW_NUMBER() OVER (PARTITION BY report_date ORDER BY sum(total_requests) DESC) AS rn
-FROM ApexHourlySiteReport a, country b
+FROM ApexDailySiteReport a, country b
 WHERE a.siteid = @__siteId__ AND a.cid = b.cid AND report_date BETWEEN @__fromDate__ AND @__toDate__
 GROUP BY report_date, a.cid, NAME
 ) a
@@ -165,7 +165,7 @@ const TOP_10_SITES_PERFORMANCE = `
 SELECT a.report_date, a.siteid, a.device_type, total_page_views, impressions, revenue, a.url, a.name, b.ntwid
 FROM (
 SELECT d.report_date, d.device_type, d.siteid, sum(d.total_requests) AS total_page_views, c.url, c.name
-FROM ApexHourlySiteReport d, Site c
+FROM ApexDailySiteReport d, Site c
 WHERE c.siteid = d.siteid AND d.report_date BETWEEN @__fromDate__ AND @__toDate__ AND d.siteid >= 25000
 GROUP BY d.report_date, d.siteid, c.url, c.name, d.device_type
 ) a
@@ -233,7 +233,7 @@ FROM (
 		SUM(c.total_requests) AS total_requests,
 		c.report_date,
 		c.siteid
-	FROM ApexHourlySiteReport c
+	FROM ApexDailySiteReport c
 	WHERE
 		c.report_date BETWEEN '2017-11-07' AND '2017-11-13'
 		AND c.siteid = 31000
@@ -333,11 +333,11 @@ const schema = {
 		where: ['mode'],
 		tables: {
 			apexSiteReport: {
-				table: 'ApexHourlySiteReport',
+				table: 'ApexDailySiteReport',
 				alias: 'c'
 			},
 			sectionReport: {
-				table: 'ApexSectionReport',
+				table: 'ApexDailySectionReport',
 				alias: 'd'
 			}
 		},

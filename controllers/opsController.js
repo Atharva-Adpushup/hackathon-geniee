@@ -42,11 +42,9 @@ router
 	.get(
 		[
 			'/',
-			'/liveSitesMapping',
 			'/couchbaseEditor',
 			'/getAllSites',
 			'/:siteId/panel',
-			'/sitesMapping',
 			'/settings/:siteId'
 		],
 		(req, res) => {

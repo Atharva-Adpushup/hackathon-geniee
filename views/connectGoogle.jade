@@ -1,66 +1,63 @@
-extends  layout/base
+//- extends  layout/base
 
-block getTitle
-    - var titleVar = "Connect Google"
+//- block getTitle
+//-     - var titleVar = "Connect Google"
 
-block append headScripts
-    script.
-        $(document).ready(function() {
-            $('#oauth').on('click', function() {
-                var x = screen.width / 2 - 700 / 2;
-                var y = screen.height / 2 - 450 / 2;
-                window.open("/user/requestOauth", 'Oauth Request', 'height=485,width=700,left=' + x + ',top=' + y);
-            });
+//- block append headScripts
+//-     script.
+//-         $(document).ready(function() {
+//-             $('#oauth').on('click', function() {
+//-                 var x = screen.width / 2 - 700 / 2;
+//-                 var y = screen.height / 2 - 450 / 2;
+//-                 window.open("/user/requestOauth", 'Oauth Request', 'height=485,width=700,left=' + x + ',top=' + y);
+//-             });
 
-            function oauthHook(event) {
-                var adsense = JSON.parse(event.data);
-                if(adsense.data) {
-                    $('#oauth').html('<span>Google Connected<span><i class="fa fa-check"></i>').css('pointer-events', 'none');
-                }
-                else {
-                    alert('Some error occurred! Please try again later.');
-                }
-            };
+//-             function oauthHook(event) {
+//-                 var adsense = JSON.parse(event.data);
+//-                 if(adsense.data) {
+//-                     $('#oauth').html('<span>Google Connected<span><i class="fa fa-check"></i>').css('pointer-events', 'none');
+//-                 }
+//-                 else {
+//-                     alert('Some error occurred! Please try again later.');
+//-                 }
+//-             };
 
-            window.addEventListener('message', oauthHook, false);
-        });
+//-             window.addEventListener('message', oauthHook, false);
+//-         });
 
-block bodyContent
-    include layout/sideBar
-    .pageContainer.page-container
-        include layout/header
-        // Page Content Starts Here
-        .pageContentWrapper.page-content
-            .pageContentInner.page-content--inner
-                .notification-wrapper
+//- block bodyContent
+//-     include layout/sideBar
+//-     .pageContainer.page-container
+//-         include layout/header
+//-         // Page Content Starts Here
+//-         .pageContentWrapper.page-content
+//-             .pageContentInner.page-content--inner
+//-                 .notification-wrapper
 
-                #widgetsArea.row
-                    .mb-30
-                        .controlAdpushupWrap
-                            h3.title.m-All-0.clearfix 
-                                a Connect Google
-                            .row
-                                .col-sm-3
-                                    img.img-responsive(src="/assets/images/onboarding/3.png" alt="Connect Google")
-                                .col-sm-9.mT-10
-                                    p.widget-text.mT-10.top
-                                        | Connecting your Google account with AdPushup helps us to access your inventory and reports for all Google services and manage them conviniently.
-                                    .mT-10
-                                        if !adNetworkSettings
-                                            button#oauth.btn.btn-lightBg.btn-default.widget-btn 
-                                                | Connect Google
-                                        else
-                                            button.btn.btn-lightBg.btn-default.widget-btn(style="pointer-events: none;") Google Connected 
-                                                i.fa.fa-check
+//-                 #widgetsArea.row
+//-                     .mb-30
+//-                         .controlAdpushupWrap
+//-                             h3.title.m-All-0.clearfix 
+//-                                 a Connect Google
+//-                             .row
+//-                                 .col-sm-3
+//-                                     img.img-responsive(src="/assets/images/onboarding/3.png" alt="Connect Google")
+//-                                 .col-sm-9.mT-10
+//-                                     p.widget-text.mT-10.top
+//-                                         | Connecting your Google account with AdPushup helps us to access your inventory and reports for all Google services and manage them conviniently.
+//-                                     .mT-10
+//-                                         if !adNetworIt looks like nothing was found at /user. Maybe try to SignUp.kSettings
+//-                                             button#oauth.btn.btn-lightBg.btn-default.widget-btn 
+//-                                                 | Connect Google
+//-                                         else
+//-                                             button.btn.btn-lightBg.btn-default.widget-btn(style="pointer-events: none;") Google Connected 
+//-                                                 i.fa.fa-check
                                     
-                                    //- if adNetworkSettings
-                                    //-     .pub-info
-                                    //-         p.widget-text 
-                                    //-             | Pub Id : 
-                                    //-             span.primary-text!= adNetworkSettings.pubId
-                                    //-         p.widget-text
-                                    //-             | Email : 
-                                    //-             != adNetworkSettings.email
-                                    
-
-               
+//-                                     //- if adNetworkSettings
+//-                                     //-     .pub-info
+//-                                     //-         p.widget-text 
+//-                                     //-             | Pub Id : 
+//-                                     //-             span.primary-text!= adNetworkSettings.pubId
+//-                                     //-         p.widget-text
+//-                                     //-             | Email : 
+//-                                     //-             != adNetworkSettings.email

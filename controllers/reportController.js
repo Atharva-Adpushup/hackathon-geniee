@@ -791,7 +791,7 @@ router
 	.get('/status', (req, res) => {
 		return request({
 			method: 'GET',
-			uri: `${commonConsts.REPORT_STATUS}?fromDate=${req.params.fromDate}&toDate=${req.params.toDate}&report=GETADPTAGREPORTSTATUS`
+			uri: `${commonConsts.REPORT_STATUS}?fromDate=${req.query.fromDate}&toDate=${req.query.toDate}&report=GETADPTAGREPORTSTATUS`
 		})
 			.then(result => {
 				return res.send(result);
