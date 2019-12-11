@@ -2,7 +2,7 @@
 extends layout/base
 
 block getTitle
-	- var titleVar = "Report"	
+	- var titleVar = "Report"
 
 block append headScripts
 	script.
@@ -30,8 +30,8 @@ block bodyContent
 				div(class="alert alert-success alert-dismissible" style="font-size:15px" role="alert")
 					button(type="button" class="close" data-dismiss="alert" aria-label="Close")
 						span(aria-hidden="true") &times;
-					strong  This report will only have data till 1st november. <a href="https://beta.adpushup.com/login?utm_source=console&utm_campaign=beta-test" target="_blank">Go to Beta by clicking <span style="color: #1e90ff; text-decoration: underline;">here</span></a>.
-			
+					strong  This report only shows data till 1st november. <a href="https://beta.adpushup.com/login?utm_source=console&utm_campaign=beta-test" target="_blank">To access latest reports go to main panel by clicking <span style="color: #1e90ff; text-decoration: underline;">here</span></a>.
+
 				#reportingPanel
 
 	script(src="/assets/js/builds/reportingPanel.js?v=1535557986333")
