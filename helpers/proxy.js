@@ -113,9 +113,49 @@ var request = require('request-promise'),
 
 			return parsedEntries;
 		},
-		verifyAdsTxt(url, ourAdsTxt) {
+
+		commonVerifyAdsTxt(ourAdsTxt, existingAdsTxtArr) {
 			let entriesNotFound = [],
 				entriesFound = [];
+			const ourAdsTxtArr = API.parseAdsTxtEntries(ourAdsTxt);
+
+			ourAdsTxtArr.forEach(({ domain, pubId, relation }) =>
+				existingAdsTxtArr.findIndex(
+					({ domain: domain1, pubId: pubId1, relation: relation1 }) =>
+						domain === domain1 && pubId === pubId1 && relation === relation1
+				) === -1
+					? entriesNotFound.push({ domain, pubId, relation })
+					: entriesFound.push({ domain, pubId, relation })
+			);
+
+			if (entriesNotFound.length) {
+				entriesNotFound = entriesNotFound.map(
+					({ domain, pubId, relation, authorityId }) =>
+						`${domain}, ${pubId}, ${relation}${authorityId ? `, ${authorityId}` : ''}`
+				);
+
+				entriesFound = entriesFound.map(
+					({ domain, pubId, relation, authorityId }) =>
+						`${domain}, ${pubId}, ${relation}${authorityId ? `, ${authorityId}` : ''}`
+				);
+
+				if (entriesNotFound.length == ourAdsTxtArr.length) {
+					throw new AdPushupError({
+						httpCode: 204,
+						error: 'Our Ads.txt entries not found.',
+						ourAdsTxt: entriesNotFound.join('\n')
+					});
+				} else {
+					throw new AdPushupError({
+						httpCode: 206,
+						error: 'Few of our Ads.txt entries not found',
+						ourAdsTxt: entriesNotFound.join('\n'),
+						presentEntries: entriesFound.join('\n')
+					});
+				}
+			}
+		},
+		verifyAdsTxt(url, ourAdsTxt) {
 			let tempUrl = url;
 			if (tempUrl.indexOf('http://') == -1 && tempUrl.indexOf('https://') == -1) {
 				tempUrl = `http://${tempUrl}`;
@@ -123,43 +163,8 @@ var request = require('request-promise'),
 			return API.load(`${utils.rightTrim(tempUrl, '/')}/ads.txt`).then(existingAdsTxt => {
 				if (typeof existingAdsTxt === 'string') {
 					const existingAdsTxtArr = API.parseAdsTxtEntries(existingAdsTxt);
-					const ourAdsTxtArr = API.parseAdsTxtEntries(ourAdsTxt);
 
-					ourAdsTxtArr.forEach(({ domain, pubId, relation }) =>
-						existingAdsTxtArr.findIndex(
-							({ domain: domain1, pubId: pubId1, relation: relation1 }) =>
-								domain === domain1 && pubId === pubId1 && relation === relation1
-						) === -1
-							? entriesNotFound.push({ domain, pubId, relation })
-							: entriesFound.push({ domain, pubId, relation })
-					);
-
-					if (entriesNotFound.length) {
-						entriesNotFound = entriesNotFound.map(
-							({ domain, pubId, relation, authorityId }) =>
-								`${domain}, ${pubId}, ${relation}${authorityId ? `, ${authorityId}` : ''}`
-						);
-
-						entriesFound = entriesFound.map(
-							({ domain, pubId, relation, authorityId }) =>
-								`${domain}, ${pubId}, ${relation}${authorityId ? `, ${authorityId}` : ''}`
-						);
-
-						if (entriesNotFound.length == ourAdsTxtArr.length) {
-							throw new AdPushupError({
-								httpCode: 204,
-								error: 'Our Ads.txt entries not found.',
-								ourAdsTxt: entriesNotFound.join('\n')
-							});
-						} else {
-							throw new AdPushupError({
-								httpCode: 206,
-								error: 'Few of our Ads.txt entries not found',
-								ourAdsTxt: entriesNotFound.join('\n'),
-								presentEntries: entriesFound.join('\n')
-							});
-						}
-					}
+					API.commonVerifyAdsTxt(ourAdsTxt, existingAdsTxtArr);
 				} else {
 					throw new AdPushupError({
 						httpCode: 404,
@@ -170,6 +175,19 @@ var request = require('request-promise'),
 				}
 			});
 		},
+
+		verifyActiveSitesAdsTxt(ourAdsTxt, existingAdsTxtArr) {
+			if (existingAdsTxtArr.length) API.commonVerifyAdsTxt(ourAdsTxt, existingAdsTxtArr);
+			else {
+				throw new AdPushupError({
+					httpCode: 404,
+					error:
+						'ads.txt file not found on your site. Please upload our ads.txt file on your site.',
+					ourAdsTxt
+				});
+			}
+		},
+
 		checkIfBillingProfileComplete(email) {
 			var tipaltiConfig = config.tipalti,
 				url = tipaltiConfig.soapUrl,

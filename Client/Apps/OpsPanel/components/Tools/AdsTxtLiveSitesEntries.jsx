@@ -1,5 +1,18 @@
 import React, { Component, Fragment } from 'react';
-import { FormGroup, ControlLabel, FormControl } from 'react-bootstrap';
+import {
+	FormGroup,
+	ControlLabel,
+	FormControl,
+	PanelGroup,
+	Panel,
+	Badge,
+	Col,
+	Row,
+	Table
+} from 'react-bootstrap';
+import { CSVLink } from 'react-csv';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import omit from 'lodash/omit';
 
 import FieldGroup from '../../../../Components/Layout/FieldGroup';
 import { ADS_TXT_LIVE_SITES_ENTRIES } from '../../configs/commonConsts';
@@ -9,9 +22,7 @@ import axiosInstance from '../../../../helpers/axiosInstance';
 
 const DEFAULT_STATE = {
 	siteId: '',
-	emailId: '',
 	adsTxtSnippet: '',
-	currentSelectedEntry: null,
 	isLoading: false
 };
 
@@ -21,6 +32,9 @@ class AdsTxtLiveSitesEntries extends Component {
 
 		this.state = {
 			isLoading: false,
+			adsTxtData: [],
+			currentSelectedEntry: null,
+			activeKey: null,
 			...DEFAULT_STATE
 		};
 	}
@@ -35,13 +49,18 @@ class AdsTxtLiveSitesEntries extends Component {
 		this.setState({ [key]: value });
 	};
 
+	handleSelectAccordian = (value = null) => {
+		this.setState({
+			activeKey: value
+		});
+	};
+
 	handleReset = () => this.setState(DEFAULT_STATE);
 
-	handleGenerate = e => {
-		e.preventDefault();
-		const { emailId, currentSelectedEntry, siteId, adsTxtSnippet } = this.state;
+	handleGenerate = () => {
+		const { currentSelectedEntry, siteId, adsTxtSnippet } = this.state;
 
-		const isValid = !!(emailId && currentSelectedEntry);
+		const isValid = !!currentSelectedEntry;
 		const { showNotification } = this.props;
 
 		if (!isValid) {
@@ -54,46 +73,102 @@ class AdsTxtLiveSitesEntries extends Component {
 		}
 
 		return axiosInstance
-			.post('/ops/adsTxtLiveEntries', {
+			.post('/adsTxt/adsTxtLiveEntries', {
 				siteId,
-				emailId,
 				currentSelectedEntry,
 				adsTxtSnippet
 			})
 			.then(res => {
 				const { data } = res.data;
-				if (!siteId || data.map(val => val.siteId).includes(parseInt(siteId))) {
-					showNotification({
-						mode: 'success',
-						title: 'Success',
-						message: `Email will be sent to ${emailId} within 30 minutes. If you don't see the email in inbox ,please check the spam folder`,
-						autoDismiss: 5
-					});
-					this.setState({ isLoading: false }, this.handleReset);
-				} else
-					showNotification({
-						mode: 'error',
-						title: 'Operation Failed',
-						message: 'Please Enter Active Site Id',
-						autoDismiss: 5
-					});
+				this.setState({ isLoading: false, adsTxtData: data }, this.handleReset);
+				return showNotification({
+					mode: 'success',
+					title: 'Success',
+					message: `Please expand the accordian below to check the entries`,
+					autoDismiss: 5
+				});
 			})
 			.catch(err => {
 				showNotification({
 					mode: 'error',
 					title: 'Operation Failed',
-					message: 'failed',
+					message: 'You are probably not entering the active Site Id',
 					autoDismiss: 5
 				});
 
 				this.setState({ isLoading: false });
 			});
 	};
-	render() {
-		const { siteId, emailId, currentSelectedEntry, adsTxtSnippet, isLoading } = this.state;
 
+	renderPanel() {
+		const { activeKey, adsTxtData, currentSelectedEntry } = this.state;
+
+		let adsData = Array.isArray(adsTxtData) ? adsTxtData : [adsTxtData];
 		return (
-			<form onSubmit={this.handleGenerate}>
+			<PanelGroup accordion id="sites" activeKey={activeKey} onSelect={this.handleSelectAccordian}>
+				<Panel eventKey="Ads.txt Entries">
+					<Panel.Heading>
+						<Panel.Title toggle>
+							Ads.txt Entries <Badge>{adsData.length}</Badge>
+						</Panel.Title>
+					</Panel.Heading>
+					{activeKey === 'Ads.txt Entries' ? (
+						<Table striped bordered hover>
+							<thead>
+								<tr>
+									<th>Site Id</th>
+									<th>Doamin</th>
+									<th>Account Email</th>
+									<th>{currentSelectedEntry} </th>
+								</tr>
+							</thead>
+							<tbody>
+								{adsData.map(val => (
+									<tr key={val.siteId}>
+										<td>{val.siteId}</td>
+										<td>{val.domain}</td>
+										<td>{val.accountEmail}</td>
+										<td>
+											<pre>
+												{currentSelectedEntry === 'All Entries Present' ||
+												val.status === 1 ||
+												val.status === 2 ||
+												val.status === 4
+													? val.message
+													: val.adsTxtEntries}
+											</pre>
+										</td>
+									</tr>
+								))}
+							</tbody>
+						</Table>
+					) : null}
+				</Panel>
+			</PanelGroup>
+		);
+	}
+
+	render() {
+		const { siteId, currentSelectedEntry, adsTxtSnippet, isLoading, adsTxtData } = this.state;
+		const csvData =
+			currentSelectedEntry === 'All Entries Present'
+				? adsTxtData.map(data => omit(data, ['status', 'adsTxtEntries']))
+				: adsTxtData.map(data => omit(data, ['status']));
+		console.log(csvData);
+		return (
+			<div>
+				<Row>
+					<CSVLink data={csvData} filename="ads-txt.csv">
+						<CustomButton
+							variant="primary"
+							className="btn btn-lightBg btn-default btn-blue-line pull-right u-margin-r3  "
+						>
+							<FontAwesomeIcon size="1x" icon="download" className="u-margin-r3" />
+							Export Entries
+						</CustomButton>
+					</CSVLink>
+				</Row>
+
 				<Fragment>
 					<p className="u-text-bold">Type Of Entries *</p>
 					<SelectBox
@@ -131,17 +206,6 @@ class AdsTxtLiveSitesEntries extends Component {
 					className="u-padding-v4 u-padding-h4"
 				/>
 
-				<FieldGroup
-					name="emailId"
-					value={emailId}
-					type="email"
-					label="Email Id *"
-					onChange={this.handleChange}
-					size={6}
-					id="emailId-input"
-					placeholder="Email Id"
-					className="u-padding-v4 u-padding-h4"
-				/>
 				<CustomButton
 					variant="secondary"
 					className="pull-right u-margin-r3"
@@ -154,10 +218,15 @@ class AdsTxtLiveSitesEntries extends Component {
 					variant="primary"
 					className="pull-right u-margin-r3"
 					showSpinner={isLoading}
+					onClick={this.handleGenerate}
 				>
 					Generate
 				</CustomButton>
-			</form>
+
+				<Col xs={12} className="u-margin-t4 u-padding-l0">
+					{this.renderPanel()}
+				</Col>
+			</div>
 		);
 	}
 }

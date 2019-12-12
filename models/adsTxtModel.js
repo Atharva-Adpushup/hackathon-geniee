@@ -1,20 +1,11 @@
 module.exports = apiModule();
 
-const { N1qlQuery } = require('couchbase');
-const request = require('request-promise');
 const model = require('../helpers/model');
 const couchbase = require('../helpers/couchBaseService');
-
 const AdPushupError = require('../helpers/AdPushupError');
-const siteModel = require('./siteModel');
-const userModel = require('./userModel');
-const channelModel = require('./channelModel');
-const commonConsts = require('../configs/commonConsts');
-
-const commonFunctions = require('../helpers/commonFunctions');
-
-const config = require('../configs/config');
 const { docKeys } = require('../configs/commonConsts');
+const siteModel = require('./siteModel');
+const proxy = require('../helpers/proxy');
 
 const AdsTxt = model.extend(function() {
 	this.keys = ['siteId', 'domain', 'accountEmail', 'adsTxt'];
@@ -55,6 +46,107 @@ function apiModule() {
 				.connectToAppBucket()
 				.then(appBucket => appBucket.getAsync(`${docKeys.adsTxt}${siteId}`))
 				.then(({ value, cas }) => new AdsTxt(value, cas));
+		},
+
+		getAdsTxtEntries(siteId, adsTxtSnippet, currentSelectedEntry) {
+			const ourAdsTxt = proxy.fetchOurAdsTxt();
+
+			function adsTxtProcessing(adsTxtData) {
+				const { accountEmail, adsTxt, domain, siteId } = adsTxtData;
+				let commonOutput = {
+					domain,
+					siteId,
+					accountEmail
+				};
+				return ourAdsTxt
+					.then(ourAdsTxtEntries =>
+						proxy.verifyActiveSitesAdsTxt(
+							(ourAdsTxtEntries = adsTxtSnippet ? adsTxtSnippet : ourAdsTxtEntries),
+							adsTxt
+						)
+					)
+					.then(() => ({
+						status: 1,
+						message: 'All Entries Available',
+						...commonOutput
+					}))
+					.catch(err => {
+						if (err instanceof AdPushupError) {
+							const {
+								message: { httpCode = 404, ourAdsTxt, presentEntries }
+							} = err;
+							let output = null;
+
+							switch (httpCode) {
+								case 204:
+									output = {
+										status: 2,
+										message: "Our Ads.txt entries not found in publisher's ads.txt",
+										...commonOutput
+									};
+									break;
+								case 206:
+									if (currentSelectedEntry === 'Missing Entries')
+										output = {
+											status: 3,
+											message: "Some entries not found in publisher's ads.txt",
+											adsTxtEntries: ourAdsTxt,
+											...commonOutput
+										};
+									else if (currentSelectedEntry === 'Present Entries')
+										output = {
+											status: 3,
+											message: "Present entries found in publisher's ads.txt",
+											adsTxtEntries: presentEntries,
+											...commonOutput
+										};
+									else
+										output = {
+											status: 3,
+											message: 'All Ads.txt Entries Not Present For this site',
+											adsTxtEntries: ourAdsTxt,
+											...commonOutput
+										};
+
+									break;
+								default:
+								case 404:
+									output = {
+										status: 4,
+										message: "Publisher's ads.txt not found",
+										...commonOutput
+									};
+									break;
+							}
+
+							return Promise.resolve(output);
+						}
+						return Promise.reject(err);
+					});
+			}
+
+			return siteModel
+				.getActiveSites()
+				.then(sites => {
+					if (!siteId) {
+						const sitesPromises = sites.map(site =>
+							API.getAdsTxtBySite(site.siteId).then(({ data }) => {
+								return adsTxtProcessing(data);
+							})
+						);
+
+						return Promise.all(sitesPromises);
+					}
+
+					return API.getAdsTxtBySite(siteId).then(({ data }) => {
+						return adsTxtProcessing(data);
+					});
+				})
+
+				.catch(err => {
+					console.log(err);
+					throw new AdPushupError('Something went wrong');
+				});
 		}
 	};
 	return API;
