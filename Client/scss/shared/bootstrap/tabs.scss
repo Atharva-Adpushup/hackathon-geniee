@@ -1,0 +1,59 @@
+// Custom tab styles
+
+.nav-tabs {
+	padding: 0;
+	font-size: 1em;
+	margin-bottom: 10px;
+	border-bottom: none;
+
+	li {
+		a {
+			font-size: 1.15em;
+			padding: 10px;
+			display: inline-block;
+			margin-right: 30px;
+			border: none;
+			border-radius: 0;
+			border-bottom: 3px solid transparent;
+
+			&:hover {
+				background: none;
+				border-color: $borderColor;
+			}
+		}
+
+		&:after {
+			content: '|';
+			position: relative;
+			left: -15px;
+			color: #999;
+		}
+		&:last-child:after {
+			content: '';
+		}
+
+		&.active {
+			a,
+			a:hover,
+			a:focus {
+				border: none;
+				background: none;
+				pointer-events: none;
+			}
+
+			a {
+				border-bottom: 3px solid $primaryColor;
+
+				.svg-inline--fa {
+					pointer-events: all;
+				}
+			}
+
+			a:hover,
+			a:focus {
+				border-bottom: 3px solid $primaryColor;
+				border-color: $primaryColor;
+			}
+		}
+	}
+}

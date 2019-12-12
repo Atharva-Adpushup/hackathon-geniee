@@ -1,0 +1,14 @@
+.ap-modal {
+	.modal-header {
+		background: $primaryColor;
+		color: $whiteColor;
+
+		.close {
+			color: $whiteColor;
+			opacity: 0.9;
+		}
+	}
+	.modal-footer {
+		background: $dashboardBgColor;
+	}
+}

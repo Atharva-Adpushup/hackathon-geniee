@@ -7,11 +7,16 @@ var browserConfig = require('./browserConfig.js'),
 
 module.exports = {
 	log: function() {
-		var queryParams = this.getQueryParams();
-		var isQueryParams = !!(queryParams && $.isPlainObject(queryParams) && !$.isEmptyObject(queryParams)),
+		var queryParams = this.queryParams;
+		var isQueryParams = !!(
+				queryParams &&
+				$.isPlainObject(queryParams) &&
+				!$.isEmptyObject(queryParams)
+			),
 			isapDebugParam = !!(isQueryParams && queryParams.apDebug);
 
-		if (typeof console !== 'undefined' && console.log && isapDebugParam) console.log.apply(console, arguments);
+		if (typeof console !== 'undefined' && console.log && isapDebugParam)
+			console.log.apply(console, arguments);
 	},
 	base64Encode: function(data) {
 		return Base64.btoa(data);
@@ -262,7 +267,9 @@ module.exports = {
 				siteDomain: adpConfig.siteDomain,
 				url: adpConfig.pageUrl,
 				mode: data.mode, // Denotes which mode is running (adpushup or fallback)
-				errorCode: data.eventType, // Denotes the error code (no error, pagegroup not found etc.)
+				//errorCode: data.eventType, // Denotes the error code (no error, pagegroup not found etc.)
+				errorCode: data.errorCode, // Denotes the error code (no error, pagegroup not found etc.)
+				referrer: adpConfig.referrer,
 				pageGroup: adpConfig.pageGroup,
 				pageVariationId: adpConfig.selectedVariation,
 				pageVariationName: adpConfig.selectedVariationName,
@@ -349,21 +356,49 @@ module.exports = {
 	rightTrim: function(string, s) {
 		return string ? string.replace(new RegExp(s + '*$'), '') : '';
 	},
-	domanize: function(domain) {
-		return domain
-			? this.rightTrim(
-					domain
-						.replace('http://', '')
-						.replace('https://', '')
-						.replace('www.', ''),
-					'/'
-			  )
-			: '';
+
+	isInCrossDomainIframe: function() {
+		try {
+			window.top.location.toString();
+		} catch (err) {
+			return true;
+		}
+
+		return false;
 	},
-	isUrlMatching: function() {
-		var config = window.adpushup.config,
-			url = this.domanize(config.siteDomain);
-		return window.location.href.indexOf(url) !== -1 ? true : false;
+	getTopWindowHref: function() {
+		if (this.isInCrossDomainIframe()) {
+			return document.referrer;
+		}
+		return window.location.href;
+	},
+	domanize: function(domain) {
+		if (domain) {
+			var hostname = this.rightTrim(
+				domain
+					.replace('http://', '')
+					.replace('https://', '')
+					.replace('www.', ''),
+				'/'
+			);
+			var indexOfFirstSlash = hostname.indexOf('/');
+			indexOfFirstSlash = indexOfFirstSlash !== -1 ? indexOfFirstSlash : hostname.length;
+			hostname = hostname.substring(0, indexOfFirstSlash);
+			return hostname;
+		} else {
+			return '';
+		}
+	},
+	isUrlMatching: function(siteDomain) {
+		var url = siteDomain || window.adpushup.config.siteDomain,
+			href = '';
+		try {
+			href = window.top.location.toString();
+		} catch (err) {
+			href = this.getTopWindowHref();
+		}
+		url = this.domanize(url);
+		return href.indexOf(url) !== -1 ? true : false;
 	},
 	getObjectByName: function(collection, name) {
 		var isInCollection = false,
@@ -473,7 +508,13 @@ module.exports = {
 	getInteractiveAds: function(config) {
 		var ads = [];
 
-		if (config && config.experiment && config.platform && config.pageGroup && config.selectedVariation) {
+		if (
+			config &&
+			config.experiment &&
+			config.platform &&
+			config.pageGroup &&
+			config.selectedVariation
+		) {
 			var variations = config.experiment[config.platform][config.pageGroup].variations,
 				selectedVariation = config.selectedVariation;
 			variations.forEach(function(variation) {
@@ -492,7 +533,8 @@ module.exports = {
 	filterInteractiveAds: function(ads, isInnovative, channel) {
 		return ads && ads.length
 			? ads.filter(function(ad) {
-					var channelValid = isInnovative && ad.pagegroups ? ad.pagegroups.indexOf(channel) !== -1 : true;
+					var channelValid =
+						isInnovative && ad.pagegroups ? ad.pagegroups.indexOf(channel) !== -1 : true;
 					return channelValid && ad.formatData && ad.formatData.event;
 			  })
 			: [];
@@ -523,7 +565,10 @@ module.exports = {
 		} else if (finalTop > 0 && adTop > viewPort.top && adTop < viewPort.bottom) {
 			return { inViewHeight: $el.height() + finalBottom };
 		} else if (threshhold) {
-			return Math.abs(adTop - viewPort.bottom) <= threshhold || Math.abs(adBottom - viewPort.top) <= threshhold;
+			return (
+				Math.abs(adTop - viewPort.bottom) <= threshhold ||
+				Math.abs(adBottom - viewPort.top) <= threshhold
+			);
 		}
 		return false;
 	},

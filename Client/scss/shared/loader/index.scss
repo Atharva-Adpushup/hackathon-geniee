@@ -1,0 +1,162 @@
+//Loader ($LO)
+$LOSpinBeforeHeiWidth: 100px;
+$LOSpinSmallBeforeHeiWidth: 50px;
+$LOSpinBeforeBorderWid: 5px;
+
+@include keyframes(spinner) {
+	to {
+		@include transform(rotate(360deg));
+	}
+}
+.spinner {
+	min-width: 30px;
+	min-height: 30px;
+	&::before {
+		content: 'Loading�';
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: $LOSpinBeforeHeiWidth;
+		height: $LOSpinBeforeHeiWidth;
+		margin-top: -50px;
+		margin-left: -50px;
+	}
+	&:not(:required):before {
+		content: '';
+		@include border-radius(50%);
+		border: $LOSpinBeforeBorderWid solid $whiteColor;
+		border-top-color: $primaryColor;
+		@include animation(spinner 0.7s linear infinite);
+		z-index: 5;
+	}
+}
+.spinner-small {
+	min-width: 30px;
+	min-height: 30px;
+	&::before {
+		content: 'Loading�';
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: $LOSpinSmallBeforeHeiWidth;
+		height: $LOSpinSmallBeforeHeiWidth;
+		margin-top: -25px;
+		margin-left: -25px;
+	}
+	&:not(:required):before {
+		content: '';
+		@include border-radius(50%);
+		border: $LOSpinBeforeBorderWid solid $whiteColor;
+		border-top-color: $primaryColor;
+		@include animation(spinner 0.7s linear infinite);
+		z-index: 5;
+	}
+}
+.loader-container {
+	position: relative;
+}
+.loaderwrapper {
+	background: rgba(0, 0, 0, 0.2);
+	height: 100%;
+	position: absolute;
+	width: 100%;
+	z-index: 999;
+
+	&.loaderwrapper--fixed {
+		background: rgba(235, 87, 92, 0.7);
+		bottom: 0;
+		left: 0;
+		position: fixed !important;
+		right: 0;
+		top: 0;
+
+		> .loaderwrapper-text {
+			color: #fff;
+			font-size: 1.6em;
+			font-weight: bold;
+			left: 43%;
+			position: absolute;
+			top: 59%;
+		}
+	}
+
+	img {
+		margin-left: -55px;
+		margin-top: -45px;
+		left: 50%;
+		position: absolute;
+		top: 50%;
+		z-index: 4;
+	}
+}
+
+/*Loader Bar CSS*/
+#nprogress {
+	pointer-events: none;
+	z-index: 999999;
+}
+#nprogress .bar {
+	background: $LBBgColor;
+	z-index: 999999;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: $LBHeight;
+}
+/* Fancy blur effect */
+#nprogress .peg {
+	display: block;
+	position: absolute;
+	right: 0px;
+	width: 100px;
+	height: 100%;
+	box-shadow: 0 0 10px $LBBgColor, 0 0 5px $LBBgColor;
+	@include opacity(1);
+	-webkit-transform: rotate(3deg) translate(0px, -4px);
+	-ms-transform: rotate(3deg) translate(0px, -4px);
+	transform: rotate(3deg) translate(0px, -4px);
+}
+
+/* Remove these to get rid of the spinner */
+#nprogress .spinner {
+	display: block;
+	position: fixed;
+	z-index: 999999;
+	top: $LBSpinnerPosition;
+	right: $LBSpinnerPosition;
+}
+#nprogress .spinner:before {
+	display: none;
+}
+
+#nprogress .spinner-icon {
+	width: $LBSpinnerHeightWidth;
+	height: $LBSpinnerHeightWidth;
+	box-sizing: border-box;
+
+	border: solid 3px transparent;
+	border-top-color: $LBBgColor;
+	border-left-color: $LBBgColor;
+	border-radius: 50%;
+
+	-webkit-animation: nprogress-spinner 400ms linear infinite;
+	animation: nprogress-spinner 400ms linear infinite;
+}
+
+@-webkit-keyframes nprogress-spinner {
+	0% {
+		-webkit-transform: rotate(0deg);
+	}
+	100% {
+		-webkit-transform: rotate(360deg);
+	}
+}
+@keyframes nprogress-spinner {
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
+}

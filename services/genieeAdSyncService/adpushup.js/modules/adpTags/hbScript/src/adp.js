@@ -1,8 +1,10 @@
-// Module with reference to the global adpushup object
+// Adpushup namespace reference
 
-var adp = window.adpushup;
-
-module.exports = {
-	adp: adp,
-	$: adp.$
+var adp = {
+	config: window.adpushup.config,
+	utils: window.adpushup.utils,
+	$: window.adpushup.$,
+	session: window.adpushup.session
 };
+
+module.exports = adp;

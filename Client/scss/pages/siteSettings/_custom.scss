@@ -1,0 +1,26 @@
+.layout-uiList input[type='text'] {
+	height: 36px;
+}
+
+.list-group-item {
+	border: none;
+	border-bottom: 1px solid $borderColor;
+	border-radius: 0;
+	box-shadow: none;
+
+	&.is-active {
+		border: none;
+		border-bottom: 1px solid $borderColor;
+		border-radius: 0;
+		box-shadow: none;
+		color: $primaryColor;
+	}
+}
+
+.wrapper {
+	&.wrapper--blocklist {
+		max-height: ($designDimensionSM * 60);
+		overflow: $hidden;
+		overflow-y: $auto;
+	}
+}

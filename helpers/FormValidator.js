@@ -1,18 +1,22 @@
 /* Data input validation library */
 
-var validator = require('validator'),
-	Promise = require('bluebird'),
-	AdPushupError = require('../helpers/AdPushupError'),
-	utils = require('./utils');
+const validator = require('validator');
+
+const Promise = require('bluebird');
+
+const AdPushupError = require('../helpers/AdPushupError');
+
+const utils = require('./utils');
 
 module.exports = {
-	validate: function(json, rules, comparison) {
-		var errors = [],
-			sampleUrlForced = json.sampleUrlForced;
+	validate(json, rules, comparison) {
+		const errors = [];
 
-		Object.keys(json).map(function(key) {
-			Object.keys(rules).map(function(validation) {
-				rules[validation].forEach(function(rule) {
+		const sampleUrlForced = json.sampleUrlForced;
+
+		Object.keys(json).map(key => {
+			Object.keys(rules).map(validation => {
+				rules[validation].forEach(rule => {
 					if (rule.name === key) {
 						switch (validation) {
 							case 'isNull':
@@ -28,6 +32,9 @@ module.exports = {
 									? errors.push({ message: rule.message, status: rule.status })
 									: '';
 								break;
+							case 'isBoolean':
+								if (!validator.isBoolean(json[key])) errors[key] = rule.message;
+								break;
 							case 'isSameDomain':
 								if (!sampleUrlForced) {
 									if (
@@ -38,15 +45,23 @@ module.exports = {
 											? errors.push({ message: rule.message, status: rule.status })
 											: '';
 									}
-									break;
 								}
+								break;
+							case 'isEmail':
+								if (!validator.isEmail(json[key], rule.value))
+									errors.push({ message: rule.message, status: rule.status });
+								break;
+							case 'isLength':
+								if (!validator.isLength(json[key], rule.value))
+									errors.push({ message: rule.message, status: rule.status });
+								break;
 						}
 					}
 				});
 			});
 		});
 
-		return new Promise(function(resolve, reject) {
+		return new Promise((resolve, reject) => {
 			if (errors.length) {
 				throw new AdPushupError(errors);
 			}

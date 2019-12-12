@@ -3,7 +3,8 @@ const Promise = require('bluebird');
 const PromiseFtp = require('promise-ftp');
 const _ = require('lodash');
 const uglifyJS = require('uglify-js');
-const { getReportData, getMediationData } = require('../../../reports/universal/index');
+
+const getReportData = require('../../../reports/universal/index');
 const mkdirpAsync = Promise.promisifyAll(require('mkdirp')).mkdirpAsync;
 const fs = Promise.promisifyAll(require('fs'));
 const CC = require('../../../configs/commonConsts');
@@ -13,22 +14,22 @@ const config = require('../../../configs/config');
 const generateStatusesAndConfig = require('./generateConfig');
 const bundleGeneration = require('./bundleGeneration');
 const prebidGeneration = require('./prebidGeneration');
-const prodEnv = config.environment.HOST_ENV === 'production';
+const isNotProduction =
+	config.environment.HOST_ENV === 'development' || config.environment.HOST_ENV === 'staging';
 const request = require('request-promise');
-const disableSiteCdnSyncList = [38333];
+const disableSiteCdnSyncList = [38333, 39468];
 // NOTE: Above 'disableSiteCdnSyncList' array is added to prevent site specific JavaScript CDN sync
 // as custom generated Javascript files will replace their existing live files for new feature testing purposes.
 // Websites: autocarindia (38333, It is running adpushup lite for which script is uploaded to CDN manually, for now)
 const ieTestingSiteList = [38903]; // iaai.com
 
-module.exports = function(site, externalData = {}) {
+module.exports = function(site, user) {
 	ftp = new PromiseFtp();
 
 	var paramConfig = {
 			siteId: site.get('siteId')
 		},
 		noop = 'function() {}',
-		isExternalRequest = externalData && Object.keys(externalData).length && externalData.externalRequest,
 		isAutoOptimise = !!(site.get('apConfigs') && site.get('apConfigs').autoOptimise),
 		poweredByBanner = !!(site.get('apConfigs') && site.get('apConfigs').poweredByBanner),
 		tempDestPath = path.join(
@@ -44,11 +45,14 @@ module.exports = function(site, externalData = {}) {
 			site.get('siteId').toString()
 		),
 		setAllConfigs = function(combinedConfig) {
+			let apps = site.get('apps');
 			let apConfigs = site.get('apConfigs');
+			const adServerSettings = user.get('adServerSettings');
 			let isAdPartner = !!site.get('partner');
-			let { experiment, adpTagsConfig, manualAds, innovativeAds, isLegacyInnovativeAds } = combinedConfig;
+			let { experiment, adpTagsConfig, manualAds, innovativeAds } = combinedConfig;
 
 			isAdPartner ? (apConfigs.partner = site.get('partner')) : null;
+
 			apConfigs.autoOptimise = isAutoOptimise ? true : false;
 			apConfigs.poweredByBanner = poweredByBanner ? true : false;
 			apConfigs.siteDomain = site.get('siteDomain');
@@ -56,14 +60,17 @@ module.exports = function(site, externalData = {}) {
 			apConfigs.spaPageTransitionTimeout = apConfigs.spaPageTransitionTimeout
 				? apConfigs.spaPageTransitionTimeout
 				: 0;
-			apConfigs.activeDFPNetwork = apConfigs.activeDFPNetwork ? apConfigs.activeDFPNetwork : null;
-			apConfigs.manualModeActive = site.get('isManual') && manualAds && manualAds.length ? true : false;
-			apConfigs.innovativeModeActive =
-				(site.get('isInnovative') && innovativeAds && innovativeAds.length) || isLegacyInnovativeAds
-					? true
-					: false;
+			apConfigs.activeDFPNetwork = adServerSettings && adServerSettings.dfp && adServerSettings.dfp.activeDFPNetwork || null;
+
+			apConfigs.manualModeActive = !!(apps.apTag && manualAds && manualAds.length);
+			apConfigs.innovativeModeActive = !!(
+				apps.innovativeAds &&
+				innovativeAds &&
+				innovativeAds.length
+			);
+
 			// Default 'draft' mode is selected if config mode is not present
-			apConfigs.mode = !apConfigs.mode ? 2 : apConfigs.mode;
+			apConfigs.mode = apps.layout && apConfigs.mode ? apConfigs.mode : 2;
 
 			apConfigs.manualModeActive ? (apConfigs.manualAds = manualAds || []) : null;
 			apConfigs.innovativeModeActive ? (apConfigs.innovativeAds = innovativeAds || []) : null;
@@ -73,16 +80,20 @@ module.exports = function(site, externalData = {}) {
 
 			return { apConfigs, adpTagsConfig };
 		},
-		generateCombinedJson = (experiment, adpTags, manualAds, innovativeAds, isLegacyInnovativeAds) => {
+		generateCombinedJson = (experiment, adpTags, manualAds, innovativeAds) => {
 			if (!(Array.isArray(adpTags) && adpTags.length)) {
-				return { experiment, adpTagsConfig: false, manualAds, innovativeAds, isLegacyInnovativeAds };
+				return {
+					experiment,
+					adpTagsConfig: false,
+					manualAds,
+					innovativeAds
+				};
 			}
 			return generateADPTagsConfig(adpTags, site.get('siteId')).then(adpTagsConfig => ({
 				adpTagsConfig,
 				experiment,
 				manualAds,
-				innovativeAds,
-				isLegacyInnovativeAds
+				innovativeAds
 			}));
 		},
 		generateFinalInitScript = jsFile => {
@@ -90,8 +101,15 @@ module.exports = function(site, externalData = {}) {
 				addService: (serviceName, isActive, serviceConfig = {}) => {
 					switch (serviceName) {
 						case CC.SERVICES.ADPTAGS:
+							var prebidConfig = serviceConfig.prebidConfig;
+							var inventory = Object.assign({}, serviceConfig);
+							delete inventory.prebidConfig;
+							delete inventory.dateCreated;
+							delete inventory.dateModified;
+							delete inventory.siteId;
 							if (isActive) {
-								jsFile = _.replace(jsFile, '__INVENTORY__', JSON.stringify(serviceConfig));
+								jsFile = _.replace(jsFile, '__INVENTORY__', JSON.stringify(inventory));
+								jsFile = _.replace(jsFile, '__PREBID_CONFIG__', JSON.stringify(prebidConfig));
 								jsFile = _.replace(jsFile, '__SITE_ID__', site.get('siteId'));
 							}
 							return generateFinalInitScript(jsFile);
@@ -131,10 +149,7 @@ module.exports = function(site, externalData = {}) {
 			};
 		},
 		getComputedConfig = () => {
-			function getData() {
-				return isExternalRequest ? getMediationData(site, externalData) : getReportData(site);
-			}
-			return getData()
+			return getReportData(site)
 				.then(reportData => {
 					if (reportData.status && reportData.data) {
 						return generateAdPushupConfig(site, reportData.data);
@@ -145,7 +160,9 @@ module.exports = function(site, externalData = {}) {
 				.then(setAllConfigs);
 		},
 		getConfigWrapper = site => {
-			return getComputedConfig().then(computedConfig => generateStatusesAndConfig(site, computedConfig));
+			return getComputedConfig().then(computedConfig =>
+				generateStatusesAndConfig(site, computedConfig)
+			);
 		},
 		getFinalConfig = () => {
 			return getConfigWrapper(site)
@@ -226,34 +243,29 @@ module.exports = function(site, externalData = {}) {
 			});
 		},
 		uploadJS = function(fileConfig) {
-			var siteId = site.get('siteId');
-			var shouldJSCdnSyncBeDisabled = !!(disableSiteCdnSyncList.indexOf(siteId) > -1);
-			var isStaging = !!config.environment.IS_STAGING;
+			const siteId = site.get('siteId');
+			const shouldJSCdnSyncBeDisabled = !!(disableSiteCdnSyncList.indexOf(siteId) > -1);
 
-			// Disable CDN upload for specific websites where generated JavaScript is added manually for testing purposes
-			if (shouldJSCdnSyncBeDisabled || isStaging) {
+			if (shouldJSCdnSyncBeDisabled || isNotProduction) {
+				console.log(
+					"Either current site's cdn generation is disabled or environment is development/staging. Skipping CDN Upload."
+				);
 				return Promise.resolve(fileConfig.uncompressed);
 			} else {
-				if (prodEnv) {
-					return connectToServer()
-						.then(cwd)
-						.then(function() {
-							return ftp.put(fileConfig.default, 'adpushup.js');
-						})
-						.then(function() {
-							return Promise.resolve(fileConfig.uncompressed);
-						});
-				}
-				return Promise.resolve(fileConfig.uncompressed);
+				return connectToServer()
+					.then(cwd)
+					.then(function() {
+						return ftp.put(fileConfig.default, 'adpushup.js');
+					})
+					.then(function() {
+						return Promise.resolve(fileConfig.uncompressed);
+					});
 			}
 		},
 		getFinalConfigWrapper = () => getFinalConfig().then(fileConfig => fileConfig);
 
 	return Promise.join(getFinalConfigWrapper(), fileConfig => {
-		function processing() {
-			return isExternalRequest ? Promise.resolve(fileConfig.uncompressed) : uploadJS(fileConfig);
-		}
-		return processing()
+		return uploadJS(fileConfig)
 			.then(writeTempFile)
 			.then(startIETesting)
 			.then(() => writeTempFile(fileConfig.default, 'adpushup.min.js'))

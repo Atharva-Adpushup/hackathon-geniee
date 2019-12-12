@@ -1,0 +1,80 @@
+$cardWidth: ($fullPercentage - 69);
+$cardMinHeight: 237px;
+
+.card-wrapper {
+	min-height: $cardMinHeight;
+	width: $cardWidth;
+}
+.my-sites-wrapper {
+	.card {
+		> .card-body {
+			.panel-heading {
+				font-size: ($designDimensionSM + 0.6);
+			}
+
+			.panel-body {
+				font-size: ($designDimensionSM + 0.4);
+				opacity: ($numberOne - 0.2);
+			}
+
+			a {
+				opacity: $numberOne;
+				text-decoration: $textUnderline;
+			}
+		}
+
+		> .card-footer {
+			button {
+				background: $transparent;
+				border: $numberZero;
+				box-shadow: $none;
+				outline: $numberZero $none;
+				padding: $designDimensionSM ($designDimensionSM + 0.5);
+				color: #555;
+
+				&:hover,
+				&:active,
+				&:focus {
+					background: #e6e6e6;
+					box-shadow: $none;
+					outline: 0 $none;
+				}
+			}
+		}
+
+		&.card--theme-dotted {
+			width: $fullPercentage;
+		}
+
+		&.panel {
+			width: $cardWidth;
+
+			&.panel-success {
+				> .card-body {
+					.panel-body {
+						color: $successText;
+					}
+				}
+			}
+
+			&.panel-warning {
+				> .card-body {
+					.panel-body {
+						color: $warningText;
+					}
+				}
+			}
+
+			&.panel-danger {
+				> .card-body {
+					.panel-body {
+						color: $dangerText;
+					}
+				}
+			}
+		}
+	}
+	.onboarding-step > .counter-icon {
+		display: none !important;
+	}
+}

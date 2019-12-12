@@ -38,13 +38,11 @@ const commonConsts = {
 				position: 'absolute',
 				top: '2px',
 				right: '2px',
-				// float: 'right',
 				height: '15px',
 				width: '15px',
 				stroke: '#fff',
 				cursor: 'pointer',
 				'stroke-width': 1.25
-				// top: -15
 			},
 			BOTTOM: {
 				// top: -15
@@ -58,26 +56,22 @@ const commonConsts = {
 		HEIGHT: 20,
 		TEXT: 'Ads by',
 		IMAGE: 'https://console.adpushup.com/assets/images/logo-white-200X50.png',
-		REDIRECT_URL: 'https://campaign.adpushup.com/get-started/?utm_source=banner&utm_campaign=growth_hack',
+		REDIRECT_URL:
+			'https://campaign.adpushup.com/get-started/?utm_source=banner&utm_campaign=growth_hack',
 		CSS: {
 			COMMON: {
 				color: '#fff',
 				fontFamily: 'sans-serif',
 				fontSize: 9,
-				// background: '#222',
 				display: 'inline-block',
 				padding: '2px 6px',
-				// position: 'absolute',
 				textDecoration: 'none'
-				// float: 'left'
-				// left: 0
 			},
 			LOGO: {
 				'max-width': '75px',
 				height: '14px',
 				'vertical-align': 'middle',
 				'margin-left': '2px'
-				// background: '#fff'
 			}
 		}
 	},

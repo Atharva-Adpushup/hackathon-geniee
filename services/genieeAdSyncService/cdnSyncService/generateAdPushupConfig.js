@@ -1,106 +1,107 @@
 let ADPTags = [];
 let finalJson = {};
-let isLegacyInnovativeAds = false;
 
-const Promise = require('bluebird'),
-	_ = require('lodash'),
-	AdPushupError = require('../../../helpers/AdPushupError'),
-	{ ERROR_MESSAGES } = require('../../../configs/commonConsts'),
-	config = require('../../../configs/config'),
-	{ promiseForeach, couchbaseService } = require('node-utils'),
-	appBucket = couchbaseService(
-		`couchbase://${config.couchBase.HOST}/${config.couchBase.DEFAULT_BUCKET}`,
-		config.couchBase.DEFAULT_BUCKET,
-		config.couchBase.DEFAULT_USER_NAME,
-		config.couchBase.DEFAULT_USER_PASSWORD
-	),
-	isAdSynced = ad => {
-		if (!ad.network || !ad.networkData) {
-			return false;
-		}
-		if (
-			(ad.network === 'geniee' && ad.networkData.zoneId) ||
-			(ad.network === 'adpTags' && ad.networkData.dfpAdunit) ||
-			(typeof ad.networkData.adCode === 'string' && ad.networkData.adCode.length) ||
-			(ad.network === 'custom' && ad.networkData.forceByPass)
-		) {
-			return true;
-		}
+const Promise = require('bluebird');
+const _ = require('lodash');
+const { promiseForeach, couchbaseService } = require('node-utils');
+
+const AdPushupError = require('../../../helpers/AdPushupError');
+const { ERROR_MESSAGES } = require('../../../configs/commonConsts');
+const config = require('../../../configs/config');
+
+const appBucket = couchbaseService(
+	`couchbase://${config.couchBase.HOST}/${config.couchBase.DEFAULT_BUCKET}`,
+	config.couchBase.DEFAULT_BUCKET,
+	config.couchBase.DEFAULT_USER_NAME,
+	config.couchBase.DEFAULT_USER_PASSWORD
+);
+
+const isAdSynced = ad => {
+	if (!ad.network || !ad.networkData) {
 		return false;
-	},
-	pushToAdpTags = function(ad, json) {
-		const isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length);
-		const isNetwork = !!ad.network;
-		const isNetworkData = !!ad.networkData;
-		const isDynamicAllocation = !!(isNetworkData && ad.networkData.dynamicAllocation);
-		const isZoneContainerId = !!(isNetworkData && ad.networkData.zoneContainerId);
-		const isAdpTagsNetwork = !!(isNetwork && ad.network === 'adpTags');
-		const isGenieeNetwork = !!(isNetwork && ad.network === 'geniee');
+	}
+	if (
+		(ad.network === 'geniee' && ad.networkData.zoneId) ||
+		(ad.network === 'adpTags' && ad.networkData.dfpAdunit) ||
+		(typeof ad.networkData.adCode === 'string' && ad.networkData.adCode.length) ||
+		(ad.network === 'custom' && ad.networkData.forceByPass)
+	) {
+		return true;
+	}
+	return false;
+};
 
-		if (isAdpTagsNetwork || (isGenieeNetwork && isDynamicAllocation)) {
-			let adData = {
-				key: `${json.width}x${json.height}`,
-				height: json.height,
-				width: json.width,
-				dfpAdunit: isZoneContainerId ? ad.networkData.zoneContainerId : ad.networkData.dfpAdunit,
-				dfpAdunitCode: ad.networkData.dfpAdunitCode,
-				headerBidding: ad.networkData.headerBidding,
-				keyValues: ad.networkData.keyValues
-			};
+const pushToAdpTags = function(ad, json) {
+	const isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length);
+	const isNetwork = !!ad.network;
+	const isNetworkData = !!ad.networkData;
+	const isDynamicAllocation = !!(isNetworkData && ad.networkData.dynamicAllocation);
+	const isZoneContainerId = !!(isNetworkData && ad.networkData.zoneContainerId);
+	const isAdpTagsNetwork = !!(isNetwork && ad.network === 'adpTags');
+	const isGenieeNetwork = !!(isNetwork && ad.network === 'geniee');
 
-			if (isMultipleAdSizes) {
-				adData.multipleAdSizes = ad.multipleAdSizes.concat([]);
-			}
+	if (isAdpTagsNetwork || (isGenieeNetwork && isDynamicAllocation)) {
+		const adData = {
+			key: `${json.width}x${json.height}`,
+			height: json.height,
+			width: json.width,
+			dfpAdunit: isZoneContainerId ? ad.networkData.zoneContainerId : ad.networkData.dfpAdunit,
+			dfpAdunitCode: ad.networkData.dfpAdunitCode,
+			headerBidding: ad.networkData.headerBidding,
+			keyValues: ad.networkData.keyValues
+		};
 
-			ADPTags.push(adData);
+		if (isMultipleAdSizes) {
+			adData.multipleAdSizes = ad.multipleAdSizes.concat([]);
 		}
-	},
-	getSectionsPayload = function(variationSections, platform, pagegroup, selectorsTreeLevel) {
-		let ads = [];
-		let ad = null;
-		let json;
 
-		_.each(variationSections, function(section, sectionId) {
-			if (!Object.keys(section.ads).length) {
-				return true;
-			}
-			ad = section.ads[Object.keys(section.ads)[0]]; // for now we have only one ad inside a section
+		ADPTags.push(adData);
+	}
+};
 
-			//In case if even one ad inside variation is unsynced then we don't generate JS as unsynced ads will have no impression and hence loss of revenue'
-			if (!isAdSynced(ad)) {
-				throw new AdPushupError({
-					message: ERROR_MESSAGES.MESSAGE.UNSYNCED_SETUP,
-					ad: ad,
-					sectionId: sectionId,
-					platform: platform || 'Not Present',
-					pagegroup: pagegroup || 'Not Present'
-				});
-			}
+const getAdConfig = function(adType, section) {
+	const ad =
+		adType === 'layout'
+			? section.ads[Object.keys(section.ads)[0]] // for now we have only one ad inside a section
+			: section;
 
-			const isResponsive = !!ad.networkData.isResponsive;
-			if (section.type === 3) {
-				isLegacyInnovativeAds = true;
-			}
+	const {
+		network,
+		networkData: { isResponsive },
+		css,
+		height,
+		width,
+		multipleAdSizes
+	} = ad;
+
+	const { name: sectionName, id, formatData } = section;
+
+	let json = {
+		id,
+		sectionName,
+		network,
+		css,
+		height: isResponsive ? height : parseInt(height, 10),
+		width: isResponsive ? width : parseInt(width, 10),
+		formatData
+	};
+
+	// Add 'multipleAdSizes' property if exists
+	const isMultipleAdSizes = !!(multipleAdSizes && multipleAdSizes.length);
+
+	if (isMultipleAdSizes) {
+		json.multipleAdSizes = multipleAdSizes.concat([]);
+	}
+
+	switch (adType) {
+		case 'layout': {
+			const { enableLazyLoading, type } = section;
 
 			json = {
-				id: sectionId,
-				sectionName: section.name,
-				network: ad.network,
-				//Format type of ad like, 1 for structural, 2 for incontent
-				type: section.type,
-				formatData: section.formatData,
-				css: ad.css,
-				height: isResponsive ? ad.height : parseInt(ad.height, 10),
-				width: isResponsive ? ad.width : parseInt(ad.width, 10),
-				enableLazyLoading: section.enableLazyLoading
+				...json,
+				enableLazyLoading,
+				type // Format type of ad like, 1 for structural, 2 for incontent
 			};
-
-			// Add 'multipleAdSizes' property if exists
-			const isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length);
-
-			if (isMultipleAdSizes) {
-				json.multipleAdSizes = ad.multipleAdSizes.concat([]);
-			}
 
 			if (section.isIncontent) {
 				_.extend(json, {
@@ -125,171 +126,240 @@ const Promise = require('bluebird'),
 					operation: section.operation
 				});
 			}
-			//for geniee provide networkData
-			pushToAdpTags(ad, json);
 
-			//Sending whole network data object in ad.
+			break;
+		}
+		case 'innovativeAds': {
+			const { isInnovativeAd, networkData, pagegroups, type } = ad;
+
+			json = {
+				...json,
+				isInnovativeAd,
+				networkData,
+				pagegroups,
+				type
+			};
+
+			break;
+		}
+		case 'apTag': {
+			const { isManual, networkData, type } = ad;
+
+			json = {
+				...json,
+				isManual,
+				networkData,
+				type
+			};
+
+			break;
+		}
+		default:
+	}
+
+	pushToAdpTags(ad, json);
+
+	return json;
+};
+
+const getSectionsPayload = function(variationSections, platform, pagegroup, selectorsTreeLevel) {
+	const ads = [];
+	let ad = null;
+	let json;
+
+	_.each(variationSections, (section, sectionId) => {
+		if (!Object.keys(section.ads).length) {
+			return true;
+		}
+		ad = section.ads[Object.keys(section.ads)[0]]; // for now we have only one ad inside a section
+
+		// In case if even one ad inside variation is unsynced then we don't generate JS as unsynced ads will have no impression and hence loss of revenue'
+		if (!isAdSynced(ad)) {
+			throw new AdPushupError({
+				message: ERROR_MESSAGES.MESSAGE.UNSYNCED_SETUP,
+				ad,
+				sectionId,
+				platform: platform || 'Not Present',
+				pagegroup: pagegroup || 'Not Present'
+			});
+		}
+
+		const isEditorInnovativeSection = !!(section.type === 3 || section.type === 4 || section.type === 5);
+
+		if (!isEditorInnovativeSection) {
+			json = getAdConfig('layout', section);
+
+			// Sending whole network data object in ad.
 			json.networkData = ad.networkData;
 
 			ads.push(json);
-		});
-
-		return ads;
-	},
-	getVariationPayload = (variation, platform, pageGroup, variationData, finalJson) => {
-		const isVariation = !!variation;
-		const isDisable = !!(isVariation && variation.disable);
-
-		if (isDisable) {
-			return true;
 		}
+	});
 
-		let ads = getSectionsPayload(variation.sections, platform, pageGroup, variation.selectorsTreeLevel);
-		let computedVariationObj;
-		let contentSelector = variation.contentSelector;
-		let isContentSelector = !!contentSelector;
+	return ads;
+};
 
-		if (!ads.length) {
-			return true;
-		}
+const getVariationPayload = (variation, platform, pageGroup, variationData, finalJson) => {
+	const isVariation = !!variation;
+	const isDisable = !!(isVariation && variation.disable);
 
-		computedVariationObj = {
-			id: variation.id,
-			name: variation.name,
-			traffic: variation.trafficDistribution,
-			customJs: variation.customJs,
-			adpKeyValues: variation.adpKeyValues,
-			contentSelector: isContentSelector ? contentSelector : '',
-			isControl: variation.isControl ? variation.isControl : false,
-			ads: ads,
-			incontentSectionConfig: {
-				selectorsTreeLevel: variation.selectorsTreeLevel || '',
-				sectionBracket: variation.incontentSectionBracket,
-				isEvenSpacingAlgo: variation.enableIncontentEvenSpacingAlgo || false
-			},
-			personalization: variation.personalization,
-			isControl: !!variation.isControl,
-			// Data required for auto optimiser model
-			// Page revenue is mapped as sum
-			sum:
-				variationData && parseFloat(variationData.pageRevenue) > -1
-					? variationData.pageRevenue < 1
-						? 1
-						: Math.round(variationData.pageRevenue)
-					: 1,
-			// Data required for auto optimiser model
-			// Page view is mapped as count
-			count:
-				variationData && parseInt(variationData.pageViews, 10) > -1
-					? variationData.pageViews < 1
-						? 1
-						: Math.round(variationData.pageViews)
-					: 1
-		};
+	if (isDisable) {
+		return true;
+	}
 
-		return computedVariationObj;
-	},
-	getPageGroupPattern = (pageGroupPattern, platform, pageGroup) => {
-		if (!pageGroupPattern || !_.isObject(pageGroupPattern)) {
-			return null;
-		}
-		const patterns = pageGroupPattern[platform];
-		if (!patterns || !patterns.length) {
-			return null;
-		}
+	let ads = [];
+	if (variation.sections && Object.keys(variation.sections).length) {
+		ads = getSectionsPayload(variation.sections, platform, pageGroup, variation.selectorsTreeLevel);
+	}
 
-		for (var i = 0; i < patterns.length; i++) {
-			if (patterns[i].pageGroup === pageGroup) {
-				return patterns[i].pattern;
-			}
-		}
-		return null;
-	},
-	getChannelPayload = (channel, pageGroupData, pageGroupPattern) => {
-		const { platform, pageGroup } = channel;
+	let computedVariationObj;
+	const contentSelector = variation.contentSelector;
+	const isContentSelector = !!contentSelector;
 
-		if (!finalJson[platform]) {
-			finalJson[platform] = {};
-		}
+	/*if (!ads.length) {
+		return true;
+	}*/
 
-		finalJson[platform][pageGroup] = {
-			variations: [],
-			contentSelector: channel.contentSelector,
-			pageGroupPattern: getPageGroupPattern(pageGroupPattern, platform, pageGroup),
-			hasVariationsWithNoData: false,
-			// ampSettings: channel.ampSettings ? { isEnabled: channel.ampSettings.isEnabled } : { isEnabled: false },
-			autoOptimise: channel.hasOwnProperty('autoOptimise') ? channel.autoOptimise : false
-		};
-
-		_.each(channel.variations, (variation, id) => {
-			let variationData = pageGroupData && _.isObject(pageGroupData) ? pageGroupData.variations[id] : null;
-			let variationPayload = getVariationPayload(variation, platform, pageGroup, variationData, finalJson);
-			if (typeof variationPayload == 'object' && Object.keys(variationPayload).length) {
-				finalJson[platform][pageGroup].variations.push(variationPayload);
-				finalJson[platform][pageGroup].hasVariationsWithNoData =
-					finalJson[platform][pageGroup].hasVariationsWithNoData == false
-						? variationData == null
-							? true
-							: false
-						: finalJson[platform][pageGroup].hasVariationsWithNoData;
-			}
-		});
-		if (Object.keys(finalJson[platform][pageGroup].variations).length) {
-			// delete finalJson[platform][pageGroup];
-			// } else {
-			finalJson[platform][pageGroup].variations.sort(function(a, b) {
-				return a.traffic - b.traffic;
-			});
-		}
-		return finalJson;
-	},
-	getAds = (docKey, siteId) => {
-		return appBucket.getDoc(docKey).then(docWithCas => {
-			const ads = docWithCas.value.ads.filter(ad => !ad.hasOwnProperty('isActive') || ad.isActive);
-			return ads;
-		});
-		// .catch(err => Promise.reject(new Error(`Error fetching tgmr doc for ${siteId}`)));
-	},
-	getAdsAndPushToAdp = (identifier, docKey, site) => {
-		if (!site.get(identifier)) {
-			return Promise.resolve([]);
-		}
-
-		return getAds(docKey, site.get('siteId'))
-			.then(ads => {
-				_.forEach(ads, ad => pushToAdpTags(ad, ad));
-				return ads;
-			})
-			.catch(err =>
-				err.code && err.code === 13 && err.message.includes('key does not exist') ? [] : Promise.reject(err)
-			);
-	},
-	generatePayload = (site, pageGroupData) => {
-		//Empty finaJson and dfpAunits
-		finalJson = {};
-		ADPTags = [];
-		isLegacyInnovativeAds = false;
-		// let manualAds = [];
-		const pageGroupPattern = site.get('apConfigs').pageGroupPattern;
-
-		return site
-			.getAllChannels()
-			.then(channels =>
-				promiseForeach(
-					channels,
-					channel => getChannelPayload(channel, pageGroupData, pageGroupPattern),
-					err => false
-				)
-			)
-			.then(() => {
-				return Promise.join(
-					getAdsAndPushToAdp('isManual', `tgmr::${site.get('siteId')}`, site),
-					getAdsAndPushToAdp('isInnovative', `fmrt::${site.get('siteId')}`, site),
-					(manualAds, innovativeAds) => {
-						return [finalJson, ADPTags, manualAds, innovativeAds, isLegacyInnovativeAds];
-					}
-				);
-			});
+	computedVariationObj = {
+		id: variation.id,
+		name: variation.name,
+		traffic: variation.trafficDistribution,
+		customJs: variation.customJs,
+		adpKeyValues: variation.adpKeyValues,
+		contentSelector: isContentSelector ? contentSelector : '',
+		isControl: variation.isControl ? variation.isControl : false,
+		ads,
+		incontentSectionConfig: {
+			selectorsTreeLevel: variation.selectorsTreeLevel || '',
+			sectionBracket: variation.incontentSectionBracket,
+			isEvenSpacingAlgo: variation.enableIncontentEvenSpacingAlgo || false
+		},
+		personalization: variation.personalization,
+		isControl: !!variation.isControl,
+		// Data required for auto optimiser model
+		// Page revenue is mapped as sum
+		sum:
+			variationData && parseFloat(variationData.pageRevenue) > -1
+				? variationData.pageRevenue < 1
+					? 1
+					: Math.round(variationData.pageRevenue)
+				: 1,
+		// Data required for auto optimiser model
+		// Page view is mapped as count
+		count:
+			variationData && parseInt(variationData.pageViews, 10) > -1
+				? variationData.pageViews < 1
+					? 1
+					: Math.round(variationData.pageViews)
+				: 1
 	};
+
+	return computedVariationObj;
+};
+
+const getPageGroupPattern = (pageGroupPattern, platform, pageGroup) => {
+	if (!pageGroupPattern || !_.isObject(pageGroupPattern)) {
+		return null;
+	}
+	const patterns = pageGroupPattern[platform];
+	if (!patterns || !patterns.length) {
+		return null;
+	}
+
+	for (let i = 0; i < patterns.length; i++) {
+		if (patterns[i].pageGroup === pageGroup) {
+			return patterns[i].pattern;
+		}
+	}
+	return null;
+};
+
+const getChannelPayload = (channel, pageGroupData, pageGroupPattern) => {
+	const { platform, pageGroup } = channel;
+
+	if (!finalJson[platform]) {
+		finalJson[platform] = {};
+	}
+
+	finalJson[platform][pageGroup] = {
+		variations: [],
+		contentSelector: channel.contentSelector,
+		pageGroupPattern: getPageGroupPattern(pageGroupPattern, platform, pageGroup),
+		hasVariationsWithNoData: false,
+		// ampSettings: channel.ampSettings ? { isEnabled: channel.ampSettings.isEnabled } : { isEnabled: false },
+		autoOptimise: channel.hasOwnProperty('autoOptimise') ? channel.autoOptimise : false
+	};
+
+	_.each(channel.variations, (variation, id) => {
+		const variationData =
+			pageGroupData && _.isObject(pageGroupData) ? pageGroupData.variations[id] : null;
+		const variationPayload = getVariationPayload(
+			variation,
+			platform,
+			pageGroup,
+			variationData,
+			finalJson
+		);
+		if (typeof variationPayload === 'object' && Object.keys(variationPayload).length) {
+			finalJson[platform][pageGroup].variations.push(variationPayload);
+			finalJson[platform][pageGroup].hasVariationsWithNoData =
+				finalJson[platform][pageGroup].hasVariationsWithNoData == false
+					? variationData == null
+					: finalJson[platform][pageGroup].hasVariationsWithNoData;
+		}
+	});
+	if (Object.keys(finalJson[platform][pageGroup].variations).length) {
+		// delete finalJson[platform][pageGroup];
+		// } else {
+		finalJson[platform][pageGroup].variations.sort((a, b) => a.traffic - b.traffic);
+	}
+	return finalJson;
+};
+
+const getSections = (docKey, siteId) =>
+	appBucket.getDoc(docKey).then(docWithCas => {
+		const ads = docWithCas.value.ads.filter(ad => !ad.hasOwnProperty('isActive') || ad.isActive);
+		return ads;
+	});
+
+const getAdsAndPushToAdp = (identifier, docKey, site) => {
+	const apps = site.get('apps') || { [identifier]: false };
+
+	if (!apps[identifier]) {
+		return Promise.resolve([]);
+	}
+
+	return getSections(docKey, site.get('siteId'))
+		.then(sections => sections.map(section => getAdConfig(identifier, section)))
+		.catch(err =>
+			err.code && err.code === 13 && err.message.includes('key does not exist')
+				? []
+				: Promise.reject(err)
+		);
+};
+
+const generatePayload = (site, pageGroupData) => {
+	// Empty finaJson and dfpAunits
+	finalJson = {};
+	ADPTags = [];
+	const pageGroupPattern = site.get('apConfigs').pageGroupPattern;
+
+	return site
+		.getAllChannels()
+		.then(channels =>
+			promiseForeach(
+				channels,
+				channel => getChannelPayload(channel, pageGroupData, pageGroupPattern),
+				err => false
+			)
+		)
+		.then(() =>
+			Promise.join(
+				getAdsAndPushToAdp('apTag', `tgmr::${site.get('siteId')}`, site),
+				getAdsAndPushToAdp('innovativeAds', `fmrt::${site.get('siteId')}`, site),
+				(manualAds, innovativeAds) => [finalJson, ADPTags, manualAds, innovativeAds]
+			)
+		);
+};
 
 module.exports = generatePayload;
