@@ -20,9 +20,18 @@ export const switchUser = email => dispatch =>
 				type: USER_ACTIONS.RESET_STATE
 			});
 			return true;
-			// return window.location.reload();
 		})
 		.catch(() => window.alert('User Switch Failed'));
+export const impersonateCurrentUser = () => dispatch =>
+	userService
+		.impersonateCurrentUser()
+		.then(() => {
+			dispatch({
+				type: USER_ACTIONS.RESET_STATE
+			});
+			return true;
+		})
+		.catch(() => window.alert('User Impersonate Failed'));
 export const signupAction = user => () =>
 	userService.signup(user).then(response => {
 		window.cookieProcessing();
