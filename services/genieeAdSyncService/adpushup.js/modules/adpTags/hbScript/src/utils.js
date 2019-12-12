@@ -112,6 +112,19 @@ var utils = {
 
 		return objURL;
 	})(),
+	getUniqueSizesNestedArray: function (nestedSizesArr) {
+		const sizeMap = {},
+			uniqueSizesArr = nestedSizesArr.filter(size => {
+				const key = size.join(',');
+				if (!sizeMap[key]) {
+					sizeMap[key] = true;
+					return true;
+				}
+				return false;
+			});
+
+		return uniqueSizesArr;
+	}
 }
 
 module.exports = utils;
