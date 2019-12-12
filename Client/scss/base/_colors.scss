@@ -1,0 +1,53 @@
+$textColor: #555;
+
+$primaryColor: #eb575c; //Main Adpushup Red Color
+$primaryColorDark: #cf474b; //Red Dark Color
+$primaryColorLight: #fb9fa2;
+$mainBgColor: #f6f7f8;
+$whiteColor: #fff;
+$blackColor: #000;
+$greyColor: #89949b;
+$warningColor: #f0ad4e;
+$fontColor: #555555;
+$dimFontColor: #b2b2b2;
+$borderColor: #e6e6e6;
+$dottedBorderColor: #ccc;
+$iconColor: #787878;
+$dashboardBgColor: #ebf1f2;
+$lightGrey: #ccc;
+$GreenColor: #14a314;
+$codeBg: #f3f5f7;
+$primaryRed: #d9434e;
+$primaryRedDark: darken($primaryRed, 10%);
+$successGreen: #3bb85d;
+$linkBlue: #47b6e4;
+$linkColor: #1155cc;
+$darkGreyColor: #505050;
+$lightBlue: #47b6e4;
+$darkBlue: #167096;
+$darkYellow: #e1b12c;
+
+$LBBgColor: #f9f9f9;
+$LPFormColor: #89949b;
+
+$errorText: #c3272b;
+$successText: #006442;
+
+// Global bootstrap alert background and text colors
+// Use them globally for all alert use cases
+$dangerBackground: #f2dede;
+$dangerBorder: #ebccd1;
+$dangerText: #a94442;
+$warningBackground: #fcf8e3;
+$warningBorder: #faebcc;
+$warningText: #8a6d3b;
+$successBackground: #dff0d8;
+$successBorder: #d6e9c6;
+$successText: #3c763d;
+
+$boxShadowOne: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+$boxShadowTwo: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+$boxShadowThree: 0 1px 1px rgba(0, 0, 0, 0.15), -1px 0 0 rgba(0, 0, 0, 0.03),
+	1px 0 0 rgba(0, 0, 0, 0.03), 0 1px 0 rgba(0, 0, 0, 0.12);
+
+$boxShadowInsetOne: 0 0 10px $borderColor inset;

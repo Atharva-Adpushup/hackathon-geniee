@@ -1,0 +1,114 @@
+{
+	"series": [
+		{
+			"data": [1.1, 1.13, 1.17, 1.11, 1.18, 1.1, 1.27, 1.18, 1.1, 1.12, 1.14, 1.08, 1.27, 1.14],
+			"name": "Page RPM (Original)"
+		},
+		{
+			"data": [1.08, 1.27, 1.14, 1.1, 1.12, 1.14, 1.1, 1.27, 1.18, 1.17, 1.11, 1.18, 1.1, 1.13],
+			"name": "Page RPM (AdPushup)"
+		}
+	],
+	"xAxis": {
+		"categories": [
+			"01-03-2019",
+			"02-03-2019",
+			"03-03-2019",
+			"04-03-2019",
+			"05-03-2019",
+			"06-03-2019",
+			"07-03-2019",
+			"08-03-2019",
+			"09-03-2019",
+			"10-03-2019",
+			"11-03-2019",
+			"12-03-2019",
+			"13-03-2019",
+			"14-03-2019"
+		]
+	},
+	"tableHeader": [
+		{ "title": "Website", "prop": "site" },
+		{ "title": "Pageviews", "prop": "pageviews" },
+		{ "title": "Page CPM ($)", "prop": "page_cpm" },
+		{ "title": "Impressions", "prop": "impressions" },
+		{ "title": "Ad eCPM", "prop": "ad_ecpm" },
+		{ "title": "Revenue", "prop": "revenue" },
+		{ "title": "Action", "prop": "action" }
+	],
+	"tableBody": [
+		{
+			"site": "abc.com",
+			"pageviews": 117703,
+			"page_cpm": 17.48,
+			"impressions": 362783,
+			"ad_ecpm": 5.67,
+			"revenue": 200,
+			"action": "View Reports"
+		},
+		{
+			"site": "xyz.com",
+			"pageviews": 99286,
+			"page_cpm": 18.43,
+			"requests": 342328,
+			"impressions": 362783,
+			"ad_ecpm": 5.75,
+			"revenue": 200,
+			"action": "View Reports"
+		},
+		{
+			"site": "pqr.com",
+			"pageviews": 997703,
+			"page_cpm": 15.48,
+			"requests": 408054,
+			"impressions": 323783,
+			"ad_ecpm": 4.67,
+			"revenue": 200,
+			"action": "View Reports"
+		},
+		{
+			"site": "efg.com",
+			"pageviews": 997703,
+			"page_cpm": 15.48,
+			"requests": 408054,
+			"impressions": 323783,
+			"ad_ecpm": 4.67,
+			"revenue": 200,
+			"action": "View Reports"
+		}
+	],
+	"pieData": [
+		{
+			"name": "Brands",
+			"colorByPoint": true,
+			"data": [
+				{
+					"name": "Chrome",
+					"y": 61.41,
+					"sliced": true,
+					"selected": true
+				},
+				{
+					"name": "Internet Explorer",
+					"y": 11.84
+				},
+				{
+					"name": "Firefox",
+					"y": 10.85
+				},
+				{
+					"name": "Edge",
+					"y": 4.67
+				},
+				{
+					"name": "Safari",
+					"y": 4.18
+				},
+				{
+					"name": "Other",
+					"y": 7.05
+				}
+			]
+		}
+	]
+}

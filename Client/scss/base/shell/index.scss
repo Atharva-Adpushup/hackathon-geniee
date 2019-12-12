@@ -1,0 +1,22 @@
+@import 'header';
+@import 'sidebar';
+
+.container-fluid {
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+	.sidebar-main-wrap {
+		height: calc(100vh - 55px);
+		min-height: 460px;
+		display: flex;
+		flex-grow: 1;
+		.main-content {
+			flex-grow: 1;
+			//background: #eee;
+			background: #ebf1f2;
+			padding: 30px;
+			position: relative;
+			overflow-y: auto;
+		}
+	}
+}

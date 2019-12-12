@@ -1,0 +1,21 @@
+.custom-message {
+	box-shadow: 0 0 0 1px rgba(34, 36, 38, 0.22) inset, 0 0 0 0 transparent;
+	background: #f8f8f9;
+	border-radius: 0.28571429rem;
+
+	h3 {
+		// span {
+		// 	align-self: flex-start;
+		// }
+		// .close-button {
+		// 	align-self: flex-end;
+		// }
+	}
+
+	hr {
+		border: 1px solid #ebebeb;
+	}
+	p {
+		font-size: 14px;
+	}
+}

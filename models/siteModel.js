@@ -9,6 +9,7 @@ var model = require('../helpers/model'),
 	apConfigSchema = require('./subClasses/site/apConfig'),
 	Promise = require('bluebird'),
 	commonConsts = require('../configs/commonConsts'),
+	adSizeMappingConsts = require('../helpers/adSizeMappingConsts'),
 	_ = require('lodash'),
 	Site = model.extend(function() {
 		this.keys = [
@@ -24,6 +25,7 @@ var model = require('../helpers/model'),
 			'genieeMediaId',
 			'dateCreated',
 			'dateModified',
+			'onboardingStage',
 			'step',
 			'websiteRevenue',
 			'adsensePublisherId',
@@ -31,7 +33,10 @@ var model = require('../helpers/model'),
 			'isManual',
 			'isInnovative',
 			'gdpr',
-			'ampSettings'
+			'ampSettings',
+			'apps',
+			'adServerSetupStatus',
+			'dataFeedActive'
 		];
 		this.clientKeys = [
 			'siteId',
@@ -47,7 +52,10 @@ var model = require('../helpers/model'),
 			'isManual',
 			'isInnovative',
 			'gdpr',
-			'ampSettings'
+			'ampSettings',
+			'apps',
+			'adServerSetupStatus',
+			'dataFeedActive'
 		];
 		this.validations = {
 			required: []
@@ -67,7 +75,15 @@ var model = require('../helpers/model'),
 				cmsName: '',
 				pageGroups: []
 			},
-			adNetworkSettings: commonConsts.DEFAULT_AD_NETWORK_SETTINGS
+			adNetworkSettings: commonConsts.DEFAULT_AD_NETWORK_SETTINGS,
+			apps: {
+				layout: true,
+				apTag: true,
+				innovativeAds: true,
+				headerBidding: true,
+				consentManagement: false
+			},
+			adServerSetupStatus: 0
 		};
 		this.ignore = [];
 		this.classMap = { apConfigs: apConfigSchema };
@@ -87,9 +103,7 @@ var model = require('../helpers/model'),
 		};
 
 		this.getNetwork = function(networkName) {
-			return Promise.resolve(
-				_.find(this.get('adNetworks'), { name: networkName })
-			);
+			return Promise.resolve(_.find(this.get('adNetworks'), { name: networkName }));
 		};
 
 		this.deleteChannel = function(platform, pageGroup) {
@@ -132,11 +146,7 @@ var model = require('../helpers/model'),
 				this.get('channels'),
 				function(channel) {
 					var channelArr = channel.split(':'); // channel[0] is platform and channel[1] is pagegroup
-					return channelModel.getChannel(
-						this.get('siteId'),
-						channelArr[0],
-						channelArr[1]
-					);
+					return channelModel.getChannel(this.get('siteId'), channelArr[0], channelArr[1]);
 				}.bind(this)
 			);
 			return Promise.all(allChannels).then(function(data) {
@@ -152,14 +162,8 @@ var model = require('../helpers/model'),
 			return Promise.resolve(this.getAllChannels()).then(function(channelsArr) {
 				if (Array.isArray(channelsArr) && channelsArr.length) {
 					_.forEach(channelsArr, function(channelObj, channelKey) {
-						if (
-							channelObj.hasOwnProperty('variations') &&
-							channelObj.variations
-						) {
-							_.forOwn(channelObj.variations, function(
-								variationObj,
-								variationKey
-							) {
+						if (channelObj.hasOwnProperty('variations') && channelObj.variations) {
+							_.forOwn(channelObj.variations, function(variationObj, variationKey) {
 								computedConfig[variationObj.id] = {
 									id: variationObj.id,
 									name: variationObj.name,
@@ -275,7 +279,7 @@ function apiModule() {
 				return API.saveSiteData(siteId, 'POST', json);
 			});
 		},
-		getSiteById: function(siteId, requestMethod) {
+		getSiteById: function(siteId) {
 			return couchbase
 				.connectToAppBucket()
 				.then(function(appBucket) {
@@ -286,9 +290,7 @@ function apiModule() {
 				})
 				.catch(function(err) {
 					if (err.code === 13) {
-						throw new AdPushupError([
-							{ status: 404, message: 'Site does not exist' }
-						]);
+						throw new AdPushupError([{ status: 404, message: 'Site does not exist' }]);
 					}
 
 					return false;
@@ -310,14 +312,10 @@ function apiModule() {
 				})
 				.catch(function(err) {
 					if (err.message[0].status === 404) {
-						throw new AdPushupError([
-							{ status: 404, message: 'Site does not exist' }
-						]);
+						throw new AdPushupError([{ status: 404, message: 'Site does not exist' }]);
 					}
 
-					throw new AdPushupError([
-						{ status: 500, message: 'Some error occurred' }
-					]);
+					throw new AdPushupError([{ status: 500, message: 'Some error occurred' }]);
 				});
 		},
 		createSiteFromJson: function(json) {
@@ -341,9 +339,7 @@ function apiModule() {
 							return platform + ':' + pageGroup;
 						})
 						.catch(function() {
-							throw new AdPushupError(
-								'getDeleteChannelsPromises: Channel is not deleted'
-							);
+							throw new AdPushupError('getDeleteChannelsPromises: Channel is not deleted');
 						});
 				});
 			}
@@ -359,16 +355,14 @@ function apiModule() {
 						return channelArr;
 					})
 					.catch(function() {
-						throw new AdPushupError(
-							'deleteAllChannels: Channels are not deleted'
-						);
+						throw new AdPushupError('deleteAllChannels: Channels are not deleted');
 					});
 			}
 
-			return Promise.all([
-				API.getSiteById(siteId),
-				couchbase.connectToAppBucket()
-			]).spread(function(site, appBucket) {
+			return Promise.all([API.getSiteById(siteId), couchbase.connectToAppBucket()]).spread(function(
+				site,
+				appBucket
+			) {
 				return (
 					Promise.resolve(deleteAllChannels(site))
 						// .then(function(deleteChannelsArr) {
@@ -394,9 +388,7 @@ function apiModule() {
 			};
 
 			const settings = json.settings,
-				pageGroupPattern = setPagegroupPattern(
-					JSON.parse(settings.pageGroupPattern)
-				),
+				pageGroupPattern = setPagegroupPattern(JSON.parse(settings.pageGroupPattern)),
 				blocklist = JSON.parse(settings.blocklist);
 			let otherSettings = JSON.parse(settings.otherSettings),
 				encodedOtherSettings = Object.assign({}, otherSettings);
@@ -422,22 +414,14 @@ function apiModule() {
 						: commonConsts.apConfigDefaults.adpushupPercentage,
 					autoOptimise: settings.autoOptimise === 'false' ? false : true,
 					poweredByBanner: settings.poweredByBanner === 'false' ? false : true,
-					activeDFPNetwork: settings.activeDFPNetwork
-						? settings.activeDFPNetwork
-						: '',
-					activeDFPParentId: settings.activeDFPParentId
-						? settings.activeDFPParentId
-						: '',
+					activeDFPNetwork: settings.activeDFPNetwork ? settings.activeDFPNetwork : '',
+					activeDFPParentId: settings.activeDFPParentId ? settings.activeDFPParentId : '',
 					activeDFPCurrencyCode: settings.activeDFPCurrencyCode || '',
-					blocklist: blocklist.length ? blocklist : '',
+					blocklist: blocklist.length ? blocklist : [],
 					isSPA: settings.isSPA === 'false' ? false : true,
 					isThirdPartyAdx: settings.isThirdPartyAdx === 'false' ? false : true,
-					spaPageTransitionTimeout: parseInt(
-						settings.spaPageTransitionTimeout,
-						10
-					),
-					isAdPushupControlWithPartnerSSP: !!site.get('apConfigs')
-						.isAdPushupControlWithPartnerSSP
+					spaPageTransitionTimeout: parseInt(settings.spaPageTransitionTimeout, 10),
+					isAdPushupControlWithPartnerSSP: !!site.get('apConfigs').isAdPushupControlWithPartnerSSP
 						? site.get('apConfigs').isAdPushupControlWithPartnerSSP
 						: commonConsts.apConfigDefaults.isAdPushupControlWithPartnerSSP
 				};
@@ -456,6 +440,16 @@ function apiModule() {
 					throw new AdPushupError('Cannot get setup step');
 				});
 		},
+		getSetupStage: function(siteId) {
+			return API.getSiteById(siteId)
+				.then(function(site) {
+					var onboardingStage = site.get('onboardingStage');
+					return onboardingStage;
+				})
+				.catch(function(err) {
+					throw new AdPushupError('Cannot get setup onboarding stage');
+				});
+		},
 		getCmsData: function(siteId) {
 			return API.getSiteById(siteId)
 				.then(function(site) {
@@ -466,11 +460,118 @@ function apiModule() {
 					throw new AdPushupError('Cannot get cms data');
 				});
 		},
-		getSiteChannels: siteId =>
-			API.getSiteById(siteId).then(site => site.get('channels')),
-		setSiteStep: function(siteId, step) {
+		getSiteChannels: siteId => API.getSiteById(siteId).then(site => site.get('channels')),
+		isLayoutInventoryExist: siteId => {
+			return API.getSiteById(siteId)
+				.then(site => site.getAllChannels())
+				.then(channels => {
+					let inventoryFound = false;
+					// eslint-disable-next-line no-restricted-syntax
+					for (const channel of channels) {
+						if (inventoryFound) break;
+						// eslint-disable-next-line no-restricted-syntax
+						if (channel.variations && Object.keys(channel.variations).length) {
+							for (const variationKey in channel.variations) {
+								if (inventoryFound) break;
+
+								const variation = channel.variations[variationKey];
+
+								if (variation.sections && Object.keys(variation.sections).length) {
+									for (const sectionKey in variation.sections) {
+										if (inventoryFound) break;
+
+										const section = variation.sections[sectionKey];
+
+										if (section.ads && Object.keys(section.ads).length) {
+											for (const adKey in section.ads) {
+												if (inventoryFound) break;
+
+												const ad = section.ads[adKey];
+
+												if (ad.network === 'adpTags') {
+													inventoryFound = true;
+													break;
+												}
+											}
+										} else {
+											continue;
+										}
+									}
+								} else {
+									continue;
+								}
+							}
+						} else {
+							continue;
+						}
+					}
+
+					if (inventoryFound) return inventoryFound;
+					throw new AdPushupError('Inventory Not Found');
+				});
+		},
+
+		isApTagInventoryExist: siteId => {
+			return couchbase
+				.connectToAppBucket()
+				.then(function(appBucket) {
+					return appBucket.getAsync('tgmr::' + siteId, {});
+				})
+				.then(({ value }) => {
+					let apTagInventoryFound = false;
+					if (value.ads.length) {
+						for (const ad of value.ads) {
+							apTagInventoryFound = ad.network === 'adpTags';
+							if (apTagInventoryFound) break;
+						}
+					}
+
+					if (apTagInventoryFound) return apTagInventoryFound;
+					throw new AdPushupError('Inventory Not Found');
+				})
+				.catch(err => {
+					if (err.code === 13) {
+						throw new AdPushupError('Inventory Not Found');
+					}
+
+					throw err;
+				});
+		},
+		isInnovativeAdInventoryExist: siteId => {
+			return couchbase
+				.connectToAppBucket()
+				.then(function(appBucket) {
+					return appBucket.getAsync('fmrt::' + siteId, {});
+				})
+				.then(({ value }) => {
+					let innovativeAdInventoryFound = false;
+					if (value.ads.length) {
+						for (const ad of value.ads) {
+							innovativeAdInventoryFound = ad.network === 'adpTags';
+							if (innovativeAdInventoryFound) break;
+						}
+					}
+
+					if (innovativeAdInventoryFound) return innovativeAdInventoryFound;
+					throw new AdPushupError('Inventory Not Found');
+				})
+				.catch(err => {
+					if (err.code === 13) {
+						throw new AdPushupError('Inventory Not Found');
+					}
+
+					throw err;
+				});
+		},
+		isInventoryExist: siteId => {
+			return API.isLayoutInventoryExist(siteId)
+				.catch(() => API.isApTagInventoryExist(siteId))
+				.catch(() => API.isInnovativeAdInventoryExist(siteId));
+		},
+		setSiteStep: function(siteId, onboardingStage, step) {
 			return API.getSiteById(siteId)
 				.then(function(site) {
+					site.set('onboardingStage', onboardingStage);
 					site.set('step', parseInt(step));
 					return site.save();
 				})
@@ -486,9 +587,7 @@ function apiModule() {
 					channelsList.forEach(channel => {
 						const platform = channel.split(':')[0],
 							pageGroup = channel.split(':')[1];
-						sectionPromises.push(
-							channelModel.getChannelSections(siteId, platform, pageGroup)
-						);
+						sectionPromises.push(channelModel.getChannelSections(siteId, platform, pageGroup));
 					});
 
 					return Promise.all(sectionPromises);

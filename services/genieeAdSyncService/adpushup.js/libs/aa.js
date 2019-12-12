@@ -1,3 +1,5 @@
+var utils = require('./utils');
+
 module.exports = (function() {
 	// TODO: Do not change above written text `module.exports = ` as this text is removed in cdnSyncConsumer
 	// by exact index count (17). If you wish to change below text, please update this script injection code in cdnSyncConsumer file
@@ -133,7 +135,7 @@ module.exports = (function() {
 						// Clear results in blank space on the side.
 						// result = improper floating ad box
 						if (cssClear === 'both' || ref.floatVar === cssClear /** In case of clear: left or right */) {
-							console.log('Break because cleared');
+							utils.log('Break because cleared');
 							break;
 						}
 
@@ -147,7 +149,7 @@ module.exports = (function() {
 						wrap the text but without background. This results in an obvious overlap.
 						which can be prevented by checking the background */
 						if (ref.rootBackgroundColor !== ref.computeBackgroundColor(nextElem)) {
-							console.log(
+							utils.log(
 								'Break Because Different background.',
 								ref.rootBackgroundColor,
 								ref.computeBackgroundColor(nextElem)
@@ -160,23 +162,23 @@ module.exports = (function() {
 						if (ref.floatVar === 'right') {
 							/* if ad floats on left then UL and OL won't be an issue */
 							if (checkTags(nextElem, ['iframe', 'img', 'table'])) {
-								console.log('Break Because IFRAME, IMG, TABLE.');
+								utils.log('Break Because IFRAME, IMG, TABLE.');
 								break elemLoop;
 							}
 						} else if (ref.floatVar === 'left') {
 							if (checkTags(nextElem, ['ul', 'ol', 'iframe', 'img', 'table'])) {
-								console.log('Break because UL, OL, IFRAME.');
+								utils.log('Break because UL, OL, IFRAME.');
 								break elemLoop;
 							}
 						}
 
 						if (!isWrappable($(nextElem).text(), (ref.containerWidth - ref.width) / 10)) {
-							console.log('Break Because not wrappable.');
+							utils.log('Break Because not wrappable.');
 							break elemLoop;
 						}
 
 						if (calcArea(element, nextElem) > reqArea) {
-							console.log('Inserted', calcArea(element, nextElem), reqArea);
+							utils.log('Inserted', calcArea(element, nextElem), reqArea);
 							filteredElems.push($(element));
 						}
 
@@ -347,7 +349,7 @@ module.exports = (function() {
 					);
 
 				if ($rootThis.length > 1) {
-					console.error('Ambigious content area selector.');
+					utils.log('Ambigious content area selector.');
 					return this;
 				}
 
@@ -357,7 +359,7 @@ module.exports = (function() {
 				ref.containerWidth = $rootThis.width();
 
 				if (ref.floatVar !== 'none' && ref.width > ref.containerWidth / 1.5) {
-					console.error("Ad Size of this size shouldn't be floated.");
+					utils.log("Ad Size of this size shouldn't be floated.");
 					return this;
 				}
 

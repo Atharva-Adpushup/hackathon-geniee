@@ -1,0 +1,15 @@
+.panel {
+	&.panel--transparent {
+		background: transparent;
+		border: none;
+		box-shadow: none;
+
+		> .panel-heading,
+		> .panel-body,
+		> .panel-footer {
+			background: transparent;
+			border: none;
+			box-shadow: none;
+		}
+	}
+}

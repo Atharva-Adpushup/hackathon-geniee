@@ -581,148 +581,148 @@ router
 			});
 		}
 	})
-	// .get('/profile', function(req, res) {
-	// 	userModel.getUserByEmail(req.session.user.email).then(
-	// 		function(user) {
-	// 			var formData = {
-	// 				firstName: user.get('firstName'),
-	// 				lastName: user.get('lastName'),
-	// 				email: user.get('email')
-	// 			};
+	.get('/profile', function(req, res) {
+		userModel.getUserByEmail(req.session.user.email).then(
+			function(user) {
+				var formData = {
+					firstName: user.get('firstName'),
+					lastName: user.get('lastName'),
+					email: user.get('email')
+				};
 
-	// 			res.render('profile', {
-	// 				formData: formData
-	// 			});
-	// 		},
-	// 		function() {
-	// 			return res.redirect('/');
-	// 		}
-	// 	);
-	// })
-	// .post('/profile', function(req, res) {
-	// 	req.body.firstName = req.body.firstName ? utils.trimString(req.body.firstName) : req.body.firstName;
-	// 	req.body.lastName = req.body.lastName ? utils.trimString(req.body.lastName) : req.body.lastName;
-	// 	let jsonParams = Object.assign({}, req.body),
-	// 		encodedParams = {
-	// 			firstName: req.body.firstName,
-	// 			lastName: req.body.lastName
-	// 		};
+				res.render('profile', {
+					formData: formData
+				});
+			},
+			function() {
+				return res.redirect('/');
+			}
+		);
+	})
+	.post('/profile', function(req, res) {
+		req.body.firstName = req.body.firstName ? utils.trimString(req.body.firstName) : req.body.firstName;
+		req.body.lastName = req.body.lastName ? utils.trimString(req.body.lastName) : req.body.lastName;
+		let jsonParams = Object.assign({}, req.body),
+			encodedParams = {
+				firstName: req.body.firstName,
+				lastName: req.body.lastName
+			};
 
-	// 	encodedParams = utils.getHtmlEncodedJSON(encodedParams);
-	// 	jsonParams = Object.assign({}, jsonParams, encodedParams);
-	// 	userModel
-	// 		.saveProfile(jsonParams, req.session.user.email)
-	// 		.then(function() {
-	// 			/**
-	// 			 * TODO: Fix user.save() to return updated user object
-	// 			 * and remove below hack
-	// 			 * File name: model.js
-	// 			 */
-	// 			var user = Array.prototype.slice.call(arguments)[0];
+		encodedParams = utils.getHtmlEncodedJSON(encodedParams);
+		jsonParams = Object.assign({}, jsonParams, encodedParams);
+		userModel
+			.saveProfile(jsonParams, req.session.user.email)
+			.then(function() {
+				/**
+				 * TODO: Fix user.save() to return updated user object
+				 * and remove below hack
+				 * File name: model.js
+				 */
+				var user = Array.prototype.slice.call(arguments)[0];
 
-	// 			console.log(user);
+				console.log(user);
 
-	// 			req.session.user = user;
-	// 			return res.render('profile', {
-	// 				profileSaved: true,
-	// 				formData: req.body
-	// 			});
-	// 		})
-	// 		.catch(function(e) {
-	// 			if (e instanceof AdPushupError) {
-	// 				res.render('profile', {
-	// 					profileError: e.message,
-	// 					formData: req.body
-	// 				});
-	// 			} else if (e.name && e.name === 'CouchbaseError') {
-	// 				res.render('profile', { userNotFound: true, formData: req.body });
-	// 			}
-	// 		});
-	// })
-	// .get('/updateUserStatus', function(req, res) {
-	// 	if (req.session.isSuperUser) {
-	// 		return res.render('updateUserStatus', {
-	// 			currentStatus: req.session.user.requestDemo,
-	// 			email: req.session.user.email,
-	// 			websiteRevenue: req.session.user.websiteRevenue
-	// 		});
-	// 	} else {
-	// 		return res.redirect('/user/dashboard');
-	// 	}
-	// })
-	// .post('/updateUserStatus', function(req, res) {
-	// 	if (req.session.isSuperUser) {
-	// 		var email = req.session.user.email,
-	// 			websiteRevenue = req.session.user.websiteRevenue,
-	// 			revenueUpperLimit = null;
+				req.session.user = user;
+				return res.render('profile', {
+					profileSaved: true,
+					formData: req.body
+				});
+			})
+			.catch(function(e) {
+				if (e instanceof AdPushupError) {
+					res.render('profile', {
+						profileError: e.message,
+						formData: req.body
+					});
+				} else if (e.name && e.name === 'CouchbaseError') {
+					res.render('profile', { userNotFound: true, formData: req.body });
+				}
+			});
+	})
+	.get('/updateUserStatus', function(req, res) {
+		if (req.session.isSuperUser) {
+			return res.render('updateUserStatus', {
+				currentStatus: req.session.user.requestDemo,
+				email: req.session.user.email,
+				websiteRevenue: req.session.user.websiteRevenue
+			});
+		} else {
+			return res.redirect('/user/dashboard');
+		}
+	})
+	.post('/updateUserStatus', function(req, res) {
+		if (req.session.isSuperUser) {
+			var email = req.session.user.email,
+				websiteRevenue = req.session.user.websiteRevenue,
+				revenueUpperLimit = null;
 
-	// 		if (req.body.websiteRevenue.trim()) {
-	// 			websiteRevenue = req.body.websiteRevenue;
-	// 		}
+			if (req.body.websiteRevenue.trim()) {
+				websiteRevenue = req.body.websiteRevenue;
+			}
 
-	// 		if (email.trim() && req.body.status) {
-	// 			var status = true; // By default user would be inactive
-	// 			/* 
-    //                 By Default requestDemo would be True | User is inactive
-    //                 To make user active | Need to set requestDemo False
-    //                 If value in request is 0 | User should be active | Set requestDemo to be False
-    //                 If value in request is 1 | User should be inactive | Set requestDemo to be True
-    //             */
-	// 			if (req.body.status == 0) {
-	// 				status = false;
-	// 			}
+			if (email.trim() && req.body.status) {
+				var status = true; // By default user would be inactive
+				/*
+                    By Default requestDemo would be True | User is inactive
+                    To make user active | Need to set requestDemo False
+                    If value in request is 0 | User should be active | Set requestDemo to be False
+                    If value in request is 1 | User should be inactive | Set requestDemo to be True
+                */
+				if (req.body.status == 0) {
+					status = false;
+				}
 
-	// 			var revenueArray = websiteRevenue.split('-');
-	// 			if (revenueArray.length > 1) {
-	// 				revenueUpperLimit = revenueArray[1];
-	// 			} else {
-	// 				revenueUpperLimit = revenueArray[0];
-	// 			}
+				var revenueArray = websiteRevenue.split('-');
+				if (revenueArray.length > 1) {
+					revenueUpperLimit = revenueArray[1];
+				} else {
+					revenueUpperLimit = revenueArray[0];
+				}
 
-	// 			return userModel
-	// 				.setUserStatus(
-	// 					{
-	// 						status: status,
-	// 						websiteRevenue: websiteRevenue,
-	// 						revenueUpperLimit: revenueUpperLimit
-	// 					},
-	// 					email.trim()
-	// 				)
-	// 				.then(function(user) {
-	// 					var currentStatus = user.get('requestDemo'),
-	// 						websiteRevenue = user.get('websiteRevenue');
+				return userModel
+					.setUserStatus(
+						{
+							status: status,
+							websiteRevenue: websiteRevenue,
+							revenueUpperLimit: revenueUpperLimit
+						},
+						email.trim()
+					)
+					.then(function(user) {
+						var currentStatus = user.get('requestDemo'),
+							websiteRevenue = user.get('websiteRevenue');
 
-	// 					req.session.user = user;
+						req.session.user = user;
 
-	// 					return res.render('updateUserStatus', {
-	// 						status: 'success',
-	// 						message: 'User updated successfully',
-	// 						currentStatus: currentStatus,
-	// 						email: email,
-	// 						websiteRevenue: websiteRevenue
-	// 					});
-	// 				})
-	// 				.catch(function(err) {
-	// 					if (err) {
-	// 						return res.render('updateUserStatus', {
-	// 							status: 'failure',
-	// 							message: 'Some error occured',
-	// 							currentStatus: req.session.user.requestDemo,
-	// 							email: email,
-	// 							websiteRevenue: websiteRevenue
-	// 						});
-	// 					}
-	// 				});
-	// 		} else {
-	// 			return res.render('updateUserStatus', {
-	// 				status: 'failure',
-	// 				message: 'Incomplete values'
-	// 			});
-	// 		}
-	// 	} else {
-	// 		return res.redirect('/user/dashboard');
-	// 	}
-	// })
+						return res.render('updateUserStatus', {
+							status: 'success',
+							message: 'User updated successfully',
+							currentStatus: currentStatus,
+							email: email,
+							websiteRevenue: websiteRevenue
+						});
+					})
+					.catch(function(err) {
+						if (err) {
+							return res.render('updateUserStatus', {
+								status: 'failure',
+								message: 'Some error occured',
+								currentStatus: req.session.user.requestDemo,
+								email: email,
+								websiteRevenue: websiteRevenue
+							});
+						}
+					});
+			} else {
+				return res.render('updateUserStatus', {
+					status: 'failure',
+					message: 'Incomplete values'
+				});
+			}
+		} else {
+			return res.redirect('/user/dashboard');
+		}
+	})
 	.get('/credentials', function(req, res) {
 		userModel.getUserByEmail(req.session.user.email).then(function(user) {
 			var credentialsFromModel = user.get('adnetworkCredentials') || [],
@@ -936,62 +936,46 @@ router
 				});
 			});
 	})
-	// .get('/payment', function(req, res) {
-	// 	const getTipaltiUrls = email => {
-	// 			var tipaltiConfig = config.tipalti,
-	// 				tipaltiUrl = '',
-	// 				tipaltiBaseUrl = tipaltiConfig.baseUrl,
-	// 				payeeId = encodeURIComponent(
-	// 					crypto
-	// 						.createHash('md5')
-	// 						.update(email)
-	// 						.digest('hex')
-	// 						.substr(0, 64)
-	// 				),
-	// 				payer = tipaltiConfig.payerName,
-	// 				date = Math.floor(+new Date() / 1000),
-	// 				paramsStr =
-	// 					'idap=' + payeeId + '&payer=' + payer + '&ts=' + date + '&email=' + encodeURIComponent(email),
-	// 				key = tipaltiConfig.key,
-	// 				hash = crypto
-	// 					.createHmac('sha256', key)
-	// 					.update(paramsStr.toString('utf-8'))
-	// 					.digest('hex'),
-	// 				paymentHistoryUrl = tipaltiConfig.paymentHistoryUrl + paramsStr + '&hashkey=' + hash;
+	.get('/payment', function(req, res) {
+		const getTipaltiUrls = email => {
+				var tipaltiConfig = config.tipalti,
+					tipaltiUrl = '',
+					tipaltiBaseUrl = tipaltiConfig.baseUrl,
+					payeeId = encodeURIComponent(
+						crypto
+							.createHash('md5')
+							.update(email)
+							.digest('hex')
+							.substr(0, 64)
+					),
+					payer = tipaltiConfig.payerName,
+					date = Math.floor(+new Date() / 1000),
+					paramsStr =
+						'idap=' + payeeId + '&payer=' + payer + '&ts=' + date + '&email=' + encodeURIComponent(email),
+					key = tipaltiConfig.key,
+					hash = crypto
+						.createHmac('sha256', key)
+						.update(paramsStr.toString('utf-8'))
+						.digest('hex'),
+					paymentHistoryUrl = tipaltiConfig.paymentHistoryUrl + paramsStr + '&hashkey=' + hash;
 
-	// 			// date = Math.floor(date / 1000);
-	// 			tipaltiUrl = tipaltiBaseUrl + paramsStr + '&hashkey=' + hash;
+				// date = Math.floor(date / 1000);
+				tipaltiUrl = tipaltiBaseUrl + paramsStr + '&hashkey=' + hash;
 
-	// 			return { paymentHistoryUrl, tipaltiUrl };
-	// 		},
-	// 		email = req.session.user.email;
-	// 	return Promise.all([getTipaltiUrls(email), userModel.updateUserPaymentStatus(email)])
-	// 		.spread(tipaltiUrls => {
-	// 			return res.render('payment', {
-	// 				tipaltiUrl: tipaltiUrls.tipaltiUrl,
-	// 				paymentHistoryUrl: tipaltiUrls.paymentHistoryUrl
-	// 			});
-	// 		})
-	// 		.catch(err => {
-	// 			return res.render('payment', {
-	// 				error: 'Some error occurred!'
-	// 			});
-	// 		});
-	// })
-	.get('/updatePaymentStatusAllUser', function(req, res) {
-		var userPromises = function(users) {
-			return _.map(users, user => {
-				return userModel.updateUserPaymentStatus(user);
-			});
-		};
-		return userModel
-			.getAllUsers()
-			.then(users => {
-				Promise.all(userPromises(users));
-				return res.send('done');
+				return { paymentHistoryUrl, tipaltiUrl };
+			},
+			email = req.session.user.email;
+		return Promise.all([getTipaltiUrls(email), userModel.updateUserPaymentStatus(email)])
+			.spread(tipaltiUrls => {
+				return res.render('payment', {
+					tipaltiUrl: tipaltiUrls.tipaltiUrl,
+					paymentHistoryUrl: tipaltiUrls.paymentHistoryUrl
+				});
 			})
 			.catch(err => {
-				console.log(err);
+				return res.render('payment', {
+					error: 'Some error occurred!'
+				});
 			});
 	});
 

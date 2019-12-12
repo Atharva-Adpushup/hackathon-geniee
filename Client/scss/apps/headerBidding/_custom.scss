@@ -1,0 +1,392 @@
+.white-tab-container {
+	background: #fff;
+	padding: 30px;
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.15), -1px 0 0 rgba(0, 0, 0, 0.03),
+		1px 0 0 rgba(0, 0, 0, 0.03), 0 1px 0 rgba(0, 0, 0, 0.12);
+}
+
+.hb-setup {
+	ul {
+		li {
+			list-style: none;
+			margin: 15px 0;
+			span {
+				display: inline-block;
+				&.name {
+					min-width: 200px;
+				}
+				&.status {
+					width: 50px;
+				}
+				&.btn-wrap {
+					margin-right: 10px;
+				}
+			}
+		}
+	}
+	ul.text-points {
+		padding-left: 0;
+		li {
+			list-style: disc;
+			list-style-position: inside;
+		}
+	}
+}
+
+.hb-bidders-list {
+	.added-bidders,
+	.not-added-bidders {
+		.heading {
+			margin-bottom: 15px;
+		}
+		.bidders-list-card {
+			width: 18%;
+			.panel-body {
+				width: 100%;
+				padding-top: 75%;
+				position: relative;
+				.text-img {
+					background: #ccc;
+					position: absolute;
+					top: 0;
+					right: 0;
+					bottom: 0;
+					left: 0;
+					display: flex;
+					justify-content: center;
+					align-items: center;
+					user-select: none;
+					.top-right-text {
+						position: absolute;
+						top: 0;
+						right: 0;
+						padding: 1px 10px;
+						background: rgba(0, 0, 0, 0.2);
+						color: #fff;
+						border-radius: 0 0 0 5px;
+						font-size: 0.8em;
+						text-transform: uppercase;
+					}
+					.text {
+						background-color: rgba(0, 0, 0, 0.5);
+						color: transparent;
+						text-shadow: 0px 1px 2px rgba(255, 255, 255, 0.5);
+						-webkit-background-clip: text;
+						-moz-background-clip: text;
+						background-clip: text;
+						font-size: 1.6vw;
+						font-weight: bold;
+						letter-spacing: 1px;
+						text-align: center;
+					}
+				}
+			}
+			.panel-footer {
+				.btn.btn-default {
+					color: inherit;
+					border: none;
+					background: none;
+					&:hover {
+						background: #e6e6e6;
+						box-shadow: none;
+						outline: 0 none;
+					}
+				}
+			}
+			&.added-bidder-card {
+				.text-img {
+					background: #fff;
+					.top-right-text {
+						background: $primaryColor;
+					}
+					.text {
+						background-color: $primaryColor;
+						text-shadow: none;
+					}
+				}
+			}
+		}
+		.u-cursor-pointer:hover {
+			background: rgba($color: #000000, $alpha: 0.05);
+		}
+	}
+	.added-bidders {
+		.disabled {
+			position: relative;
+			&::before {
+				content: 'This bidder has been disabled by AdPushup';
+				position: absolute;
+				top: 0;
+				right: 0;
+				bottom: 0;
+				left: 0;
+				display: flex;
+				align-items: center;
+				text-align: center;
+				background: #eee;
+				opacity: 0.9;
+				z-index: 1;
+			}
+		}
+	}
+}
+
+.hb-bidder {
+	label.control-label {
+		text-align: left;
+	}
+	.hb-input {
+		height: 35px;
+	}
+	.non-sizeless-params {
+		display: flex;
+		padding: 0 15px;
+		.size-tabs {
+			padding: 20px 0;
+			li {
+				margin-bottom: 5px;
+				&:last-of-type {
+					margin-bottom: 0;
+				}
+				a {
+					background-color: #e6e6e6;
+					border: 1px solid transparent;
+					border-radius: 5px 0 0 5px;
+					color: #999;
+					font-size: 0.9em;
+					&:hover {
+						background-color: #fafafa;
+						color: #666;
+						border: 1px solid rgba(0, 0, 0, 0.05);
+						border-right: none;
+					}
+					.org-size {
+						margin-left: 3px;
+					}
+					.check-icon {
+						margin-left: 5px;
+						color: $GreenColor;
+					}
+				}
+				&.active a {
+					background-color: #fafafa;
+					color: #666;
+					border: 1px solid rgba(0, 0, 0, 0.05);
+					border-right: none;
+					margin-right: -1px;
+					z-index: 1;
+				}
+			}
+		}
+		.size-tab-content {
+			background-color: #fafafa;
+			padding: 30px 40px;
+			border: 1px solid rgba(black, 0.05);
+			border-radius: 5px;
+			.add-size-wrap {
+				display: flex;
+				.add-size-tabs {
+					padding: 20px 0;
+					li {
+						margin-bottom: 5px;
+						&:last-of-type {
+							margin-bottom: 0;
+						}
+						a {
+							background-color: #e6e6e6;
+							border: 1px solid transparent;
+							border-radius: 5px 0 0 5px;
+							color: #999;
+							&:hover {
+								background-color: #f5f5f5;
+								color: #666;
+								border: 1px solid rgba(0, 0, 0, 0.05);
+								border-right: none;
+							}
+						}
+						&.active a {
+							background-color: #f5f5f5;
+							color: #666;
+							border: 1px solid rgba(0, 0, 0, 0.05);
+							border-right: none;
+							margin-right: -1px;
+							z-index: 1;
+						}
+					}
+				}
+				.add-size-content {
+					background-color: #f5f5f5;
+					padding: 30px 40px;
+					border: 1px solid rgba(black, 0.05);
+					border-radius: 5px;
+					ul {
+						padding: 0;
+						list-style: none;
+						margin: 0;
+						li {
+							input {
+								margin-right: 10px;
+							}
+							label {
+								font-weight: normal;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+.hb-inventories {
+	.toggle-hb-status-for-site {
+		.icon {
+			width: 25px;
+			height: 25px;
+			&.disabled {
+				color: #ccc;
+			}
+			&.active {
+				color: $primaryColor;
+				cursor: pointer;
+			}
+		}
+	}
+
+	.inventory-wrap {
+		position: relative;
+		&.disabled::before {
+			position: absolute;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			content: 'Header Bidding is paused on this site. Please enable it first to manage inventories.';
+			font-size: 1.2em;
+			background: rgba(255, 255, 255, 0.9);
+			z-index: 3;
+		}
+		.updt-inv-hb-status {
+			.lds-ring {
+				vertical-align: middle;
+			}
+		}
+
+		.table-datatable {
+			margin-top: 30px;
+			.thead-default {
+				.thead-tr-default {
+					.thead-th-default {
+						&.sortable {
+							&:hover {
+								background: #eee;
+								cursor: pointer;
+							}
+						}
+						.checkbox {
+							display: inline-block;
+							margin: 0;
+						}
+					}
+				}
+			}
+
+			.tbody-default {
+				.tbody-tr-default {
+					.tbody-td-default {
+						.checkbox {
+							display: inline-block;
+							margin: 0;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+.hb-prebid-settings {
+	form {
+		.form-row {
+			margin-bottom: 15px;
+		}
+		.footer-btns {
+			margin-left: 15px;
+		}
+	}
+}
+
+.hb-optimization {
+	table {
+		tbody {
+			tr {
+				.action-icon {
+					color: $primaryColor;
+				}
+			}
+			tr.table-footer {
+				td {
+					font-size: 16px;
+					font-weight: bold;
+					padding: 8px;
+					&.link {
+						background: #eee;
+						color: #888;
+						text-shadow: 0px 1px 1px rgba(255, 255, 255, 0.5);
+						cursor: pointer;
+						&:hover {
+							background: #ddd;
+							color: #666;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+.bidder-rule-form {
+	label {
+		text-align: left !important;
+	}
+	.countries-list-selectbox {
+		.dropdown-menu {
+			max-height: 300px;
+			overflow-y: scroll;
+		}
+	}
+}
+
+.inventory-table .rt-resizable-header-content {
+	float: left;
+}
+
+.inventory-table .rt-thead {
+	position: sticky;
+	top: 0;
+	z-index: 2;
+	background: white;
+}
+.inventory-table .rt-tbody {
+	overflow: visible !important;
+}
+
+.inventory-tab .filterbox {
+	z-index: 3 !important;
+}
+
+.inventory-table .rt-thead .rt-th.-sort-asc {
+	background-image: url('../../../../public/assets/images/sort-up-icon.jpg');
+}
+.inventory-table .rt-thead .rt-th.-sort-desc {
+	background-image: url('../../../../public/assets/images/sort-arrow-down.png');
+}
+.ReactTable .rt-thead .rt-th {
+	background-repeat: no-repeat;
+	background-size: 18px 18px;
+	background-position: right 4px;
+	font-weight: bolder;
+}

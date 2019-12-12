@@ -10,13 +10,17 @@ function init(generatedConfig) {
 		if (!statuses.HB_ACTIVE) {
 			return resolve(generatedConfig);
 		}
-		exec(`gulp build --modules=${config.prebidAdapters}`, { cwd: prebidDir }, (e, stdout, stderr) => {
-			if (e instanceof Error) {
-				return reject(e);
+		exec(
+			`gulp build --modules=${config.prebidAdapters}`,
+			{ cwd: prebidDir },
+			(e, stdout, stderr) => {
+				if (e instanceof Error) {
+					return reject(e);
+				}
+				console.log('Output from child process ', stdout);
+				return resolve(generatedConfig);
 			}
-			console.log('Output from child process ', stdout);
-			return resolve(generatedConfig);
-		});
+		);
 	});
 }
 

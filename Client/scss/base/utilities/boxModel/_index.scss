@@ -1,0 +1,24 @@
+.u-width-full,
+.u-block {
+	width: $fullPercentage !important;
+}
+
+.u-width-half,
+.u-block-half {
+	width: $halfPercentage !important;
+}
+
+.u-height-full,
+.u-block {
+	height: $fullPercentage !important;
+}
+
+.u-height-half,
+.u-block-half {
+	height: $halfPercentage !important;
+}
+
+.u-block,
+.u-block-half {
+	display: $displayBlock !important;
+}
