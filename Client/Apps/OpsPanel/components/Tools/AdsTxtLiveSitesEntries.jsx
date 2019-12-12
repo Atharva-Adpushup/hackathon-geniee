@@ -154,7 +154,6 @@ class AdsTxtLiveSitesEntries extends Component {
 			currentSelectedEntry === 'All Entries Present'
 				? adsTxtData.map(data => omit(data, ['status', 'adsTxtEntries']))
 				: adsTxtData.map(data => omit(data, ['status']));
-		console.log(csvData);
 		return (
 			<div>
 				<Row>
