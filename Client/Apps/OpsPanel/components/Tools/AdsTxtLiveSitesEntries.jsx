@@ -93,7 +93,7 @@ class AdsTxtLiveSitesEntries extends Component {
 				showNotification({
 					mode: 'error',
 					title: 'Operation Failed',
-					message: 'You are probably not entering the active Site Id',
+					message: 'Something Went Wrong',
 					autoDismiss: 5
 				});
 
