@@ -80,7 +80,10 @@ class AdsTxtLiveSitesEntries extends Component {
 			})
 			.then(res => {
 				const { data } = res.data;
-				this.setState({ isLoading: false, adsTxtData: data }, this.handleReset);
+				this.setState(
+					{ isLoading: false, adsTxtData: Array.isArray(data) ? data : [data] },
+					this.handleReset
+				);
 				return showNotification({
 					mode: 'success',
 					title: 'Success',
@@ -104,13 +107,12 @@ class AdsTxtLiveSitesEntries extends Component {
 	renderPanel() {
 		const { activeKey, adsTxtData, currentSelectedEntry } = this.state;
 
-		let adsData = Array.isArray(adsTxtData) ? adsTxtData : [adsTxtData];
 		return (
 			<PanelGroup accordion id="sites" activeKey={activeKey} onSelect={this.handleSelectAccordian}>
 				<Panel eventKey="Ads.txt Entries">
 					<Panel.Heading>
 						<Panel.Title toggle>
-							Ads.txt Entries <Badge>{adsData.length}</Badge>
+							Ads.txt Entries <Badge>{adsTxtData.length}</Badge>
 						</Panel.Title>
 					</Panel.Heading>
 					{activeKey === 'Ads.txt Entries' ? (
@@ -124,13 +126,13 @@ class AdsTxtLiveSitesEntries extends Component {
 								</tr>
 							</thead>
 							<tbody>
-								{adsData.map(val => (
+								{adsTxtData.map(val => (
 									<tr key={val.siteId}>
 										<td>{val.siteId}</td>
 										<td>{val.domain}</td>
 										<td>{val.accountEmail}</td>
 										<td>
-											<pre>
+											<pre style={{ fontSize: '10' }}>
 												{currentSelectedEntry === 'All Entries Present' ||
 												val.status === 1 ||
 												val.status === 2 ||

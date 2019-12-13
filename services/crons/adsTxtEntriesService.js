@@ -17,6 +17,8 @@ function getExistingSitesAdsTxt(site) {
 			if (typeof existingAdsTxt === 'string') {
 				let adsTxtArray = proxy.parseAdsTxtEntries(existingAdsTxt);
 				return { ...site, adsTxt: adsTxtArray };
+			} else {
+				return { ...site, adsTxt: [] };
 			}
 		})
 		.catch(err => console.log(err));
@@ -37,7 +39,6 @@ function getPublisherAdsTxt() {
 function saveAdsTxtEntries() {
 	getPublisherAdsTxt()
 		.then(adsTxtEntries => {
-			// console.log(adsTxtEntries);
 			adsTxtEntries.map(adsTxtEntry => {
 				adsTxtModel.saveAdsTxt(adsTxtEntry).catch(err => {
 					console.log(err);
