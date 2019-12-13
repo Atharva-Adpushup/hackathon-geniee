@@ -89,6 +89,7 @@ class AdsTxtLiveSitesEntries extends Component {
 				});
 			})
 			.catch(err => {
+				console.log(err);
 				showNotification({
 					mode: 'error',
 					title: 'Operation Failed',
