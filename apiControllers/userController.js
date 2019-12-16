@@ -346,6 +346,43 @@ router
 			})
 			.catch(err => errorHandler(err, res));
 	})
+	.post('/impersonateCurrentUser', (req, res) => {
+		const { isSuperUser, email } = req.user;
+		if (!isSuperUser || !email) {
+			return sendErrorResponse(
+				{
+					message: 'Permission Denined'
+				},
+				res,
+				httpStatus.PERMISSION_DENIED
+			);
+		}
+
+		return userModel
+			.setSitePageGroups(email)
+			.then(user => {
+				const token = authToken.getAuthToken({
+					email: user.get('email'),
+					isSuperUser: false
+				});
+
+				return res
+					.status(httpStatus.OK)
+					.cookie(
+						'user',
+						JSON.stringify({
+							authToken: token,
+							isSuperUser: false
+						}),
+						{ maxAge: 86400000, path: '/' }
+					)
+					.send({
+						success: 'User Impersonated Successfully',
+						authToken: token
+					});
+			})
+			.catch(err => errorHandler(err, res));
+	})
 	.post('/updateUser', (req, res) => {
 		const { toUpdate } = req.body;
 		const toSend = [];

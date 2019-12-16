@@ -18,7 +18,15 @@ function consoleRedirection(e) {
 	}, 500);
 }
 
-const Header = ({ sidebarToggle, logout, user, switchUser, findUsers, hasUnsavedChanges }) => {
+const Header = ({
+	sidebarToggle,
+	logout,
+	user,
+	switchUser,
+	impersonateCurrentUser,
+	findUsers,
+	hasUnsavedChanges
+}) => {
 	function handleLogout() {
 		if (hasUnsavedChanges) {
 			// eslint-disable-next-line no-alert
@@ -44,10 +52,19 @@ const Header = ({ sidebarToggle, logout, user, switchUser, findUsers, hasUnsaved
 			</span>
 
 			<div className="header-nav">
-				{!!user.isSuperUser ? (
+				{// eslint-disable-next-line no-extra-boolean-cast
+				!!user.isSuperUser ? (
 					<React.Fragment>
 						<UserChange switchUser={switchUser} findUsers={findUsers} />
-		{/* <CustomButton variant="secondary" onClick={consoleRedirection} className="u-margin-r3">
+						<CustomButton
+							variant="secondary"
+							onClick={impersonateCurrentUser}
+							className="u-margin-r3 impersonate-btn"
+							title={`Impersonate as ${user.email}`}
+						>
+							Impersonate as {user.email}
+						</CustomButton>
+						{/* <CustomButton variant="secondary" onClick={consoleRedirection} className="u-margin-r3">
 							Go to Console
 						</CustomButton> */}
 					</React.Fragment>
