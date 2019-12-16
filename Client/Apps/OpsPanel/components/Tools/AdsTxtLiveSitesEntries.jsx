@@ -35,6 +35,7 @@ class AdsTxtLiveSitesEntries extends Component {
 			adsTxtData: [],
 			currentSelectedEntry: null,
 			activeKey: null,
+			selectedValue: '',
 			...DEFAULT_STATE
 		};
 	}
@@ -56,6 +57,58 @@ class AdsTxtLiveSitesEntries extends Component {
 	};
 
 	handleReset = () => this.setState(DEFAULT_STATE);
+
+	formattedCsvData = () => {
+		const { adsTxtData, selectedValue } = this.state;
+
+		let csvData = [];
+		let missingEntries = '';
+		let presentEntries = '';
+		adsTxtData.map(data => {
+			if (selectedValue === 'Global Entries') {
+				if (data.status === 2) {
+					missingEntries = data.adsTxtEntries;
+					presentEntries = '';
+				} else if (data.status === 1) {
+					missingEntries = '';
+					presentEntries = data.adsTxtEntries;
+				} else {
+					missingEntries = data.adsTxtEntries.ourAdsTxt;
+					presentEntries = data.adsTxtEntries.presentEntries;
+				}
+				csvData.push({
+					siteId: data.siteId,
+					domain: data.domain,
+					accountEmail: data.accountEmail,
+					missingEntries,
+					presentEntries
+				});
+			} else if (selectedValue === 'Missing Entries') {
+				csvData.push({
+					siteId: data.siteId,
+					domain: data.domain,
+					accountEmail: data.accountEmail,
+					missingEntries: data.adsTxtEntries
+				});
+			} else if (selectedValue === 'Present Entries') {
+				presentEntries = data.adsTxtEntries;
+
+				csvData.push({
+					siteId: data.siteId,
+					domain: data.domain,
+					accountEmail: data.accountEmail,
+					presentEntries
+				});
+			} else {
+				csvData.push({
+					siteId: data.siteId,
+					domain: data.domain,
+					accountEmail: data.accountEmail
+				});
+			}
+		});
+		return csvData;
+	};
 
 	handleGenerate = () => {
 		const { currentSelectedEntry, siteId, adsTxtSnippet } = this.state;
@@ -80,8 +133,9 @@ class AdsTxtLiveSitesEntries extends Component {
 			})
 			.then(res => {
 				const { data } = res.data;
+
 				this.setState(
-					{ isLoading: false, adsTxtData: Array.isArray(data) ? data : [data] },
+					{ isLoading: false, adsTxtData: data.adsData, selectedValue: data.currentSelectedEntry },
 					this.handleReset
 				);
 				return showNotification({
@@ -105,8 +159,7 @@ class AdsTxtLiveSitesEntries extends Component {
 	};
 
 	renderPanel() {
-		const { activeKey, adsTxtData, currentSelectedEntry } = this.state;
-
+		const { activeKey, adsTxtData, selectedValue } = this.state;
 		return (
 			<PanelGroup accordion id="sites" activeKey={activeKey} onSelect={this.handleSelectAccordian}>
 				<Panel eventKey="Ads.txt Entries">
@@ -116,13 +169,23 @@ class AdsTxtLiveSitesEntries extends Component {
 						</Panel.Title>
 					</Panel.Heading>
 					{activeKey === 'Ads.txt Entries' ? (
-						<Table striped bordered hover>
+						<Table responsive striped bordered hover>
 							<thead>
 								<tr>
 									<th>Site Id</th>
 									<th>Doamin</th>
 									<th>Account Email</th>
-									<th>{currentSelectedEntry} </th>
+									{selectedValue === 'No Ads.Txt Present' ||
+									selectedValue === 'Global Entries' ? null : (
+										<th>{selectedValue} </th>
+									)}
+
+									{selectedValue !== 'Global Entries' ? null : (
+										<React.Fragment>
+											<th>Missing Entries</th>
+											<th>Present Entries</th>
+										</React.Fragment>
+									)}
 								</tr>
 							</thead>
 							<tbody>
@@ -131,16 +194,35 @@ class AdsTxtLiveSitesEntries extends Component {
 										<td>{val.siteId}</td>
 										<td>{val.domain}</td>
 										<td>{val.accountEmail}</td>
-										<td>
-											<pre style={{ fontSize: '10' }}>
-												{currentSelectedEntry === 'All Entries Present' ||
-												val.status === 1 ||
-												val.status === 2 ||
-												val.status === 4
-													? val.message
-													: val.adsTxtEntries}
-											</pre>
-										</td>
+										{selectedValue === 'No Ads.Txt Present' ||
+										selectedValue === 'Global Entries' ? null : (
+											<td>
+												<pre style={{ fontSize: '10' }}>{val.adsTxtEntries}</pre>
+											</td>
+										)}
+
+										{selectedValue !== 'Global Entries' ? null : (
+											<React.Fragment>
+												<td>
+													<pre style={{ fontSize: '10' }}>
+														{val.status === 2
+															? val.adsTxtEntries
+															: val.status === 1
+															? ''
+															: val.adsTxtEntries.ourAdsTxt}
+													</pre>
+												</td>
+												<td>
+													<pre style={{ fontSize: '10' }}>
+														{val.status === 2
+															? ''
+															: val.status === 1
+															? val.adsTxtEntries
+															: val.adsTxtEntries.presentEntries}
+													</pre>
+												</td>
+											</React.Fragment>
+										)}
 									</tr>
 								))}
 							</tbody>
@@ -152,25 +234,12 @@ class AdsTxtLiveSitesEntries extends Component {
 	}
 
 	render() {
-		const { siteId, currentSelectedEntry, adsTxtSnippet, isLoading, adsTxtData } = this.state;
-		const csvData =
-			currentSelectedEntry === 'All Entries Present'
-				? adsTxtData.map(data => omit(data, ['status', 'adsTxtEntries']))
-				: adsTxtData.map(data => omit(data, ['status']));
+		const { siteId, currentSelectedEntry, adsTxtSnippet, isLoading } = this.state;
+
+		const csvData = this.formattedCsvData();
+
 		return (
 			<div>
-				<Row>
-					<CSVLink data={csvData} filename="ads-txt.csv">
-						<CustomButton
-							variant="primary"
-							className="btn btn-lightBg btn-default btn-blue-line pull-right u-margin-r3  "
-						>
-							<FontAwesomeIcon size="1x" icon="download" className="u-margin-r3" />
-							Export Entries
-						</CustomButton>
-					</CSVLink>
-				</Row>
-
 				<Fragment>
 					<p className="u-text-bold">Type Of Entries *</p>
 					<SelectBox
@@ -228,6 +297,17 @@ class AdsTxtLiveSitesEntries extends Component {
 				<Col xs={12} className="u-margin-t4 u-padding-l0">
 					{this.renderPanel()}
 				</Col>
+				<Row>
+					<CSVLink data={csvData} filename="ads-txt.csv">
+						<CustomButton
+							variant="primary"
+							className="btn btn-lightBg btn-default btn-blue-line pull-right u-margin-r3  "
+						>
+							<FontAwesomeIcon size="1x" icon="download" className="u-margin-r3" />
+							Export Entries
+						</CustomButton>
+					</CSVLink>
+				</Row>
 			</div>
 		);
 	}

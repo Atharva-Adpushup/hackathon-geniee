@@ -34,7 +34,22 @@ router.post('/adsTxtLiveEntries', (req, res) => {
 
 	return adsTxtModel
 		.getAdsTxtEntries(siteId, adsTxtSnippet, currentSelectedEntry)
-		.then(sitesData => sendSuccessResponse(sitesData, res))
+		.then(sitesData => {
+			sitesData = Array.isArray(sitesData) ? sitesData : [sitesData];
+			let adsData = [];
+
+			if (currentSelectedEntry === 'Missing Entries') {
+				adsData = sitesData.filter(val => val.status === 2 || val.status === 3);
+			} else if (currentSelectedEntry === 'Present Entries') {
+				adsData = sitesData.filter(val => val.status === 1 || val.status === 3);
+			} else if (currentSelectedEntry === 'Global Entries') {
+				adsData = sitesData.filter(val => val.status !== 4);
+			} else {
+				adsData = sitesData.filter(val => val.status === 4);
+			}
+
+			return sendSuccessResponse({ adsData, currentSelectedEntry }, res);
+		})
 		.catch(err => errorHandler(err, res));
 });
 

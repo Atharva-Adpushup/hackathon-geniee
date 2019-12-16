@@ -279,7 +279,8 @@ const TOOLS_IDENTIFIERS = {
 const ADS_TXT_LIVE_SITES_ENTRIES = [
 	{ name: 'Missing Entries', value: 'Missing Entries' },
 	{ name: 'Present Entries', value: 'Present Entries' },
-	{ name: 'All Entries Present', value: 'All Entries Present' }
+	{ name: 'Global Entries', value: 'Global Entries' },
+	{ name: 'No Ads.Txt Present', value: 'No Ads.Txt Present' }
 ];
 
 const INFO_PANEL_IDENTIFIERS = {

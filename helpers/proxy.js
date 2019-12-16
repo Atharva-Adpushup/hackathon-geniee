@@ -127,14 +127,16 @@ var request = require('request-promise'),
 					? entriesNotFound.push({ domain, pubId, relation })
 					: entriesFound.push({ domain, pubId, relation })
 			);
+			entriesFound = entriesFound.map(
+				({ domain, pubId, relation, authorityId }) =>
+					`${domain}, ${pubId}, ${relation}${authorityId ? `, ${authorityId}` : ''}`
+			);
+			if (entriesFound.length === ourAdsTxtArr.length) {
+				return Promise.resolve(entriesFound.join('\n'));
+			}
 
 			if (entriesNotFound.length) {
 				entriesNotFound = entriesNotFound.map(
-					({ domain, pubId, relation, authorityId }) =>
-						`${domain}, ${pubId}, ${relation}${authorityId ? `, ${authorityId}` : ''}`
-				);
-
-				entriesFound = entriesFound.map(
 					({ domain, pubId, relation, authorityId }) =>
 						`${domain}, ${pubId}, ${relation}${authorityId ? `, ${authorityId}` : ''}`
 				);
@@ -164,7 +166,7 @@ var request = require('request-promise'),
 				if (typeof existingAdsTxt === 'string') {
 					const existingAdsTxtArr = API.parseAdsTxtEntries(existingAdsTxt);
 
-					API.commonVerifyAdsTxt(ourAdsTxt, existingAdsTxtArr);
+					return API.commonVerifyAdsTxt(ourAdsTxt, existingAdsTxtArr);
 				} else {
 					throw new AdPushupError({
 						httpCode: 404,
@@ -177,7 +179,7 @@ var request = require('request-promise'),
 		},
 
 		verifyActiveSitesAdsTxt(ourAdsTxt, existingAdsTxtArr) {
-			if (existingAdsTxtArr.length) API.commonVerifyAdsTxt(ourAdsTxt, existingAdsTxtArr);
+			if (existingAdsTxtArr.length) return API.commonVerifyAdsTxt(ourAdsTxt, existingAdsTxtArr);
 			else {
 				throw new AdPushupError({
 					httpCode: 404,

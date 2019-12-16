@@ -65,11 +65,13 @@ function apiModule() {
 							adsTxt
 						)
 					)
-					.then(() => ({
+					.then(adsTxt => ({
 						status: 1,
 						message: 'All Entries Available',
+						adsTxtEntries: adsTxt,
 						...commonOutput
 					}))
+
 					.catch(err => {
 						if (err instanceof AdPushupError) {
 							const {
@@ -82,6 +84,7 @@ function apiModule() {
 									output = {
 										status: 2,
 										message: "Our Ads.txt entries not found in publisher's ads.txt",
+										adsTxtEntries: ourAdsTxt,
 										...commonOutput
 									};
 									break;
@@ -104,7 +107,7 @@ function apiModule() {
 										output = {
 											status: 3,
 											message: 'All Ads.txt Entries Not Present For this site',
-											adsTxtEntries: ourAdsTxt,
+											adsTxtEntries: { ourAdsTxt, presentEntries },
 											...commonOutput
 										};
 
