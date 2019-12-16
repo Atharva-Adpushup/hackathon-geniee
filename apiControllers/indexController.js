@@ -238,17 +238,10 @@ router
 				userModel
 					.setSitePageGroups(req.body.email)
 					.then(user => {
-						let userPasswordMatch = 0;
-						let isSuperUser = false;
-
-						if (user.isMe(email, password)) {
-							isSuperUser = user.get('isAdmin') === true;
-							userPasswordMatch = 1;
-						} else if (password === consts.password.IMPERSONATE) {
-							userPasswordMatch = 1;
-						}
+						const userPasswordMatch = user.isMe(email, password);
 
 						if (userPasswordMatch) {
+							const isSuperUser = user.get('isAdmin') === true;
 							const token = authToken.getAuthToken({ email, isSuperUser });
 
 							res

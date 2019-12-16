@@ -93,6 +93,7 @@ class Shell extends React.Component {
 			location,
 			logout,
 			switchUser,
+			impersonateCurrentUser,
 			findUsers,
 			hasUnsavedChanges
 		} = this.props;
@@ -108,6 +109,7 @@ class Shell extends React.Component {
 							user={user}
 							logout={logout}
 							switchUser={switchUser}
+							impersonateCurrentUser={impersonateCurrentUser}
 							findUsers={findUsers}
 							hasUnsavedChanges={hasUnsavedChanges}
 						/>
