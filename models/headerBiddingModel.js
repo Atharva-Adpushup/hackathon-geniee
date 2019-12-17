@@ -254,7 +254,7 @@ function apiModule() {
 													} = ad;
 													inventory.headerBidding = headerBidding ? 'Enabled' : 'Disabled';
 													inventory.size = `${width}x${height}`;
-													inventory.adUnit = section.id;
+													inventory.adUnit = section.name;
 													inventories.push({ ...inventory });
 												}
 											}
@@ -293,7 +293,7 @@ function apiModule() {
 									networkData: { headerBidding },
 									width,
 									height,
-									id: adUnit
+									name: adUnit
 								} = ad;
 								inventory.headerBidding = headerBidding ? 'Enabled' : 'Disabled';
 								inventory.size = `${width}x${height}`;
@@ -329,7 +329,7 @@ function apiModule() {
 									networkData: { headerBidding },
 									width,
 									height,
-									id: adUnit
+									name: adUnit
 								} = ad;
 								inventory.headerBidding = headerBidding ? 'Enabled' : 'Disabled';
 								inventory.size = `${width}x${height}`;
