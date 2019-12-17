@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { Helmet } from 'react-helmet';
+import DocumentTitle from 'react-document-title';
 import { Col, Table, Modal, Nav, NavItem } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
@@ -327,9 +327,7 @@ class AdsTxtManager extends Component {
 		}
 		return (
 			<Fragment>
-				<Helmet>
-					<title>Ads.txt Management</title>
-				</Helmet>
+				<DocumentTitle title="Ads.txt Management" />
 
 				<div title="Ads.txt Manager">
 					{this.renderModal()}

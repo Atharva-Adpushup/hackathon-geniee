@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { Helmet } from 'react-helmet';
+import DocumentTitle from 'react-document-title';
 import { Nav, NavItem, Alert } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
@@ -150,9 +150,7 @@ class Payment extends Component {
 		}
 		return (
 			<Fragment>
-				<Helmet>
-					<title>Payment</title>
-				</Helmet>
+				<DocumentTitle title="Payment" />
 
 				<div title="Payment Settings">
 					<Nav bsStyle="tabs" activeKey={activeItem.INDEX} onSelect={this.handleNavSelect}>

@@ -2,7 +2,7 @@ import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { Row, Col } from 'react-bootstrap';
-import { Helmet } from 'react-helmet';
+import DocumentTitle from 'react-document-title';
 import history from '../../helpers/history';
 import AuthShell from '../../Components/AuthShell';
 import AuthFormWrap from '../../Components/AuthFormWrap';
@@ -159,10 +159,11 @@ class Signup extends Component {
 
 		return (
 			<Fragment>
-				<Helmet>
+				{/* <Helmet>
 					<title>Signup</title>
 					<meta name="robots" content="noindex" />
-				</Helmet>
+				</Helmet> */}
+				<DocumentTitle title="Signup" />
 
 				<AuthShell>
 					<AuthFormWrap formType="signup" onSubmit={this.onSubmit}>

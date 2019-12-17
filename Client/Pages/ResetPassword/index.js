@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { Helmet } from 'react-helmet';
+import DocumentTitle from 'react-document-title';
 import AuthShell from '../../Components/AuthShell';
 import AuthFormWrap from '../../Components/AuthFormWrap';
 import FormInput from '../../Components/FormInput';
@@ -181,9 +181,7 @@ class ResetPassword extends Component {
 		} = this.state;
 		return (
 			<Fragment>
-				<Helmet>
-					<title>Reset Password</title>
-				</Helmet>
+				<DocumentTitle title="Reset Password" />
 
 				<AuthShell>
 					<AuthFormWrap formType="resetPassword" onSubmit={this.onSubmit}>
