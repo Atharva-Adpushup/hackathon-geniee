@@ -2,7 +2,7 @@
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import React from 'react';
-import { Col } from 'react-bootstrap';
+import { Col, Form, FormGroup, ControlLabel, FormControl, HelpBlock } from 'react-bootstrap';
 
 const CustomList = props => {
 	const {
@@ -17,7 +17,8 @@ const CustomList = props => {
 		toMatch,
 		options,
 		simpleList,
-		onClick
+		onClick,
+		onCustomFieldValueChange
 	} = props;
 	function renderTabbedHeaders() {
 		return Object.keys(tabbedList.list)
@@ -51,6 +52,49 @@ const CustomList = props => {
 					</li>
 				))}
 			</ul>
+		) : null;
+	}
+
+	function renderTabbedCustomFields() {
+		return platform && tabbedList.list[platform].customFields ? (
+			<Form horizontal className="custom-fields">
+				{tabbedList.list[platform].customFields.map(customField => {
+					const {
+						displayName,
+						key,
+						inputType,
+						placeholder,
+						attributes = {},
+						value,
+						isValid,
+						validationMessage,
+						isRequired
+					} = customField;
+
+					return (
+						<FormGroup controlId="formBasicText" key={key}>
+							<Col componentClass={ControlLabel} sm={3}>
+								{`${displayName}${isRequired ? '*' : ''}`}
+							</Col>
+							<Col sm={9}>
+								<FormControl
+									type={inputType}
+									name={key}
+									placeholder={placeholder}
+									value={value}
+									required={!!isRequired}
+									onChange={onCustomFieldValueChange}
+									{...attributes}
+								/>
+
+								{typeof isValid === 'boolean' && !isValid && (
+									<HelpBlock className="u-text-error">{validationMessage}</HelpBlock>
+								)}
+							</Col>
+						</FormGroup>
+					);
+				})}
+			</Form>
 		) : null;
 	}
 
@@ -91,6 +135,7 @@ const CustomList = props => {
 				<div>
 					<ul className="options">{renderTabbedHeaders()}</ul>
 					{renderTabbedOptions()}
+					{renderTabbedCustomFields()}
 				</div>
 			);
 		}

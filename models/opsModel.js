@@ -9,7 +9,7 @@ const clonedeep = require('lodash.clonedeep');
 const couchbase = require('../helpers/couchBaseService');
 const AdPushupError = require('../helpers/AdPushupError');
 const commonConsts = require('../configs/commonConsts');
-
+const proxy = require('../helpers/proxy');
 const commonSiteFunctions = {
 	isActiveHbBidder(network, key) {
 		return network.isActive && network.isHb && key !== 'adpTags';
@@ -232,10 +232,6 @@ const commonSiteFunctions = {
 	}
 };
 
-function getUniqueSites(myArr, prop) {
-	return _.uniq(_.map(myArr, prop));
-}
-
 function apiModule() {
 	const API = {
 		getAllSitesStats() {
@@ -320,6 +316,126 @@ function apiModule() {
 						result: sortedFinalSites
 					};
 				})
+				.catch(err => {
+					console.log(err);
+					throw new AdPushupError('Something went wrong');
+				});
+		},
+
+		getActiveSites() {
+			const query = N1qlQuery.fromString(commonConsts.GET_ACTIVE_SITES_QUERY);
+
+			return couchbase
+				.connectToAppBucket()
+				.then(appBucket => appBucket.queryAsync(query))
+				.then(sites => {
+					return sites.map(value => value);
+				})
+				.catch(err => console.log(err));
+		},
+
+		getAdsTxtEntries(siteId, adsTxtSnippet, currentSelectedEntry) {
+			const adsTxt = proxy.fetchOurAdsTxt();
+
+			function adsTxtProcessing(params) {
+				const { domain, siteId, accountEmail, adsTxtSnippet, currentSelectedEntry } = params;
+				let commonOutput = {
+					domain,
+					siteId,
+					accountEmail
+				};
+				return adsTxt
+					.then(ourAdsTxt =>
+						proxy.verifyAdsTxt(domain, (ourAdsTxt = adsTxtSnippet ? adsTxtSnippet : ourAdsTxt))
+					)
+					.then(() => ({
+						status: 1,
+						message: 'All Entries Available',
+						...commonOutput
+					}))
+					.catch(err => {
+						if (err instanceof AdPushupError) {
+							const {
+								message: { httpCode = 404, ourAdsTxt, presentEntries }
+							} = err;
+							let output = null;
+
+							switch (httpCode) {
+								case 204:
+									output = {
+										status: 2,
+										message: "Our Ads.txt entries not found in publisher's ads.txt",
+										...commonOutput
+									};
+									break;
+								case 206:
+									if (currentSelectedEntry === 'Missing Entries')
+										output = {
+											status: 3,
+											message: "Some entries not found in publisher's ads.txt",
+											adsTxtEntries: ourAdsTxt,
+											...commonOutput
+										};
+									else if (currentSelectedEntry === 'Present Entries')
+										output = {
+											status: 3,
+											message: "Present entries found in publisher's ads.txt",
+											adsTxtEntries: presentEntries,
+											...commonOutput
+										};
+									else
+										output = {
+											status: 3,
+											message: 'All Ads.txt Entries Not Present For this site',
+											adsTxtEntries: ourAdsTxt,
+											...commonOutput
+										};
+
+									break;
+								default:
+								case 404:
+									output = {
+										status: 4,
+										message: "Publisher's ads.txt not found",
+										...commonOutput
+									};
+									break;
+							}
+
+							return Promise.resolve(output);
+						}
+						return Promise.reject(err);
+					});
+			}
+
+			return this.getActiveSites()
+				.then(sites => {
+					if (!siteId) {
+						const sitesPromises = sites.map(value =>
+							adsTxtProcessing({
+								domain: value.domain,
+								siteId: value.siteId,
+								accountEmail: value.accountEmail,
+								adsTxtSnippet,
+								currentSelectedEntry
+							})
+						);
+						return Promise.all(sitesPromises);
+					}
+
+					let enteredSiteEntries = sites.filter(site => site.siteId === parseInt(siteId));
+					const { domain, accountEmail } = enteredSiteEntries[0];
+					const params = {
+						domain,
+						siteId: parseInt(siteId),
+						accountEmail,
+						adsTxtSnippet,
+						currentSelectedEntry
+					};
+
+					return adsTxtProcessing(params);
+				})
+
 				.catch(err => {
 					console.log(err);
 					throw new AdPushupError('Something went wrong');

@@ -158,9 +158,9 @@ $TSCheckedAfterColor: #e84046;
 	/*****Disabled class rules*****/
 	//TODO: Move color literal values as variables
 	&.toggle--disabled {
-		input[type='checkbox']:checked ~ label .toggleSwitch {
-			background-color: #098409;
-			opacity: 0.7;
+		input[type='checkbox'] ~ label .toggleSwitch {
+			opacity: 0.3;
+			cursor: not-allowed;
 
 			&:after {
 				background: #eee;

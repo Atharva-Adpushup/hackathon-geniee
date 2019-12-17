@@ -13,7 +13,7 @@ var $ = require('jquery'),
 			: $.extend({}, true, commonConsts.DOCKED_CSS, computedStyles);
 	},
 	getDockedOffset = function (formatData) {
-		var bottomOffset = formatData && formatData.bottomOffset ? Number(formatData.bottomOffset) : 0;
+		var bottomOffset = formatData && formatData.bottomOffset ? parseFloat(formatData.bottomOffset) : 0;
 		var bottomXPath = formatData ? formatData.bottomXpath || formatData.bottomXPath : null;
 		return bottomXPath ? $(bottomXPath).offset().top - bottomOffset : null;
 	},
@@ -25,13 +25,18 @@ var $ = require('jquery'),
 		var $el = $(xPath);
 		var elComputedStyles = window.getComputedStyle($el[0]);
 		var dockedCSS = getDockedCSS(formatData, elComputedStyles);
-		var offset = getDockedOffset(formatData);
 		var windowHeight = $(window).height();
 
 		var dockifyTrigger = function () {
 			var windowScrollTop = $(window).scrollTop();
 			var fixedPoint = $el.attr('data-fixed-point') || null;
 			var elTopOffset = fixedPoint || $el.offset().top;
+			var offset = $el.attr('data-bottom-offset') || null;
+			if (!offset) {
+				offset = getDockedOffset(formatData);
+				$el.attr('data-bottom-offset', offset);
+			}
+			
 			var scrollLimitReachedWithoutOffset = windowScrollTop > elTopOffset && !offset;
 			var scrollLimitReachedWithOffset = windowScrollTop > elTopOffset && offset && windowScrollTop < offset;
 

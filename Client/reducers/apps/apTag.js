@@ -53,7 +53,8 @@ const global = (state = { currentAd: null }, action) => {
 				...state,
 				[action.siteId]: {
 					...siteData,
-					currentAd: action.currentAd
+					currentAd: action.currentAd,
+					maxHeight: action.maxHeight
 				}
 			};
 

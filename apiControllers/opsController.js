@@ -10,6 +10,7 @@ const { GET_SITES_STATS_API, EMAIL_REGEX } = require('../configs/commonConsts');
 const { sendSuccessResponse, sendErrorResponse } = require('../helpers/commonFunctions');
 const { appBucket, errorHandler } = require('../helpers/routeHelpers');
 const opsModel = require('../models/opsModel');
+const proxy = require('../helpers/proxy');
 
 const router = express.Router();
 
@@ -250,6 +251,98 @@ router
 				if (code !== 1) return Promise.reject(new Error(response.data));
 				return sendSuccessResponse(response, res);
 			})
+			.catch(err => errorHandler(err, res));
+	})
+
+	.post('/adsTxtLiveEntries', (req, res) => {
+		if (!req.user.isSuperUser) {
+			return sendErrorResponse(
+				{
+					message: 'Unauthorized Request',
+					code: HTTP_STATUSES.UNAUTHORIZED
+				},
+				res
+			);
+		}
+
+		const { siteId, emailId, currentSelectedEntry, adsTxtSnippet } = req.body;
+
+		const isDataValid = !!(currentSelectedEntry && EMAIL_REGEX.test(emailId));
+
+		if (isDataValid === false) {
+			return sendErrorResponse(
+				{
+					message: 'Missing or Inavalid params.'
+				},
+				res
+			);
+		}
+
+		opsModel
+			.getAdsTxtEntries(siteId, adsTxtSnippet, currentSelectedEntry)
+			.then(sitesData => {
+				let adsData = '';
+				let commonMailFormatIfSiteId = `<div class="mailData">
+			<p><b>Domain :</b> ${sitesData.domain}</p>
+			<p><b>Site ID :</b> ${siteId}
+			<p> <b>Account Email :</b> ${sitesData.accountEmail}</p>`;
+				siteId
+					? (adsData =
+							currentSelectedEntry === 'All Entries Present' ||
+							sitesData.status === 1 ||
+							sitesData.status === 2 ||
+							sitesData.status === 4
+								? `${commonMailFormatIfSiteId}
+								  <p> <b>${sitesData.message} </b></p>
+					</div>
+				`
+								: `${commonMailFormatIfSiteId}
+				<p> <b>${currentSelectedEntry} :</b> ${sitesData.adsTxtEntries.split('\n').join('<br>')} </p>
+				</div>`)
+					: sitesData.forEach(siteData => {
+							let commonMailFormatIfNoSiteId = `<div class="mailData">
+						<p><b>Domain :</b> ${siteData.domain}</p>
+						<p><b>Site ID :</b> ${siteData.siteId}
+						<p> <b>Account Email :</b> ${siteData.accountEmail}</p>`;
+							adsData +=
+								currentSelectedEntry === 'All Entries Present' ||
+								siteData.status === 1 ||
+								siteData.status === 2 ||
+								siteData.status === 4
+									? `${commonMailFormatIfNoSiteId}
+					<p> <b>${siteData.message} </b></p>
+					</div><br/>
+				`
+									: `${commonMailFormatIfNoSiteId}
+				<p> <b>${currentSelectedEntry} :</b> ${siteData.adsTxtEntries.split('\n').join('<br>')} </p>
+				</div> <br/>`;
+					  });
+
+				var options = {
+					method: 'POST',
+					uri: 'http://queuepublisher.adpushup.com/publish',
+					body: {
+						queue: 'MAILER',
+						data: {
+							to: emailId,
+							body: adsData,
+							subject: !siteId
+								? `${currentSelectedEntry} list for all the active sites`
+								: `${currentSelectedEntry} list for ${sitesData.domain} `
+						}
+					},
+					json: true
+				};
+
+				return request(options)
+					.then(data => console.log(data))
+					.catch(err => console.log(err));
+			})
+			.catch(err => errorHandler(err, res));
+
+		return opsModel
+			.getActiveSites()
+			.then(sitesData => sendSuccessResponse(sitesData, res))
 			.catch(err => errorHandler(err, res));
 	})
 

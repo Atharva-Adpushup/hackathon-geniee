@@ -45,6 +45,16 @@ module.exports = {
 								ON keys ('hbdc::' || to_string(_site.siteId))
 								WHERE meta(_site).id LIKE 'site::%'
 								AND meta(_user).id LIKE 'user::%';`,
+
+	GET_ACTIVE_SITES_QUERY: `SELECT _site.siteId,
+                                	_site.siteDomain as domain,
+									_site.ownerEmail as accountEmail,
+									_hbdc.hbcf as addedBidders
+							FROM AppBucket _site
+							LEFT JOIN AppBucket _hbdc
+							ON keys ('hbdc::' || to_string(_site.siteId))
+							WHERE meta(_site).id LIKE 'site::%' AND _site.dataFeedActive = true;`,
+
 	DEMO_PAGEGROUPS: [
 		'HOME',
 		'CALC',
@@ -251,10 +261,6 @@ module.exports = {
 			utmFirstReferrer: 'c3daf387ef687bffc465193a6b1ac525960a1d05'
 		},
 		emailBlockList: ['demo@adpushup.com']
-	},
-	password: {
-		MASTER: 'fd146d7eea32ff77a19987f41081f466',
-		IMPERSONATE: '#m9ce[=*s#cK9R}9V.]gTK9x?2B3=C*J(PGvBAt'
 	},
 	exceptions: {
 		str: {

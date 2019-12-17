@@ -27,6 +27,11 @@
 			margin-right: 10px;
 			display: inline-flex;
 		}
+		.impersonate-btn {
+			max-width: 300px;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
 		.dropdown {
 			margin-left: auto;
 			&.open button,

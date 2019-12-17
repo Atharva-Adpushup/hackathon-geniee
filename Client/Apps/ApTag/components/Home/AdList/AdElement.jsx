@@ -71,7 +71,10 @@ class AdElement extends Component {
 		const isAMP = ad.formatData.type === 'amp';
 
 		let code = isAMP ? this.getAMPAdCode(ad) : ADCODE;
-		code = code ? code.replace(/__AD_ID__/g, ad.id) : null;
+		const customAttributes = ad.maxHeight ? ` max-height="${ad.maxHeight}"` : '';
+		code = code
+			? code.replace(/__AD_ID__/g, ad.id).replace(/__CUSTOM_ATTRIBS__/, customAttributes)
+			: null;
 
 		if (showNetworkDetails) {
 			return (
@@ -142,6 +145,9 @@ class AdElement extends Component {
 						? makeFirstLetterCapitalize(ad.width)
 						: `${ad.width}x${ad.height}`
 				)}
+				{ad.width === 'responsive' && !!ad.maxHeight
+					? this.renderInformation('Max Height', ad.maxHeight)
+					: null}
 				{user.isSuperUser ? (
 					<div>
 						{this.renderInformation(

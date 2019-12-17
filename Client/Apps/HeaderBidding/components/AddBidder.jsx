@@ -22,10 +22,12 @@ export default class AddBidder extends React.Component {
 		if (bidderConfig.relation === 'adpushup' && fieldsConfig.bids) {
 			bidderConfig.bids = fieldsConfig.bids;
 			bidderConfig.revenueShare =
+				fieldsConfig.bids === 'gross' &&
+				fieldsConfig.revenueShare !== '' &&
 				// eslint-disable-next-line no-restricted-globals
-				fieldsConfig.bids === 'gross' && !isNaN(fieldsConfig.revenueShare)
-					? fieldsConfig.revenueShare
-					: null;
+				!isNaN(Number(fieldsConfig.revenueShare))
+					? Number(fieldsConfig.revenueShare)
+					: '';
 		}
 
 		// Inject custom params if any
