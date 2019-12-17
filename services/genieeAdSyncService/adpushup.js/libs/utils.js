@@ -7,7 +7,7 @@ var browserConfig = require('./browserConfig.js'),
 
 module.exports = {
 	log: function() {
-		var queryParams = this.queryParams;
+		var queryParams = this.getQueryParams();
 		var isQueryParams = !!(
 				queryParams &&
 				$.isPlainObject(queryParams) &&
@@ -234,7 +234,23 @@ module.exports = {
 				if (document.createEvent !== 'undefined') {
 					try {
 						evt = document.createEvent('MouseEvent');
-						evt.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+						evt.initMouseEvent(
+							'click',
+							true,
+							true,
+							window,
+							0,
+							0,
+							0,
+							0,
+							0,
+							false,
+							false,
+							false,
+							false,
+							0,
+							null
+						);
 						browserConfig.$pingEl
 							.attr('ping', toFeedback)
 							.get(0)
@@ -325,7 +341,23 @@ module.exports = {
 				if (document.createEvent !== 'undefined') {
 					try {
 						evt = document.createEvent('MouseEvent');
-						evt.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+						evt.initMouseEvent(
+							'click',
+							true,
+							true,
+							window,
+							0,
+							0,
+							0,
+							0,
+							0,
+							false,
+							false,
+							false,
+							false,
+							0,
+							null
+						);
 						browserConfig.$pingEl
 							.attr('ping', toFeedback)
 							.get(0)
@@ -484,7 +516,7 @@ module.exports = {
 			}
 
 			url = urlBase + (parts.length > 0 ? '?' + parts.join('&') : '');
-			/*if (Object.keys(this.queryParams).length >= 1) {
+			/*if (Object.keys(this.getQueryParams()).length >= 1) {
 				url = urlBase + '?' + parts.join('&');
 			} else {
 				url = urlBase;

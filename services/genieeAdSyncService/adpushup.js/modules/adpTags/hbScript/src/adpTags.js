@@ -62,7 +62,10 @@ var adpTags = {
 				clearTimeout(this.slotInterval);
 			}
 			this.currentBatchAdpSlots.push(slot);
-			this.slotInterval = setTimeout(this.processBatchForBidding.bind(this), constants.BATCHING_INTERVAL);
+			this.slotInterval = setTimeout(
+				this.processBatchForBidding.bind(this),
+				constants.BATCHING_INTERVAL
+			);
 		},
 		createSlot: function(containerId, size, placement, optionalParam) {
 			var adUnits = inventoryMapper.get(inventory, size, optionalParam);
@@ -70,21 +73,32 @@ var adpTags = {
 			var bidders = optionalParam.headerBidding ? adUnits.bidders : [];
 			var isResponsive = optionalParam.isResponsive;
 			var sectionName = optionalParam.sectionName;
-			var multipleAdSizes = optionalParam.multipleAdSizes;
+			var multipleAdSizes =
+				constants.AD_SIZE_MAPPING.IAB_SIZES.BACKWARD_COMPATIBLE_MAPPING[size.join('x')] ||
+				optionalParam.multipleAdSizes;
 			var services = optionalParam.services;
+			var formats =
+				config.PREBID_CONFIG && config.PREBID_CONFIG.formats
+					? config.PREBID_CONFIG.formats
+					: constants.PREBID.DEFAULT_FORMATS;
+			var timeout =
+				config.PREBID_CONFIG && config.PREBID_CONFIG.timeOut
+					? config.PREBID_CONFIG.timeOut
+					: constants.PREBID.TIMEOUT;
 
 			this.adpSlots[containerId] = {
 				slotId: slotId,
 				optionalParam: optionalParam,
 				bidders: bidders || [],
+				formats: formats,
 				placement: placement,
 				activeDFPNetwork: utils.getActiveDFPNetwork(),
 				size: size,
 				sectionName: sectionName,
-				computedSizes: multipleAdSizes ? multipleAdSizes : [],
+				computedSizes: multipleAdSizes || [],
 				isResponsive: isResponsive,
 				containerId: containerId,
-				timeout: constants.PREBID.TIMEOUT,
+				timeout: timeout,
 				gSlot: null,
 				hasRendered: false,
 				biddingComplete: false,

@@ -5,6 +5,7 @@ var responsiveAds = require('./responsiveAds');
 var adp = require('./adp');
 var utils = require('./utils');
 var auction = require('./auction');
+var config = require('./config');
 var hb = {
 	createPrebidSlots: function(adpSlotsBatch) {
 		var prebidSlots = [];
@@ -17,51 +18,99 @@ var hb = {
 				adpSlot.computedSizes = responsiveSizes;
 			}
 
-			if (!adpSlot.bidders || !adpSlot.bidders.length) {
+			if (
+				!window.adpushup.services.HB_ACTIVE ||
+				!adpSlot.bidders ||
+				!adpSlot.bidders.length
+			) {
+				adpSlot.biddingComplete = true;
 				return;
 			}
 
 			var size = adpSlot.size;
-			var computedSizes = adpSlot.isResponsive ? responsiveSizes : adpSlot.computedSizes;
+			var computedSizes = adpSlot.computedSizes;
 			var prebidSizes = computedSizes.length ? computedSizes : [size];
 			if (adpSlot.optionalParam.overrideActive && adpSlot.optionalParam.overrideSizeTo) {
 				size = adpSlot.optionalParam.overrideSizeTo.split('x');
 			}
 
-			// Set custom sub id for criteo
-			var updatedBidders = adpSlot.bidders.map(function(bidder) {
-				if (bidder.bidder === 'criteo') {
-					bidder.params.publisherSubId =
-						'AP/' + adp.config.siteId + '_' + adp.utils.domanize(adp.config.siteDomain);
+			var computedBidders = JSON.parse(JSON.stringify(adpSlot.bidders));
+			var sizeConfig = config.INVENTORY.deviceConfig.sizeConfig;
+
+			computedBidders.forEach(function(val, i) {
+				// find size config of current bidder
+				var index;
+				for (index = 0; index < sizeConfig.length; index++) {
+					var element = sizeConfig[index];
+					if (element.bidder === val.bidder) {
+						break;
+					}
 				}
 
-				return bidder;
+				// if found then set its labels as labelAny in current bidder object
+				if (!isNaN(index) && sizeConfig[index]) {
+					computedBidders[i].labelAny = sizeConfig[index].labels;
+				}
+
+				if (
+					val.bidder === 'rubicon' &&
+					adpSlot.formats.indexOf('video') !== -1 &&
+					val.params.video
+				) {
+					computedBidders[i].params.video = {
+						playerWidth: prebidSizes[0][0].toString(),
+						playerHeight: prebidSizes[0][1].toString()
+					};
+				}
 			});
 
-			prebidSlots.push({
+			var prebidSlot = {
 				code: adpSlot.containerId,
-				mediaTypes: {
-					banner: {
-						sizes: prebidSizes
-					},
-					// video: {
-					// 	context: constants.PREBID.VIDEO_FORMAT_TYPE,
-					// 	playerSize: prebidSizes[0]
-					// }
-				},
-				bids: updatedBidders
+				mediaTypes: {},
+				bids: computedBidders
+			};
+
+			adpSlot.formats.forEach(function(format) {
+				switch (format) {
+					case 'display': {
+						prebidSlot.mediaTypes.banner = { sizes: prebidSizes };
+						break;
+					}
+					case 'video': {
+						prebidSlot.mediaTypes.video = {
+							context: constants.PREBID.VIDEO_FORMAT_TYPE,
+							playerSize: prebidSizes[0],
+							mimes: ['video/mp4', 'video/x-ms-wmv'],
+							protocols: [2, 5],
+							maxduration: 30,
+							linearity: 1,
+							api: [2]
+						};
+						break;
+					}
+					case 'native': {
+						// TODO: add native format in prebid config
+						break;
+					}
+				}
 			});
+
+			prebidSlots.push(prebidSlot);
 		});
 
-		return !prebidSlots.length ? auction.end(adpBatchId) : auction.start(prebidSlots, adpBatchId);
+		return !prebidSlots.length
+			? auction.end(adpBatchId)
+			: auction.start(prebidSlots, adpBatchId);
 	},
 	setBidWonListener: function(w) {
-		w.pbjs.que.push(function() {
-			w.pbjs.onEvent(constants.EVENTS.PREBID.BID_WON, function(bidData) {
-				console.log('===BidWon====', bidData);
+		w._apPbJs.que.push(function() {
+			w._apPbJs.onEvent(constants.EVENTS.PREBID.BID_WON, function(bidData) {
+				utils.log('===BidWon====', bidData);
 
 				var slot = window.adpushup.adpTags.adpSlots[bidData.adUnitCode];
-				var computedCPMValue = utils.currencyConversionActive(adp.config) ? 'originalCpm' : 'cpm';
+				var computedCPMValue = utils.currencyConversionActive(adp.config)
+					? 'originalCpm'
+					: 'cpm';
 
 				slot.feedback.winner = bidData.bidder;
 				slot.feedback.winningRevenue = bidData[computedCPMValue] / 1000;
@@ -70,21 +119,21 @@ var hb = {
 		});
 	},
 	loadPrebid: function(w) {
-		/* 
-            HB flag passed as a global constant to the webpack config using DefinePlugin 
-            (https://webpack.js.org/plugins/define-plugin/#root) 
+		/*
+            HB flag passed as a global constant to the webpack config using DefinePlugin
+            (https://webpack.js.org/plugins/define-plugin/#root)
         */
 		if (HB_ACTIVE) {
 			(function() {
-				require('../../../../../adpushup.js/modules/adpTags/Prebid.js/build/dist/prebid');
+				require('../../Prebid.js/build/dist/prebid');
 			})();
 		}
 
 		return this.setBidWonListener(w);
 	},
 	init: function(w) {
-		w.pbjs = w.pbjs || {};
-		w.pbjs.que = w.pbjs.que || [];
+		w._apPbJs = w._apPbJs || {};
+		w._apPbJs.que = w._apPbJs.que || [];
 
 		return this.loadPrebid(w);
 	}
