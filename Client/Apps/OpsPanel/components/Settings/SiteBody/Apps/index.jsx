@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { PanelGroup, Panel, Col, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { PanelGroup, Panel, Col, OverlayTrigger, Tooltip } from '@/Client/helpers/react-bootstrap-imports';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 

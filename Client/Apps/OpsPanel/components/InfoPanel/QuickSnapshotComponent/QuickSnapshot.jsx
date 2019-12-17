@@ -4,7 +4,7 @@ import isEmpty from 'lodash/isEmpty';
 import orderBy from 'lodash/orderBy';
 import cloneDeep from 'lodash/cloneDeep';
 import { Link } from 'react-router-dom';
-import { Button } from 'react-bootstrap';
+import { Button } from '@/Client/helpers/react-bootstrap-imports';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import '../../../../../scss/pages/dashboard/index.scss';
 import Empty from '../../../../../Components/Empty/index';

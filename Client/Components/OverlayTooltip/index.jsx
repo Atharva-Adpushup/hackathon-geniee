@@ -1,5 +1,5 @@
 import React from 'react';
-import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { OverlayTrigger, Tooltip } from '@/Client/helpers/react-bootstrap-imports';
 
 function OverlayTooltip({ id, children, tooltip, placement }) {
 	return (

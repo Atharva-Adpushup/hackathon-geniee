@@ -4,7 +4,7 @@
 /* eslint-disable react/destructuring-assignment */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Row, Col, Nav, NavItem, FormGroup, ControlLabel, HelpBlock } from 'react-bootstrap';
+import { Row, Col, Nav, NavItem, FormGroup, ControlLabel, HelpBlock } from '@/Client/helpers/react-bootstrap-imports';
 import InputBox from '../../../Components/InputBox';
 import CustomButton from '../../../Components/CustomButton';
 

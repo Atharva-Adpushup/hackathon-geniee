@@ -3,7 +3,7 @@
 /* eslint-disable guard-for-in */
 /* eslint-disable no-restricted-syntax */
 import React from 'react';
-import { Button } from 'react-bootstrap';
+import { Button } from '@/Client/helpers/react-bootstrap-imports';
 import Card from '../../../Components/Layout/Card';
 
 function getBidderJSX(bidderType, bidderObj, bidderKey, openAddManageBidderView) {

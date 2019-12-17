@@ -4,7 +4,7 @@ import 'react-dates/initialize';
 import { DateRangePicker, isInclusivelyBeforeDay } from 'react-dates';
 import 'react-dates/lib/css/_datepicker.css';
 
-import { PanelGroup, Panel, Col, Badge, Row } from 'react-bootstrap';
+import { PanelGroup, Panel, Col, Badge, Row } from '@/Client/helpers/react-bootstrap-imports';
 import FieldGroup from '../../../../../Components/Layout/FieldGroup';
 import CommonTable from './CommonTable';
 import CustomButton from '../../../../../Components/CustomButton/index';

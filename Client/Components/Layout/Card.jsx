@@ -1,5 +1,5 @@
 import React from 'react';
-import { Panel } from 'react-bootstrap';
+import { Panel } from '@/Client/helpers/react-bootstrap-imports';
 import PropTypes from 'prop-types';
 
 class Card extends React.Component {

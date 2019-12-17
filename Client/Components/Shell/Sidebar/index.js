@@ -1,7 +1,7 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { NavLink } from 'react-router-dom';
-import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { OverlayTrigger, Tooltip } from '@/Client/helpers/react-bootstrap-imports';
 
 const Sidebar = ({ show, user, sites }) => {
 	const getNavItem = (name, link, icon, showTooltip, tooltipText) => {

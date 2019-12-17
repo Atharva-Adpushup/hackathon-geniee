@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import DocumentTitle from 'react-document-title';
-import { Col, Table, Modal, Nav, NavItem } from 'react-bootstrap';
+import { Col, Table, Modal, Nav, NavItem } from '@/Client/helpers/react-bootstrap-imports';
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
 import proxyService from '../../services/proxyService';

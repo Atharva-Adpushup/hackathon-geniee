@@ -1,6 +1,6 @@
 /* eslint-disable no-alert */
 import React, { Component, Fragment } from 'react';
-import { Table, Modal } from 'react-bootstrap';
+import { Table, Modal } from '@/Client/helpers/react-bootstrap-imports';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import CustomButton from '../../../../../../Components/CustomButton/index';

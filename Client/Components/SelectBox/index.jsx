@@ -2,7 +2,7 @@
 /* eslint-disable prefer-destructuring */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { DropdownButton, MenuItem, Glyphicon, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { DropdownButton, MenuItem, Glyphicon, OverlayTrigger, Tooltip } from '@/Client/helpers/react-bootstrap-imports';
 
 const findSelected = props => {
 	const { selected, title, options } = props;

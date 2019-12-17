@@ -6,7 +6,7 @@ import React, { Component } from 'react';
 // import _ from 'lodash';
 // import clipboard from 'clipboard-polyfill';
 // import moment from 'moment';
-import { Col, Breadcrumb } from 'react-bootstrap';
+import { Col, Breadcrumb } from '@/Client/helpers/react-bootstrap-imports';
 import { Link } from 'react-router-dom';
 import Datatable from 'react-bs-datatable';
 import { copyToClipBoard, formatDate } from '../../../helpers/commonFunctions';

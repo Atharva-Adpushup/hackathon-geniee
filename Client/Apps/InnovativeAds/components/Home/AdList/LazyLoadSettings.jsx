@@ -1,5 +1,5 @@
 // import React from 'react';
-// import { Row, Col } from 'react-bootstrap';
+// import { Row, Col } from '@/Client/helpers/react-bootstrap-imports';
 // import { CustomButton } from '../../shared/index';
 // import CustomToggleSwitch from '../../../../Editor/components/shared/customToggleSwitch';
 

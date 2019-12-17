@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row, Col, Button } from 'react-bootstrap';
+import { Row, Col, Button } from '@/Client/helpers/react-bootstrap-imports';
 import Codemirror from 'react-codemirror';
 
 class customCodeEditor extends React.Component {

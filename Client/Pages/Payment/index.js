@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import DocumentTitle from 'react-document-title';
-import { Nav, NavItem, Alert } from 'react-bootstrap';
+import { Nav, NavItem, Alert } from '@/Client/helpers/react-bootstrap-imports';
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
 import ActionCard from '../../Components/ActionCard/index';

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Col, ProgressBar } from 'react-bootstrap';
+import { Col, ProgressBar } from '@/Client/helpers/react-bootstrap-imports';
 import CustomList from './CustomList';
 import { Docked, Default, InView, StickyTop } from './Formats/index';
 import { PLATFORMS, FORMATS, SIZES, displayAdMessage } from '../../configs/commonConsts';

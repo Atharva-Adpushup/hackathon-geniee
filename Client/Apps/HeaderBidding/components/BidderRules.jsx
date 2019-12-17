@@ -3,7 +3,7 @@
 /* eslint-disable no-unused-vars */
 
 import React from 'react';
-import { Table } from 'react-bootstrap';
+import { Table } from '@/Client/helpers/react-bootstrap-imports';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import CustomIcon from '../../../Components/CustomIcon';
 import {
