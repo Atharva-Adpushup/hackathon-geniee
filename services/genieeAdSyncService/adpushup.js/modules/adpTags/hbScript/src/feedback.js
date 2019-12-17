@@ -23,7 +23,7 @@ var feedback = {
 			winnerAdUnitId: slot.feedback.winnerAdUnitId || null,
 			timedOutBidders: [],
 			services: slot.services,
-			sectionId: (slot.optionalParam && slot.optionalParam.originalId) || slot.sectionId,
+			sectionId: slot.sectionId,
 			sectionName: slot.sectionName,
 			pageGroup: adp.config.pageGroup,
 			pageVariationId: window.adpushup.config.selectedVariation,
@@ -45,11 +45,9 @@ var feedback = {
 		var feedbackData = this.getFeedbackData(slot, defaultWinner);
 
 		// Old feedback
-		// adp.$.post(constants.FEEDBACK.URL_OLD, JSON.stringify(feedbackData));
+		adp.$.post(constants.FEEDBACK.URL_OLD, JSON.stringify(feedbackData));
 
-		return adp.$.get(
-			constants.FEEDBACK.URL + adp.utils.base64Encode(JSON.stringify(feedbackData))
-		);
+		return adp.$.get(constants.FEEDBACK.URL + adp.utils.base64Encode(JSON.stringify(feedbackData)));
 	}
 };
 

@@ -4,12 +4,18 @@ var constants = require('./constants');
 var feedback = require('./feedback');
 var responsiveAds = require('./responsiveAds');
 var targeting = require('./targeting');
+var getDFPCOntainerFromDom = function(containerId) {
+	return document.getElementById(containerId);
+};
 var gpt = {
 	refreshGPTSlot: function(googletag, gSlot) {
-		return googletag.pubads().refresh([gSlot]);
+		if (gSlot) {
+			return googletag.pubads().refresh([gSlot]);
+		}
 	},
 	renderSlot: function(googletag, adpSlot) {
-		if (!adpSlot.containerPresent || !adpSlot.biddingComplete || adpSlot.hasRendered) {
+		//if (!adpSlot.containerPresent || !adpSlot.biddingComplete || adpSlot.hasRendered) {
+		if (!getDFPCOntainerFromDom(adpSlot.containerId) || !adpSlot.biddingComplete || adpSlot.hasRendered) {
 			return;
 		}
 		adpSlot.hasRendered = true;
@@ -53,37 +59,31 @@ var gpt = {
 	},
 	setSlotRenderListener: function(w) {
 		w.googletag.cmd.push(function() {
-			w.googletag
-				.pubads()
-				.addEventListener(constants.EVENTS.GPT.SLOT_RENDER_ENDED, function(event) {
-					var slot = null;
-					var adUnitPath = event.slot.getAdUnitPath();
-					var adUnitPathArray = adUnitPath.split('/');
-					var adUnitCode = adUnitPathArray[adUnitPathArray.length - 1];
-					var networkCode = constants.NETWORK_ID;
+			w.googletag.pubads().addEventListener(constants.EVENTS.GPT.SLOT_RENDER_ENDED, function(event) {
+				var slot = null;
+				var adUnitPath = event.slot.getAdUnitPath();
+				var adUnitPathArray = adUnitPath.split('/');
+				var adUnitCode = adUnitPathArray[adUnitPathArray.length - 1];
+				var networkCode = constants.NETWORK_ID;
 
-					Object.keys(window.adpushup.adpTags.adpSlots).forEach(function(adpSlot) {
-						var currentSlot = window.adpushup.adpTags.adpSlots[adpSlot];
-						var slotMatched = !!(
-							currentSlot.optionalParam.dfpAdunitCode == adUnitCode &&
-							currentSlot.activeDFPNetwork
-						);
+				Object.keys(window.adpushup.adpTags.adpSlots).forEach(function(adpSlot) {
+					var currentSlot = window.adpushup.adpTags.adpSlots[adpSlot];
+					var slotMatched = !!(
+						currentSlot.optionalParam.dfpAdunitCode == adUnitCode && currentSlot.activeDFPNetwork
+					);
 
-						if (slotMatched) {
-							networkCode = currentSlot.activeDFPNetwork;
-						}
-						if (
-							'/' + networkCode + '/' + currentSlot.optionalParam.dfpAdunitCode ===
-							adUnitPath
-						) {
-							slot = currentSlot;
-						}
-					});
-
-					if (slot) {
-						return feedback.send(slot);
+					if (slotMatched) {
+						networkCode = currentSlot.activeDFPNetwork;
+					}
+					if ('/' + networkCode + '/' + currentSlot.optionalParam.dfpAdunitCode === adUnitPath) {
+						slot = currentSlot;
 					}
 				});
+
+				if (slot) {
+					return feedback.send(slot);
+				}
+			});
 		});
 	},
 	loadGpt: function(w, d) {
