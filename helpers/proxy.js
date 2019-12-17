@@ -178,7 +178,7 @@ var request = require('request-promise'),
 			});
 		},
 
-		verifyActiveSitesAdsTxt(ourAdsTxt, existingAdsTxtArr) {
+		getAdsTxtFromDbAndVerify(ourAdsTxt, existingAdsTxtArr) {
 			if (existingAdsTxtArr.length) return API.commonVerifyAdsTxt(ourAdsTxt, existingAdsTxtArr);
 			else {
 				throw new AdPushupError({

@@ -50,5 +50,4 @@ function saveAdsTxtEntries() {
 		});
 }
 
-// cron.schedule('0 0 */12 * * *', saveAdsTxtEntries);
-saveAdsTxtEntries();
+cron.schedule('0 0 */12 * * *', saveAdsTxtEntries);

@@ -60,7 +60,7 @@ function apiModule() {
 				};
 				return ourAdsTxt
 					.then(ourAdsTxtEntries =>
-						proxy.verifyActiveSitesAdsTxt(
+						proxy.getAdsTxtFromDbAndVerify(
 							(ourAdsTxtEntries = adsTxtSnippet ? adsTxtSnippet : ourAdsTxtEntries),
 							adsTxt
 						)
