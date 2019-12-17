@@ -204,22 +204,24 @@ class AdsTxtLiveSitesEntries extends Component {
 										{selectedValue !== 'Global Entries' ? null : (
 											<React.Fragment>
 												<td>
-													<pre style={{ fontSize: '10' }}>
-														{val.status === 2
-															? val.adsTxtEntries
-															: val.status === 1
-															? ''
-															: val.adsTxtEntries.ourAdsTxt}
-													</pre>
+													{val.status === 2 ? (
+														<pre style={{ fontSize: '10' }}>{val.adsTxtEntries} </pre>
+													) : val.status === 1 ? (
+														''
+													) : (
+														<pre style={{ fontSize: '10' }}>{val.adsTxtEntries.ourAdsTxt} </pre>
+													)}
 												</td>
 												<td>
-													<pre style={{ fontSize: '10' }}>
-														{val.status === 2
-															? ''
-															: val.status === 1
-															? val.adsTxtEntries
-															: val.adsTxtEntries.presentEntries}
-													</pre>
+													{val.status === 2 ? (
+														''
+													) : val.status === 1 ? (
+														<pre style={{ fontSize: '10' }}>{val.adsTxtEntries} </pre>
+													) : (
+														<pre style={{ fontSize: '10' }}>
+															{val.adsTxtEntries.presentEntries}{' '}
+														</pre>
+													)}
 												</td>
 											</React.Fragment>
 										)}
@@ -268,7 +270,7 @@ class AdsTxtLiveSitesEntries extends Component {
 				<FieldGroup
 					name="siteId"
 					value={siteId}
-					type="number"
+					type="text"
 					label="Site Id "
 					onChange={this.handleChange}
 					size={6}

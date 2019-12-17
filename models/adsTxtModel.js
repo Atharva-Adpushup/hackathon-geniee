@@ -50,7 +50,7 @@ function apiModule() {
 
 		getAdsTxtEntries(siteId, adsTxtSnippet, currentSelectedEntry) {
 			const ourAdsTxt = proxy.fetchOurAdsTxt();
-
+			const siteIdArr = siteId.split(',');
 			function adsTxtProcessing(adsTxtData) {
 				const { accountEmail, adsTxt, domain, siteId } = adsTxtData;
 				let commonOutput = {
@@ -131,19 +131,19 @@ function apiModule() {
 			return siteModel
 				.getActiveSites()
 				.then(sites => {
-					if (!siteId) {
-						const sitesPromises = sites.map(site =>
-							API.getAdsTxtBySite(site.siteId).then(({ data }) => {
-								return adsTxtProcessing(data);
-							})
-						);
+					const sitesPromises = !siteId
+						? sites.map(site =>
+								API.getAdsTxtBySite(site.siteId).then(({ data }) => {
+									return adsTxtProcessing(data);
+								})
+						  )
+						: siteIdArr.map(siteId =>
+								API.getAdsTxtBySite(parseInt(siteId.trim())).then(({ data }) => {
+									return adsTxtProcessing(data);
+								})
+						  );
 
-						return Promise.all(sitesPromises);
-					}
-
-					return API.getAdsTxtBySite(siteId).then(({ data }) => {
-						return adsTxtProcessing(data);
-					});
+					return Promise.all(sitesPromises);
 				})
 
 				.catch(err => {
