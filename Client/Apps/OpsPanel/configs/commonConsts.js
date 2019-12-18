@@ -370,7 +370,7 @@ const XPATH_MODE_URL = {
 		{ name: 'Mobile', value: 'Mobile' },
 		{ name: 'Tablet', value: 'Tablet' }
 	],
-	modes: [{ name: 'Mode 1', value: 'Mode 1' }, { name: 'Mode 2', value: 'Mode 2' }]
+	modes: [{ name: 'Mode 1', value: 1 }, { name: 'Mode 2', value: 2 }]
 };
 
 const SITE_MAPPING_COLUMNS = [
