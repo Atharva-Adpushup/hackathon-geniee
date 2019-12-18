@@ -3,8 +3,6 @@ import { Row, Col } from 'react-bootstrap';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Nav, NavItem } from 'react-bootstrap';
-
-import { getActiveChannel } from 'selectors/channelSelectors';
 import { createSection } from 'actions/sectionActions';
 import { showNotification } from 'actions/uiActions';
 import { interactiveAds } from '../../../../../consts/commonConsts';
@@ -25,22 +23,7 @@ class InteractiveAds extends Component {
 	}
 
 	adpushupSubmitHandler(sectionPayload, adPayload) {
-		const { variation, channel } = this.props;
-
-		this.props.createSectionAndAd(
-			{
-				...sectionPayload,
-				namingData: {
-					platform: channel.platform,
-					pagegroup: channel.pageGroup,
-					service: 'I',
-					height: adPayload.height,
-					width: adPayload.width
-				}
-			},
-			adPayload,
-			variation.id
-		);
+		this.props.createSectionAndAd(sectionPayload, adPayload, this.props.variation.id);
 		this.props.showNotification({
 			mode: 'success',
 			title: 'Operation Successful',
@@ -74,10 +57,7 @@ class InteractiveAds extends Component {
 }
 
 export default connect(
-	(state, ownProps) => {
-		const channel = state.channelData.activeChannel ? getActiveChannel(state) : { platform: null, pageGroup: null };
-		return { networkConfig: state.networkConfig, channel, ...ownProps };
-	},
+	(state, ownProps) => ({ networkConfig: state.networkConfig, ...ownProps }),
 	dispatch =>
 		bindActionCreators(
 			{

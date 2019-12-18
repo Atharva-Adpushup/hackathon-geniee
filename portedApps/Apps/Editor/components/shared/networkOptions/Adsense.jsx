@@ -21,8 +21,6 @@ function checkAdCode(value) {
 	return response;
 }
 
-const Creation = FormWrapper(checkAdCode, 'Adsense', /data-ad-slot=\"\d+\"/gi);
-
 class Adsense extends Component {
 	constructor(props) {
 		super(props);
@@ -36,6 +34,7 @@ class Adsense extends Component {
 		};
 		this.toggleSync = this.toggleSync.bind(this);
 		this.toggleLink = this.toggleLink.bind(this);
+		this.renderAdCodeComponent = this.renderAdCodeComponent.bind(this);
 		this.syncSubmitHanlder = this.syncSubmitHanlder.bind(this);
 	}
 
@@ -49,6 +48,11 @@ class Adsense extends Component {
 		this.setState({
 			isLink: !!value
 		});
+	}
+
+	renderAdCodeComponent() {
+		const Element = FormWrapper(checkAdCode, 'Adsense', /data-ad-slot=\"\d+\"/gi);
+		return <Element {...this.props} />;
 	}
 
 	syncSubmitHanlder() {
@@ -112,7 +116,7 @@ class Adsense extends Component {
 						/>
 					</Col>
 				</Row>
-				{shouldSync ? this.renderSyncingOptions() : <Creation {...this.props} />}
+				{shouldSync ? this.renderSyncingOptions() : this.renderAdCodeComponent()}
 			</div>
 		);
 	}

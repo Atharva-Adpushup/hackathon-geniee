@@ -101,15 +101,7 @@ const fn = {
 			});
 		}
 
-		return Promise.resolve([
-			cas,
-			value,
-			{
-				id,
-				name
-			},
-			payload.siteId
-		]);
+		return Promise.resolve([cas, value, id, payload.siteId]);
 	},
 	getAndUpdate: (key, value, adId) =>
 		appBucket
@@ -161,15 +153,16 @@ router
 					res
 				)
 			)
-			.catch(err =>
-				err.code && err.code === 13 && err.message.includes('key does not exist')
-					? sendSuccessResponse(
-							{
-								ads: []
-							},
-							res
-					  )
-					: fn.errorHandler(err, res)
+			.catch(
+				err =>
+					err.code && err.code === 13 && err.message.includes('key does not exist')
+						? sendSuccessResponse(
+								{
+									ads: []
+								},
+								res
+						  )
+						: fn.errorHandler(err, res)
 			);
 	})
 	.get('/networkConfig', (req, res) =>
@@ -194,13 +187,14 @@ router
 
 		return siteModel
 			.getSiteById(params.siteId)
-			.then(site =>
-				site.get('ownerEmail') != session.user.email
-					? res.render('404')
-					: res.render('tagManager', {
-							siteId: params.siteId,
-							isSuperUser: !!session.isSuperUser
-					  })
+			.then(
+				site =>
+					site.get('ownerEmail') != session.user.email
+						? res.render('404')
+						: res.render('tagManager', {
+								siteId: params.siteId,
+								isSuperUser: !!session.isSuperUser
+						  })
 			)
 			.catch(err => {
 				console.log(err.message);
@@ -227,10 +221,11 @@ router
 		return appBucket
 			.getDoc(`${docKeys.apTag}${req.body.siteId}`)
 			.then(docWithCas => fn.processing(docWithCas, payload))
-			.catch(err =>
-				err.name && err.name == 'CouchbaseError' && err.code == 13
-					? fn.createNewDocAndDoProcessing(payload)
-					: Promise.reject(err)
+			.catch(
+				err =>
+					err.name && err.name == 'CouchbaseError' && err.code == 13
+						? fn.createNewDocAndDoProcessing(payload)
+						: Promise.reject(err)
 			)
 			.spread(fn.dbWrapper)
 			.then(toReturn =>

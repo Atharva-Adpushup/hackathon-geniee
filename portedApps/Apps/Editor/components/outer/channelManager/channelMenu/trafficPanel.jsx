@@ -48,7 +48,6 @@ class TrafficPanel extends Component {
 					/>
 					{!autoOptimise ? (
 						<NumericCollectionManager
-							required
 							description={trafficDistributionConfig.description}
 							sumMismatchErrorMessage={trafficDistributionConfig.sumMismatchErrorMessage}
 							collection={allTrafficDistributions}

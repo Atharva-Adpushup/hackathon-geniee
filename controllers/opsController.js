@@ -33,7 +33,9 @@ const fn = {
 	getAllSitesFromCouchbase: () => {
 		let query = `select a.siteId, a.siteDomain, a.adNetworkSettings, a.ownerEmail, a.step, a.channels, a.apConfigs, a.dateCreated, b.adNetworkSettings[0].pubId, b.adNetworkSettings[0].adsenseEmail from ${
 			config.couchBase.DEFAULT_BUCKET
-		} a join ${config.couchBase.DEFAULT_BUCKET} b on keys 'user::' || a.ownerEmail where meta(a).id like 'site::%'`;
+		} a join ${
+			config.couchBase.DEFAULT_BUCKET
+		} b on keys 'user::' || a.ownerEmail where meta(a).id like 'site::%'`;
 		return appBucket.queryDB(query);
 	}
 };
@@ -42,9 +44,11 @@ router
 	.get(
 		[
 			'/',
+			'/liveSitesMapping',
 			'/couchbaseEditor',
 			'/getAllSites',
 			'/:siteId/panel',
+			'/sitesMapping',
 			'/settings/:siteId'
 		],
 		(req, res) => {
