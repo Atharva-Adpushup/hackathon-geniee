@@ -165,7 +165,7 @@ var targeting = {
 		// 	pagesToExclude: ['']
 		// };
 
-		if (!window.adpushup.customPageLevelTargetingMap) {
+		if (window.adpushup.customPageLevelTargetingMap) {
 			const {
 				targeting: customPageLevelTargeting = {},
 				pagesToExclude = []
