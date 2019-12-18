@@ -3,7 +3,7 @@ const Promise = require('bluebird');
 const authToken = require('../helpers/authToken');
 const userModel = require('../models/userModel');
 
-const openRoutes = ['/login', '/signup', '/forgotPassword', '/resetPassword'];
+const openRoutes = ['/login', '/signup', '/forgotPassword', '/resetPassword', '/utils'];
 const closedRoutes = ['/user'];
 
 module.exports = (req, res, next) => {
