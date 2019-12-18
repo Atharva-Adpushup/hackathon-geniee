@@ -51,7 +51,9 @@ class Table extends React.Component {
 	getTableColumns = (columns, total) => {
 		let tableColumns = [];
 		let sortedMetrics = [];
-		const { metrics, dimension } = this.props;
+
+		const { metrics, dimension, aggregatedData } = this.props;
+
 		const { isDaily } = this.getDateIntervalValidators();
 		const computedDate = {
 			Header: 'Date',
@@ -87,17 +89,20 @@ class Table extends React.Component {
 				// eslint-disable-next-line camelcase
 				const { display_name: Header, table_position } = metrics[column];
 				let footerValue = total[`total_${column}`] || '';
+
 				let aggregateValue = 0;
 
 				if (!columnsBlacklistedForAddition.includes(column)) {
 					aggregateValue = vals => numberWithCommas(sum(vals));
 				} else if (column === 'network_ad_ecpm') {
-					aggregateValue = (vals, rows) =>
-						(
-							(sum(rows.map(({ network_net_revenue }) => network_net_revenue)) /
-								sum(rows.map(({ network_impressions }) => network_impressions))) *
-							1000
-						).toFixed(2);
+					for (let key in aggregatedData) {
+						if (aggregatedData.hasOwnProperty(key)) {
+							aggregateValue = (vals, rows) =>
+								(sum(aggregatedData[key].map(({ network_net_revenue }) => network_net_revenue)) /
+									sum(aggregatedData[key].map(({ network_impressions }) => network_impressions))) *
+								1000;
+						}
+					}
 				} else if (column === 'adpushup_ad_ecpm') {
 					aggregateValue = (vals, rows) =>
 						(
@@ -131,6 +136,7 @@ class Table extends React.Component {
 						}
 					}
 				}
+
 				sortedMetrics.push({
 					Header,
 					accessor: column,
@@ -138,6 +144,7 @@ class Table extends React.Component {
 					table_position,
 					Footer: footerValue,
 					aggregate: aggregateValue,
+
 					Cell: props =>
 						metrics[column].valueType === 'money' ? (
 							<span>${numberWithCommas(props.value)}</span>
@@ -273,6 +280,7 @@ class Table extends React.Component {
 	render() {
 		const { tableBody, tableColumns, tableData } = this.state;
 
+		console.log(this.props.aggregatedData);
 		const onSortFunction = {
 			network_net_revenue(columnValue) {
 				if (typeof columnValue === 'string') return parseFloat(columnValue.replace(/[,$]/g, ''));

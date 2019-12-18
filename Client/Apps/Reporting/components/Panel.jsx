@@ -1,5 +1,6 @@
 /* eslint-disable no-prototype-builtins */
 import React, { Component } from 'react';
+import _ from 'lodash';
 import { Row, Col, Alert } from 'react-bootstrap';
 import moment from 'moment';
 import { Object } from 'es6-shim';
@@ -689,6 +690,14 @@ class Panel extends Component {
 		this.setState({ show: false });
 	};
 
+	aggregateValues(result) {
+		var groupedData = _.mapValues(_.groupBy(result, 'date'), reportData =>
+			reportData.map(data => _.omit(data, 'date'))
+		);
+
+		return groupedData;
+	}
+
 	renderContent = () => {
 		const {
 			selectedDimension,
@@ -726,6 +735,7 @@ class Panel extends Component {
 			tableData
 		);
 
+		const aggregatedData = this.aggregateValues(tableData.result);
 		const { email } = this.getDemoUserParams();
 		const { isValid } = getReportingDemoUserValidation(email, reportType);
 
@@ -791,6 +801,7 @@ class Panel extends Component {
 				<Col sm={12} className="u-margin-t5 u-margin-b4">
 					<TableContainer
 						tableData={selectedMetricsTableData}
+						aggregatedData={aggregatedData}
 						startDate={startDate}
 						endDate={endDate}
 						selectedInterval={selectedInterval}
@@ -806,7 +817,11 @@ class Panel extends Component {
 	};
 
 	render() {
-		const { isLoading, show } = this.state;
+		const {
+			isLoading,
+			show,
+			tableData: { result }
+		} = this.state;
 		const { reportsMeta } = this.props;
 
 		if (!reportsMeta.fetched || isLoading) {
