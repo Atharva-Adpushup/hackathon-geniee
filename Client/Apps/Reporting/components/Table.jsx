@@ -95,14 +95,12 @@ class Table extends React.Component {
 				if (!columnsBlacklistedForAddition.includes(column)) {
 					aggregateValue = vals => numberWithCommas(sum(vals));
 				} else if (column === 'network_ad_ecpm') {
-					for (let key in aggregatedData) {
-						if (aggregatedData.hasOwnProperty(key)) {
-							aggregateValue = (vals, rows) =>
-								(sum(aggregatedData[key].map(({ network_net_revenue }) => network_net_revenue)) /
-									sum(aggregatedData[key].map(({ network_impressions }) => network_impressions))) *
-								1000;
-						}
-					}
+					aggregateValue = (vals, rows) =>
+						(
+							(sum(rows.map(({ network_net_revenue }) => network_net_revenue)) /
+								sum(rows.map(({ network_impressions }) => network_impressions))) *
+							1000
+						).toFixed(2);
 				} else if (column === 'adpushup_ad_ecpm') {
 					aggregateValue = (vals, rows) =>
 						(
