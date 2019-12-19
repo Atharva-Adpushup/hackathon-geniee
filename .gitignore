@@ -16,6 +16,7 @@ logs/
 .DS_Store
 *.log
 *.map
+services/genieeAdSyncService/adpushup.js/libs/jquery
 fabfile.pyc
 composer.phar
 composer.lock
@@ -41,7 +42,6 @@ public/assets/js/builds/geniee/
 TODO
 pipedriveTest.js
 services/adpTags/hbScript/build
-Prebid.js
 __queries.sql
 clientDist
 flow.txt

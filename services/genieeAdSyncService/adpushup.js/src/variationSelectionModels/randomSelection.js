@@ -1,4 +1,4 @@
-var $ = require('jquery');
+var $ = require('../../libs/jquery');
 
 module.exports = function() {
 	function getChosenVariation(allVariations) {

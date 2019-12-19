@@ -48,10 +48,12 @@ var utils = require('../libs/utils'),
 		}
 	},
 	removeBidderTargeting = function(slot) {
-		var targetingKeys = slot.gSlot.getTargetingKeys();
-		for (var i = 0; i < targetingKeys.length; i++) {
-			if (targetingKeys[i].match(/^hb_/g)) {
-				slot.gSlot.clearTargeting(targetingKeys[i]);
+		if (slot.gSlot) {
+			var targetingKeys = slot.gSlot.getTargetingKeys();
+			for (var i = 0; i < targetingKeys.length; i++) {
+				if (targetingKeys[i].match(/^hb_/g)) {
+					slot.gSlot.clearTargeting(targetingKeys[i]);
+				}
 			}
 		}
 	},

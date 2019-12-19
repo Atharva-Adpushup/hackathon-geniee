@@ -1,13 +1,13 @@
 var browserConfig = require('./browserConfig.js'),
 	// eslint-disable-next-line no-undef
-	$ = require('jquery'),
+	$ = require('./jquery'),
 	dockify = require('./dockify'),
 	commonConsts = require('../config/commonConsts'),
 	Base64 = require('Base64');
 
 module.exports = {
 	log: function() {
-		var queryParams = this.queryParams;
+		var queryParams = this.getQueryParams();
 		var isQueryParams = !!(
 				queryParams &&
 				$.isPlainObject(queryParams) &&
@@ -515,11 +515,12 @@ module.exports = {
 				}
 			}
 
-			if (Object.keys(this.queryParams).length >= 1) {
+			url = urlBase + (parts.length > 0 ? '?' + parts.join('&') : '');
+			/*if (Object.keys(this.getQueryParams()).length >= 1) {
 				url = urlBase + '?' + parts.join('&');
 			} else {
 				url = urlBase;
-			}
+			}*/
 		}
 
 		if (url.charAt(url.length - 1) === '?') {
@@ -622,7 +623,7 @@ module.exports = {
 		}
 		return false;
 	},
-	queryParams: (function() {
+	getQueryParams: function() {
 		var str = window.location.search,
 			objURL = {};
 
@@ -634,6 +635,6 @@ module.exports = {
 		});
 
 		return objURL;
-	})(),
+	},
 	dockify: dockify
 };

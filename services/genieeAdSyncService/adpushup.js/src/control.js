@@ -1,6 +1,6 @@
 var utils = require('../libs/utils'),
 	w = window,
-	$ = require('jquery');
+	$ = require('../libs/jquery');
 
 function Control(controlCodeType) {
 	var ads = [],

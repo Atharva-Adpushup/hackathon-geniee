@@ -1,75 +1,75 @@
-//- Payments template
+//- //- Payments template
 
-extends  layout/base
+//- extends  layout/base
     
-block getTitle
-    - var titleVar = "Payments - Billing"
+//- block getTitle
+//-     - var titleVar = "Payments - Billing"
 
-block append headScripts
-    script.
-        $('document').ready(function() {
+//- block append headScripts
+//-     script.
+//-         $('document').ready(function() {
 
-            tipaltiHandler = function (data){
-                if(data.caller=="PaymentHistory")
-                    var tipaltiIframe  = $('#tipaltiPaymentHistoryIframe');
-                else
-                    var tipaltiIframe  = $('#tipaltiPaymentDetailIframe');
-                if (data && data.TipaltiIframeInfo){
-                    if (data.TipaltiIframeInfo.height)
-                        tipaltiIframe.height(data.TipaltiIframeInfo.height);
-                    if (data.TipaltiIframeInfo.width){
-                        tipaltiIframe.width(data.TipaltiIframeInfo.width);
-                        tipaltiIframe.parent().width(data.TipaltiIframeInfo.width)
-                    }
-                    tipaltiIframe.show();
-                    tipaltiIframe.prev('.loaderwrapper').hide();
-                }
-            }
+//-             tipaltiHandler = function (data){
+//-                 if(data.caller=="PaymentHistory")
+//-                     var tipaltiIframe  = $('#tipaltiPaymentHistoryIframe');
+//-                 else
+//-                     var tipaltiIframe  = $('#tipaltiPaymentDetailIframe');
+//-                 if (data && data.TipaltiIframeInfo){
+//-                     if (data.TipaltiIframeInfo.height)
+//-                         tipaltiIframe.height(data.TipaltiIframeInfo.height);
+//-                     if (data.TipaltiIframeInfo.width){
+//-                         tipaltiIframe.width(data.TipaltiIframeInfo.width);
+//-                         tipaltiIframe.parent().width(data.TipaltiIframeInfo.width)
+//-                     }
+//-                     tipaltiIframe.show();
+//-                     tipaltiIframe.prev('.loaderwrapper').hide();
+//-                 }
+//-             }
 
-            $(window).on('message', function(evt){
-              tipaltiHandler(evt.originalEvent.data)
-           });
+//-             $(window).on('message', function(evt){
+//-               tipaltiHandler(evt.originalEvent.data)
+//-            });
            
-        });
+//-         });
 
-block append headCss
-    style.
-        .loaderwrapper.spinner {
-            top: 0;
-            left: 0;
-        }
-block bodyContent
+//- block append headCss
+//-     style.
+//-         .loaderwrapper.spinner {
+//-             top: 0;
+//-             left: 0;
+//-         }
+//- block bodyContent
    
-    include layout/sideBar
-    .pageContainer
-        include layout/header
-        .pageContentWrapper.page-content
-            .pageContentInner.page-content--inner
-                #widgetsArea.row
-                    .mb-30
-                        .controlAdpushupWrap
-                            h3.title.m-All-0.clearfix 
-                                a Payment Details
-                            .content-item-container
-                                .row
-                                    if tipaltiUrl
-                                        div(style="padding:20px; min-height:200px;margin: 0px auto;")
-                                            .loaderwrapper.spinner
-                                                img(src="/assets/images/loaderLogo.png")
-                                            iframe(id='tipaltiPaymentDetailIframe' src=tipaltiUrl frameborder="0" style="display:none;width:100%")
-                                    else
-                                        div(style="text-align:center") Some error occured
+//-     include layout/sideBar
+//-     .pageContainer
+//-         include layout/header
+//-         .pageContentWrapper.page-content
+//-             .pageContentInner.page-content--inner
+//-                 #widgetsArea.row
+//-                     .mb-30
+//-                         .controlAdpushupWrap
+//-                             h3.title.m-All-0.clearfix 
+//-                                 a Payment Details
+//-                             .content-item-container
+//-                                 .row
+//-                                     if tipaltiUrl
+//-                                         div(style="padding:20px; min-height:200px;margin: 0px auto;")
+//-                                             .loaderwrapper.spinner
+//-                                                 img(src="/assets/images/loaderLogo.png")
+//-                                             iframe(id='tipaltiPaymentDetailIframe' src=tipaltiUrl frameborder="0" style="display:none;width:100%")
+//-                                     else
+//-                                         div(style="text-align:center") Some error occured
                             
-                    .mb-30
-                        .controlAdpushupWrap
-                            h3.title.m-All-0.clearfix 
-                                a Payment History
-                            .content-item-container
-                                .row
-                                    if tipaltiUrl
-                                        div(style="padding:20px; min-height:200px;margin: 0px auto;")
-                                            .loaderwrapper.spinner
-                                                img(src="/assets/images/loaderLogo.png")
-                                            iframe(id='tipaltiPaymentHistoryIframe' src=paymentHistoryUrl frameborder="0" style="display:none;width:100%")
-                                    else
-                                        div(style="text-align:center") Some error occured
+//-                     .mb-30
+//-                         .controlAdpushupWrap
+//-                             h3.title.m-All-0.clearfix 
+//-                                 a Payment History
+//-                             .content-item-container
+//-                                 .row
+//-                                     if tipaltiUrl
+//-                                         div(style="padding:20px; min-height:200px;margin: 0px auto;")
+//-                                             .loaderwrapper.spinner
+//-                                                 img(src="/assets/images/loaderLogo.png")
+//-                                             iframe(id='tipaltiPaymentHistoryIframe' src=paymentHistoryUrl frameborder="0" style="display:none;width:100%")
+//-                                     else
+//-                                         div(style="text-align:center") Some error occured

@@ -1,7 +1,7 @@
 var w = window;
 var pageGroupTimer;
 var adp = (w.adpushup = w.adpushup || {});
-var $ = (adp.$ = require('jquery'));
+var $ = (adp.$ = require('../libs/jquery'));
 var utils = require('../libs/utils');
 var defaultConfig = $.extend({}, require('../config/config.js'));
 var config = (adp.config = require('../config/config.js'));
@@ -36,6 +36,34 @@ if (INNOVATIVE_ADS_ACTIVE) {
 
 var isGenieeSite;
 window.adpushup.configExtended = false;
+
+// Extend adpushup object
+$.extend(adp, {
+	creationProcessStarted: false,
+	afterJSExecuted: false,
+	err: [],
+	utils: utils,
+	control: control,
+	// tracker: new Tracker(),
+	nodewatcher: nodewatcher,
+	geniee: genieeObject,
+	triggerAd: triggerAd,
+	session: session,
+	generateAdCode: adCodeGenerator.generateAdCode,
+	executeAdpTagsHeadCode: adCodeGenerator.executeAdpTagsHeadCode,
+	executeAfterJS: adCreater.executeAfterJS,
+	services: {
+		APTAG_ACTIVE: APTAG_ACTIVE,
+		INNOVATIVE_ADS_ACTIVE: INNOVATIVE_ADS_ACTIVE,
+		LAYOUT_ACTIVE: LAYOUT_ACTIVE,
+		ADPTAG_ACTIVE: ADPTAG_ACTIVE,
+		SPA_ACTIVE: SPA_ACTIVE,
+		GENIEE_ACTIVE: GENIEE_ACTIVE,
+		HB_ACTIVE: HB_ACTIVE,
+		GDPR_ACTIVE: GDPR_ACTIVE,
+		INCONTENT_ACTIVE: INCONTENT_ACTIVE
+	}
+});
 
 // Destroy ADP slots and their associated GPT slots
 function destroyAdpSlots() {
@@ -78,34 +106,11 @@ function initAdpConfig() {
 		resetAdpConfig();
 		resetAdpTagsConfig();
 
-		// Extend adpushup object
 		$.extend(adp, {
 			creationProcessStarted: false,
 			afterJSExecuted: false,
-			err: [],
-			utils: utils,
-			control: control,
-			// tracker: new Tracker(),
-			nodewatcher: nodewatcher,
-			geniee: genieeObject,
-			triggerAd: triggerAd,
-			session: session,
-			generateAdCode: adCodeGenerator.generateAdCode,
-			executeAdpTagsHeadCode: adCodeGenerator.executeAdpTagsHeadCode,
-			executeAfterJS: adCreater.executeAfterJS,
-			services: {
-				APTAG_ACTIVE: APTAG_ACTIVE,
-				INNOVATIVE_ADS_ACTIVE: INNOVATIVE_ADS_ACTIVE,
-				LAYOUT_ACTIVE: LAYOUT_ACTIVE,
-				ADPTAG_ACTIVE: ADPTAG_ACTIVE,
-				SPA_ACTIVE: SPA_ACTIVE,
-				GENIEE_ACTIVE: GENIEE_ACTIVE,
-				HB_ACTIVE: HB_ACTIVE,
-				GDPR_ACTIVE: GDPR_ACTIVE,
-				INCONTENT_ACTIVE: INCONTENT_ACTIVE
-			}
+			err: []
 		});
-
 		// Extend the settings with generated settings
 		// eslint-disable-next-line no-undef
 		$.extend(adp.config, __AP_CONFIG__, {
@@ -349,7 +354,7 @@ function main() {
 	hookAndInit(adp, startCreation, browserConfig.platform);
 
 	// AdPushup Debug Force Variation
-	if (utils.queryParams && utils.queryParams.forceVariation && !adp.creationProcessStarted) {
+	if (utils.getQueryParams && utils.getQueryParams().forceVariation && !adp.creationProcessStarted) {
 		startCreation(true);
 		return false;
 	}
@@ -359,7 +364,7 @@ function main() {
 	}
 
 	// AdPushup Debug Force Control
-	if (utils.queryParams && utils.queryParams.forceControl) {
+	if (utils.getQueryParams && utils.getQueryParams().forceControl) {
 		triggerControl(commonConsts.MODE.FALLBACK, commonConsts.ERROR_CODES.FALLBACK_FORCED); // Control forced (run fallback)
 		return false;
 	}

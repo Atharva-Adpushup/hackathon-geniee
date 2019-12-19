@@ -1,4 +1,4 @@
-var $ = require('jquery'),
+var $ = require('../../libs/jquery'),
 	utils = require('../../libs/utils'),
 	Bandit = require('bayesian-bandit').Bandit,
 	preparePayload = function(allVariations) {

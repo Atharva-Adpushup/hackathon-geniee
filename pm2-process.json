@@ -3,17 +3,35 @@
 		{
 			"name": "app",
 			"script": "./app.js",
-			"log_date_format": "YYYY-MM-DD HH:mm Z"
+			"log_date_format": "YYYY-MM-DD HH:mm Z",
+			"instances": "1",
+			"exec_mode": "fork_mode",
+			"env": {
+				"NODE_ENV": "production"
+			},
+			"max_memory_restart": "1G"
 		},
 		{
 			"name": "cdnSyncConsumer",
 			"script": "./cdnSyncConsumer.js",
-			"log_date_format": "YYYY-MM-DD HH:mm Z"
+			"log_date_format": "YYYY-MM-DD HH:mm Z",
+			"instances": "1",
+			"exec_mode": "fork_mode",
+			"env": {
+				"NODE_ENV": "production"
+			},
+			"max_memory_restart": "1G"
 		},
 		{
-			"name": "transactionLogConsumer",
-			"script": "./transactionLogConsumer.js",
-			"log_date_format": "YYYY-MM-DD HH:mm Z"
+			"name": "activeSitesMarkingService",
+			"script": "./services/crons/activeSitesMarkingService.js",
+			"log_date_format": "YYYY-MM-DD HH:mm Z",
+			"instances": "1",
+			"exec_mode": "fork_mode",
+			"env": {
+				"NODE_ENV": "production"
+			},
+			"max_memory_restart": "1G"
 		}
 	]
 }

@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-undef
 var w = window,
 	d = document,
-	$ = require('jquery'),
+	$ = require('./jquery'),
 	browserConfig = require('../libs/browserConfig');
 
 function TrackingNode($el, callback) {
@@ -178,14 +178,12 @@ Tracker.prototype.add = function($el, callback, cancelCallback) {
 		var el = new TrackingNode($el, callback, cancelCallback);
 		this.nodesToTrack.push(el);
 
-		$el
-			.on('mouseout', function() {
-				// ???
-				$(w).focus();
-			})
-			.on('mouseover', function() {
-				$(w).focus();
-			});
+		$el.on('mouseout', function() {
+			// ???
+			$(w).focus();
+		}).on('mouseover', function() {
+			$(w).focus();
+		});
 	}
 };
 

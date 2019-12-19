@@ -92,22 +92,27 @@ var targeting = {
         // Set custom slot level targeting, if present
         this.setCustomSlotLevelTargeting(adpSlot);
 
-        if (adpSlot.optionalParam.keyValues && Object.keys(adpSlot.optionalParam.keyValues).length) {
+        if (
+            adpSlot.optionalParam.keyValues && 
+            Object.keys(adpSlot.optionalParam.keyValues).length
+        ) {
             Object.assign(targeting, adpSlot.optionalParam.keyValues);
         }
 
-        Object.keys(targeting).forEach(function (key) {
-            // Check if any of keys belong to price floor key then set price using granularity function, so that it can match with price rules on server
-            if (constants.TARGETING.ADX_FLOOR.priceFloorKeys.indexOf(key) !== -1) {
-                if (parseInt(targeting[key], 10) === 0) {
-                    return true;
+        Object.keys(targeting).forEach(
+            function (key) {
+                // Check if any of keys belong to price floor key then set price using granularity function, so that it can match with price rules on server
+                if (constants.TARGETING.ADX_FLOOR.priceFloorKeys.indexOf(key) !== -1) {
+                    if (parseInt(targeting[key], 10) === 0) {
+                        return true;
+                    }
+
+                    targeting[key] = this.getFloorWithGranularity(targeting[key]);
                 }
 
-                targeting[key] = this.getFloorWithGranularity(targeting[key]);
-            }
-
-            adpSlot.gSlot.setTargeting(key, String(targeting[key]));
-        }.bind(this));
+                adpSlot.gSlot.setTargeting(key, String(targeting[key]));
+            }.bind(this)
+        );
     },
     setUTMLevel: function (googletag) {
         var urlParams = adp.utils.queryParams;
@@ -117,7 +122,9 @@ var targeting = {
             var utmSessionCookie = adp.session.getCookie(constants.UTM_SESSION_COOKIE);
 
             if (utmSessionCookie) {
-                var utmSessionCookieValues = adp.utils.base64Decode(utmSessionCookie.split('_=')[1]);
+                var utmSessionCookieValues = adp.utils.base64Decode(
+                    utmSessionCookie.split('_=')[1]
+                );
                 urlParams = utmSessionCookieValues ? JSON.parse(utmSessionCookieValues) : {};
             }
         }
@@ -130,7 +137,10 @@ var targeting = {
 
             googletag
                 .pubads()
-                .setTargeting(keyVal.trim().toLowerCase(), String(utmParam ? utmParam.trim().substr(0, 40) : null));
+                .setTargeting(
+                    keyVal.trim().toLowerCase(), 
+                    String(utmParam ? utmParam.trim().substr(0, 40) : null)
+                );
         });
 
         // Set custom UTM targeting
@@ -159,11 +169,13 @@ var targeting = {
 	setPageLevel: function (googletag) {
 		let pageLevelTargeting = constants.TARGETING.PAGE_LEVEL;
 		
-		// SAMPLE customPageLevelTargetingMap set through beforeJs
-		// window.adpushup.customPageLevelTargetingMap = {
-		// 	targeting: { adp_geo: window.adp_geo, key2: 'dsome val' },
-		// 	pagesToExclude: ['']
-		// };
+		/*
+            SAMPLE customPageLevelTargetingMap set through beforeJs
+            window.adpushup.customPageLevelTargetingMap = {
+                targeting: { adp_geo: window.adp_geo, key2: 'dsome val' },
+                pagesToExclude: ['']
+            };
+     */
 
 		if (window.adpushup.customPageLevelTargetingMap) {
 			const {

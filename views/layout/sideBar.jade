@@ -21,47 +21,47 @@ nav.pageLeftSidebar.sidebar
                             span.icon-thumbnail#sidebar-dashboard-icon-thumbnail
                                 i.fa.fa-tachometer#sidebar-dashboard-icon
 
-                li.sidebar-menu-item
-                    a(id="sidebar-new-website-link", href='/user/addSite', data-toggle='', data-target='')
-                        | Add New Website
-                        span.icon-thumbnail#sidebar-new-website-icon-thumbnail
-                            i.fa.fa-plus#sidebar-new-website-icon
+                //- li.sidebar-menu-item
+                //-     a(id="sidebar-new-website-link", href='/user/addSite', data-toggle='', data-target='')
+                //-         | Add New Website
+                //-         span.icon-thumbnail#sidebar-new-website-icon-thumbnail
+                //-             i.fa.fa-plus#sidebar-new-website-icon
                 //- li.sidebar-menu-item
                 //-     a(id="sidebar-billing-link", href='/user/billing')
                 //-         | Billing Profile
                 //-         span.icon-thumbnail#sidebar-billing-icon-thumbnail
                 //-             i.fa.fa-file#sidebar-billing-icon
-                li.sidebar-menu-item
-                    a(id="sidebar-payment-link", href='/user/payment')
-                        | Payment Details
-                        span.icon-thumbnail#sidebar-payment-icon-thumbnail
-                            i.fa.fa-dollar#sidebar-payment-icon
-                if isSuperUser
-                    li.sidebar-menu-item
-                        a(id="sidebar-new-website-link", href='/user/updateUserStatus', data-toggle='', data-target='')
-                            | User Controls
-                            span.icon-thumbnail#sidebar-user-controls-icon-thumbnail
-                                i.fa.fa-sliders#sidebar-user-controls
-                    li.sidebar-menu-item
-                        a(id="sidebar-new-website-link", href='/ops', data-toggle='', data-target='')
-                            | Ops Panel
-                            span.icon-thumbnail#sidebar-user-controls-icon-thumbnail
-                                i.fa.fa-wrench#sidebar-user-controls
+                //- li.sidebar-menu-item
+                //-     a(id="sidebar-payment-link", href='/user/payment')
+                //-         | Payment Details
+                //-         span.icon-thumbnail#sidebar-payment-icon-thumbnail
+                //-             i.fa.fa-dollar#sidebar-payment-icon
+                //- if isSuperUser
+                    //- li.sidebar-menu-item
+                    //-     a(id="sidebar-new-website-link", href='/user/updateUserStatus', data-toggle='', data-target='')
+                    //-         | User Controls
+                    //-         span.icon-thumbnail#sidebar-user-controls-icon-thumbnail
+                    //-             i.fa.fa-sliders#sidebar-user-controls
+                    //- li.sidebar-menu-item
+                    //-     a(id="sidebar-new-website-link", href='/ops', data-toggle='', data-target='')
+                    //-         | Ops Panel
+                    //-         span.icon-thumbnail#sidebar-user-controls-icon-thumbnail
+                    //-             i.fa.fa-wrench#sidebar-user-controls
                 //- li.sidebar-menu-item
                 //-     a(id="sidebar-reports-link", href='/user/reports/apexReport')
                 //-         | Reports
                 //-         span.icon-thumbnail#sidebar-reports-icon-thumbnail
                 //-             i.fa.fa-bar-chart#sidebar-reports-icon
-                li.sidebar-menu-item
-                    a(id="sidebar-adsense-link", href='/user/connectGoogle')
-                        | Connect Google
-                        span.icon-thumbnail#sidebar-adsense-icon-thumbnail
-                            i.fa.fa-google#sidebar-adsense-icon
-                li.sidebar-menu-item
-                    a(id="sidebar-profile-link", href='/user/profile')
-                        | Update Profile
-                        span.icon-thumbnail#sidebar-profile-icon-thumbnail
-                            i.fa.fa-user#sidebar-profile-icon
+                //- li.sidebar-menu-item
+                //-     a(id="sidebar-adsense-link", href='/user/connectGoogle')
+                //-         | Connect Google
+                //-         span.icon-thumbnail#sidebar-adsense-icon-thumbnail
+                //-             i.fa.fa-google#sidebar-adsense-icon
+                //- li.sidebar-menu-item
+                //-     a(id="sidebar-profile-link", href='/user/profile')
+                //-         | Update Profile
+                //-         span.icon-thumbnail#sidebar-profile-icon-thumbnail
+                //-             i.fa.fa-user#sidebar-profile-icon
                 li.sidebar-menu-item
                     a(id="sidebar-logout-link", href='/user/logout')
                         | Logout
@@ -90,34 +90,34 @@ nav.pageLeftSidebar.sidebar
                         span.icon-thumbnail#sidebar-settings-icon-thumbnail
                             i.fa.fa-cog#sidebar-settings-icon
 // Modal
-#addSite.modal._ap_modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true')
-    .modal-dialog
-        .modal-content
-            .modal-header
-                button.close(id="addsite-close-btn", type='button', data-dismiss='modal', aria-label='Close')
-                    span(aria-hidden='true') ×
-                h4#myModalLabel.modal-title Add Site
-            form.form-inline(action='/user/addSite', method='post')
-                .modal-body.addSite
-                    .form-group
-                        .input-group
-                            span.input-group-addon
-                                i.fa.fa-link
-                            input#site.form-control.input-lg(type='url', value="#{unSavedSiteStr}" required=true, name='site', placeholder='For example, http://www.google.com/')
-                        .error-message #{errors.site_domain}
-                // Footer Section Starts Here
-                .modal-footer.row
-                    .col-xs-12
-                        button.btn-lightBg.btn.btn-block.btn-lg(id="addsite-submit", type='submit') Add Site
-if errors.site_domain
-    script(type='text/javascript').
-        $(function(){
-            $("#addSite").modal('show');
-        });
+//- #addSite.modal._ap_modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true')
+//-     .modal-dialog
+//-         .modal-content
+//-             .modal-header
+//-                 button.close(id="addsite-close-btn", type='button', data-dismiss='modal', aria-label='Close')
+//-                     span(aria-hidden='true') ×
+//-                 h4#myModalLabel.modal-title Add Site
+//-             form.form-inline(action='/user/addSite', method='post')
+//-                 .modal-body.addSite
+//-                     .form-group
+//-                         .input-group
+//-                             span.input-group-addon
+//-                                 i.fa.fa-link
+//-                             input#site.form-control.input-lg(type='url', value="#{unSavedSiteStr}" required=true, name='site', placeholder='For example, http://www.google.com/')
+//-                         .error-message #{errors.site_domain}
+//-                 // Footer Section Starts Here
+//-                 .modal-footer.row
+//-                     .col-xs-12
+//-                         button.btn-lightBg.btn.btn-block.btn-lg(id="addsite-submit", type='submit') Add Site
+//- if errors.site_domain
+//-     script(type='text/javascript').
+//-         $(function(){
+//-             $("#addSite").modal('show');
+//-         });
 
-script(type='text/javascript').
-    $("#site").off('change').on('change', function() {
-        if ((this.value.indexOf("http://") !== 0) && (this.value.indexOf("https://") !== 0)) {
-            this.value = "http://" + this.value;
-        }
-    });
+//- script(type='text/javascript').
+//-     $("#site").off('change').on('change', function() {
+//-         if ((this.value.indexOf("http://") !== 0) && (this.value.indexOf("https://") !== 0)) {
+//-             this.value = "http://" + this.value;
+//-         }
+//-     });
