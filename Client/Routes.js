@@ -50,7 +50,7 @@ const OpsPanel = lazy(() => import(/* webpackChunkName: "opsPanel" */ './Apps/Op
 
 const Routes = () => (
 	<Router history={history}>
-		<Suspense fallback={<Loader height="100vh" />}>
+		{/* <Suspense fallback={<Loader height="100vh" />}> */}
 			<Switch>
 				{/* Public Routes */}
 				<Route
@@ -314,7 +314,7 @@ const Routes = () => (
 					<PrivateRoute exact name="User OnBoarding" path="/onboarding" component={OnBoarding} />
 				</ShellContainer>
 			</Switch>
-		</Suspense>
+		{/* </Suspense> */}
 	</Router>
 );
 
