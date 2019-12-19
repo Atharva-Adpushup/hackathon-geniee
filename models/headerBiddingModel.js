@@ -254,7 +254,8 @@ function apiModule() {
 													} = ad;
 													inventory.headerBidding = headerBidding ? 'Enabled' : 'Disabled';
 													inventory.size = `${width}x${height}`;
-													inventory.adUnit = section.id;
+													inventory.adUnit = section.name;
+													inventory.adUnitId = section.id;
 													inventories.push({ ...inventory });
 												}
 											}
@@ -293,11 +294,13 @@ function apiModule() {
 									networkData: { headerBidding },
 									width,
 									height,
-									id: adUnit
+									name: adUnit,
+									id: adUnitId
 								} = ad;
 								inventory.headerBidding = headerBidding ? 'Enabled' : 'Disabled';
 								inventory.size = `${width}x${height}`;
 								inventory.adUnit = adUnit;
+								inventory.adUnitId = adUnitId;
 
 								inventories.push({ ...inventory });
 							}
@@ -329,11 +332,13 @@ function apiModule() {
 									networkData: { headerBidding },
 									width,
 									height,
-									id: adUnit
+									name: adUnit,
+									id: adUnitId
 								} = ad;
 								inventory.headerBidding = headerBidding ? 'Enabled' : 'Disabled';
 								inventory.size = `${width}x${height}`;
 								inventory.adUnit = adUnit;
+								inventory.adUnitId = adUnitId;
 
 								inventories.push({ ...inventory });
 							}
@@ -371,7 +376,7 @@ function apiModule() {
 			const jsonByChannels = {};
 			for (const obj of json) {
 				const {
-					target: { device, pageGroup, adUnit },
+					target: { device, pageGroup, adUnitId },
 					enableHB
 				} = obj;
 				const key = `${device}:${pageGroup}`;
@@ -385,7 +390,7 @@ function apiModule() {
 					jsonByChannels[key].pageGroup = pageGroup;
 				}
 
-				jsonByChannels[key].list.push({ adUnit, enableHB });
+				jsonByChannels[key].list.push({ adUnitId, enableHB });
 			}
 
 			const promiseArr = [];
@@ -412,7 +417,7 @@ function apiModule() {
 													if (
 														ad.network === 'adpTags' &&
 														ad.networkData &&
-														section.id === inventory.adUnit &&
+														section.id === inventory.adUnitId &&
 														ad.networkData.headerBidding !== inventory.enableHB
 													) {
 														ad.networkData.headerBidding = inventory.enableHB;
@@ -456,7 +461,7 @@ function apiModule() {
 							if (
 								ad.network === 'adpTags' &&
 								ad.networkData &&
-								ad.id === inventory.target.adUnit &&
+								ad.id === inventory.target.adUnitId &&
 								ad.networkData.headerBidding !== inventory.enableHB
 							) {
 								ad.networkData.headerBidding = inventory.enableHB;
@@ -489,7 +494,7 @@ function apiModule() {
 							if (
 								ad.network === 'adpTags' &&
 								ad.networkData &&
-								ad.id === inventory.target.adUnit &&
+								ad.id === inventory.target.adUnitId &&
 								ad.networkData.headerBidding !== inventory.enableHB
 							) {
 								ad.networkData.headerBidding = inventory.enableHB;

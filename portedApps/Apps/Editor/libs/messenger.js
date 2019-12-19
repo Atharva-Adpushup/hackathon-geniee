@@ -4,18 +4,27 @@ import _ from 'lodash';
 import Utils from './utils';
 import Event from './event';
 
-
-var isStringParseable = function (str) {
-	return str.indexOf('{') === 0 || str.indexOf("[") === 0;
+var isStringParseable = function(str) {
+	return str.indexOf('{') === 0 || str.indexOf('[') === 0;
 };
 
-var deepJsonParse = function (stringifiedData) {
+var deepJsonParse = function(stringifiedData) {
 	var data = null;
 	if (typeof stringifiedData === 'string' && isStringParseable(stringifiedData)) {
 		try {
 			data = JSON.parse(stringifiedData);
 		} catch (d) {
-			return null;
+			/**
+			 * HACK
+			 * the deep parsing of json was done to avoid errors for sites which has overwritten Array.prototype.toJSON method
+			 * This method is internally used by JSON.stringify while stringifying a JS Object
+			 * But the stringified json may conatin attribute css selectors, which starts from '['. Parsing these will return in error, so putting in a check to return the string itself in case it's starting from '['
+			 */
+			if (stringifiedData.indexOf('[') === 0) {
+				return stringifiedData;
+			} else {
+				return null;
+			}
 		}
 	} else {
 		data = stringifiedData;
@@ -29,8 +38,8 @@ var deepJsonParse = function (stringifiedData) {
 	return data;
 };
 
-const Messenger = (function ($, Utils, Event) {
-	const Messenger = function (target, origin) {
+const Messenger = (function($, Utils, Event) {
+	const Messenger = function(target, origin) {
 		this.id = Utils.getRandomNumber();
 		this.messageQueue = [];
 		this.responseQueue = [];
@@ -44,23 +53,23 @@ const Messenger = (function ($, Utils, Event) {
 		$(window).bind('message', this.messageHandler);
 	};
 
-	Messenger.prototype.setTarget = function (target) {
+	Messenger.prototype.setTarget = function(target) {
 		this.target = target;
 	};
 
-	Messenger.prototype.setOrigin = function (origin) {
+	Messenger.prototype.setOrigin = function(origin) {
 		this.origin = origin;
 	};
 
-	Messenger.prototype.dispose = function () {
+	Messenger.prototype.dispose = function() {
 		$(window).unbind('message', this.handleMessage);
 		this.target = null;
 	};
-	Messenger.prototype.sendMessage = function (cmd, data) {
+	Messenger.prototype.sendMessage = function(cmd, data) {
 		const req = { data: data || {}, cmd, id: this.id };
 		this.target.postMessage(JSON.stringify(req), '*');
 	};
-	Messenger.prototype.isOriginValid = function (e) {
+	Messenger.prototype.isOriginValid = function(e) {
 		return true;
 		return (
 			/.adpushup.com/gi.test(e.origin) ||
@@ -68,14 +77,14 @@ const Messenger = (function ($, Utils, Event) {
 		);
 	};
 
-	Messenger.prototype.handleMessage = function (e, s) {
+	Messenger.prototype.handleMessage = function(e, s) {
 		e = e.originalEvent || s;
 		if (this.isOriginValid(e)) {
 			let req = null;
 			/**
 			 * There are some websites which custom implements Array.prototype.toJSON which is called by the JSON.stringify
 			 * This leads to either custom/double/nested stringification of the values.
-			 * Hence, we are deep parsing any json received from inner js. 
+			 * Hence, we are deep parsing any json received from inner js.
 			 */
 			req = deepJsonParse(e.data);
 			if (!req || !req.cmd) {

@@ -262,9 +262,6 @@ module.exports = {
 		},
 		emailBlockList: ['demo@adpushup.com']
 	},
-	password: {
-		IMPERSONATE: '#m9ce[=*s#cK9R}9V.]gTK9x?2B3=C*J(PGvBAt'
-	},
 	exceptions: {
 		str: {
 			apexServiceDataEmpty: 'Apex service data should not be empty'

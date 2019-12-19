@@ -273,11 +273,11 @@ router
 		const categorizedJSON = { layoutEditor: [], apTag: [], innovativeAds: [] };
 		for (const json of req.body) {
 			const {
-				target: { app, adUnit },
+				target: { app, adUnitId },
 				enableHB
 			} = json;
 
-			if (!app || !adUnit || typeof enableHB !== 'boolean' || !siteId) {
+			if (!app || !adUnitId || typeof enableHB !== 'boolean' || !siteId) {
 				return res.status(httpStatus.BAD_REQUEST).json({ error: 'Invalid data received' });
 			}
 
