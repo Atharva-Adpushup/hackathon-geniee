@@ -26,9 +26,12 @@ export function fetchInventories(siteId) {
 
 export function updateInventoriesHbStatus(siteId, inventoriesToUpdate) {
 	const payload = inventoriesToUpdate.map(inventory => {
-		const { app, pageGroup, device, adUnit, headerBidding } = inventory;
+		const { app, pageGroup, device, adUnit, adUnitId, headerBidding } = inventory;
 
-		return { target: { app, pageGroup, device, adUnit }, enableHB: headerBidding === 'Enabled' };
+		return {
+			target: { app, pageGroup, device, adUnit, adUnitId },
+			enableHB: headerBidding === 'Enabled'
+		};
 	});
 
 	return axiosInstance.put(`/headerBidding/updateHbStatus/${siteId}`, payload);
