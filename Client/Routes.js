@@ -14,7 +14,6 @@ import history from './helpers/history';
 import PublicOnlyRoute from './Components/PublicOnlyRoute';
 import PrivateRoute from './Components/PrivateRoute';
 import authService from './services/authService';
-import Loader from './Components/Loader';
 import ShellContainer from './Containers/ShellContainer';
 
 import Login from './Pages/Login';

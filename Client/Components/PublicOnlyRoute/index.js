@@ -2,9 +2,10 @@ import React, { Suspense } from 'react';
 import { Route, Redirect } from 'react-router-dom';
 import authService from '../../services/authService';
 import SendGAPageViewEvent from '../SendGAPageViewEvent';
+import Loader from '../Loader';
 
 export default ({ component: Component, ...rest }) => (
-	<Suspense fallback={<h1>Loading...</h1>}>
+	<Suspense fallback={<Loader height="100vh" />}>
 		<Route
 			{...rest}
 			render={props =>
