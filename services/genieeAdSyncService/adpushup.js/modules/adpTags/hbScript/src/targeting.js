@@ -155,14 +155,36 @@ var targeting = {
                     String(keyCombination ? keyCombination.trim().substr(0, 40) : null)
                 );
         });
-    },
-    setPageLevel: function (googletag) {
-        var pageLevelTargeting = constants.TARGETING.PAGE_LEVEL;
+	},
+	setPageLevel: function (googletag) {
+		let pageLevelTargeting = constants.TARGETING.PAGE_LEVEL;
+		
+		// SAMPLE customPageLevelTargetingMap set through beforeJs
+		// window.adpushup.customPageLevelTargetingMap = {
+		// 	targeting: { adp_geo: window.adp_geo, key2: 'dsome val' },
+		// 	pagesToExclude: ['']
+		// };
 
-        for (var key in pageLevelTargeting) {
-            googletag.pubads().setTargeting(key, String(pageLevelTargeting[key]));
-        }
-    }
+		if (window.adpushup.customPageLevelTargetingMap) {
+			const {
+				targeting: customPageLevelTargeting = {},
+				pagesToExclude = []
+			} = window.adpushup.customPageLevelTargetingMap;
+			const pageUrl = window.location.href;
+
+			const shouldSetCustomTargeting = pagesToExclude.some(
+				pageUrlPattern => !!pageUrl.match(new RegExp(pageUrlPattern))
+			);
+
+			if (shouldSetCustomTargeting) {
+				pageLevelTargeting = { ...pageLevelTargeting, ...customPageLevelTargeting };
+			}
+		}
+
+		for (var key in pageLevelTargeting) {
+			googletag.pubads().setTargeting(key, String(pageLevelTargeting[key]));
+		}
+	}
 };
 
 module.exports = targeting;
