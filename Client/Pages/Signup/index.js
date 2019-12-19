@@ -159,10 +159,6 @@ class Signup extends Component {
 
 		return (
 			<Fragment>
-				{/* <Helmet>
-					<title>Signup</title>
-					<meta name="robots" content="noindex" />
-				</Helmet> */}
 				<DocumentTitle title="Signup" />
 
 				<AuthShell>
