@@ -48,6 +48,19 @@ class Table extends React.Component {
 		return resultObject;
 	};
 
+	formatAggregatedData = () => {
+		const { aggregatedData } = this.props;
+
+		let aggregateValue = [];
+
+		for (const key in aggregatedData) {
+			if (key === '2019-12-13') {
+				aggregateValue = aggregatedData[key].map(({ network_net_revenue }) => network_net_revenue);
+			}
+		}
+		return aggregateValue;
+	};
+
 	getTableColumns = (columns, total) => {
 		let tableColumns = [];
 		let sortedMetrics = [];
@@ -90,35 +103,6 @@ class Table extends React.Component {
 				const { display_name: Header, table_position } = metrics[column];
 				let footerValue = total[`total_${column}`] || '';
 
-				let aggregateValue = 0;
-
-				if (!columnsBlacklistedForAddition.includes(column)) {
-					aggregateValue = vals => numberWithCommas(sum(vals));
-				} else if (column === 'network_ad_ecpm') {
-					aggregateValue = (vals, rows) =>
-						(
-							(sum(rows.map(({ network_net_revenue }) => network_net_revenue)) /
-								sum(rows.map(({ network_impressions }) => network_impressions))) *
-							1000
-						).toFixed(2);
-				} else if (column === 'adpushup_ad_ecpm') {
-					aggregateValue = (vals, rows) =>
-						(
-							(sum(rows.map(({ network_net_revenue }) => network_net_revenue)) /
-								sum(rows.map(({ adpushup_impressions }) => adpushup_impressions))) *
-							1000
-						).toFixed(2);
-				} else if (column === 'adpushup_page_cpm') {
-					aggregateValue = (vals, rows) =>
-						(
-							(sum(rows.map(({ network_net_revenue }) => network_net_revenue)) /
-								sum(rows.map(({ adpushup_page_views }) => adpushup_page_views))) *
-							1000
-						).toFixed(2);
-				} else {
-					aggregateValue = vals => mean(vals).toFixed(2);
-				}
-
 				if (footerValue) {
 					switch (metrics[column].valueType) {
 						case 'money': {
@@ -141,7 +125,7 @@ class Table extends React.Component {
 					sortable: true,
 					table_position,
 					Footer: footerValue,
-					aggregate: aggregateValue,
+					aggregate: vals => sum(vals),
 
 					Cell: props =>
 						metrics[column].valueType === 'money' ? (
@@ -170,7 +154,7 @@ class Table extends React.Component {
 
 	getTableBody = tableBody => {
 		let tableData = [...tableBody];
-		let displayTableData = [];
+		const displayTableData = [];
 		const { startDate, endDate, site } = this.props;
 		const { isDaily, isMonthly, isCumulative } = this.getDateIntervalValidators();
 
@@ -278,7 +262,6 @@ class Table extends React.Component {
 	render() {
 		const { tableBody, tableColumns, tableData } = this.state;
 
-		console.log(this.props.aggregatedData);
 		const onSortFunction = {
 			network_net_revenue(columnValue) {
 				if (typeof columnValue === 'string') return parseFloat(columnValue.replace(/[,$]/g, ''));
