@@ -324,64 +324,64 @@ router
 	// 		isSuperUser: !!req.session.isSuperUser
 	// 	});
 	// })
-	.get('/connectGoogle', function(req, res) {
-		return userModel
-			.getUserByEmail(req.session.user.email)
-			.then(function(user) {
-				var adSenseData = _.find(user.get('adNetworkSettings'), {
-					networkName: 'ADSENSE'
-				});
-				return res.render('connectGoogle', {
-					adNetworkSettings: !_.isEmpty(user.get('adNetworkSettings'))
-						? {
-								pubId: adSenseData.adsenseAccounts[0].id,
-								email: adSenseData.userInfo.email
-						  }
-						: false,
-					siteId: req.session.siteId
-				});
-			})
-			.catch(function(err) {
-				res.redirect('/404');
-			});
-	})
-	.get('/addSite', function(req, res) {
-		var allUserSites = req.session.user.sites,
-			params = {};
-		_.map(allUserSites, function(site) {
-			if (site.step == 1) {
-				params = {
-					siteDomain: site.domain,
-					siteId: site.siteId,
-					step: site.step
-				};
-			}
-		});
-		res.render('addSite', params);
-	})
-	.post('/addSite', function(req, res) {
-		var site = req.body.site ? utils.getSafeUrl(req.body.site) : req.body.site;
+	// .get('/connectGoogle', function(req, res) {
+	// 	return userModel
+	// 		.getUserByEmail(req.session.user.email)
+	// 		.then(function(user) {
+	// 			var adSenseData = _.find(user.get('adNetworkSettings'), {
+	// 				networkName: 'ADSENSE'
+	// 			});
+	// 			return res.render('connectGoogle', {
+	// 				adNetworkSettings: !_.isEmpty(user.get('adNetworkSettings'))
+	// 					? {
+	// 							pubId: adSenseData.adsenseAccounts[0].id,
+	// 							email: adSenseData.userInfo.email
+	// 					  }
+	// 					: false,
+	// 				siteId: req.session.siteId
+	// 			});
+	// 		})
+	// 		.catch(function(err) {
+	// 			res.redirect('/404');
+	// 		});
+	// })
+	// .get('/addSite', function(req, res) {
+	// 	var allUserSites = req.session.user.sites,
+	// 		params = {};
+	// 	_.map(allUserSites, function(site) {
+	// 		if (site.step == 1) {
+	// 			params = {
+	// 				siteDomain: site.domain,
+	// 				siteId: site.siteId,
+	// 				step: site.step
+	// 			};
+	// 		}
+	// 	});
+	// 	res.render('addSite', params);
+	// })
+	// .post('/addSite', function(req, res) {
+	// 	var site = req.body.site ? utils.getSafeUrl(req.body.site) : req.body.site;
 
-		userModel
-			.addSite(req.session.user.email, site)
-			.spread(function(user, siteId) {
-				var userSites = user.get('sites');
-				for (var i in userSites) {
-					if (userSites[i].siteId === siteId) {
-						userSites[i].step = CC.onboarding.initialStep; // initial site step i.e. 1 now
-						user.set('sites', userSites);
-						req.session.user = user;
-						user.save();
-						return res.send({ success: 1, siteId: siteId });
-					}
-				}
-				return res.send({ success: 0 });
-			})
-			.catch(function(err) {
-				console.log('Error while Adding site', err);
-				return res.send({ success: 0 });
-			});
-	})
+	// 	userModel
+	// 		.addSite(req.session.user.email, site)
+	// 		.spread(function(user, siteId) {
+	// 			var userSites = user.get('sites');
+	// 			for (var i in userSites) {
+	// 				if (userSites[i].siteId === siteId) {
+	// 					userSites[i].step = CC.onboarding.initialStep; // initial site step i.e. 1 now
+	// 					user.set('sites', userSites);
+	// 					req.session.user = user;
+	// 					user.save();
+	// 					return res.send({ success: 1, siteId: siteId });
+	// 				}
+	// 			}
+	// 			return res.send({ success: 0 });
+	// 		})
+	// 		.catch(function(err) {
+	// 			console.log('Error while Adding site', err);
+	// 			return res.send({ success: 0 });
+	// 		});
+	// })
 	.get('/logout', function(req, res) {
 		req.session.destroy(function() {
 			return res.redirect('/');

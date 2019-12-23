@@ -1,51 +1,51 @@
-extends layout/base
+//- extends layout/base
 
-block getTitle
-    - var titleVar = "Update User Status"
+//- block getTitle
+//-     - var titleVar = "Update User Status"
 
-block bodyContent
-    - var statusValue = status || null;
-    - var msg = message;
-    - var currentStatusValue = currentStatus ? 'Inactive' : 'Active';
+//- block bodyContent
+//-     - var statusValue = status || null;
+//-     - var msg = message;
+//-     - var currentStatusValue = currentStatus ? 'Inactive' : 'Active';
 
-    include layout/sideBar
-    .pageContainer.page-container
+//-     include layout/sideBar
+//-     .pageContainer.page-container
 
-        include layout/header
-        // Page Content Starts Here
-        .pageContentWrapper.page-content
-            .pageContentInner.page-content--inner
-                .notification-wrapper
-                .controlAdpushupWrap.col-sm-12.mb-30
-                    .container.col-md-6(style="margin: 0 auto; float: none;")
-                        div(class="profileForm form-container js-form-container", data-ui-component="user-status", id="credentials-wrapper", style="width: 90%;")
-                            form(class="form--userStatus js-form-profile", action='/user/updateUserStatus', method='post')
-                                if (statusValue && statusValue == 'success')
-                                    div(class="success-message top", style="padding:10px; font-size: 16px; font-weight: bold; text-align:center;") #{msg}
-                                else if (statusValue && statusValue == 'failure')
-                                    div(class="error-message", style="margin-bottom: 15px; font-size: 16px; font-weight: bold; text-align:center;") #{missingData}
+//-         include layout/header
+//-         // Page Content Starts Here
+//-         .pageContentWrapper.page-content
+//-             .pageContentInner.page-content--inner
+//-                 .notification-wrapper
+//-                 .controlAdpushupWrap.col-sm-12.mb-30
+//-                     .container.col-md-6(style="margin: 0 auto; float: none;")
+//-                         div(class="profileForm form-container js-form-container", data-ui-component="user-status", id="credentials-wrapper", style="width: 90%;")
+//-                             form(class="form--userStatus js-form-profile", action='/user/updateUserStatus', method='post')
+//-                                 if (statusValue && statusValue == 'success')
+//-                                     div(class="success-message top", style="padding:10px; font-size: 16px; font-weight: bold; text-align:center;") #{msg}
+//-                                 else if (statusValue && statusValue == 'failure')
+//-                                     div(class="error-message", style="margin-bottom: 15px; font-size: 16px; font-weight: bold; text-align:center;") #{missingData}
 
-                                div(class="col-md-12", style="font-size: 16px;")
-                                    div(class="form-group row")
-                                        .input-group
-                                            input.form-control.login-field(type='text', id="email" name='email', placeholder='Enter User Email', value='#{email}', style="width: 100%;", readonly)
-                                        .input-group
-                                            p Current Revenue : #{websiteRevenue}
-                                            select(class="form-control input-lg", id="signup-websiteRevenue", name="websiteRevenue")
-                                                option(value="") Monthly Ad Revenue (in USD)
-                                                option(value="999") &lt; 1,000
-                                                option(value="1000-2500") 1,000-2,500
-                                                option(value="2500-5000") 2,500-5,000
-                                                option(value="5000-10000") 5,000-10,000
-                                                option(value="10000-50000") 10,000-50,000
-                                                option(value="50000-200000") 50,000-200,000
-                                                option(value="200001") 200,000+
-                                        .input-group                                     
-                                            p Current Status : #{currentStatusValue}
-                                        .form-check-label(style="vertical-align:top;")
-                                            input.form-check-input(type="radio", name="status", value="0")
-                                            | &nbsp; Active
-                                        .form-check-label(style="vertical-align:top;")
-                                            input.form-check-input(type="radio", name="status", value="1")
-                                            | &nbsp; Inactive
-                                        button#credentials-submit.btn.btn-lightBg.btn-block.btn-lg.btn-submit(type='submit', style="margin-bottom: 10px;") Update
+//-                                 div(class="col-md-12", style="font-size: 16px;")
+//-                                     div(class="form-group row")
+//-                                         .input-group
+//-                                             input.form-control.login-field(type='text', id="email" name='email', placeholder='Enter User Email', value='#{email}', style="width: 100%;", readonly)
+//-                                         .input-group
+//-                                             p Current Revenue : #{websiteRevenue}
+//-                                             select(class="form-control input-lg", id="signup-websiteRevenue", name="websiteRevenue")
+//-                                                 option(value="") Monthly Ad Revenue (in USD)
+//-                                                 option(value="999") &lt; 1,000
+//-                                                 option(value="1000-2500") 1,000-2,500
+//-                                                 option(value="2500-5000") 2,500-5,000
+//-                                                 option(value="5000-10000") 5,000-10,000
+//-                                                 option(value="10000-50000") 10,000-50,000
+//-                                                 option(value="50000-200000") 50,000-200,000
+//-                                                 option(value="200001") 200,000+
+//-                                         .input-group                                     
+//-                                             p Current Status : #{currentStatusValue}
+//-                                         .form-check-label(style="vertical-align:top;")
+//-                                             input.form-check-input(type="radio", name="status", value="0")
+//-                                             | &nbsp; Active
+//-                                         .form-check-label(style="vertical-align:top;")
+//-                                             input.form-check-input(type="radio", name="status", value="1")
+//-                                             | &nbsp; Inactive
+//-                                         button#credentials-submit.btn.btn-lightBg.btn-block.btn-lg.btn-submit(type='submit', style="margin-bottom: 10px;") Update

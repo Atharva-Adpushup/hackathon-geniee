@@ -1,130 +1,130 @@
-extends  layout/base
+//- extends  layout/base
 
-block getTitle
-    - var titleVar = "PageGroup"
+//- block getTitle
+//-     - var titleVar = "PageGroup"
 
-block bodyContent
-    include layout/sideBar
-    .pageContainer.page-container
-        include layout/header
-        // Page Content Starts Here
-        .pageContentWrapper.page-content
-            .pageContentInner.page-content--inner
-                .notification-wrapper
-                #widgetsArea.row
-                    .mb-30
-                        .controlAdpushupWrap
-                            if pageGroup
-                                h3.title.m-All-0.clearfix
-                                    a!= pageGroup.channelName
-                                div
-                                    ul.nav.nav-tabs(role='tablist')
-                                        li.active(role='presentation')
-                                            a(href='#summary', aria-controls='home', role='tab', data-toggle='tab') Summary  
-                                        li(role='presentation')
-                                            a(href='#variations', aria-controls='profile', role='tab', data-toggle='tab') Variations
-                                        //- li.pull-right.data-row-action
-                                        //-     a(href="/") 
-                                        //-         i.fa.fa-edit
-                                        //-         | Edit Page Group
-                                        //- li.pull-right.data-row-action
-                                        //-     a(href="/") 
-                                        //-         i.fa.fa-pause-circle-o
-                                        //-         | Pause AdPushup
-                                        li.pull-right.data-row-action
-                                            a(href="/user/site/#{siteId}/editor") 
-                                                i.fa.fa-file-code-o
-                                                | Ad Editor
-                                    .tab-content
-                                        #summary.tab-pane.fade.in.active(role='tabpanel', style="padding: 20px;") 
-                                            .data-row
-                                                h5.data-font-m.text-dark Basic Information
-                                                .row
-                                                    .col-sm-3
-                                                        label.data-font-m Page Group URL
-                                                    .col-sm-9
-                                                        a(href="#{pageGroup.sampleUrl}", target="_blank", class="data-font-m sampleUrl")!= pageGroup.sampleUrl
-                                                .row
-                                                    .col-sm-3
-                                                        label.data-font-m Platform
-                                                    .col-sm-9
-                                                        .data-font-m.text-dark.device
-                                                            if pageGroup.device === 'DESKTOP' 
-                                                                i.fa.fa-desktop 
-                                                                span!= pageGroup.device
-                                                            if pageGroup.device === 'TABLET' 
-                                                                i.fa.fa-tablet 
-                                                                span!= pageGroup.device
-                                                            if pageGroup.device === 'MOBILE' 
-                                                                i.fa.fa-mobile 
-                                                                span!= pageGroup.device
-                                                .row
-                                                    .col-sm-3
-                                                        label.data-font-m Inventory Type
-                                                    .col-sm-9
-                                                        .data-font-m.text-dark Standard Banner Ads
+//- block bodyContent
+//-     include layout/sideBar
+//-     .pageContainer.page-container
+//-         include layout/header
+//-         // Page Content Starts Here
+//-         .pageContentWrapper.page-content
+//-             .pageContentInner.page-content--inner
+//-                 .notification-wrapper
+//-                 #widgetsArea.row
+//-                     .mb-30
+//-                         .controlAdpushupWrap
+//-                             if pageGroup
+//-                                 h3.title.m-All-0.clearfix
+//-                                     a!= pageGroup.channelName
+//-                                 div
+//-                                     ul.nav.nav-tabs(role='tablist')
+//-                                         li.active(role='presentation')
+//-                                             a(href='#summary', aria-controls='home', role='tab', data-toggle='tab') Summary  
+//-                                         li(role='presentation')
+//-                                             a(href='#variations', aria-controls='profile', role='tab', data-toggle='tab') Variations
+//-                                         //- li.pull-right.data-row-action
+//-                                         //-     a(href="/") 
+//-                                         //-         i.fa.fa-edit
+//-                                         //-         | Edit Page Group
+//-                                         //- li.pull-right.data-row-action
+//-                                         //-     a(href="/") 
+//-                                         //-         i.fa.fa-pause-circle-o
+//-                                         //-         | Pause AdPushup
+//-                                         li.pull-right.data-row-action
+//-                                             a(href="/user/site/#{siteId}/editor") 
+//-                                                 i.fa.fa-file-code-o
+//-                                                 | Ad Editor
+//-                                     .tab-content
+//-                                         #summary.tab-pane.fade.in.active(role='tabpanel', style="padding: 20px;") 
+//-                                             .data-row
+//-                                                 h5.data-font-m.text-dark Basic Information
+//-                                                 .row
+//-                                                     .col-sm-3
+//-                                                         label.data-font-m Page Group URL
+//-                                                     .col-sm-9
+//-                                                         a(href="#{pageGroup.sampleUrl}", target="_blank", class="data-font-m sampleUrl")!= pageGroup.sampleUrl
+//-                                                 .row
+//-                                                     .col-sm-3
+//-                                                         label.data-font-m Platform
+//-                                                     .col-sm-9
+//-                                                         .data-font-m.text-dark.device
+//-                                                             if pageGroup.device === 'DESKTOP' 
+//-                                                                 i.fa.fa-desktop 
+//-                                                                 span!= pageGroup.device
+//-                                                             if pageGroup.device === 'TABLET' 
+//-                                                                 i.fa.fa-tablet 
+//-                                                                 span!= pageGroup.device
+//-                                                             if pageGroup.device === 'MOBILE' 
+//-                                                                 i.fa.fa-mobile 
+//-                                                                 span!= pageGroup.device
+//-                                                 .row
+//-                                                     .col-sm-3
+//-                                                         label.data-font-m Inventory Type
+//-                                                     .col-sm-9
+//-                                                         .data-font-m.text-dark Standard Banner Ads
                                             
-                                            //- .data-row
-                                            //-     h5.data-font-m.text-dark Additional Information
-                                            //-     .row
-                                            //-         .col-sm-3
-                                            //-             label.data-font-m Category
-                                            //-         .col-sm-9
-                                            //-             .data-font-m.text-dark!= category
-                                            //-     .row
-                                            //-         .col-sm-3
-                                            //-             label.data-font-m Sub-category
-                                            //-         .col-sm-9
-                                            //-             .data-font-m.text-dark!= subCategory
-                                            //-     .row
-                                            //-         .col-sm-3
-                                            //-             label.data-font-m Major Audience Geography
-                                            //-         .col-sm-9
-                                            //-             .data-font-m.text-dark!= majorAudience
-                                            //-     .row
-                                            //-         .col-sm-3
-                                            //-             label.data-font-m Use SSL 
-                                            //-             input(type="checkbox", disabled, checked=(useSSL == true ? true : undefined))
-                                            //-     .row
-                                            //-         .col-sm-3
-                                            //-             label.data-font-m Include Adult Content 
-                                            //-             input(type="checkbox", disabled, checked=(adultContent == true ? true : undefined))
+//-                                             //- .data-row
+//-                                             //-     h5.data-font-m.text-dark Additional Information
+//-                                             //-     .row
+//-                                             //-         .col-sm-3
+//-                                             //-             label.data-font-m Category
+//-                                             //-         .col-sm-9
+//-                                             //-             .data-font-m.text-dark!= category
+//-                                             //-     .row
+//-                                             //-         .col-sm-3
+//-                                             //-             label.data-font-m Sub-category
+//-                                             //-         .col-sm-9
+//-                                             //-             .data-font-m.text-dark!= subCategory
+//-                                             //-     .row
+//-                                             //-         .col-sm-3
+//-                                             //-             label.data-font-m Major Audience Geography
+//-                                             //-         .col-sm-9
+//-                                             //-             .data-font-m.text-dark!= majorAudience
+//-                                             //-     .row
+//-                                             //-         .col-sm-3
+//-                                             //-             label.data-font-m Use SSL 
+//-                                             //-             input(type="checkbox", disabled, checked=(useSSL == true ? true : undefined))
+//-                                             //-     .row
+//-                                             //-         .col-sm-3
+//-                                             //-             label.data-font-m Include Adult Content 
+//-                                             //-             input(type="checkbox", disabled, checked=(adultContent == true ? true : undefined))
                                                         
-                                        #variations.tab-pane.fade(role='tabpanel')
-                                            //- Variations table
-                                            .table-wrapper-paddded
+//-                                         #variations.tab-pane.fade(role='tabpanel')
+//-                                             //- Variations table
+//-                                             .table-wrapper-paddded
 
-                                                if pageGroup.variations && Object.keys(pageGroup.variations).length
-                                                    table.table.table-bordered.table-hover
-                                                        thead
-                                                            tr
-                                                                th Name
-                                                                th Zones
-                                                                th Traffic Distribution
-                                                                //- th Impressions
-                                                                //- th CTR
-                                                                //- th RPM
-                                                                //- th Actions
-                                                        tbody
-                                                            for variation in pageGroup.variations
-                                                                tr
-                                                                    td!= variation.name
-                                                                    td!= Object.keys(variation.sections).length
-                                                                    td!= variation.trafficDistribution + '%'
-                                                                    //- td!= variation.impressions
-                                                                    //-     if variation.topPerforming
-                                                                    //-         span.top-variation Top Performing
-                                                                    //- td!= variation.ctr
-                                                                    //- td!= variation.rpm
-                                                                    //- td.table-actions
-                                                                    //-     a(href="/" title="Edit")
-                                                                    //-         i.fa.fa-edit
-                                                                    //-     a(href="/" title="Pause Variation")
-                                                                    //-         i.fa.fa-pause-circle-o
-                                                                    //-     a(href="/" title="Delete")
-                                                                    //-         i.fa.fa-trash
-                                                else
-                                                    h5 No Variations Found!
-                            else
-                                h3.title.m-All-0.clearfix
-                                    a Page Group data could not be loaded!
+//-                                                 if pageGroup.variations && Object.keys(pageGroup.variations).length
+//-                                                     table.table.table-bordered.table-hover
+//-                                                         thead
+//-                                                             tr
+//-                                                                 th Name
+//-                                                                 th Zones
+//-                                                                 th Traffic Distribution
+//-                                                                 //- th Impressions
+//-                                                                 //- th CTR
+//-                                                                 //- th RPM
+//-                                                                 //- th Actions
+//-                                                         tbody
+//-                                                             for variation in pageGroup.variations
+//-                                                                 tr
+//-                                                                     td!= variation.name
+//-                                                                     td!= Object.keys(variation.sections).length
+//-                                                                     td!= variation.trafficDistribution + '%'
+//-                                                                     //- td!= variation.impressions
+//-                                                                     //-     if variation.topPerforming
+//-                                                                     //-         span.top-variation Top Performing
+//-                                                                     //- td!= variation.ctr
+//-                                                                     //- td!= variation.rpm
+//-                                                                     //- td.table-actions
+//-                                                                     //-     a(href="/" title="Edit")
+//-                                                                     //-         i.fa.fa-edit
+//-                                                                     //-     a(href="/" title="Pause Variation")
+//-                                                                     //-         i.fa.fa-pause-circle-o
+//-                                                                     //-     a(href="/" title="Delete")
+//-                                                                     //-         i.fa.fa-trash
+//-                                                 else
+//-                                                     h5 No Variations Found!
+//-                             else
+//-                                 h3.title.m-All-0.clearfix
+//-                                     a Page Group data could not be loaded!

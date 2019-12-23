@@ -1,5 +1,5 @@
 'use strict';
-var $ = require('jquery'),
+var $ = require('./jquery'),
 	html = window.document.documentElement,
 	matchFunction =
 		html.matches ||

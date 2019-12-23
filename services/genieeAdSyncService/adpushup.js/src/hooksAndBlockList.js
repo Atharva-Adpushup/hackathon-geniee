@@ -1,4 +1,4 @@
-var $ = require('jquery'),
+var $ = require('../libs/jquery'),
 	utils = require('../libs/utils');
 
 function init(adp, onPageGroupPush, platform) {
@@ -64,6 +64,7 @@ function init(adp, onPageGroupPush, platform) {
 				}
 			}
 		} catch (error) {
+			config.pageGroup = undefined;
 			utils.log('Error while detecting pageGroup', error, experimentPageGroups);
 		}
 	}

@@ -56,7 +56,7 @@ export default class InventoryTab extends React.Component {
 
 		const updatedFilteredInventories = filteredInventories.map(filteredInventory => {
 			const matchedInventory = inventories.find(
-				inventory => inventory.adUnit === filteredInventory.adUnit
+				inventory => inventory.adUnitId === filteredInventory.adUnitId
 			);
 
 			if (!updated && filteredInventory.headerBidding !== matchedInventory.headerBidding) {
@@ -74,19 +74,19 @@ export default class InventoryTab extends React.Component {
 		const newState = {};
 		newState.selectAllInventories = !selectAllInventories;
 		newState.selectedInventories = !selectAllInventories
-			? [...filteredInventories].map(inventory => inventory.adUnit)
+			? [...filteredInventories].map(inventory => inventory.adUnitId)
 			: [];
 
 		this.setState(newState);
 	};
 
-	handleInventorySelect = (e, adUnit) => {
+	handleInventorySelect = (e, adUnitId) => {
 		const { checkedCopy, selectedInventories, filteredInventories } = this.state;
 		const checked = checkedCopy;
 		if (e.target.checked) {
-			selectedInventories.push(adUnit);
+			selectedInventories.push(adUnitId);
 		} else {
-			selectedInventories.splice(selectedInventories.indexOf(adUnit), 1);
+			selectedInventories.splice(selectedInventories.indexOf(adUnitId), 1);
 		}
 		this.setState({
 			checkedCopy: checked,
@@ -138,7 +138,7 @@ export default class InventoryTab extends React.Component {
 		const inventoriesToUpdate = [];
 
 		for (const inventory of inventories) {
-			if (selectedInventories.indexOf(inventory.adUnit) > -1) {
+			if (selectedInventories.indexOf(inventory.adUnitId) > -1) {
 				inventoriesToUpdate.push({
 					...inventory,
 					headerBidding: enableHB ? 'Enabled' : 'Disabled'

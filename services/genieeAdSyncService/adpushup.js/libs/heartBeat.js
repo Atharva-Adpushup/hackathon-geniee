@@ -11,7 +11,7 @@ things to consider:
 
 var browserConfig = require('../libs/browserConfig'),
 	utils = require('../libs/utils'),
-	$ = require('jquery');
+	$ = require('./jquery');
 
 module.exports = function(url, minGapInterval, heartBeatDelay, apStartTime) {
 	var hadWindowFocusAtLeastOnce,

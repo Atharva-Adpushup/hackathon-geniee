@@ -6,7 +6,7 @@ var BACKWARD_COMPATIBLE_MAPPING = require('./constants').AD_SIZE_MAPPING.IAB_SIZ
 var inventoryMapper = {
 	get: function(inventory, size, optionalParam) {
 		// Reset inventory as default if site is SPA
-		if (adp.config.isSPA) {
+		if (adp.config.isSPA || adp.config.spaButUsingHook) {
 			inventory = adp.$.extend(true, {}, window.adpushup.adpTags.defaultInventory);
 		}
 

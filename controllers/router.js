@@ -68,7 +68,7 @@ module.exports = function(app) {
 					'/innovativeAdsManager/data/',
 					'/user/site',
 					'/genieeApi',
-					'/user/connectGoogle',
+					// '/user/connectGoogle',
 					'/user/requestOauth',
 					'/user/oauth2callback',
 					'/data',

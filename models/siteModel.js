@@ -13,6 +13,7 @@ var model = require('../helpers/model'),
 	commonConsts = require('../configs/commonConsts'),
 	adSizeMappingConsts = require('../helpers/adSizeMappingConsts'),
 	_ = require('lodash'),
+	{ N1qlQuery } = require('couchbase'),
 	Site = model.extend(function() {
 		this.keys = [
 			'siteId',
@@ -247,6 +248,23 @@ var model = require('../helpers/model'),
 	});
 
 function apiModule() {
+	function generateGetSitesQueryString(siteIds, keysToReturn) {
+		const selectStatement = `SELECT ${
+			Array.isArray(keysToReturn) && keysToReturn.length
+				? keysToReturn.map(key => `_site.${key}`)
+				: '*'
+		}`;
+
+		const whereStatement = `WHERE meta(_site).id ${
+			Array.isArray(siteIds) && siteIds.length
+				? `IN [${siteIds.map(siteId => `"site::${siteId}"`)}]`
+				: `LIKE 'site::%' AND _site.dataFeedActive = true;`
+		}`;
+
+		const queryString = `${selectStatement} FROM AppBucket _site ${whereStatement};`;
+
+		return queryString;
+	}
 	var API = {
 		createSite: function(data) {
 			var json = {
@@ -693,6 +711,19 @@ function apiModule() {
 				.then(function(site) {
 					return site.save();
 				});
+		},
+		/**
+		 * - If siteIds list is empty then return all active site docs
+		 * - if keysToReturn list is emplty then return all site doc keys
+		 *
+		 * @param config:{siteIds:[], keysToReturn:[]}
+		 * @returns
+		 */
+		getSites: function({ siteIds = [], keysToReturn = [] }) {
+			const queryString = generateGetSitesQueryString(siteIds, keysToReturn);
+			const query = N1qlQuery.fromString(queryString);
+
+			return couchbase.connectToAppBucket().then(appBucket => appBucket.queryAsync(query));
 		}
 	};
 

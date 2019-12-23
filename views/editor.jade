@@ -1,71 +1,71 @@
-extends layout/base
-block getTitle
-    - var titleVar = utils.domanize(domain)
+//- extends layout/base
+//- block getTitle
+//-     - var titleVar = utils.domanize(domain)
 
-block headCss
-    link(href="//fonts.googleapis.com/css?family=Karla:400,700,400italic,700italic&subset=latin,latin-ext", rel='stylesheet', type='text/css')
-    if environment == "production"
-        +loadAsset("css", [
-            //'//vjs.zencdn.net/4.12/video-js.css',
-            '/assets/css/third-party/dataTables.css',
-            '/assets/css/builds/editor.min.css'
-        ])
-    else
-        link(href="/assets/css/libs/editor.css", rel="stylesheet", type="text/css")
+//- block headCss
+//-     link(href="//fonts.googleapis.com/css?family=Karla:400,700,400italic,700italic&subset=latin,latin-ext", rel='stylesheet', type='text/css')
+//-     if environment == "production"
+//-         +loadAsset("css", [
+//-             //'//vjs.zencdn.net/4.12/video-js.css',
+//-             '/assets/css/third-party/dataTables.css',
+//-             '/assets/css/builds/editor.min.css'
+//-         ])
+//-     else
+//-         link(href="/assets/css/libs/editor.css", rel="stylesheet", type="text/css")
 
-    +loadAsset("css", [
-        '/assets/css/third-party/c3.css',
-        //'//vjs.zencdn.net/4.12/video-js.css',
-        '/assets/css/third-party/dataTables.css'
-    ])
+//-     +loadAsset("css", [
+//-         '/assets/css/third-party/c3.css',
+//-         //'//vjs.zencdn.net/4.12/video-js.css',
+//-         '/assets/css/third-party/dataTables.css'
+//-     ])
 
-block append headScripts
-    - isEnvironmentProduction = environment == "production";
+//- block append headScripts
+//-     - isEnvironmentProduction = environment == "production";
 
-    script(type="text/javascript").
-        var currentUser = !{JSON.stringify(currentUser)},
-            currentSiteId = !{JSON.stringify(currentSiteId)};
-        window.ADP_BASEURL = "#{consts.BASE_URL}";
-        window.ADP_ORIGIN = "#{consts.PROXY_ORIGIN}";
-        window.ADP_SITE_DOMAIN = "#{domain}";
-        window.ADP_SITE_ID = #{siteId};
-        window.ADP_ENVIRONMENT = "#{environment}";
-        window.isSuperUser = #{isSuperUser};
-        window.isGeniee = window.currentUser.userType && window.currentUser.userType == 'partner' ? true : false;
-        window.gcfg = !{JSON.stringify(config)};
+//-     script(type="text/javascript").
+//-         var currentUser = !{JSON.stringify(currentUser)},
+//-             currentSiteId = !{JSON.stringify(currentSiteId)};
+//-         window.ADP_BASEURL = "#{consts.BASE_URL}";
+//-         window.ADP_ORIGIN = "#{consts.PROXY_ORIGIN}";
+//-         window.ADP_SITE_DOMAIN = "#{domain}";
+//-         window.ADP_SITE_ID = #{siteId};
+//-         window.ADP_ENVIRONMENT = "#{environment}";
+//-         window.isSuperUser = #{isSuperUser};
+//-         window.isGeniee = window.currentUser.userType && window.currentUser.userType == 'partner' ? true : false;
+//-         window.gcfg = !{JSON.stringify(config)};
        
-    if channels.length
-        +loadAsset("js", [
-            '/assets/js/react-15.js',
-            '/assets/js/react-dom.js',
-            //'//vjs.zencdn.net/4.12/video.js',
-            //'/assets/js/builds/shim.js',
-            // '/assets/js/libs/third-party/underscore.js',
-            //'/assets/js/lodash.js',
-            '/assets/js/builds/outer.js?v=1512052159832'
-        ])
+//-     if channels.length
+//-         +loadAsset("js", [
+//-             '/assets/js/react-15.js',
+//-             '/assets/js/react-dom.js',
+//-             //'//vjs.zencdn.net/4.12/video.js',
+//-             //'/assets/js/builds/shim.js',
+//-             // '/assets/js/libs/third-party/underscore.js',
+//-             //'/assets/js/lodash.js',
+//-             '/assets/js/builds/outer.js?v=1512052159832'
+//-         ])
 
-    link(rel="chrome-webstore-item", href="https://chrome.google.com/webstore/detail/lbfaiagkagpgeefmnpefcibmpeccpjpi")
+//-     link(rel="chrome-webstore-item", href="https://chrome.google.com/webstore/detail/lbfaiagkagpgeefmnpefcibmpeccpjpi")
 
-block bodyContent
+//- block bodyContent
 
-    if environment === 'production'
-        //- include layout/extensionDetectionPopup
+//-     if environment === 'production'
+//-         //- include layout/extensionDetectionPopup
 
-    if isChrome
-        if channels.length
-            .loaderwrapper.spinner(data-id='loader', style='display: block')
-                img(src='/assets/images/loaderLogo.png')
-            div(id='editor')   
-        else
-            .errorMain
-                .container
-                    .row
-                        .col-sm-12
-                            section.txt-ed.animated.In.fadeInDown
-                                h4
-                                    | No Page Group found!  Please create one to access the editor.
-                                a(href="/user/site/#{siteId}/pagegroups") Create PageGroup
-    else
-        div(style='width:100%;height:100%;position: absolute;background:url(/public/assets/images/chrome-required.png) center center no-repeat;')
+//-     if isChrome
+//-         if channels.length
+//-             .loaderwrapper.spinner(data-id='loader', style='display: block')
+//-                 img(src='/assets/images/loaderLogo.png')
+//-             div(id='editor')   
+//-         else
+//-             .errorMain
+//-                 .container
+//-                     .row
+//-                         .col-sm-12
+//-                             section.txt-ed.animated.In.fadeInDown
+//-                                 h4
+//-                                     | No Page Group found!  Please create one to access the editor.
+//-                                 a(href="/user/site/#{siteId}/pagegroups") Create PageGroup
+//-     else
+//-         div(style='width:100%;height:100%;position: absolute;background:url(/public/assets/images/chrome-required.png) center center no-repeat;')
    
