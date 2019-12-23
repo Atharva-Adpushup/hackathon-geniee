@@ -18,16 +18,10 @@ function getHeader(
 					style={{ float: 'left' }}
 				/>
 			),
-			Cell: ({
-				original: {
-					adUnit: {
-						props: { title }
-					}
-				}
-			}) => (
+			Cell: ({ original: { adUnitId } }) => (
 				<Checkbox
-					checked={selectedInventories.indexOf(title) > -1}
-					onChange={e => handleInventorySelect(e, title)}
+					checked={selectedInventories.indexOf(adUnitId) > -1}
+					onChange={e => handleInventorySelect(e, adUnitId)}
 				/>
 			),
 			sortable: false,

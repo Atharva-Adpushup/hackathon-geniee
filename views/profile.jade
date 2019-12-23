@@ -1,59 +1,59 @@
-extends layout/base
+//- extends layout/base
 
-block getTitle
-    - var titleVar = "Edit Profile";
+//- block getTitle
+//-     - var titleVar = "Edit Profile";
 
-block bodyContent
-    - formData = formData || {};
-    - var firstNameError = (profileError && profileError.firstName) ? profileError.firstName[0] : null;
-    - var lastNameError = (profileError && profileError.lastName) ? profileError.lastName[0] : null;
-    - var oldPasswordError = (profileError && profileError.oldPassword) ? profileError.oldPassword[0] : null;
-    - var passwordError = (profileError && profileError.password) ? profileError.password[0] : null;
-    - var confirmPasswordError = (profileError && profileError.confirmPassword) ? profileError.confirmPassword[0] : null;
-    - var isProfileSaved = (profileSaved) ? true : false;
-    - var userNotFoundError = (userNotFound) ? "Unable to find user with entered email id": null;
+//- block bodyContent
+//-     - formData = formData || {};
+//-     - var firstNameError = (profileError && profileError.firstName) ? profileError.firstName[0] : null;
+//-     - var lastNameError = (profileError && profileError.lastName) ? profileError.lastName[0] : null;
+//-     - var oldPasswordError = (profileError && profileError.oldPassword) ? profileError.oldPassword[0] : null;
+//-     - var passwordError = (profileError && profileError.password) ? profileError.password[0] : null;
+//-     - var confirmPasswordError = (profileError && profileError.confirmPassword) ? profileError.confirmPassword[0] : null;
+//-     - var isProfileSaved = (profileSaved) ? true : false;
+//-     - var userNotFoundError = (userNotFound) ? "Unable to find user with entered email id": null;
 
-    include layout/sideBar
+//-     include layout/sideBar
 
-    // Main Page Starts Here
-    .pageContainer.page-container
-        include layout/header
-        // Page Content Starts Here
-        .pageContentWrapper.page-content
-            .pageContentInner.page-content--inner
-                // Control v/s Adpushup Starts here
-                .controlAdpushupWrap.col-sm-12.mb-30
-                    div(class="profileForm form-container js-form-container", data-ui-component="user-profile", id="profile-wrapper")
-                        .text-center.profilePic
-                            img(src="http://www.gravatar.com/avatar/" + md5Email + "?d=monsterid&s=100")
-                            br
-                        form(class="form--profile js-form-profile", action='/user/profile', method='post')
-                            if (isProfileSaved)
-                                .success-message.top Profile updated!
+//-     // Main Page Starts Here
+//-     .pageContainer.page-container
+//-         include layout/header
+//-         // Page Content Starts Here
+//-         .pageContentWrapper.page-content
+//-             .pageContentInner.page-content--inner
+//-                 // Control v/s Adpushup Starts here
+//-                 .controlAdpushupWrap.col-sm-12.mb-30
+//-                     div(class="profileForm form-container js-form-container", data-ui-component="user-profile", id="profile-wrapper")
+//-                         .text-center.profilePic
+//-                             img(src="http://www.gravatar.com/avatar/" + md5Email + "?d=monsterid&s=100")
+//-                             br
+//-                         form(class="form--profile js-form-profile", action='/user/profile', method='post')
+//-                             if (isProfileSaved)
+//-                                 .success-message.top Profile updated!
 
-                            .input-group
-                                input.form-control.login-field(type='text', id="profile-firstName" name='firstName', value=formData.firstName, placeholder='First Name')
-                                label.login-field-icon.fui-user(for='profile-firstName')
-                                .error-message #{firstNameError} #{userNotFoundError}
+//-                             .input-group
+//-                                 input.form-control.login-field(type='text', id="profile-firstName" name='firstName', value=formData.firstName, placeholder='First Name')
+//-                                 label.login-field-icon.fui-user(for='profile-firstName')
+//-                                 .error-message #{firstNameError} #{userNotFoundError}
 
-                            .input-group
-                                input.form-control.login-field(type='text', id="profile-lastName" name='lastName', value=formData.lastName, placeholder='Last Name')
-                                label.login-field-icon.fui-user(for='profile-lastName')
-                                .error-message #{lastNameError} #{userNotFoundError}
+//-                             .input-group
+//-                                 input.form-control.login-field(type='text', id="profile-lastName" name='lastName', value=formData.lastName, placeholder='Last Name')
+//-                                 label.login-field-icon.fui-user(for='profile-lastName')
+//-                                 .error-message #{lastNameError} #{userNotFoundError}
 
-                            .input-group
-                                input.form-control.login-field(type='password', id="profile-oldPassword", name='oldPassword', placeholder='Old Password')
-                                label.login-field-icon.fui-lock(for='profile-oldPassword')
-                                .error-message #{oldPasswordError}
+//-                             .input-group
+//-                                 input.form-control.login-field(type='password', id="profile-oldPassword", name='oldPassword', placeholder='Old Password')
+//-                                 label.login-field-icon.fui-lock(for='profile-oldPassword')
+//-                                 .error-message #{oldPasswordError}
 
-                            .input-group
-                                input.form-control.login-field(type='password', id="profile-password", name='password', placeholder='New Password')
-                                label.login-field-icon.fui-lock(for='profile-password')
-                                .error-message #{passwordError}
+//-                             .input-group
+//-                                 input.form-control.login-field(type='password', id="profile-password", name='password', placeholder='New Password')
+//-                                 label.login-field-icon.fui-lock(for='profile-password')
+//-                                 .error-message #{passwordError}
 
-                            .input-group
-                                input.form-control.login-field(type='password', id="profile-confirmPassword", name='confirmPassword', placeholder='Confirm Password')
-                                label.login-field-icon.fui-lock(for='profile-confirmPassword')
-                                .error-message #{confirmPasswordError}
+//-                             .input-group
+//-                                 input.form-control.login-field(type='password', id="profile-confirmPassword", name='confirmPassword', placeholder='Confirm Password')
+//-                                 label.login-field-icon.fui-lock(for='profile-confirmPassword')
+//-                                 .error-message #{confirmPasswordError}
 
-                            button#profile-submit.btn.btn-lightBg.btn-block.btn-lg.btn-submit(type='submit') Update Profile
+//-                             button#profile-submit.btn.btn-lightBg.btn-block.btn-lg.btn-submit(type='submit') Update Profile

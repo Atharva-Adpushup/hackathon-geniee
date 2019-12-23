@@ -4,12 +4,22 @@ var constants = require('./constants');
 var feedback = require('./feedback');
 var responsiveAds = require('./responsiveAds');
 var targeting = require('./targeting');
+var getDFPCOntainerFromDom = function(containerId) {
+	return document.getElementById(containerId);
+};
 var gpt = {
 	refreshGPTSlot: function(googletag, gSlot) {
-		return googletag.pubads().refresh([gSlot]);
+		if (gSlot) {
+			return googletag.pubads().refresh([gSlot]);
+		}
 	},
 	renderSlot: function(googletag, adpSlot) {
-		if (!adpSlot.containerPresent || !adpSlot.biddingComplete || adpSlot.hasRendered) {
+		//if (!adpSlot.containerPresent || !adpSlot.biddingComplete || adpSlot.hasRendered) {
+		if (
+			!getDFPCOntainerFromDom(adpSlot.containerId) ||
+			!adpSlot.biddingComplete ||
+			adpSlot.hasRendered
+		) {
 			return;
 		}
 		adpSlot.hasRendered = true;

@@ -6,6 +6,10 @@ var utils = require('../helpers/utils'),
 	feedback = require('./feedback').feedback,
 	$ = require('./adp').$,
 	adp = require('./adp').adp,
+	UTM_REPORTING_SITES = [39041, 39358],
+	getDFPCOntainerFromDom = function(containerId) {
+		return document.getElementById(containerId);
+	},
 	getFloorWithGranularity = function(floor) {
 		var val = parseFloat(Math.abs(floor).toFixed(2));
 		if (val > 20) {
@@ -21,7 +25,7 @@ var utils = require('../helpers/utils'),
 		googletag.pubads().refresh([gSlot]);
 	},
 	renderGPT = function(slot) {
-		if (!slot.containerPresent || !slot.biddingComplete || slot.hasRendered) {
+		if (!getDFPCOntainerFromDom(slot.containerId) || !slot.biddingComplete || slot.hasRendered) {
 			return false;
 		}
 		slot.hasRendered = true;
@@ -100,7 +104,7 @@ var utils = require('../helpers/utils'),
 		return null;
 	},
 	setUTMWiseTargeting = function() {
-		var urlParams = adp.utils.queryParams,
+		var urlParams = adp.utils.getQueryParams(),
 			separator = ':';
 
 		if (!Object.keys(urlParams).length) {
@@ -204,7 +208,10 @@ var utils = require('../helpers/utils'),
 			if (dfpAdunitCodes.indexOf(slot.optionalParam.dfpAdunitCode) !== -1) {
 				var currentTargetingObject =
 						config.TARGETING[
-							'/' + networkCodes[slot.optionalParam.dfpAdunitCode] + '/' + slot.optionalParam.dfpAdunitCode
+							'/' +
+								networkCodes[slot.optionalParam.dfpAdunitCode] +
+								'/' +
+								slot.optionalParam.dfpAdunitCode
 						],
 					currentTargetingObject = setPageLevelTargeting(currentTargetingObject, slot);
 				Object.keys(currentTargetingObject).forEach(function(dfpKey, index) {
@@ -329,7 +336,7 @@ var utils = require('../helpers/utils'),
 				googletag.pubads().setTargeting(key, String(config.PAGE_KEY_VALUES[key]));
 			}
 
-			if (config.SITE_ID === 39041) {
+			if (config.SITE_ID && UTM_REPORTING_SITES.indexOf(config.SITE_ID) !== -1) {
 				setUTMWiseTargeting();
 			}
 

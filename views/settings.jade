@@ -1,269 +1,269 @@
-extends  layout/base
+//- extends  layout/base
 
-block getTitle
-    - var titleVar = "Settings"
+//- block getTitle
+//-     - var titleVar = "Settings"
 
-block append headScripts
-    script.
-        $(document).ready(function() {
-            window.selectedSiteId = !{siteId};
-            window.blocklist = '!{blocklist}' ? '!{blocklist}'.split(',') : []; 
-        });
-    +loadAsset("js", [
-        '/assets/js/libs/custom/settings.js?v=1496398593986',
-    ])
-    style.
-        .u-hide {
-            display: none;
-        }
-        .select-wrapper {
-            border-right: 1px solid #ccc;
-            margin-bottom: 10px;
-            width: 100%;
-        }
-        table {
-            border-collapse: collapse;
-            width: 100%;
-            margin-top: 10px;
-        }
+//- block append headScripts
+//-     script.
+//-         $(document).ready(function() {
+//-             window.selectedSiteId = !{siteId};
+//-             window.blocklist = '!{blocklist}' ? '!{blocklist}'.split(',') : []; 
+//-         });
+//-     +loadAsset("js", [
+//-         '/assets/js/libs/custom/settings.js?v=1496398593986',
+//-     ])
+//-     style.
+//-         .u-hide {
+//-             display: none;
+//-         }
+//-         .select-wrapper {
+//-             border-right: 1px solid #ccc;
+//-             margin-bottom: 10px;
+//-             width: 100%;
+//-         }
+//-         table {
+//-             border-collapse: collapse;
+//-             width: 100%;
+//-             margin-top: 10px;
+//-         }
 
-        td, th {
-            border: 1px solid #dddddd;
-            text-align: left;
-            padding: 8px;
-        }
+//-         td, th {
+//-             border: 1px solid #dddddd;
+//-             text-align: left;
+//-             padding: 8px;
+//-         }
 
-        tr:nth-child(even) {
-        }
+//-         tr:nth-child(even) {
+//-         }
 
-block bodyContent
-    include layout/sideBar
-    .pageContainer.page-container
-        include layout/header
-        // Page Content Starts Here
-        .pageContentWrapper.page-content
-            .pageContentInner.page-content--inner
-                .notification-wrapper
+//- block bodyContent
+//-     include layout/sideBar
+//-     .pageContainer.page-container
+//-         include layout/header
+//-         // Page Content Starts Here
+//-         .pageContentWrapper.page-content
+//-             .pageContentInner.page-content--inner
+//-                 .notification-wrapper
 
-                #showHeaderCode.modal._ap_modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true')
-                    .modal-dialog
-                        .modal-content
-                            .modal-header
-                                button.close(type='button', data-dismiss='modal', aria-label='Close')
-                                    span(aria-hidden='true') ×
-                                h4#myModalLabel.modal-title Header Code
-                            .modal-body
-                                p.text-medium(style="margin: 10px 0 0;")
-                                    | Copy and paste this snippet in the head tag of your website
-                                div.snippet-wrapper
-                                    span.clipboard-copy Copied !
-                                    textarea.snippet(style="font-size: 1em;" id="header-code" readonly="" placeholder="AdPushup init code comes here..") 
-                                    div.snippet-btn-wrapper
-                                        div
-                                            button(style="width: 270px;" data-toggle="modal" data-target="#sendToDevModal" id="sendToDev" class="snippet-btn apbtn-main-line apbtn-small")
-                                                | Send Code to Developer
-                                                i.fa.fa-code
-                                            button(style="width: 270px;" id="clipboardCopy" class="snippet-btn apbtn-main-line apbtn-small") Copy to clipboard
-                                                i.fa.fa-clipboard
+//-                 #showHeaderCode.modal._ap_modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true')
+//-                     .modal-dialog
+//-                         .modal-content
+//-                             .modal-header
+//-                                 button.close(type='button', data-dismiss='modal', aria-label='Close')
+//-                                     span(aria-hidden='true') ×
+//-                                 h4#myModalLabel.modal-title Header Code
+//-                             .modal-body
+//-                                 p.text-medium(style="margin: 10px 0 0;")
+//-                                     | Copy and paste this snippet in the head tag of your website
+//-                                 div.snippet-wrapper
+//-                                     span.clipboard-copy Copied !
+//-                                     textarea.snippet(style="font-size: 1em;" id="header-code" readonly="" placeholder="AdPushup init code comes here..") 
+//-                                     div.snippet-btn-wrapper
+//-                                         div
+//-                                             button(style="width: 270px;" data-toggle="modal" data-target="#sendToDevModal" id="sendToDev" class="snippet-btn apbtn-main-line apbtn-small")
+//-                                                 | Send Code to Developer
+//-                                                 i.fa.fa-code
+//-                                             button(style="width: 270px;" id="clipboardCopy" class="snippet-btn apbtn-main-line apbtn-small") Copy to clipboard
+//-                                                 i.fa.fa-clipboard
 
-                #sendToDevModal.modal._ap_modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true')
-                    .modal-dialog
-                        .modal-content
-                            .modal-header
-                                button.close(type='button', data-dismiss='modal', aria-label='Close')
-                                    span(aria-hidden='true') ×
-                                h4#myModalLabel.modal-title Send Code to Developer
-                            form.form-inline#sendCodeForm
-                                .modal-body.addSite
-                                    .form-group(style="display: block;")
-                                        .input-group(style="width: 100%;")
-                                            span.input-group-addon
-                                                i.fa.fa-envelope-o
-                                            input.form-control.input-lg(type='email', required=true, name='developerEmail', placeholder='Enter your developer\'s email')
-                                            input(type="hidden", name="headerCode", id="headerCodeInput")
-                                        .error-message 
-                                .modal-footer.row
-                                    .col-xs-12
-                                        button.btn-lightBg.btn.btn-block.btn-lg(id="sendCodeSubmit", type='submit') Send
+//-                 #sendToDevModal.modal._ap_modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true')
+//-                     .modal-dialog
+//-                         .modal-content
+//-                             .modal-header
+//-                                 button.close(type='button', data-dismiss='modal', aria-label='Close')
+//-                                     span(aria-hidden='true') ×
+//-                                 h4#myModalLabel.modal-title Send Code to Developer
+//-                             form.form-inline#sendCodeForm
+//-                                 .modal-body.addSite
+//-                                     .form-group(style="display: block;")
+//-                                         .input-group(style="width: 100%;")
+//-                                             span.input-group-addon
+//-                                                 i.fa.fa-envelope-o
+//-                                             input.form-control.input-lg(type='email', required=true, name='developerEmail', placeholder='Enter your developer\'s email')
+//-                                             input(type="hidden", name="headerCode", id="headerCodeInput")
+//-                                         .error-message 
+//-                                 .modal-footer.row
+//-                                     .col-xs-12
+//-                                         button.btn-lightBg.btn.btn-block.btn-lg(id="sendCodeSubmit", type='submit') Send
 
-                #widgetsArea.row
-                    .mb-30
-                        .controlAdpushupWrap
-                            h3.title.m-All-0.clearfix 
-                                a Site settings - #{utils.domanize(siteDomain)}
-                            form#saveSiteSettings.settings-pane
-                                .row
-                                    .col-sm-6
-                                        if !pageGroups.length
-                                            | No Pagegroups found!
-                                        else
-                                            .row
-                                                .col-sm-12
-                                                    h4 Pagegroup pattern
-                                        for p in pageGroups
-                                            .row
-                                                .col-sm-4
-                                                    .input-name!= p.pageGroup + ' - ' + p.platform
-                                                    input(type="hidden" name="pageGroupPattern" 
-                                                        value=`{"pageGroup": "${p.pageGroup}", "platform": "${p.platform}"}`)
-                                                .col-sm-8
-                                                    input.form-control(value=utils.getPageGroupPattern(p.pageGroup, p.platform, patterns) name="pageGroupPattern" type="text" placeholder="Enter pagegroup pattern")
-                                        hr
-                                        .row
-                                            .col-md-4
-                                                a.btn.btn-primary(href="/user/site/#{siteId}/settings/regexVerifier", target="_blank", style="width: 100%") Regex Verification Tool
-                                            if isSuperUser
-                                                .col-md-4
-                                                    a.btn.btn-primary(href="/user/site/#{siteId}/settings/regexGenerator", target="_blank", style="width: 100%") Regex Generation Tool
-                                    .col-sm-6
-                                        .row
-                                            .col-sm-12
-                                                h4 Other Settings
-                                        .row
-                                            .col-sm-5
-                                                .input-name Adpushup Percentage
-                                            .col-sm-7
-                                                input.form-control(value=(apConfigs.adpushupPercentage ? apConfigs.adpushupPercentage : 100) name="adpushupPercentage" type="number" min="0" max="100" placeholder="Enter Adpushup Percentage")
-                                        .row
-                                            .col-sm-5
-                                                .input-name Heart Beat Min Interval
-                                            .col-sm-7
-                                                input.form-control(value=(apConfigs.heartBeatMinInterval ? apConfigs.heartBeatMinInterval : 3000) name="heartBeatMinInterval" type="number" placeholder="Enter Heart Beat Min Interval")
-                                        .row
-                                            .col-sm-5
-                                                .input-name Heart Beat Start Delay
-                                            .col-sm-7
-                                                input.form-control(value=(apConfigs.heartBeatStartDelay ? apConfigs.heartBeatStartDelay : 2000) name="heartBeatStartDelay" type="number" placeholder="Enter Heart Beat Start Delay")
-                                        .row
-                                            .col-sm-5
-                                                .input-name X Path Wait Timeout
-                                            .col-sm-7
-                                                input.form-control(value=(apConfigs.xpathWaitTimeout ? apConfigs.xpathWaitTimeout : 5000) name="xpathWaitTimeout" type="number" placeholder="Enter X Path Wait Timeout")
-                                        .row
-                                            .col-sm-5
-                                                .input-name Is SPA
-                                            .col-sm-7
-                                                input(style="margin-top: 10px;" type="checkbox" id="isSPA" name="isSPA" value=(apConfigs.isSPA ? (apConfigs.isSPA ? "true" : "false") : "false") checked=(apConfigs.isSPA !== "undefined" ? (apConfigs.isSPA ? "true" : undefined) : "false"))
-                                        .row
-                                            .col-sm-5
-                                                .input-name SPA page transition timeout
-                                            .col-sm-7
-                                                input.form-control(style="margin-top: 10px;" value=(apConfigs.spaPageTransitionTimeout ? apConfigs.spaPageTransitionTimeout : 0) name="spaPageTransitionTimeout" type="number" placeholder="Enter SPA Page Transition Timeout")
-                                         .row
-                                            .col-sm-5
-                                                .input-name Auto Optimise
-                                            .col-sm-7
-                                                input(style="margin-top: 10px;" type="checkbox" id="autoOptimise" name="autoOptimise" value=(apConfigs.autoOptimise ? (apConfigs.autoOptimise ? "true" : "false") : "false") checked=(apConfigs.autoOptimise !== undefined ? (apConfigs.autoOptimise ? "true" : undefined) : "false"))
-                                        .row
-                                            .col-sm-5
-                                                .input-name "Powered by" banner
-                                            .col-sm-7
-                                                input(style="margin-top: 10px;" type="checkbox" id="poweredByBanner" name="poweredByBanner" value=(apConfigs.poweredByBanner ? (apConfigs.poweredByBanner ? "true" : "false") : "false") checked=(apConfigs.poweredByBanner !== undefined ? (apConfigs.poweredByBanner ? "true" : undefined) : "true"))
-                                        .row
-                                            .col-sm-12
-                                                table
-                                                    tr
-                                                        th Channel
-                                                        th Auto Optimise
-                                                    each channel in channels
-                                                        - channelAutoOptimiseClass = channel.autoOptimise == false || channel.autoOptimise == 'N/A'  ? 'red' : 'green'
-                                                        - channelAutoOptimiseStatus = channel.autoOptimise == false ? 'Disabled' : channel.autoOptimise == 'N/A' ? 'N/A' : 'Enabled'
-                                                        tr
-                                                            td !{channel.name}
-                                                            td(data-identifier="autoptimise", class=channelAutoOptimiseClass) !{channelAutoOptimiseStatus}
-                                            .row
-                                            .col-sm-12#autoOptimiseErr.error-message
+//-                 #widgetsArea.row
+//-                     .mb-30
+//-                         .controlAdpushupWrap
+//-                             h3.title.m-All-0.clearfix 
+//-                                 a Site settings - #{utils.domanize(siteDomain)}
+//-                             form#saveSiteSettings.settings-pane
+//-                                 .row
+//-                                     .col-sm-6
+//-                                         if !pageGroups.length
+//-                                             | No Pagegroups found!
+//-                                         else
+//-                                             .row
+//-                                                 .col-sm-12
+//-                                                     h4 Pagegroup pattern
+//-                                         for p in pageGroups
+//-                                             .row
+//-                                                 .col-sm-4
+//-                                                     .input-name!= p.pageGroup + ' - ' + p.platform
+//-                                                     input(type="hidden" name="pageGroupPattern" 
+//-                                                         value=`{"pageGroup": "${p.pageGroup}", "platform": "${p.platform}"}`)
+//-                                                 .col-sm-8
+//-                                                     input.form-control(value=utils.getPageGroupPattern(p.pageGroup, p.platform, patterns) name="pageGroupPattern" type="text" placeholder="Enter pagegroup pattern")
+//-                                         hr
+//-                                         .row
+//-                                             .col-md-4
+//-                                                 a.btn.btn-primary(href="/user/site/#{siteId}/settings/regexVerifier", target="_blank", style="width: 100%") Regex Verification Tool
+//-                                             if isSuperUser
+//-                                                 .col-md-4
+//-                                                     a.btn.btn-primary(href="/user/site/#{siteId}/settings/regexGenerator", target="_blank", style="width: 100%") Regex Generation Tool
+//-                                     .col-sm-6
+//-                                         .row
+//-                                             .col-sm-12
+//-                                                 h4 Other Settings
+//-                                         .row
+//-                                             .col-sm-5
+//-                                                 .input-name Adpushup Percentage
+//-                                             .col-sm-7
+//-                                                 input.form-control(value=(apConfigs.adpushupPercentage ? apConfigs.adpushupPercentage : 100) name="adpushupPercentage" type="number" min="0" max="100" placeholder="Enter Adpushup Percentage")
+//-                                         .row
+//-                                             .col-sm-5
+//-                                                 .input-name Heart Beat Min Interval
+//-                                             .col-sm-7
+//-                                                 input.form-control(value=(apConfigs.heartBeatMinInterval ? apConfigs.heartBeatMinInterval : 3000) name="heartBeatMinInterval" type="number" placeholder="Enter Heart Beat Min Interval")
+//-                                         .row
+//-                                             .col-sm-5
+//-                                                 .input-name Heart Beat Start Delay
+//-                                             .col-sm-7
+//-                                                 input.form-control(value=(apConfigs.heartBeatStartDelay ? apConfigs.heartBeatStartDelay : 2000) name="heartBeatStartDelay" type="number" placeholder="Enter Heart Beat Start Delay")
+//-                                         .row
+//-                                             .col-sm-5
+//-                                                 .input-name X Path Wait Timeout
+//-                                             .col-sm-7
+//-                                                 input.form-control(value=(apConfigs.xpathWaitTimeout ? apConfigs.xpathWaitTimeout : 5000) name="xpathWaitTimeout" type="number" placeholder="Enter X Path Wait Timeout")
+//-                                         .row
+//-                                             .col-sm-5
+//-                                                 .input-name Is SPA
+//-                                             .col-sm-7
+//-                                                 input(style="margin-top: 10px;" type="checkbox" id="isSPA" name="isSPA" value=(apConfigs.isSPA ? (apConfigs.isSPA ? "true" : "false") : "false") checked=(apConfigs.isSPA !== "undefined" ? (apConfigs.isSPA ? "true" : undefined) : "false"))
+//-                                         .row
+//-                                             .col-sm-5
+//-                                                 .input-name SPA page transition timeout
+//-                                             .col-sm-7
+//-                                                 input.form-control(style="margin-top: 10px;" value=(apConfigs.spaPageTransitionTimeout ? apConfigs.spaPageTransitionTimeout : 0) name="spaPageTransitionTimeout" type="number" placeholder="Enter SPA Page Transition Timeout")
+//-                                          .row
+//-                                             .col-sm-5
+//-                                                 .input-name Auto Optimise
+//-                                             .col-sm-7
+//-                                                 input(style="margin-top: 10px;" type="checkbox" id="autoOptimise" name="autoOptimise" value=(apConfigs.autoOptimise ? (apConfigs.autoOptimise ? "true" : "false") : "false") checked=(apConfigs.autoOptimise !== undefined ? (apConfigs.autoOptimise ? "true" : undefined) : "false"))
+//-                                         .row
+//-                                             .col-sm-5
+//-                                                 .input-name "Powered by" banner
+//-                                             .col-sm-7
+//-                                                 input(style="margin-top: 10px;" type="checkbox" id="poweredByBanner" name="poweredByBanner" value=(apConfigs.poweredByBanner ? (apConfigs.poweredByBanner ? "true" : "false") : "false") checked=(apConfigs.poweredByBanner !== undefined ? (apConfigs.poweredByBanner ? "true" : undefined) : "true"))
+//-                                         .row
+//-                                             .col-sm-12
+//-                                                 table
+//-                                                     tr
+//-                                                         th Channel
+//-                                                         th Auto Optimise
+//-                                                     each channel in channels
+//-                                                         - channelAutoOptimiseClass = channel.autoOptimise == false || channel.autoOptimise == 'N/A'  ? 'red' : 'green'
+//-                                                         - channelAutoOptimiseStatus = channel.autoOptimise == false ? 'Disabled' : channel.autoOptimise == 'N/A' ? 'N/A' : 'Enabled'
+//-                                                         tr
+//-                                                             td !{channel.name}
+//-                                                             td(data-identifier="autoptimise", class=channelAutoOptimiseClass) !{channelAutoOptimiseStatus}
+//-                                             .row
+//-                                             .col-sm-12#autoOptimiseErr.error-message
 
-                                        if dfpAccounts && dfpAccounts.length
-                                            .row
-                                                .col-sm-12
-                                                    h4 Thid party DFP
-                                                .col-sm-12(class="u-margin-b15px")
-                                                    .row
-                                                        .col-sm-6
-                                                            .select-wrapper
-                                                                select(id="activeDFPNetwork", name="activeDFPNetwork")
-                                                                    option(value="" selected) Select DFP Network
-                                                                    each dfpAccount in dfpAccounts
-                                                                        - var optionName = dfpAccount.name ? dfpAccount.code + ' - ' + dfpAccount.name : dfpAccount.code + ' - ' + 'N/A';
-                                                                        - var optionValue = dfpAccount.code + '-' + dfpAccount.dfpParentId;
-                                                                        - var optionCurrencyCode = dfpAccount.currencyCode || null;
-                                                                        - var isSelected = (apConfigs.activeDFPNetwork === dfpAccount.code ? true : undefined);
+//-                                         if dfpAccounts && dfpAccounts.length
+//-                                             .row
+//-                                                 .col-sm-12
+//-                                                     h4 Thid party DFP
+//-                                                 .col-sm-12(class="u-margin-b15px")
+//-                                                     .row
+//-                                                         .col-sm-6
+//-                                                             .select-wrapper
+//-                                                                 select(id="activeDFPNetwork", name="activeDFPNetwork")
+//-                                                                     option(value="" selected) Select DFP Network
+//-                                                                     each dfpAccount in dfpAccounts
+//-                                                                         - var optionName = dfpAccount.name ? dfpAccount.code + ' - ' + dfpAccount.name : dfpAccount.code + ' - ' + 'N/A';
+//-                                                                         - var optionValue = dfpAccount.code + '-' + dfpAccount.dfpParentId;
+//-                                                                         - var optionCurrencyCode = dfpAccount.currencyCode || null;
+//-                                                                         - var isSelected = (apConfigs.activeDFPNetwork === dfpAccount.code ? true : undefined);
 
-                                                                        option(value=optionValue, data-currencyCode=optionCurrencyCode, selected=isSelected) #{optionName}
-                                                        .col-sm-6
-                                                            - var activeDFPCurrencyCode = (apConfigs.activeDFPCurrencyCode || '');
-                                                            - var isCurrencyTableHidden = (activeDFPCurrencyCode ? '' : 'u-hide')
-                                                            input(type="hidden", id="activeDFPCurrencyCode", name="activeDFPCurrencyCode", value=activeDFPCurrencyCode)
-                                                            table(class="u-margin-0px js-currency-table #{isCurrencyTableHidden}")
-                                                                tr
-                                                                    td
-                                                                        b Currency
-                                                                    td(id="currencyValue") #{activeDFPCurrencyCode}
+//-                                                                         option(value=optionValue, data-currencyCode=optionCurrencyCode, selected=isSelected) #{optionName}
+//-                                                         .col-sm-6
+//-                                                             - var activeDFPCurrencyCode = (apConfigs.activeDFPCurrencyCode || '');
+//-                                                             - var isCurrencyTableHidden = (activeDFPCurrencyCode ? '' : 'u-hide')
+//-                                                             input(type="hidden", id="activeDFPCurrencyCode", name="activeDFPCurrencyCode", value=activeDFPCurrencyCode)
+//-                                                             table(class="u-margin-0px js-currency-table #{isCurrencyTableHidden}")
+//-                                                                 tr
+//-                                                                     td
+//-                                                                         b Currency
+//-                                                                     td(id="currencyValue") #{activeDFPCurrencyCode}
 
-                                                    - var isActiveDFPNetwork = !!(apConfigs.activeDFPNetwork);
-                                                    - var isThirdPartyAdxProperty = !!(apConfigs && apConfigs.hasOwnProperty('isThirdPartyAdx'));
-                                                    - var isThirdPartyAdxUI = !!((isActiveDFPNetwork || (isActiveDFPNetwork && isThirdPartyAdxProperty)) ? true : false);
-                                                    - var computedClassName = !!(isThirdPartyAdxUI ? '' : 'u-hide');
-                                                    - var computedValue = apConfigs.isThirdPartyAdx ? 'true' : 'false';
-                                                    - var computedPropValue = apConfigs.isThirdPartyAdx ? true : false;
+//-                                                     - var isActiveDFPNetwork = !!(apConfigs.activeDFPNetwork);
+//-                                                     - var isThirdPartyAdxProperty = !!(apConfigs && apConfigs.hasOwnProperty('isThirdPartyAdx'));
+//-                                                     - var isThirdPartyAdxUI = !!((isActiveDFPNetwork || (isActiveDFPNetwork && isThirdPartyAdxProperty)) ? true : false);
+//-                                                     - var computedClassName = !!(isThirdPartyAdxUI ? '' : 'u-hide');
+//-                                                     - var computedValue = apConfigs.isThirdPartyAdx ? 'true' : 'false';
+//-                                                     - var computedPropValue = apConfigs.isThirdPartyAdx ? true : false;
 
-                                                    .row(class='js-thirdpartyadx-wrapper #{computedClassName}')
-                                                        .col-sm-5
-                                                            .input-name Is Third Party AdX
-                                                        .col-sm-7
-                                                            input(type="checkbox" id="isThirdPartyAdx" name="isThirdPartyAdx" value=computedValue checked=computedPropValue)
+//-                                                     .row(class='js-thirdpartyadx-wrapper #{computedClassName}')
+//-                                                         .col-sm-5
+//-                                                             .input-name Is Third Party AdX
+//-                                                         .col-sm-7
+//-                                                             input(type="checkbox" id="isThirdPartyAdx" name="isThirdPartyAdx" value=computedValue checked=computedPropValue)
 
-                                        .row
-                                            .col-sm-12
-                                                h4 Manage Blocklist
-                                            .col-sm-12
-                                                .row
-                                                    .col-sm-9
-                                                        input#blocklistItem.form-control(name="blocklistItem" type="text" placeholder="Enter Url or pattern to block")
-                                                    .col-sm-3
-                                                        button#addBlocklistItem.btn-primary(type="button") Add to blocklist
-                                                .row
-                                                    div#blocklistErr.error-message(style="margin: 5px 15px 20px;")
-                                                    ul.blocklist
+//-                                         .row
+//-                                             .col-sm-12
+//-                                                 h4 Manage Blocklist
+//-                                             .col-sm-12
+//-                                                 .row
+//-                                                     .col-sm-9
+//-                                                         input#blocklistItem.form-control(name="blocklistItem" type="text" placeholder="Enter Url or pattern to block")
+//-                                                     .col-sm-3
+//-                                                         button#addBlocklistItem.btn-primary(type="button") Add to blocklist
+//-                                                 .row
+//-                                                     div#blocklistErr.error-message(style="margin: 5px 15px 20px;")
+//-                                                     ul.blocklist
 
-                                        if uiaccecc
-                                            .row
-                                                .col-sm-12
-                                                    h4 Adcode Conversion
-                                                .col-sm-12
-                                                    div.snippet-wrapper.code-convert-wrapper
-                                                        span.clipboard-copy Copied !
-                                                        textarea.snippet#code-conversion-box(placeholder="Enter Passback/Control Ad code here", style="margin-top: 0px;")
-                                                        .row
-                                                            .col-sm-4(style="float: right;")
-                                                                button.btn-primary(id="code-conversion-button") Convert
-                                                            .col-sm-4(style="float: right;")
-                                                                button.btn-primary#clipboard-copy-adcode Copy to clipboard
+//-                                         if uiaccecc
+//-                                             .row
+//-                                                 .col-sm-12
+//-                                                     h4 Adcode Conversion
+//-                                                 .col-sm-12
+//-                                                     div.snippet-wrapper.code-convert-wrapper
+//-                                                         span.clipboard-copy Copied !
+//-                                                         textarea.snippet#code-conversion-box(placeholder="Enter Passback/Control Ad code here", style="margin-top: 0px;")
+//-                                                         .row
+//-                                                             .col-sm-4(style="float: right;")
+//-                                                                 button.btn-primary(id="code-conversion-button") Convert
+//-                                                             .col-sm-4(style="float: right;")
+//-                                                                 button.btn-primary#clipboard-copy-adcode Copy to clipboard
 
-                                        if !isPartner
-                                            .row
-                                                .col-sm-12
-                                                    h4 GDPR Compliance
-                                                .col-sm-12
-                                                    .row(style="margin-top: -10px;")
-                                                        .col-sm-2
-                                                            .input-name Enable
-                                                        .col-sm-10
-                                                            input(style="margin-top: 10px;" type="checkbox" id="gdprCompliance" name="gdprCompliance" value=(gdpr.compliance ? (gdpr.compliance ? "true" : "false") : "false") checked=(gdpr.compliance !== false ? (gdpr.compliance ? "true" : "true") : undefined))
-                                                    .row
-                                                        .col-sm-4
-                                                            .input-name Cookie Control Config
-                                                        .col-sm-8
-                                                            textarea(name="cookieControlConfig" placeholder="Cookie control config (only JSON)", style="margin-top: 0px; height: 300px;")!=JSON.stringify(gdpr.cookieControlConfig)
-                                hr
-                                .row.settings-btn-pane
-                                    .col-sm-4
-                                        button.btn-success Save Settings
-                                    .col-sm-2
-                                        button.btn-primary(type="button" data-toggle="modal" data-target="#showHeaderCode") View Init Code
-                                .row
-                                    .col-sm-7
-                                        .error-message#error
+//-                                         if !isPartner
+//-                                             .row
+//-                                                 .col-sm-12
+//-                                                     h4 GDPR Compliance
+//-                                                 .col-sm-12
+//-                                                     .row(style="margin-top: -10px;")
+//-                                                         .col-sm-2
+//-                                                             .input-name Enable
+//-                                                         .col-sm-10
+//-                                                             input(style="margin-top: 10px;" type="checkbox" id="gdprCompliance" name="gdprCompliance" value=(gdpr.compliance ? (gdpr.compliance ? "true" : "false") : "false") checked=(gdpr.compliance !== false ? (gdpr.compliance ? "true" : "true") : undefined))
+//-                                                     .row
+//-                                                         .col-sm-4
+//-                                                             .input-name Cookie Control Config
+//-                                                         .col-sm-8
+//-                                                             textarea(name="cookieControlConfig" placeholder="Cookie control config (only JSON)", style="margin-top: 0px; height: 300px;")!=JSON.stringify(gdpr.cookieControlConfig)
+//-                                 hr
+//-                                 .row.settings-btn-pane
+//-                                     .col-sm-4
+//-                                         button.btn-success Save Settings
+//-                                     .col-sm-2
+//-                                         button.btn-primary(type="button" data-toggle="modal" data-target="#showHeaderCode") View Init Code
+//-                                 .row
+//-                                     .col-sm-7
+//-                                         .error-message#error
                             
 

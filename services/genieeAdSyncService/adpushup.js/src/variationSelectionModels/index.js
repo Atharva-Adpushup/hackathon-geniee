@@ -1,5 +1,5 @@
 var utils = require('../../libs/utils'),
-	$ = require('jquery'),
+	$ = require('../../libs/jquery'),
 	getPersonalizedVariations = require('./personalization'),
 	bayesianBanditModel = require('./bayesianBandit'),
 	randomSelectionModel = require('./randomSelection')();
@@ -47,7 +47,7 @@ function checkForcedVariation(moduleConfig) {
 		variationObject;
 
 	allVariations = experiment[config.platform][config.pageGroup].variations;
-	forcedVariationName = utils.queryParams[config.forceVariation];
+	forcedVariationName = utils.getQueryParams()[config.forceVariation];
 	variationObject = utils.getObjectByName(allVariations, forcedVariationName);
 	forcedVariation =
 		forcedVariationName &&

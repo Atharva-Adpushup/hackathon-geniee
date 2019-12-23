@@ -1,55 +1,55 @@
-if !partner
-    block append headScripts
-        script.
-            $('document').ready(function() {
-                $('.delPg').on('submit', function(e) {
-                    e.preventDefault();
-                    if(confirm('Are you sure you want to delete this pagegroup ? ')) {
-                        $.post('/genieeApi/pagegroup/delete', {
-                            pageGroupId: $(this).serializeArray()[0].value,
-                            siteId: #{siteId}
-                        }, function(res) {
-                            res.success ? location.reload() : alert('Some error occurred!');
-                        });
-                    }
-                });
-            });
+//- if !partner
+//-     block append headScripts
+//-         script.
+//-             $('document').ready(function() {
+//-                 $('.delPg').on('submit', function(e) {
+//-                     e.preventDefault();
+//-                     if(confirm('Are you sure you want to delete this pagegroup ? ')) {
+//-                         $.post('/genieeApi/pagegroup/delete', {
+//-                             pageGroupId: $(this).serializeArray()[0].value,
+//-                             siteId: #{siteId}
+//-                         }, function(res) {
+//-                             res.success ? location.reload() : alert('Some error occurred!');
+//-                         });
+//-                     }
+//-                 });
+//-             });
 
-.mb-30
-    .controlAdpushupWrap
-        h3.title.m-All-0.clearfix 
-            a Page Groups
+//- .mb-30
+//-     .controlAdpushupWrap
+//-         h3.title.m-All-0.clearfix 
+//-             a Page Groups
 
-            if !partner
-                .pull-right
-                    a.btn.btn-lightBg.btn-default(href='/user/site/#{siteId}/createPagegroup') Create New PageGroup
+//-             if !partner
+//-                 .pull-right
+//-                     a.btn.btn-lightBg.btn-default(href='/user/site/#{siteId}/createPagegroup') Create New PageGroup
 
-        //- Pagegroups table
-        .table-wrapper-paddded
-            if pageGroups.length
-                table.table.table-bordered.table-hover
-                    thead
-                        tr
-                            th Name
-                            th Platform
-                            th Variations
-                            th Actions
-                    tbody
-                        for pagegroup in pageGroups
-                            - pageGroupHash = utils.getPageGroupHash(pagegroup.pageGroup, pagegroup.platform)
-                            tr
-                                td.underline!= utils.convertPagegroupLink(pagegroup.id, pagegroup.pageGroup, siteId)
-                                td!= pagegroup.platform
-                                td!= Object.keys(pagegroup.variations).length
-                                td.table-actions
-                                    //- a(href="/" title="Edit")
-                                        i.fa.fa-edit
-                                    a(target="_blank" href="/user/site/#{siteId}/editor?updateHash=#{pageGroupHash}" title="Go to Editor")
-                                        i.fa.fa-code
-                                    if !partner
-                                        form.delPg(style="display: inline-block;margin-right:10px;")
-                                            input(type="hidden", name="pageGroupId", value="#{pagegroup.id}")
-                                            button.delete-pagegroup(title="Delete")
-                                                i.fa.fa-trash
-            else
-                h5 No PageGroup Found!
+//-         //- Pagegroups table
+//-         .table-wrapper-paddded
+//-             if pageGroups.length
+//-                 table.table.table-bordered.table-hover
+//-                     thead
+//-                         tr
+//-                             th Name
+//-                             th Platform
+//-                             th Variations
+//-                             th Actions
+//-                     tbody
+//-                         for pagegroup in pageGroups
+//-                             - pageGroupHash = utils.getPageGroupHash(pagegroup.pageGroup, pagegroup.platform)
+//-                             tr
+//-                                 td.underline!= utils.convertPagegroupLink(pagegroup.id, pagegroup.pageGroup, siteId)
+//-                                 td!= pagegroup.platform
+//-                                 td!= Object.keys(pagegroup.variations).length
+//-                                 td.table-actions
+//-                                     //- a(href="/" title="Edit")
+//-                                         i.fa.fa-edit
+//-                                     a(target="_blank" href="/user/site/#{siteId}/editor?updateHash=#{pageGroupHash}" title="Go to Editor")
+//-                                         i.fa.fa-code
+//-                                     if !partner
+//-                                         form.delPg(style="display: inline-block;margin-right:10px;")
+//-                                             input(type="hidden", name="pageGroupId", value="#{pagegroup.id}")
+//-                                             button.delete-pagegroup(title="Delete")
+//-                                                 i.fa.fa-trash
+//-             else
+//-                 h5 No PageGroup Found!

@@ -1,139 +1,139 @@
-extends  layout/base
+//- extends  layout/base
 
-block getTitle
-    - var titleVar = "AMP Settings"
+//- block getTitle
+//-     - var titleVar = "AMP Settings"
 
-block append headScripts
-    script.
-        $(document).ready(function() {
-            //- window.selectedSiteId = !{siteId};
-            //- window.ampSettingsConfig = !{JSON.stringify(config)};
-        });
-    +loadAsset("css", [
-        '/assets/css/builds/editor.min.css'
-    ])
+//- block append headScripts
+//-     script.
+//-         $(document).ready(function() {
+//-             //- window.selectedSiteId = !{siteId};
+//-             //- window.ampSettingsConfig = !{JSON.stringify(config)};
+//-         });
+//-     +loadAsset("css", [
+//-         '/assets/css/builds/editor.min.css'
+//-     ])
 
-block bodyContent
-    include layout/sideBar
-    .pageContainer.page-container
-        include layout/header
-        // Page Content Starts Here
-        .pageContentWrapper.page-content
-            .pageContentInner.page-content--inner
-                .notification-wrapper
-                #ampSettings
-    script(src="/assets/js/builds/ampSettings.js")
-                //- #widgetsArea.row
-                //-     .mb-30
-                //-         .controlAdpushupWrap
-                //-             h3.title.m-All-0.clearfix 
-                //-                 a AMP settings - #{channel.pageGroup}-#{channel.platform}
-                //-             form#saveAmpSettings.settings-pane
-                //-                 .row
-                //-                     .col-sm-6
-                //-                         .row
-                //-                             .col-sm-12
-                //-                                 h4 Selectors Settings
-                //-                         for selector in config.selectors
-                //-                             .row
-                //-                                 .col-sm-5
-                //-                                     .input-name #{selector.alias}
-                //-                                     input(type="hidden" id="pageGroupPattern" 
-                //-                                         value=`{"pageGroup": "${channel.pageGroup}", "platform": "${channel.platform}"}`)
-                //-                                 .col-sm-7
-                //-                                     - var selectorValue = channel.ampSettings &&channel.ampSettings['selectors'] && channel.ampSettings['selectors'][selector.value] ?channel.ampSettings['selectors'][selector.value]:''
-                //-                                     input.form-control(name="#{selector.value}" type="text" placeholder="#{selector.alias}" value="#{selectorValue}")
-                //-                         .row
-                //-                             .col-sm-12#autoOptimiseErr.error-message
-                //-                         .row
-                //-                             .col-sm-12
-                //-                                 h4 Custom CSS
-                //-                             .col-sm-12
-                //-                                 div.snippet-wrapper.code-convert-wrapper
-                //-                                     - var customCss = channel.ampSettings &&channel.ampSettings['customCSS']?channel.ampSettings['customCSS'].value:''
-                //-                                     textarea.snippet(placeholder="Enter Custom CSS here", style="margin-top: 0px;" name="customCss") #{customCss}
-                //-                         .row
-                //-                             .col-sm-12#autoOptimiseErr.error-message
-                //-                         .row
-                //-                             .col-sm-12
-                //-                                 h4 Delete Selector
-                //-                             .col-sm-12
-                //-                                 div.snippet-wrapper.code-convert-wrapper
-                //-                                     - var toDelete = channel.ampSettings &&channel.ampSettings['toDelete']?channel.ampSettings['toDelete']:''
-                //-                                     textarea.snippet(style="margin-top: 0px;" name="toDelete") #{toDelete}
-                //-                     .col-sm-6
-                //-                         .row
-                //-                             .col-sm-12
-                //-                                 h4 Social Settings
-                //-                         .row
-                //-                             .col-sm-5
-                //-                                 .input-name Include
-                //-                             .col-sm-7
-                //-                                 - var include = channel.ampSettings && channel.ampSettings.social ? channel.ampSettings.social['include']:false
-                //-                                 input(name="includeSocialLinks" id="includeSocialLinks" type="checkbox" placeholder="Logo" checked=include)
-                //-                         .row
-                //-                             .col-sm-5
-                //-                                 .input-name Placement
-                //-                             .col-sm-7
-                //-                                 - var placement = channel.ampSettings && channel.ampSettings.social ? channel.ampSettings.social['placement']:'top'
-                //-                                 select.form-control(name="placementSocial")
-                //-                                     option(value="top" selected=placement=='top'?true:false) top
-                //-                                     option(value="bottom" selected=placement=='bottom'?true:false) bottom
-                //-                         .row
-                //-                             .col-sm-12
-                //-                                 .input-name Apps
-                //-                             for app in config.socialApps
-                //-                                 .col-sm-3
-                //-                                     - var selectedApp = channel.ampSettings && channel.ampSettings.social &&  channel.ampSettings.social['apps'].indexOf(app.value)>-1? true:false
-                //-                                     input.col-sm-2(name="#{app.value}" type="checkbox" placeholder="Logo" style="width:auto" checked=selectedApp)
-                //-                                     label.col-sm-10 #{app.alias}
-                //-                         .row
-                //-                             .col-sm-12#autoOptimiseErr.error-message
-                //-                         .row
-                //-                             .col-sm-12
-                //-                                 h4 BeforeJs
-                //-                             .col-sm-12
-                //-                                 div.snippet-wrapper.code-convert-wrapper
-                //-                                     - var beforeJs = channel.ampSettings?channel.ampSettings['beforeJs']:''
-                //-                                     textarea.snippet(style="margin-top: 0px;" name="beforeJs") #{beforeJs}
-                //-                         .row
-                //-                             .col-sm-12#autoOptimiseErr.error-message
-                //-                         .row
-                //-                             .col-sm-12
-                //-                                 h4 Other Settings
-                //-                         .row
-                //-                             .col-sm-5
-                //-                                 .input-name Site Name
-                //-                             .col-sm-7
-                //-                                 - var siteName = channel.ampSettings&&channel.ampSettings['siteName']?channel.ampSettings['siteName']:''
-                //-                                 input.form-control(name="siteName" type="text" placeholder="Site Name" value="#{siteName}")
-                //-                         .row
-                //-                             .col-sm-5
-                //-                                 .input-name Template
-                //-                             .col-sm-7
-                //-                                 - var template = channel.ampSettings&&channel.ampSettings['template']?channel.ampSettings['template']:''
-                //-                                 input.form-control(name="template" type="text" placeholder="Template" value="#{template}")
-                //-                         .row
-                //-                             .col-sm-5
-                //-                                 .input-name Ad Network
-                //-                             .col-sm-7
-                //-                                 - var adNetwork = channel.ampSettings&&channel.ampSettings['adNetwork']?channel.ampSettings['adNetwork']:'adsense'
-                //-                                 select.form-control(name="adNetwork")
-                //-                                     option(value="adsense" selected=adNetwork=='adsense'?true:false) Adsense
-                //-                                     option(value="adx" selected=adNetwork=='adx'?true:false) AdX
-                //-                         .row
-                //-                             .col-sm-5
-                //-                                 .input-name Pub Id
-                //-                             .col-sm-7
-                //-                                 - var pubId = channel.ampSettings&&channel.ampSettings['pubId']?channel.ampSettings['pubId']:''
-                //-                                 input.form-control(name="pubId" type="text" placeholder="Pub Id" value="#{pubId}")
+//- block bodyContent
+//-     include layout/sideBar
+//-     .pageContainer.page-container
+//-         include layout/header
+//-         // Page Content Starts Here
+//-         .pageContentWrapper.page-content
+//-             .pageContentInner.page-content--inner
+//-                 .notification-wrapper
+//-                 #ampSettings
+//-     script(src="/assets/js/builds/ampSettings.js")
+//-                 //- #widgetsArea.row
+//-                 //-     .mb-30
+//-                 //-         .controlAdpushupWrap
+//-                 //-             h3.title.m-All-0.clearfix 
+//-                 //-                 a AMP settings - #{channel.pageGroup}-#{channel.platform}
+//-                 //-             form#saveAmpSettings.settings-pane
+//-                 //-                 .row
+//-                 //-                     .col-sm-6
+//-                 //-                         .row
+//-                 //-                             .col-sm-12
+//-                 //-                                 h4 Selectors Settings
+//-                 //-                         for selector in config.selectors
+//-                 //-                             .row
+//-                 //-                                 .col-sm-5
+//-                 //-                                     .input-name #{selector.alias}
+//-                 //-                                     input(type="hidden" id="pageGroupPattern" 
+//-                 //-                                         value=`{"pageGroup": "${channel.pageGroup}", "platform": "${channel.platform}"}`)
+//-                 //-                                 .col-sm-7
+//-                 //-                                     - var selectorValue = channel.ampSettings &&channel.ampSettings['selectors'] && channel.ampSettings['selectors'][selector.value] ?channel.ampSettings['selectors'][selector.value]:''
+//-                 //-                                     input.form-control(name="#{selector.value}" type="text" placeholder="#{selector.alias}" value="#{selectorValue}")
+//-                 //-                         .row
+//-                 //-                             .col-sm-12#autoOptimiseErr.error-message
+//-                 //-                         .row
+//-                 //-                             .col-sm-12
+//-                 //-                                 h4 Custom CSS
+//-                 //-                             .col-sm-12
+//-                 //-                                 div.snippet-wrapper.code-convert-wrapper
+//-                 //-                                     - var customCss = channel.ampSettings &&channel.ampSettings['customCSS']?channel.ampSettings['customCSS'].value:''
+//-                 //-                                     textarea.snippet(placeholder="Enter Custom CSS here", style="margin-top: 0px;" name="customCss") #{customCss}
+//-                 //-                         .row
+//-                 //-                             .col-sm-12#autoOptimiseErr.error-message
+//-                 //-                         .row
+//-                 //-                             .col-sm-12
+//-                 //-                                 h4 Delete Selector
+//-                 //-                             .col-sm-12
+//-                 //-                                 div.snippet-wrapper.code-convert-wrapper
+//-                 //-                                     - var toDelete = channel.ampSettings &&channel.ampSettings['toDelete']?channel.ampSettings['toDelete']:''
+//-                 //-                                     textarea.snippet(style="margin-top: 0px;" name="toDelete") #{toDelete}
+//-                 //-                     .col-sm-6
+//-                 //-                         .row
+//-                 //-                             .col-sm-12
+//-                 //-                                 h4 Social Settings
+//-                 //-                         .row
+//-                 //-                             .col-sm-5
+//-                 //-                                 .input-name Include
+//-                 //-                             .col-sm-7
+//-                 //-                                 - var include = channel.ampSettings && channel.ampSettings.social ? channel.ampSettings.social['include']:false
+//-                 //-                                 input(name="includeSocialLinks" id="includeSocialLinks" type="checkbox" placeholder="Logo" checked=include)
+//-                 //-                         .row
+//-                 //-                             .col-sm-5
+//-                 //-                                 .input-name Placement
+//-                 //-                             .col-sm-7
+//-                 //-                                 - var placement = channel.ampSettings && channel.ampSettings.social ? channel.ampSettings.social['placement']:'top'
+//-                 //-                                 select.form-control(name="placementSocial")
+//-                 //-                                     option(value="top" selected=placement=='top'?true:false) top
+//-                 //-                                     option(value="bottom" selected=placement=='bottom'?true:false) bottom
+//-                 //-                         .row
+//-                 //-                             .col-sm-12
+//-                 //-                                 .input-name Apps
+//-                 //-                             for app in config.socialApps
+//-                 //-                                 .col-sm-3
+//-                 //-                                     - var selectedApp = channel.ampSettings && channel.ampSettings.social &&  channel.ampSettings.social['apps'].indexOf(app.value)>-1? true:false
+//-                 //-                                     input.col-sm-2(name="#{app.value}" type="checkbox" placeholder="Logo" style="width:auto" checked=selectedApp)
+//-                 //-                                     label.col-sm-10 #{app.alias}
+//-                 //-                         .row
+//-                 //-                             .col-sm-12#autoOptimiseErr.error-message
+//-                 //-                         .row
+//-                 //-                             .col-sm-12
+//-                 //-                                 h4 BeforeJs
+//-                 //-                             .col-sm-12
+//-                 //-                                 div.snippet-wrapper.code-convert-wrapper
+//-                 //-                                     - var beforeJs = channel.ampSettings?channel.ampSettings['beforeJs']:''
+//-                 //-                                     textarea.snippet(style="margin-top: 0px;" name="beforeJs") #{beforeJs}
+//-                 //-                         .row
+//-                 //-                             .col-sm-12#autoOptimiseErr.error-message
+//-                 //-                         .row
+//-                 //-                             .col-sm-12
+//-                 //-                                 h4 Other Settings
+//-                 //-                         .row
+//-                 //-                             .col-sm-5
+//-                 //-                                 .input-name Site Name
+//-                 //-                             .col-sm-7
+//-                 //-                                 - var siteName = channel.ampSettings&&channel.ampSettings['siteName']?channel.ampSettings['siteName']:''
+//-                 //-                                 input.form-control(name="siteName" type="text" placeholder="Site Name" value="#{siteName}")
+//-                 //-                         .row
+//-                 //-                             .col-sm-5
+//-                 //-                                 .input-name Template
+//-                 //-                             .col-sm-7
+//-                 //-                                 - var template = channel.ampSettings&&channel.ampSettings['template']?channel.ampSettings['template']:''
+//-                 //-                                 input.form-control(name="template" type="text" placeholder="Template" value="#{template}")
+//-                 //-                         .row
+//-                 //-                             .col-sm-5
+//-                 //-                                 .input-name Ad Network
+//-                 //-                             .col-sm-7
+//-                 //-                                 - var adNetwork = channel.ampSettings&&channel.ampSettings['adNetwork']?channel.ampSettings['adNetwork']:'adsense'
+//-                 //-                                 select.form-control(name="adNetwork")
+//-                 //-                                     option(value="adsense" selected=adNetwork=='adsense'?true:false) Adsense
+//-                 //-                                     option(value="adx" selected=adNetwork=='adx'?true:false) AdX
+//-                 //-                         .row
+//-                 //-                             .col-sm-5
+//-                 //-                                 .input-name Pub Id
+//-                 //-                             .col-sm-7
+//-                 //-                                 - var pubId = channel.ampSettings&&channel.ampSettings['pubId']?channel.ampSettings['pubId']:''
+//-                 //-                                 input.form-control(name="pubId" type="text" placeholder="Pub Id" value="#{pubId}")
 
-                //-                 hr
-                //-                 .row.settings-btn-pane
-                //-                     .col-sm-12
-                //-                         button.btn-success Save Settings
-                //-                 .row
-                //-                     .col-sm-7
-                //-                         .error-message#error
+//-                 //-                 hr
+//-                 //-                 .row.settings-btn-pane
+//-                 //-                     .col-sm-12
+//-                 //-                         button.btn-success Save Settings
+//-                 //-                 .row
+//-                 //-                     .col-sm-7
+//-                 //-                         .error-message#error
                                 
 
