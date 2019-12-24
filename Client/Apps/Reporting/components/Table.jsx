@@ -1,10 +1,9 @@
 import React from 'react';
 import ReactTable from 'react-table';
-import { Col } from 'react-bootstrap';
+
 import sortBy from 'lodash/sortBy';
 import isEqual from 'lodash/isEqual';
 import sum from 'lodash/sum';
-import mean from 'lodash/mean';
 
 import moment from 'moment';
 import { numberWithCommas, computeCsvData } from '../helpers/utils';
@@ -240,7 +239,6 @@ class Table extends React.Component {
 			displayTableData.push(tableRow);
 		});
 
-		// displayTableData = this.formatTableData(displayTableData);
 		return displayTableData;
 	};
 
@@ -256,40 +254,8 @@ class Table extends React.Component {
 		return { tableBody, tableColumns };
 	};
 
-	formatTableData = tableBody => {
-		const { metrics } = this.props;
-
-		tableBody.forEach(row => {
-			Object.keys(row).forEach(col => {
-				if (metrics[col]) {
-					switch (metrics[col].valueType) {
-						case 'money': {
-							// eslint-disable-next-line no-param-reassign
-							row[col] = `$${numberWithCommas(row[col].toFixed(2))}`;
-
-							break;
-						}
-						case 'percent': {
-							// eslint-disable-next-line no-param-reassign
-							row[col] = `${numberWithCommas(row[col].toFixed(2))}%`;
-
-							break;
-						}
-						default: {
-							// eslint-disable-next-line no-param-reassign
-							row[col] = numberWithCommas(row[col]);
-						}
-					}
-				}
-			});
-		});
-
-		return tableBody;
-	};
-
 	render() {
 		const { tableBody, tableColumns, tableData } = this.state;
-		console.log(this.props.aggregatedData);
 
 		const onSortFunction = {
 			network_net_revenue(columnValue) {

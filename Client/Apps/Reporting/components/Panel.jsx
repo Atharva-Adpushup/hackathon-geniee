@@ -1,6 +1,8 @@
 /* eslint-disable no-prototype-builtins */
 import React, { Component } from 'react';
-import _ from 'lodash';
+import mapValues from 'lodash/mapValues';
+import omit from 'lodash/omit';
+import groupBy from 'lodash/groupBy';
 import { Row, Col, Alert } from 'react-bootstrap';
 import moment from 'moment';
 import { Object } from 'es6-shim';
@@ -691,8 +693,8 @@ class Panel extends Component {
 	};
 
 	aggregateValues(result) {
-		var groupedData = _.mapValues(_.groupBy(result, 'date'), reportData =>
-			reportData.map(data => _.omit(data, 'date'))
+		var groupedData = mapValues(groupBy(result, 'date'), reportData =>
+			reportData.map(data => omit(data, 'date'))
 		);
 
 		return groupedData;
