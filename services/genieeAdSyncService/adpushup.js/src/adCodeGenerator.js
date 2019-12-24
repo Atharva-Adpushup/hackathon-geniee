@@ -85,7 +85,7 @@ var utils = require('../libs/utils'),
 							originalId: ad.originalId,
 							dfpAdunit: networkData.dfpAdunit,
 							dfpAdunitCode: networkData.dfpAdunitCode,
-							headerBidding: networkData.headerBidding,
+							headerBidding: window.adpushup.services.HB_ACTIVE && networkData.headerBidding,
 							keyValues: networkData.keyValues,
 							network: ad.network,
 							enableLazyLoading: networkData.enableLazyLoading,
@@ -125,7 +125,9 @@ var utils = require('../libs/utils'),
 		);
 		adCode.push('<scr' + 'ipt async src="https://cdn.ampproject.org/v0.js"></scr' + 'ipt>');
 		adCode.push(
-			'<scr' + 'ipt async custom-element="amp-ad" src="https://cdn.ampproject.org/v0/amp-ad-0.1.js"></scr' + 'ipt>'
+			'<scr' +
+				'ipt async custom-element="amp-ad" src="https://cdn.ampproject.org/v0/amp-ad-0.1.js"></scr' +
+				'ipt>'
 		);
 		adCode.push(
 			'<scr' +
