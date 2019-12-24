@@ -143,7 +143,8 @@ const columnsBlacklistedForAddition = [
 	'adpushup_ad_ecpm',
 	'network_ad_ecpm',
 	'adpushup_page_cpm',
-	'adpushup_xpath_miss_percent'
+	'adpushup_xpath_miss_percent',
+	'adpushup_count_percent'
 ];
 
 export {

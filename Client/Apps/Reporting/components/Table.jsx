@@ -48,19 +48,6 @@ class Table extends React.Component {
 		return resultObject;
 	};
 
-	formatAggregatedData = () => {
-		const { aggregatedData } = this.props;
-
-		let aggregateValue = [];
-
-		for (const key in aggregatedData) {
-			if (key === '2019-12-13') {
-				aggregateValue = aggregatedData[key].map(({ network_net_revenue }) => network_net_revenue);
-			}
-		}
-		return aggregateValue;
-	};
-
 	getTableColumns = (columns, total) => {
 		let tableColumns = [];
 		let sortedMetrics = [];
@@ -125,7 +112,48 @@ class Table extends React.Component {
 					sortable: true,
 					table_position,
 					Footer: footerValue,
-					aggregate: vals => sum(vals),
+					aggregate: (vals, rows) => {
+						let grouped = [];
+						for (const key in aggregatedData) {
+							if (key === rows[0].date) {
+								aggregatedData[key].map(row => {
+									for (const prop in row) {
+										if (!columnsBlacklistedForAddition.includes(prop) && prop === column)
+											grouped = !Number.isInteger(sum(aggregatedData[key].map(val => val[prop])))
+												? sum(aggregatedData[key].map(val => val[prop])).toFixed(2)
+												: sum(aggregatedData[key].map(val => val[prop]));
+										else if (prop === 'adpushup_ad_ecpm' && prop === column)
+											grouped = (
+												(sum(aggregatedData[key].map(val => val.network_net_revenue)) /
+													sum(aggregatedData[key].map(val => val.adpushup_impressions))) *
+												1000
+											).toFixed(2);
+										else if (prop === 'network_ad_ecpm' && prop === column)
+											grouped = (
+												(sum(aggregatedData[key].map(val => val.network_net_revenue)) /
+													sum(aggregatedData[key].map(val => val.network_impressions))) *
+												1000
+											).toFixed(2);
+										else if (prop === 'adpushup_page_cpm' && prop === column)
+											grouped = (
+												(sum(aggregatedData[key].map(val => val.network_net_revenue)) /
+													sum(aggregatedData[key].map(val => val.adpushup_page_views))) *
+												1000
+											).toFixed(2);
+										else if (prop === 'adpushup_xpath_miss_percent' && prop === column)
+											grouped = (
+												(sum(aggregatedData[key].map(val => val.adpushup_xpath_miss)) /
+													(sum(aggregatedData[key].map(val => val.adpushup_xpath_miss)) +
+														sum(aggregatedData[key].map(val => val.adpushup_impressions)))) *
+												100
+											).toFixed(2);
+										else if (prop === 'adpushup_count_percent' && prop === column) grouped = 100;
+									}
+								});
+								return grouped;
+							}
+						}
+					},
 
 					Cell: props =>
 						metrics[column].valueType === 'money' ? (
@@ -261,6 +289,7 @@ class Table extends React.Component {
 
 	render() {
 		const { tableBody, tableColumns, tableData } = this.state;
+		console.log(this.props.aggregatedData);
 
 		const onSortFunction = {
 			network_net_revenue(columnValue) {
