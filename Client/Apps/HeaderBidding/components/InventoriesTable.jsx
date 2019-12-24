@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactTable from 'react-table';
-import { Checkbox } from 'react-bootstrap';
+import { Checkbox } from '@/Client/helpers/react-bootstrap-imports';
 import { INVENTORY_TABLE_COLUMNS } from '../constants/index';
 
 function getHeader(

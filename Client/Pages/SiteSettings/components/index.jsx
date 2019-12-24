@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import { Col } from 'react-bootstrap';
+import { Col } from '@/Client/helpers/react-bootstrap-imports';
 import cloneDeep from 'lodash/cloneDeep';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faCopy, faEnvelope } from '@fortawesome/free-solid-svg-icons';
+import { faCopy, faEnvelope } from '@/Client/helpers/fort-awesome-imports';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import SplitScreen from '../../../Components/Layout/SplitScreen';

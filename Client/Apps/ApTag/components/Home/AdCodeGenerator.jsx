@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, ProgressBar } from 'react-bootstrap';
+import { Row, Col, ProgressBar } from '@/Client/helpers/react-bootstrap-imports';
 import CustomList from './CustomList';
 import {
 	TYPES,

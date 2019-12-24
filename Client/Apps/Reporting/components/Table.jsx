@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactTable from 'react-table';
-import { Col } from 'react-bootstrap';
+import { Col } from '@/Client/helpers/react-bootstrap-imports';
 import sortBy from 'lodash/sortBy';
 import isEqual from 'lodash/isEqual';
 import moment from 'moment';

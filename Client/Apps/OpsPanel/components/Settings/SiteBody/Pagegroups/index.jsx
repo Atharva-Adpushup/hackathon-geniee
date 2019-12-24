@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/label-has-for */
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import React, { Component } from 'react';
-import { Panel, PanelGroup } from 'react-bootstrap';
+import { Panel, PanelGroup } from '@/Client/helpers/react-bootstrap-imports';
 
 import Listing from './Listing';
 import Creation from './Creation';

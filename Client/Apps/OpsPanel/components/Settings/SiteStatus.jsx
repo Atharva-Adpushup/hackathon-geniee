@@ -1,6 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import React, { Component } from 'react';
-import { Modal, Table } from 'react-bootstrap';
+import { Modal, Table } from '@/Client/helpers/react-bootstrap-imports';
 
 import axiosInstance from '../../../../helpers/axiosInstance';
 import Loader from '../../../../Components/Loader/index';

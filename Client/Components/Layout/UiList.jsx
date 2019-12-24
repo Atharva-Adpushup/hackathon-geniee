@@ -8,10 +8,10 @@ import {
 	FormGroup,
 	InputGroup,
 	FormControl
-} from 'react-bootstrap';
+} from '@/Client/helpers/react-bootstrap-imports';
 import PropTypes from 'prop-types';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faEdit, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faTimesCircle } from '@/Client/helpers/fort-awesome-imports';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import CustomButton from '../CustomButton/index';
 import PlaceHolder from '../PlaceHolder/index';

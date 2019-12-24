@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { Glyphicon, Button } from 'react-bootstrap';
+import { Glyphicon, Button } from '@/Client/helpers/react-bootstrap-imports';
 import 'react-dates/lib/css/_datepicker.css';
 import 'react-dates/initialize';
 import { CSVLink } from 'react-csv';

@@ -2,7 +2,7 @@
 /* eslint-disable no-else-return */
 /* eslint-disable prefer-destructuring */
 import React, { Component, Fragment } from 'react';
-import { Col } from 'react-bootstrap';
+import { Col } from '@/Client/helpers/react-bootstrap-imports';
 import memoize from 'memoize-one';
 
 import {

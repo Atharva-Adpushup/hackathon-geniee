@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row } from 'react-bootstrap';
+import { Row } from '@/Client/helpers/react-bootstrap-imports';
 import PropTypes from 'prop-types';
 
 class PlaceHolder extends React.Component {

@@ -2,7 +2,7 @@
 /* eslint-disable no-restricted-syntax */
 import React from 'react';
 import { Redirect, Prompt } from 'react-router-dom';
-import { Nav, NavItem } from 'react-bootstrap';
+import { Nav, NavItem } from '@/Client/helpers/react-bootstrap-imports';
 import { NAV_ITEMS, NAV_ITEMS_INDEXES, NAV_ITEMS_VALUES } from '../constants';
 import Setup from './Setup';
 import BiddersTab from './BiddersTab';

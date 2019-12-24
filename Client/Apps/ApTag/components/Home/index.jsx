@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
-import { Nav, NavItem } from 'react-bootstrap';
+import { Nav, NavItem } from '@/Client/helpers/react-bootstrap-imports';
 
 import CustomError from '../../../../Components/CustomError/index';
 import AdCodeGeneratorContainer from '../../containers/AdCodeGeneratorContainer';

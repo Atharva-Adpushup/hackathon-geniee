@@ -3,7 +3,7 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import React, { Component } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Col, OverlayTrigger, Tooltip, Button } from 'react-bootstrap';
+import { Col, OverlayTrigger, Tooltip, Button } from '@/Client/helpers/react-bootstrap-imports';
 import { makeFirstLetterCapitalize } from '../../../../../helpers/commonFunctions';
 import CopyButtonWrapperContainer from '../../../../../Containers/CopyButtonWrapperContainer';
 import { ADCODE, AMP_MESSAGE } from '../../../configs/commonConsts';

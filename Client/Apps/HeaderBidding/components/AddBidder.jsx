@@ -2,7 +2,7 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import React from 'react';
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col } from '@/Client/helpers/react-bootstrap-imports';
 import AddManageSizelessBidder from './AddManageSizelessBidder';
 import AddManageNonResponsiveBidder from './AddManageNonResponsiveBidder';
 import getCustomParams from '../helpers/getCustomParams';

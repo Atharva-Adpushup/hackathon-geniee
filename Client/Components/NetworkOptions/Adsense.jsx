@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Button } from 'react-bootstrap';
+import { Row, Col, Button } from '@/Client/helpers/react-bootstrap-imports';
 
 import { FormWrapper } from './commonForm';
 import CustomToggleSwitch from '../CustomToggleSwitch/index';

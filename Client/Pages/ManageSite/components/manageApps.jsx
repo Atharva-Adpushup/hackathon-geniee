@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Row } from 'react-bootstrap';
+import { Button, Row } from '@/Client/helpers/react-bootstrap-imports';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
 import OverlayTooltip from '../../../Components/OverlayTooltip/index';

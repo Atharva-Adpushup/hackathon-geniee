@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { FormGroup, ControlLabel, FormControl } from 'react-bootstrap';
+import { FormGroup, ControlLabel, FormControl } from '@/Client/helpers/react-bootstrap-imports';
 
 import FieldGroup from '../../../../Components/Layout/FieldGroup';
 import { ADS_TXT_LIVE_SITES_ENTRIES } from '../../configs/commonConsts';

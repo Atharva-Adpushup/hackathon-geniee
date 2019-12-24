@@ -5,7 +5,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-case-declarations */
 import React, { Component } from 'react';
-import { Panel, Table } from 'react-bootstrap';
+import { Panel, Table } from '@/Client/helpers/react-bootstrap-imports';
 
 import CustomToggleSwitch from '../../../../../../Components/CustomToggleSwitch/index';
 import CustomMessage from '../../../../../../Components/CustomMessage/index';

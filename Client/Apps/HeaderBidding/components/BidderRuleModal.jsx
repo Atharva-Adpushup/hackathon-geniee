@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form, Modal, FormGroup, Col, ControlLabel, HelpBlock } from 'react-bootstrap';
+import { Form, Modal, FormGroup, Col, ControlLabel, HelpBlock } from '@/Client/helpers/react-bootstrap-imports';
 import Select from 'react-select';
 import CustomButton from '../../../Components/CustomButton';
 import SelectBox from '../../../Components/SelectBox';

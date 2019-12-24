@@ -2,7 +2,7 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable no-alert */
 import React, { Component } from 'react';
-import { Col } from 'react-bootstrap';
+import { Col } from '@/Client/helpers/react-bootstrap-imports';
 import SelectBox from '../../../../../Components/SelectBox/index';
 import { AD_OPERATIONS, TYPE_OF_ADS, EVENTS } from '../../../configs/commonConsts';
 import CodeBox from '../../../../../Components/CodeBox/index';
