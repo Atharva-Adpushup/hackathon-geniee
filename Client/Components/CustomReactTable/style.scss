@@ -1,0 +1,45 @@
+.ReactTable {
+	.rt-thead {
+		position: sticky;
+		top: 0;
+		z-index: 2;
+		background: white;
+
+		.rt-th {
+			background-repeat: no-repeat !important;
+			background-size: 18px 18px !important;
+			background-position: right 4px center !important;
+			font-weight: bolder !important;
+			background: #fff;
+		}
+
+		.rt-th.-sort-asc {
+			background-image: url('../../../public/assets/images/sort-up-icon.jpg');
+		}
+
+		.rt-th.-sort-desc {
+			background-image: url('../../../public/assets/images/sort-arrow-down.png');
+		}
+	}
+
+	.rt-resizable-header-content {
+		float: left;
+	}
+
+	.rt-tbody {
+		overflow: visible !important;
+	}
+
+	.-pagination .-btn {
+		color: rgba(0, 0, 0, 0.5);
+		background: rgba(0, 0, 0, 0.18);
+	}
+
+	.-pagination .-btn {
+		opacity: 1 !important;
+	}
+
+	.rt-tfoot {
+		font-weight: bold;
+	}
+}

@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactTable from 'react-table';
+import CustomReactTable from '../../../Components/CustomReactTable/index';
 import { Checkbox } from 'react-bootstrap';
 import { INVENTORY_TABLE_COLUMNS } from '../constants/index';
 
@@ -51,7 +51,7 @@ const InventoriesTable = ({
 	selectAllInventories,
 	selectedInventories
 }) => (
-	<ReactTable
+	<CustomReactTable
 		columns={getHeader(
 			handleSelectAllInventories,
 			handleInventorySelect,
@@ -59,7 +59,6 @@ const InventoriesTable = ({
 			selectedInventories
 		)}
 		data={getBody(inventories)}
-		className="-striped -highlight u-padding-h3 u-padding-v2 inventory-table"
 		pageSizeOptions={[10, 25, 50, 100]}
 		defaultSorting={[
 			{

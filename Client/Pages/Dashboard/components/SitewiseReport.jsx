@@ -1,7 +1,7 @@
 import React from 'react';
-import ReactTable from 'react-table';
 import moment from 'moment';
 import sortBy from 'lodash/sortBy';
+import CustomReactTable from '../../../Components/CustomReactTable/index';
 
 import { numberWithCommas, roundOffTwoDecimal, getWidgetValidDationState } from '../helpers/utils';
 import { reactTableSortMethod } from '../../../helpers/commonFunctions';
@@ -138,8 +138,7 @@ class SitewiseReport extends React.Component {
 		};
 
 		return tableBody && tableBody.length > 0 ? (
-			<ReactTable
-				className="sitewise-report u-padding-h3 u-padding-v2 -striped -highlight"
+			<CustomReactTable
 				columns={tableHeader}
 				data={tableBody}
 				showPaginationTop
