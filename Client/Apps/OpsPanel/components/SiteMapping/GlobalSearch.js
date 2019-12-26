@@ -1,5 +1,5 @@
 import React from 'react';
-import { FormGroup, InputGroup, FormControl } from 'react-bootstrap';
+import { FormGroup, InputGroup, FormControl } from '@/Client/helpers/react-bootstrap-imports';
 
 class GlobalSearch extends React.Component {
 	constructor(props) {

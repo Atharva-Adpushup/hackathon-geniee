@@ -1,13 +1,12 @@
 import React, { Fragment } from 'react';
-import { Helmet } from 'react-helmet';
+import DocumentTitle from 'react-document-title';
 import IntegrationsContainer from './containers/index';
 import '../../scss/pages/integrations/index.scss';
 
 const Integrations = props => (
 	<Fragment>
-		<Helmet>
-			<title>Integrations</title>
-		</Helmet>
+		<DocumentTitle title="Integrations" />
+
 		<IntegrationsContainer {...props} />
 	</Fragment>
 );

@@ -3,7 +3,7 @@
 /* eslint-disable react/prefer-stateless-function */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Col, FormGroup, ControlLabel, HelpBlock } from 'react-bootstrap';
+import { Col, FormGroup, ControlLabel, HelpBlock } from '@/Client/helpers/react-bootstrap-imports';
 import SelectBox from '../../../Components/SelectBox';
 import InputBox from '../../../Components/InputBox';
 

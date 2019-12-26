@@ -3,7 +3,7 @@
 /* eslint-disable react/no-array-index-key */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { OverlayTrigger, Tooltip } from '@/Client/helpers/react-bootstrap-imports';
 
 const Tags = props => {
 	const { labels, classNames, clickHandler, additionalProps } = props;

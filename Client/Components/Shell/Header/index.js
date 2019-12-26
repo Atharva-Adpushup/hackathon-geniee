@@ -2,7 +2,7 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { DropdownButton, MenuItem } from 'react-bootstrap';
+import { DropdownButton, MenuItem } from '@/Client/helpers/react-bootstrap-imports';
 import history from '../../../helpers/history';
 import UserChange from './UserChange';
 import config from '../../../config/config';

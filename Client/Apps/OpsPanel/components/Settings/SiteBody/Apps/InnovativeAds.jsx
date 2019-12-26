@@ -3,7 +3,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-case-declarations */
 import React, { Component } from 'react';
-import { Panel } from 'react-bootstrap';
+import { Panel } from '@/Client/helpers/react-bootstrap-imports';
 import CustomMessage from '../../../../../../Components/CustomMessage';
 import CustomToggleSwitch from '../../../../../../Components/CustomToggleSwitch/index';
 import CustomButton from '../../../../../../Components/CustomButton/index';

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Col } from 'react-bootstrap';
+import { Col } from '@/Client/helpers/react-bootstrap-imports';
 import FieldGroup from '../../../../Components/Layout/FieldGroup';
 
 const CustomInput = ({ size, id, label, type, name, handler, value }) => (

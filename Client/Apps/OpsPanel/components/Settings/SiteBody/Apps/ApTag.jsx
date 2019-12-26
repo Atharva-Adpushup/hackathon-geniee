@@ -3,7 +3,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-case-declarations */
 import React, { Component } from 'react';
-import { Panel, Table } from 'react-bootstrap';
+import { Panel, Table } from '@/Client/helpers/react-bootstrap-imports';
 
 import CustomMessage from '../../../../../../Components/CustomMessage';
 import CustomButton from '../../../../../../Components/CustomButton';

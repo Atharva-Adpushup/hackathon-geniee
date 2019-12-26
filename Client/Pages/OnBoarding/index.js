@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { Helmet } from 'react-helmet';
+import DocumentTitle from 'react-document-title';
 import siteService from '../../services/siteService';
 
 import history from '../../helpers/history';
@@ -66,10 +66,7 @@ class OnBoarding extends Component {
 		const { isOnboarding, siteId, existingSite, site, onboardingStage, step } = this.state;
 		return (
 			<Fragment>
-				<Helmet>
-					<title>Onboarding</title>
-				</Helmet>
-
+				<DocumentTitle title="Onboarding" />
 				<OnboardingWrap
 					isOnboarding={isOnboarding}
 					siteId={siteId}

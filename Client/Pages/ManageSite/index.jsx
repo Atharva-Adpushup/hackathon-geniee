@@ -1,13 +1,11 @@
 import React, { Fragment } from 'react';
-import { Helmet } from 'react-helmet';
+import DocumentTitle from 'react-document-title';
 import ManageSiteContainer from './containers/ManageSiteContainer';
 import '../../scss/pages/manageSites/index.scss';
 
 const App = props => (
 	<Fragment>
-		<Helmet>
-			<title>Manage Site</title>
-		</Helmet>
+		<DocumentTitle title="Manage Site" />
 
 		<ManageSiteContainer {...props} />
 	</Fragment>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Redirect } from 'react-router-dom';
-import { Nav, NavItem } from 'react-bootstrap';
+import { Nav, NavItem } from '@/Client/helpers/react-bootstrap-imports';
 import Empty from '../../../Components/Empty';
 import ManageAppsContainer from '../containers/ManageAppsContainer';
 import { NAV_ITEMS, NAV_ITEMS_INDEXES, NAV_ITEMS_VALUES } from '../constants/index';

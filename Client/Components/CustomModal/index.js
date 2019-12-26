@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Modal } from 'react-bootstrap';
+import { Modal } from '@/Client/helpers/react-bootstrap-imports';
 
 const CustomModal = ({ show, handleClose, title, children }) => (
 	<Modal show={show} onHide={handleClose} className="ap-modal">

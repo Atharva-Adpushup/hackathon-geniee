@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col } from '@/Client/helpers/react-bootstrap-imports';
 import PropTypes from 'prop-types';
 import requiredIf from 'react-required-if';
 import SelectBox from '../select/select';

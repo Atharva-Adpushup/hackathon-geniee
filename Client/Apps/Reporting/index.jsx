@@ -1,14 +1,12 @@
 import React from 'react';
-import { Helmet } from 'react-helmet';
+import DocumentTitle from 'react-document-title';
 
 import PanelContainer from './containers/PanelContainer';
 import '../../scss/apps/reporting/index.scss';
 
 const App = props => (
 	<React.Fragment>
-		<Helmet>
-			<title>Reporting</title>
-		</Helmet>
+		<DocumentTitle title="Reporting" />
 		<PanelContainer {...props} />
 	</React.Fragment>
 );

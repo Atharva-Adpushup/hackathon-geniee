@@ -4,7 +4,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-case-declarations */
 import React, { Component } from 'react';
-import { Panel } from 'react-bootstrap';
+import { Panel } from '@/Client/helpers/react-bootstrap-imports';
 
 import { GDPR } from '../../../../configs/commonConsts';
 import CustomToggleSwitch from '../../../../../../Components/CustomToggleSwitch/index';

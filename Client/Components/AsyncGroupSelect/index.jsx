@@ -9,7 +9,7 @@ import {
 	OverlayTrigger,
 	Tooltip,
 	MenuItem
-} from 'react-bootstrap';
+} from '@/Client/helpers/react-bootstrap-imports';
 
 class AsyncGroupSelect extends Component {
 	constructor(props) {

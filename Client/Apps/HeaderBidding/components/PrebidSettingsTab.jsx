@@ -8,7 +8,7 @@ import {
 	ButtonToolbar,
 	ToggleButtonGroup,
 	Checkbox
-} from 'react-bootstrap';
+} from '@/Client/helpers/react-bootstrap-imports';
 import InputBox from '../../../Components/InputBox';
 import CustomButton from '../../../Components/CustomButton';
 import Loader from '../../../Components/Loader';

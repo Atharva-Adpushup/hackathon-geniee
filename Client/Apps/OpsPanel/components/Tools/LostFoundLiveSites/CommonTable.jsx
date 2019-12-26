@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table } from 'react-bootstrap';
+import { Table } from '@/Client/helpers/react-bootstrap-imports';
 import Empty from '../../../../../Components/Empty/index';
 
 const CommonTable = ({ data }) =>

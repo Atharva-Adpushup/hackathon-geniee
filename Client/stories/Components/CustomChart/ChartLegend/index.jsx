@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Row } from 'react-bootstrap';
+import { Row } from '@/Client/helpers/react-bootstrap-imports';
 import LegendItem from './LegendItem';
 
 const ChartLegend = ({ chart: { series }, legends, activeLegendItems }) => (

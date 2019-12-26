@@ -13,7 +13,7 @@ module.exports = merge(common, {
 		new MiniCssExtractPlugin({
 			filename: '[name].css',
 			chunkFilename: '[id].css'
-		})
-		//new BundleAnalyzerPlugin()
+		}),
+		new BundleAnalyzerPlugin()
 	]
 });

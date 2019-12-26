@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-globals */
 import React, { Component } from 'react';
-import { Col } from 'react-bootstrap';
+import { Col } from '@/Client/helpers/react-bootstrap-imports';
 import CustomToggleSwitch from '../../../../../Components/CustomToggleSwitch/index';
 import FieldGroup from '../../../../../Components/Layout/FieldGroup';
 import InputBox from '../../../../../Components/InputBox/index';
