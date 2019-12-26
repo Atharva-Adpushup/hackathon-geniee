@@ -22,6 +22,10 @@
 		}
 	}
 
+	.rt-tfoot {
+		font-weight: bold;
+	}
+
 	.rt-resizable-header-content {
 		float: left;
 	}
@@ -37,9 +41,5 @@
 
 	.-pagination .-btn {
 		opacity: 1 !important;
-	}
-
-	.rt-tfoot {
-		font-weight: bold;
 	}
 }
