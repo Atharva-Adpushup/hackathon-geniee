@@ -1,6 +1,6 @@
 {
 	"extends": ["airbnb", "prettier", "prettier/react"],
-	"plugins": ["prettier", "react"],
+	"plugins": ["prettier", "react", "alternate-import"],
 	"parser": "babel-eslint",
 	"rules": {
 		"react/boolean-prop-naming": "off",
@@ -21,7 +21,33 @@
 			{
 				"allowTernary": true
 			}
-		]
+		],
+		"alternate-import/restricted-direct-import": "error"
+	},
+	"settings": {
+		"alternate-import": {
+			"alternatePackagesMap": [
+				{
+					"original": "react-bootstrap",
+					"alternate": "/Client/helpers/react-bootstrap-imports.js"
+				},
+				{
+					"original": "@fortawesome/free-solid-svg-icons",
+					"alternate": "/Client/helpers/fort-awesome-imports.js"
+				},
+				{
+					"original": "restricted-package",
+					"alternate": "alternate-package"
+				},
+				{
+					"original": "no-alternate"
+				}
+			],
+			"customFileImportRootPrefix": "@"
+		},
+		"import/resolver": {
+			"babel-plugin-root-import": {}
+		}
 	},
 	"globals": {
 		"window": true,
