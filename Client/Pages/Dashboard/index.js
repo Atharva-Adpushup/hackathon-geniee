@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { Helmet } from 'react-helmet';
+import DocumentTitle from 'react-document-title';
 
 import DashboardContainer from './containers/index';
 import '../../scss/pages/dashboard/index.scss';
@@ -7,9 +7,7 @@ import { dashboardWidgets } from './configs/commonConsts';
 
 const Dashboard = props => (
 	<Fragment>
-		<Helmet>
-			<title>Dashboard</title>
-		</Helmet>
+		<DocumentTitle title="Dashboard" />
 		<DashboardContainer {...props} widgetsList={dashboardWidgets} />
 	</Fragment>
 );

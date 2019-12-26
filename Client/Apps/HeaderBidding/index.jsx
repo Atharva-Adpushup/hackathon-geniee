@@ -1,13 +1,11 @@
 import React, { Fragment } from 'react';
-import { Helmet } from 'react-helmet';
+import DocumentTitle from 'react-document-title';
 import HeaderBiddingContainer from './containers/HeaderBiddingContainer';
 import '../../scss/apps/headerBidding/index.scss';
 
 const HeaderBiddingWrap = props => (
 	<Fragment>
-		<Helmet>
-			<title>Header Bidding</title>
-		</Helmet>
+		<DocumentTitle title="Header Bidding" />
 
 		<HeaderBiddingContainer {...props} />
 	</Fragment>

@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 import sortBy from 'lodash/sortBy';
 import isEmpty from 'lodash/isEmpty';
 import { Link } from 'react-router-dom';
-import { Button } from 'react-bootstrap';
+import { Button } from '@/Client/helpers/react-bootstrap-imports';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Card from '../../../Components/Layout/Card';
 import EstimatedEarningsContainer from '../containers/EstimatedEarningsContainer';

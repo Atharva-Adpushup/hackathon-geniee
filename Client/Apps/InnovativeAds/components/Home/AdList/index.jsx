@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Table, Modal, Col, Row } from 'react-bootstrap';
+import { Table, Modal, Col, Row } from '@/Client/helpers/react-bootstrap-imports';
 import AdElement from './AdElement';
 import CustomButton from '../../../../../Components/CustomButton/index';
 import Empty from '../../../../../Components/Empty/index';

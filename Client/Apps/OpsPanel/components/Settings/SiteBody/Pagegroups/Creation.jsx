@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/label-has-for */
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import React, { Component, Fragment } from 'react';
-import { Form, FormControl } from 'react-bootstrap';
+import { Form, FormControl } from '@/Client/helpers/react-bootstrap-imports';
 import memoize from 'memoize-one';
 
 import CustomToggleSwitch from '../../../../../../Components/CustomToggleSwitch/index';

@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/interactive-supports-focus */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import React, { Component, Fragment } from 'react';
-import { PanelGroup, Panel } from 'react-bootstrap';
+import { PanelGroup, Panel } from '@/Client/helpers/react-bootstrap-imports';
 
 import SiteBody from './SiteBody/index';
 import Empty from '../../../../Components/Empty/index';

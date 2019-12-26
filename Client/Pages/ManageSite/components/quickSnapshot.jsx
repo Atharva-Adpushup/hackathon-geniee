@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row } from 'react-bootstrap';
+import { Row } from '@/Client/helpers/react-bootstrap-imports';
 
 import SiteWidgets from '../../Dashboard/containers/index';
 import '../../../scss/pages/dashboard/index.scss';

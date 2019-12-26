@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Tab, Nav, NavItem, Row, Col } from 'react-bootstrap';
+import { Tab, Nav, NavItem, Row, Col } from '@/Client/helpers/react-bootstrap-imports';
 import { TOOLS_IDENTIFIERS } from '../../configs/commonConsts';
 import RegexVerification from './RegexVerification/index';
 import EnableHbBidder from './EnableHbBidder';

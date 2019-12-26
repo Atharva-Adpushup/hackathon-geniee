@@ -1,7 +1,7 @@
 /* eslint-disable react/forbid-prop-types */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Col } from 'react-bootstrap';
+import { Col } from '@/Client/helpers/react-bootstrap-imports';
 import CustomButton from '../CustomButton/index';
 import InputBox from '../InputBox/index';
 

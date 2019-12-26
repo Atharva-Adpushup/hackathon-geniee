@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
-import { Nav, NavItem } from 'react-bootstrap';
+import { Nav, NavItem } from '@/Client/helpers/react-bootstrap-imports';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
+import { faCheckCircle } from '@/Client/helpers/fort-awesome-imports';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import ActionCard from '../../../Components/ActionCard/index';

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
-import { Tab, Nav, NavItem, Row, Col } from 'react-bootstrap';
+import { Tab, Nav, NavItem, Row, Col } from '@/Client/helpers/react-bootstrap-imports';
 import {
 	INFO_PANEL_IDENTIFIERS,
 	QUICK_SNAPSHOTS_WIDGETS,

@@ -1,6 +1,6 @@
 /* eslint-disable react/destructuring-assignment */
 import React, { Component, Fragment } from 'react';
-import { Helmet } from 'react-helmet';
+import DocumentTitle from 'react-document-title';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import history from '../../helpers/history';
@@ -123,9 +123,7 @@ class Login extends Component {
 		} = this.state;
 		return (
 			<Fragment>
-				<Helmet>
-					<title>Login</title>
-				</Helmet>
+				<DocumentTitle title="Login" />
 
 				<AuthShell>
 					<AuthFormWrap formType="login" onSubmit={this.onSubmit}>

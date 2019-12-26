@@ -2,7 +2,7 @@
 /* eslint-disable guard-for-in */
 /* eslint-disable react/prefer-stateless-function */
 import React from 'react';
-import { Row, Col, Nav, NavItem } from 'react-bootstrap';
+import { Row, Col, Nav, NavItem } from '@/Client/helpers/react-bootstrap-imports';
 import CustomButton from '../../../Components/CustomButton';
 import BidderFormFields from './BidderFormFields';
 import formValidator from '../../../helpers/formValidator';

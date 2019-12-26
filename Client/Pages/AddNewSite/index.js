@@ -1,12 +1,10 @@
 import React, { Fragment } from 'react';
-import { Helmet } from 'react-helmet';
+import DocumentTitle from 'react-document-title';
 import OnboardingWrap from '../../Components/OnboardingWrap';
 
 const AddNewSite = () => (
 	<Fragment>
-		<Helmet>
-			<title>Add New Website</title>
-		</Helmet>
+		<DocumentTitle title="Add New Website" />
 
 		<OnboardingWrap isOnboarding={false} />
 	</Fragment>
