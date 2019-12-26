@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactTable from 'react-table';
-
 import sortBy from 'lodash/sortBy';
 import isEqual from 'lodash/isEqual';
 import sum from 'lodash/sum';

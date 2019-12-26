@@ -7,7 +7,7 @@ import ReactTable from 'react-table';
 import clonedeep from 'lodash/cloneDeep';
 import sortBy from 'lodash/sortBy';
 import 'react-table/react-table.css';
-import { Row } from 'react-bootstrap';
+import { Row } from '@/Client/helpers/react-bootstrap-imports';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { CSVLink } from 'react-csv';
 

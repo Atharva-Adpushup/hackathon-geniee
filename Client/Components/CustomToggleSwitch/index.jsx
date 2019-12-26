@@ -1,8 +1,8 @@
 /* eslint-disable jsx-a11y/label-has-for */
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import React from 'react';
-import Row from 'react-bootstrap/lib/Row';
-import Col from 'react-bootstrap/lib/Col';
+import { Row } from '@/Client/helpers/react-bootstrap-imports';
+import { Col } from '@/Client/helpers/react-bootstrap-imports';
 
 class customToggleSwitch extends React.Component {
 	constructor(props) {

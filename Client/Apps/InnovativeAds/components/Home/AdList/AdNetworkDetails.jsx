@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col } from '@/Client/helpers/react-bootstrap-imports';
 
 import { REFRESH_INTERVALS, DEFAULT_REFRESH_INTERVAL } from '../../../configs/commonConsts';
 import SelectBox from '../../../../../Components/SelectBox/index';

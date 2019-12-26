@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col } from '@/Client/helpers/react-bootstrap-imports';
 import Heading from './helper/Heading.jsx';
 import RowColSpan from './helper/RowColSpan.jsx';
 import CustomToggleSwitch from './helper/CustomToggleSwitch.jsx';

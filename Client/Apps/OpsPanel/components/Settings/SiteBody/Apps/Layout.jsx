@@ -4,7 +4,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-case-declarations */
 import React, { Component, Fragment } from 'react';
-import { Panel, Table } from 'react-bootstrap';
+import { Panel, Table } from '@/Client/helpers/react-bootstrap-imports';
 import cloneDeep from 'lodash/cloneDeep';
 import Loader from '../../../../../../Components/Loader';
 import CustomToggleSwitch from '../../../../../../Components/CustomToggleSwitch/index';

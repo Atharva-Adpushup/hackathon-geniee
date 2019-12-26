@@ -4,7 +4,7 @@ import 'react-dates/initialize';
 import { DateRangePicker, isInclusivelyBeforeDay } from 'react-dates';
 import 'react-dates/lib/css/_datepicker.css';
 
-import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
+import { faQuestionCircle } from '@/Client/helpers/fort-awesome-imports';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import FieldGroup from '../../../../Components/Layout/FieldGroup';

@@ -39,7 +39,7 @@ import {
 	faMailBulk,
 	faDownload,
 	faSignInAlt
-} from '@fortawesome/free-solid-svg-icons';
+} from '@/Client/helpers/fort-awesome-imports';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import 'bootstrap-sass/assets/stylesheets/_bootstrap.scss';
 import ErrorBoundary from './Components/ErrorBoundary';

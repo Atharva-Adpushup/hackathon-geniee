@@ -1,6 +1,6 @@
 /* eslint-disable no-alert */
 import React from 'react';
-import { Panel, Button } from 'react-bootstrap';
+import { Panel, Button } from '@/Client/helpers/react-bootstrap-imports';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
 	faCheckCircle,
@@ -11,7 +11,7 @@ import {
 	faExclamationTriangle,
 	faPlusCircle,
 	faSpinner
-} from '@fortawesome/free-solid-svg-icons';
+} from '@/Client/helpers/fort-awesome-imports';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
 

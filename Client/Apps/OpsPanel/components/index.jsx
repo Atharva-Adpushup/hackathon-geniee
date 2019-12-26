@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
-import { Nav, NavItem } from 'react-bootstrap';
+import { Nav, NavItem } from '@/Client/helpers/react-bootstrap-imports';
 
 import { OP_NAV_ITEMS, OP_NAV_ITEMS_INDEXES, OP_NAV_ITEMS_VALUES } from '../configs/commonConsts';
 import ActionCard from '../../../Components/ActionCard';

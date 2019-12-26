@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col } from '@/Client/helpers/react-bootstrap-imports';
 
 import Empty from '../../../../../Components/Empty/index';
 import FieldGroup from '../../../../../Components/Layout/FieldGroup';

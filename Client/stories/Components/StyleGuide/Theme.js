@@ -1,5 +1,5 @@
 import React from 'react';
-import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { OverlayTrigger, Tooltip } from '@/Client/helpers/react-bootstrap-imports';
 import map from 'lodash/map';
 import clipboard from 'clipboard-polyfill';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';

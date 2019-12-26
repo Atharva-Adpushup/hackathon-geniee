@@ -1,14 +1,13 @@
 import React from 'react';
-import { Helmet } from 'react-helmet';
+import DocumentTitle from 'react-document-title';
 
 import HomeContainer from './containers/HomeContainer';
 import '../../scss/apps/innovativeAds/index.scss';
 
 const App = props => (
 	<React.Fragment>
-		<Helmet>
-			<title>Innovative Ads</title>
-		</Helmet>
+		<DocumentTitle title="Innovative Ads" />
+
 		<HomeContainer {...props} />
 	</React.Fragment>
 );

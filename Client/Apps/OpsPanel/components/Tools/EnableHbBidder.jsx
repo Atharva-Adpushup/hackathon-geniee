@@ -1,6 +1,6 @@
 /* eslint-disable no-alert */
 import React from 'react';
-import { Table } from 'react-bootstrap';
+import { Table } from '@/Client/helpers/react-bootstrap-imports';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import CustomToggleSwitch from '../../../../Components/CustomToggleSwitch/index';
 import CustomButton from '../../../../Components/CustomButton/index';
