@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table } from 'react-bootstrap';
+import { Table } from '@/Client/helpers/react-bootstrap-imports';
 import Head from './Head';
 import Body from './Body';
 

@@ -2,7 +2,7 @@
 /* eslint-disable no-alert */
 /* eslint-disable no-console */
 import React, { Component } from 'react';
-import { Form, FormControl } from 'react-bootstrap';
+import { Form, FormControl } from '@/Client/helpers/react-bootstrap-imports';
 import CustomButton from '../../CustomButton/index';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 

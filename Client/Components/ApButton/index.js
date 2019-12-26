@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from 'react-bootstrap';
+import { Button } from '@/Client/helpers/react-bootstrap-imports';
 import PropTypes from 'prop-types';
 import Spinner from '../Spinner';
 

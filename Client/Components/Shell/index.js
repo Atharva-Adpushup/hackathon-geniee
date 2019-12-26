@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Row, Col } from 'react-bootstrap';
+import { Grid, Row, Col } from '@/Client/helpers/react-bootstrap-imports';
 import Breadcrumbs from 'react-router-dynamic-breadcrumbs';
 import Header from './Header';
 import Sidebar from './Sidebar';

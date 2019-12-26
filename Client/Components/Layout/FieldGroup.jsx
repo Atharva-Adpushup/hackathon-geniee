@@ -10,7 +10,7 @@ import {
 	ButtonToolbar,
 	ToggleButtonGroup,
 	ToggleButton
-} from 'react-bootstrap';
+} from '@/Client/helpers/react-bootstrap-imports';
 import PropTypes from 'prop-types';
 import SelectBox from '../SelectBox/index';
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row } from 'react-bootstrap';
+import { Row } from '@/Client/helpers/react-bootstrap-imports';
 import Settings from './Settings';
 import PagegroupContainer from '../../../containers/PagegroupContainer';
 import AppsContainer from '../../../containers/AppsContainer';

@@ -2,7 +2,7 @@ import React from 'react';
 import { storiesOf } from '@storybook/react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { withKnobs, boolean } from '@storybook/addon-knobs';
-import { Grid, Row } from 'react-bootstrap';
+import { Grid, Row } from '@/Client/helpers/react-bootstrap-imports';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
 	faBars,
@@ -13,7 +13,7 @@ import {
 	faDollarSign,
 	faDesktop,
 	faPlus
-} from '@fortawesome/free-solid-svg-icons';
+} from '@/Client/helpers/fort-awesome-imports';
 
 import Sidebar from '../Components/Shell/Sidebar';
 

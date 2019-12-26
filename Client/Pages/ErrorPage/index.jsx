@@ -1,12 +1,10 @@
 import React, { Fragment } from 'react';
-import { Helmet } from 'react-helmet';
+import DocumentTitle from 'react-document-title';
 import CustomError from '../../Components/CustomError/index';
 
 const ErrorPage = () => (
 	<Fragment>
-		<Helmet>
-			<title>Not Found!</title>
-		</Helmet>
+		<DocumentTitle title="Not Found!" />
 
 		<CustomError />
 	</Fragment>

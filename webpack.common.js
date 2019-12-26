@@ -20,7 +20,22 @@ module.exports = {
 				vendors: {
 					name: 'vendors',
 					chunks: 'all',
-					test: /node_modules/
+					test: /[\\/]node_modules[\\/]((?!(codemirror|highchart|react-dates)).*)[\\/]/
+				},
+				"codemirror": {
+					name: 'codemirror',
+					chunks: 'all',
+					test: /node_modules\/codemirror/
+				},
+				"highcharts": {
+					name: 'highcharts',
+					chunks: 'all',
+					test: /node_modules\/highcharts/
+				},
+				"react-dates": {
+					name: 'react-dates',
+					chunks: 'all',
+					test: /node_modules\/react-dates/
 				}
 			}
 		}

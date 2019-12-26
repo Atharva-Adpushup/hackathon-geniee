@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Button, OverlayTrigger, Tooltip, Alert } from 'react-bootstrap';
+import { Row, Col, Button, OverlayTrigger, Tooltip, Alert } from '@/Client/helpers/react-bootstrap-imports';
 import CodeBox from '../CodeBox/index';
 import { priceFloorKeys, iabSizes, refreshIntervals } from '../../constants/visualEditor';
 import SelectBox from '../SelectBox/index';

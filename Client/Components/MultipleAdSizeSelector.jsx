@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Accordion, Row, Col, Panel, Button, Well, Label } from 'react-bootstrap';
+import { Accordion, Row, Col, Panel, Button, Well, Label } from '@/Client/helpers/react-bootstrap-imports';
 import remove from 'lodash/remove';
 import find from 'lodash/find';
 import compact from 'lodash/compact';

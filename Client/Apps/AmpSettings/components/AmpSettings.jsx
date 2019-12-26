@@ -1,6 +1,6 @@
 import React from 'react';
 import Select from 'react-select';
-import { Row, Col, Button } from 'react-bootstrap';
+import { Row, Col, Button } from '@/Client/helpers/react-bootstrap-imports';
 import ActionCard from '../../../Components/ActionCard.jsx';
 import Loader from '../../../Components/Loader.jsx';
 import Heading from './helper/Heading.jsx';

@@ -6,7 +6,7 @@ import React, { Component } from 'react';
 import clonedeep from 'lodash/cloneDeep';
 import sortBy from 'lodash/sortBy';
 
-import { Row } from 'react-bootstrap';
+import { Row } from '@/Client/helpers/react-bootstrap-imports';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { CSVLink } from 'react-csv';
 

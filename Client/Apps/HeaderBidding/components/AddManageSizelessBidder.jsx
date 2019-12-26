@@ -3,7 +3,7 @@
 /* eslint-disable react/prefer-stateless-function */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Col, Form, FormGroup } from 'react-bootstrap';
+import { Col, Form, FormGroup } from '@/Client/helpers/react-bootstrap-imports';
 import CustomButton from '../../../Components/CustomButton';
 import getCommonBidderFields from '../config/commonBidderFields';
 import BidderFormFields from './BidderFormFields';

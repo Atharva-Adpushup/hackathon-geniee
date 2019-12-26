@@ -1,6 +1,5 @@
 import React from 'react';
 import CustomReactTable from '../../../Components/CustomReactTable/index';
-import { Col } from 'react-bootstrap';
 import sortBy from 'lodash/sortBy';
 import isEqual from 'lodash/isEqual';
 import moment from 'moment';

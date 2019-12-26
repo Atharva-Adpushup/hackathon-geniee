@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import { Row, Col, Button } from 'react-bootstrap';
+import { Row, Col, Button } from '@/Client/helpers/react-bootstrap-imports';
 import reactCSS from 'reactcss';
 import { SketchPicker } from 'react-color';
 

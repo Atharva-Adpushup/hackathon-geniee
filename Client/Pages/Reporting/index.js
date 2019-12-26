@@ -1,11 +1,9 @@
 import React, { Fragment } from 'react';
-import { Helmet } from 'react-helmet';
+import DocumentTitle from 'react-document-title';
 
 const Reporting = () => (
 	<Fragment>
-		<Helmet>
-			<title>Reporting</title>
-		</Helmet>
+		<DocumentTitle title="Reporting" />
 		<div />
 	</Fragment>
 );

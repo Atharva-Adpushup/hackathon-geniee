@@ -11,7 +11,7 @@ import {
 	faDollarSign,
 	faDesktop,
 	faPlus
-} from '@fortawesome/free-solid-svg-icons';
+} from '@/Client/helpers/fort-awesome-imports';
 
 import NamingConvention from './Components/StyleGuide/NamingConvention';
 import Theme from './Components/StyleGuide/Theme';

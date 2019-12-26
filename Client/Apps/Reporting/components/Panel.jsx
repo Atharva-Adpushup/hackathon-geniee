@@ -1,8 +1,7 @@
 /* eslint-disable no-prototype-builtins */
 import React, { Component } from 'react';
-import { Row, Col, Alert } from 'react-bootstrap';
+import { Row, Col, Alert } from '@/Client/helpers/react-bootstrap-imports';
 import moment from 'moment';
-import { Object } from 'es6-shim';
 import qs from 'querystringify';
 import isEmpty from 'lodash/isEmpty';
 import union from 'lodash/union';
