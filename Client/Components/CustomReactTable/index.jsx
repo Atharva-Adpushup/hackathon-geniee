@@ -14,7 +14,8 @@ const CustomReactTable = ({
 	filterable,
 	showPaginationTop,
 	showPaginationBottom,
-	defaultSorting
+	defaultSorting,
+	pivotBy
 }) => (
 	<ReactTable
 		columns={columns}
@@ -27,6 +28,7 @@ const CustomReactTable = ({
 		showPaginationTop={showPaginationTop}
 		showPaginationBottom={showPaginationBottom}
 		defaultSorting={defaultSorting}
+		pivotBy={pivotBy}
 		className="u-padding-h3 u-padding-v2 -striped -highlight"
 	/>
 );
@@ -41,7 +43,8 @@ CustomReactTable.propTypes = {
 	filterable: PropTypes.bool.isRequired,
 	showPaginationBottom: PropTypes.bool.isRequired,
 	showPaginationTop: PropTypes.bool.isRequired,
-	defaultSorting: PropTypes.object.isRequired
+	defaultSorting: PropTypes.object.isRequired,
+	pivotBy: PropTypes.object.isRequired
 };
 
 CustomReactTable.defaultProps = {
