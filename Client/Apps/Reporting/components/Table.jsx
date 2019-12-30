@@ -110,6 +110,15 @@ class Table extends React.Component {
 					sortable: true,
 					table_position,
 					Footer: footerValue,
+					Cell: props =>
+						metrics[column].valueType === 'money' ? (
+							<span>${numberWithCommas(props.value)}</span>
+						) : metrics[column].valueType === 'percent' ? (
+							<span>{numberWithCommas(props.value)}%</span>
+						) : (
+							<span>{numberWithCommas(props.value)}</span>
+						),
+					sortMethod: (a, b) => reactTableSortMethod(a, b),
 					aggregate: (vals, rows) => {
 						let grouped = [];
 						for (const key in aggregatedData) {
@@ -151,17 +160,7 @@ class Table extends React.Component {
 								return grouped;
 							}
 						}
-					},
-
-					Cell: props =>
-						metrics[column].valueType === 'money' ? (
-							<span>${numberWithCommas(props.value)}</span>
-						) : metrics[column].valueType === 'percent' ? (
-							<span>{numberWithCommas(props.value)}%</span>
-						) : (
-							<span>{numberWithCommas(props.value)}</span>
-						),
-					sortMethod: (a, b) => reactTableSortMethod(a, b)
+					}
 				});
 			}
 		});
@@ -255,6 +254,12 @@ class Table extends React.Component {
 
 	render() {
 		const { tableBody, tableColumns, tableData } = this.state;
+		const { startDate, endDate } = this.props;
+		const { result } = tableData;
+
+		const nummberOfdays = moment(endDate).diff(moment(startDate), 'days');
+
+		const showAggregation = result.length > nummberOfdays + 1;
 
 		const onSortFunction = {
 			network_net_revenue(columnValue) {
@@ -292,7 +297,7 @@ class Table extends React.Component {
 						minRows={0}
 						showPaginationTop
 						showPaginationBottom={false}
-						pivotBy={['date']}
+						pivotBy={showAggregation ? ['date'] : []}
 						className="reporting u-padding-h3 u-padding-v2 -striped -highlight"
 					/>
 					<div className="u-margin-t3">
