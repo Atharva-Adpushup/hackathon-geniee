@@ -1,4 +1,5 @@
-function getDefaultNetworkData(network) {
+import Utils from '../libs/utils'
+function getDefaultNetworkData(network, isResponsive) {
 	let response = {};
 	switch (network) {
 		case 'adpTags':
@@ -14,6 +15,9 @@ function getDefaultNetworkData(network) {
 		default:
 			response = {};
 			break;
+	}
+	if(Utils.isDef(isResponsive)) {
+		response.isResponsive = isResponsive;
 	}
 	return response;
 }

@@ -404,9 +404,7 @@ class AdDetails extends Component {
 	}
 
 	renderContent() {
-		if (this.state.editDock) {
-			return <DockedSettings {...this.props} onCancel={this.toggleHandler.bind(null, 'editDock')} />;
-		} else if (this.state.editTrigger) {
+		if (this.state.editTrigger) {
 			return <TriggerSettings {...this.props} onCancel={this.toggleHandler.bind(null, 'editTrigger')} />;
 		} else if (this.state.editLazyLoad) {
 			return <LazyLoadSettings {...this.props} onCancel={this.toggleHandler.bind(null, 'editLazyLoad')} />;
@@ -425,9 +423,6 @@ class AdDetails extends Component {
 							</div>
 						: null}
 					{this.props.showEventData ? this.renderEventData() : null}
-					{!this.props.section.isIncontent && this.props.section.type != typeOfAds.INTERACTIVE_AD
-						? this.renderButton('Docked Settings', this.toggleHandler.bind(null, 'editDock'))
-						: null}
 					{this.renderButton('Lazyload Settings', this.toggleHandler.bind(null, 'editLazyLoad'))}
 				</div>
 			);
