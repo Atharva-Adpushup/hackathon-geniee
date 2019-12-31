@@ -129,6 +129,8 @@ function HbProcessing(site, apConfigs) {
 						? `,sizeConfig: ${JSON.stringify(deviceConfig.sizeConfig)}`
 						: '';
 
+				prebidAdapters = `${prebidAdapters},schain`;
+
 				if (isValidCurrencyConfig) {
 					prebidCurrencyConfig = `,currency: ${JSON.stringify(computedPrebidCurrencyConfig)}`;
 					prebidAdapters = `${prebidAdapters},currency`;
