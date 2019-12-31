@@ -105,7 +105,7 @@ function udpateActiveSitesStaus() {
 
 	pendingActions.push(getActiveSites(fromDate, toDate));
 
-	Promise.all(pendingActions)
+	return Promise.all(pendingActions)
 		.then(res => {
 			// if (!res[0] || !Object.keys(res[0]).length) {
 			if (!res[0] || !res[0].length) {
@@ -140,10 +140,11 @@ function udpateActiveSitesStaus() {
 		})
 		.then(res => {
 			checkforFailedUpdates(updateResponse);
+			return Promise.resolve();
 		})
 		.catch(err => {
 			console.log(`Error.....\n ${err}`);
 		});
 }
-// udpateActiveSitesStaus();
-cron.schedule(constants.cronSchedule.activeSiteMarkingService, udpateActiveSitesStaus);
+
+module.exports = udpateActiveSitesStaus;
