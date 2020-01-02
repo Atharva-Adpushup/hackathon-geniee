@@ -14,7 +14,7 @@ import SelectBox from '../../../../Components/SelectBox/index';
 import axiosInstance from '../../../../helpers/axiosInstance';
 import OverlayToolTip from '../../../../Components/OverlayTooltip/index';
 
-const { devices, modes } = XPATH_MODE_URL;
+const { devices, modes, ORDER_BY_PARAMS } = XPATH_MODE_URL;
 
 const DEFAULT_STATE = {
 	siteId: '',
@@ -25,6 +25,7 @@ const DEFAULT_STATE = {
 	modes,
 	currentSelectedDevice: null,
 	currentSelectedMode: null,
+	orderBy: null,
 	errorCode: '',
 	startDate: moment()
 		.subtract(7, 'days')
@@ -67,6 +68,7 @@ class TopXPathMissAndModeURL extends Component {
 			pageGroups,
 			currentSelectedDevice,
 			currentSelectedMode,
+			orderBy,
 			errorCode,
 			startDate,
 			endDate
@@ -94,6 +96,7 @@ class TopXPathMissAndModeURL extends Component {
 				pageGroups,
 				currentSelectedDevice,
 				currentSelectedMode,
+				orderBy,
 				errorCode,
 				startDate,
 				endDate
@@ -149,6 +152,7 @@ class TopXPathMissAndModeURL extends Component {
 			emailId,
 			currentSelectedDevice,
 			currentSelectedMode,
+			orderBy,
 			pageGroups,
 			errorCode,
 			startDate,
@@ -257,6 +261,18 @@ class TopXPathMissAndModeURL extends Component {
 						reset
 					/>
 				</Fragment>
+				<Fragment>
+					<p className="u-text-bold u-margin-t4">Order By</p>
+					<SelectBox
+						selected={orderBy}
+						options={ORDER_BY_PARAMS}
+						onSelect={this.handleSelect}
+						id="order-by"
+						title="Order By"
+						dataKey="orderBy"
+						reset
+					/>
+				</Fragment>
 				<div className="u-margin-t4">
 					<FieldGroup
 						name="errorCode"
@@ -270,6 +286,7 @@ class TopXPathMissAndModeURL extends Component {
 						className="u-padding-v4 u-padding-h4"
 					/>
 				</div>
+
 				<CustomButton
 					type="submit"
 					variant="primary"

@@ -206,6 +206,7 @@ router
 			pageGroups,
 			currentSelectedDevice,
 			currentSelectedMode,
+			orderBy,
 			errorCode,
 			startDate,
 			endDate
@@ -234,6 +235,7 @@ router
 			email: emailId,
 			page_group: pageGroups,
 			device_type: currentSelectedDevice,
+			orderBy,
 			mode: currentSelectedMode,
 			error_code: errorCode,
 			fromDate: startDate,

@@ -371,7 +371,13 @@ const XPATH_MODE_URL = {
 		{ name: 'Mobile', value: 'Mobile' },
 		{ name: 'Tablet', value: 'Tablet' }
 	],
-	modes: [{ name: 'Mode 1', value: 1 }, { name: 'Mode 2', value: 2 }]
+	modes: [{ name: 'Mode 1', value: 1 }, { name: 'Mode 2', value: 2 }],
+	ORDER_BY_PARAMS: [
+		{ name: 'hits', value: 'hits' },
+		{ name: 'xpath_miss', value: 'xpath_miss' },
+		{ name: 'impressions', value: 'impressions' },
+		{ name: 'url', value: 'url' }
+	]
 };
 
 const SITE_MAPPING_COLUMNS = [
