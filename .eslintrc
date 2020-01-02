@@ -34,13 +34,6 @@
 				{
 					"original": "@fortawesome/free-solid-svg-icons",
 					"alternate": "/Client/helpers/fort-awesome-imports.js"
-				},
-				{
-					"original": "restricted-package",
-					"alternate": "alternate-package"
-				},
-				{
-					"original": "no-alternate"
 				}
 			],
 			"customFileImportRootPrefix": "@"
