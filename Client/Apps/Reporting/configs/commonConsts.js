@@ -139,6 +139,14 @@ const REPORT_TYPE = {
 	SITE: 'site'
 };
 
+const columnsBlacklistedForAddition = [
+	'adpushup_ad_ecpm',
+	'network_ad_ecpm',
+	'adpushup_page_cpm',
+	'adpushup_xpath_miss_percent',
+	'adpushup_count_percent'
+];
+
 export {
 	REPORTS_NAV_ITEMS,
 	REPORTS_NAV_ITEMS_INDEXES,
@@ -154,6 +162,7 @@ export {
 	accountDimension,
 	accountDisableFilter,
 	accountDisableDimension,
+	columnsBlacklistedForAddition,
 	REPORT_INTERVAL_TABLE_KEYS,
 	opsDimension,
 	opsFilter,
