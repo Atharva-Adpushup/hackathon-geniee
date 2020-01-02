@@ -3,10 +3,9 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-param-reassign */
 import React, { Component } from 'react';
-import ReactTable from 'react-table';
 import clonedeep from 'lodash/cloneDeep';
 import sortBy from 'lodash/sortBy';
-import 'react-table/react-table.css';
+
 import { Row } from '@/Client/helpers/react-bootstrap-imports';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { CSVLink } from 'react-csv';
@@ -20,6 +19,7 @@ import CustomButton from '../../../../Components/CustomButton';
 import CustomError from '../../../../Components/CustomError/index';
 import { SITE_MAPPING_COLUMNS } from '../../configs/commonConsts';
 import CopyButtonWrapperContainer from '../../../../Containers/CopyButtonWrapperContainer';
+import CustomReactTable from '../../../../Components/CustomReactTable/index';
 
 import GlobalSearch from './GlobalSearch';
 
@@ -267,17 +267,17 @@ class SiteMapping extends Component {
 		if (!filteredData.length) return <Empty message=" No Data found " />;
 
 		return (
-			<ReactTable
+			<CustomReactTable
 				columns={this.getTableHeaders(columnsMeta)}
 				data={this.getTableBody(filteredDataCopy, columnsMeta)}
 				filterable={false}
 				showPaginationTop
 				showPaginationBottom={false}
-				className="u-padding-h3 u-padding-v2 site-mapping -striped -highlight"
 				defaultPageSize={50}
 				pageSizeOptions={[50, 100, 150, 200, 250]}
 				minRows={0}
-				sortable={true}>
+				sortable={true}
+			>
 				{(state, makeTable, instance) => {
 					let recordsInfoText = '';
 
@@ -310,7 +310,7 @@ class SiteMapping extends Component {
 						</div>
 					);
 				}}
-			</ReactTable>
+			</CustomReactTable>
 		);
 	};
 
@@ -358,7 +358,8 @@ class SiteMapping extends Component {
 						<CSVLink data={csvData} filename="site-stats.csv">
 							<CustomButton
 								variant="primary"
-								className="btn btn-lightBg btn-default btn-blue-line pull-right u-margin-r3 u-margin-b4 ">
+								className="btn btn-lightBg btn-default btn-blue-line pull-right u-margin-r3 u-margin-b4 "
+							>
 								<FontAwesomeIcon size="1x" icon="download" className="u-margin-r3" />
 								Export Report
 							</CustomButton>

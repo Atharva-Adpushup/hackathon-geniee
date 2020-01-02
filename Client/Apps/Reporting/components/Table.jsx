@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactTable from 'react-table';
+import CustomReactTable from '../../../Components/CustomReactTable/index';
 import sortBy from 'lodash/sortBy';
 import isEqual from 'lodash/isEqual';
 import sum from 'lodash/sum';
@@ -289,7 +289,7 @@ class Table extends React.Component {
 		if (tableData && tableData.result && tableData.result.length > 0)
 			return (
 				<React.Fragment>
-					<ReactTable
+					<CustomReactTable
 						columns={tableColumns}
 						data={tableBody}
 						defaultPageSize={10}
@@ -298,7 +298,6 @@ class Table extends React.Component {
 						showPaginationTop
 						showPaginationBottom={false}
 						pivotBy={showAggregation ? ['date'] : []}
-						className="reporting u-padding-h3 u-padding-v2 -striped -highlight"
 					/>
 					<div className="u-margin-t3">
 						<b>*Note:</b> Net Revenue is estimated earnings, finalized earnings may vary depending
