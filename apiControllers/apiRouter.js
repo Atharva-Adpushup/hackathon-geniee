@@ -14,6 +14,7 @@ const channelController = require('./channelController');
 const headerBiddingController = require('./headerBiddingController');
 const visualEditorController = require('./visualEditorController');
 const ampSettingsController = require('./ampSettingsController');
+const adsTxtController = require('./adsTxtController');
 const utilityController = require('./utilityController');
 
 const apiAuthMiddleware = require('../middlewares/apiAuthMiddleware');
@@ -34,6 +35,7 @@ router.use('/channel', channelController);
 router.use('/headerBidding', headerBiddingController);
 router.use('/visualEditor', visualEditorController);
 router.use('/ampSettings', ampSettingsController);
+router.use('/adsTxt', adsTxtController);
 router.use('/utils', utilityController);
 router.use('/', indexController);
 

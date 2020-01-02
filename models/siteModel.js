@@ -2,6 +2,8 @@ module.exports = apiModule();
 
 var model = require('../helpers/model'),
 	couchbase = require('../helpers/couchBaseService'),
+	couchbaseModule = require('couchbase'),
+	N1qlQuery = couchbaseModule.N1qlQuery,
 	globalModel = require('../models/globalModel'),
 	AdPushupError = require('../helpers/AdPushupError'),
 	utils = require('../helpers/utils'),
@@ -313,6 +315,18 @@ function apiModule() {
 
 					return false;
 				});
+		},
+
+		getActiveSites: function() {
+			const query = N1qlQuery.fromString(commonConsts.GET_ACTIVE_SITES_QUERY);
+
+			return couchbase
+				.connectToAppBucket()
+				.then(appBucket => appBucket.queryAsync(query))
+				.then(sites => {
+					return sites;
+				})
+				.catch(err => console.log(err));
 		},
 		updateSite: function(json) {
 			return API.getSiteById(json.siteId)
