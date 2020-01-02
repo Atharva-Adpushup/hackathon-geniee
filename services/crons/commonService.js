@@ -11,9 +11,8 @@ function initiateService() {
 				// return nextTask();
 			})
 			.catch(err => console.log(err))
-			.finally(() => nextTask());
+			.then(() => nextTask());
 	}, Promise.resolve());
 }
 
-// initiateService();
 cron.schedule(constants.cronSchedule.activeSiteMarkingAndAdsTxtService, initiateService);
