@@ -130,10 +130,10 @@ class Component {
 		switch (formatData.type) {
 			case commonConsts.FORMATS.STICKY.NAME:
 				$format.css({
-					...css,
 					...commonConsts.FORMAT_CSS,
 					...commonConsts.FORMATS.STICKY.BASE_STYLES,
-					...this.getPlacementCSS(formatData)
+					...this.getPlacementCSS(formatData),
+					...css
 				});
 				formatData.placement.toLowerCase() === 'top' ? this.pushContent(formatData) : null;
 				this.parentNode.append($format.append(this.adCode));
@@ -141,9 +141,9 @@ class Component {
 
 			case commonConsts.FORMATS.IN_VIEW.NAME:
 				$format.css({
-					...css,
 					...commonConsts.FORMAT_CSS,
-					...commonConsts.FORMATS.IN_VIEW.BASE_STYLES
+					...commonConsts.FORMATS.IN_VIEW.BASE_STYLES,
+					...css
 				});
 				this.parentNode.append(
 					$format
@@ -155,8 +155,8 @@ class Component {
 
 			case commonConsts.FORMATS.DOCKED.NAME:
 				$format.css({
-					...css,
-					...commonConsts.FORMAT_CSS
+					...commonConsts.FORMAT_CSS,
+					...css
 				});
 				this.parentNode.append($format.append(this.adCode));
 				window.adpushup.utils.dockify.dockifyAd(`#${id}`, formatData, window.adpushup.utils);
