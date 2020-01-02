@@ -3,6 +3,7 @@ const Promise = require('bluebird');
 const PromiseFtp = require('promise-ftp');
 const _ = require('lodash');
 const uglifyJS = require('uglify-js');
+const crypto = require('crypto');
 
 const getReportData = require('../../../reports/universal/index');
 const mkdirpAsync = Promise.promisifyAll(require('mkdirp')).mkdirpAsync;
@@ -56,6 +57,11 @@ module.exports = function(site, user) {
 			apConfigs.autoOptimise = isAutoOptimise ? true : false;
 			apConfigs.poweredByBanner = poweredByBanner ? true : false;
 			apConfigs.siteDomain = site.get('siteDomain');
+			apConfigs.ownerEmailMD5 = crypto
+				.createHash('md5')
+				.update(site.get('ownerEmail'))
+				.digest('hex')
+				.substr(0, 64);
 			apConfigs.isSPA = apConfigs.isSPA ? apConfigs.isSPA : false;
 			apConfigs.spaPageTransitionTimeout = apConfigs.spaPageTransitionTimeout
 				? apConfigs.spaPageTransitionTimeout

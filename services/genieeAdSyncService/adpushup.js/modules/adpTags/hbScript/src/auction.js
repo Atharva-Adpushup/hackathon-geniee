@@ -34,7 +34,7 @@ var auction = {
 		var pbSizeConfig = [];
 		var labelIndexTracker = {};
 
-		sizeConfigFromDB.forEach(function(obj){
+		sizeConfigFromDB.forEach(function(obj) {
 			// if label doesn't exist in pbSizeConfig
 			if (!labelIndexTracker[obj.labels[0]]) {
 				labelIndexTracker[obj.labels[0]] = pbSizeConfig.length;
@@ -133,7 +133,22 @@ var auction = {
 			priceGranularity: constants.PREBID.PRICE_GRANULARITY,
 			sizeConfig: this.getSizeConfig(),
 			currency: config.PREBID_CONFIG.currencyConfig,
-			useBidCache: true
+			useBidCache: true,
+			schain: {
+				validation: 'strict',
+				config: {
+					ver: '1.0', //required
+					complete: 1, //required
+					nodes: [
+						//required //SupplyChainNode object
+						{
+							asi: 'adpushup.com', //required
+							sid: adp.config.ownerEmailMD5, //MD5 hash for chris@poshonpennies.com
+							hp: 1 //required
+						}
+					]
+				}
+			}
 		};
 
 		pbjs.setConfig(pbConfig);
