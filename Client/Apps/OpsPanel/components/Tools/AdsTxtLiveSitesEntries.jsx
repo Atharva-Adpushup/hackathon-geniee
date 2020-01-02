@@ -277,7 +277,6 @@ class AdsTxtLiveSitesEntries extends Component {
 					placeholder="Site Id"
 					className="u-padding-v4 u-padding-h4"
 				/>
-
 				<CustomButton
 					variant="secondary"
 					className="pull-right u-margin-r3"
@@ -294,7 +293,6 @@ class AdsTxtLiveSitesEntries extends Component {
 				>
 					Generate
 				</CustomButton>
-
 				<Col xs={12} className="u-margin-t4 u-padding-l0">
 					{this.renderPanel()}
 				</Col>
@@ -309,6 +307,7 @@ class AdsTxtLiveSitesEntries extends Component {
 						</CustomButton>
 					</CSVLink>
 				</Row>
+				<b>Note:</b> Ads.Txt Entries takes upto 12 hours to update.
 			</div>
 		);
 	}
