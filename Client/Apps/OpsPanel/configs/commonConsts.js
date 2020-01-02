@@ -373,10 +373,10 @@ const XPATH_MODE_URL = {
 	],
 	modes: [{ name: 'Mode 1', value: 1 }, { name: 'Mode 2', value: 2 }],
 	ORDER_BY_PARAMS: [
-		{ name: 'hits', value: 'hits' },
-		{ name: 'xpath_miss', value: 'xpath_miss' },
-		{ name: 'impressions', value: 'impressions' },
-		{ name: 'url', value: 'url' }
+		{ name: 'Hits', value: 'hits' },
+		{ name: 'XPath Miss', value: 'xpath_miss' },
+		{ name: 'Impressions', value: 'impressions' },
+		{ name: 'Url', value: 'url' }
 	]
 };
 
