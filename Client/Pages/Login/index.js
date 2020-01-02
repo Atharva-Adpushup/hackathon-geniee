@@ -11,6 +11,7 @@ import CustomButton from '../../Components/CustomButton';
 import { loginAction, logout } from '../../actions/userActions';
 import formValidator from '../../helpers/formValidator';
 import validationSchema from '../../helpers/validationSchema';
+import config from '../../config/config';
 
 class Login extends Component {
 	state = {
@@ -168,9 +169,13 @@ class Login extends Component {
 							<div className="AuthFooter LoginFooter row">
 								<div className="pull-right">
 									Don&apos;t have an account?
-									<Link to="/signup" id="auth-signup-redirect-link" className="btn btn--secondary">
+									<a
+										href={config.AP_GETTING_STARTED_URL}
+										id="auth-signup-redirect-link"
+										className="btn btn--secondary"
+									>
 										Sign up
-									</Link>
+									</a>
 								</div>
 							</div>
 						</Fragment>

@@ -6,5 +6,6 @@ export default {
 	ANALYTICS_METAINFO_URL: '/common/metaInfo',
 	HB_MSGS: {
 		UNSAVED_CHANGES: 'You have unsaved changes. Are you sure you want to leave?'
-	}
+	},
+	AP_GETTING_STARTED_URL: 'https://campaign.adpushup.com/get-started/'
 };
