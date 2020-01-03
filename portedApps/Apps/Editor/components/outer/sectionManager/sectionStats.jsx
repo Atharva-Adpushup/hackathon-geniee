@@ -22,7 +22,7 @@ module.exports = React.createClass({
 			<div className="level-og">
 				{_(this.props.data.networkStats).map(
 					function(networkStats, network) {
-						return <NetworkStats name={network} data={networkStats} />;
+						return <NetworkStats key={network} name={network} data={networkStats} />;
 					}.bind(this)
 				)}
 			</div>

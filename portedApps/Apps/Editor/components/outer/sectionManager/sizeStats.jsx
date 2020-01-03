@@ -19,9 +19,10 @@ module.exports = React.createClass({
 		return (
 			<div className="level-og">
 				{_(this.props.data.variations).map(
-					function(variation) {
+					function(variation, key) {
 						return (
 							<BaseUnit
+							key={key}
 								name={variation.variationName}
 								data={{
 									impressions: variation.impressions,

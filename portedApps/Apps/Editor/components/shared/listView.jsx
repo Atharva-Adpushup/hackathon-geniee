@@ -18,7 +18,7 @@ class ListView extends React.Component {
 			}
 
 			return (
-				<li>
+				<li key={itemKey}>
 					{this.props.removeHandler ? (
 						<a onClick={this.props.removeHandler.bind(null, item)} className="remove" href="#">
 							<i className="fa fa-trash-o" />
