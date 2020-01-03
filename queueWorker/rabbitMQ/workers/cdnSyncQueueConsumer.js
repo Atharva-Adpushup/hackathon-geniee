@@ -16,11 +16,11 @@ const queueConfig = {
 	name: 'CDN SYNC Consumer',
 	mail: {
 		ack: {
-			header: 'Alert close for Service: CDN SYN Consumer [beta.adpushup.com]',
+			header: 'Alert close for Service: CDN SYN Consumer [console.adpushup.com]',
 			content: '<p>Consumer is up and running.</p>'
 		},
 		nack: {
-			header: 'Alert open for Service: CDN SYN Consumer [beta.adpushup.com]',
+			header: 'Alert open for Service: CDN SYN Consumer [console.adpushup.com]',
 			content: '<p>Consumer failed multiple times. Please check on priority.</p>'
 		},
 		emailId:
