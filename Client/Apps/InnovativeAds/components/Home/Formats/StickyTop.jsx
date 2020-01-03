@@ -53,11 +53,9 @@ class Docked extends Component {
 				contentOffset,
 				topOffset,
 				contentXpath: contentXpath.trim(),
-				formatData: {
-					event: EVENTS.SCRIPT_LOADED,
-					eventData: {
-						value: ''
-					}
+				event: EVENTS.SCRIPT_LOADED,
+				eventData: {
+					value: ''
 				}
 			},
 			css: parsedCSS,
