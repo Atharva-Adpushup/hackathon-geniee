@@ -297,7 +297,7 @@ class Table extends React.Component {
 						minRows={0}
 						showPaginationTop
 						showPaginationBottom={false}
-						pivotBy={showAggregation ? ['date'] : []}
+						// pivotBy={showAggregation ? ['date'] : []}
 					/>
 					<div className="u-margin-t3">
 						<b>*Note:</b> Net Revenue is estimated earnings, finalized earnings may vary depending
