@@ -189,11 +189,13 @@ const OPS_AD_LIST_HEADERS = [
 ];
 const USER_AD_LIST_ACTIONS = [
 	{ displayText: 'Archive', key: 'archive' },
+	{ displayText: 'Unarchive', key: 'unarchive' },
 	{ displayText: 'Format Options', key: 'formatEdit' }
 ];
 const OPS_AD_LIST_ACTIONS = [
 	{ displayText: 'Network Options', key: 'networkEdit' },
 	{ displayText: 'Archive', key: 'archive' },
+	{ displayText: 'Unarchive', key: 'unarchive' },
 	{ displayText: 'Format Options', key: 'formatEdit' }
 ];
 const AD_LIST_ACTIONS = {
