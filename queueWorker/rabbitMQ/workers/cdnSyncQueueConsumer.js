@@ -91,7 +91,7 @@ function errorHandler(error, originalMessage) {
 	if (!customErrorMessage) {
 		customErrorMessage = error && error[0] ? error[0].message : 'Unsynced ads in setup';
 		if (typeof customErrorMessage === 'object') {
-			customErrorMessage = `[LOG FROM BETA] Unsynced ads in setup | Pagegroup - ${
+			customErrorMessage = `[LOG FROM CONSOLE] Unsynced ads in setup | Pagegroup - ${
 				customErrorMessage.pagegroup
 			} | Platform - ${customErrorMessage.platform} | SectionId - ${
 				customErrorMessage.sectionId
