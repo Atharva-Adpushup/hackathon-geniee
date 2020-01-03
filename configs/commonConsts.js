@@ -2,7 +2,9 @@ const config = require('./config');
 
 const prodEnv = config.environment.HOST_ENV === 'production';
 const reportingBaseURL = 'https://staging.adpushup.com/CentralReportingWebService';
-const computedProductionURL = prodEnv ? 'https://beta.adpushup.com' : 'http://localhost:8080';
+const computedProductionURL = prodEnv
+	? 'https://console.adpushup.com'
+	: `http://localhost:${config.environment.HOST_PORT}`;
 
 module.exports = {
 	SALT: '_ADP_RANDOMIZER_',
