@@ -3,6 +3,8 @@ import CustomReactTable from '../../../Components/CustomReactTable/index';
 import sortBy from 'lodash/sortBy';
 import isEqual from 'lodash/isEqual';
 import sum from 'lodash/sum';
+import countBy from 'lodash/countBy';
+import map from 'lodash/map';
 
 import moment from 'moment';
 import { numberWithCommas, computeCsvData } from '../helpers/utils';
@@ -178,6 +180,7 @@ class Table extends React.Component {
 	};
 
 	getTableBody = tableBody => {
+		console.log(tableBody);
 		let tableData = [...tableBody];
 		const displayTableData = [];
 		const { startDate, endDate, site } = this.props;
@@ -252,14 +255,20 @@ class Table extends React.Component {
 		return { tableBody, tableColumns };
 	};
 
+	checkForAggregation(tableBody) {
+		const dateCount = countBy(map(tableBody, 'date'));
+		for (let key in dateCount) {
+			if (dateCount[key] > 1) {
+				return true;
+			}
+			return false;
+		}
+	}
+
 	render() {
 		const { tableBody, tableColumns, tableData } = this.state;
-		const { startDate, endDate } = this.props;
-		const { result } = tableData;
 
-		const nummberOfdays = moment(endDate).diff(moment(startDate), 'days');
-
-		const showAggregation = result.length > nummberOfdays + 1;
+		const showAggregation = this.checkForAggregation(tableBody);
 
 		const onSortFunction = {
 			network_net_revenue(columnValue) {
@@ -297,7 +306,7 @@ class Table extends React.Component {
 						minRows={0}
 						showPaginationTop
 						showPaginationBottom={false}
-						// pivotBy={showAggregation ? ['date'] : []}
+						pivotBy={showAggregation ? ['date'] : []}
 					/>
 					<div className="u-margin-t3">
 						<b>*Note:</b> Net Revenue is estimated earnings, finalized earnings may vary depending

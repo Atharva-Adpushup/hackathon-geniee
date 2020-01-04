@@ -692,7 +692,50 @@ class Panel extends Component {
 	};
 
 	aggregateValues(result) {
-		var groupedData = mapValues(groupBy(result, 'date'), reportData =>
+		let modifiedResult = [];
+		const { selectedInterval, startDate, endDate } = this.state;
+
+		result.forEach(row => {
+			const tableRow = { ...row };
+
+			if (selectedInterval === 'daily') tableRow.date = tableRow.date;
+
+			if (selectedInterval === 'monthly' && tableRow.month) {
+				let monthlyDateRangeStart;
+				let monthlyDateRangeEnd;
+
+				// Compute monthlyDateRangeStart
+				if (`${tableRow.year}-${tableRow.month}` === moment(startDate).format('Y-M')) {
+					monthlyDateRangeStart = moment(startDate).format('ll');
+				} else {
+					monthlyDateRangeStart = moment()
+						.month(tableRow.month - 1) // moment accepts 0-11 months
+						.year(tableRow.year)
+						.startOf('month')
+						.format('ll');
+				}
+
+				// Compute monthlyDateRangeEnd
+				if (`${tableRow.year}-${tableRow.month}` === moment(endDate).format('Y-M')) {
+					monthlyDateRangeEnd = moment(endDate).format('ll');
+				} else {
+					monthlyDateRangeEnd = moment()
+						.month(tableRow.month - 1) // moment accepts 0-11 months
+						.year(tableRow.year)
+						.endOf('month')
+						.format('ll');
+				}
+
+				tableRow.date = `${monthlyDateRangeStart} to ${monthlyDateRangeEnd}`;
+			}
+
+			if (selectedInterval === 'cumulative')
+				tableRow.date = `${moment(startDate).format('ll')} to ${moment(endDate).format('ll')}`;
+
+			modifiedResult.push(tableRow);
+		});
+
+		let groupedData = mapValues(groupBy(modifiedResult, 'date'), reportData =>
 			reportData.map(data => omit(data, 'date'))
 		);
 
@@ -803,6 +846,7 @@ class Panel extends Component {
 					<TableContainer
 						tableData={selectedMetricsTableData}
 						aggregatedData={aggregatedData}
+						resultData={tableData.result}
 						startDate={startDate}
 						endDate={endDate}
 						selectedInterval={selectedInterval}
