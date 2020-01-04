@@ -180,7 +180,6 @@ class Table extends React.Component {
 	};
 
 	getTableBody = tableBody => {
-		console.log(tableBody);
 		let tableData = [...tableBody];
 		const displayTableData = [];
 		const { startDate, endDate, site } = this.props;

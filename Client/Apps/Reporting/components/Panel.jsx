@@ -846,7 +846,6 @@ class Panel extends Component {
 					<TableContainer
 						tableData={selectedMetricsTableData}
 						aggregatedData={aggregatedData}
-						resultData={tableData.result}
 						startDate={startDate}
 						endDate={endDate}
 						selectedInterval={selectedInterval}
