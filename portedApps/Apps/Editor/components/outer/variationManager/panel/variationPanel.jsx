@@ -9,9 +9,7 @@ import VariationOptions from './variationOptions';
 import VariationSections from './variationSections/index';
 import VariationBar from './variationBar';
 import BeforeAfterJsPanel from './beforeAfterJsPanel';
-import Personalization from './personalization';
 import KeyValuesPanel from './keyValuesPanel';
-import InteractiveAds from './interactiveAds/index';
 
 class VariationPanel extends React.Component {
 	constructor(props) {
@@ -145,18 +143,6 @@ class VariationPanel extends React.Component {
 						</div>
 					)}
 					{this.renderKeyValuesOptions()}
-					<div tabTitle="Interactive Ads">
-						<InteractiveAds
-							channelId={channelId}
-							variation={variation}
-							sections={sections}
-							ui={ui}
-							platform={activeChannel.platform}
-						/>
-					</div>
-					<div tabTitle="Personalization">
-						<Personalization channelId={channelId} variation={variation} />
-					</div>
 				</TabPanel>
 			</div>
 		);

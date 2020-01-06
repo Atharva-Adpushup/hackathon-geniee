@@ -67,4 +67,8 @@ function generateSectionName({
 	return name.join('_');
 }
 
-export { capitalCase, isFloat, ajax, getSupportedAdSizes, generateSectionName };
+function updateSectionName(sectionName, id = uuid.v4()) {
+	return sectionName.replace(sectionName.substr(sectionName.lastIndexOf('_')+1,5), id.slice(0, 5))
+}
+
+export { capitalCase, isFloat, ajax, getSupportedAdSizes, generateSectionName, updateSectionName };

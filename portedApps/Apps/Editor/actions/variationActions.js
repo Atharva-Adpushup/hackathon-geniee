@@ -10,6 +10,7 @@ import {
 import { getSectionWithAds } from 'selectors/sectionSelectors';
 import { uiActions } from '../consts/commonConsts';
 import { updateLogWritten } from './adActions';
+import { updateSectionName} from '../../../common/helpers';
 
 const getLastVariationNumber = function(variations) {
 		const names = variations.map(({ name }) => {
@@ -122,10 +123,10 @@ const getLastVariationNumber = function(variations) {
 				return {
 					...section,
 					id: sectionId,
-					name: `Section-${sectionId}`,
+					name: updateSectionName(section.name),
 					ads: _.map(section.ads, ad => {
 						const adId = Utils.getRandomNumber();
-						ads.push({ ...ad, adCode: '', networkData: getDefaultNetworkData(ad.network), id: adId });
+						ads.push({ ...ad, adCode: '', networkData: getDefaultNetworkData(ad.network, ad.networkData.isResponsive), id: adId });
 						return adId;
 					})
 				};
