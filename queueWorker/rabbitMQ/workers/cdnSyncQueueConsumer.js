@@ -16,11 +16,11 @@ const queueConfig = {
 	name: 'CDN SYNC Consumer',
 	mail: {
 		ack: {
-			header: 'Alert close for Service: CDN SYN Consumer [beta.adpushup.com]',
+			header: 'Alert close for Service: CDN SYN Consumer [console.adpushup.com]',
 			content: '<p>Consumer is up and running.</p>'
 		},
 		nack: {
-			header: 'Alert open for Service: CDN SYN Consumer [beta.adpushup.com]',
+			header: 'Alert open for Service: CDN SYN Consumer [console.adpushup.com]',
 			content: '<p>Consumer failed multiple times. Please check on priority.</p>'
 		},
 		emailId:
@@ -91,7 +91,7 @@ function errorHandler(error, originalMessage) {
 	if (!customErrorMessage) {
 		customErrorMessage = error && error[0] ? error[0].message : 'Unsynced ads in setup';
 		if (typeof customErrorMessage === 'object') {
-			customErrorMessage = `[LOG FROM BETA] Unsynced ads in setup | Pagegroup - ${
+			customErrorMessage = `[LOG FROM CONSOLE] Unsynced ads in setup | Pagegroup - ${
 				customErrorMessage.pagegroup
 			} | Platform - ${customErrorMessage.platform} | SectionId - ${
 				customErrorMessage.sectionId
