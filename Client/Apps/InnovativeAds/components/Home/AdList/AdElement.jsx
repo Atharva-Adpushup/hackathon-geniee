@@ -26,7 +26,7 @@ class AdElement extends Component {
 				: true
 		};
 		this.renderAdDetails = this.renderAdDetails.bind(this);
-		this.disableAd = this.disableAd.bind(this);
+		this.toggleAdStatus = this.toggleAdStatus.bind(this);
 		this.updateWrapper = this.updateWrapper.bind(this);
 		this.incrementIdentifier = this.incrementIdentifier.bind(this);
 		this.getIdentifier = this.getIdentifier.bind(this);
@@ -50,7 +50,7 @@ class AdElement extends Component {
 		this.identifier += 1;
 	}
 
-	disableAd() {
+	toggleAdStatus() {
 		const { isActive } = this.state;
 		const { ad, archiveAd, user, siteId } = this.props;
 		const message = isActive
@@ -147,7 +147,8 @@ class AdElement extends Component {
 		const { modalToggle, ad } = this.props;
 		switch (action) {
 			case 'archive':
-				return this.disableAd();
+			case 'unarchive':
+				return this.toggleAdStatus();
 			case 'networkEdit':
 				return modalToggle({
 					header: 'Edit Network Options',
@@ -233,16 +234,21 @@ class AdElement extends Component {
 		const actions = this.isSuperUser ? OPS_AD_LIST_ACTIONS : USER_AD_LIST_ACTIONS;
 		const { ad } = this.props;
 
-		return actions.map(action => (
-			<CustomButton
-				key={`adAction-${ad.id}-${action.key}`}
-				variant="secondary"
-				className="u-margin-b3"
-				onClick={() => this.userActionsHandler(action.key)}
-			>
-				{action.displayText}
-			</CustomButton>
-		));
+		return actions
+			.filter(
+				action =>
+					(ad.isActive && action.key !== 'unarchive') || (!ad.isActive && action.key !== 'archive')
+			)
+			.map(action => (
+				<CustomButton
+					key={`adAction-${ad.id}-${action.key}`}
+					variant="secondary"
+					className="u-margin-b3"
+					onClick={() => this.userActionsHandler(action.key)}
+				>
+					{action.displayText}
+				</CustomButton>
+			));
 	}
 
 	renderAdDetails() {
