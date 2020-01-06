@@ -406,7 +406,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 	},
 	docKeys: {
 		apTag: 'tgmr::',
-		networkConfig: 'data::apNetworkBeta',
+		networkConfig: 'data::apNetworks',
 		interactiveAds: 'fmrt::',
 		user: 'user::',
 		hb: 'hbdc::',
