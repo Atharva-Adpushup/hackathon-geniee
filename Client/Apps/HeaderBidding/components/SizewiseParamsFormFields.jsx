@@ -19,12 +19,12 @@ class SizewiseParamsFormFields extends React.Component {
 	};
 
 	componentDidMount() {
-		const { sizes, formFields, savedParams } = this.props;
+		const { sizes, formFields, savedParams, relation } = this.props;
 
 		this.setState(() => {
 			const newState = {
 				activeKey: (!!sizes.length && sizes[0]) || '',
-				tempParams: {}
+				tempParams: this.getDefaultTempParams(sizes, formFields, savedParams, relation)
 			};
 
 			for (const adSize of sizes) {
@@ -60,8 +60,64 @@ class SizewiseParamsFormFields extends React.Component {
 		});
 	}
 
+	componentDidUpdate(prevProps) {
+		const { sizes, formFields, savedParams, relation } = this.props;
+		if (relation !== prevProps.relation) {
+			// eslint-disable-next-line react/no-did-update-set-state
+			this.setState(() => {
+				const newState = {
+					tempParams: this.getDefaultTempParams(sizes, formFields, savedParams, relation)
+				};
+
+				return newState;
+			});
+		}
+	}
+
+	getDefaultTempParams = (sizes, formFields, savedParams, relation) => {
+		const tempParams = {};
+
+		for (const adSize of sizes) {
+			const params = {};
+
+			for (const paramKey in formFields.params.siteLevel) {
+				if (savedParams[adSize]) {
+					params[paramKey] = savedParams[adSize][paramKey];
+
+					// eslint-disable-next-line no-continue
+					continue;
+				}
+
+				if (
+					!formFields.params.siteLevel[paramKey].visible &&
+					formFields.params.siteLevel[paramKey].value !== undefined
+				) {
+					params[paramKey] = formFields.params.siteLevel[paramKey].value;
+
+					// eslint-disable-next-line no-continue
+					continue;
+				}
+
+				if (relation === 'adpushup') {
+					params[paramKey] =
+						formFields.params.siteLevel[paramKey].defaultValue ||
+						(formFields.params.siteLevel[paramKey].dataType === 'number' ? null : '');
+				}
+
+				if (relation === 'direct') {
+					params[paramKey] =
+						formFields.params.siteLevel[paramKey].dataType === 'number' ? null : '';
+				}
+			}
+
+			tempParams[adSize] = { ...params, saved: !!savedParams[adSize] };
+		}
+
+		return tempParams;
+	};
+
 	addNewSize = adSize => {
-		const { addNewSizeInState, formFields } = this.props;
+		const { addNewSizeInState, formFields, relation } = this.props;
 
 		this.setState(state => {
 			const params = {};
@@ -78,7 +134,7 @@ class SizewiseParamsFormFields extends React.Component {
 				}
 
 				params[paramKey] =
-					formFields.params.siteLevel[paramKey].defaultValue ||
+					(relation === 'adpushup' && formFields.params.siteLevel[paramKey].defaultValue) ||
 					(formFields.params.siteLevel[paramKey].dataType === 'number' ? null : '');
 			}
 

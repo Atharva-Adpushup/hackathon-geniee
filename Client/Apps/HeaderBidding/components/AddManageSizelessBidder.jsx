@@ -9,7 +9,7 @@ import getCommonBidderFields from '../config/commonBidderFields';
 import BidderFormFields from './BidderFormFields';
 import formValidator from '../../../helpers/formValidator';
 import getValidationSchema from '../helpers/getValidationSchema';
-import { filterValidationSchema } from '../helpers/commonHelpers';
+import { filterValidationSchema, getDefaultBidderParamsByRelation } from '../helpers/commonHelpers';
 
 class AddManageSizelessBidder extends React.Component {
 	state = {
@@ -42,7 +42,7 @@ class AddManageSizelessBidder extends React.Component {
 
 						for (const paramKey in formFields.bidderConfig) {
 							newState.bidderConfig[paramKey] =
-								formFields.bidderConfig[paramKey].defaultValue ||
+								(isApRelation && formFields.bidderConfig[paramKey].defaultValue) ||
 								(formFields.bidderConfig[paramKey] === 'number' ? null : '');
 						}
 
@@ -64,7 +64,7 @@ class AddManageSizelessBidder extends React.Component {
 							}
 
 							newState.params[paramKey] =
-								formFieldsParams[paramKey].defaultValue ||
+								(isApRelation && formFieldsParams[paramKey].defaultValue) ||
 								(formFieldsParams[paramKey].dataType === 'number' ? null : '');
 						}
 
@@ -198,6 +198,13 @@ class AddManageSizelessBidder extends React.Component {
 	};
 
 	setFormFieldValueInState = (stateKey, paramKey, value) => {
+		const {
+			bidderConfig: { params, paramsFormFields }
+		} = this.props;
+
+		const { adUnitLevel, global, siteLevel } = params || paramsFormFields;
+		const paramsFromNetworkTree = { ...adUnitLevel, ...global, ...siteLevel };
+
 		this.setState(state => {
 			const newState = {
 				[stateKey]: {
@@ -209,6 +216,15 @@ class AddManageSizelessBidder extends React.Component {
 				}
 			};
 			if (paramKey === 'bids' && value === 'net') newState[stateKey].revenueShare = '';
+
+			if (paramKey === 'relation') {
+				newState.params = getDefaultBidderParamsByRelation(
+					value,
+					state.params,
+					paramsFromNetworkTree
+				);
+			}
+
 			const newErrors = { ...state.errors };
 			const error = newErrors[paramKey];
 			const { validationSchema } = state;
