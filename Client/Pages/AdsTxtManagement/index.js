@@ -237,7 +237,7 @@ class AdsTxtManager extends Component {
 		return (
 			<div>
 				<div className="u-padding-4">
-					Ensure that ads.txt is updated to all times to ensure maximum advertising partners are
+					Ensure that ads.txt is updated to all sites to ensure maximum advertising partners are
 					bidding on your website.
 				</div>
 				<div className="u-padding-4 text-center snippet-wrapper">
