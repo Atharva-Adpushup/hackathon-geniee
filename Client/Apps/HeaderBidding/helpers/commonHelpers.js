@@ -50,3 +50,23 @@ export function filterValidationSchema(validationSchema, keysToFilterOut = []) {
 
 	return validationSchema;
 }
+
+export function getDefaultBidderParamsByRelation(relation, params, paramsFromNetworkTree) {
+	const paramsCopy = { ...params };
+
+	for (const newStateParamKey in paramsCopy) {
+		// eslint-disable-next-line no-prototype-builtins
+		if (paramsCopy.hasOwnProperty(newStateParamKey)) {
+			const paramFromNetworkTree = paramsFromNetworkTree[newStateParamKey];
+
+			if (relation === 'adpushup' && paramFromNetworkTree && paramFromNetworkTree.defaultValue) {
+				paramsCopy[newStateParamKey] = paramFromNetworkTree.defaultValue;
+			} else {
+				paramsCopy[newStateParamKey] =
+					paramFromNetworkTree && paramFromNetworkTree.dataType === 'number' ? null : '';
+			}
+		}
+	}
+
+	return paramsCopy;
+}
