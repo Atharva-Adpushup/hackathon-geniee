@@ -9,7 +9,7 @@ import BidderFormFields from './BidderFormFields';
 import formValidator from '../../../helpers/formValidator';
 import getValidationSchema from '../helpers/getValidationSchema';
 import SizewiseParamsFormFields from './SizewiseParamsFormFields';
-import { filterValidationSchema } from '../helpers/commonHelpers';
+import { filterValidationSchema, getDefaultBidderParamsByRelation } from '../helpers/commonHelpers';
 
 class AddManageNonResponsiveBidder extends React.Component {
 	state = {
@@ -48,7 +48,7 @@ class AddManageNonResponsiveBidder extends React.Component {
 
 						for (const paramKey in formFields.bidderConfig) {
 							newState.bidderConfig[paramKey] =
-								formFields.bidderConfig[paramKey].defaultValue ||
+								(isApRelation && formFields.bidderConfig[paramKey].defaultValue) ||
 								(formFields.bidderConfig[paramKey].dataType === 'number' ? null : '');
 						}
 
@@ -65,7 +65,7 @@ class AddManageNonResponsiveBidder extends React.Component {
 							}
 
 							newState.globalParams[globalParamKey] =
-								formFields.params.global[globalParamKey].defaultValue ||
+								(isApRelation && formFields.params.global[globalParamKey].defaultValue) ||
 								(formFields.params.global[globalParamKey].dataType === 'number' ? null : '');
 						}
 
@@ -345,6 +345,14 @@ class AddManageNonResponsiveBidder extends React.Component {
 	};
 
 	setFormFieldValueInState = (stateKey, paramKey, value) => {
+		const {
+			bidderConfig: { params, paramsFormFields }
+		} = this.props;
+
+		const { adUnitLevel, global, siteLevel } = params || paramsFormFields;
+
+		const paramsFromNetworkTree = { ...adUnitLevel, ...global, ...siteLevel };
+
 		this.setState(state => {
 			const newState = {
 				[stateKey]: {
@@ -354,6 +362,14 @@ class AddManageNonResponsiveBidder extends React.Component {
 			};
 
 			if (paramKey === 'bids' && value === 'net') newState[stateKey].revenueShare = '';
+
+			if (paramKey === 'relation') {
+				newState.globalParams = getDefaultBidderParamsByRelation(
+					value,
+					state.globalParams,
+					paramsFromNetworkTree
+				);
+			}
 
 			const newErrors = { ...state.errors };
 
@@ -468,6 +484,7 @@ class AddManageNonResponsiveBidder extends React.Component {
 								validationSchema={validationSchema}
 								addNewSizeInState={this.addNewSizeInState}
 								errors={errors}
+								relation={relation}
 							/>
 						)}
 						<FormGroup>
