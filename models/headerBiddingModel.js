@@ -469,7 +469,7 @@ function apiModule() {
 						}
 					}
 
-					return appBucket.replaceAsync(`tgmr::${siteId}`, value, { expiry: 1296000 });
+					return appBucket.replaceAsync(`tgmr::${siteId}`, value);
 				})
 				.catch(err => {
 					if (err.code === 13) {
@@ -502,7 +502,7 @@ function apiModule() {
 						}
 					}
 
-					return appBucket.replaceAsync(`fmrt::${siteId}`, value, { expiry: 1296000 });
+					return appBucket.replaceAsync(`fmrt::${siteId}`, value);
 				})
 				.catch(err => {
 					if (err.code === 13) {
