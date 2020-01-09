@@ -23,6 +23,7 @@ import {
 	updateNetwork,
 	updateAdCode,
 	updateAd,
+	updateCss,
 	updateCustomCss,
 	updateMultipleAdSizes
 } from 'actions/adActions';
@@ -99,6 +100,7 @@ class variationSections extends Component {
 			onUpdatePartnerData,
 			onUpdateXPath,
 			onUpdateOperation,
+			onUpdateCss,
 			onUpdateCustomCss,
 			onUpdateInContentMinDistanceFromPrevAd,
 			onUpdateInContentNotNear,
@@ -156,6 +158,7 @@ class variationSections extends Component {
 									onUpdatePartnerData={onUpdatePartnerData}
 									onUpdateXPath={onUpdateXPath}
 									onUpdateOperation={onUpdateOperation}
+									onUpdateCss={onUpdateCss}
 									onUpdateCustomCss={onUpdateCustomCss}
 									onUpdateInContentMinDistanceFromPrevAd={onUpdateInContentMinDistanceFromPrevAd}
 									onUpdateInContentNotNear={onUpdateInContentNotNear}
@@ -195,6 +198,7 @@ variationSections.propTypes = {
 	onUpdatePartnerData: PropTypes.func.isRequired,
 	onUpdateXPath: PropTypes.func,
 	onUpdateOperation: PropTypes.func,
+	onUpdateCss:PropTypes.func,
 	onUpdateCustomCss: PropTypes.func,
 	onUpdateInContentMinDistanceFromPrevAd: PropTypes.func,
 	onUpdateInContentNotNear: PropTypes.func,
@@ -221,6 +225,7 @@ export default connect(
 				onDeleteSection: deleteSection,
 				onRenameSection: renameSection,
 				onUpdateAdCode: updateAdCode,
+				onUpdateCss:updateCss,
 				onUpdateCustomCss: updateCustomCss,
 				onUpdatePartnerData: updatePartnerData,
 				onUpdateXPath: updateXPath,
