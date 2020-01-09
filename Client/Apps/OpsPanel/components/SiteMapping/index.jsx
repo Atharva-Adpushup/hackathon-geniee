@@ -277,40 +277,7 @@ class SiteMapping extends Component {
 				pageSizeOptions={[50, 100, 150, 200, 250]}
 				minRows={0}
 				sortable={true}
-			>
-				{(state, makeTable, instance) => {
-					let recordsInfoText = '';
-
-					const { filtered, pageRows, pageSize, sortedData, page } = state;
-
-					if (sortedData && sortedData.length > 0) {
-						let isFiltered = filtered.length > 0;
-
-						let totalRecords = sortedData.length;
-
-						let recordsCountFrom = page * pageSize + 1;
-
-						let recordsCountTo = recordsCountFrom + pageRows.length - 1;
-
-						if (isFiltered)
-							recordsInfoText = `${recordsCountFrom}-${recordsCountTo} of ${totalRecords} filtered records`;
-						else
-							recordsInfoText = `${recordsCountFrom}-${recordsCountTo} of ${totalRecords} records`;
-					} else recordsInfoText = 'No records';
-
-					return (
-						<div className="main-grid">
-							<div className="above-table text-right">
-								<div className="col-sm-12">
-									<span className="records-info">{recordsInfoText} </span>
-								</div>
-							</div>
-
-							{makeTable()}
-						</div>
-					);
-				}}
-			</CustomReactTable>
+			/>
 		);
 	};
 
