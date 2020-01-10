@@ -29,19 +29,13 @@ var $ = require('./jquery'),
 
 		var dockifyTrigger = function () {
 			var windowScrollTop = $(window).scrollTop();
-			var fixedPoint = $el.attr('data-fixed-point') || null;
-			var elTopOffset = fixedPoint || $el.offset().top;
-			var offset = $el.attr('data-bottom-offset') || null;
-			if (!offset) {
-				offset = getDockedOffset(formatData);
-				$el.attr('data-bottom-offset', offset);
-			}
-			
+			var elTopOffset = $el.parent().offset().top;
+			var offset = getDockedOffset(formatData);
+
 			var scrollLimitReachedWithoutOffset = windowScrollTop > elTopOffset && !offset;
 			var scrollLimitReachedWithOffset = windowScrollTop > elTopOffset && offset && windowScrollTop < offset;
 
 			if (scrollLimitReachedWithoutOffset || scrollLimitReachedWithOffset) {
-				$el.attr('data-fixed-point', elTopOffset);
 				$el.css(dockedCSS);
 			} else {
 				$el.css({
