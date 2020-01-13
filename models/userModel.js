@@ -54,7 +54,7 @@ var modelAPI = (module.exports = apiModule()),
 			'billingInfoComplete',
 			'paymentInfoComplete',
 			'isPaymentDetailsComplete',
-			"adServerSettings",
+			'adServerSettings',
 			'adServerSetupStatus'
 		];
 		this.clientKeys = [
@@ -78,7 +78,7 @@ var modelAPI = (module.exports = apiModule()),
 			'billingInfoComplete',
 			'paymentInfoComplete',
 			'isPaymentDetailsComplete',
-			"adServerSettings",
+			'adServerSettings',
 			'adServerSetupStatus'
 		];
 		this.validations = schema.user.validations;
@@ -108,15 +108,13 @@ var modelAPI = (module.exports = apiModule()),
 			return Promise.resolve(_.find(this.get('sites'), { domain: domain }));
 		};
 
-		this.getSiteByNormalizedDomain = function (domain) {
+		this.getSiteByNormalizedDomain = function(domain) {
 			const regex = /^((http(s){0,1}:\/\/))(www\.){0,1}/;
 			const normalizedDomain = domain.replace(regex, '');
 
-			return Promise.resolve(_.find(
-				this.get('sites'),
-				site => 
-					site.domain.replace(regex, '') === normalizedDomain
-				));
+			return Promise.resolve(
+				_.find(this.get('sites'), site => site.domain.replace(regex, '') === normalizedDomain)
+			);
 		};
 
 		this.getSiteById = function(siteId) {
@@ -167,12 +165,12 @@ var modelAPI = (module.exports = apiModule()),
 			return data;
 		};
 
-		this.getActiveAdServerData = function (networkName) {
+		this.getActiveAdServerData = function(networkName) {
 			var adServerSettings = this.get('adServerSettings');
 			var activeAdServerData = adServerSettings && adServerSettings[networkName];
 
 			return activeAdServerData || false;
-		};	
+		};
 
 		this.getNetworkDataSync = function(networkName, keys) {
 			var data = this.getNetworkDataObj(networkName),
@@ -209,24 +207,32 @@ var modelAPI = (module.exports = apiModule()),
 				}
 				var adNetworkSettings = me.get('adNetworkSettings');
 				var isExist = false;
-				if(adNetworkSettings.length && data.networkName === "ADSENSE" || data.networkName === "DFP"){
-					for (var i = 0; i < adNetworkSettings.length; i++){
-						switch(data.networkName){
-							case "ADSENSE": {
-								isExist = data.networkName === adNetworkSettings[i].networkName && data.adsenseEmail === adNetworkSettings[i].adsenseEmail && data.pubId === adNetworkSettings[i].pubId
+				if (
+					(adNetworkSettings.length && data.networkName === 'ADSENSE') ||
+					data.networkName === 'DFP'
+				) {
+					for (var i = 0; i < adNetworkSettings.length; i++) {
+						switch (data.networkName) {
+							case 'ADSENSE': {
+								isExist =
+									data.networkName === adNetworkSettings[i].networkName &&
+									data.adsenseEmail === adNetworkSettings[i].adsenseEmail &&
+									data.pubId === adNetworkSettings[i].pubId;
 								break;
 							}
-							case "DFP": {
-								isExist = data.networkName === adNetworkSettings[i].networkName && data.userInfo.email === adNetworkSettings[i].userInfo.email
+							case 'DFP': {
+								isExist =
+									data.networkName === adNetworkSettings[i].networkName &&
+									data.userInfo.email === adNetworkSettings[i].userInfo.email;
 								break;
 							}
 						}
 
-						if(isExist) break;
+						if (isExist) break;
 					}
 				}
 
-				if(!isExist){
+				if (!isExist) {
 					adNetworkSettings.push(data);
 					me.set('adNetworkSettings', adNetworkSettings);
 				}
@@ -454,68 +460,13 @@ function apiModule() {
 					});
 				});
 
-			return addSite.spread((user, site) => {
-				const validateSiteForDealCreation = user => {
-						const allSites = user.get('sites'),
-							isAllSites = !!(allSites && allSites.length);
-						let isNewSite = true;
-
-						if (!isAllSites) {
-							return Promise.resolve(false);
-						}
-
-						_.forEach(allSites, siteObject => {
-							const siteDomain = utils.domanize(siteObject.domain),
-								inputDomain = utils.domanize(domain),
-								isDomainMatch = !!(siteDomain === inputDomain),
-								isPipeDriveData = !!(
-									isDomainMatch &&
-									siteObject.pipeDrive &&
-									siteObject.pipeDrive.dealId &&
-									siteObject.pipeDrive.dealTitle
-								);
-
-							if (isPipeDriveData) {
-								isNewSite = false;
-								return false;
-							}
-						});
-
-						return Promise.resolve(isNewSite);
-					},
-					setNewDealForExistingUser = validateSiteForDealCreation(user).then(isSiteValidated => {
-						const api = {
-							params: { site: normalizedDomain },
-							options: { isExistingUser: true }
-						};
-
-						return getUser.then(user => {
-							const isAPIActivated = isPipeDriveAPIActivated(),
-								isEmailInBLockList = isEmailInAnalyticsBlockList(email);
-
-							if (!isSiteValidated || !isAPIActivated || isEmailInBLockList) {
-								return user;
-							}
-
-							return API.createNewPipeDriveDeal(api.params, user, api.options).spread(
-								(user, pipeDriveData) => {
-									const pipedriveParams = {
-										dealTitle: pipeDriveData.dealTitle || false,
-										dealId: pipeDriveData.dealId || false,
-										domain
-									};
-									return setSiteLevelPipeDriveData(user, pipedriveParams);
-								}
-							);
-						});
-					});
-
-				return setNewDealForExistingUser.then(user => {
-					return user.save().then(function(userObj) {
-						return [userObj, site.siteId];
-					});
+			return addSite
+				.spread(function(user, site) {
+					return Promise.join(user.save(), site);
+				})
+				.spread(function(userObj, site) {
+					return [userObj, site.siteId];
 				});
-			});
 		},
 		createUserFromJson: function(json) {
 			return Promise.resolve(new User(json));
@@ -692,7 +643,6 @@ function apiModule() {
 							})
 							.then(function(user) {
 								const isUserTypePartner = !!(json.userType && json.userType === 'partner'),
-									isAPIActivated = isPipeDriveAPIActivated(),
 									isManualTagActivated = isManualTagsActivated(),
 									isEmailInBLockList = isEmailInAnalyticsBlockList(json.email);
 
@@ -700,27 +650,14 @@ function apiModule() {
 									sendUserSignupMail(json).then(console.log);
 								}
 
-								if (isUserTypePartner || !isAPIActivated || isEmailInBLockList) {
+								if (isUserTypePartner || isEmailInBLockList) {
 									return [user, {}];
 								}
 
-								return API.createNewPipeDriveDeal(json, user, {});
+								return Promise.join(user, user.addSite(json.site, isManualTagActivated));
 							})
-							.spread(function(user, pipedriveData) {
-								const pipedriveParams = {
-										dealTitle: pipedriveData.dealTitle || false,
-										dealId: pipedriveData.dealId || false,
-										domain: json.site
-									},
-									isManualTagActivated = isManualTagsActivated() || false,
-									addUserSite = user.addSite(json.site, isManualTagActivated),
-									setPipeDriveData = addUserSite.then(addedSiteData => {
-										return setSiteLevelPipeDriveData(user, pipedriveParams);
-									});
-
-								return setPipeDriveData.then(function(user) {
-									return user.save();
-								});
+							.spread(function(user) {
+								return user.save();
 							})
 							.then(function(user) {
 								if (json.userType === 'partner') {
