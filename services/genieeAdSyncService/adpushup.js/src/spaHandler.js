@@ -9,7 +9,7 @@ var spaHandlerEnabled = false,
 			function reInitAdp() {
 				w.requestAnimationFrame(function() {
 					w.setTimeout(function() {
-						if (url !== w.location.href) {
+						if (url !== w.location.href && !adp.config.spaButUsingHook) {
 							url = w.location.href;
 							adp.init();
 						}
