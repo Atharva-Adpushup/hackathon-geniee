@@ -48,8 +48,8 @@ module.exports = React.createClass({
 		}
 	},
 	getComboxOptions() {
-		return this.props.section.allXpaths.map(xpath => {
-			return <ComboboxOption value={xpath}>{xpath}</ComboboxOption>;
+		return this.props.section.allXpaths.map((xpath, key) => {
+			return <ComboboxOption key={key} value={xpath}>{xpath}</ComboboxOption>;
 		});
 	},
 	handleXpathSelect(xpath) {

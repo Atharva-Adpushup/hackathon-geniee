@@ -31,6 +31,8 @@ class EditOptions extends Component {
 		this.adpushupSubmitHandler = this.adpushupSubmitHandler.bind(this);
 		this.customCSSEditorSubmit = this.customCSSEditorSubmit.bind(this);
 		this.notNearEditorSubmit = this.notNearEditorSubmit.bind(this);
+		this.toggleDeleteButton = this.toggleDeleteButton.bind(this);
+		this.saveCSSSubmit = this.saveCSSSubmit.bind(this);
 	}
 
 	onFloatSelectChange(float) {
@@ -65,7 +67,6 @@ class EditOptions extends Component {
 	};
 
 	adpushupSubmitHandler = (sectionPayload, adPayload) => {
-		console.log(sectionPayload, adPayload);
 		this.props.updateSection(this.props.section.id, sectionPayload);
 		this.props.updateAd(this.props.section.ads[0].id, adPayload);
 		this.toggleEditInteractiveAd();
@@ -85,6 +86,20 @@ class EditOptions extends Component {
 
 	toggleNotNearCSSEditor() {
 		this.setState({ toggleNotNearCSSEditor: !this.state.toggleNotNearCSSEditor });
+	}
+
+	toggleDeleteButton() {
+		this.setState({ showButton: !this.state.showButton });
+	}
+
+	saveCSSSubmit(adId, css) {
+		this.props.showNotification({
+			mode: 'success',
+			title: 'Operation Successful',
+			message: 'Ad custom CSS saved successfully'
+		});
+		this.props.onUpdateCss(adId, css);
+		this.toggleCustomCSSEditor();
 	}
 
 	customCSSEditorSubmit(adId, customCSS) {
@@ -122,6 +137,22 @@ class EditOptions extends Component {
 				/>
 			);
 		}
+		if (this.state.toggleCustomCSSEditor) {
+			const { ads } = this.props.section,
+			defaultCustomCSS = {
+				'margin-top': '0px',
+				'margin-right': '0px',
+				'margin-bottom': '0px',
+				'margin-left': '0px'
+			},
+			inContentAdCustomCSS = ads[0].css || defaultCustomCSS;
+			return (<CssEditor
+				css={inContentAdCustomCSS}
+				onSave={this.saveCSSSubmit.bind(null, ads[0].id)}
+				onCancel={this.toggleCustomCSSEditor}
+			/>)
+		}
+
 		if (this.state.editInteractiveAdData) {
 			return (
 				<AdPushupAds
@@ -148,12 +179,22 @@ class EditOptions extends Component {
 				variationId={this.props.variation.id}
 				editNetwork={this.toggleNetworkEditor}
 				editInteractiveAd={this.toggleEditInteractiveAd}
-				fromPanel={true}
 				showEventData={this.props.section.type == 3 ? true : false}
 				onUpdateOperation={this.props.onUpdateOperation}
 				onSetSectionType={this.props.onSetSectionType}
 				onFormatDataUpdate={this.props.onFormatDataUpdate}
 				onToggleLazyLoad={this.props.onToggleLazyLoad}
+
+				editCss={this.toggleCustomCSSEditor}
+				onUpdateXPath={this.props.onUpdateXPath}
+				onSectionAllXPaths={this.props.onSectionAllXPaths}
+				onValidateXPath={this.props.onValidateXPath}
+				onResetErrors={this.props.onResetErrors}
+				onRenameSection={this.props.onRenameSection}
+				showNotification={this.props.showNotification}
+				toggleDeleteButton={this.toggleDeleteButton}
+				updateAdSize={this.props.updateAdSize}
+				channelId={this.props.channelId}
 			/>
 		);
 	}

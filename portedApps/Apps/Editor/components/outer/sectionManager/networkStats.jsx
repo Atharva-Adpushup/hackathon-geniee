@@ -12,7 +12,7 @@ module.exports = React.createClass({
 			<div className="level-og">
 				{_(this.props.data.sizesStats).map(
 					function(sizeStats, size) {
-						return <SizeStats name={size} data={sizeStats} />;
+						return <SizeStats key={size} name={size} data={sizeStats} />;
 					}.bind(this)
 				)}
 			</div>

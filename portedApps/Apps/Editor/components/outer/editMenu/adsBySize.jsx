@@ -35,8 +35,8 @@ module.exports = React.createClass({
 						return (
 							<Panel header={network} eventKey={count} className="panelBySize">
 								<Row>
-									{_(ads).map(ad => {
-										return <AdsDescriptor ad={ad} />;
+									{_(ads).map((ad, key) => {
+										return <AdsDescriptor key={key} ad={ad} />;
 									})}
 								</Row>
 							</Panel>

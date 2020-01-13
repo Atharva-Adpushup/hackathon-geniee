@@ -74,9 +74,9 @@ module.exports = React.createClass({
 							<ul>
 								{_(this.props.sections).map(
 									function(section) {
-										if (section.stats)
+										if (section.stats, key)
 											return (
-												<SectionStats
+												<SectionStats key={section.id}
 													style={section.xpathMissing ? { backgroundColor: 'red' } : null}
 													onMouseOver={this.handleMouseOver.bind(this, section)}
 													name={section.name}
