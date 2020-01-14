@@ -194,7 +194,7 @@ var utils = require('../libs/utils'),
 					adpTags.display(computedDFPAdUnitId);
 				}
 			} else {
-				adCode.push('<div id="' + computedDFPAdUnitId + '">');
+				adCode.push('<div id="' + computedDFPAdUnitId + '" style="margin: 0 auto">');
 				adCode.push('<scr' + 'ipt type="text/javascript">');
 				adCode.push('window.adpushup.adpTags.que.push(function(){');
 				adCode.push('window.adpushup.adpTags.display("' + computedDFPAdUnitId + '");');
