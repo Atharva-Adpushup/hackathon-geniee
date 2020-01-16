@@ -291,7 +291,7 @@ function checkManageAdsTxtStatus(site) {
 			const output = {};
 			const isRedirecting = response.request.uri.href.indexOf(ADS_TXT_REDIRECT_PATTERN) !== -1;
 
-			isRedirecting ? (output['8'] = APP_KEYS['8']) : null;
+			isRedirecting ? (output['8'] = APP_KEYS['manageadstxt']) : null;
 			return output;
 		})
 		.catch(err => {
