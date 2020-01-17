@@ -63,6 +63,7 @@ module.exports = function(site, user) {
 				.digest('hex')
 				.substr(0, 64);
 			apConfigs.isSPA = apConfigs.isSPA ? apConfigs.isSPA : false;
+			apConfigs.spaButUsingHook = apConfigs.spaButUsingHook ? apConfigs.spaButUsingHook : false;
 			apConfigs.spaPageTransitionTimeout = apConfigs.spaPageTransitionTimeout
 				? apConfigs.spaPageTransitionTimeout
 				: 0;
