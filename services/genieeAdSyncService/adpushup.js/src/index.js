@@ -326,6 +326,8 @@ function initAdpQue() {
 }
 
 function main() {
+	//for SPAs: remove any interactive ad containers, if available
+	adp.$('.adp_interactive_ad').remove();
 	// Set user syncing cookies
 	syncUser();
 
@@ -354,7 +356,11 @@ function main() {
 	hookAndInit(adp, startCreation, browserConfig.platform);
 
 	// AdPushup Debug Force Variation
-	if (utils.getQueryParams && utils.getQueryParams().forceVariation && !adp.creationProcessStarted) {
+	if (
+		utils.getQueryParams &&
+		utils.getQueryParams().forceVariation &&
+		!adp.creationProcessStarted
+	) {
 		startCreation(true);
 		return false;
 	}
@@ -398,4 +404,6 @@ function main() {
 }
 
 adp.init = main;
-adp.init();
+if (!adp.config.isSPA && !adp.services.SPA_ACTIVE) {
+	adp.init();
+}
