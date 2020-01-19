@@ -5,9 +5,9 @@ var config = require('./config');
 var constants = require('./constants');
 var utils = require('./utils');
 var hb = require('./hb');
-var inventoryMapper = require('./inventoryMapper');
 var gpt = require('./gpt');
-var inventory = config.INVENTORY;
+var BACKWARD_COMPATIBLE_MAPPING = require('./constants').AD_SIZE_MAPPING.IAB_SIZES
+	.BACKWARD_COMPATIBLE_MAPPING;
 var adpTags = {
 	module: {
 		adpSlots: {},
@@ -67,10 +67,80 @@ var adpTags = {
 				constants.BATCHING_INTERVAL
 			);
 		},
+		getBiddersForSlot: function(size) {
+			var width = size[0];
+			var height = size[1];
+			var size = width + 'x' + height;
+			var bidders = [];
+			var prebidConfig = config.PREBID_CONFIG;
+			var hbConfig = prebidConfig.hbcf;
+
+			if (hbConfig && Object.keys(hbConfig).length) {
+				Object.keys(hbConfig).forEach(function(bidder) {
+					var bidderData = hbConfig[bidder];
+
+					if (!bidderData.isPaused) {
+						if (bidderData.sizeLess) {
+							bidders.push({
+								bidder: bidder,
+								params: bidderData.config
+							});
+						}
+
+						function getOriginalOrDownwardSizeBidderParams(
+							allSizesParams,
+							inventorySize
+						) {
+							if (!allSizesParams || !Object.keys(allSizesParams).length) return;
+
+							if (
+								inventorySize === 'responsivexresponsive' &&
+								allSizesParams['responsive']
+							)
+								return allSizesParams['responsive'];
+
+							if (allSizesParams[inventorySize]) return allSizesParams[inventorySize];
+
+							for (const originalSize in BACKWARD_COMPATIBLE_MAPPING) {
+								if (
+									originalSize === inventorySize &&
+									BACKWARD_COMPATIBLE_MAPPING[originalSize].length
+								) {
+									const backwardSizes = BACKWARD_COMPATIBLE_MAPPING[originalSize];
+
+									for (let backwardSize of backwardSizes) {
+										backwardSize = backwardSize.join('x');
+										if (allSizesParams[backwardSize])
+											return allSizesParams[backwardSize];
+									}
+
+									return;
+								}
+							}
+						}
+
+						if (!bidderData.sizeLess && bidderData.reusable) {
+							const bidderParams = getOriginalOrDownwardSizeBidderParams(
+								bidderData.config,
+								size
+							);
+
+							if (bidderParams) {
+								bidders.push({
+									bidder: bidder,
+									params: bidderParams
+								});
+							}
+						}
+					}
+				});
+			}
+
+			return bidders;
+		},
 		createSlot: function(containerId, size, placement, optionalParam) {
-			var adUnits = inventoryMapper.get(inventory, size, optionalParam);
-			var slotId = adUnits.dfpAdUnit;
-			var bidders = optionalParam.headerBidding ? adUnits.bidders : [];
+			var slotId = optionalParam.dfpAdunit;
+			var bidders = this.getBiddersForSlot(size);
 			var isResponsive = optionalParam.isResponsive;
 			var sectionName = optionalParam.sectionName;
 			var multipleAdSizes =
@@ -156,9 +226,6 @@ var adpTags = {
 
 		// Set adpTags if already present else initialise module
 		w.adpushup.adpTags = existingAdpTags.adpSlots ? existingAdpTags : adpTagsModule;
-
-		// Keep deep copy of inventory in adpTags module
-		w.adpushup.adpTags.defaultInventory = w.adpushup.$.extend(true, {}, inventory);
 
 		// Merge adpQue with any existing que items if present
 		w.adpushup.adpTags.que = w.adpushup.adpTags.que.concat(adpQue).concat(w.adpTags.que);

@@ -85,7 +85,6 @@ function destroyAdpSlots() {
 // Reset adpTags config and destroy all ADP slots
 function resetAdpTagsConfig() {
 	if (w.adpTags && w.adpTags.config) {
-		w.adpTags.config.INVENTORY = $.extend(true, {}, w.adpTags.defaultInventory);
 		w.adpTags.adpBatches = [];
 		w.adpTags.batchPrebiddingComplete = false;
 		w.adpTags.currentBatchAdpSlots = [];
@@ -354,7 +353,11 @@ function main() {
 	hookAndInit(adp, startCreation, browserConfig.platform);
 
 	// AdPushup Debug Force Variation
-	if (utils.getQueryParams && utils.getQueryParams().forceVariation && !adp.creationProcessStarted) {
+	if (
+		utils.getQueryParams &&
+		utils.getQueryParams().forceVariation &&
+		!adp.creationProcessStarted
+	) {
 		startCreation(true);
 		return false;
 	}

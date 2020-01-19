@@ -156,14 +156,14 @@ function HbProcessing(site, apConfigs) {
 }
 
 function init(site, computedConfig) {
-	const { apConfigs, adpTagsConfig } = computedConfig;
+	const { apConfigs, prebidConfig } = computedConfig;
 	let statusesAndAds = {
 		statuses: {
 			APTAG_ACTIVE: !!apConfigs.manualModeActive,
 			INNOVATIVE_ADS_ACTIVE: !!apConfigs.innovativeModeActive,
 
 			LAYOUT_ACTIVE: !!apConfigs.mode || false,
-			ADPTAG_ACTIVE: !!adpTagsConfig,
+			ADPTAG_ACTIVE: !!prebidConfig,
 			SPA_ACTIVE: !!apConfigs.isSPA,
 			GENIEE_ACTIVE: !!apConfigs.partner
 		},
@@ -172,8 +172,8 @@ function init(site, computedConfig) {
 	};
 
 	return Promise.join(HbProcessing(site, apConfigs), gdprProcessing(site), (hb, gdpr) => {
-		if (adpTagsConfig.prebidConfig) {
-			adpTagsConfig.prebidConfig.currencyConfig = hb.config.prebidCurrencyConfigObj;
+		if (prebidConfig) {
+			prebidConfig.currencyConfig = hb.config.prebidCurrencyConfigObj;
 			delete hb.config.prebidCurrencyConfigObj;
 		}
 
@@ -187,7 +187,7 @@ function init(site, computedConfig) {
 			},
 			ads: {
 				...hb.ads,
-				adpTags: adpTagsConfig,
+				adpTags: prebidConfig,
 				layoutInventory: apConfigs.experiment
 			},
 			config: {
@@ -198,7 +198,7 @@ function init(site, computedConfig) {
 
 		return {
 			apConfigs,
-			adpTagsConfig,
+			prebidConfig,
 			statusesAndAds
 		};
 	}).catch(err => {

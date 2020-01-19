@@ -35,7 +35,7 @@ var hb = {
 			}
 
 			var computedBidders = JSON.parse(JSON.stringify(adpSlot.bidders));
-			var sizeConfig = config.INVENTORY.deviceConfig.sizeConfig;
+			var sizeConfig = config.PREBID_CONFIG.deviceConfig.sizeConfig;
 
 			computedBidders.forEach(function(val, i) {
 				// find size config of current bidder
