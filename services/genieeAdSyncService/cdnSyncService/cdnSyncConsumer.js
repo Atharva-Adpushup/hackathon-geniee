@@ -9,7 +9,7 @@ const getReportData = require('../../../reports/universal/index');
 const mkdirpAsync = Promise.promisifyAll(require('mkdirp')).mkdirpAsync;
 const fs = Promise.promisifyAll(require('fs'));
 const CC = require('../../../configs/commonConsts');
-const generateADPTagsConfig = require('./generateADPTagsConfig');
+const generatePrebidConfig = require('./generatePrebidConfig');
 const generateAdPushupConfig = require('./generateAdPushupConfig');
 const config = require('../../../configs/config');
 const generateStatusesAndConfig = require('./generateConfig');
@@ -50,7 +50,7 @@ module.exports = function(site, user) {
 			let apConfigs = site.get('apConfigs');
 			const adServerSettings = user.get('adServerSettings');
 			let isAdPartner = !!site.get('partner');
-			let { experiment, adpTagsConfig, manualAds, innovativeAds } = combinedConfig;
+			let { experiment, prebidConfig, manualAds, innovativeAds } = combinedConfig;
 
 			isAdPartner ? (apConfigs.partner = site.get('partner')) : null;
 
@@ -86,19 +86,19 @@ module.exports = function(site, user) {
 			apConfigs.experiment = experiment;
 			delete apConfigs.pageGroupPattern;
 
-			return { apConfigs, adpTagsConfig };
+			return { apConfigs, prebidConfig };
 		},
 		generateCombinedJson = (experiment, adpTags, manualAds, innovativeAds) => {
 			if (!(Array.isArray(adpTags) && adpTags.length)) {
 				return {
 					experiment,
-					adpTagsConfig: false,
+					prebidConfig: false,
 					manualAds,
 					innovativeAds
 				};
 			}
-			return generateADPTagsConfig(adpTags, site.get('siteId')).then(adpTagsConfig => ({
-				adpTagsConfig,
+			return generatePrebidConfig(site.get('siteId')).then(prebidConfig => ({
+				prebidConfig,
 				experiment,
 				manualAds,
 				innovativeAds
@@ -109,14 +109,8 @@ module.exports = function(site, user) {
 				addService: (serviceName, isActive, serviceConfig = {}) => {
 					switch (serviceName) {
 						case CC.SERVICES.ADPTAGS:
-							var prebidConfig = serviceConfig.prebidConfig;
-							var inventory = Object.assign({}, serviceConfig);
-							delete inventory.prebidConfig;
-							delete inventory.dateCreated;
-							delete inventory.dateModified;
-							delete inventory.siteId;
+							var prebidConfig = serviceConfig;
 							if (isActive) {
-								jsFile = _.replace(jsFile, '__INVENTORY__', JSON.stringify(inventory));
 								jsFile = _.replace(jsFile, '__PREBID_CONFIG__', JSON.stringify(prebidConfig));
 								jsFile = _.replace(jsFile, '__SITE_ID__', site.get('siteId'));
 							}
@@ -177,7 +171,7 @@ module.exports = function(site, user) {
 				.then(generatedConfig => prebidGeneration(generatedConfig))
 				.then(generatedConfig => bundleGeneration(site, generatedConfig))
 				.spread((generatedConfig, bundle) => {
-					let { apConfigs, adpTagsConfig, statusesAndAds: finalConfig } = generatedConfig;
+					let { apConfigs, prebidConfig, statusesAndAds: finalConfig } = generatedConfig;
 
 					if (site.get('medianetId')) apConfigs.medianetId = site.get('medianetId');
 
@@ -187,7 +181,7 @@ module.exports = function(site, user) {
 
 					// Generate final init script based on the services that are enabled
 					var uncompressed = generateFinalInitScript(bundle)
-						.addService(CC.SERVICES.ADPTAGS, finalConfig.statuses.ADPTAG_ACTIVE, adpTagsConfig)
+						.addService(CC.SERVICES.ADPTAGS, finalConfig.statuses.ADPTAG_ACTIVE, prebidConfig)
 						.addService(CC.SERVICES.HEADER_BIDDING, finalConfig.statuses.HB_ACTIVE, {
 							deviceConfig: finalConfig.config.deviceConfig,
 							prebidCurrencyConfig: finalConfig.config.prebidCurrencyConfig

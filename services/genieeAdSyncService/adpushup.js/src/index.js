@@ -85,7 +85,6 @@ function destroyAdpSlots() {
 // Reset adpTags config and destroy all ADP slots
 function resetAdpTagsConfig() {
 	if (w.adpTags && w.adpTags.config) {
-		w.adpTags.config.INVENTORY = $.extend(true, {}, w.adpTags.defaultInventory);
 		w.adpTags.adpBatches = [];
 		w.adpTags.batchPrebiddingComplete = false;
 		w.adpTags.currentBatchAdpSlots = [];

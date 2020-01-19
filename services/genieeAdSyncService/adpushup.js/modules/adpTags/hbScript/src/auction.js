@@ -30,7 +30,7 @@ var auction = {
 		});
 	},
 	getSizeConfig: function() {
-		var sizeConfigFromDB = config.INVENTORY.deviceConfig.sizeConfig;
+		var sizeConfigFromDB = config.PREBID_CONFIG.deviceConfig.sizeConfig;
 		var pbSizeConfig = [];
 		var labelIndexTracker = {};
 
@@ -59,7 +59,7 @@ var auction = {
 		return pbSizeConfig;
 	},
 	getBidderSettings: function() {
-		var bidders = config.INVENTORY.hbcf;
+		var bidders = config.PREBID_CONFIG.hbcf;
 		var keys = constants.ADSERVER_TARGETING_KEYS;
 
 		// Set custom default key value pairs
@@ -108,7 +108,7 @@ var auction = {
 		return bidderSettings;
 	},
 	setBidderAliases(pbjs) {
-		const bidders = config.INVENTORY.hbcf;
+		const bidders = config.PREBID_CONFIG.hbcf;
 		for (const bidderCode in bidders) {
 			if (bidders.hasOwnProperty(bidderCode) && bidders[bidderCode].alias) {
 				pbjs.aliasBidder(bidders[bidderCode].alias, bidderCode);
