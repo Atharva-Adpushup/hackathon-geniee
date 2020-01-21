@@ -85,7 +85,8 @@ module.exports = {
 		ADPTAGS: 'ADPTAGS',
 		HEADER_BIDDING: 'HEADER_BIDDING',
 		GDPR: 'GDPR',
-		INNOVATIVE_ADS: 'INNOVATIVE_ADS'
+		INNOVATIVE_ADS: 'INNOVATIVE_ADS',
+		AP_LITE: 'AP_LITE'
 	},
 	INJECTION_TECHNIQUES: {
 		LAYOUT: 1,
@@ -410,7 +411,8 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		interactiveAds: 'fmrt::',
 		user: 'user::',
 		hb: 'hbdc::',
-		adsTxt: 'adtx::'
+		adsTxt: 'adtx::',
+		apLite: 'aplt::'
 	},
 	tagManagerInitialDoc: {
 		siteId: null,

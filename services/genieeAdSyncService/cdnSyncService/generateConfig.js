@@ -30,9 +30,9 @@ function getPrebidModules(hbcf) {
 
 function gdprProcessing(site) {
 	const config = site.get('gdpr');
-	const apps = site.get('apps') || { consentManagement: false };
+	const apps = site.get('apps');
 	return {
-		status: config && config.compliance && apps.consentManagement,
+		status: !!(config && config.compliance && apps && apps.consentManagement),
 		config: {
 			gdpr: config
 		}
@@ -59,113 +59,139 @@ function getActiveUsedBiddersWithAdapter(usedBidders, biddersFromNetworkTree) {
 function HbProcessing(site, apConfigs) {
 	const siteId = site.get('siteId');
 	const email = site.get('ownerEmail');
-	const apps = site.get('apps') || { headerBidding: false, apTag: false, innovativeAds: false };
-	const { apTag, innovativeAds } = apps;
+	const apps = site.get('apps') || {
+		headerBidding: false,
+		apTag: false,
+		innovativeAds: false,
+		apLite: false
+	};
+	const { apTag, innovativeAds, apLite } = apps;
 
 	return Promise.join(
 		getHbConfig(siteId),
 		getBiddersFromNetworkTree(),
-		siteModel.getIncontentAndHbAds(siteId),
-		userModel.getUserByEmail(email),
-		getHbAdsApTag(siteId, apTag),
-		getHbAdsInnovativeAds(siteId, innovativeAds),
-		(hbcf, biddersFromNetworkTree, incontentAndHbAds, user, hbAdsApTag, hbAdsInnovativeAds) => {
-			let { incontentAds = [], hbAds = [] } = incontentAndHbAds;
-			hbAds = hbAds.concat(hbAdsApTag); // Final Hb Ads
-			const isValidHBConfig = !!(
-				apps.headerBidding &&
-				hbcf.value &&
-				hbcf.value.hbcf &&
-				Object.keys(hbcf.value.hbcf).length &&
-				(hbAds.length || hbAdsInnovativeAds.length)
+		userModel.getUserByEmail(email)
+	)
+		.then(data => {
+			if (apLite) return data;
+
+			return Promise.join(
+				...data,
+				siteModel.getIncontentAndHbAds(siteId),
+				getHbAdsApTag(siteId, apTag),
+				getHbAdsInnovativeAds(siteId, innovativeAds)
 			);
+		})
+		.then(
+			([
+				hbcf,
+				biddersFromNetworkTree,
+				user,
+				incontentAndHbAds = {},
+				hbAdsApTag = [],
+				hbAdsInnovativeAds = []
+			]) => {
+				let { incontentAds = [], hbAds = [] } = incontentAndHbAds;
+				hbAds = hbAds.concat(hbAdsApTag); // Final Hb Ads
 
-			if (!isValidHBConfig) {
-				// Returning default response if HB is not active
-				return {
-					status: false,
-					ads: {
-						incontentAds
-					},
-					config: {}
-				};
-			}
+				const isValidHBConfig = !!(
+					apps.headerBidding &&
+					hbcf.value &&
+					hbcf.value.hbcf &&
+					Object.keys(hbcf.value.hbcf).length &&
+					(apLite || hbAds.length || hbAdsInnovativeAds.length)
+				);
 
-			hbcf.value.hbcf = getActiveUsedBiddersWithAdapter(hbcf.value.hbcf, biddersFromNetworkTree);
+				if (!isValidHBConfig) {
+					// Returning default response if HB is not active
+					const resp = {
+						status: false,
+						ads: {},
+						config: {}
+					};
 
-			const adServerSettings = user.get('adServerSettings');
-			const isValidCurrencyCnfg =
-				adServerSettings &&
-				adServerSettings.dfp &&
-				isValidThirdPartyDFPAndCurrency(adServerSettings.dfp);
-			let computedPrebidCurrencyConfig = {};
-			let deviceConfig = '';
-			let prebidCurrencyConfig = '';
-			let prebidAdapters = getPrebidModules(hbcf);
+					if (!apLite) resp.ads = { incontentAds };
 
-			if (isValidCurrencyCnfg) {
-				const activeAdServer = adServerSettings.dfp;
-				computedPrebidCurrencyConfig = {
-					adServerCurrency: activeAdServer.activeDFPCurrencyCode,
-					granularityMultiplier: Number(activeAdServer.prebidGranularityMultiplier) || 1,
-					rates: activeAdServer.activeDFPCurrencyExchangeRate
-				};
-			}
-
-			const isValidCurrencyConfig = !!(
-				isValidHBConfig &&
-				computedPrebidCurrencyConfig &&
-				Object.keys(computedPrebidCurrencyConfig).length &&
-				computedPrebidCurrencyConfig.adServerCurrency &&
-				computedPrebidCurrencyConfig.granularityMultiplier &&
-				computedPrebidCurrencyConfig.rates
-			);
-
-			if (isValidHBConfig) {
-				deviceConfig = hbcf.value.deviceConfig;
-
-				deviceConfig =
-					deviceConfig && deviceConfig.sizeConfig.length
-						? `,sizeConfig: ${JSON.stringify(deviceConfig.sizeConfig)}`
-						: '';
-
-				prebidAdapters = `${prebidAdapters},schain`;
-
-				if (isValidCurrencyConfig) {
-					prebidCurrencyConfig = `,currency: ${JSON.stringify(computedPrebidCurrencyConfig)}`;
-					prebidAdapters = `${prebidAdapters},currency`;
+					return resp;
 				}
-			}
 
-			return {
-				status: isValidHBConfig,
-				ads: {
-					hbAds,
-					incontentAds
-				},
-				config: {
-					deviceConfig: deviceConfig || '',
-					prebidCurrencyConfig: prebidCurrencyConfig || '',
-					prebidCurrencyConfigObj: computedPrebidCurrencyConfig,
-					hbcf,
-					prebidAdapters
+				hbcf.value.hbcf = getActiveUsedBiddersWithAdapter(hbcf.value.hbcf, biddersFromNetworkTree);
+
+				const adServerSettings = user.get('adServerSettings');
+				const isValidCurrencyCnfg =
+					adServerSettings &&
+					adServerSettings.dfp &&
+					isValidThirdPartyDFPAndCurrency(adServerSettings.dfp);
+				let computedPrebidCurrencyConfig = {};
+				let deviceConfig = '';
+				let prebidCurrencyConfig = '';
+				let prebidAdapters = getPrebidModules(hbcf);
+
+				if (isValidCurrencyCnfg) {
+					const activeAdServer = adServerSettings.dfp;
+					computedPrebidCurrencyConfig = {
+						adServerCurrency: activeAdServer.activeDFPCurrencyCode,
+						granularityMultiplier: Number(activeAdServer.prebidGranularityMultiplier) || 1,
+						rates: activeAdServer.activeDFPCurrencyExchangeRate
+					};
 				}
-			};
-		}
-	);
+
+				const isValidCurrencyConfig = !!(
+					isValidHBConfig &&
+					computedPrebidCurrencyConfig &&
+					Object.keys(computedPrebidCurrencyConfig).length &&
+					computedPrebidCurrencyConfig.adServerCurrency &&
+					computedPrebidCurrencyConfig.granularityMultiplier &&
+					computedPrebidCurrencyConfig.rates
+				);
+
+				if (isValidHBConfig) {
+					deviceConfig = hbcf.value.deviceConfig;
+
+					deviceConfig =
+						deviceConfig && deviceConfig.sizeConfig.length
+							? `,sizeConfig: ${JSON.stringify(deviceConfig.sizeConfig)}`
+							: '';
+
+					prebidAdapters = `${prebidAdapters},schain`;
+
+					if (isValidCurrencyConfig) {
+						prebidCurrencyConfig = `,currency: ${JSON.stringify(computedPrebidCurrencyConfig)}`;
+						prebidAdapters = `${prebidAdapters},currency`;
+					}
+				}
+
+				const output = {
+					status: isValidHBConfig,
+					ads: {},
+					config: {
+						deviceConfig: deviceConfig || '',
+						prebidCurrencyConfig: prebidCurrencyConfig || '',
+						prebidCurrencyConfigObj: computedPrebidCurrencyConfig,
+						hbcf,
+						prebidAdapters
+					}
+				};
+
+				if (!apLite) output.ads = { hbAds, incontentAds };
+
+				return output;
+			}
+		);
 }
 
 function init(site, computedConfig) {
-	const { apConfigs, prebidConfig } = computedConfig;
+	const apps = site.get('apps');
+	const { apConfigs, prebidConfig, apLiteConfig } = computedConfig;
 	let statusesAndAds = {
 		statuses: {
 			APTAG_ACTIVE: !!apConfigs.manualModeActive,
 			INNOVATIVE_ADS_ACTIVE: !!apConfigs.innovativeModeActive,
-
-			LAYOUT_ACTIVE: !!apConfigs.mode || false,
+			LAYOUT_ACTIVE: !(apps && apps.apLite) && !!apConfigs.mode,
 			ADPTAG_ACTIVE: !!prebidConfig,
 			SPA_ACTIVE: !!apConfigs.isSPA,
-			GENIEE_ACTIVE: !!apConfigs.partner
+			GENIEE_ACTIVE: !!apConfigs.partner,
+			AP_LITE: !!(apps && apps.apLite && apLiteConfig)
 		},
 		ads: {},
 		config: {}
@@ -187,8 +213,7 @@ function init(site, computedConfig) {
 			},
 			ads: {
 				...hb.ads,
-				adpTags: prebidConfig,
-				layoutInventory: apConfigs.experiment
+				adpTags: prebidConfig
 			},
 			config: {
 				...hb.config,
@@ -196,11 +221,17 @@ function init(site, computedConfig) {
 			}
 		};
 
-		return {
+		if (!(apps && apps.apLite)) statusesAndAds.ads.layoutInventory = apConfigs.experiment;
+
+		const output = {
 			apConfigs,
 			prebidConfig,
 			statusesAndAds
 		};
+
+		if (apps && apps.apLite) output.apLiteConfig = apLiteConfig;
+
+		return output;
 	}).catch(err => {
 		console.log(
 			`Error while creating generate config for site ${site.get('siteId')} and Error is ${err}`
