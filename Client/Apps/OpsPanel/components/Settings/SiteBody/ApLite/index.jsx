@@ -6,15 +6,10 @@ import CustomButton from '../../../../../../Components/CustomButton/index';
 import FieldGroup from '../../../../../../Components/Layout/FieldGroup.jsx';
 import CustomToggleSwitch from '../../../../../../Components/CustomToggleSwitch/index';
 import SelectBox from '../../../../../../Components/SelectBox/index';
-
-const REFRESH_RATE_ENTRIES = [
-	{ name: '30 seconds', value: '30s' },
-	{ name: '40 seconds', value: '40s' },
-	{ name: '50 seconds', value: '50s' }
-];
+import { REFRESH_RATE_ENTRIES } from '../../../../configs/commonConsts';
 
 class ApLite extends Component {
-	state = { view: 'list', adRefresh: true, selectedRefreshRate: null };
+	state = { view: 'list', adRefresh: true, selectedRefreshRate: REFRESH_RATE_ENTRIES[0].value };
 
 	handleSelect = value => {
 		this.setState({

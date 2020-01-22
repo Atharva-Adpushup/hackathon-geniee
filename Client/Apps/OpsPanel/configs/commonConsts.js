@@ -472,6 +472,12 @@ const HB_BIDDERS_KEYS_NULL_SHOULD_NOT_BE_NULL = [
 	'params'
 ];
 
+const REFRESH_RATE_ENTRIES = [
+	{ name: '30 seconds', value: '30s (default)' },
+	{ name: '40 seconds', value: '40s' },
+	{ name: '50 seconds', value: '50s' }
+];
+
 export {
 	OP_NAV_ITEMS,
 	OP_NAV_ITEMS_INDEXES,
@@ -495,5 +501,6 @@ export {
 	ERROR_REPORT_PROPS,
 	PREBID_CURRENCY_URL,
 	ADS_TXT_LIVE_SITES_ENTRIES,
-	HB_BIDDERS_KEYS_NULL_SHOULD_NOT_BE_NULL
+	HB_BIDDERS_KEYS_NULL_SHOULD_NOT_BE_NULL,
+	REFRESH_RATE_ENTRIES
 };
