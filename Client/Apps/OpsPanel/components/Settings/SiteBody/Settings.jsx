@@ -155,6 +155,7 @@ class Settings extends Component {
 			status
 		} = this.state;
 		const { site } = this.props;
+
 		const { siteId, siteDomain } = site;
 		const effectRevenueShareDate = formatDate(+new Date(), 'subtract', 2);
 

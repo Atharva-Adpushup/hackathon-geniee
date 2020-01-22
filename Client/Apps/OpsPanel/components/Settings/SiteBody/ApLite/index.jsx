@@ -11,6 +11,14 @@ import { REFRESH_RATE_ENTRIES } from '../../../../configs/commonConsts';
 class ApLite extends Component {
 	state = { view: 'list', adRefresh: true, selectedRefreshRate: REFRESH_RATE_ENTRIES[0].value };
 
+	componentDidMount() {
+		const {
+			fetchHBInitDataAction,
+			site: { siteId }
+		} = this.props;
+		fetchHBInitDataAction(siteId);
+	}
+
 	handleSelect = value => {
 		this.setState({
 			activeKey: value
@@ -30,6 +38,17 @@ class ApLite extends Component {
 		this.setState({ [key]: value });
 	};
 
+	getHbStatus(setupStatus) {
+		const { dfpConnected, biddersFound, adServerSetupStatus, isPublisherActiveDfp } = setupStatus;
+		if (dfpConnected && biddersFound && adServerSetupStatus === 2 && isPublisherActiveDfp) {
+			return 'Complete';
+		}
+		if (dfpConnected && !biddersFound && adServerSetupStatus === 2 && isPublisherActiveDfp) {
+			return 'HB Setup Complete(No Bidders Active)';
+		}
+		return 'Pending';
+	}
+
 	getNetworkName(adNetworkSettings, activeDFPNetworkId) {
 		const dfPNetworkNameField = adNetworkSettings.filter(val => val.networkName === 'DFP')[0] || {};
 		const matchDfpAccount =
@@ -46,11 +65,15 @@ class ApLite extends Component {
 		};
 		const {
 			site,
-			userData: { adServerSettings, adNetworkSettings }
+			userData: { adServerSettings, adNetworkSettings },
+			headerBiddingData
 		} = this.props;
 
 		const { siteId, siteDomain } = site;
 		const { selectedRefreshRate, adRefresh } = this.state;
+
+		const { setupStatus } = headerBiddingData[siteId];
+		const hbStatus = this.getHbStatus(setupStatus);
 
 		const activeDFPNetworkId = adServerSettings.hasOwnProperty('dfp')
 			? adServerSettings.dfp.activeDFPNetwork
@@ -79,7 +102,7 @@ class ApLite extends Component {
 				/>
 				<FieldGroup
 					name="HB App"
-					value="hello"
+					value={hbStatus}
 					isTextOnly
 					textOnlyStyles={styles}
 					label="HB App"
