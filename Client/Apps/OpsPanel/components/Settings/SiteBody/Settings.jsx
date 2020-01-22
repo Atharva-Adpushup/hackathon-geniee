@@ -6,11 +6,14 @@ import FieldGroup from '../../../../../Components/Layout/FieldGroup';
 import InputBox from '../../../../../Components/InputBox/index';
 import CustomButton from '../../../../../Components/CustomButton/index';
 import { formatDate } from '../../../../../helpers/commonFunctions';
+import { ADPUSHUP_NETWORK_ID } from '../../../../../../configs/commonConsts';
 
 class Settings extends Component {
 	constructor(props) {
 		super(props);
 		const { site } = props;
+		const { apps = {} } = site;
+
 		const {
 			isSPA = false,
 			spaPageTransitionTimeout = 0,
@@ -20,6 +23,7 @@ class Settings extends Component {
 			adsLabel = 'Advertisement'
 		} = site.apConfigs || {};
 		const { revenueShare = 10 } = site.adNetworkSettings || {};
+		const status = Object.prototype.hasOwnProperty.call(apps, 'apLite') ? apps.apLite : undefined;
 
 		this.state = {
 			isSPA,
@@ -28,16 +32,49 @@ class Settings extends Component {
 			poweredByBanner,
 			isAdsLabelOn,
 			adsLabel,
-			revenueShare
+			revenueShare,
+			status,
+			isLoading: false
 		};
 	}
 
 	handleToggle = (value, event) => {
 		const attributeValue = event.target.getAttribute('name');
+		const {
+			userData: { adServerSettings },
+			updateAppStatus,
+			site
+		} = this.props;
+		const { status } = this.state;
 		const name = attributeValue.split('-')[0];
-		this.setState({
-			[name]: value
-		});
+		if (name !== 'apLite') {
+			this.setState({
+				[name]: value
+			});
+		} else if (
+			name === 'apLite' &&
+			adServerSettings.hasOwnProperty('dfp') &&
+			adServerSettings.dfp.activeDFPNetwork === ADPUSHUP_NETWORK_ID.toString() &&
+			value
+		) {
+			alert('AP Lite can not be enabled');
+			this.setState({ [name]: false });
+		} else if (name === 'apLite' && value) {
+			const val = confirm('Are you sure you want to enable AP Lite ?');
+			if (val) {
+				this.setState({ [name]: value, isLoading: true });
+
+				return updateAppStatus(site.siteId, {
+					app: 'apLite',
+					value
+				}).then(() => this.setState({ isLoading: false, status: value }));
+			} else {
+				this.setState({ [name]: false });
+			}
+		} else {
+			alert(`you can't disable AP Lite`);
+			this.setState({ [name]: true });
+		}
 	};
 
 	handleChange = e => {
@@ -96,6 +133,7 @@ class Settings extends Component {
 				isAdsLabelOn,
 				adsLabel
 			},
+
 			adNetworkSettings: {
 				revenueShare: Number(revenueShare)
 			}
@@ -110,7 +148,8 @@ class Settings extends Component {
 			poweredByBanner,
 			isAdsLabelOn,
 			adsLabel,
-			revenueShare
+			revenueShare,
+			status
 		} = this.state;
 		const { site } = this.props;
 		const { siteId, siteDomain } = site;
@@ -118,6 +157,19 @@ class Settings extends Component {
 
 		return (
 			<Col xs={4} style={{ borderRight: '1px dashed #ccc' }}>
+				<CustomToggleSwitch
+					labelText="AP Lite"
+					className="u-margin-b4 negative-toggle"
+					checked={status}
+					onChange={this.handleToggle}
+					layout="horizontal"
+					size="m"
+					on="Yes"
+					off="No"
+					defaultLayout
+					name={`apLite-${siteId}-${siteDomain}`}
+					id={`js-apLite-${siteId}-${siteDomain}`}
+				/>
 				<CustomToggleSwitch
 					labelText="Powered By AdPushup"
 					className="u-margin-b4 negative-toggle"

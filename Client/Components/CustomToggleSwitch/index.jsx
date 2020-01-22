@@ -25,6 +25,12 @@ class customToggleSwitch extends React.Component {
 		if (checked !== nextProps.checked) {
 			this.setState({ value: nextProps.checked });
 		}
+		if (checked === false && nextProps.checked === false) {
+			this.setState({ value: false });
+		}
+		if (checked === true && nextProps.checked === true) {
+			this.setState({ value: true });
+		}
 	}
 
 	componentWillUnmount() {

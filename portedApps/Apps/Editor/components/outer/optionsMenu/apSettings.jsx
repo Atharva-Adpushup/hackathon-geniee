@@ -72,9 +72,12 @@ module.exports = React.createClass({
 				break;
 
 			case 'trafficDistribution':
-				this.setState({ manageTrafficDistribution: !this.state.manageTrafficDistribution }, function() {
-					this.props.onUpdate();
-				});
+				this.setState(
+					{ manageTrafficDistribution: !this.state.manageTrafficDistribution },
+					function() {
+						this.props.onUpdate();
+					}
+				);
 		}
 	},
 	toggleExplicitPlatform: function(value) {
@@ -169,7 +172,9 @@ module.exports = React.createClass({
 		if (this.state.managePageGroupPattern) {
 			var listArr = this.isAdRecoverInSite()
 				? this.props.apConfigs.adRecover.pageGroupPattern
-				: this.props.isApex ? this.props.apConfigs.pageGroupPattern || [] : [];
+				: this.props.isApex
+				? this.props.apConfigs.pageGroupPattern || []
+				: [];
 
 			return (
 				<TextRangeListManager
@@ -193,7 +198,8 @@ module.exports = React.createClass({
 			);
 		}
 
-		var isChanged = Utils.deepDiffMapper.test(this.state, this.getInitialState(this.props)).isChanged;
+		var isChanged = Utils.deepDiffMapper.test(this.state, this.getInitialState(this.props))
+			.isChanged;
 		return (
 			<div className="containerButtonBar sm-pad">
 				<Row>
@@ -263,7 +269,7 @@ module.exports = React.createClass({
 						/>
 					</Col>
 				</Row>
-				<Row>
+				{/* <Row>
 					<Col className="u-padding-r10px" xs={12}>
 						<Button
 							className="btn-lightBg btn-edit"
@@ -272,7 +278,7 @@ module.exports = React.createClass({
 							Manage BlockList
 						</Button>
 					</Col>
-				</Row>
+				</Row> */}
 				{this.isAdRecoverInSite() || this.props.isApex ? this.renderPageGroupPatternLayout() : null}
 				{this.props.isApex ? this.renderTrafficDistributionLayout() : null}
 

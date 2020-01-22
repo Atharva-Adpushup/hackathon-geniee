@@ -16,6 +16,7 @@ import CustomButton from '../../../../Components/CustomButton/index';
 import CustomMessage from '../../../../Components/CustomMessage/index';
 import SelectBox from '../../../../Components/SelectBox';
 import Loader from '../../../../Components/Loader/index';
+import { ADPUSHUP_NETWORK_ID } from '../../../../../configs/commonConsts';
 
 class Account extends Component {
 	constructor(props) {
@@ -81,6 +82,7 @@ class Account extends Component {
 		adNetworkSettings.forEach(network => {
 			if (network.networkName === 'DFP') {
 				const { dfpAccounts } = network;
+
 				const filteredAccounts = dfpAccounts.filter(
 					account => `${account.code}-${account.dfpParentId}-${account.currencyCode}` === code
 				);
@@ -231,7 +233,18 @@ class Account extends Component {
 			originalactiveDFP,
 			loading
 		} = this.state;
-		const { user } = this.props;
+
+		const { user, sites } = this.props;
+		const { adServerSettings } = user;
+
+		const siteIds = Object.keys(sites);
+
+		const apLiteSites = siteIds.filter(siteId => {
+			const site = sites[siteId];
+			const { apps = {} } = site;
+			if (apps.hasOwnProperty('apLite') && apps.apLite) return apps;
+		});
+
 		const { adNetworkSettings = [] } = user;
 		const activeDFPName = this.getActiveDFPName(adNetworkSettings, activeDFP);
 		const isDFPSetup = !!activeDFP;
@@ -283,15 +296,25 @@ class Account extends Component {
 				) : (
 					<Fragment>
 						<p className="u-text-bold">Select Google Ad Manager</p>
-						<SelectBox
-							onSelect={this.handleToggle}
-							options={dfpAccounts}
-							title="Select Google Ad Manager"
-							selected={activeDFP}
-							id="accounts-dfp-select"
-							wrapperClassName="u-margin-v4"
-							dataKey="activeDFP"
-						/>
+						{apLiteSites.length && !adServerSettings.hasOwnProperty('dfp') ? (
+							<div className="u-margin-b4">Please add a Third Party DFP Network</div>
+						) : (
+							<SelectBox
+								onSelect={this.handleToggle}
+								options={
+									!apLiteSites.length
+										? dfpAccounts
+										: dfpAccounts.filter(
+												val => val.name.split('-')[0].trim() !== ADPUSHUP_NETWORK_ID.toString()
+										  )
+								}
+								title="Select Google Ad Manager"
+								selected={activeDFP}
+								id="accounts-dfp-select"
+								wrapperClassName="u-margin-v4"
+								dataKey="activeDFP"
+							/>
+						)}
 					</Fragment>
 				)}
 				<FieldGroup
