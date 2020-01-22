@@ -67,6 +67,30 @@ var adpTags = {
 				constants.BATCHING_INTERVAL
 			);
 		},
+		getOriginalOrDownwardSizeBidderParams: function(allSizesParams, inventorySize) {
+			if (!allSizesParams || !Object.keys(allSizesParams).length) return;
+
+			if (inventorySize === 'responsivexresponsive' && allSizesParams['responsive'])
+				return allSizesParams['responsive'];
+
+			if (allSizesParams[inventorySize]) return allSizesParams[inventorySize];
+
+			for (const originalSize in BACKWARD_COMPATIBLE_MAPPING) {
+				if (
+					originalSize === inventorySize &&
+					BACKWARD_COMPATIBLE_MAPPING[originalSize].length
+				) {
+					const backwardSizes = BACKWARD_COMPATIBLE_MAPPING[originalSize];
+
+					for (let backwardSize of backwardSizes) {
+						backwardSize = backwardSize.join('x');
+						if (allSizesParams[backwardSize]) return allSizesParams[backwardSize];
+					}
+
+					return;
+				}
+			}
+		},
 		getBiddersForSlot: function(size) {
 			var width = size[0];
 			var height = size[1];
@@ -87,40 +111,8 @@ var adpTags = {
 							});
 						}
 
-						function getOriginalOrDownwardSizeBidderParams(
-							allSizesParams,
-							inventorySize
-						) {
-							if (!allSizesParams || !Object.keys(allSizesParams).length) return;
-
-							if (
-								inventorySize === 'responsivexresponsive' &&
-								allSizesParams['responsive']
-							)
-								return allSizesParams['responsive'];
-
-							if (allSizesParams[inventorySize]) return allSizesParams[inventorySize];
-
-							for (const originalSize in BACKWARD_COMPATIBLE_MAPPING) {
-								if (
-									originalSize === inventorySize &&
-									BACKWARD_COMPATIBLE_MAPPING[originalSize].length
-								) {
-									const backwardSizes = BACKWARD_COMPATIBLE_MAPPING[originalSize];
-
-									for (let backwardSize of backwardSizes) {
-										backwardSize = backwardSize.join('x');
-										if (allSizesParams[backwardSize])
-											return allSizesParams[backwardSize];
-									}
-
-									return;
-								}
-							}
-						}
-
 						if (!bidderData.sizeLess && bidderData.reusable) {
-							const bidderParams = getOriginalOrDownwardSizeBidderParams(
+							const bidderParams = this.getOriginalOrDownwardSizeBidderParams(
 								bidderData.config,
 								size
 							);
@@ -140,7 +132,7 @@ var adpTags = {
 		},
 		createSlot: function(containerId, size, placement, optionalParam) {
 			var slotId = optionalParam.dfpAdunit;
-			var bidders = this.getBiddersForSlot(size);
+			var bidders = optionalParam.headerBidding ? this.getBiddersForSlot(size) : [];
 			var isResponsive = optionalParam.isResponsive;
 			var sectionName = optionalParam.sectionName;
 			var multipleAdSizes =
