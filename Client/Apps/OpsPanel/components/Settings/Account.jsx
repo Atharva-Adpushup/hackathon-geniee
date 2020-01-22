@@ -297,7 +297,14 @@ class Account extends Component {
 					<Fragment>
 						<p className="u-text-bold">Select Google Ad Manager</p>
 						{apLiteSites.length && !adServerSettings.hasOwnProperty('dfp') ? (
-							<div className="u-margin-b4">Please add a Third Party DFP Network</div>
+							<CustomMessage
+								type="error"
+								header="No Third Party DFP Added"
+								message={
+									"<p style='font-size: 16px'>Please add a Third Party DFP Network since AP Lite is enabled on one of your sites.<p>"
+								}
+								rootClassNames="u-margin-b4"
+							/>
 						) : (
 							<SelectBox
 								onSelect={this.handleToggle}

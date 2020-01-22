@@ -33,8 +33,7 @@ class Settings extends Component {
 			isAdsLabelOn,
 			adsLabel,
 			revenueShare,
-			status,
-			isLoading: false
+			status
 		};
 	}
 
@@ -45,36 +44,40 @@ class Settings extends Component {
 			updateAppStatus,
 			site
 		} = this.props;
-		const { status } = this.state;
-		const name = attributeValue.split('-')[0];
-		if (name !== 'apLite') {
-			this.setState({
-				[name]: value
-			});
-		} else if (
-			name === 'apLite' &&
-			adServerSettings.hasOwnProperty('dfp') &&
-			adServerSettings.dfp.activeDFPNetwork === ADPUSHUP_NETWORK_ID.toString() &&
-			value
-		) {
-			alert('AP Lite can not be enabled');
-			this.setState({ [name]: false });
-		} else if (name === 'apLite' && value) {
-			const val = confirm('Are you sure you want to enable AP Lite ?');
-			if (val) {
-				this.setState({ [name]: value, isLoading: true });
 
-				return updateAppStatus(site.siteId, {
-					app: 'apLite',
-					value
-				}).then(() => this.setState({ isLoading: false, status: value }));
+		const name = attributeValue.split('-')[0];
+
+		this.setState(() => {
+			if (name !== 'apLite') {
+				return {
+					[name]: value
+				};
+			} else if (
+				name === 'apLite' &&
+				adServerSettings.hasOwnProperty('dfp') &&
+				adServerSettings.dfp.activeDFPNetwork === ADPUSHUP_NETWORK_ID.toString() &&
+				value
+			) {
+				alert('AP Lite can not be enabled');
+
+				return {
+					[name]: false
+				};
+			} else if (name === 'apLite' && value) {
+				const val = confirm('Are you sure you want to enable AP Lite ?');
+				if (val) {
+					return updateAppStatus(site.siteId, {
+						app: 'apLite',
+						value
+					}).then(() => this.setState({ status: value, [name]: value }));
+				} else {
+					return { [name]: false };
+				}
 			} else {
-				this.setState({ [name]: false });
+				alert(`you can't disable AP Lite`);
+				return { [name]: true };
 			}
-		} else {
-			alert(`you can't disable AP Lite`);
-			this.setState({ [name]: true });
-		}
+		});
 	};
 
 	handleChange = e => {
