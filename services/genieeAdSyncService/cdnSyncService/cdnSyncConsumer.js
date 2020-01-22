@@ -9,7 +9,8 @@ const getReportData = require('../../../reports/universal/index');
 const mkdirpAsync = Promise.promisifyAll(require('mkdirp')).mkdirpAsync;
 const fs = Promise.promisifyAll(require('fs'));
 const CC = require('../../../configs/commonConsts');
-const generateADPTagsConfig = require('./generateADPTagsConfig');
+const generatePrebidConfig = require('./generatePrebidConfig');
+const generateApLiteConfig = require('./generateApLiteConfig');
 const generateAdPushupConfig = require('./generateAdPushupConfig');
 const config = require('../../../configs/config');
 const generateStatusesAndConfig = require('./generateConfig');
@@ -27,10 +28,8 @@ const ieTestingSiteList = [38903]; // iaai.com
 module.exports = function(site, user) {
 	ftp = new PromiseFtp();
 
-	var paramConfig = {
-			siteId: site.get('siteId')
-		},
-		noop = 'function() {}',
+	var siteId = site.get('siteId'),
+		apps = site.get('apps'),
 		isAutoOptimise = !!(site.get('apConfigs') && site.get('apConfigs').autoOptimise),
 		poweredByBanner = !!(site.get('apConfigs') && site.get('apConfigs').poweredByBanner),
 		tempDestPath = path.join(
@@ -43,14 +42,13 @@ module.exports = function(site, user) {
 			'js',
 			'builds',
 			'geniee',
-			site.get('siteId').toString()
+			siteId.toString()
 		),
 		setAllConfigs = function(combinedConfig) {
-			let apps = site.get('apps');
 			let apConfigs = site.get('apConfigs');
 			const adServerSettings = user.get('adServerSettings');
 			let isAdPartner = !!site.get('partner');
-			let { experiment, adpTagsConfig, manualAds, innovativeAds } = combinedConfig;
+			let { experiment, prebidConfig, apLiteConfig, manualAds, innovativeAds } = combinedConfig;
 
 			isAdPartner ? (apConfigs.partner = site.get('partner')) : null;
 
@@ -63,41 +61,50 @@ module.exports = function(site, user) {
 				.digest('hex')
 				.substr(0, 64);
 			apConfigs.isSPA = apConfigs.isSPA ? apConfigs.isSPA : false;
+			apConfigs.spaButUsingHook = apConfigs.spaButUsingHook ? apConfigs.spaButUsingHook : false;
 			apConfigs.spaPageTransitionTimeout = apConfigs.spaPageTransitionTimeout
 				? apConfigs.spaPageTransitionTimeout
 				: 0;
 			apConfigs.activeDFPNetwork =
 				(adServerSettings && adServerSettings.dfp && adServerSettings.dfp.activeDFPNetwork) || null;
 
-			apConfigs.manualModeActive = !!(apps.apTag && manualAds && manualAds.length);
-			apConfigs.innovativeModeActive = !!(
-				apps.innovativeAds &&
-				innovativeAds &&
-				innovativeAds.length
-			);
+			apConfigs.apLiteActive = !!apps.apLite;
 
-			// Default 'draft' mode is selected if config mode is not present
-			apConfigs.mode = apps.layout && apConfigs.mode ? apConfigs.mode : 2;
+			if (!apps.apLite) {
+				apConfigs.manualModeActive = !!(apps.apTag && manualAds && manualAds.length);
+				apConfigs.innovativeModeActive = !!(
+					apps.innovativeAds &&
+					innovativeAds &&
+					innovativeAds.length
+				);
 
-			apConfigs.manualModeActive ? (apConfigs.manualAds = manualAds || []) : null;
-			apConfigs.innovativeModeActive ? (apConfigs.innovativeAds = innovativeAds || []) : null;
+				// Default 'draft' mode is selected if config mode is not present
+				apConfigs.mode = apps.layout && apConfigs.mode ? apConfigs.mode : 2;
 
-			apConfigs.experiment = experiment;
+				apConfigs.manualModeActive ? (apConfigs.manualAds = manualAds || []) : null;
+				apConfigs.innovativeModeActive ? (apConfigs.innovativeAds = innovativeAds || []) : null;
+
+				apConfigs.experiment = experiment;
+			}
+
 			delete apConfigs.pageGroupPattern;
 
-			return { apConfigs, adpTagsConfig };
+			const output = { apConfigs, prebidConfig };
+			if (apps.apLite) output.apLiteConfig = apLiteConfig;
+
+			return output;
 		},
 		generateCombinedJson = (experiment, adpTags, manualAds, innovativeAds) => {
 			if (!(Array.isArray(adpTags) && adpTags.length)) {
 				return {
 					experiment,
-					adpTagsConfig: false,
+					prebidConfig: false,
 					manualAds,
 					innovativeAds
 				};
 			}
-			return generateADPTagsConfig(adpTags, site.get('siteId')).then(adpTagsConfig => ({
-				adpTagsConfig,
+			return generatePrebidConfig(siteId).then(prebidConfig => ({
+				prebidConfig,
 				experiment,
 				manualAds,
 				innovativeAds
@@ -108,16 +115,10 @@ module.exports = function(site, user) {
 				addService: (serviceName, isActive, serviceConfig = {}) => {
 					switch (serviceName) {
 						case CC.SERVICES.ADPTAGS:
-							var prebidConfig = serviceConfig.prebidConfig;
-							var inventory = Object.assign({}, serviceConfig);
-							delete inventory.prebidConfig;
-							delete inventory.dateCreated;
-							delete inventory.dateModified;
-							delete inventory.siteId;
+							var prebidConfig = serviceConfig;
 							if (isActive) {
-								jsFile = _.replace(jsFile, '__INVENTORY__', JSON.stringify(inventory));
 								jsFile = _.replace(jsFile, '__PREBID_CONFIG__', JSON.stringify(prebidConfig));
-								jsFile = _.replace(jsFile, '__SITE_ID__', site.get('siteId'));
+								jsFile = _.replace(jsFile, '__SITE_ID__', siteId);
 							}
 							return generateFinalInitScript(jsFile);
 
@@ -146,6 +147,13 @@ module.exports = function(site, user) {
 							}
 							return generateFinalInitScript(jsFile);
 
+						case CC.SERVICES.AP_LITE:
+							var apLiteConfig = serviceConfig;
+							if (isActive) {
+								jsFile = _.replace(jsFile, '__AP_LITE_CONFIG__', JSON.stringify(apLiteConfig));
+							}
+							return generateFinalInitScript(jsFile);
+
 						default:
 							return generateFinalInitScript(jsFile);
 					}
@@ -156,15 +164,22 @@ module.exports = function(site, user) {
 			};
 		},
 		getComputedConfig = () => {
-			return getReportData(site)
-				.then(reportData => {
-					if (reportData.status && reportData.data) {
-						return generateAdPushupConfig(site, reportData.data);
-					}
-					return generateAdPushupConfig(site);
-				})
-				.spread(generateCombinedJson)
-				.then(setAllConfigs);
+			return (() => {
+				if (apps.apLite) {
+					return Promise.join(generatePrebidConfig(siteId), generateApLiteConfig(siteId)).then(
+						([prebidConfig, apLiteConfig]) => ({ prebidConfig, apLiteConfig })
+					);
+				}
+
+				return getReportData(site)
+					.then(reportData => {
+						if (reportData.status && reportData.data) {
+							return generateAdPushupConfig(site, reportData.data);
+						}
+						return generateAdPushupConfig(site);
+					})
+					.spread(generateCombinedJson);
+			})().then(setAllConfigs);
 		},
 		getConfigWrapper = site => {
 			return getComputedConfig().then(computedConfig =>
@@ -176,22 +191,28 @@ module.exports = function(site, user) {
 				.then(generatedConfig => prebidGeneration(generatedConfig))
 				.then(generatedConfig => bundleGeneration(site, generatedConfig))
 				.spread((generatedConfig, bundle) => {
-					let { apConfigs, adpTagsConfig, statusesAndAds: finalConfig } = generatedConfig;
+					let {
+						apConfigs,
+						prebidConfig,
+						apLiteConfig,
+						statusesAndAds: finalConfig
+					} = generatedConfig;
 
 					if (site.get('medianetId')) apConfigs.medianetId = site.get('medianetId');
 
 					bundle = _.replace(bundle, '__AP_CONFIG__', JSON.stringify(apConfigs));
-					bundle = _.replace(bundle, /__SITE_ID__/g, site.get('siteId'));
+					bundle = _.replace(bundle, /__SITE_ID__/g, siteId);
 					bundle = _.replace(bundle, '__COUNTRY__', false);
 
 					// Generate final init script based on the services that are enabled
 					var uncompressed = generateFinalInitScript(bundle)
-						.addService(CC.SERVICES.ADPTAGS, finalConfig.statuses.ADPTAG_ACTIVE, adpTagsConfig)
+						.addService(CC.SERVICES.ADPTAGS, finalConfig.statuses.ADPTAG_ACTIVE, prebidConfig)
 						.addService(CC.SERVICES.HEADER_BIDDING, finalConfig.statuses.HB_ACTIVE, {
 							deviceConfig: finalConfig.config.deviceConfig,
 							prebidCurrencyConfig: finalConfig.config.prebidCurrencyConfig
 						})
 						.addService(CC.SERVICES.GDPR, finalConfig.statuses.GDPR_ACTIVE, finalConfig.config.gdpr)
+						.addService(CC.SERVICES.AP_LITE, finalConfig.statuses.AP_LITE, apLiteConfig)
 						.done();
 					var compressed = '';
 
@@ -222,7 +243,6 @@ module.exports = function(site, user) {
 				.then(() => jsFile);
 		},
 		startIETesting = uncompressedFile => {
-			const siteId = site.get('siteId');
 			const enableIETesting = !!(ieTestingSiteList.indexOf(siteId) > -1);
 
 			return enableIETesting
@@ -233,9 +253,9 @@ module.exports = function(site, user) {
 				: Promise.resolve(uncompressedFile);
 		},
 		cwd = function() {
-			return ftp.cwd('/' + site.get('siteId')).catch(function() {
-				return ftp.mkdir(site.get('siteId')).then(function() {
-					return ftp.cwd('/' + site.get('siteId'));
+			return ftp.cwd('/' + siteId).catch(function() {
+				return ftp.mkdir(siteId).then(function() {
+					return ftp.cwd('/' + siteId);
 				});
 			});
 		},
@@ -250,7 +270,6 @@ module.exports = function(site, user) {
 			});
 		},
 		uploadJS = function(fileConfig) {
-			const siteId = site.get('siteId');
 			const shouldJSCdnSyncBeDisabled = !!(disableSiteCdnSyncList.indexOf(siteId) > -1);
 
 			if (shouldJSCdnSyncBeDisabled || isNotProduction) {

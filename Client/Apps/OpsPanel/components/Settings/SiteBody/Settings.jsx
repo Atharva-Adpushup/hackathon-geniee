@@ -16,6 +16,7 @@ class Settings extends Component {
 
 		const {
 			isSPA = false,
+			spaButUsingHook = false,
 			spaPageTransitionTimeout = 0,
 			adpushupPercentage = 100,
 			poweredByBanner = false,
@@ -27,6 +28,7 @@ class Settings extends Component {
 
 		this.state = {
 			isSPA,
+			spaButUsingHook,
 			spaPageTransitionTimeout,
 			adpushupPercentage,
 			poweredByBanner,
@@ -48,6 +50,14 @@ class Settings extends Component {
 		const name = attributeValue.split('-')[0];
 
 		this.setState(() => {
+			if (name === 'isSPA' && value === false) {
+				return {
+					[name]: value,
+					spaButUsingHook: false,
+					spaPageTransitionTimeout: 0
+				};
+			}
+
 			if (name !== 'apLite') {
 				return {
 					[name]: value
@@ -89,6 +99,7 @@ class Settings extends Component {
 	handleSave = () => {
 		const {
 			isSPA,
+			spaButUsingHook,
 			spaPageTransitionTimeout,
 			adpushupPercentage,
 			poweredByBanner,
@@ -130,6 +141,7 @@ class Settings extends Component {
 		return saveSettings(site.siteId, {
 			apConfigs: {
 				isSPA,
+				spaButUsingHook,
 				spaPageTransitionTimeout: Number(spaPageTransitionTimeout),
 				adpushupPercentage: Number(adpushupPercentage),
 				poweredByBanner,
@@ -146,6 +158,7 @@ class Settings extends Component {
 	render() {
 		const {
 			isSPA,
+			spaButUsingHook,
 			spaPageTransitionTimeout,
 			adpushupPercentage,
 			poweredByBanner,
@@ -224,17 +237,32 @@ class Settings extends Component {
 					id={`js-spa-switch-${siteId}-${siteDomain}`}
 				/>
 				{isSPA && (
-					<FieldGroup
-						name="spaPageTransitionTimeout"
-						value={spaPageTransitionTimeout}
-						type="text"
-						label="SPA Transition(ms)"
-						onChange={this.handleChange}
-						size={6}
-						id={`spa-transition-input-${siteId}-${siteDomain}`}
-						placeholder="SPA Transition(ms)"
-						className="u-padding-v4 u-padding-h4"
-					/>
+					<React.Fragment>
+						<CustomToggleSwitch
+							labelText="SPA But Using Hook"
+							className="u-margin-b4 negative-toggle"
+							checked={spaButUsingHook}
+							onChange={this.handleToggle}
+							layout="horizontal"
+							size="m"
+							on="Yes"
+							off="No"
+							defaultLayout
+							name={`spaButUsingHook-${siteId}-${siteDomain}`}
+							id={`js-spaButUsingHook-${siteId}-${siteDomain}`}
+						/>
+						<FieldGroup
+							name="spaPageTransitionTimeout"
+							value={spaPageTransitionTimeout}
+							type="text"
+							label="SPA Transition(ms)"
+							onChange={this.handleChange}
+							size={6}
+							id={`spa-transition-input-${siteId}-${siteDomain}`}
+							placeholder="SPA Transition(ms)"
+							className="u-padding-v4 u-padding-h4"
+						/>
+					</React.Fragment>
 				)}
 				<FieldGroup
 					name="adpushupPercentage"
