@@ -8,8 +8,9 @@ const siteModel = require('../../models/siteModel');
 const config = require('../../configs/config');
 const constants = require('../../configs/commonConsts');
 
+// TODO: Use reporting base url
 const activeSiteApiUri =
-	'https://staging.adpushup.com/CentralReportingWebService/site/activeSiteList';
+	'https://api.adpushup.com/CentralReportingWebService/site/activeSiteList';
 
 function getFormattedDate(date, offset) {
 	date.setDate(date.getDate() - (offset || 0));
