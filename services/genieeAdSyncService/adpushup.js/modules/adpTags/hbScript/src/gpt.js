@@ -4,6 +4,8 @@ var constants = require('./constants');
 var feedback = require('./feedback');
 var responsiveAds = require('./responsiveAds');
 var targeting = require('./targeting');
+var adpConfig = window.adpushup.config;
+var adp = require('../../../apLite/adp');
 var getDFPCOntainerFromDom = function(containerId) {
 	return document.getElementById(containerId);
 };
@@ -11,6 +13,11 @@ var gpt = {
 	refreshGPTSlot: function(googletag, gSlot) {
 		if (gSlot) {
 			return googletag.pubads().refresh([gSlot]);
+		}
+	},
+	refreshGPTSlots: function(googletag, gSlots) {
+		if (Array.isArray(gSlots) && gSlots.length) {
+			return googletag.pubads().refresh(gSlots);
 		}
 	},
 	renderSlot: function(googletag, adpSlot) {
@@ -27,6 +34,20 @@ var gpt = {
 		googletag.display(adpSlot.containerId);
 		if (googletag.pubads().isInitialLoadDisabled() || adpSlot.toBeRefreshed) {
 			this.refreshGPTSlot(googletag, adpSlot.gSlot);
+		}
+	},
+	renderApLiteSlots: function(googletag, adpSlots) {
+		if (googletag.pubads().isInitialLoadDisabled()) {
+			var gSlots = adpSlots
+				.filter(
+					adpSlot =>
+						getDFPCOntainerFromDom(adpSlot.containerId) &&
+						adpSlot.biddingComplete &&
+						!adpSlot.hasRendered
+				)
+				.map(adpSlot => ((adpSlot.hasRendered = true), adpSlot.gSlot));
+
+			this.refreshGPTSlots(googletag, gSlots);
 		}
 	},
 	defineSlot: function(googletag, adpSlot) {
@@ -96,7 +117,34 @@ var gpt = {
 				});
 		});
 	},
+	setApLiteSlotRenderListener: function(w) {
+		w.googletag.cmd.push(
+			function() {
+				w.googletag
+					.pubads()
+					.addEventListener(constants.EVENTS.GPT.SLOT_RENDER_ENDED, function(event) {
+						if (event && event.slot) {
+							var gSlot = event.slot,
+								size = event.size,
+								slot = window.adpushup.adpSlots.filter(function(adpSlot) {
+									return adpSlot.id === gSlot.getSlotElementId();
+								})[0];
+							if (slot) {
+								slot.renderedSize = size;
+								return feedback.send(slot);
+							}
+						}
+					});
+
+				return adp.registerAdpSlots(w.googletag);
+			}.bind(this)
+		);
+	},
 	loadGpt: function(w, d) {
+		if (adpConfig.apLiteActive) {
+			return this.setApLiteSlotRenderListener(w);
+		}
+
 		var gptScript = d.createElement('script');
 		gptScript.src = '//securepubads.g.doubleclick.net/tag/js/gpt.js';
 		gptScript.async = true;

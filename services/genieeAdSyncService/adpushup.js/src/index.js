@@ -35,7 +35,7 @@ if (INNOVATIVE_ADS_ACTIVE) {
 // var	ampInit = require('./ampInit');
 
 var isGenieeSite;
-window.adpushup.configExtended = false;
+w.adpushup.configExtended = false;
 
 // Extend adpushup object
 $.extend(adp, {
@@ -103,7 +103,6 @@ function resetAdpConfig() {
 function initAdpConfig() {
 	return new Promise(function(resolve) {
 		resetAdpConfig();
-		resetAdpTagsConfig();
 
 		$.extend(adp, {
 			creationProcessStarted: false,
@@ -116,9 +115,12 @@ function initAdpConfig() {
 			platform: browserConfig.platform,
 			packetId: utils.uniqueId(__SITE_ID__)
 		});
+
+		!adp.config.apLiteActive && resetAdpTagsConfig();
+
 		resolve();
 	}).then(function() {
-		if (!window.adpushup.configExtended) {
+		if (!w.adpushup.configExtended) {
 			if (ADPTAG_ACTIVE) {
 				//TODO: this needs to be changed
 				require('../modules/adpTags/hbScript/src/index');
@@ -126,7 +128,7 @@ function initAdpConfig() {
 			if (GDPR_ACTIVE) {
 				require('../modules/gdpr/index');
 			}
-			window.adpushup.configExtended = true;
+			w.adpushup.configExtended = true;
 		}
 	});
 }
@@ -304,6 +306,11 @@ function startCreation(forced) {
 	});
 }
 
+function startApLiteCreation() {
+	var apLiteAdpModule = require('../modules/apLite/adp');
+	apLiteAdpModule.init();
+}
+
 function processQue() {
 	while (w.adpushup.que.length) {
 		w.adpushup.que.shift().call();
@@ -325,13 +332,16 @@ function initAdpQue() {
 }
 
 function main() {
-	//for SPAs: remove any interactive ad containers, if available
-	adp.$('.adp_interactive_ad').remove();
 	// Set user syncing cookies
 	syncUser();
 
 	// Initialise adp config
 	initAdpConfig();
+
+	var apLiteActive = adp.config.apLiteActive;
+
+	//for SPAs: remove any interactive ad containers, if available and apLite is disabled
+	!apLiteActive && adp.$('.adp_interactive_ad').remove();
 
 	// Initialise SPA handler
 	if (adp.config.isSPA && adp.services.SPA_ACTIVE) {
@@ -344,62 +354,69 @@ function main() {
 	//Initialise refresh slots
 	refreshAdSlot.init(w);
 
-	//Geniee ad network specific site check
-	isGenieeSite = !!(adp.config.partner && adp.config.partner === 'geniee');
-	adp.config.isGeniee = isGenieeSite;
+	if (!apLiteActive) {
+		//Geniee ad network specific site check
+		isGenieeSite = !!(adp.config.partner && adp.config.partner === 'geniee');
+		adp.config.isGeniee = isGenieeSite;
+	}
 
 	// Initialise adp que
 	initAdpQue();
 
-	// Hook Pagegroup, find pageGroup and check for blockList
-	hookAndInit(adp, startCreation, browserConfig.platform);
+	if (!apLiteActive) {
+		// Hook Pagegroup, find pageGroup and check for blockList
+		hookAndInit(adp, startCreation, browserConfig.platform);
 
-	// AdPushup Debug Force Variation
-	if (
-		utils.getQueryParams &&
-		utils.getQueryParams().forceVariation &&
-		!adp.creationProcessStarted
-	) {
-		startCreation(true);
-		return false;
+		// AdPushup Debug Force Variation
+		if (
+			utils.getQueryParams &&
+			utils.getQueryParams().forceVariation &&
+			!adp.creationProcessStarted
+		) {
+			startCreation(true);
+			return false;
+		}
+
+		// Geniee specific check
+		if (shouldWeNotProceed()) {
+			return false;
+		}
+
+		// AdPushup Debug Force Control
+		if (utils.getQueryParams && utils.getQueryParams().forceControl) {
+			triggerControl(commonConsts.MODE.FALLBACK, commonConsts.ERROR_CODES.FALLBACK_FORCED); // Control forced (run fallback)
+			return false;
+		}
+
+		// AdPushup Mode Logic
+		if (parseInt(config.mode, 10) === 2) {
+			triggerControl(commonConsts.MODE.FALLBACK, commonConsts.ERROR_CODES.PAUSED_IN_EDITOR); // Paused from editor (run fallback)
+			return false;
+		}
+
+		// AdPushup Percentage Logic
+		var rand = Math.floor(Math.random() * 100) + 1;
+		if (rand > config.adpushupPercentage) {
+			triggerControl(commonConsts.MODE.FALLBACK, commonConsts.ERROR_CODES.FALLBACK_PLANNED); // Control planned (run fallback)
+			return false;
+		}
+
+		if (!config.pageGroup) {
+			pageGroupTimer = setTimeout(function() {
+				!config.pageGroup
+					? triggerControl(commonConsts.MODE.FALLBACK, commonConsts.ERROR_CODES.PAGEGROUP_NOT_FOUND)
+					: clearTimeout(pageGroupTimer);
+			}, config.pageGroupTimeout);
+		} else {
+			// start heartBeat
+			// heartBeat(config.feedbackUrl, config.heartBeatMinInterval, config.heartBeatDelay).start();
+
+			//Init creation
+			startCreation();
+		}
 	}
 
-	if (shouldWeNotProceed()) {
-		return false;
-	}
-
-	// AdPushup Debug Force Control
-	if (utils.getQueryParams && utils.getQueryParams().forceControl) {
-		triggerControl(commonConsts.MODE.FALLBACK, commonConsts.ERROR_CODES.FALLBACK_FORCED); // Control forced (run fallback)
-		return false;
-	}
-
-	// AdPushup Mode Logic
-	if (parseInt(config.mode, 10) === 2) {
-		triggerControl(commonConsts.MODE.FALLBACK, commonConsts.ERROR_CODES.PAUSED_IN_EDITOR); // Paused from editor (run fallback)
-		return false;
-	}
-
-	// AdPushup Percentage Logic
-	var rand = Math.floor(Math.random() * 100) + 1;
-	if (rand > config.adpushupPercentage) {
-		triggerControl(commonConsts.MODE.FALLBACK, commonConsts.ERROR_CODES.FALLBACK_PLANNED); // Control planned (run fallback)
-		return false;
-	}
-
-	if (!config.pageGroup) {
-		pageGroupTimer = setTimeout(function() {
-			!config.pageGroup
-				? triggerControl(commonConsts.MODE.FALLBACK, commonConsts.ERROR_CODES.PAGEGROUP_NOT_FOUND)
-				: clearTimeout(pageGroupTimer);
-		}, config.pageGroupTimeout);
-	} else {
-		// start heartBeat
-		// heartBeat(config.feedbackUrl, config.heartBeatMinInterval, config.heartBeatDelay).start();
-
-		//Init creation
-		startCreation();
-	}
+	apLiteActive && startApLiteCreation();
 }
 
 adp.init = main;
