@@ -98,6 +98,17 @@ var utils = require('../libs/utils'),
 	refreshGPTSlot = function(gSlot) {
 		googletag.pubads().refresh([gSlot]);
 	},
+	stopRefreshForASlot = function(slotId) {
+		var adIndex = ads.findIndex(obj => obj.ad.slotId === slotId);
+
+		if (adIndex !== -1) {
+			var container = ads[adIndex].container;
+			var oldTimeoutId = container.attr('data-timeout');
+			oldTimeoutId && clearTimeout(oldTimeoutId);
+
+			ads.splice(adIndex, 1);
+		}
+	},
 	getAllInViewAds = function() {
 		inViewAds = [];
 		for (var i = 0; i < ads.length; i++) {
@@ -181,6 +192,7 @@ var utils = require('../libs/utils'),
 	};
 
 module.exports = {
-	init: init,
-	refreshSlot: refreshSlot
+	init,
+	refreshSlot,
+	stopRefreshForASlot
 };

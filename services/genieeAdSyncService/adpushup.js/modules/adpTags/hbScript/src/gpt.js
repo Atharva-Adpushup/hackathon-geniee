@@ -3,9 +3,10 @@
 var constants = require('./constants');
 var feedback = require('./feedback');
 var responsiveAds = require('./responsiveAds');
-var targeting = require('./targeting');
 var adpConfig = window.adpushup.config;
+var apLiteConfig = require('../../../apLite/config').AP_LITE_CONFIG;
 var adp = require('../../../apLite/adp');
+var refreshAdSlot = require('../../../../src/refreshAdSlot');
 var getDFPCOntainerFromDom = function(containerId) {
 	return document.getElementById(containerId);
 };
@@ -77,7 +78,6 @@ var gpt = {
 			);
 		}
 
-		targeting.setSlotLevel(adpSlot);
 		if (!adpSlot.toBeRefreshed) {
 			adpSlot.gSlot.addService(googletag.pubads());
 		}
@@ -126,10 +126,24 @@ var gpt = {
 						if (event && event.slot) {
 							var gSlot = event.slot,
 								size = event.size,
-								slot = window.adpushup.adpSlots.filter(function(adpSlot) {
-									return adpSlot.id === gSlot.getSlotElementId();
-								})[0];
+								slotElementId = gSlot.getSlotElementId(),
+								slot = window.apLite.adpSlots[slotElementId];
 							if (slot) {
+								// stop refresh if line Item is not price priority type
+								var lineItemId = event.sourceAgnosticLineItemId;
+								var pricePriorityLineItems = apLiteConfig.pricePriorityLineItems;
+								var isNotPricePriorityLineItem = !!(
+									lineItemId &&
+									pricePriorityLineItems &&
+									Array.isArray(pricePriorityLineItems) &&
+									pricePriorityLineItems.length &&
+									pricePriorityLineItems.indexOf(lineItemId) === -1
+								);
+
+								if (isNotPricePriorityLineItem) {
+									refreshAdSlot.stopRefreshForASlot(slotElementId);
+								}
+
 								slot.renderedSize = size;
 								return feedback.send(slot);
 							}
