@@ -12,7 +12,7 @@ const dbHelper = couchbaseService(
 );
 
 const generateApLiteConfig = siteId => {
-	const emptyResponse = { value: {} };
+	const emptyResponse = {};
 
 	return dbHelper
 		.getDoc(`${docKeys.apLite}${siteId}`)
@@ -23,7 +23,18 @@ const generateApLiteConfig = siteId => {
 			throw err;
 		})
 		.then(apLiteDoc => {
-			return apLiteDoc.value;
+			var apLiteConfig = apLiteDoc.value;
+			var adUnits = apLiteConfig.adUnits;
+
+			// Remove Inactive adUnits
+			adUnits &&
+				Object.keys(adUnits).forEach(dfpAdUnitName => {
+					if (adUnits[dfpAdUnitName].isActive === false) {
+						delete adUnits[dfpAdUnitName];
+					}
+				});
+
+			return apLiteConfig;
 		});
 };
 
