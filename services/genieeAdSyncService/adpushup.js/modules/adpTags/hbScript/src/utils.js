@@ -3,6 +3,9 @@
 var adp = require('./adp');
 var find = require('lodash.find');
 var $ = require('../../../../libs/jquery');
+var config = require('./config');
+var BACKWARD_COMPATIBLE_MAPPING = require('./constants').AD_SIZE_MAPPING.IAB_SIZES
+	.BACKWARD_COMPATIBLE_MAPPING;
 var utils = {
 	currencyConversionActive: function(inputObject) {
 		var inputObject = inputObject || adp.config,
@@ -121,6 +124,71 @@ var utils = {
 		});
 
 		return objURL;
+	},
+	getOriginalOrDownwardSizeBidderParams: function(allSizesParams, inventorySize) {
+		if (!allSizesParams || !Object.keys(allSizesParams).length) return;
+
+		if (inventorySize === 'responsivexresponsive' && allSizesParams['responsive'])
+			return allSizesParams['responsive'];
+
+		if (allSizesParams[inventorySize]) return allSizesParams[inventorySize];
+
+		for (const originalSize in BACKWARD_COMPATIBLE_MAPPING) {
+			if (
+				originalSize === inventorySize &&
+				BACKWARD_COMPATIBLE_MAPPING[originalSize].length
+			) {
+				const backwardSizes = BACKWARD_COMPATIBLE_MAPPING[originalSize];
+
+				for (let backwardSize of backwardSizes) {
+					backwardSize = backwardSize.join('x');
+					if (allSizesParams[backwardSize]) return allSizesParams[backwardSize];
+				}
+
+				return;
+			}
+		}
+	},
+	getBiddersForSlot: function(size) {
+		var width = size[0];
+		var height = size[1];
+		var size = width + 'x' + height;
+		var bidders = [];
+		var prebidConfig = config.PREBID_CONFIG;
+		var hbConfig = prebidConfig.hbcf;
+
+		if (hbConfig && Object.keys(hbConfig).length) {
+			Object.keys(hbConfig).forEach(
+				function(bidder) {
+					var bidderData = hbConfig[bidder];
+
+					if (!bidderData.isPaused) {
+						if (bidderData.sizeLess) {
+							bidders.push({
+								bidder: bidder,
+								params: bidderData.config
+							});
+						}
+
+						if (!bidderData.sizeLess && bidderData.reusable) {
+							const bidderParams = this.getOriginalOrDownwardSizeBidderParams(
+								bidderData.config,
+								size
+							);
+
+							if (bidderParams) {
+								bidders.push({
+									bidder: bidder,
+									params: bidderParams
+								});
+							}
+						}
+					}
+				}.bind(this)
+			);
+		}
+
+		return bidders;
 	}
 };
 

@@ -3,13 +3,17 @@
 var utils = require('./utils');
 var adp = require('./adp');
 var config = require('./config');
+var adpConfig = window.adpushup.config;
 var constants = require('./constants');
 var render = require('./render');
 var auction = {
 	end: function(adpBatchId) {
-		var adpSlots = utils.getCurrentAdpSlotBatch(window.adpushup.adpTags.adpBatches, adpBatchId);
+		var adpBatches = adpConfig.apLiteActive
+			? window.apLite.adpBatches
+			: window.adpushup.adpTags.adpBatches;
+		var adpSlots = utils.getCurrentAdpSlotBatch(adpBatches, adpBatchId);
 
-		window.adpushup.adpTags.batchPrebiddingComplete = true;
+		window.apLite.batchPrebiddingComplete = true;
 		if (Object.keys(adpSlots).length) {
 			return render.init(adpSlots);
 		}
