@@ -9,7 +9,12 @@ import SelectBox from '../../../../../../Components/SelectBox/index';
 import { REFRESH_RATE_ENTRIES } from '../../../../configs/commonConsts';
 
 class ApLite extends Component {
-	state = { view: 'list', adRefresh: true, selectedRefreshRate: REFRESH_RATE_ENTRIES[0].value };
+	state = {
+		view: 'list',
+		fileName: '',
+		adRefresh: true,
+		selectedRefreshRate: REFRESH_RATE_ENTRIES[0].value
+	};
 
 	componentDidMount() {
 		const {
@@ -36,6 +41,20 @@ class ApLite extends Component {
 
 	onSelect = (value, key) => {
 		this.setState({ [key]: value });
+	};
+
+	handleGAM = e => {
+		const { showNotification } = this.props;
+		if (!e.target.value.endsWith('.csv')) {
+			this.setState({ fileName: '' });
+			return showNotification({
+				mode: 'error',
+				title: 'Operation Failed',
+				message: 'Only csv files are allowed',
+				autoDismiss: 5
+			});
+		}
+		this.setState({ fileName: e.target.value });
 	};
 
 	getHbStatus(setupStatus) {
@@ -70,7 +89,7 @@ class ApLite extends Component {
 		} = this.props;
 
 		const { siteId, siteDomain } = site;
-		const { selectedRefreshRate, adRefresh } = this.state;
+		const { selectedRefreshRate, adRefresh, fileName } = this.state;
 
 		const { setupStatus } = headerBiddingData[siteId];
 		const hbStatus = this.getHbStatus(setupStatus);
@@ -110,45 +129,50 @@ class ApLite extends Component {
 					id="hbApp-text"
 					className="u-padding-v4 u-padding-h4"
 				/>
+
 				<FieldGroup
 					name="GAM Ad Units"
-					value="hello"
-					isTextOnly
-					textOnlyStyles={styles}
+					value={fileName}
+					onChange={this.handleGAM}
+					type="file"
 					label="GAM Ad Units"
 					size={6}
 					id="gamAdUnits-text"
 					className="u-padding-v4 u-padding-h4"
 				/>
+				{fileName ? (
+					<React.Fragment>
+						<CustomToggleSwitch
+							labelText="Ad Refresh"
+							className="u-margin-b4 negative-toggle"
+							checked={adRefresh}
+							onChange={this.handleToggle}
+							layout="horizontal"
+							size="m"
+							on="Yes"
+							off="No"
+							defaultLayout
+							name={`adRefresh-${siteId}-${siteDomain}`}
+							id={`js-adRefresh-${siteId}-${siteDomain}`}
+						/>
 
-				<CustomToggleSwitch
-					labelText="Ad Refresh"
-					className="u-margin-b4 negative-toggle"
-					checked={adRefresh}
-					onChange={this.handleToggle}
-					layout="horizontal"
-					size="m"
-					on="Yes"
-					off="No"
-					defaultLayout
-					name={`adRefresh-${siteId}-${siteDomain}`}
-					id={`js-adRefresh-${siteId}-${siteDomain}`}
-				/>
+						<div className="refresh-rate" style={{ display: 'flex' }}>
+							<p className="u-text-bold u-margin-b4">Refresh Rate</p>
+							<SelectBox
+								selected={selectedRefreshRate}
+								options={REFRESH_RATE_ENTRIES}
+								onSelect={this.onSelect}
+								id="select-entry"
+								title="Select Entry"
+								dataKey="selectedRefreshRate"
+								reset
+								style={{ marginLeft: 'auto', width: '20%' }}
+								className="refresh-rate"
+							/>
+						</div>
+					</React.Fragment>
+				) : null}
 
-				<div className="refresh-rate" style={{ display: 'flex' }}>
-					<p className="u-text-bold u-margin-b4">Refresh Rate</p>
-					<SelectBox
-						selected={selectedRefreshRate}
-						options={REFRESH_RATE_ENTRIES}
-						onSelect={this.onSelect}
-						id="select-entry"
-						title="Select Entry"
-						dataKey="selectedRefreshRate"
-						reset
-						style={{ marginLeft: 'auto', width: '20%' }}
-						className="refresh-rate"
-					/>
-				</div>
 				<CustomButton variant="secondary" className="pull-right u-margin-r3 u-margin-t4">
 					Cancel
 				</CustomButton>
