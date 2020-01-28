@@ -138,36 +138,38 @@ var $ = require('../../libs/jquery'),
 										gptAdUnitPath = gptSlot.getAdUnitPath(),
 										gptAdUnitPathArr = gptAdUnitPath.split('/'),
 										dfpAdUnitName = gptAdUnitPathArr[gptAdUnitPathArr.length - 1],
-										apLiteAdUnit = apLiteConfig.adUnits[dfpAdUnitName],
+										apLiteAdUnit = apLiteConfig.adUnits.find(
+											adUnit => adUnit.dfpAdUnit === dfpAdUnitName
+										),
 										sectionId = apLiteAdUnit && apLiteAdUnit.sectionId,
-										dfpAdunitCode = apLiteAdUnit.dfpAdunitCode,
-										slotHbStatus = apLiteAdUnit.headerBidding,
-										refreshSlot = apLiteAdUnit.refreshSlot,
-										refreshInterval = apLiteAdUnit.refreshInterval,
 										container = $(`#${gptSlotElementId}`);
 
 									// Create adp slot only if defined GPT slot has the associated container in the DOM and gpt ad unit has a valid section id
 									if (container.length && dfpAdUnitName) {
 										//filter out units provided to us
 										if (sectionId) {
-											var adpSlot = this.createAdpSlot(
-												gptSlotElementId,
-												dfpAdUnitName,
-												gptSlot,
-												allSizes,
-												sectionId,
-												{
-													dfpAdunit: dfpAdUnitName,
-													dfpAdunitCode,
-													headerBidding: window.adpushup.services.HB_ACTIVE && slotHbStatus,
-													network: 'adpTag',
-													enableLazyLoading: false,
-													multipleAdSizes: allSizes,
-													sectionName: dfpAdUnitName,
-													refreshSlot,
-													refreshInterval
-												}
-											);
+											var dfpAdunitCode = apLiteAdUnit.dfpAdunitCode,
+												slotHbStatus = apLiteAdUnit.headerBidding,
+												refreshSlot = apLiteAdUnit.refreshSlot,
+												refreshInterval = apLiteAdUnit.refreshInterval,
+												adpSlot = this.createAdpSlot(
+													gptSlotElementId,
+													dfpAdUnitName,
+													gptSlot,
+													allSizes,
+													sectionId,
+													{
+														dfpAdunit: dfpAdUnitName,
+														dfpAdunitCode,
+														headerBidding: window.adpushup.services.HB_ACTIVE && slotHbStatus,
+														network: 'adpTag',
+														enableLazyLoading: false,
+														multipleAdSizes: allSizes,
+														sectionName: dfpAdUnitName,
+														refreshSlot,
+														refreshInterval
+													}
+												);
 
 											this.adpSlots[gptSlotElementId] = adpSlot;
 											this.queSlotForBidding(adpSlot);
