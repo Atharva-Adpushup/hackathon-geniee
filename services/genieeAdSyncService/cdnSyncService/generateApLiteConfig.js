@@ -24,15 +24,11 @@ const generateApLiteConfig = siteId => {
 		})
 		.then(apLiteDoc => {
 			var apLiteConfig = apLiteDoc.value;
-			var adUnits = apLiteConfig.adUnits;
 
 			// Remove Inactive adUnits
-			adUnits &&
-				Object.keys(adUnits).forEach(dfpAdUnitName => {
-					if (adUnits[dfpAdUnitName].isActive === false) {
-						delete adUnits[dfpAdUnitName];
-					}
-				});
+			apLiteConfig.adUnits &&
+				Array.isArray(apLiteConfig.adUnits) &&
+				(apLiteConfig.adUnits = apLiteConfig.adUnits.filter(adUnit => adUnit.isActive !== false));
 
 			return apLiteConfig;
 		});
