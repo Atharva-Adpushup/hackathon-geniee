@@ -194,6 +194,13 @@ var getFilteredData = function(inputData, maxHeight) {
 		inputData.collection = removeBiggerSizes(inputData.collection, maxHeight);
 	}
 
+	// remove duplicate sizes
+	var uniqueSizes = {};
+	inputData.collection.forEach(([width, height]) => {
+		!uniqueSizes[`${width}x${height}`] && (uniqueSizes[`${width}x${height}`] = true);
+	});
+	inputData.collection = Object.keys(uniqueSizes).map(size => size.split('x'));
+
 	return inputData;
 };
 var getComputedAdSizes = function(elementSelector) {
