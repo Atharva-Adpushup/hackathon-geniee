@@ -196,10 +196,12 @@ var getFilteredData = function(inputData, maxHeight) {
 
 	// remove duplicate sizes
 	var uniqueSizes = {};
-	inputData.collection.forEach(([width, height]) => {
-		!uniqueSizes[`${width}x${height}`] && (uniqueSizes[`${width}x${height}`] = true);
+	inputData.collection = inputData.collection.filter(([width, height]) => {
+		if (!uniqueSizes[`${width}x${height}`]) {
+			uniqueSizes[`${width}x${height}`] = true;
+			return [width, height];
+		}
 	});
-	inputData.collection = Object.keys(uniqueSizes).map(size => size.split('x'));
 
 	return inputData;
 };
