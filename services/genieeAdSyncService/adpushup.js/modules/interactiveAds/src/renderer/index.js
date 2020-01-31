@@ -9,33 +9,33 @@ import config from '../config';
 // import { generateAdCode } from '../../../genieeAdSyncService/genieeAp/src/adCodeGenerator';
 
 const createParentNode = (appendTo, interactiveAd, css = {}, operation = 'append') => {
-	const $parentNode = $('<div/>'),
-		{ id } = interactiveAd;
+		const $parentNode = $('<div/>'),
+			{ id } = interactiveAd;
 
-	$parentNode.attr({ class: commonConsts.DEFAULT_CLASSNAME });
+		$parentNode.attr({ class: commonConsts.DEFAULT_CLASSNAME });
 
-	// Set CSS on parent node - required in case of video interactive ad format
-	if (css && Object.keys(css).length) {
-		$parentNode.css(css);
-	}
+		// Set CSS on parent node - required in case of video interactive ad format
+		if (css && Object.keys(css).length) {
+			$parentNode.css(css);
+		}
 
-	switch (operation.toLowerCase()) {
-		case 'prepend':
-			$(appendTo).prepend($parentNode);
-			break;
-		case 'insertbefore':
-			$(appendTo).before($parentNode);
-			break;
-		case 'insertafter':
-			$(appendTo).after($parentNode);
-			break;
-		case 'append':
-		default:
-			$(appendTo).append($parentNode);
-	}
+		switch (operation.toLowerCase()) {
+			case 'PREPEND':
+				$(appendTo).prepend($parentNode);
+				break;
+			case 'INSERT BEFORE':
+				$(appendTo).before($parentNode);
+				break;
+			case 'INSERT AFTER':
+				$(appendTo).after($parentNode);
+				break;
+			case 'APPEND':
+			default:
+				$(appendTo).append($parentNode);
+		}
 
-	return $parentNode;
-},
+		return $parentNode;
+	},
 	renderAd = (interactiveAd, adInstance) => {
 		const type = interactiveAd.formatData.type;
 		const adCode = window.adpushup.generateAdCode(interactiveAd);
