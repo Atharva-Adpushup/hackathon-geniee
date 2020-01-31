@@ -37,7 +37,8 @@ module.exports = {
 		TAG: 2,
 		HB: 3,
 		MEDIATION: 4,
-		INTERACTIVE_AD: 5
+		INTERACTIVE_AD: 5,
+		AP_LITE: 6
 	},
 	ERROR_CODES: {
 		UNKNOWN: 0,

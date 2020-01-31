@@ -13,8 +13,11 @@ var auction = {
 			: window.adpushup.adpTags.adpBatches;
 		var adpSlots = utils.getCurrentAdpSlotBatch(adpBatches, adpBatchId);
 
-		window.apLite.batchPrebiddingComplete = true;
-		if (Object.keys(adpSlots).length) {
+		adpConfig.apLiteActive
+			? (window.apLite.batchPrebiddingComplete = true)
+			: (window.adpTags.batchPrebiddingComplete = true);
+
+		if (adpSlots.length) {
 			return render.init(adpSlots);
 		}
 
