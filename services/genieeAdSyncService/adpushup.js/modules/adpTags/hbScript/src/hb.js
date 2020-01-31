@@ -13,7 +13,7 @@ var hb = {
 
 		adpSlotsBatch.forEach(function(adpSlot) {
 			var responsiveSizes = [];
-			if (adpSlot.isResponsive) {
+			if (!adp.config.apLiteActive && adpSlot.isResponsive) {
 				responsiveSizes = responsiveAds.getAdSizes(adpSlot.optionalParam.adId).collection;
 				adpSlot.computedSizes = responsiveSizes;
 			}
@@ -30,7 +30,11 @@ var hb = {
 			var size = adpSlot.size;
 			var computedSizes = adpSlot.computedSizes;
 			var prebidSizes = computedSizes.length ? computedSizes : [size];
-			if (adpSlot.optionalParam.overrideActive && adpSlot.optionalParam.overrideSizeTo) {
+			if (
+				!adp.config.apLiteActive &&
+				adpSlot.optionalParam.overrideActive &&
+				adpSlot.optionalParam.overrideSizeTo
+			) {
 				size = adpSlot.optionalParam.overrideSizeTo.split('x');
 			}
 

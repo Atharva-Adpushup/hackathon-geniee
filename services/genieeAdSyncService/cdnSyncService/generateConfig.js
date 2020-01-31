@@ -191,7 +191,7 @@ function init(site, computedConfig) {
 			ADPTAG_ACTIVE: !!prebidConfig,
 			SPA_ACTIVE: !!apConfigs.isSPA,
 			GENIEE_ACTIVE: !!apConfigs.partner,
-			AP_LITE: !!(apps && apps.apLite && apLiteConfig)
+			AP_LITE_ACTIVE: !!(apps && apps.apLite && apLiteConfig)
 		},
 		ads: {},
 		config: {}
