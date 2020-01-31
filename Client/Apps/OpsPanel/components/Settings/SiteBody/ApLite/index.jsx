@@ -1,6 +1,10 @@
 /* eslint-disable jsx-a11y/label-has-for */
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import React, { Component, Fragment } from 'react';
+import Papa from 'papaparse';
+import uuid from 'uuid';
+
+import axiosInstance from '../../../../../../helpers/axiosInstance';
 import { Panel, PanelGroup } from '@/Client/helpers/react-bootstrap-imports';
 import CustomButton from '../../../../../../Components/CustomButton/index';
 import FieldGroup from '../../../../../../Components/Layout/FieldGroup.jsx';
@@ -8,12 +12,19 @@ import CustomToggleSwitch from '../../../../../../Components/CustomToggleSwitch/
 import SelectBox from '../../../../../../Components/SelectBox/index';
 import { REFRESH_RATE_ENTRIES } from '../../../../configs/commonConsts';
 
+const DEFAULT_STATE = {
+	file: null,
+	fileName: ''
+};
+
 class ApLite extends Component {
 	state = {
 		view: 'list',
-		fileName: '',
+		isLoading: false,
 		adRefresh: true,
-		selectedRefreshRate: REFRESH_RATE_ENTRIES[0].value
+		selectedRefreshRate: REFRESH_RATE_ENTRIES[0].value,
+		structuredAdUnits: [],
+		...DEFAULT_STATE
 	};
 
 	componentDidMount() {
@@ -24,10 +35,20 @@ class ApLite extends Component {
 		fetchHBInitDataAction(siteId);
 	}
 
+	handleReset = () => this.setState(DEFAULT_STATE);
+
 	handleSelect = value => {
+		const {
+			site: { siteId }
+		} = this.props;
 		this.setState({
 			activeKey: value
 		});
+
+		return axiosInstance
+			.get(`ops/ap-lite/${siteId}`)
+			.then(res => console.log(res))
+			.catch(err => console.log(err));
 	};
 
 	handleToggle = (value, event) => {
@@ -45,6 +66,8 @@ class ApLite extends Component {
 
 	handleGAM = e => {
 		const { showNotification } = this.props;
+
+		let adUnitsArr = [];
 		if (!e.target.value.endsWith('.csv')) {
 			this.setState({ fileName: '' });
 			return showNotification({
@@ -54,7 +77,84 @@ class ApLite extends Component {
 				autoDismiss: 5
 			});
 		}
-		this.setState({ fileName: e.target.value });
+
+		this.setState({ fileName: e.target.value, file: e.target.files[0] }, () => {
+			Papa.parse(this.state.file, {
+				delimiter: '',
+				chunkSize: 3,
+				header: false,
+				complete: function(responses) {
+					responses.data.forEach(unit => {
+						let structuredData = {};
+						let dfpAdUnitName = unit[0].includes('�') ? unit[0].replace('�', '/') : unit[0];
+
+						structuredData.dfpAdUnitName = dfpAdUnitName;
+						structuredData.sectionId = uuid.v4();
+						structuredData.dfpAdunitCode = unit[1];
+
+						adUnitsArr.push(structuredData);
+					});
+				}
+			});
+			this.setState({ structuredAdUnits: adUnitsArr });
+		});
+	};
+
+	handleSave = () => {
+		const { structuredAdUnits } = this.state;
+
+		const {
+			site: {
+				siteId,
+				apps: { headerBidding }
+			},
+			showNotification
+		} = this.props;
+		const { adRefresh, selectedRefreshRate } = this.state;
+
+		const adUnitsWithAllFields = structuredAdUnits.map(v =>
+			Object.assign(
+				{},
+				{
+					...v,
+					refreshSlot: adRefresh,
+					refreshInterval: selectedRefreshRate,
+					headerBidding
+				}
+			)
+		);
+
+		let adUnits = adUnitsWithAllFields.filter(
+			data =>
+				data.dfpAdUnitName !== '' &&
+				data.dfpAdUnitName !== 'Total' &&
+				data.dfpAdUnitName !== 'Ad unit'
+		);
+
+		this.setState({ isLoading: true });
+
+		return axiosInstance
+			.put(`/ops/ap-lite/${siteId}`, {
+				adUnits
+			})
+			.then(res => {
+				showNotification({
+					mode: 'success',
+					title: 'Success',
+					message: 'Settings saved successsfully',
+					autoDismiss: 5
+				});
+				this.setState({ isLoading: false }, this.handleReset);
+			})
+			.catch(err => {
+				showNotification({
+					mode: 'error',
+					title: 'Operation Failed',
+					message: 'Something went wrong',
+					autoDismiss: 5
+				});
+				console.log(err);
+			});
 	};
 
 	getHbStatus(setupStatus) {
@@ -180,6 +280,7 @@ class ApLite extends Component {
 					type="submit"
 					variant="primary"
 					className="pull-right u-margin-r3 u-margin-t4"
+					onClick={this.handleSave}
 				>
 					Save
 				</CustomButton>
