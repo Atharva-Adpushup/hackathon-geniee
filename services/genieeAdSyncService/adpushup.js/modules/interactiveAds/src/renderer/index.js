@@ -19,7 +19,7 @@ const createParentNode = (appendTo, interactiveAd, css = {}, operation = 'append
 			$parentNode.css(css);
 		}
 
-		switch (operation.toLowerCase()) {
+		switch (operation.toUpperCase()) {
 			case 'PREPEND':
 				$(appendTo).prepend($parentNode);
 				break;
