@@ -310,7 +310,11 @@ class ApLite extends Component {
 					</React.Fragment>
 				) : null}
 
-				<CustomButton variant="secondary" className="pull-right u-margin-r3 u-margin-t4">
+				<CustomButton
+					variant="secondary"
+					className="pull-right u-margin-r3 u-margin-t4"
+					onClick={this.handleReset}
+				>
 					Cancel
 				</CustomButton>
 				<CustomButton
