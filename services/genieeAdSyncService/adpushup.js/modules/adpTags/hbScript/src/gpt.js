@@ -4,8 +4,6 @@ var constants = require('./constants');
 var feedback = require('./feedback');
 var responsiveAds = require('./responsiveAds');
 var adpConfig = window.adpushup.config;
-var apLiteConfig = require('../../../apLite/config').AP_LITE_CONFIG;
-var adp = require('../../../apLite/adp');
 var refreshAdSlot = require('../../../../src/refreshAdSlot');
 var getDFPCOntainerFromDom = function(containerId) {
 	return document.getElementById(containerId);
@@ -118,6 +116,8 @@ var gpt = {
 		});
 	},
 	setApLiteSlotRenderListener: function(w) {
+		var adp = require('../../../apLite/adp');
+
 		w.googletag.cmd.push(
 			function() {
 				w.googletag
@@ -131,7 +131,7 @@ var gpt = {
 							if (slot) {
 								// stop refresh if line Item is not price priority type
 								var lineItemId = event.sourceAgnosticLineItemId;
-								var pricePriorityLineItems = apLiteConfig.pricePriorityLineItems;
+								var pricePriorityLineItems = adpConfig.pricePriorityLineItems || [];
 								var isNotPricePriorityLineItem = !!(
 									lineItemId &&
 									pricePriorityLineItems &&

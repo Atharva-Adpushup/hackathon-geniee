@@ -6,6 +6,7 @@ var adp = require('./adp');
 var utils = require('./utils');
 var auction = require('./auction');
 var config = require('./config');
+var isApLiteActive = window.adpushup.config.apLiteActive;
 var hb = {
 	createPrebidSlots: function(adpSlotsBatch) {
 		var prebidSlots = [];
@@ -111,7 +112,9 @@ var hb = {
 			w._apPbJs.onEvent(constants.EVENTS.PREBID.BID_WON, function(bidData) {
 				utils.log('===BidWon====', bidData);
 
-				var slot = window.adpushup.adpTags.adpSlots[bidData.adUnitCode];
+				var slot = isApLiteActive
+					? window.apLite.adpSlots[bidData.adUnitCode]
+					: window.adpushup.adpTags.adpSlots[bidData.adUnitCode];
 				var computedCPMValue = utils.currencyConversionActive(adp.config)
 					? 'originalCpm'
 					: 'cpm';

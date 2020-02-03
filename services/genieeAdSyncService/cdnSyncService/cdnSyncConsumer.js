@@ -11,6 +11,7 @@ const fs = Promise.promisifyAll(require('fs'));
 const CC = require('../../../configs/commonConsts');
 const generatePrebidConfig = require('./generatePrebidConfig');
 const generateApLiteConfig = require('./generateApLiteConfig');
+const generateAdNetworkConfig = require('./generateAdNetworkConfig');
 const generateAdPushupConfig = require('./generateAdPushupConfig');
 const config = require('../../../configs/config');
 const generateStatusesAndConfig = require('./generateConfig');
@@ -48,10 +49,19 @@ module.exports = function(site, user) {
 			let apConfigs = site.get('apConfigs');
 			const adServerSettings = user.get('adServerSettings');
 			let isAdPartner = !!site.get('partner');
-			let { experiment, prebidConfig, apLiteConfig, manualAds, innovativeAds } = combinedConfig;
+			let {
+				experiment,
+				prebidConfig,
+				apLiteConfig,
+				adNetworkConfig,
+				manualAds,
+				innovativeAds
+			} = combinedConfig;
 
 			isAdPartner ? (apConfigs.partner = site.get('partner')) : null;
 
+			apConfigs.pricePriorityLineItems =
+				(adNetworkConfig && adNetworkConfig.pricePriorityLineItems) || [];
 			apConfigs.autoOptimise = isAutoOptimise ? true : false;
 			apConfigs.poweredByBanner = poweredByBanner ? true : false;
 			apConfigs.siteDomain = site.get('siteDomain');
@@ -179,7 +189,14 @@ module.exports = function(site, user) {
 						return generateAdPushupConfig(site);
 					})
 					.spread(generateCombinedJson);
-			})().then(setAllConfigs);
+			})()
+				.then(combinedConfig =>
+					generateAdNetworkConfig().then(adNetworkConfig => ({
+						adNetworkConfig,
+						...combinedConfig
+					}))
+				)
+				.then(setAllConfigs);
 		},
 		getConfigWrapper = site => {
 			return getComputedConfig().then(computedConfig =>
@@ -212,7 +229,7 @@ module.exports = function(site, user) {
 							prebidCurrencyConfig: finalConfig.config.prebidCurrencyConfig
 						})
 						.addService(CC.SERVICES.GDPR, finalConfig.statuses.GDPR_ACTIVE, finalConfig.config.gdpr)
-						.addService(CC.SERVICES.AP_LITE, finalConfig.statuses.AP_LITE, apLiteConfig)
+						.addService(CC.SERVICES.AP_LITE, finalConfig.statuses.AP_LITE_ACTIVE, apLiteConfig)
 						.done();
 					var compressed = '';
 

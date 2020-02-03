@@ -5,7 +5,9 @@ var $ = require('../../libs/jquery'),
 	config = require('../adpTags/hbScript/src/config'),
 	apLiteConfig = require('./config').AP_LITE_CONFIG,
 	constants = require('../adpTags/hbScript/src/constants'),
-	utils = require('../adpTags/hbScript/src/utils'),
+	commonConsts = require('../../config/commonConsts'),
+	hbUtils = require('../adpTags/hbScript/src/utils'),
+	utils = require('../../libs/utils'),
 	refreshAdSlot = require('../../src/refreshAdSlot'),
 	apLite = {
 		module: {
@@ -28,10 +30,10 @@ var $ = require('../../libs/jquery'),
 				this.adpBatches.push({ batchId: batchId, adpSlots: adpSlots });
 
 				// Add batch id to all batched adpSlots
-				utils.addBatchIdToAdpSlots(adpSlots, batchId);
+				hbUtils.addBatchIdToAdpSlots(adpSlots, batchId);
 
 				// Initiate prebidding for current adpSlots batch
-				this.prebidBatching(utils.getCurrentAdpSlotBatch(this.adpBatches, batchId));
+				this.prebidBatching(hbUtils.getCurrentAdpSlotBatch(this.adpBatches, batchId));
 
 				// Reset the adpSlots batch
 				this.currentBatchId = null;
@@ -54,7 +56,7 @@ var $ = require('../../libs/jquery'),
 
 				if (!this.slotInterval) {
 					this.currentBatchId = !this.currentBatchId
-						? Math.abs(utils.hashCode(String(+new Date())))
+						? Math.abs(hbUtils.hashCode(String(+new Date())))
 						: this.currentBatchId;
 				} else {
 					clearTimeout(this.slotInterval);
@@ -86,9 +88,9 @@ var $ = require('../../libs/jquery'),
 				var adpSlot = {
 					slotId: gptSlotElementId,
 					optionalParam,
-					bidders: optionalParam.headerBidding ? utils.getBiddersForSlot(size) : [],
+					bidders: optionalParam.headerBidding ? hbUtils.getBiddersForSlot(size) : [],
 					formats,
-					activeDFPNetwork: utils.getActiveDFPNetwork(),
+					activeDFPNetwork: hbUtils.getActiveDFPNetwork(),
 					size,
 					sectionName: dfpAdUnitName,
 					computedSizes: allSizes,
@@ -99,6 +101,7 @@ var $ = require('../../libs/jquery'),
 					feedbackSent: false,
 					hasTimedOut: false,
 					sectionId: sectionId,
+					services: optionalParam.services,
 					feedback: {
 						winner: constants.FEEDBACK.DEFAULT_WINNER
 					}
@@ -108,15 +111,21 @@ var $ = require('../../libs/jquery'),
 			},
 			setFeedbackData: function(adpSlot) {
 				var feedbackData = {
-					newFeedbackAdObj: {
-						ads: [adpSlot]
-					}
-					// services: [constants.SERVICES.HB],
-					// xpathMiss: [],
-					// ads: [adpSlot.sectionId],
-					// eventType: constants.MODE.ADPUSHUP,
-					// mode: constants.MODE.ADPUSHUP,
-					// variationId: config.VARIATION.ID
+					mode: commonConsts.MODE.ADPUSHUP,
+					errorCode: commonConsts.ERROR_CODES.NO_ERROR,
+					ads: [
+						{
+							id: adpSlot.slotId,
+							sectionName: adpSlot.sectionName,
+							status: commonConsts.AD_STATUS.IMPRESSION,
+							network: adpSlot.optionalParam.network,
+							networkData: {
+								adunitId: adpSlot.optionalParam.dfpAdunit,
+								headerBidding: adpSlot.optionalParam.headerBidding
+							},
+							services: adpSlot.services
+						}
+					]
 				};
 
 				return feedbackData;
@@ -162,16 +171,21 @@ var $ = require('../../libs/jquery'),
 														dfpAdunit: dfpAdUnitName,
 														dfpAdunitCode,
 														headerBidding: window.adpushup.services.HB_ACTIVE && slotHbStatus,
-														network: 'adpTag',
+														network: commonConsts.NETWORKS.ADPTAGS,
 														enableLazyLoading: false,
 														multipleAdSizes: allSizes,
 														sectionName: dfpAdUnitName,
 														refreshSlot,
-														refreshInterval
+														refreshInterval,
+														services: [commonConsts.SERVICES.AP_LITE]
 													}
 												);
 
 											this.adpSlots[gptSlotElementId] = adpSlot;
+
+											var feedbackData = this.setFeedbackData(adpSlot);
+											utils.sendFeedback(feedbackData);
+
 											this.queSlotForBidding(adpSlot);
 
 											var currentTime = new Date().getTime();
