@@ -3,6 +3,8 @@
 import React, { Component, Fragment } from 'react';
 import Papa from 'papaparse';
 import uuid from 'uuid';
+import isEqual from 'lodash/isEqual';
+import differenceWith from 'lodash/differenceWith';
 
 import axiosInstance from '../../../../../../helpers/axiosInstance';
 import { Panel, PanelGroup } from '@/Client/helpers/react-bootstrap-imports';
@@ -24,6 +26,7 @@ class ApLite extends Component {
 		adRefresh: true,
 		selectedRefreshRate: REFRESH_RATE_ENTRIES[0].value,
 		structuredAdUnits: [],
+		oldAdUnits: [],
 		...DEFAULT_STATE
 	};
 
@@ -47,7 +50,17 @@ class ApLite extends Component {
 
 		return axiosInstance
 			.get(`ops/ap-lite/${siteId}`)
-			.then(res => console.log(res))
+			.then(res => {
+				const {
+					data: { adUnits }
+				} = res.data;
+				const { refreshSlot, refreshInterval } = adUnits[0];
+				this.setState({
+					adRefresh: refreshSlot,
+					selectedRefreshRate: refreshInterval,
+					oldAdUnits: adUnits
+				});
+			})
 			.catch(err => console.log(err));
 	};
 
@@ -89,7 +102,6 @@ class ApLite extends Component {
 						let dfpAdUnitName = unit[0].includes('�') ? unit[0].replace('�', '/') : unit[0];
 
 						structuredData.dfpAdUnitName = dfpAdUnitName;
-						structuredData.sectionId = uuid.v4();
 						structuredData.dfpAdunitCode = unit[1];
 
 						adUnitsArr.push(structuredData);
@@ -101,7 +113,33 @@ class ApLite extends Component {
 	};
 
 	handleSave = () => {
-		const { structuredAdUnits } = this.state;
+		const { structuredAdUnits, oldAdUnits } = this.state;
+
+		let currentAdUnitsWithDfpNameAndCode = structuredAdUnits.filter(
+			data =>
+				data.dfpAdUnitName !== '' &&
+				data.dfpAdUnitName !== 'Total' &&
+				data.dfpAdUnitName !== 'Ad unit'
+		);
+		const oldAdUnitsWithDfpNameAndCode = oldAdUnits.map(
+			({ refreshSlot, refreshInterval, headerBidding, sectionId, isActive, ...rest }) => rest
+		);
+
+		const unCommonAdUnits = differenceWith(
+			oldAdUnitsWithDfpNameAndCode,
+			currentAdUnitsWithDfpNameAndCode,
+			isEqual
+		);
+
+		if (!unCommonAdUnits.length) {
+			currentAdUnitsWithDfpNameAndCode = [
+				...currentAdUnitsWithDfpNameAndCode.map(v => ({ ...v, isActive: true }))
+			];
+		}
+		currentAdUnitsWithDfpNameAndCode = [
+			...currentAdUnitsWithDfpNameAndCode.map(v => ({ ...v, isActive: true })),
+			...unCommonAdUnits.map(v => ({ ...v, isActive: false }))
+		];
 
 		const {
 			site: {
@@ -112,23 +150,17 @@ class ApLite extends Component {
 		} = this.props;
 		const { adRefresh, selectedRefreshRate } = this.state;
 
-		const adUnitsWithAllFields = structuredAdUnits.map(v =>
+		const adUnits = currentAdUnitsWithDfpNameAndCode.map(v =>
 			Object.assign(
 				{},
 				{
 					...v,
+					sectionId: uuid.v4(),
 					refreshSlot: adRefresh,
 					refreshInterval: selectedRefreshRate,
 					headerBidding
 				}
 			)
-		);
-
-		let adUnits = adUnitsWithAllFields.filter(
-			data =>
-				data.dfpAdUnitName !== '' &&
-				data.dfpAdUnitName !== 'Total' &&
-				data.dfpAdUnitName !== 'Ad unit'
 		);
 
 		this.setState({ isLoading: true });
@@ -138,12 +170,17 @@ class ApLite extends Component {
 				adUnits
 			})
 			.then(res => {
+				const {
+					data: { adUnits }
+				} = res.data;
+
 				showNotification({
 					mode: 'success',
 					title: 'Success',
 					message: 'Settings saved successsfully',
 					autoDismiss: 5
 				});
+
 				this.setState({ isLoading: false }, this.handleReset);
 			})
 			.catch(err => {

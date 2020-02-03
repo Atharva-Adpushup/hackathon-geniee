@@ -281,7 +281,8 @@ router
 		const json = { siteId: parseInt(siteId), adUnits };
 		return apLiteModel
 			.saveAdUnits(json)
-			.then(() => res.send({ msg: 'doc saved successfully' }))
+			.then(() => apLiteModel.getAPLiteModelBySite(json.siteId))
+			.then(doc => sendSuccessResponse(doc, res))
 			.catch(err => errorHandler(err));
 	})
 
@@ -290,7 +291,7 @@ router
 
 		return apLiteModel
 			.getAPLiteModelBySite(parseInt(siteId))
-			.then(adUnitData => sendSuccessResponse(adUnitData, res))
+			.then(docData => sendSuccessResponse(docData, res))
 			.catch(err => errorHandler(err, res));
 	});
 module.exports = router;
