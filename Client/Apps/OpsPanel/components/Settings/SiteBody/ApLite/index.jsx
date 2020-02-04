@@ -5,9 +5,12 @@ import Papa from 'papaparse';
 import uuid from 'uuid';
 import isEqual from 'lodash/isEqual';
 import differenceWith from 'lodash/differenceWith';
+import { CSVLink } from 'react-csv';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
+import CustomReactTable from '../../../../../../Components/CustomReactTable/index.jsx';
 import axiosInstance from '../../../../../../helpers/axiosInstance';
-import { Panel, PanelGroup } from '@/Client/helpers/react-bootstrap-imports';
+import { Panel, PanelGroup, Modal } from '@/Client/helpers/react-bootstrap-imports';
 import CustomButton from '../../../../../../Components/CustomButton/index';
 import FieldGroup from '../../../../../../Components/Layout/FieldGroup.jsx';
 import CustomToggleSwitch from '../../../../../../Components/CustomToggleSwitch/index';
@@ -24,6 +27,7 @@ class ApLite extends Component {
 		view: 'list',
 		isLoading: false,
 		adRefresh: true,
+		show: false,
 		selectedRefreshRate: REFRESH_RATE_ENTRIES[0].value,
 		structuredAdUnits: [],
 		oldAdUnits: [],
@@ -73,6 +77,10 @@ class ApLite extends Component {
 		});
 	};
 
+	handleHide = () => {
+		this.setState({ show: false });
+	};
+
 	onSelect = (value, key) => {
 		this.setState({ [key]: value });
 	};
@@ -118,6 +126,7 @@ class ApLite extends Component {
 		let currentAdUnitsWithDfpNameAndCode = structuredAdUnits.filter(
 			data =>
 				data.dfpAdUnitName !== '' &&
+				data.dfpAdUnitName !== 'Default' &&
 				data.dfpAdUnitName !== 'Total' &&
 				data.dfpAdUnitName !== 'Ad unit'
 		);
@@ -212,6 +221,26 @@ class ApLite extends Component {
 
 		return matchDfpAccount.name;
 	}
+
+	gamAdUnitsLabel = () => {
+		return (
+			<React.Fragment>
+				GAM Ad Units{' '}
+				<CSVLink
+					headers={[
+						{ label: 'Ad unit', key: 'dfpAdUnitName' },
+						{ label: 'Ad Unit Code', key: 'dfpAdUnitCode' }
+					]}
+					data={[]}
+					filename="adUnitsTemplate.csv"
+					style={{ display: 'block' }}
+				>
+					(Download CSV Template)
+				</CSVLink>
+			</React.Fragment>
+		);
+	};
+
 	renderView = () => {
 		const styles = {
 			display: 'inline-block',
@@ -272,11 +301,17 @@ class ApLite extends Component {
 					value={fileName}
 					onChange={this.handleGAM}
 					type="file"
-					label="GAM Ad Units"
+					label={this.gamAdUnitsLabel()}
 					size={6}
 					id="gamAdUnits-text"
-					className="u-padding-v4 u-padding-h4"
+					style={{
+						display: 'inline-block',
+						float: 'right',
+						width: '220',
+						fontWeight: '700'
+					}}
 				/>
+
 				{fileName ? (
 					<React.Fragment>
 						<CustomToggleSwitch
@@ -307,6 +342,44 @@ class ApLite extends Component {
 								className="refresh-rate"
 							/>
 						</div>
+
+						<CustomButton
+							variant="primary"
+							bsSize="large"
+							onClick={() => this.setState({ show: true })}
+						>
+							Show Uploaded Ad Units
+						</CustomButton>
+
+						<Modal
+							show={this.state.show}
+							onHide={this.handleHide}
+							container={this}
+							aria-labelledby="contained-modal-title"
+						>
+							<Modal.Header closeButton>
+								<Modal.Title id="contained-modal-title">List of Ad Units</Modal.Title>
+							</Modal.Header>
+							<Modal.Body className="aplite-modal">
+								<CustomReactTable
+									columns={[
+										{ Header: 'Ad Unit', accessor: 'dfpAdUnitName' },
+										{ Header: 'Ad Unit Code', accessor: 'dfpAdunitCode' }
+									]}
+									data={this.state.structuredAdUnits.filter(
+										data =>
+											data.dfpAdUnitName !== '' &&
+											data.dfpAdUnitName !== 'Default' &&
+											data.dfpAdUnitName !== 'Total' &&
+											data.dfpAdUnitName !== 'Ad unit'
+									)}
+									defaultPageSize={100}
+								/>
+							</Modal.Body>
+							<Modal.Footer>
+								<CustomButton onClick={this.handleHide}>Close</CustomButton>
+							</Modal.Footer>
+						</Modal>
 					</React.Fragment>
 				) : null}
 
