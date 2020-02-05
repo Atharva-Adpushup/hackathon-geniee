@@ -213,7 +213,7 @@ var request = require('request-promise'),
 					idap: payeeId,
 					timestamp: date,
 					key: hash,
-					amount: '100'
+					amount: '5000'
 				},
 				createClient = Promise.promisify(soap.createClient);
 
