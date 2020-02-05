@@ -200,9 +200,10 @@ var request = require('request-promise'),
 						.digest('hex')
 						.substr(0, 64)
 				),
+				amount = 5000,
 				payer = tipaltiConfig.payerName,
 				date = Math.floor(+new Date() / 1000),
-				paramsStr = payer + payeeId + date + '100',
+				paramsStr = payer + payeeId + date + amount,
 				key = tipaltiConfig.key,
 				hash = crypto
 					.createHmac('sha256', key)
@@ -213,7 +214,7 @@ var request = require('request-promise'),
 					idap: payeeId,
 					timestamp: date,
 					key: hash,
-					amount: '5000'
+					amount
 				},
 				createClient = Promise.promisify(soap.createClient);
 
