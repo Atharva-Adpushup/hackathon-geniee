@@ -235,7 +235,7 @@ class ApLite extends Component {
 					filename="adUnitsTemplate.csv"
 					style={{ display: 'block' }}
 				>
-					(Download CSV Template)
+					<small> (Download CSV Template)</small>
 				</CSVLink>
 			</React.Fragment>
 		);
