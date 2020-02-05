@@ -115,7 +115,7 @@ var $ = require('../../libs/jquery'),
 					errorCode: commonConsts.ERROR_CODES.NO_ERROR,
 					ads: [
 						{
-							id: adpSlot.slotId,
+							id: adpSlot.sectionId,
 							sectionName: adpSlot.sectionName,
 							status: commonConsts.AD_STATUS.IMPRESSION,
 							network: adpSlot.optionalParam.network,
