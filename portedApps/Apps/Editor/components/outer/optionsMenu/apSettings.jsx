@@ -269,7 +269,7 @@ module.exports = React.createClass({
 						/>
 					</Col>
 				</Row>
-				{/* <Row>
+				<Row>
 					<Col className="u-padding-r10px" xs={12}>
 						<Button
 							className="btn-lightBg btn-edit"
@@ -278,7 +278,7 @@ module.exports = React.createClass({
 							Manage BlockList
 						</Button>
 					</Col>
-				</Row> */}
+				</Row>
 				{this.isAdRecoverInSite() || this.props.isApex ? this.renderPageGroupPatternLayout() : null}
 				{this.props.isApex ? this.renderTrafficDistributionLayout() : null}
 
