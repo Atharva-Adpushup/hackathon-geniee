@@ -151,10 +151,7 @@ class ApLite extends Component {
 		];
 
 		const {
-			site: {
-				siteId,
-				apps: { headerBidding }
-			},
+			site: { siteId },
 			showNotification
 		} = this.props;
 		const { adRefresh, selectedRefreshRate } = this.state;
@@ -167,7 +164,7 @@ class ApLite extends Component {
 					sectionId: uuid.v4(),
 					refreshSlot: adRefresh,
 					refreshInterval: selectedRefreshRate,
-					headerBidding
+					headerBidding: true
 				}
 			)
 		);
@@ -328,20 +325,22 @@ class ApLite extends Component {
 							id={`js-adRefresh-${siteId}-${siteDomain}`}
 						/>
 
-						<div className="refresh-rate" style={{ display: 'flex' }}>
-							<p className="u-text-bold u-margin-b4">Refresh Rate</p>
-							<SelectBox
-								selected={selectedRefreshRate}
-								options={REFRESH_RATE_ENTRIES}
-								onSelect={this.onSelect}
-								id="select-entry"
-								title="Select Entry"
-								dataKey="selectedRefreshRate"
-								reset
-								style={{ marginLeft: 'auto', width: '20%' }}
-								className="refresh-rate"
-							/>
-						</div>
+						{adRefresh ? (
+							<div className="refresh-rate" style={{ display: 'flex' }}>
+								<p className="u-text-bold u-margin-b4">Refresh Rate</p>
+								<SelectBox
+									selected={selectedRefreshRate}
+									options={REFRESH_RATE_ENTRIES}
+									onSelect={this.onSelect}
+									id="select-entry"
+									title="Select Entry"
+									dataKey="selectedRefreshRate"
+									reset
+									style={{ marginLeft: 'auto', width: '20%' }}
+									className="refresh-rate"
+								/>
+							</div>
+						) : null}
 
 						<CustomButton
 							variant="primary"
