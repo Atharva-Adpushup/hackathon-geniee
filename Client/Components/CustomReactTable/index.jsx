@@ -68,17 +68,17 @@ const CustomReactTable = ({
 );
 
 CustomReactTable.propTypes = {
-	columns: PropTypes.object.isRequired,
-	data: PropTypes.object.isRequired,
-	pageSizeOptions: PropTypes.object.isRequired,
-	defaultPageSize: PropTypes.number.isRequired,
-	minRows: PropTypes.number.isRequired,
-	sortable: PropTypes.bool.isRequired,
-	filterable: PropTypes.bool.isRequired,
-	showPaginationBottom: PropTypes.bool.isRequired,
-	showPaginationTop: PropTypes.bool.isRequired,
-	defaultSorting: PropTypes.object.isRequired,
-	pivotBy: PropTypes.object.isRequired
+	columns: PropTypes.oneOfType([PropTypes.array, PropTypes.object]).isRequired,
+	data: PropTypes.oneOfType([PropTypes.array, PropTypes.object]).isRequired,
+	pageSizeOptions: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
+	defaultPageSize: PropTypes.number,
+	minRows: PropTypes.number,
+	sortable: PropTypes.bool,
+	filterable: PropTypes.bool,
+	showPaginationBottom: PropTypes.bool,
+	showPaginationTop: PropTypes.bool,
+	defaultSorting: PropTypes.object,
+	pivotBy: PropTypes.oneOfType([PropTypes.array, PropTypes.object])
 };
 
 CustomReactTable.defaultProps = {

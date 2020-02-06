@@ -124,3 +124,19 @@
 		}
 	}
 }
+
+.refresh-rate {
+	.custom-select-box-wrapper {
+		width: 20%;
+		margin-left: auto;
+	}
+}
+
+.aplite-modal {
+	.ReactTable {
+		height: 400px;
+		.rt-thead {
+			overflow-y: scroll;
+		}
+	}
+}

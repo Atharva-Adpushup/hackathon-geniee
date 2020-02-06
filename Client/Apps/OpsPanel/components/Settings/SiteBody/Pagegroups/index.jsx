@@ -58,25 +58,28 @@ class Pagegroups extends Component {
 
 	render() {
 		const { site } = this.props;
+		const { apps = {} } = site;
 		const { siteId, siteDomain } = site;
 		const { activeKey } = this.state;
 		return (
 			<div className="u-margin-t4">
-				<PanelGroup
-					accordion
-					id={`pagegroup-panel-${siteId}-${siteDomain}`}
-					activeKey={activeKey}
-					onSelect={this.handleSelect}
-				>
-					<Panel eventKey="pagegroups">
-						<Panel.Heading>
-							<Panel.Title toggle>Pagegroups</Panel.Title>
-						</Panel.Heading>
-						{activeKey === 'pagegroups' ? (
-							<Panel.Body collapsible>{this.renderView()}</Panel.Body>
-						) : null}
-					</Panel>
-				</PanelGroup>
+				{apps.apLite ? null : (
+					<PanelGroup
+						accordion
+						id={`pagegroup-panel-${siteId}-${siteDomain}`}
+						activeKey={activeKey}
+						onSelect={this.handleSelect}
+					>
+						<Panel eventKey="pagegroups">
+							<Panel.Heading>
+								<Panel.Title toggle>Pagegroups</Panel.Title>
+							</Panel.Heading>
+							{activeKey === 'pagegroups' ? (
+								<Panel.Body collapsible>{this.renderView()}</Panel.Body>
+							) : null}
+						</Panel>
+					</PanelGroup>
+				)}
 			</div>
 		);
 	}
