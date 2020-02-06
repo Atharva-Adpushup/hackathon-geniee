@@ -27,6 +27,7 @@ const AP_APP_BUCKET = 'apAppBucket';
 
 let errors = [];
 let confidentialEmails = ['@media.net'];
+let confidentialCompanyNames = ['media.net'];
 let ignoredEmails = ['@mailinator', '@adpushup'];
 
 function getUsersQueryForBucket(bucketName) {
@@ -67,8 +68,16 @@ function isIgnoredEmail(email) {
 	return ignoredEmails.some(ignoredEmail => !!email.includes(ignoredEmail));
 }
 
-function isConfidentialUser(email) {
-	return confidentialEmails.some(confidentialEmail => !!email.includes(confidentialEmail));
+function isConfidentialEmail(email) {
+	return confidentialEmails.some(
+		confidentialEmail => !!email.toLowerCase().includes(confidentialEmail)
+	);
+}
+
+function isConfidentialCompanyName(companyName) {
+	return confidentialCompanyNames.some(
+		confidentialCompanyName => !!companyName.toLowerCase().includes(confidentialCompanyName)
+	);
 }
 
 function getUsersWithNonEmptySites() {
@@ -123,7 +132,8 @@ function createSellerId(email) {
 
 function getPreparedSiteObj(siteDomain, user) {
 	let siteObj = {};
-	let isConfidential = isConfidentialUser(user.email);
+	let isConfidential =
+		isConfidentialEmail(user.email) || isConfidentialCompanyName(user.companyName);
 
 	if (!isConfidential) {
 		siteObj.name = user.companyName;
@@ -333,4 +343,9 @@ process.on('unhandledRejection', function(reason) {
 	handleError(reason);
 });
 
-init();
+try {
+	init();
+} catch (error) {
+	handleError(error);
+	reportErrors();
+}
