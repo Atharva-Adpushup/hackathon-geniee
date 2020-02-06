@@ -55,7 +55,9 @@ var modelAPI = (module.exports = apiModule()),
 			'paymentInfoComplete',
 			'isPaymentDetailsComplete',
 			'adServerSettings',
-			'adServerSetupStatus'
+			'adServerSetupStatus',
+			'sellerId',
+			'companyName'
 		];
 		this.clientKeys = [
 			'firstName',
@@ -79,7 +81,9 @@ var modelAPI = (module.exports = apiModule()),
 			'paymentInfoComplete',
 			'isPaymentDetailsComplete',
 			'adServerSettings',
-			'adServerSetupStatus'
+			'adServerSetupStatus',
+			'sellerId',
+			'companyName'
 		];
 		this.validations = schema.user.validations;
 		this.classMap = {
@@ -902,6 +906,17 @@ function apiModule() {
 					return user.save();
 				});
 			});
+		},
+		updateUserData: function(email, data) {
+			return API.getUserByEmail(email).then(function(user) {
+				for (key in data) {
+					user.set(key, data[key]);
+				}
+				return user.save();
+			});
+		},
+		getUserDetailsFromTipalti: function(email) {
+			return proxy.getPayeeDetailsFromTipalti(email);
 		}
 	};
 

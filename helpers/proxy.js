@@ -230,6 +230,46 @@ var request = require('request-promise'),
 				.catch(function() {
 					return 'some error occured';
 				});
+		},
+
+		getPayeeDetailsFromTipalti(email) {
+			var tipaltiConfig = config.tipalti,
+				url = tipaltiConfig.soapUrl,
+				payeeId = encodeURIComponent(
+					crypto
+						.createHash('md5')
+						.update(email)
+						.digest('hex')
+						.substr(0, 64)
+				),
+				payer = tipaltiConfig.payerName,
+				date = Math.floor(+new Date() / 1000),
+				paramsStr = payer + payeeId + date,
+				key = tipaltiConfig.key,
+				hash = crypto
+					.createHmac('sha256', key)
+					.update(paramsStr.toString('utf-8'))
+					.digest('hex'),
+				requestArgs = {
+					payerName: payer,
+					idap: payeeId,
+					timestamp: date,
+					key: hash
+				},
+				createClient = Promise.promisify(soap.createClient);
+
+			return createClient(url)
+				.then(function(client) {
+					var method = client['GetPayeeDetails'];
+					method = Promise.promisify(method);
+					return method(requestArgs);
+				})
+				.then(function(result) {
+					return result.GetPayeeDetailsResult;
+				})
+				.catch(function(error) {
+					return `FAILED TO FETCH DATA FROM TIPALTI: ${error}`;
+				});
 		}
 	};
 

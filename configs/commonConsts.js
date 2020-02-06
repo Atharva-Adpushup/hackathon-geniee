@@ -10,6 +10,10 @@ module.exports = {
 	SALT: '_ADP_RANDOMIZER_',
 	BASE_URL: computedProductionURL,
 	INTEGRATION_BASE_URL: computedProductionURL,
+	SUPPORT_EMAIL: 'support@adpushup.com',
+	ADDRESS: {
+		USA: '4023 Kennett Pike #52878 Wilmington, DE 19807'
+	},
 	DFP_WEB_SERVICE_ENDPOINT: 'https://api.adpushup.com/DfpWebService/info',
 	TRANSACTION_LOG_ENDPOINT: 'https://api.adpushup.com/SetupLogWebService/log',
 	REPORT_STATUS: 'https://api.adpushup.com/OpsWebService/ops?report=getNetworkImportServiceStatus',
