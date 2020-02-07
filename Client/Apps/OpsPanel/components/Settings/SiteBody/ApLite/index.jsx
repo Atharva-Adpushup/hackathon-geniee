@@ -123,7 +123,7 @@ class ApLite extends Component {
 								? `${
 										adUnits.filter(val => val.adUnitName.trim() === unit[0].split('»')[0].trim())[0]
 											.adUnitcode
-								  } / ${unit[1]}`
+								  }/${unit[1]}`
 								: unit[1];
 
 						structuredData.dfpAdUnitName = dfpAdUnitName;
