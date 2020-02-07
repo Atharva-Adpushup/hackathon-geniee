@@ -3,7 +3,6 @@ const md5 = require('md5');
 const path = require('path');
 const validator = require('validator');
 const couchbase = require('couchbase');
-const _isEmpty = require('lodash/isEmpty');
 const _findIndex = require('lodash/findIndex');
 
 const userModel = require('../../models/userModel');
@@ -254,7 +253,8 @@ function processDataInChunks(users, chunkSize = 500) {
 
 		if (!user.sellerId) {
 			let sellerId = createSellerId(user.email);
-			userModelUpdates['sellerId'] = sellerId;
+			let updateSellerIdPromise = updateUser(user, { sellerId });
+			pendingPromises.push(updateSellerIdPromise);
 			user.sellerId = sellerId;
 		}
 
@@ -273,10 +273,7 @@ function processDataInChunks(users, chunkSize = 500) {
 						// skip user if company name not set in user after fetching from Tipalti
 						return Promise.reject({ skipUser: true });
 					}
-
-					if (!_isEmpty(userModelUpdates)) {
-						return updateUser(user, userModelUpdates);
-					}
+					return updateUser(user, userModelUpdates);
 				})
 				.then(function() {
 					let siteObj = getPreparedSiteObj(user.siteDomain, user);
