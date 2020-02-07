@@ -105,9 +105,26 @@ class ApLite extends Component {
 				chunkSize: 3,
 				header: false,
 				complete: function(responses) {
+					let adUnits = [];
+					let adUnitsName = [];
+
 					responses.data.forEach(unit => {
+						let obj = {};
+
+						adUnitsName.push(unit[0]);
+						obj.adUnitName = unit[0];
+						obj.adUnitcode = unit[1];
+						adUnits.push(obj);
+
 						let structuredData = {};
-						let dfpAdUnitName = unit[0].includes('�') ? unit[0].replace('�', '/') : unit[0];
+						let dfpAdUnitName =
+							unit[0].includes('»') &&
+							adUnitsName.map(s => s.trim()).includes(unit[0].split('»')[0].trim())
+								? `${
+										adUnits.filter(val => val.adUnitName.trim() === unit[0].split('»')[0].trim())[0]
+											.adUnitcode
+								  } / ${unit[1]}`
+								: unit[1];
 
 						structuredData.dfpAdUnitName = dfpAdUnitName;
 						structuredData.dfpAdunitCode = unit[1];
@@ -116,6 +133,7 @@ class ApLite extends Component {
 					});
 				}
 			});
+
 			this.setState({ structuredAdUnits: adUnitsArr });
 		});
 	};
@@ -128,7 +146,9 @@ class ApLite extends Component {
 				data.dfpAdUnitName !== '' &&
 				data.dfpAdUnitName !== 'Default' &&
 				data.dfpAdUnitName !== 'Total' &&
-				data.dfpAdUnitName !== 'Ad unit'
+				data.dfpAdUnitName !== 'Ad unit' &&
+				data.dfpAdUnitName !== 'Ad Unit Code' &&
+				data.dfpAdUnitName !== undefined
 		);
 		const oldAdUnitsWithDfpNameAndCode = oldAdUnits.map(
 			({ refreshSlot, refreshInterval, headerBidding, sectionId, isActive, ...rest }) => rest
@@ -370,9 +390,12 @@ class ApLite extends Component {
 											data.dfpAdUnitName !== '' &&
 											data.dfpAdUnitName !== 'Default' &&
 											data.dfpAdUnitName !== 'Total' &&
-											data.dfpAdUnitName !== 'Ad unit'
+											data.dfpAdUnitName !== 'Ad unit' &&
+											data.dfpAdUnitName !== 'Ad Unit Code' &&
+											data.dfpAdUnitName !== undefined
 									)}
-									defaultPageSize={100}
+									defaultPageSize={20}
+									minRows={0}
 								/>
 							</Modal.Body>
 							<Modal.Footer>
