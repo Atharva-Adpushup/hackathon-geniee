@@ -145,8 +145,7 @@ var $ = require('../../libs/jquery'),
 										}),
 										gptSlotElementId = gptSlot.getSlotElementId(),
 										gptAdUnitPath = gptSlot.getAdUnitPath(),
-										gptAdUnitPathArr = gptAdUnitPath.split('/'),
-										dfpAdUnitName = gptAdUnitPathArr[gptAdUnitPathArr.length - 1],
+										dfpAdUnitName = gptAdUnitPath.replace(/^\/\d+\//, ''),
 										apLiteAdUnit = apLiteConfig.adUnits.find(
 											adUnit => adUnit.dfpAdUnit === dfpAdUnitName
 										),
