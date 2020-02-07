@@ -252,7 +252,6 @@ class Account extends Component {
 
 		if (loading) return <Loader height="200px" />;
 
-		console.log(dfpAccounts);
 		return (
 			<Col xs={12} style={{ margin: '0 auto' }}>
 				{isDFPSetup ? null : (
