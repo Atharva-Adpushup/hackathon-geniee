@@ -252,6 +252,7 @@ class Account extends Component {
 
 		if (loading) return <Loader height="200px" />;
 
+		console.log(dfpAccounts);
 		return (
 			<Col xs={12} style={{ margin: '0 auto' }}>
 				{isDFPSetup ? null : (
@@ -296,7 +297,8 @@ class Account extends Component {
 				) : (
 					<Fragment>
 						<p className="u-text-bold">Select Google Ad Manager</p>
-						{apLiteSites.length && !adServerSettings.hasOwnProperty('dfp') ? (
+						{apLiteSites.length &&
+						!adNetworkSettings.filter(val => val.networkName === 'DFP').length ? (
 							<CustomMessage
 								type="error"
 								header="No Third Party DFP Added"

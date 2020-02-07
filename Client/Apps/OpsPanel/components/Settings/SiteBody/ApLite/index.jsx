@@ -17,6 +17,8 @@ import CustomToggleSwitch from '../../../../../../Components/CustomToggleSwitch/
 import SelectBox from '../../../../../../Components/SelectBox/index';
 import { REFRESH_RATE_ENTRIES } from '../../../../configs/commonConsts';
 
+const dfpAdsUnitNamesToFilter = ['Default', 'Total', '', undefined, 'Ad Unit Code', 'Ad unit'];
+
 const DEFAULT_STATE = {
 	file: null,
 	fileName: ''
@@ -126,7 +128,7 @@ class ApLite extends Component {
 								  }/${unit[1]}`
 								: unit[1];
 
-						structuredData.dfpAdUnitName = dfpAdUnitName;
+						structuredData.dfpAdUnit = dfpAdUnitName;
 						structuredData.dfpAdunitCode = unit[1];
 
 						adUnitsArr.push(structuredData);
@@ -141,14 +143,8 @@ class ApLite extends Component {
 	handleSave = () => {
 		const { structuredAdUnits, oldAdUnits } = this.state;
 
-		let currentAdUnitsWithDfpNameAndCode = structuredAdUnits.filter(
-			data =>
-				data.dfpAdUnitName !== '' &&
-				data.dfpAdUnitName !== 'Default' &&
-				data.dfpAdUnitName !== 'Total' &&
-				data.dfpAdUnitName !== 'Ad unit' &&
-				data.dfpAdUnitName !== 'Ad Unit Code' &&
-				data.dfpAdUnitName !== undefined
+		let currentAdUnitsWithDfpNameAndCode = structuredAdUnits.filter(data => data =>
+			!dfpAdsUnitNamesToFilter.includes(data.dfpAdUnit)
 		);
 		const oldAdUnitsWithDfpNameAndCode = oldAdUnits.map(
 			({ refreshSlot, refreshInterval, headerBidding, sectionId, isActive, ...rest }) => rest
@@ -245,7 +241,7 @@ class ApLite extends Component {
 				GAM Ad Units{' '}
 				<CSVLink
 					headers={[
-						{ label: 'Ad unit', key: 'dfpAdUnitName' },
+						{ label: 'Ad unit', key: 'dfpAdUnit' },
 						{ label: 'Ad Unit Code', key: 'dfpAdUnitCode' }
 					]}
 					data={[]}
@@ -382,17 +378,11 @@ class ApLite extends Component {
 							<Modal.Body className="aplite-modal">
 								<CustomReactTable
 									columns={[
-										{ Header: 'Ad Unit', accessor: 'dfpAdUnitName' },
+										{ Header: 'Ad Unit', accessor: 'dfpAdUnit' },
 										{ Header: 'Ad Unit Code', accessor: 'dfpAdunitCode' }
 									]}
 									data={this.state.structuredAdUnits.filter(
-										data =>
-											data.dfpAdUnitName !== '' &&
-											data.dfpAdUnitName !== 'Default' &&
-											data.dfpAdUnitName !== 'Total' &&
-											data.dfpAdUnitName !== 'Ad unit' &&
-											data.dfpAdUnitName !== 'Ad Unit Code' &&
-											data.dfpAdUnitName !== undefined
+										data => !dfpAdsUnitNamesToFilter.includes(data.dfpAdUnit)
 									)}
 									defaultPageSize={20}
 									minRows={0}
