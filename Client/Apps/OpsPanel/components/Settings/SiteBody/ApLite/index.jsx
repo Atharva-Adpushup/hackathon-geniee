@@ -33,6 +33,7 @@ class ApLite extends Component {
 		selectedRefreshRate: REFRESH_RATE_ENTRIES[0].value,
 		structuredAdUnits: [],
 		oldAdUnits: [],
+		uploadedAdUnits: [],
 		...DEFAULT_STATE
 	};
 
@@ -143,8 +144,8 @@ class ApLite extends Component {
 	handleSave = () => {
 		const { structuredAdUnits, oldAdUnits } = this.state;
 
-		let currentAdUnitsWithDfpNameAndCode = structuredAdUnits.filter(data => data =>
-			!dfpAdsUnitNamesToFilter.includes(data.dfpAdUnit)
+		let currentAdUnitsWithDfpNameAndCode = structuredAdUnits.filter(
+			data => !dfpAdsUnitNamesToFilter.includes(data.dfpAdUnit)
 		);
 		const oldAdUnitsWithDfpNameAndCode = oldAdUnits.map(
 			({ refreshSlot, refreshInterval, headerBidding, sectionId, isActive, ...rest }) => rest
@@ -203,7 +204,16 @@ class ApLite extends Component {
 					autoDismiss: 5
 				});
 
-				this.setState({ isLoading: false }, this.handleReset);
+				this.setState(
+					{
+						isLoading: false,
+						uploadedAdUnits: adUnits.map(
+							({ refreshSlot, refreshInterval, headerBidding, sectionId, isActive, ...rest }) =>
+								rest
+						)
+					},
+					this.handleReset
+				);
 			})
 			.catch(err => {
 				showNotification({
@@ -268,7 +278,14 @@ class ApLite extends Component {
 		} = this.props;
 
 		const { siteId, siteDomain } = site;
-		const { selectedRefreshRate, adRefresh, fileName } = this.state;
+		const {
+			selectedRefreshRate,
+			adRefresh,
+			fileName,
+			oldAdUnits,
+			uploadedAdUnits,
+			structuredAdUnits
+		} = this.state;
 
 		const { setupStatus } = headerBiddingData[siteId];
 		const hbStatus = this.getHbStatus(setupStatus);
@@ -288,7 +305,7 @@ class ApLite extends Component {
 					name="Google Ad Manager"
 					value={
 						activeDFPNetworkName
-							? `Connected ( ${activeDFPNetworkName} ,${activeDFPNetworkId})`
+							? `Connected (${activeDFPNetworkName} ,${activeDFPNetworkId})`
 							: 'Not Connected'
 					}
 					isTextOnly
@@ -325,7 +342,7 @@ class ApLite extends Component {
 					}}
 				/>
 
-				{fileName ? (
+				{fileName || uploadedAdUnits.length || oldAdUnits.length ? (
 					<React.Fragment>
 						<CustomToggleSwitch
 							labelText="Ad Refresh"
@@ -381,9 +398,13 @@ class ApLite extends Component {
 										{ Header: 'Ad Unit', accessor: 'dfpAdUnit' },
 										{ Header: 'Ad Unit Code', accessor: 'dfpAdunitCode' }
 									]}
-									data={this.state.structuredAdUnits.filter(
-										data => !dfpAdsUnitNamesToFilter.includes(data.dfpAdUnit)
-									)}
+									data={
+										oldAdUnits.length
+											? oldAdUnits
+											: structuredAdUnits.filter(
+													data => !dfpAdsUnitNamesToFilter.includes(data.dfpAdUnit)
+											  )
+									}
 									defaultPageSize={20}
 									minRows={0}
 								/>
