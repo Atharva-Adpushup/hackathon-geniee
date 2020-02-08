@@ -412,7 +412,8 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		user: 'user::',
 		hb: 'hbdc::',
 		adsTxt: 'adtx::',
-		apLite: 'aplt::'
+		apLite: 'aplt::',
+		network: 'ntwk::'
 	},
 	tagManagerInitialDoc: {
 		siteId: null,

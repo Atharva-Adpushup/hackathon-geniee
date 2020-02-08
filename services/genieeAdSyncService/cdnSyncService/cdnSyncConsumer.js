@@ -60,8 +60,7 @@ module.exports = function(site, user) {
 
 			isAdPartner ? (apConfigs.partner = site.get('partner')) : null;
 
-			apConfigs.pricePriorityLineItems =
-				(adNetworkConfig && adNetworkConfig.pricePriorityLineItems) || [];
+			apConfigs.lineItems = (adNetworkConfig && adNetworkConfig.lineItems) || [];
 			apConfigs.autoOptimise = isAutoOptimise ? true : false;
 			apConfigs.poweredByBanner = poweredByBanner ? true : false;
 			apConfigs.siteDomain = site.get('siteDomain');
@@ -176,9 +175,25 @@ module.exports = function(site, user) {
 		getComputedConfig = () => {
 			return (() => {
 				if (apps.apLite) {
-					return Promise.join(generatePrebidConfig(siteId), generateApLiteConfig(siteId)).then(
-						([prebidConfig, apLiteConfig]) => ({ prebidConfig, apLiteConfig })
-					);
+					return Promise.join(generatePrebidConfig(siteId), generateApLiteConfig(siteId))
+						.then(([prebidConfig, apLiteConfig]) => ({ prebidConfig, apLiteConfig }))
+						.then(combinedConfig => {
+							const adServerSettings = user.get('adServerSettings');
+							const activeDFPNetwork =
+								(adServerSettings &&
+									adServerSettings.dfp &&
+									adServerSettings.dfp.activeDFPNetwork) ||
+								null;
+
+							if (activeDFPNetwork) {
+								return generateAdNetworkConfig(activeDFPNetwork).then(adNetworkConfig => ({
+									adNetworkConfig,
+									...combinedConfig
+								}));
+							}
+
+							return combinedConfig;
+						});
 				}
 
 				return getReportData(site)
@@ -189,14 +204,7 @@ module.exports = function(site, user) {
 						return generateAdPushupConfig(site);
 					})
 					.spread(generateCombinedJson);
-			})()
-				.then(combinedConfig =>
-					generateAdNetworkConfig().then(adNetworkConfig => ({
-						adNetworkConfig,
-						...combinedConfig
-					}))
-				)
-				.then(setAllConfigs);
+			})().then(setAllConfigs);
 		},
 		getConfigWrapper = site => {
 			return getComputedConfig().then(computedConfig =>
