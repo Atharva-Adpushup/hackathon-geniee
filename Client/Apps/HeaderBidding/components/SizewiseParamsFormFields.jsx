@@ -117,7 +117,7 @@ class SizewiseParamsFormFields extends React.Component {
 	};
 
 	addNewSize = adSize => {
-		const { addNewSizeInState, formFields, relation } = this.props;
+		const { addNewSizeInState, formFields, relation, bidderKey } = this.props;
 
 		this.setState(state => {
 			const params = {};
@@ -133,9 +133,13 @@ class SizewiseParamsFormFields extends React.Component {
 					continue;
 				}
 
-				params[paramKey] =
-					(relation === 'adpushup' && formFields.params.siteLevel[paramKey].defaultValue) ||
-					(formFields.params.siteLevel[paramKey].dataType === 'number' ? null : '');
+				if (bidderKey === 'ix' && paramKey === 'size') {
+					params[paramKey] = adSize.split('x').map(val => parseInt(val, 10));
+				} else {
+					params[paramKey] =
+						(relation === 'adpushup' && formFields.params.siteLevel[paramKey].defaultValue) ||
+						(formFields.params.siteLevel[paramKey].dataType === 'number' ? null : '');
+				}
 			}
 
 			return {

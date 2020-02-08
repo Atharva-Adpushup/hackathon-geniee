@@ -440,7 +440,7 @@ class AddManageNonResponsiveBidder extends React.Component {
 		const { openBiddersListView, formType } = this.props;
 		const {
 			formFields,
-			bidderConfig: { bids, relation },
+			bidderConfig: { bids, relation, key: bidderKey },
 			errors,
 			formError,
 			validationSchema,
@@ -474,6 +474,7 @@ class AddManageNonResponsiveBidder extends React.Component {
 							).length
 						) && (
 							<SizewiseParamsFormFields
+								bidderKey={bidderKey}
 								sizes={sizes}
 								formFields={{ params: formFields.params }}
 								savedParams={params}
