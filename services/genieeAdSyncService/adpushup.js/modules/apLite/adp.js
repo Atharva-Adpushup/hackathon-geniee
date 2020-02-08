@@ -145,10 +145,13 @@ var $ = require('../../libs/jquery'),
 										}),
 										gptSlotElementId = gptSlot.getSlotElementId(),
 										gptAdUnitPath = gptSlot.getAdUnitPath(),
-										dfpAdUnitName = gptAdUnitPath.replace(/^\/\d+\//, ''),
-										apLiteAdUnit = apLiteConfig.adUnits.find(
-											adUnit => adUnit.dfpAdUnit === dfpAdUnitName
-										),
+										gptAdUnitPathArr = gptAdUnitPath.split('/'),
+										dfpAdUnitName = gptAdUnitPathArr[gptAdUnitPathArr.length - 1],
+										apLiteAdUnit = apLiteConfig.adUnits.find(adUnit => {
+											var adUnitArr = adUnit.dfpAdUnit.split('/');
+											var dfpAdUnit = adUnitArr[adUnitArr.length - 1];
+											return dfpAdUnit === dfpAdUnitName;
+										}),
 										sectionId = apLiteAdUnit && apLiteAdUnit.sectionId,
 										container = $(`#${gptSlotElementId}`);
 
