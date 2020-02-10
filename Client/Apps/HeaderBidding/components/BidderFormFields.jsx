@@ -9,7 +9,7 @@ import InputBox from '../../../Components/InputBox';
 
 class BidderFormFields extends React.Component {
 	getBidderInputField = (
-		/* paramConfig */ { inputType, options, dataType },
+		/* paramConfig */ { inputType, options, dataType, isEditable },
 		paramKey,
 		stateKey
 	) => {
@@ -29,6 +29,8 @@ class BidderFormFields extends React.Component {
 		} else {
 			currValue = getCurrentFieldValue ? getCurrentFieldValue(stateKey, paramKey, adSize) : '';
 		}
+
+		if (dataType === 'array' && currValue) currValue = currValue.toString();
 
 		switch (inputType) {
 			case 'selectBox': {
@@ -73,6 +75,7 @@ class BidderFormFields extends React.Component {
 								);
 							}
 						}}
+						disabled={isEditable === false}
 					/>
 				);
 			}

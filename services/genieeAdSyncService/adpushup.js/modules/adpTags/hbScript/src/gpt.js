@@ -131,13 +131,13 @@ var gpt = {
 							if (slot) {
 								// stop refresh if line Item is not price priority type
 								var lineItemId = event.sourceAgnosticLineItemId;
-								var pricePriorityLineItems = adpConfig.pricePriorityLineItems || [];
+								var lineItems = adpConfig.lineItems || [];
 								var isNotPricePriorityLineItem = !!(
 									lineItemId &&
-									pricePriorityLineItems &&
-									Array.isArray(pricePriorityLineItems) &&
-									pricePriorityLineItems.length &&
-									pricePriorityLineItems.indexOf(lineItemId) === -1
+									lineItems &&
+									Array.isArray(lineItems) &&
+									lineItems.length &&
+									lineItems.indexOf(lineItemId) === -1
 								);
 
 								if (isNotPricePriorityLineItem) {

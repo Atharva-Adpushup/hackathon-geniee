@@ -11,30 +11,22 @@ const dbHelper = couchbaseService(
 	couchBase.DEFAULT_USER_PASSWORD
 );
 
-const generateAdNetworkConfig = siteId => {
-	const emptyResponse = {};
+const generateAdNetworkConfig = activeDFPNetwork => {
+	const emptyResponse = { lineItems: [] };
 
-	return (
-		Promise.resolve({
-			value: {
-				networkId: 4534534,
-				userEmail: 'ravi.jagga@adpushup.com',
-				pricePriorityLineItems: []
+	return dbHelper
+		.getDoc(`${docKeys.network}${activeDFPNetwork}`)
+		.catch(err => {
+			if (err.code == CB_ERRORS.keyNotFound) {
+				return emptyResponse;
 			}
+			throw err;
 		})
-			// dbHelper
-			// 	.getDoc(`${docKeys.apLite}${siteId}`)
-			.catch(err => {
-				if (err.code == CB_ERRORS.keyNotFound) {
-					return emptyResponse;
-				}
-				throw err;
-			})
-			.then(adNetworkConfigDoc => {
-				var adNetworkConfig = adNetworkConfigDoc.value;
-				return adNetworkConfig;
-			})
-	);
+		.then(adNetworkConfigDoc => {
+			var adNetworkConfig = adNetworkConfigDoc.value;
+
+			return adNetworkConfig;
+		});
 };
 
 module.exports = generateAdNetworkConfig;
