@@ -473,14 +473,14 @@ const HB_BIDDERS_KEYS_NULL_SHOULD_NOT_BE_NULL = [
 ];
 
 const REFRESH_RATE_ENTRIES = [
-	{ name: '30 seconds', value: '30s' },
-	{ name: '60 seconds', value: '60s' },
-	{ name: '90 seconds', value: '90s' },
-	{ name: '120 seconds', value: '120s' },
-	{ name: '180 seconds', value: '180s' },
-	{ name: '240 seconds', value: '240s' },
-	{ name: '300 seconds', value: '300s' },
-	{ name: '360 seconds', value: '360s' }
+	{ name: '30 seconds', value: 30 },
+	{ name: '60 seconds', value: 60 },
+	{ name: '90 seconds', value: 90 },
+	{ name: '120 seconds', value: 120 },
+	{ name: '180 seconds', value: 180 },
+	{ name: '240 seconds', value: 240 },
+	{ name: '300 seconds', value: 300 },
+	{ name: '360 seconds', value: 360 }
 ];
 
 export {
