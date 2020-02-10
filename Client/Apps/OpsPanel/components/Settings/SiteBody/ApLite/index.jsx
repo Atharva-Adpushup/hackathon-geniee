@@ -146,12 +146,14 @@ class ApLite extends Component {
 	};
 
 	handleSave = () => {
-		const { structuredAdUnits, oldAdUnits } = this.state;
+		const { structuredAdUnits, oldAdUnits, uploadedAdUnits } = this.state;
 
 		let currentAdUnitsWithDfpNameAndCode = structuredAdUnits.filter(
 			data => !dfpAdsUnitNamesToFilter.includes(data.dfpAdUnit)
 		);
-		const oldAdUnitsWithDfpNameAndCode = oldAdUnits.map(
+
+		const oldAdUnitList = uploadedAdUnits.length ? uploadedAdUnits : oldAdUnits;
+		const oldAdUnitsWithDfpNameAndCode = oldAdUnitList.map(
 			({ refreshSlot, refreshInterval, headerBidding, sectionId, isActive, ...rest }) => rest
 		);
 
@@ -390,6 +392,7 @@ class ApLite extends Component {
 							onHide={this.handleHide}
 							container={this}
 							aria-labelledby="contained-modal-title"
+							className="adUnit-modal"
 						>
 							<Modal.Header closeButton>
 								<Modal.Title id="contained-modal-title">List of Ad Units</Modal.Title>
@@ -401,11 +404,11 @@ class ApLite extends Component {
 										{ Header: 'Ad Unit Code', accessor: 'dfpAdunitCode' }
 									]}
 									data={
-										oldAdUnits.length
-											? oldAdUnits
-											: structuredAdUnits.filter(
+										structuredAdUnits.length
+											? structuredAdUnits.filter(
 													data => !dfpAdsUnitNamesToFilter.includes(data.dfpAdUnit)
 											  )
+											: oldAdUnits.filter(({ isActive }) => isActive !== false)
 									}
 									defaultPageSize={20}
 									minRows={0}

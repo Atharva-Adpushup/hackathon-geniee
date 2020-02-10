@@ -132,11 +132,14 @@
 	}
 }
 
-.aplite-modal {
+.adUnit-modal {
 	.ReactTable {
 		height: 400px;
 		.rt-thead {
 			overflow-y: scroll;
 		}
+	}
+	.modal-dialog {
+		width: 50%;
 	}
 }
