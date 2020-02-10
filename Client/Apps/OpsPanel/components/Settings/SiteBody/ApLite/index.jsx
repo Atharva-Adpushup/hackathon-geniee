@@ -141,6 +141,10 @@ class ApLite extends Component {
 		});
 	};
 
+	showUploadedAdUnits = () => {
+		this.setState({ show: true });
+	};
+
 	handleSave = () => {
 		const { structuredAdUnits, oldAdUnits } = this.state;
 
@@ -238,9 +242,10 @@ class ApLite extends Component {
 	}
 
 	getNetworkName(adNetworkSettings, activeDFPNetworkId) {
-		const dfPNetworkNameField = adNetworkSettings.filter(val => val.networkName === 'DFP')[0] || {};
+		const dfPNetworkNameField = adNetworkSettings.find(val => val.networkName === 'DFP') || {};
+		const { dfpAccounts = [] } = dfPNetworkNameField;
 		const matchDfpAccount =
-			dfPNetworkNameField.dfpAccounts.filter(val => val.code == activeDFPNetworkId)[0] || {};
+			dfpAccounts.find(val => val.code === activeDFPNetworkId.toString()) || {};
 
 		return matchDfpAccount.name;
 	}
@@ -284,7 +289,8 @@ class ApLite extends Component {
 			fileName,
 			oldAdUnits,
 			uploadedAdUnits,
-			structuredAdUnits
+			structuredAdUnits,
+			show
 		} = this.state;
 
 		const { setupStatus } = headerBiddingData[siteId];
@@ -292,7 +298,7 @@ class ApLite extends Component {
 
 		const activeDFPNetworkId = adServerSettings.hasOwnProperty('dfp')
 			? adServerSettings.dfp.activeDFPNetwork
-			: undefined;
+			: null;
 
 		const activeDFPNetworkName =
 			adNetworkSettings.length && adNetworkSettings.filter(val => val.networkName === 'DFP')
@@ -305,7 +311,7 @@ class ApLite extends Component {
 					name="Google Ad Manager"
 					value={
 						activeDFPNetworkName
-							? `Connected (${activeDFPNetworkName} ,${activeDFPNetworkId})`
+							? `Connected (${activeDFPNetworkName}, ${activeDFPNetworkId})`
 							: 'Not Connected'
 					}
 					isTextOnly
@@ -375,16 +381,12 @@ class ApLite extends Component {
 							</div>
 						) : null}
 
-						<CustomButton
-							variant="primary"
-							bsSize="large"
-							onClick={() => this.setState({ show: true })}
-						>
+						<CustomButton variant="primary" bsSize="large" onClick={this.showUploadedAdUnits}>
 							Show Uploaded Ad Units
 						</CustomButton>
 
 						<Modal
-							show={this.state.show}
+							show={show}
 							onHide={this.handleHide}
 							container={this}
 							aria-labelledby="contained-modal-title"
