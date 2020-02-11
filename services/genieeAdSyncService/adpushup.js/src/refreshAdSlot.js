@@ -98,8 +98,8 @@ var utils = require('../libs/utils'),
 	refreshGPTSlot = function(gSlot) {
 		googletag.pubads().refresh([gSlot]);
 	},
-	stopRefreshForASlot = function(slotId) {
-		var adIndex = ads.findIndex(obj => obj.ad.slotId === slotId);
+	stopRefreshForASlot = function(container) {
+		var adIndex = ads.findIndex(obj => obj.ad.container[0] === container[0]);
 
 		if (adIndex !== -1) {
 			var container = ads[adIndex].container;
