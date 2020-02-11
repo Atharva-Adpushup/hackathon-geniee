@@ -141,13 +141,19 @@ class ApLite extends Component {
 		});
 	};
 
+	showUploadedAdUnits = () => {
+		this.setState({ show: true });
+	};
+
 	handleSave = () => {
-		const { structuredAdUnits, oldAdUnits } = this.state;
+		const { structuredAdUnits, oldAdUnits, uploadedAdUnits } = this.state;
 
 		let currentAdUnitsWithDfpNameAndCode = structuredAdUnits.filter(
 			data => !dfpAdsUnitNamesToFilter.includes(data.dfpAdUnit)
 		);
-		const oldAdUnitsWithDfpNameAndCode = oldAdUnits.map(
+
+		const oldAdUnitList = uploadedAdUnits.length ? uploadedAdUnits : oldAdUnits;
+		const oldAdUnitsWithDfpNameAndCode = oldAdUnitList.map(
 			({ refreshSlot, refreshInterval, headerBidding, sectionId, isActive, ...rest }) => rest
 		);
 
@@ -238,11 +244,12 @@ class ApLite extends Component {
 	}
 
 	getNetworkName(adNetworkSettings, activeDFPNetworkId) {
-		const dfPNetworkNameField = adNetworkSettings.filter(val => val.networkName === 'DFP')[0] || {};
+		const dfPNetworkNameField = adNetworkSettings.find(val => val.networkName === 'DFP') || {};
+		const { dfpAccounts = [] } = dfPNetworkNameField;
 		const matchDfpAccount =
-			dfPNetworkNameField.dfpAccounts.filter(val => val.code == activeDFPNetworkId)[0] || {};
+			dfpAccounts.find(val => val.code === activeDFPNetworkId.toString()) || {};
 
-		return matchDfpAccount.name;
+		return matchDfpAccount.name || '';
 	}
 
 	gamAdUnitsLabel = () => {
@@ -284,7 +291,8 @@ class ApLite extends Component {
 			fileName,
 			oldAdUnits,
 			uploadedAdUnits,
-			structuredAdUnits
+			structuredAdUnits,
+			show
 		} = this.state;
 
 		const { setupStatus } = headerBiddingData[siteId];
@@ -292,20 +300,24 @@ class ApLite extends Component {
 
 		const activeDFPNetworkId = adServerSettings.hasOwnProperty('dfp')
 			? adServerSettings.dfp.activeDFPNetwork
-			: undefined;
+			: null;
+
+		console.log(adNetworkSettings);
 
 		const activeDFPNetworkName =
-			adNetworkSettings.length && adNetworkSettings.filter(val => val.networkName === 'DFP')
+			adNetworkSettings.length && adNetworkSettings.find(val => val.networkName === 'DFP')
 				? this.getNetworkName(adNetworkSettings, activeDFPNetworkId)
-				: undefined;
+				: '';
 
 		return (
 			<div>
 				<FieldGroup
 					name="Google Ad Manager"
 					value={
-						activeDFPNetworkName
-							? `Connected (${activeDFPNetworkName} ,${activeDFPNetworkId})`
+						activeDFPNetworkId
+							? activeDFPNetworkName
+								? `Connected (${activeDFPNetworkName}, ${activeDFPNetworkId})`
+								: `Connected (${activeDFPNetworkId})`
 							: 'Not Connected'
 					}
 					isTextOnly
@@ -375,19 +387,16 @@ class ApLite extends Component {
 							</div>
 						) : null}
 
-						<CustomButton
-							variant="primary"
-							bsSize="large"
-							onClick={() => this.setState({ show: true })}
-						>
+						<CustomButton variant="primary" bsSize="large" onClick={this.showUploadedAdUnits}>
 							Show Uploaded Ad Units
 						</CustomButton>
 
 						<Modal
-							show={this.state.show}
+							show={show}
 							onHide={this.handleHide}
 							container={this}
 							aria-labelledby="contained-modal-title"
+							className="adUnit-modal"
 						>
 							<Modal.Header closeButton>
 								<Modal.Title id="contained-modal-title">List of Ad Units</Modal.Title>
@@ -399,11 +408,11 @@ class ApLite extends Component {
 										{ Header: 'Ad Unit Code', accessor: 'dfpAdunitCode' }
 									]}
 									data={
-										oldAdUnits.length
-											? oldAdUnits
-											: structuredAdUnits.filter(
+										structuredAdUnits.length
+											? structuredAdUnits.filter(
 													data => !dfpAdsUnitNamesToFilter.includes(data.dfpAdUnit)
 											  )
+											: oldAdUnits.filter(({ isActive }) => isActive !== false)
 									}
 									defaultPageSize={20}
 									minRows={0}
