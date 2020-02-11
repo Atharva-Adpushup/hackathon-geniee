@@ -249,7 +249,7 @@ class ApLite extends Component {
 		const matchDfpAccount =
 			dfpAccounts.find(val => val.code === activeDFPNetworkId.toString()) || {};
 
-		return matchDfpAccount.name;
+		return matchDfpAccount.name || '';
 	}
 
 	gamAdUnitsLabel = () => {
@@ -302,18 +302,22 @@ class ApLite extends Component {
 			? adServerSettings.dfp.activeDFPNetwork
 			: null;
 
+		console.log(adNetworkSettings);
+
 		const activeDFPNetworkName =
-			adNetworkSettings.length && adNetworkSettings.filter(val => val.networkName === 'DFP')
+			adNetworkSettings.length && adNetworkSettings.find(val => val.networkName === 'DFP')
 				? this.getNetworkName(adNetworkSettings, activeDFPNetworkId)
-				: undefined;
+				: '';
 
 		return (
 			<div>
 				<FieldGroup
 					name="Google Ad Manager"
 					value={
-						activeDFPNetworkName
-							? `Connected (${activeDFPNetworkName}, ${activeDFPNetworkId})`
+						activeDFPNetworkId
+							? activeDFPNetworkName
+								? `Connected (${activeDFPNetworkName}, ${activeDFPNetworkId})`
+								: `Connected (${activeDFPNetworkId})`
 							: 'Not Connected'
 					}
 					isTextOnly
