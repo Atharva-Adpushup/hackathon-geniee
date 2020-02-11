@@ -1,10 +1,18 @@
+const uuid = require('uuid');
 const getLogger = require('./Logger');
 const Database = require('./db');
-const {db: dbConfig, dfp: {adpushup_network_code, user: dfpUserConfig, auth: dfpAuthConfig}} = require('./config');
+const {
+    serviceStatusPingDelayMs,
+    serviceStatusDb: serviceStatusDbConfig, 
+    db: dbConfig, 
+    dfp: {adpushup_network_code, user: dfpUserConfig, auth: dfpAuthConfig}
+} = require('./config');
 const LineItemsService = require('./LineItemsService');
 
 const db = new Database(dbConfig);
+const statusDb = new Database(serviceStatusDbConfig);
 const logger = getLogger();
+let pingTimer = null;
 
 const updateLineItemsForNetwork = async (dfpConfig) => {
     try {
@@ -45,7 +53,7 @@ const updateLineItemsForThirdPartyDfps = async () => {
         const queryString = `SELECT 
             adServerSettings.dfp.activeDFPNetwork as networkId,
             ARRAY adNetworkSetting FOR adNetworkSetting IN adNetworkSettings WHEN adNetworkSetting.networkName = 'DFP' END AS dfpNetworkSettings 
-            FROM AppBucket 
+            FROM ${dbConfig.bucketName} 
             WHERE meta().id LIKE 'user::%' 
             AND adServerSettings.dfp.activeDFPNetwork != $adPushupNetworkId`;
         const {results, status, resultCount} = await db.query(queryString, {adPushupNetworkId: adpushup_network_code});
@@ -96,8 +104,93 @@ const updateLineItemsForAdPushupDfp = async () => {
     }
 };
 
-async function runService() {
+const isSyncRunning = async () => {
     try {
+        const bucketName = serviceStatusDbConfig.bucketName;
+        const qs = `SELECT meta().id, lastUpdated 
+            FROM ${bucketName} 
+            WHERE meta().id LIKE 'adms::%' 
+            AND status = 'RUNNING'
+            AND lastUpdated >= CLOCK_MILLIS() - $serviceStatusPingDelayMs
+        `;
+        const {resultCount = 0} = await statusDb.query(qs, {serviceStatusPingDelayMs});
+        return !!resultCount;
+    } catch(ex) {
+        console.error('isSyncRunning::ERROR', ex);
+        throw ex;
+    }
+};
+
+const setServiceStatusStarted = async () => {
+    try {
+        const docId = `adms::${uuid.v4()}`;
+        await statusDb
+        .insertDoc(docId, {
+            docType: 'AdManagerSyncServiceStatus', 
+            status: 'RUNNING', 
+            startedOn: +new Date(), 
+            lastUpdated: +new Date()
+        });
+        return docId;
+    } catch(ex) {
+        logger.error({message: 'startServiceStatusPing', debugData: {ex}});
+        throw ex;
+    }
+};
+
+const updateServiceStatusStopped = async (statusDocId) => {
+    try {
+        await statusDb
+        .updatePartial(statusDocId, {
+            status: 'FINISHED', 
+            completedOn: +new Date(), 
+            lastUpdated: +new Date()
+        });
+        return true;
+    } catch(ex) {
+        logger.error({message: 'updateServiceStatusStopped', debugData: {ex}});
+        throw ex;
+    }
+};
+
+const updateServiceStatusRunning = async (statusDocId) => {
+    try {
+        await statusDb
+        .updatePartial(statusDocId, { lastUpdated: +new Date() });
+        return true;
+    } catch(ex) {
+        logger.error({message: 'startServiceStatusPing', debugData: {ex}});
+        throw ex;
+    }
+}
+
+const startServiceStatusPing = async () => {
+    if(pingTimer) {
+        clearInterval(pingTimer);
+    }
+    const statusDocId = await setServiceStatusStarted();
+    pingTimer = setInterval(() => updateServiceStatusRunning(statusDocId), serviceStatusPingDelayMs);
+    return statusDocId;
+};
+
+const stopServiceStatusPing = async (statusDocId) => {
+    if(pingTimer) {
+        clearInterval(pingTimer);
+    }
+    if(statusDocId) {
+        return await updateServiceStatusStopped(statusDocId);
+    }
+    return true;
+};
+
+async function runService() {
+    let statusDocId = null;
+    try {
+        // check if any service instance is already running
+        if(await isSyncRunning()) {
+            return new Error('Another Sync process is running');
+        }
+        statusDocId = await startServiceStatusPing();
         logger.info({message: 'Updating adPushup Dfp'});
         const adPushupUpdateResult = await updateLineItemsForAdPushupDfp();
         if(adPushupUpdateResult instanceof Error) {
@@ -113,10 +206,12 @@ async function runService() {
         } else {
             logger.info({message: `updated ${thirdPartyUpdateResult} line items for 3rd party dfps`});
         }
-        process.exit(0);
+        return true;
     } catch (ex) {
         logger.error({message: 'runService::ERROR', debugData: {ex}});
-        process.exit(1);
+        return ex;
+    } finally {
+        await stopServiceStatusPing(statusDocId);
     }
 }
 

@@ -87,6 +87,27 @@ class Database {
         });
     }
 
+    updatePartial(id, data) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                if(!this.bucket) {
+                    await this.connect();
+                }
+
+                let mutateDoc = this.bucket.mutateIn(id);
+                Object.keys(data).forEach(docKey => {
+                    mutateDoc = mutateDoc.upsert(docKey, data[docKey]);
+                });
+                mutateDoc.execute((err) => {
+                    if(err) return reject(err);
+                    return resolve(true);
+                });
+            } catch(ex) {
+                return reject(ex);
+            }
+        });
+    }
+
     arrayConcat(id, path, data) {
         return new Promise(async (resolve, reject) => {
             try {

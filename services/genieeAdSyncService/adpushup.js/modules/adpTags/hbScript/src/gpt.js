@@ -1,5 +1,6 @@
 // GPT interfacing module
 
+var $ = require('../../../../libs/jquery');
 var constants = require('./constants');
 var feedback = require('./feedback');
 var responsiveAds = require('./responsiveAds');
@@ -141,7 +142,8 @@ var gpt = {
 								);
 
 								if (isNotPricePriorityLineItem) {
-									refreshAdSlot.stopRefreshForASlot(slotElementId);
+									var container = $(`#${slotElementId}`);
+									refreshAdSlot.stopRefreshForASlot(container);
 								}
 
 								slot.renderedSize = size;

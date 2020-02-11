@@ -1,4 +1,12 @@
 module.exports = {
+    serviceStatusPingDelayMs: 5000,
+    serviceStatusDb: {
+        host: 'localhost',
+        port: 8091,
+        username: 'admin',
+        password: 'asd12345',
+        bucketName: 'AppBucket'
+    },
     db: {
         host: 'localhost',
         port: 8091,
