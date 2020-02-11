@@ -77,20 +77,19 @@ class Account extends Component {
 		};
 	}
 
-	getActiveDFPName = memoize((adNetworkSettings, code) => {
+	getActiveDFPName = memoize((adNetworkSettings = [], activeDFPNetwork, code) => {
 		let response = '103512698 - AdPushup Inc.';
-		adNetworkSettings.forEach(network => {
-			if (network.networkName === 'DFP') {
-				const { dfpAccounts } = network;
 
-				const filteredAccounts = dfpAccounts.filter(
-					account => `${account.code}-${account.dfpParentId}-${account.currencyCode}` === code
-				);
-				if (filteredAccounts.length) {
-					response = `${filteredAccounts[0].code} - ${filteredAccounts[0].name || 'N/A'}`;
-				}
-			}
-		});
+		const dfpNetwork = adNetworkSettings.find(({ networkName }) => networkName === 'DFP') || {};
+		const { dfpAccounts = [] } = dfpNetwork;
+
+		const filteredAccounts = dfpAccounts.find(
+			account => `${account.code}-${account.dfpParentId}-${account.currencyCode}` === code
+		);
+
+		response = filteredAccounts
+			? `${filteredAccounts.code} - ${filteredAccounts.name || 'N/A'}`
+			: activeDFPNetwork;
 		return response;
 	});
 
@@ -236,6 +235,8 @@ class Account extends Component {
 
 		const { user, sites } = this.props;
 		const { adServerSettings } = user;
+		const { dfp = {} } = adServerSettings;
+		const { activeDFPNetwork } = dfp;
 
 		const siteIds = Object.keys(sites);
 
@@ -246,7 +247,7 @@ class Account extends Component {
 		});
 
 		const { adNetworkSettings = [] } = user;
-		const activeDFPName = this.getActiveDFPName(adNetworkSettings, activeDFP);
+		const activeDFPName = this.getActiveDFPName(adNetworkSettings, activeDFPNetwork, activeDFP);
 		const isDFPSetup = !!activeDFP;
 		const disableThirdPartyAdx = isDFPSetup && this.checkAdPushupGAM(activeDFP);
 
@@ -297,7 +298,8 @@ class Account extends Component {
 					<Fragment>
 						<p className="u-text-bold">Select Google Ad Manager</p>
 						{apLiteSites.length &&
-						!adNetworkSettings.filter(val => val.networkName === 'DFP').length ? (
+						!adNetworkSettings.find(val => val.networkName === 'DFP') &&
+						!activeDFPNetwork ? (
 							<CustomMessage
 								type="error"
 								header="No Third Party DFP Added"
