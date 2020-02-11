@@ -83,12 +83,12 @@ class Account extends Component {
 		const dfpNetwork = adNetworkSettings.find(({ networkName }) => networkName === 'DFP') || {};
 		const { dfpAccounts = [] } = dfpNetwork;
 
-		const filteredAccounts = dfpAccounts.find(
+		const matchedDfpAccount = dfpAccounts.find(
 			account => `${account.code}-${account.dfpParentId}-${account.currencyCode}` === code
 		);
 
-		response = filteredAccounts
-			? `${filteredAccounts.code} - ${filteredAccounts.name || 'N/A'}`
+		response = matchedDfpAccount
+			? `${matchedDfpAccount.code} - ${matchedDfpAccount.name || 'N/A'}`
 			: activeDFPNetwork;
 		return response;
 	});
