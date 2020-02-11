@@ -280,9 +280,11 @@ class ApLite extends Component {
 		};
 		const {
 			site,
-			userData: { adServerSettings, adNetworkSettings },
+			userData: { adServerSettings = {}, adNetworkSettings = [] },
 			headerBiddingData
 		} = this.props;
+		const { dfp = {} } = adServerSettings;
+		const { activeDFPNetwork } = dfp;
 
 		const { siteId, siteDomain } = site;
 		const {
@@ -298,16 +300,16 @@ class ApLite extends Component {
 		const { setupStatus } = headerBiddingData[siteId];
 		const hbStatus = this.getHbStatus(setupStatus);
 
-		const activeDFPNetworkId = adServerSettings.hasOwnProperty('dfp')
-			? adServerSettings.dfp.activeDFPNetwork
-			: null;
+		const activeDFPNetworkId =
+			adServerSettings.hasOwnProperty('dfp') && dfp.hasOwnProperty('activeDFPNetwork')
+				? activeDFPNetwork
+				: null;
 
-		console.log(adNetworkSettings);
-
-		const activeDFPNetworkName =
-			adNetworkSettings.length && adNetworkSettings.find(val => val.networkName === 'DFP')
+		const activeDFPNetworkName = activeDFPNetworkId
+			? adNetworkSettings.length && adNetworkSettings.find(val => val.networkName === 'DFP')
 				? this.getNetworkName(adNetworkSettings, activeDFPNetworkId)
-				: '';
+				: ''
+			: null;
 
 		return (
 			<div>
