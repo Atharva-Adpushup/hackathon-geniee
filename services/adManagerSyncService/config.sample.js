@@ -1,10 +1,13 @@
 module.exports = {
+    serviceStatusPingDelayMs: 5000,
+    serviceStatusDb: {
+        host: 'localhost',
+        port: 8091,
+        username: 'admin',
+        password: 'asd12345',
+        bucketName: 'AppBucket'
+    },
     db: {
-        // host: 'staging.adpushup.com',
-        // port: 8091,
-        // username: 'administrator',
-        // password: 'ndiwncx9KdnbdR9#dL',
-        // bucketName: 'AppBucket',
         host: 'localhost',
         port: 8091,
         username: 'admin',
@@ -21,7 +24,7 @@ module.exports = {
         },
         user: {
             network_code: '', 
-            app_name: 'Network LineItems Sync Service', 
+            app_name: 'adManagerSyncService', 
             version: 'v201902'
         }
     },

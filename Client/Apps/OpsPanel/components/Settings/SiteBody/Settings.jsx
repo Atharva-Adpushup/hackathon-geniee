@@ -62,7 +62,8 @@ class Settings extends Component {
 				return {
 					[name]: value
 				};
-			} else if (
+			}
+			if (
 				name === 'apLite' &&
 				adServerSettings.hasOwnProperty('dfp') &&
 				adServerSettings.dfp.activeDFPNetwork === ADPUSHUP_NETWORK_ID.toString() &&
@@ -73,7 +74,8 @@ class Settings extends Component {
 				return {
 					[name]: false
 				};
-			} else if (name === 'apLite' && value) {
+			}
+			if (name === 'apLite' && value) {
 				const val = confirm('Are you sure you want to enable AP Lite ?');
 				if (val) {
 					return updateAppStatus(site.siteId, {
