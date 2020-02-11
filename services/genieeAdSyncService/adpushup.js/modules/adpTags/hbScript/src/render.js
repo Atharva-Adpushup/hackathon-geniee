@@ -14,7 +14,9 @@ var render = {
 			adpSlot.biddingComplete = true;
 
 			targeting.setSlotLevel(adpSlot);
+		});
 
+		adpSlots.forEach(function(adpSlot) {
 			!adpConfig.apLiteActive && gpt.renderSlot(googletag, adpSlot);
 		});
 
