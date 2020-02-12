@@ -23,8 +23,7 @@ const queueConfig = {
 			header: 'Alert open for Service: CDN SYN Consumer [console.adpushup.com]',
 			content: '<p>Consumer failed multiple times. Please check on priority.</p>'
 		},
-		emailId:
-			'yomesh.gupta@adpushup.com, zahin@adpushup.com, abhinav.choudhri@adpushup.com,prashanth.kumar@adpushup.com, shubham.grover@adpushup.com'
+		emailId: 'abhinav.choudhri@adpushup.com,anil.panghal@adpushup.com, ravi.jagga@adpushup.com'
 	}
 };
 const QUEUE = CONFIG.RABBITMQ.CDN_SYNC.QUEUE.name;
@@ -91,11 +90,7 @@ function errorHandler(error, originalMessage) {
 	if (!customErrorMessage) {
 		customErrorMessage = error && error[0] ? error[0].message : 'Unsynced ads in setup';
 		if (typeof customErrorMessage === 'object') {
-			customErrorMessage = `[LOG FROM CONSOLE] Unsynced ads in setup | Pagegroup - ${
-				customErrorMessage.pagegroup
-			} | Platform - ${customErrorMessage.platform} | SectionId - ${
-				customErrorMessage.sectionId
-			} | adId - ${customErrorMessage.ad.id} | Network - ${customErrorMessage.ad.network}`;
+			customErrorMessage = `[LOG FROM CONSOLE] Unsynced ads in setup | Pagegroup - ${customErrorMessage.pagegroup} | Platform - ${customErrorMessage.platform} | SectionId - ${customErrorMessage.sectionId} | adId - ${customErrorMessage.ad.id} | Network - ${customErrorMessage.ad.network}`;
 		}
 	}
 

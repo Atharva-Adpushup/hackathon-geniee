@@ -66,12 +66,14 @@ function getTemplateConfig(inputData) {
 		'@__revenue_value__@': Math.round(inputData.report.metricComparison.revenue.thisWeekOriginal),
 		'@__cpm_change_text__@': cpmChange,
 		'@__cpm_change_value__@': cpmPercentage,
-		'@__revenue_change_img__@': changeImgPathObject[inputData.report.metricComparison.revenue.change],
+		'@__revenue_change_img__@':
+			changeImgPathObject[inputData.report.metricComparison.revenue.change],
 		'@__revenue_lastWeek_value__@': revenueLastWeekOriginalNumber,
 		'@__revenue_thisWeek_value__@': revenueThisWeekOriginalNumber,
 		'@__impression_lastWeek_value__@': inputData.report.metricComparison.impressions.lastWeek,
 		'@__impression_thisWeek_value__@': inputData.report.metricComparison.impressions.thisWeek,
-		'@__impression_change_img__@': changeImgPathObject[inputData.report.metricComparison.impressions.change],
+		'@__impression_change_img__@':
+			changeImgPathObject[inputData.report.metricComparison.impressions.change],
 		'@__cpm_lastWeek_value__@': inputData.report.metricComparison.cpm.lastWeek,
 		'@__cpm_thisWeek_value__@': inputData.report.metricComparison.cpm.thisWeek,
 		'@__cpm_change_img__@': changeImgPathObject[cpmChange],
@@ -148,7 +150,7 @@ function getEmailObject(inputData) {
 
 	return {
 		from: emailConfig.MAIL_FROM,
-		to: `${inputData.email}, abhinav.choudhri@adpushup.com, zahin@adpushup.com`,
+		to: `${inputData.email}, abhinav.choudhri@adpushup.com, anil.panghal@adpushup.com`,
 		cc: isCPMDecreaseHigh ? 'support@adpushup.com' : '',
 		subject: `AdPushup Performance Report: ${inputData.siteName}`,
 		attachment: []
