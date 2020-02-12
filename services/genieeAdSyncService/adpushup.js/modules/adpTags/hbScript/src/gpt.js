@@ -119,8 +119,6 @@ var gpt = {
 		});
 	},
 	setApLiteSlotRenderListener: function(w) {
-		var adp = require('../../../apLite/adp');
-
 		w.googletag.cmd.push(
 			function() {
 				w.googletag
@@ -156,8 +154,6 @@ var gpt = {
 							}
 						}
 					});
-
-				return adp.registerAdpSlots(w.googletag);
 			}.bind(this)
 		);
 	},
