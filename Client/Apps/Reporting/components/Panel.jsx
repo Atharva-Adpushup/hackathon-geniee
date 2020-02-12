@@ -692,7 +692,7 @@ class Panel extends Component {
 	};
 
 	aggregateValues(result) {
-		let modifiedResult = [];
+		const modifiedResult = [];
 		const { selectedInterval, startDate, endDate } = this.state;
 
 		result.forEach(row => {
@@ -735,7 +735,7 @@ class Panel extends Component {
 			modifiedResult.push(tableRow);
 		});
 
-		let groupedData = mapValues(groupBy(modifiedResult, 'date'), reportData =>
+		const groupedData = mapValues(groupBy(modifiedResult, 'date'), reportData =>
 			reportData.map(data => omit(data, 'date'))
 		);
 
@@ -877,7 +877,7 @@ class Panel extends Component {
 				<ActionCard title="AdPushup Reports">{this.renderContent()}</ActionCard>
 				{show ? (
 					<Alert bsStyle="info" onDismiss={this.handleDismiss} className="u-margin-t4">
-						For old reporting data <strong>(before 1st August)</strong> go to old console by{' '}
+						For old reporting data <strong>(before 1st August, 2019)</strong> go to old console by{' '}
 						<a
 							target="_blank"
 							onClick={oldConsoleRedirection}
