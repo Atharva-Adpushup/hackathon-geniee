@@ -2,10 +2,10 @@ const Dfp = require('node-google-dfp');
 
 class LineItemService {
     constructor(dfpConfig) {
-        const { network_code, app_name, version, ...authConfig } = dfpConfig;
-        this.network_code = network_code;
-        this.app_name = app_name;
-        this.version = version;
+        const { networkCode, appName, dfpApiVersion, ...authConfig } = dfpConfig;
+        this.networkCode = networkCode;
+        this.appName = appName;
+        this.dfpApiVersion = dfpApiVersion;
         this.authConfig = authConfig;
         this.dfpUser = null;
         this.service = null;
@@ -28,7 +28,7 @@ class LineItemService {
     initService() {
         // create dfpUser instance and set auth settings
         // can throw exception for synchronous operations
-        this.dfpUser = new Dfp.User(this.network_code, this.app_name, this.version);
+        this.dfpUser = new Dfp.User(this.networkCode, this.appName, this.dfpApiVersion);
         this.dfpUser.setSettings(this.authConfig);
         
         // this.service will be set to error object for async operation errors
@@ -67,7 +67,7 @@ class LineItemService {
                     return reject(this.service);
                 } else {
                     // service initialized
-                    console.log("\n\n", `network::${this.network_code}::getLineItems::`, {offset, count});
+                    console.log("\n\n", `network::${this.networkCode}::getLineItems::`, {offset, count});
                     const statement = new Dfp.Statement(`WHERE LineItemType IN ('PRICE_PRIORITY', 'AD_EXCHANGE') LIMIT ${offset}, ${count}`);
                     this.service
                     .getLineItemsByStatement(statement, (err, results) => {
@@ -85,8 +85,8 @@ class LineItemService {
                     });
                 }
             } catch(ex) {
-                console.error("\n\n",'getLineItems::Error', `network::${this.network_code}`, "\n\n");
-                return reject(new Error(`network::${this.network_code}::exception - ${ex.message}`));
+                console.error("\n\n",'getLineItems::Error', `network::${this.networkCode}`, "\n\n");
+                return reject(new Error(`network::${this.networkCode}::exception - ${ex.message}`));
             }
         });
     }
@@ -126,8 +126,8 @@ class LineItemService {
                     });
                 }
             } catch(ex) {
-                console.error("\n\n",'getLineItems::Error', `network::${this.network_code}`, "\n\n");
-                return reject(new Error(`network::${this.network_code}::exception - ${ex.message}`));
+                console.error("\n\n",'getLineItems::Error', `network::${this.networkCode}`, "\n\n");
+                return reject(new Error(`network::${this.networkCode}::exception - ${ex.message}`));
             }
         });
     };
