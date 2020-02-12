@@ -111,7 +111,9 @@ var gpt = {
 					});
 
 					if (slot) {
-						return feedback.send(slot);
+						return setTimeout(function() {
+							return feedback.send(slot);
+						}, 100);
 					}
 				});
 		});
@@ -147,7 +149,10 @@ var gpt = {
 								}
 
 								slot.renderedSize = size;
-								return feedback.send(slot);
+
+								return setTimeout(function() {
+									return feedback.send(slot);
+								}, 100);
 							}
 						}
 					});

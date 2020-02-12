@@ -131,19 +131,9 @@ function HbProcessing(site, apConfigs) {
 					const activeAdServer = adServerSettings.dfp;
 					computedPrebidCurrencyConfig = {
 						adServerCurrency: activeAdServer.activeDFPCurrencyCode,
-						granularityMultiplier: Number(activeAdServer.prebidGranularityMultiplier) || 1,
-						rates: activeAdServer.activeDFPCurrencyExchangeRate
+						granularityMultiplier: Number(activeAdServer.prebidGranularityMultiplier) || 1
 					};
 				}
-
-				const isValidCurrencyConfig = !!(
-					isValidHBConfig &&
-					computedPrebidCurrencyConfig &&
-					Object.keys(computedPrebidCurrencyConfig).length &&
-					computedPrebidCurrencyConfig.adServerCurrency &&
-					computedPrebidCurrencyConfig.granularityMultiplier &&
-					computedPrebidCurrencyConfig.rates
-				);
 
 				if (isValidHBConfig) {
 					deviceConfig = hbcf.value.deviceConfig;
@@ -153,12 +143,9 @@ function HbProcessing(site, apConfigs) {
 							? `,sizeConfig: ${JSON.stringify(deviceConfig.sizeConfig)}`
 							: '';
 
-					prebidAdapters = `${prebidAdapters},schain`;
+					prebidAdapters = `${prebidAdapters},currency,schain`;
 
-					if (isValidCurrencyConfig) {
-						prebidCurrencyConfig = `,currency: ${JSON.stringify(computedPrebidCurrencyConfig)}`;
-						prebidAdapters = `${prebidAdapters},currency`;
-					}
+					prebidCurrencyConfig = `,currency: ${JSON.stringify(computedPrebidCurrencyConfig)}`;
 				}
 
 				const output = {
