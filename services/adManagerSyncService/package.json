@@ -1,0 +1,17 @@
+{
+  "name": "dfpservice",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "couchbase": "^2.6.10",
+    "node-google-dfp": "^0.3.2",
+    "uuid": "^3.4.0",
+    "woodlot": "^3.2.8"
+  }
+}

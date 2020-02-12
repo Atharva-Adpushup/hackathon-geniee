@@ -1,5 +1,11 @@
 import React, { Component } from 'react';
-import { PanelGroup, Panel, Col, OverlayTrigger, Tooltip } from '@/Client/helpers/react-bootstrap-imports';
+import {
+	PanelGroup,
+	Panel,
+	Col,
+	OverlayTrigger,
+	Tooltip
+} from '@/Client/helpers/react-bootstrap-imports';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
@@ -43,6 +49,63 @@ class Apps extends Component {
 		a.remove();
 	};
 
+	renderOnlyAPLiteSpecificFeild() {
+		const { activeKey } = this.state;
+		const {
+			site,
+			bidders,
+			showNotification,
+			updateAppStatus,
+			fetchAllBiddersAction,
+			updateBidderAction
+		} = this.props;
+
+		const common = {
+			activeKey,
+			site,
+			showNotification,
+			updateAppStatus,
+			resetTab: this.handleSelect
+		};
+		return (
+			<PanelGroup
+				accordion
+				id={`apps-accordion-${site.siteId}-${site.siteDomain}`}
+				activeKey={activeKey}
+				onSelect={this.handleSelect}
+			>
+				<Panel eventKey="headerBidding">
+					<Panel.Heading>
+						<Panel.Title toggle className="app-panel-title">
+							Header Bidding
+						</Panel.Title>
+						<Link to={`/sites/${site.siteId}/apps/header-bidding`} className="u-margin-r3 app-link">
+							<OverlayTrigger
+								placement="top"
+								overlay={
+									<Tooltip id={`tooltip-header-bidding-link-${site.siteId}`}>
+										Go to Header Bidding App
+									</Tooltip>
+								}
+								key={`app-header-bidding-link-${site.siteId}`}
+							>
+								<FontAwesomeIcon icon="link" className="u-text-red" size="lg" />
+							</OverlayTrigger>
+						</Link>
+					</Panel.Heading>
+					{activeKey === 'headerBidding' ? (
+						<HeaderBidding
+							{...common}
+							bidders={bidders}
+							fetchAllBiddersAction={fetchAllBiddersAction}
+							updateBidderAction={updateBidderAction}
+						/>
+					) : null}
+				</Panel>
+			</PanelGroup>
+		);
+	}
+
 	renderPanel() {
 		const { activeKey } = this.state;
 		const {
@@ -57,6 +120,7 @@ class Apps extends Component {
 			fetchAllBiddersAction,
 			updateBidderAction
 		} = this.props;
+
 		const common = {
 			activeKey,
 			site,
@@ -226,7 +290,11 @@ class Apps extends Component {
 			site: { apps }
 		} = this.props;
 
-		return <Col xs={8}>{!apps ? <Loader height="100px" /> : this.renderPanel()}</Col>;
+		if (!apps.apLite)
+			return <Col xs={8}>{!apps ? <Loader height="100px" /> : this.renderPanel()}</Col>;
+		return (
+			<Col xs={8}>{!apps ? <Loader height="100px" /> : this.renderOnlyAPLiteSpecificFeild()}</Col>
+		);
 	}
 }
 

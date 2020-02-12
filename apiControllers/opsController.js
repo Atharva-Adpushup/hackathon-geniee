@@ -10,6 +10,7 @@ const { GET_SITES_STATS_API, EMAIL_REGEX } = require('../configs/commonConsts');
 const { sendSuccessResponse, sendErrorResponse } = require('../helpers/commonFunctions');
 const { appBucket, errorHandler } = require('../helpers/routeHelpers');
 const opsModel = require('../models/opsModel');
+const apLiteModel = require('../models/apLiteModel');
 
 const router = express.Router();
 
@@ -270,6 +271,27 @@ router
 			.getAllSitesStats()
 			.then(sitesData => sendSuccessResponse(sitesData, res))
 			.catch(err => errorHandler(err, res));
-	});
+	})
 
+	.put('/ap-lite/:siteId', (req, res) => {
+		const { siteId } = req.params;
+
+		const { adUnits } = req.body;
+
+		const json = { siteId: parseInt(siteId), adUnits };
+		return apLiteModel
+			.saveAdUnits(json)
+			.then(() => apLiteModel.getAPLiteModelBySite(json.siteId))
+			.then(doc => sendSuccessResponse(doc, res))
+			.catch(err => errorHandler(err));
+	})
+
+	.get('/ap-lite/:siteId', (req, res) => {
+		const { siteId } = req.params;
+
+		return apLiteModel
+			.getAPLiteModelBySite(parseInt(siteId))
+			.then(docData => sendSuccessResponse(docData, res))
+			.catch(err => errorHandler(err, res));
+	});
 module.exports = router;

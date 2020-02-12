@@ -38,12 +38,12 @@ export default class AddBidder extends React.Component {
 				if (params.hasOwnProperty(size)) {
 					params[size] = {
 						...params[size],
-						...getCustomParams(bidderConfig, siteId, domain, size)
+						...getCustomParams(bidderConfig, siteId, domain)
 					};
 				}
 			}
 		} else {
-			params = { ...params, ...getCustomParams(bidderConfig, siteId, domain, null) };
+			params = { ...params, ...getCustomParams(bidderConfig, siteId, domain) };
 		}
 
 		addBidderAction(siteId, { key: fieldsConfig.key, ...bidderConfig }, params)

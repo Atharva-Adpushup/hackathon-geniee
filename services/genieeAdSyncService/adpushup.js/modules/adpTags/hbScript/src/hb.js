@@ -6,6 +6,7 @@ var adp = require('./adp');
 var utils = require('./utils');
 var auction = require('./auction');
 var config = require('./config');
+var isApLiteActive = window.adpushup.config.apLiteActive;
 var hb = {
 	createPrebidSlots: function(adpSlotsBatch) {
 		var prebidSlots = [];
@@ -13,7 +14,7 @@ var hb = {
 
 		adpSlotsBatch.forEach(function(adpSlot) {
 			var responsiveSizes = [];
-			if (adpSlot.isResponsive) {
+			if (!adp.config.apLiteActive && adpSlot.isResponsive) {
 				responsiveSizes = responsiveAds.getAdSizes(adpSlot.optionalParam.adId).collection;
 				adpSlot.computedSizes = responsiveSizes;
 			}
@@ -30,12 +31,16 @@ var hb = {
 			var size = adpSlot.size;
 			var computedSizes = adpSlot.computedSizes;
 			var prebidSizes = computedSizes.length ? computedSizes : [size];
-			if (adpSlot.optionalParam.overrideActive && adpSlot.optionalParam.overrideSizeTo) {
+			if (
+				!adp.config.apLiteActive &&
+				adpSlot.optionalParam.overrideActive &&
+				adpSlot.optionalParam.overrideSizeTo
+			) {
 				size = adpSlot.optionalParam.overrideSizeTo.split('x');
 			}
 
 			var computedBidders = JSON.parse(JSON.stringify(adpSlot.bidders));
-			var sizeConfig = config.INVENTORY.deviceConfig.sizeConfig;
+			var sizeConfig = config.PREBID_CONFIG.deviceConfig.sizeConfig;
 
 			computedBidders.forEach(function(val, i) {
 				// find size config of current bidder
@@ -107,7 +112,9 @@ var hb = {
 			w._apPbJs.onEvent(constants.EVENTS.PREBID.BID_WON, function(bidData) {
 				utils.log('===BidWon====', bidData);
 
-				var slot = window.adpushup.adpTags.adpSlots[bidData.adUnitCode];
+				var slot = isApLiteActive
+					? window.apLite.adpSlots[bidData.adUnitCode]
+					: window.adpushup.adpTags.adpSlots[bidData.adUnitCode];
 				var computedCPMValue = utils.currencyConversionActive(adp.config)
 					? 'originalCpm'
 					: 'cpm';

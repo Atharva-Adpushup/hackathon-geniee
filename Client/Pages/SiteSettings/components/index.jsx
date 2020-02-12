@@ -133,14 +133,22 @@ class SiteSettings extends Component {
 	renderRightPanel() {
 		const {
 			siteData: {
-				apConfigs: { blocklist = [] }
+				apConfigs: { blocklist = [] },
+				apps = {}
 			}
 		} = this.state;
 
 		const blocklistCopy = Array.isArray(blocklist) ? cloneDeep(blocklist) : [];
 
 		return (
-			<div className="clearfix">
+			<div
+				className="clearfix"
+				style={
+					apps.hasOwnProperty('apLite') && apps.apLite
+						? { pointerEvents: 'none', opacity: 0.5 }
+						: null
+				}
+			>
 				<h4 className="u-margin-t0 u-margin-b4 u-text-bold">Manage Blocklist</h4>
 				<p className="u-margin-b4">Block AdPushup ads on selected URLs of the website</p>
 				<UiList

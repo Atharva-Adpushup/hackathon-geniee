@@ -5,9 +5,7 @@ var config = require('./config');
 var constants = require('./constants');
 var utils = require('./utils');
 var hb = require('./hb');
-var inventoryMapper = require('./inventoryMapper');
 var gpt = require('./gpt');
-var inventory = config.INVENTORY;
 var adpTags = {
 	module: {
 		adpSlots: {},
@@ -68,9 +66,8 @@ var adpTags = {
 			);
 		},
 		createSlot: function(containerId, size, placement, optionalParam) {
-			var adUnits = inventoryMapper.get(inventory, size, optionalParam);
-			var slotId = adUnits.dfpAdUnit;
-			var bidders = optionalParam.headerBidding ? adUnits.bidders : [];
+			var slotId = optionalParam.dfpAdunit;
+			var bidders = optionalParam.headerBidding ? utils.getBiddersForSlot(size) : [];
 			var isResponsive = optionalParam.isResponsive;
 			var sectionName = optionalParam.sectionName;
 			var multipleAdSizes =
@@ -156,9 +153,6 @@ var adpTags = {
 
 		// Set adpTags if already present else initialise module
 		w.adpushup.adpTags = existingAdpTags.adpSlots ? existingAdpTags : adpTagsModule;
-
-		// Keep deep copy of inventory in adpTags module
-		w.adpushup.adpTags.defaultInventory = w.adpushup.$.extend(true, {}, inventory);
 
 		// Merge adpQue with any existing que items if present
 		w.adpushup.adpTags.que = w.adpushup.adpTags.que.concat(adpQue).concat(w.adpTags.que);

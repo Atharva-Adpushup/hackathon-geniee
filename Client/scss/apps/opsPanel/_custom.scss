@@ -124,3 +124,22 @@
 		}
 	}
 }
+
+.refresh-rate {
+	.custom-select-box-wrapper {
+		width: 20%;
+		margin-left: auto;
+	}
+}
+
+.adUnit-modal {
+	.ReactTable {
+		height: 400px;
+		.rt-thead {
+			overflow-y: scroll;
+		}
+	}
+	.modal-dialog {
+		width: 50%;
+	}
+}

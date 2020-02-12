@@ -1,0 +1,477 @@
+/* eslint-disable jsx-a11y/label-has-for */
+/* eslint-disable jsx-a11y/label-has-associated-control */
+import React, { Component, Fragment } from 'react';
+import Papa from 'papaparse';
+import uuid from 'uuid';
+import isEqual from 'lodash/isEqual';
+import differenceWith from 'lodash/differenceWith';
+import { CSVLink } from 'react-csv';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
+import CustomReactTable from '../../../../../../Components/CustomReactTable/index.jsx';
+import axiosInstance from '../../../../../../helpers/axiosInstance';
+import { Panel, PanelGroup, Modal } from '@/Client/helpers/react-bootstrap-imports';
+import CustomButton from '../../../../../../Components/CustomButton/index';
+import FieldGroup from '../../../../../../Components/Layout/FieldGroup.jsx';
+import CustomToggleSwitch from '../../../../../../Components/CustomToggleSwitch/index';
+import SelectBox from '../../../../../../Components/SelectBox/index';
+import { REFRESH_RATE_ENTRIES } from '../../../../configs/commonConsts';
+
+const dfpAdsUnitNamesToFilter = ['Default', 'Total', '', undefined, 'Ad Unit Code', 'Ad unit'];
+
+const DEFAULT_STATE = {
+	file: null,
+	fileName: ''
+};
+
+class ApLite extends Component {
+	state = {
+		view: 'list',
+		isLoading: false,
+		adRefresh: true,
+		show: false,
+		selectedRefreshRate: REFRESH_RATE_ENTRIES[0].value,
+		structuredAdUnits: [],
+		oldAdUnits: [],
+		uploadedAdUnits: [],
+		...DEFAULT_STATE
+	};
+
+	componentDidMount() {
+		const {
+			fetchHBInitDataAction,
+			site: { siteId }
+		} = this.props;
+		fetchHBInitDataAction(siteId);
+	}
+
+	handleReset = () => this.setState(DEFAULT_STATE);
+
+	handleSelect = value => {
+		const {
+			site: { siteId }
+		} = this.props;
+		this.setState({
+			activeKey: value
+		});
+
+		return axiosInstance
+			.get(`ops/ap-lite/${siteId}`)
+			.then(res => {
+				const {
+					data: { adUnits }
+				} = res.data;
+				const { refreshSlot, refreshInterval } = adUnits[0];
+				this.setState({
+					adRefresh: refreshSlot,
+					selectedRefreshRate: refreshInterval,
+					oldAdUnits: adUnits
+				});
+			})
+			.catch(err => console.log(err));
+	};
+
+	handleToggle = (value, event) => {
+		const attributeValue = event.target.getAttribute('name');
+		const name = attributeValue.split('-')[0];
+
+		this.setState({
+			[name]: value
+		});
+	};
+
+	handleHide = () => {
+		this.setState({ show: false });
+	};
+
+	onSelect = (value, key) => {
+		this.setState({ [key]: value });
+	};
+
+	handleGAM = e => {
+		const { showNotification } = this.props;
+
+		let adUnitsArr = [];
+		if (!e.target.value.endsWith('.csv')) {
+			this.setState({ fileName: '' });
+			return showNotification({
+				mode: 'error',
+				title: 'Operation Failed',
+				message: 'Only csv files are allowed',
+				autoDismiss: 5
+			});
+		}
+
+		this.setState({ fileName: e.target.value, file: e.target.files[0] }, () => {
+			Papa.parse(this.state.file, {
+				delimiter: '',
+				chunkSize: 3,
+				header: false,
+				complete: function(responses) {
+					let adUnits = [];
+					let adUnitsName = [];
+
+					responses.data.forEach(unit => {
+						let obj = {};
+
+						adUnitsName.push(unit[0]);
+						obj.adUnitName = unit[0];
+						obj.adUnitcode = unit[1];
+						adUnits.push(obj);
+
+						let structuredData = {};
+						let dfpAdUnitName =
+							unit[0].includes('»') &&
+							adUnitsName.map(s => s.trim()).includes(unit[0].split('»')[0].trim())
+								? `${
+										adUnits.filter(val => val.adUnitName.trim() === unit[0].split('»')[0].trim())[0]
+											.adUnitcode
+								  }/${unit[1]}`
+								: unit[1];
+
+						structuredData.dfpAdUnit = dfpAdUnitName;
+						structuredData.dfpAdunitCode = unit[1];
+
+						adUnitsArr.push(structuredData);
+					});
+				}
+			});
+
+			this.setState({ structuredAdUnits: adUnitsArr });
+		});
+	};
+
+	showUploadedAdUnits = () => {
+		this.setState({ show: true });
+	};
+
+	handleSave = () => {
+		const { structuredAdUnits, oldAdUnits, uploadedAdUnits } = this.state;
+
+		let currentAdUnitsWithDfpNameAndCode = structuredAdUnits.filter(
+			data => !dfpAdsUnitNamesToFilter.includes(data.dfpAdUnit)
+		);
+
+		const oldAdUnitList = uploadedAdUnits.length ? uploadedAdUnits : oldAdUnits;
+		const oldAdUnitsWithDfpNameAndCode = oldAdUnitList.map(
+			({ refreshSlot, refreshInterval, headerBidding, sectionId, isActive, ...rest }) => rest
+		);
+
+		const unCommonAdUnits = differenceWith(
+			oldAdUnitsWithDfpNameAndCode,
+			currentAdUnitsWithDfpNameAndCode,
+			isEqual
+		);
+
+		if (!unCommonAdUnits.length) {
+			currentAdUnitsWithDfpNameAndCode = [
+				...currentAdUnitsWithDfpNameAndCode.map(v => ({ ...v, isActive: true }))
+			];
+		}
+		currentAdUnitsWithDfpNameAndCode = [
+			...currentAdUnitsWithDfpNameAndCode.map(v => ({ ...v, isActive: true })),
+			...unCommonAdUnits.map(v => ({ ...v, isActive: false }))
+		];
+
+		const {
+			site: { siteId },
+			showNotification
+		} = this.props;
+		const { adRefresh, selectedRefreshRate } = this.state;
+
+		const adUnits = currentAdUnitsWithDfpNameAndCode.map(v =>
+			Object.assign(
+				{},
+				{
+					...v,
+					sectionId: uuid.v4(),
+					refreshSlot: adRefresh,
+					refreshInterval: selectedRefreshRate,
+					headerBidding: true
+				}
+			)
+		);
+
+		this.setState({ isLoading: true });
+
+		return axiosInstance
+			.put(`/ops/ap-lite/${siteId}`, {
+				adUnits
+			})
+			.then(res => {
+				const {
+					data: { adUnits }
+				} = res.data;
+
+				showNotification({
+					mode: 'success',
+					title: 'Success',
+					message: 'Settings saved successsfully',
+					autoDismiss: 5
+				});
+
+				this.setState(
+					{
+						isLoading: false,
+						uploadedAdUnits: adUnits.map(
+							({ refreshSlot, refreshInterval, headerBidding, sectionId, isActive, ...rest }) =>
+								rest
+						)
+					},
+					this.handleReset
+				);
+			})
+			.catch(err => {
+				showNotification({
+					mode: 'error',
+					title: 'Operation Failed',
+					message: 'Something went wrong',
+					autoDismiss: 5
+				});
+				console.log(err);
+			});
+	};
+
+	getHbStatus(setupStatus) {
+		const { dfpConnected, biddersFound, adServerSetupStatus, isPublisherActiveDfp } = setupStatus;
+		if (dfpConnected && biddersFound && adServerSetupStatus === 2 && isPublisherActiveDfp) {
+			return 'Complete';
+		}
+		if (dfpConnected && !biddersFound && adServerSetupStatus === 2 && isPublisherActiveDfp) {
+			return 'HB Setup Complete(No Bidders Active)';
+		}
+		return 'Pending';
+	}
+
+	getNetworkName(adNetworkSettings, activeDFPNetworkId) {
+		const dfPNetworkNameField = adNetworkSettings.find(val => val.networkName === 'DFP') || {};
+		const { dfpAccounts = [] } = dfPNetworkNameField;
+		const matchDfpAccount =
+			dfpAccounts.find(val => val.code === activeDFPNetworkId.toString()) || {};
+
+		return matchDfpAccount.name || '';
+	}
+
+	gamAdUnitsLabel = () => {
+		return (
+			<React.Fragment>
+				GAM Ad Units{' '}
+				<CSVLink
+					headers={[
+						{ label: 'Ad unit', key: 'dfpAdUnit' },
+						{ label: 'Ad Unit Code', key: 'dfpAdUnitCode' }
+					]}
+					data={[]}
+					filename="adUnitsTemplate.csv"
+					style={{ display: 'block' }}
+				>
+					<small> (Download CSV Template)</small>
+				</CSVLink>
+			</React.Fragment>
+		);
+	};
+
+	renderView = () => {
+		const styles = {
+			display: 'inline-block',
+			float: 'right',
+			fontWeight: 'bold',
+			padding: '5px 15px'
+		};
+		const {
+			site,
+			userData: { adServerSettings = {}, adNetworkSettings = [] },
+			headerBiddingData
+		} = this.props;
+		const { dfp = {} } = adServerSettings;
+		const { activeDFPNetwork } = dfp;
+
+		const { siteId, siteDomain } = site;
+		const {
+			selectedRefreshRate,
+			adRefresh,
+			fileName,
+			oldAdUnits,
+			uploadedAdUnits,
+			structuredAdUnits,
+			show
+		} = this.state;
+
+		const { setupStatus } = headerBiddingData[siteId];
+		const hbStatus = this.getHbStatus(setupStatus);
+
+		const activeDFPNetworkId =
+			adServerSettings.hasOwnProperty('dfp') && dfp.hasOwnProperty('activeDFPNetwork')
+				? activeDFPNetwork
+				: null;
+
+		const activeDFPNetworkName = activeDFPNetworkId
+			? adNetworkSettings.length && adNetworkSettings.find(val => val.networkName === 'DFP')
+				? this.getNetworkName(adNetworkSettings, activeDFPNetworkId)
+				: ''
+			: null;
+
+		return (
+			<div>
+				<FieldGroup
+					name="Google Ad Manager"
+					value={
+						activeDFPNetworkId
+							? activeDFPNetworkName
+								? `Connected (${activeDFPNetworkName}, ${activeDFPNetworkId})`
+								: `Connected (${activeDFPNetworkId})`
+							: 'Not Connected'
+					}
+					isTextOnly
+					textOnlyStyles={styles}
+					label="Google Ad Manager"
+					size={6}
+					id="googleAdManager-text"
+					className="u-padding-v4 u-padding-h4"
+				/>
+				<FieldGroup
+					name="HB App"
+					value={hbStatus}
+					isTextOnly
+					textOnlyStyles={styles}
+					label="HB App"
+					size={6}
+					id="hbApp-text"
+					className="u-padding-v4 u-padding-h4"
+				/>
+
+				<FieldGroup
+					name="GAM Ad Units"
+					value={fileName}
+					onChange={this.handleGAM}
+					type="file"
+					label={this.gamAdUnitsLabel()}
+					size={6}
+					id="gamAdUnits-text"
+					style={{
+						display: 'inline-block',
+						float: 'right',
+						width: '220',
+						fontWeight: '700'
+					}}
+				/>
+
+				{fileName || uploadedAdUnits.length || oldAdUnits.length ? (
+					<React.Fragment>
+						<CustomToggleSwitch
+							labelText="Ad Refresh"
+							className="u-margin-b4 negative-toggle"
+							checked={adRefresh}
+							onChange={this.handleToggle}
+							layout="horizontal"
+							size="m"
+							on="Yes"
+							off="No"
+							defaultLayout
+							name={`adRefresh-${siteId}-${siteDomain}`}
+							id={`js-adRefresh-${siteId}-${siteDomain}`}
+						/>
+
+						{adRefresh ? (
+							<div className="refresh-rate" style={{ display: 'flex' }}>
+								<p className="u-text-bold u-margin-b4">Refresh Rate</p>
+								<SelectBox
+									selected={selectedRefreshRate}
+									options={REFRESH_RATE_ENTRIES}
+									onSelect={this.onSelect}
+									id="select-entry"
+									title="Select Entry"
+									dataKey="selectedRefreshRate"
+									reset
+									style={{ marginLeft: 'auto', width: '20%' }}
+									className="refresh-rate"
+								/>
+							</div>
+						) : null}
+
+						<CustomButton variant="primary" bsSize="large" onClick={this.showUploadedAdUnits}>
+							Show Uploaded Ad Units
+						</CustomButton>
+
+						<Modal
+							show={show}
+							onHide={this.handleHide}
+							container={this}
+							aria-labelledby="contained-modal-title"
+							className="adUnit-modal"
+						>
+							<Modal.Header closeButton>
+								<Modal.Title id="contained-modal-title">List of Ad Units</Modal.Title>
+							</Modal.Header>
+							<Modal.Body className="aplite-modal">
+								<CustomReactTable
+									columns={[
+										{ Header: 'Ad Unit', accessor: 'dfpAdUnit' },
+										{ Header: 'Ad Unit Code', accessor: 'dfpAdunitCode' }
+									]}
+									data={
+										structuredAdUnits.length
+											? structuredAdUnits.filter(
+													data => !dfpAdsUnitNamesToFilter.includes(data.dfpAdUnit)
+											  )
+											: oldAdUnits.filter(({ isActive }) => isActive !== false)
+									}
+									defaultPageSize={20}
+									minRows={0}
+								/>
+							</Modal.Body>
+							<Modal.Footer>
+								<CustomButton onClick={this.handleHide}>Close</CustomButton>
+							</Modal.Footer>
+						</Modal>
+					</React.Fragment>
+				) : null}
+
+				<CustomButton
+					variant="secondary"
+					className="pull-right u-margin-r3 u-margin-t4"
+					onClick={this.handleReset}
+				>
+					Cancel
+				</CustomButton>
+				<CustomButton
+					type="submit"
+					variant="primary"
+					className="pull-right u-margin-r3 u-margin-t4"
+					onClick={this.handleSave}
+				>
+					Save
+				</CustomButton>
+			</div>
+		);
+	};
+
+	render() {
+		const { site } = this.props;
+		const { siteId, siteDomain, apps = {} } = site;
+		const { activeKey } = this.state;
+		if (apps.apLite) {
+			return (
+				<div className="u-margin-t4">
+					<PanelGroup
+						accordion
+						id={`apLite-panel-${siteId}-${siteDomain}`}
+						activeKey={activeKey}
+						onSelect={this.handleSelect}
+					>
+						<Panel eventKey="apLite">
+							<Panel.Heading>
+								<Panel.Title toggle>AP Lite</Panel.Title>
+							</Panel.Heading>
+							{activeKey === 'apLite' ? (
+								<Panel.Body collapsible>{this.renderView()}</Panel.Body>
+							) : null}
+						</Panel>
+					</PanelGroup>
+				</div>
+			);
+		} else return null;
+	}
+}
+
+export default ApLite;

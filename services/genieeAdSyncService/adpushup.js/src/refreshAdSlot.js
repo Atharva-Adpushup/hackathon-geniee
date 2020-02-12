@@ -29,7 +29,8 @@ var utils = require('../libs/utils'),
 			if (ad.network === commonConsts.NETWORKS.ADPTAGS && !ad.networkData.headerBidding) {
 				var slot = getAdpSlot(ad);
 				refreshGPTSlot(slot.gSlot);
-				sendFeedback(ad);
+				// TODO: Implement apLite Feedback
+				!adp.config.apLiteActive && sendFeedback(ad);
 				setRefreshTimeOut(container, ad);
 			} else if (ad.network === commonConsts.NETWORKS.ADPTAGS && ad.networkData.headerBidding) {
 				//container.children().remove();
@@ -37,9 +38,11 @@ var utils = require('../libs/utils'),
 				slot.toBeRefreshed = true;
 
 				removeBidderTargeting(slot);
-				adp.adpTags.queSlotForBidding(slot);
+				adp.config.apLiteActive
+					? window.apLite.queSlotForBidding(slot)
+					: adp.adpTags.queSlotForBidding(slot);
 				setRefreshTimeOut(container, ad);
-			} else if (ad.network !== commonConsts.NETWORKS.ADPTAGS) {
+			} else if (!adp.config.apLiteActive && ad.network !== commonConsts.NETWORKS.ADPTAGS) {
 				container.children().remove();
 				container.append(adCodeGenerator.generateAdCode(ad));
 				sendFeedback(ad);
@@ -58,6 +61,12 @@ var utils = require('../libs/utils'),
 		}
 	},
 	getAdpSlot = function(ad) {
+		if (adp.config.apLiteActive) {
+			var slot = window.apLite.adpSlots[ad.slotId];
+
+			return slot;
+		}
+
 		var adSize = ad.width + 'X' + ad.height,
 			adSize1 = ad.width + 'x' + ad.height,
 			siteId = adp.config.siteId,
@@ -88,6 +97,17 @@ var utils = require('../libs/utils'),
 	},
 	refreshGPTSlot = function(gSlot) {
 		googletag.pubads().refresh([gSlot]);
+	},
+	stopRefreshForASlot = function(container) {
+		var adIndex = ads.findIndex(obj => obj.container[0] === container[0]);
+
+		if (adIndex !== -1) {
+			var container = ads[adIndex].container;
+			var oldTimeoutId = container.attr('data-timeout');
+			oldTimeoutId && clearTimeout(oldTimeoutId);
+
+			ads.splice(adIndex, 1);
+		}
 	},
 	getAllInViewAds = function() {
 		inViewAds = [];
@@ -172,6 +192,7 @@ var utils = require('../libs/utils'),
 	};
 
 module.exports = {
-	init: init,
-	refreshSlot: refreshSlot
+	init,
+	refreshSlot,
+	stopRefreshForASlot
 };

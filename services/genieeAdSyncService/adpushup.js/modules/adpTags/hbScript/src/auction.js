@@ -3,14 +3,21 @@
 var utils = require('./utils');
 var adp = require('./adp');
 var config = require('./config');
+var adpConfig = window.adpushup.config;
 var constants = require('./constants');
 var render = require('./render');
 var auction = {
 	end: function(adpBatchId) {
-		var adpSlots = utils.getCurrentAdpSlotBatch(window.adpushup.adpTags.adpBatches, adpBatchId);
+		var adpBatches = adpConfig.apLiteActive
+			? window.apLite.adpBatches
+			: window.adpushup.adpTags.adpBatches;
+		var adpSlots = utils.getCurrentAdpSlotBatch(adpBatches, adpBatchId);
 
-		window.adpushup.adpTags.batchPrebiddingComplete = true;
-		if (Object.keys(adpSlots).length) {
+		adpConfig.apLiteActive
+			? (window.apLite.batchPrebiddingComplete = true)
+			: (window.adpTags.batchPrebiddingComplete = true);
+
+		if (adpSlots.length) {
 			return render.init(adpSlots);
 		}
 
@@ -30,7 +37,7 @@ var auction = {
 		});
 	},
 	getSizeConfig: function() {
-		var sizeConfigFromDB = config.INVENTORY.deviceConfig.sizeConfig;
+		var sizeConfigFromDB = config.PREBID_CONFIG.deviceConfig.sizeConfig;
 		var pbSizeConfig = [];
 		var labelIndexTracker = {};
 
@@ -59,7 +66,7 @@ var auction = {
 		return pbSizeConfig;
 	},
 	getBidderSettings: function() {
-		var bidders = config.INVENTORY.hbcf;
+		var bidders = config.PREBID_CONFIG.hbcf;
 		var keys = constants.ADSERVER_TARGETING_KEYS;
 
 		// Set custom default key value pairs
@@ -108,7 +115,7 @@ var auction = {
 		return bidderSettings;
 	},
 	setBidderAliases(pbjs) {
-		const bidders = config.INVENTORY.hbcf;
+		const bidders = config.PREBID_CONFIG.hbcf;
 		for (const bidderCode in bidders) {
 			if (bidders.hasOwnProperty(bidderCode) && bidders[bidderCode].alias) {
 				pbjs.aliasBidder(bidders[bidderCode].alias, bidderCode);

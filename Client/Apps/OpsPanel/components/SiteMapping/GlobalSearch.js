@@ -91,7 +91,11 @@ class GlobalSearch extends React.Component {
 						>
 							<option value=""> All columns</option>
 							{columns.map(col => {
-								return <option value={col.accessor}>{col.Header}</option>;
+								return (
+									<option key={col.accessor} value={col.accessor}>
+										{col.Header}
+									</option>
+								);
 							})}
 						</select>
 						<FormControl

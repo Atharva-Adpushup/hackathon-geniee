@@ -69,7 +69,7 @@ export {
 	ListGroup,
 	ListGroupItem,
 	Accordion,
-    Well,
-    Grid,
+	Well,
+	Grid,
 	Popover
 };
