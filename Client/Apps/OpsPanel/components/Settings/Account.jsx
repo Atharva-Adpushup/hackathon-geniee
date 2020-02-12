@@ -79,17 +79,18 @@ class Account extends Component {
 
 	getActiveDFPName = memoize((adNetworkSettings = [], activeDFPNetwork, code) => {
 		let response = '103512698 - AdPushup Inc.';
+		const activeNetwork = activeDFPNetwork === '103512698' ? response : activeDFPNetwork;
 
 		const dfpNetwork = adNetworkSettings.find(({ networkName }) => networkName === 'DFP') || {};
 		const { dfpAccounts = [] } = dfpNetwork;
 
-		const matchedDfpAccount = dfpAccounts.find(
+		const filteredAccounts = dfpAccounts.find(
 			account => `${account.code}-${account.dfpParentId}-${account.currencyCode}` === code
 		);
 
-		response = matchedDfpAccount
-			? `${matchedDfpAccount.code} - ${matchedDfpAccount.name || 'N/A'}`
-			: activeDFPNetwork;
+		response = filteredAccounts
+			? `${filteredAccounts.code} - ${filteredAccounts.name || 'N/A'}`
+			: activeNetwork;
 		return response;
 	});
 
