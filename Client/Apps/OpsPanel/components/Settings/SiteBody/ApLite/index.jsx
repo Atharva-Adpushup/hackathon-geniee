@@ -109,32 +109,26 @@ class ApLite extends Component {
 				chunkSize: 3,
 				header: false,
 				complete: function(responses) {
-					let adUnits = [];
-					let adUnitsName = [];
-
+					let adUnitMap = {};
+					let parentAdUnit;
+					let childAdUnit;
 					responses.data.forEach(unit => {
-						let obj = {};
-
-						adUnitsName.push(unit[0]);
-						obj.adUnitName = unit[0];
-						obj.adUnitcode = unit[1];
-						adUnits.push(obj);
-
-						let structuredData = {};
-						let dfpAdUnitName =
-							unit[0].includes('»') &&
-							adUnitsName.map(s => s.trim()).includes(unit[0].split('»')[0].trim())
-								? `${
-										adUnits.filter(val => val.adUnitName.trim() === unit[0].split('»')[0].trim())[0]
-											.adUnitcode
-								  }/${unit[1]}`
-								: unit[1];
-
-						structuredData.dfpAdUnit = dfpAdUnitName === undefined ? '' : dfpAdUnitName;
-						structuredData.dfpAdunitCode = unit[1];
-
-						adUnitsArr.push(structuredData);
+						adUnitMap[unit[0]] = unit[1];
 					});
+
+					for (let key in adUnitMap) {
+						delete adUnitMap.Default;
+
+						parentAdUnit = key.includes('»') ? key.split('»')[0].trim() : key;
+						childAdUnit = key.includes('»') ? key.split('»')[1].trim() : key;
+
+						let dfpAdUnit =
+							parentAdUnit !== childAdUnit && adUnitMap[parentAdUnit]
+								? `${adUnitMap[parentAdUnit]}/${adUnitMap[key]}`
+								: adUnitMap[key];
+						let dfpAdunitCode = adUnitMap[key];
+						adUnitsArr.push({ dfpAdUnit: dfpAdUnit === undefined ? '' : dfpAdUnit, dfpAdunitCode });
+					}
 				}
 			});
 
