@@ -110,8 +110,6 @@ class ApLite extends Component {
 				header: false,
 				complete: function(responses) {
 					let adUnitMap = {};
-					let parentAdUnit;
-					let childAdUnit;
 					responses.data.forEach(unit => {
 						adUnitMap[unit[0]] = unit[1];
 					});
@@ -119,8 +117,8 @@ class ApLite extends Component {
 					for (let key in adUnitMap) {
 						delete adUnitMap.Default;
 
-						parentAdUnit = key.includes('»') ? key.split('»')[0].trim() : key;
-						childAdUnit = key.includes('»') ? key.split('»')[1].trim() : key;
+						let parentAdUnit = key.includes('»') ? key.split('»')[0].trim() : key;
+						let childAdUnit = key.includes('»') ? key.split('»')[1].trim() : key;
 
 						let dfpAdUnit =
 							parentAdUnit !== childAdUnit && adUnitMap[parentAdUnit]
