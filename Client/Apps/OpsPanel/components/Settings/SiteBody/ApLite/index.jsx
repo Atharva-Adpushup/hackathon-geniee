@@ -16,7 +16,7 @@ import CustomToggleSwitch from '../../../../../../Components/CustomToggleSwitch/
 import SelectBox from '../../../../../../Components/SelectBox/index';
 import { REFRESH_RATE_ENTRIES } from '../../../../configs/commonConsts';
 
-const dfpAdsUnitNamesToFilter = ['Default', 'Total', '', undefined, 'Ad Unit Code', 'Ad unit'];
+const dfpAdsUnitNamesToFilter = ['DEFAULT', 'TOTAL', '', 'AD UNIT CODE', 'AD UNIT'];
 
 const DEFAULT_STATE = {
 	file: null,
@@ -130,7 +130,7 @@ class ApLite extends Component {
 								  }/${unit[1]}`
 								: unit[1];
 
-						structuredData.dfpAdUnit = dfpAdUnitName;
+						structuredData.dfpAdUnit = dfpAdUnitName === undefined ? '' : dfpAdUnitName;
 						structuredData.dfpAdunitCode = unit[1];
 
 						adUnitsArr.push(structuredData);
@@ -150,7 +150,7 @@ class ApLite extends Component {
 		const { structuredAdUnits, oldAdUnits, uploadedAdUnits } = this.state;
 
 		let currentAdUnitsWithDfpNameAndCode = structuredAdUnits.filter(
-			data => !dfpAdsUnitNamesToFilter.includes(data.dfpAdUnit)
+			data => !dfpAdsUnitNamesToFilter.includes(data.dfpAdUnit.toUpperCase().trim())
 		);
 
 		const oldAdUnitList = uploadedAdUnits.length ? uploadedAdUnits : oldAdUnits;
@@ -413,7 +413,8 @@ class ApLite extends Component {
 									data={
 										structuredAdUnits.length
 											? structuredAdUnits.filter(
-													data => !dfpAdsUnitNamesToFilter.includes(data.dfpAdUnit)
+													data =>
+														!dfpAdsUnitNamesToFilter.includes(data.dfpAdUnit.toUpperCase().trim())
 											  )
 											: oldAdUnits.filter(({ isActive }) => isActive !== false)
 									}
