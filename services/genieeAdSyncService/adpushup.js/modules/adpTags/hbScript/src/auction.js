@@ -139,7 +139,6 @@ var auction = {
 			bidderSequence: constants.PREBID.BIDDER_SEQUENCE,
 			priceGranularity: constants.PREBID.PRICE_GRANULARITY,
 			sizeConfig: this.getSizeConfig(),
-			currency: config.PREBID_CONFIG.currencyConfig,
 			useBidCache: true,
 			schain: {
 				validation: 'strict',
@@ -157,6 +156,14 @@ var auction = {
 				}
 			}
 		};
+
+		if (
+			config.PREBID_CONFIG.currencyConfig &&
+			config.PREBID_CONFIG.currencyConfig.adServerCurrency &&
+			config.PREBID_CONFIG.currencyConfig.granularityMultiplier
+		) {
+			pbConfig.currency = config.PREBID_CONFIG.currencyConfig;
+		}
 
 		pbjs.setConfig(pbConfig);
 
