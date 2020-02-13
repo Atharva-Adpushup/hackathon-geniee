@@ -1,18 +1,45 @@
-const uuid = require('uuid');
 const getLogger = require('./Logger');
 const Database = require('./db');
+const ServiceStatus = require('./serviceStatus');
+
 const {
     serviceStatusPingDelayMs,
+    serviceStatusDocExpiryDays,
     serviceStatusDb: serviceStatusDbConfig, 
-    db: dbConfig, 
-    dfp: {adpushup_network_code, user: dfpUserConfig, auth: dfpAuthConfig}
+    appName,
+    dfpApiVersion,
+    db: dbConfig
 } = require('./config');
+
+const {
+    ADPUSHUP_GAM: {
+        ACTIVE_DFP_NETWORK: ADPUSHUP_DFP_NETWORK_CODE, 
+        REFRESH_TOKEN: ADPUSHUP_REFRSH_TOKEN,
+        OAUTH_CALLBACK: ADPUSHUP_OAUTH_CALLBACK
+    },
+    googleOauth: {
+        OAUTH_CLIENT_ID: ADPUSHUP_CLIENT_ID,
+        OAUTH_CLIENT_SECRET: ADPUSHUP_CLIENT_SECRET
+    }
+} = require('../../configs/config');
+
+const dfpUserConfig = {
+    networkCode: '', 
+    appName, 
+    dfpApiVersion
+};
+
+const dfpAuthConfig = {
+    client_id : ADPUSHUP_CLIENT_ID,
+    client_secret : ADPUSHUP_CLIENT_SECRET,
+    refresh_token : ADPUSHUP_REFRSH_TOKEN,
+    redirect_url : ADPUSHUP_OAUTH_CALLBACK
+};
+
 const LineItemsService = require('./LineItemsService');
 
 const db = new Database(dbConfig);
-const statusDb = new Database(serviceStatusDbConfig);
 const logger = getLogger();
-let pingTimer = null;
 
 const updateLineItemsForNetwork = async (dfpConfig) => {
     try {
@@ -20,16 +47,16 @@ const updateLineItemsForNetwork = async (dfpConfig) => {
         let offset = 0;
         let updatedCount = 0;
         let hasMore = true;
-        const lineItemsService = new LineItemsService(dfpConfig);
+        const lineItemsService = new LineItemsService(dfpConfig, logger);
         // make paginated requests and collect all data
         while(hasMore) {
             // @TODO: retry on failure
             const {results: lineItems, total} = await lineItemsService.getPricePriorityLineItems(offset, count);
             let dbResult = null;
             if(offset === 0) {
-                dbResult = await db.upsertDoc(`ntwk::${dfpConfig.network_code}`, {networkCode: dfpConfig.network_code, lineItems, lastUpdated: +new Date()});
+                dbResult = await db.upsertDoc(`ntwk::${dfpConfig.networkCode}`, {networkCode: dfpConfig.networkCode, lineItems, lastUpdated: +new Date()});
             } else {
-                dbResult = await db.arrayConcat(`ntwk::${dfpConfig.network_code}`, 'lineItems', lineItems);
+                dbResult = await db.arrayConcat(`ntwk::${dfpConfig.networkCode}`, 'lineItems', lineItems);
             }
             if(dbResult instanceof Error) return dbResult;
             offset += count;
@@ -56,23 +83,24 @@ const updateLineItemsForThirdPartyDfps = async () => {
             FROM ${dbConfig.bucketName} 
             WHERE meta().id LIKE 'user::%' 
             AND adServerSettings.dfp.activeDFPNetwork != $adPushupNetworkId`;
-        const {results, status, resultCount} = await db.query(queryString, {adPushupNetworkId: adpushup_network_code});
-        console.log('3rd party dfps results=', results, "\n\ntotal=", resultCount, "\n\nstatus=", status);
+        const {results, status, resultCount} = await db.query(queryString, {adPushupNetworkId: ADPUSHUP_DFP_NETWORK_CODE});
+        logger.info({message: `Found ${resultCount} 3rd Party dfps`});
         // run for each network
         let totalLineItemsUpdated = 0;
         let errors = {};
         for(const {networkId, dfpNetworkSettings} of results) {
             try {
-                console.info(`Processing network id ${networkId}`, "\n");
+                logger.info({message: `Processing network id ${networkId}`});
                 const refreshToken = dfpNetworkSettings && dfpNetworkSettings.length && dfpNetworkSettings[0].refreshToken;
                 if(!refreshToken) {
-                    errors[networkId] = new Error(`missing Refresh Token`);
+                    // skip the network if refresh token is missing
+                    // errors[networkId] = new Error(`missing Refresh Token`);
                     continue;
                 }
                 dfpConfig.refresh_token = refreshToken;
-                dfpConfig.network_code = networkId;
+                dfpConfig.networkCode = networkId;
                 const updatedCount = await updateLineItemsForNetwork(dfpConfig);
-                logger.info({message: `updated ${updatedCount} lineItems for ntwk::${dfpConfig.network_code}`});
+                logger.info({message: `updated ${updatedCount} lineItems for ntwk::${dfpConfig.networkCode}`});
                 totalLineItemsUpdated += updatedCount;
             } catch(ex) {
                 errors[networkId] = ex;
@@ -85,7 +113,7 @@ const updateLineItemsForThirdPartyDfps = async () => {
         }
         return totalLineItemsUpdated;
     } catch(ex) {
-        logger.error({message: 'updateLineItemsForThirdPartyDfps::Error', debugData: {ex}});
+        logger.error({message: 'updateLineItemsForThirdPartyDfps::ERROR', debugData: {ex}});
         return ex;
     }
 };
@@ -94,103 +122,26 @@ const updateLineItemsForAdPushupDfp = async () => {
     try {
         const dfpConfig = {
             ...dfpUserConfig,
-            network_code: adpushup_network_code,
+            networkCode: ADPUSHUP_DFP_NETWORK_CODE,
             ...dfpAuthConfig
         };
         return await updateLineItemsForNetwork(dfpConfig);
     } catch(ex) {
-        logger.error({message: 'updateLineItemsForAdPushupDfp::Error', debugData: {ex}});
+        logger.error({message: 'updateLineItemsForAdPushupDfp::ERROR', debugData: {ex}});
         return ex;
     }
 };
 
-const isSyncRunning = async () => {
-    try {
-        const bucketName = serviceStatusDbConfig.bucketName;
-        const qs = `SELECT meta().id, lastUpdated 
-            FROM ${bucketName} 
-            WHERE meta().id LIKE 'adms::%' 
-            AND status = 'RUNNING'
-            AND lastUpdated >= CLOCK_MILLIS() - $serviceStatusPingDelayMs
-        `;
-        const {resultCount = 0} = await statusDb.query(qs, {serviceStatusPingDelayMs});
-        return !!resultCount;
-    } catch(ex) {
-        console.error('isSyncRunning::ERROR', ex);
-        throw ex;
-    }
-};
-
-const setServiceStatusStarted = async () => {
-    try {
-        const docId = `adms::${uuid.v4()}`;
-        await statusDb
-        .insertDoc(docId, {
-            docType: 'AdManagerSyncServiceStatus', 
-            status: 'RUNNING', 
-            startedOn: +new Date(), 
-            lastUpdated: +new Date()
-        });
-        return docId;
-    } catch(ex) {
-        logger.error({message: 'startServiceStatusPing', debugData: {ex}});
-        throw ex;
-    }
-};
-
-const updateServiceStatusStopped = async (statusDocId) => {
-    try {
-        await statusDb
-        .updatePartial(statusDocId, {
-            status: 'FINISHED', 
-            completedOn: +new Date(), 
-            lastUpdated: +new Date()
-        });
-        return true;
-    } catch(ex) {
-        logger.error({message: 'updateServiceStatusStopped', debugData: {ex}});
-        throw ex;
-    }
-};
-
-const updateServiceStatusRunning = async (statusDocId) => {
-    try {
-        await statusDb
-        .updatePartial(statusDocId, { lastUpdated: +new Date() });
-        return true;
-    } catch(ex) {
-        logger.error({message: 'startServiceStatusPing', debugData: {ex}});
-        throw ex;
-    }
-}
-
-const startServiceStatusPing = async () => {
-    if(pingTimer) {
-        clearInterval(pingTimer);
-    }
-    const statusDocId = await setServiceStatusStarted();
-    pingTimer = setInterval(() => updateServiceStatusRunning(statusDocId), serviceStatusPingDelayMs);
-    return statusDocId;
-};
-
-const stopServiceStatusPing = async (statusDocId) => {
-    if(pingTimer) {
-        clearInterval(pingTimer);
-    }
-    if(statusDocId) {
-        return await updateServiceStatusStopped(statusDocId);
-    }
-    return true;
-};
-
 async function runService() {
-    let statusDocId = null;
+    logger.info(`Sync service invoked at ${+new Date()}`);
+    const serviceStatus = new ServiceStatus(serviceStatusDbConfig, serviceStatusPingDelayMs, serviceStatusDocExpiryDays, logger);
     try {
         // check if any service instance is already running
-        if(await isSyncRunning()) {
+        if(await serviceStatus.isSyncRunning()) {
+            logger.error('Another sync process is running, exiting');
             return new Error('Another Sync process is running');
         }
-        statusDocId = await startServiceStatusPing();
+        await serviceStatus.startServiceStatusPing();
         logger.info({message: 'Updating adPushup Dfp'});
         const adPushupUpdateResult = await updateLineItemsForAdPushupDfp();
         if(adPushupUpdateResult instanceof Error) {
@@ -211,7 +162,7 @@ async function runService() {
         logger.error({message: 'runService::ERROR', debugData: {ex}});
         return ex;
     } finally {
-        await stopServiceStatusPing(statusDocId);
+        await serviceStatus.stopServiceStatusPing();
     }
 }
 
