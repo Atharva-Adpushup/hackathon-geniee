@@ -6,7 +6,6 @@ import uuid from 'uuid';
 import isEqual from 'lodash/isEqual';
 import differenceWith from 'lodash/differenceWith';
 import { CSVLink } from 'react-csv';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import CustomReactTable from '../../../../../../Components/CustomReactTable/index.jsx';
 import axiosInstance from '../../../../../../helpers/axiosInstance';
@@ -28,6 +27,7 @@ class ApLite extends Component {
 	state = {
 		view: 'list',
 		isLoading: false,
+		isError: false,
 		adRefresh: true,
 		show: false,
 		selectedRefreshRate: REFRESH_RATE_ENTRIES[0].value,
@@ -63,12 +63,13 @@ class ApLite extends Component {
 				} = res.data;
 				const { refreshSlot, refreshInterval } = adUnits[0];
 				this.setState({
+					isError: false,
 					adRefresh: refreshSlot,
 					selectedRefreshRate: refreshInterval,
 					oldAdUnits: adUnits
 				});
 			})
-			.catch(err => console.log(err));
+			.catch(err => this.setState({ isError: true }));
 	};
 
 	handleToggle = (value, event) => {

@@ -276,8 +276,17 @@ router
 	.put('/ap-lite/:siteId', (req, res) => {
 		const { siteId } = req.params;
 
-		const { adUnits } = req.body;
+		if (!siteId) {
+			return sendErrorResponse(
+				{
+					message: 'Site Id is necessary'
+				},
+				res,
+				HTTP_STATUSES.BAD_REQUEST
+			);
+		}
 
+		const { adUnits } = req.body;
 		const json = { siteId: parseInt(siteId), adUnits };
 		return apLiteModel
 			.saveAdUnits(json)
@@ -289,9 +298,19 @@ router
 	.get('/ap-lite/:siteId', (req, res) => {
 		const { siteId } = req.params;
 
+		if (!siteId) {
+			return sendErrorResponse(
+				{
+					message: 'Site Id is necessary'
+				},
+				res,
+				HTTP_STATUSES.BAD_REQUEST
+			);
+		}
+
 		return apLiteModel
 			.getAPLiteModelBySite(parseInt(siteId))
 			.then(docData => sendSuccessResponse(docData, res))
-			.catch(err => errorHandler(err, res));
+			.catch(err => errorHandler(err, res, 404));
 	});
 module.exports = router;
