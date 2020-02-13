@@ -20,6 +20,13 @@ class customToggleSwitch extends React.Component {
 		}
 	}
 
+	// componentWillReceiveProps(nextProps) {
+	// 	const { checked } = this.props;
+	// 	if (checked !== nextProps.checked) {
+	// 		this.setState({ value: nextProps.checked });
+	// 	}
+	// }
+
 	componentWillReceiveProps(nextProps) {
 		const { checked } = this.props;
 
@@ -29,10 +36,10 @@ class customToggleSwitch extends React.Component {
 					value: nextProps.checked
 				};
 			}
-			if (!checked && !nextProps.checked) {
+			if (!checked && !nextProps.checked && nextProps.labelText === 'AP Lite') {
 				return { value: false };
 			}
-			if (checked && nextProps.checked) {
+			if (checked && nextProps.checked && nextProps.labelText === 'AP Lite') {
 				return { value: true };
 			}
 		});
