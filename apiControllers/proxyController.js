@@ -18,30 +18,42 @@ router
 				res.status(httpStatus.NOT_FOUND).json({ error: 'Adpushup Code not found!', ap: false })
 			)
 	)
-	.get('/verifyAdsTxt', (req, res) =>
-		proxy
-			.fetchOurAdsTxt()
-			.then(ourAdsTxt => proxy.verifyAdsTxt(req.query.url, ourAdsTxt))
-			.then(response => res.status(httpStatus.OK).json({ success: 'Our Ads.txt entries found!' }))
+	.get('/verifyAdsTxt', (req, res) => {
+		const getAdsTxtData = [
+			proxy.fetchOurAdsTxt(),
+			proxy.getMandatoryAdsTxtEntryBySite(req.query.siteId)
+		];
+
+		Promise.all(getAdsTxtData)
+			.then(data => {
+				const [ourAdsTxt, mandatoryAdsTxtEntry] = data;
+				return proxy.verifyAdsTxt(req.query.url, ourAdsTxt, mandatoryAdsTxtEntry);
+			})
+			.then(() => res.status(httpStatus.OK).json({ success: 'Our Ads.txt entries found!' }))
 			.catch(err => {
 				if (err instanceof AdPushupError) {
 					return res
 						.status(err.message.httpCode)
-						.json({ error: err.message.error, ourAdsTxt: err.message.ourAdsTxt });
+						.json({ error: err.message.error, data: err.message.data });
 				}
 
 				return res
 					.status(httpStatus.INTERNAL_SERVER_ERROR)
 					.json({ error: 'Something went wrong!' });
-			})
-	)
+			});
+	})
 	.get('/getAdsTxt', (req, res) =>
 		proxy
 			.fetchOurAdsTxt()
 			.then(adsTxtSnippet => res.status(httpStatus.OK).json({ adsTxtSnippet }))
-			.catch(err =>
+			.catch(() =>
 				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Something went wrong!' })
 			)
+	)
+	.get('/getMandatoryAdsTxtEntry', (req, res) =>
+		proxy
+			.getMandatoryAdsTxtEntry(req.query)
+			.then(mandatoryAdsTxtEntry => res.status(httpStatus.OK).send({ mandatoryAdsTxtEntry }))
 	);
 
 module.exports = router;

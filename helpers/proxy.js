@@ -4,6 +4,8 @@ var request = require('request-promise'),
 	crypto = require('crypto'),
 	Promise = require('bluebird'),
 	soap = require('strong-soap').soap,
+	userModel = require('../models/userModel'),
+	siteModel = require('../models/siteModel'),
 	cheerio = require('cheerio'),
 	commonConst = require('../configs/commonConsts'),
 	config = require('../configs/config'),
@@ -35,6 +37,7 @@ var request = require('request-promise'),
 			timestamp
 		};
 	},
+	{ getMandatoryAdsTxtEntrySnippet } = require('../helpers/commonFunctions'),
 	API = {
 		load(url, userAgent, fullResponse) {
 			userAgent =
@@ -141,65 +144,153 @@ var request = require('request-promise'),
 			return parsedEntries;
 		},
 
+		getMandatoryAdsTxtEntry({ email, siteId }) {
+			if (email) {
+				return API.getMandatoryAdsTxtEntryByUserEmail(email);
+			}
+			return API.getMandatoryAdsTxtEntryBySite(siteId);
+		},
+
+		getMandatoryAdsTxtEntryBySite(siteId) {
+			return siteModel.getSiteById(siteId).then(function(site) {
+				if (site) {
+					let ownerEmail = site.get('ownerEmail');
+					return API.getMandatoryAdsTxtEntryByUserEmail(ownerEmail);
+				}
+				return null;
+			});
+		},
+
+		getMandatoryAdsTxtEntryByUserEmail(email) {
+			return userModel.getUserByEmail(email).then(function(user) {
+				const sellerId = user.get('sellerId');
+				if (sellerId) {
+					return getMandatoryAdsTxtEntrySnippet(sellerId);
+				}
+				return null;
+			});
+		},
+
+		verifyMandatoryAdsTxtEntry(mandatoryAdsTxtEntry, existingAdsTxtArr) {
+			let hasMandatoryAdsTxtEntry;
+
+			if (mandatoryAdsTxtEntry) {
+				hasMandatoryAdsTxtEntry = existingAdsTxtArr.some(
+					snippet => snippet === mandatoryAdsTxtEntry
+				);
+			}
+
+			if (!hasMandatoryAdsTxtEntry) {
+				throw new AdPushupError({
+					httpCode: 204,
+					error: 'Mandatory entry missing',
+					type: 'mandatoryAdsTxtEntry',
+					data: { mandatoryAdsTxtEntry }
+				});
+			}
+		},
+
 		commonVerifyAdsTxt(ourAdsTxt, existingAdsTxtArr) {
 			let entriesNotFound = [],
 				entriesFound = [];
 			const ourAdsTxtArr = API.parseAdsTxtEntries(ourAdsTxt);
 
-			ourAdsTxtArr.forEach(({ domain, pubId, relation }) =>
+			function getSnippet({ domain, pubId, relation, authorityId }) {
+				return `${domain}, ${pubId}, ${relation}${authorityId ? `, ${authorityId}` : ''}`;
+			}
+
+			ourAdsTxtArr.forEach(({ domain, pubId, relation, authorityId }) =>
 				existingAdsTxtArr.findIndex(
 					({ domain: domain1, pubId: pubId1, relation: relation1 }) =>
 						domain === domain1 && pubId === pubId1 && relation === relation1
 				) === -1
-					? entriesNotFound.push({ domain, pubId, relation })
-					: entriesFound.push({ domain, pubId, relation })
+					? entriesNotFound.push(getSnippet({ domain, pubId, relation, authorityId }))
+					: entriesFound.push(getSnippet({ domain, pubId, relation, authorityId }))
 			);
-			entriesFound = entriesFound.map(
-				({ domain, pubId, relation, authorityId }) =>
-					`${domain}, ${pubId}, ${relation}${authorityId ? `, ${authorityId}` : ''}`
-			);
+
 			if (entriesFound.length === ourAdsTxtArr.length) {
-				return Promise.resolve(entriesFound.join('\n'));
+				return Promise.resolve(entriesFound);
 			}
 
 			if (entriesNotFound.length) {
-				entriesNotFound = entriesNotFound.map(
-					({ domain, pubId, relation, authorityId }) =>
-						`${domain}, ${pubId}, ${relation}${authorityId ? `, ${authorityId}` : ''}`
-				);
-
-				if (entriesNotFound.length == ourAdsTxtArr.length) {
+				if (entriesNotFound.length === ourAdsTxtArr.length) {
 					throw new AdPushupError({
 						httpCode: 204,
-						error: 'Our Ads.txt entries not found.',
-						ourAdsTxt: entriesNotFound.join('\n')
+						error: 'Our Ads.txt entries not found',
+						type: 'ourAdsTxt',
+						data: {
+							ourAdsTxt: entriesNotFound
+						}
 					});
 				} else {
 					throw new AdPushupError({
 						httpCode: 206,
 						error: 'Few of our Ads.txt entries not found',
-						ourAdsTxt: entriesNotFound.join('\n'),
-						presentEntries: entriesFound.join('\n')
+						type: 'ourAdsTxt',
+						data: {
+							ourAdsTxt: entriesNotFound,
+							presentEntries: entriesFound
+						}
 					});
 				}
 			}
 		},
-		verifyAdsTxt(url, ourAdsTxt) {
+		verifyAdsTxt(url, ourAdsTxt, mandatoryAdsTxtEntry = null) {
 			let tempUrl = url;
 			if (tempUrl.indexOf('http://') == -1 && tempUrl.indexOf('https://') == -1) {
 				tempUrl = `http://${tempUrl}`;
 			}
+
 			return API.load(`${utils.rightTrim(tempUrl, '/')}/ads.txt`).then(existingAdsTxt => {
 				if (typeof existingAdsTxt === 'string') {
+					let errors = [];
+
 					const existingAdsTxtArr = API.parseAdsTxtEntries(existingAdsTxt);
 
-					return API.commonVerifyAdsTxt(ourAdsTxt, existingAdsTxtArr);
+					try {
+						API.verifyMandatoryAdsTxtEntry(mandatoryAdsTxtEntry, existingAdsTxtArr);
+					} catch (error) {
+						errors.push(error);
+					}
+
+					try {
+						API.commonVerifyAdsTxt(ourAdsTxt, existingAdsTxtArr);
+					} catch (error) {
+						errors.push(error);
+					}
+
+					if (errors.length) {
+						let data = {};
+						let errorResponse = [];
+
+						errors.forEach(({ message }) => {
+							if (message.data) {
+								data = {
+									...data,
+									...message.data
+								};
+							}
+							errorResponse.push({
+								code: message.httpCode,
+								type: message.type,
+								error: message.error
+							});
+						});
+
+						throw new AdPushupError({
+							httpCode: 400,
+							error: errorResponse,
+							data
+						});
+					}
 				} else {
 					throw new AdPushupError({
 						httpCode: 404,
-						error:
-							'ads.txt file not found on your site. Please upload our ads.txt file on your site.',
-						ourAdsTxt
+						error: {
+							ourAdsTxt: 'No Ads.txt Found',
+							mandatoryAdsTxtEntry: 'Mandatory Entry Missing'
+						},
+						data: { ourAdsTxt, mandatoryAdsTxtEntry }
 					});
 				}
 			});
@@ -216,7 +307,6 @@ var request = require('request-promise'),
 				});
 			}
 		},
-
 		checkIfBillingProfileComplete(email) {
 			const idap = getUserIDAP(email);
 			const { url, payerName, configKey, timestamp } = getTipaltiConfig(email);

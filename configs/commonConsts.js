@@ -559,5 +559,10 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 			sellers: []
 		}
 	},
-	USER_PAYABLE_VERIFICATION_AMOUNT: 5000
+	USER_PAYABLE_VERIFICATION_AMOUNT: 5000,
+	mandatoryAdsTxtSnippet: {
+		domain: 'adpushup.com',
+		relationship: 'DIRECT',
+		certificationAuthorityId: 'b0b8ff8485794fdd'
+	}
 };
