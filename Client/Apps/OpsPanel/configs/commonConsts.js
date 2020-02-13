@@ -1,4 +1,3 @@
-import React from 'react';
 // OP abbreviation stands for Ops Panel
 const OP_NAV_ITEMS_INDEXES = {
 	SETTINGS: 'settings',
@@ -392,6 +391,10 @@ const SITE_MAPPING_COLUMNS = [
 	{
 		Header: 'Owner Email',
 		accessor: 'accountEmail'
+	},
+	{
+		Header: 'Account ID',
+		accessor: 'sellerId'
 	},
 	{
 		Header: 'Onboarding Status',

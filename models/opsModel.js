@@ -166,9 +166,18 @@ const commonSiteFunctions = {
 				minWidth: 250
 			},
 			{
+				name: 'Account ID',
+				key: 'sellerId',
+				position: 4,
+				showCopyBtn: true,
+				width: 250,
+				maxWidth: 250,
+				minWidth: 250
+			},
+			{
 				name: 'Onboarding Status',
 				key: 'onboardingStatus',
-				position: 4,
+				position: 5,
 				width: 200,
 				maxWidth: 200,
 				minWidth: 200
@@ -176,15 +185,15 @@ const commonSiteFunctions = {
 			{
 				name: 'Active Status',
 				key: 'activeStatus',
-				position: 5,
+				position: 6,
 				filters: ['Active', 'Inactive', 'N/A'],
 				...DEFAULT_WIDTH
 			},
-			{ name: 'Date Created', key: 'dateCreated', position: 6, ...DEFAULT_WIDTH },
+			{ name: 'Date Created', key: 'dateCreated', position: 7, ...DEFAULT_WIDTH },
 			{
 				name: 'Active Products',
 				key: 'activeProducts',
-				position: 7,
+				position: 8,
 				filters: [...allProductNames, 'N/A'],
 				isMultiValue: true,
 				showCopyBtn: true,
@@ -195,7 +204,7 @@ const commonSiteFunctions = {
 			{
 				name: 'Active Bidders',
 				key: 'activeBidders',
-				position: 8,
+				position: 9,
 				filters: [...allBidderNames, 'N/A'],
 				isMultiValue: true,
 				showCopyBtn: true,
@@ -204,30 +213,36 @@ const commonSiteFunctions = {
 			{
 				name: 'Inactive Bidders',
 				key: 'inactiveBidders',
-				position: 9,
+				position: 10,
 				filters: [...allBidderNames, 'N/A'],
 				isMultiValue: true,
 				showCopyBtn: true,
 				...DEFAULT_WIDTH
 			},
-			{ name: 'Rev Share (%)', key: 'revenueShare', position: 10, ...DEFAULT_WIDTH },
+			{ name: 'Rev Share (%)', key: 'revenueShare', position: 11, ...DEFAULT_WIDTH },
 			{
 				name: 'Publisher Id',
 				key: 'publisherId',
-				position: 11,
+				position: 12,
 				showCopyBtn: true,
 				...DEFAULT_WIDTH
 			},
 			{
 				name: 'Auth Email',
 				key: 'authEmail',
-				position: 12,
+				position: 13,
 				showCopyBtn: true,
 				width: 200,
 				maxWidth: 200,
 				minWidth: 200
 			},
-			{ name: 'Ad Manager', key: 'adManager', position: 13, showCopyBtn: true, ...DEFAULT_WIDTH }
+			{
+				name: 'Ad Manager',
+				key: 'adManager',
+				position: 14,
+				showCopyBtn: true,
+				...DEFAULT_WIDTH
+			}
 		];
 	}
 };

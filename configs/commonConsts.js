@@ -43,6 +43,7 @@ module.exports = {
 									_site.dataFeedActive as activeStatus,
 									_user.adNetworkSettings,
 									_user.adServerSettings,
+									_user.sellerId,
 									_hbdc.hbcf as addedBidders
 								FROM AppBucket _site
 								LEFT JOIN AppBucket _user
