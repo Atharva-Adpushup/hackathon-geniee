@@ -55,13 +55,17 @@ class Database {
         });
     };
 
-    insertDoc(id, data) {
+    insertDoc(id, data, expirySecs = 0) {
         return new Promise(async (resolve, reject) => {
             try {
                 if(!this.bucket) {
                     await this.connect();
                 }
-                this.bucket.insert(id, data, (err) => {
+                const options = {};
+                if(expirySecs) {
+                    options.expiry = expirySecs;
+                }
+                this.bucket.insert(id, data, options, (err) => {
                     if(err) return reject(err);
                     return resolve(true);
                 });

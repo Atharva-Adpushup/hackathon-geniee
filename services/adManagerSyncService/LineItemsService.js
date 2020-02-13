@@ -1,12 +1,13 @@
 const Dfp = require('node-google-dfp');
 
 class LineItemService {
-    constructor(dfpConfig) {
+    constructor(dfpConfig, logger) {
         const { networkCode, appName, dfpApiVersion, ...authConfig } = dfpConfig;
         this.networkCode = networkCode;
         this.appName = appName;
         this.dfpApiVersion = dfpApiVersion;
         this.authConfig = authConfig;
+        this.logger = logger;
         this.dfpUser = null;
         this.service = null;
         this.operationsQueue = [];
@@ -16,7 +17,6 @@ class LineItemService {
     async processPendingOperations() {
         try {
             while(this.operationsQueue.length) {
-                // console.log('pending ops', this.operationsQueue.length);
                 await this.operationsQueue.shift()();
             }
             return true;
@@ -36,7 +36,7 @@ class LineItemService {
             this.dfpUser
             .getService('LineItemService', async (err, lineItemService) => {
                 if(err) {
-                    console.error('Failed to get LineItemService', err);
+                    this.logger.error({message: 'LineItemsService::initService::ERROR', debugData: {ex:err}});
                     this.service = err;
                 } else {
                     this.service = lineItemService;
@@ -44,7 +44,7 @@ class LineItemService {
                 }
             });
         } catch(ex) {
-            console.error('Exception::init', ex);
+            this.logger.error({message: 'LineItemsService::initService::ERROR', debugData: {ex}});
             this.service = ex;
         }
     }
@@ -67,16 +67,16 @@ class LineItemService {
                     return reject(this.service);
                 } else {
                     // service initialized
-                    console.log("\n\n", `network::${this.networkCode}::getLineItems::`, {offset, count});
+                    this.logger.info({message: `network::${this.networkCode}::getLineItems:: offset=${offset}, count=${count}`});
                     const statement = new Dfp.Statement(`WHERE LineItemType IN ('PRICE_PRIORITY', 'AD_EXCHANGE') LIMIT ${offset}, ${count}`);
                     this.service
                     .getLineItemsByStatement(statement, (err, results) => {
                         if(err) {
-                            console.error('lineitems service error', err);
+                            this.logger.error({message: 'Error fetching lineItems', debugData: {ex: err}});
                             return reject(err);
                         }
                         const totalResults = results.rval.totalResultSetSize || 0;
-                        console.log('totalResults=', totalResults);
+                        this.logger.info({message: `totalResults=${totalResults}`});
                         const _results = totalResults === 0 || !results.rval.results || !results.rval.results.length ? [] : results.rval.results.map(({id}) => id);
                         return resolve({
                             results: _results,
@@ -85,7 +85,7 @@ class LineItemService {
                     });
                 }
             } catch(ex) {
-                console.error("\n\n",'getLineItems::Error', `network::${this.networkCode}`, "\n\n");
+                this.logger.error({message: `getPricePriorityLineItems::ERROR::network::${this.networkCode}`, debugData: {ex}});
                 return reject(new Error(`network::${this.networkCode}::exception - ${ex.message}`));
             }
         });

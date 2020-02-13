@@ -80,7 +80,7 @@ class Logger {
                 type: this.getLogLevelNumber(logLevel) || 3,
                 details: logData.details || 'N/A',
                 debugData: logData.debugData ? JSON.stringify(logData.debugData) : 'N/A'
-            }, 'slog', this.logExpirySecs );
+            }, this.logExpirySecs);
             return true;
         } catch(ex) {
             console.error('Logger::send::Error', ex);

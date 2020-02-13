@@ -4,6 +4,7 @@ const ServiceStatus = require('./serviceStatus');
 
 const {
     serviceStatusPingDelayMs,
+    serviceStatusDocExpiryDays,
     serviceStatusDb: serviceStatusDbConfig, 
     appName,
     dfpApiVersion,
@@ -46,7 +47,7 @@ const updateLineItemsForNetwork = async (dfpConfig) => {
         let offset = 0;
         let updatedCount = 0;
         let hasMore = true;
-        const lineItemsService = new LineItemsService(dfpConfig);
+        const lineItemsService = new LineItemsService(dfpConfig, logger);
         // make paginated requests and collect all data
         while(hasMore) {
             // @TODO: retry on failure
@@ -83,16 +84,17 @@ const updateLineItemsForThirdPartyDfps = async () => {
             WHERE meta().id LIKE 'user::%' 
             AND adServerSettings.dfp.activeDFPNetwork != $adPushupNetworkId`;
         const {results, status, resultCount} = await db.query(queryString, {adPushupNetworkId: ADPUSHUP_DFP_NETWORK_CODE});
-        console.log('3rd party dfps results=', results, "\n\ntotal=", resultCount, "\n\nstatus=", status);
+        logger.info({message: `Found ${resultCount} 3rd Party dfps`});
         // run for each network
         let totalLineItemsUpdated = 0;
         let errors = {};
         for(const {networkId, dfpNetworkSettings} of results) {
             try {
-                console.info(`Processing network id ${networkId}`, "\n");
+                logger.info({message: `Processing network id ${networkId}`});
                 const refreshToken = dfpNetworkSettings && dfpNetworkSettings.length && dfpNetworkSettings[0].refreshToken;
                 if(!refreshToken) {
-                    errors[networkId] = new Error(`missing Refresh Token`);
+                    // skip the network if refresh token is missing
+                    // errors[networkId] = new Error(`missing Refresh Token`);
                     continue;
                 }
                 dfpConfig.refresh_token = refreshToken;
@@ -111,7 +113,7 @@ const updateLineItemsForThirdPartyDfps = async () => {
         }
         return totalLineItemsUpdated;
     } catch(ex) {
-        logger.error({message: 'updateLineItemsForThirdPartyDfps::Error', debugData: {ex}});
+        logger.error({message: 'updateLineItemsForThirdPartyDfps::ERROR', debugData: {ex}});
         return ex;
     }
 };
@@ -125,17 +127,18 @@ const updateLineItemsForAdPushupDfp = async () => {
         };
         return await updateLineItemsForNetwork(dfpConfig);
     } catch(ex) {
-        logger.error({message: 'updateLineItemsForAdPushupDfp::Error', debugData: {ex}});
+        logger.error({message: 'updateLineItemsForAdPushupDfp::ERROR', debugData: {ex}});
         return ex;
     }
 };
 
 async function runService() {
-    const serviceStatus = new ServiceStatus(serviceStatusDbConfig, serviceStatusPingDelayMs, logger);
+    logger.info(`Sync service invoked at ${+new Date()}`);
+    const serviceStatus = new ServiceStatus(serviceStatusDbConfig, serviceStatusPingDelayMs, serviceStatusDocExpiryDays, logger);
     try {
         // check if any service instance is already running
         if(await serviceStatus.isSyncRunning()) {
-            console.error("\n\n------------------------another sync process is running------------------------------\n\n");
+            logger.error('Another sync process is running, exiting');
             return new Error('Another Sync process is running');
         }
         await serviceStatus.startServiceStatusPing();

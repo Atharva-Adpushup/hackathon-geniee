@@ -2,9 +2,10 @@ const Database = require('./db');
 const uuid = require('uuid');
 
 class ServiceStatus {
-    constructor(dbConfig, serviceStatusPingDelayMs, logger) {
+    constructor(dbConfig, serviceStatusPingDelayMs, serviceStatusDocExpiryDays, logger) {
         this.dbConfig = dbConfig;
         this.serviceStatusPingDelayMs = serviceStatusPingDelayMs;
+        this.docExpirySecs = serviceStatusDocExpiryDays * 24 * 3600;
         this.logger = logger;
         this.statusDocId = null;
         this.pingTimer = null;
@@ -24,7 +25,6 @@ class ServiceStatus {
             const {results, resultCount = 0} = await this.db.query(qs, {toleranceMs});
             return !!resultCount;
         } catch(ex) {
-            console.error('isSyncRunning::ERROR', ex);
             throw ex;
         }
     }
@@ -38,7 +38,7 @@ class ServiceStatus {
                 status: 'RUNNING', 
                 startedOn: +new Date(), 
                 lastUpdated: +new Date()
-            });
+            }, this.docExpirySecs);
             return docId;
         } catch(ex) {
             this.logger.error({message: 'startServiceStatusPing', debugData: {ex}});
