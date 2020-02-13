@@ -106,19 +106,22 @@ class ManageApps extends React.Component {
 							headerChildren={
 								<div className="aligner aligner--row">
 									<div className="aligner-item card-header-title" style={{ position: 'relative' }}>
-										<OverlayTooltip
-											id={`tooltip-app-info-${name}-${key}`}
-											placement="top"
-											tooltip={description}
-										>
-											<span>
-												{name}{' '}
-												<FontAwesomeIcon
-													icon="info-circle"
-													className="aligner aligner-item aligner--hCenter card-header-icon custom-tooltip"
-												/>
-											</span>
-										</OverlayTooltip>
+										{key !== 2 && (
+											<OverlayTooltip
+												id={`tooltip-app-info-${name}-${key}`}
+												placement="top"
+												tooltip={description}
+											>
+												<span>
+													{name}{' '}
+													<FontAwesomeIcon
+														icon="info-circle"
+														className="aligner aligner-item aligner--hCenter card-header-icon custom-tooltip"
+													/>
+												</span>
+											</OverlayTooltip>
+										)}
+										{key === 2 && <span>{name}</span>}
 									</div>
 									<OverlayTooltip
 										id={`tooltip-app-status-info-${name}-${key}`}

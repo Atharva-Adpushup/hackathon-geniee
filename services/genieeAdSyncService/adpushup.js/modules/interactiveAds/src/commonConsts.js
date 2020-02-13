@@ -135,7 +135,7 @@ const commonConsts = {
 			}
 		},
 		IN_VIEW: {
-			NAME: 'inview',
+			NAME: 'inView',
 			WAIT_TIMEOUT: 3000,
 			BASE_STYLES: {
 				position: 'relative',

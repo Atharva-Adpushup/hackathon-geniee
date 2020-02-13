@@ -62,7 +62,7 @@ const APPS = [
 		link: 1,
 		image: '/assets/images/manageSites/innovative-ads.png',
 		description:
-			'In addition to standard IAB units, we offer sticky ads, docked ads, in-image ads, and native ads. We fill these ads with premium demand via our partner ad networks and exchanges to maximise publisher revenue.',
+			'In addition to standard IAB units, we offer sticky ads, docked ads, and native ads. We fill these ads with premium demand via our partner ad networks and exchanges to maximise publisher revenue.',
 		left: {
 			type: TYPE.TEXT,
 			text: 'Status: __STATUS__'
@@ -80,8 +80,7 @@ const APPS = [
 		key: 2,
 		link: 1,
 		image: '/assets/images/manageSites/ap-tag.png',
-		description:
-			'In addition to standard IAB units, we offer sticky ads, docked ads, in-image ads, and native ads. We fill these ads with premium demand via our partner ad networks and exchanges to maximise publisher revenue.',
+		description: '',
 		left: {
 			type: TYPE.TEXT,
 			text: 'Status: __STATUS__'

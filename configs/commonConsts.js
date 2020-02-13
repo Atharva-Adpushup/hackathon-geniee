@@ -1,7 +1,7 @@
 const config = require('./config');
 
 const prodEnv = config.environment.HOST_ENV === 'production';
-const reportingBaseURL = 'https://staging.adpushup.com/CentralReportingWebService';
+const reportingBaseURL = 'https://api.adpushup.com/CentralReportingWebService';
 const computedProductionURL = prodEnv
 	? 'https://console.adpushup.com'
 	: `http://localhost:${config.environment.HOST_PORT}`;
@@ -10,7 +10,7 @@ module.exports = {
 	SALT: '_ADP_RANDOMIZER_',
 	BASE_URL: computedProductionURL,
 	INTEGRATION_BASE_URL: computedProductionURL,
-	DFP_WEB_SERVICE_ENDPOINT: 'http://staging.adpushup.com/DfpWebService/info',
+	DFP_WEB_SERVICE_ENDPOINT: 'https://api.adpushup.com/DfpWebService/info',
 	TRANSACTION_LOG_ENDPOINT: 'https://api.adpushup.com/SetupLogWebService/log',
 	REPORT_STATUS: 'https://api.adpushup.com/OpsWebService/ops?report=getNetworkImportServiceStatus',
 	IE_TESTING_ENDPOINT: 'http://apdc1n-central5.eastus2.cloudapp.azure.com:8081/api/health-report',
@@ -23,7 +23,7 @@ module.exports = {
 	ANALYTICS_API_ROOT: reportingBaseURL,
 	ANALYTICS_METAINFO_URL: '/common/metaInfo',
 	REPORT_PATH: '/site/report?report_name=get_stats_by_custom',
-	DFP_LINE_ITEM_AUTOMATION_API: 'https://staging.adpushup.com/DfpInventoryWebService/job',
+	DFP_LINE_ITEM_AUTOMATION_API: 'https://api.adpushup.com/DfpInventoryWebService/job',
 	PAGEGROUP_LIST_API: `${reportingBaseURL}/site/list`,
 	DEMO_ACCOUNT_EMAIL: 'demo@adpushup.com',
 	AMP_SETTINGS_ACCESS_EMAILS: ['genieeamp@adpushup.com'],
