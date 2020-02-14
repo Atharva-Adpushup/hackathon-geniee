@@ -104,33 +104,54 @@ class ApLite extends Component {
 		}
 
 		this.setState({ fileName: e.target.value, file: e.target.files[0] }, () => {
+			let adUnitMap = {};
+			let parentAdUnitError = false;
+
 			Papa.parse(this.state.file, {
 				delimiter: '',
 				chunkSize: 3,
 				header: false,
-				complete: function(responses) {
-					let adUnitMap = {};
+				complete: responses => {
 					responses.data.forEach(unit => {
-						adUnitMap[unit[0]] = unit[1];
+						if (
+							!dfpAdsUnitNamesToFilter.includes(unit[0].toUpperCase().trim()) &&
+							unit[0] !== undefined
+						)
+							adUnitMap[unit[0]] = unit[1];
 					});
 
 					for (let key in adUnitMap) {
-						delete adUnitMap.Default;
+						let parentAdUnit;
+						let adUnit;
+						if (!key.includes('»')) {
+							adUnit = key;
+						}
+						parentAdUnit = key.split('»')[0].trim();
 
-						let parentAdUnit = key.includes('»') ? key.split('»')[0].trim() : key;
-						let childAdUnit = key.includes('»') ? key.split('»')[1].trim() : key;
+						if (parentAdUnit && !adUnitMap[parentAdUnit]) {
+							this.handleReset();
+							parentAdUnitError = true;
 
-						let dfpAdUnit =
-							parentAdUnit !== childAdUnit && adUnitMap[parentAdUnit]
-								? `${adUnitMap[parentAdUnit]}/${adUnitMap[key]}`
-								: adUnitMap[key];
+							showNotification({
+								mode: 'error',
+								title: 'Operation Failed',
+								message:
+									'Parent Ad unit name not found , Kindly add the Parent Ad Unit Name first in the list and try to upload again',
+								autoDismiss: 5
+							});
+
+							break;
+						}
+
+						let dfpAdUnit = !adUnit
+							? `${adUnitMap[parentAdUnit]}/${adUnitMap[key]}`
+							: adUnitMap[key];
 						let dfpAdunitCode = adUnitMap[key];
-						adUnitsArr.push({ dfpAdUnit: dfpAdUnit === undefined ? '' : dfpAdUnit, dfpAdunitCode });
+						adUnitsArr.push({ dfpAdUnit, dfpAdunitCode });
 					}
+					if (!parentAdUnitError) this.setState({ structuredAdUnits: adUnitsArr });
 				}
 			});
-
-			this.setState({ structuredAdUnits: adUnitsArr });
 		});
 	};
 
@@ -139,90 +160,99 @@ class ApLite extends Component {
 	};
 
 	handleSave = () => {
-		const { structuredAdUnits, oldAdUnits, uploadedAdUnits } = this.state;
-
-		let currentAdUnitsWithDfpNameAndCode = structuredAdUnits.filter(
-			data => !dfpAdsUnitNamesToFilter.includes(data.dfpAdUnit.toUpperCase().trim())
-		);
-
-		const oldAdUnitList = uploadedAdUnits.length ? uploadedAdUnits : oldAdUnits;
-		const oldAdUnitsWithDfpNameAndCode = oldAdUnitList.map(
-			({ refreshSlot, refreshInterval, headerBidding, sectionId, isActive, ...rest }) => rest
-		);
-
-		const unCommonAdUnits = differenceWith(
-			oldAdUnitsWithDfpNameAndCode,
-			currentAdUnitsWithDfpNameAndCode,
-			isEqual
-		);
-
-		if (!unCommonAdUnits.length) {
-			currentAdUnitsWithDfpNameAndCode = [
-				...currentAdUnitsWithDfpNameAndCode.map(v => ({ ...v, isActive: true }))
-			];
-		}
-		currentAdUnitsWithDfpNameAndCode = [
-			...currentAdUnitsWithDfpNameAndCode.map(v => ({ ...v, isActive: true })),
-			...unCommonAdUnits.map(v => ({ ...v, isActive: false }))
-		];
-
+		const { structuredAdUnits, oldAdUnits, uploadedAdUnits, fileName } = this.state;
 		const {
 			site: { siteId },
 			showNotification
 		} = this.props;
-		const { adRefresh, selectedRefreshRate } = this.state;
 
-		const adUnits = currentAdUnitsWithDfpNameAndCode.map(v =>
-			Object.assign(
-				{},
-				{
-					...v,
-					sectionId: uuid.v4(),
-					refreshSlot: adRefresh,
-					refreshInterval: selectedRefreshRate,
-					headerBidding: true
-				}
-			)
-		);
-
-		this.setState({ isLoading: true });
-
-		return axiosInstance
-			.put(`/ops/ap-lite/${siteId}`, {
-				adUnits
-			})
-			.then(res => {
-				const {
-					data: { adUnits }
-				} = res.data;
-
-				showNotification({
-					mode: 'success',
-					title: 'Success',
-					message: 'Settings saved successsfully',
-					autoDismiss: 5
-				});
-
-				this.setState(
-					{
-						isLoading: false,
-						uploadedAdUnits: adUnits.map(
-							({ refreshSlot, refreshInterval, headerBidding, sectionId, isActive, ...rest }) =>
-								rest
-						)
-					},
-					this.handleReset
-				);
-			})
-			.catch(err => {
-				showNotification({
-					mode: 'error',
-					title: 'Operation Failed',
-					message: 'Something went wrong',
-					autoDismiss: 5
-				});
-				console.log(err);
+		if (!fileName) {
+			showNotification({
+				mode: 'error',
+				title: 'Operation Failed',
+				message: 'Please select a valid Ad Unit csv file first',
+				autoDismiss: 5
 			});
+		} else {
+			let currentAdUnitsWithDfpNameAndCode = structuredAdUnits.length
+				? structuredAdUnits
+				: uploadedAdUnits;
+
+			const oldAdUnitList = uploadedAdUnits.length ? uploadedAdUnits : oldAdUnits;
+			const oldAdUnitsWithDfpNameAndCode = oldAdUnitList.map(
+				({ refreshSlot, refreshInterval, headerBidding, sectionId, isActive, ...rest }) => rest
+			);
+
+			const unCommonAdUnits = differenceWith(
+				oldAdUnitsWithDfpNameAndCode,
+				currentAdUnitsWithDfpNameAndCode,
+				isEqual
+			);
+
+			if (!unCommonAdUnits.length) {
+				currentAdUnitsWithDfpNameAndCode = [
+					...currentAdUnitsWithDfpNameAndCode.map(v => ({ ...v, isActive: true }))
+				];
+			}
+			currentAdUnitsWithDfpNameAndCode = [
+				...currentAdUnitsWithDfpNameAndCode.map(v => ({ ...v, isActive: true })),
+				...unCommonAdUnits.map(v => ({ ...v, isActive: false }))
+			];
+
+			const { adRefresh, selectedRefreshRate } = this.state;
+
+			const adUnits = currentAdUnitsWithDfpNameAndCode.map(v =>
+				Object.assign(
+					{},
+					{
+						...v,
+						sectionId: uuid.v4(),
+						refreshSlot: adRefresh,
+						refreshInterval: selectedRefreshRate,
+						headerBidding: true
+					}
+				)
+			);
+
+			this.setState({ isLoading: true });
+
+			return axiosInstance
+				.put(`/ops/ap-lite/${siteId}`, {
+					adUnits
+				})
+				.then(res => {
+					const {
+						data: { adUnits }
+					} = res.data;
+
+					showNotification({
+						mode: 'success',
+						title: 'Success',
+						message: 'Settings saved successsfully',
+						autoDismiss: 5
+					});
+
+					this.setState(
+						{
+							isLoading: false,
+							uploadedAdUnits: adUnits.map(
+								({ refreshSlot, refreshInterval, headerBidding, sectionId, isActive, ...rest }) =>
+									rest
+							)
+						},
+						this.handleReset
+					);
+				})
+				.catch(err => {
+					showNotification({
+						mode: 'error',
+						title: 'Operation Failed',
+						message: 'Something went wrong',
+						autoDismiss: 5
+					});
+					console.log(err);
+				});
+		}
 	};
 
 	getHbStatus(setupStatus) {
@@ -264,6 +294,47 @@ class ApLite extends Component {
 		);
 	};
 
+	renderModal = () => {
+		let showAdUnits;
+		const { structuredAdUnits, show, oldAdUnits, uploadedAdUnits } = this.state;
+
+		if (structuredAdUnits.length) {
+			showAdUnits = structuredAdUnits;
+		} else if (!structuredAdUnits.length && !oldAdUnits.length) {
+			showAdUnits = uploadedAdUnits;
+		} else {
+			showAdUnits = oldAdUnits.filter(({ isActive }) => isActive !== false);
+		}
+
+		return (
+			<Modal
+				show={show}
+				onHide={this.handleHide}
+				container={this}
+				aria-labelledby="contained-modal-title"
+				className="adUnit-modal"
+			>
+				<Modal.Header closeButton>
+					<Modal.Title id="contained-modal-title">List of Ad Units</Modal.Title>
+				</Modal.Header>
+				<Modal.Body className="aplite-modal">
+					<CustomReactTable
+						columns={[
+							{ Header: 'Ad Unit', accessor: 'dfpAdUnit' },
+							{ Header: 'Ad Unit Code', accessor: 'dfpAdunitCode' }
+						]}
+						data={showAdUnits}
+						defaultPageSize={20}
+						minRows={0}
+					/>
+				</Modal.Body>
+				<Modal.Footer>
+					<CustomButton onClick={this.handleHide}>Close</CustomButton>
+				</Modal.Footer>
+			</Modal>
+		);
+	};
+
 	renderView = () => {
 		const styles = {
 			display: 'inline-block',
@@ -280,15 +351,7 @@ class ApLite extends Component {
 		const { activeDFPNetwork } = dfp;
 
 		const { siteId, siteDomain } = site;
-		const {
-			selectedRefreshRate,
-			adRefresh,
-			fileName,
-			oldAdUnits,
-			uploadedAdUnits,
-			structuredAdUnits,
-			show
-		} = this.state;
+		const { selectedRefreshRate, adRefresh, fileName, oldAdUnits, uploadedAdUnits } = this.state;
 
 		const { setupStatus } = headerBiddingData[siteId];
 		const hbStatus = this.getHbStatus(setupStatus);
@@ -337,6 +400,9 @@ class ApLite extends Component {
 					name="GAM Ad Units"
 					value={fileName}
 					onChange={this.handleGAM}
+					onClick={event => {
+						event.target.value = null;
+					}}
 					type="file"
 					label={this.gamAdUnitsLabel()}
 					size={6}
@@ -385,39 +451,7 @@ class ApLite extends Component {
 						<CustomButton variant="primary" bsSize="large" onClick={this.showUploadedAdUnits}>
 							Show Uploaded Ad Units
 						</CustomButton>
-
-						<Modal
-							show={show}
-							onHide={this.handleHide}
-							container={this}
-							aria-labelledby="contained-modal-title"
-							className="adUnit-modal"
-						>
-							<Modal.Header closeButton>
-								<Modal.Title id="contained-modal-title">List of Ad Units</Modal.Title>
-							</Modal.Header>
-							<Modal.Body className="aplite-modal">
-								<CustomReactTable
-									columns={[
-										{ Header: 'Ad Unit', accessor: 'dfpAdUnit' },
-										{ Header: 'Ad Unit Code', accessor: 'dfpAdunitCode' }
-									]}
-									data={
-										structuredAdUnits.length
-											? structuredAdUnits.filter(
-													data =>
-														!dfpAdsUnitNamesToFilter.includes(data.dfpAdUnit.toUpperCase().trim())
-											  )
-											: oldAdUnits.filter(({ isActive }) => isActive !== false)
-									}
-									defaultPageSize={20}
-									minRows={0}
-								/>
-							</Modal.Body>
-							<Modal.Footer>
-								<CustomButton onClick={this.handleHide}>Close</CustomButton>
-							</Modal.Footer>
-						</Modal>
+						{this.renderModal()}
 					</React.Fragment>
 				) : null}
 
