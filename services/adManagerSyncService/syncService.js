@@ -133,12 +133,13 @@ const updateLineItemsForAdPushupDfp = async () => {
 };
 
 async function runService() {
-    logger.info(`Sync service invoked at ${+new Date()}`);
+    logger.info({message: `Sync service invoked at ${+new Date()}`});
     const serviceStatus = new ServiceStatus(serviceStatusDbConfig, serviceStatusPingDelayMs, serviceStatusDocExpiryDays, logger);
     try {
         // check if any service instance is already running
-        if(await serviceStatus.isSyncRunning()) {
-            logger.error('Another sync process is running, exiting');
+        const isSyncAlreadyRunning = await serviceStatus.isSyncRunning();
+        if(isSyncAlreadyRunning) {
+            logger.error({message: 'Another sync process is running, exiting'});
             return new Error('Another Sync process is running');
         }
         await serviceStatus.startServiceStatusPing();
