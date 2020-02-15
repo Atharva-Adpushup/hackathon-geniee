@@ -117,36 +117,35 @@ class ApLite extends Component {
 							!dfpAdsUnitNamesToFilter.includes(unit[0].toUpperCase().trim()) &&
 							unit[0] !== undefined
 						)
-							adUnitMap[unit[0]] = unit[1];
+							adUnitMap[unit[0].trim()] = unit[1].trim();
 					});
 
 					for (let key in adUnitMap) {
 						let parentAdUnit;
-						let adUnit;
-						if (!key.includes('»')) {
-							adUnit = key;
-						}
-						parentAdUnit = key.split('»')[0].trim();
-
-						if (parentAdUnit && !adUnitMap[parentAdUnit]) {
-							this.handleReset();
-							parentAdUnitError = true;
-
-							showNotification({
-								mode: 'error',
-								title: 'Operation Failed',
-								message:
-									'Parent Ad unit name not found , Kindly add the Parent Ad Unit Name first in the list and try to upload again',
-								autoDismiss: 5
-							});
-
-							break;
-						}
-
-						let dfpAdUnit = !adUnit
-							? `${adUnitMap[parentAdUnit]}/${adUnitMap[key]}`
-							: adUnitMap[key];
+						let dfpAdUnit = adUnitMap[key];
 						let dfpAdunitCode = adUnitMap[key];
+
+						if (key.includes('»')) {
+							parentAdUnit = key.split('»')[0].trim();
+
+							if (parentAdUnit && !adUnitMap[parentAdUnit]) {
+								this.handleReset();
+								parentAdUnitError = true;
+
+								showNotification({
+									mode: 'error',
+									title: 'Operation Failed',
+									message:
+										`Parent Ad Unit "${parentAdUnit}" not found in adUnits column, Kindly add the Parent Ad Unit Name first in the list and try to upload again`,
+									autoDismiss: 5
+								});
+
+								break;
+							}esle{
+								let dfpAdUnit = `${adUnitMap[parentAdUnit]}/${dfpAdUnit}`;
+							}
+						}
+
 						adUnitsArr.push({ dfpAdUnit, dfpAdunitCode });
 					}
 					if (!parentAdUnitError) this.setState({ structuredAdUnits: adUnitsArr });
