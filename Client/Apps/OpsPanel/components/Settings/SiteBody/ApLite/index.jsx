@@ -135,13 +135,12 @@ class ApLite extends Component {
 								showNotification({
 									mode: 'error',
 									title: 'Operation Failed',
-									message:
-										`Parent Ad Unit "${parentAdUnit}" not found in adUnits column, Kindly add the Parent Ad Unit Name first in the list and try to upload again`,
+									message: `Parent Ad Unit "${parentAdUnit}" not found in adUnits column, Kindly add the Parent Ad Unit Name first in the list and try to upload again`,
 									autoDismiss: 5
 								});
 
 								break;
-							}esle{
+							} else {
 								let dfpAdUnit = `${adUnitMap[parentAdUnit]}/${dfpAdUnit}`;
 							}
 						}
