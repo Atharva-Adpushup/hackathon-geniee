@@ -141,7 +141,7 @@ class ApLite extends Component {
 
 								break;
 							} else {
-								let dfpAdUnit = `${adUnitMap[parentAdUnit]}/${dfpAdUnit}`;
+								dfpAdUnit = `${adUnitMap[parentAdUnit]}/${dfpAdUnit}`;
 							}
 						}
 
