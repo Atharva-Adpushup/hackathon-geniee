@@ -3,11 +3,11 @@ const uuid = require('uuid');
 
 class ServiceStatus {
     constructor(dbConfig, serviceStatusPingDelayMs, serviceStatusDocExpiryDays, logger) {
+        this.statusDocId = 'adms::status';
         this.dbConfig = dbConfig;
         this.serviceStatusPingDelayMs = serviceStatusPingDelayMs;
         this.docExpirySecs = serviceStatusDocExpiryDays * 24 * 3600;
         this.logger = logger;
-        this.statusDocId = null;
         this.pingTimer = null;
         this.db = new Database(this.dbConfig);
     }
@@ -15,14 +15,14 @@ class ServiceStatus {
     async isSyncRunning() {
         try {
             const { bucketName } = this.dbConfig;
-            const toleranceMs = 5000;
-            const qs = `SELECT meta().id, lastUpdated 
+            const toleranceMs = 10000;
+            const qs = `SELECT lastUpdated 
                 FROM ${bucketName} 
-                WHERE meta().id LIKE 'adms::%' 
+                WHERE meta().id = '${this.statusDocId}' 
                 AND status = 'RUNNING'
-                AND lastUpdated >= CLOCK_MILLIS() - $toleranceMs
+                AND lastUpdated >= CLOCK_MILLIS() - ${toleranceMs}
             `;
-            const {results, resultCount = 0} = await this.db.query(qs, {toleranceMs});
+            const {results, resultCount = 0} = await this.db.query(qs);
             return !!resultCount;
         } catch(ex) {
             throw ex;
@@ -31,15 +31,25 @@ class ServiceStatus {
     
     async setServiceStatusStarted() {
         try {
-            const docId = `adms::${uuid.v4()}`;
-            await this.db
-            .insertDoc(docId, {
-                docType: 'AdManagerSyncServiceStatus', 
-                status: 'RUNNING', 
-                startedOn: +new Date(), 
-                lastUpdated: +new Date()
-            }, this.docExpirySecs);
-            return docId;
+            const existingDoc = await this.db.getDoc(this.statusDocId);
+            if(existingDoc) {
+                await this.db
+                .updatePartial(this.statusDocId, {
+                    status: 'RUNNING', 
+                    startedOn: +new Date(), 
+                    lastUpdated: +new Date(),
+                    completedOn: null
+                });
+            } else {
+                await this.db
+                .insertDoc(this.statusDocId, {
+                    docType: 'AdManagerSyncServiceStatus', 
+                    status: 'RUNNING', 
+                    startedOn: +new Date(), 
+                    lastUpdated: +new Date()
+                });
+            }
+            return true;
         } catch(ex) {
             this.logger.error({message: 'startServiceStatusPing', debugData: {ex}});
             throw ex;
@@ -75,16 +85,14 @@ class ServiceStatus {
         if(this.pingTimer) {
             clearInterval(this.pingTimer);
         }
-        this.statusDocId = await this.setServiceStatusStarted();
+        await this.setServiceStatusStarted();
         this.pingTimer = setInterval(this.updateServiceStatusRunning.bind(this), this.serviceStatusPingDelayMs);
     };
     
     async stopServiceStatusPing() {
         if(this.pingTimer) {
             clearInterval(this.pingTimer);
-        }
-        if(this.statusDocId) {
-            return await this.updateServiceStatusStopped();
+            await this.updateServiceStatusStopped();
         }
         return true;
     };

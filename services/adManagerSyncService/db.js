@@ -55,6 +55,22 @@ class Database {
         });
     };
 
+    getDoc(id) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                if(!this.bucket) {
+                    await this.connect();
+                }
+                this.bucket.get(id, (err, res) => {
+                    if(err) return resolve(false);
+                    return resolve(res.value);
+                });
+            } catch(ex) {
+                return reject(ex);
+            }
+        });
+    }
+
     insertDoc(id, data, expirySecs = 0) {
         return new Promise(async (resolve, reject) => {
             try {
@@ -97,7 +113,6 @@ class Database {
                 if(!this.bucket) {
                     await this.connect();
                 }
-
                 let mutateDoc = this.bucket.mutateIn(id);
                 Object.keys(data).forEach(docKey => {
                     mutateDoc = mutateDoc.upsert(docKey, data[docKey]);
