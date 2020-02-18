@@ -546,3 +546,11 @@ body {
 .PresetDateRangePicker_button {
 	margin: 5px;
 }
+
+.reporting-filterBox {
+	.dropdown {
+		.dropdown-toggle {
+			z-index: 0;
+		}
+	}
+}

@@ -290,7 +290,7 @@ class Control extends Component {
 					</div>
 				</div>
 				<div className="aligner aligner--wrap aligner--hSpaceBetween u-margin-t4">
-					<div className="aligner-item aligner-item--grow5 u-margin-r4">
+					<div className="reporting-filterBox aligner-item aligner-item--grow5 u-margin-r4">
 						{/* eslint-disable */}
 						<AsyncGroupSelect
 							key="filter list"
