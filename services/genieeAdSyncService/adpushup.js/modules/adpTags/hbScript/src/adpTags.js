@@ -75,11 +75,10 @@ var adpTags = {
 				optionalParam.multipleAdSizes;
 			var services = optionalParam.services;
 			var formats =
-				config.PREBID_CONFIG &&
-				config.PREBID_CONFIG.prebidConfig &&
-				config.PREBID_CONFIG.prebidConfig.formats
-					? config.PREBID_CONFIG.prebidConfig.formats
-					: constants.PREBID.DEFAULT_FORMATS;
+				(Array.isArray(optionalParam.formats) &&
+					optionalParam.formats.length &&
+					optionalParam.formats) ||
+				constants.PREBID.DEFAULT_FORMATS;
 			var timeout =
 				config.PREBID_CONFIG &&
 				config.PREBID_CONFIG.prebidConfig &&

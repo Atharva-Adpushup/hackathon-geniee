@@ -56,7 +56,8 @@ var constants = {
 		BIDDER_SEQUENCE: 'random',
 		PRICE_GRANULARITY: 'dense',
 		VIDEO_FORMAT_TYPE: 'outstream',
-		DEFAULT_FORMATS: ['display']
+		DEFAULT_FORMATS: ['display'],
+		ALL_SUPPORTED_FORMATS: ['display', 'video', 'native']
 	},
 	ADSERVER_TARGETING_KEYS: {
 		BIDDER: 'hb_ap_bidder',

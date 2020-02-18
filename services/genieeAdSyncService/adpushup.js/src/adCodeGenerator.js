@@ -75,7 +75,8 @@ var utils = require('../libs/utils'),
 						isZoneContainerId = !!networkData.zoneContainerId,
 						computedDFPAdUnitId = isZoneContainerId
 							? networkData.zoneContainerId
-							: networkData.dfpAdunit;
+							: networkData.dfpAdunit,
+						formats = networkData && networkData.formats;
 
 					window.adpushup.adpTags.defineSlot(
 						computedDFPAdUnitId,
@@ -88,6 +89,7 @@ var utils = require('../libs/utils'),
 							headerBidding: window.adpushup.services.HB_ACTIVE && networkData.headerBidding,
 							keyValues: networkData.keyValues,
 							network: ad.network,
+							formats: formats,
 							enableLazyLoading: networkData.enableLazyLoading,
 							overrideActive: networkData.overrideActive,
 							overrideSizeTo: networkData.overrideSizeTo,

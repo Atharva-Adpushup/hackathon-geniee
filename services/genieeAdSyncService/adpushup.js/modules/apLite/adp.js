@@ -75,12 +75,7 @@ var $ = require('../../libs/jquery'),
 				sectionId,
 				optionalParam
 			) {
-				var formats =
-					config.PREBID_CONFIG &&
-					config.PREBID_CONFIG.prebidConfig &&
-					config.PREBID_CONFIG.prebidConfig.formats
-						? config.PREBID_CONFIG.prebidConfig.formats
-						: constants.PREBID.DEFAULT_FORMATS;
+				var formats = constants.PREBID.ALL_SUPPORTED_FORMATS;
 				var timeout =
 					config.PREBID_CONFIG &&
 					config.PREBID_CONFIG.prebidConfig &&
