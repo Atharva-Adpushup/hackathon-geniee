@@ -549,6 +549,8 @@ body {
 
 .reporting-filterBox {
 	.dropdown {
-		z-index: 0;
+		.dropdown-toggle {
+			z-index: 0;
+		}
 	}
 }
