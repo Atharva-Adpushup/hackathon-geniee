@@ -7,7 +7,9 @@ function getHeader(
 	handleSelectAllInventories,
 	handleInventorySelect,
 	selectAllInventories,
-	selectedInventories
+	selectedInventories,
+	checked,
+	handleNativeChange
 ) {
 	return [
 		{
@@ -30,7 +32,22 @@ function getHeader(
 			maxWidth: 50,
 			minWidth: 50
 		},
-		...INVENTORY_TABLE_COLUMNS
+		...INVENTORY_TABLE_COLUMNS,
+		{
+			Header: 'Multi-format Options',
+			Cell: () => (
+				<React.Fragment>
+					<Checkbox
+						checked={checked}
+						onChange={handleNativeChange}
+						// onChange={e => console.log(e.target.checked)}
+					>
+						Native
+					</Checkbox>
+					<Checkbox checked={checked}>video</Checkbox>
+				</React.Fragment>
+			)
+		}
 	];
 }
 
@@ -49,14 +66,18 @@ const InventoriesTable = ({
 	handleSelectAllInventories,
 	handleInventorySelect,
 	selectAllInventories,
-	selectedInventories
+	selectedInventories,
+	checked,
+	handleNativeChange
 }) => (
 	<CustomReactTable
 		columns={getHeader(
 			handleSelectAllInventories,
 			handleInventorySelect,
 			selectAllInventories,
-			selectedInventories
+			selectedInventories,
+			checked,
+			handleNativeChange
 		)}
 		data={getBody(inventories)}
 		pageSizeOptions={[10, 25, 50, 100]}

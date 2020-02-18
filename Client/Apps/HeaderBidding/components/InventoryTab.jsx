@@ -2,6 +2,8 @@
 /* eslint-disable guard-for-in */
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Checkbox } from '@/Client/helpers/react-bootstrap-imports';
+
 import InventoriesTable from './InventoriesTable';
 import FilterBox from '../../../Components/FilterBox';
 import CustomButton from '../../../Components/CustomButton';
@@ -18,7 +20,8 @@ export default class InventoryTab extends React.Component {
 		hbStatusForSite: null,
 		loadingHbStatusForSite: true,
 		updatingInventoryHbStatus: false,
-		selectAllInventories: false
+		selectAllInventories: false,
+		checked: false
 	};
 
 	componentDidMount() {
@@ -68,6 +71,14 @@ export default class InventoryTab extends React.Component {
 
 		return { updated, updatedFilteredInventories };
 	}
+
+	handleChange = e => {
+		this.setState({ checked: e.target.checked });
+	};
+
+	handleNativeChange = () => {
+		console.log('hello');
+	};
 
 	handleSelectAllInventories = () => {
 		const { filteredInventories, selectAllInventories } = this.state;
@@ -185,7 +196,8 @@ export default class InventoryTab extends React.Component {
 			loadingHbStatusForSite,
 			updatingInventoryHbStatus,
 			checkedCopy,
-			selectAllInventories
+			selectAllInventories,
+			checked
 		} = this.state;
 
 		return (
@@ -285,6 +297,14 @@ export default class InventoryTab extends React.Component {
 							/>
 						)}
 
+						<Checkbox
+							onChange={this.handleChange}
+							checked={checked}
+							disabled={checked ? true : false}
+						>
+							Enable native and video format for all units
+						</Checkbox>
+
 						{!filteredInventories.length ? (
 							<Empty message="No Data Found" />
 						) : (
@@ -295,6 +315,8 @@ export default class InventoryTab extends React.Component {
 									handleInventorySelect={this.handleInventorySelect}
 									handleSelectAllInventories={this.handleSelectAllInventories}
 									checkedCopy={checkedCopy}
+									checked={checked}
+									handleNativeChange={this.handleNativeChange}
 									selectAllInventories={selectAllInventories}
 								/>
 							)
