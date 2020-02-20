@@ -188,6 +188,8 @@ var request = require('request-promise'),
 					data: { mandatoryAdsTxtEntry }
 				});
 			}
+
+			return mandatoryAdsTxtEntry;
 		},
 
 		commonVerifyAdsTxt(ourAdsTxt, existingAdsTxtArr) {
@@ -307,6 +309,31 @@ var request = require('request-promise'),
 				});
 			}
 		},
+
+		verifyMandatoryAdsTxtFetchedFromDb(mandatoryAdsTxtSnippet, existingAdsTxtArr) {
+			if (existingAdsTxtArr.length) {
+				return API.verifyMandatoryAdsTxtEntry(mandatoryAdsTxtSnippet, existingAdsTxtArr);
+			}
+
+			throw new AdPushupError({
+				httpCode: 404,
+				error: 'ads.txt file not found on your site. Please upload our ads.txt file on your site.',
+				data: { mandatoryAdsTxtSnippet }
+			});
+		},
+
+		verifyAdsTxtFetchedFromDb(ourAdsTxt, existingAdsTxtArr) {
+			if (existingAdsTxtArr.length) {
+				return API.commonVerifyAdsTxt(ourAdsTxt, existingAdsTxtArr);
+			}
+
+			throw new AdPushupError({
+				httpCode: 404,
+				error: 'ads.txt file not found on your site. Please upload our ads.txt file on your site.',
+				data: { ourAdsTxt }
+			});
+		},
+
 		checkIfBillingProfileComplete(email) {
 			const idap = getUserIDAP(email);
 			const { url, payerName, configKey, timestamp } = getTipaltiConfig(email);

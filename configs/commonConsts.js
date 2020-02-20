@@ -565,5 +565,11 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		domain: 'adpushup.com',
 		relationship: 'DIRECT',
 		certificationAuthorityId: 'b0b8ff8485794fdd'
+	},
+	liveAdsTxtEntryStatus: {
+		allPresent: 1,
+		allMissing: 2,
+		partialPresent: 3,
+		noAdsTxt: 4
 	}
 };
