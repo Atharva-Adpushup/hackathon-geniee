@@ -11,6 +11,8 @@ const FormValidator = require('../helpers/FormValidator');
 const schema = require('../helpers/schema');
 const commonConsts = require('../configs/commonConsts');
 const adpushup = require('../helpers/adpushupEvent');
+const { sendSuccessResponse, sendErrorResponse } = require('../helpers/commonFunctions');
+const { errorHandler } = require('../helpers/routeHelpers');
 
 const router = express.Router();
 
@@ -606,6 +608,82 @@ router
 
 				return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Something went wrong' });
 			});
+	})
+
+	.put('/nativeChnage/:siteId', (req, res) => {
+		const { siteId } = req.params;
+		const { email } = req.user;
+		const { checked, adUnitId, app, pageGroup, device } = req.body;
+
+		return userModel
+			.verifySiteOwner(email, siteId)
+			.then(() => {
+				if (app === 'Innovative Ads')
+					return headerBiddingModel.updateInnovativeAd(siteId, adUnitId, checked, 'native');
+				else if (app === 'AP Tag')
+					return headerBiddingModel.updateApTag(siteId, adUnitId, checked, 'native');
+				else
+					return headerBiddingModel.updateLayoutEditor(
+						siteId,
+						adUnitId,
+						checked,
+						pageGroup,
+						device,
+						'native'
+					);
+			})
+			.then(docData => sendSuccessResponse(docData, res))
+			.catch(err => errorHandler(err));
+	})
+
+	.put('/videoChnage/:siteId', (req, res) => {
+		const { siteId } = req.params;
+		const { email } = req.user;
+		const { checked, adUnitId, app, pageGroup, device } = req.body;
+
+		return userModel
+			.verifySiteOwner(email, siteId)
+			.then(() => {
+				if (app === 'Innovative Ads')
+					return headerBiddingModel.updateInnovativeAd(siteId, adUnitId, checked, 'video');
+				else if (app === 'AP Tag')
+					return headerBiddingModel.updateApTag(siteId, adUnitId, checked, 'video');
+				else
+					return headerBiddingModel.updateLayoutEditor(
+						siteId,
+						adUnitId,
+						checked,
+						pageGroup,
+						device,
+						'video'
+					);
+			})
+			.then(docData => sendSuccessResponse(docData, res))
+			.catch(err => errorHandler(err));
+	})
+
+	.put('/allSelected/:siteId', (req, res) => {
+		const { siteId } = req.params;
+		const { email } = req.user;
+		const { checked, adUnitId, app, pageGroup, device } = req.body;
+
+		return userModel
+			.verifySiteOwner(email, siteId)
+			.then(() => {
+				if (app === 'Innovative Ads')
+					return headerBiddingModel.updateAllInnovativeAd(siteId, 'native');
+				else if (app === 'AP Tag') return headerBiddingModel.updateAllApTag(siteId, 'native');
+				else return headerBiddingModel.updateAllLayoutEditor(siteId, pageGroup, device, 'native');
+			})
+			.then(() => {
+				if (app === 'Innovative Ads')
+					return headerBiddingModel.updateAllInnovativeAd(siteId, 'video');
+				else if (app === 'AP Tag') return headerBiddingModel.updateAllApTag(siteId, 'video');
+				else return headerBiddingModel.updateAllLayoutEditor(siteId, pageGroup, device, 'video');
+			})
+
+			.then(docData => sendSuccessResponse(docData, res))
+			.catch(err => errorHandler(err));
 	});
 
 module.exports = router;
