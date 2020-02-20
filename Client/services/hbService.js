@@ -80,3 +80,33 @@ export function checkOrBeginDfpSetup() {
 export function startCdnSync(siteId) {
 	return axiosInstance.get(`/headerBidding/startCdnSync/${siteId}`);
 }
+
+export function nativeChange(siteId, adUnitId, app, pageGroup, device, checked) {
+	return axiosInstance.put(`/headerBidding/nativeChnage/${siteId}`, {
+		checked,
+		adUnitId,
+		app,
+		pageGroup,
+		device
+	});
+}
+
+export function videoChange(siteId, adUnitId, app, pageGroup, device, checked) {
+	return axiosInstance.put(`/headerBidding/videoChnage/${siteId}`, {
+		checked,
+		adUnitId,
+		app,
+		pageGroup,
+		device
+	});
+}
+
+export function allSelected(siteId, adUnitId, app, pageGroup, device, checked) {
+	return axiosInstance.put(`/headerBidding/allSelected/${siteId}`, {
+		checked,
+		adUnitId,
+		pageGroup,
+		device,
+		app
+	});
+}
