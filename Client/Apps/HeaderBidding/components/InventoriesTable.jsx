@@ -8,8 +8,10 @@ function getHeader(
 	handleInventorySelect,
 	selectAllInventories,
 	selectedInventories,
-	checked,
-	handleNativeChange
+	handleNativeChange,
+	handleVideoChange,
+	selectAllVideo,
+	selectAllNative
 ) {
 	return [
 		{
@@ -35,16 +37,20 @@ function getHeader(
 		...INVENTORY_TABLE_COLUMNS,
 		{
 			Header: 'Multi-format Options',
-			Cell: () => (
+			Cell: ({ original: { adUnitId, app, pageGroup, device } }) => (
 				<React.Fragment>
 					<Checkbox
-						checked={checked}
-						onChange={handleNativeChange}
-						// onChange={e => console.log(e.target.checked)}
+						checked={selectAllNative.indexOf(adUnitId) > -1}
+						onChange={e => handleNativeChange(e, adUnitId, app, pageGroup, device)}
 					>
 						Native
 					</Checkbox>
-					<Checkbox checked={checked}>video</Checkbox>
+					<Checkbox
+						checked={selectAllVideo.indexOf(adUnitId) > -1}
+						onChange={e => handleVideoChange(e, adUnitId, app, pageGroup, device)}
+					>
+						Video
+					</Checkbox>
 				</React.Fragment>
 			)
 		}
@@ -67,8 +73,10 @@ const InventoriesTable = ({
 	handleInventorySelect,
 	selectAllInventories,
 	selectedInventories,
-	checked,
-	handleNativeChange
+	handleNativeChange,
+	handleVideoChange,
+	selectAllVideo,
+	selectAllNative
 }) => (
 	<CustomReactTable
 		columns={getHeader(
@@ -76,8 +84,10 @@ const InventoriesTable = ({
 			handleInventorySelect,
 			selectAllInventories,
 			selectedInventories,
-			checked,
-			handleNativeChange
+			handleNativeChange,
+			handleVideoChange,
+			selectAllVideo,
+			selectAllNative
 		)}
 		data={getBody(inventories)}
 		pageSizeOptions={[10, 25, 50, 100]}
