@@ -107,18 +107,18 @@ export default class InventoryTab extends React.Component {
 
 	handleChange = e => {
 		const { filteredInventories, selectAllMultiFormat } = this.state;
-		const { siteId, showNotification } = this.props;
+		const { siteId, inventories, showNotification } = this.props;
 		let allSelectedPromises = [];
 		const newState = {};
 		newState.selectAllMultiFormat = !selectAllMultiFormat;
 		newState.selectAllNative = !selectAllMultiFormat
-			? [...filteredInventories].map(inventory => inventory.adUnitId)
+			? [...inventories].map(inventory => inventory.adUnitId)
 			: [];
 		newState.selectAllVideo = !selectAllMultiFormat
-			? [...filteredInventories].map(inventory => inventory.adUnitId)
+			? [...inventories].map(inventory => inventory.adUnitId)
 			: [];
 
-		allSelectedPromises = filteredInventories.map(({ pageGroup, device, app }) => {
+		allSelectedPromises = inventories.map(({ pageGroup, device, app }) => {
 			const params = { pageGroup, device, app, siteId };
 			return allSelected(params).then(data => data);
 		});
