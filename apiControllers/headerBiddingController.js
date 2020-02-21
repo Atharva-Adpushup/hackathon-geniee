@@ -616,23 +616,15 @@ router
 		const { siteId } = req.params;
 		const { email } = req.user;
 		const { checked, adUnitId, app, pageGroup, device } = req.body;
-
+		const params = { siteId, adUnitId, status: checked };
 		return userModel
 			.verifySiteOwner(email, siteId)
 			.then(() => {
 				if (app === 'Innovative Ads')
-					return headerBiddingModel.updateInnovativeAd(siteId, adUnitId, checked, 'native');
-				else if (app === 'AP Tag')
-					return headerBiddingModel.updateApTag(siteId, adUnitId, checked, 'native');
-				else
-					return headerBiddingModel.updateLayoutEditor(
-						siteId,
-						adUnitId,
-						checked,
-						pageGroup,
-						device,
-						'native'
-					);
+					return headerBiddingModel.updateInnovativeAd(params, 'native');
+				if (app === 'AP Tag') return headerBiddingModel.updateApTag(params, 'native');
+
+				return headerBiddingModel.updateLayoutEditor({ ...params, pageGroup, device }, 'native');
 			})
 			.then(docData => sendSuccessResponse(docData, res))
 			.catch(err => errorHandler(err));
@@ -642,23 +634,15 @@ router
 		const { siteId } = req.params;
 		const { email } = req.user;
 		const { checked, adUnitId, app, pageGroup, device } = req.body;
+		const params = { siteId, adUnitId, status: checked };
 
 		return userModel
 			.verifySiteOwner(email, siteId)
 			.then(() => {
-				if (app === 'Innovative Ads')
-					return headerBiddingModel.updateInnovativeAd(siteId, adUnitId, checked, 'video');
-				else if (app === 'AP Tag')
-					return headerBiddingModel.updateApTag(siteId, adUnitId, checked, 'video');
-				else
-					return headerBiddingModel.updateLayoutEditor(
-						siteId,
-						adUnitId,
-						checked,
-						pageGroup,
-						device,
-						'video'
-					);
+				if (app === 'Innovative Ads') return headerBiddingModel.updateInnovativeAd(params, 'video');
+				if (app === 'AP Tag') return headerBiddingModel.updateApTag(params, 'video');
+
+				return headerBiddingModel.updateLayoutEditor({ ...params, pageGroup, device }, 'video');
 			})
 			.then(docData => sendSuccessResponse(docData, res))
 			.catch(err => errorHandler(err));
@@ -667,21 +651,21 @@ router
 	.put('/allSelected/:siteId', (req, res) => {
 		const { siteId } = req.params;
 		const { email } = req.user;
-		const { checked, adUnitId, app, pageGroup, device } = req.body;
-
+		const { app, pageGroup, device } = req.body;
+		const params = { siteId, pageGroup, device };
 		return userModel
 			.verifySiteOwner(email, siteId)
 			.then(() => {
 				if (app === 'Innovative Ads')
 					return headerBiddingModel.updateAllInnovativeAd(siteId, 'native');
-				else if (app === 'AP Tag') return headerBiddingModel.updateAllApTag(siteId, 'native');
-				else return headerBiddingModel.updateAllLayoutEditor(siteId, pageGroup, device, 'native');
+				if (app === 'AP Tag') return headerBiddingModel.updateAllApTag(siteId, 'native');
+				return headerBiddingModel.updateAllLayoutEditor(params, 'native');
 			})
 			.then(() => {
 				if (app === 'Innovative Ads')
 					return headerBiddingModel.updateAllInnovativeAd(siteId, 'video');
-				else if (app === 'AP Tag') return headerBiddingModel.updateAllApTag(siteId, 'video');
-				else return headerBiddingModel.updateAllLayoutEditor(siteId, pageGroup, device, 'video');
+				if (app === 'AP Tag') return headerBiddingModel.updateAllApTag(siteId, 'video');
+				return headerBiddingModel.updateAllLayoutEditor(params, 'video');
 			})
 
 			.then(docData => sendSuccessResponse(docData, res))

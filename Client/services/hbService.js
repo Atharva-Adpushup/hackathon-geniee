@@ -81,7 +81,8 @@ export function startCdnSync(siteId) {
 	return axiosInstance.get(`/headerBidding/startCdnSync/${siteId}`);
 }
 
-export function nativeChange(siteId, adUnitId, app, pageGroup, device, checked) {
+export function nativeChange(params) {
+	const { siteId, adUnitId, app, pageGroup, device, checked } = params;
 	return axiosInstance.put(`/headerBidding/nativeChnage/${siteId}`, {
 		checked,
 		adUnitId,
@@ -91,7 +92,8 @@ export function nativeChange(siteId, adUnitId, app, pageGroup, device, checked) 
 	});
 }
 
-export function videoChange(siteId, adUnitId, app, pageGroup, device, checked) {
+export function videoChange(params) {
+	const { siteId, adUnitId, app, pageGroup, device, checked } = params;
 	return axiosInstance.put(`/headerBidding/videoChnage/${siteId}`, {
 		checked,
 		adUnitId,
@@ -101,10 +103,9 @@ export function videoChange(siteId, adUnitId, app, pageGroup, device, checked) {
 	});
 }
 
-export function allSelected(siteId, adUnitId, app, pageGroup, device, checked) {
+export function allSelected(params) {
+	const { siteId, app, pageGroup, device } = params;
 	return axiosInstance.put(`/headerBidding/allSelected/${siteId}`, {
-		checked,
-		adUnitId,
 		pageGroup,
 		device,
 		app

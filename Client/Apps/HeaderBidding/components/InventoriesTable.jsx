@@ -37,17 +37,17 @@ function getHeader(
 		...INVENTORY_TABLE_COLUMNS,
 		{
 			Header: 'Multi-format Options',
-			Cell: ({ original: { adUnitId, app, pageGroup, device } }) => (
+			Cell: ({ original }) => (
 				<React.Fragment>
 					<Checkbox
-						checked={selectAllNative.indexOf(adUnitId) > -1}
-						onChange={e => handleNativeChange(e, adUnitId, app, pageGroup, device)}
+						checked={selectAllNative.indexOf(original.adUnitId) > -1}
+						onChange={e => handleNativeChange(e, original)}
 					>
 						Native
 					</Checkbox>
 					<Checkbox
-						checked={selectAllVideo.indexOf(adUnitId) > -1}
-						onChange={e => handleVideoChange(e, adUnitId, app, pageGroup, device)}
+						checked={selectAllVideo.indexOf(original.adUnitId) > -1}
+						onChange={e => handleVideoChange(e, original)}
 					>
 						Video
 					</Checkbox>
