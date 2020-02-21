@@ -92,7 +92,7 @@ class VerifyAdsTxtCodeOnboarding extends Component {
 								...this.resetErrorState
 							},
 							mandatoryAdsTxtEntry,
-							ourAdsTxt: ourAdsTxt.join('\n')
+							ourAdsTxt
 						};
 
 						for (let index = 0; index < errors.length; index += 1) {
@@ -235,6 +235,12 @@ class VerifyAdsTxtCodeOnboarding extends Component {
 								emailBody={sendCodeByEmailModalContent}
 							/>
 
+							{mandatoryAdsTxtEntryError && ourAdsTxtError && (
+								<p className="u-text-primary-red u-text-bold u-padding-b3">
+									Please add entries from both the sections below to avoid revenue loss
+								</p>
+							)}
+
 							<div className="u-padding-b4">
 								<p>
 									Add this mandatory entry
@@ -287,7 +293,7 @@ class VerifyAdsTxtCodeOnboarding extends Component {
 								</div>
 							</div>
 
-							<div className="u-padding-b3">
+							<div className="u-padding-b4">
 								<p>
 									Add these entries in your ads.txt file
 									{ourAdsTxtError && (

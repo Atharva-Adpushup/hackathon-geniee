@@ -107,7 +107,7 @@ class AdsTxtManager extends Component {
 											const { error: err, type, code } = errors[index];
 
 											if (type === 'ourAdsTxt') {
-												result.adsTxt = ourAdsTxt.join('\n');
+												result.adsTxt = ourAdsTxt;
 												result.ourAdsTxtStatus = statusText[code];
 											} else {
 												result.mandatoryAdsTxtEntryStatus = err;
@@ -190,8 +190,13 @@ class AdsTxtManager extends Component {
 				</Modal.Header>
 				<Modal.Body>
 					<div className="u-padding-3">
-						The following entries are missing. To avoid loss in revenue, please append the following
-						entries in your ads.txt file.
+						{modalMandatoryAdsTxtEntry && modalAdsTxt ? (
+							<span className="u-padding-b3 u-text-bold u-text-primary-red">
+								Please add entries from both the sections below to avoid revenue loss
+							</span>
+						) : (
+							'The following entries are missing. To avoid loss in revenue, please append the following entries in your ads.txt file.'
+						)}
 					</div>
 					<div className="snippet-wrapper text-center u-padding-b4 u-padding-h4 u-padding-t3">
 						<SendCodeByEmailModal
@@ -215,7 +220,7 @@ class AdsTxtManager extends Component {
 									placeholder="Mandatory Ads.txt Entry comes here.."
 									value={modalMandatoryAdsTxtEntry}
 								/>
-								<div className="snippet-btn-wrapper aligner aligner--hEnd u-padding-v3 u-padding-h3">
+								<div className="snippet-btn-wrapper aligner aligner--hEnd u-padding-v3">
 									<CustomButton
 										onClick={() => {
 											this.setState({
@@ -250,12 +255,12 @@ class AdsTxtManager extends Component {
 								<textarea
 									readOnly
 									className="input--snippet"
-									style={{ height: '50%' }}
+									style={{ height: '40%' }}
 									id="adsTxtSnippetTextarea"
 									placeholder="AdPushup init code comes here.."
 									value={modalAdsTxt}
 								/>
-								<div className="snippet-btn-wrapper aligner aligner--hEnd u-padding-v3 u-padding-h3">
+								<div className="snippet-btn-wrapper aligner aligner--hEnd u-padding-v3">
 									<CustomButton
 										onClick={() => {
 											this.setState({

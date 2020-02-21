@@ -219,20 +219,20 @@ var request = require('request-promise'),
 					throw new AdPushupError({
 						httpCode: 204,
 						error: 'Our Ads.txt entries not found',
-						type: 'ourAdsTxt',
-						data: {
-							ourAdsTxt: entriesNotFound
-						}
-					});
-				} else {
-					throw new AdPushupError({
-						httpCode: 206,
-						error: 'Few of our Ads.txt entries not found',
-						type: 'ourAdsTxt',
-						data: {
-							ourAdsTxt: entriesNotFound,
-							presentEntries: entriesFound
-						}
+					type: 'ourAdsTxt',
+					data: {
+						ourAdsTxt: entriesNotFound.join('\n')
+					}
+				});
+			} else {
+				throw new AdPushupError({
+					httpCode: 206,
+					error: 'Few of our Ads.txt entries not found',
+					type: 'ourAdsTxt',
+					data: {
+						ourAdsTxt: entriesNotFound.join('\n'),
+						presentEntries: entriesFound.join('\n')
+					}
 					});
 				}
 			}
@@ -279,6 +279,13 @@ var request = require('request-promise'),
 							});
 						});
 
+						if (!data.ourAdsTxt) {
+							data.ourAdsTxt = ourAdsTxt;
+						}
+						if (!data.mandatoryAdsTxtEntry) {
+							data.mandatoryAdsTxtEntry = mandatoryAdsTxtEntry;
+						}
+						
 						throw new AdPushupError({
 							httpCode: 400,
 							error: errorResponse,
@@ -286,6 +293,7 @@ var request = require('request-promise'),
 						});
 					}
 				} else {
+
 					throw new AdPushupError({
 						httpCode: 404,
 						error: {
@@ -310,15 +318,15 @@ var request = require('request-promise'),
 			}
 		},
 
-		verifyMandatoryAdsTxtFetchedFromDb(mandatoryAdsTxtSnippet, existingAdsTxtArr) {
+		verifyMandatoryAdsTxtFetchedFromDb(mandatoryAdsTxtEntry, existingAdsTxtArr) {
 			if (existingAdsTxtArr.length) {
-				return API.verifyMandatoryAdsTxtEntry(mandatoryAdsTxtSnippet, existingAdsTxtArr);
+				return API.verifyMandatoryAdsTxtEntry(mandatoryAdsTxtEntry, existingAdsTxtArr);
 			}
-
+	
 			throw new AdPushupError({
 				httpCode: 404,
 				error: 'ads.txt file not found on your site. Please upload our ads.txt file on your site.',
-				data: { mandatoryAdsTxtSnippet }
+				data: { mandatoryAdsTxtEntry }
 			});
 		},
 
