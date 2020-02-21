@@ -107,7 +107,7 @@ export default class InventoryTab extends React.Component {
 
 	handleChange = e => {
 		const { filteredInventories, selectAllMultiFormat } = this.state;
-		const { siteId } = this.props;
+		const { siteId, showNotification } = this.props;
 		let allSelectedPromises = [];
 		const newState = {};
 		newState.selectAllMultiFormat = !selectAllMultiFormat;
@@ -118,22 +118,28 @@ export default class InventoryTab extends React.Component {
 			? [...filteredInventories].map(inventory => inventory.adUnitId)
 			: [];
 
-		allSelectedPromises = filteredInventories.map(val => {
-			const { adUnitId, pageGroup, device, app } = val;
-
-			return allSelected(siteId, adUnitId, app, pageGroup, device, true).then(data => data);
+		allSelectedPromises = filteredInventories.map(({ pageGroup, device, app }) => {
+			const params = { pageGroup, device, app, siteId };
+			return allSelected(params).then(data => data);
 		});
-
 		Promise.all(allSelectedPromises)
-			.then(() => console.log('success'))
+			.then(res => {
+				return showNotification({
+					mode: 'success',
+					title: 'Success',
+					message: ' All Inventories updated successsfully',
+					autoDismiss: 5
+				});
+			})
 			.catch(err => console.log(err));
 
 		this.setState(newState);
 	};
 
-	handleNativeChange = ({ target: { checked } }, adUnitId, app, pageGroup, device) => {
+	handleNativeChange = ({ target: { checked } }, params) => {
+		const { adUnitId } = params;
 		const { selectAllNative, filteredInventories, selectAllVideo } = this.state;
-		const { siteId } = this.props;
+		const { siteId, showNotification } = this.props;
 
 		if (checked) {
 			selectAllNative.push(adUnitId);
@@ -141,19 +147,30 @@ export default class InventoryTab extends React.Component {
 			selectAllNative.splice(selectAllNative.indexOf(adUnitId), 1);
 		}
 
-		nativeChange(siteId, adUnitId, app, pageGroup, device, checked).then(res => console.log(res));
-
-		this.setState({
-			selectAllNative,
-			selectAllMultiFormat:
-				selectAllNative.length === filteredInventories.length &&
-				selectAllVideo.length === filteredInventories.length
-					? true
-					: false
-		});
+		nativeChange({ ...params, siteId, checked })
+			.then(res => {
+				this.setState({
+					selectAllNative,
+					selectAllMultiFormat:
+						selectAllNative.length === filteredInventories.length &&
+						selectAllVideo.length === filteredInventories.length
+							? true
+							: false
+				});
+			})
+			.catch(err => {
+				console.log(err);
+				return showNotification({
+					mode: 'error',
+					title: 'Operation Failed',
+					message: 'Something went wrong',
+					autoDismiss: 5
+				});
+			});
 	};
 
-	handleVideoChange = ({ target: { checked } }, adUnitId, app, pageGroup, device) => {
+	handleVideoChange = ({ target: { checked } }, params) => {
+		const { adUnitId } = params;
 		const { selectAllVideo, selectAllNative, filteredInventories } = this.state;
 		const { siteId } = this.props;
 
@@ -163,16 +180,26 @@ export default class InventoryTab extends React.Component {
 			selectAllVideo.splice(selectAllVideo.indexOf(adUnitId), 1);
 		}
 
-		videoChange(siteId, adUnitId, app, pageGroup, device, checked).then(res => console.log(res));
-
-		this.setState({
-			selectAllVideo,
-			selectAllMultiFormat:
-				selectAllNative.length === filteredInventories.length &&
-				selectAllVideo.length === filteredInventories.length
-					? true
-					: false
-		});
+		videoChange({ ...params, siteId, checked })
+			.then(res => {
+				this.setState({
+					selectAllVideo,
+					selectAllMultiFormat:
+						selectAllNative.length === filteredInventories.length &&
+						selectAllVideo.length === filteredInventories.length
+							? true
+							: false
+				});
+			})
+			.catch(err => {
+				console.log(err);
+				return showNotification({
+					mode: 'error',
+					title: 'Operation Failed',
+					message: 'Something went wrong',
+					autoDismiss: 5
+				});
+			});
 	};
 
 	handleSelectAllInventories = () => {

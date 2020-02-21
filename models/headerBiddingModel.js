@@ -515,7 +515,8 @@ function apiModule() {
 				});
 		},
 
-		updateInnovativeAd: (siteId, adUnitId, status, format) => {
+		updateInnovativeAd: (params, format) => {
+			const { siteId, adUnitId, status } = params;
 			return couchbase
 				.connectToAppBucket()
 				.then(appBucket =>
@@ -546,7 +547,8 @@ function apiModule() {
 				});
 		},
 
-		updateLayoutEditor: (siteId, adUnitId, status, pageGroup, device, format) => {
+		updateLayoutEditor: (params, format) => {
+			const { siteId, adUnitId, status, pageGroup, device } = params;
 			return couchbase
 				.connectToAppBucket()
 				.then(appBucket =>
@@ -591,7 +593,8 @@ function apiModule() {
 				});
 		},
 
-		updateApTag: (siteId, adUnitId, status, format) => {
+		updateApTag: (params, format) => {
+			const { siteId, adUnitId, status } = params;
 			return couchbase
 				.connectToAppBucket()
 				.then(appBucket =>
@@ -609,7 +612,6 @@ function apiModule() {
 							? networkData.formats.splice(networkData.formats.indexOf(format), 1)
 							: null;
 					}
-					console.log(value);
 					return appBucket.replaceAsync(`tgmr::${siteId}`, value) && value;
 				})
 				.catch(err => {
@@ -647,7 +649,8 @@ function apiModule() {
 				});
 		},
 
-		updateAllLayoutEditor: (siteId, pageGroup, device, format) => {
+		updateAllLayoutEditor: (params, format) => {
+			const { siteId, pageGroup, device } = params;
 			return couchbase
 				.connectToAppBucket()
 				.then(appBucket =>
