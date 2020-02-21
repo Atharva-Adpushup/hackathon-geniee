@@ -634,9 +634,11 @@ function apiModule() {
 				.then(({ appBucket, innovativeAdDoc: { value } }) => {
 					const { ads } = value;
 					ads.map(val => {
-						const { networkData } = val;
+						const { networkData, network } = val;
 						if (!networkData.formats) networkData.formats = ['display'];
-						!networkData.formats.includes(format) ? networkData.formats.push(format) : null;
+						!networkData.formats.includes(format) && !!(network === 'adpTags')
+							? networkData.formats.push(format)
+							: null;
 					});
 					return appBucket.replaceAsync(`fmrt::${siteId}`, value) && value;
 				})
@@ -671,11 +673,13 @@ function apiModule() {
 
 							adIds.forEach(adId => {
 								const currentAdId = ads[adId];
-								const { networkData } = currentAdId;
+								const { networkData, network } = currentAdId;
 
 								if (!networkData.formats) networkData.formats = ['display'];
 
-								!networkData.formats.includes(format) ? networkData.formats.push(format) : null;
+								!networkData.formats.includes(format) && !!(network === 'adpTags')
+									? networkData.formats.push(format)
+									: null;
 							});
 						}
 					});
@@ -701,9 +705,11 @@ function apiModule() {
 					const { ads } = value;
 
 					ads.map(val => {
-						const { networkData } = val;
+						const { networkData, network } = val;
 						if (!networkData.formats) networkData.formats = ['display'];
-						!networkData.formats.includes(format) ? networkData.formats.push(format) : null;
+						!networkData.formats.includes(format) && !!(network === 'adpTags')
+							? networkData.formats.push(format)
+							: null;
 					});
 
 					return appBucket.replaceAsync(`tgmr::${siteId}`, value) && value;
