@@ -154,6 +154,10 @@ var auction = {
 						}
 					]
 				}
+			},
+			// Prebid client-side cache required for video format bidding by Pubmatic and IX adapters to cache VAST XML
+			cache: {
+				url: 'https://prebid.adnxs.com/pbc/v1/cache'
 			}
 		};
 
