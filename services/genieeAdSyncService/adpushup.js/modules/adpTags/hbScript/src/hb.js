@@ -6,6 +6,7 @@ var adp = require('./adp');
 var utils = require('./utils');
 var auction = require('./auction');
 var config = require('./config');
+var { mediaTypesConfig } = require('./bidderConfigMapping');
 var isApLiteActive = window.adpushup.config.apLiteActive;
 var hb = {
 	createPrebidSlots: function(adpSlotsBatch) {
@@ -56,17 +57,6 @@ var hb = {
 				if (!isNaN(index) && sizeConfig[index]) {
 					computedBidders[i].labelAny = sizeConfig[index].labels;
 				}
-
-				if (
-					val.bidder === 'rubicon' &&
-					adpSlot.formats.indexOf('video') !== -1 &&
-					val.params.video
-				) {
-					computedBidders[i].params.video = {
-						playerWidth: prebidSizes[0][0].toString(),
-						playerHeight: prebidSizes[0][1].toString()
-					};
-				}
 			});
 
 			var prebidSlot = {
@@ -78,23 +68,23 @@ var hb = {
 			adpSlot.formats.forEach(function(format) {
 				switch (format) {
 					case 'display': {
-						prebidSlot.mediaTypes.banner = { sizes: prebidSizes };
+						prebidSlot.mediaTypes.banner = {
+							...mediaTypesConfig.banner,
+							sizes: prebidSizes
+						};
 						break;
 					}
 					case 'video': {
 						prebidSlot.mediaTypes.video = {
-							context: constants.PREBID.VIDEO_FORMAT_TYPE,
-							playerSize: prebidSizes[0],
-							mimes: ['video/mp4', 'video/x-ms-wmv'],
-							protocols: [2, 5],
-							maxduration: 30,
-							linearity: 1,
-							api: [2]
+							...mediaTypesConfig.video,
+							playerSize: prebidSizes[0]
 						};
 						break;
 					}
 					case 'native': {
-						// TODO: add native format in prebid config
+						prebidSlot.mediaTypes.native = {
+							...mediaTypesConfig.native
+						};
 						break;
 					}
 				}
