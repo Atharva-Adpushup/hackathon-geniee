@@ -6,6 +6,7 @@ var $ = require('../../../../libs/jquery');
 var config = require('./config');
 var BACKWARD_COMPATIBLE_MAPPING = require('./constants').AD_SIZE_MAPPING.IAB_SIZES
 	.BACKWARD_COMPATIBLE_MAPPING;
+var { bidderParamsMapping } = require('./bidderConfigMapping');
 var utils = {
 	currencyConversionActive: function(inputObject) {
 		var inputObject = inputObject || adp.config,
@@ -149,7 +150,19 @@ var utils = {
 			}
 		}
 	},
-	getBiddersForSlot: function(size) {
+	getVideoOrNativeParams: function(format) {
+		switch (format) {
+			case 'video':
+				return bidderParamsMapping[bidder].videoParams || {};
+
+			case 'native':
+				return bidderParamsMapping[bidder].nativeParams || {};
+
+			default:
+				return {};
+		}
+	},
+	getBiddersForSlot: function(size, formats) {
 		var width = size[0];
 		var height = size[1];
 		var size = width + 'x' + height;
@@ -164,10 +177,21 @@ var utils = {
 
 					if (!bidderData.isPaused) {
 						if (bidderData.sizeLess) {
-							bidders.push({
+							var computedBidderObj = {
 								bidder: bidder,
 								params: bidderData.config
-							});
+							};
+
+							if (bidderParamsMapping[bidder]) {
+								formats.forEach(format => {
+									computedBidderObj.params = {
+										...this.getVideoOrNativeParams(format),
+										...computedBidderObj.params
+									};
+								});
+							}
+
+							bidders.push(computedBidderObj);
 						}
 
 						if (!bidderData.sizeLess && bidderData.reusable) {
@@ -177,6 +201,15 @@ var utils = {
 							);
 
 							if (bidderParams) {
+								if (bidderParamsMapping[bidder]) {
+									formats.forEach(format => {
+										bidderParams = {
+											...this.getVideoOrNativeParams(format),
+											...bidderParams
+										};
+									});
+								}
+
 								bidders.push({
 									bidder: bidder,
 									params: bidderParams
