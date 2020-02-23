@@ -6,7 +6,7 @@ var $ = require('../../../../libs/jquery');
 var config = require('./config');
 var BACKWARD_COMPATIBLE_MAPPING = require('./constants').AD_SIZE_MAPPING.IAB_SIZES
 	.BACKWARD_COMPATIBLE_MAPPING;
-var { bidderParamsMapping } = require('./bidderConfigMapping');
+var { bidderParamsMapping } = require('./multiFormatConfig');
 var utils = {
 	currencyConversionActive: function(inputObject) {
 		var inputObject = inputObject || adp.config,
@@ -150,7 +150,7 @@ var utils = {
 			}
 		}
 	},
-	getVideoOrNativeParams: function(format) {
+	getVideoOrNativeParams: function(format, bidder) {
 		switch (format) {
 			case 'video':
 				return bidderParamsMapping[bidder].videoParams || {};
@@ -185,7 +185,7 @@ var utils = {
 							if (bidderParamsMapping[bidder]) {
 								formats.forEach(format => {
 									computedBidderObj.params = {
-										...this.getVideoOrNativeParams(format),
+										...this.getVideoOrNativeParams(format, bidder),
 										...computedBidderObj.params
 									};
 								});
@@ -195,7 +195,7 @@ var utils = {
 						}
 
 						if (!bidderData.sizeLess && bidderData.reusable) {
-							const bidderParams = this.getOriginalOrDownwardSizeBidderParams(
+							var bidderParams = this.getOriginalOrDownwardSizeBidderParams(
 								bidderData.config,
 								size
 							);
@@ -204,7 +204,7 @@ var utils = {
 								if (bidderParamsMapping[bidder]) {
 									formats.forEach(format => {
 										bidderParams = {
-											...this.getVideoOrNativeParams(format),
+											...this.getVideoOrNativeParams(format, bidder),
 											...bidderParams
 										};
 									});
