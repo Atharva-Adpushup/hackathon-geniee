@@ -6,7 +6,7 @@ var adp = require('./adp');
 var utils = require('./utils');
 var auction = require('./auction');
 var config = require('./config');
-var { mediaTypesConfig } = require('./bidderConfigMapping');
+var { multiFormatConstants, mediaTypesConfig } = require('./multiFormatConfig');
 var isApLiteActive = window.adpushup.config.apLiteActive;
 var hb = {
 	createPrebidSlots: function(adpSlotsBatch) {
@@ -62,6 +62,24 @@ var hb = {
 			var prebidSlot = {
 				code: adpSlot.containerId,
 				mediaTypes: {},
+				renderer: {
+					url: multiFormatConstants.VIDEO.RENDERER_URL,
+					render: function(bid) {
+						// push to render queue because jwplayer may not be loaded yet.
+						bid.renderer.push(() => {
+							jwplayer(bid.adUnitCode).setup({
+								width: bid.width,
+								height: bid.height,
+								advertising: {
+									outstream: true,
+									client: 'vast',
+									vastxml: bid.vastXml,
+									...multiFormatConstants.VIDEO.RENDERER_CONFIG
+								}
+							});
+						});
+					}
+				},
 				bids: computedBidders
 			};
 
