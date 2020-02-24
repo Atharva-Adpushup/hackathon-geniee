@@ -293,7 +293,9 @@ router
 	})
 	.get('/findUsers', (req, res) =>
 		appBucket
-			.queryDB('select email from AppBucket where meta().id like "user::%"')
+			.queryDB(
+				'SELECT email, ARRAY site.domain FOR site IN sites WHEN site.domain IS NOT MISSING END AS domains FROM AppBucket WHERE meta().id LIKE "user::%"'
+			)
 			.then(users => {
 				let response = [];
 				if (users && Array.isArray(users) && users.length) {

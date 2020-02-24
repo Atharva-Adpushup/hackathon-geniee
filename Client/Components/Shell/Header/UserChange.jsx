@@ -3,8 +3,9 @@
 /* eslint-disable no-console */
 import React, { Component } from 'react';
 import { Form, FormControl } from '@/Client/helpers/react-bootstrap-imports';
-import CustomButton from '../../CustomButton/index';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import CustomButton from '../../CustomButton/index';
+import { domanize } from '../../../helpers/commonFunctions';
 
 class UserChange extends Component {
 	state = {
@@ -47,6 +48,12 @@ class UserChange extends Component {
 		};
 	};
 
+	getFormattedUserDomainsList = (domains = []) =>
+		domains
+			.slice(0, 5)
+			.map(domain => domanize(domain))
+			.join(' | ');
+
 	onFormSubmit = e => {
 		e.preventDefault();
 
@@ -64,21 +71,25 @@ class UserChange extends Component {
 		const { email, users } = this.state;
 
 		return (
-			<Form onSubmit={this.onFormSubmit} className='change-user-form'>
+			<Form onSubmit={this.onFormSubmit} className="change-user-form">
 				<FormControl
-					type='text'
-					name='email'
+					type="text"
+					name="email"
 					value={email}
 					onChange={this.onValChange}
 					onFocus={this.onFocus}
-					list='users-list'
-					placeholder='Email'
+					list="users-list"
+					placeholder="Email"
 					style={{ borderRadius: '0', borderTopLeftRadius: 4, borderBottomLeftRadius: 4 }}
 				/>
 				{users.length ? (
-					<datalist id='users-list'>
+					<datalist id="users-list">
 						{users.map(user => (
-							<option key={user.email} value={user.email} />
+							<option
+								key={user.email}
+								value={user.email}
+								label={this.getFormattedUserDomainsList(user.domains)}
+							/>
 						))}
 					</datalist>
 				) : (
@@ -86,17 +97,17 @@ class UserChange extends Component {
 				)}
 
 				<CustomButton
-					type='submit'
-					variant='secondary'
+					type="submit"
+					variant="secondary"
 					style={{
 						borderRadius: '0',
 						borderTopRightRadius: 4,
 						borderBottomRightRadius: 4,
 						height: '34'
 					}}
-					title='Change User'
+					title="Change User"
 				>
-					<FontAwesomeIcon size='1x' icon='sign-in-alt' className='u-margin-r3' />
+					<FontAwesomeIcon size="1x" icon="sign-in-alt" className="u-margin-r3" />
 				</CustomButton>
 			</Form>
 		);
