@@ -33,7 +33,7 @@ function computeDisplayData(props) {
 		});
 	}
 
-	series[0].data = seriesData;
+	series[0].data = seriesData.sort((a, b) => a.y - b.y);
 	return series;
 }
 
