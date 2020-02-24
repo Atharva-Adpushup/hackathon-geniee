@@ -30,7 +30,8 @@ var feedback = {
 			pageVariationName: window.adpushup.config.selectedVariationName,
 			pageVariationType: window.adpushup.config.selectedVariationType,
 			platform: adp.config.platform,
-			packetId: adp.config.packetId
+			packetId: adp.config.packetId,
+			unitFormat: slot.feedback.unitFormat
 		};
 
 		return feedbackData;

@@ -140,6 +140,7 @@ var hb = {
 				slot.feedback.winner = bidData.bidder;
 				slot.feedback.winningRevenue = bidData[computedCPMValue] / 1000;
 				slot.feedback.winnerAdUnitId = bidData.adId;
+				slot.feedback.unitFormat = bidData.mediaType;
 			});
 		});
 	},
