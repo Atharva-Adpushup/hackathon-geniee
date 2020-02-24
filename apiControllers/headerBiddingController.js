@@ -621,10 +621,14 @@ router
 			.verifySiteOwner(email, siteId)
 			.then(() => {
 				if (app === 'Innovative Ads')
-					return headerBiddingModel.updateInnovativeAd(params, 'native');
-				if (app === 'AP Tag') return headerBiddingModel.updateApTag(params, 'native');
+					return headerBiddingModel.updateFormatsOnInnovAdInventory(params, 'native');
+				if (app === 'AP Tag')
+					return headerBiddingModel.updateFormatsOnApTagInventory(params, 'native');
 
-				return headerBiddingModel.updateLayoutEditor({ ...params, pageGroup, device }, 'native');
+				return headerBiddingModel.updateFormatsOnLayoutInventory(
+					{ ...params, pageGroup, device },
+					'native'
+				);
 			})
 			.then(docData => sendSuccessResponse(docData, res))
 			.catch(err => errorHandler(err));
@@ -639,10 +643,15 @@ router
 		return userModel
 			.verifySiteOwner(email, siteId)
 			.then(() => {
-				if (app === 'Innovative Ads') return headerBiddingModel.updateInnovativeAd(params, 'video');
-				if (app === 'AP Tag') return headerBiddingModel.updateApTag(params, 'video');
+				if (app === 'Innovative Ads')
+					return headerBiddingModel.updateFormatsOnInnovAdInventory(params, 'video');
+				if (app === 'AP Tag')
+					return headerBiddingModel.updateFormatsOnApTagInventory(params, 'video');
 
-				return headerBiddingModel.updateLayoutEditor({ ...params, pageGroup, device }, 'video');
+				return headerBiddingModel.updateFormatsOnLayoutInventory(
+					{ ...params, pageGroup, device },
+					'video'
+				);
 			})
 			.then(docData => sendSuccessResponse(docData, res))
 			.catch(err => errorHandler(err));
@@ -657,15 +666,17 @@ router
 			.verifySiteOwner(email, siteId)
 			.then(() => {
 				if (app === 'Innovative Ads')
-					return headerBiddingModel.updateAllInnovativeAd(siteId, 'native');
-				if (app === 'AP Tag') return headerBiddingModel.updateAllApTag(siteId, 'native');
-				return headerBiddingModel.updateAllLayoutEditor(params, 'native');
+					return headerBiddingModel.updateFormatsOnEveryInnovAdInventory(siteId, 'native');
+				if (app === 'AP Tag')
+					return headerBiddingModel.updateFormatsOnEveryApTagInventory(siteId, 'native');
+				return headerBiddingModel.updateFormatsOnEveryLayoutInventory(params, 'native');
 			})
 			.then(() => {
 				if (app === 'Innovative Ads')
-					return headerBiddingModel.updateAllInnovativeAd(siteId, 'video');
-				if (app === 'AP Tag') return headerBiddingModel.updateAllApTag(siteId, 'video');
-				return headerBiddingModel.updateAllLayoutEditor(params, 'video');
+					return headerBiddingModel.updateFormatsOnEveryInnovAdInventory(siteId, 'video');
+				if (app === 'AP Tag')
+					return headerBiddingModel.updateFormatsOnEveryApTagInventory(siteId, 'video');
+				return headerBiddingModel.updateFormatsOnEveryLayoutInventory(params, 'video');
 			})
 
 			.then(docData => sendSuccessResponse(docData, res))
