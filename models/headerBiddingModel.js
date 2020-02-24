@@ -515,7 +515,7 @@ function apiModule() {
 				});
 		},
 
-		updateInnovativeAd: (params, format) => {
+		updateFormatsOnInnovAdInventory: (params, format) => {
 			const { siteId, adUnitId, status } = params;
 			return couchbase
 				.connectToAppBucket()
@@ -525,9 +525,9 @@ function apiModule() {
 						.then(innovativeAdDoc => ({ appBucket, innovativeAdDoc }))
 				)
 				.then(({ appBucket, innovativeAdDoc: { value } }) => {
-					const { ads } = value;
+					const { ads = [] } = value;
 					const matchedAdUnit = ads.find(({ id }) => id === adUnitId);
-					const { networkData } = matchedAdUnit;
+					const { networkData = {} } = matchedAdUnit;
 					if (!networkData.formats) networkData.formats = ['display'];
 					if (status === true) {
 						!networkData.formats.includes(format) ? networkData.formats.push(format) : null;
@@ -547,7 +547,7 @@ function apiModule() {
 				});
 		},
 
-		updateLayoutEditor: (params, format) => {
+		updateFormatsOnLayoutInventory: (params, format) => {
 			const { siteId, adUnitId, status, pageGroup, device } = params;
 			return couchbase
 				.connectToAppBucket()
@@ -557,19 +557,19 @@ function apiModule() {
 						.then(layoutEditorDoc => ({ appBucket, layoutEditorDoc }))
 				)
 				.then(({ appBucket, layoutEditorDoc: { value } }) => {
-					const { variations } = value;
+					const { variations = {} } = value;
 
 					const keys = Object.keys(variations);
 					keys.forEach(variationId => {
 						const current = variations[variationId];
-						const { sections } = current;
+						const { sections = {} } = current;
 						if (!sections[adUnitId]) return;
 						const { ads = {} } = sections[adUnitId];
 
 						const adIds = Object.keys(ads);
 						return adIds.forEach(adId => {
 							const currentAdId = ads[adId];
-							const { networkData } = currentAdId;
+							const { networkData = {} } = currentAdId;
 
 							if (!networkData.formats) networkData.formats = ['display'];
 							if (status === true) {
@@ -593,7 +593,7 @@ function apiModule() {
 				});
 		},
 
-		updateApTag: (params, format) => {
+		updateFormatsOnApTagInventory: (params, format) => {
 			const { siteId, adUnitId, status } = params;
 			return couchbase
 				.connectToAppBucket()
@@ -601,9 +601,9 @@ function apiModule() {
 					appBucket.getAsync(`tgmr::${siteId}`, {}).then(apTagDoc => ({ appBucket, apTagDoc }))
 				)
 				.then(({ appBucket, apTagDoc: { value } }) => {
-					const { ads } = value;
+					const { ads = [] } = value;
 					const matchedAdUnit = ads.find(({ id }) => id === adUnitId);
-					const { networkData } = matchedAdUnit;
+					const { networkData = {} } = matchedAdUnit;
 					if (!networkData.formats) networkData.formats = ['display'];
 					if (status === true) {
 						!networkData.formats.includes(format) ? networkData.formats.push(format) : null;
@@ -623,7 +623,7 @@ function apiModule() {
 				});
 		},
 
-		updateAllInnovativeAd: (siteId, format) => {
+		updateFormatsOnEveryInnovAdInventory: (siteId, format) => {
 			return couchbase
 				.connectToAppBucket()
 				.then(appBucket =>
@@ -632,9 +632,9 @@ function apiModule() {
 						.then(innovativeAdDoc => ({ appBucket, innovativeAdDoc }))
 				)
 				.then(({ appBucket, innovativeAdDoc: { value } }) => {
-					const { ads } = value;
+					const { ads = [] } = value;
 					ads.map(val => {
-						const { networkData, network } = val;
+						const { networkData = {}, network } = val;
 						if (!networkData.formats) networkData.formats = ['display'];
 						!networkData.formats.includes(format) && !!(network === 'adpTags')
 							? networkData.formats.push(format)
@@ -651,7 +651,7 @@ function apiModule() {
 				});
 		},
 
-		updateAllLayoutEditor: (params, format) => {
+		updateFormatsOnEveryLayoutInventory: (params, format) => {
 			const { siteId, pageGroup, device } = params;
 			return couchbase
 				.connectToAppBucket()
@@ -661,19 +661,19 @@ function apiModule() {
 						.then(layoutEditorDoc => ({ appBucket, layoutEditorDoc }))
 				)
 				.then(({ appBucket, layoutEditorDoc: { value } }) => {
-					const { variations } = value;
+					const { variations = {} } = value;
 
 					const keys = Object.keys(variations);
 					keys.forEach(variationId => {
 						const current = variations[variationId];
-						const { sections } = current;
+						const { sections = {} } = current;
 						for (let adUnitId in sections) {
 							const { ads = {} } = sections[adUnitId];
 							const adIds = Object.keys(ads);
 
 							adIds.forEach(adId => {
 								const currentAdId = ads[adId];
-								const { networkData, network } = currentAdId;
+								const { networkData = {}, network } = currentAdId;
 
 								if (!networkData.formats) networkData.formats = ['display'];
 
@@ -695,17 +695,17 @@ function apiModule() {
 				});
 		},
 
-		updateAllApTag: (siteId, format) => {
+		updateFormatsOnEveryApTagInventory: (siteId, format) => {
 			return couchbase
 				.connectToAppBucket()
 				.then(appBucket =>
 					appBucket.getAsync(`tgmr::${siteId}`, {}).then(apTagDoc => ({ appBucket, apTagDoc }))
 				)
 				.then(({ appBucket, apTagDoc: { value } }) => {
-					const { ads } = value;
+					const { ads = [] } = value;
 
 					ads.map(val => {
-						const { networkData, network } = val;
+						const { networkData = {}, network } = val;
 						if (!networkData.formats) networkData.formats = ['display'];
 						!networkData.formats.includes(format) && !!(network === 'adpTags')
 							? networkData.formats.push(format)
