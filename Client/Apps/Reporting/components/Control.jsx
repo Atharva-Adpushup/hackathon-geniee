@@ -226,7 +226,7 @@ class Control extends Component {
 
 	render() {
 		const { state } = this;
-		const { reportType } = this.props;
+		const { reportType, showNotification } = this.props;
 
 		return (
 			<Fragment>
@@ -298,6 +298,7 @@ class Control extends Component {
 							selectedFilters={state.selectedFilters}
 							onFilterValueChange={this.onFilteChange}
 							getSelectedFilter={this.getSelectedFilter}
+							showNotification={showNotification}
 						/>
 						{/* eslint-enable */}
 					</div>

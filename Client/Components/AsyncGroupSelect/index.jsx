@@ -65,10 +65,21 @@ class AsyncGroupSelect extends Component {
 
 	fetchSelectedFilterValues(filter) {
 		const { props } = this;
+		const { showNotification } = props;
 		const { selectedFilters } = this.state;
 		selectedFilters[filter.value] = selectedFilters[filter.value] || {};
 		this.setState({ isLoading: true });
 		props.getSelectedFilter(filter).then(response => {
+			if (response.status === 504) {
+				this.setState({ isLoading: false });
+				return showNotification({
+					mode: 'error',
+					title: 'Operation Failed',
+					message: 'Request Timeout',
+					autoDismiss: 5
+				});
+			}
+
 			if (
 				response.status == 200 &&
 				response.data &&
