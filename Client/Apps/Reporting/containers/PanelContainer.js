@@ -3,6 +3,7 @@ import {
 	updateAccountReportMetaData,
 	updateGlobalReportMetaData
 } from '../../../actions/globalActions';
+import { showNotification } from '../../../actions/uiActions';
 import Panel from '../components/Panel';
 import { checkReportTypeGlobal } from '../../../helpers/commonFunctions';
 
@@ -32,7 +33,8 @@ const mapDispatchToProps = (dispatch, ownProps) => {
 	const updateReportMetaData =
 		isForOps || isReportTypeGlobal ? updateGlobalReportMetaData : updateAccountReportMetaData;
 	const computedObject = {
-		updateReportMetaData: params => dispatch(updateReportMetaData(params))
+		updateReportMetaData: params => dispatch(updateReportMetaData(params)),
+		showNotification: data => dispatch(showNotification(data))
 	};
 
 	return computedObject;
