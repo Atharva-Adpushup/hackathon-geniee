@@ -47,10 +47,9 @@ export default class InventoryTab extends React.Component {
 		});
 
 		inventories.forEach(inventory => {
-			const {
-				networkData: { formats = [] },
-				adUnitId
-			} = inventory;
+			const { networkData = {}, adUnitId } = inventory;
+
+			const { formats = [] } = networkData;
 
 			if (formats.includes('native')) {
 				selectAllNative.push(adUnitId);
