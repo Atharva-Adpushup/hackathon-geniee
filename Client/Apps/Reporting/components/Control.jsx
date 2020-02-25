@@ -275,6 +275,10 @@ class Control extends Component {
 							datesUpdated={({ startDate, endDate }) =>
 								this.setState({ startDate, endDate }, this.onControlChange.bind(null, reportType))
 							}
+							/*
+								data prior to 1st Aug, 2019 is present in the old console 
+								therefore disabling dates before 1st Aug, 2019
+							*/
 							isOutsideRange={day =>
 								day.isAfter(moment()) ||
 								day.isBefore(
