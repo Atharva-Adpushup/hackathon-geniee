@@ -610,75 +610,61 @@ router
 			});
 	})
 
-	.put('/nativeChnage/:siteId', (req, res) => {
+	.put('/updateFormat/:siteId', (req, res) => {
 		const { siteId } = req.params;
 		const { email } = req.user;
-		const { checked, adUnitId, app, pageGroup, device } = req.body;
-		const params = { siteId, adUnitId, status: checked };
-		return userModel
-			.verifySiteOwner(email, siteId)
-			.then(() => {
-				if (app === 'Innovative Ads')
-					return headerBiddingModel.updateFormatsOnInnovAdInventory(params, 'native');
-				if (app === 'AP Tag')
-					return headerBiddingModel.updateFormatsOnApTagInventory(params, 'native');
+		const { checked, adUnitId, app, pageGroup, device, format } = req.body;
+		let params = {};
 
-				return headerBiddingModel.updateFormatsOnLayoutInventory(
-					{ ...params, pageGroup, device },
-					'native'
-				);
-			})
-			.then(docData => sendSuccessResponse(docData, res))
-			.catch(err => errorHandler(err));
-	})
+		if (!app || !adUnitId || !siteId || !format) {
+			return res.status(httpStatus.BAD_REQUEST).json({ error: 'Invalid data received' });
+		}
 
-	.put('/videoChnage/:siteId', (req, res) => {
-		const { siteId } = req.params;
-		const { email } = req.user;
-		const { checked, adUnitId, app, pageGroup, device } = req.body;
-		const params = { siteId, adUnitId, status: checked };
+		switch (app) {
+			case 'Layout Editor': {
+				params = { siteId, adUnitId, status: checked, pageGroup, device, app, format };
+				break;
+			}
+			case 'AP Tag': {
+				params = { siteId, adUnitId, status: checked, app, format };
+				break;
+			}
+			case 'Innovative Ads': {
+				params = { siteId, adUnitId, status: checked, app, format };
+				break;
+			}
+			default:
+		}
 
 		return userModel
 			.verifySiteOwner(email, siteId)
-			.then(() => {
-				if (app === 'Innovative Ads')
-					return headerBiddingModel.updateFormatsOnInnovAdInventory(params, 'video');
-				if (app === 'AP Tag')
-					return headerBiddingModel.updateFormatsOnApTagInventory(params, 'video');
-
-				return headerBiddingModel.updateFormatsOnLayoutInventory(
-					{ ...params, pageGroup, device },
-					'video'
-				);
-			})
-			.then(docData => sendSuccessResponse(docData, res))
-			.catch(err => errorHandler(err));
+			.then(() => headerBiddingModel.updateFormats(params))
+			.then(() => res.status(httpStatus.OK).json({ success: 'Format updated successfully' }))
+			.catch(() =>
+				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error!' })
+			);
 	})
 
-	.put('/allSelected/:siteId', (req, res) => {
+	.put('/updateAllInventoryFormats/:siteId', (req, res) => {
 		const { siteId } = req.params;
 		const { email } = req.user;
 		const { app, pageGroup, device } = req.body;
-		const params = { siteId, pageGroup, device };
+
+		const params = { siteId, pageGroup, device, app };
+
+		if (!app || !siteId) {
+			return res.status(httpStatus.BAD_REQUEST).json({ error: 'Invalid data received' });
+		}
+
 		return userModel
 			.verifySiteOwner(email, siteId)
-			.then(() => {
-				if (app === 'Innovative Ads')
-					return headerBiddingModel.updateFormatsOnEveryInnovAdInventory(siteId, 'native');
-				if (app === 'AP Tag')
-					return headerBiddingModel.updateFormatsOnEveryApTagInventory(siteId, 'native');
-				return headerBiddingModel.updateFormatsOnEveryLayoutInventory(params, 'native');
-			})
-			.then(() => {
-				if (app === 'Innovative Ads')
-					return headerBiddingModel.updateFormatsOnEveryInnovAdInventory(siteId, 'video');
-				if (app === 'AP Tag')
-					return headerBiddingModel.updateFormatsOnEveryApTagInventory(siteId, 'video');
-				return headerBiddingModel.updateFormatsOnEveryLayoutInventory(params, 'video');
-			})
+			.then(() => headerBiddingModel.updateFormats({ ...params, format: 'native' }))
+			.then(() => headerBiddingModel.updateFormats({ ...params, format: 'video' }))
 
-			.then(docData => sendSuccessResponse(docData, res))
-			.catch(err => errorHandler(err));
+			.then(() => res.status(httpStatus.OK).json({ success: 'Format updated successfully' }))
+			.catch(() =>
+				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error!' })
+			);
 	});
 
 module.exports = router;
