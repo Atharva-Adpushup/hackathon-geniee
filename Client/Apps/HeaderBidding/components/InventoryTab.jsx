@@ -10,9 +10,8 @@ import CustomButton from '../../../Components/CustomButton';
 import {
 	getHbStatusForSite,
 	toggleHbStatusForSite,
-	nativeChange,
-	videoChange,
-	allSelected
+	updateFormat,
+	updateAllInventoryFormats
 } from '../../../services/hbService';
 import Loader from '../../../Components/Loader';
 import Spinner from '../../../Components/Spinner';
@@ -119,7 +118,7 @@ export default class InventoryTab extends React.Component {
 
 		allSelectedPromises = inventories.map(({ pageGroup, device, app }) => {
 			const params = { pageGroup, device, app, siteId };
-			return allSelected(params).then(data => data);
+			return updateAllInventoryFormats(params).then(data => data);
 		});
 		Promise.all(allSelectedPromises)
 			.then(res => {
@@ -130,7 +129,15 @@ export default class InventoryTab extends React.Component {
 					autoDismiss: 5
 				});
 			})
-			.catch(err => console.log(err));
+			.catch(err => {
+				console.log(err);
+				return showNotification({
+					mode: 'error',
+					title: 'Operation Failed',
+					message: 'Something went wrong',
+					autoDismiss: 5
+				});
+			});
 
 		this.setState(newState);
 	};
@@ -139,6 +146,7 @@ export default class InventoryTab extends React.Component {
 		const { adUnitId } = params;
 		const { selectAllNative, filteredInventories, selectAllVideo } = this.state;
 		const { siteId, showNotification } = this.props;
+		const format = 'native';
 
 		if (checked) {
 			selectAllNative.push(adUnitId);
@@ -146,7 +154,7 @@ export default class InventoryTab extends React.Component {
 			selectAllNative.splice(selectAllNative.indexOf(adUnitId), 1);
 		}
 
-		nativeChange({ ...params, siteId, checked })
+		return updateFormat({ ...params, siteId, checked, format })
 			.then(res => {
 				this.setState({
 					selectAllNative,
@@ -172,6 +180,7 @@ export default class InventoryTab extends React.Component {
 		const { adUnitId } = params;
 		const { selectAllVideo, selectAllNative, filteredInventories } = this.state;
 		const { siteId } = this.props;
+		const format = 'video';
 
 		if (checked) {
 			selectAllVideo.push(adUnitId);
@@ -179,7 +188,7 @@ export default class InventoryTab extends React.Component {
 			selectAllVideo.splice(selectAllVideo.indexOf(adUnitId), 1);
 		}
 
-		videoChange({ ...params, siteId, checked })
+		return updateFormat({ ...params, siteId, checked, format })
 			.then(res => {
 				this.setState({
 					selectAllVideo,

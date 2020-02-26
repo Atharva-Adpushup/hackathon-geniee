@@ -81,31 +81,21 @@ export function startCdnSync(siteId) {
 	return axiosInstance.get(`/headerBidding/startCdnSync/${siteId}`);
 }
 
-export function nativeChange(params) {
-	const { siteId, adUnitId, app, pageGroup, device, checked } = params;
-	return axiosInstance.put(`/headerBidding/nativeChnage/${siteId}`, {
+export function updateFormat(params) {
+	const { siteId, adUnitId, app, pageGroup, device, checked, format } = params;
+	return axiosInstance.put(`/headerBidding/updateFormat/${siteId}`, {
 		checked,
 		adUnitId,
 		app,
 		pageGroup,
-		device
+		device,
+		format
 	});
 }
 
-export function videoChange(params) {
-	const { siteId, adUnitId, app, pageGroup, device, checked } = params;
-	return axiosInstance.put(`/headerBidding/videoChnage/${siteId}`, {
-		checked,
-		adUnitId,
-		app,
-		pageGroup,
-		device
-	});
-}
-
-export function allSelected(params) {
+export function updateAllInventoryFormats(params) {
 	const { siteId, app, pageGroup, device } = params;
-	return axiosInstance.put(`/headerBidding/allSelected/${siteId}`, {
+	return axiosInstance.put(`/headerBidding/updateAllInventoryFormats/${siteId}`, {
 		pageGroup,
 		device,
 		app
