@@ -75,7 +75,11 @@ var $ = require('../../libs/jquery'),
 				sectionId,
 				optionalParam
 			) {
-				var formats = constants.PREBID.ALL_SUPPORTED_FORMATS;
+				var formats =
+					(Array.isArray(optionalParam.formats) &&
+						optionalParam.formats.length &&
+						optionalParam.formats) ||
+					constants.PREBID.DEFAULT_FORMATS;
 				var timeout =
 					config.PREBID_CONFIG && config.PREBID_CONFIG.timeOut
 						? config.PREBID_CONFIG.timeOut
@@ -160,6 +164,7 @@ var $ = require('../../libs/jquery'),
 												slotHbStatus = apLiteAdUnit.headerBidding,
 												refreshSlot = apLiteAdUnit.refreshSlot,
 												refreshInterval = apLiteAdUnit.refreshInterval,
+												formats = apLiteAdUnit.formats,
 												adpSlot = this.createAdpSlot(
 													gptSlotElementId,
 													dfpAdUnitName,
@@ -171,6 +176,7 @@ var $ = require('../../libs/jquery'),
 														dfpAdunitCode,
 														headerBidding: window.adpushup.services.HB_ACTIVE && slotHbStatus,
 														network: commonConsts.NETWORKS.ADPTAGS,
+														formats,
 														enableLazyLoading: false,
 														multipleAdSizes: allSizes,
 														sectionName: dfpAdUnitName,
