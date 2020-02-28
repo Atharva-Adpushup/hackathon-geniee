@@ -10,8 +10,7 @@ import CustomButton from '../../../Components/CustomButton';
 import {
 	getHbStatusForSite,
 	toggleHbStatusForSite,
-	updateFormat,
-	updateAllInventoryFormats
+	updateFormat
 } from '../../../services/hbService';
 import Loader from '../../../Components/Loader';
 import Spinner from '../../../Components/Spinner';
@@ -104,9 +103,8 @@ export default class InventoryTab extends React.Component {
 	}
 
 	handleChange = e => {
-		const { filteredInventories, selectAllMultiFormat } = this.state;
+		const { selectAllMultiFormat } = this.state;
 		const { siteId, inventories, showNotification } = this.props;
-		let allSelectedPromises = [];
 		const newState = {};
 		newState.selectAllMultiFormat = !selectAllMultiFormat;
 		newState.selectAllNative = !selectAllMultiFormat
@@ -116,19 +114,18 @@ export default class InventoryTab extends React.Component {
 			? [...inventories].map(inventory => inventory.adUnitId)
 			: [];
 
-		allSelectedPromises = inventories.map(({ pageGroup, device, app }) => {
-			const params = { pageGroup, device, app, siteId };
-			return updateAllInventoryFormats(params).then(data => data);
-		});
-		Promise.all(allSelectedPromises)
-			.then(res => {
-				return showNotification({
+		updateFormat(inventories.map(v => ({ ...v, checked: true, format: 'native' })), siteId)
+			.then(() =>
+				updateFormat(inventories.map(v => ({ ...v, checked: true, format: 'video' })), siteId)
+			)
+			.then(() =>
+				showNotification({
 					mode: 'success',
 					title: 'Success',
 					message: ' All Inventories updated successsfully',
 					autoDismiss: 5
-				});
-			})
+				})
+			)
 			.catch(err => {
 				console.log(err);
 				return showNotification({
@@ -143,10 +140,13 @@ export default class InventoryTab extends React.Component {
 	};
 
 	handleNativeChange = ({ target: { checked } }, params) => {
-		const { adUnitId } = params;
+		const { adUnitId, app, pageGroup, device } = params;
 		const { selectAllNative, filteredInventories, selectAllVideo } = this.state;
 		const { siteId, showNotification } = this.props;
 		const format = 'native';
+		const inventoryToUpdate = [];
+		const jsonTopush = { checked, format, adUnitId, app, pageGroup, device };
+		inventoryToUpdate.push(jsonTopush);
 
 		if (checked) {
 			selectAllNative.push(adUnitId);
@@ -154,8 +154,8 @@ export default class InventoryTab extends React.Component {
 			selectAllNative.splice(selectAllNative.indexOf(adUnitId), 1);
 		}
 
-		return updateFormat({ ...params, siteId, checked, format })
-			.then(res => {
+		return updateFormat(inventoryToUpdate, siteId)
+			.then(() => {
 				this.setState({
 					selectAllNative,
 					selectAllMultiFormat:
@@ -177,10 +177,13 @@ export default class InventoryTab extends React.Component {
 	};
 
 	handleVideoChange = ({ target: { checked } }, params) => {
-		const { adUnitId } = params;
+		const { adUnitId, app, pageGroup, device } = params;
 		const { selectAllVideo, selectAllNative, filteredInventories } = this.state;
 		const { siteId } = this.props;
 		const format = 'video';
+		const inventoryToUpdate = [];
+		const jsonTopush = { checked, format, adUnitId, app, pageGroup, device };
+		inventoryToUpdate.push(jsonTopush);
 
 		if (checked) {
 			selectAllVideo.push(adUnitId);
@@ -188,8 +191,8 @@ export default class InventoryTab extends React.Component {
 			selectAllVideo.splice(selectAllVideo.indexOf(adUnitId), 1);
 		}
 
-		return updateFormat({ ...params, siteId, checked, format })
-			.then(res => {
+		return updateFormat(inventoryToUpdate, siteId)
+			.then(() => {
 				this.setState({
 					selectAllVideo,
 					selectAllMultiFormat:
