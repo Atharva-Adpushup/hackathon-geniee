@@ -81,23 +81,9 @@ export function startCdnSync(siteId) {
 	return axiosInstance.get(`/headerBidding/startCdnSync/${siteId}`);
 }
 
-export function updateFormat(params) {
-	const { siteId, adUnitId, app, pageGroup, device, checked, format } = params;
+export function updateFormat(inventories, siteId) {
+	// const { siteId, adUnitId, app, pageGroup, device, checked, format } = params;
 	return axiosInstance.put(`/headerBidding/updateFormat/${siteId}`, {
-		checked,
-		adUnitId,
-		app,
-		pageGroup,
-		device,
-		format
-	});
-}
-
-export function updateAllInventoryFormats(params) {
-	const { siteId, app, pageGroup, device } = params;
-	return axiosInstance.put(`/headerBidding/updateAllInventoryFormats/${siteId}`, {
-		pageGroup,
-		device,
-		app
+		inventories
 	});
 }

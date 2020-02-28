@@ -515,9 +515,8 @@ function apiModule() {
 				});
 		},
 
-		updateFormatsOnInnovAdInventory: params => {
-			const { siteId, adUnitId, status, app, format } = params;
-			if (app === 'AP Tag' || app === 'Layout Editor') {
+		updateFormatsOnInnovAdInventory: (siteId, json) => {
+			if (!json || !json.length) {
 				return Promise.resolve();
 			}
 
@@ -529,95 +528,27 @@ function apiModule() {
 						.then(innovativeAdDoc => ({ appBucket, innovativeAdDoc }))
 				)
 				.then(({ appBucket, innovativeAdDoc: { value } }) => {
-					const { ads = [] } = value;
-					if (!adUnitId) {
-						ads.map(val => {
-							const { networkData = {}, network } = val;
-							if (!networkData.formats) networkData.formats = ['display'];
-							!networkData.formats.includes(format) && !!(network === 'adpTags')
-								? networkData.formats.push(format)
-								: null;
-						});
-					} else {
-						const matchedAdUnit = ads.find(({ id }) => id === adUnitId);
-						const { networkData = {} } = matchedAdUnit;
-						if (!networkData.formats) networkData.formats = ['display'];
-						if (status === true) {
-							!networkData.formats.includes(format) ? networkData.formats.push(format) : null;
-						} else {
-							networkData.formats.includes(format)
-								? networkData.formats.splice(networkData.formats.indexOf(format), 1)
-								: null;
-						}
-					}
-					return appBucket.replaceAsync(`fmrt::${siteId}`, value) && value;
-				})
-				.catch(err => {
-					if (err.code === 13) {
-						return [];
-					}
+					for (const inventory of json) {
+						for (const ad of value.ads) {
+							const { networkData = {}, network } = ad;
+							const { format, adUnitId } = inventory;
+							if (ad.id === adUnitId) {
+								if (!networkData.formats) networkData.formats = ['display'];
 
-					throw err;
-				});
-		},
-
-		updateFormatsOnLayoutInventory: params => {
-			const { siteId, adUnitId, status, pageGroup, device, app, format } = params;
-			if (app === 'AP Tag' || app === 'Innovative Ads') {
-				return Promise.resolve();
-			}
-			return couchbase
-				.connectToAppBucket()
-				.then(appBucket =>
-					appBucket
-						.getAsync(`chnl::${siteId}:${device}:${pageGroup}`, {})
-						.then(layoutEditorDoc => ({ appBucket, layoutEditorDoc }))
-				)
-				.then(({ appBucket, layoutEditorDoc: { value } }) => {
-					const { variations = {} } = value;
-
-					const keys = Object.keys(variations);
-					keys.forEach(variationId => {
-						const current = variations[variationId];
-						const { sections = {} } = current;
-						if (!adUnitId) {
-							for (let adUnitId in sections) {
-								const { ads = {} } = sections[adUnitId];
-								const adIds = Object.keys(ads);
-
-								adIds.forEach(adId => {
-									const currentAdId = ads[adId];
-									const { networkData = {}, network } = currentAdId;
-
-									if (!networkData.formats) networkData.formats = ['display'];
-
+								if (inventory.checked)
 									!networkData.formats.includes(format) && !!(network === 'adpTags')
 										? networkData.formats.push(format)
 										: null;
-								});
-							}
-						} else {
-							if (!sections[adUnitId]) return;
-							const { ads = {} } = sections[adUnitId];
-
-							const adIds = Object.keys(ads);
-							return adIds.forEach(adId => {
-								const currentAdId = ads[adId];
-								const { networkData = {} } = currentAdId;
-
-								if (!networkData.formats) networkData.formats = ['display'];
-								if (status === true) {
-									!networkData.formats.includes(format) ? networkData.formats.push(format) : null;
-								} else {
+								else {
 									networkData.formats.includes(format)
 										? networkData.formats.splice(networkData.formats.indexOf(format), 1)
 										: null;
 								}
-							});
+							} else continue;
 						}
-					});
+					}
 
-					return appBucket.replaceAsync(`chnl::${siteId}:${device}:${pageGroup}`, value) && value;
+					return appBucket.replaceAsync(`fmrt::${siteId}`, value);
 				})
 				.catch(err => {
 					if (err.code === 13) {
@@ -628,39 +559,119 @@ function apiModule() {
 				});
 		},
 
-		updateFormatsOnApTagInventory: params => {
-			const { siteId, adUnitId, status, app, format } = params;
-			if (app === 'Layout Editor' || app === 'Innovative Ads') {
+		updateFormatsOnLayoutInventory: (siteId, json) => {
+			if (!json || !json.length) {
 				return Promise.resolve();
 			}
+
+			const jsonByChannels = {};
+			for (const obj of json) {
+				const { pageGroup, device, adUnitId, checked, format } = obj;
+				const key = `${device}:${pageGroup}`;
+
+				if (!jsonByChannels[key]) {
+					jsonByChannels[key] = { list: [] };
+				}
+
+				if (!jsonByChannels[key].device && !jsonByChannels[key].pageGroup) {
+					jsonByChannels[key].device = device;
+					jsonByChannels[key].pageGroup = pageGroup;
+				}
+
+				jsonByChannels[key].list.push({ adUnitId, checked, format });
+			}
+
+			const promiseArr = [];
+			for (const objKey in jsonByChannels) {
+				const { device, pageGroup, list: inventoryArr } = jsonByChannels[objKey];
+
+				promiseArr.push(
+					channelModel.getChannel(siteId, device, pageGroup).then(channel => {
+						const { data: channelData } = channel;
+
+						for (const inventory of inventoryArr) {
+							// eslint-disable-next-line no-restricted-syntax
+							if (channelData.variations && Object.keys(channelData.variations).length) {
+								for (const variationKey in channelData.variations) {
+									const variation = channelData.variations[variationKey];
+									if (variation.sections && Object.keys(variation.sections).length) {
+										for (const sectionKey in variation.sections) {
+											const section = variation.sections[sectionKey];
+											if (section.id !== inventory.adUnitId) continue;
+											if (section.ads && Object.keys(section.ads).length) {
+												for (const adKey in section.ads) {
+													const ad = section.ads[adKey];
+													if (!ad.networkData.formats) ad.networkData.formats = ['display'];
+
+													if (inventory.checked)
+														!ad.networkData.formats.includes(inventory.format) &&
+														!!(ad.network === 'adpTags')
+															? ad.networkData.formats.push(inventory.format)
+															: null;
+													else {
+														ad.networkData.formats.includes(inventory.format)
+															? ad.networkData.formats.splice(
+																	ad.networkData.formats.indexOf(inventory.format),
+																	1
+															  )
+															: null;
+													}
+												}
+											} else {
+												continue;
+											}
+										}
+									} else {
+										continue;
+									}
+								}
+							} else {
+								throw new AdPushupError('Target Inventory not found');
+							}
+						}
+
+						return channel.save();
+					})
+				);
+			}
+
+			return Promise.all(promiseArr);
+		},
+
+		updateFormatsOnApTagInventory: (siteId, json) => {
+			if (!json || !json.length) {
+				return Promise.resolve();
+			}
+
 			return couchbase
 				.connectToAppBucket()
 				.then(appBucket =>
-					appBucket.getAsync(`tgmr::${siteId}`, {}).then(apTagDoc => ({ appBucket, apTagDoc }))
+					appBucket
+						.getAsync(`tgmr::${siteId}`, {})
+						.then(innovativeAdDoc => ({ appBucket, innovativeAdDoc }))
 				)
-				.then(({ appBucket, apTagDoc: { value } }) => {
-					const { ads = [] } = value;
-					if (!adUnitId) {
-						ads.map(val => {
-							const { networkData = {}, network } = val;
-							if (!networkData.formats) networkData.formats = ['display'];
-							!networkData.formats.includes(format) && !!(network === 'adpTags')
-								? networkData.formats.push(format)
-								: null;
-						});
-					} else {
-						const matchedAdUnit = ads.find(({ id }) => id === adUnitId);
-						const { networkData = {} } = matchedAdUnit;
-						if (!networkData.formats) networkData.formats = ['display'];
-						if (status === true) {
-							!networkData.formats.includes(format) ? networkData.formats.push(format) : null;
-						} else {
-							networkData.formats.includes(format)
-								? networkData.formats.splice(networkData.formats.indexOf(format), 1)
-								: null;
+				.then(({ appBucket, innovativeAdDoc: { value } }) => {
+					for (const inventory of json) {
+						for (const ad of value.ads) {
+							const { networkData = {}, network } = ad;
+							const { format, adUnitId } = inventory;
+							if (ad.id === adUnitId) {
+								if (!networkData.formats) networkData.formats = ['display'];
+
+								if (inventory.checked)
+									!networkData.formats.includes(format) && !!(network === 'adpTags')
+										? networkData.formats.push(format)
+										: null;
+								else {
+									networkData.formats.includes(format)
+										? networkData.formats.splice(networkData.formats.indexOf(format), 1)
+										: null;
+								}
+							} else continue;
 						}
 					}
-					return appBucket.replaceAsync(`tgmr::${siteId}`, value) && value;
+
+					return appBucket.replaceAsync(`tgmr::${siteId}`, value);
 				})
 				.catch(err => {
 					if (err.code === 13) {
@@ -671,11 +682,11 @@ function apiModule() {
 				});
 		},
 
-		updateFormats: params => {
+		updateFormats: (siteId, json) => {
 			return Promise.all([
-				API.updateFormatsOnInnovAdInventory(params),
-				API.updateFormatsOnLayoutInventory(params),
-				API.updateFormatsOnApTagInventory(params)
+				API.updateFormatsOnInnovAdInventory(siteId, json.innovativeAds),
+				API.updateFormatsOnLayoutInventory(siteId, json.layoutEditor),
+				API.updateFormatsOnApTagInventory(siteId, json.apTag)
 			]);
 		},
 
