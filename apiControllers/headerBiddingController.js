@@ -613,54 +613,36 @@ router
 	.put('/updateFormat/:siteId', (req, res) => {
 		const { siteId } = req.params;
 		const { email } = req.user;
-		const { checked, adUnitId, app, pageGroup, device, format } = req.body;
-		let params = {};
+		const { inventories } = req.body;
 
-		if (!app || !adUnitId || !siteId || !format) {
-			return res.status(httpStatus.BAD_REQUEST).json({ error: 'Invalid data received' });
-		}
+		const categorizedJSON = { layoutEditor: [], apTag: [], innovativeAds: [] };
+		for (const inventory of inventories) {
+			const { app, adUnitId, format } = inventory;
 
-		switch (app) {
-			case 'Layout Editor': {
-				params = { siteId, adUnitId, status: checked, pageGroup, device, app, format };
-				break;
+			if (!app || !adUnitId || !siteId || !format) {
+				return res.status(httpStatus.BAD_REQUEST).json({ error: 'Invalid data received' });
 			}
-			case 'AP Tag': {
-				params = { siteId, adUnitId, status: checked, app, format };
-				break;
+
+			switch (app) {
+				case 'Layout Editor': {
+					categorizedJSON.layoutEditor.push(inventory);
+					break;
+				}
+				case 'AP Tag': {
+					categorizedJSON.apTag.push(inventory);
+					break;
+				}
+				case 'Innovative Ads': {
+					categorizedJSON.innovativeAds.push(inventory);
+					break;
+				}
+				default:
 			}
-			case 'Innovative Ads': {
-				params = { siteId, adUnitId, status: checked, app, format };
-				break;
-			}
-			default:
-		}
-
-		return userModel
-			.verifySiteOwner(email, siteId)
-			.then(() => headerBiddingModel.updateFormats(params))
-			.then(() => res.status(httpStatus.OK).json({ success: 'Format updated successfully' }))
-			.catch(() =>
-				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error!' })
-			);
-	})
-
-	.put('/updateAllInventoryFormats/:siteId', (req, res) => {
-		const { siteId } = req.params;
-		const { email } = req.user;
-		const { app, pageGroup, device } = req.body;
-
-		const params = { siteId, pageGroup, device, app };
-
-		if (!app || !siteId) {
-			return res.status(httpStatus.BAD_REQUEST).json({ error: 'Invalid data received' });
 		}
 
 		return userModel
 			.verifySiteOwner(email, siteId)
-			.then(() => headerBiddingModel.updateFormats({ ...params, format: 'native' }))
-			.then(() => headerBiddingModel.updateFormats({ ...params, format: 'video' }))
-
+			.then(() => headerBiddingModel.updateFormats(siteId, categorizedJSON))
 			.then(() => res.status(httpStatus.OK).json({ success: 'Format updated successfully' }))
 			.catch(() =>
 				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error!' })
