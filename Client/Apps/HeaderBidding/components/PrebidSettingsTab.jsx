@@ -16,7 +16,10 @@ import { fetchPrebidSettings, updatePrebidSettings } from '../../../services/hbS
 
 class PrebidSettingsTab extends React.Component {
 	state = {
-		errors: { timeOut: '' },
+		errors: {
+			timeOut: '',
+			initialTimeOut: ''
+		},
 		isSavingSettings: false
 	};
 
@@ -27,15 +30,15 @@ class PrebidSettingsTab extends React.Component {
 		});
 	}
 
-	handleTimeOut = ({ target: { value: timeOut } }) => {
+	handleTimeOut = ({ target: { value: timeOut } }, type) => {
 		// eslint-disable-next-line no-param-reassign
 		timeOut = Number(timeOut);
 
 		this.setState(state => ({
-			timeOut,
+			[type]: timeOut,
 			errors: {
 				...state.errors,
-				timeOut: !(!Number.isNaN(timeOut) && timeOut > 500 && timeOut < 10000)
+				[type]: !(!Number.isNaN(timeOut) && timeOut > 500 && timeOut < 10000)
 					? 'Timeout should be between 500ms to 10000ms'
 					: ''
 			}
@@ -48,21 +51,31 @@ class PrebidSettingsTab extends React.Component {
 
 	savePrebidSettings = e => {
 		e.preventDefault();
+
+		const {
+			errors: { timeOut: timeOutError, initialTimeOut: initialTimeOutError }
+		} = this.state;
+
+		if (timeOutError || initialTimeOutError) {
+			return alert('Please resolve the error before saving');
+		}
+
 		// eslint-disable-next-line no-alert
 		const confirmed = window.confirm('Are you sure?');
 
 		if (!confirmed) return;
 
 		const { siteId, showNotification, setUnsavedChangesAction } = this.props;
-		const { timeOut, formats } = this.state;
+		const { timeOut, initialTimeOut, formats } = this.state;
+
+		const isValidTimeout = time => !Number.isNaN(time) && time >= 500 && time <= 10000;
 
 		if (
-			!Number.isNaN(timeOut) &&
-			timeOut >= 500 &&
-			timeOut <= 10000 &&
+			isValidTimeout(timeOut) &&
+			isValidTimeout(initialTimeOut) &&
 			formats.indexOf('display') > -1
 		) {
-			const newPrebidSettings = { timeOut, formats };
+			const newPrebidSettings = { timeOut, initialTimeOut, formats };
 
 			this.setState({ isSavingSettings: true });
 			updatePrebidSettings(siteId, newPrebidSettings)
@@ -94,11 +107,12 @@ class PrebidSettingsTab extends React.Component {
 	renderForm = () => {
 		const {
 			timeOut,
+			initialTimeOut,
 			currency: { code: currencyCode },
 			formats,
 			availableFormats,
 			adServer,
-			errors: { timeOut: timeOutError },
+			errors: { timeOut: timeOutError, initialTimeOut: initialTimeOutError },
 			isSavingSettings
 		} = this.state;
 
@@ -106,7 +120,27 @@ class PrebidSettingsTab extends React.Component {
 			<Form onSubmit={this.savePrebidSettings}>
 				<FormGroup controlId="pb-timeout" className="form-row clearfix">
 					<Col componentClass={ControlLabel} sm={6}>
-						Time-Out (ms)
+						Initial Time-Out (ms)
+					</Col>
+					<Col sm={6}>
+						<InputBox
+							type="number"
+							name="pb-timeout"
+							classNames="pb-input"
+							value={initialTimeOut}
+							onChange={e => this.handleTimeOut(e, 'initialTimeOut')}
+						/>
+					</Col>
+					{!!initialTimeOutError && (
+						<HelpBlock className="error-message" style={{ padding: '0 1.5rem' }}>
+							{initialTimeOutError}
+						</HelpBlock>
+					)}
+				</FormGroup>
+
+				<FormGroup controlId="pb-timeout" className="form-row clearfix">
+					<Col componentClass={ControlLabel} sm={6}>
+						Refresh Time-Out (ms)
 					</Col>
 					<Col sm={6}>
 						<InputBox
@@ -114,10 +148,14 @@ class PrebidSettingsTab extends React.Component {
 							name="pb-timeout"
 							classNames="pb-input"
 							value={timeOut}
-							onChange={this.handleTimeOut}
+							onChange={e => this.handleTimeOut(e, 'timeOut')}
 						/>
 					</Col>
-					{!!timeOutError && <HelpBlock>{timeOutError}</HelpBlock>}
+					{!!timeOutError && (
+						<HelpBlock className="error-message" style={{ padding: '0 1.5rem' }}>
+							{timeOutError}
+						</HelpBlock>
+					)}
 				</FormGroup>
 
 				<div className="form-row clearfix">

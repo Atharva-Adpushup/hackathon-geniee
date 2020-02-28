@@ -43,6 +43,7 @@
 		}
 	},
 	"globals": {
+		"alert": true,
 		"window": true,
 		"document": true,
 		"localStorage": true,
