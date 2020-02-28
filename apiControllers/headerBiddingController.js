@@ -326,14 +326,14 @@ router
 		const { siteId } = req.params;
 		const { email } = req.user;
 		const newPrebidConfig = req.body;
-		const { timeOut, initialTimeOut, formats } = newPrebidConfig;
+		const { timeOut, refreshTimeOut, formats } = newPrebidConfig;
 
 		const isValidTimeout = timeOut => !Number.isNaN(timeOut) && timeOut >= 500 && timeOut <= 10000;
 
 		if (
 			!(
 				isValidTimeout(timeOut) &&
-				isValidTimeout(initialTimeOut) &&
+				isValidTimeout(refreshTimeOut) &&
 				formats.indexOf('display') > -1
 			)
 		) {
