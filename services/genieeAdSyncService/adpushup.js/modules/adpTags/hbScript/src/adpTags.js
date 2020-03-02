@@ -75,12 +75,16 @@ var adpTags = {
 				optionalParam.multipleAdSizes;
 			var services = optionalParam.services;
 			var formats =
-				config.PREBID_CONFIG && config.PREBID_CONFIG.formats
-					? config.PREBID_CONFIG.formats
+				config.PREBID_CONFIG &&
+				config.PREBID_CONFIG.prebidConfig &&
+				config.PREBID_CONFIG.prebidConfig.formats
+					? config.PREBID_CONFIG.prebidConfig.formats
 					: constants.PREBID.DEFAULT_FORMATS;
 			var timeout =
-				config.PREBID_CONFIG && config.PREBID_CONFIG.timeOut
-					? config.PREBID_CONFIG.timeOut
+				config.PREBID_CONFIG &&
+				config.PREBID_CONFIG.prebidConfig &&
+				config.PREBID_CONFIG.prebidConfig.timeOut
+					? config.PREBID_CONFIG.prebidConfig.timeOut
 					: constants.PREBID.TIMEOUT;
 
 			this.adpSlots[containerId] = {

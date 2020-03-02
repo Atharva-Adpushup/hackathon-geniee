@@ -28,11 +28,14 @@ var auction = {
 
 		return this.end(adpBatchId);
 	},
-	requestBids: function(pbjs, adpBatchId) {
+	requestBids: function(pbjs, adpBatchId, isRefreshBatch = false) {
 		var that = this;
+		var timeOut = isRefreshBatch
+			? config.PREBID_CONFIG.prebidConfig.refreshTimeOut || constants.PREBID.TIMEOUT
+			: config.PREBID_CONFIG.prebidConfig.timeOut || constants.PREBID.TIMEOUT;
 
 		pbjs.requestBids({
-			timeout: config.PREBID_CONFIG.timeOut || constants.PREBID.TIMEOUT,
+			timeout: timeOut,
 			bidsBackHandler: that.getAuctionResponse.bind(that, adpBatchId)
 		});
 	},
@@ -173,13 +176,12 @@ var auction = {
 
 		this.setBidderAliases(pbjs);
 	},
-	start: function(prebidSlots, adpBatchId) {
+	start: function(prebidSlots, adpBatchId, isRefreshBatch) {
 		var pbjs = window._apPbJs;
-
 		pbjs.que.push(
 			function() {
 				this.setPrebidConfig(pbjs, prebidSlots);
-				this.requestBids(pbjs, adpBatchId);
+				this.requestBids(pbjs, adpBatchId, isRefreshBatch);
 			}.bind(this)
 		);
 	}

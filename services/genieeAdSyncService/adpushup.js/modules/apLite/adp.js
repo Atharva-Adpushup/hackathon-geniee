@@ -76,12 +76,16 @@ var $ = require('../../libs/jquery'),
 				optionalParam
 			) {
 				var formats =
-					config.PREBID_CONFIG && config.PREBID_CONFIG.formats
-						? config.PREBID_CONFIG.formats
+					config.PREBID_CONFIG &&
+					config.PREBID_CONFIG.prebidConfig &&
+					config.PREBID_CONFIG.prebidConfig.formats
+						? config.PREBID_CONFIG.prebidConfig.formats
 						: constants.PREBID.DEFAULT_FORMATS;
 				var timeout =
-					config.PREBID_CONFIG && config.PREBID_CONFIG.timeOut
-						? config.PREBID_CONFIG.timeOut
+					config.PREBID_CONFIG &&
+					config.PREBID_CONFIG.prebidConfig &&
+					config.PREBID_CONFIG.prebidConfig.timeOut
+						? config.PREBID_CONFIG.prebidConfig.timeOut
 						: constants.PREBID.TIMEOUT;
 				var size = allSizes[0];
 
