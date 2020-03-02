@@ -135,6 +135,7 @@ class AdCodeGenerator extends Component {
 					overrideActive: false,
 					overrideSizeTo: null,
 					logWritten: false,
+					formats: ['display'],
 					isBackwardCompatibleSizes: true,
 					keyValues: {
 						FP_S_A: 0

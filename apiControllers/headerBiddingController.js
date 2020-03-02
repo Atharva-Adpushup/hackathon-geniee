@@ -11,6 +11,8 @@ const FormValidator = require('../helpers/FormValidator');
 const schema = require('../helpers/schema');
 const commonConsts = require('../configs/commonConsts');
 const adpushup = require('../helpers/adpushupEvent');
+const { sendSuccessResponse, sendErrorResponse } = require('../helpers/commonFunctions');
+const { errorHandler } = require('../helpers/routeHelpers');
 
 const router = express.Router();
 
@@ -606,6 +608,45 @@ router
 
 				return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Something went wrong' });
 			});
+	})
+
+	.put('/updateFormat/:siteId', (req, res) => {
+		const { siteId } = req.params;
+		const { email } = req.user;
+		const { inventories } = req.body;
+
+		const categorizedJSON = { layoutEditor: [], apTag: [], innovativeAds: [] };
+		for (const inventory of inventories) {
+			const { app, adUnitId, format } = inventory;
+
+			if (!app || !adUnitId || !siteId || !format) {
+				return res.status(httpStatus.BAD_REQUEST).json({ error: 'Invalid data received' });
+			}
+
+			switch (app) {
+				case 'Layout Editor': {
+					categorizedJSON.layoutEditor.push(inventory);
+					break;
+				}
+				case 'AP Tag': {
+					categorizedJSON.apTag.push(inventory);
+					break;
+				}
+				case 'Innovative Ads': {
+					categorizedJSON.innovativeAds.push(inventory);
+					break;
+				}
+				default:
+			}
+		}
+
+		return userModel
+			.verifySiteOwner(email, siteId)
+			.then(() => headerBiddingModel.updateFormats(siteId, categorizedJSON))
+			.then(() => res.status(httpStatus.OK).json({ success: 'Format updated successfully' }))
+			.catch(() =>
+				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error!' })
+			);
 	});
 
 module.exports = router;
