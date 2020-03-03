@@ -90,6 +90,12 @@ var auction = {
 						val: function(bidResponse) {
 							return bidResponse.pbDg; // Dense granularity
 						}
+					},
+					{
+						key: keys.FORMAT,
+						val: function(bidResponse) {
+							return bidResponse.mediaType; // Dense granularity
+						}
 					}
 				]
 			}
