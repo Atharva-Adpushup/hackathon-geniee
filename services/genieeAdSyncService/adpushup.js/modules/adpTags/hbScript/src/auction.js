@@ -94,7 +94,7 @@ var auction = {
 					{
 						key: keys.FORMAT,
 						val: function(bidResponse) {
-							return bidResponse.mediaType; // Dense granularity
+							return bidResponse.mediaType; // Current Ad Format
 						}
 					}
 				]
