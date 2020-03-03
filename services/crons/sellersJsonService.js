@@ -177,7 +177,7 @@ function writeDataToTempFile() {
 		if (fs.existsSync(filenames.new)) {
 			fs.unlinkSync(filenames.new);
 		}
-		fs.writeFile(filenames.new, JSON.stringify(fileOutput, null, 4), function(error) {
+		fs.writeFile(filenames.new, JSON.stringify(fileOutput), function(error) {
 			if (error) {
 				colorLog('red', '\nERROR WHILE STARTING WRITE DATA\n', error);
 				if (fs.existsSync(filenames.new)) {
