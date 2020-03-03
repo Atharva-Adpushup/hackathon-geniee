@@ -30,7 +30,7 @@ let confidentialCompanyNames = ['media.net'];
 let ignoredEmails = ['@mailinator', '@adpushup'];
 
 function getUsersQueryForBucket(bucketName) {
-	let queryString = `SELECT email, sites[0].domain siteDomain FROM ${bucketName} WHERE meta().id LIKE 'user::%' AND ARRAY_LENGTH(sites) > 0;`;
+	let queryString = `SELECT email, sites[0].domain siteDomain, sellerId FROM ${bucketName} WHERE meta().id LIKE 'user::%' AND ARRAY_LENGTH(sites) > 0;`;
 	return couchbase.N1qlQuery.fromString(queryString);
 }
 
@@ -177,7 +177,7 @@ function writeDataToTempFile() {
 		if (fs.existsSync(filenames.new)) {
 			fs.unlinkSync(filenames.new);
 		}
-		fs.writeFile(filenames.new, JSON.stringify(fileOutput), function(error) {
+		fs.writeFile(filenames.new, JSON.stringify(fileOutput, null, 4), function(error) {
 			if (error) {
 				colorLog('red', '\nERROR WHILE STARTING WRITE DATA\n', error);
 				if (fs.existsSync(filenames.new)) {
