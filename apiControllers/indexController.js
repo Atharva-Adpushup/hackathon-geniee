@@ -49,6 +49,7 @@ function createNewUser(params) {
 	params.site = utils.getSafeUrl(params.site);
 	params.adNetworks = consts.user.fields.default.adNetworks; // ['Other']
 	params.pageviewRange = consts.user.fields.default.pageviewRange; // 5000-15000
+	params.sellerId = md5(params.email);
 
 	params.utmSource = params.utmSource || '';
 	params.utmMedium = params.utmMedium || '';
