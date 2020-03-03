@@ -78,6 +78,7 @@ router
 			email,
 			prebidConfig: {
 				timeOut: commonConsts.hbGlobalSettingDefaults.prebidTimeout,
+				refreshTimeOut: commonConsts.hbGlobalSettingDefaults.prebidRefreshTimeout,
 				formats: commonConsts.hbGlobalSettingDefaults.defaultFormats
 			}
 		};
