@@ -5,7 +5,7 @@ import CustomToggleSwitch from '../../../../../Components/CustomToggleSwitch/ind
 import FieldGroup from '../../../../../Components/Layout/FieldGroup';
 import InputBox from '../../../../../Components/InputBox/index';
 import CustomButton from '../../../../../Components/CustomButton/index';
-import { formatDate } from '../../../../../helpers/commonFunctions';
+// import { formatDate } from '../../../../../helpers/commonFunctions';
 import { ADPUSHUP_NETWORK_ID } from '../../../../../../configs/commonConsts';
 
 class Settings extends Component {
@@ -166,13 +166,13 @@ class Settings extends Component {
 			poweredByBanner,
 			isAdsLabelOn,
 			adsLabel,
-			revenueShare,
+			// revenueShare,
 			status
 		} = this.state;
 		const { site } = this.props;
 
 		const { siteId, siteDomain } = site;
-		const effectRevenueShareDate = formatDate(+new Date(), 'subtract', 2);
+		// const effectRevenueShareDate = formatDate(+new Date(), 'subtract', 2);
 
 		return (
 			<Col xs={4} style={{ borderRight: '1px dashed #ccc' }}>
@@ -277,7 +277,7 @@ class Settings extends Component {
 					placeholder="AdPushup Percentage"
 					className="u-padding-v4 u-padding-h4"
 				/>
-				<FieldGroup
+				{/* <FieldGroup
 					name="revenueShare"
 					value={revenueShare}
 					type="number"
@@ -287,7 +287,7 @@ class Settings extends Component {
 					id={`revenueShare-input-${siteId}-${siteDomain}`}
 					placeholder={`Revenue Share - Any changes will be effective from ${effectRevenueShareDate}`}
 					className="u-padding-v4 u-padding-h4"
-				/>
+				/> */}
 				<CustomButton variant="primary" className="pull-right" onClick={this.handleSave}>
 					Save
 				</CustomButton>
