@@ -1,8 +1,13 @@
 import React, { Fragment } from 'react';
 import sortBy from 'lodash/sortBy';
+import moment from 'moment';
 import isEmpty from 'lodash/isEmpty';
 import { Link } from 'react-router-dom';
 import { Button } from '@/Client/helpers/react-bootstrap-imports';
+import 'react-dates/initialize';
+import { DateRangePicker } from 'react-dates';
+import 'react-dates/lib/css/_datepicker.css';
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Card from '../../../Components/Layout/Card';
 import EstimatedEarningsContainer from '../containers/EstimatedEarningsContainer';
@@ -184,7 +189,15 @@ class Dashboard extends React.Component {
 
 	getDisplayData = wid => {
 		const { widgetsConfig } = this.state;
-		const { selectedDate, selectedSite, path, name } = widgetsConfig[wid];
+		const {
+			selectedDate,
+			selectedSite,
+			path,
+			name,
+			customDateRange,
+			startDate,
+			endDate
+		} = widgetsConfig[wid];
 		const {
 			sites,
 			reportsMeta,
@@ -192,9 +205,18 @@ class Dashboard extends React.Component {
 				data: { email }
 			}
 		} = this.props;
+
+		let params;
+		if (customDateRange) {
+			params = {
+				fromDate: moment(startDate).format('YYYY-MM-DD'),
+				toDate: moment(endDate).format('YYYY-MM-DD')
+			};
+		} else {
+			params = getDateRange(selectedDate);
+		}
 		const { site: reportingSites } = reportsMeta.data;
 		const siteIds = Object.keys(sites);
-		const params = getDateRange(selectedDate);
 		const hidPerApOriginData =
 			name == 'per_ap_original' &&
 			reportingSites &&
@@ -291,37 +313,95 @@ class Dashboard extends React.Component {
 		const isDemoUser = checkDemoUserEmail(email);
 		const { site: reportingSites } = reportsMeta.data;
 		const { widgetsConfig, quickDates, sites } = this.state;
-		const { selectedDate, selectedSite, name } = widgetsConfig[wid];
+		const { selectedDate, selectedSite, name, focusedInput, startDate, endDate } = widgetsConfig[
+			wid
+		];
 		const layoutSites = reportingSites ? this.getLayoutSites(sites, reportingSites) : [];
 		const isPerfApOriginalWidget = !!(name === 'per_ap_original');
 		const isPerfApOriginalWidgetForDemoUser = !!(isDemoUser && isPerfApOriginalWidget);
 		const computedSelectedSite = isPerfApOriginalWidgetForDemoUser ? sites[1].value : selectedSite;
 		let sitesToShow = isPerfApOriginalWidget ? layoutSites : sites;
 
+		const handleDatesChange = ({ startDate, endDate }) => {
+			widgetsConfig[wid].startDate = startDate;
+			widgetsConfig[wid].endDate = endDate;
+			/*	
+				setting state only when focusedInput='endDate', that is when
+				the user selects the endDate and the date-picker closes,
+				otherwise selecting startDate would cause re-render
+				which in not required
+			*/
+			if (startDate && endDate && focusedInput === 'endDate') {
+				widgetsConfig[wid].isLoading = true;
+				this.setState({ widgetsConfig }, () => this.getDisplayData(wid));
+			}
+		};
+
+		const handleDatePresetSelect = selection => {
+			widgetsConfig[wid].selectedDate = selection;
+
+			if (selection === 'customDateRange') {
+				widgetsConfig[wid].customDateRange = true;
+				return this.setState({ widgetsConfig });
+			}
+			widgetsConfig[wid].isLoading = true;
+			widgetsConfig[wid].customDateRange = false;
+			this.setState({ widgetsConfig }, () => this.getDisplayData(wid));
+		};
+
+		const handleFocusUpdate = focusedInput => {
+			widgetsConfig[wid].focusedInput = focusedInput;
+			this.setState({ widgetsConfig });
+		};
+
 		sitesToShow = isDemoUser ? sites : sitesToShow;
 
 		return (
 			<div className="aligner aligner--hEnd">
 				{name !== 'estimated_earnings' ? (
-					<div className="u-margin-r4">
-						{/* eslint-disable */}
-						<label className="u-text-normal u-margin-r2">Quick Dates</label>
-						<SelectBox
-							id="performance-date"
-							wrapperClassName="display-inline"
-							pullRight
-							isClearable={false}
-							isSearchable={false}
-							selected={selectedDate}
-							options={quickDates}
-							onSelect={date => {
-								widgetsConfig[wid]['selectedDate'] = date;
-								widgetsConfig[wid].isLoading = true;
-								this.setState({ widgetsConfig }, () => this.getDisplayData(wid));
-							}}
-						/>
+					<div>
+						<div className="u-margin-r4 display-inline">
+							<SelectBox
+								id="performance-date"
+								wrapperClassName="display-inline"
+								pullRight
+								isClearable={false}
+								isSearchable={false}
+								selected={selectedDate}
+								options={quickDates}
+								onSelect={handleDatePresetSelect}
+							/>
+						</div>
 
-						{/* eslint-enable */}
+						{widgetsConfig[wid].customDateRange && (
+							<div className="u-margin-r4 display-inline">
+								<div className="display-inline">
+									<DateRangePicker
+										startDate={moment(startDate)}
+										endDate={moment(endDate)}
+										onDatesChange={handleDatesChange}
+										/*
+											data prior to 1st Aug, 2019 is present in the old console 
+											therefore disabling dates before 1st Aug, 2019
+										*/
+										isOutsideRange={day =>
+											day.isAfter(moment()) ||
+											day.isBefore(
+												moment()
+													.startOf('month')
+													.set({ year: 2019, month: 7 })
+											)
+										}
+										focusedInput={focusedInput}
+										onFocusChange={handleFocusUpdate}
+										showDefaultInputIcon
+										hideKeyboardShortcutsPanel
+										minimumNights={0}
+										displayFormat="DD-MM-YYYY"
+									/>
+								</div>
+							</div>
+						)}
 					</div>
 				) : (
 					''
