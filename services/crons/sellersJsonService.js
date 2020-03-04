@@ -19,37 +19,27 @@ const filenames = {
 	backup: path.resolve(fileDirectory, `bkp_sellers.json`)
 };
 
-const VERSION = '1.0';
 const SELLER_TYPE = 'PUBLISHER';
 const APP_BUCKET = 'AppBucket';
 const AP_APP_BUCKET = 'apAppBucket';
 
 let errors = [];
+
+let confidentialDomainValidator = {
+	'media.net': function(domain) {
+		return domain.indexOf('media.net') === 0;
+	}
+};
 let confidentialEmails = ['@media.net'];
 let confidentialCompanyNames = ['media.net'];
 let ignoredEmails = ['@mailinator', '@adpushup'];
 
 function getUsersQueryForBucket(bucketName) {
-	let queryString = `SELECT email, sites[0].domain siteDomain, sellerId FROM ${bucketName} WHERE meta().id LIKE 'user::%' AND ARRAY_LENGTH(sites) > 0;`;
+	let queryString = `SELECT email, sellerId, ARRAY site.domain FOR site IN sites END AS siteDomains FROM ${bucketName} WHERE meta().id LIKE 'user::%' AND ARRAY_LENGTH(sites) > 0;`;
 	return couchbase.N1qlQuery.fromString(queryString);
 }
 
-let fileOutput = {
-	contact_email: commonConsts.SUPPORT_EMAIL,
-	contact_address: commonConsts.ADDRESS.USA,
-	version: VERSION,
-	identifiers: [
-		{
-			name: 'TAG-ID',
-			value: 'b0b8ff8485794fdd'
-		},
-		{
-			name: 'DUNS',
-			value: '116775197'
-		}
-	],
-	sellers: []
-};
+let fileOutput = commonConsts.SELLERS_JSON.fileConfig;
 
 function colorLog(color, ...messages) {
 	let colors = {
@@ -65,6 +55,18 @@ function colorLog(color, ...messages) {
 
 function isIgnoredEmail(email) {
 	return ignoredEmails.some(ignoredEmail => !!email.includes(ignoredEmail));
+}
+
+function isConfidentialDomain(domain) {
+	for (confidentialDomain in confidentialDomainValidator) {
+		if (
+			domain.includes(confidentialDomain) &&
+			confidentialDomainValidator[confidentialDomain](domain)
+		) {
+			return true;
+		}
+	}
+	return false;
 }
 
 function isConfidentialEmail(email) {
@@ -103,8 +105,13 @@ function formatAndFilterUsers(users) {
 			return output;
 		}
 		user.bucket = 'AppBucket';
+		user.siteDomain = user.siteDomains[0];
+		user.hasConfidentialDomain = user.siteDomains.some(domain =>
+			isConfidentialDomain(domanize(domain))
+		);
 		output.push(user);
 
+		delete user.siteDomains;
 		return output;
 	}, []);
 
@@ -132,7 +139,9 @@ function createSellerId(email) {
 function getPreparedSiteObj(siteDomain, user) {
 	let siteObj = {};
 	let isConfidential =
-		isConfidentialEmail(user.email) || isConfidentialCompanyName(user.companyName);
+		user.hasConfidentialDomain ||
+		isConfidentialEmail(user.email) ||
+		isConfidentialCompanyName(user.companyName);
 
 	if (!isConfidential) {
 		siteObj.name = user.companyName;
