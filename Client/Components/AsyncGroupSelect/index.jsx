@@ -69,42 +69,45 @@ class AsyncGroupSelect extends Component {
 		const { selectedFilters } = this.state;
 		selectedFilters[filter.value] = selectedFilters[filter.value] || {};
 		this.setState({ isLoading: true });
-		props.getSelectedFilter(filter).then(response => {
-			if (response.status === 504) {
-				this.setState({ isLoading: false });
-				return showNotification({
-					mode: 'error',
-					title: 'Operation Failed',
-					message: 'Request Timeout',
-					autoDismiss: 5
-				});
-			}
-
-			if (
-				response.status == 200 &&
-				response.data &&
-				response.data.result &&
-				response.data.result.length > 0
-			) {
-				this.setState({
-					filterValues: response.data.result,
-					filterResult: response.data.result,
-					selectedFilterKey: filter.value,
-					selectedFilters,
-					showFilterValues: true,
-					isLoading: false
-				});
-			} else {
-				this.setState({
-					filterValues: [],
-					filterResult: [],
-					selectedFilterKey: filter.value,
-					selectedFilters,
-					showFilterValues: true,
-					isLoading: false
-				});
-			}
-		});
+		props
+			.getSelectedFilter(filter)
+			.then(response => {
+				if (
+					response.status == 200 &&
+					response.data &&
+					response.data.result &&
+					response.data.result.length > 0
+				) {
+					this.setState({
+						filterValues: response.data.result,
+						filterResult: response.data.result,
+						selectedFilterKey: filter.value,
+						selectedFilters,
+						showFilterValues: true,
+						isLoading: false
+					});
+				} else {
+					this.setState({
+						filterValues: [],
+						filterResult: [],
+						selectedFilterKey: filter.value,
+						selectedFilters,
+						showFilterValues: true,
+						isLoading: false
+					});
+				}
+			})
+			.catch(err => {
+				if (err.response.status.toString().startsWith('5')) {
+					this.setState({ isLoading: false });
+					return showNotification({
+						mode: 'error',
+						title: 'Operation Failed',
+						message: 'Something went wrong !',
+						autoDismiss: 5
+					});
+				}
+			});
 	}
 
 	hideFilterValues() {
