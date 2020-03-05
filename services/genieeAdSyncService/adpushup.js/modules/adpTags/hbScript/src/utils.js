@@ -222,6 +222,11 @@ var utils = {
 		}
 
 		return bidders;
+	},
+	getVideoPlayerSize: function(prebidSizes) {
+		const multipliedValue = prebidSizes.map(val => val.reduce((a, b) => a * b));
+		const index = multipliedValue.indexOf(Math.max(...multipliedValue));
+		return prebidSizes[index];
 	}
 };
 
