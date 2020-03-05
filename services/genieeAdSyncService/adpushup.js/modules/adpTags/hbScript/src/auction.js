@@ -28,14 +28,15 @@ var auction = {
 
 		return this.end(adpBatchId);
 	},
-	requestBids: function(pbjs, adpBatchId, isRefreshBatch = false) {
+	requestBids: function(pbjs, adpBatchId, slotCodes, hasRefreshSlots = false) {
 		var that = this;
-		var timeOut = isRefreshBatch
+		var timeOut = hasRefreshSlots
 			? config.PREBID_CONFIG.prebidConfig.refreshTimeOut || constants.PREBID.TIMEOUT
 			: config.PREBID_CONFIG.prebidConfig.timeOut || constants.PREBID.TIMEOUT;
 
 		pbjs.requestBids({
 			timeout: timeOut,
+			adUnitCodes: slotCodes,
 			bidsBackHandler: that.getAuctionResponse.bind(that, adpBatchId)
 		});
 	},
@@ -125,7 +126,7 @@ var auction = {
 			}
 		}
 	},
-	setPrebidConfig: function(pbjs, prebidSlots) {
+	setPrebidConfig: function(pbjs) {
 		var pbConfig = {
 			rubicon: {
 				singleRequest: true
@@ -170,18 +171,37 @@ var auction = {
 
 		pbjs.setConfig(pbConfig);
 
-		pbjs.addAdUnits(prebidSlots);
-
 		pbjs.bidderSettings = this.getBidderSettings();
 
 		this.setBidderAliases(pbjs);
 	},
-	start: function(prebidSlots, adpBatchId, isRefreshBatch) {
-		var pbjs = window._apPbJs;
+	addSlotsToPbjs: function(pbjs, prebidSlots) {
+		return pbjs.addAdUnits(prebidSlots);
+	},
+	start: function(prebidSlots, adpBatchId) {
+		var pbjs = window._apPbJs,
+			slotCodes = [],
+			hasRefreshSlots,
+			newSlots = [],
+			refreshSlots = [],
+			pbjsSlots = pbjs.adUnits.map(slot => slot.code);
+
+		function slotExistsInPbjs(slot) {
+			return pbjsSlots.indexOf(slot.code) !== -1;
+		}
+
+		prebidSlots.forEach(slot => {
+			slotCodes.push(slot.code);
+			slotExistsInPbjs(slot) ? refreshSlots.push(slot) : newSlots.push(slot);
+		});
+
+		hasRefreshSlots = !!refreshSlots.length;
+
 		pbjs.que.push(
 			function() {
 				this.setPrebidConfig(pbjs, prebidSlots);
-				this.requestBids(pbjs, adpBatchId, isRefreshBatch);
+				newSlots.length && this.addSlotsToPbjs(pbjs, newSlots);
+				this.requestBids(pbjs, adpBatchId, slotCodes, hasRefreshSlots);
 			}.bind(this)
 		);
 	}

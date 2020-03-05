@@ -11,13 +11,8 @@ var hb = {
 	createPrebidSlots: function(adpSlotsBatch) {
 		var prebidSlots = [];
 		var adpBatchId = adpSlotsBatch[0].batchId;
-		var isRefreshBatch = true;
 
 		adpSlotsBatch.forEach(function(adpSlot) {
-			if (!adpSlot.toBeRefreshed) {
-				isRefreshBatch = false;
-			}
-
 			var responsiveSizes = [];
 			if (!adp.config.apLiteActive && adpSlot.isResponsive) {
 				responsiveSizes = responsiveAds.getAdSizes(adpSlot.optionalParam.adId).collection;
@@ -110,7 +105,7 @@ var hb = {
 
 		return !prebidSlots.length
 			? auction.end(adpBatchId)
-			: auction.start(prebidSlots, adpBatchId, isRefreshBatch);
+			: auction.start(prebidSlots, adpBatchId);
 	},
 	setBidWonListener: function(w) {
 		w._apPbJs.que.push(function() {
