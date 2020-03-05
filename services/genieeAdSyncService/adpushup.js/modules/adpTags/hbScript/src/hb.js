@@ -39,6 +39,7 @@ var hb = {
 			) {
 				size = adpSlot.optionalParam.overrideSizeTo.split('x');
 			}
+			const playerSize = utils.getVideoPlayerSize(prebidSizes);
 
 			var computedBidders = JSON.parse(JSON.stringify(adpSlot.bidders));
 			var sizeConfig = config.PREBID_CONFIG.deviceConfig.sizeConfig;
