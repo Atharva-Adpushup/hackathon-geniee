@@ -178,7 +178,8 @@ class ApLite extends Component {
 
 			const oldAdUnitList = uploadedAdUnits.length ? uploadedAdUnits : oldAdUnits;
 			const oldAdUnitsWithDfpNameAndCode = oldAdUnitList.map(
-				({ refreshSlot, refreshInterval, headerBidding, sectionId, isActive, ...rest }) => rest
+				({ refreshSlot, refreshInterval, headerBidding, sectionId, formats, isActive, ...rest }) =>
+					rest
 			);
 
 			const unCommonAdUnits = differenceWith(
@@ -207,6 +208,7 @@ class ApLite extends Component {
 						sectionId: uuid.v4(),
 						refreshSlot: adRefresh,
 						refreshInterval: selectedRefreshRate,
+						formats: ['display', 'video', 'native'],
 						headerBidding: true
 					}
 				)
@@ -234,8 +236,15 @@ class ApLite extends Component {
 						{
 							isLoading: false,
 							uploadedAdUnits: adUnits.map(
-								({ refreshSlot, refreshInterval, headerBidding, sectionId, isActive, ...rest }) =>
-									rest
+								({
+									refreshSlot,
+									refreshInterval,
+									headerBidding,
+									sectionId,
+									formats,
+									isActive,
+									...rest
+								}) => rest
 							)
 						},
 						this.handleReset

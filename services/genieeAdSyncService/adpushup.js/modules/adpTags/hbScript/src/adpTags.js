@@ -80,8 +80,10 @@ var adpTags = {
 				constants.PREBID.DEFAULT_FORMATS;
 			var bidders = optionalParam.headerBidding ? utils.getBiddersForSlot(size, formats) : [];
 			var timeout =
-				config.PREBID_CONFIG && config.PREBID_CONFIG.timeOut
-					? config.PREBID_CONFIG.timeOut
+				config.PREBID_CONFIG &&
+				config.PREBID_CONFIG.prebidConfig &&
+				config.PREBID_CONFIG.prebidConfig.timeOut
+					? config.PREBID_CONFIG.prebidConfig.timeOut
 					: constants.PREBID.TIMEOUT;
 
 			this.adpSlots[containerId] = {

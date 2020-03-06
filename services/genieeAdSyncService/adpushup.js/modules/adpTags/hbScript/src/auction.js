@@ -28,11 +28,16 @@ var auction = {
 
 		return this.end(adpBatchId);
 	},
-	requestBids: function(pbjs, adpBatchId) {
+	requestBids: function(pbjs, adpBatchId, slotCodes, hasRefreshSlots = false) {
 		var that = this;
+		var timeOut = hasRefreshSlots
+			? config.PREBID_CONFIG.prebidConfig.refreshTimeOut ||
+			  config.PREBID_CONFIG.prebidConfig.timeOut
+			: config.PREBID_CONFIG.prebidConfig.timeOut;
 
 		pbjs.requestBids({
-			timeout: config.PREBID_CONFIG.timeOut || constants.PREBID.TIMEOUT,
+			timeout: timeOut || constants.PREBID.TIMEOUT,
+			adUnitCodes: slotCodes,
 			bidsBackHandler: that.getAuctionResponse.bind(that, adpBatchId)
 		});
 	},
@@ -90,6 +95,12 @@ var auction = {
 						val: function(bidResponse) {
 							return bidResponse.pbDg; // Dense granularity
 						}
+					},
+					{
+						key: keys.FORMAT,
+						val: function(bidResponse) {
+							return bidResponse.mediaType; // Current Ad Format
+						}
 					}
 				]
 			}
@@ -122,7 +133,7 @@ var auction = {
 			}
 		}
 	},
-	setPrebidConfig: function(pbjs, prebidSlots) {
+	setPrebidConfig: function(pbjs) {
 		var pbConfig = {
 			rubicon: {
 				singleRequest: true
@@ -171,19 +182,37 @@ var auction = {
 
 		pbjs.setConfig(pbConfig);
 
-		pbjs.addAdUnits(prebidSlots);
-
 		pbjs.bidderSettings = this.getBidderSettings();
 
 		this.setBidderAliases(pbjs);
 	},
+	addSlotsToPbjs: function(pbjs, prebidSlots) {
+		return pbjs.addAdUnits(prebidSlots);
+	},
 	start: function(prebidSlots, adpBatchId) {
-		var pbjs = window._apPbJs;
+		var pbjs = window._apPbJs,
+			slotCodes = [],
+			hasRefreshSlots,
+			newSlots = [],
+			refreshSlots = [],
+			pbjsSlots = pbjs.adUnits.map(slot => slot.code);
+
+		function slotExistsInPbjs(slot) {
+			return pbjsSlots.indexOf(slot.code) !== -1;
+		}
+
+		prebidSlots.forEach(slot => {
+			slotCodes.push(slot.code);
+			slotExistsInPbjs(slot) ? refreshSlots.push(slot) : newSlots.push(slot);
+		});
+
+		hasRefreshSlots = !!refreshSlots.length;
 
 		pbjs.que.push(
 			function() {
-				this.setPrebidConfig(pbjs, prebidSlots);
-				this.requestBids(pbjs, adpBatchId);
+				this.setPrebidConfig(pbjs);
+				newSlots.length && this.addSlotsToPbjs(pbjs, newSlots);
+				this.requestBids(pbjs, adpBatchId, slotCodes, hasRefreshSlots);
 			}.bind(this)
 		);
 	}

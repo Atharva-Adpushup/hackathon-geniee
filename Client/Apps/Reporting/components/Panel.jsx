@@ -767,7 +767,8 @@ class Panel extends Component {
 			isCustomizeChartLegend,
 			isForOps,
 			userSites,
-			user
+			user,
+			showNotification
 		} = this.props;
 
 		const allAvailableMetrics = this.getAllAvailableMetrics(
@@ -824,6 +825,7 @@ class Panel extends Component {
 						isDemoUser={isValid}
 						userSites={userSites}
 						user={user}
+						showNotification={showNotification}
 					/>
 				</Col>
 				<Col sm={12} className="u-margin-t5">

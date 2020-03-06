@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import momentPropTypes from 'react-moment-proptypes';
 import moment from 'moment';
 import omit from 'lodash/omit';
+import 'react-dates/initialize'; // required by DateRangePicker to work
 
 import { withStyles, withStylesPropTypes, css } from 'react-with-styles';
 
@@ -154,6 +155,7 @@ class DateRangePickerWrapper extends React.Component {
 
 	render() {
 		const { focusedInput, startDate, endDate } = this.state;
+		const { showClearDates = true, displayFormat = 'll' } = this.props;
 
 		// autoFocus, autoFocusEndDate, initialStartDate and initialEndDate are helper props for the
 		// example wrapper but are not props on the SingleDatePicker itself and
@@ -178,9 +180,9 @@ class DateRangePickerWrapper extends React.Component {
 					endDate={endDate}
 					showDefaultInputIcon
 					hideKeyboardShortcutsPanel
-					showClearDates
+					showClearDates={showClearDates}
 					minimumNights={0}
-					displayFormat="ll"
+					displayFormat={displayFormat}
 				/>
 			</div>
 		);

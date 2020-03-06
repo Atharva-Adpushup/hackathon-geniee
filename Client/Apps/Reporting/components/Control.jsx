@@ -226,7 +226,7 @@ class Control extends Component {
 
 	render() {
 		const { state } = this;
-		const { reportType } = this.props;
+		const { reportType, showNotification } = this.props;
 
 		return (
 			<Fragment>
@@ -275,6 +275,10 @@ class Control extends Component {
 							datesUpdated={({ startDate, endDate }) =>
 								this.setState({ startDate, endDate }, this.onControlChange.bind(null, reportType))
 							}
+							/*
+								data prior to 1st Aug, 2019 is present in the old console 
+								therefore disabling dates before 1st Aug, 2019
+							*/
 							isOutsideRange={day =>
 								day.isAfter(moment()) ||
 								day.isBefore(
@@ -298,6 +302,7 @@ class Control extends Component {
 							selectedFilters={state.selectedFilters}
 							onFilterValueChange={this.onFilteChange}
 							getSelectedFilter={this.getSelectedFilter}
+							showNotification={showNotification}
 						/>
 						{/* eslint-enable */}
 					</div>
