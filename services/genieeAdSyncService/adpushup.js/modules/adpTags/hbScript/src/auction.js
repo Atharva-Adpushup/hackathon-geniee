@@ -31,11 +31,12 @@ var auction = {
 	requestBids: function(pbjs, adpBatchId, slotCodes, hasRefreshSlots = false) {
 		var that = this;
 		var timeOut = hasRefreshSlots
-			? config.PREBID_CONFIG.prebidConfig.refreshTimeOut || constants.PREBID.TIMEOUT
-			: config.PREBID_CONFIG.prebidConfig.timeOut || constants.PREBID.TIMEOUT;
+			? config.PREBID_CONFIG.prebidConfig.refreshTimeOut ||
+			  config.PREBID_CONFIG.prebidConfig.timeOut
+			: config.PREBID_CONFIG.prebidConfig.timeOut;
 
 		pbjs.requestBids({
-			timeout: timeOut,
+			timeout: timeOut || constants.PREBID.TIMEOUT,
 			adUnitCodes: slotCodes,
 			bidsBackHandler: that.getAuctionResponse.bind(that, adpBatchId)
 		});
