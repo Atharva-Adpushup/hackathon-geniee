@@ -199,7 +199,7 @@ var auction = {
 
 		pbjs.que.push(
 			function() {
-				this.setPrebidConfig(pbjs, prebidSlots);
+				this.setPrebidConfig(pbjs);
 				newSlots.length && this.addSlotsToPbjs(pbjs, newSlots);
 				this.requestBids(pbjs, adpBatchId, slotCodes, hasRefreshSlots);
 			}.bind(this)
