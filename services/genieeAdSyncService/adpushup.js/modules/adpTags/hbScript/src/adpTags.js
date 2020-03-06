@@ -67,7 +67,6 @@ var adpTags = {
 		},
 		createSlot: function(containerId, size, placement, optionalParam) {
 			var slotId = optionalParam.dfpAdunit;
-			var bidders = optionalParam.headerBidding ? utils.getBiddersForSlot(size) : [];
 			var isResponsive = optionalParam.isResponsive;
 			var sectionName = optionalParam.sectionName;
 			var multipleAdSizes =
@@ -75,11 +74,11 @@ var adpTags = {
 				optionalParam.multipleAdSizes;
 			var services = optionalParam.services;
 			var formats =
-				config.PREBID_CONFIG &&
-				config.PREBID_CONFIG.prebidConfig &&
-				config.PREBID_CONFIG.prebidConfig.formats
-					? config.PREBID_CONFIG.prebidConfig.formats
-					: constants.PREBID.DEFAULT_FORMATS;
+				(Array.isArray(optionalParam.formats) &&
+					optionalParam.formats.length &&
+					optionalParam.formats) ||
+				constants.PREBID.DEFAULT_FORMATS;
+			var bidders = optionalParam.headerBidding ? utils.getBiddersForSlot(size, formats) : [];
 			var timeout =
 				config.PREBID_CONFIG &&
 				config.PREBID_CONFIG.prebidConfig &&

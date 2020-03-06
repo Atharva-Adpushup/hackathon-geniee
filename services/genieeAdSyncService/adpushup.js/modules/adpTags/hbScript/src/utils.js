@@ -6,6 +6,7 @@ var $ = require('../../../../libs/jquery');
 var config = require('./config');
 var BACKWARD_COMPATIBLE_MAPPING = require('./constants').AD_SIZE_MAPPING.IAB_SIZES
 	.BACKWARD_COMPATIBLE_MAPPING;
+var { bidderParamsMapping } = require('./multiFormatConfig');
 var utils = {
 	currencyConversionActive: function(inputObject) {
 		var inputObject = inputObject || adp.config,
@@ -149,7 +150,19 @@ var utils = {
 			}
 		}
 	},
-	getBiddersForSlot: function(size) {
+	getVideoOrNativeParams: function(format, bidder) {
+		switch (format) {
+			case 'video':
+				return bidderParamsMapping[bidder].videoParams || {};
+
+			case 'native':
+				return bidderParamsMapping[bidder].nativeParams || {};
+
+			default:
+				return {};
+		}
+	},
+	getBiddersForSlot: function(size, formats) {
 		var width = size[0];
 		var height = size[1];
 		var size = width + 'x' + height;
@@ -164,19 +177,39 @@ var utils = {
 
 					if (!bidderData.isPaused) {
 						if (bidderData.sizeLess) {
-							bidders.push({
+							var computedBidderObj = {
 								bidder: bidder,
 								params: bidderData.config
-							});
+							};
+
+							if (bidderParamsMapping[bidder]) {
+								formats.forEach(format => {
+									computedBidderObj.params = {
+										...this.getVideoOrNativeParams(format, bidder),
+										...computedBidderObj.params
+									};
+								});
+							}
+
+							bidders.push(computedBidderObj);
 						}
 
 						if (!bidderData.sizeLess && bidderData.reusable) {
-							const bidderParams = this.getOriginalOrDownwardSizeBidderParams(
+							var bidderParams = this.getOriginalOrDownwardSizeBidderParams(
 								bidderData.config,
 								size
 							);
 
 							if (bidderParams) {
+								if (bidderParamsMapping[bidder]) {
+									formats.forEach(format => {
+										bidderParams = {
+											...this.getVideoOrNativeParams(format, bidder),
+											...bidderParams
+										};
+									});
+								}
+
 								bidders.push({
 									bidder: bidder,
 									params: bidderParams
@@ -189,6 +222,11 @@ var utils = {
 		}
 
 		return bidders;
+	},
+	getVideoPlayerSize: function(prebidSizes) {
+		const multipliedValue = prebidSizes.map(val => val.reduce((a, b) => a * b));
+		const index = multipliedValue.indexOf(Math.max(...multipliedValue));
+		return prebidSizes[index];
 	}
 };
 
