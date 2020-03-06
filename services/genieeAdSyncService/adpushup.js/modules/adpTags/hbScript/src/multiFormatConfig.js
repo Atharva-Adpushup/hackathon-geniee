@@ -1,19 +1,24 @@
 const CONSTANTS = {
 	VIDEO: {
 		RENDERER_URL: 'https://cdn.jwplayer.com/libraries/AQP5aIG2.js',
-		RENDERER_CONFIG: {
-			dismissible: true,
-			displayHeading: true,
-			endstate: 'suspended'
+		JW_PLAYER_CONFIG: {
+			autostart: 'viewable',
+			stretching: 'uniform',
+			mute: true,
+			advertising: {
+				dismissible: true,
+				displayHeading: true,
+				endstate: 'suspended'
+			}
 		},
 		CONTEXT: 'outstream',
 		MIMES: ['video/mp4', 'video/webm'], // JW Player v8 has in-built support for mp4 and webm
-		PROTOCOLS: [3], // VAST 3.0
+		PROTOCOLS: [2, 3, 5, 6], // VAST 2.0, VAST 3.0, VAST 2.0 Wrapper, VAST 3.0 Wrapper
 		API: [2], // VPAID 2.0
 		MINDURATION: 0, // in seconds
-		MAXDURATION: 300, // in seconds
+		MAXDURATION: 300, // in seconds (5 min)
 		LINEARITY: 1, // Linear/In-Stream
-		PLAYBACKMETHOD: 2, // Auto-play sound off
+		PLAYBACKMETHOD: 6, // Entering Viewport with Sound Off by Default
 		PLACEMENT: 2, // In-Banner
 		SKIP: 1 // show skip option
 	}
@@ -29,21 +34,25 @@ const mediaTypesConfig = {
 		mimes: CONSTANTS.VIDEO.MIMES,
 		protocols: CONSTANTS.VIDEO.PROTOCOLS,
 		api: CONSTANTS.VIDEO.API,
-		maxduration: CONSTANTS.VIDEO.MAXDURATION,
-		linearity: CONSTANTS.VIDEO.LINEARITY
+		maxduration: CONSTANTS.VIDEO.MAXDURATION
+		// linearity: CONSTANTS.VIDEO.LINEARITY // ### Rubicon Specific ###
 	},
 	native: {
 		title: {
-			required: true
+			required: true,
+			sendId: true
 		},
 		body: {
-			required: true
+			required: true,
+			sendId: true
 		},
 		image: {
-			required: true
+			required: true,
+			sendId: true
 		},
-		sponsoredBy: {
-			required: true
+		clickUrl: {
+			required: true,
+			sendId: true
 		}
 	}
 };
@@ -52,11 +61,12 @@ const bidderParamsMapping = {
 	conversant: {
 		videoParams: { mimes: CONSTANTS.VIDEO.MIMES }
 	},
-	rubicon: {
-		videoParams: {
-			video: {}
-		}
-	},
+	// Disabled video format on Rubicon
+	// rubicon: {
+	// 	videoParams: {
+	// 		video: {}
+	// 	}
+	// },
 	pubmatic: {
 		videoParams: {
 			video: {

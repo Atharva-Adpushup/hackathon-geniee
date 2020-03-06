@@ -1,5 +1,6 @@
 // Prebid interfacing module
 
+var merge = require('lodash/merge');
 var constants = require('./constants');
 var responsiveAds = require('./responsiveAds');
 var adp = require('./adp');
@@ -66,16 +67,20 @@ var hb = {
 					render: function(bid) {
 						// push to render queue because jwplayer may not be loaded yet.
 						bid.renderer.push(() => {
-							jwplayer(bid.adUnitCode).setup({
-								width: bid.width,
-								height: bid.height,
-								advertising: {
-									outstream: true,
-									client: 'vast',
-									vastxml: bid.vastXml,
-									...multiFormatConstants.VIDEO.RENDERER_CONFIG
-								}
-							});
+							jwplayer(bid.adUnitCode).setup(
+								merge(
+									{
+										width: bid.width,
+										height: bid.height,
+										advertising: {
+											outstream: true,
+											client: 'vast',
+											vastxml: bid.vastXml
+										}
+									},
+									multiFormatConstants.VIDEO.JW_PLAYER_CONFIG
+								)
+							);
 						});
 					}
 				},
