@@ -42,7 +42,6 @@ var hb = {
 
 			var computedBidders = JSON.parse(JSON.stringify(adpSlot.bidders));
 			var sizeConfig = config.PREBID_CONFIG.deviceConfig.sizeConfig;
-
 			computedBidders.forEach(function(val, i) {
 				// find size config of current bidder
 				var index;
@@ -93,9 +92,10 @@ var hb = {
 						break;
 					}
 					case 'video': {
+						const playerSize = utils.getVideoPlayerSize(prebidSizes);
 						prebidSlot.mediaTypes.video = {
 							...mediaTypesConfig.video,
-							playerSize: prebidSizes[0]
+							playerSize
 						};
 						break;
 					}
