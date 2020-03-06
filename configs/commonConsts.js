@@ -217,6 +217,7 @@ module.exports = {
 	bidCpmAdjustments: {},
 	hbGlobalSettingDefaults: {
 		prebidTimeout: 3000,
+		prebidRefreshTimeout: 3000,
 		e3FeedbackUrl: '//e3.adpushup.com/ApexWebService/feedback',
 		targetAllDFP: false,
 		dfpAdUnitTargeting: {
