@@ -75,7 +75,7 @@ var gpt = {
 			// if multiple sizes and fluid doesn't exist then add fluid size
 			(isMultipleSizes && size.indexOf('fluid') === -1 && [...size, 'fluid']) ||
 			// if single size and that's not fluid then create a multisize array and add fluid size
-			(size !== 'fluid' && [size, 'fluid']) ||
+			(!isMultipleSizes && size !== 'fluid' && [size, 'fluid']) ||
 			// else return fluid size as it is
 			size;
 
