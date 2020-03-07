@@ -123,7 +123,12 @@ var hb = {
 	setBidWonListener: function(w) {
 		w._apPbJs.que.push(function() {
 			w._apPbJs.onEvent(constants.EVENTS.PREBID.BID_WON, function(bidData) {
-				utils.log('===BidWon====', bidData);
+				utils.log(
+					`%c===${bidData.mediaType.charAt(0).toUpperCase() +
+						bidData.mediaType.slice(1)}BidWon====`,
+					'background:#00b900; color:white; padding: 5px 8px; font-size:14px; font-weight:bold; border-radius:5px;',
+					bidData
+				);
 
 				var slot = isApLiteActive
 					? window.apLite.adpSlots[bidData.adUnitCode]
