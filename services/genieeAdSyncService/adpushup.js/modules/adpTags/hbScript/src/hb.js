@@ -1,5 +1,6 @@
 // Prebid interfacing module
 
+var merge = require('lodash/merge');
 var constants = require('./constants');
 var responsiveAds = require('./responsiveAds');
 var adp = require('./adp');
@@ -66,16 +67,20 @@ var hb = {
 					render: function(bid) {
 						// push to render queue because jwplayer may not be loaded yet.
 						bid.renderer.push(() => {
-							jwplayer(bid.adUnitCode).setup({
-								width: bid.width,
-								height: bid.height,
-								advertising: {
-									outstream: true,
-									client: 'vast',
-									vastxml: bid.vastXml,
-									...multiFormatConstants.VIDEO.RENDERER_CONFIG
-								}
-							});
+							jwplayer(bid.adUnitCode).setup(
+								merge(
+									{
+										width: bid.width,
+										height: bid.height,
+										advertising: {
+											outstream: true,
+											client: 'vast',
+											vastxml: bid.vastXml
+										}
+									},
+									multiFormatConstants.VIDEO.JW_PLAYER_CONFIG
+								)
+							);
 						});
 					}
 				},
@@ -118,7 +123,12 @@ var hb = {
 	setBidWonListener: function(w) {
 		w._apPbJs.que.push(function() {
 			w._apPbJs.onEvent(constants.EVENTS.PREBID.BID_WON, function(bidData) {
-				utils.log('===BidWon====', bidData);
+				utils.log(
+					`%c===${bidData.mediaType.charAt(0).toUpperCase() +
+						bidData.mediaType.slice(1)}BidWon====`,
+					'background:#00b900; color:white; padding: 5px 8px; font-size:14px; font-weight:bold; border-radius:5px;',
+					bidData
+				);
 
 				var slot = isApLiteActive
 					? window.apLite.adpSlots[bidData.adUnitCode]

@@ -69,6 +69,16 @@ var gpt = {
 			size = isComputedSizes ? computedSizes.concat([]).reverse() : adpSlot.size;
 		}
 
+		var isMultipleSizes =
+			Array.isArray(size) && size.some(val => Array.isArray(val) || val === 'fluid');
+		size =
+			// if multiple sizes and fluid doesn't exist then add fluid size
+			(isMultipleSizes && size.indexOf('fluid') === -1 && [...size, 'fluid']) ||
+			// if single size and that's not fluid then create a multisize array and add fluid size
+			(!isMultipleSizes && size !== 'fluid' && [size, 'fluid']) ||
+			// else return fluid size as it is
+			size;
+
 		if (!adpSlot.gSlot) {
 			adpSlot.gSlot = googletag.defineSlot(
 				'/' + networkId + '/' + adpSlot.optionalParam.dfpAdunitCode,
