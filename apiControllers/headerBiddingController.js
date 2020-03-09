@@ -78,6 +78,7 @@ router
 			email,
 			prebidConfig: {
 				timeOut: commonConsts.hbGlobalSettingDefaults.prebidTimeout,
+				refreshTimeOut: commonConsts.hbGlobalSettingDefaults.prebidRefreshTimeout,
 				formats: commonConsts.hbGlobalSettingDefaults.defaultFormats
 			}
 		};
@@ -326,13 +327,14 @@ router
 		const { siteId } = req.params;
 		const { email } = req.user;
 		const newPrebidConfig = req.body;
-		const { timeOut, formats } = newPrebidConfig;
+		const { timeOut, refreshTimeOut, formats } = newPrebidConfig;
+
+		const isValidTimeout = timeOut => !Number.isNaN(timeOut) && timeOut >= 500 && timeOut <= 10000;
 
 		if (
 			!(
-				!Number.isNaN(timeOut) &&
-				timeOut >= 500 &&
-				timeOut <= 10000 &&
+				isValidTimeout(timeOut) &&
+				isValidTimeout(refreshTimeOut) &&
 				formats.indexOf('display') > -1
 			)
 		) {

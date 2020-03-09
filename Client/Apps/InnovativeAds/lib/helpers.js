@@ -34,51 +34,51 @@ function pagegroupFiltering(
 	});
 	const disabled = new Set();
 
-	let types;
+	// let types;
 
-	/*
-		Finding to which group, ad belongs to and assigning that group to types
-		['stickyLeft', 'stickyRight', 'docked']
-		['stickyTop', 'stickyBottom']
-		['inView']
-	*/
-	if (INTERACTIVE_ADS_TYPES.VERTICAL.includes(format)) {
-		types = INTERACTIVE_ADS_TYPES.VERTICAL;
-	} else if (INTERACTIVE_ADS_TYPES.HORIZONTAL.includes(format)) {
-		types = INTERACTIVE_ADS_TYPES.HORIZONTAL;
-	} else {
-		types = INTERACTIVE_ADS_TYPES.OTHER;
-	}
+	// /*
+	// 	Finding to which group, ad belongs to and assigning that group to types
+	// 	['stickyLeft', 'stickyRight', 'docked']
+	// 	['stickyTop', 'stickyBottom']
+	// 	['inView']
+	// */
+	// if (INTERACTIVE_ADS_TYPES.VERTICAL.includes(format)) {
+	// 	types = INTERACTIVE_ADS_TYPES.VERTICAL;
+	// } else if (INTERACTIVE_ADS_TYPES.HORIZONTAL.includes(format)) {
+	// 	types = INTERACTIVE_ADS_TYPES.HORIZONTAL;
+	// } else {
+	// 	types = INTERACTIVE_ADS_TYPES.OTHER;
+	// }
 
-	/*
-		Iterating over all the filtered pagegroups and finding which all pagegroups need to be disabled as in
-		(All) Channels: ['DESKTOP:HOME', 'DESKTOP:POST', 'MOBILE:POST']
-		Platform: desktop
-		Format: stickyTop
-		Meta Pagegroups/Channel (Active ads log): ['DESKTOP-stickyBottom-DESKTOP:HOME']
-		Current Channel/Pagegroups: ['DESKTOP:HOME']
+	// /*
+	// 	Iterating over all the filtered pagegroups and finding which all pagegroups need to be disabled as in
+	// 	(All) Channels: ['DESKTOP:HOME', 'DESKTOP:POST', 'MOBILE:POST']
+	// 	Platform: desktop
+	// 	Format: stickyTop
+	// 	Meta Pagegroups/Channel (Active ads log): ['DESKTOP-stickyBottom-DESKTOP:HOME']
+	// 	Current Channel/Pagegroups: ['DESKTOP:HOME']
 
-		After processing:
-		Filtered Pagegroups/Channels: ['DESKTOP:HOME', 'DESKTOP:POST']
-		Disabled: ['DESKTOP:HOME']
+	// 	After processing:
+	// 	Filtered Pagegroups/Channels: ['DESKTOP:HOME', 'DESKTOP:POST']
+	// 	Disabled: ['DESKTOP:HOME']
 
-		i.e. we are trying to create/make a stickyTop ad in pagegroup DESKTOP:HOME but it is not allowed
-		as there is already a stickyBottom (similar type: HORIZONTAL) ad active for same DESKTOP:HOME.
-	*/
-	filteredPagegroupsByPlatform.forEach(pg => {
-		let shouldDisable = false;
-		types.forEach(type => {
-			if (listMode && currentPagegroups.includes(pg)) {
-				shouldDisable = false;
-			} else if (meta.pagegroups.includes(`${platform}-${type}-${pg}`)) {
-				shouldDisable = true;
-				return false;
-			}
-		});
-		if (shouldDisable) {
-			disabled.add(pg);
-		}
-	});
+	// 	i.e. we are trying to create/make a stickyTop ad in pagegroup DESKTOP:HOME but it is not allowed
+	// 	as there is already a stickyBottom (similar type: HORIZONTAL) ad active for same DESKTOP:HOME.
+	// */
+	// filteredPagegroupsByPlatform.forEach(pg => {
+	// 	let shouldDisable = false;
+	// 	types.forEach(type => {
+	// 		if (listMode && currentPagegroups.includes(pg)) {
+	// 			shouldDisable = false;
+	// 		} else if (meta.pagegroups.includes(`${platform}-${type}-${pg}`)) {
+	// 			shouldDisable = true;
+	// 			return false;
+	// 		}
+	// 	});
+	// 	if (shouldDisable) {
+	// 		disabled.add(pg);
+	// 	}
+	// });
 
 	return {
 		filteredPagegroupsByPlatform,

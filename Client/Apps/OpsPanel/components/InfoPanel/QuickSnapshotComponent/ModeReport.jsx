@@ -31,13 +31,9 @@ function computeGraphData(displayData) {
 			drilldown: {
 				name: categories[i],
 				categories: result.filter(obj => obj.mode === categories[i]).map(val => val.error_code),
-				data: [
-					...new Set(
-						result
-							.filter(obj => obj.mode === categories[i])
-							.map(val => parseFloat(((val.adpushup_count / totalAdpushupCount) * 100).toFixed(2)))
-					)
-				]
+				data: result
+					.filter(obj => obj.mode === categories[i])
+					.map(val => parseFloat(((val.adpushup_count / totalAdpushupCount) * 100).toFixed(2)))
 			}
 		});
 	}
