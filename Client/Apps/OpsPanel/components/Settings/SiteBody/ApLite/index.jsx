@@ -208,7 +208,7 @@ class ApLite extends Component {
 						sectionId: uuid.v4(),
 						refreshSlot: adRefresh,
 						refreshInterval: selectedRefreshRate,
-						formats: ['display', 'video', 'native'],
+						formats: ['display', 'video'],
 						headerBidding: true
 					}
 				)
