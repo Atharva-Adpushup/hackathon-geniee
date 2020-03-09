@@ -224,9 +224,50 @@ var utils = {
 		return bidders;
 	},
 	getVideoPlayerSize: function(prebidSizes) {
+		const exceptionSizes = [[300, 250], [480, 320], [320, 480], [320, 50]];
+
 		const multipliedValue = prebidSizes.map(val => val.reduce((a, b) => a * b));
 		const index = multipliedValue.indexOf(Math.max(...multipliedValue));
-		return prebidSizes[index];
+		const highestSizeAvailable = prebidSizes[index];
+
+		const width = highestSizeAvailable[0];
+		const height = highestSizeAvailable[1];
+		let highestWidthPossible = width;
+		let highestHeightPossible = height;
+		let n1, n2;
+
+		if (
+			width < height &&
+			!JSON.stringify(exceptionSizes).includes(JSON.stringify(highestSizeAvailable))
+		) {
+			//9:16 aspect ratio
+			n1 = height / 16;
+			highestHeightPossible = parseInt(n1) * 16;
+			highestWidthPossible = parseInt(n1) * 9;
+
+			if (width < highestWidthPossible) {
+				n2 = width / 9;
+				highestHeightPossible = parseInt(n2) * 16;
+				highestWidthPossible = parseInt(n2) * 9;
+			}
+		}
+		if (
+			width >= height &&
+			!JSON.stringify(exceptionSizes).includes(JSON.stringify(highestSizeAvailable))
+		) {
+			//16:9 aspect ratio
+			n1 = width / 16;
+			highestWidthPossible = parseInt(n1) * 16;
+			highestHeightPossible = parseInt(n1) * 9;
+
+			if (height < highestHeightPossible) {
+				n2 = height / 9;
+				highestHeightPossible = parseInt(n2) * 9;
+				highestWidthPossible = parseInt(n2) * 16;
+			}
+		}
+
+		return [highestWidthPossible, highestHeightPossible];
 	}
 };
 
