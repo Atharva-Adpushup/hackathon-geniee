@@ -45,9 +45,9 @@ class PrebidSettingsTab extends React.Component {
 		}));
 	};
 
-	handleFormats = formats => {
-		this.setState({ formats });
-	};
+	// handleFormats = formats => {
+	// 	this.setState({ formats });
+	// };
 
 	savePrebidSettings = e => {
 		e.preventDefault();
@@ -66,16 +66,12 @@ class PrebidSettingsTab extends React.Component {
 		if (!confirmed) return;
 
 		const { siteId, showNotification, setUnsavedChangesAction } = this.props;
-		const { timeOut, refreshTimeOut, formats } = this.state;
+		const { timeOut, refreshTimeOut } = this.state;
 
 		const isValidTimeout = time => !Number.isNaN(time) && time >= 500 && time <= 10000;
 
-		if (
-			isValidTimeout(timeOut) &&
-			isValidTimeout(refreshTimeOut) &&
-			formats.indexOf('display') > -1
-		) {
-			const newPrebidSettings = { timeOut, refreshTimeOut, formats };
+		if (isValidTimeout(timeOut) && isValidTimeout(refreshTimeOut)) {
+			const newPrebidSettings = { timeOut, refreshTimeOut };
 
 			this.setState({ isSavingSettings: true });
 			updatePrebidSettings(siteId, newPrebidSettings)
@@ -109,8 +105,7 @@ class PrebidSettingsTab extends React.Component {
 			timeOut,
 			refreshTimeOut,
 			currency: { code: currencyCode },
-			formats,
-			availableFormats,
+
 			adServer,
 			errors: { timeOut: timeOutError, refreshTimeOut: refreshTimeOutError },
 			isSavingSettings
@@ -171,32 +166,6 @@ class PrebidSettingsTab extends React.Component {
 					</Col>
 					<Col sm={6}>{currencyCode || 'N/A'}</Col>
 				</div>
-
-				<FormGroup controlId="pb-formats" className="form-row clearfix">
-					<Col componentClass={ControlLabel} sm={6}>
-						Formats
-					</Col>
-					<Col sm={6}>
-						<ButtonToolbar>
-							<ToggleButtonGroup
-								type="checkbox"
-								defaultValue={formats}
-								onChange={this.handleFormats}
-							>
-								{availableFormats.map(formatObj => (
-									<Checkbox
-										key={formatObj.value}
-										value={formatObj.value}
-										inline
-										disabled={formatObj.value === 'display'}
-									>
-										{formatObj.name}
-									</Checkbox>
-								))}
-							</ToggleButtonGroup>
-						</ButtonToolbar>
-					</Col>
-				</FormGroup>
 
 				<div className="footer-btns">
 					<CustomButton variant="primary" type="submit" showSpinner={isSavingSettings}>
