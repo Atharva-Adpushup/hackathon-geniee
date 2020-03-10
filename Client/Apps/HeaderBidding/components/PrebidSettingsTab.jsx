@@ -45,10 +45,6 @@ class PrebidSettingsTab extends React.Component {
 		}));
 	};
 
-	// handleFormats = formats => {
-	// 	this.setState({ formats });
-	// };
-
 	savePrebidSettings = e => {
 		e.preventDefault();
 
