@@ -6,6 +6,7 @@ var $ = require('../../../../libs/jquery');
 var config = require('./config');
 var BACKWARD_COMPATIBLE_MAPPING = require('./constants').AD_SIZE_MAPPING.IAB_SIZES
 	.BACKWARD_COMPATIBLE_MAPPING;
+var constants = require('./constants');
 var { bidderParamsMapping } = require('./multiFormatConfig');
 var utils = {
 	currencyConversionActive: function(inputObject) {
@@ -224,50 +225,53 @@ var utils = {
 		return bidders;
 	},
 	getVideoPlayerSize: function(prebidSizes) {
-		const exceptionSizes = [[300, 250], [480, 320], [320, 480], [320, 50]];
-
+		const { VIDEO_PLAYER_EXCEPTION_SIZES } = constants;
 		const multipliedValue = prebidSizes.map(val => val.reduce((a, b) => a * b));
 		const index = multipliedValue.indexOf(Math.max(...multipliedValue));
 		const highestSizeAvailable = prebidSizes[index];
 
-		const width = highestSizeAvailable[0];
-		const height = highestSizeAvailable[1];
-		let highestWidthPossible = width;
-		let highestHeightPossible = height;
-		let n1, n2;
+		const highestWidthPossible = highestSizeAvailable[0];
+		const highestHeightPossible = highestSizeAvailable[1];
+		let playerWidth = highestWidthPossible;
+		let playerHeight = highestHeightPossible;
+		let gcd;
 
 		if (
-			width < height &&
-			!JSON.stringify(exceptionSizes).includes(JSON.stringify(highestSizeAvailable))
+			highestWidthPossible < highestHeightPossible &&
+			!JSON.stringify(VIDEO_PLAYER_EXCEPTION_SIZES).includes(
+				JSON.stringify(highestSizeAvailable)
+			)
 		) {
 			//9:16 aspect ratio
-			n1 = height / 16;
-			highestHeightPossible = parseInt(n1) * 16;
-			highestWidthPossible = parseInt(n1) * 9;
+			gcd = parseInt(highestHeightPossible / 16);
+			playerHeight = gcd * 16;
+			playerWidth = gcd * 9;
 
-			if (width < highestWidthPossible) {
-				n2 = width / 9;
-				highestHeightPossible = parseInt(n2) * 16;
-				highestWidthPossible = parseInt(n2) * 9;
+			if (highestWidthPossible < playerWidth) {
+				gcd = parseInt(highestWidthPossible / 9);
+				playerHeight = gcd * 16;
+				playerWidth = gcd * 9;
 			}
 		}
 		if (
-			width >= height &&
-			!JSON.stringify(exceptionSizes).includes(JSON.stringify(highestSizeAvailable))
+			highestWidthPossible >= highestHeightPossible &&
+			!JSON.stringify(VIDEO_PLAYER_EXCEPTION_SIZES).includes(
+				JSON.stringify(highestSizeAvailable)
+			)
 		) {
 			//16:9 aspect ratio
-			n1 = width / 16;
-			highestWidthPossible = parseInt(n1) * 16;
-			highestHeightPossible = parseInt(n1) * 9;
+			gcd = parseInt(highestWidthPossible / 16);
+			playerWidth = gcd * 16;
+			playerHeight = gcd * 9;
 
-			if (height < highestHeightPossible) {
-				n2 = height / 9;
-				highestHeightPossible = parseInt(n2) * 9;
-				highestWidthPossible = parseInt(n2) * 16;
+			if (highestHeightPossible < playerHeight) {
+				gcd = parseInt(highestHeightPossible / 9);
+				playerHeight = gcd * 9;
+				playerWidth = gcd * 16;
 			}
 		}
 
-		return [highestWidthPossible, highestHeightPossible];
+		return [playerWidth, playerHeight];
 	}
 };
 

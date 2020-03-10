@@ -682,7 +682,8 @@ var constants = {
 	},
 	NETWORK_ID: 103512698,
 	BATCHING_INTERVAL: 50,
-	UTM_SESSION_COOKIE: '_adp_utm_session_'
+	UTM_SESSION_COOKIE: '_adp_utm_session_',
+	VIDEO_PLAYER_EXCEPTION_SIZES : [[300, 250], [480, 320], [320, 480], [320, 50]]
 };
 
 module.exports = constants;
