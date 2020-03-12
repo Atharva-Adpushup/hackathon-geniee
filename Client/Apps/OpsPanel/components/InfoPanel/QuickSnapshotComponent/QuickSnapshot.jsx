@@ -1,4 +1,5 @@
 import React, { Fragment } from 'react';
+import moment from 'moment';
 import sortBy from 'lodash/sortBy';
 import isEmpty from 'lodash/isEmpty';
 import orderBy from 'lodash/orderBy';
@@ -6,6 +7,10 @@ import cloneDeep from 'lodash/cloneDeep';
 import { Link } from 'react-router-dom';
 import { Button } from '@/Client/helpers/react-bootstrap-imports';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import 'react-dates/initialize';
+import { DateRangePicker } from 'react-dates';
+import 'react-dates/lib/css/_datepicker.css';
+
 import '../../../../../scss/pages/dashboard/index.scss';
 import Empty from '../../../../../Components/Empty/index';
 import Card from '../../../../../Components/Layout/Card';
@@ -194,6 +199,7 @@ class QuickSnapshot extends React.Component {
 	};
 
 	getTop10SitesData = (path, selectedDate) => {
+		console.log('gettting top 10 sites data for date', path, selectedDate);
 		const params = { ...getDateRange(selectedDate), isSuperUser: true };
 
 		return reportService
@@ -420,7 +426,16 @@ class QuickSnapshot extends React.Component {
 	getDisplayData = wid => {
 		const { widgetsConfig, reportingSites } = this.state;
 		const { isReportTypeAccount, isReportTypeGlobal } = this.getReportTypeValidation();
-		const { selectedDate, selectedSite, selectedMetric, path, name } = widgetsConfig[wid];
+		const {
+			selectedDate,
+			selectedSite,
+			selectedMetric,
+			path,
+			name,
+			customDateRange,
+			startDate,
+			endDate
+		} = widgetsConfig[wid];
 		const {
 			sites,
 			widgetsName: { PER_AP_ORIGINAL },
@@ -429,7 +444,14 @@ class QuickSnapshot extends React.Component {
 
 		const metaData = globalReportMetaData;
 		const siteIds = Object.keys(sites);
-		const params = getDateRange(selectedDate);
+		let params = getDateRange(selectedDate);
+		if (customDateRange) {
+			params = {
+				fromDate: moment(startDate).format('YYYY-MM-DD'),
+				toDate: moment(endDate).format('YYYY-MM-DD')
+			};
+		}
+
 		const isWidgetNamePerAPOriginal = !!(name === PER_AP_ORIGINAL);
 		const hidPerApOriginData =
 			isReportTypeAccount &&
@@ -656,9 +678,18 @@ class QuickSnapshot extends React.Component {
 		} = this.props;
 		const { widgetsConfig, quickDates, sites, reportingSites } = this.state;
 		const { isReportTypeGlobal, isReportTypeSite } = this.getReportTypeValidation();
-		const { selectedDate, selectedSite, selectedMetric, name, sitesList, metrics } = widgetsConfig[
-			wid
-		];
+		const {
+			selectedDate,
+			selectedSite,
+			selectedMetric,
+			name,
+			sitesList,
+			metrics,
+			customDateRange,
+			focusedInput,
+			startDate,
+			endDate
+		} = widgetsConfig[wid];
 		const layoutSites = reportingSites ? this.getLayoutSites(sites, reportingSites) : [];
 		const isWidgetNamePerAPOriginal = !!(name === PER_AP_ORIGINAL);
 		const shouldShowQuickDatesWidget = !!(name !== ESTIMATED_EARNINGS);
@@ -670,6 +701,49 @@ class QuickSnapshot extends React.Component {
 			: [];
 		let sitesToShow = isWidgetNamePerAPOriginal ? layoutSites : sites;
 		const shouldSetGlobalSites = !!(isReportTypeGlobal && sitesList && websiteWidgetValidated);
+
+		const handleCustomDateChange = ({ startDate, endDate }) => {
+			widgetsConfig[wid].startDate = startDate;
+			widgetsConfig[wid].endDate = endDate;
+			/*	
+				setting state only when focusedInput='endDate', that is when
+				the user selects the endDate and the date-picker closes,
+				otherwise selecting startDate would cause re-render
+				which in not required
+			*/
+			if (startDate && endDate && focusedInput === 'endDate') {
+				widgetsConfig[wid].isLoading = true;
+				widgetsConfig[wid].sitesList = [];
+				this.setState({ widgetsConfig }, () => this.getDisplayData(wid));
+			}
+		};
+
+		const handleDatePresetSelect = selection => {
+			widgetsConfig[wid].selectedDate = selection;
+
+			if (selection === 'customDateRange') {
+				widgetsConfig[wid].customDateRange = true;
+				return this.setState({ widgetsConfig });
+			}
+
+			widgetsConfig[wid].sitesList = [];
+			widgetsConfig[wid].isLoading = true;
+			widgetsConfig[wid].customDateRange = false;
+			this.setState({ widgetsConfig }, () => this.getDisplayData(wid));
+		};
+
+		const handleFocusUpdate = focusedInput => {
+			widgetsConfig[wid].focusedInput = focusedInput;
+			this.setState({ widgetsConfig });
+		};
+
+		const filterDates = day =>
+			day.isAfter(moment()) ||
+			day.isBefore(
+				moment()
+					.startOf('month')
+					.set({ year: 2019, month: 7 })
+			);
 
 		if (shouldSetGlobalSites) sitesToShow = sitesList.concat([]);
 
@@ -696,8 +770,6 @@ class QuickSnapshot extends React.Component {
 								this.setState({ widgetsConfig }, () => this.getDisplayData(wid));
 							}}
 						/>
-
-						{/* eslint-enable */}
 					</div>
 				) : (
 					''
@@ -706,7 +778,6 @@ class QuickSnapshot extends React.Component {
 				{shouldShowQuickDatesWidget ? (
 					<div className="u-margin-r4">
 						{/* eslint-disable */}
-						<label className="u-text-normal u-margin-r2">Quick Dates</label>
 						<SelectBox
 							id={`date-selectbox-${name}`}
 							wrapperClassName="display-inline"
@@ -715,19 +786,37 @@ class QuickSnapshot extends React.Component {
 							isSearchable={false}
 							selected={selectedDate}
 							options={quickDates}
-							onSelect={date => {
-								// if (isReportTypeGlobal) widgetsConfig[wid]['selectedSite'] = 'all';
-								widgetsConfig[wid]['selectedDate'] = date;
-								widgetsConfig[wid].isLoading = true;
-								widgetsConfig[wid]['sitesList'] = [];
-								this.setState({ widgetsConfig }, () => this.getDisplayData(wid));
-							}}
+							onSelect={handleDatePresetSelect}
 						/>
 
 						{/* eslint-enable */}
 					</div>
 				) : (
 					''
+				)}
+
+				{customDateRange && (
+					<div className="u-margin-r4 display-inline">
+						<div className="display-inline">
+							{/* eslint-enable */}
+							<DateRangePicker
+								startDate={moment(startDate)}
+								endDate={moment(endDate)}
+								onDatesChange={handleCustomDateChange}
+								/*
+									data prior to 1st Aug, 2019 is present in the old console 
+									therefore disabling dates before 1st Aug, 2019
+								*/
+								isOutsideRange={filterDates}
+								focusedInput={focusedInput}
+								onFocusChange={handleFocusUpdate}
+								showDefaultInputIcon
+								hideKeyboardShortcutsPanel
+								minimumNights={0}
+								displayFormat="DD-MM-YYYY"
+							/>
+						</div>
+					</div>
 				)}
 
 				{shouldShowWebsiteWidget ? (
