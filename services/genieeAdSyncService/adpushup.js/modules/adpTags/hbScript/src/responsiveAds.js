@@ -206,6 +206,7 @@ var getFilteredData = function(inputData, maxHeight) {
 	return inputData;
 };
 var getComputedAdSizes = function(elementSelector) {
+	if (!elementSelector || !document.getElementById(elementSelector)) return { collection: [] };
 	var computedElement = document.getElementById(elementSelector).parentNode,
 		immediateParentData = getImmediateParentData(computedElement),
 		recursiveParentData = getRecursiveParentData(computedElement),
