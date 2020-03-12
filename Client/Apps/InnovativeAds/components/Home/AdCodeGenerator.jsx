@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import { Col, ProgressBar } from '@/Client/helpers/react-bootstrap-imports';
+
 import CustomList from './CustomList';
+import { Row, Col, ProgressBar } from '@/Client/helpers/react-bootstrap-imports';
 import { Docked, Default, InView, StickyTop } from './Formats/index';
 import { PLATFORMS, FORMATS, SIZES, displayAdMessage } from '../../configs/commonConsts';
 import CustomMessage from '../../../../Components/CustomMessage/index';
@@ -9,7 +10,8 @@ import Loader from '../../../../Components/Loader';
 import { pagegroupFiltering } from '../../lib/helpers';
 import ActionCard from '../../../../Components/ActionCard';
 import CustomToggleSwitch from '../../../../Components/CustomToggleSwitch/index.jsx';
-import { Row } from 'react-bootstrap';
+
+const getAdsByType = (ads, type) => ads.filter(ad => ad.formatData.type === type);
 
 class AdCodeGenerator extends Component {
 	constructor(props) {
@@ -270,8 +272,8 @@ class AdCodeGenerator extends Component {
 	}
 
 	renderPagegroups() {
-		const { platform, format, pagegroups } = this.state;
 		const { meta, channels } = this.props;
+		const { platform, format, pagegroups } = this.state;
 		const { filteredPagegroupsByPlatform, disabled } = pagegroupFiltering(
 			channels,
 			platform,
@@ -325,19 +327,23 @@ class AdCodeGenerator extends Component {
 	}
 
 	renderIndividualFormat() {
-		const { format } = this.state;
+		const { ads } = this.props;
+		const { format, pagegroups } = this.state;
 		const save = {
 			renderFn: this.renderButton,
 			label: 'Create Ad',
 			handler: this.saveHandler
 		};
+		const dockedAds = getAdsByType(ads, 'docked');
+		const inviewAds = getAdsByType(ads, 'inView');
+
 		switch (format) {
 			case 'stickyTop':
 				return <StickyTop save={save} />;
 			case 'inView':
-				return <InView save={save} />;
+				return <InView save={save} currentInviewAds={inviewAds} selectedPagegroups={pagegroups} />;
 			case 'docked':
-				return <Docked save={save} />;
+				return <Docked save={save} currentDockedAds={dockedAds} selectedPagegroups={pagegroups} />;
 			default:
 				return <Default save={save} />;
 		}

@@ -22,7 +22,8 @@ class Home extends Component {
 	}
 
 	componentDidMount() {
-		const { meta, fetchMeta, match } = this.props;
+		const { meta, fetchMeta, match, loading, fetchAds } = this.props;
+		if (loading) fetchAds({ siteId: match.params.siteId });
 		if (!meta.fetched) fetchMeta(match.params.siteId);
 	}
 
@@ -84,7 +85,7 @@ class Home extends Component {
 	}
 
 	render() {
-		const { meta } = this.props;
+		const { meta, loading } = this.props;
 		const { redirectUrl } = this.state;
 		const activeTab = this.getActiveTab();
 		const activeItem = IA_NAV_ITEMS[activeTab];
@@ -95,7 +96,7 @@ class Home extends Component {
 
 		return (
 			<div>
-				{!meta.fetched ? (
+				{!meta.fetched || loading ? (
 					<Loader />
 				) : (
 					<React.Fragment>
