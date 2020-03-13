@@ -113,12 +113,13 @@ var utils = {
 		return objURL;
 	},
 	getOriginalOrDownwardSizeBidderParams: function(allSizesParams, inventorySize) {
-		if (!allSizesParams || !Object.keys(allSizesParams).length) return;
+		const params = [];
 
-		if (inventorySize === 'responsivexresponsive' && allSizesParams['responsive'])
-			return allSizesParams['responsive'];
+		if (!allSizesParams || !Object.keys(allSizesParams).length) return params;
 
-		if (allSizesParams[inventorySize]) return allSizesParams[inventorySize];
+		if (inventorySize === 'responsivexresponsive') {
+			return allSizesParams['responsive'] ? [allSizesParams['responsive']] : params;
+		}
 
 		for (const originalSize in BACKWARD_COMPATIBLE_MAPPING) {
 			const formattedOriginalSize = originalSize.replace(',', 'x');
@@ -130,12 +131,14 @@ var utils = {
 
 				for (let backwardSize of backwardSizes) {
 					backwardSize = backwardSize.join('x');
-					if (allSizesParams[backwardSize]) return allSizesParams[backwardSize];
+					if (allSizesParams[backwardSize]) {
+						params.push(allSizesParams[backwardSize]);
+					}
 				}
-
-				return;
 			}
 		}
+
+		return params;
 	},
 	getVideoOrNativeParams: function(format, bidder) {
 		switch (format) {
@@ -187,20 +190,26 @@ var utils = {
 								size
 							);
 
-							if (bidderParams) {
-								if (bidderParamsMapping[bidder]) {
-									formats.forEach(format => {
-										bidderParams = {
-											...this.getVideoOrNativeParams(format, bidder),
-											...bidderParams
-										};
-									});
-								}
+							if (bidderParams.length) {
+								for (const params of bidderParams) {
+									if (params) {
+										let bidderParams = params;
 
-								bidders.push({
-									bidder: bidder,
-									params: bidderParams
-								});
+										if (bidderParamsMapping[bidder]) {
+											formats.forEach(format => {
+												bidderParams = {
+													...this.getVideoOrNativeParams(format, bidder),
+													...bidderParams
+												};
+											});
+										}
+
+										bidders.push({
+											bidder,
+											params: bidderParams
+										});
+									}
+								}
 							}
 						}
 					}
