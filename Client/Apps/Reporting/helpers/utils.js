@@ -36,6 +36,7 @@ const computeCsvData = data => {
 		const csvBodyRow = tableColumns.map(header => {
 			if (header.accessor === 'siteName') {
 				// eslint-disable-next-line no-unused-expressions
+				if (!row[header.accessor].props) return row[header.accessor];
 				return row[header.accessor].props.children;
 			}
 			return row[header.accessor];
