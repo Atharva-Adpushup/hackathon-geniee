@@ -131,7 +131,10 @@ var gpt = {
 								slot = window.apLite.adpSlots[slotElementId];
 							if (slot) {
 								// stop refresh if line Item is not price priority type
-								var lineItemId = event.sourceAgnosticLineItemId;
+								var lineItemId =
+									(event.sourceAgnosticLineItemId &&
+										event.sourceAgnosticLineItemId.toString()) ||
+									'';
 								var lineItems = adpConfig.lineItems || [];
 								var isNotPricePriorityLineItem = !!(
 									lineItemId &&
