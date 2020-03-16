@@ -134,8 +134,9 @@ var utils = {
 		if (allSizesParams[inventorySize]) return allSizesParams[inventorySize];
 
 		for (const originalSize in BACKWARD_COMPATIBLE_MAPPING) {
+			const formattedOriginalSize = originalSize.replace(',', 'x');
 			if (
-				originalSize === inventorySize &&
+				formattedOriginalSize === inventorySize &&
 				BACKWARD_COMPATIBLE_MAPPING[originalSize].length
 			) {
 				const backwardSizes = BACKWARD_COMPATIBLE_MAPPING[originalSize];
