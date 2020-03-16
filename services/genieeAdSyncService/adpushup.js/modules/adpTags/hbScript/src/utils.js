@@ -238,6 +238,8 @@ var utils = {
 
 		if (
 			highestWidthPossible < highestHeightPossible &&
+			highestHeightPossible >= 16 &&
+			highestWidthPossible >= 9 &&
 			!JSON.stringify(VIDEO_PLAYER_EXCEPTION_SIZES).includes(
 				JSON.stringify(highestSizeAvailable)
 			)
@@ -255,6 +257,8 @@ var utils = {
 		}
 		if (
 			highestWidthPossible >= highestHeightPossible &&
+			highestWidthPossible >= 16 &&
+			highestHeightPossible >= 9 &&
 			!JSON.stringify(VIDEO_PLAYER_EXCEPTION_SIZES).includes(
 				JSON.stringify(highestSizeAvailable)
 			)
