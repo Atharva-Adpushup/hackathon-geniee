@@ -141,8 +141,8 @@ export default class InventoryTab extends React.Component {
 
 	handleNativeChange = ({ target: { checked } }, params) => {
 		const { adUnitId, app, pageGroup, device } = params;
-		const { selectAllNative, filteredInventories, selectAllVideo } = this.state;
-		const { siteId, showNotification } = this.props;
+		const { selectAllNative, selectAllVideo } = this.state;
+		const { siteId, showNotification, inventories } = this.props;
 		const format = 'native';
 		const inventoryToUpdate = [];
 		const jsonTopush = { checked, format, adUnitId, app, pageGroup, device };
@@ -159,8 +159,8 @@ export default class InventoryTab extends React.Component {
 				this.setState({
 					selectAllNative,
 					selectAllMultiFormat:
-						selectAllNative.length === filteredInventories.length &&
-						selectAllVideo.length === filteredInventories.length
+						selectAllNative.length === inventories.length &&
+						selectAllVideo.length === inventories.length
 							? true
 							: false
 				});
@@ -178,8 +178,8 @@ export default class InventoryTab extends React.Component {
 
 	handleVideoChange = ({ target: { checked } }, params) => {
 		const { adUnitId, app, pageGroup, device } = params;
-		const { selectAllVideo, selectAllNative, filteredInventories } = this.state;
-		const { siteId } = this.props;
+		const { selectAllVideo, selectAllNative } = this.state;
+		const { siteId, inventories, showNotification } = this.props;
 		const format = 'video';
 		const inventoryToUpdate = [];
 		const jsonTopush = { checked, format, adUnitId, app, pageGroup, device };
@@ -196,8 +196,8 @@ export default class InventoryTab extends React.Component {
 				this.setState({
 					selectAllVideo,
 					selectAllMultiFormat:
-						selectAllNative.length === filteredInventories.length &&
-						selectAllVideo.length === filteredInventories.length
+						selectAllNative.length === inventories.length &&
+						selectAllVideo.length === inventories.length
 							? true
 							: false
 				});
