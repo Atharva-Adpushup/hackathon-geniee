@@ -7,6 +7,7 @@ var adp = require('./adp');
 var utils = require('./utils');
 var auction = require('./auction');
 var config = require('./config');
+var feedback = require('./feedback');
 var { multiFormatConstants, mediaTypesConfig } = require('./multiFormatConfig');
 var isApLiteActive = window.adpushup.config.apLiteActive;
 var hb = {
@@ -137,10 +138,17 @@ var hb = {
 					? 'originalCpm'
 					: 'cpm';
 
-				slot.feedback.winner = bidData.bidder;
-				slot.feedback.winningRevenue = bidData[computedCPMValue] / 1000;
-				slot.feedback.winnerAdUnitId = bidData.adId;
-				slot.feedback.unitFormat = bidData.mediaType;
+				if (slot) {
+					slot.feedback.winner = bidData.bidder;
+					slot.feedback.winningRevenue = bidData[computedCPMValue] / 1000;
+					slot.feedback.winnerAdUnitId = bidData.adId;
+					slot.feedback.unitFormat = bidData.mediaType;
+
+					if (isApLiteActive)
+						slot.feedback.renderedSize = [bidData.width, bidData.height];
+
+					return feedback.send(slot);
+				}
 			});
 		});
 	},
