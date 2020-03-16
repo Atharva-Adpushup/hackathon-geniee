@@ -229,10 +229,12 @@ class Table extends React.Component {
 			if (tableRow.siteid) {
 				const { siteid } = tableRow;
 
-				tableRow.siteName =
-					site && site[siteid]
-						? React.cloneElement(<a href={`/reports/${siteid}`}>{site[siteid].siteName}</a>)
-						: 'Not Found';
+				if (site && site[siteid]) {
+					tableRow.siteName = React.cloneElement(
+						<a href={`/reports/${siteid}`}>{site[siteid].siteName}</a>
+					);
+				} else return;
+
 				delete tableRow.siteid;
 			}
 
