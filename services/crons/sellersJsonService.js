@@ -116,14 +116,21 @@ function formatAndFilterUsers(users) {
 	}, []);
 
 	apAppBucketUsers = apAppBucketUsers.reduce(function(output, user) {
-		if (validator.isEmail(user.email) && !isIgnoredEmail(user.email)) {
-			let userExistsInAppBucket = _findIndex(appBucketUsers, { email: user.email }) > -1;
-
-			if (!userExistsInAppBucket) {
-				user.bucket = 'apAppBucket';
-				output.push(user);
-			}
+		if (!validator.isEmail(user.email) || isIgnoredEmail(user.email)) {
+			return output;
 		}
+		let userExistsInAppBucket = _findIndex(appBucketUsers, { email: user.email }) > -1;
+
+		if (!userExistsInAppBucket) {
+			user.bucket = 'apAppBucket';
+			user.siteDomain = user.siteDomains[0];
+			user.hasConfidentialDomain = user.siteDomains.some(domain =>
+				isConfidentialDomain(domanize(domain))
+			);
+			output.push(user);
+		}
+
+		delete user.siteDomains;
 		return output;
 	}, []);
 
