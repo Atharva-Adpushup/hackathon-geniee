@@ -209,7 +209,7 @@ function writeDataToTempFile() {
 function replaceWithOldSellersJson() {
 	if (errors.length) {
 		throw new Error(
-			'Due to non-empty errors not updating the sellers.json file with this new one created'
+			'Due to non-empty errors not updating the sellers.json file with this new one created. You may check the latest_sellers.json file created to get help for errors'
 		);
 	}
 	const newFilename = filenames.new;
@@ -348,7 +348,10 @@ function init() {
 			console.log({ errors });
 		})
 		.then(reportErrors)
-		.catch(handleError);
+		.catch(function(error) {
+			handleError(error);
+			reportErrors();
+		});
 }
 
 process.on('unhandledRejection', function(reason) {
