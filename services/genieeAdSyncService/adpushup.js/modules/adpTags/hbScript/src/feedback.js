@@ -34,6 +34,8 @@ var feedback = {
 			unitFormat: slot.feedback.unitFormat
 		};
 
+		if (slot.feedback.renderedSize) feedbackData.renderedSize = slot.feedback.renderedSize;
+
 		return feedbackData;
 	},
 	send: function(slot) {
