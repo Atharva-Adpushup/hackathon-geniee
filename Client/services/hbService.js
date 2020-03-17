@@ -80,3 +80,10 @@ export function checkOrBeginDfpSetup() {
 export function startCdnSync(siteId) {
 	return axiosInstance.get(`/headerBidding/startCdnSync/${siteId}`);
 }
+
+export function updateFormat(inventories, siteId) {
+	// const { siteId, adUnitId, app, pageGroup, device, checked, format } = params;
+	return axiosInstance.put(`/headerBidding/updateFormat/${siteId}`, {
+		inventories
+	});
+}

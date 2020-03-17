@@ -76,11 +76,10 @@ var $ = require('../../libs/jquery'),
 				optionalParam
 			) {
 				var formats =
-					config.PREBID_CONFIG &&
-					config.PREBID_CONFIG.prebidConfig &&
-					config.PREBID_CONFIG.prebidConfig.formats
-						? config.PREBID_CONFIG.prebidConfig.formats
-						: constants.PREBID.DEFAULT_FORMATS;
+					(Array.isArray(optionalParam.formats) &&
+						optionalParam.formats.length &&
+						optionalParam.formats) ||
+					constants.PREBID.DEFAULT_FORMATS;
 				var timeout =
 					config.PREBID_CONFIG &&
 					config.PREBID_CONFIG.prebidConfig &&
@@ -92,7 +91,7 @@ var $ = require('../../libs/jquery'),
 				var adpSlot = {
 					slotId: gptSlotElementId,
 					optionalParam,
-					bidders: optionalParam.headerBidding ? hbUtils.getBiddersForSlot(size) : [],
+					bidders: optionalParam.headerBidding ? hbUtils.getBiddersForSlot(size, formats) : [],
 					formats,
 					activeDFPNetwork: hbUtils.getActiveDFPNetwork(),
 					size,
@@ -167,6 +166,7 @@ var $ = require('../../libs/jquery'),
 												slotHbStatus = apLiteAdUnit.headerBidding,
 												refreshSlot = apLiteAdUnit.refreshSlot,
 												refreshInterval = apLiteAdUnit.refreshInterval,
+												formats = apLiteAdUnit.formats,
 												adpSlot = this.createAdpSlot(
 													gptSlotElementId,
 													dfpAdUnitName,
@@ -178,6 +178,7 @@ var $ = require('../../libs/jquery'),
 														dfpAdunitCode,
 														headerBidding: window.adpushup.services.HB_ACTIVE && slotHbStatus,
 														network: commonConsts.NETWORKS.ADPTAGS,
+														formats,
 														enableLazyLoading: false,
 														multipleAdSizes: allSizes,
 														sectionName: dfpAdUnitName,

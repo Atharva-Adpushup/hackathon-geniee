@@ -77,7 +77,7 @@ CustomReactTable.propTypes = {
 	filterable: PropTypes.bool,
 	showPaginationBottom: PropTypes.bool,
 	showPaginationTop: PropTypes.bool,
-	defaultSorting: PropTypes.object,
+	defaultSorting: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
 	pivotBy: PropTypes.oneOfType([PropTypes.array, PropTypes.object])
 };
 

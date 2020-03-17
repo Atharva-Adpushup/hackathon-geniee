@@ -6,6 +6,8 @@ var $ = require('../../../../libs/jquery');
 var config = require('./config');
 var BACKWARD_COMPATIBLE_MAPPING = require('./constants').AD_SIZE_MAPPING.IAB_SIZES
 	.BACKWARD_COMPATIBLE_MAPPING;
+var constants = require('./constants');
+var { bidderParamsMapping } = require('./multiFormatConfig');
 var utils = {
 	currencyConversionActive: function(inputObject) {
 		var inputObject = inputObject || adp.config,
@@ -150,7 +152,19 @@ var utils = {
 			}
 		}
 	},
-	getBiddersForSlot: function(size) {
+	getVideoOrNativeParams: function(format, bidder) {
+		switch (format) {
+			case 'video':
+				return bidderParamsMapping[bidder].videoParams || {};
+
+			case 'native':
+				return bidderParamsMapping[bidder].nativeParams || {};
+
+			default:
+				return {};
+		}
+	},
+	getBiddersForSlot: function(size, formats) {
 		var width = size[0];
 		var height = size[1];
 		var size = width + 'x' + height;
@@ -165,19 +179,39 @@ var utils = {
 
 					if (!bidderData.isPaused) {
 						if (bidderData.sizeLess) {
-							bidders.push({
+							var computedBidderObj = {
 								bidder: bidder,
 								params: bidderData.config
-							});
+							};
+
+							if (bidderParamsMapping[bidder]) {
+								formats.forEach(format => {
+									computedBidderObj.params = {
+										...this.getVideoOrNativeParams(format, bidder),
+										...computedBidderObj.params
+									};
+								});
+							}
+
+							bidders.push(computedBidderObj);
 						}
 
 						if (!bidderData.sizeLess && bidderData.reusable) {
-							const bidderParams = this.getOriginalOrDownwardSizeBidderParams(
+							var bidderParams = this.getOriginalOrDownwardSizeBidderParams(
 								bidderData.config,
 								size
 							);
 
 							if (bidderParams) {
+								if (bidderParamsMapping[bidder]) {
+									formats.forEach(format => {
+										bidderParams = {
+											...this.getVideoOrNativeParams(format, bidder),
+											...bidderParams
+										};
+									});
+								}
+
 								bidders.push({
 									bidder: bidder,
 									params: bidderParams
@@ -190,6 +224,59 @@ var utils = {
 		}
 
 		return bidders;
+	},
+	getVideoPlayerSize: function(prebidSizes) {
+		const { VIDEO_PLAYER_EXCEPTION_SIZES } = constants;
+		const multipliedValue = prebidSizes.map(val => val.reduce((a, b) => a * b));
+		const index = multipliedValue.indexOf(Math.max(...multipliedValue));
+		const highestSizeAvailable = prebidSizes[index];
+
+		const highestWidthPossible = highestSizeAvailable[0];
+		const highestHeightPossible = highestSizeAvailable[1];
+		let playerWidth = highestWidthPossible;
+		let playerHeight = highestHeightPossible;
+		let gcd;
+
+		if (
+			highestWidthPossible < highestHeightPossible &&
+			highestHeightPossible >= 16 &&
+			highestWidthPossible >= 9 &&
+			!JSON.stringify(VIDEO_PLAYER_EXCEPTION_SIZES).includes(
+				JSON.stringify(highestSizeAvailable)
+			)
+		) {
+			//9:16 aspect ratio
+			gcd = parseInt(highestHeightPossible / 16);
+			playerHeight = gcd * 16;
+			playerWidth = gcd * 9;
+
+			if (highestWidthPossible < playerWidth) {
+				gcd = parseInt(highestWidthPossible / 9);
+				playerHeight = gcd * 16;
+				playerWidth = gcd * 9;
+			}
+		}
+		if (
+			highestWidthPossible >= highestHeightPossible &&
+			highestWidthPossible >= 16 &&
+			highestHeightPossible >= 9 &&
+			!JSON.stringify(VIDEO_PLAYER_EXCEPTION_SIZES).includes(
+				JSON.stringify(highestSizeAvailable)
+			)
+		) {
+			//16:9 aspect ratio
+			gcd = parseInt(highestWidthPossible / 16);
+			playerWidth = gcd * 16;
+			playerHeight = gcd * 9;
+
+			if (highestHeightPossible < playerHeight) {
+				gcd = parseInt(highestHeightPossible / 9);
+				playerHeight = gcd * 9;
+				playerWidth = gcd * 16;
+			}
+		}
+
+		return [playerWidth, playerHeight];
 	}
 };
 

@@ -56,7 +56,8 @@ var constants = {
 		BIDDER_SEQUENCE: 'random',
 		PRICE_GRANULARITY: 'dense',
 		VIDEO_FORMAT_TYPE: 'outstream',
-		DEFAULT_FORMATS: ['display']
+		DEFAULT_FORMATS: ['display'],
+		ALL_SUPPORTED_FORMATS: ['display', 'video', 'native']
 	},
 	ADSERVER_TARGETING_KEYS: {
 		BIDDER: 'hb_ap_bidder',
@@ -681,7 +682,8 @@ var constants = {
 	},
 	NETWORK_ID: 103512698,
 	BATCHING_INTERVAL: 50,
-	UTM_SESSION_COOKIE: '_adp_utm_session_'
+	UTM_SESSION_COOKIE: '_adp_utm_session_',
+	VIDEO_PLAYER_EXCEPTION_SIZES : [[300, 250], [480, 320], [320, 480], [320, 50]]
 };
 
 module.exports = constants;

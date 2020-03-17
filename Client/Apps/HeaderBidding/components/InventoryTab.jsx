@@ -2,10 +2,16 @@
 /* eslint-disable guard-for-in */
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Checkbox } from '@/Client/helpers/react-bootstrap-imports';
+
 import InventoriesTable from './InventoriesTable';
 import FilterBox from '../../../Components/FilterBox';
 import CustomButton from '../../../Components/CustomButton';
-import { getHbStatusForSite, toggleHbStatusForSite } from '../../../services/hbService';
+import {
+	getHbStatusForSite,
+	toggleHbStatusForSite,
+	updateFormat
+} from '../../../services/hbService';
 import Loader from '../../../Components/Loader';
 import Spinner from '../../../Components/Spinner';
 import Empty from '../../../Components/Empty/index';
@@ -18,12 +24,16 @@ export default class InventoryTab extends React.Component {
 		hbStatusForSite: null,
 		loadingHbStatusForSite: true,
 		updatingInventoryHbStatus: false,
-		selectAllInventories: false
+		selectAllInventories: false,
+		checked: false,
+		selectAllMultiFormat: false,
+		selectAllNative: [],
+		selectAllVideo: []
 	};
 
 	componentDidMount() {
 		const { siteId, inventories } = this.props;
-		const { filteredInventories } = this.state;
+		const { filteredInventories, selectAllNative, selectAllVideo } = this.state;
 
 		const inventoriesCopy = JSON.parse(JSON.stringify(inventories));
 
@@ -32,6 +42,29 @@ export default class InventoryTab extends React.Component {
 			if (!filteredInventories && inventories) newState.filteredInventories = inventoriesCopy;
 
 			this.setState(newState);
+		});
+
+		inventories.forEach(inventory => {
+			const { networkData = {}, adUnitId } = inventory;
+
+			const { formats = [] } = networkData;
+
+			if (formats.includes('native')) {
+				selectAllNative.push(adUnitId);
+			}
+			if (formats.includes('video')) {
+				selectAllVideo.push(adUnitId);
+			}
+		});
+
+		this.setState({
+			selectAllNative,
+			selectAllVideo,
+			selectAllMultiFormat:
+				selectAllNative.length === inventories.length &&
+				selectAllVideo.length === inventories.length
+					? true
+					: false
 		});
 	}
 
@@ -68,6 +101,117 @@ export default class InventoryTab extends React.Component {
 
 		return { updated, updatedFilteredInventories };
 	}
+
+	handleChange = e => {
+		const { selectAllMultiFormat } = this.state;
+		const { siteId, inventories, showNotification } = this.props;
+		const newState = {};
+		newState.selectAllMultiFormat = !selectAllMultiFormat;
+		newState.selectAllNative = !selectAllMultiFormat
+			? [...inventories].map(inventory => inventory.adUnitId)
+			: [];
+		newState.selectAllVideo = !selectAllMultiFormat
+			? [...inventories].map(inventory => inventory.adUnitId)
+			: [];
+
+		updateFormat(inventories.map(v => ({ ...v, checked: true, format: 'native' })), siteId)
+			.then(() =>
+				updateFormat(inventories.map(v => ({ ...v, checked: true, format: 'video' })), siteId)
+			)
+			.then(() =>
+				showNotification({
+					mode: 'success',
+					title: 'Success',
+					message: ' All Inventories updated successsfully',
+					autoDismiss: 5
+				})
+			)
+			.catch(err => {
+				console.log(err);
+				return showNotification({
+					mode: 'error',
+					title: 'Operation Failed',
+					message: 'Something went wrong',
+					autoDismiss: 5
+				});
+			});
+
+		this.setState(newState);
+	};
+
+	handleNativeChange = ({ target: { checked } }, params) => {
+		const { adUnitId, app, pageGroup, device } = params;
+		const { selectAllNative, selectAllVideo } = this.state;
+		const { siteId, showNotification, inventories } = this.props;
+		const format = 'native';
+		const inventoryToUpdate = [];
+		const jsonTopush = { checked, format, adUnitId, app, pageGroup, device };
+		inventoryToUpdate.push(jsonTopush);
+
+		if (checked) {
+			selectAllNative.push(adUnitId);
+		} else {
+			selectAllNative.splice(selectAllNative.indexOf(adUnitId), 1);
+		}
+
+		return updateFormat(inventoryToUpdate, siteId)
+			.then(() => {
+				this.setState({
+					selectAllNative,
+					selectAllMultiFormat:
+						selectAllNative.length === inventories.length &&
+						selectAllVideo.length === inventories.length
+							? true
+							: false
+				});
+			})
+			.catch(err => {
+				console.log(err);
+				return showNotification({
+					mode: 'error',
+					title: 'Operation Failed',
+					message: 'Something went wrong',
+					autoDismiss: 5
+				});
+			});
+	};
+
+	handleVideoChange = ({ target: { checked } }, params) => {
+		const { adUnitId, app, pageGroup, device } = params;
+		const { selectAllVideo, selectAllNative } = this.state;
+		const { siteId, inventories, showNotification } = this.props;
+		const format = 'video';
+		const inventoryToUpdate = [];
+		const jsonTopush = { checked, format, adUnitId, app, pageGroup, device };
+		inventoryToUpdate.push(jsonTopush);
+
+		if (checked) {
+			selectAllVideo.push(adUnitId);
+		} else {
+			selectAllVideo.splice(selectAllVideo.indexOf(adUnitId), 1);
+		}
+
+		return updateFormat(inventoryToUpdate, siteId)
+			.then(() => {
+				this.setState({
+					selectAllVideo,
+					selectAllMultiFormat:
+						selectAllNative.length === inventories.length &&
+						selectAllVideo.length === inventories.length
+							? true
+							: false
+				});
+			})
+			.catch(err => {
+				console.log(err);
+				return showNotification({
+					mode: 'error',
+					title: 'Operation Failed',
+					message: 'Something went wrong',
+					autoDismiss: 5
+				});
+			});
+	};
 
 	handleSelectAllInventories = () => {
 		const { filteredInventories, selectAllInventories } = this.state;
@@ -185,7 +329,10 @@ export default class InventoryTab extends React.Component {
 			loadingHbStatusForSite,
 			updatingInventoryHbStatus,
 			checkedCopy,
-			selectAllInventories
+			selectAllInventories,
+			selectAllMultiFormat,
+			selectAllVideo,
+			selectAllNative
 		} = this.state;
 
 		return (
@@ -285,6 +432,14 @@ export default class InventoryTab extends React.Component {
 							/>
 						)}
 
+						<Checkbox
+							onChange={this.handleChange}
+							checked={selectAllMultiFormat}
+							disabled={selectAllMultiFormat ? true : false}
+						>
+							Enable native and video format for all units
+						</Checkbox>
+
 						{!filteredInventories.length ? (
 							<Empty message="No Data Found" />
 						) : (
@@ -295,7 +450,11 @@ export default class InventoryTab extends React.Component {
 									handleInventorySelect={this.handleInventorySelect}
 									handleSelectAllInventories={this.handleSelectAllInventories}
 									checkedCopy={checkedCopy}
+									handleNativeChange={this.handleNativeChange}
+									handleVideoChange={this.handleVideoChange}
 									selectAllInventories={selectAllInventories}
+									selectAllVideo={selectAllVideo}
+									selectAllNative={selectAllNative}
 								/>
 							)
 						)}

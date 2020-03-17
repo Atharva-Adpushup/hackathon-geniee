@@ -247,15 +247,13 @@ function apiModule() {
 												const ad = section.ads[adKey];
 
 												if (ad.network === 'adpTags') {
-													const {
-														networkData: { headerBidding },
-														width,
-														height
-													} = ad;
+													const { networkData, width, height } = ad;
+													const { headerBidding } = networkData;
 													inventory.headerBidding = headerBidding ? 'Enabled' : 'Disabled';
 													inventory.size = `${width}x${height}`;
 													inventory.adUnit = section.name;
 													inventory.adUnitId = section.id;
+													inventory.networkData = networkData;
 													inventories.push({ ...inventory });
 												}
 											}
@@ -290,17 +288,13 @@ function apiModule() {
 							};
 
 							if (ad.network === 'adpTags') {
-								const {
-									networkData: { headerBidding },
-									width,
-									height,
-									name: adUnit,
-									id: adUnitId
-								} = ad;
+								const { networkData, width, height, name: adUnit, id: adUnitId } = ad;
+								const { headerBidding } = networkData;
 								inventory.headerBidding = headerBidding ? 'Enabled' : 'Disabled';
 								inventory.size = `${width}x${height}`;
 								inventory.adUnit = adUnit;
 								inventory.adUnitId = adUnitId;
+								inventory.networkData = networkData;
 
 								inventories.push({ ...inventory });
 							}
@@ -325,7 +319,14 @@ function apiModule() {
 					if (value.ads.length) {
 						for (const ad of value.ads) {
 							const [, device, pageGroup] = ad.pagegroups[0].match(/(.*):(.*)/);
-							const inventory = { app: 'Innovative Ads', pageGroup, device, variationName: 'ALL' };
+							const networkData = ad.networkData;
+							const inventory = {
+								app: 'Innovative Ads',
+								pageGroup,
+								device,
+								variationName: 'ALL',
+								networkData
+							};
 
 							if (ad.network === 'adpTags') {
 								const {
@@ -335,6 +336,7 @@ function apiModule() {
 									name: adUnit,
 									id: adUnitId
 								} = ad;
+
 								inventory.headerBidding = headerBidding ? 'Enabled' : 'Disabled';
 								inventory.size = `${width}x${height}`;
 								inventory.adUnit = adUnit;
@@ -512,6 +514,182 @@ function apiModule() {
 					throw err;
 				});
 		},
+
+		updateFormatsOnInnovAdInventory: (siteId, json) => {
+			if (!json || !json.length) {
+				return Promise.resolve();
+			}
+
+			return couchbase
+				.connectToAppBucket()
+				.then(appBucket =>
+					appBucket
+						.getAsync(`fmrt::${siteId}`, {})
+						.then(innovativeAdDoc => ({ appBucket, innovativeAdDoc }))
+				)
+				.then(({ appBucket, innovativeAdDoc: { value } }) => {
+					for (const inventory of json) {
+						for (const ad of value.ads) {
+							const { networkData = {}, network } = ad;
+							const { format, adUnitId } = inventory;
+							if (ad.id === adUnitId) {
+								if (!networkData.formats) networkData.formats = ['display'];
+
+								if (inventory.checked)
+									!networkData.formats.includes(format) && !!(network === 'adpTags')
+										? networkData.formats.push(format)
+										: null;
+								else {
+									networkData.formats.includes(format)
+										? networkData.formats.splice(networkData.formats.indexOf(format), 1)
+										: null;
+								}
+							} else continue;
+						}
+					}
+
+					return appBucket.replaceAsync(`fmrt::${siteId}`, value);
+				})
+				.catch(err => {
+					if (err.code === 13) {
+						return [];
+					}
+
+					throw err;
+				});
+		},
+
+		updateFormatsOnLayoutInventory: (siteId, json) => {
+			if (!json || !json.length) {
+				return Promise.resolve();
+			}
+
+			const jsonByChannels = {};
+			for (const obj of json) {
+				const { pageGroup, device, adUnitId, checked, format } = obj;
+				const key = `${device}:${pageGroup}`;
+
+				if (!jsonByChannels[key]) {
+					jsonByChannels[key] = { list: [] };
+				}
+
+				if (!jsonByChannels[key].device && !jsonByChannels[key].pageGroup) {
+					jsonByChannels[key].device = device;
+					jsonByChannels[key].pageGroup = pageGroup;
+				}
+
+				jsonByChannels[key].list.push({ adUnitId, checked, format });
+			}
+
+			const promiseArr = [];
+			for (const objKey in jsonByChannels) {
+				const { device, pageGroup, list: inventoryArr } = jsonByChannels[objKey];
+
+				promiseArr.push(
+					channelModel.getChannel(siteId, device, pageGroup).then(channel => {
+						const { data: channelData } = channel;
+
+						for (const inventory of inventoryArr) {
+							// eslint-disable-next-line no-restricted-syntax
+							if (channelData.variations && Object.keys(channelData.variations).length) {
+								for (const variationKey in channelData.variations) {
+									const variation = channelData.variations[variationKey];
+									if (variation.sections && Object.keys(variation.sections).length) {
+										for (const sectionKey in variation.sections) {
+											const section = variation.sections[sectionKey];
+											if (section.id !== inventory.adUnitId) continue;
+											if (section.ads && Object.keys(section.ads).length) {
+												for (const adKey in section.ads) {
+													const ad = section.ads[adKey];
+													if (!ad.networkData.formats) ad.networkData.formats = ['display'];
+
+													if (inventory.checked)
+														!ad.networkData.formats.includes(inventory.format) &&
+														!!(ad.network === 'adpTags')
+															? ad.networkData.formats.push(inventory.format)
+															: null;
+													else {
+														ad.networkData.formats.includes(inventory.format)
+															? ad.networkData.formats.splice(
+																	ad.networkData.formats.indexOf(inventory.format),
+																	1
+															  )
+															: null;
+													}
+												}
+											} else {
+												continue;
+											}
+										}
+									} else {
+										continue;
+									}
+								}
+							} else {
+								throw new AdPushupError('Target Inventory not found');
+							}
+						}
+
+						return channel.save();
+					})
+				);
+			}
+
+			return Promise.all(promiseArr);
+		},
+
+		updateFormatsOnApTagInventory: (siteId, json) => {
+			if (!json || !json.length) {
+				return Promise.resolve();
+			}
+
+			return couchbase
+				.connectToAppBucket()
+				.then(appBucket =>
+					appBucket
+						.getAsync(`tgmr::${siteId}`, {})
+						.then(innovativeAdDoc => ({ appBucket, innovativeAdDoc }))
+				)
+				.then(({ appBucket, innovativeAdDoc: { value } }) => {
+					for (const inventory of json) {
+						for (const ad of value.ads) {
+							const { networkData = {}, network } = ad;
+							const { format, adUnitId } = inventory;
+							if (ad.id === adUnitId) {
+								if (!networkData.formats) networkData.formats = ['display'];
+
+								if (inventory.checked)
+									!networkData.formats.includes(format) && !!(network === 'adpTags')
+										? networkData.formats.push(format)
+										: null;
+								else {
+									networkData.formats.includes(format)
+										? networkData.formats.splice(networkData.formats.indexOf(format), 1)
+										: null;
+								}
+							} else continue;
+						}
+					}
+
+					return appBucket.replaceAsync(`tgmr::${siteId}`, value);
+				})
+				.catch(err => {
+					if (err.code === 13) {
+						return [];
+					}
+
+					throw err;
+				});
+		},
+
+		updateFormats: (siteId, json) => {
+			return Promise.all([
+				API.updateFormatsOnInnovAdInventory(siteId, json.innovativeAds),
+				API.updateFormatsOnLayoutInventory(siteId, json.layoutEditor),
+				API.updateFormatsOnApTagInventory(siteId, json.apTag)
+			]);
+		},
+
 		updateHbStatus: (siteId, json, enableHB) =>
 			Promise.all([
 				API.updateHbStatusOnLayoutInventory(siteId, json.layoutEditor),
@@ -719,6 +897,7 @@ function apiModule() {
 				return hbConfig.save();
 			});
 		},
+
 		deleteBidderRule: (siteId, bidder) =>
 			API.getHbConfig(siteId).then(hbConfig => {
 				const { sizeConfig } = hbConfig.get('deviceConfig');

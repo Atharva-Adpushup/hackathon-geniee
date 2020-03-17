@@ -69,6 +69,16 @@ var gpt = {
 			size = isComputedSizes ? computedSizes.concat([]).reverse() : adpSlot.size;
 		}
 
+		var isMultipleSizes =
+			Array.isArray(size) && size.some(val => Array.isArray(val) || val === 'fluid');
+		size =
+			// if multiple sizes and fluid doesn't exist then add fluid size
+			(isMultipleSizes && size.indexOf('fluid') === -1 && [...size, 'fluid']) ||
+			// if single size and that's not fluid then create a multisize array and add fluid size
+			(!isMultipleSizes && size !== 'fluid' && [size, 'fluid']) ||
+			// else return fluid size as it is
+			size;
+
 		if (!adpSlot.gSlot) {
 			adpSlot.gSlot = googletag.defineSlot(
 				'/' + networkId + '/' + adpSlot.optionalParam.dfpAdunitCode,
@@ -86,35 +96,7 @@ var gpt = {
 			w.googletag
 				.pubads()
 				.addEventListener(constants.EVENTS.GPT.SLOT_RENDER_ENDED, function(event) {
-					var slot = null;
-					var adUnitPath = event.slot.getAdUnitPath();
-					var adUnitPathArray = adUnitPath.split('/');
-					var adUnitCode = adUnitPathArray[adUnitPathArray.length - 1];
-					var networkCode = constants.NETWORK_ID;
-
-					Object.keys(window.adpushup.adpTags.adpSlots).forEach(function(adpSlot) {
-						var currentSlot = window.adpushup.adpTags.adpSlots[adpSlot];
-						var slotMatched = !!(
-							currentSlot.optionalParam.dfpAdunitCode == adUnitCode &&
-							currentSlot.activeDFPNetwork
-						);
-
-						if (slotMatched) {
-							networkCode = currentSlot.activeDFPNetwork;
-						}
-						if (
-							'/' + networkCode + '/' + currentSlot.optionalParam.dfpAdunitCode ===
-							adUnitPath
-						) {
-							slot = currentSlot;
-						}
-					});
-
-					if (slot) {
-						return setTimeout(function() {
-							return feedback.send(slot);
-						}, 100);
-					}
+					// code to run after slot rendered
 				});
 		});
 	},
@@ -126,7 +108,6 @@ var gpt = {
 					.addEventListener(constants.EVENTS.GPT.SLOT_RENDER_ENDED, function(event) {
 						if (event && event.slot) {
 							var gSlot = event.slot,
-								size = event.size,
 								slotElementId = gSlot.getSlotElementId(),
 								slot = window.apLite.adpSlots[slotElementId];
 							if (slot) {
@@ -148,12 +129,6 @@ var gpt = {
 									var container = $(`#${slotElementId}`);
 									refreshAdSlot.stopRefreshForASlot(container);
 								}
-
-								slot.renderedSize = size;
-
-								return setTimeout(function() {
-									return feedback.send(slot);
-								}, 100);
 							}
 						}
 					});

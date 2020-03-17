@@ -11,6 +11,8 @@ const FormValidator = require('../helpers/FormValidator');
 const schema = require('../helpers/schema');
 const commonConsts = require('../configs/commonConsts');
 const adpushup = require('../helpers/adpushupEvent');
+const { sendSuccessResponse, sendErrorResponse } = require('../helpers/commonFunctions');
+const { errorHandler } = require('../helpers/routeHelpers');
 
 const router = express.Router();
 
@@ -327,17 +329,11 @@ router
 		const { siteId } = req.params;
 		const { email } = req.user;
 		const newPrebidConfig = req.body;
-		const { timeOut, refreshTimeOut, formats } = newPrebidConfig;
+		const { timeOut, refreshTimeOut } = newPrebidConfig;
 
 		const isValidTimeout = timeOut => !Number.isNaN(timeOut) && timeOut >= 500 && timeOut <= 10000;
 
-		if (
-			!(
-				isValidTimeout(timeOut) &&
-				isValidTimeout(refreshTimeOut) &&
-				formats.indexOf('display') > -1
-			)
-		) {
+		if (!(isValidTimeout(timeOut) && isValidTimeout(refreshTimeOut))) {
 			return res.status(httpStatus.BAD_REQUEST).json({ error: 'Invalid data' });
 		}
 
@@ -345,41 +341,6 @@ router
 			.verifySiteOwner(email, siteId)
 			.then(() => headerBiddingModel.getHbConfig(siteId))
 			.then(hbConfig => {
-				const hasVideoBefore = hbConfig.get('prebidConfig').formats.indexOf('video') !== -1;
-				const hasVideoNow = formats.indexOf('video') !== -1;
-				const bidders = hbConfig.get('hbcf');
-
-				if (hasVideoNow && !hasVideoBefore) {
-					// add video params
-					for (const bidderCode in bidders) {
-						// eslint-disable-next-line no-prototype-builtins
-						if (bidders.hasOwnProperty(bidderCode)) {
-							const newParams = headerBiddingModel.addVideoParams(
-								bidderCode,
-								bidders[bidderCode].config,
-								bidders[bidderCode].sizeLess
-							);
-
-							bidders[bidderCode].config = newParams;
-						}
-					}
-				}
-
-				if (!hasVideoNow && hasVideoBefore) {
-					// remove video params
-					for (const bidderCode in bidders) {
-						// eslint-disable-next-line no-prototype-builtins
-						if (bidders.hasOwnProperty(bidderCode)) {
-							bidders[bidderCode].config = headerBiddingModel.removeVideoParams(
-								bidderCode,
-								bidders[bidderCode].config,
-								bidders[bidderCode].sizeLess
-							);
-						}
-					}
-				}
-
-				if (hasVideoBefore !== hasVideoNow) hbConfig.set('hbcf', bidders);
 				hbConfig.set('prebidConfig', newPrebidConfig);
 				return hbConfig.save();
 			})
@@ -608,6 +569,45 @@ router
 
 				return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Something went wrong' });
 			});
+	})
+
+	.put('/updateFormat/:siteId', (req, res) => {
+		const { siteId } = req.params;
+		const { email } = req.user;
+		const { inventories } = req.body;
+
+		const categorizedJSON = { layoutEditor: [], apTag: [], innovativeAds: [] };
+		for (const inventory of inventories) {
+			const { app, adUnitId, format } = inventory;
+
+			if (!app || !adUnitId || !siteId || !format) {
+				return res.status(httpStatus.BAD_REQUEST).json({ error: 'Invalid data received' });
+			}
+
+			switch (app) {
+				case 'Layout Editor': {
+					categorizedJSON.layoutEditor.push(inventory);
+					break;
+				}
+				case 'AP Tag': {
+					categorizedJSON.apTag.push(inventory);
+					break;
+				}
+				case 'Innovative Ads': {
+					categorizedJSON.innovativeAds.push(inventory);
+					break;
+				}
+				default:
+			}
+		}
+
+		return userModel
+			.verifySiteOwner(email, siteId)
+			.then(() => headerBiddingModel.updateFormats(siteId, categorizedJSON))
+			.then(() => res.status(httpStatus.OK).json({ success: 'Format updated successfully' }))
+			.catch(() =>
+				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error!' })
+			);
 	});
 
 module.exports = router;
