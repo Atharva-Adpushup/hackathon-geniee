@@ -239,8 +239,10 @@ var $ = require('../../libs/jquery'),
 			}
 		},
 		init: function() {
-			window.apLite = window.apLite && window.apLite.adpSlots ? window.apLite : this.module;
+			window.googletag = window.googletag || {};
+			googletag.cmd = googletag.cmd || [];
 
+			window.apLite = window.apLite && window.apLite.adpSlots ? window.apLite : this.module;
 			window.apLite.registerAdpSlots();
 		}
 	};
