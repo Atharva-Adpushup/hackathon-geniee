@@ -242,6 +242,9 @@ var $ = require('../../libs/jquery'),
 			window.apLite = window.apLite && window.apLite.adpSlots ? window.apLite : this.module;
 
 			window.apLite.registerAdpSlots();
+
+			window.googletag = window.googletag || {};
+			googletag.cmd = googletag.cmd || [];
 		}
 	};
 
