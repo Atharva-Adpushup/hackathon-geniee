@@ -199,7 +199,6 @@ class QuickSnapshot extends React.Component {
 	};
 
 	getTop10SitesData = (path, selectedDate) => {
-		console.log('gettting top 10 sites data for date', path, selectedDate);
 		const params = { ...getDateRange(selectedDate), isSuperUser: true };
 
 		return reportService
