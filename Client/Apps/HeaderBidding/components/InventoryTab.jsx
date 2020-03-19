@@ -158,10 +158,9 @@ export default class InventoryTab extends React.Component {
 				this.setState(
 					{
 						selectAllNative,
-						selectAllMultiFormat: !!(
+						selectAllMultiFormat:
 							selectAllNative.length === inventories.length &&
 							selectAllVideo.length === inventories.length
-						)
 					},
 					() => setUnsavedChangesAction(true)
 				);
