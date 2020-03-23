@@ -45,6 +45,7 @@ const pushToAdpTags = function(ad, json) {
 			key: `${json.width}x${json.height}`,
 			height: json.height,
 			width: json.width,
+			fluid: json.fluid,
 			dfpAdunit: isZoneContainerId ? ad.networkData.zoneContainerId : ad.networkData.dfpAdunit,
 			dfpAdunitCode: ad.networkData.dfpAdunitCode,
 			headerBidding: ad.networkData.headerBidding,
@@ -71,7 +72,8 @@ const getAdConfig = function(adType, section) {
 		css,
 		height,
 		width,
-		multipleAdSizes
+		multipleAdSizes,
+		fluid
 	} = ad;
 
 	const { name: sectionName, id, formatData } = section;
@@ -83,7 +85,8 @@ const getAdConfig = function(adType, section) {
 		css,
 		height: isResponsive ? height : parseInt(height, 10),
 		width: isResponsive ? width : parseInt(width, 10),
-		formatData
+		formatData,
+		fluid: fluid === true
 	};
 
 	// Add 'multipleAdSizes' property if exists
@@ -184,7 +187,11 @@ const getSectionsPayload = function(variationSections, platform, pagegroup, sele
 			});
 		}
 
-		const isEditorInnovativeSection = !!(section.type === 3 || section.type === 4 || section.type === 5);
+		const isEditorInnovativeSection = !!(
+			section.type === 3 ||
+			section.type === 4 ||
+			section.type === 5
+		);
 
 		if (!isEditorInnovativeSection) {
 			json = getAdConfig('layout', section);
