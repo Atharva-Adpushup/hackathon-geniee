@@ -107,7 +107,8 @@ var $ = require('../../libs/jquery'),
 					services: optionalParam.services,
 					feedback: {
 						winner: constants.FEEDBACK.DEFAULT_WINNER
-					}
+					},
+					fluid: optionalParam.fluid
 				};
 
 				return adpSlot;
@@ -180,11 +181,11 @@ var $ = require('../../libs/jquery'),
 														network: commonConsts.NETWORKS.ADPTAGS,
 														formats,
 														enableLazyLoading: false,
-														multipleAdSizes: allSizes,
 														sectionName: dfpAdUnitName,
 														refreshSlot,
 														refreshInterval,
-														services: [commonConsts.SERVICES.AP_LITE]
+														services: [commonConsts.SERVICES.AP_LITE],
+														fluid: false
 													}
 												);
 
