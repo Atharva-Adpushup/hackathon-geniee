@@ -78,11 +78,7 @@ var $ = require('../libs/jquery'),
 		}
 		var isGenieePartner = !!(ad.network === 'geniee' && !ad.networkData.adCode),
 			isGenieeWithoutDFP = !!(isGenieePartner && !ad.networkData.dynamicAllocation),
-			isMultipleAdSizes = !!(
-				ad.multipleAdSizes &&
-				ad.multipleAdSizes.length &&
-				ad.multipleAdSizes.length > 1
-			),
+			isFluidAd = ad.fluid,
 			isGenieeNetwork = !!(ad.network === 'geniee' && ad.networkData && ad.networkData.zoneId),
 			isZoneContainerId = !!(isGenieeNetwork && ad.networkData.zoneContainerId),
 			computedSSPContainerId = isZoneContainerId
@@ -90,17 +86,18 @@ var $ = require('../libs/jquery'),
 				: ad.networkData.zoneId,
 			defaultAdProperties = {
 				display: isGenieeWithoutDFP ? 'none' : 'block',
-				clear: ad.isIncontent ? null : 'both'
+				clear: ad.isIncontent ? null : 'both',
+				textAlign: 'center',
+				margin: '0 auto'
 			},
 			container;
 
 		computedSSPContainerId = '_ap_apexGeniee_ad_' + computedSSPContainerId;
 
-		if (!isMultipleAdSizes) {
+		if (!isFluidAd) {
 			defaultAdProperties.width = ad.width + 'px';
 			defaultAdProperties.height = ad.height + 'px';
-		} else {
-			defaultAdProperties['text-align'] = 'center';
+			defaultAdProperties.overflow = 'hidden';
 		}
 
 		container = $('<div/>')
