@@ -22,9 +22,6 @@ class AdNetworkDetails extends Component {
 			networkData.multipleAdSizes &&
 			networkData.multipleAdSizes.length
 		);
-		if (isMultipleAdSizes) {
-			dataObject.multipleAdSizes = networkData.multipleAdSizes.concat([]);
-		}
 		delete networkData.multipleAdSizes;
 		delete networkData.isBackwardCompatibleSizes;
 		onSubmit(ad.id, siteId, dataObject);
