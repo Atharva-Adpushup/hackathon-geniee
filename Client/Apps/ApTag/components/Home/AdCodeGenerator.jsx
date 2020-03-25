@@ -15,6 +15,7 @@ import CustomMessage from '../../../../Components/CustomMessage/index';
 import CustomButton from '../../../../Components/CustomButton/index';
 import Loader from '../../../../Components/Loader';
 import ActionCard from '../../../../Components/ActionCard/index';
+import CustomToggleSwitch from '../../../../Components/CustomToggleSwitch/index.jsx';
 
 class AdCodeGenerator extends Component {
 	constructor(props) {
@@ -25,7 +26,8 @@ class AdCodeGenerator extends Component {
 			type: '',
 			size: null,
 			customFields: {},
-			loading: false
+			loading: false,
+			fluid: false
 		};
 		this.selectPlatform = this.selectPlatform.bind(this);
 		this.selectType = this.selectType.bind(this);
@@ -107,7 +109,7 @@ class AdCodeGenerator extends Component {
 	}
 
 	saveHandler() {
-		const { type, platform, size, customFields } = this.state;
+		const { type, platform, size, customFields, fluid, progress } = this.state;
 
 		// terminate if Custom Fields are invalid
 		const isCustomFieldsValid = !Object.keys(customFields).find(
@@ -127,8 +129,10 @@ class AdCodeGenerator extends Component {
 			width,
 			height,
 			isManual: true,
+			fluid,
 			networkData: {
-				isResponsive: !!(width === 'responsive')
+				isResponsive: !!(width === 'responsive'),
+				formats: ['display']
 			},
 			formatData: {
 				platform, // DESKTOP, MOBILE
@@ -292,10 +296,47 @@ class AdCodeGenerator extends Component {
 					<div>
 						{this.renderTypeOptions()}
 						{progress >= 50 ? this.renderSizes() : null}
-						{progress >= 75 ? this.renderButton('Generate AdCode', this.saveHandler) : null}
+						{progress >= 75 ? this.renderFluidToggle() : null}
+						{progress >= 90 ? this.renderButton('Generate AdCode', this.saveHandler) : null}
 					</div>
 				)}
 			</div>
+		);
+	}
+
+	handleToggle = (value, event) => {
+		const attributeValue = event.target.getAttribute('name');
+		const name = attributeValue.split('-')[0];
+
+		this.setState({
+			[name]: value,
+			progress: 90
+		});
+	};
+
+	renderFluidToggle() {
+		const { match } = this.props;
+		const { siteId } = match.params;
+		const { fluid } = this.state;
+		return (
+			<Row>
+				<Col md={5}>
+					<CustomToggleSwitch
+						labelText="Fluid"
+						className="u-margin-b4 negative-toggle fluid-Toggle"
+						checked={fluid}
+						onChange={this.handleToggle}
+						layout="horizontal"
+						size="m"
+						on="Yes"
+						off="No"
+						defaultLayout
+						name={`fluid-${siteId}`}
+						id={`js-fluid-${siteId}`}
+					/>
+				</Col>
+				<Col md={7} />
+			</Row>
 		);
 	}
 

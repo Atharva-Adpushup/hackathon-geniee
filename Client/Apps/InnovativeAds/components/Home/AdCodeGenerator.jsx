@@ -8,6 +8,8 @@ import CustomButton from '../../../../Components/CustomButton/index';
 import Loader from '../../../../Components/Loader';
 import { pagegroupFiltering } from '../../lib/helpers';
 import ActionCard from '../../../../Components/ActionCard';
+import CustomToggleSwitch from '../../../../Components/CustomToggleSwitch/index.jsx';
+import { Row } from 'react-bootstrap';
 
 class AdCodeGenerator extends Component {
 	constructor(props) {
@@ -20,6 +22,7 @@ class AdCodeGenerator extends Component {
 			size: null,
 			loading: false,
 			pagegroups: [],
+			fluid: false,
 			pagegroupsPresent: !!(channels && channels.length)
 		};
 		this.selectPlatform = this.selectPlatform.bind(this);
@@ -42,7 +45,7 @@ class AdCodeGenerator extends Component {
 
 	selectPlatform(platform) {
 		this.setState({
-			progress: 15,
+			progress: 10,
 			platform,
 			format: '',
 			size: null,
@@ -54,7 +57,7 @@ class AdCodeGenerator extends Component {
 		this.setState({
 			format,
 			size: null,
-			progress: 30,
+			progress: 20,
 			pagegroups: []
 		});
 	}
@@ -100,7 +103,7 @@ class AdCodeGenerator extends Component {
 
 	generateAdData(data) {
 		const { match } = this.props;
-		const { size, format, pagegroups, platform } = this.state;
+		const { size, format, pagegroups, platform, fluid } = this.state;
 		const sizesArray = size.split('x');
 		const width = sizesArray[0];
 		const height = sizesArray[1];
@@ -128,6 +131,7 @@ class AdCodeGenerator extends Component {
 				height,
 				pagegroups: pagegroups || [],
 				network: 'adpTags',
+				fluid,
 				networkData: {
 					isResponsive: false,
 					headerBidding: false,
@@ -139,8 +143,7 @@ class AdCodeGenerator extends Component {
 					isBackwardCompatibleSizes: true,
 					keyValues: {
 						FP_S_A: 0
-					},
-					multipleAdSizes: []
+					}
 				},
 				formatData: {
 					platform,
@@ -163,6 +166,16 @@ class AdCodeGenerator extends Component {
 			}
 		};
 	}
+
+	handleToggle = (value, event) => {
+		const attributeValue = event.target.getAttribute('name');
+		const name = attributeValue.split('-')[0];
+
+		this.setState({
+			[name]: value,
+			progress: 30
+		});
+	};
 
 	saveHandler(data) {
 		const { createAd } = this.props;
@@ -282,6 +295,32 @@ class AdCodeGenerator extends Component {
 		);
 	}
 
+	renderFluidToggle() {
+		const { match } = this.props;
+		const { siteId } = match.params;
+		const { fluid } = this.state;
+		return (
+			<Row>
+				<Col md={5}>
+					<CustomToggleSwitch
+						labelText="Fluid"
+						className="u-margin-b4 negative-toggle fluid-Toggle"
+						checked={fluid}
+						onChange={this.handleToggle}
+						layout="horizontal"
+						size="m"
+						on="Yes"
+						off="No"
+						defaultLayout
+						name={`fluid-${siteId}`}
+						id={`js-fluid-${siteId}`}
+					/>
+				</Col>
+				<Col md={7} />
+			</Row>
+		);
+	}
+
 	renderIndividualFormat() {
 		const { format } = this.state;
 		const save = {
@@ -349,7 +388,8 @@ class AdCodeGenerator extends Component {
 				) : (
 					<div>
 						{this.renderPlatformOptions()}
-						{progress >= 15 ? this.renderFormats() : null}
+						{progress >= 10 ? this.renderFormats() : null}
+						{progress >= 20 ? this.renderFluidToggle() : null}
 						{progress >= 30 ? this.renderSizes() : null}
 						{progress >= 45 ? this.renderPagegroups() : null}
 						{progress >= 60 && pagegroupsPresent ? this.renderFormatDetails() : null}
