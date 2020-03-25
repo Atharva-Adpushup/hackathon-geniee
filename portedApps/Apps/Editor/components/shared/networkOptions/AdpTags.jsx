@@ -120,11 +120,9 @@ class AdpTags extends Component {
 				!multipleAdSizes.length
 			);
 		let computedMultipleAdSizes = multipleAdSizes;
-		let fluidVal;
 
 		if (shouldMultipleAdSizesBeComputed) {
 			computedMultipleAdSizes = this.getMultipleAdSizesOfPrimaryAdSize(isBackwardCompatibleSizes);
-			fluidVal = fluid;
 		}
 		this.props.submitHandler({
 			headerBidding: !!hbAcivated,
@@ -137,7 +135,7 @@ class AdpTags extends Component {
 			overrideActive,
 			overrideSizeTo: overrideActive ? overrideSizeTo : null,
 			formats: ['display'],
-			fluid: fluidVal,
+			fluid,
 			dfpAdunitId,
 			// NOTE: Below key is exported only because it is required to provide `Backward compatible size mapping`
 			// functionality in features (such as InContent sections) that cannot receive primary ad size
