@@ -12,12 +12,17 @@ var adp = window.adpushup,
 	getContainer = function(ad) {
 		var defer = $.Deferred(),
 			isResponsive = !!(ad.networkData && ad.networkData.isResponsive),
-			computedStylesObject = isResponsive
-				? {}
-				: {
-						width: ad.width,
-						height: ad.height
-				  };
+			isFluid = ad.fluid,
+			computedStylesObject = {
+				textAlign: 'center',
+				margin: '0 auto'
+			};
+
+		if (!isResponsive && !isFluid) {
+			computedStylesObject.width = ad.width;
+			computedStylesObject.height = ad.height;
+			computedStylesObject.overflow = 'hidden';
+		}
 
 		try {
 			var $adEl = $('#' + ad.id);
@@ -79,16 +84,16 @@ var adp = window.adpushup,
 			ad.originalId = adId;
 			if (isAdElement) {
 				var feedbackData = {
-						ads: [ad],
-						xpathMiss: [],
-						errorCode: commonConsts.ERROR_CODES.NO_ERROR,
-						// mode: 16,
-						mode: commonConsts.MODE.ADPUSHUP, // Sending Mode 1 in Manual Ads
-						referrer: config.referrer,
-						tracking: browserConfig.trackerSupported,
-						variationId: commonConsts.MANUAL_ADS.VARIATION
-					};
-					//oldFeedbackData = $.extend(true, {}, feedbackData);
+					ads: [ad],
+					xpathMiss: [],
+					errorCode: commonConsts.ERROR_CODES.NO_ERROR,
+					// mode: 16,
+					mode: commonConsts.MODE.ADPUSHUP, // Sending Mode 1 in Manual Ads
+					referrer: config.referrer,
+					tracking: browserConfig.trackerSupported,
+					variationId: commonConsts.MANUAL_ADS.VARIATION
+				};
+				//oldFeedbackData = $.extend(true, {}, feedbackData);
 
 				//oldFeedbackData.ads = [ad.originalId];
 				return getContainer(ad)
