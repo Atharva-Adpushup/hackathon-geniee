@@ -48,6 +48,7 @@ class AdpTags extends Component {
 			hbAcivated: isGenieeUIAccessDAInActive ? false : headerBidding,
 			showMultipleAdSizesSelector: false,
 			multipleAdSizes: [],
+			fluid: false,
 			dfpAdunitId: '',
 			refreshSlot,
 			refreshInterval,
@@ -102,6 +103,7 @@ class AdpTags extends Component {
 				fpKey,
 				hbAcivated,
 				pf,
+				fluid,
 				keyValues,
 				refreshSlot,
 				refreshInterval,
@@ -118,9 +120,11 @@ class AdpTags extends Component {
 				!multipleAdSizes.length
 			);
 		let computedMultipleAdSizes = multipleAdSizes;
+		let fluidVal;
 
 		if (shouldMultipleAdSizesBeComputed) {
 			computedMultipleAdSizes = this.getMultipleAdSizesOfPrimaryAdSize(isBackwardCompatibleSizes);
+			fluidVal = fluid;
 		}
 		this.props.submitHandler({
 			headerBidding: !!hbAcivated,
@@ -132,7 +136,8 @@ class AdpTags extends Component {
 			refreshInterval,
 			overrideActive,
 			overrideSizeTo: overrideActive ? overrideSizeTo : null,
-			multipleAdSizes: computedMultipleAdSizes,
+			formats: ['display'],
+			fluid: fluidVal,
 			dfpAdunitId,
 			// NOTE: Below key is exported only because it is required to provide `Backward compatible size mapping`
 			// functionality in features (such as InContent sections) that cannot receive primary ad size
@@ -582,6 +587,24 @@ class AdpTags extends Component {
 											? `js-refresh-slot-switch-${this.props.id}`
 											: 'js-refresh-slot-switch'
 									}
+									customComponentClass={this.props.fromPanel ? 'u-padding-0px' : ''}
+								/>
+							</Col>
+							<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px' : ''}>
+								<CustomToggleSwitch
+									labelText="Fluid"
+									className="mB-10"
+									checked={this.state.fluid}
+									onChange={val => {
+										this.setState({ fluid: !!val });
+									}}
+									layout="horizontal"
+									size="m"
+									on="Yes"
+									off="No"
+									defaultLayout={this.props.fromPanel ? false : true}
+									name={this.props.id ? `fluid-${this.props.id}` : 'fluid'}
+									id={this.props.id ? `fluid-${this.props.id}` : 'fluid'}
 									customComponentClass={this.props.fromPanel ? 'u-padding-0px' : ''}
 								/>
 							</Col>
