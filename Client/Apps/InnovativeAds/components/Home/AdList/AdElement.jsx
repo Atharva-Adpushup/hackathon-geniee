@@ -14,6 +14,7 @@ import {
 } from '../../../configs/commonConsts';
 import Edit from '../../../../../Components/EditBox/index';
 import AdNetworkDetails from './AdNetworkDetails';
+import FluidEdit from './FluidEdit';
 import Tags from '../../../../../Components/Tags';
 import CustomButton from '../../../../../Components/CustomButton/index';
 
@@ -159,6 +160,12 @@ class AdElement extends Component {
 				return modalToggle({
 					header: 'Edit Format Options',
 					body: <FormatEdit ad={ad} onSave={this.updateWrapper} onCancel={modalToggle} />,
+					footer: false
+				});
+			case 'fluidEdit':
+				return modalToggle({
+					header: 'Edit Fluid Value',
+					body: <FluidEdit ad={ad} onSubmit={this.updateWrapper} onCancel={modalToggle} />,
 					footer: false
 				});
 			default:

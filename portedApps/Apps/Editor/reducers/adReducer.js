@@ -21,8 +21,7 @@ const adsByIds = (state = {}, action) => {
 				// Network data object is only added when custom zone id value is added
 				// through Visual Editor
 				isNetworkData = !!(payload.networkData && Object.keys(payload.networkData).length),
-				isZoneId = !!(isNetworkData && payload.networkData.zoneId),
-				
+				isZoneId = !!(isNetworkData && payload.networkData.zoneId);
 
 			if (isZoneId) {
 				createAdObject.networkData = { zoneId: payload.networkData.zoneId };
@@ -34,7 +33,6 @@ const adsByIds = (state = {}, action) => {
 					payload.networkData
 				);
 			}
-		
 
 			return {
 				...state,
@@ -135,6 +133,8 @@ const adsByIds = (state = {}, action) => {
 				[action.adId]: {
 					...state[action.adId],
 					network: action.network,
+					fluid: action.networkData.fluid,
+
 					// adCode:
 					// 	action.network == 'adpTags'
 					// 		? ''

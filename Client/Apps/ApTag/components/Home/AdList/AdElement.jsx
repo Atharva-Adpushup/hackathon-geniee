@@ -12,6 +12,7 @@ import AdNetworkDetails from './AdNetworkDetails';
 import LazyLoadSettings from './LazyLoadSettings';
 import EditBox from '../../../../../Components/EditBox/index';
 import Tags from '../../../../../Components/Tags/index';
+import FluidEdit from './FluidEdit';
 
 class AdElement extends Component {
 	constructor(props) {
@@ -19,6 +20,7 @@ class AdElement extends Component {
 		this.state = {
 			showNetworkDetails: false,
 			showLazyload: false,
+			showFluidVal: false,
 			editName: false,
 			isActive: Object.prototype.hasOwnProperty.call(props.ad, 'isActive')
 				? props.ad.isActive
@@ -67,7 +69,7 @@ class AdElement extends Component {
 
 	renderAdDetails() {
 		const { ad, updateAd, networkConfig, user, siteId } = this.props;
-		const { showLazyload, showNetworkDetails, editName, isActive } = this.state;
+		const { showLazyload, showNetworkDetails, editName, isActive, showFluidVal } = this.state;
 		const isAMP = ad.formatData.type === 'amp';
 
 		let code = isAMP ? this.getAMPAdCode(ad) : ADCODE;
@@ -75,6 +77,18 @@ class AdElement extends Component {
 		code = code
 			? code.replace(/__AD_ID__/g, ad.id).replace(/__CUSTOM_ATTRIBS__/, customAttributes)
 			: null;
+
+		if (showFluidVal) {
+			return (
+				<FluidEdit
+					ad={ad}
+					siteId={siteId}
+					onCancel={() => this.toggleHandler('showFluidVal')}
+					onSubmit={this.updateWrapper}
+					user={user}
+				/>
+			);
+		}
 
 		if (showNetworkDetails) {
 			return (
@@ -166,6 +180,13 @@ class AdElement extends Component {
 							onClick={() => this.toggleHandler('showNetworkDetails')}
 						>
 							Network Details
+						</CustomButton>
+						<CustomButton
+							variant="secondary"
+							className="u-margin-l3 u-margin-t3 pull-right"
+							onClick={() => this.toggleHandler('showFluidVal')}
+						>
+							Edit Fluid
 						</CustomButton>
 						<CustomButton
 							variant="secondary"
