@@ -6,8 +6,7 @@ const CONSTANTS = {
 			stretching: 'uniform',
 			mute: true,
 			advertising: {
-				dismissible: true,
-				displayHeading: true,
+				dismissible: false,
 				endstate: 'suspended'
 			}
 		},
