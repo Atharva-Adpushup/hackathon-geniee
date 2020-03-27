@@ -121,7 +121,6 @@ class AdpTags extends Component {
 				!multipleAdSizes.length
 			);
 		let computedMultipleAdSizes = multipleAdSizes;
-
 		if (shouldMultipleAdSizesBeComputed) {
 			computedMultipleAdSizes = this.getMultipleAdSizesOfPrimaryAdSize(isBackwardCompatibleSizes);
 		}
@@ -132,7 +131,7 @@ class AdpTags extends Component {
 				[fpKey]: pf
 			},
 			refreshSlot,
-			refreshInterval,
+			refreshInterval: refreshInterval || refreshIntervals[0],
 			overrideActive,
 			overrideSizeTo: overrideActive ? overrideSizeTo : null,
 			formats: ['display'],
@@ -558,9 +557,9 @@ class AdpTags extends Component {
 					</div>
 				)}
 				{this.renderDynamicAllocation()}
-				{this.props.geniee ? null : this.renderIsBackwardCompatibleSizesToggleSwitch()}
+				{/* {this.props.geniee ? null : this.renderIsBackwardCompatibleSizesToggleSwitch()} */}
 				{this.props.geniee ? this.renderDFPAdUnitIdSelectBox() : null}
-				{this.props.geniee ? this.renderManageMultipleAdSizeBlock() : null}
+				{/* {this.props.geniee ? this.renderManageMultipleAdSizeBlock() : null} */}
 				{!this.props.geniee ? this.renderOverrideSettings(isGenieeEditableMode) : null}
 				{!this.props.geniee &&
 				this.props.networkConfig &&

@@ -57,7 +57,8 @@ class AdCodeGenerator extends Component {
 			platform: '',
 			size: null,
 			progress: 50,
-			customFields: {}
+			customFields: {},
+			fluid: false
 		});
 	}
 
@@ -65,7 +66,8 @@ class AdCodeGenerator extends Component {
 		const { progress } = this.state;
 		this.setState({
 			size,
-			progress: progress > 75 ? progress : 75
+			progress: progress > 75 ? progress : 75,
+			fluid: false
 		});
 	}
 
