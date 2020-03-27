@@ -47,7 +47,8 @@ class AdCodeGenerator extends Component {
 		this.setState({
 			platform,
 			size: platform === 'responsive' ? 'responsive' : null,
-			progress: platform === 'responsive' ? 75 : 50
+			progress: platform === 'responsive' ? 75 : 50,
+			fluid: false
 		});
 	}
 
