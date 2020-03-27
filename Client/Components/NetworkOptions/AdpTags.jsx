@@ -572,9 +572,9 @@ class AdpTags extends Component {
 					</div>
 				)}
 				{this.renderDynamicAllocation()}
-				{geniee ? null : this.renderIsBackwardCompatibleSizesToggleSwitch()}
+				{/* {geniee ? null : this.renderIsBackwardCompatibleSizesToggleSwitch()} */}
 				{geniee ? this.renderDFPAdUnitIdSelectBox() : null}
-				{geniee ? this.renderManageMultipleAdSizeBlock() : null}
+				{/* {geniee ? this.renderManageMultipleAdSizeBlock() : null} */}
 				{!geniee ? this.renderOverrideSettings(isGenieeEditableMode) : null}
 				{!geniee && networkConfig && networkConfig.enableRefreshSlot ? (
 					<div>

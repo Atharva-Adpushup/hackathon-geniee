@@ -49,7 +49,8 @@ class AdCodeGenerator extends Component {
 			platform,
 			format: '',
 			size: null,
-			pagegroups: []
+			pagegroups: [],
+			fluid: false
 		});
 	}
 
@@ -58,7 +59,8 @@ class AdCodeGenerator extends Component {
 			format,
 			size: null,
 			progress: 20,
-			pagegroups: []
+			pagegroups: [],
+			fluid: false
 		});
 	}
 
@@ -195,7 +197,8 @@ class AdCodeGenerator extends Component {
 				progress: 0,
 				platform: '',
 				size: null,
-				loading: false
+				loading: false,
+				fluid: false
 			},
 			() => resetCurrentAd(siteId)
 		);
