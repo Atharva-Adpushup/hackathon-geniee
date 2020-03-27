@@ -61,7 +61,7 @@ class AdpTags extends Component {
 			multipleAdSizes: [],
 			dfpAdunitId: '',
 			refreshSlot,
-			refreshInterval,
+			refreshInterval: refreshInterval || refreshIntervals[0],
 			isBackwardCompatibleSizes: true,
 			isResponsive: isResponsiveAdSize,
 			overrideActive,
