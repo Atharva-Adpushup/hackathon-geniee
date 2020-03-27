@@ -128,12 +128,15 @@ const adsByIds = (state = {}, action) => {
 		 */
 
 		case adActions.UPDATE_NETWORK:
+			const fluid = action.networkData.fluid;
+			delete action.networkData.fluid;
+
 			return {
 				...state,
 				[action.adId]: {
 					...state[action.adId],
 					network: action.network,
-					fluid: action.networkData.fluid,
+					fluid,
 
 					// adCode:
 					// 	action.network == 'adpTags'
