@@ -68,20 +68,26 @@ var hb = {
 					render: function(bid) {
 						// push to render queue because jwplayer may not be loaded yet.
 						bid.renderer.push(() => {
-							jwplayer(bid.adUnitCode).setup(
-								merge(
-									{
-										width: bid.width,
-										height: bid.height,
-										advertising: {
-											outstream: true,
-											client: 'vast',
-											vastxml: bid.vastXml
-										}
-									},
-									multiFormatConstants.VIDEO.JW_PLAYER_CONFIG
+							var jwPlayerInstance = jwplayer(bid.adUnitCode);
+							jwPlayerInstance
+								.setup(
+									merge(
+										{
+											width: bid.width,
+											height: bid.height,
+											advertising: {
+												outstream: true,
+												client: 'vast',
+												vastxml: bid.vastXml
+											}
+										},
+										multiFormatConstants.VIDEO.JW_PLAYER_CONFIG
+									)
 								)
-							);
+								.on('ready', function() {
+									var playerElem = jwPlayerInstance.getContainer();
+									playerElem.style.margin = '0 auto';
+								});
 						});
 					}
 				},

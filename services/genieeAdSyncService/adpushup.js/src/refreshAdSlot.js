@@ -32,6 +32,12 @@ var utils = require('../libs/utils'),
 				slot.toBeRefreshed = true;
 
 				removeBidderTargeting(slot);
+
+				// Remove jwplayer if rendered for current adUnit
+				var jwPlayerInstance = window.jwplayer && window.jwplayer(slot.slotId);
+				var hasJWPlayerRendered = jwPlayerInstance && !!jwPlayerInstance.getState();
+				if (hasJWPlayerRendered) jwPlayerInstance.remove();
+
 				adp.config.apLiteActive
 					? window.apLite.queSlotForBidding(slot)
 					: adp.adpTags.queSlotForBidding(slot);
