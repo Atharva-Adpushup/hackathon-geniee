@@ -26,13 +26,7 @@ var utils = require('../libs/utils'),
 		if (utils.checkElementInViewPercent(container)) {
 			var currentTime = new Date().getTime();
 			container.attr('data-refresh-time', currentTime);
-			if (ad.network === commonConsts.NETWORKS.ADPTAGS && !ad.networkData.headerBidding) {
-				var slot = getAdpSlot(ad);
-				refreshGPTSlot(slot.gSlot);
-				// TODO: Implement apLite Feedback
-				!adp.config.apLiteActive && sendFeedback(ad);
-				setRefreshTimeOut(container, ad);
-			} else if (ad.network === commonConsts.NETWORKS.ADPTAGS && ad.networkData.headerBidding) {
+			if (ad.network === commonConsts.NETWORKS.ADPTAGS) {
 				//container.children().remove();
 				var slot = getAdpSlot(ad);
 				slot.toBeRefreshed = true;
@@ -94,9 +88,6 @@ var utils = require('../libs/utils'),
 		feedbackData.ads = [ad];
 		feedbackData.variationId = adp.config.selectedVariation;
 		utils.sendFeedback(feedbackData);
-	},
-	refreshGPTSlot = function(gSlot) {
-		googletag.pubads().refresh([gSlot]);
 	},
 	stopRefreshForASlot = function(container) {
 		var adIndex = ads.findIndex(obj => obj.container[0] === container[0]);
