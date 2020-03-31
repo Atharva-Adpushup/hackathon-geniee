@@ -134,7 +134,7 @@ var hb = {
 				var slot = isApLiteActive
 					? window.apLite.adpSlots[bidData.adUnitCode]
 					: window.adpushup.adpTags.adpSlots[bidData.adUnitCode];
-				var computedCPMValue = utils.currencyConversionActive(adp.config)
+				var computedCPMValue = utils.currencyConversionActive(config.PREBID_CONFIG.currencyConfig)
 					? 'originalCpm'
 					: 'cpm';
 
