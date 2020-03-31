@@ -117,8 +117,8 @@ var auction = {
 			) {
 				bidderSettings[bidderCode] = {
 					bidCpmAdjustment: function(bidCpm) {
-						return bidCpm - bidCpm * (revenueShare / 100);
-					}
+						return bidCpm - bidCpm * (this.revenueShare / 100);
+					}.bind({ revenueShare: revenueShare })
 				};
 			}
 		}
