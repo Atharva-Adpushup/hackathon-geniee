@@ -151,7 +151,26 @@ const APPS = [
 			type: TYPE.LINK,
 			text: 'Manage App',
 			link: LINK_TYPE.INAPP,
-			destination: '/sites/__SITE_ID__/apps/header-bidding',
+			destination: '/sites/__SITE_ID__/apps/amp',
+			icon: 'cog'
+		}
+	},
+	{
+		name: 'AMP Settings',
+		key: 3,
+		link: 3,
+		image: '/assets/images/manageSites/amp.png',
+		description:
+			'We provide custom implementation of Google’s Accelerated Mobile Pages (AMP) for web publishers. Our focus is on decreasing page load times, maintaining the uniformity of design, and increasing ad yield.',
+		left: {
+			type: TYPE.TEXT,
+			text: 'Status: __STATUS__'
+		},
+		right: {
+			type: TYPE.LINK,
+			text: 'Manage App',
+			link: LINK_TYPE.INAPP,
+			destination: '/sites/__SITE_ID__/apps/amp',
 			icon: 'cog'
 		}
 	},
