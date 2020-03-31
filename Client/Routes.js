@@ -31,6 +31,7 @@ const AdsTxtManagement = lazy(() =>
 );
 const Payment = lazy(() => import(/* webpackChunkName: "payment" */ './Pages/Payment'));
 const ApTag = lazy(() => import(/* webpackChunkName: "apTag" */ './Apps/ApTag/index'));
+const Amp = lazy(() => import(/* webpackChunkName: "amp" */ './Apps/Amp/index'));
 const InnovativeAds = lazy(() =>
 	import(/* webpackChunkName: "innovativeAds" */ './Apps/InnovativeAds/index')
 );
@@ -110,6 +111,22 @@ const Routes = () => (
 					name="Manage"
 					path="/sites/:siteId/apps/ap-tag/manage"
 					component={ApTag}
+				/>
+
+				{/** Amp */}
+				<PrivateRoute
+					exact
+					customProps={{ activeTab: APT_NAV_ITEMS_INDEXES.CREATE_ADS }}
+					name="AMP"
+					path="/sites/:siteId/apps/amp"
+					component={Amp}
+				/>
+				<PrivateRoute
+					exact
+					customProps={{ activeTab: APT_NAV_ITEMS_INDEXES.MANAGE_ADS }}
+					name="Manage"
+					path="/sites/:siteId/apps/amp/manage"
+					component={Amp}
 				/>
 
 				{/** Innovative Ads */}
