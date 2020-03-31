@@ -64,10 +64,6 @@ const adsByIds = (state = {}, action) => {
 			if (isInContentAdZoneId) {
 				createInContentAdObject.networkData = { zoneId: payload.networkData.zoneId };
 			}
-
-			if (isInContentAdZoneId) {
-				createInContentAdObject.networkData = { zoneId: payload.networkData.zoneId };
-			}
 			if (isInContentAdNetworkData) {
 				let networkData = createInContentAdObject.networkData || {};
 				createInContentAdObject.networkData = Object.assign({}, networkData, payload.networkData);
