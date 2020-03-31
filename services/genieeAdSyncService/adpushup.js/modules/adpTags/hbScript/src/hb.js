@@ -60,6 +60,8 @@ var hb = {
 				}
 			});
 
+			var playerSize = utils.getVideoPlayerSize(prebidSizes);
+
 			var prebidSlot = {
 				code: adpSlot.containerId,
 				mediaTypes: {},
@@ -73,8 +75,8 @@ var hb = {
 								.setup(
 									merge(
 										{
-											width: bid.width,
-											height: bid.height,
+											width: playerSize[0],
+											height: playerSize[1],
 											advertising: {
 												outstream: true,
 												client: 'vast',
@@ -104,7 +106,6 @@ var hb = {
 						break;
 					}
 					case 'video': {
-						const playerSize = utils.getVideoPlayerSize(prebidSizes);
 						prebidSlot.mediaTypes.video = {
 							...mediaTypesConfig.video,
 							playerSize
