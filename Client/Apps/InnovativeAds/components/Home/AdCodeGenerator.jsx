@@ -393,7 +393,7 @@ class AdCodeGenerator extends Component {
 						{this.renderPlatformOptions()}
 						{progress >= 10 ? this.renderFormats() : null}
 						{progress >= 20 ? this.renderFluidToggle() : null}
-						{progress >= 30 ? this.renderSizes() : null}
+						{progress >= 20 ? this.renderSizes() : null}
 						{progress >= 45 ? this.renderPagegroups() : null}
 						{progress >= 60 && pagegroupsPresent ? this.renderFormatDetails() : null}
 					</div>
