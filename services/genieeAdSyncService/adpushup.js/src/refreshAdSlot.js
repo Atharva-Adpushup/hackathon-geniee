@@ -34,7 +34,7 @@ var utils = require('../libs/utils'),
 				removeBidderTargeting(slot);
 
 				// Remove jwplayer if rendered for current adUnit
-				var jwPlayerInstance = window.jwplayer && window.jwplayer(slot.slotId);
+				var jwPlayerInstance = window.jwplayer && window.jwplayer(slot.containerId);
 				var hasJWPlayerRendered = jwPlayerInstance && !!jwPlayerInstance.getState();
 				if (hasJWPlayerRendered) jwPlayerInstance.remove();
 
