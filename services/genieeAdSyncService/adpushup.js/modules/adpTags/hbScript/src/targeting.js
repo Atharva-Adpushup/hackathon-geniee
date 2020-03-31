@@ -61,7 +61,8 @@ var targeting = {
 		var targeting = {
 			[keys.ADPUSHUP_RAN]: 1,
 			[keys.SITE_ID]: config.SITE_ID,
-			[keys.HB_RAN]: 0
+			[keys.HB_RAN]: 0,
+			[keys.FLUID]: 0
 		};
 		var adServerTargeting = this.getAdserverTargeting(adpSlot);
 
