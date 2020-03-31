@@ -300,7 +300,7 @@ class AdCodeGenerator extends Component {
 						{this.renderTypeOptions()}
 						{progress >= 50 ? this.renderSizes() : null}
 						{progress >= 75 ? this.renderFluidToggle() : null}
-						{progress >= 90 ? this.renderButton('Generate AdCode', this.saveHandler) : null}
+						{progress >= 75 ? this.renderButton('Generate AdCode', this.saveHandler) : null}
 					</div>
 				)}
 			</div>
