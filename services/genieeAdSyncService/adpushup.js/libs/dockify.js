@@ -25,8 +25,11 @@ var $ = require('./jquery'),
 		var $el = $(xPath);
 		var elComputedStyles = window.getComputedStyle($el[0]);
 		var dockedCSS = getDockedCSS(formatData, elComputedStyles);
-		var windowHeight = $(window).height();
-
+		var adWidth = $el.width();
+		var adHeight = $el.height();
+		$el.parent().width(adWidth);
+		$el.parent().height(adHeight);
+		
 		var dockifyTrigger = function () {
 			var windowScrollTop = $(window).scrollTop();
 			var elTopOffset = $el.parent().offset().top;
@@ -45,8 +48,8 @@ var $ = require('./jquery'),
 				});
 			}
 
-			if (offset && windowScrollTop + windowHeight > offset) {
-				var resetTop = offset - (windowScrollTop + windowHeight);
+			if (offset && windowScrollTop + adHeight > offset) {
+				var resetTop = offset - (windowScrollTop + adHeight);
 				$el.css({
 					position: 'fixed',
 					top: resetTop, // This goes in negative as the offset is crossed
