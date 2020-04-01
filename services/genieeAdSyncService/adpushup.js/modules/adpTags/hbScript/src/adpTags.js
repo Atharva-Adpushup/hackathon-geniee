@@ -69,9 +69,9 @@ var adpTags = {
 			var slotId = optionalParam.dfpAdunit;
 			var isResponsive = optionalParam.isResponsive;
 			var sectionName = optionalParam.sectionName;
-			var multipleAdSizes =
+			var computedSizes =
 				constants.AD_SIZE_MAPPING.IAB_SIZES.BACKWARD_COMPATIBLE_MAPPING[size.join(',')] ||
-				optionalParam.multipleAdSizes;
+				[];
 			var services = optionalParam.services;
 			var formats =
 				(Array.isArray(optionalParam.formats) &&
@@ -95,7 +95,7 @@ var adpTags = {
 				activeDFPNetwork: utils.getActiveDFPNetwork(),
 				size: size,
 				sectionName: sectionName,
-				computedSizes: multipleAdSizes || [],
+				computedSizes: computedSizes,
 				isResponsive: isResponsive,
 				containerId: containerId,
 				timeout: timeout,

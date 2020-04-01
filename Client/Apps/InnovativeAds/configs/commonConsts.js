@@ -196,7 +196,8 @@ const OPS_AD_LIST_ACTIONS = [
 	{ displayText: 'Network Options', key: 'networkEdit' },
 	{ displayText: 'Archive', key: 'archive' },
 	{ displayText: 'Unarchive', key: 'unarchive' },
-	{ displayText: 'Format Options', key: 'formatEdit' }
+	{ displayText: 'Format Options', key: 'formatEdit' },
+	{ displayText: 'Edit Fluid', key: 'fluidEdit' }
 ];
 const AD_LIST_ACTIONS = {
 	copy: {

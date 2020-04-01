@@ -60,6 +60,8 @@ var hb = {
 				}
 			});
 
+			var playerSize = utils.getVideoPlayerSize(prebidSizes);
+
 			var prebidSlot = {
 				code: adpSlot.containerId,
 				mediaTypes: {},
@@ -68,20 +70,26 @@ var hb = {
 					render: function(bid) {
 						// push to render queue because jwplayer may not be loaded yet.
 						bid.renderer.push(() => {
-							jwplayer(bid.adUnitCode).setup(
-								merge(
-									{
-										width: bid.width,
-										height: bid.height,
-										advertising: {
-											outstream: true,
-											client: 'vast',
-											vastxml: bid.vastXml
-										}
-									},
-									multiFormatConstants.VIDEO.JW_PLAYER_CONFIG
+							var jwPlayerInstance = jwplayer(bid.adUnitCode);
+							jwPlayerInstance
+								.setup(
+									merge(
+										{
+											width: playerSize[0],
+											height: playerSize[1],
+											advertising: {
+												outstream: true,
+												client: 'vast',
+												vastxml: bid.vastXml
+											}
+										},
+										multiFormatConstants.VIDEO.JW_PLAYER_CONFIG
+									)
 								)
-							);
+								.on('ready', function() {
+									var playerElem = jwPlayerInstance.getContainer();
+									playerElem.style.margin = '0 auto';
+								});
 						});
 					}
 				},
@@ -98,7 +106,6 @@ var hb = {
 						break;
 					}
 					case 'video': {
-						const playerSize = utils.getVideoPlayerSize(prebidSizes);
 						prebidSlot.mediaTypes.video = {
 							...mediaTypesConfig.video,
 							playerSize

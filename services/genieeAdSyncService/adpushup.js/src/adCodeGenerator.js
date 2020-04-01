@@ -65,7 +65,6 @@ var utils = require('../libs/utils'),
 						isNetworkData = !!ad.networkData,
 						networkData = isNetworkData && ad.networkData,
 						//Geniee specific variables
-						isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length),
 						isResponsive = !!(networkData && networkData.isResponsive),
 						isManual = !!ad.isManual,
 						sectionName = ad.sectionName || null,
@@ -93,13 +92,13 @@ var utils = require('../libs/utils'),
 							enableLazyLoading: networkData.enableLazyLoading,
 							overrideActive: networkData.overrideActive,
 							overrideSizeTo: networkData.overrideSizeTo,
-							multipleAdSizes: isMultipleAdSizes ? ad.multipleAdSizes : null,
 							isResponsive: isResponsive,
 							isManual: isManual,
 							sectionName: sectionName,
 							adId: ad.id,
 							services: ad.services,
-							refreshInterval: networkData.refreshInterval || consts.AD_REFRESH_INTERVAL / 1000
+							refreshInterval: networkData.refreshInterval || consts.AD_REFRESH_INTERVAL / 1000,
+							fluid: ad.fluid
 						}
 					);
 				}
@@ -196,7 +195,9 @@ var utils = require('../libs/utils'),
 					adpTags.display(computedDFPAdUnitId);
 				}
 			} else {
-				adCode.push('<div id="' + computedDFPAdUnitId + '" style="margin: 0 auto">');
+				adCode.push(
+					'<div id="' + computedDFPAdUnitId + '" style="text-align: center; margin: 0 auto;">'
+				);
 				adCode.push('<scr' + 'ipt type="text/javascript">');
 				adCode.push('window.adpushup.adpTags.que.push(function(){');
 				adCode.push('window.adpushup.adpTags.display("' + computedDFPAdUnitId + '");');
