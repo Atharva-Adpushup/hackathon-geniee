@@ -129,7 +129,7 @@ module.exports = {
 	getNetworkAdUnitIdForAd: function(ad) {
 		switch (ad.network) {
 			case commonConsts.NETWORKS.ADPTAGS:
-				return ad.networkData.dfpAdunit;
+				return ad.networkData.dfpAdunit || ad.networkData.adunitId;
 			case commonConsts.NETWORKS.ADSENSE:
 			case commonConsts.NETWORKS.ADX:
 			case commonConsts.NETWORKS.MEDIANET:
