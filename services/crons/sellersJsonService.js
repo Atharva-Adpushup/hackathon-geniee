@@ -1,6 +1,7 @@
 const fs = require('fs');
 const md5 = require('md5');
 const path = require('path');
+const moment = require('moment');
 const validator = require('validator');
 const couchbase = require('couchbase');
 const _findIndex = require('lodash/findIndex');
@@ -22,6 +23,8 @@ const filenames = {
 const SELLER_TYPE = 'PUBLISHER';
 const APP_BUCKET = 'AppBucket';
 const AP_APP_BUCKET = 'apAppBucket';
+const NEW_USER_AGE_IN_MONTHS = 2;
+const LAST_PAYMENT_CHECK_EXPIRY = 5;
 
 let errors = [];
 
@@ -34,12 +37,12 @@ let confidentialEmails = ['@media.net'];
 let confidentialCompanyNames = ['media.net'];
 let ignoredEmails = ['@mailinator', '@adpushup'];
 
+let fileOutput = commonConsts.SELLERS_JSON.fileConfig;
+
 function getUsersQueryForBucket(bucketName) {
-	let queryString = `SELECT email, sellerId, ARRAY site.domain FOR site IN sites END AS siteDomains FROM ${bucketName} WHERE meta().id LIKE 'user::%' AND ARRAY_LENGTH(sites) > 0;`;
+	let queryString = `SELECT email, sellerId, dateCreated, lastPaymentCheckDateSellersJson, ARRAY site.domain FOR site IN sites END AS siteDomains FROM ${bucketName} WHERE meta().id LIKE 'user::%' AND ARRAY_LENGTH(sites) > 0;`;
 	return couchbase.N1qlQuery.fromString(queryString);
 }
-
-let fileOutput = commonConsts.SELLERS_JSON.fileConfig;
 
 function colorLog(color, ...messages) {
 	let colors = {
@@ -162,8 +165,20 @@ function getPreparedSiteObj(siteDomain, user) {
 	return siteObj;
 }
 
-function getCompanyNameFromTipalti(email) {
-	return userModel.getUserDetailsFromTipalti(email).then(function(data) {
+function userPaidInPastFiveMonths(email) {
+	const from = moment()
+		.subtract(5, 'months')
+		.startOf('day')
+		.unix();
+	const to = moment().unix();
+
+	return userModel.getUserPaymentDetailsForRangeFromTipalti(email, from, to).then(function(data) {
+		return data.submittedTotal && data.submittedTotal > 0;
+	});
+}
+
+function getUserCompanyName(email) {
+	return userModel.getUserBasicDetailsFromTipalti(email).then(function(data) {
 		return data.CompanyName || data.Name || false;
 	});
 }
@@ -178,7 +193,8 @@ function updateUser(user, data) {
 function updateApAppBucketUser(user, data) {
 	let queryString = `UPDATE ${user.bucket} USE KEYS 'user::${user.email}' SET`;
 	for (key in data) {
-		queryString += ` ${key} = "${data[key].replace(/"/g, "'")}",`;
+		const value = typeof data[key] === 'string' ? `"${data[key].replace(/"/g, "'")}"` : data[key];
+		queryString += ` ${key} = ${value},`;
 	}
 	queryString = `${rightTrim(queryString, ',')}`;
 
@@ -257,6 +273,27 @@ function replaceWithOldSellersJson() {
 	});
 }
 
+function shouldUserBeAdded(user) {
+	if (user.dateCreated && moment().diff(user.dateCreated, 'months') <= NEW_USER_AGE_IN_MONTHS) {
+		return Promise.resolve();
+	}
+
+	if (
+		user.lastPaymentCheckDateSellersJson &&
+		moment().diff(user.lastPaymentCheckDateSellersJson, 'months') < LAST_PAYMENT_CHECK_EXPIRY
+	) {
+		return Promise.resolve();
+	}
+
+	return userPaidInPastFiveMonths(user.email).then(function(paid) {
+		if (paid) {
+			return paid;
+		}
+
+		return Promise.reject({ skipUser: true });
+	});
+}
+
 function processDataInChunks(users, chunkSize = 500) {
 	let chunkPromises = [];
 	let usersChunk = users.splice(0, chunkSize);
@@ -264,7 +301,7 @@ function processDataInChunks(users, chunkSize = 500) {
 	while (usersChunk.length > 0) {
 		let user = usersChunk.pop();
 
-		const userModelUpdates = {};
+		const userUpdates = {};
 		const pendingPromises = [];
 
 		if (!user.sellerId) {
@@ -274,9 +311,9 @@ function processDataInChunks(users, chunkSize = 500) {
 			user.sellerId = sellerId;
 		}
 
-		let getCompanyNamePromise = getCompanyNameFromTipalti(user.email).then(function(companyName) {
+		let getCompanyNamePromise = getUserCompanyName(user.email).then(function(companyName) {
 			if (companyName) {
-				userModelUpdates['companyName'] = companyName;
+				userUpdates.companyName = companyName;
 				user.companyName = companyName;
 			}
 		});
@@ -289,7 +326,13 @@ function processDataInChunks(users, chunkSize = 500) {
 						// skip user if company name not set in user after fetching from Tipalti
 						return Promise.reject({ skipUser: true });
 					}
-					return updateUser(user, userModelUpdates);
+					return shouldUserBeAdded(user).then(function(paidInPastFiveMonths) {
+						if (paidInPastFiveMonths) {
+							userUpdates.lastPaymentCheckDateSellersJson = new Date().getTime();
+						}
+
+						return updateUser(user, userUpdates);
+					});
 				})
 				.then(function() {
 					let siteObj = getPreparedSiteObj(user.siteDomain, user);

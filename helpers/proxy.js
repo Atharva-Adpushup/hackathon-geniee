@@ -8,6 +8,33 @@ var request = require('request-promise'),
 	commonConst = require('../configs/commonConsts'),
 	config = require('../configs/config'),
 	AdPushupError = require('../helpers/AdPushupError'),
+	getTipaltiKey = function(key, params) {
+		return crypto
+			.createHmac('sha256', key)
+			.update(params.toString('utf-8'))
+			.digest('hex');
+	},
+	getUserIDAP = function(email) {
+		return encodeURIComponent(
+			crypto
+				.createHash('md5')
+				.update(email)
+				.digest('hex')
+				.substr(0, 64)
+		);
+	},
+	getTipaltiConfig = function() {
+		const tipaltiConfig = config.tipalti;
+		const { key: configKey, payerName, soapUrl: url } = tipaltiConfig;
+		const timestamp = Math.floor(+new Date() / 1000);
+
+		return {
+			url,
+			configKey,
+			payerName,
+			timestamp
+		};
+	},
 	API = {
 		load(url, userAgent, fullResponse) {
 			userAgent =
@@ -191,32 +218,22 @@ var request = require('request-promise'),
 		},
 
 		checkIfBillingProfileComplete(email) {
-			var tipaltiConfig = config.tipalti,
-				url = tipaltiConfig.soapUrl,
-				payeeId = encodeURIComponent(
-					crypto
-						.createHash('md5')
-						.update(email)
-						.digest('hex')
-						.substr(0, 64)
-				),
-				amount = 5000,
-				payer = tipaltiConfig.payerName,
-				date = Math.floor(+new Date() / 1000),
-				paramsStr = payer + payeeId + date + amount,
-				key = tipaltiConfig.key,
-				hash = crypto
-					.createHmac('sha256', key)
-					.update(paramsStr.toString('utf-8'))
-					.digest('hex'),
-				requestArgs = {
-					payerName: payer,
-					idap: payeeId,
-					timestamp: date,
-					key: hash,
-					amount
-				},
-				createClient = Promise.promisify(soap.createClient);
+			const idap = getUserIDAP(email);
+			const { url, payerName, configKey, timestamp } = getTipaltiConfig(email);
+
+			const amount = commonConst.USER_PAYABLE_VERIFICATION_AMOUNT;
+			const params = payerName + idap + timestamp + amount;
+			const key = getTipaltiKey(configKey, params);
+
+			const requestArgs = {
+				key,
+				idap,
+				amount,
+				payerName,
+				timestamp
+			};
+
+			const createClient = Promise.promisify(soap.createClient);
 
 			return createClient(url)
 				.then(function(client) {
@@ -232,31 +249,20 @@ var request = require('request-promise'),
 				});
 		},
 
-		getPayeeDetailsFromTipalti(email) {
-			var tipaltiConfig = config.tipalti,
-				url = tipaltiConfig.soapUrl,
-				payeeId = encodeURIComponent(
-					crypto
-						.createHash('md5')
-						.update(email)
-						.digest('hex')
-						.substr(0, 64)
-				),
-				payer = tipaltiConfig.payerName,
-				date = Math.floor(+new Date() / 1000),
-				paramsStr = payer + payeeId + date,
-				key = tipaltiConfig.key,
-				hash = crypto
-					.createHmac('sha256', key)
-					.update(paramsStr.toString('utf-8'))
-					.digest('hex'),
-				requestArgs = {
-					payerName: payer,
-					idap: payeeId,
-					timestamp: date,
-					key: hash
-				},
-				createClient = Promise.promisify(soap.createClient);
+		getBasicDetailsFromTipalti(email) {
+			const idap = getUserIDAP(email);
+			const { url, payerName, timestamp, configKey } = getTipaltiConfig(email);
+
+			const params = payerName + idap + timestamp;
+			const key = getTipaltiKey(configKey, params);
+
+			const requestArgs = {
+				key,
+				idap,
+				payerName,
+				timestamp
+			};
+			const createClient = Promise.promisify(soap.createClient);
 
 			return createClient(url)
 				.then(function(client) {
@@ -266,6 +272,43 @@ var request = require('request-promise'),
 				})
 				.then(function(result) {
 					return result.GetPayeeDetailsResult;
+				})
+				.catch(function(error) {
+					return `FAILED TO FETCH DATA FROM TIPALTI: ${error}`;
+				});
+		},
+
+		getPaymentDetailsForRangeFromTipalti(email, from, to) {
+			// from and to are to be unix timestamp in SECONDS, not MILLISECONDS
+
+			const idap = getUserIDAP(email);
+			const { url, configKey, payerName, timestamp } = getTipaltiConfig(email);
+			const params = payerName + idap + Math.floor(+new Date() / 1000) + from;
+			const key = getTipaltiKey(configKey, params);
+
+			const requestArgs = {
+				key,
+				idap,
+				from,
+				to,
+				payerName,
+				timestamp
+			};
+
+			const createClient = Promise.promisify(soap.createClient);
+
+			return createClient(url)
+				.then(function(client) {
+					var method = client['PaymentsBetweenDates'];
+					method = Promise.promisify(method);
+					return method(requestArgs);
+				})
+				.then(function(result) {
+					const { errorCode } = result.PaymentsBetweenDatesResult;
+					if (errorCode !== 'OK') {
+						throw new Error(errorCode);
+					}
+					return result.PaymentsBetweenDatesResult;
 				})
 				.catch(function(error) {
 					return `FAILED TO FETCH DATA FROM TIPALTI: ${error}`;
