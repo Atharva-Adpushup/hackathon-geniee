@@ -14,12 +14,13 @@ class Setup extends React.Component {
 
 	componentDidMount() {
 		const {
+			// eslint-disable-next-line no-unused-vars
 			setupStatus: { isAdpushupDfp, dfpConnected, adServerSetupStatus }
 		} = this.props;
 
 		if (!isAdpushupDfp && !dfpConnected) this.addPostMessageListener();
 
-		if (adServerSetupStatus === 1) this.checkOrBeginDfpSetup();
+		// if (adServerSetupStatus === 1) this.checkOrBeginDfpSetup();
 	}
 
 	addPostMessageListener = () => {
@@ -104,6 +105,7 @@ class Setup extends React.Component {
 		const {
 			setupStatus: { dfpConnected, isPublisherActiveDfp, adServerSetupStatus }
 		} = this.props;
+		// eslint-disable-next-line no-unused-vars
 		const { checkingAdserverSetupStatusForFirstTime } = this.state;
 
 		let statusJsx;
@@ -122,9 +124,7 @@ class Setup extends React.Component {
 				break;
 			}
 			case 3: {
-				statusJsx = (
-					<FontAwesomeIcon icon="info-circle" title="AdServer Setup failed. Please retry." />
-				);
+				statusJsx = <FontAwesomeIcon icon="info-circle" title="AdServer Setup failed" />;
 				break;
 			}
 			default:
@@ -137,7 +137,7 @@ class Setup extends React.Component {
 				{dfpConnected && !isPublisherActiveDfp && (
 					<span className="">Ad Server Activation by AdPushup pending</span>
 				)}
-				{dfpConnected && isPublisherActiveDfp && adServerSetupStatus === 0 && (
+				{/* {dfpConnected && isPublisherActiveDfp && adServerSetupStatus === 0 && (
 					<span className="btn-wrap">
 						<CustomButton
 							variant="secondary"
@@ -163,7 +163,7 @@ class Setup extends React.Component {
 							Retry Setup
 						</CustomButton>
 					</span>
-				)}
+				)} */}
 			</li>
 		);
 	}
