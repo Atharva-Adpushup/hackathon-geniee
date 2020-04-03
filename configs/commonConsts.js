@@ -10,6 +10,10 @@ module.exports = {
 	SALT: '_ADP_RANDOMIZER_',
 	BASE_URL: computedProductionURL,
 	INTEGRATION_BASE_URL: computedProductionURL,
+	SUPPORT_EMAIL: 'support@adpushup.com',
+	ADDRESS: {
+		USA: '4023 Kennett Pike #52878 Wilmington, DE 19807'
+	},
 	DFP_WEB_SERVICE_ENDPOINT: 'https://api.adpushup.com/DfpWebService/info',
 	TRANSACTION_LOG_ENDPOINT: 'https://api.adpushup.com/SetupLogWebService/log',
 	REPORT_STATUS: 'https://api.adpushup.com/OpsWebService/ops?report=getNetworkImportServiceStatus',
@@ -536,5 +540,24 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 	cronSchedule: {
 		activeSiteMarkingAndAdsTxtService: '20 14,2 * * *',
 		adManagerSyncService: '0 */12 * * *'
-	}
+	},
+	SELLERS_JSON: {
+		fileConfig: {
+			contact_email: 'support@adpushup.com',
+			contact_address: '4023 Kennett Pike #52878 Wilmington, DE 19807',
+			version: '1.0',
+			identifiers: [
+				{
+					name: 'TAG-ID',
+					value: 'b0b8ff8485794fdd'
+				},
+				{
+					name: 'DUNS',
+					value: '116775197'
+				}
+			],
+			sellers: []
+		}
+	},
+	USER_PAYABLE_VERIFICATION_AMOUNT: 5000
 };
