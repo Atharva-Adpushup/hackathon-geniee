@@ -103,8 +103,10 @@ if (window.NodeList && !NodeList.prototype.forEach) {
 	};
 }
 
-//Array.prototype.includes pollyfill taken from
-//https://www.npmjs.com/package/polyfill-array-includes
+/**
+ * Array.prototype.includes pollyfill taken from
+ * https://www.npmjs.com/package/polyfill-array-includes
+ * /
 if (!Array.prototype.includes) {
 	Object.defineProperty(Array.prototype, 'includes', {
 		value: function(searchElement, fromIndex) {
@@ -153,6 +155,24 @@ if (!Array.prototype.includes) {
 			return false;
 		}
 	});
+}
+
+/**
+ * String.prototype.includes pollyfill taken from
+ * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/includes
+ * /
+if (!String.prototype.includes) {
+	String.prototype.includes = function(search, start) {
+		'use strict';
+
+		if (search instanceof RegExp) {
+			throw TypeError('first argument must not be a RegExp');
+		}
+		if (start === undefined) {
+			start = 0;
+		}
+		return this.indexOf(search, start) !== -1;
+	};
 }
 
 (function() {
