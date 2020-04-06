@@ -3,7 +3,7 @@ import { Redirect } from 'react-router-dom';
 import { Nav, NavItem } from '@/Client/helpers/react-bootstrap-imports';
 
 import CustomError from '../../../../Components/CustomError/index';
-// import AdCodeGeneratorContainer from '../../containers/AdCodeGeneratorContainer';
+import AdCodeGeneratorContainer from '../../containers/AdCodeGeneratorContainer';
 // import AdListContainer from '../../containers/AdListContainer';
 import {
 	AMP_NAV_ITEMS,
@@ -55,7 +55,7 @@ class Home extends Component {
 		switch (activeTab) {
 			default:
 			case AMP_NAV_ITEMS_INDEXES.CREATE_ADS:
-				// return <AdCodeGeneratorContainer {...this.props} />;
+				return <AdCodeGeneratorContainer {...this.props} />;
 				return <div>Hi</div>;
 			case AMP_NAV_ITEMS_INDEXES.MANAGE_ADS:
 				// return <AdListContainer {...this.props} />;

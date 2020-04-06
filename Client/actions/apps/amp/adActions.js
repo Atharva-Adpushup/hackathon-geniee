@@ -9,12 +9,12 @@ const createAd = params => dispatch =>
 			const { data } = response.data;
 			dispatch({
 				type: AD_ACTIONS.UPDATE_ADS_LIST,
-				data: data.doc,
+				data: { ...params.ad, id: data.id, name: data.name },
 				siteId: params.siteId
 			});
 			return dispatch({
 				type: GLOBAL_ACTIONS.SET_CURRENT_AD,
-				currentAd: data.doc.id,
+				currentAd: data.id,
 				maxHeight: params.ad.maxHeight,
 				siteId: params.siteId
 			});
@@ -23,12 +23,18 @@ const createAd = params => dispatch =>
 
 const fetchAds = params => dispatch =>
 	axiosInstance
-		.get('/amp/fetchAds', { params })
+		.get('/apTag/fetchAds', { params })
 		.then(response => {
 			const { data } = response.data;
 			return dispatch({ type: AD_ACTIONS.REPLACE_ADS_LIST, data: data.ads, siteId: params.siteId });
 		})
 		.catch(err => errorHandler(err, 'Ad Fetching Failed'));
+
+const deleteAd = params => dispatch =>
+	axiosInstance
+		.post('/apTag/deleteAd', { params })
+		.then(() => dispatch({ type: AD_ACTIONS.DELETE_AD, adId: params.adId, siteId: params.siteId }))
+		.catch(err => errorHandler(err, 'Ad Deletion Failed'));
 
 const updateAd = (adId, siteId, data) => dispatch =>
 	dispatch({
@@ -42,7 +48,7 @@ const updateAd = (adId, siteId, data) => dispatch =>
 
 const modifyAdOnServer = (siteId, adId, data) => dispatch =>
 	axiosInstance
-		.post('/amp/modifyAd', { siteId, adId, data })
+		.post('/apTag/modifyAd', { siteId, adId, data })
 		.then(() =>
 			dispatch({
 				type: AD_ACTIONS.UPDATE_AD,
@@ -55,4 +61,4 @@ const modifyAdOnServer = (siteId, adId, data) => dispatch =>
 		)
 		.catch(err => errorHandler(err));
 
-export { createAd, fetchAds, updateAd, modifyAdOnServer };
+export { createAd, fetchAds, deleteAd, updateAd, modifyAdOnServer };

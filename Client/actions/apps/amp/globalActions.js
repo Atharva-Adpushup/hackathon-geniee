@@ -2,9 +2,9 @@
 import { GLOBAL_ACTIONS } from '../../../constants/amp';
 import axiosInstance from '../../../helpers/axiosInstance';
 import { errorHandler } from '../../../helpers/commonFunctions';
-import { getAdsAndGlobal } from '../../../Apps/AmpTag/lib/helpers';
+import { getAdsAndGlobal } from '../../../Apps/amp/lib/helpers';
 
-const masterSave = (adsToUpdate, siteId) => (_, getState) => {
+const masterSave = siteId => (_, getState) => {
 	const { ads } = getAdsAndGlobal(getState(), {
 		match: {
 			params: {
@@ -12,9 +12,9 @@ const masterSave = (adsToUpdate, siteId) => (_, getState) => {
 			}
 		}
 	});
-	const data = { siteId, adsToUpdate, ads: ads.content };
+	const data = { siteId, ads: ads.content };
 	return axiosInstance
-		.post('/amp/masterSave', data)
+		.post('/apTag/masterSave', data)
 		.then(() => window.alert('Save successful'))
 		.catch(err => errorHandler(err, 'Master Save Failed'));
 };
