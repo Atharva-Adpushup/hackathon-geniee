@@ -414,7 +414,8 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		hb: 'hbdc::',
 		adsTxt: 'adtx::',
 		apLite: 'aplt::',
-		network: 'ntwk::'
+		network: 'ntwk::',
+		amp: 'amtg::'
 	},
 	tagManagerInitialDoc: {
 		siteId: null,
@@ -422,6 +423,14 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		siteDomain: null,
 		ads: []
 	},
+
+	ampAdInitialDoc: {
+		siteId: null,
+		ownerEmail: null,
+		siteDomain: null,
+		ads: []
+	},
+
 	INNOVATIVE_ADS_INITIAL_DOC: {
 		siteId: null,
 		ownerEmail: null,

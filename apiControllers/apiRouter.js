@@ -16,6 +16,7 @@ const visualEditorController = require('./visualEditorController');
 const ampSettingsController = require('./ampSettingsController');
 const adsTxtController = require('./adsTxtController');
 const utilityController = require('./utilityController');
+const ampController = require('./ampController');
 
 const apiAuthMiddleware = require('../middlewares/apiAuthMiddleware');
 
@@ -37,6 +38,7 @@ router.use('/visualEditor', visualEditorController);
 router.use('/ampSettings', ampSettingsController);
 router.use('/adsTxt', adsTxtController);
 router.use('/utils', utilityController);
+router.use('/amp', ampController);
 router.use('/', indexController);
 
 module.exports = router;
