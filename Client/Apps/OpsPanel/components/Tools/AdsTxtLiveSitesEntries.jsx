@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import React, { Component, Fragment } from 'react';
 import { CSVLink } from 'react-csv';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -14,7 +15,7 @@ import {
 } from '@/Client/helpers/react-bootstrap-imports';
 
 import FieldGroup from '../../../../Components/Layout/FieldGroup';
-import { ADS_TXT_LIVE_SITES_ENTRIES } from '../../configs/commonConsts';
+import { ADS_TXT_LIVE_SITES_ENTRIES, ADS_TXT_LIVE_SITES_STATUS } from '../../configs/commonConsts';
 import CustomButton from '../../../../Components/CustomButton/index';
 import SelectBox from '../../../../Components/SelectBox/index';
 import axiosInstance from '../../../../helpers/axiosInstance';
@@ -24,6 +25,8 @@ const DEFAULT_STATE = {
 	adsTxtSnippet: '',
 	isLoading: false
 };
+
+const { ALL_MISSING, ALL_PRESENT } = ADS_TXT_LIVE_SITES_STATUS;
 
 class AdsTxtLiveSitesEntries extends Component {
 	constructor(props) {
@@ -60,19 +63,22 @@ class AdsTxtLiveSitesEntries extends Component {
 	formattedCsvData = () => {
 		const { adsTxtData, selectedValue } = this.state;
 
-		let csvData = [];
+		const csvData = [];
 		let missingEntries = '';
 		let presentEntries = '';
+
+		// eslint-disable-next-line array-callback-return
 		adsTxtData.map(data => {
 			if (selectedValue === 'Global Entries') {
-				if (data.status === 2) {
+				if (data.status === ALL_MISSING) {
 					missingEntries = data.adsTxtEntries;
 					presentEntries = '';
-				} else if (data.status === 1) {
+				} else if (data.status === ALL_PRESENT) {
 					missingEntries = '';
 					presentEntries = data.adsTxtEntries;
 				} else {
 					missingEntries = data.adsTxtEntries.ourAdsTxt;
+					// eslint-disable-next-line prefer-destructuring
 					presentEntries = data.adsTxtEntries.presentEntries;
 				}
 				csvData.push({
@@ -97,6 +103,20 @@ class AdsTxtLiveSitesEntries extends Component {
 					domain: data.domain,
 					accountEmail: data.accountEmail,
 					presentEntries
+				});
+			} else if (selectedValue === 'Mandatory Ads.txt Snippet Missing') {
+				csvData.push({
+					siteId: data.siteId,
+					domain: data.domain,
+					accountEmail: data.accountEmail,
+					missingMandatorySnippet: data.adsTxtEntries
+				});
+			} else if (selectedValue === 'Mandatory Ads.txt Snippet Present') {
+				csvData.push({
+					siteId: data.siteId,
+					domain: data.domain,
+					accountEmail: data.accountEmail,
+					presentMandatorySnippet: data.adsTxtEntries
 				});
 			} else {
 				csvData.push({
@@ -145,6 +165,7 @@ class AdsTxtLiveSitesEntries extends Component {
 				});
 			})
 			.catch(err => {
+				// eslint-disable-next-line no-console
 				console.log(err);
 				showNotification({
 					mode: 'error',
@@ -203,18 +224,18 @@ class AdsTxtLiveSitesEntries extends Component {
 										{selectedValue !== 'Global Entries' ? null : (
 											<React.Fragment>
 												<td>
-													{val.status === 2 ? (
+													{val.status === ALL_MISSING ? (
 														<pre style={{ fontSize: '10' }}>{val.adsTxtEntries} </pre>
-													) : val.status === 1 ? (
+													) : val.status === ALL_PRESENT ? (
 														''
 													) : (
 														<pre style={{ fontSize: '10' }}>{val.adsTxtEntries.ourAdsTxt} </pre>
 													)}
 												</td>
 												<td>
-													{val.status === 2 ? (
+													{val.status === ALL_MISSING ? (
 														''
-													) : val.status === 1 ? (
+													) : val.status === ALL_PRESENT ? (
 														<pre style={{ fontSize: '10' }}>{val.adsTxtEntries} </pre>
 													) : (
 														<pre style={{ fontSize: '10' }}>

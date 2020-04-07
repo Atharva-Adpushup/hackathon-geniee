@@ -1,4 +1,3 @@
-import React from 'react';
 // OP abbreviation stands for Ops Panel
 const OP_NAV_ITEMS_INDEXES = {
 	SETTINGS: 'settings',
@@ -280,8 +279,17 @@ const ADS_TXT_LIVE_SITES_ENTRIES = [
 	{ name: 'Missing Entries', value: 'Missing Entries' },
 	{ name: 'Present Entries', value: 'Present Entries' },
 	{ name: 'Global Entries', value: 'Global Entries' },
+	{ name: 'Mandatory Ads.txt Snippet Missing', value: 'Mandatory Ads.txt Snippet Missing' },
+	{ name: 'Mandatory Ads.txt Snippet Present', value: 'Mandatory Ads.txt Snippet Present' },
 	{ name: 'No Ads.Txt Present', value: 'No Ads.Txt Present' }
 ];
+
+const ADS_TXT_LIVE_SITES_STATUS = {
+	ALL_PRESENT: 1,
+	ALL_MISSING: 2,
+	PARTIAL_PRESENT: 3,
+	NO_ADS_TXT: 4
+};
 
 const INFO_PANEL_IDENTIFIERS = {
 	QUICK_SNAPSHOT: 'QUICK_SNAPSHOT',
@@ -392,6 +400,10 @@ const SITE_MAPPING_COLUMNS = [
 	{
 		Header: 'Owner Email',
 		accessor: 'accountEmail'
+	},
+	{
+		Header: 'Account ID',
+		accessor: 'sellerId'
 	},
 	{
 		Header: 'Onboarding Status',
@@ -507,5 +519,6 @@ export {
 	PREBID_CURRENCY_URL,
 	ADS_TXT_LIVE_SITES_ENTRIES,
 	HB_BIDDERS_KEYS_NULL_SHOULD_NOT_BE_NULL,
-	REFRESH_RATE_ENTRIES
+	REFRESH_RATE_ENTRIES,
+	ADS_TXT_LIVE_SITES_STATUS
 };
