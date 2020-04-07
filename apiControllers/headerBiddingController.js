@@ -330,10 +330,19 @@ router
 		const { email } = req.user;
 		const newPrebidConfig = req.body;
 		const { timeOut, refreshTimeOut } = newPrebidConfig;
+		const {
+			HEADER_BIDDING: { INITIAL_TIMEOUT, REFRESH_TIMEOUT }
+		} = commonConsts;
 
-		const isValidTimeout = timeOut => !Number.isNaN(timeOut) && timeOut >= 500 && timeOut <= 10000;
+		const isValidInitialTimeout =
+			!Number.isNaN(timeOut) && timeOut >= INITIAL_TIMEOUT.MIN && timeOut <= INITIAL_TIMEOUT.MAX;
 
-		if (!(isValidTimeout(timeOut) && isValidTimeout(refreshTimeOut))) {
+		const isValidRefreshTimeout =
+			!Number.isNaN(refreshTimeOut) &&
+			refreshTimeOut >= REFRESH_TIMEOUT.MIN &&
+			refreshTimeOut <= REFRESH_TIMEOUT.MAX;
+
+		if (!isValidInitialTimeout || !isValidRefreshTimeout) {
 			return res.status(httpStatus.BAD_REQUEST).json({ error: 'Invalid data' });
 		}
 
