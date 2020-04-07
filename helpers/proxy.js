@@ -176,7 +176,8 @@ var request = require('request-promise'),
 
 			if (mandatoryAdsTxtEntry) {
 				hasMandatoryAdsTxtEntry = existingAdsTxtArr.some(
-					snippet => snippet === mandatoryAdsTxtEntry
+					({ domain, pubId, relation, authorityId }) =>
+						`${domain}, ${pubId}, ${relation}, ${authorityId}` === mandatoryAdsTxtEntry
 				);
 			}
 
@@ -219,20 +220,20 @@ var request = require('request-promise'),
 					throw new AdPushupError({
 						httpCode: 204,
 						error: 'Our Ads.txt entries not found',
-					type: 'ourAdsTxt',
-					data: {
-						ourAdsTxt: entriesNotFound.join('\n')
-					}
-				});
-			} else {
-				throw new AdPushupError({
-					httpCode: 206,
-					error: 'Few of our Ads.txt entries not found',
-					type: 'ourAdsTxt',
-					data: {
-						ourAdsTxt: entriesNotFound.join('\n'),
-						presentEntries: entriesFound.join('\n')
-					}
+						type: 'ourAdsTxt',
+						data: {
+							ourAdsTxt: entriesNotFound.join('\n')
+						}
+					});
+				} else {
+					throw new AdPushupError({
+						httpCode: 206,
+						error: 'Few of our Ads.txt entries not found',
+						type: 'ourAdsTxt',
+						data: {
+							ourAdsTxt: entriesNotFound.join('\n'),
+							presentEntries: entriesFound.join('\n')
+						}
 					});
 				}
 			}
@@ -285,7 +286,7 @@ var request = require('request-promise'),
 						if (!data.mandatoryAdsTxtEntry) {
 							data.mandatoryAdsTxtEntry = mandatoryAdsTxtEntry;
 						}
-						
+
 						throw new AdPushupError({
 							httpCode: 400,
 							error: errorResponse,
@@ -293,7 +294,6 @@ var request = require('request-promise'),
 						});
 					}
 				} else {
-
 					throw new AdPushupError({
 						httpCode: 404,
 						error: {
@@ -322,7 +322,7 @@ var request = require('request-promise'),
 			if (existingAdsTxtArr.length) {
 				return API.verifyMandatoryAdsTxtEntry(mandatoryAdsTxtEntry, existingAdsTxtArr);
 			}
-	
+
 			throw new AdPushupError({
 				httpCode: 404,
 				error: 'ads.txt file not found on your site. Please upload our ads.txt file on your site.',
