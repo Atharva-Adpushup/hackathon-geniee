@@ -173,6 +173,7 @@ var $ = require('../../libs/jquery'),
 												refreshSlot = apLiteAdUnit.refreshSlot,
 												refreshInterval = apLiteAdUnit.refreshInterval,
 												formats = apLiteAdUnit.formats,
+												adType = (apLiteAdUnit.formatData && apLiteAdUnit.formatData.type) || null,
 												adpSlot = this.createAdpSlot(
 													gptSlotElementId,
 													dfpAdUnitName,
