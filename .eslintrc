@@ -44,6 +44,7 @@
 	},
 	"globals": {
 		"alert": true,
+		"confirm": true,
 		"window": true,
 		"document": true,
 		"localStorage": true,

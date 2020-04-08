@@ -44,6 +44,7 @@ var $ = require('../../libs/jquery'),
 				slot.hasRendered = false;
 				slot.biddingComplete = false;
 				slot.feedbackSent = false;
+				slot.auctionFeedbackSent = false;
 				slot.hasTimedOut = false;
 				slot.feedback = {
 					winner: constants.FEEDBACK.DEFAULT_WINNER
@@ -102,13 +103,15 @@ var $ = require('../../libs/jquery'),
 					gSlot: gptSlot,
 					biddingComplete: false,
 					feedbackSent: false,
+					auctionFeedbackSent: false,
 					hasTimedOut: false,
 					sectionId: sectionId,
 					services: optionalParam.services,
 					feedback: {
 						winner: constants.FEEDBACK.DEFAULT_WINNER
 					},
-					fluid: optionalParam.fluid
+					fluid: optionalParam.fluid,
+					adType: optionalParam.adType
 				};
 
 				return adpSlot;
@@ -131,6 +134,8 @@ var $ = require('../../libs/jquery'),
 						}
 					]
 				};
+
+				feedbackData = $.extend({}, feedbackData, utils.getPageFeedbackMetaData());
 
 				return feedbackData;
 			},
@@ -168,6 +173,7 @@ var $ = require('../../libs/jquery'),
 												refreshSlot = apLiteAdUnit.refreshSlot,
 												refreshInterval = apLiteAdUnit.refreshInterval,
 												formats = apLiteAdUnit.formats,
+												adType = (apLiteAdUnit.formatData && apLiteAdUnit.formatData.type) || null,
 												adpSlot = this.createAdpSlot(
 													gptSlotElementId,
 													dfpAdUnitName,
@@ -185,7 +191,8 @@ var $ = require('../../libs/jquery'),
 														refreshSlot,
 														refreshInterval,
 														services: [commonConsts.SERVICES.AP_LITE],
-														fluid: false
+														fluid: false,
+														adType: adType
 													}
 												);
 
@@ -224,7 +231,7 @@ var $ = require('../../libs/jquery'),
 
 						return;
 					} catch (e) {
-						console.err ? console.err(e) : console.log(e);
+						console.error ? console.error(e) : console.log(e);
 					}
 				} else {
 					return false;

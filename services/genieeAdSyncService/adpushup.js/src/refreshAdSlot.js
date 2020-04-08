@@ -14,10 +14,13 @@ var utils = require('../libs/utils'),
 				refreshInterval !== undefined
 					? refreshInterval
 					: parseInt(ad.networkData.refreshInterval) * 1000 || commonConsts.AD_REFRESH_INTERVAL;
+
 			var currentTime = new Date().getTime();
 			container.attr('data-refresh-time', currentTime);
+
 			var oldTimeoutId = container.attr('data-timeout');
 			oldTimeoutId && clearTimeout(oldTimeoutId);
+
 			var newTimeoutId = setTimeout(refreshAd, refreshInterval, container, ad);
 			container.attr('data-timeout', newTimeoutId);
 		}
@@ -90,7 +93,8 @@ var utils = require('../libs/utils'),
 			referrer: adp.config.referrer,
 			tracking: false
 		};
-		feedbackData.xpathMiss = [];
+		var feedbackMetaData = utils.getPageFeedbackMetaData();
+		feedbackData = $.extend({}, feedbackData, feedbackMetaData);
 		feedbackData.ads = [ad];
 		feedbackData.variationId = adp.config.selectedVariation;
 		utils.sendFeedback(feedbackData);

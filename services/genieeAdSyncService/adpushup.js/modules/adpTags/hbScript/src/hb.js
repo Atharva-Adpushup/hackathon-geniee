@@ -7,9 +7,9 @@ var adp = require('./adp');
 var utils = require('./utils');
 var auction = require('./auction');
 var config = require('./config');
-var feedback = require('./feedback');
+var analytics = require('./analytics');
 var { multiFormatConstants, mediaTypesConfig } = require('./multiFormatConfig');
-var isApLiteActive = window.adpushup.config.apLiteActive;
+
 var hb = {
 	createPrebidSlots: function(adpSlotsBatch) {
 		var prebidSlots = [];
@@ -132,38 +132,22 @@ var hb = {
 			? auction.end(adpBatchId)
 			: auction.start(prebidSlots, adpBatchId);
 	},
-	setBidWonListener: function(w) {
-		w._apPbJs.que.push(function() {
-			w._apPbJs.onEvent(constants.EVENTS.PREBID.BID_WON, function(bidData) {
-				utils.log(
-					`%c===${bidData.mediaType.charAt(0).toUpperCase() +
-						bidData.mediaType.slice(1)}BidWon====`,
-					'background:#00b900; color:white; padding: 5px 8px; font-size:14px; font-weight:bold; border-radius:5px;',
-					bidData
-				);
+	enableHbAnalytics: function(w) {
+		const prebidEvents = constants.EVENTS.PREBID;
 
-				var slot = isApLiteActive
-					? window.apLite.adpSlots[bidData.adUnitCode]
-					: window.adpushup.adpTags.adpSlots[bidData.adUnitCode];
-				var computedCPMValue = utils.currencyConversionActive(
-					config.PREBID_CONFIG.currencyConfig
-				)
-					? 'originalCpm'
-					: 'cpm';
+		const eventsToBeEnabled = [
+			prebidEvents.AUCTION_END,
+			prebidEvents.BID_TIMEOUT,
+			prebidEvents.BID_WON
+		];
 
-				if (slot) {
-					slot.feedback.winner = bidData.bidder;
-					slot.feedback.winningRevenue = bidData[computedCPMValue] / 1000;
-					slot.feedback.winnerAdUnitId = bidData.adId;
-					slot.feedback.unitFormat = bidData.mediaType;
+		const deps = { w, adp, utils, config, constants };
 
-					if (isApLiteActive)
-						slot.feedback.renderedSize = [bidData.width, bidData.height];
-
-					return feedback.send(slot);
-				}
-			});
-		});
+		try {
+			analytics.init(deps).enableEvents(eventsToBeEnabled);
+		} catch (error) {
+			console.error('HB Analytics :', error);
+		}
 	},
 	loadPrebid: function(w) {
 		/*
@@ -176,7 +160,7 @@ var hb = {
 			})();
 		}
 
-		return this.setBidWonListener(w);
+		adp.config.hbAnalytics && this.enableHbAnalytics(w);
 	},
 	init: function(w) {
 		w._apPbJs = w._apPbJs || {};

@@ -73,7 +73,7 @@ class Component {
 		// uncomment the below when re-thinking poweredByAdPushup logic
 		// const $closeButton = this.createCloseButton(formatData);
 
-		const feedbackOptions = {
+		let feedbackOptions = {
 			// ads: [this.interactiveAd],
 			// xpathMiss: [],
 			errorCode: 1,
@@ -85,6 +85,15 @@ class Component {
 				? adp.config.selectedVariation
 				: commonConsts.MANUAL_ADS.VARIATION
 		};
+
+		let feedbackMetaData =
+			(adp &&
+				adp.utils &&
+				adp.utils.getPageFeedbackMetaData &&
+				adp.utils.getPageFeedbackMetaData()) ||
+			{};
+
+		feedbackOptions = $.extend({}, feedbackOptions, feedbackMetaData);
 
 		// uncomment the below when re-thinking poweredByAdPushup logic
 		// const $frame = $('<div />');

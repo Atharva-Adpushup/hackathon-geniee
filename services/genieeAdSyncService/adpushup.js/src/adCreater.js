@@ -219,13 +219,12 @@ var $ = require('../libs/jquery'),
 			handleContentSelectorFailure = function(inContentAds) {
 				feedbackData.contentSelectorMissing = true;
 				$.each(inContentAds, function(index, ad) {
-					//feedbackData.xpathMiss.push(ad.id);
 					next(ad, { success: false });
 				});
 			},
 			next = function(adObj, data) {
-				//var newFeedbackAdObj = $.extend({}, adObj),
-				var newFeedbackAdObj = {},
+				var feedbackMetaData = utils.getPageFeedbackMetaData();
+				var newFeedbackAdObj = $.extend({}, feedbackMetaData),
 					isContainerVisible;
 
 				if (displayCounter) {
@@ -246,54 +245,19 @@ var $ = require('../libs/jquery'),
 							return false;
 						}
 
-						// feedbackData.xpathMiss = [];
-						// New feedback
-						//newFeedbackAdObj.status = commonConsts.AD_STATUS.IMPRESSION;
 						adObj.status = commonConsts.AD_STATUS.IMPRESSION;
-						//newFeedbackAdObj.ads = [newFeedbackAdObj];
 						newFeedbackAdObj.ads = [$.extend({}, adObj)];
-						//feedbackData.newFeedbackAdObj = newFeedbackAdObj;
-						//feedbackData.eventType = 1;
 						newFeedbackAdObj.errorCode = commonConsts.ERROR_CODES.NO_ERROR;
-						//feedbackData.mode = 1;
 						newFeedbackAdObj.mode = commonConsts.MODE.ADPUSHUP;
 
-						//feedbackData.xpathMiss = [];
-						//feedbackData.ads = [adObj.id];
 						placeAd(data.container, adObj);
-						// utils.sendFeedbackOld(feedbackData);
 						utils.sendFeedback(newFeedbackAdObj);
-
-						// Old feedback
-						// feedbackData.eventType = 1;
-						// feedbackData.mode = 1;
-						// feedbackData.ads = [adObj.id];
-						// utils.sendFeedbackOld(feedbackData);
 					} else {
-						// New feedback
-						//newFeedbackAdObj.xpathMiss = true;
-						//newFeedbackAdObj.status = commonConsts.AD_STATUS.XPATH_MISS;
 						adObj.status = commonConsts.AD_STATUS.XPATH_MISS;
-						//newFeedbackAdObj.ads = [newFeedbackAdObj];
 						newFeedbackAdObj.ads = [$.extend({}, adObj)];
-						//feedbackData.newFeedbackAdObj = newFeedbackAdObj;
-
-						//feedbackData.ads = [];
-						//feedbackData.eventType = 1;
 						newFeedbackAdObj.errorCode = commonConsts.ERROR_CODES.NO_ERROR;
-						//feedbackData.mode = 1;
 						newFeedbackAdObj.mode = commonConsts.MODE.ADPUSHUP;
-						//feedbackData.xpathMiss = [adObj.id];
-						// utils.sendFeedbackOld(feedbackData);
 						utils.sendFeedback(newFeedbackAdObj);
-
-						// Old feedback
-						// var oldFeedbackData = $.extend({}, feedbackData);
-						// oldFeedbackData.ads = [];
-						// oldFeedbackData.eventType = 1;
-						// oldFeedbackData.mode = 1;
-						// oldFeedbackData.xpathMiss = [adObj.id];
-						// utils.sendFeedbackOld(oldFeedbackData);
 					}
 				}
 				if (!displayCounter && !finished) {
@@ -301,7 +265,6 @@ var $ = require('../libs/jquery'),
 					if (variation.customJs && variation.customJs.afterAp && !adp.afterJSExecuted) {
 						executeAfterJS(variation);
 					}
-					//utils.sendFeedback(feedbackData);
 				}
 			},
 			placeStructuralAds = function(structuredAds) {

@@ -16,7 +16,7 @@ module.exports = {
 			isapDebugParam = !!(isQueryParams && queryParams.apDebug);
 
 		if (typeof console !== 'undefined' && console.log && isapDebugParam)
-			console.log.apply(console, arguments);
+			console.log.call(console, 'AP:', ...arguments);
 	},
 	base64Encode: function(data) {
 		return Base64.btoa(data);
@@ -612,7 +612,8 @@ module.exports = {
 				elTop = $el.offset().top,
 				viewPort = this.getViewport(),
 				elPixel = elWidth * elHeight,
-				inViewHeight = this.isElementInViewport(el) && this.isElementInViewport(el).inViewHeight,
+				inViewElement = this.isElementInViewport(el),
+				inViewHeight = inViewElement && inViewElement.inViewHeight,
 				inViewPixel = elWidth * inViewHeight,
 				percentageInView = (inViewPixel * 100) / elPixel;
 			if (elHeight == 0 && elTop >= viewPort.top && elTop <= viewPort.bottom) {
@@ -636,5 +637,37 @@ module.exports = {
 
 		return objURL;
 	},
-	dockify: dockify
+	dockify: dockify,
+	isSiteHttps: function() {
+		return window.location.protocol === 'https:';
+	},
+	getMetaKeyword: function() {
+		return (document.querySelector("meta[name='keywords']") || {}).content || '';
+	},
+	getScreenOrientation: function() {
+		return (
+			window.screen &&
+			((window.screen.orientation || {}).type ||
+				window.screen.mozOrientation ||
+				window.screen.msOrientation)
+		);
+	},
+	getScreenSize: function() {
+		return [$(window).width(), $(window).height()];
+	},
+	getPageFeedbackMetaData: function() {
+		try {
+			var orientations = commonConsts.SCREEN_ORIENTATIONS_FEEDBACK_VALUE;
+			var currentOrientation = this.getScreenOrientation();
+
+			return {
+				screenSize: this.getScreenSize().join('x'),
+				isSecureContent: this.isSiteHttps(),
+				metaKeywordString: this.getMetaKeyword(),
+				screenOrientation: (currentOrientation && orientations[currentOrientation]) || 0
+			};
+		} catch (error) {
+			return {};
+		}
+	}
 };
