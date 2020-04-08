@@ -571,5 +571,15 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		allMissing: 2,
 		partialPresent: 3,
 		noAdsTxt: 4
+	},
+	HEADER_BIDDING: {
+		INITIAL_TIMEOUT: {
+			MIN: 0,
+			MAX: 10000
+		},
+		REFRESH_TIMEOUT: {
+			MIN: 0,
+			MAX: 10000
+		}
 	}
 };
