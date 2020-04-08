@@ -269,7 +269,6 @@ var utils = {
 		if (slot.adType === 'sticky') {
 			return true;
 		}
-
 		var containerId = slot.containerId;
 		var $container = $('#' + containerId);
 
