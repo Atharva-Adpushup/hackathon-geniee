@@ -578,7 +578,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 			MAX: 10000
 		},
 		REFRESH_TIMEOUT: {
-			MIN: 500,
+			MIN: 0,
 			MAX: 10000
 		}
 	}

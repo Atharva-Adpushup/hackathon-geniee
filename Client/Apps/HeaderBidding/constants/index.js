@@ -86,7 +86,7 @@ export const HEADER_BIDDING = {
 		MAX: 10000
 	},
 	REFRESH_TIMEOUT: {
-		MIN: 500,
+		MIN: 0,
 		MAX: 10000
 	}
 };
