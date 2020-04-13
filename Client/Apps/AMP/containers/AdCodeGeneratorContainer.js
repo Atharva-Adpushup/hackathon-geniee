@@ -7,21 +7,18 @@ import { showNotification } from '../../../actions/uiActions';
 import { getAdsAndGlobal } from '../lib/helpers';
 
 const mapStateToProps = (state, ownProps) => {
-	const { global, siteId } = getAdsAndGlobal(state, ownProps);
+	const { global, siteId, currentAdDoc = {} } = getAdsAndGlobal(state, ownProps);
+	const { ad = {} } = currentAdDoc;
 	return {
 		currentAd: global.currentAd,
 		codeGenerated: !!global.currentAd,
 		adId: global.currentAd,
 		maxHeight: global.maxHeight,
+		type: ad ? ad.type : '',
 		siteId,
 		...ownProps
 	};
 };
-
-// const mapDispatchToProps = dispatch => ({
-// createAd: payload => dispatch(createAd(payload)),
-// 	resetCurrentAd: siteId => dispatch(resetCurrentAd(siteId))
-// });
 
 export default connect(
 	mapStateToProps,

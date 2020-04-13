@@ -4,8 +4,8 @@ const AMP_NAV_ITEMS_INDEXES = {
 };
 
 const AMP_NAV_ITEMS_VALUES = {
-	CREATE_ADS: 'Create Ads',
-	MANAGE_ADS: 'Manage Ads'
+	CREATE_TAG: 'Create Tags',
+	MANAGE_TAG: 'Manage Tags'
 };
 
 const AMP_NAV_ITEMS = {
@@ -46,7 +46,7 @@ const SIZES = {
 	STICKY: {
 		ALLOWED: ['mobile'],
 
-		MOBILE: ['320x50', '300x250', '250x250', '200x200', '320x100', '336x280']
+		MOBILE: ['320x50', '320x100']
 	}
 };
 
@@ -67,15 +67,31 @@ const CUSTOM_FIELD_DEFAULT_VALUE = {
 	STRING: ''
 };
 
-const ADCODE = `<div id="__AD_ID__" class="_ap_apex_ad"__CUSTOM_ATTRIBS__>
-	<script>
-		var adpushup = adpushup || {};
-		adpushup.que = adpushup.que || [];
-		adpushup.que.push(function() {
-			adpushup.triggerAd("__AD_ID__");
-		});
-	</script>
-</div>`;
+// const ADCODE = `<div id="__AD_ID__" class="_ap_apex_ad"__CUSTOM_ATTRIBS__>
+// 	<script>
+// 		var adpushup = adpushup || {};
+// 		adpushup.que = adpushup.que || [];
+// 		adpushup.que.push(function() {
+// 			adpushup.triggerAd("__AD_ID__");
+// 		});
+// 	</script>
+// </div>`;
+
+const DISPLAYADCODE = `<amp-ad width="__WIDTH__" height="__HEIGHT__" type="doubleclick" __REFRESH_INTERVAL__ __MULTI_SIZE__ data-slot="/100885613/21845298506" rtc-config='{
+	"urls": [
+	  "https://localhost:8089/openrtb2/amp?tag_id=__AD_ID__"
+	]
+}' json='{"targeting":{"amp_test":["1"]}}'>
+</amp-ad>`;
+
+const STICKYADCODE = `<amp-sticky-ad layout="nodisplay">
+<amp-ad width="__WIDTH__" height="__HEIGHT__" type="doubleclick" __REFRESH_INTERVAL__ __MULTI_SIZE__ data-slot="/100885613/21845298506" rtc-config='{
+	"urls": [
+	  "https://localhost:8089/openrtb2/amp?tag_id=__AD_ID__"
+	]
+}' json='{"targeting":{"amp_test":["1"]}}'>
+</amp-ad>
+</amp-sticky-ad>`;
 
 const DEFAULT_ADS_RESPONSE = { fetched: false, content: [] };
 const DEFAULT_GLOBAL_RESPONSE = {
@@ -95,7 +111,8 @@ export {
 	SIZES,
 	CUSTOM_FIELDS,
 	CUSTOM_FIELD_DEFAULT_VALUE,
-	ADCODE,
+	DISPLAYADCODE,
+	STICKYADCODE,
 	DEFAULT_ADS_RESPONSE,
 	DEFAULT_GLOBAL_RESPONSE,
 	DISPLAY_AD_MESSAGE

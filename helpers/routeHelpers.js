@@ -91,6 +91,55 @@ function emitEventAndSendResponse(siteId, res, data = {}) {
 	});
 }
 
+function getAmpAds(siteId) {
+	const GET_ALL_AMP_ADS_QUERY = `SELECT _amtg as doc 							
+	FROM AppBucket _amtg
+	WHERE meta(_amtg).id LIKE 'amtg::%' AND _amtg.siteId = "${siteId}";`;
+
+	const query = N1qlQuery.fromString(GET_ALL_AMP_ADS_QUERY);
+
+	return couchbase
+		.connectToAppBucket()
+		.then(appBucket => appBucket.queryAsync(query))
+		.then(ads => ads)
+		.catch(err => console.log(err));
+}
+
+function fetchAmpAds(req, res, docKey) {
+	if (!req.query || !req.query.siteId) {
+		return sendErrorResponse(
+			{
+				message: 'Incomplete Parameters. Please check siteId'
+			},
+			res
+		);
+	}
+	const { siteId } = req.query;
+
+	return verifyOwner(siteId, req.user.email)
+		.then(() => getAmpAds(siteId))
+		.then(queryResult => queryResult)
+		.then(ads =>
+			sendSuccessResponse(
+				{
+					ads: ads.map(val => val.doc) || []
+				},
+				res
+			)
+		)
+
+		.catch(err =>
+			err.code && err.code === 13 && err.message.includes('key does not exist')
+				? sendSuccessResponse(
+						{
+							ads: []
+						},
+						res
+				  )
+				: errorHandler(err, res)
+		);
+}
+
 function fetchAds(req, res, docKey) {
 	if (!req.query || !req.query.siteId) {
 		return sendErrorResponse(
@@ -121,6 +170,17 @@ function fetchAds(req, res, docKey) {
 				  )
 				: errorHandler(err, res)
 		);
+}
+
+function createNewAmpDocAndDoProcessing(payload, initialDoc, docKey, processing) {
+	const defaultDocCopy = _.cloneDeep(initialDoc);
+	return appBucket
+		.createDoc(`${docKey}${payload.id}`, defaultDocCopy, {})
+		.then(() => appBucket.getDoc(`site::${payload.siteId}`))
+		.then(docWithCas => {
+			payload.siteDomain = docWithCas.value.siteDomain;
+			return processing(defaultDocCopy, payload);
+		});
 }
 
 function createNewDocAndDoProcessing(payload, initialDoc, docKey, processing) {
@@ -341,67 +401,7 @@ function checkParams(toCheck, req, mode, checkLight = false) {
 	});
 }
 
-function createNewAmpDocAndDoProcessing(payload, initialDoc, docKey, processing) {
-	const defaultDocCopy = _.cloneDeep(initialDoc);
-	return appBucket
-		.createDoc(`${docKey}${payload.siteId}:${payload.id}`, defaultDocCopy, {})
-		.then(() => appBucket.getDoc(`site::${payload.siteId}`))
-		.then(docWithCas => {
-			payload.siteDomain = docWithCas.value.siteDomain;
-			return processing(defaultDocCopy, payload);
-		});
-}
-
-function getAmpAds(siteId) {
-	const GET_ALL_AMP_ADS_QUERY = `SELECT _amtg as doc 							
-	FROM AppBucket _amtg
-	WHERE meta(_amtg).id LIKE 'amtg::%' AND _amtg.siteId = "${siteId}";`;
-
-	const query = N1qlQuery.fromString(GET_ALL_AMP_ADS_QUERY);
-
-	return couchbase
-		.connectToAppBucket()
-		.then(appBucket => appBucket.queryAsync(query))
-		.then(ads => ads)
-		.catch(err => console.log(err));
-}
-
-function fetchAmpAds(req, res, docKey) {
-	if (!req.query || !req.query.siteId) {
-		return sendErrorResponse(
-			{
-				message: 'Incomplete Parameters. Please check siteId'
-			},
-			res
-		);
-	}
-	const { siteId } = req.query;
-
-	return verifyOwner(siteId, req.user.email)
-		.then(() => getAmpAds(siteId))
-		.then(queryResult => queryResult)
-		.then(ads =>
-			sendSuccessResponse(
-				{
-					ads: ads.map(val => val.doc) || []
-				},
-				res
-			)
-		)
-
-		.catch(err =>
-			err.code && err.code === 13 && err.message.includes('key does not exist')
-				? sendSuccessResponse(
-						{
-							ads: []
-						},
-						res
-				  )
-				: errorHandler(err, res)
-		);
-}
-
-function updateAmpTags(id, ads, updateThis) {
+function updateAmpTags(id, ads) {
 	if (!id) {
 		return Promise.resolve();
 	}
@@ -412,19 +412,12 @@ function updateAmpTags(id, ads, updateThis) {
 			appBucket.getAsync(`amtg::${id}`, {}).then(amtgDoc => ({ appBucket, amtgDoc }))
 		)
 		.then(({ appBucket, amtgDoc: { value } }) => {
-			if (!ads) {
-				value = { ...value, ...updateThis, updatedOn: +new Date() };
-			} else {
-				const updatedAd = ads.find(val => val.id === id);
+			const updatedAd = ads.find(val => val.id === id);
 
-				value = updatedAd;
-				value.updatedOn = +new Date();
-				value.ad.isRefreshEnabled
-					? (value.ad.refreshInterval = 30)
-					: delete value.ad.refreshInterval;
-			}
+			value = updatedAd;
+			if (!value.ad.isRefreshEnabled) delete value.ad.refreshInterval;
 
-			return appBucket.replaceAsync(`amtg::${id}`, value) && value;
+			return appBucket.replaceAsync(`amtg::${id}`, value);
 		})
 		.catch(err => {
 			if (err.code === 13) {
@@ -433,162 +426,6 @@ function updateAmpTags(id, ads, updateThis) {
 
 			throw err;
 		});
-}
-
-function checkAmpUnsyncedAds(doc) {
-	const { ad } = doc;
-	if (!ad.networkData.dfpAdunitCode) {
-		const defaultAdData = {
-			sectionName: doc.name,
-			variations: [
-				// hard coded! check apTag code
-				{
-					variationName: 'manual',
-					variationId: 'manual',
-					pageGroup: null,
-					platform: 'mobile'
-				}
-			],
-			adId: doc.id,
-			isResponsive: false, // false in amp
-			sizeWidth: ad.width,
-			sizeHeight: ad.height,
-			sectionId: doc.id,
-			type: ad.type,
-			isManual: false,
-			isInnovativeAd: false,
-			isNative: false,
-			isAmp: true,
-			network: 'adpTags',
-			networkData: {
-				headerBidding: true // always true
-			},
-			platform: 'mobile' // always mobile
-		};
-		return defaultAdData;
-	}
-	return false;
-}
-
-function getSiteDocValues(siteId) {
-	const siteDocValues = {};
-	return appBucket
-		.getDoc(`site::${siteId}`)
-		.then(siteDocWithCas => {
-			const siteData = siteDocWithCas.value;
-			siteDocValues.siteDomain = siteData.siteDomain;
-			siteDocValues.ownerEmail = siteData.ownerEmail;
-		})
-		.then(() => siteDocValues);
-}
-
-function commonDataForUnsyncedAmpAds(siteId, allAmpAds) {
-	let ampAdsCommonData = {
-		siteId,
-
-		publisher: {
-			email: null,
-			name: null,
-			id: null
-		},
-		ads: []
-	};
-
-	allAmpAds.forEach(ad => {
-		const adsData = checkAmpUnsyncedAds(ad);
-		const { ads } = ampAdsCommonData;
-		if (adsData) ads.push(adsData);
-	});
-
-	return getSiteDocValues(siteId)
-		.then(site => {
-			const { siteDomain, ownerEmail } = site;
-			ampAdsCommonData.siteDomain = siteDomain;
-
-			return appBucket.getDoc(`user::${ownerEmail}`).then(userDocWithCas => {
-				const userData = userDocWithCas.value;
-				const { adNetworkSettings = [], firstName, lastName, adServerSettings = {} } = userData;
-				const hasAdNetworkSettings = !!adNetworkSettings.length;
-				const {
-					dfp: { activeDFPNetwork = false, activeDFPParentId = false, isThirdPartyAdx = false } = {}
-				} = adServerSettings;
-
-				let pubId = null;
-				let refreshToken = null;
-
-				if (activeDFPNetwork && activeDFPParentId) {
-					ampAdsCommonData.currentDFP = {
-						activeDFPNetwork,
-						activeDFPParentId,
-						isThirdPartyDFP: false
-						// isThirdPartyDFP: !!(activeDFPNetwork != config.ADPUSHUP_GAM.ACTIVE_DFP_NETWORK)
-					};
-				}
-
-				if (hasAdNetworkSettings) {
-					pubId = adNetworkSettings[0].pubId;
-					_.some(adNetworkSettings, network => {
-						if (network.networkName === 'DFP') {
-							refreshToken = network.refreshToken;
-							return true;
-						}
-						return false;
-					});
-				}
-
-				ampAdsCommonData.publisher = {
-					...ampAdsCommonData.publisher,
-					...ampAdsCommonData.currentDFP,
-					name: `${firstName} ${lastName}`,
-					email: ownerEmail,
-					id: pubId,
-					refreshToken,
-					isThirdPartyAdx
-				};
-
-				ampAdsCommonData = { ...ampAdsCommonData };
-			});
-		})
-		.then(() => ampAdsCommonData);
-}
-
-function queuePublishingWrapper(siteId, ads) {
-	return commonDataForUnsyncedAmpAds(siteId, ads).then(data => {
-		var options = {
-			method: 'POST',
-			uri: `http://queuePublisher.adpushup.com/publish`,
-			body: {
-				queue: 'adpTagSync',
-				data
-			},
-			json: true // Automatically stringifies the body to JSON
-		};
-
-		return request(options)
-			.then(() => ads)
-			.catch(
-				err => console.log(err)
-				// POST failed...
-			);
-	});
-}
-
-function storedRequestWrapper(doc) {
-	var options = {
-		method: 'POST',
-		uri: `http://queuePublisher.adpushup.com/publish`,
-		body: {
-			queue: 'storedRequestsSync',
-			doc
-		},
-		json: true // Automatically stringifies the body to JSON
-	};
-	return request(options)
-		.then(() => sendSuccessResponse({ msg: 'stored Request completed' }))
-		.catch(
-			err => console.log(err)
-			// POST failed...
-		);
 }
 
 module.exports = {
