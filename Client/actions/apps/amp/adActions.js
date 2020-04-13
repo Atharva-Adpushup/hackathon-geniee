@@ -9,12 +9,12 @@ const createAd = params => dispatch =>
 			const { data } = response.data;
 			dispatch({
 				type: AD_ACTIONS.UPDATE_ADS_LIST,
-				data: { ...params.ad, id: data.id, name: data.name },
+				data: data.doc,
 				siteId: params.siteId
 			});
 			return dispatch({
 				type: GLOBAL_ACTIONS.SET_CURRENT_AD,
-				currentAd: data.id,
+				currentAd: data.doc.id,
 				maxHeight: params.ad.maxHeight,
 				siteId: params.siteId
 			});
@@ -23,7 +23,7 @@ const createAd = params => dispatch =>
 
 const fetchAds = params => dispatch =>
 	axiosInstance
-		.get('/apTag/fetchAds', { params })
+		.get('/amp/fetchAds', { params })
 		.then(response => {
 			const { data } = response.data;
 			return dispatch({ type: AD_ACTIONS.REPLACE_ADS_LIST, data: data.ads, siteId: params.siteId });
@@ -48,7 +48,7 @@ const updateAd = (adId, siteId, data) => dispatch =>
 
 const modifyAdOnServer = (siteId, adId, data) => dispatch =>
 	axiosInstance
-		.post('/apTag/modifyAd', { siteId, adId, data })
+		.post('/amp/modifyAd', { siteId, adId, data })
 		.then(() =>
 			dispatch({
 				type: AD_ACTIONS.UPDATE_AD,

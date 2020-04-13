@@ -8,24 +8,31 @@ import {
 	CUSTOM_FIELD_DEFAULT_VALUE,
 	DISPLAY_AD_MESSAGE,
 	AMP_MESSAGE,
-	ADCODE
+	DISPLAYADCODE,
+	STICKYADCODE
 } from '../../configs/commonConsts';
 import CopyButtonWrapperContainer from '../../../../Containers/CopyButtonWrapperContainer';
 import CustomMessage from '../../../../Components/CustomMessage/index';
 import CustomButton from '../../../../Components/CustomButton/index';
 import Loader from '../../../../Components/Loader';
 import ActionCard from '../../../../Components/ActionCard/index';
+import CustomToggleSwitch from '../../../../Components/CustomToggleSwitch/index';
+import { computeDownWardCompatibleSizes } from '../../lib/helpers';
+import { refreshIntervals } from '../../../../constants/visualEditor';
 
 class AdCodeGenerator extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 			progress: 0,
-			platform: '',
+			platform: 'mobile',
 			type: '',
-			size: null,
+			size: '',
 			customFields: {},
-			loading: false
+			loading: false,
+			isRefreshEnabled: true,
+			refreshInterval: 30,
+			isMultiSize: false
 		};
 		this.selectPlatform = this.selectPlatform.bind(this);
 		this.selectType = this.selectType.bind(this);
@@ -44,7 +51,7 @@ class AdCodeGenerator extends Component {
 	selectPlatform(platform) {
 		this.setState({
 			platform,
-			size: platform === 'responsive' ? 'responsive' : null,
+			size: platform === 'responsive' ? 'responsive' : '',
 			progress: platform === 'responsive' ? 75 : 50
 		});
 	}
@@ -52,8 +59,8 @@ class AdCodeGenerator extends Component {
 	selectType(type) {
 		this.setState({
 			type,
-			platform: '',
-			size: null,
+			platform: 'mobile',
+			size: '',
 			progress: 50,
 			customFields: {}
 		});
@@ -107,7 +114,15 @@ class AdCodeGenerator extends Component {
 	}
 
 	saveHandler() {
-		const { type, platform, size, customFields } = this.state;
+		const {
+			type,
+			platform,
+			size,
+			customFields,
+			isRefreshEnabled,
+			isMultiSize,
+			refreshInterval
+		} = this.state;
 
 		// terminate if Custom Fields are invalid
 		const isCustomFieldsValid = !Object.keys(customFields).find(
@@ -126,22 +141,21 @@ class AdCodeGenerator extends Component {
 		const ad = {
 			width,
 			height,
-			isManual: true,
+			type,
+			isMultiSize,
+			isRefreshEnabled,
 			networkData: {
-				isResponsive: !!(width === 'responsive')
+				dfpAdunitCode: null,
+				dfpAdunit: null
 			},
-			formatData: {
-				platform, // DESKTOP, MOBILE
-				type // DISPLAY, NATIVE, AMP, LINK
+			hbConfig: {
+				formats: ['display']
 			},
-			type: 1, // STRUCTURAL
-			css: {
-				display: 'block',
-				margin: '10px auto',
-				'text-align': 'center'
-			},
+
 			isActive: true
 		};
+
+		if (isRefreshEnabled) ad.refreshInterval = refreshInterval;
 
 		// Add Custom Fields in ad obj
 		Object.keys(customFields).forEach(customFieldKey => {
@@ -163,17 +177,18 @@ class AdCodeGenerator extends Component {
 
 	resetHandler() {
 		const { resetCurrentAd, siteId } = this.props;
-		this.setState(
-			{
-				progress: 0,
-				platform: '',
-				type: '',
-				size: null,
-				customFields: {},
-				loading: false
-			},
-			() => resetCurrentAd(siteId)
-		);
+		resetCurrentAd(siteId);
+		this.setState({
+			progress: 0,
+			platform: 'mobile',
+			type: '',
+			size: '',
+			customFields: {},
+			loading: false,
+			isRefreshEnabled: true,
+			refreshInterval: 30,
+			isMultiSize: false
+		});
 	}
 
 	renderTypeOptions() {
@@ -246,13 +261,26 @@ class AdCodeGenerator extends Component {
 	);
 
 	renderGeneratedAdcode() {
-		const { type } = this.state;
+		const { type, size, isRefreshEnabled, refreshInterval, isMultiSize } = this.state;
+		const adType = type ? type : this.props.type;
+		const availableSizes = SIZES[adType.toUpperCase()].MOBILE;
+		const downwardCompatibleSizes = computeDownWardCompatibleSizes(availableSizes, size);
+
+		const sizesArray = size.split('x');
+		const width = sizesArray[0];
+		const height = sizesArray[1];
 		const { adId, maxHeight, siteId } = this.props;
 		const isDisplayAd = type !== 'amp';
 		const customAttributes = maxHeight ? ` max-height="${maxHeight}"` : '';
+		const refresh = isRefreshEnabled ? `data-enable-refresh="${refreshInterval}"` : '';
+		const multiSize = isMultiSize ? `data-multi-size='${downwardCompatibleSizes}'` : '';
+		const ADCODE = type === 'display' ? DISPLAYADCODE : STICKYADCODE;
 		const code = isDisplayAd
 			? ADCODE.replace(/__AD_ID__/g, adId)
-					.replace(/__CUSTOM_ATTRIBS__/, customAttributes)
+					.replace(/__REFRESH_INTERVAL__/, refresh)
+					.replace(/__MULTI_SIZE__/, multiSize)
+					.replace(/__WIDTH__/, width)
+					.replace(/__HEIGHT__/, height)
 					.trim()
 			: null;
 		const message = isDisplayAd ? DISPLAY_AD_MESSAGE.replace(/__SITE_ID__/g, siteId) : AMP_MESSAGE;
@@ -292,6 +320,8 @@ class AdCodeGenerator extends Component {
 					<div>
 						{this.renderTypeOptions()}
 						{progress >= 50 ? this.renderSizes() : null}
+						{progress >= 75 ? this.renderRefreshToggle() : null}
+						{progress >= 75 ? this.renderMultiSizeToggle() : null}
 						{progress >= 75 ? this.renderButton('Generate AdCode', this.saveHandler) : null}
 					</div>
 				)}
@@ -299,9 +329,72 @@ class AdCodeGenerator extends Component {
 		);
 	}
 
+	handleToggle = (value, event) => {
+		const attributeValue = event.target.getAttribute('name');
+		const name = attributeValue.split('-')[0];
+
+		this.setState({
+			[name]: value,
+			progress: 90
+		});
+	};
+
+	renderMultiSizeToggle() {
+		const { match } = this.props;
+		const { siteId } = match.params;
+		const { isMultiSize } = this.state;
+		return (
+			<Row>
+				<Col md={5}>
+					<CustomToggleSwitch
+						labelText="Multi Size"
+						className="u-margin-b4 negative-toggle toggle"
+						checked={isMultiSize}
+						onChange={this.handleToggle}
+						layout="horizontal"
+						size="m"
+						on="Yes"
+						off="No"
+						defaultLayout
+						name={`isMultiSize-${siteId}`}
+						id={`js-isMultiSize-${siteId}`}
+					/>
+				</Col>
+				<Col md={7} />
+			</Row>
+		);
+	}
+
+	renderRefreshToggle() {
+		const { match } = this.props;
+		const { siteId } = match.params;
+		const { isRefreshEnabled } = this.state;
+		return (
+			<Row>
+				<Col md={5}>
+					<CustomToggleSwitch
+						labelText="Refresh"
+						className="u-margin-b4 negative-toggle toggle"
+						checked={isRefreshEnabled}
+						onChange={this.handleToggle}
+						layout="horizontal"
+						size="m"
+						on="Yes"
+						off="No"
+						defaultLayout
+						name={`isRefreshEnabled-${siteId}`}
+						id={`js-isRefreshEnabled-${siteId}`}
+					/>
+				</Col>
+				<Col md={7} />
+			</Row>
+		);
+	}
+
 	render() {
 		const { loading } = this.state;
 		const { codeGenerated } = this.props;
+
 		return (
 			<ActionCard className="options-wrapper">
 				{loading && !codeGenerated ? <Loader /> : this.renderMainContent()}

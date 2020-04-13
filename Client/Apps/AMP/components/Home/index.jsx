@@ -4,7 +4,7 @@ import { Nav, NavItem } from '@/Client/helpers/react-bootstrap-imports';
 
 import CustomError from '../../../../Components/CustomError/index';
 import AdCodeGeneratorContainer from '../../containers/AdCodeGeneratorContainer';
-// import AdListContainer from '../../containers/AdListContainer';
+import AdListContainer from '../../containers/AdListContainer';
 import {
 	AMP_NAV_ITEMS,
 	AMP_NAV_ITEMS_INDEXES,
@@ -56,10 +56,8 @@ class Home extends Component {
 			default:
 			case AMP_NAV_ITEMS_INDEXES.CREATE_ADS:
 				return <AdCodeGeneratorContainer {...this.props} />;
-				return <div>Hi</div>;
 			case AMP_NAV_ITEMS_INDEXES.MANAGE_ADS:
-				// return <AdListContainer {...this.props} />;
-				return <div>Hello</div>;
+				return <AdListContainer {...this.props} />;
 		}
 	}
 	render() {
@@ -72,8 +70,8 @@ class Home extends Component {
 		return (
 			<div>
 				<Nav bsStyle="tabs" activeKey={activeItem.INDEX} onSelect={this.handleNavSelect}>
-					<NavItem eventKey={1}>{AMP_NAV_ITEMS_VALUES.CREATE_ADS}</NavItem>
-					<NavItem eventKey={2}>{AMP_NAV_ITEMS_VALUES.MANAGE_ADS}</NavItem>
+					<NavItem eventKey={1}>{AMP_NAV_ITEMS_VALUES.CREATE_TAG}</NavItem>
+					<NavItem eventKey={2}>{AMP_NAV_ITEMS_VALUES.MANAGE_TAG}</NavItem>
 				</Nav>
 				{this.renderContent()}
 			</div>
