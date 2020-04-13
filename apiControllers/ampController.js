@@ -14,7 +14,10 @@ const {
 	sendDataToZapier,
 	emitEventAndSendResponse,
 	fetchAds,
+	fetchAmpAds,
 	createNewDocAndDoProcessing,
+	createNewAmpDocAndDoProcessing,
+	updateAmpTags,
 	masterSave,
 	modifyAd
 } = require('../helpers/routeHelpers');
@@ -24,30 +27,25 @@ const router = express.Router();
 const fn = {
 	isSuperUser: false,
 	createNewDocAndDoProcessingWrapper: payload =>
-		createNewDocAndDoProcessing(payload, ampAdInitialDoc, docKeys.amp, fn.processing),
+		createNewAmpDocAndDoProcessing(payload, ampAdInitialDoc, docKeys.amp, fn.processing),
 	processing: (data, payload) => {
 		const cas = data.cas || false;
 		const value = data.value || data;
-		const id = uuid.v4();
+		const id = payload.id;
 		const name = generateSectionName({
 			width: payload.ad.width,
 			height: payload.ad.height,
-			platform: payload.ad.formatData.platform || null,
 			pagegroup: null,
 			id,
-			service: 'T'
+			service: 'A_M'
 		});
 		const ad = {
-			...payload.ad,
-			id,
-			name,
-			createdOn: +new Date(),
-			formatData: {
-				...payload.ad.formatData
-			}
+			...payload.ad
 		};
-
-		value.ads.push(ad);
+		// value.createdOn = +new Date();
+		value.ad = ad;
+		value.id = id;
+		value.name = name;
 		value.siteDomain = value.siteDomain || payload.siteDomain;
 		value.siteId = value.siteId || payload.siteId;
 		value.ownerEmail = value.ownerEmail || payload.ownerEmail;
@@ -68,35 +66,39 @@ const fn = {
 		return Promise.resolve([
 			cas,
 			value,
-			{
-				id,
-				name
-			},
+			// {
+			// 	id,
+			// 	name
+			// },
 			payload.siteId
 		]);
 	},
 	getAndUpdate: (key, value) =>
 		appBucket.getDoc(key).then(result => appBucket.updateDoc(key, value, result.cas)),
 	directDBUpdate: (key, value, cas) => appBucket.updateDoc(key, value, cas),
-	dbWrapper: (cas, value, toReturn, siteId) => {
-		const key = `${docKeys.amp}${siteId}`;
+	dbWrapper: (cas, value, siteId) => {
+		const key = `${docKeys.amp}${value.id}`;
 
 		function dbOperation() {
 			return !cas ? fn.getAndUpdate(key, value) : fn.directDBUpdate(key, value, cas);
 		}
 
-		return dbOperation().then(() => toReturn);
+		return dbOperation().then(() => value);
 	},
-	adUpdateProcessing: (req, res, key, processing) =>
-		appBucket
-			.getDoc(`${key}${req.body.siteId}`)
+	adUpdateProcessing: (req, res, key, processing) => {
+		const { ads } = req.body;
+		const ad = ads[1];
+
+		return appBucket
+			.getDoc(`${key}${ad.id}`)
 			.then(docWithCas => processing(docWithCas))
 			.then(() => emitEventAndSendResponse(req.body.siteId, res))
-			.catch(err => errorHandler(err, res))
+			.catch(err => errorHandler(err, res));
+	}
 };
 
 router
-	.get('/fetchAds', (req, res) => fetchAds(req, res, docKeys.amp))
+	.get('/fetchAds', (req, res) => fetchAmpAds(req, res, docKeys.amp))
 	.post('/createAd', (req, res) => {
 		if (!req.body || !req.body.siteId || !req.body.ad) {
 			return sendErrorResponse(
@@ -110,10 +112,11 @@ router
 		const payload = {
 			ad: req.body.ad,
 			siteId: req.body.siteId,
-			ownerEmail: req.user.email
+			ownerEmail: req.user.email,
+			id: uuid.v4()
 		};
 		return verifyOwner(req.body.siteId, req.user.email)
-			.then(() => appBucket.getDoc(`${docKeys.amp}${req.body.siteId}`))
+			.then(() => appBucket.getDoc(`${docKeys.amp}${payload.id}`))
 			.then(docWithCas => fn.processing(docWithCas, payload))
 			.catch(err =>
 				err.name && err.name === 'CouchbaseError' && err.code === 13
@@ -121,20 +124,27 @@ router
 					: Promise.reject(err)
 			)
 			.spread(fn.dbWrapper)
-			.then(toReturn =>
+			.then(value =>
 				sendSuccessResponse(
 					{
 						message: 'Ad created',
-						...toReturn
+						doc: { ...value }
 					},
 					res
 				)
 			)
 			.catch(err => errorHandler(err, res));
 	})
-	.post('/masterSave', (req, res) =>
-		masterSave(req, res, fn.adUpdateProcessing, fn.directDBUpdate, docKeys.amp, 1)
-	)
+	.post('/masterSave', (req, res) => {
+		const { adsToUpdate, ads } = req.body;
+
+		const updatedAds = adsToUpdate.map(adId => updateAmpTags(adId, ads));
+		return Promise.all(updatedAds)
+			.then(() => res.send({ msg: 'success' }))
+			.catch(err => console.log(err));
+
+		// masterSave(req, res, fn.adUpdateProcessing, fn.directDBUpdate, docKeys.amp, 1);
+	})
 	.post('/modifyAd', (req, res) =>
 		modifyAd(req, res, fn.adUpdateProcessing, fn.directDBUpdate, docKeys.amp)
 	);
