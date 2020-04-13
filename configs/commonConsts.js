@@ -439,7 +439,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		siteId: null,
 		ownerEmail: null,
 		siteDomain: null,
-		ads: []
+		docType: 'amtg'
 	},
 
 	INNOVATIVE_ADS_INITIAL_DOC: {

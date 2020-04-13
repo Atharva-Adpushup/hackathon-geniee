@@ -19,12 +19,37 @@ function getAdsAndGlobal(state, props) {
 	const { siteId } = params;
 	const ads = amp.ads[siteId] || DEFAULT_ADS_RESPONSE;
 	const global = amp.global[siteId] || DEFAULT_GLOBAL_RESPONSE;
+	const currentAdDoc = ads.content[0];
 
 	return {
 		siteId,
 		ads,
+		currentAdDoc,
 		global
 	};
 }
+function computeDownWardCompatibleSizes(sizes, selectedSize) {
+	const sizesArray = selectedSize.split('x');
+	const width = sizesArray[0];
+	const height = sizesArray[1];
+	let downwardSizes = '';
+	sizes.forEach(val => {
+		const arr = val.split('x');
+		const computedWidth = arr[0];
+		const computedHeight = arr[1];
+		if (
+			parseInt(computedWidth) <= parseInt(width) &&
+			parseInt(computedHeight) <= parseInt(height)
+		) {
+			downwardSizes = downwardSizes.concat(`${val},`);
+		}
+	});
+	return downwardSizes.replace(/,\s*$/, '');
+}
 
-export { makeFirstLetterCapitalize, copyToClipBoard, getAdsAndGlobal };
+export {
+	makeFirstLetterCapitalize,
+	copyToClipBoard,
+	getAdsAndGlobal,
+	computeDownWardCompatibleSizes
+};

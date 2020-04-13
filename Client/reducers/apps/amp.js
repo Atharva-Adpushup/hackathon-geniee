@@ -31,11 +31,11 @@ const ads = (state = {}, action) => {
 				...state,
 				[action.siteId]: {
 					...state[action.siteId],
-					content: content.map(ad => {
-						if (action.data.id === ad.id) {
-							return { ...ad, ...action.data.updateThis };
+					content: content.map(doc => {
+						if (action.data.id === doc.id) {
+							return { ...doc, ...action.data.updateThis };
 						}
-						return ad;
+						return doc;
 					})
 				}
 			};

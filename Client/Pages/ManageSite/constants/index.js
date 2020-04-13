@@ -151,7 +151,7 @@ const APPS = [
 			type: TYPE.LINK,
 			text: 'Manage App',
 			link: LINK_TYPE.INAPP,
-			destination: '/sites/__SITE_ID__/apps/amp',
+			destination: '/sites/__SITE_ID__/apps/header-bidding',
 			icon: 'cog'
 		}
 	},
