@@ -45,7 +45,7 @@ var helpers = {
 
 			if (slot) {
 				var adUnitAuctionData = adUnits[adUnitCode][auctionId];
-				var cpmType = utils.currencyConversionActive(adp.config) ? 'originalCpm' : 'cpm';
+				var cpmType = utils.currencyConversionActive(config.PREBID_CONFIG.currencyConfig) ? 'originalCpm' : 'cpm';
 
 				var bidData = {
 					bidder: bid['bidder'],
@@ -235,7 +235,7 @@ var handleBidWonEvent = function(bidWonData) {
 	var slot = isApLiteActive
 		? w.apLite.adpSlots[bidWonData.adUnitCode]
 		: w.adpushup.adpTags.adpSlots[bidWonData.adUnitCode];
-	var computedCPMValue = utils.currencyConversionActive(adp.config) ? 'originalCpm' : 'cpm';
+	var computedCPMValue = utils.currencyConversionActive(config.PREBID_CONFIG.currencyConfig) ? 'originalCpm' : 'cpm';
 
 	if (slot) {
 		slot.feedback.winner = bidWonData.bidder;
