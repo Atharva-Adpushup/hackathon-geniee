@@ -295,6 +295,7 @@ class SiteMapping extends Component {
 	};
 
 	sortMethod = (firstNode, secondNode, desc) => {
+		if (!firstNode || !secondNode) return 0;
 		const { title: first } = firstNode.props || {};
 		const { title: second } = secondNode.props || {};
 		if (typeof first === 'number' && typeof second === 'number') {
