@@ -277,6 +277,7 @@ class SiteMapping extends Component {
 				pageSizeOptions={[50, 100, 150, 200, 250]}
 				minRows={0}
 				sortable={true}
+				defaultSortMethod={this.sortMethod}
 			/>
 		);
 	};
@@ -294,6 +295,18 @@ class SiteMapping extends Component {
 	handleSetSearchInput = searchInput => {
 		this.setState({ searchInput });
 	};
+
+	sortMethod = (firstNode, secondNode, desc) => {
+		const { title: first } = firstNode.props || {};
+		const { title: second } = secondNode.props || {};
+		if (typeof first === 'number' && typeof second === 'number') {
+			if (first > second) return -1;
+			else if (second > first) return 1;
+			else return 0;
+		} else if (typeof first === 'string' && typeof second === 'string') {
+			return first.localeCompare(second);
+		} else return 0;
+	}
 
 	render() {
 		const {
