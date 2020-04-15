@@ -31,7 +31,8 @@ class AdList extends Component {
 			modifyAdOnServer,
 			user,
 			networkConfig,
-			siteId
+			siteId,
+			networkCode
 		} = this.props;
 
 		const { adIdsToUpdate } = this.state;
@@ -74,6 +75,7 @@ class AdList extends Component {
 										modifyAdOnServer={modifyAdOnServer}
 										networkConfig={networkConfig}
 										siteId={siteId}
+										networkCode={networkCode}
 										adsToUpdateOnMasterSave={this.adsToUpdate}
 									/>
 								</li>

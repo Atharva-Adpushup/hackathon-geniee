@@ -14,18 +14,27 @@ function copyToClipBoard(content) {
 function getAdsAndGlobal(state, props) {
 	const { amp } = state.apps;
 	const {
+		global: { user }
+	} = state;
+	const {
+		data: { adServerSettings = {} }
+	} = user;
+	const { dfp = {} } = adServerSettings;
+	const {
 		match: { params }
 	} = props;
 	const { siteId } = params;
 	const ads = amp.ads[siteId] || DEFAULT_ADS_RESPONSE;
 	const global = amp.global[siteId] || DEFAULT_GLOBAL_RESPONSE;
 	const currentAdDoc = ads.content[0];
+	const networkCode = dfp.activeDFPNetwork;
 
 	return {
 		siteId,
 		ads,
 		currentAdDoc,
-		global
+		global,
+		networkCode
 	};
 }
 function computeDownWardCompatibleSizes(sizes, selectedSize) {
