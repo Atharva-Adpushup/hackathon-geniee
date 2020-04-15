@@ -5,7 +5,7 @@ import AdList from '../components/Home/AdList/index';
 import { getAdsAndGlobal } from '../lib/helpers';
 
 const mapStateToProps = (state, ownProps) => {
-	const { siteId, ads } = getAdsAndGlobal(state, ownProps);
+	const { siteId, ads, networkCode } = getAdsAndGlobal(state, ownProps);
 	const { user, networkConfig } = state.global;
 
 	return {
@@ -14,6 +14,7 @@ const mapStateToProps = (state, ownProps) => {
 		user: user.data,
 		networkConfig: networkConfig.data,
 		siteId,
+		networkCode,
 		...ownProps
 	};
 };

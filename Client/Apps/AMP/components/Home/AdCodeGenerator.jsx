@@ -262,10 +262,10 @@ class AdCodeGenerator extends Component {
 
 	renderGeneratedAdcode() {
 		const { type, size, isRefreshEnabled, refreshInterval, isMultiSize } = this.state;
+		const { networkCode } = this.props;
 		const adType = type ? type : this.props.type;
 		const availableSizes = SIZES[adType.toUpperCase()].MOBILE;
 		const downwardCompatibleSizes = computeDownWardCompatibleSizes(availableSizes, size);
-
 		const sizesArray = size.split('x');
 		const width = sizesArray[0];
 		const height = sizesArray[1];
@@ -281,27 +281,28 @@ class AdCodeGenerator extends Component {
 					.replace(/__MULTI_SIZE__/, multiSize)
 					.replace(/__WIDTH__/, width)
 					.replace(/__HEIGHT__/, height)
+					.replace(/__NETWORK_CODE__/, networkCode)
 					.trim()
 			: null;
 		const message = isDisplayAd ? DISPLAY_AD_MESSAGE.replace(/__SITE_ID__/g, siteId) : AMP_MESSAGE;
 		return (
 			<Col xs={12}>
-				{isDisplayAd ? <pre>{code}</pre> : null}
+				{/* {isDisplayAd ? <pre>{code}</pre> : null} */}
 				<CustomMessage header="Information" type="info" message={message} />
 				<CustomButton
 					variant="primary"
 					className="u-margin-t3 pull-right"
 					onClick={() => this.resetHandler()}
 				>
-					Create More Ads
+					Create More Tags
 				</CustomButton>
-				{isDisplayAd ? (
+				{/* {isDisplayAd ? (
 					<CopyButtonWrapperContainer content={code}>
 						<CustomButton variant="secondary" className="u-margin-t3 u-margin-r3 pull-right">
 							Copy Adcode
 						</CustomButton>
 					</CopyButtonWrapperContainer>
-				) : null}
+				) : null} */}
 			</Col>
 		);
 	}
@@ -322,7 +323,7 @@ class AdCodeGenerator extends Component {
 						{progress >= 50 ? this.renderSizes() : null}
 						{progress >= 75 ? this.renderRefreshToggle() : null}
 						{progress >= 75 ? this.renderMultiSizeToggle() : null}
-						{progress >= 75 ? this.renderButton('Generate AdCode', this.saveHandler) : null}
+						{progress >= 75 ? this.renderButton('Create Tag', this.saveHandler) : null}
 					</div>
 				)}
 			</div>
