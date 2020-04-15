@@ -19,7 +19,8 @@ const {
 	createNewAmpDocAndDoProcessing,
 	updateAmpTags,
 	masterSave,
-	modifyAd
+	modifyAd,
+	queuePublishingWrapper
 } = require('../helpers/routeHelpers');
 
 const router = express.Router();
@@ -49,6 +50,12 @@ const fn = {
 		value.siteDomain = value.siteDomain || payload.siteDomain;
 		value.siteId = value.siteId || payload.siteId;
 		value.ownerEmail = value.ownerEmail || payload.ownerEmail;
+		value.dfpSyncingStatus = {
+			startedOn: null, // timestamp
+			completedOn: null, // timestamp
+			error: null // Error msg
+		};
+		value.storedRequestSyncedOn = null; // timestamp
 
 		// if (config.environment.HOST_ENV === 'production' && !fn.isSuperUser) {
 		// 	sendDataToZapier('https://hooks.zapier.com/hooks/catch/547126/cdt7p8/?', {
@@ -136,17 +143,23 @@ router
 			.catch(err => errorHandler(err, res));
 	})
 	.post('/masterSave', (req, res) => {
-		const { adsToUpdate, ads } = req.body;
+		const { adsToUpdate, ads = [] } = req.body;
 
 		const updatedAds = adsToUpdate.map(adId => updateAmpTags(adId, ads));
 		return Promise.all(updatedAds)
+			.then(() => queuePublishingWrapper('13', ads))
 			.then(() => res.send({ msg: 'success' }))
 			.catch(err => console.log(err));
 
 		// masterSave(req, res, fn.adUpdateProcessing, fn.directDBUpdate, docKeys.amp, 1);
 	})
-	.post('/modifyAd', (req, res) =>
-		modifyAd(req, res, fn.adUpdateProcessing, fn.directDBUpdate, docKeys.amp)
-	);
+	.post('/modifyAd', (req, res) => {
+		const { adId, data, siteId } = req.body;
+
+		return updateAmpTags(adId, null, data)
+			.then(() => res.send({ msg: 'success' }))
+			.catch(err => console.log(err));
+		// modifyAd(req, res, fn.adUpdateProcessing, fn.directDBUpdate, docKeys.amp);
+	});
 
 module.exports = router;

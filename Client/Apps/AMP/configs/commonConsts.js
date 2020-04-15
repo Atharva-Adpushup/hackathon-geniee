@@ -77,7 +77,7 @@ const CUSTOM_FIELD_DEFAULT_VALUE = {
 // 	</script>
 // </div>`;
 
-const DISPLAYADCODE = `<amp-ad width="__WIDTH__" height="__HEIGHT__" type="doubleclick" __REFRESH_INTERVAL__ __MULTI_SIZE__ data-slot="/100885613/21845298506" rtc-config='{
+const DISPLAYADCODE = `<amp-ad width="__WIDTH__" height="__HEIGHT__" type="doubleclick" __REFRESH_INTERVAL__ __MULTI_SIZE__ data-slot="/__NETWORK_CODE__/__AD_UNIT_CODE__" rtc-config='{
 	"urls": [
 	  "https://localhost:8089/openrtb2/amp?tag_id=__AD_ID__"
 	]
@@ -85,7 +85,7 @@ const DISPLAYADCODE = `<amp-ad width="__WIDTH__" height="__HEIGHT__" type="doubl
 </amp-ad>`;
 
 const STICKYADCODE = `<amp-sticky-ad layout="nodisplay">
-<amp-ad width="__WIDTH__" height="__HEIGHT__" type="doubleclick" __REFRESH_INTERVAL__ __MULTI_SIZE__ data-slot="/100885613/21845298506" rtc-config='{
+<amp-ad width="__WIDTH__" height="__HEIGHT__" type="doubleclick" __REFRESH_INTERVAL__ __MULTI_SIZE__ data-slot="/__NETWORK_CODE__/__AD_UNIT_CODE__" rtc-config='{
 	"urls": [
 	  "https://localhost:8089/openrtb2/amp?tag_id=__AD_ID__"
 	]

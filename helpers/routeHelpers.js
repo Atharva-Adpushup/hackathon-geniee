@@ -401,7 +401,7 @@ function checkParams(toCheck, req, mode, checkLight = false) {
 	});
 }
 
-function updateAmpTags(id, ads) {
+function updateAmpTags(id, ads, updateThis) {
 	if (!id) {
 		return Promise.resolve();
 	}
@@ -412,10 +412,15 @@ function updateAmpTags(id, ads) {
 			appBucket.getAsync(`amtg::${id}`, {}).then(amtgDoc => ({ appBucket, amtgDoc }))
 		)
 		.then(({ appBucket, amtgDoc: { value } }) => {
-			const updatedAd = ads.find(val => val.id === id);
+			if (!ads) {
+				value = { ...value, ...updateThis, updatedOn: +new Date() };
+			} else {
+				const updatedAd = ads.find(val => val.id === id);
 
-			value = updatedAd;
-			if (!value.ad.isRefreshEnabled) delete value.ad.refreshInterval;
+				value = updatedAd;
+				value.updatedOn = +new Date();
+				if (!value.ad.isRefreshEnabled) delete value.ad.refreshInterval;
+			}
 
 			return appBucket.replaceAsync(`amtg::${id}`, value);
 		})
@@ -426,6 +431,30 @@ function updateAmpTags(id, ads) {
 
 			throw err;
 		});
+}
+
+function queuePublishingWrapper(siteId, ads) {
+	var options = {
+		method: 'POST',
+		uri: `http://queuePublisher.adpushup.com/publish`,
+		body: {
+			queue: 'adpTagSync',
+			data: {
+				siteId,
+				ads
+			}
+		},
+		json: true // Automatically stringifies the body to JSON
+	};
+
+	request(options)
+		.then(data => {
+			res.send({ data, msg: 'dfp syncing completed' });
+		})
+		.catch(
+			err => console.log(err)
+			// POST failed...
+		);
 }
 
 module.exports = {
@@ -443,5 +472,6 @@ module.exports = {
 	modifyAd,
 	fetchStatusesFromReporting,
 	fetchCustomStatuses,
-	checkParams
+	checkParams,
+	queuePublishingWrapper
 };

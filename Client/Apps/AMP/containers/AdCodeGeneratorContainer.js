@@ -7,7 +7,7 @@ import { showNotification } from '../../../actions/uiActions';
 import { getAdsAndGlobal } from '../lib/helpers';
 
 const mapStateToProps = (state, ownProps) => {
-	const { global, siteId, currentAdDoc = {} } = getAdsAndGlobal(state, ownProps);
+	const { global, siteId, currentAdDoc = {}, networkCode } = getAdsAndGlobal(state, ownProps);
 	const { ad = {} } = currentAdDoc;
 	return {
 		currentAd: global.currentAd,
@@ -15,6 +15,7 @@ const mapStateToProps = (state, ownProps) => {
 		adId: global.currentAd,
 		maxHeight: global.maxHeight,
 		type: ad ? ad.type : '',
+		networkCode,
 		siteId,
 		...ownProps
 	};
