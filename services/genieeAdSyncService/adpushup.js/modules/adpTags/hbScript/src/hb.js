@@ -33,7 +33,11 @@ var hb = {
 
 			var size = adpSlot.size;
 			var computedSizes = adpSlot.computedSizes;
-			var prebidSizes = computedSizes.length ? computedSizes : [size];
+			var prebidSizes = computedSizes.length
+				? computedSizes
+				: size[0] === 'responsive' && size[1] === 'responsive'
+				? [[0, 0]]
+				: [size];
 			if (
 				!adp.config.apLiteActive &&
 				adpSlot.optionalParam.overrideActive &&
@@ -141,7 +145,9 @@ var hb = {
 				var slot = isApLiteActive
 					? window.apLite.adpSlots[bidData.adUnitCode]
 					: window.adpushup.adpTags.adpSlots[bidData.adUnitCode];
-				var computedCPMValue = utils.currencyConversionActive(config.PREBID_CONFIG.currencyConfig)
+				var computedCPMValue = utils.currencyConversionActive(
+					config.PREBID_CONFIG.currencyConfig
+				)
 					? 'originalCpm'
 					: 'cpm';
 
