@@ -58,7 +58,14 @@ const mediaTypesConfig = {
 
 const bidderParamsMapping = {
 	conversant: {
-		videoParams: { mimes: CONSTANTS.VIDEO.MIMES }
+		videoParams: {
+			// required
+			mimes: CONSTANTS.VIDEO.MIMES,
+			// optional
+			maxduration: CONSTANTS.VIDEO.MAXDURATION,
+			api: CONSTANTS.VIDEO.API,
+			protocols: CONSTANTS.VIDEO.PROTOCOLS
+		}
 	},
 	// Disabled video format on Rubicon
 	// rubicon: {
@@ -89,16 +96,26 @@ const bidderParamsMapping = {
 	pulsepoint: {
 		videoParams: {
 			video: {
-				mimes: CONSTANTS.VIDEO.MIMES
+				// required
+				mimes: CONSTANTS.VIDEO.MIMES,
+				// optional
+				minduration: CONSTANTS.VIDEO.MINDURATION,
+				maxduration: CONSTANTS.VIDEO.MAXDURATION,
+				protocols: CONSTANTS.VIDEO.PROTOCOLS,
+				skip: CONSTANTS.VIDEO.SKIP,
+				api: CONSTANTS.VIDEO.API
 			}
 		}
 	},
 	criteo: {
 		videoParams: {
 			video: {
+				// required
 				playbackmethod: CONSTANTS.VIDEO.PLAYBACKMETHOD,
 				placement: CONSTANTS.VIDEO.PLACEMENT,
-				skip: CONSTANTS.VIDEO.SKIP
+				skip: CONSTANTS.VIDEO.SKIP,
+				// optional
+				minduration: CONSTANTS.VIDEO.MINDURATION
 			}
 		}
 	},
