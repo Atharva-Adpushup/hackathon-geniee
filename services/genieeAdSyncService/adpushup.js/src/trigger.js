@@ -33,8 +33,29 @@ var adp = window.adpushup,
 			return defer.reject('Unable to get adpushup container');
 		}
 	},
+	isDisplayNone = function(el) {
+		var elComputedStyles = window.getComputedStyle(el);
+
+		var displayNoneRegex = /none/g;
+		return !!displayNoneRegex.test(elComputedStyles.display);
+	},
+	checkElementDisplay = function(adId) {
+		var el = document.getElementById(adId);
+		if (!el) {
+			return true;
+		}
+
+		var isElDisplayNone = isDisplayNone(el);
+
+		while (!isElDisplayNone && !el.tagName == 'BODY') {
+			el = el.parentNode;
+			isElDisplayNone = isDisplayNone(el);
+		}
+		return isElDisplayNone;
+	},
 	trigger = function(adId) {
 		var isDOMElement = !!document.getElementById(adId);
+		var isElementDisplayedNone = checkElementDisplay(adId);
 		// utils.log('ApTag id ', adId, 'DOM Element', isDOMElement);
 
 		// NOTE: Stop execution of this module if related DOM element does not exist
@@ -42,7 +63,7 @@ var adp = window.adpushup,
 		// and the script (adpushup.js) logic execution breaks as related DOM element does not exist
 		// Please check Github issue: #837 for more information
 		// Issue url: https://github.com/adpushup/GenieeAdPushup/issues/837
-		if (!isDOMElement) {
+		if (!isDOMElement || isElementDisplayedNone) {
 			return false;
 		}
 
