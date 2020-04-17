@@ -196,9 +196,8 @@ class AddManageNonResponsiveBidder extends React.Component {
 	};
 
 	removeSize = adSize => {
-		const { sizes } = this.state || {};
+		const { sizes, params } = this.state || {};
 		const newSizes = sizes.filter(size => size !== adSize);
-		const { params } = this.state || {};
 		const newParams = { ...params };
 		delete newParams[adSize];
 		this.setState(state => ({
@@ -248,8 +247,6 @@ class AddManageNonResponsiveBidder extends React.Component {
 		const { onBidderAdd, onBidderUpdate } = this.props;
 		const { formFields, bidderConfig, globalParams, params, validationSchema, sizes } = this.state;
 		const isDirectRelation = bidderConfig.relation === 'direct';
-
-		console.log({ sizes, params, globalParams });
 
 		const validationResult = formValidator.validate(
 			{ ...bidderConfig, ...globalParams },
@@ -318,7 +315,6 @@ class AddManageNonResponsiveBidder extends React.Component {
 
 					mergedParams = { ...newParams };
 					this.setState({ params: newParams });
-					console.log({ newParams });
 				}
 			}
 
@@ -347,8 +343,6 @@ class AddManageNonResponsiveBidder extends React.Component {
 					mergedParams[size] = { ...paramsObj, ...globalParams };
 				}
 			} else {
-				console.log('sizes for each');
-				console.log({ sizes });
 				sizes.forEach(size => {
 					mergedParams[size] = globalParams;
 				});

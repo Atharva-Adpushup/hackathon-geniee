@@ -236,8 +236,6 @@ class SizewiseParamsFormFields extends React.Component {
 		const { tempParams } = this.state;
 		const tabsJSX = [];
 
-		console.log({ sizes, tempParams });
-
 		for (const size of sizes) {
 			tabsJSX.push(
 				<NavItem key={size} eventKey={size}>
