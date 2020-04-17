@@ -43,7 +43,8 @@ const fn = {
 			service: 'A_M'
 		});
 		const ad = {
-			...payload.ad
+			...payload.ad,
+			sectionId: `${payload.siteId}:${id}`
 		};
 		// value.createdOn = +new Date();
 		value.ad = ad;
