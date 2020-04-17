@@ -47,7 +47,7 @@ var adp = window.adpushup,
 
 		var isElDisplayNone = isDisplayNone(el);
 
-		while (!isElDisplayNone && !el.tagName == 'BODY') {
+		while (!isElDisplayNone && el.tagName !== 'BODY') {
 			el = el.parentNode;
 			isElDisplayNone = isDisplayNone(el);
 		}
