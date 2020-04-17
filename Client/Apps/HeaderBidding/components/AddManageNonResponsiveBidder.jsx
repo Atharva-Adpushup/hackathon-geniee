@@ -195,6 +195,15 @@ class AddManageNonResponsiveBidder extends React.Component {
 		}));
 	};
 
+	removeSize = adSize => {
+		const { sizes } = this.state || {};
+		const newSizes = sizes.filter(size => size !== adSize);
+		this.setState(state => ({
+			...state,
+			sizes: newSizes
+		}));
+	};
+
 	getSiteLevelParamsCountByType = siteLevelParams => {
 		const siteLevelParamsKeys = Object.keys(siteLevelParams);
 		const siteLevelParamsCount = siteLevelParamsKeys.length;
@@ -484,6 +493,7 @@ class AddManageNonResponsiveBidder extends React.Component {
 								getCurrentFieldValue={this.getCurrentFieldValue}
 								validationSchema={validationSchema}
 								addNewSizeInState={this.addNewSizeInState}
+								removeSize={this.removeSize}
 								errors={errors}
 								relation={relation}
 							/>

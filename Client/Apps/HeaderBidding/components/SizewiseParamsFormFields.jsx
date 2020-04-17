@@ -151,6 +151,21 @@ class SizewiseParamsFormFields extends React.Component {
 		addNewSizeInState(adSize);
 	};
 
+	deleteAdSize = adSize => {
+		const { removeSize } = this.props;
+		removeSize(adSize);
+		const { tempParams } = this.state || {};
+		const newTempParams = {
+			...tempParams
+		};
+		delete newTempParams[adSize];
+		this.setState(state => ({
+			...state,
+			activeKey: '',
+			tempParams: newTempParams
+		}));
+	};
+
 	setParamInTempState = (adSize, paramKey, value) => {
 		this.setState(state => ({
 			tempParams: {
@@ -211,6 +226,8 @@ class SizewiseParamsFormFields extends React.Component {
 		const { tempParams } = this.state;
 		const tabsJSX = [];
 
+		console.log({ sizes, tempParams });
+
 		for (const size of sizes) {
 			tabsJSX.push(
 				<NavItem key={size} eventKey={size}>
@@ -265,6 +282,9 @@ class SizewiseParamsFormFields extends React.Component {
 					<Col sm={6} smPush={6}>
 						<CustomButton type="button" variant="secondary" onClick={() => this.saveParams(adSize)}>
 							{tempParams[adSize] && tempParams[adSize].saved ? 'Update Params' : 'Add Params'}
+						</CustomButton>
+						<CustomButton type="button" variant="primary" onClick={() => this.deleteAdSize(adSize)}>
+							Delete AdSize
 						</CustomButton>
 					</Col>
 				</Row>
