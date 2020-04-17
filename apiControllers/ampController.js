@@ -20,7 +20,8 @@ const {
 	updateAmpTags,
 	masterSave,
 	modifyAd,
-	queuePublishingWrapper
+	queuePublishingWrapper,
+	storedRequestWrapper
 } = require('../helpers/routeHelpers');
 
 const router = express.Router();
@@ -33,6 +34,7 @@ const fn = {
 		const cas = data.cas || false;
 		const value = data.value || data;
 		const id = payload.id;
+
 		const name = generateSectionName({
 			width: payload.ad.width,
 			height: payload.ad.height,
@@ -45,8 +47,9 @@ const fn = {
 		};
 		// value.createdOn = +new Date();
 		value.ad = ad;
-		value.id = id;
+		value.id = `${payload.siteId}:${id}`;
 		value.name = name;
+		value.isAmp = true;
 		value.siteDomain = value.siteDomain || payload.siteDomain;
 		value.siteId = value.siteId || payload.siteId;
 		value.ownerEmail = value.ownerEmail || payload.ownerEmail;
@@ -57,28 +60,7 @@ const fn = {
 		};
 		value.storedRequestSyncedOn = null; // timestamp
 
-		// if (config.environment.HOST_ENV === 'production' && !fn.isSuperUser) {
-		// 	sendDataToZapier('https://hooks.zapier.com/hooks/catch/547126/cdt7p8/?', {
-		// 		email: value.ownerEmail,
-		// 		website: value.siteDomain,
-		// 		platform: ad.formatData.platform,
-		// 		size: `${ad.width}x${ad.height}`,
-		// 		adId: ad.id,
-		// 		type: 'action',
-		// 		message: 'New Section Created. Please Check',
-		// 		createdOn: moment(ad.createdOn).format('dddd, MMMM Do YYYY, h:mm:ss a')
-		// 	});
-		// }
-
-		return Promise.resolve([
-			cas,
-			value,
-			// {
-			// 	id,
-			// 	name
-			// },
-			payload.siteId
-		]);
+		return Promise.resolve([cas, value, payload.siteId]);
 	},
 	getAndUpdate: (key, value) =>
 		appBucket.getDoc(key).then(result => appBucket.updateDoc(key, value, result.cas)),
@@ -123,7 +105,7 @@ router
 			id: uuid.v4()
 		};
 		return verifyOwner(req.body.siteId, req.user.email)
-			.then(() => appBucket.getDoc(`${docKeys.amp}${payload.id}`))
+			.then(() => appBucket.getDoc(`${docKeys.amp}${payload.siteId}:${payload.id}`))
 			.then(docWithCas => fn.processing(docWithCas, payload))
 			.catch(err =>
 				err.name && err.name === 'CouchbaseError' && err.code === 13
@@ -143,13 +125,23 @@ router
 			.catch(err => errorHandler(err, res));
 	})
 	.post('/masterSave', (req, res) => {
-		const { adsToUpdate, ads = [] } = req.body;
+		const { adsToUpdate, ads = [], siteId } = req.body;
 
 		const updatedAds = adsToUpdate.map(adId => updateAmpTags(adId, ads));
-		return Promise.all(updatedAds)
-			.then(() => queuePublishingWrapper('13', ads))
-			.then(() => res.send({ msg: 'success' }))
-			.catch(err => console.log(err));
+		return (
+			Promise.all(updatedAds)
+				.then(modifiedAds => {
+					const allAmpAds = ads.map(obj => modifiedAds.find(o => o.id === obj.id) || obj);
+
+					return queuePublishingWrapper(siteId, allAmpAds);
+				})
+				// .then(res => {
+				// 	const { ads } = res;
+				// 	return ads.map(doc => storedRequestWrapper(doc));
+				// })
+				.then(() => res.send({ msg: 'success' }))
+				.catch(err => console.log(err))
+		);
 
 		// masterSave(req, res, fn.adUpdateProcessing, fn.directDBUpdate, docKeys.amp, 1);
 	})
