@@ -185,6 +185,16 @@ class SizewiseParamsFormFields extends React.Component {
 		return currValue;
 	};
 
+	toggleConfirmationModal = () => {
+		this.setState(state => ({
+			...state,
+			deleteConfirmation: {
+				...state.deleteConfirmation,
+				isModalShowing: !state.deleteConfirmation.isModalShowing
+			}
+		}));
+	};
+
 	saveParams = adSize => {
 		let {
 			tempParams: { [adSize]: params }
@@ -283,8 +293,13 @@ class SizewiseParamsFormFields extends React.Component {
 						<CustomButton type="button" variant="secondary" onClick={() => this.saveParams(adSize)}>
 							{tempParams[adSize] && tempParams[adSize].saved ? 'Update Params' : 'Add Params'}
 						</CustomButton>
-						<CustomButton type="button" variant="primary" onClick={() => this.deleteAdSize(adSize)}>
-							Delete AdSize
+						<CustomButton
+							type="button"
+							variant="primary"
+							onClick={() => this.deleteAdSize(adSize)}
+							className="ml-2"
+						>
+							Remove AdSize
 						</CustomButton>
 					</Col>
 				</Row>
@@ -299,16 +314,18 @@ class SizewiseParamsFormFields extends React.Component {
 	render() {
 		const { activeKey } = this.state;
 		return (
-			<Row className="clearfix non-sizeless-params u-margin-v5">
-				<Col sm={3} className="size-tabs">
-					<Nav bsStyle="pills" stacked activeKey={activeKey} onSelect={this.handleNavSelect}>
-						{this.renderTabs()}
-					</Nav>
-				</Col>
-				<Col sm={9} className="size-tab-content">
-					{this.renderTabContent()}
-				</Col>
-			</Row>
+			<React.Fragment>
+				<Row className="clearfix non-sizeless-params u-margin-v5">
+					<Col sm={3} className="size-tabs">
+						<Nav bsStyle="pills" stacked activeKey={activeKey} onSelect={this.handleNavSelect}>
+							{this.renderTabs()}
+						</Nav>
+					</Col>
+					<Col sm={9} className="size-tab-content">
+						{this.renderTabContent()}
+					</Col>
+				</Row>
+			</React.Fragment>
 		);
 	}
 }
