@@ -51,7 +51,8 @@ var constants = {
 	FEEDBACK: {
 		DEFAULT_WINNER: 'adx',
 		URL: '//e3.adpushup.com/AdPushupFeedbackWebService/feedback/aphb?data=',
-		AUCTION_FEEDBACK_URL: '//e3.adpushup.com/AdPushupFeedbackWebService/feedback/aphb/auctionData?data=',
+		AUCTION_FEEDBACK_URL:
+			'//e3.adpushup.com/AdPushupFeedbackWebService/feedback/aphb/auctionData?data=',
 		URL_OLD: '//e3.adpushup.com/ApHbWebService/feedback'
 	},
 	PREBID: {

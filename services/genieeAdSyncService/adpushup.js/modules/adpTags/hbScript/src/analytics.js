@@ -132,7 +132,7 @@ var helpers = {
 
 		var slotRefreshData = utils.getSlotRefreshData(slot);
 		var refreshCount = slotRefreshData.exists
-			? slotRefreshData.currentValue
+			? slotRefreshData.nextValue
 			: slotRefreshData.defaultValue;
 
 		var slotFeedbackData = {
@@ -166,7 +166,7 @@ var helpers = {
 var feedback = {
 	sendBidWonFeedback: function(bidWonData, slot) {
 		var defaultWinner = constants.FEEDBACK.DEFAULT_WINNER;
-		var hbTypes = { client: 1, server: 2 };
+		var hbTypes = constants.FEEDBACK.HB_TYPES;
 		var hbType = hbTypes[bidWonData['source']];
 
 		if (slot.feedbackSent || slot.feedback.winner === defaultWinner) {

@@ -146,7 +146,11 @@ var hb = {
 		try {
 			analytics.init(deps).enableEvents(eventsToBeEnabled);
 		} catch (error) {
-			console.error('HB Analytics :', error);
+			Array.isArray(window.adpushup.err) &&
+				window.adpushup.err.push({
+					msg: 'Error in HB Analytics',
+					error: error
+				});
 		}
 	},
 	loadPrebid: function(w) {
