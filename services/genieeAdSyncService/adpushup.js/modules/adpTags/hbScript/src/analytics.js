@@ -45,7 +45,9 @@ var helpers = {
 
 			if (slot) {
 				var adUnitAuctionData = adUnits[adUnitCode][auctionId];
-				var cpmType = utils.currencyConversionActive(config.PREBID_CONFIG.currencyConfig) ? 'originalCpm' : 'cpm';
+				var cpmType = utils.currencyConversionActive(config.PREBID_CONFIG.currencyConfig)
+					? 'originalCpm'
+					: 'cpm';
 
 				var bidData = {
 					bidder: bid['bidder'],
@@ -75,16 +77,11 @@ var helpers = {
 					slot.isATF = typeof isSlotATF === 'undefined' ? 0 : isSlotATF ? 1 : 2;
 				}
 
-				var slotRefreshData = utils.getSlotRefreshData(slot);
-				var refreshCount = slotRefreshData.exists
-					? slotRefreshData.nextValue
-					: slotRefreshData.defaultValue;
-
 				var commonAdUnitData = {
 					sectionId: adUnitCode,
 					sectionName: slot.sectionName,
 					placement: slot.isATF,
-					refreshCount: refreshCount,
+					refreshCount: slot.refreshCount,
 					prebidAuctionId: auctionId,
 					timeOfAuction: auctionStartTime,
 					bids: [],
@@ -130,10 +127,10 @@ var helpers = {
 		var winner = slot.feedback.winner || defaultWinner;
 		var winningRevenue = slot.feedback.winningRevenue || 0;
 
-		var slotRefreshData = utils.getSlotRefreshData(slot);
-		var refreshCount = slotRefreshData.exists
-			? slotRefreshData.nextValue
-			: slotRefreshData.defaultValue;
+		if (typeof slot.isATF === 'undefined' || slot.isATF === 0) {
+			var isSlotATF = utils.isSlotATF(slot);
+			slot.isATF = typeof isSlotATF === 'undefined' ? 0 : isSlotATF ? 1 : 2;
+		}
 
 		var slotFeedbackData = {
 			bids: [
@@ -151,8 +148,9 @@ var helpers = {
 			services: slot.services,
 			sectionId: (slot.optionalParam && slot.optionalParam.originalId) || slot.sectionId,
 			sectionName: slot.sectionName,
-			unitFormat: slot.feedback.unitFormat,
-			refreshCount: refreshCount
+			formatType: slot.feedback.unitFormat,
+			refreshCount: slot.refreshCount,
+			placement: slot.isATF
 		};
 
 		var feedbackData = w.adpushup.$.extend({}, pageFeedbackData, slotFeedbackData);
@@ -197,7 +195,7 @@ var feedback = {
 };
 
 var handleAuctionEndEvent = function(auctionEndData) {
-	utils.log('auctionEnd', auctionEndData);
+	utils.log('========= auctionEnd =========', auctionEndData);
 
 	var slots = helpers.getSlotsAuctioned(auctionEndData);
 	var auctionId = auctionEndData['auctionId'];
@@ -209,7 +207,7 @@ var handleAuctionEndEvent = function(auctionEndData) {
 };
 
 var handleBidTimeoutEvent = function(bidTimeoutData) {
-	utils.log('timeout', bidTimeoutData);
+	utils.log('========= timeout =========', bidTimeoutData);
 	var adUnits = w.hbAnalytics.adUnits;
 
 	bidTimeoutData.forEach(bid => {
@@ -230,12 +228,14 @@ var handleBidTimeoutEvent = function(bidTimeoutData) {
 };
 
 var handleBidWonEvent = function(bidWonData) {
-	utils.log('bidWon', bidWonData);
+	utils.log('========= bidWon =========', bidWonData);
 
 	var slot = isApLiteActive
 		? w.apLite.adpSlots[bidWonData.adUnitCode]
 		: w.adpushup.adpTags.adpSlots[bidWonData.adUnitCode];
-	var computedCPMValue = utils.currencyConversionActive(config.PREBID_CONFIG.currencyConfig) ? 'originalCpm' : 'cpm';
+	var computedCPMValue = utils.currencyConversionActive(config.PREBID_CONFIG.currencyConfig)
+		? 'originalCpm'
+		: 'cpm';
 
 	if (slot) {
 		slot.feedback.winner = bidWonData.bidder;
@@ -271,10 +271,10 @@ var API = {
 			siteId: config.SITE_ID,
 			url: adp.config.pageUrl,
 			siteDomain: adp.config.siteDomain,
-			pageGroup: adp.config.pageGroup,
-			pageVariationId: w.adpushup.config.selectedVariation,
-			pageVariationName: w.adpushup.config.selectedVariationName,
-			pageVariationType: w.adpushup.config.selectedVariationType,
+			pageGroup: adp.config.pageGroup || null,
+			pageVariationId: w.adpushup.config.selectedVariation || null,
+			pageVariationName: w.adpushup.config.selectedVariationName || null,
+			pageVariationType: w.adpushup.config.selectedVariationType || null,
 			platform: adp.config.platform,
 			packetId: adp.config.packetId
 		};

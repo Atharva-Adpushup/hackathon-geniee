@@ -33,6 +33,7 @@ var utils = require('../libs/utils'),
 				//container.children().remove();
 				var slot = getAdpSlot(ad);
 				slot.toBeRefreshed = true;
+				slot.refreshCount = typeof slot.refreshCount === 'undefined' ? 0 : ++slot.refreshCount;
 
 				removeBidderTargeting(slot);
 

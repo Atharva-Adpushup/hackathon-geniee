@@ -112,7 +112,8 @@ var adpTags = {
 				feedback: {
 					winner: constants.FEEDBACK.DEFAULT_WINNER
 				},
-				adType: adType
+				adType: adType,
+				refreshCount: 0
 			};
 
 			return this.adpSlots[containerId];

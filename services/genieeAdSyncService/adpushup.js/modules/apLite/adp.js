@@ -111,7 +111,7 @@ var $ = require('../../libs/jquery'),
 						winner: constants.FEEDBACK.DEFAULT_WINNER
 					},
 					fluid: optionalParam.fluid,
-					adType: optionalParam.adType
+					refreshCount: 0
 				};
 
 				return adpSlot;
@@ -173,7 +173,6 @@ var $ = require('../../libs/jquery'),
 												refreshSlot = apLiteAdUnit.refreshSlot,
 												refreshInterval = apLiteAdUnit.refreshInterval,
 												formats = apLiteAdUnit.formats,
-												adType = (apLiteAdUnit.formatData && apLiteAdUnit.formatData.type) || null,
 												adpSlot = this.createAdpSlot(
 													gptSlotElementId,
 													dfpAdUnitName,
@@ -192,7 +191,6 @@ var $ = require('../../libs/jquery'),
 														refreshInterval,
 														services: [commonConsts.SERVICES.AP_LITE],
 														fluid: false,
-														adType: adType
 													}
 												);
 

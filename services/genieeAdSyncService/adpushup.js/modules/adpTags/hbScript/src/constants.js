@@ -53,7 +53,8 @@ var constants = {
 		URL: '//e3.adpushup.com/AdPushupFeedbackWebService/feedback/aphb?data=',
 		AUCTION_FEEDBACK_URL:
 			'//e3.adpushup.com/AdPushupFeedbackWebService/feedback/aphb/auctionData?data=',
-		URL_OLD: '//e3.adpushup.com/ApHbWebService/feedback'
+		URL_OLD: '//e3.adpushup.com/ApHbWebService/feedback',
+		HB_TYPES: { client: 1, server: 2 }
 	},
 	PREBID: {
 		TIMEOUT: 3000,
