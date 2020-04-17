@@ -69,7 +69,20 @@ const bidderParamsMapping = {
 	pubmatic: {
 		videoParams: {
 			video: {
-				mimes: CONSTANTS.VIDEO.MIMES
+				// Required params according to the pubmatic documentation and
+				// is available in prebid pubmatic video params list
+				// Link: https://community.pubmatic.com/display/SSP/Recommended+Video+Parameter+Values
+				mimes: CONSTANTS.VIDEO.MIMES,
+				minduration: CONSTANTS.VIDEO.MINDURATION,
+				maxduration: CONSTANTS.VIDEO.MAXDURATION,
+				protocols: CONSTANTS.VIDEO.PROTOCOLS,
+				// Recomended params according to the pubmatic documentation and
+				// is available in prebid pubmatic video params list
+				api: CONSTANTS.VIDEO.API,
+				playbackmethod: CONSTANTS.VIDEO.PLAYBACKMETHOD,
+				linearity: CONSTANTS.VIDEO.LINEARITY,
+				placement: CONSTANTS.VIDEO.PLACEMENT,
+				skippable: CONSTANTS.VIDEO.SKIP
 			}
 		}
 	},
