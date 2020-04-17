@@ -175,7 +175,7 @@ function fetchAds(req, res, docKey) {
 function createNewAmpDocAndDoProcessing(payload, initialDoc, docKey, processing) {
 	const defaultDocCopy = _.cloneDeep(initialDoc);
 	return appBucket
-		.createDoc(`${docKey}${payload.id}`, defaultDocCopy, {})
+		.createDoc(`${docKey}${payload.siteId}:${payload.id}`, defaultDocCopy, {})
 		.then(() => appBucket.getDoc(`site::${payload.siteId}`))
 		.then(docWithCas => {
 			payload.siteDomain = docWithCas.value.siteDomain;
@@ -422,7 +422,7 @@ function updateAmpTags(id, ads, updateThis) {
 				if (!value.ad.isRefreshEnabled) delete value.ad.refreshInterval;
 			}
 
-			return appBucket.replaceAsync(`amtg::${id}`, value);
+			return appBucket.replaceAsync(`amtg::${id}`, value) && value;
 		})
 		.catch(err => {
 			if (err.code === 13) {
@@ -433,24 +433,156 @@ function updateAmpTags(id, ads, updateThis) {
 		});
 }
 
+function checkAmpUnsyncedAds(doc) {
+	const { ad } = doc;
+	if (!ad.networkData.dfpAdunitCode) {
+		const defaultAdData = {
+			sectionName: doc.name,
+			variations: [
+				// hard coded! check apTag code
+				{
+					variationName: 'manual',
+					variationId: 'manual',
+					pageGroup: null,
+					platform: 'mobile'
+				}
+			],
+			adId: doc.id,
+			isResponsive: false, // false in amp
+			sizeWidth: ad.width,
+			sizeHeight: ad.height,
+			sectionId: doc.id,
+			type: ad.type,
+			isManual: false,
+			isInnovativeAd: false,
+			isNative: false,
+			isAmp: true,
+			network: 'adpTags',
+			networkData: {
+				headerBidding: true // always true
+			},
+			platform: 'mobile' // always mobile
+		};
+		return defaultAdData;
+	}
+	return false;
+}
+
+function getSiteDocValues(siteId) {
+	const siteDocValues = {};
+	return appBucket
+		.getDoc(`site::${siteId}`)
+		.then(siteDocWithCas => {
+			const siteData = siteDocWithCas.value;
+			siteDocValues.siteDomain = siteData.siteDomain;
+			siteDocValues.ownerEmail = siteData.ownerEmail;
+		})
+		.then(() => siteDocValues);
+}
+
+function commonDataForUnsyncedAmpAds(siteId, allAmpAds) {
+	let ampAdsCommonData = {
+		siteId,
+
+		publisher: {
+			email: null,
+			name: null,
+			id: null
+		},
+		ads: []
+	};
+
+	allAmpAds.forEach(ad => {
+		const adsData = checkAmpUnsyncedAds(ad);
+		const { ads } = ampAdsCommonData;
+		if (adsData) ads.push(adsData);
+	});
+
+	return getSiteDocValues(siteId)
+		.then(site => {
+			const { siteDomain, ownerEmail } = site;
+			ampAdsCommonData.siteDomain = siteDomain;
+
+			return appBucket.getDoc(`user::${ownerEmail}`).then(userDocWithCas => {
+				const userData = userDocWithCas.value;
+				const { adNetworkSettings = [], firstName, lastName, adServerSettings = {} } = userData;
+				const hasAdNetworkSettings = !!adNetworkSettings.length;
+				const {
+					dfp: { activeDFPNetwork = false, activeDFPParentId = false, isThirdPartyAdx = false } = {}
+				} = adServerSettings;
+
+				let pubId = null;
+				let refreshToken = null;
+
+				if (activeDFPNetwork && activeDFPParentId) {
+					ampAdsCommonData.currentDFP = {
+						activeDFPNetwork,
+						activeDFPParentId,
+						isThirdPartyDFP: false
+						// isThirdPartyDFP: !!(activeDFPNetwork != config.ADPUSHUP_GAM.ACTIVE_DFP_NETWORK)
+					};
+				}
+
+				if (hasAdNetworkSettings) {
+					pubId = adNetworkSettings[0].pubId;
+					_.some(adNetworkSettings, network => {
+						if (network.networkName === 'DFP') {
+							refreshToken = network.refreshToken;
+							return true;
+						}
+						return false;
+					});
+				}
+
+				ampAdsCommonData.publisher = {
+					...ampAdsCommonData.publisher,
+					...ampAdsCommonData.currentDFP,
+					name: `${firstName} ${lastName}`,
+					email: ownerEmail,
+					id: pubId,
+					refreshToken,
+					isThirdPartyAdx
+				};
+
+				ampAdsCommonData = { ...ampAdsCommonData };
+			});
+		})
+		.then(() => ampAdsCommonData);
+}
+
 function queuePublishingWrapper(siteId, ads) {
+	return commonDataForUnsyncedAmpAds(siteId, ads).then(data => {
+		var options = {
+			method: 'POST',
+			uri: `http://queuePublisher.adpushup.com/publish`,
+			body: {
+				queue: 'adpTagSync',
+				data
+			},
+			json: true // Automatically stringifies the body to JSON
+		};
+
+		return request(options)
+			.then(() => res.send({ ads, msg: 'dfp syncing completed' }))
+			.catch(
+				err => console.log(err)
+				// POST failed...
+			);
+	});
+}
+
+function storedRequestWrapper(doc) {
 	var options = {
 		method: 'POST',
 		uri: `http://queuePublisher.adpushup.com/publish`,
 		body: {
-			queue: 'adpTagSync',
-			data: {
-				siteId,
-				ads
-			}
+			queue: 'storedRequestsSync',
+			doc
 		},
 		json: true // Automatically stringifies the body to JSON
 	};
-
-	request(options)
-		.then(data => {
-			res.send({ data, msg: 'dfp syncing completed' });
-		})
+	return request(options)
+		.then(() => res.send({ msg: 'stored Request completed' }))
 		.catch(
 			err => console.log(err)
 			// POST failed...
@@ -473,5 +605,6 @@ module.exports = {
 	fetchStatusesFromReporting,
 	fetchCustomStatuses,
 	checkParams,
-	queuePublishingWrapper
+	queuePublishingWrapper,
+	storedRequestWrapper
 };
