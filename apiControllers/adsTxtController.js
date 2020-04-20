@@ -1,10 +1,10 @@
 const express = require('express');
-const _ = require('lodash');
 
 const HTTP_STATUSES = require('../configs/httpStatusConsts');
 const { sendSuccessResponse, sendErrorResponse } = require('../helpers/commonFunctions');
 const { errorHandler } = require('../helpers/routeHelpers');
 const adsTxtModel = require('../models/adsTxtModel');
+const { liveAdsTxtEntryStatus } = require('../configs/commonConsts');
 
 const router = express.Router();
 
@@ -35,17 +35,38 @@ router.post('/adsTxtLiveEntries', (req, res) => {
 	return adsTxtModel
 		.getAdsTxtEntries(siteId, adsTxtSnippet, currentSelectedEntry)
 		.then(sitesData => {
+			// eslint-disable-next-line no-param-reassign
 			sitesData = Array.isArray(sitesData) ? sitesData : [sitesData];
 			let adsData = [];
 
-			if (currentSelectedEntry === 'Missing Entries') {
-				adsData = sitesData.filter(val => val.status === 2 || val.status === 3);
-			} else if (currentSelectedEntry === 'Present Entries') {
-				adsData = sitesData.filter(val => val.status === 1 || val.status === 3);
-			} else if (currentSelectedEntry === 'Global Entries') {
-				adsData = sitesData.filter(val => val.status !== 4);
-			} else {
-				adsData = sitesData.filter(val => val.status === 4);
+			switch (currentSelectedEntry) {
+				case 'Missing Entries':
+					adsData = sitesData.filter(
+						val =>
+							val.status === liveAdsTxtEntryStatus.allMissing ||
+							val.status === liveAdsTxtEntryStatus.partialPresent
+					);
+					break;
+				case 'Present Entries':
+					adsData = sitesData.filter(
+						val =>
+							val.status === liveAdsTxtEntryStatus.allPresent ||
+							val.status === liveAdsTxtEntryStatus.partialPresent
+					);
+					break;
+				case 'Global Entries':
+					adsData = sitesData.filter(val => val.status !== liveAdsTxtEntryStatus.noAdsTxt);
+					break;
+				case 'Mandatory Ads.txt Snippet Missing':
+					adsData = sitesData.filter(val => val.status === liveAdsTxtEntryStatus.allMissing);
+					break;
+				case 'Mandatory Ads.txt Snippet Present':
+					adsData = sitesData.filter(val => val.status === liveAdsTxtEntryStatus.allPresent);
+					break;
+
+				default:
+					adsData = sitesData.filter(val => val.status === liveAdsTxtEntryStatus.noAdsTxt);
+					break;
 			}
 
 			return sendSuccessResponse({ adsData, currentSelectedEntry }, res);

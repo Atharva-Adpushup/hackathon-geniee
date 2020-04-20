@@ -43,9 +43,9 @@ const Promise = require('bluebird'),
 				innerObj[identifier].aggregate.total_revenue += parseFloat(row['total_revenue']);
 			});
 			// Rounding off
-			innerObj[identifier].aggregate.total_revenue = Number(innerObj[identifier].aggregate.total_revenue).toFixed(
-				3
-			);
+			innerObj[identifier].aggregate.total_revenue = Number(
+				innerObj[identifier].aggregate.total_revenue
+			).toFixed(3);
 
 			let isInvalidRevenue = !!(
 				innerObj[identifier].aggregate.total_revenue == 0 ||
@@ -62,9 +62,9 @@ const Promise = require('bluebird'),
 				isInvalidRevenue || innerObj[identifier].aggregate.total_impressions == 0
 					? 0
 					: Number(
-						(innerObj[identifier].aggregate.total_revenue * 1000) /
-						innerObj[identifier].aggregate.total_impressions
-					).toFixed(3);
+							(innerObj[identifier].aggregate.total_revenue * 1000) /
+								innerObj[identifier].aggregate.total_impressions
+					  ).toFixed(3);
 		});
 		container[key] = innerObj;
 	},
@@ -112,7 +112,12 @@ const Promise = require('bluebird'),
 		return resultData;
 	},
 	validateMetricsData = inputData => {
-		const isInputData = !!(inputData && inputData.siteId && inputData.lastWeekReport && inputData.thisWeekReport),
+		const isInputData = !!(
+				inputData &&
+				inputData.siteId &&
+				inputData.lastWeekReport &&
+				inputData.thisWeekReport
+			),
 			isLastWeekReport = !!(
 				isInputData &&
 				inputData.lastWeekReport &&
@@ -157,7 +162,9 @@ const Promise = require('bluebird'),
 		inputData.thisWeek = utils.numberFormatter(thisWeek);
 		inputData.thisWeekOriginal = Number(thisWeek);
 
-		inputData.percentage = isPercentageGreaterThanOrEqualToOne ? Math.round(percentage) : percentage;
+		inputData.percentage = isPercentageGreaterThanOrEqualToOne
+			? Math.round(percentage)
+			: percentage;
 		inputData.change = comparisonData.change;
 	},
 	computeWeekCPMContribution = weekCPMReport => {
@@ -189,51 +196,51 @@ const Promise = require('bluebird'),
 	},
 	computeMetricComparison = inputData => {
 		const resultData = {
-			impressions: {
-				lastWeek: 0,
-				lastWeekOriginal: 0,
-				thisWeek: 0,
-				thisWeekOriginal: 0,
-				percentage: 0,
-				change: false
+				impressions: {
+					lastWeek: 0,
+					lastWeekOriginal: 0,
+					thisWeek: 0,
+					thisWeekOriginal: 0,
+					percentage: 0,
+					change: false
+				},
+				revenue: {
+					lastWeek: 0,
+					lastWeekOriginal: 0,
+					thisWeek: 0,
+					thisWeekOriginal: 0,
+					percentage: 0,
+					change: false
+				},
+				pageViews: {
+					lastWeek: 0,
+					lastWeekOriginal: 0,
+					thisWeek: 0,
+					thisWeekOriginal: 0,
+					percentage: 0,
+					change: false
+				},
+				cpm: {
+					lastWeek: 0,
+					lastWeekOriginal: 0,
+					thisWeek: 0,
+					thisWeekOriginal: 0,
+					percentage: 0,
+					change: false
+				},
+				pageCPM: {
+					lastWeek: 0,
+					lastWeekOriginal: 0,
+					thisWeek: 0,
+					thisWeekOriginal: 0,
+					percentage: 0,
+					change: false
+				},
+				dates: {
+					lastWeek: {},
+					thisWeek: {}
+				}
 			},
-			revenue: {
-				lastWeek: 0,
-				lastWeekOriginal: 0,
-				thisWeek: 0,
-				thisWeekOriginal: 0,
-				percentage: 0,
-				change: false
-			},
-			pageViews: {
-				lastWeek: 0,
-				lastWeekOriginal: 0,
-				thisWeek: 0,
-				thisWeekOriginal: 0,
-				percentage: 0,
-				change: false
-			},
-			cpm: {
-				lastWeek: 0,
-				lastWeekOriginal: 0,
-				thisWeek: 0,
-				thisWeekOriginal: 0,
-				percentage: 0,
-				change: false
-			},
-			pageCPM: {
-				lastWeek: 0,
-				lastWeekOriginal: 0,
-				thisWeek: 0,
-				thisWeekOriginal: 0,
-				percentage: 0,
-				change: false
-			},
-			dates: {
-				lastWeek: {},
-				thisWeek: {}
-			}
-		},
 			lastWeekDatesInfo = getWeekDatesRepresentation({
 				startDate: inputData.lastWeekReport.reportFrom,
 				endDate: inputData.lastWeekReport.reportTo
@@ -376,8 +383,12 @@ const Promise = require('bluebird'),
 		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
 			config = {
 				siteId: parameterConfig.siteId,
-				fromDate: parameterConfig.fromDate ? parameterConfig.fromDate : moment(getDay(7)).format(dateFormat),
-				toDate: parameterConfig.toDate ? parameterConfig.toDate : moment(getDay(1)).format(dateFormat),
+				fromDate: parameterConfig.fromDate
+					? parameterConfig.fromDate
+					: moment(getDay(7)).format(dateFormat),
+				toDate: parameterConfig.toDate
+					? parameterConfig.toDate
+					: moment(getDay(1)).format(dateFormat),
 				count: parameterConfig.count ? parameterConfig.count : 10,
 				transform: parameterConfig.transform ? parameterConfig.transform : false
 			};
@@ -388,8 +399,12 @@ const Promise = require('bluebird'),
 		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
 			config = {
 				siteId: parameterConfig.siteId,
-				fromDate: parameterConfig.fromDate ? parameterConfig.fromDate : moment(getDay(7)).format(dateFormat),
-				toDate: parameterConfig.toDate ? parameterConfig.toDate : moment(getDay(1)).format(dateFormat),
+				fromDate: parameterConfig.fromDate
+					? parameterConfig.fromDate
+					: moment(getDay(7)).format(dateFormat),
+				toDate: parameterConfig.toDate
+					? parameterConfig.toDate
+					: moment(getDay(1)).format(dateFormat),
 				count: parameterConfig.count || 20,
 				mode: parameterConfig.mode || 1,
 				platformCode: parameterConfig.platformCode || '',
@@ -402,8 +417,12 @@ const Promise = require('bluebird'),
 		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
 			config = {
 				siteId: parameterConfig.siteId,
-				fromDate: parameterConfig.fromDate ? parameterConfig.fromDate : moment(getDay(7)).format(dateFormat),
-				toDate: parameterConfig.toDate ? parameterConfig.toDate : moment(getDay(1)).format(dateFormat),
+				fromDate: parameterConfig.fromDate
+					? parameterConfig.fromDate
+					: moment(getDay(7)).format(dateFormat),
+				toDate: parameterConfig.toDate
+					? parameterConfig.toDate
+					: moment(getDay(1)).format(dateFormat),
 				count: parameterConfig.count ? parameterConfig.count : 20,
 				transform: parameterConfig.transform ? parameterConfig.transform : false
 			};
@@ -414,8 +433,12 @@ const Promise = require('bluebird'),
 		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
 			config = {
 				siteId: parameterConfig.siteId,
-				fromDate: parameterConfig.fromDate ? parameterConfig.fromDate : moment(getDay(7)).format(dateFormat),
-				toDate: parameterConfig.toDate ? parameterConfig.toDate : moment(getDay(1)).format(dateFormat),
+				fromDate: parameterConfig.fromDate
+					? parameterConfig.fromDate
+					: moment(getDay(7)).format(dateFormat),
+				toDate: parameterConfig.toDate
+					? parameterConfig.toDate
+					: moment(getDay(1)).format(dateFormat),
 				transform: parameterConfig.transform ? parameterConfig.transform : false
 			};
 
@@ -425,8 +448,12 @@ const Promise = require('bluebird'),
 		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
 			config = {
 				siteId: parameterConfig.siteId,
-				fromDate: parameterConfig.fromDate ? parameterConfig.fromDate : moment(getDay(7)).format(dateFormat),
-				toDate: parameterConfig.toDate ? parameterConfig.toDate : moment(getDay(1)).format(dateFormat),
+				fromDate: parameterConfig.fromDate
+					? parameterConfig.fromDate
+					: moment(getDay(7)).format(dateFormat),
+				toDate: parameterConfig.toDate
+					? parameterConfig.toDate
+					: moment(getDay(1)).format(dateFormat),
 				transform: parameterConfig.transform ? parameterConfig.transform : false
 			};
 
@@ -436,8 +463,12 @@ const Promise = require('bluebird'),
 		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
 			config = {
 				siteId: parameterConfig.siteId,
-				fromDate: parameterConfig.fromDate ? parameterConfig.fromDate : moment(getDay(7)).format(dateFormat),
-				toDate: parameterConfig.toDate ? parameterConfig.toDate : moment(getDay(1)).format(dateFormat),
+				fromDate: parameterConfig.fromDate
+					? parameterConfig.fromDate
+					: moment(getDay(7)).format(dateFormat),
+				toDate: parameterConfig.toDate
+					? parameterConfig.toDate
+					: moment(getDay(1)).format(dateFormat),
 				transform: parameterConfig.transform ? parameterConfig.transform : false
 			};
 
@@ -447,8 +478,12 @@ const Promise = require('bluebird'),
 		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
 			config = {
 				siteId: parameterConfig.siteId,
-				fromDate: parameterConfig.fromDate ? parameterConfig.fromDate : moment(getDay(7)).format(dateFormat),
-				toDate: parameterConfig.toDate ? parameterConfig.toDate : moment(getDay(1)).format(dateFormat),
+				fromDate: parameterConfig.fromDate
+					? parameterConfig.fromDate
+					: moment(getDay(7)).format(dateFormat),
+				toDate: parameterConfig.toDate
+					? parameterConfig.toDate
+					: moment(getDay(1)).format(dateFormat),
 				transform: parameterConfig.transform ? parameterConfig.transform : false
 			};
 
@@ -458,8 +493,12 @@ const Promise = require('bluebird'),
 		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
 			config = {
 				siteId: parameterConfig.siteId,
-				fromDate: parameterConfig.fromDate ? parameterConfig.fromDate : moment(getDay(7)).format(dateFormat),
-				toDate: parameterConfig.toDate ? parameterConfig.toDate : moment(getDay(1)).format(dateFormat),
+				fromDate: parameterConfig.fromDate
+					? parameterConfig.fromDate
+					: moment(getDay(7)).format(dateFormat),
+				toDate: parameterConfig.toDate
+					? parameterConfig.toDate
+					: moment(getDay(1)).format(dateFormat),
 				transform: parameterConfig.transform ? parameterConfig.transform : false
 			};
 
@@ -469,8 +508,12 @@ const Promise = require('bluebird'),
 		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
 			config = {
 				siteId: parameterConfig.siteId,
-				fromDate: parameterConfig.fromDate ? parameterConfig.fromDate : moment(getDay(7)).format(dateFormat),
-				toDate: parameterConfig.toDate ? parameterConfig.toDate : moment(getDay(1)).format(dateFormat),
+				fromDate: parameterConfig.fromDate
+					? parameterConfig.fromDate
+					: moment(getDay(7)).format(dateFormat),
+				toDate: parameterConfig.toDate
+					? parameterConfig.toDate
+					: moment(getDay(1)).format(dateFormat),
 				platformCode: parameterConfig.platformCode || '',
 				transform: parameterConfig.transform ? parameterConfig.transform : false
 			};
@@ -480,8 +523,12 @@ const Promise = require('bluebird'),
 	getGlobalNetworkWiseDataContributionReport = parameterConfig => {
 		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
 			config = {
-				fromDate: parameterConfig.fromDate ? parameterConfig.fromDate : moment(getDay(7)).format(dateFormat),
-				toDate: parameterConfig.toDate ? parameterConfig.toDate : moment(getDay(1)).format(dateFormat),
+				fromDate: parameterConfig.fromDate
+					? parameterConfig.fromDate
+					: moment(getDay(7)).format(dateFormat),
+				toDate: parameterConfig.toDate
+					? parameterConfig.toDate
+					: moment(getDay(1)).format(dateFormat),
 				transform: parameterConfig.transform ? parameterConfig.transform : false
 			};
 
@@ -490,8 +537,12 @@ const Promise = require('bluebird'),
 	getGlobalMetricsDataContributionReport = parameterConfig => {
 		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
 			config = {
-				fromDate: parameterConfig.fromDate ? parameterConfig.fromDate : moment(getDay(7)).format(dateFormat),
-				toDate: parameterConfig.toDate ? parameterConfig.toDate : moment(getDay(1)).format(dateFormat),
+				fromDate: parameterConfig.fromDate
+					? parameterConfig.fromDate
+					: moment(getDay(7)).format(dateFormat),
+				toDate: parameterConfig.toDate
+					? parameterConfig.toDate
+					: moment(getDay(1)).format(dateFormat),
 				transform: parameterConfig.transform ? parameterConfig.transform : false
 			};
 
@@ -501,8 +552,12 @@ const Promise = require('bluebird'),
 		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
 			config = {
 				siteId: parameterConfig.siteId,
-				fromDate: parameterConfig.fromDate ? parameterConfig.fromDate : moment(getDay(7)).format(dateFormat),
-				toDate: parameterConfig.toDate ? parameterConfig.toDate : moment(getDay(1)).format(dateFormat),
+				fromDate: parameterConfig.fromDate
+					? parameterConfig.fromDate
+					: moment(getDay(7)).format(dateFormat),
+				toDate: parameterConfig.toDate
+					? parameterConfig.toDate
+					: moment(getDay(1)).format(dateFormat),
 				transform: parameterConfig.transform ? parameterConfig.transform : false
 			};
 
@@ -511,8 +566,12 @@ const Promise = require('bluebird'),
 	getGlobalModeWiseTrafficContributionReport = parameterConfig => {
 		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
 			config = {
-				fromDate: parameterConfig.fromDate ? parameterConfig.fromDate : moment(getDay(7)).format(dateFormat),
-				toDate: parameterConfig.toDate ? parameterConfig.toDate : moment(getDay(1)).format(dateFormat),
+				fromDate: parameterConfig.fromDate
+					? parameterConfig.fromDate
+					: moment(getDay(7)).format(dateFormat),
+				toDate: parameterConfig.toDate
+					? parameterConfig.toDate
+					: moment(getDay(1)).format(dateFormat),
 				transform: parameterConfig.transform ? parameterConfig.transform : false
 			};
 
@@ -521,8 +580,12 @@ const Promise = require('bluebird'),
 	getGlobalTop10CountriesContributionQuery = parameterConfig => {
 		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
 			config = {
-				fromDate: parameterConfig.fromDate ? parameterConfig.fromDate : moment(getDay(7)).format(dateFormat),
-				toDate: parameterConfig.toDate ? parameterConfig.toDate : moment(getDay(1)).format(dateFormat),
+				fromDate: parameterConfig.fromDate
+					? parameterConfig.fromDate
+					: moment(getDay(7)).format(dateFormat),
+				toDate: parameterConfig.toDate
+					? parameterConfig.toDate
+					: moment(getDay(1)).format(dateFormat),
 				transform: parameterConfig.transform ? parameterConfig.transform : false,
 				count: parameterConfig.count
 			};
@@ -533,8 +596,12 @@ const Promise = require('bluebird'),
 		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
 			config = {
 				siteId: parameterConfig.siteId,
-				fromDate: parameterConfig.fromDate ? parameterConfig.fromDate : moment(getDay(7)).format(dateFormat),
-				toDate: parameterConfig.toDate ? parameterConfig.toDate : moment(getDay(1)).format(dateFormat),
+				fromDate: parameterConfig.fromDate
+					? parameterConfig.fromDate
+					: moment(getDay(7)).format(dateFormat),
+				toDate: parameterConfig.toDate
+					? parameterConfig.toDate
+					: moment(getDay(1)).format(dateFormat),
 				transform: parameterConfig.transform ? parameterConfig.transform : false,
 				count: parameterConfig.count
 			};
@@ -544,14 +611,19 @@ const Promise = require('bluebird'),
 	getGlobalTop10SitesContributionReport = parameterConfig => {
 		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
 			config = {
-				fromDate: parameterConfig.fromDate ? parameterConfig.fromDate : moment(getDay(7)).format(dateFormat),
-				toDate: parameterConfig.toDate ? parameterConfig.toDate : moment(getDay(1)).format(dateFormat),
+				fromDate: parameterConfig.fromDate
+					? parameterConfig.fromDate
+					: moment(getDay(7)).format(dateFormat),
+				toDate: parameterConfig.toDate
+					? parameterConfig.toDate
+					: moment(getDay(1)).format(dateFormat),
 				transform: parameterConfig.transform ? parameterConfig.transform : false
 			};
 
 		return globalTop10SitesContributionQuery.getData(config);
 	},
-	getGlobalLostAndFoundLiveSitesReport = parameterConfig => globalLostAndFoundLiveSitesQuery.getData(parameterConfig),
+	getGlobalLostAndFoundLiveSitesReport = parameterConfig =>
+		globalLostAndFoundLiveSitesQuery.getData(parameterConfig),
 	getWeeklyEmailReport = siteId => {
 		const dateFormat = commonConsts.REPORT_API.DATE_FORMAT,
 			parameterConfig = {
@@ -623,7 +695,12 @@ const Promise = require('bluebird'),
 			ad.networkData.hasOwnProperty('logWritten') &&
 			ad.networkData.logWritten === false
 		);
-		const isADPSynced = !!(isADPTags && hasNetworkData && ad.networkData.dfpAdunit && ad.networkData.dfpAdunitCode);
+		const isADPSynced = !!(
+			isADPTags &&
+			hasNetworkData &&
+			ad.networkData.dfpAdunit &&
+			ad.networkData.dfpAdunitCode
+		);
 		const genieeNonSyncing = !!(
 			isGeniee &&
 			hasNetworkData &&
@@ -655,10 +732,7 @@ const Promise = require('bluebird'),
 				config.activeDFPCurrencyCode.length &&
 				config.activeDFPCurrencyCode.length === 3
 			),
-			isValidResult = !!(
-				isActiveDFPNetwork &&
-				isActiveDFPCurrencyCode
-			);
+			isValidResult = !!(isActiveDFPNetwork && isActiveDFPCurrencyCode);
 
 		return isValidResult;
 	},
@@ -676,7 +750,7 @@ const Promise = require('bluebird'),
 
 			const isTargetObj = typeof target === 'object' && target !== null;
 			const isSourceObj = typeof source === 'object' && source !== null;
-			
+
 			if (isTargetObj && isSourceObj) {
 				for (const key in source) {
 					if (source.hasOwnProperty(key) && !target.hasOwnProperty(key)) {
@@ -687,12 +761,12 @@ const Promise = require('bluebird'),
 					}
 				}
 			}
-			
-			if((!isSourceObj || !isTargetObj) && recursionLevel === 1) return false;
-			
-			if(isSourceObj && !isTargetObj) return false;
+
+			if ((!isSourceObj || !isTargetObj) && recursionLevel === 1) return false;
+
+			if (isSourceObj && !isTargetObj) return false;
 		}
-    
+
 		return verifyKeys(target, source) === false ? false : true;
 	},
 	deleteKeysInCollection = (target, source) => {
@@ -704,6 +778,13 @@ const Promise = require('bluebird'),
 		}
 
 		return targetCopy;
+	},
+	getMandatoryAdsTxtEntrySnippet = sellerId => {
+		const {
+			mandatoryAdsTxtSnippet: { domain, relationship, certificationAuthorityId }
+		} = commonConsts;
+
+		return `${domain}, ${sellerId}, ${relationship}, ${certificationAuthorityId}`;
 	};
 
 module.exports = {
@@ -734,5 +815,6 @@ module.exports = {
 	isValidThirdPartyDFPAndCurrency,
 	getNetworkConfig,
 	verifyKeysInCollection,
-	deleteKeysInCollection
+	deleteKeysInCollection,
+	getMandatoryAdsTxtEntrySnippet
 };

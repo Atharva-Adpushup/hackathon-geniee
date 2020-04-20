@@ -1,5 +1,12 @@
 import React, { Component } from 'react';
-import { Row, Col, Button, OverlayTrigger, Tooltip, Alert } from '@/Client/helpers/react-bootstrap-imports';
+import {
+	Row,
+	Col,
+	Button,
+	OverlayTrigger,
+	Tooltip,
+	Alert
+} from '@/Client/helpers/react-bootstrap-imports';
 import CodeBox from '../CodeBox/index';
 import { priceFloorKeys, iabSizes, refreshIntervals } from '../../constants/visualEditor';
 import SelectBox from '../SelectBox/index';
@@ -23,7 +30,11 @@ class AdpTags extends Component {
 		} = props;
 
 		// Geniee specific UI access feature 'dynamic allocation' property computatio;
-		const isGenieeUIAccessDA = !!(window.isGeniee && window.gcfg && Object.prototype.hasOwnProperty.call(window.gcfg, 'uud'));
+		const isGenieeUIAccessDA = !!(
+			window.isGeniee &&
+			window.gcfg &&
+			Object.prototype.hasOwnProperty.call(window.gcfg, 'uud')
+		);
 		const isGenieeUIAccessDAActive = !!(isGenieeUIAccessDA && window.gcfg.uud);
 		const isGenieeUIAccessDAInActive = !!(isGenieeUIAccessDA && !window.gcfg.uud);
 		const isPrimaryAdSize = !!(primaryAdSize && primaryAdSize.width && primaryAdSize.height);
@@ -50,7 +61,7 @@ class AdpTags extends Component {
 			multipleAdSizes: [],
 			dfpAdunitId: '',
 			refreshSlot,
-			refreshInterval,
+			refreshInterval: refreshInterval || refreshIntervals[0],
 			isBackwardCompatibleSizes: true,
 			isResponsive: isResponsiveAdSize,
 			overrideActive,
@@ -95,7 +106,7 @@ class AdpTags extends Component {
 			}
 		});
 		return response;
-	}
+	};
 
 	save() {
 		const {
@@ -133,7 +144,6 @@ class AdpTags extends Component {
 			refreshInterval,
 			overrideActive,
 			overrideSizeTo: overrideActive ? overrideSizeTo : null,
-			multipleAdSizes: computedMultipleAdSizes,
 			dfpAdunitId,
 			// NOTE: Below key is exported only because it is required to provide `Backward compatible size mapping`
 			// functionality in features (such as InContent sections) that cannot receive primary ad size
@@ -394,7 +404,7 @@ class AdpTags extends Component {
 		) : (
 			''
 		);
-	}
+	};
 
 	handleIsBackCompatibleSizesChange(val) {
 		const isValue = !!val,
@@ -504,7 +514,16 @@ class AdpTags extends Component {
 	}
 
 	renderNonAdvanced() {
-		const { showButtons, onCancel, buttonType, isInsertMode, geniee, fromPanel, networkConfig, id } = this.props;
+		const {
+			showButtons,
+			onCancel,
+			buttonType,
+			isInsertMode,
+			geniee,
+			fromPanel,
+			networkConfig,
+			id
+		} = this.props;
 		const { fpKey, pf, refreshSlot, refreshInterval } = this.state;
 
 		const code = this.generateCode();
@@ -553,9 +572,9 @@ class AdpTags extends Component {
 					</div>
 				)}
 				{this.renderDynamicAllocation()}
-				{geniee ? null : this.renderIsBackwardCompatibleSizesToggleSwitch()}
+				{/* {geniee ? null : this.renderIsBackwardCompatibleSizesToggleSwitch()} */}
 				{geniee ? this.renderDFPAdUnitIdSelectBox() : null}
-				{geniee ? this.renderManageMultipleAdSizeBlock() : null}
+				{/* {geniee ? this.renderManageMultipleAdSizeBlock() : null} */}
 				{!geniee ? this.renderOverrideSettings(isGenieeEditableMode) : null}
 				{!geniee && networkConfig && networkConfig.enableRefreshSlot ? (
 					<div>

@@ -81,12 +81,12 @@ var getMatchedAdSize = function(inputObject) {
 		multipleAdSizesCollection.forEach(function(adSizeArr) {
 			var stringifiedAdSize = adSizeArr.join(',');
 			computedMatchedSizeArray = computedMatchedSizeArray.concat(
-				adsWithBackwardCompatibleSizesMapping[stringifiedAdSize] || adSizeArr
+				adsWithBackwardCompatibleSizesMapping[stringifiedAdSize] || [adSizeArr]
 			);
 		});
 	} else {
 		computedMatchedSizeArray = computedMatchedSizeArray.concat(
-			adsWithBackwardCompatibleSizesMapping[matchedAdSize.join(',')] || matchedAdSize
+			adsWithBackwardCompatibleSizesMapping[matchedAdSize.join(',')] || [matchedAdSize]
 		);
 	}
 

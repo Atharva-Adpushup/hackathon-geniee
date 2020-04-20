@@ -80,6 +80,21 @@ function pagegroupFiltering(
 	// 	}
 	// });
 
+	/*
+		Checking if the ad of this format !='docked||inView' and already exists
+		If format='docked||inView', we will check for it in the next step
+		when the user will choose the xpath|operation
+		For eg if we are trying to create a stickyTop ad for DESKTOP:HOME
+		but a stickyTop ad already exists for DESKTOP:HOME, disable the creation of the same ad
+	*/
+	if (format !== 'docked' && format !== 'inView') {
+		filteredPagegroupsByPlatform.forEach(pg => {
+			if (meta.pagegroups.includes(`${platform}-${format}-${pg}`)) {
+				disabled.add(pg);
+			}
+		});
+	}
+
 	return {
 		filteredPagegroupsByPlatform,
 		disabled

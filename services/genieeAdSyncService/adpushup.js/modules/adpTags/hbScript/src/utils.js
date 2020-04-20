@@ -10,31 +10,15 @@ var constants = require('./constants');
 var { bidderParamsMapping } = require('./multiFormatConfig');
 var utils = {
 	currencyConversionActive: function(inputObject) {
-		var inputObject = inputObject || adp.config,
-			isActiveDFPNetwork = !!(
-				inputObject.activeDFPNetwork && inputObject.activeDFPNetwork.length
-			),
-			isActiveDFPCurrencyCode = !!(
-				inputObject.activeDFPCurrencyCode &&
-				inputObject.activeDFPCurrencyCode.length &&
-				inputObject.activeDFPCurrencyCode.length === 3
-			),
-			isPrebidGranularityMultiplier = !!(
-				inputObject.prebidGranularityMultiplier &&
-				Number(inputObject.prebidGranularityMultiplier)
-			),
-			isActiveDFPCurrencyExchangeRate = !!(
-				inputObject.activeDFPCurrencyExchangeRate &&
-				Object.keys(inputObject.activeDFPCurrencyExchangeRate).length
-			),
-			isValidResult = !!(
-				isActiveDFPNetwork &&
-				isActiveDFPCurrencyCode &&
-				isPrebidGranularityMultiplier &&
-				isActiveDFPCurrencyExchangeRate
-			);
+		var isValidAdserverCurrency =
+				inputObject.adServerCurrency &&
+				typeof inputObject.adServerCurrency === 'string' &&
+				inputObject.adServerCurrency.length === 3,
+			isValidGranularityMultiplier =
+				typeof inputObject.granularityMultiplier === 'number' &&
+				!isNaN(inputObject.granularityMultiplier);
 
-		return isValidResult;
+		return isValidAdserverCurrency && isValidGranularityMultiplier;
 	},
 	getActiveDFPNetwork: function() {
 		if (adp && adp.config) {

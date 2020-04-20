@@ -15,6 +15,7 @@ class AdpTags extends Component {
 				fpKey,
 				priceFloor,
 				headerBidding,
+				fluid,
 				code,
 				refreshSlot,
 				refreshInterval,
@@ -48,6 +49,7 @@ class AdpTags extends Component {
 			hbAcivated: isGenieeUIAccessDAInActive ? false : headerBidding,
 			showMultipleAdSizesSelector: false,
 			multipleAdSizes: [],
+			fluid,
 			dfpAdunitId: '',
 			refreshSlot,
 			refreshInterval,
@@ -102,6 +104,7 @@ class AdpTags extends Component {
 				fpKey,
 				hbAcivated,
 				pf,
+				fluid,
 				keyValues,
 				refreshSlot,
 				refreshInterval,
@@ -118,7 +121,6 @@ class AdpTags extends Component {
 				!multipleAdSizes.length
 			);
 		let computedMultipleAdSizes = multipleAdSizes;
-
 		if (shouldMultipleAdSizesBeComputed) {
 			computedMultipleAdSizes = this.getMultipleAdSizesOfPrimaryAdSize(isBackwardCompatibleSizes);
 		}
@@ -129,10 +131,11 @@ class AdpTags extends Component {
 				[fpKey]: pf
 			},
 			refreshSlot,
-			refreshInterval,
+			refreshInterval: refreshInterval || refreshIntervals[0],
 			overrideActive,
 			overrideSizeTo: overrideActive ? overrideSizeTo : null,
-			multipleAdSizes: computedMultipleAdSizes,
+			formats: ['display'],
+			fluid,
 			dfpAdunitId,
 			// NOTE: Below key is exported only because it is required to provide `Backward compatible size mapping`
 			// functionality in features (such as InContent sections) that cannot receive primary ad size
@@ -554,9 +557,9 @@ class AdpTags extends Component {
 					</div>
 				)}
 				{this.renderDynamicAllocation()}
-				{this.props.geniee ? null : this.renderIsBackwardCompatibleSizesToggleSwitch()}
+				{/* {this.props.geniee ? null : this.renderIsBackwardCompatibleSizesToggleSwitch()} */}
 				{this.props.geniee ? this.renderDFPAdUnitIdSelectBox() : null}
-				{this.props.geniee ? this.renderManageMultipleAdSizeBlock() : null}
+				{/* {this.props.geniee ? this.renderManageMultipleAdSizeBlock() : null} */}
 				{!this.props.geniee ? this.renderOverrideSettings(isGenieeEditableMode) : null}
 				{!this.props.geniee &&
 				this.props.networkConfig &&
@@ -582,6 +585,24 @@ class AdpTags extends Component {
 											? `js-refresh-slot-switch-${this.props.id}`
 											: 'js-refresh-slot-switch'
 									}
+									customComponentClass={this.props.fromPanel ? 'u-padding-0px' : ''}
+								/>
+							</Col>
+							<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px' : ''}>
+								<CustomToggleSwitch
+									labelText="Fluid"
+									className="mB-10"
+									checked={this.state.fluid}
+									onChange={val => {
+										this.setState({ fluid: !!val });
+									}}
+									layout="horizontal"
+									size="m"
+									on="Yes"
+									off="No"
+									defaultLayout={this.props.fromPanel ? false : true}
+									name={this.props.id ? `fluid-${this.props.id}` : 'fluid'}
+									id={this.props.id ? `fluid-${this.props.id}` : 'fluid'}
 									customComponentClass={this.props.fromPanel ? 'u-padding-0px' : ''}
 								/>
 							</Col>

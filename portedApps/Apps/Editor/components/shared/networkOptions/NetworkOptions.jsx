@@ -51,6 +51,7 @@ class NetworkOptions extends Component {
 	submitHandler(networkData) {
 		return this.props.onSubmit({
 			network: this.state.network,
+			fluid: networkData.fluid,
 			networkData: { ...networkData }
 		});
 	}
@@ -67,7 +68,10 @@ class NetworkOptions extends Component {
 					? this.props.ad.networkData.keyValues
 					: false;
 		} else {
-			code = this.props.ad.networkData && this.props.ad.networkData.adCode ? this.props.ad.networkData : false;
+			code =
+				this.props.ad.networkData && this.props.ad.networkData.adCode
+					? this.props.ad.networkData
+					: false;
 		}
 		return code;
 	}
@@ -100,23 +104,35 @@ class NetworkOptions extends Component {
 			isAdNetworkData = !!(adExists && props.ad.networkData),
 			code = adExists && props.ad.network ? this.getCode() : false,
 			pfKeyExists =
-				isAdNetworkData && props.ad.networkData.keyValues && Object.keys(props.ad.networkData.keyValues).length,
+				isAdNetworkData &&
+				props.ad.networkData.keyValues &&
+				Object.keys(props.ad.networkData.keyValues).length,
 			fpKey = pfKeyExists
-				? Object.keys(props.ad.networkData.keyValues).filter(key => key.match(/FP/g))[0] || defaultPriceFloorKey
+				? Object.keys(props.ad.networkData.keyValues).filter(key => key.match(/FP/g))[0] ||
+				  defaultPriceFloorKey
 				: defaultPriceFloorKey,
 			priceFloor = pfKeyExists ? props.ad.networkData.keyValues[fpKey] : 0,
 			refreshSlot =
-				isAdNetworkData && props.ad.networkData.refreshSlot ? props.ad.networkData.refreshSlot : false,
+				isAdNetworkData && props.ad.networkData.refreshSlot
+					? props.ad.networkData.refreshSlot
+					: false,
 			refreshInterval =
-				isAdNetworkData && props.ad.networkData.refreshInterval ? props.ad.networkData.refreshInterval : null,
+				isAdNetworkData && props.ad.networkData.refreshInterval
+					? props.ad.networkData.refreshInterval
+					: null,
 			overrideActive =
-				isAdNetworkData && props.ad.networkData.overrideActive ? props.ad.networkData.overrideActive : false,
+				isAdNetworkData && props.ad.networkData.overrideActive
+					? props.ad.networkData.overrideActive
+					: false,
 			overrideSizeTo =
-				isAdNetworkData && props.ad.networkData.overrideSizeTo ? props.ad.networkData.overrideSizeTo : false,
+				isAdNetworkData && props.ad.networkData.overrideSizeTo
+					? props.ad.networkData.overrideSizeTo
+					: false,
 			headerBidding =
 				isAdNetworkData && props.ad.networkData.hasOwnProperty('headerBidding')
 					? props.ad.networkData.headerBidding
 					: false,
+			fluid = props.ad && props.ad.hasOwnProperty('fluid') ? props.ad.fluid : false,
 			dynamicAllocation =
 				isAdNetworkData && props.ad.networkData.hasOwnProperty('dynamicAllocation')
 					? props.ad.networkData.dynamicAllocation
@@ -126,11 +142,17 @@ class NetworkOptions extends Component {
 					? props.ad.networkData.firstFold
 					: true,
 			position =
-				isAdNetworkData && props.ad.networkData.hasOwnProperty('position') ? props.ad.networkData.position : '',
+				isAdNetworkData && props.ad.networkData.hasOwnProperty('position')
+					? props.ad.networkData.position
+					: '',
 			customAdCode =
-				isAdNetworkData && props.ad.networkData.hasOwnProperty('adCode') ? props.ad.networkData.adCode : '',
+				isAdNetworkData && props.ad.networkData.hasOwnProperty('adCode')
+					? props.ad.networkData.adCode
+					: '',
 			zoneId =
-				isAdNetworkData && props.ad.networkData.hasOwnProperty('zoneId') ? props.ad.networkData.zoneId : '',
+				isAdNetworkData && props.ad.networkData.hasOwnProperty('zoneId')
+					? props.ad.networkData.zoneId
+					: '',
 			isPrimaryAdSize = !!(props.primaryAdSize && Object.keys(props.primaryAdSize).length),
 			isAdSize = !!(adExists && props.ad.width && props.ad.height),
 			primaryAdSize =
@@ -148,6 +170,7 @@ class NetworkOptions extends Component {
 						fpKey={fpKey}
 						priceFloor={priceFloor}
 						headerBidding={headerBidding}
+						fluid={fluid}
 						submitHandler={this.submitHandler}
 						onCancel={props.onCancel}
 						code={code}
@@ -250,7 +273,11 @@ class NetworkOptions extends Component {
 		let filteredNetworks = this.filterNetworks();
 		return (
 			<div className="networkOptionsRow">
-				<SelectBox value={this.state.network} label="Select Network" onChange={this.networkChangeHandler}>
+				<SelectBox
+					value={this.state.network}
+					label="Select Network"
+					onChange={this.networkChangeHandler}
+				>
 					{filteredNetworks.map((item, index) => (
 						<option key={index} value={item}>
 							{item.charAt(0).toUpperCase() + item.slice(1).replace(/([A-Z])/g, ' $1')}

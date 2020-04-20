@@ -248,11 +248,11 @@ class Signup extends Component {
 												</span>
 												<div className="input-group-text">
 													I agree to{' '}
-													<a target="_blank" href="http://www.adpushup.com/tos.php">
+													<a target="_blank" href="https://www.adpushup.com/terms-of-service/">
 														Terms of Service{' '}
 													</a>
 													&amp;{' '}
-													<a target="_blank" href="http://www.adpushup.com/privacy.php">
+													<a target="_blank" href="https://www.adpushup.com/privacy-policy/">
 														Privacy Policy
 													</a>
 												</div>

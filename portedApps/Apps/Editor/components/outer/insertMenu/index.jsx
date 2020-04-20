@@ -96,16 +96,19 @@ class insertMenu extends React.Component {
 			networkData: {}
 		};
 
+		adPayload.fluid = networkData.fluid;
 		if (isMultipleAdSizes) {
 			adPayload.multipleAdSizes = networkData.multipleAdSizes;
 		}
 		delete networkData.multipleAdSizes;
 		delete networkData.isBackwardCompatibleSizes;
+		delete networkData.fluid;
 
 		adPayload.networkData = {
 			...adPayload.networkData,
 			...networkData
 		};
+
 		props.createSectionAndAd(sectionPayload, adPayload, props.variationId);
 	}
 

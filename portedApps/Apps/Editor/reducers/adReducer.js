@@ -15,22 +15,23 @@ const adsByIds = (state = {}, action) => {
 					css: payload.css,
 					height: payload.height,
 					width: payload.width,
-					network: payload.network
+					network: payload.network,
+					fluid: payload.fluid
 				},
 				// Network data object is only added when custom zone id value is added
 				// through Visual Editor
 				isNetworkData = !!(payload.networkData && Object.keys(payload.networkData).length),
-				isZoneId = !!(isNetworkData && payload.networkData.zoneId),
-				isMultipleAdSizes = !!(payload.multipleAdSizes && payload.multipleAdSizes.length);
+				isZoneId = !!(isNetworkData && payload.networkData.zoneId);
 
 			if (isZoneId) {
 				createAdObject.networkData = { zoneId: payload.networkData.zoneId };
 			}
 			if (isNetworkData) {
-				createAdObject.networkData = Object.assign({}, createAdObject.networkData, payload.networkData);
-			}
-			if (isMultipleAdSizes) {
-				createAdObject.multipleAdSizes = payload.multipleAdSizes.concat([]);
+				createAdObject.networkData = Object.assign(
+					{},
+					createAdObject.networkData,
+					payload.networkData
+				);
 			}
 
 			return {
@@ -54,7 +55,9 @@ const adsByIds = (state = {}, action) => {
 				},
 				// Network data object is only added when custom zone id value is added
 				// through Visual Editor
-				isInContentAdNetworkData = !!(payload.networkData && Object.keys(payload.networkData).length),
+				isInContentAdNetworkData = !!(
+					payload.networkData && Object.keys(payload.networkData).length
+				),
 				isInContentAdZoneId = !!(isInContentAdNetworkData && payload.networkData.zoneId),
 				isInContentMultipleAdSizes = !!(payload.multipleAdSizes && payload.multipleAdSizes.length);
 
@@ -121,11 +124,16 @@ const adsByIds = (state = {}, action) => {
 		 */
 
 		case adActions.UPDATE_NETWORK:
+			const fluid = action.networkData.fluid;
+			delete action.networkData.fluid;
+
 			return {
 				...state,
 				[action.adId]: {
 					...state[action.adId],
 					network: action.network,
+					fluid,
+
 					// adCode:
 					// 	action.network == 'adpTags'
 					// 		? ''
@@ -162,7 +170,10 @@ const adsByIds = (state = {}, action) => {
 			return { ...state, [action.adId]: { ...state[action.adId], ...action.params } };
 
 		case adActions.UPDATE_MULTIPLE_AD_SIZES:
-			return { ...state, [action.adId]: { ...state[action.adId], multipleAdSizes: action.multipleAdSizes } };
+			return {
+				...state,
+				[action.adId]: { ...state[action.adId], multipleAdSizes: action.multipleAdSizes }
+			};
 
 		case sectionActions.UPDATE_INCONTENT_FLOAT:
 			return { ...state, [action.adId]: { ...state[action.adId], css: action.floatCss } };

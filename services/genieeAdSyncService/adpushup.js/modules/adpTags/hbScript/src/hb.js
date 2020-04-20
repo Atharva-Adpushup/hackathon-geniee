@@ -33,7 +33,11 @@ var hb = {
 
 			var size = adpSlot.size;
 			var computedSizes = adpSlot.computedSizes;
-			var prebidSizes = computedSizes.length ? computedSizes : [size];
+			var prebidSizes = computedSizes.length
+				? computedSizes
+				: size[0] === 'responsive' && size[1] === 'responsive'
+				? [[0, 0]]
+				: [size];
 			if (
 				!adp.config.apLiteActive &&
 				adpSlot.optionalParam.overrideActive &&
@@ -60,6 +64,8 @@ var hb = {
 				}
 			});
 
+			var playerSize = utils.getVideoPlayerSize(prebidSizes);
+
 			var prebidSlot = {
 				code: adpSlot.containerId,
 				mediaTypes: {},
@@ -68,20 +74,26 @@ var hb = {
 					render: function(bid) {
 						// push to render queue because jwplayer may not be loaded yet.
 						bid.renderer.push(() => {
-							jwplayer(bid.adUnitCode).setup(
-								merge(
-									{
-										width: bid.width,
-										height: bid.height,
-										advertising: {
-											outstream: true,
-											client: 'vast',
-											vastxml: bid.vastXml
-										}
-									},
-									multiFormatConstants.VIDEO.JW_PLAYER_CONFIG
+							var jwPlayerInstance = jwplayer(bid.adUnitCode);
+							jwPlayerInstance
+								.setup(
+									merge(
+										{
+											width: playerSize[0],
+											height: playerSize[1],
+											advertising: {
+												outstream: true,
+												client: 'vast',
+												vastxml: bid.vastXml
+											}
+										},
+										multiFormatConstants.VIDEO.JW_PLAYER_CONFIG
+									)
 								)
-							);
+								.on('ready', function() {
+									var playerElem = jwPlayerInstance.getContainer();
+									playerElem.style.margin = '0 auto';
+								});
 						});
 					}
 				},
@@ -98,7 +110,6 @@ var hb = {
 						break;
 					}
 					case 'video': {
-						const playerSize = utils.getVideoPlayerSize(prebidSizes);
 						prebidSlot.mediaTypes.video = {
 							...mediaTypesConfig.video,
 							playerSize
@@ -134,7 +145,9 @@ var hb = {
 				var slot = isApLiteActive
 					? window.apLite.adpSlots[bidData.adUnitCode]
 					: window.adpushup.adpTags.adpSlots[bidData.adUnitCode];
-				var computedCPMValue = utils.currencyConversionActive(adp.config)
+				var computedCPMValue = utils.currencyConversionActive(
+					config.PREBID_CONFIG.currencyConfig
+				)
 					? 'originalCpm'
 					: 'cpm';
 

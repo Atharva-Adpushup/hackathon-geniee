@@ -3,7 +3,7 @@ module.exports = apiModule();
 const model = require('../helpers/model');
 const couchbase = require('../helpers/couchBaseService');
 const AdPushupError = require('../helpers/AdPushupError');
-const { docKeys } = require('../configs/commonConsts');
+const { docKeys, liveAdsTxtEntryStatus } = require('../configs/commonConsts');
 const siteModel = require('./siteModel');
 const proxy = require('../helpers/proxy');
 
@@ -51,7 +51,13 @@ function apiModule() {
 		getAdsTxtEntries(siteId, adsTxtSnippet, currentSelectedEntry) {
 			const ourAdsTxt = proxy.fetchOurAdsTxt();
 			const siteIdArr = siteId.split(',');
+			const entriesForMandatoryAdsTxt = [
+				'Mandatory Ads.txt Snippet Missing',
+				'Mandatory Ads.txt Snippet Present'
+			];
+
 			function adsTxtProcessing(adsTxtData) {
+				// adsTxtData belongs to publisher's ads.txt data
 				const { accountEmail, adsTxt, domain, siteId } = adsTxtData;
 				let commonOutput = {
 					domain,
@@ -59,14 +65,22 @@ function apiModule() {
 					accountEmail
 				};
 				return ourAdsTxt
-					.then(ourAdsTxtEntries =>
-						proxy.getAdsTxtFromDbAndVerify(
-							(ourAdsTxtEntries = adsTxtSnippet ? adsTxtSnippet : ourAdsTxtEntries),
-							adsTxt
-						)
-					)
+					.then(ourAdsTxtEntries => {
+						if (entriesForMandatoryAdsTxt.includes(currentSelectedEntry)) {
+							return proxy
+								.getMandatoryAdsTxtEntryBySite(siteId)
+								.then(mandatoryAdsTxtSnippet =>
+									proxy.verifyMandatoryAdsTxtFetchedFromDb(mandatoryAdsTxtSnippet, adsTxt)
+								);
+						} else {
+							return proxy.verifyAdsTxtFetchedFromDb(
+								(ourAdsTxtEntries = adsTxtSnippet ? adsTxtSnippet : ourAdsTxtEntries),
+								adsTxt
+							);
+						}
+					})
 					.then(adsTxt => ({
-						status: 1,
+						status: liveAdsTxtEntryStatus.allPresent,
 						message: 'All Entries Available',
 						adsTxtEntries: adsTxt,
 						...commonOutput
@@ -75,37 +89,42 @@ function apiModule() {
 					.catch(err => {
 						if (err instanceof AdPushupError) {
 							const {
-								message: { httpCode = 404, ourAdsTxt, presentEntries }
+								message: {
+									httpCode = 404,
+									data: { ourAdsTxt, presentEntries, mandatoryAdsTxtEntry }
+								}
 							} = err;
+
 							let output = null;
 
 							switch (httpCode) {
+								// check for present entries
 								case 204:
 									output = {
-										status: 2,
+										status: liveAdsTxtEntryStatus.allMissing,
 										message: "Our Ads.txt entries not found in publisher's ads.txt",
-										adsTxtEntries: ourAdsTxt,
+										adsTxtEntries: ourAdsTxt || mandatoryAdsTxtEntry,
 										...commonOutput
 									};
 									break;
 								case 206:
 									if (currentSelectedEntry === 'Missing Entries')
 										output = {
-											status: 3,
+											status: liveAdsTxtEntryStatus.partialPresent,
 											message: "Some entries not found in publisher's ads.txt",
 											adsTxtEntries: ourAdsTxt,
 											...commonOutput
 										};
 									else if (currentSelectedEntry === 'Present Entries')
 										output = {
-											status: 3,
+											status: liveAdsTxtEntryStatus.partialPresent,
 											message: "Present entries found in publisher's ads.txt",
 											adsTxtEntries: presentEntries,
 											...commonOutput
 										};
 									else
 										output = {
-											status: 3,
+											status: liveAdsTxtEntryStatus.partialPresent,
 											message: 'All Ads.txt Entries Not Present For this site',
 											adsTxtEntries: { ourAdsTxt, presentEntries },
 											...commonOutput
@@ -115,7 +134,7 @@ function apiModule() {
 								default:
 								case 404:
 									output = {
-										status: 4,
+										status: liveAdsTxtEntryStatus.noAdsTxt,
 										message: "Publisher's ads.txt not found",
 										...commonOutput
 									};

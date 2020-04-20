@@ -28,20 +28,35 @@ class AdsTxtManager extends Component {
 		showModal: false,
 		modalAdsTxt: '',
 		showSendCodeByEmailModal: false,
-		redirectUrl: ''
+		redirectUrl: '',
+		sendCodeByEmailModalContent: ''
 	};
 
 	componentDidMount() {
-		return proxyService
-			.getAdsTxt()
-			.then(res => {
+		const {
+			user: { email }
+		} = this.props;
+
+		const getDataPromises = [
+			proxyService.getAdsTxt(),
+			proxyService.getMandatoryAdsTxtEntry({ email })
+		];
+
+		return Promise.all(getDataPromises)
+			.then(([adsTxtRes, mandatoryAdsTxtEntryRes]) => {
 				let snippet = '';
-				if (res.status === 200) snippet = res.data.adsTxtSnippet;
-				return snippet;
+				let mandatoryAdsTxtEntry = '';
+
+				if (adsTxtRes.status === 200) snippet = adsTxtRes.data.adsTxtSnippet;
+				if (mandatoryAdsTxtEntryRes.status === 200)
+					mandatoryAdsTxtEntry = mandatoryAdsTxtEntryRes.data.mandatoryAdsTxtEntry;
+
+				return [snippet, mandatoryAdsTxtEntry];
 			})
-			.then(snippet =>
-				this.getSitesAdstxtStatus(snippet).then(response => {
+			.then(([snippet, mandatoryAdsTxtEntry]) =>
+				this.getSitesAdstxtStatus().then(response => {
 					this.setState({
+						mandatoryAdsTxtEntry,
 						adsTxtSnippet: snippet,
 						sites: response,
 						isLoading: false
@@ -50,53 +65,95 @@ class AdsTxtManager extends Component {
 			);
 	}
 
-	getSitesAdstxtStatus = adsTxtSnippet => {
+	getSitesAdstxtStatus = () => {
 		const { sites } = this.props;
+
+		const statusText = {
+			204: 'No Content',
+			206: 'Partial Content'
+		};
+
 		const promiseSerial = funcs =>
 			funcs.reduce(
 				(promise, obj) =>
 					promise.then(all => {
 						const { func, site } = obj;
 						return func()
-							.then(res => {
-								let result;
-								if (res.status === 200)
-									result = {
-										domain: sites[site].siteDomain,
-										statusText: 'Entries Upto Date',
-										status: res.status
-									};
-								else if (res.status === 204)
-									result = {
-										domain: sites[site].siteDomain,
-										statusText: res.statusText,
-										adsTxt: adsTxtSnippet,
-										status: res.status
-									};
-								else {
-									result = {
-										domain: sites[site].siteDomain,
-										statusText: res.statusText,
-										adsTxt: res.data.ourAdsTxt,
-										status: res.status
-									};
-								}
+							.then(() => {
+								const result = {
+									domain: sites[site].siteDomain,
+									genericStatus: 'Entries Upto Date',
+									genericError: false,
+									isComplete: true
+								};
 								return all.concat(result);
 							})
 							.catch(error => {
-								const result = {
-									domain: sites[site].siteDomain,
-									statusText: 'No Ads.txt Found',
-									adsTxt: error.response.data.ourAdsTxt,
-									status: 400
+								let result = {
+									isComplete: false,
+									domain: sites[site].siteDomain
 								};
+
+								if (error.response) {
+									const errorResponse = error.response.data;
+
+									if (error.response.status === 400) {
+										const {
+											error: errors,
+											data: { ourAdsTxt, mandatoryAdsTxtEntry }
+										} = errorResponse;
+
+										for (let index = 0; index < errors.length; index += 1) {
+											const { error: err, type, code } = errors[index];
+
+											if (type === 'ourAdsTxt') {
+												result.adsTxt = ourAdsTxt;
+												result.ourAdsTxtStatus = statusText[code];
+											} else {
+												result.mandatoryAdsTxtEntryStatus = err;
+												result.mandatoryAdsTxtEntry = mandatoryAdsTxtEntry;
+											}
+										}
+									} else if (error.response.status === 404) {
+										const { ourAdsTxt, mandatoryAdsTxtEntry } = errorResponse.data;
+										const {
+											ourAdsTxt: ourAdsTxtError,
+											mandatoryAdsTxtEntry: mandatoryAdsTxtEntryError
+										} = errorResponse.error;
+
+										result = {
+											...result,
+											adsTxt: ourAdsTxt,
+											mandatoryAdsTxtEntry,
+											ourAdsTxtStatus: ourAdsTxtError,
+											mandatoryAdsTxtEntryStatus: mandatoryAdsTxtEntryError
+										};
+									} else {
+										result = {
+											...result,
+											adsTxt: '',
+											mandatoryAdsTxtEntry: '',
+											genericStatus: errorResponse.error,
+											genericError: true
+										};
+									}
+								} else {
+									result = {
+										...result,
+										adsTxt: '',
+										mandatoryAdsTxtEntry: '',
+										genericStatus: 'Something went wrong!',
+										genericError: true
+									};
+								}
+
 								return all.concat(result);
 							});
 					}),
 				Promise.resolve([])
 			);
 		const funcs = Object.keys(sites).map(site => ({
-			func: () => proxyService.verifyAdsTxtCode(sites[site].siteDomain),
+			func: () => proxyService.verifyAdsTxtCode(sites[site].siteDomain, sites[site].siteId),
 			site
 		}));
 
@@ -118,52 +175,120 @@ class AdsTxtManager extends Component {
 	};
 
 	renderModal = () => {
-		const { showSendCodeByEmailModal, modalAdsTxt, showModal } = this.state;
+		const {
+			showModal,
+			modalAdsTxt,
+			modalMandatoryAdsTxtEntry,
+			showSendCodeByEmailModal,
+			sendCodeByEmailModalContent
+		} = this.state;
+
 		return (
 			<Modal show={showModal} onHide={this.handleClose}>
 				<Modal.Header closeButton>
 					<Modal.Title>Missing Entries</Modal.Title>
 				</Modal.Header>
 				<Modal.Body>
-					<div className="u-padding-4">
-						The following entries are missing. To avoid loss in revenue, please append the following
-						entries in your ads.txt file.
+					<div className="u-padding-3">
+						{modalMandatoryAdsTxtEntry && modalAdsTxt ? (
+							<span className="u-padding-b3 u-text-bold u-text-primary-red">
+								Please add entries from both the sections below to avoid revenue loss
+							</span>
+						) : (
+							'The following entries are missing. To avoid loss in revenue, please append the following entries in your ads.txt file.'
+						)}
 					</div>
-					<div className="u-padding-4 text-center snippet-wrapper">
-						<textarea
-							readOnly
-							className="input--snippet"
-							style={{ height: '50%' }}
-							id="adsTxtSnippetTextarea"
-							placeholder="AdPushup init code comes here.."
-							value={modalAdsTxt}
+					<div className="snippet-wrapper text-center u-padding-b4 u-padding-h4 u-padding-t3">
+						<SendCodeByEmailModal
+							show={showSendCodeByEmailModal}
+							title="Send Code to Developer"
+							handleClose={this.toggleShowSendCodeByEmailModal}
+							subject="AdPushup Ads.txt Entries"
+							emailBody={sendCodeByEmailModalContent}
 						/>
-						<div className="snippet-btn-wrapper aligner aligner--hEnd u-padding-v3 u-padding-h3">
-							<CustomButton
-								onClick={this.toggleShowSendCodeByEmailModal}
-								variant="secondary"
-								className="u-margin-r3 snippet-btn apbtn-main-line apbtn-small"
-								style={{ width: '170px' }}
-							>
-								Email Code
-							</CustomButton>
-							<SendCodeByEmailModal
-								show={showSendCodeByEmailModal}
-								title="Send Code to Developer"
-								handleClose={this.toggleShowSendCodeByEmailModal}
-								subject="AdPushup Ads.txt Entries"
-								emailBody={this.getEmailBody(modalAdsTxt)}
-							/>
-							<CopyButtonWrapperContainer content={modalAdsTxt} callback={this.onCopyToClipBoard}>
-								<CustomButton
-									variant="secondary"
-									className="snippet-btn apbtn-main-line apbtn-small"
-									style={{ width: '170px' }}
-								>
-									Copy to clipboard
-								</CustomButton>
-							</CopyButtonWrapperContainer>
-						</div>
+
+						{modalMandatoryAdsTxtEntry && (
+							<div className="">
+								<div className="u-padding-b3 u-text-bold u-text-primary-red">
+									Mandatory Ads.txt entry
+								</div>
+								<textarea
+									readOnly
+									className="input--snippet"
+									style={{ height: '15%' }}
+									id="mandatoryAdsTxtSnippetTextarea"
+									placeholder="Mandatory Ads.txt Entry comes here.."
+									value={modalMandatoryAdsTxtEntry}
+								/>
+								<div className="snippet-btn-wrapper aligner aligner--hEnd u-padding-v3">
+									<CustomButton
+										onClick={() => {
+											this.setState({
+												sendCodeByEmailModalContent: this.getEmailBody(modalMandatoryAdsTxtEntry)
+											});
+											this.toggleShowSendCodeByEmailModal();
+										}}
+										variant="secondary"
+										className="u-margin-r3 snippet-btn apbtn-main-line apbtn-small"
+										style={{ width: '170px' }}
+									>
+										Email Code
+									</CustomButton>
+									<CopyButtonWrapperContainer
+										content={modalMandatoryAdsTxtEntry}
+										callback={() => this.onCopyToClipBoard('mandatoryAdsTxtSnippetTextarea')}
+									>
+										<CustomButton
+											variant="secondary"
+											className="snippet-btn apbtn-main-line apbtn-small"
+											style={{ width: '170px' }}
+										>
+											Copy to clipboard
+										</CustomButton>
+									</CopyButtonWrapperContainer>
+								</div>
+							</div>
+						)}
+
+						{modalAdsTxt && (
+							<div className="u-padding-v3">
+								<textarea
+									readOnly
+									className="input--snippet"
+									style={{ height: '40%' }}
+									id="adsTxtSnippetTextarea"
+									placeholder="AdPushup init code comes here.."
+									value={modalAdsTxt}
+								/>
+								<div className="snippet-btn-wrapper aligner aligner--hEnd u-padding-v3">
+									<CustomButton
+										onClick={() => {
+											this.setState({
+												sendCodeByEmailModalContent: this.getEmailBody(modalAdsTxt)
+											});
+											this.toggleShowSendCodeByEmailModal();
+										}}
+										variant="secondary"
+										className="u-margin-r3 snippet-btn apbtn-main-line apbtn-small"
+										style={{ width: '170px' }}
+									>
+										Email Code
+									</CustomButton>
+									<CopyButtonWrapperContainer
+										content={modalAdsTxt}
+										callback={() => this.onCopyToClipBoard('adsTxtSnippetTextarea')}
+									>
+										<CustomButton
+											variant="secondary"
+											className="snippet-btn apbtn-main-line apbtn-small"
+											style={{ width: '170px' }}
+										>
+											Copy to clipboard
+										</CustomButton>
+									</CopyButtonWrapperContainer>
+								</div>
+							</div>
+						)}
 					</div>
 				</Modal.Body>
 			</Modal>
@@ -174,9 +299,31 @@ class AdsTxtManager extends Component {
 		this.setState(state => ({ showSendCodeByEmailModal: !state.showSendCodeByEmailModal }));
 	};
 
-	onCopyToClipBoard = () => {
-		document.getElementById('adsTxtSnippetTextarea').focus();
-		document.getElementById('adsTxtSnippetTextarea').select();
+	onCopyToClipBoard = targetId => {
+		document.getElementById(targetId).focus();
+		document.getElementById(targetId).select();
+	};
+
+	getSiteStatusText = site => {
+		if (site.genericStatus) {
+			return (
+				<span className={site.genericError ? 'u-text-primary-red' : ''}>{site.genericStatus}</span>
+			);
+		}
+		const siteStatusText = [];
+
+		if (site.ourAdsTxtStatus) {
+			siteStatusText.push(<span key={`${site.domain}`}>{site.ourAdsTxtStatus}</span>);
+		}
+		if (site.mandatoryAdsTxtEntryStatus) {
+			siteStatusText.push(
+				<p key={`${site.domain}_mandatory`} className="u-text-primary-red u-text-bold u-margin-0">
+					{site.mandatoryAdsTxtEntryStatus}
+				</p>
+			);
+		}
+
+		return siteStatusText;
 	};
 
 	renderSiteStatusTable = () => {
@@ -197,19 +344,20 @@ class AdsTxtManager extends Component {
 							sites.map(site => (
 								<tr key={site.domain}>
 									<td>{site.domain}</td>
-									<td>{site.statusText}</td>
+									<td>{this.getSiteStatusText(site)}</td>
 									<td>
 										<CustomButton
 											onClick={() => {
 												this.setState({
 													showModal: true,
-													modalAdsTxt: site.adsTxt
+													modalAdsTxt: site.adsTxt,
+													modalMandatoryAdsTxtEntry: site.mandatoryAdsTxtEntry
 												});
 											}}
 											variant="secondary"
 											className="snippet-btn apbtn-main-line apbtn-small"
 											style={{ width: '170px' }}
-											disabled={site.status === 200}
+											disabled={site.isComplete || site.genericError}
 										>
 											Get Entries
 										</CustomButton>
@@ -233,7 +381,12 @@ class AdsTxtManager extends Component {
 	};
 
 	renderSnippetTextarea = () => {
-		const { showSendCodeByEmailModal, adsTxtSnippet } = this.state;
+		const {
+			adsTxtSnippet,
+			mandatoryAdsTxtEntry,
+			showSendCodeByEmailModal,
+			sendCodeByEmailModalContent
+		} = this.state;
 		return (
 			<div>
 				<div className="u-padding-4">
@@ -241,39 +394,92 @@ class AdsTxtManager extends Component {
 					bidding on your website.
 				</div>
 				<div className="u-padding-4 text-center snippet-wrapper">
-					<textarea
-						readOnly
-						className="input--snippet"
-						style={{ height: '50%' }}
-						id="adsTxtSnippetTextarea"
-						placeholder="AdPushup init code comes here.."
-						value={adsTxtSnippet}
+					<SendCodeByEmailModal
+						show={showSendCodeByEmailModal}
+						title="Send Code to Developer"
+						handleClose={this.toggleShowSendCodeByEmailModal}
+						subject="AdPushup Ads.txt Entries"
+						emailBody={sendCodeByEmailModalContent}
 					/>
-					<div className="snippet-btn-wrapper aligner aligner--hEnd u-padding-v3 u-padding-h3">
-						<CustomButton
-							onClick={this.toggleShowSendCodeByEmailModal}
-							variant="secondary"
-							className="u-margin-r3 snippet-btn apbtn-main-line apbtn-small"
-							style={{ width: '170px' }}
-						>
-							Email Code
-						</CustomButton>
-						<SendCodeByEmailModal
-							show={showSendCodeByEmailModal}
-							title="Send Code to Developer"
-							handleClose={this.toggleShowSendCodeByEmailModal}
-							subject="AdPushup Ads.txt Entries"
-							emailBody={this.getEmailBody(adsTxtSnippet)}
+					<div>
+						<div className="u-padding-b3 u-text-bold u-text-primary-red">
+							Mandatory Ads.txt entry
+						</div>
+						<textarea
+							readOnly
+							className="input--snippet"
+							style={{ height: '15%' }}
+							id="mandatoryAdsTxtSnippetTextarea"
+							placeholder="Mandatory Ads.txt Entry comes here.."
+							value={mandatoryAdsTxtEntry}
 						/>
-						<CopyButtonWrapperContainer content={adsTxtSnippet} callback={this.onCopyToClipBoard}>
+
+						<div className="snippet-btn-wrapper aligner aligner--hEnd u-padding-v3 u-padding-h3">
 							<CustomButton
+								onClick={() => {
+									this.setState({
+										sendCodeByEmailModalContent: this.getEmailBody(mandatoryAdsTxtEntry)
+									});
+									this.toggleShowSendCodeByEmailModal();
+								}}
 								variant="secondary"
-								className="snippet-btn apbtn-main-line apbtn-small"
+								className="u-margin-r3 snippet-btn apbtn-main-line apbtn-small"
 								style={{ width: '170px' }}
 							>
-								Copy to clipboard
+								Email Code
 							</CustomButton>
-						</CopyButtonWrapperContainer>
+
+							<CopyButtonWrapperContainer
+								content={mandatoryAdsTxtEntry}
+								callback={() => this.onCopyToClipBoard('mandatoryAdsTxtSnippetTextarea')}
+							>
+								<CustomButton
+									variant="secondary"
+									className="snippet-btn apbtn-main-line apbtn-small"
+									style={{ width: '170px' }}
+								>
+									Copy to clipboard
+								</CustomButton>
+							</CopyButtonWrapperContainer>
+						</div>
+					</div>
+
+					<div className="u-padding-t5">
+						<textarea
+							readOnly
+							className="input--snippet"
+							style={{ height: '50%' }}
+							id="adsTxtSnippetTextarea"
+							placeholder="AdPushup init code comes here.."
+							value={adsTxtSnippet}
+						/>
+						<div className="snippet-btn-wrapper aligner aligner--hEnd u-padding-v3 u-padding-h3">
+							<CustomButton
+								onClick={() => {
+									this.setState({
+										sendCodeByEmailModalContent: this.getEmailBody(adsTxtSnippet)
+									});
+									this.toggleShowSendCodeByEmailModal();
+								}}
+								variant="secondary"
+								className="u-margin-r3 snippet-btn apbtn-main-line apbtn-small"
+								style={{ width: '170px' }}
+							>
+								Email Code
+							</CustomButton>
+							<CopyButtonWrapperContainer
+								content={adsTxtSnippet}
+								callback={() => this.onCopyToClipBoard('adsTxtSnippetTextarea')}
+							>
+								<CustomButton
+									variant="secondary"
+									className="snippet-btn apbtn-main-line apbtn-small"
+									style={{ width: '170px' }}
+								>
+									Copy to clipboard
+								</CustomButton>
+							</CopyButtonWrapperContainer>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -353,8 +559,8 @@ class AdsTxtManager extends Component {
 }
 
 const mapStateToProps = state => {
-	const { sites } = state.global;
-	return { sites: sites.data };
+	const { sites, user } = state.global;
+	return { sites: sites.data, user: user.data };
 };
 
 export default connect(

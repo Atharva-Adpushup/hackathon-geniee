@@ -704,7 +704,11 @@ function apiModule() {
 					const networkData = user.getNetworkDataObj('DFP');
 
 					const currencyCode = !!activeAdServer && activeAdServer.activeDFPCurrencyCode;
-					const mergedPrebidConfig = { ...prebidConfig };
+					const mergedPrebidConfig = {
+						timeOut: hbGlobalSettingDefaults.prebidTimeout,
+						refreshTimeOut: hbGlobalSettingDefaults.prebidRefreshTimeout,
+						...prebidConfig
+					};
 
 					if (activeAdServer && activeAdServer.activeDFPNetwork) {
 						if (

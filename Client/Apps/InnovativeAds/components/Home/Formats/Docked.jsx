@@ -2,18 +2,46 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable no-alert */
 import React, { Component } from 'react';
-import { Col } from '@/Client/helpers/react-bootstrap-imports';
+import CustomMessage from '../../../../../Components/CustomMessage';
+import { Row, Col } from '@/Client/helpers/react-bootstrap-imports';
 import SelectBox from '../../../../../Components/SelectBox/index';
 import { AD_OPERATIONS, TYPE_OF_ADS, EVENTS } from '../../../configs/commonConsts';
 import CodeBox from '../../../../../Components/CodeBox/index';
 import CustomInput from '../../shared/index';
 
+/*
+	Checking if for the selected page groups there exists
+	a docked ad with same xpath-operation configuration
+*/
+const getPagegroupsWithDuplicateAds = (xpath, operation, selectedPagegroups, existingDockedAds) => {
+	let duplicates = [];
+
+	if (!!xpath && !!operation && !!existingDockedAds.length) {
+		duplicates = selectedPagegroups.filter(pg =>
+			existingDockedAds.some(ad => ad === `${xpath}-${operation}-${pg}`)
+		);
+	}
+
+	return duplicates;
+};
+
 class Docked extends Component {
 	constructor(props) {
 		super(props);
-		const { ad } = this.props;
+		const { ad, currentDockedAds = [] } = this.props;
 		const hasFormatData = ad && ad.formatData ? ad.formatData : false;
+		const existingDockedAds = currentDockedAds.reduce((ads, ad) => {
+			const { archivedOn, formatData, pagegroups } = ad;
+			if (archivedOn) return ads;
+
+			const pagegroupAds = pagegroups.map(
+				pg => `${formatData.xpath}-${formatData.operation}-${pg}`
+			);
+			return ads.concat(pagegroupAds);
+		}, []);
 		this.state = {
+			existingDockedAds,
+			pagegroupsWithDuplicateAds: [],
 			xpath: hasFormatData ? ad.formatData.xpath : '',
 			bottomXpath: hasFormatData ? ad.formatData.bottomXpath : '',
 			bottomOffset: hasFormatData ? ad.formatData.bottomOffset : '',
@@ -26,10 +54,42 @@ class Docked extends Component {
 		this.saveHandler = this.saveHandler.bind(this);
 	}
 
+	static getDerivedStateFromProps(props, state) {
+		if (props.selectedPagegroups !== state.selectedPagegroups) {
+			const { xpath, operation, existingDockedAds } = state;
+			const pagegroupsWithDuplicateAds = getPagegroupsWithDuplicateAds(
+				xpath,
+				operation,
+				props.selectedPagegroups,
+				existingDockedAds
+			);
+			return {
+				pagegroupsWithDuplicateAds
+			};
+		}
+		return null;
+	}
+
 	handleChange(e) {
-		this.setState({
-			[e.target.name]: e.target.value
-		});
+		const name = e.target.name;
+		const value = e.target.value;
+		const newState = {
+			[name]: value
+		};
+
+		if (name === 'xpath') {
+			const { selectedPagegroups } = this.props;
+			const { operation, existingDockedAds } = this.state;
+			const pagegroupsWithDuplicateAds = getPagegroupsWithDuplicateAds(
+				name,
+				operation,
+				selectedPagegroups,
+				existingDockedAds
+			);
+
+			newState.pagegroupsWithDuplicateAds = pagegroupsWithDuplicateAds;
+		}
+		this.setState(newState);
 	}
 
 	handleCodeChange(css) {
@@ -37,7 +97,19 @@ class Docked extends Component {
 	}
 
 	operationChange(value) {
-		this.setState({ operation: value });
+		const { selectedPagegroups } = this.props;
+		const { xpath, existingDockedAds } = this.state;
+		const pagegroupsWithDuplicateAds = getPagegroupsWithDuplicateAds(
+			xpath,
+			value,
+			selectedPagegroups,
+			existingDockedAds
+		);
+
+		this.setState({
+			operation: value,
+			pagegroupsWithDuplicateAds
+		});
 	}
 
 	saveHandler(e) {
@@ -74,58 +146,85 @@ class Docked extends Component {
 
 	render() {
 		const { save, cancel, fullWidth } = this.props;
-		const { xpath, bottomOffset, bottomXpath, operation, css } = this.state;
+		const {
+			xpath,
+			bottomOffset,
+			bottomXpath,
+			operation,
+			css,
+			pagegroupsWithDuplicateAds
+		} = this.state;
+		const hasPagegroupsWithDuplicateAds = !!pagegroupsWithDuplicateAds.length;
+		const formattedPagegroupsWithDuplicateAds = pagegroupsWithDuplicateAds
+			.map(pg => pg.replace(':', ' - '))
+			.join(', ');
+
 		const colSize = fullWidth ? 12 : 6;
 		return (
-			<form action="#" method="POST">
-				<CustomInput
-					name="xpath"
-					value={xpath}
-					type="text"
-					label="Enter Xpath"
-					handler={this.handleChange}
-					size={colSize}
-					id="xpath-input"
-				/>
-				<Col md={colSize} className="u-padding-l0 u-margin-b5">
-					<label htmlFor="adOperation">Ad Operation*</label>
-					<SelectBox
-						selected={operation}
-						onSelect={this.operationChange}
-						title="Ad Operation"
-						id="ad-operation-selectbox"
-						options={AD_OPERATIONS.map(op => ({
-							name: op,
-							value: op
-						}))}
-					/>
-				</Col>
-				<CustomInput
-					name="bottomXpath"
-					value={bottomXpath}
-					type="text"
-					label="Enter Bottom XPath"
-					handler={this.handleChange}
-					size={colSize}
-					id="bottom-xpath-input"
-				/>
-				{/* </Col> */}
-				<CustomInput
-					name="bottomOffset"
-					value={bottomOffset}
-					type="text"
-					label="Enter Bottom Offset"
-					handler={this.handleChange}
-					size={colSize}
-					id="bottom-offset-input"
-				/>
-				<Col md={12} className="u-padding-l0">
-					<label htmlFor="css">Custom CSS</label>
-					<CodeBox name="css" showButtons={false} onChange={this.handleCodeChange} code={css} />
-				</Col>
-				{save.renderFn(save.label, this.saveHandler)}
-				{cancel ? cancel.renderFn(cancel.label, cancel.handler, 'secondary') : null}
-			</form>
+			<div>
+				<Row>
+					<form action="#" method="POST">
+						<CustomInput
+							name="xpath"
+							value={xpath}
+							type="text"
+							label="Enter Xpath"
+							handler={this.handleChange}
+							size={colSize}
+							id="xpath-input"
+						/>
+						<Col md={colSize} className="u-padding-l0 u-margin-b5">
+							<label htmlFor="adOperation">Ad Operation*</label>
+							<SelectBox
+								selected={operation}
+								onSelect={this.operationChange}
+								title="Ad Operation"
+								id="ad-operation-selectbox"
+								options={AD_OPERATIONS.map(op => ({
+									name: op,
+									value: op
+								}))}
+							/>
+						</Col>
+						<CustomInput
+							name="bottomXpath"
+							value={bottomXpath}
+							type="text"
+							label="Enter Bottom XPath"
+							handler={this.handleChange}
+							size={colSize}
+							id="bottom-xpath-input"
+						/>
+						{/* </Col> */}
+						<CustomInput
+							name="bottomOffset"
+							value={bottomOffset}
+							type="text"
+							label="Enter Bottom Offset"
+							handler={this.handleChange}
+							size={colSize}
+							id="bottom-offset-input"
+						/>
+						<Col md={12} className="u-padding-l0">
+							<label htmlFor="css">Custom CSS</label>
+							<CodeBox name="css" showButtons={false} onChange={this.handleCodeChange} code={css} />
+						</Col>
+						{!hasPagegroupsWithDuplicateAds && save.renderFn(save.label, this.saveHandler)}
+						{cancel ? cancel.renderFn(cancel.label, cancel.handler, 'secondary') : null}
+					</form>
+				</Row>
+
+				{hasPagegroupsWithDuplicateAds && (
+					<div className="u-margin-v5">
+						<CustomMessage
+							message={`A docked ad for xpath <strong>'${xpath}'</strong> and operation <strong>'${operation}'</strong> already exists for <strong>'${formattedPagegroupsWithDuplicateAds}'</strong>. Please archive the existing ad before creating a new one.`}
+							className="error"
+							header="Similar Docked Ad already exists"
+							key={1}
+						/>
+					</div>
+				)}
+			</div>
 		);
 	}
 }

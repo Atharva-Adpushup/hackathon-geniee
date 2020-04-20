@@ -117,8 +117,8 @@ var auction = {
 			) {
 				bidderSettings[bidderCode] = {
 					bidCpmAdjustment: function(bidCpm) {
-						return bidCpm - bidCpm * (revenueShare / 100);
-					}
+						return bidCpm - bidCpm * (this.revenueShare / 100);
+					}.bind({ revenueShare: revenueShare })
 				};
 			}
 		}
@@ -169,6 +169,12 @@ var auction = {
 			// Prebid client-side cache required for video format bidding by Pubmatic and IX adapters to cache VAST XML
 			cache: {
 				url: 'https://prebid.adnxs.com/pbc/v1/cache'
+			},
+			consentManagement: {
+				usp: {
+					cmpApi: 'iab',
+					timeout: 100 // US Privacy timeout 100ms
+				}
 			}
 		};
 

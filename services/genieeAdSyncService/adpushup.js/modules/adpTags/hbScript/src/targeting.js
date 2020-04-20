@@ -61,12 +61,17 @@ var targeting = {
 		var targeting = {
 			[keys.ADPUSHUP_RAN]: 1,
 			[keys.SITE_ID]: config.SITE_ID,
-			[keys.HB_RAN]: 0
+			[keys.HB_RAN]: 0,
+			[keys.FLUID]: 0
 		};
 		var adServerTargeting = this.getAdserverTargeting(adpSlot);
 
 		if (adpSlot.bidders.length) {
 			Object.assign(targeting, { [keys.HB_RAN]: 1 });
+		}
+
+		if (adpSlot.optionalParam.fluid) {
+			Object.assign(targeting, { [keys.FLUID]: 1 });
 		}
 
 		var existingTargeting = (adpSlot.gSlot && adpSlot.gSlot.getTargetingMap()) || {};
@@ -83,7 +88,9 @@ var targeting = {
 			Object.assign(targeting, { [keys.REFRESH_COUNT]: 0 });
 		}
 
-		Object.assign(targeting, { [keys.REFRESH_RATE]: adpSlot.optionalParam.refreshInterval });
+		Object.assign(targeting, {
+			[keys.REFRESH_RATE]: adpSlot.optionalParam.refreshInterval
+		});
 
 		if (adServerTargeting) {
 			Object.assign(targeting, adServerTargeting);

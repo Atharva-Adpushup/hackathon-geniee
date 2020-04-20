@@ -60,11 +60,10 @@ export default class InventoryTab extends React.Component {
 		this.setState({
 			selectAllNative,
 			selectAllVideo,
-			selectAllMultiFormat:
+			selectAllMultiFormat: !!(
 				selectAllNative.length === inventories.length &&
 				selectAllVideo.length === inventories.length
-					? true
-					: false
+			)
 		});
 	}
 
@@ -142,7 +141,7 @@ export default class InventoryTab extends React.Component {
 	handleNativeChange = ({ target: { checked } }, params) => {
 		const { adUnitId, app, pageGroup, device } = params;
 		const { selectAllNative, selectAllVideo } = this.state;
-		const { siteId, showNotification, inventories } = this.props;
+		const { siteId, showNotification, inventories, setUnsavedChangesAction } = this.props;
 		const format = 'native';
 		const inventoryToUpdate = [];
 		const jsonTopush = { checked, format, adUnitId, app, pageGroup, device };
@@ -156,14 +155,15 @@ export default class InventoryTab extends React.Component {
 
 		return updateFormat(inventoryToUpdate, siteId)
 			.then(() => {
-				this.setState({
-					selectAllNative,
-					selectAllMultiFormat:
-						selectAllNative.length === inventories.length &&
-						selectAllVideo.length === inventories.length
-							? true
-							: false
-				});
+				this.setState(
+					{
+						selectAllNative,
+						selectAllMultiFormat:
+							selectAllNative.length === inventories.length &&
+							selectAllVideo.length === inventories.length
+					},
+					() => setUnsavedChangesAction(true)
+				);
 			})
 			.catch(err => {
 				console.log(err);
@@ -195,11 +195,10 @@ export default class InventoryTab extends React.Component {
 			.then(() => {
 				this.setState({
 					selectAllVideo,
-					selectAllMultiFormat:
+					selectAllMultiFormat: !!(
 						selectAllNative.length === inventories.length &&
 						selectAllVideo.length === inventories.length
-							? true
-							: false
+					)
 				});
 			})
 			.catch(err => {
@@ -435,7 +434,7 @@ export default class InventoryTab extends React.Component {
 						<Checkbox
 							onChange={this.handleChange}
 							checked={selectAllMultiFormat}
-							disabled={selectAllMultiFormat ? true : false}
+							disabled={!!selectAllMultiFormat}
 						>
 							Enable native and video format for all units
 						</Checkbox>

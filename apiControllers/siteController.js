@@ -35,6 +35,10 @@ router
 	.get('/status', (req, res) => {
 		const { email } = req.user;
 		const { siteId } = req.query;
+		const {
+			liveAdsTxtEntryStatus: { partialPresent, allPresent, noAdsTxt }
+		} = CC;
+
 		const DEFAULT_RESPONSE = {
 			gam: {
 				status: false,
@@ -43,7 +47,7 @@ router
 				key: 'gamStatus'
 			},
 			adsTxt: {
-				status: 4, // 1: All Good | 2: Not Found | 3: Some are missing | 4: Ads Txt not present
+				status: noAdsTxt, // 1: All Good | 2: Not Found | 3: Some are missing | 4: Ads Txt not present
 				isOptional: true,
 				displayText: 'AdsTxt',
 				key: 'adsTxtStatus'
@@ -70,40 +74,55 @@ router
 		const response = _.cloneDeep(DEFAULT_RESPONSE);
 
 		function adsTxtProcessing(domain) {
-			return proxy
-				.fetchOurAdsTxt()
-				.then(ourAdsTxt => proxy.verifyAdsTxt(domain, ourAdsTxt))
+			const getAdsTxtData = [
+				proxy.fetchOurAdsTxt(),
+				proxy.getMandatoryAdsTxtEntryBySite(req.query.siteId)
+			];
+
+			return Promise.all(getAdsTxtData)
+				.then(([ourAdsTxt, mandatoryAdsTxtEntry]) =>
+					proxy.verifyAdsTxt(domain, ourAdsTxt, mandatoryAdsTxtEntry)
+				)
 				.then(() => ({
-					status: 1,
+					status: allPresent,
 					message: 'All fine'
 				}))
 				.catch(err => {
 					if (err instanceof AdPushupError) {
-						const {
-							message: { httpCode = 404 }
-						} = err;
 						let output = null;
-						switch (httpCode) {
-							case 204:
-								output = {
-									status: 2,
-									message: "Our Ads.txt entries not found in publisher's ads.txt"
-								};
-								break;
-							case 206:
-								output = {
-									status: 3,
-									message: "Some entries not found in publisher's ads.txt"
-								};
-								break;
-							default:
-							case 404:
-								output = {
-									status: 4,
-									message: "Publisher's ads.txt not found"
-								};
-								break;
+
+						if (err.message.httpCode === 400) {
+							const {
+								message: { error: errors }
+							} = err;
+							let mandatoryEntryMessage = null;
+							let commonEntryMessage = null;
+
+							for (let index = 0; index < errors.length; index += 1) {
+								const { code, type } = errors[index];
+
+								if (type === 'ourAdsTxt') {
+									// code = 204 || 206
+									commonEntryMessage = code === 204 ? 'Our Ads.txt entries' : 'Some entries';
+								} else {
+									mandatoryEntryMessage = 'Mandatory Entry';
+								}
+							}
+
+							const message =
+								mandatoryEntryMessage && commonEntryMessage
+									? `${mandatoryEntryMessage} and ${commonEntryMessage} not found in publisher's ads.txt`
+									: `${commonEntryMessage ||
+											mandatoryEntryMessage} not found in publisher's ads.txt`;
+
+							output = { message, status: partialPresent };
+						} else {
+							output = {
+								status: noAdsTxt,
+								message: "Publisher's ads.txt not found"
+							};
 						}
+
 						return Promise.resolve(output);
 					}
 					return Promise.reject(err);

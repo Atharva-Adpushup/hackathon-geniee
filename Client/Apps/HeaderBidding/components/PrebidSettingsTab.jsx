@@ -12,6 +12,7 @@ import {
 import InputBox from '../../../Components/InputBox';
 import CustomButton from '../../../Components/CustomButton';
 import Loader from '../../../Components/Loader';
+import { HEADER_BIDDING } from '../constants';
 import { fetchPrebidSettings, updatePrebidSettings } from '../../../services/hbService';
 
 class PrebidSettingsTab extends React.Component {
@@ -33,13 +34,20 @@ class PrebidSettingsTab extends React.Component {
 	handleTimeOut = ({ target: { value: timeOut } }, type) => {
 		// eslint-disable-next-line no-param-reassign
 		timeOut = Number(timeOut);
+		let minAllowedTime = HEADER_BIDDING.INITIAL_TIMEOUT.MIN;
+		let maxAllowedTime = HEADER_BIDDING.INITIAL_TIMEOUT.MAX;
+
+		if (type === 'refreshTimeOut') {
+			minAllowedTime = HEADER_BIDDING.REFRESH_TIMEOUT.MIN;
+			maxAllowedTime = HEADER_BIDDING.REFRESH_TIMEOUT.MAX;
+		}
 
 		this.setState(state => ({
 			[type]: timeOut,
 			errors: {
 				...state.errors,
-				[type]: !(!Number.isNaN(timeOut) && timeOut > 500 && timeOut < 10000)
-					? 'Timeout should be between 500ms to 10000ms'
+				[type]: !(!Number.isNaN(timeOut) && timeOut >= minAllowedTime && timeOut <= maxAllowedTime)
+					? `Timeout should be between ${minAllowedTime}ms to ${maxAllowedTime}ms`
 					: ''
 			}
 		}));
@@ -64,9 +72,17 @@ class PrebidSettingsTab extends React.Component {
 		const { siteId, showNotification, setUnsavedChangesAction } = this.props;
 		const { timeOut, refreshTimeOut } = this.state;
 
-		const isValidTimeout = time => !Number.isNaN(time) && time >= 500 && time <= 10000;
+		const isValidInitialTimeout =
+			!Number.isNaN(timeOut) &&
+			timeOut >= HEADER_BIDDING.INITIAL_TIMEOUT.MIN &&
+			timeOut <= HEADER_BIDDING.INITIAL_TIMEOUT.MAX;
 
-		if (isValidTimeout(timeOut) && isValidTimeout(refreshTimeOut)) {
+		const isValidRefreshTimeout =
+			!Number.isNaN(refreshTimeOut) &&
+			refreshTimeOut >= HEADER_BIDDING.REFRESH_TIMEOUT.MIN &&
+			refreshTimeOut <= HEADER_BIDDING.REFRESH_TIMEOUT.MAX;
+
+		if (isValidInitialTimeout && isValidRefreshTimeout) {
 			const newPrebidSettings = { timeOut, refreshTimeOut };
 
 			this.setState({ isSavingSettings: true });

@@ -358,9 +358,11 @@ class Account extends Component {
 					id="js-isThirdPartyAdx"
 					disabled={disableThirdPartyAdx}
 				/>
-				<CustomButton variant="primary" className="pull-right" onClick={this.handleSave}>
-					Save
-				</CustomButton>
+				{isDFPSetup && originalactiveDFP !== null ? null : (
+					<CustomButton variant="primary" className="pull-right" onClick={this.handleSave}>
+						Save
+					</CustomButton>
+				)}
 			</Col>
 		);
 	}
