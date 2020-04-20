@@ -4,7 +4,19 @@ var w = null,
 	config = null,
 	constants = null,
 	isApLiteActive = null,
-	pageFeedbackData = null;
+	getPageFeedbackData = function() {
+		return {
+			siteId: config.SITE_ID,
+			url: adp.config.pageUrl,
+			siteDomain: adp.config.siteDomain,
+			pageGroup: adp.config.pageGroup || null,
+			pageVariationId: w.adpushup.config.selectedVariation || null,
+			pageVariationName: w.adpushup.config.selectedVariationName || null,
+			pageVariationType: w.adpushup.config.selectedVariationType || null,
+			platform: adp.config.platform,
+			packetId: adp.config.packetId
+		};
+	};
 
 var helpers = {
 	getSlotsAuctioned: function(auctionEndData) {
@@ -153,7 +165,7 @@ var helpers = {
 			placement: slot.isATF
 		};
 
-		var feedbackData = w.adpushup.$.extend({}, pageFeedbackData, slotFeedbackData);
+		var feedbackData = w.adpushup.$.extend({}, getPageFeedbackData(), slotFeedbackData);
 
 		if (slot.feedback.renderedSize) feedbackData.renderedSize = slot.feedback.renderedSize;
 
@@ -182,7 +194,7 @@ var feedback = {
 		);
 	},
 	sendAuctionFeedack: function(auctionId, slots) {
-		var feedbackData = w.adpushup.$.extend({}, pageFeedbackData);
+		var feedbackData = w.adpushup.$.extend({}, getPageFeedbackData());
 		feedbackData['sections'] = helpers.getAuctionFeedbackData(auctionId, w);
 
 		helpers.markSlotFeedbackSent(slots);
@@ -267,17 +279,6 @@ var API = {
 		config = params['config'];
 		constants = params['constants'];
 		isApLiteActive = w.adpushup.config.apLiteActive;
-		pageFeedbackData = {
-			siteId: config.SITE_ID,
-			url: adp.config.pageUrl,
-			siteDomain: adp.config.siteDomain,
-			pageGroup: adp.config.pageGroup || null,
-			pageVariationId: w.adpushup.config.selectedVariation || null,
-			pageVariationName: w.adpushup.config.selectedVariationName || null,
-			pageVariationType: w.adpushup.config.selectedVariationType || null,
-			platform: adp.config.platform,
-			packetId: adp.config.packetId
-		};
 
 		w.hbAnalytics = {
 			adUnits: {}

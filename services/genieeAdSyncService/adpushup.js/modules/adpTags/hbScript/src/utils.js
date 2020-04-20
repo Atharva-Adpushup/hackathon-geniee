@@ -269,10 +269,15 @@ var utils = {
 		if (slot.adType === 'sticky') {
 			return true;
 		}
+
 		var containerId = slot.containerId;
 		var $container = $('#' + containerId);
 
 		if ($container.length) {
+			if (isApLiteActive && utils.isStickyContainer($container)) {
+				return true;
+			}
+
 			var aboveTheFoldHeight = $(window).height();
 
 			if (aboveTheFoldHeight) {
@@ -298,6 +303,27 @@ var utils = {
 				return containerPixel < 242000 ? percentageInView >= 50 : percentageInView >= 30;
 			}
 		}
+	},
+	isStickyContainer: function($container) {
+		/*
+			either container should have position fixed
+			or any of its parents until body should have position fixed
+		*/
+
+		var containerPosition = $container.css('position');
+		if (containerPosition === 'fixed') {
+			return true;
+		}
+
+		var fixedContainerParents = $container.parentsUntil('body').filter(function() {
+			return $(this).css('position') === 'fixed';
+		});
+
+		if (fixedContainerParents.length) {
+			return true;
+		}
+
+		return false;
 	},
 	getSlotRefreshData: function(adpSlot) {
 		var keys = constants.ADSERVER_TARGETING_KEYS,
