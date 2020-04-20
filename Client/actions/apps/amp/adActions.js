@@ -30,12 +30,6 @@ const fetchAds = params => dispatch =>
 		})
 		.catch(err => errorHandler(err, 'Ad Fetching Failed'));
 
-const deleteAd = params => dispatch =>
-	axiosInstance
-		.post('/apTag/deleteAd', { params })
-		.then(() => dispatch({ type: AD_ACTIONS.DELETE_AD, adId: params.adId, siteId: params.siteId }))
-		.catch(err => errorHandler(err, 'Ad Deletion Failed'));
-
 const updateAd = (adId, siteId, data) => dispatch =>
 	dispatch({
 		type: AD_ACTIONS.UPDATE_AD,
@@ -61,4 +55,4 @@ const modifyAdOnServer = (siteId, adId, data) => dispatch =>
 		)
 		.catch(err => errorHandler(err));
 
-export { createAd, fetchAds, deleteAd, updateAd, modifyAdOnServer };
+export { createAd, fetchAds, updateAd, modifyAdOnServer };
