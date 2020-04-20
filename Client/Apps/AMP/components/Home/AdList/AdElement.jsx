@@ -4,12 +4,9 @@
 import React, { Component } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Col, OverlayTrigger, Tooltip, Button } from '@/Client/helpers/react-bootstrap-imports';
-import { makeFirstLetterCapitalize } from '../../../../../helpers/commonFunctions';
 import CopyButtonWrapperContainer from '../../../../../Containers/CopyButtonWrapperContainer';
-import { DISPLAYADCODE, STICKYADCODE, AMP_MESSAGE, SIZES } from '../../../configs/commonConsts';
+import { DISPLAYADCODE, STICKYADCODE, SIZES } from '../../../configs/commonConsts';
 import CustomButton from '../../../../../Components/CustomButton/index';
-// import AdNetworkDetails from './AdNetworkDetails';
-// import LazyLoadSettings from './LazyLoadSettings';
 import MultiSizeSettings from './MultiSizeSettings';
 import RefreshSettings from './RefreshSettings';
 import EditBox from '../../../../../Components/EditBox/index';
@@ -34,11 +31,6 @@ class AdElement extends Component {
 		this.disableAd = this.disableAd.bind(this);
 		this.updateWrapper = this.updateWrapper.bind(this);
 	}
-
-	getAMPAdCode = ({ formatData }) =>
-		formatData.network && formatData.networkData && formatData.networkData.adCode
-			? formatData.networkData.adCode
-			: AMP_MESSAGE;
 
 	disableAd() {
 		const { isActive } = this.state;
@@ -77,7 +69,7 @@ class AdElement extends Component {
 	);
 
 	renderAdDetails() {
-		const { updateAd, networkConfig, user, siteId, doc, networkCode } = this.props;
+		const { user, siteId, doc, networkCode } = this.props;
 		const {
 			dfpSyncingStatus: { completedOn }
 		} = doc;
@@ -92,15 +84,7 @@ class AdElement extends Component {
 			type,
 			networkData: { dfpAdunitCode }
 		} = ad;
-		const {
-			showLazyload,
-			showNetworkDetails,
-			editName,
-			isActive,
-			showMultiSize,
-			showRefresh
-		} = this.state;
-		const isAMP = ad.type === 'amp';
+		const { editName, isActive, showMultiSize, showRefresh } = this.state;
 
 		const refresh = isRefreshEnabled ? `data-enable-refresh="${refreshInterval}"` : '';
 		const availableSizes = SIZES[type.toUpperCase()].MOBILE;
@@ -109,8 +93,8 @@ class AdElement extends Component {
 
 		const multiSize = isMultiSize ? `data-multi-size='${downwardCompatibleSizes}'` : '';
 		const ADCODE = type === 'display' ? DISPLAYADCODE : STICKYADCODE;
-		let code = isAMP ? this.getAMPAdCode(ad) : ADCODE;
-		const customAttributes = ad.maxHeight ? ` max-height="${ad.maxHeight}"` : '';
+		let code = ADCODE;
+
 		code = code
 			? code
 					.replace(/__AD_ID__/g, id)
@@ -121,19 +105,6 @@ class AdElement extends Component {
 					.replace(/__NETWORK_CODE__/, networkCode)
 					.replace(/__AD_UNIT_CODE__/, dfpAdunitCode)
 			: null;
-
-		// if (showNetworkDetails) {
-		// 	return (
-		// 		<AdNetworkDetails
-		// 			ad={ad}
-		// 			siteId={siteId}
-		// 			onCancel={() => this.toggleHandler('showNetworkDetails')}
-		// 			onSubmit={updateAd}
-		// 			networkConfig={networkConfig}
-		// 			user={user}
-		// 		/>
-		// 	);
-		// }
 
 		if (showMultiSize) {
 			return (
@@ -172,16 +143,7 @@ class AdElement extends Component {
 				/>
 			);
 		}
-		// if (showLazyload) {
-		// 	return (
-		// 		<LazyLoadSettings
-		// 			checked={ad.enableLazyLoading}
-		// 			id={ad.id}
-		// 			onChange={payload => updateAd(ad.id, siteId, payload)}
-		// 			onCancel={() => this.toggleHandler('showLazyload')}
-		// 		/>
-		// 	);
-		// }
+
 		return (
 			<div key={`adDetails${id}`}>
 				{user.isSuperUser && !isActive ? (
@@ -203,28 +165,13 @@ class AdElement extends Component {
 						</span>
 					</OverlayTrigger>
 				</p>
-				{/* {this.renderInformation('Platform', makeFirstLetterCapitalize(ad.formatData.platform))}
-				{this.renderInformation(
-					'Type',
-					`${makeFirstLetterCapitalize(ad.formatData.type)} ${
-						ad.formatData.placement ? makeFirstLetterCapitalize(ad.formatData.placement) : ''
-					}`
-				)} */}
-				{this.renderInformation(
-					'Size',
-					ad.width === 'responsive'
-						? makeFirstLetterCapitalize(ad.width)
-						: `${ad.width}x${ad.height}`
-				)}
+				{this.renderInformation('Size', `${ad.width}x${ad.height}`)}
 				{ad.width === 'responsive' && !!ad.maxHeight
 					? this.renderInformation('Max Height', ad.maxHeight)
 					: null}
 				{user.isSuperUser ? (
 					<div>
-						{this.renderInformation(
-							'Network',
-							ad.network && ad.networkData ? ad.network.toUpperCase() : 'Not Set'
-						)}
+						{this.renderInformation('Network', 'Adp Tags ')}
 						{this.renderInformation('Status', ad.isActive ? 'Active' : 'Archived')}
 					</div>
 				) : null}
@@ -233,7 +180,7 @@ class AdElement extends Component {
 						? code
 						: 'DFP Sync service is ruuning. Code will be available here once it is completed.'}
 				</pre>{' '}
-				{user.isSuperUser && ad.type !== 'amp' ? (
+				{user.isSuperUser ? (
 					<React.Fragment>
 						<CustomButton
 							variant="secondary"
