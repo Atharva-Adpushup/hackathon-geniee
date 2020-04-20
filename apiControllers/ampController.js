@@ -1,25 +1,18 @@
 const express = require('express');
 const Promise = require('bluebird');
 const uuid = require('uuid');
-const moment = require('moment');
 
 const config = require('../configs/config');
 const { sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFunctions');
-const { docKeys, tagManagerInitialDoc, ampAdInitialDoc } = require('../configs/commonConsts');
+const { docKeys, ampAdInitialDoc } = require('../configs/commonConsts');
 const { generateSectionName } = require('../helpers/clientServerHelpers');
 const {
 	appBucket,
 	errorHandler,
 	verifyOwner,
-	sendDataToZapier,
-	emitEventAndSendResponse,
-	fetchAds,
 	fetchAmpAds,
-	createNewDocAndDoProcessing,
 	createNewAmpDocAndDoProcessing,
 	updateAmpTags,
-	masterSave,
-	modifyAd,
 	queuePublishingWrapper,
 	storedRequestWrapper
 } = require('../helpers/routeHelpers');
@@ -74,16 +67,6 @@ const fn = {
 		}
 
 		return dbOperation().then(() => value);
-	},
-	adUpdateProcessing: (req, res, key, processing) => {
-		const { ads } = req.body;
-		const ad = ads[1];
-
-		return appBucket
-			.getDoc(`${key}${ad.id}`)
-			.then(docWithCas => processing(docWithCas))
-			.then(() => emitEventAndSendResponse(req.body.siteId, res))
-			.catch(err => errorHandler(err, res));
 	}
 };
 
@@ -143,8 +126,6 @@ router
 				.then(() => res.send({ msg: 'success' }))
 				.catch(err => console.log(err))
 		);
-
-		// masterSave(req, res, fn.adUpdateProcessing, fn.directDBUpdate, docKeys.amp, 1);
 	})
 	.post('/modifyAd', (req, res) => {
 		const { adId, data, siteId } = req.body;
@@ -152,7 +133,6 @@ router
 		return updateAmpTags(adId, null, data)
 			.then(() => res.send({ msg: 'success' }))
 			.catch(err => console.log(err));
-		// modifyAd(req, res, fn.adUpdateProcessing, fn.directDBUpdate, docKeys.amp);
 	});
 
 module.exports = router;

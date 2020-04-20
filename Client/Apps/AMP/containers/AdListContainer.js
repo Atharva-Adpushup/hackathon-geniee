@@ -12,7 +12,6 @@ const mapStateToProps = (state, ownProps) => {
 		loading: !ads.fetched,
 		ads: ads.content,
 		user: user.data,
-		networkConfig: networkConfig.data,
 		siteId,
 		networkCode,
 		...ownProps
