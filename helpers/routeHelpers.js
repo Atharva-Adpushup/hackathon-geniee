@@ -91,55 +91,6 @@ function emitEventAndSendResponse(siteId, res, data = {}) {
 	});
 }
 
-function getAmpAds(siteId) {
-	const GET_ALL_AMP_ADS_QUERY = `SELECT _amtg as doc 							
-	FROM AppBucket _amtg
-	WHERE meta(_amtg).id LIKE 'amtg::%' AND _amtg.siteId = "${siteId}";`;
-
-	const query = N1qlQuery.fromString(GET_ALL_AMP_ADS_QUERY);
-
-	return couchbase
-		.connectToAppBucket()
-		.then(appBucket => appBucket.queryAsync(query))
-		.then(ads => ads)
-		.catch(err => console.log(err));
-}
-
-function fetchAmpAds(req, res, docKey) {
-	if (!req.query || !req.query.siteId) {
-		return sendErrorResponse(
-			{
-				message: 'Incomplete Parameters. Please check siteId'
-			},
-			res
-		);
-	}
-	const { siteId } = req.query;
-
-	return verifyOwner(siteId, req.user.email)
-		.then(() => getAmpAds(siteId))
-		.then(queryResult => queryResult)
-		.then(ads =>
-			sendSuccessResponse(
-				{
-					ads: ads.map(val => val.doc) || []
-				},
-				res
-			)
-		)
-
-		.catch(err =>
-			err.code && err.code === 13 && err.message.includes('key does not exist')
-				? sendSuccessResponse(
-						{
-							ads: []
-						},
-						res
-				  )
-				: errorHandler(err, res)
-		);
-}
-
 function fetchAds(req, res, docKey) {
 	if (!req.query || !req.query.siteId) {
 		return sendErrorResponse(
@@ -170,17 +121,6 @@ function fetchAds(req, res, docKey) {
 				  )
 				: errorHandler(err, res)
 		);
-}
-
-function createNewAmpDocAndDoProcessing(payload, initialDoc, docKey, processing) {
-	const defaultDocCopy = _.cloneDeep(initialDoc);
-	return appBucket
-		.createDoc(`${docKey}${payload.siteId}:${payload.id}`, defaultDocCopy, {})
-		.then(() => appBucket.getDoc(`site::${payload.siteId}`))
-		.then(docWithCas => {
-			payload.siteDomain = docWithCas.value.siteDomain;
-			return processing(defaultDocCopy, payload);
-		});
 }
 
 function createNewDocAndDoProcessing(payload, initialDoc, docKey, processing) {
@@ -401,6 +341,66 @@ function checkParams(toCheck, req, mode, checkLight = false) {
 	});
 }
 
+function createNewAmpDocAndDoProcessing(payload, initialDoc, docKey, processing) {
+	const defaultDocCopy = _.cloneDeep(initialDoc);
+	return appBucket
+		.createDoc(`${docKey}${payload.siteId}:${payload.id}`, defaultDocCopy, {})
+		.then(() => appBucket.getDoc(`site::${payload.siteId}`))
+		.then(docWithCas => {
+			payload.siteDomain = docWithCas.value.siteDomain;
+			return processing(defaultDocCopy, payload);
+		});
+}
+
+function getAmpAds(siteId) {
+	const GET_ALL_AMP_ADS_QUERY = `SELECT _amtg as doc 							
+	FROM AppBucket _amtg
+	WHERE meta(_amtg).id LIKE 'amtg::%' AND _amtg.siteId = "${siteId}";`;
+
+	const query = N1qlQuery.fromString(GET_ALL_AMP_ADS_QUERY);
+
+	return couchbase
+		.connectToAppBucket()
+		.then(appBucket => appBucket.queryAsync(query))
+		.then(ads => ads)
+		.catch(err => console.log(err));
+}
+
+function fetchAmpAds(req, res, docKey) {
+	if (!req.query || !req.query.siteId) {
+		return sendErrorResponse(
+			{
+				message: 'Incomplete Parameters. Please check siteId'
+			},
+			res
+		);
+	}
+	const { siteId } = req.query;
+
+	return verifyOwner(siteId, req.user.email)
+		.then(() => getAmpAds(siteId))
+		.then(queryResult => queryResult)
+		.then(ads =>
+			sendSuccessResponse(
+				{
+					ads: ads.map(val => val.doc) || []
+				},
+				res
+			)
+		)
+
+		.catch(err =>
+			err.code && err.code === 13 && err.message.includes('key does not exist')
+				? sendSuccessResponse(
+						{
+							ads: []
+						},
+						res
+				  )
+				: errorHandler(err, res)
+		);
+}
+
 function updateAmpTags(id, ads, updateThis) {
 	if (!id) {
 		return Promise.resolve();
@@ -419,7 +419,9 @@ function updateAmpTags(id, ads, updateThis) {
 
 				value = updatedAd;
 				value.updatedOn = +new Date();
-				if (!value.ad.isRefreshEnabled) delete value.ad.refreshInterval;
+				value.ad.isRefreshEnabled
+					? (value.ad.refreshInterval = 30)
+					: delete value.ad.refreshInterval;
 			}
 
 			return appBucket.replaceAsync(`amtg::${id}`, value) && value;
