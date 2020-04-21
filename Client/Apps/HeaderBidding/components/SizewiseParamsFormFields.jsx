@@ -233,8 +233,8 @@ class SizewiseParamsFormFields extends React.Component {
 					{tempParams[size] && tempParams[size].saved ? (
 						<CustomIcon icon="check" className="check-icon" />
 					) : (
-							''
-						)}
+						''
+					)}
 				</NavItem>
 			);
 		}
