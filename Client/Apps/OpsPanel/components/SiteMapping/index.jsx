@@ -313,7 +313,7 @@ class SiteMapping extends Component {
 
 				const diff = firstDate.diff(secondDate);
 				if (diff < 0) return 1;
-				else return -1;
+				return -1;
 			}
 			return first.localeCompare(second);
 		}
