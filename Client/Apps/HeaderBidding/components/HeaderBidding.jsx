@@ -9,6 +9,7 @@ import BiddersTab from './BiddersTab';
 import InventoryTab from './InventoryTab';
 import PrebidSettingsTab from './PrebidSettingsTab';
 import OptimizationTab from './OptimizationTab';
+import AmazonUAMTab from './AmazonUAMTab';
 import CustomButton from '../../../Components/CustomButton';
 import config from '../../../config/config';
 
@@ -186,6 +187,10 @@ class HeaderBidding extends React.Component {
 				if (!biddersFound) return false;
 				redirectUrl = `${computedRedirectUrl}/${NAV_ITEMS_INDEXES.TAB_5}`;
 				break;
+			case 6:
+				// if (!biddersFound) return false;
+				redirectUrl = `${computedRedirectUrl}/${NAV_ITEMS_INDEXES.TAB_6}`;
+				break;
 
 			default:
 				break;
@@ -273,6 +278,16 @@ class HeaderBidding extends React.Component {
 							/>
 						)
 					);
+				case 'amazon-uam':
+					return (
+						isSuperUser && (
+							<AmazonUAMTab
+								siteId={siteId}
+								showNotification={showNotification}
+								setUnsavedChangesAction={setUnsavedChangesAction}
+							/>
+						)
+					);
 				default:
 					return null;
 			}
@@ -321,6 +336,12 @@ class HeaderBidding extends React.Component {
 					{isSuperUser && (
 						<NavItem eventKey={5} className={!biddersFound ? 'disabled' : ''}>
 							{NAV_ITEMS_VALUES.TAB_5}
+						</NavItem>
+					)}
+
+					{isSuperUser && (
+						<NavItem eventKey={6} className={!biddersFound ? 'disabled' : ''}>
+							{NAV_ITEMS_VALUES.TAB_6}
 						</NavItem>
 					)}
 
