@@ -85,7 +85,7 @@ class customToggleSwitch extends React.Component {
 	 * @returns {XML}
 	 */
 	renderHorizontalLayout(options) {
-		const { labelText, subText } = this.props;
+		const { labelText, subText, subComponent } = this.props;
 		const labelClassNames = options.defaultLayout ? '' : 'u-padding-r10px';
 		let componentClassNames = options.defaultLayout ? '' : 'u-padding-l10px';
 
@@ -95,7 +95,8 @@ class customToggleSwitch extends React.Component {
 			<div className={options.errorClassName}>
 				<Col className={labelClassNames} xs={options.labelSize}>
 					{options.labelBold ? <b>{labelText}</b> : labelText}
-					{subText && <div>{subText}</div>}
+					{subText && <i>{subText}</i>}
+					{subComponent}
 				</Col>
 				<Col className={componentClassNames} xs={options.componentSize}>
 					{this.renderToggleSwitch()}
@@ -119,6 +120,7 @@ class customToggleSwitch extends React.Component {
 				<Col className={labelClassNames} xs={12} md={12}>
 					<b>{labelText}</b>
 					{subText && <div>{subText}</div>}
+					{subComponent}
 				</Col>
 				<Col className={componentClassNames} xs={12} md={12}>
 					{this.renderToggleSwitch()}

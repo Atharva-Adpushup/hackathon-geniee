@@ -42,8 +42,8 @@ class customToggleSwitch extends React.Component {
 			isNoLabelLayout = !!(options && options.nolabel),
 			leftAlignedStyles = isNoLabelLayout
 				? {
-						justifyContent: 'flex-start'
-				  }
+					justifyContent: 'flex-start'
+				}
 				: null;
 
 		rootClassName += this.props.disabled ? ' toggle--disabled' : '';
@@ -70,6 +70,7 @@ class customToggleSwitch extends React.Component {
 	 * @returns {XML}
 	 */
 	renderHorizontalLayout(options) {
+		const { labelText, subText, subComponent } = this.props || {};
 		let labelClassNames = options.defaultLayout ? '' : 'u-padding-r10px',
 			componentClassNames = options.defaultLayout ? '' : 'u-padding-l10px';
 
@@ -77,7 +78,9 @@ class customToggleSwitch extends React.Component {
 		return (
 			<div className={options.errorClassName}>
 				<Col className={labelClassNames} xs={options.labelSize}>
-					{options.labelBold ? <b>{this.props.labelText}</b> : this.props.labelText}
+					{options.labelBold ? <b>{labelText}</b> : labelText}
+					{subText && <div>{subText}</div>}
+					{subComponent}
 				</Col>
 				<Col className={componentClassNames} xs={options.componentSize}>
 					{this.renderToggleSwitch()}
