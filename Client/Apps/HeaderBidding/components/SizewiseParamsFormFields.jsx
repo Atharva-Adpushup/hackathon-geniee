@@ -185,16 +185,6 @@ class SizewiseParamsFormFields extends React.Component {
 		return currValue;
 	};
 
-	toggleConfirmationModal = () => {
-		this.setState(state => ({
-			...state,
-			deleteConfirmation: {
-				...state.deleteConfirmation,
-				isModalShowing: !state.deleteConfirmation.isModalShowing
-			}
-		}));
-	};
-
 	saveParams = adSize => {
 		let {
 			tempParams: { [adSize]: params }
@@ -243,8 +233,8 @@ class SizewiseParamsFormFields extends React.Component {
 					{tempParams[size] && tempParams[size].saved ? (
 						<CustomIcon icon="check" className="check-icon" />
 					) : (
-						''
-					)}
+							''
+						)}
 				</NavItem>
 			);
 		}
@@ -312,18 +302,16 @@ class SizewiseParamsFormFields extends React.Component {
 	render() {
 		const { activeKey } = this.state;
 		return (
-			<React.Fragment>
-				<Row className="clearfix non-sizeless-params u-margin-v5">
-					<Col sm={3} className="size-tabs">
-						<Nav bsStyle="pills" stacked activeKey={activeKey} onSelect={this.handleNavSelect}>
-							{this.renderTabs()}
-						</Nav>
-					</Col>
-					<Col sm={9} className="size-tab-content">
-						{this.renderTabContent()}
-					</Col>
-				</Row>
-			</React.Fragment>
+			<Row className="clearfix non-sizeless-params u-margin-v5">
+				<Col sm={3} className="size-tabs">
+					<Nav bsStyle="pills" stacked activeKey={activeKey} onSelect={this.handleNavSelect}>
+						{this.renderTabs()}
+					</Nav>
+				</Col>
+				<Col sm={9} className="size-tab-content">
+					{this.renderTabContent()}
+				</Col>
+			</Row>
 		);
 	}
 }
