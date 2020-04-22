@@ -152,7 +152,7 @@ class SizewiseParamsFormFields extends React.Component {
 	};
 
 	deleteAdSize = adSize => {
-		const { removeSize } = this.props;
+		const { removeSize, sizes } = this.props;
 		removeSize(adSize);
 		const { tempParams } = this.state || {};
 		const newTempParams = {
@@ -161,7 +161,7 @@ class SizewiseParamsFormFields extends React.Component {
 		delete newTempParams[adSize];
 		this.setState(state => ({
 			...state,
-			activeKey: '',
+			activeKey: sizes[0] || '',
 			tempParams: newTempParams
 		}));
 	};
@@ -276,16 +276,17 @@ class SizewiseParamsFormFields extends React.Component {
 					getCurrentParamValue={this.getCurrentParamValue}
 					tempParamsErrors={tempParamsErrors}
 				/>
+				a
 				<Row>
 					<Col sm={6} smPush={6}>
-						<CustomButton type="button" variant="secondary" onClick={() => this.saveParams(adSize)}>
+						<CustomButton type="button" variant="primary" onClick={() => this.saveParams(adSize)}>
 							{tempParams[adSize] && tempParams[adSize].saved ? 'Update Params' : 'Add Params'}
 						</CustomButton>
 						<CustomButton
 							type="button"
-							variant="primary"
+							variant="secondary"
 							onClick={() => this.deleteAdSize(adSize)}
-							className="ml-2"
+							className="u-margin-l4"
 						>
 							Remove AdSize
 						</CustomButton>
