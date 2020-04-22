@@ -286,7 +286,7 @@ class SizewiseParamsFormFields extends React.Component {
 							type="button"
 							variant="secondary"
 							onClick={() => this.deleteAdSize(adSize)}
-							className="u-margin-l4"
+							className="u-margin-l2"
 						>
 							Remove AdSize
 						</CustomButton>
