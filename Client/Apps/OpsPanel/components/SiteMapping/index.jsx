@@ -275,6 +275,12 @@ class SiteMapping extends Component {
 				defaultPageSize={50}
 				pageSizeOptions={[50, 100, 150, 200, 250]}
 				minRows={0}
+				defaultSorted={[
+					{
+						id: 'activeStatus',
+						desc: false
+					}
+				]}
 				sortable
 				defaultSortMethod={this.sortMethod}
 			/>
