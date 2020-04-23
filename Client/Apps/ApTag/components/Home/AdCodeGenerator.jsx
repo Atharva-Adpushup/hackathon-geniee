@@ -317,7 +317,7 @@ class AdCodeGenerator extends Component {
 	renderFluidToggleSubComponent = () => {
 		return (
 			<div>
-				<i style="font-size:14px; color:#cf474b;">
+				<i style={{ fontSize: '14px', color: '#cf474b' }}>
 					The slot height may increase or decrease depending on the rendered ad size
 				</i>
 			</div>

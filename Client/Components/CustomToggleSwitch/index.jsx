@@ -97,7 +97,7 @@ class customToggleSwitch extends React.Component {
 					{options.labelBold ? <b>{labelText}</b> : labelText}
 					{subText && (
 						<div>
-							<i style="font-size:14px;">{subText}</i>
+							<i style={{ fontSize: '14px' }}>{subText}</i>
 						</div>
 					)}
 					{subComponent}

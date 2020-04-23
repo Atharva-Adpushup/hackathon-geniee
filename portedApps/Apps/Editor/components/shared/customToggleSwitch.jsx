@@ -79,7 +79,7 @@ class customToggleSwitch extends React.Component {
 			<div className={options.errorClassName}>
 				<Col className={labelClassNames} xs={options.labelSize}>
 					{options.labelBold ? <b>{labelText}</b> : labelText}
-					{subText && <div>{subText}</div>}
+					{subText && <div style={{ fontSize: '14px' }}>{subText}</div>}
 					{subComponent}
 				</Col>
 				<Col className={componentClassNames} xs={options.componentSize}>
