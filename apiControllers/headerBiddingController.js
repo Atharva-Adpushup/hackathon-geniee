@@ -81,7 +81,8 @@ router
 			prebidConfig: {
 				timeOut: commonConsts.hbGlobalSettingDefaults.prebidTimeout,
 				refreshTimeOut: commonConsts.hbGlobalSettingDefaults.prebidRefreshTimeout
-			}
+			},
+			amazonUAMConfig: {}
 		};
 
 		const bidderConfig = {
@@ -339,6 +340,25 @@ router
 				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error!' })
 			);
 	})
+
+	.put('/amazonUAMSettings/:siteId', (req, res) => {
+		const { siteId } = req.params;
+		const { email } = req.user;
+		const amazonUAMConfig = req.body;
+
+		return userModel
+			.verifySiteOwner(email, siteId)
+			.then(() => headerBiddingModel.getHbConfig(siteId))
+			.then(hbConfig => {
+				hbConfig.set('amazonUAMConfig', amazonUAMConfig);
+				return hbConfig.save();
+			})
+			.then(({ data: { amazonUAMConfig } }) => res.status(httpStatus.OK).json(amazonUAMConfig))
+			.catch(() =>
+				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error!' })
+			);
+	})
+
 	.get('/hbStatusForSite/:siteId', (req, res) => {
 		const { siteId } = req.params;
 		const { email } = req.user;

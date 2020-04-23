@@ -21,7 +21,8 @@ const HeaderBidding = model.extend(function() {
 		'siteId',
 		'siteDomain',
 		'email',
-		'prebidConfig'
+		'prebidConfig',
+		'amazonUAMConfig'
 	];
 	this.clientKeys = [
 		'hbcf',
@@ -30,7 +31,8 @@ const HeaderBidding = model.extend(function() {
 		'siteId',
 		'siteDomain',
 		'email',
-		'prebidConfig'
+		'prebidConfig',
+		'amazonUAMConfig'
 	];
 	this.validations = {
 		required: []
