@@ -315,7 +315,7 @@ class SiteMapping extends Component {
 			if (moment(first, dateFormat).isValid() && moment(second, dateFormat).isValid()) {
 				// both the strings are dates. Sort differently.
 				const firstDate = moment(first, dateFormat);
-				const secondDate = moment(Second, dateFormat);
+				const secondDate = moment(second, dateFormat);
 
 				const diff = firstDate.diff(secondDate);
 				if (diff < 0) return 1;
