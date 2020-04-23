@@ -123,7 +123,7 @@ router
 				// 	const { ads } = res;
 				// 	return ads.map(doc => storedRequestWrapper(doc));
 				// })
-				.then(() => res.send({ msg: 'success' }))
+				.then(() => sendSuccessResponse({ msg: 'success' }, res))
 				.catch(err => console.log(err))
 		);
 	})
@@ -131,7 +131,7 @@ router
 		const { adId, data, siteId } = req.body;
 
 		return updateAmpTags(adId, null, data)
-			.then(() => res.send({ msg: 'success' }))
+			.then(() => sendSuccessResponse({ msg: 'success' }, res))
 			.catch(err => console.log(err));
 	});
 
