@@ -565,7 +565,7 @@ function queuePublishingWrapper(siteId, ads) {
 		};
 
 		return request(options)
-			.then(() => res.send({ ads, msg: 'dfp syncing completed' }))
+			.then(() => sendSuccessResponse({ msg: 'dfp syncing completed' }, ads))
 			.catch(
 				err => console.log(err)
 				// POST failed...
@@ -584,7 +584,7 @@ function storedRequestWrapper(doc) {
 		json: true // Automatically stringifies the body to JSON
 	};
 	return request(options)
-		.then(() => res.send({ msg: 'stored Request completed' }))
+		.then(() => sendSuccessResponse({ msg: 'stored Request completed' }))
 		.catch(
 			err => console.log(err)
 			// POST failed...
