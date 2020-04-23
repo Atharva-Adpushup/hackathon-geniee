@@ -298,6 +298,16 @@ class AdCodeGenerator extends Component {
 		);
 	}
 
+	renderFluidToggleSubComponent = () => {
+		return (
+			<div>
+				<i style="font-size:14px; color:#cf474b;">
+					The slot height may increase or decrease depending on the rendered ad size
+				</i>
+			</div>
+		);
+	}
+
 	renderFluidToggle() {
 		const { match } = this.props;
 		const { siteId } = match.params;
@@ -318,13 +328,7 @@ class AdCodeGenerator extends Component {
 						name={`fluid-${siteId}`}
 						id={`js-fluid-${siteId}`}
 						subText="Enable this option to display ADX Native Ads"
-						subComponent={
-							<div>
-								<i style="font-size:14px; color: #cf474b;" className="fluid-sub-component">
-									The slot height may increase or decrease depending on the rendered ad size
-								</i>
-							</div>
-						}
+						subComponent={this.renderFluidToggleSubComponent()}
 					/>
 				</Col>
 				<Col md={7} />
