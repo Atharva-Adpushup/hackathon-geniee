@@ -63,8 +63,8 @@ class customToggleSwitch extends React.Component {
 		const isNoLabelLayout = !!(options && options.nolabel);
 		const leftAlignedStyles = isNoLabelLayout
 			? {
-					justifyContent: 'flex-start'
-			  }
+				justifyContent: 'flex-start'
+			}
 			: null;
 
 		rootClassName += disabled ? ' toggle--disabled' : '';
@@ -97,7 +97,7 @@ class customToggleSwitch extends React.Component {
 					{options.labelBold ? <b>{labelText}</b> : labelText}
 					{subText && (
 						<div>
-							<i>{subText}</i>
+							<i style="font-size: 14px;">{subText}</i>
 						</div>
 					)}
 					{subComponent}

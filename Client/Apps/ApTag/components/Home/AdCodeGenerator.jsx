@@ -190,8 +190,8 @@ class AdCodeGenerator extends Component {
 		const customAttributes = maxHeight ? ` max-height="${maxHeight}"` : '';
 		const code = isDisplayAd
 			? ADCODE.replace(/__AD_ID__/g, adId)
-					.replace(/__CUSTOM_ATTRIBS__/, customAttributes)
-					.trim()
+				.replace(/__CUSTOM_ATTRIBS__/, customAttributes)
+				.trim()
 			: null;
 		const message = isDisplayAd ? DISPLAY_AD_MESSAGE.replace(/__SITE_ID__/g, siteId) : AMP_MESSAGE;
 		return (
@@ -227,13 +227,13 @@ class AdCodeGenerator extends Component {
 				{codeGenerated ? (
 					this.renderGeneratedAdcode()
 				) : (
-					<div>
-						{this.renderTypeOptions()}
-						{progress >= 50 ? this.renderSizes() : null}
-						{progress >= 75 ? this.renderFluidToggle() : null}
-						{progress >= 75 ? this.renderButton('Generate AdCode', this.saveHandler) : null}
-					</div>
-				)}
+						<div>
+							{this.renderTypeOptions()}
+							{progress >= 50 ? this.renderSizes() : null}
+							{progress >= 75 ? this.renderFluidToggle() : null}
+							{progress >= 75 ? this.renderButton('Generate AdCode', this.saveHandler) : null}
+						</div>
+					)}
 			</div>
 		);
 	}
@@ -335,9 +335,9 @@ class AdCodeGenerator extends Component {
 						id={`js-fluid-${siteId}`}
 						subText="Enable this option to display ADX Native Ads"
 						subComponent={
-							<i className="fluid-sub-component">
+							<div><i style="font-size:14px; color: #cf474b;" className="fluid-sub-component">
 								The slot height may increase or decrease depending on the rendered ad size
-							</i>
+							</i></div>
 						}
 					/>
 				</Col>

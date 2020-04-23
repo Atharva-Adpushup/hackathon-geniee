@@ -320,7 +320,7 @@ class AdCodeGenerator extends Component {
 						subText="Enable this option to display ADX Native Ads"
 						subComponent={
 							<div>
-								<i className="fluid-sub-component">
+								<i style="font-size:14px; color: #cf474b;" className="fluid-sub-component">
 									The slot height may increase or decrease depending on the rendered ad size
 								</i>
 							</div>
@@ -401,15 +401,15 @@ class AdCodeGenerator extends Component {
 				{codeGenerated ? (
 					this.renderGeneratedAdcode()
 				) : (
-					<div>
-						{this.renderPlatformOptions()}
-						{progress >= 10 ? this.renderFormats() : null}
-						{progress >= 20 ? this.renderFluidToggle() : null}
-						{progress >= 20 ? this.renderSizes() : null}
-						{progress >= 45 ? this.renderPagegroups() : null}
-						{progress >= 60 && pagegroupsPresent ? this.renderFormatDetails() : null}
-					</div>
-				)}
+						<div>
+							{this.renderPlatformOptions()}
+							{progress >= 10 ? this.renderFormats() : null}
+							{progress >= 20 ? this.renderFluidToggle() : null}
+							{progress >= 20 ? this.renderSizes() : null}
+							{progress >= 45 ? this.renderPagegroups() : null}
+							{progress >= 60 && pagegroupsPresent ? this.renderFormatDetails() : null}
+						</div>
+					)}
 			</React.Fragment>
 		);
 	}
