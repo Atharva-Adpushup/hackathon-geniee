@@ -18,8 +18,8 @@ class NetworkOptions extends Component {
 				this.props.ad && this.props.ad.network
 					? this.props.ad.network
 					: this.props.ad && currentUser.userType == 'partner'
-					? 'geniee'
-					: false
+						? 'geniee'
+						: false
 		};
 		this.submitHandler = this.submitHandler.bind(this);
 		this.renderNetwork = this.renderNetwork.bind(this);
@@ -109,7 +109,7 @@ class NetworkOptions extends Component {
 				Object.keys(props.ad.networkData.keyValues).length,
 			fpKey = pfKeyExists
 				? Object.keys(props.ad.networkData.keyValues).filter(key => key.match(/FP/g))[0] ||
-				  defaultPriceFloorKey
+				defaultPriceFloorKey
 				: defaultPriceFloorKey,
 			priceFloor = pfKeyExists ? props.ad.networkData.keyValues[fpKey] : 0,
 			refreshSlot =
@@ -132,7 +132,7 @@ class NetworkOptions extends Component {
 				isAdNetworkData && props.ad.networkData.hasOwnProperty('headerBidding')
 					? props.ad.networkData.headerBidding
 					: false,
-			fluid = props.ad && props.ad.hasOwnProperty('fluid') ? props.ad.fluid : false,
+			fluid = props.ad && props.ad.hasOwnProperty('fluid') ? props.ad.fluid : true,
 			dynamicAllocation =
 				isAdNetworkData && props.ad.networkData.hasOwnProperty('dynamicAllocation')
 					? props.ad.networkData.dynamicAllocation

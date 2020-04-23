@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
-import CustomList from './CustomList';
 import { Row, Col, ProgressBar } from '@/Client/helpers/react-bootstrap-imports';
+import CustomList from './CustomList';
 import { Docked, Default, InView, StickyTop } from './Formats/index';
 import { PLATFORMS, FORMATS, SIZES, displayAdMessage } from '../../configs/commonConsts';
 import CustomMessage from '../../../../Components/CustomMessage/index';
@@ -9,7 +9,7 @@ import CustomButton from '../../../../Components/CustomButton/index';
 import Loader from '../../../../Components/Loader';
 import { pagegroupFiltering } from '../../lib/helpers';
 import ActionCard from '../../../../Components/ActionCard';
-import CustomToggleSwitch from '../../../../Components/CustomToggleSwitch/index.jsx';
+import CustomToggleSwitch from '../../../../Components/CustomToggleSwitch';
 
 const getAdsByType = (ads, type) => ads.filter(ad => ad.formatData.type === type);
 
@@ -24,7 +24,7 @@ class AdCodeGenerator extends Component {
 			size: null,
 			loading: false,
 			pagegroups: [],
-			fluid: false,
+			fluid: true,
 			pagegroupsPresent: !!(channels && channels.length)
 		};
 		this.selectPlatform = this.selectPlatform.bind(this);
@@ -51,18 +51,7 @@ class AdCodeGenerator extends Component {
 			platform,
 			format: '',
 			size: null,
-			pagegroups: [],
-			fluid: false
-		});
-	}
-
-	selectFormat(format) {
-		this.setState({
-			format,
-			size: null,
-			progress: 20,
-			pagegroups: [],
-			fluid: false
+			pagegroups: []
 		});
 	}
 
@@ -181,6 +170,15 @@ class AdCodeGenerator extends Component {
 		});
 	};
 
+	selectFormat(format) {
+		this.setState({
+			format,
+			size: null,
+			progress: 20,
+			pagegroups: []
+		});
+	}
+
 	saveHandler(data) {
 		const { createAd } = this.props;
 		this.setState(
@@ -200,7 +198,7 @@ class AdCodeGenerator extends Component {
 				platform: '',
 				size: null,
 				loading: false,
-				fluid: false
+				fluid: true
 			},
 			() => resetCurrentAd(siteId)
 		);
@@ -300,6 +298,16 @@ class AdCodeGenerator extends Component {
 		);
 	}
 
+	renderFluidToggleSubComponent = () => {
+		return (
+			<div>
+				<i style={{ fontSize: '14px', color: '#cf474b' }}>
+					The slot height may increase or decrease depending on the rendered ad size
+				</i>
+			</div>
+		);
+	}
+
 	renderFluidToggle() {
 		const { match } = this.props;
 		const { siteId } = match.params;
@@ -319,6 +327,8 @@ class AdCodeGenerator extends Component {
 						defaultLayout
 						name={`fluid-${siteId}`}
 						id={`js-fluid-${siteId}`}
+						subText="Enable this option to display ADX Native Ads"
+						subComponent={this.renderFluidToggleSubComponent()}
 					/>
 				</Col>
 				<Col md={7} />
@@ -395,15 +405,15 @@ class AdCodeGenerator extends Component {
 				{codeGenerated ? (
 					this.renderGeneratedAdcode()
 				) : (
-					<div>
-						{this.renderPlatformOptions()}
-						{progress >= 10 ? this.renderFormats() : null}
-						{progress >= 20 ? this.renderFluidToggle() : null}
-						{progress >= 20 ? this.renderSizes() : null}
-						{progress >= 45 ? this.renderPagegroups() : null}
-						{progress >= 60 && pagegroupsPresent ? this.renderFormatDetails() : null}
-					</div>
-				)}
+						<div>
+							{this.renderPlatformOptions()}
+							{progress >= 10 ? this.renderFormats() : null}
+							{progress >= 20 ? this.renderFluidToggle() : null}
+							{progress >= 20 ? this.renderSizes() : null}
+							{progress >= 45 ? this.renderPagegroups() : null}
+							{progress >= 60 && pagegroupsPresent ? this.renderFormatDetails() : null}
+						</div>
+					)}
 			</React.Fragment>
 		);
 	}

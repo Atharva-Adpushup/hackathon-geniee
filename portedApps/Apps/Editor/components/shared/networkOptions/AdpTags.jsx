@@ -12,17 +12,17 @@ class AdpTags extends Component {
 	constructor(props) {
 		super(props);
 		const {
-				fpKey,
-				priceFloor,
-				headerBidding,
-				fluid,
-				code,
-				refreshSlot,
-				refreshInterval,
-				overrideActive,
-				overrideSizeTo,
-				primaryAdSize
-			} = props,
+			fpKey,
+			priceFloor,
+			headerBidding,
+			fluid,
+			code,
+			refreshSlot,
+			refreshInterval,
+			overrideActive,
+			overrideSizeTo,
+			primaryAdSize
+		} = props,
 			// Geniee specific UI access feature 'dynamic allocation' property computation
 			isGenieeUIAccessDA = !!(window.isGeniee && window.gcfg && window.gcfg.hasOwnProperty('uud')),
 			isGenieeUIAccessDAActive = !!(isGenieeUIAccessDA && window.gcfg.uud),
@@ -61,8 +61,8 @@ class AdpTags extends Component {
 			advanced: false,
 			keyValues: !code
 				? {
-						[fpKey]: priceFloor
-				  }
+					[fpKey]: priceFloor
+				}
 				: code
 		};
 		this.save = this.save.bind(this);
@@ -101,20 +101,20 @@ class AdpTags extends Component {
 
 	save() {
 		const {
-				fpKey,
-				hbAcivated,
-				pf,
-				fluid,
-				keyValues,
-				refreshSlot,
-				refreshInterval,
-				overrideActive,
-				overrideSizeTo,
-				multipleAdSizes,
-				dfpAdunitId,
-				isBackwardCompatibleSizes,
-				isResponsive
-			} = this.state,
+			fpKey,
+			hbAcivated,
+			pf,
+			fluid,
+			keyValues,
+			refreshSlot,
+			refreshInterval,
+			overrideActive,
+			overrideSizeTo,
+			multipleAdSizes,
+			dfpAdunitId,
+			isBackwardCompatibleSizes,
+			isResponsive
+		} = this.state,
 			shouldMultipleAdSizesBeComputed = !!(
 				isBackwardCompatibleSizes &&
 				multipleAdSizes &&
@@ -173,8 +173,8 @@ class AdpTags extends Component {
 				</Row>
 			</div>
 		) : (
-			''
-		);
+				''
+			);
 	}
 
 	renderNormalSaveButton(showButtons = true, submitHandler, cancelHandler) {
@@ -192,8 +192,8 @@ class AdpTags extends Component {
 				</Col>
 			</div>
 		) : (
-			''
-		);
+				''
+			);
 	}
 
 	renderButtons(type = 1, showButtons = true, submitHandler, cancelHandler) {
@@ -218,7 +218,7 @@ class AdpTags extends Component {
 	renderGenieeNote() {
 		let output = `<strong>NOTE:</strong><i><b>Geniee Zone Id</b> ${
 			window.gcfg.uud ? 'and <b>Dynamic Allocation</b>' : ''
-		} field(s) are non-editable.</i>`;
+			} field(s) are non-editable.</i>`;
 		return (
 			<Row>
 				<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px' : ''}>
@@ -562,74 +562,76 @@ class AdpTags extends Component {
 				{/* {this.props.geniee ? this.renderManageMultipleAdSizeBlock() : null} */}
 				{!this.props.geniee ? this.renderOverrideSettings(isGenieeEditableMode) : null}
 				{!this.props.geniee &&
-				this.props.networkConfig &&
-				this.props.networkConfig.enableRefreshSlot ? (
-					<div>
-						<Row>
-							<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px' : ''}>
-								<CustomToggleSwitch
-									labelText="Refresh Slot"
-									className="mB-10"
-									checked={this.state.refreshSlot}
-									onChange={val => {
-										this.setState({ refreshSlot: !!val });
-									}}
-									layout="horizontal"
-									size="m"
-									on="Yes"
-									off="No"
-									defaultLayout={this.props.fromPanel ? false : true}
-									name={this.props.id ? `refreshSlotSwitch-${this.props.id}` : 'refreshSlotSwitch'}
-									id={
-										this.props.id
-											? `js-refresh-slot-switch-${this.props.id}`
-											: 'js-refresh-slot-switch'
-									}
-									customComponentClass={this.props.fromPanel ? 'u-padding-0px' : ''}
-								/>
-							</Col>
-							<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px' : ''}>
-								<CustomToggleSwitch
-									labelText="Fluid"
-									className="mB-10"
-									checked={this.state.fluid}
-									onChange={val => {
-										this.setState({ fluid: !!val });
-									}}
-									layout="horizontal"
-									size="m"
-									on="Yes"
-									off="No"
-									defaultLayout={this.props.fromPanel ? false : true}
-									name={this.props.id ? `fluid-${this.props.id}` : 'fluid'}
-									id={this.props.id ? `fluid-${this.props.id}` : 'fluid'}
-									customComponentClass={this.props.fromPanel ? 'u-padding-0px' : ''}
-								/>
-							</Col>
-						</Row>
-						<Row>
-							<Col xs={6} className={this.props.fromPanel ? 'u-padding-r10px' : ''}>
-								<strong>Refresh Interval</strong>
-							</Col>
-							<Col xs={6} className={this.props.fromPanel ? 'u-padding-l10px' : ''}>
-								<SelectBox
-									className="mB-10"
-									value={this.state.refreshInterval || refreshIntervals[0]}
-									showClear={false}
-									onChange={refreshInterval => {
-										this.setState({ refreshInterval });
-									}}
-								>
-									{refreshIntervals.map((item, index) => (
-										<option key={item} value={item}>
-											{item}
-										</option>
-									))}
-								</SelectBox>
-							</Col>
-						</Row>
-					</div>
-				) : null}
+					this.props.networkConfig &&
+					this.props.networkConfig.enableRefreshSlot ? (
+						<div>
+							<Row>
+								<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px' : ''}>
+									<CustomToggleSwitch
+										labelText="Refresh Slot"
+										className="mB-10"
+										checked={this.state.refreshSlot}
+										onChange={val => {
+											this.setState({ refreshSlot: !!val });
+										}}
+										layout="horizontal"
+										size="m"
+										on="Yes"
+										off="No"
+										defaultLayout={this.props.fromPanel ? false : true}
+										name={this.props.id ? `refreshSlotSwitch-${this.props.id}` : 'refreshSlotSwitch'}
+										id={
+											this.props.id
+												? `js-refresh-slot-switch-${this.props.id}`
+												: 'js-refresh-slot-switch'
+										}
+										customComponentClass={this.props.fromPanel ? 'u-padding-0px' : ''}
+									/>
+								</Col>
+								<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px' : ''}>
+									<CustomToggleSwitch
+										labelText="Fluid"
+										className="mB-10"
+										checked={this.state.fluid}
+										onChange={val => {
+											this.setState({ fluid: !!val });
+										}}
+										layout="horizontal"
+										subText="For displaying AdX naive ads"
+										subComponent={<i style={{ fontSize: '14px', color: '#cf474b' }}>The slot height may increase or decrease depending on the AdSize</i>}
+										size="m"
+										on="Yes"
+										off="No"
+										defaultLayout={this.props.fromPanel ? false : true}
+										name={this.props.id ? `fluid-${this.props.id}` : 'fluid'}
+										id={this.props.id ? `fluid-${this.props.id}` : 'fluid'}
+										customComponentClass={this.props.fromPanel ? 'u-padding-0px' : ''}
+									/>
+								</Col>
+							</Row>
+							<Row>
+								<Col xs={6} className={this.props.fromPanel ? 'u-padding-r10px' : ''}>
+									<strong>Refresh Interval</strong>
+								</Col>
+								<Col xs={6} className={this.props.fromPanel ? 'u-padding-l10px' : ''}>
+									<SelectBox
+										className="mB-10"
+										value={this.state.refreshInterval || refreshIntervals[0]}
+										showClear={false}
+										onChange={refreshInterval => {
+											this.setState({ refreshInterval });
+										}}
+									>
+										{refreshIntervals.map((item, index) => (
+											<option key={item} value={item}>
+												{item}
+											</option>
+										))}
+									</SelectBox>
+								</Col>
+							</Row>
+						</div>
+					) : null}
 				{this.renderAdvancedBlock()}
 				<div>{this.renderButtons(buttonType, showButtons, this.save, onCancel)}</div>
 			</div>

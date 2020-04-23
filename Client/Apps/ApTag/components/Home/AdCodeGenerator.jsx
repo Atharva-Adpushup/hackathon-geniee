@@ -15,7 +15,7 @@ import CustomMessage from '../../../../Components/CustomMessage/index';
 import CustomButton from '../../../../Components/CustomButton/index';
 import Loader from '../../../../Components/Loader';
 import ActionCard from '../../../../Components/ActionCard/index';
-import CustomToggleSwitch from '../../../../Components/CustomToggleSwitch/index.jsx';
+import CustomToggleSwitch from '../../../../Components/CustomToggleSwitch/index';
 
 class AdCodeGenerator extends Component {
 	constructor(props) {
@@ -27,7 +27,7 @@ class AdCodeGenerator extends Component {
 			size: null,
 			customFields: {},
 			loading: false,
-			fluid: false
+			fluid: true
 		};
 		this.selectPlatform = this.selectPlatform.bind(this);
 		this.selectType = this.selectType.bind(this);
@@ -42,24 +42,13 @@ class AdCodeGenerator extends Component {
 		this.getCustomFields = this.getCustomFields.bind(this);
 	}
 
-	// eslint-disable-next-line react/sort-comp
-	selectPlatform(platform) {
-		this.setState({
-			platform,
-			size: platform === 'responsive' ? 'responsive' : null,
-			progress: platform === 'responsive' ? 75 : 50,
-			fluid: false
-		});
-	}
-
 	selectType(type) {
 		this.setState({
 			type,
 			platform: '',
 			size: null,
 			progress: 50,
-			customFields: {},
-			fluid: false
+			customFields: {}
 		});
 	}
 
@@ -67,8 +56,7 @@ class AdCodeGenerator extends Component {
 		const { progress } = this.state;
 		this.setState({
 			size,
-			progress: progress > 75 ? progress : 75,
-			fluid: false
+			progress: progress > 75 ? progress : 75
 		});
 	}
 
@@ -183,20 +171,82 @@ class AdCodeGenerator extends Component {
 		);
 	}
 
-	renderTypeOptions() {
+	renderButton = (label, handler) => (
+		<Row style={{ margin: '0px' }}>
+			<CustomButton
+				variant="primary"
+				className="u-margin-t2 u-margin-r3 pull-right"
+				onClick={handler}
+			>
+				{label}
+			</CustomButton>
+		</Row>
+	);
+
+	renderGeneratedAdcode() {
 		const { type } = this.state;
+		const { adId, maxHeight, siteId } = this.props;
+		const isDisplayAd = type !== 'amp';
+		const customAttributes = maxHeight ? ` max-height="${maxHeight}"` : '';
+		const code = isDisplayAd
+			? ADCODE.replace(/__AD_ID__/g, adId)
+				.replace(/__CUSTOM_ATTRIBS__/, customAttributes)
+				.trim()
+			: null;
+		const message = isDisplayAd ? DISPLAY_AD_MESSAGE.replace(/__SITE_ID__/g, siteId) : AMP_MESSAGE;
 		return (
-			<CustomList
-				options={TYPES}
-				heading="Select Ad Type"
-				subHeading="AdpPushup supports varied ad types"
-				onClick={this.selectType}
-				leftSize={3}
-				rightSize={9}
-				toMatch={type}
-			/>
+			<Col xs={12}>
+				{isDisplayAd ? <pre>{code}</pre> : null}
+				<CustomMessage header="Information" type="info" message={message} />
+				<CustomButton
+					variant="primary"
+					className="u-margin-t3 pull-right"
+					onClick={() => this.resetHandler()}
+				>
+					Create More Ads
+				</CustomButton>
+				{isDisplayAd ? (
+					<CopyButtonWrapperContainer content={code}>
+						<CustomButton variant="secondary" className="u-margin-t3 u-margin-r3 pull-right">
+							Copy Adcode
+						</CustomButton>
+					</CopyButtonWrapperContainer>
+				) : null}
+			</Col>
 		);
 	}
+
+	renderMainContent() {
+		const { progress } = this.state;
+		const { codeGenerated } = this.props;
+		return (
+			<div>
+				<div className="progress-wrapper">
+					<ProgressBar striped active bsStyle="success" now={progress} />
+				</div>
+				{codeGenerated ? (
+					this.renderGeneratedAdcode()
+				) : (
+						<div>
+							{this.renderTypeOptions()}
+							{progress >= 50 ? this.renderSizes() : null}
+							{progress >= 75 ? this.renderFluidToggle() : null}
+							{progress >= 75 ? this.renderButton('Generate AdCode', this.saveHandler) : null}
+						</div>
+					)}
+			</div>
+		);
+	}
+
+	handleToggle = (value, event) => {
+		const attributeValue = event.target.getAttribute('name');
+		const name = attributeValue.split('-')[0];
+
+		this.setState({
+			[name]: value,
+			progress: 90
+		});
+	};
 
 	renderSizes() {
 		const { size, platform, type } = this.state;
@@ -240,82 +290,39 @@ class AdCodeGenerator extends Component {
 		);
 	}
 
-	renderButton = (label, handler) => (
-		<Row style={{ margin: '0px' }}>
-			<CustomButton
-				variant="primary"
-				className="u-margin-t2 u-margin-r3 pull-right"
-				onClick={handler}
-			>
-				{label}
-			</CustomButton>
-		</Row>
-	);
+	// eslint-disable-next-line react/sort-comp
+	selectPlatform(platform) {
+		this.setState({
+			platform,
+			size: platform === 'responsive' ? 'responsive' : null,
+			progress: platform === 'responsive' ? 75 : 50
+		});
+	}
 
-	renderGeneratedAdcode() {
+	renderTypeOptions() {
 		const { type } = this.state;
-		const { adId, maxHeight, siteId } = this.props;
-		const isDisplayAd = type !== 'amp';
-		const customAttributes = maxHeight ? ` max-height="${maxHeight}"` : '';
-		const code = isDisplayAd
-			? ADCODE.replace(/__AD_ID__/g, adId)
-					.replace(/__CUSTOM_ATTRIBS__/, customAttributes)
-					.trim()
-			: null;
-		const message = isDisplayAd ? DISPLAY_AD_MESSAGE.replace(/__SITE_ID__/g, siteId) : AMP_MESSAGE;
 		return (
-			<Col xs={12}>
-				{isDisplayAd ? <pre>{code}</pre> : null}
-				<CustomMessage header="Information" type="info" message={message} />
-				<CustomButton
-					variant="primary"
-					className="u-margin-t3 pull-right"
-					onClick={() => this.resetHandler()}
-				>
-					Create More Ads
-				</CustomButton>
-				{isDisplayAd ? (
-					<CopyButtonWrapperContainer content={code}>
-						<CustomButton variant="secondary" className="u-margin-t3 u-margin-r3 pull-right">
-							Copy Adcode
-						</CustomButton>
-					</CopyButtonWrapperContainer>
-				) : null}
-			</Col>
+			<CustomList
+				options={TYPES}
+				heading="Select Ad Type"
+				subHeading="AdpPushup supports varied ad types"
+				onClick={this.selectType}
+				leftSize={3}
+				rightSize={9}
+				toMatch={type}
+			/>
 		);
 	}
 
-	renderMainContent() {
-		const { progress } = this.state;
-		const { codeGenerated } = this.props;
+	renderFluidToggleSubComponent = () => {
 		return (
 			<div>
-				<div className="progress-wrapper">
-					<ProgressBar striped active bsStyle="success" now={progress} />
-				</div>
-				{codeGenerated ? (
-					this.renderGeneratedAdcode()
-				) : (
-					<div>
-						{this.renderTypeOptions()}
-						{progress >= 50 ? this.renderSizes() : null}
-						{progress >= 75 ? this.renderFluidToggle() : null}
-						{progress >= 75 ? this.renderButton('Generate AdCode', this.saveHandler) : null}
-					</div>
-				)}
+				<i style={{ fontSize: '14px', color: '#cf474b' }}>
+					The slot height may increase or decrease depending on the rendered ad size
+				</i>
 			</div>
 		);
 	}
-
-	handleToggle = (value, event) => {
-		const attributeValue = event.target.getAttribute('name');
-		const name = attributeValue.split('-')[0];
-
-		this.setState({
-			[name]: value,
-			progress: 90
-		});
-	};
 
 	renderFluidToggle() {
 		const { match } = this.props;
@@ -336,6 +343,8 @@ class AdCodeGenerator extends Component {
 						defaultLayout
 						name={`fluid-${siteId}`}
 						id={`js-fluid-${siteId}`}
+						subText="Enable this option to display ADX Native Ads"
+						subComponent={this.renderFluidToggleSubComponent()}
 					/>
 				</Col>
 				<Col md={7} />

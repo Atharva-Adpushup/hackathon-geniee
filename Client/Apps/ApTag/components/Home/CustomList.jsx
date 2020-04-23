@@ -2,7 +2,14 @@
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import React from 'react';
-import { Col, Form, FormGroup, ControlLabel, FormControl, HelpBlock } from '@/Client/helpers/react-bootstrap-imports';
+import {
+	Col,
+	Form,
+	FormGroup,
+	ControlLabel,
+	FormControl,
+	HelpBlock
+} from '@/Client/helpers/react-bootstrap-imports';
 
 const CustomList = props => {
 	const {
