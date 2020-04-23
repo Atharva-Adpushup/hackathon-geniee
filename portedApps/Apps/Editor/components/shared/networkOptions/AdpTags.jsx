@@ -598,7 +598,7 @@ class AdpTags extends Component {
 										}}
 										layout="horizontal"
 										subText="For displaying AdX naive ads"
-										subComponent={<i>The slot height may increase or decrease depending on the AdSize</i>}
+										subComponent={<i style="color:#cf474b">The slot height may increase or decrease depending on the AdSize</i>}
 										size="m"
 										on="Yes"
 										off="No"
