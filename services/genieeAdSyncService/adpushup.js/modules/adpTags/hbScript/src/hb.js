@@ -7,7 +7,7 @@ var adp = require('./adp');
 var utils = require('./utils');
 var auction = require('./auction');
 var config = require('./config');
-var analytics = require('./analytics');
+var prebidDataCollector = require('./prebidDataCollector');
 var { multiFormatConstants, mediaTypesConfig } = require('./multiFormatConfig');
 
 var hb = {
@@ -132,23 +132,23 @@ var hb = {
 			? auction.end(adpBatchId)
 			: auction.start(prebidSlots, adpBatchId);
 	},
-	enableHbAnalytics: function(w) {
+	bindPrebidEvents: function(w) {
 		const prebidEvents = constants.EVENTS.PREBID;
-
-		const eventsToBeEnabled = [
-			prebidEvents.AUCTION_END,
-			prebidEvents.BID_TIMEOUT,
-			prebidEvents.BID_WON
-		];
-
 		const deps = { w, adp, utils, config, constants };
 
 		try {
-			analytics.init(deps).enableEvents(eventsToBeEnabled);
+			prebidDataCollector.init(deps);
+			let events = [prebidEvents.BID_WON];
+
+			if (adp.config.hbAnalytics) {
+				events.push(prebidEvents.AUCTION_END, prebidEvents.BID_TIMEOUT);
+			}
+
+			prebidDataCollector.enableEvents(events);
 		} catch (error) {
 			Array.isArray(window.adpushup.err) &&
 				window.adpushup.err.push({
-					msg: 'Error in HB Analytics',
+					msg: 'Error in Prebid Data Collector',
 					error: error
 				});
 		}
@@ -164,7 +164,7 @@ var hb = {
 			})();
 		}
 
-		adp.config.hbAnalytics && this.enableHbAnalytics(w);
+		this.bindPrebidEvents(w);
 	},
 	init: function(w) {
 		w._apPbJs = w._apPbJs || {};

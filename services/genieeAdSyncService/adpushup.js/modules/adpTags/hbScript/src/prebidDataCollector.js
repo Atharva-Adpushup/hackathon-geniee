@@ -135,9 +135,10 @@ var helpers = {
 		});
 		return feedbackData;
 	},
-	getBidWonFeedbackData: function(slot, defaultWinner) {
+	getBidWonFeedbackData: function(slot, defaultWinner, bidWonData) {
 		var winner = slot.feedback.winner || defaultWinner;
 		var winningRevenue = slot.feedback.winningRevenue || 0;
+		var bidResponseTime = bidWonData['timeToRespond'];
 
 		if (typeof slot.isATF === 'undefined' || slot.isATF === 0) {
 			var isSlotATF = utils.isSlotATF(slot);
@@ -148,7 +149,8 @@ var helpers = {
 			bids: [
 				{
 					bidder: winner,
-					revenue: winningRevenue
+					revenue: winningRevenue,
+					bidResponseTime: bidResponseTime
 				}
 			],
 			mode: adp.config.mode,
@@ -183,7 +185,7 @@ var feedback = {
 			return;
 		}
 		slot.feedbackSent = true;
-		var feedbackData = helpers.getBidWonFeedbackData(slot, defaultWinner);
+		var feedbackData = helpers.getBidWonFeedbackData(slot, defaultWinner, bidWonData);
 
 		feedbackData['renderedAdSize'] = bidWonData['size'];
 		feedbackData['prebidAuctionId'] = bidWonData['auctionId'];
@@ -209,13 +211,15 @@ var feedback = {
 var handleAuctionEndEvent = function(auctionEndData) {
 	utils.log('========= auctionEnd =========', auctionEndData);
 
-	var slots = helpers.getSlotsAuctioned(auctionEndData);
-	var auctionId = auctionEndData['auctionId'];
+	if (auctionEndData['auctionStatus'] === 'completed') {
+		var slots = helpers.getSlotsAuctioned(auctionEndData);
+		var auctionId = auctionEndData['auctionId'];
 
-	helpers.collectAuctionData(auctionEndData, slots);
-	helpers.collectAdUnitBidsData(auctionEndData, slots);
+		helpers.collectAuctionData(auctionEndData, slots);
+		helpers.collectAdUnitBidsData(auctionEndData, slots);
 
-	feedback.sendAuctionFeedack(auctionId, slots);
+		feedback.sendAuctionFeedack(auctionId, slots);
+	}
 };
 
 var handleBidTimeoutEvent = function(bidTimeoutData) {
@@ -299,11 +303,25 @@ var API = {
 			[prebidEvents.AUCTION_END]: handleAuctionEndEvent
 		};
 
+		var wrapErrorHandler = function(fn) {
+			return function() {
+				try {
+					fn.apply(this, arguments);
+				} catch (error) {
+					Array.isArray(window.adpushup.err) &&
+						window.adpushup.err.push({
+							msg: 'Error in Prebid Data Collector',
+							error: error
+						});
+				}
+			};
+		};
+
 		events.forEach(function(event) {
 			var handler = eventHandlers[event];
 			if (handler) {
 				w._apPbJs.que.push(function() {
-					w._apPbJs.onEvent(event, handler);
+					w._apPbJs.onEvent(event, wrapErrorHandler(handler));
 				});
 			}
 		});
