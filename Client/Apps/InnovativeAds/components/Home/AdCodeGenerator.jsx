@@ -319,9 +319,11 @@ class AdCodeGenerator extends Component {
 						id={`js-fluid-${siteId}`}
 						subText="Enable this option to display ADX Native Ads"
 						subComponent={
-							<i className="fluid-sub-component">
-								The slot height may increase or decrease depending on the rendered ad size
-							</i>
+							<div>
+								<i className="fluid-sub-component">
+									The slot height may increase or decrease depending on the rendered ad size
+								</i>
+							</div>
 						}
 					/>
 				</Col>
