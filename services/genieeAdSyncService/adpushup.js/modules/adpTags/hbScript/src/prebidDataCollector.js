@@ -150,7 +150,7 @@ var helpers = {
 				{
 					bidder: winner,
 					revenue: winningRevenue,
-					bidResponseTime: bidResponseTime
+					responseTime: bidResponseTime
 				}
 			],
 			mode: adp.config.mode,
