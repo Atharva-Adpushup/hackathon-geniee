@@ -31,7 +31,7 @@ const AdsTxtManagement = lazy(() =>
 );
 const Payment = lazy(() => import(/* webpackChunkName: "payment" */ './Pages/Payment'));
 const ApTag = lazy(() => import(/* webpackChunkName: "apTag" */ './Apps/ApTag/index'));
-const Amp = lazy(() => import(/* webpackChunkName: "amp" */ './Apps/AMP/index'));
+const Amp = lazy(() => import(/* webpackChunkName: "amp" */ './Apps/Amp/index'));
 const InnovativeAds = lazy(() =>
 	import(/* webpackChunkName: "innovativeAds" */ './Apps/InnovativeAds/index')
 );
