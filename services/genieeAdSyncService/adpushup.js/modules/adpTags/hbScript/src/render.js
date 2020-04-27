@@ -12,7 +12,6 @@ var render = {
 		}
 		adpSlots.forEach(function(adpSlot) {
 			adpSlot.biddingComplete = true;
-
 			targeting.setSlotLevel(adpSlot);
 		});
 
@@ -45,9 +44,11 @@ var render = {
 		googletag.cmd.push(
 			function() {
 				this.setPageAndUtmTargeting(googletag);
-				adpConfig.apLiteActive
+				/*adpConfig.apLiteActive
 					? this.renderGPTSlots(googletag, adpSlots)
-					: this.createGPTSlots(googletag, adpSlots);
+					: this.createGPTSlots(googletag, adpSlots);*/
+
+				this.renderGPTSlots(googletag, adpSlots);
 			}.bind(this)
 		);
 	}

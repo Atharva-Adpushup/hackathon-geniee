@@ -102,11 +102,9 @@ var adpTags = {
 			}
 
 			computedSizes =
-				computedSizes && computedSizes.length
-					? computedSizes.concat([]).reverse()
-					: size;
+				computedSizes && computedSizes.length ? computedSizes.concat([]).reverse() : size;
 
-			this.adpSlots[containerId] = {
+			var adpSlot = {
 				slotId: slotId,
 				optionalParam: optionalParam,
 				bidders: bidders || [],
@@ -133,6 +131,9 @@ var adpTags = {
 				adType: adType,
 				refreshCount: 0
 			};
+
+			adpSlot.gSlot = gpt.defineSlot(window.googletag, adpSlot);
+			this.adpSlots[containerId] = adpSlot;
 
 			return this.adpSlots[containerId];
 		},
