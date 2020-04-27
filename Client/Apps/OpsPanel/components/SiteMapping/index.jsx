@@ -9,6 +9,7 @@ import sortBy from 'lodash/sortBy';
 import { Row } from '@/Client/helpers/react-bootstrap-imports';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { CSVLink } from 'react-csv';
+import moment from 'moment';
 
 import axiosInstance from '../../../../helpers/axiosInstance';
 import FilterBox from '../../../../Components/FilterBox';
@@ -219,23 +220,21 @@ class SiteMapping extends Component {
 
 			if (column.key === 'activeProducts')
 				return {
-					Header: () => {
-						return (
-							<span>
-								{Header}
+					Header: () => (
+						<span>
+							{Header}
 
-								<FontAwesomeIcon
-									size="1x"
-									icon="info-circle"
-									className="u-margin-r3"
-									style={{ marginLeft: '5' }}
-									className="info"
-									title="This would not match with Mysites>>sitename.com>>Manage Apps active products
+							<FontAwesomeIcon
+								size="1x"
+								icon="info-circle"
+								className="u-margin-r3"
+								style={{ marginLeft: '5' }}
+								className="info"
+								title="This would not match with Mysites>>sitename.com>>Manage Apps active products
 										as this data comes from reporting data"
-								/>
-							</span>
-						);
-					},
+							/>
+						</span>
+					),
 					...commonProps
 				};
 			if (column.key !== 'activeStatus') return { Header, ...commonProps };
@@ -276,7 +275,14 @@ class SiteMapping extends Component {
 				defaultPageSize={50}
 				pageSizeOptions={[50, 100, 150, 200, 250]}
 				minRows={0}
-				sortable={true}
+				defaultSorted={[
+					{
+						id: 'activeStatus',
+						desc: false
+					}
+				]}
+				sortable
+				defaultSortMethod={this.sortMethod}
 			/>
 		);
 	};
@@ -293,6 +299,31 @@ class SiteMapping extends Component {
 
 	handleSetSearchInput = searchInput => {
 		this.setState({ searchInput });
+	};
+
+	sortMethod = (firstNode, secondNode, desc) => {
+		if (!firstNode || !secondNode) return 0;
+		const { title: first } = firstNode.props || {};
+		const { title: second } = secondNode.props || {};
+		const dateFormat = 'Do MMM YYYY';
+		if (typeof first === 'number' && typeof second === 'number') {
+			if (first > second) return -1;
+			if (second > first) return 1;
+			return 0;
+		}
+		if (typeof first === 'string' && typeof second === 'string') {
+			if (moment(first, dateFormat).isValid() && moment(second, dateFormat).isValid()) {
+				// both the strings are dates. Sort differently.
+				const firstDate = moment(first, dateFormat);
+				const secondDate = moment(second, dateFormat);
+
+				const diff = firstDate.diff(secondDate);
+				if (diff < 0) return 1;
+				return -1;
+			}
+			return first.localeCompare(second);
+		}
+		return 0;
 	};
 
 	render() {

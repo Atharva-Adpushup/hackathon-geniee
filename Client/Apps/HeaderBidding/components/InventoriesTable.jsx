@@ -1,6 +1,6 @@
 import React from 'react';
-import CustomReactTable from '../../../Components/CustomReactTable/index';
 import { Checkbox } from '@/Client/helpers/react-bootstrap-imports';
+import CustomReactTable from '../../../Components/CustomReactTable/index';
 import { INVENTORY_TABLE_COLUMNS } from '../constants/index';
 
 function getHeader(
@@ -91,7 +91,7 @@ const InventoriesTable = ({
 		)}
 		data={getBody(inventories)}
 		pageSizeOptions={[10, 25, 50, 100]}
-		defaultSorting={[
+		defaultSorted={[
 			{
 				id: 'adUnit',
 				desc: false

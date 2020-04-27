@@ -80,8 +80,7 @@ router
 			email,
 			prebidConfig: {
 				timeOut: commonConsts.hbGlobalSettingDefaults.prebidTimeout,
-				refreshTimeOut: commonConsts.hbGlobalSettingDefaults.prebidRefreshTimeout,
-				formats: commonConsts.hbGlobalSettingDefaults.defaultFormats
+				refreshTimeOut: commonConsts.hbGlobalSettingDefaults.prebidRefreshTimeout
 			}
 		};
 
@@ -119,25 +118,7 @@ router
 					return headerBiddingModel.getHbConfig(siteId);
 				})
 				// hbConfig found OR created new hbConfig
-				.then(hbConfig => {
-					const isVideo = hbConfig.get('prebidConfig').formats.indexOf('video') !== -1;
-					if (isVideo) {
-						bidderConfig.config = headerBiddingModel.addVideoParams(
-							key,
-							bidderConfig.config,
-							bidderConfig.sizeLess
-						);
-					}
-					if (!isVideo) {
-						bidderConfig.config = headerBiddingModel.removeVideoParams(
-							key,
-							bidderConfig.config,
-							bidderConfig.sizeLess
-						);
-					}
-
-					return hbConfig.saveBidderConfig(key, bidderConfig);
-				})
+				.then(hbConfig => hbConfig.saveBidderConfig(key, bidderConfig))
 				.then(hbConfig => hbConfig.save())
 				.then(() => headerBiddingModel.getAllBiddersFromNetworkConfig())
 				.then(biddersFromNetworkConfig => {

@@ -14,7 +14,8 @@ const CustomReactTable = ({
 	filterable,
 	showPaginationTop,
 	showPaginationBottom,
-	defaultSorting,
+	defaultSorted,
+	defaultSortMethod,
 	pivotBy
 }) => (
 	<ReactTable
@@ -27,8 +28,9 @@ const CustomReactTable = ({
 		filterable={filterable}
 		showPaginationTop={showPaginationTop}
 		showPaginationBottom={showPaginationBottom}
-		defaultSorting={defaultSorting}
+		defaultSorted={defaultSorted}
 		pivotBy={pivotBy}
+		defaultSortMethod={defaultSortMethod}
 		className="u-padding-h3 u-padding-v2 -striped -highlight"
 	>
 		{/* To calculate total number of records present */}
@@ -39,13 +41,13 @@ const CustomReactTable = ({
 			const { filtered, pageRows, pageSize, sortedData, page } = state;
 
 			if (sortedData && sortedData.length > 0) {
-				let isFiltered = filtered.length > 0;
+				const isFiltered = filtered.length > 0;
 
-				let totalRecords = sortedData.length;
+				const totalRecords = sortedData.length;
 
-				let recordsCountFrom = page * pageSize + 1;
+				const recordsCountFrom = page * pageSize + 1;
 
-				let recordsCountTo = recordsCountFrom + pageRows.length - 1;
+				const recordsCountTo = recordsCountFrom + pageRows.length - 1;
 
 				if (isFiltered)
 					recordsInfoText = `${recordsCountFrom}-${recordsCountTo} of ${totalRecords} filtered records`;
@@ -77,7 +79,8 @@ CustomReactTable.propTypes = {
 	filterable: PropTypes.bool,
 	showPaginationBottom: PropTypes.bool,
 	showPaginationTop: PropTypes.bool,
-	defaultSorting: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
+	defaultSorted: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
+	defaultSortMethod: PropTypes.func,
 	pivotBy: PropTypes.oneOfType([PropTypes.array, PropTypes.object])
 };
 

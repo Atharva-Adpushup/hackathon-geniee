@@ -1,8 +1,7 @@
 /* eslint-disable jsx-a11y/label-has-for */
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import React from 'react';
-import { Row } from '@/Client/helpers/react-bootstrap-imports';
-import { Col } from '@/Client/helpers/react-bootstrap-imports';
+import { Row, Col } from '@/Client/helpers/react-bootstrap-imports';
 
 class customToggleSwitch extends React.Component {
 	constructor(props) {
@@ -23,7 +22,7 @@ class customToggleSwitch extends React.Component {
 	componentWillReceiveProps(nextProps) {
 		const { checked } = this.props;
 
-		this.setState(() => {
+		this.setState(state => {
 			if (checked !== nextProps.checked) {
 				return {
 					value: nextProps.checked
@@ -35,6 +34,7 @@ class customToggleSwitch extends React.Component {
 			if (checked && nextProps.checked && nextProps.labelText === 'AP Lite') {
 				return { value: true };
 			}
+			return state;
 		});
 	}
 
@@ -63,8 +63,8 @@ class customToggleSwitch extends React.Component {
 		const isNoLabelLayout = !!(options && options.nolabel);
 		const leftAlignedStyles = isNoLabelLayout
 			? {
-					justifyContent: 'flex-start'
-			  }
+				justifyContent: 'flex-start'
+			}
 			: null;
 
 		rootClassName += disabled ? ' toggle--disabled' : '';
@@ -85,7 +85,7 @@ class customToggleSwitch extends React.Component {
 	 * @returns {XML}
 	 */
 	renderHorizontalLayout(options) {
-		const { labelText } = this.props;
+		const { labelText, subText, subComponent } = this.props;
 		const labelClassNames = options.defaultLayout ? '' : 'u-padding-r10px';
 		let componentClassNames = options.defaultLayout ? '' : 'u-padding-l10px';
 
@@ -95,6 +95,12 @@ class customToggleSwitch extends React.Component {
 			<div className={options.errorClassName}>
 				<Col className={labelClassNames} xs={options.labelSize}>
 					{options.labelBold ? <b>{labelText}</b> : labelText}
+					{subText && (
+						<div>
+							<i style={{ fontSize: '14px' }}>{subText}</i>
+						</div>
+					)}
+					{subComponent}
 				</Col>
 				<Col className={componentClassNames} xs={options.componentSize}>
 					{this.renderToggleSwitch()}
@@ -109,7 +115,7 @@ class customToggleSwitch extends React.Component {
 	 * @returns {XML}
 	 */
 	renderVerticalLayout(options) {
-		const { labelText } = this.props;
+		const { labelText, subText } = this.props;
 		const labelClassNames = options.defaultLayout ? '' : 'u-padding-b5px';
 		const componentClassNames = options.defaultLayout ? '' : 'u-padding-0px';
 
@@ -117,6 +123,8 @@ class customToggleSwitch extends React.Component {
 			<div className={options.errorClassName}>
 				<Col className={labelClassNames} xs={12} md={12}>
 					<b>{labelText}</b>
+					{subText && <div>{subText}</div>}
+					{subComponent}
 				</Col>
 				<Col className={componentClassNames} xs={12} md={12}>
 					{this.renderToggleSwitch()}
