@@ -17,10 +17,10 @@ var hb = {
 
 		adpSlotsBatch.forEach(function(adpSlot) {
 			var responsiveSizes = [];
-			if (!adp.config.apLiteActive && adpSlot.isResponsive) {
+			/* if (!adp.config.apLiteActive && adpSlot.isResponsive) {
 				responsiveSizes = responsiveAds.getAdSizes(adpSlot.optionalParam.adId).collection;
 				adpSlot.computedSizes = responsiveSizes;
-			}
+			}*/
 
 			if (
 				!window.adpushup.services.HB_ACTIVE ||

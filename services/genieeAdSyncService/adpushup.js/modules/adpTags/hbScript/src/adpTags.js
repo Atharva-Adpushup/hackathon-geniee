@@ -25,7 +25,16 @@ var adpTags = {
 			var batchId = this.currentBatchId;
 			var adpSlots = this.currentBatchAdpSlots;
 
-			this.adpBatches.push({ batchId: batchId, adpSlots: adpSlots });
+			/**
+			 * #TODO: this can be converted to a map with batchId being the key, instead of array.
+			 * This will also allow to do away with using utils.getCurrentAdpSlotBatch everytime to get a batch of adpSlots for a given batchId
+			 *
+			 * */
+
+			this.adpBatches.push({
+				batchId: batchId,
+				adpSlots: adpSlots
+			});
 
 			// Add batch id to all batched adpSlots
 			utils.addBatchIdToAdpSlots(adpSlots, batchId);
@@ -87,6 +96,15 @@ var adpTags = {
 					? config.PREBID_CONFIG.prebidConfig.timeOut
 					: constants.PREBID.TIMEOUT;
 			var adType = optionalParam.adType;
+
+			if (isResponsive) {
+				computedSizes = responsiveAds.getAdSizes(optionalParam.adId).collection;
+			}
+
+			computedSizes =
+				computedSizes && computedSizes.length
+					? computedSizes.concat([]).reverse()
+					: size;
 
 			this.adpSlots[containerId] = {
 				slotId: slotId,

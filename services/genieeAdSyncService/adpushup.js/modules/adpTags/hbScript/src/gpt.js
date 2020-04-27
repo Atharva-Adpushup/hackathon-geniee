@@ -56,7 +56,7 @@ var gpt = {
 		var isComputedSizes = !!(computedSizes && computedSizes.length);
 		var responsiveAdsData, size;
 
-		if (isResponsive) {
+		/*if (isResponsive) {
 			responsiveAdsData = responsiveAds.getAdSizes(adpSlot.optionalParam.adId);
 			size = responsiveAdsData.collection.concat([]).reverse();
 		} else {
@@ -66,7 +66,9 @@ var gpt = {
 			// added order in `size` argument. If DFP does prioritizes this, then we need to ensure that
 			// selected ad size is the first size present in `size` array.
 			size = isComputedSizes ? computedSizes.concat([]).reverse() : adpSlot.size;
-		}
+		}*/
+
+		size = isComputedSizes ? computedSizes : adpSlot.size;
 
 		var isMultipleSizes =
 			Array.isArray(size) && size.some(val => Array.isArray(val) || val === 'fluid');
