@@ -565,7 +565,7 @@ function queuePublishingWrapper(siteId, ads) {
 		};
 
 		return request(options)
-			.then(() => sendSuccessResponse({ msg: 'dfp syncing completed' }, ads))
+			.then(() => ads)
 			.catch(
 				err => console.log(err)
 				// POST failed...
