@@ -112,20 +112,19 @@ router
 		const { adsToUpdate, ads = [], siteId } = req.body;
 
 		const updatedAds = adsToUpdate.map(adId => updateAmpTags(adId, ads));
-		return (
-			Promise.all(updatedAds)
-				.then(modifiedAds => {
-					const allAmpAds = ads.map(obj => modifiedAds.find(o => o.id === obj.id) || obj);
+		return Promise.all(updatedAds)
+			.then(modifiedAds => {
+				const allAmpAds = ads.map(obj => modifiedAds.find(o => o.id === obj.id) || obj);
 
-					return queuePublishingWrapper(siteId, allAmpAds);
-				})
-				// .then(res => {
-				// 	const { ads } = res;
-				// 	return ads.map(doc => storedRequestWrapper(doc));
-				// })
-				.then(() => sendSuccessResponse({ msg: 'success' }, res))
-				.catch(err => console.log(err))
-		);
+				return queuePublishingWrapper(siteId, allAmpAds);
+			})
+			.then(ads => {
+				const storeRequestArr = ads.map(doc => storedRequestWrapper(doc));
+
+				return Promise.all(storeRequestArr);
+			})
+			.then(() => sendSuccessResponse({ msg: 'success' }, res))
+			.catch(err => console.log(err));
 	})
 	.post('/modifyAd', (req, res) => {
 		const { adId, data, siteId } = req.body;
