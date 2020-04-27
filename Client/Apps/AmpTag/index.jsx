@@ -6,7 +6,7 @@ import '../../scss/apps/amp/index.scss';
 
 const App = props => (
 	<React.Fragment>
-		<DocumentTitle title="Amp" />
+		<DocumentTitle title="AmpTag" />
 		<HomeContainer {...props} />
 	</React.Fragment>
 );
