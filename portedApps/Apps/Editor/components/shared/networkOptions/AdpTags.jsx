@@ -597,7 +597,7 @@ class AdpTags extends Component {
 											this.setState({ fluid: !!val });
 										}}
 										layout="horizontal"
-										subText="For displaying AdX naive ads"
+										subText="For displaying AdX native ads"
 										subComponent={<i style={{ fontSize: '14px', color: '#cf474b' }}>The slot height may increase or decrease depending on the AdSize</i>}
 										size="m"
 										on="Yes"
