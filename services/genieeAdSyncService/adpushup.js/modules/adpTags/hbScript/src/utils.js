@@ -8,6 +8,7 @@ var BACKWARD_COMPATIBLE_MAPPING = require('./constants').AD_SIZE_MAPPING.IAB_SIZ
 	.BACKWARD_COMPATIBLE_MAPPING;
 var constants = require('./constants');
 var { bidderParamsMapping } = require('./multiFormatConfig');
+var isApLiteActive = window.adpushup.config.apLiteActive;
 var utils = {
 	currencyConversionActive: function(inputObject) {
 		var isValidAdserverCurrency =
@@ -94,7 +95,7 @@ var utils = {
 			isapDebugParam = !!(isQueryParams && queryParams.apDebug);
 
 		if (typeof console !== 'undefined' && console.log && isapDebugParam)
-			console.log.apply(console, arguments);
+			console.log.call(console, 'AP:', ...arguments);
 	},
 	getQueryParams: function() {
 		var str = window.location.search,
@@ -261,6 +262,101 @@ var utils = {
 		}
 
 		return [playerWidth, playerHeight];
+	},
+	isSlotATF: function(slot) {
+		if (!slot) return;
+
+		if (slot.adType === 'sticky') {
+			return true;
+		}
+
+		var containerId = slot.containerId;
+		var $container = $('#' + containerId);
+
+		if ($container.length) {
+			if (isApLiteActive && utils.isStickyContainer($container)) {
+				return true;
+			}
+
+			var aboveTheFoldHeight = $(window).height();
+
+			if (aboveTheFoldHeight) {
+				var containerOffsetTop = $container.offset().top,
+					containerHeight = $container.height(),
+					containerWidth = $container.width();
+
+				var containerOffsetBottom = containerOffsetTop + containerHeight;
+
+				if (containerOffsetTop >= aboveTheFoldHeight) {
+					return false;
+				}
+
+				if (containerOffsetBottom < aboveTheFoldHeight) {
+					return true;
+				}
+
+				var containerInViewHeight = aboveTheFoldHeight - containerOffsetTop,
+					containerPixel = containerHeight * containerWidth,
+					inViewPixel = containerInViewHeight * containerWidth,
+					percentageInView = (inViewPixel * 100) / containerPixel;
+
+				return containerPixel < 242000 ? percentageInView >= 50 : percentageInView >= 30;
+			}
+		}
+	},
+	isStickyContainer: function($container) {
+		/*
+			either container should have position fixed
+			or any of its parents until body should have position fixed
+		*/
+
+		var containerPosition = $container.css('position');
+		if (containerPosition === 'fixed') {
+			return true;
+		}
+
+		var fixedContainerParents = $container.parentsUntil('body').filter(function() {
+			return $(this).css('position') === 'fixed';
+		});
+
+		if (fixedContainerParents.length) {
+			return true;
+		}
+
+		return false;
+	},
+	getSlotRefreshData: function(adpSlot) {
+		var keys = constants.ADSERVER_TARGETING_KEYS,
+			data = {
+				exists: false,
+				currentValue: null,
+				nextValue: null,
+				defaultValue: 0
+			},
+			existingTargeting = (adpSlot.gSlot && adpSlot.gSlot.getTargetingMap()) || {};
+
+		if (
+			!existingTargeting[keys.REFRESH_COUNT] ||
+			!existingTargeting[keys.REFRESH_COUNT].length
+		) {
+			return data;
+		}
+
+		data.exists = true;
+		data.currentValue = existingTargeting[keys.REFRESH_COUNT][0];
+
+		var parsedCurrentValue = parseInt(data.currentValue, 10);
+
+		if (!isNaN(parsedCurrentValue)) {
+			data.currentValue = parsedCurrentValue;
+		}
+
+		data.nextValue =
+			!isNaN(parsedCurrentValue) && parsedCurrentValue < 20
+				? parsedCurrentValue + 1
+				: 'more_than_20';
+
+		return data;
 	}
 };
 

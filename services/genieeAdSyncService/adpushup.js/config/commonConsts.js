@@ -74,5 +74,11 @@ module.exports = {
 		MOBILE: 'MOBILE'
 	},
 	ADPUSHUP_MEDIANET_ID: '8CUEJU9TP',
-	AD_REFRESH_INTERVAL: 30000
+	AD_REFRESH_INTERVAL: 30000,
+	SCREEN_ORIENTATIONS_FEEDBACK_VALUE: {
+		'landscape-primary': 1,
+		'landscape-secondary': 1,
+		'portrait-primary': 2,
+		'portrait-secondary': 2
+	}
 };

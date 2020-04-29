@@ -73,7 +73,6 @@ var adp = window.adpushup,
 			adp.config.manualAds.length &&
 			adp.utils.isUrlMatching()
 		) {
-			// utils.log('APTag running for', adId);
 			var manualAds = adp.config.manualAds,
 				newAdId = utils.uniqueId(),
 				manualAd = manualAds.filter(function(ad) {
@@ -99,7 +98,6 @@ var adp = window.adpushup,
 					ad.networkData.zoneContainerId = 'ADP_' + siteId + '_' + adSize + '_' + newAdId;
 			}
 
-			//ad.status = 1; // Mark ap tag status as successful impression
 			ad.status = commonConsts.AD_STATUS.IMPRESSION; // Mark ap tag status as successful impression
 			ad.services = [commonConsts.SERVICES.TAG]; // Set service id for ap tag ads
 			ad.originalId = adId;
@@ -108,18 +106,16 @@ var adp = window.adpushup,
 					ads: [ad],
 					xpathMiss: [],
 					errorCode: commonConsts.ERROR_CODES.NO_ERROR,
-					// mode: 16,
 					mode: commonConsts.MODE.ADPUSHUP, // Sending Mode 1 in Manual Ads
 					referrer: config.referrer,
 					tracking: browserConfig.trackerSupported,
 					variationId: commonConsts.MANUAL_ADS.VARIATION
 				};
-				//oldFeedbackData = $.extend(true, {}, feedbackData);
+				var feedbackMetaData = utils.getPageFeedbackMetaData();
+				feedbackData = $.extend({}, feedbackData, feedbackMetaData);
 
-				//oldFeedbackData.ads = [ad.originalId];
 				return getContainer(ad)
 					.done(function(container) {
-						// utils.log('Container found ', container);
 						var isLazyLoadingAd = !!(ad.enableLazyLoading === true);
 						var isAdNetworkAdpTag = !!(ad.network === commonConsts.NETWORKS.ADPTAGS);
 						var isAdNetworkMedianet = !!(
@@ -138,17 +134,11 @@ var adp = window.adpushup,
 						}
 						if (isLazyLoadingAd) {
 							isAdContainerInView(container).done(function() {
-								// Send feedback call
 								utils.sendFeedback(feedbackData);
-								//utils.sendFeedbackOld(oldFeedbackData);
-								// Place the ad in the container
 								return placeAd(container, ad);
 							});
 						} else {
-							// Send feedback call
 							utils.sendFeedback(feedbackData);
-							//utils.sendFeedbackOld(oldFeedbackData);
-							// Place the ad in the container
 							return placeAd(container, ad);
 						}
 					})

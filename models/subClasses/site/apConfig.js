@@ -22,7 +22,8 @@ const ApConfig = {
 		'isThirdPartyAdx',
 		'spaPageTransitionTimeout',
 		'adsLabel',
-		'isAdsLabelOn'
+		'isAdsLabelOn',
+		'hbAnalytics'
 	],
 	override: [
 		'mode',
@@ -47,7 +48,8 @@ const ApConfig = {
 		'isThirdPartyAdx',
 		'spaPageTransitionTimeout',
 		'adsLabel',
-		'isAdsLabelOn'
+		'isAdsLabelOn',
+		'hbAnalytics'
 	],
 	merge: []
 };

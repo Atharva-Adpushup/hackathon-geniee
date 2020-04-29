@@ -42,6 +42,7 @@ var adpTags = {
 			slot.hasRendered = false;
 			slot.biddingComplete = false;
 			slot.feedbackSent = false;
+			slot.auctionFeedbackSent = false;
 			slot.hasTimedOut = false;
 			slot.feedback = {
 				winner: constants.FEEDBACK.DEFAULT_WINNER
@@ -85,6 +86,7 @@ var adpTags = {
 				config.PREBID_CONFIG.prebidConfig.timeOut
 					? config.PREBID_CONFIG.prebidConfig.timeOut
 					: constants.PREBID.TIMEOUT;
+			var adType = optionalParam.adType;
 
 			this.adpSlots[containerId] = {
 				slotId: slotId,
@@ -104,11 +106,14 @@ var adpTags = {
 				biddingComplete: false,
 				containerPresent: false,
 				feedbackSent: false,
+				auctionFeedbackSent: false,
 				hasTimedOut: false,
 				services: services,
 				feedback: {
 					winner: constants.FEEDBACK.DEFAULT_WINNER
-				}
+				},
+				adType: adType,
+				refreshCount: 0
 			};
 
 			return this.adpSlots[containerId];

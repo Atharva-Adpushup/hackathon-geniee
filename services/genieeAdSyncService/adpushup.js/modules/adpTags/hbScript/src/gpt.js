@@ -2,7 +2,6 @@
 
 var $ = require('../../../../libs/jquery');
 var constants = require('./constants');
-var feedback = require('./feedback');
 var responsiveAds = require('./responsiveAds');
 var adpConfig = window.adpushup.config;
 var refreshAdSlot = require('../../../../src/refreshAdSlot');

@@ -7,9 +7,9 @@ var adp = require('./adp');
 var utils = require('./utils');
 var auction = require('./auction');
 var config = require('./config');
-var feedback = require('./feedback');
+var prebidDataCollector = require('./prebidDataCollector');
 var { multiFormatConstants, mediaTypesConfig } = require('./multiFormatConfig');
-var isApLiteActive = window.adpushup.config.apLiteActive;
+
 var hb = {
 	createPrebidSlots: function(adpSlotsBatch) {
 		var prebidSlots = [];
@@ -132,38 +132,26 @@ var hb = {
 			? auction.end(adpBatchId)
 			: auction.start(prebidSlots, adpBatchId);
 	},
-	setBidWonListener: function(w) {
-		w._apPbJs.que.push(function() {
-			w._apPbJs.onEvent(constants.EVENTS.PREBID.BID_WON, function(bidData) {
-				utils.log(
-					`%c===${bidData.mediaType.charAt(0).toUpperCase() +
-						bidData.mediaType.slice(1)}BidWon====`,
-					'background:#00b900; color:white; padding: 5px 8px; font-size:14px; font-weight:bold; border-radius:5px;',
-					bidData
-				);
+	bindPrebidEvents: function(w) {
+		const prebidEvents = constants.EVENTS.PREBID;
+		const deps = { w, adp, utils, config, constants };
 
-				var slot = isApLiteActive
-					? window.apLite.adpSlots[bidData.adUnitCode]
-					: window.adpushup.adpTags.adpSlots[bidData.adUnitCode];
-				var computedCPMValue = utils.currencyConversionActive(
-					config.PREBID_CONFIG.currencyConfig
-				)
-					? 'originalCpm'
-					: 'cpm';
+		try {
+			prebidDataCollector.init(deps);
+			let events = [prebidEvents.BID_WON];
 
-				if (slot) {
-					slot.feedback.winner = bidData.bidder;
-					slot.feedback.winningRevenue = bidData[computedCPMValue] / 1000;
-					slot.feedback.winnerAdUnitId = bidData.adId;
-					slot.feedback.unitFormat = bidData.mediaType;
+			if (adp.config.hbAnalytics) {
+				events.push(prebidEvents.AUCTION_END, prebidEvents.BID_TIMEOUT);
+			}
 
-					if (isApLiteActive)
-						slot.feedback.renderedSize = [bidData.width, bidData.height];
-
-					return feedback.send(slot);
-				}
-			});
-		});
+			prebidDataCollector.enableEvents(events);
+		} catch (error) {
+			Array.isArray(window.adpushup.err) &&
+				window.adpushup.err.push({
+					msg: 'Error in Prebid Data Collector',
+					error: error
+				});
+		}
 	},
 	loadPrebid: function(w) {
 		/*
@@ -176,7 +164,7 @@ var hb = {
 			})();
 		}
 
-		return this.setBidWonListener(w);
+		this.bindPrebidEvents(w);
 	},
 	init: function(w) {
 		w._apPbJs = w._apPbJs || {};
