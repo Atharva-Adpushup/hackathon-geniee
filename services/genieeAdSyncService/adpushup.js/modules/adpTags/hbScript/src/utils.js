@@ -224,40 +224,40 @@ var utils = {
 
 		if (
 			highestWidthPossible < highestHeightPossible &&
-			highestHeightPossible >= 4 &&
-			highestWidthPossible >= 3 &&
+			highestHeightPossible >= 16 &&
+			highestWidthPossible >= 9 &&
 			!JSON.stringify(VIDEO_PLAYER_EXCEPTION_SIZES).includes(
 				JSON.stringify(highestSizeAvailable)
 			)
 		) {
-			//3:4 aspect ratio
-			gcd = parseInt(highestHeightPossible / 4);
-			playerHeight = gcd * 4;
-			playerWidth = gcd * 3;
+			//9:16 aspect ratio
+			gcd = parseInt(highestHeightPossible / 16);
+			playerHeight = gcd * 16;
+			playerWidth = gcd * 9;
 
 			if (highestWidthPossible < playerWidth) {
-				gcd = parseInt(highestWidthPossible / 3);
-				playerHeight = gcd * 4;
-				playerWidth = gcd * 3;
+				gcd = parseInt(highestWidthPossible / 9);
+				playerHeight = gcd * 16;
+				playerWidth = gcd * 9;
 			}
 		}
 		if (
 			highestWidthPossible >= highestHeightPossible &&
-			highestWidthPossible >= 4 &&
-			highestHeightPossible >= 3 &&
+			highestWidthPossible >= 16 &&
+			highestHeightPossible >= 9 &&
 			!JSON.stringify(VIDEO_PLAYER_EXCEPTION_SIZES).includes(
 				JSON.stringify(highestSizeAvailable)
 			)
 		) {
-			//4:3 aspect ratio
-			gcd = parseInt(highestWidthPossible / 4);
-			playerWidth = gcd * 4;
-			playerHeight = gcd * 3;
+			//16:9 aspect ratio
+			gcd = parseInt(highestWidthPossible / 16);
+			playerWidth = gcd * 16;
+			playerHeight = gcd * 9;
 
 			if (highestHeightPossible < playerHeight) {
-				gcd = parseInt(highestHeightPossible / 3);
-				playerHeight = gcd * 3;
-				playerWidth = gcd * 4;
+				gcd = parseInt(highestHeightPossible / 9);
+				playerHeight = gcd * 9;
+				playerWidth = gcd * 16;
 			}
 		}
 
