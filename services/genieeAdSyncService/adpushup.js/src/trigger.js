@@ -55,7 +55,7 @@ var adp = window.adpushup,
 	},
 	trigger = function(adId) {
 		var isDOMElement = !!document.getElementById(adId);
-		var isElementDisplayedNone = checkElementDisplay(adId);
+
 		// utils.log('ApTag id ', adId, 'DOM Element', isDOMElement);
 
 		// NOTE: Stop execution of this module if related DOM element does not exist
@@ -63,7 +63,20 @@ var adp = window.adpushup,
 		// and the script (adpushup.js) logic execution breaks as related DOM element does not exist
 		// Please check Github issue: #837 for more information
 		// Issue url: https://github.com/adpushup/GenieeAdPushup/issues/837
-		if (!isDOMElement || isElementDisplayedNone) {
+		if (!isDOMElement) {
+			return false;
+		}
+
+		var newAdId = utils.uniqueId(),
+			currentTime = new Date().getTime();
+
+		document.getElementById(adId).setAttribute('id', newAdId);
+		document.getElementById(newAdId).setAttribute('data-section', newAdId);
+		document.getElementById(newAdId).setAttribute('data-orig-id', adId);
+		document.getElementById(newAdId).setAttribute('data-render-time', currentTime);
+
+		var isElementDisplayedNone = checkElementDisplay(newAdId);
+		if (isElementDisplayedNone) {
 			return false;
 		}
 
@@ -74,7 +87,6 @@ var adp = window.adpushup,
 			adp.utils.isUrlMatching()
 		) {
 			var manualAds = adp.config.manualAds,
-				newAdId = utils.uniqueId(),
 				manualAd = manualAds.filter(function(ad) {
 					return ad.id === adId;
 				})[0],
@@ -83,16 +95,12 @@ var adp = window.adpushup,
 				adSize = ad.width + 'x' + ad.height,
 				isAdId = !!(ad && ad.id),
 				domElem = document.getElementById(ad.id),
-				currentTime = new Date().getTime(),
 				isAdElement = !!(isAdId && domElem);
 
 			// utils.log('APTag found ', manualAd, 'DOM element', domElem);
 
 			ad.id = newAdId;
-			document.getElementById(adId).setAttribute('id', newAdId);
-			document.getElementById(newAdId).setAttribute('data-section', newAdId);
-			document.getElementById(newAdId).setAttribute('data-orig-id', adId);
-			document.getElementById(newAdId).setAttribute('data-render-time', currentTime);
+
 			if (ad.network === commonConsts.NETWORKS.ADPTAGS) {
 				if (ad.networkData)
 					ad.networkData.zoneContainerId = 'ADP_' + siteId + '_' + adSize + '_' + newAdId;
