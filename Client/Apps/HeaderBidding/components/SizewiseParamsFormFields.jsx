@@ -154,16 +154,17 @@ class SizewiseParamsFormFields extends React.Component {
 	deleteAdSize = adSize => {
 		const { removeSize, sizes } = this.props;
 		removeSize(adSize);
-		const { tempParams = {} } = this.state || {};
-		const newTempParams = {
-			...tempParams
-		};
-		delete newTempParams[adSize];
-		this.setState(state => ({
-			...state,
-			activeKey: sizes[0] || '',
-			tempParams: newTempParams
-		}));
+		this.setState(state => {
+			const { tempParams = {} } = state || {};
+			const newTempParams = {
+				...tempParams
+			};
+			delete newTempParams[adSize];
+			return {
+				activeKey: sizes[0] || '',
+				tempParams: newTempParams
+			}
+		});
 	};
 
 	setParamInTempState = (adSize, paramKey, value) => {

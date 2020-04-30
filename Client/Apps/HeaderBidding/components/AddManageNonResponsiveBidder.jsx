@@ -196,14 +196,16 @@ class AddManageNonResponsiveBidder extends React.Component {
 	};
 
 	removeSize = adSize => {
-		const { sizes, params } = this.state || {};
-		const newSizes = sizes.filter(size => size !== adSize);
-		const newParams = { ...params };
-		delete newParams[adSize];
-		this.setState(state => ({
-			sizes: newSizes,
-			params: newParams
-		}));
+		this.setState(state => {
+			const { sizes = [], params = {} } = state || {};
+			const newSizes = sizes.filter(size => size !== adSize);
+			const newParams = { ...params };
+			delete newParams[adSize];
+			return {
+				sizes: newSizes,
+				params: newParams
+			}
+		});
 	};
 
 	getSiteLevelParamsCountByType = siteLevelParams => {
@@ -484,22 +486,22 @@ class AddManageNonResponsiveBidder extends React.Component {
 								param => formFields.params.siteLevel[param].visible
 							).length
 						) && (
-							<SizewiseParamsFormFields
-								bidderKey={bidderKey}
-								sizes={sizes}
-								formFields={{ params: formFields.params }}
-								savedParams={params}
-								formType={formType}
-								setFormFieldValueInState={this.setFormFieldValueInState}
-								saveNonSizelessParams={this.saveNonSizelessParams}
-								getCurrentFieldValue={this.getCurrentFieldValue}
-								validationSchema={validationSchema}
-								addNewSizeInState={this.addNewSizeInState}
-								removeSize={this.removeSize}
-								errors={errors}
-								relation={relation}
-							/>
-						)}
+								<SizewiseParamsFormFields
+									bidderKey={bidderKey}
+									sizes={sizes}
+									formFields={{ params: formFields.params }}
+									savedParams={params}
+									formType={formType}
+									setFormFieldValueInState={this.setFormFieldValueInState}
+									saveNonSizelessParams={this.saveNonSizelessParams}
+									getCurrentFieldValue={this.getCurrentFieldValue}
+									validationSchema={validationSchema}
+									addNewSizeInState={this.addNewSizeInState}
+									removeSize={this.removeSize}
+									errors={errors}
+									relation={relation}
+								/>
+							)}
 						<FormGroup>
 							<Col md={12} className="footer-btns">
 								<CustomButton type="submit" variant="primary" className="u-margin-r3">
@@ -527,8 +529,8 @@ AddManageNonResponsiveBidder.propTypes = {
 };
 
 AddManageNonResponsiveBidder.defaultProps = {
-	onBidderAdd: () => {},
-	onBidderUpdate: () => {}
+	onBidderAdd: () => { },
+	onBidderUpdate: () => { }
 };
 
 export default AddManageNonResponsiveBidder;
