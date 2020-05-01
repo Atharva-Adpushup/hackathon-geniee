@@ -4,7 +4,7 @@ const { N1qlQuery } = require('couchbase');
 const request = require('request-promise');
 const moment = require('moment');
 const _ = require('lodash');
-const clonedeep = require('lodash.clonedeep');
+// const clonedeep = require('lodash.clonedeep');
 
 const couchbase = require('../helpers/couchBaseService');
 const AdPushupError = require('../helpers/AdPushupError');
