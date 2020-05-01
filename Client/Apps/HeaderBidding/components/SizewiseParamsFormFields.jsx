@@ -151,6 +151,22 @@ class SizewiseParamsFormFields extends React.Component {
 		addNewSizeInState(adSize);
 	};
 
+	deleteAdSize = adSize => {
+		const { removeSize, sizes } = this.props;
+		removeSize(adSize);
+		this.setState(state => {
+			const { tempParams = {} } = state || {};
+			const newTempParams = {
+				...tempParams
+			};
+			delete newTempParams[adSize];
+			return {
+				activeKey: sizes[0] || '',
+				tempParams: newTempParams
+			}
+		});
+	};
+
 	setParamInTempState = (adSize, paramKey, value) => {
 		this.setState(state => ({
 			tempParams: {
@@ -218,8 +234,8 @@ class SizewiseParamsFormFields extends React.Component {
 					{tempParams[size] && tempParams[size].saved ? (
 						<CustomIcon icon="check" className="check-icon" />
 					) : (
-						''
-					)}
+							''
+						)}
 				</NavItem>
 			);
 		}
@@ -262,9 +278,17 @@ class SizewiseParamsFormFields extends React.Component {
 					tempParamsErrors={tempParamsErrors}
 				/>
 				<Row>
-					<Col sm={6} smPush={6}>
-						<CustomButton type="button" variant="secondary" onClick={() => this.saveParams(adSize)}>
+					<Col sm={12} className="tab-content-buttons-container">
+						<CustomButton type="button" variant="primary" onClick={() => this.saveParams(adSize)}>
 							{tempParams[adSize] && tempParams[adSize].saved ? 'Update Params' : 'Add Params'}
+						</CustomButton>
+						<CustomButton
+							type="button"
+							variant="secondary"
+							onClick={() => this.deleteAdSize(adSize)}
+							className="u-margin-l2"
+						>
+							Remove Size
 						</CustomButton>
 					</Col>
 				</Row>
