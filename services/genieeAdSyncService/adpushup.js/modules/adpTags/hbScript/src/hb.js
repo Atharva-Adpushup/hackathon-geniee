@@ -9,24 +9,34 @@ var auction = require('./auction');
 var config = require('./config');
 var prebidDataCollector = require('./prebidDataCollector');
 var { multiFormatConstants, mediaTypesConfig } = require('./multiFormatConfig');
-
+var isApLiteActive = window.adpushup.config.apLiteActive;
+var amznPubId =
+	config.PREBID_CONFIG &&
+	config.PREBID_CONFIG.hbcf &&
+	config.PREBID_CONFIG.hbcf.amazonUAM &&
+	config.PREBID_CONFIG.hbcf.amazonUAM.pubId;
 var hb = {
+	start: function(adpSlots) {
+		if (window.adpushup.services.HB_ACTIVE) {
+			this.createPrebidSlots(adpSlots);
+			this.createUAMslots(adpSlots);
+		} else {
+			var adpBatchId = adpSlots[0].batchId;
+			var batch = utils.getCurrentAdpSlotBatch(batchId);
+			adpSlotsBatch.forEach(function(adpSlot) {
+				adpSlot.biddingComplete = true;
+			});
+			adpBacth.auctionStatus.amazonUam = 'done';
+			adpBacth.auctionStatus.prebid = 'done';
+			auction.end(adpBatchId);
+		}
+	},
 	createPrebidSlots: function(adpSlotsBatch) {
 		var prebidSlots = [];
 		var adpBatchId = adpSlotsBatch[0].batchId;
 
 		adpSlotsBatch.forEach(function(adpSlot) {
-			var responsiveSizes = [];
-			/* if (!adp.config.apLiteActive && adpSlot.isResponsive) {
-				responsiveSizes = responsiveAds.getAdSizes(adpSlot.optionalParam.adId).collection;
-				adpSlot.computedSizes = responsiveSizes;
-			}*/
-
-			if (
-				!window.adpushup.services.HB_ACTIVE ||
-				!adpSlot.bidders ||
-				!adpSlot.bidders.length
-			) {
+			if (!utils.isPrebidHbEnabled(adpSlot)) {
 				adpSlot.biddingComplete = true;
 				return;
 			}
@@ -128,9 +138,37 @@ var hb = {
 			prebidSlots.push(prebidSlot);
 		});
 
-		return !prebidSlots.length
-			? auction.end(adpBatchId)
-			: auction.start(prebidSlots, adpBatchId);
+		if (!prebidSlots.length) {
+			adpBacth.auctionStatus.prebid = 'done';
+			auction.end(adpBatchId);
+		} else {
+			auction.startPrebidAuction(prebidSlots, adpBatchId);
+		}
+	},
+	createUAMslots: function(adpSlots) {
+		var amznUamSlots = [];
+		var adpBatchId = adpSlots[0].batchId;
+		var adpBacth = utils.getCurrentAdpSlotBatch(batchId);
+
+		adpSlotsBatch.forEach(function(adpSlot) {
+			if (utils.isAmazonUamEnabled(adpSlot)) {
+				var networkId = adpSlot.activeDFPNetwork
+					? adpSlot.activeDFPNetwork
+					: constants.NETWORK_ID;
+				amznUamSlots.push({
+					slotName: '/' + networkId + '/' + adpSlot.optionalParam.dfpAdunitCode,
+					slotID: adpSlot.containerId,
+					sizes: adpSlot.computedSizes
+				});
+			}
+		});
+
+		if (!amznUamSlots.length || !window.apstag || !amznPubId) {
+			adpBacth.auctionStatus.amazonUam = 'done';
+			auction.end(adpBatchId);
+		} else {
+			auction.startAmazonAuction(slots);
+		}
 	},
 	bindPrebidEvents: function(w) {
 		const prebidEvents = constants.EVENTS.PREBID;
@@ -153,6 +191,18 @@ var hb = {
 				});
 		}
 	},
+	loadAmazonApsTag: function(w) {
+		if (HB_ACTIVE && amznPubId) {
+			(function() {
+				require('./amazonUamApsTag');
+			})();
+
+			window.apstag.init({
+				pubID: amznPubId,
+				adServer: 'googletag'
+			});
+		}
+	},
 	loadPrebid: function(w) {
 		/*
             HB flag passed as a global constant to the webpack config using DefinePlugin
@@ -170,7 +220,8 @@ var hb = {
 		w._apPbJs = w._apPbJs || {};
 		w._apPbJs.que = w._apPbJs.que || [];
 
-		return this.loadPrebid(w);
+		this.loadPrebid(w);
+		this.loadAmazonApsTag(w);
 	}
 };
 

@@ -18,7 +18,7 @@ var adpTags = {
 		batchPrebiddingComplete: false,
 		prebidBatching: function(adpSlotsBatch) {
 			if (adpSlotsBatch && adpSlotsBatch.length) {
-				hb.createPrebidSlots(adpSlotsBatch);
+				hb.start(adpSlotsBatch);
 			}
 		},
 		processBatchForBidding: function() {
@@ -33,14 +33,18 @@ var adpTags = {
 
 			this.adpBatches.push({
 				batchId: batchId,
-				adpSlots: adpSlots
+				adpSlots: adpSlots,
+				auctionStatus: {
+					amazonUam: 'pending',
+					prebid: 'pending'
+				}
 			});
 
 			// Add batch id to all batched adpSlots
 			utils.addBatchIdToAdpSlots(adpSlots, batchId);
 
 			// Initiate prebidding for current adpSlots batch
-			this.prebidBatching(utils.getCurrentAdpSlotBatch(this.adpBatches, batchId));
+			this.prebidBatching(adpSlots);
 
 			// Reset the adpSlots batch
 			this.currentBatchId = null;

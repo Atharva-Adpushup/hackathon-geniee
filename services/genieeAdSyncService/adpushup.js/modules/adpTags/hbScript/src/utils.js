@@ -83,7 +83,7 @@ var utils = {
 	getCurrentAdpSlotBatch: function(adpBatches, batchId) {
 		return find(adpBatches, function(batch) {
 			return batch.batchId === batchId;
-		}).adpSlots;
+		});
 	},
 	log: function() {
 		var queryParams = this.getQueryParams();
@@ -209,6 +209,18 @@ var utils = {
 		}
 
 		return bidders;
+	},
+	isPrebidHbEnabled: function(slot) {
+		return (
+			window.adpushup.services.HB_ACTIVE &&
+			slot &&
+			slot.headerBidding &&
+			slot.bidders &&
+			slot.bidders.length
+		);
+	},
+	isAmazonUamEnabled: function(slot) {
+		return window.adpushup.services.HB_ACTIVE && slot && slot.headerBidding;
 	},
 	getVideoPlayerSize: function(prebidSizes) {
 		const { VIDEO_PLAYER_EXCEPTION_SIZES } = constants;
