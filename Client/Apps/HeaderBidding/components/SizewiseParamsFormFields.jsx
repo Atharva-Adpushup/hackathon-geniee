@@ -161,9 +161,9 @@ class SizewiseParamsFormFields extends React.Component {
 			};
 			delete newTempParams[adSize];
 			return {
-				activeKey: sizes[0] || '',
+				activeKey: Object.keys(newTempParams)[0] || '',
 				tempParams: newTempParams
-			}
+			};
 		});
 	};
 
