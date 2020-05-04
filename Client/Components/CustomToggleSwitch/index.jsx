@@ -61,11 +61,14 @@ class customToggleSwitch extends React.Component {
 		const { value } = this.state;
 		let rootClassName = size === 's' ? 'toggle toggleSizeSmall' : 'toggle';
 		const isNoLabelLayout = !!(options && options.nolabel);
-		const leftAlignedStyles = isNoLabelLayout
-			? {
-				justifyContent: 'flex-start'
-			}
-			: null;
+		const isComponentAlignmentLeft =
+			options.componentAlignment && options.componentAlignment === 'left';
+		const leftAlignedStyles =
+			isNoLabelLayout || isComponentAlignmentLeft
+				? {
+						justifyContent: 'flex-start'
+				  }
+				: null;
 
 		rootClassName += disabled ? ' toggle--disabled' : '';
 
@@ -103,7 +106,7 @@ class customToggleSwitch extends React.Component {
 					{subComponent}
 				</Col>
 				<Col className={componentClassNames} xs={options.componentSize}>
-					{this.renderToggleSwitch()}
+					{this.renderToggleSwitch(options)}
 				</Col>
 			</div>
 		);
@@ -146,7 +149,8 @@ class customToggleSwitch extends React.Component {
 			labelBold,
 			labelText,
 			name,
-			id
+			id,
+			componentAlignment
 		} = this.props;
 
 		const options = {
@@ -159,7 +163,8 @@ class customToggleSwitch extends React.Component {
 			labelSize,
 			componentSize,
 			customComponentClass,
-			labelBold
+			labelBold,
+			componentAlignment
 		};
 
 		const renderBlocks = [];
@@ -198,7 +203,8 @@ customToggleSwitch.defaultProps = {
 	labelSize: 8,
 	componentSize: 4,
 	customComponentClass: '',
-	labelBold: true
+	labelBold: true,
+	componentAlignment: ''
 };
 
 export default customToggleSwitch;

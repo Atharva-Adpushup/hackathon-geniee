@@ -167,7 +167,6 @@ class Settings extends Component {
 			adpushupPercentage,
 			poweredByBanner,
 			isAdsLabelOn,
-			amazonUAM,
 			adsLabel,
 			// revenueShare,
 			status,
@@ -205,19 +204,6 @@ class Settings extends Component {
 					defaultLayout
 					name={`poweredByBanner-${siteId}-${siteDomain}`}
 					id={`js-poweredByBanner-${siteId}-${siteDomain}`}
-				/>
-				<CustomToggleSwitch
-					labelText="Amazon UAM"
-					className="u-margin-b4 negative-toggle"
-					checked={amazonUAM}
-					onChange={this.handleToggle}
-					layout="horizontal"
-					size="m"
-					on="Yes"
-					off="No"
-					defaultLayout
-					name={`amazonUAM-${siteId}-${siteDomain}`}
-					id={`js-amazonUAM-${siteId}-${siteDomain}`}
 				/>
 				<CustomToggleSwitch
 					labelText="Ads Label"

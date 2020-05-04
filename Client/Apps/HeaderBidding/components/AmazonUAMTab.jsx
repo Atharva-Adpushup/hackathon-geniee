@@ -9,9 +9,10 @@ import {
 	ToggleButtonGroup,
 	Checkbox
 } from '@/Client/helpers/react-bootstrap-imports';
+import Loader from '../../../Components/Loader';
 import InputBox from '../../../Components/InputBox';
 import CustomButton from '../../../Components/CustomButton';
-import Loader from '../../../Components/Loader';
+import CustomToggleSwitch from '../../../Components/CustomToggleSwitch';
 
 import { fetchPrebidSettings, updateAmazonUAMSettings } from '../../../services/hbService';
 
@@ -20,7 +21,8 @@ class AmazonUAMTab extends React.Component {
 		publisherId: '',
 		timeOut: '',
 		refreshTimeOut: '',
-		isSavingSettings: false
+		isSavingSettings: false,
+		isAmazonUAMActive: false
 	};
 
 	componentDidMount() {
@@ -36,10 +38,19 @@ class AmazonUAMTab extends React.Component {
 		});
 	};
 
+	handleToggle = (value, event) => {
+		const [name] = event.target.getAttribute('name').split('-');
+		if (name) {
+			this.setState({
+				[name]: value
+			});
+		}
+	};
+
 	saveSettings = e => {
 		e.preventDefault();
 		const { siteId, showNotification, setUnsavedChangesAction } = this.props;
-		const { publisherId, timeOut, refreshTimeOut } = this.state;
+		const { publisherId, timeOut, refreshTimeOut, isAmazonUAMActive } = this.state;
 		if (!publisherId) {
 			return showNotification({
 				mode: 'error',
@@ -48,7 +59,7 @@ class AmazonUAMTab extends React.Component {
 				autoDismiss: 5
 			});
 		}
-		const amazonUAMSettings = { publisherId, timeOut, refreshTimeOut };
+		const amazonUAMSettings = { publisherId, timeOut, refreshTimeOut, isAmazonUAMActive };
 
 		const confirmed = window.confirm('Are you sure?');
 
@@ -81,10 +92,37 @@ class AmazonUAMTab extends React.Component {
 	};
 
 	renderForm = () => {
-		const { timeOut, refreshTimeOut, isSavingSettings, publisherId } = this.state;
+		const { siteId } = this.props;
+		const {
+			timeOut,
+			refreshTimeOut,
+			isSavingSettings,
+			publisherId,
+			isAmazonUAMActive
+		} = this.state;
 
 		return (
 			<Form onSubmit={this.saveSettings}>
+				<div className="clearfix">
+					<Col sm={12}>
+						<CustomToggleSwitch
+							labelText="Amazon UAM Active"
+							className="u-margin-b4"
+							checked={isAmazonUAMActive}
+							onChange={this.handleToggle}
+							layout="horizontal"
+							size="m"
+							on="Yes"
+							off="No"
+							defaultLayout
+							labelSize={6}
+							componentSize={6}
+							componentAlignment="left"
+							name={`isAmazonUAMActive-${siteId}`}
+							id={`js-amazon-uam-active-${siteId}`}
+						/>
+					</Col>
+				</div>
 				<FormGroup controlId="pb-id" className="form-row clearfix">
 					<Col componentClass={ControlLabel} sm={6}>
 						Publisher Id
@@ -99,6 +137,7 @@ class AmazonUAMTab extends React.Component {
 						/>
 					</Col>
 				</FormGroup>
+
 				<div className="form-row clearfix">
 					<Col componentClass={ControlLabel} sm={6}>
 						Initial Time-Out (ms)
