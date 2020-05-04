@@ -128,6 +128,21 @@ const bidderParamsMapping = {
 				protocols: CONSTANTS.VIDEO.PROTOCOLS
 			}
 		}
+	},
+	openx: {
+		videoParams: {
+			// openx supported video params are mentioned here
+			// https://docs.openx.com/Content/developers/containers/prebid-video-adapter.html
+			video: {
+				mimes: CONSTANTS.VIDEO.MIMES,
+				minduration: CONSTANTS.VIDEO.MINDURATION,
+				maxduration: CONSTANTS.VIDEO.MAXDURATION,
+				protocols: CONSTANTS.VIDEO.PROTOCOLS,
+				api: CONSTANTS.VIDEO.API,
+				playbackmethod: CONSTANTS.VIDEO.PLAYBACKMETHOD,
+				linearity: CONSTANTS.VIDEO.LINEARITY
+			}
+		}
 	}
 };
 
