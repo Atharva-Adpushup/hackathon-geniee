@@ -96,3 +96,14 @@ export const HEADER_BIDDING = {
 		MAX: 10000
 	}
 };
+
+export const AMAZON_UAM = {
+	INITIAL_TIMEOUT: {
+		MIN: 0,
+		MAX: 10000
+	},
+	REFRESH_TIMEOUT: {
+		MIN: 0,
+		MAX: 10000
+	}
+};

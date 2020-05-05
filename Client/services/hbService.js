@@ -47,6 +47,12 @@ export function updatePrebidSettings(siteId, newPrebidSettings) {
 	return axiosInstance.put(`/headerBidding/prebidSettings/${siteId}`, newPrebidSettings);
 }
 
+export function fetchAmazonUAMSettings(siteId) {
+	return axiosInstance
+		.get(`/headerBidding/amazonUAMSettings/${siteId}`)
+		.then(({ data: amazonUAMSettings }) => amazonUAMSettings);
+}
+
 export function updateAmazonUAMSettings(siteId, amazonUAMSettings) {
 	return axiosInstance.put(`/headerBidding/amazonUAMSettings/${siteId}`, amazonUAMSettings);
 }

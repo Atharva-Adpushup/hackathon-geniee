@@ -9,7 +9,11 @@ const userModel = require('./userModel');
 const channelModel = require('./channelModel');
 const hbVideoParamsMap = require('../configs/hbVideoParamsMap');
 const commonFunctions = require('../helpers/commonFunctions');
-const { docKeys, hbGlobalSettingDefaults } = require('../configs/commonConsts');
+const {
+	docKeys,
+	hbGlobalSettingDefaults,
+	amazonUAMConfigDefaults
+} = require('../configs/commonConsts');
 const dfpLineItemAutomationReqBody = require('../configs/dfpLineItemAutomationReqBody');
 const config = require('../configs/config');
 
@@ -679,6 +683,15 @@ function apiModule() {
 					return hbConfig.save();
 				})
 				.then(({ data: { prebidConfig } }) => prebidConfig),
+		getAmazonUAMConfig: siteId =>
+			API.getHbConfig(siteId).then(hbConfig => {
+				const amazonUAMConfig = hbConfig.get('amazonUAMConfig');
+
+				return {
+					...amazonUAMConfigDefaults,
+					...amazonUAMConfig
+				};
+			}),
 		getHbStatusForSite: siteId =>
 			siteModel.getSiteById(siteId).then(site => {
 				const { headerBidding = false } = site.get('apps');

@@ -82,7 +82,9 @@ router
 				timeOut: commonConsts.hbGlobalSettingDefaults.prebidTimeout,
 				refreshTimeOut: commonConsts.hbGlobalSettingDefaults.prebidRefreshTimeout
 			},
-			amazonUAMConfig: {}
+			amazonUAMConfig: {
+				...commonConsts.amazonUAMConfigDefaults
+			}
 		};
 
 		const bidderConfig = {
@@ -341,10 +343,42 @@ router
 			);
 	})
 
+	.get('/amazonUAMSettings/:siteId', (req, res) => {
+		const { email } = req.user;
+		const { siteId } = req.params;
+
+		return userModel
+			.verifySiteOwner(email, siteId)
+			.then(() => headerBiddingModel.getAmazonUAMConfig(siteId, email))
+			.then(amazonUAMConfig => res.status(httpStatus.OK).json(amazonUAMConfig))
+			.catch(error => {
+				// eslint-disable-next-line no-console
+				console.log(error);
+				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error!' });
+			});
+	})
+
 	.put('/amazonUAMSettings/:siteId', (req, res) => {
 		const { siteId } = req.params;
 		const { email } = req.user;
 		const amazonUAMConfig = req.body;
+		const { timeOut, refreshTimeOut, publisherId } = amazonUAMConfig;
+
+		const {
+			AMAZON_UAM: { INITIAL_TIMEOUT, REFRESH_TIMEOUT }
+		} = commonConsts;
+
+		const isValidInitialTimeout =
+			!Number.isNaN(timeOut) && timeOut >= INITIAL_TIMEOUT.MIN && timeOut <= INITIAL_TIMEOUT.MAX;
+
+		const isValidRefreshTimeout =
+			!Number.isNaN(refreshTimeOut) &&
+			refreshTimeOut >= REFRESH_TIMEOUT.MIN &&
+			refreshTimeOut <= REFRESH_TIMEOUT.MAX;
+
+		if (!isValidInitialTimeout || !isValidRefreshTimeout || !publisherId) {
+			return res.status(httpStatus.BAD_REQUEST).json({ error: 'Invalid data' });
+		}
 
 		return userModel
 			.verifySiteOwner(email, siteId)

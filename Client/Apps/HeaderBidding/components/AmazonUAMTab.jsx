@@ -1,34 +1,36 @@
 import React from 'react';
+import { AMAZON_UAM } from '../constants';
+import Loader from '../../../Components/Loader';
+import InputBox from '../../../Components/InputBox';
+import CustomButton from '../../../Components/CustomButton';
+import CustomToggleSwitch from '../../../Components/CustomToggleSwitch';
 import {
 	Form,
 	Col,
 	FormGroup,
 	ControlLabel,
-	HelpBlock,
-	ButtonToolbar,
-	ToggleButtonGroup,
-	Checkbox
+	HelpBlock
 } from '@/Client/helpers/react-bootstrap-imports';
-import Loader from '../../../Components/Loader';
-import InputBox from '../../../Components/InputBox';
-import CustomButton from '../../../Components/CustomButton';
-import CustomToggleSwitch from '../../../Components/CustomToggleSwitch';
 
-import { fetchPrebidSettings, updateAmazonUAMSettings } from '../../../services/hbService';
+import { fetchAmazonUAMSettings, updateAmazonUAMSettings } from '../../../services/hbService';
 
 class AmazonUAMTab extends React.Component {
 	state = {
 		publisherId: '',
 		timeOut: '',
 		refreshTimeOut: '',
+		isAmazonUAMActive: false,
 		isSavingSettings: false,
-		isAmazonUAMActive: false
+		errors: {
+			timeOut: '',
+			refreshTimeOut: ''
+		}
 	};
 
 	componentDidMount() {
 		const { siteId } = this.props;
-		fetchPrebidSettings(siteId).then(prebidSettings => {
-			this.setState(prebidSettings);
+		fetchAmazonUAMSettings(siteId).then(amazonUAMSettings => {
+			this.setState(amazonUAMSettings);
 		});
 	}
 
@@ -47,28 +49,62 @@ class AmazonUAMTab extends React.Component {
 		}
 	};
 
+	handleTimeOutChange = ({ target: { value: timeOut } }, type) => {
+		// eslint-disable-next-line no-param-reassign
+		timeOut = Number(timeOut);
+		let minAllowedTime = AMAZON_UAM.INITIAL_TIMEOUT.MIN;
+		let maxAllowedTime = AMAZON_UAM.INITIAL_TIMEOUT.MAX;
+
+		if (type === 'refreshTimeOut') {
+			minAllowedTime = AMAZON_UAM.REFRESH_TIMEOUT.MIN;
+			maxAllowedTime = AMAZON_UAM.REFRESH_TIMEOUT.MAX;
+		}
+
+		this.setState(state => ({
+			[type]: timeOut,
+			errors: {
+				...state.errors,
+				[type]: !(!Number.isNaN(timeOut) && timeOut >= minAllowedTime && timeOut <= maxAllowedTime)
+					? `Timeout should be between ${minAllowedTime}ms to ${maxAllowedTime}ms`
+					: ''
+			}
+		}));
+	};
+
 	saveSettings = e => {
 		e.preventDefault();
+
 		const { siteId, showNotification, setUnsavedChangesAction } = this.props;
-		const { publisherId, timeOut, refreshTimeOut, isAmazonUAMActive } = this.state;
-		if (!publisherId) {
+		const {
+			timeOut,
+			publisherId,
+			refreshTimeOut,
+			isAmazonUAMActive,
+			errors: { timeOut: timeOutError, refreshTimeOut: refreshTimeOutError }
+		} = this.state;
+
+		if (timeOutError || refreshTimeOutError || !publisherId) {
+			const message = !publisherId
+				? 'Publisher Id is required'
+				: 'Please enter a valid Timeout value';
+
 			return showNotification({
 				mode: 'error',
 				title: 'Error',
-				message: 'Publisher Id is required',
+				message,
 				autoDismiss: 5
 			});
 		}
-		const amazonUAMSettings = { publisherId, timeOut, refreshTimeOut, isAmazonUAMActive };
 
 		const confirmed = window.confirm('Are you sure?');
-
 		if (!confirmed) return;
+
+		const amazonUAMSettings = { publisherId, timeOut, refreshTimeOut, isAmazonUAMActive };
 
 		this.setState({ isSavingSettings: true });
 		updateAmazonUAMSettings(siteId, amazonUAMSettings)
 			.then(() => {
-				this.setState({ isSavingSettings: false, publisherId: '' }, () => {
+				this.setState({ isSavingSettings: false }, () => {
 					setUnsavedChangesAction(true);
 
 					showNotification({
@@ -98,7 +134,8 @@ class AmazonUAMTab extends React.Component {
 			refreshTimeOut,
 			isSavingSettings,
 			publisherId,
-			isAmazonUAMActive
+			isAmazonUAMActive,
+			errors: { timeOut: timeOutError, refreshTimeOut: refreshTimeOutError }
 		} = this.state;
 
 		return (
@@ -123,7 +160,7 @@ class AmazonUAMTab extends React.Component {
 						/>
 					</Col>
 				</div>
-				<FormGroup controlId="pb-id" className="form-row clearfix">
+				<FormGroup controlId="publisherId" className="form-row clearfix">
 					<Col componentClass={ControlLabel} sm={6}>
 						Publisher Id
 					</Col>
@@ -131,7 +168,6 @@ class AmazonUAMTab extends React.Component {
 						<InputBox
 							type="text"
 							name="publisherId"
-							classNames="pb-input"
 							value={publisherId}
 							onChange={this.handleChange}
 						/>
@@ -142,14 +178,38 @@ class AmazonUAMTab extends React.Component {
 					<Col componentClass={ControlLabel} sm={6}>
 						Initial Time-Out (ms)
 					</Col>
-					<Col sm={6}>{`${timeOut} (Prebid Default)`}</Col>
+					<Col sm={6}>
+						<InputBox
+							type="number"
+							name="amazonUAMTimeout"
+							value={timeOut}
+							onChange={e => this.handleTimeOutChange(e, 'timeOut')}
+						/>
+					</Col>
+					{!!timeOutError && (
+						<HelpBlock className="error-message" style={{ padding: '0 1.5rem' }}>
+							{timeOutError}
+						</HelpBlock>
+					)}
 				</div>
 
 				<div className="form-row clearfix">
 					<Col componentClass={ControlLabel} sm={6}>
 						Refresh Time-Out (ms)
 					</Col>
-					<Col sm={6}>{`${refreshTimeOut} (Prebid Default)`}</Col>
+					<Col sm={6}>
+						<InputBox
+							type="number"
+							name="amazonUAMRefreshTimeout"
+							value={refreshTimeOut}
+							onChange={e => this.handleTimeOutChange(e, 'refreshTimeOut')}
+						/>
+					</Col>
+					{!!refreshTimeOutError && (
+						<HelpBlock className="error-message" style={{ padding: '0 1.5rem' }}>
+							{refreshTimeOutError}
+						</HelpBlock>
+					)}
 				</div>
 
 				<div className="footer-btns">
