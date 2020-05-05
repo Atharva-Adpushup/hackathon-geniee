@@ -114,6 +114,7 @@ var adpTags = {
 				bidders: bidders || [],
 				formats: formats,
 				placement: placement,
+				headerBidding: optionalParam.headerBidding,
 				activeDFPNetwork: utils.getActiveDFPNetwork(),
 				size: size,
 				sectionName: sectionName,
@@ -136,7 +137,7 @@ var adpTags = {
 				refreshCount: 0
 			};
 
-			adpSlot.gSlot = gpt.defineSlot(window.googletag, adpSlot);
+			gpt.defineSlot(window.googletag, adpSlot);
 			this.adpSlots[containerId] = adpSlot;
 
 			return this.adpSlots[containerId];

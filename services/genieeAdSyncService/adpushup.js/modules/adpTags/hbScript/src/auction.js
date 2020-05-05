@@ -30,9 +30,12 @@ var auction = {
 	},
 	getAuctionResponse: function(adpBatchId) {
 		utils.log(window._apPbJs.getBidResponses());
-		var adpBatch = utils.getCurrentAdpSlotBatch(adpBatchId);
+		var adpBatches = adpConfig.apLiteActive
+			? window.apLite.adpBatches
+			: window.adpushup.adpTags.adpBatches;
+		var adpBatch = utils.getCurrentAdpSlotBatch(adpBatches, adpBatchId);
 
-		adpBacth.auctionStatus.prebid = 'done';
+		adpBatch.auctionStatus.prebid = 'done';
 		return this.end(adpBatchId);
 	},
 	requestBids: function(pbjs, adpBatchId, slotCodes, hasRefreshSlots = false) {
@@ -202,21 +205,26 @@ var auction = {
 	addSlotsToPbjs: function(pbjs, prebidSlots) {
 		return pbjs.addAdUnits(prebidSlots);
 	},
-	startAmazonAuction: function(slots) {
-		var adpBatchId = adpSlots[0].batchId;
-		var adpBacth = utils.getCurrentAdpSlotBatch(batchId);
-
+	startAmazonAuction: function(slots, adpBatchId, hasRefreshSlots) {
+		var adpBatches = adp.config.apLiteActive
+			? window.apLite.adpBatches
+			: window.adpushup.adpTags.adpBatches;
+		var adpBatch = utils.getCurrentAdpSlotBatch(adpBatches, adpBatchId);
 		var apstag = window.apstag;
+
+		var auctionEnd = this.end;
 
 		apstag.fetchBids(
 			{
 				slots: slots,
-				timeout: config.PREBID_CONFIG.hbcf.amzonTimeout
+				timeout: hasRefreshSlots
+					? config.PREBID_CONFIG.config.PREBID_CONFIG.amazonUAMConfig.refreshTimeOut
+					: config.PREBID_CONFIG.config.amazonUAMConfig.PREBID_CONFIG.timeOut
 			},
 			function(bids) {
 				apstag.setDisplayBids();
-				adpBacth.auctionStatus.amazonUam = 'done';
-				this.end(adpBatchId);
+				adpBatch.auctionStatus.amazonUam = 'done';
+				auctionEnd(adpBatchId);
 			}
 		);
 	},

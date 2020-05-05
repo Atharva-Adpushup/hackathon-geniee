@@ -100,6 +100,7 @@ var $ = require('../../libs/jquery'),
 					slotId: gptSlotElementId,
 					optionalParam,
 					bidders: optionalParam.headerBidding ? hbUtils.getBiddersForSlot(size, formats) : [],
+					headerBidding: optionalParam.headerBidding,
 					formats,
 					activeDFPNetwork: hbUtils.getActiveDFPNetwork(),
 					size,
@@ -197,7 +198,7 @@ var $ = require('../../libs/jquery'),
 														refreshSlot,
 														refreshInterval,
 														services: [commonConsts.SERVICES.AP_LITE],
-														fluid: false,
+														fluid: false
 													}
 												);
 

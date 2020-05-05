@@ -25,10 +25,14 @@ var gpt = {
 		}
 		adpSlot.hasRendered = true;
 
-		googletag.display(adpSlot.containerId);
-		if (googletag.pubads().isInitialLoadDisabled() || adpSlot.toBeRefreshed) {
-			this.refreshGPTSlots(googletag, [adpSlot.gSlot]);
-		}
+		var refreshGPTSlots = this.refreshGPTSlots.bind(this);
+
+		googletag.cmd.push(function() {
+			googletag.display(adpSlot.containerId);
+			if (googletag.pubads().isInitialLoadDisabled() || adpSlot.toBeRefreshed) {
+				refreshGPTSlots(googletag, [adpSlot.gSlot]);
+			}
+		});
 	},
 	renderApLiteSlots: function(googletag, adpSlots) {
 		if (googletag.pubads().isInitialLoadDisabled()) {
@@ -68,18 +72,20 @@ var gpt = {
 
 		var sizes = this.getSlotSizes(computedSizes);
 
-		if (!adpSlot.gSlot) {
-			gSlot = googletag.defineSlot(
-				'/' + networkId + '/' + adpSlot.optionalParam.dfpAdunitCode,
-				size,
-				adpSlot.containerId
-			);
-		}
+		googletag.cmd.push(function() {
+			if (!adpSlot.gSlot) {
+				adpSlot.gSlot = googletag.defineSlot(
+					'/' + networkId + '/' + adpSlot.optionalParam.dfpAdunitCode,
+					sizes,
+					adpSlot.containerId
+				);
+			}
 
-		if (!adpSlot.toBeRefreshed) {
-			adpSlot.gSlot.addService(googletag.pubads());
-		}
-		return gSlot;
+			if (!adpSlot.toBeRefreshed) {
+				adpSlot.gSlot.addService(googletag.pubads());
+			}
+		});
+		//return gSlot;
 	},
 	setSlotRenderListener: function(w) {
 		w.googletag.cmd.push(function() {

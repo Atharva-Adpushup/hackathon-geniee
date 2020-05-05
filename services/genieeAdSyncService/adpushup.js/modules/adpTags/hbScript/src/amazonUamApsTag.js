@@ -24,7 +24,7 @@ function initiateApsTag(w) {
 	};
 }
 
-if (!w.apstag) {
+if (!window.apstag) {
 	loadApsTag(window, document);
 	initiateApsTag(window, document);
 }
