@@ -13,7 +13,7 @@ var isApLiteActive = window.adpushup.config.apLiteActive;
 var amznPubId =
 	config.PREBID_CONFIG &&
 	config.PREBID_CONFIG.amazonUAMConfig &&
-	config.PREBID_CONFIG.amazonUAMConfig.enabled &&
+	config.PREBID_CONFIG.amazonUAMConfig.isAmazonUAMActive &&
 	config.PREBID_CONFIG.amazonUAMConfig.publisherId;
 var hb = {
 	start: function(adpSlots) {
