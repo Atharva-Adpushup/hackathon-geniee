@@ -218,8 +218,8 @@ var auction = {
 			{
 				slots: slots,
 				timeout: hasRefreshSlots
-					? config.PREBID_CONFIG.config.PREBID_CONFIG.amazonUAMConfig.refreshTimeOut
-					: config.PREBID_CONFIG.config.amazonUAMConfig.PREBID_CONFIG.timeOut
+					? config.PREBID_CONFIG.amazonUAMConfig.refreshTimeOut
+					: config.PREBID_CONFIG.amazonUAMConfig.timeOut
 			},
 			function(bids) {
 				apstag.setDisplayBids();
