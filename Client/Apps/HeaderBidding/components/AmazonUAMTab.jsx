@@ -143,7 +143,7 @@ class AmazonUAMTab extends React.Component {
 				<div className="clearfix">
 					<Col sm={12}>
 						<CustomToggleSwitch
-							labelText="Amazon UAM Active"
+							labelText="Enable Amazon UAM"
 							className="u-margin-b4"
 							checked={isAmazonUAMActive}
 							onChange={this.handleToggle}
