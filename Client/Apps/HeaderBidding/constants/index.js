@@ -19,7 +19,8 @@ export const NAV_ITEMS_INDEXES = {
 	TAB_2: 'bidders',
 	TAB_3: 'inventory',
 	TAB_4: 'prebid-settings',
-	TAB_5: 'optimization'
+	TAB_5: 'optimization',
+	TAB_6: 'amazon-uam'
 };
 
 export const NAV_ITEMS_VALUES = {
@@ -27,7 +28,8 @@ export const NAV_ITEMS_VALUES = {
 	TAB_2: 'Bidders',
 	TAB_3: 'Inventory',
 	TAB_4: 'Prebid Settings',
-	TAB_5: 'Optimization'
+	TAB_5: 'Optimization',
+	TAB_6: 'Amazon UAM'
 };
 
 export const INVENTORY_TABLE_COLUMNS = [
@@ -77,10 +79,25 @@ export const NAV_ITEMS = {
 	[NAV_ITEMS_INDEXES.TAB_5]: {
 		NAME: [NAV_ITEMS_VALUES.TAB_5],
 		INDEX: 5
+	},
+	[NAV_ITEMS_INDEXES.TAB_6]: {
+		NAME: [NAV_ITEMS_VALUES.TAB_6],
+		INDEX: 6
 	}
 };
 
 export const HEADER_BIDDING = {
+	INITIAL_TIMEOUT: {
+		MIN: 0,
+		MAX: 10000
+	},
+	REFRESH_TIMEOUT: {
+		MIN: 0,
+		MAX: 10000
+	}
+};
+
+export const AMAZON_UAM = {
 	INITIAL_TIMEOUT: {
 		MIN: 0,
 		MAX: 10000

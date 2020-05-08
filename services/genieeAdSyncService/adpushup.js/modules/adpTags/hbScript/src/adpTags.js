@@ -18,20 +18,33 @@ var adpTags = {
 		batchPrebiddingComplete: false,
 		prebidBatching: function(adpSlotsBatch) {
 			if (adpSlotsBatch && adpSlotsBatch.length) {
-				hb.createPrebidSlots(adpSlotsBatch);
+				hb.start(adpSlotsBatch);
 			}
 		},
 		processBatchForBidding: function() {
 			var batchId = this.currentBatchId;
 			var adpSlots = this.currentBatchAdpSlots;
 
-			this.adpBatches.push({ batchId: batchId, adpSlots: adpSlots });
+			/**
+			 * #TODO: this can be converted to a map with batchId being the key, instead of array.
+			 * This will also allow to do away with using utils.getCurrentAdpSlotBatch everytime to get a batch of adpSlots for a given batchId
+			 *
+			 * */
+
+			this.adpBatches.push({
+				batchId: batchId,
+				adpSlots: adpSlots,
+				auctionStatus: {
+					amazonUam: 'pending',
+					prebid: 'pending'
+				}
+			});
 
 			// Add batch id to all batched adpSlots
 			utils.addBatchIdToAdpSlots(adpSlots, batchId);
 
 			// Initiate prebidding for current adpSlots batch
-			this.prebidBatching(utils.getCurrentAdpSlotBatch(this.adpBatches, batchId));
+			this.prebidBatching(adpSlots);
 
 			// Reset the adpSlots batch
 			this.currentBatchId = null;
@@ -88,12 +101,20 @@ var adpTags = {
 					: constants.PREBID.TIMEOUT;
 			var adType = optionalParam.adType;
 
-			this.adpSlots[containerId] = {
+			if (isResponsive) {
+				computedSizes = responsiveAds.getAdSizes(optionalParam.adId).collection;
+			}
+
+			computedSizes =
+				computedSizes && computedSizes.length ? computedSizes.concat([]).reverse() : size;
+
+			var adpSlot = {
 				slotId: slotId,
 				optionalParam: optionalParam,
 				bidders: bidders || [],
 				formats: formats,
 				placement: placement,
+				headerBidding: optionalParam.headerBidding,
 				activeDFPNetwork: utils.getActiveDFPNetwork(),
 				size: size,
 				sectionName: sectionName,
@@ -115,6 +136,9 @@ var adpTags = {
 				adType: adType,
 				refreshCount: 0
 			};
+
+			gpt.defineSlot(window.googletag, adpSlot);
+			this.adpSlots[containerId] = adpSlot;
 
 			return this.adpSlots[containerId];
 		},

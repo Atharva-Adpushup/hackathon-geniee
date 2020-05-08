@@ -11,13 +11,18 @@ var auction = {
 		var adpBatches = adpConfig.apLiteActive
 			? window.apLite.adpBatches
 			: window.adpushup.adpTags.adpBatches;
-		var adpSlots = utils.getCurrentAdpSlotBatch(adpBatches, adpBatchId);
+		var adpBatch = utils.getCurrentAdpSlotBatch(adpBatches, adpBatchId);
+		var adpSlots = adpBatch.adpSlots;
 
 		adpConfig.apLiteActive
 			? (window.apLite.batchPrebiddingComplete = true)
 			: (window.adpTags.batchPrebiddingComplete = true);
 
-		if (adpSlots.length) {
+		if (
+			adpBatch.auctionStatus.prebid == 'done' &&
+			adpBatch.auctionStatus.amazonUam == 'done' &&
+			adpSlots.length
+		) {
 			return render.init(adpSlots);
 		}
 
@@ -25,7 +30,12 @@ var auction = {
 	},
 	getAuctionResponse: function(adpBatchId) {
 		utils.log(window._apPbJs.getBidResponses());
+		var adpBatches = adpConfig.apLiteActive
+			? window.apLite.adpBatches
+			: window.adpushup.adpTags.adpBatches;
+		var adpBatch = utils.getCurrentAdpSlotBatch(adpBatches, adpBatchId);
 
+		adpBatch.auctionStatus.prebid = 'done';
 		return this.end(adpBatchId);
 	},
 	requestBids: function(pbjs, adpBatchId, slotCodes, hasRefreshSlots = false) {
@@ -195,7 +205,30 @@ var auction = {
 	addSlotsToPbjs: function(pbjs, prebidSlots) {
 		return pbjs.addAdUnits(prebidSlots);
 	},
-	start: function(prebidSlots, adpBatchId) {
+	startAmazonAuction: function(slots, adpBatchId, hasRefreshSlots) {
+		var adpBatches = adp.config.apLiteActive
+			? window.apLite.adpBatches
+			: window.adpushup.adpTags.adpBatches;
+		var adpBatch = utils.getCurrentAdpSlotBatch(adpBatches, adpBatchId);
+		var apstag = window.apstag;
+
+		var auctionEnd = this.end;
+
+		apstag.fetchBids(
+			{
+				slots: slots,
+				timeout: hasRefreshSlots
+					? config.PREBID_CONFIG.amazonUAMConfig.refreshTimeOut
+					: config.PREBID_CONFIG.amazonUAMConfig.timeOut
+			},
+			function(bids) {
+				apstag.setDisplayBids();
+				adpBatch.auctionStatus.amazonUam = 'done';
+				auctionEnd(adpBatchId);
+			}
+		);
+	},
+	startPrebidAuction: function(prebidSlots, adpBatchId) {
 		var pbjs = window._apPbJs,
 			slotCodes = [],
 			hasRefreshSlots,
