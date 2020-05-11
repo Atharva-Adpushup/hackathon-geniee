@@ -107,6 +107,30 @@ var hb = {
 									var playerElem = jwPlayerInstance.getContainer();
 									playerElem.style.margin = '0 auto';
 								});
+
+							var jwpEvents = [
+								'error',
+								'setupError',
+								'adImpression',
+								'adRequest',
+								'adStarted',
+								'adPlay'
+							];
+
+							jwpEvents.forEach(function(eventName) {
+								jwPlayerInstance.on(eventName, function(e) {
+									window.adpushup.$.ajax({
+										type: 'POST',
+										url: '//vastdump-staging.adpushup.com/' + eventName,
+										data: {
+											data: JSON.stringify(e),
+											auctionId: bid.auctionId || '',
+											requestId: bid.requestId || ''
+										},
+										dataType: 'json'
+									});
+								});
+							});
 						});
 					}
 				},
