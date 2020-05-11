@@ -122,11 +122,13 @@ var hb = {
 									window.adpushup.$.ajax({
 										type: 'POST',
 										url: '//vastdump-staging.adpushup.com/' + eventName,
-										data: {
+										data: JSON.stringify({
 											data: JSON.stringify(e),
 											auctionId: bid.auctionId || '',
 											requestId: bid.requestId || ''
-										},
+										}),
+										contentType: 'application/json',
+										processData: false,
 										dataType: 'json'
 									});
 								});
