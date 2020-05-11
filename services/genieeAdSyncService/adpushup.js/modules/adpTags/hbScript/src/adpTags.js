@@ -4,6 +4,7 @@ var adp = require('./adp');
 var config = require('./config');
 var constants = require('./constants');
 var utils = require('./utils');
+var responsiveAds = require('./responsiveAds');
 var hb = require('./hb');
 var gpt = require('./gpt');
 var adpTags = {
