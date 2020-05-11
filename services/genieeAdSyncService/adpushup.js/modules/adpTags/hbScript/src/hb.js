@@ -109,6 +109,8 @@ var hb = {
 								});
 
 							var jwpEvents = [
+								'ready',
+								'adError',
 								'error',
 								'setupError',
 								'adImpression',
