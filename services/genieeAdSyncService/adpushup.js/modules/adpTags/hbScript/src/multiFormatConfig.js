@@ -2,7 +2,7 @@ const CONSTANTS = {
 	VIDEO: {
 		RENDERER_URL: 'https://cdn.jwplayer.com/libraries/AQP5aIG2.js',
 		JW_PLAYER_CONFIG: {
-			autostart: 'viewable',
+			autostart: 'true',
 			stretching: 'uniform',
 			mute: true,
 			advertising: {
