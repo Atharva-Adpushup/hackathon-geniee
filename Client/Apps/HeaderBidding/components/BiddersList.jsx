@@ -7,7 +7,11 @@ import { Button } from '@/Client/helpers/react-bootstrap-imports';
 import Card from '../../../Components/Layout/Card';
 
 function getBidderJSX(bidderType, bidderObj, bidderKey, openAddManageBidderView) {
-	const { name, isApRelation, isPaused, isActive } = bidderObj;
+	let { name, isApRelation, isPaused, isActive, isAmpActive = 'false' } = bidderObj;
+
+	if (typeof isAmpActive === 'boolean') {
+		isAmpActive = isAmpActive ? 'true' : 'false';
+	}
 
 	return (
 		<Card
@@ -31,7 +35,7 @@ function getBidderJSX(bidderType, bidderObj, bidderKey, openAddManageBidderView)
 				null,
 				bidderType === 'NOT_ADDED' ? 'addBidder' : 'manageBidder',
 				bidderKey,
-				bidderObj
+				{ ...bidderObj, isAmpActive }
 			)}
 			footerChildren={
 				<div className="aligner aligner--row">

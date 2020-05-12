@@ -33,7 +33,8 @@ module.exports = {
 									: '';
 								break;
 							case 'isBoolean':
-								if (!validator.isBoolean(json[key])) errors[key] = rule.message;
+								if (!validator.isBoolean(json[key]) || typeof json[key] !== 'boolean')
+									errors.push({ message: rule.message, status: rule.status });
 								break;
 							case 'isSameDomain':
 								if (!sampleUrlForced) {

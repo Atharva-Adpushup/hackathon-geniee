@@ -155,6 +155,12 @@ module.exports = {
 					message: 'reusable property should be a boolean',
 					value: '',
 					status: 403
+				},
+				{
+					name: 'isAmpActive',
+					message: 'isAmpActive property should be a boolean',
+					value: '',
+					status: 403
 				}
 			]
 		}
