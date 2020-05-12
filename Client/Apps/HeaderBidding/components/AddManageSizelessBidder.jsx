@@ -28,7 +28,7 @@ class AddManageSizelessBidder extends React.Component {
 		switch (formType) {
 			case 'add': {
 				const {
-					bidderConfig: { key, name, sizeLess, reusable, isApRelation, params }
+					bidderConfig: { key, name, sizeLess, reusable, isApRelation, params, isAmpActive }
 				} = this.props;
 
 				const formFields = {
@@ -68,7 +68,14 @@ class AddManageSizelessBidder extends React.Component {
 								(formFieldsParams[paramKey].dataType === 'number' ? null : '');
 						}
 
-						newState.bidderConfig = { key, name, sizeLess, reusable, ...newState.bidderConfig };
+						newState.bidderConfig = {
+							key,
+							name,
+							sizeLess,
+							reusable,
+							isAmpActive,
+							...newState.bidderConfig
+						};
 						newState.validationSchema = getValidationSchema({
 							...formFields.bidderConfig,
 							...formFields.params.global,
@@ -96,7 +103,8 @@ class AddManageSizelessBidder extends React.Component {
 						isPaused,
 						relation,
 						bids,
-						revenueShare
+						revenueShare,
+						isAmpActive
 					}
 				} = this.props;
 
@@ -136,6 +144,10 @@ class AddManageSizelessBidder extends React.Component {
 								case 'status':
 									value = isPaused ? 'paused' : 'active';
 									break;
+								case 'isAmpActive':
+									value = isAmpActive;
+
+									break;
 								default:
 							}
 
@@ -153,6 +165,7 @@ class AddManageSizelessBidder extends React.Component {
 							reusable,
 							relation,
 							bids,
+							isAmpActive,
 							revenueShare,
 							...newState.bidderConfig
 						};
@@ -188,6 +201,18 @@ class AddManageSizelessBidder extends React.Component {
 
 		if (validationResult.isValid) {
 			this.setState({ errors: {} });
+
+			if (typeof bidderConfig.isAmpActive !== 'undefined') {
+				/*
+					-	convert the value to boolean before saving to the database
+					-	the value will be converted back to the corresponding value like
+					true -> 'true' and false -> 'false' when received from the database
+					-	this was to be done due to the SelectBox not accepting boolean values
+					
+					NOTE: this is also being done in the AddManageNonResponsiveBidder
+				*/
+				bidderConfig.isAmpActive = bidderConfig.isAmpActive === 'true';
+			}
 
 			// eslint-disable-next-line no-unused-expressions
 			(onBidderAdd && onBidderAdd(bidderConfig, params)) ||

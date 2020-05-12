@@ -36,6 +36,14 @@ export default function getCommonBidderFields(isApRelation, manageBidderData) {
 			inputType: 'text',
 			isRequired: false,
 			isEditable: true
+		},
+		isAmpActive: {
+			name: 'AMP Status',
+			dataType: 'string',
+			inputType: 'selectBox',
+			options: [{ name: 'Active', value: 'true' }, { name: 'Inactive', value: 'false' }],
+			isRequired: true,
+			isEditable: true
 		}
 	};
 

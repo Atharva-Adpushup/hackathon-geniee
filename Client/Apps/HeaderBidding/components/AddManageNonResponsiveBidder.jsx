@@ -97,7 +97,8 @@ class AddManageNonResponsiveBidder extends React.Component {
 						isPaused,
 						relation,
 						bids,
-						revenueShare
+						revenueShare,
+						isAmpActive
 					}
 				} = this.props;
 
@@ -106,7 +107,8 @@ class AddManageNonResponsiveBidder extends React.Component {
 						values: {
 							relation,
 							bids,
-							revenueShare
+							revenueShare,
+							isAmpActive
 						},
 						newFields: { isPaused }
 					}),
@@ -161,6 +163,9 @@ class AddManageNonResponsiveBidder extends React.Component {
 											break;
 										case 'status':
 											value = isPaused ? 'paused' : 'active';
+											break;
+										case 'isAmpActive':
+											value = isAmpActive;
 											break;
 										default:
 									}
@@ -347,6 +352,17 @@ class AddManageNonResponsiveBidder extends React.Component {
 				sizes.forEach(size => {
 					mergedParams[size] = globalParams;
 				});
+			}
+
+			if (typeof bidderConfig.isAmpActive !== 'undefined') {
+				/*
+					-	convert the value to boolean before saving to the database
+					-	the value will be converted back to the corresponding value like true -> 'true' and false -> 'false' when received from the database
+					-	this was to be done due to the SelectBox not accepting boolean values
+					
+					NOTE: this is also being done in the AddManageSizelessBidder
+				*/
+				bidderConfig.isAmpActive = bidderConfig.isAmpActive === 'true';
 			}
 
 			// eslint-disable-next-line no-unused-expressions
