@@ -245,7 +245,14 @@ var handleBidTimeoutEvent = function(bidTimeoutData) {
 
 var handleBidWonEvent = function(bidWonData) {
 	utils.log('========= bidWon =========', bidWonData);
+	// for winning video bids, feedback will be sent on adImpression event from jwplayer
+	if (bidWonData.mediaType == 'video') {
+		return;
+	}
+	collectBidWonData(bidWonData);
+};
 
+var collectBidWonData = function(bidWonData) {
 	var slot = isApLiteActive
 		? w.apLite.adpSlots[bidWonData.adUnitCode]
 		: w.adpushup.adpTags.adpSlots[bidWonData.adUnitCode];
@@ -325,7 +332,8 @@ var API = {
 				});
 			}
 		});
-	}
+	},
+	collectBidWonData: collectBidWonData
 };
 
 module.exports = API;

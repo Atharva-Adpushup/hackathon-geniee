@@ -107,7 +107,12 @@ var hb = {
 									var playerElem = jwPlayerInstance.getContainer();
 									playerElem.style.margin = '0 auto';
 								});
+							// setup listener for adImpression event to send bid won feedback for video bids.
+							jwPlayerInstance.on('adImpression', function() {
+								prebidDataCollector.collectBidWonData(bid);
+							});
 
+							// ad-hoc data logging
 							var jwpEvents = [
 								'ready',
 								'adError',
