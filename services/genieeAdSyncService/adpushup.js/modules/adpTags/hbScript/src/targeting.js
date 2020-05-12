@@ -74,19 +74,14 @@ var targeting = {
 			Object.assign(targeting, { [keys.FLUID]: 1 });
 		}
 
-		var existingTargeting = (adpSlot.gSlot && adpSlot.gSlot.getTargetingMap()) || {};
+		var slotRefreshData = utils.getSlotRefreshData(adpSlot);
+		var refreshCount = slotRefreshData.exists
+			? slotRefreshData.nextValue
+			: slotRefreshData.defaultValue;
 
-		if (existingTargeting[keys.REFRESH_COUNT] && existingTargeting[keys.REFRESH_COUNT].length) {
-			let refreshCountNum = parseInt(existingTargeting[keys.REFRESH_COUNT][0], 10);
-
-			if (!isNaN(refreshCountNum) && refreshCountNum < 20) {
-				Object.assign(targeting, { [keys.REFRESH_COUNT]: ++refreshCountNum });
-			} else {
-				Object.assign(targeting, { [keys.REFRESH_COUNT]: 'more_than_20' });
-			}
-		} else {
-			Object.assign(targeting, { [keys.REFRESH_COUNT]: 0 });
-		}
+		Object.assign(targeting, {
+			[keys.REFRESH_COUNT]: refreshCount
+		});
 
 		Object.assign(targeting, {
 			[keys.REFRESH_RATE]: adpSlot.optionalParam.refreshInterval

@@ -2,7 +2,7 @@ const CONSTANTS = {
 	VIDEO: {
 		RENDERER_URL: 'https://cdn.jwplayer.com/libraries/AQP5aIG2.js',
 		JW_PLAYER_CONFIG: {
-			autostart: 'viewable',
+			autostart: 'true',
 			stretching: 'uniform',
 			mute: true,
 			advertising: {
@@ -126,6 +126,21 @@ const bidderParamsMapping = {
 				minduration: CONSTANTS.VIDEO.MINDURATION,
 				maxduration: CONSTANTS.VIDEO.MAXDURATION,
 				protocols: CONSTANTS.VIDEO.PROTOCOLS
+			}
+		}
+	},
+	openx: {
+		videoParams: {
+			// openx supported video params are mentioned here
+			// https://docs.openx.com/Content/developers/containers/prebid-video-adapter.html
+			video: {
+				mimes: CONSTANTS.VIDEO.MIMES,
+				minduration: CONSTANTS.VIDEO.MINDURATION,
+				maxduration: CONSTANTS.VIDEO.MAXDURATION,
+				protocols: CONSTANTS.VIDEO.PROTOCOLS,
+				api: CONSTANTS.VIDEO.API,
+				playbackmethod: CONSTANTS.VIDEO.PLAYBACKMETHOD,
+				linearity: CONSTANTS.VIDEO.LINEARITY
 			}
 		}
 	}

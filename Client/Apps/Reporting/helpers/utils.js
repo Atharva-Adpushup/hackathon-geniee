@@ -55,6 +55,7 @@ const getPresets = () => {
 	const today = moment();
 	const yesterday = moment().subtract(1, 'day');
 	const last7Days = moment().subtract(1, 'week');
+	const startOfMonth = moment().startOf('month');
 	return [
 		{
 			text: 'Today',
@@ -78,8 +79,8 @@ const getPresets = () => {
 		},
 		{
 			text: 'This Month',
-			start: moment().startOf('month'),
-			end: yesterday
+			start: startOfMonth,
+			end: yesterday.isBefore(startOfMonth) ? startOfMonth : yesterday
 		},
 		{
 			text: 'Last Month',

@@ -6,7 +6,9 @@ var constants = {
 			SLOT_RENDER_ENDED: 'slotRenderEnded'
 		},
 		PREBID: {
-			BID_WON: 'bidWon'
+			BID_WON: 'bidWon',
+			BID_TIMEOUT: 'bidTimeout',
+			AUCTION_END: 'auctionEnd'
 		}
 	},
 	TARGETING: {
@@ -49,7 +51,10 @@ var constants = {
 	FEEDBACK: {
 		DEFAULT_WINNER: 'adx',
 		URL: '//e3.adpushup.com/AdPushupFeedbackWebService/feedback/aphb?data=',
-		URL_OLD: '//e3.adpushup.com/ApHbWebService/feedback'
+		AUCTION_FEEDBACK_URL:
+			'//e3.adpushup.com/AdPushupFeedbackWebService/feedback/aphb/auctionData?data=',
+		URL_OLD: '//e3.adpushup.com/ApHbWebService/feedback',
+		HB_TYPES: { client: 1, server: 2 }
 	},
 	PREBID: {
 		TIMEOUT: 3000,
@@ -484,7 +489,7 @@ var constants = {
 	BATCHING_INTERVAL: 50,
 	UTM_SESSION_COOKIE: '_adp_utm_session_',
 	VIDEO_PLAYER_EXCEPTION_SIZES: [[300, 250], [480, 320], [320, 480], [320, 50]],
-	DEFAULT_JW_PLAYER_SIZE: [640, 480]
+	DEFAULT_JW_PLAYER_SIZE: [256, 144]
 };
 
 module.exports = constants;

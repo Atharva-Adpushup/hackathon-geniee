@@ -20,20 +20,27 @@ var $ = require('../../libs/jquery'),
 			batchPrebiddingComplete: false,
 			prebidBatching: function(adpSlotsBatch) {
 				if (adpSlotsBatch && adpSlotsBatch.length) {
-					hb.createPrebidSlots(adpSlotsBatch);
+					hb.start(adpSlotsBatch);
 				}
 			},
 			processBatchForBidding: function() {
 				var batchId = this.currentBatchId;
 				var adpSlots = this.currentBatchAdpSlots;
 
-				this.adpBatches.push({ batchId: batchId, adpSlots: adpSlots });
+				this.adpBatches.push({
+					batchId: batchId,
+					adpSlots: adpSlots,
+					auctionStatus: {
+						amazonUam: 'pending',
+						prebid: 'pending'
+					}
+				});
 
 				// Add batch id to all batched adpSlots
 				hbUtils.addBatchIdToAdpSlots(adpSlots, batchId);
 
 				// Initiate prebidding for current adpSlots batch
-				this.prebidBatching(hbUtils.getCurrentAdpSlotBatch(this.adpBatches, batchId));
+				this.prebidBatching(adpSlots);
 
 				// Reset the adpSlots batch
 				this.currentBatchId = null;
@@ -44,6 +51,7 @@ var $ = require('../../libs/jquery'),
 				slot.hasRendered = false;
 				slot.biddingComplete = false;
 				slot.feedbackSent = false;
+				slot.auctionFeedbackSent = false;
 				slot.hasTimedOut = false;
 				slot.feedback = {
 					winner: constants.FEEDBACK.DEFAULT_WINNER
@@ -92,6 +100,7 @@ var $ = require('../../libs/jquery'),
 					slotId: gptSlotElementId,
 					optionalParam,
 					bidders: optionalParam.headerBidding ? hbUtils.getBiddersForSlot(size, formats) : [],
+					headerBidding: optionalParam.headerBidding,
 					formats,
 					activeDFPNetwork: hbUtils.getActiveDFPNetwork(),
 					size,
@@ -102,13 +111,15 @@ var $ = require('../../libs/jquery'),
 					gSlot: gptSlot,
 					biddingComplete: false,
 					feedbackSent: false,
+					auctionFeedbackSent: false,
 					hasTimedOut: false,
 					sectionId: sectionId,
 					services: optionalParam.services,
 					feedback: {
 						winner: constants.FEEDBACK.DEFAULT_WINNER
 					},
-					fluid: optionalParam.fluid
+					fluid: optionalParam.fluid,
+					refreshCount: 0
 				};
 
 				return adpSlot;
@@ -131,6 +142,8 @@ var $ = require('../../libs/jquery'),
 						}
 					]
 				};
+
+				feedbackData = $.extend({}, feedbackData, utils.getPageFeedbackMetaData());
 
 				return feedbackData;
 			},
@@ -224,7 +237,7 @@ var $ = require('../../libs/jquery'),
 
 						return;
 					} catch (e) {
-						console.err ? console.err(e) : console.log(e);
+						console.error ? console.error(e) : console.log(e);
 					}
 				} else {
 					return false;

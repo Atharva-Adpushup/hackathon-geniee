@@ -220,6 +220,12 @@ module.exports = {
 		isAdPushupControlWithPartnerSSP: false
 	},
 	bidCpmAdjustments: {},
+	amazonUAMConfigDefaults: {
+		publisherId: '',
+		timeOut: 3000,
+		refreshTimeOut: 3000,
+		isAmazonUAMActive: false
+	},
 	hbGlobalSettingDefaults: {
 		prebidTimeout: 3000,
 		prebidRefreshTimeout: 3000,
@@ -582,6 +588,16 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		noAdsTxt: 4
 	},
 	HEADER_BIDDING: {
+		INITIAL_TIMEOUT: {
+			MIN: 0,
+			MAX: 10000
+		},
+		REFRESH_TIMEOUT: {
+			MIN: 0,
+			MAX: 10000
+		}
+	},
+	AMAZON_UAM: {
 		INITIAL_TIMEOUT: {
 			MIN: 0,
 			MAX: 10000

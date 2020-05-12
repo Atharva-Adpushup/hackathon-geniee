@@ -181,6 +181,14 @@ const Routes = () => (
 					path={`/sites/:siteId/apps/header-bidding/${HB_NAV_ITEMS_INDEXES.TAB_5}`}
 					component={HeaderBidding}
 				/>
+
+				<PrivateRoute
+					exact
+					customProps={{ activeTab: HB_NAV_ITEMS_INDEXES.TAB_6 }}
+					name="Amazon UAM"
+					path={`/sites/:siteId/apps/header-bidding/${HB_NAV_ITEMS_INDEXES.TAB_6}`}
+					component={HeaderBidding}
+				/>
 				<PrivateRoute exact name="Reports" path="/reports" component={Reporting} />
 
 				<PrivateRoute

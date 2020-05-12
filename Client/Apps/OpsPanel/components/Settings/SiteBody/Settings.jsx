@@ -21,7 +21,8 @@ class Settings extends Component {
 			adpushupPercentage = 100,
 			poweredByBanner = false,
 			isAdsLabelOn = false,
-			adsLabel = 'Advertisement'
+			adsLabel = 'Advertisement',
+			hbAnalytics = false
 		} = site.apConfigs || {};
 		const { revenueShare = 10 } = site.adNetworkSettings || {};
 		const status = Object.prototype.hasOwnProperty.call(apps, 'apLite') ? apps.apLite : undefined;
@@ -35,7 +36,8 @@ class Settings extends Component {
 			isAdsLabelOn,
 			adsLabel,
 			revenueShare,
-			status
+			status,
+			hbAnalytics
 		};
 	}
 
@@ -82,13 +84,11 @@ class Settings extends Component {
 						app: 'apLite',
 						value
 					}).then(() => this.setState({ status: value, [name]: value }));
-				} else {
-					return { [name]: false };
 				}
-			} else {
-				alert(`you can't disable AP Lite`);
-				return { [name]: true };
+				return { [name]: false };
 			}
+			alert(`you can't disable AP Lite`);
+			return { [name]: true };
 		});
 	};
 
@@ -107,7 +107,8 @@ class Settings extends Component {
 			poweredByBanner,
 			isAdsLabelOn,
 			adsLabel,
-			revenueShare
+			revenueShare,
+			hbAnalytics
 		} = this.state;
 		const { showNotification, saveSettings, site } = this.props;
 		const isTransitionInValid = isSPA && isNaN(Number(spaPageTransitionTimeout));
@@ -148,7 +149,8 @@ class Settings extends Component {
 				adpushupPercentage: Number(adpushupPercentage),
 				poweredByBanner,
 				isAdsLabelOn,
-				adsLabel
+				adsLabel,
+				hbAnalytics
 			},
 
 			adNetworkSettings: {
@@ -167,7 +169,8 @@ class Settings extends Component {
 			isAdsLabelOn,
 			adsLabel,
 			// revenueShare,
-			status
+			status,
+			hbAnalytics
 		} = this.state;
 		const { site } = this.props;
 
@@ -237,6 +240,19 @@ class Settings extends Component {
 					defaultLayout
 					name={`isSPA-${siteId}-${siteDomain}`}
 					id={`js-spa-switch-${siteId}-${siteDomain}`}
+				/>
+				<CustomToggleSwitch
+					labelText="HB Analytics"
+					className="u-margin-b4 negative-toggle"
+					checked={hbAnalytics}
+					onChange={this.handleToggle}
+					layout="horizontal"
+					size="m"
+					on="Yes"
+					off="No"
+					defaultLayout
+					name={`hbAnalytics-${siteId}-${siteDomain}`}
+					id={`js-hbAnalytics-switch-${siteId}-${siteDomain}`}
 				/>
 				{isSPA && (
 					<React.Fragment>

@@ -12,7 +12,6 @@ var render = {
 		}
 		adpSlots.forEach(function(adpSlot) {
 			adpSlot.biddingComplete = true;
-
 			targeting.setSlotLevel(adpSlot);
 		});
 
@@ -29,7 +28,7 @@ var render = {
 
 		return this.renderGPTSlots(googletag, adpSlots);
 	},
-	setTargeting: function(googletag) {
+	setPageAndUtmTargeting: function(googletag) {
 		targeting.setPageLevel(googletag);
 
 		if (config.SITE_ID === 39041 || config.SITE_ID === 41077) {
@@ -44,10 +43,12 @@ var render = {
 		var googletag = window.googletag;
 		googletag.cmd.push(
 			function() {
-				this.setTargeting(googletag);
-				adpConfig.apLiteActive
+				this.setPageAndUtmTargeting(googletag);
+				/*adpConfig.apLiteActive
 					? this.renderGPTSlots(googletag, adpSlots)
-					: this.createGPTSlots(googletag, adpSlots);
+					: this.createGPTSlots(googletag, adpSlots);*/
+
+				this.renderGPTSlots(googletag, adpSlots);
 			}.bind(this)
 		);
 	}

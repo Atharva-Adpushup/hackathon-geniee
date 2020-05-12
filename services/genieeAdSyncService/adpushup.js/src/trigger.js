@@ -54,8 +54,8 @@ var adp = window.adpushup,
 		return isElDisplayNone;
 	},
 	trigger = function(adId) {
-		var isDOMElement = !!document.getElementById(adId);
-		var isElementDisplayedNone = checkElementDisplay(adId);
+		var adElement = document.getElementById(adId);
+
 		// utils.log('ApTag id ', adId, 'DOM Element', isDOMElement);
 
 		// NOTE: Stop execution of this module if related DOM element does not exist
@@ -63,7 +63,22 @@ var adp = window.adpushup,
 		// and the script (adpushup.js) logic execution breaks as related DOM element does not exist
 		// Please check Github issue: #837 for more information
 		// Issue url: https://github.com/adpushup/GenieeAdPushup/issues/837
-		if (!isDOMElement || isElementDisplayedNone) {
+		if (!adElement) {
+			return false;
+		}
+
+		var newAdId = utils.uniqueId(),
+			currentTime = new Date().getTime();
+
+		adElement.setAttribute('id', newAdId);
+
+		var newAdElement = document.getElementById(newAdId);
+		newAdElement.setAttribute('data-section', newAdId);
+		newAdElement.setAttribute('data-orig-id', adId);
+		newAdElement.setAttribute('data-render-time', currentTime);
+
+		var isElementDisplayedNone = checkElementDisplay(newAdId);
+		if (isElementDisplayedNone) {
 			return false;
 		}
 
@@ -73,89 +88,74 @@ var adp = window.adpushup,
 			adp.config.manualAds.length &&
 			adp.utils.isUrlMatching()
 		) {
-			// utils.log('APTag running for', adId);
 			var manualAds = adp.config.manualAds,
-				newAdId = utils.uniqueId(),
 				manualAd = manualAds.filter(function(ad) {
 					return ad.id === adId;
 				})[0],
 				ad = $.extend(true, {}, manualAd),
 				siteId = adp.config.siteId,
-				adSize = ad.width + 'x' + ad.height,
-				isAdId = !!(ad && ad.id),
-				domElem = document.getElementById(ad.id),
-				currentTime = new Date().getTime(),
-				isAdElement = !!(isAdId && domElem);
+				adSize = ad.width + 'x' + ad.height;
+			//isAdId = !!(ad && ad.id);
+			//domElem = document.getElementById(ad.id),
+			//isAdElement = !!(isAdId && domElem);
 
 			// utils.log('APTag found ', manualAd, 'DOM element', domElem);
 
 			ad.id = newAdId;
-			document.getElementById(adId).setAttribute('id', newAdId);
-			document.getElementById(newAdId).setAttribute('data-section', newAdId);
-			document.getElementById(newAdId).setAttribute('data-orig-id', adId);
-			document.getElementById(newAdId).setAttribute('data-render-time', currentTime);
+
 			if (ad.network === commonConsts.NETWORKS.ADPTAGS) {
 				if (ad.networkData)
 					ad.networkData.zoneContainerId = 'ADP_' + siteId + '_' + adSize + '_' + newAdId;
 			}
 
-			//ad.status = 1; // Mark ap tag status as successful impression
 			ad.status = commonConsts.AD_STATUS.IMPRESSION; // Mark ap tag status as successful impression
 			ad.services = [commonConsts.SERVICES.TAG]; // Set service id for ap tag ads
 			ad.originalId = adId;
-			if (isAdElement) {
-				var feedbackData = {
-					ads: [ad],
-					xpathMiss: [],
-					errorCode: commonConsts.ERROR_CODES.NO_ERROR,
-					// mode: 16,
-					mode: commonConsts.MODE.ADPUSHUP, // Sending Mode 1 in Manual Ads
-					referrer: config.referrer,
-					tracking: browserConfig.trackerSupported,
-					variationId: commonConsts.MANUAL_ADS.VARIATION
-				};
-				//oldFeedbackData = $.extend(true, {}, feedbackData);
+			//if (isAdElement) {
+			var feedbackData = {
+				ads: [ad],
+				xpathMiss: [],
+				errorCode: commonConsts.ERROR_CODES.NO_ERROR,
+				mode: commonConsts.MODE.ADPUSHUP, // Sending Mode 1 in Manual Ads
+				referrer: config.referrer,
+				tracking: browserConfig.trackerSupported,
+				variationId: commonConsts.MANUAL_ADS.VARIATION
+			};
+			var feedbackMetaData = utils.getPageFeedbackMetaData();
+			feedbackData = $.extend({}, feedbackData, feedbackMetaData);
 
-				//oldFeedbackData.ads = [ad.originalId];
-				return getContainer(ad)
-					.done(function(container) {
-						// utils.log('Container found ', container);
-						var isLazyLoadingAd = !!(ad.enableLazyLoading === true);
-						var isAdNetworkAdpTag = !!(ad.network === commonConsts.NETWORKS.ADPTAGS);
-						var isAdNetworkMedianet = !!(
-							!isMedianetHeaderCodePlaced && ad.network === commonConsts.NETWORKS.MEDIANET
-						);
+			return getContainer(ad)
+				.done(function(container) {
+					var isLazyLoadingAd = !!(ad.enableLazyLoading === true);
+					var isAdNetworkAdpTag = !!(ad.network === commonConsts.NETWORKS.ADPTAGS);
+					var isAdNetworkMedianet = !!(
+						!isMedianetHeaderCodePlaced && ad.network === commonConsts.NETWORKS.MEDIANET
+					);
 
-						adp.config.renderedTagAds = adp.config.renderedTagAds || [];
-						adp.config.renderedTagAds.push({ newId: newAdId, oldId: adId });
-						// Once container has been found, execute adp head code if ad network is "adpTags"
-						if (isAdNetworkAdpTag) {
-							executeAdpTagsHeadCode([ad], {}); // This function expects an array of adpTags and optional adpKeyValues
-						}
-						if (isAdNetworkMedianet) {
-							generateMediaNetHeadCode();
-							isMedianetHeaderCodePlaced = true;
-						}
-						if (isLazyLoadingAd) {
-							isAdContainerInView(container).done(function() {
-								// Send feedback call
-								utils.sendFeedback(feedbackData);
-								//utils.sendFeedbackOld(oldFeedbackData);
-								// Place the ad in the container
-								return placeAd(container, ad);
-							});
-						} else {
-							// Send feedback call
+					adp.config.renderedTagAds = adp.config.renderedTagAds || [];
+					adp.config.renderedTagAds.push({ newId: newAdId, oldId: adId });
+					// Once container has been found, execute adp head code if ad network is "adpTags"
+					if (isAdNetworkAdpTag) {
+						executeAdpTagsHeadCode([ad], {}); // This function expects an array of adpTags and optional adpKeyValues
+					}
+					if (isAdNetworkMedianet) {
+						generateMediaNetHeadCode();
+						isMedianetHeaderCodePlaced = true;
+					}
+					if (isLazyLoadingAd) {
+						isAdContainerInView(container).done(function() {
 							utils.sendFeedback(feedbackData);
-							//utils.sendFeedbackOld(oldFeedbackData);
-							// Place the ad in the container
 							return placeAd(container, ad);
-						}
-					})
-					.fail(function(err) {
-						throw new Error(err);
-					});
-			}
+						});
+					} else {
+						utils.sendFeedback(feedbackData);
+						return placeAd(container, ad);
+					}
+				})
+				.fail(function(err) {
+					throw new Error(err);
+				});
+			//}
 		}
 	};
 
