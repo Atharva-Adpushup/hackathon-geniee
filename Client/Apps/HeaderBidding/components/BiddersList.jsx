@@ -9,6 +9,13 @@ import Card from '../../../Components/Layout/Card';
 function getBidderJSX(bidderType, bidderObj, bidderKey, openAddManageBidderView) {
 	let { name, isApRelation, isPaused, isActive, isAmpActive = 'false' } = bidderObj;
 
+	/*
+		converting the isAmpActive value to boolean since the select box used to 
+		show this field doesn't support the boolean values
+
+		NOTE: this conversion is also done when saving the data to the database
+		where 'true' is considered as true rest everything as false
+	*/
 	if (typeof isAmpActive === 'boolean') {
 		isAmpActive = isAmpActive ? 'true' : 'false';
 	}

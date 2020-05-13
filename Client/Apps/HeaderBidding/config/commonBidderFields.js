@@ -43,7 +43,8 @@ export default function getCommonBidderFields(isApRelation, manageBidderData) {
 			inputType: 'selectBox',
 			options: [{ name: 'Active', value: 'true' }, { name: 'Inactive', value: 'false' }],
 			isRequired: true,
-			isEditable: true
+			isEditable: true,
+			defaultValue: 'false'
 		}
 	};
 

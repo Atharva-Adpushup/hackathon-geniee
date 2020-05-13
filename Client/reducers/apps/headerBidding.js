@@ -60,9 +60,13 @@ export default function(state = defaultState, action) {
 			const { siteId, bidderKey, bidderConfig } = action;
 			const bidders = { ...state.sites[siteId].bidders };
 
-			delete bidders.notAddedBidders[bidderKey];
 			if (!bidders.addedBidders) bidders.addedBidders = {};
-			bidders.addedBidders[bidderKey] = bidderConfig;
+			bidders.addedBidders[bidderKey] = {
+				...bidders.notAddedBidders[bidderKey],
+				...bidderConfig
+			};
+
+			delete bidders.notAddedBidders[bidderKey];
 
 			return {
 				...state,
@@ -80,7 +84,10 @@ export default function(state = defaultState, action) {
 			const { siteId, bidderKey, bidderConfig } = action;
 			const bidders = { ...state.sites[siteId].bidders };
 
-			bidders.addedBidders[bidderKey] = bidderConfig;
+			bidders.addedBidders[bidderKey] = {
+				...bidders.addedBidders[bidderKey],
+				...bidderConfig
+			};
 
 			return {
 				...state,
