@@ -88,6 +88,7 @@ var hb = {
 						bid.renderer.push(() => {
 							var jwPlayerInstance = jwplayer(bid.adUnitCode);
 							var playerSize = utils.getVideoPlayerSize(prebidSizes);
+							var bidWonTime = +new Date();
 							jwPlayerInstance
 								.setup(
 									merge(
@@ -132,6 +133,9 @@ var hb = {
 										url: '//vastdump-staging.adpushup.com/' + eventName,
 										data: JSON.stringify({
 											data: JSON.stringify(e),
+											bid: JSON.stringify(bid),
+											eventTime: +new Date(),
+											bidWonTime: bidWonTime,
 											auctionId: bid.auctionId || '',
 											requestId: bid.requestId || ''
 										}),
