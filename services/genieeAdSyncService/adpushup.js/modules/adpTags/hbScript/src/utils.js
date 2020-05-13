@@ -10,6 +10,14 @@ var constants = require('./constants');
 var { bidderParamsMapping } = require('./multiFormatConfig');
 var isApLiteActive = window.adpushup.config.apLiteActive;
 var utils = {
+	randomAlphaNumericString: function(length) {
+		var allChars = 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+			allCharsLength = allChars.length,
+			randomString = '';
+		for (var i = length; i > 0; --i)
+			randomString += allChars[Math.floor(Math.random() * allCharsLength)];
+		return randomString;
+	},
 	currencyConversionActive: function(inputObject) {
 		var isValidAdserverCurrency =
 				inputObject.adServerCurrency &&

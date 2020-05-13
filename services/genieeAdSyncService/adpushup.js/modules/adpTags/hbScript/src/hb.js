@@ -97,6 +97,7 @@ var hb = {
 											advertising: {
 												outstream: true,
 												client: 'vast',
+												adscheduleid: utils.randomAlphaNumericString(8),
 												vastxml: bid.vastXml
 											}
 										},
