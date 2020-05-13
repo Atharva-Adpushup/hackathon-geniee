@@ -17,6 +17,7 @@ import ChartContainer from '../containers/ChartContainer';
 import reportService from '../../../services/reportService';
 import {
 	displayMetrics,
+	displayUniqueImpressionMetrics,
 	accountDisableFilter,
 	accountDisableDimension,
 	opsDimension,
@@ -528,10 +529,10 @@ class Panel extends Component {
 			let found = newMetrics.filter((item) => item.value=="unique_impressions")
 			// if unique impression selected
 			if(found.length) {
-				let match = ["unique_net_revenue", "unique_gross_revenue", "unique_ad_ecpm", "unique_impressions", "adpushup_page_views"]
+				let match = displayUniqueImpressionMetrics.map((item) => item.value)
 				sortedMetrics = sortedMetaMetrics.filter((item) => match.indexOf(item.value)!=-1)
 			} else {
-				let match = ["network_net_revenue", "adpushup_page_views", "adpushup_page_cpm", "network_impressions", "network_ad_ecpm"]
+				let match = displayMetrics.map((item) => item.value)
 				sortedMetrics = sortedMetaMetrics.filter((item) => match.indexOf(item.value)!=-1)
 			}
 		}
