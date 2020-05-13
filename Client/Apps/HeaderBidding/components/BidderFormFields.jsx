@@ -8,11 +8,7 @@ import SelectBox from '../../../Components/SelectBox';
 import InputBox from '../../../Components/InputBox';
 
 class BidderFormFields extends React.Component {
-	getBidderInputField = (
-		/* paramConfig */ { inputType, options, dataType, isEditable },
-		paramKey,
-		stateKey
-	) => {
+	getBidderInputField = ({ inputType, options, dataType, isEditable }, paramKey, stateKey) => {
 		const {
 			setFormFieldValueInState,
 			setParamInTempState,
@@ -41,6 +37,7 @@ class BidderFormFields extends React.Component {
 						wrapperClassName="hb-input"
 						selected={currValue}
 						options={options}
+						disabled={!isEditable}
 						onSelect={value => {
 							if (adSize) {
 								setParamInTempState(adSize, paramKey, value);
@@ -106,14 +103,51 @@ class BidderFormFields extends React.Component {
 	renderFormFields = () => {
 		const formFieldsJSX = [];
 
-		const { formFields, errors, tempParamsErrors, adSize } = this.props;
+		const { formFields, errors, tempParamsErrors, adSize, meta = {} } = this.props;
+
+		/*
+			fieldsToHide
+				-	this can be used to hide any fields
+				-	make sure you handle the isRequired part if hiding anything
+		*/
+		const { fieldsToHide = {}, fieldsToDisable = {} } = meta;
+		/*
+			fieldsToHide
+				-	It will be used to hide the complete field dynamically
+				-	It will have the fields to be hidden with the collectionKey prepended
+				-	Eg, to hide isAmpActive in bidderConfig, the fieldsToHide obj will look like this
+						fieldsToHide = {
+							isAmpActive: 'bidderConfig.isAmpActive'
+						}
+				-	This is done to ensure we can target the right fieldKey without hiding any other key with similar name
+
+			fieldsToDisable
+				-	It will be used to disable the fields dynamically
+				-	It will have the fields to be hidden with the collectionKey prepended
+			
+		*/
 
 		for (const collectionKey in formFields) {
 			const collection = formFields[collectionKey];
 			for (const fieldKey in collection) {
 				const fieldConfig = collection[fieldKey];
+
 				// eslint-disable-next-line no-continue
 				if (fieldConfig.visible === false) continue;
+
+				if (fieldKey in fieldsToHide) {
+					const [collectionName, fieldName] = fieldsToHide[fieldKey].split('.');
+					if (collectionName === collectionKey && fieldName === fieldKey) {
+						continue;
+					}
+				}
+
+				if (fieldKey in fieldsToDisable) {
+					const [collectionName, fieldName] = fieldsToDisable[fieldKey].split('.');
+					if (collectionName === collectionKey && fieldName === fieldKey) {
+						fieldConfig.isEditable = false;
+					}
+				}
 
 				formFieldsJSX.push(
 					<FormGroup key={fieldKey} controlId={`hb-${fieldKey}`}>

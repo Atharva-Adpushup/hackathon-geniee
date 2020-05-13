@@ -23,13 +23,25 @@ class AddManageSizelessBidder extends React.Component {
 		}
 	};
 
+	bidderFormFieldsMeta = {
+		fieldsToHide: {},
+		fieldsToDisable: {}
+	};
+
 	componentDidMount() {
 		const { formType } = this.props;
 		switch (formType) {
 			case 'add': {
 				const {
-					bidderConfig: { key, name, sizeLess, reusable, isApRelation, params, isAmpActive }
+					bidderConfig: { key, name, sizeLess, reusable, isApRelation, params, isAmpActive, isS2S }
 				} = this.props;
+
+				// disable the AMP status if not isS2S
+				if (!isS2S) {
+					this.bidderFormFieldsMeta.fieldsToDisable = {
+						isAmpActive: 'bidderConfig.isAmpActive'
+					};
+				}
 
 				const formFields = {
 					bidderConfig: getCommonBidderFields(isApRelation),
@@ -104,10 +116,17 @@ class AddManageSizelessBidder extends React.Component {
 						relation,
 						bids,
 						revenueShare,
-						isAmpActive
+						isAmpActive,
+						isS2S
 					}
 				} = this.props;
 
+				// disable the AMP status if not isS2S
+				if (!isS2S) {
+					this.bidderFormFieldsMeta.fieldsToDisable = {
+						isAmpActive: 'bidderConfig.isAmpActive'
+					};
+				}
 				const formFields = {
 					bidderConfig: getCommonBidderFields(isApRelation, {
 						values: {
@@ -326,6 +345,7 @@ class AddManageSizelessBidder extends React.Component {
 							setFormFieldValueInState={this.setFormFieldValueInState}
 							getCurrentFieldValue={this.getCurrentFieldValue}
 							errors={errors}
+							meta={this.bidderFormFieldsMeta}
 						/>
 						<FormGroup>
 							<Col md={12} className="u-margin-t4">

@@ -99,14 +99,28 @@ function apiModule() {
 				([allBidders, addedBidders]) => {
 					const notAddedBidders = { ...allBidders };
 
-					// delete added bidders keys from all bidders
+					/*
+						keys which are stored in the global bidders config and are to
+						be merged with the addedBidders config stored in hbdc:: since
+						we store selected keys from global config in the hbdc::
+					*/
+					const keysToMergeForAddedBidders = ['isS2S', 'isActive'];
+
+					/*
+						iterate over the addedBidders and merge the data from global bidders config
+						also, remove each added bidder from notAddedBidders to get the bidders that
+						have not been added yet
+					*/
 					for (const addedBidderKey in addedBidders) {
-						if (!notAddedBidders[addedBidderKey]) throw new AdPushupError('Invalid bidders added');
+						if (!allBidders[addedBidderKey]) throw new AdPushupError('Invalid bidders added');
 
 						addedBidders[addedBidderKey].paramsFormFields = {
-							...notAddedBidders[addedBidderKey].params
+							...allBidders[addedBidderKey].params
 						};
-						addedBidders[addedBidderKey].isActive = notAddedBidders[addedBidderKey].isActive;
+
+						for (const key of keysToMergeForAddedBidders) {
+							addedBidders[addedBidderKey][key] = allBidders[addedBidderKey][key];
+						}
 
 						delete notAddedBidders[addedBidderKey];
 					}
