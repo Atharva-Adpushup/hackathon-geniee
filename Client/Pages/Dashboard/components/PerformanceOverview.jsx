@@ -38,6 +38,8 @@ function computeDisplayData(props) {
 		});
 	}
 
+	// correct calculation of AP Page RPM
+	resultData["adpushup_page_cpm"].value = (resultData["network_net_revenue"].value/resultData["adpushup_page_views"].value)*1000
 	return sortBy(resultData, o => o.position);
 }
 
