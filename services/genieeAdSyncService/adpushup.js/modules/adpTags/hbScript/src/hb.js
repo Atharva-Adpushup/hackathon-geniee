@@ -78,6 +78,7 @@ var hb = {
 				}
 			});
 
+			var playerSize = utils.getVideoPlayerSize(prebidSizes);
 			var prebidSlot = {
 				code: adpSlot.containerId,
 				mediaTypes: {},
@@ -87,7 +88,6 @@ var hb = {
 						// push to render queue because jwplayer may not be loaded yet.
 						bid.renderer.push(() => {
 							var jwPlayerInstance = jwplayer(bid.adUnitCode);
-							var playerSize = utils.getVideoPlayerSize(prebidSizes);
 							var bidWonTime = +new Date();
 							jwPlayerInstance
 								.setup(
@@ -161,10 +161,10 @@ var hb = {
 						break;
 					}
 					case 'video': {
-						const { DEFAULT_JW_PLAYER_SIZE } = constants;
+						//const { DEFAULT_JW_PLAYER_SIZE } = constants;
 						prebidSlot.mediaTypes.video = {
 							...mediaTypesConfig.video,
-							playerSize: DEFAULT_JW_PLAYER_SIZE
+							playerSize
 						};
 						break;
 					}
