@@ -798,7 +798,7 @@ class Panel extends Component {
 
 		if(!isForOps) {
 			allAvailableMetrics = allAvailableMetrics.filter((item) => item.value=="unique_impressions").map(item => {
-				item.name = "Unique Impressions"
+				item.name = "Unique Impressions Reporting"
 				item.isDisabled = false;
 				return item;
 			})
