@@ -10,6 +10,15 @@ var constants = require('./constants');
 var { bidderParamsMapping } = require('./multiFormatConfig');
 var isApLiteActive = window.adpushup.config.apLiteActive;
 var utils = {
+	getVastClientType: function(vastXml, adTag) {
+		var googleDomainsRegex = 'doubleclick.net|doubleclick.com|google.com|2mdn.net';
+		var clientType = 'vast';
+
+		if ((vastXml || adTag).match(new RegExp(googleDomainsRegex))) {
+			clientType = 'googima';
+		}
+		return clientType;
+	},
 	randomAlphaNumericString: function(length) {
 		var allChars = 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ',
 			allCharsLength = allChars.length,
