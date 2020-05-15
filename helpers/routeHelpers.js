@@ -556,7 +556,7 @@ function queuePublishingWrapper(siteId, ads) {
 	return commonDataForUnsyncedAmpAds(siteId, ads).then(data => {
 		var options = {
 			method: 'POST',
-			uri: `http://queuePublisher.adpushup.com/publish`,
+			uri: `${config.queuePublishingURL}/publish`,
 			body: {
 				queue: 'adpTagSync',
 				data
@@ -576,7 +576,7 @@ function queuePublishingWrapper(siteId, ads) {
 function storedRequestWrapper(doc) {
 	var options = {
 		method: 'POST',
-		uri: `http://queuePublisher.adpushup.com/publish`,
+		uri: `${config.queuePublishingURL}/publish`,
 		body: {
 			queue: 'storedRequestsSync',
 			doc
