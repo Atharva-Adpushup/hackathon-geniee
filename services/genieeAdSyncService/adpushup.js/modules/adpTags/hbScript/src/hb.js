@@ -162,10 +162,10 @@ var hb = {
 						break;
 					}
 					case 'video': {
-						//const { DEFAULT_JW_PLAYER_SIZE } = constants;
+						const { DEFAULT_JW_PLAYER_SIZE } = constants;
 						prebidSlot.mediaTypes.video = {
 							...mediaTypesConfig.video,
-							playerSize
+							playerSize: DEFAULT_JW_PLAYER_SIZE
 						};
 						break;
 					}
