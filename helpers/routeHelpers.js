@@ -558,7 +558,7 @@ function queuePublishingWrapper(siteId, ads) {
 			method: 'POST',
 			uri: `${config.queuePublishingURL}/publish`,
 			body: {
-				queue: 'adpTagSync',
+				queue: 'AD_TAG_SYNC', // queuePublishingService needs this key, specified in its config, not the actual queue name
 				data
 			},
 			json: true // Automatically stringifies the body to JSON
@@ -578,8 +578,8 @@ function storedRequestWrapper(doc) {
 		method: 'POST',
 		uri: `${config.queuePublishingURL}/publish`,
 		body: {
-			queue: 'storedRequestsSync',
-			doc
+			queue: 'AMP_SR_SYNC',
+			data: doc
 		},
 		json: true // Automatically stringifies the body to JSON
 	};
