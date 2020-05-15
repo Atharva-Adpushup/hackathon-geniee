@@ -584,7 +584,6 @@ function storedRequestWrapper(doc) {
 		json: true // Automatically stringifies the body to JSON
 	};
 	return request(options)
-		.then(() => sendSuccessResponse({ msg: 'stored Request completed' }))
 		.catch(
 			err => console.log(err)
 			// POST failed...
