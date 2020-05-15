@@ -23,14 +23,26 @@ class AddManageNonResponsiveBidder extends React.Component {
 		formError: ''
 	};
 
+	bidderFormFieldsMeta = {
+		fieldsToHide: {},
+		fieldsToDisable: {}
+	};
+
 	componentDidMount() {
 		const { formType } = this.props;
 
 		switch (formType) {
 			case 'add': {
 				const {
-					bidderConfig: { key, name, sizeLess, reusable, isApRelation, params }
+					bidderConfig: { key, name, sizeLess, reusable, isApRelation, params, isS2S }
 				} = this.props;
+
+				// disable the AMP status if not isS2S
+				if (!isS2S) {
+					this.bidderFormFieldsMeta.fieldsToDisable = {
+						isAmpActive: 'bidderConfig.isAmpActive'
+					};
+				}
 
 				const formFields = {
 					bidderConfig: getCommonBidderFields(isApRelation),
@@ -97,16 +109,26 @@ class AddManageNonResponsiveBidder extends React.Component {
 						isPaused,
 						relation,
 						bids,
-						revenueShare
+						revenueShare,
+						isAmpActive,
+						isS2S
 					}
 				} = this.props;
+
+				// disable the AMP status if not isS2S
+				if (!isS2S) {
+					this.bidderFormFieldsMeta.fieldsToDisable = {
+						isAmpActive: 'bidderConfig.isAmpActive'
+					};
+				}
 
 				const formFields = {
 					bidderConfig: getCommonBidderFields(isApRelation, {
 						values: {
 							relation,
 							bids,
-							revenueShare
+							revenueShare,
+							isAmpActive
 						},
 						newFields: { isPaused }
 					}),
@@ -162,6 +184,9 @@ class AddManageNonResponsiveBidder extends React.Component {
 										case 'status':
 											value = isPaused ? 'paused' : 'active';
 											break;
+										case 'isAmpActive':
+											value = isAmpActive;
+											break;
 										default:
 									}
 								}
@@ -204,7 +229,7 @@ class AddManageNonResponsiveBidder extends React.Component {
 			return {
 				sizes: newSizes,
 				params: newParams
-			}
+			};
 		});
 	};
 
@@ -349,6 +374,17 @@ class AddManageNonResponsiveBidder extends React.Component {
 				});
 			}
 
+			if (typeof bidderConfig.isAmpActive !== 'undefined') {
+				/*
+					-	convert the value to boolean before saving to the database
+					-	the value will be converted back to the corresponding value like true -> 'true' and false -> 'false' when received from the database
+					-	this was to be done due to the SelectBox not accepting boolean values
+					
+					NOTE: this is also being done in the AddManageSizelessBidder
+				*/
+				bidderConfig.isAmpActive = bidderConfig.isAmpActive === 'true';
+			}
+
 			// eslint-disable-next-line no-unused-expressions
 			(onBidderAdd && onBidderAdd(bidderConfig, mergedParams)) ||
 				(onBidderUpdate && onBidderUpdate(bidderConfig, mergedParams));
@@ -477,6 +513,7 @@ class AddManageNonResponsiveBidder extends React.Component {
 							setFormFieldValueInState={this.setFormFieldValueInState}
 							getCurrentFieldValue={this.getCurrentFieldValue}
 							errors={errors}
+							meta={this.bidderFormFieldsMeta}
 						/>
 
 						{!!(
@@ -486,22 +523,22 @@ class AddManageNonResponsiveBidder extends React.Component {
 								param => formFields.params.siteLevel[param].visible
 							).length
 						) && (
-								<SizewiseParamsFormFields
-									bidderKey={bidderKey}
-									sizes={sizes}
-									formFields={{ params: formFields.params }}
-									savedParams={params}
-									formType={formType}
-									setFormFieldValueInState={this.setFormFieldValueInState}
-									saveNonSizelessParams={this.saveNonSizelessParams}
-									getCurrentFieldValue={this.getCurrentFieldValue}
-									validationSchema={validationSchema}
-									addNewSizeInState={this.addNewSizeInState}
-									removeSize={this.removeSize}
-									errors={errors}
-									relation={relation}
-								/>
-							)}
+							<SizewiseParamsFormFields
+								bidderKey={bidderKey}
+								sizes={sizes}
+								formFields={{ params: formFields.params }}
+								savedParams={params}
+								formType={formType}
+								setFormFieldValueInState={this.setFormFieldValueInState}
+								saveNonSizelessParams={this.saveNonSizelessParams}
+								getCurrentFieldValue={this.getCurrentFieldValue}
+								validationSchema={validationSchema}
+								addNewSizeInState={this.addNewSizeInState}
+								removeSize={this.removeSize}
+								errors={errors}
+								relation={relation}
+							/>
+						)}
 						<FormGroup>
 							<Col md={12} className="footer-btns">
 								<CustomButton type="submit" variant="primary" className="u-margin-r3">
@@ -529,8 +566,8 @@ AddManageNonResponsiveBidder.propTypes = {
 };
 
 AddManageNonResponsiveBidder.defaultProps = {
-	onBidderAdd: () => { },
-	onBidderUpdate: () => { }
+	onBidderAdd: () => {},
+	onBidderUpdate: () => {}
 };
 
 export default AddManageNonResponsiveBidder;
