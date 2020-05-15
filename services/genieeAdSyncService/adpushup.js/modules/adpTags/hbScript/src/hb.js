@@ -89,6 +89,7 @@ var hb = {
 						bid.renderer.push(() => {
 							var jwPlayerInstance = jwplayer(bid.adUnitCode);
 							var bidWonTime = +new Date();
+							var client = utils.getVastClientType(bid.vastXml, bid.adTag);
 							jwPlayerInstance
 								.setup(
 									merge(
@@ -97,7 +98,7 @@ var hb = {
 											height: playerSize[1],
 											advertising: {
 												outstream: true,
-												client: 'vast',
+												client: client,
 												adscheduleid: utils.randomAlphaNumericString(8),
 												vastxml: bid.vastXml
 											}
@@ -161,10 +162,10 @@ var hb = {
 						break;
 					}
 					case 'video': {
-						//const { DEFAULT_JW_PLAYER_SIZE } = constants;
+						const { DEFAULT_JW_PLAYER_SIZE } = constants;
 						prebidSlot.mediaTypes.video = {
 							...mediaTypesConfig.video,
-							playerSize
+							playerSize: DEFAULT_JW_PLAYER_SIZE
 						};
 						break;
 					}
