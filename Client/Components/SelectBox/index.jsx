@@ -2,7 +2,13 @@
 /* eslint-disable prefer-destructuring */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { DropdownButton, MenuItem, Glyphicon, OverlayTrigger, Tooltip } from '@/Client/helpers/react-bootstrap-imports';
+import {
+	DropdownButton,
+	MenuItem,
+	Glyphicon,
+	OverlayTrigger,
+	Tooltip
+} from '@/Client/helpers/react-bootstrap-imports';
 
 const findSelected = props => {
 	const { selected, title, options } = props;
@@ -73,7 +79,8 @@ class SelectBox extends Component {
 			type,
 			dataKey,
 			reset,
-			pullRight
+			pullRight,
+			disabled = false
 		} = this.props;
 		const selectedTitle = reset ? (
 			<div
@@ -105,6 +112,7 @@ class SelectBox extends Component {
 					className={`custom-select-box ${dropdownClassName}`}
 					id={id}
 					onSelect={this.selectWrapper}
+					disabled={disabled}
 				>
 					{options.map((option, key) => {
 						if (option.isDisabled) {

@@ -23,13 +23,25 @@ class AddManageSizelessBidder extends React.Component {
 		}
 	};
 
+	bidderFormFieldsMeta = {
+		fieldsToHide: {},
+		fieldsToDisable: {}
+	};
+
 	componentDidMount() {
 		const { formType } = this.props;
 		switch (formType) {
 			case 'add': {
 				const {
-					bidderConfig: { key, name, sizeLess, reusable, isApRelation, params }
+					bidderConfig: { key, name, sizeLess, reusable, isApRelation, params, isAmpActive, isS2S }
 				} = this.props;
+
+				// disable the AMP status if not isS2S
+				if (!isS2S) {
+					this.bidderFormFieldsMeta.fieldsToDisable = {
+						isAmpActive: 'bidderConfig.isAmpActive'
+					};
+				}
 
 				const formFields = {
 					bidderConfig: getCommonBidderFields(isApRelation),
@@ -68,7 +80,14 @@ class AddManageSizelessBidder extends React.Component {
 								(formFieldsParams[paramKey].dataType === 'number' ? null : '');
 						}
 
-						newState.bidderConfig = { key, name, sizeLess, reusable, ...newState.bidderConfig };
+						newState.bidderConfig = {
+							key,
+							name,
+							sizeLess,
+							reusable,
+							isAmpActive,
+							...newState.bidderConfig
+						};
 						newState.validationSchema = getValidationSchema({
 							...formFields.bidderConfig,
 							...formFields.params.global,
@@ -96,10 +115,18 @@ class AddManageSizelessBidder extends React.Component {
 						isPaused,
 						relation,
 						bids,
-						revenueShare
+						revenueShare,
+						isAmpActive,
+						isS2S
 					}
 				} = this.props;
 
+				// disable the AMP status if not isS2S
+				if (!isS2S) {
+					this.bidderFormFieldsMeta.fieldsToDisable = {
+						isAmpActive: 'bidderConfig.isAmpActive'
+					};
+				}
 				const formFields = {
 					bidderConfig: getCommonBidderFields(isApRelation, {
 						values: {
@@ -136,6 +163,10 @@ class AddManageSizelessBidder extends React.Component {
 								case 'status':
 									value = isPaused ? 'paused' : 'active';
 									break;
+								case 'isAmpActive':
+									value = isAmpActive;
+
+									break;
 								default:
 							}
 
@@ -153,6 +184,7 @@ class AddManageSizelessBidder extends React.Component {
 							reusable,
 							relation,
 							bids,
+							isAmpActive,
 							revenueShare,
 							...newState.bidderConfig
 						};
@@ -188,6 +220,18 @@ class AddManageSizelessBidder extends React.Component {
 
 		if (validationResult.isValid) {
 			this.setState({ errors: {} });
+
+			if (typeof bidderConfig.isAmpActive !== 'undefined') {
+				/*
+					-	convert the value to boolean before saving to the database
+					-	the value will be converted back to the corresponding value like
+					true -> 'true' and false -> 'false' when received from the database
+					-	this was to be done due to the SelectBox not accepting boolean values
+					
+					NOTE: this is also being done in the AddManageNonResponsiveBidder
+				*/
+				bidderConfig.isAmpActive = bidderConfig.isAmpActive === 'true';
+			}
 
 			// eslint-disable-next-line no-unused-expressions
 			(onBidderAdd && onBidderAdd(bidderConfig, params)) ||
@@ -301,6 +345,7 @@ class AddManageSizelessBidder extends React.Component {
 							setFormFieldValueInState={this.setFormFieldValueInState}
 							getCurrentFieldValue={this.getCurrentFieldValue}
 							errors={errors}
+							meta={this.bidderFormFieldsMeta}
 						/>
 						<FormGroup>
 							<Col md={12} className="u-margin-t4">

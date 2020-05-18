@@ -52,6 +52,5 @@
 		"FileReader": true,
 		"Blob": true,
 		"navigator": true,
-		"confirm": true
 	}
 }
