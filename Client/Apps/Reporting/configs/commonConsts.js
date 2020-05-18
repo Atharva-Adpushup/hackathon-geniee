@@ -121,8 +121,8 @@ const accountDisableFilter = [
 	TERMS.PAGEGROUP,
 	TERMS.SECTION
 ];
-const opsFilter = ['mode', 'error_code', 'country'];
-const opsDimension = ['mode', 'error_code', 'country'];
+const opsFilter = ['mode', 'error_code'];
+const opsDimension = ['mode', 'error_code'];
 const accountDimension = ['siteid', 'device_type', 'network'];
 const accountDisableDimension = [
 	TERMS.PAGE_VARIATION_TYPE,

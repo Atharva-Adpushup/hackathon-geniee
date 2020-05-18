@@ -54,6 +54,7 @@ class Dashboard extends React.Component {
 
 		userSites = getDashboardDemoUserSiteIds(userSites, email);
 
+		// show payment profile incomplete notification
 		if (!isPaymentDetailsComplete && !window.location.pathname.includes('payment')) {
 			showNotification({
 				mode: 'error',
@@ -149,6 +150,14 @@ class Dashboard extends React.Component {
 					widget.selectedDimension = 'siteid';
 				}
 
+				if (widget.name == 'ops_country_report') {
+					widget.selectedDimension = 'ops_country_report';
+					widget.chartLegend = 'Country';
+					widget.chartSeriesLabel = 'country';
+					widget.chartSeriesMetric = 'adpushup_page_views';
+					widget.chartSeriesMetricType = 'number';
+				}
+
 				widgetsConfig.push(widget);
 			}
 		});
@@ -183,6 +192,10 @@ class Dashboard extends React.Component {
 				return '';
 			case 'rev_by_network':
 				return <RevenueContainer displayData={widget} />;
+
+			case 'ops_country_report':
+				return <RevenueContainer displayData={widget} reportType="site" />;
+
 			default:
 		}
 	};
@@ -543,3 +556,10 @@ class Dashboard extends React.Component {
 }
 
 export default Dashboard;
+
+/*
+	Steps I followed to add the Country Widget on Dashboard
+	-	Add the widget specific key to DashboardContainer's prop widgetsList in Client\Pages\Dashboard\index.js
+	-	Add the config for the widget in the getWidgetConfig() here
+	-	Add the component to be rendered for the widget in getWidgetComponent here
+*/

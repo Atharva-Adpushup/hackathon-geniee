@@ -98,7 +98,8 @@ const dashboardWidgets = [
 	'estimated_earnings',
 	'rev_by_network',
 	'per_overview',
-	'per_ap_original'
+	'per_ap_original',
+	'ops_country_report'
 ];
 
 const ALL_SITES_VALUE = { name: 'All', value: 'all' };
