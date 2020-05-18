@@ -16,6 +16,19 @@ var w = null,
 			platform: adp.config.platform,
 			packetId: adp.config.packetId
 		};
+	},
+	calculateBidCpmForFeedback = function(bid) {
+		var bidderConfig = config.PREBID_CONFIG.hbcf[bid.bidder || bid.bidderCode];
+
+		if (utils.currencyConversionActive(config.PREBID_CONFIG.currencyConfig)) {
+			var revShare = bidderConfig.bids == 'gross' && bidderConfig.revenueShare;
+			if (revShare) {
+				return bid.originalCpm - bid.originalCpm * (revShare / 100);
+			}
+			return bid.originalCpm;
+		}
+
+		return bid.cpm;
 	};
 
 var helpers = {
@@ -57,13 +70,12 @@ var helpers = {
 
 			if (slot) {
 				var adUnitAuctionData = adUnits[adUnitCode][auctionId];
-				var cpmType = utils.currencyConversionActive(config.PREBID_CONFIG.currencyConfig)
-					? 'originalCpm'
-					: 'cpm';
+
+				var cpm = calculateBidCpmForFeedback(bid);
 
 				var bidData = {
 					bidder: bid['bidder'],
-					revenue: bid[cpmType] / 1000,
+					revenue: cpm / 1000,
 					formatType: mediaType,
 					timeOfBidReceived: bid['responseTimestamp']
 				};
@@ -256,13 +268,11 @@ var collectBidWonData = function(bidWonData) {
 	var slot = isApLiteActive
 		? w.apLite.adpSlots[bidWonData.adUnitCode]
 		: w.adpushup.adpTags.adpSlots[bidWonData.adUnitCode];
-	var computedCPMValue = utils.currencyConversionActive(config.PREBID_CONFIG.currencyConfig)
-		? 'originalCpm'
-		: 'cpm';
+	var cpm = calculateBidCpmForFeedback(bidWonData);
 
 	if (slot) {
 		slot.feedback.winner = bidWonData.bidder;
-		slot.feedback.winningRevenue = bidWonData[computedCPMValue] / 1000;
+		slot.feedback.winningRevenue = cpm / 1000;
 		slot.feedback.winnerAdUnitId = bidWonData.adId;
 		slot.feedback.unitFormat = bidWonData.mediaType;
 
