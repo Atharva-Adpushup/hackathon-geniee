@@ -520,8 +520,7 @@ function commonDataForUnsyncedAmpAds(siteId, allAmpAds) {
 					ampAdsCommonData.currentDFP = {
 						activeDFPNetwork,
 						activeDFPParentId,
-						isThirdPartyDFP: false
-						// isThirdPartyDFP: !!(activeDFPNetwork != config.ADPUSHUP_GAM.ACTIVE_DFP_NETWORK)
+						isThirdPartyDFP: !!(activeDFPNetwork != config.ADPUSHUP_GAM.ACTIVE_DFP_NETWORK)
 					};
 				}
 
