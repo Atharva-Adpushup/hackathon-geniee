@@ -46,7 +46,9 @@ class AdCodeGenerator extends Component {
 			type,
 			platform: 'mobile',
 			size: '',
-			progress: 50
+			progress: 50,
+			isRefreshEnabled: true,
+			isMultiSize: false
 		});
 	}
 
@@ -54,7 +56,9 @@ class AdCodeGenerator extends Component {
 		const { progress } = this.state;
 		this.setState({
 			size,
-			progress: progress > 75 ? progress : 75
+			progress: progress > 75 ? progress : 75,
+			isRefreshEnabled: true,
+			isMultiSize: false
 		});
 	}
 
