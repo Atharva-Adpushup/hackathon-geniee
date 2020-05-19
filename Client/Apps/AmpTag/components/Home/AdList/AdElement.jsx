@@ -103,7 +103,10 @@ class AdElement extends Component {
 		const size = `${width}x${height}`;
 		const downwardCompatibleSizes = computeDownWardCompatibleSizes(availableSizes, size);
 
-		if (isMultiSize) dynamicAttribsArr.push(`data-multi-size="${downwardCompatibleSizes}"`);
+		if (isMultiSize) {
+			dynamicAttribsArr.push(`data-multi-size="${downwardCompatibleSizes}"`);
+			dynamicAttribsArr.push('data-multi-size-validation=false');
+		}
 
 		const dynamicAttribsStr = dynamicAttribsArr.length ? ` ${dynamicAttribsArr.join(' ')} ` : ' ';
 		const multiSizeQueryParam = isMultiSize ? `&ms=${downwardCompatibleSizes}` : '';
