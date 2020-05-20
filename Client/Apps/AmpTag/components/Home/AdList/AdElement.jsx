@@ -5,7 +5,12 @@ import React, { Component } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Col, OverlayTrigger, Tooltip, Button } from '@/Client/helpers/react-bootstrap-imports';
 import CopyButtonWrapperContainer from '../../../../../Containers/CopyButtonWrapperContainer';
-import { DISPLAYADCODE, STICKYADCODE, SIZES } from '../../../configs/commonConsts';
+import {
+	DISPLAYADCODE,
+	STICKYADCODE,
+	SIZES,
+	AMP_FIXED_TARGETING
+} from '../../../configs/commonConsts';
 import CustomButton from '../../../../../Components/CustomButton/index';
 import MultiSizeSettings from './MultiSizeSettings';
 import RefreshSettings from './RefreshSettings';
@@ -86,12 +91,25 @@ class AdElement extends Component {
 		} = ad;
 		const { editName, isActive, showMultiSize, showRefresh } = this.state;
 
-		const refresh = isRefreshEnabled ? `data-enable-refresh="${refreshInterval}"` : '';
+		const dynamicAttribsArr = [];
+		const ampFixedTargeting = { ...AMP_FIXED_TARGETING };
+
+		if (isRefreshEnabled) {
+			dynamicAttribsArr.push(`data-enable-refresh="${refreshInterval}"`);
+			ampFixedTargeting.refreshrate = '30';
+		}
+		const ampFixedTargetingJson = JSON.stringify(ampFixedTargeting);
 		const availableSizes = SIZES[type.toUpperCase()].MOBILE;
 		const size = `${width}x${height}`;
 		const downwardCompatibleSizes = computeDownWardCompatibleSizes(availableSizes, size);
 
-		const multiSize = isMultiSize ? `data-multi-size='${downwardCompatibleSizes}'` : '';
+		if (isMultiSize) {
+			dynamicAttribsArr.push(`data-multi-size="${downwardCompatibleSizes}"`);
+			dynamicAttribsArr.push('data-multi-size-validation=false');
+		}
+
+		const dynamicAttribsStr = dynamicAttribsArr.length ? ` ${dynamicAttribsArr.join(' ')} ` : ' ';
+		const multiSizeQueryParam = isMultiSize ? `&ms=${downwardCompatibleSizes}` : '';
 		const ADCODE = type === 'display' ? DISPLAYADCODE : STICKYADCODE;
 		let code = ADCODE;
 
@@ -100,10 +118,11 @@ class AdElement extends Component {
 					.replace(/__AD_ID__/g, id)
 					.replace(/__WIDTH__/, width)
 					.replace(/__HEIGHT__/, height)
-					.replace(/__REFRESH_INTERVAL__/, refresh)
-					.replace(/__MULTI_SIZE__/, multiSize)
+					.replace(/__DYNAMIC_ATTRIBS__/, dynamicAttribsStr)
+					.replace(/__MULTI_SIZE_QUERY_PARAM__/, multiSizeQueryParam)
 					.replace(/__NETWORK_CODE__/, networkCode)
 					.replace(/__AD_UNIT_CODE__/, dfpAdunitCode)
+					.replace(/__AMP_FIXED_TARGETING__/, ampFixedTargetingJson)
 			: null;
 
 		if (showMultiSize) {
@@ -178,7 +197,7 @@ class AdElement extends Component {
 				<pre style={{ wordBreak: 'break-word' }}>
 					{dfpAdunitCode && completedOn
 						? code
-						: 'DFP Sync service is ruuning. Code will be available here once it is completed.'}
+						: 'DFP Sync service is running. Code will be available here once it is completed.'}
 				</pre>{' '}
 				{user.isSuperUser ? (
 					<React.Fragment>

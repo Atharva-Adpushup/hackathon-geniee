@@ -1,3 +1,5 @@
+import { prebidServer as prebidServerConfig } from '../../../../configs/config';
+
 const AMP_NAV_ITEMS_INDEXES = {
 	CREATE_ADS: 'create-ads',
 	MANAGE_ADS: 'manage-ads'
@@ -40,7 +42,21 @@ const SIZES = {
 	DISPLAY: {
 		ALLOWED: ['mobile'],
 
-		MOBILE: ['320x50', '300x250', '250x250', '200x200', '320x100', '336x280']
+		MOBILE: [
+			'120x600',
+			'160x600',
+			'200x200',
+			'240x400',
+			'250x250',
+			'300x50',
+			'300x100',
+			'300x250',
+			'300x600',
+			'320x50',
+			'320x100',
+			'320x480',
+			'336x280'
+		]
 	},
 
 	STICKY: {
@@ -50,19 +66,29 @@ const SIZES = {
 	}
 };
 
-const DISPLAYADCODE = `<amp-ad width="__WIDTH__" height="__HEIGHT__" type="doubleclick" __REFRESH_INTERVAL__ __MULTI_SIZE__ data-slot="/__NETWORK_CODE__/__AD_UNIT_CODE__" rtc-config='{
+const PREBID_SERVER_ENDPOINT = `${
+	prebidServerConfig.host
+}openrtb2/amp?tag_id=__AD_ID____MULTI_SIZE_QUERY_PARAM__`;
+
+const AMP_FIXED_TARGETING = {
+	adpushup_ran: '1',
+	fluid: '1',
+	da: 'adx'
+};
+
+const DISPLAYADCODE = `<amp-ad width="__WIDTH__" height="__HEIGHT__" type="doubleclick"__DYNAMIC_ATTRIBS__data-slot="/__NETWORK_CODE__/__AD_UNIT_CODE__" rtc-config='{
 	"urls": [
-	  "https://localhost:8089/openrtb2/amp?tag_id=__AD_ID__"
+	  ${PREBID_SERVER_ENDPOINT}
 	]
-}' json='{"targeting":{"amp_test":["1"]}}'>
+}' json='{"targeting":__AMP_FIXED_TARGETING__}'>
 </amp-ad>`;
 
 const STICKYADCODE = `<amp-sticky-ad layout="nodisplay">
-<amp-ad width="__WIDTH__" height="__HEIGHT__" type="doubleclick" __REFRESH_INTERVAL__ __MULTI_SIZE__ data-slot="/__NETWORK_CODE__/__AD_UNIT_CODE__" rtc-config='{
+<amp-ad width="__WIDTH__" height="__HEIGHT__" type="doubleclick"__DYNAMIC_ATTRIBS__data-slot="/__NETWORK_CODE__/__AD_UNIT_CODE__" rtc-config='{
 	"urls": [
-	  "https://localhost:8089/openrtb2/amp?tag_id=__AD_ID__"
+	  ${PREBID_SERVER_ENDPOINT}
 	]
-}' json='{"targeting":{"amp_test":["1"]}}'>
+}' json='{"targeting":__AMP_FIXED_TARGETING__}'>
 </amp-ad>
 </amp-sticky-ad>`;
 
@@ -86,6 +112,7 @@ export {
 	CUSTOM_FIELD_DEFAULT_VALUE,
 	DISPLAYADCODE,
 	STICKYADCODE,
+	AMP_FIXED_TARGETING,
 	DEFAULT_ADS_RESPONSE,
 	DEFAULT_GLOBAL_RESPONSE,
 	AD_MESSAGE

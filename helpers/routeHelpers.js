@@ -520,8 +520,7 @@ function commonDataForUnsyncedAmpAds(siteId, allAmpAds) {
 					ampAdsCommonData.currentDFP = {
 						activeDFPNetwork,
 						activeDFPParentId,
-						isThirdPartyDFP: false
-						// isThirdPartyDFP: !!(activeDFPNetwork != config.ADPUSHUP_GAM.ACTIVE_DFP_NETWORK)
+						isThirdPartyDFP: !!(activeDFPNetwork != config.ADPUSHUP_GAM.ACTIVE_DFP_NETWORK)
 					};
 				}
 
@@ -554,6 +553,9 @@ function commonDataForUnsyncedAmpAds(siteId, allAmpAds) {
 
 function queuePublishingWrapper(siteId, ads) {
 	return commonDataForUnsyncedAmpAds(siteId, ads).then(data => {
+		// If no unsynced ad then skip dfp syncing
+		if (!(data && Array.isArray(data.ads) && data.ads.length)) return Promise.resolve(ads);
+
 		var options = {
 			method: 'POST',
 			uri: `${config.queuePublishingURL}/publish`,
@@ -583,11 +585,10 @@ function storedRequestWrapper(doc) {
 		},
 		json: true // Automatically stringifies the body to JSON
 	};
-	return request(options)
-		.catch(
-			err => console.log(err)
-			// POST failed...
-		);
+	return request(options).catch(
+		err => console.log(err)
+		// POST failed...
+	);
 }
 
 module.exports = {
