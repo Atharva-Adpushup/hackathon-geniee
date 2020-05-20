@@ -26,9 +26,9 @@ var hb = {
 			this.createPrebidSlots(adpBatch);
 			this.createUAMslots(adpBatch);
 		} else {
-			adpSlots.forEach(function(adpSlot) {
+			/*adpSlots.forEach(function(adpSlot) {
 				adpSlot.biddingComplete = true;
-			});
+			});*/
 			adpBatch.auctionStatus.amazonUam = 'done';
 			adpBatch.auctionStatus.prebid = 'done';
 			auction.end(adpBatchId);
@@ -41,7 +41,7 @@ var hb = {
 
 		adpSlotsBatch.forEach(function(adpSlot) {
 			if (!utils.isPrebidHbEnabled(adpSlot)) {
-				adpSlot.biddingComplete = true;
+				//adpSlot.biddingComplete = true;
 				return;
 			}
 

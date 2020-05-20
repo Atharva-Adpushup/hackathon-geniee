@@ -45,7 +45,7 @@ var adpTags = {
 			utils.addBatchIdToAdpSlots(adpSlots, batchId);
 
 			// Initiate prebidding for current adpSlots batch
-			this.prebidBatching(adpSlots);
+			this.prebidBatching(utils.getCurrentAdpSlotBatch(this.adpBatches, batchId).adpSlots);
 
 			// Reset the adpSlots batch
 			this.currentBatchId = null;
@@ -53,7 +53,7 @@ var adpTags = {
 			this.slotInterval = null;
 		},
 		resetSlotFeedback: function(slot) {
-			slot.hasRendered = false;
+			//slot.hasRendered = false;
 			slot.biddingComplete = false;
 			slot.feedbackSent = false;
 			slot.auctionFeedbackSent = false;
@@ -163,7 +163,7 @@ var adpTags = {
 			adpSlot.computedSizes =
 				computedSizes && computedSizes.length
 					? computedSizes.concat([]).reverse()
-					: adpSlot.size;
+					: [adpSlot.size];
 
 			gpt.defineSlot(window.googletag, adpSlot);
 		},
@@ -204,7 +204,8 @@ var adpTags = {
 					this.computeSizesAndDefineSlot(slot);
 					this.queSlotForBidding(slot);
 				}
-				gpt.renderSlot(window.googletag, slot);
+				slot.hasRendered = true;
+				gpt.renderSlots(window.googletag, [slot]);
 			}
 		}
 	},

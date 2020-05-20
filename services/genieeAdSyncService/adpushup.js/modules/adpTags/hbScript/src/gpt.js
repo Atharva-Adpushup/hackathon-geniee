@@ -1,6 +1,7 @@
 // GPT interfacing module
 
 var $ = require('../../../../libs/jquery');
+var targeting = require('./targeting');
 var constants = require('./constants');
 var responsiveAds = require('./responsiveAds');
 var adpConfig = window.adpushup.config;
@@ -14,24 +15,28 @@ var gpt = {
 			return googletag.pubads().refresh(gSlots);
 		}
 	},
-	renderSlot: function(googletag, adpSlot) {
+	renderSlots: function(googletag, adpSlots) {
 		//if (!adpSlot.containerPresent || !adpSlot.biddingComplete || adpSlot.hasRendered) {
-		if (
-			!getDfpContainerFromDom(adpSlot.containerId) ||
-			!adpSlot.biddingComplete ||
-			adpSlot.hasRendered
-		) {
-			return;
-		}
-		adpSlot.hasRendered = true;
+		var gSlots = adpSlots
+			.filter(
+				adpSlot =>
+					getDfpContainerFromDom(adpSlot.containerId) &&
+					adpSlot.biddingComplete &&
+					adpSlot.hasRendered
+			)
+			.map(adpSlot => {
+				//adpSlot.hasRendered = true;
+				targeting.setSlotLevel(adpSlot);
+				return adpSlot.gSlot;
+			});
 
 		var refreshGPTSlots = this.refreshGPTSlots.bind(this);
 
 		googletag.cmd.push(function() {
-			googletag.display(adpSlot.containerId);
-			if (googletag.pubads().isInitialLoadDisabled() || adpSlot.toBeRefreshed) {
-				refreshGPTSlots(googletag, [adpSlot.gSlot]);
-			}
+			//googletag.display(adpSlot.containerId);
+			//if (googletag.pubads().isInitialLoadDisabled() || adpSlot.toBeRefreshed) {
+			refreshGPTSlots(googletag, gSlots);
+			//}
 		});
 	},
 	renderApLiteSlots: function(googletag, adpSlots) {
@@ -43,7 +48,11 @@ var gpt = {
 						adpSlot.biddingComplete &&
 						!adpSlot.hasRendered
 				)
-				.map(adpSlot => ((adpSlot.hasRendered = true), adpSlot.gSlot));
+				.map(adpSlot => {
+					adpSlot.hasRendered = true;
+					targeting.setSlotLevel(adpSlot);
+					return adpSlot.gSlot;
+				});
 
 			this.refreshGPTSlots(googletag, gSlots);
 		}
@@ -83,6 +92,7 @@ var gpt = {
 
 			if (!adpSlot.toBeRefreshed) {
 				adpSlot.gSlot.addService(googletag.pubads());
+				googletag.display(adpSlot.containerId);
 			}
 		});
 		//return gSlot;
@@ -144,8 +154,16 @@ var gpt = {
 		return this.setSlotRenderListener(w);
 	},
 	init: function(w, d) {
-		w.googletag = w.googletag || {};
+		var googletag = (w.googletag = w.googletag || {});
 		googletag.cmd = googletag.cmd || [];
+
+		if (!adpConfig.apLiteActive) {
+			googletag.cmd.push(function() {
+				googletag.pubads().enableSingleRequest();
+				googletag.pubads().disableInitialLoad();
+				googletag.enableServices();
+			});
+		}
 
 		return this.loadGpt(w, d);
 	}
