@@ -6,20 +6,16 @@ var adpConfig = window.adpushup.config;
 var gpt = require('./gpt');
 var render = {
 	renderGPTSlots: function(googletag, adpSlots) {
-		if (!adpConfig.apLiteActive) {
-			googletag.pubads().enableSingleRequest();
-			googletag.enableServices();
-		}
 		adpSlots.forEach(function(adpSlot) {
 			adpSlot.biddingComplete = true;
-			targeting.setSlotLevel(adpSlot);
 		});
 
-		adpSlots.forEach(function(adpSlot) {
-			!adpConfig.apLiteActive && gpt.renderSlot(googletag, adpSlot);
-		});
-
-		adpConfig.apLiteActive && gpt.renderApLiteSlots(googletag, adpSlots);
+		if (!adpConfig.apLiteActive) {
+			gpt.renderSlots(googletag, adpSlots);
+		} else {
+			gpt.renderApLiteSlots(googletag, adpSlots);
+		}
+		//adpConfig.apLiteActive && gpt.renderApLiteSlots(googletag, adpSlots);
 	},
 	createGPTSlots: function(googletag, adpSlots) {
 		adpSlots.forEach(function(adpSlot) {
