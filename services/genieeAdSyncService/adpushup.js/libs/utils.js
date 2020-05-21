@@ -424,12 +424,18 @@ module.exports = {
 	isUrlMatching: function(siteDomain) {
 		var url = siteDomain || window.adpushup.config.siteDomain,
 			href = '';
-		try {
-			href = window.top.location.toString();
-		} catch (err) {
-			href = this.getTopWindowHref();
-		}
 		url = this.domanize(url);
+
+		if (window.location.href.indexOf(url) !== -1) {
+			return true;
+		}
+		if (window !== window.top) {
+			try {
+				href = window.top.location.toString();
+			} catch (err) {
+				href = this.getTopWindowHref();
+			}
+		}
 		return href.indexOf(url) !== -1 ? true : false;
 	},
 	getObjectByName: function(collection, name) {
