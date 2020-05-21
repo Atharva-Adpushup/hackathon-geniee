@@ -422,10 +422,13 @@ module.exports = {
 		}
 	},
 	isUrlMatching: function(siteDomain) {
-		if (window.location.href) return true;
 		var url = siteDomain || window.adpushup.config.siteDomain,
 			href = '';
+		url = this.domanize(url);
 
+		if (window.location.href.indexOf(url) !== -1) {
+			return true;
+		}
 		if (window !== window.top) {
 			try {
 				href = window.top.location.toString();
@@ -433,8 +436,6 @@ module.exports = {
 				href = this.getTopWindowHref();
 			}
 		}
-
-		url = this.domanize(url);
 		return href.indexOf(url) !== -1 ? true : false;
 	},
 	getObjectByName: function(collection, name) {
