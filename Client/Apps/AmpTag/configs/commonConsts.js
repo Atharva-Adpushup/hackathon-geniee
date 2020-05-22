@@ -68,7 +68,7 @@ const SIZES = {
 
 const PREBID_SERVER_ENDPOINT = `${
 	prebidServerConfig.host
-}openrtb2/amp?tag_id=__AD_ID____MULTI_SIZE_QUERY_PARAM__`;
+}/prebidserver/openrtb2/amp?tag_id=__AD_ID____MULTI_SIZE_QUERY_PARAM__`;
 
 const AMP_FIXED_TARGETING = {
 	adpushup_ran: '1',
@@ -78,7 +78,7 @@ const AMP_FIXED_TARGETING = {
 
 const DISPLAYADCODE = `<amp-ad width="__WIDTH__" height="__HEIGHT__" type="doubleclick"__DYNAMIC_ATTRIBS__data-slot="/__NETWORK_CODE__/__AD_UNIT_CODE__" rtc-config='{
 	"urls": [
-	  ${PREBID_SERVER_ENDPOINT}
+	  "${PREBID_SERVER_ENDPOINT}"
 	]
 }' json='{"targeting":__AMP_FIXED_TARGETING__}'>
 </amp-ad>`;
@@ -86,7 +86,7 @@ const DISPLAYADCODE = `<amp-ad width="__WIDTH__" height="__HEIGHT__" type="doubl
 const STICKYADCODE = `<amp-sticky-ad layout="nodisplay">
 <amp-ad width="__WIDTH__" height="__HEIGHT__" type="doubleclick"__DYNAMIC_ATTRIBS__data-slot="/__NETWORK_CODE__/__AD_UNIT_CODE__" rtc-config='{
 	"urls": [
-	  ${PREBID_SERVER_ENDPOINT}
+	  "${PREBID_SERVER_ENDPOINT}"
 	]
 }' json='{"targeting":__AMP_FIXED_TARGETING__}'>
 </amp-ad>
