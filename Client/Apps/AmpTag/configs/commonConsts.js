@@ -68,7 +68,7 @@ const SIZES = {
 
 const PREBID_SERVER_ENDPOINT = `${
 	prebidServerConfig.host
-}/prebidserver/openrtb2/amp?tag_id=__AD_ID____MULTI_SIZE_QUERY_PARAM__`;
+}prebidserver/openrtb2/amp?tag_id=__AD_ID____MULTI_SIZE_QUERY_PARAM__`;
 
 const AMP_FIXED_TARGETING = {
 	adpushup_ran: '1',
