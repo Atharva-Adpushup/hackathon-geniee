@@ -124,18 +124,18 @@ const APPS = [
 			text: 'Status: __STATUS__'
 		}
 	},
-	{
-		name: 'AMP',
-		key: 6,
-		link: 3,
-		image: '/assets/images/manageSites/amp.png',
-		description:
-			'We provide custom implementation of Google’s Accelerated Mobile Pages (AMP) for web publishers. Our focus is on decreasing page load times, maintaining the uniformity of design, and increasing ad yield.',
-		full: {
-			type: TYPE.TEXT,
-			text: 'Status: __STATUS__'
-		}
-	},
+	// {
+	// 	name: 'AMP',
+	// 	key: 6,
+	// 	link: 3,
+	// 	image: '/assets/images/manageSites/amp.png',
+	// 	description:
+	// 		'We provide custom implementation of Google’s Accelerated Mobile Pages (AMP) for web publishers. Our focus is on decreasing page load times, maintaining the uniformity of design, and increasing ad yield.',
+	// 	full: {
+	// 		type: TYPE.TEXT,
+	// 		text: 'Status: __STATUS__'
+	// 	}
+	// },
 	{
 		name: 'Header Bidding',
 		key: 3,
@@ -156,7 +156,7 @@ const APPS = [
 		}
 	},
 	{
-		name: 'AMP Settings',
+		name: 'AMP',
 		key: 3,
 		link: 3,
 		image: '/assets/images/manageSites/amp.png',
