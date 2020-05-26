@@ -11,8 +11,6 @@ const FormValidator = require('../helpers/FormValidator');
 const schema = require('../helpers/schema');
 const commonConsts = require('../configs/commonConsts');
 const adpushup = require('../helpers/adpushupEvent');
-const { sendSuccessResponse, sendErrorResponse } = require('../helpers/commonFunctions');
-const { errorHandler } = require('../helpers/routeHelpers');
 
 const router = express.Router();
 
@@ -250,6 +248,38 @@ router
 
 					return res.status(httpStatus.OK).json({ bidderKey: key, bidderConfig });
 				})
+				.catch(err => {
+					// eslint-disable-next-line no-console
+					console.log(err);
+					if (err instanceof AdPushupError && Array.isArray(err.message)) {
+						return res.status(httpStatus.BAD_REQUEST).json({ error: err.message });
+					}
+
+					return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: err.message });
+				})
+		);
+	})
+	.delete('/bidder/:siteId', (req, res) => {
+		const { siteId } = req.params;
+		const { email } = req.user;
+		const { bidderKey } = req.body || {};
+
+		if (!bidderKey) {
+			return res.status(httpStatus.BAD_REQUEST).json({ error: 'Bidder key required' });
+		}
+
+		if (!siteId) {
+			return res.status(httpStatus.BAD_REQUEST).json({ error: 'Site ID required' });
+		}
+
+		return (
+			userModel
+				.verifySiteOwner(email, siteId)
+				.then(() => headerBiddingModel.getHbConfig(siteId))
+				// hbConfig found
+				.then(hbConfig => hbConfig.deleteBidder(bidderKey))
+				.then(hbConfig => hbConfig.save())
+				.then(() => res.json({ message: 'Bidder successfully deleted' }))
 				.catch(err => {
 					// eslint-disable-next-line no-console
 					console.log(err);

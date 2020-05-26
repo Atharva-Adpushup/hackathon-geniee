@@ -42,7 +42,11 @@ const HeaderBidding = model.extend(function() {
 		required: []
 	};
 	this.classMap = {};
-	this.defaults = { hbcf: {}, deviceConfig: { sizeConfig: [] }, countryConfig: [] };
+	this.defaults = {
+		hbcf: {},
+		deviceConfig: { sizeConfig: [] },
+		countryConfig: []
+	};
 	this.constructor = function(data, cas) {
 		if (!(data.siteId && data.siteDomain && data.email)) {
 			throw new Error('siteId, siteDomain and publisher email required for header bidding doc');
@@ -57,6 +61,14 @@ const HeaderBidding = model.extend(function() {
 	this.saveBidderConfig = function(bidderKey, bidderConfig) {
 		const hbcf = this.get('hbcf');
 		hbcf[bidderKey] = bidderConfig;
+		return Promise.resolve(this);
+	};
+	this.deleteBidder = function(bidderKey) {
+		const hbcf = this.get('hbcf');
+		if (!hbcf[bidderKey]) {
+			return Promise.reject(`Bidder ${bidderKey} doesn't exist in the site configuration`);
+		}
+		delete hbcf[bidderKey];
 		return Promise.resolve(this);
 	};
 });
@@ -76,8 +88,14 @@ function apiModule() {
 					const hbBidders = {};
 
 					for (const key in networks) {
-						if (key !== 'adpTags' && networks[key] && networks[key].isHb && networks[key].reusable)
+						if (
+							key !== 'adpTags' &&
+							networks[key] &&
+							networks[key].isHb &&
+							networks[key].reusable
+						) {
 							hbBidders[key] = networks[key];
+						}
 					}
 
 					return hbBidders;
@@ -112,7 +130,9 @@ function apiModule() {
 						have not been added yet
 					*/
 					for (const addedBidderKey in addedBidders) {
-						if (!allBidders[addedBidderKey]) throw new AdPushupError('Invalid bidders added');
+						if (!allBidders[addedBidderKey]) {
+							throw new AdPushupError('Invalid bidders added');
+						}
 
 						addedBidders[addedBidderKey].paramsFormFields = {
 							...allBidders[addedBidderKey].params
@@ -398,7 +418,10 @@ function apiModule() {
 			return couchbase
 				.connectToAppBucket()
 				.then(appBucket =>
-					appBucket.getAsync(`tgmr::${siteId}`, {}).then(apTagDoc => ({ appBucket, apTagDoc }))
+					appBucket.getAsync(`tgmr::${siteId}`, {}).then(apTagDoc => ({
+						appBucket,
+						apTagDoc
+					}))
 				)
 				.then(({ appBucket, apTagDoc: { value } }) => {
 					for (const inventory of json) {
@@ -431,7 +454,10 @@ function apiModule() {
 			return couchbase
 				.connectToAppBucket()
 				.then(appBucket =>
-					appBucket.getAsync(`fmrt::${siteId}`, {}).then(apTagDoc => ({ appBucket, apTagDoc }))
+					appBucket.getAsync(`fmrt::${siteId}`, {}).then(apTagDoc => ({
+						appBucket,
+						apTagDoc
+					}))
 				)
 				.then(({ appBucket, apTagDoc: { value } }) => {
 					for (const inventory of json) {
@@ -478,11 +504,11 @@ function apiModule() {
 							if (ad.id === adUnitId) {
 								if (!networkData.formats) networkData.formats = ['display'];
 
-								if (inventory.checked)
+								if (inventory.checked) {
 									!networkData.formats.includes(format) && !!(network === 'adpTags')
 										? networkData.formats.push(format)
 										: null;
-								else {
+								} else {
 									networkData.formats.includes(format)
 										? networkData.formats.splice(networkData.formats.indexOf(format), 1)
 										: null;
@@ -544,14 +570,16 @@ function apiModule() {
 											if (section.ads && Object.keys(section.ads).length) {
 												for (const adKey in section.ads) {
 													const ad = section.ads[adKey];
-													if (!ad.networkData.formats) ad.networkData.formats = ['display'];
+													if (!ad.networkData.formats) {
+														ad.networkData.formats = ['display'];
+													}
 
-													if (inventory.checked)
+													if (inventory.checked) {
 														!ad.networkData.formats.includes(inventory.format) &&
 														!!(ad.network === 'adpTags')
 															? ad.networkData.formats.push(inventory.format)
 															: null;
-													else {
+													} else {
 														ad.networkData.formats.includes(inventory.format)
 															? ad.networkData.formats.splice(
 																	ad.networkData.formats.indexOf(inventory.format),
@@ -601,11 +629,11 @@ function apiModule() {
 							if (ad.id === adUnitId) {
 								if (!networkData.formats) networkData.formats = ['display'];
 
-								if (inventory.checked)
+								if (inventory.checked) {
 									!networkData.formats.includes(format) && !!(network === 'adpTags')
 										? networkData.formats.push(format)
 										: null;
-								else {
+								} else {
 									networkData.formats.includes(format)
 										? networkData.formats.splice(networkData.formats.indexOf(format), 1)
 										: null;
@@ -810,7 +838,7 @@ function apiModule() {
 				const countryRuleIndex = countryConfig.findIndex(obj => obj.bidder === bidder);
 
 				if (sizeRuleIndex > -1) {
-					if (device)
+					if (device) {
 						sizeConfig[sizeRuleIndex] = {
 							bidder,
 							status,
@@ -818,6 +846,7 @@ function apiModule() {
 							sizesSupported,
 							labels: [device]
 						};
+					}
 
 					if (!device) sizeConfig.splice(sizeRuleIndex, 1);
 				}
@@ -833,12 +862,13 @@ function apiModule() {
 				}
 
 				if (countryRuleIndex > -1) {
-					if (country)
+					if (country) {
 						countryConfig[countryRuleIndex] = {
 							bidder,
 							status,
 							labels: [country]
 						};
+					}
 					if (!country) countryConfig.splice(countryRuleIndex, 1);
 				}
 

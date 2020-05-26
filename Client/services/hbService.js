@@ -20,6 +20,10 @@ export function updateBidder(siteId, bidderConfig, params) {
 	return axiosInstance.put(`/headerBidding/bidder/${siteId}`, { bidderConfig, params });
 }
 
+export function removeBidder(siteId, bidderKey) {
+	return axiosInstance.delete(`/headerBidding/bidder/${siteId}`, { data: { bidderKey } });
+}
+
 export function fetchInventories(siteId) {
 	return axiosInstance.get(`/headerBidding/inventory/${siteId}`);
 }
