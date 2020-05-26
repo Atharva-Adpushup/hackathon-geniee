@@ -47,15 +47,20 @@ var helpers = {
 
 		return slots;
 	},
-	collectAdUnitPrebidWinners: function(prebidWinners, adUnitCode, adUnitAuctionData) {
-		var adUnitWinner = prebidWinners[adUnitCode];
+	collectAdUnitPrebidWinner: function(adUnitPrebidWinner, adUnitAuctionData, auctionEndData) {
+		if (Object.keys(adUnitPrebidWinner).length) {
+			var adId = adUnitPrebidWinner['hb_ap_adid'];
+			var bids = auctionEndData.bidsReceived;
 
-		if (Object.keys(adUnitWinner).length) {
-			adUnitAuctionData['prebidWinner'] = prebidWinners[adUnitCode]['hb_ap_bidder'];
-			adUnitAuctionData['prebidWinnerAdUnitId'] = prebidWinners[adUnitCode]['hb_ap_adid'];
-			adUnitAuctionData['prebidWinnerCpm'] = parseFloat(
-				prebidWinners[adUnitCode]['hb_ap_pb']
-			);
+			// get the calculated cpm of the winning bid
+			var winningBid = helpers.findBidByAdId(adId, bids);
+
+			if (winningBid) {
+				var cpm = calculateBidCpmForFeedback(winningBid);
+				adUnitAuctionData['prebidWinner'] = adUnitPrebidWinner['hb_ap_bidder'];
+				adUnitAuctionData['prebidWinnerAdUnitId'] = adUnitPrebidWinner['hb_ap_adid'];
+				adUnitAuctionData['prebidWinnerCpm'] = cpm / 1000;
+			}
 		}
 	},
 	collectAdUnitBidsData: function(auctionEndData, slots) {
@@ -96,6 +101,7 @@ var helpers = {
 			var slot = slots[adUnitCode];
 
 			if (slot) {
+				// slot.isATF = 0 means value is unknown, if unknown, try again
 				if (typeof slot.isATF === 'undefined' || slot.isATF === 0) {
 					var isSlotATF = utils.isSlotATF(slot);
 					slot.isATF = typeof isSlotATF === 'undefined' ? 0 : isSlotATF ? 1 : 2;
@@ -122,8 +128,13 @@ var helpers = {
 					adUnitData[auctionId] || {}
 				);
 				var adUnitAuctionData = adUnitData[auctionId];
+				var adUnitPrebidWinner = prebidWinners[adUnitCode] || {};
 
-				this.collectAdUnitPrebidWinners(prebidWinners, adUnitCode, adUnitAuctionData);
+				this.collectAdUnitPrebidWinner(
+					adUnitPrebidWinner,
+					adUnitAuctionData,
+					auctionEndData
+				);
 			}
 		});
 	},
@@ -184,6 +195,17 @@ var helpers = {
 		if (slot.feedback.renderedSize) feedbackData.renderedSize = slot.feedback.renderedSize;
 
 		return feedbackData;
+	},
+	findBidByAdId: function(adId, bids) {
+		for (var i = 0; i < bids.length; i++) {
+			var bid = bids[i];
+
+			if (bid.adId === adId) {
+				return bid;
+			}
+		}
+
+		return false;
 	}
 };
 
@@ -229,7 +251,6 @@ var handleAuctionEndEvent = function(auctionEndData) {
 
 		helpers.collectAuctionData(auctionEndData, slots);
 		helpers.collectAdUnitBidsData(auctionEndData, slots);
-
 		feedback.sendAuctionFeedack(auctionId, slots);
 	}
 };
