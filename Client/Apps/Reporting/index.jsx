@@ -7,7 +7,7 @@ import '../../scss/apps/reporting/index.scss';
 const App = props => (
 	<React.Fragment>
 		<DocumentTitle title="Reporting" />
-		<PanelContainer {...props} />
+		<PanelContainer isCustomizeChartLegend {...props} />
 	</React.Fragment>
 );
 

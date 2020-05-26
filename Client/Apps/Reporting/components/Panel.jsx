@@ -17,6 +17,7 @@ import ChartContainer from '../containers/ChartContainer';
 import reportService from '../../../services/reportService';
 import {
 	displayMetrics,
+	displayUniqueImpressionMetrics,
 	accountDisableFilter,
 	accountDisableDimension,
 	opsDimension,
@@ -245,12 +246,13 @@ class Panel extends Component {
 			selectedInterval,
 			metricsList
 		} = this.state;
-		const { userSites, isCustomizeChartLegend, defaultReportType } = this.props;
+		const { userSites, isCustomizeChartLegend, defaultReportType, isForOps } = this.props;
 		const { email, reportType } = this.getDemoUserParams();
 		let selectedMetrics;
 
-		if (metricsList && !isCustomizeChartLegend) {
-			selectedMetrics = displayMetrics.map(metric => metric.value);
+		// if (metricsList && !isCustomizeChartLegend) {
+		if (metricsList) {
+				selectedMetrics = displayMetrics.map(metric => metric.value);
 		}
 
 		if (metricsList && isCustomizeChartLegend) {
@@ -415,7 +417,7 @@ class Panel extends Component {
 	 * @memberof Panel
 	 */
 	getMetricsList = tableData => {
-		const { reportsMeta } = this.props;
+		const { reportsMeta, isForOps } = this.props;
 
 		const filteredMetrics = tableData.columns.filter(metric => {
 			const isDimension = !!reportsMeta.data.dimension[metric];
@@ -428,15 +430,18 @@ class Panel extends Component {
 
 		const sortedMetaMetrics = this.getSortedMetaMetrics(reportsMeta.data.metrics);
 
-		const computedMetrics = [];
+		let computedMetrics = [];
 
 		sortedMetaMetrics.forEach(metaMetric => {
 			const { name, value, valueType } = metaMetric;
 			if (filteredMetrics.indexOf(value) !== -1) computedMetrics.push({ name, value, valueType });
 		});
-
-		computedMetrics.splice(5);
-
+		// if(isForOps) {
+		// 	computedMetrics.splice(5);
+		// } else {
+			let match = ["network_net_revenue", "adpushup_page_views", "adpushup_page_cpm", "network_impressions", "network_ad_ecpm"]
+			computedMetrics = computedMetrics.filter((item) => match.indexOf(item.value)!=-1)
+		// }
 		return computedMetrics;
 	};
 
@@ -511,15 +516,26 @@ class Panel extends Component {
 	};
 
 	updateMetrics = (newMetrics = []) => {
-		const { reportsMeta } = this.props;
+		const { reportsMeta, isForOps } = this.props;
 		const sortedMetaMetrics = this.getSortedMetaMetrics(reportsMeta.data.metrics);
-		const sortedMetrics = [];
-
-		sortedMetaMetrics.forEach(metaMetric => {
-			const foundMetric = newMetrics.find(newMetric => newMetric.value === metaMetric.value);
-
-			if (foundMetric) sortedMetrics.push(foundMetric);
-		});
+		let sortedMetrics = [];
+		if(isForOps) {
+			sortedMetaMetrics.forEach(metaMetric => {
+				const foundMetric = newMetrics.find(newMetric => newMetric.value === metaMetric.value);
+	
+				if (foundMetric) sortedMetrics.push(foundMetric);
+			});
+		} else {
+			let found = newMetrics.filter((item) => item.value=="unique_impressions")
+			// if unique impression selected
+			if(found.length) {
+				let match = displayUniqueImpressionMetrics.map((item) => item.value)
+				sortedMetrics = sortedMetaMetrics.filter((item) => match.indexOf(item.value)!=-1)
+			} else {
+				let match = displayMetrics.map((item) => item.value)
+				sortedMetrics = sortedMetaMetrics.filter((item) => match.indexOf(item.value)!=-1)
+			}
+		}
 
 		this.setState({ metricsList: sortedMetrics });
 	};
@@ -743,7 +759,7 @@ class Panel extends Component {
 	}
 
 	renderContent = () => {
-		const {
+		let {
 			selectedDimension,
 			selectedFilters,
 			selectedInterval,
@@ -771,7 +787,7 @@ class Panel extends Component {
 			showNotification
 		} = this.props;
 
-		const allAvailableMetrics = this.getAllAvailableMetrics(
+		let allAvailableMetrics = this.getAllAvailableMetrics(
 			isCustomizeChartLegend,
 			reportsMeta,
 			selectedDimension,
@@ -780,6 +796,13 @@ class Panel extends Component {
 			tableData
 		);
 
+		if(!isForOps) {
+			allAvailableMetrics = allAvailableMetrics.filter((item) => item.value=="unique_impressions").map(item => {
+				item.name = "Unique Impressions Reporting"
+				item.isDisabled = false;
+				return item;
+			})
+		}
 		const aggregatedData = this.aggregateValues(tableData.result);
 		const { email } = this.getDemoUserParams();
 		const { isValid } = getReportingDemoUserValidation(email, reportType);
