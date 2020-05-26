@@ -50,8 +50,13 @@ var hb = {
 			var prebidSizes = computedSizes.length
 				? computedSizes
 				: size[0] === 'responsive' && size[1] === 'responsive'
-				? [[0, 0]]
+				? []
 				: [size];
+
+			if (!prebidSizes || !prebidSizes.length) {
+				return;
+			}
+
 			if (
 				!adp.config.apLiteActive &&
 				adpSlot.optionalParam.overrideActive &&
