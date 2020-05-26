@@ -74,7 +74,7 @@ class AdElement extends Component {
 	);
 
 	renderAdDetails() {
-		const { user, siteId, doc, networkCode } = this.props;
+		const { user, siteId, doc, networkCode, dfpMessage } = this.props;
 		const {
 			dfpSyncingStatus: { completedOn }
 		} = doc;
@@ -195,9 +195,7 @@ class AdElement extends Component {
 					</div>
 				) : null}
 				<pre style={{ wordBreak: 'break-word' }}>
-					{dfpAdunitCode && completedOn
-						? code
-						: 'DFP Sync service is running. Code will be available here once it is completed.'}
+					{dfpAdunitCode && completedOn ? code : dfpMessage}
 				</pre>{' '}
 				{user.isSuperUser ? (
 					<React.Fragment>
