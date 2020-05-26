@@ -108,6 +108,24 @@ const displayMetrics = [
 	METRICS.NETWORK_IMPRESSIONS,
 	METRICS.NETWORK_AD_ECPM
 ];
+
+const UNIQUE_IMPRESSION_METRICS = {
+	NETWORK_NET_REVENUE: { value: 'network_net_revenue', name: 'Net Revenue', valueType: 'money' },
+	ADPUSHUP_PAGE_VIEWS: { value: 'adpushup_page_views', name: 'Page Views', valueType: 'number' },
+	ADPUSHUP_PAGE_CPM: { value: 'adpushup_page_cpm', name: 'Page RPM', valueType: 'money' },
+	UNIQUE_IMPRESSIONS: { value: 'unique_impressions', name: 'Unique Impressions', valueType: 'number' },
+	UNIQUE_AD_ECPM: { value: 'unique_ad_ecpm', name: 'Unique Ad eCPM', valueType: 'money' }
+};
+
+const displayUniqueImpressionMetrics = [
+	UNIQUE_IMPRESSION_METRICS.NETWORK_NET_REVENUE,
+	UNIQUE_IMPRESSION_METRICS.ADPUSHUP_PAGE_VIEWS,
+	UNIQUE_IMPRESSION_METRICS.ADPUSHUP_PAGE_VIEWS,
+	UNIQUE_IMPRESSION_METRICS.ADPUSHUP_PAGE_CPM,
+	UNIQUE_IMPRESSION_METRICS.UNIQUE_IMPRESSIONS,
+	UNIQUE_IMPRESSION_METRICS.UNIQUE_AD_ECPM
+];
+
 const activeLegendItem = METRICS.NETWORK_NET_REVENUE;
 const activeLegendItemArray = [
 	METRICS.NETWORK_NET_REVENUE,
@@ -156,6 +174,7 @@ export {
 	filtersValues,
 	REPORT_PATH,
 	displayMetrics,
+	displayUniqueImpressionMetrics,
 	activeLegendItem,
 	activeLegendItemArray,
 	accountFilter,
