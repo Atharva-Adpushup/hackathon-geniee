@@ -10,7 +10,7 @@ var auction = require('./auction');
 var config = require('./config');
 var prebidDataCollector = require('./prebidDataCollector');
 var { multiFormatConstants, mediaTypesConfig } = require('./multiFormatConfig');
-var utilsNew = require('../../../../libs/utils');
+var apUtils = require('../../../../libs/utils');
 var isApLiteActive = window.adpushup.config.apLiteActive;
 var amznPubId =
 	config.PREBID_CONFIG &&
@@ -115,14 +115,14 @@ var hb = {
 										return currentBid;
 
 									return highestBid;
-								});
+								}, false);
 
 							// if video bid is rendering first time,
 							// slot is not in view
 							// and have alive banner bid then render it
 							if (
 								prevRenderedOutOfViewVideoBidId !== bid.adId &&
-								!utilsNew.checkElementInViewPercent(container) &&
+								!apUtils.checkElementInViewPercent(container) &&
 								highestAliveBannerBid
 							) {
 								prevRenderedOutOfViewVideoBidId = bid.adId;
@@ -147,7 +147,7 @@ var hb = {
 									var timeSpentInMs = currentTime - bannerAdRenderedTime;
 
 									if (
-										!utilsNew.checkElementInViewPercent(container) &&
+										!apUtils.checkElementInViewPercent(container) &&
 										timeSpentInMs < watcherExpiryTimeInMs
 									) {
 										timeoutId = setTimeout(() => {
