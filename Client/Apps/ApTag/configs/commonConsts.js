@@ -30,12 +30,6 @@ const TYPES = [
 		image: '/assets/images/tagManager/links.png',
 		key: 'links',
 		description: 'Link units display a list of topics that are relevant to the content of your page'
-	},
-	{
-		name: 'AMP Ad',
-		image: '/assets/images/tagManager/amp.png',
-		key: 'amp',
-		description: 'AMPHTML ads are a faster, lighter and more secure way to advertise on the web'
 	}
 ];
 const SIZES = {
