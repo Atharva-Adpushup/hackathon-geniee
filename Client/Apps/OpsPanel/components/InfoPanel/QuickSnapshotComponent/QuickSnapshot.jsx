@@ -27,6 +27,7 @@ import {
 	ALL_SITES_VALUE,
 	REPORT_LINK
 } from '../../../../../Pages/Dashboard/configs/commonConsts';
+import { TOP_TEN_SITE_WIDGETS_COLUMNS } from '../../../configs/commonConsts'
 import SelectBox from '../../../../../Components/SelectBox/index';
 import reportService from '../../../../../services/reportService';
 import { convertObjToArr, getDateRange } from '../../../../../Pages/Dashboard/helpers/utils';
@@ -552,7 +553,8 @@ class QuickSnapshot extends React.Component {
 
 	getTopSitesWidgetTransformedData = displayData => {
 		const computedData = cloneDeep(displayData);
-
+		// set cols to display
+		computedData.columns = computedData.columns.filter((col) => TOP_TEN_SITE_WIDGETS_COLUMNS.includes(col))
 		computedData.result = orderBy(computedData.result, ['network_net_revenue'], ['desc']).slice(
 			0,
 			10

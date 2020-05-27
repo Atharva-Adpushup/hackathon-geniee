@@ -297,6 +297,15 @@ const INFO_PANEL_IDENTIFIERS = {
 	GLOBAL_REPORT_VITALS: 'GLOBAL_REPORT_VITALS'
 };
 
+const TOP_TEN_SITE_WIDGETS_COLUMNS = [
+	'adpushup_page_views',
+	'adpushup_page_cpm',
+	'network_ad_ecpm',
+	'siteid',
+	'network_net_revenue',
+	'network_impressions'
+];
+
 const WIDGETS_INFO = {
 	ESTIMATED_EARNINGS: 'estimated_earnings',
 	PER_AP_ORIGINAL: 'per_ap_original',
@@ -507,6 +516,7 @@ export {
 	TOOLS_IDENTIFIERS,
 	INFO_PANEL_IDENTIFIERS,
 	QUICK_SNAPSHOTS_WIDGETS,
+	TOP_TEN_SITE_WIDGETS_COLUMNS,
 	WIDGETS_INFO,
 	ICONS,
 	BACKUP_ADS_FORMATS,
