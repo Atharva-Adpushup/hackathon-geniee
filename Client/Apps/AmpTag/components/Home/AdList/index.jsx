@@ -8,6 +8,7 @@ import ActionCard from '../../../../../Components/ActionCard';
 
 class AdList extends Component {
 	state = {
+		dfpMessage: 'click on master save to start dfp syncing',
 		adIdsToUpdate: []
 	};
 	componentDidMount() {
@@ -34,7 +35,7 @@ class AdList extends Component {
 			networkCode
 		} = this.props;
 
-		const { adIdsToUpdate } = this.state;
+		const { adIdsToUpdate, dfpMessage } = this.state;
 		const customStyle = user.isSuperUser ? { minHeight: '540px' } : { minHeight: '440px' };
 
 		if (loading) {
@@ -53,7 +54,11 @@ class AdList extends Component {
 								className="u-margin-t3 u-margin-r2 pull-right"
 								onClick={() => {
 									masterSave(adIdsToUpdate, siteId, user.isSuperUser);
-									this.setState({ adIdsToUpdate: [] });
+									this.setState({
+										adIdsToUpdate: [],
+										dfpMessage:
+											'DFP Sync service is running. Code will be available here once it is completed.'
+									});
 								}}
 							>
 								Master Save
@@ -75,6 +80,7 @@ class AdList extends Component {
 										siteId={siteId}
 										networkCode={networkCode}
 										adsToUpdateOnMasterSave={this.adsToUpdate}
+										dfpMessage={dfpMessage}
 									/>
 								</li>
 							</div>
