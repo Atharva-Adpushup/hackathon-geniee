@@ -4,6 +4,7 @@ import {
 	FETCH_ALL_BIDDERS,
 	ADD_BIDDER,
 	UPDATE_BIDDER,
+	DELETE_BIDDER,
 	FETCH_INVENTORIES,
 	UPDATE_INVENTORIES_HB_STATUS,
 	SET_DFP_SETUP_STATUS,
@@ -61,6 +62,12 @@ export const updateBidderAction = (siteId, bidderConfig, params) => dispatch =>
 			dispatch({ type: UPDATE_BIDDER, siteId, bidderKey, bidderConfig: bidderConfigFromDB });
 			dispatch({ type: SET_UNSAVED_CHANGES, hasUnsavedChanges: true });
 		});
+
+export const deleteBidderAction = (siteId, bidderKey) => dispatch =>
+	service.removeBidder(siteId, bidderKey).then(() => {
+		dispatch({ type: DELETE_BIDDER, siteId, bidderKey });
+		dispatch({ type: SET_UNSAVED_CHANGES, hasUnsavedChanges: true });
+	});
 
 export const fetchInventoriesAction = siteId => dispatch =>
 	service

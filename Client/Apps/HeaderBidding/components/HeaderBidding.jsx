@@ -214,6 +214,7 @@ class HeaderBidding extends React.Component {
 			checkOrBeginDfpSetupAction,
 			addBidderAction,
 			updateBidderAction,
+			deleteBidderAction,
 			inventories,
 			updateInventoriesHbStatus,
 			showNotification,
@@ -246,6 +247,7 @@ class HeaderBidding extends React.Component {
 							fetchAllBiddersAction={fetchAllBiddersAction}
 							addBidderAction={addBidderAction}
 							updateBidderAction={updateBidderAction}
+							deleteBidderAction={deleteBidderAction}
 							showNotification={showNotification}
 							inventories={inventories}
 						/>

@@ -439,7 +439,7 @@ class Panel extends Component {
 		// if(isForOps) {
 		// 	computedMetrics.splice(5);
 		// } else {
-			let match = ["network_net_revenue", "adpushup_page_views", "adpushup_page_cpm", "network_impressions", "network_ad_ecpm"]
+			let match = displayUniqueImpressionMetrics.map((item) => item.value)
 			computedMetrics = computedMetrics.filter((item) => match.indexOf(item.value)!=-1)
 		// }
 		return computedMetrics;

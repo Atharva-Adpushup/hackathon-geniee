@@ -35,6 +35,32 @@ export default class ManageBidder extends React.Component {
 			});
 	};
 
+	onBidderDelete = bidderKey => {
+		const { siteId, deleteBidderAction, openView, showNotification } = this.props;
+		// eslint-disable-next-line no-alert
+		const shouldContinue = window.confirm('Are you sure you want to delete the bidder?');
+		if (shouldContinue) {
+			deleteBidderAction(siteId, bidderKey)
+				.then(() => {
+					openView('biddersList');
+					showNotification({
+						mode: 'success',
+						title: 'Success',
+						message: 'Bidder deleted successfully',
+						autoDismiss: 5
+					});
+				})
+				.catch(() => {
+					showNotification({
+						mode: 'error',
+						title: 'Error',
+						message: 'Unable to delete bidder',
+						autoDismiss: 5
+					});
+				});
+		}
+	};
+
 	openBiddersListView = () => {
 		const { openView } = this.props;
 		openView('biddersList');
@@ -62,6 +88,7 @@ export default class ManageBidder extends React.Component {
 								bidderConfig={bidderConfig}
 								openBiddersListView={this.openBiddersListView}
 								onBidderUpdate={this.onBidderUpdate}
+								onBidderDelete={this.onBidderDelete}
 								showNotification={showNotification}
 							/>
 						) : (
@@ -71,6 +98,7 @@ export default class ManageBidder extends React.Component {
 								bidderConfig={bidderConfig}
 								openBiddersListView={this.openBiddersListView}
 								onBidderUpdate={this.onBidderUpdate}
+								onBidderDelete={this.onBidderDelete}
 								showNotification={showNotification}
 								inventories={inventories}
 							/>

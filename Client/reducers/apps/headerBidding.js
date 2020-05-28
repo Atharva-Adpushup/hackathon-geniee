@@ -4,6 +4,7 @@ import {
 	CHECK_INVENTORY,
 	ADD_BIDDER,
 	UPDATE_BIDDER,
+	DELETE_BIDDER,
 	FETCH_INVENTORIES,
 	UPDATE_INVENTORIES_HB_STATUS,
 	SET_DFP_SETUP_STATUS,
@@ -88,6 +89,25 @@ export default function(state = defaultState, action) {
 				...bidders.addedBidders[bidderKey],
 				...bidderConfig
 			};
+
+			return {
+				...state,
+				sites: {
+					...state.sites,
+					[siteId]: {
+						...state.sites[siteId],
+						bidders
+					}
+				}
+			};
+		}
+		case DELETE_BIDDER: {
+			const { siteId, bidderKey } = action;
+			const bidders = { ...state.sites[siteId].bidders };
+
+			const bidderToRemove = bidders.addedBidders[bidderKey];
+			delete bidders.addedBidders[bidderKey];
+			bidders.notAddedBidders[bidderKey] = bidderToRemove;
 
 			return {
 				...state,

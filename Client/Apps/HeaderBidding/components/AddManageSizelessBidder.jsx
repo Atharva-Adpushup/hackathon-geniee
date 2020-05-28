@@ -323,6 +323,11 @@ class AddManageSizelessBidder extends React.Component {
 		return computedFormFields;
 	};
 
+	onDeleteBidder = () => {
+		const { onBidderDelete, bidderConfig } = this.props;
+		onBidderDelete(bidderConfig.key);
+	};
+
 	render() {
 		const { openBiddersListView, formType } = this.props;
 		const {
@@ -355,6 +360,16 @@ class AddManageSizelessBidder extends React.Component {
 								<CustomButton type="button" variant="secondary" onClick={openBiddersListView}>
 									Cancel
 								</CustomButton>
+								{formType !== 'add' && (
+									<CustomButton
+										type="button"
+										variant="secondary"
+										className="u-margin-l3"
+										onClick={this.onDeleteBidder}
+									>
+										Remove Bidder
+									</CustomButton>
+								)}
 							</Col>
 						</FormGroup>
 					</Form>
