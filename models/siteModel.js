@@ -39,8 +39,7 @@ var model = require('../helpers/model'),
 			'ampSettings',
 			'apps',
 			'adServerSetupStatus',
-			'dataFeedActive',
-			'customJS'
+			'dataFeedActive'
 		];
 		this.clientKeys = [
 			'siteId',
@@ -59,8 +58,7 @@ var model = require('../helpers/model'),
 			'ampSettings',
 			'apps',
 			'adServerSetupStatus',
-			'dataFeedActive',
-			'customJS'
+			'dataFeedActive'
 		];
 		this.validations = {
 			required: []
