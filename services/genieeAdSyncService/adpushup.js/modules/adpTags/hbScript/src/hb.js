@@ -137,7 +137,7 @@ var hb = {
 
 								// Replace it with video ad when slot come back in view
 								var bannerAdRenderedTime = new Date();
-								var watcherExpiryTimeInMs = 20000;
+								var watcherExpiryTimeInMs = 1000;
 								var timeoutId;
 
 								function videoSlotInViewWatcher() {
