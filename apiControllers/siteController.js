@@ -494,7 +494,7 @@ router
 			)
 	)
 
-	.post('/scriptInjection/:siteId', (req, res) => {
+	.post('/siteLevelBeforeJs/:siteId', (req, res) => {
 		const { siteId } = req.params;
 		const { email } = req.user;
 		const { beforeJs } = req.body;

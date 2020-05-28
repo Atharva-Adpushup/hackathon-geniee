@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 
 import { showNotification } from '../../../actions/uiActions';
-import ScriptInjectionTool from '../components/Settings/SiteBody/ScriptInjectionTool/index';
+import SiteLevelBeforeJS from '../components/Settings/SiteBody/SiteLevelBeforeJS/index';
 
 const mapStateToProps = (state, ownProps) => {
 	return {
@@ -12,4 +12,4 @@ const mapStateToProps = (state, ownProps) => {
 export default connect(
 	mapStateToProps,
 	{ showNotification }
-)(ScriptInjectionTool);
+)(SiteLevelBeforeJS);

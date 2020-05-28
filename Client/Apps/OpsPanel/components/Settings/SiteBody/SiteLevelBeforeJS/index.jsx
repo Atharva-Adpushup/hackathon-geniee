@@ -17,7 +17,7 @@ const DEFAULT_STATE = {
 	isLoading: false
 };
 
-class ScriptInjectionTool extends Component {
+class SiteLevelBeforeJS extends Component {
 	constructor(props) {
 		super(props);
 
@@ -59,7 +59,7 @@ class ScriptInjectionTool extends Component {
 		}
 
 		return axiosInstance
-			.post(`/site/scriptInjection/${siteId}`, { beforeJs: btoa(beforeJsSnippet) })
+			.post(`/site/siteLevelBeforeJs/${siteId}`, { beforeJs: btoa(beforeJsSnippet) })
 			.then(res => {
 				this.setState({ isLoading: false }, this.handleReset);
 				return showNotification({
@@ -89,7 +89,7 @@ class ScriptInjectionTool extends Component {
 		return (
 			<div>
 				<div className="u-margin-t4">
-					<FormGroup controlId="adsTxtSnippet-input">
+					<FormGroup controlId="beforeJsSnippet-input">
 						<ControlLabel>CustomJS Snippet</ControlLabel>
 						<FormControl
 							componentClass="textarea"
@@ -130,15 +130,15 @@ class ScriptInjectionTool extends Component {
 			<div className="u-margin-t4">
 				<PanelGroup
 					accordion
-					id={`scriptInjection-panel-${siteId}-${siteDomain}`}
+					id={`siteLevelBeforeJs-panel-${siteId}-${siteDomain}`}
 					activeKey={activeKey}
 					onSelect={this.handleSelect}
 				>
-					<Panel eventKey="scriptInjection">
+					<Panel eventKey="siteLevelBeforeJs">
 						<Panel.Heading>
-							<Panel.Title toggle>Script Injection</Panel.Title>
+							<Panel.Title toggle>Site Level beforeJS</Panel.Title>
 						</Panel.Heading>
-						{activeKey === 'scriptInjection' ? (
+						{activeKey === 'siteLevelBeforeJs' ? (
 							<Panel.Body collapsible>{this.renderView()}</Panel.Body>
 						) : null}
 					</Panel>
@@ -148,4 +148,4 @@ class ScriptInjectionTool extends Component {
 	}
 }
 
-export default ScriptInjectionTool;
+export default SiteLevelBeforeJS;
