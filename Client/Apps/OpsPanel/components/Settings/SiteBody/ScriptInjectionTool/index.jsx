@@ -53,7 +53,7 @@ class ScriptInjectionTool extends Component {
 			return showNotification({
 				mode: 'error',
 				title: 'Operation Failed',
-				message: 'Both the snippets are mandatory',
+				message: 'Please add the JS Snippet to Save',
 				autoDismiss: 5
 			});
 		}
