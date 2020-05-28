@@ -497,16 +497,15 @@ router
 	.post('/scriptInjection/:siteId', (req, res) => {
 		const { siteId } = req.params;
 		const { email } = req.user;
-		const { afterJsSnippet, beforeJsSnippet } = req.body;
-		const jsSnippet = { afterJsSnippet, beforeJsSnippet };
+		const { beforeJs } = req.body;
 		return userModel
 			.verifySiteOwner(email, siteId)
 
 			.then(() => siteModel.getSiteById(siteId))
 			.then(site => {
-				const customJSConfig = { ...site.get('customJS'), ...jsSnippet };
+				const apConfig = { ...site.get('apConfigs'), ...{ beforeJs } };
 
-				site.set('customJS', customJSConfig);
+				site.set('apConfigs', apConfig);
 				return site.save();
 			})
 			.then(() => sendSuccessResponse({ message: 'Settings saved successfully' }, res))

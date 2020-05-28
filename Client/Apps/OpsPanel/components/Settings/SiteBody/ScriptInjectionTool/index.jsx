@@ -14,7 +14,6 @@ import axiosInstance from '../../../../../../helpers/axiosInstance';
 
 const DEFAULT_STATE = {
 	beforeJsSnippet: '',
-	afterJsSnippet: '',
 	isLoading: false
 };
 
@@ -45,15 +44,12 @@ class ScriptInjectionTool extends Component {
 	};
 
 	handleGenerate = () => {
-		const { beforeJsSnippet, afterJsSnippet } = this.state;
-		const jsSnippet = {
-			beforeJsSnippet: btoa(beforeJsSnippet),
-			afterJsSnippet: btoa(afterJsSnippet)
-		};
+		const { beforeJsSnippet } = this.state;
+
 		const { site, showNotification } = this.props;
 		const { siteId } = site;
 
-		if (!beforeJsSnippet || !afterJsSnippet) {
+		if (!beforeJsSnippet) {
 			return showNotification({
 				mode: 'error',
 				title: 'Operation Failed',
@@ -63,7 +59,7 @@ class ScriptInjectionTool extends Component {
 		}
 
 		return axiosInstance
-			.post(`/site/scriptInjection/${siteId}`, jsSnippet)
+			.post(`/site/scriptInjection/${siteId}`, { beforeJs: btoa(beforeJsSnippet) })
 			.then(res => {
 				this.setState({ isLoading: false }, this.handleReset);
 				return showNotification({
@@ -88,33 +84,19 @@ class ScriptInjectionTool extends Component {
 	};
 
 	renderView = () => {
-		const { beforeJsSnippet, afterJsSnippet, isLoading } = this.state;
+		const { beforeJsSnippet, isLoading } = this.state;
 
 		return (
 			<div>
 				<div className="u-margin-t4">
 					<FormGroup controlId="adsTxtSnippet-input">
-						<ControlLabel>BeforeJS Snippet</ControlLabel>
+						<ControlLabel>CustomJS Snippet</ControlLabel>
 						<FormControl
 							componentClass="textarea"
-							placeholder="BeforeJS Snippet"
+							placeholder="CustomJS Snippet"
 							name="beforeJsSnippet"
 							onChange={this.handleChange}
 							value={beforeJsSnippet}
-							className="u-padding-v4 u-padding-h4"
-						/>
-					</FormGroup>
-				</div>
-
-				<div className="u-margin-t4">
-					<FormGroup controlId="adsTxtSnippet-input">
-						<ControlLabel>AfterJS Snippet</ControlLabel>
-						<FormControl
-							componentClass="textarea"
-							placeholder="AfterJS Snippet"
-							name="afterJsSnippet"
-							onChange={this.handleChange}
-							value={afterJsSnippet}
 							className="u-padding-v4 u-padding-h4"
 						/>
 					</FormGroup>

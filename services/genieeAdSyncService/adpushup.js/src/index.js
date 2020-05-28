@@ -339,6 +339,20 @@ function main() {
 	// Initialise adp config
 	initAdpConfig();
 
+	var beforeJs = adp.config.beforeJs;
+
+	if (beforeJs) {
+		try {
+			utils.runScript(utils.base64Decode(beforeJs));
+		} catch (e) {
+			err.push({
+				msg: 'Error in beforeJs.',
+				js: beforeJs,
+				error: e
+			});
+		}
+	}
+
 	var apLiteActive = adp.config.apLiteActive;
 
 	//for SPAs: remove any interactive ad containers, if available and apLite is disabled

@@ -23,7 +23,8 @@ const ApConfig = {
 		'spaPageTransitionTimeout',
 		'adsLabel',
 		'isAdsLabelOn',
-		'hbAnalytics'
+		'hbAnalytics',
+		'beforeJs'
 	],
 	override: [
 		'mode',
@@ -49,7 +50,8 @@ const ApConfig = {
 		'spaPageTransitionTimeout',
 		'adsLabel',
 		'isAdsLabelOn',
-		'hbAnalytics'
+		'hbAnalytics',
+		'beforeJs'
 	],
 	merge: []
 };
