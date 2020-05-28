@@ -485,6 +485,12 @@ class AddManageNonResponsiveBidder extends React.Component {
 		return computedFormFields;
 	};
 
+	onDeleteBidder = () => {
+		const { onBidderDelete } = this.props;
+		const { bidderConfig } = this.state;
+		onBidderDelete(bidderConfig.key);
+	};
+
 	render() {
 		const { openBiddersListView, formType } = this.props;
 		const {
@@ -547,6 +553,16 @@ class AddManageNonResponsiveBidder extends React.Component {
 								<CustomButton type="button" variant="secondary" onClick={openBiddersListView}>
 									Cancel
 								</CustomButton>
+								{formType !== 'add' && (
+									<CustomButton
+										type="button"
+										variant="secondary"
+										className="u-margin-l3"
+										onClick={this.onDeleteBidder}
+									>
+										Remove Bidder
+									</CustomButton>
+								)}
 							</Col>
 						</FormGroup>
 					</Form>

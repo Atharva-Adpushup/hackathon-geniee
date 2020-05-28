@@ -44,6 +44,7 @@ export default class BiddersTab extends React.Component {
 			bidders,
 			addBidderAction,
 			updateBidderAction,
+			deleteBidderAction,
 			showNotification,
 			domain,
 			inventories
@@ -70,6 +71,7 @@ export default class BiddersTab extends React.Component {
 							siteId={siteId}
 							bidderConfig={bidderConfig}
 							updateBidderAction={updateBidderAction}
+							deleteBidderAction={deleteBidderAction}
 							openView={this.openView}
 							showNotification={showNotification}
 							inventories={inventories}
