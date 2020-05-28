@@ -133,6 +133,9 @@ var hb = {
 									.get(0);
 								pbjs.renderAd(iframeDocument, highestAliveBannerBid.adId);
 
+								// send banner bid won feedback
+								prebidDataCollector.collectBidWonData(highestAliveBannerBid);
+
 								console.log('banner rendered: ', adpSlot.containerId);
 
 								// Replace it with video ad when slot come back in view
