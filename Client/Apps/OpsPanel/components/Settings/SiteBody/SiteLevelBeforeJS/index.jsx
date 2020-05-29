@@ -26,13 +26,24 @@ class SiteLevelBeforeJS extends Component {
 		};
 	}
 
+	componentDidMount() {
+		const {
+			sitesData,
+			site: { siteId }
+		} = this.props;
+
+		const siteLevelData = sitesData[siteId];
+		const { apConfigs = {} } = siteLevelData;
+		const { beforeJs = '' } = apConfigs;
+
+		this.setState({ beforeJsSnippet: atob(beforeJs) });
+	}
+
 	handleChange = e => {
 		this.setState({
 			[e.target.name]: e.target.value
 		});
 	};
-
-	handleReset = () => this.setState(DEFAULT_STATE);
 
 	handleSelect = value => {
 		const {
@@ -61,7 +72,7 @@ class SiteLevelBeforeJS extends Component {
 		return axiosInstance
 			.post(`/site/siteLevelBeforeJs/${siteId}`, { beforeJs: btoa(beforeJsSnippet) })
 			.then(res => {
-				this.setState({ isLoading: false }, this.handleReset);
+				this.setState({ isLoading: false });
 				return showNotification({
 					mode: 'success',
 					title: 'Success',
@@ -102,13 +113,6 @@ class SiteLevelBeforeJS extends Component {
 					</FormGroup>
 				</div>
 
-				<CustomButton
-					variant="secondary"
-					className="pull-right u-margin-r3"
-					onClick={this.handleReset}
-				>
-					Reset
-				</CustomButton>
 				<CustomButton
 					type="submit"
 					variant="primary"

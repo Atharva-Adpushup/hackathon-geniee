@@ -4,7 +4,11 @@ import { showNotification } from '../../../actions/uiActions';
 import SiteLevelBeforeJS from '../components/Settings/SiteBody/SiteLevelBeforeJS/index';
 
 const mapStateToProps = (state, ownProps) => {
+	const {
+		sites: { data }
+	} = state.global;
 	return {
+		sitesData: data,
 		...ownProps
 	};
 };

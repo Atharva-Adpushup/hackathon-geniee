@@ -508,7 +508,14 @@ router
 				site.set('apConfigs', apConfig);
 				return site.save();
 			})
-			.then(() => sendSuccessResponse({ message: 'Settings saved successfully' }, res))
+
+			.then(siteData => {
+				const {
+					data: { apConfigs = {} }
+				} = siteData;
+
+				return sendSuccessResponse({ message: 'Settings saved successfully', apConfigs }, res);
+			})
 			.catch(err => console.log(err));
 	})
 
