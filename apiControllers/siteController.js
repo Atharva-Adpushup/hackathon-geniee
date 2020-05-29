@@ -493,6 +493,32 @@ router
 				})
 			)
 	)
+
+	.post('/siteLevelBeforeJs/:siteId', (req, res) => {
+		const { siteId } = req.params;
+		const { email } = req.user;
+		const { beforeJs } = req.body;
+		return userModel
+			.verifySiteOwner(email, siteId)
+
+			.then(() => siteModel.getSiteById(siteId))
+			.then(site => {
+				const apConfig = { ...site.get('apConfigs'), ...{ beforeJs } };
+
+				site.set('apConfigs', apConfig);
+				return site.save();
+			})
+
+			.then(siteData => {
+				const {
+					data: { apConfigs = {} }
+				} = siteData;
+
+				return sendSuccessResponse({ message: 'Settings saved successfully', apConfigs }, res);
+			})
+			.catch(err => console.log(err));
+	})
+
 	.post('/:siteId/saveAmpSettings', (req, res) => {
 		const response = {
 			error: true,
