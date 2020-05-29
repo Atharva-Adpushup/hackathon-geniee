@@ -30,6 +30,13 @@ const TYPES = [
 		image: '/assets/images/tagManager/links.png',
 		key: 'links',
 		description: 'Link units display a list of topics that are relevant to the content of your page'
+	},
+	{
+		name: 'Rewarded Video Ads',
+		image: '/assets/images/tagManager/rewarded-video-ads.png',
+		key: 'rewarded-video-ads',
+		description:
+			'Rewarded ads provide an opportunity for users to watch a video or engage with a playable ad in exchange for a reward within the app'
 	}
 ];
 const SIZES = {
