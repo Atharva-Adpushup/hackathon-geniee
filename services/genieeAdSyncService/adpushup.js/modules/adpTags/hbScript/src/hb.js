@@ -157,6 +157,7 @@ var hb = {
 											videoSlotInViewWatcher();
 										}, 100);
 									} else {
+										adpSlot.feedbackSent = false; // reset feedbackSent status for current slot
 										pbjs.renderAd(iframeDocument, bid.adId);
 									}
 								}
