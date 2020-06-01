@@ -218,7 +218,7 @@ class AdCodeGenerator extends Component {
 	}
 
 	renderMainContent() {
-		const { progress } = this.state;
+		const { progress, type } = this.state;
 		const { codeGenerated } = this.props;
 		return (
 			<div>
@@ -231,7 +231,12 @@ class AdCodeGenerator extends Component {
 					<div>
 						{this.renderTypeOptions()}
 						{progress >= 50 ? this.renderSizes() : null}
-						{progress >= 75 ? this.renderFluidToggle() : null}
+
+						{type !== 'rewardedVideoAds'
+							? progress >= 75
+								? this.renderFluidToggle()
+								: null
+							: null}
 						{progress >= 75 ? this.renderButton('Generate AdCode', this.saveHandler) : null}
 					</div>
 				)}
@@ -293,10 +298,11 @@ class AdCodeGenerator extends Component {
 
 	// eslint-disable-next-line react/sort-comp
 	selectPlatform(platform) {
+		const { type } = this.state;
 		this.setState({
 			platform,
 			size: platform === 'responsive' ? 'responsive' : null,
-			progress: platform === 'responsive' ? 75 : 50
+			progress: platform === 'responsive' || type === 'rewardedVideoAds' ? 75 : 50
 		});
 	}
 

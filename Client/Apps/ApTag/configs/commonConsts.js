@@ -34,7 +34,7 @@ const TYPES = [
 	{
 		name: 'Rewarded Video Ads',
 		image: '/assets/images/tagManager/rewarded-video-ads.png',
-		key: 'rewarded-video-ads',
+		key: 'rewardedVideoAds',
 		description:
 			'Rewarded ads provide an opportunity for users to watch a video or engage with a playable ad in exchange for a reward within the app'
 	}
@@ -93,29 +93,8 @@ const SIZES = {
 		DESKTOP: ['336x280', '120x600', '1070x250', '320x100', '336x280', '300x250', '468x60'],
 		MOBILE: ['320x100', '336x280', '300x250', '468x60']
 	},
-	AMP: {
-		ALLOWED: ['mobile'],
-		DESKTOP: [
-			'970x250',
-			'970x90',
-			'728x250',
-			'728x90',
-			'468x60',
-			'336x280',
-			'320x50',
-			'300x600',
-			'300x100',
-			'250x250',
-			'240x240',
-			'234x60',
-			'200x200',
-			'180x150',
-			'160x600',
-			'120x600',
-			'120x240',
-			'300x250'
-		],
-		MOBILE: ['320x50', '300x250', '250x250', '200x200', '320x100', '336x280']
+	REWARDEDVIDEOADS: {
+		ALLOWED: ['mobile']
 	}
 };
 
