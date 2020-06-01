@@ -161,7 +161,7 @@ const APPS = [
 		link: 3,
 		image: '/assets/images/manageSites/amp.png',
 		description:
-			'We provide custom implementation of Google’s Accelerated Mobile Pages (AMP) for web publishers. Our focus is on decreasing page load times, maintaining the uniformity of design, and increasing ad yield.',
+			'Use this app to create and manage ads specially designed for AMP (Accelerated Mobile Pages)',
 		left: {
 			type: TYPE.TEXT,
 			text: 'Status: __STATUS__'
