@@ -286,7 +286,7 @@ function startCreation(forced) {
 						for (var id in ads) {
 							var hasDfpAdUnit = ads[id].networkData && ads[id].networkData.dfpAdunit;
 							if (hasDfpAdUnit) {
-								var slotId = ads[id].networkData.dfpAdunit;
+								var slotId = ads[id].id;
 								var container = $('#' + slotId);
 								var currentTime = new Date();
 								container.attr('data-render-time', currentTime.getTime());

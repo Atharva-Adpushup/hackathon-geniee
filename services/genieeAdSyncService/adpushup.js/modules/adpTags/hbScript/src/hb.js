@@ -1,7 +1,5 @@
 // Prebid interfacing module
 
-var $ = require('../../../../libs/jquery');
-var merge = require('lodash/merge');
 var constants = require('./constants');
 var responsiveAds = require('./responsiveAds');
 var adp = require('./adp');
@@ -10,7 +8,7 @@ var auction = require('./auction');
 var config = require('./config');
 var prebidDataCollector = require('./prebidDataCollector');
 var { multiFormatConstants, mediaTypesConfig } = require('./multiFormatConfig');
-var apUtils = require('../../../../libs/utils');
+var videoRenderer = require('./videoRenderer');
 var isApLiteActive = window.adpushup.config.apLiteActive;
 var amznPubId =
 	config.PREBID_CONFIG &&
@@ -81,185 +79,12 @@ var hb = {
 			});
 
 			var playerSize = utils.getVideoPlayerSize(prebidSizes);
-			var prevRenderedOutOfViewVideoBidId;
 			var prebidSlot = {
 				code: adpSlot.containerId,
 				mediaTypes: {},
 				renderer: {
 					url: multiFormatConstants.VIDEO.RENDERER_URL,
-					render: function(bid) {
-						// push to render queue because jwplayer may not be loaded yet.
-						bid.renderer.push(() => {
-							var pbjs = window._apPbJs;
-							var container = $(`#${adpSlot.containerId}`);
-							var highestAliveBannerBid = pbjs
-								.getBidResponsesForAdUnitCode(bid.adUnitCode)
-								.bids.filter(bid => {
-									var isBanner = bid.mediaType === 'banner';
-									var isUnusedBid = bid.status !== 'rendered';
-
-									// Check if bid is not expired
-									function isBidAlive() {
-										var timeNow = new Date();
-										var bidResponseTime = new Date(bid.responseTimestamp);
-										var bidAgeInMs = timeNow - bidResponseTime;
-										var bidTtlInMs = (bid.ttl - 1) * 1000; // substracted 1s from bid ttl to adjust rendering time
-
-										return bidAgeInMs <= bidTtlInMs;
-									}
-
-									return isBanner && isUnusedBid && isBidAlive(); // check bid alive only in case of banner
-								})
-								.reduce((highestBid, currentBid) => {
-									if (!highestBid || currentBid.cpm > highestBid.cpm)
-										return currentBid;
-
-									return highestBid;
-								}, false);
-
-							// if video bid is rendering first time,
-							// slot is not in view
-							// and have alive banner bid then render it
-							if (
-								prevRenderedOutOfViewVideoBidId !== bid.adId &&
-								!apUtils.checkElementInViewPercent(container) &&
-								highestAliveBannerBid
-							) {
-								prevRenderedOutOfViewVideoBidId = bid.adId;
-
-								var iframeDocument = container
-									.find('iframe')
-									.contents()
-									.get(0);
-								pbjs.renderAd(iframeDocument, highestAliveBannerBid.adId);
-
-								// send banner bid won feedback
-								prebidDataCollector.collectBidWonData(highestAliveBannerBid);
-
-								console.log('banner rendered: ', adpSlot.containerId);
-
-								// Replace it with video ad when slot come back in view
-								var bannerAdRenderedTime = new Date();
-								var watcherExpiryTimeInMs = 1000;
-								var timeoutId;
-
-								function videoSlotInViewWatcher() {
-									if (timeoutId) timeoutId = clearTimeout(timeoutId);
-
-									var currentTime = new Date();
-									var timeSpentInMs = currentTime - bannerAdRenderedTime;
-
-									if (
-										!apUtils.checkElementInViewPercent(container) &&
-										timeSpentInMs < watcherExpiryTimeInMs
-									) {
-										timeoutId = setTimeout(() => {
-											videoSlotInViewWatcher();
-										}, 100);
-									} else {
-										adpSlot.feedbackSent = false; // reset feedbackSent status for current slot
-										pbjs.renderAd(iframeDocument, bid.adId);
-									}
-								}
-
-								videoSlotInViewWatcher();
-							}
-							// otherwise render video
-							else {
-								renderVideoBid();
-
-								console.log('video rendered: ', adpSlot.containerId);
-							}
-
-							function renderVideoBid() {
-								var jwPlayerInstance;
-								var playerReInstantiated = false;
-								var bidWonTime = +new Date();
-								var jwpEvents = [
-									'ready',
-									'adError',
-									'error',
-									'setupError',
-									'adImpression',
-									'adRequest',
-									'adStarted',
-									'adPlay'
-								];
-								//var client = utils.getVastClientType(bid.vastXml, bid.adTag);
-								var instantiateJwPlayer = function(clientType) {
-									// remove if player has already rendered
-									if (jwPlayerInstance && !!jwPlayerInstance.getState()) {
-										jwPlayerInstance.remove();
-									}
-
-									jwPlayerInstance = jwplayer(bid.adUnitCode);
-
-									jwPlayerInstance
-										.setup(
-											merge(
-												{
-													width: playerSize[0],
-													height: playerSize[1],
-													advertising: {
-														outstream: true,
-														client: clientType || 'vast',
-														adscheduleid: utils.randomAlphaNumericString(
-															8
-														),
-														vastxml: bid.vastXml
-													}
-												},
-												multiFormatConstants.VIDEO.JW_PLAYER_CONFIG
-											)
-										)
-										.on('ready', function() {
-											var playerElem = jwPlayerInstance.getContainer();
-											playerElem.style.margin = '0 auto';
-										});
-
-									setupPlayerEvents(jwPlayerInstance);
-								};
-
-								var setupPlayerEvents = function(jwPlayerInstance) {
-									// setup listener for adError event to reinstantiate the player with different client type.
-									jwPlayerInstance.on('adError', function() {
-										if (!playerReInstantiated) {
-											playerReInstantiated = true;
-											instantiateJwPlayer('googima');
-										}
-									});
-
-									// setup listener for adImpression event to send bid won feedback for video bids.
-									jwPlayerInstance.on('adImpression', function() {
-										prebidDataCollector.collectBidWonData(bid);
-									});
-
-									// ad-hoc data logging
-									jwpEvents.forEach(function(eventName) {
-										jwPlayerInstance.on(eventName, function(e) {
-											window.adpushup.$.ajax({
-												type: 'POST',
-												url: '//vastdump-staging.adpushup.com/' + eventName,
-												data: JSON.stringify({
-													data: JSON.stringify(e),
-													bid: JSON.stringify(bid),
-													eventTime: +new Date(),
-													bidWonTime: bidWonTime,
-													auctionId: bid.auctionId || '',
-													requestId: bid.requestId || ''
-												}),
-												contentType: 'application/json',
-												processData: false,
-												dataType: 'json'
-											});
-										});
-									});
-								};
-
-								instantiateJwPlayer();
-							}
-						});
-					}
+					render: videoRenderer.bind(null, adpSlot, playerSize)
 				},
 				bids: computedBidders
 			};

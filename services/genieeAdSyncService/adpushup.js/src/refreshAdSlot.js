@@ -25,6 +25,39 @@ var utils = require('../libs/utils'),
 			container.attr('data-timeout', newTimeoutId);
 		}
 	},
+	getAdObjById = function(adId) {
+		return ads.find(obj => obj.ad.id === adId);
+	},
+	setRefreshTimeOutByAdId = function(adId, refreshInterval) {
+		if (!adId) return;
+
+		var adObj = getAdObjById(adId);
+		if (!adObj) return;
+
+		setRefreshTimeOut(adObj.container, adObj.ad, refreshInterval);
+	},
+	getRefreshDataByAdId = function(adId) {
+		var adObj = getAdObjById(adId);
+		if (!adObj) return;
+
+		var { refreshTime: refreshTimeStamp, timeout: refreshTimeoutId } = adObj.container[0].dataset;
+
+		if (!refreshTimeStamp) return;
+
+		var refreshTimeoutStartTime = new Date(parseInt(refreshTimeStamp, 10));
+		var currentTime = new Date();
+
+		var refreshIntervalInMs =
+			adObj.ad.networkData.refreshInterval * 1000 || commonConsts.AD_REFRESH_INTERVAL;
+
+		var refreshTimeLeftInMs = refreshIntervalInMs - (currentTime - refreshTimeoutStartTime);
+
+		return {
+			refreshTimeoutStartTime,
+			refreshTimeLeftInMs,
+			refreshTimeoutId
+		};
+	},
 	refreshAd = function(container, ad) {
 		if (utils.checkElementInViewPercent(container)) {
 			var currentTime = new Date().getTime();
@@ -196,5 +229,7 @@ var utils = require('../libs/utils'),
 module.exports = {
 	init,
 	refreshSlot,
-	stopRefreshForASlot
+	stopRefreshForASlot,
+	setRefreshTimeOutByAdId,
+	getRefreshDataByAdId
 };
