@@ -60,15 +60,6 @@ class SiteLevelBeforeJS extends Component {
 		const { site, showNotification } = this.props;
 		const { siteId } = site;
 
-		if (!beforeJsSnippet) {
-			return showNotification({
-				mode: 'error',
-				title: 'Operation Failed',
-				message: 'Please add the JS Snippet to Save',
-				autoDismiss: 5
-			});
-		}
-
 		return axiosInstance
 			.post(`/site/siteLevelBeforeJs/${siteId}`, { beforeJs: btoa(beforeJsSnippet) })
 			.then(res => {
