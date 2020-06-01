@@ -101,10 +101,10 @@ class SiteLevelBeforeJS extends Component {
 			<div>
 				<div className="u-margin-t4">
 					<FormGroup controlId="beforeJsSnippet-input">
-						<ControlLabel>CustomJS Snippet</ControlLabel>
+						<ControlLabel>Custom Script</ControlLabel>
 						<FormControl
 							componentClass="textarea"
-							placeholder="CustomJS Snippet"
+							placeholder="Custom Script"
 							name="beforeJsSnippet"
 							onChange={this.handleChange}
 							value={beforeJsSnippet}
@@ -140,7 +140,7 @@ class SiteLevelBeforeJS extends Component {
 				>
 					<Panel eventKey="siteLevelBeforeJs">
 						<Panel.Heading>
-							<Panel.Title toggle>Site Level beforeJS</Panel.Title>
+							<Panel.Title toggle>Script Injection </Panel.Title>
 						</Panel.Heading>
 						{activeKey === 'siteLevelBeforeJs' ? (
 							<Panel.Body collapsible>{this.renderView()}</Panel.Body>
