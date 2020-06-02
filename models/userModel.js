@@ -58,7 +58,8 @@ var modelAPI = (module.exports = apiModule()),
 			'adServerSetupStatus',
 			'sellerId',
 			'companyName',
-			'lastPaymentCheckDateSellersJson'
+			'lastPaymentCheckDateSellersJson',
+			'manuallyEnteredCompanyName'
 		];
 		this.clientKeys = [
 			'firstName',
@@ -85,7 +86,8 @@ var modelAPI = (module.exports = apiModule()),
 			'adServerSetupStatus',
 			'sellerId',
 			'companyName',
-			'lastPaymentCheckDateSellersJson'
+			'lastPaymentCheckDateSellersJson',
+			'manuallyEnteredCompanyName'
 		];
 		this.validations = schema.user.validations;
 		this.classMap = {
