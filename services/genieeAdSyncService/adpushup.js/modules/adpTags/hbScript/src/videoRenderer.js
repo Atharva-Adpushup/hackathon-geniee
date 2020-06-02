@@ -155,10 +155,13 @@ module.exports = (function() {
 						var highestAliveBid = utils.getHighestAliveBid(pbjs, bid.adUnitCode);
 
 						if (highestAliveBid) {
-							var {
-								refreshTimeLeftInMs,
-								refreshTimeoutId
-							} = refreshAdSlot.getRefreshDataByAdId(adpSlot.optionalParam.adId);
+							var refreshData = refreshAdSlot.getRefreshDataByAdId(
+								adpSlot.optionalParam.adId
+							);
+
+							if (!refreshData) return;
+
+							var { refreshTimeLeftInMs, refreshTimeoutId } = refreshData;
 							var minRefreshTimeoutForImpInMs = 1000;
 
 							// If refresh time left is greater than 1s

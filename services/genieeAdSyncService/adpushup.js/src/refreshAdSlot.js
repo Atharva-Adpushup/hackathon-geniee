@@ -42,7 +42,7 @@ var utils = require('../libs/utils'),
 
 		var { refreshTime: refreshTimeStamp, timeout: refreshTimeoutId } = adObj.container[0].dataset;
 
-		if (!refreshTimeStamp) return;
+		if (!refreshTimeStamp || !refreshTimeoutId) return;
 
 		var refreshTimeoutStartTime = new Date(parseInt(refreshTimeStamp, 10));
 		var currentTime = new Date();
