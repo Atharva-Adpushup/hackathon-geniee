@@ -23,7 +23,7 @@ const filenames = {
 const SELLER_TYPE = 'PUBLISHER';
 const APP_BUCKET = 'AppBucket';
 const AP_APP_BUCKET = 'apAppBucket';
-const NEW_USER_AGE_IN_MONTHS = 2;
+const NEW_USER_AGE_IN_MONTHS = 3;
 const LAST_PAYMENT_CHECK_EXPIRY = 5;
 
 let errors = [];
@@ -40,7 +40,7 @@ let ignoredEmails = ['@mailinator', '@adpushup'];
 let fileOutput = commonConsts.SELLERS_JSON.fileConfig;
 
 function getUsersQueryForBucket(bucketName) {
-	let queryString = `SELECT email, sellerId, dateCreated, lastPaymentCheckDateSellersJson, ARRAY site.domain FOR site IN sites END AS siteDomains FROM ${bucketName} WHERE meta().id LIKE 'user::%' AND ARRAY_LENGTH(sites) > 0;`;
+	let queryString = `SELECT email, sellerId, dateCreated, manuallyEnteredCompanyName, lastPaymentCheckDateSellersJson, ARRAY site.domain FOR site IN sites END AS siteDomains FROM ${bucketName} WHERE meta().id LIKE 'user::%' AND ARRAY_LENGTH(sites) > 0;`;
 	return couchbase.N1qlQuery.fromString(queryString);
 }
 
@@ -146,7 +146,7 @@ function createSellerId(email) {
 	return md5(email.toLowerCase());
 }
 
-function getPreparedSiteObj(siteDomain, user) {
+function getPreparedSiteObj(user) {
 	let siteObj = {};
 	let isConfidential =
 		user.hasConfidentialDomain ||
@@ -155,7 +155,7 @@ function getPreparedSiteObj(siteDomain, user) {
 
 	if (!isConfidential) {
 		siteObj.name = user.companyName;
-		siteObj.domain = domanize(siteDomain);
+		siteObj.domain = domanize(user.siteDomain);
 	}
 
 	siteObj.seller_id = user.sellerId;
@@ -224,6 +224,7 @@ function writeDataToTempFile() {
 
 function replaceWithOldSellersJson() {
 	if (errors.length) {
+		console.log(errors);
 		throw new Error(
 			'Due to non-empty errors not updating the sellers.json file with this new one created. You may check the latest_sellers.json file created to get help for errors'
 		);
@@ -311,10 +312,18 @@ function processDataInChunks(users, chunkSize = 500) {
 			user.sellerId = sellerId;
 		}
 
+		/*
+			-	if tipalti does not have companyName, check for 'manuallyEnteredCompanyName' in the user doc
+			-	if 'manuallyEnteredCompanyName' is not present do the following
+					1.	save the 'manuallyEnteredCompanyName' in user doc = user.siteDomain
+					2.	use 'manuallyEnteredCompanyName' as the companyName
+		*/
 		let getCompanyNamePromise = getUserCompanyName(user.email).then(function(companyName) {
 			if (companyName) {
 				userUpdates.companyName = companyName;
 				user.companyName = companyName;
+			} else if (user.manuallyEnteredCompanyName) {
+				user.companyName = user.manuallyEnteredCompanyName;
 			}
 		});
 		pendingPromises.push(getCompanyNamePromise);
@@ -323,8 +332,8 @@ function processDataInChunks(users, chunkSize = 500) {
 			return Promise.all(pendingPromises)
 				.then(function() {
 					if (!user.companyName) {
-						// skip user if company name not set in user after fetching from Tipalti
-						return Promise.reject({ skipUser: true });
+						// if code reaches here, it means neither we have companyName in tipalti nor manuallyEnteredCompanyName in user
+						user.companyName = userUpdates.manuallyEnteredCompanyName = domanize(user.siteDomain);
 					}
 					return shouldUserBeAdded(user).then(function(paidInPastFiveMonths) {
 						if (paidInPastFiveMonths) {
@@ -335,7 +344,7 @@ function processDataInChunks(users, chunkSize = 500) {
 					});
 				})
 				.then(function() {
-					let siteObj = getPreparedSiteObj(user.siteDomain, user);
+					let siteObj = getPreparedSiteObj(user);
 					fileOutput.sellers.push(siteObj);
 					return resolve();
 				})
