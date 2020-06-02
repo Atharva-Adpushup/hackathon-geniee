@@ -230,12 +230,12 @@ class Account extends Component {
 					}
 				]);
 			})
-			.then(() => {
+			.then(() =>
 				this.setState({
 					originalactiveDFP: activeDFP,
 					loading: false
-				});
-			});
+				})
+			);
 	};
 
 	render() {
