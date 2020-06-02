@@ -152,7 +152,7 @@ var utils = require('../libs/utils'),
 			}
 		}
 	},
-	onScroll = function() {
+	handleRefresh = function() {
 		getAllInViewAds();
 
 		for (var i = 0; i < inViewAds.length; i++) {
@@ -188,34 +188,9 @@ var utils = require('../libs/utils'),
 			}
 		}
 	},
-	onFocus = function() {
-		getAllInViewAds();
-
-		for (var i = 0; i < inViewAds.length; i++) {
-			var inViewAd = inViewAds[i],
-				container = inViewAd.container,
-				ad = inViewAd.ad,
-				lastRefreshTime = container.attr('data-refresh-time'),
-				currentTime = new Date().getTime(),
-				adRefreshInterval =
-					parseInt(ad.networkData.refreshInterval) * 1000 || commonConsts.AD_REFRESH_INTERVAL,
-				timeDifferenceInSec,
-				refreshInterval;
-			if (lastRefreshTime) {
-				// if Ad has been rendered before
-				timeDifferenceInSec = currentTime - lastRefreshTime;
-				if (timeDifferenceInSec > adRefreshInterval) {
-					// if last refresh turn has been missed
-					refreshInterval = 0;
-					setRefreshTimeOut(container, ad, refreshInterval);
-				}
-				// else immediatly refresh it;
-			}
-		}
-	},
 	init = function() {
-		$(window).on('scroll', debounce(onScroll, 50));
-		$(window).on('focus', onFocus);
+		$(window).on('scroll', debounce(handleRefresh, 50));
+		$(window).on('focus', handleRefresh);
 	},
 	refreshSlot = function(container, ad) {
 		setRefreshTimeOut(container, ad);
