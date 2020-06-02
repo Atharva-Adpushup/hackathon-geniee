@@ -316,7 +316,7 @@ class HeaderBidding extends React.Component {
 		const { isMasterSaving } = this.state;
 
 		return (
-			<div>
+			<div className="headerBidding">
 				<Nav bsStyle="tabs" activeKey={activeItem.INDEX} onSelect={this.handleNavSelect}>
 					{((!isAdpushupDfp && (!dfpConnected || adServerSetupStatus !== 2)) ||
 						!inventoryFound ||
@@ -336,7 +336,7 @@ class HeaderBidding extends React.Component {
 						{NAV_ITEMS_VALUES.TAB_4}
 					</NavItem>
 					{isSuperUser && (
-						<NavItem eventKey={5} className={!biddersFound ? 'disabled' : ''}>
+						<NavItem eventKey={5} className="disabled">
 							{NAV_ITEMS_VALUES.TAB_5}
 						</NavItem>
 					)}

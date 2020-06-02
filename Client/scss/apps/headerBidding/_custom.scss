@@ -8,7 +8,7 @@
 .tab-content-buttons-container {
 	display: flex;
 	justify-content: flex-end;
-};
+}
 
 .hb-setup {
 	ul {
@@ -367,4 +367,15 @@
 
 .inventory-tab .filterbox {
 	z-index: 3 !important;
+}
+
+.headerBidding {
+	.nav-tabs {
+		.disabled {
+			cursor: not-allowed;
+			a {
+				pointer-events: none;
+			}
+		}
+	}
 }
