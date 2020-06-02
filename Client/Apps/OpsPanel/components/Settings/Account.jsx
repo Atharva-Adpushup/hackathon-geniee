@@ -148,10 +148,38 @@ class Account extends Component {
 		});
 	};
 
-	handleSave = () => {
-		const { adsensePubId, activeDFP, originalactiveDFP, isThirdPartyAdx } = this.state;
+	handleAdsenseSave = () => {
+		const { adsensePubId } = this.state;
 		const { showNotification, updateUser, user } = this.props;
-		const { adNetworkSettings = [], adServerSettings = {} } = user;
+
+		const { adNetworkSettings = [] } = user;
+
+		const originalAdsensePubId = adNetworkSettings[0] ? adNetworkSettings[0].pubId : null;
+		const shouldUpdateAdNetworkSettings = !!(originalAdsensePubId || adsensePubId);
+
+		if (shouldUpdateAdNetworkSettings) {
+			adNetworkSettings[0] = adNetworkSettings[0] || {};
+			adNetworkSettings[0].pubId = adsensePubId;
+			adNetworkSettings[0].networkName = adNetworkSettings[0].networkName || 'ADSENSE';
+		}
+		this.setState({ loading: true });
+
+		return updateUser([
+			{
+				key: 'adNetworkSettings',
+				value: adNetworkSettings
+			}
+		]).then(() =>
+			this.setState({
+				loading: false
+			})
+		);
+	};
+
+	handleAdManagerSave = () => {
+		const { activeDFP, originalactiveDFP, isThirdPartyAdx, adsensePubId } = this.state;
+		const { showNotification, updateUser, user } = this.props;
+		const { adServerSettings = {} } = user;
 
 		if (originalactiveDFP === null) {
 			if (activeDFP === null) {
@@ -184,15 +212,6 @@ class Account extends Component {
 			}
 		};
 
-		const originalAdsensePubId = adNetworkSettings[0] ? adNetworkSettings[0].pubId : null;
-		const shouldUpdateAdNetworkSettings = !!(originalAdsensePubId || adsensePubId);
-
-		if (shouldUpdateAdNetworkSettings) {
-			adNetworkSettings[0] = adNetworkSettings[0] || {};
-			adNetworkSettings[0].pubId = adsensePubId;
-			adNetworkSettings[0].networkName = adNetworkSettings[0].networkName || 'ADSENSE';
-		}
-
 		this.setState({ loading: true });
 
 		return this.getPrebidGranularityMultiplier(activeDFPNetwork, activeDFPCurrencyCode)
@@ -208,19 +227,15 @@ class Account extends Component {
 					{
 						key: 'adServerSettings',
 						value: updatedAdServerSettings
-					},
-					{
-						key: 'adNetworkSettings',
-						value: adNetworkSettings
 					}
 				]);
 			})
-			.then(() =>
+			.then(() => {
 				this.setState({
 					originalactiveDFP: activeDFP,
 					loading: false
-				})
-			);
+				});
+			});
 	};
 
 	render() {
@@ -359,10 +374,17 @@ class Account extends Component {
 					disabled={disableThirdPartyAdx}
 				/>
 				{isDFPSetup && originalactiveDFP !== null ? null : (
-					<CustomButton variant="primary" className="pull-right" onClick={this.handleSave}>
-						Save
+					<CustomButton
+						variant="primary"
+						className="pull-right u-margin-l4"
+						onClick={this.handleAdManagerSave}
+					>
+						Sync Ad Manager
 					</CustomButton>
 				)}
+				<CustomButton variant="primary" className="pull-right" onClick={this.handleAdsenseSave}>
+					Sync AdSense
+				</CustomButton>
 			</Col>
 		);
 	}
