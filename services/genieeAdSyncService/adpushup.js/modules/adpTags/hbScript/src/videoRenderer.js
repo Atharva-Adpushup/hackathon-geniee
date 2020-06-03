@@ -49,8 +49,6 @@ module.exports = (function() {
 				} else {
 					adpSlot.feedbackSent = false; // reset feedbackSent status for current slot
 					pbjs.renderAd(getIframeDocument(), bid.adId);
-
-					console.log('Render Video ad as soon as slot comes in view: ', bid.adUnitCode);
 				}
 			};
 		})();
@@ -74,16 +72,12 @@ module.exports = (function() {
 				// send banner bid won feedback
 				prebidDataCollector.collectBidWonData(highestAliveBannerBid);
 
-				console.log('out of view video slot banner rendered: ', adpSlot.containerId);
-
 				// Replace it with video ad when slot come back in view
 				videoSlotInViewWatcher();
 			}
 			// otherwise render video
 			else {
 				renderVideoBid();
-
-				console.log('inview video rendered: ', adpSlot.containerId);
 			}
 
 			function renderVideoBid() {
@@ -149,8 +143,6 @@ module.exports = (function() {
 
 					// listen video complete event
 					jwPlayerInstance.on('adComplete', function() {
-						console.log('adComplete event fired: ', bid.adUnitCode);
-
 						// check if there is any another highest alive unused bid in cache
 						var highestAliveBid = utils.getHighestAliveBid(pbjs, bid.adUnitCode);
 
@@ -167,10 +159,6 @@ module.exports = (function() {
 							// If refresh time left is greater than 1s
 							if (refreshTimeLeftInMs >= minRefreshTimeoutForImpInMs) {
 								cleanJwPlayerAndRenderBid(jwPlayerInstance, highestAliveBid);
-								console.log(
-									'Video complete cache bid rendered without extending refresh timout: ',
-									highestAliveBid.adUnitCode
-								);
 							}
 							// If refresh time left is less than 1s
 							else if (
@@ -187,12 +175,6 @@ module.exports = (function() {
 								refreshAdSlot.setRefreshTimeOutByAdId(
 									adpSlot.optionalParam.adId,
 									minRefreshTimeoutForImpInMs
-								);
-
-								console.log(
-									`Video complete cache bid rendered and refresh timout extended by ${minRefreshTimeoutForImpInMs /
-										1000}s: `,
-									highestAliveBid.adUnitCode
 								);
 							}
 						}
