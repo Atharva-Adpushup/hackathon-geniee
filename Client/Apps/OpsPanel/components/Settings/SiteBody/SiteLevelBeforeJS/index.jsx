@@ -90,7 +90,7 @@ class SiteLevelBeforeJS extends Component {
 
 		return (
 			<div>
-				<div className="u-margin-t4">
+				<div className="u-margin-t4 beforeJs">
 					<FormGroup controlId="beforeJsSnippet-input">
 						<ControlLabel>Custom Script</ControlLabel>
 						<FormControl
