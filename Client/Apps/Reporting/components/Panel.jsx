@@ -802,6 +802,9 @@ class Panel extends Component {
 				item.isDisabled = false;
 				return item;
 			})
+		} else {
+			// this is for ops panel reports. Don't whow unique impression items in dropdown
+			allAvailableMetrics = allAvailableMetrics.filter((item) => item.value.indexOf("unique") === -1)
 		}
 		const aggregatedData = this.aggregateValues(tableData.result);
 		const { email } = this.getDemoUserParams();
