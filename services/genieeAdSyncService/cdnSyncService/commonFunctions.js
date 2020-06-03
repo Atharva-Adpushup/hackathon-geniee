@@ -19,6 +19,15 @@ function getBiddersFromNetworkTree() {
 		.catch(err => Promise.resolve({}));
 }
 
+function getSizeMappingConfigFromCB() {
+	return couchbase
+		.connectToAppBucket()
+		.then(appBucket => appBucket.getAsync(commonConsts.docKeys.sizeMapppingConfig, {}))
+		.then(({ value }) => value || {})
+		.catch(err => Promise.resolve({}));
+}
+
 module.exports = {
-	getBiddersFromNetworkTree
+	getBiddersFromNetworkTree,
+	getSizeMappingConfigFromCB
 };

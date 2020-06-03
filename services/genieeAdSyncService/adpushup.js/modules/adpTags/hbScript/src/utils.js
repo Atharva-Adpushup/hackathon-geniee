@@ -428,6 +428,64 @@ var utils = {
 
 				return highestBid;
 			}, false);
+	},
+	getDownwardCompatibleSizes: function(dimensions, sizes, addOriginalSize = true) {
+		const { maxHeight, maxWidth } = dimensions;
+
+		/*
+			-	by original size, I mean the size that was used to filter the sizes
+			-	we also need the original size in the compatible sizes in most of the cases
+			-	for example, if 300 and 200 was used to find the smaller sizes, [300, 200] must also be added to the array
+		*/
+		let hasOriginalSizeBeenAdded = false;
+
+		const compatibleSizes = sizes.filter(size => {
+			const [width, height] = size;
+
+			if (width === maxWidth && height === maxHeight) {
+				hasOriginalSizeBeenAdded = true;
+			}
+
+			return width <= maxWidth && height <= maxHeight;
+		});
+
+		if (addOriginalSize && !hasOriginalSizeBeenAdded) {
+			compatibleSizes.push([maxWidth, maxHeight]);
+		}
+
+		return compatibleSizes.sort((a, b) => b[0] - a[0]);
+	},
+	getSizeMappingForCurrentViewport: function(sizeMapping) {
+		let matchedSizeMapping = null;
+
+		for (let i = 0; i < sizeMapping.length; i++) {
+			const { viewportWidth } = sizeMapping[i];
+			const mediaQuery = `(max-width:${viewportWidth}px)`;
+
+			if (window.matchMedia(mediaQuery).matches) {
+				matchedSizeMapping = sizeMapping[i];
+				break;
+			}
+		}
+
+		return matchedSizeMapping;
+	},
+	getSizesComputedUsingSizeMapping: function(sizeMapping, sizes) {
+		var sizeMapping = null;
+		var computedSizes = [];
+
+		try {
+			sizeMapping = this.getSizeMappingForCurrentViewport(sizeMapping);
+		} catch (error) {}
+
+		if (sizeMapping) {
+			var { maxHeight, maxWidth } = sizeMapping;
+			var dimension = { maxWidth, maxHeight };
+
+			computedSizes = this.getDownwardCompatibleSizes(dimension, sizes);
+		}
+
+		return computedSizes;
 	}
 };
 

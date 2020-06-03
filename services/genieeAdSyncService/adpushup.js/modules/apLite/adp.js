@@ -157,8 +157,12 @@ var $ = require('../../libs/jquery'),
 							gptSlots.forEach(
 								function(gptSlot) {
 									var allSizes = gptSlot.getSizes().map(function(size) {
-											var sizeKeys = Object.keys(size);
-											return [size[sizeKeys[0]], size[sizeKeys[1]]];
+											/*
+												layout of size object is { l: 300, j: 100 }
+											*/
+											var width = size.l,
+												height = size.j;
+											return [width, height];
 										}),
 										gptSlotElementId = gptSlot.getSlotElementId(),
 										gptAdUnitPath = gptSlot.getAdUnitPath(),
@@ -169,8 +173,18 @@ var $ = require('../../libs/jquery'),
 											var dfpAdUnit = adUnitArr[adUnitArr.length - 1];
 											return dfpAdUnit === dfpAdUnitName;
 										}),
+										sizeMapping = apLiteAdUnit && apLiteAdUnit.sizeMapping,
 										sectionId = apLiteAdUnit && apLiteAdUnit.sectionId,
-										container = $(`#${gptSlotElementId}`);
+										container = $(`#${gptSlotElementId}`),
+										computedSizes;
+
+									if (Array.isArray(sizeMapping) && sizeMapping.length > 0) {
+										/*
+											if we have sizes for this viewport, use them otherwise use all the sizes
+										*/
+										computedSizes = hbUtils.getSizesComputedUsingSizeMapping(sizeMapping, allSizes);
+										allSizes = computedSizes.length ? computedSizes : allSizes;
+									}
 
 									// Create adp slot only if defined GPT slot has the associated container in the DOM and gpt ad unit has a valid section id
 									if (container.length && dfpAdUnitName) {

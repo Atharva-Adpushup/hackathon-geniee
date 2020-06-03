@@ -220,7 +220,8 @@ module.exports = function(site, user) {
 						apConfigs,
 						prebidConfig,
 						apLiteConfig,
-						statusesAndAds: finalConfig
+						statusesAndAds: finalConfig,
+						sizeMappingConfig
 					} = generatedConfig;
 
 					if (site.get('medianetId')) apConfigs.medianetId = site.get('medianetId');
@@ -228,6 +229,7 @@ module.exports = function(site, user) {
 					bundle = _.replace(bundle, '__AP_CONFIG__', JSON.stringify(apConfigs));
 					bundle = _.replace(bundle, /__SITE_ID__/g, siteId);
 					bundle = _.replace(bundle, '__COUNTRY__', false);
+					bundle = _.replace(bundle, '__SIZE_MAPPING__', JSON.stringify(sizeMappingConfig));
 
 					// Generate final init script based on the services that are enabled
 					var uncompressed = generateFinalInitScript(bundle)

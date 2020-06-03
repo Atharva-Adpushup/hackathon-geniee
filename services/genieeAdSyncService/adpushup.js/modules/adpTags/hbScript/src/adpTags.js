@@ -7,6 +7,8 @@ var utils = require('./utils');
 var responsiveAds = require('./responsiveAds');
 var hb = require('./hb');
 var gpt = require('./gpt');
+var globalSizes = config.SIZE_MAPPING.sizes || [];
+
 var adpTags = {
 	module: {
 		adpSlots: {},
@@ -99,6 +101,7 @@ var adpTags = {
 					? config.PREBID_CONFIG.prebidConfig.timeOut
 					: constants.PREBID.TIMEOUT;
 			var adType = optionalParam.adType;
+			var sizeMapping = optionalParam.sizeMapping;
 
 			/*
 			if (isResponsive) {
@@ -134,31 +137,18 @@ var adpTags = {
 					winner: constants.FEEDBACK.DEFAULT_WINNER
 				},
 				adType: adType,
-				refreshCount: 0
+				refreshCount: 0,
+				sizeMapping: sizeMapping
 			};
 
-			this.computeSizesAndDefineSlot(adpSlot);
+			this.computeSizesAndDefineGPTSlot(adpSlot);
 
 			this.adpSlots[containerId] = adpSlot;
 
 			return this.adpSlots[containerId];
 		},
-		computeSizesAndDefineSlot: function(adpSlot) {
-			var computedSizes;
-			if (adpSlot.isResponsive) {
-				// for a responsive slot the ad container has to be in the DOM for size computation.
-				if (document.getElementById(adpSlot.containerId)) {
-					computedSizes = responsiveAds.getAdSizes(adpSlot.optionalParam.adId).collection;
-				} else {
-					// return without defining gpt slot since we can not compute applicable sizes
-					return;
-				}
-			} else {
-				computedSizes =
-					constants.AD_SIZE_MAPPING.IAB_SIZES.BACKWARD_COMPATIBLE_MAPPING[
-						adpSlot.size.join(',')
-					] || [];
-			}
+		computeSizesAndDefineGPTSlot: function(adpSlot) {
+			var computedSizes = this.getComputedSizes(adpSlot);
 
 			adpSlot.computedSizes =
 				computedSizes && computedSizes.length
@@ -201,12 +191,62 @@ var adpTags = {
 				 * So, now we can compute the sizes and initiate header bidding on this slot.
 				 */
 				if (!slot.computedSizes) {
-					this.computeSizesAndDefineSlot(slot);
+					this.computeSizesAndDefineGPTSlot(slot);
 					this.queSlotForBidding(slot);
 				}
 				slot.hasRendered = true;
 				gpt.renderSlots(window.googletag, [slot]);
 			}
+		},
+
+		getComputedSizes: function(adpSlot) {
+			var computedSizes;
+
+			if (adpSlot.isResponsive) {
+				// for a responsive slot the ad container has to be in the DOM for size computation.
+				if (document.getElementById(adpSlot.containerId)) {
+					computedSizes = responsiveAds.getAdSizes(adpSlot.optionalParam.adId).collection;
+				} else {
+					// return without defining gpt slot since we can not compute applicable sizes
+					return;
+				}
+			} else {
+				/**
+				 * First we try to compute sizes using the size mapping (if present) for this adpSlot
+				 * If size mapping is not present or if the sizes array returned is empty
+				 * We use the adpSlot.size ([width, height]) to compute the sizes
+				 *
+				 * NOTE: The sizes are computed from the global list and filtered if their height and width are <= maxHeight and maxWidth
+				 */
+
+				const { sizeMapping } = adpSlot;
+				const isValidSizeMapping = Array.isArray(sizeMapping) && sizeMapping.length > 0;
+
+				if (isValidSizeMapping) {
+					computedSizes = utils.getSizesComputedUsingSizeMapping(
+						sizeMapping,
+						globalSizes
+					);
+				}
+
+				/*
+				 * Checking if computed sizes is array with length 0 to handle the case where
+				 * the sizeMapping might exist but no config for current viewport is present in
+				 * the size mapping
+				 */
+
+				const isInvalidComputedSizes =
+					!computedSizes || (Array.isArray(computedSizes) && computedSizes.length === 0);
+
+				if (isInvalidComputedSizes) {
+					const [maxWidth, maxHeight] = adpSlot.size;
+					const dimension = { maxHeight, maxWidth };
+
+					computedSizes = utils.getDownwardCompatibleSizes(dimension, globalSizes);
+				}
+			}
+
+			return computedSizes;
 		}
 	},
 	init: function(w) {
