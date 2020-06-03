@@ -16,6 +16,7 @@ import CustomButton from '../../../../Components/CustomButton/index';
 import Loader from '../../../../Components/Loader';
 import ActionCard from '../../../../Components/ActionCard/index';
 import CustomToggleSwitch from '../../../../Components/CustomToggleSwitch/index';
+import FieldGroup from '../../../../Components/Layout/FieldGroup.jsx';
 
 class AdCodeGenerator extends Component {
 	constructor(props) {
@@ -24,10 +25,12 @@ class AdCodeGenerator extends Component {
 			progress: 0,
 			platform: '',
 			type: '',
+			rewardText: '',
 			size: null,
 			customFields: {},
 			loading: false,
-			fluid: true
+			fluid: true,
+			automaticTrigger: false
 		};
 		this.selectPlatform = this.selectPlatform.bind(this);
 		this.selectType = this.selectType.bind(this);
@@ -237,6 +240,10 @@ class AdCodeGenerator extends Component {
 								? this.renderFluidToggle()
 								: null
 							: null}
+						{type === 'rewardedVideoAds' && progress >= 75 ? this.renderRewardInput() : null}
+						{type === 'rewardedVideoAds' && progress >= 75
+							? this.renderAutomaticTriggerToggle()
+							: null}
 						{progress >= 75 ? this.renderButton('Generate AdCode', this.saveHandler) : null}
 					</div>
 				)}
@@ -330,6 +337,60 @@ class AdCodeGenerator extends Component {
 			</div>
 		);
 	};
+
+	handleChange = e => {
+		this.setState({
+			[e.target.name]: e.target.value
+		});
+	};
+
+	renderRewardInput() {
+		const { match } = this.props;
+		const { siteId } = match.params;
+		const { rewardText } = this.state;
+		return (
+			<div className="Reward">
+				<FieldGroup
+					name="rewardText"
+					value={rewardText}
+					type="text"
+					label="Reward Text"
+					onChange={this.handleChange}
+					size={4}
+					id="rewardText-input"
+					placeholder=" Enter Reward Text"
+					className="u-padding-v4 u-padding-h4 rewardText"
+				/>
+			</div>
+		);
+	}
+
+	renderAutomaticTriggerToggle() {
+		const { match } = this.props;
+		const { siteId } = match.params;
+		const { automaticTrigger } = this.state;
+		return (
+			<Row>
+				<Col md={5}>
+					<CustomToggleSwitch
+						labelText="Trigger Automatically"
+						className="u-margin-b4 u-margin-t4 negative-toggle fluid-Toggle"
+						checked={automaticTrigger}
+						onChange={this.handleToggle}
+						layout="horizontal"
+						size="m"
+						on="Yes"
+						off="No"
+						defaultLayout
+						name={`automaticTrigger-${siteId}`}
+						id={`js-automaticTrigger-${siteId}`}
+						subText="If this option is enabled, the ad will be triggered whereever the AP Tag is placed.Otherwise one of the conditional triggeres would be used"
+					/>
+				</Col>
+				<Col md={7} />
+			</Row>
+		);
+	}
 
 	renderFluidToggle() {
 		const { match } = this.props;

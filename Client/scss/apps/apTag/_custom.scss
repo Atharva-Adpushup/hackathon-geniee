@@ -257,3 +257,17 @@ select.inputMinimal {
 		}
 	}
 }
+
+.Reward {
+	.form-group {
+		margin-left: 2rem;
+		.rewardText {
+			display: inline;
+			width: 50%;
+			margin-left: 20%;
+		}
+		label {
+			font-size: 18px;
+		}
+	}
+}
