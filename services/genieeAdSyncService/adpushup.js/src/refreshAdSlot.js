@@ -26,6 +26,8 @@ var utils = require('../libs/utils'),
 		}
 	},
 	getAdObjById = function(adId) {
+		if (!adId) return;
+
 		return ads.find(obj => obj.ad.id === adId);
 	},
 	setRefreshTimeOutByAdId = function(adId, refreshInterval) {
@@ -37,10 +39,15 @@ var utils = require('../libs/utils'),
 		setRefreshTimeOut(adObj.container, adObj.ad, refreshInterval);
 	},
 	getRefreshDataByAdId = function(adId) {
+		if (!adId) return;
+
 		var adObj = getAdObjById(adId);
 		if (!adObj) return;
 
-		var { refreshTime: refreshTimeStamp, timeout: refreshTimeoutId } = adObj.container[0].dataset;
+		// get updated container (adObj.container is old)
+		var container = $(`#${adObj.ad.id}`);
+
+		var { refreshTime: refreshTimeStamp, timeout: refreshTimeoutId } = container[0].dataset;
 
 		if (!refreshTimeStamp || !refreshTimeoutId) return;
 
