@@ -2,7 +2,7 @@ import React from 'react';
 import sortBy from 'lodash/sortBy';
 import cloneDeep from 'lodash/cloneDeep';
 import { numberWithCommas, roundOffTwoDecimal, getWidgetValidDationState } from '../helpers/utils';
-import { displayMetrics, opsDisplayMetricsKeys } from '../configs/commonConsts';
+import { displayMetrics, displayUniqueMetrics, opsDisplayMetricsKeys } from '../configs/commonConsts';
 
 function computeDisplayData(props) {
 	const {
@@ -71,8 +71,8 @@ class PerformanceOverview extends React.Component {
 
 	render() {
 		const { displayData } = this.state;
-		const { isForOps } = this.props;
-		const computedDisplayMetrics = cloneDeep(displayMetrics);
+		const { isForOps, isUniqueImpChecked } = this.props;
+		const computedDisplayMetrics = cloneDeep(isUniqueImpChecked?displayUniqueMetrics:displayMetrics);
 		if (!isForOps) {
 			Object.keys(computedDisplayMetrics).forEach(displayMetricKey => {
 				const isOpsKey = opsDisplayMetricsKeys.indexOf(displayMetricKey) !== -1;

@@ -32,12 +32,15 @@ import CustomButton from '../../../Components/CustomButton';
 class Dashboard extends React.Component {
 	constructor(props) {
 		super(props);
+		// getting value as string from localStorage and Boolean() is not working
+		// override normal cols with unique imp columns
+		let isUniqueImpChecked  = localStorage.getItem('isUniqueImpChecked') == "true"?true:false
 		this.state = {
 			quickDates: dates,
 			sites: [],
 			widgetsConfig: [],
 			isLoading: true,
-			isUniqueImpChecked:localStorage.getItem('isUniqueImpChecked')
+			isUniqueImpChecked
 		};
 	}
 
@@ -167,6 +170,7 @@ class Dashboard extends React.Component {
 
 	getWidgetComponent = widget => {
 		const { reportType } = this.props;
+		let { isUniqueImpChecked } = this.state;
 		if (widget.isLoading) return <Loader height="20vh" />;
 
 		switch (widget.name) {
@@ -180,7 +184,7 @@ class Dashboard extends React.Component {
 					/>
 				);
 			case 'per_overview':
-				return <PerformanceOverviewContainer displayData={widget.data} />;
+				return <PerformanceOverviewContainer isUniqueImpChecked={isUniqueImpChecked} displayData={widget.data} />;
 			case 'per_site_wise':
 				if (reportType != 'site') {
 					return <SitewiseReportContainer displayData={widget.data} />;
@@ -202,7 +206,7 @@ class Dashboard extends React.Component {
 	};
 
 	getDisplayData = wid => {
-		const { widgetsConfig } = this.state;
+		const { widgetsConfig, isUniqueImpChecked } = this.state;
 		const {
 			selectedDate,
 			selectedSite,
@@ -243,9 +247,7 @@ class Dashboard extends React.Component {
 		widgetsConfig[wid].startDate = params.fromDate;
 		widgetsConfig[wid].endDate = params.toDate;
 
-		// getting value as string from localStorage and Boolean() is not working
-		// override normal cols with unique imp columns
-		if(name == 'per_site_wise' && this.state.isUniqueImpChecked == "true") {
+		if(name == 'per_site_wise' && isUniqueImpChecked) {
 			path = path.replace('network_impressions,', '')
 			path = path.replace('network_ad_ecpm,', '')
 			path += ',unique_impressions,unique_ad_ecpm'

@@ -91,6 +91,15 @@ const displayMetrics = {
 	network_ad_ecpm: { name: 'Ad eCPM', valueType: 'money' }
 };
 
+const displayUniqueMetrics = {
+	network_gross_revenue: { name: 'Gross Revenue', valueType: 'money' },
+	network_net_revenue: { name: 'Net Revenue', valueType: 'money' },
+	adpushup_page_views: { name: 'Page Views', valueType: 'number' },
+	adpushup_page_cpm: { name: 'Page RPM', valueType: 'money' },
+	unique_impressions: { name: 'Impressions', valueType: 'number' },
+	unique_ad_ecpm: { name: 'Ad eCPM', valueType: 'money' }
+};
+
 const opsDisplayMetricsKeys = ['network_gross_revenue'];
 
 const dashboardWidgets = [
@@ -120,6 +129,7 @@ export {
 	yAxisGroups,
 	tableHeader,
 	displayMetrics,
+	displayUniqueMetrics,
 	opsDisplayMetricsKeys,
 	dashboardWidgets,
 	activeLegendItemArray,
