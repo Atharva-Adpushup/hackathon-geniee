@@ -531,9 +531,13 @@ class Panel extends Component {
 			if(found.length) {
 				let match = displayUniqueImpressionMetrics.map((item) => item.value)
 				sortedMetrics = sortedMetaMetrics.filter((item) => match.indexOf(item.value)!=-1)
+				// temp code for unqiue imp selection in dashboard from this component
+				localStorage.setItem('isUniqueImpChecked', true)
 			} else {
 				let match = displayMetrics.map((item) => item.value)
 				sortedMetrics = sortedMetaMetrics.filter((item) => match.indexOf(item.value)!=-1)
+				// temp code for unqiue imp selection in dashboard from this component
+				localStorage.setItem('isUniqueImpChecked', false)
 			}
 		}
 

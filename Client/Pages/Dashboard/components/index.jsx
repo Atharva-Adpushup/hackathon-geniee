@@ -36,7 +36,8 @@ class Dashboard extends React.Component {
 			quickDates: dates,
 			sites: [],
 			widgetsConfig: [],
-			isLoading: true
+			isLoading: true,
+			isUniqueImpChecked:localStorage.getItem('isUniqueImpChecked')
 		};
 	}
 
@@ -205,12 +206,13 @@ class Dashboard extends React.Component {
 		const {
 			selectedDate,
 			selectedSite,
-			path,
 			name,
 			customDateRange,
 			startDate,
 			endDate
 		} = widgetsConfig[wid];
+		let { path } = widgetsConfig[wid];
+
 		const {
 			sites,
 			reportsMeta,
@@ -240,6 +242,14 @@ class Dashboard extends React.Component {
 		params.siteid = getDashboardDemoUserSiteIds(params.siteid, email);
 		widgetsConfig[wid].startDate = params.fromDate;
 		widgetsConfig[wid].endDate = params.toDate;
+
+		// getting value as string from localStorage and Boolean() is not working
+		// override normal cols with unique imp columns
+		if(name == 'per_site_wise' && this.state.isUniqueImpChecked == "true") {
+			path = path.replace('network_impressions,', '')
+			path = path.replace('network_ad_ecpm,', '')
+			path += ',unique_impressions,unique_ad_ecpm'
+		}
 
 		if (hidPerApOriginData) {
 			widgetsConfig[wid].isDataSufficient = false;
