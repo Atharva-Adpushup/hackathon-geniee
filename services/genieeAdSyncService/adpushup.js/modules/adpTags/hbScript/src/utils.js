@@ -471,15 +471,15 @@ var utils = {
 		return matchedSizeMapping;
 	},
 	getSizesComputedUsingSizeMapping: function(sizeMapping, sizes) {
-		var sizeMapping = null;
+		var matchedSizeMapping = null;
 		var computedSizes = [];
 
 		try {
-			sizeMapping = this.getSizeMappingForCurrentViewport(sizeMapping);
+			matchedSizeMapping = this.getSizeMappingForCurrentViewport(sizeMapping);
 		} catch (error) {}
 
-		if (sizeMapping) {
-			var { maxHeight, maxWidth } = sizeMapping;
+		if (matchedSizeMapping) {
+			var { maxHeight, maxWidth } = matchedSizeMapping;
 			var dimension = { maxWidth, maxHeight };
 
 			computedSizes = this.getDownwardCompatibleSizes(dimension, sizes);
