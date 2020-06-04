@@ -109,6 +109,24 @@ const displayMetrics = [
 	METRICS.NETWORK_AD_ECPM
 ];
 
+const METRICS_OPS_PANEL = {
+	NETWORK_NET_REVENUE: { value: 'network_net_revenue', name: 'Net Revenue', valueType: 'money' },
+	ADPUSHUP_PAGE_VIEWS: { value: 'adpushup_page_views', name: 'Page Views', valueType: 'number' },
+	ADPUSHUP_PAGE_CPM: { value: 'adpushup_page_cpm', name: 'Page RPM', valueType: 'money' },
+	NETWORK_IMPRESSIONS: { value: 'network_impressions', name: 'Impressions', valueType: 'number' },
+	NETWORK_AD_ECPM: { value: 'network_ad_ecpm', name: 'Ad eCPM', valueType: 'money' },
+	GROSS_REVENUE: { value: "network_gross_revenue", name: 'Gross Revenue', valueType: 'money' }
+};
+
+const displayOpsMetrics = [
+	METRICS_OPS_PANEL.NETWORK_NET_REVENUE,
+	METRICS_OPS_PANEL.ADPUSHUP_PAGE_VIEWS,
+	METRICS_OPS_PANEL.ADPUSHUP_PAGE_CPM,
+	METRICS_OPS_PANEL.NETWORK_IMPRESSIONS,
+	METRICS_OPS_PANEL.NETWORK_AD_ECPM,
+	METRICS_OPS_PANEL.GROSS_REVENUE
+];
+
 const UNIQUE_IMPRESSION_METRICS = {
 	NETWORK_NET_REVENUE: { value: 'network_net_revenue', name: 'Net Revenue', valueType: 'money' },
 	ADPUSHUP_PAGE_VIEWS: { value: 'adpushup_page_views', name: 'Page Views', valueType: 'number' },
@@ -174,6 +192,7 @@ export {
 	filtersValues,
 	REPORT_PATH,
 	displayMetrics,
+	displayOpsMetrics,
 	displayUniqueImpressionMetrics,
 	activeLegendItem,
 	activeLegendItemArray,

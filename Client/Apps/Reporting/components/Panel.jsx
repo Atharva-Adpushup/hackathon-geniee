@@ -17,6 +17,7 @@ import ChartContainer from '../containers/ChartContainer';
 import reportService from '../../../services/reportService';
 import {
 	displayMetrics,
+	displayOpsMetrics,
 	displayUniqueImpressionMetrics,
 	accountDisableFilter,
 	accountDisableDimension,
@@ -440,7 +441,20 @@ class Panel extends Component {
 		// 	computedMetrics.splice(5);
 		// } else {
 			let match = displayMetrics.map((item) => item.value)
-			computedMetrics = computedMetrics.filter((item) => match.indexOf(item.value)!=-1)
+			if(isForOps) {
+				match = displayOpsMetrics.map((item) => item.value)
+				computedMetrics = computedMetrics.filter((item) => match.indexOf(item.value)!=-1)	
+			} else {
+				// local storage return value as string
+				// Boolean("false") also returns true, have to use "true"(string) match for this 
+				// instead of boolean true
+				if(localStorage.getItem('isUniqueImpChecked') == "true") {
+					match = displayUniqueImpressionMetrics.map((item) => item.value)
+					computedMetrics = computedMetrics.filter((item) => match.indexOf(item.value)!=-1)
+				} else {
+					computedMetrics = computedMetrics.filter((item) => match.indexOf(item.value)!=-1)
+				}
+			}
 		// }
 		return computedMetrics;
 	};
