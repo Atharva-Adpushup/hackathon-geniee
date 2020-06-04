@@ -21,9 +21,19 @@ module.exports = (function() {
 				.get(0);
 		};
 
-		function cleanJwPlayerAndRenderBid(jwPlayerInstance, bid) {
+		function cleanJwPlayerAndRenderBid(jwPlayerInstance, bid, refreshData = {}) {
 			// clean container
 			jwPlayerInstance.remove();
+
+			var { adId, refreshTimeoutId, refreshExtendTimeInMs } = refreshData;
+
+			if (adId && refreshTimeoutId && refreshExtendTimeInMs) {
+				// clear existing refresh timeout
+				clearTimeout(refreshTimeoutId);
+
+				// set new refresh timeout
+				refreshAdSlot.setRefreshTimeOutByAdId(adId, refreshExtendTimeInMs);
+			}
 
 			pbjs.renderAd(getIframeDocument(), bid.adId);
 		}
@@ -101,6 +111,15 @@ module.exports = (function() {
 						jwPlayerInstance.remove();
 					}
 
+					// get existing refresh data from slot (not container)
+					var slotEl = document.getElementById(bid.adUnitCode);
+					var slotElDataset =
+						(slotEl && {
+							...slotEl.dataset
+						}) ||
+						{};
+					var attrToReserve = ['renderTime', 'refreshTime', 'timeout'];
+
 					jwPlayerInstance = window.jwplayer(bid.adUnitCode);
 
 					jwPlayerInstance
@@ -122,6 +141,13 @@ module.exports = (function() {
 						.on('ready', function() {
 							var playerElem = jwPlayerInstance.getContainer();
 							playerElem.style.margin = '0 auto';
+
+							// migrate slot attributes to player el
+							attrToReserve.forEach(
+								attrName =>
+									slotElDataset[attrName] !== undefined &&
+									(playerElem.dataset[attrName] = slotElDataset[attrName])
+							);
 						});
 
 					setupPlayerEvents(jwPlayerInstance);
@@ -166,16 +192,11 @@ module.exports = (function() {
 								refreshTimeLeftInMs >= 0
 							) {
 								// Render cached bid
-								cleanJwPlayerAndRenderBid(jwPlayerInstance, highestAliveBid);
-
-								// clear existing refresh timeout
-								clearTimeout(refreshTimeoutId);
-
-								// set new refresh timeout
-								refreshAdSlot.setRefreshTimeOutByAdId(
-									adpSlot.optionalParam.adId,
-									minRefreshTimeoutForImpInMs
-								);
+								cleanJwPlayerAndRenderBid(jwPlayerInstance, highestAliveBid, {
+									adId: adpSlot.optionalParam.adId,
+									refreshTimeoutId,
+									refreshExtendTimeInMs: minRefreshTimeoutForImpInMs
+								});
 							}
 						}
 					});

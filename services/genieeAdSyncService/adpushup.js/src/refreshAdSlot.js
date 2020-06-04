@@ -36,7 +36,8 @@ var utils = require('../libs/utils'),
 		var adObj = getAdObjById(adId);
 		if (!adObj) return;
 
-		setRefreshTimeOut(adObj.container, adObj.ad, refreshInterval);
+		var container = $(`#${adId}`);
+		setRefreshTimeOut(container, adObj.ad, refreshInterval);
 	},
 	getRefreshDataByAdId = function(adId) {
 		if (!adId) return;
@@ -140,11 +141,11 @@ var utils = require('../libs/utils'),
 		feedbackData.variationId = adp.config.selectedVariation;
 		utils.sendFeedback(feedbackData);
 	},
-	stopRefreshForASlot = function(container) {
-		var adIndex = ads.findIndex(obj => obj.container[0] === container[0]);
+	stopRefreshForASlot = function(adId) {
+		var adIndex = ads.findIndex(obj => obj.ad.id === adId);
 
 		if (adIndex !== -1) {
-			var container = ads[adIndex].container;
+			var container = $(`#${adId}`);
 			var oldTimeoutId = container.attr('data-timeout');
 			oldTimeoutId && clearTimeout(oldTimeoutId);
 
@@ -154,7 +155,8 @@ var utils = require('../libs/utils'),
 	getAllInViewAds = function() {
 		inViewAds = [];
 		for (var i = 0; i < ads.length; i++) {
-			if (utils.checkElementInViewPercent(ads[i].container)) {
+			var container = $(`#${ads[i].ad.id}`);
+			if (utils.checkElementInViewPercent(container)) {
 				inViewAds.push(ads[i]);
 			}
 		}
@@ -164,7 +166,7 @@ var utils = require('../libs/utils'),
 
 		for (var i = 0; i < inViewAds.length; i++) {
 			var inViewAd = inViewAds[i],
-				container = inViewAd.container,
+				container = $(`#${inViewAd.ad.id}`), // get updated container (inViewAd.container is not updated)
 				ad = inViewAd.ad,
 				adRenderTime = container.attr('data-render-time'),
 				lastRefreshTime = container.attr('data-refresh-time'),

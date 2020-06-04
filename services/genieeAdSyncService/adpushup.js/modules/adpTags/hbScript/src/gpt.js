@@ -132,8 +132,7 @@ var gpt = {
 								);
 
 								if (isNotPricePriorityLineItem) {
-									var container = $(`#${slotElementId}`);
-									refreshAdSlot.stopRefreshForASlot(container);
+									refreshAdSlot.stopRefreshForASlot(slotElementId);
 								}
 							}
 						}
