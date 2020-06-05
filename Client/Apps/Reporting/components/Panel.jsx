@@ -390,9 +390,9 @@ class Panel extends Component {
 						// for that we will check users previous selection, if it
 						// is different from default list override default wit
 						// previous values
-						if(prevMetricsList.length != metricsList.length) {
+						if(isForOps && (prevMetricsList.length != metricsList.length)) {
 							metricsList = [...prevMetricsList]
-						} else {
+						} else if(isForOps){
 							// for same length we need to check for individual value
 							let listPrevColList = prevMetricsList.map(item => item.value).sort().join()
 							let defaultPrevColList = metricsList.map( item => item.value).sort().join()
