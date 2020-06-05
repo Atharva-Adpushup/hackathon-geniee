@@ -157,7 +157,7 @@ const APPS = [
 	},
 	{
 		name: 'AMP Ads',
-		key: 3,
+		key: 6,
 		link: 3,
 		image: '/assets/images/manageSites/amp.png',
 		description:
