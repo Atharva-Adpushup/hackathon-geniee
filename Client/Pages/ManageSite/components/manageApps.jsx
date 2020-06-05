@@ -87,17 +87,18 @@ class ManageApps extends React.Component {
 		const { appStatuses } = site;
 		const disableAppStyles = { pointerEvents: 'none', opacity: 0.5 };
 		const disableAppIfApLite = [1, 5, 2, 4, 6];
+
+		let appStatus = { ...appStatuses };
+		const ampObject = {
+			6: { app: 'AMP ', key: 6, alias: 'amp' }
+		};
+		if (apps.amp) {
+			appStatus = { ...appStatus, ...ampObject };
+		}
 		return (
 			<div className="aligner aligner--row aligner--wrap">
 				{APPS.map(app => {
 					const { name, image, description, key, left, right, full = false } = app;
-					let appStatus = { ...appStatuses };
-					const ampObject = {
-						6: { app: 'AMP ', key: 6, alias: 'amp' }
-					};
-					if (apps.amp) {
-						appStatus = { ...appStatus, ...ampObject };
-					}
 
 					const isAppActive = !!appStatus[key];
 					const statuses = isAppActive ? STATUSES.ACTIVE : STATUSES.INACTIVE;
