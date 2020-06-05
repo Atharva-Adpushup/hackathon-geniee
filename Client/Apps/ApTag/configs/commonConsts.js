@@ -33,7 +33,7 @@ const TYPES = [
 	},
 	{
 		name: 'Rewarded Video Ads',
-		image: '/assets/images/tagManager/rewarded-video-ads.png',
+		image: '/assets/images/tagManager/rewardedVideoAds.png',
 		key: 'rewardedVideoAds',
 		description:
 			'Rewarded ads provide an opportunity for users to watch a video or engage with a playable ad in exchange for a reward within the app'

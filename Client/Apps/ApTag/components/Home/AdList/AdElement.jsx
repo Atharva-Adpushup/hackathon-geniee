@@ -13,6 +13,7 @@ import LazyLoadSettings from './LazyLoadSettings';
 import EditBox from '../../../../../Components/EditBox/index';
 import Tags from '../../../../../Components/Tags/index';
 import FluidEdit from './FluidEdit';
+import RewardedVideoSettings from './RewardedVideoSettings';
 
 class AdElement extends Component {
 	constructor(props) {
@@ -21,6 +22,7 @@ class AdElement extends Component {
 			showNetworkDetails: false,
 			showLazyload: false,
 			showFluidVal: false,
+			showRewardedVideo: false,
 			editName: false,
 			isActive: Object.prototype.hasOwnProperty.call(props.ad, 'isActive')
 				? props.ad.isActive
@@ -69,14 +71,26 @@ class AdElement extends Component {
 
 	renderAdDetails() {
 		const { ad, updateAd, networkConfig, user, siteId } = this.props;
-		const { showLazyload, showNetworkDetails, editName, isActive, showFluidVal } = this.state;
+		const {
+			showLazyload,
+			showNetworkDetails,
+			editName,
+			isActive,
+			showFluidVal,
+			showRewardedVideo
+		} = this.state;
 		const isAMP = ad.formatData.type === 'amp';
-
+		const isRewarded = ad.formatData.type === 'rewardedVideoAds';
 		let code = isAMP ? this.getAMPAdCode(ad) : ADCODE;
 		const customAttributes = ad.maxHeight ? ` max-height="${ad.maxHeight}"` : '';
 		code = code
 			? code.replace(/__AD_ID__/g, ad.id).replace(/__CUSTOM_ATTRIBS__/, customAttributes)
 			: null;
+
+		if (ad.formatData.type === 'rewardedVideoAds') {
+			ad.width = 1;
+			ad.height = 1;
+		}
 
 		if (showFluidVal) {
 			return (
@@ -122,6 +136,18 @@ class AdElement extends Component {
 					id={ad.id}
 					onChange={payload => updateAd(ad.id, siteId, payload)}
 					onCancel={() => this.toggleHandler('showLazyload')}
+				/>
+			);
+		}
+
+		if (showRewardedVideo) {
+			return (
+				<RewardedVideoSettings
+					ad={ad}
+					siteId={siteId}
+					onCancel={() => this.toggleHandler('showRewardedVideo')}
+					onSubmit={this.updateWrapper}
+					user={user}
 				/>
 			);
 		}
@@ -195,6 +221,15 @@ class AdElement extends Component {
 						>
 							Lazyload Settings
 						</CustomButton>
+						{isRewarded ? (
+							<CustomButton
+								variant="secondary"
+								className="u-margin-l3 u-margin-t3 pull-right"
+								onClick={() => this.toggleHandler('showRewardedVideo')}
+							>
+								Rewarded Video Settings
+							</CustomButton>
+						) : null}
 						<CopyButtonWrapperContainer content={code} className="u-margin-t3 pull-right">
 							<CustomButton variant="secondary">Copy AdCode</CustomButton>
 						</CopyButtonWrapperContainer>

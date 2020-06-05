@@ -271,3 +271,27 @@ select.inputMinimal {
 		}
 	}
 }
+
+.beforeJs {
+	.form-group {
+		display: flex;
+		margin-left: 2rem;
+
+		textarea {
+			width: 50%;
+			margin-left: 20%;
+		}
+	}
+}
+
+.rewardTriggerFunction {
+	.form-group {
+		display: flex;
+		margin-left: 2rem;
+
+		textarea {
+			width: 50%;
+			margin-left: 14%;
+		}
+	}
+}

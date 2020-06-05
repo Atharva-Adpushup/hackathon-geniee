@@ -1,5 +1,12 @@
 import React, { Component } from 'react';
-import { Row, Col, ProgressBar } from '@/Client/helpers/react-bootstrap-imports';
+import {
+	Row,
+	Col,
+	ProgressBar,
+	FormControl,
+	FormGroup,
+	ControlLabel
+} from '@/Client/helpers/react-bootstrap-imports';
 import CustomList from './CustomList';
 import {
 	TYPES,
@@ -30,7 +37,9 @@ class AdCodeGenerator extends Component {
 			customFields: {},
 			loading: false,
 			fluid: true,
-			automaticTrigger: false
+			automaticTrigger: true,
+			customJsSnippet: '',
+			rewardTriggerFunction: ''
 		};
 		this.selectPlatform = this.selectPlatform.bind(this);
 		this.selectType = this.selectType.bind(this);
@@ -103,7 +112,18 @@ class AdCodeGenerator extends Component {
 	}
 
 	saveHandler() {
-		const { type, platform, size, customFields, fluid, progress } = this.state;
+		const {
+			type,
+			platform,
+			size,
+			customFields,
+			fluid,
+			progress,
+			automaticTrigger,
+			rewardText,
+			customJsSnippet,
+			rewardTriggerFunction
+		} = this.state;
 
 		// terminate if Custom Fields are invalid
 		const isCustomFieldsValid = !Object.keys(customFields).find(
@@ -113,9 +133,14 @@ class AdCodeGenerator extends Component {
 
 		const { createAd, siteId } = this.props;
 		const isResponsive = size === 'responsive';
-		const sizesArray = isResponsive ? 'responsive' : size.split('x');
-		const width = isResponsive ? 'responsive' : sizesArray[0];
-		const height = isResponsive ? 'responsive' : sizesArray[1];
+		let width = 1,
+			height = 1;
+
+		if (type !== 'rewardedVideoAds') {
+			const sizesArray = isResponsive ? 'responsive' : size.split('x');
+			width = isResponsive ? 'responsive' : sizesArray[0];
+			height = isResponsive ? 'responsive' : sizesArray[1];
+		}
 		const typeAndPlacement = type.split(/^([^A-Z]+)/);
 		typeAndPlacement.shift();
 
@@ -142,11 +167,23 @@ class AdCodeGenerator extends Component {
 			isActive: true
 		};
 
-		// Add Custom Fields in ad obj
-		Object.keys(customFields).forEach(customFieldKey => {
-			ad[customFieldKey] = customFields[customFieldKey].value;
-		});
+		if (type === 'rewardedVideoAds') {
+			delete ad.fluid;
 
+			ad.isRewarded = true;
+			ad.networkData.headerBidding = false;
+			ad.rewardText = rewardText;
+			ad.automaticTrigger = automaticTrigger;
+			!ad.automaticTrigger ? (ad.customScript = btoa(customJsSnippet)) : null;
+			ad.rewardTriggerFunction = btoa(rewardTriggerFunction);
+		}
+
+		if (type !== 'rewardedVideoAds') {
+			// Add Custom Fields in ad obj
+			Object.keys(customFields).forEach(customFieldKey => {
+				ad[customFieldKey] = customFields[customFieldKey].value;
+			});
+		}
 		this.setState(
 			{
 				progress: 100,
@@ -191,16 +228,18 @@ class AdCodeGenerator extends Component {
 		const { type } = this.state;
 		const { adId, maxHeight, siteId } = this.props;
 		const isDisplayAd = type !== 'amp';
+		const isRewarded = type === 'rewardedVideoAds';
 		const customAttributes = maxHeight ? ` max-height="${maxHeight}"` : '';
-		const code = isDisplayAd
-			? ADCODE.replace(/__AD_ID__/g, adId)
-					.replace(/__CUSTOM_ATTRIBS__/, customAttributes)
-					.trim()
-			: null;
+		const code =
+			isDisplayAd && !isRewarded
+				? ADCODE.replace(/__AD_ID__/g, adId)
+						.replace(/__CUSTOM_ATTRIBS__/, customAttributes)
+						.trim()
+				: null;
 		const message = isDisplayAd ? DISPLAY_AD_MESSAGE.replace(/__SITE_ID__/g, siteId) : AMP_MESSAGE;
 		return (
 			<Col xs={12}>
-				{isDisplayAd ? <pre>{code}</pre> : null}
+				{isDisplayAd && !isRewarded ? <pre>{code}</pre> : null}
 				<CustomMessage header="Information" type="info" message={message} />
 				<CustomButton
 					variant="primary"
@@ -209,7 +248,7 @@ class AdCodeGenerator extends Component {
 				>
 					Create More Ads
 				</CustomButton>
-				{isDisplayAd ? (
+				{isDisplayAd && !isRewarded ? (
 					<CopyButtonWrapperContainer content={code}>
 						<CustomButton variant="secondary" className="u-margin-t3 u-margin-r3 pull-right">
 							Copy Adcode
@@ -221,7 +260,7 @@ class AdCodeGenerator extends Component {
 	}
 
 	renderMainContent() {
-		const { progress, type } = this.state;
+		const { progress, type, automaticTrigger } = this.state;
 		const { codeGenerated } = this.props;
 		return (
 			<div>
@@ -243,6 +282,12 @@ class AdCodeGenerator extends Component {
 						{type === 'rewardedVideoAds' && progress >= 75 ? this.renderRewardInput() : null}
 						{type === 'rewardedVideoAds' && progress >= 75
 							? this.renderAutomaticTriggerToggle()
+							: null}
+						{type === 'rewardedVideoAds' && progress >= 75 && !automaticTrigger
+							? this.renderCustomScriptInput()
+							: null}
+						{type === 'rewardedVideoAds' && progress >= 75
+							? this.renderRewardTriggerFunction()
 							: null}
 						{progress >= 75 ? this.renderButton('Generate AdCode', this.saveHandler) : null}
 					</div>
@@ -267,8 +312,12 @@ class AdCodeGenerator extends Component {
 		return (
 			<div>
 				<CustomList
-					heading="Select Ad Size"
-					subHeading="AdpPushup supports varied ad sizes"
+					heading={type === 'rewardedVideoAds' ? `Select Platform` : `Select Ad Size`}
+					subHeading={
+						type === 'rewardedVideoAds'
+							? 'It only supports mobile Platform'
+							: 'AdpPushup supports varied ad sizes'
+					}
 					leftSize={3}
 					rightSize={9}
 					toMatch={size}
@@ -391,6 +440,44 @@ class AdCodeGenerator extends Component {
 			</Row>
 		);
 	}
+
+	renderCustomScriptInput = () => {
+		const { customJsSnippet } = this.state;
+		return (
+			<div className="u-margin-t4 beforeJs">
+				<FormGroup controlId="beforeJsSnippet-input">
+					<ControlLabel>Custom Script</ControlLabel>
+					<FormControl
+						componentClass="textarea"
+						placeholder="Custom Script"
+						name="customJsSnippet"
+						onChange={this.handleChange}
+						value={customJsSnippet}
+						className="u-padding-v4 u-padding-h4"
+					/>
+				</FormGroup>
+			</div>
+		);
+	};
+
+	renderRewardTriggerFunction = () => {
+		const { rewardTriggerFunction } = this.state;
+		return (
+			<div className="u-margin-t4 rewardTriggerFunction">
+				<FormGroup controlId="beforeJsSnippet-input">
+					<ControlLabel>Reward Trigger Function</ControlLabel>
+					<FormControl
+						componentClass="textarea"
+						placeholder="Enter value..."
+						name="rewardTriggerFunction"
+						onChange={this.handleChange}
+						value={rewardTriggerFunction}
+						className="u-padding-v4 u-padding-h4"
+					/>
+				</FormGroup>
+			</div>
+		);
+	};
 
 	renderFluidToggle() {
 		const { match } = this.props;
