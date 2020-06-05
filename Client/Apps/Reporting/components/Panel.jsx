@@ -52,7 +52,7 @@ class Panel extends Component {
 			dimensionList: [],
 			filterList: [],
 			intervalList: [],
-			metricsList: displayMetrics,
+			metricsList: props.isForOps?displayOpsMetrics:displayMetrics,
 			selectedDimension: '',
 			selectedFilters: {},
 			selectedMetrics: [],
@@ -302,6 +302,7 @@ class Panel extends Component {
 		let { tableData, selectedDimension, selectedFilters, dimensionList } = this.state;
 		const { reportType, isCustomizeChartLegend, isForOps } = this.props;
 		const computedState = Object.assign({ isLoading: true }, inputState);
+		let prevMetricsList = this.state.metricsList;
 
 		this.setState(computedState, () => {
 			let newState = {};
@@ -383,7 +384,22 @@ class Panel extends Component {
 					});
 
 					if (tableData.columns && tableData.columns.length) {
-						const metricsList = this.getMetricsList(tableData);
+						let metricsList = this.getMetricsList(tableData);
+						// we need to persist user column selection when user
+						// generates report multiple times.
+						// for that we will check users previous selection, if it
+						// is different from default list override default wit
+						// previous values
+						if(prevMetricsList.length != metricsList.length) {
+							metricsList = [...prevMetricsList]
+						} else {
+							// for same length we need to check for individual value
+							let listPrevColList = prevMetricsList.map(item => item.value).sort().join()
+							let defaultPrevColList = metricsList.map( item => item.value).sort().join()
+							if(listPrevColList != defaultPrevColList) {
+								metricsList = [...prevMetricsList]
+							}
+						}
 						newState = { ...newState, metricsList };
 					}
 				}
