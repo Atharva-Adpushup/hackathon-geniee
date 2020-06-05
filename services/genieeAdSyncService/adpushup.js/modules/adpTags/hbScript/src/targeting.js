@@ -186,7 +186,7 @@ var targeting = {
 			} = window.adpushup.customPageLevelTargetingMap;
 			const pageUrl = window.location.href;
 
-			const shouldSetCustomTargeting = pagesToExclude.some(
+			const shouldSetCustomTargeting = !pagesToExclude.some(
 				pageUrlPattern => !!pageUrl.match(new RegExp(pageUrlPattern))
 			);
 
