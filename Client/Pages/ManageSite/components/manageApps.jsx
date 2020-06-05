@@ -86,7 +86,7 @@ class ManageApps extends React.Component {
 		const { apps = {} } = site;
 		const { appStatuses } = site;
 		const disableAppStyles = { pointerEvents: 'none', opacity: 0.5 };
-		const disableAppIfApLite = ['Layout Editor', 'Innovative Ads', 'AP Tag', 'Mediation', 'AMP'];
+		const disableAppIfApLite = [1, 5, 2, 4, 6];
 		return (
 			<div className="aligner aligner--row aligner--wrap">
 				{APPS.map(app => {
@@ -105,7 +105,7 @@ class ManageApps extends React.Component {
 
 					return (
 						<Card
-							style={apps.apLite && disableAppIfApLite.includes(name) ? disableAppStyles : null}
+							style={apps.apLite && disableAppIfApLite.includes(key) ? disableAppStyles : null}
 							rootClassName="manage-site-card u-margin-r4 u-margin-b4"
 							key={`card-${key}`}
 							type={type}
