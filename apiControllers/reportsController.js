@@ -2,6 +2,7 @@ const express = require('express');
 const request = require('request-promise');
 const csv = require('express-csv');
 const _ = require('lodash');
+const { v1: uuid } = require('uuid');
 
 const HTTP_STATUSES = require('../configs/httpStatusConsts');
 const { sendSuccessResponse, sendErrorResponse } = require('../helpers/commonFunctions');
@@ -394,5 +395,54 @@ router
 					.then(config => res.status(HTTP_STATUSES.OK).json(config));
 			})
 			.catch(__ => res.status(HTTP_STATUSES.NOT_FOUND).json({ message: 'Document not found' }));
+	})
+	.post('/saveReport', (req, res) => {
+		let reportConfig = req.body;
+		reportConfig = {
+			...reportConfig,
+			createdAt: Date.now(),
+			id: uuid()
+		};
+		const { user } = req;
+		return reportsModel.getSavedReportConfig(user.email)
+			.then(reportsConfig => {
+				const updatedReportsConfig = {
+					...reportsConfig,
+					savedReports: [...reportsConfig.savedReports, reportConfig]
+				};
+				return reportsModel.updateSavedReportConfig(updatedReportsConfig, user.email);
+			})
+			.catch(err => {
+				if (err.code && err.code === 13) {
+					// rprt doc does not exist. Create a new doc
+					const userReportConfig = {
+						savedReports: [reportConfig],
+						scheduledReports: []
+					};
+					return reportsModel.updateSavedReportConfig(userReportConfig, user.email);
+				}
+				// handled in the next catch
+				throw new Error();
+			})
+			.then(reportsConfig => sendSuccessResponse(reportsConfig, res, HTTP_STATUSES.OK))
+			.catch(err => {
+				let { message: errorMessage } = err;
+				try {
+					errorMessage = JSON.parse(errorMessage);
+				} catch (e) {
+					errorMessage = 'Something went wrong';
+				}
+				const {
+					message = 'Something went wrong',
+					code = HTTP_STATUSES.INTERNAL_SERVER_ERROR
+				} = errorMessage;
+				return sendErrorResponse(
+					{
+						message
+					},
+					res,
+					code
+				);
+			});
 	});
 module.exports = router;
