@@ -7,6 +7,7 @@ const HTTP_STATUSES = require('../configs/httpStatusConsts');
 const { sendSuccessResponse, sendErrorResponse } = require('../helpers/commonFunctions');
 const CC = require('../configs/commonConsts');
 const utils = require('../helpers/utils');
+const reportsModel = require('../models/reportsModel');
 
 const config = require('../configs/config');
 
@@ -376,6 +377,22 @@ router
 					code
 				);
 			});
+	})
+	.get('/getSavedReportConfig', (req, res) => {
+		const { user } = req;
+		return reportsModel
+			.getSavedReportConfig(user.email)
+			.then(reportConfig => res.status(HTTP_STATUSES.OK).json(reportConfig))
+			.catch(__ => {
+				// If no config file is found, create a config file
+				const savedReportsConfig = {
+					savedReports: [],
+					scheduledReports: []
+				};
+				return reportsModel
+					.updateSavedReportConfig(savedReportsConfig, user.email)
+					.then(config => res.status(HTTP_STATUSES.OK).json(config));
+			})
+			.catch(__ => res.status(HTTP_STATUSES.NOT_FOUND).json({ message: 'Document not found' }));
 	});
-
 module.exports = router;

@@ -3,7 +3,9 @@ var AdPushupError = require('../helpers/AdPushupError'),
 	moment = require('moment'),
 	Promise = require('bluebird'),
 	{ fileLogger } = require('../helpers/logger/file/index'),
-	// eslint-disable-next-line no-unused-vars
+	couchbaseService = require('./../helpers/couchBaseService'),
+	couchbase = require('couchbase');
+	// eslint-disable-next-line no-unused-vars 
 	getE3lgIndexArrToSearch = function(startDate, endDate) {
 		var newStartDate = startDate,
 			newEndDate = endDate,
@@ -706,5 +708,15 @@ module.exports = {
 				reportType: prepareEditorStatsReport
 			};
 		return performEsSearch(esSearchConfig);
+	},
+	getSavedReportConfig: function(email) {
+		return couchbaseService.connectToAppBucket()
+			.then(bucket => bucket.getAsync(`rprt::${email}`))
+			.then(result => result.value);
+	},
+	updateSavedReportConfig: function(reportConfig, email) {
+		const dataToUpdate = {...reportConfig, email};
+		const query = couchbase.N1qlQuery.fromString(`UPSERT INTO AppBucket (KEY, VALUE) VALUES ("rprt::${email}", ${JSON.stringify(dataToUpdate)})`);
+		return couchbaseService.queryViewFromAppBucket(query).then(() => dataToUpdate);
 	}
 };
