@@ -383,18 +383,37 @@ router
 		const { user } = req;
 		return reportsModel
 			.getSavedReportConfig(user.email)
-			.then(reportConfig => res.status(HTTP_STATUSES.OK).json(reportConfig))
-			.catch(__ => {
-				// If no config file is found, create a config file
-				const savedReportsConfig = {
-					savedReports: [],
-					scheduledReports: []
-				};
-				return reportsModel
-					.updateSavedReportConfig(savedReportsConfig, user.email)
-					.then(config => res.status(HTTP_STATUSES.OK).json(config));
+			.catch(err => {
+				if (err.code && err.code === 13) {
+					// If no config file is found, create a config file
+					const savedReportsConfig = {
+						savedReports: [],
+						scheduledReports: []
+					};
+					return reportsModel.updateSavedReportConfig(savedReportsConfig, user.email);
+				}
+				throw err;
 			})
-			.catch(__ => res.status(HTTP_STATUSES.NOT_FOUND).json({ message: 'Document not found' }));
+			.then(reportConfig => sendSuccessResponse(reportConfig, res, HTTP_STATUSES.OK))
+			.catch(err => {
+				let { message: errorMessage } = err;
+				try {
+					errorMessage = JSON.parse(errorMessage);
+				} catch (e) {
+					errorMessage = 'Something went wrong';
+				}
+				const {
+					message = 'Something went wrong',
+					code = HTTP_STATUSES.INTERNAL_SERVER_ERROR
+				} = errorMessage;
+				return sendErrorResponse(
+					{
+						message
+					},
+					res,
+					code
+				);
+			});
 	})
 	.post('/saveReport', (req, res) => {
 		let reportConfig = req.body;
@@ -404,7 +423,8 @@ router
 			id: uuid()
 		};
 		const { user } = req;
-		return reportsModel.getSavedReportConfig(user.email)
+		return reportsModel
+			.getSavedReportConfig(user.email)
 			.then(reportsConfig => {
 				const updatedReportsConfig = {
 					...reportsConfig,
@@ -422,7 +442,7 @@ router
 					return reportsModel.updateSavedReportConfig(userReportConfig, user.email);
 				}
 				// handled in the next catch
-				throw new Error();
+				throw err;
 			})
 			.then(reportsConfig => sendSuccessResponse(reportsConfig, res, HTTP_STATUSES.OK))
 			.catch(err => {
