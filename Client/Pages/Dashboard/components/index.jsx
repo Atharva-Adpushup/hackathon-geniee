@@ -32,9 +32,7 @@ import CustomButton from '../../../Components/CustomButton';
 class Dashboard extends React.Component {
 	constructor(props) {
 		super(props);
-		// getting value as string from localStorage and Boolean() is not working
-		// override normal cols with unique imp columns
-		let isUniqueImpChecked  = localStorage.getItem('isUniqueImpChecked') == "true"?true:false
+		let {user: { data: { isUniqueImpChecked } }}  = props
 		this.state = {
 			quickDates: dates,
 			sites: [],
