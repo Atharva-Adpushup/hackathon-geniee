@@ -60,6 +60,13 @@ export const updateAdNetworkSettingsAction = data => dispatch =>
 		type: USER_ACTIONS.UPDATE_AD_NETWORK_SETTINGS,
 		data
 	});
+export const overrideOpsPanelUniqueImpValue = data => dispatch => {
+	dispatch({
+        type: USER_ACTIONS.OVERRIDE_OPS_PANEL_VALUE,
+        data
+	});
+}
+
 export const updateUser = params => dispatch =>
 	axiosInstance
 		.post('/user/updateUser', { toUpdate: params })

@@ -62,6 +62,15 @@ const user = (state = { fetched: false, data: {} }, action) => {
 				}
 			};
 		}
+		case USER_ACTIONS.OVERRIDE_OPS_PANEL_VALUE: {
+			return {
+				...state,
+				data: {
+					...state.data,
+					isUniqueImpChecked: action.data.isUniqueImpChecked
+				}
+			};
+		}
 		default:
 			return state;
 	}
