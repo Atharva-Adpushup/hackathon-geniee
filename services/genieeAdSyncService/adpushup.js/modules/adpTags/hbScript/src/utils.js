@@ -4,11 +4,13 @@ var adp = require('./adp');
 var find = require('lodash.find');
 var $ = require('../../../../libs/jquery');
 var config = require('./config');
-var BACKWARD_COMPATIBLE_MAPPING = require('./constants').AD_SIZE_MAPPING.IAB_SIZES
-	.BACKWARD_COMPATIBLE_MAPPING;
+// var BACKWARD_COMPATIBLE_MAPPING = require('./constants').AD_SIZE_MAPPING.IAB_SIZES
+// .BACKWARD_COMPATIBLE_MAPPING;
 var constants = require('./constants');
 var { bidderParamsMapping } = require('./multiFormatConfig');
 var isApLiteActive = window.adpushup.config.apLiteActive;
+var globalSizes = config.SIZE_MAPPING.sizes || [];
+
 var utils = {
 	getVastClientType: function(vastXml, adTag) {
 		var googleDomainsRegex = 'doubleclick.net|doubleclick.com|google.com|2mdn.net';
@@ -439,6 +441,9 @@ var utils = {
 		*/
 		let hasOriginalSizeBeenAdded = false;
 
+		maxWidth = parseInt(maxWidth, 10);
+		maxHeight = parseInt(maxHeight, 10);
+
 		const compatibleSizes = sizes.filter(size => {
 			const [width, height] = size;
 
@@ -480,9 +485,8 @@ var utils = {
 
 		if (matchedSizeMapping) {
 			var { maxHeight, maxWidth } = matchedSizeMapping;
-			var dimension = { maxWidth, maxHeight };
 
-			computedSizes = this.getDownwardCompatibleSizes(dimension, sizes);
+			computedSizes = this.getDownwardCompatibleSizes(maxWidth, maxHeight, sizes);
 		}
 
 		return computedSizes;

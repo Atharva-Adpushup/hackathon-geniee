@@ -239,10 +239,9 @@ var adpTags = {
 					!computedSizes || (Array.isArray(computedSizes) && computedSizes.length === 0);
 
 				if (isInvalidComputedSizes) {
-					const [maxWidth, maxHeight] = adpSlot.size;
-					const dimension = { maxHeight, maxWidth };
+					const [width, height] = adpSlot.size;
 
-					computedSizes = utils.getDownwardCompatibleSizes(dimension, globalSizes);
+					computedSizes = utils.getDownwardCompatibleSizes(width, height, globalSizes);
 				}
 			}
 
