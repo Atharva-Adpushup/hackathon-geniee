@@ -14,6 +14,7 @@ const DEFAULT_ITEM = {
 const APPS = [
 	{
 		name: 'Layout Editor',
+		alias: 'layout',
 		key: 1,
 		image: '/assets/images/manageSites/layout-optimization.png',
 		description:
@@ -39,6 +40,7 @@ const APPS = [
 	},
 	{
 		name: 'AdRecover',
+		alias: 'adRecover',
 		key: 7,
 		type: 2,
 		image: '/assets/images/manageSites/adrecover.png',
@@ -58,6 +60,7 @@ const APPS = [
 	},
 	{
 		name: 'Innovative Ads',
+		alias: 'innovativeAds',
 		key: 5,
 		link: 1,
 		image: '/assets/images/manageSites/innovative-ads.png',
@@ -77,6 +80,7 @@ const APPS = [
 	},
 	{
 		name: 'AP Tag',
+		alias: 'apTag',
 		key: 2,
 		link: 1,
 		image: '/assets/images/manageSites/ap-tag.png',
@@ -95,6 +99,7 @@ const APPS = [
 	},
 	{
 		name: 'Manage Ads.txt',
+		alias: 'manageAdsTxt',
 		key: 8,
 		link: 1,
 		image: '/assets/images/manageSites/manage-ads-txt.png',
@@ -114,6 +119,7 @@ const APPS = [
 	},
 	{
 		name: 'Mediation',
+		alias: 'mediation',
 		key: 4,
 		link: 3,
 		image: '/assets/images/manageSites/ad-mediation.png',
@@ -138,6 +144,7 @@ const APPS = [
 	// },
 	{
 		name: 'Header Bidding',
+		alias: 'headerBidding',
 		key: 3,
 		link: 3,
 		image: '/assets/images/manageSites/header-bidding.png',
@@ -157,6 +164,7 @@ const APPS = [
 	},
 	{
 		name: 'AMP Ads',
+		alias: 'amp',
 		key: 6,
 		link: 3,
 		image: '/assets/images/manageSites/amp.png',
@@ -188,6 +196,8 @@ const STATUSES = {
 		tooltip: 'App is Active'
 	}
 };
+
+const DISABLED_APP_KEYS_IF_APLITE = [1, 5, 2, 4, 6];
 
 const NAV_ITEMS_INDEXES = {
 	QUICK_SNAPSHOT: 'quick-snapshot',
@@ -233,5 +243,6 @@ export {
 	NAV_ITEMS,
 	NAV_ITEMS_INDEXES,
 	NAV_ITEMS_VALUES,
+	DISABLED_APP_KEYS_IF_APLITE,
 	siteWidgets
 };
