@@ -86,18 +86,27 @@ class ManageApps extends React.Component {
 		const { apps = {} } = site;
 		const { appStatuses } = site;
 		const disableAppStyles = { pointerEvents: 'none', opacity: 0.5 };
-		const disableAppIfApLite = ['Layout Editor', 'Innovative Ads', 'AP Tag', 'Mediation', 'AMP'];
+		const disableAppIfApLite = [1, 5, 2, 4, 6];
+
+		let appStatus = { ...appStatuses };
+		const ampObject = {
+			6: { app: 'AMP ', key: 6, alias: 'amp' }
+		};
+		if (apps.amp) {
+			appStatus = { ...appStatus, ...ampObject };
+		}
 		return (
 			<div className="aligner aligner--row aligner--wrap">
 				{APPS.map(app => {
 					const { name, image, description, key, left, right, full = false } = app;
-					const isAppActive = !!appStatuses[key];
+
+					const isAppActive = !!appStatus[key];
 					const statuses = isAppActive ? STATUSES.ACTIVE : STATUSES.INACTIVE;
 					const { type, icon, tooltip } = statuses;
 
 					return (
 						<Card
-							style={apps.apLite && disableAppIfApLite.includes(name) ? disableAppStyles : null}
+							style={apps.apLite && disableAppIfApLite.includes(key) ? disableAppStyles : null}
 							rootClassName="manage-site-card u-margin-r4 u-margin-b4"
 							key={`card-${key}`}
 							type={type}
