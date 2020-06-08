@@ -59,7 +59,8 @@ var modelAPI = (module.exports = apiModule()),
 			'sellerId',
 			'companyName',
 			'lastPaymentCheckDateSellersJson',
-			'manuallyEnteredCompanyName'
+			'manuallyEnteredCompanyName',
+			'isShowUniqueImpressionsReporting'
 		];
 		this.clientKeys = [
 			'firstName',
@@ -87,7 +88,8 @@ var modelAPI = (module.exports = apiModule()),
 			'sellerId',
 			'companyName',
 			'lastPaymentCheckDateSellersJson',
-			'manuallyEnteredCompanyName'
+			'manuallyEnteredCompanyName',
+			'isShowUniqueImpressionsReporting'
 		];
 		this.validations = schema.user.validations;
 		this.classMap = {

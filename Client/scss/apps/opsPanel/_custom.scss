@@ -149,3 +149,19 @@
 		height: 50%;
 	}
 }
+
+.isShowUniqueImpressionsReporting {
+	.col-xs-8 {
+		margin-top: 2rem;
+		b {
+			margin-left: 1rem;
+		}
+	}
+	.col-xs-4 {
+		margin-top: 2rem;
+
+		.toggleSwitch {
+			margin-right: 1rem;
+		}
+	}
+}
