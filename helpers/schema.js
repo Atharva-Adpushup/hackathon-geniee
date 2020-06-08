@@ -214,5 +214,14 @@ module.exports = {
 				}
 			]
 		}
+	},
+	saveReportApi: {
+		validations: {
+			isNull: [
+				{name: 'name', message: 'Report name cannot be blank', value: '', status: 403},
+				{name: 'startDate', message: 'Report start date cannot be blank', value: '', status: 403},
+				{name: 'endDate', message: 'Report end date cannot be blank', value: '', status: 403},
+			]
+		}
 	}
 };

@@ -9,6 +9,8 @@ const { sendSuccessResponse, sendErrorResponse } = require('../helpers/commonFun
 const CC = require('../configs/commonConsts');
 const utils = require('../helpers/utils');
 const reportsModel = require('../models/reportsModel');
+const FormValidator = require('../helpers/FormValidator');
+const schema = require('../helpers/schema');
 
 const config = require('../configs/config');
 
@@ -423,8 +425,8 @@ router
 			id: uuid()
 		};
 		const { user } = req;
-		return reportsModel
-			.getSavedReportConfig(user.email)
+		return FormValidator.validate(reportConfig, schema.saveReportApi.validations)
+			.then(() => reportsModel.getSavedReportConfig(user.email))
 			.then(reportsConfig => {
 				const updatedReportsConfig = {
 					...reportsConfig,
