@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
-
 import Select from 'react-select';
-import CustomReactTable from '../../../Components/CustomReactTable';
-import CustomButton from '../../../Components/CustomButton';
+
 import {
 	Row,
 	Col,
@@ -11,6 +9,8 @@ import {
 	FormControl,
 	ControlLabel
 } from '@/Client/helpers/react-bootstrap-imports';
+import CustomReactTable from '../../../Components/CustomReactTable';
+import CustomButton from '../../../Components/CustomButton';
 
 class SizeMapping extends Component {
 	state = {
@@ -23,6 +23,8 @@ class SizeMapping extends Component {
 			sizeMapping: []
 		},
 		errors: {
+			maxWidth: {},
+			maxHeight: {},
 			viewportWidth: {}
 		}
 	};
@@ -90,9 +92,9 @@ class SizeMapping extends Component {
 
 	tableColumns = [
 		{ Header: 'Name', accessor: 'name' },
-		{ Header: 'Viewport Size (px)', accessor: 'viewportWidth' },
-		{ Header: 'Max Width (px)', accessor: 'maxWidth' },
-		{ Header: 'Max Height (px)', accessor: 'maxHeight' },
+		{ Header: 'Screen Width (px)', accessor: 'viewportWidth' },
+		{ Header: 'Max Creative Width (px)', accessor: 'maxWidth' },
+		{ Header: 'Max Creative Height (px)', accessor: 'maxHeight' },
 		{ Header: 'Actions', accessor: 'actions' }
 	];
 
@@ -115,7 +117,7 @@ class SizeMapping extends Component {
 
 	getViewportRuleTemplate = viewportWidth => ({
 		viewportWidth,
-		name: `Viewport Width <= ${viewportWidth}px`,
+		name: `Screen Width <= ${viewportWidth}px`,
 		maxWidth: 0,
 		maxHeight: 0
 	});
@@ -123,39 +125,45 @@ class SizeMapping extends Component {
 	handlePanelSelect = activeKey => this.setState({ activeKey });
 
 	handleAdUnitSelect = data => {
-		const { value: adUnitId, type } = data;
+		const { value: adUnitId } = data;
 		const { inventoryMap } = this.state;
-		const { sizeMapping = [] } = inventoryMap[adUnitId];
+		const { sizeMapping = [], type } = inventoryMap[adUnitId];
 
-		this.setState(state => ({
+		const updateState = () => ({
 			selectedAdUnit: {
 				adUnitId,
-				sizeMapping
+				sizeMapping,
+				appType: type
 			},
 			errors: {
-				...state.errors,
+				maxWidth: {},
+				maxHeight: {},
 				viewportWidth: {}
 			}
-		}));
+		});
+
+		this.setState(updateState);
 	};
 
 	sanitizePropertyValue = value => {
 		let sanitizedValue = value;
 
-		if (sanitizedValue === '') {
-			sanitizedValue = 0;
-		}
+		const parsedValue = parseInt(sanitizedValue, 10);
 
-		if (Number.isNaN(parseInt(sanitizedValue, 10))) {
+		if (Number.isNaN(parsedValue)) {
 			sanitizedValue = 0;
 		} else {
-			sanitizedValue = parseInt(sanitizedValue, 10);
+			sanitizedValue = parsedValue;
+		}
+
+		if (sanitizedValue < 0) {
+			sanitizedValue = 0;
 		}
 
 		return sanitizedValue;
 	};
 
-	validateViewportWidth = (viewportWidth, currentIndex) => {
+	validateViewportWidth = () => {
 		/*
 			-	check if the entered viewportWidth already exists in the sizeMapping array
 			-	currentIndex indicates the index of the item that is being updated
@@ -163,49 +171,129 @@ class SizeMapping extends Component {
 		*/
 		const { selectedAdUnit } = this.state;
 		const { sizeMapping } = selectedAdUnit;
-		let hasAlreadyViewportWidth = false;
+		const existingViewportWidthMap = {};
 
 		// eslint-disable-next-line no-plusplus
 		for (let index = 0; index < sizeMapping.length; index++) {
-			const mapping = sizeMapping[index];
-			if (mapping.viewportWidth === viewportWidth && index !== currentIndex) {
-				hasAlreadyViewportWidth = true;
-				break;
-			}
+			const { viewportWidth: vw } = sizeMapping[index];
+			existingViewportWidthMap[vw] = existingViewportWidthMap[vw] || [];
+			existingViewportWidthMap[vw].push(index);
 		}
 
-		this.setState(state => {
-			const viewportWidthErrors = {
-				...state.errors.viewportWidth
-			};
+		const updateState = state => {
+			const viewportWidthErrors = {};
 
-			if (hasAlreadyViewportWidth) {
-				viewportWidthErrors[currentIndex] = `Rule for Width ${viewportWidth}px already exists`;
+			sizeMapping.forEach(({ viewportWidth }, sizeMappingIndex) => {
+				const viewportIndexes = existingViewportWidthMap[viewportWidth];
+				if (viewportIndexes && viewportIndexes.length > 1) {
+					// show error for rows/index other than the first one
+					if (viewportIndexes.indexOf(sizeMappingIndex) > 0) {
+						viewportWidthErrors[
+							sizeMappingIndex
+						] = `Rule for Width ${viewportWidth}px already exists`;
+					}
+				}
+			});
+
+			return {
+				errors: {
+					...state.errors,
+					viewportWidth: viewportWidthErrors
+				}
+			};
+		};
+
+		this.setState(updateState);
+	};
+
+	validateMaxHeight = (index, size) => {
+		const { selectedAdUnit } = this.state;
+		const { appType, sizeMapping } = selectedAdUnit;
+		const { maxHeight: currentValue } = sizeMapping[index];
+
+		if (appType === 'apLite') {
+			return;
+		}
+
+		let [, adUnitHeight] = size.split('x');
+		adUnitHeight = parseInt(adUnitHeight, 10);
+
+		const updateState = state => {
+			const maxHeightErrors = {
+				...state.errors.maxHeight
+			};
+			if (currentValue > adUnitHeight) {
+				maxHeightErrors[index] = `Max Height allowed: ${adUnitHeight}px`;
 			} else {
-				delete viewportWidthErrors[currentIndex];
+				delete maxHeightErrors[index];
 			}
 
 			return {
 				errors: {
 					...state.errors,
-					viewportWidth: {
-						...viewportWidthErrors
-					}
+					maxHeight: maxHeightErrors
 				}
 			};
-		});
+		};
+
+		this.setState(updateState);
 	};
 
-	handlePropertyUpdate = (type, index, e) => {
-		e.persist();
+	validateMaxWidth = (index, size) => {
+		const { selectedAdUnit } = this.state;
+		const { appType, sizeMapping } = selectedAdUnit;
+		const { maxWidth: currentValue } = sizeMapping[index];
 
-		const newValue = this.sanitizePropertyValue(e.target.value);
-
-		if (type === 'viewportWidth') {
-			this.validateViewportWidth(newValue, index);
+		if (appType === 'apLite') {
+			return;
 		}
 
-		this.setState(state => {
+		let [adUnitWidth] = size.split('x');
+		adUnitWidth = parseInt(adUnitWidth, 10);
+
+		const updateState = state => {
+			const maxWidthErrors = {
+				...state.errors.maxWidth
+			};
+			if (currentValue > adUnitWidth) {
+				maxWidthErrors[index] = `Max Width allowed: ${adUnitWidth}px`;
+			} else {
+				delete maxWidthErrors[index];
+			}
+
+			return {
+				errors: {
+					...state.errors,
+					maxWidth: maxWidthErrors
+				}
+			};
+		};
+
+		this.setState(updateState);
+	};
+
+	validateValues = (type, index, adUnitSize) => {
+		switch (type) {
+			case 'viewportWidth':
+				this.validateViewportWidth();
+				break;
+			case 'maxHeight':
+				this.validateMaxHeight(index, adUnitSize);
+				break;
+			case 'maxWidth':
+				this.validateMaxWidth(index, adUnitSize);
+				break;
+
+			default:
+				break;
+		}
+	};
+
+	handlePropertyUpdate = (propertyType, index, e, adUnitSize) => {
+		e.persist();
+		const propertyValue = this.sanitizePropertyValue(e.target.value);
+
+		const updateState = state => {
 			const {
 				selectedAdUnit: { sizeMapping }
 			} = state;
@@ -213,11 +301,11 @@ class SizeMapping extends Component {
 			const newSizeMapping = [...sizeMapping];
 			const mappingData = {
 				...newSizeMapping[index],
-				[type]: newValue
+				[propertyType]: propertyValue
 			};
 
-			if (type === 'viewportWidth') {
-				mappingData.name = `Viewport Width <= ${newValue}px`;
+			if (propertyType === 'viewportWidth') {
+				mappingData.name = `Screen Width <= ${propertyValue}px`;
 			}
 
 			newSizeMapping[index] = mappingData;
@@ -228,7 +316,9 @@ class SizeMapping extends Component {
 					sizeMapping: newSizeMapping
 				}
 			};
-		});
+		};
+
+		this.setState(updateState, () => this.validateValues(propertyType, index, adUnitSize));
 	};
 
 	// eslint-disable-next-line consistent-return
@@ -248,16 +338,17 @@ class SizeMapping extends Component {
 				}
 			}),
 			() => {
-				const { selectedAdUnit } = this.state;
-				this.validateViewportWidth(0, selectedAdUnit.sizeMapping.length - 1);
+				// const { selectedAdUnit } = this.state;
+				this.validateViewportWidth();
 			}
 		);
 	};
 
+	// eslint-disable-next-line consistent-return
 	removeViewportRule = (mappingIndex, viewportWidth) => {
-		// eslint-disable-next-line no-alert
+		// eslint-disable-next-line no-restricted-globals
 		const isUserSure = confirm(
-			`Are you sure you want to remove rule for Viewport Width <= ${viewportWidth} ?`
+			`Are you sure you want to remove rule for Screen Width <= ${viewportWidth} ?`
 		);
 
 		if (!isUserSure) {
@@ -282,11 +373,16 @@ class SizeMapping extends Component {
 
 	hasValidationErrors = () => {
 		const { errors } = this.state;
-		const { viewportWidth } = errors;
+		const { maxHeight, maxWidth, viewportWidth } = errors;
 
-		return !!Object.keys(viewportWidth).length;
+		return (
+			!!Object.keys(maxWidth).length ||
+			!!Object.keys(maxHeight).length ||
+			!!Object.keys(viewportWidth).length
+		);
 	};
 
+	// eslint-disable-next-line consistent-return
 	saveSizeMapping = () => {
 		const { updateSizeMapping, site, showNotification } = this.props;
 		const { siteId } = site;
@@ -329,14 +425,16 @@ class SizeMapping extends Component {
 			});
 	};
 
-	getTableRows = sizeMapping => {
-		const { errors } = this.state;
-		const { viewportWidth: viewportWidthErrors } = errors;
+	renderPropertyError = (errors, index) =>
+		!!errors[index] && <div className="error-message">{errors[index]}</div>;
 
-		const renderViewportWidthError = index =>
-			!!viewportWidthErrors[index] && (
-				<div className="error-message">{viewportWidthErrors[index]}</div>
-			);
+	getTableRows = (sizeMapping, adUnitSize) => {
+		const { errors } = this.state;
+		const {
+			maxWidth: maxWidthErrors,
+			maxHeight: maxHeightErrors,
+			viewportWidth: viewportWidthErrors
+		} = errors;
 
 		return sizeMapping.map((mapping, index) => {
 			const { name, viewportWidth, maxHeight, maxWidth } = mapping;
@@ -350,24 +448,30 @@ class SizeMapping extends Component {
 							value={viewportWidth}
 							onChange={e => this.handlePropertyUpdate('viewportWidth', index, e)}
 						/>
-						{renderViewportWidthError(index)}
+						{this.renderPropertyError(viewportWidthErrors, index)}
 					</div>
 				),
 				maxHeight: (
-					<FormControl
-						type="number"
-						min={0}
-						value={maxHeight}
-						onChange={e => this.handlePropertyUpdate('maxHeight', index, e)}
-					/>
+					<>
+						<FormControl
+							type="number"
+							min={0}
+							value={maxHeight}
+							onChange={e => this.handlePropertyUpdate('maxHeight', index, e, adUnitSize)}
+						/>
+						{this.renderPropertyError(maxHeightErrors, index)}
+					</>
 				),
 				maxWidth: (
-					<FormControl
-						type="number"
-						min={0}
-						value={maxWidth}
-						onChange={e => this.handlePropertyUpdate('maxWidth', index, e)}
-					/>
+					<>
+						<FormControl
+							type="number"
+							min={0}
+							value={maxWidth}
+							onChange={e => this.handlePropertyUpdate('maxWidth', index, e, adUnitSize)}
+						/>
+						{this.renderPropertyError(maxWidthErrors, index)}
+					</>
 				),
 				actions: (
 					<CustomButton
@@ -391,10 +495,11 @@ class SizeMapping extends Component {
 	);
 
 	renderView = () => {
-		const { inventoryOptions, selectedAdUnit } = this.state;
+		const { inventoryOptions, selectedAdUnit, inventoryMap } = this.state;
 		const { adUnitId, sizeMapping } = selectedAdUnit;
+		const { size } = inventoryMap[adUnitId] || {};
 
-		const data = this.getTableRows(sizeMapping);
+		const data = this.getTableRows(sizeMapping, size);
 
 		return (
 			<div className="size-mapping">
@@ -403,7 +508,7 @@ class SizeMapping extends Component {
 						<ControlLabel className="u-padding-v1">Ad Unit</ControlLabel>
 						<Select
 							onChange={this.handleAdUnitSelect}
-							placeholder="Please select an Ad Unit"
+							placeholder="Please select any Ad Unit"
 							options={inventoryOptions}
 							selected={adUnitId}
 							isSearchable

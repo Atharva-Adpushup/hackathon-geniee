@@ -189,12 +189,15 @@
 
 			.rt-th {
 				padding: 1rem;
+				white-space: normal;
 			}
 
 			.rt-td {
+				white-space: normal;
 				padding: 0.5rem 1rem;
 				&:first-child {
 					padding: 1rem;
+					font-size: 16px;
 				}
 			}
 		}
@@ -224,6 +227,11 @@
 	}
 
 	.select-options-group {
+		color: $primaryRed;
+		font-weight: bolder;
+		font-size: 1.1rem;
+		border-bottom: 2px solid $primaryRed;
+		padding-bottom: 0.5rem;
 		display: flex;
 		align-items: center;
 
@@ -232,12 +240,12 @@
 		}
 
 		.count {
-			background-color: #ebecf0;
+			background-color: $primaryRed;
 			border-radius: 2em;
-			color: #172b4d;
+			color: $whiteColor;
 			display: inline-block;
 			font-size: 11;
-			font-weight: normal;
+			font-weight: bolder;
 			line-height: 1;
 			min-width: 1;
 			padding: 0.16666666666667em 0.5em;
