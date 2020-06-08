@@ -434,8 +434,7 @@ class Panel extends Component {
 	 * @memberof Panel
 	 */
 	getMetricsList = tableData => {
-		const { reportsMeta, isForOps } = this.props;
-
+		const { reportsMeta, isForOps, user: { data: {isUniqueImpChecked = false} } } = this.props;
 		const filteredMetrics = tableData.columns.filter(metric => {
 			const isDimension = !!reportsMeta.data.dimension[metric];
 			const isBlacklistedMetric = REPORT_INTERVAL_TABLE_KEYS.indexOf(metric) !== -1;
@@ -461,10 +460,8 @@ class Panel extends Component {
 				match = displayOpsMetrics.map((item) => item.value)
 				computedMetrics = computedMetrics.filter((item) => match.indexOf(item.value)!=-1)	
 			} else {
-				// local storage return value as string
-				// Boolean("false") also returns true, have to use "true"(string) match for this 
-				// instead of boolean true
-				if(localStorage.getItem('isUniqueImpChecked') == "true") {
+				// check if unique imp is checked
+				if(isUniqueImpChecked) {
 					match = displayUniqueImpressionMetrics.map((item) => item.value)
 					computedMetrics = computedMetrics.filter((item) => match.indexOf(item.value)!=-1)
 				} else {
@@ -546,7 +543,7 @@ class Panel extends Component {
 	};
 
 	updateMetrics = (newMetrics = []) => {
-		const { reportsMeta, isForOps } = this.props;
+		const { reportsMeta, isForOps, overrideOpsPanelUniqueImpValue } = this.props;
 		const sortedMetaMetrics = this.getSortedMetaMetrics(reportsMeta.data.metrics);
 		let sortedMetrics = [];
 		if(isForOps) {
@@ -562,12 +559,12 @@ class Panel extends Component {
 				let match = displayUniqueImpressionMetrics.map((item) => item.value)
 				sortedMetrics = sortedMetaMetrics.filter((item) => match.indexOf(item.value)!=-1)
 				// temp code for unqiue imp selection in dashboard from this component
-				localStorage.setItem('isUniqueImpChecked', true)
+				overrideOpsPanelUniqueImpValue({isUniqueImpChecked: true})
 			} else {
 				let match = displayMetrics.map((item) => item.value)
 				sortedMetrics = sortedMetaMetrics.filter((item) => match.indexOf(item.value)!=-1)
 				// temp code for unqiue imp selection in dashboard from this component
-				localStorage.setItem('isUniqueImpChecked', false)
+				overrideOpsPanelUniqueImpValue({isUniqueImpChecked: false})
 			}
 		}
 
