@@ -3,7 +3,14 @@ import { Button, Row } from '@/Client/helpers/react-bootstrap-imports';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
 import OverlayTooltip from '../../../Components/OverlayTooltip/index';
-import { APPS, STATUSES, LINK_TYPE, TYPE, DEFAULT_ITEM } from '../constants/index';
+import {
+	APPS,
+	STATUSES,
+	LINK_TYPE,
+	TYPE,
+	DEFAULT_ITEM,
+	DISABLED_APP_KEYS_IF_APLITE
+} from '../constants/index';
 import Card from '../../../Components/Layout/Card';
 import Loader from '../../../Components/Loader/index';
 import CustomMessage from '../../../Components/CustomMessage/index';
@@ -84,29 +91,35 @@ class ManageApps extends React.Component {
 	renderApps = () => {
 		const { site } = this.props;
 		const { apps = {} } = site;
-		const { appStatuses } = site;
+		const { appStatuses = {} } = site;
 		const disableAppStyles = { pointerEvents: 'none', opacity: 0.5 };
-		const disableAppIfApLite = [1, 5, 2, 4, 6];
 
-		let appStatus = { ...appStatuses };
-		const ampObject = {
-			6: { app: 'AMP ', key: 6, alias: 'amp' }
-		};
-		if (apps.amp) {
-			appStatus = { ...appStatus, ...ampObject };
+		const activeAppsArr = [];
+		for (let key in apps) {
+			if (apps[key]) activeAppsArr.push(key);
 		}
+
+		if (appStatuses[7]) {
+			activeAppsArr.push('adRecover');
+		}
+		if (appStatuses[8]) {
+			activeAppsArr.push('manageAdsTxt');
+		}
+
 		return (
 			<div className="aligner aligner--row aligner--wrap">
 				{APPS.map(app => {
-					const { name, image, description, key, left, right, full = false } = app;
+					const { name, alias, image, description, key, left, right, full = false } = app;
 
-					const isAppActive = !!appStatus[key];
+					const isAppActive = activeAppsArr.includes(alias);
 					const statuses = isAppActive ? STATUSES.ACTIVE : STATUSES.INACTIVE;
 					const { type, icon, tooltip } = statuses;
 
 					return (
 						<Card
-							style={apps.apLite && disableAppIfApLite.includes(key) ? disableAppStyles : null}
+							style={
+								apps.apLite && DISABLED_APP_KEYS_IF_APLITE.includes(key) ? disableAppStyles : null
+							}
 							rootClassName="manage-site-card u-margin-r4 u-margin-b4"
 							key={`card-${key}`}
 							type={type}
