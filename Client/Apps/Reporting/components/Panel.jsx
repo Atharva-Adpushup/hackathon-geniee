@@ -434,7 +434,7 @@ class Panel extends Component {
 	 * @memberof Panel
 	 */
 	getMetricsList = tableData => {
-		const { reportsMeta, isForOps, user: { data: {showUniqueImpressionsReporting = false} } } = this.props;
+		const { reportsMeta, isForOps, user: { data: {isUniqueImpEnabled = false} } } = this.props;
 		const filteredMetrics = tableData.columns.filter(metric => {
 			const isDimension = !!reportsMeta.data.dimension[metric];
 			const isBlacklistedMetric = REPORT_INTERVAL_TABLE_KEYS.indexOf(metric) !== -1;
@@ -461,7 +461,7 @@ class Panel extends Component {
 				computedMetrics = computedMetrics.filter((item) => match.indexOf(item.value)!=-1)	
 			} else {
 				// check if unique imp is checked
-				if(showUniqueImpressionsReporting) {
+				if(isUniqueImpEnabled) {
 					match = displayUniqueImpressionMetrics.map((item) => item.value)
 					computedMetrics = computedMetrics.filter((item) => match.indexOf(item.value)!=-1)
 				} else {
@@ -559,12 +559,12 @@ class Panel extends Component {
 				let match = displayUniqueImpressionMetrics.map((item) => item.value)
 				sortedMetrics = sortedMetaMetrics.filter((item) => match.indexOf(item.value)!=-1)
 				// temp code for unqiue imp selection in dashboard from this component
-				overrideOpsPanelUniqueImpValue({showUniqueImpressionsReporting: true})
+				overrideOpsPanelUniqueImpValue({isUniqueImpEnabled: true})
 			} else {
 				let match = displayMetrics.map((item) => item.value)
 				sortedMetrics = sortedMetaMetrics.filter((item) => match.indexOf(item.value)!=-1)
 				// temp code for unqiue imp selection in dashboard from this component
-				overrideOpsPanelUniqueImpValue({showUniqueImpressionsReporting: false})
+				overrideOpsPanelUniqueImpValue({isUniqueImpEnabled: false})
 			}
 		}
 
