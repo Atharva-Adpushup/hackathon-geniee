@@ -143,6 +143,22 @@ const bidderParamsMapping = {
 				linearity: CONSTANTS.VIDEO.LINEARITY
 			}
 		}
+	},
+	appnexus: {
+		/**
+		 * AppNexus has different video properties than openRTB standards.
+		 * That's why using custom properties here.
+		 */
+		videoParams: {
+			video: {
+				mimes: CONSTANTS.VIDEO.MIMES,
+				minduration: CONSTANTS.VIDEO.MINDURATION,
+				maxduration: CONSTANTS.VIDEO.MAXDURATION,
+				skippable: true,
+				playback_method: ['auto_play_sound_off'],
+				frameworks: [1] // VPAID 2.0
+			}
+		}
 	}
 };
 
