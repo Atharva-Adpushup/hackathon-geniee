@@ -264,7 +264,10 @@ class NetworkOptions extends Component {
 					title="Select Network"
 					onSelect={this.networkChangeHandler}
 					options={filteredNetworks.map(item => ({
-						name: item.charAt(0).toUpperCase() + item.slice(1).replace(/([A-Z])/g, ' $1'),
+						name:
+							item === 'adpTags'
+								? 'ADP'
+								: item.charAt(0).toUpperCase() + item.slice(1).replace(/([A-Z])/g, ' $1'),
 						value: item
 					}))}
 					selected={network}
