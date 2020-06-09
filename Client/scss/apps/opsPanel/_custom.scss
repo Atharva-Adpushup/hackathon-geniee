@@ -163,5 +163,10 @@
 		.toggleSwitch {
 			margin-right: 1rem;
 		}
+
+		input[type='checkbox']:checked ~ label .toggleSwitch {
+			background-color: $GreenColor;
+		}
+
 	}
 }
