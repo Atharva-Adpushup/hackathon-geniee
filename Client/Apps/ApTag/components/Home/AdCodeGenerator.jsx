@@ -121,6 +121,7 @@ class AdCodeGenerator extends Component {
 			height,
 			isManual: true,
 			fluid,
+			network: 'adpTags',
 			networkData: {
 				isResponsive: !!(width === 'responsive'),
 				formats: ['display']
@@ -190,8 +191,8 @@ class AdCodeGenerator extends Component {
 		const customAttributes = maxHeight ? ` max-height="${maxHeight}"` : '';
 		const code = isDisplayAd
 			? ADCODE.replace(/__AD_ID__/g, adId)
-				.replace(/__CUSTOM_ATTRIBS__/, customAttributes)
-				.trim()
+					.replace(/__CUSTOM_ATTRIBS__/, customAttributes)
+					.trim()
 			: null;
 		const message = isDisplayAd ? DISPLAY_AD_MESSAGE.replace(/__SITE_ID__/g, siteId) : AMP_MESSAGE;
 		return (
@@ -227,13 +228,13 @@ class AdCodeGenerator extends Component {
 				{codeGenerated ? (
 					this.renderGeneratedAdcode()
 				) : (
-						<div>
-							{this.renderTypeOptions()}
-							{progress >= 50 ? this.renderSizes() : null}
-							{progress >= 75 ? this.renderFluidToggle() : null}
-							{progress >= 75 ? this.renderButton('Generate AdCode', this.saveHandler) : null}
-						</div>
-					)}
+					<div>
+						{this.renderTypeOptions()}
+						{progress >= 50 ? this.renderSizes() : null}
+						{progress >= 75 ? this.renderFluidToggle() : null}
+						{progress >= 75 ? this.renderButton('Generate AdCode', this.saveHandler) : null}
+					</div>
+				)}
 			</div>
 		);
 	}
@@ -322,7 +323,7 @@ class AdCodeGenerator extends Component {
 				</i>
 			</div>
 		);
-	}
+	};
 
 	renderFluidToggle() {
 		const { match } = this.props;
