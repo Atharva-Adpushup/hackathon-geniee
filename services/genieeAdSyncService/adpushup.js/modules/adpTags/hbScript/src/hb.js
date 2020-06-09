@@ -194,7 +194,7 @@ var hb = {
 						const { DEFAULT_JW_PLAYER_SIZE } = constants;
 						prebidSlot.mediaTypes.video = {
 							...mediaTypesConfig.video,
-							playerSize: DEFAULT_JW_PLAYER_SIZE
+							playerSize
 						};
 						break;
 					}
