@@ -166,11 +166,7 @@ class AdElement extends Component {
 					<div>
 						{this.renderInformation(
 							'Network',
-							ad.network && ad.networkData
-								? ad.network === 'adpTags'
-									? 'ADP'
-									: ad.network.toUpperCase()
-								: 'Not Set'
+							ad.network && ad.networkData ? ad.network.toUpperCase() : 'Not Set'
 						)}
 						{this.renderInformation('Status', ad.isActive ? 'Active' : 'Archived')}
 					</div>
