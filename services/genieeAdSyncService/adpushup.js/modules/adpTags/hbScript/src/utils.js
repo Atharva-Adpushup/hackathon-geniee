@@ -260,7 +260,7 @@ var utils = {
 		let playerHeight = highestHeightPossible;
 		let gcd;
 
-		/*if (
+		if (
 			highestWidthPossible < highestHeightPossible &&
 			highestHeightPossible >= 16 &&
 			highestWidthPossible >= 9 &&
@@ -278,9 +278,9 @@ var utils = {
 				playerHeight = gcd * 16;
 				playerWidth = gcd * 9;
 			}
-		}*/
+		}
 		if (
-			//highestWidthPossible >= highestHeightPossible &&
+			highestWidthPossible >= highestHeightPossible &&
 			highestWidthPossible >= 16 &&
 			highestHeightPossible >= 9 &&
 			!JSON.stringify(VIDEO_PLAYER_EXCEPTION_SIZES).includes(
