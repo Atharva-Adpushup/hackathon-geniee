@@ -6,8 +6,6 @@ var $ = require('./adp').$;
 var getMatchedAdSize = function(inputObject) {
 	var adCollection = AD_SIZE_MAPPING.IAB_SIZES.ALL,
 		widthsWithMultipleAdSizes = AD_SIZE_MAPPING.IAB_SIZES.MULTIPLE_AD_SIZES_WIDTHS_MAPPING,
-		adsWithBackwardCompatibleSizesMapping =
-			AD_SIZE_MAPPING.IAB_SIZES.BACKWARD_COMPATIBLE_MAPPING,
 		differenceObject = {},
 		isValidInput = !!inputObject,
 		areValidInputDimensions = !!(
@@ -79,15 +77,19 @@ var getMatchedAdSize = function(inputObject) {
 	if (isMatchedWidthInMultipleAdSize) {
 		multipleAdSizesCollection = widthsWithMultipleAdSizes[matchedAdSize[0]];
 		multipleAdSizesCollection.forEach(function(adSizeArr) {
-			var stringifiedAdSize = adSizeArr.join(',');
-			computedMatchedSizeArray = computedMatchedSizeArray.concat(
-				adsWithBackwardCompatibleSizesMapping[stringifiedAdSize] || [adSizeArr]
+			let backwardCompatibleSizes = utils.getDownwardCompatibleSizesFromGlobalList(
+				adSizeArr[0],
+				adSizeArr[1]
 			);
+			computedMatchedSizeArray = computedMatchedSizeArray.concat(backwardCompatibleSizes);
 		});
 	} else {
-		computedMatchedSizeArray = computedMatchedSizeArray.concat(
-			adsWithBackwardCompatibleSizesMapping[matchedAdSize.join(',')] || [matchedAdSize]
+		let backwardCompatibleSizes = utils.getDownwardCompatibleSizesFromGlobalList(
+			matchedAdSize[0],
+			matchedAdSize[1]
 		);
+
+		computedMatchedSizeArray = computedMatchedSizeArray.concat(backwardCompatibleSizes);
 	}
 
 	finalComputedData.size = matchedAdSize;

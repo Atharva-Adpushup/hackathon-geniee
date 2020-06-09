@@ -4,8 +4,6 @@ var adp = require('./adp');
 var find = require('lodash.find');
 var $ = require('../../../../libs/jquery');
 var config = require('./config');
-// var BACKWARD_COMPATIBLE_MAPPING = require('./constants').AD_SIZE_MAPPING.IAB_SIZES
-// .BACKWARD_COMPATIBLE_MAPPING;
 var constants = require('./constants');
 var { bidderParamsMapping } = require('./multiFormatConfig');
 var isApLiteActive = window.adpushup.config.apLiteActive;
@@ -140,22 +138,16 @@ var utils = {
 			return allSizesParams['responsive'] ? [allSizesParams['responsive']] : params;
 		}
 
-		for (const originalSize in BACKWARD_COMPATIBLE_MAPPING) {
-			const formattedOriginalSize = originalSize.replace(',', 'x');
-			if (
-				formattedOriginalSize === inventorySize &&
-				BACKWARD_COMPATIBLE_MAPPING[originalSize].length
-			) {
-				const backwardSizes = BACKWARD_COMPATIBLE_MAPPING[originalSize];
+		const [width, height] = inventorySize.split('x');
+		const BACKWARD_COMPATIBLE_MAPPING = this.getDownwardCompatibleSizesFromGlobalList(
+			width,
+			height
+		);
 
-				//for (let backwardSize of backwardSizes) {
-				for (let index = 0; index < backwardSizes.length; index++) {
-					let backwardSize = backwardSizes[index];
-					backwardSize = backwardSize.join('x');
-					if (allSizesParams[backwardSize]) {
-						params.push(allSizesParams[backwardSize]);
-					}
-				}
+		for (let size of BACKWARD_COMPATIBLE_MAPPING) {
+			size = size.join('x');
+			if (allSizesParams[size]) {
+				params.push(allSizesParams[size]);
 			}
 		}
 

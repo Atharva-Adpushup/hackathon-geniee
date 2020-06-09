@@ -150,6 +150,10 @@ var adpTags = {
 		computeSizesAndDefineGPTSlot: function(adpSlot) {
 			var computedSizes = this.getComputedSizes(adpSlot);
 
+			if (!computedSizes) {
+				return;
+			}
+
 			adpSlot.computedSizes =
 				computedSizes && computedSizes.length
 					? computedSizes.concat([]).reverse()
