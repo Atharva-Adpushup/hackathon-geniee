@@ -10,10 +10,10 @@ class UniqueImpressionToggle extends Component {
 	constructor(props) {
 		super(props);
 		const { user } = this.props;
-		const { isShowUniqueImpressionsReporting = false } = user;
+		const { showUniqueImpressionsReporting = false } = user;
 
 		this.state = {
-			isShowUniqueImpressionsReporting,
+			showUniqueImpressionsReporting,
 			loading: false
 		};
 	}
@@ -27,14 +27,14 @@ class UniqueImpressionToggle extends Component {
 	};
 
 	handleSave = () => {
-		const { isShowUniqueImpressionsReporting } = this.state;
+		const { showUniqueImpressionsReporting } = this.state;
 		const { updateUser } = this.props;
 		this.setState({ loading: true });
 
 		return updateUser([
 			{
-				key: 'isShowUniqueImpressionsReporting',
-				value: isShowUniqueImpressionsReporting
+				key: 'showUniqueImpressionsReporting',
+				value: showUniqueImpressionsReporting
 			}
 		]).then(() =>
 			this.setState({
@@ -44,22 +44,22 @@ class UniqueImpressionToggle extends Component {
 	};
 
 	render() {
-		const { loading, isShowUniqueImpressionsReporting } = this.state;
+		const { loading, showUniqueImpressionsReporting } = this.state;
 
 		return (
-			<div className="isShowUniqueImpressionsReporting">
+			<div className="showUniqueImpressionsReporting">
 				<CustomToggleSwitch
 					labelText="Show Unique Impressions Reporting"
 					className="u-margin-t4 u-margin-b4 u-margin-t4 negative-toggle u-cursor-pointer"
-					checked={isShowUniqueImpressionsReporting}
+					checked={showUniqueImpressionsReporting}
 					onChange={this.handleToggle}
 					layout="horizontal"
 					size="m"
 					on="Yes"
 					off="No"
 					defaultLayout
-					name="isShowUniqueImpressionsReporting"
-					id="js-isShowUniqueImpressionsReporting"
+					name="showUniqueImpressionsReporting"
+					id="js-showUniqueImpressionsReporting"
 				/>
 				<CustomButton
 					variant="primary"
