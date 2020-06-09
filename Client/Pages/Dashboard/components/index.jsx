@@ -32,13 +32,13 @@ import CustomButton from '../../../Components/CustomButton';
 class Dashboard extends React.Component {
 	constructor(props) {
 		super(props);
-		let {user: { data: { isUniqueImpChecked } }}  = props
+		let {user: { data: { showUniqueImpressionsReporting } }}  = props
 		this.state = {
 			quickDates: dates,
 			sites: [],
 			widgetsConfig: [],
 			isLoading: true,
-			isUniqueImpChecked
+			showUniqueImpressionsReporting
 		};
 	}
 
@@ -168,7 +168,7 @@ class Dashboard extends React.Component {
 
 	getWidgetComponent = widget => {
 		const { reportType } = this.props;
-		let { isUniqueImpChecked } = this.state;
+		let { showUniqueImpressionsReporting } = this.state;
 		if (widget.isLoading) return <Loader height="20vh" />;
 
 		switch (widget.name) {
@@ -182,7 +182,7 @@ class Dashboard extends React.Component {
 					/>
 				);
 			case 'per_overview':
-				return <PerformanceOverviewContainer isUniqueImpChecked={isUniqueImpChecked} displayData={widget.data} />;
+				return <PerformanceOverviewContainer showUniqueImpressionsReporting={showUniqueImpressionsReporting} displayData={widget.data} />;
 			case 'per_site_wise':
 				if (reportType != 'site') {
 					return <SitewiseReportContainer displayData={widget.data} />;
@@ -204,7 +204,7 @@ class Dashboard extends React.Component {
 	};
 
 	getDisplayData = wid => {
-		const { widgetsConfig, isUniqueImpChecked } = this.state;
+		const { widgetsConfig, showUniqueImpressionsReporting } = this.state;
 		const {
 			selectedDate,
 			selectedSite,
@@ -245,7 +245,7 @@ class Dashboard extends React.Component {
 		widgetsConfig[wid].startDate = params.fromDate;
 		widgetsConfig[wid].endDate = params.toDate;
 
-		if(name == 'per_site_wise' && isUniqueImpChecked) {
+		if(name == 'per_site_wise' && showUniqueImpressionsReporting) {
 			path = path.replace('network_impressions,', '')
 			path = path.replace('network_ad_ecpm,', '')
 			path += ',unique_impressions,unique_ad_ecpm'

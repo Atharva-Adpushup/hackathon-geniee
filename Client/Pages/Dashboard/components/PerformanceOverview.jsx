@@ -71,8 +71,8 @@ class PerformanceOverview extends React.Component {
 
 	render() {
 		const { displayData } = this.state;
-		const { isForOps, isUniqueImpChecked } = this.props;
-		const computedDisplayMetrics = cloneDeep(isUniqueImpChecked?displayUniqueMetrics:displayMetrics);
+		const { isForOps, showUniqueImpressionsReporting } = this.props;
+		const computedDisplayMetrics = cloneDeep(showUniqueImpressionsReporting?displayUniqueMetrics:displayMetrics);
 		if (!isForOps) {
 			Object.keys(computedDisplayMetrics).forEach(displayMetricKey => {
 				const isOpsKey = opsDisplayMetricsKeys.indexOf(displayMetricKey) !== -1;

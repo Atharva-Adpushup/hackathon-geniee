@@ -67,7 +67,7 @@ const user = (state = { fetched: false, data: {} }, action) => {
 				...state,
 				data: {
 					...state.data,
-					isUniqueImpChecked: action.data.isUniqueImpChecked
+					showUniqueImpressionsReporting: action.data.showUniqueImpressionsReporting
 				}
 			};
 		}
