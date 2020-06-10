@@ -1,5 +1,6 @@
 // Prebid interfacing module
 
+var clonedeep = require('lodash.clonedeep');
 var constants = require('./constants');
 var responsiveAds = require('./responsiveAds');
 var adp = require('./adp');
@@ -60,7 +61,7 @@ var hb = {
 				size = adpSlot.optionalParam.overrideSizeTo.split('x');
 			}
 
-			var computedBidders = JSON.parse(JSON.stringify(adpSlot.bidders));
+			var computedBidders = clonedeep(adpSlot.bidders);
 			var sizeConfig = config.PREBID_CONFIG.deviceConfig.sizeConfig;
 			computedBidders.forEach(function(val, i) {
 				// find size config of current bidder
