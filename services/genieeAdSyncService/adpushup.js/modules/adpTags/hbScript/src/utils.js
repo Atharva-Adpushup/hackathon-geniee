@@ -395,6 +395,35 @@ var utils = {
 				: 'more_than_20';
 
 		return data;
+	},
+	getHighestAliveBid: function(pbjs, adUnitCode, mediaTypesToFilter = []) {
+		return pbjs
+			.getBidResponsesForAdUnitCode(adUnitCode)
+			.bids.filter(bid => {
+				var isDesiredMediaType =
+					Array.isArray(mediaTypesToFilter) &&
+					(!mediaTypesToFilter.length ||
+						mediaTypesToFilter.indexOf(bid.mediaType) !== -1);
+
+				var isUnusedBid = bid.status !== 'rendered';
+
+				// Check if bid is not expired
+				function isBidAlive() {
+					var timeNow = new Date();
+					var bidResponseTime = new Date(bid.responseTimestamp);
+					var bidAgeInMs = timeNow - bidResponseTime;
+					var bidTtlInMs = (bid.ttl - 1) * 1000; // substracted 1s from bid ttl to adjust rendering time
+
+					return bidAgeInMs <= bidTtlInMs;
+				}
+
+				return isDesiredMediaType && isUnusedBid && isBidAlive(); // check bid alive only in case of banner
+			})
+			.reduce((highestBid, currentBid) => {
+				if (!highestBid || currentBid.cpm > highestBid.cpm) return currentBid;
+
+				return highestBid;
+			}, false);
 	}
 };
 

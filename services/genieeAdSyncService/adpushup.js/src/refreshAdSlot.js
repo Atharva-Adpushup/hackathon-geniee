@@ -25,6 +25,47 @@ var utils = require('../libs/utils'),
 			container.attr('data-timeout', newTimeoutId);
 		}
 	},
+	getAdObjById = function(adId) {
+		if (!adId) return;
+
+		return ads.find(obj => obj.ad.id === adId);
+	},
+	setRefreshTimeOutByAdId = function(adId, refreshInterval) {
+		if (!adId) return;
+
+		var adObj = getAdObjById(adId);
+		if (!adObj) return;
+
+		var container = $(`#${adId}`);
+		setRefreshTimeOut(container, adObj.ad, refreshInterval);
+	},
+	getRefreshDataByAdId = function(adId) {
+		if (!adId) return;
+
+		var adObj = getAdObjById(adId);
+		if (!adObj) return;
+
+		// get updated container (adObj.container is old)
+		var container = $(`#${adObj.ad.id}`);
+
+		var { refreshTime: refreshTimeStamp, timeout: refreshTimeoutId } = container[0].dataset;
+
+		if (!refreshTimeStamp || !refreshTimeoutId) return;
+
+		var refreshTimeoutStartTime = new Date(parseInt(refreshTimeStamp, 10));
+		var currentTime = new Date();
+
+		var refreshIntervalInMs =
+			adObj.ad.networkData.refreshInterval * 1000 || commonConsts.AD_REFRESH_INTERVAL;
+
+		var refreshTimeLeftInMs = refreshIntervalInMs - (currentTime - refreshTimeoutStartTime);
+
+		return {
+			refreshTimeoutStartTime,
+			refreshTimeLeftInMs,
+			refreshTimeoutId
+		};
+	},
 	refreshAd = function(container, ad) {
 		if (utils.checkElementInViewPercent(container)) {
 			var currentTime = new Date().getTime();
@@ -100,11 +141,11 @@ var utils = require('../libs/utils'),
 		feedbackData.variationId = adp.config.selectedVariation;
 		utils.sendFeedback(feedbackData);
 	},
-	stopRefreshForASlot = function(container) {
-		var adIndex = ads.findIndex(obj => obj.container[0] === container[0]);
+	stopRefreshForASlot = function(adId) {
+		var adIndex = ads.findIndex(obj => obj.ad.id === adId);
 
 		if (adIndex !== -1) {
-			var container = ads[adIndex].container;
+			var container = $(`#${adId}`);
 			var oldTimeoutId = container.attr('data-timeout');
 			oldTimeoutId && clearTimeout(oldTimeoutId);
 
@@ -114,17 +155,18 @@ var utils = require('../libs/utils'),
 	getAllInViewAds = function() {
 		inViewAds = [];
 		for (var i = 0; i < ads.length; i++) {
-			if (utils.checkElementInViewPercent(ads[i].container)) {
+			var container = $(`#${ads[i].ad.id}`);
+			if (utils.checkElementInViewPercent(container)) {
 				inViewAds.push(ads[i]);
 			}
 		}
 	},
-	onScroll = function() {
+	handleRefresh = function() {
 		getAllInViewAds();
 
 		for (var i = 0; i < inViewAds.length; i++) {
 			var inViewAd = inViewAds[i],
-				container = inViewAd.container,
+				container = $(`#${inViewAd.ad.id}`), // get updated container (inViewAd.container is not updated)
 				ad = inViewAd.ad,
 				adRenderTime = container.attr('data-render-time'),
 				lastRefreshTime = container.attr('data-refresh-time'),
@@ -155,34 +197,9 @@ var utils = require('../libs/utils'),
 			}
 		}
 	},
-	onFocus = function() {
-		getAllInViewAds();
-
-		for (var i = 0; i < inViewAds.length; i++) {
-			var inViewAd = inViewAds[i],
-				container = inViewAd.container,
-				ad = inViewAd.ad,
-				lastRefreshTime = container.attr('data-refresh-time'),
-				currentTime = new Date().getTime(),
-				adRefreshInterval =
-					parseInt(ad.networkData.refreshInterval) * 1000 || commonConsts.AD_REFRESH_INTERVAL,
-				timeDifferenceInSec,
-				refreshInterval;
-			if (lastRefreshTime) {
-				// if Ad has been rendered before
-				timeDifferenceInSec = currentTime - lastRefreshTime;
-				if (timeDifferenceInSec > adRefreshInterval) {
-					// if last refresh turn has been missed
-					refreshInterval = 0;
-					setRefreshTimeOut(container, ad, refreshInterval);
-				}
-				// else immediatly refresh it;
-			}
-		}
-	},
 	init = function() {
-		$(window).on('scroll', debounce(onScroll, 50));
-		$(window).on('focus', onFocus);
+		$(window).on('scroll', debounce(handleRefresh, 50));
+		$(window).on('focus', handleRefresh);
 	},
 	refreshSlot = function(container, ad) {
 		setRefreshTimeOut(container, ad);
@@ -196,5 +213,7 @@ var utils = require('../libs/utils'),
 module.exports = {
 	init,
 	refreshSlot,
-	stopRefreshForASlot
+	stopRefreshForASlot,
+	setRefreshTimeOutByAdId,
+	getRefreshDataByAdId
 };

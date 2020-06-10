@@ -188,6 +188,7 @@ var $ = require('../../libs/jquery'),
 													allSizes,
 													sectionId,
 													{
+														adId: gptSlotElementId,
 														dfpAdunit: dfpAdUnitName,
 														dfpAdunitCode,
 														headerBidding: window.adpushup.services.HB_ACTIVE && slotHbStatus,
@@ -214,6 +215,7 @@ var $ = require('../../libs/jquery'),
 
 											refreshSlot &&
 												refreshAdSlot.refreshSlot(container, {
+													id: gptSlotElementId,
 													slotId: gptSlotElementId,
 													dfpAdUnitName,
 													network: 'adpTags',

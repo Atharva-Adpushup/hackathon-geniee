@@ -1,6 +1,5 @@
 // Prebid interfacing module
 
-var merge = require('lodash/merge');
 var constants = require('./constants');
 var responsiveAds = require('./responsiveAds');
 var adp = require('./adp');
@@ -9,6 +8,7 @@ var auction = require('./auction');
 var config = require('./config');
 var prebidDataCollector = require('./prebidDataCollector');
 var { multiFormatConstants, mediaTypesConfig } = require('./multiFormatConfig');
+var videoRenderer = require('./videoRenderer');
 var isApLiteActive = window.adpushup.config.apLiteActive;
 var amznPubId =
 	config.PREBID_CONFIG &&
@@ -89,94 +89,7 @@ var hb = {
 				mediaTypes: {},
 				renderer: {
 					url: multiFormatConstants.VIDEO.RENDERER_URL,
-					render: function(bid) {
-						// push to render queue because jwplayer may not be loaded yet.
-						bid.renderer.push(() => {
-							var jwPlayerInstance;
-							var playerReInstantiated = false;
-							var bidWonTime = +new Date();
-							var jwpEvents = [
-								'ready',
-								'adError',
-								'error',
-								'setupError',
-								'adImpression',
-								'adRequest',
-								'adStarted',
-								'adPlay'
-							];
-							//var client = utils.getVastClientType(bid.vastXml, bid.adTag);
-							var instantiateJwPlayer = function(clientType) {
-								// remove if player has already rendered
-								if (jwPlayerInstance && !!jwPlayerInstance.getState()) {
-									jwPlayerInstance.remove();
-								}
-
-								jwPlayerInstance = jwplayer(bid.adUnitCode);
-
-								jwPlayerInstance
-									.setup(
-										merge(
-											{
-												width: playerSize[0],
-												height: playerSize[1],
-												advertising: {
-													outstream: true,
-													client: clientType || 'vast',
-													adscheduleid: utils.randomAlphaNumericString(8),
-													vastxml: bid.vastXml
-												}
-											},
-											multiFormatConstants.VIDEO.JW_PLAYER_CONFIG
-										)
-									)
-									.on('ready', function() {
-										var playerElem = jwPlayerInstance.getContainer();
-										playerElem.style.margin = '0 auto';
-									});
-
-								setupPlayerEvents(jwPlayerInstance);
-							};
-
-							var setupPlayerEvents = function(jwPlayerInstance) {
-								// setup listener for adError event to reinstantiate the player with different client type.
-								jwPlayerInstance.on('adError', function() {
-									if (!playerReInstantiated) {
-										playerReInstantiated = true;
-										instantiateJwPlayer('googima');
-									}
-								});
-
-								// setup listener for adImpression event to send bid won feedback for video bids.
-								jwPlayerInstance.on('adImpression', function() {
-									prebidDataCollector.collectBidWonData(bid);
-								});
-
-								// ad-hoc data logging
-								jwpEvents.forEach(function(eventName) {
-									jwPlayerInstance.on(eventName, function(e) {
-										window.adpushup.$.ajax({
-											type: 'POST',
-											url: '//vastdump-staging.adpushup.com/' + eventName,
-											data: JSON.stringify({
-												data: JSON.stringify(e),
-												bid: JSON.stringify(bid),
-												eventTime: +new Date(),
-												bidWonTime: bidWonTime,
-												auctionId: bid.auctionId || '',
-												requestId: bid.requestId || ''
-											}),
-											contentType: 'application/json',
-											processData: false,
-											dataType: 'json'
-										});
-									});
-								});
-							};
-
-							instantiateJwPlayer();
-						});
-					}
+					render: videoRenderer.bind(null, adpSlot, playerSize)
 				},
 				bids: computedBidders
 			};
