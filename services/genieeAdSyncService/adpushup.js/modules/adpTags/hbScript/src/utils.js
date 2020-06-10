@@ -423,9 +423,12 @@ var utils = {
 				return highestBid;
 			}, false);
 	},
-	getDownwardCompatibleSizes: function(dimensions, sizes, addOriginalSize = true) {
-		const { maxHeight, maxWidth } = dimensions;
-
+	getDownwardCompatibleSizes: function(
+		maxWidth,
+		maxHeight,
+		addOriginalSize = true,
+		sizes = globalSizes
+	) {
 		/*
 			-	by original size, I mean the size that was used to filter the sizes
 			-	we also need the original size in the compatible sizes in most of the cases
@@ -433,8 +436,9 @@ var utils = {
 		*/
 		let hasOriginalSizeBeenAdded = false;
 
+		// maxHeight = Infinity if we don't find height for responsive ad container and size mapping is not found
 		maxWidth = parseInt(maxWidth, 10);
-		maxHeight = parseInt(maxHeight, 10);
+		maxHeight = maxHeight === Infinity ? Infinity : parseInt(maxHeight, 10);
 
 		const compatibleSizes = sizes.filter(size => {
 			const [width, height] = size;
@@ -446,7 +450,7 @@ var utils = {
 			return width <= maxWidth && height <= maxHeight;
 		});
 
-		if (addOriginalSize && !hasOriginalSizeBeenAdded) {
+		if (addOriginalSize && !hasOriginalSizeBeenAdded && maxHeight !== Infinity) {
 			compatibleSizes.push([maxWidth, maxHeight]);
 		}
 
@@ -467,21 +471,39 @@ var utils = {
 
 		return matchedSizeMapping;
 	},
-	getSizesComputedUsingSizeMapping: function(sizeMapping, sizes) {
-		var matchedSizeMapping = null;
-		var computedSizes = [];
+	getDimensionsFromSizeMapping: function(slot) {
+		let maxWidth = null,
+			maxHeight = null;
 
-		try {
-			matchedSizeMapping = this.getSizeMappingForCurrentViewport(sizeMapping);
-		} catch (error) {}
+		const { sizeMapping } = slot;
+		const isValidSizeMapping = Array.isArray(sizeMapping) && sizeMapping.length > 0;
 
-		if (matchedSizeMapping) {
-			var { maxHeight, maxWidth } = matchedSizeMapping;
+		if (isValidSizeMapping) {
+			const matchedSizeMapping = this.getSizeMappingForCurrentViewport(sizeMapping);
 
-			computedSizes = this.getDownwardCompatibleSizes(maxWidth, maxHeight, sizes);
+			if (matchedSizeMapping) {
+				({ maxWidth, maxHeight } = matchedSizeMapping);
+			}
 		}
 
-		return computedSizes;
+		return [maxWidth, maxHeight];
+	},
+	getSizesComputedUsingSizeMappingOrAdUnitSize: function(
+		slot,
+		useAdUnitSize = true,
+		sizes = globalSizes
+	) {
+		let [maxWidth, maxHeight] = this.getDimensionsFromSizeMapping(slot);
+
+		//  maxWidth, maxHeight can also be 0
+		if (maxWidth === null || maxHeight === null) {
+			// specifically for apLite slots, since they don't have size
+			if (!useAdUnitSize) return null;
+
+			[maxWidth, maxHeight] = slot.size;
+		}
+
+		return this.getDownwardCompatibleSizes(maxWidth, maxHeight, true, sizes);
 	}
 };
 

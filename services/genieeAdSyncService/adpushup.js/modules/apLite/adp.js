@@ -157,9 +157,7 @@ var $ = require('../../libs/jquery'),
 							gptSlots.forEach(
 								function(gptSlot) {
 									var allSizes = gptSlot.getSizes().map(function(size) {
-											/*
-												layout of size object is { l: 300, j: 100 }
-											*/
+											/* layout of size object is { l: 300, j: 100 } */
 											var width = size.l,
 												height = size.j;
 											return [width, height];
@@ -173,18 +171,8 @@ var $ = require('../../libs/jquery'),
 											var dfpAdUnit = adUnitArr[adUnitArr.length - 1];
 											return dfpAdUnit === dfpAdUnitName;
 										}),
-										sizeMapping = apLiteAdUnit && apLiteAdUnit.sizeMapping,
 										sectionId = apLiteAdUnit && apLiteAdUnit.sectionId,
-										container = $(`#${gptSlotElementId}`),
-										computedSizes;
-
-									if (Array.isArray(sizeMapping) && sizeMapping.length > 0) {
-										/*
-											if we have sizes for this viewport, use them otherwise use all the sizes
-										*/
-										computedSizes = hbUtils.getSizesComputedUsingSizeMapping(sizeMapping, allSizes);
-										allSizes = computedSizes.length ? computedSizes : allSizes;
-									}
+										container = $(`#${gptSlotElementId}`);
 
 									// Create adp slot only if defined GPT slot has the associated container in the DOM and gpt ad unit has a valid section id
 									if (container.length && dfpAdUnitName) {
@@ -195,27 +183,35 @@ var $ = require('../../libs/jquery'),
 												refreshSlot = apLiteAdUnit.refreshSlot,
 												refreshInterval = apLiteAdUnit.refreshInterval,
 												formats = apLiteAdUnit.formats,
-												adpSlot = this.createAdpSlot(
-													gptSlotElementId,
-													dfpAdUnitName,
-													gptSlot,
-													allSizes,
-													sectionId,
-													{
-														adId: gptSlotElementId,
-														dfpAdunit: dfpAdUnitName,
-														dfpAdunitCode,
-														headerBidding: window.adpushup.services.HB_ACTIVE && slotHbStatus,
-														network: commonConsts.NETWORKS.ADPTAGS,
-														formats,
-														enableLazyLoading: false,
-														sectionName: dfpAdUnitName,
-														refreshSlot,
-														refreshInterval,
-														services: [commonConsts.SERVICES.AP_LITE],
-														fluid: false
-													}
+												computedSizes = hbUtils.getSizesComputedUsingSizeMappingOrAdUnitSize(
+													apLiteAdUnit,
+													false,
+													allSizes
 												);
+											allSizes =
+												Array.isArray(computedSizes) && computedSizes.length
+													? computedSizes
+													: allSizes;
+											adpSlot = this.createAdpSlot(
+												gptSlotElementId,
+												dfpAdUnitName,
+												gptSlot,
+												allSizes,
+												sectionId,
+												{
+													dfpAdunit: dfpAdUnitName,
+													dfpAdunitCode,
+													headerBidding: window.adpushup.services.HB_ACTIVE && slotHbStatus,
+													network: commonConsts.NETWORKS.ADPTAGS,
+													formats,
+													enableLazyLoading: false,
+													sectionName: dfpAdUnitName,
+													refreshSlot,
+													refreshInterval,
+													services: [commonConsts.SERVICES.AP_LITE],
+													fluid: false
+												}
+											);
 
 											this.adpSlots[gptSlotElementId] = adpSlot;
 
