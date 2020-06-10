@@ -61,6 +61,13 @@ const user = (state = { fetched: false, data: {} }, action) => {
 			};
 		}
 		case USER_ACTIONS.UPDATE_USER: {
+			// copy the value of `showUniqueImpressionsReporting`
+			// client can change its value temp and it should not affect the flag
+			// in the ops panel. Ops panel will use `showUniqueImpressionsReporting`
+			// and client side reporting will use its copy - `isUniqueImpEnabled`
+			if(action.data) {
+				state.data.isUniqueImpEnabled = action.data.value || false
+			}
 			return {
 				...state,
 				data: {
