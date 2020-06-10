@@ -159,6 +159,17 @@ const bidderParamsMapping = {
 				frameworks: [1] // VPAID 2.0
 			}
 		}
+	},
+	spotx: {
+		videoParams: {
+			outstream_function: function() {
+				/**
+				 * This is just a place holder renderer function as preference
+				 * will be given to global renderer function and this won't be called.
+				 * Without `outstream_function` property, spotx won't send video bids.
+				 */
+			}
+		}
 	}
 };
 

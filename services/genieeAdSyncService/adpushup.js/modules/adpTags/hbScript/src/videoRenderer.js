@@ -130,33 +130,36 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 
 				jwPlayerInstance = window.jwplayer(bid.adUnitCode);
 
-				jwPlayerInstance
-					.setup(
-						merge(
-							{
-								width: playerSize[0],
-								height: playerSize[1],
-								advertising: {
-									outstream: true,
-									client: clientType || 'vast',
-									adscheduleid: utils.randomAlphaNumericString(8),
-									vastxml: bid.vastXml
-								}
-							},
-							multiFormatConstants.VIDEO.JW_PLAYER_CONFIG
-						)
-					)
-					.on('ready', function() {
-						var playerElem = jwPlayerInstance.getContainer();
-						playerElem.style.margin = '0 auto';
+				var jwPlayerConfig = merge(
+					{
+						width: playerSize[0],
+						height: playerSize[1],
+						advertising: {
+							outstream: true,
+							client: clientType || 'vast',
+							adscheduleid: utils.randomAlphaNumericString(8)
+						}
+					},
+					multiFormatConstants.VIDEO.JW_PLAYER_CONFIG
+				);
 
-						// migrate slot attributes to player el
-						attrToReserve.forEach(
-							attrName =>
-								slotElDataset[attrName] !== undefined &&
-								(playerElem.dataset[attrName] = slotElDataset[attrName])
-						);
-					});
+				if (bid.vastXml) {
+					jwPlayerConfig.advertising.vastxml = bid.vastXml;
+				} else if (bid.vastUrl) {
+					jwPlayerConfig.advertising.tag = bid.vastUrl;
+				}
+
+				jwPlayerInstance.setup(jwPlayerConfig).on('ready', function() {
+					var playerElem = jwPlayerInstance.getContainer();
+					playerElem.style.margin = '0 auto';
+
+					// migrate slot attributes to player el
+					attrToReserve.forEach(
+						attrName =>
+							slotElDataset[attrName] !== undefined &&
+							(playerElem.dataset[attrName] = slotElDataset[attrName])
+					);
+				});
 
 				setupPlayerEvents(jwPlayerInstance);
 			};
