@@ -3,6 +3,13 @@ import { USER_ACTIONS, SITE_ACTIONS } from '../../constants/global';
 const user = (state = { fetched: false, data: {} }, action) => {
 	switch (action.type) {
 		case USER_ACTIONS.REPLACE_USER_DATA:
+			// copy the value of `showUniqueImpressionsReporting`
+			// client can change its value temp and it should not affect the flag
+			// in the ops panel. Ops panel will use `showUniqueImpressionsReporting`
+			// and client side reporting will use its copy - `isUniqueImpEnabled`
+			if(action.data && action.data.showUniqueImpressionsReporting) {
+				action.data.isUniqueImpEnabled = action.data.showUniqueImpressionsReporting || false
+			}
 			return { fetched: true, data: { ...state.data, ...action.data } };
 		case SITE_ACTIONS.UPDATE_SITE_DATA: {
 			const site = { ...action.data };
@@ -54,11 +61,28 @@ const user = (state = { fetched: false, data: {} }, action) => {
 			};
 		}
 		case USER_ACTIONS.UPDATE_USER: {
+			// copy the value of `showUniqueImpressionsReporting`
+			// client can change its value temp and it should not affect the flag
+			// in the ops panel. Ops panel will use `showUniqueImpressionsReporting`
+			// and client side reporting will use its copy - `isUniqueImpEnabled`
+			if(action.data) {
+				state.data.isUniqueImpEnabled = action.data.value || false
+			}
 			return {
 				...state,
 				data: {
 					...state.data,
 					[action.data.key]: action.data.value
+				}
+			};
+		}
+		case USER_ACTIONS.OVERRIDE_OPS_PANEL_VALUE: {
+			// temp change value for client only
+			return {
+				...state,
+				data: {
+					...state.data,
+					isUniqueImpEnabled: action.data.isUniqueImpEnabled
 				}
 			};
 		}

@@ -17,6 +17,7 @@ import ChartContainer from '../containers/ChartContainer';
 import reportService from '../../../services/reportService';
 import {
 	displayMetrics,
+	displayOpsMetrics,
 	displayUniqueImpressionMetrics,
 	accountDisableFilter,
 	accountDisableDimension,
@@ -51,7 +52,7 @@ class Panel extends Component {
 			dimensionList: [],
 			filterList: [],
 			intervalList: [],
-			metricsList: displayMetrics,
+			metricsList: props.isForOps?displayOpsMetrics:displayMetrics,
 			selectedDimension: '',
 			selectedFilters: {},
 			selectedMetrics: [],
@@ -301,6 +302,7 @@ class Panel extends Component {
 		let { tableData, selectedDimension, selectedFilters, dimensionList } = this.state;
 		const { reportType, isCustomizeChartLegend, isForOps } = this.props;
 		const computedState = Object.assign({ isLoading: true }, inputState);
+		let prevMetricsList = this.state.metricsList;
 
 		this.setState(computedState, () => {
 			let newState = {};
@@ -382,7 +384,22 @@ class Panel extends Component {
 					});
 
 					if (tableData.columns && tableData.columns.length) {
-						const metricsList = this.getMetricsList(tableData);
+						let metricsList = this.getMetricsList(tableData);
+						// we need to persist user column selection when user
+						// generates report multiple times.
+						// for that we will check users previous selection, if it
+						// is different from default list override default wit
+						// previous values
+						if(isForOps && (prevMetricsList.length != metricsList.length)) {
+							metricsList = [...prevMetricsList]
+						} else if(isForOps){
+							// for same length we need to check for individual value
+							let listPrevColList = prevMetricsList.map(item => item.value).sort().join()
+							let defaultPrevColList = metricsList.map( item => item.value).sort().join()
+							if(listPrevColList != defaultPrevColList) {
+								metricsList = [...prevMetricsList]
+							}
+						}
 						newState = { ...newState, metricsList };
 					}
 				}
@@ -417,8 +434,7 @@ class Panel extends Component {
 	 * @memberof Panel
 	 */
 	getMetricsList = tableData => {
-		const { reportsMeta, isForOps } = this.props;
-
+		const { reportsMeta, isForOps, user: { data: {isUniqueImpEnabled = false} } } = this.props;
 		const filteredMetrics = tableData.columns.filter(metric => {
 			const isDimension = !!reportsMeta.data.dimension[metric];
 			const isBlacklistedMetric = REPORT_INTERVAL_TABLE_KEYS.indexOf(metric) !== -1;
@@ -440,7 +456,18 @@ class Panel extends Component {
 		// 	computedMetrics.splice(5);
 		// } else {
 			let match = displayMetrics.map((item) => item.value)
-			computedMetrics = computedMetrics.filter((item) => match.indexOf(item.value)!=-1)
+			if(isForOps) {
+				match = displayOpsMetrics.map((item) => item.value)
+				computedMetrics = computedMetrics.filter((item) => match.indexOf(item.value)!=-1)	
+			} else {
+				// check if unique imp is checked
+				if(isUniqueImpEnabled) {
+					match = displayUniqueImpressionMetrics.map((item) => item.value)
+					computedMetrics = computedMetrics.filter((item) => match.indexOf(item.value)!=-1)
+				} else {
+					computedMetrics = computedMetrics.filter((item) => match.indexOf(item.value)!=-1)
+				}
+			}
 		// }
 		return computedMetrics;
 	};
@@ -516,7 +543,7 @@ class Panel extends Component {
 	};
 
 	updateMetrics = (newMetrics = []) => {
-		const { reportsMeta, isForOps } = this.props;
+		const { reportsMeta, isForOps, overrideOpsPanelUniqueImpValue } = this.props;
 		const sortedMetaMetrics = this.getSortedMetaMetrics(reportsMeta.data.metrics);
 		let sortedMetrics = [];
 		if(isForOps) {
@@ -531,9 +558,13 @@ class Panel extends Component {
 			if(found.length) {
 				let match = displayUniqueImpressionMetrics.map((item) => item.value)
 				sortedMetrics = sortedMetaMetrics.filter((item) => match.indexOf(item.value)!=-1)
+				// temp code for unqiue imp selection in dashboard from this component
+				overrideOpsPanelUniqueImpValue({isUniqueImpEnabled: true})
 			} else {
 				let match = displayMetrics.map((item) => item.value)
 				sortedMetrics = sortedMetaMetrics.filter((item) => match.indexOf(item.value)!=-1)
+				// temp code for unqiue imp selection in dashboard from this component
+				overrideOpsPanelUniqueImpValue({isUniqueImpEnabled: false})
 			}
 		}
 
