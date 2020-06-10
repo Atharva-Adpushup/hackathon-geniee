@@ -41,7 +41,6 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 		var watcherExpiryTimeInMs = 1000;
 		var timeoutId;
 		var scrollEventListener;
-		var focusEventListener;
 
 		return function watcher() {
 			var currentTime = new Date();
@@ -64,17 +63,13 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 
 				scrollEventListener = debounce(inViewCheck, 50);
 				window.addEventListener('scroll', scrollEventListener);
-
-				focusEventListener = inViewCheck;
-				window.addEventListener('focus', scrollEventListener);
 			} else {
 				/**
-				 * Clear timeout and scroll/focus event listners
+				 * Clear timeout and scroll event listners
 				 * first before rendering video bid
 				 */
 				if (timeoutId) clearTimeout(timeoutId);
 				if (scrollEventListener) window.removeEventListener('scroll', scrollEventListener);
-				if (focusEventListener) window.removeEventListener('focus', focusEventListener);
 
 				adpSlot.feedbackSent = false; // reset feedbackSent status for current slot
 
