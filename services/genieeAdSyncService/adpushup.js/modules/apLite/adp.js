@@ -119,7 +119,8 @@ var $ = require('../../libs/jquery'),
 						winner: constants.FEEDBACK.DEFAULT_WINNER
 					},
 					fluid: optionalParam.fluid,
-					refreshCount: 0
+					refreshCount: 0,
+					sizeMapping: optionalParam.sizeMapping || []
 				};
 
 				return adpSlot;
@@ -183,6 +184,7 @@ var $ = require('../../libs/jquery'),
 												refreshSlot = apLiteAdUnit.refreshSlot,
 												refreshInterval = apLiteAdUnit.refreshInterval,
 												formats = apLiteAdUnit.formats,
+												sizeMapping = apLiteAdUnit.sizeMapping || [],
 												computedSizes = hbUtils.getSizesComputedUsingSizeMappingOrAdUnitSize(
 													apLiteAdUnit,
 													false,
@@ -209,7 +211,8 @@ var $ = require('../../libs/jquery'),
 													refreshSlot,
 													refreshInterval,
 													services: [commonConsts.SERVICES.AP_LITE],
-													fluid: false
+													fluid: false,
+													sizeMapping
 												}
 											);
 

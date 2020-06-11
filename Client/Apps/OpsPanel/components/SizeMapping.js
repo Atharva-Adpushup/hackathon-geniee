@@ -92,7 +92,7 @@ class SizeMapping extends Component {
 
 	tableColumns = [
 		{ Header: 'Name', accessor: 'name' },
-		{ Header: 'Screen Width (px)', accessor: 'viewportWidth' },
+		{ Header: 'Max Screen Width (px)', accessor: 'viewportWidth' },
 		{ Header: 'Max Creative Width (px)', accessor: 'maxWidth' },
 		{ Header: 'Max Creative Height (px)', accessor: 'maxHeight' },
 		{ Header: 'Actions', accessor: 'actions' }
@@ -117,7 +117,7 @@ class SizeMapping extends Component {
 
 	getViewportRuleTemplate = viewportWidth => ({
 		viewportWidth,
-		name: `Screen Width <= ${viewportWidth}px`,
+		name: `Max Screen Width <= ${viewportWidth}px`,
 		maxWidth: 0,
 		maxHeight: 0
 	});
@@ -305,7 +305,7 @@ class SizeMapping extends Component {
 			};
 
 			if (propertyType === 'viewportWidth') {
-				mappingData.name = `Screen Width <= ${propertyValue}px`;
+				mappingData.name = `Max Screen Width <= ${propertyValue}px`;
 			}
 
 			newSizeMapping[index] = mappingData;
@@ -348,7 +348,7 @@ class SizeMapping extends Component {
 	removeViewportRule = (mappingIndex, viewportWidth) => {
 		// eslint-disable-next-line no-restricted-globals
 		const isUserSure = confirm(
-			`Are you sure you want to remove rule for Screen Width <= ${viewportWidth} ?`
+			`Are you sure you want to remove rule for Max Screen Width <= ${viewportWidth} ?`
 		);
 
 		if (!isUserSure) {
