@@ -146,7 +146,9 @@ var utils = {
 			) {
 				const backwardSizes = BACKWARD_COMPATIBLE_MAPPING[originalSize];
 
-				for (let backwardSize of backwardSizes) {
+				//for (let backwardSize of backwardSizes) {
+				for (let index = 0; index < backwardSizes.length; index++) {
+					let backwardSize = backwardSizes[index];
 					backwardSize = backwardSize.join('x');
 					if (allSizesParams[backwardSize]) {
 						params.push(allSizesParams[backwardSize]);
@@ -208,7 +210,9 @@ var utils = {
 							);
 
 							if (bidderParams.length) {
-								for (const params of bidderParams) {
+								//for (const params of bidderParams) {
+								for (let index = 0; index < bidderParams.length; index++) {
+									const params = bidderParams[index];
 									if (params) {
 										let bidderParams = params;
 
