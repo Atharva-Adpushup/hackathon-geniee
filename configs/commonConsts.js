@@ -426,7 +426,8 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		adsTxt: 'adtx::',
 		apLite: 'aplt::',
 		network: 'ntwk::',
-		amp: 'amtg::'
+		amp: 'amtg::',
+		requestLogger: 'reql::'
 	},
 	tagManagerInitialDoc: {
 		siteId: null,

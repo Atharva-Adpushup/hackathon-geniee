@@ -19,6 +19,7 @@ const utilityController = require('./utilityController');
 const ampController = require('./ampController');
 
 const apiAuthMiddleware = require('../middlewares/apiAuthMiddleware');
+const logger = require('../middlewares/logger');
 
 router.use(apiAuthMiddleware);
 
@@ -29,7 +30,7 @@ router.use('/apTag', apTagController);
 router.use('/site', siteController);
 router.use('/data', dataController);
 router.use('/innovativeAds', innovativeAdsController);
-router.use('/reports', reportsController);
+router.use('/reports', logger, reportsController);
 router.use('/ops', opsController);
 router.use('/channel', channelController);
 router.use('/headerBidding', headerBiddingController);
