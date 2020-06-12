@@ -187,7 +187,9 @@ var getComputedAdSizes = function(adpSlot) {
 
 	if (currentEle.hasAttribute('max-height')) {
 		let maxHeight = parseInt(currentEle.getAttribute('max-height'), 10);
-		computedParentData.height = Math.min(computedParentData.height || 0, maxHeight);
+		computedParentData.height = maxHeight
+			? Math.min(computedParentData.height || Infinity, maxHeight)
+			: computedParentData.height;
 	}
 
 	matchedSizeData = getMatchedAdSize(computedParentData, adpSlot);

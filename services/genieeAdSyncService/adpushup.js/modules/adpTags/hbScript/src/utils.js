@@ -139,13 +139,10 @@ var utils = {
 		}
 
 		const [width, height] = inventorySize.split('x');
-		const BACKWARD_COMPATIBLE_MAPPING = this.getDownwardCompatibleSizesFromGlobalList(
-			width,
-			height
-		);
+		const BACKWARD_COMPATIBLE_MAPPING = this.getDownwardCompatibleSizes(width, height);
 
-		for (let size of BACKWARD_COMPATIBLE_MAPPING) {
-			size = size.join('x');
+		for (let i = 0; i < BACKWARD_COMPATIBLE_MAPPING.length; i++) {
+			const size = BACKWARD_COMPATIBLE_MAPPING[i].join('x');
 			if (allSizesParams[size]) {
 				params.push(allSizesParams[size]);
 			}
