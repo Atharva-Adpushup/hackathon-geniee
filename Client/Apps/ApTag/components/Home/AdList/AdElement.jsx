@@ -80,14 +80,14 @@ class AdElement extends Component {
 			showRewardedVideo
 		} = this.state;
 		const isAMP = ad.formatData.type === 'amp';
-		const isRewarded = ad.formatData.type === 'rewardedVideoAds';
+		const isRewarded = ad.formatData.type === 'rewardedAds';
 		let code = isAMP ? this.getAMPAdCode(ad) : ADCODE;
 		const customAttributes = ad.maxHeight ? ` max-height="${ad.maxHeight}"` : '';
 		code = code
 			? code.replace(/__AD_ID__/g, ad.id).replace(/__CUSTOM_ATTRIBS__/, customAttributes)
 			: null;
 
-		if (ad.formatData.type === 'rewardedVideoAds') {
+		if (ad.formatData.type === 'rewardedAds') {
 			ad.width = 1;
 			ad.height = 1;
 		}

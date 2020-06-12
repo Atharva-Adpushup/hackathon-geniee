@@ -30,8 +30,8 @@ const fn = {
 		const value = data.value || data;
 		const id = uuid.v4();
 		const name = generateSectionName({
-			width: payload.ad.formatData.type === 'rewardedVideoAds' ? 1 : payload.ad.width,
-			height: payload.ad.formatData.type === 'rewardedVideoAds' ? 1 : payload.ad.height,
+			width: payload.ad.formatData.type === 'rewardedAds' ? 1 : payload.ad.width,
+			height: payload.ad.formatData.type === 'rewardedAds' ? 1 : payload.ad.height,
 			platform: payload.ad.formatData.platform || null,
 			pagegroup: null,
 			id,

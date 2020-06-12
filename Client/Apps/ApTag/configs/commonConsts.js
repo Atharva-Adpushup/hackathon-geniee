@@ -32,11 +32,11 @@ const TYPES = [
 		description: 'Link units display a list of topics that are relevant to the content of your page'
 	},
 	{
-		name: 'Rewarded Video Ads',
-		image: '/assets/images/tagManager/rewardedVideoAds.png',
-		key: 'rewardedVideoAds',
+		name: 'Rewarded Ads',
+		image: '/assets/images/tagManager/rewardedAds.png',
+		key: 'rewardedAds',
 		description:
-			'Rewarded ads provide an opportunity for users to watch a video or engage with a playable ad in exchange for a reward within the app'
+			'High value video ads that may be watched by visitors in exchange for access to premium content'
 	}
 ];
 const SIZES = {
@@ -93,7 +93,7 @@ const SIZES = {
 		DESKTOP: ['336x280', '120x600', '1070x250', '320x100', '336x280', '300x250', '468x60'],
 		MOBILE: ['320x100', '336x280', '300x250', '468x60']
 	},
-	REWARDEDVIDEOADS: {
+	REWARDEDADS: {
 		ALLOWED: ['mobile']
 	}
 };

@@ -33,6 +33,7 @@ class AdCodeGenerator extends Component {
 			platform: '',
 			type: '',
 			rewardText: '',
+			rewardValue: '',
 			size: null,
 			customFields: {},
 			loading: false,
@@ -121,6 +122,7 @@ class AdCodeGenerator extends Component {
 			progress,
 			automaticTrigger,
 			rewardText,
+			rewardValue,
 			customJsSnippet,
 			rewardTriggerFunction
 		} = this.state;
@@ -136,7 +138,7 @@ class AdCodeGenerator extends Component {
 		let width = 1,
 			height = 1;
 
-		if (type !== 'rewardedVideoAds') {
+		if (type !== 'rewardedAds') {
 			const sizesArray = isResponsive ? 'responsive' : size.split('x');
 			width = isResponsive ? 'responsive' : sizesArray[0];
 			height = isResponsive ? 'responsive' : sizesArray[1];
@@ -167,18 +169,19 @@ class AdCodeGenerator extends Component {
 			isActive: true
 		};
 
-		if (type === 'rewardedVideoAds') {
+		if (type === 'rewardedAds') {
 			delete ad.fluid;
 
 			ad.isRewarded = true;
 			ad.networkData.headerBidding = false;
 			ad.rewardText = rewardText;
+			ad.rewardValue = rewardValue;
 			ad.automaticTrigger = automaticTrigger;
 			!ad.automaticTrigger ? (ad.customScript = btoa(customJsSnippet)) : null;
 			ad.rewardTriggerFunction = btoa(rewardTriggerFunction);
 		}
 
-		if (type !== 'rewardedVideoAds') {
+		if (type !== 'rewardedAds') {
 			// Add Custom Fields in ad obj
 			Object.keys(customFields).forEach(customFieldKey => {
 				ad[customFieldKey] = customFields[customFieldKey].value;
@@ -228,7 +231,7 @@ class AdCodeGenerator extends Component {
 		const { type } = this.state;
 		const { adId, maxHeight, siteId } = this.props;
 		const isDisplayAd = type !== 'amp';
-		const isRewarded = type === 'rewardedVideoAds';
+		const isRewarded = type === 'rewardedAds';
 		const customAttributes = maxHeight ? ` max-height="${maxHeight}"` : '';
 		const code =
 			isDisplayAd && !isRewarded
@@ -274,21 +277,13 @@ class AdCodeGenerator extends Component {
 						{this.renderTypeOptions()}
 						{progress >= 50 ? this.renderSizes() : null}
 
-						{type !== 'rewardedVideoAds'
-							? progress >= 75
-								? this.renderFluidToggle()
-								: null
-							: null}
-						{type === 'rewardedVideoAds' && progress >= 75 ? this.renderRewardInput() : null}
-						{type === 'rewardedVideoAds' && progress >= 75
-							? this.renderAutomaticTriggerToggle()
-							: null}
-						{type === 'rewardedVideoAds' && progress >= 75 && !automaticTrigger
+						{type !== 'rewardedAds' ? (progress >= 75 ? this.renderFluidToggle() : null) : null}
+						{type === 'rewardedAds' && progress >= 75 ? this.renderRewardInput() : null}
+						{type === 'rewardedAds' && progress >= 75 ? this.renderAutomaticTriggerToggle() : null}
+						{type === 'rewardedAds' && progress >= 75 && !automaticTrigger
 							? this.renderCustomScriptInput()
 							: null}
-						{type === 'rewardedVideoAds' && progress >= 75
-							? this.renderRewardTriggerFunction()
-							: null}
+						{type === 'rewardedAds' && progress >= 75 ? this.renderRewardTriggerFunction() : null}
 						{progress >= 75 ? this.renderButton('Generate AdCode', this.saveHandler) : null}
 					</div>
 				)}
@@ -312,9 +307,9 @@ class AdCodeGenerator extends Component {
 		return (
 			<div>
 				<CustomList
-					heading={type === 'rewardedVideoAds' ? `Select Platform` : `Select Ad Size`}
+					heading={type === 'rewardedAds' ? `Select Platform` : `Select Ad Size`}
 					subHeading={
-						type === 'rewardedVideoAds'
+						type === 'rewardedAds'
 							? 'It only supports mobile Platform'
 							: 'AdpPushup supports varied ad sizes'
 					}
@@ -358,7 +353,7 @@ class AdCodeGenerator extends Component {
 		this.setState({
 			platform,
 			size: platform === 'responsive' ? 'responsive' : null,
-			progress: platform === 'responsive' || type === 'rewardedVideoAds' ? 75 : 50
+			progress: platform === 'responsive' || type === 'rewardedAds' ? 75 : 50
 		});
 	}
 
@@ -396,7 +391,7 @@ class AdCodeGenerator extends Component {
 	renderRewardInput() {
 		const { match } = this.props;
 		const { siteId } = match.params;
-		const { rewardText } = this.state;
+		const { rewardText, rewardValue } = this.state;
 		return (
 			<div className="Reward">
 				<FieldGroup
@@ -409,6 +404,17 @@ class AdCodeGenerator extends Component {
 					id="rewardText-input"
 					placeholder=" Enter Reward Text"
 					className="u-padding-v4 u-padding-h4 rewardText"
+				/>
+				<FieldGroup
+					name="rewardValue"
+					value={rewardValue}
+					type="text"
+					label="Reward Value"
+					onChange={this.handleChange}
+					size={4}
+					id="rewardValue-input"
+					placeholder=" Enter Reward Value"
+					className="u-padding-v4 u-padding-h4 rewardValue"
 				/>
 			</div>
 		);
@@ -465,7 +471,7 @@ class AdCodeGenerator extends Component {
 		return (
 			<div className="u-margin-t4 rewardTriggerFunction">
 				<FormGroup controlId="beforeJsSnippet-input">
-					<ControlLabel>Reward Trigger Function</ControlLabel>
+					<ControlLabel>Post Rewarded Custom Script</ControlLabel>
 					<FormControl
 						componentClass="textarea"
 						placeholder="Enter value..."
