@@ -15,6 +15,7 @@ import ConsentManagement from './ConsentManagement';
 import HeaderBidding from './HeaderBidding';
 import ApTag from './ApTag';
 import InnovativeAds from './InnovativeAds';
+import AmpAds from './AmpAds';
 
 class Apps extends Component {
 	state = {
@@ -255,6 +256,28 @@ class Apps extends Component {
 					{activeKey === 'innovativeAds' ? (
 						<InnovativeAds {...common} updateSite={updateSite} />
 					) : null}
+				</Panel>
+
+				<Panel eventKey="ampAds">
+					<Panel.Heading>
+						<Panel.Title toggle className="app-panel-title">
+							AMP Ads
+						</Panel.Title>
+						<Link to={`/sites/${site.siteId}/apps/amp`} className="u-margin-r3 app-link">
+							<OverlayTrigger
+								placement="top"
+								overlay={
+									<Tooltip id={`tooltip-innovative-ads-link-${site.siteId}`}>
+										Go to AMP Ads App
+									</Tooltip>
+								}
+								key={`app-amp-ads-link-${site.siteId}`}
+							>
+								<FontAwesomeIcon icon="link" className="u-text-red" size="lg" />
+							</OverlayTrigger>
+						</Link>
+					</Panel.Heading>
+					{activeKey === 'ampAds' ? <AmpAds {...common} updateSite={updateSite} /> : null}
 				</Panel>
 				<Panel>
 					<Panel.Heading>
