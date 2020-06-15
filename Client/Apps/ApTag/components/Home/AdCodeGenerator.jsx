@@ -127,6 +127,17 @@ class AdCodeGenerator extends Component {
 			rewardTriggerFunction
 		} = this.state;
 
+		const { showNotification } = this.props;
+
+		if (type === 'rewardedAds' && (!rewardText || !rewardValue || !rewardTriggerFunction)) {
+			return showNotification({
+				mode: 'error',
+				title: 'Error',
+				message: 'All the fields are mandatory',
+				autoDismiss: 5
+			});
+		}
+
 		// terminate if Custom Fields are invalid
 		const isCustomFieldsValid = !Object.keys(customFields).find(
 			customFieldKey => !customFields[customFieldKey].isValid
