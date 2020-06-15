@@ -394,28 +394,36 @@ class AdCodeGenerator extends Component {
 		const { rewardText, rewardValue } = this.state;
 		return (
 			<div className="Reward">
-				<FieldGroup
-					name="rewardText"
-					value={rewardText}
-					type="text"
-					label="Reward Text"
-					onChange={this.handleChange}
-					size={4}
-					id="rewardText-input"
-					placeholder=" Enter Reward Text"
-					className="u-padding-v4 u-padding-h4 rewardText"
-				/>
-				<FieldGroup
-					name="rewardValue"
-					value={rewardValue}
-					type="text"
-					label="Reward Value"
-					onChange={this.handleChange}
-					size={4}
-					id="rewardValue-input"
-					placeholder=" Enter Reward Value"
-					className="u-padding-v4 u-padding-h4 rewardValue"
-				/>
+				<Col md={3} className="rewardLabel">
+					Reward Text
+				</Col>
+				<Col md={9}>
+					<FieldGroup
+						name="rewardText"
+						value={rewardText}
+						type="text"
+						onChange={this.handleChange}
+						size={4}
+						id="rewardText-input"
+						placeholder=" Enter Reward Text"
+						className="u-padding-v4 u-padding-h4 rewardText"
+					/>
+				</Col>
+				<Col md={3} className="rewardLabel u-margin-t4">
+					Reward Value
+				</Col>
+				<Col md={9} className="u-margin-t4">
+					<FieldGroup
+						name="rewardValue"
+						value={rewardValue}
+						type="text"
+						onChange={this.handleChange}
+						size={4}
+						id="rewardValue-input"
+						placeholder=" Enter Reward Value"
+						className="u-padding-v4 u-padding-h4 rewardText"
+					/>
+				</Col>
 			</div>
 		);
 	}
@@ -452,15 +460,19 @@ class AdCodeGenerator extends Component {
 		return (
 			<div className="u-margin-t4 beforeJs">
 				<FormGroup controlId="beforeJsSnippet-input">
-					<ControlLabel>Custom Script</ControlLabel>
-					<FormControl
-						componentClass="textarea"
-						placeholder="Custom Script"
-						name="customJsSnippet"
-						onChange={this.handleChange}
-						value={customJsSnippet}
-						className="u-padding-v4 u-padding-h4"
-					/>
+					<Col md={3}>
+						<ControlLabel className="scriptLabel">Custom Script</ControlLabel>
+					</Col>
+					<Col md={9}>
+						<FormControl
+							componentClass="textarea"
+							placeholder="Custom Script"
+							name="customJsSnippet"
+							onChange={this.handleChange}
+							value={customJsSnippet}
+							className="u-padding-v4 u-padding-h4 u-margin-b4 scriptTextArea"
+						/>
+					</Col>
 				</FormGroup>
 			</div>
 		);
@@ -471,15 +483,19 @@ class AdCodeGenerator extends Component {
 		return (
 			<div className="u-margin-t4 rewardTriggerFunction">
 				<FormGroup controlId="beforeJsSnippet-input">
-					<ControlLabel>Post Rewarded Custom Script</ControlLabel>
-					<FormControl
-						componentClass="textarea"
-						placeholder="Enter value..."
-						name="rewardTriggerFunction"
-						onChange={this.handleChange}
-						value={rewardTriggerFunction}
-						className="u-padding-v4 u-padding-h4"
-					/>
+					<Col md={3}>
+						<ControlLabel className="scriptLabel">Post Rewarded Custom Script</ControlLabel>
+					</Col>
+					<Col md={9}>
+						<FormControl
+							componentClass="textarea"
+							placeholder="Enter script"
+							name="rewardTriggerFunction"
+							onChange={this.handleChange}
+							value={rewardTriggerFunction}
+							className="u-padding-v4 u-padding-h4 u-margin-b4 scriptTextArea"
+						/>
+					</Col>
 				</FormGroup>
 			</div>
 		);

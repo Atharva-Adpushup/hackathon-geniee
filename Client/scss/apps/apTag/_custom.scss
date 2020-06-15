@@ -263,41 +263,19 @@ select.inputMinimal {
 		margin-left: 2rem;
 		.rewardText {
 			display: inline;
-			width: 50%;
-			margin-left: 20%;
+			width: 70%;
 		}
-
-		.rewardValue {
-			display: inline;
-			width: 50%;
-			margin-left: 19%;
-		}
-		label {
-			font-size: 18px;
-		}
+	}
+	.rewardLabel {
+		font-size: 18px;
 	}
 }
 
-.beforeJs {
-	.form-group {
-		display: flex;
-		margin-left: 2rem;
-
-		textarea {
-			width: 50%;
-			margin-left: 20%;
-		}
-	}
+.scriptLabel {
+	font-size: 18px;
+	font-weight: 500;
 }
 
-.rewardTriggerFunction {
-	.form-group {
-		display: flex;
-		margin-left: 2rem;
-
-		textarea {
-			width: 50%;
-			margin-left: 10%;
-		}
-	}
+.scriptTextArea {
+	width: 70%;
 }
