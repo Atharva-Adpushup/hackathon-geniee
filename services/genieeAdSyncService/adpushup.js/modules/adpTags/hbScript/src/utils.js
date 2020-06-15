@@ -169,7 +169,7 @@ var utils = {
 				return {};
 		}
 	},
-	getBiddersForSlot: function(size, formats) {
+	getBiddersForSlot: function(size, formats, bidderRulesConfig = {}) {
 		var width = size[0];
 		var height = size[1];
 		var size = width + 'x' + height;
@@ -177,12 +177,17 @@ var utils = {
 		var prebidConfig = config.PREBID_CONFIG;
 		var hbConfig = prebidConfig.hbcf;
 
+		var computedFormats = bidderRulesConfig.formats || formats;
+
 		if (hbConfig && Object.keys(hbConfig).length) {
 			Object.keys(hbConfig).forEach(
 				function(bidder) {
 					var bidderData = hbConfig[bidder];
+					var isBidderAllowed =
+						!bidderRulesConfig.allowedBidders ||
+						bidderRulesConfig.allowedBidders.indexOf(bidder) !== -1;
 
-					if (!bidderData.isPaused) {
+					if (!bidderData.isPaused && isBidderAllowed) {
 						if (bidderData.sizeLess) {
 							var computedBidderObj = {
 								bidder: bidder,
@@ -190,7 +195,7 @@ var utils = {
 							};
 
 							if (bidderParamsMapping[bidder]) {
-								formats.forEach(format => {
+								computedFormats.forEach(format => {
 									computedBidderObj.params = {
 										...this.getVideoOrNativeParams(format, bidder),
 										...computedBidderObj.params
@@ -213,7 +218,7 @@ var utils = {
 										let bidderParams = params;
 
 										if (bidderParamsMapping[bidder]) {
-											formats.forEach(format => {
+											computedFormats.forEach(format => {
 												bidderParams = {
 													...this.getVideoOrNativeParams(format, bidder),
 													...bidderParams
@@ -234,7 +239,29 @@ var utils = {
 			);
 		}
 
+		if (bidderRulesConfig.bidderSequence) {
+			bidders = this.sortBidders(bidders, bidderRulesConfig.bidderSequence);
+		}
+
 		return bidders;
+	},
+	sortBidders: function(unsortedBidders, bidderSequence) {
+		var sortedBidders = [];
+
+		if (!(bidderSequence && Array.isArray(bidderSequence) && bidderSequence.length)) {
+			return unsortedBidders;
+		}
+
+		bidderSequence.forEach(bidderCode => {
+			var index = unsortedBidders.findIndex(bidder => bidder.bidder === bidderCode);
+			if (index !== -1) {
+				sortedBidders = sortedBidders.concat(unsortedBidders.splice(index, 1));
+			}
+		});
+
+		sortedBidders = sortedBidders.concat(unsortedBidders);
+
+		return sortedBidders;
 	},
 	isPrebidHbEnabled: function(slot) {
 		return (
