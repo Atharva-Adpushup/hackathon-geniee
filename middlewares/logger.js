@@ -1,11 +1,10 @@
-var couchbase = require('../helpers/couchBaseService');
+const couchbase = require('../helpers/couchBaseService');
 const uuid = require('uuid');
 const { docKeys } = require('../configs/commonConsts');
+const config = require('../configs/config');
 
 //@desc       dump request to cocuchdb
 const logger = (req, res, next) => {
-	var bucketName = 'RequestBucket';
-
 	const reqlDoc = {
 		path: `${req.get('host')}${req.baseUrl}${req.path}`,
 		method: req.method,
@@ -14,7 +13,7 @@ const logger = (req, res, next) => {
 		timestamp: +new Date()
 	};
 	return couchbase
-		.connectToBucket(bucketName)
+		.connectToBucket(config.couchBase.REQUEST_LOG_BUCKET)
 		.then(requestBucket =>
 			requestBucket.upsertAsync(`${docKeys.requestLogger}${uuid.v4()}`, reqlDoc, {})
 		)
