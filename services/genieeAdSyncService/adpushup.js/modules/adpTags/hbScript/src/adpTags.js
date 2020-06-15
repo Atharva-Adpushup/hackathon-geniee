@@ -82,6 +82,127 @@ var adpTags = {
 				constants.BATCHING_INTERVAL
 			);
 		},
+		getDataByRules: function(size, formats) {
+			var rules = [
+				{
+					triggers: [
+						{
+							name: 'device',
+							operator: 'contains',
+							valueType: 'array',
+							value: ['desktop', 'mobile']
+						}
+					],
+					actions: [
+						{
+							name: 'allowed_bidders',
+							valueType: 'array',
+							value: ['pubmatic', 'sovrn', 'critio', 'adyoulike']
+						},
+						{
+							name: 'bidders_order',
+							valueType: 'array',
+							value: ['adyoulike', 'sovrn']
+						},
+						{
+							name: 'refresh_timeout',
+							valueType: 'integer',
+							value: 2000
+						},
+						{
+							name: 'initial_timeout',
+							valueType: 'integer',
+							value: 2500
+						},
+						{
+							name: 'use_formats',
+							valueType: 'array',
+							value: ['display', 'video']
+						}
+					]
+				}
+			];
+
+			var outputData = {};
+			var bidderRulesConfig = {};
+			rules.forEach(rule => {
+				// check whether rule matches
+
+				// if rule matches then apply actions
+				rule.actions.forEach(action => {
+					switch (action.name) {
+						case 'allowed_bidders': {
+							if (Array.isArray(action.value) && action.value.length) {
+								bidderRulesConfig.allowedBidders = action.value;
+							}
+
+							break;
+						}
+						case 'bidders_order': {
+							if (Array.isArray(action.value) && action.value.length) {
+								bidderRulesConfig.bidderSequence = action.value;
+
+								config.PREBID_CONFIG.prebidConfig.enableBidderSequence = true;
+							}
+
+							break;
+						}
+						case 'use_formats': {
+							if (
+								Array.isArray(action.value) &&
+								action.value.length &&
+								action.value.indexOf('display') !== -1
+							) {
+								bidderRulesConfig.formats = action.value;
+								outputData.formats = action.value;
+							}
+
+							break;
+						}
+						case 'refresh_timeout': {
+							var refreshTimeOut = parseInt(action.value, 10);
+							if (!isNaN(refreshTimeOut)) {
+								config.PREBID_CONFIG.prebidConfig.refreshTimeOut = refreshTimeOut;
+
+								var isAmazonUAMActive =
+									config.PREBID_CONFIG &&
+									config.PREBID_CONFIG.amazonUAMConfig &&
+									config.PREBID_CONFIG.amazonUAMConfig.isAmazonUAMActive &&
+									config.PREBID_CONFIG.amazonUAMConfig.publisherId;
+
+								if (isAmazonUAMActive) {
+									config.PREBID_CONFIG.amazonUAMConfig.refreshTimeOut = refreshTimeOut;
+								}
+							}
+
+							break;
+						}
+						case 'initial_timeout': {
+							var initialTimeOut = parseInt(action.value, 10);
+							if (!isNaN(initialTimeOut)) {
+								config.PREBID_CONFIG.prebidConfig.timeOut = initialTimeOut;
+
+								var isAmazonUAMActive =
+									config.PREBID_CONFIG &&
+									config.PREBID_CONFIG.amazonUAMConfig &&
+									config.PREBID_CONFIG.amazonUAMConfig.isAmazonUAMActive &&
+									config.PREBID_CONFIG.amazonUAMConfig.publisherId;
+
+								if (isAmazonUAMActive) {
+									config.PREBID_CONFIG.amazonUAMConfig.timeOut = initialTimeOut;
+								}
+							}
+
+							break;
+						}
+					}
+				});
+			});
+
+			outputData.bidders = utils.getBiddersForSlot(size, formats, bidderRulesConfig);
+
+			return outputData;
+		},
 		createSlot: function(containerId, size, placement, optionalParam) {
 			var slotId = optionalParam.dfpAdunit;
 			var isResponsive = optionalParam.isResponsive;
@@ -93,7 +214,7 @@ var adpTags = {
 					optionalParam.formats.length &&
 					optionalParam.formats) ||
 				constants.PREBID.DEFAULT_FORMATS;
-			var bidders = optionalParam.headerBidding ? utils.getBiddersForSlot(size, formats) : [];
+
 			var timeout =
 				config.PREBID_CONFIG &&
 				config.PREBID_CONFIG.prebidConfig &&
@@ -102,6 +223,14 @@ var adpTags = {
 					: constants.PREBID.TIMEOUT;
 			var adType = optionalParam.adType;
 			var sizeMapping = optionalParam.sizeMapping;
+
+			var bidders;
+			if (optionalParam.headerBidding) {
+				var { bidders: computedBidders, formats: computedFormats } = this.getDataByRules(
+					size,
+					formats
+				);
+			}
 
 			/*
 			if (isResponsive) {
@@ -114,8 +243,8 @@ var adpTags = {
 			var adpSlot = {
 				slotId: slotId,
 				optionalParam: optionalParam,
-				bidders: bidders || [],
-				formats: formats,
+				bidders: computedBidders || bidders || [],
+				formats: computedFormats || formats,
 				placement: placement,
 				headerBidding: optionalParam.headerBidding,
 				activeDFPNetwork: utils.getActiveDFPNetwork(),
