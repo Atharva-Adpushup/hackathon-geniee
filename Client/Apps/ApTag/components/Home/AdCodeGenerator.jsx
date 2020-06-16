@@ -192,12 +192,11 @@ class AdCodeGenerator extends Component {
 			ad.rewardTriggerFunction = btoa(rewardTriggerFunction);
 		}
 
-		if (type !== 'rewardedAds') {
-			// Add Custom Fields in ad obj
-			Object.keys(customFields).forEach(customFieldKey => {
-				ad[customFieldKey] = customFields[customFieldKey].value;
-			});
-		}
+		// Add Custom Fields in ad obj
+		Object.keys(customFields).forEach(customFieldKey => {
+			ad[customFieldKey] = customFields[customFieldKey].value;
+		});
+
 		this.setState(
 			{
 				progress: 100,
