@@ -12,6 +12,7 @@ const logger = (req, res, next) => {
 		params: req.query,
 		timestamp: +new Date()
 	};
+
 	return couchbase
 		.connectToBucket(config.couchBase.REQUEST_LOG_BUCKET)
 		.then(requestBucket =>

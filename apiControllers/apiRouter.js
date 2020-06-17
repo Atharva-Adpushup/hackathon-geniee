@@ -17,6 +17,7 @@ const ampSettingsController = require('./ampSettingsController');
 const adsTxtController = require('./adsTxtController');
 const utilityController = require('./utilityController');
 const ampController = require('./ampController');
+const configs = require('../configs/config');
 
 const apiAuthMiddleware = require('../middlewares/apiAuthMiddleware');
 const logger = require('../middlewares/logger');
@@ -30,7 +31,11 @@ router.use('/apTag', apTagController);
 router.use('/site', siteController);
 router.use('/data', dataController);
 router.use('/innovativeAds', innovativeAdsController);
-router.use('/reports', logger, reportsController);
+router.use(
+	'/reports',
+	!configs.couchBase.IS_REQUEST_LOG ? reportsController : logger,
+	reportsController
+);
 router.use('/ops', opsController);
 router.use('/channel', channelController);
 router.use('/headerBidding', headerBiddingController);
