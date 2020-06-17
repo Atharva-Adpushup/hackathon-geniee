@@ -31,11 +31,7 @@ router.use('/apTag', apTagController);
 router.use('/site', siteController);
 router.use('/data', dataController);
 router.use('/innovativeAds', innovativeAdsController);
-router.use(
-	'/reports',
-	!configs.couchBase.IS_REQUEST_LOG ? reportsController : logger,
-	reportsController
-);
+router.use('/reports', logger, reportsController);
 router.use('/ops', opsController);
 router.use('/channel', channelController);
 router.use('/headerBidding', headerBiddingController);
