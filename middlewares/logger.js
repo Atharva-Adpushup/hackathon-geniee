@@ -1,4 +1,4 @@
-const couchbase = require('../helpers/couchBaseService');
+const couchbase = require('../helpers/couchBaseStagingService');
 const uuid = require('uuid');
 const { docKeys } = require('../configs/commonConsts');
 const config = require('../configs/config');
@@ -7,7 +7,7 @@ const config = require('../configs/config');
 const logger = (req, res, next) => {
 	next();
 
-	if (config.couchBase.IS_REQUEST_LOG) {
+	if (config.couchBaseStaging.IS_REQUEST_LOG) {
 		const reqlDoc = {
 			path: `${req.get('host')}${req.baseUrl}${req.path}`,
 			method: req.method,
@@ -15,15 +15,18 @@ const logger = (req, res, next) => {
 			params: req.query,
 			timestamp: +new Date()
 		};
-		return couchbase
-			.connectToBucket(config.couchBase.REQUEST_LOG_BUCKET)
+
+		couchbase
+			.connectToBucket(config.couchBaseStaging.REQUEST_LOG_BUCKET)
 			.then(requestBucket =>
 				requestBucket.upsertAsync(`${docKeys.requestLogger}${uuid.v4()}`, reqlDoc, {})
 			)
 			.then(() => {
 				console.log('Doc created');
 			})
-			.catch(err => console.log(err));
+			.catch(err => {
+				console.log(err);
+			});
 	}
 };
 
