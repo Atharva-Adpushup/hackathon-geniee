@@ -7,8 +7,13 @@ const HTTP_STATUSES = require('../configs/httpStatusConsts');
 const { sendSuccessResponse, sendErrorResponse } = require('../helpers/commonFunctions');
 const CC = require('../configs/commonConsts');
 const utils = require('../helpers/utils');
+const redis = require('redis');
+
+const REDIS_PORT = process.env.PORT || 6379;
+const client = redis.createClient(REDIS_PORT);
 
 const router = express.Router();
+const cache = require('../middlewares/cacheMiddleware');
 
 router
 	.get('/getCustomStats', (req, res) => {
@@ -93,7 +98,7 @@ router
 				return res.send({});
 			})
 	)
-	.get('/getMetaData', (req, res) => {
+	.get('/getMetaData', cache, (req, res) => {
 		const {
 			query: { sites = '', isSuperUser = false }
 		} = req;
@@ -107,9 +112,12 @@ router
 				json: true,
 				qs: params
 			})
-				.then(response =>
-					response.code == 1 && response.data ? res.send(response.data) : res.send({})
-				)
+				.then(response => {
+					const data = response.data;
+					//set data to redis
+					client.setex(JSON.stringify(req.query), 3600, JSON.stringify(data));
+					return response.code == 1 && data ? res.send(data) : res.send({});
+				})
 				.catch(() => res.send({}));
 		}
 

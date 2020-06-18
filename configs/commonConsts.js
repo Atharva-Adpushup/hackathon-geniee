@@ -556,7 +556,8 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 	EMAIL_REGEX: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
 	cronSchedule: {
 		activeSiteMarkingAndAdsTxtService: '20 14,2 * * *',
-		adManagerSyncService: '0 */12 * * *'
+		adManagerSyncService: '0 */12 * * *',
+		prefetchService: '0 */1 * * *'
 	},
 	SELLERS_JSON: {
 		fileConfig: {
