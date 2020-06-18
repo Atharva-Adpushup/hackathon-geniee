@@ -171,13 +171,16 @@ var utils = {
 		var hbConfig = prebidConfig.hbcf;
 
 		var computedFormats = bidderRulesConfig.formats || formats;
+		var isAllowedBiddersRuleListValid =
+			Array.isArray(bidderRulesConfig.allowedBidders) &&
+			bidderRulesConfig.allowedBidders.length;
 
 		if (hbConfig && Object.keys(hbConfig).length) {
 			Object.keys(hbConfig).forEach(
 				function(bidder) {
 					var bidderData = hbConfig[bidder];
 					var isBidderAllowed =
-						!bidderRulesConfig.allowedBidders ||
+						!isAllowedBiddersRuleListValid ||
 						bidderRulesConfig.allowedBidders.indexOf(bidder) !== -1;
 
 					if (!bidderData.isPaused && isBidderAllowed) {
@@ -243,7 +246,7 @@ var utils = {
 	sortBidders: function(unsortedBidders, bidderSequence) {
 		var sortedBidders = [];
 
-		if (!(bidderSequence && Array.isArray(bidderSequence) && bidderSequence.length)) {
+		if (!(Array.isArray(bidderSequence) && bidderSequence.length)) {
 			return unsortedBidders;
 		}
 
@@ -528,7 +531,75 @@ var utils = {
 		}
 
 		return this.getDownwardCompatibleSizes(maxWidth, maxHeight, true, sizes);
+	},
+	isGivenTimeExistsInTimeRanges: function(inputTime, timeRanges) {
+		var timeMatches = false;
+
+		for (var i = 0; i < timeRanges.length; i++) {
+			var timeRange = timeRanges[i];
+
+			/**
+			 * Validate timeRange
+			 * sample timeRange: "06:00-11:59"
+			 */
+			var timeRangePattern = /^(\d{2}:\d{2}){1}-(\d{2}:\d{2}){1}$/g;
+			var isTimeRangeValid = timeRange.match(timeRangePattern);
+			if (!isTimeRangeValid) return timeMatches;
+
+			var [rangeStart, rangeEnd] = timeRange.split('-');
+			var [startH, startM] = rangeStart.split(':');
+			var [endH, endM] = rangeEnd.split(':');
+
+			var timeStart = new Date(inputTime.getTime());
+			timeStart.setHours(startH);
+			timeStart.setMinutes(startM);
+
+			var timeEnd = new Date(inputTime.getTime());
+			timeEnd.setHours(endH);
+			timeEnd.setMinutes(endM);
+
+			if (timeStart < timeEnd) {
+				timeMatches = inputTime >= timeStart && inputTime <= timeEnd;
+			} else {
+				timeMatches = inputTime >= timeStart || inputTime <= timeEnd;
+			}
+
+			if (timeMatches) break;
+		}
+
+		return timeMatches;
 	}
+	// getDayOfTheWeekByDay: function(dayIndex) {
+	// 	var dayIndexNum = parseInt(dayIndex, 10);
+	// 	if (isNaN(dayIndexNum)) return;
+
+	// 	var dayIndexMapping = [
+	// 		'sunday',
+	// 		'monday',
+	// 		'tuesday',
+	// 		'wednesday',
+	// 		'thursday',
+	// 		'friday',
+	// 		'saturday'
+	// 	];
+	// 	var day = dayIndexMapping[dayIndexNum];
+	// 	if (!day) return;
+
+	// 	var keys = Object.keys(constants.TIME_RANGE_MAPPING);
+	// 	var computedDayOfTheWeek;
+
+	// 	for (var i = 0; i < keys; i++) {
+	// 		var days = constants.DAY_OF_WEEK[keys[i]];
+
+	// 		if (days.indexOf(day) !== -1) {
+	// 			computedDayOfTheWeek = keys[i];
+
+	// 			break;
+	// 		}
+	// 	}
+
+	// 	return computedDayOfTheWeek;
+	// }
 };
 
 module.exports = utils;

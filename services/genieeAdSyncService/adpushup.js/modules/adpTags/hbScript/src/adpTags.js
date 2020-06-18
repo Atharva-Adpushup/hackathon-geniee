@@ -82,124 +82,328 @@ var adpTags = {
 				constants.BATCHING_INTERVAL
 			);
 		},
-		getDataByRules: function(size, formats) {
+		isHbRuleTriggerMatch: function(trigger, sectionName) {
+			function isMatch(triggerValue, triggerValueType, currentValue, operator) {
+				var matched;
+
+				switch (triggerValueType) {
+					case 'array': {
+						matched = triggerValue.indexOf(currentValue) !== -1;
+
+						break;
+					}
+					case 'boolean': {
+						matched = triggerValue;
+
+						break;
+					}
+				}
+
+				return operator === 'contain' ? matched : !matched;
+			}
+
+			// function checkString(triggerValue, currentValue, operator) {
+			// 	var matched = triggerValue === currentValue;
+
+			// 	return operator === 'contain' ? matched : !matched;
+			// }
+
+			switch (trigger.key) {
+				case 'device': {
+					if (!(Array.isArray(trigger.value) && trigger.value.length)) return false;
+
+					var currentDevice = adpushup.config.platform.toLowerCase();
+
+					return isMatch(trigger.value, 'array', currentDevice, trigger.operator);
+				}
+				case 'country': {
+					if (!(Array.isArray(trigger.value) && trigger.value.length)) return false;
+
+					var currentCountry = 'IN'; // TODO: [HbRules] Add get currentCountry Feature
+
+					return isMatch(trigger.value, 'array', currentCountry, trigger.operator);
+				}
+				case 'time_range': {
+					if (!(Array.isArray(trigger.value) && trigger.value.length)) return false;
+
+					var timeNow = new Date();
+
+					var isTimeMatch = utils.isGivenTimeExistsInTimeRanges(timeNow, trigger.value);
+
+					return isMatch(isTimeMatch, 'boolean', timeNow, trigger.operator);
+				}
+				case 'day_of_the_week': {
+					if (!(Array.isArray(trigger.value) && trigger.value.length)) return false;
+
+					var days = [
+						'sunday',
+						'monday',
+						'tuesday',
+						'wednesday',
+						'thursday',
+						'friday',
+						'saturday'
+					];
+					var todayIndex = new Date().getDay();
+					var today = days[todayIndex];
+
+					return isMatch(trigger.value, 'array', today, trigger.operator);
+				}
+				case 'adunit': {
+					if (!(Array.isArray(trigger.value) && trigger.value.length)) return false;
+
+					return isMatch(trigger.value, 'array', sectionName, trigger.operator);
+				}
+			}
+		},
+		getMatchedHbRules: function(sectionName) {
+			// TODO: [HbRules] check PREBID_CONFIG value if hb is off
+			// var rules = config.PREBID_CONFIG.rules || [];
+
 			var rules = [
 				{
+					isActive: true,
 					triggers: [
 						{
-							name: 'device',
-							operator: 'contains',
-							valueType: 'array',
-							value: ['desktop', 'mobile']
+							key: 'device',
+							operator: 'contain',
+							value: ['desktop', 'mobile'] // desktop,  mobile, tablet
+						},
+						{
+							key: 'country',
+							operator: 'contain',
+							value: ['IN']
+						},
+						/**
+						 * TODO: [HbRules] remove this comment
+						 *
+						 * night: '20:00-05:59'
+						 * morning: '06:00-11:59'
+						 * afternoon: '12:00-15:59'
+						 * evening: '16:00-19:59'
+						 */
+						{
+							key: 'time_range',
+							operator: 'not_contain',
+							value: ['06:00-11:59']
+						},
+						/**
+						 * TODO: [HbRules] Remove this comment
+						 *
+						 * weekday: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
+						 * weekend: ['saturday', 'sunday']
+						 */
+						{
+							key: 'day_of_the_week',
+							operator: 'contain',
+							value: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday']
+						},
+						{
+							key: 'adunit',
+							operator: 'contain',
+							value: ['AP_L_D_POST-PAGE_728X90_56074']
 						}
 					],
 					actions: [
 						{
-							name: 'allowed_bidders',
-							valueType: 'array',
+							key: 'allowed_bidders',
 							value: ['pubmatic', 'sovrn', 'critio', 'adyoulike']
 						},
 						{
-							name: 'bidders_order',
-							valueType: 'array',
+							key: 'bidders_order',
 							value: ['adyoulike', 'sovrn']
 						},
+						// {
+						// 	key: 'disable_header_bidding'
+						// },
 						{
-							name: 'refresh_timeout',
-							valueType: 'integer',
+							key: 'refresh_timeout',
 							value: 2000
 						},
 						{
-							name: 'initial_timeout',
-							valueType: 'integer',
+							key: 'initial_timeout',
 							value: 2500
 						},
 						{
-							name: 'use_formats',
-							valueType: 'array',
+							key: 'formats',
 							value: ['display', 'video']
+						},
+						{
+							key: 'disable_amazon_uam'
 						}
-					]
+					],
+					createdAt: 1592304084229
 				}
 			];
 
-			var outputData = {};
-			var bidderRulesConfig = {};
-			rules.forEach(rule => {
-				// check whether rule matches
+			matchedRules = rules.filter(rule => {
+				var isActive = rule.isActive !== false; // we assumed a rule is active until it's defined as inactive.
 
-				// if rule matches then apply actions
-				rule.actions.forEach(action => {
-					switch (action.name) {
-						case 'allowed_bidders': {
-							if (Array.isArray(action.value) && action.value.length) {
-								bidderRulesConfig.allowedBidders = action.value;
-							}
+				if (!isActive) return false;
 
-							break;
-						}
-						case 'bidders_order': {
-							if (Array.isArray(action.value) && action.value.length) {
-								bidderRulesConfig.bidderSequence = action.value;
+				var ruleMatched = true;
 
-								config.PREBID_CONFIG.prebidConfig.enableBidderSequence = true;
-							}
+				/**
+				 * An Hb rule will match if it's all triggers matches
+				 */
+				for (var i = 0; i < rule.triggers.length; i++) {
+					var trigger = rule.triggers[i];
+					ruleMatched = this.isHbRuleTriggerMatch(trigger, sectionName);
 
-							break;
-						}
-						case 'use_formats': {
-							if (
-								Array.isArray(action.value) &&
-								action.value.length &&
-								action.value.indexOf('display') !== -1
-							) {
-								bidderRulesConfig.formats = action.value;
-								outputData.formats = action.value;
-							}
+					if (!ruleMatched) break;
+				}
 
-							break;
-						}
-						case 'refresh_timeout': {
-							var refreshTimeOut = parseInt(action.value, 10);
-							if (!isNaN(refreshTimeOut)) {
-								config.PREBID_CONFIG.prebidConfig.refreshTimeOut = refreshTimeOut;
-
-								var isAmazonUAMActive =
-									config.PREBID_CONFIG &&
-									config.PREBID_CONFIG.amazonUAMConfig &&
-									config.PREBID_CONFIG.amazonUAMConfig.isAmazonUAMActive &&
-									config.PREBID_CONFIG.amazonUAMConfig.publisherId;
-
-								if (isAmazonUAMActive) {
-									config.PREBID_CONFIG.amazonUAMConfig.refreshTimeOut = refreshTimeOut;
-								}
-							}
-
-							break;
-						}
-						case 'initial_timeout': {
-							var initialTimeOut = parseInt(action.value, 10);
-							if (!isNaN(initialTimeOut)) {
-								config.PREBID_CONFIG.prebidConfig.timeOut = initialTimeOut;
-
-								var isAmazonUAMActive =
-									config.PREBID_CONFIG &&
-									config.PREBID_CONFIG.amazonUAMConfig &&
-									config.PREBID_CONFIG.amazonUAMConfig.isAmazonUAMActive &&
-									config.PREBID_CONFIG.amazonUAMConfig.publisherId;
-
-								if (isAmazonUAMActive) {
-									config.PREBID_CONFIG.amazonUAMConfig.timeOut = initialTimeOut;
-								}
-							}
-
-							break;
-						}
-					}
-				});
+				return ruleMatched;
 			});
 
-			outputData.bidders = utils.getBiddersForSlot(size, formats, bidderRulesConfig);
+			return matchedRules;
+		},
+		getComputedActions: function(hbRules) {
+			if (!Array.isArray(hbRules) || !hbRules.length) return [];
+
+			if (hbRules.length === 1) return hbRules[0].actions;
+
+			/**
+			 * If there are multiple rules then merge their actions.
+			 * In case of duplicate action, choose the latest created rule action
+			 */
+			var actionsMapping = {};
+			hbRules.forEach(hbRule => {
+				for (var i = 0; i < hbRule.actions.length; i++) {
+					var action = hbRule.actions[i];
+					var currentActionDate = new Date(action.createdAt);
+					var oldActionDate =
+						actionsMapping[action.key] &&
+						new Date(actionsMapping[action.key].createdAt);
+
+					if (!actionsMapping[action.key] || currentActionDate > oldActionDate) {
+						actionsMapping[action.key] = {
+							action: action,
+							createdAt: hbRule.createdAt
+						};
+
+						continue;
+					}
+				}
+			});
+
+			var computedActions = Object.keys(actionsMapping).map(key =>
+				computedActions.push(actionsMapping[key].action)
+			);
+
+			return computedActions;
+		},
+		getDataByRules: function(size, formats, sectionName) {
+			var outputData = {};
+
+			var matchedHbRules = this.getMatchedHbRules(sectionName);
+			if (!matchedHbRules.length) return outputData;
+
+			var actions = this.getComputedActions(matchedHbRules);
+			if (!matchedHbRules.length) return outputData;
+
+			var bidderRulesConfig = {};
+
+			// if rule matches then apply actions
+			actions.forEach(action => {
+				switch (action.key) {
+					// slotwise
+					case 'allowed_bidders': {
+						if (Array.isArray(action.value) && action.value.length) {
+							bidderRulesConfig.allowedBidders = action.value;
+						}
+
+						break;
+					}
+					// slotwise
+					case 'bidders_order': {
+						if (Array.isArray(action.value) && action.value.length) {
+							bidderRulesConfig.bidderSequence = action.value;
+
+							config.PREBID_CONFIG.prebidConfig.enableBidderSequence = true;
+						}
+
+						break;
+					}
+					// slotwise
+					case 'disable_header_bidding': {
+						outputData.headerBidding = false;
+
+						break;
+					}
+					// slotwise
+					case 'formats': {
+						if (
+							Array.isArray(action.value) &&
+							action.value.length &&
+							action.value.indexOf('display') !== -1
+						) {
+							bidderRulesConfig.formats = action.value;
+							outputData.formats = action.value;
+						}
+
+						break;
+					}
+					// prebid-batch-wise
+					case 'refresh_timeout': {
+						var refreshTimeOut = parseInt(action.value, 10);
+						if (!isNaN(refreshTimeOut)) {
+							config.PREBID_CONFIG.prebidConfig.refreshTimeOut = refreshTimeOut;
+
+							var isAmazonUAMActive =
+								config.PREBID_CONFIG &&
+								config.PREBID_CONFIG.amazonUAMConfig &&
+								config.PREBID_CONFIG.amazonUAMConfig.isAmazonUAMActive &&
+								config.PREBID_CONFIG.amazonUAMConfig.publisherId;
+
+							if (isAmazonUAMActive) {
+								config.PREBID_CONFIG.amazonUAMConfig.refreshTimeOut = refreshTimeOut;
+							}
+						}
+
+						break;
+					}
+					// prebid-batch-wise
+					case 'initial_timeout': {
+						var initialTimeOut = parseInt(action.value, 10);
+						if (!isNaN(initialTimeOut)) {
+							config.PREBID_CONFIG.prebidConfig.timeOut = initialTimeOut;
+
+							var isAmazonUAMActive =
+								config.PREBID_CONFIG &&
+								config.PREBID_CONFIG.amazonUAMConfig &&
+								config.PREBID_CONFIG.amazonUAMConfig.isAmazonUAMActive &&
+								config.PREBID_CONFIG.amazonUAMConfig.publisherId;
+
+							if (isAmazonUAMActive) {
+								config.PREBID_CONFIG.amazonUAMConfig.timeOut = initialTimeOut;
+							}
+						}
+
+						break;
+					}
+
+					case 'disable_amazon_uam': {
+						/**
+						 * right now we enable amzn uam for a slot if
+						 * - amzn uam publisher id exist
+						 * - hb_active globally
+						 * - hb active for that slot
+						 */
+
+						break;
+					}
+				}
+			});
+
+			/**
+			 * Compute bidders only if headerbidding is not
+			 * disabled by "disable_header_bidding" action
+			 */
+			outputData.bidders =
+				outputData.headerBidding !== false
+					? utils.getBiddersForSlot(size, formats, bidderRulesConfig)
+					: [];
 
 			return outputData;
 		},
@@ -226,10 +430,15 @@ var adpTags = {
 
 			var bidders;
 			if (optionalParam.headerBidding) {
-				var { bidders: computedBidders, formats: computedFormats } = this.getDataByRules(
-					size,
-					formats
-				);
+				var {
+					bidders: computedBidders,
+					formats: computedFormats,
+					headerBidding
+				} = this.getDataByRules(size, formats, sectionName);
+
+				if (computedBidders) bidders = computedBidders;
+				if (headerBidding !== undefined) optionalParam.headerBidding = headerBidding;
+				if (computedFormats) formats = computedFormats;
 			}
 
 			/*
@@ -243,8 +452,8 @@ var adpTags = {
 			var adpSlot = {
 				slotId: slotId,
 				optionalParam: optionalParam,
-				bidders: computedBidders || bidders || [],
-				formats: computedFormats || formats,
+				bidders: bidders || [],
+				formats: formats,
 				placement: placement,
 				headerBidding: optionalParam.headerBidding,
 				activeDFPNetwork: utils.getActiveDFPNetwork(),
