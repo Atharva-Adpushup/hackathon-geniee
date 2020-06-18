@@ -45,7 +45,7 @@ var auction = {
 			  config.PREBID_CONFIG.prebidConfig.timeOut
 			: config.PREBID_CONFIG.prebidConfig.timeOut;
 
-		// TODO: Delete this temp auctionEnd event handler after
+		// TODO: [HbRules] Delete this temp auctionEnd event handler after
 		if (!window.auctionEndRegistered) {
 			pbjs.onEvent('auctionEnd', auctionData => console.log('auction end: ', auctionData));
 			window.auctionEndRegistered = true;
