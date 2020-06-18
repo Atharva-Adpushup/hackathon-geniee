@@ -56,6 +56,4 @@ function getAllUsersMeta() {
 	);
 }
 
-getAllUsersMeta();
-
-// cron.schedule(commonConsts.cronSchedule.prefetchService, getAllUsersMeta);
+cron.schedule(commonConsts.cronSchedule.prefetchService, getAllUsersMeta);
