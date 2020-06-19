@@ -9,7 +9,7 @@ var utils = require('../libs/utils'),
 	ads = [],
 	inViewAds = [],
 	setRefreshTimeOut = function(container, ad, refreshInterval) {
-		if (utils.checkElementInViewPercent(container)) {
+		if (container.length && utils.checkElementInViewPercent(container)) {
 			var refreshInterval =
 				refreshInterval !== undefined
 					? refreshInterval
