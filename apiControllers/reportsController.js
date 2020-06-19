@@ -8,8 +8,9 @@ const { sendSuccessResponse, sendErrorResponse } = require('../helpers/commonFun
 const CC = require('../configs/commonConsts');
 const utils = require('../helpers/utils');
 const redis = require('redis');
+const config = require('../configs/config');
 
-const REDIS_PORT = process.env.REDIS_PORT || 6379;
+const REDIS_PORT = config.environment.REDIS_PORT || 6379;
 const client = redis.createClient(REDIS_PORT);
 
 const router = express.Router();

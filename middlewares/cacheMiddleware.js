@@ -1,6 +1,6 @@
 const redis = require('redis');
-
-const REDIS_PORT = process.env.PORT || 6379;
+const config = require('../configs/config');
+const REDIS_PORT = config.environment.REDIS_PORT || 6379;
 const client = redis.createClient(REDIS_PORT);
 
 const cache = (req, res, next) => {
