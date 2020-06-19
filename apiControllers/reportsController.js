@@ -9,7 +9,7 @@ const CC = require('../configs/commonConsts');
 const utils = require('../helpers/utils');
 const redis = require('redis');
 
-const REDIS_PORT = process.env.PORT || 6379;
+const REDIS_PORT = process.env.REDIS_PORT || 6379;
 const client = redis.createClient(REDIS_PORT);
 
 const router = express.Router();
@@ -114,11 +114,11 @@ router
 			})
 				.then(response => {
 					const data = response.data;
+					response.code == 1 && data ? res.send(data) : res.send({});
 					//set data to redis
 					client.setex(JSON.stringify(req.query), 3600, JSON.stringify(data));
-					return response.code == 1 && data ? res.send(data) : res.send({});
 				})
-				.catch(() => res.send({}));
+				.catch(() => res.end({}));
 		}
 
 		return res.send({});

@@ -5,7 +5,10 @@ const client = redis.createClient(REDIS_PORT);
 
 const cache = (req, res, next) => {
 	client.get(JSON.stringify(req.query), (err, data) => {
-		if (err) throw err;
+		if (err) {
+			console.log(err);
+			next();
+		}
 		if (data !== null) {
 			res.send(data);
 		} else {
