@@ -21,7 +21,7 @@ var utils = require('../libs/utils'),
 			var oldTimeoutId = container.attr('data-timeout');
 			oldTimeoutId && clearTimeout(oldTimeoutId);
 
-			var newTimeoutId = setTimeout(refreshAd, refreshInterval, container, ad);
+			var newTimeoutId = setTimeout(refreshAd, refreshInterval, ad);
 			container.attr('data-timeout', newTimeoutId);
 		}
 	},
@@ -66,8 +66,9 @@ var utils = require('../libs/utils'),
 			refreshTimeoutId
 		};
 	},
-	refreshAd = function(container, ad) {
-		if (utils.checkElementInViewPercent(container)) {
+	refreshAd = function(ad) {
+		var container = $(`#${ad.id}`);
+		if (container.length && utils.checkElementInViewPercent(container)) {
 			var currentTime = new Date().getTime();
 			container.attr('data-refresh-time', currentTime);
 			if (ad.network === commonConsts.NETWORKS.ADPTAGS) {
@@ -156,7 +157,7 @@ var utils = require('../libs/utils'),
 		inViewAds = [];
 		for (var i = 0; i < ads.length; i++) {
 			var container = $(`#${ads[i].ad.id}`);
-			if (utils.checkElementInViewPercent(container)) {
+			if (container.length && utils.checkElementInViewPercent(container)) {
 				inViewAds.push(ads[i]);
 			}
 		}
