@@ -7,7 +7,7 @@ const config = require('../configs/config');
 const logger = (req, res, next) => {
 	next();
 
-	if (config.couchBaseStaging.IS_REQUEST_LOG) {
+	if (config.couchBaseStaging && config.couchBaseStaging.IS_REQUEST_LOG) {
 		const reqlDoc = {
 			path: `${req.get('host')}${req.baseUrl}${req.path}`,
 			method: req.method,
