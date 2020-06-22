@@ -27,7 +27,7 @@ var render = {
 	setPageAndUtmTargeting: function(googletag) {
 		targeting.setPageLevel(googletag);
 
-		if (config.SITE_ID === 39041 || config.SITE_ID === 41077) {
+		if (config.SITE_ID === 39041 || config.SITE_ID === 41077 || config.SITE_ID === 41120) {
 			targeting.setUTMLevel(googletag);
 		}
 	},
