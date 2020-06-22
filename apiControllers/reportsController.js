@@ -114,12 +114,27 @@ router
 				qs: params
 			})
 				.then(response => {
-					const data = response.data;
+					const { code = -1, data } = response;
+					if (code !== 1) return Promise.reject(new Error(response.data));
 					response.code == 1 && data ? res.send(data) : res.send({});
 					//set data to redis
 					client.setex(JSON.stringify(req.query), 3600, JSON.stringify(data));
 				})
-				.catch(() => res.end({}));
+				.catch(err => {
+					let { message: errorMessage } = err;
+
+					const {
+						message = 'Something went wrong',
+						code = HTTP_STATUSES.INTERNAL_SERVER_ERROR
+					} = errorMessage;
+					return sendErrorResponse(
+						{
+							message
+						},
+						res,
+						code
+					);
+				});
 		}
 
 		return res.send({});
