@@ -10,6 +10,7 @@ var couchbase = require('couchbase'),
 		apAppBucket: null
 	};
 
+if (!config.couchBaseStaging) return;
 state.cluster = new couchbase.Cluster('couchbase://' + config.couchBaseStaging.HOST, {
 	operation_timeout: 5000
 });
