@@ -490,16 +490,6 @@ var constants = {
 	UTM_SESSION_COOKIE: '_adp_utm_session_',
 	VIDEO_PLAYER_EXCEPTION_SIZES: [[300, 250], [480, 320], [320, 480], [320, 50]],
 	DEFAULT_JW_PLAYER_SIZE: [256, 144]
-	// TIME_RANGE_MAPPING: {
-	// 	night: { start: '20:00', end: '05:59' },
-	// 	morning: { start: '06:00', end: '11:59' },
-	// 	afternoon: { start: '12:00', end: '15:59' },
-	// 	evening: { start: '16:00', end: '19:59' }
-	// },
-	// DAY_OF_WEEK: {
-	// 	weekday: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
-	// 	weekend: ['saturday', 'sunday']
-	// }
 };
 
 module.exports = constants;

@@ -102,12 +102,6 @@ var adpTags = {
 				return operator === 'contain' ? matched : !matched;
 			}
 
-			// function checkString(triggerValue, currentValue, operator) {
-			// 	var matched = triggerValue === currentValue;
-
-			// 	return operator === 'contain' ? matched : !matched;
-			// }
-
 			switch (trigger.key) {
 				case 'device': {
 					if (!(Array.isArray(trigger.value) && trigger.value.length)) return false;
@@ -157,10 +151,7 @@ var adpTags = {
 			}
 		},
 		getMatchedHbRules: function(sectionName) {
-			// TODO: [HbRules] check PREBID_CONFIG value if hb is off
-			// var rules = config.PREBID_CONFIG.rules || [];
-
-			var rules = require('./hbRulesConfig');
+			var rules = config.PREBID_CONFIG.rules || [];
 
 			matchedRules = rules.filter(rule => {
 				var isActive = rule.isActive !== false; // we assumed a rule is active until it's defined as inactive.
