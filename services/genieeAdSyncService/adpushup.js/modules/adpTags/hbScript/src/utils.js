@@ -569,37 +569,6 @@ var utils = {
 
 		return timeMatches;
 	}
-	// getDayOfTheWeekByDay: function(dayIndex) {
-	// 	var dayIndexNum = parseInt(dayIndex, 10);
-	// 	if (isNaN(dayIndexNum)) return;
-
-	// 	var dayIndexMapping = [
-	// 		'sunday',
-	// 		'monday',
-	// 		'tuesday',
-	// 		'wednesday',
-	// 		'thursday',
-	// 		'friday',
-	// 		'saturday'
-	// 	];
-	// 	var day = dayIndexMapping[dayIndexNum];
-	// 	if (!day) return;
-
-	// 	var keys = Object.keys(constants.TIME_RANGE_MAPPING);
-	// 	var computedDayOfTheWeek;
-
-	// 	for (var i = 0; i < keys; i++) {
-	// 		var days = constants.DAY_OF_WEEK[keys[i]];
-
-	// 		if (days.indexOf(day) !== -1) {
-	// 			computedDayOfTheWeek = keys[i];
-
-	// 			break;
-	// 		}
-	// 	}
-
-	// 	return computedDayOfTheWeek;
-	// }
 };
 
 module.exports = utils;
