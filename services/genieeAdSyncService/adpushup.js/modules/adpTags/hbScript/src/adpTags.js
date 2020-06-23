@@ -158,81 +158,7 @@ var adpTags = {
 			// TODO: [HbRules] check PREBID_CONFIG value if hb is off
 			// var rules = config.PREBID_CONFIG.rules || [];
 
-			var rules = [
-				{
-					isActive: true,
-					triggers: [
-						{
-							key: 'device',
-							operator: 'contain',
-							value: ['desktop', 'mobile'] // desktop,  mobile, tablet
-						},
-						{
-							key: 'country',
-							operator: 'contain',
-							value: ['IN']
-						},
-						/**
-						 * TODO: [HbRules] remove this comment
-						 *
-						 * night: '20:00-05:59'
-						 * morning: '06:00-11:59'
-						 * afternoon: '12:00-15:59'
-						 * evening: '16:00-19:59'
-						 */
-						{
-							key: 'time_range',
-							operator: 'not_contain',
-							value: ['06:00-11:59']
-						},
-						/**
-						 * TODO: [HbRules] Remove this comment
-						 *
-						 * weekday: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
-						 * weekend: ['saturday', 'sunday']
-						 */
-						{
-							key: 'day_of_the_week',
-							operator: 'contain',
-							value: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday']
-						},
-						{
-							key: 'adunit',
-							operator: 'contain',
-							value: ['AP_L_D_POST-PAGE_728X90_56074']
-						}
-					],
-					actions: [
-						{
-							key: 'allowed_bidders',
-							value: ['pubmatic', 'sovrn', 'critio', 'adyoulike']
-						},
-						{
-							key: 'bidders_order',
-							value: ['adyoulike', 'sovrn']
-						},
-						// {
-						// 	key: 'disable_header_bidding'
-						// },
-						{
-							key: 'refresh_timeout',
-							value: 2000
-						},
-						{
-							key: 'initial_timeout',
-							value: 2500
-						},
-						{
-							key: 'formats',
-							value: ['display', 'video']
-						},
-						{
-							key: 'disable_amazon_uam'
-						}
-					],
-					createdAt: 1592304084229
-				}
-			];
+			var rules = require('./hbRulesConfig');
 
 			matchedRules = rules.filter(rule => {
 				var isActive = rule.isActive !== false; // we assumed a rule is active until it's defined as inactive.
@@ -269,7 +195,7 @@ var adpTags = {
 			hbRules.forEach(hbRule => {
 				for (var i = 0; i < hbRule.actions.length; i++) {
 					var action = hbRule.actions[i];
-					var currentActionDate = new Date(action.createdAt);
+					var currentActionDate = new Date(hbRule.createdAt);
 					var oldActionDate =
 						actionsMapping[action.key] &&
 						new Date(actionsMapping[action.key].createdAt);
@@ -285,8 +211,8 @@ var adpTags = {
 				}
 			});
 
-			var computedActions = Object.keys(actionsMapping).map(key =>
-				computedActions.push(actionsMapping[key].action)
+			var computedActions = Object.keys(actionsMapping).map(
+				key => actionsMapping[key].action
 			);
 
 			return computedActions;
@@ -295,10 +221,11 @@ var adpTags = {
 			var outputData = {};
 
 			var matchedHbRules = this.getMatchedHbRules(sectionName);
-			if (!matchedHbRules.length) return outputData;
-
 			var actions = this.getComputedActions(matchedHbRules);
-			if (!matchedHbRules.length) return outputData;
+
+			// TODO: [HbRules] Remove temp console logs
+			console.log('matchedHbRules', matchedHbRules);
+			console.log('actions', actions);
 
 			var bidderRulesConfig = {};
 
@@ -380,17 +307,6 @@ var adpTags = {
 
 						break;
 					}
-
-					case 'disable_amazon_uam': {
-						/**
-						 * right now we enable amzn uam for a slot if
-						 * - amzn uam publisher id exist
-						 * - hb_active globally
-						 * - hb active for that slot
-						 */
-
-						break;
-					}
 				}
 			});
 
@@ -402,6 +318,9 @@ var adpTags = {
 				outputData.headerBidding !== false
 					? utils.getBiddersForSlot(size, formats, bidderRulesConfig)
 					: [];
+
+			// TODO: [HbRules] Remove temp console logs
+			console.log('dataByRules', outputData);
 
 			return outputData;
 		},
