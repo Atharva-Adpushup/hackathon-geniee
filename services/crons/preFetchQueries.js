@@ -8,12 +8,20 @@ const REDIS_PORT = config.environment.REDIS_PORT || 6379;
 const client = redis.createClient(REDIS_PORT);
 const commonConsts = require('../../configs/commonConsts');
 const siteModel = require('../../models/siteModel');
+const couchbase = require('../../helpers/couchBaseService');
 const { promiseForeach } = require('node-utils');
+const { isEqual } = require('lodash');
+
+let oldLastRunInfo = null;
 
 function getActiveUsers() {
-	return siteModel
-		.getActiveSites()
-		.then(users => Array.from(new Set(users.map(({ accountEmail }) => accountEmail))));
+	return (
+		siteModel
+			.getActiveSites()
+			// .then(users => Array.from(new Set(users.map(({ accountEmail }) => accountEmail))))
+			// .catch(err => console.log(err))
+			.then(users => ['yash.garg@adpushup.com'])
+	);
 }
 
 function getUserSites(ownerEmail) {
@@ -57,4 +65,19 @@ function getAllUsersMeta() {
 	);
 }
 
-cron.schedule(commonConsts.cronSchedule.prefetchService, getAllUsersMeta);
+function getLastRunInfo() {
+	return couchbase
+		.connectToBucket('apLocalBucket')
+		.then(requestBucket =>
+			requestBucket.getAsync('config::apnd:last-run-info').then(doc => {
+				let newLastRunInfo = doc.value;
+				if (!isEqual(oldLastRunInfo, newLastRunInfo)) getAllUsersMeta();
+
+				oldLastRunInfo = newLastRunInfo;
+			})
+		)
+		.catch(err => console.log(err));
+}
+
+// cron.schedule('* * * * *', getLastRunInfo);
+getLastRunInfo();
