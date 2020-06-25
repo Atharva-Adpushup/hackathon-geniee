@@ -1,4 +1,5 @@
 const redis = require('redis');
+const moment = require('moment');
 const cron = require('node-cron');
 const userModel = require('../../models/userModel');
 const request = require('request-promise');
@@ -12,7 +13,13 @@ const { promiseForeach } = require('node-utils');
 const { isEqual } = require('lodash');
 
 let oldLastRunInfo = null;
-const { fromDate, toDate } = CC.DEFAULT_REPORTING_QUERY_DATES;
+
+const fromDate = moment()
+	.subtract(7, 'days')
+	.format('YYYY-MM-DD');
+const toDate = moment()
+	.subtract(1, 'days')
+	.format('YYYY-MM-DD');
 
 function getActiveUsers() {
 	return siteModel
@@ -49,7 +56,7 @@ function preFetchMeta(ownerEmail) {
 		})
 			.then(response => {
 				const { data } = response;
-				client.set(JSON.stringify(requestQuery), JSON.stringify(data));
+				client.setex(JSON.stringify(requestQuery), 24 * 3600, JSON.stringify(data));
 				console.log(data);
 			})
 			.catch(err => console.log(err));
@@ -73,7 +80,7 @@ function preFetchCustomStats(ownerEmail) {
 				if (response.code == 1 && response.data) {
 					console.log(response.data);
 
-					client.set(JSON.stringify(requestQuery), JSON.stringify(response.data));
+					client.setex(JSON.stringify(requestQuery), 24 * 3600, JSON.stringify(response.data));
 				}
 			})
 			.catch(err => {
@@ -95,7 +102,7 @@ function getWidgetData(params, path) {
 	})
 		.then(response => {
 			if (response.code == 1 && response.data) {
-				client.set(JSON.stringify(requestQuery), JSON.stringify(response.data));
+				client.setex(JSON.stringify(requestQuery), 24 * 3600, JSON.stringify(response.data));
 				console.log(response.data);
 			}
 		})
@@ -142,14 +149,32 @@ function getLastRunInfo() {
 		.connectToBucket(bucket)
 		.then(requestBucket =>
 			requestBucket.getAsync(CC.docKeys.lastRunInfoDoc).then(doc => {
-				let newLastRunInfo = doc.value;
-				if (!isEqual(oldLastRunInfo, newLastRunInfo)) getAllUsersData();
+				const { lastRunOn } = doc.value;
+
+				let newLastRunInfo = lastRunOn;
+				if (!isEqual(oldLastRunInfo, newLastRunInfo)) {
+					client.flushall(function(err, succeeded) {
+						console.log(`${succeeded}: Cache Cleared`); // will be true if successfull
+						getAllUsersData();
+					});
+				}
 
 				oldLastRunInfo = newLastRunInfo;
 			})
 		)
-		.catch(err => console.log(err));
+		.catch(err => {
+			if (oldLastRunInfo) {
+				const currentTime = moment();
+				const lastRunTime = moment(oldLastRunInfo);
+				const diffInHours = currentTime.diff(lastRunTime, 'hours');
+				if (diffInHours >= 4) {
+					client.flushall(function(err, succeeded) {
+						console.log(`${succeeded}: Cache Cleared`);
+					});
+				}
+			}
+			console.log(err);
+		});
 }
 
-// cron.schedule(CC.cronSchedule.prefetchService, getLastRunInfo);
-getLastRunInfo();
+cron.schedule(CC.cronSchedule.prefetchService, getLastRunInfo);

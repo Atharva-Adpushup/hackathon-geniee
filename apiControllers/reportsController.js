@@ -37,7 +37,7 @@ router
 				})
 				.then(data =>
 					//set data to redis
-					client.set(JSON.stringify(req.query), JSON.stringify(data))
+					client.setex(JSON.stringify(req.query), 24 * 3600, JSON.stringify(data))
 				)
 				.catch(err => {
 					console.log(err);
@@ -67,7 +67,7 @@ router
 				})
 				.then(data =>
 					//set data to redis
-					client.set(JSON.stringify(req.query), JSON.stringify(data))
+					client.setex(JSON.stringify(req.query), 24 * 3600, JSON.stringify(data))
 				)
 				.catch(err => {
 					console.log(err);
@@ -132,7 +132,7 @@ router
 				})
 				.then(data =>
 					//set data to redis
-					client.set(JSON.stringify(req.query), JSON.stringify(data))
+					client.setex(JSON.stringify(req.query), 24 * 3600, JSON.stringify(data))
 				)
 				.catch(err => {
 					let { message: errorMessage } = err;

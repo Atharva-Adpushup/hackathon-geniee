@@ -1,5 +1,4 @@
 const config = require('./config');
-const moment = require('moment');
 
 const prodEnv = config.environment.HOST_ENV === 'production';
 const reportingBaseURL = 'https://api.adpushup.com/CentralReportingWebService';
@@ -618,14 +617,5 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		'/site/report?report_name=revenue_by_network',
 		'/site/report?report_name=get_stats_by_custom&dimension=siteid&interval=cumulative&metrics=adpushup_page_views,adpushup_page_cpm,network_ad_ecpm,network_impressions,network_net_revenue',
 		'/site/report?report_name=country_report'
-	],
-
-	DEFAULT_REPORTING_QUERY_DATES: {
-		fromDate: moment()
-			.subtract(7, 'days')
-			.format('YYYY-MM-DD'),
-		toDate: moment()
-			.subtract(1, 'days')
-			.format('YYYY-MM-DD')
-	}
+	]
 };
