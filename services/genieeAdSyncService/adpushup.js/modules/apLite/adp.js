@@ -9,6 +9,7 @@ var $ = require('../../libs/jquery'),
 	hbUtils = require('../adpTags/hbScript/src/utils'),
 	utils = require('../../libs/utils'),
 	refreshAdSlot = require('../../src/refreshAdSlot'),
+	hbRules = require('../adpTags/hbScript/src/hbRules'),
 	apLite = {
 		module: {
 			config: apLiteConfig,
@@ -96,10 +97,23 @@ var $ = require('../../libs/jquery'),
 						: constants.PREBID.TIMEOUT;
 				var size = allSizes[0];
 
+				var bidders;
+				if (optionalParam.headerBidding) {
+					var {
+						bidders: computedBidders,
+						formats: computedFormats,
+						headerBidding
+					} = hbRules.getDataByRules(size, formats, dfpAdUnitName);
+
+					if (computedBidders) bidders = computedBidders;
+					if (headerBidding !== undefined) optionalParam.headerBidding = headerBidding;
+					if (computedFormats) formats = computedFormats;
+				}
+
 				var adpSlot = {
 					slotId: gptSlotElementId,
 					optionalParam,
-					bidders: optionalParam.headerBidding ? hbUtils.getBiddersForSlot(size, formats) : [],
+					bidders: bidders || [],
 					headerBidding: optionalParam.headerBidding,
 					formats,
 					activeDFPNetwork: hbUtils.getActiveDFPNetwork(),
