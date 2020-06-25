@@ -110,6 +110,12 @@ var $ = require('../../libs/jquery'),
 					if (computedFormats) formats = computedFormats;
 				}
 
+				// native format is not supported in apLite
+				var nativeFormatIndex = formats.indexOf('native');
+				if (nativeFormatIndex !== -1) {
+					formats.splice(nativeFormatIndex, 1);
+				}
+
 				var adpSlot = {
 					slotId: gptSlotElementId,
 					optionalParam,
