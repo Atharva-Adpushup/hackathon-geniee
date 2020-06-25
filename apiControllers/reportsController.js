@@ -17,7 +17,7 @@ const router = express.Router();
 const cache = require('../middlewares/cacheMiddleware');
 
 router
-	.get('/getCustomStats', (req, res) => {
+	.get('/getCustomStats', cache, (req, res) => {
 		const {
 			query: { siteid = '', isSuperUser = false, fromDate, toDate, interval }
 		} = req;
@@ -30,9 +30,15 @@ router
 				qs: req.query
 			})
 				.then(response => {
-					if (response.code == 1 && response.data) return res.send(response.data);
+					if (response.code == 1 && response.data) {
+						return res.send(response.data) && response.data;
+					}
 					return res.send({});
 				})
+				.then(data =>
+					//set data to redis
+					client.set(JSON.stringify(req.query), JSON.stringify(data))
+				)
 				.catch(err => {
 					console.log(err);
 					return res.send({});
@@ -41,7 +47,7 @@ router
 
 		return res.send({});
 	})
-	.get('/getWidgetData', (req, res) => {
+	.get('/getWidgetData', cache, (req, res) => {
 		const { params, path } = req.query;
 		const reqParams = _.isString(params) ? JSON.parse(params) : {};
 		const { siteid, isSuperUser } = reqParams;
@@ -54,9 +60,15 @@ router
 				qs: reqParams
 			})
 				.then(response => {
-					if (response.code == 1 && response.data) return res.send(response.data);
+					if (response.code == 1 && response.data) {
+						return res.send(response.data) && response.data;
+					}
 					return res.send({});
 				})
+				.then(data =>
+					//set data to redis
+					client.set(JSON.stringify(req.query), JSON.stringify(data))
+				)
 				.catch(err => {
 					console.log(err);
 					return res.send({});
@@ -116,10 +128,12 @@ router
 				.then(response => {
 					const { code = -1, data } = response;
 					if (code !== 1) return Promise.reject(new Error(response.data));
-					response.code == 1 && data ? res.send(data) : res.send({});
-					//set data to redis
-					client.setex(JSON.stringify(req.query), 3600, JSON.stringify(data));
+					return response.code == 1 && data ? res.send(data) && data : res.send({});
 				})
+				.then(data =>
+					//set data to redis
+					client.set(JSON.stringify(req.query), JSON.stringify(data))
+				)
 				.catch(err => {
 					let { message: errorMessage } = err;
 

@@ -6,35 +6,35 @@ const CC = require('../../configs/commonConsts');
 const config = require('../../configs/config');
 const REDIS_PORT = config.environment.REDIS_PORT || 6379;
 const client = redis.createClient(REDIS_PORT);
-const commonConsts = require('../../configs/commonConsts');
 const siteModel = require('../../models/siteModel');
 const couchbase = require('../../helpers/couchBaseService');
 const { promiseForeach } = require('node-utils');
 const { isEqual } = require('lodash');
 
 let oldLastRunInfo = null;
+const { fromDate, toDate } = CC.DEFAULT_REPORTING_QUERY_DATES;
 
 function getActiveUsers() {
-	return (
-		siteModel
-			.getActiveSites()
-			// .then(users => Array.from(new Set(users.map(({ accountEmail }) => accountEmail))))
-			// .catch(err => console.log(err))
-			.then(users => ['yash.garg@adpushup.com'])
-	);
+	return siteModel
+		.getActiveSites()
+		.then(users => Array.from(new Set(users.map(({ accountEmail }) => accountEmail))))
+		.catch(err => console.log(err));
 }
 
 function getUserSites(ownerEmail) {
 	let siteid = [];
 
-	return userModel.getUserByEmail(ownerEmail).then(user => {
-		const userSites = user.get('sites');
+	return userModel
+		.getUserByEmail(ownerEmail)
+		.then(user => {
+			const userSites = user.get('sites');
 
-		userSites.map(({ siteId }) => {
-			siteid.push(siteId.toString());
-		});
-		return siteid.sort((a, b) => a - b).join();
-	});
+			userSites.map(({ siteId }) => {
+				siteid.push(siteId.toString());
+			});
+			return siteid.sort((a, b) => a - b).join();
+		})
+		.catch(err => console.log(err));
 }
 
 function preFetchMeta(ownerEmail) {
@@ -48,30 +48,102 @@ function preFetchMeta(ownerEmail) {
 			qs: params
 		})
 			.then(response => {
-				const data = response.data;
+				const { data } = response;
+				client.set(JSON.stringify(requestQuery), JSON.stringify(data));
 				console.log(data);
-				client.setex(JSON.stringify(requestQuery), 3600, JSON.stringify(data));
 			})
 			.catch(err => console.log(err));
 	});
 }
 
-function getAllUsersMeta() {
-	getActiveUsers().then(ownerEmails =>
-		promiseForeach(ownerEmails, preFetchMeta, (data, err) => {
-			console.log(err);
-			return true;
+function preFetchCustomStats(ownerEmail) {
+	return getUserSites(ownerEmail).then(siteid => {
+		const requestQuery = {
+			fromDate,
+			toDate,
+			interval: 'daily',
+			siteid
+		};
+		return request({
+			uri: `${CC.ANALYTICS_API_ROOT}${CC.REPORT_PATH}`,
+			json: true,
+			qs: requestQuery
 		})
-	);
+			.then(response => {
+				if (response.code == 1 && response.data) {
+					console.log(response.data);
+
+					client.set(JSON.stringify(requestQuery), JSON.stringify(response.data));
+				}
+			})
+			.catch(err => {
+				console.log(err);
+			});
+	});
+}
+
+function getWidgetData(params, path) {
+	const requestQuery = {
+		path,
+		params: JSON.stringify(params)
+	};
+
+	return request({
+		uri: `${CC.ANALYTICS_API_ROOT}${requestQuery.path}`,
+		json: true,
+		qs: params
+	})
+		.then(response => {
+			if (response.code == 1 && response.data) {
+				client.set(JSON.stringify(requestQuery), JSON.stringify(response.data));
+				console.log(response.data);
+			}
+		})
+		.catch(err => {
+			console.log(err);
+		});
+}
+
+function preFetchWidgetData(ownerEmail) {
+	return getUserSites(ownerEmail)
+		.then(siteid => {
+			const params = { fromDate, toDate, siteid };
+
+			promiseForeach(CC.DASHBOARD_QUERY_PATHS, getWidgetData.bind(null, params), (data, err) => {
+				console.log(err);
+				return true;
+			});
+		})
+		.catch(err => console.log(err));
+}
+
+function preFetchAllData(ownerEmail) {
+	return Promise.resolve()
+		.then(() => preFetchMeta(ownerEmail))
+		.then(() => preFetchCustomStats(ownerEmail))
+		.then(() => preFetchWidgetData(ownerEmail))
+		.catch(err => console.log(err));
+}
+
+function getAllUsersData() {
+	getActiveUsers()
+		.then(ownerEmails =>
+			promiseForeach(ownerEmails, preFetchAllData, (data, err) => {
+				console.log(err);
+				return true;
+			})
+		)
+		.catch(err => console.log(err));
 }
 
 function getLastRunInfo() {
+	const bucket = 'apLocalBucket';
 	return couchbase
-		.connectToBucket('apLocalBucket')
+		.connectToBucket(bucket)
 		.then(requestBucket =>
-			requestBucket.getAsync('config::apnd:last-run-info').then(doc => {
+			requestBucket.getAsync(CC.docKeys.lastRunInfoDoc).then(doc => {
 				let newLastRunInfo = doc.value;
-				if (!isEqual(oldLastRunInfo, newLastRunInfo)) getAllUsersMeta();
+				if (!isEqual(oldLastRunInfo, newLastRunInfo)) getAllUsersData();
 
 				oldLastRunInfo = newLastRunInfo;
 			})
@@ -79,5 +151,5 @@ function getLastRunInfo() {
 		.catch(err => console.log(err));
 }
 
-// cron.schedule('* * * * *', getLastRunInfo);
+// cron.schedule(CC.cronSchedule.prefetchService, getLastRunInfo);
 getLastRunInfo();

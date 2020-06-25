@@ -1,4 +1,5 @@
 const config = require('./config');
+const moment = require('moment');
 
 const prodEnv = config.environment.HOST_ENV === 'production';
 const reportingBaseURL = 'https://api.adpushup.com/CentralReportingWebService';
@@ -427,7 +428,8 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		apLite: 'aplt::',
 		network: 'ntwk::',
 		amp: 'amtg::',
-		requestLogger: 'reql::'
+		requestLogger: 'reql::',
+		lastRunInfoDoc: 'config::apnd:last-run-info'
 	},
 	tagManagerInitialDoc: {
 		siteId: null,
@@ -557,7 +559,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 	cronSchedule: {
 		activeSiteMarkingAndAdsTxtService: '20 14,2 * * *',
 		adManagerSyncService: '0 */12 * * *',
-		prefetchService: '0 */1 * * *'
+		prefetchService: '*/10 * * * *' // Every 10 mins
 	},
 	SELLERS_JSON: {
 		fileConfig: {
@@ -608,5 +610,22 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 			MIN: 0,
 			MAX: 10000
 		}
+	},
+	DASHBOARD_QUERY_PATHS: [
+		'/site/report?report_name=estimated_earning_comparison',
+		'/site/report?report_name=ap_vs_baseline',
+		'/site/report?report_name=site_summary',
+		'/site/report?report_name=revenue_by_network',
+		'/site/report?report_name=get_stats_by_custom&dimension=siteid&interval=cumulative&metrics=adpushup_page_views,adpushup_page_cpm,network_ad_ecpm,network_impressions,network_net_revenue',
+		'/site/report?report_name=country_report'
+	],
+
+	DEFAULT_REPORTING_QUERY_DATES: {
+		fromDate: moment()
+			.subtract(7, 'days')
+			.format('YYYY-MM-DD'),
+		toDate: moment()
+			.subtract(1, 'days')
+			.format('YYYY-MM-DD')
 	}
 };
