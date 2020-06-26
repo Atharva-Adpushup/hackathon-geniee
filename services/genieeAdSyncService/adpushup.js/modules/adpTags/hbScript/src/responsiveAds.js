@@ -46,7 +46,7 @@ var getMatchedAdSize = function(inputObject, adpSlot) {
 	 * If we don't get inputSizeHeight, use Infinity as maxHeight since we want to allow all the downward compatible heights
 	 */
 	let maxWidth = inputSizeWidth;
-	let maxHeight = inputSizeHeight || Infinity;
+	let maxHeight = inputSizeHeight || inputObject.maxHeight ? inputObject.maxHeight : Infinity;
 
 	let [sizeMappingWidth, sizeMappingHeight] = utils.getDimensionsFromSizeMapping(adpSlot);
 
@@ -187,9 +187,11 @@ var getComputedAdSizes = function(adpSlot) {
 
 	if (currentEle.hasAttribute('max-height')) {
 		let maxHeight = parseInt(currentEle.getAttribute('max-height'), 10);
-		computedParentData.height = maxHeight
-			? Math.min(computedParentData.height || Infinity, maxHeight)
-			: computedParentData.height;
+
+		if (maxHeight) {
+			computedParentData.height = Math.min(computedParentData.height || Infinity, maxHeight);
+			computedParentData.maxHeight = maxHeight;
+		}
 	}
 
 	matchedSizeData = getMatchedAdSize(computedParentData, adpSlot);
