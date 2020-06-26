@@ -76,7 +76,8 @@ var utils = require('../libs/utils'),
 							? networkData.zoneContainerId
 							: networkData.dfpAdunit,
 						formats = networkData && networkData.formats,
-						adType = (ad.formatData && ad.formatData.type) || null;
+						adType = (ad.formatData && ad.formatData.type) || null,
+						sizeMapping = ad.sizeMapping || [];
 
 					window.adpushup.adpTags.defineSlot(
 						computedDFPAdUnitId,
@@ -100,7 +101,8 @@ var utils = require('../libs/utils'),
 							services: ad.services,
 							refreshInterval: networkData.refreshInterval || consts.AD_REFRESH_INTERVAL / 1000,
 							fluid: ad.fluid,
-							adType: adType
+							adType: adType,
+							sizeMapping: sizeMapping
 						}
 					);
 				}

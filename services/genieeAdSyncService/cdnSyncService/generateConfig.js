@@ -7,7 +7,7 @@ const userModel = require('../../../models/userModel');
 const couchbase = require('../../../helpers/couchBaseService');
 const { getHbAdsApTag, getHbAdsInnovativeAds } = require('./generateInjectionTechniqueConfig');
 const { isValidThirdPartyDFPAndCurrency } = require('../../../helpers/commonFunctions');
-const { getBiddersFromNetworkTree } = require('./commonFunctions');
+const { getBiddersFromNetworkTree, getSizeMappingConfigFromCB } = require('./commonFunctions');
 
 function getHbConfig(siteId) {
 	return couchbase
@@ -184,42 +184,48 @@ function init(site, computedConfig) {
 		config: {}
 	};
 
-	return Promise.join(HbProcessing(site, apConfigs), gdprProcessing(site), (hb, gdpr) => {
-		if (prebidConfig) {
-			prebidConfig.currencyConfig = hb.config.prebidCurrencyConfigObj;
-			delete hb.config.prebidCurrencyConfigObj;
-		}
-
-		statusesAndAds = {
-			...statusesAndAds,
-			statuses: {
-				...statusesAndAds.statuses,
-				HB_ACTIVE: hb.status,
-				GDPR_ACTIVE: gdpr.status,
-				INCONTENT_ACTIVE: !!(hb.ads.incontentAds && hb.ads.incontentAds.length)
-			},
-			ads: {
-				...hb.ads,
-				adpTags: prebidConfig
-			},
-			config: {
-				...hb.config,
-				...gdpr.config
+	return Promise.join(
+		HbProcessing(site, apConfigs),
+		gdprProcessing(site),
+		getSizeMappingConfigFromCB(),
+		(hb, gdpr, sizeMappingConfig) => {
+			if (prebidConfig) {
+				prebidConfig.currencyConfig = hb.config.prebidCurrencyConfigObj;
+				delete hb.config.prebidCurrencyConfigObj;
 			}
-		};
 
-		if (!(apps && apps.apLite)) statusesAndAds.ads.layoutInventory = apConfigs.experiment;
+			statusesAndAds = {
+				...statusesAndAds,
+				statuses: {
+					...statusesAndAds.statuses,
+					HB_ACTIVE: hb.status,
+					GDPR_ACTIVE: gdpr.status,
+					INCONTENT_ACTIVE: !!(hb.ads.incontentAds && hb.ads.incontentAds.length)
+				},
+				ads: {
+					...hb.ads,
+					adpTags: prebidConfig
+				},
+				config: {
+					...hb.config,
+					...gdpr.config
+				}
+			};
 
-		const output = {
-			apConfigs,
-			prebidConfig,
-			statusesAndAds
-		};
+			if (!(apps && apps.apLite)) statusesAndAds.ads.layoutInventory = apConfigs.experiment;
 
-		if (apps && apps.apLite) output.apLiteConfig = apLiteConfig;
+			const output = {
+				apConfigs,
+				prebidConfig,
+				statusesAndAds,
+				sizeMappingConfig
+			};
 
-		return output;
-	}).catch(err => {
+			if (apps && apps.apLite) output.apLiteConfig = apLiteConfig;
+
+			return output;
+		}
+	).catch(err => {
 		console.log(
 			`Error while creating generate config for site ${site.get('siteId')} and Error is ${err}`
 		);

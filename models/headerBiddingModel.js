@@ -193,7 +193,7 @@ function apiModule() {
 					// eslint-disable-next-line no-restricted-syntax
 					for (const channel of channels) {
 						const { pageGroup, platform: device } = channel;
-						const inventory = { app: 'Layout Editor', pageGroup, device };
+						const inventory = { app: 'Layout Editor', type: 'layout', pageGroup, device };
 
 						// eslint-disable-next-line no-restricted-syntax
 						if (channel.variations && Object.keys(channel.variations).length) {
@@ -210,13 +210,15 @@ function apiModule() {
 												const ad = section.ads[adKey];
 
 												if (ad.network === 'adpTags') {
-													const { networkData, width, height } = ad;
+													const { id: adId, networkData, width, height, sizeMapping = [] } = ad;
 													const { headerBidding } = networkData;
+													inventory.adId = adId;
 													inventory.headerBidding = headerBidding ? 'Enabled' : 'Disabled';
 													inventory.size = `${width}x${height}`;
 													inventory.adUnit = section.name;
 													inventory.adUnitId = section.id;
 													inventory.networkData = networkData;
+													inventory.sizeMapping = sizeMapping;
 													inventories.push({ ...inventory });
 												}
 											}
@@ -245,19 +247,28 @@ function apiModule() {
 						for (const ad of value.ads) {
 							const inventory = {
 								app: 'AP Tag',
+								type: 'apTag',
 								pageGroup: 'N/A',
 								device: 'N/A',
 								variationName: 'N/A'
 							};
 
 							if (ad.network === 'adpTags') {
-								const { networkData, width, height, name: adUnit, id: adUnitId } = ad;
+								const {
+									networkData,
+									width,
+									height,
+									name: adUnit,
+									id: adUnitId,
+									sizeMapping = []
+								} = ad;
 								const { headerBidding } = networkData;
 								inventory.headerBidding = headerBidding ? 'Enabled' : 'Disabled';
 								inventory.size = `${width}x${height}`;
 								inventory.adUnit = adUnit;
 								inventory.adUnitId = adUnitId;
 								inventory.networkData = networkData;
+								inventory.sizeMapping = sizeMapping;
 
 								inventories.push({ ...inventory });
 							}
@@ -283,8 +294,10 @@ function apiModule() {
 						for (const ad of value.ads) {
 							const [, device, pageGroup] = ad.pagegroups[0].match(/(.*):(.*)/);
 							const networkData = ad.networkData;
+							const sizeMapping = ad.sizeMapping || [];
 							const inventory = {
 								app: 'Innovative Ads',
+								type: 'innovative',
 								pageGroup,
 								device,
 								variationName: 'ALL',
@@ -304,9 +317,41 @@ function apiModule() {
 								inventory.size = `${width}x${height}`;
 								inventory.adUnit = adUnit;
 								inventory.adUnitId = adUnitId;
+								inventory.sizeMapping = sizeMapping;
 
 								inventories.push({ ...inventory });
 							}
+						}
+					}
+
+					return inventories;
+				})
+				.catch(err => {
+					if (err.code === 13) {
+						return [];
+					}
+
+					throw err;
+				}),
+
+		getApLiteInventoriesForHB: siteId =>
+			couchbase
+				.connectToAppBucket()
+				.then(appBucket => appBucket.getAsync(`aplt::${siteId}`, {}))
+				.then(({ value }) => {
+					const inventories = [];
+					if (value.adUnits.length) {
+						for (const ad of value.adUnits) {
+							const { dfpAdUnit, sizeMapping = [], sectionId, headerBidding } = ad;
+							const inventory = {
+								app: 'ApLite',
+								type: 'apLite',
+								adUnit: dfpAdUnit,
+								sectionId,
+								sizeMapping,
+								headerBidding: headerBidding ? 'Enabled' : 'Disabled'
+							};
+							inventories.push(inventory);
 						}
 					}
 
@@ -323,12 +368,14 @@ function apiModule() {
 			Promise.all([
 				API.getLayoutInventoriesForHB(siteId),
 				API.getApTagInventoriesForHB(siteId),
-				API.getInnovativeAdInventoriesForHB(siteId)
-			]).then(([layoutInventories, apTagInventories, innovativeAdsInventories]) => {
+				API.getInnovativeAdInventoriesForHB(siteId),
+				API.getApLiteInventoriesForHB(siteId)
+			]).then(([layoutInventories, apTagInventories, innovativeAdsInventories, apLiteInventories]) => {
 				const inventories = [
 					...layoutInventories,
 					...apTagInventories,
-					...innovativeAdsInventories
+					...innovativeAdsInventories,
+					...apLiteInventories
 				];
 
 				return inventories;

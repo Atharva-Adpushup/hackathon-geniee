@@ -224,6 +224,21 @@ const deleteSite = siteId => (dispatch, getState) =>
 		})
 		.catch(err => errorHandler(err));
 
+const fetchSiteInventories = siteId => dispatch =>
+	axiosInstance
+		.get(`/site/${siteId}/inventories`)
+		.then(({ data: { data: inventories = [] } }) => {
+			dispatch({
+				type: SITE_ACTIONS.UPDATE_SITE_INVENTORIES,
+				data: { siteId, inventories }
+			});
+		})
+		.catch(err => errorHandler(err));
+
+const resetSiteInventories = siteId => dispatch => {
+	dispatch({ type: SITE_ACTIONS.UPDATE_SITE_INVENTORIES, data: { siteId, inventories: [] } });
+};
+
 export {
 	fetchAppStatuses,
 	addNewSite,
@@ -234,5 +249,7 @@ export {
 	updateSiteAutoOptimise,
 	updateAppStatus,
 	updateSite,
-	deleteSite
+	deleteSite,
+	fetchSiteInventories,
+	resetSiteInventories
 };

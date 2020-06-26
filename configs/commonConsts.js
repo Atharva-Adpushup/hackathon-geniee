@@ -428,7 +428,8 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		network: 'ntwk::',
 		amp: 'amtg::',
 		requestLogger: 'reql::',
-		lastRunInfoDoc: 'config::apnd:last-run-info'
+		lastRunInfoDoc: 'config::apnd:last-run-info',
+		sizeMapppingConfig: 'data::sizeMapping'
 	},
 	tagManagerInitialDoc: {
 		siteId: null,
