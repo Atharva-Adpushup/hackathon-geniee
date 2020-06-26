@@ -106,11 +106,12 @@ var adpTags = {
 
 			var bidders;
 			if (optionalParam.headerBidding) {
+				hbRulesApi = hbRules({ config, utils, adpushup: window.adpushup || {} });
 				var {
 					bidders: computedBidders,
 					formats: computedFormats,
 					headerBidding
-				} = hbRules.getDataByRules(size, formats, sectionName);
+				} = hbRulesApi.getDataByRules(size, formats, sectionName);
 
 				if (computedBidders) bidders = computedBidders;
 				if (headerBidding !== undefined) optionalParam.headerBidding = headerBidding;
