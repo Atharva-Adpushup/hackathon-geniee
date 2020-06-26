@@ -10,9 +10,8 @@ const client = redis.createClient(REDIS_PORT);
 const siteModel = require('../../models/siteModel');
 const couchbase = require('../../helpers/couchBaseService');
 const { promiseForeach } = require('node-utils');
-const { isEqual } = require('lodash');
 
-let oldLastRunInfo = null;
+let oldTimestamp = null;
 
 const fromDate = moment()
 	.subtract(7, 'days')
@@ -149,23 +148,25 @@ function getLastRunInfo() {
 		.connectToBucket(bucket)
 		.then(requestBucket =>
 			requestBucket.getAsync(CC.docKeys.lastRunInfoDoc).then(doc => {
-				const { lastRunOn } = doc.value;
+				const { value = {} } = doc;
+				const { lastRunOn } = value;
+				if (!lastRunOn) return Promise.reject(new Error('timestamp not found'));
 
-				let newLastRunInfo = lastRunOn;
-				if (!isEqual(oldLastRunInfo, newLastRunInfo)) {
+				let newTimestamp = lastRunOn;
+				if (oldTimestamp !== newTimestamp) {
 					client.flushall(function(err, succeeded) {
 						console.log(`${succeeded}: Cache Cleared`); // will be true if successfull
 						getAllUsersData();
 					});
 				}
 
-				oldLastRunInfo = newLastRunInfo;
+				oldTimestamp = newTimestamp;
 			})
 		)
 		.catch(err => {
-			if (oldLastRunInfo) {
+			if (oldTimestamp) {
 				const currentTime = moment();
-				const lastRunTime = moment(oldLastRunInfo);
+				const lastRunTime = moment(oldTimestamp);
 				const diffInHours = currentTime.diff(lastRunTime, 'hours');
 				if (diffInHours >= 4) {
 					client.flushall(function(err, succeeded) {
@@ -177,4 +178,5 @@ function getLastRunInfo() {
 		});
 }
 
-cron.schedule(CC.cronSchedule.prefetchService, getLastRunInfo);
+if (config.reporting.preFetchQueries)
+	cron.schedule(CC.cronSchedule.prefetchService, getLastRunInfo);
