@@ -99,11 +99,12 @@ var $ = require('../../libs/jquery'),
 
 				var bidders;
 				if (optionalParam.headerBidding) {
+					hbRulesApi = hbRules({ config, utils: hbUtils, adpushup: window.adpushup || {} });
 					var {
 						bidders: computedBidders,
 						formats: computedFormats,
 						headerBidding
-					} = hbRules.getDataByRules(size, formats, dfpAdUnitName);
+					} = hbRulesApi.getDataByRules(size, formats, dfpAdUnitName);
 
 					if (computedBidders) bidders = computedBidders;
 					if (headerBidding !== undefined) optionalParam.headerBidding = headerBidding;
