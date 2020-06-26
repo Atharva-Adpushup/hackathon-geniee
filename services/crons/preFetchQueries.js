@@ -178,5 +178,4 @@ function getLastRunInfo() {
 		});
 }
 
-if (config.reporting.preFetchQueries)
-	cron.schedule(CC.cronSchedule.prefetchService, getLastRunInfo);
+cron.schedule(CC.cronSchedule.prefetchService, getLastRunInfo);

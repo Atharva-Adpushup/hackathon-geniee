@@ -9,7 +9,7 @@ const cache = (req, res, next) => {
 			console.log(err);
 			next();
 		}
-		if (data !== null) {
+		if (data !== null && config.reporting.useCachedData) {
 			res.send(data);
 		} else {
 			next();
