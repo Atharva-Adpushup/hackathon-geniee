@@ -75,6 +75,18 @@ const sites = (state = { fetched: false, data: {} }, action) => {
 				}
 			};
 
+		case SITE_ACTIONS.UPDATE_SITE_INVENTORIES:
+			return {
+				...state,
+				data: {
+					...state.data,
+					[action.data.siteId]: {
+						...state.data[action.data.siteId],
+						inventories: action.data.inventories
+					}
+				}
+			};
+
 		default:
 			return state;
 	}

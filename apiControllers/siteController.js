@@ -3,10 +3,11 @@ const Promise = require('bluebird');
 const _ = require('lodash');
 
 // eslint-disable-next-line no-unused-vars
-const woodlotCustomLogger = require('woodlot').customLogger;
+// const woodlotCustomLogger = require('woodlot').customLogger;
 const userModel = require('../models/userModel');
 const siteModel = require('../models/siteModel');
 const channelModel = require('../models/channelModel');
+const headerBiddingModel = require('../models/headerBiddingModel');
 const schema = require('../helpers/schema');
 const CC = require('../configs/commonConsts');
 const HTTP_STATUS = require('../configs/httpStatusConsts');
@@ -18,7 +19,9 @@ const {
 	fetchStatusesFromReporting,
 	fetchCustomStatuses,
 	errorHandler,
-	checkParams
+	checkParams,
+	appBucket,
+	emitEventAndSendResponse
 } = require('../helpers/routeHelpers');
 const proxy = require('../helpers/proxy');
 const pageGroupController = require('./pageGroupController');
@@ -30,6 +33,25 @@ const router = express.Router();
 // 	streams: ['./logs/geniee-api-custom.log'],
 // 	stdout: false
 // });
+
+const helpers = {
+	adUpdateProcessing: (req, res, key, processing) =>
+		appBucket
+			.getDoc(`${key}${req.params.siteId}`)
+			.then(docWithCas => processing(docWithCas))
+			.then(() => emitEventAndSendResponse(req.body.siteId, res))
+			.catch(err => {
+				let error = err;
+				if (err && err.code && err.code === 13) {
+					error = new AdPushupError({
+						message: 'No Doc Found',
+						code: HTTP_STATUS.BAD_REQUEST
+					});
+				}
+				return errorHandler(error, res);
+			}),
+	directDBUpdate: (key, value, cas) => appBucket.updateDoc(key, value, cas)
+};
 
 router
 	.get('/status', (req, res) => {
@@ -304,7 +326,6 @@ router
 			})
 			.catch(() => res.status(HTTP_STATUS.NOT_FOUND).json({ error: 'Site not found!' }));
 	})
-
 	.get('/fetchAppStatuses', (req, res) => {
 		const { siteId } = req.query;
 		const { email } = req.user;
@@ -542,6 +563,189 @@ router
 					message: 'Some Error Occured'
 				})
 			);
+	})
+	.get('/:siteId/inventories', (req, res) => {
+		const { siteId } = req.params;
+		const { email } = req.user;
+
+		return userModel
+			.verifySiteOwner(email, siteId)
+			.then(() => headerBiddingModel.getInventoriesForHB(siteId))
+			.then(inventories => sendSuccessResponse(inventories, res))
+			.catch(err => {
+				// eslint-disable-next-line no-console
+				console.log(err);
+
+				if (err instanceof AdPushupError)
+					return res.status(HTTP_STATUS.NOT_FOUND).json({ error: err.message });
+
+				return res
+					.status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
+					.json({ error: 'Something went wrong' });
+			});
+	})
+	.post('/:siteId/sizeMapping', (req, res) => {
+		const data = req.body;
+		const { email } = req.user;
+		const { siteId } = req.params;
+
+		const { type } = data;
+
+		const validateSizeMapping = sizeMapping => {
+			if (!Array.isArray(sizeMapping)) {
+				return false;
+			}
+
+			const viewportWidthMap = {};
+
+			for (let i = 0; i < sizeMapping.length; i++) {
+				const { viewportWidth, maxHeight, maxWidth } = sizeMapping[i];
+
+				const isValidMaxWidth = typeof maxWidth === 'number' && maxWidth >= 0;
+				const isValidMaxHeight = typeof maxHeight === 'number' && maxHeight >= 0;
+				const isValidViewportWidth = typeof viewportWidth === 'number' && viewportWidth >= 0;
+
+				const hasValidValues = isValidMaxWidth && isValidMaxHeight && isValidViewportWidth;
+				const isUniqueViewportWidth = !viewportWidthMap[viewportWidth];
+
+				if (!hasValidValues || !isUniqueViewportWidth) {
+					return false;
+				}
+
+				viewportWidthMap[viewportWidth] = true;
+			}
+
+			return true;
+		};
+
+		const getSortedSizeMapping = sizeMapping =>
+			sizeMapping.sort((a, b) => parseInt(a.viewportWidth, 10) - parseInt(b.viewportWidth, 10));
+
+		const updateLayoutAd = adData => {
+			const { adUnitId, device: platform, pageGroup, sizeMapping, adId } = adData;
+
+			return channelModel
+				.getChannel(siteId, platform, pageGroup)
+				.then(channel => {
+					// find variation
+					let variationId = null;
+					const { data: channelData } = channel;
+					const { variations } = channelData;
+
+					// eslint-disable-next-line no-restricted-syntax
+					for (const key in variations) {
+						if (Object.prototype.hasOwnProperty.call(variations, key)) {
+							const { sections } = variations[key];
+							if (adUnitId in sections) {
+								variationId = key;
+								break;
+							}
+						}
+					}
+
+					if (!variationId) {
+						throw new AdPushupError({ message: 'Invalid adUnitId', code: 400 });
+					}
+
+					channelData.variations[variationId].sections[adUnitId].ads[
+						adId
+					].sizeMapping = sizeMapping;
+
+					return channelModel.saveChannel(siteId, platform, pageGroup, channelData);
+				})
+				.then(() => sendSuccessResponse({}, res))
+				.catch(err => errorHandler(err, res));
+		};
+
+		const updateNonLayoutAds = (docKey, adData) => {
+			const { adUnitId, sizeMapping } = adData;
+
+			return helpers
+				.adUpdateProcessing(req, res, docKey, docWithCas => {
+					const doc = docWithCas.value;
+					if (doc.ownerEmail !== req.user.email) {
+						throw new AdPushupError({
+							message: 'Unauthorized Request',
+							code: HTTP_STATUS.PERMISSION_DENIED
+						});
+					}
+					_.forEach(doc.ads, (ad, index) => {
+						if (ad.id === adUnitId) {
+							doc.ads[index] = { ...ad, sizeMapping };
+							return false;
+						}
+					});
+
+					return helpers.directDBUpdate(`${docKey}${req.params.siteId}`, doc, docWithCas.cas);
+				})
+				.catch(err => errorHandler(err, res));
+		};
+
+		const updateApTagAd = adData => {
+			const docKey = CC.docKeys.apTag;
+			return updateNonLayoutAds(docKey, adData);
+		};
+
+		const updateInnovativeAd = adData => {
+			const docKey = CC.docKeys.interactiveAds;
+			return updateNonLayoutAds(docKey, adData);
+		};
+
+		const updateApLiteAd = adData => {
+			const docKey = CC.docKeys.apLite;
+			const { adUnit, sizeMapping } = adData;
+
+			return helpers
+				.adUpdateProcessing(req, res, docKey, docWithCas => {
+					const doc = docWithCas.value;
+
+					_.forEach(doc.adUnits, (ad, index) => {
+						if (ad.dfpAdUnit === adUnit) {
+							doc.adUnits[index] = { ...ad, sizeMapping };
+							return false;
+						}
+					});
+
+					return helpers.directDBUpdate(`${docKey}${req.params.siteId}`, doc, docWithCas.cas);
+				})
+				.catch(err => errorHandler(err, res));
+		};
+
+		const updateSizeMapping = adType => {
+			const { sizeMapping } = data;
+
+			const isValidSizeMapping = validateSizeMapping(sizeMapping);
+
+			if (!isValidSizeMapping) {
+				throw new AdPushupError({ message: 'Invalid Size Mapping Configuration', code: 400 });
+			}
+
+			const sortedSizeMapping = getSortedSizeMapping(sizeMapping);
+
+			const adData = { ...data, sizeMapping: sortedSizeMapping };
+
+			switch (adType) {
+				case 'layout':
+					return updateLayoutAd(adData);
+
+				case 'apTag':
+					return updateApTagAd(adData);
+
+				case 'innovative':
+					return updateInnovativeAd(adData);
+
+				case 'apLite':
+					return updateApLiteAd(adData);
+
+				default:
+					throw new AdPushupError({ message: 'Invalid Ad type', code: 400 });
+			}
+		};
+
+		return userModel
+			.verifySiteOwner(email, siteId)
+			.then(() => updateSizeMapping(type))
+			.catch(err => errorHandler(err, res));
 	})
 	.use('/:siteId/pagegroup/', pageGroupController);
 

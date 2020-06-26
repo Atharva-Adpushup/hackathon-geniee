@@ -3,14 +3,14 @@
 var AD_SIZE_MAPPING = require('./constants').AD_SIZE_MAPPING;
 var utils = require('./utils');
 var $ = require('./adp').$;
-var getMatchedAdSize = function(inputObject) {
-	var adCollection = AD_SIZE_MAPPING.IAB_SIZES.ALL,
-		widthsWithMultipleAdSizes = AD_SIZE_MAPPING.IAB_SIZES.MULTIPLE_AD_SIZES_WIDTHS_MAPPING,
-		adsWithBackwardCompatibleSizesMapping =
-			AD_SIZE_MAPPING.IAB_SIZES.BACKWARD_COMPATIBLE_MAPPING,
-		differenceObject = {},
-		isValidInput = !!inputObject,
-		areValidInputDimensions = !!(
+
+var getMatchedAdSize = function(inputObject, adpSlot) {
+	var isValidInput = !!inputObject;
+	if (!isValidInput) {
+		return null;
+	}
+
+	var areValidInputDimensions = !!(
 			isValidInput &&
 			inputObject.width &&
 			inputObject.height &&
@@ -24,73 +24,39 @@ var getMatchedAdSize = function(inputObject) {
 		),
 		inputSizeWidth,
 		inputSizeHeight,
-		matchedAdSize,
 		computedMatchedSizeArray = [],
-		isMatchedWidthInMultipleAdSize,
-		multipleAdSizesCollection,
 		finalComputedData = {};
-
-	if (!isValidInput) {
-		return null;
-	}
 
 	if (areValidInputDimensions) {
 		inputSizeWidth = inputObject.width;
 		inputSizeHeight = inputObject.height;
 	} else if (isValidInputWidth) {
 		inputSizeWidth = inputObject.width;
-	}
-
-	adCollection.forEach(function(adSizeArr) {
-		var widthDifference,
-			heightDifference,
-			overallDifference,
-			isValidDifference,
-			adSizeWidth = adSizeArr[0],
-			adSizeHeight = adSizeArr[1];
-
-		if (areValidInputDimensions) {
-			widthDifference = inputSizeWidth - adSizeWidth;
-			heightDifference = inputSizeHeight - adSizeHeight;
-			isValidDifference = !!(widthDifference >= 0 && heightDifference >= 0);
-			isValidDifference ? (overallDifference = widthDifference + heightDifference) : null;
-		} else if (isValidInputWidth) {
-			widthDifference = inputSizeWidth - adSizeWidth;
-			isValidDifference = !!(widthDifference >= 0);
-			isValidDifference ? (overallDifference = widthDifference) : null;
-		}
-
-		overallDifference ? (differenceObject[overallDifference] = adSizeArr.concat([])) : null;
-	});
-
-	matchedAdSize = Math.min.apply(null, Object.keys(differenceObject));
-	matchedAdSize = differenceObject[matchedAdSize];
-
-	if (!matchedAdSize) {
-		var errorMessage = 'No matched ad for width : ' + inputSizeWidth + 'px';
-
-		utils.log(errorMessage);
-		matchedAdSize = [];
-	}
-	isMatchedWidthInMultipleAdSize = !!widthsWithMultipleAdSizes[matchedAdSize[0]];
-
-	// 'isMatchedWidthInMultipleAdSize' check is added to incorporate backward compatible sizes of all
-	// ad sizes that belong to a common width dimension (like 300, 320, 728, 970)
-	if (isMatchedWidthInMultipleAdSize) {
-		multipleAdSizesCollection = widthsWithMultipleAdSizes[matchedAdSize[0]];
-		multipleAdSizesCollection.forEach(function(adSizeArr) {
-			var stringifiedAdSize = adSizeArr.join(',');
-			computedMatchedSizeArray = computedMatchedSizeArray.concat(
-				adsWithBackwardCompatibleSizesMapping[stringifiedAdSize] || [adSizeArr]
-			);
-		});
 	} else {
-		computedMatchedSizeArray = computedMatchedSizeArray.concat(
-			adsWithBackwardCompatibleSizesMapping[matchedAdSize.join(',')] || [matchedAdSize]
-		);
+		var errorMessage = 'No matched ad for width : ' + inputSizeWidth + 'px';
+		utils.log(errorMessage);
+
+		finalComputedData.collection = computedMatchedSizeArray;
+		finalComputedData.elementWidth = null;
+		finalComputedData.elementHeight = null;
+		return finalComputedData;
 	}
 
-	finalComputedData.size = matchedAdSize;
+	/**
+	 * If we don't get inputSizeHeight, use Infinity as maxHeight since we want to allow all the downward compatible heights
+	 */
+	let maxWidth = inputSizeWidth;
+	let maxHeight = inputSizeHeight || Infinity;
+
+	let [sizeMappingWidth, sizeMappingHeight] = utils.getDimensionsFromSizeMapping(adpSlot);
+
+	if (sizeMappingWidth && sizeMappingHeight) {
+		maxWidth = Math.min(maxWidth, sizeMappingWidth);
+		maxHeight = Math.min(maxHeight, sizeMappingHeight);
+	}
+
+	computedMatchedSizeArray = utils.getDownwardCompatibleSizes(maxWidth, maxHeight);
+
 	finalComputedData.collection = computedMatchedSizeArray.concat([]);
 	finalComputedData.elementWidth = inputSizeWidth;
 	finalComputedData.elementHeight = inputSizeHeight;
@@ -167,18 +133,7 @@ var removeBlackListedSizes = function(inputCollection) {
 
 	return filteredCollection;
 };
-var removeBiggerSizes = function(inputCollection, maxHeight) {
-	var filteredCollection = [];
-
-	inputCollection.forEach(function(item) {
-		if (item[1] < maxHeight) {
-			filteredCollection.push(item);
-		}
-	});
-
-	return filteredCollection;
-};
-var getFilteredData = function(inputData, maxHeight) {
+var getFilteredData = function(inputData) {
 	var windowWidth = $(window).width(),
 		thirtyPercentOfWindowWidth = Math.round((30 / 100) * windowWidth),
 		primarySizeWidth = inputData.elementWidth,
@@ -190,24 +145,14 @@ var getFilteredData = function(inputData, maxHeight) {
 		inputData.collection = removeBlackListedSizes(inputData.collection);
 	}
 
-	if (maxHeight) {
-		inputData.collection = removeBiggerSizes(inputData.collection, maxHeight);
-	}
-
-	// remove duplicate sizes
-	var uniqueSizes = {};
-	inputData.collection = inputData.collection.filter(([width, height]) => {
-		if (!uniqueSizes[`${width}x${height}`]) {
-			uniqueSizes[`${width}x${height}`] = true;
-			return [width, height];
-		}
-	});
-
 	return inputData;
 };
-var getComputedAdSizes = function(elementSelector) {
+var getComputedAdSizes = function(adpSlot) {
+	var elementSelector = adpSlot.optionalParam.adId;
 	if (!elementSelector || !document.getElementById(elementSelector)) return { collection: [] };
-	var computedElement = document.getElementById(elementSelector).parentNode,
+
+	var currentEle = document.getElementById(elementSelector),
+		computedElement = currentEle.parentNode,
 		immediateParentData = getImmediateParentData(computedElement),
 		recursiveParentData = getRecursiveParentData(computedElement),
 		isValidImmediateParentData = !!(
@@ -233,20 +178,22 @@ var getComputedAdSizes = function(elementSelector) {
 
 	if (isValidImmediateParentData) {
 		computedParentData = $.extend({}, immediateParentData);
-	} else if (isValidImmediateParentHeight) {
-		computedParentData = $.extend({}, recursiveParentData);
-		computedParentData.height = immediateParentData.height;
 	} else {
 		computedParentData = $.extend({}, recursiveParentData);
+		computedParentData.height = isValidImmediateParentHeight
+			? immediateParentData.height
+			: computedParentData.height;
 	}
 
-	matchedSizeData = getMatchedAdSize(computedParentData);
-	var maxHeight = null;
-	var currentEle = document.getElementById(elementSelector);
 	if (currentEle.hasAttribute('max-height')) {
-		maxHeight = parseInt(currentEle.getAttribute('max-height'), 10);
+		let maxHeight = parseInt(currentEle.getAttribute('max-height'), 10);
+		computedParentData.height = maxHeight
+			? Math.min(computedParentData.height || Infinity, maxHeight)
+			: computedParentData.height;
 	}
-	finalComputedData = getFilteredData(matchedSizeData, maxHeight);
+
+	matchedSizeData = getMatchedAdSize(computedParentData, adpSlot);
+	finalComputedData = getFilteredData(matchedSizeData);
 	return finalComputedData;
 };
 

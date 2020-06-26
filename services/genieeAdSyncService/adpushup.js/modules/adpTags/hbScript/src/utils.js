@@ -4,11 +4,11 @@ var adp = require('./adp');
 var find = require('lodash.find');
 var $ = require('../../../../libs/jquery');
 var config = require('./config');
-var BACKWARD_COMPATIBLE_MAPPING = require('./constants').AD_SIZE_MAPPING.IAB_SIZES
-	.BACKWARD_COMPATIBLE_MAPPING;
 var constants = require('./constants');
 var { bidderParamsMapping } = require('./multiFormatConfig');
 var isApLiteActive = window.adpushup.config.apLiteActive;
+var globalSizes = config.SIZE_MAPPING.sizes || [];
+
 var utils = {
 	getVastClientType: function(vastXml, adTag) {
 		var googleDomainsRegex = 'doubleclick.net|doubleclick.com|google.com|2mdn.net';
@@ -138,22 +138,13 @@ var utils = {
 			return allSizesParams['responsive'] ? [allSizesParams['responsive']] : params;
 		}
 
-		for (const originalSize in BACKWARD_COMPATIBLE_MAPPING) {
-			const formattedOriginalSize = originalSize.replace(',', 'x');
-			if (
-				formattedOriginalSize === inventorySize &&
-				BACKWARD_COMPATIBLE_MAPPING[originalSize].length
-			) {
-				const backwardSizes = BACKWARD_COMPATIBLE_MAPPING[originalSize];
+		const [width, height] = inventorySize.split('x');
+		const BACKWARD_COMPATIBLE_MAPPING = this.getDownwardCompatibleSizes(width, height);
 
-				//for (let backwardSize of backwardSizes) {
-				for (let index = 0; index < backwardSizes.length; index++) {
-					let backwardSize = backwardSizes[index];
-					backwardSize = backwardSize.join('x');
-					if (allSizesParams[backwardSize]) {
-						params.push(allSizesParams[backwardSize]);
-					}
-				}
+		for (let i = 0; i < BACKWARD_COMPATIBLE_MAPPING.length; i++) {
+			const size = BACKWARD_COMPATIBLE_MAPPING[i].join('x');
+			if (allSizesParams[size]) {
+				params.push(allSizesParams[size]);
 			}
 		}
 
@@ -428,6 +419,88 @@ var utils = {
 
 				return highestBid;
 			}, false);
+	},
+	getDownwardCompatibleSizes: function(
+		maxWidth,
+		maxHeight,
+		addOriginalSize = true,
+		sizes = globalSizes
+	) {
+		/*
+			-	by original size, I mean the size that was used to filter the sizes
+			-	we also need the original size in the compatible sizes in most of the cases
+			-	for example, if 300 and 200 was used to find the smaller sizes, [300, 200] must also be added to the array
+		*/
+		let hasOriginalSizeBeenAdded = false;
+
+		// maxHeight = Infinity if we don't find height for responsive ad container and size mapping is not found
+		maxWidth = parseInt(maxWidth, 10);
+		maxHeight = maxHeight === Infinity ? Infinity : parseInt(maxHeight, 10);
+
+		const compatibleSizes = sizes.filter(size => {
+			const [width, height] = size;
+
+			if (width === maxWidth && height === maxHeight) {
+				hasOriginalSizeBeenAdded = true;
+			}
+
+			return width <= maxWidth && height <= maxHeight;
+		});
+
+		if (addOriginalSize && !hasOriginalSizeBeenAdded && maxHeight !== Infinity) {
+			compatibleSizes.push([maxWidth, maxHeight]);
+		}
+
+		return compatibleSizes.sort((a, b) => b[0] - a[0]);
+	},
+	getSizeMappingForCurrentViewport: function(sizeMapping) {
+		let matchedSizeMapping = null;
+
+		for (let i = 0; i < sizeMapping.length; i++) {
+			const { viewportWidth } = sizeMapping[i];
+			const mediaQuery = `(max-width:${viewportWidth}px)`;
+
+			if (window.matchMedia(mediaQuery).matches) {
+				matchedSizeMapping = sizeMapping[i];
+				break;
+			}
+		}
+
+		return matchedSizeMapping;
+	},
+	getDimensionsFromSizeMapping: function(slot) {
+		let maxWidth = null,
+			maxHeight = null;
+
+		const { sizeMapping } = slot;
+		const isValidSizeMapping = Array.isArray(sizeMapping) && sizeMapping.length > 0;
+
+		if (isValidSizeMapping) {
+			const matchedSizeMapping = this.getSizeMappingForCurrentViewport(sizeMapping);
+
+			if (matchedSizeMapping) {
+				({ maxWidth, maxHeight } = matchedSizeMapping);
+			}
+		}
+
+		return [maxWidth, maxHeight];
+	},
+	getSizesComputedUsingSizeMappingOrAdUnitSize: function(
+		slot,
+		useAdUnitSize = true,
+		sizes = globalSizes
+	) {
+		let [maxWidth, maxHeight] = this.getDimensionsFromSizeMapping(slot);
+
+		//  maxWidth, maxHeight can also be 0
+		if (maxWidth === null || maxHeight === null) {
+			// specifically for apLite slots, since they don't have size
+			if (!useAdUnitSize) return null;
+
+			[maxWidth, maxHeight] = slot.size;
+		}
+
+		return this.getDownwardCompatibleSizes(maxWidth, maxHeight, true, sizes);
 	}
 };
 

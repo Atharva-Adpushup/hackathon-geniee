@@ -73,7 +73,8 @@ const getAdConfig = function(adType, section) {
 		height,
 		width,
 		multipleAdSizes,
-		fluid
+		fluid,
+		sizeMapping
 	} = ad;
 
 	const { name: sectionName, id, formatData } = section;
@@ -86,7 +87,8 @@ const getAdConfig = function(adType, section) {
 		height: isResponsive ? height : parseInt(height, 10),
 		width: isResponsive ? width : parseInt(width, 10),
 		formatData,
-		fluid: fluid === true
+		fluid: fluid === true,
+		sizeMapping
 	};
 
 	// Add 'multipleAdSizes' property if exists
