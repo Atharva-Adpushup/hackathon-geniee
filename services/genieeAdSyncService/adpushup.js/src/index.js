@@ -26,6 +26,8 @@ if (SPA_ACTIVE) {
 }
 if (APTAG_ACTIVE) {
 	var triggerAd = require('./trigger');
+} else {
+	triggerAd = function() {};
 }
 if (INNOVATIVE_ADS_ACTIVE) {
 	var processInnovativeAds = require('../modules/interactiveAds/index').default;
