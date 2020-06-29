@@ -58,7 +58,8 @@ class Apps extends Component {
 			showNotification,
 			updateAppStatus,
 			fetchAllBiddersAction,
-			updateBidderAction
+			updateBidderAction,
+			updateSite
 		} = this.props;
 
 		const common = {
@@ -102,6 +103,27 @@ class Apps extends Component {
 							updateBidderAction={updateBidderAction}
 						/>
 					) : null}
+				</Panel>
+				<Panel eventKey="ampAds">
+					<Panel.Heading>
+						<Panel.Title toggle className="app-panel-title">
+							AMP Ads
+						</Panel.Title>
+						<Link to={`/sites/${site.siteId}/apps/amp`} className="u-margin-r3 app-link">
+							<OverlayTrigger
+								placement="top"
+								overlay={
+									<Tooltip id={`tooltip-innovative-ads-link-${site.siteId}`}>
+										Go to AMP Ads App
+									</Tooltip>
+								}
+								key={`app-amp-ads-link-${site.siteId}`}
+							>
+								<FontAwesomeIcon icon="link" className="u-text-red" size="lg" />
+							</OverlayTrigger>
+						</Link>
+					</Panel.Heading>
+					{activeKey === 'ampAds' ? <AmpAds {...common} updateSite={updateSite} /> : null}
 				</Panel>
 			</PanelGroup>
 		);
