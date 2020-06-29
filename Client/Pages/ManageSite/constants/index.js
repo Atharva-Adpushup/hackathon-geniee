@@ -197,7 +197,7 @@ const STATUSES = {
 	}
 };
 
-const DISABLED_APP_KEYS_IF_APLITE = [1, 5, 2, 4, 6];
+const DISABLED_APP_KEYS_IF_APLITE = [1, 5, 2, 4];
 
 const NAV_ITEMS_INDEXES = {
 	QUICK_SNAPSHOT: 'quick-snapshot',
