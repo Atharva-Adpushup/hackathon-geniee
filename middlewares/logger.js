@@ -1,9 +1,9 @@
-const couchbase = require('../helpers/couchBaseStagingService');
 const uuid = require('uuid');
+const couchbase = require('../helpers/couchBaseStagingService');
 const { docKeys } = require('../configs/commonConsts');
 const config = require('../configs/config');
 
-//@desc       dump request to cocuchdb
+// @desc       dump request to cocuchdb
 const logger = (req, res, next) => {
 	next();
 
@@ -21,9 +21,6 @@ const logger = (req, res, next) => {
 			.then(requestBucket =>
 				requestBucket.upsertAsync(`${docKeys.requestLogger}${uuid.v4()}`, reqlDoc, {})
 			)
-			.then(() => {
-				console.log('Doc created');
-			})
 			.catch(err => {
 				console.log(err);
 			});
