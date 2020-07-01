@@ -7,11 +7,10 @@ const HTTP_STATUSES = require('../configs/httpStatusConsts');
 const { sendSuccessResponse, sendErrorResponse } = require('../helpers/commonFunctions');
 const CC = require('../configs/commonConsts');
 const utils = require('../helpers/utils');
-const redis = require('redis');
+
 const config = require('../configs/config');
 
-const REDIS_PORT = config.environment.REDIS_PORT || 6379;
-const client = redis.createClient(REDIS_PORT);
+const redisClient = require('../middlewares/redis');
 
 const router = express.Router();
 const cache = require('../middlewares/cacheMiddleware');
@@ -37,7 +36,7 @@ router
 				})
 				.then(data =>
 					//set data to redis
-					client.setex(JSON.stringify(req.query), 24 * 3600, JSON.stringify(data))
+					redisClient.setex(JSON.stringify(req.query), 24 * 3600, JSON.stringify(data))
 				)
 				.catch(err => {
 					console.log(err);
@@ -67,7 +66,7 @@ router
 				})
 				.then(data =>
 					//set data to redis
-					client.setex(JSON.stringify(req.query), 24 * 3600, JSON.stringify(data))
+					redisClient.setex(JSON.stringify(req.query), 24 * 3600, JSON.stringify(data))
 				)
 				.catch(err => {
 					console.log(err);
@@ -132,7 +131,7 @@ router
 				})
 				.then(data =>
 					//set data to redis
-					client.setex(JSON.stringify(req.query), 24 * 3600, JSON.stringify(data))
+					redisClient.setex(JSON.stringify(req.query), 24 * 3600, JSON.stringify(data))
 				)
 				.catch(err => {
 					let { message: errorMessage } = err;

@@ -1,12 +1,9 @@
-const redis = require('redis');
 const moment = require('moment');
 const cron = require('node-cron');
 const userModel = require('../../models/userModel');
 const request = require('request-promise');
 const CC = require('../../configs/commonConsts');
-const config = require('../../configs/config');
-const REDIS_PORT = config.environment.REDIS_PORT || 6379;
-const client = redis.createClient(REDIS_PORT);
+const redisClient = require('../../middlewares/redis');
 const siteModel = require('../../models/siteModel');
 const couchbase = require('../../helpers/couchBaseService');
 const { promiseForeach } = require('node-utils');
@@ -55,7 +52,7 @@ function preFetchMeta(ownerEmail) {
 		})
 			.then(response => {
 				const { data } = response;
-				client.setex(JSON.stringify(requestQuery), 24 * 3600, JSON.stringify(data));
+				redisClient.setex(JSON.stringify(requestQuery), 24 * 3600, JSON.stringify(data));
 				console.log(data);
 			})
 			.catch(err => console.log(err));
@@ -79,7 +76,7 @@ function preFetchCustomStats(ownerEmail) {
 				if (response.code == 1 && response.data) {
 					console.log(response.data);
 
-					client.setex(JSON.stringify(requestQuery), 24 * 3600, JSON.stringify(response.data));
+					redisClient.setex(JSON.stringify(requestQuery), 24 * 3600, JSON.stringify(response.data));
 				}
 			})
 			.catch(err => {
@@ -101,7 +98,7 @@ function getWidgetData(params, path) {
 	})
 		.then(response => {
 			if (response.code == 1 && response.data) {
-				client.setex(JSON.stringify(requestQuery), 24 * 3600, JSON.stringify(response.data));
+				redisClient.setex(JSON.stringify(requestQuery), 24 * 3600, JSON.stringify(response.data));
 				console.log(response.data);
 			}
 		})
@@ -154,7 +151,7 @@ function getLastRunInfo() {
 
 				let newTimestamp = lastRunOn;
 				if (oldTimestamp !== newTimestamp) {
-					client.flushall(function(err, succeeded) {
+					redisClient.flushall(function(err, succeeded) {
 						console.log(`${succeeded}: Cache Cleared`); // will be true if successfull
 						getAllUsersData();
 					});
@@ -169,7 +166,7 @@ function getLastRunInfo() {
 				const lastRunTime = moment(oldTimestamp);
 				const diffInHours = currentTime.diff(lastRunTime, 'hours');
 				if (diffInHours >= 4) {
-					client.flushall(function(err, succeeded) {
+					redisClient.flushall(function(err, succeeded) {
 						console.log(`${succeeded}: Cache Cleared`);
 					});
 				}
