@@ -108,8 +108,10 @@ function errorHandler(error, originalMessage) {
 	);
 
 	if (isEmptyConsumerMessage || isInvalidConsumerMessage) {
-		isInvalidConsumerMessage ? consumer.acknowledge(originalMessage) : null;
-		console.log(customErrorMessage);
+		if (isInvalidConsumerMessage) {
+			consumer.acknowledge(originalMessage);
+			console.log(customErrorMessage);
+		}
 		return isEmptyConsumerMessage ? 5000 : 0; // Restart the consumer if input is invalid or queue is empty.
 	}
 	if (counter > CONSTANTS.CDN_SYNC_MAX_ATTEMPTS) {
