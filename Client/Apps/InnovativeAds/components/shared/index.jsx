@@ -3,7 +3,7 @@ import { Col } from '@/Client/helpers/react-bootstrap-imports';
 import FieldGroup from '../../../../Components/Layout/FieldGroup';
 
 const CustomInput = ({ size, id, label, type, name, handler, value }) => (
-	<Col md={size} className="u-padding-l0">
+	<Col md={size}>
 		<FieldGroup
 			id={id}
 			label={label}

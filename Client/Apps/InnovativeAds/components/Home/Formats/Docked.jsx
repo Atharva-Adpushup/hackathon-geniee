@@ -2,8 +2,8 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable no-alert */
 import React, { Component } from 'react';
-import CustomMessage from '../../../../../Components/CustomMessage';
 import { Row, Col } from '@/Client/helpers/react-bootstrap-imports';
+import CustomMessage from '../../../../../Components/CustomMessage';
 import SelectBox from '../../../../../Components/SelectBox/index';
 import { AD_OPERATIONS, TYPE_OF_ADS, EVENTS } from '../../../configs/commonConsts';
 import CodeBox from '../../../../../Components/CodeBox/index';
@@ -71,8 +71,8 @@ class Docked extends Component {
 	}
 
 	handleChange(e) {
-		const name = e.target.name;
-		const value = e.target.value;
+		const { name } = e.target;
+		const { value } = e.target;
 		const newState = {
 			[name]: value
 		};
@@ -173,7 +173,7 @@ class Docked extends Component {
 							size={colSize}
 							id="xpath-input"
 						/>
-						<Col md={colSize} className="u-padding-l0 u-margin-b5">
+						<Col md={colSize} className="u-margin-b5">
 							<label htmlFor="adOperation">Ad Operation*</label>
 							<SelectBox
 								selected={operation}
@@ -205,12 +205,14 @@ class Docked extends Component {
 							size={colSize}
 							id="bottom-offset-input"
 						/>
-						<Col md={12} className="u-padding-l0">
+						<Col md={12}>
 							<label htmlFor="css">Custom CSS</label>
 							<CodeBox name="css" showButtons={false} onChange={this.handleCodeChange} code={css} />
 						</Col>
-						{!hasPagegroupsWithDuplicateAds && save.renderFn(save.label, this.saveHandler)}
-						{cancel ? cancel.renderFn(cancel.label, cancel.handler, 'secondary') : null}
+						<Col md={12} className="button-group">
+							{!hasPagegroupsWithDuplicateAds && save.renderFn(save.label, this.saveHandler)}
+							{cancel ? cancel.renderFn(cancel.label, cancel.handler, 'secondary') : null}
+						</Col>
 					</form>
 				</Row>
 
