@@ -199,6 +199,7 @@ class Docked extends Component {
 						<CustomInput
 							name="bottomOffset"
 							value={bottomOffset}
+							placeholder="20"
 							type="text"
 							label="Enter Bottom Offset"
 							handler={this.handleChange}
