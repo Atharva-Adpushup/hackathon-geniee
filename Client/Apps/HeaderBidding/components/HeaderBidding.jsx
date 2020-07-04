@@ -219,7 +219,9 @@ class HeaderBidding extends React.Component {
 			updateInventoriesHbStatus,
 			showNotification,
 			setUnsavedChangesAction,
-			isSuperUser
+			isSuperUser,
+			fetchHBRulesAction,
+			rules
 		} = this.props;
 
 		const activeTab = this.getActiveTab();
@@ -275,8 +277,12 @@ class HeaderBidding extends React.Component {
 						isSuperUser && (
 							<OptimizationTab
 								siteId={siteId}
+								rules={rules}
+								bidders={bidders}
+								inventories={inventories}
 								showNotification={showNotification}
 								setUnsavedChangesAction={setUnsavedChangesAction}
+								fetchHBRulesAction={fetchHBRulesAction}
 							/>
 						)
 					);

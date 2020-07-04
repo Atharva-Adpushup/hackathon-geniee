@@ -10,7 +10,9 @@ import {
 	SET_DFP_SETUP_STATUS,
 	UPDATE_ADSERVER_SETUP_STATUS,
 	GET_HB_INIT_DATA,
-	SET_UNSAVED_CHANGES
+	SET_UNSAVED_CHANGES,
+	FETCH_HB_RULES
+	// SAVE_HB_RULES
 } from '../../../constants/headerBidding';
 import history from '../../../helpers/history';
 import * as service from '../../../services/hbService';
@@ -117,3 +119,12 @@ export const masterSaveAction = siteId => dispatch =>
 	service
 		.startCdnSync(siteId)
 		.then(() => dispatch({ type: SET_UNSAVED_CHANGES, hasUnsavedChanges: false }));
+
+export const fetchHBRulesAction = siteId => dispatch => {
+	service
+		.fetchHbRules(siteId)
+		.then(({ data: rules }) => dispatch({ type: FETCH_HB_RULES, siteId, rules }))
+		.catch(() => {
+			history.push('/error');
+		});
+};

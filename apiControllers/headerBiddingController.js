@@ -1,7 +1,9 @@
 /* eslint-disable no-shadow */
 /* eslint-disable no-restricted-syntax */
+const axios = require('axios').default;
 const express = require('express');
 const Promise = require('bluebird');
+const _get = require('lodash/get');
 const userModel = require('../models/userModel');
 const siteModel = require('../models/siteModel');
 const headerBiddingModel = require('../models/headerBiddingModel');
@@ -728,6 +730,184 @@ router
 			.catch(() =>
 				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error!' })
 			);
+	})
+	/**
+	 * get meta data from Udit's API, combine and convert the response
+	 * save rules in the redux store
+	 * api to save/update data to hbDoc
+	 */
+	.get('/rules/meta', (req, res) => {
+		const apis = {
+			devices:
+				'https://api.adpushup.com/CentralReportingWebService/site/list?list_name=GET_ALL_DEVICES',
+			countries:
+				'https://api.adpushup.com/CentralReportingWebService/site/list?list_name=GET_ALL_COUNTRIES',
+			days:
+				'https://api.adpushup.com/CentralReportingWebService/hb_analytics/list?list_name=GET_ALL_DAY_TYPES',
+			adTypes:
+				'https://api.adpushup.com/CentralReportingWebService/hb_analytics/list?list_name=GET_AD_TYPE_OPTIONS',
+			timeSlots:
+				'https://api.adpushup.com/CentralReportingWebService/hb_analytics/list?list_name=GET_TIME_OF_AUCTION_BUCKETS'
+		};
+
+		const fetchDataFromAPI = api => axios.get(api);
+		const getDataFromAPIResponse = response =>
+			(response.data &&
+				response.data.description === 'SUCCESS' &&
+				response.data.data &&
+				response.data.data.result) ||
+			[];
+
+		const dataTypesWithRequiredFields = ['adTypes', 'devices', 'days', 'timeSlots'];
+		const dataTypesWithIgnoredFields = ['countries'];
+
+		const fieldsIgnored = {
+			countries: {
+				XX: true
+			}
+		};
+
+		const fieldsRequired = {
+			adTypes: { Banner: true, Native: true, Video: true },
+			devices: { Mobile: true, Tablet: true, Desktop: true },
+			days: { Weekday: true, Weekend: true },
+			timeSlots: {
+				'Morning (6AM-12PM)': true,
+				'Afternoon (12PM-4PM)': true,
+				'Evening (4PM-8PM)': true,
+				'Night (8PM-6AM)': true
+			}
+		};
+
+		const fieldsToBeReplaced = {
+			adTypes: {
+				label: { Banner: 'Display' },
+				value: { Banner: 'display' }
+			}
+		};
+
+		// eslint-disable-next-line consistent-return
+		const getKeysToBeUsed = type => {
+			switch (type) {
+				case 'countries':
+					return { labelKey: 'value', valueKey: 'country_code_alpha2' };
+
+				default:
+					return { labelKey: 'value', valueKey: 'value' };
+			}
+		};
+
+		const getConvertedDataFromAPI = (response, dataType) => {
+			const data = getDataFromAPIResponse(response);
+
+			const hasIgnoredFieldsFilter = dataTypesWithIgnoredFields.includes(dataType);
+			const hasRequiredFieldsFilter = dataTypesWithRequiredFields.includes(dataType);
+
+			const fieldsIgnoredForDataType = _get(fieldsIgnored, dataType, {});
+			const fieldsRequiredForDataType = _get(fieldsRequired, dataType, {});
+			const fieldsToBeReplacedForDataType = _get(fieldsToBeReplaced, dataType, {});
+
+			const { labelKey, valueKey } = getKeysToBeUsed(dataType);
+
+			return data.reduce((result, item) => {
+				const label = item[labelKey];
+				const value = item[valueKey];
+
+				// is valid field ?
+				if (hasRequiredFieldsFilter) {
+					const isFieldRequired = _get(fieldsRequiredForDataType, value, false);
+					if (!isFieldRequired) return result;
+				}
+
+				if (hasIgnoredFieldsFilter) {
+					const isFieldIgnored = _get(fieldsIgnoredForDataType, value, false);
+					if (isFieldIgnored) return result;
+				}
+
+				// get label and value to be used
+				const convertedItem = {};
+				convertedItem.label = _get(fieldsToBeReplacedForDataType, `label.${label}`, label);
+				convertedItem.value = _get(fieldsToBeReplacedForDataType, `value.${value}`, value);
+
+				result.push(convertedItem);
+
+				return result;
+			}, []);
+		};
+
+		axios
+			.all([
+				fetchDataFromAPI(apis.countries),
+				fetchDataFromAPI(apis.devices),
+				fetchDataFromAPI(apis.days),
+				fetchDataFromAPI(apis.timeSlots),
+				fetchDataFromAPI(apis.adTypes)
+			])
+			.then(
+				axios.spread((countries, devices, days, timeSlots, adTypes) => ({
+					days: getConvertedDataFromAPI(days, 'days'),
+					adTypes: getConvertedDataFromAPI(adTypes, 'adTypes'),
+					devices: getConvertedDataFromAPI(devices, 'devices'),
+					countries: getConvertedDataFromAPI(countries, 'countries'),
+					timeSlots: getConvertedDataFromAPI(timeSlots, 'timeSlots')
+				}))
+			)
+			.then(data => res.send(data))
+			.catch(error => res.status(httpStatus.BAD_REQUEST).send(error.message));
+
+		// const requests = [];
+		// const countryReq = axios.get;
+
+		// return axios
+		// 	.get(
+		// 		'https://api.adpushup.com/CentralReportingWebService/site/list?list_name=GET_ALL_COUNTRIES'
+		// 	)
+		// 	.then(response => response.data.status);
+	})
+	.get('/rules/:siteId', (req, res) => {
+		const { siteId } = req.params;
+		const { email } = req.user;
+
+		return userModel
+			.verifySiteOwner(email, siteId)
+			.then(() => headerBiddingModel.getHbConfig(siteId, email))
+			.then(hbConfig => hbConfig.get('rules') || [])
+			.then(rules => res.status(httpStatus.OK).json(rules))
+			.catch(err => {
+				// eslint-disable-next-line no-console
+				console.log(err);
+				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error!' });
+			});
+	})
+	.put('/rules/:siteId', (req, res) => {
+		const { siteId } = req.params;
+		const { email } = req.user;
+		const newHbRule = req.body;
+
+		// validate newHbRule
+		// atleast one trigger, one action
+		const { triggers, actions } = newHbRule;
+
+		if (triggers.length === 0 || actions.length === 0) {
+			return res
+				.status(httpStatus.BAD_REQUEST)
+				.json({ error: 'Please provide atleast 1 trigger and 1 action' });
+		}
+
+		return userModel
+			.verifySiteOwner(email, siteId)
+			.then(() => headerBiddingModel.getHbConfig(siteId, email))
+			.then(hbConfig => {
+				const rules = hbConfig.get('rules') || [];
+				hbConfig.set('rules', [...rules, newHbRule]);
+				return hbConfig.save();
+			})
+			.then(({ data: { rules } }) => res.status(httpStatus.OK).json(rules))
+			.catch(err => {
+				// eslint-disable-next-line no-console
+				console.log(err);
+				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error!' });
+			});
 	});
 
 module.exports = router;

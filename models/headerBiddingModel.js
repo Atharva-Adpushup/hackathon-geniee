@@ -26,7 +26,8 @@ const HeaderBidding = model.extend(function() {
 		'siteDomain',
 		'email',
 		'prebidConfig',
-		'amazonUAMConfig'
+		'amazonUAMConfig',
+		'hbRules'
 	];
 	this.clientKeys = [
 		'hbcf',
@@ -36,7 +37,8 @@ const HeaderBidding = model.extend(function() {
 		'siteDomain',
 		'email',
 		'prebidConfig',
-		'amazonUAMConfig'
+		'amazonUAMConfig',
+		'hbRules'
 	];
 	this.validations = {
 		required: []
@@ -45,7 +47,12 @@ const HeaderBidding = model.extend(function() {
 	this.defaults = {
 		hbcf: {},
 		deviceConfig: { sizeConfig: [] },
-		countryConfig: []
+		countryConfig: [],
+		hbRules: []
+		/* {
+			triggers: [],
+			actions: []
+		} */
 	};
 	this.constructor = function(data, cas) {
 		if (!(data.siteId && data.siteDomain && data.email)) {
@@ -370,16 +377,18 @@ function apiModule() {
 				API.getApTagInventoriesForHB(siteId),
 				API.getInnovativeAdInventoriesForHB(siteId),
 				API.getApLiteInventoriesForHB(siteId)
-			]).then(([layoutInventories, apTagInventories, innovativeAdsInventories, apLiteInventories]) => {
-				const inventories = [
-					...layoutInventories,
-					...apTagInventories,
-					...innovativeAdsInventories,
-					...apLiteInventories
-				];
+			]).then(
+				([layoutInventories, apTagInventories, innovativeAdsInventories, apLiteInventories]) => {
+					const inventories = [
+						...layoutInventories,
+						...apTagInventories,
+						...innovativeAdsInventories,
+						...apLiteInventories
+					];
 
-				return inventories;
-			}),
+					return inventories;
+				}
+			),
 		updateHbStatusOnLayoutInventory: (siteId, json) => {
 			if (!json || !json.length) {
 				return Promise.resolve();

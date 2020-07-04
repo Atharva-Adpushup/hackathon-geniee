@@ -379,3 +379,261 @@
 		}
 	}
 }
+
+.hb-rules {
+	.dropdown,
+	.number,
+	.toggle {
+		margin-left: 1rem;
+		display: inline-block;
+		max-width: 250px;
+		width: 100%;
+	}
+
+	.number {
+		max-width: 300px;
+	}
+
+	.text {
+		// display: inline-block;
+		// padding: 1rem 2rem;
+		// min-width: 80px;
+	}
+
+	.page__subtitle {
+		margin-bottom: 2rem;
+	}
+
+	.page__content {
+		.triggers-container,
+		.actions-container {
+			// padding: 2rem 0;
+			// margin: 0 0 2rem;
+
+			.col-1 {
+				display: inline-block;
+				padding: 1rem 2rem;
+				min-width: 80px;
+			}
+
+			.col-2 {
+				flex: 1;
+			}
+		}
+
+		.container-heading {
+			padding: 1rem;
+			background: white;
+			position: relative;
+			// font-weight: bold;
+			// font-size: 1.1rem;
+			margin: 1rem 0 2.5rem;
+			border-bottom: 2px solid $borderColor;
+		}
+
+		.triggers-container {
+			.trigger {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: start;
+				padding: 2rem 0;
+
+				&:nth-of-type(even) {
+					background-color: rgba(0, 0, 0, 0.03);
+				}
+
+				// &.error {
+				// 	border: 2px solid $primaryColor;
+				// }
+
+				.error-message {
+					text-align: center;
+				}
+
+				.value-dropdown {
+					max-width: 100%;
+				}
+
+				.content {
+					// flex: 1;
+					display: flex;
+					flex-wrap: wrap;
+					padding: 0 1rem;
+
+					.dropdown {
+						flex: 1;
+
+						&.dropdown--full-width {
+							flex: 0 0 100%;
+							min-width: 100%;
+							margin: 1rem;
+						}
+					}
+				}
+
+				// show borders between triggers
+				&:not(:nth-last-child()) {
+					// border-bottom: 1px solid $greyColor;
+				}
+
+				// &:nth-last-child(1) {
+				// 	margin-bottom: 2rem;
+				// }
+
+				.button {
+					margin: 0 1rem;
+				}
+			}
+
+			.add-trigger {
+				margin: 2rem 0;
+			}
+
+			.remove-trigger {
+				margin: 0 1rem;
+			}
+		}
+
+		.actions-container {
+			.action {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: start;
+				padding: 2rem 0;
+
+				&:nth-of-type(even) {
+					background-color: rgba(0, 0, 0, 0.03);
+				}
+
+				.button {
+					margin: 0 1rem;
+				}
+
+				.ignored-message {
+					flex-basis: 100%;
+					text-align: center;
+					margin: 2rem 0 1rem;
+					color: $primaryColor;
+					font-size: 1.4rem;
+				}
+
+				.content {
+					// flex: 1;
+					display: flex;
+					flex-wrap: wrap;
+					// justify-content: center;
+					// align-items: center;
+
+					&.error {
+						border: 2px solid $primaryColor;
+					}
+
+					& > .dropdown,
+					& > .number,
+					& > .toggle {
+						flex: 1;
+					}
+
+					& > .toggle {
+						display: flex;
+						align-items: center;
+
+						& > div {
+							flex: 1;
+
+							& > .form-group {
+								margin: 0;
+							}
+						}
+					}
+
+					.number {
+						&.error {
+							input {
+								border-color: red;
+							}
+						}
+					}
+
+					.label {
+						display: block;
+						margin: 0;
+						padding-top: 0.5rem;
+						color: $dimFontColor;
+					}
+
+					.error-message {
+						// margin-left: 1rem;
+						// flex: 0 0 100%;
+						text-align: center;
+					}
+
+					.dropdown--full-width {
+						flex: 1;
+						max-width: 100%;
+					}
+
+					.drag-drop {
+						flex: 0 0 100%;
+						padding: 1.5rem;
+						margin: 1rem 0 0 1rem;
+						display: grid;
+						grid-gap: 0.5rem;
+						grid-auto-rows: 1fr;
+						justify-content: center;
+						grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+						// border: 2px solid $borderColor;
+						// border-radius: 0.4rem;
+						// align-items: center;
+
+						// display: flex;
+						// flex-direction: column;
+						// flex-wrap: wrap;
+						// justify-content: space-evenly;
+
+						.message {
+							font-size: 1.4rem;
+							color: $dimFontColor;
+							text-align: center;
+							margin: 0;
+							grid-column: 1/ -1;
+
+							// &.top {
+							// 	grid-row: -1;
+							// }
+
+							// &.bottom {
+							// 	grid-row: 1;
+							// }
+						}
+
+						.draggable-card {
+							display: flex;
+							justify-content: center;
+							align-items: center;
+							padding: 0.5rem 1rem;
+							border-radius: 0.3rem;
+							background-color: $primaryColor;
+							color: #fff;
+							border: 1px solid rgba(0, 0, 0, 0.2);
+							cursor: move;
+
+							&.dragging {
+								border: 1px dashed gray;
+								opacity: 0.5;
+							}
+						}
+					}
+				}
+			}
+
+			.add-action {
+				margin: 2rem 0;
+			}
+
+			.remove-action {
+				margin: 0 1rem;
+			}
+		}
+	}
+}
