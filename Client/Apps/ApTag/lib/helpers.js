@@ -14,16 +14,28 @@ function copyToClipBoard(content) {
 function getAdsAndGlobal(state, props) {
 	const { apTag } = state.apps;
 	const {
+		global: { user }
+	} = state;
+
+	const {
+		data: { adServerSettings = {} }
+	} = user;
+	const { dfp = {} } = adServerSettings;
+
+	const {
 		match: { params }
 	} = props;
+
 	const { siteId } = params;
 	const ads = apTag.ads[siteId] || DEFAULT_ADS_RESPONSE;
 	const global = apTag.global[siteId] || DEFAULT_GLOBAL_RESPONSE;
+	const networkCode = dfp.activeDFPNetwork;
 
 	return {
 		siteId,
 		ads,
-		global
+		global,
+		networkCode
 	};
 }
 

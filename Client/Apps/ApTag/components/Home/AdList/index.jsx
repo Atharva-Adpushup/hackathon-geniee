@@ -8,6 +8,10 @@ import ActionCard from '../../../../../Components/ActionCard';
 import CustomToggleSwitch from '../../../../../Components/CustomToggleSwitch';
 
 class AdList extends Component {
+	state = {
+		dfpMessage: 'click on master save to start dfp syncing'
+	};
+
 	componentDidMount() {
 		const { loading, fetchAds, siteId } = this.props;
 		if (loading) fetchAds({ siteId });
@@ -28,8 +32,10 @@ class AdList extends Component {
 			modifyAdOnServer,
 			user,
 			networkConfig,
-			siteId
+			siteId,
+			networkCode
 		} = this.props;
+		const { dfpMessage } = this.state;
 		const customStyle = user.isSuperUser ? { minHeight: '540px' } : { minHeight: '440px' };
 		const isBulkFluidEnabled = ads.every(ad => ad.fluid);
 		if (loading) {
@@ -43,16 +49,20 @@ class AdList extends Component {
 				<ul className="section-list row">
 					{user.isSuperUser ? (
 						<div>
-							<div>
-								<CustomButton
-									variant="primary"
-									className="u-margin-t3 u-margin-r2 pull-right"
-									onClick={() => masterSave(siteId, user.isSuperUser)}
-								>
-									Master Save
-								</CustomButton>
-								<div style={{ clear: 'both' }}>&nbsp;</div>
-							</div>
+							<CustomButton
+								variant="primary"
+								className="u-margin-t3 u-margin-r2 pull-right"
+								onClick={() => {
+									masterSave(siteId, user.isSuperUser);
+									this.setState({
+										dfpMessage:
+											'DFP Sync service is running. Code will be available here once it is completed.'
+									});
+								}}
+							>
+								Master Save
+							</CustomButton>
+							<div style={{ clear: 'both' }}>&nbsp;</div>
 							<CustomToggleSwitch
 								layout="horizontal"
 								className="u-margin-b4"
@@ -81,6 +91,8 @@ class AdList extends Component {
 										modifyAdOnServer={modifyAdOnServer}
 										networkConfig={networkConfig}
 										siteId={siteId}
+										dfpMessage={dfpMessage}
+										networkCode={networkCode}
 									/>
 								</li>
 							</div>
