@@ -116,15 +116,17 @@ class HeaderBiddingRuleTriggers extends React.Component {
 				className={`dropdown value-dropdown ${spanDropdownFullWidth ? 'dropdown--full-width' : ''}`}
 			>
 				{key && operator && (
-					<Select
-						isMulti
-						styles={styles}
-						options={options}
-						value={selectedOption}
-						onChange={e => onChangeHandler(index, e)}
-					/>
+					<>
+						<Select
+							isMulti
+							styles={styles}
+							options={options}
+							value={selectedOption}
+							onChange={e => onChangeHandler(index, e)}
+						/>
+						{error && <p className="error-message">{error}</p>}
+					</>
 				)}
-				{error && <p className="error-message">{error}</p>}
 			</div>
 		);
 	}

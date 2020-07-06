@@ -5,7 +5,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { Button, FormControl } from '@/Client/helpers/react-bootstrap-imports';
 
 import DragDropCard from './DragDropCard';
-import CustomToggleSwitch from '../../../Components/CustomToggleSwitch';
+// import CustomToggleSwitch from '../../../Components/CustomToggleSwitch';
 
 // TODO: group inventories
 
@@ -21,52 +21,7 @@ const getDropdownStyles = error => ({
 	multiValueRemove: (base, state) => (state.data.isFixed ? { ...base, display: 'none' } : base)
 });
 
-// const getDropdownOptions = key => {
-// 	switch (key) {
-// 		case 'action-key':
-// 			return [
-// 				{
-// 					label: 'Allow Bidders',
-// 					value: 'allowed_bidders'
-// 				},
-// 				{
-// 					label: 'Order of bidders',
-// 					value: 'bidders_order'
-// 				},
-// 				{
-// 					label: 'Most Significant Bidders',
-// 					value: 'significant_bidders'
-// 				},
-// 				{
-// 					label: 'Set Refresh Timeout',
-// 					value: 'refresh_timeout'
-// 				},
-// 				{
-// 					label: 'Set Initial Timeout',
-// 					value: 'initial_timeout'
-// 				},
-// 				{
-// 					label: 'Disable S2S',
-// 					value: 's2s_toggle'
-// 				},
-// 				{
-// 					label: 'Set S2S Timeout',
-// 					value: 's2s_timeout'
-// 				},
-// 				{
-// 					label: 'Use formats',
-// 					value: 'formats'
-// 				}
-// 			];
-
-// 		default:
-// 			return [];
-// 	}
-// };
-
 class HeaderBiddingRuleActions extends React.Component {
-	// -------------------------- misc --------------------------
-
 	// common
 	getTextNode = text => <span className="text">{text}</span>;
 
@@ -76,144 +31,6 @@ class HeaderBiddingRuleActions extends React.Component {
 		typeError: null,
 		valueError: null
 	});
-
-	// getPreparedActionKeyOptions(index) {
-	// 	const { actions, dropdownOptions } = this.props;
-
-	// 	const { key: keyOptions } = dropdownOptions;
-	// 	// for disabled option, disable it if it is not the chosen value of current action
-
-	// 	const currentValue = actions[index].key;
-	// 	// const disableOptions = keyOptions.map(option => )
-
-	// 	const actionOptions = getDropdownOptions('action-key');
-	// 	const chosenActions = actions.map(action => action.key);
-
-	// 	// disable the options that are already selected
-	// 	return actionOptions.map(option => ({
-	// 		...option,
-	// 		isDisabled: chosenActions.includes(option.value) && option.value !== currentValue
-	// 	}));
-	// }
-
-	// getDropdownValuesByKey(type) {
-	// 	switch (type) {
-	// 		case 'formats':
-	// 			return [
-	// 				{ label: 'Banner', value: 'banner', isFixed: true },
-	// 				{ label: 'Native', value: 'native' },
-	// 				{ label: 'Video', value: 'video' }
-	// 			];
-
-	// 		case 'allowed_bidders':
-	// 		case 'significant_bidders':
-	// 			const { addedBidders } = this.props;
-
-	// 			return Object.values(addedBidders).map(bidder => ({
-	// 				label: bidder.name,
-	// 				value: bidder.name
-	// 			}));
-
-	// 		default:
-	// 			return [];
-	// 	}
-	// }
-
-	// getResetValueForAction(actionKey) {
-	// 	const booleanTypes = ['s2s_toggle'];
-	// 	const numberTypes = ['refresh_timeout', 'initial_timeout', 's2s_timeout'];
-	// 	const arrayTypes = ['allowed_bidders', 'bidders_order', 'significant_bidders'];
-
-	// 	if (booleanTypes.includes(actionKey)) return false;
-	// 	if (numberTypes.includes(actionKey)) return 0;
-	// 	if (arrayTypes.includes(actionKey)) return [];
-	// 	if (actionKey === 'formats') return ['banner']; // fixed/mandatory option
-
-	// 	return null;
-	// }
-
-	// -------------------------- handlers --------------------------
-
-	// handleKeyChange = (index, { value }) => {
-	// 	const { actions, onChange, addedBidders } = this.props;
-	// 	const newActions = [...actions];
-
-	// 	const action = newActions[index];
-	// 	action.key = value;
-	// 	action.value = this.getResetValueForAction(value);
-	// 	action.typeError = null;
-	// 	action.valueError = null;
-
-	// 	if (value === 'bidders_order') {
-	// 		const addedBiddersData = Object.values(addedBidders).map(({ name }) => name);
-	// 		action.value = addedBiddersData;
-	// 	}
-
-	// 	onChange(newActions);
-	// };
-
-	handleValueChange = (index, valueType, selection) => {
-		const { actions, onChange } = this.props;
-
-		let value = null;
-
-		let error = null;
-
-		switch (valueType) {
-			case 'dropdown':
-				value = Array.isArray(selection) ? selection.map(({ value }) => value) : selection.value;
-				error = value.length === 0 ? 'Please select an option' : null;
-				break;
-
-			case 'number':
-				selection.persist();
-
-				const selectedValue = selection.target.value;
-				const parsedNumber = parseInt(selectedValue, 10);
-				value = Number.isNaN(parsedNumber) ? 0 : parsedNumber;
-				if (!(value >= 0 && value <= 10000)) {
-					error = 'Please choose a number between 0 and 10000';
-				}
-
-				break;
-
-			case 'radio':
-				value = typeof selection === 'boolean' ? selection : false;
-				break;
-
-			default:
-				break;
-		}
-
-		const newActions = [...actions];
-		newActions[index].value = value;
-		newActions[index].valueError = error;
-
-		onChange(newActions);
-	};
-
-	handleAddAction() {
-		const { actions, onChange } = this.props;
-		const newActions = [...actions, this.getActionTemplate()];
-
-		onChange(newActions);
-	}
-
-	// handleRemoveAction(index) {
-	// 	const { actions, onChange } = this.props;
-
-	// 	const { key } = actions[index];
-	// 	// const confirmed = confirm(`Remove Action : ${key || ''}?`);
-	// 	const confirmed = confirm(`Remove Action ?`);
-
-	// 	if (!confirmed) {
-	// 		return false;
-	// 	}
-
-	// 	const newActions = [...actions.slice(0, index), ...actions.slice(index + 1)];
-
-	// 	onChange(newActions);
-	// }
 
 	handleDraggedCard(dragIndex, hoverIndex, index) {
 		const { actions, onChange } = this.props;
@@ -282,7 +99,7 @@ class HeaderBiddingRuleActions extends React.Component {
 					onChange={e => onChangeHandler(index, e)}
 					value={selectedOption}
 				/>
-				{error && <p className="error-message">{error}</p>}
+				{error && !isIgnored && <p className="error-message">{error}</p>}
 			</div>
 		);
 	}
@@ -296,14 +113,13 @@ class HeaderBiddingRuleActions extends React.Component {
 		);
 	}
 
-	// renderValueElement(valueType, index, onChangeHandler, currentValue, error) {
 	renderValueElement(index, action, onChangeHandler, isIgnored) {
 		const { dropdownOptions } = this.props;
 		const { valueOptions } = dropdownOptions;
 
 		const { key: elementType, value: currentValue, valueError: error } = action;
 
-		const radioElementTypes = ['s2s_toggle'];
+		const radioElementTypes = ['s2s_toggle', 'disable_header_bidding'];
 		const numberElementTypes = ['initial_timeout', 'refresh_timeout', 's2s_timeout'];
 		const dropdownElementTypes = ['formats', 'allowed_bidders', 'significant_bidders'];
 
@@ -353,21 +169,9 @@ class HeaderBiddingRuleActions extends React.Component {
 		}
 
 		if (radioElementTypes.includes(elementType)) {
-			return (
-				<div className="toggle">
-					<CustomToggleSwitch
-						defaultLayout
-						checked={currentValue}
-						onChange={e => onChangeHandler(index, 'radio', e)}
-						name="disableS2s"
-						layout="nolabel"
-						size="m"
-						id="disableS2s"
-						on="Enable"
-						off="Disable"
-					/>
-				</div>
-			);
+			// nothing to be rendered
+
+			return null;
 		}
 
 		if (elementType === 'bidders_order') {
@@ -400,7 +204,7 @@ class HeaderBiddingRuleActions extends React.Component {
 								will be used
 							</p>
 						)}
-						{/* show # before index and align them to left */}
+						{/* TODO: show # before index and align them to left */}
 					</div>
 				</>
 			);
@@ -425,10 +229,8 @@ class HeaderBiddingRuleActions extends React.Component {
 					<DndProvider backend={HTML5Backend}>
 						<div className="col-1">{this.getTextNode(`Action - ${index + 1}`)}</div>
 						<div className="col-2 content">
-							{/* pass complete action to them */}
 							{this.renderKeyDropdown(index, action, onKeyChange, isIgnored)}
 							{this.renderValueElement(index, action, onValueChange, isIgnored)}
-							{/* {error && <p className="error-message">{error}</p>} */}
 						</div>
 
 						{this.renderRemoveActionButton(index)}

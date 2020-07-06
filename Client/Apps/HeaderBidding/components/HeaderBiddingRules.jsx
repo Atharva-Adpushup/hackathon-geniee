@@ -1,11 +1,24 @@
 import React from 'react';
 import _omitBy from 'lodash/omitBy';
+import { Button } from '@/Client/helpers/react-bootstrap-imports';
 
 import history from '../../../helpers/history';
 import axiosInstance from '../../../helpers/axiosInstance';
 import HeaderBiddingRuleActions from './HeaderBiddingRuleActions';
 import HeaderBiddingRuleTriggers from './HeaderBiddingRuleTriggers';
 import CustomToggleSwitch from '../../../Components/CustomToggleSwitch';
+
+const getConvertedBiddersData = bidders => {
+	const { addedBidders } = bidders;
+
+	return Object.values(addedBidders).map(({ name }) => ({
+		label: name,
+		value: name
+	}));
+};
+
+const getConvertedAdUnitsData = adUnits =>
+	adUnits.map(({ adUnit }) => ({ label: adUnit, value: adUnit }));
 
 class HeaderBiddingRules extends React.Component {
 	notSupportedOptions = [
@@ -17,21 +30,14 @@ class HeaderBiddingRules extends React.Component {
 
 	constructor(props) {
 		super(props);
-		const { bidders } = props;
-		const { addedBidders } = bidders;
+		const { bidders, inventories } = props;
+
+		const adUnits = getConvertedAdUnitsData(inventories);
+		const allowedBidders = getConvertedBiddersData(bidders);
 
 		this.state = {
 			isActive: true,
-			triggers: [
-				// {
-				// 	key: 'day',
-				// 	operator: 'in',
-				// 	value: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'].join(','),
-				// 	keyError: null,
-				// 	operatorError: null,
-				// 	valueError: null
-				// }
-			],
+			triggers: [],
 			actions: [],
 			actionKeyOptions: [
 				{
@@ -73,10 +79,7 @@ class HeaderBiddingRules extends React.Component {
 				}
 			],
 			actionValueOptions: {
-				allowed_bidders: Object.values(addedBidders).map(({ name }) => ({
-					label: name,
-					value: name
-				})),
+				allowed_bidders: allowedBidders,
 				formats: []
 			},
 			triggerKeyOptions: [
@@ -115,12 +118,18 @@ class HeaderBiddingRules extends React.Component {
 				country: [],
 				device: [],
 				time_range: [],
-				day_of_the_week: []
+				day_of_the_week: [],
+				adunit: adUnits
 			},
 			actionKeyIndexMap: {},
-			triggerKeyIndexMap: {}
+			triggerKeyIndexMap: {},
+
+			// required for getDerivedStateFromProps
+			bidders,
+			inventories
 		};
 
+		this.handleSubmit = this.handleSubmit.bind(this);
 		this.handleRuleStatusChange = this.handleRuleStatusChange.bind(this);
 
 		this.handleAddTrigger = this.handleAddTrigger.bind(this);
@@ -136,14 +145,35 @@ class HeaderBiddingRules extends React.Component {
 		this.handleBiddersOrderChange = this.handleBiddersOrderChange.bind(this);
 	}
 
+	static getDerivedStateFromProps(props, state) {
+		const { bidders: newBidders, inventories: newInventories } = props;
+		const { bidders: currentBidders, inventories: currentInventories } = state;
+
+		let updatedState = {};
+
+		if (newBidders !== currentBidders) {
+			updatedState = {
+				actionValueOptions: {
+					...state.actionValueOptions,
+					allowed_bidders: getConvertedBiddersData(newBidders)
+				}
+			};
+		}
+
+		if (newInventories !== currentInventories) {
+			updatedState = {
+				...updatedState,
+				triggerValueOptions: {
+					...state.triggerValueOptions,
+					adunit: getConvertedAdUnitsData(newInventories)
+				}
+			};
+		}
+
+		return Object.keys(updatedState).length ? updatedState : null;
+	}
+
 	componentDidMount() {
-		// const { siteId, fetchHBRulesAction, rules } = this.props;
-		// fetchHBRulesAction(siteId);
-
-		// if (Array.isArray(rules) && rules.length > 0) {
-		// 	// update state
-		// }
-
 		this.getMetaData();
 	}
 
@@ -155,6 +185,7 @@ class HeaderBiddingRules extends React.Component {
 				this.setState(state => ({
 					actionValueOptions: {
 						...state.actionValueOptions,
+						// display is mandatory
 						formats: adTypes.map(item => ({ ...item, isFixed: item.value === 'display' }))
 					},
 					triggerValueOptions: {
@@ -305,6 +336,10 @@ class HeaderBiddingRules extends React.Component {
 			if (value === 'formats') {
 				// display is mandatory
 				action.value = ['display'];
+			}
+
+			if (value === 'disable_header_bidding') {
+				action.value = true;
 			}
 
 			newActions[index] = action;
@@ -548,14 +583,6 @@ class HeaderBiddingRules extends React.Component {
 		});
 	}
 
-	handleOnSave() {
-		// TODO: check validations + empty values on submit
-		// TODO: atleast 1 allowed bidder
-		// check for null values,
-		// show validation errors
-		// filter ignored values
-	}
-
 	handleTriggerValueChange(index, value) {
 		const { triggers } = this.state;
 
@@ -569,6 +596,96 @@ class HeaderBiddingRules extends React.Component {
 		this.setState(state => ({ ...state, triggers: newTriggers }));
 	}
 
+	handleSubmit() {
+		const { showNotification } = this.props;
+
+		const { triggers, actions } = this.state;
+		let hasInvalidTriggers = false;
+		let hasInvalidActions = false;
+		let hasMinimumOneValidTrigger = false;
+		let hasMinimumOneValidAction = false;
+
+		const updatedTriggers = [];
+		const updatedActions = [];
+
+		for (let index = 0; index < triggers.length; index++) {
+			const trigger = triggers[index];
+
+			const hasInvalidKey = !trigger.key;
+			const hasInvalidOperator = !trigger.operator;
+			const hasInvalidValue =
+				trigger.value === null || (Array.isArray(trigger.value) && trigger.value.length === 0);
+
+			if (hasInvalidKey || hasInvalidOperator || hasInvalidValue) {
+				hasInvalidTriggers = true;
+			}
+
+			if (!trigger.isIgnored) {
+				hasMinimumOneValidTrigger = true;
+			}
+
+			trigger.keyError = trigger.keyError || hasInvalidKey ? 'Please select an option' : '';
+			trigger.operatorError =
+				trigger.operatorError || hasInvalidOperator ? 'Please select an option' : '';
+			trigger.valueError = trigger.valueError || hasInvalidValue ? 'Please select an option' : '';
+
+			updatedTriggers.push(trigger);
+		}
+
+		for (let index = 0; index < actions.length; index++) {
+			const action = actions[index];
+
+			const hasInvalidKey = !action.key;
+			const hasInvalidValue =
+				action.value === null || (Array.isArray(action.value) && action.value.length === 0);
+
+			if (hasInvalidKey || hasInvalidValue) {
+				hasInvalidActions = true;
+			}
+
+			if (!action.isIgnored) {
+				hasMinimumOneValidAction = true;
+			}
+
+			action.keyError = action.keyError || hasInvalidKey ? 'Please select an option' : '';
+			action.valueError = action.valueError || hasInvalidValue ? 'Please select an option' : '';
+
+			updatedActions.push(action);
+		}
+
+		if (!hasMinimumOneValidAction || !hasMinimumOneValidTrigger) {
+			let message = '';
+
+			if (!hasMinimumOneValidAction) {
+				message = 'Please add atleast one valid Action';
+			}
+
+			if (!hasMinimumOneValidTrigger) {
+				message = message.length
+					? `${message} and one valid Trigger`
+					: 'Please add atleast one valid Trigger';
+			}
+
+			const notification = {
+				message,
+				title: 'Invalid Data',
+				mode: 'error',
+				autoDismiss: 5
+			};
+
+			showNotification(notification);
+		}
+
+		if (hasInvalidActions || hasInvalidTriggers) {
+			const updatedState = {};
+
+			hasInvalidActions && (updatedState['actions'] = updatedActions);
+			hasInvalidTriggers && (updatedState['triggers'] = updatedTriggers);
+
+			return this.setState(updatedState);
+		}
+	}
+
 	handleRuleStatusChange(status) {
 		this.setState({
 			isActive: status
@@ -576,7 +693,6 @@ class HeaderBiddingRules extends React.Component {
 	}
 
 	renderContent() {
-		const { inventories } = this.props;
 		const { actions, triggers, isActive } = this.state;
 
 		const actionDropdownOptions = this.getDropdownOptionsForAction();
@@ -598,7 +714,6 @@ class HeaderBiddingRules extends React.Component {
 				/>
 				<HeaderBiddingRuleTriggers
 					triggers={triggers}
-					inventories={inventories}
 					onAddTrigger={this.handleAddTrigger}
 					onRemoveTrigger={this.handleRemoveTrigger}
 					dropdownOptions={triggerDropdownOptions}
@@ -615,6 +730,11 @@ class HeaderBiddingRules extends React.Component {
 					onBiddersOrderChange={this.handleBiddersOrderChange}
 					dropdownOptions={actionDropdownOptions}
 				/>
+				<div className="control">
+					<Button className="btn-primary" onClick={this.handleSubmit}>
+						Save
+					</Button>
+				</div>
 			</div>
 		);
 	}
