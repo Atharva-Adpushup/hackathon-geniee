@@ -6,6 +6,7 @@ var config = require('./config');
 var adpConfig = window.adpushup.config;
 var constants = require('./constants');
 var render = require('./render');
+var s2sConfigGen = require("./s2sConfigGen");
 var auction = {
 	end: function(adpBatchId) {
 		var adpBatches = adpConfig.apLiteActive
@@ -187,6 +188,10 @@ var auction = {
 				}
 			}
 		};
+		const s2sConfigObj = s2sConfigGen.generateS2SConfig();
+		if (s2sConfigObj) {
+			pbConfig.s2sConfig = s2sConfigObj;
+		}
 
 		if (
 			config.PREBID_CONFIG.currencyConfig &&
