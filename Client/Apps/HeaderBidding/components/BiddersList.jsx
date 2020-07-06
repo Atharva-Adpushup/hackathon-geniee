@@ -17,7 +17,7 @@ function getBidderJSX(bidderType, bidderObj, bidderKey, openAddManageBidderView)
 	} = bidderObj;
 
 	/*
-		converting the isAmpActive value to boolean since the select box used to 
+		converting the isAmpActive and isS2SActive value to boolean since the select box used to 
 		show this field doesn't support the boolean values
 
 		NOTE: this conversion is also done when saving the data to the database

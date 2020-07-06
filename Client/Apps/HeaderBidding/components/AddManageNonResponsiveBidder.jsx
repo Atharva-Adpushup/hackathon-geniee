@@ -392,13 +392,6 @@ class AddManageNonResponsiveBidder extends React.Component {
 				bidderConfig.isAmpActive = bidderConfig.isAmpActive === 'true';
 			}
 			if (typeof bidderConfig.isS2SActive !== 'undefined') {
-				/*
-					-	convert the value to boolean before saving to the database
-					-	the value will be converted back to the corresponding value like true -> 'true' and false -> 'false' when received from the database
-					-	this was to be done due to the SelectBox not accepting boolean values
-					
-					NOTE: this is also being done in the AddManageSizelessBidder
-				*/
 				bidderConfig.isS2SActive = bidderConfig.isS2SActive === 'true';
 			}
 			// eslint-disable-next-line no-unused-expressions
