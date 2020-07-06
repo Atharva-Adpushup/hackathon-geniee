@@ -8,10 +8,15 @@ const { sendSuccessResponse, sendErrorResponse } = require('../helpers/commonFun
 const CC = require('../configs/commonConsts');
 const utils = require('../helpers/utils');
 
+const config = require('../configs/config');
+
+const redisClient = require('../middlewares/redis');
+
 const router = express.Router();
+const cache = require('../middlewares/cacheMiddleware');
 
 router
-	.get('/getCustomStats', (req, res) => {
+	.get('/getCustomStats', cache, (req, res) => {
 		const {
 			query: { siteid = '', isSuperUser = false, fromDate, toDate, interval }
 		} = req;
@@ -24,9 +29,15 @@ router
 				qs: req.query
 			})
 				.then(response => {
-					if (response.code == 1 && response.data) return res.send(response.data);
+					if (response.code == 1 && response.data) {
+						return res.send(response.data) && response.data;
+					}
 					return res.send({});
 				})
+				.then(data =>
+					//set data to redis
+					redisClient.setex(JSON.stringify(req.query), 24 * 3600, JSON.stringify(data))
+				)
 				.catch(err => {
 					console.log(err);
 					return res.send({});
@@ -35,7 +46,7 @@ router
 
 		return res.send({});
 	})
-	.get('/getWidgetData', (req, res) => {
+	.get('/getWidgetData', cache, (req, res) => {
 		const { params, path } = req.query;
 		const reqParams = _.isString(params) ? JSON.parse(params) : {};
 		const { siteid, isSuperUser } = reqParams;
@@ -48,9 +59,15 @@ router
 				qs: reqParams
 			})
 				.then(response => {
-					if (response.code == 1 && response.data) return res.send(response.data);
+					if (response.code == 1 && response.data) {
+						return res.send(response.data) && response.data;
+					}
 					return res.send({});
 				})
+				.then(data =>
+					//set data to redis
+					redisClient.setex(JSON.stringify(req.query), 24 * 3600, JSON.stringify(data))
+				)
 				.catch(err => {
 					console.log(err);
 					return res.send({});
@@ -93,7 +110,7 @@ router
 				return res.send({});
 			})
 	)
-	.get('/getMetaData', (req, res) => {
+	.get('/getMetaData', cache, (req, res) => {
 		const {
 			query: { sites = '', isSuperUser = false }
 		} = req;
@@ -107,10 +124,30 @@ router
 				json: true,
 				qs: params
 			})
-				.then(response =>
-					response.code == 1 && response.data ? res.send(response.data) : res.send({})
+				.then(response => {
+					const { code = -1, data } = response;
+					if (code !== 1) return Promise.reject(new Error(response.data));
+					return response.code == 1 && data ? res.send(data) && data : res.send({});
+				})
+				.then(data =>
+					//set data to redis
+					redisClient.setex(JSON.stringify(req.query), 24 * 3600, JSON.stringify(data))
 				)
-				.catch(() => res.send({}));
+				.catch(err => {
+					let { message: errorMessage } = err;
+
+					const {
+						message = 'Something went wrong',
+						code = HTTP_STATUSES.INTERNAL_SERVER_ERROR
+					} = errorMessage;
+					return sendErrorResponse(
+						{
+							message
+						},
+						res,
+						code
+					);
+				});
 		}
 
 		return res.send({});
