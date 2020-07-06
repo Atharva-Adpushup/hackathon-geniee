@@ -37,10 +37,11 @@ class AddManageNonResponsiveBidder extends React.Component {
 					bidderConfig: { key, name, sizeLess, reusable, isApRelation, params, isS2S }
 				} = this.props;
 
-				// disable the AMP status if not isS2S
+				// disable the AMP and S2S status if not isS2S
 				if (!isS2S) {
 					this.bidderFormFieldsMeta.fieldsToDisable = {
-						isAmpActive: 'bidderConfig.isAmpActive'
+						isAmpActive: 'bidderConfig.isAmpActive',
+						isS2SActive: 'bidderConfig.isS2SActive'
 					};
 				}
 
@@ -111,14 +112,16 @@ class AddManageNonResponsiveBidder extends React.Component {
 						bids,
 						revenueShare,
 						isAmpActive,
+						isS2SActive,
 						isS2S
 					}
 				} = this.props;
 
-				// disable the AMP status if not isS2S
+				// disable the AMP and S2S status if not isS2S
 				if (!isS2S) {
 					this.bidderFormFieldsMeta.fieldsToDisable = {
-						isAmpActive: 'bidderConfig.isAmpActive'
+						isAmpActive: 'bidderConfig.isAmpActive',
+						isS2SActive: 'bidderConfig.isS2SActive'
 					};
 				}
 
@@ -128,7 +131,8 @@ class AddManageNonResponsiveBidder extends React.Component {
 							relation,
 							bids,
 							revenueShare,
-							isAmpActive
+							isAmpActive,
+							isS2SActive
 						},
 						newFields: { isPaused }
 					}),
@@ -186,6 +190,9 @@ class AddManageNonResponsiveBidder extends React.Component {
 											break;
 										case 'isAmpActive':
 											value = isAmpActive;
+											break;
+										case 'isS2SActive':
+											value = isS2SActive;
 											break;
 										default:
 									}
@@ -384,7 +391,16 @@ class AddManageNonResponsiveBidder extends React.Component {
 				*/
 				bidderConfig.isAmpActive = bidderConfig.isAmpActive === 'true';
 			}
-
+			if (typeof bidderConfig.isS2SActive !== 'undefined') {
+				/*
+					-	convert the value to boolean before saving to the database
+					-	the value will be converted back to the corresponding value like true -> 'true' and false -> 'false' when received from the database
+					-	this was to be done due to the SelectBox not accepting boolean values
+					
+					NOTE: this is also being done in the AddManageSizelessBidder
+				*/
+				bidderConfig.isS2SActive = bidderConfig.isS2SActive === 'true';
+			}
 			// eslint-disable-next-line no-unused-expressions
 			(onBidderAdd && onBidderAdd(bidderConfig, mergedParams)) ||
 				(onBidderUpdate && onBidderUpdate(bidderConfig, mergedParams));
