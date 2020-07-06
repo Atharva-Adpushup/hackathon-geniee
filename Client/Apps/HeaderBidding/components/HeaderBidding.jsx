@@ -221,6 +221,7 @@ class HeaderBidding extends React.Component {
 			setUnsavedChangesAction,
 			isSuperUser,
 			fetchHBRulesAction,
+			saveHBRulesAction,
 			rules
 		} = this.props;
 
@@ -283,6 +284,7 @@ class HeaderBidding extends React.Component {
 								showNotification={showNotification}
 								setUnsavedChangesAction={setUnsavedChangesAction}
 								fetchHBRulesAction={fetchHBRulesAction}
+								saveHBRulesAction={saveHBRulesAction}
 							/>
 						)
 					);

@@ -104,3 +104,7 @@ export function updateFormat(inventories, siteId) {
 export function fetchHbRules(siteId) {
 	return axiosInstance.get(`/headerBidding/rules/${siteId}`);
 }
+
+export function saveHbRule(siteId, data) {
+	return axiosInstance.put(`/headerBidding/rules/${siteId}`, data);
+}

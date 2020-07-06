@@ -140,7 +140,7 @@ class HeaderBiddingRuleTriggers extends React.Component {
 
 		return (
 			<Button
-				className="add-trigger"
+				className="add-trigger btn-primary"
 				onClick={onAddTrigger}
 				disabled={consumedAllSupportedOptions}
 				title={consumedAllSupportedOptions ? 'You have added all the available Triggers' : ''}
@@ -168,7 +168,9 @@ class HeaderBiddingRuleTriggers extends React.Component {
 
 			return (
 				<div
-					className={`trigger ${valueError || operatorError || keyError ? `error` : ``}`}
+					className={`trigger container-body ${
+						valueError || operatorError || keyError ? `error` : ``
+					}`}
 					key={`trigger-${key}-${index}`}
 				>
 					<div className="col-1">
@@ -189,10 +191,12 @@ class HeaderBiddingRuleTriggers extends React.Component {
 
 	render() {
 		return (
-			<div className="triggers-container">
-				<h3 className="container-heading">Triggers</h3>
+			<div className="triggers-container u-margin-b4">
+				<div className="container-header">
+					<h3 className="container-title">Triggers</h3>
+				</div>
 				{this.rendersData()}
-				{this.renderAddTriggerButton()}
+				<div className="container-footer">{this.renderAddTriggerButton()}</div>
 			</div>
 		);
 	}

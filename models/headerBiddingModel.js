@@ -27,7 +27,7 @@ const HeaderBidding = model.extend(function() {
 		'email',
 		'prebidConfig',
 		'amazonUAMConfig',
-		'hbRules'
+		'rules'
 	];
 	this.clientKeys = [
 		'hbcf',
@@ -38,7 +38,7 @@ const HeaderBidding = model.extend(function() {
 		'email',
 		'prebidConfig',
 		'amazonUAMConfig',
-		'hbRules'
+		'rules'
 	];
 	this.validations = {
 		required: []
@@ -48,11 +48,7 @@ const HeaderBidding = model.extend(function() {
 		hbcf: {},
 		deviceConfig: { sizeConfig: [] },
 		countryConfig: [],
-		hbRules: []
-		/* {
-			triggers: [],
-			actions: []
-		} */
+		rules: []
 	};
 	this.constructor = function(data, cas) {
 		if (!(data.siteId && data.siteDomain && data.email)) {

@@ -7,6 +7,7 @@ import axiosInstance from '../../../helpers/axiosInstance';
 import HeaderBiddingRuleActions from './HeaderBiddingRuleActions';
 import HeaderBiddingRuleTriggers from './HeaderBiddingRuleTriggers';
 import CustomToggleSwitch from '../../../Components/CustomToggleSwitch';
+import Loader from '../../../Components/Loader';
 
 const getConvertedBiddersData = bidders => {
 	const { addedBidders } = bidders;
@@ -20,7 +21,7 @@ const getConvertedBiddersData = bidders => {
 const getConvertedAdUnitsData = adUnits =>
 	adUnits.map(({ adUnit }) => ({ label: adUnit, value: adUnit }));
 
-class HeaderBiddingRules extends React.Component {
+class HeaderBiddingRule extends React.Component {
 	notSupportedOptions = [
 		'triggerKeyOptions.country',
 		'actionKeyOptions.s2s_toggle',
@@ -30,15 +31,17 @@ class HeaderBiddingRules extends React.Component {
 
 	constructor(props) {
 		super(props);
-		const { bidders, inventories } = props;
+		const { bidders, inventories, selectedRuleIndex, rules } = props;
+		const editRule = selectedRuleIndex !== null ? rules[selectedRuleIndex] : null;
 
 		const adUnits = getConvertedAdUnitsData(inventories);
 		const allowedBidders = getConvertedBiddersData(bidders);
 
 		this.state = {
-			isActive: true,
-			triggers: [],
-			actions: [],
+			showLoader: true,
+			isActive: editRule ? editRule['isActive'] : true,
+			triggers: editRule ? editRule['triggers'] : [],
+			actions: editRule ? editRule['actions'] : [],
 			actionKeyOptions: [
 				{
 					label: 'Allow Bidders',
@@ -130,6 +133,7 @@ class HeaderBiddingRules extends React.Component {
 		};
 
 		this.handleSubmit = this.handleSubmit.bind(this);
+		this.handleCancel = this.handleCancel.bind(this);
 		this.handleRuleStatusChange = this.handleRuleStatusChange.bind(this);
 
 		this.handleAddTrigger = this.handleAddTrigger.bind(this);
@@ -200,6 +204,11 @@ class HeaderBiddingRules extends React.Component {
 			.catch(error => {
 				console.error(error.message);
 				history.push('/error');
+			})
+			.then(() => {
+				this.setState({
+					showLoader: false
+				});
 			});
 	}
 
@@ -597,11 +606,12 @@ class HeaderBiddingRules extends React.Component {
 	}
 
 	handleSubmit() {
-		const { showNotification } = this.props;
+		const { siteId, showNotification, saveHBRulesAction, selectedRuleIndex } = this.props;
+		const { triggers, actions, isActive } = this.state;
 
-		const { triggers, actions } = this.state;
-		let hasInvalidTriggers = false;
-		let hasInvalidActions = false;
+		let hasInvalidTriggers = triggers.length === 0;
+		let hasInvalidActions = actions.length === 0;
+
 		let hasMinimumOneValidTrigger = false;
 		let hasMinimumOneValidAction = false;
 
@@ -679,11 +689,55 @@ class HeaderBiddingRules extends React.Component {
 		if (hasInvalidActions || hasInvalidTriggers) {
 			const updatedState = {};
 
-			hasInvalidActions && (updatedState['actions'] = updatedActions);
-			hasInvalidTriggers && (updatedState['triggers'] = updatedTriggers);
+			hasInvalidActions && (updatedState.actions = updatedActions);
+			hasInvalidTriggers && (updatedState.triggers = updatedTriggers);
 
 			return this.setState(updatedState);
 		}
+
+		// save the rule
+		const rule = {
+			isActive,
+			triggers: triggers.map(trigger => ({
+				key: trigger.key,
+				operator: trigger.operator,
+				value: trigger.value
+			})),
+			actions: actions.map(action => ({
+				key: action.key,
+				value: action.value
+			}))
+		};
+
+		saveHBRulesAction(siteId, { rule, ruleIndex: selectedRuleIndex })
+			.then(() => {
+				showNotification({
+					mode: 'success',
+					title: 'Operation Successful',
+					message: 'Rule added successfully',
+					autoDismiss: 5
+				});
+			})
+			.catch(error => {
+				console.error(error);
+
+				showNotification({
+					mode: 'error',
+					title: 'Operation Failed',
+					message: error.message,
+					autoDismiss: 5
+				});
+			});
+	}
+
+	handleCancel() {
+		const { showRulesList } = this.props;
+
+		const confirmed = window.confirm('Any changes made will be lost! Are you sure?');
+
+		if (!confirmed) return;
+
+		showRulesList();
 	}
 
 	handleRuleStatusChange(status) {
@@ -700,18 +754,21 @@ class HeaderBiddingRules extends React.Component {
 
 		return (
 			<div className="page__content">
-				Rule Status
-				<CustomToggleSwitch
-					defaultLayout
-					checked={isActive}
-					onChange={this.handleRuleStatusChange}
-					name="isActive"
-					layout="nolabel"
-					size="m"
-					id="isActive"
-					on="Enable"
-					off="Disable"
-				/>
+				<div className="status-container">
+					<h3>Rule Status</h3>
+					<CustomToggleSwitch
+						defaultLayout
+						checked={isActive}
+						onChange={this.handleRuleStatusChange}
+						name="isActive"
+						layout="nolabel"
+						size="m"
+						id="isActive"
+						on="Enable"
+						off="Disable"
+					/>
+				</div>
+				<div className="divider" />
 				<HeaderBiddingRuleTriggers
 					triggers={triggers}
 					onAddTrigger={this.handleAddTrigger}
@@ -721,6 +778,7 @@ class HeaderBiddingRules extends React.Component {
 					onValueChange={this.handleTriggerValueChange}
 					onOperatorChange={this.handleTriggerOperatorChange}
 				/>
+				<div className="divider" />
 				<HeaderBiddingRuleActions
 					actions={actions}
 					onAddAction={this.handleAddAction}
@@ -730,9 +788,13 @@ class HeaderBiddingRules extends React.Component {
 					onBiddersOrderChange={this.handleBiddersOrderChange}
 					dropdownOptions={actionDropdownOptions}
 				/>
+				<div className="divider" />
 				<div className="control">
 					<Button className="btn-primary" onClick={this.handleSubmit}>
 						Save
+					</Button>
+					<Button className="btn-secondary" onClick={this.handleCancel}>
+						Cancel
 					</Button>
 				</div>
 			</div>
@@ -740,16 +802,28 @@ class HeaderBiddingRules extends React.Component {
 	}
 
 	render() {
+		const { selectedRuleIndex } = this.props;
+		const { showLoader } = this.state;
+
 		return (
 			<div className="hb-rules">
-				<h3 className="page__title">HB Rules</h3>
-				<h5 className="page__subtitle">
-					Please follow the below steps to add different Rules for Header Bidding
-				</h5>
-				{this.renderContent()}
+				{showLoader ? (
+					<Loader />
+				) : (
+					<>
+						<div className="page__head">
+							<h3 className="page__title">{selectedRuleIndex !== null ? 'Edit ' : 'Add '} Rule</h3>
+							<Button className="btn-secondary" onClick={this.handleCancel}>
+								Go Back to Rules List
+							</Button>
+						</div>
+
+						{this.renderContent()}
+					</>
+				)}
 			</div>
 		);
 	}
 }
 
-export default HeaderBiddingRules;
+export default HeaderBiddingRule;

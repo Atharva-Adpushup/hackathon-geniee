@@ -882,30 +882,32 @@ router
 	.put('/rules/:siteId', (req, res) => {
 		const { siteId } = req.params;
 		const { email } = req.user;
-		const newHbRule = req.body;
+		const { rule, ruleIndex } = req.body;
 
-		// validate newHbRule
-		// atleast one trigger, one action
-		const { triggers, actions } = newHbRule;
-
-		if (triggers.length === 0 || actions.length === 0) {
-			return res
-				.status(httpStatus.BAD_REQUEST)
-				.json({ error: 'Please provide atleast 1 trigger and 1 action' });
-		}
+		console.log({ body: req.body });
 
 		return userModel
 			.verifySiteOwner(email, siteId)
+			.then(() => FormValidator.validate(rule, schema.hbRules.rule))
 			.then(() => headerBiddingModel.getHbConfig(siteId, email))
 			.then(hbConfig => {
 				const rules = hbConfig.get('rules') || [];
-				hbConfig.set('rules', [...rules, newHbRule]);
+
+				const isValidRuleIndex = parseInt(ruleIndex, 10);
+				Number.isNaN(isValidRuleIndex) ? rules.push(rule) : (rules[isValidRuleIndex] = rule);
+
+				hbConfig.set('rules', rules);
 				return hbConfig.save();
 			})
 			.then(({ data: { rules } }) => res.status(httpStatus.OK).json(rules))
 			.catch(err => {
 				// eslint-disable-next-line no-console
 				console.log(err);
+
+				if (err instanceof AdPushupError) {
+					return res.status(httpStatus.BAD_REQUEST).json({ error: err.message });
+				}
+
 				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error!' });
 			});
 	});

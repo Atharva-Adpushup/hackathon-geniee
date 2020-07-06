@@ -14,8 +14,8 @@ import {
 	fetchHBInitDataAction,
 	setUnsavedChangesAction,
 	masterSaveAction,
-	fetchHBRulesAction
-	// saveHBRulesAction
+	fetchHBRulesAction,
+	saveHBRulesAction
 } from '../../../actions/apps/headerBidding/hbActions';
 
 import { showNotification, hideNotification } from '../../../actions/uiActions';
@@ -84,7 +84,7 @@ export default connect(
 		fetchHBInitDataAction,
 		setUnsavedChangesAction,
 		masterSaveAction,
-		fetchHBRulesAction
-		// saveHBRulesAction
+		fetchHBRulesAction,
+		saveHBRulesAction
 	}
 )(HeaderBiddingContainer);

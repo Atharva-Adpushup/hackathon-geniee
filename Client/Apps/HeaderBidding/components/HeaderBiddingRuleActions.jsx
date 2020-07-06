@@ -58,7 +58,7 @@ class HeaderBiddingRuleActions extends React.Component {
 
 		return (
 			<Button
-				className="add-action"
+				className="add-action btn-primary"
 				onClick={onAddAction}
 				disabled={consumedAllSupportedOptions}
 				title={consumedAllSupportedOptions ? 'You have added all the available Actions' : ''}
@@ -200,7 +200,7 @@ class HeaderBiddingRuleActions extends React.Component {
 						{actions[index].value.map((bidder, i) => renderBidder(bidder, i))}
 						{actions[index].value.length && (
 							<p className="message bottom">
-								If you are using Allow Bidders action, only the bidders selected in Allow Bidders
+								If you are using Allow Bidders Action, only the Bidders selected in Allow Bidders
 								will be used
 							</p>
 						)}
@@ -221,7 +221,7 @@ class HeaderBiddingRuleActions extends React.Component {
 
 			return (
 				<div
-					className={`action ${typeError || valueError ? 'error' : ''} ${
+					className={`container-body action ${typeError || valueError ? 'error' : ''} ${
 						isIgnored ? `ignored` : ``
 					}`}
 					key={`action-${key}-${index}`}
@@ -243,10 +243,12 @@ class HeaderBiddingRuleActions extends React.Component {
 
 	render() {
 		return (
-			<div className="actions-container">
-				<h3 className="container-heading">Actions</h3>
+			<div className="actions-container u-margin-b4">
+				<div className="container-header">
+					<h3 className="container-title">Actions</h3>
+				</div>
 				{this.renderActionsData()}
-				{this.renderAddActionButton()}
+				<div className="container-footer">{this.renderAddActionButton()}</div>
 			</div>
 		);
 	}
