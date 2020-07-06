@@ -428,6 +428,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		network: 'ntwk::',
 		amp: 'amtg::',
 		requestLogger: 'reql::',
+		lastRunInfoDoc: 'config::apnd:last-run-info',
 		sizeMapppingConfig: 'data::sizeMapping'
 	},
 	tagManagerInitialDoc: {
@@ -557,7 +558,8 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 	EMAIL_REGEX: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
 	cronSchedule: {
 		activeSiteMarkingAndAdsTxtService: '20 14,2 * * *',
-		adManagerSyncService: '0 */12 * * *'
+		adManagerSyncService: '0 */12 * * *',
+		prefetchService: '*/10 * * * *' // Every 10 mins
 	},
 	SELLERS_JSON: {
 		fileConfig: {
@@ -608,5 +610,13 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 			MIN: 0,
 			MAX: 10000
 		}
-	}
+	},
+	DASHBOARD_QUERY_PATHS: [
+		'/site/report?report_name=estimated_earning_comparison',
+		'/site/report?report_name=ap_vs_baseline',
+		'/site/report?report_name=site_summary',
+		'/site/report?report_name=revenue_by_network',
+		'/site/report?report_name=get_stats_by_custom&dimension=siteid&interval=cumulative&metrics=adpushup_page_views,adpushup_page_cpm,network_ad_ecpm,network_impressions,network_net_revenue',
+		'/site/report?report_name=country_report'
+	]
 };

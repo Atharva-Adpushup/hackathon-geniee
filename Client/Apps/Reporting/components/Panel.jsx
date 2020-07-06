@@ -52,7 +52,7 @@ class Panel extends Component {
 			dimensionList: [],
 			filterList: [],
 			intervalList: [],
-			metricsList: props.isForOps?displayOpsMetrics:displayMetrics,
+			metricsList: props.isForOps ? displayOpsMetrics : displayMetrics,
 			selectedDimension: '',
 			selectedFilters: {},
 			selectedMetrics: [],
@@ -93,8 +93,11 @@ class Panel extends Component {
 			isSuperUser = true;
 		}
 
+		const params = { sites: userSitesStr };
+		isSuperUser ? (params.isSuperUser = isSuperUser) : null;
+
 		if (!reportsMeta.fetched) {
-			return reportService.getMetaData({ sites: userSitesStr, isSuperUser }).then(response => {
+			return reportService.getMetaData(params).then(response => {
 				let { data: computedData } = response;
 
 				computedData = getDemoUserSites(computedData, email);
@@ -253,7 +256,7 @@ class Panel extends Component {
 
 		// if (metricsList && !isCustomizeChartLegend) {
 		if (metricsList) {
-				selectedMetrics = displayMetrics.map(metric => metric.value);
+			selectedMetrics = displayMetrics.map(metric => metric.value);
 		}
 
 		if (metricsList && isCustomizeChartLegend) {
@@ -390,14 +393,20 @@ class Panel extends Component {
 						// for that we will check users previous selection, if it
 						// is different from default list override default wit
 						// previous values
-						if(isForOps && (prevMetricsList.length != metricsList.length)) {
-							metricsList = [...prevMetricsList]
-						} else if(isForOps){
+						if (isForOps && prevMetricsList.length != metricsList.length) {
+							metricsList = [...prevMetricsList];
+						} else if (isForOps) {
 							// for same length we need to check for individual value
-							let listPrevColList = prevMetricsList.map(item => item.value).sort().join()
-							let defaultPrevColList = metricsList.map( item => item.value).sort().join()
-							if(listPrevColList != defaultPrevColList) {
-								metricsList = [...prevMetricsList]
+							let listPrevColList = prevMetricsList
+								.map(item => item.value)
+								.sort()
+								.join();
+							let defaultPrevColList = metricsList
+								.map(item => item.value)
+								.sort()
+								.join();
+							if (listPrevColList != defaultPrevColList) {
+								metricsList = [...prevMetricsList];
 							}
 						}
 						newState = { ...newState, metricsList };
@@ -434,7 +443,13 @@ class Panel extends Component {
 	 * @memberof Panel
 	 */
 	getMetricsList = tableData => {
-		const { reportsMeta, isForOps, user: { data: {isUniqueImpEnabled = false} } } = this.props;
+		const {
+			reportsMeta,
+			isForOps,
+			user: {
+				data: { isUniqueImpEnabled = false }
+			}
+		} = this.props;
 		const filteredMetrics = tableData.columns.filter(metric => {
 			const isDimension = !!reportsMeta.data.dimension[metric];
 			const isBlacklistedMetric = REPORT_INTERVAL_TABLE_KEYS.indexOf(metric) !== -1;
@@ -455,19 +470,19 @@ class Panel extends Component {
 		// if(isForOps) {
 		// 	computedMetrics.splice(5);
 		// } else {
-			let match = displayMetrics.map((item) => item.value)
-			if(isForOps) {
-				match = displayOpsMetrics.map((item) => item.value)
-				computedMetrics = computedMetrics.filter((item) => match.indexOf(item.value)!=-1)	
+		let match = displayMetrics.map(item => item.value);
+		if (isForOps) {
+			match = displayOpsMetrics.map(item => item.value);
+			computedMetrics = computedMetrics.filter(item => match.indexOf(item.value) != -1);
+		} else {
+			// check if unique imp is checked
+			if (isUniqueImpEnabled) {
+				match = displayUniqueImpressionMetrics.map(item => item.value);
+				computedMetrics = computedMetrics.filter(item => match.indexOf(item.value) != -1);
 			} else {
-				// check if unique imp is checked
-				if(isUniqueImpEnabled) {
-					match = displayUniqueImpressionMetrics.map((item) => item.value)
-					computedMetrics = computedMetrics.filter((item) => match.indexOf(item.value)!=-1)
-				} else {
-					computedMetrics = computedMetrics.filter((item) => match.indexOf(item.value)!=-1)
-				}
+				computedMetrics = computedMetrics.filter(item => match.indexOf(item.value) != -1);
 			}
+		}
 		// }
 		return computedMetrics;
 	};
@@ -546,25 +561,25 @@ class Panel extends Component {
 		const { reportsMeta, isForOps, overrideOpsPanelUniqueImpValue } = this.props;
 		const sortedMetaMetrics = this.getSortedMetaMetrics(reportsMeta.data.metrics);
 		let sortedMetrics = [];
-		if(isForOps) {
+		if (isForOps) {
 			sortedMetaMetrics.forEach(metaMetric => {
 				const foundMetric = newMetrics.find(newMetric => newMetric.value === metaMetric.value);
-	
+
 				if (foundMetric) sortedMetrics.push(foundMetric);
 			});
 		} else {
-			let found = newMetrics.filter((item) => item.value=="unique_impressions")
+			let found = newMetrics.filter(item => item.value == 'unique_impressions');
 			// if unique impression selected
-			if(found.length) {
-				let match = displayUniqueImpressionMetrics.map((item) => item.value)
-				sortedMetrics = sortedMetaMetrics.filter((item) => match.indexOf(item.value)!=-1)
+			if (found.length) {
+				let match = displayUniqueImpressionMetrics.map(item => item.value);
+				sortedMetrics = sortedMetaMetrics.filter(item => match.indexOf(item.value) != -1);
 				// temp code for unqiue imp selection in dashboard from this component
-				overrideOpsPanelUniqueImpValue({isUniqueImpEnabled: true})
+				overrideOpsPanelUniqueImpValue({ isUniqueImpEnabled: true });
 			} else {
-				let match = displayMetrics.map((item) => item.value)
-				sortedMetrics = sortedMetaMetrics.filter((item) => match.indexOf(item.value)!=-1)
+				let match = displayMetrics.map(item => item.value);
+				sortedMetrics = sortedMetaMetrics.filter(item => match.indexOf(item.value) != -1);
 				// temp code for unqiue imp selection in dashboard from this component
-				overrideOpsPanelUniqueImpValue({isUniqueImpEnabled: false})
+				overrideOpsPanelUniqueImpValue({ isUniqueImpEnabled: false });
 			}
 		}
 
@@ -827,15 +842,17 @@ class Panel extends Component {
 			tableData
 		);
 
-		if(!isForOps) {
-			allAvailableMetrics = allAvailableMetrics.filter((item) => item.value=="unique_impressions").map(item => {
-				item.name = "Unique Impressions Reporting"
-				item.isDisabled = false;
-				return item;
-			})
+		if (!isForOps) {
+			allAvailableMetrics = allAvailableMetrics
+				.filter(item => item.value == 'unique_impressions')
+				.map(item => {
+					item.name = 'Unique Impressions Reporting';
+					item.isDisabled = false;
+					return item;
+				});
 		} else {
 			// this is for ops panel reports. Don't whow unique impression items in dropdown
-			allAvailableMetrics = allAvailableMetrics.filter((item) => item.value.indexOf("unique") === -1)
+			allAvailableMetrics = allAvailableMetrics.filter(item => item.value.indexOf('unique') === -1);
 		}
 		const aggregatedData = this.aggregateValues(tableData.result);
 		const { email } = this.getDemoUserParams();
