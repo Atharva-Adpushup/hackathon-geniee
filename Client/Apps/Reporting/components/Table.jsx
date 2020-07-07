@@ -137,7 +137,7 @@ class Table extends React.Component {
 													sum(aggregatedData[key].map(val => val.adpushup_impressions))) *
 												1000
 											).toFixed(2);
-										else if (prop === 'network_ad_ecpm' && prop === column)
+										else if ((prop === 'network_ad_ecpm' || prop === 'unique_ad_ecpm') && prop === column)
 											grouped = (
 												(sum(aggregatedData[key].map(val => val.network_net_revenue)) /
 													sum(aggregatedData[key].map(val => val.network_impressions))) *
