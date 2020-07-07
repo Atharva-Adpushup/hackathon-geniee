@@ -3,11 +3,6 @@ import Select from 'react-select';
 import { countries } from 'country-data';
 import { Button } from '@/Client/helpers/react-bootstrap-imports';
 
-// TODO: duplicate united kingdom in countries list
-
-const countriesList = Object.values(countries.all).map(({ name }) => name);
-const uniqueCountriesList = [...new Set(countriesList)];
-
 const dropdownErrorStyle = {
 	control: styles => ({
 		...styles,
@@ -155,38 +150,44 @@ class HeaderBiddingRuleTriggers extends React.Component {
 
 		return (
 			<Button className="remove-trigger btn--secondary" onClick={() => onRemoveTrigger(index)}>
-				Remove Trigger
+				Delete
 			</Button>
 		);
 	}
 
-	rendersData() {
+	renderData() {
 		const { triggers } = this.props;
 
-		return triggers.map((trigger, index) => {
-			const { key, valueError, operatorError, keyError } = trigger;
+		return triggers.length === 0 ? (
+			<div className="empty-state">
+				No triggers added! Press the Add Trigger button to start adding triggers
+			</div>
+		) : (
+			triggers.map((trigger, index) => {
+				const { key, valueError, operatorError, keyError } = trigger;
 
-			return (
-				<div
-					className={`trigger container-body ${
-						valueError || operatorError || keyError ? `error` : ``
-					}`}
-					key={`trigger-${key}-${index}`}
-				>
-					<div className="col-1">
-						{index === 0 ? this.getTextNode('IF') : this.getTextNode('AND')}
+				return (
+					<div
+						className={`trigger container-body ${
+							valueError || operatorError || keyError ? `error` : ``
+						}`}
+						key={`trigger-${key}-${index}`}
+					>
+						<div className="col-1">
+							{index === 0 ? this.getTextNode('IF') : this.getTextNode('AND')}
+						</div>
+
+						<div className="col-2 content">
+							{this.renderKeyDropdown(index, trigger)}
+							{this.renderOperatorDropdown(index, trigger)}
+							{this.renderValueDropdown(index, trigger)}
+						</div>
+
+						{this.renderRemoveTriggerButton(index)}
 					</div>
-
-					<div className="col-2 content">
-						{this.renderKeyDropdown(index, trigger)}
-						{this.renderOperatorDropdown(index, trigger)}
-						{this.renderValueDropdown(index, trigger)}
-					</div>
-
-					{this.renderRemoveTriggerButton(index)}
-				</div>
-			);
-		});
+				);
+			})
+		);
 	}
 
 	render() {
@@ -195,7 +196,7 @@ class HeaderBiddingRuleTriggers extends React.Component {
 				<div className="container-header">
 					<h3 className="container-title">Triggers</h3>
 				</div>
-				{this.rendersData()}
+				{this.renderData()}
 				<div className="container-footer">{this.renderAddTriggerButton()}</div>
 			</div>
 		);

@@ -108,7 +108,7 @@ class HeaderBiddingRuleActions extends React.Component {
 		const { onRemoveAction } = this.props;
 		return (
 			<Button className="remove-action btn--secondary" onClick={() => onRemoveAction(index)}>
-				Remove Action
+				Delete
 			</Button>
 		);
 	}
@@ -213,32 +213,38 @@ class HeaderBiddingRuleActions extends React.Component {
 		return null;
 	}
 
-	renderActionsData() {
+	renderData() {
 		const { actions, onKeyChange, onValueChange } = this.props;
 
-		return actions.map((action, index) => {
-			const { key, isIgnored = false, isIgnoredMessage, typeError, valueError } = action;
+		return actions.length === 0 ? (
+			<div className="empty-state">
+				No actions added! Press the Add Action button to start adding actions
+			</div>
+		) : (
+			actions.map((action, index) => {
+				const { key, isIgnored = false, isIgnoredMessage, typeError, valueError } = action;
 
-			return (
-				<div
-					className={`container-body action ${typeError || valueError ? 'error' : ''} ${
-						isIgnored ? `ignored` : ``
-					}`}
-					key={`action-${key}-${index}`}
-				>
-					<DndProvider backend={HTML5Backend}>
-						<div className="col-1">{this.getTextNode(`Action - ${index + 1}`)}</div>
-						<div className="col-2 content">
-							{this.renderKeyDropdown(index, action, onKeyChange, isIgnored)}
-							{this.renderValueElement(index, action, onValueChange, isIgnored)}
-						</div>
+				return (
+					<div
+						className={`container-body action ${typeError || valueError ? 'error' : ''} ${
+							isIgnored ? `ignored` : ``
+						}`}
+						key={`action-${key}-${index}`}
+					>
+						<DndProvider backend={HTML5Backend}>
+							<div className="col-1">{this.getTextNode(`Action - ${index + 1}`)}</div>
+							<div className="col-2 content">
+								{this.renderKeyDropdown(index, action, onKeyChange, isIgnored)}
+								{this.renderValueElement(index, action, onValueChange, isIgnored)}
+							</div>
 
-						{this.renderRemoveActionButton(index)}
-					</DndProvider>
-					{isIgnored && <p className="ignored-message">{isIgnoredMessage}</p>}
-				</div>
-			);
-		});
+							{this.renderRemoveActionButton(index)}
+						</DndProvider>
+						{isIgnored && <p className="ignored-message">{isIgnoredMessage}</p>}
+					</div>
+				);
+			})
+		);
 	}
 
 	render() {
@@ -247,7 +253,7 @@ class HeaderBiddingRuleActions extends React.Component {
 				<div className="container-header">
 					<h3 className="container-title">Actions</h3>
 				</div>
-				{this.renderActionsData()}
+				{this.renderData()}
 				<div className="container-footer">{this.renderAddActionButton()}</div>
 			</div>
 		);
