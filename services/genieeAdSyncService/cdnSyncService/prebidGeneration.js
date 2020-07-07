@@ -10,13 +10,6 @@ function init(generatedConfig) {
 		if (!statuses.HB_ACTIVE) {
 			return resolve(generatedConfig);
 		}
-		const bidders = config.hbcf.value.hbcf;
-		for (bidder in bidders) {
-			if (bidders[bidder].isS2SActive) {
-				config.prebidAdapters += ",prebidServerBidAdapter"
-				break;
-			}
-		}
 		exec(
 			`gulp build --modules=${config.prebidAdapters}`,
 			{ cwd: prebidDir },

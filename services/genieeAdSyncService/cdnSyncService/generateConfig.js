@@ -19,8 +19,12 @@ function getHbConfig(siteId) {
 function getPrebidModules(hbcf) {
 	const hbConfig = hbcf.value.hbcf;
 	const modules = new Set();
-
+	let s2sEnabled = false;
 	for (const bidderCode of Object.keys(hbConfig)) {
+		if (!s2sEnabled && hbConfig[bidderCode].isS2SActive) {
+			modules.add(PREBID_ADAPTERS.prebidServer);
+			s2sEnabled = true;
+		}
 		const adpater = hbConfig[bidderCode].adapter;
 		adpater ? modules.add(adpater) : console.log(`Prebid Adapter not found for ${bidderCode}`);
 	}

@@ -1,7 +1,7 @@
 const config = require("./config");
 const constants = require("./constants");
 const bidders = config.PREBID_CONFIG.hbcf;
-const isS2SActive = config.S2S_ENABLED;
+const isS2SActive = config.S2S_CONFIG.S2S_ENABLED;
 const s2sBidders = []
 
 for(var bidder in bidders) {
@@ -15,13 +15,13 @@ function generateS2SConfig() {
     return null;
   }
   return {
-    accountId: "1001",
+    accountId: config.S2S_CONFIG.S2S_ACCOUNT_ID,
     enabled: true,
     bidders: s2sBidders,
-    timeout: constants.PREBID.TIMEOUT,
+    timeout: config.S2S_CONFIG.S2S_TIMEOUT,
     adapter: "prebidServer",
-    endpoint: config.S2S_AUCTION_ENDPOINT,
-    syncEndpoint: config.S2S_SYNC_ENDPOINT,
+    endpoint: config.S2S_CONFIG.S2S_AUCTION_ENDPOINT,
+    syncEndpoint: config.S2S_CONFIG.S2S_SYNC_ENDPOINT,
     extPrebid: {
       targeting: {
         includebidderkeys: false,
