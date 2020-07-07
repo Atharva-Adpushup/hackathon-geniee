@@ -1,5 +1,7 @@
 import React from 'react';
 import _omitBy from 'lodash/omitBy';
+import _cloneDeep from 'lodash/cloneDeep';
+
 import { Button } from '@/Client/helpers/react-bootstrap-imports';
 
 import history from '../../../helpers/history';
@@ -32,8 +34,7 @@ class OptimizationTab extends React.Component {
 
 	constructor(props) {
 		super(props);
-		const { bidders, inventories, selectedRuleIndex, rules } = props;
-		const editRule = selectedRuleIndex !== null ? rules[selectedRuleIndex] : null;
+		const { bidders, inventories } = props;
 
 		const adUnits = getConvertedAdUnitsData(inventories);
 		const allowedBidders = getConvertedBiddersData(bidders);
@@ -42,9 +43,9 @@ class OptimizationTab extends React.Component {
 			showLoader: true,
 			selectedRuleIndex: null,
 			activeComponent: 'list-component',
-			isActive: editRule ? editRule['isActive'] : true,
-			triggers: editRule ? editRule['triggers'] : [],
-			actions: editRule ? editRule['actions'] : [],
+			isActive: true,
+			triggers: [],
+			actions: [],
 			actionKeyOptions: [
 				{
 					label: 'Allow Bidders',
@@ -891,8 +892,8 @@ class OptimizationTab extends React.Component {
 
 		this.setState(
 			{
-				triggers,
-				actions,
+				actions: _cloneDeep(actions),
+				triggers: _cloneDeep(triggers),
 				activeComponent: 'rule-component',
 				selectedRuleIndex: index
 			},
