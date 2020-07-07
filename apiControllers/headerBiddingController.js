@@ -758,9 +758,6 @@ router
 				response.data.data.result) ||
 			[];
 
-		const dataTypesWithRequiredFields = ['adTypes', 'devices', 'days', 'timeSlots'];
-		const dataTypesWithIgnoredFields = ['countries'];
-
 		const fieldsIgnored = {
 			countries: {
 				XX: true
@@ -768,21 +765,14 @@ router
 		};
 
 		const fieldsRequired = {
-			adTypes: { Banner: true, Native: true, Video: true },
-			devices: { Mobile: true, Tablet: true, Desktop: true },
-			days: { Weekday: true, Weekend: true },
-			timeSlots: {
-				'Morning (6AM-12PM)': true,
-				'Afternoon (12PM-4PM)': true,
-				'Evening (4PM-8PM)': true,
-				'Night (8PM-6AM)': true
-			}
+			adTypes: { banner: true, native: true, video: true },
+			devices: { mobile: true, tablet: true, desktop: true }
 		};
 
 		const fieldsToBeReplaced = {
 			adTypes: {
 				label: { Banner: 'Display' },
-				value: { Banner: 'display' }
+				value: { banner: 'display' }
 			}
 		};
 
@@ -793,19 +783,16 @@ router
 					return { labelKey: 'value', valueKey: 'country_code_alpha2' };
 
 				default:
-					return { labelKey: 'value', valueKey: 'value' };
+					return { labelKey: 'value', valueKey: 'ext' };
 			}
 		};
 
 		const getConvertedDataFromAPI = (response, dataType) => {
 			const data = getDataFromAPIResponse(response);
 
-			const hasIgnoredFieldsFilter = dataTypesWithIgnoredFields.includes(dataType);
-			const hasRequiredFieldsFilter = dataTypesWithRequiredFields.includes(dataType);
-
-			const fieldsIgnoredForDataType = _get(fieldsIgnored, dataType, {});
-			const fieldsRequiredForDataType = _get(fieldsRequired, dataType, {});
-			const fieldsToBeReplacedForDataType = _get(fieldsToBeReplaced, dataType, {});
+			const fieldsIgnoredForDataType = fieldsIgnored[dataType];
+			const fieldsRequiredForDataType = fieldsRequired[dataType];
+			const fieldsToBeReplacedForDataType = fieldsToBeReplaced[dataType];
 
 			const { labelKey, valueKey } = getKeysToBeUsed(dataType);
 
@@ -813,18 +800,19 @@ router
 				const label = item[labelKey];
 				const value = item[valueKey];
 
-				// is valid field ?
-				if (hasRequiredFieldsFilter) {
+				// has fields required ?
+				if (fieldsRequiredForDataType) {
 					const isFieldRequired = _get(fieldsRequiredForDataType, value, false);
 					if (!isFieldRequired) return result;
 				}
 
-				if (hasIgnoredFieldsFilter) {
+				// has fields to be ignored ?
+				if (fieldsIgnoredForDataType) {
 					const isFieldIgnored = _get(fieldsIgnoredForDataType, value, false);
 					if (isFieldIgnored) return result;
 				}
 
-				// get label and value to be used
+				// get label and value replacements to be used
 				const convertedItem = {};
 				convertedItem.label = _get(fieldsToBeReplacedForDataType, `label.${label}`, label);
 				convertedItem.value = _get(fieldsToBeReplacedForDataType, `value.${value}`, value);

@@ -439,10 +439,11 @@
 				display: flex;
 
 				.key-content {
-					min-width: 30%;
+					min-width: 25%;
 				}
 
 				.operator-content {
+					min-width: 10%;
 					white-space: nowrap;
 				}
 
