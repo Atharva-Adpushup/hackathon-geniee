@@ -11,7 +11,6 @@ var config = {
 		S2S_ENABLED: true,
 		S2S_AUCTION_ENDPOINT: `${globalConfig.prebidServer.host}prebidserver/openrtb2/auction`,
 		S2S_SYNC_ENDPOINT: `${globalConfig.prebidServer.host}prebidserver/cookie_sync`,
-		S2S_TIMEOUT: 5000,
 		S2S_ACCOUNT_ID: "1001"
 	}
 };
