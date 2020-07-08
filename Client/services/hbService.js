@@ -106,5 +106,8 @@ export function fetchHbRules(siteId) {
 }
 
 export function saveHbRule(siteId, data) {
+	return axiosInstance.post(`/headerBidding/rules/${siteId}`, data);
+}
+export function updateHbRule(siteId, data) {
 	return axiosInstance.put(`/headerBidding/rules/${siteId}`, data);
 }

@@ -384,6 +384,18 @@
 }
 
 .hb-rules {
+	.page__header {
+		display: flex;
+
+		.page__title {
+			flex: 1;
+		}
+
+		button {
+			align-self: flex-start;
+		}
+	}
+
 	.empty-state {
 		font-size: 1.5rem;
 		color: rgba(0, 0, 0, 0.4);
@@ -407,12 +419,17 @@
 					vertical-align: middle;
 				}
 				&:nth-of-type(3) {
-					width: 70%;
+					width: 60%;
 				}
 				&:nth-of-type(4) {
 					text-align: center;
 					vertical-align: middle;
 					width: 10%;
+				}
+				&:nth-of-type(5) {
+					text-align: center;
+					vertical-align: middle;
+					width: 5%;
 				}
 
 				&.enabled {
@@ -421,6 +438,10 @@
 				&.disabled {
 					color: $primaryColor;
 				}
+			}
+
+			.toggle {
+				width: 100px;
 			}
 
 			.triggers-section {
@@ -438,19 +459,26 @@
 			.action-content {
 				display: flex;
 
+				.serial {
+					width: 1%;
+					margin: 0 1rem 0 0.5rem;
+				}
+
 				.key-content {
-					min-width: 25%;
+					// min-width: 25%;
+					white-space: nowrap;
 				}
 
 				.operator-content {
-					min-width: 10%;
+					// min-width: 10%;
 					white-space: nowrap;
 				}
 
 				.content-item {
 					display: flex;
-					margin: 1rem;
+					// margin: 1rem;
 					flex-wrap: wrap;
+					align-self: flex-start;
 					align-items: center;
 				}
 			}
@@ -458,7 +486,6 @@
 
 		& > .control {
 			display: flex;
-			flex-direction: row-reverse;
 		}
 
 		// .key-content::after,
@@ -487,23 +514,23 @@
 		max-width: 300px;
 	}
 
-	.page__head {
+	.rule__header {
 		display: flex;
 		border-bottom: 1.5px solid $primaryColor;
 		justify-content: space-between;
 		align-items: center;
 
-		.page__title {
+		.rule__title {
 			margin-top: 0;
 			margin: 1rem 0;
 		}
 	}
 
-	.page__content {
+	.rule__content {
 		padding-top: 2rem;
 
 		.status-container {
-			max-width: 50%;
+			// max-width: 50%;
 			display: flex;
 			justify-content: space-between;
 			align-items: center;
@@ -511,6 +538,10 @@
 			h3 {
 				margin: 1rem;
 				font-size: 2rem;
+			}
+
+			& > div {
+				margin-right: 100px;
 			}
 		}
 
@@ -546,7 +577,7 @@
 			display: flex;
 			align-items: center;
 			justify-content: space-between;
-			padding: 1rem 0;
+			padding: 2rem 0 1rem;
 			margin-bottom: 1rem 0 2rem;
 		}
 
@@ -734,34 +765,8 @@
 
 		.control {
 			display: flex;
-			flex-direction: row-reverse;
+			// flex-direction: row-reverse;
 			flex-wrap: wrap;
-
-			.unsaved-changes-message {
-				flex-basis: 100%;
-				font-size: 1.5rem;
-				text-align: center;
-				color: $primaryColor;
-				animation: blinkingText 1.2s infinite;
-			}
-
-			@keyframes blinkingText {
-				0% {
-					color: $primaryColor;
-				}
-				49% {
-					color: $primaryColor;
-				}
-				60% {
-					color: transparent;
-				}
-				99% {
-					color: transparent;
-				}
-				100% {
-					color: $primaryColor;
-				}
-			}
 
 			.btn {
 				margin: 0 1rem;

@@ -731,11 +731,6 @@ router
 				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error!' })
 			);
 	})
-	/**
-	 * get meta data from Udit's API, combine and convert the response
-	 * save rules in the redux store
-	 * api to save/update data to hbDoc
-	 */
 	.get('/rules/meta', (req, res) => {
 		const apis = {
 			devices:
@@ -842,15 +837,6 @@ router
 			)
 			.then(data => res.send(data))
 			.catch(error => res.status(httpStatus.BAD_REQUEST).send(error.message));
-
-		// const requests = [];
-		// const countryReq = axios.get;
-
-		// return axios
-		// 	.get(
-		// 		'https://api.adpushup.com/CentralReportingWebService/site/list?list_name=GET_ALL_COUNTRIES'
-		// 	)
-		// 	.then(response => response.data.status);
 	})
 	.get('/rules/:siteId', (req, res) => {
 		const { siteId } = req.params;
@@ -867,12 +853,12 @@ router
 				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error!' });
 			});
 	})
-	.put('/rules/:siteId', (req, res) => {
+	.post('/rules/:siteId', (req, res) => {
 		const { siteId } = req.params;
 		const { email } = req.user;
-		const { rule, ruleIndex } = req.body;
+		const { rule } = req.body;
 
-		console.log({ body: req.body });
+		const newRule = { ...rule, createdAt: new Date().getTime() };
 
 		return userModel
 			.verifySiteOwner(email, siteId)
@@ -880,9 +866,44 @@ router
 			.then(() => headerBiddingModel.getHbConfig(siteId, email))
 			.then(hbConfig => {
 				const rules = hbConfig.get('rules') || [];
+				hbConfig.set('rules', [...rules, newRule]);
+				return hbConfig.save();
+			})
+			.then(({ data: { rules } }) => res.status(httpStatus.OK).json(rules))
+			.catch(err => {
+				// eslint-disable-next-line no-console
+				console.log(err);
 
-				const isValidRuleIndex = parseInt(ruleIndex, 10);
-				Number.isNaN(isValidRuleIndex) ? rules.push(rule) : (rules[isValidRuleIndex] = rule);
+				if (err instanceof AdPushupError) {
+					return res.status(httpStatus.BAD_REQUEST).json({ error: err.message });
+				}
+
+				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error!' });
+			});
+	})
+	.put('/rules/:siteId', (req, res) => {
+		const { siteId } = req.params;
+		const { email } = req.user;
+		const { rule, ruleIndex } = req.body;
+
+		return userModel
+			.verifySiteOwner(email, siteId)
+			.then(() => FormValidator.validate(rule, schema.hbRules.rule))
+			.then(() => {
+				const parsedRuleIndex = parseInt(ruleIndex, 10);
+				if (Number.isNaN(parsedRuleIndex)) {
+					throw new AdPushupError('Invalid data given to edit rule');
+				}
+			})
+			.then(() => headerBiddingModel.getHbConfig(siteId, email))
+			.then(hbConfig => {
+				const rules = hbConfig.get('rules') || [];
+
+				if (rules.length <= ruleIndex) {
+					throw new AdPushupError('Invalid data given to edit rule');
+				}
+
+				rules[ruleIndex] = { ...rules[ruleIndex], ...rule };
 
 				hbConfig.set('rules', rules);
 				return hbConfig.save();

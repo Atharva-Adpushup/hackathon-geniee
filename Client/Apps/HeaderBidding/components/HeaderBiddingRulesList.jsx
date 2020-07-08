@@ -1,5 +1,7 @@
 import React from 'react';
+import moment from 'moment';
 import { Table, Button } from '@/Client/helpers/react-bootstrap-imports';
+import CustomToggleSwitch from '../../../Components/CustomToggleSwitch';
 
 class HeaderBiddingRulesList extends React.Component {
 	renderTable = () => {
@@ -8,9 +10,10 @@ class HeaderBiddingRulesList extends React.Component {
 				<thead>
 					<tr>
 						<th>S.No</th>
-						<th>Status</th>
+						<th>Date Added</th>
 						<th>Triggers and Actions</th>
 						<th>Edit</th>
+						<th>Status</th>
 					</tr>
 				</thead>
 				<tbody>{this.renderTableBodyRows()}</tbody>
@@ -22,6 +25,7 @@ class HeaderBiddingRulesList extends React.Component {
 		const {
 			rules,
 			onEditRule,
+			onToggleStatus,
 			actionKeyOptions,
 			actionValueOptions,
 			triggerKeyOptions,
@@ -59,9 +63,9 @@ class HeaderBiddingRulesList extends React.Component {
 		}
 
 		return rules.map((rule, index) => {
-			const { isActive, triggers, actions } = rule;
+			const { isActive, triggers, actions, createdAt } = rule;
 
-			const triggersContent = triggers.map(trigger => {
+			const triggersContent = triggers.map((trigger, index) => {
 				// key, operator, value
 				const { key, operator, value } = trigger;
 				const keyContent = triggersKeyMap[key];
@@ -83,21 +87,28 @@ class HeaderBiddingRulesList extends React.Component {
 						hasWeekend && convertedValue.push(weekend.join(','));
 					}
 
-					valueContent = convertedValue.map(val => triggersValueMap[key][val]).join(', ');
+					valueContent = convertedValue.map(val => `'${triggersValueMap[key][val]}'`).join(', ');
 				} else {
 					valueContent = triggersValueMap[key][value];
 				}
 
 				return (
 					<div className="trigger-content" key={key}>
-						<span className="content-item key-content">{keyContent} </span>
-						<span className="content-item operator-content">{operatorContent} </span>
+						<span className="content-item serial">{index + 1}. </span>
+						<span className="content-item key-content">
+							{keyContent}
+							{/*  &ndash;  */}&nbsp;{' '}
+						</span>
+						<span className="content-item operator-content">
+							{operatorContent.replace('IS', '')}
+							{/*  &ndash;  */}&nbsp;
+						</span>
 						<span className="content-item value-content">{valueContent}</span>
 					</div>
 				);
 			});
 
-			const actionsContent = actions.map(action => {
+			const actionsContent = actions.map((action, index) => {
 				const { key, value } = action;
 				const keyContent = actionsKeyMap[key];
 
@@ -113,7 +124,11 @@ class HeaderBiddingRulesList extends React.Component {
 
 				return (
 					<div className="action-content" key={key}>
-						<span className="content-item key-content">{keyContent} </span>
+						<span className="content-item serial">{index + 1}. </span>
+						<span className="content-item key-content">
+							{keyContent}
+							{/*  &ndash;  */}&nbsp;
+						</span>
 						<span className="content-item value-content">{valueContent}</span>
 					</div>
 				);
@@ -122,7 +137,8 @@ class HeaderBiddingRulesList extends React.Component {
 			return (
 				<tr key={`rule-${index}`}>
 					<td>{index + 1}</td>
-					<td className={isActive ? 'enabled' : 'disabled'}>{isActive ? 'Enabled' : 'Disabled'}</td>
+					<td>{moment(createdAt).format('lll')}</td>
+					{/* <td className={isActive ? 'enabled' : 'disabled'}>{isActive ? 'Enabled' : 'Disabled'}</td> */}
 					<td>
 						<div className="triggers-section">
 							<div className="section-heading">Triggers</div>
@@ -137,6 +153,19 @@ class HeaderBiddingRulesList extends React.Component {
 						<Button className="btn-primary" onClick={() => onEditRule(index)}>
 							Edit
 						</Button>
+					</td>
+					<td>
+						<CustomToggleSwitch
+							defaultLayout
+							checked={isActive}
+							onChange={value => onToggleStatus(index, value)}
+							name="isActive"
+							layout="nolabel"
+							size="m"
+							id="isActive"
+							on="Enable"
+							off="Disable"
+						/>
 					</td>
 				</tr>
 			);

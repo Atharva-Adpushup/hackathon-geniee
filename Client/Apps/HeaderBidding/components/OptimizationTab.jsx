@@ -5,6 +5,7 @@ import _cloneDeep from 'lodash/cloneDeep';
 import { Button } from '@/Client/helpers/react-bootstrap-imports';
 
 import history from '../../../helpers/history';
+import utils from '../../../helpers/utils';
 import axiosInstance from '../../../helpers/axiosInstance';
 import HeaderBiddingRuleActions from './HeaderBiddingRuleActions';
 import HeaderBiddingRuleTriggers from './HeaderBiddingRuleTriggers';
@@ -136,8 +137,9 @@ class OptimizationTab extends React.Component {
 		};
 
 		this.handleSubmit = this.handleSubmit.bind(this);
-		this.handleCancel = this.handleCancel.bind(this);
+		this.goBackToList = this.goBackToList.bind(this);
 		this.handleEditRule = this.handleEditRule.bind(this);
+		this.handleToggleStatus = this.handleToggleStatus.bind(this);
 		this.handleRuleStatusChange = this.handleRuleStatusChange.bind(this);
 
 		this.handleAddTrigger = this.handleAddTrigger.bind(this);
@@ -782,15 +784,13 @@ class OptimizationTab extends React.Component {
 				const notification = {
 					mode: 'success',
 					title: 'Operation Successful',
-					message: 'Rule added successfully',
+					message: `Rule ${utils.isNumber(selectedRuleIndex) ? 'updated' : 'added'} successfully`,
 					autoDismiss: 5
 				};
 
 				setUnsavedChangesAction(true);
 				showNotification(notification);
-				this.setState({
-					activeComponent: 'list-component'
-				});
+				this.goBackToList(false);
 			})
 			.catch(error => {
 				console.error(error);
@@ -804,10 +804,11 @@ class OptimizationTab extends React.Component {
 			});
 	}
 
-	handleCancel() {
-		const confirmed = window.confirm('Are you sure? Any unsaved changes made will be lost!');
+	goBackToList(getConfirmation = true) {
+		const confirmed =
+			getConfirmation && window.confirm('Are you sure? Any unsaved changes made will be lost!');
 
-		if (!confirmed) return;
+		if (getConfirmation && !confirmed) return;
 
 		this.setState({
 			selectedRuleIndex: null,
@@ -828,7 +829,6 @@ class OptimizationTab extends React.Component {
 	}
 
 	renderRuleComponent() {
-		const { hasUnsavedChanges } = this.props;
 		const { actions, triggers, isActive, selectedRuleIndex } = this.state;
 
 		const actionDropdownOptions = this.getDropdownOptionsForAction();
@@ -836,14 +836,13 @@ class OptimizationTab extends React.Component {
 
 		return (
 			<>
-				<div className="page__head">
-					<h3 className="page__title">{selectedRuleIndex !== null ? 'Edit ' : 'Add '} Rule</h3>
-					<Button className="btn-primary" onClick={this.handleCancel}>
-						Go Back to Rules List
-					</Button>
+				<div className="rule__header">
+					<h3 className="rule__title">
+						{utils.isNumber(selectedRuleIndex) ? 'Edit ' : 'Add '} Rule
+					</h3>
 				</div>
 
-				<div className="page__content">
+				<div className="rule__content">
 					<div className="status-container">
 						<h3>Rule Status</h3>
 						<CustomToggleSwitch
@@ -883,23 +882,50 @@ class OptimizationTab extends React.Component {
 						<Button className="btn-primary" onClick={this.handleSubmit}>
 							Save
 						</Button>
-						<Button className="btn-secondary" onClick={this.handleCancel}>
+						<Button className="btn-secondary" onClick={this.goBackToList}>
 							Cancel
 						</Button>
-						{hasUnsavedChanges && (
-							<div className="unsaved-changes-message">
-								Please make sure you press the Master Save button
-							</div>
-						)}
 					</div>
 				</div>
 			</>
 		);
 	}
 
+	handleToggleStatus(index, value) {
+		const { siteId, showNotification, saveHBRulesAction, setUnsavedChangesAction } = this.props;
+
+		const rule = {
+			isActive: value
+		};
+
+		saveHBRulesAction(siteId, { rule, ruleIndex: index })
+			.then(() => {
+				const notification = {
+					mode: 'success',
+					title: 'Operation Successful',
+					message: `Rule updated successfully`,
+					autoDismiss: 5
+				};
+
+				setUnsavedChangesAction(true);
+				showNotification(notification);
+				// this.goBackToList(false);
+			})
+			.catch(error => {
+				console.error(error);
+
+				showNotification({
+					mode: 'error',
+					title: 'Operation Failed',
+					message: error.message,
+					autoDismiss: 5
+				});
+			});
+	}
+
 	handleEditRule(index) {
 		const { rules } = this.props;
-		const { triggers, actions } = rules[index];
+		const { triggers, actions, isActive } = rules[index];
 
 		// convert weekday, weekend value from array to string
 		const convertedTriggers = triggers.map(trigger => {
@@ -924,6 +950,7 @@ class OptimizationTab extends React.Component {
 
 		this.setState(
 			{
+				isActive,
 				actions: _cloneDeep(actions),
 				triggers: _cloneDeep(convertedTriggers),
 				activeComponent: 'rule-component',
@@ -959,6 +986,7 @@ class OptimizationTab extends React.Component {
 				<HeaderBiddingRulesList
 					rules={rules}
 					onEditRule={this.handleEditRule}
+					onToggleStatus={this.handleToggleStatus}
 					triggerKeyOptions={triggerKeyOptions}
 					triggerOperatorOptions={triggerOperatorOptions}
 					triggerValueOptions={triggerValueOptions}
@@ -986,23 +1014,30 @@ class OptimizationTab extends React.Component {
 	}
 
 	render() {
-		const { showLoader } = this.state;
+		const { showLoader, activeComponent } = this.state;
+
+		if (showLoader) {
+			return <Loader />;
+		}
 
 		return (
 			<div className="hb-rules white-tab-container">
-				{showLoader ? (
-					<Loader />
-				) : (
-					<>
+				<div className="page__header">
+					<div className="page__title">
 						<h3 className="u-margin-t0">Advanced Configuration</h3>
 						<p className="u-margin-b4">
 							Can result in drastic performance issues. Please contact support if you do not
 							understand what this means.
 						</p>
+					</div>
+					{activeComponent !== 'list-component' && (
+						<Button className="btn-primary" onClick={this.goBackToList}>
+							Go Back to Rules List
+						</Button>
+					)}
+				</div>
 
-						{this.renderComponent()}
-					</>
-				)}
+				{this.renderComponent()}
 			</div>
 		);
 	}

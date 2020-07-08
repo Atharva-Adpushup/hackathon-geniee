@@ -129,9 +129,10 @@ export const fetchHBRulesAction = siteId => dispatch => {
 		});
 };
 
-export const saveHBRulesAction = (siteId, data) => dispatch => {
-	return service
-		.saveHbRule(siteId, data)
+export const saveHBRulesAction = (siteId, { rule, ruleIndex }) => dispatch => {
+	const updaterFn = typeof ruleIndex === 'number' ? service.updateHbRule : service.saveHbRule;
+
+	return updaterFn(siteId, { rule, ruleIndex })
 		.then(({ data: rules }) => dispatch({ type: UPDATE_HB_RULES, siteId, rules }))
 		.catch(error => {
 			const { response } = error;
