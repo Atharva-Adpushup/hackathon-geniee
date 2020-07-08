@@ -591,6 +591,20 @@ function storedRequestWrapper(doc) {
 	);
 }
 
+function publishAdPushupBuild(siteId) {
+	var options = {
+		method: 'POST',
+		uri: `${config.queuePublishingURL}/publish`,
+		body: {
+			queue: 'CDN_SYNC',
+			data: { siteId }
+		},
+		json: true
+	};
+
+	return request(options);
+}
+
 module.exports = {
 	verifyOwner,
 	errorHandler,
@@ -608,5 +622,6 @@ module.exports = {
 	fetchCustomStatuses,
 	checkParams,
 	queuePublishingWrapper,
-	storedRequestWrapper
+	storedRequestWrapper,
+	publishAdPushupBuild
 };

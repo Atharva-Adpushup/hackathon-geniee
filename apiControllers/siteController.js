@@ -21,7 +21,8 @@ const {
 	errorHandler,
 	checkParams,
 	appBucket,
-	emitEventAndSendResponse
+	emitEventAndSendResponse,
+	publishAdPushupBuild
 } = require('../helpers/routeHelpers');
 const proxy = require('../helpers/proxy');
 const pageGroupController = require('./pageGroupController');
@@ -747,6 +748,15 @@ router
 			.then(() => updateSizeMapping(type))
 			.catch(err => errorHandler(err, res));
 	})
-	.use('/:siteId/pagegroup/', pageGroupController);
+	.use('/:siteId/pagegroup/', pageGroupController)
+	.post('/:siteId/forceApBuild', (req, res) => {
+		const { siteId } = req.params;
+		if (!siteId || siteId.trim().length === 0) {
+			return res.status(404).json({ message: 'Invalid Site ID' });
+		}
+		return publishAdPushupBuild(siteId)
+			.then(() => res.json({ message: 'Build pushed' }))
+			.catch(() => res.json({ message: 'Error publishing build' }));
+	});
 
 module.exports = router;
