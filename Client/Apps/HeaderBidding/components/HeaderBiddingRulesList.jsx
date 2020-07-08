@@ -66,9 +66,27 @@ class HeaderBiddingRulesList extends React.Component {
 				const { key, operator, value } = trigger;
 				const keyContent = triggersKeyMap[key];
 				const operatorContent = triggersOperatorMap[operator];
-				const valueContent = Array.isArray(value)
-					? value.map(val => triggersValueMap[key][val]).join(', ')
-					: triggersValueMap[key][value];
+				let valueContent;
+
+				if (Array.isArray(value)) {
+					let convertedValue = value;
+
+					if (key == 'day_of_the_week') {
+						const weekend = ['saturday', 'sunday'];
+						const weekday = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+
+						const hasWeekday = weekday.every(day => value.includes(day));
+						const hasWeekend = weekend.every(day => value.includes(day));
+
+						convertedValue = [];
+						hasWeekday && convertedValue.push(weekday.join(','));
+						hasWeekend && convertedValue.push(weekend.join(','));
+					}
+
+					valueContent = convertedValue.map(val => triggersValueMap[key][val]).join(', ');
+				} else {
+					valueContent = triggersValueMap[key][value];
+				}
 
 				return (
 					<div className="trigger-content" key={key}>

@@ -742,10 +742,18 @@ class OptimizationTab extends React.Component {
 
 		const triggersData = triggers.reduce((data, trigger) => {
 			if (!trigger.isIgnored) {
+				const value =
+					trigger.key === 'day_of_the_week'
+						? trigger.value.reduce((output, val) => {
+								output = output.concat(val.split(','));
+								return output;
+						  }, [])
+						: trigger.value;
+
 				data.push({
 					key: trigger.key,
 					operator: trigger.operator,
-					value: trigger.value
+					value
 				});
 			}
 			return data;
@@ -780,6 +788,9 @@ class OptimizationTab extends React.Component {
 
 				setUnsavedChangesAction(true);
 				showNotification(notification);
+				this.setState({
+					activeComponent: 'list-component'
+				});
 			})
 			.catch(error => {
 				console.error(error);
@@ -890,10 +901,31 @@ class OptimizationTab extends React.Component {
 		const { rules } = this.props;
 		const { triggers, actions } = rules[index];
 
+		// convert weekday, weekend value from array to string
+		const convertedTriggers = triggers.map(trigger => {
+			let convertedValue = trigger.value;
+
+			if (trigger.key == 'day_of_the_week') {
+				const weekend = ['saturday', 'sunday'];
+				const weekday = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+
+				const hasWeekday = weekday.every(day => trigger.value.includes(day));
+				const hasWeekend = weekend.every(day => trigger.value.includes(day));
+
+				convertedValue = [];
+				hasWeekday && convertedValue.push(weekday.join(','));
+				hasWeekend && convertedValue.push(weekend.join(','));
+			}
+
+			trigger.value = convertedValue;
+
+			return trigger;
+		});
+
 		this.setState(
 			{
 				actions: _cloneDeep(actions),
-				triggers: _cloneDeep(triggers),
+				triggers: _cloneDeep(convertedTriggers),
 				activeComponent: 'rule-component',
 				selectedRuleIndex: index
 			},
