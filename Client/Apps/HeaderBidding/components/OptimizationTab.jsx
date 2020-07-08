@@ -16,10 +16,13 @@ import HeaderBiddingRulesList from './HeaderBiddingRulesList';
 const getConvertedBiddersData = bidders => {
 	const { addedBidders } = bidders;
 
-	return Object.values(addedBidders).map(({ name }) => ({
-		label: name,
-		value: name
-	}));
+	return Object.keys(addedBidders).map(bidderCode => {
+		const { name } = addedBidders[bidderCode];
+		return {
+			label: name,
+			value: bidderCode
+		};
+	});
 };
 
 const getConvertedAdUnitsData = adUnits =>
