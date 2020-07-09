@@ -11,9 +11,8 @@ const Card = React.forwardRef(
 		}));
 		return (
 			<div ref={elementRef} className={`draggable-card ${isDragging ? 'dragging' : ''}`}>
-				<div>
-					<span className="order">{`${index + 1}`}</span> - {text}
-				</div>
+				<span className="order">{`${index + 1}`}</span>
+				<span className="bidder">{text}</span>
 			</div>
 		);
 	}
