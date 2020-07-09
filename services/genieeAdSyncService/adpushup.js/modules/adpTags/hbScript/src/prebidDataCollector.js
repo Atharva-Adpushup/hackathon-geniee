@@ -160,6 +160,9 @@ var helpers = {
 	},
 	getBidWonFeedbackData: function(slot, defaultWinner, bidWonData) {
 		var winner = slot.feedback.winner || defaultWinner;
+		if (bidWonData.source === 's2s') {
+			winner = winner + '[s2s]';
+		}
 		var winningRevenue = slot.feedback.winningRevenue || 0;
 		var bidResponseTime = bidWonData['timeToRespond'];
 
