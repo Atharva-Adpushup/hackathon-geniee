@@ -251,50 +251,50 @@ var utils = {
 
 		const highestWidthPossible = highestSizeAvailable[0];
 		const highestHeightPossible = highestSizeAvailable[1];
-		let playerWidth = highestWidthPossible;
-		let playerHeight = highestHeightPossible;
-		let gcd;
+		// let playerWidth = highestWidthPossible;
+		// let playerHeight = highestHeightPossible;
+		// let gcd;
 
-		if (
-			highestWidthPossible < highestHeightPossible &&
-			highestHeightPossible >= 16 &&
-			highestWidthPossible >= 9 &&
-			!JSON.stringify(VIDEO_PLAYER_EXCEPTION_SIZES).includes(
-				JSON.stringify(highestSizeAvailable)
-			)
-		) {
-			//9:16 aspect ratio
-			gcd = parseInt(highestHeightPossible / 16);
-			playerHeight = gcd * 16;
-			playerWidth = gcd * 9;
+		// if (
+		// 	highestWidthPossible < highestHeightPossible &&
+		// 	highestHeightPossible >= 16 &&
+		// 	highestWidthPossible >= 9 &&
+		// 	!JSON.stringify(VIDEO_PLAYER_EXCEPTION_SIZES).includes(
+		// 		JSON.stringify(highestSizeAvailable)
+		// 	)
+		// ) {
+		// 	//9:16 aspect ratio
+		// 	gcd = parseInt(highestHeightPossible / 16);
+		// 	playerHeight = gcd * 16;
+		// 	playerWidth = gcd * 9;
 
-			if (highestWidthPossible < playerWidth) {
-				gcd = parseInt(highestWidthPossible / 9);
-				playerHeight = gcd * 16;
-				playerWidth = gcd * 9;
-			}
-		}
-		if (
-			highestWidthPossible >= highestHeightPossible &&
-			highestWidthPossible >= 16 &&
-			highestHeightPossible >= 9 &&
-			!JSON.stringify(VIDEO_PLAYER_EXCEPTION_SIZES).includes(
-				JSON.stringify(highestSizeAvailable)
-			)
-		) {
-			//16:9 aspect ratio
-			gcd = parseInt(highestWidthPossible / 16);
-			playerWidth = gcd * 16;
-			playerHeight = gcd * 9;
+		// 	if (highestWidthPossible < playerWidth) {
+		// 		gcd = parseInt(highestWidthPossible / 9);
+		// 		playerHeight = gcd * 16;
+		// 		playerWidth = gcd * 9;
+		// 	}
+		// }
+		// if (
+		// 	highestWidthPossible >= highestHeightPossible &&
+		// 	highestWidthPossible >= 16 &&
+		// 	highestHeightPossible >= 9 &&
+		// 	!JSON.stringify(VIDEO_PLAYER_EXCEPTION_SIZES).includes(
+		// 		JSON.stringify(highestSizeAvailable)
+		// 	)
+		// ) {
+		// 	//16:9 aspect ratio
+		// 	gcd = parseInt(highestWidthPossible / 16);
+		// 	playerWidth = gcd * 16;
+		// 	playerHeight = gcd * 9;
 
-			if (highestHeightPossible < playerHeight) {
-				gcd = parseInt(highestHeightPossible / 9);
-				playerHeight = gcd * 9;
-				playerWidth = gcd * 16;
-			}
-		}
+		// 	if (highestHeightPossible < playerHeight) {
+		// 		gcd = parseInt(highestHeightPossible / 9);
+		// 		playerHeight = gcd * 9;
+		// 		playerWidth = gcd * 16;
+		// 	}
+		// }
 
-		return [playerWidth, playerHeight];
+		return [highestWidthPossible, highestHeightPossible];
 	},
 	isSlotATF: function(slot) {
 		if (!slot) return;
