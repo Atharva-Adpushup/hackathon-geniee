@@ -33,13 +33,24 @@ class AddManageSizelessBidder extends React.Component {
 		switch (formType) {
 			case 'add': {
 				const {
-					bidderConfig: { key, name, sizeLess, reusable, isApRelation, params, isAmpActive, isS2S }
+					bidderConfig: {
+						key,
+						name,
+						sizeLess,
+						reusable,
+						isApRelation,
+						params,
+						isAmpActive,
+						isS2SActive,
+						isS2S
+					}
 				} = this.props;
 
 				// disable the AMP status if not isS2S
 				if (!isS2S) {
 					this.bidderFormFieldsMeta.fieldsToDisable = {
-						isAmpActive: 'bidderConfig.isAmpActive'
+						isAmpActive: 'bidderConfig.isAmpActive',
+						isS2SActive: 'bidderConfig.isS2SActive'
 					};
 				}
 
@@ -86,6 +97,7 @@ class AddManageSizelessBidder extends React.Component {
 							sizeLess,
 							reusable,
 							isAmpActive,
+							isS2SActive,
 							...newState.bidderConfig
 						};
 						newState.validationSchema = getValidationSchema({
@@ -117,14 +129,16 @@ class AddManageSizelessBidder extends React.Component {
 						bids,
 						revenueShare,
 						isAmpActive,
+						isS2SActive,
 						isS2S
 					}
 				} = this.props;
 
-				// disable the AMP status if not isS2S
+				// disable the AMP and S2S status if not isS2S
 				if (!isS2S) {
 					this.bidderFormFieldsMeta.fieldsToDisable = {
-						isAmpActive: 'bidderConfig.isAmpActive'
+						isAmpActive: 'bidderConfig.isAmpActive',
+						isS2SActive: 'bidderConfig.isS2SActive'
 					};
 				}
 				const formFields = {
@@ -165,8 +179,11 @@ class AddManageSizelessBidder extends React.Component {
 									break;
 								case 'isAmpActive':
 									value = isAmpActive;
-
 									break;
+								case 'isS2SActive':
+									value = isS2SActive;
+									break;
+
 								default:
 							}
 
@@ -185,6 +202,7 @@ class AddManageSizelessBidder extends React.Component {
 							relation,
 							bids,
 							isAmpActive,
+							isS2SActive,
 							revenueShare,
 							...newState.bidderConfig
 						};
@@ -231,6 +249,10 @@ class AddManageSizelessBidder extends React.Component {
 					NOTE: this is also being done in the AddManageNonResponsiveBidder
 				*/
 				bidderConfig.isAmpActive = bidderConfig.isAmpActive === 'true';
+			}
+
+			if (typeof bidderConfig.isS2SActive !== 'undefined') {
+				bidderConfig.isS2SActive = bidderConfig.isS2SActive === 'true';
 			}
 
 			// eslint-disable-next-line no-unused-expressions

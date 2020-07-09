@@ -64,10 +64,30 @@ router
 		const { siteId } = req.params;
 		const { email } = req.user;
 		const {
-			bidderConfig: { key, name, relation, sizeLess, reusable, bids, revenueShare, isAmpActive },
+			bidderConfig: {
+				key,
+				name,
+				relation,
+				sizeLess,
+				reusable,
+				bids,
+				revenueShare,
+				isAmpActive,
+				isS2SActive
+			},
 			params
 		} = req.body;
-		const json = { key, name, sizeLess, reusable, relation, bids, revenueShare, isAmpActive };
+		const json = {
+			key,
+			name,
+			sizeLess,
+			reusable,
+			relation,
+			bids,
+			revenueShare,
+			isAmpActive,
+			isS2SActive
+		};
 
 		const hbConfig = {
 			hbcf: {},
@@ -96,7 +116,8 @@ router
 			revenueShare,
 			config: params,
 			isActive: true,
-			isAmpActive
+			isAmpActive,
+			isS2SActive
 		};
 
 		return (
@@ -169,7 +190,8 @@ router
 				bids,
 				revenueShare,
 				status,
-				isAmpActive
+				isAmpActive,
+				isS2SActive
 			},
 			params
 		} = req.body;
@@ -182,7 +204,8 @@ router
 			bids,
 			revenueShare,
 			status,
-			isAmpActive
+			isAmpActive,
+			isS2SActive
 		};
 
 		const hbConfig = {
@@ -206,7 +229,8 @@ router
 			revenueShare,
 			config: params,
 			isActive: true,
-			isAmpActive
+			isAmpActive,
+			isS2SActive
 		};
 
 		return (

@@ -45,6 +45,15 @@ export default function getCommonBidderFields(isApRelation, manageBidderData) {
 			isRequired: true,
 			isEditable: true,
 			defaultValue: 'false'
+		},
+		isS2SActive: {
+			name: 'S2S Web Status',
+			dataType: 'string',
+			inputType: 'selectBox',
+			options: [{ name: 'Active', value: 'true' }, { name: 'Inactive', value: 'false' }],
+			isRequired: true,
+			isEditable: true,
+			defaultValue: 'false'
 		}
 	};
 
