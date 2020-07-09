@@ -131,8 +131,10 @@ const ADCODE = `<div id="__AD_ID__" class="_ap_apex_ad"__CUSTOM_ATTRIBS__>
 	</script>
 </div>`;
 
-const REWARDED_AD_CODE = `if ($("#btnSendText_V2_Mobile").is(":visible")) {
-    if (Math.floor(Math.random() * 100) < 20) {
+const REWARDED_AD_CODE = ` 
+<script>
+if ($("#btnSendText_V2_Mobile").is(":visible")) {
+    if (Math.floor(Math.random() * 100) <script 20) {
         googletag = window.googletag || {
             cmd: []
         };
@@ -289,7 +291,9 @@ const REWARDED_AD_CODE = `if ($("#btnSendText_V2_Mobile").is(":visible")) {
             googletag.pubads().refresh([slot]);
         });
     }
-}`;
+}
+</script>
+`;
 
 const ADS_TXT_DATA = `#AdX
 google.com,pub-8933329999391104,RESELLER,f08c47fec0942fa0
