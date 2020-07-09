@@ -26,11 +26,11 @@ const getConvertedBiddersData = bidders => {
 };
 
 const getConvertedAdUnitsData = adUnits =>
-	adUnits.map(({ adUnit }) => ({ label: adUnit, value: adUnit }));
+	adUnits.map(({ adUnit, adUnitId }) => ({ label: adUnit, value: adUnitId }));
 
 class OptimizationTab extends React.Component {
 	notSupportedOptions = [
-		'triggerKeyOptions.country',
+		// 'triggerKeyOptions.country',
 		'actionKeyOptions.s2s_toggle',
 		'actionKeyOptions.s2s_timeout',
 		'actionKeyOptions.significant_bidders'
