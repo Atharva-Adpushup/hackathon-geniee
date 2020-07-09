@@ -84,13 +84,13 @@ var hb = {
 				}
 			});
 
-			var computedPlayerSize = utils.getVideoPlayerSize(prebidSizes);
+			var playerSize = utils.getVideoPlayerSize(prebidSizes);
 			var prebidSlot = {
 				code: adpSlot.containerId,
 				mediaTypes: {},
 				renderer: {
 					url: multiFormatConstants.VIDEO.RENDERER_URL,
-					render: videoRenderer.bind(null, adpSlot, computedPlayerSize)
+					render: videoRenderer.bind(null, adpSlot, playerSize)
 				},
 				bids: computedBidders
 			};
@@ -108,7 +108,7 @@ var hb = {
 						const { DEFAULT_JW_PLAYER_SIZE } = constants;
 						prebidSlot.mediaTypes.video = {
 							...mediaTypesConfig.video,
-							playerSize: computedPlayerSize
+							playerSize
 						};
 						break;
 					}

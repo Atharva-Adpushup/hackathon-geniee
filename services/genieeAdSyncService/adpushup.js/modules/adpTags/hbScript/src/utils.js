@@ -243,58 +243,58 @@ var utils = {
 	isAmazonUamEnabled: function(slot) {
 		return window.adpushup.services.HB_ACTIVE && slot && slot.headerBidding;
 	},
-	getVideoPlayerSize: function(prebidSizes) {
+	getComputedSizeByAspectRatio: function(size) {
 		const { VIDEO_PLAYER_EXCEPTION_SIZES } = constants;
+		const highestWidthPossible = size[0];
+		const highestHeightPossible = size[1];
+		let playerWidth = highestWidthPossible;
+		let playerHeight = highestHeightPossible;
+		let gcd;
+
+		if (
+			highestWidthPossible < highestHeightPossible &&
+			highestHeightPossible >= 16 &&
+			highestWidthPossible >= 9 &&
+			!JSON.stringify(VIDEO_PLAYER_EXCEPTION_SIZES).includes(JSON.stringify(size))
+		) {
+			//9:16 aspect ratio
+			gcd = parseInt(highestHeightPossible / 16);
+			playerHeight = gcd * 16;
+			playerWidth = gcd * 9;
+
+			if (highestWidthPossible < playerWidth) {
+				gcd = parseInt(highestWidthPossible / 9);
+				playerHeight = gcd * 16;
+				playerWidth = gcd * 9;
+			}
+		}
+		if (
+			highestWidthPossible >= highestHeightPossible &&
+			highestWidthPossible >= 16 &&
+			highestHeightPossible >= 9 &&
+			!JSON.stringify(VIDEO_PLAYER_EXCEPTION_SIZES).includes(JSON.stringify(size))
+		) {
+			//16:9 aspect ratio
+			gcd = parseInt(highestWidthPossible / 16);
+			playerWidth = gcd * 16;
+			playerHeight = gcd * 9;
+
+			if (highestHeightPossible < playerHeight) {
+				gcd = parseInt(highestHeightPossible / 9);
+				playerHeight = gcd * 9;
+				playerWidth = gcd * 16;
+			}
+		}
+
+		return [playerWidth, playerHeight];
+	},
+	getVideoPlayerSize: function(prebidSizes) {
 		const multipliedValue = prebidSizes.map(val => val.reduce((a, b) => a * b));
 		const index = multipliedValue.indexOf(Math.max(...multipliedValue));
 		const highestSizeAvailable = prebidSizes[index];
 
-		const highestWidthPossible = highestSizeAvailable[0];
-		const highestHeightPossible = highestSizeAvailable[1];
-		// let playerWidth = highestWidthPossible;
-		// let playerHeight = highestHeightPossible;
-		// let gcd;
-
-		// if (
-		// 	highestWidthPossible < highestHeightPossible &&
-		// 	highestHeightPossible >= 16 &&
-		// 	highestWidthPossible >= 9 &&
-		// 	!JSON.stringify(VIDEO_PLAYER_EXCEPTION_SIZES).includes(
-		// 		JSON.stringify(highestSizeAvailable)
-		// 	)
-		// ) {
-		// 	//9:16 aspect ratio
-		// 	gcd = parseInt(highestHeightPossible / 16);
-		// 	playerHeight = gcd * 16;
-		// 	playerWidth = gcd * 9;
-
-		// 	if (highestWidthPossible < playerWidth) {
-		// 		gcd = parseInt(highestWidthPossible / 9);
-		// 		playerHeight = gcd * 16;
-		// 		playerWidth = gcd * 9;
-		// 	}
-		// }
-		// if (
-		// 	highestWidthPossible >= highestHeightPossible &&
-		// 	highestWidthPossible >= 16 &&
-		// 	highestHeightPossible >= 9 &&
-		// 	!JSON.stringify(VIDEO_PLAYER_EXCEPTION_SIZES).includes(
-		// 		JSON.stringify(highestSizeAvailable)
-		// 	)
-		// ) {
-		// 	//16:9 aspect ratio
-		// 	gcd = parseInt(highestWidthPossible / 16);
-		// 	playerWidth = gcd * 16;
-		// 	playerHeight = gcd * 9;
-
-		// 	if (highestHeightPossible < playerHeight) {
-		// 		gcd = parseInt(highestHeightPossible / 9);
-		// 		playerHeight = gcd * 9;
-		// 		playerWidth = gcd * 16;
-		// 	}
-		// }
-
-		return [highestWidthPossible, highestHeightPossible];
+		// return this.getComputedSizeByAspectRatio(highestSizeAvailable);
+		return highestSizeAvailable;
 	},
 	isSlotATF: function(slot) {
 		if (!slot) return;
