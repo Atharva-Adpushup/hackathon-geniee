@@ -444,20 +444,31 @@
 				width: 100px;
 			}
 
+			.triggers-section,
+			.actions-section {
+				background-color: rgba(0, 0, 0, 0.08);
+				padding: 0 1rem 1rem;
+			}
+
 			.triggers-section {
-				padding-bottom: 1rem;
+				margin-bottom: 1rem;
 			}
 
 			.section-heading {
 				padding: 1rem;
+				text-transform: uppercase;
 				text-align: center;
 				font-size: 1.5rem;
-				color: rgba(0, 0, 0, 0.5);
+				font-weight: 800;
+				color: rgba(0, 0, 0, 0.6);
+				border-bottom: 1px solid rgba(0, 0, 0, 0.3);
 			}
 
 			.trigger-content,
 			.action-content {
+				font-size: 1.5rem;
 				display: flex;
+				margin: 0.75rem 0;
 
 				.serial {
 					width: 1%;
@@ -465,18 +476,18 @@
 				}
 
 				.key-content {
-					// min-width: 25%;
+					min-width: 25%;
 					white-space: nowrap;
 				}
 
 				.operator-content {
-					// min-width: 10%;
+					min-width: 10%;
 					white-space: nowrap;
 				}
 
 				.content-item {
 					display: flex;
-					// margin: 1rem;
+					margin: 0 1rem;
 					flex-wrap: wrap;
 					align-self: flex-start;
 					align-items: center;
@@ -487,11 +498,6 @@
 		& > .control {
 			display: flex;
 		}
-
-		// .key-content::after,
-		// .operator-content::after {
-		// 	content: '&#8210';
-		// }
 	}
 
 	.divider {
@@ -765,7 +771,7 @@
 
 		.control {
 			display: flex;
-			// flex-direction: row-reverse;
+			flex-direction: row-reverse;
 			flex-wrap: wrap;
 
 			.btn {

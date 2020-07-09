@@ -3,24 +3,13 @@ import moment from 'moment';
 import { Table, Button } from '@/Client/helpers/react-bootstrap-imports';
 import CustomToggleSwitch from '../../../Components/CustomToggleSwitch';
 
-class HeaderBiddingRulesList extends React.Component {
-	renderTable = () => {
-		return (
-			<Table striped bordered condensed hover responsive size="sm" className="rules-list-table">
-				<thead>
-					<tr>
-						<th>S.No</th>
-						<th>Date Added</th>
-						<th>Triggers and Actions</th>
-						<th>Edit</th>
-						<th>Status</th>
-					</tr>
-				</thead>
-				<tbody>{this.renderTableBodyRows()}</tbody>
-			</Table>
-		);
-	};
+const createMapForDropdown = options =>
+	options.reduce((map, option) => {
+		map[option.value] = option.label;
+		return map;
+	}, {});
 
+class HeaderBiddingRulesList extends React.Component {
 	renderTableBodyRows = () => {
 		const {
 			rules,
@@ -33,11 +22,15 @@ class HeaderBiddingRulesList extends React.Component {
 			triggerValueOptions
 		} = this.props;
 
-		const createMapForDropdown = options =>
-			options.reduce((map, option) => {
-				map[option.value] = option.label;
-				return map;
-			}, {});
+		if (!rules.length) {
+			return (
+				<tr>
+					<td colSpan="5" className="text-center u-padding-3">
+						No Rules Found
+					</td>
+				</tr>
+			);
+		}
 
 		const triggersKeyMap = createMapForDropdown(triggerKeyOptions);
 		const triggersOperatorMap = createMapForDropdown(triggerOperatorOptions);
@@ -51,16 +44,6 @@ class HeaderBiddingRulesList extends React.Component {
 			map[key] = createMapForDropdown(actionValueOptions[key]);
 			return map;
 		}, {});
-
-		if (!rules.length) {
-			return (
-				<tr>
-					<td colSpan="5" className="text-center u-padding-3">
-						No Rules Found
-					</td>
-				</tr>
-			);
-		}
 
 		return rules.map((rule, index) => {
 			const { isActive, triggers, actions, createdAt } = rule;
@@ -87,7 +70,7 @@ class HeaderBiddingRulesList extends React.Component {
 						hasWeekend && convertedValue.push(weekend.join(','));
 					}
 
-					valueContent = convertedValue.map(val => `'${triggersValueMap[key][val]}'`).join(', ');
+					valueContent = convertedValue.map(val => triggersValueMap[key][val]).join(', ');
 				} else {
 					valueContent = triggersValueMap[key][value];
 				}
@@ -95,13 +78,9 @@ class HeaderBiddingRulesList extends React.Component {
 				return (
 					<div className="trigger-content" key={key}>
 						<span className="content-item serial">{index + 1}. </span>
-						<span className="content-item key-content">
-							{keyContent}
-							{/*  &ndash;  */}&nbsp;{' '}
-						</span>
+						<span className="content-item key-content">{keyContent}</span>
 						<span className="content-item operator-content">
 							{operatorContent.replace('IS', '')}
-							{/*  &ndash;  */}&nbsp;
 						</span>
 						<span className="content-item value-content">{valueContent}</span>
 					</div>
@@ -125,10 +104,7 @@ class HeaderBiddingRulesList extends React.Component {
 				return (
 					<div className="action-content" key={key}>
 						<span className="content-item serial">{index + 1}. </span>
-						<span className="content-item key-content">
-							{keyContent}
-							{/*  &ndash;  */}&nbsp;
-						</span>
+						<span className="content-item key-content">{keyContent}</span>
 						<span className="content-item value-content">{valueContent}</span>
 					</div>
 				);
@@ -138,7 +114,6 @@ class HeaderBiddingRulesList extends React.Component {
 				<tr key={`rule-${index}`}>
 					<td>{index + 1}</td>
 					<td>{moment(createdAt).format('lll')}</td>
-					{/* <td className={isActive ? 'enabled' : 'disabled'}>{isActive ? 'Enabled' : 'Disabled'}</td> */}
 					<td>
 						<div className="triggers-section">
 							<div className="section-heading">Triggers</div>
@@ -173,7 +148,20 @@ class HeaderBiddingRulesList extends React.Component {
 	};
 
 	render() {
-		return this.renderTable();
+		return (
+			<Table striped bordered condensed hover responsive size="sm" className="rules-list-table">
+				<thead>
+					<tr>
+						<th>S.No</th>
+						<th>Date Added</th>
+						<th>Rules</th>
+						<th>Edit</th>
+						<th>Status</th>
+					</tr>
+				</thead>
+				<tbody>{this.renderTableBodyRows()}</tbody>
+			</Table>
+		);
 	}
 }
 
