@@ -6,6 +6,7 @@ var config = require('./config');
 var adpConfig = window.adpushup.config;
 var constants = require('./constants');
 var render = require('./render');
+var s2sConfigGen = require('./s2sConfigGen');
 var auction = {
 	end: function(adpBatchId) {
 		var adpBatches = adpConfig.apLiteActive
@@ -38,12 +39,8 @@ var auction = {
 		adpBatch.auctionStatus.prebid = 'done';
 		return this.end(adpBatchId);
 	},
-	requestBids: function(pbjs, adpBatchId, slotCodes, hasRefreshSlots = false) {
+	requestBids: function(pbjs, adpBatchId, slotCodes, timeOut) {
 		var that = this;
-		var timeOut = hasRefreshSlots
-			? config.PREBID_CONFIG.prebidConfig.refreshTimeOut ||
-			  config.PREBID_CONFIG.prebidConfig.timeOut
-			: config.PREBID_CONFIG.prebidConfig.timeOut;
 
 		pbjs.requestBids({
 			timeout: timeOut || constants.PREBID.TIMEOUT,
@@ -143,7 +140,7 @@ var auction = {
 			}
 		}
 	},
-	setPrebidConfig: function(pbjs) {
+	setPrebidConfig: function(pbjs, prebidAuctionTimeOut) {
 		var pbConfig = {
 			rubicon: {
 				singleRequest: true
@@ -187,6 +184,11 @@ var auction = {
 				}
 			}
 		};
+
+		const s2sConfigObj = s2sConfigGen.generateS2SConfig(prebidAuctionTimeOut);
+		if (s2sConfigObj) {
+			pbConfig.s2sConfig = s2sConfigObj;
+		}
 
 		if (
 			config.PREBID_CONFIG.currencyConfig &&
@@ -232,6 +234,7 @@ var auction = {
 		var pbjs = window._apPbJs,
 			slotCodes = [],
 			hasRefreshSlots,
+			prebidAuctionTimeOut,
 			newSlots = [],
 			refreshSlots = [],
 			pbjsSlots = pbjs.adUnits.map(slot => slot.code);
@@ -246,12 +249,16 @@ var auction = {
 		});
 
 		hasRefreshSlots = !!refreshSlots.length;
+		prebidAuctionTimeOut = hasRefreshSlots
+			? config.PREBID_CONFIG.prebidConfig.refreshTimeOut ||
+			  config.PREBID_CONFIG.prebidConfig.timeOut
+			: config.PREBID_CONFIG.prebidConfig.timeOut;
 
 		pbjs.que.push(
 			function() {
-				this.setPrebidConfig(pbjs);
+				this.setPrebidConfig(pbjs, prebidAuctionTimeOut);
 				newSlots.length && this.addSlotsToPbjs(pbjs, newSlots);
-				this.requestBids(pbjs, adpBatchId, slotCodes, hasRefreshSlots);
+				this.requestBids(pbjs, adpBatchId, slotCodes, prebidAuctionTimeOut);
 			}.bind(this)
 		);
 	}

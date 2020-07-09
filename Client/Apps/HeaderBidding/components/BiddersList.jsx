@@ -7,10 +7,17 @@ import { Button } from '@/Client/helpers/react-bootstrap-imports';
 import Card from '../../../Components/Layout/Card';
 
 function getBidderJSX(bidderType, bidderObj, bidderKey, openAddManageBidderView) {
-	let { name, isApRelation, isPaused, isActive, isAmpActive = 'false' } = bidderObj;
+	let {
+		name,
+		isApRelation,
+		isPaused,
+		isActive,
+		isAmpActive = 'false',
+		isS2SActive = 'false'
+	} = bidderObj;
 
 	/*
-		converting the isAmpActive value to boolean since the select box used to 
+		converting the isAmpActive and isS2SActive value to boolean since the select box used to 
 		show this field doesn't support the boolean values
 
 		NOTE: this conversion is also done when saving the data to the database
@@ -18,6 +25,9 @@ function getBidderJSX(bidderType, bidderObj, bidderKey, openAddManageBidderView)
 	*/
 	if (typeof isAmpActive === 'boolean') {
 		isAmpActive = isAmpActive ? 'true' : 'false';
+	}
+	if (typeof isS2SActive === 'boolean') {
+		isS2SActive = isS2SActive ? 'true' : 'false';
 	}
 
 	return (
@@ -42,7 +52,7 @@ function getBidderJSX(bidderType, bidderObj, bidderKey, openAddManageBidderView)
 				null,
 				bidderType === 'NOT_ADDED' ? 'addBidder' : 'manageBidder',
 				bidderKey,
-				{ ...bidderObj, isAmpActive }
+				{ ...bidderObj, isAmpActive, isS2SActive }
 			)}
 			footerChildren={
 				<div className="aligner aligner--row">

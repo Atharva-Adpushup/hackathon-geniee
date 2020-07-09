@@ -161,6 +161,12 @@ module.exports = {
 					message: 'isAmpActive property should be a boolean',
 					value: '',
 					status: 403
+				},
+				{
+					name: 'isS2SActive',
+					message: 'isS2SActive property should be a boolean',
+					value: '',
+					status: 403
 				}
 			]
 		}
