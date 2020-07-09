@@ -230,6 +230,7 @@ module.exports = function(site, user) {
 					bundle = _.replace(bundle, /__SITE_ID__/g, siteId);
 					bundle = _.replace(bundle, '__COUNTRY__', false);
 					bundle = _.replace(bundle, '__SIZE_MAPPING__', JSON.stringify(sizeMappingConfig));
+					bundle = _.replace(bundle, '__WEB_S2S_STATUS__', finalConfig.config.isS2SActive);
 
 					// Generate final init script based on the services that are enabled
 					var uncompressed = generateFinalInitScript(bundle)

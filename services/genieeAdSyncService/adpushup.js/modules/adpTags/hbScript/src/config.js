@@ -8,10 +8,10 @@ var config = {
 	TARGETING: {},
 	SIZE_MAPPING: __SIZE_MAPPING__,
 	S2S_CONFIG: {
-		S2S_ENABLED: true,
+		S2S_ENABLED: __WEB_S2S_STATUS__,
 		S2S_AUCTION_ENDPOINT: `${globalConfig.prebidServer.host}prebidserver/openrtb2/auction`,
 		S2S_SYNC_ENDPOINT: `${globalConfig.prebidServer.host}prebidserver/cookie_sync`,
-		S2S_ACCOUNT_ID: "1001"
+		S2S_ACCOUNT_ID: '1001'
 	}
 };
 

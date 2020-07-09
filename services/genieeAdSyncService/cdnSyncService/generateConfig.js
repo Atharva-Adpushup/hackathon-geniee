@@ -16,18 +16,15 @@ function getHbConfig(siteId) {
 		.catch(err => Promise.resolve({}));
 }
 
-function getPrebidModules(hbcf) {
+function getPrebidModules(hbcf, isS2SActive) {
 	const hbConfig = hbcf.value.hbcf;
 	const modules = new Set();
-	let s2sEnabled = false;
 	for (const bidderCode of Object.keys(hbConfig)) {
-		if (!s2sEnabled && hbConfig[bidderCode].isS2SActive) {
-			modules.add(PREBID_ADAPTERS.prebidServer);
-			s2sEnabled = true;
-		}
 		const adpater = hbConfig[bidderCode].adapter;
 		adpater ? modules.add(adpater) : console.log(`Prebid Adapter not found for ${bidderCode}`);
 	}
+
+	if (isS2SActive) modules.add(PREBID_ADAPTERS.prebidServer);
 
 	return Array.from(modules).join(',');
 }
@@ -129,7 +126,10 @@ function HbProcessing(site, apConfigs) {
 				let computedPrebidCurrencyConfig = {};
 				let deviceConfig = '';
 				let prebidCurrencyConfig = '';
-				let prebidAdapters = getPrebidModules(hbcf);
+				const isS2SActive = Object.keys(hbcf.value.hbcf).some(
+					bidder => !!hbcf.value.hbcf[bidder].isS2SActive
+				);
+				let prebidAdapters = getPrebidModules(hbcf, isS2SActive);
 
 				if (isValidCurrencyCnfg) {
 					const activeAdServer = adServerSettings.dfp;
@@ -160,7 +160,8 @@ function HbProcessing(site, apConfigs) {
 						prebidCurrencyConfig: prebidCurrencyConfig || '',
 						prebidCurrencyConfigObj: computedPrebidCurrencyConfig,
 						hbcf,
-						prebidAdapters
+						prebidAdapters,
+						isS2SActive
 					}
 				};
 
