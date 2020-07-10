@@ -118,6 +118,20 @@ var adpTags = {
 				if (computedFormats) formats = computedFormats;
 			}
 
+			var bidders;
+			if (optionalParam.headerBidding) {
+				hbRulesApi = hbRules({ config, utils, adpushup: window.adpushup || {} });
+				var {
+					bidders: computedBidders,
+					formats: computedFormats,
+					headerBidding
+				} = hbRulesApi.getDataByRules(size, formats, sectionName);
+
+				if (computedBidders) bidders = computedBidders;
+				if (headerBidding !== undefined) optionalParam.headerBidding = headerBidding;
+				if (computedFormats) formats = computedFormats;
+			}
+
 			/*
 			if (isResponsive) {
 				computedSizes = responsiveAds.getAdSizes(optionalParam.adId).collection;
