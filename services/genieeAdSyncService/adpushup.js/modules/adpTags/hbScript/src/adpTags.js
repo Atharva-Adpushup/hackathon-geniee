@@ -125,7 +125,7 @@ var adpTags = {
 					bidders: computedBidders,
 					formats: computedFormats,
 					headerBidding
-				} = hbRulesApi.getDataByRules(size, formats, sectionName);
+				} = hbRulesApi.getDataByRules(size, formats, optionalParam.adId);
 
 				if (computedBidders) bidders = computedBidders;
 				if (headerBidding !== undefined) optionalParam.headerBidding = headerBidding;

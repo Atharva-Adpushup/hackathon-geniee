@@ -10,7 +10,7 @@ module.exports = function(dependencies) {
 	var { config, utils, adpushup } = dependencies;
 
 	var api = {
-		isHbRuleTriggerMatch(trigger, sectionName) {
+		isHbRuleTriggerMatch(trigger, sectionId) {
 			function isMatch(triggerValue, triggerValueType, currentValue, operator) {
 				var matched;
 
@@ -74,11 +74,11 @@ module.exports = function(dependencies) {
 				case 'adunit': {
 					if (!(Array.isArray(trigger.value) && trigger.value.length)) return false;
 
-					return isMatch(trigger.value, 'array', sectionName, trigger.operator);
+					return isMatch(trigger.value, 'array', sectionId, trigger.operator);
 				}
 			}
 		},
-		getMatchedHbRules(sectionName) {
+		getMatchedHbRules(sectionId) {
 			var rules = config.PREBID_CONFIG.rules || [];
 
 			matchedRules = rules.filter(rule => {
@@ -93,7 +93,7 @@ module.exports = function(dependencies) {
 				 */
 				for (var i = 0; i < rule.triggers.length; i++) {
 					var trigger = rule.triggers[i];
-					ruleMatched = this.isHbRuleTriggerMatch(trigger, sectionName);
+					ruleMatched = this.isHbRuleTriggerMatch(trigger, sectionId);
 
 					if (!ruleMatched) break;
 				}
@@ -138,10 +138,10 @@ module.exports = function(dependencies) {
 
 			return computedActions;
 		},
-		getDataByRules(size, formats, sectionName) {
+		getDataByRules(size, formats, sectionId) {
 			var outputData = {};
 
-			var matchedHbRules = this.getMatchedHbRules(sectionName);
+			var matchedHbRules = this.getMatchedHbRules(sectionId);
 			var actions = this.getComputedActions(matchedHbRules);
 
 			// TODO: [HbRules] Remove temp console logs
