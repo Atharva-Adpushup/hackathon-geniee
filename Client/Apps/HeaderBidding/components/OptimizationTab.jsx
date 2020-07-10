@@ -25,8 +25,19 @@ const getConvertedBiddersData = bidders => {
 	});
 };
 
-const getConvertedAdUnitsData = adUnits =>
-	adUnits.map(({ adUnit, adUnitId }) => ({ label: adUnit, value: adUnitId }));
+const getConvertedAdUnitsData = adUnits => {
+	return adUnits.map(item => {
+		let labelKey = 'adUnit';
+		let valueKey = 'adUnitId';
+
+		if (item.type === 'apLite') {
+			labelKey = 'adUnit';
+			valueKey = 'sectionId';
+		}
+
+		return { label: item[labelKey], value: item[valueKey] };
+	});
+};
 
 class OptimizationTab extends React.Component {
 	notSupportedOptions = [
