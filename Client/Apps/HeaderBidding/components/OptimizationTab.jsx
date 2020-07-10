@@ -359,7 +359,7 @@ class OptimizationTab extends React.Component {
 			if (value === 'bidders_order') {
 				const { bidders } = this.props;
 				const { addedBidders } = bidders;
-				const addedBiddersData = Object.values(addedBidders).map(({ name }) => name);
+				const addedBiddersData = Object.keys(addedBidders);
 
 				action.value = addedBiddersData;
 			}
