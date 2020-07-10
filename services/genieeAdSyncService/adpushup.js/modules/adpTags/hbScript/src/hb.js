@@ -88,6 +88,7 @@ var hb = {
 			var prebidSlot = {
 				code: adpSlot.containerId,
 				mediaTypes: {},
+				sizes: prebidSizes,
 				renderer: {
 					url: multiFormatConstants.VIDEO.RENDERER_URL,
 					render: videoRenderer.bind(null, adpSlot, playerSize)
