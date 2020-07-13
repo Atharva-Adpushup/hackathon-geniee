@@ -175,19 +175,18 @@ class HeaderBiddingRuleActions extends React.Component {
 		}
 
 		if (elementType === 'bidders_order') {
-			const { onBiddersOrderChange } = this.props;
+			const { actions, onBiddersOrderChange } = this.props;
 
-			const renderBidder = (name, bidderIndex) => (
+			const renderBidder = ({ label, value }, bidderIndex) => (
 				<DragDropCard
-					key={name}
+					key={value}
 					index={bidderIndex}
-					id={name}
-					text={name}
+					id={value}
+					text={label}
+					value={value}
 					moveCard={(dragIndex, hoverIndex) => onBiddersOrderChange(dragIndex, hoverIndex, index)}
 				/>
 			);
-
-			const { actions } = this.props;
 
 			return (
 				<>

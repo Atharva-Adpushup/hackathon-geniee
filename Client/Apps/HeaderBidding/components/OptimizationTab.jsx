@@ -151,7 +151,7 @@ class OptimizationTab extends React.Component {
 		};
 
 		this.handleSubmit = this.handleSubmit.bind(this);
-		this.goBackToList = this.goBackToList.bind(this);
+		this.resetState = this.resetState.bind(this);
 		this.handleEditRule = this.handleEditRule.bind(this);
 		this.handleToggleStatus = this.handleToggleStatus.bind(this);
 		this.handleRuleStatusChange = this.handleRuleStatusChange.bind(this);
@@ -358,8 +358,7 @@ class OptimizationTab extends React.Component {
 
 			if (value === 'bidders_order') {
 				const { bidders } = this.props;
-				const { addedBidders } = bidders;
-				const addedBiddersData = Object.keys(addedBidders);
+				const addedBiddersData = getConvertedBiddersData(bidders);
 
 				action.value = addedBiddersData;
 			}
@@ -757,32 +756,44 @@ class OptimizationTab extends React.Component {
 		}
 
 		const triggersData = triggers.reduce((data, trigger) => {
-			if (!trigger.isIgnored) {
-				const value =
-					trigger.key === 'day_of_the_week'
-						? trigger.value.reduce((output, val) => {
-								output = output.concat(val.split(','));
-								return output;
-						  }, [])
-						: trigger.value;
+			const { isIgnored, key, operator, value } = trigger;
 
-				data.push({
-					key: trigger.key,
-					operator: trigger.operator,
-					value
-				});
+			if (isIgnored) return data;
+
+			let convertedValue = value;
+
+			if (key === 'day_of_the_week') {
+				convertedValue = trigger.value.reduce((output, val) => {
+					output = output.concat(val.split(','));
+					return output;
+				}, []);
 			}
+
+			data.push({
+				key,
+				operator,
+				value: convertedValue
+			});
 			return data;
 		}, []);
 
 		const actionsData = actions.reduce((data, action) => {
-			if (!action.isIgnored) {
-				data.push({
-					key: action.key,
-					operator: action.operator,
-					value: action.value
-				});
+			const { isIgnored, key, operator, value } = action;
+
+			if (isIgnored) return data;
+
+			let convertedValue = value;
+
+			if (key === 'bidders_order') {
+				convertedValue = value.map(({ value }) => value);
 			}
+
+			data.push({
+				key,
+				operator,
+				value: convertedValue
+			});
+
 			return data;
 		}, []);
 
@@ -804,7 +815,7 @@ class OptimizationTab extends React.Component {
 
 				setUnsavedChangesAction(true);
 				showNotification(notification);
-				this.goBackToList(false);
+				this.resetState(false);
 			})
 			.catch(error => {
 				console.error(error);
@@ -818,7 +829,7 @@ class OptimizationTab extends React.Component {
 			});
 	}
 
-	goBackToList(getConfirmation = true) {
+	resetState(getConfirmation = true) {
 		const confirmed =
 			getConfirmation && window.confirm('Are you sure? Any unsaved changes made will be lost!');
 
@@ -828,7 +839,9 @@ class OptimizationTab extends React.Component {
 			selectedRuleIndex: null,
 			activeComponent: 'list-component',
 			triggers: [],
-			actions: []
+			actions: [],
+			actionKeyIndexMap: {},
+			valueKeyIndexMap: {}
 		});
 	}
 
@@ -896,7 +909,7 @@ class OptimizationTab extends React.Component {
 						<Button className="btn-primary" onClick={this.handleSubmit}>
 							Save
 						</Button>
-						<Button className="btn-secondary" onClick={this.goBackToList}>
+						<Button className="btn-secondary" onClick={this.resetState}>
 							Cancel
 						</Button>
 					</div>
@@ -923,7 +936,7 @@ class OptimizationTab extends React.Component {
 
 				setUnsavedChangesAction(true);
 				showNotification(notification);
-				// this.goBackToList(false);
+				// this.resetState(false);
 			})
 			.catch(error => {
 				console.error(error);
@@ -938,8 +951,9 @@ class OptimizationTab extends React.Component {
 	}
 
 	handleEditRule(index) {
-		const { rules } = this.props;
-		const { triggers, actions, isActive } = rules[index];
+		const { rules, bidders } = this.props;
+		const { addedBidders } = bidders;
+		const { triggers, actions, isActive } = _cloneDeep(rules)[index];
 
 		// convert weekday, weekend value from array to string
 		const convertedTriggers = triggers.map(trigger => {
@@ -962,11 +976,31 @@ class OptimizationTab extends React.Component {
 			return trigger;
 		});
 
+		const convertedActions = actions.map(action => {
+			const { key, value } = action;
+
+			let convertedValue = value;
+
+			if (key === 'bidders_order') {
+				const biddersMap = Object.keys(addedBidders).reduce((map, bidderCode) => {
+					const { name } = addedBidders[bidderCode];
+					map[bidderCode] = name;
+					return map;
+				}, {});
+
+				convertedValue = value.map(val => ({ label: biddersMap[val], value: val }));
+			}
+
+			action.value = convertedValue;
+
+			return action;
+		});
+
 		this.setState(
 			{
 				isActive,
-				actions: _cloneDeep(actions),
-				triggers: _cloneDeep(convertedTriggers),
+				actions: convertedActions,
+				triggers: convertedTriggers,
 				activeComponent: 'rule-component',
 				selectedRuleIndex: index
 			},
@@ -980,7 +1014,6 @@ class OptimizationTab extends React.Component {
 
 	renderListComponent() {
 		const { rules, bidders } = this.props;
-		const { addedBidders } = bidders;
 
 		let {
 			actionKeyOptions,
@@ -992,7 +1025,7 @@ class OptimizationTab extends React.Component {
 
 		actionValueOptions = {
 			...actionValueOptions,
-			bidders_order: Object.values(addedBidders).map(({ name }) => ({ label: name, value: name }))
+			bidders_order: getConvertedBiddersData(bidders)
 		};
 
 		return (
@@ -1045,7 +1078,7 @@ class OptimizationTab extends React.Component {
 						</p>
 					</div>
 					{activeComponent !== 'list-component' && (
-						<Button className="btn-primary" onClick={this.goBackToList}>
+						<Button className="btn-primary" onClick={this.resetState}>
 							Go Back to Rules List
 						</Button>
 					)}
