@@ -139,7 +139,7 @@ if ($("#btnSendText_V2_Mobile").is(":visible")) {
             cmd: []
         };
         function setupRewarded() {
-            const rewardedSlot = googletag.defineOutOfPageSlot("/__NETWORK_CODE__/__AD_UNIT_CODE__", googletag.enums.OutOfPageFormat.REWARDED).addService(googletag.pubads());
+            const rewardedSlot = googletag.defineOutOfPageSlot("/__NETWORK_CODE__/__AD_UNIT__", googletag.enums.OutOfPageFormat.REWARDED).addService(googletag.pubads());
             rewardedSlot.setForceSafeFrame(true);
             googletag.pubads().enableAsyncRendering();
             googletag.enableServices();

@@ -68,7 +68,7 @@ class AdElement extends Component {
 	renderAdDetails() {
 		const { ad, updateAd, networkConfig, user, siteId, networkCode, dfpMessage } = this.props;
 		const {
-			networkData: { dfpAdunitCode }
+			networkData: { dfpAdunitCode, dfpAdunit }
 		} = ad;
 		const {
 			showLazyload,
@@ -87,7 +87,7 @@ class AdElement extends Component {
 			? code
 					.replace(/__AD_ID__/g, ad.id)
 					.replace(/__CUSTOM_ATTRIBS__/, customAttributes)
-					.replace(/__AD_UNIT_CODE__/, dfpAdunitCode)
+					.replace(/__AD_UNIT__/, dfpAdunit)
 					.replace(/__NETWORK_CODE__/, networkCode)
 			: null;
 

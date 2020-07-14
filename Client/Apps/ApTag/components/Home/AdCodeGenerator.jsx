@@ -185,8 +185,6 @@ class AdCodeGenerator extends Component {
 
 			ad.isRewarded = true;
 			ad.networkData.headerBidding = false;
-			ad.networkData.dfpAdunitCode = null;
-			ad.networkData.dfpAdunit = null;
 			ad.rewardText = rewardText;
 			ad.rewardValue = rewardValue;
 			ad.automaticTrigger = automaticTrigger;
