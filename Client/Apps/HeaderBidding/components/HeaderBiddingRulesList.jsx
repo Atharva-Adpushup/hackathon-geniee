@@ -5,6 +5,7 @@ import CustomToggleSwitch from '../../../Components/CustomToggleSwitch';
 
 const createMapForDropdown = options =>
 	options.reduce((map, option) => {
+		// eslint-disable-next-line no-param-reassign
 		map[option.value] = option.label;
 		return map;
 	}, {});
@@ -35,12 +36,14 @@ class HeaderBiddingRulesList extends React.Component {
 		const triggersKeyMap = createMapForDropdown(triggerKeyOptions);
 		const triggersOperatorMap = createMapForDropdown(triggerOperatorOptions);
 		const triggersValueMap = Object.keys(triggerValueOptions).reduce((map, key) => {
+			// eslint-disable-next-line no-param-reassign
 			map[key] = createMapForDropdown(triggerValueOptions[key]);
 			return map;
 		}, {});
 
 		const actionsKeyMap = createMapForDropdown(actionKeyOptions);
 		const actionsValueMap = Object.keys(actionValueOptions).reduce((map, key) => {
+			// eslint-disable-next-line no-param-reassign
 			map[key] = createMapForDropdown(actionValueOptions[key]);
 			return map;
 		}, {});
@@ -48,7 +51,7 @@ class HeaderBiddingRulesList extends React.Component {
 		return rules.map((rule, index) => {
 			const { isActive, triggers, actions, createdAt } = rule;
 
-			const triggersContent = triggers.map((trigger, index) => {
+			const triggersContent = triggers.map((trigger, triggerIndex) => {
 				// key, operator, value
 				const { key, operator, value } = trigger;
 				const keyContent = triggersKeyMap[key];
@@ -58,7 +61,7 @@ class HeaderBiddingRulesList extends React.Component {
 				if (Array.isArray(value)) {
 					let convertedValue = value;
 
-					if (key == 'day_of_the_week') {
+					if (key === 'day_of_the_week') {
 						const weekend = ['saturday', 'sunday'];
 						const weekday = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
 
@@ -66,8 +69,8 @@ class HeaderBiddingRulesList extends React.Component {
 						const hasWeekend = weekend.every(day => value.includes(day));
 
 						convertedValue = [];
-						hasWeekday && convertedValue.push(weekday.join(','));
-						hasWeekend && convertedValue.push(weekend.join(','));
+						if (hasWeekday) convertedValue.push(weekday.join(','));
+						if (hasWeekend) convertedValue.push(weekend.join(','));
 					}
 
 					valueContent = convertedValue.map(val => triggersValueMap[key][val]).join(', ');
@@ -77,7 +80,7 @@ class HeaderBiddingRulesList extends React.Component {
 
 				return (
 					<div className="trigger-content" key={key}>
-						<span className="content-item serial">{index + 1}. </span>
+						<span className="content-item serial">{triggerIndex + 1}. </span>
 						<span className="content-item key-content">{keyContent}</span>
 						<span className="content-item operator-content">
 							{operatorContent.replace('IS', '')}
@@ -87,7 +90,7 @@ class HeaderBiddingRulesList extends React.Component {
 				);
 			});
 
-			const actionsContent = actions.map((action, index) => {
+			const actionsContent = actions.map((action, actionIndex) => {
 				const { key, value } = action;
 				const keyContent = actionsKeyMap[key];
 
@@ -103,7 +106,7 @@ class HeaderBiddingRulesList extends React.Component {
 
 				return (
 					<div className="action-content" key={key}>
-						<span className="content-item serial">{index + 1}. </span>
+						<span className="content-item serial">{actionIndex + 1}. </span>
 						<span className="content-item key-content">{keyContent}</span>
 						<span className="content-item value-content">{valueContent}</span>
 					</div>
@@ -111,7 +114,7 @@ class HeaderBiddingRulesList extends React.Component {
 			});
 
 			return (
-				<tr key={`rule-${index}`}>
+				<tr key={`rule-${createdAt}`}>
 					<td>{index + 1}</td>
 					<td>{moment(createdAt).format('lll')}</td>
 					<td>
@@ -134,10 +137,10 @@ class HeaderBiddingRulesList extends React.Component {
 							defaultLayout
 							checked={isActive}
 							onChange={value => onToggleStatus(index, value)}
-							name="isActive"
+							name={`rule-status-${index}`}
 							layout="nolabel"
 							size="m"
-							id="isActive"
+							id={`rule-status-${index}`}
 							on="Enable"
 							off="Disable"
 						/>
