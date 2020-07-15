@@ -245,19 +245,28 @@ var utils = {
 	},
 	sortBidders: function(unsortedBidders, bidderSequence) {
 		var sortedBidders = [];
+		var unsortedBiddersCopy = [...unsortedBidders];
 
 		if (!(Array.isArray(bidderSequence) && bidderSequence.length)) {
 			return unsortedBidders;
 		}
 
 		bidderSequence.forEach(bidderCode => {
-			var index = unsortedBidders.findIndex(bidder => bidder.bidder === bidderCode);
-			if (index !== -1) {
-				sortedBidders = sortedBidders.concat(unsortedBidders.splice(index, 1));
-			}
+			unsortedBidders.forEach(bidder => {
+				// if bidder is in bidderSequence
+				if (bidder.bidder === bidderCode) {
+					// then move it from unsorted array to sorted array
+					var index = unsortedBiddersCopy.findIndex(
+						bidder => bidder.bidder === bidderCode
+					);
+					sortedBidders = sortedBidders.concat(unsortedBiddersCopy.splice(index, 1));
+				}
+			});
 		});
 
-		sortedBidders = sortedBidders.concat(unsortedBidders);
+		// move rest of the unsortedBidders which are not in bidderSequence
+		// at end of sortedBidders array
+		sortedBidders = sortedBidders.concat(unsortedBiddersCopy);
 
 		return sortedBidders;
 	},
