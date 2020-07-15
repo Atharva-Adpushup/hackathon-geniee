@@ -68,7 +68,8 @@ class AdElement extends Component {
 	renderAdDetails() {
 		const { ad, updateAd, networkConfig, user, siteId, networkCode, dfpMessage } = this.props;
 		const {
-			networkData: { dfpAdunitCode, dfpAdunit }
+			networkData: { dfpAdunitCode, dfpAdunit },
+			rewardTriggerFunction
 		} = ad;
 		const {
 			showLazyload,
@@ -89,6 +90,10 @@ class AdElement extends Component {
 					.replace(/__CUSTOM_ATTRIBS__/, customAttributes)
 					.replace(/__AD_UNIT__/, dfpAdunit)
 					.replace(/__NETWORK_CODE__/, networkCode)
+					.replace(
+						/__POST_REWARDED_FUNCTION__/g,
+						rewardTriggerFunction && atob(rewardTriggerFunction)
+					)
 			: null;
 
 		if (ad.formatData.type === 'rewardedAds') {
@@ -208,7 +213,7 @@ class AdElement extends Component {
 							: null
 					}
 				>
-					{isRewarded ? (dfpAdunitCode ? code : dfpMessage) : code}
+					{isRewarded ? (dfpAdunit || dfpAdunitCode ? code : dfpMessage) : code}
 				</pre>{' '}
 				{user.isSuperUser && ad.formatData.type !== 'amp' ? (
 					<React.Fragment>

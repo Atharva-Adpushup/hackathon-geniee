@@ -259,7 +259,7 @@ if ($("#btnSendText_V2_Mobile").is(":visible")) {
                 $("#modal").on("hidden.bs.modal", function() {
                     $(this).remove();
                 });
-                sendResoomerForm();
+                __POST_REWARDED_FUNCTION__
             });
             googletag.pubads().addEventListener("rewardedSlotCanceled", function(e) {
                 var data = {};
@@ -281,7 +281,7 @@ if ($("#btnSendText_V2_Mobile").is(":visible")) {
                 });
                 $("#btnSendText_V2_Mobile").unbind("click");
                 $("#btnSendText_V2_Mobile").click(function() {
-                    sendResoomerForm();
+					__POST_REWARDED_FUNCTION__
                 });
                 var slot = setupRewarded();
                 googletag.display(slot);
