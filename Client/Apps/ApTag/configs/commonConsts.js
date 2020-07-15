@@ -133,6 +133,7 @@ const ADCODE = `<div id="__AD_ID__" class="_ap_apex_ad"__CUSTOM_ATTRIBS__>
 
 const REWARDED_AD_CODE = ` 
 <script>
+if(!!navigator.userAgent.match(/iPad|iPhone|Android|BlackBerry|Windows Phone|webOS/i))){
 if ($("#btnSendText_V2_Mobile").is(":visible")) {
     if (Math.floor(Math.random() * 100) <script 20) {
         googletag = window.googletag || {
@@ -290,7 +291,8 @@ if ($("#btnSendText_V2_Mobile").is(":visible")) {
             googletag.display(slot);
             googletag.pubads().refresh([slot]);
         });
-    }
+	}
+}
 }
 </script>
 `;
