@@ -107,11 +107,13 @@ var adpTags = {
 			var bidders;
 			if (optionalParam.headerBidding) {
 				hbRulesApi = hbRules({ config, utils, adpushup: window.adpushup || {} });
+				var sectionId =
+					optionalParam.isManual === true ? optionalParam.originalId : optionalParam.adId;
 				var {
 					bidders: computedBidders,
 					formats: computedFormats,
 					headerBidding
-				} = hbRulesApi.getDataByRules(size, formats, optionalParam.adId);
+				} = hbRulesApi.getDataByRules(size, formats, sectionId);
 
 				if (computedBidders) bidders = computedBidders;
 				if (headerBidding !== undefined) optionalParam.headerBidding = headerBidding;
