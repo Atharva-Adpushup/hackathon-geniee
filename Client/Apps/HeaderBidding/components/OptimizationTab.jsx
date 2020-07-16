@@ -17,6 +17,16 @@ import CustomToggleSwitch from '../../../Components/CustomToggleSwitch';
 import Loader from '../../../Components/Loader';
 import HeaderBiddingRulesList from './HeaderBiddingRulesList';
 
+const getDefaultState = () => ({
+	isActive: true,
+	selectedRuleIndex: null,
+	activeComponent: 'list-component',
+	triggers: [],
+	actions: [],
+	actionKeyIndexMap: {},
+	triggerKeyIndexMap: {}
+});
+
 const getConvertedBiddersData = bidders => {
 	const { addedBidders } = bidders;
 
@@ -78,16 +88,6 @@ class OptimizationTab extends React.Component {
 		'actionKeyOptions.s2s_timeout',
 		'actionKeyOptions.significant_bidders'
 	];
-
-	defaultState = {
-		isActive: true,
-		selectedRuleIndex: null,
-		activeComponent: 'list-component',
-		triggers: [],
-		actions: [],
-		actionKeyIndexMap: {},
-		triggerKeyIndexMap: {}
-	};
 
 	constructor(props) {
 		super(props);
@@ -411,7 +411,7 @@ class OptimizationTab extends React.Component {
 
 		switch (valueType) {
 			case 'dropdown':
-				value = Array.isArray(selection) ? selection.map(({ val }) => val) : selection.value;
+				value = Array.isArray(selection) ? selection.map(({ value: val }) => val) : selection.value;
 				error = value.length === 0 ? 'Please select an option' : null;
 				break;
 
@@ -640,7 +640,7 @@ class OptimizationTab extends React.Component {
 
 		const newTriggers = [...triggers];
 
-		const preparedValue = Array.isArray(value) ? value.map(({ val }) => val) : [];
+		const preparedValue = Array.isArray(value) ? value.map(({ value: val }) => val) : [];
 
 		newTriggers[index].value = preparedValue;
 		newTriggers[index].valueError = preparedValue.length === 0 ? 'Please select an option' : null;
@@ -835,7 +835,7 @@ class OptimizationTab extends React.Component {
 			let convertedValue = value;
 
 			if (key === 'bidders_order') {
-				convertedValue = value.map(({ val }) => val);
+				convertedValue = value.map(({ value: val }) => val);
 			}
 
 			data.push({
@@ -886,7 +886,7 @@ class OptimizationTab extends React.Component {
 
 		if (getConfirmation && !confirmed) return;
 
-		this.setState({ ...this.defaultState }, this.updateIgnoredFields);
+		this.setState({ ...getDefaultState() }, this.updateIgnoredFields);
 	}
 
 	handleRuleStatusChange(status) {
@@ -897,7 +897,7 @@ class OptimizationTab extends React.Component {
 
 	handleAddNewRule() {
 		this.setState({
-			...this.defaultState,
+			...getDefaultState(),
 			activeComponent: 'rule-component'
 		});
 	}
