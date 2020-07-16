@@ -63,7 +63,7 @@ class HeaderBiddingRuleActions extends React.Component {
 				disabled={consumedAllSupportedOptions}
 				title={consumedAllSupportedOptions ? 'You have added all the available Actions' : ''}
 			>
-				Add Action
+				Add New Action
 			</Button>
 		);
 	}
@@ -228,6 +228,7 @@ class HeaderBiddingRuleActions extends React.Component {
 						className={`container-body action ${typeError || valueError ? 'error' : ''} ${
 							isIgnored ? `ignored` : ``
 						}`}
+						// eslint-disable-next-line react/no-array-index-key
 						key={`action-${key}-${index}`}
 					>
 						<DndProvider backend={HTML5Backend}>

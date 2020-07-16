@@ -1,6 +1,5 @@
 import React from 'react';
 import Select from 'react-select';
-import { countries } from 'country-data';
 import { Button } from '@/Client/helpers/react-bootstrap-imports';
 
 const dropdownErrorStyle = {
@@ -140,7 +139,7 @@ class HeaderBiddingRuleTriggers extends React.Component {
 				disabled={consumedAllSupportedOptions}
 				title={consumedAllSupportedOptions ? 'You have added all the available Triggers' : ''}
 			>
-				Add Trigger
+				Add New Trigger
 			</Button>
 		);
 	}
@@ -171,6 +170,7 @@ class HeaderBiddingRuleTriggers extends React.Component {
 						className={`trigger container-body ${
 							valueError || operatorError || keyError ? `error` : ``
 						}`}
+						// eslint-disable-next-line react/no-array-index-key
 						key={`trigger-${key}-${index}`}
 					>
 						<div className="col-1">

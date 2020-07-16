@@ -1,3 +1,7 @@
+/* eslint-disable no-alert */
+/* eslint-disable no-restricted-globals */
+/* eslint-disable consistent-return */
+/* eslint-disable react/sort-comp */
 import React from 'react';
 import _omitBy from 'lodash/omitBy';
 import _cloneDeep from 'lodash/cloneDeep';
@@ -25,8 +29,8 @@ const getConvertedBiddersData = bidders => {
 	});
 };
 
-const getConvertedAdUnitsData = adUnits => {
-	return adUnits.map(item => {
+const getConvertedAdUnitsData = adUnits =>
+	adUnits.map(item => {
 		let labelKey = 'adUnit';
 		let valueKey = 'adUnitId';
 
@@ -37,6 +41,34 @@ const getConvertedAdUnitsData = adUnits => {
 
 		return { label: item[labelKey], value: item[valueKey] };
 	});
+
+const getTemplate = type => {
+	const template = {
+		key: null,
+		value: [],
+		keyError: null,
+		valueError: null
+	};
+
+	if (type === 'trigger') {
+		template.operator = null;
+		template.operatorError = null;
+	}
+
+	return template;
+};
+
+const getResetValueForAction = actionKey => {
+	const booleanTypes = ['s2s_toggle'];
+	const numberTypes = ['refresh_timeout', 'initial_timeout', 's2s_timeout'];
+	const arrayTypes = ['allowed_bidders', 'bidders_order', 'significant_bidders'];
+
+	if (booleanTypes.includes(actionKey)) return false;
+	if (numberTypes.includes(actionKey)) return 0;
+	if (arrayTypes.includes(actionKey)) return [];
+	if (actionKey === 'formats') return ['banner']; // fixed/mandatory option
+
+	return null;
 };
 
 class OptimizationTab extends React.Component {
@@ -46,6 +78,16 @@ class OptimizationTab extends React.Component {
 		'actionKeyOptions.s2s_timeout',
 		'actionKeyOptions.significant_bidders'
 	];
+
+	defaultState = {
+		isActive: true,
+		selectedRuleIndex: null,
+		activeComponent: 'list-component',
+		triggers: [],
+		actions: [],
+		actionKeyIndexMap: {},
+		triggerKeyIndexMap: {}
+	};
 
 	constructor(props) {
 		super(props);
@@ -224,6 +266,7 @@ class OptimizationTab extends React.Component {
 				}));
 			})
 			.catch(error => {
+				// eslint-disable-next-line no-console
 				console.error(error.message);
 				history.push('/error');
 			})
@@ -234,28 +277,12 @@ class OptimizationTab extends React.Component {
 			});
 	}
 
-	getTemplate(type) {
-		const template = {
-			key: null,
-			value: [],
-			keyError: null,
-			valueError: null
-		};
-
-		if (type === 'trigger') {
-			template.operator = null;
-			template.operatorError = null;
-		}
-
-		return template;
-	}
-
 	// ------------------------------ action ----------------------------
 
 	handleAddAction() {
 		this.setState(state => ({
 			...state,
-			actions: [...state.actions, this.getTemplate('action')]
+			actions: [...state.actions, getTemplate('action')]
 		}));
 	}
 
@@ -276,6 +303,7 @@ class OptimizationTab extends React.Component {
 		const { actions, actionKeyOptions, actionKeyIndexMap } = this.state;
 		const updatedActionKeyIndexMap = { ...actionKeyIndexMap };
 
+		// eslint-disable-next-line no-restricted-syntax
 		for (const option of actionKeyOptions) {
 			const actionIndex = actions.findIndex(action => action.key === option.value);
 
@@ -309,6 +337,7 @@ class OptimizationTab extends React.Component {
 				label: `${option.label}${isNotSupported ? ` (Not Supported)` : ``}`
 			};
 
+			// eslint-disable-next-line no-nested-ternary
 			isNotSupported
 				? notSupportedOptions.push(item)
 				: typeof selectedFor !== 'undefined'
@@ -328,19 +357,6 @@ class OptimizationTab extends React.Component {
 		};
 	}
 
-	getResetValueForAction(actionKey) {
-		const booleanTypes = ['s2s_toggle'];
-		const numberTypes = ['refresh_timeout', 'initial_timeout', 's2s_timeout'];
-		const arrayTypes = ['allowed_bidders', 'bidders_order', 'significant_bidders'];
-
-		if (booleanTypes.includes(actionKey)) return false;
-		if (numberTypes.includes(actionKey)) return 0;
-		if (arrayTypes.includes(actionKey)) return [];
-		if (actionKey === 'formats') return ['banner']; // fixed/mandatory option
-
-		return null;
-	}
-
 	handleActionKeyChange(index, { value, isIgnored, isIgnoredMessage }) {
 		this.setState(state => {
 			const { actions, actionKeyIndexMap } = state;
@@ -349,7 +365,7 @@ class OptimizationTab extends React.Component {
 			const action = {
 				...newActions[index],
 				key: value,
-				value: this.getResetValueForAction(value),
+				value: getResetValueForAction(value),
 				keyError: null,
 				valueError: null,
 				isIgnored: !!isIgnored,
@@ -389,20 +405,21 @@ class OptimizationTab extends React.Component {
 		const { actions } = this.state;
 
 		let value = null;
-
 		let error = null;
+		let parsedNumber = null;
+		let selectedValue = null;
 
 		switch (valueType) {
 			case 'dropdown':
-				value = Array.isArray(selection) ? selection.map(({ value }) => value) : selection.value;
+				value = Array.isArray(selection) ? selection.map(({ val }) => val) : selection.value;
 				error = value.length === 0 ? 'Please select an option' : null;
 				break;
 
 			case 'number':
 				selection.persist();
 
-				const selectedValue = selection.target.value;
-				const parsedNumber = parseInt(selectedValue, 10);
+				selectedValue = selection.target.value;
+				parsedNumber = parseInt(selectedValue, 10);
 				value = Number.isNaN(parsedNumber) ? 0 : parsedNumber;
 				if (!(value >= 0 && value <= 10000)) {
 					error = 'Please choose a number between 0 and 10000';
@@ -447,7 +464,7 @@ class OptimizationTab extends React.Component {
 	handleAddTrigger() {
 		this.setState(state => ({
 			...state,
-			triggers: [...state.triggers, this.getTemplate('trigger')]
+			triggers: [...state.triggers, getTemplate('trigger')]
 		}));
 	}
 
@@ -473,6 +490,7 @@ class OptimizationTab extends React.Component {
 		const { triggers, triggerKeyOptions, triggerKeyIndexMap } = this.state;
 		const updatedTriggerKeyIndexMap = { ...triggerKeyIndexMap };
 
+		// eslint-disable-next-line no-restricted-syntax
 		for (const option of triggerKeyOptions) {
 			const triggerIndex = triggers.findIndex(trigger => trigger.key === option.value);
 
@@ -511,6 +529,7 @@ class OptimizationTab extends React.Component {
 				label: `${option.label}${isNotSupported ? ` (Not Supported)` : ``}`
 			};
 
+			// eslint-disable-next-line no-nested-ternary
 			isNotSupported
 				? notSupportedOptions.push(item)
 				: typeof selectedFor !== 'undefined'
@@ -542,21 +561,24 @@ class OptimizationTab extends React.Component {
 		const newActionKeyOptions = actionKeyOptions.map(option => {
 			if (optionsToBeIgnored.includes(option.value)) {
 				// add ignored data to option which will be used when this option is selected
+				// eslint-disable-next-line no-param-reassign
 				option.isIgnored = ignoreHbTimeouts;
+				// eslint-disable-next-line no-param-reassign
 				option.isIgnoredMessage = ignoreHbTimeouts
-					? `You cannot set this value if Ad Unit Trigger is set`
+					? `You cannot use this Action if Ad Unit Trigger is set`
 					: null;
 			}
 
 			return option;
 		});
-
 		// add ignored data to action that has these options selected
 		const newActions = actions.map(action => {
 			if (optionsToBeIgnored.includes(action.key)) {
+				// eslint-disable-next-line no-param-reassign
 				action.isIgnored = ignoreHbTimeouts;
+				// eslint-disable-next-line no-param-reassign
 				action.isIgnoredMessage = ignoreHbTimeouts
-					? `You cannot set this value if Ad Unit Trigger is set`
+					? `You cannot use this Action if Ad Unit Trigger is set`
 					: null;
 			}
 
@@ -618,7 +640,7 @@ class OptimizationTab extends React.Component {
 
 		const newTriggers = [...triggers];
 
-		const preparedValue = Array.isArray(value) ? value.map(({ value }) => value) : [];
+		const preparedValue = Array.isArray(value) ? value.map(({ val }) => val) : [];
 
 		newTriggers[index].value = preparedValue;
 		newTriggers[index].valueError = preparedValue.length === 0 ? 'Please select an option' : null;
@@ -632,29 +654,34 @@ class OptimizationTab extends React.Component {
 		const { showNotification } = this.props;
 		const { triggers, actions } = this.state;
 
-		let hasInvalidData = false;
-		let hasInvalidTriggers = triggers.length === 0;
-		let hasInvalidActions = actions.length === 0;
+		let notificationTime = 0;
+		const notificationMessage = [];
 
-		let hasMinimumOneValidTrigger = false;
-		let hasMinimumOneValidAction = false;
 		let hasIgnoredTrigger = false;
 		let hasIgnoredAction = false;
+		let hasMinimumOneValidTrigger = false;
+		let hasMinimumOneValidAction = false;
+
+		let hasInvalidActionValues = false;
+		let hasInvalidTriggerValues = false;
 
 		const updatedTriggers = [];
 		const updatedActions = [];
 
 		// set error for key, operator, value of trigger if not valid
+		// eslint-disable-next-line no-plusplus
 		for (let index = 0; index < triggers.length; index++) {
 			const trigger = triggers[index];
 
-			const hasInvalidKey = !trigger.key;
-			const hasInvalidOperator = !trigger.operator;
+			const hasInvalidKey = !trigger.key || trigger.keyError;
+			const hasInvalidOperator = !trigger.operator || trigger.operatorError;
 			const hasInvalidValue =
-				trigger.value === null || (Array.isArray(trigger.value) && trigger.value.length === 0);
+				trigger.value === null ||
+				(Array.isArray(trigger.value) && trigger.value.length === 0) ||
+				trigger.valueError;
 
 			if (hasInvalidKey || hasInvalidOperator || hasInvalidValue) {
-				hasInvalidTriggers = true;
+				hasInvalidTriggerValues = true;
 			}
 
 			if (!trigger.isIgnored) {
@@ -663,24 +690,27 @@ class OptimizationTab extends React.Component {
 				hasIgnoredTrigger = true;
 			}
 
-			trigger.keyError = trigger.keyError || hasInvalidKey ? 'Please select an option' : '';
+			trigger.keyError = trigger.keyError || (hasInvalidKey ? 'Please select an option' : '');
 			trigger.operatorError =
-				trigger.operatorError || hasInvalidOperator ? 'Please select an option' : '';
-			trigger.valueError = trigger.valueError || hasInvalidValue ? 'Please select an option' : '';
+				trigger.operatorError || (hasInvalidOperator ? 'Please select an option' : '');
+			trigger.valueError = trigger.valueError || (hasInvalidValue ? 'Please select an option' : '');
 
 			updatedTriggers.push(trigger);
 		}
 
 		// set error for key, value of action if not valid
+		// eslint-disable-next-line no-plusplus
 		for (let index = 0; index < actions.length; index++) {
 			const action = actions[index];
 
-			const hasInvalidKey = !action.key;
+			const hasInvalidKey = !action.key || action.keyError;
 			const hasInvalidValue =
-				action.value === null || (Array.isArray(action.value) && action.value.length === 0);
+				action.value === null ||
+				(Array.isArray(action.value) && action.value.length === 0) ||
+				action.valueError;
 
 			if (hasInvalidKey || hasInvalidValue) {
-				hasInvalidActions = true;
+				hasInvalidActionValues = true;
 			}
 
 			if (!action.isIgnored) {
@@ -689,8 +719,8 @@ class OptimizationTab extends React.Component {
 				hasIgnoredAction = true;
 			}
 
-			action.keyError = action.keyError || hasInvalidKey ? 'Please select an option' : '';
-			action.valueError = action.valueError || hasInvalidValue ? 'Please select an option' : '';
+			action.keyError = action.keyError || (hasInvalidKey ? 'Please select an option' : '');
+			action.valueError = action.valueError || (hasInvalidValue ? 'Please select an option' : '');
 
 			updatedActions.push(action);
 		}
@@ -699,50 +729,69 @@ class OptimizationTab extends React.Component {
 			let message = '';
 
 			if (!hasMinimumOneValidAction) {
-				message = 'Please add atleast one valid Action';
+				message = `Please add atleast one${hasIgnoredAction ? ' valid' : ''} Action`;
 			}
 
 			if (!hasMinimumOneValidTrigger) {
 				message = message.length
-					? `${message} and one valid Trigger`
-					: 'Please add atleast one valid Trigger';
+					? `${message} and one${hasIgnoredTrigger ? ' valid' : ''} Trigger`
+					: `Please add atleast one${hasIgnoredTrigger ? ' valid' : ''} Trigger`;
 			}
 
-			const notification = {
-				message,
-				title: 'Invalid Data',
-				mode: 'error',
-				autoDismiss: 5
-			};
-
-			showNotification(notification);
-			hasInvalidData = true;
+			notificationTime = 5;
+			notificationMessage.push(message);
 		}
 
 		if (hasIgnoredAction || hasIgnoredTrigger) {
-			const notification = {
-				message: 'Please remove the fields that can not be set',
-				title: 'Invalid Data',
-				mode: 'error',
-				autoDismiss: 5
-			};
-
-			showNotification(notification);
-			hasInvalidData = true;
+			const message = 'Please remove the fields that can not be used';
+			notificationTime = notificationTime === 0 ? 5 : notificationTime + 4;
+			notificationMessage.push(message);
 		}
 
-		if (hasInvalidActions || hasInvalidTriggers) {
+		if (hasInvalidActionValues || hasInvalidTriggerValues) {
+			const message = 'Please fill all the details with valid data before proceeding';
+			notificationTime = notificationTime === 0 ? 5 : notificationTime + 4;
+			notificationMessage.push(message);
+
 			const updatedState = {};
 
-			hasInvalidActions && (updatedState.actions = updatedActions);
-			hasInvalidTriggers && (updatedState.triggers = updatedTriggers);
+			if (hasInvalidActionValues) {
+				updatedState.actions = updatedActions;
+			}
+			if (hasInvalidTriggerValues) {
+				updatedState.triggers = updatedTriggers;
+			}
 
 			this.setState(updatedState);
-
-			hasInvalidData = true;
 		}
 
-		return hasInvalidData;
+		if (notificationMessage.length) {
+			const hasMultipleMessages = notificationMessage.length > 1;
+			let message = '';
+			notificationMessage.forEach((msg, index) => {
+				if (hasMultipleMessages) {
+					message += `${index + 1}. ${msg} <br/>`;
+				} else {
+					message = msg;
+				}
+			});
+
+			showNotification({
+				message,
+				mode: 'error',
+				title: 'Error',
+				autoDismiss: notificationTime
+			});
+		}
+
+		return (
+			hasIgnoredAction ||
+			hasIgnoredTrigger ||
+			hasInvalidActionValues ||
+			hasInvalidTriggerValues ||
+			!hasMinimumOneValidAction ||
+			!hasMinimumOneValidTrigger
+		);
 	}
 
 	handleSubmit() {
@@ -764,6 +813,7 @@ class OptimizationTab extends React.Component {
 
 			if (key === 'day_of_the_week') {
 				convertedValue = trigger.value.reduce((output, val) => {
+					// eslint-disable-next-line no-param-reassign
 					output = output.concat(val.split(','));
 					return output;
 				}, []);
@@ -785,7 +835,7 @@ class OptimizationTab extends React.Component {
 			let convertedValue = value;
 
 			if (key === 'bidders_order') {
-				convertedValue = value.map(({ value }) => value);
+				convertedValue = value.map(({ val }) => val);
 			}
 
 			data.push({
@@ -818,6 +868,7 @@ class OptimizationTab extends React.Component {
 				this.resetState(false);
 			})
 			.catch(error => {
+				// eslint-disable-next-line no-console
 				console.error(error);
 
 				showNotification({
@@ -835,14 +886,7 @@ class OptimizationTab extends React.Component {
 
 		if (getConfirmation && !confirmed) return;
 
-		this.setState({
-			selectedRuleIndex: null,
-			activeComponent: 'list-component',
-			triggers: [],
-			actions: [],
-			actionKeyIndexMap: {},
-			valueKeyIndexMap: {}
-		});
+		this.setState({ ...this.defaultState }, this.updateIgnoredFields);
 	}
 
 	handleRuleStatusChange(status) {
@@ -851,8 +895,11 @@ class OptimizationTab extends React.Component {
 		});
 	}
 
-	handleActiveComponent(activeComponent) {
-		this.setState({ activeComponent });
+	handleAddNewRule() {
+		this.setState({
+			...this.defaultState,
+			activeComponent: 'rule-component'
+		});
 	}
 
 	renderRuleComponent() {
@@ -939,6 +986,7 @@ class OptimizationTab extends React.Component {
 				// this.resetState(false);
 			})
 			.catch(error => {
+				// eslint-disable-next-line no-console
 				console.error(error);
 
 				showNotification({
@@ -953,13 +1001,13 @@ class OptimizationTab extends React.Component {
 	handleEditRule(index) {
 		const { rules, bidders } = this.props;
 		const { addedBidders } = bidders;
-		const { triggers, actions, isActive } = _cloneDeep(rules)[index];
+		const { triggers = [], actions = [], isActive } = _cloneDeep(rules)[index];
 
 		// convert weekday, weekend value from array to string
 		const convertedTriggers = triggers.map(trigger => {
 			let convertedValue = trigger.value;
 
-			if (trigger.key == 'day_of_the_week') {
+			if (trigger.key === 'day_of_the_week') {
 				const weekend = ['saturday', 'sunday'];
 				const weekday = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
 
@@ -967,10 +1015,11 @@ class OptimizationTab extends React.Component {
 				const hasWeekend = weekend.every(day => trigger.value.includes(day));
 
 				convertedValue = [];
-				hasWeekday && convertedValue.push(weekday.join(','));
-				hasWeekend && convertedValue.push(weekend.join(','));
+				if (hasWeekday) convertedValue.push(weekday.join(','));
+				if (hasWeekend) convertedValue.push(weekend.join(','));
 			}
 
+			// eslint-disable-next-line no-param-reassign
 			trigger.value = convertedValue;
 
 			return trigger;
@@ -984,6 +1033,7 @@ class OptimizationTab extends React.Component {
 			if (key === 'bidders_order') {
 				const biddersMap = Object.keys(addedBidders).reduce((map, bidderCode) => {
 					const { name } = addedBidders[bidderCode];
+					// eslint-disable-next-line no-param-reassign
 					map[bidderCode] = name;
 					return map;
 				}, {});
@@ -991,6 +1041,7 @@ class OptimizationTab extends React.Component {
 				convertedValue = value.map(val => ({ label: biddersMap[val], value: val }));
 			}
 
+			// eslint-disable-next-line no-param-reassign
 			action.value = convertedValue;
 
 			return action;
@@ -1015,7 +1066,7 @@ class OptimizationTab extends React.Component {
 	renderListComponent() {
 		const { rules, bidders } = this.props;
 
-		let {
+		const {
 			actionKeyOptions,
 			actionValueOptions,
 			triggerKeyOptions,
@@ -1023,7 +1074,7 @@ class OptimizationTab extends React.Component {
 			triggerValueOptions
 		} = this.state;
 
-		actionValueOptions = {
+		const modifiedActionValueOptions = {
 			...actionValueOptions,
 			bidders_order: getConvertedBiddersData(bidders)
 		};
@@ -1038,13 +1089,10 @@ class OptimizationTab extends React.Component {
 					triggerOperatorOptions={triggerOperatorOptions}
 					triggerValueOptions={triggerValueOptions}
 					actionKeyOptions={actionKeyOptions}
-					actionValueOptions={actionValueOptions}
+					actionValueOptions={modifiedActionValueOptions}
 				/>
 				<div className="control">
-					<Button
-						className="btn-primary"
-						onClick={() => this.handleActiveComponent('rule-component')}
-					>
+					<Button className="btn-primary" onClick={() => this.handleAddNewRule()}>
 						Add New Rule
 					</Button>
 				</div>
