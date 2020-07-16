@@ -374,7 +374,8 @@ class Panel extends Component {
 							if (
 								REPORT_INTERVAL_TABLE_KEYS.indexOf(column) === -1 &&
 								!Number.isNaN(row[column]) &&
-								!dimensionList.find(dimension => dimension.value === column)
+								!dimensionList.find(dimension => dimension.value === column) &&
+								column !== 'site'
 							) {
 								// eslint-disable-next-line no-param-reassign
 								row[column] = parseFloat(roundOffTwoDecimal(row[column]));
@@ -726,7 +727,8 @@ class Panel extends Component {
 				if (
 					!metricsList.find(metric => metric.value === key) &&
 					REPORT_INTERVAL_TABLE_KEYS.indexOf(key) === -1 &&
-					!dimensionList.find(dimension => dimension.value === key)
+					!dimensionList.find(dimension => dimension.value === key) &&
+					!computedRow.site
 				) {
 					delete computedRow[key];
 				}
