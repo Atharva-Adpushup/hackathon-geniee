@@ -1,5 +1,5 @@
 // Top-level component
-
+import constants from '../../../../../config/commonConsts';
 import commonConsts from '../../commonConsts';
 import $ from '../../$';
 // import { executeAdpTagsHeadCode } from '../../../../genieeAdSyncService/genieeAp/src/adCodeGenerator';
@@ -102,6 +102,7 @@ class Component {
 
 		// New feedback
 		adObj.status = 1;
+		adObj.adUnitType = constants.AD_UNIT_TYPE_MAPPING[formatData.type.toUpperCase()];
 		//newFeedbackAdObj.ads = [newFeedbackAdObj];
 		feedbackOptions.ads = [adObj];
 

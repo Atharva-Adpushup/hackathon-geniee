@@ -299,14 +299,14 @@ module.exports = {
 									if (this.isHBActiveForAd(ad)) {
 										ad.services.push(commonConsts.SERVICES.HB);
 									}
-
 									return {
 										sectionId: ad.isManual ? ad.originalId : ad.id,
 										sectionName: ad.sectionName,
 										status: ad.status,
 										network: ad.network,
 										networkAdUnitId: this.getNetworkAdUnitIdForAd(ad),
-										services: ad.services
+										services: ad.services,
+										adUnitType: ad.adUnitType || commonConsts.AD_UNIT_TYPE_MAPPING.DISPLAY
 									};
 								}.bind(this)
 						  )
