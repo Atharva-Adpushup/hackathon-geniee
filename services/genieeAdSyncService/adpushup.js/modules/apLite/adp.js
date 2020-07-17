@@ -107,7 +107,7 @@ var $ = require('../../libs/jquery'),
 					} = hbRulesApi.getDataByRules(size, formats, sectionId);
 
 					if (computedBidders) bidders = computedBidders;
-					if (headerBidding !== undefined) optionalParam.headerBidding = headerBidding;
+					optionalParam.headerBidding = headerBidding;
 					if (computedFormats) formats = computedFormats;
 				}
 

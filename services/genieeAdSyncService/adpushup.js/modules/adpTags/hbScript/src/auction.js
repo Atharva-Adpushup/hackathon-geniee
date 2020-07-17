@@ -160,9 +160,9 @@ var auction = {
 				}
 			},
 			publisherDomain: adp.config.siteDomain,
-			bidderSequence:
-				(config.PREBID_CONFIG.prebidConfig.enableBidderSequence && 'fixed') ||
-				constants.PREBID.BIDDER_SEQUENCE,
+			bidderSequence: config.PREBID_CONFIG.prebidConfig.enableBidderSequence
+				? constants.PREBID.BIDDER_SEQUENCE.FIXED
+				: constants.PREBID.BIDDER_SEQUENCE.RANDOM,
 			priceGranularity: constants.PREBID.PRICE_GRANULARITY,
 			sizeConfig: this.getSizeConfig(),
 			useBidCache: true,

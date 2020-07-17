@@ -169,7 +169,8 @@ describe('process hb rules and return computed data', function() {
 			),
 			{
 				bidders: ['appnexus', 'rubicon'],
-				formats: computedFormats ? computedFormats.value : undefined
+				formats: ['display'],
+				headerBidding: true
 			}
 		);
 
@@ -199,7 +200,8 @@ describe('process hb rules and return computed data', function() {
 	it("shouldn't return any computed data or do side effects if rules don't match", function() {
 		var computedFormats = dataVariation2.computedActions.find(action => action.key === 'formats');
 		var dataByRulesOutput = {
-			bidders: ['appnexus', 'rubicon']
+			bidders: ['appnexus', 'rubicon'],
+			headerBidding: true
 		};
 		if (computedFormats) dataByRulesOutput.formats = computedFormats.value;
 

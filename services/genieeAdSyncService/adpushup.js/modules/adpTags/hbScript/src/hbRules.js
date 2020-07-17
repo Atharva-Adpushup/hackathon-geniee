@@ -139,7 +139,7 @@ module.exports = function(dependencies) {
 			return computedActions;
 		},
 		getDataByRules(size, formats, sectionId) {
-			var outputData = {};
+			var outputData = { headerBidding: true };
 
 			var matchedHbRules = this.getMatchedHbRules(sectionId);
 			var actions = this.getComputedActions(matchedHbRules);
@@ -184,8 +184,13 @@ module.exports = function(dependencies) {
 							action.value.length &&
 							action.value.indexOf('display') !== -1
 						) {
-							bidderRulesConfig.formats = action.value;
-							outputData.formats = action.value;
+							// Pick intersection of formats action and original formats added by user
+							// 'display' format will always there so computedFormats will never be empty
+							var computedFormats = action.value.filter(
+								format => formats.indexOf(format) !== -1
+							);
+							bidderRulesConfig.formats = computedFormats;
+							outputData.formats = computedFormats;
 						}
 
 						break;
@@ -235,10 +240,9 @@ module.exports = function(dependencies) {
 			 * Compute bidders only if headerbidding is not
 			 * disabled by "disable_header_bidding" action
 			 */
-			outputData.bidders =
-				outputData.headerBidding !== false
-					? utils.getBiddersForSlot(size, formats, bidderRulesConfig)
-					: [];
+			outputData.bidders = outputData.headerBidding
+				? utils.getBiddersForSlot(size, formats, bidderRulesConfig)
+				: [];
 
 			// TODO: [HbRules] Remove temp console logs
 			console.log('dataByRules', outputData);

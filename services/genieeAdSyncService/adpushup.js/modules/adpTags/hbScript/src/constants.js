@@ -58,7 +58,10 @@ var constants = {
 	},
 	PREBID: {
 		TIMEOUT: 3000,
-		BIDDER_SEQUENCE: 'random',
+		BIDDER_SEQUENCE: {
+			FIXED: 'fixed',
+			RANDOM: 'random'
+		},
 		PRICE_GRANULARITY: 'dense',
 		VIDEO_FORMAT_TYPE: 'outstream',
 		DEFAULT_FORMATS: ['display'],

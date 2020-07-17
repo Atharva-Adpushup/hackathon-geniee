@@ -50,7 +50,7 @@ function getDataVariation1() {
 				},
 				{
 					key: 'formats',
-					value: ['display', 'video']
+					value: ['display', 'video', 'native']
 				}
 			],
 			createdAt: 1592304084229,
@@ -99,7 +99,7 @@ function getDataVariation1() {
 				},
 				{
 					key: 'formats',
-					value: ['display', 'video', 'native']
+					value: ['display', 'native']
 				}
 			],
 			createdAt: 1592894410251,
@@ -150,7 +150,7 @@ function getDataVariation1() {
 			},
 			{
 				key: 'formats',
-				value: ['display', 'video', 'native']
+				value: ['display', 'native']
 			}
 		],
 		currentTime: new Date('2020-06-25 13:10'),
