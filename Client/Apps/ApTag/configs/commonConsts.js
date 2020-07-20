@@ -135,7 +135,7 @@ const REWARDED_AD_CODE = `
 <script>
 if(!!navigator.userAgent.match(/iPad|iPhone|Android|BlackBerry|Windows Phone|webOS/i)){
 if ($("#btnSendText_V2_Mobile").is(":visible")) {
-    if (Math.floor(Math.random() * 100) <script 20) {
+    if (Math.floor(Math.random() * 100) < 20) {
         googletag = window.googletag || {
             cmd: []
         };
