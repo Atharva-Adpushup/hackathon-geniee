@@ -109,32 +109,26 @@ module.exports = function(dependencies) {
 			if (hbRules.length === 1) return hbRules[0].actions;
 
 			/**
-			 * If there are multiple rules then merge their actions.
-			 * In case of duplicate action, choose the latest created rule action
+			 * Sorting hbRules in ascending order by date
+			 * so that while merging duplicate actions,
+			 * we can just override previous action to
+			 * keep latest action.
 			 */
-			var actionsMapping = {};
-			hbRules.forEach(hbRule => {
-				for (var i = 0; i < hbRule.actions.length; i++) {
-					var action = hbRule.actions[i];
-					var currentActionDate = new Date(hbRule.createdAt);
-					var oldActionDate =
-						actionsMapping[action.key] &&
-						new Date(actionsMapping[action.key].createdAt);
+			var sortedHbRules = hbRules.sort((a, b) => {
+				var aDate = new Date(a.createdAt);
+				var bDate = new Date(b.createdAt);
 
-					if (!actionsMapping[action.key] || currentActionDate > oldActionDate) {
-						actionsMapping[action.key] = {
-							action: action,
-							createdAt: hbRule.createdAt
-						};
-
-						continue;
-					}
-				}
+				return aDate - bDate;
 			});
 
-			var computedActions = Object.keys(actionsMapping).map(
-				key => actionsMapping[key].action
-			);
+			var actionsMapping = {};
+			sortedHbRules.forEach(hbRule => {
+				hbRule.actions.forEach(action => {
+					actionsMapping[action.key] = action;
+				});
+			});
+
+			var computedActions = Object.keys(actionsMapping).map(key => actionsMapping[key]);
 
 			return computedActions;
 		},

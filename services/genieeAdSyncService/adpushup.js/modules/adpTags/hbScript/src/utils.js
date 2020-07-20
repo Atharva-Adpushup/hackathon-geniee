@@ -244,29 +244,25 @@ var utils = {
 		return bidders;
 	},
 	sortBidders: function(unsortedBidders, bidderSequence) {
-		var sortedBidders = [];
-		var unsortedBiddersCopy = [...unsortedBidders];
-
 		if (!(Array.isArray(bidderSequence) && bidderSequence.length)) {
 			return unsortedBidders;
 		}
 
+		var sortedBidders = [];
 		bidderSequence.forEach(bidderCode => {
 			unsortedBidders.forEach(bidder => {
 				// if bidder is in bidderSequence
 				if (bidder.bidder === bidderCode) {
-					// then move it from unsorted array to sorted array
-					var index = unsortedBiddersCopy.findIndex(
-						bidder => bidder.bidder === bidderCode
-					);
-					sortedBidders = sortedBidders.concat(unsortedBiddersCopy.splice(index, 1));
+					sortedBidders.push(bidder);
 				}
 			});
 		});
-
-		// move rest of the unsortedBidders which are not in bidderSequence
-		// at end of sortedBidders array
-		sortedBidders = sortedBidders.concat(unsortedBiddersCopy);
+		unsortedBidders.forEach(bidder => {
+			// if bidder is not in bidderSequence
+			if (bidderSequence.indexOf(bidder.bidder) === -1) {
+				sortedBidders.push(bidder);
+			}
+		});
 
 		return sortedBidders;
 	},
