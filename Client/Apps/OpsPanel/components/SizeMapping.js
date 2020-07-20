@@ -445,6 +445,7 @@ class SizeMapping extends Component {
 						<FormControl
 							min={0}
 							type="number"
+							onFocus={e => e.target.select()}
 							value={viewportWidth}
 							onChange={e => this.handlePropertyUpdate('viewportWidth', index, e)}
 						/>
@@ -455,6 +456,7 @@ class SizeMapping extends Component {
 					<>
 						<FormControl
 							type="number"
+							onFocus={e => e.target.select()}
 							min={0}
 							value={maxHeight}
 							onChange={e => this.handlePropertyUpdate('maxHeight', index, e, adUnitSize)}
@@ -466,6 +468,7 @@ class SizeMapping extends Component {
 					<>
 						<FormControl
 							type="number"
+							onFocus={e => e.target.select()}
 							min={0}
 							value={maxWidth}
 							onChange={e => this.handlePropertyUpdate('maxWidth', index, e, adUnitSize)}
@@ -547,7 +550,7 @@ class SizeMapping extends Component {
 					<Col sm={12}>
 						<p className="downward-size-info error-message">
 							NOTE: The downward compatible sizes will be added automatically according to the Max
-							Height and Max Width set by you
+							Creative Height and Max Creative Width set by you
 						</p>
 					</Col>
 				</Row>
