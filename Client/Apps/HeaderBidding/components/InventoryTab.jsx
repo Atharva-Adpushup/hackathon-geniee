@@ -2,7 +2,6 @@
 /* eslint-disable guard-for-in */
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Checkbox } from '@/Client/helpers/react-bootstrap-imports';
 
 import InventoriesTable from './InventoriesTable';
 import FilterBox from '../../../Components/FilterBox';
@@ -15,6 +14,7 @@ import {
 import Loader from '../../../Components/Loader';
 import Spinner from '../../../Components/Spinner';
 import Empty from '../../../Components/Empty/index';
+import CustomToggleSwitch from '../../../Components/CustomToggleSwitch';
 
 export default class InventoryTab extends React.Component {
 	state = {
@@ -25,7 +25,6 @@ export default class InventoryTab extends React.Component {
 		loadingHbStatusForSite: true,
 		updatingInventoryHbStatus: false,
 		selectAllInventories: false,
-		checked: false,
 		selectAllMultiFormat: false,
 		selectAllNative: [],
 		selectAllVideo: []
@@ -71,14 +70,14 @@ export default class InventoryTab extends React.Component {
 		const inventoriesCopy = JSON.parse(JSON.stringify(inventories));
 		const { filteredInventories } = this.state;
 		if (!filteredInventories && inventories) {
-			return this.setState({ filteredInventories: inventoriesCopy });
+			this.setState({ filteredInventories: inventoriesCopy });
 		}
 		if (filteredInventories && inventories) {
 			const { updated, updatedFilteredInventories } = this.getUpdatedFilteredInventories(
 				inventoriesCopy
 			);
 
-			if (updated) return this.setState({ filteredInventories: updatedFilteredInventories });
+			if (updated) this.setState({ filteredInventories: updatedFilteredInventories });
 		}
 	}
 
@@ -101,7 +100,7 @@ export default class InventoryTab extends React.Component {
 		return { updated, updatedFilteredInventories };
 	}
 
-	handleChange = e => {
+	handleChange = isEnabled => {
 		const { selectAllMultiFormat } = this.state;
 		const { siteId, inventories, showNotification } = this.props;
 		const newState = {};
@@ -113,27 +112,32 @@ export default class InventoryTab extends React.Component {
 			? [...inventories].map(inventory => inventory.adUnitId)
 			: [];
 
-		updateFormat(inventories.map(v => ({ ...v, checked: true, format: 'native' })), siteId)
+		updateFormat(
+			inventories.map(v => ({ ...v, checked: isEnabled, format: 'native' })),
+			siteId
+		)
 			.then(() =>
-				updateFormat(inventories.map(v => ({ ...v, checked: true, format: 'video' })), siteId)
+				updateFormat(
+					inventories.map(v => ({ ...v, checked: isEnabled, format: 'video' })),
+					siteId
+				)
 			)
 			.then(() =>
 				showNotification({
 					mode: 'success',
 					title: 'Success',
-					message: ' All Inventories updated successsfully',
+					message: `All Inventories ${isEnabled ? 'enabled' : 'disabled'} successsfully`,
 					autoDismiss: 5
 				})
 			)
-			.catch(err => {
-				console.log(err);
-				return showNotification({
+			.catch(() =>
+				showNotification({
 					mode: 'error',
 					title: 'Operation Failed',
 					message: 'Something went wrong',
 					autoDismiss: 5
-				});
-			});
+				})
+			);
 
 		this.setState(newState);
 	};
@@ -165,15 +169,14 @@ export default class InventoryTab extends React.Component {
 					() => setUnsavedChangesAction(true)
 				);
 			})
-			.catch(err => {
-				console.log(err);
-				return showNotification({
+			.catch(() =>
+				showNotification({
 					mode: 'error',
 					title: 'Operation Failed',
 					message: 'Something went wrong',
 					autoDismiss: 5
-				});
-			});
+				})
+			);
 	};
 
 	handleVideoChange = ({ target: { checked } }, params) => {
@@ -201,15 +204,14 @@ export default class InventoryTab extends React.Component {
 					)
 				});
 			})
-			.catch(err => {
-				console.log(err);
-				return showNotification({
+			.catch(() =>
+				showNotification({
 					mode: 'error',
 					title: 'Operation Failed',
 					message: 'Something went wrong',
 					autoDismiss: 5
-				});
-			});
+				})
+			);
 	};
 
 	handleSelectAllInventories = () => {
@@ -262,8 +264,7 @@ export default class InventoryTab extends React.Component {
 		this.setState({
 			filteredInventories,
 			selectedInventories: [],
-			checkedCopy: [],
-			selectAll: false
+			checkedCopy: []
 		});
 	};
 
@@ -374,9 +375,7 @@ export default class InventoryTab extends React.Component {
 					<div className={`inventory-wrap${hbStatusForSite === false ? ' disabled' : ' active'}`}>
 						{!!selectedInventories.length && (
 							<div className="updt-inv-hb-status u-margin-b4">
-								<span className="selected-inv-count u-margin-r3">{`${
-									selectedInventories.length
-								} selected`}</span>
+								<span className="selected-inv-count u-margin-r3">{`${selectedInventories.length} selected`}</span>
 								<CustomButton
 									disabled={updatingInventoryHbStatus}
 									variant="secondary"
@@ -431,13 +430,21 @@ export default class InventoryTab extends React.Component {
 							/>
 						)}
 
-						<Checkbox
-							onChange={this.handleChange}
+						<CustomToggleSwitch
+							layout="horizontal"
+							className="u-margin-b4"
 							checked={selectAllMultiFormat}
-							disabled={!!selectAllMultiFormat}
-						>
-							Enable native and video format for all units
-						</Checkbox>
+							onChange={this.handleChange}
+							labelText="Enable or Disable Video and Native on all units"
+							labelBold
+							size="m"
+							disabled={false}
+							on="Yes"
+							off="No"
+							defaultLayout
+							name="toggle-multiformat"
+							id="toggle-multiformat"
+						/>
 
 						{!filteredInventories.length ? (
 							<Empty message="No Data Found" />
