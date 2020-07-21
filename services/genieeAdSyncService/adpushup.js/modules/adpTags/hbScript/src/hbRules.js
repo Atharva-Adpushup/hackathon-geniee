@@ -41,7 +41,8 @@ module.exports = function(dependencies) {
 				case 'country': {
 					if (!(Array.isArray(trigger.value) && trigger.value.length)) return false;
 
-					var currentCountry = 'IN'; // TODO: [HbRules] Add get currentCountry Feature
+					var currentCountry = null; // TODO: [HbRules] Add get currentCountry Feature
+					if (!currentCountry) return false;
 
 					return isMatch(trigger.value, 'array', currentCountry, trigger.operator);
 				}
@@ -81,7 +82,7 @@ module.exports = function(dependencies) {
 		getMatchedHbRules(sectionId) {
 			var rules = config.PREBID_CONFIG.rules || [];
 
-			matchedRules = rules.filter(rule => {
+			var matchedRules = rules.filter(rule => {
 				var isActive = rule.isActive !== false; // we assumed a rule is active until it's defined as inactive.
 
 				if (!isActive) return false;
@@ -137,10 +138,6 @@ module.exports = function(dependencies) {
 
 			var matchedHbRules = this.getMatchedHbRules(sectionId);
 			var actions = this.getComputedActions(matchedHbRules);
-
-			// TODO: [HbRules] Remove temp console logs
-			console.log('matchedHbRules', matchedHbRules);
-			console.log('actions', actions);
 
 			var bidderRulesConfig = {};
 
@@ -237,9 +234,6 @@ module.exports = function(dependencies) {
 			outputData.bidders = outputData.headerBidding
 				? utils.getBiddersForSlot(size, formats, bidderRulesConfig)
 				: [];
-
-			// TODO: [HbRules] Remove temp console logs
-			console.log('dataByRules', outputData);
 
 			return outputData;
 		}

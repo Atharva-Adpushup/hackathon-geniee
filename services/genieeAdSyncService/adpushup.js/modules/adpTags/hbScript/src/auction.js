@@ -42,12 +42,6 @@ var auction = {
 	requestBids: function(pbjs, adpBatchId, slotCodes, timeOut) {
 		var that = this;
 
-		// TODO: [HbRules] Delete this temp auctionEnd event handler after
-		if (!window.auctionEndRegistered) {
-			pbjs.onEvent('auctionEnd', auctionData => console.log('auction end: ', auctionData));
-			window.auctionEndRegistered = true;
-		}
-
 		pbjs.requestBids({
 			timeout: timeOut || constants.PREBID.TIMEOUT,
 			adUnitCodes: slotCodes,
