@@ -57,13 +57,13 @@ function colorLog(color, ...messages) {
 }
 
 function isIgnoredEmail(email) {
-	return ignoredEmails.some(ignoredEmail => !!email.includes(ignoredEmail));
+	return ignoredEmails.some(ignoredEmail => !!email.toLowerCase().includes(ignoredEmail));
 }
 
 function isConfidentialDomain(domain) {
 	for (confidentialDomain in confidentialDomainValidator) {
 		if (
-			domain.includes(confidentialDomain) &&
+			domain.toLowerCase().includes(confidentialDomain) &&
 			confidentialDomainValidator[confidentialDomain](domain)
 		) {
 			return true;
@@ -107,7 +107,7 @@ function formatAndFilterUsers(users) {
 		if (!validator.isEmail(user.email) || isIgnoredEmail(user.email)) {
 			return output;
 		}
-		user.bucket = 'AppBucket';
+		user.bucket = [APP_BUCKET];
 		user.siteDomain = user.siteDomains[0];
 		user.hasConfidentialDomain = user.siteDomains.some(domain =>
 			isConfidentialDomain(domanize(domain))
@@ -122,10 +122,12 @@ function formatAndFilterUsers(users) {
 		if (!validator.isEmail(user.email) || isIgnoredEmail(user.email)) {
 			return output;
 		}
-		let userExistsInAppBucket = _findIndex(appBucketUsers, { email: user.email }) > -1;
+		let userIndex = _findIndex(appBucketUsers, { email: user.email });
 
-		if (!userExistsInAppBucket) {
-			user.bucket = 'apAppBucket';
+		if (userIndex !== -1) {
+			appBucketUsers[userIndex].bucket.push(AP_APP_BUCKET);
+		} else {
+			user.bucket = [AP_APP_BUCKET];
 			user.siteDomain = user.siteDomains[0];
 			user.hasConfidentialDomain = user.siteDomains.some(domain =>
 				isConfidentialDomain(domanize(domain))
@@ -184,14 +186,26 @@ function getUserCompanyName(email) {
 }
 
 function updateUser(user, data) {
-	if (user.bucket === 'AppBucket') {
+	if (Object.keys(data).length === 0) {
+		return Promise.resolve();
+	}
+	// user exists in both the buckets, update the docs in both the buckets
+	if (user.bucket.length === 2) {
+		const apAppBucketUpdate = updateApAppBucketUser(user, data);
+		const appBucketUpdate = userModel.updateUserData(user.email, data);
+
+		return Promise.all([apAppBucketUpdate, appBucketUpdate]);
+	}
+
+	if (user.bucket.includes(APP_BUCKET)) {
 		return userModel.updateUserData(user.email, data);
 	}
+
 	return updateApAppBucketUser(user, data);
 }
 
 function updateApAppBucketUser(user, data) {
-	let queryString = `UPDATE ${user.bucket} USE KEYS 'user::${user.email}' SET`;
+	let queryString = `UPDATE ${AP_APP_BUCKET} USE KEYS 'user::${user.email}' SET`;
 	for (key in data) {
 		const value = typeof data[key] === 'string' ? `"${data[key].replace(/"/g, "'")}"` : data[key];
 		queryString += ` ${key} = ${value},`;
@@ -315,8 +329,9 @@ function processDataInChunks(users, chunkSize = 500) {
 		/*
 			-	if tipalti does not have companyName, check for 'manuallyEnteredCompanyName' in the user doc
 			-	if 'manuallyEnteredCompanyName' is not present do the following
-					1.	save the 'manuallyEnteredCompanyName' in user doc = user.siteDomain
+					1.	save the 'manuallyEnteredCompanyName' in user doc with value user.siteDomain
 					2.	use 'manuallyEnteredCompanyName' as the companyName
+					3.	next time this process will be ignored since we would already have 'manuallyEnteredCompanyName' set
 		*/
 		let getCompanyNamePromise = getUserCompanyName(user.email).then(function(companyName) {
 			if (companyName) {
@@ -328,7 +343,7 @@ function processDataInChunks(users, chunkSize = 500) {
 		});
 		pendingPromises.push(getCompanyNamePromise);
 
-		let siteProcessingPromise = new Promise(function(resolve, reject) {
+		let userProcessingPromise = new Promise(function(resolve, reject) {
 			return Promise.all(pendingPromises)
 				.then(function() {
 					if (!user.companyName) {
@@ -357,7 +372,7 @@ function processDataInChunks(users, chunkSize = 500) {
 				});
 		});
 
-		chunkPromises.push(siteProcessingPromise);
+		chunkPromises.push(userProcessingPromise);
 	}
 
 	return Promise.all(chunkPromises).then(function() {
