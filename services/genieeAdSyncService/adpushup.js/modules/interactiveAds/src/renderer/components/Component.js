@@ -102,7 +102,8 @@ class Component {
 
 		// New feedback
 		adObj.status = 1;
-		adObj.adUnitType = constants.AD_UNIT_TYPE_MAPPING[formatData.type.toUpperCase()];
+		adObj.adUnitType = constants.AD_UNIT_TYPE_MAPPING[formatData.type.toUpperCase()] 
+			|| constants.AD_UNIT_TYPE_MAPPING.DISPLAY; // default to display incase of video ads or in view ads.
 		//newFeedbackAdObj.ads = [newFeedbackAdObj];
 		feedbackOptions.ads = [adObj];
 
