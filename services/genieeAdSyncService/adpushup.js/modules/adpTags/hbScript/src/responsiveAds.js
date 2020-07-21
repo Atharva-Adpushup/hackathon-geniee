@@ -5,61 +5,27 @@ var utils = require('./utils');
 var $ = require('./adp').$;
 
 var getMatchedAdSize = function(inputObject, adpSlot) {
-	var isValidInput = !!inputObject;
-	if (!isValidInput) {
-		return null;
-	}
-
-	var areValidInputDimensions = !!(
-			isValidInput &&
-			inputObject.width &&
-			inputObject.height &&
-			// Below '50' height value is minimum height to consider
-			inputObject.height >= 50
-		),
-		isValidInputWidth = !!(
-			isValidInput &&
-			inputObject.width &&
-			(!inputObject.height || inputObject.height < 50)
-		),
-		inputSizeWidth,
-		inputSizeHeight,
-		computedMatchedSizeArray = [],
+	var computedMatchedSizeArray = [],
 		finalComputedData = {};
-
-	if (areValidInputDimensions) {
-		inputSizeWidth = inputObject.width;
-		inputSizeHeight = inputObject.height;
-	} else if (isValidInputWidth) {
-		inputSizeWidth = inputObject.width;
-	} else {
-		var errorMessage = 'No matched ad for width : ' + inputSizeWidth + 'px';
-		utils.log(errorMessage);
-
-		finalComputedData.collection = computedMatchedSizeArray;
-		finalComputedData.elementWidth = null;
-		finalComputedData.elementHeight = null;
-		return finalComputedData;
-	}
 
 	/**
 	 * If we don't get inputSizeHeight, use Infinity as maxHeight since we want to allow all the downward compatible heights
 	 */
-	let maxWidth = inputSizeWidth;
-	let maxHeight = inputSizeHeight || inputObject.maxHeight ? inputObject.maxHeight : Infinity;
+	let maxWidth = inputObject.width;
+	let maxHeight = inputObject.height || Infinity;
 
 	let [sizeMappingWidth, sizeMappingHeight] = utils.getDimensionsFromSizeMapping(adpSlot);
 
 	if (sizeMappingWidth && sizeMappingHeight) {
-		maxWidth = Math.min(maxWidth, sizeMappingWidth);
-		maxHeight = Math.min(maxHeight, sizeMappingHeight);
+		maxWidth = Math.min(sizeMappingWidth, maxWidth);
+		maxHeight = Math.min(sizeMappingHeight, maxHeight);
 	}
 
 	computedMatchedSizeArray = utils.getDownwardCompatibleSizes(maxWidth, maxHeight);
 
 	finalComputedData.collection = computedMatchedSizeArray.concat([]);
-	finalComputedData.elementWidth = inputSizeWidth;
-	finalComputedData.elementHeight = inputSizeHeight;
+	finalComputedData.elementWidth = inputObject.width;
+	finalComputedData.elementHeight = inputObject.height;
 	return finalComputedData;
 };
 var getElComputedStyles = function(element) {
@@ -185,12 +151,24 @@ var getComputedAdSizes = function(adpSlot) {
 			: computedParentData.height;
 	}
 
+	if (
+		!computedParentData ||
+		!computedParentData.width ||
+		(computedParentData.height && computedParentData.height < 50)
+	) {
+		utils.log('No matched ad for width : ' + computedParentData.width + 'px');
+		return {
+			collection: [],
+			elementWidth: null,
+			elementHeight: null
+		};
+	}
 	if (currentEle.hasAttribute('max-height')) {
 		let maxHeight = parseInt(currentEle.getAttribute('max-height'), 10);
 
 		if (maxHeight) {
 			computedParentData.height = Math.min(computedParentData.height || Infinity, maxHeight);
-			computedParentData.maxHeight = maxHeight;
+			//computedParentData.maxHeight = maxHeight;
 		}
 	}
 
