@@ -162,7 +162,7 @@ var utils = {
 				return {};
 		}
 	},
-	getBiddersForSlot: function(size, formats) {
+	getBiddersForSlot: function(size, formats, bidderRulesConfig = {}) {
 		var width = size[0];
 		var height = size[1];
 		var size = width + 'x' + height;
@@ -170,12 +170,20 @@ var utils = {
 		var prebidConfig = config.PREBID_CONFIG;
 		var hbConfig = prebidConfig.hbcf;
 
+		var computedFormats = bidderRulesConfig.formats || formats;
+		var isAllowedBiddersRuleListValid =
+			Array.isArray(bidderRulesConfig.allowedBidders) &&
+			bidderRulesConfig.allowedBidders.length;
+
 		if (hbConfig && Object.keys(hbConfig).length) {
 			Object.keys(hbConfig).forEach(
 				function(bidder) {
 					var bidderData = hbConfig[bidder];
+					var isBidderAllowed =
+						!isAllowedBiddersRuleListValid ||
+						bidderRulesConfig.allowedBidders.indexOf(bidder) !== -1;
 
-					if (!bidderData.isPaused) {
+					if (!bidderData.isPaused && isBidderAllowed) {
 						if (bidderData.sizeLess) {
 							var computedBidderObj = {
 								bidder: bidder,
@@ -183,7 +191,7 @@ var utils = {
 							};
 
 							if (bidderParamsMapping[bidder]) {
-								formats.forEach(format => {
+								computedFormats.forEach(format => {
 									computedBidderObj.params = {
 										...this.getVideoOrNativeParams(format, bidder),
 										...computedBidderObj.params
@@ -208,7 +216,7 @@ var utils = {
 										let bidderParams = params;
 
 										if (bidderParamsMapping[bidder]) {
-											formats.forEach(format => {
+											computedFormats.forEach(format => {
 												bidderParams = {
 													...this.getVideoOrNativeParams(format, bidder),
 													...bidderParams
@@ -229,7 +237,34 @@ var utils = {
 			);
 		}
 
+		if (bidderRulesConfig.bidderSequence) {
+			bidders = this.sortBidders(bidders, bidderRulesConfig.bidderSequence);
+		}
+
 		return bidders;
+	},
+	sortBidders: function(unsortedBidders, bidderSequence) {
+		if (!(Array.isArray(bidderSequence) && bidderSequence.length)) {
+			return unsortedBidders;
+		}
+
+		var sortedBidders = [];
+		bidderSequence.forEach(bidderCode => {
+			unsortedBidders.forEach(bidder => {
+				// if bidder is in bidderSequence
+				if (bidder.bidder === bidderCode) {
+					sortedBidders.push(bidder);
+				}
+			});
+		});
+		unsortedBidders.forEach(bidder => {
+			// if bidder is not in bidderSequence
+			if (bidderSequence.indexOf(bidder.bidder) === -1) {
+				sortedBidders.push(bidder);
+			}
+		});
+
+		return sortedBidders;
 	},
 	isPrebidHbEnabled: function(slot) {
 		return (
@@ -501,6 +536,43 @@ var utils = {
 		}
 
 		return this.getDownwardCompatibleSizes(maxWidth, maxHeight, true, sizes);
+	},
+	isGivenTimeExistsInTimeRanges: function(inputTime, timeRanges) {
+		var timeMatches = false;
+
+		for (var i = 0; i < timeRanges.length; i++) {
+			var timeRange = timeRanges[i];
+
+			/**
+			 * Validate timeRange
+			 * sample timeRange: "06:00-11:59"
+			 */
+			var timeRangePattern = /^(\d{2}:\d{2}){1}-(\d{2}:\d{2}){1}$/g;
+			var isTimeRangeValid = timeRange.match(timeRangePattern);
+			if (!isTimeRangeValid) return timeMatches;
+
+			var [rangeStart, rangeEnd] = timeRange.split('-');
+			var [startH, startM] = rangeStart.split(':');
+			var [endH, endM] = rangeEnd.split(':');
+
+			var timeStart = new Date(inputTime.getTime());
+			timeStart.setHours(startH);
+			timeStart.setMinutes(startM);
+
+			var timeEnd = new Date(inputTime.getTime());
+			timeEnd.setHours(endH);
+			timeEnd.setMinutes(endM);
+
+			if (timeStart < timeEnd) {
+				timeMatches = inputTime >= timeStart && inputTime <= timeEnd;
+			} else {
+				timeMatches = inputTime >= timeStart || inputTime <= timeEnd;
+			}
+
+			if (timeMatches) break;
+		}
+
+		return timeMatches;
 	}
 };
 

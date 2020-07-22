@@ -8,6 +8,7 @@ var responsiveAds = require('./responsiveAds');
 var hb = require('./hb');
 var gpt = require('./gpt');
 var globalSizes = config.SIZE_MAPPING.sizes || [];
+var hbRules = require('./hbRules');
 
 var adpTags = {
 	module: {
@@ -93,7 +94,7 @@ var adpTags = {
 					optionalParam.formats.length &&
 					optionalParam.formats) ||
 				constants.PREBID.DEFAULT_FORMATS;
-			var bidders = optionalParam.headerBidding ? utils.getBiddersForSlot(size, formats) : [];
+
 			var timeout =
 				config.PREBID_CONFIG &&
 				config.PREBID_CONFIG.prebidConfig &&
@@ -102,6 +103,21 @@ var adpTags = {
 					: constants.PREBID.TIMEOUT;
 			var adType = optionalParam.adType;
 			var sizeMapping = optionalParam.sizeMapping;
+
+			var bidders;
+			if (optionalParam.headerBidding) {
+				hbRulesApi = hbRules({ config, utils, adpushup: window.adpushup || {} });
+				var sectionId = optionalParam.originalId || optionalParam.adId;
+				var {
+					bidders: computedBidders,
+					formats: computedFormats,
+					headerBidding
+				} = hbRulesApi.getDataByRules(size, formats, sectionId);
+
+				if (computedBidders) bidders = computedBidders;
+				optionalParam.headerBidding = headerBidding;
+				if (computedFormats) formats = computedFormats;
+			}
 
 			/*
 			if (isResponsive) {

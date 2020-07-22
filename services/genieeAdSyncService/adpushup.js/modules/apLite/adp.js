@@ -9,6 +9,7 @@ var $ = require('../../libs/jquery'),
 	hbUtils = require('../adpTags/hbScript/src/utils'),
 	utils = require('../../libs/utils'),
 	refreshAdSlot = require('../../src/refreshAdSlot'),
+	hbRules = require('../adpTags/hbScript/src/hbRules'),
 	apLite = {
 		module: {
 			config: apLiteConfig,
@@ -96,10 +97,30 @@ var $ = require('../../libs/jquery'),
 						: constants.PREBID.TIMEOUT;
 				var size = allSizes[0];
 
+				var bidders;
+				if (optionalParam.headerBidding) {
+					hbRulesApi = hbRules({ config, utils: hbUtils, adpushup: window.adpushup || {} });
+					var {
+						bidders: computedBidders,
+						formats: computedFormats,
+						headerBidding
+					} = hbRulesApi.getDataByRules(size, formats, sectionId);
+
+					if (computedBidders) bidders = computedBidders;
+					optionalParam.headerBidding = headerBidding;
+					if (computedFormats) formats = computedFormats;
+				}
+
+				// native format is not supported in apLite
+				var nativeFormatIndex = formats.indexOf('native');
+				if (nativeFormatIndex !== -1) {
+					formats.splice(nativeFormatIndex, 1);
+				}
+
 				var adpSlot = {
 					slotId: gptSlotElementId,
 					optionalParam,
-					bidders: optionalParam.headerBidding ? hbUtils.getBiddersForSlot(size, formats) : [],
+					bidders: bidders || [],
 					headerBidding: optionalParam.headerBidding,
 					formats,
 					activeDFPNetwork: hbUtils.getActiveDFPNetwork(),
