@@ -28,7 +28,7 @@ router.use('/user', userController);
 router.use('/proxy', proxyController);
 router.use('/apTag', apTagController);
 router.use('/site', siteController);
-router.use('/data', dataController);
+router.use(['/data', '/:siteId'], dataController);
 router.use('/innovativeAds', innovativeAdsController);
 router.use('/reports', loggerMiddleware, reportsController);
 router.use('/ops', opsController);

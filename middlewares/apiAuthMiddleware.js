@@ -3,12 +3,19 @@ const Promise = require('bluebird');
 const authToken = require('../helpers/authToken');
 const userModel = require('../models/userModel');
 
-const openRoutes = ['/login', '/signup', '/forgotPassword', '/resetPassword', '/utils'];
+const openRoutes = [
+	'/login',
+	'/signup',
+	'/forgotPassword',
+	'/resetPassword',
+	'/utils',
+	'\\/\\d+\\/adpushup\\.js'
+];
 const closedRoutes = ['/user'];
 
 module.exports = (req, res, next) => {
 	function isDifferentGenieeSiteId() {
-		const url = req.url;
+		const { url } = req;
 		const sessionSiteId = Number(req.session.siteId);
 		const sitePath = '/user/site/';
 		const siteIdPathRegex = /^\/user\/site\/(\d{1,10})\//;
@@ -41,7 +48,6 @@ module.exports = (req, res, next) => {
 	const isUserInSession = !!(isSession && req.session.user);
 	const isSiteIdInSession = !!(isSession && req.session.siteId);
 	const isAuthorisedURL = !!(isSession && isAuthorised());
-	const isSessionInvalid = !!(!req.session || !req.session.user);
 	const isOpenRouteValid = isOpenRoute();
 	const isDifferentGenieeSite = !!(
 		isSession &&
@@ -78,8 +84,7 @@ module.exports = (req, res, next) => {
 			next();
 			return null;
 		})
-	).catch(err => {
-		console.log(err);
+	).catch(() => {
 		res.clearCookie('user');
 		return res.redirect('/login');
 	});
