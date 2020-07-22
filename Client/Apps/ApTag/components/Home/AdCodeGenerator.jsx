@@ -472,6 +472,9 @@ class AdCodeGenerator extends Component {
 				<FormGroup controlId="beforeJsSnippet-input">
 					<Col md={3}>
 						<ControlLabel className="scriptLabel">Custom Script</ControlLabel>
+						<small style={{ display: 'block', fontSize: '14px' }}>
+							<i> Please call triggerRewardedAd function in your custom script</i>
+						</small>
 					</Col>
 					<Col md={9}>
 						<FormControl

@@ -133,169 +133,232 @@ const ADCODE = `<div id="__AD_ID__" class="_ap_apex_ad"__CUSTOM_ATTRIBS__>
 
 const REWARDED_AD_CODE = ` 
 <script>
-if(!!navigator.userAgent.match(/iPad|iPhone|Android|BlackBerry|Windows Phone|webOS/i)){
-if ($("#btnSendText_V2_Mobile").is(":visible")) {
-    if (Math.floor(Math.random() * 100) < 20) {
-        googletag = window.googletag || {
-            cmd: []
-        };
-        function setupRewarded() {
-            const rewardedSlot = googletag.defineOutOfPageSlot("/__NETWORK_CODE__/__AD_UNIT__", googletag.enums.OutOfPageFormat.REWARDED).addService(googletag.pubads());
-            rewardedSlot.setForceSafeFrame(true);
-            googletag.pubads().enableAsyncRendering();
-            googletag.enableServices();
-            return rewardedSlot;
+  if (
+    !!navigator.userAgent.match(
+      /iPad|iPhone|Android|BlackBerry|Windows Phone|webOS/i
+    )
+  ) {
+    googletag = window.googletag || {
+      cmd: [],
+    };
+    function setupRewarded() {
+      const rewardedSlot = googletag
+        .defineOutOfPageSlot(
+          "/__NETWORK_CODE__/__AD_UNIT__",
+          googletag.enums.OutOfPageFormat.REWARDED
+        )
+        .addService(googletag.pubads());
+      rewardedSlot.setForceSafeFrame(true);
+      googletag.pubads().enableAsyncRendering();
+      googletag.enableServices();
+      return rewardedSlot;
+    }
+    googletag.cmd.push(function () {
+      function getRandomData() {
+        if (window && window.crypto && window.crypto.getRandomValues) {
+          return crypto.getRandomValues(new Uint8Array(1))[0] % 16;
+        } else {
+          return Math.random() * 16;
         }
-        googletag.cmd.push(function() {
-            function getRandomData() {
-                if (window && window.crypto && window.crypto.getRandomValues) {
-                    return crypto.getRandomValues(new Uint8Array(1))[0] % 16;
-                } else {
-                    return Math.random() * 16;
-                }
-            }
-            function generateUUID(placeholder) {
-                return placeholder ? (placeholder ^ (getRandomData() >> (placeholder / 4))).toString(16) : ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, generateUUID);
-            }
-            if (!localStorage.getItem("aprewarded_key")) {
-                localStorage.setItem("aprewarded_key", JSON.stringify({
-                    ready: 0,
-                    granted: 0,
-                    played: 0,
-                    userId: generateUUID()
-                }));
-            }
-            var uuid = generateUUID();
-            var initialData = {};
-            initialData.timestamp = new Date().getTime();
-            initialData.id = uuid;
-            initialData.eventType = 5;
-            initialData.type = 0;
-            initialData.ua = navigator.userAgent;
-            initialData.userStats = JSON.parse(localStorage.getItem("aprewarded_key"));
+      }
+      function generateUUID(placeholder) {
+        return placeholder
+          ? (placeholder ^ (getRandomData() >> (placeholder / 4))).toString(16)
+          : ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(
+              /[018]/g,
+              generateUUID
+            );
+      }
+      if (!localStorage.getItem("aprewarded_key")) {
+        localStorage.setItem(
+          "aprewarded_key",
+          JSON.stringify({
+            ready: 0,
+            granted: 0,
+            played: 0,
+            userId: generateUUID(),
+          })
+        );
+      }
+      var uuid = generateUUID();
+      var initialData = {};
+      initialData.timestamp = new Date().getTime();
+      initialData.id = uuid;
+      initialData.eventType = 5;
+      initialData.type = 0;
+      initialData.ua = navigator.userAgent;
+      initialData.userStats = JSON.parse(
+        localStorage.getItem("aprewarded_key")
+      );
+      var xhr = new XMLHttpRequest();
+      xhr.open(
+        "POST",
+        "https://vastdump-staging.adpushup.com/rewardedAdDump",
+        true
+      );
+      xhr.setRequestHeader("Content-type", "application/json");
+      xhr.send(JSON.stringify(initialData));
+      googletag.pubads().addEventListener("rewardedSlotReady", function (e) {
+        var rewardedData = JSON.parse(localStorage.getItem("aprewarded_key"));
+        rewardedData.ready += 1;
+        localStorage.setItem("aprewarded_key", JSON.stringify(rewardedData));
+        $("body").append(
+          '<div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">' +
+            '<div class="modal-dialog" role="document">' +
+            '<div class="modal-content">' +
+            '<div class="modal-header">' +
+            '<h5 class="modal-title" id="exampleModalLabel"></h5>' +
+            '<button type="button" class="close" data-dismiss="modal" aria-label="Close">' +
+            '<span aria-hidden="true">&times;</span>' +
+            "</button>" +
+            "</div>" +
+            '<div class="modal-body">' +
+            "You need 10 credits to view the summary. Would you like to watch an ad to earn 10 credits?" +
+            "</div>" +
+            '<div class="modal-footer">' +
+            '<button type="button" id="noThanksBtn" class="btn btn-secondary" data-dismiss="modal">Close</button>' +
+            '<button type="button" id="watchAdBtn" class="btn btn-primary">Watch</button>' +
+            "</div>" +
+            "</div>" +
+            "</div>" +
+            "</div>"
+        );
+
+        var modalShown = false;
+        function triggerRewardedAd() {
+          $("#modal").modal("show");
+          if (!modalShown) {
             var xhr = new XMLHttpRequest();
-            xhr.open("POST", "https://vastdump-staging.adpushup.com/rewardedAdDump", true);
+            var data = {};
+            data.timestamp = new Date().getTime();
+            data.type = 0;
+            // type = 1 for the 4 download buttons type = 0 for 'resoomer' button
+            data.id = uuid;
+            data.eventType = 6;
+            // {0: ready, 1: played, 2: granted, 3: cancelled, 6: resoomerPressed}
+            data.ua = navigator.userAgent;
+            data.userStats = JSON.parse(localStorage.getItem("aprewarded_key"));
+            xhr.open(
+              "POST",
+              "https://vastdump-staging.adpushup.com/rewardedAdDump",
+              true
+            );
             xhr.setRequestHeader("Content-type", "application/json");
-            xhr.send(JSON.stringify(initialData));
-            googletag.pubads().addEventListener("rewardedSlotReady", function(e) {
-                var rewardedData = JSON.parse(localStorage.getItem("aprewarded_key"));
-                rewardedData.ready += 1;
-                localStorage.setItem("aprewarded_key", JSON.stringify(rewardedData));
-                $("body").append('<div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">' + '<div class="modal-dialog" role="document">' + '<div class="modal-content">' + '<div class="modal-header">' + '<h5 class="modal-title" id="exampleModalLabel"></h5>' + '<button type="button" class="close" data-dismiss="modal" aria-label="Close">' + '<span aria-hidden="true">&times;</span>' + "</button>" + "</div>" + '<div class="modal-body">' + "You need 10 credits to view the summary. Would you like to watch an ad to earn 10 credits?" + "</div>" + '<div class="modal-footer">' + '<button type="button" id="noThanksBtn" class="btn btn-secondary" data-dismiss="modal">Close</button>' + '<button type="button" id="watchAdBtn" class="btn btn-primary">Watch</button>' + "</div>" + "</div>" + "</div>" + "</div>");
-                $("#btnSendText_V2_Mobile").unbind("click");
-                var modalShown = false;
-                $("#btnSendText_V2_Mobile").click(function(clicke) {
-                    $("#modal").modal("show");
-                    if (!modalShown) {
-                        var xhr = new XMLHttpRequest();
-                        var data = {};
-                        data.timestamp = new Date().getTime();
-                        data.type = 0;
-                        // type = 1 for the 4 download buttons type = 0 for 'resoomer' button
-                        data.id = uuid;
-                        data.eventType = 6;
-                        // {0: ready, 1: played, 2: granted, 3: cancelled, 6: resoomerPressed}
-                        data.ua = navigator.userAgent;
-                        data.userStats = JSON.parse(localStorage.getItem("aprewarded_key"));
-                        xhr.open("POST", "https://vastdump-staging.adpushup.com/rewardedAdDump", true);
-                        xhr.setRequestHeader("Content-type", "application/json");
-                        xhr.send(JSON.stringify(data));
-                    }
-                    $("#watchAdBtn").click(function() {
-                        var data = {};
-                        var rewardedData = JSON.parse(localStorage.getItem("aprewarded_key"))
-                        rewardedData.played += 1;
-                        localStorage.setItem("aprewarded_key", JSON.stringify(rewardedData));
-                        data.timestamp = new Date().getTime();
-                        data.type = 0;
-                        // type = 1 for the 4 download buttons type = 0 for 'resoomer' button
-                        data.id = uuid;
-                        data.eventType = 1;
-                        // {0: ready, 1: played, 2: granted, 3: cancelled, 6: resoomerPressed}
-                        data.ua = navigator.userAgent;
-                        data.userStats = JSON.parse(localStorage.getItem("aprewarded_key"));
-                        var xhr = new XMLHttpRequest();
-                        xhr.open("POST", "https://vastdump-staging.adpushup.com/rewardedAdDump", true);
-                        xhr.setRequestHeader("Content-type", "application/json");
-                        xhr.send(JSON.stringify(data));
-                        e.makeRewardedVisible();
-                    });
-                    $("#noThanksBtn").click(function() {
-                        $("#modal").modal("hide");
-                    });
-                });
-                var data = {};
-                data.timestamp = new Date().getTime();
-                data.type = 0;
-                // type = 1 for the 4 download buttons type = 0 for 'resoomer' button
-                data.id = uuid;
-                data.eventType = 0;
-                // {0: ready, 1: played, 2: granted, 3: cancelled, 6: resoomerPressed}
-                data.ua = navigator.userAgent;
-                data.userStats = JSON.parse(localStorage.getItem("aprewarded_key"))
-                var xhr = new XMLHttpRequest();
-                xhr.open("POST", "https://vastdump-staging.adpushup.com/rewardedAdDump", true);
-                xhr.setRequestHeader("Content-type", "application/json");
-                xhr.send(JSON.stringify(data));
-            });
-            googletag.pubads().addEventListener("rewardedSlotGranted", function(e) {
-                var rewardedData = JSON.parse(localStorage.getItem("aprewarded_key"));
-                rewardedData.granted += 1;
-                localStorage.setItem("aprewarded_key", JSON.stringify(rewardedData));
-                var data = {};
-                data.timestamp = new Date().getTime();
-                data.type = 0;
-                // type = 1 for the 4 download buttons type = 0 for 'resoomer' button
-                data.id = uuid;
-                data.eventType = 2;
-                // {0: ready, 1: played, 2: granted, 3: cancelled, 6: resoomerPressed}
-                data.ua = navigator.userAgent;
-                data.userStats = JSON.parse(localStorage.getItem("aprewarded_key"));
-                var xhr = new XMLHttpRequest();
-                xhr.open("POST", "https://vastdump-staging.adpushup.com/rewardedAdDump", true);
-                xhr.setRequestHeader("Content-type", "application/json");
-                xhr.send(JSON.stringify(data));
-                $("#modal").hide();
-                $("#modal").on("hidden.bs.modal", function() {
-                    $(this).remove();
-                });
-                __POST_REWARDED_FUNCTION__
-            });
-            googletag.pubads().addEventListener("rewardedSlotCanceled", function(e) {
-                var data = {};
-                data.timestamp = new Date().getTime();
-                data.type = 0;
-                // type = 1 for the 4 download buttons type = 0 for 'resoomer' button
-                data.id = uuid;
-                data.eventType = 3;
-                // {0: ready, 1: played, 2: granted, 3: cancelled, 6: resoomerPressed}
-                data.ua = navigator.userAgent;
-                data.userStats = JSON.parse(localStorage.getItem("aprewarded_key"));
-                var xhr = new XMLHttpRequest();
-                xhr.open("POST", "https://vastdump-staging.adpushup.com/rewardedAdDump", true);
-                xhr.setRequestHeader("Content-type", "application/json");
-                xhr.send(JSON.stringify(data));
-                $("#modal").modal("hide");
-                $("#modal").on("hidden.bs.modal", function() {
-                    $(this).remove();
-                });
-                $("#btnSendText_V2_Mobile").unbind("click");
-                $("#btnSendText_V2_Mobile").click(function() {
-					__POST_REWARDED_FUNCTION__
-                });
-                var slot = setupRewarded();
-                googletag.display(slot);
-                googletag.pubads().refresh([slot]);
-            });
-            var slot = setupRewarded();
-            googletag.display(slot);
-            googletag.pubads().refresh([slot]);
+            xhr.send(JSON.stringify(data));
+          }
+          $("#watchAdBtn").click(function () {
+            var data = {};
+            var rewardedData = JSON.parse(
+              localStorage.getItem("aprewarded_key")
+            );
+            rewardedData.played += 1;
+            localStorage.setItem(
+              "aprewarded_key",
+              JSON.stringify(rewardedData)
+            );
+            data.timestamp = new Date().getTime();
+            data.type = 0;
+            // type = 1 for the 4 download buttons type = 0 for 'resoomer' button
+            data.id = uuid;
+            data.eventType = 1;
+            // {0: ready, 1: played, 2: granted, 3: cancelled, 6: resoomerPressed}
+            data.ua = navigator.userAgent;
+            data.userStats = JSON.parse(localStorage.getItem("aprewarded_key"));
+            var xhr = new XMLHttpRequest();
+            xhr.open(
+              "POST",
+              "https://vastdump-staging.adpushup.com/rewardedAdDump",
+              true
+            );
+            xhr.setRequestHeader("Content-type", "application/json");
+            xhr.send(JSON.stringify(data));
+            e.makeRewardedVisible();
+          });
+          $("#noThanksBtn").click(function () {
+            $("#modal").modal("hide");
+          });
+        }
+        var data = {};
+        data.timestamp = new Date().getTime();
+        data.type = 0;
+        // type = 1 for the 4 download buttons type = 0 for 'resoomer' button
+        data.id = uuid;
+        data.eventType = 0;
+        // {0: ready, 1: played, 2: granted, 3: cancelled, 6: resoomerPressed}
+        data.ua = navigator.userAgent;
+        data.userStats = JSON.parse(localStorage.getItem("aprewarded_key"));
+        var xhr = new XMLHttpRequest();
+        xhr.open(
+          "POST",
+          "https://vastdump-staging.adpushup.com/rewardedAdDump",
+          true
+        );
+        xhr.setRequestHeader("Content-type", "application/json");
+        xhr.send(JSON.stringify(data));
+      });
+      googletag.pubads().addEventListener("rewardedSlotGranted", function (e) {
+        var rewardedData = JSON.parse(localStorage.getItem("aprewarded_key"));
+        rewardedData.granted += 1;
+        localStorage.setItem("aprewarded_key", JSON.stringify(rewardedData));
+        var data = {};
+        data.timestamp = new Date().getTime();
+        data.type = 0;
+        // type = 1 for the 4 download buttons type = 0 for 'resoomer' button
+        data.id = uuid;
+        data.eventType = 2;
+        // {0: ready, 1: played, 2: granted, 3: cancelled, 6: resoomerPressed}
+        data.ua = navigator.userAgent;
+        data.userStats = JSON.parse(localStorage.getItem("aprewarded_key"));
+        var xhr = new XMLHttpRequest();
+        xhr.open(
+          "POST",
+          "https://vastdump-staging.adpushup.com/rewardedAdDump",
+          true
+        );
+        xhr.setRequestHeader("Content-type", "application/json");
+        xhr.send(JSON.stringify(data));
+        $("#modal").hide();
+        $("#modal").on("hidden.bs.modal", function () {
+          $(this).remove();
         });
-	}
-}
-}
-</script>
-`;
+        __POST_REWARDED_FUNCTION__;
+      });
+      googletag.pubads().addEventListener("rewardedSlotCanceled", function (e) {
+        var data = {};
+        data.timestamp = new Date().getTime();
+        data.type = 0;
+        // type = 1 for the 4 download buttons type = 0 for 'resoomer' button
+        data.id = uuid;
+        data.eventType = 3;
+        // {0: ready, 1: played, 2: granted, 3: cancelled, 6: resoomerPressed}
+        data.ua = navigator.userAgent;
+        data.userStats = JSON.parse(localStorage.getItem("aprewarded_key"));
+        var xhr = new XMLHttpRequest();
+        xhr.open(
+          "POST",
+          "https://vastdump-staging.adpushup.com/rewardedAdDump",
+          true
+        );
+        xhr.setRequestHeader("Content-type", "application/json");
+        xhr.send(JSON.stringify(data));
+        $("#modal").modal("hide");
+        $("#modal").on("hidden.bs.modal", function () {
+          $(this).remove();
+        });
+
+		
+        var slot = setupRewarded();
+        googletag.display(slot);
+        googletag.pubads().refresh([slot]);
+      });
+      var slot = setupRewarded();
+      googletag.display(slot);
+      googletag.pubads().refresh([slot]);
+    });
+  }
+
+  __TRIGGER_REWARDED_AD__;
+</script>`;
 
 const ADS_TXT_DATA = `#AdX
 google.com,pub-8933329999391104,RESELLER,f08c47fec0942fa0

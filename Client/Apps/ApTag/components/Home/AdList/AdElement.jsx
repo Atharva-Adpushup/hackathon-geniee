@@ -69,7 +69,8 @@ class AdElement extends Component {
 		const { ad, updateAd, networkConfig, user, siteId, networkCode, dfpMessage } = this.props;
 		const {
 			networkData: { dfpAdunitCode, dfpAdunit },
-			rewardTriggerFunction
+			rewardTriggerFunction,
+			customScript
 		} = ad;
 		const {
 			showLazyload,
@@ -82,6 +83,7 @@ class AdElement extends Component {
 
 		const isRewarded = ad.formatData.type === 'rewardedAds';
 		let code = isRewarded ? REWARDED_AD_CODE : ADCODE;
+		let triggerRewardedAd = !customScript ? 'triggerRewardedAd()' : atob(customScript);
 
 		const customAttributes = ad.maxHeight ? ` max-height="${ad.maxHeight}"` : '';
 		code = code
@@ -94,6 +96,7 @@ class AdElement extends Component {
 						/__POST_REWARDED_FUNCTION__/g,
 						rewardTriggerFunction && atob(rewardTriggerFunction)
 					)
+					.replace(/__TRIGGER_REWARDED_AD__/, triggerRewardedAd)
 			: null;
 
 		if (ad.formatData.type === 'rewardedAds') {
