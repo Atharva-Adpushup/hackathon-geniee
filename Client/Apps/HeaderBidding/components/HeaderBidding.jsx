@@ -219,7 +219,11 @@ class HeaderBidding extends React.Component {
 			updateInventoriesHbStatus,
 			showNotification,
 			setUnsavedChangesAction,
-			isSuperUser
+			isSuperUser,
+			fetchHBRulesAction,
+			saveHBRulesAction,
+			hasUnsavedChanges,
+			rules
 		} = this.props;
 
 		const activeTab = this.getActiveTab();
@@ -275,8 +279,14 @@ class HeaderBidding extends React.Component {
 						isSuperUser && (
 							<OptimizationTab
 								siteId={siteId}
+								rules={rules}
+								bidders={bidders}
+								inventories={inventories}
 								showNotification={showNotification}
 								setUnsavedChangesAction={setUnsavedChangesAction}
+								fetchHBRulesAction={fetchHBRulesAction}
+								saveHBRulesAction={saveHBRulesAction}
+								hasUnsavedChanges={hasUnsavedChanges}
 							/>
 						)
 					);
@@ -336,7 +346,7 @@ class HeaderBidding extends React.Component {
 						{NAV_ITEMS_VALUES.TAB_4}
 					</NavItem>
 					{isSuperUser && (
-						<NavItem eventKey={5} className="disabled">
+						<NavItem eventKey={5} className={!biddersFound ? 'disabled' : ''}>
 							{NAV_ITEMS_VALUES.TAB_5}
 						</NavItem>
 					)}

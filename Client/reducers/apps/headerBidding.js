@@ -11,7 +11,9 @@ import {
 	UPDATE_ADSERVER_SETUP_STATUS,
 	GET_HB_INIT_DATA,
 	FETCH_ALL_BIDDERS,
-	SET_UNSAVED_CHANGES
+	SET_UNSAVED_CHANGES,
+	FETCH_HB_RULES,
+	UPDATE_HB_RULES
 } from '../../constants/headerBidding';
 
 const defaultState = { hasUnsavedChanges: false, sites: {} };
@@ -201,6 +203,23 @@ export default function(state = defaultState, action) {
 				hasUnsavedChanges
 			};
 		}
+
+		case FETCH_HB_RULES:
+		case UPDATE_HB_RULES: {
+			const { siteId, rules } = action;
+
+			return {
+				...state,
+				sites: {
+					...state.sites,
+					[siteId]: {
+						...state.sites[siteId],
+						rules
+					}
+				}
+			};
+		}
+
 		default:
 			return state;
 	}

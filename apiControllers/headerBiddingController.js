@@ -1,7 +1,9 @@
 /* eslint-disable no-shadow */
 /* eslint-disable no-restricted-syntax */
+const axios = require('axios').default;
 const express = require('express');
 const Promise = require('bluebird');
+const _get = require('lodash/get');
 const userModel = require('../models/userModel');
 const siteModel = require('../models/siteModel');
 const headerBiddingModel = require('../models/headerBiddingModel');
@@ -728,6 +730,195 @@ router
 			.catch(() =>
 				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error!' })
 			);
+	})
+	.get('/rules/meta', (req, res) => {
+		const apis = {
+			devices:
+				'https://api.adpushup.com/CentralReportingWebService/site/list?list_name=GET_ALL_DEVICES',
+			countries:
+				'https://api.adpushup.com/CentralReportingWebService/site/list?list_name=GET_ALL_COUNTRIES',
+			days:
+				'https://api.adpushup.com/CentralReportingWebService/hb_analytics/list?list_name=GET_ALL_DAY_TYPES',
+			adTypes:
+				'https://api.adpushup.com/CentralReportingWebService/hb_analytics/list?list_name=GET_AD_TYPE_OPTIONS',
+			timeSlots:
+				'https://api.adpushup.com/CentralReportingWebService/hb_analytics/list?list_name=GET_TIME_OF_AUCTION_BUCKETS'
+		};
+
+		const fetchDataFromAPI = api => axios.get(api);
+		const getDataFromAPIResponse = response =>
+			(response.data &&
+				response.data.description === 'SUCCESS' &&
+				response.data.data &&
+				response.data.data.result) ||
+			[];
+
+		const fieldsIgnored = {
+			countries: {
+				XX: true
+			}
+		};
+
+		const fieldsRequired = {
+			adTypes: { banner: true, native: true, video: true },
+			devices: { mobile: true, tablet: true, desktop: true }
+		};
+
+		const fieldsToBeReplaced = {
+			adTypes: {
+				label: { Banner: 'Display' },
+				value: { banner: 'display' }
+			}
+		};
+
+		// eslint-disable-next-line consistent-return
+		const getKeysToBeUsed = type => {
+			switch (type) {
+				case 'countries':
+					return { labelKey: 'value', valueKey: 'country_code_alpha2' };
+
+				default:
+					return { labelKey: 'value', valueKey: 'ext' };
+			}
+		};
+
+		const getConvertedDataFromAPI = (response, dataType) => {
+			const data = getDataFromAPIResponse(response);
+
+			const fieldsIgnoredForDataType = fieldsIgnored[dataType];
+			const fieldsRequiredForDataType = fieldsRequired[dataType];
+			const fieldsToBeReplacedForDataType = fieldsToBeReplaced[dataType];
+
+			const { labelKey, valueKey } = getKeysToBeUsed(dataType);
+
+			return data.reduce((result, item) => {
+				const label = item[labelKey];
+				const value = item[valueKey];
+
+				// has fields required ?
+				if (fieldsRequiredForDataType) {
+					const isFieldRequired = _get(fieldsRequiredForDataType, value, false);
+					if (!isFieldRequired) return result;
+				}
+
+				// has fields to be ignored ?
+				if (fieldsIgnoredForDataType) {
+					const isFieldIgnored = _get(fieldsIgnoredForDataType, value, false);
+					if (isFieldIgnored) return result;
+				}
+
+				// get label and value replacements to be used
+				const convertedItem = {};
+				convertedItem.label = _get(fieldsToBeReplacedForDataType, `label.${label}`, label);
+				convertedItem.value = _get(fieldsToBeReplacedForDataType, `value.${value}`, value);
+
+				result.push(convertedItem);
+
+				return result;
+			}, []);
+		};
+
+		axios
+			.all([
+				fetchDataFromAPI(apis.countries),
+				fetchDataFromAPI(apis.devices),
+				fetchDataFromAPI(apis.days),
+				fetchDataFromAPI(apis.timeSlots),
+				fetchDataFromAPI(apis.adTypes)
+			])
+			.then(
+				axios.spread((countries, devices, days, timeSlots, adTypes) => ({
+					days: getConvertedDataFromAPI(days, 'days'),
+					adTypes: getConvertedDataFromAPI(adTypes, 'adTypes'),
+					devices: getConvertedDataFromAPI(devices, 'devices'),
+					countries: getConvertedDataFromAPI(countries, 'countries'),
+					timeSlots: getConvertedDataFromAPI(timeSlots, 'timeSlots')
+				}))
+			)
+			.then(data => res.send(data))
+			.catch(error => res.status(httpStatus.BAD_REQUEST).send(error.message));
+	})
+	.get('/rules/:siteId', (req, res) => {
+		const { siteId } = req.params;
+		const { email } = req.user;
+
+		return userModel
+			.verifySiteOwner(email, siteId)
+			.then(() => headerBiddingModel.getHbConfig(siteId, email))
+			.then(hbConfig => hbConfig.get('rules') || [])
+			.then(rules => res.status(httpStatus.OK).json(rules))
+			.catch(err => {
+				// eslint-disable-next-line no-console
+				console.log(err);
+				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error!' });
+			});
+	})
+	.post('/rules/:siteId', (req, res) => {
+		const { siteId } = req.params;
+		const { email } = req.user;
+		const { rule } = req.body;
+
+		const newRule = { ...rule, createdAt: new Date().getTime() };
+
+		return userModel
+			.verifySiteOwner(email, siteId)
+			.then(() => FormValidator.validate(rule, schema.hbRules.rule))
+			.then(() => headerBiddingModel.getHbConfig(siteId, email))
+			.then(hbConfig => {
+				const rules = hbConfig.get('rules') || [];
+				hbConfig.set('rules', [...rules, newRule]);
+				return hbConfig.save();
+			})
+			.then(({ data: { rules } }) => res.status(httpStatus.OK).json(rules))
+			.catch(err => {
+				// eslint-disable-next-line no-console
+				console.log(err);
+
+				if (err instanceof AdPushupError) {
+					return res.status(httpStatus.BAD_REQUEST).json({ error: err.message });
+				}
+
+				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error!' });
+			});
+	})
+	.put('/rules/:siteId', (req, res) => {
+		const { siteId } = req.params;
+		const { email } = req.user;
+		const { rule, ruleIndex } = req.body;
+
+		return userModel
+			.verifySiteOwner(email, siteId)
+			.then(() => FormValidator.validate(rule, schema.hbRules.rule))
+			.then(() => {
+				const parsedRuleIndex = parseInt(ruleIndex, 10);
+				if (Number.isNaN(parsedRuleIndex)) {
+					throw new AdPushupError('Invalid data given to edit rule');
+				}
+			})
+			.then(() => headerBiddingModel.getHbConfig(siteId, email))
+			.then(hbConfig => {
+				const rules = hbConfig.get('rules') || [];
+
+				if (rules.length <= ruleIndex) {
+					throw new AdPushupError('Invalid data given to edit rule');
+				}
+
+				rules[ruleIndex] = { ...rules[ruleIndex], ...rule };
+
+				hbConfig.set('rules', rules);
+				return hbConfig.save();
+			})
+			.then(({ data: { rules } }) => res.status(httpStatus.OK).json(rules))
+			.catch(err => {
+				// eslint-disable-next-line no-console
+				console.log(err);
+
+				if (err instanceof AdPushupError) {
+					return res.status(httpStatus.BAD_REQUEST).json({ error: err.message });
+				}
+
+				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error!' });
+			});
 	});
 
 module.exports = router;

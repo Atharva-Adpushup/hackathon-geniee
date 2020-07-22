@@ -4,5 +4,8 @@ export default {
 	},
 	atob(b64Encoded) {
 		return Buffer.from(b64Encoded, 'base64').toString();
+	},
+	isNumber(value) {
+		return typeof value === 'number';
 	}
 };

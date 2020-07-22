@@ -193,5 +193,26 @@ module.exports = {
 			],
 			isLength: [{ name: 'country', message: 'Country Code is invalid', value: { min: 2, max: 2 } }]
 		}
+	},
+	hbRules: {
+		rule: {
+			isBoolean: [
+				{
+					name: 'isActive',
+					message: 'isActive property should be a boolean',
+					value: '',
+					status: 400
+				}
+			],
+			isLength: [
+				{ name: 'actions', message: 'Please set minimum 1 action', value: { min: 1 }, status: 400 },
+				{
+					name: 'triggers',
+					message: 'Please set minimum 1 trigger',
+					value: { min: 1 },
+					status: 400
+				}
+			]
+		}
 	}
 };
