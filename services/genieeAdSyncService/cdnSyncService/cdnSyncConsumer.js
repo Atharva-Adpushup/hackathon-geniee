@@ -247,7 +247,7 @@ module.exports = function(site, user) {
 					try {
 						var output = uglifyJS.minify(uncompressed, {
 							compress: true,
-							mangle: false,
+							mangle: true,
 							sourceMap: true
 						});
 						if (output.error) throw output.error;
