@@ -208,10 +208,7 @@ router
 					res
 				)
 			)
-			.catch(err => {
-				console.log(err);
-				return sendErrorResponse(DEFAULT_RESPONSE, res);
-			});
+			.catch(() => sendErrorResponse(DEFAULT_RESPONSE, res));
 	})
 	.post('/create', (req, res) => {
 		// siteDomain
@@ -371,10 +368,7 @@ router
 						)
 				)
 			)
-			.catch(err => {
-				console.log(err);
-				return sendErrorResponse(err, res);
-			});
+			.catch(err => sendErrorResponse(err, res));
 	})
 	.get('/getAppStatuses', (req, res) => {
 		const { email } = req.user;
@@ -387,10 +381,7 @@ router
 				const apps = site.get('apps') || {};
 				return sendSuccessResponse({ apps }, res);
 			})
-			.catch(err => {
-				console.log(err);
-				return sendErrorResponse(err, res);
-			});
+			.catch(err => sendErrorResponse(err, res));
 	})
 	.post('/saveApConfigs', (req, res) => {
 		const { email } = req.user;
@@ -409,10 +400,7 @@ router
 				return site.save();
 			})
 			.then(() => sendSuccessResponse({ success: 1 }, res))
-			.catch(err => {
-				console.log(err);
-				return sendErrorResponse(err, res);
-			});
+			.catch(err => sendErrorResponse(err, res));
 	})
 	.post('/saveSettings', (req, res) => {
 		const { email } = req.user;
@@ -428,10 +416,7 @@ router
 				return site.save();
 			})
 			.then(() => sendSuccessResponse({ success: 1 }, res))
-			.catch(err => {
-				console.log(err);
-				return sendErrorResponse(err, res);
-			});
+			.catch(err => sendErrorResponse(err, res));
 	})
 	.post('/updateSite', (req, res) => {
 		const { siteId, toUpdate } = req.body;
@@ -538,7 +523,7 @@ router
 
 				return sendSuccessResponse({ message: 'Settings saved successfully', apConfigs }, res);
 			})
-			.catch(err => console.log(err));
+			.catch(() => sendErrorResponse({ message: 'Unable to save settings' }));
 	})
 
 	.post('/:siteId/saveAmpSettings', (req, res) => {
@@ -574,9 +559,6 @@ router
 			.then(() => headerBiddingModel.getInventoriesForHB(siteId))
 			.then(inventories => sendSuccessResponse(inventories, res))
 			.catch(err => {
-				// eslint-disable-next-line no-console
-				console.log(err);
-
 				if (err instanceof AdPushupError)
 					return res.status(HTTP_STATUS.NOT_FOUND).json({ error: err.message });
 
@@ -599,7 +581,7 @@ router
 
 			const viewportWidthMap = {};
 
-			for (let i = 0; i < sizeMapping.length; i++) {
+			for (let i = 0; i < sizeMapping.length; i+=1) {
 				const { viewportWidth, maxHeight, maxWidth } = sizeMapping[i];
 
 				const isValidMaxWidth = typeof maxWidth === 'number' && maxWidth >= 0;
@@ -675,6 +657,7 @@ router
 							doc.ads[index] = { ...ad, sizeMapping };
 							return false;
 						}
+						return true;
 					});
 
 					return helpers.directDBUpdate(`${docKey}${req.params.siteId}`, doc, docWithCas.cas);
@@ -705,6 +688,7 @@ router
 							doc.adUnits[index] = { ...ad, sizeMapping };
 							return false;
 						}
+						return true;
 					});
 
 					return helpers.directDBUpdate(`${docKey}${req.params.siteId}`, doc, docWithCas.cas);
@@ -754,9 +738,18 @@ router
 		if (!siteId || siteId.trim().length === 0) {
 			return res.status(404).json({ message: 'Invalid Site ID' });
 		}
-		return publishAdPushupBuild(siteId)
+
+		return siteModel
+			.getSiteById(siteId)
+			.then(() => publishAdPushupBuild(siteId))
 			.then(() => res.json({ message: 'Build pushed' }))
-			.catch(() => res.json({ message: 'Error publishing build' }));
+			.catch(e => {
+				if (e instanceof AdPushupError) {
+					// site id not found.
+					return res.status(404).json({ message: `Site for ID ${siteId} not found` });
+				}
+				return res.status(500).json({ message: 'Unable to build adpushup.js' });
+			});
 	});
 
 module.exports = router;

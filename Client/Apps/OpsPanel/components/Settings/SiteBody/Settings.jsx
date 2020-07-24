@@ -7,7 +7,7 @@ import InputBox from '../../../../../Components/InputBox/index';
 import CustomButton from '../../../../../Components/CustomButton/index';
 // import { formatDate } from '../../../../../helpers/commonFunctions';
 import { ADPUSHUP_NETWORK_ID } from '../../../../../../configs/commonConsts';
-import axiosInstance from '../../../../../helpers/axiosInstance';
+import siteService from '../../../../../services/siteService';
 
 class Settings extends Component {
 	constructor(props) {
@@ -103,8 +103,8 @@ class Settings extends Component {
 
 	handleForceBuild = () => {
 		const { site, showNotification } = this.props;
-		axiosInstance
-			.post(`/site/${site.siteId}/forceApBuild`)
+		siteService
+			.forceApBuild(site.siteId)
 			.then(res => {
 				const data = {
 					mode: 'success',
@@ -117,7 +117,7 @@ class Settings extends Component {
 			.catch(() => {
 				const data = {
 					mode: 'error',
-					title: 'Success',
+					title: 'Error',
 					autoDismiss: 5,
 					message: 'Error pushing adpushup build'
 				};
@@ -351,7 +351,7 @@ class Settings extends Component {
 				/> */}
 				<Row>
 					<CustomButton variant="primary" className="pull-left" onClick={this.handleForceBuild}>
-						Force Adpushup Build
+						Force adpushup.js Build
 					</CustomButton>
 					<CustomButton variant="primary" className="pull-right" onClick={this.handleSave}>
 						Save
