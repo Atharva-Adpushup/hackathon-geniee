@@ -437,8 +437,6 @@ export default class InventoryTab extends React.Component {
 							onChange={this.onBulkFormatToggle}
 							labelText="Enable or Disable Video and Native on all units"
 							labelBold
-							size="m"
-							disabled={false}
 							on="Yes"
 							off="No"
 							defaultLayout
