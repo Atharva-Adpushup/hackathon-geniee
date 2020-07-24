@@ -100,7 +100,7 @@ export default class InventoryTab extends React.Component {
 		return { updated, updatedFilteredInventories };
 	}
 
-	handleChange = isEnabled => {
+	onBulkFormatToggle = isEnabled => {
 		const { selectAllMultiFormat } = this.state;
 		const { siteId, inventories, showNotification } = this.props;
 		const newState = {};
@@ -126,7 +126,7 @@ export default class InventoryTab extends React.Component {
 				showNotification({
 					mode: 'success',
 					title: 'Success',
-					message: `All Inventories ${isEnabled ? 'enabled' : 'disabled'} successsfully`,
+					message: `All Inventories ${isEnabled ? 'enabled' : 'disabled'} successfully`,
 					autoDismiss: 5
 				})
 			)
@@ -434,7 +434,7 @@ export default class InventoryTab extends React.Component {
 							layout="horizontal"
 							className="u-margin-b4"
 							checked={selectAllMultiFormat}
-							onChange={this.handleChange}
+							onChange={this.onBulkFormatToggle}
 							labelText="Enable or Disable Video and Native on all units"
 							labelBold
 							size="m"
