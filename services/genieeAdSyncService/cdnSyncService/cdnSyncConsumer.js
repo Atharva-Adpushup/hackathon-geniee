@@ -33,7 +33,7 @@ module.exports = function(site, user) {
 		apps = site.get('apps'),
 		isAutoOptimise = !!(site.get('apConfigs') && site.get('apConfigs').autoOptimise),
 		poweredByBanner = !!(site.get('apConfigs') && site.get('apConfigs').poweredByBanner),
-		gptMultiRequest = !!(site.get('apConfigs') && site.get('apConfigs').gptMultiRequest)
+		gptSraDisabled = !!(site.get('apConfigs') && site.get('apConfigs').gptSraDisabled)
 		tempDestPath = path.join(
 			__dirname,
 			'..',
@@ -64,7 +64,7 @@ module.exports = function(site, user) {
 			apConfigs.lineItems = (adNetworkConfig && adNetworkConfig.lineItems) || [];
 			apConfigs.autoOptimise = isAutoOptimise ? true : false;
 			apConfigs.poweredByBanner = poweredByBanner ? true : false;
-			apConfigs.gptMultiRequest = !!gptMultiRequest;
+			apConfigs.gptSraDisabled = !!gptSraDisabled;
 			apConfigs.siteDomain = site.get('siteDomain');
 			apConfigs.ownerEmailMD5 = crypto
 				.createHash('md5')
