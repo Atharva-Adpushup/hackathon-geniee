@@ -158,7 +158,7 @@ var gpt = {
 
 		if (!adpConfig.apLiteActive) {
 			googletag.cmd.push(function() {
-				googletag.pubads().enableSingleRequest();
+				!adpConfig.gptMultiRequest && googletag.pubads().enableSingleRequest();
 				googletag.pubads().disableInitialLoad();
 				googletag.enableServices();
 			});
