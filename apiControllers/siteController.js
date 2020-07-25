@@ -581,7 +581,7 @@ router
 
 			const viewportWidthMap = {};
 
-			for (let i = 0; i < sizeMapping.length; i+=1) {
+			for (let i = 0; i < sizeMapping.length; i += 1) {
 				const { viewportWidth, maxHeight, maxWidth } = sizeMapping[i];
 
 				const isValidMaxWidth = typeof maxWidth === 'number' && maxWidth >= 0;
@@ -746,7 +746,7 @@ router
 			.catch(e => {
 				if (e instanceof AdPushupError) {
 					// site id not found.
-					return res.status(404).json({ message: `Site for ID ${siteId} not found` });
+					return res.status(404).json({ message: e.message || 'Unable to build adpushup.js' });
 				}
 				return res.status(500).json({ message: 'Unable to build adpushup.js' });
 			});
