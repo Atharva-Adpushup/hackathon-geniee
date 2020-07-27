@@ -339,6 +339,13 @@ if (
 __TRIGGER_REWARDED_AD__;
 </script>`;
 
+const TIGGER_AUTOMATICALLY_CODE = ` let timer = setInterval(function () {
+	if ($("#modal").length) {
+	  triggerRewardedAd();
+	  clearInterval(timer);
+	}
+  }, 100);`;
+
 const ADS_TXT_DATA = `#AdX
 google.com,pub-8933329999391104,RESELLER,f08c47fec0942fa0
 #DMX and OpenX
@@ -547,5 +554,6 @@ export {
 	IAB_SIZES,
 	DEFAULT_ADS_RESPONSE,
 	DEFAULT_GLOBAL_RESPONSE,
-	REWARDED_AD_CODE
+	REWARDED_AD_CODE,
+	TIGGER_AUTOMATICALLY_CODE
 };

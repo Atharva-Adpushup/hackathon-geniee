@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Col, OverlayTrigger, Tooltip, Button } from '@/Client/helpers/react-bootstrap-imports';
 import { makeFirstLetterCapitalize } from '../../../../../helpers/commonFunctions';
 import CopyButtonWrapperContainer from '../../../../../Containers/CopyButtonWrapperContainer';
-import { ADCODE, REWARDED_AD_CODE } from '../../../configs/commonConsts';
+import { ADCODE, REWARDED_AD_CODE, TIGGER_AUTOMATICALLY_CODE } from '../../../configs/commonConsts';
 import CustomButton from '../../../../../Components/CustomButton/index';
 import AdNetworkDetails from './AdNetworkDetails';
 import LazyLoadSettings from './LazyLoadSettings';
@@ -84,7 +84,7 @@ class AdElement extends Component {
 
 		const isRewarded = ad.formatData.type === 'rewardedAds';
 		let code = isRewarded ? REWARDED_AD_CODE : ADCODE;
-		let triggerRewardedAd = !customScript ? 'triggerRewardedAd()' : atob(customScript);
+		let triggerRewardedAd = !customScript ? TIGGER_AUTOMATICALLY_CODE : atob(customScript);
 
 		const customAttributes = ad.maxHeight ? ` max-height="${ad.maxHeight}"` : '';
 		code = code
