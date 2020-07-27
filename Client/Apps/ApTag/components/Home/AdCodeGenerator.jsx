@@ -124,12 +124,16 @@ class AdCodeGenerator extends Component {
 			rewardText,
 			rewardValue,
 			customJsSnippet,
-			rewardTriggerFunction
+			rewardTriggerFunction,
+			modalText
 		} = this.state;
 
 		const { showNotification } = this.props;
 
-		if (type === 'rewardedAds' && (!rewardText || !rewardValue || !rewardTriggerFunction)) {
+		if (
+			type === 'rewardedAds' &&
+			(!modalText || !rewardText || !rewardValue || !rewardTriggerFunction)
+		) {
 			return showNotification({
 				mode: 'error',
 				title: 'Error',
@@ -185,6 +189,7 @@ class AdCodeGenerator extends Component {
 
 			ad.isRewarded = true;
 			ad.networkData.headerBidding = false;
+			ad.modalText = modalText;
 			ad.rewardText = rewardText;
 			ad.rewardValue = rewardValue;
 			ad.automaticTrigger = automaticTrigger;
@@ -288,6 +293,8 @@ class AdCodeGenerator extends Component {
 						{progress >= 50 ? this.renderSizes() : null}
 
 						{type !== 'rewardedAds' ? (progress >= 75 ? this.renderFluidToggle() : null) : null}
+						{type === 'rewardedAds' && progress >= 75 ? this.renderModalText() : null}
+
 						{type === 'rewardedAds' && progress >= 75 ? this.renderRewardInput() : null}
 						{type === 'rewardedAds' && progress >= 75 ? this.renderAutomaticTriggerToggle() : null}
 						{type === 'rewardedAds' && progress >= 75 && !automaticTrigger
@@ -396,6 +403,30 @@ class AdCodeGenerator extends Component {
 		this.setState({
 			[e.target.name]: e.target.value
 		});
+	};
+
+	renderModalText = () => {
+		const { modalText } = this.state;
+
+		return (
+			<React.Fragment>
+				<Col md={3} className="modalLabel">
+					Modal Text
+				</Col>
+				<Col md={9} className="modal-form-group">
+					<FieldGroup
+						name="modalText"
+						value={modalText}
+						type="text"
+						onChange={this.handleChange}
+						size={4}
+						id="modalText-input"
+						placeholder=" Enter Modal Text"
+						className="u-padding-v4 u-padding-h4 u-margin-b4 modalText"
+					/>
+				</Col>
+			</React.Fragment>
+		);
 	};
 
 	renderRewardInput() {

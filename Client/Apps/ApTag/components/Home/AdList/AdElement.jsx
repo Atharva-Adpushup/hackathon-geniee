@@ -70,7 +70,8 @@ class AdElement extends Component {
 		const {
 			networkData: { dfpAdunitCode, dfpAdunit },
 			rewardTriggerFunction,
-			customScript
+			customScript,
+			modalText
 		} = ad;
 		const {
 			showLazyload,
@@ -96,6 +97,7 @@ class AdElement extends Component {
 						/__POST_REWARDED_FUNCTION__/g,
 						rewardTriggerFunction && atob(rewardTriggerFunction)
 					)
+					.replace(/__MODAL_TEXT__/, modalText)
 					.replace(/__TRIGGER_REWARDED_AD__/, triggerRewardedAd)
 			: null;
 

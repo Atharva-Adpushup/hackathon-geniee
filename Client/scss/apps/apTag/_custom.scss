@@ -258,7 +258,8 @@ select.inputMinimal {
 	}
 }
 
-.Reward {
+.Reward,
+.modal-form-group {
 	.form-group {
 		margin-left: 2rem;
 		.rewardText {
@@ -269,6 +270,15 @@ select.inputMinimal {
 	.rewardLabel {
 		font-size: 18px;
 	}
+}
+
+.modalLabel {
+	font-size: 18px;
+}
+
+.modalText {
+	display: inline;
+	width: 70%;
 }
 
 .scriptLabel {

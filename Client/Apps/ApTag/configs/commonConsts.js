@@ -255,7 +255,7 @@ if (
 		  "</button>" +
 		  "</div>" +
 		  '<div class="modal-body">' +
-		  "You need 10 credits to view the summary. Would you like to watch an ad to earn 10 credits?" +
+		  "__MODAL_TEXT__" +
 		  "</div>" +
 		  '<div class="modal-footer">' +
 		  '<button type="button" id="noThanksBtn" class="btn btn-secondary" data-dismiss="modal">Close</button>' +
