@@ -166,7 +166,7 @@ if (
   }
 
   var uuid = generateUUID();
-
+  var makeRewardVisible = false;
   function vastDump(data) {
 	var xhr = new XMLHttpRequest();
 	xhr.open(
@@ -209,7 +209,7 @@ if (
 		data.userStats = JSON.parse(localStorage.getItem("aprewarded_key"));
 
 		vastDump(data);
-		e.makeRewardedVisible();
+		makeRewardVisible = true;
 	  });
 	  $("#noThanksBtn").click(function () {
 		$("#modal").modal("hide");
@@ -266,6 +266,14 @@ if (
 		  "</div>"
 	  );
 
+	  let timer = setInterval(function () {
+		if (makeRewardVisible) {
+		  e.makeRewardedVisible();
+		  clearInterval(timer);
+		}
+	  }, 100);
+
+	  makeRewardVisible = false;
 	  var data = {};
 	  data.timestamp = new Date().getTime();
 	  data.type = 0;
