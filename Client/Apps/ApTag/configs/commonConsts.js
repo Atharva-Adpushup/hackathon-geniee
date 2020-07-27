@@ -273,7 +273,6 @@ if (
 		}
 	  }, 100);
 
-	  makeRewardVisible = false;
 	  var data = {};
 	  data.timestamp = new Date().getTime();
 	  data.type = 0;
