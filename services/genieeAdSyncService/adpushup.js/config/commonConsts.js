@@ -80,5 +80,13 @@ module.exports = {
 		'landscape-secondary': 1,
 		'portrait-primary': 2,
 		'portrait-secondary': 2
+	},
+	AD_UNIT_TYPE_MAPPING: {
+		DISPLAY: 1,
+		DOCKED: 2,
+		STICKY: 3,
+		// AMP: 4,
+		REWARDED: 5,
+		INSTREAM: 6
 	}
 };
