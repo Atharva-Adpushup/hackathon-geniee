@@ -112,15 +112,9 @@ export default class InventoryTab extends React.Component {
 			? [...inventories].map(inventory => inventory.adUnitId)
 			: [];
 
-		updateFormat(
-			inventories.map(v => ({ ...v, checked: isEnabled, format: 'native' })),
-			siteId
-		)
+		updateFormat(inventories.map(v => ({ ...v, checked: isEnabled, format: 'native' })), siteId)
 			.then(() =>
-				updateFormat(
-					inventories.map(v => ({ ...v, checked: isEnabled, format: 'video' })),
-					siteId
-				)
+				updateFormat(inventories.map(v => ({ ...v, checked: isEnabled, format: 'video' })), siteId)
 			)
 			.then(() =>
 				showNotification({
@@ -375,7 +369,9 @@ export default class InventoryTab extends React.Component {
 					<div className={`inventory-wrap${hbStatusForSite === false ? ' disabled' : ' active'}`}>
 						{!!selectedInventories.length && (
 							<div className="updt-inv-hb-status u-margin-b4">
-								<span className="selected-inv-count u-margin-r3">{`${selectedInventories.length} selected`}</span>
+								<span className="selected-inv-count u-margin-r3">{`${
+									selectedInventories.length
+								} selected`}</span>
 								<CustomButton
 									disabled={updatingInventoryHbStatus}
 									variant="secondary"
@@ -437,8 +433,8 @@ export default class InventoryTab extends React.Component {
 							onChange={this.handleBulkFormatToggle}
 							labelText="Enable or Disable Video and Native on all units"
 							labelBold
-							on="Yes"
-							off="No"
+							on="Enable"
+							off="Disable"
 							defaultLayout
 							name="toggle-multiformat"
 							id="toggle-multiformat"
