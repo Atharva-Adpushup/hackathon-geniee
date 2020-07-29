@@ -676,16 +676,19 @@ module.exports = {
 			return {};
 		}
 	},
-	fetchAndSetKeyValueForUrlReporting: function({urlMappingServiceEndpoint, pageUrl, pageUrlKeyValue}) {
-		if(!urlMappingServiceEndpoint || !pageUrl) return false;
+	fetchAndSetKeyValueForUrlReporting: function(adp) {
+		if(!adp.config.pageUrlMappingServiceEndpoint || !adp.config.pageUrl) return false;
 
-		urlMappingServiceEndpoint.replace('__PAGE_URL__', base64Encode(pageUrl));
+		var pageUrlMappingServiceEndpoint = adp.config.pageUrlMappingServiceEndpoint.replace(
+			'__PAGE_URL__',
+			this.base64Encode(adp.config.pageUrl)
+		);
 
-		this.requestServer(urlMappingServiceEndpoint, {}, 5000, 'GET', 'json')
+		this.requestServer(pageUrlMappingServiceEndpoint, {}, 5000, 'GET', 'json')
 		.done(function({data: {urlTargetingKey, urlTargetingValue}}) {
 			if(urlTargetingKey && urlTargetingValue) {
-				pageUrlKeyValue.urlTargetingKey = urlTargetingKey;
-				pageUrlKeyValue.urlTargetingValue = urlTargetingValue;
+				adp.config.pageUrlKeyValue.urlTargetingKey = urlTargetingKey;
+				adp.config.pageUrlKeyValue.urlTargetingValue = urlTargetingValue;
 			}
 		})
 		.fail(function(error) {

@@ -368,8 +368,8 @@ function main() {
 	// Initialise adpushup session
 	session.init();
 
-	if(urlReportingEnabled) {
-		utils.fetchAndSetKeyValueForUrlReporting(adp.config);
+	if (adp.config.urlReportingEnabled) {
+		utils.fetchAndSetKeyValueForUrlReporting(adp);
 	}
 
 	//Initialise refresh slots
