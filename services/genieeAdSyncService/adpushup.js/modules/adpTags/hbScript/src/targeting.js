@@ -171,6 +171,11 @@ var targeting = {
 	setPageLevel: function(googletag) {
 		let pageLevelTargeting = constants.TARGETING.PAGE_LEVEL;
 
+		const {urlTargetingKey, urlTargetingValue} = window.adpushup.config.pageUrlKeyValue;
+		if(urlTargetingKey && urlTargetingValue) {
+			pageLevelTargeting[urlTargetingKey] = urlTargetingValue;
+		}
+
 		/*
             SAMPLE customPageLevelTargetingMap set through beforeJs
             window.adpushup.customPageLevelTargetingMap = {

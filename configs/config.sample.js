@@ -250,7 +250,8 @@ module.exports = {
     host: 'https://amp.adpushup.com/'
   },
   // queuePublishingURL: 'http://queuePublisher.adpushup.com', // production URL
-  queuePublishingURL: 'http://localhost:9009'
+  queuePublishingURL: 'http://localhost:9009',
+  urlReportingEnabledSites: []
 };
 
 /*

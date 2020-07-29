@@ -675,5 +675,26 @@ module.exports = {
 		} catch (error) {
 			return {};
 		}
+	},
+	fetchAndSetKeyValueForUrlReporting: function(adp) {
+		if(!adp.config.pageUrlMappingServiceEndpoint || !adp.config.pageUrl) return false;
+
+		var pageUrlMappingServiceEndpoint = adp.config.pageUrlMappingServiceEndpoint.replace(
+			'__PAGE_URL__',
+			this.base64Encode(adp.config.pageUrl)
+		);
+
+		this.requestServer(pageUrlMappingServiceEndpoint, {}, 5000, 'GET', 'json')
+		.done(function({data: {urlTargetingKey, urlTargetingValue}}) {
+			if(urlTargetingKey && urlTargetingValue) {
+				adp.config.pageUrlKeyValue.urlTargetingKey = urlTargetingKey;
+				adp.config.pageUrlKeyValue.urlTargetingValue = urlTargetingValue;
+			}
+		})
+		.fail(function(error) {
+			console.error(error);
+		});
+
+		return true;
 	}
 };
