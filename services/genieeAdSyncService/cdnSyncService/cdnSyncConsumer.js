@@ -227,12 +227,16 @@ module.exports = function(site, user) {
 					} = generatedConfig;
 
 					if (site.get('medianetId')) apConfigs.medianetId = site.get('medianetId');
+					const isUrlReportingEnabled =
+						Array.isArray(config.urlReportingEnabledSites) &&
+						config.urlReportingEnabledSites.indexOf(parseInt(siteId, 10)) !== -1;
 
 					bundle = _.replace(bundle, '__AP_CONFIG__', JSON.stringify(apConfigs));
 					bundle = _.replace(bundle, /__SITE_ID__/g, siteId);
 					bundle = _.replace(bundle, '__COUNTRY__', false);
 					bundle = _.replace(bundle, '__SIZE_MAPPING__', JSON.stringify(sizeMappingConfig));
 					bundle = _.replace(bundle, '__WEB_S2S_STATUS__', finalConfig.config.isS2SActive);
+					bundle = _.replace(bundle, '__URL_REPORTING_ENABLED__', isUrlReportingEnabled);
 
 					// Generate final init script based on the services that are enabled
 					var uncompressed = generateFinalInitScript(bundle)
