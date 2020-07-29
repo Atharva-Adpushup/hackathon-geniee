@@ -17,5 +17,8 @@ module.exports = {
 	domain: '',
 	forceVariation: 'forceVariation',
 	pageUrl: window.location.href,
-	referrer: document.referrer
+	referrer: document.referrer,
+	pageUrlMappingServiceEndpoint: '//e3.adpushup.com/AdPushupUrlMappingWebService/urlMapping?url=__PAGE_URL__',
+	pageUrlKeyValue: {urlTargetingKey: '', urlTargetingValue: ''},
+	urlReportingEnabled: __URL_REPORTING_ENABLED__
 };
