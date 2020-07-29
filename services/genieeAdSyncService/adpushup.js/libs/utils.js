@@ -675,5 +675,23 @@ module.exports = {
 		} catch (error) {
 			return {};
 		}
+	},
+	fetchAndSetKeyValueForUrlReporting: function({urlMappingServiceEndpoint, pageUrl, pageUrlKeyValue}) {
+		if(!urlMappingServiceEndpoint || !pageUrl) return false;
+
+		urlMappingServiceEndpoint.replace('__PAGE_URL__', base64Encode(pageUrl));
+
+		this.requestServer(urlMappingServiceEndpoint, {}, 5000, 'GET', 'json')
+		.done(function({data: {urlTargetingKey, urlTargetingValue}}) {
+			if(urlTargetingKey && urlTargetingValue) {
+				pageUrlKeyValue.urlTargetingKey = urlTargetingKey;
+				pageUrlKeyValue.urlTargetingValue = urlTargetingValue;
+			}
+		})
+		.fail(function(error) {
+			console.error(error);
+		});
+
+		return true;
 	}
 };
