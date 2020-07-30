@@ -4,8 +4,10 @@
 var url = require('url'),
 	request = require('request-promise'),
 	commonConsts = require('../configs/commonConsts'),
+	config = require('../configs/config'),
 	moment = require('moment'),
 	// logger = require('./logger'),
+	evLogger = require('./globalBucketLogger'),
 	CryptoJS = require('crypto-js'),
 	Promise = require('bluebird'),
 	randomStore = [],
@@ -41,7 +43,15 @@ var url = require('url'),
 			return new Buffer.from(b64Encoded, 'base64').toString();
 		},
 		convertPagegroupLink: function(pageGroupId, pageGroupName, siteId) {
-			return '<a href="/user/site/' + siteId + '/pagegroup/' + pageGroupId + '">' + pageGroupName + '</a>';
+			return (
+				'<a href="/user/site/' +
+				siteId +
+				'/pagegroup/' +
+				pageGroupId +
+				'">' +
+				pageGroupName +
+				'</a>'
+			);
 		},
 		getPageGroupPattern: function(pageGroup, platform, patterns) {
 			if (Object.keys(patterns).length) {
@@ -272,6 +282,39 @@ var url = require('url'),
 			}
 
 			return encodedData;
+		},
+		publishToRabbitMqQueue: async (queue, data) => {
+			debugger;
+			if (!queue || !data) {
+				return;
+			}
+
+			const uri = Array.isArray(data)
+				? config.RABBITMQ.PUBLISHER_API_BULK
+				: config.RABBITMQ.PUBLISHER_API;
+			var options = {
+				method: 'POST',
+				uri: uri,
+				headers: {
+					'Content-Type': 'application/json; charset=utf-8'
+				},
+				body: {
+					queue: queue,
+					data: data
+				},
+				json: true
+			};
+
+			return request(options).catch(err => {
+				console.log(err);
+				evLogger({
+					source: 'QUEUE PUBLISHER LOGS',
+					message: `failed to publish to rabbit mq queue ${queue}`,
+					details: data,
+					debugData: `Message : ${err.message} | Stack: ${err.stack}`
+				});
+				return Promise.reject(err);
+			});
 		}
 	};
 
