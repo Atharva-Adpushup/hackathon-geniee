@@ -2,8 +2,6 @@ const express = require('express');
 const atob = require('atob');
 const _ = require('lodash');
 
-// const fs = require('fs');
-// const path = require('path');
 const userModel = require('../models/userModel');
 const siteModel = require('../models/siteModel');
 const channelModel = require('../models/channelModel');
@@ -14,12 +12,17 @@ const pagegroupCreationAutomation = require('../services/pagegroupCreationAutoma
 const AdpushupError = require('../helpers/AdPushupError');
 const { checkParams, errorHandler, verifyOwner } = require('../helpers/routeHelpers');
 const { sendSuccessResponse, getNetworkConfig } = require('../helpers/commonFunctions');
-const upload = require('../helpers/uploadToCDN');
 const logger = require('../helpers/globalBucketLogger');
-
-// const buildDir = '../public/assets/js/builds/geniee';
+const helperUtils = require('../helpers/utils');
 
 const router = express.Router();
+
+function pushToCdnOriginQueue(filePath, content) {
+	return helperUtils.publishToRabbitMqQueue('CDN_ORIGIN', {
+		filePath,
+		content
+	});
+}
 
 router
 	.post('/saveSite', (req, res) => {
@@ -94,20 +97,9 @@ router
 		const { siteId, content, format } = req.body;
 		const randomId = utils.randomString();
 
-		function cwd(ftp) {
-			const ftpPath = `/${siteId}/ads/`;
-			return ftp.cwd(ftpPath).catch(() => ftp.mkdir(ftpPath).then(() => ftp.cwd(ftpPath)));
-		}
-
 		return checkParams(['siteId', 'content'], req, 'post')
 			.then(() => verifyOwner(siteId, req.user.email))
-			.then(() => {
-				const decodedContent = atob(content);
-				return upload(cwd, {
-					content: decodedContent,
-					filename: `${randomId}.${format}`
-				});
-			})
+			.then(() => pushToCdnOriginQueue(`${siteId}/ads/${randomId}.${format}`, content))
 			.then(() => {
 				sendSuccessResponse(
 					{
@@ -234,34 +226,5 @@ router
 				)
 			)
 	);
-/*
-	.get('/adpushup.js', (req, res) => {
-		const siteId = req.baseUrl.match(/\d+/)[0];
-		const apJsFilePath = path.join(__dirname, buildDir, `${siteId}/adpushup.min.js`);
-		const countryHeader = req.headers['x-cf-geodata'] || false;
-		const country = countryHeader
-			? countryHeader.replace('country_code=', '').replace(/"/g, '')
-			: false;
-
-		return new Promise((resolve, reject) => {
-			fs.readFile(apJsFilePath, (err, content) => {
-				if (err) return reject(err);
-				return resolve(content);
-			});
-		})
-			.then(apJs => {
-				res
-					.status(200)
-					.set('x-cf-geodata', country)
-					.set('Content-Type', 'application/javascript');
-
-				// .set('Cache-Control', 'max-age=900');
-
-				// apJs = `${apJs}\n//this is for country ${country}`;
-				return res.send(apJs.replace('__COUNTRY__', country));
-			})
-			.catch(() => res.sendStatus(400));
-	});
-	*/
 
 module.exports = router;
