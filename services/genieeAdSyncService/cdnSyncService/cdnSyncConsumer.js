@@ -254,7 +254,6 @@ module.exports = function(site, user) {
 						if (output.error) throw output.error;
 						compressed = output.code;
 					} catch (e) {
-						console.log(e);
 						return Promise.reject(new Error('CDN Sync failed while compressing the file'));
 					}
 
@@ -267,7 +266,6 @@ module.exports = function(site, user) {
 		writeTempFiles = function(fileConfigs) {
 			const fsWriteFilePromises = fileConfigs.map(file => {
 				return mkdirpAsync(tempDestPath).then(function() {
-					console.log('in writeTempFiles');
 					return fs.writeFileAsync(path.join(tempDestPath, file.name), file.content);
 				});
 			});
@@ -304,7 +302,6 @@ module.exports = function(site, user) {
 			});
 		},
 		pushToCdnOriginQueue = function(fileConfig) {
-			console.log('in pushToCdnOriginQueue');
 			const shouldJSCdnSyncBeDisabled = !!(disableSiteCdnSyncList.indexOf(siteId) > -1);
 
 			if (shouldJSCdnSyncBeDisabled || !isNotProduction) {
@@ -313,22 +310,16 @@ module.exports = function(site, user) {
 				);
 				return Promise.resolve(fileConfig.uncompressed);
 			} else {
-				console.log('========before pushing to cdn======');
 				let content = Buffer.from(fileConfig.default).toString('base64');
-				console.log(typeof content);
-
-				content = content.toString();
-				console.log(typeof content);
 				return helperUtils.publishToRabbitMqQueue('CDN_ORIGIN', {
 					filePath: `${siteId}/adpushup.js`,
-					content: Buffer.from(fileConfig.default).toString('base64')
+					content: content
 				});
 			}
 		},
 		getFinalConfigWrapper = () => getFinalConfig().then(fileConfig => fileConfig);
 
 	return Promise.join(getFinalConfigWrapper(), fileConfig => {
-		console.log('in main');
 		return writeTempFiles([
 			{ content: fileConfig.uncompressed, name: 'adpushup.js' },
 			{ content: fileConfig.default, name: 'adpushup.min.js' }
@@ -336,7 +327,6 @@ module.exports = function(site, user) {
 			.then(startIETesting)
 			.then(() => pushToCdnOriginQueue(fileConfig))
 			.catch(err => {
-				console.log('====error====', err);
 				return Promise.reject(err);
 			});
 	});

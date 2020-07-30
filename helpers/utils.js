@@ -284,7 +284,6 @@ var url = require('url'),
 			return encodedData;
 		},
 		publishToRabbitMqQueue: async (queue, data) => {
-			debugger;
 			if (!queue || !data) {
 				return;
 			}
@@ -306,7 +305,6 @@ var url = require('url'),
 			};
 
 			return request(options).catch(err => {
-				console.log(err);
 				evLogger({
 					source: 'QUEUE PUBLISHER LOGS',
 					message: `failed to publish to rabbit mq queue ${queue}`,
