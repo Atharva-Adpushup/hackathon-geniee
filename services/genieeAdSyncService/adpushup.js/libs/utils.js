@@ -678,16 +678,6 @@ module.exports = {
 	},
 	performance: function() {
 		return {
-			mark: function(name) {
-
-			},
-			measure: function() {
-
-			}
-		};
-	},
-	performance: function() {
-		return {
 			markers: {},
 			mark: function(name, data = {}) {
 				this.markers[name] = {
