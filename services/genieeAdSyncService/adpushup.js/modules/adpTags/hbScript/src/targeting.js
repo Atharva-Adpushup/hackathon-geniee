@@ -171,9 +171,17 @@ var targeting = {
 	setPageLevel: function(googletag) {
 		let pageLevelTargeting = constants.TARGETING.PAGE_LEVEL;
 
-		const {urlTargetingKey, urlTargetingValue} = window.adpushup.config.pageUrlKeyValue;
-		if(urlTargetingKey && urlTargetingValue) {
-			pageLevelTargeting[urlTargetingKey] = urlTargetingValue;
+		if (adp.config.urlReportingEnabled) {
+			const {urlTargetingKey, urlTargetingValue} = window.adpushup.config.pageUrlKeyValue;
+			const { performance } = window.adpushup;
+			if(urlTargetingKey && urlTargetingValue) {
+				pageLevelTargeting[urlTargetingKey] = urlTargetingValue;
+				performance && performance.mark('URM_TARGETING_KEY_VALUE_SET', {urlTargetingKey, urlTargetingValue});
+			} else {
+				performance && performance.mark('URM_TARGETING_KEY_VALUE_EMPTY', {urlTargetingKey, urlTargetingValue});
+			}
+			// send url reporting log, if its collected
+			performance && performance.sendURLReportingLog();
 		}
 
 		/*

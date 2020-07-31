@@ -676,22 +676,64 @@ module.exports = {
 			return {};
 		}
 	},
+	performance: function() {
+		return {
+			markers: {},
+			mark: function(name, data = {}) {
+				this.markers[name] = {
+					data,
+					timestamp: +new Date()
+				}
+			},
+			clearMarkers: function() {
+				this.markers = {};
+			},
+			sendURLReportingLog: function() {
+				const markers = {...this.markers};
+				this.clearMarkers();
+				if(!Object.keys(markers).length) return;
+		
+				if(markers.URM_REQUEST_STARTED && markers.URM_REQUEST_SUCCESS) {
+					markers.URM_RESPONSE_TIME = markers.URM_REQUEST_SUCCESS.timestamp - markers.URM_REQUEST_STARTED.timestamp;
+				}
+		
+				$.post({
+					url: '//vastdump-staging.adpushup.com/umlog',
+					data: JSON.stringify({logs: markers, timestamp: +new Date()}),
+					contentType: 'application/json',
+					processData: false,
+					dataType: 'json'
+				});
+			}
+		};
+	},
 	fetchAndSetKeyValueForUrlReporting: function(adp) {
-		if(!adp.config.pageUrlMappingServiceEndpoint || !adp.config.pageUrl) return false;
+		const { performance } = adp;
+		performance.mark('URM_START');
+		if(!adp.config.pageUrlMappingServiceEndpoint || !adp.config.pageUrl) {
+			performance.mark('URM_CONFIG_NOT_FOUND');
+			return false;
+		};
 
 		var pageUrlMappingServiceEndpoint = adp.config.pageUrlMappingServiceEndpoint.replace(
 			'__PAGE_URL__',
 			this.base64Encode(adp.config.pageUrl)
 		);
 
+		performance.mark('URM_REQUEST_STARTED');
 		this.requestServer(pageUrlMappingServiceEndpoint, {}, 5000, 'GET', 'json')
 		.done(function({data: {urlTargetingKey, urlTargetingValue}}) {
+			performance.mark('URM_REQUEST_SUCCESS');
 			if(urlTargetingKey && urlTargetingValue) {
 				adp.config.pageUrlKeyValue.urlTargetingKey = urlTargetingKey;
 				adp.config.pageUrlKeyValue.urlTargetingValue = urlTargetingValue;
+				performance.mark('URM_CONFIG_KEY_VALUE_SET', {urlTargetingKey, urlTargetingValue});
+				return;
 			}
+			performance.mark('URM_CONFIG_KEY_VALUE_EMPTY', {urlTargetingKey, urlTargetingValue});
 		})
 		.fail(function(error) {
+			performance.mark('URM_REQUEST_FAILED');
 			console.error(error);
 		});
 
