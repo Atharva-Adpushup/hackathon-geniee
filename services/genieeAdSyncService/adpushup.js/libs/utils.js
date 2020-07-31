@@ -688,7 +688,7 @@ module.exports = {
 			clearMarkers: function() {
 				this.markers = {};
 			},
-			sendURLReportingLog: function(adp) {
+			sendURLReportingLog: function() {
 				const markers = {...this.markers};
 				this.clearMarkers();
 				if(!Object.keys(markers).length) return;
