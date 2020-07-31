@@ -369,6 +369,7 @@ function main() {
 	session.init();
 
 	if (adp.config.urlReportingEnabled) {
+		adp.performance = utils.performance();
 		utils.fetchAndSetKeyValueForUrlReporting(adp);
 	}
 
