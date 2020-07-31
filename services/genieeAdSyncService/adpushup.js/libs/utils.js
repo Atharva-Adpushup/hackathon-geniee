@@ -704,7 +704,7 @@ module.exports = {
 				if(!Object.keys(markers).length) return;
 		
 				if(markers.URM_REQUEST_STARTED && markers.URM_REQUEST_SUCCESS) {
-					markers.URM_RESPONSE_TIME = markers.URM_REQUEST_SUCCESS - markers.URM_REQUEST_STARTED;
+					markers.URM_RESPONSE_TIME = markers.URM_REQUEST_SUCCESS.timestamp - markers.URM_REQUEST_STARTED.timestamp;
 				}
 		
 				$.post({
