@@ -164,7 +164,7 @@ class ApLite extends Component {
 			showNotification
 		} = this.props;
 
-		if (!fileName) {
+		if (!oldAdUnits.length && !fileName) {
 			showNotification({
 				mode: 'error',
 				title: 'Operation Failed',
