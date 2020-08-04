@@ -9,31 +9,28 @@ import qs from 'querystringify';
 import isEmpty from 'lodash/isEmpty';
 import union from 'lodash/union';
 import sortBy from 'lodash/sortBy';
-import ActionCard from '../../../Components/ActionCard/index';
-import Empty from '../../../Components/Empty/index';
-import ControlContainer from '../containers/ControlContainer';
-import TableContainer from '../containers/TableContainer';
-import ChartContainer from '../containers/ChartContainer';
-import reportService from '../../../services/reportService';
+import ActionCard from '../../../../Components/ActionCard/index';
+import Empty from '../../../../Components/Empty/index';
+import ControlContainer from '../../containers/URLAndUTMContainer/ControlContainer';
+import TableContainer from '../../containers/URLAndUTMContainer/TableContainer';
+import urlReportService from '../../../../services/urlReportService';
+
 import {
-	displayMetrics,
-	displayOpsMetrics,
-	displayUniqueImpressionMetrics,
-	accountDisableFilter,
-	accountDisableDimension,
+	displayURLMetrics,
+	displayUTMMetrics,
 	opsDimension,
 	opsFilter,
-	REPORT_INTERVAL_TABLE_KEYS
-} from '../configs/commonConsts';
-import { DEMO_ACCOUNT_DATA } from '../../../constants/others';
-import Loader from '../../../Components/Loader';
-import { convertObjToArr, roundOffTwoDecimal } from '../helpers/utils';
+	REPORT_INTERVAL_TABLE_KEYS,
+	columnsBlacklistedForAddition
+} from '../../configs/commonConsts';
+import { DEMO_ACCOUNT_DATA } from '../../../../constants/others';
+import Loader from '../../../../Components/Loader';
+import { convertObjToArr, roundOffTwoDecimal } from '../../helpers/utils';
 import {
 	getReportingDemoUserValidation,
 	getReportingDemoUserSiteIds,
 	getDemoUserSites
-} from '../../../helpers/commonFunctions';
-import { columnsBlacklistedForAddition } from '../configs/commonConsts';
+} from '../../../../helpers/commonFunctions';
 
 function oldConsoleRedirection(e) {
 	e.preventDefault();
@@ -45,19 +42,29 @@ function oldConsoleRedirection(e) {
 	}, 500);
 }
 
-class Panel extends Component {
+class Report extends Component {
 	constructor(props) {
 		super(props);
+		// let selectedMetrics = displayURLAndUTMMetrics.filter((metrics) => metrics.visible).map((metrics) => metrics.value)
 		this.state = {
 			dimensionList: [],
 			filterList: [],
 			intervalList: [],
-			metricsList: props.isForOps ? displayOpsMetrics : displayMetrics,
-			selectedDimension: '',
+			displayURLMetrics,
+			displayUTMMetrics,
+			displayURLAndUTMMetrics: displayUTMMetrics || [],
+			metricsList: [],
+			selectedDimension: 'url',
 			selectedFilters: {},
 			selectedMetrics: [],
-			selectedInterval: 'daily',
-			selectedChartLegendMetric: '',
+			selectedInterval: 'cumulative',
+			selectedOrder: 'top_select_criteria',
+			selectedOrderBy: 'impressions',
+			selectedTotalRecords: '500',
+			searchFilter: '',
+			pagesFetched: 0,
+			pageIndex: 0,
+			pageSize: 150,
 			startDate: moment()
 				.startOf('day')
 				.subtract(7, 'days')
@@ -77,7 +84,7 @@ class Panel extends Component {
 	}
 
 	componentDidMount() {
-		const { userSites, updateReportMetaData, reportsMeta, isForOps } = this.props;
+		const { userSites, updateReportMetaData, urlUTMReportingMeta, isForOps } = this.props;
 		const { email, reportType } = this.getDemoUserParams();
 
 		let userSitesStr = '';
@@ -93,20 +100,17 @@ class Panel extends Component {
 			isSuperUser = true;
 		}
 
-		const params = { sites: userSitesStr };
-		isSuperUser ? (params.isSuperUser = isSuperUser) : null;
-
-		if (!reportsMeta.fetched) {
-			return reportService.getMetaData(params).then(response => {
-				let { data: computedData } = response;
-
-				computedData = getDemoUserSites(computedData, email);
-				updateReportMetaData(computedData);
-				return this.getContentInfo(computedData);
-			});
+		if (!urlUTMReportingMeta.fetched) {
+			return urlReportService
+				.getMetaData({ sites: userSitesStr, isSuperUser, product: 'hb-analytics' })
+				.then(response => {
+					let { data: computedData } = response;
+					computedData = getDemoUserSites(computedData, email);
+					updateReportMetaData(computedData);
+					return this.getContentInfo(computedData);
+				});
 		}
-
-		return this.getContentInfo(reportsMeta.data);
+		return this.getContentInfo(urlUTMReportingMeta.data);
 	}
 
 	removeOpsFilterDimension = (filterList, dimensionList) => {
@@ -145,13 +149,13 @@ class Panel extends Component {
 		const computedMetricsList = metricsList || metricsListFromState;
 
 		const {
-			reportsMeta,
+			urlUTMReportingMeta,
 			user: {
 				data: { isSuperUser }
 			}
 		} = this.props;
 
-		const { dimension: dimensionListObj, filter: filterListObj } = reportsMeta.data;
+		const { dimension: dimensionListObj, filter: filterListObj } = urlUTMReportingMeta.data;
 		const dimensionList = convertObjToArr(dimensionListObj);
 		const filterList = convertObjToArr(filterListObj);
 		const { updatedDimensionList, updatedFilterList } = isSuperUser
@@ -182,11 +186,26 @@ class Panel extends Component {
 
 	onControlChange = (data, reportType) => {
 		const params = this.getControlChangedParams({ ...data, reportType });
+		const { metricsList } = this.state;
+		const {
+			selectedMetrics,
+			selectedOrder,
+			selectedOrderBy,
+			selectedTotalRecords,
+			regexFilter
+		} = data;
+		const filteredMetricsList = metricsList.filter(item => selectedMetrics.includes(item.value));
 
 		this.setState({
 			...data,
 			...params,
-			reportType
+			reportType,
+			selectedMetrics,
+			displayURLAndUTMMetrics: filteredMetricsList,
+			selectedOrder,
+			selectedOrderBy,
+			selectedTotalRecords,
+			searchFilter: regexFilter
 		});
 	};
 
@@ -204,8 +223,8 @@ class Panel extends Component {
 
 	getControlChangedParams = (controlParams, metricsList) => {
 		const { selectedDimension, selectedFilters, reportType } = controlParams;
-		const { reportsMeta } = this.props;
-		const { dimension: dimensionList, filter: filterList } = reportsMeta.data;
+		const { urlUTMReportingMeta } = this.props;
+		const { dimension: dimensionList, filter: filterList } = urlUTMReportingMeta.data;
 		let disabledFilter = [];
 		let disabledDimension = [];
 		let disabledMetrics = [];
@@ -246,35 +265,25 @@ class Panel extends Component {
 			startDate,
 			endDate,
 			selectedDimension,
+			selectedOrder,
+			selectedOrderBy,
+			pageIndex,
+			selectedTotalRecords,
 			selectedFilters,
-			selectedInterval,
-			metricsList
+			selectedInterval
 		} = this.state;
-		const { userSites, isCustomizeChartLegend, defaultReportType, isForOps } = this.props;
+		const { userSites, defaultReportType } = this.props;
 		const { email, reportType } = this.getDemoUserParams();
-		let selectedMetrics;
-
-		// if (metricsList && !isCustomizeChartLegend) {
-		if (metricsList) {
-			selectedMetrics = displayMetrics.map(metric => metric.value);
-		}
-
-		if (metricsList && isCustomizeChartLegend) {
-			selectedMetrics = metricsList
-				.filter(metric => !metric.isDisabled)
-				.map(metric => metric.value);
-		}
 
 		const params = {
 			fromDate: moment(startDate).format('YYYY-MM-DD'),
 			toDate: moment(endDate).format('YYYY-MM-DD'),
 			interval: selectedInterval,
-			dimension: selectedDimension || null
+			dimension: selectedDimension,
+			[selectedOrder]: selectedOrderBy,
+			page_size: selectedTotalRecords,
+			page: pageIndex
 		};
-
-		if (!isCustomizeChartLegend) {
-			params.metrics = selectedMetrics ? selectedMetrics.toString() : '';
-		}
 
 		Object.keys(selectedFilters).forEach(filter => {
 			const filters = Object.keys(selectedFilters[filter]);
@@ -301,20 +310,91 @@ class Panel extends Component {
 		return params;
 	};
 
-	generateButtonHandler = (inputState = {}) => {
-		let { tableData, selectedDimension, selectedFilters, dimensionList } = this.state;
-		const { reportType, isCustomizeChartLegend, isForOps } = this.props;
-		const computedState = Object.assign({ isLoading: true }, inputState);
-		let prevMetricsList = this.state.metricsList;
+	prefetchTableData = () => {
+		const params = this.formateReportParams();
+		delete params.dimension;
+		const { pagesFetched } = this.state;
+		params.page = +pagesFetched + 1;
 
+		const { reportType } = this.props;
+		urlReportService.getCustomStats({ ...params }).then(response => {
+			if (Number(response.status) === 200 && response.data) {
+				const data = response.data || [];
+				const { tableData } = this.state;
+				tableData.result = [...tableData.result, ...data.result];
+
+				// Compute data table total
+				if (
+					reportType === 'global' &&
+					!tableData.total &&
+					tableData.columns &&
+					tableData.columns.length
+				) {
+					tableData.total = this.computeTotal(tableData.result);
+				}
+
+				tableData.result.forEach(row => {
+					Object.keys(row).forEach(column => {
+						if (!Number.isNaN(row[column]) && !(typeof row[column] === 'string')) {
+							// eslint-disable-next-line no-param-reassign
+							row[column] = parseFloat(roundOffTwoDecimal(row[column]));
+						}
+					});
+				});
+				this.setState({
+					pagesFetched,
+					tableData: Object.assign({}, { ...tableData })
+				});
+			}
+		});
+	};
+
+	onPageChange = pageIndex => {
+		const { pageSize, tableData } = this.state;
+		const totlaRecordsFetched = tableData.result.length;
+		const pageCount = Math.ceil(totlaRecordsFetched / pageSize);
+
+		this.setState(
+			{
+				pageSize,
+				pageIndex
+			},
+			() => {
+				// index start from 0
+				if (pageCount - (pageIndex + 1) <= 1) {
+					this.prefetchTableData();
+				}
+			}
+		);
+	};
+
+	onPageSizeChange = (tablePageSize, pageIndex) => {
+		const { tableData } = this.state;
+		const totlaRecordsFetched = tableData.result.length;
+		const pageCount = Math.ceil(totlaRecordsFetched / tablePageSize);
+
+		// index start from 0
+		if (pageCount - (pageIndex + 1) <= 1) {
+			this.prefetchTableData();
+		}
+	};
+
+	generateButtonHandler = (inputState = {}) => {
+		let { tableData } = this.state;
+		const { selectedDimension, selectedFilters, dimensionList } = this.state;
+		const { reportType, isForOps } = this.props;
+		const computedState = Object.assign({ isLoading: true }, inputState);
+		const isURL = selectedDimension.indexOf('url') !== -1;
 		this.setState(computedState, () => {
 			let newState = {};
 			const params = this.formateReportParams();
-
-			reportService.getCustomStats(params).then(response => {
+			delete params.dimension;
+			urlReportService.getCustomStats({ ...params }).then(response => {
 				if (Number(response.status) === 200 && response.data) {
-					tableData = response.data;
-
+					tableData = response.data || [];
+					// hide bidder/network col - data is being aggregated data wise
+					tableData.columns = tableData.columns.filter(item => item !== 'network');
+					tableData.total = {};
 					const shouldAddAdpushupCountPercentColumn =
 						(selectedDimension === 'mode' ||
 							selectedDimension === 'error_code' ||
@@ -375,7 +455,7 @@ class Panel extends Component {
 								REPORT_INTERVAL_TABLE_KEYS.indexOf(column) === -1 &&
 								!Number.isNaN(row[column]) &&
 								!dimensionList.find(dimension => dimension.value === column) &&
-								column !== 'site'
+								!(typeof row[column] === 'string')
 							) {
 								// eslint-disable-next-line no-param-reassign
 								row[column] = parseFloat(roundOffTwoDecimal(row[column]));
@@ -383,38 +463,22 @@ class Panel extends Component {
 						});
 					});
 
-					Object.keys(tableData.total).forEach(column => {
+					Object.keys(tableData.total || {}).forEach(column => {
 						tableData.total[column] = parseFloat(roundOffTwoDecimal(tableData.total[column]));
 					});
 
 					if (tableData.columns && tableData.columns.length) {
 						let metricsList = this.getMetricsList(tableData);
-						// we need to persist user column selection when user
-						// generates report multiple times.
-						// for that we will check users previous selection, if it
-						// is different from default list override default wit
-						// previous values
-						if (isForOps && prevMetricsList.length != metricsList.length) {
-							metricsList = [...prevMetricsList];
-						} else if (isForOps) {
-							// for same length we need to check for individual value
-							let listPrevColList = prevMetricsList
-								.map(item => item.value)
-								.sort()
-								.join();
-							let defaultPrevColList = metricsList
-								.map(item => item.value)
-								.sort()
-								.join();
-							if (listPrevColList != defaultPrevColList) {
-								metricsList = [...prevMetricsList];
-							}
-						}
+						// eslint-disable-next-line no-shadow
+						const { displayURLMetrics, displayUTMMetrics } = this.state;
+						metricsList = [...(isURL ? displayURLMetrics : displayUTMMetrics)];
+
+						// show only metrices that are in displayURLAndUTMMetricsList
 						newState = { ...newState, metricsList };
 					}
 				}
 
-				newState = { ...newState, isLoading: false, tableData };
+				newState = { ...newState, isLoading: false, tableData, isURL };
 				this.setState(newState);
 			});
 		});
@@ -423,16 +487,16 @@ class Panel extends Component {
 	getSortedMetaMetrics = metaMetrics => {
 		const metaMetricsArray = Object.keys(metaMetrics).map(value => {
 			// eslint-disable-next-line camelcase
-			const { display_name: name, chart_position, valueType } = metaMetrics[value];
+			const { display_name: name, table_position, valueType } = metaMetrics[value];
 
 			return {
 				name,
 				value,
 				valueType,
-				chart_position
+				table_position
 			};
 		});
-		return sortBy(metaMetricsArray, ['chart_position']);
+		return sortBy(metaMetricsArray, ['table_position']);
 	};
 
 	/**
@@ -441,50 +505,29 @@ class Panel extends Component {
 	 * - remove unselectable items (given in meta)
 	 * - sort by chart position (given in meta)
 	 * - pick first 5
-	 * @memberof Panel
+	 * @memberof Report
 	 */
 	getMetricsList = tableData => {
-		const {
-			reportsMeta,
-			isForOps,
-			user: {
-				data: { isUniqueImpEnabled = false }
-			}
-		} = this.props;
+		const { urlUTMReportingMeta } = this.props;
+
 		const filteredMetrics = tableData.columns.filter(metric => {
-			const isDimension = !!reportsMeta.data.dimension[metric];
+			const isDimension = !!urlUTMReportingMeta.data.dimension[metric];
 			const isBlacklistedMetric = REPORT_INTERVAL_TABLE_KEYS.indexOf(metric) !== -1;
 			const isSelectableMetric =
-				reportsMeta.data.metrics[metric] && reportsMeta.data.metrics[metric].selectable;
-
+				urlUTMReportingMeta.data.metrics[metric] &&
+				urlUTMReportingMeta.data.metrics[metric].selectable;
 			return !isDimension && !isBlacklistedMetric && isSelectableMetric;
 		});
 
-		const sortedMetaMetrics = this.getSortedMetaMetrics(reportsMeta.data.metrics);
+		const sortedMetaMetrics = this.getSortedMetaMetrics(urlUTMReportingMeta.data.metrics);
 
-		let computedMetrics = [];
+		const computedMetrics = [];
 
 		sortedMetaMetrics.forEach(metaMetric => {
 			const { name, value, valueType } = metaMetric;
 			if (filteredMetrics.indexOf(value) !== -1) computedMetrics.push({ name, value, valueType });
 		});
-		// if(isForOps) {
-		// 	computedMetrics.splice(5);
-		// } else {
-		let match = displayMetrics.map(item => item.value);
-		if (isForOps) {
-			match = displayOpsMetrics.map(item => item.value);
-			computedMetrics = computedMetrics.filter(item => match.indexOf(item.value) != -1);
-		} else {
-			// check if unique imp is checked
-			if (isUniqueImpEnabled) {
-				match = displayUniqueImpressionMetrics.map(item => item.value);
-				computedMetrics = computedMetrics.filter(item => match.indexOf(item.value) != -1);
-			} else {
-				computedMetrics = computedMetrics.filter(item => match.indexOf(item.value) != -1);
-			}
-		}
-		// }
+		// computedMetrics.splice(5);
 		return computedMetrics;
 	};
 
@@ -559,30 +602,15 @@ class Panel extends Component {
 	};
 
 	updateMetrics = (newMetrics = []) => {
-		const { reportsMeta, isForOps, overrideOpsPanelUniqueImpValue } = this.props;
-		const sortedMetaMetrics = this.getSortedMetaMetrics(reportsMeta.data.metrics);
-		let sortedMetrics = [];
-		if (isForOps) {
-			sortedMetaMetrics.forEach(metaMetric => {
-				const foundMetric = newMetrics.find(newMetric => newMetric.value === metaMetric.value);
+		const { urlUTMReportingMeta } = this.props;
+		const sortedMetaMetrics = this.getSortedMetaMetrics(urlUTMReportingMeta.data.metrics);
+		const sortedMetrics = [];
 
-				if (foundMetric) sortedMetrics.push(foundMetric);
-			});
-		} else {
-			let found = newMetrics.filter(item => item.value == 'unique_impressions');
-			// if unique impression selected
-			if (found.length) {
-				let match = displayUniqueImpressionMetrics.map(item => item.value);
-				sortedMetrics = sortedMetaMetrics.filter(item => match.indexOf(item.value) != -1);
-				// temp code for unqiue imp selection in dashboard from this component
-				overrideOpsPanelUniqueImpValue({ isUniqueImpEnabled: true });
-			} else {
-				let match = displayMetrics.map(item => item.value);
-				sortedMetrics = sortedMetaMetrics.filter(item => match.indexOf(item.value) != -1);
-				// temp code for unqiue imp selection in dashboard from this component
-				overrideOpsPanelUniqueImpValue({ isUniqueImpEnabled: false });
-			}
-		}
+		sortedMetaMetrics.forEach(metaMetric => {
+			const foundMetric = newMetrics.find(newMetric => newMetric.value === metaMetric.value);
+
+			if (foundMetric) sortedMetrics.push(foundMetric);
+		});
 
 		this.setState({ metricsList: sortedMetrics });
 	};
@@ -593,16 +621,20 @@ class Panel extends Component {
 
 	renderEmptyMessage = msg => <Empty message={msg} />;
 
-	getContentInfo = reportsMetaData => {
+	getContentInfo = urlUTMReportingMetaData => {
 		let {
 			selectedDimension,
+			selectedOrder,
+			selectedOrderBy,
+			selectedTotalRecords,
+			searchFilter,
 			selectedFilters,
 			selectedInterval,
-			selectedChartLegendMetric,
 			reportType,
 			startDate,
 			endDate
 		} = this.state;
+
 		const {
 			match: {
 				params: { siteId }
@@ -611,7 +643,7 @@ class Panel extends Component {
 			userSites
 		} = this.props;
 		const { email } = this.getDemoUserParams();
-		const { site: reportingSites, interval: intervalsObj } = reportsMetaData;
+		const { site: reportingSites, interval: intervalsObj } = urlUTMReportingMetaData;
 		const selectedControls = qs.parse(queryParams);
 		const isValidSite = !!(userSites && userSites[siteId] && userSites[siteId].siteDomain);
 		const isReportingData = !!reportingSites;
@@ -635,10 +667,22 @@ class Panel extends Component {
 		}
 
 		if (Object.keys(selectedControls).length > 0) {
-			const { dimension, interval, fromDate, toDate, chartLegendMetric } = selectedControls;
+			const {
+				dimension,
+				order,
+				orderBy,
+				totalRecords,
+				regexFilter,
+				interval,
+				fromDate,
+				toDate
+			} = selectedControls;
 			selectedDimension = dimension;
+			selectedOrder = order;
+			selectedOrderBy = orderBy;
+			selectedTotalRecords = totalRecords;
+			searchFilter = regexFilter;
 			selectedInterval = interval || 'daily';
-			selectedChartLegendMetric = chartLegendMetric;
 			startDate = fromDate;
 			endDate = toDate;
 		}
@@ -648,6 +692,10 @@ class Panel extends Component {
 			endDate,
 			selectedInterval,
 			selectedDimension,
+			selectedOrder,
+			selectedOrderBy,
+			selectedTotalRecords,
+			searchFilter,
 			selectedFilters,
 			reportType
 		});
@@ -659,8 +707,11 @@ class Panel extends Component {
 				endDate,
 				selectedInterval,
 				selectedDimension,
+				selectedOrder,
+				selectedOrderBy,
+				selectedTotalRecords,
+				searchFilter,
 				selectedFilters,
-				selectedChartLegendMetric,
 				reportType,
 				dimensionList,
 				filterList,
@@ -673,8 +724,12 @@ class Panel extends Component {
 
 	getAllAvailableMetrics = (
 		isCustomizeChartLegend,
-		reportsMeta,
+		urlUTMReportingMeta,
 		selectedDimension,
+		selectedOrder,
+		selectedOrderBy,
+		selectedTotalRecords,
+		searchFilter,
 		selectedFilters,
 		reportType,
 		tableData
@@ -682,19 +737,19 @@ class Panel extends Component {
 		let allAvailableMetrics = [];
 		if (
 			isCustomizeChartLegend &&
-			reportsMeta &&
-			reportsMeta.data &&
-			reportsMeta.data.metrics &&
-			typeof reportsMeta.data.metrics === 'object' &&
-			Object.keys(reportsMeta.data.metrics).length &&
+			urlUTMReportingMeta &&
+			urlUTMReportingMeta.data &&
+			urlUTMReportingMeta.data.metrics &&
+			typeof urlUTMReportingMeta.data.metrics === 'object' &&
+			Object.keys(urlUTMReportingMeta.data.metrics).length &&
 			tableData &&
 			tableData.result &&
 			tableData.result.length
 		) {
-			const allAvailableMetricsArr = Object.keys(reportsMeta.data.metrics)
-				.filter(key => reportsMeta.data.metrics[key].selectable)
+			const allAvailableMetricsArr = Object.keys(urlUTMReportingMeta.data.metrics)
+				.filter(key => urlUTMReportingMeta.data.metrics[key].selectable)
 				.map(key => {
-					const { display_name: name, valueType, selectable } = reportsMeta.data.metrics[key];
+					const { display_name: name, valueType } = urlUTMReportingMeta.data.metrics[key];
 					return {
 						name,
 						value: key,
@@ -709,43 +764,17 @@ class Panel extends Component {
 		return allAvailableMetrics;
 	};
 
-	filterTableDataBySelectedMetrics = (tableData, metricsList, dimensionList) => {
+	filterTableDataBySelectedMetrics = tableData => {
 		const selectedMetricsTableData = tableData;
+		// eslint-disable-next-line no-shadow
+		const { isURL } = this.state;
 
-		selectedMetricsTableData.columns = selectedMetricsTableData.columns.filter(
-			column =>
-				!!metricsList.find(metric => metric.value === column) ||
-				REPORT_INTERVAL_TABLE_KEYS.indexOf(column) !== -1 ||
-				!!dimensionList.find(dimension => dimension.value === column)
+		const metricNameList = (isURL ? displayURLMetrics : displayUTMMetrics).map(
+			metrics => metrics.value
 		);
-
-		selectedMetricsTableData.result = selectedMetricsTableData.result.map(row => {
-			const computedRow = { ...row };
-
-			// eslint-disable-next-line no-restricted-syntax
-			for (const key in computedRow) {
-				if (
-					!metricsList.find(metric => metric.value === key) &&
-					REPORT_INTERVAL_TABLE_KEYS.indexOf(key) === -1 &&
-					!dimensionList.find(dimension => dimension.value === key) &&
-					!computedRow.site
-				) {
-					delete computedRow[key];
-				}
-			}
-
-			return computedRow;
-		});
+		selectedMetricsTableData.columns = metricNameList;
 
 		const computedTotal = { ...selectedMetricsTableData.total };
-
-		// eslint-disable-next-line no-restricted-syntax
-		for (const key in computedTotal) {
-			if (!metricsList.find(metric => `total_${metric.value}` === key)) {
-				delete computedTotal[key];
-			}
-		}
-
 		selectedMetricsTableData.total = computedTotal;
 
 		return selectedMetricsTableData;
@@ -807,12 +836,16 @@ class Panel extends Component {
 	}
 
 	renderContent = () => {
-		let {
+		const {
 			selectedDimension,
+			selectedOrder,
+			selectedOrderBy,
+			selectedTotalRecords,
+			searchFilter,
 			selectedFilters,
 			selectedInterval,
 			selectedMetrics,
-			selectedChartLegendMetric,
+			displayURLAndUTMMetrics,
 			reportType,
 			startDate,
 			endDate,
@@ -823,44 +856,23 @@ class Panel extends Component {
 			intervalList,
 			metricsList,
 			filterList,
-			tableData
+			tableData,
+			pageSize,
+			pageIndex
 		} = this.state;
 		const {
-			reportsMeta,
 			reportType: defaultReportType,
-			isCustomizeChartLegend,
 			isForOps,
 			userSites,
 			user,
 			showNotification
 		} = this.props;
 
-		let allAvailableMetrics = this.getAllAvailableMetrics(
-			isCustomizeChartLegend,
-			reportsMeta,
-			selectedDimension,
-			selectedFilters,
-			reportType,
-			tableData
-		);
-
-		if (!isForOps) {
-			allAvailableMetrics = allAvailableMetrics
-				.filter(item => item.value == 'unique_impressions')
-				.map(item => {
-					item.name = 'Unique Impressions Reporting';
-					item.isDisabled = false;
-					return item;
-				});
-		} else {
-			// this is for ops panel reports. Don't whow unique impression items in dropdown
-			allAvailableMetrics = allAvailableMetrics.filter(item => item.value.indexOf('unique') === -1);
-		}
 		const aggregatedData = this.aggregateValues(tableData.result);
 		const { email } = this.getDemoUserParams();
 		const { isValid } = getReportingDemoUserValidation(email, reportType);
 
-		if (reportType == 'site') {
+		if (reportType === 'site') {
 			if (!isValidSite)
 				return this.renderEmptyMessage(
 					'Seems like you have entered an invalid siteid in url. Please check.'
@@ -870,18 +882,23 @@ class Panel extends Component {
 
 		let selectedMetricsTableData = JSON.parse(JSON.stringify(tableData));
 
-		if (isCustomizeChartLegend && tableData.result && tableData.result.length) {
+		if (tableData.result && tableData.result.length) {
 			selectedMetricsTableData = this.filterTableDataBySelectedMetrics(
 				selectedMetricsTableData,
 				metricsList,
 				dimensionList
 			);
 		}
-
+		if (searchFilter) {
+			const pattern = new RegExp(searchFilter);
+			selectedMetricsTableData.result =
+				selectedMetricsTableData.result.filter(item => pattern.test(item.url)) || [];
+		}
 		return (
 			<Row>
 				<Col sm={12}>
 					<ControlContainer
+						isHB
 						startDate={startDate}
 						endDate={endDate}
 						generateButtonHandler={this.generateButtonHandler}
@@ -890,7 +907,12 @@ class Panel extends Component {
 						filterList={filterList}
 						intervalList={intervalList}
 						metricsList={metricsList}
+						displayURLAndUTMMetrics={displayURLAndUTMMetrics}
 						selectedDimension={selectedDimension}
+						selectedOrder={selectedOrder}
+						selectedOrderBy={selectedOrderBy}
+						selectedTotalRecords={selectedTotalRecords}
+						searchFilter={searchFilter}
 						selectedFilters={selectedFilters}
 						selectedMetrics={selectedMetrics}
 						selectedInterval={selectedInterval}
@@ -902,25 +924,12 @@ class Panel extends Component {
 						userSites={userSites}
 						user={user}
 						showNotification={showNotification}
+						pageSize={pageSize}
+						pageIndex={pageIndex}
+						recordCount={tableData.result.length}
 					/>
 				</Col>
-				<Col sm={12} className="u-margin-t5">
-					<ChartContainer
-						tableData={tableData}
-						selectedDimension={selectedDimension}
-						startDate={startDate}
-						endDate={endDate}
-						metricsList={metricsList}
-						allAvailableMetrics={allAvailableMetrics}
-						reportType={reportType}
-						isForOps={isForOps}
-						isCustomizeChartLegend={isCustomizeChartLegend}
-						updateMetrics={this.updateMetrics}
-						selectedInterval={selectedInterval}
-						selectedChartLegendMetric={selectedChartLegendMetric}
-					/>
-				</Col>
-				<Col sm={12} className="u-margin-t5 u-margin-b4">
+				<Col sm={12} className="u-margin-b4 url-reporting-table">
 					<TableContainer
 						tableData={selectedMetricsTableData}
 						aggregatedData={aggregatedData}
@@ -928,10 +937,15 @@ class Panel extends Component {
 						endDate={endDate}
 						selectedInterval={selectedInterval}
 						selectedDimension={selectedDimension}
+						selectedOrder={selectedOrder}
+						selectedOrderBy={selectedOrderBy}
 						getCsvData={this.getCsvData}
 						reportType={reportType}
 						defaultReportType={defaultReportType}
 						isForOps={isForOps}
+						onPageSizeChange={this.onPageSizeChange}
+						onPageChange={this.onPageChange}
+						showPaginationTop={false}
 					/>
 				</Col>
 			</Row>
@@ -939,14 +953,10 @@ class Panel extends Component {
 	};
 
 	render() {
-		const {
-			isLoading,
-			show,
-			tableData: { result }
-		} = this.state;
-		const { reportsMeta } = this.props;
+		const { isLoading, show } = this.state;
+		const { urlUTMReportingMeta } = this.props;
 
-		if (!reportsMeta.fetched || isLoading) {
+		if (!urlUTMReportingMeta.fetched || isLoading) {
 			return <Loader />;
 		}
 
@@ -971,4 +981,4 @@ class Panel extends Component {
 	}
 }
 
-export default Panel;
+export default Report;

@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from 'react';
+import React, { lazy } from 'react';
 import { Router, Route, Redirect, Switch } from 'react-router-dom';
 
 import { NAV_ITEMS_INDEXES } from './Pages/ManageSite/constants/index';
@@ -35,7 +35,11 @@ const Amp = lazy(() => import(/* webpackChunkName: "ampTag" */ './Apps/AmpTag/in
 const InnovativeAds = lazy(() =>
 	import(/* webpackChunkName: "innovativeAds" */ './Apps/InnovativeAds/index')
 );
-const Reporting = lazy(() => import(/* webpackChunkName: "reporting" */ './Apps/Reporting/index'));
+
+const Reporting = lazy(() =>
+	import(/* webpackChunkName: "reporting" */ './Apps/Reporting/containers/ReportContainer')
+);
+
 const ManageSite = lazy(() =>
 	import(/* webpackChunkName: "manageSite" */ './Pages/ManageSite/index')
 );
@@ -189,8 +193,28 @@ const Routes = () => (
 					path={`/sites/:siteId/apps/header-bidding/${HB_NAV_ITEMS_INDEXES.TAB_6}`}
 					component={HeaderBidding}
 				/>
-				<PrivateRoute exact name="Reports" path="/reports" component={Reporting} />
 
+				<PrivateRoute
+					exact
+					customProps={{ activeTab: REPORTS_NAV_ITEMS_INDEXES.GENERAL }}
+					name="General"
+					path="/reports"
+					component={Reporting}
+				/>
+				<PrivateRoute
+					exact
+					customProps={{ activeTab: REPORTS_NAV_ITEMS_INDEXES.GENERAL }}
+					name="General"
+					path="/reports/general"
+					component={Reporting}
+				/>
+				<PrivateRoute
+					exact
+					customProps={{ activeTab: REPORTS_NAV_ITEMS_INDEXES.URL_UTM_REPORTING }}
+					name="URL Analytics"
+					path="/reports/url-analytics"
+					component={Reporting}
+				/>
 				<PrivateRoute
 					exact
 					name=":siteId"

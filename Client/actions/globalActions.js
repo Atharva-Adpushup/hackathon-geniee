@@ -3,6 +3,7 @@ import {
 	NETWORK_CONFIG_ACTIONS,
 	SITE_ACTIONS,
 	REPORTS_ACTIONS,
+	URL_REPORTS_ACTIONS,
 	UI_ACTIONS
 } from '../constants/global';
 import axiosInstance from '../helpers/axiosInstance';
@@ -40,6 +41,12 @@ const updateAccountReportMetaData = data => dispatch =>
 		data
 	});
 
+const updateGlobalURLReportsMetaData = data => dispatch =>
+	dispatch({
+		type: URL_REPORTS_ACTIONS.REPLACE_GLOBAL_URL_REPORTS_DATA,
+		data
+	});
+
 const updateNetworkConfig = config => dispatch =>
 	axiosInstance
 		.post('/updateNetworkConfig', { config })
@@ -63,5 +70,6 @@ export {
 	fetchGlobalData,
 	updateNetworkConfig,
 	updateGlobalReportMetaData,
-	updateAccountReportMetaData
+	updateAccountReportMetaData,
+	updateGlobalURLReportsMetaData
 };

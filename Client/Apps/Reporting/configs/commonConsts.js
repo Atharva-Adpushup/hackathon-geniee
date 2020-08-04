@@ -1,23 +1,69 @@
 const REPORTS_NAV_ITEMS_INDEXES = {
 	SITE: 'site',
-	ACCOUNT: 'account'
+	ACCOUNT: 'account',
+	GENERAL: 'general',
+	URL_UTM_REPORTING: 'url-analytics'
 };
 
 const REPORTS_NAV_ITEMS_VALUES = {
 	SITE: 'Site-wise',
-	ACCOUNT: 'Account'
+	ACCOUNT: 'Account',
+	GENERAL: 'General',
+	URL_UTM_REPORTING: 'URL Analytics'
 };
 
 const REPORTS_NAV_ITEMS = {
-	[REPORTS_NAV_ITEMS_INDEXES.SITE]: {
-		NAME: [REPORTS_NAV_ITEMS_VALUES.SITE],
-		INDEX: 2
-	},
-	[REPORTS_NAV_ITEMS_INDEXES.ACCOUNT]: {
-		NAME: [REPORTS_NAV_ITEMS_VALUES.ACCOUNT],
+	[REPORTS_NAV_ITEMS_INDEXES.GENERAL]: {
+		NAME: [REPORTS_NAV_ITEMS_VALUES.GENERAL],
 		INDEX: 1
+	},
+	[REPORTS_NAV_ITEMS_INDEXES.URL_UTM_REPORTING]: {
+		NAME: [REPORTS_NAV_ITEMS_VALUES.URL_UTM_REPORTING],
+		INDEX: 2
 	}
 };
+
+const ORDER_URL_UTM = {
+	HIGHEST_PERFORMING: {
+		value: 'top_select_criteria',
+		display_name: 'Highest Performing',
+		name: 'Highest Performing'
+	},
+	LOWEST_PERFORMING: {
+		value: 'lowest_performing',
+		display_name: 'Lowest Performing',
+		name: 'Lowest Performing'
+	}
+};
+
+const optionListForOrderURLAndUTM = [
+	ORDER_URL_UTM.HIGHEST_PERFORMING,
+	ORDER_URL_UTM.LOWEST_PERFORMING
+];
+
+const ORDER_BY_URL_UTM = {
+	IMPRESSIONS: { value: 'impressions', display_name: 'Impressions', name: 'Impressions' },
+	NET_REVENUE: { value: 'net_revenue', display_name: 'Net Revenue', name: 'Net Revenue' }
+	// GROSS_REVENUE: { value: 'GROSS_REVENUE', display_name:'Gross Revenue', name: 'Gross Revenue' },
+};
+
+const optionListForOrderByURLAndUTM = [
+	ORDER_BY_URL_UTM.NET_REVENUE,
+	ORDER_BY_URL_UTM.IMPRESSIONS
+	// ORDER_BY_URL_UTM.GROSS_REVENUE
+];
+
+const TOTAL_RECORD_LIST_URL_UTM = {
+	HUNDRED_FIFTY: { value: '150', display_name: '150', name: '150' },
+	THREE_HUNDRED: { value: '300', display_name: '300', name: '300' },
+	FIVE_HUNDRED: { value: '500', display_name: '500', name: '500' }
+};
+
+const optionListForTotalRecordForURLAndUTM = [
+	TOTAL_RECORD_LIST_URL_UTM.HUNDRED_FIFTY,
+	TOTAL_RECORD_LIST_URL_UTM.THREE_HUNDRED,
+	TOTAL_RECORD_LIST_URL_UTM.FIVE_HUNDRED
+];
 
 const dimensions = {
 	site: { display_name: 'Site' },
@@ -115,7 +161,7 @@ const METRICS_OPS_PANEL = {
 	ADPUSHUP_PAGE_CPM: { value: 'adpushup_page_cpm', name: 'Page RPM', valueType: 'money' },
 	NETWORK_IMPRESSIONS: { value: 'network_impressions', name: 'Impressions', valueType: 'number' },
 	NETWORK_AD_ECPM: { value: 'network_ad_ecpm', name: 'Ad eCPM', valueType: 'money' },
-	GROSS_REVENUE: { value: "network_gross_revenue", name: 'Gross Revenue', valueType: 'money' }
+	GROSS_REVENUE: { value: 'network_gross_revenue', name: 'Gross Revenue', valueType: 'money' }
 };
 
 const displayOpsMetrics = [
@@ -131,9 +177,40 @@ const UNIQUE_IMPRESSION_METRICS = {
 	NETWORK_NET_REVENUE: { value: 'network_net_revenue', name: 'Net Revenue', valueType: 'money' },
 	ADPUSHUP_PAGE_VIEWS: { value: 'adpushup_page_views', name: 'Page Views', valueType: 'number' },
 	ADPUSHUP_PAGE_CPM: { value: 'adpushup_page_cpm', name: 'Page RPM', valueType: 'money' },
-	UNIQUE_IMPRESSIONS: { value: 'unique_impressions', name: 'Unique Impressions', valueType: 'number' },
+	UNIQUE_IMPRESSIONS: {
+		value: 'unique_impressions',
+		name: 'Unique Impressions',
+		valueType: 'number'
+	},
 	UNIQUE_AD_ECPM: { value: 'unique_ad_ecpm', name: 'Unique Ad eCPM', valueType: 'money' }
 };
+
+const URL_UTM_METRICS = {
+	URL: { value: 'url', name: 'URL', valueType: 'url' },
+	UTM_PARAM: { value: 'utm_param', name: 'Parameter', valueType: 'string' },
+	UTM_VALUE: { value: 'utm_value', name: 'Value', valueType: 'string' },
+	UTM_IMPRESSIONS: { value: 'utm_impression', name: 'Impressions', valueType: 'number' },
+	UTM_AD_ECPM: { value: 'utm_ad_ecpm', name: 'Ad eCPM', valueType: 'money' },
+	UTM_NET_REVENUE: { value: 'utm_net_revenue', name: 'Revenue', valueType: 'money' },
+	URL_IMPRESSIONS: { value: 'network_impressions', name: 'Impressions', valueType: 'number' },
+	URL_AD_ECPM: { value: 'network_ad_ecpm', name: 'Ad eCPM', valueType: 'money' },
+	URL_NET_REVENUE: { value: 'network_net_revenue', name: 'Net Revenue', valueType: 'money' }
+};
+
+const displayURLMetrics = [
+	URL_UTM_METRICS.URL,
+	URL_UTM_METRICS.URL_IMPRESSIONS,
+	URL_UTM_METRICS.URL_AD_ECPM,
+	URL_UTM_METRICS.URL_NET_REVENUE
+];
+
+const displayUTMMetrics = [
+	URL_UTM_METRICS.UTM_PARAM,
+	URL_UTM_METRICS.UTM_VALUE,
+	URL_UTM_METRICS.UTM_IMPRESSIONS,
+	URL_UTM_METRICS.UTM_AD_ECPM,
+	URL_UTM_METRICS.UTM_NET_REVENUE
+];
 
 const displayUniqueImpressionMetrics = [
 	UNIQUE_IMPRESSION_METRICS.NETWORK_NET_REVENUE,
@@ -195,6 +272,11 @@ export {
 	displayMetrics,
 	displayOpsMetrics,
 	displayUniqueImpressionMetrics,
+	optionListForOrderURLAndUTM,
+	optionListForOrderByURLAndUTM,
+	optionListForTotalRecordForURLAndUTM,
+	displayURLMetrics,
+	displayUTMMetrics,
 	activeLegendItem,
 	activeLegendItemArray,
 	accountFilter,
