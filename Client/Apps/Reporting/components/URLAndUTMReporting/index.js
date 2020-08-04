@@ -856,10 +856,12 @@ class Report extends Component {
 			intervalList,
 			metricsList,
 			filterList,
-			tableData,
-			pageSize,
-			pageIndex
+			tableData
 		} = this.state;
+
+		let { pageSize, pageIndex } = this.state;
+		let recordCount = 0;
+
 		const {
 			reportType: defaultReportType,
 			isForOps,
@@ -888,11 +890,17 @@ class Report extends Component {
 				metricsList,
 				dimensionList
 			);
+			recordCount = tableData.result.length;
 		}
 		if (searchFilter) {
 			const pattern = new RegExp(searchFilter);
 			selectedMetricsTableData.result =
 				selectedMetricsTableData.result.filter(item => pattern.test(item.url)) || [];
+
+			const newLength = selectedMetricsTableData.result.length;
+			pageSize = newLength > pageSize ? pageSize : newLength;
+			pageIndex = 0;
+			recordCount = newLength;
 		}
 		return (
 			<Row>
@@ -926,7 +934,7 @@ class Report extends Component {
 						showNotification={showNotification}
 						pageSize={pageSize}
 						pageIndex={pageIndex}
-						recordCount={tableData.result.length}
+						recordCount={recordCount}
 					/>
 				</Col>
 				<Col sm={12} className="u-margin-b4 url-reporting-table">
