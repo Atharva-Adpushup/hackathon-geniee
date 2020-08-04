@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import { updateGlobalHBAnalyticMetaData } from '../../../../actions/globalActions';
+import { updateGlobalURLReportsMetaData } from '../../../../actions/globalActions';
 import { showNotification } from '../../../../actions/uiActions';
 import HBAnalytic from '../../components/URLAndUTMReporting';
 
@@ -187,7 +187,7 @@ const mapStateToProps = (state, ownProps) => {
 };
 
 const mapDispatchToProps = dispatch => {
-	const updateReportMetaData = updateGlobalHBAnalyticMetaData;
+	const updateReportMetaData = updateGlobalURLReportsMetaData;
 
 	const computedObject = {
 		updateReportMetaData: params => dispatch(updateReportMetaData(params)),

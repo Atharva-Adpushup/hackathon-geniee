@@ -1,13 +1,13 @@
 import React from 'react';
 import DocumentTitle from 'react-document-title';
 
-import ReportContainer from './containers';
+import ReportPanel from './components';
 import '../../scss/apps/reporting/index.scss';
 
 const App = props => (
 	<React.Fragment>
 		<DocumentTitle title="Reporting" />
-		<ReportContainer isCustomizeChartLegend {...props} />
+		<ReportPanel isCustomizeChartLegend {...props} />
 	</React.Fragment>
 );
 
