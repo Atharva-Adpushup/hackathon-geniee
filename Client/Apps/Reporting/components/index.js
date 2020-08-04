@@ -58,31 +58,30 @@ class ReportsPanel extends Component {
 	render() {
 		const { redirectUrl } = this.state;
 		const activeTab = this.getActiveTab();
+		console.log(activeTab, 'activeTab')
 		const activeItem = REPORTS_NAV_ITEMS[activeTab];
 		if (redirectUrl) {
 			return <Redirect to={{ pathname: redirectUrl }} />;
 		}
 
-		const { userSites, hideHB } = this.props;
+		const { userSites } = this.props;
 		let isURLReportingEnabled = false;
 		const sites = Object.values(userSites);
 		// eslint-disable-next-line array-callback-return
 		sites.map(site => {
 			isURLReportingEnabled = !!site.urlReporting;
 		});
-console.log(isURLReportingEnabled, 'isURLReportingEnabled')
+
 		return (
 			<ActionCard>
-				{!hideHB ? (
+				{
 					<Nav bsStyle="tabs" activeKey={activeItem.INDEX} onSelect={this.handleNavSelect}>
 						<NavItem eventKey={1}>{REPORTS_NAV_ITEMS_VALUES.GENERAL}</NavItem>
 						{isURLReportingEnabled && (
-							<NavItem eventKey={3}>{REPORTS_NAV_ITEMS_VALUES.URL_UTM_REPORTING}</NavItem>
+							<NavItem eventKey={2}>{REPORTS_NAV_ITEMS_VALUES.URL_UTM_REPORTING}</NavItem>
 						)}
 					</Nav>
-				) : (
-					''
-				)}
+				}
 				{this.renderContent()}
 			</ActionCard>
 		);

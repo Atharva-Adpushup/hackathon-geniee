@@ -1,13 +1,9 @@
 const REPORTS_NAV_ITEMS_INDEXES = {
-	SITE: 'site',
-	ACCOUNT: 'account',
 	GENERAL: 'general',
 	URL_UTM_REPORTING: 'url-analytics'
 };
 
 const REPORTS_NAV_ITEMS_VALUES = {
-	SITE: 'Site-wise',
-	ACCOUNT: 'Account',
 	GENERAL: 'General',
 	URL_UTM_REPORTING: 'URL Analytics'
 };
