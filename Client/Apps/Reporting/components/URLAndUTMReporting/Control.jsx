@@ -14,7 +14,8 @@ import {
 	accountFilter,
 	accountDimension,
 	opsDimension,
-	opsFilter
+	opsFilter,
+	optionListForOrderByURLAndUTM
 } from '../../configs/commonConsts';
 import {
 	getReportingControlDemoUserSites,
@@ -34,6 +35,7 @@ class Control extends Component {
 			selectedCharts: props.selectedCharts,
 			chartList: props.hbMetricsList,
 			intervalList: props.intervalList,
+			orderByList: optionListForOrderByURLAndUTM,
 			startDate: props.startDate,
 			endDate: props.endDate,
 			reportType: props.reportType,

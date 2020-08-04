@@ -35,11 +35,7 @@ const Amp = lazy(() => import(/* webpackChunkName: "ampTag" */ './Apps/AmpTag/in
 const InnovativeAds = lazy(() =>
 	import(/* webpackChunkName: "innovativeAds" */ './Apps/InnovativeAds/index')
 );
-
-const Reporting = lazy(() =>
-	import(/* webpackChunkName: "reporting" */ './Apps/Reporting/containers/index')
-);
-
+const Reporting = lazy(() => import(/* webpackChunkName: "reporting" */ './Apps/Reporting/containers/index'));
 const ManageSite = lazy(() =>
 	import(/* webpackChunkName: "manageSite" */ './Pages/ManageSite/index')
 );
@@ -193,11 +189,14 @@ const Routes = () => (
 					path={`/sites/:siteId/apps/header-bidding/${HB_NAV_ITEMS_INDEXES.TAB_6}`}
 					component={HeaderBidding}
 				/>
+				{/* commented by harpreet to resolve conflict during rebase */}
+				{/* <PrivateRoute exact name="Reports" path="/reports" component={Reporting} /> */}
 
+				{/** Reporting Section */}
 				<PrivateRoute
 					exact
 					customProps={{ activeTab: REPORTS_NAV_ITEMS_INDEXES.GENERAL }}
-					name="General"
+					name="Reports"
 					path="/reports"
 					component={Reporting}
 				/>
@@ -208,18 +207,12 @@ const Routes = () => (
 					path="/reports/general"
 					component={Reporting}
 				/>
+
 				<PrivateRoute
 					exact
 					customProps={{ activeTab: REPORTS_NAV_ITEMS_INDEXES.URL_UTM_REPORTING }}
 					name="URL Analytics"
 					path="/reports/url-analytics"
-					component={Reporting}
-				/>
-				<PrivateRoute
-					exact
-					name=":siteId"
-					path="/reports/:siteId"
-					customProps={{ activeTab: REPORTS_NAV_ITEMS_INDEXES.ACCOUNT }}
 					component={Reporting}
 				/>
 
