@@ -4,10 +4,11 @@ import { Tab, Nav, NavItem, Row, Col } from '@/Client/helpers/react-bootstrap-im
 import {
 	INFO_PANEL_IDENTIFIERS,
 	QUICK_SNAPSHOTS_WIDGETS,
-	WIDGETS_INFO
+	WIDGETS_INFO,
+	REPORTS_NAV_ITEMS_INDEXES
 } from '../../configs/commonConsts';
 import QuickSnapshot from './QuickSnapshotComponent/QuickSnapshot';
-import ReportVitals from '../../../Reporting/index';
+import ReportVitals from '../../../Reporting/containers/index';
 
 class InfoPanel extends Component {
 	constructor(props) {
@@ -84,6 +85,7 @@ class InfoPanel extends Component {
 					<ReportVitals
 						reportType={reportType || 'account'}
 						isForOps
+						customProps={{ activeTab: REPORTS_NAV_ITEMS_INDEXES.GENERAL }}
 						isCustomizeChartLegend
 						match={match}
 						location={location}
@@ -95,6 +97,7 @@ class InfoPanel extends Component {
 						reportType="global"
 						defaultReportType="global"
 						isForOps
+						customProps={{ activeTab: REPORTS_NAV_ITEMS_INDEXES.GENERAL }}
 						isCustomizeChartLegend
 						match={match}
 						location={location}

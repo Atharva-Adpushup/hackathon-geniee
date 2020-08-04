@@ -58,7 +58,7 @@ class ReportsPanel extends Component {
 	render() {
 		const { redirectUrl } = this.state;
 		const activeTab = this.getActiveTab();
-		console.log(activeTab, 'activeTab')
+
 		const activeItem = REPORTS_NAV_ITEMS[activeTab];
 		if (redirectUrl) {
 			return <Redirect to={{ pathname: redirectUrl }} />;

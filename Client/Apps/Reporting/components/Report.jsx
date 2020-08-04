@@ -19,6 +19,11 @@ import { DEMO_ACCOUNT_DATA } from '../../../constants/others';
 import Loader from '../../../Components/Loader';
 import { convertObjToArr, roundOffTwoDecimal } from '../helpers/utils';
 import {
+	getReportingDemoUserValidation,
+	getReportingDemoUserSiteIds,
+	getDemoUserSites
+} from '../../../helpers/commonFunctions';
+import {
 	displayMetrics,
 	displayOpsMetrics,
 	displayUniqueImpressionMetrics,
@@ -27,11 +32,6 @@ import {
 	REPORT_INTERVAL_TABLE_KEYS,
 	columnsBlacklistedForAddition
 } from '../configs/commonConsts';
-import {
-	getReportingDemoUserValidation,
-	getReportingDemoUserSiteIds,
-	getDemoUserSites
-} from '../../../helpers/commonFunctions';
 
 function oldConsoleRedirection(e) {
 	e.preventDefault();
@@ -303,7 +303,6 @@ class Report extends Component {
 		let { tableData, metricsList } = this.state;
 		const { selectedDimension, selectedFilters, dimensionList } = this.state;
 		const { reportType, isForOps } = this.props;
-
 		const computedState = Object.assign({ isLoading: true }, inputState);
 		const prevMetricsList = metricsList;
 
@@ -388,6 +387,7 @@ class Report extends Component {
 					});
 
 					if (tableData.columns && tableData.columns.length) {
+						metricsList = this.getMetricsList(tableData);
 						// we need to persist user column selection when user
 						// generates report multiple times.
 						// for that we will check users previous selection, if it
@@ -440,7 +440,7 @@ class Report extends Component {
 	 * - remove unselectable items (given in meta)
 	 * - sort by chart position (given in meta)
 	 * - pick first 5
-	 * @memberof Report
+	 * @memberof Panel
 	 */
 	getMetricsList = tableData => {
 		const {
@@ -935,11 +935,7 @@ class Report extends Component {
 	};
 
 	render() {
-		const {
-			isLoading,
-			show,
-			tableData: { result }
-		} = this.state;
+		const { isLoading, show } = this.state;
 		const { reportsMeta } = this.props;
 
 		if (!reportsMeta.fetched || isLoading) {
