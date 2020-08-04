@@ -70,7 +70,7 @@ class ReportsPanel extends Component {
 		sites.map(site => {
 			isURLReportingEnabled = !!site.urlReporting;
 		});
-
+console.log(isURLReportingEnabled, 'isURLReportingEnabled')
 		return (
 			<ActionCard>
 				{!hideHB ? (

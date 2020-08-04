@@ -37,7 +37,7 @@ const InnovativeAds = lazy(() =>
 );
 
 const Reporting = lazy(() =>
-	import(/* webpackChunkName: "reporting" */ './Apps/Reporting/containers/ReportContainer')
+	import(/* webpackChunkName: "reporting" */ './Apps/Reporting/containers/index')
 );
 
 const ManageSite = lazy(() =>
