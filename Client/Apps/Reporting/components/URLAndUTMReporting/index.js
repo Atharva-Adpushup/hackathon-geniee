@@ -59,7 +59,7 @@ class Report extends Component {
 			selectedMetrics: [],
 			selectedInterval: 'cumulative',
 			selectedOrder: 'top_select_criteria',
-			selectedOrderBy: 'impressions',
+			selectedOrderBy: 'net_revenue',
 			selectedTotalRecords: '500',
 			searchFilter: '',
 			pagesFetched: 0,
