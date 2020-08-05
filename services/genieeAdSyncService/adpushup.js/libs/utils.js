@@ -689,7 +689,7 @@ module.exports = {
 				this.markers = {};
 			},
 			sendURLReportingLog: function() {
-				const markers = {...this.markers};
+				const markers = {pageUrl: window.location.href, ...this.markers};
 				this.clearMarkers();
 				if(!Object.keys(markers).length) return;
 		
