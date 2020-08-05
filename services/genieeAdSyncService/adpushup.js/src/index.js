@@ -75,10 +75,15 @@ function destroyAdpSlots() {
 	if (adpSlots.length) {
 		var adpGSlots = [];
 		adpSlots.forEach(function(adpSlot) {
-			adpGSlots.push(w.adpTags.adpSlots[adpSlot].gSlot);
+			var slot = w.adpTags.adpSlots[adpSlot];
+			if (!slot.optionalParam.isManual && slot.gSlot) {
+				// remove the slot from adpSlots
+				w.adpTags.adpSlots[adpSlot] = undefined;
+				adpGSlots.push(slot.gSlot);
+			}
 		});
 
-		w.adpTags.adpSlots = {};
+		// w.adpTags.adpSlots = {};
 		w.googletag.cmd.push(function() {
 			w.googletag.destroySlots(adpGSlots);
 		});
