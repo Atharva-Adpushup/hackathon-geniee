@@ -62,7 +62,8 @@ class Table extends React.Component {
 			sortable: isDaily,
 			Cell: props =>
 				isDaily ? <span>{moment(props.value).format('ll')}</span> : <span>{props.value}</span>,
-			Footer: 'Total'
+			Footer: 'Total',
+			pivot: !isURLReport
 		};
 
 		// we don't need date col for URL Reporting
@@ -115,7 +116,6 @@ class Table extends React.Component {
 					sortable: true,
 					table_position,
 					Footer: footerValue,
-					pivot: !isURLReport,
 					Cell: props =>
 						// eslint-disable-next-line no-nested-ternary
 						metrics[column].valueType === 'money' ? (
@@ -333,6 +333,7 @@ class Table extends React.Component {
 				return moment(columnValue, 'll').valueOf();
 			}
 		};
+
 		if (tableData && tableData.result && tableData.result.length > 0)
 			return (
 				<React.Fragment>
