@@ -12,10 +12,21 @@ const pagegroupCreationAutomation = require('../services/pagegroupCreationAutoma
 const AdpushupError = require('../helpers/AdPushupError');
 const { checkParams, errorHandler, verifyOwner } = require('../helpers/routeHelpers');
 const { sendSuccessResponse, getNetworkConfig } = require('../helpers/commonFunctions');
-const upload = require('../helpers/uploadToCDN');
 const logger = require('../helpers/globalBucketLogger');
+const helperUtils = require('../helpers/utils');
+const config = require('../configs/config');
 
 const router = express.Router();
+
+function pushToCdnOriginQueue(filePath, content) {
+	return helperUtils.publishToRabbitMqQueue(
+		config.RABBITMQ.CDN_ORIGIN.NAME_IN_QUEUE_PUBLISHER_SERVICE,
+		{
+			filePath,
+			content
+		}
+	);
+}
 
 router
 	.post('/saveSite', (req, res) => {
@@ -27,11 +38,10 @@ router
 
 		userModel
 			.verifySiteOwner(req.user.email, siteId)
-			.catch(err => {
+			.catch(() => {
 				throw AdpushupError({ message: 'Site not found!', status: httpStatus.NOT_FOUND });
 			})
 			.then(() => {
-				const audienceId = utils.getRandomNumber();
 				const siteData = {
 					siteDomain: data.site,
 					siteId,
@@ -53,7 +63,7 @@ router
 				siteObj = site;
 				return userModel.setSitePageGroups(req.user.email);
 			})
-			.then(user =>
+			.then(() =>
 				pagegroupCreationAutomation({
 					siteId: siteObj.data.siteId,
 					url: siteObj.data.siteDomain,
@@ -91,20 +101,9 @@ router
 		const { siteId, content, format } = req.body;
 		const randomId = utils.randomString();
 
-		function cwd(ftp) {
-			const path = `/${siteId}/ads/`;
-			return ftp.cwd(path).catch(() => ftp.mkdir(path).then(() => ftp.cwd(path)));
-		}
-
 		return checkParams(['siteId', 'content'], req, 'post')
 			.then(() => verifyOwner(siteId, req.user.email))
-			.then(() => {
-				const decodedContent = atob(content);
-				return upload(cwd, {
-					content: decodedContent,
-					filename: `${randomId}.${format}`
-				});
-			})
+			.then(() => pushToCdnOriginQueue(`${siteId}/ads/${randomId}.${format}`, content))
 			.then(() => {
 				sendSuccessResponse(
 					{
@@ -222,15 +221,14 @@ router
 					res
 				)
 			)
-			.catch(err => {
-				console.log(err);
-				return sendSuccessResponse(
+			.catch(() =>
+				sendSuccessResponse(
 					{
 						message: `Log Written Failed`
 					},
 					res
-				);
-			})
+				)
+			)
 	);
 
 module.exports = router;
