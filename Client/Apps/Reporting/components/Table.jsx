@@ -254,17 +254,15 @@ class Table extends React.Component {
 				// adjust url acc to width - add break points for every '-'
 				const splitURL = url.split('-');
 				tableRow.url = React.cloneElement(
-					<div>
-						<a href={url}>
-							{splitURL.map((item, index) => (
-								// eslint-disable-next-line react/no-array-index-key
-								<span key={index}>
-									{`${index !== 0 ? '-' : ''}${item}`}
-									<wbr />
-								</span>
-							))}
-						</a>
-					</div>
+					<a target="_blank" rel="noopener noreferrer" href={`https://${url}`}>
+						{splitURL.map((item, index) => (
+							// eslint-disable-next-line react/no-array-index-key
+							<span key={index}>
+								{`${index !== 0 ? '-' : ''}${item}`}
+								<wbr />
+							</span>
+						))}
+					</a>
 				);
 			}
 
