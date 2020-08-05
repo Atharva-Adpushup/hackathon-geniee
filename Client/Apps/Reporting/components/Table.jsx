@@ -1,5 +1,4 @@
 import React from 'react';
-import CustomReactTable from '../../../Components/CustomReactTable/index';
 import sortBy from 'lodash/sortBy';
 import isEqual from 'lodash/isEqual';
 import sum from 'lodash/sum';
@@ -10,6 +9,7 @@ import moment from 'moment';
 import { numberWithCommas, computeCsvData } from '../helpers/utils';
 import { reactTableSortMethod } from '../../../helpers/commonFunctions';
 import { columnsBlacklistedForAddition } from '../configs/commonConsts';
+import CustomReactTable from '../../../Components/CustomReactTable/index';
 
 class Table extends React.Component {
 	constructor(props) {
@@ -34,8 +34,9 @@ class Table extends React.Component {
 	}
 
 	setCsvData = data => {
+		const { getCsvData } = this.props;
 		const csvData = computeCsvData(data);
-		this.props.getCsvData(csvData);
+		getCsvData(csvData);
 	};
 
 	getDateIntervalValidators = () => {
@@ -52,7 +53,7 @@ class Table extends React.Component {
 		let tableColumns = [];
 		let sortedMetrics = [];
 
-		const { metrics, dimension, aggregatedData } = this.props;
+		const { metrics, dimension, aggregatedData, isURLReport } = this.props;
 
 		const { isDaily } = this.getDateIntervalValidators();
 		const computedDate = {
@@ -61,10 +62,13 @@ class Table extends React.Component {
 			sortable: isDaily,
 			Cell: props =>
 				isDaily ? <span>{moment(props.value).format('ll')}</span> : <span>{props.value}</span>,
-			Footer: 'Total'
+			Footer: 'Total',
+			pivot: !isURLReport
 		};
 
-		tableColumns.push(computedDate);
+		// we don't need date col for URL Reporting
+		// eslint-disable-next-line no-unused-expressions
+		!isURLReport && tableColumns.push(computedDate);
 
 		columns.forEach(column => {
 			if (dimension[column]) {
@@ -113,6 +117,7 @@ class Table extends React.Component {
 					table_position,
 					Footer: footerValue,
 					Cell: props =>
+						// eslint-disable-next-line no-nested-ternary
 						metrics[column].valueType === 'money' ? (
 							<span>${numberWithCommas(props.value)}</span>
 						) : metrics[column].valueType === 'percent' ? (
@@ -123,9 +128,12 @@ class Table extends React.Component {
 					sortMethod: (a, b) => reactTableSortMethod(a, b),
 					aggregate: (vals, rows) => {
 						let grouped = [];
+						// eslint-disable-next-line no-restricted-syntax
 						for (const key in aggregatedData) {
 							if (key === rows[0].date) {
+								// eslint-disable-next-line no-loop-func
 								aggregatedData[key].map(row => {
+									// eslint-disable-next-line no-restricted-syntax
 									for (const prop in row) {
 										if (!columnsBlacklistedForAddition.includes(prop) && prop === column)
 											grouped = !Number.isInteger(sum(aggregatedData[key].map(val => val[prop])))
@@ -241,6 +249,30 @@ class Table extends React.Component {
 				delete tableRow.siteid;
 			}
 
+			if (tableRow.url) {
+				const { url } = tableRow;
+				// adjust url acc to width - add break points for every '-'
+				const splitURL = url.split('-');
+				tableRow.url = React.cloneElement(
+					<div>
+						<a href={url}>
+							{splitURL.map((item, index) => (
+								// eslint-disable-next-line react/no-array-index-key
+								<span key={index}>
+									{`${index !== 0 ? '-' : ''}${item}`}
+									<wbr />
+								</span>
+							))}
+						</a>
+					</div>
+				);
+			}
+
+			if (tableRow.utm_param) {
+				const { utmParam } = tableRow;
+				tableRow.utm_param = React.cloneElement(<a href={utmParam}>{utmParam}</a>);
+			}
+
 			displayTableData.push(tableRow);
 		});
 
@@ -261,7 +293,7 @@ class Table extends React.Component {
 
 	checkForAggregation(tableBody) {
 		const dateCount = countBy(map(tableBody, 'date'));
-		for (let key in dateCount) {
+		for (const key in dateCount) {
 			if (dateCount[key] > 1) {
 				return true;
 			}
@@ -271,8 +303,10 @@ class Table extends React.Component {
 
 	render() {
 		const { tableBody, tableColumns, tableData } = this.state;
+		const { isURLReport, onPageSizeChange, onPageChange } = this.props;
 
-		const showAggregation = this.checkForAggregation(tableBody);
+		// don't need aggregation for URL Report
+		const showAggregation = !isURLReport ? this.checkForAggregation(tableBody) : false;
 
 		const onSortFunction = {
 			network_net_revenue(columnValue) {
@@ -299,17 +333,20 @@ class Table extends React.Component {
 				return moment(columnValue, 'll').valueOf();
 			}
 		};
+
 		if (tableData && tableData.result && tableData.result.length > 0)
 			return (
 				<React.Fragment>
 					<CustomReactTable
 						columns={tableColumns}
 						data={tableBody}
-						defaultPageSize={10}
-						pageSizeOptions={[10, 20, 30, 40, 50]}
+						defaultPageSize={isURLReport ? 150 : 10}
+						pageSizeOptions={isURLReport ? [150] : [10, 20, 30, 40, 50]}
 						minRows={0}
 						showPaginationTop
 						showPaginationBottom={false}
+						onPageSizeChange={onPageSizeChange}
+						onPageChange={onPageChange}
 						pivotBy={showAggregation ? ['date'] : []}
 					/>
 					<div className="u-margin-t3">

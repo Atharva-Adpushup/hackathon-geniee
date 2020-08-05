@@ -1,44 +1,60 @@
 import React, { Component, Fragment } from 'react';
-import { Glyphicon, Button } from '@/Client/helpers/react-bootstrap-imports';
+import { Glyphicon, Button, InputGroup } from '@/Client/helpers/react-bootstrap-imports';
 import 'react-dates/lib/css/_datepicker.css';
 import 'react-dates/initialize';
 import { CSVLink } from 'react-csv';
 import isEqual from 'lodash/isEqual';
+import debounce from 'lodash/debounce';
 import moment from 'moment';
-import AsyncGroupSelect from '../../../Components/AsyncGroupSelect/index';
-import PresetDateRangePicker from '../../../Components/PresetDateRangePicker/index';
-import SelectBox from '../../../Components/SelectBox/index';
-import { getPresets } from '../helpers/utils';
-import reportService from '../../../services/reportService';
-import { accountFilter, accountDimension, opsDimension, opsFilter } from '../configs/commonConsts';
+import PresetDateRangePicker from '../../../../Components/PresetDateRangePicker/index';
+import SelectBox from '../../../../Components/SelectBox/index';
+import { getPresets } from '../../helpers/utils';
+import reportService from '../../../../services/reportService';
+import {
+	accountFilter,
+	accountDimension,
+	opsDimension,
+	opsFilter,
+	optionListForOrderByURLAndUTM
+} from '../../configs/commonConsts';
 import {
 	getReportingControlDemoUserSites,
 	getReportingDemoUserSiteIds
-} from '../../../helpers/commonFunctions';
+} from '../../../../helpers/commonFunctions';
 
 class Control extends Component {
 	constructor(props) {
 		super(props);
-		// const { updatedDimensionList, updatedFilterList } = this.updateFilterDimensionList(
-		// 	props.reportType,
-		// 	props.filterList,
-		// 	props.dimensionList
-		// );
+		const selectedMetrics = props.isHB ? props.selectedMetrics : [];
+
 		this.state = {
 			dimensionList: props.dimensionList,
 			filterList: props.filterList,
+			metricsList: props.metricsList,
+			selectedMetrics,
+			selectedCharts: props.selectedCharts,
+			chartList: props.hbMetricsList,
 			intervalList: props.intervalList,
+			orderByList: optionListForOrderByURLAndUTM,
 			startDate: props.startDate,
 			endDate: props.endDate,
 			reportType: props.reportType,
 			selectedDimension: props.selectedDimension || '',
 			selectedInterval: props.selectedInterval || '',
+			selectedOrder: props.selectedOrder || '',
+			selectedOrderBy: props.selectedOrderBy || '',
+			selectedTotalRecords: props.selectedTotalRecords || '',
 			selectedFilters: props.selectedFilters || {},
 			disableGenerateButton: false,
 			updateStatusText: '',
+			regexFilter: props.searchFilter,
+			revenueCutoff: '',
 			csvData: props.csvData,
 			fileName: 'adpushup-report'
 		};
+		this.onMetricsListChange = this.onMetricsListChange.bind(this);
+		this.onChartListChange = this.onChartListChange.bind(this);
+		this.onDebounceControlChange = debounce(this.onDebounceControlChange.bind(this), 250);
 	}
 
 	componentDidMount() {
@@ -50,13 +66,14 @@ class Control extends Component {
 		const isCsvData = !!(nextProps && nextProps.csvData);
 		const updateDimensionList = !isEqual(currState.dimensionList, nextProps.dimensionList);
 		const updateFilterList = !isEqual(currState.filterList, nextProps.filterList);
+		const updateMetricsList = !isEqual(currState.metricsList, nextProps.metricsList);
 
 		const newState = {};
-
+		newState.chartList = currState.chartList;
 		if (isCsvData) newState.csvData = nextProps.csvData;
 		if (updateDimensionList) newState.dimensionList = nextProps.dimensionList;
 		if (updateFilterList) newState.filterList = nextProps.filterList;
-
+		if (updateMetricsList) newState.metricsList = nextProps.metricsList;
 		this.setState(newState);
 	}
 
@@ -68,31 +85,56 @@ class Control extends Component {
 	onFilteChange = selectedFilters => {
 		const { defaultReportType } = this.props;
 		let reportType = defaultReportType || 'account';
-		const { filterList, dimensionList } = this.props;
+		const { filterList, dimensionList, hbMetricsList, metricsList } = this.props;
 		const selectedSiteFilters = selectedFilters.siteid || {};
 		if (selectedSiteFilters && Object.keys(selectedSiteFilters).length === 1) {
 			reportType = 'site';
 		}
-		const { updatedFilterList, updatedDimensionList } = this.updateFilterDimensionList(
+
+		const {
+			updatedFilterList,
+			updatedDimensionList,
+			updatedMetricsList,
+			updatedChartList
+		} = this.updateFilterDimensionList(
 			reportType,
 			defaultReportType,
 			filterList,
+			metricsList,
+			hbMetricsList,
 			dimensionList
 		);
 		this.setState(
 			{
 				dimensionList: updatedDimensionList,
 				filterList: updatedFilterList,
+				metricsList: updatedMetricsList,
+				chartList: updatedChartList,
 				reportType
 			},
 			() => this.onControlChange(reportType)
 		);
 	};
 
+	onChartListChange = selectedCharts => {
+		const { reportType } = this.props;
+		this.setState({ selectedCharts }, this.onControlChange.bind(null, reportType));
+	};
+
+	onMetricsListChange = selectedMetrics => {
+		const { reportType } = this.props;
+		this.setState({ selectedMetrics }, this.onControlChange.bind(null, reportType));
+	};
+
+	onDebounceControlChange = reportType => {
+		const resultObject = this.getStateParams();
+		const { onControlChange } = this.props;
+		onControlChange(resultObject, reportType);
+	};
+
 	onControlChange = reportType => {
 		const resultObject = this.getStateParams();
 		const { onControlChange } = this.props;
-
 		onControlChange(resultObject, reportType);
 	};
 
@@ -103,6 +145,14 @@ class Control extends Component {
 		generateButtonHandler(resultObject);
 	};
 
+	handleOnChange = e => {
+		const { target } = e;
+		const { name } = target;
+		const { reportType } = this.props;
+		const value = target.type === 'checkbox' ? target.checked : target.value;
+		this.setState({ [name]: value }, this.onControlChange.bind(null, reportType));
+	};
+
 	getStateParams = () => {
 		const {
 			startDate,
@@ -110,6 +160,13 @@ class Control extends Component {
 			selectedInterval,
 			selectedDimension,
 			selectedFilters,
+			selectedMetrics,
+			selectedCharts,
+			selectedOrder,
+			selectedOrderBy,
+			selectedTotalRecords,
+			regexFilter,
+			revenueCutoff,
 			reportType
 		} = this.state;
 		const resultObject = {
@@ -118,6 +175,13 @@ class Control extends Component {
 			selectedInterval,
 			selectedDimension,
 			selectedFilters,
+			selectedMetrics,
+			selectedCharts,
+			selectedOrder,
+			selectedOrderBy,
+			selectedTotalRecords,
+			regexFilter,
+			revenueCutoff,
 			reportType
 		};
 
@@ -196,47 +260,58 @@ class Control extends Component {
 		return { updatedDimensionList, updatedFilterList };
 	};
 
-	updateFilterDimensionList = (reportType, defaultReportType, filterList, dimensionList) => {
+	updateFilterDimensionList = (
+		reportType,
+		defaultReportType,
+		filterList,
+		metricsList,
+		hbMetricsList,
+		dimensionList
+	) => {
 		const updatedDimensionList = JSON.parse(JSON.stringify(dimensionList));
 		const updatedFilterList = JSON.parse(JSON.stringify(filterList));
+		const updatedChartList = JSON.parse(JSON.stringify(hbMetricsList || {}));
+		const updatedMetricsList = JSON.parse(JSON.stringify(metricsList || {}));
 
+		/* eslint-disable no-param-reassign */
 		if (reportType === 'account' || reportType === 'global') {
 			updatedFilterList.forEach(fil => {
 				const index = accountFilter.indexOf(fil.value);
 				if (index >= 0) {
-					// eslint-disable-next-line no-param-reassign
 					fil.isDisabled = false;
-					// eslint-disable-next-line no-param-reassign
 				} else fil.isDisabled = true;
 			});
 			updatedDimensionList.forEach(dim => {
 				const index = accountDimension.indexOf(dim.value);
 				if (index >= 0) {
-					// eslint-disable-next-line no-param-reassign
 					dim.isDisabled = false;
-					// eslint-disable-next-line no-param-reassign
 				} else dim.isDisabled = true;
 			});
 		} else {
 			updatedFilterList.forEach(fil => {
-				// eslint-disable-next-line no-param-reassign
 				fil.isDisabled = false;
 			});
 			updatedDimensionList.forEach(dim => {
-				// eslint-disable-next-line no-param-reassign
 				dim.isDisabled = false;
 			});
 		}
-		return { updatedFilterList, updatedDimensionList };
+		return { updatedFilterList, updatedDimensionList, updatedChartList, updatedMetricsList };
 	};
 
 	render() {
 		const { state } = this;
-		const { reportType, showNotification } = this.props;
+		const { reportType, pageSize, pageIndex, recordCount } = this.props;
+		const currentSet = pageSize * pageIndex;
 
 		return (
 			<Fragment>
-				<div className="aligner aligner--wrap aligner--hSpaceBetween u-margin-t4">
+				<div
+					className="aligner aligner--wrap aligner--hSpaceBetween u-margin-t4"
+					style={{
+						display: 'grid',
+						'grid-template-columns': '1fr 1fr 1fr'
+					}}
+				>
 					<div className="aligner-item u-margin-r4">
 						{/* eslint-disable */}
 						<label className="u-text-normal">Report By</label>
@@ -299,31 +374,47 @@ class Control extends Component {
 						{/* eslint-enable */}
 					</div>
 				</div>
-				<div className="aligner aligner--wrap aligner--hSpaceBetween u-margin-t4">
-					<div className="reporting-filterBox aligner-item aligner-item--grow5 u-margin-r4">
+				<div
+					style={{
+						display: 'grid',
+						gridTemplateColumns: '1fr 1fr 1fr'
+					}}
+				>
+					<div className="aligner-item u-margin-r4">
 						{/* eslint-disable */}
-						<AsyncGroupSelect
-							key="filter list"
-							filterList={state.filterList}
-							selectedFilters={state.selectedFilters}
-							onFilterValueChange={this.onFilteChange}
-							getSelectedFilter={this.getSelectedFilter}
-							showNotification={showNotification}
+						<label className="u-text-normal">Order By</label>
+						<SelectBox
+							id="orderby"
+							key="orderby"
+							wrapperClassName="custom-select-box-wrapper"
+							isClearable={false}
+							isSearchable={false}
+							selected={state.selectedOrderBy}
+							options={state.orderByList}
+							onSelect={selectedOrderBy => {
+								this.setState({ selectedOrderBy }, this.onControlChange.bind(null, reportType));
+							}}
 						/>
 						{/* eslint-enable */}
 					</div>
-
-					<div className="aligner-item u-margin-r4 aligner--hEnd">
+					<div />
+					<div
+						className="aligner-item aligner--hEnd"
+						style={{
+							display: 'flex',
+							alignItems: 'flex-end'
+						}}
+					>
 						<Button
+							className="u-margin-r4"
 							bsStyle="primary"
 							onClick={this.onGenerateButtonClick}
 							disabled={state.disableGenerateButton}
+							style={{ width: '100%' }}
 						>
 							<Glyphicon glyph="cog u-margin-r2" />
 							Generate Report
 						</Button>
-					</div>
-					<div className="aligner-item ">
 						<CSVLink
 							data={state.csvData}
 							filename={`${state.fileName}.csv`}
@@ -333,9 +424,58 @@ class Control extends Component {
 							}}
 							className="btn btn-lightBg btn-default btn-blue-line"
 						>
-							<Glyphicon glyph="download-alt u-margin-r2" />
+							<Glyphicon glyph="download-alt  u-margin-r2" />
 							Export Report
 						</CSVLink>
+					</div>
+				</div>
+				<hr />
+				<div
+					style={{
+						display: 'grid',
+						gridTemplateColumns: '1fr 1fr 1fr',
+						paddingBottom: '10px'
+					}}
+				>
+					<div
+						className="aligner-item u-margin-r4"
+						style={{
+							display: 'flex',
+							alignItems: 'flex-end'
+						}}
+					>
+						<InputGroup
+							style={{
+								width: '100%'
+							}}
+						>
+							<InputGroup.Addon>Filter</InputGroup.Addon>
+							<input
+								className="form-control"
+								type="text"
+								placeholder="Search"
+								name="regexFilter"
+								value={state.regexFilter}
+								onChange={e => {
+									const { value } = e.target;
+									this.setState(
+										{ regexFilter: value },
+										debounce(this.onDebounceControlChange.bind(null, reportType))
+									);
+								}}
+							/>
+						</InputGroup>
+					</div>
+					<div />
+					<div
+						style={{
+							display: 'flex',
+							alignItems: 'flex-end',
+							justifyContent: 'flex-end'
+						}}
+					>
+						<span>{`${pageSize > 0 ? currentSet + 1 : 0}-${currentSet +
+							pageSize} of ${recordCount} records`}</span>
 					</div>
 				</div>
 			</Fragment>

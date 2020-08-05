@@ -15,16 +15,6 @@ import ControlContainer from '../containers/ControlContainer';
 import TableContainer from '../containers/TableContainer';
 import ChartContainer from '../containers/ChartContainer';
 import reportService from '../../../services/reportService';
-import {
-	displayMetrics,
-	displayOpsMetrics,
-	displayUniqueImpressionMetrics,
-	accountDisableFilter,
-	accountDisableDimension,
-	opsDimension,
-	opsFilter,
-	REPORT_INTERVAL_TABLE_KEYS
-} from '../configs/commonConsts';
 import { DEMO_ACCOUNT_DATA } from '../../../constants/others';
 import Loader from '../../../Components/Loader';
 import { convertObjToArr, roundOffTwoDecimal } from '../helpers/utils';
@@ -33,7 +23,15 @@ import {
 	getReportingDemoUserSiteIds,
 	getDemoUserSites
 } from '../../../helpers/commonFunctions';
-import { columnsBlacklistedForAddition } from '../configs/commonConsts';
+import {
+	displayMetrics,
+	displayOpsMetrics,
+	displayUniqueImpressionMetrics,
+	opsDimension,
+	opsFilter,
+	REPORT_INTERVAL_TABLE_KEYS,
+	columnsBlacklistedForAddition
+} from '../configs/commonConsts';
 
 function oldConsoleRedirection(e) {
 	e.preventDefault();
@@ -45,7 +43,7 @@ function oldConsoleRedirection(e) {
 	}, 500);
 }
 
-class Panel extends Component {
+class Report extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -94,6 +92,7 @@ class Panel extends Component {
 		}
 
 		const params = { sites: userSitesStr };
+		// eslint-disable-next-line no-unused-expressions
 		isSuperUser ? (params.isSuperUser = isSuperUser) : null;
 
 		if (!reportsMeta.fetched) {
@@ -250,11 +249,10 @@ class Panel extends Component {
 			selectedInterval,
 			metricsList
 		} = this.state;
-		const { userSites, isCustomizeChartLegend, defaultReportType, isForOps } = this.props;
+		const { userSites, isCustomizeChartLegend, defaultReportType } = this.props;
 		const { email, reportType } = this.getDemoUserParams();
 		let selectedMetrics;
 
-		// if (metricsList && !isCustomizeChartLegend) {
 		if (metricsList) {
 			selectedMetrics = displayMetrics.map(metric => metric.value);
 		}
@@ -302,10 +300,11 @@ class Panel extends Component {
 	};
 
 	generateButtonHandler = (inputState = {}) => {
-		let { tableData, selectedDimension, selectedFilters, dimensionList } = this.state;
-		const { reportType, isCustomizeChartLegend, isForOps } = this.props;
+		let { tableData, metricsList } = this.state;
+		const { selectedDimension, selectedFilters, dimensionList } = this.state;
+		const { reportType, isForOps } = this.props;
 		const computedState = Object.assign({ isLoading: true }, inputState);
-		let prevMetricsList = this.state.metricsList;
+		const prevMetricsList = metricsList;
 
 		this.setState(computedState, () => {
 			let newState = {};
@@ -388,25 +387,25 @@ class Panel extends Component {
 					});
 
 					if (tableData.columns && tableData.columns.length) {
-						let metricsList = this.getMetricsList(tableData);
+						metricsList = this.getMetricsList(tableData);
 						// we need to persist user column selection when user
 						// generates report multiple times.
 						// for that we will check users previous selection, if it
 						// is different from default list override default wit
 						// previous values
-						if (isForOps && prevMetricsList.length != metricsList.length) {
+						if (isForOps && prevMetricsList.length !== metricsList.length) {
 							metricsList = [...prevMetricsList];
 						} else if (isForOps) {
 							// for same length we need to check for individual value
-							let listPrevColList = prevMetricsList
+							const listPrevColList = prevMetricsList
 								.map(item => item.value)
 								.sort()
 								.join();
-							let defaultPrevColList = metricsList
+							const defaultPrevColList = metricsList
 								.map(item => item.value)
 								.sort()
 								.join();
-							if (listPrevColList != defaultPrevColList) {
+							if (listPrevColList !== defaultPrevColList) {
 								metricsList = [...prevMetricsList];
 							}
 						}
@@ -468,23 +467,18 @@ class Panel extends Component {
 			const { name, value, valueType } = metaMetric;
 			if (filteredMetrics.indexOf(value) !== -1) computedMetrics.push({ name, value, valueType });
 		});
-		// if(isForOps) {
-		// 	computedMetrics.splice(5);
-		// } else {
+
 		let match = displayMetrics.map(item => item.value);
 		if (isForOps) {
 			match = displayOpsMetrics.map(item => item.value);
-			computedMetrics = computedMetrics.filter(item => match.indexOf(item.value) != -1);
+			computedMetrics = computedMetrics.filter(item => match.indexOf(item.value) !== -1);
 		} else {
 			// check if unique imp is checked
 			if (isUniqueImpEnabled) {
 				match = displayUniqueImpressionMetrics.map(item => item.value);
-				computedMetrics = computedMetrics.filter(item => match.indexOf(item.value) != -1);
-			} else {
-				computedMetrics = computedMetrics.filter(item => match.indexOf(item.value) != -1);
 			}
+			computedMetrics = computedMetrics.filter(item => match.indexOf(item.value) !== -1);
 		}
-		// }
 		return computedMetrics;
 	};
 
@@ -569,16 +563,16 @@ class Panel extends Component {
 				if (foundMetric) sortedMetrics.push(foundMetric);
 			});
 		} else {
-			let found = newMetrics.filter(item => item.value == 'unique_impressions');
+			const found = newMetrics.filter(item => item.value === 'unique_impressions');
 			// if unique impression selected
 			if (found.length) {
-				let match = displayUniqueImpressionMetrics.map(item => item.value);
-				sortedMetrics = sortedMetaMetrics.filter(item => match.indexOf(item.value) != -1);
+				const match = displayUniqueImpressionMetrics.map(item => item.value);
+				sortedMetrics = sortedMetaMetrics.filter(item => match.indexOf(item.value) !== -1);
 				// temp code for unqiue imp selection in dashboard from this component
 				overrideOpsPanelUniqueImpValue({ isUniqueImpEnabled: true });
 			} else {
-				let match = displayMetrics.map(item => item.value);
-				sortedMetrics = sortedMetaMetrics.filter(item => match.indexOf(item.value) != -1);
+				const match = displayMetrics.map(item => item.value);
+				sortedMetrics = sortedMetaMetrics.filter(item => match.indexOf(item.value) !== -1);
 				// temp code for unqiue imp selection in dashboard from this component
 				overrideOpsPanelUniqueImpValue({ isUniqueImpEnabled: false });
 			}
@@ -694,7 +688,7 @@ class Panel extends Component {
 			const allAvailableMetricsArr = Object.keys(reportsMeta.data.metrics)
 				.filter(key => reportsMeta.data.metrics[key].selectable)
 				.map(key => {
-					const { display_name: name, valueType, selectable } = reportsMeta.data.metrics[key];
+					const { display_name: name, valueType } = reportsMeta.data.metrics[key];
 					return {
 						name,
 						value: key,
@@ -807,7 +801,7 @@ class Panel extends Component {
 	}
 
 	renderContent = () => {
-		let {
+		const {
 			selectedDimension,
 			selectedFilters,
 			selectedInterval,
@@ -846,9 +840,11 @@ class Panel extends Component {
 
 		if (!isForOps) {
 			allAvailableMetrics = allAvailableMetrics
-				.filter(item => item.value == 'unique_impressions')
+				.filter(item => item.value === 'unique_impressions')
 				.map(item => {
+					// eslint-disable-next-line no-param-reassign
 					item.name = 'Unique Impressions Reporting';
+					// eslint-disable-next-line no-param-reassign
 					item.isDisabled = false;
 					return item;
 				});
@@ -860,7 +856,7 @@ class Panel extends Component {
 		const { email } = this.getDemoUserParams();
 		const { isValid } = getReportingDemoUserValidation(email, reportType);
 
-		if (reportType == 'site') {
+		if (reportType === 'site') {
 			if (!isValidSite)
 				return this.renderEmptyMessage(
 					'Seems like you have entered an invalid siteid in url. Please check.'
@@ -939,11 +935,7 @@ class Panel extends Component {
 	};
 
 	render() {
-		const {
-			isLoading,
-			show,
-			tableData: { result }
-		} = this.state;
+		const { isLoading, show } = this.state;
 		const { reportsMeta } = this.props;
 
 		if (!reportsMeta.fetched || isLoading) {
@@ -971,4 +963,4 @@ class Panel extends Component {
 	}
 }
 
-export default Panel;
+export default Report;

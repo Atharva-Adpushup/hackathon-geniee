@@ -5,7 +5,7 @@ import {
 } from '../../../actions/globalActions';
 import { showNotification } from '../../../actions/uiActions';
 import { overrideOpsPanelUniqueImpValue } from '../../../actions/userActions';
-import Panel from '../components/Panel';
+import Report from '../components/Report';
 import { checkReportTypeGlobal } from '../../../helpers/commonFunctions';
 
 const mapStateToProps = (state, ownProps) => {
@@ -36,7 +36,7 @@ const mapDispatchToProps = (dispatch, ownProps) => {
 	const computedObject = {
 		updateReportMetaData: params => dispatch(updateReportMetaData(params)),
 		showNotification: data => dispatch(showNotification(data)),
-		overrideOpsPanelUniqueImpValue: data => dispatch(overrideOpsPanelUniqueImpValue(data)),
+		overrideOpsPanelUniqueImpValue: data => dispatch(overrideOpsPanelUniqueImpValue(data))
 	};
 
 	return computedObject;
@@ -45,4 +45,4 @@ const mapDispatchToProps = (dispatch, ownProps) => {
 export default connect(
 	mapStateToProps,
 	mapDispatchToProps
-)(Panel);
+)(Report);

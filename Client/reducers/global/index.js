@@ -4,5 +4,6 @@ import networkConfig from './networkConfig';
 import sites from './sites';
 import ui from './ui';
 import reports from './reports';
+import urlreport from './urlReport';
 
-export default combineReducers({ user, networkConfig, sites, ui, reports });
+export default combineReducers({ user, networkConfig, sites, ui, reports, urlreport });
