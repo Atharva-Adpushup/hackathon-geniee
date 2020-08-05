@@ -285,7 +285,7 @@ var url = require('url'),
 		},
 		publishToRabbitMqQueue: async (queue, data) => {
 			if (!queue || !data) {
-				return;
+				throw new Error('queue name or data not available to utils.publishToRabbitMqQueue');
 			}
 
 			const uri = Array.isArray(data)

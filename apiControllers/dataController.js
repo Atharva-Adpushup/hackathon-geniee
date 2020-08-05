@@ -14,14 +14,18 @@ const { checkParams, errorHandler, verifyOwner } = require('../helpers/routeHelp
 const { sendSuccessResponse, getNetworkConfig } = require('../helpers/commonFunctions');
 const logger = require('../helpers/globalBucketLogger');
 const helperUtils = require('../helpers/utils');
+const config = require('../configs/config');
 
 const router = express.Router();
 
 function pushToCdnOriginQueue(filePath, content) {
-	return helperUtils.publishToRabbitMqQueue('CDN_ORIGIN', {
-		filePath,
-		content
-	});
+	return helperUtils.publishToRabbitMqQueue(
+		config.RABBITMQ.CDN_ORIGIN.NAME_IN_QUEUE_PUBLISHER_SERVICE,
+		{
+			filePath,
+			content
+		}
+	);
 }
 
 router

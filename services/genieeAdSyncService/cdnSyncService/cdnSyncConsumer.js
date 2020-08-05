@@ -302,19 +302,22 @@ module.exports = function(site, user) {
 			});
 		},
 		pushToCdnOriginQueue = function(fileConfig) {
-			const shouldJSCdnSyncBeDisabled = !!(disableSiteCdnSyncList.indexOf(siteId) > -1);
+			const shouldJSCdnSyncBeDisabled = disableSiteCdnSyncList.indexOf(siteId) > -1;
 
-			if (shouldJSCdnSyncBeDisabled || !isNotProduction) {
+			if (shouldJSCdnSyncBeDisabled || isNotProduction) {
 				console.log(
 					"Either current site's cdn generation is disabled or environment is development/staging. Skipping CDN syncing."
 				);
 				return Promise.resolve(fileConfig.uncompressed);
 			} else {
 				let content = Buffer.from(fileConfig.default).toString('base64');
-				return helperUtils.publishToRabbitMqQueue('CDN_ORIGIN', {
-					filePath: `${siteId}/adpushup.js`,
-					content: content
-				});
+				return helperUtils.publishToRabbitMqQueue(
+					config.RABBITMQ.CDN_ORIGIN.NAME_IN_QUEUE_PUBLISHER_SERVICE,
+					{
+						filePath: `${siteId}/adpushup.js`,
+						content: content
+					}
+				);
 			}
 		},
 		getFinalConfigWrapper = () => getFinalConfig().then(fileConfig => fileConfig);
