@@ -37,6 +37,9 @@ const computeCsvData = data => {
 			if (header.accessor === 'siteName') {
 				// eslint-disable-next-line no-unused-expressions
 				return row[header.accessor].props.children;
+				// eslint-disable-next-line no-else-return
+			} else if (header.accessor === 'url') {
+				return row[header.accessor].props.href;
 			}
 			return row[header.accessor];
 		});
