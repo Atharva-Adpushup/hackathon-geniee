@@ -111,9 +111,7 @@ const mapStateToProps = (state, ownProps) => {
 			widget: {},
 			total_metrics: {},
 			interval: {
-				monthly: { display_name: 'Monthly', position: 2 },
-				cumulative: { display_name: 'Cumulative', position: 3 },
-				daily: { display_name: 'Daily', isDefault: true, position: 1 }
+				cumulative: { display_name: 'Cumulative', position: 3 }
 			},
 			metrics: {
 				utm_param: {
