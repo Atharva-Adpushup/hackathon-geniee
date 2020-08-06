@@ -35,7 +35,9 @@ const Amp = lazy(() => import(/* webpackChunkName: "ampTag" */ './Apps/AmpTag/in
 const InnovativeAds = lazy(() =>
 	import(/* webpackChunkName: "innovativeAds" */ './Apps/InnovativeAds/index')
 );
-const Reporting = lazy(() => import(/* webpackChunkName: "reporting" */ './Apps/Reporting/containers/index'));
+const Reporting = lazy(() =>
+	import(/* webpackChunkName: "reporting" */ './Apps/Reporting/containers/index')
+);
 const ManageSite = lazy(() =>
 	import(/* webpackChunkName: "manageSite" */ './Pages/ManageSite/index')
 );
@@ -205,6 +207,13 @@ const Routes = () => (
 					customProps={{ activeTab: REPORTS_NAV_ITEMS_INDEXES.GENERAL }}
 					name="General"
 					path="/reports/general"
+					component={Reporting}
+				/>
+				<PrivateRoute
+					exact
+					name=":siteId"
+					path="/reports/:siteId"
+					customProps={{ activeTab: REPORTS_NAV_ITEMS_INDEXES.GENERAL }}
 					component={Reporting}
 				/>
 
