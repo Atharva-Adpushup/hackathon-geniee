@@ -211,17 +211,17 @@ const Routes = () => (
 				/>
 				<PrivateRoute
 					exact
-					name=":siteId"
-					path="/reports/:siteId"
-					customProps={{ activeTab: REPORTS_NAV_ITEMS_INDEXES.GENERAL }}
+					customProps={{ activeTab: REPORTS_NAV_ITEMS_INDEXES.URL_UTM_REPORTING }}
+					name="URL Analytics"
+					path="/reports/url-analytics"
 					component={Reporting}
 				/>
 
 				<PrivateRoute
 					exact
-					customProps={{ activeTab: REPORTS_NAV_ITEMS_INDEXES.URL_UTM_REPORTING }}
-					name="URL Analytics"
-					path="/reports/url-analytics"
+					name=":siteId"
+					path="/reports/:siteId"
+					customProps={{ activeTab: REPORTS_NAV_ITEMS_INDEXES.GENERAL }}
 					component={Reporting}
 				/>
 
