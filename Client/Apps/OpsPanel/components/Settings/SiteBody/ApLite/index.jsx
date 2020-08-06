@@ -164,7 +164,7 @@ class ApLite extends Component {
 			showNotification
 		} = this.props;
 
-		if (!oldAdUnits.length && !fileName) {
+		if (!uploadedAdUnits && !oldAdUnits.length && !fileName) {
 			showNotification({
 				mode: 'error',
 				title: 'Operation Failed',
@@ -177,27 +177,42 @@ class ApLite extends Component {
 				: uploadedAdUnits;
 
 			const oldAdUnitList = uploadedAdUnits.length ? uploadedAdUnits : oldAdUnits;
-			const oldAdUnitsWithDfpNameAndCode = oldAdUnitList.map(
-				({ refreshSlot, refreshInterval, headerBidding, sectionId, formats, isActive, ...rest }) =>
-					rest
-			);
+			const oldAdUnitsWithDfpNameAndCode = !fileName
+				? oldAdUnitList.map(
+						({ refreshSlot, refreshInterval, sectionId, headerBidding, formats, ...rest }) => rest
+				  )
+				: oldAdUnitList.map(
+						({
+							refreshSlot,
+							refreshInterval,
+							sectionId,
+							headerBidding,
+							formats,
+							isActive,
+							...rest
+						}) => rest
+				  );
 
-			const unCommonAdUnits = differenceWith(
-				oldAdUnitsWithDfpNameAndCode,
-				currentAdUnitsWithDfpNameAndCode,
-				isEqual
-			);
+			if (!fileName) {
+				//oldAdunits properties needs to be updated
+				currentAdUnitsWithDfpNameAndCode = oldAdUnitsWithDfpNameAndCode;
+			} else {
+				const unCommonAdUnits = differenceWith(
+					oldAdUnitsWithDfpNameAndCode,
+					currentAdUnitsWithDfpNameAndCode,
+					isEqual
+				);
 
-			if (!unCommonAdUnits.length) {
+				if (!unCommonAdUnits.length) {
+					currentAdUnitsWithDfpNameAndCode = [
+						...currentAdUnitsWithDfpNameAndCode.map(v => ({ ...v, isActive: true }))
+					];
+				}
 				currentAdUnitsWithDfpNameAndCode = [
-					...currentAdUnitsWithDfpNameAndCode.map(v => ({ ...v, isActive: true }))
+					...currentAdUnitsWithDfpNameAndCode.map(v => ({ ...v, isActive: true })),
+					...unCommonAdUnits.map(v => ({ ...v, isActive: false }))
 				];
 			}
-			currentAdUnitsWithDfpNameAndCode = [
-				...currentAdUnitsWithDfpNameAndCode.map(v => ({ ...v, isActive: true })),
-				...unCommonAdUnits.map(v => ({ ...v, isActive: false }))
-			];
-
 			const { adRefresh, selectedRefreshRate } = this.state;
 
 			const adUnits = currentAdUnitsWithDfpNameAndCode.map(v =>
@@ -205,8 +220,8 @@ class ApLite extends Component {
 					{},
 					{
 						...v,
-						sectionId: uuid.v4(),
 						refreshSlot: adRefresh,
+						sectionId: uuid.v4(),
 						refreshInterval: selectedRefreshRate,
 						formats: ['display', 'video'],
 						headerBidding: true
