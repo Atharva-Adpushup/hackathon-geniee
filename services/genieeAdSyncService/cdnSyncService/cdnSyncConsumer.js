@@ -17,6 +17,7 @@ const config = require('../../../configs/config');
 const generateStatusesAndConfig = require('./generateConfig');
 const bundleGeneration = require('./bundleGeneration');
 const prebidGeneration = require('./prebidGeneration');
+const helperUtils = require('../../../helpers/utils');
 const isNotProduction =
 	config.environment.HOST_ENV === 'development' || config.environment.HOST_ENV === 'staging';
 const request = require('request-promise');
@@ -233,7 +234,7 @@ module.exports = function(site, user) {
 
 					bundle = _.replace(bundle, '__AP_CONFIG__', JSON.stringify(apConfigs));
 					bundle = _.replace(bundle, /__SITE_ID__/g, siteId);
-					bundle = _.replace(bundle, '__COUNTRY__', false);
+					//bundle = _.replace(bundle, '__COUNTRY__', false);
 					bundle = _.replace(bundle, '__SIZE_MAPPING__', JSON.stringify(sizeMappingConfig));
 					bundle = _.replace(bundle, '__WEB_S2S_STATUS__', finalConfig.config.isS2SActive);
 					bundle = _.replace(bundle, '__URL_REPORTING_ENABLED__', isUrlReportingEnabled);
@@ -259,7 +260,6 @@ module.exports = function(site, user) {
 						if (output.error) throw output.error;
 						compressed = output.code;
 					} catch (e) {
-						console.log(e);
 						return Promise.reject(new Error('CDN Sync failed while compressing the file'));
 					}
 
@@ -269,12 +269,16 @@ module.exports = function(site, user) {
 					};
 				});
 		},
-		writeTempFile = function(jsFile, name = 'adpushup.js') {
-			return mkdirpAsync(tempDestPath)
-				.then(function() {
-					return fs.writeFileAsync(path.join(tempDestPath, name), jsFile);
-				})
-				.then(() => jsFile);
+		writeTempFiles = function(fileConfigs) {
+			const fsWriteFilePromises = fileConfigs.map(file => {
+				return mkdirpAsync(tempDestPath).then(function() {
+					return fs.writeFileAsync(path.join(tempDestPath, file.name), file.content);
+				});
+			});
+
+			return Promise.join(fsWriteFilePromises, () => {
+				return fileConfigs;
+			});
 		},
 		startIETesting = uncompressedFile => {
 			const enableIETesting = !!(ieTestingSiteList.indexOf(siteId) > -1);
@@ -303,43 +307,35 @@ module.exports = function(site, user) {
 				password: config.cacheFlyFtp.PASSWORD
 			});
 		},
-		uploadJS = function(fileConfig) {
-			const shouldJSCdnSyncBeDisabled = !!(disableSiteCdnSyncList.indexOf(siteId) > -1);
+		pushToCdnOriginQueue = function(fileConfig) {
+			const shouldJSCdnSyncBeDisabled = disableSiteCdnSyncList.indexOf(siteId) > -1;
 
 			if (shouldJSCdnSyncBeDisabled || isNotProduction) {
 				console.log(
-					"Either current site's cdn generation is disabled or environment is development/staging. Skipping CDN Upload."
+					"Either current site's cdn generation is disabled or environment is development/staging. Skipping CDN syncing."
 				);
 				return Promise.resolve(fileConfig.uncompressed);
 			} else {
-				return connectToServer()
-					.then(cwd)
-					.then(function() {
-						return ftp.put(fileConfig.default, 'adpushup.js');
-					})
-					.then(function() {
-						return Promise.resolve(fileConfig.uncompressed);
-					});
+				let content = Buffer.from(fileConfig.default).toString('base64');
+				return helperUtils.publishToRabbitMqQueue(
+					config.RABBITMQ.CDN_ORIGIN.NAME_IN_QUEUE_PUBLISHER_SERVICE,
+					{
+						filePath: `${siteId}/adpushup.js`,
+						content: content
+					}
+				);
 			}
 		},
 		getFinalConfigWrapper = () => getFinalConfig().then(fileConfig => fileConfig);
 
 	return Promise.join(getFinalConfigWrapper(), fileConfig => {
-		return uploadJS(fileConfig)
-			.then(writeTempFile)
+		return writeTempFiles([
+			{ content: fileConfig.uncompressed, name: 'adpushup.js' },
+			{ content: fileConfig.default, name: 'adpushup.min.js' }
+		])
 			.then(startIETesting)
-			.then(() => writeTempFile(fileConfig.default, 'adpushup.min.js'))
-			.then(() => {
-				if (ftp.getConnectionStatus() === 'connected') {
-					ftp.end();
-				} else {
-					return fileConfig.default;
-				}
-			})
+			.then(() => pushToCdnOriginQueue(fileConfig))
 			.catch(err => {
-				if (ftp && ftp.getConnectionStatus() === 'connected') {
-					ftp.end();
-				}
 				return Promise.reject(err);
 			});
 	});
