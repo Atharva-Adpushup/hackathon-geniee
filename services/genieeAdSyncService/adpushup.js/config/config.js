@@ -3,7 +3,7 @@ module.exports = {
 	// eslint-disable-next-line no-undef
 	siteId: __SITE_ID__,
 	// eslint-disable-next-line no-undef
-	country: __COUNTRY__,
+	country: '__COUNTRY__',
 	feedbackUrl: '//e3.adpushup.com/AdPushupFeedbackWebService/feedback?data=',
 	feedbackUrlOld: '//e3.adpushup.com/ApexWebService/feedback',
 	heartBeatMinInterval: 30000,
@@ -18,7 +18,8 @@ module.exports = {
 	forceVariation: 'forceVariation',
 	pageUrl: window.location.href,
 	referrer: document.referrer,
-	pageUrlMappingServiceEndpoint: '//e3.adpushup.com/AdPushupUrlMappingWebService/urlMapping?url=__PAGE_URL__',
-	pageUrlKeyValue: {urlTargetingKey: '', urlTargetingValue: ''},
+	pageUrlMappingServiceEndpoint:
+		'//e3.adpushup.com/AdPushupUrlMappingWebService/urlMapping?url=__PAGE_URL__',
+	pageUrlKeyValue: { urlTargetingKey: '', urlTargetingValue: '' },
 	urlReportingEnabled: __URL_REPORTING_ENABLED__
 };
