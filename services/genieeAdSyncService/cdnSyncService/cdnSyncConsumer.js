@@ -334,7 +334,10 @@ module.exports = function(site, user) {
 				content: fileConfig.uncompressed.replace(/[\"\']__COUNTRY__[\"\']/g, false),
 				name: 'adpushup.js'
 			},
-			{ content: fileConfig.default, name: 'adpushup.min.js' }
+			{
+				content: fileConfig.default.replace(/[\"\']__COUNTRY__[\"\']/g, false),
+				name: 'adpushup.min.js'
+			}
 		])
 			.then(startIETesting)
 			.then(() => pushToCdnOriginQueue(fileConfig))
