@@ -83,7 +83,7 @@ const getResetValueForAction = actionKey => {
 
 class OptimizationTab extends React.Component {
 	notSupportedOptions = [
-		'triggerKeyOptions.country',
+		// 'triggerKeyOptions.country',
 		'actionKeyOptions.s2s_toggle',
 		'actionKeyOptions.s2s_timeout',
 		'actionKeyOptions.significant_bidders'
