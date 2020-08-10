@@ -28,13 +28,13 @@ const disableSiteCdnSyncList = [38333];
 const ieTestingSiteList = [38903]; // iaai.com
 
 module.exports = function(site, user) {
-	ftp = new PromiseFtp();
+	var ftp = new PromiseFtp();
 
 	var siteId = site.get('siteId'),
 		apps = site.get('apps'),
 		isAutoOptimise = !!(site.get('apConfigs') && site.get('apConfigs').autoOptimise),
 		poweredByBanner = !!(site.get('apConfigs') && site.get('apConfigs').poweredByBanner),
-		gptSraDisabled = !!(site.get('apConfigs') && site.get('apConfigs').gptSraDisabled)
+		gptSraDisabled = !!(site.get('apConfigs') && site.get('apConfigs').gptSraDisabled),
 		tempDestPath = path.join(
 			__dirname,
 			'..',
@@ -122,6 +122,20 @@ module.exports = function(site, user) {
 				innovativeAds
 			}));
 		},
+		setAdNetworkConfig = function(combinedConfig) {
+			const adServerSettings = user.get('adServerSettings');
+			const activeDFPNetwork =
+				(adServerSettings && adServerSettings.dfp && adServerSettings.dfp.activeDFPNetwork) || null;
+
+			if (activeDFPNetwork) {
+				return generateAdNetworkConfig(activeDFPNetwork).then(adNetworkConfig => ({
+					...combinedConfig,
+					adNetworkConfig
+				}));
+			}
+
+			return Promise.resolve(combinedConfig);
+		},
 		generateFinalInitScript = jsFile => {
 			return {
 				addService: (serviceName, isActive, serviceConfig = {}) => {
@@ -178,25 +192,9 @@ module.exports = function(site, user) {
 		getComputedConfig = () => {
 			return (() => {
 				if (apps.apLite) {
-					return Promise.join(generatePrebidConfig(siteId), generateApLiteConfig(siteId))
-						.then(([prebidConfig, apLiteConfig]) => ({ prebidConfig, apLiteConfig }))
-						.then(combinedConfig => {
-							const adServerSettings = user.get('adServerSettings');
-							const activeDFPNetwork =
-								(adServerSettings &&
-									adServerSettings.dfp &&
-									adServerSettings.dfp.activeDFPNetwork) ||
-								null;
-
-							if (activeDFPNetwork) {
-								return generateAdNetworkConfig(activeDFPNetwork).then(adNetworkConfig => ({
-									adNetworkConfig,
-									...combinedConfig
-								}));
-							}
-
-							return combinedConfig;
-						});
+					return Promise.join(generatePrebidConfig(siteId), generateApLiteConfig(siteId)).then(
+						([prebidConfig, apLiteConfig]) => ({ prebidConfig, apLiteConfig })
+					);
 				}
 
 				return getReportData(site)
@@ -207,7 +205,9 @@ module.exports = function(site, user) {
 						return generateAdPushupConfig(site);
 					})
 					.spread(generateCombinedJson);
-			})().then(setAllConfigs);
+			})()
+				.then(setAdNetworkConfig)
+				.then(setAllConfigs);
 		},
 		getConfigWrapper = site => {
 			return getComputedConfig().then(computedConfig =>
@@ -330,8 +330,14 @@ module.exports = function(site, user) {
 
 	return Promise.join(getFinalConfigWrapper(), fileConfig => {
 		return writeTempFiles([
-			{ content: fileConfig.uncompressed, name: 'adpushup.js' },
-			{ content: fileConfig.default, name: 'adpushup.min.js' }
+			{
+				content: fileConfig.uncompressed.replace(/[\"\']__COUNTRY__[\"\']/g, false),
+				name: 'adpushup.js'
+			},
+			{
+				content: fileConfig.default.replace(/[\"\']__COUNTRY__[\"\']/g, false),
+				name: 'adpushup.min.js'
+			}
 		])
 			.then(startIETesting)
 			.then(() => pushToCdnOriginQueue(fileConfig))

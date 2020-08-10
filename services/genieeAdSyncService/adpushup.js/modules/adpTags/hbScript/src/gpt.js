@@ -98,15 +98,6 @@ var gpt = {
 		//return gSlot;
 	},
 	setSlotRenderListener: function(w) {
-		w.googletag.cmd.push(function() {
-			w.googletag
-				.pubads()
-				.addEventListener(constants.EVENTS.GPT.SLOT_RENDER_ENDED, function(event) {
-					// code to run after slot rendered
-				});
-		});
-	},
-	setApLiteSlotRenderListener: function(w) {
 		w.googletag.cmd.push(
 			function() {
 				w.googletag
@@ -115,7 +106,9 @@ var gpt = {
 						if (event && event.slot) {
 							var gSlot = event.slot,
 								slotElementId = gSlot.getSlotElementId(),
-								slot = window.apLite.adpSlots[slotElementId];
+								slot = adpConfig.apLiteActive
+									? window.apLite.adpSlots[slotElementId]
+									: window.adpTags.adpSlots[slotElementId];
 							if (slot) {
 								// stop refresh if line Item is not price priority type
 								var lineItemId =
@@ -132,7 +125,10 @@ var gpt = {
 								);
 
 								if (isNotPricePriorityLineItem) {
-									refreshAdSlot.stopRefreshForASlot(slotElementId);
+									var adId = adpConfig.apLiteActive
+										? slotElementId
+										: slot.optionalParam.adId;
+									refreshAdSlot.stopRefreshForASlot(adId);
 								}
 							}
 						}
@@ -141,15 +137,14 @@ var gpt = {
 		);
 	},
 	loadGpt: function(w, d) {
-		if (adpConfig.apLiteActive) {
-			return this.setApLiteSlotRenderListener(w);
+		if (!adpConfig.apLiteActive) {
+			var gptScript = d.createElement('script');
+			gptScript.src = '//securepubads.g.doubleclick.net/tag/js/gpt.js';
+			gptScript.async = true;
+
+			d.head.appendChild(gptScript);
 		}
 
-		var gptScript = d.createElement('script');
-		gptScript.src = '//securepubads.g.doubleclick.net/tag/js/gpt.js';
-		gptScript.async = true;
-
-		d.head.appendChild(gptScript);
 		return this.setSlotRenderListener(w);
 	},
 	init: function(w, d) {
