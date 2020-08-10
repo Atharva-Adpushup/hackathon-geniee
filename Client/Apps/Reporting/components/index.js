@@ -81,7 +81,9 @@ class ReportsPanel extends Component {
 			<ActionCard>
 				{
 					<Nav bsStyle="tabs" activeKey={activeItem.INDEX} onSelect={this.handleNavSelect}>
-						<NavItem eventKey={1}>{REPORTS_NAV_ITEMS_VALUES.REPORT}</NavItem>
+						<NavItem eventKey={1}>
+							{isURLReportingEnabled ? 'General' : REPORTS_NAV_ITEMS_VALUES.REPORT}
+						</NavItem>
 						{isURLReportingEnabled && (
 							<NavItem eventKey={2}>{REPORTS_NAV_ITEMS_VALUES.URL_UTM_REPORTING}</NavItem>
 						)}
