@@ -1119,11 +1119,7 @@ class OptimizationTab extends React.Component {
 			<div className="hb-rules white-tab-container">
 				<div className="page__header">
 					<div className="page__title">
-						<h3 className="u-margin-t0">Advanced Configuration</h3>
-						<p className="u-margin-b4">
-							Can result in drastic performance issues. Please contact support if you do not
-							understand what this means.
-						</p>
+						<h3 className="u-margin-t0 u-margin-b4">Advanced Configuration</h3>
 					</div>
 					{activeComponent !== 'list-component' && (
 						<Button className="btn-primary" onClick={this.resetState}>
