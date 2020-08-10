@@ -7,6 +7,7 @@ var refreshAdSlot = require('../../../../src/refreshAdSlot');
 var prebidDataCollector = require('./prebidDataCollector');
 var { multiFormatConstants, mediaTypesConfig } = require('./multiFormatConfig');
 var apUtils = require('../../../../libs/utils');
+var config = require('./config');
 
 module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 	var pbjs = window._apPbJs;
@@ -39,21 +40,28 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 	var videoSlotInViewWatcher = (function() {
 		var bannerAdRenderedTime = new Date();
 		var watcherExpiryTimeInMs = 1000;
+		var watcherInterval = 50;
 		var timeoutId;
 		var scrollEventListener;
 
 		return function watcher() {
 			var currentTime = new Date();
 			var timeSpentInMs = currentTime - bannerAdRenderedTime;
+			var disableVideoWaitLimit =
+				Array.isArray(config.SITES_TO_DISABLE_VIDEO_WAIT_LIMIT) &&
+				config.SITES_TO_DISABLE_VIDEO_WAIT_LIMIT.indexOf(config.SITE_ID) !== -1;
 
 			if (
 				!apUtils.checkElementInViewPercent(container) &&
-				timeSpentInMs < watcherExpiryTimeInMs &&
-				!timeoutId
+				(disableVideoWaitLimit || (timeSpentInMs < watcherExpiryTimeInMs && !timeoutId))
 			) {
+				var computedWatcherInterval = disableVideoWaitLimit
+					? watcherInterval
+					: watcherExpiryTimeInMs - timeSpentInMs;
+
 				timeoutId = setTimeout(() => {
 					watcher();
-				}, watcherExpiryTimeInMs - timeSpentInMs);
+				}, computedWatcherInterval);
 
 				var inViewCheck = () => {
 					if (apUtils.checkElementInViewPercent(container)) {
@@ -61,8 +69,10 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 					}
 				};
 
-				scrollEventListener = debounce(inViewCheck, 50);
-				window.addEventListener('scroll', scrollEventListener);
+				if (!disableVideoWaitLimit) {
+					scrollEventListener = debounce(inViewCheck, 50);
+					window.addEventListener('scroll', scrollEventListener);
+				}
 			} else {
 				/**
 				 * Clear timeout and scroll event listners
