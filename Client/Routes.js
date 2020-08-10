@@ -197,18 +197,12 @@ const Routes = () => (
 				{/** Reporting Section */}
 				<PrivateRoute
 					exact
-					customProps={{ activeTab: REPORTS_NAV_ITEMS_INDEXES.GENERAL }}
-					name="Reports"
+					customProps={{ activeTab: REPORTS_NAV_ITEMS_INDEXES.REPORT }}
+					name="Report"
 					path="/reports"
 					component={Reporting}
 				/>
-				<PrivateRoute
-					exact
-					customProps={{ activeTab: REPORTS_NAV_ITEMS_INDEXES.GENERAL }}
-					name="General"
-					path="/reports/general"
-					component={Reporting}
-				/>
+
 				<PrivateRoute
 					exact
 					customProps={{ activeTab: REPORTS_NAV_ITEMS_INDEXES.URL_UTM_REPORTING }}
@@ -221,7 +215,7 @@ const Routes = () => (
 					exact
 					name=":siteId"
 					path="/reports/:siteId"
-					customProps={{ activeTab: REPORTS_NAV_ITEMS_INDEXES.GENERAL }}
+					customProps={{ activeTab: REPORTS_NAV_ITEMS_INDEXES.REPORT }}
 					component={Reporting}
 				/>
 

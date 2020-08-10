@@ -32,7 +32,7 @@ class ReportsPanel extends Component {
 		switch (Number(value)) {
 			default:
 			case 1:
-				redirectUrl = `${computedRedirectUrl}/general`;
+				redirectUrl = `${computedRedirectUrl}`;
 				break;
 
 			case 2:
@@ -48,7 +48,7 @@ class ReportsPanel extends Component {
 
 		switch (activeTab) {
 			default:
-			case REPORTS_NAV_ITEMS_INDEXES.GENERAL:
+			case REPORTS_NAV_ITEMS_INDEXES.REPORT:
 				return <ReportContainer isCustomizeChartLegend {...this.props} />;
 			case REPORTS_NAV_ITEMS_INDEXES.URL_UTM_REPORTING:
 				return <URLAndUTMContainer isCustomizeChartLegend {...this.props} />;
@@ -64,19 +64,24 @@ class ReportsPanel extends Component {
 			return <Redirect to={{ pathname: redirectUrl }} />;
 		}
 
-		const { userSites } = this.props;
+		const { userSites, match } = this.props;
 		let isURLReportingEnabled = false;
+
 		const sites = Object.values(userSites);
-		// eslint-disable-next-line array-callback-return
 		sites.map(site => {
 			isURLReportingEnabled = !!site.urlReporting;
+			return site;
 		});
+
+		if (match && match.url === '/reports/url-analytics' && match.path === '/reports/:siteId') {
+			return '';
+		}
 
 		return (
 			<ActionCard>
 				{
 					<Nav bsStyle="tabs" activeKey={activeItem.INDEX} onSelect={this.handleNavSelect}>
-						<NavItem eventKey={1}>{REPORTS_NAV_ITEMS_VALUES.GENERAL}</NavItem>
+						<NavItem eventKey={1}>{REPORTS_NAV_ITEMS_VALUES.REPORT}</NavItem>
 						{isURLReportingEnabled && (
 							<NavItem eventKey={2}>{REPORTS_NAV_ITEMS_VALUES.URL_UTM_REPORTING}</NavItem>
 						)}

@@ -85,7 +85,7 @@ class InfoPanel extends Component {
 					<ReportVitals
 						reportType={reportType || 'account'}
 						isForOps
-						customProps={{ activeTab: REPORTS_NAV_ITEMS_INDEXES.GENERAL }}
+						customProps={{ activeTab: REPORTS_NAV_ITEMS_INDEXES.REPORT }}
 						isCustomizeChartLegend
 						match={match}
 						location={location}
@@ -97,7 +97,7 @@ class InfoPanel extends Component {
 						reportType="global"
 						defaultReportType="global"
 						isForOps
-						customProps={{ activeTab: REPORTS_NAV_ITEMS_INDEXES.GENERAL }}
+						customProps={{ activeTab: REPORTS_NAV_ITEMS_INDEXES.REPORT }}
 						isCustomizeChartLegend
 						match={match}
 						location={location}
