@@ -267,7 +267,6 @@ class Report extends Component {
 			selectedDimension,
 			selectedOrder,
 			selectedOrderBy,
-			pageIndex,
 			selectedTotalRecords,
 			selectedFilters,
 			selectedInterval
@@ -282,7 +281,7 @@ class Report extends Component {
 			dimension: selectedDimension,
 			[selectedOrder]: selectedOrderBy,
 			page_size: selectedTotalRecords,
-			page: pageIndex
+			page: 0
 		};
 
 		Object.keys(selectedFilters).forEach(filter => {
@@ -478,7 +477,7 @@ class Report extends Component {
 					}
 				}
 
-				newState = { ...newState, isLoading: false, tableData, isURL };
+				newState = { ...newState, isLoading: false, tableData, isURL, pageIndex: 0 };
 				this.setState(newState);
 			});
 		});
