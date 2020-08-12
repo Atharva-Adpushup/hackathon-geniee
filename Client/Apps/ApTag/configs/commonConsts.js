@@ -131,220 +131,359 @@ const ADCODE = `<div id="__AD_ID__" class="_ap_apex_ad"__CUSTOM_ATTRIBS__>
 	</script>
 </div>`;
 
-const REWARDED_AD_CODE = `<script>
-if (
-  !!navigator.userAgent.match(
-	/iPad|iPhone|Android|BlackBerry|Windows Phone|webOS/i
-  )
-) {
-  googletag = window.googletag || { cmd: [] };
-
-  function setupRewarded() {
-	const rewardedSlot = googletag
-	  .defineOutOfPageSlot(
-		"/__NETWORK_CODE__/__AD_UNIT__",
-		googletag.enums.OutOfPageFormat.REWARDED
-	  )
-	  .addService(googletag.pubads());
-	rewardedSlot.setForceSafeFrame(true);
-	googletag.pubads().enableAsyncRendering();
-	googletag.enableServices();
-	return rewardedSlot;
-  }
-
-  function getRandomData() {
-	if (window && window.crypto && window.crypto.getRandomValues) {
-	  return crypto.getRandomValues(new Uint8Array(1))[0] % 16;
-	} else {
-	  return Math.random() * 16;
+const REWARDED_AD_CODE = `<html>
+<head>
+  <style>
+	:root {
+	  --modal-duration: 1s;
+	  --modal-color: #428bca;
 	}
-  }
-  function generateUUID(placeholder) {
-	return placeholder
-	  ? (placeholder ^ (getRandomData() >> (placeholder / 4))).toString(16)
-	  : ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, generateUUID);
-  }
 
-  var uuid = generateUUID();
-  var makeRewardVisible = false;
-  function vastDump(data) {
-	var xhr = new XMLHttpRequest();
-	xhr.open(
-	  "POST",
-	  "https://vastdump-staging.adpushup.com/rewardedAdDump",
-	  true
-	);
-	xhr.setRequestHeader("Content-type", "application/json");
-	xhr.send(JSON.stringify(data));
-  }
-
-  function triggerRewardedAd() {
-	var modalShown = false;
-
-	$("#modal").modal("show");
-	if (!modalShown) {
-	  var data = {};
-	  data.timestamp = new Date().getTime();
-	  data.type = 0;
-	  // type = 1 for the 4 download buttons type = 0 for 'resoomer' button
-	  data.id = uuid;
-	  data.eventType = 6;
-	  // {0: ready, 1: played, 2: granted, 3: cancelled, 6: resoomerPressed}
-	  data.ua = navigator.userAgent;
-	  data.userStats = JSON.parse(localStorage.getItem("aprewarded_key"));
-	  vastDump(data);
-	  modalShown = true;
-	  $("#watchAdBtn").click(function () {
-		var data = {};
-		var rewardedData = JSON.parse(localStorage.getItem("aprewarded_key"));
-		rewardedData.played += 1;
-		localStorage.setItem("aprewarded_key", JSON.stringify(rewardedData));
-		data.timestamp = new Date().getTime();
-		data.type = 0;
-		// type = 1 for the 4 download buttons type = 0 for 'resoomer' button
-		data.id = uuid;
-		data.eventType = 1;
-		// {0: ready, 1: played, 2: granted, 3: cancelled, 6: resoomerPressed}
-		data.ua = navigator.userAgent;
-		data.userStats = JSON.parse(localStorage.getItem("aprewarded_key"));
-
-		vastDump(data);
-		makeRewardVisible = true;
-	  });
-	  $("#noThanksBtn").click(function () {
-		$("#modal").modal("hide");
-	  });
+	body {
+	  font-family: Arial, Helvetica, sans-serif;
+	  background: #f4f4f4;
+	  font-size: 17px;
+	  line-height: 1.6;
+	  display: flex;
+	  height: 100vh;
+	  align-items: center;
+	  justify-content: center;
 	}
-  }
 
-  googletag.cmd.push(function () {
-	if (!localStorage.getItem("aprewarded_key")) {
-	  localStorage.setItem(
-		"aprewarded_key",
-		JSON.stringify({
-		  ready: 0,
-		  granted: 0,
-		  played: 0,
-		  userId: generateUUID(),
-		})
-	  );
+	.button {
+	  background: #428bca;
+	  padding: 1em 2em;
+	  color: #fff;
+	  border: 0;
+	  border-radius: 5px;
+	  cursor: pointer;
 	}
-	var initialData = {};
-	initialData.timestamp = new Date().getTime();
-	initialData.id = uuid;
-	initialData.eventType = 5;
-	initialData.type = 0;
-	initialData.ua = navigator.userAgent;
-	initialData.userStats = JSON.parse(
-	  localStorage.getItem("aprewarded_key")
-	);
-	vastDump(initialData);
 
-	googletag.pubads().addEventListener("rewardedSlotReady", function (e) {
-	  var rewardedData = JSON.parse(localStorage.getItem("aprewarded_key"));
-	  rewardedData.ready += 1;
-	  localStorage.setItem("aprewarded_key", JSON.stringify(rewardedData));
-	  $("body").append(
-		'<div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">' +
-		  '<div class="modal-dialog" role="document">' +
-		  '<div class="modal-content">' +
-		  '<div class="modal-header">' +
-		  '<h5 class="modal-title" id="exampleModalLabel"></h5>' +
-		  '<button type="button" class="close" data-dismiss="modal" aria-label="Close">' +
-		  '<span aria-hidden="true">&times;</span>' +
-		  "</button>" +
-		  "</div>" +
-		  '<div class="modal-body">' +
-		  "__MODAL_TEXT__" +
-		  "</div>" +
-		  '<div class="modal-footer">' +
-		  '<button type="button" id="noThanksBtn" class="btn btn-secondary" data-dismiss="modal">Close</button>' +
-		  '<button type="button" id="watchAdBtn" class="btn btn-primary">Watch</button>' +
-		  "</div>" +
-		  "</div>" +
-		  "</div>" +
-		  "</div>"
-	  );
+	.button:hover {
+	  background: #3876ac;
+	}
 
-	  let timer = setInterval(function () {
-		if (makeRewardVisible) {
-		  e.makeRewardedVisible();
-		  clearInterval(timer);
-		}
-	  }, 100);
+	.modal {
+	  display: none;
+	  position: fixed;
+	  z-index: 1;
+	  left: 0;
+	  top: 0;
+	  height: 100%;
+	  width: 100%;
+	  overflow: auto;
+	  background-color: rgba(0, 0, 0, 0.5);
+	}
 
-	  var data = {};
-	  data.timestamp = new Date().getTime();
-	  data.type = 0;
-	  // type = 1 for the 4 download buttons type = 0 for 'resoomer' button
-	  data.id = uuid;
-	  data.eventType = 0;
-	  // {0: ready, 1: played, 2: granted, 3: cancelled, 6: resoomerPressed}
-	  data.ua = navigator.userAgent;
-	  data.userStats = JSON.parse(localStorage.getItem("aprewarded_key"));
+	.modal-content {
+	  margin: 10% auto;
+	  width: 60%;
+	  box-shadow: 0 5px 8px 0 rgba(0, 0, 0, 0.2),
+		0 7px 20px 0 rgba(0, 0, 0, 0.17);
+	  animation-name: modalopen;
+	  animation-duration: var(--modal-duration);
+	}
 
-	  vastDump(data);
-	});
-	googletag.pubads().addEventListener("rewardedSlotGranted", function (e) {
-	  var rewardedData = JSON.parse(localStorage.getItem("aprewarded_key"));
-	  rewardedData.granted += 1;
-	  localStorage.setItem("aprewarded_key", JSON.stringify(rewardedData));
-	  var data = {};
-	  data.timestamp = new Date().getTime();
-	  data.type = 0;
-	  // type = 1 for the 4 download buttons type = 0 for 'resoomer' button
-	  data.id = uuid;
-	  data.eventType = 2;
-	  // {0: ready, 1: played, 2: granted, 3: cancelled, 6: resoomerPressed}
-	  data.ua = navigator.userAgent;
-	  data.userStats = JSON.parse(localStorage.getItem("aprewarded_key"));
+	.modal-header h2,
+	.modal-footer h3 {
+	  margin: 0;
+	}
 
-	  if (navigator.sendBeacon) {
-		navigator.sendBeacon(
-		  "https://vastdump-staging.adpushup.com/rewardedAdDump",
-		  JSON.stringify(data)
-		);
-	  } else {
-		var img = new Image();
-		var encData = btoa(JSON.stringify(data));
-		img.src =
-		  "https://vastdump-staging.adpushup.com/rewardedAdDump?data=" +
-		  encData;
+	.modal-header {
+	  background: var(--modal-color);
+	  padding: 15px;
+	  color: #fff;
+	  border-top-left-radius: 5px;
+	  border-top-right-radius: 5px;
+	  height: 50px;
+	}
+
+	.modal-body {
+	  padding: 10px 20px;
+	  background: #fff;
+	  height: 110px;
+	}
+
+	.close {
+	  color: #ccc;
+	  float: right;
+	  font-size: 30px;
+	  color: #fff;
+	}
+
+	.close:hover,
+	.close:focus {
+	  color: #000;
+	  text-decoration: none;
+	  cursor: pointer;
+	}
+
+	@keyframes modalopen {
+	  from {
+		opacity: 0;
 	  }
-	  $("#modal").hide();
-	  $("#modal").on("hidden.bs.modal", function () {
-		$(this).remove();
-	  });
-	  __POST_REWARDED_FUNCTION__;
-	});
-	googletag.pubads().addEventListener("rewardedSlotCanceled", function (e) {
-	  var data = {};
-	  data.timestamp = new Date().getTime();
-	  data.type = 0;
-	  // type = 1 for the 4 download buttons type = 0 for 'resoomer' button
-	  data.id = uuid;
-	  data.eventType = 3;
-	  // {0: ready, 1: played, 2: granted, 3: cancelled, 6: resoomerPressed}
-	  data.ua = navigator.userAgent;
-	  data.userStats = JSON.parse(localStorage.getItem("aprewarded_key"));
+	  to {
+		opacity: 1;
+	  }
+	}
 
-	  vastDump(data);
-	  $("#modal").modal("hide");
-	  $("#modal").on("hidden.bs.modal", function () {
-		$(this).remove();
-	  });
+	.watch {
+	  background-color: var(--modal-color);
+	  border: none;
+	  color: white;
+	  border-radius: 5px;
+	  font-size: 15px;
+	  float: right;
+	  position: relative;
+	  margin-left: 5px;
+	}
 
-	  var slot = setupRewarded();
-	  googletag.display(slot);
-	  googletag.pubads().refresh([slot]);
-	});
-	var slot = setupRewarded();
-	googletag.display(slot);
-	googletag.pubads().refresh([slot]);
-  });
-}
-__TRIGGER_REWARDED_AD__;
-</script>`;
+	.closeModal {
+	  font-size: 15px;
+	  border: none;
+	  float: right;
+	  position: relative;
+	}
+  </style>
+</head>
+
+<body>
+  <script>
+	if (
+	  !!navigator.userAgent.match(
+		/iPad|iPhone|Android|BlackBerry|Windows Phone|webOS/i
+	  )
+	) {
+	  googletag = window.googletag || { cmd: [] };
+
+	  function setupRewarded() {
+		const rewardedSlot = googletag
+		  .defineOutOfPageSlot(
+			"/__NETWORK_CODE__/__AD_UNIT__",
+			googletag.enums.OutOfPageFormat.REWARDED
+		  )
+		  .addService(googletag.pubads());
+		rewardedSlot.setForceSafeFrame(true);
+		googletag.pubads().enableAsyncRendering();
+		googletag.enableServices();
+		return rewardedSlot;
+	  }
+
+	  function getRandomData() {
+		if (window && window.crypto && window.crypto.getRandomValues) {
+		  return crypto.getRandomValues(new Uint8Array(1))[0] % 16;
+		} else {
+		  return Math.random() * 16;
+		}
+	  }
+	  function generateUUID(placeholder) {
+		return placeholder
+		  ? (placeholder ^ (getRandomData() >> (placeholder / 4))).toString(
+			  16
+			)
+		  : ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(
+			  /[018]/g,
+			  generateUUID
+			);
+	  }
+
+	  var uuid = generateUUID();
+	  var makeRewardVisible = false;
+	  function vastDump(data) {
+		var xhr = new XMLHttpRequest();
+		xhr.open(
+		  "POST",
+		  "https://vastdump-staging.adpushup.com/rewardedAdDump",
+		  true
+		);
+		xhr.setRequestHeader("Content-type", "application/json");
+		xhr.send(JSON.stringify(data));
+	  }
+
+	  function triggerRewardedAd() {
+		var modalShown = false;
+
+		$("#modal").show();
+		if (!modalShown) {
+		  var data = {};
+		  data.timestamp = new Date().getTime();
+		  data.type = 0;
+		  data.id = uuid;
+		  data.eventType = 6;
+		  data.ua = navigator.userAgent;
+		  data.userStats = JSON.parse(localStorage.getItem("aprewarded_key"));
+		  vastDump(data);
+		  modalShown = true;
+		  $("#watchAdBtn").click(function () {
+			var data = {};
+			var rewardedData = JSON.parse(
+			  localStorage.getItem("aprewarded_key")
+			);
+			rewardedData.played += 1;
+			localStorage.setItem(
+			  "aprewarded_key",
+			  JSON.stringify(rewardedData)
+			);
+			data.timestamp = new Date().getTime();
+			data.type = 0;
+			data.id = uuid;
+			data.eventType = 1;
+			data.ua = navigator.userAgent;
+			data.userStats = JSON.parse(
+			  localStorage.getItem("aprewarded_key")
+			);
+
+			vastDump(data);
+			makeRewardVisible = true;
+		  });
+		  $("#noThanksBtn, .close").click(function () {
+			$("#modal").hide();
+		  });
+		}
+	  }
+
+	  googletag.cmd.push(function () {
+		if (!localStorage.getItem("aprewarded_key")) {
+		  localStorage.setItem(
+			"aprewarded_key",
+			JSON.stringify({
+			  ready: 0,
+			  granted: 0,
+			  played: 0,
+			  userId: generateUUID(),
+			})
+		  );
+		}
+		var initialData = {};
+		initialData.timestamp = new Date().getTime();
+		initialData.id = uuid;
+		initialData.eventType = 5;
+		initialData.type = 0;
+		initialData.ua = navigator.userAgent;
+		initialData.userStats = JSON.parse(
+		  localStorage.getItem("aprewarded_key")
+		);
+		vastDump(initialData);
+
+		googletag
+		  .pubads()
+		  .addEventListener("rewardedSlotReady", function (e) {
+			var rewardedData = JSON.parse(
+			  localStorage.getItem("aprewarded_key")
+			);
+			rewardedData.ready += 1;
+			localStorage.setItem(
+			  "aprewarded_key",
+			  JSON.stringify(rewardedData)
+			);
+			$("body").append(
+			  "<div id="modal" class="modal">
+		  <div class="modal-content">
+			  <div class="modal-header">
+				  <span class="close">&times;</span>
+				  <h3>Watch Ad ?</h3>
+			  </div>
+			  <div class="modal-body">
+				  <p>__MODAL_TEXT__</p>
+				  <button id ="watchAdBtn" class=" watch primary">Watch</button>
+				  <button  id ="noThanksBtn" class="closeModal secondary"><span class="lg">Close</button>
+			  </div>
+		  </div>
+	  </div>"
+			);
+
+			let timer = setInterval(function () {
+			  if (makeRewardVisible) {
+				e.makeRewardedVisible();
+				clearInterval(timer);
+			  }
+			}, 100);
+
+			var data = {};
+			data.timestamp = new Date().getTime();
+			data.type = 0;
+			data.id = uuid;
+			data.eventType = 0;
+			data.ua = navigator.userAgent;
+			data.userStats = JSON.parse(
+			  localStorage.getItem("aprewarded_key")
+			);
+
+			vastDump(data);
+		  });
+		googletag
+		  .pubads()
+		  .addEventListener("rewardedSlotGranted", function (e) {
+			var rewardedData = JSON.parse(
+			  localStorage.getItem("aprewarded_key")
+			);
+			rewardedData.granted += 1;
+			localStorage.setItem(
+			  "aprewarded_key",
+			  JSON.stringify(rewardedData)
+			);
+			var data = {};
+			data.timestamp = new Date().getTime();
+			data.type = 0;
+
+			data.id = uuid;
+			data.eventType = 2;
+
+			data.ua = navigator.userAgent;
+			data.userStats = JSON.parse(
+			  localStorage.getItem("aprewarded_key")
+			);
+
+			if (navigator.sendBeacon) {
+			  navigator.sendBeacon(
+				"https://vastdump-staging.adpushup.com/rewardedAdDump",
+				JSON.stringify(data)
+			  );
+			} else {
+			  var img = new Image();
+			  var encData = btoa(JSON.stringify(data));
+			  img.src =
+				"https://vastdump-staging.adpushup.com/rewardedAdDump?data=" +
+				encData;
+			}
+			$("#modal").hide();
+			$("#modal").remove();
+
+			__POST_REWARDED_FUNCTION__;
+		  });
+		googletag
+		  .pubads()
+		  .addEventListener("rewardedSlotCanceled", function (e) {
+			var data = {};
+			data.timestamp = new Date().getTime();
+			data.type = 0;
+			data.id = uuid;
+			data.eventType = 3;
+			data.ua = navigator.userAgent;
+			data.userStats = JSON.parse(
+			  localStorage.getItem("aprewarded_key")
+			);
+
+			vastDump(data);
+			$("#modal").hide();
+
+			$("#modal").remove();
+			makeRewardVisible = false;
+
+			var slot = setupRewarded();
+			googletag.display(slot);
+			googletag.pubads().refresh([slot]);
+		  });
+		var slot = setupRewarded();
+		googletag.display(slot);
+		googletag.pubads().refresh([slot]);
+	  });
+	}
+	__TRIGGER_REWARDED_AD__;
+  </script>
+</body>
+</html>
+`;
 
 const TIGGER_AUTOMATICALLY_CODE = `let timer = setInterval(function () {
 	if ($("#modal").length) {
