@@ -1,5 +1,11 @@
 // Site config
-var globalConfig = require("../../../../../../../configs/config");
+//var globalConfig = require('../../../../../../../configs/config');
+
+var globalConfig = {
+	prebidServer: {
+		host: 'https://amp.adpushup.com/'
+	}
+};
 
 var config = {
 	SITE_ID: __SITE_ID__,
