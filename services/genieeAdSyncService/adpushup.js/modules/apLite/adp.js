@@ -194,7 +194,9 @@ var $ = require('../../libs/jquery'),
 											var dfpAdUnit = adUnitArr[adUnitArr.length - 1];
 											return dfpAdUnit === dfpAdUnitName;
 										}),
-										sectionId = apLiteAdUnit && apLiteAdUnit.sectionId;
+										sectionId = apLiteAdUnit && apLiteAdUnit.sectionId,
+										container;
+									
 										try {
 											container = $(`#${cssescape(gptSlotElementId)}`);
 										} catch (error) {
