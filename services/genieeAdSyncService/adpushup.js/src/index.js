@@ -387,9 +387,6 @@ function main() {
 		adp.config.isGeniee = isGenieeSite;
 	}
 
-	// Initialise adp que
-	initAdpQue();
-
 	if (!apLiteActive) {
 		// Hook Pagegroup, find pageGroup and check for blockList
 		hookAndInit(adp, startCreation, browserConfig.platform);
@@ -447,6 +444,10 @@ function main() {
 }
 
 adp.init = main;
+
+// Initialise adp que
+initAdpQue();
+
 if (!adp.config.isSPA && !adp.services.SPA_ACTIVE) {
 	adp.init();
 }
