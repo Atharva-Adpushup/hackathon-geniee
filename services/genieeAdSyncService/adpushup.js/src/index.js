@@ -445,9 +445,9 @@ function main() {
 
 adp.init = main;
 
-// Initialise adp que
-initAdpQue();
-
 if (!adp.config.isSPA && !adp.services.SPA_ACTIVE) {
 	adp.init();
 }
+
+// Initialise adp que
+initAdpQue();
