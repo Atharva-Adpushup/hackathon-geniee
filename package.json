@@ -42,6 +42,7 @@
 		"couchbase": "2.5.1",
 		"country-data": "0.0.31",
 		"crypto-js": "^3.1.6",
+		"css.escape": "^1.5.1",
 		"debug": "^4.1.1",
 		"deepmerge": "^0.2.10",
 		"draggabilly": "^2.1.1",
