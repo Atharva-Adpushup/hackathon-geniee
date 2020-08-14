@@ -10,6 +10,7 @@ var $ = require('../../libs/jquery'),
 	utils = require('../../libs/utils'),
 	refreshAdSlot = require('../../src/refreshAdSlot'),
 	hbRules = require('../adpTags/hbScript/src/hbRules'),
+	cssescape = require("css.escape")
 	apLite = {
 		module: {
 			config: apLiteConfig,
@@ -179,11 +180,11 @@ var $ = require('../../libs/jquery'),
 							gptSlots.forEach(
 								function(gptSlot) {
 									var allSizes = gptSlot.getSizes().map(function(size) {
-											/* layout of size object is { l: 300, j: 100 } */
-											var width = size.l,
-												height = size.j;
-											return [width, height];
-										}),
+										/* layout of size object is { l: 300, j: 100 } */
+										var width = size.l,
+											height = size.j;
+										return [width, height];
+									}),
 										gptSlotElementId = gptSlot.getSlotElementId(),
 										gptAdUnitPath = gptSlot.getAdUnitPath(),
 										gptAdUnitPathArr = gptAdUnitPath.split('/'),
@@ -194,7 +195,14 @@ var $ = require('../../libs/jquery'),
 											return dfpAdUnit === dfpAdUnitName;
 										}),
 										sectionId = apLiteAdUnit && apLiteAdUnit.sectionId,
-										container = $(`#${gptSlotElementId}`);
+										container;
+									
+										try {
+											container = $(`#${cssescape(gptSlotElementId)}`);
+										} catch (error) {
+											container = [];
+											window.adpushup.err.push(error);
+										}
 
 									// Create adp slot only if defined GPT slot has the associated container in the DOM and gpt ad unit has a valid section id
 									if (container.length && dfpAdUnitName) {
