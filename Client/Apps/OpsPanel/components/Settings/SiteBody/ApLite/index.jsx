@@ -37,7 +37,6 @@ class ApLite extends Component {
 		oldAdUnits: [],
 		uploadedAdUnits: [],
 		selectedAdUnitCodeForHB: [],
-		selectedAdUnitCodeForDisplayFormat: [],
 		selectedAdUnitCodeForVideoFormat: [],
 		selectAllFormats: true,
 		...DEFAULT_STATE
@@ -70,7 +69,6 @@ class ApLite extends Component {
 				const originalAdUnits = adUnits;
 				const headerBiddingEnabledAdUnits = [];
 				const adRefreshEnabledUnits = [];
-				const displayFormatEnabledUnits = [];
 				const videoFormatEnabledUnits = [];
 
 				originalAdUnits
@@ -81,9 +79,6 @@ class ApLite extends Component {
 						}
 						if (refreshSlot) {
 							adRefreshEnabledUnits.push(dfpAdunitCode);
-						}
-						if (formats.includes('display')) {
-							displayFormatEnabledUnits.push(dfpAdunitCode);
 						}
 						if (formats.includes('video')) {
 							videoFormatEnabledUnits.push(dfpAdunitCode);
@@ -99,7 +94,6 @@ class ApLite extends Component {
 					selectedAdUnitCodeForHB: headerBiddingEnabledAdUnits,
 					selectedAdUnitCodeForAdRefresh: adRefreshEnabledUnits,
 					selectedAdUnitCodeForVideoFormat: videoFormatEnabledUnits,
-					selectedAdUnitCodeForDisplayFormat: displayFormatEnabledUnits,
 					headerBidding:
 						headerBiddingEnabledAdUnits.length ===
 						adUnits.filter(({ isActive }) => isActive !== false).length,
@@ -108,9 +102,7 @@ class ApLite extends Component {
 						adUnits.filter(({ isActive }) => isActive !== false).length,
 					selectAllFormats:
 						videoFormatEnabledUnits.length ===
-							adUnits.filter(({ isActive }) => isActive !== false).length &&
-						displayFormatEnabledUnits.length ===
-							adUnits.filter(({ isActive }) => isActive !== false).length
+						adUnits.filter(({ isActive }) => isActive !== false).length
 				});
 			})
 			.catch(err => this.setState({ isError: true }));
@@ -162,13 +154,10 @@ class ApLite extends Component {
 				.filter(({ isActive }) => isActive !== false)
 				.map(({ formats, ...rest }) => ({
 					...rest,
-					formats: value ? ['display', 'video'] : []
+					formats: value ? ['display', 'video'] : ['display']
 				}));
 
 			stateToReturn.selectAllFormats = value ? true : false;
-			stateToReturn.selectedAdUnitCodeForDisplayFormat = value
-				? adUnits.map(({ dfpAdunitCode }) => dfpAdunitCode)
-				: [];
 			stateToReturn.selectedAdUnitCodeForVideoFormat = value
 				? adUnits.map(({ dfpAdunitCode }) => dfpAdunitCode)
 				: [];
@@ -234,7 +223,7 @@ class ApLite extends Component {
 
 	handleFileSelect = () => {
 		const { showNotification } = this.props;
-		const { headerBidding, adRefresh, selectAllFormats } = this.state;
+		const { headerBidding, adRefresh } = this.state;
 
 		let adUnitsArr = [];
 		let adUnitMap = {};
@@ -291,9 +280,6 @@ class ApLite extends Component {
 						structuredAdUnits: adUnitsArr,
 						selectedAdUnitCodeForHB: adUnitsArr.map(({ dfpAdunitCode }) => dfpAdunitCode),
 						selectedAdUnitCodeForAdRefresh: adUnitsArr.map(({ dfpAdunitCode }) => dfpAdunitCode),
-						selectedAdUnitCodeForDisplayFormat: adUnitsArr.map(
-							({ dfpAdunitCode }) => dfpAdunitCode
-						),
 						selectedAdUnitCodeForVideoFormat: adUnitsArr.map(({ dfpAdunitCode }) => dfpAdunitCode)
 					});
 			}
@@ -502,57 +488,12 @@ class ApLite extends Component {
 		});
 	};
 
-	handleDisplayChange = (e, adunitCode) => {
-		const {
-			uploadedAdUnits,
-			oldAdUnits,
-			structuredAdUnits,
-			selectedAdUnitCodeForDisplayFormat,
-			selectedAdUnitCodeForVideoFormat
-		} = this.state;
-		let adUnits = structuredAdUnits.length
-			? structuredAdUnits
-			: uploadedAdUnits.length
-			? uploadedAdUnits
-			: oldAdUnits;
-		if (e.target.checked) {
-			selectedAdUnitCodeForDisplayFormat.push(adunitCode);
-			let adunit = adUnits.find(v => v.dfpAdunitCode === adunitCode);
-			if (!adunit.formats.includes('display')) {
-				adunit.formats.push('display');
-			}
-		} else {
-			selectedAdUnitCodeForDisplayFormat.splice(
-				selectedAdUnitCodeForDisplayFormat.indexOf(adunitCode),
-				1
-			);
-
-			let adunit = adUnits.find(v => v.dfpAdunitCode === adunitCode);
-			if (adunit.formats.includes('display')) {
-				adunit.formats.splice(adunit.formats.indexOf('display'), 1);
-			}
-		}
-
-		this.setState({
-			selectedAdUnitCodeForDisplayFormat,
-			oldAdUnits,
-			uploadedAdUnits,
-			structuredAdUnits,
-			selectAllFormats:
-				selectedAdUnitCodeForDisplayFormat.length ===
-					adUnits.filter(({ isActive }) => isActive !== false).length &&
-				selectedAdUnitCodeForVideoFormat.length ===
-					adUnits.filter(({ isActive }) => isActive !== false).length
-		});
-	};
-
 	handleVideoChange = (e, adunitCode) => {
 		const {
 			uploadedAdUnits,
 			oldAdUnits,
 			structuredAdUnits,
-			selectedAdUnitCodeForVideoFormat,
-			selectedAdUnitCodeForDisplayFormat
+			selectedAdUnitCodeForVideoFormat
 		} = this.state;
 		let adUnits = structuredAdUnits.length
 			? structuredAdUnits
@@ -583,9 +524,7 @@ class ApLite extends Component {
 			structuredAdUnits,
 			selectAllFormats:
 				selectedAdUnitCodeForVideoFormat.length ===
-					adUnits.filter(({ isActive }) => isActive !== false).length &&
-				selectedAdUnitCodeForDisplayFormat.length ===
-					adUnits.filter(({ isActive }) => isActive !== false).length
+				adUnits.filter(({ isActive }) => isActive !== false).length
 		});
 	};
 
@@ -598,8 +537,7 @@ class ApLite extends Component {
 			uploadedAdUnits,
 			selectedAdUnitCodeForHB,
 			selectedAdUnitCodeForAdRefresh,
-			selectedAdUnitCodeForVideoFormat,
-			selectedAdUnitCodeForDisplayFormat
+			selectedAdUnitCodeForVideoFormat
 		} = this.state;
 
 		if (structuredAdUnits.length) {
@@ -649,20 +587,12 @@ class ApLite extends Component {
 							{
 								Header: 'Multi-format Options',
 								Cell: ({ original: { dfpAdunitCode } }) => (
-									<React.Fragment>
-										<Checkbox
-											onChange={e => this.handleDisplayChange(e, dfpAdunitCode)}
-											checked={selectedAdUnitCodeForDisplayFormat.includes(dfpAdunitCode)}
-										>
-											display
-										</Checkbox>
-										<Checkbox
-											onChange={e => this.handleVideoChange(e, dfpAdunitCode)}
-											checked={selectedAdUnitCodeForVideoFormat.includes(dfpAdunitCode)}
-										>
-											video
-										</Checkbox>
-									</React.Fragment>
+									<Checkbox
+										onChange={e => this.handleVideoChange(e, dfpAdunitCode)}
+										checked={selectedAdUnitCodeForVideoFormat.includes(dfpAdunitCode)}
+									>
+										video
+									</Checkbox>
 								)
 							}
 						]}
@@ -769,7 +699,7 @@ class ApLite extends Component {
 				{fileName || uploadedAdUnits.length || oldAdUnits.length ? (
 					<React.Fragment>
 						<CustomToggleSwitch
-							labelText="Header Bidding"
+							labelText="Toggle HB"
 							className="u-margin-b4 negative-toggle"
 							checked={headerBidding}
 							onChange={this.handleToggle}
@@ -783,7 +713,7 @@ class ApLite extends Component {
 						/>
 
 						<CustomToggleSwitch
-							labelText="Enable or Disable Video and Display on all units"
+							labelText="Toggle outstream video"
 							className="u-margin-b4 negative-toggle"
 							checked={selectAllFormats}
 							onChange={this.handleToggle}
