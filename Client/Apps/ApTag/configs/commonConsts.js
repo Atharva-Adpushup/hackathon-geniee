@@ -138,8 +138,7 @@ const AMP_MESSAGE =
 	'AMP adcode will be sent to your registered e-mail address by your account manager';
 const ADCODE = `<div id="__AD_ID__" class="_ap_apex_ad"__CUSTOM_ATTRIBS__>
 	<script>
-		var adpushup = adpushup || {};
-		adpushup.que = adpushup.que || [];
+		var adpushup = window.adpushup  = window.adpushup || {que:[]};
 		adpushup.que.push(function() {
 			adpushup.triggerAd("__AD_ID__");
 		});
