@@ -21,7 +21,7 @@ const queueConfig = {
 			header: 'Alert open for Service: TRANSACTION LOG SYNC Consumer',
 			content: '<p>Consumer failed multiple times. Please check on priority.</p>'
 		},
-		emailId: 'yomesh.gupta@adpushup.com, zahin@adpushup.com'
+		emailId: 'anil.panghal@adpushup.com'
 	}
 };
 const QUEUE = CONFIG.RABBITMQ.TRANSACTION_LOG_SYNC.QUEUE.name;
@@ -41,7 +41,11 @@ function validateMessageData(originalMessage) {
 		} catch (err) {
 			return reject(new CustomError(CONSTANTS.ERROR_MESSAGES.MESSAGE.INVALID_DATA));
 		}
-		const isCorrectRootLevelFormat = !!(decodedMessage.siteId && decodedMessage.siteDomain && decodedMessage.ads);
+		const isCorrectRootLevelFormat = !!(
+			decodedMessage.siteId &&
+			decodedMessage.siteDomain &&
+			decodedMessage.ads
+		);
 		const isCorrectMessage = !!(isObject && isCorrectRootLevelFormat);
 		if (isCorrectMessage) {
 			return resolve(decodedMessage);
@@ -53,8 +57,12 @@ function validateMessageData(originalMessage) {
 
 function errorHandler(error, originalMessage) {
 	let customErrorMessage = error.message;
-	const isEmptyConsumerMessage = !!(customErrorMessage === CONSTANTS.ERROR_MESSAGES.RABBITMQ.CONSUMER.EMPTY_MESSAGE);
-	const isInvalidConsumerMessage = !!(customErrorMessage === CONSTANTS.ERROR_MESSAGES.MESSAGE.INVALID_DATA);
+	const isEmptyConsumerMessage = !!(
+		customErrorMessage === CONSTANTS.ERROR_MESSAGES.RABBITMQ.CONSUMER.EMPTY_MESSAGE
+	);
+	const isInvalidConsumerMessage = !!(
+		customErrorMessage === CONSTANTS.ERROR_MESSAGES.MESSAGE.INVALID_DATA
+	);
 
 	if (isEmptyConsumerMessage || isInvalidConsumerMessage) {
 		isInvalidConsumerMessage ? consumer.acknowledge(originalMessage) : null;
