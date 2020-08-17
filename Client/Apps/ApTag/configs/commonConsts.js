@@ -131,6 +131,14 @@ const ADCODE = `<div id="__AD_ID__" class="_ap_apex_ad"__CUSTOM_ATTRIBS__>
 	</script>
 </div>`;
 
+const HEADER_TEXT = '';
+const WATCH_BUTTON_TEXT = '';
+const NO_THANKS_BUTTON = '';
+
+const modalHeaderText = HEADER_TEXT || 'Watch Ad ?';
+const watchButton = WATCH_BUTTON_TEXT || 'Watch';
+const noThanksButton = NO_THANKS_BUTTON || 'Close';
+
 const REWARDED_AD_CODE = `<html>
 <head>
   <style>
@@ -381,12 +389,12 @@ const REWARDED_AD_CODE = `<html>
 		  <div class="modal-content">
 			  <div class="modal-header">
 				  <span class="close">&times;</span>
-				  <h3>Watch Ad ?</h3>
+				  <h3>${modalHeaderText}</h3>
 			  </div>
 			  <div class="modal-body">
 				  <p>__MODAL_TEXT__</p>
-				  <button id ="watchAdBtn" class=" watch primary">Watch</button>
-				  <button  id ="noThanksBtn" class="closeModal secondary"><span class="lg">Close</button>
+				  <button id ="watchAdBtn" class=" watch primary">${watchButton}</button>
+				  <button  id ="noThanksBtn" class="closeModal secondary"><span class="lg">${noThanksButton}</button>
 			  </div>
 		  </div>
 	  </div>"
