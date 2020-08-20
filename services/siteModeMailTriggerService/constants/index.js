@@ -45,7 +45,7 @@ const MESSAGES = {
 					CONTENT: '<h2>The site ___sitename___ has data discrepancy!</h2>\n'
 				}
 			},
-			ID: 'zahin@adpushup.com'
+			ID: 'anil.panghal@adpushup.com'
 		}
 	};
 
