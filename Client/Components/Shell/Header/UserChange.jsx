@@ -48,10 +48,14 @@ class UserChange extends Component {
 		};
 	};
 
-	getFormattedUserDomainsList = (domains = []) =>
+	getFormattedUserDomainsList = (domains = [], siteIds = []) =>
 		domains
 			.slice(0, 5)
-			.map(domain => domanize(domain))
+			.map((domain, i) => {
+				const siteId = siteIds[i];
+				const currentDomain = domanize(domain);
+				return `${currentDomain}(${siteId})`;
+			})
 			.join(' | ');
 
 	onFormSubmit = e => {
@@ -88,7 +92,7 @@ class UserChange extends Component {
 							<option
 								key={user.email}
 								value={user.email}
-								label={this.getFormattedUserDomainsList(user.domains)}
+								label={this.getFormattedUserDomainsList(user.domains, user.siteIds)}
 							/>
 						))}
 					</datalist>
