@@ -129,7 +129,9 @@ var hb = {
 			adpBatch.auctionStatus.prebid = 'done';
 			auction.end(adpBatchId);
 		} else {
-			auction.startPrebidAuction(prebidSlots, adpBatchId);
+			_apPbJs.que.push(function() {
+				auction.startPrebidAuction(prebidSlots, adpBatchId);
+			});
 		}
 	},
 	createUAMslots: function(adpBatch) {
@@ -197,7 +199,7 @@ var hb = {
             HB flag passed as a global constant to the webpack config using DefinePlugin
             (https://webpack.js.org/plugins/define-plugin/#root)
         */
-		if (HB_ACTIVE) {
+		if (!SEPARATE_PREBID && HB_ACTIVE) {
 			(function() {
 				require('../../Prebid.js/build/dist/prebid');
 			})();

@@ -9,6 +9,7 @@ const getReportData = require('../../../reports/universal/index');
 const mkdirpAsync = Promise.promisifyAll(require('mkdirp')).mkdirpAsync;
 const fs = Promise.promisifyAll(require('fs'));
 const CC = require('../../../configs/commonConsts');
+const { writeTempFiles, pushToCdnOriginQueue } = require('./commonFunctions');
 const generatePrebidConfig = require('./generatePrebidConfig');
 const generateApLiteConfig = require('./generateApLiteConfig');
 const generateAdNetworkConfig = require('./generateAdNetworkConfig');
@@ -18,8 +19,6 @@ const generateStatusesAndConfig = require('./generateConfig');
 const bundleGeneration = require('./bundleGeneration');
 const prebidGeneration = require('./prebidGeneration');
 const helperUtils = require('../../../helpers/utils');
-const isNotProduction =
-	config.environment.HOST_ENV === 'development' || config.environment.HOST_ENV === 'staging';
 const request = require('request-promise');
 const disableSiteCdnSyncList = [38333];
 // NOTE: Above 'disableSiteCdnSyncList' array is added to prevent site specific JavaScript CDN sync
@@ -79,6 +78,7 @@ module.exports = function(site, user) {
 				: 0;
 			apConfigs.activeDFPNetwork =
 				(adServerSettings && adServerSettings.dfp && adServerSettings.dfp.activeDFPNetwork) || null;
+			apConfigs.isSeparatePrebidEnabled = config.separatePrebidEnabledSites.indexOf(siteId) !== -1;
 
 			apConfigs.apLiteActive = !!apps.apLite;
 
@@ -216,7 +216,18 @@ module.exports = function(site, user) {
 		},
 		getFinalConfig = () => {
 			return getConfigWrapper(site)
-				.then(generatedConfig => prebidGeneration(generatedConfig))
+				.then(generatedConfig => {
+					const {
+						statusesAndAds: { statuses = {}, config = {} } = {},
+						apConfigs = {}
+					} = generatedConfig;
+
+					if (apConfigs.isSeparatePrebidEnabled || !statuses.HB_ACTIVE) {
+						return generatedConfig;
+					}
+
+					return prebidGeneration(config.prebidAdapters).then(() => generatedConfig);
+				})
 				.then(generatedConfig => bundleGeneration(site, generatedConfig))
 				.spread((generatedConfig, bundle) => {
 					let {
@@ -238,6 +249,7 @@ module.exports = function(site, user) {
 					bundle = _.replace(bundle, '__SIZE_MAPPING__', JSON.stringify(sizeMappingConfig));
 					bundle = _.replace(bundle, '__WEB_S2S_STATUS__', finalConfig.config.isS2SActive);
 					bundle = _.replace(bundle, '__URL_REPORTING_ENABLED__', isUrlReportingEnabled);
+					// bundle = _.replace(bundle, '__SEPARATE_PREBID_ENABLED__', isSeparatePrebidEnabled);
 
 					// Generate final init script based on the services that are enabled
 					var uncompressed = generateFinalInitScript(bundle)
@@ -269,17 +281,6 @@ module.exports = function(site, user) {
 					};
 				});
 		},
-		writeTempFiles = function(fileConfigs) {
-			const fsWriteFilePromises = fileConfigs.map(file => {
-				return mkdirpAsync(tempDestPath).then(function() {
-					return fs.writeFileAsync(path.join(tempDestPath, file.name), file.content);
-				});
-			});
-
-			return Promise.join(fsWriteFilePromises, () => {
-				return fileConfigs;
-			});
-		},
 		startIETesting = uncompressedFile => {
 			const enableIETesting = !!(ieTestingSiteList.indexOf(siteId) > -1);
 
@@ -307,40 +308,32 @@ module.exports = function(site, user) {
 				password: config.cacheFlyFtp.PASSWORD
 			});
 		},
-		pushToCdnOriginQueue = function(fileConfig) {
-			const shouldJSCdnSyncBeDisabled = disableSiteCdnSyncList.indexOf(siteId) > -1;
-
-			if (shouldJSCdnSyncBeDisabled || isNotProduction) {
-				console.log(
-					"Either current site's cdn generation is disabled or environment is development/staging. Skipping CDN syncing."
-				);
-				return Promise.resolve(fileConfig.uncompressed);
-			} else {
-				let content = Buffer.from(fileConfig.default).toString('base64');
-				return helperUtils.publishToRabbitMqQueue(
-					config.RABBITMQ.CDN_ORIGIN.NAME_IN_QUEUE_PUBLISHER_SERVICE,
-					{
-						filePath: `${siteId}/adpushup.js`,
-						content: content
-					}
-				);
-			}
-		},
 		getFinalConfigWrapper = () => getFinalConfig().then(fileConfig => fileConfig);
 
 	return Promise.join(getFinalConfigWrapper(), fileConfig => {
 		return writeTempFiles([
 			{
 				content: fileConfig.uncompressed.replace(/[\"\']__COUNTRY__[\"\']/g, false),
+				path: tempDestPath,
 				name: 'adpushup.js'
 			},
 			{
 				content: fileConfig.default.replace(/[\"\']__COUNTRY__[\"\']/g, false),
+				path: tempDestPath,
 				name: 'adpushup.min.js'
 			}
 		])
 			.then(startIETesting)
-			.then(() => pushToCdnOriginQueue(fileConfig))
+			.then(() => {
+				const shouldJSCdnSyncBeDisabled = disableSiteCdnSyncList.indexOf(siteId) > -1;
+
+				if (shouldJSCdnSyncBeDisabled) {
+					console.log("Current site's cdn generation is disabled. Skipping CDN syncing.");
+					return Promise.resolve(fileConfig);
+				}
+
+				return pushToCdnOriginQueue({ ...fileConfig, name: 'adpushup.js' }, siteId);
+			})
 			.catch(err => {
 				return Promise.reject(err);
 			});

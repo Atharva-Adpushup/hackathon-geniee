@@ -19,22 +19,20 @@ state.cluster = new couchbase.Cluster('couchbase://' + config.couchBase.HOST, {
 state.cluster.authenticate(config.couchBase.DEFAULT_USER_NAME, config.couchBase.DEFAULT_USER_PASSWORD);
 
 function connect(bucket) {
-	return new Promise(function(resolve, reject) {
-		if (state[bucket]) {
-			resolve(state[bucket]);
-			return;
-		}
-
-		state[bucket] = state.cluster.openBucket(bucket, function(err) {
+	if (state[bucket]) {
+		return state[bucket];
+	}
+	state[bucket] = new Promise(function(resolve, reject) {
+		const tempBucket = state.cluster.openBucket(bucket, function(err) {
 			if (err) {
 				reject(err);
 				return;
 			}
-			state[bucket] = Promise.promisifyAll(state[bucket]);
-			resolve(state[bucket]);
+			resolve(Promise.promisifyAll(tempBucket));
 			return;
 		});
 	});
+	return state[bucket];
 }
 
 API = {

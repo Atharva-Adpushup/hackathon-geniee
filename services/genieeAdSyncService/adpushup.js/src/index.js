@@ -14,6 +14,18 @@ var adCodeGenerator = require('./adCodeGenerator');
 var session = require('../libs/session');
 var refreshAdSlot = require('./refreshAdSlot');
 
+if (SEPARATE_PREBID && HB_ACTIVE) {
+	var d = document,
+		pbs = d.createElement('script');
+	pbs.type = 'text/javascript';
+	pbs.src = 'http://localhost:8080/assets/js/builds/geniee/prebid.js';
+	var target = document.getElementsByTagName('head')[0];
+	// added timeout to mimic network delay
+	setTimeout(() => {
+		target.insertBefore(pbs, target.firstChild);
+	}, 3000);
+}
+
 if (LAYOUT_ACTIVE) {
 	var selectVariation = require('./variationSelectionModels/index');
 	var nodewatcher = require('../libs/nodeWatcher');

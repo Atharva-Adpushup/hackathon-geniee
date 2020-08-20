@@ -4,21 +4,17 @@ const path = require('path');
 
 const prebidDir = path.join(__dirname, '../', 'adpushup.js', 'modules', 'adpTags', 'Prebid.js');
 
-function init(generatedConfig) {
+function init(prebidAdapters) {
 	return new Promise((resolve, reject) => {
-		const { statusesAndAds: { statuses = {}, config = {} } = {} } = generatedConfig;
-		if (!statuses.HB_ACTIVE) {
-			return resolve(generatedConfig);
-		}
 		exec(
-			`gulp build --modules=${config.prebidAdapters}`,
+			`gulp build --modules=${prebidAdapters}`,
 			{ cwd: prebidDir },
 			(e, stdout, stderr) => {
 				if (e instanceof Error) {
 					return reject(e);
 				}
 				console.log('Output from child process ', stdout);
-				return resolve(generatedConfig);
+				return resolve(true);
 			}
 		);
 	});

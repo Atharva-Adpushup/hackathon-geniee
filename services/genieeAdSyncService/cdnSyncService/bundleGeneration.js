@@ -8,7 +8,7 @@ const AdPushupError = require('../../../helpers/AdPushupError');
 let buildPath = '../../../public/assets/js/builds/geniee/__SITE_ID__/';
 
 function init(site, config) {
-	const { statusesAndAds: { statuses } = {} } = config;
+	const { statusesAndAds: { statuses } = {}, apConfigs = {} } = config;
 	const siteId = site.get('siteId');
 
 	buildPath = buildPath.replace('__SITE_ID__', siteId);
@@ -52,7 +52,13 @@ function init(site, config) {
 					}
 				]
 			},
-			plugins: [new webpack.DefinePlugin({ ...statuses, SITE_ID: JSON.stringify(siteId) })]
+			plugins: [
+				new webpack.DefinePlugin({
+					...statuses,
+					SITE_ID: JSON.stringify(siteId),
+					SEPARATE_PREBID: apConfigs.isSeparatePrebidEnabled
+				})
+			]
 		});
 		new webpack.ProgressPlugin().apply(compiler);
 		compiler.run((err, stats) =>
