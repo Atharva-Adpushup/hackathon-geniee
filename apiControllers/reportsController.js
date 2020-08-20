@@ -381,7 +381,7 @@ router
 				);
 			});
 	})
-	.get('/getSavedReportConfig', (req, res) => {
+	.get('/savedReports', (req, res) => {
 		const { user } = req;
 		return reportsModel
 			.getSavedReportConfig(user.email)
@@ -424,8 +424,9 @@ router
 			createdAt: Date.now(),
 			id: uuid()
 		};
+		console.log({reportConfig});
 		const { user } = req;
-		return FormValidator.validate(reportConfig, schema.saveReportApi.validations)
+		return FormValidator.validate(reportConfig, schema.saveReportApi.validations) 
 			.then(() => reportsModel.getSavedReportConfig(user.email))
 			.then(reportsConfig => {
 				const updatedReportsConfig = {

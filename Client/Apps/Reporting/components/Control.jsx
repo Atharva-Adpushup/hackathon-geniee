@@ -1,5 +1,12 @@
 import React, { Component, Fragment } from 'react';
-import { Glyphicon, Button } from '@/Client/helpers/react-bootstrap-imports';
+import {
+	Glyphicon,
+	Button,
+	Modal,
+	Form,
+	FormControl,
+	ControlLabel
+} from '@/Client/helpers/react-bootstrap-imports';
 import 'react-dates/lib/css/_datepicker.css';
 import 'react-dates/initialize';
 import { CSVLink } from 'react-csv';
@@ -45,6 +52,7 @@ class Control extends Component {
 
 	componentDidMount() {
 		this.getReportStatus();
+		this.getSavedReports();
 	}
 
 	componentWillReceiveProps(nextProps) {
@@ -63,6 +71,7 @@ class Control extends Component {
 	}
 
 	onReportBySelect = selectedDimension => {
+		console.log({selectedDimension});
 		const { reportType } = this.props;
 		this.setState({ selectedDimension }, this.onControlChange.bind(null, reportType));
 	};
@@ -103,7 +112,6 @@ class Control extends Component {
 	onGenerateButtonClick = () => {
 		const resultObject = this.getStateParams();
 		const { generateButtonHandler } = this.props;
-
 		generateButtonHandler(resultObject);
 	};
 
@@ -193,6 +201,88 @@ class Control extends Component {
 		});
 	};
 
+	getSavedReports = () => {
+		const { showNotification } = this.props;
+		reportService
+			.getSavedReports()
+			.then(res => {
+				const { savedReports, scheduledReports } = res.data.data;
+				this.processAndSaveReports(savedReports, scheduledReports);
+			})
+			.catch(err => {
+				showNotification({
+					mode: 'error',
+					title: 'Operation Failed',
+					message: err.message || 'Something went wrong !',
+					autoDismiss: 5
+				});
+			});
+	};
+
+	// saveReportHandler = () => {
+	// 	const { saveReport } = this.props;
+	// 	if (saveReport) saveReport();
+	// };
+	processAndSaveReports = (savedReports, scheduledReports, callback = () => {}) => {
+		const savedReportsWithValue = savedReports.map(report => ({
+			...report,
+			value: report.name
+		}));
+
+		this.setState(
+			{
+				savedReports: savedReportsWithValue,
+				scheduledReports
+			},
+			callback
+		);
+	};
+
+	saveReportHandler = () => {
+		const {
+			reportName,
+			startDate,
+			endDate,
+			selectedDimension,
+			selectedFilters,
+			selectedInterval
+		} = this.state;
+		const { showNotification } = this.props;
+
+		const reportConfig = {
+			name: reportName,
+			startDate,
+			endDate,
+			selectedDimension,
+			selectedFilters,
+			selectedInterval
+		};
+
+		reportService
+			.saveReportConfig(reportConfig)
+			.then(res => {
+				const response = res.data.data;
+				const { savedReports, scheduledReports } = response;
+				this.processAndSaveReports(savedReports, scheduledReports, () => {
+					showNotification({
+						mode: 'success',
+						title: 'Success',
+						message: 'Report Saved',
+						autoDismiss: 5
+					});
+				});
+			})
+			.catch(err => {
+				showNotification({
+					mode: 'error',
+					title: 'Operation Failed',
+					message: err.message || 'Something went wrong !',
+					autoDismiss: 5
+				});
+			});
+		this.toggleSaveReportModal();
+	};
+
 	removeOpsFilterDimension = (filterList, dimensionList) => {
 		const updatedFilterList = [];
 		const updatedDimensionList = [];
@@ -241,12 +331,44 @@ class Control extends Component {
 		return { updatedFilterList, updatedDimensionList };
 	};
 
+	toggleSaveReportModal = () => {
+		this.setState(oldState => ({
+			...oldState,
+			showSaveReportModal: !oldState.showSaveReportModal
+		}));
+	};
+
+	handleInputChange = e => {
+		this.setState({
+			[e.target.name]: e.target.value
+		});
+	};
+
+	onSavedReportSelect = (report, key) => {
+		console.log({ report, key });
+		// const selectedReport = this.state.savedReports.filter(report => )
+	};
+
 	render() {
 		const { state } = this;
 		const { reportType, showNotification } = this.props;
 
 		return (
 			<Fragment>
+				<div className="aligner aligner--wrap aligner--hSpaceBetween u-margin-t4">
+					<label className="u-text-normal">Saved Reports</label>
+					<SelectBox
+						id="saved-reports"
+						key="saved-reports"
+						isClearable={false}
+						isSearchable={false}
+						wrapperClassName="custom-select-box-wrapper"
+						reset
+						selected={state.selectedReport}
+						options={state.savedReports}
+						onSelect={this.onSavedReportSelect}
+					/>
+				</div>
 				<div className="aligner aligner--wrap aligner--hSpaceBetween u-margin-t4">
 					<div className="aligner-item u-margin-r4">
 						{/* eslint-disable */}
@@ -349,6 +471,37 @@ class Control extends Component {
 						</CSVLink>
 					</div>
 				</div>
+				<div className="aligner aligner--wrap aligner--hSpaceBetween u-margin-t4">
+					<Button bsStyle="primary" onClick={this.toggleSaveReportModal}>
+						Save Report
+					</Button>
+				</div>
+				<Modal
+					show={state.showSaveReportModal}
+					onHide={this.toggleSaveReportModal}
+					className="u-margin-t4"
+				>
+					<Modal.Header closeButton>
+						<Modal.Title>Save Report</Modal.Title>
+					</Modal.Header>
+					<Modal.Body>
+						<Form>
+							<ControlLabel>Name for the saved report</ControlLabel>
+							<FormControl
+								type="text"
+								placeholder="Report Name"
+								onChange={this.handleInputChange}
+								value={state.reportName}
+								name="reportName"
+							/>
+						</Form>
+					</Modal.Body>
+					<Modal.Footer>
+						<Button bsStyle="primary" onClick={this.saveReportHandler}>
+							Save Report
+						</Button>
+					</Modal.Footer>
+				</Modal>
 			</Fragment>
 		);
 	}

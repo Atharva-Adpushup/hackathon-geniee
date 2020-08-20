@@ -3,7 +3,16 @@ import React, { Component } from 'react';
 import mapValues from 'lodash/mapValues';
 import omit from 'lodash/omit';
 import groupBy from 'lodash/groupBy';
-import { Row, Col, Alert } from '@/Client/helpers/react-bootstrap-imports';
+import {
+	Row,
+	Col,
+	Alert,
+	Modal,
+	Form,
+	FormControl,
+	ControlLabel,
+	Button
+} from '@/Client/helpers/react-bootstrap-imports';
 import moment from 'moment';
 import qs from 'querystringify';
 import isEmpty from 'lodash/isEmpty';
@@ -72,7 +81,11 @@ class Report extends Component {
 			isLoading: true,
 			isValidSite: true,
 			isReportingSite: true,
-			show: true
+			show: true,
+			showSaveReportModal: false,
+			reportName: '',
+			savedReports: [],
+			scheduledReports: []
 		};
 	}
 
@@ -158,7 +171,7 @@ class Report extends Component {
 		const { updatedDimensionList, updatedFilterList } = isSuperUser
 			? { updatedDimensionList: dimensionList, updatedFilterList: filterList }
 			: this.removeOpsFilterDimension(filterList, dimensionList);
-
+ 
 		updatedFilterList.forEach(filter => {
 			// eslint-disable-next-line no-param-reassign
 			filter.isDisabled = this.isControlItemDisabled(filter, disabledFilter, reportType);
@@ -308,6 +321,51 @@ class Report extends Component {
 		}
 
 		return params;
+	};
+
+	toggleSaveReportModal = () => {
+		this.setState(oldState => ({
+			...oldState,
+			showSaveReportModal: !oldState.showSaveReportModal
+		}));
+	};
+
+	saveReportHandler = () => {
+		const {
+			reportName,
+			startDate,
+			endDate,
+			selectedDimension,
+			selectedFilters,
+			selectedInterval
+		} = this.state;
+
+		const reportConfig = {
+			name: reportName,
+			startDate,
+			endDate,
+			selectedDimension,
+			selectedFilters,
+			selectedInterval
+		};
+
+		reportService
+			.saveReportConfig(reportConfig)
+			.then(res => {
+				const response = res.data.data;
+				const { savedReports, scheduledReports } = response;
+				this.setState(
+					{
+						savedReports,
+						scheduledReports
+					},
+					() => {}
+				);
+			})
+			.catch(err => {
+				console.log(err);
+			});
+		console.log({ reportName, reportConfig, state: this.state });
 	};
 
 	generateButtonHandler = (inputState = {}) => {
@@ -825,6 +883,12 @@ class Report extends Component {
 		return groupedData;
 	}
 
+	handleInputChange = e => {
+		this.setState({
+			[e.target.name]: e.target.value
+		});
+	};
+
 	renderContent = () => {
 		const {
 			selectedDimension,
@@ -972,7 +1036,7 @@ class Report extends Component {
 	};
 
 	render() {
-		const { isLoading, show } = this.state;
+		const { isLoading, show, showSaveReportModal, reportName } = this.state;
 		const { reportsMeta } = this.props;
 
 		if (!reportsMeta.fetched || isLoading) {
@@ -986,7 +1050,6 @@ class Report extends Component {
 					<Alert bsStyle="info" onDismiss={this.handleDismiss} className="u-margin-t4">
 						For old reporting data <strong>(before 1st August, 2019)</strong> go to old console by{' '}
 						<a
-							target="_blank"
 							onClick={oldConsoleRedirection}
 							className="u-link-reset"
 							style={{ cursor: 'pointer' }}
