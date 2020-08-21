@@ -388,20 +388,20 @@ const REWARDED_AD_CODE = `<html>
 			  JSON.stringify(rewardedData)
 			);
 			$("body").append(
-			  "<div id="modal" class="modal">" +
-		  "<div class="modal-content">" +
-			  "<div class="modal-header">" +
-				  "<span class="close">&times;</span>" +
-				  "<h3>${modalHeaderText}</h3>" +
-			  "</div>" +
-			  "<div class="modal-body">" +
-				  "<p>__MODAL_TEXT__</p>" +
-				  "<button id ="watchAdBtn" class=" watch primary">${watchButton}</button>"+
-				  "<button  id ="noThanksBtn" class="closeModal secondary"><span class="lg">" +
-				  "${noThanksButton}</button>" +
-			  "</div>" +
-		  "</div>" +
-	  "</div>"
+			  '<div id="modal" class="modal">' +
+		  '<div class="modal-content">' +
+			  '<div class="modal-header">' +
+				  '<span class="close">&times;</span>' +
+				  '<h3>${modalHeaderText}</h3>' +
+			  '</div>' +
+			  '<div class="modal-body">' +
+				  '<p>__MODAL_TEXT__</p>' +
+				  '<button id ="watchAdBtn" class=" watch primary">${watchButton}</button>'+
+				  '<button  id ="noThanksBtn" class="closeModal secondary"><span class="lg">' +
+				  '${noThanksButton}</button>' +
+			  '</div>' +
+		  </div>' +
+	  'div>'
 			);
 
 			let timer = setInterval(function () {
