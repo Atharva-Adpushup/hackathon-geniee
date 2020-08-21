@@ -212,7 +212,7 @@ const REWARDED_AD_CODE = `<html>
 	.modal-body {
 	  padding: 10px 20px;
 	  background: #fff;
-	  height: 110px;
+	  height: 150px;
 	}
 
 	.close {
@@ -401,7 +401,7 @@ const REWARDED_AD_CODE = `<html>
 				  "${noThanksButton}</button>" +
 			  "</div>" +
 		  "</div>" +
-	  </div>"
+	  "</div>"
 			);
 
 			let timer = setInterval(function () {
