@@ -7,6 +7,7 @@ const couchbaseModule = require('couchbase');
 const couchbase = require('../../../helpers/couchBaseService');
 const commonConsts = require('../../../configs/commonConsts');
 const config = require('../../../configs/config');
+const helperUtils = require('../../../helpers/utils');
 
 const N1qlQuery = couchbaseModule.N1qlQuery;
 const isNotProduction =
