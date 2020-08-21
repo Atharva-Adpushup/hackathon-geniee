@@ -256,7 +256,7 @@ function apiModule() {
 								variationName: 'N/A'
 							};
 
-							if (ad.network === 'adpTags') {
+							if (ad.network === 'adpTags' && ad.formatData.type !== 'rewardedAds') {
 								const {
 									networkData,
 									width,
