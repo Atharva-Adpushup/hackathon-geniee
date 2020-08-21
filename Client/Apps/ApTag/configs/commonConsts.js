@@ -400,8 +400,8 @@ const REWARDED_AD_CODE = `<html>
 				  '<button  id ="noThanksBtn" class="closeModal secondary"><span class="lg">' +
 				  '${noThanksButton}</button>' +
 			  '</div>' +
-		  </div>' +
-	  'div>'
+		  '</div>' +
+	  '<div>'
 			);
 
 			let timer = setInterval(function () {
