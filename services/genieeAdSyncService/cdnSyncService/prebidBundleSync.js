@@ -55,6 +55,7 @@ module.exports = function() {
 				throw new Error('Active Bidder Adapters List not changed!');
 			}
 
+			console.log('Building separate prebid bundle...');
 			return buildPrebidBundle(data.activeBidderAdapters);
 		})
 		.then(prebidBundle => {
