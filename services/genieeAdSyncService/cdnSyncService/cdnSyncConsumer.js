@@ -6,8 +6,6 @@ const uglifyJS = require('uglify-js');
 const crypto = require('crypto');
 
 const getReportData = require('../../../reports/universal/index');
-const mkdirpAsync = Promise.promisifyAll(require('mkdirp')).mkdirpAsync;
-const fs = Promise.promisifyAll(require('fs'));
 const CC = require('../../../configs/commonConsts');
 const { writeTempFiles, pushToCdnOriginQueue } = require('./commonFunctions');
 const generatePrebidConfig = require('./generatePrebidConfig');
@@ -18,7 +16,6 @@ const config = require('../../../configs/config');
 const generateStatusesAndConfig = require('./generateConfig');
 const bundleGeneration = require('./bundleGeneration');
 const prebidGeneration = require('./prebidGeneration');
-const helperUtils = require('../../../helpers/utils');
 const request = require('request-promise');
 const disableSiteCdnSyncList = [38333];
 // NOTE: Above 'disableSiteCdnSyncList' array is added to prevent site specific JavaScript CDN sync
