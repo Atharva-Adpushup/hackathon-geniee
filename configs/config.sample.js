@@ -271,7 +271,8 @@ module.exports = {
 	// queuePublishingURL: 'http://queuePublisher.adpushup.com', // production URL
 	queuePublishingURL: 'http://localhost:9009',
 	urlReportingEnabledSites: [],
-	separatePrebidEnabledSites: []
+	separatePrebidEnabledSites: [],
+	prebidBundleUrl: 'http://localhost:8080/assets/js/builds/geniee/prebid.js'
 };
 
 /*
