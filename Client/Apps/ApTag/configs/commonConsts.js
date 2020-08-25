@@ -131,13 +131,9 @@ const ADCODE = `<div id="__AD_ID__" class="_ap_apex_ad"__CUSTOM_ATTRIBS__>
 	</script>
 </div>`;
 
-const HEADER_TEXT = '';
-const WATCH_BUTTON_TEXT = '';
-const NO_THANKS_BUTTON = '';
-
-const modalHeaderText = HEADER_TEXT || 'Watch Ad ?';
-const watchButton = WATCH_BUTTON_TEXT || 'Watch';
-const noThanksButton = NO_THANKS_BUTTON || 'Close';
+const modalHeaderText = typeof HEADER_TEXT === 'undefined' ? 'Watch Ad ?' : HEADER_TEXT;
+const watchButton = typeof WATCH_BUTTON_TEXT === 'undefined' ? 'Watch' : WATCH_BUTTON_TEXT;
+const noThanksButton = typeof NO_THANKS_BUTTON === 'undefined' ? 'Close' : NO_THANKS_BUTTON;
 
 const REWARDED_AD_CODE = `<html>
 <head>
