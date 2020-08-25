@@ -15,15 +15,7 @@ var session = require('../libs/session');
 var refreshAdSlot = require('./refreshAdSlot');
 
 if (SEPARATE_PREBID && HB_ACTIVE) {
-	var d = document,
-		pbs = d.createElement('script');
-	pbs.type = 'text/javascript';
-	pbs.src = 'http://localhost:8080/assets/js/builds/geniee/prebid.js';
-	var target = document.getElementsByTagName('head')[0];
-	// added timeout to mimic network delay
-	setTimeout(() => {
-		target.insertBefore(pbs, target.firstChild);
-	}, 3000);
+	utils.injectHeadCodeOnPage(config.prebidBundleUrl);
 }
 
 if (LAYOUT_ACTIVE) {
