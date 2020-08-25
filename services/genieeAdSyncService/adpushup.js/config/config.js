@@ -22,5 +22,5 @@ module.exports = {
 		'//e3.adpushup.com/AdPushupUrlMappingWebService/urlMapping?url=__PAGE_URL__',
 	pageUrlKeyValue: { urlTargetingKey: '', urlTargetingValue: '' },
 	urlReportingEnabled: __URL_REPORTING_ENABLED__,
-	prebidBundleUrl: 'http://localhost:8080/assets/js/builds/geniee/prebid.js'
+	prebidBundleUrl: '__PREBID_BUNDLE_URL__'
 };
