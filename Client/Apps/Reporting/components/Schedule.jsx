@@ -18,7 +18,8 @@ const Schedule = ({
 	reportInterval,
 	isUpdating,
 	onReportSave,
-	onReportUpdate,
+    onReportUpdate,
+    onReportDelete,
 	showNotification
 }) => {
 	const [reportName, setReportName] = useState(name || '');
@@ -57,8 +58,6 @@ const Schedule = ({
 		if (isUpdating) onReportUpdate(scheduleOptions, reportName);
 		else onReportSave(scheduleOptions, reportName);
 	};
-
-	const deleteReportHandler = () => {};
 
 	return (
 		<Panel defaultExpanded className="reports-schedule u-margin-t4">
@@ -107,7 +106,7 @@ const Schedule = ({
 							</div>
 							<div className="u-margin-t4">
                                 <Button onClick={saveReportHandler} bsStyle="primary" className="u-margin-l4">{isUpdating ? "Update Report" : "Save Report"}</Button>
-                                {isUpdating && 	<Button onClick={deleteReportHandler} className="u-margin-l4">Delete Report</Button>}
+                                {isUpdating && 	<Button onClick={onReportDelete} className="u-margin-l4">Delete Report</Button>}
 							</div>
 						</Panel.Body>
 					</Panel.Collapse>

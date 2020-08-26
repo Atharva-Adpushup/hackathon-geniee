@@ -275,7 +275,8 @@ class Control extends Component {
 			selectedReport,
 			savedReports,
 			onReportSave,
-			onReportUpdate
+			onReportUpdate,
+			onReportDelete
 		} = this.props;
 
 		const selectedReportName = selectedReport ? selectedReport.name : '';
@@ -413,6 +414,7 @@ class Control extends Component {
 					onReportSave={onReportSave}
 					onReportUpdate={onReportUpdate}
 					showNotification={showNotification}
+					onReportDelete={onReportDelete}
 				/>
 			</Fragment>
 		);

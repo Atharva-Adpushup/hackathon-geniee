@@ -17,5 +17,6 @@ export default {
 	},
 	getMetaData: params => axiosInstance.get('/reports/getMetaData', { params }),
 	getSavedReports: () => axiosInstance.get('/reports/savedReports'),
-	saveReportConfig: reportConfig => axiosInstance.post('/reports/saveReport', reportConfig)
+	saveReportConfig: reportConfig => axiosInstance.post('/reports/saveReport', reportConfig),
+	deleteSavedReport: reportId => axiosInstance.delete(`reports/deleteSavedReport/${reportId}`)
 };

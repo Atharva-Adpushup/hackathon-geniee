@@ -334,6 +334,12 @@ const checkDefaultReportTypeGlobal = props => {
 	return isValid;
 };
 
+// any of these properties have to be changed to reschedule a new job
+const isSameScheduleOptions = (existingOptions, newOptions) =>
+	existingOptions.interval === newOptions.interval &&
+	existingOptions.startDate === newOptions.startDate &&
+	existingOptions.endDate === newOptions.endDate;
+
 export {
 	errorHandler,
 	getDuplicatesInArray,
@@ -356,5 +362,6 @@ export {
 	getReportingControlDemoUserSites,
 	getAppBaseUrls,
 	getOnboardingTemplateData,
-	reactTableSortMethod
+	reactTableSortMethod,
+	isSameScheduleOptions
 };

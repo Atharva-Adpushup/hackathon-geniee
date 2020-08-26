@@ -31,7 +31,8 @@ import { convertObjToArr, roundOffTwoDecimal } from '../helpers/utils';
 import {
 	getReportingDemoUserValidation,
 	getReportingDemoUserSiteIds,
-	getDemoUserSites
+	getDemoUserSites,
+	isSameScheduleOptions
 } from '../../../helpers/commonFunctions';
 import {
 	displayMetrics,
@@ -929,11 +930,65 @@ class Report extends Component {
 
 	onReportUpdate = (scheduleOptions, reportName) => {
 		const { selectedReport } = this.state;
+		const { showNotification } = this.props;
 		const updateReportConfig = {
-			scheduleOptions,
 			name: reportName,
 			id: selectedReport.id
 		};
+
+		// only send schedule options if it differs
+		if (!isSameScheduleOptions(selectedReport.scheduleOptions, scheduleOptions)) {
+			updateReportConfig.scheduleOptions = scheduleOptions;
+		}
+		return reportService
+			.updateSavedReport(updateReportConfig)
+			.then(res => {
+				const response = res.data.data;
+				const { savedReports } = response;
+				this.processAndSaveReports(savedReports, () => {
+					showNotification({
+						mode: 'success',
+						title: 'Success',
+						message: 'Report Updated',
+						autoDismiss: 5
+					});
+				});
+			})
+			.catch(err =>
+				showNotification({
+					mode: 'error',
+					title: 'Operation Failed',
+					message: err.message || 'Something went wrong !',
+					autoDismiss: 5
+				})
+			);
+	};
+
+	onReportDelete = () => {
+		const { selectedReport } = this.state;
+		const { showNotification } = this.props;
+		reportService
+			.deleteSavedReport(selectedReport.id)
+			.then(res => {
+				const response = res.data.data;
+				const { savedReports } = response;
+				this.processAndSaveReports(savedReports, () => {
+					showNotification({
+						mode: 'success',
+						title: 'Success',
+						message: 'Report Deleted',
+						autoDismiss: 5
+					});
+				});
+			})
+			.catch(err =>
+				showNotification({
+					mode: 'error',
+					title: 'Operation Failed',
+					message: err.message || 'Something went wrong !',
+					autoDismiss: 5
+				})
+			);
 	};
 
 	renderContent = () => {
@@ -1050,6 +1105,7 @@ class Report extends Component {
 						setSelectedReport={this.setSelectedReport}
 						onReportSave={this.onReportSave}
 						onReportUpdate={this.onReportUpdate}
+						onReportDelete={this.onReportDelete}
 					/>
 				</Col>
 				<Col sm={12}>
