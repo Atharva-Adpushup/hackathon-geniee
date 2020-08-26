@@ -78,7 +78,7 @@ function pushToCdnOriginQueue(fileConfig, siteId) {
 				job.filePath = `${siteId}/${fileConfig.name}`;
 				break;
 			case 'prebid.js':
-				job.filePath = fileConfig.name;
+				job.filePath = `prebid/${fileConfig.name}`;
 		}
 
 		console.log(job);
