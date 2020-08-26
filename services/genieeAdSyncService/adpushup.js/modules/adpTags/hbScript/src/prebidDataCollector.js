@@ -82,6 +82,7 @@ var helpers = {
 					bidder: bid['bidder'],
 					revenue: cpm / 1000,
 					formatType: mediaType,
+					responseTime: bid['timeToRespond'],
 					timeOfBidReceived: bid['responseTimestamp']
 				};
 
