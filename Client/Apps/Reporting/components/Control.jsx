@@ -1,12 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import {
-	Glyphicon,
-	Button,
-	Modal,
-	Form,
-	FormControl,
-	ControlLabel
-} from '@/Client/helpers/react-bootstrap-imports';
+import { Glyphicon, Button, Modal } from '@/Client/helpers/react-bootstrap-imports';
 import 'react-dates/lib/css/_datepicker.css';
 import 'react-dates/initialize';
 import { CSVLink } from 'react-csv';
@@ -15,6 +8,7 @@ import moment from 'moment';
 import AsyncGroupSelect from '../../../Components/AsyncGroupSelect/index';
 import PresetDateRangePicker from '../../../Components/PresetDateRangePicker/index';
 import SelectBox from '../../../Components/SelectBox/index';
+import Schedule from './Schedule';
 import { getPresets } from '../helpers/utils';
 import reportService from '../../../services/reportService';
 import { accountFilter, accountDimension, opsDimension, opsFilter } from '../configs/commonConsts';
@@ -52,7 +46,6 @@ class Control extends Component {
 
 	componentDidMount() {
 		this.getReportStatus();
-		this.getSavedReports();
 	}
 
 	componentWillReceiveProps(nextProps) {
@@ -71,7 +64,6 @@ class Control extends Component {
 	}
 
 	onReportBySelect = selectedDimension => {
-		console.log({selectedDimension});
 		const { reportType } = this.props;
 		this.setState({ selectedDimension }, this.onControlChange.bind(null, reportType));
 	};
@@ -102,11 +94,11 @@ class Control extends Component {
 		);
 	};
 
-	onControlChange = reportType => {
+	onControlChange = (reportType, resetSelectedReport = true) => {
 		const resultObject = this.getStateParams();
 		const { onControlChange } = this.props;
 
-		onControlChange(resultObject, reportType);
+		onControlChange(resultObject, reportType, resetSelectedReport);
 	};
 
 	onGenerateButtonClick = () => {
@@ -201,88 +193,6 @@ class Control extends Component {
 		});
 	};
 
-	getSavedReports = () => {
-		const { showNotification } = this.props;
-		reportService
-			.getSavedReports()
-			.then(res => {
-				const { savedReports, scheduledReports } = res.data.data;
-				this.processAndSaveReports(savedReports, scheduledReports);
-			})
-			.catch(err => {
-				showNotification({
-					mode: 'error',
-					title: 'Operation Failed',
-					message: err.message || 'Something went wrong !',
-					autoDismiss: 5
-				});
-			});
-	};
-
-	// saveReportHandler = () => {
-	// 	const { saveReport } = this.props;
-	// 	if (saveReport) saveReport();
-	// };
-	processAndSaveReports = (savedReports, scheduledReports, callback = () => {}) => {
-		const savedReportsWithValue = savedReports.map(report => ({
-			...report,
-			value: report.name
-		}));
-
-		this.setState(
-			{
-				savedReports: savedReportsWithValue,
-				scheduledReports
-			},
-			callback
-		);
-	};
-
-	saveReportHandler = () => {
-		const {
-			reportName,
-			startDate,
-			endDate,
-			selectedDimension,
-			selectedFilters,
-			selectedInterval
-		} = this.state;
-		const { showNotification } = this.props;
-
-		const reportConfig = {
-			name: reportName,
-			startDate,
-			endDate,
-			selectedDimension,
-			selectedFilters,
-			selectedInterval
-		};
-
-		reportService
-			.saveReportConfig(reportConfig)
-			.then(res => {
-				const response = res.data.data;
-				const { savedReports, scheduledReports } = response;
-				this.processAndSaveReports(savedReports, scheduledReports, () => {
-					showNotification({
-						mode: 'success',
-						title: 'Success',
-						message: 'Report Saved',
-						autoDismiss: 5
-					});
-				});
-			})
-			.catch(err => {
-				showNotification({
-					mode: 'error',
-					title: 'Operation Failed',
-					message: err.message || 'Something went wrong !',
-					autoDismiss: 5
-				});
-			});
-		this.toggleSaveReportModal();
-	};
-
 	removeOpsFilterDimension = (filterList, dimensionList) => {
 		const updatedFilterList = [];
 		const updatedDimensionList = [];
@@ -331,41 +241,64 @@ class Control extends Component {
 		return { updatedFilterList, updatedDimensionList };
 	};
 
-	toggleSaveReportModal = () => {
-		this.setState(oldState => ({
-			...oldState,
-			showSaveReportModal: !oldState.showSaveReportModal
-		}));
-	};
-
 	handleInputChange = e => {
 		this.setState({
 			[e.target.name]: e.target.value
 		});
 	};
 
-	onSavedReportSelect = (report, key) => {
-		console.log({ report, key });
-		// const selectedReport = this.state.savedReports.filter(report => )
+	onSavedReportSelect = reportId => {
+		const { reportType, setSelectedReport, savedReports } = this.props;
+		const selectedReport = savedReports.filter(report => report.id === reportId)[0];
+		if (selectedReport) {
+			this.setState(
+				{
+					startDate: selectedReport.startDate,
+					endDate: selectedReport.endDate,
+					selectedInterval: selectedReport.selectedInterval,
+					selectedDimension: selectedReport.selectedDimension,
+					selectedFilters: selectedReport.selectedFilters
+				},
+				() => {
+					setSelectedReport(selectedReport);
+					this.onControlChange(reportType, false);
+				}
+			);
+		}
 	};
 
 	render() {
 		const { state } = this;
-		const { reportType, showNotification } = this.props;
+		const {
+			reportType,
+			showNotification,
+			selectedReport,
+			savedReports,
+			onReportSave,
+			onReportUpdate
+		} = this.props;
 
+		const selectedReportName = selectedReport ? selectedReport.name : '';
+		const { scheduleOptions: { startDate, endDate, interval } = {} } = selectedReport || {};
+		const selectedReportStartDate = startDate || moment();
+		const selectedReportEndDate = endDate || moment();
+		const isUpdating = selectedReport !== null;
+		// const { selectedReport } = state;
 		return (
 			<Fragment>
 				<div className="aligner aligner--wrap aligner--hSpaceBetween u-margin-t4">
+					{/* eslint-disable */}
 					<label className="u-text-normal">Saved Reports</label>
+					{/* eslint-disable */}
 					<SelectBox
 						id="saved-reports"
 						key="saved-reports"
 						isClearable={false}
 						isSearchable={false}
 						wrapperClassName="custom-select-box-wrapper"
-						reset
-						selected={state.selectedReport}
-						options={state.savedReports}
+						reset={false}
+						selected={selectedReport ? selectedReport.value : null}
+						options={savedReports}
 						onSelect={this.onSavedReportSelect}
 					/>
 				</div>
@@ -471,37 +404,16 @@ class Control extends Component {
 						</CSVLink>
 					</div>
 				</div>
-				<div className="aligner aligner--wrap aligner--hSpaceBetween u-margin-t4">
-					<Button bsStyle="primary" onClick={this.toggleSaveReportModal}>
-						Save Report
-					</Button>
-				</div>
-				<Modal
-					show={state.showSaveReportModal}
-					onHide={this.toggleSaveReportModal}
-					className="u-margin-t4"
-				>
-					<Modal.Header closeButton>
-						<Modal.Title>Save Report</Modal.Title>
-					</Modal.Header>
-					<Modal.Body>
-						<Form>
-							<ControlLabel>Name for the saved report</ControlLabel>
-							<FormControl
-								type="text"
-								placeholder="Report Name"
-								onChange={this.handleInputChange}
-								value={state.reportName}
-								name="reportName"
-							/>
-						</Form>
-					</Modal.Body>
-					<Modal.Footer>
-						<Button bsStyle="primary" onClick={this.saveReportHandler}>
-							Save Report
-						</Button>
-					</Modal.Footer>
-				</Modal>
+				<Schedule
+					name={selectedReportName}
+					startDate={selectedReportStartDate}
+					endDate={selectedReportEndDate}
+					reportInterval={interval}
+					isUpdating={isUpdating}
+					onReportSave={onReportSave}
+					onReportUpdate={onReportUpdate}
+					showNotification={showNotification}
+				/>
 			</Fragment>
 		);
 	}

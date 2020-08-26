@@ -712,7 +712,19 @@ module.exports = {
 	getSavedReportConfig: function(email) {
 		return couchbaseService.connectToAppBucket()
 			.then(bucket => bucket.getAsync(`rprt::${email}`))
-			.then(result => result.value);
+			.catch(err => {
+				if (err && err.code && err.code === 13) {
+					// doc not found. Create a new doc.
+					const reportConfig = {
+						savedReports: []
+					};
+					return this.updateSavedReportConfig(reportConfig, email);
+				}
+				throw err;
+			})
+			.then(result => {
+				return result.value;
+			})
 	},
 	updateSavedReportConfig: function(reportConfig, email) {
 		const dataToUpdate = {...reportConfig, email};

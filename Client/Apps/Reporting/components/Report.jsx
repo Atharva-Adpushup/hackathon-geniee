@@ -82,10 +82,8 @@ class Report extends Component {
 			isValidSite: true,
 			isReportingSite: true,
 			show: true,
-			showSaveReportModal: false,
-			reportName: '',
 			savedReports: [],
-			scheduledReports: []
+			selectedReport: null
 		};
 	}
 
@@ -119,8 +117,8 @@ class Report extends Component {
 				return this.getContentInfo(computedData);
 			});
 		}
-
-		return this.getContentInfo(reportsMeta.data);
+		return this.getSavedReports().then(() => this.getContentInfo(reportsMeta.data));
+		// return this.getContentInfo(reportsMeta.data);
 	}
 
 	removeOpsFilterDimension = (filterList, dimensionList) => {
@@ -171,7 +169,7 @@ class Report extends Component {
 		const { updatedDimensionList, updatedFilterList } = isSuperUser
 			? { updatedDimensionList: dimensionList, updatedFilterList: filterList }
 			: this.removeOpsFilterDimension(filterList, dimensionList);
- 
+
 		updatedFilterList.forEach(filter => {
 			// eslint-disable-next-line no-param-reassign
 			filter.isDisabled = this.isControlItemDisabled(filter, disabledFilter, reportType);
@@ -194,7 +192,7 @@ class Report extends Component {
 		};
 	};
 
-	onControlChange = (data, reportType) => {
+	onControlChange = (data, reportType, resetSavedReport = true) => {
 		const params = this.getControlChangedParams({ ...data, reportType });
 		const { selectedFilterValues } = this.state;
 		const newStateData = { ...data };
@@ -209,8 +207,9 @@ class Report extends Component {
 		this.setState({
 			...newStateData,
 			...params,
-			reportType
-		});
+			reportType,
+			selectedReport: resetSavedReport ? null : oldState.selectedReport
+		}));
 	};
 
 	getDemoUserParams = () => {
@@ -328,44 +327,6 @@ class Report extends Component {
 			...oldState,
 			showSaveReportModal: !oldState.showSaveReportModal
 		}));
-	};
-
-	saveReportHandler = () => {
-		const {
-			reportName,
-			startDate,
-			endDate,
-			selectedDimension,
-			selectedFilters,
-			selectedInterval
-		} = this.state;
-
-		const reportConfig = {
-			name: reportName,
-			startDate,
-			endDate,
-			selectedDimension,
-			selectedFilters,
-			selectedInterval
-		};
-
-		reportService
-			.saveReportConfig(reportConfig)
-			.then(res => {
-				const response = res.data.data;
-				const { savedReports, scheduledReports } = response;
-				this.setState(
-					{
-						savedReports,
-						scheduledReports
-					},
-					() => {}
-				);
-			})
-			.catch(err => {
-				console.log(err);
-			});
-		console.log({ reportName, reportConfig, state: this.state });
 	};
 
 	generateButtonHandler = (inputState = {}) => {
@@ -889,6 +850,92 @@ class Report extends Component {
 		});
 	};
 
+	getSavedReports = () => {
+		const { showNotification } = this.props;
+		return reportService
+			.getSavedReports()
+			.then(res => {
+				const { savedReports } = res.data.data;
+				this.processAndSaveReports(savedReports);
+			})
+			.catch(err => {
+				showNotification({
+					mode: 'error',
+					title: 'Operation Failed',
+					message: err.message || 'Something went wrong !',
+					autoDismiss: 5
+				});
+			});
+	};
+
+	processAndSaveReports = (savedReports, callback = () => {}) => {
+		const savedReportsWithValue = savedReports.map(report => ({
+			...report,
+			name: report.name,
+			value: report.id
+		}));
+
+		this.setState(
+			{
+				savedReports: savedReportsWithValue
+			},
+			callback
+		);
+	};
+
+	setSelectedReport = selectedReport => {
+		this.setState({
+			selectedReport
+		});
+	};
+
+	onReportSave = (scheduleOptions, reportName) => {
+		const { startDate, endDate, selectedDimension, selectedFilters, selectedInterval } = this.state;
+		const { showNotification } = this.props;
+
+		const reportConfig = {
+			name: reportName,
+			startDate,
+			endDate,
+			selectedDimension,
+			selectedFilters,
+			selectedInterval,
+			scheduleOptions
+		};
+
+		reportService
+			.saveReportConfig(reportConfig)
+			.then(res => {
+				const response = res.data.data;
+				const { savedReports } = response;
+				this.processAndSaveReports(savedReports, () => {
+					showNotification({
+						mode: 'success',
+						title: 'Success',
+						message: 'Report Saved',
+						autoDismiss: 5
+					});
+				});
+			})
+			.catch(err => {
+				showNotification({
+					mode: 'error',
+					title: 'Operation Failed',
+					message: err.message || 'Something went wrong !',
+					autoDismiss: 5
+				});
+			});
+	};
+
+	onReportUpdate = (scheduleOptions, reportName) => {
+		const { selectedReport } = this.state;
+		const updateReportConfig = {
+			scheduleOptions,
+			name: reportName,
+			id: selectedReport.id
+		};
+	};
+
 	renderContent = () => {
 		const {
 			selectedDimension,
@@ -907,7 +954,9 @@ class Report extends Component {
 			intervalList,
 			metricsList,
 			filterList,
-			tableData
+			tableData,
+			savedReports,
+			selectedReport
 		} = this.state;
 		const {
 			reportsMeta,
@@ -996,6 +1045,11 @@ class Report extends Component {
 						userSites={userSites}
 						user={user}
 						showNotification={showNotification}
+						savedReports={savedReports}
+						selectedReport={selectedReport}
+						setSelectedReport={this.setSelectedReport}
+						onReportSave={this.onReportSave}
+						onReportUpdate={this.onReportUpdate}
 					/>
 				</Col>
 				<Col sm={12}>

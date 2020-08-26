@@ -39,7 +39,6 @@ class SelectBox extends Component {
 
 	selectWrapper = (key, e) => {
 		const { onSelect, options, title, dataKey: dataKeyFromProps } = this.props;
-		console.log({options, title, dataKeyFromProps});
 		const optionValueType = typeof options[0].value;
 		const dataKey = e && e.target ? e.target.getAttribute('data-key') : dataKeyFromProps || '';
 
