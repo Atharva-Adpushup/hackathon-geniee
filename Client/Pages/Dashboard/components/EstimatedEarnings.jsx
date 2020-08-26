@@ -24,15 +24,15 @@ function EstimatedEarnings(props) {
 
 	const dayProgress =
 		yesterday > 0 && sameDayLastWeek > 0
-			? roundOffTwoDecimal(((yesterday - sameDayLastWeek) / yesterday) * 100)
+			? roundOffTwoDecimal(((yesterday - sameDayLastWeek) / sameDayLastWeek) * 100)
 			: 'N/A';
 	const weekProgress =
 		lastSevenDays > 0 && previousSevenDays > 0
-			? roundOffTwoDecimal(((lastSevenDays - previousSevenDays) / lastSevenDays) * 100)
+			? roundOffTwoDecimal(((lastSevenDays - previousSevenDays) / previousSevenDays) * 100)
 			: 'N/A';
 	const monthProgress =
 		lastThirtyDays > 0 && previousThirtyDays > 0
-			? roundOffTwoDecimal(((lastThirtyDays - previousThirtyDays) / lastThirtyDays) * 100)
+			? roundOffTwoDecimal(((lastThirtyDays - previousThirtyDays) / previousThirtyDays) * 100)
 			: 'N/A';
 	const displayYesterday = numberWithCommas(roundOffTwoDecimal(yesterday));
 	const displaySameDayLastWeek = numberWithCommas(roundOffTwoDecimal(sameDayLastWeek));
