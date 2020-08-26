@@ -19,8 +19,9 @@ module.exports = {
 	pageUrl: window.location.href,
 	referrer: document.referrer,
 	pageUrlMappingServiceEndpoint:
-		'//e3.adpushup.com/AdPushupUrlMappingWebService/urlMapping?url=__PAGE_URL__',
+		'//e3.adpushup.com/AdPushupUrlMappingWebService/urlMapping?url=__PAGE_URL__&siteid=__SITE_ID__',
 	pageUrlKeyValue: { urlTargetingKey: '', urlTargetingValue: '' },
 	urlReportingEnabled: __URL_REPORTING_ENABLED__,
-	prebidBundleUrl: '__PREBID_BUNDLE_URL__'
+	prebidBundleUrl: '__PREBID_BUNDLE_URL__',
+	isPerformanceLoggingEnabled: __PERFORMANCE_LOGGING_ENABLED__
 };

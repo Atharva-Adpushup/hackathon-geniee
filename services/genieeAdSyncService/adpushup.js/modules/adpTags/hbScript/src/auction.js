@@ -7,6 +7,7 @@ var adpConfig = window.adpushup.config;
 var constants = require('./constants');
 var render = require('./render');
 var s2sConfigGen = require('./s2sConfigGen');
+const commonConsts = require('../../../../config/commonConsts');
 var auction = {
 	end: function(adpBatchId) {
 		var adpBatches = adpConfig.apLiteActive
@@ -37,7 +38,14 @@ var auction = {
 		var adpBatch = utils.getCurrentAdpSlotBatch(adpBatches, adpBatchId);
 
 		adpBatch.auctionStatus.prebid = 'done';
-		return this.end(adpBatchId);
+		const returnVal = this.end(adpBatchId);
+
+		window.adpushup.utils.logPerformanceEvent(
+			commonConsts.EVENT_LOGGER.EVENTS.AUCTION_END_DELAY
+		);
+		
+		window.adpushup.utils.sendPerformanceEventLogs();
+		return returnVal;
 	},
 	requestBids: function(pbjs, adpBatchId, slotCodes, timeOut) {
 		var that = this;
@@ -47,6 +55,10 @@ var auction = {
 			adUnitCodes: slotCodes,
 			bidsBackHandler: that.getAuctionResponse.bind(that, adpBatchId)
 		});
+
+		window.adpushup.utils.logPerformanceEvent(
+			commonConsts.EVENT_LOGGER.EVENTS.AUCTION_START_DELAY
+		);
 	},
 	getSizeConfig: function() {
 		var sizeConfigFromDB = config.PREBID_CONFIG.deviceConfig.sizeConfig;

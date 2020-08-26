@@ -243,6 +243,9 @@ module.exports = function(site, user, prebidBundleName) {
 						'__FILE_NAME__',
 						prebidBundleName || config.prebidBundleDefaultName
 					);
+					const isPerformanceLoggingEnabled =
+						Array.isArray(config.performanceLoggingEnabledSites) &&
+						config.performanceLoggingEnabledSites.indexOf(parseInt(siteId, 10)) !== -1;
 
 					bundle = _.replace(bundle, '__AP_CONFIG__', JSON.stringify(apConfigs));
 					bundle = _.replace(bundle, /__SITE_ID__/g, siteId);
@@ -251,6 +254,7 @@ module.exports = function(site, user, prebidBundleName) {
 					bundle = _.replace(bundle, '__WEB_S2S_STATUS__', finalConfig.config.isS2SActive);
 					bundle = _.replace(bundle, '__URL_REPORTING_ENABLED__', isUrlReportingEnabled);
 					bundle = _.replace(bundle, '__PREBID_BUNDLE_URL__', prebidBundleUrl);
+					bundle = _.replace(bundle, '__PERFORMANCE_LOGGING_ENABLED__', isPerformanceLoggingEnabled);
 
 					// Generate final init script based on the services that are enabled
 					var uncompressed = generateFinalInitScript(bundle)

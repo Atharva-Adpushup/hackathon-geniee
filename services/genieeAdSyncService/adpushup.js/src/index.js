@@ -3,6 +3,7 @@ var pageGroupTimer;
 var adp = (w.adpushup = w.adpushup || {});
 var $ = (adp.$ = require('../libs/jquery'));
 var utils = require('../libs/utils');
+var EventLogger = require('../libs/eventLogger');
 var defaultConfig = $.extend({}, require('../config/config.js'));
 var config = (adp.config = require('../config/config.js'));
 var commonConsts = require('../config/commonConsts');
@@ -51,6 +52,7 @@ $.extend(adp, {
 	utils: utils,
 	control: control,
 	// tracker: new Tracker(),
+	eventLogger: new EventLogger(),
 	nodewatcher: nodewatcher,
 	geniee: genieeObject,
 	triggerAd: triggerAd,
@@ -344,6 +346,8 @@ function initAdpQue() {
 }
 
 function main() {
+	utils.logPerformanceEvent(commonConsts.EVENT_LOGGER.EVENTS.MAIN_FN_CALL_DELAY);
+
 	// Set user syncing cookies
 	syncUser();
 
@@ -378,7 +382,6 @@ function main() {
 	session.init();
 
 	if (adp.config.urlReportingEnabled) {
-		adp.performance = utils.performance();
 		utils.fetchAndSetKeyValueForUrlReporting(adp);
 	}
 
