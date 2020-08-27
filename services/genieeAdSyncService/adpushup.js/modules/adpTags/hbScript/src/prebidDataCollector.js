@@ -82,6 +82,7 @@ var helpers = {
 					bidder: bid['bidder'],
 					revenue: cpm / 1000,
 					formatType: mediaType,
+					responseTime: bid['timeToRespond'],
 					timeOfBidReceived: bid['responseTimestamp']
 				};
 
@@ -108,7 +109,7 @@ var helpers = {
 				}
 
 				var commonAdUnitData = {
-					sectionId: adUnitCode,
+					sectionId: (slot.optionalParam && slot.optionalParam.originalId) || slot.sectionId,
 					sectionName: slot.sectionName,
 					placement: slot.isATF,
 					refreshCount: slot.refreshCount,
@@ -240,7 +241,7 @@ var feedback = {
 
 		return adp.$.get(
 			constants.FEEDBACK.AUCTION_FEEDBACK_URL +
-				adp.utils.base64Encode(JSON.stringify(feedbackData))
+			adp.utils.base64Encode(JSON.stringify(feedbackData))
 		);
 	}
 };
