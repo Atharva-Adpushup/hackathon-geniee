@@ -18,7 +18,7 @@ function getAdsAndGlobal(state, props) {
 	} = state;
 
 	const {
-		data: { adServerSettings = {} }
+		data: { adServerSettings = {}, sites = {} }
 	} = user;
 	const { dfp = {} } = adServerSettings;
 
@@ -30,9 +30,11 @@ function getAdsAndGlobal(state, props) {
 	const ads = apTag.ads[siteId] || DEFAULT_ADS_RESPONSE;
 	const global = apTag.global[siteId] || DEFAULT_GLOBAL_RESPONSE;
 	const networkCode = dfp.activeDFPNetwork;
+	const siteDomain = sites[siteId].domain;
 
 	return {
 		siteId,
+		siteDomain,
 		ads,
 		global,
 		networkCode

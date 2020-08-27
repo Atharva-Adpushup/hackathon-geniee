@@ -33,6 +33,7 @@ class AdList extends Component {
 			user,
 			networkConfig,
 			siteId,
+			siteDomain,
 			networkCode
 		} = this.props;
 		const { dfpMessage } = this.state;
@@ -91,6 +92,7 @@ class AdList extends Component {
 										modifyAdOnServer={modifyAdOnServer}
 										networkConfig={networkConfig}
 										siteId={siteId}
+										siteDomain={siteDomain}
 										dfpMessage={dfpMessage}
 										networkCode={networkCode}
 									/>

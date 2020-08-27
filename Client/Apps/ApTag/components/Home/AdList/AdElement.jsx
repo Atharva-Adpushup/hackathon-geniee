@@ -65,8 +65,34 @@ class AdElement extends Component {
 		</p>
 	);
 
+	generatePacketId = appendNum => {
+		var d = +new Date(),
+			r,
+			appendMe =
+				!appendNum || (typeof appendNum === 'number' && appendNum < 0)
+					? Number(1).toString(16)
+					: Number(appendNum).toString(16);
+		appendMe = ('0000000'.substr(0, 8 - appendMe.length) + appendMe).toUpperCase();
+		return (
+			appendMe +
+			'-xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+				r = ((d = Math.floor(d / 16)) + Math.random() * 16) % 16 | 0;
+				return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
+			})
+		);
+	};
+
 	renderAdDetails() {
-		const { ad, updateAd, networkConfig, user, siteId, networkCode, dfpMessage } = this.props;
+		const {
+			ad,
+			updateAd,
+			networkConfig,
+			user,
+			siteId,
+			networkCode,
+			dfpMessage,
+			siteDomain
+		} = this.props;
 		const {
 			networkData: { dfpAdunitCode, dfpAdunit },
 			rewardTriggerFunction,
@@ -82,6 +108,7 @@ class AdElement extends Component {
 			showRewardedVideo
 		} = this.state;
 
+		const packetId = this.generatePacketId(siteId);
 		const isRewarded = ad.formatData.type === 'rewardedAds';
 		let code = isRewarded ? REWARDED_AD_CODE : ADCODE;
 		let triggerRewardedAd = !customScript ? TIGGER_AUTOMATICALLY_CODE : atob(customScript);
@@ -91,12 +118,16 @@ class AdElement extends Component {
 			? code
 					.replace(/__AD_ID__/g, ad.id)
 					.replace(/__CUSTOM_ATTRIBS__/, customAttributes)
-					.replace(/__AD_UNIT__/, dfpAdunit)
+					.replace(/__AD_UNIT__/g, dfpAdunit)
 					.replace(/__NETWORK_CODE__/, networkCode)
+					.replace(/__PACKET_ID__/, packetId)
 					.replace(
 						/__POST_REWARDED_FUNCTION__/g,
 						rewardTriggerFunction && atob(rewardTriggerFunction)
 					)
+					.replace(/__AD_NAME__/, ad.name)
+					.replace(/__SITE_DOMAIN__/, siteDomain)
+					.replace(/__SITE_ID__/, siteId)
 					.replace(/__MODAL_TEXT__/, modalText)
 					.replace(/__TRIGGER_REWARDED_AD__/, triggerRewardedAd)
 			: null;

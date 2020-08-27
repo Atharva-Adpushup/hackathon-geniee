@@ -263,6 +263,57 @@ const REWARDED_AD_CODE = `<html>
 	) {
 	  googletag = window.googletag || { cmd: [] };
 
+	  var packetId = __PACKET_ID__;   
+	  var siteId = __SITE_ID__;  
+	  var domain = __SITE_DOMAIN__;  
+	  var adId = __AD_ID__;   
+	  var adName =  __AD_NAME__ ;  
+	  var dfpAdunit = __AD_UNIT__;   
+	 
+
+	  function createFeedBackPayload()  {
+		var adpConfig =  window.adpushup && window.adpushup.config ? window.adpushup.config : {};
+
+		var feedbackObj = {
+			createdTS: +new Date(),
+			packetId: adpConfig.packetId  || packetId ,
+			siteId: adpConfig.siteId || siteId,
+			siteDomain: adpConfig.siteDomain || domain,
+			url: adpConfig.pageUrl  || window.location.href,
+			mode: 1,   
+			errorCode: 1,   
+			referrer: adpConfig.referrer || window.document.referrer,   
+			platform: 'MOBILE',    
+			isGeniee: false,  
+			sections: [
+				{
+					sectionId:  adId,
+					sectionName: adName,
+					status: 1,
+					network: 'adpTags',
+					networkAdUnitId: dfpAdunit ,
+					services: [2],
+					adUnitType: 5
+				}  
+			]
+		}
+
+		return feedbackObj;
+	  }
+
+	  function fireImagePixel(src) {
+		var imgEl = document.createElement('img');
+		imgEl.src = src;
+	},
+
+	   function sendFeedback() {  
+		var feedbackObj = this.createFeedBackPayload();
+		var url = '//e3.adpushup.com/AdPushupFeedbackWebService/feedback?data='
+		var data = window.btoa(JSON.stringify(feedbackObj))
+		var toFeedback = url + data;
+		this.fireImagePixel(toFeedback);
+	   }
+
 	  function setupRewarded() {
 		const rewardedSlot = googletag
 		  .defineOutOfPageSlot(
@@ -403,6 +454,7 @@ const REWARDED_AD_CODE = `<html>
 			let timer = setInterval(function () {
 			  if (makeRewardVisible) {
 				e.makeRewardedVisible();
+                this.sendFeedback();
 				clearInterval(timer);
 			  }
 			}, 100);
