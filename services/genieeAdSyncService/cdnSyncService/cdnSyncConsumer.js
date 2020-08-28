@@ -23,7 +23,7 @@ const disableSiteCdnSyncList = [38333];
 // Websites: autocarindia (38333, It is running adpushup lite for which script is uploaded to CDN manually, for now)
 const ieTestingSiteList = [38903]; // iaai.com
 
-module.exports = function(site, user) {
+module.exports = function(site, user, prebidBundleName) {
 	var ftp = new PromiseFtp();
 
 	var siteId = site.get('siteId'),
@@ -239,6 +239,9 @@ module.exports = function(site, user) {
 					const isUrlReportingEnabled =
 						Array.isArray(config.urlReportingEnabledSites) &&
 						config.urlReportingEnabledSites.indexOf(parseInt(siteId, 10)) !== -1;
+					const prebidBundleUrl = prebidBundleName
+						? config.prebidBundleUrl.replace('__FILE_NAME__', prebidBundleName)
+						: config.prebidBundleUrl;
 
 					bundle = _.replace(bundle, '__AP_CONFIG__', JSON.stringify(apConfigs));
 					bundle = _.replace(bundle, /__SITE_ID__/g, siteId);
@@ -246,7 +249,7 @@ module.exports = function(site, user) {
 					bundle = _.replace(bundle, '__SIZE_MAPPING__', JSON.stringify(sizeMappingConfig));
 					bundle = _.replace(bundle, '__WEB_S2S_STATUS__', finalConfig.config.isS2SActive);
 					bundle = _.replace(bundle, '__URL_REPORTING_ENABLED__', isUrlReportingEnabled);
-					bundle = _.replace(bundle, '__PREBID_BUNDLE_URL__', config.prebidBundleUrl);
+					bundle = _.replace(bundle, '__PREBID_BUNDLE_URL__', prebidBundleUrl);
 
 					// Generate final init script based on the services that are enabled
 					var uncompressed = generateFinalInitScript(bundle)

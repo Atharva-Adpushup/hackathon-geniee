@@ -1,4 +1,5 @@
 const path = require('path');
+const Promise = require('bluebird');
 
 const commonConsts = require('../../../configs/commonConsts');
 const {
@@ -33,16 +34,7 @@ module.exports = function() {
 			name: 'prebid.js'
 		};
 
-		return prebidGeneration(prebidAdapters)
-			.then(() => {
-				return readTempFile(buildFileConfig);
-			})
-			.then(content => {
-				buildFileConfig.content = content;
-				delete buildFileConfig.path;
-
-				return buildFileConfig;
-			});
+		return prebidGeneration(prebidAdapters).then(() => readTempFile(buildFileConfig));
 	}
 
 	return getActiveUsedBidderAdapters()
@@ -51,17 +43,36 @@ module.exports = function() {
 			return updateActiveBidderAdaptersIfChanged(activeBidders);
 		})
 		.then(data => {
+			if (!data.prebidBundleName) {
+				throw new Error('Something went wrong, Prebid bundle name not found.');
+			}
+
 			if (!data.isUpdated) {
-				throw new Error('Active Bidder Adapters List not changed!');
+				throw {
+					error: 'Active Bidder Adapters List not changed!',
+					customData: { name: data.prebidBundleName }
+				};
 			}
 
 			console.log('Building separate prebid bundle...');
-			return buildPrebidBundle(data.activeBidderAdapters);
+			return Promise.join(buildPrebidBundle(data.activeBidderAdapters), data.prebidBundleName);
 		})
-		.then(prebidBundle => {
+		.then(([prebidBundleContent, prebidBundleName]) => {
 			const fileConfig = {
-				...prebidBundle,
-				path: path.join(__dirname, '..', '..', '..', 'public', 'assets', 'js', 'builds', 'geniee')
+				content: prebidBundleContent,
+				path: path.join(
+					__dirname,
+					'..',
+					'..',
+					'..',
+					'public',
+					'assets',
+					'js',
+					'builds',
+					'geniee',
+					'prebid'
+				),
+				name: prebidBundleName
 			};
 
 			return writeTempFiles([fileConfig]);
@@ -73,6 +84,13 @@ module.exports = function() {
 			return pushToCdnOriginQueue(fileConfig);
 		})
 		.catch(err => {
+			if (err.customData) {
+				console.log(err.error);
+				return err.customData;
+			}
+
+			console.log('Some error in prebid bundle sync service!');
 			console.log(err.message);
+			throw err;
 		});
 };

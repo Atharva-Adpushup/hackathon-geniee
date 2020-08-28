@@ -5,26 +5,34 @@ const couchbase = require('../helpers/couchBaseService');
 const { docKeys } = require('../configs/commonConsts');
 
 const ActiveBidderAdaptersList = model.extend(function() {
-	this.keys = ['activeBiddersInAscOrder'];
-	this.clientKeys = ['activeBiddersInAscOrder'];
+	this.keys = ['prebidBundleName', 'activeBiddersInAscOrder'];
+	this.clientKeys = ['prebidBundleName', 'activeBiddersInAscOrder'];
 	this.validations = {
 		required: []
 	};
 	this.classMap = {};
 	this.defaults = {};
 	this.constructor = function(data, cas) {
-		if (!data.activeBiddersInAscOrder) {
-			throw new Error('activeBidders list is required for ActiveBidderAdaptersList doc');
+		if (!data.activeBiddersInAscOrder || !data.prebidBundleName) {
+			throw new Error(
+				'activeBidders list and prebidBundleName are required for ActiveBidderAdaptersList doc'
+			);
 		}
 		this.key = docKeys.activeBidderAdaptersList;
 		this.super(data, !!cas);
 		this.casValue = cas; // if user is loaded from database which will be almost every time except first, this value will be thr
 		this.updateActiveBidderAdapters = function(activeBidders) {
+			this.set('prebidBundleName', getPrebidBundleName());
 			this.set('activeBiddersInAscOrder', activeBidders);
 			return Promise.resolve(this);
 		};
 	};
 });
+
+function getPrebidBundleName() {
+	var timestamp = Date.now();
+	return `pb.${timestamp}.js`;
+}
 
 function apiModule() {
 	const API = {
@@ -35,7 +43,10 @@ function apiModule() {
 				.then(json => new ActiveBidderAdaptersList(json.value, json.cas));
 		},
 		createActiveBidderAdaptersDoc(activeBidders) {
-			const json = { activeBiddersInAscOrder: activeBidders };
+			const json = {
+				prebidBundleName: getPrebidBundleName(),
+				activeBiddersInAscOrder: activeBidders
+			};
 			return Promise.resolve(new ActiveBidderAdaptersList(json)).then(ActiveBidderAdaptersList =>
 				ActiveBidderAdaptersList.save()
 			);
@@ -48,7 +59,8 @@ function apiModule() {
 		updateActiveBidderAdaptersIfChanged(activeBidderAdapters) {
 			const output = {
 				activeBidderAdapters,
-				isUpdated: false
+				isUpdated: false,
+				prebidBundleName: ''
 			};
 			const newActiveBiddersInAscOrderString = activeBidderAdapters.join(',');
 
@@ -62,22 +74,26 @@ function apiModule() {
 						ActiveBidderAdaptersList.updateActiveBidderAdapters(activeBidderAdapters);
 						return ActiveBidderAdaptersList.save().then(activeBidderAdapters => {
 							output.isUpdated = true;
-							return output;
+							return activeBidderAdapters;
 						});
 					}
 
-					return output;
+					return ActiveBidderAdaptersList;
 				})
 				.catch(err => {
 					if (err.code === 13) {
 						return API.createActiveBidderAdaptersDoc(activeBidderAdapters).then(
 							activeBidderAdapters => {
 								output.isUpdated = true;
-								return output;
+								return activeBidderAdapters;
 							}
 						);
 					}
 
+					throw err;
+				})
+				.then(ActiveBidderAdaptersList => {
+					output.prebidBundleName = ActiveBidderAdaptersList.get('prebidBundleName');
 					return output;
 				});
 		}

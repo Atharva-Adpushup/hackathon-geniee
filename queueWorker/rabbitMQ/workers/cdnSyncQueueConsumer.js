@@ -80,7 +80,7 @@ function syncCDNWrapper(decodedMessage) {
 	return siteModel
 		.getSiteById(decodedMessage.siteId)
 		.then(site => Promise.join(site, userModel.getUserByEmail(site.get('ownerEmail'))))
-		.then(([site, user]) => syncCDNService(site, user))
+		.then(([site, user]) => syncCDNService(site, user, decodedMessage.prebidBundleName))
 		.then(() => decodedMessage.siteId);
 }
 
@@ -137,7 +137,10 @@ function doProcessingAndAck(originalMessage) {
 
 			if (isSeparatePrebidEnabled) {
 				console.log('Separate Prebid bundle feature is enabled.');
-				return syncPrebidBundle().then(() => decodedMessage);
+				return syncPrebidBundle().then(({ name: prebidBundleName }) => ({
+					...decodedMessage,
+					prebidBundleName
+				}));
 			}
 
 			console.log('Separate Prebid bundle feature is disabled.');
