@@ -272,7 +272,7 @@ module.exports = {
 	queuePublishingURL: 'http://localhost:9009',
 	urlReportingEnabledSites: [],
 	separatePrebidEnabledSites: [],
-	prebidBundleUrl: 'http://localhost:8080/assets/js/builds/geniee/prebid.js'
+	prebidBundleUrl: 'http://localhost:8080/assets/js/builds/geniee/prebid/__FILE_NAME__'
 };
 
 /*
