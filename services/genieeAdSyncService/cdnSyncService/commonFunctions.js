@@ -73,15 +73,16 @@ function pushToCdnOriginQueue(fileConfig, siteId) {
 		return Promise.resolve(fileConfig);
 	} else {
 		const job = { content: Buffer.from(fileConfig.default).toString('base64') };
-		switch (fileConfig.name) {
-			case 'adpushup.js':
-				job.filePath = `${siteId}/${fileConfig.name}`;
-				break;
-			case 'prebid.js':
-				job.filePath = `prebid/${fileConfig.name}`;
+
+		if (fileConfig.name === 'adpushup.js') {
+			job.filePath = `${siteId}/${fileConfig.name}`;
 		}
 
-		console.log(job);
+		if (fileConfig.name.match(/^pb.\d+.js$/)) {
+			job.filePath = `prebid/${fileConfig.name}`;
+		}
+
+		console.log(`${fileConfig.name} pushed to cdn origin queue at ${job.filePath} path.`);
 
 		return helperUtils.publishToRabbitMqQueue(
 			config.RABBITMQ.CDN_ORIGIN.NAME_IN_QUEUE_PUBLISHER_SERVICE,
