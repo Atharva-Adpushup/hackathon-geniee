@@ -304,7 +304,7 @@ const REWARDED_AD_CODE = `<html>
 	  function fireImagePixel(src) {
 		var imgEl = document.createElement('img');
 		imgEl.src = src;
-	},
+	}
 
 	   function sendFeedback() {  
 		var feedbackObj = this.createFeedBackPayload();
@@ -320,8 +320,8 @@ const REWARDED_AD_CODE = `<html>
 			"/__NETWORK_CODE__/__AD_UNIT__",
 			googletag.enums.OutOfPageFormat.REWARDED
 		  )
-		  .addService(googletag.pubads());
-		  .setTargeting('adpushup_ran', 1)
+		  .addService(googletag.pubads())
+		  .setTargeting('adpushup_ran', 1);
 		rewardedSlot.setForceSafeFrame(true);
 		googletag.pubads().enableAsyncRendering();
 		googletag.enableServices();
