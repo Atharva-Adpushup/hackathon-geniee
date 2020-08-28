@@ -263,12 +263,12 @@ const REWARDED_AD_CODE = `<html>
 	) {
 	  googletag = window.googletag || { cmd: [] };
 
-	  var packetId = __PACKET_ID__;   
+	  var packetId = "__PACKET_ID__";   
 	  var siteId = __SITE_ID__;  
-	  var domain = __SITE_DOMAIN__;  
-	  var adId = __AD_ID__;   
-	  var adName =  __AD_NAME__ ;  
-	  var dfpAdunit = __AD_UNIT__;   
+	  var domain = "__SITE_DOMAIN__";  
+	  var adId = "__AD_ID__";   
+	  var adName =  "__AD_NAME__" ;  
+	  var dfpAdunit = "__AD_UNIT__";   
 	 
 
 	  function createFeedBackPayload()  {
@@ -321,6 +321,7 @@ const REWARDED_AD_CODE = `<html>
 			googletag.enums.OutOfPageFormat.REWARDED
 		  )
 		  .addService(googletag.pubads());
+		  .setTargeting('adpushup_ran', 1)
 		rewardedSlot.setForceSafeFrame(true);
 		googletag.pubads().enableAsyncRendering();
 		googletag.enableServices();
