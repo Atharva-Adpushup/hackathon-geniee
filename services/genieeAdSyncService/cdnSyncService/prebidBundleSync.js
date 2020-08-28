@@ -81,7 +81,7 @@ module.exports = function() {
 			const fileConfig = { name: prebidBundle.name, default: prebidBundle.content };
 
 			// push script to cdn
-			return pushToCdnOriginQueue(fileConfig);
+			return pushToCdnOriginQueue(fileConfig).then(() => fileConfig);
 		})
 		.catch(err => {
 			if (err.customData) {
