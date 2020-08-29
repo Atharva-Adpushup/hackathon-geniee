@@ -430,7 +430,8 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		amp: 'amtg::',
 		requestLogger: 'reql::',
 		lastRunInfoDoc: 'config::apnd:last-run-info',
-		sizeMapppingConfig: 'data::sizeMapping'
+		sizeMapppingConfig: 'data::sizeMapping',
+		activeBidderAdaptersList: 'data::activeBidderAdapters'
 	},
 	tagManagerInitialDoc: {
 		siteId: null,
@@ -620,5 +621,41 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		'/site/report?report_name=revenue_by_network',
 		'/site/report?report_name=get_stats_by_custom&dimension=siteid&interval=cumulative&metrics=adpushup_page_views,adpushup_page_cpm,network_ad_ecpm,network_impressions,network_net_revenue',
 		'/site/report?report_name=country_report'
-	]
+	],
+	PREBID_BUNDLING: {
+		PREBID_ADAPTERS_TO_ALWAYS_BUILD: ['currency', 'schain'],
+		ACTIVE_BIDDER_ADAPTERS_N1QL: `SELECT DISTINCT RAW activeBidderAdapters
+								FROM
+									AppBucket _apNetworks
+									UNNEST
+										(
+											ARRAY _apNetworks.[bidderKey].adapter
+											FOR bidderKey
+											IN (
+												SELECT DISTINCT RAW activeBiddersHbdc
+												FROM
+													AppBucket _hbdc
+													UNNEST
+														(
+															ARRAY hbdcBidderKey
+															FOR hbdcBidderKey
+															IN OBJECT_NAMES(_hbdc.hbcf)
+															WHEN _hbdc.hbcf.[hbdcBidderKey].isPaused = false
+															AND _hbdc.hbcf.[hbdcBidderKey].isActive = true END
+														)
+														AS activeBiddersHbdc
+												WHERE
+													meta(_hbdc).id LIKE 'hbdc::%'
+											)
+											WHEN
+												_apNetworks.[bidderKey] IS VALUED
+												AND _apNetworks.[bidderKey].isHb = true
+												AND _apNetworks.[bidderKey].isActive = true
+												AND _apNetworks.[bidderKey].params IS VALUED END
+										)
+										AS activeBidderAdapters
+								WHERE
+									meta(_apNetworks).id = 'data::apNetworks'
+									ORDER BY activeBidderAdapters ASC;`
+	}
 };

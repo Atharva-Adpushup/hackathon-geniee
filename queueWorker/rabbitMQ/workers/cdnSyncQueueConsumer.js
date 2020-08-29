@@ -8,6 +8,7 @@ const Consumer = require('../libs/consumer');
 const CustomError = require('./customError');
 const logger = require('../../../helpers/globalBucketLogger');
 const syncCDNService = require('../../../services/genieeAdSyncService/cdnSyncService/cdnSyncConsumer');
+const syncPrebidBundle = require('../../../services/genieeAdSyncService/cdnSyncService/prebidBundleSync');
 
 const queueConfig = {
 	url: CONFIG.RABBITMQ.URL,
@@ -79,7 +80,7 @@ function syncCDNWrapper(decodedMessage) {
 	return siteModel
 		.getSiteById(decodedMessage.siteId)
 		.then(site => Promise.join(site, userModel.getUserByEmail(site.get('ownerEmail'))))
-		.then(([site, user]) => syncCDNService(site, user))
+		.then(([site, user]) => syncCDNService(site, user, decodedMessage.prebidBundleName))
 		.then(() => decodedMessage.siteId);
 }
 
@@ -130,6 +131,21 @@ function errorHandler(error, originalMessage) {
 
 function doProcessingAndAck(originalMessage) {
 	return validateMessageData(originalMessage)
+		.then(decodedMessage => {
+			const isSeparatePrebidEnabled =
+				CONFIG.separatePrebidEnabledSites.indexOf(decodedMessage.siteId) !== -1;
+
+			if (isSeparatePrebidEnabled) {
+				console.log('Separate Prebid bundle feature is enabled.');
+				return syncPrebidBundle().then(({ name: prebidBundleName }) => ({
+					...decodedMessage,
+					prebidBundleName
+				}));
+			}
+
+			console.log('Separate Prebid bundle feature is disabled.');
+			return decodedMessage;
+		})
 		.then(syncCDNWrapper)
 		.then((siteId = 'N/A') => {
 			counter = 0;

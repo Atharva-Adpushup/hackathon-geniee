@@ -21,5 +21,6 @@ module.exports = {
 	pageUrlMappingServiceEndpoint:
 		'//e3.adpushup.com/AdPushupUrlMappingWebService/urlMapping?url=__PAGE_URL__',
 	pageUrlKeyValue: { urlTargetingKey: '', urlTargetingValue: '' },
-	urlReportingEnabled: __URL_REPORTING_ENABLED__
+	urlReportingEnabled: __URL_REPORTING_ENABLED__,
+	prebidBundleUrl: '__PREBID_BUNDLE_URL__'
 };

@@ -14,6 +14,10 @@ var adCodeGenerator = require('./adCodeGenerator');
 var session = require('../libs/session');
 var refreshAdSlot = require('./refreshAdSlot');
 
+if (SEPARATE_PREBID && HB_ACTIVE) {
+	utils.injectHeadCodeOnPage(config.prebidBundleUrl);
+}
+
 if (LAYOUT_ACTIVE) {
 	var selectVariation = require('./variationSelectionModels/index');
 	var nodewatcher = require('../libs/nodeWatcher');
