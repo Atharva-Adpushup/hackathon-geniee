@@ -36,19 +36,19 @@ function getPrebidBundleName() {
 
 function apiModule() {
 	const API = {
-		getActiveBidderAdaptersDoc: function() {
+		getActiveBidderAdaptersList: function() {
 			return couchbase
 				.connectToAppBucket()
 				.then(appBucket => appBucket.getAsync(docKeys.activeBidderAdaptersList))
 				.then(json => new ActiveBidderAdaptersList(json.value, json.cas));
 		},
-		createActiveBidderAdaptersDoc(activeBidders) {
+		createActiveBidderAdaptersList(activeBidders) {
 			const json = {
 				prebidBundleName: getPrebidBundleName(),
 				activeBiddersInAscOrder: activeBidders
 			};
-			return Promise.resolve(new ActiveBidderAdaptersList(json)).then(ActiveBidderAdaptersList =>
-				ActiveBidderAdaptersList.save()
+			return Promise.resolve(new ActiveBidderAdaptersList(json)).then(activeBidderAdaptersList =>
+				activeBidderAdaptersList.save()
 			);
 		},
 		/**
@@ -57,43 +57,45 @@ function apiModule() {
 		 * - If activeBidders list not changed or got any error while fetching doc then do nothing
 		 */
 		updateActiveBidderAdaptersIfChanged(activeBidderAdapters) {
+			const newActiveBiddersInAscOrder = activeBidderAdapters.sort();
 			const output = {
-				activeBidderAdapters,
+				activeBidderAdapters: newActiveBiddersInAscOrder,
 				isUpdated: false,
 				prebidBundleName: ''
 			};
-			const newActiveBiddersInAscOrderString = activeBidderAdapters.join(',');
 
-			return API.getActiveBidderAdaptersDoc()
-				.then(ActiveBidderAdaptersList => {
-					const existingActiveBiddersInAscOrderString = ActiveBidderAdaptersList.get(
-						'activeBiddersInAscOrder'
-					).join(',');
+			const newActiveBiddersInAscOrderString = newActiveBiddersInAscOrder.join(',');
+
+			return API.getActiveBidderAdaptersList()
+				.then(activeBidderAdaptersList => {
+					const existingActiveBiddersInAscOrderString = activeBidderAdaptersList
+						.get('activeBiddersInAscOrder')
+						.join(',');
 
 					if (existingActiveBiddersInAscOrderString !== newActiveBiddersInAscOrderString) {
-						ActiveBidderAdaptersList.updateActiveBidderAdapters(activeBidderAdapters);
-						return ActiveBidderAdaptersList.save().then(activeBidderAdapters => {
+						activeBidderAdaptersList.updateActiveBidderAdapters(newActiveBiddersInAscOrder);
+						return activeBidderAdaptersList.save().then(activeBidderAdaptersList => {
 							output.isUpdated = true;
-							return activeBidderAdapters;
+							return activeBidderAdaptersList;
 						});
 					}
 
-					return ActiveBidderAdaptersList;
+					return activeBidderAdaptersList;
 				})
 				.catch(err => {
 					if (err.code === 13) {
-						return API.createActiveBidderAdaptersDoc(activeBidderAdapters).then(
-							activeBidderAdapters => {
+						return API.createActiveBidderAdaptersList(newActiveBiddersInAscOrder).then(
+							activeBidderAdaptersList => {
 								output.isUpdated = true;
-								return activeBidderAdapters;
+								return activeBidderAdaptersList;
 							}
 						);
 					}
 
 					throw err;
 				})
-				.then(ActiveBidderAdaptersList => {
-					output.prebidBundleName = ActiveBidderAdaptersList.get('prebidBundleName');
+				.then(activeBidderAdaptersList => {
+					output.prebidBundleName = activeBidderAdaptersList.get('prebidBundleName');
 					return output;
 				});
 		}

@@ -239,9 +239,10 @@ module.exports = function(site, user, prebidBundleName) {
 					const isUrlReportingEnabled =
 						Array.isArray(config.urlReportingEnabledSites) &&
 						config.urlReportingEnabledSites.indexOf(parseInt(siteId, 10)) !== -1;
-					const prebidBundleUrl = prebidBundleName
-						? config.prebidBundleUrl.replace('__FILE_NAME__', prebidBundleName)
-						: config.prebidBundleUrl;
+					const prebidBundleUrl = config.prebidBundleUrl.replace(
+						'__FILE_NAME__',
+						prebidBundleName || config.prebidBundleDefaultName
+					);
 
 					bundle = _.replace(bundle, '__AP_CONFIG__', JSON.stringify(apConfigs));
 					bundle = _.replace(bundle, /__SITE_ID__/g, siteId);
