@@ -262,8 +262,7 @@ const REWARDED_AD_CODE = `<html>
 	  )
 	) {
 	  googletag = window.googletag || { cmd: [] };
-
-	  var packetId = "__PACKET_ID__";   
+  
 	  var siteId = __SITE_ID__;  
 	  var domain = "__SITE_DOMAIN__";  
 	  var adId = "__AD_ID__";   
@@ -276,7 +275,7 @@ const REWARDED_AD_CODE = `<html>
 
 		var feedbackObj = {
 			createdTS: +new Date(),
-			packetId: adpConfig.packetId  || packetId ,
+			packetId: adpConfig.packetId  ,
 			siteId: adpConfig.siteId || siteId,
 			siteDomain: adpConfig.siteDomain || domain,
 			url: adpConfig.pageUrl  || window.location.href,

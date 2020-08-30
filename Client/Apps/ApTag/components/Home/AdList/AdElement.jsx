@@ -65,23 +65,6 @@ class AdElement extends Component {
 		</p>
 	);
 
-	generatePacketId = appendNum => {
-		var d = +new Date(),
-			r,
-			appendMe =
-				!appendNum || (typeof appendNum === 'number' && appendNum < 0)
-					? Number(1).toString(16)
-					: Number(appendNum).toString(16);
-		appendMe = ('0000000'.substr(0, 8 - appendMe.length) + appendMe).toUpperCase();
-		return (
-			appendMe +
-			'-xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-				r = ((d = Math.floor(d / 16)) + Math.random() * 16) % 16 | 0;
-				return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
-			})
-		);
-	};
-
 	renderAdDetails() {
 		const {
 			ad,
@@ -108,7 +91,6 @@ class AdElement extends Component {
 			showRewardedVideo
 		} = this.state;
 
-		const packetId = this.generatePacketId(siteId);
 		const isRewarded = ad.formatData.type === 'rewardedAds';
 		let code = isRewarded ? REWARDED_AD_CODE : ADCODE;
 		let triggerRewardedAd = !customScript ? TIGGER_AUTOMATICALLY_CODE : atob(customScript);
@@ -120,7 +102,6 @@ class AdElement extends Component {
 					.replace(/__CUSTOM_ATTRIBS__/, customAttributes)
 					.replace(/__AD_UNIT__/g, dfpAdunit)
 					.replace(/__NETWORK_CODE__/, networkCode)
-					.replace(/__PACKET_ID__/, packetId)
 					.replace(
 						/__POST_REWARDED_FUNCTION__/g,
 						rewardTriggerFunction && atob(rewardTriggerFunction)
@@ -260,20 +241,24 @@ class AdElement extends Component {
 						>
 							Network Details
 						</CustomButton>
-						<CustomButton
-							variant="secondary"
-							className="u-margin-l3 u-margin-t3 pull-right"
-							onClick={() => this.toggleHandler('showFluidVal')}
-						>
-							Edit Fluid
-						</CustomButton>
-						<CustomButton
-							variant="secondary"
-							className="u-margin-l3 u-margin-t3 pull-right"
-							onClick={() => this.toggleHandler('showLazyload')}
-						>
-							Lazyload Settings
-						</CustomButton>
+						{!isRewarded && (
+							<CustomButton
+								variant="secondary"
+								className="u-margin-l3 u-margin-t3 pull-right"
+								onClick={() => this.toggleHandler('showFluidVal')}
+							>
+								Edit Fluid
+							</CustomButton>
+						)}
+						{!isRewarded && (
+							<CustomButton
+								variant="secondary"
+								className="u-margin-l3 u-margin-t3 pull-right"
+								onClick={() => this.toggleHandler('showLazyload')}
+							>
+								Lazyload Settings
+							</CustomButton>
+						)}
 						{isRewarded ? (
 							<CustomButton
 								variant="secondary"
