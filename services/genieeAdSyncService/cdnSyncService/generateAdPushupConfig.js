@@ -348,7 +348,6 @@ const getAdsAndPushToAdp = (identifier, docKey, site) => {
 };
 
 const generatePayload = (site, pageGroupData) => {
-	debugger;
 	// Empty finaJson and dfpAunits
 	finalJson = {};
 	ADPTags = [];
