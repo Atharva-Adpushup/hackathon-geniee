@@ -246,8 +246,7 @@ var REWARDED_MODAL_STYLES = `:root {
     position: relative;
   }`;
 
-const REWARDED_AD_CODE = `
-  <script>
+const REWARDED_AD_CODE = `<script>
 	if (
 	  !!navigator.userAgent.match(
 		/iPad|iPhone|Android|BlackBerry|Windows Phone|webOS/i
@@ -277,9 +276,10 @@ const REWARDED_AD_CODE = `
 		document.getElementsByTagName("head")[0].appendChild(css); 
 	} 
 	  
+	var styles = ${REWARDED_MODAL_STYLES} ;
 	  
 	/* Function call */ 
-	window.onload = function() { addStyle(${REWARDED_MODAL_STYLES}) }; 
+	window.onload = function() { addStyle(styles) }; 
 
 
 	  function createFeedBackPayload()  {
@@ -552,9 +552,7 @@ const REWARDED_AD_CODE = `
 	  });
 	}
 	__TRIGGER_REWARDED_AD__;
-  </script>
-
-`;
+  </script>`;
 
 const TIGGER_AUTOMATICALLY_CODE = `let timer = setInterval(function () {
 	if ($("#modal").length) {
