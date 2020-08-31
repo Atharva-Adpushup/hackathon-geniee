@@ -301,7 +301,7 @@ const getChannelPayload = (channel, pageGroupData, pageGroupPattern) => {
 
 	_.each(channel.variations, (variation, id) => {
 		const variationData =
-			pageGroupData && _.isObject(pageGroupData) ? pageGroupData.variations[id] : null;
+			pageGroupData && _.isObject(pageGroupData) ? pageGroupData.variations[id.toUpperCase()] : null;
 		const variationPayload = getVariationPayload(
 			variation,
 			platform,
@@ -348,6 +348,7 @@ const getAdsAndPushToAdp = (identifier, docKey, site) => {
 };
 
 const generatePayload = (site, pageGroupData) => {
+	debugger;
 	// Empty finaJson and dfpAunits
 	finalJson = {};
 	ADPTags = [];
