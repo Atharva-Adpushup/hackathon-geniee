@@ -270,7 +270,10 @@ module.exports = {
 	},
 	// queuePublishingURL: 'http://queuePublisher.adpushup.com', // production URL
 	queuePublishingURL: 'http://localhost:9009',
-	urlReportingEnabledSites: []
+	urlReportingEnabledSites: [],
+	separatePrebidEnabledSites: [],
+	prebidBundleUrl: 'http://localhost:8080/assets/js/builds/geniee/prebid/__FILE_NAME__',
+	prebidBundleDefaultName: 'prebid.js'
 };
 
 /*

@@ -738,5 +738,14 @@ module.exports = {
 		});
 
 		return true;
+	},
+	injectHeadCodeOnPage: function(src) {
+		const scriptEl = document.createElement('script');
+		scriptEl.type = 'text/javascript';
+		scriptEl.async = true;
+		scriptEl.src = src;
+
+		const headEl = document.getElementsByTagName('head')[0];
+		headEl.appendChild(scriptEl);
 	}
 };
