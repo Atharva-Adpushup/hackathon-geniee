@@ -148,106 +148,21 @@ const REWARDED_AD_CODE = `
 	  var adId = "__AD_ID__";   
 	  var adName =  "__AD_NAME__" ;  
 	  var dfpAdunit = "__AD_UNIT__";   
+
+	  var cssAnimation = document.createElement('style');
+	  cssAnimation.type = 'text/css';
+      var rules = document.createTextNode('@keyframes modalopen {'+
+          'from {'+
+                'opacity: 0;'+
+         ' }'+
+          'to {'+
+                'opacity: 1;'+
+          '}'+
+        '}');
+cssAnimation.appendChild(rules);
+document.getElementsByTagName("head")[0].appendChild(cssAnimation);
+
 	 
-
-	  function addStyle(styles) { 
-              
-		/* Create style document */ 
-		var css =  document.createElement('style'); 
-		css.type = 'text/css'; 
-	  
-		if (css.styleSheet)  
-			css.styleSheet.cssText = styles; 
-		else  
-			css.appendChild(document.createTextNode(styles)); 
-		  
-		/* Append style to the tag name */ 
-		document.getElementsByTagName("head")[0].appendChild(css); 
-	} 
-	  
-	var styles = ':root {'+
-    '--modal-duration: 1s;'+
-    '--modal-color: #428bca;'+
-  '}'+
-  '.rewarded-modal {'+
-    'display: none;'+
-    'position: fixed;'+
-    'z-index: 1;'+
-    'left: 0;'+
-    'top: 0;'+
-    'height: 100%;'+
-    'width: 100%;'+
-    'overflow: auto;'+
-'background-color: rgba(0, 0, 0, 0.5);'+
-  '}'+
-  '.rewarded-modal-content {'+
-    'margin: 10% auto;'+
-    'width: 60%;'+
-    'box-shadow: 0 5px 8px 0 rgba(0, 0, 0, 0.2),'+
-      '0 7px 20px 0 rgba(0, 0, 0, 0.17);'+
-    'animation-name: modalopen;'+
-    'animation-duration: var(--modal-duration);'+
-  '}'+
-  '.rewarded-modal-header h3{'+
-	'margin: 0;'+
-	'color: #fff;'+
-  '}'+
-  '.rewarded-modal-header {'+
-    'background: var(--modal-color);'+
-    'padding: 15px;'+
-    'color: #fff;'+
-    'border-top-left-radius: 5px;'+
-    'border-top-right-radius: 5px;'+
-    'height: 50px;'+
-  '}'+
-  '.rewarded-modal-body {'+
-    'padding: 10px 20px;'+
-    'background: #fff;'+
-    'height: 150px;'+
-  '}'+
-  '.close {'+
-    'color: #ccc;'+
-    'float: right;'+
-    'font-size: 30px;'+
-    'color: #fff;'+
-  '}'+
-  '.close:hover,'+
-  '.close:focus {'+
-    'color: #000;'+
-    'text-decoration: none;'+
-    'cursor: pointer;'+
-  '}'+
-  '@keyframes modalopen {'+
-    'from {'+
-      'opacity: 0;'+
-    '}'+
-    'to {'+
-      'opacity: 1;'+
-    '}'+
-  '}'+
-  '.watch {'+
-    'background-color: var(--modal-color);'+
-    'border: none;'+
-    'color: white;'+
-    'border-radius: 5px;'+
-    'font-size: 15px;'+
-    'float: right;'+
-    'position: relative;'+
-    'margin-left: 5px;'+
-  '}'+
-  '.closeModal {'+
-    'font-size: 15px;'+
-    'border: none;'+
-    'float: right;'+
-	'position: relative;'+
-	'border-radius: 5px;'+
-	'color: #000;'+
-  '};'
-
-	  
-	/* Function call */ 
-	window.onload = function() { addStyle(styles) }; 
-
 
 	  function createFeedBackPayload()  {
 		var adpConfig =  window.adpushup && window.adpushup.config ? window.adpushup.config : {};
@@ -415,16 +330,29 @@ const REWARDED_AD_CODE = `
 			  JSON.stringify(rewardedData)
 			);
 			$("body").append(
-			  '<div id="modal" class="rewarded-modal">' +
-		  '<div class="rewarded-modal-content">' +
-			  '<div class="rewarded-modal-header">' +
-				  '<span class="close">&times;</span>' +
-				  '<h3>${modalHeaderText}</h3>' +
+			  '<div id="modal" class="rewarded-modal" style="display: none;position: fixed;'+
+			  'z-index: 1;left: 0;top: 0;height: 100%;width: 100%;overflow: auto;'+
+			  'background-color: rgba(0, 0, 0, 0.5);">' +
+		  '<div class="rewarded-modal-content" style="margin:10% auto;width: 60%;'+
+		'box-shadow: 0 5px 8px 0 rgba(0, 0, 0, 0.2),0 7px 20px 0 rgba(0, 0, 0, 0.17);'+
+		'animation-name: modalopen;animation-duration: 1s;">' +
+			  '<div class="rewarded-modal-header" style = "background: #428bca;padding: 15px;'+
+			  'color: #fff;height: 50px;">' +
+				  '<span class="close" style ="color: #ccc;float: right;font-size: 30px;">'+
+				  '&times;</span>' +
+				  '<h3 style ="margin: 0;color: #fff;">${modalHeaderText}</h3>' +
 			  '</div>' +
-			  '<div class="rewarded-modal-body">' +
+			  '<div class="rewarded-modal-body" style="padding: 10px 20px;background: #fff;'+
+			  'height: 130px;">' +
 				  '<p>__MODAL_TEXT__</p>' +
-				  '<button id ="watchAdBtn" class=" watch primary">${watchButton}</button>'+
-				  '<button  id ="noThanksBtn" class="closeModal secondary"><span class="lg">' +
+				  '<button id ="watchAdBtn" class=" watch primary"'+
+				  'style ="background-color:#428bca;border: none;color: white;'+
+				  'border-radius: 5px;font-size: 15px;float: right;position: relative;'+
+				  'margin-left: 5px;">${watchButton}</button>'+
+				  '<button  id ="noThanksBtn" class="closeModal secondary" '+
+				'style ="font-size: 15px;border: none;float: right;position: relative;'+
+				'border-radius: 5px;color: #000;">'+
+				  '<span class="lg">' +
 				  '${noThanksButton}</button>' +
 			  '</div>' +
 		  '</div>' +
