@@ -253,7 +253,7 @@ var auction = {
 		hasRefreshSlots = !!refreshSlots.length;
 		prebidAuctionTimeOut = hasRefreshSlots
 			? config.PREBID_CONFIG.prebidConfig.refreshTimeOut ||
-			  config.PREBID_CONFIG.prebidConfig.timeOut
+			config.PREBID_CONFIG.prebidConfig.timeOut
 			: config.PREBID_CONFIG.prebidConfig.timeOut;
 
 		pbjs.que.push(

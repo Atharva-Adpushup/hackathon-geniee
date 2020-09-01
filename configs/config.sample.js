@@ -23,13 +23,7 @@ module.exports = {
 	},
 	cacheFlyFtp: {
 		HOST: '127.0.0.1',
-		//   // app
-		//   // USERNAME: 'apexAdpushup',
-		//   // PASSWORD: 'sdfkh@804'
-
-		//   // console
 		USERNAME: 'anonymous'
-		//   PASSWORD: '5e9e538f'
 	},
 	elasticServer: {
 		host: 'localhost:9200',
@@ -37,8 +31,8 @@ module.exports = {
 		requestTimeout: 3500 // in ms
 	},
 	googleOauth: {
-		OAUTH_CLIENT_ID: '1058013895547-dagamjh7hg4rfv9r6qgsrkh4pajgqe73.apps.googleusercontent.com',
-		OAUTH_CLIENT_SECRET: '3KXmKs9jnW92GUyB9d-I9Q5o',
+		OAUTH_CLIENT_ID: 'GOOGLE CLIENT ID',
+		OAUTH_CLIENT_SECRET: 'GOOGLE CLIENT SECRET',
 		OAUTH_CALLBACK: 'http://localhost:8080/api/user/oauth2callback',
 		OAUTH_SCOPE: [
 			'https://www.googleapis.com/auth/adsense.readonly',
@@ -49,30 +43,10 @@ module.exports = {
 		].join(' ')
 	},
 	ADPUSHUP_GAM: {
-		REFRESH_TOKEN: '1/Q136DItX0u5n28d3vi99M1xNi-qJsNTm3qcUxRtZjCk7Npig-UrT-i3Fv6K8Yqmw',
+		REFRESH_TOKEN: 'AP GAM REFRESH TOKEN',
 		ACTIVE_DFP_NETWORK: '103512698',
 		ACTIVE_DFP_PARENTID: '102512818'
 	},
-	// Production
-	// couchBase: {
-	// 	HOST: '10.1.1.9',
-	// 	USERNAME: 'administrator',
-	// 	PASSWORD: 'gknVsthji5f3yQR$%@AYV',
-	// 	DEFAULT_BUCKET: 'apAppBucket',
-	// 	DEFAULT_BUCKET_PASSWORD: 'zgvzr26xwtAidA9EUa9IU',
-	// 	SESSION_SECRET: 'ADPUSHUP_SESSION_KEY'
-	// },
-	// stagin
-	// couchBase: {
-	//   HOST: 'staging.adpushup.com',
-	//   USERNAME: 'administrator',
-	//   PASSWORD: 'ndiwncx9KdnbdR9#dL',
-	//   DEFAULT_BUCKET: 'AppBucket',
-	//   DEFAULT_BUCKET_PASSWORD: 'asd12345',
-	//   DEFAULT_USER_NAME: 'appuser',
-	//   DEFAULT_USER_PASSWORD: 'sttR45Ea6voy$$43',
-	//   SESSION_SECRET: 'ADPUSHUP_SESSION_KEY'
-	// },
 	// local
 	redisEnvironment: {
 		REDIS_PORT: 6379,
@@ -81,19 +55,19 @@ module.exports = {
 	couchBase: {
 		HOST: '127.0.0.1',
 		USERNAME: 'Admin',
-		PASSWORD: 'asd12345',
+		PASSWORD: 'CB PASSWORD',
 		DEFAULT_BUCKET: 'AppBucket',
-		DEFAULT_BUCKET_PASSWORD: 'asd12345',
+		DEFAULT_BUCKET_PASSWORD: 'CB PASSWORD',
 		DEFAULT_USER_NAME: 'Admin',
-		DEFAULT_USER_PASSWORD: 'asd12345',
+		DEFAULT_USER_PASSWORD: 'CB PASSWORD',
 		SESSION_SECRET: 'ADPUSHUP_SESSION_KEY'
 	},
 	globalBucket: {
 		HOST: '127.0.0.1',
 		USERNAME: 'admin',
-		PASSWORD: 'asd12345',
+		PASSWORD: 'CB PASSWORD',
 		DEFAULT_BUCKET: 'apGlobalBucket',
-		DEFAULT_BUCKET_PASSWORD: 'asd12345'
+		DEFAULT_BUCKET_PASSWORD: 'CB PASSWORD'
 	},
 	email: {
 		MAIL_FROM: 'support@adpushup.com',
@@ -107,44 +81,34 @@ module.exports = {
 			apStatsBucket: {
 				HOST: '127.0.0.1',
 				USERNAME: 'administrator',
-				PASSWORD: 'dSTt4%fnd7zxgfkfGg',
-				BUCKET_PASSWORD: 'sttR45Ea6voy$$43'
+				PASSWORD: 'CB PASS',
+				BUCKET_PASSWORD: 'BUCKET PASS'
 			},
 			apGlobalBucket: {
 				HOST: '10.1.1.7',
 				USERNAME: 'administrator',
-				PASSWORD: 'gknVsthji5f3yQR$%@AYV',
+				PASSWORD: 'CB PASS',
 				BUCKET_NAME: 'apGlobalBucket',
-				BUCKET_PASSWORD: 'zgvzr26xwtAidA9EUa9IU'
+				BUCKET_PASSWORD: 'BUCKET PASS'
 			}
 		},
 		auth: {
-			username: 'cbadmin',
-			pass: 'hyperloop'
+			username: 'ops.adpushup.com username',
+			pass: 'ops.adpushup.com pass'
 		},
-		salt: 'adstxtsalt123',
-		masterPswMd5: 'a8dd36503a629d4181cb545e3a53a03a'
+		salt: 'Ads txt salt',
+		masterPswMd5: 'master password md5'
 	},
 	jwt: {
-		salt: '6981EDF13FB48'
+		salt: 'JWT salt'
 	},
 	RABBITMQ: {
 		// localhost
 		PUBLISHER_API: 'http://localhost:8087/publish',
 		PUBLISHER_API_BULK: 'http://localhost:8087/publishBulk',
 
-		// production
-		// PUBLISHER_API: 'http://queuepublisher.adpushup.com/publish',
-		// PUBLISHER_API_BULK: 'http://queuepublisher.adpushup.com/publishBulk',
-
 		// localhost
 		URL: 'amqp://guest:guest@localhost:5672',
-
-		// new production
-		// URL: 'amqp://rabbitAdmin:WY67rtuwi9aee@apdc1-central-daemon-1.eastus2.cloudapp.azure.com:5672',
-
-		// old
-		// URL: 'amqp://rabbitAdmin:WY67rtuwi9aee@apdc1-central-daemon-3.eastus2.cloudapp.azure.com:5672',
 		CDN_ORIGIN: {
 			NAME_IN_QUEUE_PUBLISHER_SERVICE: 'CDN_ORIGIN',
 			EXCHANGE: {
@@ -221,20 +185,6 @@ module.exports = {
 		warehouse: 'central-warehouse'
 	},
 	sql: {
-		//   user: 'apadmin',
-		//   password: 'UYjhiJhvMHDHsYRsY2!',
-		//   server: 'apdc1-central-sql.database.windows.net',
-		//   database: 'central-sql',
-		//   options: {
-		//     encrypt: true
-		//   },
-		//   pool: {
-		//     max: 10,
-		//     min: 1,
-		//     idleTimeoutMillis: 50000
-		//   },
-		//   connectionTimeout: 300000,
-		//   requestTimeout: 300000
 	},
 	ampSettings: {
 		selectors: {
@@ -277,15 +227,15 @@ module.exports = {
 };
 
 /*
-    Production
-    consoleCdnSync - for cdn syncing and uploading adpushup.js
-    genieeMCMZoneSync - for updating Geniee with adsense unit id and storing that id in our db
-    genieeZoneSync - to sync unsynced zones with geniee and update channel doc and pulbish job to consoleCdnSync and MCM Automation
+	Production
+	consoleCdnSync - for cdn syncing and uploading adpushup.js
+	genieeMCMZoneSync - for updating Geniee with adsense unit id and storing that id in our db
+	genieeZoneSync - to sync unsynced zones with geniee and update channel doc and pulbish job to consoleCdnSync and MCM Automation
 
 
-    adpDfpZoneSyncConsumer - /adpushup/QueueWorkers/adpDfpZoneSyncConsumer.js
-    adsenseStatSyncService - /adpushup/App/app.js
-    appCdnUpload - /adpushup/QueueWorkers/app.js
-    consoleAdSyncConsumer - /adpushup/QueueWorkers/consoleAdSyncConsumer.js
-    genieeZoneSyncConsumer - /adpushup/QueueWorkers/genieeZoneSyncConsumer.js
+	adpDfpZoneSyncConsumer - /adpushup/QueueWorkers/adpDfpZoneSyncConsumer.js
+	adsenseStatSyncService - /adpushup/App/app.js
+	appCdnUpload - /adpushup/QueueWorkers/app.js
+	consoleAdSyncConsumer - /adpushup/QueueWorkers/consoleAdSyncConsumer.js
+	genieeZoneSyncConsumer - /adpushup/QueueWorkers/genieeZoneSyncConsumer.js
 */
