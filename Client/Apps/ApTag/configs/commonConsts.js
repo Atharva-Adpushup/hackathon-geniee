@@ -165,23 +165,85 @@ const REWARDED_AD_CODE = `
 		document.getElementsByTagName("head")[0].appendChild(css); 
 	} 
 	  
-	var styles = ':root {--modal-duration: 1s;--modal-color: #428bca;}'+
-	'.rewarded-modal {display: none;position: fixed;z-index: 1;left: 0;top: 0;height: 100%;'+
-	'width: 100% overflow: auto; background-color: rgba(0, 0, 0, 0.5);}'+
-	'.rewarded-modal-content {margin: 10% auto;width: 60%;'+
-	'box-shadow: 0 5px 8px 0 rgba(0, 0, 0, 0.2),0 7px 20px 0 rgba(0, 0, 0, 0.17);'+
-	'animation-name: modalopen;animation-duration: var(--modal-duration);}'+
-	'.rewarded-modal-header h3{margin: 0;color: #fff;}'+
-	'.rewarded-modal-header {background: var(--modal-color);padding: 15px;color: #fff;'+
-	'border-top-left-radius: 5px;border-top-right-radius: 5px;height: 50px;}'+
-	'.rewarded-modal-body { padding: 10px 20px;background: #fff;height: 150px;}'+
-	'.close {color: #ccc;float: right;font-size: 30px;color: #fff;}'+
-	'.close:hover,.close:focus {color: #000;text-decoration: none;cursor: pointer;}'+
-	'@keyframes modalopen {from {opacity: 0;}to {opacity: 1;}}'+
-	'.watch {background-color: var(--modal-color);border: none;color: white;border-radius: 5px;'+
-	'font-size: 15px;float: right;position: relative;margin-left: 5px;}'+
-	'.closeModal {font-size: 15px;border: none;float: right;position: relative;border-radius: 5px;'+
-	'color: #000;} ;'
+	var styles = ':root {'+
+    '--modal-duration: 1s;'+
+    '--modal-color: #428bca;'+
+  '}'+
+  '.rewarded-modal {'+
+    'display: none;'+
+    'position: fixed;'+
+    'z-index: 1;'+
+    'left: 0;'+
+    'top: 0;'+
+    'height: 100%;'+
+    'width: 100%;'+
+    'overflow: auto;'+
+'background-color: rgba(0, 0, 0, 0.5);'+
+  '}'+
+  '.rewarded-modal-content {'+
+    'margin: 10% auto;'+
+    'width: 60%;'+
+    'box-shadow: 0 5px 8px 0 rgba(0, 0, 0, 0.2),'+
+      '0 7px 20px 0 rgba(0, 0, 0, 0.17);'+
+    'animation-name: modalopen;'+
+    'animation-duration: var(--modal-duration);'+
+  '}'+
+  '.rewarded-modal-header h3{'+
+	'margin: 0;'+
+	'color: #fff;'+
+  '}'+
+  '.rewarded-modal-header {'+
+    'background: var(--modal-color);'+
+    'padding: 15px;'+
+    'color: #fff;'+
+    'border-top-left-radius: 5px;'+
+    'border-top-right-radius: 5px;'+
+    'height: 50px;'+
+  '}'+
+  '.rewarded-modal-body {'+
+    'padding: 10px 20px;'+
+    'background: #fff;'+
+    'height: 150px;'+
+  '}'+
+  '.close {'+
+    'color: #ccc;'+
+    'float: right;'+
+    'font-size: 30px;'+
+    'color: #fff;'+
+  '}'+
+  '.close:hover,'+
+  '.close:focus {'+
+    'color: #000;'+
+    'text-decoration: none;'+
+    'cursor: pointer;'+
+  '}'+
+  '@keyframes modalopen {'+
+    'from {'+
+      'opacity: 0;'+
+    '}'+
+    'to {'+
+      'opacity: 1;'+
+    '}'+
+  '}'+
+  '.watch {'+
+    'background-color: var(--modal-color);'+
+    'border: none;'+
+    'color: white;'+
+    'border-radius: 5px;'+
+    'font-size: 15px;'+
+    'float: right;'+
+    'position: relative;'+
+    'margin-left: 5px;'+
+  '}'+
+  '.closeModal {'+
+    'font-size: 15px;'+
+    'border: none;'+
+    'float: right;'+
+	'position: relative;'+
+	'border-radius: 5px;'+
+	'color: #000;'+
+  '};'
+
 	  
 	/* Function call */ 
 	window.onload = function() { addStyle(styles) }; 
