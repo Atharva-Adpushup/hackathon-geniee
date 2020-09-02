@@ -623,7 +623,13 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		'/site/report?report_name=country_report'
 	],
 	PREBID_BUNDLING: {
-		PREBID_ADAPTERS_TO_ALWAYS_BUILD: ['currency', 'schain'],
+		PREBID_ADAPTERS_TO_ALWAYS_BUILD: [
+			'currency',
+			'schain',
+			'userId',
+			'unifiedIdSystem',
+			'criteoIdSystem'
+		],
 		ACTIVE_BIDDER_ADAPTERS_N1QL: `SELECT DISTINCT RAW activeBidderAdapters
 								FROM
 									AppBucket _apNetworks
