@@ -1,7 +1,11 @@
 const Promise = require('bluebird');
 const _ = require('lodash');
 
-const { PREBID_ADAPTERS, docKeys } = require('../../../configs/commonConsts');
+const {
+	PREBID_ADAPTERS,
+	docKeys,
+	PREBID_BUNDLING: { PREBID_ADAPTERS_TO_ALWAYS_BUILD }
+} = require('../../../configs/commonConsts');
 const siteModel = require('../../../models/siteModel');
 const userModel = require('../../../models/userModel');
 const couchbase = require('../../../helpers/couchBaseService');
@@ -147,7 +151,7 @@ function HbProcessing(site, apConfigs) {
 							? `,sizeConfig: ${JSON.stringify(deviceConfig.sizeConfig)}`
 							: '';
 
-					prebidAdapters = `${prebidAdapters},currency,schain`;
+					prebidAdapters = `${prebidAdapters},${PREBID_ADAPTERS_TO_ALWAYS_BUILD.join(',')}`;
 
 					prebidCurrencyConfig = `,currency: ${JSON.stringify(computedPrebidCurrencyConfig)}`;
 				}
