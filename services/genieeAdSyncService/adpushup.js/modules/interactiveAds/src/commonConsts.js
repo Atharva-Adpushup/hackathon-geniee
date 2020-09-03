@@ -28,7 +28,7 @@ const commonConsts = {
 	},
 	DEFAULT_CLASSNAME: 'adp_interactive_ad',
 	FORMAT_CSS: {
-		background: '#eaeaea'
+		background: 'transparent'
 	},
 	CLOSE_BUTTON: {
 		IMAGE:
