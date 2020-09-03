@@ -39,7 +39,8 @@ const mediaTypesConfig = {
 	native: {
 		title: {
 			required: true,
-			sendId: true
+			sendId: true,
+			len: 100
 		},
 		body: {
 			required: true,

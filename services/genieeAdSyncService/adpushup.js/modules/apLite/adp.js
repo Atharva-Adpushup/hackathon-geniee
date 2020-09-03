@@ -241,7 +241,8 @@ var $ = require('../../libs/jquery'),
 													refreshInterval,
 													services: [commonConsts.SERVICES.AP_LITE],
 													fluid: false,
-													sizeMapping
+													sizeMapping,
+													adId: gptSlotElementId
 												}
 											);
 
