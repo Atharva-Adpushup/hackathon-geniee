@@ -68,6 +68,7 @@ router
 					return siteModel.saveSiteData(siteId, 'POST', siteData);
 				}
 			})
+
 			.then(site => {
 				siteObj = site;
 				return userModel.setSitePageGroups(req.user.email);
