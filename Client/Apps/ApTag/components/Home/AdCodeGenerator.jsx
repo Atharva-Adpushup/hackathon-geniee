@@ -133,7 +133,7 @@ class AdCodeGenerator extends Component {
 			type: 1, // STRUCTURAL
 			css: {
 				display: 'block',
-				margin: '10px auto',
+				margin: '0 auto',
 				'text-align': 'center'
 			},
 			isActive: true
