@@ -4,6 +4,7 @@ var utils = require('./utils');
 var constants = require('./constants');
 var config = require('./config');
 var adp = require('./adp');
+var commonConsts = require('../../../../config/commonConsts');
 var targeting = {
 	getFloorWithGranularity: function(floor) {
 		var val = parseFloat(Math.abs(floor).toFixed(2));
@@ -172,16 +173,31 @@ var targeting = {
 		let pageLevelTargeting = constants.TARGETING.PAGE_LEVEL;
 
 		if (adp.config.urlReportingEnabled) {
-			const {urlTargetingKey, urlTargetingValue} = window.adpushup.config.pageUrlKeyValue;
-			const { performance } = window.adpushup;
-			if(urlTargetingKey && urlTargetingValue) {
+			const { urlTargetingKey, urlTargetingValue } = window.adpushup.config.pageUrlKeyValue;
+			const { utils } = window.adpushup;
+
+			if (urlTargetingKey && urlTargetingValue) {
 				pageLevelTargeting[urlTargetingKey] = urlTargetingValue;
-				performance && performance.mark('URM_TARGETING_KEY_VALUE_SET', {urlTargetingKey, urlTargetingValue});
+
+				utils.logURMTargettingEvent(
+					commonConsts.EVENT_LOGGER.EVENTS.URM_TARGETING_KEY_VALUE_SET,
+					{
+						urlTargetingKey,
+						urlTargetingValue
+					}
+				);
 			} else {
-				performance && performance.mark('URM_TARGETING_KEY_VALUE_EMPTY', {urlTargetingKey, urlTargetingValue});
+				utils.logURMTargettingEvent(
+					commonConsts.EVENT_LOGGER.EVENTS.URM_TARGETING_KEY_VALUE_EMPTY,
+					{
+						urlTargetingKey,
+						urlTargetingValue
+					}
+				);
 			}
 			// send url reporting log, if its collected
-			performance && performance.sendURLReportingLog();
+
+			utils.sendURMTargettingEventLogs();
 		}
 
 		/*

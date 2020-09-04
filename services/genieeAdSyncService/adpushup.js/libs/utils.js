@@ -3,7 +3,8 @@ var browserConfig = require('./browserConfig.js'),
 	$ = require('./jquery'),
 	dockify = require('./dockify'),
 	commonConsts = require('../config/commonConsts'),
-	Base64 = require('Base64');
+	Base64 = require('Base64'),
+	UM_LOG_ENDPOINT = '//vastdump-staging.adpushup.com/umlogv2';
 
 module.exports = {
 	log: function() {
@@ -318,6 +319,10 @@ module.exports = {
 					console.log('Required params for feedback missing');
 				}
 				return false;
+			}
+
+			if (window.adpushup.config.urlReportingEnabled) {
+				this.sendURMPageFeedbackEventLogs({ ...feedbackObj });
 			}
 
 			data = this.base64Encode(JSON.stringify(feedbackObj));
@@ -676,68 +681,330 @@ module.exports = {
 			return {};
 		}
 	},
-	performance: function() {
-		return {
-			markers: {},
-			mark: function(name, data = {}) {
-				this.markers[name] = {
-					data,
-					timestamp: +new Date()
-				}
-			},
-			clearMarkers: function() {
-				this.markers = {};
-			},
-			sendURLReportingLog: function() {
-				const markers = {pageUrl: window.location.href, ...this.markers};
-				this.clearMarkers();
-				if(!Object.keys(markers).length) return;
+	sendUmLog: function(logs, type) {
 		
-				if(markers.URM_REQUEST_STARTED && markers.URM_REQUEST_SUCCESS) {
-					markers.URM_RESPONSE_TIME = markers.URM_REQUEST_SUCCESS.timestamp - markers.URM_REQUEST_STARTED.timestamp;
+		if (!logs) return false;
+		if(this.apFeedbackSent && type === 'ap-feedback') return false;
+
+		if(type === 'ap-feedback') {
+			this.apFeedbackSent = true;
+		}
+		let adpConfig = window.adpushup.config;
+		// get packet Id
+		const packetId = adpConfig.packetId;
+		const data = {
+			logs,
+			packetId,
+			timestamp: +new Date()
+		};
+
+		if ((typeof type === 'string' || type instanceof String) && type) {
+			data.type = type;
+		}
+
+		return $.post({
+			url: UM_LOG_ENDPOINT,
+			data: JSON.stringify(data),
+			contentType: 'application/json',
+			processData: false,
+			dataType: 'json'
+		});
+	},
+	fetchAndSetKeyValueForUrlReporting: function(adp) {
+		const { utils } = adp;
+		utils.logURMEvent(commonConsts.EVENT_LOGGER.EVENTS.URM_START);
+
+		if (!adp.config.pageUrlMappingServiceEndpoint || !adp.config.pageUrl) {
+			utils.logURMEvent(commonConsts.EVENT_LOGGER.EVENTS.URM_CONFIG_NOT_FOUND);
+			return false;
+		}
+
+		var pageUrlMappingServiceEndpoint = adp.config.pageUrlMappingServiceEndpoint
+			.replace('__PAGE_URL__', this.base64Encode(adp.config.pageUrl))
+			.replace('__SITE_ID__', adp.config.siteId);
+
+		utils.logURMEvent(commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_STARTED);
+
+		this.requestServer(
+			pageUrlMappingServiceEndpoint,
+			{},
+			commonConsts.URM_REPORTING.GET_URM_TARGETTING_REQUEST_TIMEOUT,
+			'GET',
+			'json'
+		)
+			.done(function({ data: { urlTargetingKey, urlTargetingValue } }) {
+				utils.logURMEvent(commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_SUCCESS);
+
+				if (urlTargetingKey && urlTargetingValue) {
+					adp.config.pageUrlKeyValue.urlTargetingKey = urlTargetingKey;
+					adp.config.pageUrlKeyValue.urlTargetingValue = urlTargetingValue;
+					utils.logURMEvent(commonConsts.EVENT_LOGGER.EVENTS.URM_CONFIG_KEY_VALUE_SET, {
+						urlTargetingKey,
+						urlTargetingValue
+					});
+				} else {
+					utils.logURMEvent(commonConsts.EVENT_LOGGER.EVENTS.URM_CONFIG_KEY_VALUE_EMPTY, {
+						urlTargetingKey,
+						urlTargetingValue
+					});
 				}
-		
+
+				utils.sendURMKeyValueEventLogs();
+			})
+			.fail(function(xhr) {
+				const { responseText, getAllResponseHeaders } = xhr;
+				utils.logURMEvent(commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_FAILED, {
+					error: {
+						responseText,
+						responseHeaders: getAllResponseHeaders()
+					}
+				});
+				utils.sendURMKeyValueEventLogs();
+			});
+
+		return true;
+	},
+	logPerformanceEvent: function(name, data = {}) {
+		// eventLogger ideally should be injected
+		const eventLogger = window.adpushup.eventLogger;
+		try {
+			if (
+				window.adpushup.config.isPerformanceLoggingEnabled &&
+				!window.adpushup.config.isInitialPerformanceLogSent &&
+				window.performance &&
+				window.performance.timing &&
+				window.performance.timing.navigationStart
+			) {
+				eventLogger.log({
+					name,
+					type: commonConsts.EVENT_LOGGER.TYPES.ADP_PERF,
+					data: $.extend(data, {
+						time: new Date().getTime() - window.performance.timing.navigationStart
+					})
+				});
+			}
+		} catch (error) {
+			window.adpushup.err.push({
+				msg: 'Failed to log Performance Event',
+				error
+			});
+		}
+	},
+	sendPerformanceEventLogs: function() {
+		try {
+			if (
+				window.adpushup.config.isPerformanceLoggingEnabled &&
+				!window.adpushup.config.isInitialPerformanceLogSent
+			) {
+				const eventLogger = window.adpushup.eventLogger;
+				const eventType = commonConsts.EVENT_LOGGER.TYPES.ADP_PERF;
+				const logs = eventLogger.getLogsByEventType(eventType);
+
+				if (!logs.length) {
+					return false;
+				}
+
+				const payload = {
+					data: { logs },
+					type: eventType,
+					timestamp: +new Date(),
+					pageUrl: window.location.href,
+					pageUrlTrimmed: window.location.origin + window.location.pathname
+				};
+
+				// TODO move URLs to config
 				$.post({
-					url: '//vastdump-staging.adpushup.com/umlog',
-					data: JSON.stringify({logs: markers, timestamp: +new Date()}),
+					url: UM_LOG_ENDPOINT,
+					data: JSON.stringify(payload),
 					contentType: 'application/json',
 					processData: false,
 					dataType: 'json'
 				});
+
+				window.adpushup.config.isInitialPerformanceLogSent = true;
+				eventLogger.removeLogsByEventType(eventType);
 			}
+		} catch (error) {
+			window.adpushup.err.push({ msg: 'Error occured in sending performance logs', error });
+		}
+	},
+	logURMEvent: function(name, data = {}) {
+		const eventLogger = window.adpushup.eventLogger;
+		eventLogger.log({
+			name,
+			data,
+			type: commonConsts.EVENT_LOGGER.TYPES.URM_KEY_VALUE
+		});
+	},
+	logURMPageFeedbackEvent: function(name, data = {}) {
+		const eventLogger = window.adpushup.eventLogger;
+		eventLogger.log({
+			name,
+			data,
+			type: commonConsts.EVENT_LOGGER.TYPES.URM_PAGE_FEEDBACK
+		});
+	},
+	logURMTargettingEvent: function(name, data = {}) {
+		const eventLogger = window.adpushup.eventLogger;
+		eventLogger.log({
+			name,
+			data,
+			type: commonConsts.EVENT_LOGGER.TYPES.URM_TARGETTING
+		});
+	},
+	getUrmResponseTimeFromEventLogs: function(urmLogs) {
+		let urmReqSuccessTimestamp = 0;
+		let urmReqStartedTimestamp = 0;
+
+		for (let i = 0; i < urmLogs.length; i++) {
+			const log = urmLogs[i];
+			if (log.name === commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_STARTED) {
+				urmReqStartedTimestamp = log.timestamp;
+			}
+
+			if (log.name === commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_SUCCESS) {
+				urmReqSuccessTimestamp = log.timestamp;
+				break;
+			}
+		}
+
+		return urmReqStartedTimestamp && urmReqSuccessTimestamp
+			? urmReqSuccessTimestamp - urmReqStartedTimestamp
+			: -1;
+	},
+	getPreparedURMResponseData: function(urmLogs) {
+		const urmResponseTime = this.getUrmResponseTimeFromEventLogs(urmLogs);
+
+		return {
+			data: { time: urmResponseTime },
+			timestamp: new Date().getTime(),
+			name: commonConsts.EVENT_LOGGER.EVENTS.URM_RESPONSE_TIME
 		};
 	},
-	fetchAndSetKeyValueForUrlReporting: function(adp) {
-		const { performance } = adp;
-		performance.mark('URM_START');
-		if(!adp.config.pageUrlMappingServiceEndpoint || !adp.config.pageUrl) {
-			performance.mark('URM_CONFIG_NOT_FOUND');
-			return false;
-		};
+	sendURMTargettingEventLogs: function() {
+		try {
+			const { utils, eventLogger } = window.adpushup;
+			const eventType = commonConsts.EVENT_LOGGER.TYPES.URM_TARGETTING;
 
-		var pageUrlMappingServiceEndpoint = adp.config.pageUrlMappingServiceEndpoint.replace(
-			'__PAGE_URL__',
-			this.base64Encode(adp.config.pageUrl)
-		);
+			let urmTargettingLogs = eventLogger.getLogsByEventType(eventType);
 
-		performance.mark('URM_REQUEST_STARTED');
-		this.requestServer(pageUrlMappingServiceEndpoint, {}, 5000, 'GET', 'json')
-		.done(function({data: {urlTargetingKey, urlTargetingValue}}) {
-			performance.mark('URM_REQUEST_SUCCESS');
-			if(urlTargetingKey && urlTargetingValue) {
-				adp.config.pageUrlKeyValue.urlTargetingKey = urlTargetingKey;
-				adp.config.pageUrlKeyValue.urlTargetingValue = urlTargetingValue;
-				performance.mark('URM_CONFIG_KEY_VALUE_SET', {urlTargetingKey, urlTargetingValue});
-				return;
+			if (!urmTargettingLogs.length) {
+				utils.logURMTargettingEvent(commonConsts.EVENT_LOGGER.EVENTS.EMPTY);
+				urmTargettingLogs = eventLogger.getLogsByEventType(eventType);
 			}
-			performance.mark('URM_CONFIG_KEY_VALUE_EMPTY', {urlTargetingKey, urlTargetingValue});
-		})
-		.fail(function(error) {
-			performance.mark('URM_REQUEST_FAILED');
-			console.error(error);
-		});
 
-		return true;
+			const packetId = window.adpushup.config.packetId;
+			const payload = {
+				packetId,
+				type: eventType,
+				timestamp: new Date().getTime(),
+				data: { logs: urmTargettingLogs },
+				pageUrl: window.location.href,
+				pageUrlTrimmed: window.location.origin + window.location.pathname
+			};
+
+			// TODO move url to config
+			$.post({
+				url: UM_LOG_ENDPOINT,
+				data: JSON.stringify(payload),
+				dataType: 'json',
+				processData: false,
+				contentType: 'application/json'
+			});
+
+			eventLogger.removeLogsByEventType(eventType);
+		} catch (error) {
+			window.adpushup.err.push({
+				error,
+				msg: 'Error occured while sending URM trigger logs'
+			});
+		}
+	},
+	sendURMPageFeedbackEventLogs: function(feedback) {
+		try {
+			if (window.adpushup.config.isURMPageFeedbackSent) {
+				return false;
+			}
+
+			const { utils, eventLogger } = window.adpushup;
+			const eventType = commonConsts.EVENT_LOGGER.TYPES.URM_PAGE_FEEDBACK;
+
+			let urmLogs = eventLogger.getLogsByEventType(eventType);
+
+			if (!urmLogs.length) {
+				utils.logURMPageFeedbackEvent(commonConsts.EVENT_LOGGER.EVENTS.EMPTY);
+				urmLogs = eventLogger.getLogsByEventType(eventType);
+			}
+
+			const packetId = window.adpushup.config.packetId;
+
+			const payload = {
+				packetId,
+				type: eventType,
+				timestamp: new Date().getTime(),
+				data: { logs: urmLogs, feedback },
+				pageUrl: window.location.href,
+				pageUrlTrimmed: window.location.origin + window.location.pathname
+			};
+			// TODO move url to config
+			$.post({
+				url: UM_LOG_ENDPOINT,
+				data: JSON.stringify(payload),
+				contentType: 'application/json',
+				processData: false,
+				dataType: 'json'
+			});
+
+			window.adpushup.config.isURMPageFeedbackSent = true;
+			eventLogger.removeLogsByEventType(eventType);
+		} catch (error) {
+			window.adpushup.err.push({
+				error,
+				msg: 'Error occured while sending URM page feedback logs'
+			});
+		}
+	},
+	sendURMKeyValueEventLogs: function() {
+		try {
+			const { utils, eventLogger } = window.adpushup;
+			const eventType = commonConsts.EVENT_LOGGER.TYPES.URM_KEY_VALUE;
+
+			let urmLogs = eventLogger.getLogsByEventType(eventType);
+
+			if (!urmLogs.length) {
+				utils.logURMEvent(commonConsts.EVENT_LOGGER.EVENTS.EMPTY);
+				urmLogs = eventLogger.getLogsByEventType(eventType);
+			}
+
+			const packetId = window.adpushup.config.packetId;
+			const urmResponseLog = utils.getPreparedURMResponseData(urmLogs);
+			urmLogs.push(urmResponseLog);
+			const payload = {
+				packetId,
+				type: eventType,
+				data: { logs: urmLogs },
+				timestamp: new Date().getTime(),
+				pageUrl: window.location.href,
+				pageUrlTrimmed: window.location.origin + window.location.pathname
+			};
+
+			// TODO move url to config
+			$.post({
+				url: UM_LOG_ENDPOINT,
+				data: JSON.stringify(payload),
+				contentType: 'application/json',
+				processData: false,
+				dataType: 'json'
+			});
+
+			window.adpushup.config.isURMPageFeedbackSent = true;
+			eventLogger.removeLogsByEventType(eventType);
+		} catch (error) {
+			window.adpushup.err.push({
+				error,
+				msg: 'Error occured while sending URM event logs'
+			});
+		}
 	},
 	injectHeadCodeOnPage: function(src) {
 		const scriptEl = document.createElement('script');
