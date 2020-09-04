@@ -218,12 +218,12 @@ module.exports = {
 	prebidServer: {
 		host: 'https://amp.adpushup.com/'
 	},
-	// queuePublishingURL: 'http://queuePublisher.adpushup.com', // production URL
 	queuePublishingURL: 'http://localhost:9009',
 	urlReportingEnabledSites: [],
 	separatePrebidEnabledSites: [],
 	prebidBundleUrl: 'http://localhost:8080/assets/js/builds/geniee/prebid/__FILE_NAME__',
-	prebidBundleDefaultName: 'prebid.js'
+	prebidBundleDefaultName: 'prebid.js',
+	performanceLoggingEnabledSites: [37780]
 };
 
 /*
