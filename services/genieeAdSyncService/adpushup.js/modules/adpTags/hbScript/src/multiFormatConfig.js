@@ -33,8 +33,8 @@ const mediaTypesConfig = {
 		mimes: CONSTANTS.VIDEO.MIMES,
 		protocols: CONSTANTS.VIDEO.PROTOCOLS,
 		api: CONSTANTS.VIDEO.API,
-		maxduration: CONSTANTS.VIDEO.MAXDURATION
-		// linearity: CONSTANTS.VIDEO.LINEARITY // ### Rubicon Specific ###
+		maxduration: CONSTANTS.VIDEO.MAXDURATION,
+		linearity: CONSTANTS.VIDEO.LINEARITY
 	},
 	native: {
 		title: {
@@ -68,12 +68,11 @@ const bidderParamsMapping = {
 			protocols: CONSTANTS.VIDEO.PROTOCOLS
 		}
 	},
-	// Disabled video format on Rubicon
-	// rubicon: {
-	// 	videoParams: {
-	// 		video: {}
-	// 	}
-	// },
+	rubicon: {
+		videoParams: {
+			video: {}
+		}
+	},
 	pubmatic: {
 		videoParams: {
 			video: {
