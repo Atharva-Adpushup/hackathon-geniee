@@ -6,7 +6,9 @@
 	"directories": {
 		"test": "tests"
 	},
-	"dependencies": {},
+	"dependencies": {
+		"css.escape": "^1.5.1"
+	},
 	"devDependencies": {
 		"@babel/core": "^7.2.2",
 		"@babel/preset-env": "^7.3.1",
