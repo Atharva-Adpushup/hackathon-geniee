@@ -713,7 +713,6 @@ module.exports = {
 	fetchAndSetKeyValueForUrlReporting: function(adp) {
 		const { utils } = adp;
 		utils.logURMEvent(commonConsts.EVENT_LOGGER.EVENTS.URM_START);
-		utils.logURMPageFeedbackEvent(commonConsts.EVENT_LOGGER.EVENTS.URM_START);
 
 		if (!adp.config.pageUrlMappingServiceEndpoint || !adp.config.pageUrl) {
 			utils.logURMEvent(commonConsts.EVENT_LOGGER.EVENTS.URM_CONFIG_NOT_FOUND);
