@@ -151,7 +151,24 @@ var auction = {
 						bidders: '*',
 						filter: 'include'
 					}
-				}
+				},
+				userIds: [
+					{
+						name: 'unifiedId',
+						params: {
+							url: '//match.adsrvr.org/track/rid?ttd_pid=pubmatic&fmt=json'
+						},
+						storage: {
+							type: 'html5',
+							name: 'pbjs-unifiedid', // set localstorage with this name
+							expires: 60
+						}
+					},
+					{
+						name: 'criteo'
+					}
+				],
+				syncDelay: 3000 // 3 seconds after the first auction
 			},
 			publisherDomain: adp.config.siteDomain,
 			bidderSequence: config.PREBID_CONFIG.prebidConfig.enableBidderSequence

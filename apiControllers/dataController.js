@@ -42,22 +42,31 @@ router
 				throw AdpushupError({ message: 'Site not found!', status: httpStatus.NOT_FOUND });
 			})
 			.then(() => {
-				const siteData = {
-					siteDomain: data.site,
-					siteId,
-					ownerEmail: req.user.email,
-					onboardingStage: data.onboardingStage,
-					step: parseInt(data.step, 10),
-					ads: [],
-					channels: [],
-					templates: [],
-					apConfigs: {
-						mode: CC.site.mode.DRAFT,
-						isAdPushupControlWithPartnerSSP: CC.apConfigDefaults.isAdPushupControlWithPartnerSSP,
-						autoOptimise: false
-					}
-				};
-				return siteModel.saveSiteData(siteId, 'POST', siteData);
+				if (data.step !== 1) {
+					return siteModel.getSiteById(siteId).then(site => {
+						site.set('step', parseInt(data.step, 10));
+						site.set('onboardingStage', data.onboardingStage);
+						return site.save();
+					});
+				} else {
+					const siteData = {
+						siteDomain: data.site,
+						siteId,
+						ownerEmail: req.user.email,
+						onboardingStage: data.onboardingStage,
+						step: parseInt(data.step, 10),
+						ads: [],
+						channels: [],
+						templates: [],
+						apConfigs: {
+							mode: CC.site.mode.DRAFT,
+							isAdPushupControlWithPartnerSSP: CC.apConfigDefaults.isAdPushupControlWithPartnerSSP,
+							autoOptimise: false
+						}
+					};
+
+					return siteModel.saveSiteData(siteId, 'POST', siteData);
+				}
 			})
 			.then(site => {
 				siteObj = site;
