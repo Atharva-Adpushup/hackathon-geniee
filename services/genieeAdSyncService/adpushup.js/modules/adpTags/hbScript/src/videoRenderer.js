@@ -47,15 +47,13 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 		return function watcher() {
 			var currentTime = new Date();
 			var timeSpentInMs = currentTime - bannerAdRenderedTime;
-			var disableVideoWaitLimit =
-				Array.isArray(config.SITES_TO_DISABLE_VIDEO_WAIT_LIMIT) &&
-				config.SITES_TO_DISABLE_VIDEO_WAIT_LIMIT.indexOf(config.SITE_ID) !== -1;
 
 			if (
 				!apUtils.checkElementInViewPercent(container) &&
-				(disableVideoWaitLimit || (timeSpentInMs < watcherExpiryTimeInMs && !timeoutId))
+				(config.VIDEO_WAIT_LIMIT_DISABLED ||
+					(timeSpentInMs < watcherExpiryTimeInMs && !timeoutId))
 			) {
-				var computedWatcherInterval = disableVideoWaitLimit
+				var computedWatcherInterval = config.VIDEO_WAIT_LIMIT_DISABLED
 					? watcherInterval
 					: watcherExpiryTimeInMs - timeSpentInMs;
 
@@ -69,7 +67,7 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 					}
 				};
 
-				if (!disableVideoWaitLimit) {
+				if (!config.VIDEO_WAIT_LIMIT_DISABLED) {
 					scrollEventListener = debounce(inViewCheck, 50);
 					window.addEventListener('scroll', scrollEventListener);
 				}
