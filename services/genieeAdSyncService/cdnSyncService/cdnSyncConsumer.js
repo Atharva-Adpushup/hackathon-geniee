@@ -246,6 +246,9 @@ module.exports = function(site, user, prebidBundleName) {
 					const isPerformanceLoggingEnabled =
 						Array.isArray(config.performanceLoggingEnabledSites) &&
 						config.performanceLoggingEnabledSites.indexOf(parseInt(siteId, 10)) !== -1;
+					const isVideoWaitLimitDisabled =
+						Array.isArray(config.sitesToDisableVideoWaitLimit) &&
+						config.sitesToDisableVideoWaitLimit.indexOf(parseInt(siteId, 10)) !== -1;
 
 					bundle = _.replace(bundle, '__AP_CONFIG__', JSON.stringify(apConfigs));
 					bundle = _.replace(bundle, /__SITE_ID__/g, siteId);
@@ -255,6 +258,7 @@ module.exports = function(site, user, prebidBundleName) {
 					bundle = _.replace(bundle, '__URL_REPORTING_ENABLED__', isUrlReportingEnabled);
 					bundle = _.replace(bundle, '__PREBID_BUNDLE_URL__', prebidBundleUrl);
 					bundle = _.replace(bundle, '__PERFORMANCE_LOGGING_ENABLED__', isPerformanceLoggingEnabled);
+					bundle = _.replace(bundle, '__VIDEO_WAIT_LIMIT_DISABLED__', isVideoWaitLimitDisabled);
 
 					// Generate final init script based on the services that are enabled
 					var uncompressed = generateFinalInitScript(bundle)

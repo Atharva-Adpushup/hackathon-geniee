@@ -19,7 +19,7 @@ var config = {
 		S2S_SYNC_ENDPOINT: `${globalConfig.prebidServer.host}prebidserver/cookie_sync`,
 		S2S_ACCOUNT_ID: '1001'
 	},
-	SITES_TO_DISABLE_VIDEO_WAIT_LIMIT: [37780]
+	VIDEO_WAIT_LIMIT_DISABLED: __VIDEO_WAIT_LIMIT_DISABLED__
 };
 
 module.exports = config;
