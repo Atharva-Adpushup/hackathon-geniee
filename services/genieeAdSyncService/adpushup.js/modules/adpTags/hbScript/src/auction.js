@@ -43,7 +43,7 @@ var auction = {
 		window.adpushup.utils.logPerformanceEvent(
 			commonConsts.EVENT_LOGGER.EVENTS.AUCTION_END_DELAY
 		);
-		
+
 		window.adpushup.utils.sendPerformanceEventLogs();
 		return returnVal;
 	},
@@ -209,6 +209,11 @@ var auction = {
 				url: 'https://prebid.adnxs.com/pbc/v1/cache'
 			},
 			consentManagement: {
+				gdpr: {
+					cmpApi: 'iab',
+					timeout: 8000,
+					defaultGdprScope: true
+				},
 				usp: {
 					cmpApi: 'iab',
 					timeout: 100 // US Privacy timeout 100ms
