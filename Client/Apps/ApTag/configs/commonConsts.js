@@ -331,7 +331,7 @@ document.getElementsByTagName("head")[0].appendChild(cssAnimation);
 			);
 			$("body").append(
 			  '<div id="modal" class="rewarded-modal" style="display: none;position: fixed;'+
-			  'z-index: 1;left: 0;top: 0;height: 100%;width: 100%;overflow: auto;'+
+			  'z-index: 1000;left: 0;top: 0;height: 100%;width: 100%;overflow: auto;'+
 			  'background-color: rgba(0, 0, 0, 0.5);">' +
 		  '<div class="rewarded-modal-content" style="margin:10% auto;width: 60%;'+
 		'box-shadow: 0 5px 8px 0 rgba(0, 0, 0, 0.2),0 7px 20px 0 rgba(0, 0, 0, 0.17);'+
@@ -437,7 +437,6 @@ document.getElementsByTagName("head")[0].appendChild(cssAnimation);
 
 			$("#modal").remove();
 			makeRewardVisible = false;
-
 			var slot = setupRewarded();
 			googletag.display(slot);
 			googletag.pubads().refresh([slot]);
