@@ -4,6 +4,7 @@ const Promise = require('bluebird');
 const commonConsts = require('../../../configs/commonConsts');
 const {
 	getActiveUsedBidderAdapters,
+	isS2SBidderAddedOnAnySite,
 	writeTempFiles,
 	readTempFile,
 	pushToCdnOriginQueue
@@ -37,8 +38,10 @@ module.exports = function() {
 		return prebidGeneration(prebidAdapters).then(() => readTempFile(buildFileConfig));
 	}
 
-	return getActiveUsedBidderAdapters()
-		.then(activeBidders => {
+	return Promise.join(getActiveUsedBidderAdapters(), isS2SBidderAddedOnAnySite())
+		.then(([activeBidders, s2sBidderAddedOnAnySite]) => {
+			if (s2sBidderAddedOnAnySite) activeBidders.push(commonConsts.PREBID_ADAPTERS.prebidServer);
+
 			// Update activeBidders doc if activeBidders List has been changed
 			return updateActiveBidderAdaptersIfChanged(activeBidders);
 		})

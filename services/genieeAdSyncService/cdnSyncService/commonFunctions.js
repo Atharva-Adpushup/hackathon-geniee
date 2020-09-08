@@ -43,6 +43,12 @@ function getActiveUsedBidderAdapters() {
 	return getDataByN1qlQuery(commonConsts.PREBID_BUNDLING.ACTIVE_BIDDER_ADAPTERS_N1QL);
 }
 
+function isS2SBidderAddedOnAnySite() {
+	return getDataByN1qlQuery(commonConsts.PREBID_BUNDLING.FIRST_S2S_BIDDER_SITE).then(
+		sites => Array.isArray(sites) && !!sites.length
+	);
+}
+
 function getDataByN1qlQuery(queryString) {
 	const query = N1qlQuery.fromString(queryString);
 
@@ -95,6 +101,7 @@ module.exports = {
 	getBiddersFromNetworkTree,
 	getSizeMappingConfigFromCB,
 	getActiveUsedBidderAdapters,
+	isS2SBidderAddedOnAnySite,
 	writeTempFiles,
 	readTempFile,
 	pushToCdnOriginQueue
