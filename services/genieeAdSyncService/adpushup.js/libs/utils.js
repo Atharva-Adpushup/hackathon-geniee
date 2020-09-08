@@ -898,7 +898,7 @@ module.exports = {
 				packetId,
 				type: eventType,
 				timestamp: new Date().getTime(),
-				data: { logs: urmTargettingLogs },
+				logs: urmTargettingLogs,
 				pageUrl: window.location.href,
 				pageUrlTrimmed: window.location.origin + window.location.pathname
 			};
