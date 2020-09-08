@@ -32,7 +32,7 @@ if (SPA_ACTIVE) {
 if (APTAG_ACTIVE) {
 	var triggerAd = require('./trigger');
 } else {
-	triggerAd = function() {};
+	triggerAd = function() { };
 }
 if (INNOVATIVE_ADS_ACTIVE) {
 	var processInnovativeAds = require('../modules/interactiveAds/index').default;
@@ -82,7 +82,7 @@ function destroyAdpSlots() {
 		var adpGSlots = [];
 		adpSlots.forEach(function(adpSlot) {
 			var slot = w.adpTags.adpSlots[adpSlot];
-			if (!slot.optionalParam.isManual && slot.gSlot) {
+			if (slot && !slot.optionalParam.isManual && slot.gSlot) {
 				// remove the slot from adpSlots
 				w.adpTags.adpSlots[adpSlot] = undefined;
 				adpGSlots.push(slot.gSlot);
