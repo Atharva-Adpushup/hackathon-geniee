@@ -664,6 +664,13 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 										AS activeBidderAdapters
 								WHERE
 									meta(_apNetworks).id = 'data::apNetworks'
-									ORDER BY activeBidderAdapters ASC;`
+									ORDER BY activeBidderAdapters ASC;`,
+		FIRST_S2S_BIDDER_SITE: `SELECT _hbdc.siteId
+							FROM
+								AppBucket _hbdc
+							WHERE
+								meta(_hbdc).id LIKE 'hbdc::%'
+								AND ANY bidder IN OBJECT_VALUES(_hbdc.hbcf) SATISFIES bidder.isS2SActive = true END
+							LIMIT 1;`
 	}
 };
