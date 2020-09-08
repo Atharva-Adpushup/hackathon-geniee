@@ -4,7 +4,7 @@ var browserConfig = require('./browserConfig.js'),
 	dockify = require('./dockify'),
 	commonConsts = require('../config/commonConsts'),
 	Base64 = require('Base64'),
-	UM_LOG_ENDPOINT = '//vastdump-staging.adpushup.com/umlogv2';
+	UM_LOG_ENDPOINT = '//vastdump-staging.adpushup.com/umlogv5';
 
 module.exports = {
 	log: function() {
