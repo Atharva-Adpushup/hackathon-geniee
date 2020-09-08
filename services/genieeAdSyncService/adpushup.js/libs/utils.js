@@ -805,7 +805,7 @@ module.exports = {
 				}
 
 				const payload = {
-					data: { logs },
+					logs,
 					type: eventType,
 					timestamp: +new Date(),
 					pageUrl: window.location.href,
@@ -942,7 +942,8 @@ module.exports = {
 				packetId,
 				type: eventType,
 				timestamp: new Date().getTime(),
-				data: { logs: urmLogs, feedback },
+				logs: urmLogs, 
+				feedback,
 				pageUrl: window.location.href,
 				pageUrlTrimmed: window.location.origin + window.location.pathname
 			};
@@ -982,7 +983,7 @@ module.exports = {
 			const payload = {
 				packetId,
 				type: eventType,
-				data: { logs: urmLogs },
+				logs: urmLogs,
 				timestamp: new Date().getTime(),
 				pageUrl: window.location.href,
 				pageUrlTrimmed: window.location.origin + window.location.pathname
