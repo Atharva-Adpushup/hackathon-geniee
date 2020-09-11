@@ -444,11 +444,13 @@ const randomStore = [],
 			}
 		},
 		queryParams: function() {
-			const str = window.location.search,
+			const str = window.location.search || '',
 				objURL = {};
 
 			str.replace(new RegExp('([^?=&]+)(=([^&]*))?', 'g'), ($0, $1, $2, $3) => {
-				objURL[$1] = window.decodeURIComponent($3.replace(/\+/g, ' '));
+				if ($1 && $3) { //$3 becomes undefined if there's no value for a query param
+					objURL[$1] = window.decodeURIComponent($3.replace(/\+/g, ' '));
+				}
 			});
 			return objURL;
 		},
