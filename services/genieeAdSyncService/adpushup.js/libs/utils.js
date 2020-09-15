@@ -787,8 +787,8 @@ module.exports = {
 					type: eventType,
 					timestamp: +new Date(),
 					pageUrl: window.location.href,
-					pageUrlTrimmed: window.location.origin + window.location.pathname,
-					domain: window.location.origin
+					path: window.location.pathname,
+					domain: window.location.host
 				};
 
 				// TODO move URLs to config
@@ -873,8 +873,8 @@ module.exports = {
 				timestamp: new Date().getTime(),
 				logs: urmTargettingLogs,
 				pageUrl: window.location.href,
-				pageUrlTrimmed: window.location.origin + window.location.pathname,
-				domain: window.location.origin
+				path: window.location.pathname,
+				domain: window.location.host
 			};
 
 			// TODO move url to config
@@ -913,8 +913,8 @@ module.exports = {
 				logs: urmLogs,
 				feedback,
 				pageUrl: window.location.href,
-				pageUrlTrimmed: window.location.origin + window.location.pathname,
-				domain: window.location.origin
+				path: window.location.pathname,
+				domain: window.location.host
 			};
 			// TODO move url to config
 			this.createAndFireImagePixelForUmLog(payload);
@@ -949,8 +949,8 @@ module.exports = {
 				logs: urmLogs,
 				timestamp: new Date().getTime(),
 				pageUrl: window.location.href,
-				pageUrlTrimmed: window.location.origin + window.location.pathname,
-				domain: window.location.origin
+				path: window.location.pathname,
+				domain: window.location.host
 			};
 
 			// TODO move url to config
