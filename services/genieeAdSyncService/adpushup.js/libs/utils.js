@@ -4,7 +4,7 @@ var browserConfig = require('./browserConfig.js'),
 	dockify = require('./dockify'),
 	commonConsts = require('../config/commonConsts'),
 	Base64 = require('Base64'),
-	UM_LOG_ENDPOINT = '//vastdump-staging.adpushup.com/umlogv5';
+	UM_LOG_ENDPOINT = '//app-log.adpushup.com/umlogv5?data=';
 
 module.exports = {
 	log: function() {
@@ -681,34 +681,12 @@ module.exports = {
 			return {};
 		}
 	},
-	sendUmLog: function(logs, type) {
-		
-		if (!logs) return false;
-		if(this.apFeedbackSent && type === 'ap-feedback') return false;
+	createAndFireImagePixelForUmLog: function(json) {
+		var data = this.base64Encode(JSON.stringify(json));
+		var imgSrc = UM_LOG_ENDPOINT + data;
 
-		if(type === 'ap-feedback') {
-			this.apFeedbackSent = true;
-		}
-		let adpConfig = window.adpushup.config;
-		// get packet Id
-		const packetId = adpConfig.packetId;
-		const data = {
-			logs,
-			packetId,
-			timestamp: +new Date()
-		};
-
-		if ((typeof type === 'string' || type instanceof String) && type) {
-			data.type = type;
-		}
-
-		return $.post({
-			url: UM_LOG_ENDPOINT,
-			data: JSON.stringify(data),
-			contentType: 'application/json',
-			processData: false,
-			dataType: 'json'
-		});
+		this.fireImagePixel(imgSrc);
+		return true;
 	},
 	fetchAndSetKeyValueForUrlReporting: function(adp) {
 		const { utils } = adp;
@@ -809,17 +787,12 @@ module.exports = {
 					type: eventType,
 					timestamp: +new Date(),
 					pageUrl: window.location.href,
-					pageUrlTrimmed: window.location.origin + window.location.pathname
+					pageUrlTrimmed: window.location.origin + window.location.pathname,
+					domain: window.location.origin
 				};
 
 				// TODO move URLs to config
-				$.post({
-					url: UM_LOG_ENDPOINT,
-					data: JSON.stringify(payload),
-					contentType: 'application/json',
-					processData: false,
-					dataType: 'json'
-				});
+				this.createAndFireImagePixelForUmLog(payload);
 
 				window.adpushup.config.isInitialPerformanceLogSent = true;
 				eventLogger.removeLogsByEventType(eventType);
@@ -900,17 +873,12 @@ module.exports = {
 				timestamp: new Date().getTime(),
 				logs: urmTargettingLogs,
 				pageUrl: window.location.href,
-				pageUrlTrimmed: window.location.origin + window.location.pathname
+				pageUrlTrimmed: window.location.origin + window.location.pathname,
+				domain: window.location.origin
 			};
 
 			// TODO move url to config
-			$.post({
-				url: UM_LOG_ENDPOINT,
-				data: JSON.stringify(payload),
-				dataType: 'json',
-				processData: false,
-				contentType: 'application/json'
-			});
+			this.createAndFireImagePixelForUmLog(payload);
 
 			eventLogger.removeLogsByEventType(eventType);
 		} catch (error) {
@@ -942,19 +910,14 @@ module.exports = {
 				packetId,
 				type: eventType,
 				timestamp: new Date().getTime(),
-				logs: urmLogs, 
+				logs: urmLogs,
 				feedback,
 				pageUrl: window.location.href,
-				pageUrlTrimmed: window.location.origin + window.location.pathname
+				pageUrlTrimmed: window.location.origin + window.location.pathname,
+				domain: window.location.origin
 			};
 			// TODO move url to config
-			$.post({
-				url: UM_LOG_ENDPOINT,
-				data: JSON.stringify(payload),
-				contentType: 'application/json',
-				processData: false,
-				dataType: 'json'
-			});
+			this.createAndFireImagePixelForUmLog(payload);
 
 			window.adpushup.config.isURMPageFeedbackSent = true;
 			eventLogger.removeLogsByEventType(eventType);
@@ -986,17 +949,12 @@ module.exports = {
 				logs: urmLogs,
 				timestamp: new Date().getTime(),
 				pageUrl: window.location.href,
-				pageUrlTrimmed: window.location.origin + window.location.pathname
+				pageUrlTrimmed: window.location.origin + window.location.pathname,
+				domain: window.location.origin
 			};
 
 			// TODO move url to config
-			$.post({
-				url: UM_LOG_ENDPOINT,
-				data: JSON.stringify(payload),
-				contentType: 'application/json',
-				processData: false,
-				dataType: 'json'
-			});
+			this.createAndFireImagePixelForUmLog(payload);
 
 			window.adpushup.config.isURMPageFeedbackSent = true;
 			eventLogger.removeLogsByEventType(eventType);
