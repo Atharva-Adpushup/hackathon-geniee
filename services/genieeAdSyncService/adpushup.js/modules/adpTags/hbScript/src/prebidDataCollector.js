@@ -34,11 +34,10 @@ var w = null,
 var helpers = {
 	getSlotsAuctioned: function(auctionEndData) {
 		var slots = {};
+		var slotsData = isApLiteActive ? w.apLite.adpSlots : w.adpushup.adpTags.adpSlots;
 
 		auctionEndData['adUnitCodes'].forEach(function(adUnitCode) {
-			var slot = isApLiteActive
-				? w.apLite.adpSlots[adUnitCode]
-				: w.adpushup.adpTags.adpSlots[adUnitCode];
+			var slot = slotsData[adUnitCode];
 
 			if (slot) {
 				slots[adUnitCode] = slot;
@@ -47,19 +46,43 @@ var helpers = {
 
 		return slots;
 	},
-	collectAdUnitPrebidWinner: function(adUnitPrebidWinner, adUnitAuctionData, auctionEndData) {
+	collectAdUnitPrebidWinner: function(
+		adUnitPrebidWinner,
+		adUnitAuctionData,
+		auctionEndData,
+		adUnitCode,
+		adUnits
+	) {
 		if (Object.keys(adUnitPrebidWinner).length) {
 			var adId = adUnitPrebidWinner['hb_ap_adid'];
 			var bids = auctionEndData.bidsReceived;
+			var currentAuctionId = auctionEndData.auctionId;
 
 			// get the calculated cpm of the winning bid
 			var winningBid = helpers.findBidByAdId(adId, bids);
+
+			// getAdserverTargeting may give details of a bid from previous auction which didn't win as we also reuse the bids that didn't win in future auctions for comparing the cpm with future bids. The highest cpm bid is chosen which could be a bid from previous auctions
+			// try to find the ad in the previous auctions
+			if (!winningBid) {
+				utils.log(`winning bid not found in current auction`);
+				var previousAuctionBids = helpers.getBidsForAdUnitFromPreviousAuctions(
+					adUnitCode,
+					adUnits,
+					currentAuctionId
+				);
+				winningBid = helpers.findBidByAdId(adId, previousAuctionBids);
+				utils.log(`winning bid from previous auction`, winningBid);
+			} else {
+				utils.log(`winning bid found in current auction`, winningBid);
+			}
 
 			if (winningBid) {
 				var cpm = calculateBidCpmForFeedback(winningBid);
 				adUnitAuctionData['prebidWinner'] = adUnitPrebidWinner['hb_ap_bidder'];
 				adUnitAuctionData['prebidWinnerAdUnitId'] = adUnitPrebidWinner['hb_ap_adid'];
 				adUnitAuctionData['prebidWinnerCpm'] = cpm / 1000;
+			} else {
+				utils.log(`winning bid not found`);
 			}
 		}
 	},
@@ -79,6 +102,10 @@ var helpers = {
 				var cpm = calculateBidCpmForFeedback(bid);
 
 				var bidData = {
+					cpm: bid['cpm'],
+					adId: bid['adId'],
+					originalCpm: bid['originalCpm'],
+					// fields above are used for calculating cpm if this bid is compared with future bids and be the one with the highest cpm
 					bidder: bid['bidder'],
 					revenue: cpm / 1000,
 					formatType: mediaType,
@@ -109,7 +136,8 @@ var helpers = {
 				}
 
 				var commonAdUnitData = {
-					sectionId: (slot.optionalParam && slot.optionalParam.originalId) || slot.sectionId,
+					sectionId:
+						(slot.optionalParam && slot.optionalParam.originalId) || slot.sectionId,
 					sectionName: slot.sectionName,
 					placement: slot.isATF,
 					refreshCount: slot.refreshCount,
@@ -134,7 +162,9 @@ var helpers = {
 				this.collectAdUnitPrebidWinner(
 					adUnitPrebidWinner,
 					adUnitAuctionData,
-					auctionEndData
+					auctionEndData,
+					adUnitCode,
+					adUnits
 				);
 			}
 		});
@@ -210,6 +240,22 @@ var helpers = {
 		}
 
 		return false;
+	},
+	getBidsForAdUnitFromPreviousAuctions: function(adUnitCode, adUnits, currentAuctionId) {
+		var previousBids = [];
+		var adUnitData = adUnits[adUnitCode];
+
+		Object.keys(adUnitData).forEach(function(auctionId) {
+			if (auctionId !== currentAuctionId) {
+				var auctionData = adUnitData[auctionId];
+
+				if (auctionData && auctionData.bids.length) {
+					previousBids = previousBids.concat(auctionData.bids);
+				}
+			}
+		});
+
+		return previousBids;
 	}
 };
 
@@ -241,7 +287,7 @@ var feedback = {
 
 		return adp.$.get(
 			constants.FEEDBACK.AUCTION_FEEDBACK_URL +
-			adp.utils.base64Encode(JSON.stringify(feedbackData))
+				adp.utils.base64Encode(JSON.stringify(feedbackData))
 		);
 	}
 };
