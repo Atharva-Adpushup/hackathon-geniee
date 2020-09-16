@@ -196,7 +196,7 @@ var $ = require('../../libs/jquery'),
 										}),
 										sectionId = apLiteAdUnit && apLiteAdUnit.sectionId,
 										container;
-									
+
 										try {
 											container = $(`#${cssescape(gptSlotElementId)}`);
 										} catch (error) {
@@ -204,10 +204,9 @@ var $ = require('../../libs/jquery'),
 											window.adpushup.err.push(error);
 										}
 
+
 									// Create adp slot only if defined GPT slot has the associated container in the DOM and gpt ad unit has a valid section id
-									if (container.length && dfpAdUnitName) {
-										//filter out units provided to us
-										if (sectionId) {
+									if (container.length && dfpAdUnitName && sectionId) {
 											var dfpAdunitCode = apLiteAdUnit.dfpAdunitCode,
 												slotHbStatus = apLiteAdUnit.headerBidding,
 												refreshSlot = apLiteAdUnit.refreshSlot,
@@ -271,7 +270,7 @@ var $ = require('../../libs/jquery'),
 											//collect rest of the units (not provided to us) separately
 											nonApSlots.push(gptSlot);
 										}
-									}
+
 								}.bind(this)
 							);
 						}
