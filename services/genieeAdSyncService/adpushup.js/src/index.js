@@ -351,6 +351,9 @@ function main() {
 	// Set user syncing cookies
 	syncUser();
 
+	// disable header bidding if query param contains `?adpushupHeaderBiddingDisabled=true`
+	adp.services.HB_ACTIVE = adp.services.HB_ACTIVE && !utils.getQueryParams().adpushupHeaderBiddingDisabled;
+
 	// Initialise adp config
 	initAdpConfig();
 
