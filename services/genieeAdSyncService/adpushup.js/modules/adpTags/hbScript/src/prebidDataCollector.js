@@ -71,6 +71,7 @@ var helpers = {
 					currentAuctionId
 				);
 				winningBid = helpers.findBidByAdId(adId, previousAuctionBids);
+				adUnitAuctionData.bids.push(winningBid);
 				utils.log(`winning bid from previous auction`, winningBid);
 			} else {
 				utils.log(`winning bid found in current auction`, winningBid);
