@@ -10,7 +10,7 @@ var s2sConfigGen = require('./s2sConfigGen');
 const commonConsts = require('../../../../config/commonConsts');
 
 const country = window.adpushup.config.country;
-const doesGdprApplies = country && commonConsts.EU_COUNTRY_LIST.indexOf[country] > -1;
+const doesGdprApplies = country && commonConsts.EU_COUNTRY_LIST.indexOf(country) > -1;
 
 var auction = {
 	end: function(adpBatchId) {
