@@ -8,6 +8,10 @@ var constants = require('./constants');
 var render = require('./render');
 var s2sConfigGen = require('./s2sConfigGen');
 const commonConsts = require('../../../../config/commonConsts');
+
+const country = window.adpushup.config.country;
+const doesGdprApplies = country && commonConsts.EU_COUNTRY_LIST.indexOf[country] > -1;
+
 var auction = {
 	end: function(adpBatchId) {
 		var adpBatches = adpConfig.apLiteActive
@@ -212,7 +216,7 @@ var auction = {
 				gdpr: {
 					cmpApi: 'iab',
 					timeout: 8000,
-					defaultGdprScope: true
+					defaultGdprScope: false
 				},
 				usp: {
 					cmpApi: 'iab',
@@ -220,6 +224,10 @@ var auction = {
 				}
 			}
 		};
+
+		if (doesGdprApplies){
+			pbConfig.consentManagement.gdpr.defaultGdprScope = true;
+		}
 
 		const s2sConfigObj = s2sConfigGen.generateS2SConfig(prebidAuctionTimeOut);
 		if (s2sConfigObj) {
