@@ -7,6 +7,8 @@ import BackupAds from './BackupAds/index';
 import TopXPathMissAndModeURL from './TopXPathMissAndModeURL ';
 import LostFoundLiveSites from './LostFoundLiveSites/index';
 import AdsTxtLiveSitesEntries from './AdsTxtLiveSitesEntries';
+import BidderSettings from './BidderSettings';
+
 class Tools extends Component {
 	state = {
 		activeKey: TOOLS_IDENTIFIERS.BACKUP_ADS
@@ -43,6 +45,10 @@ class Tools extends Component {
 
 			case TOOLS_IDENTIFIERS.REGEX_GENERATION:
 				return 'Regex Generation';
+			case TOOLS_IDENTIFIERS.BIDDER_CONFIGURATIONS:
+				return (
+					<BidderSettings networks={networkConfig} updateNetworkConfig={updateNetworkConfig} />
+				);
 		}
 	};
 
@@ -73,6 +79,10 @@ class Tools extends Component {
 
 								<NavItem eventKey={TOOLS_IDENTIFIERS.ADS_TXT_LIVE_SITES}>
 									Ads.txt Entries Live Sites
+								</NavItem>
+
+								<NavItem eventKey={TOOLS_IDENTIFIERS.BIDDER_CONFIGURATIONS}>
+									Bidders Configurations
 								</NavItem>
 
 								{/* <NavItem eventKey={TOOLS_IDENTIFIERS.REGEX_GENERATION}>Regex Generation</NavItem> */}
