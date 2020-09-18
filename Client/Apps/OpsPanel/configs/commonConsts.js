@@ -195,6 +195,7 @@ const GDPR = {
 	compliance: false,
 	cookieControlConfig: {
 		apiKey: '065eea801841ec9ad57857fa1f5248a14f27bb3e',
+		iabCMP: true,
 		product: 'PRO_MULTISITE',
 		optionalCookies: [
 			{
