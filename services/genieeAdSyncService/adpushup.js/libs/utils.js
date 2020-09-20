@@ -4,8 +4,8 @@ var browserConfig = require('./browserConfig.js'),
 	dockify = require('./dockify'),
 	commonConsts = require('../config/commonConsts'),
 	Base64 = require('Base64'),
-	UM_LOG_ENDPOINT = '//app-log.adpushup.com/umlogv5?data=';
-	UM_LOG_KEEN_ENDPOINT = 'https://api.keen.io/3.0/projects/5f649d53baa9361962e0c82f/events/umlogv1?api_key=e90f57cbf658ec484612d55d19bfd8afe09d98e3495e8db39354bd578887451d82a450528af4d01833c28b6a5b0d1be4c8656bee325f33f49e0cc311bdfadbf237261f8121640d002819b2bc6f1b2df9b2c8b0ee797d605ca9a738c280e71cbe&data=';
+	UM_LOG_ENDPOINT = '//app-log.adpushup.com/umlogv5?data=',
+	UM_LOG_KEEN_ENDPOINT = '//api.keen.io/3.0/projects/5f649d53baa9361962e0c82f/events/umlogv1?api_key=e90f57cbf658ec484612d55d19bfd8afe09d98e3495e8db39354bd578887451d82a450528af4d01833c28b6a5b0d1be4c8656bee325f33f49e0cc311bdfadbf237261f8121640d002819b2bc6f1b2df9b2c8b0ee797d605ca9a738c280e71cbe&data=';
 
 module.exports = {
 	log: function() {
