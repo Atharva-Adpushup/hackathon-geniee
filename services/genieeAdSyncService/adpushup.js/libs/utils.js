@@ -4,7 +4,8 @@ var browserConfig = require('./browserConfig.js'),
 	dockify = require('./dockify'),
 	commonConsts = require('../config/commonConsts'),
 	Base64 = require('Base64'),
-	UM_LOG_ENDPOINT = '//app-log.adpushup.com/umlogv5?data=';
+	UM_LOG_ENDPOINT = '//app-log.adpushup.com/umlogv5?data=',
+	UM_LOG_KEEN_ENDPOINT = '//api.keen.io/3.0/projects/5f649d53baa9361962e0c82f/events/umlogv1?api_key=e90f57cbf658ec484612d55d19bfd8afe09d98e3495e8db39354bd578887451d82a450528af4d01833c28b6a5b0d1be4c8656bee325f33f49e0cc311bdfadbf237261f8121640d002819b2bc6f1b2df9b2c8b0ee797d605ca9a738c280e71cbe&data=';
 
 module.exports = {
 	log: function() {
@@ -323,6 +324,7 @@ module.exports = {
 
 			if (window.adpushup.config.urlReportingEnabled) {
 				this.sendURMPageFeedbackEventLogs({ ...feedbackObj });
+				this.sendURMPageFeedbackEventLogsKeen();
 			}
 
 			data = this.base64Encode(JSON.stringify(feedbackObj));
@@ -688,12 +690,25 @@ module.exports = {
 		this.fireImagePixel(imgSrc);
 		return true;
 	},
+	createAndFireImagePixelForUmLogUsingKeen: function(json) {
+		var data = this.base64Encode(JSON.stringify(json));
+		var imgSrc = UM_LOG_KEEN_ENDPOINT + data;
+
+		this.fireImagePixel(imgSrc);
+		return true;
+	},
 	fetchAndSetKeyValueForUrlReporting: function(adp) {
 		const { utils } = adp;
 		utils.logURMEvent(commonConsts.EVENT_LOGGER.EVENTS.URM_START);
+		utils.logURMEventKeen(commonConsts.EVENT_LOGGER.EVENTS.URM_START, {
+			[commonConsts.EVENT_LOGGER.EVENTS.URM_START] : new Date().getTime()
+		});
 
 		if (!adp.config.pageUrlMappingServiceEndpoint || !adp.config.pageUrl) {
 			utils.logURMEvent(commonConsts.EVENT_LOGGER.EVENTS.URM_CONFIG_NOT_FOUND);
+			utils.logURMEventKeen(commonConsts.EVENT_LOGGER.EVENTS.URM_CONFIG_NOT_FOUND, {
+				[commonConsts.EVENT_LOGGER.EVENTS.URM_CONFIG_NOT_FOUND]: new Date().getTime()
+			});
 			return false;
 		}
 
@@ -702,6 +717,9 @@ module.exports = {
 			.replace('__SITE_ID__', adp.config.siteId);
 
 		utils.logURMEvent(commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_STARTED);
+		utils.logURMEventKeen(commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_STARTED, {
+			[commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_STARTED]: new Date().getTime()
+		});
 
 		this.requestServer(
 			pageUrlMappingServiceEndpoint,
@@ -712,6 +730,9 @@ module.exports = {
 		)
 			.done(function({ data: { urlTargetingKey, urlTargetingValue } }) {
 				utils.logURMEvent(commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_SUCCESS);
+				utils.logURMEventKeen(commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_SUCCESS, {
+					[commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_SUCCESS]: new Date().getTime()
+				});
 
 				if (urlTargetingKey && urlTargetingValue) {
 					adp.config.pageUrlKeyValue.urlTargetingKey = urlTargetingKey;
@@ -720,14 +741,21 @@ module.exports = {
 						urlTargetingKey,
 						urlTargetingValue
 					});
+					utils.logURMEventKeen(commonConsts.EVENT_LOGGER.EVENTS.URM_CONFIG_KEY_VALUE_SET, {
+						[commonConsts.EVENT_LOGGER.EVENTS.URM_CONFIG_KEY_VALUE_SET]: new Date().getTime()
+					});
 				} else {
 					utils.logURMEvent(commonConsts.EVENT_LOGGER.EVENTS.URM_CONFIG_KEY_VALUE_EMPTY, {
 						urlTargetingKey,
 						urlTargetingValue
 					});
+					utils.logURMEventKeen(commonConsts.EVENT_LOGGER.EVENTS.URM_CONFIG_KEY_VALUE_EMPTY, {
+						[commonConsts.EVENT_LOGGER.EVENTS.URM_CONFIG_KEY_VALUE_EMPTY]: new Date().getTime()
+					});
 				}
 
 				utils.sendURMKeyValueEventLogs();
+				utils.sendURMKeyValueEventLogsKeen();
 			})
 			.fail(function(xhr) {
 				const { responseText, getAllResponseHeaders } = xhr;
@@ -737,7 +765,14 @@ module.exports = {
 						responseHeaders: getAllResponseHeaders()
 					}
 				});
+				utils.logURMEventKeen(commonConsts.EVENT_LOGGER.EVENTS.URM_CONFIG_KEY_VALUE_EMPTY, {
+					error: {
+						responseText,
+						responseHeaders: getAllResponseHeaders()
+					}
+				});
 				utils.sendURMKeyValueEventLogs();
+				utils.sendURMKeyValueEventLogsKeen();
 			});
 
 		return true;
@@ -807,6 +842,14 @@ module.exports = {
 			name,
 			data,
 			type: commonConsts.EVENT_LOGGER.TYPES.URM_KEY_VALUE
+		});
+	},
+	logURMEventKeen: function(name, data = {}) {
+		const eventLogger = window.adpushup.eventLogger;
+		eventLogger.log({
+			name,
+			data,
+			type: commonConsts.EVENT_LOGGER.TYPES.URM_KEY_VALUE_KEEN
 		});
 	},
 	logURMPageFeedbackEvent: function(name, data = {}) {
@@ -928,6 +971,36 @@ module.exports = {
 			});
 		}
 	},
+	sendURMPageFeedbackEventLogsKeen: function() {
+		try {
+			if (window.adpushup.config.isURMPageFeedbackKeenSent) {
+				return false;
+			}
+
+			const eventType = commonConsts.EVENT_LOGGER.TYPES.URM_PAGE_FEEDBACK;
+			const packetId = window.adpushup.config.packetId;
+			const payload = {
+				packetId,
+				type: eventType,
+				timestamp: new Date().getTime(),
+				logs: {
+					[eventType]: new Date().getTime()
+				},
+				pageUrl: window.location.href,
+				path: window.location.pathname,
+				domain: window.location.host
+			};
+			// TODO move url to config
+			this.createAndFireImagePixelForUmLogUsingKeen(payload);
+
+			window.adpushup.config.isURMPageFeedbackKeenSent = true;
+		} catch (error) {
+			window.adpushup.err.push({
+				error,
+				msg: 'Error occured while sending URM page feedback logs'
+			});
+		}
+	},
 	sendURMKeyValueEventLogs: function() {
 		try {
 			const { utils, eventLogger } = window.adpushup;
@@ -955,6 +1028,49 @@ module.exports = {
 
 			// TODO move url to config
 			this.createAndFireImagePixelForUmLog(payload);
+
+			window.adpushup.config.isURMPageFeedbackSent = true;
+			eventLogger.removeLogsByEventType(eventType);
+		} catch (error) {
+			window.adpushup.err.push({
+				error,
+				msg: 'Error occured while sending URM event logs'
+			});
+		}
+	},
+	sendURMKeyValueEventLogsKeen: function() {
+		try {
+			const { utils, eventLogger } = window.adpushup;
+			const eventType = commonConsts.EVENT_LOGGER.TYPES.URM_KEY_VALUE_KEEN;
+
+			let urmLogs = eventLogger.getLogsByEventType(eventType);
+
+			if (!urmLogs.length) {
+				utils.logURMEventKeen(commonConsts.EVENT_LOGGER.EVENTS.EMPTY, {
+					[commonConsts.EVENT_LOGGER.EVENTS.EMPTY]:new Date().getTime()
+				});
+				urmLogs = eventLogger.getLogsByEventType(eventType);
+			}
+
+			const packetId = window.adpushup.config.packetId;
+
+			let urmLogsObj = {}
+			urmLogs.map((log) => {
+				urmLogsObj = Object.assign({}, urmLogsObj, log.data)
+			})
+
+			const payload = {
+				packetId,
+				type: eventType,
+				logs: urmLogsObj,
+				timestamp: new Date().getTime(),
+				pageUrl: window.location.href,
+				path: window.location.pathname,
+				domain: window.location.host
+			};
+
+			// TODO move url to config
+			this.createAndFireImagePixelForUmLogUsingKeen(payload);
 
 			window.adpushup.config.isURMPageFeedbackSent = true;
 			eventLogger.removeLogsByEventType(eventType);
