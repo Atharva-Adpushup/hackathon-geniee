@@ -5,7 +5,7 @@ var browserConfig = require('./browserConfig.js'),
 	commonConsts = require('../config/commonConsts'),
 	Base64 = require('Base64'),
 	UM_LOG_ENDPOINT = '//app-log.adpushup.com/umlogv5?data=',
-	UM_LOG_KEEN_ENDPOINT = '//api.keen.io/3.0/projects/5f649d53baa9361962e0c82f/events/umlogv1?api_key=e90f57cbf658ec484612d55d19bfd8afe09d98e3495e8db39354bd578887451d82a450528af4d01833c28b6a5b0d1be4c8656bee325f33f49e0cc311bdfadbf237261f8121640d002819b2bc6f1b2df9b2c8b0ee797d605ca9a738c280e71cbe&data=';
+	UM_LOG_KEEN_ENDPOINT = '//api.keen.io/3.0/projects/5f6455365cf9803b3732965b/events/umlogv1?api_key=a871c7c98adc1b99fbf72820e0704d22bdcae4b9a1d0e2af20b46fe3cf2087d5def88f1e829db5715b4db29f18110d61c5896928ea0fde2e46a2116e91eb24aeb1656ed4a7a58db13f54ae1f8825ea690a34cfaa8001912d88266b9349140537&data=';
 
 module.exports = {
 	log: function() {
