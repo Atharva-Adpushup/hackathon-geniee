@@ -728,7 +728,8 @@ module.exports = {
 			'GET',
 			'json'
 		)
-			.done(function({ data: { urlTargetingKey, urlTargetingValue } }) {
+			.done(function({ data: {urlKeys: { urlTargetingKey, urlTargetingValue }, utmKeys={}} }) {
+
 				utils.logURMEvent(commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_SUCCESS);
 				utils.logURMEventKeen(commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_SUCCESS, {
 					[commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_SUCCESS]: new Date().getTime()
@@ -737,6 +738,12 @@ module.exports = {
 				if (urlTargetingKey && urlTargetingValue) {
 					adp.config.pageUrlKeyValue.urlTargetingKey = urlTargetingKey;
 					adp.config.pageUrlKeyValue.urlTargetingValue = urlTargetingValue;
+
+					adp.config.pageUTMKeyValue = []
+					Object.keys(utmKeys).map((type) => {
+						adp.config.pageUTMKeyValue.push(utmKeys[type])
+					})
+
 					utils.logURMEvent(commonConsts.EVENT_LOGGER.EVENTS.URM_CONFIG_KEY_VALUE_SET, {
 						urlTargetingKey,
 						urlTargetingValue
