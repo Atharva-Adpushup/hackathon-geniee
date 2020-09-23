@@ -27,7 +27,7 @@ module.exports = {
 	ANALYTICS_API_ROOT: reportingBaseURL,
 	ANALYTICS_METAINFO_URL: '/common/metaInfo',
 	REPORT_PATH: '/site/report?report_name=get_stats_by_custom',
-	URL_REPORT_PATH: '/url/report?report_name=GET_STATS_BY_CUSTOM',
+	URL_REPORT_PATH: '/url/report?report_name=url_report',
 	DFP_LINE_ITEM_AUTOMATION_API: 'https://api.adpushup.com/DfpInventoryWebService/job',
 	PAGEGROUP_LIST_API: `${reportingBaseURL}/site/list`,
 	DEMO_ACCOUNT_EMAIL: 'demo@adpushup.com',
