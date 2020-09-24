@@ -592,17 +592,7 @@ function storedRequestWrapper(doc) {
 }
 
 function publishAdPushupBuild(siteId) {
-	var options = {
-		method: 'POST',
-		uri: `${config.queuePublishingURL}/publish`,
-		body: {
-			queue: 'CDN_SYNC',
-			data: { siteId }
-		},
-		json: true
-	};
-
-	return request(options);
+	adpushup.emit('siteSaved', siteId);
 }
 
 module.exports = {

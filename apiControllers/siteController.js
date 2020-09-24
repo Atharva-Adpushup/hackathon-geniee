@@ -741,8 +741,10 @@ router
 
 		return siteModel
 			.getSiteById(siteId)
-			.then(() => publishAdPushupBuild(siteId))
-			.then(() => res.json({ message: 'Build pushed' }))
+			.then(() => {
+				publishAdPushupBuild(siteId);
+				return res.json({ message: 'Build pushed' });
+			})
 			.catch(e => {
 				if (e instanceof AdPushupError) {
 					// site id not found.
