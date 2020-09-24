@@ -728,27 +728,33 @@ module.exports = {
 			'GET',
 			'json'
 		)
-			.done(function({ data: { urlTargetingKey, urlTargetingValue } }) {
+			.done(function({ data: {urlKeys: { urlTargetingKey, urlTargetingValue }, utmKeys={}} }) {
+
 				utils.logURMEvent(commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_SUCCESS);
 				utils.logURMEventKeen(commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_SUCCESS, {
 					[commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_SUCCESS]: new Date().getTime()
 				});
 
+				let logObject = {
+					urlTargetingKey,
+					urlTargetingValue
+				}
+
+				Object.keys(utmKeys).map((type) => {
+					adp.config.pageUTMKeyValue.push(utmKeys[type]);
+					logObject[utmKeys[type].utmTargetingKey] = utmKeys[type].utmTargetingValue;
+				});
+
 				if (urlTargetingKey && urlTargetingValue) {
 					adp.config.pageUrlKeyValue.urlTargetingKey = urlTargetingKey;
 					adp.config.pageUrlKeyValue.urlTargetingValue = urlTargetingValue;
-					utils.logURMEvent(commonConsts.EVENT_LOGGER.EVENTS.URM_CONFIG_KEY_VALUE_SET, {
-						urlTargetingKey,
-						urlTargetingValue
-					});
+	
+					utils.logURMEvent(commonConsts.EVENT_LOGGER.EVENTS.URM_CONFIG_KEY_VALUE_SET, logObject);
 					utils.logURMEventKeen(commonConsts.EVENT_LOGGER.EVENTS.URM_CONFIG_KEY_VALUE_SET, {
 						[commonConsts.EVENT_LOGGER.EVENTS.URM_CONFIG_KEY_VALUE_SET]: new Date().getTime()
 					});
 				} else {
-					utils.logURMEvent(commonConsts.EVENT_LOGGER.EVENTS.URM_CONFIG_KEY_VALUE_EMPTY, {
-						urlTargetingKey,
-						urlTargetingValue
-					});
+					utils.logURMEvent(commonConsts.EVENT_LOGGER.EVENTS.URM_CONFIG_KEY_VALUE_EMPTY, logObject);
 					utils.logURMEventKeen(commonConsts.EVENT_LOGGER.EVENTS.URM_CONFIG_KEY_VALUE_EMPTY, {
 						[commonConsts.EVENT_LOGGER.EVENTS.URM_CONFIG_KEY_VALUE_EMPTY]: new Date().getTime()
 					});

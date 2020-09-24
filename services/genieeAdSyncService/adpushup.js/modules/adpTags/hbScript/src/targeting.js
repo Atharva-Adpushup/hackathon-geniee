@@ -175,16 +175,24 @@ var targeting = {
 		if (adp.config.urlReportingEnabled) {
 			const { urlTargetingKey, urlTargetingValue } = window.adpushup.config.pageUrlKeyValue;
 			const { utils } = window.adpushup;
+			const { pageUTMKeyValue } = window.adpushup.config;
 
 			if (urlTargetingKey && urlTargetingValue) {
 				pageLevelTargeting[urlTargetingKey] = urlTargetingValue;
 
-				utils.logURMTargettingEvent(
-					commonConsts.EVENT_LOGGER.EVENTS.URM_TARGETING_KEY_VALUE_SET,
-					{
+				let logObject = {
 						urlTargetingKey,
 						urlTargetingValue
-					}
+				}
+
+				pageUTMKeyValue && pageUTMKeyValue.map((utmKeyValue) => {
+					pageLevelTargeting[utmKeyValue.utmTargetingKey] = utmKeyValue.utmTargetingValue;
+					logObject[utmKeyValue.utmTargetingKey] = utmKeyValue.utmTargetingValue;
+				})
+
+				utils.logURMTargettingEvent(
+					commonConsts.EVENT_LOGGER.EVENTS.URM_TARGETING_KEY_VALUE_SET,
+					logObject
 				);
 			} else {
 				utils.logURMTargettingEvent(
