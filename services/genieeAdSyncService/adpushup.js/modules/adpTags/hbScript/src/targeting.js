@@ -184,12 +184,11 @@ var targeting = {
 						urlTargetingKey,
 						urlTargetingValue
 				}
-				if(pageUTMKeyValue) {
-					pageUTMKeyValue.map((utmKeyValue) => {
-							pageLevelTargeting[utmKeyValue.utmTargetingKey] = utmKeyValue.utmTargetingValue
-							logObject[utmKeyValue.utmTargetingKey] = utmKeyValue.utmTargetingValue
-					})
-				}
+
+				pageUTMKeyValue && pageUTMKeyValue.map((utmKeyValue) => {
+					pageLevelTargeting[utmKeyValue.utmTargetingKey] = utmKeyValue.utmTargetingValue;
+					logObject[utmKeyValue.utmTargetingKey] = utmKeyValue.utmTargetingValue;
+				})
 
 				utils.logURMTargettingEvent(
 					commonConsts.EVENT_LOGGER.EVENTS.URM_TARGETING_KEY_VALUE_SET,
