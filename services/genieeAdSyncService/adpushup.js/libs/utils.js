@@ -739,7 +739,6 @@ module.exports = {
 					adp.config.pageUrlKeyValue.urlTargetingKey = urlTargetingKey;
 					adp.config.pageUrlKeyValue.urlTargetingValue = urlTargetingValue;
 
-					adp.config.pageUTMKeyValue = []
 					Object.keys(utmKeys).map((type) => {
 						adp.config.pageUTMKeyValue.push(utmKeys[type])
 					})
