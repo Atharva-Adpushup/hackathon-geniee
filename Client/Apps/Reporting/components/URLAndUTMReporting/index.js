@@ -341,7 +341,8 @@ class Report extends Component {
 					});
 				});
 				this.setState({
-					pagesFetched,
+					isPreFetchingStarted: false,
+					pagesFetched: pagesFetched + 1,
 					tableData: Object.assign({}, { ...tableData })
 				});
 			}
@@ -349,22 +350,23 @@ class Report extends Component {
 	};
 
 	onPageChange = pageIndex => {
-		const { pageSize, tableData } = this.state;
+		const { pageSize, tableData, isPreFetchingStarted } = this.state;
 		const totlaRecordsFetched = tableData.result.length;
 		const pageCount = Math.ceil(totlaRecordsFetched / pageSize);
 
-		this.setState(
-			{
-				pageSize,
-				pageIndex
-			},
-			() => {
-				// index start from 0
-				if (pageCount - (pageIndex + 1) <= 1) {
+		// index start from 0
+		if (pageCount - (pageIndex + 1) <= 1 && !isPreFetchingStarted) {
+			this.setState(
+				{
+					pageSize,
+					pageIndex,
+					isPreFetchingStarted: true
+				},
+				() => {
 					this.prefetchTableData();
 				}
-			}
-		);
+			);
+		}
 	};
 
 	onPageSizeChange = (tablePageSize, pageIndex) => {
@@ -477,7 +479,14 @@ class Report extends Component {
 					}
 				}
 
-				newState = { ...newState, isLoading: false, tableData, isURL, pageIndex: 0 };
+				newState = {
+					...newState,
+					isLoading: false,
+					tableData,
+					isURL,
+					pageIndex: 0,
+					pagesFetched: 0
+				};
 				this.setState(newState);
 			});
 		});

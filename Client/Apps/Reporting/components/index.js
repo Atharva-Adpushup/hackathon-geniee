@@ -69,7 +69,7 @@ class ReportsPanel extends Component {
 
 		const sites = Object.values(userSites);
 		sites.map(site => {
-			isURLReportingEnabled = !!site.urlReporting;
+			isURLReportingEnabled = isURLReportingEnabled || !!site.urlReporting;
 			return site;
 		});
 
