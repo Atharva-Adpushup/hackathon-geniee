@@ -137,7 +137,8 @@ const Utils = {
 					name: reportConfig.name,
 					dimension: reportConfig.selectedDimension,
 					filters: reportConfig.selectedFilters,
-					interval: reportConfig.selectedInterval
+					interval: reportConfig.selectedInterval,
+					id: reportConfig.id
 				}
 			},
 			retryOptions: {
@@ -493,7 +494,7 @@ router
 				const cronExpression = Utils.generateCronExpression(interval, startDate);
 				reportConfig.scheduleOptions.cron = cronExpression;
 
-				const scheduledJobData = await Utils.scheduleReportJob(reportConfig);
+				const scheduledJobData = await Utils.scheduleReportJob(reportConfig, user.email);
 				reportConfig.scheduleOptions.jobId = scheduledJobData.job.id;
 			}
 
@@ -639,3 +640,4 @@ router
 		}
 	});
 module.exports = router;
+ 
