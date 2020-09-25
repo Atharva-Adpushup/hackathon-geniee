@@ -271,7 +271,7 @@ class Report extends Component {
 			selectedFilters,
 			selectedInterval
 		} = this.state;
-		const { userSites, defaultReportType } = this.props;
+		const { userSites, defaultReportType, urlReportingSites } = this.props;
 		const { email, reportType } = this.getDemoUserParams();
 
 		const params = {
@@ -290,8 +290,9 @@ class Report extends Component {
 		});
 
 		if (!params.siteid) {
-			const siteIds = Object.keys(userSites);
-			params.siteid = siteIds.toString();
+			// multiple sites are not supported, picking first site from array
+			const [siteId] = urlReportingSites;
+			params.siteid = siteId;
 		}
 
 		if (reportType === 'global' || defaultReportType === 'global') {
@@ -366,6 +367,10 @@ class Report extends Component {
 					this.prefetchTableData();
 				}
 			);
+		} else {
+			this.setState({
+				pageIndex
+			});
 		}
 	};
 

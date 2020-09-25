@@ -174,11 +174,17 @@ const mapStateToProps = (state, ownProps) => {
 			group: ['user']
 		}
 	};
+	const userSites = sites.fetched ? sites.data : {};
+
+	const urlReportingSites = Object.values(userSites)
+		.filter(site => !!site.urlReporting)
+		.map(site => site.siteId);
 
 	return {
 		...ownProps,
 		urlUTMReportingMeta,
-		userSites: sites.fetched ? sites.data : {},
+		userSites,
+		urlReportingSites,
 		user,
 		isHB: false
 	};
