@@ -271,7 +271,7 @@ class Report extends Component {
 			selectedFilters,
 			selectedInterval
 		} = this.state;
-		const { userSites, defaultReportType, urlReportingSites } = this.props;
+		const { defaultReportType, urlReportingSites } = this.props;
 		const { email, reportType } = this.getDemoUserParams();
 
 		const params = {
