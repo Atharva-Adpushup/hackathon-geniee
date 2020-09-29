@@ -5,7 +5,8 @@ var browserConfig = require('./browserConfig.js'),
 	commonConsts = require('../config/commonConsts'),
 	Base64 = require('Base64'),
 	UM_LOG_ENDPOINT = '//app-log.adpushup.com/umlogv5?data=',
-	UM_LOG_KEEN_ENDPOINT = '//api.keen.io/3.0/projects/5f6455365cf9803b3732965b/events/umlogv1?api_key=a871c7c98adc1b99fbf72820e0704d22bdcae4b9a1d0e2af20b46fe3cf2087d5def88f1e829db5715b4db29f18110d61c5896928ea0fde2e46a2116e91eb24aeb1656ed4a7a58db13f54ae1f8825ea690a34cfaa8001912d88266b9349140537&data=';
+	UM_LOG_KEEN_ENDPOINT =
+		'//api.keen.io/3.0/projects/5f6455365cf9803b3732965b/events/umlogv1?api_key=a871c7c98adc1b99fbf72820e0704d22bdcae4b9a1d0e2af20b46fe3cf2087d5def88f1e829db5715b4db29f18110d61c5896928ea0fde2e46a2116e91eb24aeb1656ed4a7a58db13f54ae1f8825ea690a34cfaa8001912d88266b9349140537&data=';
 
 module.exports = {
 	log: function() {
@@ -701,7 +702,7 @@ module.exports = {
 		const { utils } = adp;
 		utils.logURMEvent(commonConsts.EVENT_LOGGER.EVENTS.URM_START);
 		utils.logURMEventKeen(commonConsts.EVENT_LOGGER.EVENTS.URM_START, {
-			[commonConsts.EVENT_LOGGER.EVENTS.URM_START] : new Date().getTime()
+			[commonConsts.EVENT_LOGGER.EVENTS.URM_START]: new Date().getTime()
 		});
 
 		if (!adp.config.pageUrlMappingServiceEndpoint || !adp.config.pageUrl) {
@@ -728,8 +729,12 @@ module.exports = {
 			'GET',
 			'json'
 		)
-			.done(function({ data: {urlKeys: { urlTargetingKey, urlTargetingValue }, utmKeys={}} }) {
-
+			.done(function({
+				data: {
+					urlKeys: { urlTargetingKey, urlTargetingValue },
+					utmKeys = {}
+				}
+			}) {
 				utils.logURMEvent(commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_SUCCESS);
 				utils.logURMEventKeen(commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_SUCCESS, {
 					[commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_SUCCESS]: new Date().getTime()
@@ -738,9 +743,9 @@ module.exports = {
 				let logObject = {
 					urlTargetingKey,
 					urlTargetingValue
-				}
+				};
 
-				Object.keys(utmKeys).map((type) => {
+				Object.keys(utmKeys).map(type => {
 					adp.config.pageUTMKeyValue.push(utmKeys[type]);
 					logObject[utmKeys[type].utmTargetingKey] = utmKeys[type].utmTargetingValue;
 				});
@@ -748,7 +753,7 @@ module.exports = {
 				if (urlTargetingKey && urlTargetingValue) {
 					adp.config.pageUrlKeyValue.urlTargetingKey = urlTargetingKey;
 					adp.config.pageUrlKeyValue.urlTargetingValue = urlTargetingValue;
-	
+
 					utils.logURMEvent(commonConsts.EVENT_LOGGER.EVENTS.URM_CONFIG_KEY_VALUE_SET, logObject);
 					utils.logURMEventKeen(commonConsts.EVENT_LOGGER.EVENTS.URM_CONFIG_KEY_VALUE_SET, {
 						[commonConsts.EVENT_LOGGER.EVENTS.URM_CONFIG_KEY_VALUE_SET]: new Date().getTime()
@@ -1053,17 +1058,17 @@ module.exports = {
 
 			if (!urmLogs.length) {
 				utils.logURMEventKeen(commonConsts.EVENT_LOGGER.EVENTS.EMPTY, {
-					[commonConsts.EVENT_LOGGER.EVENTS.EMPTY]:new Date().getTime()
+					[commonConsts.EVENT_LOGGER.EVENTS.EMPTY]: new Date().getTime()
 				});
 				urmLogs = eventLogger.getLogsByEventType(eventType);
 			}
 
 			const packetId = window.adpushup.config.packetId;
 
-			let urmLogsObj = {}
-			urmLogs.map((log) => {
-				urmLogsObj = Object.assign({}, urmLogsObj, log.data)
-			})
+			let urmLogsObj = {};
+			urmLogs.map(log => {
+				urmLogsObj = Object.assign({}, urmLogsObj, log.data);
+			});
 
 			const payload = {
 				packetId,
@@ -1095,5 +1100,72 @@ module.exports = {
 
 		const headEl = document.getElementsByTagName('head')[0];
 		headEl.appendChild(scriptEl);
+	},
+
+	checkCmp: function() {
+		let f = window;
+		let cmpFrame;
+
+		while (!cmpFrame) {
+			try {
+				if (typeof f.__tcfapi === 'function' || typeof f.__cmp === 'function') {
+					cmpFrame = f;
+					break;
+				}
+			} catch (e) {}
+
+			// need separate try/catch blocks due to the exception errors thrown when trying to check for a frame that doesn't exist in 3rd party env
+			try {
+				if (f.frames['__tcfapiLocator']) {
+					cmpFrame = f;
+					break;
+				}
+			} catch (e) {}
+
+			try {
+				if (f.frames['__cmpLocator']) {
+					cmpFrame = f;
+					break;
+				}
+			} catch (e) {}
+
+			if (f === window.top) break;
+			f = f.parent;
+		}
+		return cmpFrame;
+	},
+
+	findCmp: function(timeout) {
+		const overAllTimeout = timeout;
+		const timerTimeout = 150;
+		let runningTime = 0;
+
+		const self = this;
+		return new Promise((resolve, reject) => {
+			const checkCmpRecursively = time => {
+				setTimeout(() => {
+					try {
+						self.log('in checkCmpRecursively', time, runningTime);
+						const cmpFound = !!self.checkCmp();
+						if (cmpFound) {
+							self.log('in checkCmpRecursively cmp found, resolving');
+							return resolve(cmpFound);
+						}
+						runningTime = runningTime + time;
+						if (runningTime >= overAllTimeout) {
+							self.log('in checkCmpRecursively timeout, rejecting');
+							return reject();
+						}
+
+						checkCmpRecursively(timerTimeout);
+					} catch (e) {
+						self.log('in checkCmpRecursively error, rejecting', e);
+						return reject();
+					}
+				}, time);
+			};
+
+			checkCmpRecursively(0);
+		});
 	}
 };

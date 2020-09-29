@@ -1,5 +1,6 @@
 var adp = window.adpushup,
 	$ = adp.$,
+	apTagQue = [],
 	isMedianetHeaderCodePlaced = false,
 	config = require('../config/config'),
 	utils = require('../libs/utils'),
@@ -159,4 +160,22 @@ var adp = window.adpushup,
 		}
 	};
 
-module.exports = trigger;
+module.exports = {
+	//overwrite original function to execute apTags only if cmp is loaded otherwise push them to a queue for later processing
+	triggerAd: function(adId) {
+		if (adp.config.cmpLoaded) {
+			utils.log('in triggerAd - cmp loaded', adId);
+			trigger(adId);
+		} else {
+			utils.log('in triggerAd - cmp not loaded yet ', adId);
+			apTagQue.push(adId);
+		}
+	},
+	processApTagQue: function() {
+		while (apTagQue.length) {
+			var adId = apTagQue.shift();
+			utils.log('in processApTagQue', adId);
+			trigger(adId);
+		}
+	}
+};
