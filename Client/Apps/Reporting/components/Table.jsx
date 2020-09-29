@@ -122,6 +122,8 @@ class Table extends React.Component {
 							<span>${numberWithCommas(props.value)}</span>
 						) : metrics[column].valueType === 'percent' ? (
 							<span>{numberWithCommas(props.value)}%</span>
+						) : metrics[column].valueType === 'url' ? (
+							<a rel="noopener noreferrer" href="#">{props.value}</a>
 						) : (
 							<span>{numberWithCommas(props.value)}</span>
 						),
@@ -264,11 +266,6 @@ class Table extends React.Component {
 						))}
 					</a>
 				);
-			}
-
-			if (tableRow.utm_param) {
-				const { utmParam } = tableRow;
-				tableRow.utm_param = React.cloneElement(<a href={utmParam}>{utmParam}</a>);
 			}
 
 			displayTableData.push(tableRow);
