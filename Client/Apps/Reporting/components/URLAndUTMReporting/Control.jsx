@@ -48,7 +48,7 @@ class Control extends Component {
 			disableGenerateButton: false,
 			updateStatusText: '',
 			regexFilter: props.searchFilter,
-			revenueCutoff: '',
+			cutOffRevenue: props.revenueCutOff,
 			csvData: props.csvData,
 			fileName: 'adpushup-report'
 		};
@@ -166,7 +166,7 @@ class Control extends Component {
 			selectedOrderBy,
 			selectedTotalRecords,
 			regexFilter,
-			revenueCutoff,
+			cutOffRevenue,
 			reportType
 		} = this.state;
 		const resultObject = {
@@ -181,7 +181,7 @@ class Control extends Component {
 			selectedOrderBy,
 			selectedTotalRecords,
 			regexFilter,
-			revenueCutoff,
+			revenueCutOff: cutOffRevenue,
 			reportType
 		};
 
@@ -309,7 +309,7 @@ class Control extends Component {
 					className="aligner aligner--wrap aligner--hSpaceBetween u-margin-t4"
 					style={{
 						display: 'grid',
-						'grid-template-columns': '1fr 1fr 1fr'
+						gridTemplateColumns: '1fr 1fr 1fr'
 					}}
 				>
 					<div className="aligner-item u-margin-r4">
@@ -397,7 +397,32 @@ class Control extends Component {
 						/>
 						{/* eslint-enable */}
 					</div>
-					<div />
+					<div
+						className="aligner-item u-margin-r4"
+						style={{
+							display: 'flex',
+							alignItems: 'flex-end'
+						}}
+					>
+						<div className="aligner-item u-margin-r2 custom-select-box-wrapper custom-select-box-wrapper">
+							{/* eslint-disable */}
+							<label className="u-text-normal">Revenue Cut-Off</label>
+							<input
+								className="form-control"
+								type="text"
+								placeholder="Revenue Cut Off"
+								name="cutOffRevenue"
+								value={state.cutOffRevenue}
+								onChange={e => {
+									const { value } = e.target;
+									this.setState(
+										{ cutOffRevenue: value },
+										debounce(this.onDebounceControlChange.bind(null, reportType))
+									);
+								}}
+							/>
+						</div>
+					</div>
 					<div
 						className="aligner-item aligner--hEnd"
 						style={{
