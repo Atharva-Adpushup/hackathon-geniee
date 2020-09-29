@@ -499,8 +499,8 @@ class Control extends Component {
 							justifyContent: 'flex-end'
 						}}
 					>
-						<span>{`${pageSize > 0 ? currentSet + 1 : 0}-${currentSet +
-							pageSize} of ${recordCount} records`}</span>
+						<span>{`${pageSize > 0 ? currentSet + 1 : 0}-${ pageSize < recordCount?(currentSet +
+							pageSize): recordCount} of ${recordCount} records`}</span>
 					</div>
 				</div>
 			</Fragment>

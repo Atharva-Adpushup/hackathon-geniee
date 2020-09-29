@@ -54,7 +54,7 @@ class Report extends Component {
 			displayUTMMetrics,
 			displayURLAndUTMMetrics: displayUTMMetrics || [],
 			metricsList: [],
-			selectedDimension: 'url',
+			selectedDimension: 'utm',
 			selectedFilters: {},
 			selectedMetrics: [],
 			selectedInterval: 'cumulative',
@@ -320,7 +320,6 @@ class Report extends Component {
 
 	prefetchTableData = () => {
 		const params = this.formateReportParams();
-		delete params.dimension;
 		const { pagesFetched } = this.state;
 		params.page = +pagesFetched + 1;
 
@@ -647,7 +646,6 @@ class Report extends Component {
 			selectedOrderBy,
 			selectedTotalRecords,
 			searchFilter,
-			revenueCutOff,
 			selectedFilters,
 			selectedInterval,
 			reportType,
