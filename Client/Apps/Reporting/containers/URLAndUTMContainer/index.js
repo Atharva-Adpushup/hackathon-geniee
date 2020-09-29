@@ -1,179 +1,19 @@
 import { connect } from 'react-redux';
 import { updateGlobalURLReportsMetaData } from '../../../../actions/globalActions';
 import { showNotification } from '../../../../actions/uiActions';
-import HBAnalytic from '../../components/URLAndUTMReporting';
+import URLReports from '../../components/URLAndUTMReporting';
+import { URL_UTM_DIMENSIONS } from '../../configs/commonConsts';
 
 const mapStateToProps = (state, ownProps) => {
-	const { sites, user } = state.global;
+	const {
+		urlreport: { global: globalReportMetaData },
+		sites,
+		user
+	} = state.global;
 
-	const urlUTMReportingMeta = {
-		fetched: true,
-		data: {
-			filter: {
-				day_type: {
-					path: '/url/list?list_name=GET_ALL_DAY_TYPES',
-					position: 1,
-					display_name: 'Day Of the week',
-					default_enabled: true
-				},
-				country: {
-					path: '/site/list?list_name=GET_ALL_COUNTRIES',
-					position: 4,
-					display_name: 'Country',
-					default_enabled: true
-				},
-				ad_type: {
-					path: '/url/list?list_name=GET_AD_TYPE_OPTIONS',
-					position: 9,
-					display_name: 'Ad Type',
-					default_enabled: true
-				},
-				bid_response_time: {
-					path: '/url/list?list_name=GET_BID_RESPONSE_BUCKETS',
-					position: 11,
-					display_name: 'Bid Response Time',
-					default_enabled: true
-				},
-				time_of_auction: {
-					path: '/url/list?list_name=GET_TIME_OF_AUCTION_BUCKETS',
-					position: 2,
-					display_name: 'Time of the ad auction',
-					default_enabled: true
-				},
-				siteid: {
-					path: '/site/list?list_name=GET_ALL_SITES',
-					position: 5,
-					display_name: 'Site',
-					default_enabled: true
-				},
-				device_type: {
-					path: '/site/list?list_name=GET_ALL_DEVICES',
-					position: 3,
-					display_name: 'Device',
-					default_enabled: true
-				},
-				section: {
-					path: '/site/list?list_name=GET_ALL_SECTIONS',
-					position: 6,
-					display_name: 'Ad Unit',
-					default_enabled: false
-				},
-				ad_placement: {
-					path: '/url/list?list_name=GET_UNIT_VISIBILITY_OPTIONS',
-					position: 10,
-					display_name: 'Unit Visibility',
-					default_enabled: true
-				},
-				refresh_count: {
-					path: '/url/list?list_name=GET_REFRESH_COUNT_BUCKETS',
-					position: 8,
-					display_name: 'Refresh count',
-					default_enabled: true
-				},
-				network: {
-					path: '/site/list?list_name=GET_ALL_NETWORKS&revenue_channel=2',
-					position: 7,
-					display_name: 'Bidder',
-					default_enabled: true
-				}
-			},
-			product: {
-				'hb-analytics': {
-					name: 'Hb Analytics',
-					reports: {
-						default: {
-							path: '/url/report?report_name=get_stats_by_custom',
-							isDefault: true,
-							position: 1,
-							display_name: 'Custom'
-						}
-					},
-					isDefault: true,
-					position: 1,
-					display_name: 'Hb Analytics'
-				}
-			},
-			site: {
-				'31454': {
-					dataAvailableOutOfLast30Days: 30,
-					adpushup_page_cpm: 4.110431273818351,
-					siteName: 'www.hardreset.info',
-					product: { IA: 1, HB: 1, Tag: 0, Layout: 1 },
-					isTopPerforming: true
-				},
-				'39699': {
-					dataAvailableOutOfLast30Days: 30,
-					adpushup_page_cpm: 0.5422311348781937,
-					siteName: 'https://fossbytes.com/',
-					product: { IA: 1, HB: 1, Tag: 0, Layout: 1 }
-				}
-			},
-			widget: {},
-			total_metrics: {},
-			interval: {
-				cumulative: { display_name: 'Cumulative', position: 3 }
-			},
-			metrics: {
-				utm_param: {
-					display_name: 'UTM Parameter',
-					table_position: 2,
-					valueType: 'url',
-					selectable: true
-				},
-				utm_value: {
-					display_name: 'UTM Value',
-					table_position: 3,
-					valueType: 'string',
-					selectable: true
-				},
-				utm_impression: {
-					display_name: 'Impressions',
-					table_position: 4,
-					valueType: 'number',
-					selectable: true
-				},
-				utm_ad_ecpm: {
-					display_name: 'Ad eCPM',
-					table_position: 5,
-					valueType: 'money',
-					selectable: true
-				},
-				utm_net_revenue: {
-					display_name: 'Net Revenue',
-					table_position: 6,
-					valueType: 'money',
-					selectable: true
-				},
-				_url: { display_name: 'URL', table_position: 7, valueType: 'url', selectable: true },
-				gross_revenue: {
-					display_name: 'Gross Revenue',
-					table_position: 7,
-					valueType: 'number',
-					selectable: true
-				},
-				impressions: {
-					display_name: 'Impressions',
-					table_position: 7,
-					valueType: 'string',
-					selectable: true
-				},
-				ad_ecpm: {
-					display_name: 'Ad eCPM',
-					table_position: 5,
-					valueType: 'money',
-					selectable: true
-				},
-				net_revenue: {
-					display_name: 'Net Revenue',
-					table_position: 5,
-					valueType: 'money',
-					selectable: true
-				}
-			},
-			dimension: { url: { display_name: 'URL', default_enabled: true, position: 1 } },
-			group: ['user']
-		}
-	};
+	const urlUTMReportingMeta = globalReportMetaData;
+	urlUTMReportingMeta.data.dimension = URL_UTM_DIMENSIONS;
+
 	const userSites = sites.fetched ? sites.data : {};
 
 	const urlReportingSites = Object.values(userSites)
@@ -204,4 +44,4 @@ const mapDispatchToProps = dispatch => {
 export default connect(
 	mapStateToProps,
 	mapDispatchToProps
-)(HBAnalytic);
+)(URLReports);
