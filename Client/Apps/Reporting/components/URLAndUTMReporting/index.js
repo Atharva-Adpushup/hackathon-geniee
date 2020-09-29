@@ -62,6 +62,7 @@ class Report extends Component {
 			selectedOrderBy: 'impressions',
 			selectedTotalRecords: '500',
 			searchFilter: '',
+			revenueCutOff: '',
 			pagesFetched: 0,
 			pageIndex: 0,
 			pageSize: 150,
@@ -102,7 +103,7 @@ class Report extends Component {
 
 		if (!urlUTMReportingMeta.fetched) {
 			return urlReportService
-				.getMetaData({ sites: userSitesStr, isSuperUser, product: 'hb-analytics' })
+				.getMetaData({ sites: userSitesStr, isSuperUser, product: 'url-reporting' })
 				.then(response => {
 					let { data: computedData } = response;
 					computedData = getDemoUserSites(computedData, email);
@@ -192,7 +193,8 @@ class Report extends Component {
 			selectedOrder,
 			selectedOrderBy,
 			selectedTotalRecords,
-			regexFilter
+			regexFilter,
+			revenueCutOff
 		} = data;
 		const filteredMetricsList = metricsList.filter(item => selectedMetrics.includes(item.value));
 
@@ -205,7 +207,8 @@ class Report extends Component {
 			selectedOrder,
 			selectedOrderBy,
 			selectedTotalRecords,
-			searchFilter: regexFilter
+			searchFilter: regexFilter,
+			revenueCutOff
 		});
 	};
 
@@ -224,7 +227,7 @@ class Report extends Component {
 	getControlChangedParams = (controlParams, metricsList) => {
 		const { selectedDimension, selectedFilters, reportType } = controlParams;
 		const { urlUTMReportingMeta } = this.props;
-		const { dimension: dimensionList, filter: filterList } = urlUTMReportingMeta.data;
+		const { dimension: dimensionList = {}, filter: filterList } = urlUTMReportingMeta.data;
 		let disabledFilter = [];
 		let disabledDimension = [];
 		let disabledMetrics = [];
@@ -269,7 +272,8 @@ class Report extends Component {
 			selectedOrderBy,
 			selectedTotalRecords,
 			selectedFilters,
-			selectedInterval
+			selectedInterval,
+			revenueCutOff
 		} = this.state;
 		const { defaultReportType, urlReportingSites } = this.props;
 		const { email, reportType } = this.getDemoUserParams();
@@ -288,6 +292,10 @@ class Report extends Component {
 			const filters = Object.keys(selectedFilters[filter]);
 			params[filter] = filters.length > 0 ? filters.toString() : null;
 		});
+
+		if (revenueCutOff) {
+			params.cut_off_value = revenueCutOff;
+		}
 
 		if (!params.siteid) {
 			// multiple sites are not supported, picking first site from array
@@ -394,7 +402,6 @@ class Report extends Component {
 		this.setState(computedState, () => {
 			let newState = {};
 			const params = this.formateReportParams();
-			delete params.dimension;
 			urlReportService.getCustomStats({ ...params }).then(response => {
 				if (Number(response.status) === 200 && response.data) {
 					tableData = response.data || [];
@@ -478,7 +485,6 @@ class Report extends Component {
 						// eslint-disable-next-line no-shadow
 						const { displayURLMetrics, displayUTMMetrics } = this.state;
 						metricsList = [...(isURL ? displayURLMetrics : displayUTMMetrics)];
-
 						// show only metrices that are in displayURLAndUTMMetricsList
 						newState = { ...newState, metricsList };
 					}
@@ -641,6 +647,7 @@ class Report extends Component {
 			selectedOrderBy,
 			selectedTotalRecords,
 			searchFilter,
+			revenueCutOff,
 			selectedFilters,
 			selectedInterval,
 			reportType,
@@ -855,6 +862,7 @@ class Report extends Component {
 			selectedOrderBy,
 			selectedTotalRecords,
 			searchFilter,
+			revenueCutOff,
 			selectedFilters,
 			selectedInterval,
 			selectedMetrics,
@@ -907,8 +915,12 @@ class Report extends Component {
 		}
 		if (searchFilter) {
 			const pattern = new RegExp(searchFilter);
+			const { isURL } = this.state;
+
 			selectedMetricsTableData.result =
-				selectedMetricsTableData.result.filter(item => pattern.test(item.url)) || [];
+				selectedMetricsTableData.result.filter(item =>
+					pattern.test(isURL ? item.url : item.utm_key)
+				) || [];
 
 			const newLength = selectedMetricsTableData.result.length;
 			pageSize = newLength > pageSize ? pageSize : newLength;
@@ -934,6 +946,7 @@ class Report extends Component {
 						selectedOrderBy={selectedOrderBy}
 						selectedTotalRecords={selectedTotalRecords}
 						searchFilter={searchFilter}
+						revenueCutOff={revenueCutOff}
 						selectedFilters={selectedFilters}
 						selectedMetrics={selectedMetrics}
 						selectedInterval={selectedInterval}
