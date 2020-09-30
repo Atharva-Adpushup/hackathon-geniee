@@ -68,7 +68,9 @@ class Table extends React.Component {
 
 		// we don't need date col for URL Reporting
 		// eslint-disable-next-line no-unused-expressions
-		!isURLReport && tableColumns.push(computedDate);
+		!isURLReport
+			? tableColumns.push(computedDate)
+			: isURLReport && isDaily && tableColumns.push(computedDate);
 
 		columns.forEach(column => {
 			if (dimension[column]) {
