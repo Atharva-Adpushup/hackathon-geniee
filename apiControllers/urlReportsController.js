@@ -16,22 +16,22 @@ router
 				toDate,
 				interval,
 				// eslint-disable-next-line camelcase
+				top_select_criteria,
+				// eslint-disable-next-line camelcase
 				page_size,
 				page,
 				siteid,
 				dimension
 			}
 		} = req;
-		const isValidParams = !!(
-			(siteid || isSuperUser) &&
+		const isValidParams = !!((siteid || isSuperUser) &&
 			fromDate &&
 			toDate &&
 			interval &&
 			// eslint-disable-next-line camelcase
-			page_size &&
-			page &&
-			siteid
-		);
+			top_select_criteria,
+		// eslint-disable-next-line camelcase
+		page_size && page && siteid);
 
 		const reportPath = dimension === 'url' ? CC.URL_REPORT_PATH : CC.UTM_REPORT_PATH;
 		if (isValidParams) {
