@@ -7,6 +7,8 @@ import Loader from '../Loader/index';
 import { domanize } from '../../helpers/commonFunctions';
 import { ROUTES } from '../../constants/others';
 
+import routeConfig from '../../routeConfig';
+
 function shouldWeOpenSidebar(location = { pathname: false }) {
 	if (!location.pathname) return true;
 	return !ROUTES.SIDEBAR_CLOSE.some(route => route.test(location.pathname));
@@ -41,9 +43,9 @@ class Shell extends React.Component {
 			return false;
 		}
 
-		return collection.reduce((accumulator, value) => {
-			const { path } = value.props;
-			let { name } = value.props;
+		const allRoutesMapping = collection.reduce((accumulator, value) => {
+			const { path } = value;
+			let { name } = value;
 
 			dynamicParamsArray.forEach(param => {
 				const isParamInPath = !!path.match(param);
@@ -81,6 +83,7 @@ class Shell extends React.Component {
 			accumulator[path] = name;
 			return accumulator;
 		}, {});
+		return allRoutesMapping;
 	};
 
 	render() {
@@ -97,9 +100,8 @@ class Shell extends React.Component {
 			findUsers,
 			hasUnsavedChanges
 		} = this.props;
-		const routes = this.getRoutes(children, location, user);
+		const routes = this.getRoutes(routeConfig.private, location, user);
 		const sidebarOpen = isSidebarOpen !== undefined ? isSidebarOpen : shouldWeOpenSidebar(location);
-
 		return (
 			<Grid fluid>
 				<Row style={{ zIndex: 1 }}>
