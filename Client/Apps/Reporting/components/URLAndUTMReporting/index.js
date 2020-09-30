@@ -54,7 +54,10 @@ class Report extends Component {
 			displayUTMMetrics,
 			displayURLAndUTMMetrics: displayUTMMetrics || [],
 			metricsList: [],
+			// dont forget to set isURL to false below
+			// if selectedDimension is utm
 			selectedDimension: 'url',
+			isURL: true,
 			selectedFilters: {},
 			selectedMetrics: [],
 			selectedInterval: 'cumulative',
@@ -273,9 +276,10 @@ class Report extends Component {
 			selectedTotalRecords,
 			selectedFilters,
 			selectedInterval,
-			revenueCutOff
+			revenueCutOff,
+			isURL
 		} = this.state;
-		const { defaultReportType, urlReportingSites } = this.props;
+		const { defaultReportType, urlReportingSites, utmReportingSites } = this.props;
 		const { email, reportType } = this.getDemoUserParams();
 
 		const params = {
@@ -298,8 +302,11 @@ class Report extends Component {
 		}
 
 		if (!params.siteid) {
-			// multiple sites are not supported, picking first site from array
-			const [siteId] = urlReportingSites;
+			// 1. multiple sites are not supported, picking first site from array
+			// 2. it might be possible for some site url reporting is enabled and for some sites
+			// 	  utm reporting is enabled. Here added a check to just to ensure to use siteIds
+			//	  where the particular service is actually enabled
+			const [siteId] = isURL ? urlReportingSites : utmReportingSites;
 			params.siteid = siteId;
 		}
 

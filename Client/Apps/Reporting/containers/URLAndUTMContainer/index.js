@@ -11,20 +11,30 @@ const mapStateToProps = (state, ownProps) => {
 		user
 	} = state.global;
 
-	const urlUTMReportingMeta = globalReportMetaData;
-	urlUTMReportingMeta.data.dimension = URL_UTM_DIMENSIONS;
-
 	const userSites = sites.fetched ? sites.data : {};
 
 	const urlReportingSites = Object.values(userSites)
 		.filter(site => !!site.urlReporting)
 		.map(site => site.siteId);
 
+	const utmReportingSites = Object.values(userSites)
+		.filter(site => !!site.utmReporting)
+		.map(site => site.siteId);
+
+	const urlUTMReportingMeta = globalReportMetaData;
+	// if utm reporting is not enabled for any site of the publisher
+	// then remove UTM option from reporting
+	if (!utmReportingSites.length) {
+		delete URL_UTM_DIMENSIONS.utm;
+	}
+	urlUTMReportingMeta.data.dimension = URL_UTM_DIMENSIONS;
+
 	return {
 		...ownProps,
 		urlUTMReportingMeta,
 		userSites,
 		urlReportingSites,
+		utmReportingSites,
 		user,
 		isHB: false
 	};
