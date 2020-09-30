@@ -180,6 +180,7 @@ var $ = require('../libs/jquery'),
 
 			var currentTime = new Date().getTime();
 			container.attr('data-render-time', currentTime);
+			container.attr('data-ap-network', ad.network);
 			utils.log('rendered slot ', ad.id, ' ', new Date(), ' ', document.hasFocus());
 
 			if (ad.networkData && ad.networkData.refreshSlot) {
@@ -345,7 +346,7 @@ var $ = require('../libs/jquery'),
 			}
 
 			if (ads.adpTagUnits.length) {
-				adCodeGenerator.executeAdpTagsHeadCode(ads.adpTagUnits, variation.adpKeyValues);
+				adCodeGenerator.executeAdpTagsHeadCode(ads.adpTagUnits, variation.adpKeyValues); 
 			}
 
 			if (ads.medianetAds.length) {
