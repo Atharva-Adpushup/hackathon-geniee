@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { Redirect } from 'react-router-dom';
 import { Nav, NavItem } from '@/Client/helpers/react-bootstrap-imports';
 import AdCodeGeneratorContainer from '../../containers/AdCodeGeneratorContainer';
 import Loader from '../../../../Components/Loader';
@@ -10,6 +9,7 @@ import {
 	IA_NAV_ITEMS_INDEXES,
 	IA_NAV_ITEMS_VALUES
 } from '../../configs/commonConsts';
+import history from '../../../../helpers/history';
 
 class Home extends Component {
 	constructor(props) {
@@ -91,7 +91,7 @@ class Home extends Component {
 		const activeItem = IA_NAV_ITEMS[activeTab];
 
 		if (redirectUrl) {
-			return <Redirect to={{ pathname: redirectUrl }} />;
+			history.push(redirectUrl);
 		}
 
 		return (

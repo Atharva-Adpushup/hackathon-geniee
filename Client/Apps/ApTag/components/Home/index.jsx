@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { Redirect } from 'react-router-dom';
 import { Nav, NavItem } from '@/Client/helpers/react-bootstrap-imports';
 
 import CustomError from '../../../../Components/CustomError/index';
@@ -10,6 +9,7 @@ import {
 	APT_NAV_ITEMS_INDEXES,
 	APT_NAV_ITEMS_VALUES
 } from '../../configs/commonConsts';
+import history from '../../../../helpers/history';
 
 class Home extends Component {
 	state = {
@@ -80,7 +80,7 @@ class Home extends Component {
 		const activeItem = APT_NAV_ITEMS[activeTab];
 
 		if (redirectUrl) {
-			return <Redirect to={{ pathname: redirectUrl }} />;
+			history.push(redirectUrl);
 		}
 
 		return (

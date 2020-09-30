@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { Redirect } from 'react-router-dom';
 import { Nav, NavItem } from '@/Client/helpers/react-bootstrap-imports';
 
 import CustomError from '../../../../Components/CustomError/index';
@@ -10,17 +9,20 @@ import {
 	AMP_NAV_ITEMS_INDEXES,
 	AMP_NAV_ITEMS_VALUES
 } from '../../configs/commonConsts';
+import history from '../../../../helpers/history';
 
 class Home extends Component {
 	state = {
 		redirectUrl: ''
 	};
+
 	getActiveTab = () => {
 		const {
 			customProps: { activeTab }
 		} = this.props;
 		return activeTab;
 	};
+
 	getSiteId = () => {
 		const {
 			match: {
@@ -29,6 +31,7 @@ class Home extends Component {
 		} = this.props;
 		return siteId;
 	};
+
 	handleNavSelect = value => {
 		const siteId = this.getSiteId();
 		const computedRedirectUrl = `/sites/${siteId}/apps/amp`;
@@ -45,6 +48,7 @@ class Home extends Component {
 		}
 		this.setState({ redirectUrl });
 	};
+
 	renderContent() {
 		const activeTab = this.getActiveTab();
 		const { user: { adServerSettings: { dfp = null } = {} } = {} } = this.props;
@@ -60,12 +64,13 @@ class Home extends Component {
 				return <AdListContainer {...this.props} />;
 		}
 	}
+
 	render() {
 		const { redirectUrl } = this.state;
 		const activeTab = this.getActiveTab();
 		const activeItem = AMP_NAV_ITEMS[activeTab];
 		if (redirectUrl) {
-			return <Redirect to={{ pathname: redirectUrl }} />;
+			history.push(redirectUrl);
 		}
 		return (
 			<div>
