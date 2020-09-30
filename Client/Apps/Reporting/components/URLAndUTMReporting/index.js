@@ -54,7 +54,7 @@ class Report extends Component {
 			displayUTMMetrics,
 			displayURLAndUTMMetrics: displayUTMMetrics || [],
 			metricsList: [],
-			selectedDimension: 'utm',
+			selectedDimension: 'url',
 			selectedFilters: {},
 			selectedMetrics: [],
 			selectedInterval: 'cumulative',
