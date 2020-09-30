@@ -16,7 +16,7 @@ router
 				toDate,
 				interval,
 				// eslint-disable-next-line camelcase
-				top_select_criteria,
+				top_select_criteria: topSelectedCriteria,
 				// eslint-disable-next-line camelcase
 				page_size,
 				page,
@@ -24,14 +24,16 @@ router
 				dimension
 			}
 		} = req;
-		const isValidParams = !!((siteid || isSuperUser) &&
+		const isValidParams = !!(
+			(siteid || isSuperUser) &&
 			fromDate &&
 			toDate &&
 			interval &&
 			// eslint-disable-next-line camelcase
-			top_select_criteria,
-		// eslint-disable-next-line camelcase
-		page_size && page && siteid);
+			page_size &&
+			page &&
+			siteid
+		);
 
 		const reportPath = dimension === 'url' ? CC.URL_REPORT_PATH : CC.UTM_REPORT_PATH;
 		if (isValidParams) {
@@ -41,6 +43,19 @@ router
 				qs: req.query
 			})
 				.then(response => {
+					function compare(a, b) {
+						if (a[`network_${topSelectedCriteria}`] > b[`network_${topSelectedCriteria}`]) {
+							return -1;
+						}
+						if (a[`network_${topSelectedCriteria}`] < b[`network_${topSelectedCriteria}`]) {
+							return 1;
+						}
+						return 0;
+					}
+
+					if (dimension === 'utm') {
+						response.data.result = response.data.result.sort(compare);
+					}
 					if (response.code === 1 && response.data) return res.send(response.data);
 					return res.send({});
 				})
