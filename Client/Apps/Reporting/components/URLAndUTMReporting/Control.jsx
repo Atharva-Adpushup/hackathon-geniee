@@ -406,11 +406,11 @@ class Control extends Component {
 					>
 						<div className="aligner-item u-margin-r2 custom-select-box-wrapper custom-select-box-wrapper">
 							{/* eslint-disable */}
-							<label className="u-text-normal">Revenue Cut-Off</label>
+							<label className="u-text-normal">Cut-Off</label>
 							<input
 								className="form-control"
 								type="text"
-								placeholder="Revenue Cut Off"
+								placeholder="Cut Off"
 								name="cutOffRevenue"
 								value={state.cutOffRevenue}
 								onChange={e => {
@@ -499,7 +499,7 @@ class Control extends Component {
 							justifyContent: 'flex-end'
 						}}
 					>
-						<span>{`${pageSize > 0 ? currentSet + 1 : 0}-${ pageSize < recordCount?(currentSet +
+						<span>{`${pageSize > 0 ? currentSet + 1 : 0}-${ currentSet + pageSize < recordCount?(currentSet +
 							pageSize): recordCount} of ${recordCount} records`}</span>
 					</div>
 				</div>
