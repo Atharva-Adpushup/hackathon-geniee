@@ -180,7 +180,7 @@ var $ = require('../libs/jquery'),
 
 			var currentTime = new Date().getTime();
 			container.attr('data-render-time', currentTime);
-			container.attr('ap-network', ad.network);
+			container.attr('data-ap-network', ad.network);
 			utils.log('rendered slot ', ad.id, ' ', new Date(), ' ', document.hasFocus());
 
 			if (ad.networkData && ad.networkData.refreshSlot) {
