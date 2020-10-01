@@ -524,9 +524,10 @@ var cmpFn = function() {
 	);
 };
 
-var isMobile = window.adpushup.config.platform === 'MOBILE';
+var renderConsentRevokeButton = function() {
+	var isMobile = window.adpushup.config.platform === 'MOBILE';
 
-var revokeBtnCss = `
+	var revokeBtnCss = `
     border-radius: 0 50% 50% 0;
 	bottom: ${isMobile ? '52px' : 0};
 	left:0;
@@ -541,34 +542,32 @@ var revokeBtnCss = `
     z-index: 9999;
 	position: fixed;
 	border-left: none;
+	box-sizing: border-box;
 	`;
 
-var revokeBtnTextCss = `
+	var revokeBtnImgCss = `
     border-radius: 50%;
-    background: #fff;
     border: 1px solid #c9cbcd;
     height: ${isMobile ? '20px' : '25px'};
     width: ${isMobile ? '20px' : '25px'};
     display: block;
     margin: 0 auto;
-    font-size: ${isMobile ? '13px' : '15px'};
-    line-height: ${isMobile ? '20px' : '25px'};
-	font-weight: bold;
 	`;
 
-var renderConsentRevokeButton = function() {
 	var btn = document.createElement('button');
 	btn.style.cssText = revokeBtnCss;
 	btn.title = 'Consent Management';
+	btn.id = '__ap_gfc_consent_box_btn__';
 	btn.addEventListener('click', () => {
 		googlefc.callbackQueue.push(googlefc.showRevocationMessage);
 	});
 
-	var txt = document.createElement('span');
-	txt.style.cssText = revokeBtnTextCss;
-	txt.innerText = 'C';
+	var img = document.createElement('img');
+	img.style.cssText = revokeBtnImgCss;
+	img.src =
+		'data:image/jpeg;base64,/9j/4QAYRXhpZgAASUkqAAgAAAAAAAAAAAAAAP/sABFEdWNreQABAAQAAAAeAAD/4QMraHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wLwA8P3hwYWNrZXQgYmVnaW49Iu+7vyIgaWQ9Ilc1TTBNcENlaGlIenJlU3pOVGN6a2M5ZCI/PiA8eDp4bXBtZXRhIHhtbG5zOng9ImFkb2JlOm5zOm1ldGEvIiB4OnhtcHRrPSJBZG9iZSBYTVAgQ29yZSA1LjMtYzAxMSA2Ni4xNDU2NjEsIDIwMTIvMDIvMDYtMTQ6NTY6MjcgICAgICAgICI+IDxyZGY6UkRGIHhtbG5zOnJkZj0iaHR0cDovL3d3dy53My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zIyI+IDxyZGY6RGVzY3JpcHRpb24gcmRmOmFib3V0PSIiIHhtbG5zOnhtcD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wLyIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bXA6Q3JlYXRvclRvb2w9IkFkb2JlIFBob3Rvc2hvcCBDUzYgKFdpbmRvd3MpIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjZGMzNBMTRFMDNGMzExRUI5MzBBQ0I0NjQzRTJFOERCIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjZGMzNBMTRGMDNGMzExRUI5MzBBQ0I0NjQzRTJFOERCIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6NkYzM0ExNEMwM0YzMTFFQjkzMEFDQjQ2NDNFMkU4REIiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6NkYzM0ExNEQwM0YzMTFFQjkzMEFDQjQ2NDNFMkU4REIiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz7/7gAOQWRvYmUAZMAAAAAB/9sAhAAQCwsLDAsQDAwQFw8NDxcbFBAQFBsfFxcXFxcfHhcaGhoaFx4eIyUnJSMeLy8zMy8vQEBAQEBAQEBAQEBAQEBAAREPDxETERUSEhUUERQRFBoUFhYUGiYaGhwaGiYwIx4eHh4jMCsuJycnLis1NTAwNTVAQD9AQEBAQEBAQEBAQED/wAARCAAyADIDASIAAhEBAxEB/8QAZQABAAMBAQAAAAAAAAAAAAAAAAIEBgUHAQEAAAAAAAAAAAAAAAAAAAAAEAABAwMDAgYCAwAAAAAAAAABAAIDEQQFITEScQZBUWGBkRMiMlKCFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAwDAQACEQMRAD8A9AREQEVS/wApj8bF9t/cMt2GtOZ1dTX8W7n2VTH904DJTCCzvWPmJo2NwdG5x8miVreXsg6yIiAiIgKL3BjHPd+rQSegUlCVn2RPjrTm0tr1FEGL7axUHck9x3HmI/8AQZJXR2lvJrGyNmn67Henyd118z2fiL+zey0torO8aOVvPC0RcZBq3l9Y1Hnp01VPsC5bHj58NPRl7j5pGyRE6lpNeQ/tULR399b4+zlvLlwbFC0ucT402aPU7BAx0d5FYwRX0jZbtjGtmkZXi54FCRUDforKo4bInKY2C/MLrf728hE48iBWla6VB8PRXkBERAREQZ/Ndn2OUuhkIZpLDIAUFzAaVNKAuGmo9CNFSg7EMsrH5rKXOUjjcHMhkLmsqP5c3yH4otaiCLGtY0MYA1jQA1o0AA2AUkRAREQEREBERAREQEREH//Z';
 
-	btn.appendChild(txt);
+	btn.appendChild(img);
 
 	document.body.appendChild(btn);
 };
