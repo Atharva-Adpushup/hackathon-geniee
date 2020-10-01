@@ -1,9 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import DocumentTitle from 'react-document-title';
-import { Nav, NavItem, Alert } from '@/Client/helpers/react-bootstrap-imports';
+import { Nav, NavItem } from '@/Client/helpers/react-bootstrap-imports';
 import { connect } from 'react-redux';
-import { Redirect } from 'react-router-dom';
-import ActionCard from '../../Components/ActionCard/index';
 import { paymentsAction } from '../../actions/userActions';
 import { showNotification } from '../../actions/uiActions';
 import Loader from '../../Components/Loader/index';
@@ -12,11 +10,11 @@ import {
 	PAYMENT_NAV_ITEMS_INDEXES,
 	PAYMENT_NAV_ITEMS_VALUES
 } from './configs/commonConsts';
+import history from '../../helpers/history';
 
 class Payment extends Component {
 	state = {
 		redirectUrl: '',
-		isBillingProfileComplete: false,
 		paymentDetails: {
 			url: '',
 			width: '100%',
@@ -34,7 +32,7 @@ class Payment extends Component {
 	componentDidMount() {
 		const { paymentsAction: payments } = this.props;
 		payments().then(res => {
-			if (res.status == 200) {
+			if (res.status === 200) {
 				const { paymentDetails, paymentHistory } = this.state;
 
 				paymentDetails.url = res.data.tipaltiUrls.tipaltiUrl;
@@ -55,7 +53,7 @@ class Payment extends Component {
 	handleFrameTasks = e => {
 		if (e && e.data && e.data.TipaltiIframeInfo) {
 			const { paymentDetails, paymentHistory } = this.state;
-			if (e.data.caller == 'PaymentDetails') {
+			if (e.data.caller === 'PaymentDetails') {
 				if (e.data.TipaltiIframeInfo.height) {
 					paymentDetails.height = `${e.data.TipaltiIframeInfo.height}px`;
 				}
@@ -64,7 +62,7 @@ class Payment extends Component {
 				}
 				paymentDetails.isLoading = false;
 			}
-			if (e.data.caller == 'PaymentHistory') {
+			if (e.data.caller === 'PaymentHistory') {
 				if (e.data.TipaltiIframeInfo.height) {
 					paymentHistory.height = `${e.data.TipaltiIframeInfo.height}px`;
 				}
@@ -114,7 +112,7 @@ class Payment extends Component {
 			<div>
 				{isLoading ? this.renderLoader() : ''}
 				<div className="u-padding-4 text-center">
-					<iframe src={url} frameBorder="0" style={{ width, height }} />
+					<iframe src={url} frameBorder="0" style={{ width, height }} title="iframe" />
 				</div>
 			</div>
 		);
@@ -146,7 +144,7 @@ class Payment extends Component {
 		const activeItem = PAYMENT_NAV_ITEMS[activeTab];
 
 		if (redirectUrl) {
-			return <Redirect to={{ pathname: redirectUrl }} />;
+			history.push(redirectUrl);
 		}
 		return (
 			<Fragment>
