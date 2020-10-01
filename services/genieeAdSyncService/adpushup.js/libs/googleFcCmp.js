@@ -524,11 +524,63 @@ var cmpFn = function() {
 	);
 };
 
+var isMobile = window.adpushup.config.platform === 'MOBILE';
+
+var revokeBtnCss = `
+    border-radius: 0 50% 50% 0;
+	bottom: ${isMobile ? '52px' : 0};
+	left:0;
+    margin: 0;
+    padding: 0;
+    height: ${isMobile ? '30px' : '40px'};
+    width: ${isMobile ? '30px' : '40px'};;
+    background: #e5e7e9;
+    border: 1px solid #fff;
+    box-shadow: ${isMobile ? '0px 3px 7px #777' : '0px -3px 7px #777'};
+    cursor: pointer;
+    z-index: 9999;
+	position: fixed;
+	border-left: none;
+	`;
+
+var revokeBtnTextCss = `
+    border-radius: 50%;
+    background: #fff;
+    border: 1px solid #c9cbcd;
+    height: ${isMobile ? '20px' : '25px'};
+    width: ${isMobile ? '20px' : '25px'};
+    display: block;
+    margin: 0 auto;
+    font-size: ${isMobile ? '13px' : '15px'};
+    line-height: ${isMobile ? '20px' : '25px'};
+	font-weight: bold;
+	`;
+
+var renderConsentRevokeButton = function() {
+	var btn = document.createElement('button');
+	btn.style.cssText = revokeBtnCss;
+	btn.title = 'Consent Management';
+	btn.addEventListener('click', () => {
+		googlefc.callbackQueue.push(googlefc.showRevocationMessage);
+	});
+
+	var txt = document.createElement('span');
+	txt.style.cssText = revokeBtnTextCss;
+	txt.innerText = 'C';
+
+	btn.appendChild(txt);
+
+	document.body.appendChild(btn);
+};
+
 var waitForCmpLoad = function() {
 	return new Promise((resolve, reject) => {
 		googlefc.controlledMessagingFunction = message => {
 			//setup the message
 			message.proceed();
+			setTimeout(() => {
+				renderConsentRevokeButton();
+			}, 0);
 			return resolve();
 		};
 	});

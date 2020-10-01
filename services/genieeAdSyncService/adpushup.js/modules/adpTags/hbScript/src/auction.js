@@ -11,7 +11,7 @@ const commonConsts = require('../../../../config/commonConsts');
 
 const country = window.adpushup.config.country;
 const doesGdprApplies = country && commonConsts.EU_COUNTRY_LIST.indexOf(country) > -1;
-const doesCcpaApplies = country && country == 'US';
+const doesCcpaApplies = country && country === 'US';
 
 var auction = {
 	end: function(adpBatchId) {
