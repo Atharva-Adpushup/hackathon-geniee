@@ -33,6 +33,9 @@ const generatePrebidConfig = siteId => {
 
 		const usedBidders = hbDoc.value.hbcf;
 		const activeUsedBidders = {};
+		const s2sBiddersWithDifferentParamsPattern = /^.+_s2s$/;
+		const s2sBiddersWithDifferentParams = [];
+
 		for (const bidderCode in usedBidders) {
 			if (
 				usedBidders.hasOwnProperty(bidderCode) &&
@@ -40,6 +43,19 @@ const generatePrebidConfig = siteId => {
 				biddersFromNetworkTree[bidderCode] &&
 				biddersFromNetworkTree[bidderCode].isActive
 			) {
+				/**
+				 * This is for those s2s bidders which need different params than client.
+				 * If s2s is active then we'll replace it with client bidder later,
+				 * otherwise we'll just skip that bidder
+				 */
+				if (s2sBiddersWithDifferentParamsPattern.test(bidderCode)) {
+					if (usedBidders[bidderCode].isS2SActive) {
+						s2sBiddersWithDifferentParams.push(bidderCode);
+					} else {
+						continue;
+					}
+				}
+
 				activeUsedBidders[bidderCode] = usedBidders[bidderCode];
 
 				if (biddersFromNetworkTree[bidderCode].alias) {
@@ -47,6 +63,13 @@ const generatePrebidConfig = siteId => {
 				}
 			}
 		}
+
+		s2sBiddersWithDifferentParams.forEach(s2sBidderCode => {
+			const nonS2SBiddercode = s2sBidderCode.match(/^(.+)_s2s$/)[1];
+
+			activeUsedBidders[nonS2SBiddercode] = activeUsedBidders[s2sBidderCode];
+			delete activeUsedBidders[s2sBidderCode];
+		});
 
 		hbDoc.value.hbcf = activeUsedBidders;
 
