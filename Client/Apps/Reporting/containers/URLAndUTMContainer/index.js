@@ -28,16 +28,6 @@ const mapStateToProps = (state, ownProps) => {
 		delete URL_UTM_DIMENSIONS.utm;
 	}
 
-	// temp change - api is breaking for monthly interval
-	if (
-		urlUTMReportingMeta.fetched &&
-		urlUTMReportingMeta.data &&
-		urlUTMReportingMeta.data.interval &&
-		urlUTMReportingMeta.data.interval.monthly
-	) {
-		delete urlUTMReportingMeta.data.interval.monthly;
-	}
-
 	urlUTMReportingMeta.data.dimension = URL_UTM_DIMENSIONS;
 
 	return {

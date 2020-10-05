@@ -55,7 +55,7 @@ class Table extends React.Component {
 
 		const { metrics, dimension, aggregatedData, isURLReport } = this.props;
 
-		const { isDaily } = this.getDateIntervalValidators();
+		const { isDaily, isMonthly } = this.getDateIntervalValidators();
 		const computedDate = {
 			Header: 'Date',
 			accessor: 'date',
@@ -70,7 +70,7 @@ class Table extends React.Component {
 		// eslint-disable-next-line no-unused-expressions
 		!isURLReport
 			? tableColumns.push(computedDate)
-			: isURLReport && isDaily && tableColumns.push(computedDate);
+			: isURLReport && (isDaily || isMonthly) && tableColumns.push(computedDate);
 
 		columns.forEach(column => {
 			if (dimension[column]) {
@@ -125,7 +125,7 @@ class Table extends React.Component {
 						) : metrics[column].valueType === 'percent' ? (
 							<span>{numberWithCommas(props.value)}%</span>
 						) : metrics[column].valueType === 'url' ? (
-							<a rel="noopener noreferrer" href="#">{props.value}</a>
+							<a rel="noopener noreferrer">{props.value}</a>
 						) : (
 							<span>{numberWithCommas(props.value)}</span>
 						),
