@@ -1,4 +1,7 @@
 module.exports = {
+	DEFAULT_FIND_CMP_TIMEOUT: 3000,
+	CMP_CHECK_EXCLUDED_SITES: [38903],
+	// prettier-ignore
 	EU_COUNTRY_LIST: ["AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "DE", "GR", "HU", "IE", "IT", "LV", "LT", "LU", "MT", "NL", "PL", "PT", "RO", "SK", "SI", "ES", "SE", "GB", "GF", "GP", "MQ", "ME", "YT", "RE", "MF", "GI", "AX", "PM", "GL", "BL", "SX", "AW", "CW", "WF", "PF", "NC", "TF", "AI", "BM", "IO", "VG", "KY", "FK", "MS", "PN", "SH", "GS", "TC", "AD", "LI", "MC", "SM", "VA", "JE", "GG", "GI"],
 	AD_TYPES: {
 		STRUCTURAL: 1,
@@ -113,7 +116,7 @@ module.exports = {
 			URM_KEY_VALUE: 'URM_KEY_VALUE',
 			URM_KEY_VALUE_KEEN: 'URM_KEY_VALUE_KEEN',
 			URM_TARGETTING: 'URM_TARGETTING',
-			URM_PAGE_FEEDBACK: 'URM_PAGE_FEEDBACK',
+			URM_PAGE_FEEDBACK: 'URM_PAGE_FEEDBACK'
 		}
 	},
 	URM_REPORTING: {

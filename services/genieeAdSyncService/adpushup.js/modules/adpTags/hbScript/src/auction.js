@@ -11,6 +11,7 @@ const commonConsts = require('../../../../config/commonConsts');
 
 const country = window.adpushup.config.country;
 const doesGdprApplies = country && commonConsts.EU_COUNTRY_LIST.indexOf(country) > -1;
+const doesCcpaApplies = country && country === 'US';
 
 var auction = {
 	end: function(adpBatchId) {
@@ -211,22 +212,26 @@ var auction = {
 			// Prebid client-side cache required for video format bidding by Pubmatic and IX adapters to cache VAST XML
 			cache: {
 				url: 'https://prebid.adnxs.com/pbc/v1/cache'
-			},
-			consentManagement: {
-				gdpr: {
-					cmpApi: 'iab',
-					timeout: 8000,
-					defaultGdprScope: false
-				},
-				usp: {
-					cmpApi: 'iab',
-					timeout: 100 // US Privacy timeout 100ms
-				}
 			}
 		};
 
-		if (doesGdprApplies){
-			pbConfig.consentManagement.gdpr.defaultGdprScope = true;
+		if (doesCcpaApplies) {
+			pbConfig.consentManagement = {
+				usp: {
+					cmpApi: 'iab',
+					timeout: 1000 // US Privacy timeout 1000ms
+				}
+			};
+		}
+
+		if (doesGdprApplies) {
+			pbConfig.consentManagement = {
+				gdpr: {
+					cmpApi: 'iab',
+					timeout: 8000,
+					defaultGdprScope: true
+				}
+			};
 		}
 
 		const s2sConfigObj = s2sConfigGen.generateS2SConfig(prebidAuctionTimeOut);
@@ -295,7 +300,7 @@ var auction = {
 		hasRefreshSlots = !!refreshSlots.length;
 		prebidAuctionTimeOut = hasRefreshSlots
 			? config.PREBID_CONFIG.prebidConfig.refreshTimeOut ||
-			config.PREBID_CONFIG.prebidConfig.timeOut
+			  config.PREBID_CONFIG.prebidConfig.timeOut
 			: config.PREBID_CONFIG.prebidConfig.timeOut;
 
 		pbjs.que.push(

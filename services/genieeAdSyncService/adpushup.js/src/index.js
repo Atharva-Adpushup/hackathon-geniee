@@ -15,6 +15,8 @@ var adCodeGenerator = require('./adCodeGenerator');
 var session = require('../libs/session');
 var refreshAdSlot = require('./refreshAdSlot');
 
+var googlFcCmp = require('../libs/googleFcCmp');
+
 if (SEPARATE_PREBID && HB_ACTIVE) {
 	utils.injectHeadCodeOnPage(config.prebidBundleUrl);
 }
@@ -30,9 +32,11 @@ if (SPA_ACTIVE) {
 	var spaHandler = require('./spaHandler');
 }
 if (APTAG_ACTIVE) {
-	var triggerAd = require('./trigger');
+	var apTagModule = require('./trigger');
+	var triggerAd = apTagModule.triggerAd;
+	var processApTagQue = apTagModule.processApTagQue;
 } else {
-	triggerAd = function() { };
+	triggerAd = function() {};
 }
 if (INNOVATIVE_ADS_ACTIVE) {
 	var processInnovativeAds = require('../modules/interactiveAds/index').default;
@@ -345,6 +349,42 @@ function initAdpQue() {
 	};
 }
 
+// we need to check CMP availabilityt for European countries only
+function isCmpAplicable() {
+	return (
+		!commonConsts.CMP_CHECK_EXCLUDED_SITES.includes(adp.config.siteId) &&
+		!adp.config.cmpAvailable &&
+		commonConsts.EU_COUNTRY_LIST.includes(adp.config.country)
+	);
+}
+
+function checkCmpAvailability() {
+	return new Promise((resolve, reject) => {
+		const isCmpRequired = isCmpAplicable();
+		if (isCmpRequired) {
+			return utils
+				.findCmp(commonConsts.DEFAULT_FIND_CMP_TIMEOUT)
+				.then(() => {
+					return resolve({
+						cmpRequired: 0
+					});
+				})
+				.catch(() => {
+					return resolve({
+						cmpRequired: 1
+					});
+				});
+		}
+		return resolve(() => ({
+			cmpRequired: 0
+		}));
+	});
+}
+
+function loadGoogleFundingChoicesCmp() {
+	return googlFcCmp.loadAndInitiateCmp();
+}
+
 function main() {
 	utils.logPerformanceEvent(commonConsts.EVENT_LOGGER.EVENTS.MAIN_FN_CALL_DELAY);
 
@@ -352,7 +392,8 @@ function main() {
 	syncUser();
 
 	// disable header bidding if query param contains `?adpushupHeaderBiddingDisabled=true`
-	adp.services.HB_ACTIVE = adp.services.HB_ACTIVE && !utils.getQueryParams().adpushupHeaderBiddingDisabled;
+	adp.services.HB_ACTIVE =
+		adp.services.HB_ACTIVE && !utils.getQueryParams().adpushupHeaderBiddingDisabled;
 
 	// Initialise adp config
 	initAdpConfig();
@@ -397,60 +438,81 @@ function main() {
 		adp.config.isGeniee = isGenieeSite;
 	}
 
-	if (!apLiteActive) {
-		// Hook Pagegroup, find pageGroup and check for blockList
-		hookAndInit(adp, startCreation, browserConfig.platform);
-
-		// AdPushup Debug Force Variation
-		if (
-			utils.getQueryParams &&
-			utils.getQueryParams().forceVariation &&
-			!adp.creationProcessStarted
-		) {
-			startCreation(true);
-			return false;
-		}
-
-		// Geniee specific check
-		if (shouldWeNotProceed()) {
-			return false;
-		}
-
-		// AdPushup Debug Force Control
-		if (utils.getQueryParams && utils.getQueryParams().forceControl) {
-			triggerControl(commonConsts.MODE.FALLBACK, commonConsts.ERROR_CODES.FALLBACK_FORCED); // Control forced (run fallback)
-			return false;
-		}
-
-		// AdPushup Mode Logic
-		if (parseInt(config.mode, 10) === 2) {
-			triggerControl(commonConsts.MODE.FALLBACK, commonConsts.ERROR_CODES.PAUSED_IN_EDITOR); // Paused from editor (run fallback)
-			return false;
-		}
-
-		// AdPushup Percentage Logic
-		var rand = Math.floor(Math.random() * 100) + 1;
-		if (rand > config.adpushupPercentage) {
-			triggerControl(commonConsts.MODE.FALLBACK, commonConsts.ERROR_CODES.FALLBACK_PLANNED); // Control planned (run fallback)
-			return false;
-		}
-
-		if (!config.pageGroup) {
-			pageGroupTimer = setTimeout(function() {
-				!config.pageGroup
-					? triggerControl(commonConsts.MODE.FALLBACK, commonConsts.ERROR_CODES.PAGEGROUP_NOT_FOUND)
-					: clearTimeout(pageGroupTimer);
-			}, config.pageGroupTimeout);
-		} else {
-			// start heartBeat
-			// heartBeat(config.feedbackUrl, config.heartBeatMinInterval, config.heartBeatDelay).start();
-
-			//Init creation
-			startCreation();
-		}
+	// Geniee specific check
+	if (shouldWeNotProceed()) {
+		return false;
 	}
 
-	apLiteActive && startApLiteCreation();
+	/**
+	 * For European countries we need to make sure that cmp is there on the page for user consent management, before starting the ad rendering.
+	 * So, we look for the CMP on the page, in case cmp is found we initiate the ad rendering otherwise we load googleFundingChoices on the page for the user to provide consent. Once the cmp is loaded we start the ad rendering.
+	 */
+	checkCmpAvailability()
+		.then(({ cmpRequired }) => {
+			utils.log('cmpRequired', cmpRequired);
+			return cmpRequired ? loadGoogleFundingChoicesCmp() : '';
+		})
+		.then(() => {
+			utils.log('CMP loaded');
+			adp.config.cmpLoaded = true;
+
+			// invoke processApTagQue function from trigger.js in case there has been and calls to adpushup.triggerAd from page while we were waiting for CMP check and CMP load. Use timeout so that current init function is done before apTags are processed
+			setTimeout(() => {
+				processApTagQue && processApTagQue();
+			}, 0);
+			if (!apLiteActive) {
+				// Hook Pagegroup, find pageGroup and check for blockList
+				hookAndInit(adp, startCreation, browserConfig.platform);
+
+				// AdPushup Debug Force Variation
+				if (
+					utils.getQueryParams &&
+					utils.getQueryParams().forceVariation &&
+					!adp.creationProcessStarted
+				) {
+					startCreation(true);
+					return false;
+				}
+
+				// AdPushup Debug Force Control
+				if (utils.getQueryParams && utils.getQueryParams().forceControl) {
+					triggerControl(commonConsts.MODE.FALLBACK, commonConsts.ERROR_CODES.FALLBACK_FORCED); // Control forced (run fallback)
+					return false;
+				}
+
+				// AdPushup Mode Logic
+				if (parseInt(config.mode, 10) === 2) {
+					triggerControl(commonConsts.MODE.FALLBACK, commonConsts.ERROR_CODES.PAUSED_IN_EDITOR); // Paused from editor (run fallback)
+					return false;
+				}
+
+				// AdPushup Percentage Logic
+				var rand = Math.floor(Math.random() * 100) + 1;
+				if (rand > config.adpushupPercentage) {
+					triggerControl(commonConsts.MODE.FALLBACK, commonConsts.ERROR_CODES.FALLBACK_PLANNED); // Control planned (run fallback)
+					return false;
+				}
+
+				if (!config.pageGroup) {
+					pageGroupTimer = setTimeout(function() {
+						!config.pageGroup
+							? triggerControl(
+									commonConsts.MODE.FALLBACK,
+									commonConsts.ERROR_CODES.PAGEGROUP_NOT_FOUND
+							  )
+							: clearTimeout(pageGroupTimer);
+					}, config.pageGroupTimeout);
+				} else {
+					// start heartBeat
+					// heartBeat(config.feedbackUrl, config.heartBeatMinInterval, config.heartBeatDelay).start();
+
+					//Init creation
+					startCreation();
+				}
+			}
+
+			apLiteActive && startApLiteCreation();
+		});
 }
 
 adp.init = main;
