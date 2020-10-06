@@ -574,13 +574,17 @@ var renderConsentRevokeButton = function() {
 
 var waitForCmpLoad = function() {
 	return new Promise((resolve, reject) => {
+		googlefc.callbackQueue.push({
+			CONSENT_DATA_READY: function() {
+				return resolve();
+			}
+		});
 		googlefc.controlledMessagingFunction = message => {
 			//setup the message
 			message.proceed();
 			setTimeout(() => {
 				renderConsentRevokeButton();
 			}, 0);
-			return resolve();
 		};
 	});
 };
