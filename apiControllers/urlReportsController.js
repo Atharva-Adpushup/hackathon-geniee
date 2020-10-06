@@ -34,7 +34,6 @@ router
 		);
 
 		const reportPath = dimension === 'url' ? CC.URL_REPORT_PATH : CC.UTM_REPORT_PATH;
-		console.log(dimension, reportPath, 'dimension, reportPath');
 		const utmFilter = {
 			utm_campaign: 2,
 			utm_source: 3,
@@ -45,8 +44,7 @@ router
 			utm_camp_src: 8
 		};
 		const utmPrams = utmFilter[dimension] ? `&utm_params=${utmFilter[dimension]}` : '';
-		console.log('actual url');
-		console.log(`https://staging.adpushup.com/CentralReportingWebService${reportPath}${utmPrams}`);
+
 		if (isValidParams) {
 			return request({
 				uri: `https://staging.adpushup.com/CentralReportingWebService${reportPath}${utmPrams}`,
