@@ -195,7 +195,14 @@ const URL_UTM_METRICS = {
 
 const URL_UTM_DIMENSIONS = {
 	url: { display_name: 'URL', default_enabled: true, position: 1 },
-	utm: { display_name: 'All UTM Parameters', default_enabled: true, position: 2 }
+	utm: { display_name: 'All UTM Parameters', default_enabled: true, position: 2 },
+	utm_campaign: { display_name: 'UTM CAMPAIGN', default_enabled: true, position: 3 },
+	utm_source: { display_name: 'UTM SOURCE', default_enabled: true, position: 4 },
+	utm_medium: { display_name: 'UTM MEDIUM', default_enabled: true, position: 5 },
+	utm_term: { display_name: 'UTM TERM', default_enabled: true, position: 6 },
+	utm_content: { display_name: 'UTM Content', default_enabled: true, position: 7 },
+	utm_camp_src_need: { display_name: 'UTM CAMP_SRC_MED', default_enabled: true, position: 8 },
+	utm_camp_src: { display_name: 'UTM CAMP_SRC', default_enabled: true, position: 9 }
 };
 
 const UTM_METRICS = {
