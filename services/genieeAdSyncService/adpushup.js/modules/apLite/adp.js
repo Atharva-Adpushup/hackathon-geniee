@@ -211,7 +211,13 @@ var $ = require('../../libs/jquery'),
 												slotHbStatus = apLiteAdUnit.headerBidding,
 												refreshSlot = apLiteAdUnit.refreshSlot,
 												refreshInterval = apLiteAdUnit.refreshInterval,
-												formats = apLiteAdUnit.formats,
+												// formats = apLiteAdUnit.formats,
+												/**
+												 * Temporarily Enabled "display" and "video" formats for apLite
+												 * until we enable all formats in all ad docs.
+												 * Hb Rules can still override formats list.
+												 */
+												formats = ['display', 'video'],
 												sizeMapping = apLiteAdUnit.sizeMapping || [],
 												computedSizes = hbUtils.getSizesComputedUsingSizeMappingOrAdUnitSize(
 													apLiteAdUnit,
