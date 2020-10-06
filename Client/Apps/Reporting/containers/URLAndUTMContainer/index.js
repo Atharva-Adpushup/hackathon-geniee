@@ -26,6 +26,13 @@ const mapStateToProps = (state, ownProps) => {
 	// then remove UTM option from reporting
 	if (!utmReportingSites.length) {
 		delete URL_UTM_DIMENSIONS.utm;
+		delete URL_UTM_DIMENSIONS.utm_campaign;
+		delete URL_UTM_DIMENSIONS.utm_source;
+		delete URL_UTM_DIMENSIONS.utm_medium;
+		delete URL_UTM_DIMENSIONS.utm_term;
+		delete URL_UTM_DIMENSIONS.utm_content;
+		delete URL_UTM_DIMENSIONS.utm_camp_src_need;
+		delete URL_UTM_DIMENSIONS.utm_camp_src;
 	}
 
 	urlUTMReportingMeta.data.dimension = URL_UTM_DIMENSIONS;
