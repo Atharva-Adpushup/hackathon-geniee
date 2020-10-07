@@ -201,7 +201,7 @@ const URL_UTM_DIMENSIONS = {
 	utm_medium: { display_name: 'UTM MEDIUM', default_enabled: true, position: 5 },
 	utm_term: { display_name: 'UTM TERM', default_enabled: true, position: 6 },
 	utm_content: { display_name: 'UTM Content', default_enabled: true, position: 7 },
-	utm_camp_src_need: {
+	utm_camp_src_med: {
 		display_name: 'UTM CAMPAIGN+SOURCE+MEDIUM',
 		default_enabled: true,
 		position: 8

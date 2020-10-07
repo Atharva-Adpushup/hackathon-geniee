@@ -40,8 +40,17 @@ router
 			utm_medium: 4,
 			utm_term: 5,
 			utm_content: 6,
-			utm_camp_src_need: 7,
+			utm_camp_src_med: 7,
 			utm_camp_src: 8
+		};
+		const utmKeyMapping = {
+			campaign: 'Campaign',
+			source: 'Source',
+			medium: 'Medium',
+			term: 'Term',
+			content: 'Content',
+			camp_src_med: 'Campaign+Source+Medium',
+			camp_src: 'Campaign+Source'
 		};
 		const utmPrams = utmFilter[dimension] ? `&utm_params=${utmFilter[dimension]}` : '';
 
@@ -52,7 +61,17 @@ router
 				qs: req.query
 			})
 				.then(response => {
-					if (response.code === 1 && response.data) return res.send(response.data);
+					if (response.code === 1 && response.data) {
+						// need to map some utm fields
+						if (dimension !== 'url') {
+							response.data.result = response.data.result.map(item => {
+								// eslint-disable-next-line no-param-reassign
+								item.utm_key = utmKeyMapping[item.utm_key];
+								return item;
+							});
+						}
+						return res.send(response.data);
+					}
 					return res.send({});
 				})
 				.catch(err => res.send({ err }));
