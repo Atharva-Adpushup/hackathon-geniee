@@ -404,8 +404,7 @@ class Control extends Component {
 							alignItems: 'flex-end'
 						}}
 					>
-						<div className="aligner-item u-margin-r2 custom-select-box-wrapper custom-select-box-wrapper">
-							{/* eslint-disable */}
+						{/* <div className="aligner-item u-margin-r2 custom-select-box-wrapper custom-select-box-wrapper">
 							<label className="u-text-normal">Cut-Off</label>
 							<input
 								className="form-control"
@@ -421,7 +420,7 @@ class Control extends Component {
 									);
 								}}
 							/>
-						</div>
+						</div> */}
 					</div>
 					<div
 						className="aligner-item aligner--hEnd"
