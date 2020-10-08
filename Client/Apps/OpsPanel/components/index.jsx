@@ -71,6 +71,7 @@ class OpsPanel extends Component {
 
 		if (redirectUrl) {
 			history.push(redirectUrl);
+			return null;
 		}
 		return (
 			<ActionCard>
