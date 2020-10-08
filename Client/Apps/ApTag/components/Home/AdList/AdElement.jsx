@@ -80,7 +80,8 @@ class AdElement extends Component {
 			networkData: { dfpAdunitCode, dfpAdunit },
 			rewardTriggerFunction,
 			customScript,
-			modalText
+			modalText,
+			automaticTrigger
 		} = ad;
 		const {
 			showLazyload,
@@ -93,7 +94,8 @@ class AdElement extends Component {
 
 		const isRewarded = ad.formatData.type === 'rewardedAds';
 		let code = isRewarded ? REWARDED_AD_CODE : ADCODE;
-		let triggerRewardedAd = !customScript ? TIGGER_AUTOMATICALLY_CODE : atob(customScript);
+		const triggerRewardedAd =
+			automaticTrigger || !customScript ? TIGGER_AUTOMATICALLY_CODE : atob(customScript);
 
 		const customAttributes = ad.maxHeight ? ` max-height="${ad.maxHeight}"` : '';
 		code = code
@@ -101,7 +103,7 @@ class AdElement extends Component {
 					.replace(/__AD_ID__/g, ad.id)
 					.replace(/__CUSTOM_ATTRIBS__/, customAttributes)
 					.replace(/__AD_UNIT__/g, dfpAdunit)
-					.replace(/__NETWORK_CODE__/, networkCode)
+					.replace(/__NETWORK_CODE__/g, networkCode)
 					.replace(
 						/__POST_REWARDED_FUNCTION__/g,
 						rewardTriggerFunction && atob(rewardTriggerFunction)
