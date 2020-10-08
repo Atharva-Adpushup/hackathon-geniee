@@ -70,7 +70,7 @@ const getAppStatuses = siteId => dispatch =>
 		})
 		.catch(err => errorHandler(err));
 
-const updateSiteAutoOptimise = (siteId, params) => (dispatch, getState) =>
+const updateSiteAutoOptimise = (siteId, params) => dispatch =>
 	axiosInstance
 		.post('/site/updateSite', {
 			siteId,
@@ -82,45 +82,10 @@ const updateSiteAutoOptimise = (siteId, params) => (dispatch, getState) =>
 				}
 			]
 		})
-		.then(() =>
-			axiosInstance.post('/channel/updateChannels', {
-				siteId,
-				toUpdate: [
-					{
-						key: 'autoOptimise',
-						value: params.autoOptimise
-					}
-				]
-			})
-		)
 		.then(() => {
-			const {
-				global: { sites }
-			} = getState();
-			const site = sites.data[siteId];
-			const { cmsInfo } = site;
-			const { channelsInfo } = cmsInfo;
-			const channels = Object.keys(channelsInfo);
-
-			channels.forEach(channel => {
-				channelsInfo[channel].autoOptimise = params.autoOptimise;
-			});
-
 			dispatch({
 				type: SITE_ACTIONS.UPDATE_SITE_DATA_KEY_OBJ,
 				data: { siteId, key: 'apConfigs', value: { autoOptimise: params.autoOptimise } }
-			});
-
-			dispatch({
-				type: SITE_ACTIONS.UPDATE_SITE_DATA_KEY_OBJ,
-				data: {
-					siteId,
-					key: 'cmsInfo',
-					value: {
-						...cmsInfo,
-						channelsInfo
-					}
-				}
 			});
 
 			return dispatch({
