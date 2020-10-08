@@ -2,7 +2,6 @@ import React, { Component, Fragment } from 'react';
 import DocumentTitle from 'react-document-title';
 import { Col, Table, Modal, Nav, NavItem } from '@/Client/helpers/react-bootstrap-imports';
 import { connect } from 'react-redux';
-import { Redirect } from 'react-router-dom';
 import proxyService from '../../services/proxyService';
 import { showNotification } from '../../actions/uiActions';
 import Loader from '../../Components/Loader/index';
@@ -19,6 +18,7 @@ import {
 	BONUS_MESSAGE,
 	NOTE_MESSAGE
 } from './configs/commonConsts';
+import history from '../../helpers/history';
 
 class AdsTxtManager extends Component {
 	state = {
@@ -46,11 +46,11 @@ class AdsTxtManager extends Component {
 			.then(([adsTxtRes, mandatoryAdsTxtEntryRes]) => {
 				let snippet = '';
 				let mandatoryAdsTxtEntry = '';
-
 				if (adsTxtRes.status === 200) snippet = adsTxtRes.data.adsTxtSnippet;
-				if (mandatoryAdsTxtEntryRes.status === 200)
-					mandatoryAdsTxtEntry = mandatoryAdsTxtEntryRes.data.mandatoryAdsTxtEntry;
-
+				if (mandatoryAdsTxtEntryRes.status === 200) {
+					const { mandatoryAdsTxtEntry: mandatoryadsTxtEntry } = mandatoryAdsTxtEntryRes.data;
+					mandatoryAdsTxtEntry = mandatoryadsTxtEntry;
+				}
 				return [snippet, mandatoryAdsTxtEntry];
 			})
 			.then(([snippet, mandatoryAdsTxtEntry]) =>
@@ -529,7 +529,8 @@ class AdsTxtManager extends Component {
 		const activeItem = ADSTXT_NAV_ITEMS[activeTab];
 
 		if (redirectUrl) {
-			return <Redirect to={{ pathname: redirectUrl }} />;
+			history.push(redirectUrl);
+			return null;
 		}
 		return (
 			<Fragment>

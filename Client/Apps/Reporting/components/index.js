@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { Redirect } from 'react-router-dom';
 import { Nav, NavItem } from '@/Client/helpers/react-bootstrap-imports';
 
 import {
@@ -12,6 +11,7 @@ import ActionCard from '../../../Components/ActionCard';
 import ReportContainer from '../containers/ReportContainer';
 import URLAndUTMContainer from '../containers/URLAndUTMContainer';
 import '../../../scss/apps/reporting/index.scss';
+import history from '../../../helpers/history';
 
 class ReportsPanel extends Component {
 	state = {
@@ -61,7 +61,8 @@ class ReportsPanel extends Component {
 
 		const activeItem = REPORTS_NAV_ITEMS[activeTab];
 		if (redirectUrl) {
-			return <Redirect to={{ pathname: redirectUrl }} />;
+			history.push(redirectUrl);
+			return null;
 		}
 
 		const { userSites, match } = this.props;

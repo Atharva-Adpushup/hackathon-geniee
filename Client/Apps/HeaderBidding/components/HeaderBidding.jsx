@@ -1,7 +1,7 @@
 /* eslint-disable guard-for-in */
 /* eslint-disable no-restricted-syntax */
 import React from 'react';
-import { Redirect, Prompt } from 'react-router-dom';
+import { Prompt } from 'react-router-dom';
 import { Nav, NavItem } from '@/Client/helpers/react-bootstrap-imports';
 import { NAV_ITEMS, NAV_ITEMS_INDEXES, NAV_ITEMS_VALUES } from '../constants';
 import Setup from './Setup';
@@ -12,6 +12,7 @@ import OptimizationTab from './OptimizationTab';
 import AmazonUAMTab from './AmazonUAMTab';
 import CustomButton from '../../../Components/CustomButton';
 import config from '../../../config/config';
+import history from '../../../helpers/history';
 
 class HeaderBidding extends React.Component {
 	state = {
@@ -379,7 +380,8 @@ class HeaderBidding extends React.Component {
 		const { setupStatus } = this.props;
 
 		if (redirectUrl) {
-			return <Redirect to={{ pathname: redirectUrl }} />;
+			history.push(redirectUrl);
+			return null;
 		}
 
 		return setupStatus && this.renderTabsLayout();

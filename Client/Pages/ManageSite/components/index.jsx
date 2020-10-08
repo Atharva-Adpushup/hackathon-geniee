@@ -1,11 +1,11 @@
 import React from 'react';
-import { Redirect } from 'react-router-dom';
 import { Nav, NavItem } from '@/Client/helpers/react-bootstrap-imports';
 import Empty from '../../../Components/Empty';
 import ManageAppsContainer from '../containers/ManageAppsContainer';
 import { NAV_ITEMS, NAV_ITEMS_INDEXES, NAV_ITEMS_VALUES } from '../constants/index';
 import SiteSettings from '../../SiteSettings/index';
 import QuickSnapshotContainer from '../containers/QuickSnapshotContainer';
+import history from '../../../helpers/history';
 
 class ManageSite extends React.Component {
 	constructor(props) {
@@ -94,7 +94,8 @@ class ManageSite extends React.Component {
 		const { redirectUrl } = this.state;
 
 		if (redirectUrl) {
-			return <Redirect to={{ pathname: redirectUrl }} />;
+			history.push(redirectUrl);
+			return null;
 		}
 
 		return (

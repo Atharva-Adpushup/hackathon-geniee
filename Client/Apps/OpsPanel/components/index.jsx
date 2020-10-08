@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { Redirect } from 'react-router-dom';
 import { Nav, NavItem } from '@/Client/helpers/react-bootstrap-imports';
 
 import { OP_NAV_ITEMS, OP_NAV_ITEMS_INDEXES, OP_NAV_ITEMS_VALUES } from '../configs/commonConsts';
@@ -7,7 +6,8 @@ import ActionCard from '../../../Components/ActionCard';
 import Settings from './Settings/index';
 import ToolsContainer from '../containers/ToolsContainer';
 import InfoPanelContainer from '../containers/InfoPanelContainer';
-import SiteMappingContainer from '../containers/SiteMappingContainer'
+import SiteMappingContainer from '../containers/SiteMappingContainer';
+import history from '../../../helpers/history';
 
 class OpsPanel extends Component {
 	state = {
@@ -70,7 +70,8 @@ class OpsPanel extends Component {
 		const activeItem = OP_NAV_ITEMS[activeTab];
 
 		if (redirectUrl) {
-			return <Redirect to={{ pathname: redirectUrl }} />;
+			history.push(redirectUrl);
+			return null;
 		}
 		return (
 			<ActionCard>
