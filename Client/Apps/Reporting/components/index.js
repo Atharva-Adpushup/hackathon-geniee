@@ -62,6 +62,7 @@ class ReportsPanel extends Component {
 		const activeItem = REPORTS_NAV_ITEMS[activeTab];
 		if (redirectUrl) {
 			history.push(redirectUrl);
+			return null;
 		}
 
 		const { userSites, match } = this.props;

@@ -145,6 +145,7 @@ class Payment extends Component {
 
 		if (redirectUrl) {
 			history.push(redirectUrl);
+			return null;
 		}
 		return (
 			<Fragment>

@@ -381,6 +381,7 @@ class HeaderBidding extends React.Component {
 
 		if (redirectUrl) {
 			history.push(redirectUrl);
+			return null;
 		}
 
 		return setupStatus && this.renderTabsLayout();
