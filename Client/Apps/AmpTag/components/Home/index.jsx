@@ -71,6 +71,7 @@ class Home extends Component {
 		const activeItem = AMP_NAV_ITEMS[activeTab];
 		if (redirectUrl) {
 			history.push(redirectUrl);
+			return null;
 		}
 		return (
 			<div>
