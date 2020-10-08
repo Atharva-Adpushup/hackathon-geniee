@@ -177,6 +177,15 @@ var adpTags = {
 		},
 		defineSlot: function(containerId, size, placement, optionalParam) {
 			var optionalParam = optionalParam || {};
+
+			/**
+			 * Temporarily Enabled all formats for Non-apLite
+			 * until we enable all formats in all ad docs.
+			 * Hb Rules can still override formats list.
+			 */
+			if(optionalParam.formats) optionalParam.formats =
+				constants.PREBID.ALL_SUPPORTED_FORMATS;
+
 			var slot = this.createSlot(containerId, size, placement, optionalParam);
 			/**
 			 * only case where computedSizes will not be set on slot is where it's a responsive slot and the ad container is not in the DOM
