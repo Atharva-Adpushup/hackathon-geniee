@@ -116,7 +116,7 @@ router
 			relation,
 			bids,
 			revenueShare,
-			config: params,
+			config: params || {},
 			isActive: true,
 			isAmpActive,
 			isS2SActive
@@ -134,10 +134,6 @@ router
 				// Check hbConfig
 				// eslint-disable-next-line no-unused-vars
 				.then(([validated, { domain: siteDomain }]) => {
-					if (!params || !Object.keys(params).length) {
-						throw new AdPushupError('Atleast 1 prebid param required');
-					}
-
 					hbConfig.siteDomain = siteDomain;
 
 					return headerBiddingModel.getHbConfig(siteId);
@@ -229,7 +225,7 @@ router
 			relation,
 			bids,
 			revenueShare,
-			config: params,
+			config: params || {},
 			isActive: true,
 			isAmpActive,
 			isS2SActive
@@ -247,10 +243,6 @@ router
 				// Check hbConfig
 				// eslint-disable-next-line no-unused-vars
 				.then(([validated, { domain: siteDomain }]) => {
-					if (!params || !Object.keys(params).length) {
-						throw new AdPushupError('Atleast 1 prebid param required');
-					}
-
 					hbConfig.siteDomain = siteDomain;
 
 					return headerBiddingModel.getHbConfig(siteId);
