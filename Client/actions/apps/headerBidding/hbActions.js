@@ -1,3 +1,5 @@
+import cloneDeep from 'lodash/cloneDeep';
+
 /* eslint-disable import/prefer-default-export */
 import {
 	CHECK_INVENTORY,
@@ -16,6 +18,24 @@ import {
 } from '../../../constants/headerBidding';
 import history from '../../../helpers/history';
 import * as service from '../../../services/hbService';
+
+function deleteEmptyParams(params, sizeLess = true) {
+	const paramsCopy = cloneDeep(params);
+
+	if (sizeLess) {
+		Object.keys(paramsCopy).forEach(key => {
+			if (paramsCopy[key] === '') delete paramsCopy[key];
+		});
+	} else {
+		Object.keys(paramsCopy).forEach(sizeKey => {
+			Object.keys(paramsCopy[sizeKey]).forEach(key => {
+				if (paramsCopy[sizeKey][key] === '') delete paramsCopy[sizeKey][key];
+			});
+		});
+	}
+
+	return paramsCopy;
+}
 
 export const checkInventoryAction = siteId => dispatch =>
 	service
@@ -49,21 +69,27 @@ export const setDfpSetupStatusAction = siteId => dispatch => {
 	dispatch({ type: SET_UNSAVED_CHANGES, hasUnsavedChanges: true });
 };
 
-export const addBidderAction = (siteId, bidderConfig, params) => dispatch =>
-	service
-		.addBidder(siteId, bidderConfig, params)
+export const addBidderAction = (siteId, bidderConfig, params) => dispatch => {
+	const cleanedParams = deleteEmptyParams(params, bidderConfig.sizeLess);
+
+	return service
+		.addBidder(siteId, bidderConfig, cleanedParams)
 		.then(({ data: { bidderConfig: bidderConfigFromDB, bidderKey } }) => {
 			dispatch({ type: ADD_BIDDER, siteId, bidderKey, bidderConfig: bidderConfigFromDB });
 			dispatch({ type: SET_UNSAVED_CHANGES, hasUnsavedChanges: true });
 		});
+};
 
-export const updateBidderAction = (siteId, bidderConfig, params) => dispatch =>
-	service
-		.updateBidder(siteId, bidderConfig, params)
+export const updateBidderAction = (siteId, bidderConfig, params) => dispatch => {
+	const cleanedParams = deleteEmptyParams(params, bidderConfig.sizeLess);
+
+	return service
+		.updateBidder(siteId, bidderConfig, cleanedParams)
 		.then(({ data: { bidderConfig: bidderConfigFromDB, bidderKey } }) => {
 			dispatch({ type: UPDATE_BIDDER, siteId, bidderKey, bidderConfig: bidderConfigFromDB });
 			dispatch({ type: SET_UNSAVED_CHANGES, hasUnsavedChanges: true });
 		});
+};
 
 export const deleteBidderAction = (siteId, bidderKey) => dispatch =>
 	service.removeBidder(siteId, bidderKey).then(() => {
