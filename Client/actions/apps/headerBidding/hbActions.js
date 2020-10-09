@@ -19,18 +19,12 @@ import {
 import history from '../../../helpers/history';
 import * as service from '../../../services/hbService';
 
-function deleteEmptyParams(params, sizeLess = true) {
+function deleteEmptyParams(params, bidderConfig) {
 	const paramsCopy = cloneDeep(params);
 
-	if (sizeLess) {
+	if (bidderConfig.key === 'amx') {
 		Object.keys(paramsCopy).forEach(key => {
 			if (paramsCopy[key] === '') delete paramsCopy[key];
-		});
-	} else {
-		Object.keys(paramsCopy).forEach(sizeKey => {
-			Object.keys(paramsCopy[sizeKey]).forEach(key => {
-				if (paramsCopy[sizeKey][key] === '') delete paramsCopy[sizeKey][key];
-			});
 		});
 	}
 
@@ -70,7 +64,7 @@ export const setDfpSetupStatusAction = siteId => dispatch => {
 };
 
 export const addBidderAction = (siteId, bidderConfig, params) => dispatch => {
-	const cleanedParams = deleteEmptyParams(params, bidderConfig.sizeLess);
+	const cleanedParams = deleteEmptyParams(params, bidderConfig);
 
 	return service
 		.addBidder(siteId, bidderConfig, cleanedParams)
@@ -81,7 +75,7 @@ export const addBidderAction = (siteId, bidderConfig, params) => dispatch => {
 };
 
 export const updateBidderAction = (siteId, bidderConfig, params) => dispatch => {
-	const cleanedParams = deleteEmptyParams(params, bidderConfig.sizeLess);
+	const cleanedParams = deleteEmptyParams(params, bidderConfig);
 
 	return service
 		.updateBidder(siteId, bidderConfig, cleanedParams)
