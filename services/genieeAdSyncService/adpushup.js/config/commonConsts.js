@@ -1,5 +1,5 @@
 module.exports = {
-	DEFAULT_FIND_CMP_TIMEOUT: 3000,
+	DEFAULT_FIND_CMP_TIMEOUT: 300,
 	CMP_CHECK_EXCLUDED_SITES: [38903],
 	// prettier-ignore
 	EU_COUNTRY_LIST: ["AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "DE", "GR", "HU", "IE", "IT", "LV", "LT", "LU", "MT", "NL", "PL", "PT", "RO", "SK", "SI", "ES", "SE", "GB", "GF", "GP", "MQ", "ME", "YT", "RE", "MF", "GI", "AX", "PM", "GL", "BL", "SX", "AW", "CW", "WF", "PF", "NC", "TF", "AI", "BM", "IO", "VG", "KY", "FK", "MS", "PN", "SH", "GS", "TC", "AD", "LI", "MC", "SM", "VA", "JE", "GG", "GI"],
