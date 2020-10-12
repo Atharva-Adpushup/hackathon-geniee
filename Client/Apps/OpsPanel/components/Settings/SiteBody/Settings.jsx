@@ -226,7 +226,7 @@ class Settings extends Component {
 					id={`js-isAdsLabelOn-${siteId}-${siteDomain}`}
 				/>
 				<CustomToggleSwitch
-					labelText="CMP"
+					labelText="Inject CMP"
 					className="u-margin-b4 negative-toggle"
 					checked={cmpEnabled}
 					onChange={this.handleToggle}
