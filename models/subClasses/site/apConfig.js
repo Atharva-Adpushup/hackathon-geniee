@@ -24,7 +24,8 @@ const ApConfig = {
 		'adsLabel',
 		'isAdsLabelOn',
 		'hbAnalytics',
-		'beforeJs'
+		'beforeJs',
+		'cmpAvailable'
 	],
 	override: [
 		'mode',
@@ -51,7 +52,8 @@ const ApConfig = {
 		'adsLabel',
 		'isAdsLabelOn',
 		'hbAnalytics',
-		'beforeJs'
+		'beforeJs',
+		'cmpAvailable'
 	],
 	merge: []
 };

@@ -22,7 +22,8 @@ class Settings extends Component {
 			poweredByBanner = false,
 			isAdsLabelOn = false,
 			adsLabel = 'Advertisement',
-			hbAnalytics = false
+			hbAnalytics = false,
+			cmpAvailable = false
 		} = site.apConfigs || {};
 		const { revenueShare = 10 } = site.adNetworkSettings || {};
 		const status = Object.prototype.hasOwnProperty.call(apps, 'apLite') ? apps.apLite : undefined;
@@ -37,7 +38,8 @@ class Settings extends Component {
 			adsLabel,
 			revenueShare,
 			status,
-			hbAnalytics
+			hbAnalytics,
+			cmpEnabled: !cmpAvailable
 		};
 	}
 
@@ -108,7 +110,8 @@ class Settings extends Component {
 			isAdsLabelOn,
 			adsLabel,
 			revenueShare,
-			hbAnalytics
+			hbAnalytics,
+			cmpEnabled
 		} = this.state;
 		const { showNotification, saveSettings, site } = this.props;
 		const isTransitionInValid = isSPA && isNaN(Number(spaPageTransitionTimeout));
@@ -150,7 +153,8 @@ class Settings extends Component {
 				poweredByBanner,
 				isAdsLabelOn,
 				adsLabel,
-				hbAnalytics
+				hbAnalytics,
+				cmpAvailable: !cmpEnabled
 			},
 
 			adNetworkSettings: {
@@ -170,7 +174,8 @@ class Settings extends Component {
 			adsLabel,
 			// revenueShare,
 			status,
-			hbAnalytics
+			hbAnalytics,
+			cmpEnabled
 		} = this.state;
 		const { site } = this.props;
 
@@ -219,6 +224,19 @@ class Settings extends Component {
 					defaultLayout
 					name={`isAdsLabelOn-${siteId}-${siteDomain}`}
 					id={`js-isAdsLabelOn-${siteId}-${siteDomain}`}
+				/>
+				<CustomToggleSwitch
+					labelText="Inject CMP"
+					className="u-margin-b4 negative-toggle"
+					checked={cmpEnabled}
+					onChange={this.handleToggle}
+					layout="horizontal"
+					size="m"
+					on="Yes"
+					off="No"
+					defaultLayout
+					name={`cmpEnabled-${siteId}-${siteDomain}`}
+					id={`js-cmpEnabled-${siteId}-${siteDomain}`}
 				/>
 				{isAdsLabelOn && (
 					<InputBox
