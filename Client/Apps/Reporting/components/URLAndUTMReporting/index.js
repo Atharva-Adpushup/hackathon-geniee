@@ -1004,15 +1004,8 @@ class Report extends Component {
 				<ActionCard title="AdPushup Reports">{this.renderContent()}</ActionCard>
 				{show ? (
 					<Alert bsStyle="info" onDismiss={this.handleDismiss} className="u-margin-t4">
-						For old reporting data <strong>(before 1st August, 2019)</strong> go to old console by{' '}
-						<a
-							target="_blank"
-							onClick={oldConsoleRedirection}
-							className="u-link-reset"
-							style={{ cursor: 'pointer' }}
-						>
-							<strong>clicking here.</strong>
-						</a>
+						Due to an internal data migration process, there might be some inconsistencies in the
+						UTM reports for the period between <strong>4th October till 9th October.</strong>
 					</Alert>
 				) : null}
 			</React.Fragment>
