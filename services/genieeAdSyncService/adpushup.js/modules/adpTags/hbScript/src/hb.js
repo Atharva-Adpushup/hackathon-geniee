@@ -84,15 +84,10 @@ var hb = {
 				}
 			});
 
-			var playerSize = utils.getVideoPlayerSize(prebidSizes);
 			var prebidSlot = {
 				code: adpSlot.containerId,
 				mediaTypes: {},
 				sizes: prebidSizes,
-				renderer: {
-					url: multiFormatConstants.VIDEO.RENDERER_URL,
-					render: videoRenderer.bind(null, adpSlot, playerSize)
-				},
 				bids: computedBidders
 			};
 
@@ -106,7 +101,11 @@ var hb = {
 						break;
 					}
 					case 'video': {
-						const { DEFAULT_JW_PLAYER_SIZE } = constants;
+						var playerSize = utils.getVideoPlayerSize(prebidSizes);
+						prebidSlot.renderer = {
+							url: multiFormatConstants.VIDEO.RENDERER_URL,
+							render: videoRenderer.bind(null, adpSlot, playerSize)
+						};
 						prebidSlot.mediaTypes.video = {
 							...mediaTypesConfig.video,
 							playerSize
