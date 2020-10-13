@@ -212,16 +212,16 @@ const ROUTES = {
 		},
 		{
 			exact: true,
-			name: ':siteId',
-			path: '/reports/:siteId',
-			customProps: { activeTab: REPORTS_NAV_ITEMS_INDEXES.REPORT },
+			customProps: { activeTab: REPORTS_NAV_ITEMS_INDEXES.URL_UTM_REPORTING },
+			name: 'URL Analytics',
+			path: '/reports/url-analytics',
 			component: Reporting
 		},
 		{
 			exact: true,
-			customProps: { activeTab: REPORTS_NAV_ITEMS_INDEXES.URL_UTM_REPORTING },
-			name: 'URL Analytics',
-			path: '/reports/url-analytics',
+			name: ':siteId',
+			path: '/reports/:siteId',
+			customProps: { activeTab: REPORTS_NAV_ITEMS_INDEXES.REPORT },
 			component: Reporting
 		},
 
