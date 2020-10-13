@@ -221,10 +221,11 @@ const REWARDED_AD_CODE = `(function(w, d) {
 		}
 		var rewardedData = JSON.parse(localStorage.getItem('aprewarded_key'));
 		function triggerRewardedAd() {
+			var urlParams = new URLSearchParams(window.location.search);
 			// show only to 20% users
 			if (
 				(rewardedData === null || isResetRejectedFinal()) &&
-				Math.floor(Math.random() * 100) < 20
+				Math.floor(Math.random() * 100) < 20||urlParams.has('adpushuptesting')
 			) {
 				// if (true) 
 				function addModalStyle(styles) {
@@ -382,7 +383,7 @@ const REWARDED_AD_CODE = `(function(w, d) {
 
 						let timer = setInterval(function() {
 							if (makeRewardVisible) {
-								e.makeRewardedVisible();
+								rewardedEvent.makeRewardedVisible();
 								sendFeedback();
 								clearInterval(timer);
 							}
@@ -408,7 +409,7 @@ const REWARDED_AD_CODE = `(function(w, d) {
 								rewardedData.played += 1;
 								localStorage.setItem('aprewarded_key', JSON.stringify(rewardedData));
 								log(1, uuid);
-								rewardedEvent.makeRewardedVisible();
+								makeRewardVisible = true;
 							}
 
 							function onWatchAdClosed() {
@@ -453,7 +454,6 @@ const REWARDED_AD_CODE = `(function(w, d) {
 					});
 
 					googletag.pubads().addEventListener('slotRenderEnded', function(event) {
-						makeRewardVisible = true;
 						var slotEnded = event.slot;
 						var endTime = performance.now();
 						if (slot === slotEnded && !isSlotLogged) {
