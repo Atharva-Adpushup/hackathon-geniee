@@ -472,7 +472,7 @@ const REWARDED_AD_CODE = `(function(w, d) {
 })(window, document)`;
 
 const TIGGER_AUTOMATICALLY_CODE = `let timer = setInterval(function () {
-	if ($("#rewarded-modal").length) {
+	if ($("#rewarded-modal")) {
 	  triggerRewardedAd();
 	  clearInterval(timer);
 	}
