@@ -398,6 +398,11 @@ function main() {
 	// Initialise adp config
 	initAdpConfig();
 
+	if (utils.isAdPushupForceDisabled()) {
+		utils.log(`AdPushup has been forced disabled...`);
+		return false;
+	}
+
 	var beforeJs = adp.config.beforeJs;
 
 	if (beforeJs) {

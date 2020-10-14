@@ -303,6 +303,12 @@ var auction = {
 			  config.PREBID_CONFIG.prebidConfig.timeOut
 			: config.PREBID_CONFIG.prebidConfig.timeOut;
 
+		var forceHbTimeout = adp.utils.getQueryParams().forceHbTimeout;
+		if (forceHbTimeout) {
+			prebidAuctionTimeOut = parseInt(forceHbTimeout, 10);
+			adp.utils.log(`Forced HB Timeout to ${forceHbTimeout}`);
+		}
+
 		pbjs.que.push(
 			function() {
 				this.setPrebidConfig(pbjs, prebidAuctionTimeOut);

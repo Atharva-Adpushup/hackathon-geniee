@@ -1167,5 +1167,9 @@ module.exports = {
 
 			checkCmpRecursively(0);
 		});
+	},
+
+	isAdPushupForceDisabled: function() {
+		return !!this.getQueryParams().forceDisableAp;
 	}
 };
