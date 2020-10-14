@@ -163,6 +163,10 @@ var adp = window.adpushup,
 module.exports = {
 	//overwrite original function to execute apTags only if cmp is loaded otherwise push them to a queue for later processing
 	triggerAd: function(adId) {
+		if (utils.isAdPushupForceDisabled()) {
+			utils.log(`AdPushup Force Disabled.. ApTag render blocked`);
+			return;
+		}
 		if (adp.config.cmpLoaded) {
 			utils.log('in triggerAd - cmp loaded', adId);
 			trigger(adId);
