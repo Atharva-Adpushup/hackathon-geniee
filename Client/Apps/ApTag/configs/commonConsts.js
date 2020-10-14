@@ -335,13 +335,13 @@ const REWARDED_AD_CODE = `(function(w, d) {
 							'<div class="rewarded-modal-body">' +
 							'<p>__MODAL_TEXT__</p>' +
 							'<button id ="watchAdBtn" class=" watch primary">' +
-							${watchButton}+
+							'${watchButton}'+
 							'</button>';
 
 						if (!forced) {
 							const closeHtml =
 								'<button  id ="noThanksBtn" class="closeModal secondary"><span class="lg">' +
-                                ${noThanksButton}+
+                                '${noThanksButton}'+
 								'</button>';
 							modalHtml += closeHtml;
 						}
