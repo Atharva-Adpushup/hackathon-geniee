@@ -305,7 +305,7 @@ var auction = {
 
 		var forceHbTimeout = adp.utils.getQueryParams().forceHbTimeout;
 		if (forceHbTimeout) {
-			prebidAuctionTimeOut = parseInt(forceHbTimeout);
+			prebidAuctionTimeOut = parseInt(forceHbTimeout, 10);
 			adp.utils.log(`Forced HB Timeout to ${forceHbTimeout}`);
 		}
 
