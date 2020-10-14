@@ -471,12 +471,7 @@ const REWARDED_AD_CODE = `(function(w, d) {
 	}
 })(window, document)`;
 
-const TIGGER_AUTOMATICALLY_CODE = `let timer = setInterval(function () {
-	if ($("#rewarded-modal")) {
-	  triggerRewardedAd();
-	  clearInterval(timer);
-	}
-  }, 100)`;
+const TIGGER_AUTOMATICALLY_CODE = `triggerRewardedAd()`;
 
 const ADS_TXT_DATA = `#AdX
 google.com,pub-8933329999391104,RESELLER,f08c47fec0942fa0
