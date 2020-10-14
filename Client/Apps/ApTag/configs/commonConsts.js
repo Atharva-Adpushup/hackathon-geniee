@@ -247,7 +247,7 @@ const REWARDED_AD_CODE = `(function(w, d) {
 					'.rewarded-modal-content {margin: 50% auto;width: 60%;' +
 					'box-shadow: 0 5px 8px 0 rgba(0, 0, 0, 0.2),0 7px 20px 0 rgba(0, 0, 0, 0.17);' +
 					'animation-name: modalopen;animation-duration: 1s;}' +
-					'.rewarded-modal-body { padding: 10px 20px;background: #fff;height: 150px; display: table-cell; vertical-align: middle}' +
+					'.rewarded-modal-body { padding: 10px 20px;background: #fff;height: 150px; display: table-cell; vertical-align: middle;width: 60%;}' +
 					'.close {color: #ccc;float: right;font-size: 30px;line-height: 12px;color: #fff;}' +
 					'.close:hover,.close:focus {color: #000;text-decoration: none;cursor: pointer;}' +
 					'@keyframes modalopen {from {opacity: 0;}to {opacity: 1;}}' +
