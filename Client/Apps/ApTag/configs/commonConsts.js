@@ -134,342 +134,348 @@ const ADCODE = `<div id="__AD_ID__" class="_ap_apex_ad"__CUSTOM_ATTRIBS__>
 const watchButton = typeof WATCH_BUTTON_TEXT === 'undefined' ? 'Watch' : WATCH_BUTTON_TEXT;
 const noThanksButton = typeof NO_THANKS_BUTTON === 'undefined' ? 'Close' : NO_THANKS_BUTTON;
 
-const REWARDED_AD_CODE = `(function(w, d) {
-	if (!!navigator.userAgent.match(/iPad|iPhone|Android|BlackBerry|Windows Phone|webOS/i)) {
-		var siteId = __SITE_ID__;
-		var domain = '__SITE_DOMAIN__';
-		var adId = '__AD_ID__';
-		var adName = '__AD_NAME__';
-		var dfpAdunit = '__AD_UNIT__';
-
-		var cssAnimation = document.createElement('style');
-		cssAnimation.type = 'text/css';
-		var rules = document.createTextNode(
-			'@keyframes modalopen {' +
-				'from {' +
-				'opacity: 0;' +
-				' }' +
-				'to {' +
-				'opacity: 1;' +
-				'}' +
-				'}'
-		);
-		cssAnimation.appendChild(rules);
-		document.getElementsByTagName('head')[0].appendChild(cssAnimation);
-
-		function createFeedBackPayload() {
-			var adpConfig = window.adpushup && window.adpushup.config ? window.adpushup.config : {};
-
-			var feedbackObj = {
-				createdTS: +new Date(),
-				packetId: adpConfig.packetId,
-				siteId: adpConfig.siteId || siteId,
-				siteDomain: adpConfig.siteDomain || domain,
-				url: adpConfig.pageUrl || window.location.href,
-				mode: 1,
-				errorCode: 1,
-				referrer: adpConfig.referrer || window.document.referrer,
-				platform: 'MOBILE',
-				isGeniee: false,
-				sections: [
-					{
-						sectionId: adId,
-						sectionName: adName,
-						status: 1,
-						network: 'adpTags',
-						networkAdUnitId: dfpAdunit,
-						services: [2],
-						adUnitType: 5
-					}
-				]
-			};
-
-			return feedbackObj;
-		}
-
-		function fireImagePixel(src) {
-			var imgEl = document.createElement('img');
-			imgEl.src = src;
-		}
-
-		function sendFeedback() {
-			var feedbackObj = createFeedBackPayload();
-			var url = '//e3.adpushup.com/AdPushupFeedbackWebService/feedback?data=';
-			var data = window.btoa(JSON.stringify(feedbackObj));
-			var toFeedback = url + data;
-			fireImagePixel(toFeedback);
-		}
-
-		var $ = w.adpushup.$;
-		var makeRewardVisible = false;
-		function isResetRejectedFinal() {
-			return true;
+const REWARDED_AD_CODE = `<script>
+   !(function(w, d) {
+	var adpTags = (w.adpTags = w.adpTags || { que: [] });
+	adpTags.que.push(function(){
+		if (!!navigator.userAgent.match(/iPad|iPhone|Android|BlackBerry|Windows Phone|webOS/i)) {
+			var siteId = __SITE_ID__;
+			var domain = '__SITE_DOMAIN__';
+			var adId = '__AD_ID__';
+			var adName = '__AD_NAME__';
+			var dfpAdunit = '__AD_UNIT__';
+	
+			var cssAnimation = document.createElement('style');
+			cssAnimation.type = 'text/css';
+			var rules = document.createTextNode(
+				'@keyframes modalopen {' +
+					'from {' +
+					'opacity: 0;' +
+					' }' +
+					'to {' +
+					'opacity: 1;' +
+					'}' +
+					'}'
+			);
+			cssAnimation.appendChild(rules);
+			document.getElementsByTagName('head')[0].appendChild(cssAnimation);
+	
+			function createFeedBackPayload() {
+				var adpConfig = window.adpushup && window.adpushup.config ? window.adpushup.config : {};
+	
+				var feedbackObj = {
+					createdTS: +new Date(),
+					packetId: adpConfig.packetId,
+					siteId: adpConfig.siteId || siteId,
+					siteDomain: adpConfig.siteDomain || domain,
+					url: adpConfig.pageUrl || window.location.href,
+					mode: 1,
+					errorCode: 1,
+					referrer: adpConfig.referrer || window.document.referrer,
+					platform: 'MOBILE',
+					isGeniee: false,
+					sections: [
+						{
+							sectionId: adId,
+							sectionName: adName,
+							status: 1,
+							network: 'adpTags',
+							networkAdUnitId: dfpAdunit,
+							services: [2],
+							adUnitType: 5
+						}
+					]
+				};
+	
+				return feedbackObj;
+			}
+	
+			function fireImagePixel(src) {
+				var imgEl = document.createElement('img');
+				imgEl.src = src;
+			}
+	
+			function sendFeedback() {
+				var feedbackObj = createFeedBackPayload();
+				var url = '//e3.adpushup.com/AdPushupFeedbackWebService/feedback?data=';
+				var data = window.btoa(JSON.stringify(feedbackObj));
+				var toFeedback = url + data;
+				fireImagePixel(toFeedback);
+			}
+	
+			var $ = w.adpushup.$;
+			var makeRewardVisible = false;
+			function isResetRejectedFinal() {
+				return true;
+				var rewardedData = JSON.parse(localStorage.getItem('aprewarded_key'));
+				if (!rewardedData.rejectedFinal) return true;
+				if (!rewardedData.expiryDate) {
+					rewardedData.expiryDate = new Date(new Date().getTime() + 604800000);
+					localStorage.setItem('aprewarded_key', JSON.stringify(rewardedData));
+					return true;
+				}
+				if (new Date().getTime() > new Date(rewardedData.expiryDate)) {
+					rewardedData.expiryDate = undefined;
+					rewardedData.rejectedFinal = false;
+					localStorage.setItem('aprewarded_key', JSON.stringify(rewardedData));
+					return true;
+				}
+				return false;
+			}
 			var rewardedData = JSON.parse(localStorage.getItem('aprewarded_key'));
-			if (!rewardedData.rejectedFinal) return true;
-			if (!rewardedData.expiryDate) {
-				rewardedData.expiryDate = new Date(new Date().getTime() + 604800000);
-				localStorage.setItem('aprewarded_key', JSON.stringify(rewardedData));
-				return true;
-			}
-			if (new Date().getTime() > new Date(rewardedData.expiryDate)) {
-				rewardedData.expiryDate = undefined;
-				rewardedData.rejectedFinal = false;
-				localStorage.setItem('aprewarded_key', JSON.stringify(rewardedData));
-				return true;
-			}
-			return false;
-		}
-		var rewardedData = JSON.parse(localStorage.getItem('aprewarded_key'));
-		function triggerRewardedAd() {
-			var urlParams = new URLSearchParams(window.location.search);
-			// show only to 20% users
-			if (
-				(rewardedData === null || isResetRejectedFinal()) &&
-				Math.floor(Math.random() * 100) < 20||urlParams.has('adpushuptesting')
-			) {
-				// if (true) 
-				function addModalStyle(styles) {
-					/* Create style document */
-					var css = document.createElement('style');
-					css.type = 'text/css';
-
-					css.appendChild(document.createTextNode(styles));
-
-					/* Append style to the tag name */
-					document.getElementsByTagName('head')[0].appendChild(css);
-				}
-
-				const forceRewarded = false;
-
-				var styles =
-					'.rewarded-modal {display: none;position: fixed;z-index: 1000;left: 0;top: 0;height: 100%;' +
-					'width: 100%; overflow: auto; background-color: rgba(0, 0, 0);}' +
-					'.rewarded-modal-content {margin: 50% auto;width: 60%;' +
-					'box-shadow: 0 5px 8px 0 rgba(0, 0, 0, 0.2),0 7px 20px 0 rgba(0, 0, 0, 0.17);' +
-					'animation-name: modalopen;animation-duration: 1s;}' +
-					'.rewarded-modal-body { padding: 10px 20px;background: #fff;height: 150px; display: table-cell; vertical-align: middle;width: 60%;}' +
-					'.close {color: #ccc;float: right;font-size: 30px;line-height: 12px;color: #fff;}' +
-					'.close:hover,.close:focus {color: #000;text-decoration: none;cursor: pointer;}' +
-					'@keyframes modalopen {from {opacity: 0;}to {opacity: 1;}}' +
-					'.watch {background-color: #428bca;border: none;color: white;border-radius: 5px;' +
-					'font-size: 15px;float: right;position: relative;margin-left: 5px;}' +
-					'.closeModal {font-size: 15px;border: none;float: right;position: relative;border-radius: 5px;' +
-					'color: #000;} ;';
-
-				googletag = w.googletag || { cmd: [] };
-
-				function setupRewarded() {
-					const rewardedSlot = googletag
-						.defineOutOfPageSlot(
-							'/__NETWORK_CODE__/__AD_UNIT__',
-							googletag.enums.OutOfPageFormat.REWARDED
-						)
-						.addService(googletag.pubads())
-						.setTargeting('adpushup_ran', 1);
-					rewardedSlot.setForceSafeFrame(true);
-					googletag.pubads().enableAsyncRendering();
-					googletag.enableServices();
-					return rewardedSlot;
-				}
-
-				var isSlotLogged = false;
-				var startTime;
-				var refreshCount = -1;
-
-				function processRewarded() {
-					var slot = setupRewarded();
-					googletag.display(slot);
-
-					isSlotLogged = false;
-					startTime = performance.now();
-					googletag.pubads().refresh([slot]);
-					refreshCount++;
-					return slot;
-				}
-
-				function log(eventType, id, dfpResponseTime) {
-					var data = {
-						timestamp: new Date().getTime(),
-						type: 0,
-						id: id,
-						eventType: eventType,
-						pageUrl: w.location.href,
-						lang: d.documentElement.lang,
-						ua: navigator.userAgent,
-						releaseVersion: 2,
-						forced: forceRewarded,
-						refreshCount: refreshCount,
-						userStats: JSON.parse(localStorage.getItem('aprewarded_key'))
-					};
-					if (dfpResponseTime) data.dfpResponseTime = dfpResponseTime;
-
-					const logUrl = 'https://vastdump-staging.adpushup.com/rewardedAdDump';
-
-					if (navigator.sendBeacon) {
-						navigator.sendBeacon(logUrl, JSON.stringify(data));
-					} else {
-						var img = new Image();
-						var encData = btoa(JSON.stringify(data));
-						img.src = logUrl + '?data=' + encData;
+			function triggerRewardedAd() {
+				var urlParams = new URLSearchParams(window.location.search);
+				// show only to 20% users
+				if (
+					(rewardedData === null || isResetRejectedFinal()) &&
+					Math.floor(Math.random() * 100) < 20||urlParams.has('adpushuptesting')
+				) {
+					// if (true) 
+					function addModalStyle(styles) {
+						/* Create style document */
+						var css = document.createElement('style');
+						css.type = 'text/css';
+	
+						css.appendChild(document.createTextNode(styles));
+	
+						/* Append style to the tag name */
+						document.getElementsByTagName('head')[0].appendChild(css);
 					}
-				}
-
-				return googletag.cmd.push(function() {
-					function getRandomData() {
-						if (w && w.crypto && w.crypto.getRandomValues) {
-							return crypto.getRandomValues(new Uint8Array(1))[0] % 16;
+	
+					const forceRewarded = false;
+	
+					var styles =
+						'.rewarded-modal {display: none;position: fixed;z-index: 1000;left: 0;top: 0;height: 100%;' +
+						'width: 100%; overflow: auto; background-color: rgba(0, 0, 0);}' +
+						'.rewarded-modal-content {margin: 50% auto;width: 60%;' +
+						'box-shadow: 0 5px 8px 0 rgba(0, 0, 0, 0.2),0 7px 20px 0 rgba(0, 0, 0, 0.17);' +
+						'animation-name: modalopen;animation-duration: 1s;}' +
+						'.rewarded-modal-body { padding: 10px 20px;background: #fff;height: 150px; display: table-cell; vertical-align: middle;width: 60%;}' +
+						'.close {color: #ccc;float: right;font-size: 30px;line-height: 12px;color: #fff;}' +
+						'.close:hover,.close:focus {color: #000;text-decoration: none;cursor: pointer;}' +
+						'@keyframes modalopen {from {opacity: 0;}to {opacity: 1;}}' +
+						'.watch {background-color: #428bca;border: none;color: white;border-radius: 5px;' +
+						'font-size: 15px;float: right;position: relative;margin-left: 5px;}' +
+						'.closeModal {font-size: 15px;border: none;float: right;position: relative;border-radius: 5px;' +
+						'color: #000;} ;';
+	
+					googletag = w.googletag || { cmd: [] };
+	
+					function setupRewarded() {
+						const rewardedSlot = googletag
+							.defineOutOfPageSlot(
+								'/__NETWORK_CODE__/__AD_UNIT__',
+								googletag.enums.OutOfPageFormat.REWARDED
+							)
+							.addService(googletag.pubads())
+							.setTargeting('adpushup_ran', 1);
+						rewardedSlot.setForceSafeFrame(true);
+						return rewardedSlot;
+					}
+	
+					var isSlotLogged = false;
+					var startTime;
+					var refreshCount = -1;
+	
+					function processRewarded() {
+						var slot = setupRewarded();
+						if (!googletag.pubads().isInitialLoadDisabled()) {
+							googletag.display(slot);
 						} else {
-							return Math.random() * 16;
+							googletag.pubads().refresh([slot]);
+						}
+						isSlotLogged = false;
+						startTime = performance.now();
+						refreshCount++;
+						return slot;
+					}
+	
+					function log(eventType, id, dfpResponseTime) {
+						var data = {
+							timestamp: new Date().getTime(),
+							type: 0,
+							id: id,
+							eventType: eventType,
+							pageUrl: w.location.href,
+							lang: d.documentElement.lang,
+							ua: navigator.userAgent,
+							releaseVersion: 2,
+							forced: forceRewarded,
+							refreshCount: refreshCount,
+							userStats: JSON.parse(localStorage.getItem('aprewarded_key'))
+						};
+						if (dfpResponseTime) data.dfpResponseTime = dfpResponseTime;
+	
+						const logUrl = 'https://vastdump-staging.adpushup.com/rewardedAdDump';
+	
+						if (navigator.sendBeacon) {
+							navigator.sendBeacon(logUrl, JSON.stringify(data));
+						} else {
+							var img = new Image();
+							var encData = btoa(JSON.stringify(data));
+							img.src = logUrl + '?data=' + encData;
 						}
 					}
-					function generateUUID(placeholder) {
-						return placeholder
-							? (placeholder ^ (getRandomData() >> (placeholder / 4))).toString(16)
-							: ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, generateUUID);
-					}
-
-					function generateModalCode(forced) {
-						let modalHtml =
-							'<div id="rewarded-modal" class="rewarded-modal">' +
-							'<div class="rewarded-modal-content">' +
-							'<div class="rewarded-modal-body">' +
-							'<p>__MODAL_TEXT__</p>' +
-							'<button id ="watchAdBtn" class=" watch primary">' +
-							'${watchButton}'+
-							'</button>';
-
-						if (!forced) {
-							const closeHtml =
-								'<button  id ="noThanksBtn" class="closeModal secondary"><span class="lg">' +
-                                '${noThanksButton}'+
+	
+					return googletag.cmd.push(function() {
+						function getRandomData() {
+							if (w && w.crypto && w.crypto.getRandomValues) {
+								return crypto.getRandomValues(new Uint8Array(1))[0] % 16;
+							} else {
+								return Math.random() * 16;
+							}
+						}
+						function generateUUID(placeholder) {
+							return placeholder
+								? (placeholder ^ (getRandomData() >> (placeholder / 4))).toString(16)
+								: ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, generateUUID);
+						}
+	
+						function generateModalCode(forced) {
+							let modalHtml =
+								'<div id="rewarded-modal" class="rewarded-modal">' +
+								'<div class="rewarded-modal-content">' +
+								'<div class="rewarded-modal-body">' +
+								'<p>__MODAL_TEXT__</p>' +
+								'<button id ="watchAdBtn" class=" watch primary">' +
+								'${watchButton}'+
 								'</button>';
-							modalHtml += closeHtml;
-						}
-
-						modalHtml = modalHtml + '</div> </div> <div>';
-						return modalHtml;
-					}
-
-					if (!localStorage.getItem('aprewarded_key')) {
-						localStorage.setItem(
-							'aprewarded_key',
-							JSON.stringify({
-								ready: 0,
-								granted: 0,
-								played: 0,
-								userId: generateUUID(),
-								rejected: false,
-								rejectedFinal: false
-							})
-						);
-					} else {
-						var initData = JSON.parse(localStorage.getItem('aprewarded_key'));
-						if (typeof initData.rejectedFinal === 'undefined') {
-							initData.rejected = false;
-							localStorage.setItem('aprewarded_key', JSON.stringify(initData));
-						}
-					}
-
-					var uuid = generateUUID();
-					log(5, uuid);
-
-					var slot = processRewarded();
-
-					googletag.pubads().addEventListener('rewardedSlotReady', function(rewardedEvent) {
-						addModalStyle(styles);
-						// replaceOriginalButtonWithCloned();
-
-						$('body').append(generateModalCode(forceRewarded));
-
-						let timer = setInterval(function() {
-							if (makeRewardVisible) {
-								rewardedEvent.makeRewardedVisible();
-								sendFeedback();
-								clearInterval(timer);
+	
+							if (!forced) {
+								const closeHtml =
+									'<button  id ="noThanksBtn" class="closeModal secondary"><span class="lg">' +
+									'${noThanksButton}'+
+									'</button>';
+								modalHtml += closeHtml;
 							}
-						}, 100);
-
-						var rewardedData = JSON.parse(localStorage.getItem('aprewarded_key'));
-						rewardedData.ready += 1;
-						localStorage.setItem('aprewarded_key', JSON.stringify(rewardedData));
-
-						var modalShown = false;
-
-						$('#rewarded-modal').show();
-
-						if (!modalShown) {
-							log(6, uuid);
-
-							modalShown = true;
-
-							$('#watchAdBtn').click(onWatchAdClicked);
-
-							function onWatchAdClicked() {
-								var rewardedData = JSON.parse(localStorage.getItem('aprewarded_key'));
-								rewardedData.played += 1;
-								localStorage.setItem('aprewarded_key', JSON.stringify(rewardedData));
-								log(1, uuid);
-								makeRewardVisible = true;
-							}
-
-							function onWatchAdClosed() {
-								$('#rewarded-modal').hide();
-							}
-
-							$('#noThanksBtn, #rewarded-modal-close').click(onWatchAdClosed);
+	
+							modalHtml = modalHtml + '</div> </div> <div>';
+							return modalHtml;
 						}
-
-						log(0, uuid);
-					});
-
-					googletag.pubads().addEventListener('rewardedSlotGranted', function(e) {
-						var rewardedData = JSON.parse(localStorage.getItem('aprewarded_key'));
-						rewardedData.granted += 1;
-						localStorage.setItem('aprewarded_key', JSON.stringify(rewardedData));
-						$('#rewarded-modal').hide();
-						log(2, uuid);
-						var slot = googletag
-							.pubads()
-							.getSlots()
-							.find(slot => slot.getAdUnitPath() === '/__NETWORK_CODE__/__AD_UNIT__');
-						googletag.destroySlots([slot]);
-						__POST_REWARDED_FUNCTION__
-					});
-
-					googletag.pubads().addEventListener('rewardedSlotCanceled', function(e) {
-						makeRewardVisible = false;
-						log(3, uuid);
-						$('#rewarded-modal').remove();
-						if (forceRewarded) {
+	
+						if (!localStorage.getItem('aprewarded_key')) {
+							localStorage.setItem(
+								'aprewarded_key',
+								JSON.stringify({
+									ready: 0,
+									granted: 0,
+									played: 0,
+									userId: generateUUID(),
+									rejected: false,
+									rejectedFinal: false
+								})
+							);
+						} else {
+							var initData = JSON.parse(localStorage.getItem('aprewarded_key'));
+							if (typeof initData.rejectedFinal === 'undefined') {
+								initData.rejected = false;
+								localStorage.setItem('aprewarded_key', JSON.stringify(initData));
+							}
+						}
+	
+						var uuid = generateUUID();
+						log(5, uuid);
+	
+						var slot = processRewarded();
+	
+						googletag.pubads().addEventListener('rewardedSlotReady', function(rewardedEvent) {
+							addModalStyle(styles);
+							// replaceOriginalButtonWithCloned();
+	
+							$('body').append(generateModalCode(forceRewarded));
+	
+							let timer = setInterval(function() {
+								if (makeRewardVisible) {
+									rewardedEvent.makeRewardedVisible();
+									sendFeedback();
+									clearInterval(timer);
+								}
+							}, 100);
+	
+							var rewardedData = JSON.parse(localStorage.getItem('aprewarded_key'));
+							rewardedData.ready += 1;
+							localStorage.setItem('aprewarded_key', JSON.stringify(rewardedData));
+	
+							var modalShown = false;
+	
+							$('#rewarded-modal').show();
+	
+							if (!modalShown) {
+								log(6, uuid);
+	
+								modalShown = true;
+	
+								$('#watchAdBtn').click(onWatchAdClicked);
+	
+								function onWatchAdClicked() {
+									var rewardedData = JSON.parse(localStorage.getItem('aprewarded_key'));
+									rewardedData.played += 1;
+									localStorage.setItem('aprewarded_key', JSON.stringify(rewardedData));
+									log(1, uuid);
+									makeRewardVisible = true;
+								}
+	
+								function onWatchAdClosed() {
+									$('#rewarded-modal').hide();
+								}
+	
+								$('#noThanksBtn, #rewarded-modal-close').click(onWatchAdClosed);
+							}
+	
+							log(0, uuid);
+						});
+	
+						googletag.pubads().addEventListener('rewardedSlotGranted', function(e) {
+							var rewardedData = JSON.parse(localStorage.getItem('aprewarded_key'));
+							rewardedData.granted += 1;
+							localStorage.setItem('aprewarded_key', JSON.stringify(rewardedData));
+							$('#rewarded-modal').hide();
+							log(2, uuid);
 							var slot = googletag
 								.pubads()
 								.getSlots()
 								.find(slot => slot.getAdUnitPath() === '/__NETWORK_CODE__/__AD_UNIT__');
 							googletag.destroySlots([slot]);
-							processRewarded();
-						}
-
-						var rewardedData = JSON.parse(localStorage.getItem('aprewarded_key'));
-						localStorage.setItem('aprewarded_key', JSON.stringify(rewardedData));
+							__POST_REWARDED_FUNCTION__
+						});
+	
+						googletag.pubads().addEventListener('rewardedSlotCanceled', function(e) {
+							makeRewardVisible = false;
+							log(3, uuid);
+							$('#rewarded-modal').remove();
+							if (forceRewarded) {
+								var slot = googletag
+									.pubads()
+									.getSlots()
+									.find(slot => slot.getAdUnitPath() === '/__NETWORK_CODE__/__AD_UNIT__');
+								googletag.destroySlots([slot]);
+								processRewarded();
+							}
+	
+							var rewardedData = JSON.parse(localStorage.getItem('aprewarded_key'));
+							localStorage.setItem('aprewarded_key', JSON.stringify(rewardedData));
+						});
+	
+						googletag.pubads().addEventListener('slotRenderEnded', function(event) {
+							var slotEnded = event.slot;
+							var endTime = performance.now();
+							if (slot === slotEnded && !isSlotLogged) {
+								isSlotLogged = true;
+								//send log here
+								var dfpResponseTime = endTime - startTime;
+								var uuid = generateUUID();
+								log(7, uuid, dfpResponseTime);
+							}
+						});
 					});
-
-					googletag.pubads().addEventListener('slotRenderEnded', function(event) {
-						var slotEnded = event.slot;
-						var endTime = performance.now();
-						if (slot === slotEnded && !isSlotLogged) {
-							isSlotLogged = true;
-							//send log here
-							var dfpResponseTime = endTime - startTime;
-							var uuid = generateUUID();
-							log(7, uuid, dfpResponseTime);
-						}
-					});
-				});
+				}
 			}
+			__TRIGGER_REWARDED_AD__;
 		}
-		__TRIGGER_REWARDED_AD__;
-	}
-})(window, document)`;
+	});
+})(window, document);
+</script>
+`;
 
 const TIGGER_AUTOMATICALLY_CODE = `triggerRewardedAd()`;
 
