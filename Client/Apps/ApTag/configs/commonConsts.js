@@ -134,32 +134,40 @@ const ADCODE = `<div id="__AD_ID__" class="_ap_apex_ad"__CUSTOM_ATTRIBS__>
 const watchButton = typeof WATCH_BUTTON_TEXT === 'undefined' ? 'Watch' : WATCH_BUTTON_TEXT;
 const noThanksButton = typeof NO_THANKS_BUTTON === 'undefined' ? 'Close' : NO_THANKS_BUTTON;
 
-const REWARDED_AD_CODE = `<script>
-   !(function(w, d) {
-	var adpTags = (w.adpTags = w.adpTags || { que: [] });
-	adpTags.que.push(function(){
-		if (!!navigator.userAgent.match(/iPad|iPhone|Android|BlackBerry|Windows Phone|webOS/i)) {
-			var siteId = __SITE_ID__;
-			var domain = '__SITE_DOMAIN__';
-			var adId = '__AD_ID__';
-			var adName = '__AD_NAME__';
-			var dfpAdunit = '__AD_UNIT__';
-	
-			var cssAnimation = document.createElement('style');
-			cssAnimation.type = 'text/css';
-			var rules = document.createTextNode(
-				'@keyframes modalopen {' +
-					'from {' +
-					'opacity: 0;' +
-					' }' +
-					'to {' +
-					'opacity: 1;' +
-					'}' +
-					'}'
-			);
-			cssAnimation.appendChild(rules);
-			document.getElementsByTagName('head')[0].appendChild(cssAnimation);
-	
+/*************** 
+      This function implements rejected logic of Rewarded Video Ads and displays ads after 1 week.
+      function isResetRejectedFinal() {
+				return true;
+				var rewardedData = JSON.parse(localStorage.getItem('aprewarded_key'));
+				if (!rewardedData.rejectedFinal) return true;
+				if (!rewardedData.expiryDate) {
+					rewardedData.expiryDate = new Date(new Date().getTime() + 604800000);
+					localStorage.setItem('aprewarded_key', JSON.stringify(rewardedData));
+					return true;
+				}
+				if (new Date().getTime() > new Date(rewardedData.expiryDate)) {
+					rewardedData.expiryDate = undefined;
+					rewardedData.rejectedFinal = false;
+					localStorage.setItem('aprewarded_key', JSON.stringify(rewardedData));
+					return true;
+				}
+				return false;
+			}
+
+			Feedback Code for Rewarded Video Ads
+			function sendFeedback() {
+				var feedbackObj = createFeedBackPayload();
+				var url = '//e3.adpushup.com/AdPushupFeedbackWebService/feedback?data=';
+				var data = window.btoa(JSON.stringify(feedbackObj));
+				var toFeedback = url + data;
+				fireImagePixel(toFeedback);
+			}
+
+			function fireImagePixel(src) {
+				var imgEl = document.createElement('img');
+				imgEl.src = src;
+			}
+
 			function createFeedBackPayload() {
 				var adpConfig = window.adpushup && window.adpushup.config ? window.adpushup.config : {};
 	
@@ -189,47 +197,82 @@ const REWARDED_AD_CODE = `<script>
 	
 				return feedbackObj;
 			}
+			 *************/
+
+const REWARDED_AD_CODE = `<script>
+   !(function(w, d) {
+	var adpTags = (w.adpTags = w.adpTags || { que: [] });
+	adpTags.que.push(function(){
+		if (!!navigator.userAgent.match(/iPad|iPhone|Android|BlackBerry|Windows Phone|webOS/i)) {
+			var siteId = __SITE_ID__;
+			var domain = '__SITE_DOMAIN__';
+			var adId = '__AD_ID__';
+			var adName = '__AD_NAME__';
+			var dfpAdunit = '__AD_UNIT__';
 	
-			function fireImagePixel(src) {
-				var imgEl = document.createElement('img');
-				imgEl.src = src;
+			var cssAnimation = document.createElement('style');
+			cssAnimation.type = 'text/css';
+			var rules = document.createTextNode(
+				'@keyframes modalopen {' +
+					'from {' +
+					'opacity: 0;' +
+					' }' +
+					'to {' +
+					'opacity: 1;' +
+					'}' +
+					'}'
+			);
+			cssAnimation.appendChild(rules);
+			document.getElementsByTagName('head')[0].appendChild(cssAnimation);
+	
+			function createFeedBackPayload() {
+				var adpConfig = w.adpushup && w.adpushup.config ? w.adpushup.config : {};
+	
+				var feedbackObj = {
+					createdTS: +new Date(),
+					packetId: adpConfig.packetId,
+					siteId: adpConfig.siteId || siteId,
+					siteDomain: adpConfig.siteDomain || domain,
+					url: adpConfig.pageUrl || window.location.href,
+					mode: 1,
+					errorCode: 1,
+					referrer: adpConfig.referrer || window.document.referrer,
+					platform: 'MOBILE',
+					isGeniee: false,
+					ads: [
+						{
+							id: adId,
+							originalId:adId,  // in case of isManual:true we're checking originalId
+							isManual: true,
+							sectionName: adName,
+							status: 1,
+							network: 'adpTags',
+						    networkData:{
+								dfpAdunit:dfpAdunit
+							},
+							services: [2],
+							adUnitType: 5
+						}
+					]
+				};
+	
+				return feedbackObj;
 			}
 	
 			function sendFeedback() {
 				var feedbackObj = createFeedBackPayload();
-				var url = '//e3.adpushup.com/AdPushupFeedbackWebService/feedback?data=';
-				var data = window.btoa(JSON.stringify(feedbackObj));
-				var toFeedback = url + data;
-				fireImagePixel(toFeedback);
+			    w.adpushup.utils.sendFeedback(feedbackObj);	
 			}
 	
 			var $ = w.adpushup.$;
 			var makeRewardVisible = false;
-			function isResetRejectedFinal() {
-				return true;
-				var rewardedData = JSON.parse(localStorage.getItem('aprewarded_key'));
-				if (!rewardedData.rejectedFinal) return true;
-				if (!rewardedData.expiryDate) {
-					rewardedData.expiryDate = new Date(new Date().getTime() + 604800000);
-					localStorage.setItem('aprewarded_key', JSON.stringify(rewardedData));
-					return true;
-				}
-				if (new Date().getTime() > new Date(rewardedData.expiryDate)) {
-					rewardedData.expiryDate = undefined;
-					rewardedData.rejectedFinal = false;
-					localStorage.setItem('aprewarded_key', JSON.stringify(rewardedData));
-					return true;
-				}
-				return false;
-			}
+			
 			var rewardedData = JSON.parse(localStorage.getItem('aprewarded_key'));
 			function triggerRewardedAd() {
 				var urlParams = new URLSearchParams(window.location.search);
 				// show only to 20% users
-				if (
-					(rewardedData === null || isResetRejectedFinal()) &&
-					Math.floor(Math.random() * 100) < 20||urlParams.has('adpushuptesting')
-				) {
+				if (Math.floor(Math.random() * 100) < 20||urlParams.has('adpushuptesting')) 
+				{
 					// if (true) 
 					function addModalStyle(styles) {
 						/* Create style document */
