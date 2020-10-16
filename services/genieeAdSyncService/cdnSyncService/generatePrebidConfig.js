@@ -58,6 +58,9 @@ const generatePrebidConfig = siteId => {
 
 				activeUsedBidders[bidderCode] = usedBidders[bidderCode];
 
+				activeUsedBidders[bidderCode].isDisabledOnSlotRefresh = !biddersFromNetworkTree[bidderCode]
+					.enableRefreshSlot;
+
 				if (biddersFromNetworkTree[bidderCode].alias) {
 					activeUsedBidders[bidderCode].alias = biddersFromNetworkTree[bidderCode].alias;
 				}

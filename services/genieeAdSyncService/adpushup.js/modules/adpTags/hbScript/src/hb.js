@@ -166,7 +166,7 @@ var hb = {
 
 		try {
 			prebidDataCollector.init(deps);
-			let events = [prebidEvents.BID_WON];
+			let events = [prebidEvents.BID_WON, prebidEvents.BEFORE_REQUEST_BID];
 
 			if (adp.config.hbAnalytics) {
 				events.push(prebidEvents.AUCTION_END, prebidEvents.BID_TIMEOUT);

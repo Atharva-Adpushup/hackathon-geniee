@@ -8,7 +8,8 @@ var constants = {
 		PREBID: {
 			BID_WON: 'bidWon',
 			BID_TIMEOUT: 'bidTimeout',
-			AUCTION_END: 'auctionEnd'
+			AUCTION_END: 'auctionEnd',
+			BEFORE_REQUEST_BID: 'beforeRequestBids'
 		}
 	},
 	TARGETING: {
