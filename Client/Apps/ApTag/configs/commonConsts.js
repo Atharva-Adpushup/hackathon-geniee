@@ -229,16 +229,8 @@ const REWARDED_AD_CODE = `<script>
 				var adpConfig = w.adpushup && w.adpushup.config ? w.adpushup.config : {};
 	
 				var feedbackObj = {
-					createdTS: +new Date(),
-					packetId: adpConfig.packetId,
-					siteId: adpConfig.siteId || siteId,
-					siteDomain: adpConfig.siteDomain || domain,
-					url: adpConfig.pageUrl || window.location.href,
 					mode: 1,
 					errorCode: 1,
-					referrer: adpConfig.referrer || window.document.referrer,
-					platform: 'MOBILE',
-					isGeniee: false,
 					ads: [
 						{
 							id: adId,
@@ -294,6 +286,7 @@ const REWARDED_AD_CODE = `<script>
 						'box-shadow: 0 5px 8px 0 rgba(0, 0, 0, 0.2),0 7px 20px 0 rgba(0, 0, 0, 0.17);' +
 						'animation-name: modalopen;animation-duration: 1s;}' +
 						'.rewarded-modal-body { padding: 10px 20px;background: #fff;height: 150px; display: table-cell; vertical-align: middle;width: 60%;}' +
+						'.rewarded-modal-body>p{font-size: 14px;}'+
 						'.close {color: #ccc;float: right;font-size: 30px;line-height: 12px;color: #fff;}' +
 						'.close:hover,.close:focus {color: #000;text-decoration: none;cursor: pointer;}' +
 						'@keyframes modalopen {from {opacity: 0;}to {opacity: 1;}}' +
@@ -494,9 +487,6 @@ const REWARDED_AD_CODE = `<script>
 								googletag.destroySlots([slot]);
 								processRewarded();
 							}
-	
-							var rewardedData = JSON.parse(localStorage.getItem('aprewarded_key'));
-							localStorage.setItem('aprewarded_key', JSON.stringify(rewardedData));
 						});
 	
 						googletag.pubads().addEventListener('slotRenderEnded', function(event) {
