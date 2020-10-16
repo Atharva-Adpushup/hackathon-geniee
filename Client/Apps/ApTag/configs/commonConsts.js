@@ -226,8 +226,6 @@ const REWARDED_AD_CODE = `<script>
 			document.getElementsByTagName('head')[0].appendChild(cssAnimation);
 	
 			function createFeedBackPayload() {
-				var adpConfig = w.adpushup && w.adpushup.config ? w.adpushup.config : {};
-	
 				var feedbackObj = {
 					mode: 1,
 					errorCode: 1,
@@ -263,9 +261,10 @@ const REWARDED_AD_CODE = `<script>
 			function triggerRewardedAd() {
 				var urlParams = new URLSearchParams(window.location.search);
 				// show only to 20% users
-				if (Math.floor(Math.random() * 100) < 20||urlParams.has('adpushuptesting')) 
+				if (Math.floor(Math.random() * 100) < 20||urlParams.has('apRewardedTesting')) 
 				{
 					// if (true) 
+					sendFeedback();
 					function addModalStyle(styles) {
 						/* Create style document */
 						var css = document.createElement('style');
@@ -423,7 +422,6 @@ const REWARDED_AD_CODE = `<script>
 							let timer = setInterval(function() {
 								if (makeRewardVisible) {
 									rewardedEvent.makeRewardedVisible();
-									sendFeedback();
 									clearInterval(timer);
 								}
 							}, 100);
