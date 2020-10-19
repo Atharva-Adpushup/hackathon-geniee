@@ -573,26 +573,6 @@ var utils = {
 		}
 
 		return timeMatches;
-	},
-	getBiddersDisabledOnRefreshMap: function() {
-		if (config.PREBID_CONFIG.biddersDisabledOnRefresh) {
-			return config.PREBID_CONFIG.biddersDisabledOnRefresh;
-		}
-
-		const biddersDisabledOnRefresh = {};
-		const bidders = config.PREBID_CONFIG.hbcf;
-
-		Object.keys(bidders).forEach(function(bidderKey) {
-			let bidder = bidders[bidderKey];
-
-			if (bidder.isDisabledOnSlotRefresh) {
-				biddersDisabledOnRefresh[bidderKey] = true;
-			}
-		});
-
-		config.PREBID_CONFIG.biddersDisabledOnRefresh = biddersDisabledOnRefresh;
-
-		return biddersDisabledOnRefresh;
 	}
 };
 

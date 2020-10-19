@@ -160,13 +160,65 @@ var hb = {
 			auction.startAmazonAuction(amznUamSlots, adpBatchId, hasRefreshSlots);
 		}
 	},
+	removeBiddersDisabledOnRefresh: function(adUnitsToBeAuctioned) {
+		try {
+			let biddersDisabledOnRefresh = config.PREBID_CONFIG.biddersDisabledOnRefresh;
+			let hasBiddersDisabledOnRefresh = Object.keys(biddersDisabledOnRefresh).length > 0;
+
+			if (hasBiddersDisabledOnRefresh) {
+				const adpSlots = isApLiteActive
+					? window.apLite.adpSlots
+					: window.adpushup.adpTags.adpSlots;
+
+				for (let i = 0; i < adUnitsToBeAuctioned.length; i++) {
+					const adUnit = adUnitsToBeAuctioned[i];
+					const slot = adpSlots[adUnit.code];
+
+					// slot.removedBiddersDisabledOnRefresh will be [] if we tried to remove bidders before but there were no bidders added to this slot to be removed. [] will skip running this code again
+					if (slot && slot.toBeRefreshed && !slot.removedBiddersDisabledOnRefresh) {
+						const slotBiddersDisabledOnRefresh = [];
+
+						adUnit.bids = adUnit.bids.filter(bid => {
+							if (biddersDisabledOnRefresh[bid.bidder]) {
+								if (!slotBiddersDisabledOnRefresh.includes(bid.bidder)) {
+									slotBiddersDisabledOnRefresh.push(bid.bidder);
+								}
+								return false;
+							}
+
+							return true;
+						});
+
+						slot.removedBiddersDisabledOnRefresh = slotBiddersDisabledOnRefresh;
+					}
+				}
+			}
+		} catch (error) {
+			Array.isArray(window.adpushup.err) &&
+				window.adpushup.err.push({
+					msg: 'Error in Prebid Data Collector',
+					error: error
+				});
+		}
+	},
+	bindBeforeRequestBidsHandler: function(w) {
+		let _this = this;
+		w._apPbJs.que.push(function() {
+			w._apPbJs.onEvent(
+				constants.EVENTS.PREBID.BEFORE_REQUEST_BID,
+				_this.removeBiddersDisabledOnRefresh
+			);
+		});
+	},
 	bindPrebidEvents: function(w) {
 		const prebidEvents = constants.EVENTS.PREBID;
 		const deps = { w, adp, utils, config, constants };
 
+		this.bindBeforeRequestBidsHandler(w);
+
 		try {
 			prebidDataCollector.init(deps);
-			let events = [prebidEvents.BID_WON, prebidEvents.BEFORE_REQUEST_BID];
+			let events = [prebidEvents.BID_WON];
 
 			if (adp.config.hbAnalytics) {
 				events.push(prebidEvents.AUCTION_END, prebidEvents.BID_TIMEOUT);

@@ -35,6 +35,7 @@ const generatePrebidConfig = siteId => {
 		const activeUsedBidders = {};
 		const s2sBiddersWithDifferentParamsPattern = /^.+_s2s$/;
 		const s2sBiddersWithDifferentParams = [];
+		const biddersDisabledOnRefresh = {};
 
 		for (const bidderCode in usedBidders) {
 			if (
@@ -61,6 +62,10 @@ const generatePrebidConfig = siteId => {
 				activeUsedBidders[bidderCode].isDisabledOnSlotRefresh = !biddersFromNetworkTree[bidderCode]
 					.enableRefreshSlot;
 
+				if (activeUsedBidders[bidderCode].isDisabledOnSlotRefresh) {
+					biddersDisabledOnRefresh[bidderCode] = true;
+				}
+
 				if (biddersFromNetworkTree[bidderCode].alias) {
 					activeUsedBidders[bidderCode].alias = biddersFromNetworkTree[bidderCode].alias;
 				}
@@ -75,6 +80,7 @@ const generatePrebidConfig = siteId => {
 		});
 
 		hbDoc.value.hbcf = activeUsedBidders;
+		hbDoc.value.biddersDisabledOnRefresh = biddersDisabledOnRefresh;
 
 		return hbDoc.value;
 	});

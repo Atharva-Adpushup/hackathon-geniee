@@ -353,41 +353,6 @@ var collectBidWonData = function(bidWonData) {
 	}
 };
 
-let removeBiddersDisabledOnRefresh = function(adUnitsToBeAuctioned) {
-	let biddersDisabledOnRefresh = utils.getBiddersDisabledOnRefreshMap();
-	let hasBiddersDisabledOnRefresh = Object.keys(biddersDisabledOnRefresh).length > 0;
-
-	if (hasBiddersDisabledOnRefresh) {
-		const adpSlots = isApLiteActive ? w.apLite.adpSlots : w.adpushup.adpTags.adpSlots;
-
-		for (let i = 0; i < adUnitsToBeAuctioned.length; i++) {
-			const adUnit = adUnitsToBeAuctioned[i];
-			const slot = adpSlots[adUnit.code];
-
-			if (slot && slot.toBeRefreshed && !slot.removedBiddersDisabledOnRefresh) {
-				const slotBiddersDisabledOnRefresh = {};
-				
-				adUnit.bids = adUnit.bids.filter(bid => {
-					if (biddersDisabledOnRefresh[bid.bidder]) {
-						slotBiddersDisabledOnRefresh[bid.bidder] = true;
-						return false;
-					}
-
-					return true;
-				});
-
-				slot.removedBiddersDisabledOnRefresh = Object.keys(
-					slotBiddersDisabledOnRefresh
-				).join(', ');
-			}
-		}
-	}
-};
-
-let handleBeforeRequestBidEvent = function(adUnits) {
-	removeBiddersDisabledOnRefresh(adUnits);
-};
-
 var API = {
 	init: function(params) {
 		var deps = ['w', 'adp', 'utils', 'config', 'constants'];
@@ -423,8 +388,7 @@ var API = {
 		var eventHandlers = {
 			[prebidEvents.BID_WON]: handleBidWonEvent,
 			[prebidEvents.BID_TIMEOUT]: handleBidTimeoutEvent,
-			[prebidEvents.AUCTION_END]: handleAuctionEndEvent,
-			[prebidEvents.BEFORE_REQUEST_BID]: handleBeforeRequestBidEvent
+			[prebidEvents.AUCTION_END]: handleAuctionEndEvent
 		};
 
 		var wrapErrorHandler = function(fn) {
