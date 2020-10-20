@@ -138,8 +138,23 @@ class Component {
 		// 	}.bind(adp, id)
 		// );
 
+		const $bottomStickyBg = $('<div />')
+			.attr('id', `bg-sticky-${id}`)
+			.css({
+				width: '100%',
+				height,
+				background: '#80808094',
+				bottom: 0,
+				left: 0,
+				right: 0,
+				position: 'fixed',
+				'margin-left': 'auto',
+				'margin-right': 'auto'
+			});
+
 		switch (formatData.type) {
 			case commonConsts.FORMATS.STICKY.NAME:
+				const shouldAppendStickyBg = formatData.placement.toLowerCase() === 'bottom' && !formatData.disableStickyBg;
 				$format.css({
 					...commonConsts.FORMAT_CSS,
 					...commonConsts.FORMATS.STICKY.BASE_STYLES,
@@ -147,6 +162,9 @@ class Component {
 					...css
 				});
 				formatData.placement.toLowerCase() === 'top' ? this.pushContent(formatData) : null;
+				shouldAppendStickyBg
+					? this.parentNode.append($bottomStickyBg)
+					: null;
 				this.parentNode.append($format.append(this.adCode));
 				break;
 
