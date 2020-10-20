@@ -882,7 +882,8 @@ class Report extends Component {
 			intervalList,
 			metricsList,
 			filterList,
-			tableData
+			tableData,
+			show
 		} = this.state;
 
 		let { pageSize, pageIndex } = this.state;
@@ -969,6 +970,12 @@ class Report extends Component {
 					/>
 				</Col>
 				<Col sm={12} className="u-margin-b4 url-reporting-table">
+					{show ? (
+						<Alert bsStyle="info" onDismiss={this.handleDismiss} className="u-margin-t4">
+							Due to an internal data migration process, there might be some inconsistencies in the
+							UTM reports for the period between <strong>4th October till 9th October.</strong>
+						</Alert>
+					) : null}
 					<TableContainer
 						tableData={selectedMetricsTableData}
 						aggregatedData={aggregatedData}
@@ -992,7 +999,7 @@ class Report extends Component {
 	};
 
 	render() {
-		const { isLoading, show } = this.state;
+		const { isLoading } = this.state;
 		const { urlUTMReportingMeta } = this.props;
 
 		if (!urlUTMReportingMeta.fetched || isLoading) {
@@ -1002,12 +1009,6 @@ class Report extends Component {
 		return (
 			<React.Fragment>
 				<ActionCard title="AdPushup Reports">{this.renderContent()}</ActionCard>
-				{show ? (
-					<Alert bsStyle="info" onDismiss={this.handleDismiss} className="u-margin-t4">
-						Due to an internal data migration process, there might be some inconsistencies in the
-						UTM reports for the period between <strong>4th October till 9th October.</strong>
-					</Alert>
-				) : null}
 			</React.Fragment>
 		);
 	}
