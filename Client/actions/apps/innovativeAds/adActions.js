@@ -105,6 +105,12 @@ const updateAd = (adId, siteId, data) => dispatch =>
 		},
 		siteId
 	});
+const updateAllAds = (siteId, data) => dispatch =>
+	dispatch({
+		type: AD_ACTIONS.REPLACE_ADS_LIST,
+		data,
+		siteId
+	});
 const modifyAdOnServer = (adId, siteId, data) => dispatch =>
 	axiosInstance.post(API_PATHS.MODIFY_AD, { siteId, adId, data }).then(response => {
 		if (response.error) {
@@ -210,4 +216,13 @@ const updateTraffic = (
 	);
 };
 
-export { createAd, fetchAds, deleteAd, updateAd, modifyAdOnServer, archiveAd, updateTraffic };
+export {
+	createAd,
+	fetchAds,
+	deleteAd,
+	updateAd,
+	modifyAdOnServer,
+	archiveAd,
+	updateTraffic,
+	updateAllAds
+};

@@ -339,6 +339,15 @@ function apiModule() {
 						});
 					})
 			);
+		},
+		updateChannel: function(channelId, channel) {
+			return couchbase
+				.connectToAppBucket()
+				.then(appBucket => appBucket.replaceAsync(channelId, channel))
+				.catch(err => {
+					if (err.code && err.code === 13) return [];
+					throw err;
+				});
 		}
 	};
 

@@ -61,4 +61,11 @@ const modifyAdOnServer = (siteId, adId, data) => dispatch =>
 		)
 		.catch(err => errorHandler(err));
 
-export { createAd, fetchAds, deleteAd, updateAd, modifyAdOnServer };
+const updateAllAds = (siteId, data) => dispatch =>
+	dispatch({
+		type: AD_ACTIONS.REPLACE_ADS_LIST,
+		data,
+		siteId
+	});
+
+export { createAd, fetchAds, deleteAd, updateAd, modifyAdOnServer, updateAllAds };
