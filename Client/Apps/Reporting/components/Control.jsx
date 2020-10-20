@@ -37,7 +37,9 @@ class Control extends Component {
 			disableGenerateButton: false,
 			updateStatusText: '',
 			csvData: props.csvData,
-			fileName: 'adpushup-report'
+			fileName: 'adpushup-report',
+			selectedFilterKey: null,
+			selectedFilterValues: null
 		};
 	}
 
@@ -65,7 +67,7 @@ class Control extends Component {
 		this.setState({ selectedDimension }, this.onControlChange.bind(null, reportType));
 	};
 
-	onFilteChange = selectedFilters => {
+	onFilteChange = (selectedFilters, selectedFilterValues, selectedFilterKey) => {
 		const { defaultReportType } = this.props;
 		let reportType = defaultReportType || 'account';
 		const { filterList, dimensionList } = this.props;
@@ -83,7 +85,9 @@ class Control extends Component {
 			{
 				dimensionList: updatedDimensionList,
 				filterList: updatedFilterList,
-				reportType
+				reportType,
+				selectedFilterKey,
+				selectedFilterValues
 			},
 			() => this.onControlChange(reportType)
 		);
@@ -110,7 +114,9 @@ class Control extends Component {
 			selectedInterval,
 			selectedDimension,
 			selectedFilters,
-			reportType
+			reportType,
+			selectedFilterKey,
+			selectedFilterValues
 		} = this.state;
 		const resultObject = {
 			startDate,
@@ -120,6 +126,11 @@ class Control extends Component {
 			selectedFilters,
 			reportType
 		};
+
+		if (selectedFilterKey && selectedFilterValues) {
+			resultObject.selectedFilterKey = selectedFilterKey;
+			resultObject.selectedFilterValues = selectedFilterValues;
+		}
 
 		return resultObject;
 	};
