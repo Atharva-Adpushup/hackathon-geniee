@@ -170,6 +170,11 @@ const bidderParamsMapping = {
 				 */
 			}
 		}
+	},
+	synacormedia: {
+		videoParams: {
+			video: {}
+		}
 	}
 };
 
