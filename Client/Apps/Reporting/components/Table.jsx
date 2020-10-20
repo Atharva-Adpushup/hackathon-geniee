@@ -269,6 +269,9 @@ class Table extends React.Component {
 					</a>
 				);
 			}
+			if (tableRow.utm_key) {
+				tableRow.utm_key = tableRow.display_name;
+			}
 
 			displayTableData.push(tableRow);
 		});
