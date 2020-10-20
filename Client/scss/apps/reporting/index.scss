@@ -554,3 +554,41 @@ body {
 		}
 	}
 }
+
+.badge {
+	background-color: #e5e5e5;
+	margin: 4px;
+	color: #545454;
+	font-weight: 100 !important;
+}
+
+.badge-toggle {
+	cursor: pointer;
+}
+
+.selected-filter {
+	border-top-style: hidden !important;
+}
+
+.selected-filter td {
+	padding: 4px !important;
+	padding-left: 8px;
+}
+
+.filter-badge-key {
+	width: 175px;
+	font-size: 1.4rem;
+}
+
+.filter-list-table {
+	margin-left: 8px;
+}
+
+.filter-legend {
+	margin-top: 8px;
+	padding-top: 12px;
+}
+
+.filter-list-title {
+	margin-left: 10px;
+}

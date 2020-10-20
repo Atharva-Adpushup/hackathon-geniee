@@ -14,6 +14,7 @@ import Empty from '../../../Components/Empty/index';
 import ControlContainer from '../containers/ControlContainer';
 import TableContainer from '../containers/TableContainer';
 import ChartContainer from '../containers/ChartContainer';
+import FilterLegend from './FilterLegend';
 import reportService from '../../../services/reportService';
 import { DEMO_ACCOUNT_DATA } from '../../../constants/others';
 import Loader from '../../../Components/Loader';
@@ -53,6 +54,7 @@ class Report extends Component {
 			metricsList: props.isForOps ? displayOpsMetrics : displayMetrics,
 			selectedDimension: '',
 			selectedFilters: {},
+			selectedFilterValues: {},
 			selectedMetrics: [],
 			selectedInterval: 'daily',
 			selectedChartLegendMetric: '',
@@ -181,9 +183,18 @@ class Report extends Component {
 
 	onControlChange = (data, reportType) => {
 		const params = this.getControlChangedParams({ ...data, reportType });
+		const { selectedFilterValues } = this.state;
+		const newStateData = { ...data };
+		if (data.selectedFilterKey && data.selectedFilterValues) {
+			newStateData.selectedFilterValues = {
+				...selectedFilterValues,
+				[newStateData.selectedFilterKey]: [...newStateData.selectedFilterValues]
+			};
+			delete newStateData.selectedFilterKey;
+		}
 
 		this.setState({
-			...data,
+			...newStateData,
 			...params,
 			reportType
 		});
@@ -300,7 +311,7 @@ class Report extends Component {
 	};
 
 	generateButtonHandler = (inputState = {}) => {
-		let { tableData, metricsList } = this.state;
+		let { tableData, metricsList, selectedFilterValues } = this.state;
 		const { selectedDimension, selectedFilters, dimensionList } = this.state;
 		const { reportType, isForOps } = this.props;
 		const computedState = Object.assign({ isLoading: true }, inputState);
@@ -413,7 +424,7 @@ class Report extends Component {
 					}
 				}
 
-				newState = { ...newState, isLoading: false, tableData };
+				newState = { ...newState, isLoading: false, tableData, selectedFilterValues };
 				this.setState(newState);
 			});
 		});
@@ -804,6 +815,7 @@ class Report extends Component {
 		const {
 			selectedDimension,
 			selectedFilters,
+			selectedFilterValues,
 			selectedInterval,
 			selectedMetrics,
 			selectedChartLegendMetric,
@@ -899,6 +911,9 @@ class Report extends Component {
 						user={user}
 						showNotification={showNotification}
 					/>
+				</Col>
+				<Col sm={12}>
+					<FilterLegend selectedFilters={selectedFilterValues} filtersList={filterList} />
 				</Col>
 				<Col sm={12} className="u-margin-t5">
 					<ChartContainer

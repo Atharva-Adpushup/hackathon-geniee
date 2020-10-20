@@ -48,7 +48,7 @@ class AsyncGroupSelect extends Component {
 	);
 
 	handleFilterValueSelect(checked, key) {
-		const { selectedFilters, selectedFilterKey } = this.state;
+		const { selectedFilters, selectedFilterKey, filterValues } = this.state;
 		selectedFilters[selectedFilterKey] = selectedFilters[selectedFilterKey] || {};
 		if (checked) selectedFilters[selectedFilterKey][key] = true;
 		else if (selectedFilters[selectedFilterKey][key])
@@ -58,7 +58,10 @@ class AsyncGroupSelect extends Component {
 				selectedFilters
 			},
 			() => {
-				this.props.onFilterValueChange(selectedFilters);
+				const selectedFilterValues = filterValues.filter(
+					value => selectedFilters[selectedFilterKey][value.id]
+				);
+				this.props.onFilterValueChange(selectedFilters, selectedFilterValues, selectedFilterKey);
 			}
 		);
 	}
@@ -175,7 +178,10 @@ class AsyncGroupSelect extends Component {
 				selectedFilters
 			},
 			() => {
-				this.props.onFilterValueChange(selectedFilters);
+				const selectedFilterValues = filterValues.filter(
+					value => selectedFilters[selectedFilterKey][value.id]
+				);
+				this.props.onFilterValueChange(selectedFilters, selectedFilterValues, selectedFilterKey);
 			}
 		);
 	};
@@ -188,7 +194,8 @@ class AsyncGroupSelect extends Component {
 				selectedFilters
 			},
 			() => {
-				this.props.onFilterValueChange(selectedFilters);
+				const selectedFilterValues = [];
+				this.props.onFilterValueChange(selectedFilters, selectedFilterValues, selectedFilterKey);
 			}
 		);
 	};
@@ -228,7 +235,8 @@ class AsyncGroupSelect extends Component {
 										selectedFilters
 									},
 									() => {
-										props.onFilterValueChange(selectedFilters);
+										const selectedFilterValues = [];
+										props.onFilterValueChange(selectedFilters, selectedFilterValues, filterKey);
 									}
 								);
 							}}
