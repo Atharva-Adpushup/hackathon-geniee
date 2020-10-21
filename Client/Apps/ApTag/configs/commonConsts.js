@@ -210,7 +210,7 @@ const REWARDED_AD_CODE = `<script>
 			var dfpAdunit = '__AD_UNIT__';
 	        var watchButton = typeof window.WATCH_BUTTON_TEXT === 'undefined' ? 'Watch' : window.WATCH_BUTTON_TEXT;
 			var noThanksButton = typeof window.NO_THANKS_BUTTON === 'undefined' ? 'Close' : window.NO_THANKS_BUTTON;
-			var modalText= typeof window.MODAL_TEXT === 'undefined' ? __MODAL_TEXT__ : window.MODAL_TEXT;
+			var modalText= typeof window.MODAL_TEXT === 'undefined' ? '__MODAL_TEXT__' : window.MODAL_TEXT;
 			var cssAnimation = document.createElement('style');
 			cssAnimation.type = 'text/css';
 			var rules = document.createTextNode(
