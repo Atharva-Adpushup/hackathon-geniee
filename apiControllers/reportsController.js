@@ -142,8 +142,7 @@ const Utils = {
 				}
 			},
 			retryOptions: {
-				attempts: 3,
-				fallbackUrl: 'http://localhost:8080/api/fallback'
+				attempts: 3
 			},
 			executionOptions: {
 				type: 'repeat',
@@ -156,7 +155,20 @@ const Utils = {
 			.post(`${CC.SCHEDULER_API_ROOT}/schedule`, jobConfiguration)
 			.then(response => response.data);
 	},
-	cancelScheduledJob: async jobId => axios.delete(`${CC.SCHEDULER_API_ROOT}/cancel/${jobId}`)
+	cancelScheduledJob: async jobId => axios.delete(`${CC.SCHEDULER_API_ROOT}/cancel/${jobId}`),
+	initiateReportsSchedule: async (reportConfig, email) => {
+		const { interval, startDate } = reportConfig.scheduleOptions;
+		const cronExpression = Utils.generateCronExpression(interval, startDate);
+
+		const scheduleConfig = Object.assign({}, reportConfig);
+
+		scheduleConfig.scheduleOptions.cron = cronExpression;
+
+		const scheduledJobData = await Utils.scheduleReportJob(reportConfig, email);
+		scheduleConfig.scheduleOptions.jobId = scheduledJobData.job.id;
+
+		return scheduleConfig;
+	}
 };
 
 router
@@ -438,19 +450,9 @@ router
 	})
 	.get('/savedReports', (req, res) => {
 		const { user } = req;
+		const email = user.originalEmail || user.email;
 		return reportsModel
-			.getSavedReportConfig(user.email)
-			.catch(err => {
-				if (err.code && err.code === 13) {
-					// If no config file is found, create a config file
-					const savedReportsConfig = {
-						savedReports: [],
-						scheduledReports: []
-					};
-					return reportsModel.updateSavedReportConfig(savedReportsConfig, user.email);
-				}
-				throw err;
-			})
+			.getSavedReportConfig(email)
 			.then(reportConfig => sendSuccessResponse(reportConfig, res, HTTP_STATUSES.OK))
 			.catch(err => {
 				let { message: errorMessage } = err;
@@ -473,13 +475,13 @@ router
 			});
 	})
 	.post('/saveReport', async (req, res) => {
-		const reportBody = req.body;
-		const reportConfig = {
+		const { user, body: reportBody } = req;
+		let reportConfig = {
 			...reportBody,
 			createdAt: Date.now(),
 			id: uuid()
 		};
-		const { user } = req;
+		const email = user.originalEmail || user.email;
 		try {
 			const errors = await FormValidator.validate(reportConfig, schema.saveReportApi.validations);
 			if (errors && errors.length) {
@@ -490,21 +492,16 @@ router
 			}
 
 			if (reportConfig.scheduleOptions && Object.keys(reportConfig.scheduleOptions).length) {
-				const { interval, startDate } = reportConfig.scheduleOptions;
-				const cronExpression = Utils.generateCronExpression(interval, startDate);
-				reportConfig.scheduleOptions.cron = cronExpression;
-
-				const scheduledJobData = await Utils.scheduleReportJob(reportConfig, user.email);
-				reportConfig.scheduleOptions.jobId = scheduledJobData.job.id;
+				reportConfig = await Utils.initiateReportsSchedule(reportConfig, email);
 			}
 
-			const reportsConfig = await reportsModel.getSavedReportConfig(user.email);
+			const reportsConfig = await reportsModel.getSavedReportConfig(email);
 			const updatedReportsConfig = {
 				...reportsConfig,
 				savedReports: [...reportsConfig.savedReports, reportConfig]
 			};
 
-			const response = await reportsModel.updateSavedReportConfig(updatedReportsConfig, user.email);
+			const response = await reportsModel.updateSavedReportConfig(updatedReportsConfig, email);
 
 			return sendSuccessResponse(response, res, HTTP_STATUSES.OK);
 		} catch (err) {
@@ -530,9 +527,10 @@ router
 	.patch('/updateSavedReport', async (req, res) => {
 		try {
 			const { user } = req;
+			const email = user.originalEmail || user.email;
 			const updateConfiguration = req.body;
 			if (!updateConfiguration.id) throw new Error('Id required to update saved report');
-			const reportsConfig = await reportsModel.getSavedReportConfig(user.email);
+			const reportsConfig = await reportsModel.getSavedReportConfig(email);
 			if (!reportsConfig || !reportsConfig.savedReports.length)
 				throw new Error('No saved reports found');
 
@@ -542,7 +540,7 @@ router
 			if (!existingConfigForId)
 				throw new Error('Unable to find existng configuration for this report');
 
-			const updatedReportConfig = {
+			let updatedReportConfig = {
 				...existingConfigForId,
 				name: updateConfiguration.name || existingConfigForId.name
 			};
@@ -552,13 +550,8 @@ router
 				Object.keys(updateConfiguration.scheduleOptions).length
 			) {
 				await Utils.cancelScheduledJob(existingConfigForId.scheduleOptions.jobId);
-				const { interval, startDate } = updateConfiguration.scheduleOptions;
 				updatedReportConfig.scheduleOptions = updateConfiguration.scheduleOptions;
-				const cronExpression = Utils.generateCronExpression(interval, startDate);
-				updatedReportConfig.scheduleOptions.cron = cronExpression;
-
-				const scheduledJobData = await Utils.scheduleReportJob(updatedReportConfig);
-				updatedReportConfig.scheduleOptions.jobId = scheduledJobData.job.id;
+				updatedReportConfig = await Utils.initiateReportsSchedule(updatedReportConfig, email);
 			}
 
 			const newSavedReports = reportsConfig.savedReports.map(report => {
@@ -572,7 +565,7 @@ router
 				savedReports: newSavedReports
 			};
 
-			const response = await reportsModel.updateSavedReportConfig(newConfiguration, user.email);
+			const response = await reportsModel.updateSavedReportConfig(newConfiguration, email);
 			return sendSuccessResponse(response, res, HTTP_STATUSES.OK);
 		} catch (err) {
 			let { message: errorMessage } = err;
@@ -597,10 +590,11 @@ router
 	.delete('/deleteSavedReport/:id', async (req, res) => {
 		try {
 			const { user } = req;
+			const email = user.originalEmail || user.email;
 			const reportId = req.params.id;
 			if (!reportId) throw new Error('Invalid report ID');
 
-			const reportsConfig = await reportsModel.getSavedReportConfig(user.email);
+			const reportsConfig = await reportsModel.getSavedReportConfig(email);
 			if (!reportsConfig || !reportsConfig.savedReports.length)
 				throw new Error('No saved reports found');
 
@@ -616,10 +610,9 @@ router
 				...reportsConfig,
 				savedReports: newSavedReports
 			};
-			const response = await reportsModel.updateSavedReportConfig(newConfiguration, user.email);
+			const response = await reportsModel.updateSavedReportConfig(newConfiguration, email);
 			return sendSuccessResponse(response, res, HTTP_STATUSES.OK);
 		} catch (err) {
-			console.log(err);
 			let { message: errorMessage } = err;
 			try {
 				errorMessage = JSON.parse(errorMessage);
@@ -640,4 +633,3 @@ router
 		}
 	});
 module.exports = router;
- 

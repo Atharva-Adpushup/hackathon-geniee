@@ -109,6 +109,7 @@ class Report extends Component {
 		// eslint-disable-next-line no-unused-expressions
 		isSuperUser ? (params.isSuperUser = isSuperUser) : null;
 
+		this.getSavedReports();
 		if (!reportsMeta.fetched) {
 			return reportService.getMetaData(params).then(response => {
 				let { data: computedData } = response;
@@ -118,8 +119,7 @@ class Report extends Component {
 				return this.getContentInfo(computedData);
 			});
 		}
-		return this.getSavedReports().then(() => this.getContentInfo(reportsMeta.data));
-		// return this.getContentInfo(reportsMeta.data);
+		return this.getContentInfo(reportsMeta.data);
 	}
 
 	removeOpsFilterDimension = (filterList, dimensionList) => {
@@ -208,9 +208,8 @@ class Report extends Component {
 		this.setState({
 			...newStateData,
 			...params,
-			reportType,
-			selectedReport: resetSavedReport ? null : oldState.selectedReport
-		}));
+			reportType
+		});
 	};
 
 	getDemoUserParams = () => {
@@ -321,13 +320,6 @@ class Report extends Component {
 		}
 
 		return params;
-	};
-
-	toggleSaveReportModal = () => {
-		this.setState(oldState => ({
-			...oldState,
-			showSaveReportModal: !oldState.showSaveReportModal
-		}));
 	};
 
 	generateButtonHandler = (inputState = {}) => {
@@ -856,7 +848,7 @@ class Report extends Component {
 		return reportService
 			.getSavedReports()
 			.then(res => {
-				const { savedReports } = res.data.data;
+				const { savedReports } = res.data.data || [];
 				this.processAndSaveReports(savedReports);
 			})
 			.catch(err => {

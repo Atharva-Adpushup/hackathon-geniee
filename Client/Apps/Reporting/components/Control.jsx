@@ -273,7 +273,7 @@ class Control extends Component {
 			reportType,
 			showNotification,
 			selectedReport,
-			savedReports,
+			savedReports = [],
 			onReportSave,
 			onReportUpdate,
 			onReportDelete
@@ -281,28 +281,29 @@ class Control extends Component {
 
 		const selectedReportName = selectedReport ? selectedReport.name : '';
 		const { scheduleOptions: { startDate, endDate, interval } = {} } = selectedReport || {};
-		const selectedReportStartDate = startDate || moment();
-		const selectedReportEndDate = endDate || moment();
+		const selectedReportStartDate = startDate;
+		const selectedReportEndDate = endDate;
 		const isUpdating = selectedReport !== null;
+		const isSavedReportsEmpty = savedReports.length === 0;
 		// const { selectedReport } = state;
 		return (
 			<Fragment>
-				<div className="aligner aligner--wrap aligner--hSpaceBetween u-margin-t4">
-					{/* eslint-disable */}
-					<label className="u-text-normal">Saved Reports</label>
-					{/* eslint-disable */}
-					<SelectBox
-						id="saved-reports"
-						key="saved-reports"
-						isClearable={false}
-						isSearchable={false}
-						wrapperClassName="custom-select-box-wrapper"
-						reset={false}
-						selected={selectedReport ? selectedReport.value : null}
-						options={savedReports}
-						onSelect={this.onSavedReportSelect}
-					/>
-				</div>
+				{!isSavedReportsEmpty && (
+					<div className="aligner aligner--wrap aligner--hSpaceBetween u-margin-t4">
+						<label className="u-text-normal">Saved Reports</label>
+						<SelectBox
+							id="saved-reports"
+							key="saved-reports"
+							isClearable={false}
+							isSearchable={false}
+							wrapperClassName="custom-select-box-wrapper"
+							reset={false}
+							selected={selectedReport ? selectedReport.value : null}
+							options={savedReports}
+							onSelect={this.onSavedReportSelect}
+						/>
+					</div>
+				)}
 				<div className="aligner aligner--wrap aligner--hSpaceBetween u-margin-t4">
 					<div className="aligner-item u-margin-r4">
 						{/* eslint-disable */}

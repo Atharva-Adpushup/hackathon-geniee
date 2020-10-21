@@ -18,22 +18,22 @@ const Schedule = ({
 	reportInterval,
 	isUpdating,
 	onReportSave,
-    onReportUpdate,
-    onReportDelete,
+	onReportUpdate,
+	onReportDelete,
 	showNotification
 }) => {
 	const [reportName, setReportName] = useState(name || '');
-	const [interval, setInterval] = useState(reportInterval || null);
+	const [interval, setReportInterval] = useState(reportInterval || null);
 	const [dates, setDates] = useState({
-		startDate: startDate || null,
-		endDate: endDate || null
+		startDate,
+		endDate
 	});
 
 	useEffect(() => setReportName(name), [name]);
 	useEffect(() => setDates({ startDate, endDate }), [startDate, endDate]);
-	useEffect(() => setInterval(reportInterval), [reportInterval]);
+	useEffect(() => setReportInterval(reportInterval), [reportInterval]);
 
-	const onReportScheduleSelect = value => setInterval(value);
+	const onReportScheduleSelect = value => setReportInterval(value);
 
 	const onReportNameChanged = e => setReportName(e.target.value);
 
@@ -79,40 +79,45 @@ const Schedule = ({
 					<div className="aligner aligner--wrap u-margin-t4 u-margin-l4">
 						<div>
 							{/* eslint-disable */}
-									<label className="u-text-normal">Schedule</label>
-									{/* eslint-disable */}
-									<SelectBox
-										id="schedule"
-										key="schedule"
-										isClearable={false}
-										isSearchable={false}
-										wrapperClassName="custom-select-box-wrapper"
-										reset={false}
-										selected={interval}
-										options={getReportScheduleIntervals()}
-										onSelect={onReportScheduleSelect}
-									/>
-								</div>
-								<div className="u-margin-l2">
-									<label className="u-text-normal">From</label>
-									<PresetDateRangePicker
-										startDate={moment(dates.startDate)}
-										endDate={moment(dates.endDate)}
-										datesUpdated={({ startDate, endDate }) => setDates({startDate, endDate})}
-										isOutsideRange={day => day.isBefore(moment()) }
-										autoFocus
-									/>
-								</div>
-							</div>
-							<div className="u-margin-t4">
-                                <Button onClick={saveReportHandler} bsStyle="primary" className="u-margin-l4">{isUpdating ? "Update Report" : "Save Report"}</Button>
-                                {isUpdating && 	<Button onClick={onReportDelete} className="u-margin-l4">Delete Report</Button>}
-							</div>
-						</Panel.Body>
-					</Panel.Collapse>
-				</Panel>
-    )
-
-}
+							<label className="u-text-normal">Schedule</label>
+							{/* eslint-disable */}
+							<SelectBox
+								id="schedule"
+								key="schedule"
+								isClearable={false}
+								isSearchable={false}
+								wrapperClassName="custom-select-box-wrapper"
+								reset={false}
+								selected={interval}
+								options={getReportScheduleIntervals()}
+								onSelect={onReportScheduleSelect}
+							/>
+						</div>
+						<div className="u-margin-l2">
+							<label className="u-text-normal">From</label>
+							<PresetDateRangePicker
+								startDate={dates.startDate || moment().add(1, 'days')}
+								endDate={dates.endDate|| moment().add(2, 'days')}
+								datesUpdated={({ startDate, endDate }) => setDates({ startDate, endDate })}
+								isOutsideRange={day => day.isBefore(moment())}
+								autoFocus
+							/>
+						</div>
+					</div>
+					<div className="u-margin-t4">
+						<Button onClick={saveReportHandler} bsStyle="primary" className="u-margin-l4">
+							{isUpdating ? 'Update Report' : 'Save Report'}
+						</Button>
+						{isUpdating && (
+							<Button onClick={onReportDelete} className="u-margin-l4">
+								Delete Report
+							</Button>
+						)}
+					</div>
+				</Panel.Body>
+			</Panel.Collapse>
+		</Panel>
+	);
+};
 
 export default Schedule;
