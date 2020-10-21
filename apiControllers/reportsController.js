@@ -433,7 +433,10 @@ router
 				try {
 					errorMessage = JSON.parse(errorMessage);
 				} catch (e) {
-					errorMessage = 'Something went wrong';
+					errorMessage = {
+						message: 'Something went wrong',
+						code: HTTP_STATUSES.INTERNAL_SERVER_ERROR
+					};
 				}
 				const {
 					message = 'Something went wrong',
@@ -509,7 +512,10 @@ router
 			try {
 				errorMessage = JSON.parse(errorMessage);
 			} catch (e) {
-				errorMessage = 'Something went wrong';
+				errorMessage = {
+					message: 'Something went wrong',
+					code: HTTP_STATUSES.INTERNAL_SERVER_ERROR
+				};
 			}
 			const {
 				message = 'Something went wrong',
@@ -572,7 +578,10 @@ router
 			try {
 				errorMessage = JSON.parse(errorMessage);
 			} catch (e) {
-				errorMessage = 'Something went wrong';
+				errorMessage = {
+					message: 'Something went wrong',
+					code: HTTP_STATUSES.INTERNAL_SERVER_ERROR
+				};
 			}
 			const {
 				message = 'Something went wrong',
@@ -617,7 +626,10 @@ router
 			try {
 				errorMessage = JSON.parse(errorMessage);
 			} catch (e) {
-				errorMessage = 'Something went wrong';
+				errorMessage = {
+					message: 'Something went wrong',
+					code: HTTP_STATUSES.INTERNAL_SERVER_ERROR
+				};
 			}
 			const {
 				message = 'Something went wrong',
