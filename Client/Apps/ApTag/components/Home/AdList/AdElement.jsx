@@ -26,8 +26,7 @@ class AdElement extends Component {
 			editName: false,
 			isActive: Object.prototype.hasOwnProperty.call(props.ad, 'isActive')
 				? props.ad.isActive
-				: true,
-			codeLengthToShow: 500
+				: true
 		};
 		this.toggleHandler = this.toggleHandler.bind(this);
 		this.renderAdDetails = this.renderAdDetails.bind(this);

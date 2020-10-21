@@ -131,8 +131,7 @@ const ADCODE = `<div id="__AD_ID__" class="_ap_apex_ad"__CUSTOM_ATTRIBS__>
 	</script>
 </div>`;
 
-const watchButton = typeof WATCH_BUTTON_TEXT === 'undefined' ? 'Watch' : WATCH_BUTTON_TEXT;
-const noThanksButton = typeof NO_THANKS_BUTTON === 'undefined' ? 'Close' : NO_THANKS_BUTTON;
+
 
 /*************** 
       This function implements rejected logic of Rewarded Video Ads and displays ads after 1 week.
@@ -209,7 +208,9 @@ const REWARDED_AD_CODE = `<script>
 			var adId = '__AD_ID__';
 			var adName = '__AD_NAME__';
 			var dfpAdunit = '__AD_UNIT__';
-	
+	        var watchButton = typeof window.WATCH_BUTTON_TEXT === 'undefined' ? 'Watch' : window.WATCH_BUTTON_TEXT;
+			var noThanksButton = typeof window.NO_THANKS_BUTTON === 'undefined' ? 'Close' : window.NO_THANKS_BUTTON;
+			var modalText= typeof window.MODAL_TEXT === 'undefined' ? __MODAL_TEXT__ : window.MODAL_TEXT;
 			var cssAnimation = document.createElement('style');
 			cssAnimation.type = 'text/css';
 			var rules = document.createTextNode(
@@ -371,15 +372,15 @@ const REWARDED_AD_CODE = `<script>
 								'<div id="rewarded-modal" class="rewarded-modal">' +
 								'<div class="rewarded-modal-content">' +
 								'<div class="rewarded-modal-body">' +
-								'<p>__MODAL_TEXT__</p>' +
+								'<p>'+modalText+'</p>' +
 								'<button id ="watchAdBtn" class=" watch primary">' +
-								'${watchButton}'+
+								watchButton +
 								'</button>';
 	
 							if (!forced) {
 								const closeHtml =
 									'<button  id ="noThanksBtn" class="closeModal secondary"><span class="lg">' +
-									'${noThanksButton}'+
+									noThanksButton+
 									'</button>';
 								modalHtml += closeHtml;
 							}
