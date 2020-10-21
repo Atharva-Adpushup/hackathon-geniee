@@ -770,18 +770,31 @@ module.exports = {
 			})
 			.fail(function(xhr) {
 				const { responseText, getAllResponseHeaders } = xhr;
+
+				utils.logURMEvent(commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_FAILED_TIME, {
+					[commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_FAILED_TIME]: new Date().getTime()
+				});
 				utils.logURMEvent(commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_FAILED, {
-					error: {
+					[commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_FAILED]: {
 						responseText,
-						responseHeaders: getAllResponseHeaders()
+						responseHeaders: getAllResponseHeaders(),
+						statusText: xhr.statusText,
+						statusCode: xhr.status
 					}
 				});
-				utils.logURMEventKeen(commonConsts.EVENT_LOGGER.EVENTS.URM_CONFIG_KEY_VALUE_EMPTY, {
-					error: {
+
+				utils.logURMEventKeen(commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_FAILED_TIME, {
+					[commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_FAILED_TIME]: new Date().getTime()
+				});
+				utils.logURMEventKeen(commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_FAILED, {
+					[commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_FAILED]: {
 						responseText,
-						responseHeaders: getAllResponseHeaders()
+						responseHeaders: getAllResponseHeaders(),
+						statusText: xhr.statusText,
+						statusCode: xhr.status
 					}
 				});
+
 				utils.sendURMKeyValueEventLogs();
 				utils.sendURMKeyValueEventLogsKeen();
 			});
