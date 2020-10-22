@@ -152,10 +152,10 @@ const Utils = {
 			}
 		};
 		return axios
-			.post(`${CC.SCHEDULER_API_ROOT}/schedule`, jobConfiguration)
+			.post(`${config.SCHEDULER_API_ROOT}/schedule`, jobConfiguration)
 			.then(response => response.data);
 	},
-	cancelScheduledJob: async jobId => axios.delete(`${CC.SCHEDULER_API_ROOT}/cancel/${jobId}`),
+	cancelScheduledJob: async jobId => axios.delete(`${config.SCHEDULER_API_ROOT}/cancel/${jobId}`),
 	initiateReportsSchedule: async (reportConfig, email) => {
 		const { interval, startDate } = reportConfig.scheduleOptions;
 		const cronExpression = Utils.generateCronExpression(interval, startDate);
@@ -451,7 +451,7 @@ router
 				);
 			});
 	})
-	.get('/savedReports', (req, res) => {
+	.get('/', (req, res) => {
 		const { user } = req;
 		const email = user.originalEmail || user.email;
 		return reportsModel
@@ -477,7 +477,7 @@ router
 				);
 			});
 	})
-	.post('/saveReport', async (req, res) => {
+	.post('/', async (req, res) => {
 		const { user, body: reportBody } = req;
 		let reportConfig = {
 			...reportBody,
@@ -530,7 +530,7 @@ router
 			);
 		}
 	})
-	.patch('/updateSavedReport', async (req, res) => {
+	.patch('/', async (req, res) => {
 		try {
 			const { user } = req;
 			const email = user.originalEmail || user.email;
@@ -596,7 +596,7 @@ router
 			);
 		}
 	})
-	.delete('/deleteSavedReport/:id', async (req, res) => {
+	.delete('/:id', async (req, res) => {
 		try {
 			const { user } = req;
 			const email = user.originalEmail || user.email;

@@ -18,7 +18,6 @@ module.exports = {
 	TRANSACTION_LOG_ENDPOINT: 'https://api.adpushup.com/SetupLogWebService/log',
 	REPORT_STATUS: 'https://api.adpushup.com/OpsWebService/ops?report=getNetworkImportServiceStatus',
 	IE_TESTING_ENDPOINT: 'http://apdc1n-central5.eastus2.cloudapp.azure.com:8081/api/health-report',
-	SCHEDULER_API_ROOT: 'http://localhost:8081/scheduler',
 	PROXY_ORIGIN: '//proxy.app.adpushup.com',
 	PRODUCT_LIST_API: `${reportingBaseURL}/common/activeProducts`,
 	SESSION_RPM_REPORTS_API: `${reportingBaseURL}/site/report?report_name=session_rpm_report`,
