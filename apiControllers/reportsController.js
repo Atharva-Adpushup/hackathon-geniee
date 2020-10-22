@@ -530,18 +530,19 @@ router
 			);
 		}
 	})
-	.patch('/', async (req, res) => {
+	.patch('/:id', async (req, res) => {
 		try {
-			const { user } = req;
+			const { user, body: updateConfiguration } = req;
 			const email = user.originalEmail || user.email;
-			const updateConfiguration = req.body;
-			if (!updateConfiguration.id) throw new Error('Id required to update saved report');
+			const savedConfigId = req.params.id;
+
+			if (!savedConfigId) throw new Error('Id required to update saved report');
 			const reportsConfig = await reportsModel.getSavedReportConfig(email);
 			if (!reportsConfig || !reportsConfig.savedReports.length)
 				throw new Error('No saved reports found');
 
 			const existingConfigForId = reportsConfig.savedReports.filter(
-				report => report.id === updateConfiguration.id
+				report => report.id === savedConfigId
 			)[0];
 			if (!existingConfigForId)
 				throw new Error('Unable to find existng configuration for this report');
@@ -561,7 +562,7 @@ router
 			}
 
 			const newSavedReports = reportsConfig.savedReports.map(report => {
-				if (report.id === updatedReportConfig.id) {
+				if (report.id === savedConfigId) {
 					return updatedReportConfig;
 				}
 				return report;
