@@ -1,23 +1,45 @@
-const Promise = require('bluebird');
 const CONFIG = require('../../../configs/config');
-const CONSTANTS = require('../constants/constants');
 const Publisher = require('../libs/publisher');
 const publishJobs = require('../libs/publisherCommon');
 
-const queueConfig = {
+const { QUEUE: MAIN_QUEUE, SELECTIVE_ROLLOUT_QUEUE } = CONFIG.RABBITMQ.CDN_SYNC;
+
+const mainQueueConfig = {
 	url: CONFIG.RABBITMQ.URL,
 	exchange: CONFIG.RABBITMQ.CDN_SYNC.EXCHANGE,
-	queue: CONFIG.RABBITMQ.CDN_SYNC.QUEUE
+	queue: MAIN_QUEUE
 };
 
-const options = {
-	queueName: CONFIG.RABBITMQ.CDN_SYNC.QUEUE.name
+const selectiveRolloutQueueConfig = {
+	...mainQueueConfig,
+	queue: SELECTIVE_ROLLOUT_QUEUE
 };
 
-const publisher = new Publisher(queueConfig);
+let mainPublisher = new Publisher(mainQueueConfig);
+let selectiveRolloutPublisher = new Publisher(selectiveRolloutQueueConfig);
+
+const getPublisherConfig = isSelectiveRolloutEnabled => {
+	if (isSelectiveRolloutEnabled) {
+		if (!SELECTIVE_ROLLOUT_QUEUE) {
+			throw new Error('Selective rollout queue config missing');
+		}
+
+		return {
+			publisher: selectiveRolloutPublisher,
+			options: { queueName: SELECTIVE_ROLLOUT_QUEUE.name }
+		};
+	}
+
+	return {
+		publisher: mainPublisher,
+		options: { queueName: MAIN_QUEUE.name }
+	};
+};
 
 module.exports = {
-	publish(paramConfig) {
+	publish(paramConfig, isSelectiveRolloutEnabled = false) {
+		const { publisher, options } = getPublisherConfig(isSelectiveRolloutEnabled);
+
 		return publishJobs(publisher, options, paramConfig)
 			.then(console.log)
 			.catch(console.log);

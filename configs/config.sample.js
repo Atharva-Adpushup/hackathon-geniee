@@ -146,6 +146,10 @@ module.exports = {
 			QUEUE: {
 				name: 'consoleCdnSync',
 				options: { durable: true }
+			},
+			SELECTIVE_ROLLOUT_QUEUE: {
+				name: 'consoleCdnSyncSelectiveRollout',
+				options: { durable: true }
 			}
 		},
 		ADP_TAG_SYNC: {
