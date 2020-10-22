@@ -764,9 +764,6 @@ module.exports = {
 						[commonConsts.EVENT_LOGGER.EVENTS.URM_CONFIG_KEY_VALUE_EMPTY]: new Date().getTime()
 					});
 				}
-
-				utils.sendURMKeyValueEventLogs();
-				utils.sendURMKeyValueEventLogsKeen();
 			})
 			.fail(function(xhr) {
 				const { responseText, getAllResponseHeaders } = xhr;
@@ -794,7 +791,8 @@ module.exports = {
 						statusCode: xhr.status
 					}
 				});
-
+			})
+			.always(function() {
 				utils.sendURMKeyValueEventLogs();
 				utils.sendURMKeyValueEventLogsKeen();
 			});
