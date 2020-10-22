@@ -1,0 +1,48 @@
+@import '../base/colors';
+
+.notification-history-item {
+	display: flex;
+	flex-direction: row;
+
+	.notification-link {
+		width: 1px;
+		border: 1px solid #cac5c5;
+		margin-left: 10px;
+	}
+}
+
+.notification-history-list {
+	display: flex;
+	flex-direction: column;
+
+	.notification-card {
+		/* Add shadows to create the "card" effect */
+		box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+		transition: 0.3s;
+		padding: 12px;
+		background: white;
+		width: 100%;
+
+		.divider {
+			border-top-color: #d8d8d8;
+		}
+
+		.card-item {
+			min-height: 70px;
+		}
+	}
+
+	/* On mouse-over, add a deeper shadow */
+	.notification-card:hover {
+		box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+	}
+}
+
+.notification-date {
+	margin: 0;
+	background: black;
+	color: white;
+	max-width: 110px;
+	padding-left: 4px;
+	padding-right: 4px;
+}

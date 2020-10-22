@@ -38,7 +38,8 @@ import {
 	faQuestionCircle,
 	faMailBulk,
 	faDownload,
-	faSignInAlt
+	faSignInAlt,
+	faBell
 } from '@/Client/helpers/fort-awesome-imports';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import 'bootstrap-sass/assets/stylesheets/_bootstrap.scss';
@@ -83,7 +84,8 @@ library.add(
 	faQuestionCircle,
 	faMailBulk,
 	faDownload,
-	faSignInAlt
+	faSignInAlt,
+	faBell
 );
 
 const App = () => (

@@ -1,0 +1,61 @@
+
+#notification {
+	margin-top: auto;
+	margin-bottom: auto;
+	cursor: pointer;
+	position: relative;
+}
+
+#notification .notification-bell {
+	position: absolute;
+	font-size: 14px;
+	top: -1px;
+	right: 10px;
+}
+
+#notification .caret {
+	display: none;
+}
+
+.notifications-list {
+	width: 600px;
+	max-height: 900px;
+	overflow-y: auto;
+}
+
+.notification-item a {
+	word-break: break-all;
+	white-space: normal !important;
+}
+
+.notification-empty {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+.notification-item-message {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	color: black;
+}
+
+.notification-sub {
+	color: grey;
+}
+
+.hover:hover {
+	cursor: pointer;
+}
+
+.divider {
+	width: 100%;
+}
+
+.all-notifications {
+	width: 100%;
+	background: #fff !important;
+	color: #eb575c !important;
+}

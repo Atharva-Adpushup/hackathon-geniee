@@ -11,6 +11,7 @@ import Login from './Pages/Login';
 import Signup from './Pages/Signup';
 import ForgotPassword from './Pages/ForgotPassword';
 import ResetPassword from './Pages/ResetPassword';
+import NotificationHistory from './Containers/NotificationHistoryContainer';
 
 const Sites = lazy(() => import(/* webpackChunkName: "sites" */ './Pages/Sites'));
 const Integrations = lazy(() =>
@@ -368,6 +369,11 @@ const ROUTES = {
 			name: 'User OnBoarding',
 			path: '/onboarding',
 			component: OnBoarding
+		},
+		{
+			exact: true,
+			path: '/notifications',
+			component: NotificationHistory
 		}
 	]
 };
