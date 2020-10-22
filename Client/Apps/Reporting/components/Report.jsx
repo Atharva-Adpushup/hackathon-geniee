@@ -556,6 +556,10 @@ class Report extends Component {
 			).toFixed(2);
 		}
 
+		if (total.hasOwnProperty('total_session_rpm')) {
+			total.total_session_rpm /= tableRows.length;
+		}
+
 		if (total.hasOwnProperty('total_adpushup_count_percent')) {
 			delete total.total_adpushup_count_percent;
 		}
@@ -586,6 +590,16 @@ class Report extends Component {
 				sortedMetrics = sortedMetaMetrics.filter(item => match.indexOf(item.value) !== -1);
 				// temp code for unqiue imp selection in dashboard from this component
 				overrideOpsPanelUniqueImpValue({ isUniqueImpEnabled: false });
+			}
+
+			const sessionMetrics = newMetrics.filter(
+				item => item.value === 'session_rpm' || item.value === 'user_sessions'
+			);
+			if (sessionMetrics.length) {
+				sortedMetaMetrics.forEach(metaMetric => {
+					const foundMetric = sessionMetrics.find(metric => metric.value === metaMetric.value);
+					if (foundMetric) sortedMetrics.push(foundMetric);
+				});
 			}
 		}
 
@@ -840,6 +854,7 @@ class Report extends Component {
 			user,
 			showNotification
 		} = this.props;
+		const { sessionRpmReports: sessionRpmReportsEnabled = true } = user.data;
 
 		let allAvailableMetrics = this.getAllAvailableMetrics(
 			isCustomizeChartLegend,
@@ -852,12 +867,19 @@ class Report extends Component {
 
 		if (!isForOps) {
 			allAvailableMetrics = allAvailableMetrics
-				.filter(item => item.value === 'unique_impressions')
+				.filter(
+					item =>
+						item.value === 'unique_impressions' ||
+						(sessionRpmReportsEnabled &&
+							(item.value === 'session_rpm' || item.value === 'user_sessions'))
+				)
 				.map(item => {
-					// eslint-disable-next-line no-param-reassign
-					item.name = 'Unique Impressions Reporting';
-					// eslint-disable-next-line no-param-reassign
-					item.isDisabled = false;
+					if (item.value === 'unique_impressions') {
+						// eslint-disable-next-line no-param-reassign
+						item.name = 'Unique Impressions Reporting';
+						// eslint-disable-next-line no-param-reassign
+						item.isDisabled = false;
+					}
 					return item;
 				});
 		} else {

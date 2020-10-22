@@ -15,36 +15,148 @@ const redisClient = require('../middlewares/redis');
 const router = express.Router();
 const cache = require('../middlewares/cacheMiddleware');
 
+const getKeyFromProps = (report = {}, props = []) => {
+	const propValues = props.map(prop => report[prop]);
+	return propValues.join(',');
+};
+
+const mergeReportingWithSessionRpmReports = (
+	reports = [],
+	sessionRpmReports = [],
+	sessionRpmColumns = []
+) => {
+	const sessionRpmUniqueProps = CC.SESSION_RPM.SESSION_RPM_PROPS; // list of columns from session rpm report that needs to be merged with normal reports
+	const propsToIgnore = CC.SESSION_RPM.IGNORE_PROPS;
+	const mergableProps = sessionRpmColumns.filter(
+		column => !sessionRpmUniqueProps.includes(column) && !propsToIgnore.includes(column)
+	);
+
+	const sessionRpmMap = sessionRpmReports.reduce((result, report) => {
+		const key = getKeyFromProps(report, mergableProps);
+		return {
+			...result,
+			[key]: report
+		};
+	}, {});
+
+	const mergedReportingData = reports.map(report => {
+		const key = getKeyFromProps(report, mergableProps);
+		const reportClone = _.cloneDeep(report);
+		if (sessionRpmMap[key]) {
+			const rpmReport = sessionRpmMap[key];
+			sessionRpmUniqueProps.forEach(prop => {
+				reportClone[prop] = rpmReport[prop];
+			});
+		} else {
+			sessionRpmUniqueProps.forEach(prop => {
+				reportClone[prop] = 0;
+			});
+		}
+		return reportClone;
+	});
+
+	return mergedReportingData;
+};
+
+const mergeReportColumns = reportColumns => [...reportColumns, ...CC.SESSION_RPM.SESSION_RPM_PROPS];
+
+const calculateSessionTotals = (sessionReports = []) => {
+	const totalSessionRpm =
+		sessionReports.reduce((result, report) => result + report.session_rpm, 0) /
+		sessionReports.length;
+	const totalSessions = sessionReports.reduce((result, report) => result + report.user_sessions, 0);
+
+	return {
+		total_session_rpm: totalSessionRpm,
+		total_user_sessions: totalSessions
+	};
+};
+
+const mergeReportsWithSessionRpmData = (reportsData, sessionRpmData, isSuperUser = false) => {
+	const { result: reports, columns: reportColumns, total: reportsTotals } = reportsData;
+	const { result: sessionRpmReports, columns: sessionRpmColumns } = sessionRpmData;
+
+	const mergedReports = mergeReportingWithSessionRpmReports(
+		reports,
+		sessionRpmReports,
+		sessionRpmColumns
+	);
+
+	const mergedColumns = mergeReportColumns(reportColumns, sessionRpmColumns);
+
+	const sessionTotals = calculateSessionTotals(sessionRpmReports);
+	const mergedTotal = {
+		...reportsTotals,
+		...sessionTotals
+	};
+
+	const mergedData = {
+		result: mergedReports,
+		columns: mergedColumns
+	};
+
+	if (!isSuperUser) mergedData.total = mergedTotal;
+
+	return mergedData;
+};
+
 router
-	.get('/getCustomStats', cache, (req, res) => {
+	.get('/getCustomStats', cache, async (req, res) => {
 		const {
-			query: { siteid = '', isSuperUser = false, fromDate, toDate, interval }
+			query: { siteid = '', isSuperUser = false, fromDate, toDate, interval, dimension, ...filters }
 		} = req;
 		const isValidParams = !!((siteid || isSuperUser) && fromDate && toDate && interval);
+		const sessionRpmSupportedDimensions = CC.SESSION_RPM.SUPPORTED_DIMENSIONS;
+		const sessionRpmSupportedFilters = CC.SESSION_RPM.SUPPORTED_FILTERS;
 
-		if (isValidParams) {
-			return request({
+		if (!isValidParams) return res.send({});
+		let reportsData = {};
+
+		try {
+			const reportsResponse = await request({
 				uri: `${CC.ANALYTICS_API_ROOT}${CC.REPORT_PATH}`,
 				json: true,
 				qs: req.query
-			})
-				.then(response => {
-					if (response.code == 1 && response.data) {
-						return res.send(response.data) && response.data;
-					}
-					return res.send({});
-				})
-				.then(data =>
-					//set data to redis
-					redisClient.setex(JSON.stringify(req.query), 24 * 3600, JSON.stringify(data))
-				)
-				.catch(err => {
-					console.log(err);
-					return res.send({});
+			});
+			if (!reportsResponse.code === 1 || !reportsResponse.data) return res.send({});
+
+			reportsData = reportsResponse.data;
+
+			const extraFiltersForSession = Object.keys(filters).filter(
+				filter => !sessionRpmSupportedFilters.includes(filter)
+			);
+
+			if (
+				!(dimension && !sessionRpmSupportedDimensions.includes(dimension)) &&
+				!extraFiltersForSession.length
+			) {
+				const sessionRpmReportsResponse = await request({
+					uri: `${CC.SESSION_RPM_REPORTS_API}`,
+					json: true,
+					qs: req.query
 				});
+
+				if (!sessionRpmReportsResponse.code === 1 || !sessionRpmReportsResponse.data)
+					return res.send(reportsData);
+
+				const sessionRpmReportsData = sessionRpmReportsResponse.data;
+
+				const mergedData = mergeReportsWithSessionRpmData(
+					reportsData,
+					sessionRpmReportsData,
+					isSuperUser
+				);
+
+				reportsData = mergedData;
+				if (Object.keys(reportsData).length) {
+					redisClient.setex(JSON.stringify(req.query), 24 * 3600, JSON.stringify(reportsData));
+				}
+			}
+		} catch (err) {
+			console.log(err);
 		}
 
-		return res.send({});
+		return res.send(reportsData);
 	})
 	.get('/getWidgetData', cache, (req, res) => {
 		const { params, path } = req.query;
