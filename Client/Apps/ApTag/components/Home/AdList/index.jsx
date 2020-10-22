@@ -23,6 +23,28 @@ class AdList extends Component {
 		return updateAllAds(siteId, adsWithFluidToggle);
 	};
 
+	onBulkAssignAdpTagNetwork = () => {
+		const { ads = [], siteId, replaceAds } = this.props;
+		const adsWithAdpTags = ads.map(ad => {
+			if (ad.network === 'adpTags') return ad;
+			return {
+				...ad,
+				network: 'adpTags',
+				networkData: {
+					dfpAdUnitId: '',
+					headerBidding: false,
+					isResponsive: false,
+					keyValues: { FP_S_A: 0 },
+					overrideActive: false,
+					overrideSizeTo: null,
+					refreshInterval: 30,
+					refreshSlot: false
+				}
+			};
+		});
+		replaceAds(siteId, adsWithAdpTags);
+	};
+
 	render() {
 		const {
 			loading,
@@ -39,6 +61,8 @@ class AdList extends Component {
 		const { dfpMessage } = this.state;
 		const customStyle = user.isSuperUser ? { minHeight: '540px' } : { minHeight: '440px' };
 		const isBulkFluidEnabled = ads.every(ad => ad.fluid);
+		const doesAllAdsHaveAdpTagNetwork = ads.every(ad => ad.network === 'adpTags');
+
 		if (loading) {
 			return <Loader />;
 		}
@@ -62,6 +86,14 @@ class AdList extends Component {
 								}}
 							>
 								Master Save
+							</CustomButton>
+							<CustomButton
+								variant="primary"
+								className="u-margin-t3 u-margin-r2 pull-right"
+								onClick={this.onBulkAssignAdpTagNetwork}
+								disabled={doesAllAdsHaveAdpTagNetwork}
+							>
+								Bulk Assign AdpTags network
 							</CustomButton>
 							<div style={{ clear: 'both' }}>&nbsp;</div>
 							<CustomToggleSwitch

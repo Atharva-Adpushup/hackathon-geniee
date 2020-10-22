@@ -68,4 +68,11 @@ const updateAllAds = (siteId, data) => dispatch =>
 		siteId
 	});
 
-export { createAd, fetchAds, deleteAd, updateAd, modifyAdOnServer, updateAllAds };
+const replaceAds = (siteId, ads) => dispatch =>
+	dispatch({
+		type: AD_ACTIONS.REPLACE_ADS_LIST,
+		data: ads,
+		siteId
+	});
+
+export { createAd, fetchAds, deleteAd, updateAd, modifyAdOnServer, updateAllAds, replaceAds };
