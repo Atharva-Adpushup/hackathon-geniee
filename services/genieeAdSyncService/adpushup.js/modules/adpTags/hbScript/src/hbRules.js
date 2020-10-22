@@ -41,10 +41,15 @@ module.exports = function(dependencies) {
 				case 'country': {
 					if (!(Array.isArray(trigger.value) && trigger.value.length)) return false;
 
-					var currentCountry = null; // TODO: [HbRules] Add get currentCountry Feature
+					var currentCountry = adpushup.config.country;
 					if (!currentCountry) return false;
 
-					return isMatch(trigger.value, 'array', currentCountry, trigger.operator);
+					return isMatch(
+						trigger.value.map(country => country.toUpperCase()),
+						'array',
+						currentCountry.toUpperCase(),
+						trigger.operator
+					);
 				}
 				case 'time_range': {
 					if (!(Array.isArray(trigger.value) && trigger.value.length)) return false;
