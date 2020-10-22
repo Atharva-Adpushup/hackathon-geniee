@@ -235,13 +235,15 @@ class AdElement extends Component {
 				</pre>{' '}
 				{user.isSuperUser && ad.formatData.type !== 'amp' ? (
 					<React.Fragment>
-						<CustomButton
-							variant="secondary"
-							className="u-margin-l3 u-margin-t3 pull-right"
-							onClick={() => this.toggleHandler('showNetworkDetails')}
-						>
-							Network Details
-						</CustomButton>
+						{!isRewarded && (
+							<CustomButton
+								variant="secondary"
+								className="u-margin-l3 u-margin-t3 pull-right"
+								onClick={() => this.toggleHandler('showNetworkDetails')}
+							>
+								Network Details
+							</CustomButton>
+						)}
 						{!isRewarded && (
 							<CustomButton
 								variant="secondary"

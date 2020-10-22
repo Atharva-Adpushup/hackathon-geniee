@@ -171,6 +171,7 @@ class NetworkOptions extends Component {
 						buttonType={props.buttonType || 1}
 						fromPanel={props.fromPanel ? props.fromPanel : false}
 						id={props.id ? props.id : false}
+						ad={props.ad}
 						showNotification={props.showNotification}
 						primaryAdSize={primaryAdSize}
 						networkConfig={networkConfig.adpTags}
