@@ -1,5 +1,6 @@
 import { connect } from 'react-redux';
 import { createAd } from '../../../actions/apps/apTag/adActions';
+import { showNotification } from '../../../actions/uiActions';
 import { resetCurrentAd } from '../../../actions/apps/apTag/globalActions';
 import AdCodeGenerator from '../components/Home/AdCodeGenerator';
 import { getAdsAndGlobal } from '../lib/helpers';
@@ -18,7 +19,8 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = dispatch => ({
 	createAd: payload => dispatch(createAd(payload)),
-	resetCurrentAd: siteId => dispatch(resetCurrentAd(siteId))
+	resetCurrentAd: siteId => dispatch(resetCurrentAd(siteId)),
+	showNotification: data => dispatch(showNotification(data))
 });
 
 export default connect(

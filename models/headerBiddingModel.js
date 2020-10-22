@@ -256,7 +256,7 @@ function apiModule() {
 								variationName: 'N/A'
 							};
 
-							if (ad.network === 'adpTags') {
+							if (ad.network === 'adpTags' && ad.formatData.type !== 'rewardedAds') {
 								const {
 									networkData,
 									width,
@@ -385,6 +385,27 @@ function apiModule() {
 					return inventories;
 				}
 			),
+		getApTagAdDoc: siteId =>
+			couchbase
+				.connectToAppBucket()
+				.then(appBucket => appBucket.getAsync(`tgmr::${siteId}`, {}))
+				.then(({ value }) => value),
+
+		getInnovativeAdDoc: siteId =>
+			couchbase
+				.connectToAppBucket()
+				.then(appBucket => appBucket.getAsync(`fmrt::${siteId}`, {}))
+				.then(({ value }) => value),
+
+		getApliteAds: siteId =>
+			couchbase
+				.connectToAppBucket()
+				.then(appBucket => appBucket.getAsync(`aplt::${siteId}`, {}))
+				.then(({ value }) => value.adUnits)
+				.catch(err => {
+					if (err && err.code === 13) return Promise.resolve([]);
+					throw err;
+				}),
 		updateHbStatusOnLayoutInventory: (siteId, json) => {
 			if (!json || !json.length) {
 				return Promise.resolve();
@@ -705,11 +726,211 @@ function apiModule() {
 				});
 		},
 
+		updateRefreshOnInnovAdInventory: async (siteId, refreshStatus) => {
+			const innovativeAdsInventories = await API.getInnovativeAdInventoriesForHB(siteId);
+
+			const innovativeAdsInventoryMap = innovativeAdsInventories.reduce(
+				(inventoriesMap, inventory) => ({ ...inventoriesMap, [inventory.adUnitId]: inventory }),
+				{}
+			);
+			const innovativeAdDoc = await API.getInnovativeAdDoc(siteId);
+
+			const modifiedInnovativeAds = innovativeAdDoc.ads
+				? innovativeAdDoc.ads.map(ad => {
+						// if ad present in innovative ad inventory, update ad
+						if (innovativeAdsInventoryMap[ad.id]) {
+							return { ...ad, networkData: { ...ad.networkData, refreshSlot: refreshStatus } };
+						}
+						return ad;
+				  })
+				: null;
+
+			if (modifiedInnovativeAds) return API.replaceInnovativeAds(siteId, modifiedInnovativeAds);
+			return Promise.resolve();
+		},
+
+		updateRefreshOnApTagInventory: async (siteId, refreshStatus) => {
+			const apTagInventoriesList = await API.getApTagInventoriesForHB(siteId);
+			// resolve if no apTagInventories exist
+			if (apTagInventoriesList === null || !apTagInventoriesList.length) return Promise.resolve();
+			// ap tag inventories lookup map
+			const apTagInventories = apTagInventoriesList.reduce(
+				(apTagsMap, inventory) => ({ ...apTagsMap, [inventory.adUnitId]: inventory }),
+				{}
+			);
+			const apTagDoc = await API.getApTagAdDoc(siteId);
+
+			const modifiedApTagAds = apTagDoc.ads
+				? apTagDoc.ads.map(ad => {
+						// if ad present in ad tag inventory, update ad
+						if (apTagInventories[ad.id]) {
+							return { ...ad, networkData: { ...ad.networkData, refreshSlot: refreshStatus } };
+						}
+						return ad;
+				  })
+				: null;
+
+			if (modifiedApTagAds) return API.replaceApTagAds(siteId, modifiedApTagAds);
+			return Promise.resolve();
+		},
+
+		updateRefreshOnLayoutInventory: async (siteId, refreshStatus) => {
+			const layoutInventoryList = await API.getLayoutInventoriesForHB(siteId);
+			// if no HB inventories for layout ads
+			if (layoutInventoryList === null || !layoutInventoryList.length) return Promise.resolve();
+
+			// convert list to map for faster lookup
+			const layoutInventoriesMap = layoutInventoryList.reduce(
+				(layoutMap, inventory) => ({ ...layoutMap, [inventory.adId]: inventory }),
+				{}
+			);
+
+			const channelNames = await siteModel.getSiteChannels(siteId);
+
+			for (const channelName of channelNames) {
+				const channelId = `chnl::${siteId}:${channelName}`;
+				const channel = await channelModel.getChannelByDocId(channelId);
+
+				const channelData = channel.data;
+
+				let modifiedChannelDoc = { ...channelData };
+				let isModified = false;
+
+				if (
+					channelData &&
+					modifiedChannelDoc.variations &&
+					Object.keys(modifiedChannelDoc.variations).length
+				) {
+					// for each variation in channel
+					for (const variationKey in modifiedChannelDoc.variations) {
+						const variation = modifiedChannelDoc.variations[variationKey];
+						if (variation.sections && Object.keys(variation.sections).length) {
+							// for each section in variation
+							for (const sectionKey in variation.sections) {
+								const section = variation.sections[sectionKey];
+								if (section.ads && Object.keys(section.ads).length) {
+									// for each ad in section
+									for (const adKey in section.ads) {
+										const ad = section.ads[adKey];
+										// only update ad unit if ad unit is present in layoutInventoriesMap
+										if (ad && layoutInventoriesMap[ad.id]) {
+											const currentVariationsSet = modifiedChannelDoc.variations;
+											const currentVariation = currentVariationsSet[variationKey];
+											const currentSectionsSet = currentVariation.sections;
+											const currentSection = currentSectionsSet[sectionKey];
+											const currentAdsSet = currentSection.ads;
+											const currentAd = currentAdsSet[adKey];
+											modifiedChannelDoc = {
+												...modifiedChannelDoc,
+												variations: {
+													...currentVariationsSet,
+													[variationKey]: {
+														...currentVariation,
+														sections: {
+															...currentSectionsSet,
+															[sectionKey]: {
+																...currentSection,
+																ads: {
+																	...currentAdsSet,
+																	[adKey]: {
+																		...currentAd,
+																		networkData: {
+																			...currentAd.networkData,
+																			refreshSlot: refreshStatus
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											};
+											isModified = true;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+
+				if (isModified)
+					await channelModel.updateChannel(channelId, modifiedChannelDoc);
+			}
+		},
+
+		updateRefreshOnApLiteInventory: (siteId, refreshStatus) => {
+			return API.getApliteAds(siteId).then(apltAds => {
+				const ads = apltAds.map(ad => ({ ...ad, refreshSlot: refreshStatus }));
+				return API.replaceApLiteAds(siteId, ads);
+			});
+		},
+
+		replaceInnovativeAds: (siteId, ads) => {
+			return couchbase
+				.connectToAppBucket()
+				.then(appBucket =>
+					appBucket
+						.getAsync(`fmrt::${siteId}`, {})
+						.then(innovativeAdDoc => ({ appBucket, innovativeAdDoc: innovativeAdDoc.value }))
+				)
+				.then(({ appBucket, innovativeAdDoc }) =>
+					appBucket.replaceAsync(`fmrt::${siteId}`, { ...innovativeAdDoc, ads })
+				)
+				.catch(err => {
+					if (err.code && err.code === 13) return [];
+					throw err;
+				});
+		},
+
+		replaceApTagAds: (siteId, ads) => {
+			return couchbase
+				.connectToAppBucket()
+				.then(appBucket =>
+					appBucket
+						.getAsync(`tgmr::${siteId}`, {})
+						.then(apTagDoc => ({ appBucket, apTagDoc: apTagDoc.value }))
+				)
+				.then(({ appBucket, apTagDoc }) =>
+					appBucket.replaceAsync(`tgmr::${siteId}`, { ...apTagDoc, ads })
+				)
+				.catch(err => {
+					if (err.code && err.code === 13) return [];
+					throw err;
+				});
+		},
+
+		replaceApLiteAds: (siteId, ads) => {
+			return couchbase
+				.connectToAppBucket()
+				.then(appBucket =>
+					appBucket
+						.getAsync(`aplt::${siteId}`, {})
+						.then(apltDoc => ({ appBucket, apltDoc: apltDoc.value }))
+				)
+				.then(({ appBucket, apltDoc }) =>
+					appBucket.replaceAsync(`aplt::${siteId}`, { ...apltDoc, adUnits: ads })
+				)
+				.catch(err => {
+					if (err.code && err.code === 13) return [];
+					throw err;
+				});
+		},
+
 		updateFormats: (siteId, json) => {
 			return Promise.all([
 				API.updateFormatsOnInnovAdInventory(siteId, json.innovativeAds),
 				API.updateFormatsOnLayoutInventory(siteId, json.layoutEditor),
 				API.updateFormatsOnApTagInventory(siteId, json.apTag)
+			]);
+		},
+
+		updateRefreshSlots: async (siteId, refreshStatus) => {
+			return Promise.all([
+				API.updateRefreshOnApLiteInventory(siteId, refreshStatus),
+				API.updateRefreshOnApTagInventory(siteId, refreshStatus),
+				API.updateRefreshOnInnovAdInventory(siteId, refreshStatus),
+				API.updateRefreshOnLayoutInventory(siteId, refreshStatus)
 			]);
 		},
 

@@ -491,10 +491,13 @@ class AdpTags extends Component {
 	}
 
 	renderAdvancedBlock() {
+		const { ad } = this.props;
+		const isRewarded = ad.formatData.type === 'rewardedAds';
+
 		let toShow = window.isGeniee && window.gcfg.uadkv ? true : !window.isGeniee,
 			code = this.generateCode();
 
-		return toShow ? (
+		return toShow && !isRewarded ? (
 			<Row>
 				<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px' : ''}>
 					<pre>
@@ -522,8 +525,11 @@ class AdpTags extends Component {
 			geniee,
 			fromPanel,
 			networkConfig,
-			id
+			id,
+			ad
 		} = this.props;
+		const isRewarded = ad.formatData.type === 'rewardedAds';
+
 		const { fpKey, pf, refreshSlot, refreshInterval } = this.state;
 
 		const code = this.generateCode();
@@ -532,7 +538,7 @@ class AdpTags extends Component {
 		return (
 			<div>
 				{isGenieeEditableMode ? this.renderGenieeNote() : null}
-				{geniee ? null : (
+				{geniee || isRewarded ? null : (
 					<div>
 						<Row>
 							<Col xs={6} className={fromPanel ? 'u-padding-r10px' : ''}>
@@ -576,7 +582,7 @@ class AdpTags extends Component {
 				{geniee ? this.renderDFPAdUnitIdSelectBox() : null}
 				{/* {geniee ? this.renderManageMultipleAdSizeBlock() : null} */}
 				{!geniee ? this.renderOverrideSettings(isGenieeEditableMode) : null}
-				{!geniee && networkConfig && networkConfig.enableRefreshSlot ? (
+				{!geniee && networkConfig && networkConfig.enableRefreshSlot && !isRewarded ? (
 					<div>
 						<Row>
 							<Col xs={12} className={fromPanel ? 'u-padding-0px' : ''}>

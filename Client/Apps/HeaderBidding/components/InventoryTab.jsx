@@ -15,6 +15,7 @@ import Loader from '../../../Components/Loader';
 import Spinner from '../../../Components/Spinner';
 import Empty from '../../../Components/Empty/index';
 import CustomToggleSwitch from '../../../Components/CustomToggleSwitch';
+import axios from '../../../helpers/axiosInstance';
 
 export default class InventoryTab extends React.Component {
 	state = {
@@ -112,9 +113,15 @@ export default class InventoryTab extends React.Component {
 			? [...inventories].map(inventory => inventory.adUnitId)
 			: [];
 
-		updateFormat(inventories.map(v => ({ ...v, checked: isEnabled, format: 'native' })), siteId)
+		updateFormat(
+			inventories.map(v => ({ ...v, checked: isEnabled, format: 'native' })),
+			siteId
+		)
 			.then(() =>
-				updateFormat(inventories.map(v => ({ ...v, checked: isEnabled, format: 'video' })), siteId)
+				updateFormat(
+					inventories.map(v => ({ ...v, checked: isEnabled, format: 'video' })),
+					siteId
+				)
 			)
 			.then(() =>
 				showNotification({
@@ -314,6 +321,28 @@ export default class InventoryTab extends React.Component {
 		);
 	};
 
+	toggleBulkEnableRefresh = isEnabled => {
+		const { siteId, showNotification } = this.props;
+		return axios
+			.put(`/headerBidding/updateRefresh/${siteId}`, { refreshStatus: isEnabled })
+			.then(() =>
+				showNotification({
+					mode: 'success',
+					title: 'Success',
+					message: `All Inventories refresh ${isEnabled ? 'enabled' : 'disabled'} successfully`,
+					autoDismiss: 5
+				})
+			)
+			.catch(e =>
+				showNotification({
+					mode: 'error',
+					title: 'Operation Failed',
+					message: e.message || 'Something went wrong',
+					autoDismiss: 5
+				})
+			);
+	};
+
 	render() {
 		const { inventories } = this.props;
 		const {
@@ -328,6 +357,10 @@ export default class InventoryTab extends React.Component {
 			selectAllVideo,
 			selectAllNative
 		} = this.state;
+
+		const doesAllHaveRefresh = inventories.every(
+			inv => inv.networkData && inv.networkData.refreshSlot
+		);
 
 		return (
 			<div className="options-wrapper white-tab-container hb-inventories">
@@ -369,9 +402,7 @@ export default class InventoryTab extends React.Component {
 					<div className={`inventory-wrap${hbStatusForSite === false ? ' disabled' : ' active'}`}>
 						{!!selectedInventories.length && (
 							<div className="updt-inv-hb-status u-margin-b4">
-								<span className="selected-inv-count u-margin-r3">{`${
-									selectedInventories.length
-								} selected`}</span>
+								<span className="selected-inv-count u-margin-r3">{`${selectedInventories.length} selected`}</span>
 								<CustomButton
 									disabled={updatingInventoryHbStatus}
 									variant="secondary"
@@ -438,6 +469,20 @@ export default class InventoryTab extends React.Component {
 							defaultLayout
 							name="toggle-multiformat"
 							id="toggle-multiformat"
+						/>
+
+						<CustomToggleSwitch
+							layout="horizontal"
+							className="u-margin-b4"
+							checked={doesAllHaveRefresh}
+							onChange={this.toggleBulkEnableRefresh}
+							labelText="Enable or Disable Refresh on all units"
+							labelBold
+							on="Enable"
+							off="Disable"
+							defaultLayout
+							name="toggle-refresh"
+							id="toggle-refresh"
 						/>
 
 						{!filteredInventories.length ? (

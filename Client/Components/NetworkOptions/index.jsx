@@ -257,13 +257,18 @@ class NetworkOptions extends Component {
 	render() {
 		const filteredNetworks = this.filterNetworks();
 		const { network } = this.state;
+		const { ad } = this.props;
+		const isRewarded = ad.formatData.type === 'rewardedAds';
+		const networks = isRewarded
+			? filteredNetworks.filter(network => network === 'adpTags')
+			: filteredNetworks;
 		return (
 			<div className="networkOptionsRow">
 				<SelectBox
 					id="network-selection"
 					title="Select Network"
 					onSelect={this.networkChangeHandler}
-					options={filteredNetworks.map(item => ({
+					options={networks.map(item => ({
 						name: item.charAt(0).toUpperCase() + item.slice(1).replace(/([A-Z])/g, ' $1'),
 						value: item
 					}))}

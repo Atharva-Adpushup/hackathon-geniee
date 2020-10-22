@@ -257,3 +257,35 @@ select.inputMinimal {
 		}
 	}
 }
+
+.Reward,
+.modal-form-group {
+	.form-group {
+		margin-left: 2rem;
+		.rewardText {
+			display: inline;
+			width: 70%;
+		}
+	}
+	.rewardLabel {
+		font-size: 18px;
+	}
+}
+
+.modalLabel {
+	font-size: 18px;
+}
+
+.modalText {
+	display: inline;
+	width: 70%;
+}
+
+.scriptLabel {
+	font-size: 18px;
+	font-weight: 500;
+}
+
+.scriptTextArea {
+	width: 70%;
+}

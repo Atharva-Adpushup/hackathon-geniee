@@ -6,13 +6,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Col, OverlayTrigger, Tooltip, Button } from '@/Client/helpers/react-bootstrap-imports';
 import { makeFirstLetterCapitalize } from '../../../../../helpers/commonFunctions';
 import CopyButtonWrapperContainer from '../../../../../Containers/CopyButtonWrapperContainer';
-import { ADCODE, AMP_MESSAGE } from '../../../configs/commonConsts';
+import { ADCODE, REWARDED_AD_CODE, TIGGER_AUTOMATICALLY_CODE } from '../../../configs/commonConsts';
 import CustomButton from '../../../../../Components/CustomButton/index';
 import AdNetworkDetails from './AdNetworkDetails';
 import LazyLoadSettings from './LazyLoadSettings';
 import EditBox from '../../../../../Components/EditBox/index';
 import Tags from '../../../../../Components/Tags/index';
 import FluidEdit from './FluidEdit';
+import RewardedVideoSettings from './RewardedVideoSettings';
 
 class AdElement extends Component {
 	constructor(props) {
@@ -21,6 +22,7 @@ class AdElement extends Component {
 			showNetworkDetails: false,
 			showLazyload: false,
 			showFluidVal: false,
+			showRewardedVideo: false,
 			editName: false,
 			isActive: Object.prototype.hasOwnProperty.call(props.ad, 'isActive')
 				? props.ad.isActive
@@ -31,11 +33,6 @@ class AdElement extends Component {
 		this.disableAd = this.disableAd.bind(this);
 		this.updateWrapper = this.updateWrapper.bind(this);
 	}
-
-	getAMPAdCode = ({ formatData }) =>
-		formatData.network && formatData.networkData && formatData.networkData.adCode
-			? formatData.networkData.adCode
-			: AMP_MESSAGE;
 
 	disableAd() {
 		const { isActive } = this.state;
@@ -68,15 +65,59 @@ class AdElement extends Component {
 	);
 
 	renderAdDetails() {
-		const { ad, updateAd, networkConfig, user, siteId } = this.props;
-		const { showLazyload, showNetworkDetails, editName, isActive, showFluidVal } = this.state;
-		const isAMP = ad.formatData.type === 'amp';
+		const {
+			ad,
+			updateAd,
+			networkConfig,
+			user,
+			siteId,
+			networkCode,
+			dfpMessage,
+			siteDomain
+		} = this.props;
+		const {
+			networkData: { dfpAdunitCode, dfpAdunit },
+			rewardTriggerFunction,
+			customScript,
+			modalText,
+			automaticTrigger
+		} = ad;
+		const {
+			showLazyload,
+			showNetworkDetails,
+			editName,
+			isActive,
+			showFluidVal,
+			showRewardedVideo
+		} = this.state;
 
-		let code = isAMP ? this.getAMPAdCode(ad) : ADCODE;
+		const isRewarded = ad.formatData.type === 'rewardedAds';
+		let code = isRewarded ? REWARDED_AD_CODE : ADCODE;
+		const triggerRewardedAd =
+			automaticTrigger || !customScript ? TIGGER_AUTOMATICALLY_CODE : atob(customScript);
+
 		const customAttributes = ad.maxHeight ? ` max-height="${ad.maxHeight}"` : '';
 		code = code
-			? code.replace(/__AD_ID__/g, ad.id).replace(/__CUSTOM_ATTRIBS__/, customAttributes)
+			? code
+					.replace(/__AD_ID__/g, ad.id)
+					.replace(/__CUSTOM_ATTRIBS__/, customAttributes)
+					.replace(/__AD_UNIT__/g, dfpAdunit)
+					.replace(/__NETWORK_CODE__/g, networkCode)
+					.replace(
+						/__POST_REWARDED_FUNCTION__/g,
+						rewardTriggerFunction && atob(rewardTriggerFunction)
+					)
+					.replace(/__AD_NAME__/, ad.name)
+					.replace(/__SITE_DOMAIN__/, siteDomain)
+					.replace(/__SITE_ID__/, siteId)
+					.replace(/__MODAL_TEXT__/, modalText)
+					.replace(/__TRIGGER_REWARDED_AD__/, triggerRewardedAd)
 			: null;
+
+		if (ad.formatData.type === 'rewardedAds') {
+			ad.width = 1;
+			ad.height = 1;
+		}
 
 		if (showFluidVal) {
 			return (
@@ -122,6 +163,18 @@ class AdElement extends Component {
 					id={ad.id}
 					onChange={payload => updateAd(ad.id, siteId, payload)}
 					onCancel={() => this.toggleHandler('showLazyload')}
+				/>
+			);
+		}
+
+		if (showRewardedVideo) {
+			return (
+				<RewardedVideoSettings
+					ad={ad}
+					siteId={siteId}
+					onCancel={() => this.toggleHandler('showRewardedVideo')}
+					onSubmit={this.updateWrapper}
+					user={user}
 				/>
 			);
 		}
@@ -171,7 +224,15 @@ class AdElement extends Component {
 						{this.renderInformation('Status', ad.isActive ? 'Active' : 'Archived')}
 					</div>
 				) : null}
-				<pre style={{ wordBreak: 'break-word' }}>{code}</pre>{' '}
+				<pre
+					style={
+						!isRewarded || (isRewarded && dfpAdunitCode)
+							? { wordBreak: 'break-word', height: '225px' }
+							: null
+					}
+				>
+					{isRewarded ? (dfpAdunit || dfpAdunitCode ? code : dfpMessage) : code}
+				</pre>{' '}
 				{user.isSuperUser && ad.formatData.type !== 'amp' ? (
 					<React.Fragment>
 						<CustomButton
@@ -181,23 +242,39 @@ class AdElement extends Component {
 						>
 							Network Details
 						</CustomButton>
-						<CustomButton
-							variant="secondary"
-							className="u-margin-l3 u-margin-t3 pull-right"
-							onClick={() => this.toggleHandler('showFluidVal')}
-						>
-							Edit Fluid
-						</CustomButton>
-						<CustomButton
-							variant="secondary"
-							className="u-margin-l3 u-margin-t3 pull-right"
-							onClick={() => this.toggleHandler('showLazyload')}
-						>
-							Lazyload Settings
-						</CustomButton>
-						<CopyButtonWrapperContainer content={code} className="u-margin-t3 pull-right">
-							<CustomButton variant="secondary">Copy AdCode</CustomButton>
-						</CopyButtonWrapperContainer>
+						{!isRewarded && (
+							<CustomButton
+								variant="secondary"
+								className="u-margin-l3 u-margin-t3 pull-right"
+								onClick={() => this.toggleHandler('showFluidVal')}
+							>
+								Edit Fluid
+							</CustomButton>
+						)}
+						{!isRewarded && (
+							<CustomButton
+								variant="secondary"
+								className="u-margin-l3 u-margin-t3 pull-right"
+								onClick={() => this.toggleHandler('showLazyload')}
+							>
+								Lazyload Settings
+							</CustomButton>
+						)}
+						{isRewarded ? (
+							<CustomButton
+								variant="secondary"
+								className="u-margin-l3 u-margin-t3 pull-right"
+								onClick={() => this.toggleHandler('showRewardedVideo')}
+							>
+								Rewarded Video Settings
+							</CustomButton>
+						) : null}
+
+						{!isRewarded || (isRewarded && dfpAdunitCode) ? (
+							<CopyButtonWrapperContainer content={code} className="u-margin-t3 pull-right">
+								<CustomButton variant="secondary">Copy AdCode</CustomButton>
+							</CopyButtonWrapperContainer>
+						) : null}
 					</React.Fragment>
 				) : null}
 			</div>

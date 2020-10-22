@@ -5,12 +5,23 @@ import CustomButton from '../../../../../Components/CustomButton/index';
 import Empty from '../../../../../Components/Empty/index';
 import Loader from '../../../../../Components/Loader';
 import ActionCard from '../../../../../Components/ActionCard';
+import CustomToggleSwitch from '../../../../../Components/CustomToggleSwitch';
 
 class AdList extends Component {
+	state = {
+		dfpMessage: 'click on master save to start dfp syncing'
+	};
+
 	componentDidMount() {
 		const { loading, fetchAds, siteId } = this.props;
 		if (loading) fetchAds({ siteId });
 	}
+
+	handleBulkFluidToggle = state => {
+		const { ads, updateAllAds, siteId } = this.props;
+		const adsWithFluidToggle = ads.map(ad => ({ ...ad, fluid: state }));
+		return updateAllAds(siteId, adsWithFluidToggle);
+	};
 
 	render() {
 		const {
@@ -21,10 +32,13 @@ class AdList extends Component {
 			modifyAdOnServer,
 			user,
 			networkConfig,
-			siteId
+			siteId,
+			siteDomain,
+			networkCode
 		} = this.props;
+		const { dfpMessage } = this.state;
 		const customStyle = user.isSuperUser ? { minHeight: '540px' } : { minHeight: '440px' };
-
+		const isBulkFluidEnabled = ads.every(ad => ad.fluid);
 		if (loading) {
 			return <Loader />;
 		}
@@ -39,11 +53,30 @@ class AdList extends Component {
 							<CustomButton
 								variant="primary"
 								className="u-margin-t3 u-margin-r2 pull-right"
-								onClick={() => masterSave(siteId, user.isSuperUser)}
+								onClick={() => {
+									masterSave(siteId, user.isSuperUser);
+									this.setState({
+										dfpMessage:
+											'DFP Sync service is running. Code will be available here once it is completed.'
+									});
+								}}
 							>
 								Master Save
 							</CustomButton>
 							<div style={{ clear: 'both' }}>&nbsp;</div>
+							<CustomToggleSwitch
+								layout="horizontal"
+								className="u-margin-b4"
+								checked={isBulkFluidEnabled}
+								onChange={this.handleBulkFluidToggle}
+								labelText="Enable or Disable Fluid on all units"
+								labelBold
+								on="Enable"
+								off="Disable"
+								defaultLayout
+								name="toggle-fluid"
+								id="toggle-fluid"
+							/>
 						</div>
 					) : null}
 					{ads.map((ad, key) =>
@@ -59,6 +92,9 @@ class AdList extends Component {
 										modifyAdOnServer={modifyAdOnServer}
 										networkConfig={networkConfig}
 										siteId={siteId}
+										siteDomain={siteDomain}
+										dfpMessage={dfpMessage}
+										networkCode={networkCode}
 									/>
 								</li>
 							</div>

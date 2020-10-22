@@ -2,6 +2,7 @@ import { connect } from 'react-redux';
 import {
 	fetchAds,
 	updateAd,
+	updateAllAds,
 	modifyAdOnServer,
 	archiveAd,
 	updateTraffic
@@ -32,10 +33,8 @@ const mapDispatchToProps = dispatch => ({
 		dispatch(archiveAd(adId, siteId, payload, isSuperUser)),
 	updateTraffic: (adId, siteId, payload, isSuperUser) =>
 		dispatch(updateTraffic(adId, siteId, payload, isSuperUser)),
-	masterSave: siteId => dispatch(masterSave(siteId))
+	masterSave: siteId => dispatch(masterSave(siteId)),
+	updateAllAds: (siteId, ads) => dispatch(updateAllAds(siteId, ads))
 });
 
-export default connect(
-	mapStateToProps,
-	mapDispatchToProps
-)(AdList);
+export default connect(mapStateToProps, mapDispatchToProps)(AdList);

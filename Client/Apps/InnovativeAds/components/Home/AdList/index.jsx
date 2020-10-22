@@ -12,6 +12,7 @@ import {
 	FORMAT_FILTER_OPTIONS
 } from '../../../configs/commonConsts';
 import ActionCard from '../../../../../Components/ActionCard';
+import CustomToggleSwitch from '../../../../../Components/CustomToggleSwitch';
 
 class AdList extends Component {
 	constructor(props) {
@@ -104,6 +105,12 @@ class AdList extends Component {
 		});
 	};
 
+	handleBulkFluidToggle = state => {
+		const { ads, updateAllAds, match } = this.props;
+		const adsToggledWithFluid = ads.map(ad => ({ ...ad, fluid: state }));
+		return updateAllAds(match.params.siteId, adsToggledWithFluid);
+	};
+
 	modalToggle(data = {}) {
 		const { show, modalData } = this.state;
 		this.setState({
@@ -143,7 +150,8 @@ class AdList extends Component {
 
 	renderFilters() {
 		const { filters } = this.state;
-		const { channels, user } = this.props;
+		const { channels, user, ads } = this.props;
+		const isBulkFluidEnabled = ads.every(ad => ad.fluid);
 		return (
 			<React.Fragment>
 				<Row>
@@ -190,6 +198,23 @@ class AdList extends Component {
 					</Col>
 					<div style={{ clear: 'both' }}>&nbsp;</div>
 				</div>
+				{user.isSuperUser && (
+					<Row>
+						<CustomToggleSwitch
+							layout="horizontal"
+							className="u-margin-b4"
+							checked={isBulkFluidEnabled}
+							onChange={this.handleBulkFluidToggle}
+							labelText="Enable or Disable Fluid on all units"
+							labelBold
+							on="Enable"
+							off="Disable"
+							defaultLayout
+							name="toggle-fluid"
+							id="toggle-fluid"
+						/>
+					</Row>
+				)}
 			</React.Fragment>
 		);
 	}

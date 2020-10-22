@@ -723,6 +723,21 @@ router
 				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error!' })
 			);
 	})
+	.put('/updateRefresh/:siteId', (req, res) => {
+		const { siteId } = req.params;
+		const { email } = req.user;
+		const { refreshStatus } = req.body;
+
+		return userModel
+			.verifySiteOwner(email, siteId)
+			.then(() => headerBiddingModel.updateRefreshSlots(siteId, refreshStatus))
+			.then(() => res.status(httpStatus.OK).json({ success: 'Refresh updated successfully' }))
+			.catch(e =>
+				res
+					.status(httpStatus.INTERNAL_SERVER_ERROR)
+					.json({ error: e.message || 'Internal Server Error!' })
+			);
+	})
 	.get('/rules/meta', (req, res) => {
 		const apis = {
 			devices:
