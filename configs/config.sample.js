@@ -224,7 +224,8 @@ module.exports = {
 	prebidBundleUrl: 'http://localhost:8080/assets/js/builds/geniee/prebid/__FILE_NAME__',
 	prebidBundleDefaultName: 'prebid.js',
 	performanceLoggingEnabledSites: [37780],
-	sitesToDisableVideoWaitLimit: []
+	sitesToDisableVideoWaitLimit: [],
+	disableAutoAddMultiformatForSites: []
 };
 
 /*
