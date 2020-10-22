@@ -182,9 +182,12 @@ var adpTags = {
 			 * Temporarily Enabled all formats for Non-apLite
 			 * until we enable all formats in all ad docs.
 			 * Hb Rules can still override formats list.
+			 *
+			 * Also remove the disableMultiformatForSites from config.js
 			 */
-			if(optionalParam.formats) optionalParam.formats =
-				constants.PREBID.ALL_SUPPORTED_FORMATS;
+			if (!window.adpushup.config.isAutoAddMultiformatDisabled && optionalParam.formats) {
+				optionalParam.formats = constants.PREBID.ALL_SUPPORTED_FORMATS;
+			}
 
 			var slot = this.createSlot(containerId, size, placement, optionalParam);
 			/**

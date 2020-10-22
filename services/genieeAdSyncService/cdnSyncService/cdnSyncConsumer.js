@@ -250,6 +250,11 @@ module.exports = function(site, user, prebidBundleName) {
 						Array.isArray(config.sitesToDisableVideoWaitLimit) &&
 						config.sitesToDisableVideoWaitLimit.indexOf(parseInt(siteId, 10)) !== -1;
 
+					// temp flag for temp change that has multiformat on for all the sites
+					const isAutoAddMultiformatDisabled =
+						Array.isArray(config.disableAutoAddMultiformatForSites) &&
+						config.disableAutoAddMultiformatForSites.includes(parseInt(siteId, 10));
+
 					bundle = _.replace(bundle, '__AP_CONFIG__', JSON.stringify(apConfigs));
 					bundle = _.replace(bundle, /__SITE_ID__/g, siteId);
 					//bundle = _.replace(bundle, '__COUNTRY__', false);
@@ -259,6 +264,7 @@ module.exports = function(site, user, prebidBundleName) {
 					bundle = _.replace(bundle, '__PREBID_BUNDLE_URL__', prebidBundleUrl);
 					bundle = _.replace(bundle, '__PERFORMANCE_LOGGING_ENABLED__', isPerformanceLoggingEnabled);
 					bundle = _.replace(bundle, '__VIDEO_WAIT_LIMIT_DISABLED__', isVideoWaitLimitDisabled);
+					bundle = _.replace(bundle, '__AUTO_ADD_MULTIFORMAT_DISABLED__', isAutoAddMultiformatDisabled);
 
 					// Generate final init script based on the services that are enabled
 					var uncompressed = generateFinalInitScript(bundle)

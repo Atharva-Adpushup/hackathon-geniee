@@ -217,7 +217,7 @@ var $ = require('../../libs/jquery'),
 												 * until we enable all formats in all ad docs.
 												 * Hb Rules can still override formats list.
 												 */
-												formats = ['display', 'video'],
+												formats = window.adpushup.config.isAutoAddMultiformatDisabled ? apLiteAdUnit.formats : ['display', 'video'],
 												sizeMapping = apLiteAdUnit.sizeMapping || [],
 												computedSizes = hbUtils.getSizesComputedUsingSizeMappingOrAdUnitSize(
 													apLiteAdUnit,
