@@ -11,13 +11,11 @@ const FilterLegend = ({ selectedFilters = {}, filtersList = [] }) => {
 		});
 	};
 
-	const showFiltersLegend = (filterValue, filterMeta) => {
-		if (!filterValue || !filterValue.length) return null;
-		const shouldShowAll = !!shouldShowMore[filterMeta.value];
+	const showFiltersLegend = (title, filterValues, key) => {
+		if (!filterValues || !filterValues.length) return null;
+		const shouldShowAll = !!shouldShowMore[key];
 
-		const allItems = Object.values(filterValue);
-
-		const filterItemsToShow = shouldShowAll ? allItems : allItems.slice(0, 5);
+		const filterItemsToShow = shouldShowAll ? filterValues : filterValues.slice(0, 5);
 
 		const filterItemsList = filterItemsToShow.map(val => (
 			<Badge className="filter-pill" key={val.id}>
@@ -25,21 +23,19 @@ const FilterLegend = ({ selectedFilters = {}, filtersList = [] }) => {
 			</Badge>
 		));
 
-		const hasMore = !shouldShowAll && allItems.length > 5;
+		const hasMore = !shouldShowAll && filterValues.length > 5;
 		return (
-			<tr key={filterMeta.position} className="selected-filter">
-				<td className="filter-badge-key">
-					<span>{filterMeta.display_name} : </span>
-				</td>
+			<tr key={key} className="selected-filter">
+				<td className="filter-badge-key">{title} :</td>
 				<td>
 					<span>{filterItemsList}</span>
 					{hasMore && (
-						<span className="badge-toggle" onClick={() => toggleShowMore(filterMeta.value)}>
+						<span className="badge-toggle" onClick={() => toggleShowMore(key)}>
 							{'more >>>'}
 						</span>
 					)}
 					{!hasMore && shouldShowAll && (
-						<span className="badge-toggle" onClick={() => toggleShowMore(filterMeta.value)}>
+						<span className="badge-toggle" onClick={() => toggleShowMore(key)}>
 							{'<<< less'}
 						</span>
 					)}
@@ -55,13 +51,22 @@ const FilterLegend = ({ selectedFilters = {}, filtersList = [] }) => {
 			[]
 		).length === 0;
 
+	const filterTitleMapping = Object.values(filtersList).reduce(
+		(result, filter) => ({ ...result, [filter.value]: filter.name }),
+		{}
+	);
+
 	return (
 		<div className="filter-legend">
 			{!isFiltersEmpty ? <h4 className="filter-list-title">Selected Filters</h4> : null}
 			<div>
 				<Table className="filter-list-table" borderless>
 					<tbody>
-						{filtersList.map(filter => showFiltersLegend(selectedFilters[filter.value], filter))}
+						{Object.keys(selectedFilters).map(key => {
+							const filterTitle = filterTitleMapping[key];
+							const selectedFilterValues = selectedFilters[key];
+							return showFiltersLegend(filterTitle, selectedFilterValues, key);
+						})}
 					</tbody>
 				</Table>
 			</div>
