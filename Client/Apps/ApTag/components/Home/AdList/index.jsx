@@ -6,6 +6,7 @@ import Empty from '../../../../../Components/Empty/index';
 import Loader from '../../../../../Components/Loader';
 import ActionCard from '../../../../../Components/ActionCard';
 import CustomToggleSwitch from '../../../../../Components/CustomToggleSwitch';
+import { NETWORK_MAPPINGS } from '../../../configs/commonConsts';
 
 class AdList extends Component {
 	state = {
@@ -21,6 +22,28 @@ class AdList extends Component {
 		const { ads, updateAllAds, siteId } = this.props;
 		const adsWithFluidToggle = ads.map(ad => ({ ...ad, fluid: state }));
 		return updateAllAds(siteId, adsWithFluidToggle);
+	};
+
+	onBulkAssignAdpTagNetwork = () => {
+		const { ads = [], siteId, replaceAds } = this.props;
+		const adsWithAdpTags = ads.map(ad => {
+			if (ad.network === NETWORK_MAPPINGS.ADPTAGS) return ad;
+			return {
+				...ad,
+				network: NETWORK_MAPPINGS.ADPTAGS,
+				networkData: {
+					dfpAdUnitId: '',
+					headerBidding: false,
+					isResponsive: false,
+					keyValues: { FP_S_A: 0 },
+					overrideActive: false,
+					overrideSizeTo: null,
+					refreshInterval: 30,
+					refreshSlot: false
+				}
+			};
+		});
+		replaceAds(siteId, adsWithAdpTags);
 	};
 
 	render() {
@@ -39,6 +62,8 @@ class AdList extends Component {
 		const { dfpMessage } = this.state;
 		const customStyle = user.isSuperUser ? { minHeight: '540px' } : { minHeight: '440px' };
 		const isBulkFluidEnabled = ads.every(ad => ad.fluid);
+		const doesAllAdsHaveAdpTagNetwork = ads.every(ad => ad.network === NETWORK_MAPPINGS.ADPTAGS);
+
 		if (loading) {
 			return <Loader />;
 		}
@@ -62,6 +87,14 @@ class AdList extends Component {
 								}}
 							>
 								Master Save
+							</CustomButton>
+							<CustomButton
+								variant="primary"
+								className="u-margin-t3 u-margin-r2 pull-right"
+								onClick={this.onBulkAssignAdpTagNetwork}
+								disabled={doesAllAdsHaveAdpTagNetwork}
+							>
+								Bulk Assign AdpTags network
 							</CustomButton>
 							<div style={{ clear: 'both' }}>&nbsp;</div>
 							<CustomToggleSwitch
