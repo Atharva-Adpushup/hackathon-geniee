@@ -411,7 +411,7 @@ class AdCodeGenerator extends Component {
 		return (
 			<React.Fragment>
 				<Col md={3} className="modalLabel">
-					Modal Text
+					Consent Popup Text
 				</Col>
 				<Col md={9} className="modal-form-group">
 					<FieldGroup
@@ -421,7 +421,7 @@ class AdCodeGenerator extends Component {
 						onChange={this.handleChange}
 						size={4}
 						id="modalText-input"
-						placeholder=" Enter Modal Text"
+						placeholder="Eg. You need 10 coins to proceed. Would you like to watch a rewarded ad and earn 10 coins?"
 						className="u-padding-v4 u-padding-h4 u-margin-b4 modalText"
 					/>
 				</Col>
@@ -436,7 +436,7 @@ class AdCodeGenerator extends Component {
 		return (
 			<div className="Reward">
 				<Col md={3} className="rewardLabel">
-					Reward Text
+					Reward
 				</Col>
 				<Col md={9}>
 					<FieldGroup
@@ -446,7 +446,7 @@ class AdCodeGenerator extends Component {
 						onChange={this.handleChange}
 						size={4}
 						id="rewardText-input"
-						placeholder=" Enter Reward Text"
+						placeholder="What would the user earn after watching the ad? Eg. Coins, Credits, Lives etc."
 						className="u-padding-v4 u-padding-h4 rewardText"
 					/>
 				</Col>
@@ -457,11 +457,11 @@ class AdCodeGenerator extends Component {
 					<FieldGroup
 						name="rewardValue"
 						value={rewardValue}
-						type="text"
+						type="number"
 						onChange={this.handleChange}
 						size={4}
 						id="rewardValue-input"
-						placeholder=" Enter Reward Value"
+						placeholder="How much of the reward would be granted? If the user would earn 10 coins, enter '10' here."
 						className="u-padding-v4 u-padding-h4 rewardText"
 					/>
 				</Col>
