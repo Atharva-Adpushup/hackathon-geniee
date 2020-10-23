@@ -958,7 +958,7 @@ class Report extends Component {
 			id: selectedReport.id
 		};
 
-		const existingReportWithName = savedReports.find(report => report.name === reportName);
+		const existingReportWithName = savedReports.find(report => report.name === reportName && selectedReport.id !== report.id);
 		if (existingReportWithName) {
 			showNotification({
 				mode: 'error',
