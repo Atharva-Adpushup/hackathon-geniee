@@ -155,7 +155,12 @@ const Utils = {
 			.post(`${config.SCHEDULER_API_ROOT}/schedule`, jobConfiguration)
 			.then(response => response.data);
 	},
-	cancelScheduledJob: async jobId => axios.delete(`${config.SCHEDULER_API_ROOT}/cancel/${jobId}`),
+	cancelScheduledJob: async jobId => {
+		if (jobId) {
+			return axios.delete(`${config.SCHEDULER_API_ROOT}/cancel/${jobId}`);
+		}
+		return Promise.resolve();
+	},
 	initiateReportsSchedule: async (reportConfig, email) => {
 		const { interval, startDate } = reportConfig.scheduleOptions;
 		const cronExpression = Utils.generateCronExpression(interval, startDate);
@@ -508,6 +513,7 @@ router
 
 			return sendSuccessResponse(response, res, HTTP_STATUSES.OK);
 		} catch (err) {
+			console.log(err);
 			let { message: errorMessage } = err;
 			try {
 				errorMessage = JSON.parse(errorMessage);
@@ -575,6 +581,7 @@ router
 			const response = await reportsModel.updateSavedReportConfig(newConfiguration, email);
 			return sendSuccessResponse(response, res, HTTP_STATUSES.OK);
 		} catch (err) {
+			console.log(err);
 			let { message: errorMessage } = err;
 			try {
 				errorMessage = JSON.parse(errorMessage);

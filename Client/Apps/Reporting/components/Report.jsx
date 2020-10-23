@@ -193,7 +193,7 @@ class Report extends Component {
 		};
 	};
 
-	onControlChange = (data, reportType, resetSavedReport = true) => {
+	onControlChange = (data, reportType) => {
 		const params = this.getControlChangedParams({ ...data, reportType });
 		const { selectedFilterValues } = this.state;
 		const newStateData = { ...data };
@@ -861,7 +861,7 @@ class Report extends Component {
 			});
 	};
 
-	processAndSaveReports = (savedReports, callback = () => {}) => {
+	processAndSaveReports = (savedReports = [], callback = () => {}) => {
 		const savedReportsWithValue = savedReports.map(report => ({
 			...report,
 			name: report.name,
@@ -883,8 +883,38 @@ class Report extends Component {
 	};
 
 	onReportSave = (scheduleOptions, reportName) => {
-		const { startDate, endDate, selectedDimension, selectedFilters, selectedInterval } = this.state;
+		const {
+			startDate,
+			endDate,
+			selectedDimension,
+			selectedFilters,
+			selectedInterval,
+			savedReports = []
+		} = this.state;
 		const { showNotification } = this.props;
+
+		const existingReportWithName = savedReports.find(report => report.name === reportName);
+		if (existingReportWithName) {
+			showNotification({
+				mode: 'error',
+				title: 'Operation Failed',
+				message: `Report with name ${reportName} already exists..`,
+				autoDismiss: 5
+			});
+			return;
+		}
+
+		if (scheduleOptions && scheduleOptions.interval) {
+			if (!scheduleOptions.startDate) {
+				showNotification({
+					mode: 'error',
+					title: 'Operation Failed',
+					message: `Start Date mandatory to schedule report`,
+					autoDismiss: 5
+				});
+				return;
+			}
+		}
 
 		const reportConfig = {
 			name: reportName,
@@ -900,8 +930,8 @@ class Report extends Component {
 			.saveReportConfig(reportConfig)
 			.then(res => {
 				const response = res.data.data;
-				const { savedReports } = response;
-				this.processAndSaveReports(savedReports, () => {
+				const { savedReports: newSavedReports } = response;
+				this.processAndSaveReports(newSavedReports, () => {
 					showNotification({
 						mode: 'success',
 						title: 'Success',
@@ -921,18 +951,41 @@ class Report extends Component {
 	};
 
 	onReportUpdate = (scheduleOptions, reportName) => {
-		const { selectedReport } = this.state;
+		const { selectedReport, savedReports = [] } = this.state;
 		const { showNotification } = this.props;
 		const updateReportConfig = {
 			name: reportName,
 			id: selectedReport.id
 		};
 
+		const existingReportWithName = savedReports.find(report => report.name === reportName);
+		if (existingReportWithName) {
+			showNotification({
+				mode: 'error',
+				title: 'Operation Failed',
+				message: `Report with name ${reportName} already exists..`,
+				autoDismiss: 5
+			});
+			return;
+		}
+
+		if (scheduleOptions && scheduleOptions.interval) {
+			if (!scheduleOptions.startDate) {
+				showNotification({
+					mode: 'error',
+					title: 'Operation Failed',
+					message: `Start Date mandatory to schedule report`,
+					autoDismiss: 5
+				});
+				return;
+			}
+		}
+
 		// only send schedule options if it differs
 		if (!isSameScheduleOptions(selectedReport.scheduleOptions, scheduleOptions)) {
 			updateReportConfig.scheduleOptions = scheduleOptions;
 		}
-		return reportService
+		reportService
 			.updateSavedReport(updateReportConfig)
 			.then(res => {
 				const response = res.data.data;

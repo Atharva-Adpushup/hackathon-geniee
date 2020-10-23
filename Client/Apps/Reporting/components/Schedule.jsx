@@ -1,12 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import moment from 'moment';
-import {
-	Form,
-	FormControl,
-	ControlLabel,
-	Panel,
-	Button
-} from '@/Client/helpers/react-bootstrap-imports';
+import { Form, FormControl, Panel, Button } from '@/Client/helpers/react-bootstrap-imports';
 import PresetDateRangePicker from '../../../Components/PresetDateRangePicker/index';
 import SelectBox from '../../../Components/SelectBox/index';
 import { getReportScheduleIntervals } from '../helpers/utils';
@@ -60,13 +54,13 @@ const Schedule = ({
 	};
 
 	return (
-		<Panel defaultExpanded className="reports-schedule u-margin-t4">
+		<Panel className="reports-schedule u-margin-t4">
 			<Panel.Title toggle>+ Save and Schedule Options</Panel.Title>
 			<Panel.Collapse>
 				<Panel.Body>
 					<div className="aligner aligner--wrap u-margin-l4">
 						<Form>
-							<ControlLabel>Name for the saved report</ControlLabel>
+							<p>Name of saved report</p>
 							<FormControl
 								type="text"
 								placeholder="Report Name"
@@ -75,11 +69,9 @@ const Schedule = ({
 								name="reportName"
 							/>
 						</Form>
-					</div>
-					<div className="aligner aligner--wrap u-margin-t4 u-margin-l4">
-						<div>
+						<div className="u-margin-l4">
 							{/* eslint-disable */}
-							<label className="u-text-normal">Schedule</label>
+							<p className="u-text-normal">Schedule</p>
 							{/* eslint-disable */}
 							<SelectBox
 								id="schedule"
@@ -93,26 +85,28 @@ const Schedule = ({
 								onSelect={onReportScheduleSelect}
 							/>
 						</div>
-						<div className="u-margin-l2">
-							<label className="u-text-normal">From</label>
-							<PresetDateRangePicker
-								startDate={dates.startDate || moment().add(1, 'days')}
-								endDate={dates.endDate|| moment().add(2, 'days')}
-								datesUpdated={({ startDate, endDate }) => setDates({ startDate, endDate })}
-								isOutsideRange={day => day.isBefore(moment())}
-								autoFocus
-							/>
-						</div>
-					</div>
-					<div className="u-margin-t4">
-						<Button onClick={saveReportHandler} bsStyle="primary" className="u-margin-l4">
-							{isUpdating ? 'Update Report' : 'Save Report'}
-						</Button>
-						{isUpdating && (
-							<Button onClick={onReportDelete} className="u-margin-l4">
-								Delete Report
-							</Button>
+						{interval && (
+							<div className="u-margin-l2">
+								<p className="u-text-normal">From</p>
+								<PresetDateRangePicker
+									startDate={dates.startDate || moment().add(1, 'days')}
+									endDate={dates.endDate|| moment().add(2, 'days')}
+									datesUpdated={({ startDate, endDate }) => setDates({ startDate, endDate })}
+									isOutsideRange={day => day.isBefore(moment())}
+									autoFocus
+								/>
+							</div>
 						)}
+						<div className="schedule-buttons">
+							<Button onClick={saveReportHandler} bsStyle="primary" className="u-margin-l4">
+								{isUpdating ? 'Update Report' : 'Save Report'}
+							</Button>
+							{isUpdating && (
+								<Button onClick={onReportDelete} className="u-margin-l4">
+									Delete Report
+								</Button>
+							)}
+						</div>
 					</div>
 				</Panel.Body>
 			</Panel.Collapse>
