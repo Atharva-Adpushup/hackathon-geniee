@@ -6,6 +6,7 @@ import Empty from '../../../../../Components/Empty/index';
 import Loader from '../../../../../Components/Loader';
 import ActionCard from '../../../../../Components/ActionCard';
 import CustomToggleSwitch from '../../../../../Components/CustomToggleSwitch';
+import { NETWORK_MAPPINGS } from '../../../configs/commonConsts';
 
 class AdList extends Component {
 	state = {
@@ -26,10 +27,10 @@ class AdList extends Component {
 	onBulkAssignAdpTagNetwork = () => {
 		const { ads = [], siteId, replaceAds } = this.props;
 		const adsWithAdpTags = ads.map(ad => {
-			if (ad.network === 'adpTags') return ad;
+			if (ad.network === NETWORK_MAPPINGS.ADPTAGS) return ad;
 			return {
 				...ad,
-				network: 'adpTags',
+				network: NETWORK_MAPPINGS.ADPTAGS,
 				networkData: {
 					dfpAdUnitId: '',
 					headerBidding: false,
@@ -61,7 +62,7 @@ class AdList extends Component {
 		const { dfpMessage } = this.state;
 		const customStyle = user.isSuperUser ? { minHeight: '540px' } : { minHeight: '440px' };
 		const isBulkFluidEnabled = ads.every(ad => ad.fluid);
-		const doesAllAdsHaveAdpTagNetwork = ads.every(ad => ad.network === 'adpTags');
+		const doesAllAdsHaveAdpTagNetwork = ads.every(ad => ad.network === NETWORK_MAPPINGS.ADPTAGS);
 
 		if (loading) {
 			return <Loader />;
