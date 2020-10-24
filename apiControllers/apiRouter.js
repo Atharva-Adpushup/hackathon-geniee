@@ -18,6 +18,10 @@ const ampSettingsController = require('./ampSettingsController');
 const adsTxtController = require('./adsTxtController');
 const utilityController = require('./utilityController');
 const ampController = require('./ampController');
+const scriptController = require('./scriptController');
+
+// TODO: add some security/authentication check
+router.use('/script', scriptController);
 
 const apiAuthMiddleware = require('../middlewares/apiAuthMiddleware');
 const loggerMiddleware = require('../middlewares/logger');
