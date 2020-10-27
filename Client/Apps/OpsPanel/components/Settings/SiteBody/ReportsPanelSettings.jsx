@@ -10,7 +10,7 @@ class ReportsPanelSettings extends Component {
 	constructor(props) {
 		super(props);
 		const { user } = this.props;
-		const { showUniqueImpressionsReporting = false, sessionRpmReports = true } = user;
+		const { showUniqueImpressionsReporting = false, sessionRpmReports = false } = user;
 
 		this.state = {
 			showUniqueImpressionsReporting,

@@ -854,7 +854,7 @@ class Report extends Component {
 			user,
 			showNotification
 		} = this.props;
-		const { sessionRpmReports: sessionRpmReportsEnabled = true } = user.data;
+		const { sessionRpmReports: sessionRpmReportsEnabled = false } = user.data;
 
 		let allAvailableMetrics = this.getAllAvailableMetrics(
 			isCustomizeChartLegend,
