@@ -1182,5 +1182,9 @@ module.exports = {
 
 	isAdPushupForceDisabled: function() {
 		return !!this.getQueryParams().forceDisableAp;
+	},
+	checkForLighthouse: function(siteId) {
+		var ua = navigator.userAgent;
+		return ua && ua.includes('Lighthouse') && commonConsts.LIGHTHOUSE_HACK_SITES.includes(siteId);
 	}
 };
