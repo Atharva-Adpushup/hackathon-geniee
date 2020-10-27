@@ -167,6 +167,7 @@ module.exports = {
 			utils.log(`AdPushup Force Disabled.. ApTag render blocked`);
 			return;
 		}
+		if (utils.checkForLighthouse(adp.config.siteId)) return;
 		if (adp.config.cmpLoaded) {
 			utils.log('in triggerAd - cmp loaded', adId);
 			trigger(adId);
