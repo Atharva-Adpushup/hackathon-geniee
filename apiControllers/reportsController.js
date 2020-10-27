@@ -136,24 +136,23 @@ router
 					qs: req.query
 				});
 
-				if (!sessionRpmReportsResponse.code === 1 || !sessionRpmReportsResponse.data)
-					return res.send(reportsData);
+				if (sessionRpmReportsResponse.code === 1 && sessionRpmReportsResponse.data) {
+					const sessionRpmReportsData = sessionRpmReportsResponse.data;
 
-				const sessionRpmReportsData = sessionRpmReportsResponse.data;
-
-				const mergedData = mergeReportsWithSessionRpmData(
-					reportsData,
-					sessionRpmReportsData,
-					isSuperUser
-				);
-
-				reportsData = mergedData;
-				if (Object.keys(reportsData).length) {
-					redisClient.setex(JSON.stringify(req.query), 24 * 3600, JSON.stringify(reportsData));
+					const mergedData = mergeReportsWithSessionRpmData(
+						reportsData,
+						sessionRpmReportsData,
+						isSuperUser
+					);
+					reportsData = mergedData;
 				}
 			}
 		} catch (err) {
 			console.log(err);
+		}
+
+		if (Object.keys(reportsData).length) {
+			redisClient.setex(JSON.stringify(req.query), 24 * 3600, JSON.stringify(reportsData));
 		}
 
 		return res.send(reportsData);
