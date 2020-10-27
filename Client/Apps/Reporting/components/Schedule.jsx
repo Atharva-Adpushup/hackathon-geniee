@@ -98,7 +98,7 @@ const Schedule = ({
 							</div>
 						)}
 						<div className="schedule-buttons">
-							<Button onClick={saveReportHandler} bsStyle="primary" className="u-margin-l4">
+							<Button onClick={saveReportHandler} className="u-margin-l4 btn--secondary">
 								{isUpdating ? 'Update Report' : 'Save Report'}
 							</Button>
 							{isUpdating && (
