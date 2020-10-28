@@ -478,7 +478,7 @@ class AdCodeGenerator extends Component {
 				<Col md={5}>
 					<CustomToggleSwitch
 						labelText="Trigger Automatically"
-						className="u-margin-b4 u-margin-t4 negative-toggle fluid-Toggle"
+						className="u-margin-b4 u-margin-t4 negative-toggle trigger-automatically-toggle"
 						checked={automaticTrigger}
 						onChange={this.handleToggle}
 						layout="horizontal"

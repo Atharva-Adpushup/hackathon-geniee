@@ -265,6 +265,7 @@ select.inputMinimal {
 		.rewardText {
 			display: inline;
 			width: 80%;
+			margin-left: 20px;
 		}
 	}
 	.rewardLabel {
@@ -279,6 +280,13 @@ select.inputMinimal {
 .modalText {
 	display: inline;
 	width: 80%;
+	margin-left: 20px;
+}
+
+.trigger-automatically-toggle {
+	.toggle {
+		margin-right: 1.5em;
+	}
 }
 
 .scriptLabel {
@@ -288,4 +296,5 @@ select.inputMinimal {
 
 .scriptTextArea {
 	width: 80%;
+	margin-left: 40px;
 }
