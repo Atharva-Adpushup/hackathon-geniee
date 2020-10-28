@@ -3,6 +3,8 @@ module.exports = apiModule();
 const model = require('../helpers/model');
 const couchbase = require('../helpers/couchBaseService');
 const { docKeys } = require('../configs/commonConsts');
+const commonConsts = require('../configs/commonConsts');
+const N1qlQuery = require("couchbase").N1qlQuery;
 
 const ActiveBidderAdaptersList = model.extend(function() {
 	this.keys = ['prebidBundleName', 'activeBiddersInAscOrder'];
@@ -98,6 +100,25 @@ function apiModule() {
 					output.prebidBundleName = activeBidderAdaptersList.get('prebidBundleName');
 					return output;
 				});
+		},
+		getActiveAndUsedBidderAdapters: function() {
+			const queryString = commonConsts.PREBID_BUNDLING.ACTIVE_BIDDER_ADAPTERS_N1QL;
+			const query = N1qlQuery.fromString(queryString);
+
+			return couchbase.connectToAppBucket().then(appBucket => {
+				return appBucket.queryAsync(query);
+			});
+		},
+		isS2SActiveOnAnySite: function() {
+			const queryString = commonConsts.PREBID_BUNDLING.ACTIVE_BIDDER_ADAPTERS_N1QL;
+			const query = N1qlQuery.fromString(queryString);
+
+			return couchbase
+				.connectToAppBucket()
+				.then(appBucket => {
+					return appBucket.queryAsync(query);
+				})
+				.then(sites => Array.isArray(sites) && !!sites.length);
 		}
 	};
 

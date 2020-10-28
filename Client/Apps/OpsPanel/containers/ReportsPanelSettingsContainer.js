@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import UniqueImpressionToggle from '../components/Settings/SiteBody/UniqueImpressionToggle';
+import ReportsPanelSettings from '../components/Settings/SiteBody/ReportsPanelSettings';
 import { showNotification } from '../../../actions/uiActions';
 import { updateUser } from '../../../actions/userActions';
 
@@ -17,7 +17,4 @@ const mapDispatchToProps = dispatch => ({
 	updateUser: data => dispatch(updateUser(data))
 });
 
-export default connect(
-	mapStateToProps,
-	mapDispatchToProps
-)(UniqueImpressionToggle);
+export default connect(mapStateToProps, mapDispatchToProps)(ReportsPanelSettings);

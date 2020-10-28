@@ -20,6 +20,7 @@ module.exports = {
 	IE_TESTING_ENDPOINT: 'http://apdc1n-central5.eastus2.cloudapp.azure.com:8081/api/health-report',
 	PROXY_ORIGIN: '//proxy.app.adpushup.com',
 	PRODUCT_LIST_API: `${reportingBaseURL}/common/activeProducts`,
+	SESSION_RPM_REPORTS_API: `${reportingBaseURL}/site/report?report_name=session_rpm_report`,
 	MAB_REPORTING_API: `${reportingBaseURL}/site/mab`,
 	GET_SITES_STATS_API: `${reportingBaseURL}/site/report`,
 	ALL_PRODUCTS_META_API: `${reportingBaseURL}/site/list?list_name=get_all_products`,
@@ -656,7 +657,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 												WHERE
 													meta(_hbdc).id LIKE 'hbdc::%'
 											)
-											WHEN
+										WHEN
 												_apNetworks.[bidderKey] IS VALUED
 												AND _apNetworks.[bidderKey].isHb = true
 												AND _apNetworks.[bidderKey].isActive = true
@@ -673,5 +674,11 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 								meta(_hbdc).id LIKE 'hbdc::%'
 								AND ANY bidder IN OBJECT_VALUES(_hbdc.hbcf) SATISFIES bidder.isS2SActive = true END
 							LIMIT 1;`
+	},
+	SESSION_RPM: {
+		SESSION_RPM_PROPS: ['session_rpm', 'user_sessions'],
+		IGNORE_PROPS: ['network_net_revenue'],
+		SUPPORTED_DIMENSIONS: ['country', 'siteid', 'device_type'],
+		SUPPORTED_FILTERS: ['country', 'siteid', 'device_type']
 	}
 };
