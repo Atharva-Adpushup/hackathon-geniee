@@ -131,8 +131,6 @@ const ADCODE = `<div id="__AD_ID__" class="_ap_apex_ad"__CUSTOM_ATTRIBS__>
 	</script>
 </div>`;
 
-
-
 /*************** 
       This function implements rejected logic of Rewarded Video Ads and displays ads after 1 week.
       function isResetRejectedFinal() {
@@ -261,10 +259,6 @@ const REWARDED_AD_CODE = `<script>
 			var rewardedData = JSON.parse(localStorage.getItem('aprewarded_key'));
 			function triggerRewardedAd() {
 				var urlParams = new URLSearchParams(window.location.search);
-				// show only to 20% users
-				if (Math.floor(Math.random() * 100) < 20||urlParams.has('apRewardedTesting')) 
-				{
-					// if (true) 
 					sendFeedback();
 					function addModalStyle(styles) {
 						/* Create style document */
@@ -500,7 +494,7 @@ const REWARDED_AD_CODE = `<script>
 							}
 						});
 					});
-				}
+				
 			}
 			__TRIGGER_REWARDED_AD__;
 		}

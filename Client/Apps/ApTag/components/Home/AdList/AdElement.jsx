@@ -7,6 +7,8 @@ import { Col, OverlayTrigger, Tooltip, Button } from '@/Client/helpers/react-boo
 import { makeFirstLetterCapitalize } from '../../../../../helpers/commonFunctions';
 import CopyButtonWrapperContainer from '../../../../../Containers/CopyButtonWrapperContainer';
 import { ADCODE, REWARDED_AD_CODE, TIGGER_AUTOMATICALLY_CODE } from '../../../configs/commonConsts';
+import { ADPUSHUP_NETWORK_ID } from '../../../../../../configs/commonConsts';
+
 import CustomButton from '../../../../../Components/CustomButton/index';
 import AdNetworkDetails from './AdNetworkDetails';
 import LazyLoadSettings from './LazyLoadSettings';
@@ -65,16 +67,7 @@ class AdElement extends Component {
 	);
 
 	renderAdDetails() {
-		const {
-			ad,
-			updateAd,
-			networkConfig,
-			user,
-			siteId,
-			networkCode,
-			dfpMessage,
-			siteDomain
-		} = this.props;
+		const { ad, updateAd, networkConfig, user, siteId, dfpMessage, siteDomain } = this.props;
 		const {
 			networkData: { dfpAdunitCode, dfpAdunit },
 			rewardTriggerFunction,
@@ -97,12 +90,13 @@ class AdElement extends Component {
 			automaticTrigger || !customScript ? TIGGER_AUTOMATICALLY_CODE : atob(customScript);
 
 		const customAttributes = ad.maxHeight ? ` max-height="${ad.maxHeight}"` : '';
+
 		code = code
 			? code
 					.replace(/__AD_ID__/g, ad.id)
 					.replace(/__CUSTOM_ATTRIBS__/, customAttributes)
 					.replace(/__AD_UNIT__/g, dfpAdunit)
-					.replace(/__NETWORK_CODE__/g, networkCode)
+					.replace(/__NETWORK_CODE__/g, ADPUSHUP_NETWORK_ID)
 					.replace(
 						/__POST_REWARDED_FUNCTION__/g,
 						rewardTriggerFunction && atob(rewardTriggerFunction)

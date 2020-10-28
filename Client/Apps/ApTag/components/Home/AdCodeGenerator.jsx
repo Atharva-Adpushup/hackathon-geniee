@@ -56,11 +56,12 @@ class AdCodeGenerator extends Component {
 	}
 
 	selectType(type) {
+		const isRewarded = type === 'rewardedAds';
 		this.setState({
 			type,
-			platform: '',
+			platform: isRewarded ? 'mobile' : '',
 			size: null,
-			progress: 50,
+			progress: isRewarded ? 75 : 50,
 			customFields: {}
 		});
 	}
@@ -320,7 +321,6 @@ class AdCodeGenerator extends Component {
 
 	renderSizes() {
 		const { size, platform, type } = this.state;
-
 		return (
 			<div>
 				<CustomList
@@ -478,7 +478,7 @@ class AdCodeGenerator extends Component {
 				<Col md={5}>
 					<CustomToggleSwitch
 						labelText="Trigger Automatically"
-						className="u-margin-b4 u-margin-t4 negative-toggle fluid-Toggle"
+						className="u-margin-b4 u-margin-t4 negative-toggle trigger-automatically-toggle"
 						checked={automaticTrigger}
 						onChange={this.handleToggle}
 						layout="horizontal"
@@ -488,7 +488,7 @@ class AdCodeGenerator extends Component {
 						defaultLayout
 						name={`automaticTrigger-${siteId}`}
 						id={`js-automaticTrigger-${siteId}`}
-						subText="If this option is enabled, the ad will be triggered whereever the AP Tag is placed.Otherwise one of the conditional triggeres would be used"
+						subText="If this option is enabled, the ad will be triggered whereever the AP Tag is placed."
 					/>
 				</Col>
 				<Col md={7} />
