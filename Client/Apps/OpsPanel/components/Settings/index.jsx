@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Tab, Nav, NavItem, Row, Col } from '@/Client/helpers/react-bootstrap-imports';
 import SitesContainer from '../../containers/SitesContainer';
 import AccountContainer from '../../containers/AccountContainer';
-import UniqueImpressionToggleContainer from '../../containers/UniqueImpressionToggleContainer';
+import ReportsPanelSettingsContainer from '../../containers/ReportsPanelSettingsContainer';
 
 class Settings extends Component {
 	state = {
@@ -36,7 +36,7 @@ class Settings extends Component {
 								{activeKey === 'account' ? (
 									<Tab.Pane eventKey="account">
 										<AccountContainer />
-										<UniqueImpressionToggleContainer />
+										<ReportsPanelSettingsContainer />
 									</Tab.Pane>
 								) : (
 									<Tab.Pane eventKey="sites">

@@ -3,7 +3,8 @@ import {
 	fetchAds,
 	updateAd,
 	modifyAdOnServer,
-	updateAllAds
+	updateAllAds,
+	replaceAds
 } from '../../../actions/apps/apTag/adActions';
 import { masterSave } from '../../../actions/apps/apTag/globalActions';
 import AdList from '../components/Home/AdList/index';
@@ -30,7 +31,8 @@ const mapDispatchToProps = dispatch => ({
 	updateAd: (adId, siteId, payload) => dispatch(updateAd(adId, siteId, payload)),
 	modifyAdOnServer: (siteId, adId, payload) => dispatch(modifyAdOnServer(siteId, adId, payload)),
 	masterSave: siteId => dispatch(masterSave(siteId)),
-	updateAllAds: (siteId, ads) => dispatch(updateAllAds(siteId, ads))
+	updateAllAds: (siteId, ads) => dispatch(updateAllAds(siteId, ads)),
+	replaceAds: (siteId, ads) => dispatch(replaceAds(siteId, ads))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AdList);
