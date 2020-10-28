@@ -6,15 +6,16 @@ import React, { Component } from 'react';
 import CustomToggleSwitch from '../../../../../Components/CustomToggleSwitch/index';
 import CustomButton from '../../../../../Components/CustomButton/index';
 
-class UniqueImpressionToggle extends Component {
+class ReportsPanelSettings extends Component {
 	constructor(props) {
 		super(props);
 		const { user } = this.props;
-		const { showUniqueImpressionsReporting = false } = user;
+		const { showUniqueImpressionsReporting = false, sessionRpmReports = false } = user;
 
 		this.state = {
 			showUniqueImpressionsReporting,
-			loading: false
+			loading: false,
+			sessionRpmReports
 		};
 	}
 
@@ -27,7 +28,7 @@ class UniqueImpressionToggle extends Component {
 	};
 
 	handleSave = () => {
-		const { showUniqueImpressionsReporting } = this.state;
+		const { showUniqueImpressionsReporting, sessionRpmReports } = this.state;
 		const { updateUser } = this.props;
 		this.setState({ loading: true });
 
@@ -35,6 +36,10 @@ class UniqueImpressionToggle extends Component {
 			{
 				key: 'showUniqueImpressionsReporting',
 				value: showUniqueImpressionsReporting
+			},
+			{
+				key: 'sessionRpmReports',
+				value: sessionRpmReports
 			}
 		]).then(() =>
 			this.setState({
@@ -44,7 +49,7 @@ class UniqueImpressionToggle extends Component {
 	};
 
 	render() {
-		const { loading, showUniqueImpressionsReporting } = this.state;
+		const { loading, showUniqueImpressionsReporting, sessionRpmReports } = this.state;
 
 		return (
 			<div className="showUniqueImpressionsReporting">
@@ -61,6 +66,19 @@ class UniqueImpressionToggle extends Component {
 					name="showUniqueImpressionsReporting"
 					id="js-showUniqueImpressionsReporting"
 				/>
+				<CustomToggleSwitch
+					labelText="Session RPM Reports"
+					className="u-margin-b4 negative-toggle u-cursor-pointer"
+					checked={sessionRpmReports}
+					onChange={this.handleToggle}
+					layout="horizontal"
+					size="m"
+					on="Yes"
+					off="No"
+					defaultLayout
+					name="sessionRpmReports"
+					id="js-sessionRpmReports"
+				/>
 				<CustomButton
 					variant="primary"
 					className="pull-right u-margin-r3"
@@ -74,4 +92,4 @@ class UniqueImpressionToggle extends Component {
 	}
 }
 
-export default UniqueImpressionToggle;
+export default ReportsPanelSettings;
