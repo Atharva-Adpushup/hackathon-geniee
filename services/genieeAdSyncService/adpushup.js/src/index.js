@@ -389,7 +389,7 @@ function main() {
 	utils.logPerformanceEvent(commonConsts.EVENT_LOGGER.EVENTS.MAIN_FN_CALL_DELAY);
 
 	// if traffic is from lighthouse and site has to be paused for lighthouse
-	if (utils.checkForLighthouse(adp.config.siteId)) return; 
+	if (!utils.getQueryParams().stopLightHouseHack && utils.checkForLighthouse(adp.config.siteId)) return; 
 
 	// Set user syncing cookies
 	syncUser();
