@@ -7,11 +7,11 @@ const HTTP_STATUSES = require('../configs/httpStatusConsts');
 const { sendSuccessResponse, sendErrorResponse } = require('../helpers/commonFunctions');
 const CC = require('../configs/commonConsts');
 const utils = require('../helpers/utils');
-
+const couchbase = require('couchbase');
 const config = require('../configs/config');
 
 const redisClient = require('../middlewares/redis');
-
+const { queryViewFromAppBucket } = require('../helpers/couchBaseService');
 const router = express.Router();
 const cache = require('../middlewares/cacheMiddleware');
 
@@ -111,12 +111,15 @@ router
 
 		if (!isValidParams) return res.send({});
 		let reportsData = {};
-
+		let queryParams = req.query;
 		try {
+			console.log(queryParams);
+			queryParams = await modifyQueryIfPnp(queryParams);
+			console.log(queryParams);
 			const reportsResponse = await request({
 				uri: `${CC.ANALYTICS_API_ROOT}${CC.REPORT_PATH}`,
 				json: true,
-				qs: req.query
+				qs: queryParams
 			});
 			if (!reportsResponse.code === 1 || !reportsResponse.data) return res.send({});
 
@@ -133,7 +136,7 @@ router
 				const sessionRpmReportsResponse = await request({
 					uri: `${CC.SESSION_RPM_REPORTS_API}`,
 					json: true,
-					qs: req.query
+					qs: queryParams
 				});
 
 				if (sessionRpmReportsResponse.code === 1 && sessionRpmReportsResponse.data) {
@@ -152,7 +155,7 @@ router
 		}
 
 		if (Object.keys(reportsData).length) {
-			redisClient.setex(JSON.stringify(req.query), 24 * 3600, JSON.stringify(reportsData));
+			redisClient.setex(JSON.stringify(queryParams), 24 * 3600, JSON.stringify(reportsData));
 		}
 
 		return res.send(reportsData);
@@ -377,5 +380,61 @@ router
 				);
 			});
 	});
+
+/**
+ *
+ * @param {array<String>} siteIds
+ * @description returns promise which resolves to get Data from Couchbase
+ */
+const queryDatabase = siteIds => {
+	const queryDbPromise = siteIds.map(siteid => {
+		const dbQuery = couchbase.N1qlQuery.fromString(
+			`select buc.apConfigs.mergeReport, buc.mappedNonPnpSiteId from AppBucket as buc where meta().id = "site::${siteid}" and buc.apConfigs.mergeReport = true`
+		);
+		return queryViewFromAppBucket(dbQuery);
+	});
+	return Promise.all(queryDbPromise);
+};
+
+/**
+ *
+ * @param {Object} query - req.query object, contains query params.
+ * @return {Object} modifiedQuery
+ * @description checks if the siteid is pnp, modify query by appending the mapped siteIds to
+ * 							query.siteid.
+ */
+const modifyQueryIfPnp = (query) => {
+	return new Promise((resolve, reject) => {
+		const regex = new RegExp('^[0-9]+(,[0-9]+)*$');
+		if (!regex.test(query.siteid)) {
+			reject(new Error('Invalid parameter in query.siteid'));
+			return;
+		}
+		const siteIds = query.siteid.split(',');
+		queryDatabase(siteIds)
+			.then((data) => {
+				
+				const filteredData = data.reduce( (accData, currArr )=> {
+					const siteData = currArr.shift();
+					return (siteData && siteData.mappedNonPnpSiteId) ? 
+						accData.concat([siteData]) : accData;
+				},[]);
+				
+				filteredData.forEach(siteData => {
+					query.siteid += `,${siteData.mappedNonPnpSiteId}`;
+				});
+
+				resolve(query);
+			})
+			.catch(err => {
+				console.error(err);
+				reject(new Error('Error while accessing data'));
+			});
+	});
+}	
+
+
+
+
 
 module.exports = router;
