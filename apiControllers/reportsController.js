@@ -113,9 +113,7 @@ router
 		let reportsData = {};
 		let queryParams = req.query;
 		try {
-			console.log(queryParams);
 			queryParams = await modifyQueryIfPnp(queryParams);
-			console.log(queryParams);
 			const reportsResponse = await request({
 				uri: `${CC.ANALYTICS_API_ROOT}${CC.REPORT_PATH}`,
 				json: true,
