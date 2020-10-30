@@ -313,10 +313,7 @@ router
 					res
 				);
 			})
-			.catch((err) => {
-				console.log(err);
-				errorHandler(err, res);
-			})
+			.catch(err => errorHandler(err, res))
 	)
 	.post('/switchUser', (req, res) => {
 		let { email } = req.body;
