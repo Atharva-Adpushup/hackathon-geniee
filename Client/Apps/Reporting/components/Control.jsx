@@ -276,10 +276,11 @@ class Control extends Component {
 			savedReports = [],
 			onReportSave,
 			onReportUpdate,
-			onReportDelete
+			onReportDelete,
+			selectedReportName,
+			updateReportName
 		} = this.props;
 
-		const selectedReportName = selectedReport ? selectedReport.name : '';
 		const { scheduleOptions: { startDate, endDate, interval } = {} } = selectedReport || {};
 		const selectedReportStartDate = startDate;
 		const selectedReportEndDate = endDate;
@@ -417,6 +418,7 @@ class Control extends Component {
 					onReportUpdate={onReportUpdate}
 					showNotification={showNotification}
 					onReportDelete={onReportDelete}
+					updateReportName={updateReportName}
 				/>
 			</Fragment>
 		);

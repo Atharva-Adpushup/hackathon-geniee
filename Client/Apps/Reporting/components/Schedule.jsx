@@ -14,7 +14,8 @@ const Schedule = ({
 	onReportSave,
 	onReportUpdate,
 	onReportDelete,
-	showNotification
+	showNotification,
+	updateReportName
 }) => {
 	const [reportName, setReportName] = useState(name || '');
 	const [interval, setReportInterval] = useState(reportInterval || null);
@@ -29,7 +30,10 @@ const Schedule = ({
 
 	const onReportScheduleSelect = value => setReportInterval(value);
 
-	const onReportNameChanged = e => setReportName(e.target.value);
+	const onReportNameChanged = e => {
+		const newReportName = e.target.value;
+		updateReportName(newReportName);
+	};
 
 	const saveReportHandler = () => {
 		const scheduleOptions = {};

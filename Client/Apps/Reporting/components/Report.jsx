@@ -84,7 +84,8 @@ class Report extends Component {
 			isReportingSite: true,
 			show: true,
 			savedReports: [],
-			selectedReport: null
+			selectedReport: null,
+			selectedReportName: ''
 		};
 	}
 
@@ -878,7 +879,8 @@ class Report extends Component {
 
 	setSelectedReport = selectedReport => {
 		this.setState({
-			selectedReport
+			selectedReport,
+			selectedReportName: selectedReport.name
 		});
 	};
 
@@ -1038,6 +1040,13 @@ class Report extends Component {
 			);
 	};
 
+	updateReportName = name => {
+		this.setState({
+			selectedReportName: name,
+			selectedReport: null
+		});
+	};
+
 	renderContent = () => {
 		const {
 			selectedDimension,
@@ -1058,7 +1067,8 @@ class Report extends Component {
 			filterList,
 			tableData,
 			savedReports,
-			selectedReport
+			selectedReport,
+			selectedReportName
 		} = this.state;
 		const {
 			reportsMeta,
@@ -1153,6 +1163,9 @@ class Report extends Component {
 						onReportSave={this.onReportSave}
 						onReportUpdate={this.onReportUpdate}
 						onReportDelete={this.onReportDelete}
+						resetSelectedReport={this.resetSelectedReport}
+						selectedReportName={selectedReportName}
+						updateReportName={this.updateReportName}
 					/>
 				</Col>
 				<Col sm={12}>
