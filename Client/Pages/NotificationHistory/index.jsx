@@ -1,19 +1,14 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import React from 'react';
+import moment from 'moment';
 import config from '../../config/config';
 import Empty from '../../Components/Empty/index';
 import '../../scss/pages/notificationhistory.scss';
 
 const NotificationHistory = ({ notifications = [] }) => {
-	const extractDate = timestamp => {
-		const date = new Date(timestamp);
-		return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
-	};
+	const extractDate = timestamp => moment(timestamp).format('YYYY-MM-DD');
 
-	const extractTime = timestamp => {
-		const date = new Date(timestamp);
-		return `${date.getHours()}:${date.getMinutes()}`;
-	};
+	const extractTime = timestamp => moment(timestamp).format('hh:mm a');
 
 	const onNotificationClick = id => {
 		const notification = notifications.filter(notif => notif.id === id)[0];
