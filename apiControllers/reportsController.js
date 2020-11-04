@@ -13,10 +13,11 @@ const reportsModel = require('../models/reportsModel');
 const FormValidator = require('../helpers/FormValidator');
 const schema = require('../helpers/schema');
 
+const couchbase = require('couchbase');
 const config = require('../configs/config');
 
 const redisClient = require('../middlewares/redis');
-
+const { queryViewFromAppBucket } = require('../helpers/couchBaseService');
 const router = express.Router();
 const cache = require('../middlewares/cacheMiddleware');
 
@@ -187,12 +188,14 @@ router
 
 		if (!isValidParams) return res.send({});
 		let reportsData = {};
-
+		let queryParams = JSON.parse(JSON.stringify(req.query));
 		try {
+			
+			queryParams = await modifyQueryIfPnp(queryParams);
 			const reportsResponse = await request({
 				uri: `${CC.ANALYTICS_API_ROOT}${CC.REPORT_PATH}`,
 				json: true,
-				qs: req.query
+				qs: queryParams
 			});
 			if (!reportsResponse.code === 1 || !reportsResponse.data) return res.send({});
 
@@ -209,7 +212,7 @@ router
 				const sessionRpmReportsResponse = await request({
 					uri: `${CC.SESSION_RPM_REPORTS_API}`,
 					json: true,
-					qs: req.query
+					qs: queryParams
 				});
 
 				if (sessionRpmReportsResponse.code === 1 && sessionRpmReportsResponse.data) {
@@ -226,9 +229,9 @@ router
 		} catch (err) {
 			console.log(err);
 		}
-
-		if (Object.keys(reportsData).length) {
-			redisClient.setex(JSON.stringify(req.query), 24 * 3600, JSON.stringify(reportsData));
+		
+		if (Object.keys(reportsData).length && JSON.stringify(queryParams) === JSON.stringify(req.query )) {
+			  redisClient.setex(JSON.stringify(queryParams), 24 * 3600, JSON.stringify(reportsData));
 		}
 
 		return res.send(reportsData);
