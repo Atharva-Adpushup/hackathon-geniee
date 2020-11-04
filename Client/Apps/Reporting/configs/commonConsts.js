@@ -1,11 +1,11 @@
 const REPORTS_NAV_ITEMS_INDEXES = {
 	REPORT: 'report',
-	URL_UTM_REPORTING: 'url-analytics'
+	URL_UTM_REPORTING: 'url-utm-analytics'
 };
 
 const REPORTS_NAV_ITEMS_VALUES = {
 	REPORT: 'Report',
-	URL_UTM_REPORTING: 'URL Analytics'
+	URL_UTM_REPORTING: 'URL/UTM Analytics'
 };
 
 const REPORTS_NAV_ITEMS = {

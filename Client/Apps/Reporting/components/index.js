@@ -36,7 +36,7 @@ class ReportsPanel extends Component {
 				break;
 
 			case 2:
-				redirectUrl = `${computedRedirectUrl}/url-analytics`;
+				redirectUrl = `${computedRedirectUrl}/url-utm-analytics`;
 				break;
 		}
 
@@ -74,7 +74,7 @@ class ReportsPanel extends Component {
 			return site;
 		});
 
-		if (match && match.url === '/reports/url-analytics' && match.path === '/reports/:siteId') {
+		if (match && match.url === '/reports/url-utm-analytics' && match.path === '/reports/:siteId') {
 			return '';
 		}
 

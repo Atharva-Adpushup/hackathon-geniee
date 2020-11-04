@@ -213,8 +213,8 @@ const ROUTES = {
 		{
 			exact: true,
 			customProps: { activeTab: REPORTS_NAV_ITEMS_INDEXES.URL_UTM_REPORTING },
-			name: 'URL Analytics',
-			path: '/reports/url-analytics',
+			name: 'URL/UTM Analytics',
+			path: '/reports/url-utm-analytics',
 			component: Reporting
 		},
 		{
