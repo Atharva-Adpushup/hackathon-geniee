@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { Glyphicon, Button } from '@/Client/helpers/react-bootstrap-imports';
+import { Glyphicon, Button, Modal } from '@/Client/helpers/react-bootstrap-imports';
 import 'react-dates/lib/css/_datepicker.css';
 import 'react-dates/initialize';
 import { CSVLink } from 'react-csv';
@@ -8,6 +8,7 @@ import moment from 'moment';
 import AsyncGroupSelect from '../../../Components/AsyncGroupSelect/index';
 import PresetDateRangePicker from '../../../Components/PresetDateRangePicker/index';
 import SelectBox from '../../../Components/SelectBox/index';
+import Schedule from './Schedule';
 import { getPresets } from '../helpers/utils';
 import reportService from '../../../services/reportService';
 import { accountFilter, accountDimension, opsDimension, opsFilter } from '../configs/commonConsts';
@@ -103,7 +104,6 @@ class Control extends Component {
 	onGenerateButtonClick = () => {
 		const resultObject = this.getStateParams();
 		const { generateButtonHandler } = this.props;
-
 		generateButtonHandler(resultObject);
 	};
 
@@ -241,12 +241,71 @@ class Control extends Component {
 		return { updatedFilterList, updatedDimensionList };
 	};
 
+	handleInputChange = e => {
+		this.setState({
+			[e.target.name]: e.target.value
+		});
+	};
+
+	onSavedReportSelect = reportId => {
+		const { reportType, setSelectedReport, savedReports } = this.props;
+		const selectedReport = savedReports.filter(report => report.id === reportId)[0];
+		if (selectedReport) {
+			this.setState(
+				{
+					startDate: selectedReport.startDate,
+					endDate: selectedReport.endDate,
+					selectedInterval: selectedReport.selectedInterval,
+					selectedDimension: selectedReport.selectedDimension,
+					selectedFilters: selectedReport.selectedFilters
+				},
+				() => {
+					setSelectedReport(selectedReport);
+					this.onControlChange(reportType);
+				}
+			);
+		}
+	};
+
 	render() {
 		const { state } = this;
-		const { reportType, showNotification } = this.props;
+		const {
+			reportType,
+			showNotification,
+			selectedReport,
+			savedReports = [],
+			onReportSave,
+			onReportUpdate,
+			onReportDelete,
+			selectedReportName,
+			updateReportName
+		} = this.props;
 
+		const { scheduleOptions: { startDate, endDate, interval } = {} } = selectedReport || {};
+		const selectedReportStartDate = startDate;
+		const selectedReportEndDate = endDate;
+		const isUpdating = selectedReport !== null;
+		const isSavedReportsEmpty = savedReports.length === 0;
+		// const { selectedReport } = state;
 		return (
 			<Fragment>
+				{!isSavedReportsEmpty && (
+					<div className="aligner aligner--wrap aligner--hSpaceBetween u-margin-t4">
+						<label className="u-text-normal">Saved Reports</label>
+						<SelectBox
+							id="saved-reports"
+							key="saved-reports"
+							isClearable={false}
+							isSearchable={false}
+							wrapperClassName="custom-select-box-wrapper"
+							reset={false}
+							selected={selectedReport ? selectedReport.value : null}
+							options={savedReports}
+							onSelect={this.onSavedReportSelect}
+							title="Select Report"
+						/>
+					</div>
+				)}
 				<div className="aligner aligner--wrap aligner--hSpaceBetween u-margin-t4">
 					<div className="aligner-item u-margin-r4">
 						{/* eslint-disable */}
@@ -349,6 +408,18 @@ class Control extends Component {
 						</CSVLink>
 					</div>
 				</div>
+				<Schedule
+					name={selectedReportName}
+					startDate={selectedReportStartDate}
+					endDate={selectedReportEndDate}
+					reportInterval={interval}
+					isUpdating={isUpdating}
+					onReportSave={onReportSave}
+					onReportUpdate={onReportUpdate}
+					showNotification={showNotification}
+					onReportDelete={onReportDelete}
+					updateReportName={updateReportName}
+				/>
 			</Fragment>
 		);
 	}

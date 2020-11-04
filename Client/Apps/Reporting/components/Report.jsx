@@ -3,7 +3,16 @@ import React, { Component } from 'react';
 import mapValues from 'lodash/mapValues';
 import omit from 'lodash/omit';
 import groupBy from 'lodash/groupBy';
-import { Row, Col, Alert } from '@/Client/helpers/react-bootstrap-imports';
+import {
+	Row,
+	Col,
+	Alert,
+	Modal,
+	Form,
+	FormControl,
+	ControlLabel,
+	Button
+} from '@/Client/helpers/react-bootstrap-imports';
 import moment from 'moment';
 import qs from 'querystringify';
 import isEmpty from 'lodash/isEmpty';
@@ -22,7 +31,8 @@ import { convertObjToArr, roundOffTwoDecimal } from '../helpers/utils';
 import {
 	getReportingDemoUserValidation,
 	getReportingDemoUserSiteIds,
-	getDemoUserSites
+	getDemoUserSites,
+	isSameScheduleOptions
 } from '../../../helpers/commonFunctions';
 import {
 	displayMetrics,
@@ -72,7 +82,10 @@ class Report extends Component {
 			isLoading: true,
 			isValidSite: true,
 			isReportingSite: true,
-			show: true
+			show: true,
+			savedReports: [],
+			selectedReport: null,
+			selectedReportName: ''
 		};
 	}
 
@@ -97,6 +110,7 @@ class Report extends Component {
 		// eslint-disable-next-line no-unused-expressions
 		isSuperUser ? (params.isSuperUser = isSuperUser) : null;
 
+		this.getSavedReports();
 		if (!reportsMeta.fetched) {
 			return reportService.getMetaData(params).then(response => {
 				let { data: computedData } = response;
@@ -106,7 +120,6 @@ class Report extends Component {
 				return this.getContentInfo(computedData);
 			});
 		}
-
 		return this.getContentInfo(reportsMeta.data);
 	}
 
@@ -825,6 +838,215 @@ class Report extends Component {
 		return groupedData;
 	}
 
+	handleInputChange = e => {
+		this.setState({
+			[e.target.name]: e.target.value
+		});
+	};
+
+	getSavedReports = () => {
+		const { showNotification } = this.props;
+		return reportService
+			.getSavedReports()
+			.then(res => {
+				const { savedReports } = res.data.data || [];
+				this.processAndSaveReports(savedReports);
+			})
+			.catch(err => {
+				showNotification({
+					mode: 'error',
+					title: 'Operation Failed',
+					message: err.message || 'Something went wrong !',
+					autoDismiss: 5
+				});
+			});
+	};
+
+	processAndSaveReports = (savedReports = [], callback = () => {}) => {
+		const savedReportsWithValue = savedReports.map(report => ({
+			...report,
+			name: report.name,
+			value: report.id
+		}));
+
+		this.setState(
+			{
+				savedReports: savedReportsWithValue
+			},
+			callback
+		);
+	};
+
+	setSelectedReport = selectedReport => {
+		this.setState({
+			selectedReport,
+			selectedReportName: selectedReport.name
+		});
+	};
+
+	onReportSave = (scheduleOptions, reportName) => {
+		const {
+			startDate,
+			endDate,
+			selectedDimension,
+			selectedFilters,
+			selectedInterval,
+			savedReports = []
+		} = this.state;
+		const { showNotification } = this.props;
+
+		const existingReportWithName = savedReports.find(report => report.name === reportName);
+		if (existingReportWithName) {
+			showNotification({
+				mode: 'error',
+				title: 'Operation Failed',
+				message: `Report with name ${reportName} already exists..`,
+				autoDismiss: 5
+			});
+			return;
+		}
+
+		if (scheduleOptions && scheduleOptions.interval) {
+			if (!scheduleOptions.startDate) {
+				showNotification({
+					mode: 'error',
+					title: 'Operation Failed',
+					message: `Start Date mandatory to schedule report`,
+					autoDismiss: 5
+				});
+				return;
+			}
+		}
+
+		const reportConfig = {
+			name: reportName,
+			startDate,
+			endDate,
+			selectedDimension,
+			selectedFilters,
+			selectedInterval,
+			scheduleOptions
+		};
+
+		reportService
+			.saveReportConfig(reportConfig)
+			.then(res => {
+				const response = res.data.data;
+				const { savedReports: newSavedReports } = response;
+				this.processAndSaveReports(newSavedReports, () => {
+					showNotification({
+						mode: 'success',
+						title: 'Success',
+						message: 'Report Saved',
+						autoDismiss: 5
+					});
+				});
+			})
+			.catch(err => {
+				showNotification({
+					mode: 'error',
+					title: 'Operation Failed',
+					message: err.message || 'Something went wrong !',
+					autoDismiss: 5
+				});
+			});
+	};
+
+	onReportUpdate = (scheduleOptions, reportName) => {
+		const { selectedReport, savedReports = [] } = this.state;
+		const { showNotification } = this.props;
+		const updateReportConfig = {
+			name: reportName,
+			id: selectedReport.id
+		};
+
+		const existingReportWithName = savedReports.find(
+			report => report.name === reportName && selectedReport.id !== report.id
+		);
+		if (existingReportWithName) {
+			showNotification({
+				mode: 'error',
+				title: 'Operation Failed',
+				message: `Report with name ${reportName} already exists..`,
+				autoDismiss: 5
+			});
+			return;
+		}
+
+		if (scheduleOptions && scheduleOptions.interval) {
+			if (!scheduleOptions.startDate) {
+				showNotification({
+					mode: 'error',
+					title: 'Operation Failed',
+					message: `Start Date mandatory to schedule report`,
+					autoDismiss: 5
+				});
+				return;
+			}
+		}
+
+		// only send schedule options if it differs
+		if (!isSameScheduleOptions(selectedReport.scheduleOptions, scheduleOptions)) {
+			updateReportConfig.scheduleOptions = scheduleOptions;
+		}
+		reportService
+			.updateSavedReport(updateReportConfig)
+			.then(res => {
+				const response = res.data.data;
+				const { savedReports } = response;
+				this.processAndSaveReports(savedReports, () => {
+					showNotification({
+						mode: 'success',
+						title: 'Success',
+						message: 'Report Updated',
+						autoDismiss: 5
+					});
+				});
+			})
+			.catch(err =>
+				showNotification({
+					mode: 'error',
+					title: 'Operation Failed',
+					message: err.message || 'Something went wrong !',
+					autoDismiss: 5
+				})
+			);
+	};
+
+	onReportDelete = () => {
+		const { selectedReport } = this.state;
+		const { showNotification } = this.props;
+		reportService
+			.deleteSavedReport(selectedReport.id)
+			.then(res => {
+				const response = res.data.data;
+				const { savedReports } = response;
+				this.processAndSaveReports(savedReports, () => {
+					showNotification({
+						mode: 'success',
+						title: 'Success',
+						message: 'Report Deleted',
+						autoDismiss: 5
+					});
+				});
+			})
+			.catch(err =>
+				showNotification({
+					mode: 'error',
+					title: 'Operation Failed',
+					message: err.message || 'Something went wrong !',
+					autoDismiss: 5
+				})
+			);
+	};
+
+	updateReportName = name => {
+		this.setState({
+			selectedReportName: name,
+			selectedReport: null
+		});
+	};
+
 	renderContent = () => {
 		const {
 			selectedDimension,
@@ -843,7 +1065,10 @@ class Report extends Component {
 			intervalList,
 			metricsList,
 			filterList,
-			tableData
+			tableData,
+			savedReports,
+			selectedReport,
+			selectedReportName
 		} = this.state;
 		const {
 			reportsMeta,
@@ -932,6 +1157,15 @@ class Report extends Component {
 						userSites={userSites}
 						user={user}
 						showNotification={showNotification}
+						savedReports={savedReports}
+						selectedReport={selectedReport}
+						setSelectedReport={this.setSelectedReport}
+						onReportSave={this.onReportSave}
+						onReportUpdate={this.onReportUpdate}
+						onReportDelete={this.onReportDelete}
+						resetSelectedReport={this.resetSelectedReport}
+						selectedReportName={selectedReportName}
+						updateReportName={this.updateReportName}
 					/>
 				</Col>
 				<Col sm={12}>
@@ -972,7 +1206,7 @@ class Report extends Component {
 	};
 
 	render() {
-		const { isLoading, show } = this.state;
+		const { isLoading, show, showSaveReportModal, reportName } = this.state;
 		const { reportsMeta } = this.props;
 
 		if (!reportsMeta.fetched || isLoading) {
@@ -986,7 +1220,6 @@ class Report extends Component {
 					<Alert bsStyle="info" onDismiss={this.handleDismiss} className="u-margin-t4">
 						For old reporting data <strong>(before 1st August, 2019)</strong> go to old console by{' '}
 						<a
-							target="_blank"
 							onClick={oldConsoleRedirection}
 							className="u-link-reset"
 							style={{ cursor: 'pointer' }}

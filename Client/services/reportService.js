@@ -15,5 +15,10 @@ export default {
 		const url = config.ANALYTICS_API_UPDATE_STATUS;
 		return axiosInstance.get(url, { params });
 	},
-	getMetaData: params => axiosInstance.get('/reports/getMetaData', { params })
+	getMetaData: params => axiosInstance.get('/reports/getMetaData', { params }),
+	getSavedReports: () => axiosInstance.get('/reports'),
+	saveReportConfig: reportConfig => axiosInstance.post('/reports', reportConfig),
+	deleteSavedReport: reportId => axiosInstance.delete(`reports/${reportId}`),
+	updateSavedReport: reportConfig =>
+		axiosInstance.patch(`/reports/${reportConfig.id}`, reportConfig)
 };
