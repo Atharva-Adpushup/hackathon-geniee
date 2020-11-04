@@ -591,6 +591,10 @@ function storedRequestWrapper(doc) {
 	);
 }
 
+function publishAdPushupBuild(siteId) {
+	adpushup.emit('siteSaved', siteId);
+}
+
 module.exports = {
 	verifyOwner,
 	errorHandler,
@@ -608,5 +612,6 @@ module.exports = {
 	fetchCustomStatuses,
 	checkParams,
 	queuePublishingWrapper,
-	storedRequestWrapper
+	storedRequestWrapper,
+	publishAdPushupBuild
 };
