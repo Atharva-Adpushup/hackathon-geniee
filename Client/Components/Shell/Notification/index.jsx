@@ -71,13 +71,18 @@ const Notification = props => {
 						</>
 					))}
 				{isNotificationsEmpty && (
-					<div className="notification-empty">No unread notifications pending</div>
+					<>
+						<div className="notification-empty u-margin-v3">No unread notifications pending</div>
+					</>
 				)}
-				<NavLink to="/notifications">
-					<CustomButton variant="secondary" className="all-notifications u-margin-t2">
-						See all notifications
-					</CustomButton>
-				</NavLink>
+				<div className="notification-action u-margin-t2">
+					<div className="divider" />
+					<NavLink to="/notifications">
+						<CustomButton variant="secondary" className="all-notifications">
+							See all notifications
+						</CustomButton>
+					</NavLink>
+				</div>
 			</Dropdown.Menu>
 		</Dropdown>
 	);
