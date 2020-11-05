@@ -47,7 +47,7 @@ router
 
 		if (isValidParams) {
 			return request({
-				uri: `https://staging.adpushup.com/CentralReportingWebService${reportPath}${utmPrams}`,
+				uri: `${CC.ANALYTICS_API_ROOT}${reportPath}${utmPrams}`,
 				json: true,
 				qs: req.query
 			})
@@ -72,7 +72,7 @@ router
 			const params = { siteid: sites, isSuperUser, product };
 
 			return request({
-				uri: `https://staging.adpushup.com/CentralReportingWebService${CC.ANALYTICS_METAINFO_URL}`,
+				uri: `${CC.ANALYTICS_API_ROOT}${CC.ANALYTICS_METAINFO_URL}`,
 				json: true,
 				qs: params
 			})
