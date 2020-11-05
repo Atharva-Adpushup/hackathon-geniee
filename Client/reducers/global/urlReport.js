@@ -1,9 +1,9 @@
 import { URL_REPORTS_ACTIONS } from '../../constants/global';
 
-const DEFAULT_HB_ANALYTICS_STATE = { fetched: false, data: {} };
+const DEFAULT_URL_UTM_REPORT_STATE = { fetched: false, data: {} };
 const DEFAULT_STATE = {
-	global: { ...DEFAULT_HB_ANALYTICS_STATE },
-	account: { ...DEFAULT_HB_ANALYTICS_STATE }
+	global: { ...DEFAULT_URL_UTM_REPORT_STATE },
+	account: { ...DEFAULT_URL_UTM_REPORT_STATE }
 };
 
 const urlreports = (state = DEFAULT_STATE, action) => {

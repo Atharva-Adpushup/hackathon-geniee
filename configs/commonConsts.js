@@ -29,6 +29,7 @@ module.exports = {
 	ANALYTICS_METAINFO_URL: '/common/metaInfo',
 	REPORT_PATH: '/site/report?report_name=get_stats_by_custom',
 	URL_REPORT_PATH: '/url/report?report_name=url_report',
+	UTM_REPORT_PATH: '/url/report?report_name=utm_report&',
 	DFP_LINE_ITEM_AUTOMATION_API: 'https://api.adpushup.com/DfpInventoryWebService/job',
 	PAGEGROUP_LIST_API: `${reportingBaseURL}/site/list`,
 	DEMO_ACCOUNT_EMAIL: 'demo@adpushup.com',

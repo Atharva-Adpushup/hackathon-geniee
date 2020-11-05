@@ -1,11 +1,11 @@
 const REPORTS_NAV_ITEMS_INDEXES = {
 	REPORT: 'report',
-	URL_UTM_REPORTING: 'url-analytics'
+	URL_UTM_REPORTING: 'url-utm-analytics'
 };
 
 const REPORTS_NAV_ITEMS_VALUES = {
 	REPORT: 'Report',
-	URL_UTM_REPORTING: 'URL Analytics'
+	URL_UTM_REPORTING: 'URL/UTM Analytics'
 };
 
 const REPORTS_NAV_ITEMS = {
@@ -44,8 +44,8 @@ const ORDER_BY_URL_UTM = {
 };
 
 const optionListForOrderByURLAndUTM = [
-	// ORDER_BY_URL_UTM.NET_REVENUE,
-	ORDER_BY_URL_UTM.IMPRESSIONS
+	ORDER_BY_URL_UTM.IMPRESSIONS,
+	ORDER_BY_URL_UTM.NET_REVENUE
 	// ORDER_BY_URL_UTM.GROSS_REVENUE
 ];
 
@@ -183,14 +183,58 @@ const UNIQUE_IMPRESSION_METRICS = {
 
 const URL_UTM_METRICS = {
 	URL: { value: 'url', name: 'URL', valueType: 'url' },
-	UTM_PARAM: { value: 'utm_param', name: 'Parameter', valueType: 'string' },
+	UTM_PARAM: { value: 'utm_key', name: 'Parameter', valueType: 'url' },
 	UTM_VALUE: { value: 'utm_value', name: 'Value', valueType: 'string' },
-	UTM_IMPRESSIONS: { value: 'utm_impression', name: 'Impressions', valueType: 'number' },
-	UTM_AD_ECPM: { value: 'utm_ad_ecpm', name: 'Ad eCPM', valueType: 'money' },
-	UTM_NET_REVENUE: { value: 'utm_net_revenue', name: 'Revenue', valueType: 'money' },
+	UTM_IMPRESSIONS: { value: 'network_impressions', name: 'Impressions', valueType: 'number' },
+	UTM_AD_ECPM: { value: 'network_ad_ecpm', name: 'Ad eCPM', valueType: 'money' },
+	UTM_NET_REVENUE: { value: 'network_net_revenue', name: 'Revenue', valueType: 'money' },
 	URL_IMPRESSIONS: { value: 'network_impressions', name: 'Impressions', valueType: 'number' },
 	URL_AD_ECPM: { value: 'network_ad_ecpm', name: 'Ad eCPM', valueType: 'money' },
 	URL_NET_REVENUE: { value: 'network_net_revenue', name: 'Net Revenue', valueType: 'money' }
+};
+
+const URL_UTM_DIMENSIONS = {
+	url: { display_name: 'URL', default_enabled: true, position: 1 },
+	utm: { display_name: 'All UTM Parameters', default_enabled: true, position: 2 },
+	utm_campaign: { display_name: 'UTM CAMPAIGN', default_enabled: true, position: 3 },
+	utm_source: { display_name: 'UTM SOURCE', default_enabled: true, position: 4 },
+	utm_medium: { display_name: 'UTM MEDIUM', default_enabled: true, position: 5 },
+	utm_term: { display_name: 'UTM TERM', default_enabled: true, position: 6 },
+	utm_content: { display_name: 'UTM Content', default_enabled: true, position: 7 },
+	utm_camp_src_med: {
+		display_name: 'UTM CAMPAIGN+SOURCE+MEDIUM',
+		default_enabled: true,
+		position: 8
+	},
+	utm_camp_src: { display_name: 'UTM CAMPAIGN+SOURCE', default_enabled: true, position: 9 }
+};
+
+const UTM_METRICS = {
+	utm_key: {
+		display_name: 'UTM Parameter',
+		value: 'utm_key',
+		name: 'Parameter',
+		valueType: 'url'
+	},
+	utm_value: { display_name: 'Value', value: 'utm_value', name: 'Value', valueType: 'string' },
+	network_impressions: {
+		display_name: 'Impressions',
+		value: 'network_impressions',
+		name: 'Impressions',
+		valueType: 'number'
+	},
+	network_ad_ecpm: {
+		display_name: 'Ad ECPM',
+		value: 'network_ad_ecpm',
+		name: 'Ad eCPM',
+		valueType: 'money'
+	},
+	network_net_revenue: {
+		display_name: 'Net Revenue',
+		value: 'network_net_revenue',
+		name: 'Revenue',
+		valueType: 'money'
+	}
 };
 
 const displayURLMetrics = [
@@ -273,6 +317,8 @@ export {
 	optionListForTotalRecordForURLAndUTM,
 	displayURLMetrics,
 	displayUTMMetrics,
+	UTM_METRICS,
+	URL_UTM_DIMENSIONS,
 	activeLegendItem,
 	activeLegendItemArray,
 	accountFilter,

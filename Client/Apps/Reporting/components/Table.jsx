@@ -55,7 +55,7 @@ class Table extends React.Component {
 
 		const { metrics, dimension, aggregatedData, isURLReport } = this.props;
 
-		const { isDaily } = this.getDateIntervalValidators();
+		const { isDaily, isMonthly } = this.getDateIntervalValidators();
 		const computedDate = {
 			Header: 'Date',
 			accessor: 'date',
@@ -68,7 +68,9 @@ class Table extends React.Component {
 
 		// we don't need date col for URL Reporting
 		// eslint-disable-next-line no-unused-expressions
-		!isURLReport && tableColumns.push(computedDate);
+		!isURLReport
+			? tableColumns.push(computedDate)
+			: isURLReport && (isDaily || isMonthly) && tableColumns.push(computedDate);
 
 		columns.forEach(column => {
 			if (dimension[column]) {
@@ -122,6 +124,8 @@ class Table extends React.Component {
 							<span>${numberWithCommas(props.value)}</span>
 						) : metrics[column].valueType === 'percent' ? (
 							<span>{numberWithCommas(props.value)}%</span>
+						) : metrics[column].valueType === 'url' ? (
+							<a rel="noopener noreferrer">{props.value}</a>
 						) : (
 							<span>{numberWithCommas(props.value)}</span>
 						),
@@ -265,10 +269,8 @@ class Table extends React.Component {
 					</a>
 				);
 			}
-
-			if (tableRow.utm_param) {
-				const { utmParam } = tableRow;
-				tableRow.utm_param = React.cloneElement(<a href={utmParam}>{utmParam}</a>);
+			if (tableRow.utm_key) {
+				tableRow.utm_key = tableRow.display_name;
 			}
 
 			displayTableData.push(tableRow);
