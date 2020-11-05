@@ -333,7 +333,8 @@ router
 			.then(user => {
 				const token = authToken.getAuthToken({
 					email: user.get('email'),
-					isSuperUser: true
+					isSuperUser: true,
+					originalEmail: req.user.originalEmail || req.user.email
 				});
 
 				return res

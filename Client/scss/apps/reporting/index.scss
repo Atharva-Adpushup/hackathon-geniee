@@ -592,3 +592,14 @@ body {
 .filter-list-title {
 	margin-left: 10px;
 }
+.reports-schedule {
+	border: none;
+	border-bottom: 1px solid lightgrey;
+	border-spacing: 0.5em;
+	border-radius: 0;
+}
+
+.schedule-buttons {
+	display: inherit;
+	align-items: flex-end;
+}

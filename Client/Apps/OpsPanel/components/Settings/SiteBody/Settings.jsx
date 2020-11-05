@@ -1,12 +1,13 @@
 /* eslint-disable no-restricted-globals */
 import React, { Component } from 'react';
-import { Col } from '@/Client/helpers/react-bootstrap-imports';
+import { Row, Col } from '@/Client/helpers/react-bootstrap-imports';
 import CustomToggleSwitch from '../../../../../Components/CustomToggleSwitch/index';
 import FieldGroup from '../../../../../Components/Layout/FieldGroup';
 import InputBox from '../../../../../Components/InputBox/index';
 import CustomButton from '../../../../../Components/CustomButton/index';
 // import { formatDate } from '../../../../../helpers/commonFunctions';
 import { ADPUSHUP_NETWORK_ID } from '../../../../../../configs/commonConsts';
+import siteService from '../../../../../services/siteService';
 
 class Settings extends Component {
 	constructor(props) {
@@ -98,6 +99,30 @@ class Settings extends Component {
 		this.setState({
 			[e.target.name]: e.target.value
 		});
+	};
+
+	handleForceBuild = () => {
+		const { site, showNotification } = this.props;
+		siteService
+			.forceApBuild(site.siteId)
+			.then(res => {
+				const data = {
+					mode: 'success',
+					title: 'Success',
+					autoDismiss: 5,
+					message: (res.data && res.data.message) || 'AdPushup build in progress'
+				};
+				showNotification(data);
+			})
+			.catch(() => {
+				const data = {
+					mode: 'error',
+					title: 'Error',
+					autoDismiss: 5,
+					message: 'Error pushing adpushup build'
+				};
+				showNotification(data);
+			});
 	};
 
 	handleSave = () => {
@@ -324,9 +349,14 @@ class Settings extends Component {
 					placeholder={`Revenue Share - Any changes will be effective from ${effectRevenueShareDate}`}
 					className="u-padding-v4 u-padding-h4"
 				/> */}
-				<CustomButton variant="primary" className="pull-right" onClick={this.handleSave}>
-					Save
-				</CustomButton>
+				<Row>
+					<CustomButton variant="primary" className="pull-left" onClick={this.handleForceBuild}>
+						Force adpushup.js Build
+					</CustomButton>
+					<CustomButton variant="primary" className="pull-right" onClick={this.handleSave}>
+						Save
+					</CustomButton>
+				</Row>
 			</Col>
 		);
 	}

@@ -2,11 +2,16 @@ const express = require('express');
 const request = require('request-promise');
 const csv = require('express-csv');
 const _ = require('lodash');
+const { v1: uuid } = require('uuid');
+const axios = require('axios').default;
 
 const HTTP_STATUSES = require('../configs/httpStatusConsts');
 const { sendSuccessResponse, sendErrorResponse } = require('../helpers/commonFunctions');
 const CC = require('../configs/commonConsts');
 const utils = require('../helpers/utils');
+const reportsModel = require('../models/reportsModel');
+const FormValidator = require('../helpers/FormValidator');
+const schema = require('../helpers/schema');
 
 const config = require('../configs/config');
 
@@ -98,6 +103,77 @@ const mergeReportsWithSessionRpmData = (reportsData, sessionRpmData, isSuperUser
 	if (!isSuperUser) mergedData.total = mergedTotal;
 
 	return mergedData;
+}
+const Utils = {
+	generateCronExpression: (interval, startDate) => {
+		if (!interval || !startDate) throw new Error('Invalid parameters to generate schedule cron');
+		let cron = '';
+		const start = new Date(startDate);
+		switch (interval) {
+			case 'daily':
+				cron = '0 20 * * *'; // everyday at 8PM
+				break;
+			case 'weekly':
+				cron = `0 20 * * ${start.getDay()}`; // same day every week at 8PM
+				break;
+			case 'monthly':
+				cron = `* 20 ${start.getDate()} * *`; // same date every month at 8PM
+				break;
+			default:
+				throw new Error('Invalid schedule interval');
+		}
+		return cron;
+	},
+	scheduleReportJob: async (configuration, email) => {
+		const { scheduleOptions, ...reportConfig } = configuration;
+		const jobConfiguration = {
+			type: 'RABBITMQ',
+			config: {
+				queue: 'REPORTS_SCHEDULER',
+				data: {
+					sendTo: email,
+					endDate: reportConfig.endDate,
+					startDate: reportConfig.startDate,
+					name: reportConfig.name,
+					dimension: reportConfig.selectedDimension,
+					filters: reportConfig.selectedFilters,
+					interval: reportConfig.selectedInterval,
+					id: reportConfig.id
+				}
+			},
+			retryOptions: {
+				attempts: 3
+			},
+			executionOptions: {
+				type: 'repeat',
+				value: scheduleOptions.cron,
+				startDate: scheduleOptions.startDate,
+				endDate: scheduleOptions.endDate
+			}
+		};
+		return axios
+			.post(`${config.SCHEDULER_API_ROOT}/schedule`, jobConfiguration)
+			.then(response => response.data);
+	},
+	cancelScheduledJob: async jobId => {
+		if (jobId) {
+			return axios.delete(`${config.SCHEDULER_API_ROOT}/cancel/${jobId}`);
+		}
+		return Promise.resolve();
+	},
+	initiateReportsSchedule: async (reportConfig, email) => {
+		const { interval, startDate } = reportConfig.scheduleOptions;
+		const cronExpression = Utils.generateCronExpression(interval, startDate);
+
+		const scheduleConfig = Object.assign({}, reportConfig);
+
+		scheduleConfig.scheduleOptions.cron = cronExpression;
+
+		const scheduledJobData = await Utils.scheduleReportJob(reportConfig, email);
+		scheduleConfig.scheduleOptions.jobId = scheduledJobData.job.id;
+
+		return scheduleConfig;
+	}
 };
 
 router
@@ -176,7 +252,7 @@ router
 					return res.send({});
 				})
 				.then(data =>
-					//set data to redis
+					// set data to redis
 					redisClient.setex(JSON.stringify(req.query), 24 * 3600, JSON.stringify(data))
 				)
 				.catch(err => {
@@ -241,11 +317,11 @@ router
 					return response.code == 1 && data ? res.send(data) && data : res.send({});
 				})
 				.then(data =>
-					//set data to redis
+					// set data to redis
 					redisClient.setex(JSON.stringify(req.query), 24 * 3600, JSON.stringify(data))
 				)
 				.catch(err => {
-					let { message: errorMessage } = err;
+					const { message: errorMessage } = err;
 
 					const {
 						message = 'Something went wrong',
@@ -362,6 +438,35 @@ router
 				try {
 					errorMessage = JSON.parse(errorMessage);
 				} catch (e) {
+					errorMessage = {
+						message: 'Something went wrong',
+						code: HTTP_STATUSES.INTERNAL_SERVER_ERROR
+					};
+				}
+				const {
+					message = 'Something went wrong',
+					code = HTTP_STATUSES.INTERNAL_SERVER_ERROR
+				} = errorMessage;
+				return sendErrorResponse(
+					{
+						message
+					},
+					res,
+					code
+				);
+			});
+	})
+	.get('/', (req, res) => {
+		const { user } = req;
+		const email = user.originalEmail || user.email;
+		return reportsModel
+			.getSavedReportConfig(email)
+			.then(reportConfig => sendSuccessResponse(reportConfig, res, HTTP_STATUSES.OK))
+			.catch(err => {
+				let { message: errorMessage } = err;
+				try {
+					errorMessage = JSON.parse(errorMessage);
+				} catch (e) {
 					errorMessage = 'Something went wrong';
 				}
 				const {
@@ -376,6 +481,175 @@ router
 					code
 				);
 			});
-	});
+	})
+	.post('/', async (req, res) => {
+		const { user, body: reportBody } = req;
+		let reportConfig = {
+			...reportBody,
+			createdAt: Date.now(),
+			id: uuid()
+		};
+		const email = user.originalEmail || user.email;
+		try {
+			const errors = await FormValidator.validate(reportConfig, schema.saveReportApi.validations);
+			if (errors && errors.length) {
+				return sendErrorResponse({
+					message: 'Invalid report parameters',
+					errors
+				});
+			}
 
+			if (reportConfig.scheduleOptions && Object.keys(reportConfig.scheduleOptions).length) {
+				reportConfig = await Utils.initiateReportsSchedule(reportConfig, email);
+			}
+
+			const reportsConfig = await reportsModel.getSavedReportConfig(email);
+			const updatedReportsConfig = {
+				...reportsConfig,
+				savedReports: [...reportsConfig.savedReports, reportConfig]
+			};
+
+			const response = await reportsModel.updateSavedReportConfig(updatedReportsConfig, email);
+
+			return sendSuccessResponse(response, res, HTTP_STATUSES.OK);
+		} catch (err) {
+			console.log(err);
+			let { message: errorMessage } = err;
+			try {
+				errorMessage = JSON.parse(errorMessage);
+			} catch (e) {
+				errorMessage = {
+					message: 'Something went wrong',
+					code: HTTP_STATUSES.INTERNAL_SERVER_ERROR
+				};
+			}
+			const {
+				message = 'Something went wrong',
+				code = HTTP_STATUSES.INTERNAL_SERVER_ERROR
+			} = errorMessage;
+			return sendErrorResponse(
+				{
+					message
+				},
+				res,
+				code
+			);
+		}
+	})
+	.patch('/:id', async (req, res) => {
+		try {
+			const { user, body: updateConfiguration } = req;
+			const email = user.originalEmail || user.email;
+			const savedConfigId = req.params.id;
+
+			if (!savedConfigId) throw new Error('Id required to update saved report');
+			const reportsConfig = await reportsModel.getSavedReportConfig(email);
+			if (!reportsConfig || !reportsConfig.savedReports.length)
+				throw new Error('No saved reports found');
+
+			const existingConfigForId = reportsConfig.savedReports.filter(
+				report => report.id === savedConfigId
+			)[0];
+			if (!existingConfigForId)
+				throw new Error('Unable to find existng configuration for this report');
+
+			let updatedReportConfig = {
+				...existingConfigForId,
+				name: updateConfiguration.name || existingConfigForId.name
+			};
+
+			if (
+				updateConfiguration.scheduleOptions &&
+				Object.keys(updateConfiguration.scheduleOptions).length
+			) {
+				await Utils.cancelScheduledJob(existingConfigForId.scheduleOptions.jobId);
+				updatedReportConfig.scheduleOptions = updateConfiguration.scheduleOptions;
+				updatedReportConfig = await Utils.initiateReportsSchedule(updatedReportConfig, email);
+			}
+
+			const newSavedReports = reportsConfig.savedReports.map(report => {
+				if (report.id === savedConfigId) {
+					return updatedReportConfig;
+				}
+				return report;
+			});
+			const newConfiguration = {
+				...reportsConfig,
+				savedReports: newSavedReports
+			};
+
+			const response = await reportsModel.updateSavedReportConfig(newConfiguration, email);
+			return sendSuccessResponse(response, res, HTTP_STATUSES.OK);
+		} catch (err) {
+			console.log(err);
+			let { message: errorMessage } = err;
+			try {
+				errorMessage = JSON.parse(errorMessage);
+			} catch (e) {
+				errorMessage = {
+					message: 'Something went wrong',
+					code: HTTP_STATUSES.INTERNAL_SERVER_ERROR
+				};
+			}
+			const {
+				message = 'Something went wrong',
+				code = HTTP_STATUSES.INTERNAL_SERVER_ERROR
+			} = errorMessage;
+			return sendErrorResponse(
+				{
+					message
+				},
+				res,
+				code
+			);
+		}
+	})
+	.delete('/:id', async (req, res) => {
+		try {
+			const { user } = req;
+			const email = user.originalEmail || user.email;
+			const reportId = req.params.id;
+			if (!reportId) throw new Error('Invalid report ID');
+
+			const reportsConfig = await reportsModel.getSavedReportConfig(email);
+			if (!reportsConfig || !reportsConfig.savedReports.length)
+				throw new Error('No saved reports found');
+
+			const reportToDelete = reportsConfig.savedReports.filter(report => report.id === reportId)[0];
+			if (!reportToDelete) throw new Error('Report not found');
+
+			if (reportToDelete.scheduleOptions && reportToDelete.scheduleOptions.jobId) {
+				await Utils.cancelScheduledJob(reportToDelete.scheduleOptions.jobId);
+			}
+
+			const newSavedReports = reportsConfig.savedReports.filter(report => report.id !== reportId);
+			const newConfiguration = {
+				...reportsConfig,
+				savedReports: newSavedReports
+			};
+			const response = await reportsModel.updateSavedReportConfig(newConfiguration, email);
+			return sendSuccessResponse(response, res, HTTP_STATUSES.OK);
+		} catch (err) {
+			let { message: errorMessage } = err;
+			try {
+				errorMessage = JSON.parse(errorMessage);
+			} catch (e) {
+				errorMessage = {
+					message: 'Something went wrong',
+					code: HTTP_STATUSES.INTERNAL_SERVER_ERROR
+				};
+			}
+			const {
+				message = 'Something went wrong',
+				code = HTTP_STATUSES.INTERNAL_SERVER_ERROR
+			} = errorMessage;
+			return sendErrorResponse(
+				{
+					message
+				},
+				res,
+				code
+			);
+		}
+	});
 module.exports = router;

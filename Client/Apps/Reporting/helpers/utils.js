@@ -97,6 +97,21 @@ const getPresets = () => {
 	];
 };
 
+const getReportScheduleIntervals = () => [
+	{
+		value: 'daily',
+		name: 'Daily'
+	},
+	{
+		value: 'weekly',
+		name: 'Weekly'
+	},
+	{
+		value: 'monthly',
+		name: 'Monthly'
+	}
+];
+
 const calculateTotalPageViews = pageViews => {
 	let totalPageviews = 0;
 	pageViews.forEach(pageView => (totalPageviews += pageView));
@@ -150,5 +165,6 @@ export {
 	getValidObject,
 	getValidArray,
 	getItemFromLocalStorage,
-	setItemToLocalStorage
+	setItemToLocalStorage,
+	getReportScheduleIntervals
 };
