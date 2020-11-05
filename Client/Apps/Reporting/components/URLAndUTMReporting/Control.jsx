@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { Glyphicon, Button, InputGroup } from '@/Client/helpers/react-bootstrap-imports';
+import { Glyphicon, Button, InputGroup, Alert } from '@/Client/helpers/react-bootstrap-imports';
 import 'react-dates/lib/css/_datepicker.css';
 import 'react-dates/initialize';
 import { CSVLink } from 'react-csv';
@@ -300,7 +300,7 @@ class Control extends Component {
 
 	render() {
 		const { state } = this;
-		const { reportType, pageSize, pageIndex, recordCount } = this.props;
+		const { reportType, pageSize, pageIndex, recordCount, showAlert } = this.props;
 		const currentSet = pageSize * pageIndex;
 
 		return (
@@ -454,6 +454,12 @@ class Control extends Component {
 					</div>
 				</div>
 				<hr />
+				{showAlert ? (
+					<Alert bsStyle="info" onDismiss={this.handleDismiss} className="u-margin-t4">
+						Due to an internal data migration process, there might be some inconsistencies in the
+						UTM reports for the period between <strong>4th October till 9th October.</strong>
+					</Alert>
+				) : null}
 				<div
 					style={{
 						display: 'grid',
