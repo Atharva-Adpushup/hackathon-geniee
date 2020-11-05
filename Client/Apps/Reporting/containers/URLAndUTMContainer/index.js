@@ -31,7 +31,7 @@ const mapStateToProps = (state, ownProps) => {
 		delete URL_UTM_DIMENSIONS.utm_medium;
 		delete URL_UTM_DIMENSIONS.utm_term;
 		delete URL_UTM_DIMENSIONS.utm_content;
-		delete URL_UTM_DIMENSIONS.utm_camp_src_need;
+		delete URL_UTM_DIMENSIONS.utm_camp_src_med;
 		delete URL_UTM_DIMENSIONS.utm_camp_src;
 	}
 
