@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import mapValues from 'lodash/mapValues';
 import omit from 'lodash/omit';
 import groupBy from 'lodash/groupBy';
-import { Row, Col, Alert } from '@/Client/helpers/react-bootstrap-imports';
+import { Row, Col } from '@/Client/helpers/react-bootstrap-imports';
 import moment from 'moment';
 import qs from 'querystringify';
 import isEmpty from 'lodash/isEmpty';
@@ -967,15 +967,10 @@ class Report extends Component {
 						pageSize={pageSize}
 						pageIndex={pageIndex}
 						recordCount={recordCount}
+						showAlert={show}
 					/>
 				</Col>
 				<Col sm={12} className="u-margin-b4 url-reporting-table">
-					{show ? (
-						<Alert bsStyle="info" onDismiss={this.handleDismiss} className="u-margin-t4">
-							Due to an internal data migration process, there might be some inconsistencies in the
-							UTM reports for the period between <strong>4th October till 9th October.</strong>
-						</Alert>
-					) : null}
 					<TableContainer
 						tableData={selectedMetricsTableData}
 						aggregatedData={aggregatedData}
