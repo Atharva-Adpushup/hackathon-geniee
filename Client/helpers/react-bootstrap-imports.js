@@ -34,6 +34,7 @@ import Accordion from 'react-bootstrap/lib/Accordion';
 import Well from 'react-bootstrap/lib/Well';
 import Grid from 'react-bootstrap/lib/Grid';
 import Popover from 'react-bootstrap/lib/Popover';
+import Dropdown from 'react-bootstrap/lib/Dropdown';
 
 export {
 	Row,
@@ -71,5 +72,6 @@ export {
 	Accordion,
 	Well,
 	Grid,
-	Popover
+	Popover,
+	Dropdown
 };
