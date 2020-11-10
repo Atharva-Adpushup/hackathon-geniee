@@ -1,6 +1,6 @@
 {
 	"name": "adpushup-app",
-	"version": "1.5.0",
+	"version": "1.6.0",
 	"private": true,
 	"scripts": {
 		"start": "node app.js",
@@ -114,6 +114,7 @@
 		"react-router-dynamic-breadcrumbs": "^2.2.0",
 		"react-select": "2.4.2",
 		"react-table": "^6.10.0",
+		"react-visibility-sensor": "^5.1.1",
 		"react-with-styles": "3.2.1",
 		"reactcss": "^1.0.3",
 		"redis": "^3.0.2",
@@ -124,6 +125,7 @@
 		"serve-favicon": "^2.5.0",
 		"simple-jade-parser": "0.0.4",
 		"socket.io": "^2.2.0",
+		"socket.io-client": "^2.3.1",
 		"strong-soap": "1.17.0",
 		"uglify-js": "^3.5.12",
 		"universal-cookie": "^3.0.7",

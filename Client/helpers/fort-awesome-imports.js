@@ -38,6 +38,7 @@ import { faTimesCircle } from '@fortawesome/free-solid-svg-icons/faTimesCircle';
 import { faThumbsUp } from '@fortawesome/free-solid-svg-icons/faThumbsUp';
 import { faPlusCircle } from '@fortawesome/free-solid-svg-icons/faPlusCircle';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons/faSpinner';
+import { faBell } from '@fortawesome/free-solid-svg-icons/faBell';
 
 export {
 	faBars,
@@ -79,5 +80,6 @@ export {
 	faTimesCircle,
 	faThumbsUp,
 	faPlusCircle,
-	faSpinner
+	faSpinner,
+	faBell
 };

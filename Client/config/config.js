@@ -8,5 +8,8 @@ export default {
 		UNSAVED_CHANGES: 'You have unsaved changes. Are you sure you want to leave?'
 	},
 	URL_ANALYTICS_API_CUSTOM_DATA: '/url/getCustomStats',
-	AP_GETTING_STARTED_URL: 'https://campaign.adpushup.com/get-started/'
+	AP_GETTING_STARTED_URL: 'https://campaign.adpushup.com/get-started/',
+	NOTIFICATION_SERVICE: {
+		HOST: 'https://notifications.adpushup.com/'
+	}
 };
