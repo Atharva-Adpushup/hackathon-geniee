@@ -10,6 +10,6 @@ export default {
 	URL_ANALYTICS_API_CUSTOM_DATA: '/url/getCustomStats',
 	AP_GETTING_STARTED_URL: 'https://campaign.adpushup.com/get-started/',
 	NOTIFICATION_SERVICE: {
-		HOST: 'https://notifications.adpushup.com/'
+		HOST: 'https://notifications.adpushup.com'
 	}
 };
