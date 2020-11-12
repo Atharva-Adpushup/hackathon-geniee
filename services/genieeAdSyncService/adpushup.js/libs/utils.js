@@ -722,6 +722,9 @@ module.exports = {
 			[commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_STARTED]: new Date().getTime()
 		});
 
+		const retryCount = adp.pageUrlMappingRetries || 1;
+		let hasSuceeded = false;
+
 		this.requestServer(
 			pageUrlMappingServiceEndpoint,
 			{},
@@ -764,9 +767,23 @@ module.exports = {
 						[commonConsts.EVENT_LOGGER.EVENTS.URM_CONFIG_KEY_VALUE_EMPTY]: new Date().getTime()
 					});
 				}
+
+				hasSuceeded = true
+
 			})
 			.fail(function(xhr) {
 				const { responseText, getAllResponseHeaders } = xhr;
+
+				if (retryCount < 3) {
+					let retryTimeout = retryCount === 3 ? 100 : 50;
+					adp.utils.log(`Retrying ${retryCount}, timeout: ${retryTimeout}`)
+					setTimeout(() => {
+						adp.pageUrlMappingRetries = retryCount + 1;
+						utils.fetchAndSetKeyValueForUrlReporting(adp);
+					}, retryTimeout);
+					// dont log failure until retries are completed
+					return;
+				}
 
 				utils.logURMEvent(commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_FAILED_TIME, {
 					[commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_FAILED_TIME]: new Date().getTime()
@@ -793,8 +810,11 @@ module.exports = {
 				});
 			})
 			.always(function() {
-				utils.sendURMKeyValueEventLogs();
-				utils.sendURMKeyValueEventLogsKeen();
+				adp.utils.log({always: retryCount})
+				if (retryCount >= 3 || hasSuceeded) {
+					utils.sendURMKeyValueEventLogs();
+					utils.sendURMKeyValueEventLogsKeen();
+				}
 			});
 
 		return true;
@@ -1062,7 +1082,7 @@ module.exports = {
 	},
 	sendURMKeyValueEventLogsKeen: function() {
 		try {
-			const { utils, eventLogger } = window.adpushup;
+			const { utils, eventLogger, pageUrlMappingRetries } = window.adpushup;
 			const eventType = commonConsts.EVENT_LOGGER.TYPES.URM_KEY_VALUE_KEEN;
 
 			let urmLogs = eventLogger.getLogsByEventType(eventType);
@@ -1088,9 +1108,11 @@ module.exports = {
 				timestamp: new Date().getTime(),
 				pageUrl: window.location.href,
 				path: window.location.pathname,
-				domain: window.location.host
+				domain: window.location.host,
+				retries: pageUrlMappingRetries || 0
 			};
 
+			utils.log({payload});
 			// TODO move url to config
 			this.createAndFireImagePixelForUmLogUsingKeen(payload);
 
