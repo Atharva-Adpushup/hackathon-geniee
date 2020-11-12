@@ -13,13 +13,6 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 	var pbjs = window._apPbJs;
 	var container = $(`#${adpSlot.containerId}`);
 
-	var getIframeDocument = function() {
-		return container
-			.find('iframe')
-			.contents()
-			.get(0);
-	};
-
 	function cleanJwPlayerAndRenderBid(jwPlayerInstance, bid, refreshData = {}) {
 		// clean container
 		jwPlayerInstance.remove();
@@ -34,7 +27,7 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 			refreshAdSlot.setRefreshTimeOutByAdId(adId, refreshExtendTimeInMs);
 		}
 
-		pbjs.renderAd(getIframeDocument(), bid.adId);
+		pbjs.renderAd(utils.getIframeDocument(container), bid.adId);
 	}
 
 	var videoSlotInViewWatcher = (function() {
@@ -91,7 +84,7 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 	// slot is not in view
 	// and have alive banner bid then render banner bid
 	if (!apUtils.checkElementInViewPercent(container) && highestAliveBannerBid) {
-		pbjs.renderAd(getIframeDocument(), highestAliveBannerBid.adId);
+		pbjs.renderAd(utils.getIframeDocument(container), highestAliveBannerBid.adId);
 
 		// send banner bid won feedback
 		prebidDataCollector.collectBidWonData(highestAliveBannerBid);

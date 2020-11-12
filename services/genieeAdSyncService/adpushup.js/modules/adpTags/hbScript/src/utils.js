@@ -427,6 +427,15 @@ var utils = {
 		return data;
 	},
 	getHighestAliveBid: function(pbjs, adUnitCode, mediaTypesToFilter = []) {
+		// Check if bid is not expired
+		function isBidAlive(bid) {
+			var timeNow = new Date();
+			var bidResponseTime = new Date(bid.responseTimestamp);
+			var bidAgeInMs = timeNow - bidResponseTime;
+			var bidTtlInMs = (bid.ttl - 1) * 1000; // substracted 1s from bid ttl to adjust rendering time
+
+			return bidAgeInMs <= bidTtlInMs;
+		}
 		return pbjs
 			.getBidResponsesForAdUnitCode(adUnitCode)
 			.bids.filter(bid => {
@@ -436,24 +445,34 @@ var utils = {
 						mediaTypesToFilter.indexOf(bid.mediaType) !== -1);
 
 				var isUnusedBid = bid.status !== 'rendered';
-
-				// Check if bid is not expired
-				function isBidAlive() {
-					var timeNow = new Date();
-					var bidResponseTime = new Date(bid.responseTimestamp);
-					var bidAgeInMs = timeNow - bidResponseTime;
-					var bidTtlInMs = (bid.ttl - 1) * 1000; // substracted 1s from bid ttl to adjust rendering time
-
-					return bidAgeInMs <= bidTtlInMs;
-				}
-
-				return isDesiredMediaType && isUnusedBid && isBidAlive(); // check bid alive only in case of banner
+				return isDesiredMediaType && isUnusedBid && isBidAlive(bid);
 			})
 			.reduce((highestBid, currentBid) => {
 				if (!highestBid || currentBid.cpm > highestBid.cpm) return currentBid;
 
 				return highestBid;
 			}, false);
+	},
+	/**
+	 * takes a jquery conatainer and returns a its first iframe children, in case no iframe found in children, creates one and returns
+	 */
+	getIframeDocument: function(container, options) {
+		var iframe = container
+			.find('iframe')
+			.contents()
+			.get(0);
+
+		if (!iframe) {
+			iframe = $(
+				`<iframe frameborder='0' scrolling='no' marginwidth='0' marginheight='0' style='border: 0px; vertical-align: bottom;' width="${options.width ||
+					'100%'}" height="${options.height || '100%'}"/>`
+			);
+			container.append(iframe);
+
+			return iframe[0].contentWindow.document;
+		}
+
+		return iframe;
 	},
 	getDownwardCompatibleSizes: function(
 		maxWidth,
