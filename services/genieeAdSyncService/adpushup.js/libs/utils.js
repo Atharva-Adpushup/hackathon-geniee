@@ -771,14 +771,14 @@ module.exports = {
 					});
 				}
 
-				hasSuceeded = true
+				hasSuceeded = true;
 
 			})
 			.fail(function(xhr) {
 				const { responseText, getAllResponseHeaders } = xhr;
 
-				if (retryCount + 1 < FETCH_URL_KEY_VALUE_RETRY_LIMIT) {
-					retryCount += 1;
+				retryCount += 1;
+				if (retryCount < FETCH_URL_KEY_VALUE_RETRY_LIMIT) {
 					let retryTimeout = FETCH_URL_KEY_RETRY_TIMEOUT * retryCount;
 					adp.utils.log(`Retrying ${retryCount}, timeout: ${retryTimeout}`)
 					setTimeout(() => { 
