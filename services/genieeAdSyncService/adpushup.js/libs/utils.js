@@ -7,6 +7,8 @@ var browserConfig = require('./browserConfig.js'),
 	UM_LOG_ENDPOINT = '//app-log.adpushup.com/umlogv5?data=',
 	UM_LOG_KEEN_ENDPOINT =
 		'//api.keen.io/3.0/projects/5f6455365cf9803b3732965b/events/umlogv1?api_key=a871c7c98adc1b99fbf72820e0704d22bdcae4b9a1d0e2af20b46fe3cf2087d5def88f1e829db5715b4db29f18110d61c5896928ea0fde2e46a2116e91eb24aeb1656ed4a7a58db13f54ae1f8825ea690a34cfaa8001912d88266b9349140537&data=';
+	FETCH_URL_KEY_VALUE_RETRY_LIMIT = 3,
+	FETCH_URL_KEY_RETRY_TIMEOUT = 50;
 
 module.exports = {
 	log: function() {
@@ -722,6 +724,10 @@ module.exports = {
 			[commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_STARTED]: new Date().getTime()
 		});
 
+		let retryCount = adp.pageUrlMappingRetries || 0;
+		let hasSuceeded = false;
+		let hasFailed = false;
+
 		this.requestServer(
 			pageUrlMappingServiceEndpoint,
 			{},
@@ -764,9 +770,26 @@ module.exports = {
 						[commonConsts.EVENT_LOGGER.EVENTS.URM_CONFIG_KEY_VALUE_EMPTY]: new Date().getTime()
 					});
 				}
+
+				hasSuceeded = true;
+
 			})
 			.fail(function(xhr) {
 				const { responseText, getAllResponseHeaders } = xhr;
+
+				retryCount += 1;
+				if (retryCount < FETCH_URL_KEY_VALUE_RETRY_LIMIT) {
+					let retryTimeout = FETCH_URL_KEY_RETRY_TIMEOUT * retryCount;
+					adp.utils.log(`Retrying ${retryCount}, timeout: ${retryTimeout}`)
+					setTimeout(() => { 
+						adp.pageUrlMappingRetries = retryCount;
+						utils.fetchAndSetKeyValueForUrlReporting(adp);
+					}, retryTimeout);
+					// dont log failure until retries are completed
+					return;
+				}
+
+				hasFailed = true;
 
 				utils.logURMEvent(commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_FAILED_TIME, {
 					[commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_FAILED_TIME]: new Date().getTime()
@@ -793,8 +816,10 @@ module.exports = {
 				});
 			})
 			.always(function() {
-				utils.sendURMKeyValueEventLogs();
-				utils.sendURMKeyValueEventLogsKeen();
+				if (hasFailed || hasSuceeded) {
+					utils.sendURMKeyValueEventLogs();
+					utils.sendURMKeyValueEventLogsKeen();
+				}
 			});
 
 		return true;
@@ -1062,7 +1087,7 @@ module.exports = {
 	},
 	sendURMKeyValueEventLogsKeen: function() {
 		try {
-			const { utils, eventLogger } = window.adpushup;
+			const { utils, eventLogger, pageUrlMappingRetries } = window.adpushup;
 			const eventType = commonConsts.EVENT_LOGGER.TYPES.URM_KEY_VALUE_KEEN;
 
 			let urmLogs = eventLogger.getLogsByEventType(eventType);
@@ -1088,9 +1113,11 @@ module.exports = {
 				timestamp: new Date().getTime(),
 				pageUrl: window.location.href,
 				path: window.location.pathname,
-				domain: window.location.host
+				domain: window.location.host,
+				retries: pageUrlMappingRetries || 0
 			};
 
+			utils.log({payload});
 			// TODO move url to config
 			this.createAndFireImagePixelForUmLogUsingKeen(payload);
 
