@@ -250,7 +250,6 @@ class Settings extends Component {
 					className="u-margin-b4 negative-toggle"
 					checked={poweredByBanner}
 					onChange={this.handleToggle}
-					disabled
 					layout="horizontal"
 					size="m"
 					on="Yes"
