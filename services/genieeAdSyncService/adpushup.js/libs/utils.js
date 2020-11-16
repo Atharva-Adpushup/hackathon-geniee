@@ -1114,7 +1114,27 @@ module.exports = {
 				pageUrl: window.location.href,
 				path: window.location.pathname,
 				domain: window.location.host,
-				retries: pageUrlMappingRetries || 0
+				retries: pageUrlMappingRetries || 0,
+				user_agent: "${keen.user_agent}",
+				ip_address: "${keen.ip}",
+				keen: {
+					addons: [
+						{
+							name: "keen:ua_parser",
+							input: {
+								ua_string: "user_agent"
+							},
+							output: "parsed_user_agent"
+						},
+						{
+							name: "keen:ip_to_geo",
+							input: {
+							  ip: "ip_address"
+							},
+							output: "ip_geo_info"
+						}
+					]
+ 				}
 			};
 
 			utils.log({payload});
