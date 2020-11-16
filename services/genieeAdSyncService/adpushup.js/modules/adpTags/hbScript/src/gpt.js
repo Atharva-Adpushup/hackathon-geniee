@@ -134,7 +134,7 @@ var gpt = {
 							}
 
 							// powered by adpushup optimisations
-							if (slotElementId.indexOf('STICKY') === 0) { 
+							if (!adpConfig.apLiteActive && slotElementId.indexOf('STICKY') === 0) { 
 								const stickyBg = $(`#bg-sticky-${slotElementId}`);
 								const adpBanner = $(`#banner-${slotElementId}`);
 		
