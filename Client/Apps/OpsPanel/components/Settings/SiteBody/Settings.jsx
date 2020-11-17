@@ -24,7 +24,9 @@ class Settings extends Component {
 			isAdsLabelOn = false,
 			adsLabel = 'Advertisement',
 			hbAnalytics = false,
-			cmpAvailable = false
+			cmpAvailable = false,
+			mergeReport=false,
+			isPnp=false
 		} = site.apConfigs || {};
 		const { revenueShare = 10 } = site.adNetworkSettings || {};
 		const status = Object.prototype.hasOwnProperty.call(apps, 'apLite') ? apps.apLite : undefined;
@@ -40,7 +42,9 @@ class Settings extends Component {
 			revenueShare,
 			status,
 			hbAnalytics,
-			cmpEnabled: !cmpAvailable
+			cmpEnabled: !cmpAvailable,
+			mergeReport,
+			isPnp
 		};
 	}
 
@@ -136,7 +140,9 @@ class Settings extends Component {
 			adsLabel,
 			revenueShare,
 			hbAnalytics,
-			cmpEnabled
+			cmpEnabled,
+			mergeReport,
+			isPnp
 		} = this.state;
 		const { showNotification, saveSettings, site } = this.props;
 		const isTransitionInValid = isSPA && isNaN(Number(spaPageTransitionTimeout));
@@ -179,7 +185,9 @@ class Settings extends Component {
 				isAdsLabelOn,
 				adsLabel,
 				hbAnalytics,
-				cmpAvailable: !cmpEnabled
+				cmpAvailable: !cmpEnabled,
+				mergeReport,
+				isPnp
 			},
 
 			adNetworkSettings: {
@@ -200,7 +208,8 @@ class Settings extends Component {
 			// revenueShare,
 			status,
 			hbAnalytics,
-			cmpEnabled
+			cmpEnabled,
+			mergeReport
 		} = this.state;
 		const { site } = this.props;
 
@@ -223,11 +232,24 @@ class Settings extends Component {
 					id={`js-apLite-${siteId}-${siteDomain}`}
 				/>
 				<CustomToggleSwitch
+					labelText="Merge Pnp Report"
+					className="u-margin-b4 negative-toggle"
+					checked={mergeReport}
+					onChange={this.handleToggle}
+					layout="horizontal"
+					disabled= {!site.apConfigs.isPnp}
+					size="m"
+					on="Yes"
+					off="No"
+					defaultLayout
+					name={`mergeReport-${siteId}-${siteDomain}`}
+					id={`js-mergeReport-${siteId}-${siteDomain}`}
+				/>
+				<CustomToggleSwitch
 					labelText="Powered By AdPushup"
 					className="u-margin-b4 negative-toggle"
 					checked={poweredByBanner}
 					onChange={this.handleToggle}
-					disabled
 					layout="horizontal"
 					size="m"
 					on="Yes"

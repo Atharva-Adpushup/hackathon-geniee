@@ -13,10 +13,11 @@ const reportsModel = require('../models/reportsModel');
 const FormValidator = require('../helpers/FormValidator');
 const schema = require('../helpers/schema');
 
+const couchbase = require('couchbase');
 const config = require('../configs/config');
 
 const redisClient = require('../middlewares/redis');
-
+const { queryViewFromAppBucket } = require('../helpers/couchBaseService');
 const router = express.Router();
 const cache = require('../middlewares/cacheMiddleware');
 
@@ -187,12 +188,15 @@ router
 
 		if (!isValidParams) return res.send({});
 		let reportsData = {};
-
+		let queryParams = _.cloneDeep(req.query);
 		try {
+			// modify query object if PNP site.
+			queryParams = await modifyQueryIfPnp(queryParams);
+			
 			const reportsResponse = await request({
 				uri: `${CC.ANALYTICS_API_ROOT}${CC.REPORT_PATH}`,
 				json: true,
-				qs: req.query
+				qs: queryParams
 			});
 			if (!reportsResponse.code === 1 || !reportsResponse.data) return res.send({});
 
@@ -209,7 +213,7 @@ router
 				const sessionRpmReportsResponse = await request({
 					uri: `${CC.SESSION_RPM_REPORTS_API}`,
 					json: true,
-					qs: req.query
+					qs: queryParams
 				});
 
 				if (sessionRpmReportsResponse.code === 1 && sessionRpmReportsResponse.data) {
@@ -226,9 +230,9 @@ router
 		} catch (err) {
 			console.log(err);
 		}
-
-		if (Object.keys(reportsData).length) {
-			redisClient.setex(JSON.stringify(req.query), 24 * 3600, JSON.stringify(reportsData));
+		
+		if (Object.keys(reportsData).length && JSON.stringify(queryParams) === JSON.stringify(req.query )) {
+			  redisClient.setex(JSON.stringify(queryParams), 24 * 3600, JSON.stringify(reportsData));
 		}
 
 		return res.send(reportsData);
@@ -652,4 +656,53 @@ router
 			);
 		}
 	});
+/**
+ *
+ * @param {array<String>} siteIds
+ * @description returns promise which resolves to get Data from Couchbase
+ */
+
+
+/**
+ *
+ * @param {Object} query - req.query object, contains query params.
+ * @return {Object} modifiedQuery
+ * @description checks if the siteid is pnp, modify query by appending the mapped siteIds to
+ * 							query.siteid.
+ */
+const modifyQueryIfPnp = (query) => {
+	return new Promise((resolve, reject) => {
+		const regex = new RegExp('^[0-9]+(,[0-9]+)*$');
+		if (!regex.test(query.siteid)) {
+			reject(new Error('Invalid parameter in query.siteid'));
+			return;
+		}
+		const siteIds = query.siteid.split(',');
+		const dbQuery = couchbase.N1qlQuery.fromString(
+			`select buc.mappedPnpSiteId from AppBucket 
+   		as buc where meta().id like 'site::%'  
+  	 	and buc.siteId in [${siteIds}]  
+   		and buc.mappedPnpSiteId is not missing  
+   		and buc.apConfigs.mergeReport = true`
+		)
+		queryViewFromAppBucket(dbQuery)
+			.then((data) => {
+				// data is array of objects e.g.. [{mappedPnpSiteId: 41355}, {mappedPnpSiteId:41395}]
+				data.forEach((ele) => {
+					query.siteid += `,${ele.mappedPnpSiteId}`;
+				});
+
+				resolve(query);
+			})
+			.catch(err => {
+				console.error(err);
+				reject(new Error('Error while accessing data'));
+			});
+	});
+}	
+
+
+
+
+
 module.exports = router;

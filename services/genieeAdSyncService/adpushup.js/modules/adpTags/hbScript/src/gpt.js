@@ -6,6 +6,7 @@ var constants = require('./constants');
 var responsiveAds = require('./responsiveAds');
 var adpConfig = window.adpushup.config;
 var refreshAdSlot = require('../../../../src/refreshAdSlot');
+var commonConsts = require('../../../../config/commonConsts');
 var getDfpContainerFromDom = function(containerId) {
 	return document.getElementById(containerId);
 };
@@ -130,6 +131,26 @@ var gpt = {
 										: slot.optionalParam.adId;
 									refreshAdSlot.stopRefreshForASlot(adId);
 								}
+							}
+
+							// powered by adpushup optimisations
+							if (!adpConfig.apLiteActive && slotElementId.indexOf('STICKY') === 0) { 
+								const stickyBg = $(`#bg-sticky-${slotElementId}`);
+								const adpBanner = $(`#banner-${slotElementId}`);
+		
+								// Ads by adpushup is disabled. nothing more to do
+								if (!adpBanner[0]) return;
+		
+								const unitHeight = parseInt(stickyBg[0].dataset.unitheight);
+		
+								if (!event.isEmpty) {
+									stickyBg[0] && stickyBg.css('height', unitHeight + commonConsts.POWERED_BY_BANNER.HEIGHT);
+									adpBanner.css('display', 'inline-block');
+								} else {
+									stickyBg[0] && stickyBg.css('height', unitHeight);
+									adpBanner.css('display', 'none');
+								}
+		
 							}
 						}
 					});

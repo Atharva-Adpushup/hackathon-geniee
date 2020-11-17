@@ -78,11 +78,12 @@ const commonConsts = {
 	FRAME: {
 		CSS: {
 			COMMON: {
-				background: 'rgba(0,0,0,0.5)',
-				'padding-bottom': '2px',
-				'max-height': '20px',
+				background: 'transparent',
 				margin: '0px auto',
-				position: 'relative'
+				position: 'absolute',
+				left: 0,
+				height: '16px',
+				width: '80px'
 			},
 			DISABLED_BANNER: {
 				height: '20px'
@@ -90,11 +91,7 @@ const commonConsts = {
 			LEFT: {},
 			RIGHT: {},
 			BOTTOM: {},
-			TOP: {
-				width: '170px',
-				'border-radius': '5px 5px 0px 0px',
-				padding: '2px'
-			}
+			TOP: {}
 		}
 	},
 	FORMATS: {

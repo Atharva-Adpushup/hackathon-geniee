@@ -123,5 +123,31 @@ module.exports = {
 	URM_REPORTING: {
 		GET_URM_TARGETTING_REQUEST_TIMEOUT: 1000
 	},
-	LIGHTHOUSE_HACK_SITES: [41619, 41584]
+	LIGHTHOUSE_HACK_SITES: [41619, 41584],
+	POWERED_BY_BANNER: {
+		HEIGHT: 16,
+		TEXT: 'Ads by',
+		IMAGE: 'https://campaign.adpushup.com/ads/adpushup-label.svg',
+		REDIRECT_URL:
+			'https://campaign.adpushup.com/get-started/?utm_source=banner&utm_campaign=growth_hack',
+		CSS: {
+			COMMON: {
+				color: '#000',
+				fontFamily: 'sans-serif',
+				fontSize: 9,
+				display: 'none',
+				textDecoration: 'none',
+				background: 'transparent',
+			},
+			LOGO: {
+				display: 'inline-block',
+				height: '16px !important', // required because some sites override img styles and logo height gets overriden,
+				'vertical-align': 'middle',
+				'margin-top': '0px',
+				'margin-bottom': '0px'
+			}
+		},
+		SUPPORTED_PLATFORMS: ['DESKTOP'],
+		SUPPORTED_FORMATS: ['STICKYBOTTOM'],
+	}
 };
