@@ -188,10 +188,11 @@ router
 
 		if (!isValidParams) return res.send({});
 		let reportsData = {};
-		let queryParams = JSON.parse(JSON.stringify(req.query));
+		let queryParams = _.cloneDeep(req.query);
 		try {
-			
+			// modify query object if PNP site.
 			queryParams = await modifyQueryIfPnp(queryParams);
+			
 			const reportsResponse = await request({
 				uri: `${CC.ANALYTICS_API_ROOT}${CC.REPORT_PATH}`,
 				json: true,
@@ -660,15 +661,7 @@ router
  * @param {array<String>} siteIds
  * @description returns promise which resolves to get Data from Couchbase
  */
-const queryDatabase = siteIds => {
-	const queryDbPromise = siteIds.map(siteid => {
-		const dbQuery = couchbase.N1qlQuery.fromString(
-			`select buc.apConfigs.mergeReport, buc.mappedPnpSiteId from AppBucket as buc where meta().id = "site::${siteid}" and buc.apConfigs.mergeReport = true`
-		);
-		return queryViewFromAppBucket(dbQuery);
-	});
-	return Promise.all(queryDbPromise);
-};
+
 
 /**
  *
@@ -685,17 +678,18 @@ const modifyQueryIfPnp = (query) => {
 			return;
 		}
 		const siteIds = query.siteid.split(',');
-		queryDatabase(siteIds)
+		const dbQuery = couchbase.N1qlQuery.fromString(
+			`select buc.mappedPnpSiteId from AppBucket 
+   		as buc where meta().id like 'site::%'  
+  	 	and buc.siteId in [${siteIds}]  
+   		and buc.mappedPnpSiteId is not missing  
+   		and buc.apConfigs.mergeReport = true`
+		)
+		queryViewFromAppBucket(dbQuery)
 			.then((data) => {
-				
-				const filteredData = data.reduce( (accData, currArr )=> {
-					const siteData = currArr.shift();
-					return (siteData && siteData.mappedPnpSiteId) ? 
-						accData.concat([siteData]) : accData;
-				},[]);
-				
-				filteredData.forEach(siteData => {
-					query.siteid += `,${siteData.mappedPnpSiteId}`;
+				// data is array of objects e.g.. [{mappedPnpSiteId: 41355}, {mappedPnpSiteId:41395}]
+				data.forEach((ele) => {
+					query.siteid += `,${ele.mappedPnpSiteId}`;
 				});
 
 				resolve(query);
