@@ -190,7 +190,7 @@ router
 		let reportsData = {};
 		let queryParams = _.cloneDeep(req.query);
 		try {
-			
+			// modify query object if PNP site.
 			queryParams = await modifyQueryIfPnp(queryParams);
 			
 			const reportsResponse = await request({
@@ -679,11 +679,11 @@ const modifyQueryIfPnp = (query) => {
 		}
 		const siteIds = query.siteid.split(',');
 		const dbQuery = couchbase.N1qlQuery.fromString(
-			`select buc.mappedPnpSiteId from AppBucket `+
-   		`as buc where meta().id like 'site::%' ` +
-  	 	`and buc.siteId in [${siteIds}] ` +
-   		`and buc.mappedPnpSiteId is not missing ` +
-   		`and buc.apConfigs.mergeReport = false `
+			`select buc.mappedPnpSiteId from AppBucket 
+   		as buc where meta().id like 'site::%'  
+  	 	and buc.siteId in [${siteIds}]  
+   		and buc.mappedPnpSiteId is not missing  
+   		and buc.apConfigs.mergeReport = true`
 		)
 		queryViewFromAppBucket(dbQuery)
 			.then((data) => {
