@@ -772,6 +772,7 @@ module.exports = {
 				}
 
 				hasSuceeded = true;
+				adp.urmRequestStatus = commonConsts.URM_REPORTING.EVENTS.SUCCESS;
 
 			})
 			.fail(function(xhr) {
@@ -790,6 +791,7 @@ module.exports = {
 				}
 
 				hasFailed = true;
+				adp.urmRequestStatus = commonConsts.URM_REPORTING.EVENTS.FAILED;
 
 				utils.logURMEvent(commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_FAILED_TIME, {
 					[commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_FAILED_TIME]: new Date().getTime()
@@ -915,6 +917,14 @@ module.exports = {
 			type: commonConsts.EVENT_LOGGER.TYPES.URM_TARGETTING
 		});
 	},
+	logURMTargettingEventKeen: function(name, data = {}) {
+		const eventLogger = window.adpushup.eventLogger;
+		eventLogger.log({
+			name,
+			data,
+			type: commonConsts.EVENT_LOGGER.TYPES.URM_TARGETTING_KEEN
+		})
+	},
 	getUrmResponseTimeFromEventLogs: function(urmLogs) {
 		let urmReqSuccessTimestamp = 0;
 		let urmReqStartedTimestamp = 0;
@@ -975,6 +985,69 @@ module.exports = {
 			window.adpushup.err.push({
 				error,
 				msg: 'Error occured while sending URM trigger logs'
+			});
+		}
+	},
+	sendURMTargettingEventLogsKeen: function() {
+		try {
+			const { utils, eventLogger, pageUrlMappingRetries, urmRequestStatus = commonConsts.URM_REPORTING.EVENTS.PENDING } = window.adpushup;
+			const eventType = commonConsts.EVENT_LOGGER.TYPES.URM_TARGETTING_KEEN;
+
+			let urmLogs = eventLogger.getLogsByEventType(eventType);
+			if (!urmLogs.length) {
+				utils.logURMTargettingEventKeen(commonConsts.EVENT_LOGGER.EVENTS.EMPTY, {
+					[commonConsts.EVENT_LOGGER.EVENTS.EMPTY]: new Date().getTime()
+				});
+				urmLogs = eventLogger.getLogsByEventType(eventType);
+			}
+
+			const packetId = window.adpushup.config.packetId;
+			let urmLogsObj = {};
+			urmLogs.map(log => {
+				urmLogsObj = Object.assign({}, urmLogsObj, log.data);
+			});
+
+			const payload = {
+				packetId,
+				type: eventType,
+				logs: urmLogsObj,
+				timestamp: new Date().getTime(),
+				pageUrl: window.location.href,
+				path: window.location.pathname,
+				domain: window.location.host,
+				retries: pageUrlMappingRetries || 0,
+				user_agent: "${keen.user_agent}",
+				ip_address: "${keen.ip}",
+				keen: {
+					addons: [
+						{
+							name: "keen:ua_parser",
+							input: {
+								ua_string: "user_agent"
+							},
+							output: "parsed_user_agent"
+						},
+						{
+							name: "keen:ip_to_geo",
+							input: {
+							  ip: "ip_address"
+							},
+							output: "ip_geo_info"
+						}
+					]
+				},
+				urmRequestStatus
+			};
+
+			utils.log('targetting logs keen', {payload});
+
+			this.createAndFireImagePixelForUmLogUsingKeen(payload);
+			window.adpushup.isURMTargettingLogsSent = true;
+			eventLogger.removeLogsByEventType(eventType);
+		} catch(error) {
+			window.adpushup.err.push({
+				error,
+				msg: 'Error occured while sending URM targetting event logs'
 			});
 		}
 	},

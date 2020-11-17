@@ -194,6 +194,10 @@ var targeting = {
 					commonConsts.EVENT_LOGGER.EVENTS.URM_TARGETING_KEY_VALUE_SET,
 					logObject
 				);
+				utils.logURMTargettingEventKeen(
+					commonConsts.EVENT_LOGGER.EVENTS.URM_TARGETING_KEY_VALUE_SET,
+					logObject
+				);	
 			} else {
 				utils.logURMTargettingEvent(
 					commonConsts.EVENT_LOGGER.EVENTS.URM_TARGETING_KEY_VALUE_EMPTY,
@@ -202,10 +206,15 @@ var targeting = {
 						urlTargetingValue
 					}
 				);
+				utils.logURMTargettingEventKeen(
+					commonConsts.EVENT_LOGGER.EVENTS.URM_TARGETING_KEY_VALUE_SET,
+					logObject
+				);
 			}
 			// send url reporting log, if its collected
 
 			utils.sendURMTargettingEventLogs();
+			utils.sendURMTargettingEventLogsKeen();
 		}
 
 		/*
