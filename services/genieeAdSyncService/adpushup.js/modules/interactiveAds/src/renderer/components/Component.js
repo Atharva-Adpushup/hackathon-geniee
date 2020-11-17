@@ -2,6 +2,7 @@
 import constants from '../../../../../config/commonConsts';
 import commonConsts from '../../commonConsts';
 import $ from '../../$';
+import adCodeGenerator from '../../../../../src/adCodeGenerator';
 // import { executeAdpTagsHeadCode } from '../../../../genieeAdSyncService/genieeAp/src/adCodeGenerator';
 // import { executeAfterJS } from '../../../../genieeAdSyncService/genieeAp/src/adCreater';
 
@@ -13,7 +14,6 @@ class Component {
 		this.interactiveAd = interactiveAd;
 		this.adCode = adCode;
 		this.sendFeedback = this.sendFeedback.bind(this);
-		this.createPoweredByBanner = this.createPoweredByBanner.bind(this);
 		this.createCloseButton = this.createCloseButton.bind(this);
 		this.closeAd = this.closeAd.bind(this);
 	}
@@ -23,22 +23,6 @@ class Component {
 			//adp.utils.sendFeedbackOld(options);
 			adp.utils.sendFeedback(options);
 		}
-	}
-
-	createPoweredByBanner(formatData) {
-		const { POWERED_BY_BANNER } = commonConsts;
-		const $banner = $('<a />');
-		const $logo = $('<img />');
-
-		$logo
-			.attr({ alt: 'AdPushup', src: POWERED_BY_BANNER.IMAGE })
-			.css({ ...POWERED_BY_BANNER.CSS.LOGO });
-
-		return $banner
-			.attr({ href: POWERED_BY_BANNER.REDIRECT_URL, target: '_blank' })
-			.css({ ...POWERED_BY_BANNER.CSS.COMMON })
-			.text(POWERED_BY_BANNER.TEXT)
-			.append($logo);
 	}
 
 	createCloseButton(formatData) {
@@ -57,8 +41,11 @@ class Component {
 	}
 
 	render() {
-		const { formatData, width, height, id, css: customCSS } = this.interactiveAd;
-		const { POWERED_BY_BANNER } = commonConsts;
+		const { formatData, width, height, id, css: customCSS, poweredByBanner = true, networkData } = this.interactiveAd;
+		const shouldShowPoweredByBanner = adp.config.poweredByBanner 
+			&& poweredByBanner
+			&& constants.POWERED_BY_BANNER.SUPPORTED_PLATFORMS.includes(formatData.platform.toUpperCase())
+			&& constants.POWERED_BY_BANNER.SUPPORTED_FORMATS.includes(formatData.format.toUpperCase())
 
 		adp.interactiveAds.ads[id] = this.interactiveAd;
 
@@ -139,11 +126,12 @@ class Component {
 		// );
 
 		const $bottomStickyBg = $('<div />')
-			.attr('id', `bg-sticky-${id}`)
+			.attr('id', `bg-sticky-${networkData.dfpAdunit}`)
+			.attr('data-unitheight', height)
 			.css({
 				width: '100%',
 				height,
-				background: '#80808094',
+				background: 'rgba(247,247,247,.9)',
 				bottom: 0,
 				left: 0,
 				right: 0,
@@ -151,6 +139,15 @@ class Component {
 				'margin-left': 'auto',
 				'margin-right': 'auto'
 			});
+
+		if (shouldShowPoweredByBanner) {
+			const bannerFrame = adCodeGenerator.generatePoweredByBanner(networkData.dfpAdunit, {
+				...commonConsts.FRAME.CSS.COMMON,
+				...commonConsts.FRAME.CSS[formatData.placement.toUpperCase()],
+				bottom: `${height}px`
+			});
+			$format.append(bannerFrame);
+		}
 
 		switch (formatData.type) {
 			case commonConsts.FORMATS.STICKY.NAME:

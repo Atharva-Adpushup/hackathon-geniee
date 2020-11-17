@@ -281,5 +281,26 @@ module.exports = {
 	},
 	generateMediaNetHeadCode: function() {
 		return executeMediaNetHeadCode();
+	},
+	generatePoweredByBanner(id, styles) {
+		const { POWERED_BY_BANNER } = consts;
+		const $banner = $('<a />');
+		const $logo = $('<img />');
+		$logo
+			.attr({
+				alt: 'AdPushup',
+				src: POWERED_BY_BANNER.IMAGE
+			})
+			.css({ ...POWERED_BY_BANNER.CSS.LOGO });
+
+		return $banner
+			.attr({
+				href: POWERED_BY_BANNER.REDIRECT_URL,
+				target: '_blank',
+				class: 'powered-by-banner',
+				id: `banner-${id}`
+			})
+			.css({ ...POWERED_BY_BANNER.CSS.COMMON, ...styles })
+			.append($logo);
 	}
 };
