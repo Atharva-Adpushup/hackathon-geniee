@@ -207,8 +207,11 @@ var targeting = {
 					}
 				);
 				utils.logURMTargettingEventKeen(
-					commonConsts.EVENT_LOGGER.EVENTS.URM_TARGETING_KEY_VALUE_SET,
-					logObject
+					commonConsts.EVENT_LOGGER.EVENTS.URM_TARGETING_KEY_VALUE_EMPTY,
+					{
+						urlTargetingKey,
+						urlTargetingValue
+					}
 				);
 			}
 			// send url reporting log, if its collected
