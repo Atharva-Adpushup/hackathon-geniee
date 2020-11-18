@@ -54,9 +54,9 @@ var render = {
 			slot.renderedPostBid = true;
 
 			var containerId = slot.containerId;
-			var bid = utils.getHighestAliveBid(_apPbJs, slot.containerId, ['video', 'banner']);
+			var bid = utils.getHighestAliveBid(_apPbJs, containerId, ['video', 'banner']);
 			if (bid) {
-				var iframe = utils.getIframeDocument(adp.$(`#${slot.containerId}`), {
+				var iframe = utils.getIframeDocument(adp.$(`#${containerId}`), {
 					width: bid.width,
 					height: bid.height
 				});

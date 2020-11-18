@@ -258,8 +258,8 @@ var adpTags = {
 
 					// clear refresh timeout
 					if (dataSet.timeout) {
-						delete dataSet.timeout;
 						clearInterval(dataSet.timeout);
+						delete dataSet.timeout;
 					}
 
 					//reset renderTime

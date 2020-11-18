@@ -157,8 +157,8 @@ var $ = require('../../libs/jquery'),
 
 						// clear refresh timeout
 						if (dataSet.timeout) {
-							delete dataSet.timeout;
 							clearInterval(dataSet.timeout);
+							delete dataSet.timeout;
 						}
 
 						//reset renderTime
