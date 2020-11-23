@@ -426,7 +426,7 @@ var utils = {
 
 		return data;
 	},
-	getHighestAliveBid: function(pbjs, adUnitCode, mediaTypesToFilter = []) {
+	getHighestAliveBid: function(pbjs, adUnitCode, mediaTypesToFilter = [], biddersToFilter = []) {
 		// Check if bid is not expired
 		function isBidAlive(bid) {
 			var timeNow = new Date();
@@ -444,8 +444,13 @@ var utils = {
 					(!mediaTypesToFilter.length ||
 						mediaTypesToFilter.indexOf(bid.mediaType) !== -1);
 
+				var isDesiredBidder =
+					Array.isArray(biddersToFilter) &&
+					(!biddersToFilter.length ||
+						biddersToFilter.indexOf(bid.bidderCode || bid.bidder) !== -1);
+
 				var isUnusedBid = bid.status !== 'rendered';
-				return isDesiredMediaType && isUnusedBid && isBidAlive(bid);
+				return isDesiredMediaType && isDesiredBidder && isUnusedBid && isBidAlive(bid);
 			})
 			.reduce((highestBid, currentBid) => {
 				if (!highestBid || currentBid.cpm > highestBid.cpm) return currentBid;
