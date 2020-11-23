@@ -918,10 +918,13 @@ class Report extends Component {
 			}
 		}
 
-		let filters = Object.assign({}, selectedFilters);
+		const filters = Object.assign({}, selectedFilters);
 		if (!filters || !filters.siteid || !Object.keys(filters.siteid).length) {
 			// If there are no site id's, send all site ID's of the user so that the scheduler has a context of which sites to fetch reports for.
-			filters.siteid = Object.keys(userSites).reduce((sites, siteid) => ({ ...sites, [siteid]: true }), {})
+			filters.siteid = Object.keys(userSites).reduce(
+				(sites, siteid) => ({ ...sites, [siteid]: true }),
+				{}
+			);
 		}
 
 		const reportConfig = {
