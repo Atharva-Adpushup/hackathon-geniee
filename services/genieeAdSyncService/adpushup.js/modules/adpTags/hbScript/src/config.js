@@ -27,7 +27,8 @@ var config = {
 		'eplanning',
 		'ix',
 		'sovrn',
-		'appnexus'
+		'appnexus',
+		'conversant'
 	]
 };
 
