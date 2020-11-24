@@ -63,30 +63,30 @@ export const setDfpSetupStatusAction = siteId => dispatch => {
 	dispatch({ type: SET_UNSAVED_CHANGES, hasUnsavedChanges: true });
 };
 
-export const addBidderAction = (siteId, bidderConfig, params) => dispatch => {
+export const addBidderAction = (siteId, bidderConfig, params, dataForAuditLogs) => dispatch => {
 	const cleanedParams = deleteEmptyParams(params, bidderConfig);
 
 	return service
-		.addBidder(siteId, bidderConfig, cleanedParams)
+		.addBidder(siteId, bidderConfig, cleanedParams, dataForAuditLogs)
 		.then(({ data: { bidderConfig: bidderConfigFromDB, bidderKey } }) => {
 			dispatch({ type: ADD_BIDDER, siteId, bidderKey, bidderConfig: bidderConfigFromDB });
 			dispatch({ type: SET_UNSAVED_CHANGES, hasUnsavedChanges: true });
 		});
 };
 
-export const updateBidderAction = (siteId, bidderConfig, params) => dispatch => {
+export const updateBidderAction = (siteId, bidderConfig, params, dataForAuditLogs) => dispatch => {
 	const cleanedParams = deleteEmptyParams(params, bidderConfig);
 
 	return service
-		.updateBidder(siteId, bidderConfig, cleanedParams)
+		.updateBidder(siteId, bidderConfig, cleanedParams, dataForAuditLogs)
 		.then(({ data: { bidderConfig: bidderConfigFromDB, bidderKey } }) => {
 			dispatch({ type: UPDATE_BIDDER, siteId, bidderKey, bidderConfig: bidderConfigFromDB });
 			dispatch({ type: SET_UNSAVED_CHANGES, hasUnsavedChanges: true });
 		});
 };
 
-export const deleteBidderAction = (siteId, bidderKey) => dispatch =>
-	service.removeBidder(siteId, bidderKey).then(() => {
+export const deleteBidderAction = (siteId, bidderKey, dataForAuditLogs) => dispatch =>
+	service.removeBidder(siteId, bidderKey, dataForAuditLogs).then(() => {
 		dispatch({ type: DELETE_BIDDER, siteId, bidderKey });
 		dispatch({ type: SET_UNSAVED_CHANGES, hasUnsavedChanges: true });
 	});
@@ -99,8 +99,12 @@ export const fetchInventoriesAction = siteId => dispatch =>
 			history.push('/error');
 		});
 
-export const updateInventoriesHbStatus = (siteId, inventoriesToUpdate) => dispatch =>
-	service.updateInventoriesHbStatus(siteId, inventoriesToUpdate).then(() => {
+export const updateInventoriesHbStatus = (
+	siteId,
+	inventoriesToUpdate,
+	dataForAuditLogs
+) => dispatch =>
+	service.updateInventoriesHbStatus(siteId, inventoriesToUpdate, dataForAuditLogs).then(() => {
 		dispatch({ type: UPDATE_INVENTORIES_HB_STATUS, siteId, inventoriesToUpdate });
 		dispatch({ type: SET_UNSAVED_CHANGES, hasUnsavedChanges: true });
 	});
@@ -149,10 +153,10 @@ export const fetchHBRulesAction = siteId => dispatch => {
 		});
 };
 
-export const saveHBRulesAction = (siteId, { rule, ruleIndex }) => dispatch => {
+export const saveHBRulesAction = (siteId, { rule, ruleIndex }, dataForAuditLogs) => dispatch => {
 	const updaterFn = typeof ruleIndex === 'number' ? service.updateHbRule : service.saveHbRule;
 
-	return updaterFn(siteId, { rule, ruleIndex })
+	return updaterFn(siteId, { rule, ruleIndex }, dataForAuditLogs)
 		.then(({ data: rules }) => dispatch({ type: UPDATE_HB_RULES, siteId, rules }))
 		.catch(error => {
 			const { response } = error;

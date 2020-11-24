@@ -4,7 +4,7 @@ import axiosInstance from '../../../helpers/axiosInstance';
 import { errorHandler } from '../../../helpers/commonFunctions';
 import { getAdsAndGlobal } from '../../../Apps/ApTag/lib/helpers';
 
-const masterSave = siteId => (_, getState) => {
+const masterSave = (siteId, dataForAuditLogs) => (_, getState) => {
 	const { ads } = getAdsAndGlobal(getState(), {
 		match: {
 			params: {
@@ -12,7 +12,7 @@ const masterSave = siteId => (_, getState) => {
 			}
 		}
 	});
-	const data = { siteId, ads: ads.content };
+	const data = { siteId, ads: ads.content, dataForAuditLogs };
 	return axiosInstance
 		.post('/apTag/masterSave', data)
 		.then(() => window.alert('Save successful'))

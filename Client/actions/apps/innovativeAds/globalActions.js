@@ -4,7 +4,7 @@ import axiosInstance from '../../../helpers/axiosInstance';
 import { errorHandler } from '../../../helpers/commonFunctions';
 import { getAdsAndGlobal } from '../../../Apps/InnovativeAds/lib/helpers';
 
-const masterSave = siteId => (_, getState) => {
+const masterSave = (siteId, dataForAuditLogs) => (_, getState) => {
 	const props = {
 		match: {
 			params: {
@@ -16,8 +16,10 @@ const masterSave = siteId => (_, getState) => {
 	const data = {
 		siteId,
 		ads: ads.content,
-		meta: global.meta.content
+		meta: global.meta.content,
+		dataForAuditLogs
 	};
+
 	return axiosInstance
 		.post('/innovativeAds/masterSave', data)
 		.then(() => window.alert('Save successful'))
