@@ -10,6 +10,8 @@ const couchbase = require('../helpers/couchBaseService');
 const AdPushupError = require('../helpers/AdPushupError');
 const commonConsts = require('../configs/commonConsts');
 const proxy = require('../helpers/proxy');
+const axios = require('axios');
+const { AMP_SETTINGS_ACCESS_EMAILS } = require('../configs/commonConsts');
 const commonSiteFunctions = {
 	isActiveHbBidder(network, key) {
 		return network.isActive && network.isHb && key !== 'adpTags';
@@ -330,6 +332,56 @@ function apiModule() {
 						columns: commonSiteFunctions.getAllSitesStatColumns(allProductNames, allBidderNames),
 						result: sortedFinalSites
 					};
+				})
+				.catch(err => {
+					console.log(err);
+					throw new AdPushupError('Something went wrong');
+				});
+		},
+		sendNotification(notificationData) {
+			const groupId = new Date().getTime();
+			const postData = {
+				queue: 'NOTIFICATIONS',
+				data: []
+			};
+			const { emails, actionUrl, notificationText } = notificationData;
+
+			postData.data = emails.map(email => ({
+				email: email,
+				message: notificationText,
+				actionUrl: actionUrl,
+				meta: {
+					groupId: groupId
+				}
+			}));
+			// emails.forEach(email => {
+			// 	postData.data.push({
+			// 		email: email,
+			// 		message: notificationText,
+			// 		actionUrl: actionUrl,
+			// 		meta: {
+			// 			groupId: groupId
+			// 		}
+			// 	});
+			// });
+
+			return request({
+				method: 'POST',
+				json: true,
+				uri: 'http://localhost:8087/publishBulk',
+				body: postData
+			});
+		},
+		getAllNotifications() {
+			const query = N1qlQuery.fromString(
+				'Select message, actionUrl,id,dateCreated from apNotificationBucket;'
+			);
+
+			return couchbase
+				.connectToAppBucket()
+				.then(appBucket => appBucket.queryAsync(query))
+				.then(notifications => {
+					return notifications;
 				})
 				.catch(err => {
 					console.log(err);

@@ -7,6 +7,7 @@ import TopXPathMissAndModeURL from './TopXPathMissAndModeURL ';
 import LostFoundLiveSites from './LostFoundLiveSites/index';
 import AdsTxtLiveSitesEntries from './AdsTxtLiveSitesEntries';
 import BidderSettings from './BidderSettings';
+import DashboardNotifications from './DashboardNotifications';
 
 class Tools extends Component {
 	state = {
@@ -49,6 +50,8 @@ class Tools extends Component {
 						user={user}
 					/>
 				);
+			case TOOLS_IDENTIFIERS.DASHBOARD_NOTIFICATIONS:
+				return <DashboardNotifications />;
 		}
 	};
 
@@ -81,6 +84,9 @@ class Tools extends Component {
 
 								<NavItem eventKey={TOOLS_IDENTIFIERS.ADS_TXT_LIVE_SITES}>
 									Ads.txt Entries Live Sites
+								</NavItem>
+								<NavItem eventKey={TOOLS_IDENTIFIERS.DASHBOARD_NOTIFICATIONS}>
+									Dashboard Notifications
 								</NavItem>
 								{/* <NavItem eventKey={TOOLS_IDENTIFIERS.REGEX_GENERATION}>Regex Generation</NavItem> */}
 							</Nav>
