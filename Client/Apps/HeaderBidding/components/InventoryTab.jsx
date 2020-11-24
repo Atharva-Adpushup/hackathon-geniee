@@ -103,7 +103,7 @@ export default class InventoryTab extends React.Component {
 
 	handleBulkFormatToggle = isEnabled => {
 		const { selectAllMultiFormat } = this.state;
-		const { siteId, inventories, showNotification } = this.props;
+		const { siteId, inventories, showNotification, customProps, user } = this.props;
 		const newState = {};
 		newState.selectAllMultiFormat = !selectAllMultiFormat;
 		newState.selectAllNative = !selectAllMultiFormat
@@ -113,14 +113,21 @@ export default class InventoryTab extends React.Component {
 			? [...inventories].map(inventory => inventory.adUnitId)
 			: [];
 
+		const dataForAuditLogs = {
+			appName: customProps.appName,
+			siteDomain: user.sites[siteId].domain
+		};
+
 		updateFormat(
 			inventories.map(v => ({ ...v, checked: isEnabled, format: 'native' })),
-			siteId
+			siteId,
+			dataForAuditLogs
 		)
 			.then(() =>
 				updateFormat(
 					inventories.map(v => ({ ...v, checked: isEnabled, format: 'video' })),
-					siteId
+					siteId,
+					dataForAuditLogs
 				)
 			)
 			.then(() =>
@@ -276,8 +283,16 @@ export default class InventoryTab extends React.Component {
 			siteId,
 			updateInventoriesHbStatus,
 			showNotification,
-			setUnsavedChangesAction
+			setUnsavedChangesAction,
+			customProps,
+			user
 		} = this.props;
+
+		const dataForAuditLogs = {
+			appName: customProps.appName,
+			siteDomain: user.sites[siteId].domain
+		};
+
 		const { selectedInventories } = this.state;
 
 		const inventoriesToUpdate = [];
@@ -291,7 +306,7 @@ export default class InventoryTab extends React.Component {
 			}
 		}
 
-		updateInventoriesHbStatus(siteId, inventoriesToUpdate)
+		updateInventoriesHbStatus(siteId, inventoriesToUpdate, dataForAuditLogs)
 			.then(() =>
 				this.setState({ updatingInventoryHbStatus: false }, () => {
 					setUnsavedChangesAction(true);
@@ -308,23 +323,41 @@ export default class InventoryTab extends React.Component {
 	};
 
 	toggleHbStatusForSiteState = newHbStatus => {
-		const { loadingHbStatusForSite, hbStatusForSite: currHbStatus } = this.state;
+		const {
+			siteId,
+			loadingHbStatusForSite,
+			hbStatusForSite: currHbStatus,
+			customProps,
+			user
+		} = this.state;
+
+		const dataForAuditLogs = {
+			appName: customProps.appName,
+			siteDomain: user.sites[siteId].domain
+		};
 
 		if (loadingHbStatusForSite || newHbStatus === currHbStatus) return false;
 
-		const { siteId, setUnsavedChangesAction } = this.props;
+		const { setUnsavedChangesAction } = this.props;
 		this.setState({ loadingHbStatusForSite: true });
-		return toggleHbStatusForSite(siteId).then(({ headerBidding: hbStatusForSite }) =>
-			this.setState({ hbStatusForSite, loadingHbStatusForSite: false }, () =>
-				setUnsavedChangesAction(true)
-			)
+		return toggleHbStatusForSite(siteId, dataForAuditLogs).then(
+			({ headerBidding: hbStatusForSite }) =>
+				this.setState({ hbStatusForSite, loadingHbStatusForSite: false }, () =>
+					setUnsavedChangesAction(true)
+				)
 		);
 	};
 
 	toggleBulkEnableRefresh = isEnabled => {
-		const { siteId, showNotification } = this.props;
+		const { siteId, showNotification, customProps, user } = this.props;
+
+		const dataForAuditLogs = {
+			appName: customProps.appName,
+			siteDomain: user.sites[siteId].domain
+		};
+
 		return axios
-			.put(`/headerBidding/updateRefresh/${siteId}`, { refreshStatus: isEnabled })
+			.put(`/headerBidding/updateRefresh/${siteId}`, { refreshStatus: isEnabled, dataForAuditLogs })
 			.then(() =>
 				showNotification({
 					mode: 'success',
@@ -402,7 +435,9 @@ export default class InventoryTab extends React.Component {
 					<div className={`inventory-wrap${hbStatusForSite === false ? ' disabled' : ' active'}`}>
 						{!!selectedInventories.length && (
 							<div className="updt-inv-hb-status u-margin-b4">
-								<span className="selected-inv-count u-margin-r3">{`${selectedInventories.length} selected`}</span>
+								<span className="selected-inv-count u-margin-r3">{`${
+									selectedInventories.length
+								} selected`}</span>
 								<CustomButton
 									disabled={updatingInventoryHbStatus}
 									variant="secondary"

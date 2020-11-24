@@ -69,8 +69,13 @@ class PrebidSettingsTab extends React.Component {
 
 		if (!confirmed) return;
 
-		const { siteId, showNotification, setUnsavedChangesAction } = this.props;
+		const { siteId, showNotification, setUnsavedChangesAction, customProps, user } = this.props;
 		const { timeOut, refreshTimeOut } = this.state;
+
+		const dataForAuditLogs = {
+			appName: customProps.appName,
+			siteDomain: user.sites[siteId].domain
+		};
 
 		const isValidInitialTimeout =
 			!Number.isNaN(timeOut) &&
@@ -86,7 +91,7 @@ class PrebidSettingsTab extends React.Component {
 			const newPrebidSettings = { timeOut, refreshTimeOut };
 
 			this.setState({ isSavingSettings: true });
-			updatePrebidSettings(siteId, newPrebidSettings)
+			updatePrebidSettings(siteId, newPrebidSettings, dataForAuditLogs)
 				.then(() => {
 					this.setState({ isSavingSettings: false }, () => {
 						setUnsavedChangesAction(true);

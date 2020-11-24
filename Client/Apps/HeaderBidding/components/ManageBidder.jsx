@@ -12,10 +12,17 @@ export default class ManageBidder extends React.Component {
 			updateBidderAction,
 			bidderConfig: fieldsConfig,
 			openView,
-			showNotification
+			showNotification,
+			customProps,
+			user
 		} = this.props;
 
-		updateBidderAction(siteId, { key: fieldsConfig.key, ...bidderConfig }, params)
+		const dataForAuditLogs = {
+			appName: customProps.appName,
+			siteDomain: user.sites[siteId].domain
+		};
+
+		updateBidderAction(siteId, { key: fieldsConfig.key, ...bidderConfig }, params, dataForAuditLogs)
 			.then(() => {
 				openView('biddersList');
 				showNotification({
@@ -36,11 +43,23 @@ export default class ManageBidder extends React.Component {
 	};
 
 	onBidderDelete = bidderKey => {
-		const { siteId, deleteBidderAction, openView, showNotification } = this.props;
+		const {
+			siteId,
+			deleteBidderAction,
+			openView,
+			showNotification,
+			customProps,
+			user
+		} = this.props;
+
+		const dataForAuditLogs = {
+			appName: customProps.appName,
+			siteDomain: user.sites[siteId].domain
+		};
 		// eslint-disable-next-line no-alert
 		const shouldContinue = window.confirm('Are you sure you want to delete the bidder?');
 		if (shouldContinue) {
-			deleteBidderAction(siteId, bidderKey)
+			deleteBidderAction(siteId, bidderKey, dataForAuditLogs)
 				.then(() => {
 					openView('biddersList');
 					showNotification({

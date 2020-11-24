@@ -795,7 +795,14 @@ class OptimizationTab extends React.Component {
 	}
 
 	handleSubmit() {
-		const { siteId, showNotification, saveHBRulesAction, setUnsavedChangesAction } = this.props;
+		const {
+			siteId,
+			showNotification,
+			saveHBRulesAction,
+			setUnsavedChangesAction,
+			customProps,
+			user
+		} = this.props;
 		const { triggers, actions, isActive, selectedRuleIndex } = this.state;
 
 		const hasInvalidData = this.validateBeforeSubmit();
@@ -803,6 +810,11 @@ class OptimizationTab extends React.Component {
 		if (hasInvalidData) {
 			return false;
 		}
+
+		const dataForAuditLogs = {
+			appName: customProps.appName,
+			siteDomain: user.sites[siteId].domain
+		};
 
 		const triggersData = triggers.reduce((data, trigger) => {
 			const { isIgnored, key, operator, value } = trigger;
@@ -854,7 +866,7 @@ class OptimizationTab extends React.Component {
 			triggers: triggersData
 		};
 
-		saveHBRulesAction(siteId, { rule, ruleIndex: selectedRuleIndex })
+		saveHBRulesAction(siteId, { rule, ruleIndex: selectedRuleIndex }, dataForAuditLogs)
 			.then(() => {
 				const notification = {
 					mode: 'success',
@@ -966,13 +978,24 @@ class OptimizationTab extends React.Component {
 	}
 
 	handleToggleStatus(index, value) {
-		const { siteId, showNotification, saveHBRulesAction, setUnsavedChangesAction } = this.props;
+		const {
+			siteId,
+			showNotification,
+			saveHBRulesAction,
+			setUnsavedChangesAction,
+			customProps,
+			user
+		} = this.props;
 
 		const rule = {
 			isActive: value
 		};
+		const dataForAuditLogs = {
+			appName: customProps.appName,
+			siteDomain: user.sites[siteId].domain
+		};
 
-		saveHBRulesAction(siteId, { rule, ruleIndex: index })
+		saveHBRulesAction(siteId, { rule, ruleIndex: index }, dataForAuditLogs)
 			.then(() => {
 				const notification = {
 					mode: 'success',

@@ -130,8 +130,12 @@ class AdList extends Component {
 	}
 
 	saveWrapper() {
-		const { masterSave, user, match } = this.props;
-		return masterSave(match.params.siteId, user.isSuperUser);
+		const { masterSave, user, match, customProps, siteId } = this.props;
+		const dataForAuditLogs = {
+			appName: customProps.appName,
+			siteDomain: user.sites[siteId].domain
+		};
+		return masterSave(match.params.siteId, dataForAuditLogs);
 	}
 
 	renderSelect = (value, label, changeHandler, array) => (

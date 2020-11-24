@@ -15,8 +15,15 @@ export default class AddBidder extends React.Component {
 			addBidderAction,
 			bidderConfig: fieldsConfig,
 			openView,
-			showNotification
+			showNotification,
+			customProps,
+			user
 		} = this.props;
+
+		const dataForAuditLogs = {
+			appName: customProps.appName,
+			siteDomain: user.sites[siteId].domain
+		};
 
 		// if bidder relation is adpushup then add our default values (bid type & revenue share)
 		if (bidderConfig.relation === 'adpushup' && fieldsConfig.bids) {
@@ -46,7 +53,7 @@ export default class AddBidder extends React.Component {
 			params = { ...params, ...getCustomParams(bidderConfig, siteId, domain) };
 		}
 
-		addBidderAction(siteId, { key: fieldsConfig.key, ...bidderConfig }, params)
+		addBidderAction(siteId, { key: fieldsConfig.key, ...bidderConfig }, params, dataForAuditLogs)
 			.then(() => {
 				openView('biddersList');
 				showNotification({

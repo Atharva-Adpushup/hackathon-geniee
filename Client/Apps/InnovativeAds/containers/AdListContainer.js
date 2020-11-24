@@ -33,8 +33,11 @@ const mapDispatchToProps = dispatch => ({
 		dispatch(archiveAd(adId, siteId, payload, isSuperUser)),
 	updateTraffic: (adId, siteId, payload, isSuperUser) =>
 		dispatch(updateTraffic(adId, siteId, payload, isSuperUser)),
-	masterSave: siteId => dispatch(masterSave(siteId)),
+	masterSave: (siteId, dataForAuditLogs) => dispatch(masterSave(siteId, dataForAuditLogs)),
 	updateAllAds: (siteId, ads) => dispatch(updateAllAds(siteId, ads))
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(AdList);
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps
+)(AdList);

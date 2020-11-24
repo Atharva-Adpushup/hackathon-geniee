@@ -51,6 +51,7 @@ export default connect(
 				params: { siteId }
 			}
 		} = ownProps;
+		const { user } = state.global;
 		const {
 			apps: {
 				headerBidding: { hasUnsavedChanges, sites }
@@ -67,7 +68,7 @@ export default connect(
 			}
 		} = state;
 		const currSiteHbData = sites && sites[siteId];
-		return { currSiteHbData, domain, hasUnsavedChanges, isSuperUser };
+		return { currSiteHbData, domain, hasUnsavedChanges, user: user.data, isSuperUser };
 	},
 	{
 		checkInventoryAction,

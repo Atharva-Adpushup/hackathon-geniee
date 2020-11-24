@@ -63,12 +63,18 @@ class HeaderBidding extends React.Component {
 			match: {
 				params: { siteId }
 			},
-			masterSaveAction
+			masterSaveAction,
+			customProps,
+			user
 		} = this.props;
 
 		this.setState({ isMasterSaving: true });
+		const dataForAuditLogs = {
+			appName: customProps.appName,
+			siteDomain: user.sites[siteId].domain
+		};
 
-		masterSaveAction(siteId)
+		masterSaveAction(siteId, dataForAuditLogs)
 			.then(() => {
 				this.setState({ isMasterSaving: false });
 			})
@@ -224,7 +230,9 @@ class HeaderBidding extends React.Component {
 			fetchHBRulesAction,
 			saveHBRulesAction,
 			hasUnsavedChanges,
-			rules
+			rules,
+			user,
+			customProps
 		} = this.props;
 
 		const activeTab = this.getActiveTab();
@@ -246,6 +254,8 @@ class HeaderBidding extends React.Component {
 				case 'bidders':
 					return (
 						<BiddersTab
+							user={user}
+							customProps={customProps}
 							siteId={siteId}
 							domain={domain}
 							bidders={bidders}
@@ -260,6 +270,8 @@ class HeaderBidding extends React.Component {
 				case 'inventory':
 					return (
 						<InventoryTab
+							user={user}
+							customProps={customProps}
 							siteId={siteId}
 							inventories={inventories}
 							updateInventoriesHbStatus={updateInventoriesHbStatus}
@@ -270,6 +282,8 @@ class HeaderBidding extends React.Component {
 				case 'prebid-settings':
 					return (
 						<PrebidSettingsTab
+							user={user}
+							customProps={customProps}
 							siteId={siteId}
 							showNotification={showNotification}
 							setUnsavedChangesAction={setUnsavedChangesAction}
@@ -279,6 +293,8 @@ class HeaderBidding extends React.Component {
 					return (
 						isSuperUser && (
 							<OptimizationTab
+								user={user}
+								customProps={customProps}
 								siteId={siteId}
 								rules={rules}
 								bidders={bidders}
@@ -295,6 +311,8 @@ class HeaderBidding extends React.Component {
 					return (
 						isSuperUser && (
 							<AmazonUAMTab
+								user={user}
+								customProps={customProps}
 								siteId={siteId}
 								showNotification={showNotification}
 								setUnsavedChangesAction={setUnsavedChangesAction}
