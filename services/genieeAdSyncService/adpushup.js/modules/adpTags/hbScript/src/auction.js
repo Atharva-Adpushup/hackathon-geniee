@@ -30,6 +30,10 @@ var auction = {
 			adpBatch.auctionStatus.amazonUam == 'done' &&
 			adpSlots.length
 		) {
+			adpSlots.forEach(function(adpSlot) {
+				adpSlot.biddingComplete = true;
+				adpSlot.renderedPostBid = false;
+			});
 			return render.init(adpSlots);
 		}
 

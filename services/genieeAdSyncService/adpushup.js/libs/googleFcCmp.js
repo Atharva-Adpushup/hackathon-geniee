@@ -1,9 +1,8 @@
 var cmpFn = function() {
 	/*
-
- Copyright The Closure Library Authors.
- SPDX-License-Identifier: Apache-2.0
-*/
+	Copyright The Closure Library Authors.
+	SPDX-License-Identifier: Apache-2.0
+	*/
 	'use strict';
 	var g = function(a) {
 			var b = 0;
@@ -524,6 +523,17 @@ var cmpFn = function() {
 	);
 };
 
+var cmpFnWrapper = function() {
+	/*calling cmpFn after a timeout so that googlefc.controlledMessagingFunction is assured to be setup before Google Funding Choices is loaded
+	https://developers.google.com/funding-choices/fc-api-docs#googlefc-controlledMessagingFunction
+	*/
+	setTimeout(function() {
+		try {
+			cmpFn.call(window);
+		} catch (error) {}
+	}, 0);
+};
+
 var renderConsentRevokeButton = function() {
 	var isMobile = window.adpushup.config.platform === 'MOBILE';
 
@@ -572,32 +582,35 @@ var renderConsentRevokeButton = function() {
 	document.body.appendChild(btn);
 };
 
-var waitForCmpLoad = function() {
+var waitForCmpLoad = function(callback) {
 	return new Promise((resolve, reject) => {
+		var consentRevokeButtonRendered = false;
+		window.googlefc = window.googlefc || {};
+		window.googlefc.callbackQueue = window.googlefc.callbackQueue || [];
+
 		googlefc.callbackQueue.push({
-			CONSENT_DATA_READY: function() {
-				return resolve();
+			CONSENT_DATA_READY: function(consentData) {
+				console.log('====consent ready', +new Date());
+				callback.call(window.adpushup || window, consentData);
 			}
 		});
 		googlefc.controlledMessagingFunction = message => {
-			//setup the message
+			//setup the consent message popup
 			message.proceed();
-			setTimeout(() => {
-				renderConsentRevokeButton();
-			}, 0);
+			if (!consentRevokeButtonRendered) {
+				consentRevokeButtonRendered = true;
+				setTimeout(() => {
+					renderConsentRevokeButton();
+				}, 0);
+			}
+			return resolve();
 		};
 	});
 };
 
 module.exports = {
-	loadAndInitiateCmp: function() {
-		window.googlefc = window.googlefc || {};
-		window.googlefc.callbackQueue = window.googlefc.callbackQueue || [];
-		try {
-			cmpFn.call(window);
-		} catch (e) {
-			window.adpushup && window.adpushup.err && window.adpushup.err.push(e);
-		}
-		return waitForCmpLoad();
+	loadAndInitiateCmp: function(consentAvailableCallback) {
+		cmpFnWrapper();
+		return waitForCmpLoad(consentAvailableCallback);
 	}
 };

@@ -19,7 +19,17 @@ var config = {
 		S2S_SYNC_ENDPOINT: `${globalConfig.prebidServer.host}prebidserver/cookie_sync`,
 		S2S_ACCOUNT_ID: '1001'
 	},
-	VIDEO_WAIT_LIMIT_DISABLED: __VIDEO_WAIT_LIMIT_DISABLED__
+	VIDEO_WAIT_LIMIT_DISABLED: __VIDEO_WAIT_LIMIT_DISABLED__,
+	POST_BID_SUPPORTED_BIDDERS: [
+		'nobid',
+		'pubmatic',
+		'rubicon',
+		'eplanning',
+		'ix',
+		'sovrn',
+		'appnexus',
+		'conversant'
+	]
 };
 
 module.exports = config;

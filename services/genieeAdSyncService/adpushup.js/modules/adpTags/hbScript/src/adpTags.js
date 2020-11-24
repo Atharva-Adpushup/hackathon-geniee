@@ -7,6 +7,7 @@ var utils = require('./utils');
 var responsiveAds = require('./responsiveAds');
 var hb = require('./hb');
 var gpt = require('./gpt');
+var render = require('./render');
 var globalSizes = config.SIZE_MAPPING.sizes || [];
 var hbRules = require('./hbRules');
 
@@ -225,7 +226,7 @@ var adpTags = {
 					this.queSlotForBidding(slot);
 				}
 				slot.hasRendered = true;
-				gpt.renderSlots(window.googletag, [slot]);
+				render.init([slot]);
 			}
 		},
 
@@ -245,6 +246,33 @@ var adpTags = {
 			}
 
 			return computedSizes;
+		},
+		reInitAfterPostBid: function(w) {
+			// adpSlots in an array
+			var adpSlots = (w.adpTags && Object.values(w.adpTags.adpSlots)) || [];
+			var reInitializableSlots = adpSlots.filter(slot => slot.renderedPostBid);
+
+			if (!adpushup.config.renderPostBid && reInitializableSlots.length) {
+				reInitializableSlots.forEach(slot => {
+					var dataSet = document.getElementById(slot.containerId).parentElement.dataset;
+
+					// clear refresh timeout
+					if (dataSet.timeout) {
+						clearInterval(dataSet.timeout);
+						delete dataSet.timeout;
+					}
+
+					//reset renderTime
+					if (dataSet.renderTime) dataSet.renderTime = +new Date();
+
+					//reset refreshTime
+					if (dataSet.refreshTime) dataSet.refreshTime = +new Date();
+
+					//reset the slot feedback flags and queue the slot for auction
+					this.resetSlotFeedback(slot);
+					this.queSlotForBidding(slot);
+				});
+			}
 		}
 	},
 	init: function(w) {

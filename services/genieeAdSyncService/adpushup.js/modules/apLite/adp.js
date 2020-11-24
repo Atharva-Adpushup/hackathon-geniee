@@ -10,7 +10,7 @@ var $ = require('../../libs/jquery'),
 	utils = require('../../libs/utils'),
 	refreshAdSlot = require('../../src/refreshAdSlot'),
 	hbRules = require('../adpTags/hbScript/src/hbRules'),
-	cssescape = require("css.escape")
+	cssescape = require('css.escape'),
 	apLite = {
 		module: {
 			config: apLiteConfig,
@@ -50,7 +50,6 @@ var $ = require('../../libs/jquery'),
 				this.slotInterval = null;
 			},
 			resetSlotFeedback: function(slot) {
-				slot.hasRendered = false;
 				slot.biddingComplete = false;
 				slot.feedbackSent = false;
 				slot.auctionFeedbackSent = false;
@@ -147,6 +146,33 @@ var $ = require('../../libs/jquery'),
 
 				return adpSlot;
 			},
+			reInitAfterPostBid: function(w) {
+				// adpSlots in an array
+				var adpSlots = (w.apLite && Object.values(w.apLite.adpSlots)) || [];
+				var reInitializableSlots = adpSlots.filter(slot => slot.renderedPostBid);
+
+				if (!adpushup.config.renderPostBid && reInitializableSlots.length) {
+					reInitializableSlots.forEach(slot => {
+						var dataSet = document.getElementById(slot.containerId).dataset;
+
+						// clear refresh timeout
+						if (dataSet.timeout) {
+							clearInterval(dataSet.timeout);
+							delete dataSet.timeout;
+						}
+
+						//reset renderTime
+						if (dataSet.renderTime) dataSet.renderTime = +new Date();
+
+						//reset refreshTime
+						if (dataSet.refreshTime) dataSet.refreshTime = +new Date();
+
+						//reset the slot feedback flags and queue the slot for auction
+						this.resetSlotFeedback(slot);
+						this.queSlotForBidding(slot);
+					});
+				}
+			},
 			setFeedbackData: function(adpSlot) {
 				var feedbackData = {
 					mode: commonConsts.MODE.ADPUSHUP,
@@ -180,11 +206,11 @@ var $ = require('../../libs/jquery'),
 							gptSlots.forEach(
 								function(gptSlot) {
 									var allSizes = gptSlot.getSizes().map(function(size) {
-										/* layout of size object is { l: 300, j: 100 } */
-										var width = size.l,
-											height = size.j;
-										return [width, height];
-									}),
+											/* layout of size object is { l: 300, j: 100 } */
+											var width = size.l,
+												height = size.j;
+											return [width, height];
+										}),
 										gptSlotElementId = gptSlot.getSlotElementId(),
 										gptAdUnitPath = gptSlot.getAdUnitPath(),
 										gptAdUnitPathArr = gptAdUnitPath.split('/'),
@@ -197,86 +223,86 @@ var $ = require('../../libs/jquery'),
 										sectionId = apLiteAdUnit && apLiteAdUnit.sectionId,
 										container;
 
-										try {
-											container = $(`#${cssescape(gptSlotElementId)}`);
-										} catch (error) {
-											container = [];
-											window.adpushup.err.push(error);
-										}
-
+									try {
+										container = $(`#${cssescape(gptSlotElementId)}`);
+									} catch (error) {
+										container = [];
+										window.adpushup.err.push(error);
+									}
 
 									// Create adp slot only if defined GPT slot has the associated container in the DOM and gpt ad unit has a valid section id
 									if (container.length && dfpAdUnitName && sectionId) {
-											var dfpAdunitCode = apLiteAdUnit.dfpAdunitCode,
-												slotHbStatus = apLiteAdUnit.headerBidding,
-												refreshSlot = apLiteAdUnit.refreshSlot,
-												refreshInterval = apLiteAdUnit.refreshInterval,
-												// formats = apLiteAdUnit.formats,
-												/**
-												 * Temporarily Enabled "display" and "video" formats for apLite
-												 * until we enable all formats in all ad docs.
-												 * Hb Rules can still override formats list.
-												 */
-												formats = window.adpushup.config.isAutoAddMultiformatDisabled ? apLiteAdUnit.formats : ['display', 'video'],
-												sizeMapping = apLiteAdUnit.sizeMapping || [],
-												computedSizes = hbUtils.getSizesComputedUsingSizeMappingOrAdUnitSize(
-													apLiteAdUnit,
-													false,
-													allSizes
-												);
-											allSizes =
-												Array.isArray(computedSizes) && computedSizes.length
-													? computedSizes
-													: allSizes;
-											adpSlot = this.createAdpSlot(
-												gptSlotElementId,
-												dfpAdUnitName,
-												gptSlot,
-												allSizes,
-												sectionId,
-												{
-													dfpAdunit: dfpAdUnitName,
-													dfpAdunitCode,
-													headerBidding: window.adpushup.services.HB_ACTIVE && slotHbStatus,
-													network: commonConsts.NETWORKS.ADPTAGS,
-													formats,
-													enableLazyLoading: false,
-													sectionName: dfpAdUnitName,
-													refreshSlot,
-													refreshInterval,
-													services: [commonConsts.SERVICES.AP_LITE],
-													fluid: false,
-													sizeMapping,
-													adId: gptSlotElementId
-												}
+										var dfpAdunitCode = apLiteAdUnit.dfpAdunitCode,
+											slotHbStatus = apLiteAdUnit.headerBidding,
+											refreshSlot = apLiteAdUnit.refreshSlot,
+											refreshInterval = apLiteAdUnit.refreshInterval,
+											// formats = apLiteAdUnit.formats,
+											/**
+											 * Temporarily Enabled "display" and "video" formats for apLite
+											 * until we enable all formats in all ad docs.
+											 * Hb Rules can still override formats list.
+											 */
+											formats = window.adpushup.config.isAutoAddMultiformatDisabled
+												? apLiteAdUnit.formats
+												: ['display', 'video'],
+											sizeMapping = apLiteAdUnit.sizeMapping || [],
+											computedSizes = hbUtils.getSizesComputedUsingSizeMappingOrAdUnitSize(
+												apLiteAdUnit,
+												false,
+												allSizes
 											);
+										allSizes =
+											Array.isArray(computedSizes) && computedSizes.length
+												? computedSizes
+												: allSizes;
+										adpSlot = this.createAdpSlot(
+											gptSlotElementId,
+											dfpAdUnitName,
+											gptSlot,
+											allSizes,
+											sectionId,
+											{
+												dfpAdunit: dfpAdUnitName,
+												dfpAdunitCode,
+												headerBidding: window.adpushup.services.HB_ACTIVE && slotHbStatus,
+												network: commonConsts.NETWORKS.ADPTAGS,
+												formats,
+												enableLazyLoading: false,
+												sectionName: dfpAdUnitName,
+												refreshSlot,
+												refreshInterval,
+												services: [commonConsts.SERVICES.AP_LITE],
+												fluid: false,
+												sizeMapping,
+												adId: gptSlotElementId
+											}
+										);
 
-											this.adpSlots[gptSlotElementId] = adpSlot;
+										this.adpSlots[gptSlotElementId] = adpSlot;
 
-											var feedbackData = this.setFeedbackData(adpSlot);
-											utils.sendFeedback(feedbackData);
+										var feedbackData = this.setFeedbackData(adpSlot);
+										utils.sendFeedback(feedbackData);
 
-											this.queSlotForBidding(adpSlot);
+										this.queSlotForBidding(adpSlot);
 
-											var currentTime = new Date().getTime();
-											container.attr('data-render-time', currentTime);
+										var currentTime = new Date().getTime();
+										container.attr('data-render-time', currentTime);
 
-											refreshSlot &&
-												refreshAdSlot.refreshSlot(container, {
-													id: gptSlotElementId,
-													slotId: gptSlotElementId,
-													dfpAdUnitName,
-													network: 'adpTags',
-													networkData: {
-														refreshInterval,
-														headerBidding: slotHbStatus
-													}
-												});
-										} else {
-											//collect rest of the units (not provided to us) separately
-											nonApSlots.push(gptSlot);
-										}
-
+										refreshSlot &&
+											refreshAdSlot.refreshSlot(container, {
+												id: gptSlotElementId,
+												slotId: gptSlotElementId,
+												dfpAdUnitName,
+												network: 'adpTags',
+												networkData: {
+													refreshInterval,
+													headerBidding: slotHbStatus
+												}
+											});
+									} else {
+										//collect rest of the units (not provided to us) separately
+										nonApSlots.push(gptSlot);
+									}
 								}.bind(this)
 							);
 						}
@@ -287,7 +313,7 @@ var $ = require('../../libs/jquery'),
 
 						return;
 					} catch (e) {
-						console.error ? console.error(e) : console.log(e);
+						console && console.error ? console.error(e) : console && console.log(e);
 					}
 				} else {
 					return false;

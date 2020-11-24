@@ -351,45 +351,32 @@ function initAdpQue() {
 
 // we need to check CMP availabilityt for European countries only
 function isCmpAplicable() {
-	return (
+	return Promise.resolve(
 		!commonConsts.CMP_CHECK_EXCLUDED_SITES.includes(adp.config.siteId) &&
-		!adp.config.cmpAvailable &&
-		commonConsts.EU_COUNTRY_LIST.includes(adp.config.country)
+			!adp.config.cmpAvailable &&
+			commonConsts.EU_COUNTRY_LIST.includes(adp.config.country)
 	);
 }
 
-function checkCmpAvailability() {
-	return new Promise((resolve, reject) => {
-		const isCmpRequired = isCmpAplicable();
-		if (isCmpRequired) {
-			return utils
-				.findCmp(commonConsts.DEFAULT_FIND_CMP_TIMEOUT)
-				.then(() => {
-					return resolve({
-						cmpRequired: 0
-					});
-				})
-				.catch(() => {
-					return resolve({
-						cmpRequired: 1
-					});
-				});
-		}
-		return resolve(() => ({
-			cmpRequired: 0
-		}));
-	});
-}
-
 function loadGoogleFundingChoicesCmp() {
-	return googlFcCmp.loadAndInitiateCmp();
+	return googlFcCmp.loadAndInitiateCmp(() => {
+		if (adp.config.renderPostBid) {
+			adp.config.renderPostBid = false;
+			setTimeout(() => {
+				adp.config.apLiteActive
+					? window.apLite.reInitAfterPostBid(window)
+					: adp.adpTags.reInitAfterPostBid(window);
+			}, 10);
+		}
+	});
 }
 
 function main() {
 	utils.logPerformanceEvent(commonConsts.EVENT_LOGGER.EVENTS.MAIN_FN_CALL_DELAY);
 
 	// if traffic is from lighthouse and site has to be paused for lighthouse
-	if (!utils.getQueryParams().stopLightHouseHack && utils.checkForLighthouse(adp.config.siteId)) return; 
+	if (!utils.getQueryParams().stopLightHouseHack && utils.checkForLighthouse(adp.config.siteId))
+		return;
 
 	// Set user syncing cookies
 	syncUser();
@@ -452,13 +439,17 @@ function main() {
 	}
 
 	/**
-	 * For European countries we need to make sure that cmp is there on the page for user consent management, before starting the ad rendering.
-	 * So, we look for the CMP on the page, in case cmp is found we initiate the ad rendering otherwise we load googleFundingChoices on the page for the user to provide consent. Once the cmp is loaded we start the ad rendering.
+	 * For European countries we need to make sure that cmp is there on the page for user consent management, before sending an ad request to Google.
+	 * So, we load googleFundingChoices on the page for the user to provide consent, but initiate our HB auction alongside, in case cmp is loaded and consent is available before auction end, we send ad request to GAM else we simply render the winning bid from HB (postBidding)
 	 */
-	checkCmpAvailability()
-		.then(({ cmpRequired }) => {
-			utils.log('cmpRequired', cmpRequired);
-			return cmpRequired ? loadGoogleFundingChoicesCmp() : '';
+	isCmpAplicable()
+		.then(cmpApplicable => {
+			utils.log('cmpApplicable', cmpApplicable);
+			if (cmpApplicable) {
+				adp.config.renderPostBid = true;
+				return loadGoogleFundingChoicesCmp();
+			}
+			return '';
 		})
 		.then(() => {
 			utils.log('CMP loaded');
