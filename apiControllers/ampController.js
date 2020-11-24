@@ -113,7 +113,6 @@ router
 	.post('/masterSave', (req, res) => {
 		const { adsToUpdate, ads = [], siteId } = req.body;
 
-		const updatedAds = adsToUpdate.map(adId => updateAmpTags(adId, ads));
 		return verifyOwner(siteId, req.user.email)
 			.then(() => getAmpAds(siteId))
 			.then(ads => ads.map(val => val.doc))
@@ -126,6 +125,7 @@ router
 					prevConfig: amdAds,
 					currentConfig: req.body.ads
 				});
+				const updatedAds = adsToUpdate.map(adId => updateAmpTags(adId, ads));
 				return Promise.all(updatedAds)
 					.then(modifiedAds => {
 						const allAmpAds = ads.map(obj => modifiedAds.find(o => o.id === obj.id) || obj);
