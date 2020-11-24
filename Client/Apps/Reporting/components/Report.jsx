@@ -893,7 +893,7 @@ class Report extends Component {
 			selectedInterval,
 			savedReports = []
 		} = this.state;
-		const { showNotification } = this.props;
+		const { showNotification, userSites } = this.props;
 
 		const existingReportWithName = savedReports.find(report => report.name === reportName);
 		if (existingReportWithName) {
@@ -918,12 +918,21 @@ class Report extends Component {
 			}
 		}
 
+		const filters = Object.assign({}, selectedFilters);
+		if (!filters || !filters.siteid || !Object.keys(filters.siteid).length) {
+			// If there are no site id's, send all site ID's of the user so that the scheduler has a context of which sites to fetch reports for.
+			filters.siteid = Object.keys(userSites).reduce(
+				(sites, siteid) => ({ ...sites, [siteid]: true }),
+				{}
+			);
+		}
+
 		const reportConfig = {
 			name: reportName,
 			startDate,
 			endDate,
 			selectedDimension,
-			selectedFilters,
+			selectedFilters: filters,
 			selectedInterval,
 			scheduleOptions
 		};
