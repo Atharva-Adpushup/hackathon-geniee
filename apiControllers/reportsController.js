@@ -672,7 +672,7 @@ router
  */
 const modifyQueryIfPnp = (query) => {
 	return new Promise((resolve, reject) => {
-		const regex = new RegExp('^[0-9]+(,[0-9]+)*$');
+		const regex = new RegExp('^[0-9]*(,[0-9]+)*$');
 		if (!regex.test(query.siteid)) {
 			reject(new Error('Invalid parameter in query.siteid'));
 			return;
@@ -699,10 +699,5 @@ const modifyQueryIfPnp = (query) => {
 				reject(new Error('Error while accessing data'));
 			});
 	});
-}	
-
-
-
-
-
+}
 module.exports = router;
