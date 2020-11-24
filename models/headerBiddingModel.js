@@ -66,6 +66,10 @@ const HeaderBidding = model.extend(function() {
 		hbcf[bidderKey] = bidderConfig;
 		return Promise.resolve(this);
 	};
+	this.getBidder = function(bidderKey) {
+		const hbcf = this.get('hbcf');
+		return Promise.resolve({...hbcf[bidderKey]});
+	};
 	this.deleteBidder = function(bidderKey) {
 		const hbcf = this.get('hbcf');
 		if (!hbcf[bidderKey]) {
@@ -367,6 +371,21 @@ function apiModule() {
 
 					throw err;
 				}),
+		getVideoNativeForHB: siteId =>
+			Promise.all([
+				API.getInnovativeAdInventoriesForHB(siteId),
+				API.getLayoutInventoriesForHB(siteId),
+				API.getApTagInventoriesForHB(siteId)
+			]).then(([layoutInventories, innovativeAdsInventories, apTagInventories]) => {
+					const inventories = {
+						layoutEditor: [...layoutInventories],
+						apTag: [...apTagInventories],
+						innovativeAds: [...innovativeAdsInventories]
+					};
+
+					return inventories;
+				}
+			),
 		getInventoriesForHB: siteId =>
 			Promise.all([
 				API.getLayoutInventoriesForHB(siteId),
