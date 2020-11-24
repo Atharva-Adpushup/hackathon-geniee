@@ -17,7 +17,8 @@ const {
 	fetchAds,
 	createNewDocAndDoProcessing,
 	masterSave,
-	modifyAd
+	modifyAd,
+	sendDataToAuditLogService
 } = require('../helpers/routeHelpers');
 
 const router = express.Router();
@@ -99,7 +100,23 @@ const fn = {
 	adUpdateProcessing: (req, res, key, processing) =>
 		appBucket
 			.getDoc(`${key}${req.body.siteId}`)
-			.then(docWithCas => processing(docWithCas))
+			.then(docWithCas => {
+				const { siteId, dataForAuditLogs } = req.body;
+				const { email, originalEmail } = req.user;
+				// log config changes
+				const { siteDomain, appName, type = 'site' } = dataForAuditLogs;
+				sendDataToAuditLogService({
+					siteId,
+					siteDomain,
+					appName,
+					type,
+					impersonateId: email,
+					userId: originalEmail,
+					prevConfig: docWithCas.value.ads,
+					currentConfig: req.body.ads
+				});
+				return processing(docWithCas);
+			})
 			.then(() => emitEventAndSendResponse(req.body.siteId, res))
 			.catch(err => {
 				let error = err;

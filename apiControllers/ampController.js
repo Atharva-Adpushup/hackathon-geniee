@@ -14,7 +14,9 @@ const {
 	createNewAmpDocAndDoProcessing,
 	updateAmpTags,
 	queuePublishingWrapper,
-	storedRequestWrapper
+	storedRequestWrapper,
+	getAmpAds,
+	sendDataToAuditLogService
 } = require('../helpers/routeHelpers');
 
 const router = express.Router();
@@ -26,7 +28,7 @@ const fn = {
 	processing: (data, payload) => {
 		const cas = data.cas || false;
 		const value = data.value || data;
-		const id = payload.id;
+		const { id } = payload;
 
 		const name = generateSectionName({
 			width: payload.ad.width,
@@ -112,18 +114,32 @@ router
 		const { adsToUpdate, ads = [], siteId } = req.body;
 
 		const updatedAds = adsToUpdate.map(adId => updateAmpTags(adId, ads));
-		return Promise.all(updatedAds)
-			.then(modifiedAds => {
-				const allAmpAds = ads.map(obj => modifiedAds.find(o => o.id === obj.id) || obj);
+		return verifyOwner(siteId, req.user.email)
+			.then(() => getAmpAds(siteId))
+			.then(ads => ads.map(val => val.doc))
+			.then(amdAds => {
+				const { email, originalEmail } = req.user;
+				sendDataToAuditLogService({
+					siteId: req.body.siteId,
+					impersonateId: email,
+					userId: originalEmail,
+					prevConfig: amdAds,
+					currentConfig: req.body.ads
+				});
+				return Promise.all(updatedAds)
+					.then(modifiedAds => {
+						const allAmpAds = ads.map(obj => modifiedAds.find(o => o.id === obj.id) || obj);
 
-				return queuePublishingWrapper(siteId, allAmpAds);
-			})
-			.then(ads => {
-				const storeRequestArr = ads.map(doc => storedRequestWrapper(doc));
+						return queuePublishingWrapper(siteId, allAmpAds);
+					})
+					.then(ads => {
+						const storeRequestArr = ads.map(doc => storedRequestWrapper(doc));
 
-				return Promise.all(storeRequestArr);
+						return Promise.all(storeRequestArr);
+					})
+					.then(() => sendSuccessResponse({ msg: 'success' }, res))
+					.catch(err => console.log(err));
 			})
-			.then(() => sendSuccessResponse({ msg: 'success' }, res))
 			.catch(err => console.log(err));
 	})
 	.post('/modifyAd', (req, res) => {
