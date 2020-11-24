@@ -121,7 +121,7 @@ const ROUTES = {
 		},
 		{
 			exact: true,
-			customProps: { activeTab: APT_NAV_ITEMS_INDEXES.MANAGE_ADS },
+			customProps: { activeTab: APT_NAV_ITEMS_INDEXES.MANAGE_ADS, appName: 'Ap Tag' },
 			name: 'Manage',
 			path: '/sites/:siteId/apps/ap-tag/manage',
 			component: ApTag
@@ -137,7 +137,7 @@ const ROUTES = {
 		},
 		{
 			exact: true,
-			customProps: { activeTab: APT_NAV_ITEMS_INDEXES.MANAGE_ADS },
+			customProps: { activeTab: APT_NAV_ITEMS_INDEXES.MANAGE_ADS, appName: 'Amp' },
 			name: 'Manage',
 			path: '/sites/:siteId/apps/amp/manage',
 			component: Amp
@@ -146,14 +146,14 @@ const ROUTES = {
 		// Innovative Ads
 		{
 			exact: true,
-			customProps: { activeTab: IA_NAV_ITEMS_INDEXES.CREATE_ADS },
+			customProps: { activeTab: IA_NAV_ITEMS_INDEXES.CREATE_ADS, appName: 'Innovative Ads' },
 			name: 'Innovative Ads',
 			path: '/sites/:siteId/apps/innovative-ads',
 			component: InnovativeAds
 		},
 		{
 			exact: true,
-			customProps: { activeTab: IA_NAV_ITEMS_INDEXES.MANAGE_ADS },
+			customProps: { activeTab: IA_NAV_ITEMS_INDEXES.MANAGE_ADS, appName: 'Innovative Ads' },
 			name: 'Manage',
 			path: '/sites/:siteId/apps/innovative-ads/manage',
 			component: InnovativeAds
@@ -161,42 +161,42 @@ const ROUTES = {
 		// Manage Header Bidding
 		{
 			exact: true,
-			customProps: { activeTab: HB_NAV_ITEMS_INDEXES.TAB_1 },
+			customProps: { activeTab: HB_NAV_ITEMS_INDEXES.TAB_1, appName: 'Header Bidding Bidders' },
 			name: 'Header Bidding',
 			path: '/sites/:siteId/apps/header-bidding',
 			component: HeaderBidding
 		},
 		{
 			exact: true,
-			customProps: { activeTab: HB_NAV_ITEMS_INDEXES.TAB_2 },
+			customProps: { activeTab: HB_NAV_ITEMS_INDEXES.TAB_2, appName: 'Header Bidding Bidders' },
 			name: 'Bidders',
 			path: `/sites/:siteId/apps/header-bidding/${HB_NAV_ITEMS_INDEXES.TAB_2}`,
 			component: HeaderBidding
 		},
 		{
 			exact: true,
-			customProps: { activeTab: HB_NAV_ITEMS_INDEXES.TAB_3 },
+			customProps: { activeTab: HB_NAV_ITEMS_INDEXES.TAB_3, appName: 'Inventory' },
 			name: 'Inventory',
 			path: `/sites/:siteId/apps/header-bidding/${HB_NAV_ITEMS_INDEXES.TAB_3}`,
 			component: HeaderBidding
 		},
 		{
 			exact: true,
-			customProps: { activeTab: HB_NAV_ITEMS_INDEXES.TAB_4 },
+			customProps: { activeTab: HB_NAV_ITEMS_INDEXES.TAB_4, appName: 'Prebid Settings' },
 			name: 'Prebid Settings',
 			path: `/sites/:siteId/apps/header-bidding/${HB_NAV_ITEMS_INDEXES.TAB_4}`,
 			component: HeaderBidding
 		},
 		{
 			exact: true,
-			customProps: { activeTab: HB_NAV_ITEMS_INDEXES.TAB_5 },
+			customProps: { activeTab: HB_NAV_ITEMS_INDEXES.TAB_5, appName: 'Optimization' },
 			name: 'Optimization',
 			path: `/sites/:siteId/apps/header-bidding/${HB_NAV_ITEMS_INDEXES.TAB_5}`,
 			component: HeaderBidding
 		},
 		{
 			exact: true,
-			customProps: { activeTab: HB_NAV_ITEMS_INDEXES.TAB_6 },
+			customProps: { activeTab: HB_NAV_ITEMS_INDEXES.TAB_6, appName: 'Amazon UAM' },
 			name: 'Amazon UAM',
 			path: `/sites/:siteId/apps/header-bidding/${HB_NAV_ITEMS_INDEXES.TAB_6}`,
 			component: HeaderBidding
