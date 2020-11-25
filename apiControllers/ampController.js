@@ -111,19 +111,23 @@ router
 			.catch(err => errorHandler(err, res));
 	})
 	.post('/masterSave', (req, res) => {
-		const { adsToUpdate, ads = [], siteId } = req.body;
+		const { adsToUpdate, ads = [], siteId, dataForAuditLogs } = req.body;
 
 		return verifyOwner(siteId, req.user.email)
 			.then(() => getAmpAds(siteId))
 			.then(ads => ads.map(val => val.doc))
 			.then(amdAds => {
 				const { email, originalEmail } = req.user;
+				const { siteDomain, appName, type = 'app' } = dataForAuditLogs;
 				sendDataToAuditLogService({
-					siteId: req.body.siteId,
+					siteId,
+					siteDomain,
+					appName,
+					type,
 					impersonateId: email,
 					userId: originalEmail,
 					prevConfig: amdAds,
-					currentConfig: req.body.ads
+					currentConfig: ads
 				});
 				const updatedAds = adsToUpdate.map(adId => updateAmpTags(adId, ads));
 				return Promise.all(updatedAds)

@@ -150,7 +150,7 @@ router
 						...biddersFromNetworkConfig[key].params
 					};
 					// log config changes
-					const { siteDomain, appName, type = 'site' } = dataForAuditLogs;
+					const { siteDomain, appName, type = 'app' } = dataForAuditLogs;
 					sendDataToAuditLogService({
 						siteId,
 						siteDomain,
@@ -283,7 +283,7 @@ router
 				.then(() => headerBiddingModel.getAllBiddersFromNetworkConfig())
 				.then(biddersFromNetworkConfig => {
 					// log config changes
-					const { siteDomain, appName, type = 'site' } = dataForAuditLogs;
+					const { siteDomain, appName, type = 'app' } = dataForAuditLogs;
 					sendDataToAuditLogService({
 						siteId,
 						siteDomain,
@@ -342,7 +342,7 @@ router
 				.then(hbConfig => hbConfig.save())
 				.then(() => {
 					// log config changes
-					const { siteDomain, appName, type = 'site' } = dataForAuditLogs;
+					const { siteDomain, appName, type = 'app' } = dataForAuditLogs;
 					sendDataToAuditLogService({
 						siteId,
 						siteDomain,
@@ -419,7 +419,7 @@ router
 				const { siteId } = req.params;
 				const { email, originalEmail } = req.user;
 				// log config changes
-				const { siteDomain, appName, type = 'site' } = dataForAuditLogs;
+				const { siteDomain, appName, type = 'app' } = dataForAuditLogs;
 				// we don't have previous config and its complex to retrieve it from backend
 				// this code just sets a flag and for maintaing logs
 				// we are using toggled value of current value to save diff.
@@ -500,7 +500,7 @@ router
 			.then(hbConfig => {
 				const prevConfig = hbConfig.get('prebidConfig');
 				// log config changes
-				const { siteDomain, appName, type = 'site' } = dataForAuditLogs;
+				const { siteDomain, appName, type = 'app' } = dataForAuditLogs;
 				sendDataToAuditLogService({
 					siteId,
 					siteDomain,
@@ -564,7 +564,7 @@ router
 			.then(hbConfig => {
 				const prevConfig = hbConfig.get('amazonUAMConfig');
 				// log config changes
-				const { siteDomain, appName, type = 'site' } = dataForAuditLogs;
+				const { siteDomain, appName, type = 'app' } = dataForAuditLogs;
 				sendDataToAuditLogService({
 					siteId,
 					siteDomain,
@@ -607,7 +607,7 @@ router
 			.then(() => headerBiddingModel.getHbStatusForSite(siteId))
 			.then(prevHBStatus => {
 				// log config changes
-				const { siteDomain, appName, type = 'site' } = dataForAuditLogs;
+				const { siteDomain, appName, type = 'app' } = dataForAuditLogs;
 				sendDataToAuditLogService({
 					siteId,
 					siteDomain,
@@ -865,7 +865,7 @@ router
 			.then(() => headerBiddingModel.getVideoNativeForHB(siteId))
 			.then(newInventories => {
 				// log config changes
-				const { siteDomain, appName, type = 'site' } = dataForAuditLogs;
+				const { siteDomain, appName, type = 'app' } = dataForAuditLogs;
 				sendDataToAuditLogService({
 					siteId,
 					siteDomain,
@@ -899,7 +899,7 @@ router
 			.then(() => headerBiddingModel.getInventoriesForHB(siteId))
 			.then(newInventories => {
 				// log config changes
-				const { siteDomain, appName, type = 'site' } = dataForAuditLogs;
+				const { siteDomain, appName, type = 'app' } = dataForAuditLogs;
 				sendDataToAuditLogService({
 					siteId,
 					siteDomain,
@@ -1060,7 +1060,7 @@ router
 				const newRules = hbConfig.get('rules') || [];
 
 				// log config changes
-				const { siteDomain, appName, type = 'site' } = dataForAuditLogs;
+				const { siteDomain, appName, type = 'app' } = dataForAuditLogs;
 				sendDataToAuditLogService({
 					siteId,
 					siteDomain,
@@ -1115,7 +1115,7 @@ router
 				const newRules = hbConfig.get('rules') || [];
 
 				// log config changes
-				const { siteDomain, appName, type = 'site' } = dataForAuditLogs;
+				const { siteDomain, appName, type = 'app' } = dataForAuditLogs;
 				sendDataToAuditLogService({
 					siteId,
 					siteDomain,

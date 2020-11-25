@@ -104,7 +104,7 @@ const fn = {
 				const { siteId, dataForAuditLogs } = req.body;
 				const { email, originalEmail } = req.user;
 				// log config changes
-				const { siteDomain, appName, type = 'site' } = dataForAuditLogs;
+				const { siteDomain, appName, type = 'app' } = dataForAuditLogs;
 				sendDataToAuditLogService({
 					siteId,
 					siteDomain,
