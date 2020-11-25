@@ -22,7 +22,8 @@ const {
 	checkParams,
 	appBucket,
 	emitEventAndSendResponse,
-	publishAdPushupBuild
+	publishAdPushupBuild,
+	sendDataToAuditLogService
 } = require('../helpers/routeHelpers');
 const proxy = require('../helpers/proxy');
 const pageGroupController = require('./pageGroupController');
@@ -384,16 +385,30 @@ router
 			.catch(err => sendErrorResponse(err, res));
 	})
 	.post('/saveApConfigs', (req, res) => {
-		const { email } = req.user;
-		const { siteId, apConfigs } = req.body;
+		const { email, originalEmail } = req.user;
+		const { siteId, apConfigs, dataForAuditLogs } = req.body;
 
 		return verifyOwner(siteId, email)
 			.then(site => {
-				const siteApConfigs = { ...site.get('apConfigs') };
+				const prevConfig = site.get('apConfigs');
+				const siteApConfigs = { ...prevConfig };
 
 				Object.keys(apConfigs).forEach(propertyKey => {
 					const propertyValue = apConfigs[propertyKey];
 					siteApConfigs[propertyKey] = propertyValue;
+				});
+
+				// log config changes
+				const { siteDomain, appName, type = 'site' } = dataForAuditLogs;
+				sendDataToAuditLogService({
+					siteId,
+					siteDomain,
+					appName,
+					type,
+					impersonateId: email,
+					userId: originalEmail,
+					prevConfig,
+					currentConfig: siteApConfigs
 				});
 
 				site.set('apConfigs', { ...siteApConfigs });

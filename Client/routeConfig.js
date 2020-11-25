@@ -91,7 +91,7 @@ const ROUTES = {
 			path: '/sites/:siteId/settings',
 			name: 'Settings',
 			exact: true,
-			customProps: { activeTab: NAV_ITEMS_INDEXES.SITE_SETTINGS },
+			customProps: { activeTab: NAV_ITEMS_INDEXES.SITE_SETTINGS, appName: 'Site Settings' },
 			component: ManageSite
 		},
 		{

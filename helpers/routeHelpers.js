@@ -93,7 +93,7 @@ function emitEventAndSendResponse(siteId, res, data = {}) {
 }
 function sendDataToAuditLogService(data) {
 	const { prevConfig, currentConfig} = data; 
-	const delta = jsondiffpatch.diff(prevConfig, currentConfig)
+	const delta = jsondiffpatch.diff(prevConfig, currentConfig);
 	const options = {
 		method: 'POST',
 		uri: `${config.auditLogElasticServer.host}`,
