@@ -26,9 +26,7 @@ const Amp = lazy(() => import(/* webpackChunkName: "ampTag" */ './Apps/AmpTag/in
 const InnovativeAds = lazy(() =>
 	import(/* webpackChunkName: "innovativeAds" */ './Apps/InnovativeAds/index')
 );
-const Reporting = lazy(() =>
-	import(/* webpackChunkName: "reporting" */ './Apps/Reporting/containers/index')
-);
+const Reporting = lazy(() => import(/* webpackChunkName: "reporting" */ './Apps/Reporting/index'));
 const ManageSite = lazy(() =>
 	import(/* webpackChunkName: "manageSite" */ './Pages/ManageSite/index')
 );
@@ -108,6 +106,7 @@ const ROUTES = {
 		{
 			exact: true,
 			name: 'Layout',
+			title: 'Layout Editor',
 			path: '/sites/:siteId/apps/layout',
 			component: Layout
 		},
@@ -209,12 +208,14 @@ const ROUTES = {
 			name: 'Reports',
 			path: '/reports',
 			component: Reporting,
+			title: 'Reporting',
 			customProps: { activeTab: REPORTS_NAV_ITEMS_INDEXES.REPORT }
 		},
 		{
 			exact: true,
 			customProps: { activeTab: REPORTS_NAV_ITEMS_INDEXES.URL_UTM_REPORTING },
 			name: 'URL/UTM Analytics',
+			title: 'Reporting',
 			path: '/reports/url-utm-analytics',
 			component: Reporting
 		},
@@ -222,6 +223,7 @@ const ROUTES = {
 			exact: true,
 			name: ':siteId',
 			path: '/reports/:siteId',
+			title: 'Reporting',
 			customProps: { activeTab: REPORTS_NAV_ITEMS_INDEXES.REPORT },
 			component: Reporting
 		},

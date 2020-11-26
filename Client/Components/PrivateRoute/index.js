@@ -5,7 +5,7 @@ import SendGAPageViewEvent from '../SendGAPageViewEvent';
 import ShellContainer from '../../Containers/ShellContainer';
 import Loader from '../Loader';
 
-export default ({ component: Component, ...rest }) => {
+export default ({ component: Component, title = '', ...rest }) => {
 	const customProps = rest.customProps || null;
 
 	if (!authService.isLoggedin())
@@ -21,7 +21,7 @@ export default ({ component: Component, ...rest }) => {
 							path={props.history.location.pathname}
 							isSuperUser={authService.isOps()}
 						>
-							<Component customProps={customProps} {...props} />
+							<Component customProps={customProps} title={title} {...props} />
 						</SendGAPageViewEvent>
 					)}
 				/>
