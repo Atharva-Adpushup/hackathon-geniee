@@ -9,7 +9,7 @@ const App = props => {
 	return (
 		<React.Fragment>
 			<DocumentTitle title={title} />
-			<ReportContainer {...props} />
+			<ReportContainer isCustomizeChartLegend {...props} />
 		</React.Fragment>
 	);
 };
