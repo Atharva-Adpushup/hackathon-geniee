@@ -328,7 +328,7 @@ var handleBidTimeoutEvent = function(bidTimeoutData) {
 
 var handleBidWonEvent = function(bidWonData) {
 	utils.log('========= bidWon =========', bidWonData);
-	// for winning video bids, feedback will be sent on adImpression event from jwplayer
+	// for winning video bids, feedback will be sent on adstarted event from bbPlayer
 	if (bidWonData.mediaType == 'video') {
 		return;
 	}
