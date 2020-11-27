@@ -118,17 +118,6 @@ var adpTags = {
 				if (computedBidders) bidders = computedBidders;
 				optionalParam.headerBidding = headerBidding;
 				if (computedFormats) formats = computedFormats;
-
-				/**
-				 * Disabled video format until we integrate any new video player.
-				 *
-				 * Disabling it after hb rules has been applied to make sure that "video" format
-				 * doesn't add from hb rules as well.
-				 */
-				var videoFormatIndex = formats.indexOf('video');
-				if (videoFormatIndex !== -1) {
-					formats.splice(videoFormatIndex, 1);
-				}
 			}
 
 			/*
@@ -199,6 +188,19 @@ var adpTags = {
 			 */
 			if (!window.adpushup.config.isAutoAddMultiformatDisabled && optionalParam.formats) {
 				optionalParam.formats = constants.PREBID.ALL_SUPPORTED_FORMATS;
+			}
+
+			/**
+			 * Disabled video format until we integrate any new video player.
+			 *
+			 * If we disble "video" format here then it won't be added through hb rules
+			 * as well. As hb rule only apply intersection of the slot formats and hb rule formats.
+			 */
+			if (
+				Array.isArray(optionalParam.formats) &&
+				optionalParam.formats.indexOf('video') !== -1
+			) {
+				optionalParam.formats.splice(optionalParam.formats.indexOf('video'), 1);
 			}
 
 			var slot = this.createSlot(containerId, size, placement, optionalParam);

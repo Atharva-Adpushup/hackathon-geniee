@@ -117,17 +117,6 @@ var $ = require('../../libs/jquery'),
 					formats.splice(nativeFormatIndex, 1);
 				}
 
-				/**
-				 * Disabled video format until we integrate any new video player.
-				 *
-				 * Disabling it after hb rules has been applied to make sure that "video" format
-				 * doesn't add from hb rules as well.
-				 */
-				var videoFormatIndex = formats.indexOf('video');
-				if (videoFormatIndex !== -1) {
-					formats.splice(videoFormatIndex, 1);
-				}
-
 				var adpSlot = {
 					slotId: gptSlotElementId,
 					optionalParam,
@@ -253,9 +242,16 @@ var $ = require('../../libs/jquery'),
 											 * until we enable all formats in all ad docs.
 											 * Hb Rules can still override formats list.
 											 */
-											formats = window.adpushup.config.isAutoAddMultiformatDisabled
-												? apLiteAdUnit.formats
-												: ['display', 'video'],
+											// formats = window.adpushup.config.isAutoAddMultiformatDisabled
+											// 	? apLiteAdUnit.formats
+											// 	: ['display', 'video'],
+											/**
+											 * Disabled video format until we integrate any new video player.
+											 *
+											 * If we disble "video" format here then it won't be added through hb rules
+											 * as well. As hb rule only apply intersection of the slot formats and hb rule formats.
+											 */
+											formats = ['display'],
 											sizeMapping = apLiteAdUnit.sizeMapping || [],
 											computedSizes = hbUtils.getSizesComputedUsingSizeMappingOrAdUnitSize(
 												apLiteAdUnit,
