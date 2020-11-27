@@ -190,6 +190,19 @@ var adpTags = {
 				optionalParam.formats = constants.PREBID.ALL_SUPPORTED_FORMATS;
 			}
 
+			/**
+			 * Disabled video format until we integrate any new video player.
+			 *
+			 * If we disble "video" format here then it won't be added through hb rules
+			 * as well. As hb rule only apply intersection of the slot formats and hb rule formats.
+			 */
+			if (
+				Array.isArray(optionalParam.formats) &&
+				optionalParam.formats.indexOf('video') !== -1
+			) {
+				optionalParam.formats.splice(optionalParam.formats.indexOf('video'), 1);
+			}
+
 			var slot = this.createSlot(containerId, size, placement, optionalParam);
 			/**
 			 * only case where computedSizes will not be set on slot is where it's a responsive slot and the ad container is not in the DOM
