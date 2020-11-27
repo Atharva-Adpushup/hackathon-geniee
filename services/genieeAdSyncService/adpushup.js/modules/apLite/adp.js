@@ -117,6 +117,17 @@ var $ = require('../../libs/jquery'),
 					formats.splice(nativeFormatIndex, 1);
 				}
 
+				/**
+				 * Disabled video format until we integrate any new video player.
+				 *
+				 * Disabling it after hb rules has been applied to make sure that "video" format
+				 * doesn't add from hb rules as well.
+				 */
+				var videoFormatIndex = formats.indexOf('video');
+				if (videoFormatIndex !== -1) {
+					formats.splice(videoFormatIndex, 1);
+				}
+
 				var adpSlot = {
 					slotId: gptSlotElementId,
 					optionalParam,
