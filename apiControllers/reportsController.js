@@ -118,7 +118,7 @@ const Utils = {
 				cron = `0 20 * * ${start.getDay()}`; // same day every week at 8PM
 				break;
 			case 'monthly':
-				cron = `* 20 ${start.getDate()} * *`; // same date every month at 8PM
+				cron = `0 20 ${start.getDate()} * *`; // same date every month at 8PM
 				break;
 			default:
 				throw new Error('Invalid schedule interval');
