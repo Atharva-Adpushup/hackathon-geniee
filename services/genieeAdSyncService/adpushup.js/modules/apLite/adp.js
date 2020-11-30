@@ -314,7 +314,7 @@ var $ = require('../../libs/jquery'),
 							);
 						}
 
-						if (nonApSlots && nonApSlots.length) {
+						if (nonApSlots && nonApSlots.length && !adpushup.config.handleAPLiteBlacklist) {
 							googletag.pubads().refresh(nonApSlots);
 						}
 
