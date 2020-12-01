@@ -5,6 +5,7 @@ import 'react-dates/initialize';
 import { CSVLink } from 'react-csv';
 import isEqual from 'lodash/isEqual';
 import moment from 'moment';
+import lodash from 'lodash';
 import AsyncGroupSelect from '../../../Components/AsyncGroupSelect/index';
 import PresetDateRangePicker from '../../../Components/PresetDateRangePicker/index';
 import SelectBox from '../../../Components/SelectBox/index';
@@ -257,7 +258,7 @@ class Control extends Component {
 					endDate: selectedReport.endDate,
 					selectedInterval: selectedReport.selectedInterval,
 					selectedDimension: selectedReport.selectedDimension,
-					selectedFilters: { ...selectedReport.selectedFilters }
+					selectedFilters: lodash.cloneDeep(selectedReport.selectedFilters)
 				},
 				() => {
 					const callback = () => this.onControlChange(reportType, false);
