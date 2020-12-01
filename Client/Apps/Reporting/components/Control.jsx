@@ -94,11 +94,11 @@ class Control extends Component {
 		);
 	};
 
-	onControlChange = reportType => {
+	onControlChange = (reportType, resetSavedReport = true) => {
 		const resultObject = this.getStateParams();
 		const { onControlChange } = this.props;
 
-		onControlChange(resultObject, reportType);
+		onControlChange(resultObject, reportType, resetSavedReport);
 	};
 
 	onGenerateButtonClick = () => {
@@ -260,8 +260,8 @@ class Control extends Component {
 					selectedFilters: selectedReport.selectedFilters
 				},
 				() => {
-					setSelectedReport(selectedReport);
-					this.onControlChange(reportType);
+					const callback = () => this.onControlChange(reportType, false);
+					setSelectedReport(selectedReport, callback);
 				}
 			);
 		}
