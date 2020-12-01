@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { Glyphicon, Button, Modal } from '@/Client/helpers/react-bootstrap-imports';
+import { Glyphicon, Button } from '@/Client/helpers/react-bootstrap-imports';
 import 'react-dates/lib/css/_datepicker.css';
 import 'react-dates/initialize';
 import { CSVLink } from 'react-csv';
@@ -249,7 +249,7 @@ class Control extends Component {
 
 	onSavedReportSelect = reportId => {
 		const { reportType, setSelectedReport, savedReports } = this.props;
-		const selectedReport = savedReports.filter(report => report.id === reportId)[0];
+		const selectedReport = savedReports.find(report => report.id === reportId);
 		if (selectedReport) {
 			this.setState(
 				{
@@ -257,7 +257,7 @@ class Control extends Component {
 					endDate: selectedReport.endDate,
 					selectedInterval: selectedReport.selectedInterval,
 					selectedDimension: selectedReport.selectedDimension,
-					selectedFilters: selectedReport.selectedFilters
+					selectedFilters: { ...selectedReport.selectedFilters }
 				},
 				() => {
 					const callback = () => this.onControlChange(reportType, false);
