@@ -194,9 +194,9 @@ class Report extends Component {
 		};
 	};
 
-	onControlChange = (data, reportType) => {
+	onControlChange = (data, reportType, resetSavedReport = true) => {
 		const params = this.getControlChangedParams({ ...data, reportType });
-		const { selectedFilterValues } = this.state;
+		const { selectedFilterValues, selectedReport } = this.state;
 		const newStateData = { ...data };
 		if (data.selectedFilterKey && data.selectedFilterValues) {
 			newStateData.selectedFilterValues = {
@@ -206,10 +206,13 @@ class Report extends Component {
 			delete newStateData.selectedFilterKey;
 		}
 
+		const newSelectedReport = !resetSavedReport ? selectedReport : null;
+
 		this.setState({
 			...newStateData,
 			...params,
-			reportType
+			reportType,
+			selectedReport: newSelectedReport
 		});
 	};
 
@@ -877,11 +880,14 @@ class Report extends Component {
 		);
 	};
 
-	setSelectedReport = selectedReport => {
-		this.setState({
-			selectedReport,
-			selectedReportName: selectedReport.name
-		});
+	setSelectedReport = (selectedReport, callback) => {
+		this.setState(
+			{
+				selectedReport,
+				selectedReportName: selectedReport.name
+			},
+			() => callback && callback()
+		);
 	};
 
 	onReportSave = (scheduleOptions, reportName) => {
@@ -1051,8 +1057,7 @@ class Report extends Component {
 
 	updateReportName = name => {
 		this.setState({
-			selectedReportName: name,
-			selectedReport: null
+			selectedReportName: name
 		});
 	};
 

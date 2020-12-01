@@ -1,10 +1,11 @@
 import React, { Component, Fragment } from 'react';
-import { Glyphicon, Button, Modal } from '@/Client/helpers/react-bootstrap-imports';
+import { Glyphicon, Button } from '@/Client/helpers/react-bootstrap-imports';
 import 'react-dates/lib/css/_datepicker.css';
 import 'react-dates/initialize';
 import { CSVLink } from 'react-csv';
 import isEqual from 'lodash/isEqual';
 import moment from 'moment';
+import cloneDeep from 'lodash/cloneDeep';
 import AsyncGroupSelect from '../../../Components/AsyncGroupSelect/index';
 import PresetDateRangePicker from '../../../Components/PresetDateRangePicker/index';
 import SelectBox from '../../../Components/SelectBox/index';
@@ -94,11 +95,11 @@ class Control extends Component {
 		);
 	};
 
-	onControlChange = reportType => {
+	onControlChange = (reportType, resetSavedReport = true) => {
 		const resultObject = this.getStateParams();
 		const { onControlChange } = this.props;
 
-		onControlChange(resultObject, reportType);
+		onControlChange(resultObject, reportType, resetSavedReport);
 	};
 
 	onGenerateButtonClick = () => {
@@ -249,7 +250,7 @@ class Control extends Component {
 
 	onSavedReportSelect = reportId => {
 		const { reportType, setSelectedReport, savedReports } = this.props;
-		const selectedReport = savedReports.filter(report => report.id === reportId)[0];
+		const selectedReport = savedReports.find(report => report.id === reportId);
 		if (selectedReport) {
 			this.setState(
 				{
@@ -257,11 +258,11 @@ class Control extends Component {
 					endDate: selectedReport.endDate,
 					selectedInterval: selectedReport.selectedInterval,
 					selectedDimension: selectedReport.selectedDimension,
-					selectedFilters: selectedReport.selectedFilters
+					selectedFilters: cloneDeep(selectedReport.selectedFilters)
 				},
 				() => {
-					setSelectedReport(selectedReport);
-					this.onControlChange(reportType);
+					const callback = () => this.onControlChange(reportType, false);
+					setSelectedReport(selectedReport, callback);
 				}
 			);
 		}
