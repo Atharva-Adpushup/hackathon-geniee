@@ -195,7 +195,6 @@ class Report extends Component {
 	};
 
 	onControlChange = (data, reportType, resetSavedReport = true) => {
-		console.log({ resetSavedReport });
 		const params = this.getControlChangedParams({ ...data, reportType });
 		const { selectedFilterValues, selectedReport } = this.state;
 		const newStateData = { ...data };
@@ -208,7 +207,6 @@ class Report extends Component {
 		}
 
 		const newSelectedReport = !resetSavedReport ? selectedReport : null;
-		console.log({ newSelectedReport });
 
 		this.setState({
 			...newStateData,
