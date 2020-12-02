@@ -1,20 +1,22 @@
 import React, { useState, useEffect } from 'react';
+import moment from 'moment';
 import { Col, Row, Checkbox, Button, Table } from '@/Client/helpers/react-bootstrap-imports';
 // import CustomToggleSwitch from '../../../../Components/CustomToggleSwitch';
 import CustomButton from '../../../../Components/CustomButton/index';
 import FieldGroup from '../../../../Components/Layout/FieldGroup';
 import axiosInstance from '../../../../helpers/axiosInstance';
+import Loader from '../../../../Components/Loader';
 // import Table from '../../../Reporting/components/Table';
 
 const DashboardNotifications = () => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [notificationText, setNotificationText] = useState('');
-	const [actionUrl, setActionUrl] = useState('');
+	const [actionUrlValue, setActionUrlValue] = useState('');
 	const [filterValue, setFilterValue] = useState('');
 	const [allAccountEmails, setAccountEmails] = useState([]);
 	const [filteredList, setFilteredList] = useState([]);
 	const [selectedEmails, setSelectedEmails] = useState({});
-	const [allNotifications, setAllNotifications] = useState([]);
+	const [allNotifications, setAllNotifications] = useState({});
 
 	const handleSearchTextChange = e => {
 		setFilterValue(e.target.value);
@@ -71,7 +73,27 @@ const DashboardNotifications = () => {
 			// 	notificationText: 'oka test',
 			// 	actionUrl: 'google.com'
 			// });
-			setAllNotifications(allNotificationsArray);
+
+			const notificationsData = {};
+			allNotificationsArray.forEach(notification => {
+				const { userEmail, message, actionUrl, notificationMeta, dateCreated } = notification;
+				const groupId = notificationMeta && notificationMeta.groupId;
+				if (!groupId) {
+					return;
+				}
+				const allUser = notificationMeta.allUser ? notificationMeta.allUser : false;
+				if (!notificationsData[groupId]) {
+					notificationsData[groupId] = {
+						dateCreated,
+						message,
+						actionUrl,
+						allUser,
+						userNotification: []
+					};
+				}
+				notificationsData[groupId].userNotification.push(userEmail);
+			});
+			setAllNotifications(notificationsData);
 		});
 	}, []);
 
@@ -85,15 +107,15 @@ const DashboardNotifications = () => {
 			}
 		});
 		notificationObject.emails = selectedEmailsList;
-		notificationObject.actionUrl = actionUrl;
+		notificationObject.actionUrl = actionUrlValue;
 		notificationObject.notificationText = notificationText;
 
 		axiosInstance
 			.post('/ops/sendNotification', { notificationData: notificationObject })
-			.then(response => {
+			.then(() => {
 				setIsLoading(false);
 			})
-			.catch(error => {
+			.catch(() => {
 				setIsLoading(false);
 			});
 		return false;
@@ -125,7 +147,9 @@ const DashboardNotifications = () => {
 	return (
 		<>
 			{!allAccountEmails.length ? (
-				<div>Please Wait</div>
+				<>
+					<Loader />
+				</>
 			) : (
 				<>
 					<div>
@@ -150,9 +174,9 @@ const DashboardNotifications = () => {
 							placeholder="Click Through URL"
 							className="u-padding-v4 u-padding-h4"
 							onChange={e => {
-								setActionUrl(e.target.value);
+								setActionUrlValue(e.target.value);
 							}}
-							value={actionUrl}
+							value={actionUrlValue}
 						/>
 					</div>
 
@@ -186,6 +210,7 @@ const DashboardNotifications = () => {
 								<Checkbox
 									className="col-sm-12"
 									key={email}
+									type="checkbox"
 									onChange={e => {
 										handleFilterValueSelect(e, email);
 									}}
@@ -217,19 +242,28 @@ const DashboardNotifications = () => {
 									<tr>
 										<th>S no</th>
 										<th>Date Sent</th>
+										<th>Receipient</th>
 										<th>Notification Text</th>
 										<th>Action Url</th>
 									</tr>
 								</thead>
 								<tbody>
-									{allNotifications.map((data, index) => (
-										<tr>
-											<td>{index + 1}</td>
-											<td>{data.dateCreated}</td>
-											<td>{data.message}</td>
-											<td>{data.actionUrl}</td>
-										</tr>
-									))}
+									{Object.keys(allNotifications).map((groupId, index) => {
+										const notification = allNotifications[groupId];
+										return (
+											<tr>
+												<td>{index + 1}</td>
+												<td>{moment(notification.dateCreated).format('DD/MM/YYYY')}</td>
+												<td>
+													{notification.allUser
+														? 'All Users'
+														: notification.userNotification && notification.userNotification.join()}
+												</td>
+												<td>{notification.message}</td>
+												<td>{notification.actionUrl}</td>
+											</tr>
+										);
+									})}
 								</tbody>
 							</Table>
 						</Col>

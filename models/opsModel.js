@@ -374,7 +374,7 @@ function apiModule() {
 		},
 		getAllNotifications() {
 			const query = N1qlQuery.fromString(
-				'Select message, actionUrl,id,dateCreated from apNotificationBucket;'
+				'Select message, actionUrl,id,dateCreated,userEmail,notificationMeta from apNotificationBucket;'
 			);
 
 			return couchbase
