@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const Promise = require('bluebird');
 const uuid = require('node-uuid');
 const request = require('request-promise');
+const _ = require('lodash');
 
 const userModel = require('../models/userModel');
 const siteModel = require('../models/siteModel');
@@ -17,7 +18,12 @@ const config = require('../configs/config');
 const AdpushupError = require('../helpers/AdPushupError');
 const { sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFunctions');
 const authToken = require('../helpers/authToken');
-const { errorHandler, appBucket, checkParams } = require('../helpers/routeHelpers');
+const {
+	errorHandler,
+	appBucket,
+	checkParams,
+	sendDataToAuditLogService
+} = require('../helpers/routeHelpers');
 
 const router = express.Router();
 
@@ -392,14 +398,20 @@ router
 			.catch(err => errorHandler(err, res));
 	})
 	.post('/updateUser', (req, res) => {
-		const { toUpdate } = req.body;
+		const { email, originalEmail } = req.user;
+		const { toUpdate, dataForAuditLogs } = req.body;
 		const toSend = [];
 		return checkParams(['toUpdate'], req, 'post')
 			.then(() => userModel.getUserByEmail(req.user.email))
 			.then(user => {
+				const prevConfig = {};
+				const currentConfig = {};
 				toUpdate.forEach(content => {
 					const { key, value, replace = false } = content;
 					let data = user.get(key);
+					// _.cloneDeep
+					prevConfig[key] = user.data[key];
+
 					if (typeof data === 'object' && !Array.isArray(data) && !replace) {
 						data = {
 							...data,
@@ -408,9 +420,24 @@ router
 					} else {
 						data = value;
 					}
+
+					currentConfig[key] = value;
 					user.set(key, data);
 					toSend.push({ key, value: data });
 				});
+				// log config changes
+				const { appName, type = 'account' } = dataForAuditLogs;
+				sendDataToAuditLogService({
+					siteId: '',
+					siteDomain: '',
+					appName,
+					type,
+					impersonateId: email,
+					userId: originalEmail,
+					prevConfig,
+					currentConfig
+				});
+
 				return user.save();
 			})
 			.then(() =>
