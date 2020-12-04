@@ -54,12 +54,8 @@ class Settings extends Component {
 			userData: { adServerSettings },
 			updateAppStatus,
 			site,
-			customProps
+			dataForAuditLogs
 		} = this.props;
-		const dataForAuditLogs = {
-			appName: customProps.appName,
-			siteDomain: site.siteDomain
-		};
 
 		const name = attributeValue.split('-')[0];
 
@@ -115,11 +111,7 @@ class Settings extends Component {
 	};
 
 	handleForceBuild = () => {
-		const { site, showNotification, customProps } = this.props;
-		const dataForAuditLogs = {
-			appName: customProps.appName,
-			siteDomain: site.siteDomain
-		};
+		const { site, showNotification, dataForAuditLogs } = this.props;
 
 		siteService
 			.forceApBuild(site.siteId, dataForAuditLogs)
