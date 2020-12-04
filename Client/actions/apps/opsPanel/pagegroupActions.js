@@ -3,9 +3,9 @@ import { SITE_ACTIONS, UI_ACTIONS } from '../../../constants/global';
 import axiosInstance from '../../../helpers/axiosInstance';
 import { errorHandler, getHtmlEncodedJSON } from '../../../helpers/commonFunctions';
 
-const createChannels = (siteId, channels) => (dispatch, getState) =>
+const createChannels = (siteId, channels, dataForAuditLogs) => (dispatch, getState) =>
 	axiosInstance
-		.post('/channel/createChannels', { siteId, channels })
+		.post('/channel/createChannels', { siteId, channels, dataForAuditLogs })
 		.then(response => {
 			const { data } = response.data;
 			const { failed, successful } = data;
@@ -120,7 +120,7 @@ const fetchChannelsInfo = siteId => dispatch =>
 			)
 		);
 
-const updatePagegroupPattern = (siteId, params) => (dispatch, getState) => {
+const updatePagegroupPattern = (siteId, params, dataForAuditLogs) => (dispatch, getState) => {
 	const {
 		global: { sites }
 	} = getState();
@@ -154,7 +154,7 @@ const updatePagegroupPattern = (siteId, params) => (dispatch, getState) => {
 	};
 
 	return axiosInstance
-		.post('/site/saveSettings', { siteId, apConfigs: { pageGroupPattern } })
+		.post('/site/saveSettings', { siteId, apConfigs: { pageGroupPattern }, dataForAuditLogs })
 		.then(() => {
 			dispatch({
 				type: SITE_ACTIONS.UPDATE_SITE_DATA_KEY_OBJ,
@@ -177,9 +177,15 @@ const updatePagegroupPattern = (siteId, params) => (dispatch, getState) => {
 		.catch(err => errorHandler(err, 'Pagegroup pattern updation failed'));
 };
 
-const deletePagegroup = (siteId, params) => (dispatch, getState) =>
+const deletePagegroup = (siteId, params, dataForAuditLogs) => (dispatch, getState) =>
 	axiosInstance
-		.post('/channel/deleteChannel', { siteId, channelId: params.channelId })
+		.post('/channel/deleteChannel', {
+			siteId,
+			pageGroup: params.pageGroup,
+			platform: params.platform,
+			channelId: params.channelId,
+			dataForAuditLogs
+		})
 		.then(response => {
 			const {
 				global: { sites }
@@ -218,7 +224,7 @@ const deletePagegroup = (siteId, params) => (dispatch, getState) =>
 		})
 		.catch(err => errorHandler(err, 'Pagegroup deletion failed'));
 
-const updateChannelAutoOptimise = (siteId, params) => (dispatch, getState) => {
+const updateChannelAutoOptimise = (siteId, params, dataForAuditLogs) => (dispatch, getState) => {
 	const {
 		global: { sites }
 	} = getState();
@@ -241,7 +247,8 @@ const updateChannelAutoOptimise = (siteId, params) => (dispatch, getState) => {
 					key: 'autoOptimise',
 					value: params.autoOptimise
 				}
-			]
+			],
+			dataForAuditLogs
 		})
 		.then(() => {
 			dispatch({

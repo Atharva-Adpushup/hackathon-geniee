@@ -150,7 +150,12 @@ class Account extends Component {
 
 	handleAdsenseSave = () => {
 		const { adsensePubId } = this.state;
-		const { showNotification, updateUser, user } = this.props;
+		const { showNotification, updateUser, customProps, user } = this.props;
+
+		const dataForAuditLogs = {
+			appName: customProps.appName,
+			siteDomain: ''
+		};
 
 		const { adNetworkSettings = [] } = user;
 
@@ -163,13 +168,15 @@ class Account extends Component {
 			adNetworkSettings[0].networkName = adNetworkSettings[0].networkName || 'ADSENSE';
 		}
 		this.setState({ loading: true });
-
-		return updateUser([
-			{
-				key: 'adNetworkSettings',
-				value: adNetworkSettings
-			}
-		]).then(() =>
+		return updateUser(
+			[
+				{
+					key: 'adNetworkSettings',
+					value: adNetworkSettings
+				}
+			],
+			dataForAuditLogs
+		).then(() =>
 			this.setState({
 				loading: false
 			})
@@ -178,8 +185,13 @@ class Account extends Component {
 
 	handleAdManagerSave = () => {
 		const { activeDFP, originalactiveDFP, isThirdPartyAdx, adsensePubId } = this.state;
-		const { showNotification, updateUser, user } = this.props;
+		const { showNotification, updateUser, customProps, user } = this.props;
 		const { adServerSettings = {} } = user;
+
+		const dataForAuditLogs = {
+			appName: customProps.appName,
+			siteDomain: ''
+		};
 
 		if (originalactiveDFP === null) {
 			if (activeDFP === null) {
@@ -223,12 +235,15 @@ class Account extends Component {
 						prebidGranularityMultiplier
 					}
 				};
-				return updateUser([
-					{
-						key: 'adServerSettings',
-						value: updatedAdServerSettings
-					}
-				]);
+				return updateUser(
+					[
+						{
+							key: 'adServerSettings',
+							value: updatedAdServerSettings
+						}
+					],
+					dataForAuditLogs
+				);
 			})
 			.then(() =>
 				this.setState({

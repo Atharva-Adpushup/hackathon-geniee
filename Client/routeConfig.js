@@ -281,14 +281,14 @@ const ROUTES = {
 		// Admin Panel
 		{
 			exact: true,
-			customProps: { activeTab: OP_NAV_ITEMS_INDEXES.SETTINGS },
+			customProps: { activeTab: OP_NAV_ITEMS_INDEXES.SETTINGS, appName: 'Ops Panel - Accounts' },
 			name: 'Admin Panel',
 			path: '/admin-panel',
 			component: OpsPanel
 		},
 		{
 			exact: true,
-			customProps: { activeTab: OP_NAV_ITEMS_INDEXES.SETTINGS },
+			customProps: { activeTab: OP_NAV_ITEMS_INDEXES.SETTINGS, appName: 'Ops Panel - Settings' },
 			name: 'Settings',
 			path: '/admin-panel/settings',
 			component: OpsPanel

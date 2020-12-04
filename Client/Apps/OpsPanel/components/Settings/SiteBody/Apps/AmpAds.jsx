@@ -33,14 +33,18 @@ class AmpAds extends Component {
 
 	handleSave = () => {
 		const { status } = this.state;
-		const { site, updateSite, updateAppStatus } = this.props;
+		const { site, updateSite, updateAppStatus, dataForAuditLogs } = this.props;
 
 		this.setState({ isLoading: true });
 
-		return updateAppStatus(site.siteId, {
-			app: 'amp',
-			value: status
-		}).then(() => this.setState({ isLoading: false }));
+		return updateAppStatus(
+			site.siteId,
+			{
+				app: 'amp',
+				value: status
+			},
+			dataForAuditLogs
+		).then(() => this.setState({ isLoading: false }));
 	};
 
 	render() {

@@ -27,7 +27,8 @@ const mapDispatchToProps = dispatch => ({
 	showNotification: data => dispatch(showNotification(data)),
 	fetchSiteInventories: siteId => dispatch(fetchSiteInventories(siteId)),
 	resetSiteInventories: siteId => dispatch(resetSiteInventories(siteId)),
-	updateSizeMapping: (siteId, sizeMapping) => dispatch(updateSizeMapping(siteId, sizeMapping))
+	updateSizeMapping: (siteId, sizeMapping, dataForAuditLogs) =>
+		dispatch(updateSizeMapping(siteId, sizeMapping, dataForAuditLogs))
 });
 
 export default connect(

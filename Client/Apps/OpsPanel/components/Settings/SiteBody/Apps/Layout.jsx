@@ -160,25 +160,40 @@ class Layout extends Component {
 			site: { siteId },
 			updateAppStatus,
 			updateSiteAutoOptimise,
-			updateChannelAutoOptimise
+			updateChannelAutoOptimise,
+			dataForAuditLogs
 		} = this.props;
 		const promises = [];
 
 		if (status !== undefined) {
-			promises.push(updateAppStatus.bind(null, siteId, { app: 'layout', value: status }));
+			promises.push(
+				updateAppStatus.bind(null, siteId, { app: 'layout', value: status }, dataForAuditLogs)
+			);
 		}
 		if (siteAutoOptimise !== undefined) {
-			promises.push(updateSiteAutoOptimise.bind(null, siteId, { autoOptimise: siteAutoOptimise }));
+			promises.push(
+				updateSiteAutoOptimise.bind(
+					null,
+					siteId,
+					{ autoOptimise: siteAutoOptimise },
+					dataForAuditLogs
+				)
+			);
 		}
 		if (channels !== undefined) {
 			const keys = Object.keys(channels);
 			keys.forEach(key => {
 				const current = channels[key];
 				promises.push(
-					updateChannelAutoOptimise.bind(null, siteId, {
-						...current,
-						channelKey: `${current.platform}:${current.pageGroup}`
-					})
+					updateChannelAutoOptimise.bind(
+						null,
+						siteId,
+						{
+							...current,
+							channelKey: `${current.platform}:${current.pageGroup}`
+						},
+						dataForAuditLogs
+					)
 				);
 			});
 		}

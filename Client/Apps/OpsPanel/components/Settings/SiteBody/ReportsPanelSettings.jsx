@@ -29,19 +29,28 @@ class ReportsPanelSettings extends Component {
 
 	handleSave = () => {
 		const { showUniqueImpressionsReporting, sessionRpmReports } = this.state;
-		const { updateUser } = this.props;
+		const { updateUser, customProps } = this.props;
+
+		const dataForAuditLogs = {
+			appName: customProps.appName,
+			siteDomain: ''
+		};
+
 		this.setState({ loading: true });
 
-		return updateUser([
-			{
-				key: 'showUniqueImpressionsReporting',
-				value: showUniqueImpressionsReporting
-			},
-			{
-				key: 'sessionRpmReports',
-				value: sessionRpmReports
-			}
-		]).then(() =>
+		return updateUser(
+			[
+				{
+					key: 'showUniqueImpressionsReporting',
+					value: showUniqueImpressionsReporting
+				},
+				{
+					key: 'sessionRpmReports',
+					value: sessionRpmReports
+				}
+			],
+			dataForAuditLogs
+		).then(() =>
 			this.setState({
 				loading: false
 			})

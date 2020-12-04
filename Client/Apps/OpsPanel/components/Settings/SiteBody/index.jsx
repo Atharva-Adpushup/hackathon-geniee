@@ -8,22 +8,43 @@ import ApLiteContainer from '../../../containers/ApLiteContainer';
 import SiteLevelBeforeJSContainer from '../../../containers/SiteLevelBeforeJSContainer';
 
 const SiteBody = props => {
-	const { site, showNotification, saveSettings } = props;
+	const { site, showNotification, saveSettings, dataForAuditLogs } = props;
 	return (
 		<React.Fragment>
 			<Row>
 				<SettingsContainer
+					dataForAuditLogs={dataForAuditLogs}
 					site={site}
 					showNotification={showNotification}
 					saveSettings={saveSettings}
 				/>
-				<AppsContainer site={site} showNotification={showNotification} />
+				<AppsContainer
+					dataForAuditLogs={dataForAuditLogs}
+					site={site}
+					showNotification={showNotification}
+				/>
 			</Row>
 			<Row>
-				<ApLiteContainer site={site} showNotification={showNotification} />
-				<PagegroupContainer site={site} showNotification={showNotification} />
-				<SiteLevelBeforeJSContainer site={site} showNotification={showNotification} />
-				<SizeMappingContainer site={site} showNotification={showNotification} />
+				<ApLiteContainer
+					dataForAuditLogs={dataForAuditLogs}
+					site={site}
+					showNotification={showNotification}
+				/>
+				<PagegroupContainer
+					dataForAuditLogs={dataForAuditLogs}
+					site={site}
+					showNotification={showNotification}
+				/>
+				<SiteLevelBeforeJSContainer
+					dataForAuditLogs={dataForAuditLogs}
+					site={site}
+					showNotification={showNotification}
+				/>
+				<SizeMappingContainer
+					dataForAuditLogs={dataForAuditLogs}
+					site={site}
+					showNotification={showNotification}
+				/>
 			</Row>
 		</React.Fragment>
 	);

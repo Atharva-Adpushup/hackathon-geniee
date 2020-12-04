@@ -10,7 +10,13 @@ const channelModel = require('../models/channelModel');
 const siteModel = require('../models/siteModel');
 const AdPushupError = require('../helpers/AdPushupError');
 const { sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFunctions');
-const { errorHandler, verifyOwner, appBucket, checkParams } = require('../helpers/routeHelpers');
+const {
+	errorHandler,
+	verifyOwner,
+	appBucket,
+	checkParams,
+	sendDataToAuditLogService
+} = require('../helpers/routeHelpers');
 
 const router = express.Router();
 
@@ -110,7 +116,7 @@ router
 			.catch(err => errorHandler(err, res, HTTP_STATUS.INTERNAL_SERVER_ERROR));
 	})
 	.post('/createChannels', (req, res) => {
-		const { channels, siteId } = req.body;
+		const { channels, siteId, dataForAuditLogs } = req.body;
 		const failed = {
 			channels: [],
 			details: {}
@@ -143,7 +149,6 @@ router
 							successful
 						),
 					(device, err) => {
-						console.log(err);
 						let additionalData = {};
 						if (err instanceof AdPushupError) {
 							additionalData = err.message;
@@ -151,6 +156,22 @@ router
 						const current = `${device.toUpperCase()}:${channels.common.pageGroupName}`;
 						failed.channels.push(current);
 						failed.details[current] = { ...channels.common, device, additionalData };
+						const { email, originalEmail } = req.user;
+						// log config changes
+						const { siteDomain, appName, type = 'site' } = dataForAuditLogs;
+						sendDataToAuditLogService({
+							siteId,
+							siteDomain,
+							appName,
+							type,
+							impersonateId: email,
+							userId: originalEmail,
+							prevConfig: {},
+							currentConfig: {
+								successful,
+								failed
+							}
+						});
 						return true;
 					}
 				)
@@ -168,7 +189,7 @@ router
 			.catch(err => errorHandler(err, res, HTTP_STATUS.BAD_REQUEST, { failed, successful }));
 	})
 	.post('/deleteChannel', (req, res) => {
-		const { channelId, siteId } = req.body;
+		const { channelId, siteId, dataForAuditLogs, platform, pageGroup } = req.body;
 		if (!channelId || !siteId) {
 			return sendErrorResponse(
 				{
@@ -179,9 +200,29 @@ router
 			);
 		}
 
+		let prevConfig = {};
 		return verifyOwner(siteId, req.user.email)
+			.then(() =>
+				channelModel.getChannel(siteId, platform, pageGroup).then(channel => {
+					prevConfig = { ...channel.data };
+					return channel;
+				})
+			)
 			.then(() => channelModel.deletePagegroupById(channelId))
 			.then(site => {
+				const { email, originalEmail } = req.user;
+				// log config changes
+				const { siteDomain, appName, type = 'site' } = dataForAuditLogs;
+				sendDataToAuditLogService({
+					siteId,
+					siteDomain,
+					appName,
+					type,
+					impersonateId: email,
+					userId: originalEmail,
+					prevConfig,
+					currentConfig: {}
+				});
 				sendSuccessResponse(
 					{
 						message: 'Pagegroup successfully deleted',
@@ -194,11 +235,35 @@ router
 			.catch(err => errorHandler(err, res, HTTP_STATUS.INTERNAL_SERVER_ERROR));
 	})
 	.post('/updateChannel', (req, res) => {
-		const { siteId, pageGroup, platform, toUpdate } = req.body;
+		const { siteId, pageGroup, platform, toUpdate, dataForAuditLogs } = req.body;
+		let prevConfig = {};
 		return checkParams(['siteId', 'pageGroup', 'platform', 'toUpdate'], req, 'post')
 			.then(() => verifyOwner(siteId, req.user.email))
-			.then(() => channelModel.getChannel(siteId, platform, pageGroup))
+			.then(() =>
+				channelModel.getChannel(siteId, platform, pageGroup).then(channel => {
+					prevConfig = { ...channel.data };
+					return channel;
+				})
+			)
 			.then(channel => hlprs.updateChannel(channel, toUpdate))
+			.then(() =>
+				channelModel.getChannel(siteId, platform, pageGroup).then(channel => {
+					const currentConfig = channel.data;
+					const { email, originalEmail } = req.user;
+					// log config changes
+					const { siteDomain, appName, type = 'site' } = dataForAuditLogs;
+					sendDataToAuditLogService({
+						siteId,
+						siteDomain,
+						appName,
+						type,
+						impersonateId: email,
+						userId: originalEmail,
+						prevConfig,
+						currentConfig
+					});
+				})
+			)
 			.then(() =>
 				sendSuccessResponse(
 					{

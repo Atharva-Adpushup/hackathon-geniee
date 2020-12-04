@@ -25,8 +25,8 @@ class Settings extends Component {
 			adsLabel = 'Advertisement',
 			hbAnalytics = false,
 			cmpAvailable = false,
-			mergeReport=false,
-			isPnp=false
+			mergeReport = false,
+			isPnp = false
 		} = site.apConfigs || {};
 		const { revenueShare = 10 } = site.adNetworkSettings || {};
 		const status = Object.prototype.hasOwnProperty.call(apps, 'apLite') ? apps.apLite : undefined;
@@ -53,8 +53,13 @@ class Settings extends Component {
 		const {
 			userData: { adServerSettings },
 			updateAppStatus,
-			site
+			site,
+			customProps
 		} = this.props;
+		const dataForAuditLogs = {
+			appName: customProps.appName,
+			siteDomain: site.siteDomain
+		};
 
 		const name = attributeValue.split('-')[0];
 
@@ -87,10 +92,14 @@ class Settings extends Component {
 			if (name === 'apLite' && value) {
 				const val = confirm('Are you sure you want to enable AP Lite ?');
 				if (val) {
-					return updateAppStatus(site.siteId, {
-						app: 'apLite',
-						value
-					}).then(() => this.setState({ status: value, [name]: value }));
+					return updateAppStatus(
+						site.siteId,
+						{
+							app: 'apLite',
+							value
+						},
+						dataForAuditLogs
+					).then(() => this.setState({ status: value, [name]: value }));
 				}
 				return { [name]: false };
 			}
@@ -106,9 +115,14 @@ class Settings extends Component {
 	};
 
 	handleForceBuild = () => {
-		const { site, showNotification } = this.props;
+		const { site, showNotification, customProps } = this.props;
+		const dataForAuditLogs = {
+			appName: customProps.appName,
+			siteDomain: site.siteDomain
+		};
+
 		siteService
-			.forceApBuild(site.siteId)
+			.forceApBuild(site.siteId, dataForAuditLogs)
 			.then(res => {
 				const data = {
 					mode: 'success',
@@ -144,7 +158,7 @@ class Settings extends Component {
 			mergeReport,
 			isPnp
 		} = this.state;
-		const { showNotification, saveSettings, site } = this.props;
+		const { showNotification, saveSettings, site, dataForAuditLogs } = this.props;
 		const isTransitionInValid = isSPA && isNaN(Number(spaPageTransitionTimeout));
 		const isAdPushupPercentageInValid =
 			isNaN(Number(adpushupPercentage)) || adpushupPercentage > 100 || adpushupPercentage < 0;
@@ -175,25 +189,29 @@ class Settings extends Component {
 			return showNotification(data);
 		}
 
-		return saveSettings(site.siteId, {
-			apConfigs: {
-				isSPA,
-				spaButUsingHook,
-				spaPageTransitionTimeout: Number(spaPageTransitionTimeout),
-				adpushupPercentage: Number(adpushupPercentage),
-				poweredByBanner,
-				isAdsLabelOn,
-				adsLabel,
-				hbAnalytics,
-				cmpAvailable: !cmpEnabled,
-				mergeReport,
-				isPnp
-			},
+		return saveSettings(
+			site.siteId,
+			{
+				apConfigs: {
+					isSPA,
+					spaButUsingHook,
+					spaPageTransitionTimeout: Number(spaPageTransitionTimeout),
+					adpushupPercentage: Number(adpushupPercentage),
+					poweredByBanner,
+					isAdsLabelOn,
+					adsLabel,
+					hbAnalytics,
+					cmpAvailable: !cmpEnabled,
+					mergeReport,
+					isPnp
+				},
 
-			adNetworkSettings: {
-				revenueShare: Number(revenueShare)
-			}
-		});
+				adNetworkSettings: {
+					revenueShare: Number(revenueShare)
+				}
+			},
+			dataForAuditLogs
+		);
 	};
 
 	render() {
@@ -237,7 +255,7 @@ class Settings extends Component {
 					checked={mergeReport}
 					onChange={this.handleToggle}
 					layout="horizontal"
-					disabled= {!site.apConfigs.isPnp}
+					disabled={!site.apConfigs.isPnp}
 					size="m"
 					on="Yes"
 					off="No"

@@ -14,7 +14,10 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = dispatch => ({
 	showNotification: data => dispatch(showNotification(data)),
-	updateUser: data => dispatch(updateUser(data))
+	updateUser: (data, dataForAuditLogs) => dispatch(updateUser(data, dataForAuditLogs))
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(ReportsPanelSettings);
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps
+)(ReportsPanelSettings);

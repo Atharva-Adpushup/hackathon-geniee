@@ -29,13 +29,15 @@ class Pagegroups extends Component {
 			createChannels,
 			showNotification,
 			updatePagegroupPattern,
-			deletePagegroup
+			deletePagegroup,
+			dataForAuditLogs
 		} = this.props;
 		switch (view) {
 			default:
 			case 'list':
 				return (
 					<Listing
+						dataForAuditLogs={dataForAuditLogs}
 						site={site}
 						updateView={this.updateView}
 						fetchChannelsInfo={fetchChannelsInfo}
@@ -47,6 +49,7 @@ class Pagegroups extends Component {
 			case 'create':
 				return (
 					<Creation
+						dataForAuditLogs={dataForAuditLogs}
 						site={site}
 						updateView={this.updateView}
 						createChannels={createChannels}

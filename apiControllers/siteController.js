@@ -418,13 +418,34 @@ router
 			.catch(err => sendErrorResponse(err, res));
 	})
 	.post('/saveSettings', (req, res) => {
-		const { email } = req.user;
-		const { siteId, apConfigs, adNetworkSettings } = req.body;
+		const { email, originalEmail } = req.user;
+		const { siteId, apConfigs, adNetworkSettings, dataForAuditLogs } = req.body;
 
 		return verifyOwner(siteId, email)
 			.then(site => {
-				const siteApConfigs = { ...site.get('apConfigs'), ...apConfigs };
-				const siteAdNetworkSettings = { ...site.get('adNetworkSettings'), ...adNetworkSettings };
+				const prevApConfigs = site.get('apConfigs');
+				const prevAdNetworkSettings = site.get('adNetworkSettings');
+				const siteApConfigs = { ...prevApConfigs, ...apConfigs };
+				const siteAdNetworkSettings = { ...prevAdNetworkSettings, ...adNetworkSettings };
+
+				// log config changes
+				const { siteDomain, appName, type = 'site' } = dataForAuditLogs;
+				sendDataToAuditLogService({
+					siteId,
+					siteDomain,
+					appName,
+					type,
+					impersonateId: email,
+					userId: originalEmail,
+					prevConfig: {
+						siteApConfigs: prevApConfigs,
+						siteAdNetworkSettings: prevAdNetworkSettings
+					},
+					currentConfig: {
+						siteApConfigs,
+						siteAdNetworkSettings
+					}
+				});
 
 				site.set('apConfigs', siteApConfigs);
 				site.set('adNetworkSettings', siteAdNetworkSettings);
@@ -434,14 +455,22 @@ router
 			.catch(err => sendErrorResponse(err, res));
 	})
 	.post('/updateSite', (req, res) => {
-		const { siteId, toUpdate } = req.body;
+		const { email, originalEmail } = req.user;
+		const { siteId, toUpdate, dataForAuditLogs } = req.body;
 		const toSend = [];
 		return checkParams(['siteId', 'toUpdate'], req, 'post')
 			.then(() => verifyOwner(siteId, req.user.email))
 			.then(site => {
+				const prevConfig = [];
+				const currentConfig = [];
 				toUpdate.forEach(content => {
 					const { key, value, replace = false, requireResponse = true } = content;
 					let data = site.get(key);
+					// for logging
+					prevConfig.push({
+						key: data
+					});
+
 					if (typeof data === 'object' && !Array.isArray(data) && !replace) {
 						data = {
 							...data,
@@ -450,9 +479,29 @@ router
 					} else {
 						data = value;
 					}
+
+					// for logging
+					currentConfig.push({
+						key: data
+					});
+
 					site.set(key, data);
 					if (requireResponse) toSend.push({ key, value: data });
 				});
+
+				// log config changes
+				const { siteDomain, appName, type = 'site' } = dataForAuditLogs;
+				sendDataToAuditLogService({
+					siteId,
+					siteDomain,
+					appName,
+					type,
+					impersonateId: email,
+					userId: originalEmail,
+					prevConfig,
+					currentConfig
+				});
+
 				return site.save();
 			})
 			.then(() =>
@@ -518,14 +567,27 @@ router
 
 	.post('/siteLevelBeforeJs/:siteId', (req, res) => {
 		const { siteId } = req.params;
-		const { email } = req.user;
-		const { beforeJs } = req.body;
+		const { email, originalEmail } = req.user;
+		const { beforeJs, dataForAuditLogs } = req.body;
 		return userModel
 			.verifySiteOwner(email, siteId)
 
 			.then(() => siteModel.getSiteById(siteId))
 			.then(site => {
-				const apConfig = { ...site.get('apConfigs'), ...{ beforeJs } };
+				const prevConfig = site.get('apConfigs');
+				const apConfig = { ...prevConfig, ...{ beforeJs } };
+				// log config changes
+				const { siteDomain, appName, type = 'site' } = dataForAuditLogs;
+				sendDataToAuditLogService({
+					siteId,
+					siteDomain,
+					appName,
+					type,
+					impersonateId: email,
+					userId: originalEmail,
+					prevConfig,
+					currentConfig: apConfig
+				});
 
 				site.set('apConfigs', apConfig);
 				return site.save();
@@ -583,9 +645,11 @@ router
 			});
 	})
 	.post('/:siteId/sizeMapping', (req, res) => {
-		const data = req.body;
-		const { email } = req.user;
+		const { data, dataForAuditLogs } = req.body;
+		const { email, originalEmail } = req.user;
 		const { siteId } = req.params;
+		// log config changes
+		const { siteDomain, appName } = dataForAuditLogs;
 
 		const { type } = data;
 
@@ -628,8 +692,8 @@ router
 					// find variation
 					let variationId = null;
 					const { data: channelData } = channel;
+					const prevConfig = _.cloneDeep(channelData);
 					const { variations } = channelData;
-
 					// eslint-disable-next-line no-restricted-syntax
 					for (const key in variations) {
 						if (Object.prototype.hasOwnProperty.call(variations, key)) {
@@ -649,6 +713,18 @@ router
 						adId
 					].sizeMapping = sizeMapping;
 
+					// log config changes
+					sendDataToAuditLogService({
+						siteId,
+						siteDomain,
+						appName,
+						type: 'site',
+						impersonateId: email,
+						userId: originalEmail,
+						prevConfig,
+						currentConfig: channelData
+					});
+
 					return channelModel.saveChannel(siteId, platform, pageGroup, channelData);
 				})
 				.then(() => sendSuccessResponse({}, res))
@@ -660,6 +736,7 @@ router
 
 			return helpers
 				.adUpdateProcessing(req, res, docKey, docWithCas => {
+					const prevConfig = _.cloneDeep(docWithCas.value);
 					const doc = docWithCas.value;
 					if (doc.ownerEmail !== req.user.email) {
 						throw new AdPushupError({
@@ -673,6 +750,17 @@ router
 							return false;
 						}
 						return true;
+					});
+
+					sendDataToAuditLogService({
+						siteId,
+						siteDomain,
+						appName,
+						type: 'site',
+						impersonateId: email,
+						userId: originalEmail,
+						prevConfig,
+						currentConfig: doc
 					});
 
 					return helpers.directDBUpdate(`${docKey}${req.params.siteId}`, doc, docWithCas.cas);
@@ -696,6 +784,7 @@ router
 
 			return helpers
 				.adUpdateProcessing(req, res, docKey, docWithCas => {
+					const prevConfig = _.cloneDeep(docWithCas.value);
 					const doc = docWithCas.value;
 
 					_.forEach(doc.adUnits, (ad, index) => {
@@ -706,6 +795,17 @@ router
 						return true;
 					});
 
+					// log config changes
+					sendDataToAuditLogService({
+						siteId,
+						siteDomain,
+						appName,
+						type: 'site',
+						impersonateId: email,
+						userId: originalEmail,
+						prevConfig,
+						currentConfig: doc
+					});
 					return helpers.directDBUpdate(`${docKey}${req.params.siteId}`, doc, docWithCas.cas);
 				})
 				.catch(err => errorHandler(err, res));
@@ -750,9 +850,26 @@ router
 	.use('/:siteId/pagegroup/', pageGroupController)
 	.post('/:siteId/forceApBuild', (req, res) => {
 		const { siteId } = req.params;
+		const { email, originalEmail } = req.user;
+		const { dataForAuditLogs } = req.body;
+
 		if (!siteId || siteId.trim().length === 0) {
 			return res.status(404).json({ message: 'Invalid Site ID' });
 		}
+
+		// log config changes
+		const { siteDomain, appName, type = 'site' } = dataForAuditLogs;
+
+		sendDataToAuditLogService({
+			siteId,
+			siteDomain,
+			appName,
+			type,
+			impersonateId: email,
+			userId: originalEmail,
+			prevConfig: {},
+			currentConfig: { forceBuild: true }
+		});
 
 		return siteModel
 			.getSiteById(siteId)

@@ -9,5 +9,8 @@ export default {
 		axiosInstance.post('/data/saveSite', { siteId, site, onboardingStage, step }),
 	saveApConfigs: (siteId, apConfigs, dataForAuditLogs) =>
 		axiosInstance.post('/site/saveApConfigs', { siteId, apConfigs, dataForAuditLogs }),
-	forceApBuild: siteId => axiosInstance.post(`/site/${siteId}/forceApBuild`)
+	forceApBuild: (siteId, dataForAuditLogs) =>
+		axiosInstance.post(`/site/${siteId}/forceApBuild`, {
+			dataForAuditLogs
+		})
 };

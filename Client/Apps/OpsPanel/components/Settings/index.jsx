@@ -17,6 +17,7 @@ class Settings extends Component {
 
 	render() {
 		const { activeKey } = this.state;
+		const { customProps } = this.props;
 		return (
 			<div className="u-padding-v4">
 				<Tab.Container
@@ -35,12 +36,12 @@ class Settings extends Component {
 							<Tab.Content animation>
 								{activeKey === 'account' ? (
 									<Tab.Pane eventKey="account">
-										<AccountContainer />
-										<ReportsPanelSettingsContainer />
+										<AccountContainer customProps={customProps} />
+										<ReportsPanelSettingsContainer customProps={customProps} />
 									</Tab.Pane>
 								) : (
 									<Tab.Pane eventKey="sites">
-										<SitesContainer />
+										<SitesContainer customProps={customProps} />
 									</Tab.Pane>
 								)}
 							</Tab.Content>

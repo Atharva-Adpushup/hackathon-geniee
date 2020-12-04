@@ -384,7 +384,7 @@ class SizeMapping extends Component {
 
 	// eslint-disable-next-line consistent-return
 	saveSizeMapping = () => {
-		const { updateSizeMapping, site, showNotification } = this.props;
+		const { updateSizeMapping, site, showNotification, dataForAuditLogs } = this.props;
 		const { siteId } = site;
 		const {
 			selectedAdUnit: { adUnitId, sizeMapping },
@@ -401,7 +401,7 @@ class SizeMapping extends Component {
 			return showNotification(notificationData);
 		}
 
-		updateSizeMapping(siteId, { ...inventoryData, sizeMapping, siteId })
+		updateSizeMapping(siteId, { ...inventoryData, sizeMapping, siteId }, dataForAuditLogs)
 			.then(() => {
 				this.fetchSiteInventories();
 				const notificationData = {
