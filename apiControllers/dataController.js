@@ -10,7 +10,12 @@ const CC = require('../configs/commonConsts');
 const httpStatus = require('../configs/httpStatusConsts');
 const pagegroupCreationAutomation = require('../services/pagegroupCreationAutomation');
 const AdpushupError = require('../helpers/AdPushupError');
-const { checkParams, errorHandler, verifyOwner } = require('../helpers/routeHelpers');
+const {
+	checkParams,
+	errorHandler,
+	verifyOwner,
+	sendDataToAuditLogService
+} = require('../helpers/routeHelpers');
 const { sendSuccessResponse, getNetworkConfig } = require('../helpers/commonFunctions');
 const logger = require('../helpers/globalBucketLogger');
 const helperUtils = require('../helpers/utils');
@@ -192,7 +197,49 @@ router
 		}
 
 		return checkChannelsExistence(siteData.siteId, siteData.channels)
+			.then(() => siteModel.getSiteById(siteData.siteId))
+			.then(prevSiteData => {
+				const newObj = {};
+				Object.keys(siteData).map(key => {
+					newObj[key] = prevSiteData.data[key];
+				});
+				const { email, originalEmail } = req.user;
+				// log config changes
+				sendDataToAuditLogService({
+					siteId: siteData.siteId,
+					siteDomain: siteData.siteDomain,
+					appName: 'Console Layout Editor',
+					type: 'site',
+					impersonateId: email,
+					userId: originalEmail,
+					prevConfig: newObj,
+					currentConfig: siteData
+				});
+			})
 			.then(siteModel.saveSiteData.bind(null, siteData.siteId, 'POST', siteData))
+			.then(() => siteModel.getSiteChannels(siteData.siteId))
+			.then(prevSiteChannelsData => {
+				const queue = [];
+				prevSiteChannelsData.map(channel => {
+					const [platform, pageGroup] = channel.split(':');
+					queue.push(channelModel.getChannel(siteData.siteId, platform, pageGroup));
+				});
+				return Promise.all(queue).then(allChannels => {
+					const channels = allChannels.map(channel => channel.data);
+					const { email, originalEmail } = req.user;
+					// log config changes
+					sendDataToAuditLogService({
+						siteId: siteData.siteId,
+						siteDomain: siteData.siteDomain,
+						appName: 'Console Layout Editor',
+						type: 'site',
+						impersonateId: email,
+						userId: originalEmail,
+						prevConfig: channels,
+						currentConfig: parsedData.channels
+					});
+				});
+			})
 			.then(
 				channelModel.saveChannels.bind(null, parseInt(parsedData.siteId, 10), parsedData.channels)
 			)
