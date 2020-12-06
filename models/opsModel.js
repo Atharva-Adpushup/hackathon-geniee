@@ -354,21 +354,11 @@ function apiModule() {
 					groupId: groupId
 				}
 			}));
-			// emails.forEach(email => {
-			// 	postData.data.push({
-			// 		email: email,
-			// 		message: notificationText,
-			// 		actionUrl: actionUrl,
-			// 		meta: {
-			// 			groupId: groupId
-			// 		}
-			// 	});
-			// });
 
 			return request({
 				method: 'POST',
 				json: true,
-				uri: 'http://localhost:8087/publishBulk',
+				uri: 'http://40.79.23.60:8087/publishBulk',
 				body: postData
 			});
 		},

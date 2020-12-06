@@ -8,16 +8,39 @@ import LostFoundLiveSites from './LostFoundLiveSites/index';
 import AdsTxtLiveSitesEntries from './AdsTxtLiveSitesEntries';
 import BidderSettings from './BidderSettings';
 import DashboardNotifications from './DashboardNotifications';
+import authService from '../../../../services/authService';
+import authToken from '../../../../../helpers/authToken';
 
 class Tools extends Component {
 	state = {
-		activeKey: TOOLS_IDENTIFIERS.BACKUP_ADS
+		activeKey: TOOLS_IDENTIFIERS.BACKUP_ADS,
+		dashboardNotificationAccess: false
 	};
 
 	handleSelect = value => {
 		this.setState({
 			activeKey: value
 		});
+	};
+
+	toggleDashboardNotificationAccess = status => {
+		this.setState({ dashboardNotificationAccess: status });
+	};
+
+	checkStatus = () => {
+		const { user } = this.props;
+		authToken.decodeAuthToken(authService.getAuthToken()).then(({ email, originalEmail }) => {
+			if (
+				(!originalEmail && user.dashboardNotificationAccess) ||
+				(originalEmail === email && user.dashboardNotificationAccess)
+			) {
+				this.toggleDashboardNotificationAccess(true);
+			}
+		});
+	};
+
+	componentDidMount = () => {
+		this.checkStatus();
 	};
 
 	renderContent = () => {
@@ -51,12 +74,13 @@ class Tools extends Component {
 					/>
 				);
 			case TOOLS_IDENTIFIERS.DASHBOARD_NOTIFICATIONS:
-				return <DashboardNotifications />;
+				return <DashboardNotifications showNotification={showNotification} />;
 		}
 	};
 
 	render() {
-		const { activeKey } = this.state;
+		const { activeKey, dashboardNotificationAccess } = this.state;
+
 		return (
 			<div className="u-padding-v4">
 				<Tab.Container
@@ -85,9 +109,13 @@ class Tools extends Component {
 								<NavItem eventKey={TOOLS_IDENTIFIERS.ADS_TXT_LIVE_SITES}>
 									Ads.txt Entries Live Sites
 								</NavItem>
-								<NavItem eventKey={TOOLS_IDENTIFIERS.DASHBOARD_NOTIFICATIONS}>
-									Dashboard Notifications
-								</NavItem>
+								{dashboardNotificationAccess ? (
+									<NavItem eventKey={TOOLS_IDENTIFIERS.DASHBOARD_NOTIFICATIONS}>
+										Dashboard Notifications
+									</NavItem>
+								) : (
+									<></>
+								)}
 								{/* <NavItem eventKey={TOOLS_IDENTIFIERS.REGEX_GENERATION}>Regex Generation</NavItem> */}
 							</Nav>
 						</Col>

@@ -327,7 +327,10 @@ router
 		return opsModel
 			.sendNotification(notificationData)
 			.then(message => sendSuccessResponse(message, res))
-			.catch(err => errorHandler(err, res));
+			.catch(err => { 
+				console.log(err);
+				return errorHandler(err, res)
+			});
 	})
 	.get('/getAllNotifications', (req, res) =>
 		opsModel

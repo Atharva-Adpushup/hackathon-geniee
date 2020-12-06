@@ -8,7 +8,7 @@ import axiosInstance from '../../../../helpers/axiosInstance';
 import Loader from '../../../../Components/Loader';
 // import Table from '../../../Reporting/components/Table';
 
-const DashboardNotifications = () => {
+const DashboardNotifications = ({ showNotification }) => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [notificationText, setNotificationText] = useState('');
 	const [actionUrlValue, setActionUrlValue] = useState('');
@@ -110,13 +110,32 @@ const DashboardNotifications = () => {
 		notificationObject.actionUrl = actionUrlValue;
 		notificationObject.notificationText = notificationText;
 
+		// showNotification({
+		// 	mode: 'error',
+		// 	title: 'Notification Sent Successfully',
+		// 	message: 'Failed to send notification',
+		// 	autoDismiss: 5
+		// });
+
 		axiosInstance
 			.post('/ops/sendNotification', { notificationData: notificationObject })
 			.then(() => {
 				setIsLoading(false);
+				return showNotification({
+					mode: 'success',
+					title: 'Success',
+					message: 'Notification Sent',
+					autoDismiss: 5
+				});
 			})
 			.catch(() => {
 				setIsLoading(false);
+				return showNotification({
+					mode: 'error',
+					title: 'Send Notification Failed',
+					message: 'Failed to send notification',
+					autoDismiss: 5
+				});
 			});
 		return false;
 	};
@@ -181,16 +200,17 @@ const DashboardNotifications = () => {
 					</div>
 
 					<div className="react-select-box-off-screen-1" aria-hidden="true">
-						<FieldGroup
-							name="Search"
-							type="text"
-							label="Search Emails"
-							id="search"
-							onChange={handleSearchTextChange}
-							value={filterValue}
-						/>
-
 						<Row>
+							<Col className="mt-2">
+								<FieldGroup
+									name="Search"
+									type="text"
+									placeholder="Seach Emails"
+									id="search"
+									onChange={handleSearchTextChange}
+									value={filterValue}
+								/>
+							</Col>
 							<Col>
 								<Button onClick={selectAllEmails} style={{ cursor: 'pointer' }}>
 									Select All

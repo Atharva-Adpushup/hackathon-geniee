@@ -94,7 +94,8 @@ var modelAPI = (module.exports = apiModule()),
 			'manuallyEnteredCompanyName',
 			'showUniqueImpressionsReporting',
 			'sessionRpmReports',
-			'isBidderAdmin'
+			'isBidderAdmin',
+			'dashboardNotificationAccess'
 		];
 		this.validations = schema.user.validations;
 		this.classMap = {
