@@ -41,7 +41,7 @@ const helpers = {
 		appBucket
 			.getDoc(`${key}${req.params.siteId}`)
 			.then(docWithCas => processing(docWithCas))
-			.then(() => emitEventAndSendResponse(req.body.siteId, res))
+			.then(() => emitEventAndSendResponse(req.body.siteId || req.params.siteId, res))
 			.catch(err => {
 				let error = err;
 				if (err && err.code && err.code === 13) {
@@ -822,7 +822,7 @@ router
 
 			const sortedSizeMapping = getSortedSizeMapping(sizeMapping);
 
-			const adData = { ...data, sizeMapping: sortedSizeMapping };
+			const adData = { ...data, sizeMapping: sortedSizeMapping, siteId };
 
 			switch (adType) {
 				case 'layout':

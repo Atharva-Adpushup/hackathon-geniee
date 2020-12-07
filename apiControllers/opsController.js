@@ -8,7 +8,7 @@ const { couchBase } = require('../configs/config');
 const HTTP_STATUSES = require('../configs/httpStatusConsts');
 const { GET_SITES_STATS_API, EMAIL_REGEX } = require('../configs/commonConsts');
 const { sendSuccessResponse, sendErrorResponse } = require('../helpers/commonFunctions');
-const { appBucket, errorHandler } = require('../helpers/routeHelpers');
+const { appBucket, errorHandler, sendDataToAuditLogService } = require('../helpers/routeHelpers');
 const opsModel = require('../models/opsModel');
 const apLiteModel = require('../models/apLiteModel');
 
@@ -286,12 +286,35 @@ router
 			);
 		}
 
-		const { adUnits } = req.body;
+		const { adUnits, dataForAuditLogs } = req.body;
 		const json = { siteId: parseInt(siteId, 10), adUnits };
+		const { email, originalEmail } = req.user;
+		// log config changes
+		const { siteDomain, appName } = dataForAuditLogs;
+
+		let prevConfig = {};
 		return apLiteModel
-			.saveAdUnits(json)
+			.getAPLiteModelBySite(json.siteId)
+			.then(apLiteSite => {
+				prevConfig = apLiteSite.data;
+			})
+			.then(() => apLiteModel.saveAdUnits(json))
 			.then(() => apLiteModel.getAPLiteModelBySite(json.siteId))
-			.then(doc => sendSuccessResponse(doc, res))
+			.then(doc => {
+				// log config changes
+				sendDataToAuditLogService({
+					siteId,
+					siteDomain,
+					appName,
+					type: 'site',
+					impersonateId: email,
+					userId: originalEmail,
+					prevConfig,
+					currentConfig: json
+				});
+
+				sendSuccessResponse(doc, res);
+			})
 			.catch(err => errorHandler(err));
 	})
 

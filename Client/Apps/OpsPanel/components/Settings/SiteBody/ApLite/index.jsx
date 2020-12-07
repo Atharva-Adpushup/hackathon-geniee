@@ -299,7 +299,8 @@ class ApLite extends Component {
 		} = this.state;
 		const {
 			site: { siteId },
-			showNotification
+			showNotification,
+			dataForAuditLogs
 		} = this.props;
 		let adUnits = [];
 		const oldAdUnitsWithDfpNameAndCode = oldAdUnits.map(({ refreshInterval, ...rest }) => rest);
@@ -356,7 +357,8 @@ class ApLite extends Component {
 
 		return axiosInstance
 			.put(`/ops/ap-lite/${siteId}`, {
-				adUnits
+				adUnits,
+				dataForAuditLogs
 			})
 			.then(res => {
 				const {
