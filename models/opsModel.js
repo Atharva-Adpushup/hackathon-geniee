@@ -351,7 +351,8 @@ function apiModule() {
 				message: notificationText,
 				actionUrl: actionUrl,
 				meta: {
-					groupId: groupId
+					groupId: groupId,
+					allUser: false
 				}
 			}));
 

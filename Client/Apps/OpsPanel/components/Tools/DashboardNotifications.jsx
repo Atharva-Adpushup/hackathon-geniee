@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import moment from 'moment';
-import { Col, Row, Checkbox, Button, Table } from '@/Client/helpers/react-bootstrap-imports';
+import {
+	Col,
+	Row,
+	Checkbox,
+	Table,
+	Label,
+	Glyphicon,
+	DropdownButton,
+	InputGroup
+} from '@/Client/helpers/react-bootstrap-imports';
 // import CustomToggleSwitch from '../../../../Components/CustomToggleSwitch';
 import CustomButton from '../../../../Components/CustomButton/index';
 import FieldGroup from '../../../../Components/Layout/FieldGroup';
@@ -12,14 +21,14 @@ const DashboardNotifications = ({ showNotification }) => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [notificationText, setNotificationText] = useState('');
 	const [actionUrlValue, setActionUrlValue] = useState('');
-	const [filterValue, setFilterValue] = useState('');
 	const [allAccountEmails, setAccountEmails] = useState([]);
 	const [filteredList, setFilteredList] = useState([]);
 	const [selectedEmails, setSelectedEmails] = useState({});
 	const [allNotifications, setAllNotifications] = useState({});
+	const [menuOpen, setMenuOpen] = useState(false);
+	const [selectBoxLabelText, setSelectBoxLabelText] = useState(0);
 
 	const handleSearchTextChange = e => {
-		setFilterValue(e.target.value);
 		let currentList = [];
 
 		let newList = [];
@@ -67,12 +76,6 @@ const DashboardNotifications = ({ showNotification }) => {
 		axiosInstance.get('/ops/getAllNotifications').then(response => {
 			const { data } = response;
 			const allNotificationsArray = data.data;
-			// allNotificationsArray.push({
-			// 	dateSent: 1605732425855,
-			// 	recipients: [''],
-			// 	notificationText: 'oka test',
-			// 	actionUrl: 'google.com'
-			// });
 
 			const notificationsData = {};
 			allNotificationsArray.forEach(notification => {
@@ -93,6 +96,7 @@ const DashboardNotifications = ({ showNotification }) => {
 				}
 				notificationsData[groupId].userNotification.push(userEmail);
 			});
+
 			setAllNotifications(notificationsData);
 		});
 	}, []);
@@ -101,30 +105,60 @@ const DashboardNotifications = ({ showNotification }) => {
 		setIsLoading(true);
 		const notificationObject = {};
 		const selectedEmailsList = [];
+		let allUserStatus = false;
 		Object.keys(selectedEmails).forEach(email => {
 			if (selectedEmails[email]) {
 				selectedEmailsList.push(email);
 			}
 		});
+		if (Object.keys(selectedEmails).length === selectedEmailsList.length) {
+			allUserStatus = true;
+		}
 		notificationObject.emails = selectedEmailsList;
 		notificationObject.actionUrl = actionUrlValue;
 		notificationObject.notificationText = notificationText;
 
-		// showNotification({
-		// 	mode: 'error',
-		// 	title: 'Notification Sent Successfully',
-		// 	message: 'Failed to send notification',
-		// 	autoDismiss: 5
-		// });
+		if (!notificationText) {
+			setIsLoading(false);
+			return showNotification({
+				mode: 'error',
+				title: 'Send Notification Failed',
+				message: 'Notification Text is Mandatory',
+				autoDismiss: 5
+			});
+		}
+
+		if (
+			actionUrlValue &&
+			!(actionUrlValue.includes('https://') || actionUrlValue.includes('http://'))
+		) {
+			setIsLoading(false);
+			return showNotification({
+				mode: 'error',
+				title: 'Send Notification Failed',
+				message: 'Please Add Valid Action Url. It must include http:// or https://',
+				autoDismiss: 5
+			});
+		}
+
+		if (selectBoxLabelText === 0) {
+			setIsLoading(false);
+			return showNotification({
+				mode: 'error',
+				title: 'Send Notification Failed',
+				message: 'Please select atleast 1 email',
+				autoDismiss: 5
+			});
+		}
 
 		axiosInstance
-			.post('/ops/sendNotification', { notificationData: notificationObject })
+			.post('/ops/sendNotification', { notificationData: notificationObject, allUserStatus })
 			.then(() => {
 				setIsLoading(false);
 				return showNotification({
 					mode: 'success',
-					title: 'Success',
-					message: 'Notification Sent',
+					title: 'Operation Successful',
+					message: 'Notification Sent successfully',
 					autoDismiss: 5
 				});
 			})
@@ -132,7 +166,7 @@ const DashboardNotifications = ({ showNotification }) => {
 				setIsLoading(false);
 				return showNotification({
 					mode: 'error',
-					title: 'Send Notification Failed',
+					title: 'Operation Failed',
 					message: 'Failed to send notification',
 					autoDismiss: 5
 				});
@@ -140,10 +174,22 @@ const DashboardNotifications = ({ showNotification }) => {
 		return false;
 	};
 
+	const setSelectBoxLabelTextCompute = () => {
+		const finalFilteredList = filteredList.filter(email => selectedEmails[email] === true);
+		setSelectBoxLabelText(finalFilteredList.length);
+	};
+
 	const handleFilterValueSelect = (e, email) => {
 		// {value, name, checked} = e.target;
 		const tempValues = { ...selectedEmails };
 		tempValues[email] = e.target.checked;
+		const value = selectBoxLabelText;
+
+		if (tempValues[email]) {
+			setSelectBoxLabelText(value + 1);
+		} else {
+			setSelectBoxLabelText(value - 1);
+		}
 		setSelectedEmails(tempValues);
 	};
 
@@ -153,15 +199,33 @@ const DashboardNotifications = ({ showNotification }) => {
 			tempValues[email] = true;
 		});
 		setSelectedEmails(tempValues);
+		setSelectBoxLabelTextCompute();
 	};
 
 	const selectNoEmails = () => {
 		const tempValues = { ...selectedEmails };
-		Object.keys(tempValues).forEach(email => {
+		filteredList.forEach(email => {
 			tempValues[email] = false;
 		});
 		setSelectedEmails(tempValues);
+		setSelectBoxLabelTextCompute();
 	};
+
+	const dropdownToggleMenu = () => {
+		setMenuOpen(!menuOpen);
+	};
+
+	const selectBoxLabels = (
+		<Label
+			bsStyle="info"
+			className="u-margin-r2"
+			style={{ height: '19px' }}
+			key="select_emails_labels"
+		>
+			{`${selectBoxLabelText} Emails Selected`}
+			<Glyphicon glyph="remove" className="u-margin-l1" onClick={selectNoEmails} />
+		</Label>
+	);
 
 	return (
 		<>
@@ -171,82 +235,103 @@ const DashboardNotifications = ({ showNotification }) => {
 				</>
 			) : (
 				<>
-					<div>
-						<FieldGroup
-							name="notificationText"
-							type="text"
-							label="Notification Text"
-							id="notification-text-input"
-							placeholder="Notification Text"
-							className="u-padding-h4"
-							onChange={e => {
-								setNotificationText(e.target.value);
-							}}
-							value={notificationText}
-							required
-						/>
-						<FieldGroup
-							name="clickThroughUrl"
-							type="text"
-							label="Clickthrough URL"
-							id="click-through-input"
-							placeholder="Click Through URL"
-							className="u-padding-v4 u-padding-h4"
-							onChange={e => {
-								setActionUrlValue(e.target.value);
-							}}
-							value={actionUrlValue}
-						/>
-					</div>
+					<Row className="mb-3">
+						<Col md="12">
+							<FieldGroup
+								name="notificationText"
+								type="text"
+								label="Notification Text"
+								id="notification-text-input"
+								placeholder="Notification Text"
+								className="u-padding-h4"
+								onChange={e => {
+									setNotificationText(e.target.value);
+								}}
+								value={notificationText}
+								required
+							/>
+						</Col>
+						<Col md="12">
+							<FieldGroup
+								name="clickThroughUrl"
+								type="text"
+								label="Clickthrough URL"
+								id="click-through-input"
+								placeholder="https://adpushup.com"
+								className="u-padding-v4 u-padding-h4"
+								onChange={e => {
+									setActionUrlValue(e.target.value);
+								}}
+								value={actionUrlValue}
+							/>
+						</Col>
+						<Col md="10">
+							<InputGroup>
+								<InputGroup.Addon>Email Filter</InputGroup.Addon>
+								<div className="custom-select-box-wrapper">
+									<DropdownButton
+										open={menuOpen}
+										onToggle={dropdownToggleMenu}
+										id="async-group-select-dropdown"
+										className=" custom-select-box u-padding-l2 "
+										aria-hidden="true"
+										title={
+											<div className="aligner aligner--hStart  aligner--wrap">
+												{selectBoxLabels}
+											</div>
+										}
+									>
+										<div className="react-select-box-off-screen-1" aria-hidden="true">
+											<input
+												type="text"
+												className="input inputSearch"
+												placeholder="Search..."
+												onChange={handleSearchTextChange}
+												onSelect={e => e.stopPropagation()}
+											/>
+											<div>
+												<a
+													onClick={selectAllEmails}
+													style={{ cursor: 'pointer' }}
+													className="u-margin-l3 u-margin-r2"
+												>
+													Select All
+												</a>
+												<a onClick={selectNoEmails} style={{ cursor: 'pointer' }}>
+													None
+												</a>
+											</div>
 
-					<div className="react-select-box-off-screen-1" aria-hidden="true">
-						<Row>
-							<Col className="mt-2">
-								<FieldGroup
-									name="Search"
-									type="text"
-									placeholder="Seach Emails"
-									id="search"
-									onChange={handleSearchTextChange}
-									value={filterValue}
-								/>
-							</Col>
-							<Col>
-								<Button onClick={selectAllEmails} style={{ cursor: 'pointer' }}>
-									Select All
-								</Button>
-								<Button
-									onClick={selectNoEmails}
-									className="u-padding-h4 u-margin-l3"
-									style={{ cursor: 'pointer' }}
-								>
-									None
-								</Button>
-							</Col>
-						</Row>
-
-						<div className="filterValues">
-							{filteredList.map(email => (
-								<Checkbox
-									className="col-sm-12"
-									key={email}
-									type="checkbox"
-									onChange={e => {
-										handleFilterValueSelect(e, email);
-									}}
-									checked={selectedEmails[email] !== null ? selectedEmails[email] : false}
-								>
-									{email}
-								</Checkbox>
-							))}
-						</div>
-					</div>
-
-					<Row>
-						<Col>
+											{filteredList && filteredList.length > 0 ? (
+												<div className="filterValues" style={{ overflow: 'auto' }}>
+													{filteredList.map(email => (
+														<Checkbox
+															className="col-sm-12"
+															key={email}
+															type="checkbox"
+															onChange={e => {
+																handleFilterValueSelect(e, email);
+															}}
+															checked={
+																selectedEmails[email] !== null ? selectedEmails[email] : false
+															}
+														>
+															{email}
+														</Checkbox>
+													))}
+												</div>
+											) : (
+												<div className="inputSearch text-center">No Value Found</div>
+											)}
+										</div>
+									</DropdownButton>
+								</div>
+							</InputGroup>
+						</Col>
+						<Col md="2">
 							<CustomButton
 								variant="primary"
-								className="pull-right u-margin-t3"
+								className="pull-right"
 								showSpinner={isLoading}
 								onClick={sendNotification}
 							>
@@ -255,8 +340,13 @@ const DashboardNotifications = ({ showNotification }) => {
 						</Col>
 					</Row>
 
-					<Row>
-						<Col>
+					<Row className="u-margin-t2">
+						<Col md="12">
+							<h4>
+								<b>Sent Notifications</b>
+							</h4>
+						</Col>
+						<Col md="12" className="pt-3 mt-3">
 							<Table striped bordered hover condensed responsive>
 								<thead>
 									<tr>
