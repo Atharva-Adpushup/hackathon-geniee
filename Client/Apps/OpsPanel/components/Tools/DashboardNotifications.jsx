@@ -1,21 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import moment from 'moment';
+import Datatable from 'react-bs-datatable';
 import {
 	Col,
 	Row,
 	Checkbox,
-	Table,
 	Label,
 	Glyphicon,
 	DropdownButton,
 	InputGroup
 } from '@/Client/helpers/react-bootstrap-imports';
-// import CustomToggleSwitch from '../../../../Components/CustomToggleSwitch';
+import 'react-table/react-table.css';
+import '../../../../Components/Tags/styles.scss';
 import CustomButton from '../../../../Components/CustomButton/index';
 import FieldGroup from '../../../../Components/Layout/FieldGroup';
 import axiosInstance from '../../../../helpers/axiosInstance';
 import Loader from '../../../../Components/Loader';
-// import Table from '../../../Reporting/components/Table';
 
 const DashboardNotifications = ({ showNotification }) => {
 	const [isLoading, setIsLoading] = useState(false);
@@ -24,22 +24,22 @@ const DashboardNotifications = ({ showNotification }) => {
 	const [allAccountEmails, setAccountEmails] = useState([]);
 	const [filteredList, setFilteredList] = useState([]);
 	const [selectedEmails, setSelectedEmails] = useState({});
-	const [allNotifications, setAllNotifications] = useState({});
 	const [menuOpen, setMenuOpen] = useState(false);
 	const [selectBoxLabelText, setSelectBoxLabelText] = useState(0);
+	const [tableConfig, setTableConfig] = useState({});
+
+	const onSort = {
+		Date: value => moment(value, 'dd MMM YYYY').valueOf()
+	};
 
 	const handleSearchTextChange = e => {
 		let currentList = [];
-
 		let newList = [];
-
 		if (e.target.value !== '') {
 			currentList = allAccountEmails;
-
 			newList = currentList.filter(email => {
 				if (email) {
 					const lc = email.toLowerCase();
-
 					const filter = e.target.value.toLowerCase();
 
 					return lc.includes(filter);
@@ -97,7 +97,47 @@ const DashboardNotifications = ({ showNotification }) => {
 				notificationsData[groupId].userNotification.push(userEmail);
 			});
 
-			setAllNotifications(notificationsData);
+			const tableBody = [];
+			Object.keys(notificationsData).map(groupId => {
+				const notification = notificationsData[groupId];
+				if (!notification) {
+					return;
+				}
+
+				const receipient = notification.allUser
+					? 'All Users'
+					: notification.userNotification && notification.userNotification.join();
+
+				const row = {
+					Date: notification.dateCreated,
+					Recepients: receipient,
+					Notification: notification.message,
+					actionUrl: notification.actionUrl
+				};
+
+				tableBody.push(row);
+			});
+
+			tableBody.sort((a, b) => {
+				return a.Date.toString().localeCompare(b.Date.toString());
+			});
+
+			const tableBodyData = tableBody.map((dataValue, index) => {
+				const dataValues = { ...dataValue };
+				dataValues.Sno = index + 1;
+				dataValues.Date = moment(dataValues.Date).format('MMM DD YYYY');
+				return dataValues;
+			});
+
+			const headers = [
+				{ title: 'Sno', prop: 'Sno', sortable: true },
+				{ title: 'Date', prop: 'Date', sortable: true },
+				{ title: 'Recepients', prop: 'Recepients', sortable: true },
+				{ title: 'Notification', prop: 'Notification', sortable: true },
+				{ title: 'Action Url', prop: 'actionUrl', sortable: true }
+			];
+			const tableData = { headers, body: tableBodyData };
+			setTableConfig(tableData);
 		});
 	}, []);
 
@@ -227,6 +267,16 @@ const DashboardNotifications = ({ showNotification }) => {
 		</Label>
 	);
 
+	const customLabels = {
+		first: '<<',
+		last: '>>',
+		prev: '<',
+		next: '>',
+		show: 'Show',
+		entries: 'rows',
+		noResults: 'There is no data to be displayed'
+	};
+
 	return (
 		<>
 			{!allAccountEmails.length ? (
@@ -340,42 +390,22 @@ const DashboardNotifications = ({ showNotification }) => {
 						</Col>
 					</Row>
 
-					<Row className="u-margin-t2">
-						<Col md="12">
+					<Row className="u-margin-t3">
+						<Col md={12}>
 							<h4>
 								<b>Sent Notifications</b>
 							</h4>
 						</Col>
-						<Col md="12" className="pt-3 mt-3">
-							<Table striped bordered hover condensed responsive>
-								<thead>
-									<tr>
-										<th>S no</th>
-										<th>Date Sent</th>
-										<th>Receipient</th>
-										<th>Notification Text</th>
-										<th>Action Url</th>
-									</tr>
-								</thead>
-								<tbody>
-									{Object.keys(allNotifications).map((groupId, index) => {
-										const notification = allNotifications[groupId];
-										return (
-											<tr>
-												<td>{index + 1}</td>
-												<td>{moment(notification.dateCreated).format('DD/MM/YYYY')}</td>
-												<td>
-													{notification.allUser
-														? 'All Users'
-														: notification.userNotification && notification.userNotification.join()}
-												</td>
-												<td>{notification.message}</td>
-												<td>{notification.actionUrl}</td>
-											</tr>
-										);
-									})}
-								</tbody>
-							</Table>
+						<Col md={12} className="report-table pt-3 mt-3">
+							<Datatable
+								tableHeader={tableConfig.headers}
+								tableBody={tableConfig.body}
+								rowsPerPage={10}
+								rowsPerPageOption={[20, 30, 40, 50]}
+								onSort={onSort}
+								paginationButtonGroup={false}
+								labels={customLabels}
+							/>
 						</Col>
 					</Row>
 				</>

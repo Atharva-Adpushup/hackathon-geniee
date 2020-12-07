@@ -10,6 +10,8 @@ const couchbase = require('../helpers/couchBaseService');
 const AdPushupError = require('../helpers/AdPushupError');
 const commonConsts = require('../configs/commonConsts');
 const proxy = require('../helpers/proxy');
+import config from '../configs/config';
+
 const axios = require('axios');
 const { AMP_SETTINGS_ACCESS_EMAILS } = require('../configs/commonConsts');
 const commonSiteFunctions = {
@@ -359,7 +361,7 @@ function apiModule() {
 			return request({
 				method: 'POST',
 				json: true,
-				uri: 'http://40.79.23.60:8087/publishBulk',
+				uri: config.PUBLISHER_API_BULK,
 				body: postData
 			});
 		},
