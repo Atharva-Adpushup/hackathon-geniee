@@ -5,6 +5,7 @@ var utils = require('./utils');
 var refreshAdSlot = require('../../../../src/refreshAdSlot');
 var prebidDataCollector = require('./prebidDataCollector');
 var apUtils = require('../../../../libs/utils');
+var { removeBbPlayerIfRendered, getBbPlayerId } = require('./bbPlayerUtils');
 var config = require('./config');
 const multiFormatConfig = require('./multiFormatConfig');
 
@@ -14,6 +15,7 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 	var bluebillywig = (window.bluebillywig = window.bluebillywig || {});
 	bluebillywig.cmd = bluebillywig.cmd || [];
 	var bidWonTime = +new Date();
+	var [width, height] = adpSlot.size;
 
 	function getBbPlayerConfig(bid) {
 		const config = {
@@ -21,44 +23,7 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 		};
 
 		if (bid.vastXml) {
-			if (bid.adUnitCode === 'ADP_37780_336X280_1bd7736f-7392-442c-8af5-f7439cb63894') {
-				config.vastXml = `<?xml version='1.0' encoding='UTF-8'?>
-					<VAST version="2.0">
-						<Ad>
-							<InLine>
-								<AdSystem>onetag</AdSystem>
-								<AdTitle><![CDATA[Prebid Video Skippable -- Avocados From Mexico]]></AdTitle>
-								<!-- <Impression><![CDATA[https://onetag-sys.com/ping/7hOU6HVGJaq_BQjX42ZcaGM7_ylaJGaAjSKYhuGKykU_pOsyxVAxiBfQdlvo9WWVSikeOIwftlIXtOtYpdS-mzMUjo9AMFkTIUD9KE89j_xGKkqHrmpJHW_2wyha0vndk7tUvqczYpcR2tNgxszsNyE2F0x-FqWEi5tG4RPdHPKCuNMewEaWccIZVqa-KqvkQLO_sgYi6WwN4GIKHK5IfpKSZxZBlhpl4v4Tw-_VSzU;KChyv57HW1MsnxCE9Blq2ctZ_bFb5E5iQRE_gcFAcwbg-80DjzBzCPR5PRxlq0q6:oAaCmRV6kxPamcl72AknUZ1T9wn6ZER8p9AqcqA8UYbWxQULeWgdNMEic6norf0bleEiLG2Hoac1sg82istJHvb8m2gHyxZP4cOPC2Cq6lpFBJ59cbEytrUN9o-guHd7TefSDJz6ECSm7zOZM43KetMp0ESTNaOLi1CmKTCWFF2wvq0lueafz9KZnDl9EbIWImfyKci3XD0-ZOgI7HdJF41ivET0DWBo4xqXMJppBi-jxEgF3_zfMQIcA85eM41q94wJIZIJZJiqZiAorKHpoOUHPyB0EG4A_q_gS35T03EaUxKZlYQy5FtbiwNxNWntG6Bct50eCLDXtuViUL3SN4H3Hpdm9DEJbi9BatqNpb9ikN6LLjHUG0wAiwRhEnZzVZnQBKOOQm6bHj-q8CBzngXzxC_UIcMQ2L249PopGS1V3tRqwxxF2aZ-dLbSsykH:115:0:0:0:0:0:0:0:70c37cdd-a840-476d-8b04-69f3218358d9]]></Impression>
-								<Impression><![CDATA[https://onetag-sys.com/ping/7hOU6HVGJaq_BQjX42ZcaGM7_ylaJGaAjSKYhuGKykU_pOsyxVAxiBfQdlvo9WWVSikeOIwftlIXtOtYpdS-mzMUjo9AMFkTIUD9KE89j_xGKkqHrmpJHW_2wyha0vndk7tUvqczYpcR2tNgxszsNyE2F0x-FqWEi5tG4RPdHPKCuNMewEaWccIZVqa-KqvkQLO_sgYi6WwN4GIKHK5IfpKSZxZBlhpl4v4Tw-_VSzU;KChyv57HW1MsnxCE9Blq2ctZ_bFb5E5iQRE_gcFAcwbg-80DjzBzCPR5PRxlq0q6:oAaCmRV6kxPamcl72AknUZ1T9wn6ZER8p9AqcqA8UYbWxQULeWgdNMEic6norf0bleEiLG2Hoac1sg82istJHvb8m2gHyxZP4cOPC2Cq6lpFBJ59cbEytrUN9o-guHd7TefSDJz6ECSm7zOZM43KetMp0ESTNaOLi1CmKTCWFF2wvq0lueafz9KZnDl9EbIWImfyKci3XD0-ZOgI7HdJF41ivET0DWBo4xqXMJppBi-jxEgF3_zfMQIcA85eM41q94wJIZIJZJiqZiAorKHpoOUHPyB0EG4A_q_gS35T03EaUxKZlYQy5FtbiwNxNWntG6Bct50eCLDXtuViUL3SN4H3Hpdm9DEJbi9BatqNpb9ikN6LLjHUG0wAiwRhEnZzVZnQBKOOQm6bHj-q8CBzngXzxC_UIcMQ2L249PopGS1V3tRqwxxF2aZ-dLbSsykH:1:0:0:0:0:0:0:0:70c37cdd-a840-476d-8b04-69f3218358d9]]></Impression>
-								<Impression><![CDATA[https://onetag-sys.com/ping/7hOU6HVGJaq_BQjX42ZcaGM7_ylaJGaAjSKYhuGKykU_pOsyxVAxiBfQdlvo9WWVSikeOIwftlIXtOtYpdS-mzMUjo9AMFkTIUD9KE89j_xGKkqHrmpJHW_2wyha0vndk7tUvqczYpcR2tNgxszsNyE2F0x-FqWEi5tG4RPdHPKCuNMewEaWccIZVqa-KqvkQLO_sgYi6WwN4GIKHK5IfpKSZxZBlhpl4v4Tw-_VSzU;KChyv57HW1MsnxCE9Blq2ctZ_bFb5E5iQRE_gcFAcwbg-80DjzBzCPR5PRxlq0q6:oAaCmRV6kxPamcl72AknUZ1T9wn6ZER8p9AqcqA8UYbWxQULeWgdNMEic6norf0bleEiLG2Hoac1sg82istJHvb8m2gHyxZP4cOPC2Cq6lpFBJ59cbEytrUN9o-guHd7TefSDJz6ECSm7zOZM43KetMp0ESTNaOLi1CmKTCWFF2wvq0lueafz9KZnDl9EbIWImfyKci3XD0-ZOgI7HdJF41ivET0DWBo4xqXMJppBi-jxEgF3_zfMQIcA85eM41q94wJIZIJZJiqZiAorKHpoOUHPyB0EG4A_q_gS35T03EaUxKZlYQy5FtbiwNxNWntG6Bct50eCLDXtuViUL3SN4H3Hpdm9DEJbi9BatqNpb9ikN6LLjHUG0wAiwRhEnZzVZnQBKOOQm6bHj-q8CBzngXzxC_UIcMQ2L249PopGS1V3tRqwxxF2aZ-dLbSsykH:128:0:0:0:0:0:0:0:70c37cdd-a840-476d-8b04-69f3218358d9]]></Impression>
-								<Impression><![CDATA[http://track.adform.net/adfserve/?bn=41297041;srctype=4;ord=1604492842411]]></Impression> -->
-								<Creatives>
-									<Creative id="1">
-										<Linear skipoffset="00:00:05">
-											<Duration>00:00:20</Duration>
-											<TrackingEvents>
-												<!-- <Tracking event="start"><![CDATA[https://onetag-sys.com/ping/7hOU6HVGJaq_BQjX42ZcaGM7_ylaJGaAjSKYhuGKykU_pOsyxVAxiBfQdlvo9WWVSikeOIwftlIXtOtYpdS-mzMUjo9AMFkTIUD9KE89j_xGKkqHrmpJHW_2wyha0vndk7tUvqczYpcR2tNgxszsNyE2F0x-FqWEi5tG4RPdHPKCuNMewEaWccIZVqa-KqvkQLO_sgYi6WwN4GIKHK5IfpKSZxZBlhpl4v4Tw-_VSzU;KChyv57HW1MsnxCE9Blq2ctZ_bFb5E5iQRE_gcFAcwbg-80DjzBzCPR5PRxlq0q6:oAaCmRV6kxPamcl72AknUZ1T9wn6ZER8p9AqcqA8UYbWxQULeWgdNMEic6norf0bleEiLG2Hoac1sg82istJHvb8m2gHyxZP4cOPC2Cq6lpFBJ59cbEytrUN9o-guHd7TefSDJz6ECSm7zOZM43KetMp0ESTNaOLi1CmKTCWFF2wvq0lueafz9KZnDl9EbIWImfyKci3XD0-ZOgI7HdJF41ivET0DWBo4xqXMJppBi-jxEgF3_zfMQIcA85eM41q94wJIZIJZJiqZiAorKHpoOUHPyB0EG4A_q_gS35T03EaUxKZlYQy5FtbiwNxNWntG6Bct50eCLDXtuViUL3SN4H3Hpdm9DEJbi9BatqNpb9ikN6LLjHUG0wAiwRhEnZzVZnQBKOOQm6bHj-q8CBzngXzxC_UIcMQ2L249PopGS1V3tRqwxxF2aZ-dLbSsykH:20:0:0:0:0:0:0:0:70c37cdd-a840-476d-8b04-69f3218358d9]]></Tracking>
-												<Tracking event="firstQuartile"><![CDATA[https://onetag-sys.com/ping/7hOU6HVGJaq_BQjX42ZcaGM7_ylaJGaAjSKYhuGKykU_pOsyxVAxiBfQdlvo9WWVSikeOIwftlIXtOtYpdS-mzMUjo9AMFkTIUD9KE89j_xGKkqHrmpJHW_2wyha0vndk7tUvqczYpcR2tNgxszsNyE2F0x-FqWEi5tG4RPdHPKCuNMewEaWccIZVqa-KqvkQLO_sgYi6WwN4GIKHK5IfpKSZxZBlhpl4v4Tw-_VSzU;KChyv57HW1MsnxCE9Blq2ctZ_bFb5E5iQRE_gcFAcwbg-80DjzBzCPR5PRxlq0q6:oAaCmRV6kxPamcl72AknUZ1T9wn6ZER8p9AqcqA8UYbWxQULeWgdNMEic6norf0bleEiLG2Hoac1sg82istJHvb8m2gHyxZP4cOPC2Cq6lpFBJ59cbEytrUN9o-guHd7TefSDJz6ECSm7zOZM43KetMp0ESTNaOLi1CmKTCWFF2wvq0lueafz9KZnDl9EbIWImfyKci3XD0-ZOgI7HdJF41ivET0DWBo4xqXMJppBi-jxEgF3_zfMQIcA85eM41q94wJIZIJZJiqZiAorKHpoOUHPyB0EG4A_q_gS35T03EaUxKZlYQy5FtbiwNxNWntG6Bct50eCLDXtuViUL3SN4H3Hpdm9DEJbi9BatqNpb9ikN6LLjHUG0wAiwRhEnZzVZnQBKOOQm6bHj-q8CBzngXzxC_UIcMQ2L249PopGS1V3tRqwxxF2aZ-dLbSsykH:21:0:0:0:0:0:0:0:70c37cdd-a840-476d-8b04-69f3218358d9]]></Tracking>
-												<Tracking event="midpoint"><![CDATA[https://onetag-sys.com/ping/7hOU6HVGJaq_BQjX42ZcaGM7_ylaJGaAjSKYhuGKykU_pOsyxVAxiBfQdlvo9WWVSikeOIwftlIXtOtYpdS-mzMUjo9AMFkTIUD9KE89j_xGKkqHrmpJHW_2wyha0vndk7tUvqczYpcR2tNgxszsNyE2F0x-FqWEi5tG4RPdHPKCuNMewEaWccIZVqa-KqvkQLO_sgYi6WwN4GIKHK5IfpKSZxZBlhpl4v4Tw-_VSzU;KChyv57HW1MsnxCE9Blq2ctZ_bFb5E5iQRE_gcFAcwbg-80DjzBzCPR5PRxlq0q6:oAaCmRV6kxPamcl72AknUZ1T9wn6ZER8p9AqcqA8UYbWxQULeWgdNMEic6norf0bleEiLG2Hoac1sg82istJHvb8m2gHyxZP4cOPC2Cq6lpFBJ59cbEytrUN9o-guHd7TefSDJz6ECSm7zOZM43KetMp0ESTNaOLi1CmKTCWFF2wvq0lueafz9KZnDl9EbIWImfyKci3XD0-ZOgI7HdJF41ivET0DWBo4xqXMJppBi-jxEgF3_zfMQIcA85eM41q94wJIZIJZJiqZiAorKHpoOUHPyB0EG4A_q_gS35T03EaUxKZlYQy5FtbiwNxNWntG6Bct50eCLDXtuViUL3SN4H3Hpdm9DEJbi9BatqNpb9ikN6LLjHUG0wAiwRhEnZzVZnQBKOOQm6bHj-q8CBzngXzxC_UIcMQ2L249PopGS1V3tRqwxxF2aZ-dLbSsykH:22:0:0:0:0:0:0:0:70c37cdd-a840-476d-8b04-69f3218358d9]]></Tracking>
-												<Tracking event="thirdQuartile"><![CDATA[https://onetag-sys.com/ping/7hOU6HVGJaq_BQjX42ZcaGM7_ylaJGaAjSKYhuGKykU_pOsyxVAxiBfQdlvo9WWVSikeOIwftlIXtOtYpdS-mzMUjo9AMFkTIUD9KE89j_xGKkqHrmpJHW_2wyha0vndk7tUvqczYpcR2tNgxszsNyE2F0x-FqWEi5tG4RPdHPKCuNMewEaWccIZVqa-KqvkQLO_sgYi6WwN4GIKHK5IfpKSZxZBlhpl4v4Tw-_VSzU;KChyv57HW1MsnxCE9Blq2ctZ_bFb5E5iQRE_gcFAcwbg-80DjzBzCPR5PRxlq0q6:oAaCmRV6kxPamcl72AknUZ1T9wn6ZER8p9AqcqA8UYbWxQULeWgdNMEic6norf0bleEiLG2Hoac1sg82istJHvb8m2gHyxZP4cOPC2Cq6lpFBJ59cbEytrUN9o-guHd7TefSDJz6ECSm7zOZM43KetMp0ESTNaOLi1CmKTCWFF2wvq0lueafz9KZnDl9EbIWImfyKci3XD0-ZOgI7HdJF41ivET0DWBo4xqXMJppBi-jxEgF3_zfMQIcA85eM41q94wJIZIJZJiqZiAorKHpoOUHPyB0EG4A_q_gS35T03EaUxKZlYQy5FtbiwNxNWntG6Bct50eCLDXtuViUL3SN4H3Hpdm9DEJbi9BatqNpb9ikN6LLjHUG0wAiwRhEnZzVZnQBKOOQm6bHj-q8CBzngXzxC_UIcMQ2L249PopGS1V3tRqwxxF2aZ-dLbSsykH:23:0:0:0:0:0:0:0:70c37cdd-a840-476d-8b04-69f3218358d9]]></Tracking>
-												<Tracking event="complete"><![CDATA[https://onetag-sys.com/ping/7hOU6HVGJaq_BQjX42ZcaGM7_ylaJGaAjSKYhuGKykU_pOsyxVAxiBfQdlvo9WWVSikeOIwftlIXtOtYpdS-mzMUjo9AMFkTIUD9KE89j_xGKkqHrmpJHW_2wyha0vndk7tUvqczYpcR2tNgxszsNyE2F0x-FqWEi5tG4RPdHPKCuNMewEaWccIZVqa-KqvkQLO_sgYi6WwN4GIKHK5IfpKSZxZBlhpl4v4Tw-_VSzU;KChyv57HW1MsnxCE9Blq2ctZ_bFb5E5iQRE_gcFAcwbg-80DjzBzCPR5PRxlq0q6:oAaCmRV6kxPamcl72AknUZ1T9wn6ZER8p9AqcqA8UYbWxQULeWgdNMEic6norf0bleEiLG2Hoac1sg82istJHvb8m2gHyxZP4cOPC2Cq6lpFBJ59cbEytrUN9o-guHd7TefSDJz6ECSm7zOZM43KetMp0ESTNaOLi1CmKTCWFF2wvq0lueafz9KZnDl9EbIWImfyKci3XD0-ZOgI7HdJF41ivET0DWBo4xqXMJppBi-jxEgF3_zfMQIcA85eM41q94wJIZIJZJiqZiAorKHpoOUHPyB0EG4A_q_gS35T03EaUxKZlYQy5FtbiwNxNWntG6Bct50eCLDXtuViUL3SN4H3Hpdm9DEJbi9BatqNpb9ikN6LLjHUG0wAiwRhEnZzVZnQBKOOQm6bHj-q8CBzngXzxC_UIcMQ2L249PopGS1V3tRqwxxF2aZ-dLbSsykH:24:0:0:0:0:0:0:0:70c37cdd-a840-476d-8b04-69f3218358d9]]></Tracking> -->
-											</TrackingEvents>
-											<VideoClicks>
-												<!-- <ClickThrough><![CDATA[https://track.adform.net/C/?bn=41297041]]></ClickThrough>
-												<ClickTracking><![CDATA[https://onetag-sys.com/ping/7hOU6HVGJaq_BQjX42ZcaGM7_ylaJGaAjSKYhuGKykU_pOsyxVAxiBfQdlvo9WWVSikeOIwftlIXtOtYpdS-mzMUjo9AMFkTIUD9KE89j_xGKkqHrmpJHW_2wyha0vndk7tUvqczYpcR2tNgxszsNyE2F0x-FqWEi5tG4RPdHPKCuNMewEaWccIZVqa-KqvkQLO_sgYi6WwN4GIKHK5IfpKSZxZBlhpl4v4Tw-_VSzU;KChyv57HW1MsnxCE9Blq2ctZ_bFb5E5iQRE_gcFAcwbg-80DjzBzCPR5PRxlq0q6:oAaCmRV6kxPamcl72AknUZ1T9wn6ZER8p9AqcqA8UYbWxQULeWgdNMEic6norf0bleEiLG2Hoac1sg82istJHvb8m2gHyxZP4cOPC2Cq6lpFBJ59cbEytrUN9o-guHd7TefSDJz6ECSm7zOZM43KetMp0ESTNaOLi1CmKTCWFF2wvq0lueafz9KZnDl9EbIWImfyKci3XD0-ZOgI7HdJF41ivET0DWBo4xqXMJppBi-jxEgF3_zfMQIcA85eM41q94wJIZIJZJiqZiAorKHpoOUHPyB0EG4A_q_gS35T03EaUxKZlYQy5FtbiwNxNWntG6Bct50eCLDXtuViUL3SN4H3Hpdm9DEJbi9BatqNpb9ikN6LLjHUG0wAiwRhEnZzVZnQBKOOQm6bHj-q8CBzngXzxC_UIcMQ2L249PopGS1V3tRqwxxF2aZ-dLbSsykH:2:0:0:0:0:0:0:0:70c37cdd-a840-476d-8b04-69f3218358d9]]></ClickTracking> -->
-											</VideoClicks>
-											<MediaFiles>
-												<MediaFile id="1" delivery="progressive" type="video/mp4" bitrate="529" width="640" height="360" scalable="true" maintainAspectRatio="true"><![CDATA[http://staging.adpushup.com:8022/single-video/mp4.mp4]]></MediaFile>
-											</MediaFiles>
-										</Linear>
-									</Creative>
-								</Creatives>
-							</InLine>
-						</Ad>
-					</VAST>`;
-			} else {
-				config.vastXml = bid.vastXml;
-			}
+			config.vastXml = bid.vastXml;
 		} else if (bid.vastUrl) {
 			config.vastUrl = bid.vastUrl;
 		} else {
@@ -79,15 +44,16 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 		return bluebillywig.renderers.find(renderer => renderer._id === rendererId);
 	}
 
+	function cleanSlotContent(slotEl) {
+		slotEl.innerHTML = '';
+	}
+
 	function renderBbPlayer(bbPlayerConfig, slotEl) {
 		const renderer = getBbPlayerRenderer();
 		if (!renderer) return;
 
+		cleanSlotContent(slotEl);
 		renderer.bootstrap(bbPlayerConfig, slotEl);
-	}
-
-	function getBbPlayerId() {
-		return '/p/inarticle/a/' + bid.adUnitCode;
 	}
 
 	function customizeBbPlayer(playerApi, slotAttributesToMigrate, preservedSlotElDataset) {
@@ -100,34 +66,22 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 
 		playerApi.setFitMode('FIT_SMART');
 
-		// var playerElem = document.getElementById(bid.adUnitCode);
+		var playerElem = document.getElementById(bid.adUnitCode);
 
 		// // Center Align BB Player
 		// playerElem.style.margin = '0 auto';
 
-		// // migrate slot attributes to player el
-		// slotAttributesToMigrate.forEach(
-		// 	attrName =>
-		// 		preservedSlotElDataset[attrName] !== undefined &&
-		// 		(playerElem.dataset[attrName] = preservedSlotElDataset[attrName])
-		// );
-	}
-
-	function removeBbPlayer(playerApi) {
-		playerApi.destruct();
-
-		// Remove queue handlers that shouldn't exist anymore
-		if (
-			Array.isArray(bluebillywig._cmdQueueHandlers) &&
-			bluebillywig._cmdQueueHandlers.length
-		) {
-			bluebillywig._cmdQueueHandlers.shift();
-		}
+		// migrate slot attributes to player el
+		slotAttributesToMigrate.forEach(
+			attrName =>
+				preservedSlotElDataset[attrName] !== undefined &&
+				(playerElem.dataset[attrName] = preservedSlotElDataset[attrName])
+		);
 	}
 
 	function cleanBbPlayerAndRenderBid(playerApi, bid, refreshData = {}) {
 		// clean container
-		removeBbPlayer(playerApi);
+		removeBbPlayerIfRendered(playerApi._playerId, `${bid.adUnitCode} videoRenderer post bid`);
 
 		var { adId, refreshTimeoutId, refreshExtendTimeInMs } = refreshData;
 
@@ -139,21 +93,29 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 			refreshAdSlot.setRefreshTimeOutByAdId(adId, refreshExtendTimeInMs);
 		}
 
-		pbjs.renderAd(utils.getIframeDocument(container), bid.adId);
+		pbjs.renderAd(utils.getIframeDocument(container, { width, height }), bid.adId);
 	}
 
 	var setupPlayerEvents = function(playerApi) {
 		// setup listener for adstarted event to send bid won feedback for video bids.
 		playerApi.on('adstarted', function() {
+			console.log(`bbPlayer: ${bid.adUnitCode} video started`);
+
 			prebidDataCollector.collectBidWonData(bid);
 		});
 
 		// listen video finished event
 		playerApi.on('adfinished', function() {
+			console.log(`bbPlayer: ${bid.adUnitCode} video finished`);
+
 			// check if there is any another highest alive unused bid in cache
 			var highestAliveBid = utils.getHighestAliveBid(pbjs, bid.adUnitCode);
 
 			if (highestAliveBid) {
+				console.log(
+					`bbPlayer: ${bid.adUnitCode} video finished, highest alive bid available`
+				);
+
 				var refreshData = refreshAdSlot.getRefreshDataByAdId(adpSlot.optionalParam.adId);
 
 				if (!refreshData) return;
@@ -163,6 +125,7 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 
 				// If refresh time left is greater than 1s
 				if (refreshTimeLeftInMs >= minRefreshTimeoutForImpInMs) {
+					console.log(`bbPlayer: ${bid.adUnitCode} refresh time is greater than 1s`);
 					cleanBbPlayerAndRenderBid(playerApi, highestAliveBid);
 				}
 				// If refresh time left is less than 1s
@@ -170,12 +133,16 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 					refreshTimeLeftInMs < minRefreshTimeoutForImpInMs &&
 					refreshTimeLeftInMs >= 0
 				) {
+					console.log(`bbPlayer: ${bid.adUnitCode} refresh time is less than 1s`);
+
 					// Render cached bid
 					cleanBbPlayerAndRenderBid(playerApi, highestAliveBid, {
 						adId: adpSlot.optionalParam.adId,
 						refreshTimeoutId,
 						refreshExtendTimeInMs: minRefreshTimeoutForImpInMs
 					});
+				} else {
+					console.log(`bbPlayer: ${bid.adUnitCode} refresh time is less than 0`);
 				}
 			}
 		});
@@ -218,28 +185,9 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 	}
 
 	function renderVideoBid() {
-		// TODO: bbPlayer: temp, remove bbCounter
-		// if (!window.bbCounter) window.bbCounter = 0;
-		// window.bbCounter++;
-		// if (window.bbCounter > 1) {
-		// 	return;
-		// }
-		// if (bid.adUnitCode === 'ADP_37780_728X90_560740ef-114b-4b94-8a1b-52dc344b2054') {
-		// 	console.log('video rendering started');
-		// } else {
-		// 	return;
-		// }
-
 		// push to render queue because bbPlayer may not be loaded yet.
 		bid.renderer.push(() => {
-			var bbPlayerApi;
 			var slotEl = document.getElementById(bid.adUnitCode);
-
-			// remove if player has already rendered
-			// TODO: bbPlayer: review if there is any case where bbPlayerApi.getState() is returning falsy value
-			if (bbPlayerApi && !!bbPlayerApi.getState()) {
-				removeBbPlayer(bbPlayerApi);
-			}
 
 			// get existing refresh data from slot (not container)
 			var { preservedSlotElDataset, slotAttributesToMigrate } = preserveSlotData(slotEl);
@@ -252,11 +200,9 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 
 			// Get BB Player Instance
 			bluebillywig.cmd.push({
-				playerId: getBbPlayerId(),
+				playerId: getBbPlayerId(bid.adUnitCode),
 				callback: function(playerApi) {
 					console.log(`bbPlayer: cmd que fired`);
-
-					bbPlayerApi = playerApi;
 
 					customizeBbPlayer(playerApi, slotAttributesToMigrate, preservedSlotElDataset);
 
@@ -317,23 +263,24 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 
 	var highestAliveBannerBid = utils.getHighestAliveBid(pbjs, bid.adUnitCode, ['banner']);
 
-	renderVideoBid();
-
 	// slot is not in view
 	// and have alive banner bid then render banner bid
-	// if (!apUtils.checkElementInViewPercent(container) && highestAliveBannerBid) {
-	// 	console.log(`bbPlayer: ${bid.adUnitCode} is not in view`);
-	// 	pbjs.renderAd(utils.getIframeDocument(container), highestAliveBannerBid.adId);
+	if (!apUtils.checkElementInViewPercent(container) && highestAliveBannerBid) {
+		console.log(`bbPlayer: ${bid.adUnitCode} is not in view`);
+		pbjs.renderAd(
+			utils.getIframeDocument(container, { width, height }),
+			highestAliveBannerBid.adId
+		);
 
-	// 	// send banner bid won feedback
-	// 	prebidDataCollector.collectBidWonData(highestAliveBannerBid);
+		// send banner bid won feedback
+		prebidDataCollector.collectBidWonData(highestAliveBannerBid);
 
-	// 	// Replace it with video ad when slot come back in view
-	// 	videoSlotInViewWatcher();
-	// }
-	// // otherwise render video
-	// else {
-	// 	console.log(`bbPlayer: ${bid.adUnitCode} is in view`);
-	// 	renderVideoBid();
-	// }
+		// Replace it with video ad when slot come back in view
+		videoSlotInViewWatcher();
+	}
+	// otherwise render video
+	else {
+		console.log(`bbPlayer: ${bid.adUnitCode} is in view`);
+		renderVideoBid();
+	}
 };

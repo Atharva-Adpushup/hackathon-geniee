@@ -3,6 +3,10 @@
 var utils = require('../libs/utils'),
 	commonConsts = require('../config/commonConsts'),
 	adCodeGenerator = require('./adCodeGenerator'),
+	{
+		getBbPlayerId,
+		removeBbPlayerIfRendered
+	} = require('../modules/adpTags/hbScript/src/bbPlayerUtils'),
 	adp = window.adpushup,
 	debounce = require('lodash.debounce'),
 	$ = adp.$,
@@ -79,11 +83,9 @@ var utils = require('../libs/utils'),
 
 				removeBidderTargeting(slot);
 
-				// TODO: bbPlayer: Update this code
-				// Remove jwplayer if rendered for current adUnit
-				var jwPlayerInstance = window.jwplayer && window.jwplayer(slot.containerId);
-				var hasJWPlayerRendered = jwPlayerInstance && !!jwPlayerInstance.getState();
-				if (hasJWPlayerRendered) jwPlayerInstance.remove();
+				// Remove BB Player if rendered for current adUnit
+				var bbPlayerId = getBbPlayerId(slot.containerId);
+				removeBbPlayerIfRendered(bbPlayerId, `${slot.containerId} before refresh`); // TODO: bbPlayer: remove second attribute
 
 				adp.config.apLiteActive
 					? window.apLite.queSlotForBidding(slot)
