@@ -93,7 +93,7 @@ function emitEventAndSendResponse(siteId, res, data = {}) {
 }
 function sendDataToAuditLogService(data) {
 	const { prevConfig, currentConfig, ...restLogData} = data; 
-	const delta = jsondiffpatch.diff(prevConfig, currentConfig);
+	const delta = jsondiffpatch.diff(prevConfig, currentConfig) || {};
 
 	// don't need to send current config to elastic service
 	const options = {
