@@ -7,6 +7,7 @@ import { PAYMENT_NAV_ITEMS_INDEXES } from './Pages/Payment/configs/commonConsts'
 import { ADSTXT_NAV_ITEMS_INDEXES } from './Pages/AdsTxtManagement/configs/commonConsts';
 import { OP_NAV_ITEMS_INDEXES } from './Apps/OpsPanel/configs/commonConsts';
 import { NAV_ITEMS_INDEXES as HB_NAV_ITEMS_INDEXES } from './Apps/HeaderBidding/constants';
+import { ROUTE_APP_NAME } from './constants/global';
 import Login from './Pages/Login';
 import Signup from './Pages/Signup';
 import ForgotPassword from './Pages/ForgotPassword';
@@ -91,7 +92,7 @@ const ROUTES = {
 			path: '/sites/:siteId/settings',
 			name: 'Settings',
 			exact: true,
-			customProps: { activeTab: NAV_ITEMS_INDEXES.SITE_SETTINGS, appName: 'Site Settings' },
+			customProps: { activeTab: NAV_ITEMS_INDEXES.SITE_SETTINGS, appName: ROUTE_APP_NAME.SETTINGS },
 			component: ManageSite
 		},
 		{
@@ -121,7 +122,7 @@ const ROUTES = {
 		},
 		{
 			exact: true,
-			customProps: { activeTab: APT_NAV_ITEMS_INDEXES.MANAGE_ADS, appName: 'Ap Tag' },
+			customProps: { activeTab: APT_NAV_ITEMS_INDEXES.MANAGE_ADS, appName: ROUTE_APP_NAME.AP_TAG },
 			name: 'Manage',
 			path: '/sites/:siteId/apps/ap-tag/manage',
 			component: ApTag
@@ -137,7 +138,7 @@ const ROUTES = {
 		},
 		{
 			exact: true,
-			customProps: { activeTab: APT_NAV_ITEMS_INDEXES.MANAGE_ADS, appName: 'Amp' },
+			customProps: { activeTab: APT_NAV_ITEMS_INDEXES.MANAGE_ADS, appName: ROUTE_APP_NAME.AMP },
 			name: 'Manage',
 			path: '/sites/:siteId/apps/amp/manage',
 			component: Amp
@@ -146,14 +147,20 @@ const ROUTES = {
 		// Innovative Ads
 		{
 			exact: true,
-			customProps: { activeTab: IA_NAV_ITEMS_INDEXES.CREATE_ADS, appName: 'Innovative Ads' },
+			customProps: {
+				activeTab: IA_NAV_ITEMS_INDEXES.CREATE_ADS,
+				appName: ROUTE_APP_NAME.INNOVATIVE_ADS
+			},
 			name: 'Innovative Ads',
 			path: '/sites/:siteId/apps/innovative-ads',
 			component: InnovativeAds
 		},
 		{
 			exact: true,
-			customProps: { activeTab: IA_NAV_ITEMS_INDEXES.MANAGE_ADS, appName: 'Innovative Ads' },
+			customProps: {
+				activeTab: IA_NAV_ITEMS_INDEXES.MANAGE_ADS,
+				appName: ROUTE_APP_NAME.INNOVATIVE_ADS
+			},
 			name: 'Manage',
 			path: '/sites/:siteId/apps/innovative-ads/manage',
 			component: InnovativeAds
@@ -161,42 +168,60 @@ const ROUTES = {
 		// Manage Header Bidding
 		{
 			exact: true,
-			customProps: { activeTab: HB_NAV_ITEMS_INDEXES.TAB_1, appName: 'Header Bidding Bidders' },
+			customProps: {
+				activeTab: HB_NAV_ITEMS_INDEXES.TAB_1,
+				appName: ROUTE_APP_NAME.HEADER_BIDDING_BIDDERS
+			},
 			name: 'Header Bidding',
 			path: '/sites/:siteId/apps/header-bidding',
 			component: HeaderBidding
 		},
 		{
 			exact: true,
-			customProps: { activeTab: HB_NAV_ITEMS_INDEXES.TAB_2, appName: 'Header Bidding Bidders' },
+			customProps: {
+				activeTab: HB_NAV_ITEMS_INDEXES.TAB_2,
+				appName: ROUTE_APP_NAME.HEADER_BIDDING_BIDDERS
+			},
 			name: 'Bidders',
 			path: `/sites/:siteId/apps/header-bidding/${HB_NAV_ITEMS_INDEXES.TAB_2}`,
 			component: HeaderBidding
 		},
 		{
 			exact: true,
-			customProps: { activeTab: HB_NAV_ITEMS_INDEXES.TAB_3, appName: 'Inventory' },
+			customProps: {
+				activeTab: HB_NAV_ITEMS_INDEXES.TAB_3,
+				appName: ROUTE_APP_NAME.HEADER_BIDDING_INVENTORY
+			},
 			name: 'Inventory',
 			path: `/sites/:siteId/apps/header-bidding/${HB_NAV_ITEMS_INDEXES.TAB_3}`,
 			component: HeaderBidding
 		},
 		{
 			exact: true,
-			customProps: { activeTab: HB_NAV_ITEMS_INDEXES.TAB_4, appName: 'Prebid Settings' },
+			customProps: {
+				activeTab: HB_NAV_ITEMS_INDEXES.TAB_4,
+				appName: ROUTE_APP_NAME.HEADER_BIDDING_PREBID_SETTINGS
+			},
 			name: 'Prebid Settings',
 			path: `/sites/:siteId/apps/header-bidding/${HB_NAV_ITEMS_INDEXES.TAB_4}`,
 			component: HeaderBidding
 		},
 		{
 			exact: true,
-			customProps: { activeTab: HB_NAV_ITEMS_INDEXES.TAB_5, appName: 'Optimization' },
+			customProps: {
+				activeTab: HB_NAV_ITEMS_INDEXES.TAB_5,
+				appName: ROUTE_APP_NAME.HEADER_BIDDING_OPTIMIZATION
+			},
 			name: 'Optimization',
 			path: `/sites/:siteId/apps/header-bidding/${HB_NAV_ITEMS_INDEXES.TAB_5}`,
 			component: HeaderBidding
 		},
 		{
 			exact: true,
-			customProps: { activeTab: HB_NAV_ITEMS_INDEXES.TAB_6, appName: 'Amazon UAM' },
+			customProps: {
+				activeTab: HB_NAV_ITEMS_INDEXES.TAB_6,
+				appName: ROUTE_APP_NAME.HEADER_BIDDING_AMAZON_UAM
+			},
 			name: 'Amazon UAM',
 			path: `/sites/:siteId/apps/header-bidding/${HB_NAV_ITEMS_INDEXES.TAB_6}`,
 			component: HeaderBidding
@@ -281,14 +306,20 @@ const ROUTES = {
 		// Admin Panel
 		{
 			exact: true,
-			customProps: { activeTab: OP_NAV_ITEMS_INDEXES.SETTINGS, appName: 'Ops Panel - Accounts' },
+			customProps: {
+				activeTab: OP_NAV_ITEMS_INDEXES.SETTINGS,
+				appName: ROUTE_APP_NAME.OPS_PANEL_ACCOUNTS
+			},
 			name: 'Admin Panel',
 			path: '/admin-panel',
 			component: OpsPanel
 		},
 		{
 			exact: true,
-			customProps: { activeTab: OP_NAV_ITEMS_INDEXES.SETTINGS, appName: 'Ops Panel - Settings' },
+			customProps: {
+				activeTab: OP_NAV_ITEMS_INDEXES.SETTINGS,
+				appName: ROUTE_APP_NAME.OPS_PANEL_SETTINGS
+			},
 			name: 'Settings',
 			path: '/admin-panel/settings',
 			component: OpsPanel
