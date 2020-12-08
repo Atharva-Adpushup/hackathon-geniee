@@ -10,7 +10,7 @@ const couchbase = require('../helpers/couchBaseService');
 const AdPushupError = require('../helpers/AdPushupError');
 const commonConsts = require('../configs/commonConsts');
 const proxy = require('../helpers/proxy');
-import config from '../configs/config';
+const config = require('../configs/config');
 
 const axios = require('axios');
 const { AMP_SETTINGS_ACCESS_EMAILS } = require('../configs/commonConsts');
@@ -336,7 +336,7 @@ function apiModule() {
 					};
 				})
 				.catch(err => {
-					console.log(err);
+					console.log(err, 'ok');
 					throw new AdPushupError('Something went wrong');
 				});
 		},
@@ -361,7 +361,7 @@ function apiModule() {
 			return request({
 				method: 'POST',
 				json: true,
-				uri: config.PUBLISHER_API_BULK,
+				uri: config.RABBITMQ.PUBLISHER_API_BULK,
 				body: postData
 			});
 		},

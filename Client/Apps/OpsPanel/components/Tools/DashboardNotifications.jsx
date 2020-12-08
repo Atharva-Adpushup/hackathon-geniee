@@ -55,10 +55,10 @@ const DashboardNotifications = ({ showNotification }) => {
 
 	useEffect(() => {
 		axiosInstance.get('/user/findUsers').then(response => {
-			// const { allNotifications } = response;
 			const allAccounts = [];
 			const filteredListData = [];
-			const accountDetails = response.data.data.users;
+			const { data } = response.data;
+			const accountDetails = data.users;
 			const selectedEmailsData = { ...selectedEmails };
 			Object.keys(accountDetails).forEach(accountData => {
 				const accountEmail = accountDetails[accountData].email;
@@ -74,8 +74,8 @@ const DashboardNotifications = ({ showNotification }) => {
 		});
 
 		axiosInstance.get('/ops/getAllNotifications').then(response => {
-			const { data } = response;
-			const allNotificationsArray = data.data;
+			const { data } = response.data;
+			const allNotificationsArray = data;
 
 			const notificationsData = {};
 			allNotificationsArray.forEach(notification => {
@@ -118,9 +118,7 @@ const DashboardNotifications = ({ showNotification }) => {
 				tableBody.push(row);
 			});
 
-			tableBody.sort((a, b) => {
-				return a.Date.toString().localeCompare(b.Date.toString());
-			});
+			tableBody.sort((a, b) => a.Date.toString().localeCompare(b.Date.toString()));
 
 			const tableBodyData = tableBody.map((dataValue, index) => {
 				const dataValues = { ...dataValue };
