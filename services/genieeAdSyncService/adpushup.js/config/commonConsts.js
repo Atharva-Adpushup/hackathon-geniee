@@ -122,7 +122,7 @@ module.exports = {
 		}
 	},
 	URM_REPORTING: {
-		GET_URM_TARGETTING_REQUEST_TIMEOUT: 1000,
+		GET_URM_TARGETTING_REQUEST_TIMEOUT: 0,
 		EVENTS: {
 			SUCCESS: 'success',
 			FAILED: 'failed',
