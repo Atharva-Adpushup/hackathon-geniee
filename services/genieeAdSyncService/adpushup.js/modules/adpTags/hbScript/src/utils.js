@@ -46,14 +46,12 @@ var utils = {
 		return null;
 	},
 	getSectionId: function(containerId) {
+		var sectionId = null;
 		if (document.getElementById(containerId)) {
 			var parent = document.getElementById(containerId).parentNode;
-
-			if (parent && parent.hasAttribute('data-section')) {
-				return parent.getAttribute('data-section');
-			}
+			sectionId = parent.getAttribute('data-orig-id') || parent.getAttribute('data-section');
 		}
-		return null;
+		return sectionId;
 	},
 	hashCode: function(str) {
 		var hash = 0;
