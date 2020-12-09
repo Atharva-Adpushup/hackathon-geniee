@@ -102,6 +102,11 @@ var adp = window.adpushup,
 
 			// utils.log('APTag found ', manualAd, 'DOM element', domElem);
 
+			if (!manualAd) {
+				utils.log('APTag not found ', adId);
+				return;
+			}
+
 			ad.id = newAdId;
 
 			if (ad.network === commonConsts.NETWORKS.ADPTAGS) {
@@ -167,7 +172,8 @@ module.exports = {
 			utils.log(`AdPushup Force Disabled.. ApTag render blocked`);
 			return;
 		}
-		if (!utils.getQueryParams().stopLightHouseHack && utils.checkForLighthouse(adp.config.siteId)) return;
+		if (!utils.getQueryParams().stopLightHouseHack && utils.checkForLighthouse(adp.config.siteId))
+			return;
 		if (adp.config.cmpLoaded) {
 			utils.log('in triggerAd - cmp loaded', adId);
 			trigger(adId);
