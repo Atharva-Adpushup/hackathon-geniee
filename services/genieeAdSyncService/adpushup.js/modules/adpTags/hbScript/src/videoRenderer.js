@@ -17,6 +17,30 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 	var bidWonTime = +new Date();
 	var [width, height] = adpSlot.size;
 
+	// TODO: bbPlayer: logging for testing...
+	window.adpushup.$.ajax({
+		type: 'POST',
+		url: '//vastdump-staging.adpushup.com/bb_player_logging',
+		data: JSON.stringify({
+			eventName: 'video_bid_received',
+			adUnitCode: bid.adUnitCode,
+			bidder: bid.bidder,
+			bidderCode: bid.bidderCode,
+			creativeId: bid.creativeId,
+			adId: bid.adId,
+			size: bid.size,
+			mediaType: bid.mediaType,
+			status: bid.status,
+			eventTime: +new Date(),
+			bidWonTime: bidWonTime,
+			auctionId: bid.auctionId || '',
+			requestId: bid.requestId || ''
+		}),
+		contentType: 'application/json',
+		processData: false,
+		dataType: 'json'
+	});
+
 	function getBbPlayerConfig(bid) {
 		const config = {
 			code: bid.adUnitCode // Mandatory for stats
@@ -44,7 +68,7 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 		return bluebillywig.renderers.find(renderer => renderer._id === rendererId);
 	}
 
-	function cleanSlotContent(slotEl) {
+	function clearSlotContent(slotEl) {
 		slotEl.innerHTML = '';
 	}
 
@@ -52,7 +76,7 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 		const renderer = getBbPlayerRenderer();
 		if (!renderer) return;
 
-		cleanSlotContent(slotEl);
+		clearSlotContent(slotEl);
 		renderer.bootstrap(bbPlayerConfig, slotEl);
 	}
 
@@ -81,7 +105,11 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 
 	function cleanBbPlayerAndRenderBid(playerApi, bid, refreshData = {}) {
 		// clean container
-		removeBbPlayerIfRendered(playerApi._playerId, `${bid.adUnitCode} videoRenderer post bid`);
+		removeBbPlayerIfRendered(
+			playerApi._playerId,
+			bid.adUnitCode,
+			`${bid.adUnitCode} videoRenderer post bid`
+		);
 
 		var { adId, refreshTimeoutId, refreshExtendTimeInMs } = refreshData;
 
@@ -108,8 +136,35 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 		playerApi.on('adfinished', function() {
 			console.log(`bbPlayer: ${bid.adUnitCode} video finished`);
 
+			// TODO: bbPlayer: logging for testing...
+			window.adpushup.$.ajax({
+				type: 'POST',
+				url: '//vastdump-staging.adpushup.com/bb_player_logging',
+				data: JSON.stringify({
+					eventName: 'video_bid_received',
+					adUnitCode: bid.adUnitCode,
+					bidder: bid.bidder,
+					bidderCode: bid.bidderCode,
+					creativeId: bid.creativeId,
+					adId: bid.adId,
+					size: bid.size,
+					mediaType: bid.mediaType,
+					status: bid.status,
+					eventTime: +new Date(),
+					bidWonTime: bidWonTime,
+					auctionId: bid.auctionId || '',
+					requestId: bid.requestId || ''
+				}),
+				contentType: 'application/json',
+				processData: false,
+				dataType: 'json'
+			});
+
 			// check if there is any another highest alive unused bid in cache
-			var highestAliveBid = utils.getHighestAliveBid(pbjs, bid.adUnitCode);
+			var highestAliveBid = utils.getHighestAliveBid(pbjs, bid.adUnitCode, [
+				'banner',
+				'native'
+			]);
 
 			if (highestAliveBid) {
 				console.log(
@@ -117,6 +172,13 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 				);
 
 				var refreshData = refreshAdSlot.getRefreshDataByAdId(adpSlot.optionalParam.adId);
+
+				console.log(
+					`bbPlayer: ${
+						bid.adUnitCode
+					} video finished, highest alive bid available, refresh data: `,
+					refreshData
+				);
 
 				if (!refreshData) return;
 
@@ -169,6 +231,30 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 				// 	processData: false,
 				// 	dataType: 'json'
 				// });
+
+				// TODO: bbPlayer: logging for testing...
+				window.adpushup.$.ajax({
+					type: 'POST',
+					url: '//vastdump-staging.adpushup.com/bb_player_logging',
+					data: JSON.stringify({
+						eventName: eventName,
+						adUnitCode: bid.adUnitCode,
+						bidder: bid.bidder,
+						bidderCode: bid.bidderCode,
+						creativeId: bid.creativeId,
+						adId: bid.adId,
+						size: bid.size,
+						mediaType: bid.mediaType,
+						status: bid.status,
+						eventTime: +new Date(),
+						bidWonTime: bidWonTime,
+						auctionId: bid.auctionId || '',
+						requestId: bid.requestId || ''
+					}),
+					contentType: 'application/json',
+					processData: false,
+					dataType: 'json'
+				});
 			});
 		});
 	};
@@ -196,7 +282,22 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 			if (!bbPlayerConfig) return; // TODO: bbPlayer: review this
 
 			window.instantiateBbPlayer(bid.adUnitCode);
+
+			var d1 = new Date();
+			console.log(
+				`bbPlayer: ${
+					bid.adUnitCode
+				} rendering... ${d1.getHours()}:${d1.getMinutes()}:${d1.getSeconds()}`
+			);
+
 			renderBbPlayer(bbPlayerConfig, slotEl);
+
+			var d2 = new Date();
+			console.log(
+				`bbPlayer: ${
+					bid.adUnitCode
+				} rendered... ${d2.getHours()}:${d2.getMinutes()}:${d2.getSeconds()}`
+			);
 
 			// Get BB Player Instance
 			bluebillywig.cmd.push({
@@ -204,11 +305,38 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 				callback: function(playerApi) {
 					console.log(`bbPlayer: cmd que fired`);
 
-					customizeBbPlayer(playerApi, slotAttributesToMigrate, preservedSlotElDataset);
+					// TODO: bbPlayer: logging for testing...
+					window.adpushup.$.ajax({
+						type: 'POST',
+						url: '//vastdump-staging.adpushup.com/bb_player_logging',
+						data: JSON.stringify({
+							eventName: 'bb_queue_fired',
+							adUnitCode: bid.adUnitCode,
+							bidder: bid.bidder,
+							bidderCode: bid.bidderCode,
+							creativeId: bid.creativeId,
+							adId: bid.adId,
+							size: bid.size,
+							mediaType: bid.mediaType,
+							status: bid.status,
+							eventTime: +new Date(),
+							bidWonTime: bidWonTime,
+							auctionId: bid.auctionId || '',
+							requestId: bid.requestId || ''
+						}),
+						contentType: 'application/json',
+						processData: false,
+						dataType: 'json'
+					});
 
+					customizeBbPlayer(playerApi, slotAttributesToMigrate, preservedSlotElDataset);
 					setupPlayerEvents(playerApi);
 				}
 			});
+
+			if (!window.bbQueueIndexMapping) window.bbQueueIndexMapping = [];
+			window.bbQueueIndexMapping.push(bid.adUnitCode);
+			console.log(`bbPlayer: ${bid.adUnitCode} pushed to index mapping`);
 		});
 	}
 

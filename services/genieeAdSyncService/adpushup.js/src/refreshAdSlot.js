@@ -83,9 +83,29 @@ var utils = require('../libs/utils'),
 
 				removeBidderTargeting(slot);
 
-				// Remove BB Player if rendered for current adUnit
-				var bbPlayerId = getBbPlayerId(slot.containerId);
-				removeBbPlayerIfRendered(bbPlayerId, `${slot.containerId} before refresh`); // TODO: bbPlayer: remove second attribute
+				// TODO: bbPlayer: logging for testing...
+				window.adpushup.$.ajax({
+					type: 'POST',
+					url: '//vastdump-staging.adpushup.com/bb_player_logging',
+					data: JSON.stringify({
+						eventName: 'refreshAd',
+						adUnitCode: slot.containerId,
+						eventTime: +new Date()
+					}),
+					contentType: 'application/json',
+					processData: false,
+					dataType: 'json'
+				});
+
+				if (adp.config.isBbPlayerEnabledForTesting) {
+					// Remove BB Player if rendered for current adUnit
+					var bbPlayerId = getBbPlayerId(slot.containerId);
+					removeBbPlayerIfRendered(
+						bbPlayerId,
+						slot.containerId,
+						`${slot.containerId} before refresh`
+					); // TODO: bbPlayer: remove second attribute
+				}
 
 				adp.config.apLiteActive
 					? window.apLite.queSlotForBidding(slot)
