@@ -154,7 +154,8 @@ class Account extends Component {
 
 		const dataForAuditLogs = {
 			appName: customProps.appName,
-			siteDomain: ''
+			siteDomain: '',
+			actionInfo: 'AdSense Update'
 		};
 
 		const { adNetworkSettings = [] } = user;
@@ -190,7 +191,8 @@ class Account extends Component {
 
 		const dataForAuditLogs = {
 			appName: customProps.appName,
-			siteDomain: ''
+			siteDomain: '',
+			actionInfo: 'AdManager Update'
 		};
 
 		if (originalactiveDFP === null) {

@@ -65,7 +65,10 @@ class SiteSettings extends Component {
 		};
 
 		return siteService
-			.saveApConfigs(siteId, apConfigs, dataForAuditLogs)
+			.saveApConfigs(siteId, apConfigs, {
+				...dataForAuditLogs,
+				actionInfo: 'Updated AP Config'
+			})
 			.then(() => {
 				updateApConfig(siteId, apConfigs);
 

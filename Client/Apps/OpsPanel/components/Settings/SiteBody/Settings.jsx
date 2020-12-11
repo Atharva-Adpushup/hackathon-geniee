@@ -94,7 +94,10 @@ class Settings extends Component {
 							app: 'apLite',
 							value
 						},
-						dataForAuditLogs
+						{
+							...dataForAuditLogs,
+							actionInfo: `Updated: ${name}`
+						}
 					).then(() => this.setState({ status: value, [name]: value }));
 				}
 				return { [name]: false };
@@ -114,7 +117,10 @@ class Settings extends Component {
 		const { site, showNotification, dataForAuditLogs } = this.props;
 
 		siteService
-			.forceApBuild(site.siteId, dataForAuditLogs)
+			.forceApBuild(site.siteId, {
+				...dataForAuditLogs,
+				actionInfo: `Force Build`
+			})
 			.then(res => {
 				const data = {
 					mode: 'success',

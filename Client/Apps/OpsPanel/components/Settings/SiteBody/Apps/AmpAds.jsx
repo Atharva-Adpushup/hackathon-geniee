@@ -43,7 +43,10 @@ class AmpAds extends Component {
 				app: 'amp',
 				value: status
 			},
-			dataForAuditLogs
+			{
+				...dataForAuditLogs,
+				actionInfo: 'Updated AMP Ads'
+			}
 		).then(() => this.setState({ isLoading: false }));
 	};
 

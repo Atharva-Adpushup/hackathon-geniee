@@ -108,20 +108,20 @@ class ApLite extends Component {
 
 	stateToReturn = (prop, value, defaultState, adUnits) => {
 		if (prop === 'headerBidding') {
-			defaultState.headerBidding = value ? true : false;
+			defaultState.headerBidding = !!value;
 			defaultState.selectedAdUnitCodeForHB = value
 				? adUnits.map(({ dfpAdunitCode }) => dfpAdunitCode)
 				: [];
 		}
 		if (prop === 'adRefresh') {
-			defaultState.refreshSlot = value ? true : false;
+			defaultState.refreshSlot = !!value;
 			defaultState.selectedAdUnitCodeForAdRefresh = value
 				? adUnits.map(({ dfpAdunitCode }) => dfpAdunitCode)
 				: [];
 		}
 
 		if (prop === 'selectAllFormats') {
-			defaultState.selectAllFormats = value ? true : false;
+			defaultState.selectAllFormats = !!value;
 			defaultState.selectedAdUnitCodeForVideoFormat = value
 				? adUnits.map(({ dfpAdunitCode }) => dfpAdunitCode)
 				: [];
@@ -134,7 +134,7 @@ class ApLite extends Component {
 		const { oldAdUnits, uploadedAdUnits, structuredAdUnits } = this.state;
 		const attributeValue = event.target.getAttribute('name');
 		const name = attributeValue.split('-')[0];
-		let adUnits = structuredAdUnits.length
+		const adUnits = structuredAdUnits.length
 			? structuredAdUnits
 			: uploadedAdUnits.length
 			? uploadedAdUnits
@@ -148,17 +148,17 @@ class ApLite extends Component {
 			.filter(({ isActive }) => isActive)
 			.map(adUnit => {
 				if (name === 'headerBidding') {
-					adUnit['headerBidding'] = value ? true : false;
+					adUnit.headerBidding = !!value;
 				}
 				if (name === 'adRefresh') {
-					adUnit['refreshSlot'] = value ? true : false;
+					adUnit.refreshSlot = !!value;
 				}
 				if (name === 'selectAllFormats') {
-					adUnit['formats'] = value ? ['display', 'video'] : ['display'];
+					adUnit.formats = value ? ['display', 'video'] : ['display'];
 				}
 			});
 
-		let stateToReturn = this.stateToReturn(name, value, defaultState, adUnits);
+		const stateToReturn = this.stateToReturn(name, value, defaultState, adUnits);
 
 		this.setState(() => {
 			if (name === 'headerBidding' || name === 'adRefresh' || name === 'selectAllFormats') {
@@ -167,21 +167,21 @@ class ApLite extends Component {
 						structuredAdUnits: adUnits,
 						...stateToReturn
 					};
-				} else if (!structuredAdUnits.length && uploadedAdUnits.length) {
+				}
+				if (!structuredAdUnits.length && uploadedAdUnits.length) {
 					return {
 						uploadedAdUnits: adUnits,
 						...stateToReturn
 					};
-				} else {
-					return {
-						oldAdUnits: adUnits,
-						...stateToReturn
-					};
 				}
-			} else
 				return {
-					stateToReturn
+					oldAdUnits: adUnits,
+					...stateToReturn
 				};
+			}
+			return {
+				stateToReturn
+			};
 		});
 	};
 
@@ -222,8 +222,8 @@ class ApLite extends Component {
 		const { showNotification } = this.props;
 		const { headerBidding, adRefresh } = this.state;
 
-		let adUnitsArr = [];
-		let adUnitMap = {};
+		const adUnitsArr = [];
+		const adUnitMap = {};
 		let parentAdUnitError = false;
 
 		Papa.parse(this.state.file, {
@@ -239,10 +239,10 @@ class ApLite extends Component {
 						adUnitMap[unit[0].trim()] = unit[1].trim();
 				});
 
-				for (let key in adUnitMap) {
+				for (const key in adUnitMap) {
 					let parentAdUnit;
 					let dfpAdUnit = adUnitMap[key];
-					let dfpAdunitCode = adUnitMap[key];
+					const dfpAdunitCode = adUnitMap[key];
 
 					if (key.includes('»')) {
 						parentAdUnit = key.split('»')[0].trim();
@@ -358,7 +358,10 @@ class ApLite extends Component {
 		return axiosInstance
 			.put(`/ops/ap-lite/${siteId}`, {
 				adUnits,
-				dataForAuditLogs
+				dataForAuditLogs: {
+					...dataForAuditLogs,
+					actionInfo: `Updated AP Lite`
+				}
 			})
 			.then(res => {
 				const {
@@ -411,28 +414,26 @@ class ApLite extends Component {
 		return matchDfpAccount.name || '';
 	}
 
-	gamAdUnitsLabel = () => {
-		return (
-			<React.Fragment>
-				GAM Ad Units{' '}
-				<CSVLink
-					headers={[
-						{ label: 'Ad unit', key: 'dfpAdUnit' },
-						{ label: 'Ad Unit Code', key: 'dfpAdUnitCode' }
-					]}
-					data={[]}
-					filename="adUnitsTemplate.csv"
-					style={{ display: 'block' }}
-				>
-					<small> (Download CSV Template)</small>
-				</CSVLink>
-			</React.Fragment>
-		);
-	};
+	gamAdUnitsLabel = () => (
+		<React.Fragment>
+			GAM Ad Units{' '}
+			<CSVLink
+				headers={[
+					{ label: 'Ad unit', key: 'dfpAdUnit' },
+					{ label: 'Ad Unit Code', key: 'dfpAdUnitCode' }
+				]}
+				data={[]}
+				filename="adUnitsTemplate.csv"
+				style={{ display: 'block' }}
+			>
+				<small> (Download CSV Template)</small>
+			</CSVLink>
+		</React.Fragment>
+	);
 
 	handleHBChange = (e, adunitCode) => {
 		const { uploadedAdUnits, oldAdUnits, structuredAdUnits, selectedAdUnitCodeForHB } = this.state;
-		let adUnits = structuredAdUnits.length
+		const adUnits = structuredAdUnits.length
 			? structuredAdUnits
 			: uploadedAdUnits.length
 			? uploadedAdUnits
@@ -462,7 +463,7 @@ class ApLite extends Component {
 			structuredAdUnits,
 			selectedAdUnitCodeForAdRefresh
 		} = this.state;
-		let adUnits = structuredAdUnits.length
+		const adUnits = structuredAdUnits.length
 			? structuredAdUnits
 			: uploadedAdUnits.length
 			? uploadedAdUnits
@@ -492,14 +493,14 @@ class ApLite extends Component {
 			structuredAdUnits,
 			selectedAdUnitCodeForVideoFormat
 		} = this.state;
-		let adUnits = structuredAdUnits.length
+		const adUnits = structuredAdUnits.length
 			? structuredAdUnits
 			: uploadedAdUnits.length
 			? uploadedAdUnits
 			: oldAdUnits;
 		if (e.target.checked) {
 			selectedAdUnitCodeForVideoFormat.push(adunitCode);
-			let adunit = adUnits.find(v => v.dfpAdunitCode === adunitCode);
+			const adunit = adUnits.find(v => v.dfpAdunitCode === adunitCode);
 			if (!adunit.formats.includes('video')) {
 				adunit.formats.push('video');
 			}
@@ -508,7 +509,7 @@ class ApLite extends Component {
 				selectedAdUnitCodeForVideoFormat.indexOf(adunitCode),
 				1
 			);
-			let adunit = adUnits.find(v => v.dfpAdunitCode === adunitCode);
+			const adunit = adUnits.find(v => v.dfpAdunitCode === adunitCode);
 			if (adunit.formats.includes('video')) {
 				adunit.formats.splice(adunit.formats.indexOf('video'), 1);
 			}
@@ -804,7 +805,8 @@ class ApLite extends Component {
 					</PanelGroup>
 				</div>
 			);
-		} else return null;
+		}
+		return null;
 	}
 }
 

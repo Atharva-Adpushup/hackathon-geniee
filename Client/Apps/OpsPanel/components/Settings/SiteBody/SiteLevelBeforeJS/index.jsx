@@ -63,7 +63,10 @@ class SiteLevelBeforeJS extends Component {
 		return axiosInstance
 			.post(`/site/siteLevelBeforeJs/${siteId}`, {
 				beforeJs: btoa(beforeJsSnippet),
-				dataForAuditLogs
+				dataForAuditLogs: {
+					...dataForAuditLogs,
+					actionInfo: 'Updated Before JS'
+				}
 			})
 			.then(res => {
 				this.setState({ isLoading: false });

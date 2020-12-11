@@ -176,7 +176,10 @@ class Layout extends Component {
 					null,
 					siteId,
 					{ autoOptimise: siteAutoOptimise },
-					dataForAuditLogs
+					{
+						...dataForAuditLogs,
+						actionInfo: 'Updated Layout Ads'
+					}
 				)
 			);
 		}
@@ -192,7 +195,10 @@ class Layout extends Component {
 							...current,
 							channelKey: `${current.platform}:${current.pageGroup}`
 						},
-						dataForAuditLogs
+						{
+							...dataForAuditLogs,
+							actionInfo: 'Updated Channel Auto Optimise'
+						}
 					)
 				);
 			});

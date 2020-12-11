@@ -56,7 +56,10 @@ class Listing extends Component {
 				platform,
 				pattern
 			},
-			dataForAuditLogs
+			{
+				...dataForAuditLogs,
+				actionInfo: `Updated Page Group Pattern`
+			}
 		);
 	};
 
@@ -100,7 +103,10 @@ class Listing extends Component {
 					channelId,
 					channelKey: `${platform.toUpperCase()}:${pageGroup}`
 				},
-				dataForAuditLogs
+				{
+					...dataForAuditLogs,
+					actionInfo: 'Deleted Page Group'
+				}
 			);
 		}
 		return false;

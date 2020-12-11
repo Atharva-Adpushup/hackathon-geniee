@@ -132,7 +132,10 @@ class Creation extends Component {
 					// tabletLayout
 				}
 			},
-			dataForAuditLogs
+			{
+				...dataForAuditLogs,
+				actionInfo: 'Create Channel'
+			}
 		).then(response => {
 			const {
 				failed = {

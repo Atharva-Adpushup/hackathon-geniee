@@ -82,7 +82,10 @@ class ConsentManagement extends Component {
 				updateSite(
 					siteId,
 					[{ key: 'gdpr', value: parsedConfig, replace: true, requireResponse: false }],
-					dataForAuditLogs
+					{
+						...dataForAuditLogs,
+						actionInfo: 'Consent Management'
+					}
 				)
 			)
 			.then(() => this.setState({ loading: false }));

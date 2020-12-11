@@ -45,7 +45,10 @@ class InnovativeAds extends Component {
 				app: 'innovativeAds',
 				value: status
 			},
-			dataForAuditLogs
+			{
+				...dataForAuditLogs,
+				actionInfo: 'Updated Innovative Ads'
+			}
 		).then(() => this.setState({ isLoading: false }));
 	};
 

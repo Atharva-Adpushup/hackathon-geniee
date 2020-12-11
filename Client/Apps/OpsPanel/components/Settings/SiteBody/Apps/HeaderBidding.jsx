@@ -73,7 +73,10 @@ class HeaderBidding extends Component {
 				app: 'headerBidding',
 				value: status
 			},
-			dataForAuditLogs
+			{
+				...dataForAuditLogs,
+				actionInfo: 'Header Bidding'
+			}
 		)
 			.then(() => {
 				const keys = Object.keys(bidders);

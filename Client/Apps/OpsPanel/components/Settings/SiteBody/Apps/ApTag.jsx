@@ -45,7 +45,10 @@ class ApTag extends Component {
 				app: 'apTag',
 				value: status
 			},
-			dataForAuditLogs
+			{
+				...dataForAuditLogs,
+				actionInfo: `Updated AP Tag`
+			}
 		).then(() => this.setState({ isLoading: false }));
 	};
 
