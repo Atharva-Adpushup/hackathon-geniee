@@ -251,7 +251,11 @@ var $ = require('../../libs/jquery'),
 											 * If we disble "video" format here then it won't be added through hb rules
 											 * as well. As hb rule only apply intersection of the slot formats and hb rule formats.
 											 */
-											formats = ['display'],
+											// formats = ['display'],
+											// Temp change: enable video for bb player testing
+											formats = !window.adpushup.config.isBbPlayerEnabledForTesting
+												? ['display']
+												: ['display', 'video'],
 											sizeMapping = apLiteAdUnit.sizeMapping || [],
 											computedSizes = hbUtils.getSizesComputedUsingSizeMappingOrAdUnitSize(
 												apLiteAdUnit,

@@ -226,7 +226,8 @@ module.exports = {
 	prebidBundleDefaultName: 'prebid.js',
 	performanceLoggingEnabledSites: [37780],
 	sitesToDisableVideoWaitLimit: [],
-	disableAutoAddMultiformatForSites: []
+	disableAutoAddMultiformatForSites: [],
+	sitesToEnableBbPlayer: [37780]
 };
 
 /*

@@ -1,15 +1,11 @@
+const BB_PLAYER_CONFIG = {
+	PUBLICATION: 'adpushup', // Your publication on Blue Billywig, potentially with environment (e.g. publication.bbvms.com or publication.test.bbvms.com)
+	RENDERER: 'outstream_ad_unit' // The ad unit code in your Blue Billywig publication
+};
+
 const CONSTANTS = {
 	VIDEO: {
-		RENDERER_URL: 'https://cdn.jwplayer.com/libraries/AQP5aIG2.js',
-		JW_PLAYER_CONFIG: {
-			autostart: 'true',
-			stretching: 'uniform',
-			mute: true,
-			advertising: {
-				dismissible: false,
-				endstate: 'suspended'
-			}
-		},
+		RENDERER_URL: 'https://cdn.adpushup.com/bbplayer.js',
 		CONTEXT: 'outstream',
 		MIMES: ['video/mp4', 'video/webm'], // JW Player v8 has in-built support for mp4 and webm
 		PROTOCOLS: [2, 3, 5, 6], // VAST 2.0, VAST 3.0, VAST 2.0 Wrapper, VAST 3.0 Wrapper
@@ -178,4 +174,9 @@ const bidderParamsMapping = {
 	}
 };
 
-module.exports = { multiFormatConstants: CONSTANTS, mediaTypesConfig, bidderParamsMapping };
+module.exports = {
+	multiFormatConstants: CONSTANTS,
+	mediaTypesConfig,
+	bidderParamsMapping,
+	BB_PLAYER_CONFIG
+};

@@ -3,6 +3,10 @@
 var utils = require('../libs/utils'),
 	commonConsts = require('../config/commonConsts'),
 	adCodeGenerator = require('./adCodeGenerator'),
+	{
+		getBbPlayerId,
+		removeBbPlayerIfRendered
+	} = require('../modules/adpTags/hbScript/src/bbPlayerUtils'),
 	adp = window.adpushup,
 	debounce = require('lodash.debounce'),
 	$ = adp.$,
@@ -79,10 +83,25 @@ var utils = require('../libs/utils'),
 
 				removeBidderTargeting(slot);
 
-				// Remove jwplayer if rendered for current adUnit
-				var jwPlayerInstance = window.jwplayer && window.jwplayer(slot.containerId);
-				var hasJWPlayerRendered = jwPlayerInstance && !!jwPlayerInstance.getState();
-				if (hasJWPlayerRendered) jwPlayerInstance.remove();
+				if (adp.config.isBbPlayerEnabledForTesting) {
+					// TODO: bbPlayer: logging for testing...
+					window.adpushup.$.ajax({
+						type: 'POST',
+						url: '//vastdump-staging.adpushup.com/bb_player_logging',
+						data: JSON.stringify({
+							eventName: 'refreshAd',
+							adUnitCode: slot.containerId,
+							eventTime: +new Date()
+						}),
+						contentType: 'application/json',
+						processData: false,
+						dataType: 'json'
+					});
+
+					// Remove BB Player if rendered for current adUnit
+					var bbPlayerId = getBbPlayerId(slot.containerId);
+					removeBbPlayerIfRendered(bbPlayerId, slot.containerId); // TODO: bbPlayer: remove second attribute
+				}
 
 				adp.config.apLiteActive
 					? window.apLite.queSlotForBidding(slot)
