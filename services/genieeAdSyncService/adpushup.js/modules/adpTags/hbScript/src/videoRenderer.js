@@ -1,4 +1,3 @@
-// @ts-check
 var $ = require('../../../../libs/jquery');
 var debounce = require('lodash.debounce');
 var utils = require('./utils');
@@ -105,11 +104,7 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 
 	function cleanBbPlayerAndRenderBid(playerApi, bid, refreshData = {}) {
 		// clean container
-		removeBbPlayerIfRendered(
-			playerApi._playerId,
-			bid.adUnitCode,
-			`${bid.adUnitCode} videoRenderer post bid`
-		);
+		removeBbPlayerIfRendered(playerApi._playerId, bid.adUnitCode);
 
 		var { adId, refreshTimeoutId, refreshExtendTimeInMs } = refreshData;
 
@@ -127,15 +122,11 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 	var setupPlayerEvents = function(playerApi) {
 		// setup listener for adstarted event to send bid won feedback for video bids.
 		playerApi.on('adstarted', function() {
-			console.log(`bbPlayer: ${bid.adUnitCode} video started`);
-
 			prebidDataCollector.collectBidWonData(bid);
 		});
 
 		// listen video finished event
 		playerApi.on('adfinished', function() {
-			console.log(`bbPlayer: ${bid.adUnitCode} video finished`);
-
 			// TODO: bbPlayer: logging for testing...
 			window.adpushup.$.ajax({
 				type: 'POST',
@@ -167,18 +158,7 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 			]);
 
 			if (highestAliveBid) {
-				console.log(
-					`bbPlayer: ${bid.adUnitCode} video finished, highest alive bid available`
-				);
-
 				var refreshData = refreshAdSlot.getRefreshDataByAdId(adpSlot.optionalParam.adId);
-
-				console.log(
-					`bbPlayer: ${
-						bid.adUnitCode
-					} video finished, highest alive bid available, refresh data: `,
-					refreshData
-				);
 
 				if (!refreshData) return;
 
@@ -187,7 +167,6 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 
 				// If refresh time left is greater than 1s
 				if (refreshTimeLeftInMs >= minRefreshTimeoutForImpInMs) {
-					console.log(`bbPlayer: ${bid.adUnitCode} refresh time is greater than 1s`);
 					cleanBbPlayerAndRenderBid(playerApi, highestAliveBid);
 				}
 				// If refresh time left is less than 1s
@@ -195,16 +174,12 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 					refreshTimeLeftInMs < minRefreshTimeoutForImpInMs &&
 					refreshTimeLeftInMs >= 0
 				) {
-					console.log(`bbPlayer: ${bid.adUnitCode} refresh time is less than 1s`);
-
 					// Render cached bid
 					cleanBbPlayerAndRenderBid(playerApi, highestAliveBid, {
 						adId: adpSlot.optionalParam.adId,
 						refreshTimeoutId,
 						refreshExtendTimeInMs: minRefreshTimeoutForImpInMs
 					});
-				} else {
-					console.log(`bbPlayer: ${bid.adUnitCode} refresh time is less than 0`);
 				}
 			}
 		});
@@ -213,8 +188,6 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 		var bbPlayerEvents = ['error', 'aderror', 'adstarted'];
 		bbPlayerEvents.forEach(function(eventName) {
 			playerApi.on(eventName, function(e) {
-				console.log(`bbPlayer: ${eventName} event fired for ${bid.adUnitCode}: `, e);
-
 				// window.adpushup.$.ajax({
 				// 	type: 'POST',
 				// 	// TODO: bbPlayer: vast dump service endpoints need to be udpated according to new event names
@@ -283,28 +256,12 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 
 			window.instantiateBbPlayer(bid.adUnitCode);
 
-			var d1 = new Date();
-			console.log(
-				`bbPlayer: ${
-					bid.adUnitCode
-				} rendering... ${d1.getHours()}:${d1.getMinutes()}:${d1.getSeconds()}`
-			);
-
 			renderBbPlayer(bbPlayerConfig, slotEl);
-
-			var d2 = new Date();
-			console.log(
-				`bbPlayer: ${
-					bid.adUnitCode
-				} rendered... ${d2.getHours()}:${d2.getMinutes()}:${d2.getSeconds()}`
-			);
 
 			// Get BB Player Instance
 			bluebillywig.cmd.push({
 				playerId: getBbPlayerId(bid.adUnitCode),
 				callback: function(playerApi) {
-					console.log(`bbPlayer: cmd que fired`);
-
 					// TODO: bbPlayer: logging for testing...
 					window.adpushup.$.ajax({
 						type: 'POST',
@@ -336,7 +293,6 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 
 			if (!window.bbQueueIndexMapping) window.bbQueueIndexMapping = [];
 			window.bbQueueIndexMapping.push(bid.adUnitCode);
-			console.log(`bbPlayer: ${bid.adUnitCode} pushed to index mapping`);
 		});
 	}
 
@@ -394,7 +350,6 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 	// slot is not in view
 	// and have alive banner bid then render banner bid
 	if (!apUtils.checkElementInViewPercent(container) && highestAliveBannerBid) {
-		console.log(`bbPlayer: ${bid.adUnitCode} is not in view`);
 		pbjs.renderAd(
 			utils.getIframeDocument(container, { width, height }),
 			highestAliveBannerBid.adId
@@ -432,7 +387,6 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 	}
 	// otherwise render video
 	else {
-		console.log(`bbPlayer: ${bid.adUnitCode} is in view`);
 		renderVideoBid();
 	}
 };
