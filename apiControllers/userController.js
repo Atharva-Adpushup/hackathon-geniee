@@ -25,6 +25,10 @@ const {
 	sendDataToAuditLogService
 } = require('../helpers/routeHelpers');
 
+const {
+	AUDIT_LOGS_ACTIONS: { OPS_PANEL }
+} = CC;
+
 const router = express.Router();
 
 let googleOAuthUniqueString = '';
@@ -435,7 +439,11 @@ router
 					impersonateId: email,
 					userId: originalEmail,
 					prevConfig,
-					currentConfig
+					currentConfig,
+					action: {
+						name: OPS_PANEL.ACCOUNTS_SETTING,
+						data: `Accounts Setting`
+					}
 				});
 
 				return user.save();

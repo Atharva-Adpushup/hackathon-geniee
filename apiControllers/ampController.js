@@ -4,7 +4,11 @@ const uuid = require('uuid');
 
 const config = require('../configs/config');
 const { sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFunctions');
-const { docKeys, ampAdInitialDoc } = require('../configs/commonConsts');
+const {
+	docKeys,
+	ampAdInitialDoc,
+	AUDIT_LOGS_ACTIONS: { AMP }
+} = require('../configs/commonConsts');
 const { generateSectionName } = require('../helpers/clientServerHelpers');
 const {
 	appBucket,
@@ -119,6 +123,8 @@ router
 			.then(amdAds => {
 				const { email, originalEmail } = req.user;
 				const { siteDomain, appName, type = 'app' } = dataForAuditLogs;
+
+				const adIds = adsToUpdate.map(adId => adId).join(', ');
 				sendDataToAuditLogService({
 					siteId,
 					siteDomain,
@@ -127,13 +133,16 @@ router
 					impersonateId: email,
 					userId: originalEmail,
 					prevConfig: amdAds,
-					currentConfig: ads
+					currentConfig: ads,
+					action: {
+						name: AMP.UPDATE_AMP_ADS,
+						data: `AMP AD IDs - ${adIds}`
+					}
 				});
 				const updatedAds = adsToUpdate.map(adId => updateAmpTags(adId, ads));
 				return Promise.all(updatedAds)
 					.then(modifiedAds => {
 						const allAmpAds = ads.map(obj => modifiedAds.find(o => o.id === obj.id) || obj);
-
 						return queuePublishingWrapper(siteId, allAmpAds);
 					})
 					.then(ads => {

@@ -28,6 +28,10 @@ const {
 const proxy = require('../helpers/proxy');
 const pageGroupController = require('./pageGroupController');
 
+const {
+	AUDIT_LOGS_ACTIONS: { OPS_PANEL }
+} = CC;
+
 const router = express.Router();
 
 // Initialise woodlot module for geniee api custom logging
@@ -408,7 +412,11 @@ router
 					impersonateId: email,
 					userId: originalEmail,
 					prevConfig,
-					currentConfig: siteApConfigs
+					currentConfig: siteApConfigs,
+					action: {
+						name: OPS_PANEL.SITES_SETTING,
+						data: `Sites Setting - Save Ap Configs`
+					}
 				});
 
 				site.set('apConfigs', { ...siteApConfigs });
@@ -429,7 +437,7 @@ router
 				const siteAdNetworkSettings = { ...prevAdNetworkSettings, ...adNetworkSettings };
 
 				// log config changes
-				const { siteDomain, appName, type = 'site' } = dataForAuditLogs;
+				const { siteDomain, appName, type = 'site', actionInfo = '' } = dataForAuditLogs;
 				sendDataToAuditLogService({
 					siteId,
 					siteDomain,
@@ -444,6 +452,10 @@ router
 					currentConfig: {
 						siteApConfigs,
 						siteAdNetworkSettings
+					},
+					action: {
+						name: OPS_PANEL.SITES_SETTING,
+						data: actionInfo ? `Sites Setting - ${actionInfo}` : 'Sites Setting'
 					}
 				});
 
@@ -490,7 +502,7 @@ router
 				});
 
 				// log config changes
-				const { siteDomain, appName, type = 'site' } = dataForAuditLogs;
+				const { siteDomain, appName, type = 'site', actionInfo = '' } = dataForAuditLogs;
 				sendDataToAuditLogService({
 					siteId,
 					siteDomain,
@@ -499,7 +511,11 @@ router
 					impersonateId: email,
 					userId: originalEmail,
 					prevConfig,
-					currentConfig
+					currentConfig,
+					action: {
+						name: OPS_PANEL.SITES_SETTING,
+						data: actionInfo ? `Sites Setting - ${actionInfo}` : 'Sites Setting'
+					}
 				});
 
 				return site.save();
@@ -586,7 +602,11 @@ router
 					impersonateId: email,
 					userId: originalEmail,
 					prevConfig,
-					currentConfig: apConfig
+					currentConfig: apConfig,
+					action: {
+						name: OPS_PANEL.SITES_SETTING,
+						data: `Sites Setting - Custom Script`
+					}
 				});
 
 				site.set('apConfigs', apConfig);
@@ -722,7 +742,11 @@ router
 						impersonateId: email,
 						userId: originalEmail,
 						prevConfig,
-						currentConfig: channelData
+						currentConfig: channelData,
+						action: {
+							name: OPS_PANEL.SITES_SETTING,
+							data: `Sites Setting - Size Mapping(Update Layout Ad)`
+						}
 					});
 
 					return channelModel.saveChannel(siteId, platform, pageGroup, channelData);
@@ -760,7 +784,11 @@ router
 						impersonateId: email,
 						userId: originalEmail,
 						prevConfig,
-						currentConfig: doc
+						currentConfig: doc,
+						action: {
+							name: OPS_PANEL.SITES_SETTING,
+							data: `Sites Setting - Size Mapping(Update Non Layout Ad)`
+						}
 					});
 
 					return helpers.directDBUpdate(`${docKey}${req.params.siteId}`, doc, docWithCas.cas);
@@ -804,7 +832,11 @@ router
 						impersonateId: email,
 						userId: originalEmail,
 						prevConfig,
-						currentConfig: doc
+						currentConfig: doc,
+						action: {
+							name: OPS_PANEL.SITES_SETTING,
+							data: `Sites Setting - Size Mapping(Update AP Lite Ad)`
+						}
 					});
 					return helpers.directDBUpdate(`${docKey}${req.params.siteId}`, doc, docWithCas.cas);
 				})
@@ -868,7 +900,11 @@ router
 			impersonateId: email,
 			userId: originalEmail,
 			prevConfig: {},
-			currentConfig: { forceBuild: true }
+			currentConfig: { forceBuild: true },
+			action: {
+				name: OPS_PANEL.SITES_SETTING,
+				data: `Sites Setting - Force Ap Build`
+			}
 		});
 
 		return siteModel

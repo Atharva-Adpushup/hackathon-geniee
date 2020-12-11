@@ -21,6 +21,10 @@ const logger = require('../helpers/globalBucketLogger');
 const helperUtils = require('../helpers/utils');
 const config = require('../configs/config');
 
+const {
+	AUDIT_LOGS_ACTIONS: { LAYOUT_EDITOR }
+} = CC;
+
 const router = express.Router();
 
 function pushToCdnOriginQueue(filePath, content) {
@@ -53,25 +57,24 @@ router
 						site.set('onboardingStage', data.onboardingStage);
 						return site.save();
 					});
-				} else {
-					const siteData = {
-						siteDomain: data.site,
-						siteId,
-						ownerEmail: req.user.email,
-						onboardingStage: data.onboardingStage,
-						step: parseInt(data.step, 10),
-						ads: [],
-						channels: [],
-						templates: [],
-						apConfigs: {
-							mode: CC.site.mode.DRAFT,
-							isAdPushupControlWithPartnerSSP: CC.apConfigDefaults.isAdPushupControlWithPartnerSSP,
-							autoOptimise: false
-						}
-					};
-
-					return siteModel.saveSiteData(siteId, 'POST', siteData);
 				}
+				const siteData = {
+					siteDomain: data.site,
+					siteId,
+					ownerEmail: req.user.email,
+					onboardingStage: data.onboardingStage,
+					step: parseInt(data.step, 10),
+					ads: [],
+					channels: [],
+					templates: [],
+					apConfigs: {
+						mode: CC.site.mode.DRAFT,
+						isAdPushupControlWithPartnerSSP: CC.apConfigDefaults.isAdPushupControlWithPartnerSSP,
+						autoOptimise: false
+					}
+				};
+
+				return siteModel.saveSiteData(siteId, 'POST', siteData);
 			})
 			.then(site => {
 				siteObj = site;
@@ -213,7 +216,11 @@ router
 					impersonateId: email,
 					userId: originalEmail,
 					prevConfig: newObj,
-					currentConfig: siteData
+					currentConfig: siteData,
+					action: {
+						name: LAYOUT_EDITOR,
+						data: `Layout Editor`
+					}
 				});
 			})
 			.then(siteModel.saveSiteData.bind(null, siteData.siteId, 'POST', siteData))
@@ -236,7 +243,11 @@ router
 						impersonateId: email,
 						userId: originalEmail,
 						prevConfig: channels,
-						currentConfig: parsedData.channels
+						currentConfig: parsedData.channels,
+						action: {
+							name: LAYOUT_EDITOR,
+							data: `Layout Editor`
+						}
 					});
 				});
 			})

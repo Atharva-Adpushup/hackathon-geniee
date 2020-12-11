@@ -6,7 +6,11 @@ const _ = require('lodash');
 
 const { couchBase } = require('../configs/config');
 const HTTP_STATUSES = require('../configs/httpStatusConsts');
-const { GET_SITES_STATS_API, EMAIL_REGEX } = require('../configs/commonConsts');
+const {
+	GET_SITES_STATS_API,
+	EMAIL_REGEX,
+	AUDIT_LOGS_ACTIONS: { OPS_PANEL }
+} = require('../configs/commonConsts');
 const { sendSuccessResponse, sendErrorResponse } = require('../helpers/commonFunctions');
 const { appBucket, errorHandler, sendDataToAuditLogService } = require('../helpers/routeHelpers');
 const opsModel = require('../models/opsModel');
@@ -310,7 +314,11 @@ router
 					impersonateId: email,
 					userId: originalEmail,
 					prevConfig,
-					currentConfig: json
+					currentConfig: json,
+					action: {
+						name: OPS_PANEL.SITES_SETTING,
+						data: `Sites Setting AP-Lite`
+					}
 				});
 
 				sendSuccessResponse(doc, res);

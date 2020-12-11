@@ -5,7 +5,11 @@ const moment = require('moment');
 
 const config = require('../configs/config');
 const { sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFunctions');
-const { docKeys, tagManagerInitialDoc } = require('../configs/commonConsts');
+const {
+	docKeys,
+	tagManagerInitialDoc,
+	AUDIT_LOGS_ACTIONS: { AP_TAGS }
+} = require('../configs/commonConsts');
 const { generateSectionName } = require('../helpers/clientServerHelpers');
 const {
 	appBucket,
@@ -104,7 +108,11 @@ const fn = {
 					impersonateId: email,
 					userId: originalEmail,
 					prevConfig: docWithCas.value.ads,
-					currentConfig: req.body.ads
+					currentConfig: req.body.ads,
+					action: {
+						name: AP_TAGS.UPDATE_AP_TAGS,
+						data: `AP Tag`
+					}
 				});
 				return processing(docWithCas);
 			})

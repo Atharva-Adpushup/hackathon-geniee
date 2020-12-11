@@ -7,7 +7,12 @@ const HTTP_STATUS = require('../configs/httpStatusConsts');
 const AdPushupError = require('../helpers/AdPushupError');
 const { sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFunctions');
 const { generateSectionName } = require('../helpers/clientServerHelpers');
-const { docKeys, INNOVATIVE_ADS_INITIAL_DOC, DEFAULT_META } = require('../configs/commonConsts');
+const {
+	docKeys,
+	INNOVATIVE_ADS_INITIAL_DOC,
+	DEFAULT_META,
+	AUDIT_LOGS_ACTIONS: { INNOVATIVE_ADS }
+} = require('../configs/commonConsts');
 const {
 	appBucket,
 	errorHandler,
@@ -113,7 +118,11 @@ const fn = {
 					impersonateId: email,
 					userId: originalEmail,
 					prevConfig: docWithCas.value.ads,
-					currentConfig: req.body.ads
+					currentConfig: req.body.ads,
+					action: {
+						name: INNOVATIVE_ADS.UPDATE_INNOVATIVE_ADS,
+						data: `INNOVATIVE AD`
+					}
 				});
 				return processing(docWithCas);
 			})

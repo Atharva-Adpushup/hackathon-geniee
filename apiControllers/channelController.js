@@ -18,6 +18,10 @@ const {
 	sendDataToAuditLogService
 } = require('../helpers/routeHelpers');
 
+const {
+	AUDIT_LOGS_ACTIONS: { CHANNELS }
+} = require('../configs/commonConsts');
+
 const router = express.Router();
 
 const hlprs = {
@@ -170,6 +174,10 @@ router
 							currentConfig: {
 								successful,
 								failed
+							},
+							action: {
+								name: CHANNELS.CREATE_CHANNEL,
+								data: 'Create Channel'
 							}
 						});
 						return true;
@@ -221,7 +229,11 @@ router
 					impersonateId: email,
 					userId: originalEmail,
 					prevConfig,
-					currentConfig: {}
+					currentConfig: {},
+					action: {
+						name: CHANNELS.DELETE_CHANNEL,
+						data: `Delete Channels - ${channelId}`
+					}
 				});
 				sendSuccessResponse(
 					{
@@ -260,7 +272,11 @@ router
 						impersonateId: email,
 						userId: originalEmail,
 						prevConfig,
-						currentConfig
+						currentConfig,
+						action: {
+							name: CHANNELS.UPDATE_CHANNEL,
+							data: `Update Channels`
+						}
 					});
 				})
 			)

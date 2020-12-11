@@ -14,7 +14,12 @@ const FormValidator = require('../helpers/FormValidator');
 const schema = require('../helpers/schema');
 const commonConsts = require('../configs/commonConsts');
 const adpushup = require('../helpers/adpushupEvent');
+
 const { sendDataToAuditLogService } = require('../helpers/routeHelpers');
+
+const {
+	AUDIT_LOGS_ACTIONS: { HEADER_BIDDING }
+} = commonConsts;
 
 const router = express.Router();
 
@@ -159,7 +164,11 @@ router
 						impersonateId: email,
 						userId: originalEmail,
 						prevConfig: {},
-						currentConfig: bidderConfig
+						currentConfig: bidderConfig,
+						action: {
+							name: HEADER_BIDDING.ADD_BIDDER,
+							data: `Add Bidder - ${key}`
+						}
 					});
 					return res.status(httpStatus.OK).json({ bidderKey: key, bidderConfig });
 				})
@@ -284,6 +293,9 @@ router
 				.then(biddersFromNetworkConfig => {
 					// log config changes
 					const { siteDomain, appName, type = 'app' } = dataForAuditLogs;
+					const {
+						AUDIT_LOGS_ACTIONS: { HEADER_BIDDING }
+					} = commonConsts;
 					sendDataToAuditLogService({
 						siteId,
 						siteDomain,
@@ -292,7 +304,11 @@ router
 						impersonateId: email,
 						userId: originalEmail,
 						prevConfig,
-						currentConfig: { ...bidderConfig }
+						currentConfig: { ...bidderConfig },
+						action: {
+							name: HEADER_BIDDING.UPDATE_BIDDER,
+							data: `Update Bidder - ${key}`
+						}
 					});
 
 					bidderConfig.paramsFormFields = {
@@ -351,7 +367,11 @@ router
 						impersonateId: email,
 						userId: originalEmail,
 						prevConfig,
-						currentConfig: {}
+						currentConfig: {},
+						action: {
+							name: HEADER_BIDDING.REMOVE_BIDDER,
+							data: `Remove Bidder - ${bidderKey}`
+						}
 					});
 					res.json({ message: 'Bidder successfully deleted' });
 				})
@@ -419,7 +439,7 @@ router
 				const { siteId } = req.params;
 				const { email, originalEmail } = req.user;
 				// log config changes
-				const { siteDomain, appName, type = 'app' } = dataForAuditLogs;
+				const { siteDomain, appName, type = 'app', actionInfo = '' } = dataForAuditLogs;
 				// we don't have previous config and its complex to retrieve it from backend
 				// this code just sets a flag and for maintaing logs
 				// we are using toggled value of current value to save diff.
@@ -448,7 +468,11 @@ router
 					impersonateId: email,
 					userId: originalEmail,
 					prevConfig,
-					currentConfig: categorizedJSON
+					currentConfig: categorizedJSON,
+					action: {
+						name: HEADER_BIDDING.UPDATE_HB_STATUS,
+						data: actionInfo ? `Update HB Status - ${actionInfo}` : 'Update HB Status'
+					}
 				});
 			})
 			.then(() => headerBiddingModel.updateHbStatus(siteId, categorizedJSON))
@@ -509,7 +533,11 @@ router
 					impersonateId: email,
 					userId: originalEmail,
 					prevConfig,
-					currentConfig: newPrebidConfig
+					currentConfig: newPrebidConfig,
+					action: {
+						name: HEADER_BIDDING.PREBID_SETTING,
+						data: 'Prebid Setting'
+					}
 				});
 
 				hbConfig.set('prebidConfig', newPrebidConfig);
@@ -573,7 +601,11 @@ router
 					impersonateId: email,
 					userId: originalEmail,
 					prevConfig,
-					currentConfig: amazonUAMConfig
+					currentConfig: amazonUAMConfig,
+					action: {
+						name: HEADER_BIDDING.AMAZON_UAM_SETTING,
+						data: 'Amazon UAM Setting'
+					}
 				});
 
 				hbConfig.set('amazonUAMConfig', amazonUAMConfig);
@@ -618,6 +650,10 @@ router
 					prevConfig: prevHBStatus,
 					currentConfig: {
 						headerBidding: !prevHBStatus.headerBidding
+					},
+					action: {
+						name: HEADER_BIDDING.HB_STATUS,
+						data: `HB_STATUS`
 					}
 				});
 				return headerBiddingModel.toggleHbStatusForSite(siteId);
@@ -874,7 +910,11 @@ router
 					impersonateId: email,
 					userId: originalEmail,
 					prevConfig,
-					currentConfig: newInventories
+					currentConfig: newInventories,
+					action: {
+						name: HEADER_BIDDING.UPDATE_VIDEO_AND_NATIVE_ON_AD_UNITS,
+						data: `Enable or Disable Video and Native on all units`
+					}
 				});
 			})
 			.then(() => res.status(httpStatus.OK).json({ success: 'Format updated successfully' }))
@@ -908,7 +948,11 @@ router
 					impersonateId: email,
 					userId: originalEmail,
 					prevConfig,
-					currentConfig: newInventories
+					currentConfig: newInventories,
+					action: {
+						name: HEADER_BIDDING.REFRESH_ALL_AD_UNITS,
+						data: `Refresh on all Ad units`
+					}
 				});
 			})
 			.then(() => res.status(httpStatus.OK).json({ success: 'Refresh updated successfully' }))
@@ -1069,7 +1113,11 @@ router
 					impersonateId: email,
 					userId: originalEmail,
 					prevConfig: prevRules,
-					currentConfig: newRules
+					currentConfig: newRules,
+					action: {
+						name: HEADER_BIDDING.OPTIMIZATION,
+						data: 'Optimization'
+					}
 				});
 				return hbConfig.save();
 			})
@@ -1124,7 +1172,11 @@ router
 					impersonateId: email,
 					userId: originalEmail,
 					prevConfig: prevRules,
-					currentConfig: newRules
+					currentConfig: newRules,
+					action: {
+						name: HEADER_BIDDING.OPTIMIZATION,
+						data: `Optimization`
+					}
 				});
 				return hbConfig.save();
 			})
