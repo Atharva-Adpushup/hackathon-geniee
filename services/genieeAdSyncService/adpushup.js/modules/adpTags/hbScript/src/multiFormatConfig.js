@@ -5,7 +5,7 @@ const BB_PLAYER_CONFIG = {
 
 const CONSTANTS = {
 	VIDEO: {
-		RENDERER_URL: 'https://cdn2.adpushup.com/public/assets/js/builds/geniee/bbplayer.js',
+		RENDERER_URL: 'https://cdn.adpushup.com/bbplayer.js',
 		CONTEXT: 'outstream',
 		MIMES: ['video/mp4', 'video/webm'], // JW Player v8 has in-built support for mp4 and webm
 		PROTOCOLS: [2, 3, 5, 6], // VAST 2.0, VAST 3.0, VAST 2.0 Wrapper, VAST 3.0 Wrapper
