@@ -196,13 +196,13 @@ var adpTags = {
 			 * If we disble "video" format here then it won't be added through hb rules
 			 * as well. As hb rule only apply intersection of the slot formats and hb rule formats.
 			 */
-			if (
-				Array.isArray(optionalParam.formats) &&
-				!adp.config.isBbPlayerEnabledForTesting &&
-				optionalParam.formats.indexOf('video') !== -1
-			) {
-				optionalParam.formats.splice(optionalParam.formats.indexOf('video'), 1);
-			}
+			// if (
+			// 	Array.isArray(optionalParam.formats) &&
+			// 	!adp.config.isBbPlayerEnabledForTesting &&
+			// 	optionalParam.formats.indexOf('video') !== -1
+			// ) {
+			// 	optionalParam.formats.splice(optionalParam.formats.indexOf('video'), 1);
+			// }
 
 			var slot = this.createSlot(containerId, size, placement, optionalParam);
 			/**
