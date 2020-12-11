@@ -141,7 +141,7 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 				type: 'POST',
 				url: '//vastdump-staging.adpushup.com/bb_player_logging',
 				data: JSON.stringify({
-					eventName: 'video_bid_received',
+					eventName: 'video_finished',
 					adUnitCode: bid.adUnitCode,
 					bidder: bid.bidder,
 					bidderCode: bid.bidderCode,
@@ -399,6 +399,30 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 			utils.getIframeDocument(container, { width, height }),
 			highestAliveBannerBid.adId
 		);
+
+		// TODO: bbPlayer: logging for testing...
+		window.adpushup.$.ajax({
+			type: 'POST',
+			url: '//vastdump-staging.adpushup.com/bb_player_logging',
+			data: JSON.stringify({
+				eventName: 'banner_before_video_rendered',
+				adUnitCode: highestAliveBannerBid.adUnitCode,
+				bidder: highestAliveBannerBid.bidder,
+				bidderCode: highestAliveBannerBid.bidderCode,
+				creativeId: highestAliveBannerBid.creativeId,
+				adId: highestAliveBannerBid.adId,
+				size: highestAliveBannerBid.size,
+				mediaType: highestAliveBannerBid.mediaType,
+				status: highestAliveBannerBid.status,
+				eventTime: +new Date(),
+				bidWonTime: bidWonTime,
+				auctionId: highestAliveBannerBid.auctionId || '',
+				requestId: highestAliveBannerBid.requestId || ''
+			}),
+			contentType: 'application/json',
+			processData: false,
+			dataType: 'json'
+		});
 
 		// send banner bid won feedback
 		prebidDataCollector.collectBidWonData(highestAliveBannerBid);
