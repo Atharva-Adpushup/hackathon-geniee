@@ -323,13 +323,8 @@ export default class InventoryTab extends React.Component {
 	};
 
 	toggleHbStatusForSiteState = newHbStatus => {
-		const {
-			siteId,
-			loadingHbStatusForSite,
-			hbStatusForSite: currHbStatus,
-			customProps,
-			user
-		} = this.state;
+		const { loadingHbStatusForSite, hbStatusForSite: currHbStatus } = this.state;
+		const { siteId, user, customProps } = this.props;
 
 		const dataForAuditLogs = {
 			appName: customProps.appName,

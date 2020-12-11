@@ -22,7 +22,7 @@ const mapDispatchToProps = dispatch => ({
 	fetchAds: payload => dispatch(fetchAds(payload)),
 	updateAd: (adId, siteId, payload) => dispatch(updateAd(adId, siteId, payload)),
 	modifyAdOnServer: (siteId, adId, payload) => dispatch(modifyAdOnServer(siteId, adId, payload)),
-	masterSave: (adsToUpdate, siteId) => dispatch(masterSave(adsToUpdate, siteId))
+	masterSave: (adsToUpdate, siteId, dataForAuditLogs) => dispatch(masterSave(adsToUpdate, siteId, dataForAuditLogs))
 });
 
 export default connect(
