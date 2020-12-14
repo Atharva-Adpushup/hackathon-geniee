@@ -16,35 +16,29 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 	var bidWonTime = +new Date();
 	var [width, height] = adpSlot.size;
 
-	if (
-		window.adpushup.config.sitesToEnableBbPlayerLogging.indexOf(
-			window.adpushup.config.siteId
-		) !== -1
-	) {
-		// TODO: bbPlayer: logging for testing...
-		window.adpushup.$.ajax({
-			type: 'POST',
-			url: '//vastdump-staging.adpushup.com/bb_player_logging',
-			data: JSON.stringify({
-				eventName: 'video_bid_received',
-				adUnitCode: bid.adUnitCode,
-				bidder: bid.bidder,
-				bidderCode: bid.bidderCode,
-				creativeId: bid.creativeId,
-				adId: bid.adId,
-				size: bid.size,
-				mediaType: bid.mediaType,
-				status: bid.status,
-				eventTime: +new Date(),
-				bidWonTime: bidWonTime,
-				auctionId: bid.auctionId || '',
-				requestId: bid.requestId || ''
-			}),
-			contentType: 'application/json',
-			processData: false,
-			dataType: 'json'
-		});
-	}
+	// TODO: bbPlayer: logging for testing...
+	window.adpushup.$.ajax({
+		type: 'POST',
+		url: '//vastdump-staging.adpushup.com/bb_player_logging',
+		data: JSON.stringify({
+			eventName: 'video_bid_received',
+			adUnitCode: bid.adUnitCode,
+			bidder: bid.bidder,
+			bidderCode: bid.bidderCode,
+			creativeId: bid.creativeId,
+			adId: bid.adId,
+			size: bid.size,
+			mediaType: bid.mediaType,
+			status: bid.status,
+			eventTime: +new Date(),
+			bidWonTime: bidWonTime,
+			auctionId: bid.auctionId || '',
+			requestId: bid.requestId || ''
+		}),
+		contentType: 'application/json',
+		processData: false,
+		dataType: 'json'
+	});
 
 	function getBbPlayerConfig(bid) {
 		const config = {
@@ -133,35 +127,29 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 
 		// listen video finished event
 		playerApi.on('adfinished', function() {
-			if (
-				window.adpushup.config.sitesToEnableBbPlayerLogging.indexOf(
-					window.adpushup.config.siteId
-				) !== -1
-			) {
-				// TODO: bbPlayer: logging for testing...
-				window.adpushup.$.ajax({
-					type: 'POST',
-					url: '//vastdump-staging.adpushup.com/bb_player_logging',
-					data: JSON.stringify({
-						eventName: 'video_finished',
-						adUnitCode: bid.adUnitCode,
-						bidder: bid.bidder,
-						bidderCode: bid.bidderCode,
-						creativeId: bid.creativeId,
-						adId: bid.adId,
-						size: bid.size,
-						mediaType: bid.mediaType,
-						status: bid.status,
-						eventTime: +new Date(),
-						bidWonTime: bidWonTime,
-						auctionId: bid.auctionId || '',
-						requestId: bid.requestId || ''
-					}),
-					contentType: 'application/json',
-					processData: false,
-					dataType: 'json'
-				});
-			}
+			// TODO: bbPlayer: logging for testing...
+			window.adpushup.$.ajax({
+				type: 'POST',
+				url: '//vastdump-staging.adpushup.com/bb_player_logging',
+				data: JSON.stringify({
+					eventName: 'video_finished',
+					adUnitCode: bid.adUnitCode,
+					bidder: bid.bidder,
+					bidderCode: bid.bidderCode,
+					creativeId: bid.creativeId,
+					adId: bid.adId,
+					size: bid.size,
+					mediaType: bid.mediaType,
+					status: bid.status,
+					eventTime: +new Date(),
+					bidWonTime: bidWonTime,
+					auctionId: bid.auctionId || '',
+					requestId: bid.requestId || ''
+				}),
+				contentType: 'application/json',
+				processData: false,
+				dataType: 'json'
+			});
 
 			// check if there is any another highest alive unused bid in cache
 			var highestAliveBid = utils.getHighestAliveBid(pbjs, bid.adUnitCode, [
@@ -200,52 +188,46 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 		var bbPlayerEvents = ['error', 'aderror', 'adstarted'];
 		bbPlayerEvents.forEach(function(eventName) {
 			playerApi.on(eventName, function(e) {
-				if (
-					window.adpushup.config.sitesToEnableBbPlayerLogging.indexOf(
-						window.adpushup.config.siteId
-					) !== -1
-				) {
-					// window.adpushup.$.ajax({
-					// 	type: 'POST',
-					// 	// TODO: bbPlayer: vast dump service endpoints need to be udpated according to new event names
-					// 	url: '//vastdump-staging.adpushup.com/' + eventName,
-					// 	data: JSON.stringify({
-					// 		data: JSON.stringify(e), // TODO: bbPlayer: `e` is the refrence to DOM, stringify is throwing "Uncaught TypeError: Converting circular structure to JSON"
-					// 		bid: JSON.stringify(bid),
-					// 		eventTime: +new Date(),
-					// 		bidWonTime: bidWonTime,
-					// 		auctionId: bid.auctionId || '',
-					// 		requestId: bid.requestId || ''
-					// 	}),
-					// 	contentType: 'application/json',
-					// 	processData: false,
-					// 	dataType: 'json'
-					// });
+				// window.adpushup.$.ajax({
+				// 	type: 'POST',
+				// 	// TODO: bbPlayer: vast dump service endpoints need to be udpated according to new event names
+				// 	url: '//vastdump-staging.adpushup.com/' + eventName,
+				// 	data: JSON.stringify({
+				// 		data: JSON.stringify(e), // TODO: bbPlayer: `e` is the refrence to DOM, stringify is throwing "Uncaught TypeError: Converting circular structure to JSON"
+				// 		bid: JSON.stringify(bid),
+				// 		eventTime: +new Date(),
+				// 		bidWonTime: bidWonTime,
+				// 		auctionId: bid.auctionId || '',
+				// 		requestId: bid.requestId || ''
+				// 	}),
+				// 	contentType: 'application/json',
+				// 	processData: false,
+				// 	dataType: 'json'
+				// });
 
-					// TODO: bbPlayer: logging for testing...
-					window.adpushup.$.ajax({
-						type: 'POST',
-						url: '//vastdump-staging.adpushup.com/bb_player_logging',
-						data: JSON.stringify({
-							eventName: eventName,
-							adUnitCode: bid.adUnitCode,
-							bidder: bid.bidder,
-							bidderCode: bid.bidderCode,
-							creativeId: bid.creativeId,
-							adId: bid.adId,
-							size: bid.size,
-							mediaType: bid.mediaType,
-							status: bid.status,
-							eventTime: +new Date(),
-							bidWonTime: bidWonTime,
-							auctionId: bid.auctionId || '',
-							requestId: bid.requestId || ''
-						}),
-						contentType: 'application/json',
-						processData: false,
-						dataType: 'json'
-					});
-				}
+				// TODO: bbPlayer: logging for testing...
+				window.adpushup.$.ajax({
+					type: 'POST',
+					url: '//vastdump-staging.adpushup.com/bb_player_logging',
+					data: JSON.stringify({
+						eventName: eventName,
+						adUnitCode: bid.adUnitCode,
+						bidder: bid.bidder,
+						bidderCode: bid.bidderCode,
+						creativeId: bid.creativeId,
+						adId: bid.adId,
+						size: bid.size,
+						mediaType: bid.mediaType,
+						status: bid.status,
+						eventTime: +new Date(),
+						bidWonTime: bidWonTime,
+						auctionId: bid.auctionId || '',
+						requestId: bid.requestId || ''
+					}),
+					contentType: 'application/json',
+					processData: false,
+					dataType: 'json'
+				});
 			});
 		});
 	};
@@ -280,35 +262,29 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 			bluebillywig.cmd.push({
 				playerId: getBbPlayerId(bid.adUnitCode),
 				callback: function(playerApi) {
-					if (
-						window.adpushup.config.sitesToEnableBbPlayerLogging.indexOf(
-							window.adpushup.config.siteId
-						) !== -1
-					) {
-						// TODO: bbPlayer: logging for testing...
-						window.adpushup.$.ajax({
-							type: 'POST',
-							url: '//vastdump-staging.adpushup.com/bb_player_logging',
-							data: JSON.stringify({
-								eventName: 'bb_queue_fired',
-								adUnitCode: bid.adUnitCode,
-								bidder: bid.bidder,
-								bidderCode: bid.bidderCode,
-								creativeId: bid.creativeId,
-								adId: bid.adId,
-								size: bid.size,
-								mediaType: bid.mediaType,
-								status: bid.status,
-								eventTime: +new Date(),
-								bidWonTime: bidWonTime,
-								auctionId: bid.auctionId || '',
-								requestId: bid.requestId || ''
-							}),
-							contentType: 'application/json',
-							processData: false,
-							dataType: 'json'
-						});
-					}
+					// TODO: bbPlayer: logging for testing...
+					window.adpushup.$.ajax({
+						type: 'POST',
+						url: '//vastdump-staging.adpushup.com/bb_player_logging',
+						data: JSON.stringify({
+							eventName: 'bb_queue_fired',
+							adUnitCode: bid.adUnitCode,
+							bidder: bid.bidder,
+							bidderCode: bid.bidderCode,
+							creativeId: bid.creativeId,
+							adId: bid.adId,
+							size: bid.size,
+							mediaType: bid.mediaType,
+							status: bid.status,
+							eventTime: +new Date(),
+							bidWonTime: bidWonTime,
+							auctionId: bid.auctionId || '',
+							requestId: bid.requestId || ''
+						}),
+						contentType: 'application/json',
+						processData: false,
+						dataType: 'json'
+					});
 
 					customizeBbPlayer(playerApi, slotAttributesToMigrate, preservedSlotElDataset);
 					setupPlayerEvents(playerApi);
@@ -379,35 +355,29 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 			highestAliveBannerBid.adId
 		);
 
-		if (
-			window.adpushup.config.sitesToEnableBbPlayerLogging.indexOf(
-				window.adpushup.config.siteId
-			) !== -1
-		) {
-			// TODO: bbPlayer: logging for testing...
-			window.adpushup.$.ajax({
-				type: 'POST',
-				url: '//vastdump-staging.adpushup.com/bb_player_logging',
-				data: JSON.stringify({
-					eventName: 'banner_before_video_rendered',
-					adUnitCode: highestAliveBannerBid.adUnitCode,
-					bidder: highestAliveBannerBid.bidder,
-					bidderCode: highestAliveBannerBid.bidderCode,
-					creativeId: highestAliveBannerBid.creativeId,
-					adId: highestAliveBannerBid.adId,
-					size: highestAliveBannerBid.size,
-					mediaType: highestAliveBannerBid.mediaType,
-					status: highestAliveBannerBid.status,
-					eventTime: +new Date(),
-					bidWonTime: bidWonTime,
-					auctionId: highestAliveBannerBid.auctionId || '',
-					requestId: highestAliveBannerBid.requestId || ''
-				}),
-				contentType: 'application/json',
-				processData: false,
-				dataType: 'json'
-			});
-		}
+		// TODO: bbPlayer: logging for testing...
+		window.adpushup.$.ajax({
+			type: 'POST',
+			url: '//vastdump-staging.adpushup.com/bb_player_logging',
+			data: JSON.stringify({
+				eventName: 'banner_before_video_rendered',
+				adUnitCode: highestAliveBannerBid.adUnitCode,
+				bidder: highestAliveBannerBid.bidder,
+				bidderCode: highestAliveBannerBid.bidderCode,
+				creativeId: highestAliveBannerBid.creativeId,
+				adId: highestAliveBannerBid.adId,
+				size: highestAliveBannerBid.size,
+				mediaType: highestAliveBannerBid.mediaType,
+				status: highestAliveBannerBid.status,
+				eventTime: +new Date(),
+				bidWonTime: bidWonTime,
+				auctionId: highestAliveBannerBid.auctionId || '',
+				requestId: highestAliveBannerBid.requestId || ''
+			}),
+			contentType: 'application/json',
+			processData: false,
+			dataType: 'json'
+		});
 
 		// send banner bid won feedback
 		prebidDataCollector.collectBidWonData(highestAliveBannerBid);

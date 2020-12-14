@@ -83,7 +83,7 @@ var utils = require('../libs/utils'),
 
 				removeBidderTargeting(slot);
 
-				if (adp.config.sitesToEnableBbPlayerLogging.indexOf(adp.config.siteId) !== -1) {
+				if (adp.config.isBbPlayerEnabledForTesting) {
 					// TODO: bbPlayer: logging for testing...
 					window.adpushup.$.ajax({
 						type: 'POST',
@@ -97,11 +97,11 @@ var utils = require('../libs/utils'),
 						processData: false,
 						dataType: 'json'
 					});
-				}
 
-				// Remove BB Player if rendered for current adUnit
-				var bbPlayerId = getBbPlayerId(slot.containerId);
-				removeBbPlayerIfRendered(bbPlayerId, slot.containerId);
+					// Remove BB Player if rendered for current adUnit
+					var bbPlayerId = getBbPlayerId(slot.containerId);
+					removeBbPlayerIfRendered(bbPlayerId, slot.containerId); // TODO: bbPlayer: remove second attribute
+				}
 
 				adp.config.apLiteActive
 					? window.apLite.queSlotForBidding(slot)

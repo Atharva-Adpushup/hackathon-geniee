@@ -26,6 +26,5 @@ module.exports = {
 	prebidBundleUrl: '__PREBID_BUNDLE_URL__',
 	isPerformanceLoggingEnabled: __PERFORMANCE_LOGGING_ENABLED__,
 	isAutoAddMultiformatDisabled: __AUTO_ADD_MULTIFORMAT_DISABLED__,
-	isBbPlayerEnabledForTesting: __ENABLE_BB_PLAYER_FOR_TESTING__,
-	sitesToEnableBbPlayerLogging: [37780, 40792]
+	isBbPlayerEnabledForTesting: __ENABLE_BB_PLAYER_FOR_TESTING__
 };
