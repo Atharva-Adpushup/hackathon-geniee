@@ -23,6 +23,7 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 		data: JSON.stringify({
 			eventName: 'video_bid_received',
 			adUnitCode: bid.adUnitCode,
+			siteId: window.adpushup.config.siteId,
 			bidder: bid.bidder,
 			bidderCode: bid.bidderCode,
 			creativeId: bid.creativeId,
@@ -134,6 +135,7 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 				data: JSON.stringify({
 					eventName: 'video_finished',
 					adUnitCode: bid.adUnitCode,
+					siteId: window.adpushup.config.siteId,
 					bidder: bid.bidder,
 					bidderCode: bid.bidderCode,
 					creativeId: bid.creativeId,
@@ -212,6 +214,7 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 					data: JSON.stringify({
 						eventName: eventName,
 						adUnitCode: bid.adUnitCode,
+						siteId: window.adpushup.config.siteId,
 						bidder: bid.bidder,
 						bidderCode: bid.bidderCode,
 						creativeId: bid.creativeId,
@@ -269,6 +272,7 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 						data: JSON.stringify({
 							eventName: 'bb_queue_fired',
 							adUnitCode: bid.adUnitCode,
+							siteId: window.adpushup.config.siteId,
 							bidder: bid.bidder,
 							bidderCode: bid.bidderCode,
 							creativeId: bid.creativeId,
@@ -362,6 +366,7 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 			data: JSON.stringify({
 				eventName: 'banner_before_video_rendered',
 				adUnitCode: highestAliveBannerBid.adUnitCode,
+				siteId: window.adpushup.config.siteId,
 				bidder: highestAliveBannerBid.bidder,
 				bidderCode: highestAliveBannerBid.bidderCode,
 				creativeId: highestAliveBannerBid.creativeId,
