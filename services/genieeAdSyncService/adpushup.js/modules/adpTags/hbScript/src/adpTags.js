@@ -198,7 +198,7 @@ var adpTags = {
 			 */
 			if (
 				Array.isArray(optionalParam.formats) &&
-				adp.config.isBbPlayerDisabled &&
+				!adp.config.isBbPlayerEnabledForTesting &&
 				optionalParam.formats.indexOf('video') !== -1
 			) {
 				optionalParam.formats.splice(optionalParam.formats.indexOf('video'), 1);
