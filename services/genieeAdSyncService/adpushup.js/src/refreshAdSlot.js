@@ -83,7 +83,7 @@ var utils = require('../libs/utils'),
 
 				removeBidderTargeting(slot);
 
-				if (!adp.config.isBbPlayerDisabled) {
+				if (adp.config.isBbPlayerEnabledForTesting) {
 					// TODO: bbPlayer: logging for testing...
 					window.adpushup.$.ajax({
 						type: 'POST',
@@ -91,7 +91,6 @@ var utils = require('../libs/utils'),
 						data: JSON.stringify({
 							eventName: 'refreshAd',
 							adUnitCode: slot.containerId,
-							siteId: adp.config.siteId,
 							eventTime: +new Date()
 						}),
 						contentType: 'application/json',

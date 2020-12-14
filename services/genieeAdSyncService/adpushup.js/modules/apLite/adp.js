@@ -253,7 +253,7 @@ var $ = require('../../libs/jquery'),
 											 */
 											// formats = ['display'],
 											// Temp change: enable video for bb player testing
-											formats = window.adpushup.config.isBbPlayerDisabled
+											formats = !window.adpushup.config.isBbPlayerEnabledForTesting
 												? ['display']
 												: ['display', 'video'],
 											sizeMapping = apLiteAdUnit.sizeMapping || [],
