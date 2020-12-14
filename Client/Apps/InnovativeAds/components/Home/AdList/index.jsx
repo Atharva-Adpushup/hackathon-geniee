@@ -148,10 +148,25 @@ class AdList extends Component {
 		</div>
 	);
 
+	handleToggleStickyBg = state => {
+		const { ads, updateAllAds, match } = this.props;
+		const adsToggledWithStickyBg = ads.map(ad => ({
+			...ad,
+			formatData: { ...ad.formatData, disableStickyBg: !state }
+		}));
+		return updateAllAds(match.params.siteId, adsToggledWithStickyBg);
+	};
+
 	renderFilters() {
 		const { filters } = this.state;
 		const { channels, user, ads } = this.props;
 		const isBulkFluidEnabled = ads.every(ad => ad.fluid);
+		const hasAtleastOneStickyBottom = ads.some(ad => ad.formatData.format === 'stickyBottom');
+		const isStickyBgEnabledOnAllUnits =
+			hasAtleastOneStickyBottom &&
+			ads
+				.filter(ad => ad.formatData.format === 'stickyBottom')
+				.every(ad => !ad.formatData.disableStickyBg);
 		return (
 			<React.Fragment>
 				<Row>
@@ -212,6 +227,20 @@ class AdList extends Component {
 							defaultLayout
 							name="toggle-fluid"
 							id="toggle-fluid"
+						/>
+						<CustomToggleSwitch
+							layout="horizontal"
+							className="u-margin-b4"
+							checked={isStickyBgEnabledOnAllUnits}
+							onChange={this.handleToggleStickyBg}
+							labelText="Enable or Disable background on all sticky background units"
+							labelBold
+							on="Enable"
+							off="Disable"
+							defaultLayout
+							disabled={!hasAtleastOneStickyBottom}
+							name="toggle-all-sticky-bg"
+							id="toggle-all-sticky-bg"
 						/>
 					</Row>
 				)}

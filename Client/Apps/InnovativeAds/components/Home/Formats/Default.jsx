@@ -7,21 +7,27 @@ import React, { Component } from 'react';
 import { Col } from '@/Client/helpers/react-bootstrap-imports';
 import CodeBox from '../../../../../Components/CodeBox/index';
 import { TYPE_OF_ADS, EVENTS } from '../../../configs/commonConsts';
+import CustomToggleSwitch from '../../../../../Components/CustomToggleSwitch';
 
 class Default extends Component {
 	constructor(props) {
 		super(props);
 		const { ad } = this.props;
 		this.state = {
-			css: ad && ad.css ? window.btoa(JSON.stringify(ad.css)) : ''
+			css: ad && ad.css ? window.btoa(JSON.stringify(ad.css)) : '',
+			stickyBgEnabled: !ad.formatData.disableStickyBg
 		};
 		this.saveHandler = this.saveHandler.bind(this);
 		this.handleChange = this.handleChange.bind(this);
 	}
 
+	handleStickyBgToggle = state => {
+		this.setState({ stickyBgEnabled: state });
+	};
+
 	saveHandler() {
 		const { save } = this.props;
-		const { css } = this.state;
+		const { css, stickyBgEnabled } = this.state;
 		let code = {};
 		if (css && css.trim().length) {
 			try {
@@ -39,7 +45,8 @@ class Default extends Component {
 				event: EVENTS.SCRIPT_LOADED,
 				eventData: {
 					value: ''
-				}
+				},
+				disableStickyBg: !stickyBgEnabled
 			},
 			css: code,
 			type: TYPE_OF_ADS.INTERACTIVE_AD
@@ -51,11 +58,26 @@ class Default extends Component {
 	}
 
 	render() {
-		const { save, cancel } = this.props;
-		const { css } = this.state;
+		const { save, cancel, ad } = this.props;
+		const { css, stickyBgEnabled } = this.state;
 		return (
 			<div>
 				<Col md={12} className="u-padding-l0">
+					{ad.formatData.format === 'stickyBottom' && (
+						<CustomToggleSwitch
+							layout="horizontal"
+							className="u-margin-b4"
+							checked={stickyBgEnabled}
+							onChange={this.handleStickyBgToggle}
+							labelText="Enable or Disable translucent background"
+							labelBold
+							on="Enable"
+							off="Disable"
+							defaultLayout
+							name="toggle-sticky-bg"
+							id="toggle-sticky-bg"
+						/>
+					)}
 					<label htmlFor="css">Custom CSS</label>
 					<CodeBox name="css" showButtons={false} onChange={this.handleChange} code={css} />
 				</Col>
