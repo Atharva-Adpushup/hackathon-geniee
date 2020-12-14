@@ -1,9 +1,12 @@
-
 #notification {
 	margin-top: auto;
 	margin-bottom: auto;
 	cursor: pointer;
 	position: relative;
+}
+
+#notification {
+	height: 36px;
 }
 
 #notification .notification-bell {

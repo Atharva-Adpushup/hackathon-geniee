@@ -287,7 +287,7 @@ router
 		}
 
 		const { adUnits } = req.body;
-		const json = { siteId: parseInt(siteId), adUnits };
+		const json = { siteId: parseInt(siteId, 10), adUnits };
 		return apLiteModel
 			.saveAdUnits(json)
 			.then(() => apLiteModel.getAPLiteModelBySite(json.siteId))
@@ -309,8 +309,32 @@ router
 		}
 
 		return apLiteModel
-			.getAPLiteModelBySite(parseInt(siteId))
+			.getAPLiteModelBySite(parseInt(siteId, 10))
 			.then(docData => sendSuccessResponse(docData, res))
 			.catch(err => errorHandler(err, res, 404));
-	});
+	})
+	.post('/sendNotification', (req, res) => {
+		if (!req.user.isSuperUser) {
+			return sendErrorResponse(
+				{
+					message: 'Unauthorized Request',
+					code: HTTP_STATUSES.UNAUTHORIZED
+				},
+				res
+			);
+		}
+		const { notificationData } = req.body;
+		return opsModel
+			.sendNotification(notificationData)
+			.then(message => sendSuccessResponse(message, res))
+			.catch(err => {
+				return errorHandler(err, res);
+			});
+	})
+	.get('/getAllNotifications', (req, res) =>
+		opsModel
+			.getAllNotifications()
+			.then(message => sendSuccessResponse(message, res))
+			.catch(err => errorHandler(err, res))
+	);
 module.exports = router;

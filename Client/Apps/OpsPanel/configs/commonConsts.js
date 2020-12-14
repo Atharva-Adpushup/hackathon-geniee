@@ -288,7 +288,8 @@ const TOOLS_IDENTIFIERS = {
 	TOP_XPATH_MISS_MODE_URL: 'TOP_XPATH_MISS_MODE_URL',
 	LOST_FOUND_LIVE_SITES: 'LOST_FOUND_LIVE_SITES',
 	ADS_TXT_LIVE_SITES: 'ADS_TXT_LIVE_SITES',
-	BIDDER_CONFIGURATIONS: 'BIDDER_CONFIGURATIONS'
+	BIDDER_CONFIGURATIONS: 'BIDDER_CONFIGURATIONS',
+	DASHBOARD_NOTIFICATIONS: 'DASHBOARD_NOTIFICATIONS'
 };
 
 const ADS_TXT_LIVE_SITES_ENTRIES = [
@@ -404,10 +405,7 @@ const XPATH_MODE_URL = {
 		{ name: 'Mobile', value: 'Mobile' },
 		{ name: 'Tablet', value: 'Tablet' }
 	],
-	modes: [
-		{ name: 'Mode 1', value: 1 },
-		{ name: 'Mode 2', value: 2 }
-	],
+	modes: [{ name: 'Mode 1', value: 1 }, { name: 'Mode 2', value: 2 }],
 	ORDER_BY_PARAMS: [
 		{ name: 'Hits', value: 'hits' },
 		{ name: 'XPath Miss', value: 'xpath_miss' },
