@@ -76,7 +76,6 @@ var bbPlayerUtils = {
 			}
 		}
 
-		console.log('keen logs: ', json);
 		const data = adp.utils.base64Encode(JSON.stringify(json));
 		const imgSrc = BB_PLAYER_LOG_KEEN_ENDPOINT + data;
 
