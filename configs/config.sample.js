@@ -227,7 +227,9 @@ module.exports = {
 	performanceLoggingEnabledSites: [37780],
 	sitesToDisableVideoWaitLimit: [],
 	disableAutoAddMultiformatForSites: [],
-	sitesToEnableBbPlayer: [37780]
+	sitesToEnableBbPlayer: [37780],
+	sitesToDisableBbPlayer: [40792],
+	enableBbPlayerLogging: false
 };
 
 /*

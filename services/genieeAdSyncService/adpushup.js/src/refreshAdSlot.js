@@ -5,7 +5,8 @@ var utils = require('../libs/utils'),
 	adCodeGenerator = require('./adCodeGenerator'),
 	{
 		getBbPlayerId,
-		removeBbPlayerIfRendered
+		removeBbPlayerIfRendered,
+		sendBbPlayerLogs
 	} = require('../modules/adpTags/hbScript/src/bbPlayerUtils'),
 	adp = window.adpushup,
 	debounce = require('lodash.debounce'),
@@ -84,19 +85,7 @@ var utils = require('../libs/utils'),
 				removeBidderTargeting(slot);
 
 				if (adp.config.isBbPlayerEnabledForTesting) {
-					// TODO: bbPlayer: logging for testing...
-					window.adpushup.$.ajax({
-						type: 'POST',
-						url: '//vastdump-staging.adpushup.com/bb_player_logging',
-						data: JSON.stringify({
-							eventName: 'refreshAd',
-							adUnitCode: slot.containerId,
-							eventTime: +new Date()
-						}),
-						contentType: 'application/json',
-						processData: false,
-						dataType: 'json'
-					});
+					sendBbPlayerLogs('refresh', 'refreshAd', slot);
 
 					// Remove BB Player if rendered for current adUnit
 					var bbPlayerId = getBbPlayerId(slot.containerId);
