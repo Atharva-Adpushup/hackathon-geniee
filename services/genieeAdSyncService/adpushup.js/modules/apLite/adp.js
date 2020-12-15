@@ -209,7 +209,7 @@ var $ = require('../../libs/jquery'),
 											/* layout of size object is { l: 300, j: 100 } */
 											var width = size.l,
 												height = size.j;
-											return [width, height];
+											return !!width && !!height && [width, height];
 										}),
 										gptSlotElementId = gptSlot.getSlotElementId(),
 										gptAdUnitPath = gptSlot.getAdUnitPath(),
