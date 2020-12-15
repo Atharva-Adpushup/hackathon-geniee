@@ -209,7 +209,7 @@ var $ = require('../../libs/jquery'),
 											/* layout of size object is { l: 300, j: 100 } */
 											var width = size.l,
 												height = size.j;
-											return !!width && !!height && [width, height];
+											return [width, height];
 										}),
 										gptSlotElementId = gptSlot.getSlotElementId(),
 										gptAdUnitPath = gptSlot.getAdUnitPath(),
@@ -222,6 +222,16 @@ var $ = require('../../libs/jquery'),
 										}),
 										sectionId = apLiteAdUnit && apLiteAdUnit.sectionId,
 										container;
+
+									allSizes = allSizes.filter(size => {
+										return (
+											size &&
+											Array.isArray(size) &&
+											size.length == 2 &&
+											!isNaN(parseInt(size[0])) &&
+											!isNaN(parseInt(size[1]))
+										);
+									});
 
 									try {
 										container = $(`#${cssescape(gptSlotElementId)}`);
