@@ -235,94 +235,94 @@ var $ = require('../../libs/jquery'),
 
 									try {
 										container = $(`#${cssescape(gptSlotElementId)}`);
-									} catch (error) {
-										container = [];
-										window.adpushup.err.push(error);
-									}
 
-									// Create adp slot only if defined GPT slot has the associated container in the DOM and gpt ad unit has a valid section id
-									if (container.length && dfpAdUnitName && sectionId) {
-										var dfpAdunitCode = apLiteAdUnit.dfpAdunitCode,
-											slotHbStatus = apLiteAdUnit.headerBidding,
-											refreshSlot = apLiteAdUnit.refreshSlot,
-											refreshInterval = apLiteAdUnit.refreshInterval,
-											// formats = apLiteAdUnit.formats,
-											/**
-											 * Temporarily Enabled "display" and "video" formats for apLite
-											 * until we enable all formats in all ad docs.
-											 * Hb Rules can still override formats list.
-											 */
-											// formats = window.adpushup.config.isAutoAddMultiformatDisabled
-											// 	? apLiteAdUnit.formats
-											// 	: ['display', 'video'],
-											/**
-											 * Disabled video format until we integrate any new video player.
-											 *
-											 * If we disble "video" format here then it won't be added through hb rules
-											 * as well. As hb rule only apply intersection of the slot formats and hb rule formats.
-											 */
-											// formats = ['display'],
-											// Temp change: enable video for bb player testing
-											formats = !window.adpushup.config.isBbPlayerEnabledForTesting
-												? ['display']
-												: ['display', 'video'],
-											sizeMapping = apLiteAdUnit.sizeMapping || [],
-											computedSizes = hbUtils.getSizesComputedUsingSizeMappingOrAdUnitSize(
-												apLiteAdUnit,
-												false,
-												allSizes
-											);
-										allSizes =
-											Array.isArray(computedSizes) && computedSizes.length
-												? computedSizes
-												: allSizes;
-										adpSlot = this.createAdpSlot(
-											gptSlotElementId,
-											dfpAdUnitName,
-											gptSlot,
-											allSizes,
-											sectionId,
-											{
-												dfpAdunit: dfpAdUnitName,
-												dfpAdunitCode,
-												headerBidding: window.adpushup.services.HB_ACTIVE && slotHbStatus,
-												network: commonConsts.NETWORKS.ADPTAGS,
-												formats,
-												enableLazyLoading: false,
-												sectionName: dfpAdUnitName,
-												refreshSlot,
-												refreshInterval,
-												services: [commonConsts.SERVICES.AP_LITE],
-												fluid: false,
-												sizeMapping,
-												adId: gptSlotElementId
-											}
-										);
-
-										this.adpSlots[gptSlotElementId] = adpSlot;
-
-										var feedbackData = this.setFeedbackData(adpSlot);
-										utils.sendFeedback(feedbackData);
-
-										this.queSlotForBidding(adpSlot);
-
-										var currentTime = new Date().getTime();
-										container.attr('data-render-time', currentTime);
-
-										refreshSlot &&
-											refreshAdSlot.refreshSlot(container, {
-												id: gptSlotElementId,
-												slotId: gptSlotElementId,
+										// Create adp slot only if defined GPT slot has the associated container in the DOM and gpt ad unit has a valid section id
+										if (container.length && dfpAdUnitName && sectionId) {
+											var dfpAdunitCode = apLiteAdUnit.dfpAdunitCode,
+												slotHbStatus = apLiteAdUnit.headerBidding,
+												refreshSlot = apLiteAdUnit.refreshSlot,
+												refreshInterval = apLiteAdUnit.refreshInterval,
+												// formats = apLiteAdUnit.formats,
+												/**
+												 * Temporarily Enabled "display" and "video" formats for apLite
+												 * until we enable all formats in all ad docs.
+												 * Hb Rules can still override formats list.
+												 */
+												// formats = window.adpushup.config.isAutoAddMultiformatDisabled
+												// 	? apLiteAdUnit.formats
+												// 	: ['display', 'video'],
+												/**
+												 * Disabled video format until we integrate any new video player.
+												 *
+												 * If we disble "video" format here then it won't be added through hb rules
+												 * as well. As hb rule only apply intersection of the slot formats and hb rule formats.
+												 */
+												// formats = ['display'],
+												// Temp change: enable video for bb player testing
+												formats = !window.adpushup.config.isBbPlayerEnabledForTesting
+													? ['display']
+													: ['display', 'video'],
+												sizeMapping = apLiteAdUnit.sizeMapping || [],
+												computedSizes = hbUtils.getSizesComputedUsingSizeMappingOrAdUnitSize(
+													apLiteAdUnit,
+													false,
+													allSizes
+												);
+											allSizes =
+												Array.isArray(computedSizes) && computedSizes.length
+													? computedSizes
+													: allSizes;
+											adpSlot = this.createAdpSlot(
+												gptSlotElementId,
 												dfpAdUnitName,
-												network: 'adpTags',
-												networkData: {
+												gptSlot,
+												allSizes,
+												sectionId,
+												{
+													dfpAdunit: dfpAdUnitName,
+													dfpAdunitCode,
+													headerBidding: window.adpushup.services.HB_ACTIVE && slotHbStatus,
+													network: commonConsts.NETWORKS.ADPTAGS,
+													formats,
+													enableLazyLoading: false,
+													sectionName: dfpAdUnitName,
+													refreshSlot,
 													refreshInterval,
-													headerBidding: slotHbStatus
+													services: [commonConsts.SERVICES.AP_LITE],
+													fluid: false,
+													sizeMapping,
+													adId: gptSlotElementId
 												}
-											});
-									} else {
-										//collect rest of the units (not provided to us) separately
+											);
+
+											this.adpSlots[gptSlotElementId] = adpSlot;
+
+											var feedbackData = this.setFeedbackData(adpSlot);
+											utils.sendFeedback(feedbackData);
+
+											this.queSlotForBidding(adpSlot);
+
+											var currentTime = new Date().getTime();
+											container.attr('data-render-time', currentTime);
+
+											refreshSlot &&
+												refreshAdSlot.refreshSlot(container, {
+													id: gptSlotElementId,
+													slotId: gptSlotElementId,
+													dfpAdUnitName,
+													network: 'adpTags',
+													networkData: {
+														refreshInterval,
+														headerBidding: slotHbStatus
+													}
+												});
+										} else {
+											//collect rest of the units (not provided to us) separately
+											nonApSlots.push(gptSlot);
+										}
+									} catch (error) {
 										nonApSlots.push(gptSlot);
+										window.adpushup.err.push(error);
 									}
 								}.bind(this)
 							);
