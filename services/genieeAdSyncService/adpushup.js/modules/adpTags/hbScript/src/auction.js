@@ -249,6 +249,12 @@ var auction = {
 			config.PREBID_CONFIG.currencyConfig.granularityMultiplier
 		) {
 			pbConfig.currency = config.PREBID_CONFIG.currencyConfig;
+
+			//add default rates for KhaleejTimes since the ctheir GAM currenct "AED" is not in the currency.json
+			// #TODO: remove this once the currecny service is deployed
+			if (window.adpushup.config.siteId == 42156) {
+				pbConfig.currency.defaultRates = { USD: { AED: 1 } };
+			}
 		}
 
 		pbjs.setConfig(pbConfig);
