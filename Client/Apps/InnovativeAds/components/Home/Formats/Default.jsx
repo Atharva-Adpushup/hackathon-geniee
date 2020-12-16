@@ -15,7 +15,7 @@ class Default extends Component {
 		const { ad } = this.props;
 		this.state = {
 			css: ad && ad.css ? window.btoa(JSON.stringify(ad.css)) : '',
-			stickyBgEnabled: !ad.formatData.disableStickyBg
+			stickyBgEnabled: (ad && ad.formatData) && !ad.formatData.disableStickyBg
 		};
 		this.saveHandler = this.saveHandler.bind(this);
 		this.handleChange = this.handleChange.bind(this);
@@ -63,7 +63,7 @@ class Default extends Component {
 		return (
 			<div>
 				<Col md={12} className="u-padding-l0">
-					{ad.formatData.format === 'stickyBottom' && (
+					{ad && (ad.formatData.format === 'stickyBottom') && (
 						<CustomToggleSwitch
 							layout="horizontal"
 							className="u-margin-b4"
