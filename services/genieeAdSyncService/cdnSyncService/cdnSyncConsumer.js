@@ -76,7 +76,7 @@ module.exports = function(site, user, prebidBundleName) {
 			apConfigs.activeDFPNetwork =
 				(adServerSettings && adServerSettings.dfp && adServerSettings.dfp.activeDFPNetwork) || null;
 			// apConfigs.isSeparatePrebidEnabled = config.separatePrebidEnabledSites.indexOf(siteId) !== -1;
-			apConfigs.isSeparatePrebidEnabled = true;
+			apConfigs.isSeparatePrebidEnabled = config.separatePrebidDisabledSites.indexOf(siteId) === -1;
 
 			apConfigs.apLiteActive = !!apps.apLite;
 
