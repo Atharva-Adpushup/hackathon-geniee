@@ -134,7 +134,7 @@ function doProcessingAndAck(originalMessage) {
 		.then(decodedMessage => {
 			// const isSeparatePrebidEnabled =
 			// 	CONFIG.separatePrebidEnabledSites.indexOf(decodedMessage.siteId) !== -1;
-			const isSeparatePrebidEnabled = true;
+			const isSeparatePrebidEnabled = CONFIG.separatePrebidDisabledSites.indexOf(decodedMessage.siteId) === -1;
 
 			if (isSeparatePrebidEnabled) {
 				console.log('Separate Prebid bundle feature is enabled.');

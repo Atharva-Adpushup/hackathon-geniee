@@ -75,8 +75,8 @@ module.exports = function(site, user, prebidBundleName) {
 				: 0;
 			apConfigs.activeDFPNetwork =
 				(adServerSettings && adServerSettings.dfp && adServerSettings.dfp.activeDFPNetwork) || null;
-			// apConfigs.isSeparatePrebidEnabled = config.separatePrebidEnabledSites.indexOf(siteId) !== -1;
-			apConfigs.isSeparatePrebidEnabled = true;
+			apConfigs.isSeparatePrebidEnabled = config.separatePrebidDisabledSites.indexOf(siteId) === -1;
+			// apConfigs.isSeparatePrebidEnabled = true;
 
 			apConfigs.apLiteActive = !!apps.apLite;
 
@@ -224,7 +224,7 @@ module.exports = function(site, user, prebidBundleName) {
 						return generatedConfig;
 					}
 
-					return prebidGeneration(config.prebidAdapters).then(() => generatedConfig);
+					return prebidGeneration(config.prebidAdapters).then(() => generatedConfig); 
 				})
 				.then(generatedConfig => bundleGeneration(site, generatedConfig))
 				.spread((generatedConfig, bundle) => {
