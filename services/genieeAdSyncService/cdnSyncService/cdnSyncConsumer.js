@@ -224,7 +224,7 @@ module.exports = function(site, user, prebidBundleName) {
 						return generatedConfig;
 					}
 
-					return prebidGeneration(config.prebidAdapters).then(() => generatedConfig); 
+					return prebidGeneration(config.prebidAdapters).then(() => generatedConfig);
 				})
 				.then(generatedConfig => bundleGeneration(site, generatedConfig))
 				.spread((generatedConfig, bundle) => {
