@@ -220,7 +220,7 @@ module.exports = {
 	},
 	queuePublishingURL: 'http://localhost:9009',
 	urlReportingEnabledSites: [],
-	separatePrebidEnabledSites: [],
+	// separatePrebidEnabledSites: [],
 	separatePrebidDisabledSites: [],
 	prebidBundleUrl: 'http://localhost:8080/assets/js/builds/geniee/prebid/__FILE_NAME__',
 	SCHEDULER_API_ROOT: 'http://localhost:8081/scheduler',
