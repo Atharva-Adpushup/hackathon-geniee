@@ -63,7 +63,7 @@ class Default extends Component {
 		return (
 			<div>
 				<Col md={12} className="u-padding-l0">
-					{ad && (ad.formatData.format === 'stickyBottom') && (
+					{ad && ad.formatData && ad.formatData.format === 'stickyBottom' && (
 						<CustomToggleSwitch
 							layout="horizontal"
 							className="u-margin-b4"
