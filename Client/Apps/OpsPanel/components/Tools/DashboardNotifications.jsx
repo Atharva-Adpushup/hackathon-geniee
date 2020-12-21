@@ -212,11 +212,6 @@ const DashboardNotifications = ({ showNotification }) => {
 		return false;
 	};
 
-	const setSelectBoxLabelTextCompute = () => {
-		const finalFilteredList = filteredList.filter(email => selectedEmails[email] === true);
-		setSelectBoxLabelText(finalFilteredList.length);
-	};
-
 	const handleFilterValueSelect = (e, email) => {
 		// {value, name, checked} = e.target;
 		const tempValues = { ...selectedEmails };
