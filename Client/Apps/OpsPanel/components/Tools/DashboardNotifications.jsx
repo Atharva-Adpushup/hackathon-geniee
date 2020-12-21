@@ -118,7 +118,7 @@ const DashboardNotifications = ({ showNotification }) => {
 				tableBody.push(row);
 			});
 
-			tableBody.sort((a, b) => a.Date.toString().localeCompare(b.Date.toString()));
+			tableBody.sort((a, b) => b.Date.toString().localeCompare(a.Date.toString()));
 
 			const tableBodyData = tableBody.map((dataValue, index) => {
 				const dataValues = { ...dataValue };
@@ -233,20 +233,28 @@ const DashboardNotifications = ({ showNotification }) => {
 
 	const selectAllEmails = () => {
 		const tempValues = { ...selectedEmails };
+		let recentlySelected= 0;
 		filteredList.forEach(email => {
-			tempValues[email] = true;
+			if(!tempValues[email]){
+				tempValues[email] = true;
+				recentlySelected++;
+			}
 		});
 		setSelectedEmails(tempValues);
-		setSelectBoxLabelTextCompute();
+		setSelectBoxLabelText(selectBoxLabelText+recentlySelected);
 	};
 
 	const selectNoEmails = () => {
 		const tempValues = { ...selectedEmails };
+		let recentlyDeSelected = 0;
 		filteredList.forEach(email => {
-			tempValues[email] = false;
+			if(tempValues[email]){
+				tempValues[email] = false;
+				recentlyDeSelected++;
+			}
 		});
 		setSelectedEmails(tempValues);
-		setSelectBoxLabelTextCompute();
+		setSelectBoxLabelText(selectBoxLabelText-recentlyDeSelected);
 	};
 
 	const dropdownToggleMenu = () => {
@@ -284,7 +292,7 @@ const DashboardNotifications = ({ showNotification }) => {
 			) : (
 				<>
 					<Row className="mb-3">
-						<Col md="12">
+						<Col md={12}>
 							<FieldGroup
 								name="notificationText"
 								type="text"
@@ -299,7 +307,7 @@ const DashboardNotifications = ({ showNotification }) => {
 								required
 							/>
 						</Col>
-						<Col md="12">
+						<Col md={12}>
 							<FieldGroup
 								name="clickThroughUrl"
 								type="text"
@@ -313,7 +321,7 @@ const DashboardNotifications = ({ showNotification }) => {
 								value={actionUrlValue}
 							/>
 						</Col>
-						<Col md="10">
+						<Col md={10}>
 							<InputGroup>
 								<InputGroup.Addon>Email Filter</InputGroup.Addon>
 								<div className="custom-select-box-wrapper">
@@ -376,7 +384,7 @@ const DashboardNotifications = ({ showNotification }) => {
 								</div>
 							</InputGroup>
 						</Col>
-						<Col md="2">
+						<Col md={2}>
 							<CustomButton
 								variant="primary"
 								className="pull-right"
@@ -398,7 +406,7 @@ const DashboardNotifications = ({ showNotification }) => {
 							<Datatable
 								tableHeader={tableConfig.headers}
 								tableBody={tableConfig.body}
-								rowsPerPage={10}
+								rowsPerPage={20}
 								rowsPerPageOption={[20, 30, 40, 50]}
 								onSort={onSort}
 								paginationButtonGroup={false}
