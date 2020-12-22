@@ -283,7 +283,13 @@ module.exports = function(site, user, prebidBundleName) {
 					}
 
 					// temp flag for enabling bb player logging
-					const enableBbPlayerLogging = !!(config.bbPlayer && config.bbPlayer.enableLogging);
+					const enableBbPlayerLogging = !!(
+						config.bbPlayer &&
+						config.bbPlayer.enableLogging &&
+						Array.isArray(config.bbPlayer.loggingWhitelistedSites) &&
+						(!config.bbPlayer.loggingWhitelistedSites.length ||
+							config.bbPlayer.loggingWhitelistedSites.includes(parseInt(siteId, 10)))
+					);
 
 					bundle = _.replace(bundle, '__AP_CONFIG__', JSON.stringify(apConfigs));
 					bundle = _.replace(bundle, /__SITE_ID__/g, siteId);

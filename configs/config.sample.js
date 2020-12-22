@@ -232,7 +232,8 @@ module.exports = {
 		sitesListKeyToBeUsed: 'whitelistedSites', // whitelistedSites/blacklistedSites
 		whitelistedSites: [37780, 41159, 31454],
 		blacklistedSites: [40792],
-		enableLogging: true
+		enableLogging: true,
+		loggingWhitelistedSites: [37780]
 	}
 };
 
