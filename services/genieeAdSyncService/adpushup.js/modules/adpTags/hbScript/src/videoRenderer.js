@@ -82,7 +82,7 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 
 	function cleanBbPlayerAndRenderBid(playerApi, bid, refreshData = {}) {
 		// clean container
-		removeBbPlayerIfRendered(playerApi._playerId, bid.adUnitCode);
+		removeBbPlayerIfRendered(playerApi._playerId);
 
 		var { adId, refreshTimeoutId, refreshExtendTimeInMs } = refreshData;
 
@@ -186,7 +186,7 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 			var { preservedSlotElDataset, slotAttributesToMigrate } = preserveSlotData(slotEl);
 
 			var bbPlayerConfig = getBbPlayerConfig(bid);
-			if (!bbPlayerConfig) return; // TODO: bbPlayer: review this
+			if (!bbPlayerConfig) return;
 
 			window.instantiateBbPlayer(bid.adUnitCode);
 
@@ -202,9 +202,6 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 					setupPlayerEvents(playerApi);
 				}
 			});
-
-			if (!window.bbQueueIndexMapping) window.bbQueueIndexMapping = [];
-			window.bbQueueIndexMapping.push(bid.adUnitCode);
 		});
 	}
 
