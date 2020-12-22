@@ -27,6 +27,5 @@ module.exports = {
 	isPerformanceLoggingEnabled: __PERFORMANCE_LOGGING_ENABLED__,
 	isAutoAddMultiformatDisabled: __AUTO_ADD_MULTIFORMAT_DISABLED__,
 	isBbPlayerEnabledForTesting: __ENABLE_BB_PLAYER_FOR_TESTING__,
-	// isBbPlayerDisabled: __DISABLE_BB_PLAYER__,
 	enableBbPlayerLogging: __ENABLE_BB_PLAYER_LOGGING__
 };
