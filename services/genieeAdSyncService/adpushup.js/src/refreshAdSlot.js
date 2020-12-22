@@ -89,7 +89,7 @@ var utils = require('../libs/utils'),
 
 					// Remove BB Player if rendered for current adUnit
 					var bbPlayerId = getBbPlayerId(slot.containerId);
-					removeBbPlayerIfRendered(bbPlayerId, slot.containerId); // TODO: bbPlayer: remove second attribute
+					removeBbPlayerIfRendered(bbPlayerId);
 				}
 
 				adp.config.apLiteActive

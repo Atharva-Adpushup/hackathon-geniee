@@ -2,7 +2,7 @@ const BB_PLAYER_LOG_KEEN_ENDPOINT =
 	'//api.keen.io/3.0/projects/5fd874cedbf8740c9be9d4fe/events/bblogs?api_key=dafa918020ac9521501e4449c9d84f3e06feb3b3cb2346e0de422b3c2f3b1847e622a65464d8696c8a47e041ef66c77c6ee3bcd9f290b0074dcd1ca763b22eed2755a7df941ed7c038f44f352abd8d5092e31442619c3980af9d404443e375fb&data=';
 
 var bbPlayerUtils = {
-	removeBbPlayerIfRendered: function(playerId, adUnitCode) {
+	removeBbPlayerIfRendered: function(playerId) {
 		var bluebillywig = (window.bluebillywig = window.bluebillywig || {});
 
 		if (!bluebillywig.getPlayerInstance) return;
@@ -12,20 +12,6 @@ var bbPlayerUtils = {
 		if (!playerApi) return;
 
 		playerApi.destruct();
-
-		if (
-			Array.isArray(bluebillywig._cmdQueueHandlers) &&
-			Array.isArray(window.bbQueueIndexMapping) &&
-			window.bbQueueIndexMapping.length &&
-			bluebillywig._cmdQueueHandlers.length &&
-			window.bbQueueIndexMapping.length === bluebillywig._cmdQueueHandlers.length
-		) {
-			const bbQueueHandlerIndex = window.bbQueueIndexMapping.indexOf(adUnitCode);
-
-			window.bbQueueIndexMapping.splice(bbQueueHandlerIndex, 1);
-
-			bluebillywig._cmdQueueHandlers.splice(bbQueueHandlerIndex, 1);
-		}
 	},
 	getBbPlayerId: function(adUnitCode) {
 		return '/p/inarticle/a/' + adUnitCode;
