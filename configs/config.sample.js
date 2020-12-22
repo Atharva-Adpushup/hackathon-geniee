@@ -228,9 +228,13 @@ module.exports = {
 	performanceLoggingEnabledSites: [37780],
 	sitesToDisableVideoWaitLimit: [],
 	disableAutoAddMultiformatForSites: [],
-	sitesToEnableBbPlayer: [37780],
-	// sitesToDisableBbPlayer: [40792],
-	enableBbPlayerLogging: false
+	bbPlayer: {
+		sitesListKeyToBeUsed: 'whitelistedSites', // whitelistedSites/blacklistedSites
+		whitelistedSites: [37780, 41159, 31454],
+		blacklistedSites: [40792],
+		enableLogging: true,
+		loggingWhitelistedSites: [37780]
+	}
 };
 
 /*

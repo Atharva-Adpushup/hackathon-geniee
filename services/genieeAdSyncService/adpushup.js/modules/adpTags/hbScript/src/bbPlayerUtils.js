@@ -29,6 +29,7 @@ var bbPlayerUtils = {
 					domain: adp.config.siteDomain,
 					refreshCount: adpSlot.refreshCount,
 					packetId: adp.config.packetId,
+					platform: adp.config.platform,
 					cpm: bid.cpm,
 					currency: bid.currency,
 					bidder: bid.bidder,
@@ -53,6 +54,7 @@ var bbPlayerUtils = {
 					domain: adp.config.siteDomain,
 					refreshCount: adpSlot.refreshCount,
 					packetId: adp.config.packetId,
+					platform: adp.config.platform,
 					eventTime: +new Date()
 				};
 				break;

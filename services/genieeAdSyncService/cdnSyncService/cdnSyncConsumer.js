@@ -257,17 +257,39 @@ module.exports = function(site, user, prebidBundleName) {
 						config.disableAutoAddMultiformatForSites.includes(parseInt(siteId, 10));
 
 					// temp flag for bb player testing
-					const isBbPlayerEnabledForTesting =
-						Array.isArray(config.sitesToEnableBbPlayer) &&
-						config.sitesToEnableBbPlayer.includes(parseInt(siteId, 10));
+					let isBbPlayerEnabledForTesting = false;
+					if (
+						config.bbPlayer &&
+						config.bbPlayer.sitesListKeyToBeUsed &&
+						Array.isArray(config.bbPlayer[config.bbPlayer.sitesListKeyToBeUsed])
+					) {
+						switch (config.bbPlayer.sitesListKeyToBeUsed) {
+							case 'whitelistedSites': {
+								isBbPlayerEnabledForTesting = config.bbPlayer[
+									config.bbPlayer.sitesListKeyToBeUsed
+								].includes(parseInt(siteId, 10));
 
-					// temp flag for bb player testing
-					// const isBbPlayerDisabled =
-					// 	Array.isArray(config.sitesToDisableBbPlayer) &&
-					// 	config.sitesToDisableBbPlayer.includes(parseInt(siteId, 10));
+								break;
+							}
+							case 'blacklistedSites': {
+								isBbPlayerEnabledForTesting = !config.bbPlayer[
+									config.bbPlayer.sitesListKeyToBeUsed
+								].includes(parseInt(siteId, 10));
+
+								break;
+							}
+							default:
+						}
+					}
 
 					// temp flag for enabling bb player logging
-					const enableBbPlayerLogging = !!config.enableBbPlayerLogging;
+					const enableBbPlayerLogging = !!(
+						config.bbPlayer &&
+						config.bbPlayer.enableLogging &&
+						Array.isArray(config.bbPlayer.loggingWhitelistedSites) &&
+						(!config.bbPlayer.loggingWhitelistedSites.length ||
+							config.bbPlayer.loggingWhitelistedSites.includes(parseInt(siteId, 10)))
+					);
 
 					bundle = _.replace(bundle, '__AP_CONFIG__', JSON.stringify(apConfigs));
 					bundle = _.replace(bundle, /__SITE_ID__/g, siteId);
@@ -282,7 +304,11 @@ module.exports = function(site, user, prebidBundleName) {
 						isPerformanceLoggingEnabled
 					);
 					bundle = _.replace(bundle, '__VIDEO_WAIT_LIMIT_DISABLED__', isVideoWaitLimitDisabled);
-					bundle = _.replace(bundle, '__AUTO_ADD_MULTIFORMAT_DISABLED__', isAutoAddMultiformatDisabled);
+					bundle = _.replace(
+						bundle,
+						'__AUTO_ADD_MULTIFORMAT_DISABLED__',
+						isAutoAddMultiformatDisabled
+					);
 					bundle = _.replace(
 						bundle,
 						'__ENABLE_BB_PLAYER_FOR_TESTING__',
