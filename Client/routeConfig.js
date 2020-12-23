@@ -392,7 +392,10 @@ const ROUTES = {
 		},
 		{
 			exact: true,
-			customProps: { activeTab: OP_NAV_ITEMS_INDEXES.TOOLS },
+			customProps: {
+				activeTab: OP_NAV_ITEMS_INDEXES.TOOLS,
+				appName: ROUTE_APP_NAME.OPS_PANEL_TOOLS
+			},
 			name: 'Tools',
 			path: '/admin-panel/tools',
 			component: OpsPanel

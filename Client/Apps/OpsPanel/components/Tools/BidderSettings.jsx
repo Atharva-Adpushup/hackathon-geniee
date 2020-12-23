@@ -4,7 +4,13 @@ import CustomToggleSwitch from '../../../../Components/CustomToggleSwitch';
 import FieldGroup from '../../../../Components/Layout/FieldGroup';
 import CustomButtom from '../../../../Components/CustomButton';
 
-const BidderSettings = ({ networks = {}, updateNetworkConfig, showNotification, user }) => {
+const BidderSettings = ({
+	networks = {},
+	updateNetworkConfig,
+	showNotification,
+	dataForAuditLogs,
+	user
+}) => {
 	const hbNetworks = Object.keys(networks)
 		.map(networkKey => ({ id: networkKey, ...networks[networkKey] }))
 		.filter(network => typeof network.isHb === 'boolean' && network.isHb);
@@ -60,7 +66,7 @@ const BidderSettings = ({ networks = {}, updateNetworkConfig, showNotification, 
 					});
 				}
 			});
-			if (isValid) updateNetworkConfig(modifiedBidders);
+			if (isValid) updateNetworkConfig(modifiedBidders, dataForAuditLogs);
 		}
 	};
 

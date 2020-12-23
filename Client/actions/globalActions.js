@@ -47,9 +47,9 @@ const updateGlobalURLReportsMetaData = data => dispatch =>
 		data
 	});
 
-const updateNetworkConfig = config => dispatch =>
+const updateNetworkConfig = (config, dataForAuditLogs) => dispatch =>
 	axiosInstance
-		.post('/updateNetworkConfig', { config })
+		.post('/updateNetworkConfig', { config, dataForAuditLogs })
 		.then(response => {
 			const { data } = response;
 			dispatch({

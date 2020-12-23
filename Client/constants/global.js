@@ -59,7 +59,8 @@ const ROUTE_APP_NAME = {
 	HEADER_BIDDING_OPTIMIZATION: 'HB App - Optimization',
 	HEADER_BIDDING_AMAZON_UAM: 'HB App - Amazon UAM',
 	OPS_PANEL_ACCOUNTS: 'Ops Panel - Accounts',
-	OPS_PANEL_SETTINGS: 'Ops Panel - Settings'
+	OPS_PANEL_SETTINGS: 'Ops Panel - Settings',
+	OPS_PANEL_TOOLS: 'Ops Panel - Tools'
 };
 export {
 	GLOBAL_ACTIONS,

@@ -17,7 +17,7 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = dispatch => ({
 	showNotification: data => dispatch(showNotification(data)),
-	updateNetworkConfig: config => dispatch(updateNetworkConfig(config))
+	updateNetworkConfig: (config, dataForAuditLogs) => dispatch(updateNetworkConfig(config, dataForAuditLogs))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Tools);

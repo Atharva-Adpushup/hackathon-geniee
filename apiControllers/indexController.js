@@ -21,7 +21,7 @@ const {
 	sendErrorResponse,
 	sendSuccessResponse
 } = require('../helpers/commonFunctions');
-const { appBucket, errorHandler, checkParams } = require('../helpers/routeHelpers');
+const { appBucket, errorHandler, checkParams, sendDataToAuditLogService } = require('../helpers/routeHelpers');
 
 const router = express.Router();
 
@@ -328,7 +328,13 @@ router
 			.then(() => appBucket.getDoc(consts.docKeys.networkConfig))
 			.then(docWithCase => {
 				const { value, cas } = docWithCase;
-				const { config } = req.body;
+				const { config, dataForAuditLogs } = req.body;
+				// log config changes
+				const { siteDomain, appName } = dataForAuditLogs;
+				const { email, originalEmail } = req.user;
+				const {AUDIT_LOGS_ACTIONS: { OPS_PANEL }} = consts
+				const prevConfig = {...value}
+
 				const networks = Object.keys(config);
 
 				networks.forEach(network => {
@@ -338,6 +344,21 @@ router
 							...networkDataFromDoc,
 							...config[network]
 						};
+					}
+				});
+				// log config changes
+				sendDataToAuditLogService({
+					siteId:'',
+					siteDomain,
+					appName,
+					type: 'account',
+					impersonateId: email,
+					userId: originalEmail,
+					prevConfig,
+					currentConfig: value,
+					action: {
+						name: OPS_PANEL.TOOLS,
+						data: `Bidders Config`
 					}
 				});
 
