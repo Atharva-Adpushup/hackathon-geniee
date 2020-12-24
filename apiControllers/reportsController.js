@@ -130,15 +130,15 @@ const modifyQueryIfPnp = query =>
 				and buc.apConfigs.mergeReport = true
 			`
 		);
-		console.log({ before: query });
+		console.log({ before: modifiedQuery });
 		queryViewFromAppBucket(dbQuery)
 			.then(data => {
 				// data is array of objects e.g.. [{mappedPnpSiteId: 41355}, {mappedPnpSiteId:41395}]
 				data.forEach(ele => {
 					modifiedQuery.siteid += `,${ele.mappedPnpSiteId}`;
 				});
-				console.log({ after: query });
-				resolve(query);
+				console.log({ after: modifiedQuery });
+				resolve(modifiedQuery);
 			})
 			.catch(err => {
 				console.error(err);
