@@ -34,15 +34,19 @@ const mapStateToProps = (state, ownProps) => {
 const mapDispatchToProps = dispatch => ({
 	getAppStatuses: siteId => dispatch(getAppStatuses(siteId)),
 	fetchChannelsInfo: siteId => dispatch(fetchChannelsInfo(siteId)),
-	updateChannelAutoOptimise: (siteId, params) =>
-		dispatch(updateChannelAutoOptimise(siteId, params)),
-	updateSiteAutoOptimise: (siteId, params) => dispatch(updateSiteAutoOptimise(siteId, params)),
-	updateAppStatus: (siteId, params) => dispatch(updateAppStatus(siteId, params)),
-	updateSite: (siteId, params) => dispatch(updateSite(siteId, params)),
+	updateChannelAutoOptimise: (siteId, params, dataForAuditLogs) =>
+		dispatch(updateChannelAutoOptimise(siteId, params, dataForAuditLogs)),
+	updateSiteAutoOptimise: (siteId, params, dataForAuditLogs) =>
+		dispatch(updateSiteAutoOptimise(siteId, params, dataForAuditLogs)),
+	updateAppStatus: (siteId, params, dataForAuditLogs) =>
+		dispatch(updateAppStatus(siteId, params, dataForAuditLogs)),
+	updateSite: (siteId, params, dataForAuditLogs) =>
+		dispatch(updateSite(siteId, params, dataForAuditLogs)),
 	fetchAllBiddersAction: siteId => dispatch(fetchAllBiddersAction(siteId)),
-	updateBidderAction: (siteId, data, params = {}) =>
-		dispatch(updateBidderAction(siteId, data, params)),
-	saveSettings: (siteId, siteData) => dispatch(saveSettings(siteId, siteData))
+	updateBidderAction: (siteId, data, params = {}, dataForAuditLogs) =>
+		dispatch(updateBidderAction(siteId, data, params, dataForAuditLogs)),
+	saveSettings: (siteId, siteData, dataForAuditLogs) =>
+		dispatch(saveSettings(siteId, siteData, dataForAuditLogs))
 });
 
 export default connect(

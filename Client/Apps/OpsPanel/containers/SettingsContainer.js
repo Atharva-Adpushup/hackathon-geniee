@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { showNotification } from '../../../actions/uiActions';
 import { updateAppStatus } from '../../../actions/siteActions';
 
-import Settings from '../components/Settings/SiteBody/Settings.jsx';
+import Settings from '../components/Settings/SiteBody/Settings';
 
 const mapStateToProps = (state, ownProps) => {
 	const {

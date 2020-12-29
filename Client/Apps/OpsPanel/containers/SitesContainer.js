@@ -4,17 +4,20 @@ import { showNotification } from '../../../actions/uiActions';
 import { saveSettings } from '../../../actions/siteActions';
 
 const mapStateToProps = (state, ownProps) => {
-	const { sites } = state.global;
+	const { user, sites } = state.global;
+
 	return {
 		fetched: sites.fetched,
 		sites: sites.data,
+		user: user.data,
 		...ownProps
 	};
 };
 
 const mapDispatchToProps = dispatch => ({
 	showNotification: data => dispatch(showNotification(data)),
-	saveSettings: (siteId, data) => dispatch(saveSettings(siteId, data))
+	saveSettings: (siteId, data, dataForAuditLogs) =>
+		dispatch(saveSettings(siteId, data, dataForAuditLogs))
 });
 
 export default connect(

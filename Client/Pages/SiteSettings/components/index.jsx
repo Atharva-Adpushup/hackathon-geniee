@@ -53,13 +53,22 @@ class SiteSettings extends Component {
 
 	uiListSaveHandler = collection => {
 		const { siteId } = this.state;
-		const { updateApConfig, showNotification } = this.props;
+		const { updateApConfig, showNotification, customProps, user } = this.props;
+
+		const dataForAuditLogs = {
+			appName: customProps.appName,
+			siteDomain: user.sites[siteId].domain
+		};
+
 		const apConfigs = {
 			blocklist: collection
 		};
 
 		return siteService
-			.saveApConfigs(siteId, apConfigs)
+			.saveApConfigs(siteId, apConfigs, {
+				...dataForAuditLogs,
+				actionInfo: 'Updated AP Config'
+			})
 			.then(() => {
 				updateApConfig(siteId, apConfigs);
 

@@ -4,6 +4,7 @@ const axios = require('axios').default;
 const express = require('express');
 const Promise = require('bluebird');
 const _get = require('lodash/get');
+const _ = require('lodash');
 const userModel = require('../models/userModel');
 const siteModel = require('../models/siteModel');
 const headerBiddingModel = require('../models/headerBiddingModel');
@@ -13,6 +14,12 @@ const FormValidator = require('../helpers/FormValidator');
 const schema = require('../helpers/schema');
 const commonConsts = require('../configs/commonConsts');
 const adpushup = require('../helpers/adpushupEvent');
+
+const { sendDataToAuditLogService } = require('../helpers/routeHelpers');
+
+const {
+	AUDIT_LOGS_ACTIONS: { HEADER_BIDDING }
+} = commonConsts;
 
 const router = express.Router();
 
@@ -64,7 +71,7 @@ router
 	})
 	.post('/bidder/:siteId', (req, res) => {
 		const { siteId } = req.params;
-		const { email } = req.user;
+		const { email, originalEmail } = req.user;
 		const {
 			bidderConfig: {
 				key,
@@ -77,7 +84,8 @@ router
 				isAmpActive,
 				isS2SActive
 			},
-			params
+			params,
+			dataForAuditLogs
 		} = req.body;
 		const json = {
 			key,
@@ -146,7 +154,22 @@ router
 					bidderConfig.paramsFormFields = {
 						...biddersFromNetworkConfig[key].params
 					};
-
+					// log config changes
+					const { siteDomain, appName, type = 'app' } = dataForAuditLogs;
+					sendDataToAuditLogService({
+						siteId,
+						siteDomain,
+						appName,
+						type,
+						impersonateId: email,
+						userId: originalEmail,
+						prevConfig: {},
+						currentConfig: bidderConfig,
+						action: {
+							name: HEADER_BIDDING.ADD_BIDDER,
+							data: `Add Bidder - ${key}`
+						}
+					});
 					return res.status(httpStatus.OK).json({ bidderKey: key, bidderConfig });
 				})
 				.catch(err => {
@@ -177,7 +200,7 @@ router
 	})
 	.put('/bidder/:siteId', (req, res) => {
 		const { siteId } = req.params;
-		const { email } = req.user;
+		const { email, originalEmail } = req.user;
 		const {
 			bidderConfig: {
 				key,
@@ -191,7 +214,8 @@ router
 				isAmpActive,
 				isS2SActive
 			},
-			params
+			params,
+			dataForAuditLogs
 		} = req.body;
 		const json = {
 			key,
@@ -231,6 +255,7 @@ router
 			isS2SActive
 		};
 
+		let prevConfig = {};
 		return (
 			userModel
 				.verifySiteOwner(email, siteId)
@@ -255,11 +280,37 @@ router
 
 					throw err;
 				})
+				.then(hbConfig => {
+					hbConfig.getBidder(key).then(bidder => {
+						prevConfig = bidder;
+					});
+					return hbConfig;
+				})
 				// hbConfig found OR created new hbConfig
 				.then(hbConfig => hbConfig.saveBidderConfig(key, bidderConfig))
 				.then(hbConfig => hbConfig.save())
 				.then(() => headerBiddingModel.getAllBiddersFromNetworkConfig())
 				.then(biddersFromNetworkConfig => {
+					// log config changes
+					const { siteDomain, appName, type = 'app' } = dataForAuditLogs;
+					const {
+						AUDIT_LOGS_ACTIONS: { HEADER_BIDDING }
+					} = commonConsts;
+					sendDataToAuditLogService({
+						siteId,
+						siteDomain,
+						appName,
+						type,
+						impersonateId: email,
+						userId: originalEmail,
+						prevConfig,
+						currentConfig: { ...bidderConfig },
+						action: {
+							name: HEADER_BIDDING.UPDATE_BIDDER,
+							data: `Update Bidder - ${key}`
+						}
+					});
+
 					bidderConfig.paramsFormFields = {
 						...biddersFromNetworkConfig[key].params
 					};
@@ -279,8 +330,8 @@ router
 	})
 	.delete('/bidder/:siteId', (req, res) => {
 		const { siteId } = req.params;
-		const { email } = req.user;
-		const { bidderKey } = req.body || {};
+		const { email, originalEmail } = req.user;
+		const { bidderKey, dataForAuditLogs } = req.body || {};
 
 		if (!bidderKey) {
 			return res.status(httpStatus.BAD_REQUEST).json({ error: 'Bidder key required' });
@@ -290,14 +341,40 @@ router
 			return res.status(httpStatus.BAD_REQUEST).json({ error: 'Site ID required' });
 		}
 
+		let prevConfig = {};
 		return (
 			userModel
 				.verifySiteOwner(email, siteId)
 				.then(() => headerBiddingModel.getHbConfig(siteId))
 				// hbConfig found
+				.then(hbConfig => {
+					// ref issue and get before delete
+					hbConfig.getBidder(bidderKey).then(bidder => {
+						prevConfig = { ...bidder };
+					});
+					return hbConfig;
+				})
 				.then(hbConfig => hbConfig.deleteBidder(bidderKey))
 				.then(hbConfig => hbConfig.save())
-				.then(() => res.json({ message: 'Bidder successfully deleted' }))
+				.then(() => {
+					// log config changes
+					const { siteDomain, appName, type = 'app' } = dataForAuditLogs;
+					sendDataToAuditLogService({
+						siteId,
+						siteDomain,
+						appName,
+						type,
+						impersonateId: email,
+						userId: originalEmail,
+						prevConfig,
+						currentConfig: {},
+						action: {
+							name: HEADER_BIDDING.REMOVE_BIDDER,
+							data: `Remove Bidder - ${bidderKey}`
+						}
+					});
+					res.json({ message: 'Bidder successfully deleted' });
+				})
 				.catch(err => {
 					// eslint-disable-next-line no-console
 					console.log(err);
@@ -326,9 +403,10 @@ router
 	.put('/updateHbStatus/:siteId', (req, res) => {
 		const { siteId } = req.params;
 		const { email } = req.user;
+		const { payload, dataForAuditLogs } = req.body;
 
 		const categorizedJSON = { layoutEditor: [], apTag: [], innovativeAds: [] };
-		for (const json of req.body) {
+		for (const json of payload) {
 			const {
 				target: { app, adUnitId },
 				enableHB
@@ -357,6 +435,46 @@ router
 
 		return userModel
 			.verifySiteOwner(email, siteId)
+			.then(() => {
+				const { siteId } = req.params;
+				const { email, originalEmail } = req.user;
+				// log config changes
+				const { siteDomain, appName, type = 'app', actionInfo = '' } = dataForAuditLogs;
+				// we don't have previous config and its complex to retrieve it from backend
+				// this code just sets a flag and for maintaing logs
+				// we are using toggled value of current value to save diff.
+				const prevConfig = _.cloneDeep(categorizedJSON);
+				prevConfig.layoutEditor = prevConfig.layoutEditor.map(item => {
+					// eslint-disable-next-line no-param-reassign
+					item.enableHB = !item.enableHB;
+					return item;
+				});
+				prevConfig.apTag = prevConfig.apTag.map(item => {
+					// eslint-disable-next-line no-param-reassign
+					item.enableHB = !item.enableHB;
+					return item;
+				});
+				prevConfig.innovativeAds = prevConfig.innovativeAds.map(item => {
+					// eslint-disable-next-line no-param-reassign
+					item.enableHB = !item.enableHB;
+					return item;
+				});
+
+				sendDataToAuditLogService({
+					siteId,
+					siteDomain,
+					appName,
+					type,
+					impersonateId: email,
+					userId: originalEmail,
+					prevConfig,
+					currentConfig: categorizedJSON,
+					action: {
+						name: HEADER_BIDDING.UPDATE_HB_STATUS,
+						data: actionInfo ? `Update HB Status - ${actionInfo}` : 'Update HB Status'
+					}
+				});
+			})
 			.then(() => headerBiddingModel.updateHbStatus(siteId, categorizedJSON))
 			.then(() =>
 				res.status(httpStatus.OK).json({ success: 'HB Status has been updated successfully' })
@@ -381,8 +499,8 @@ router
 	})
 	.put('/prebidSettings/:siteId', (req, res) => {
 		const { siteId } = req.params;
-		const { email } = req.user;
-		const newPrebidConfig = req.body;
+		const { email, originalEmail } = req.user;
+		const { newPrebidConfig, dataForAuditLogs } = req.body;
 		const { timeOut, refreshTimeOut } = newPrebidConfig;
 		const {
 			HEADER_BIDDING: { INITIAL_TIMEOUT, REFRESH_TIMEOUT }
@@ -404,6 +522,24 @@ router
 			.verifySiteOwner(email, siteId)
 			.then(() => headerBiddingModel.getHbConfig(siteId))
 			.then(hbConfig => {
+				const prevConfig = hbConfig.get('prebidConfig');
+				// log config changes
+				const { siteDomain, appName, type = 'app' } = dataForAuditLogs;
+				sendDataToAuditLogService({
+					siteId,
+					siteDomain,
+					appName,
+					type,
+					impersonateId: email,
+					userId: originalEmail,
+					prevConfig,
+					currentConfig: newPrebidConfig,
+					action: {
+						name: HEADER_BIDDING.PREBID_SETTING,
+						data: 'Prebid Setting'
+					}
+				});
+
 				hbConfig.set('prebidConfig', newPrebidConfig);
 				return hbConfig.save();
 			})
@@ -430,8 +566,8 @@ router
 
 	.put('/amazonUAMSettings/:siteId', (req, res) => {
 		const { siteId } = req.params;
-		const { email } = req.user;
-		const amazonUAMConfig = req.body;
+		const { email, originalEmail } = req.user;
+		const { amazonUAMConfig, dataForAuditLogs } = req.body;
 		const { timeOut, refreshTimeOut, publisherId } = amazonUAMConfig;
 
 		const {
@@ -454,6 +590,24 @@ router
 			.verifySiteOwner(email, siteId)
 			.then(() => headerBiddingModel.getHbConfig(siteId))
 			.then(hbConfig => {
+				const prevConfig = hbConfig.get('amazonUAMConfig');
+				// log config changes
+				const { siteDomain, appName, type = 'app' } = dataForAuditLogs;
+				sendDataToAuditLogService({
+					siteId,
+					siteDomain,
+					appName,
+					type,
+					impersonateId: email,
+					userId: originalEmail,
+					prevConfig,
+					currentConfig: amazonUAMConfig,
+					action: {
+						name: HEADER_BIDDING.AMAZON_UAM_SETTING,
+						data: 'Amazon UAM Setting'
+					}
+				});
+
 				hbConfig.set('amazonUAMConfig', amazonUAMConfig);
 				return hbConfig.save();
 			})
@@ -477,11 +631,33 @@ router
 	})
 	.put('/toggleHbStatusForSite/:siteId', (req, res) => {
 		const { siteId } = req.params;
-		const { email } = req.user;
+		const { email, originalEmail } = req.user;
+		const { dataForAuditLogs } = req.body;
 
 		return userModel
 			.verifySiteOwner(email, siteId)
-			.then(() => headerBiddingModel.toggleHbStatusForSite(siteId))
+			.then(() => headerBiddingModel.getHbStatusForSite(siteId))
+			.then(prevHBStatus => {
+				// log config changes
+				const { siteDomain, appName, type = 'app' } = dataForAuditLogs;
+				sendDataToAuditLogService({
+					siteId,
+					siteDomain,
+					appName,
+					type,
+					impersonateId: email,
+					userId: originalEmail,
+					prevConfig: prevHBStatus,
+					currentConfig: {
+						headerBidding: !prevHBStatus.headerBidding
+					},
+					action: {
+						name: HEADER_BIDDING.HB_STATUS,
+						data: `HB_STATUS`
+					}
+				});
+				return headerBiddingModel.toggleHbStatusForSite(siteId);
+			})
 			.then(hbStatus => res.status(httpStatus.OK).json(hbStatus))
 			.catch(() =>
 				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error!' })
@@ -687,8 +863,8 @@ router
 
 	.put('/updateFormat/:siteId', (req, res) => {
 		const { siteId } = req.params;
-		const { email } = req.user;
-		const { inventories } = req.body;
+		const { email, originalEmail } = req.user;
+		const { inventories, dataForAuditLogs } = req.body;
 
 		const categorizedJSON = { layoutEditor: [], apTag: [], innovativeAds: [] };
 		for (const inventory of inventories) {
@@ -714,23 +890,71 @@ router
 				default:
 			}
 		}
-
+		let prevConfig = {};
 		return userModel
 			.verifySiteOwner(email, siteId)
+			.then(() => headerBiddingModel.getVideoNativeForHB(siteId))
+			.then(prevInventories => {
+				prevConfig = prevInventories;
+			})
 			.then(() => headerBiddingModel.updateFormats(siteId, categorizedJSON))
+			.then(() => headerBiddingModel.getVideoNativeForHB(siteId))
+			.then(newInventories => {
+				// log config changes
+				const { siteDomain, appName, type = 'app' } = dataForAuditLogs;
+				sendDataToAuditLogService({
+					siteId,
+					siteDomain,
+					appName,
+					type,
+					impersonateId: email,
+					userId: originalEmail,
+					prevConfig,
+					currentConfig: newInventories,
+					action: {
+						name: HEADER_BIDDING.UPDATE_VIDEO_AND_NATIVE_ON_AD_UNITS,
+						data: `Enable or Disable Video and Native on all units`
+					}
+				});
+			})
 			.then(() => res.status(httpStatus.OK).json({ success: 'Format updated successfully' }))
-			.catch(() =>
-				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error!' })
-			);
+			.catch(err => {
+				console.log(err);
+				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error!' });
+			});
 	})
 	.put('/updateRefresh/:siteId', (req, res) => {
 		const { siteId } = req.params;
-		const { email } = req.user;
-		const { refreshStatus } = req.body;
+		const { email, originalEmail } = req.user;
+		const { refreshStatus, dataForAuditLogs } = req.body;
 
+		let prevConfig = {};
 		return userModel
 			.verifySiteOwner(email, siteId)
+			.then(() => headerBiddingModel.getInventoriesForHB(siteId))
+			.then(prevInventories => {
+				prevConfig = prevInventories;
+			})
 			.then(() => headerBiddingModel.updateRefreshSlots(siteId, refreshStatus))
+			.then(() => headerBiddingModel.getInventoriesForHB(siteId))
+			.then(newInventories => {
+				// log config changes
+				const { siteDomain, appName, type = 'app' } = dataForAuditLogs;
+				sendDataToAuditLogService({
+					siteId,
+					siteDomain,
+					appName,
+					type,
+					impersonateId: email,
+					userId: originalEmail,
+					prevConfig,
+					currentConfig: newInventories,
+					action: {
+						name: HEADER_BIDDING.REFRESH_ALL_AD_UNITS,
+						data: `Refresh on all Ad units`
+					}
+				});
+			})
 			.then(() => res.status(httpStatus.OK).json({ success: 'Refresh updated successfully' }))
 			.catch(e =>
 				res
@@ -862,8 +1086,9 @@ router
 	})
 	.post('/rules/:siteId', (req, res) => {
 		const { siteId } = req.params;
-		const { email } = req.user;
-		const { rule } = req.body;
+		const { email, originalEmail } = req.user;
+		const { hbRule, dataForAuditLogs } = req.body;
+		const { rule } = hbRule;
 
 		const newRule = { ...rule, createdAt: new Date().getTime() };
 
@@ -873,7 +1098,27 @@ router
 			.then(() => headerBiddingModel.getHbConfig(siteId, email))
 			.then(hbConfig => {
 				const rules = hbConfig.get('rules') || [];
+				const prevRules = [...rules];
+
 				hbConfig.set('rules', [...rules, newRule]);
+				const newRules = hbConfig.get('rules') || [];
+
+				// log config changes
+				const { siteDomain, appName, type = 'app' } = dataForAuditLogs;
+				sendDataToAuditLogService({
+					siteId,
+					siteDomain,
+					appName,
+					type,
+					impersonateId: email,
+					userId: originalEmail,
+					prevConfig: prevRules,
+					currentConfig: newRules,
+					action: {
+						name: HEADER_BIDDING.OPTIMIZATION,
+						data: 'Optimization'
+					}
+				});
 				return hbConfig.save();
 			})
 			.then(({ data: { rules } }) => res.status(httpStatus.OK).json(rules))
@@ -890,8 +1135,9 @@ router
 	})
 	.put('/rules/:siteId', (req, res) => {
 		const { siteId } = req.params;
-		const { email } = req.user;
-		const { rule, ruleIndex } = req.body;
+		const { email, originalEmail } = req.user;
+		const { hbRuleData, dataForAuditLogs } = req.body;
+		const { rule, ruleIndex } = hbRuleData;
 
 		return userModel
 			.verifySiteOwner(email, siteId)
@@ -905,6 +1151,7 @@ router
 			.then(() => headerBiddingModel.getHbConfig(siteId, email))
 			.then(hbConfig => {
 				const rules = hbConfig.get('rules') || [];
+				const prevRules = [...rules];
 
 				if (rules.length <= ruleIndex) {
 					throw new AdPushupError('Invalid data given to edit rule');
@@ -913,6 +1160,24 @@ router
 				rules[ruleIndex] = { ...rules[ruleIndex], ...rule };
 
 				hbConfig.set('rules', rules);
+				const newRules = hbConfig.get('rules') || [];
+
+				// log config changes
+				const { siteDomain, appName, type = 'app' } = dataForAuditLogs;
+				sendDataToAuditLogService({
+					siteId,
+					siteDomain,
+					appName,
+					type,
+					impersonateId: email,
+					userId: originalEmail,
+					prevConfig: prevRules,
+					currentConfig: newRules,
+					action: {
+						name: HEADER_BIDDING.OPTIMIZATION,
+						data: `Optimization`
+					}
+				});
 				return hbConfig.save();
 			})
 			.then(({ data: { rules } }) => res.status(httpStatus.OK).json(rules))

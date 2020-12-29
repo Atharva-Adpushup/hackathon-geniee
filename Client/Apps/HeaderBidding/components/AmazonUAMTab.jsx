@@ -74,7 +74,7 @@ class AmazonUAMTab extends React.Component {
 	saveSettings = e => {
 		e.preventDefault();
 
-		const { siteId, showNotification, setUnsavedChangesAction } = this.props;
+		const { siteId, showNotification, setUnsavedChangesAction, customProps, user } = this.props;
 		const {
 			timeOut,
 			publisherId,
@@ -82,6 +82,10 @@ class AmazonUAMTab extends React.Component {
 			isAmazonUAMActive,
 			errors: { timeOut: timeOutError, refreshTimeOut: refreshTimeOutError }
 		} = this.state;
+		const dataForAuditLogs = {
+			appName: customProps.appName,
+			siteDomain: user.sites[siteId].domain
+		};
 
 		if (timeOutError || refreshTimeOutError || !publisherId) {
 			const message = !publisherId
@@ -102,7 +106,7 @@ class AmazonUAMTab extends React.Component {
 		const amazonUAMSettings = { publisherId, timeOut, refreshTimeOut, isAmazonUAMActive };
 
 		this.setState({ isSavingSettings: true });
-		updateAmazonUAMSettings(siteId, amazonUAMSettings)
+		updateAmazonUAMSettings(siteId, amazonUAMSettings, dataForAuditLogs)
 			.then(() => {
 				this.setState({ isSavingSettings: false }, () => {
 					setUnsavedChangesAction(true);

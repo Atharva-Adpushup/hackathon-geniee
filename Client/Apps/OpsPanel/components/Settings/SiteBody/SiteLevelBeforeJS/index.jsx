@@ -57,11 +57,17 @@ class SiteLevelBeforeJS extends Component {
 	handleGenerate = () => {
 		const { beforeJsSnippet } = this.state;
 
-		const { site, showNotification } = this.props;
+		const { site, showNotification, dataForAuditLogs } = this.props;
 		const { siteId } = site;
 
 		return axiosInstance
-			.post(`/site/siteLevelBeforeJs/${siteId}`, { beforeJs: btoa(beforeJsSnippet) })
+			.post(`/site/siteLevelBeforeJs/${siteId}`, {
+				beforeJs: btoa(beforeJsSnippet),
+				dataForAuditLogs: {
+					...dataForAuditLogs,
+					actionInfo: 'Updated Before JS'
+				}
+			})
 			.then(res => {
 				this.setState({ isLoading: false });
 				return showNotification({

@@ -42,7 +42,7 @@ class Sites extends Component {
 	};
 
 	render() {
-		const { sites, showNotification, saveSettings } = this.props;
+		const { sites, showNotification, saveSettings, customProps, user } = this.props;
 		const { activeKey, show, currentSite } = this.state;
 		const siteIds = Object.keys(sites);
 
@@ -59,6 +59,12 @@ class Sites extends Component {
 					{siteIds.map(siteId => {
 						const site = sites[siteId];
 						const { siteDomain } = site;
+
+						const dataForAuditLogs = {
+							appName: customProps.appName,
+							siteDomain: user.sites[siteId].domain
+						};
+
 						return (
 							<Panel eventKey={siteId} key={siteId}>
 								<Panel.Heading>
@@ -77,6 +83,7 @@ class Sites extends Component {
 								{activeKey === siteId ? (
 									<Panel.Body collapsible>
 										<SiteBody
+											dataForAuditLogs={dataForAuditLogs}
 											site={site}
 											showNotification={showNotification}
 											saveSettings={saveSettings}

@@ -4,7 +4,11 @@ const uuid = require('uuid');
 
 const config = require('../configs/config');
 const { sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFunctions');
-const { docKeys, ampAdInitialDoc } = require('../configs/commonConsts');
+const {
+	docKeys,
+	ampAdInitialDoc,
+	AUDIT_LOGS_ACTIONS: { AMP }
+} = require('../configs/commonConsts');
 const { generateSectionName } = require('../helpers/clientServerHelpers');
 const {
 	appBucket,
@@ -14,7 +18,9 @@ const {
 	createNewAmpDocAndDoProcessing,
 	updateAmpTags,
 	queuePublishingWrapper,
-	storedRequestWrapper
+	storedRequestWrapper,
+	getAmpAds,
+	sendDataToAuditLogService
 } = require('../helpers/routeHelpers');
 
 const router = express.Router();
@@ -26,7 +32,7 @@ const fn = {
 	processing: (data, payload) => {
 		const cas = data.cas || false;
 		const value = data.value || data;
-		const id = payload.id;
+		const { id } = payload;
 
 		const name = generateSectionName({
 			width: payload.ad.width,
@@ -109,21 +115,44 @@ router
 			.catch(err => errorHandler(err, res));
 	})
 	.post('/masterSave', (req, res) => {
-		const { adsToUpdate, ads = [], siteId } = req.body;
+		const { adsToUpdate, ads = [], siteId, dataForAuditLogs } = req.body;
 
-		const updatedAds = adsToUpdate.map(adId => updateAmpTags(adId, ads));
-		return Promise.all(updatedAds)
-			.then(modifiedAds => {
-				const allAmpAds = ads.map(obj => modifiedAds.find(o => o.id === obj.id) || obj);
+		return verifyOwner(siteId, req.user.email)
+			.then(() => getAmpAds(siteId))
+			.then(ads => ads.map(val => val.doc))
+			.then(amdAds => {
+				const { email, originalEmail } = req.user;
+				const { siteDomain, appName, type = 'app' } = dataForAuditLogs;
 
-				return queuePublishingWrapper(siteId, allAmpAds);
+				const adIds = adsToUpdate.map(adId => adId).join(', ');
+				sendDataToAuditLogService({
+					siteId,
+					siteDomain,
+					appName,
+					type,
+					impersonateId: email,
+					userId: originalEmail,
+					prevConfig: amdAds,
+					currentConfig: ads,
+					action: {
+						name: AMP.UPDATE_AMP_ADS,
+						data: `AMP AD IDs - ${adIds}`
+					}
+				});
+				const updatedAds = adsToUpdate.map(adId => updateAmpTags(adId, ads));
+				return Promise.all(updatedAds)
+					.then(modifiedAds => {
+						const allAmpAds = ads.map(obj => modifiedAds.find(o => o.id === obj.id) || obj);
+						return queuePublishingWrapper(siteId, allAmpAds);
+					})
+					.then(ads => {
+						const storeRequestArr = ads.map(doc => storedRequestWrapper(doc));
+
+						return Promise.all(storeRequestArr);
+					})
+					.then(() => sendSuccessResponse({ msg: 'success' }, res))
+					.catch(err => console.log(err));
 			})
-			.then(ads => {
-				const storeRequestArr = ads.map(doc => storedRequestWrapper(doc));
-
-				return Promise.all(storeRequestArr);
-			})
-			.then(() => sendSuccessResponse({ msg: 'success' }, res))
 			.catch(err => console.log(err));
 	})
 	.post('/modifyAd', (req, res) => {

@@ -7,7 +7,12 @@ const HTTP_STATUS = require('../configs/httpStatusConsts');
 const AdPushupError = require('../helpers/AdPushupError');
 const { sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFunctions');
 const { generateSectionName } = require('../helpers/clientServerHelpers');
-const { docKeys, INNOVATIVE_ADS_INITIAL_DOC, DEFAULT_META } = require('../configs/commonConsts');
+const {
+	docKeys,
+	INNOVATIVE_ADS_INITIAL_DOC,
+	DEFAULT_META,
+	AUDIT_LOGS_ACTIONS: { INNOVATIVE_ADS }
+} = require('../configs/commonConsts');
 const {
 	appBucket,
 	errorHandler,
@@ -17,7 +22,8 @@ const {
 	fetchAds,
 	createNewDocAndDoProcessing,
 	masterSave,
-	modifyAd
+	modifyAd,
+	sendDataToAuditLogService
 } = require('../helpers/routeHelpers');
 
 const router = express.Router();
@@ -99,7 +105,27 @@ const fn = {
 	adUpdateProcessing: (req, res, key, processing) =>
 		appBucket
 			.getDoc(`${key}${req.body.siteId}`)
-			.then(docWithCas => processing(docWithCas))
+			.then(docWithCas => {
+				const { siteId, dataForAuditLogs } = req.body;
+				const { email, originalEmail } = req.user;
+				// log config changes
+				const { siteDomain, appName, type = 'app' } = dataForAuditLogs;
+				sendDataToAuditLogService({
+					siteId,
+					siteDomain,
+					appName,
+					type,
+					impersonateId: email,
+					userId: originalEmail,
+					prevConfig: docWithCas.value.ads,
+					currentConfig: req.body.ads,
+					action: {
+						name: INNOVATIVE_ADS.UPDATE_INNOVATIVE_ADS,
+						data: `INNOVATIVE AD`
+					}
+				});
+				return processing(docWithCas);
+			})
 			.then(() => emitEventAndSendResponse(req.body.siteId, res))
 			.catch(err => {
 				let error = err;

@@ -60,16 +60,24 @@ class HeaderBidding extends Component {
 			updateBidderAction,
 			showNotification,
 			site,
-			bidders: biddersFromProps
+			bidders: biddersFromProps,
+			dataForAuditLogs
 		} = this.props;
 		const { siteId } = site;
 
 		this.setState({ loading: true });
 
-		return updateAppStatus(siteId, {
-			app: 'headerBidding',
-			value: status
-		})
+		return updateAppStatus(
+			siteId,
+			{
+				app: 'headerBidding',
+				value: status
+			},
+			{
+				...dataForAuditLogs,
+				actionInfo: 'Header Bidding'
+			}
+		)
 			.then(() => {
 				const keys = Object.keys(bidders);
 				if (keys.length) {
@@ -86,7 +94,8 @@ class HeaderBidding extends Component {
 										key: cleanKey,
 										status: status ? 'active' : 'paused'
 									},
-									propsBidder.config
+									propsBidder.config,
+									dataForAuditLogs
 								);
 							}),
 						Promise.resolve()

@@ -1,6 +1,7 @@
 const Promise = require('bluebird');
 const _ = require('lodash');
 const { couchbaseService } = require('node-utils');
+const jsondiffpatch = require('jsondiffpatch').create();
 
 const request = require('request-promise');
 const couchbase = require('../helpers/couchBaseService'),
@@ -89,6 +90,28 @@ function emitEventAndSendResponse(siteId, res, data = {}) {
 			res
 		);
 	});
+}
+function sendDataToAuditLogService(data) {
+	const { prevConfig, currentConfig, action = {}, ...restLogData} = data; 
+	const delta = jsondiffpatch.diff(prevConfig, currentConfig) || {};
+
+	// don't need to send current config to elastic service
+	const options = {
+		method: 'POST',
+		uri: `${config.auditLogElasticServer.host}`,
+		body: {
+			...restLogData,
+			prevConfig,
+			logData: {
+				delta,
+				action
+			}
+		},
+		json: true
+	};
+	return request(options)
+		.then(() => console.log('Audit Logs saved'))
+		.catch(err => console.log('Audit Logs failed', err));
 }
 
 function fetchAds(req, res, docKey) {
@@ -613,5 +636,7 @@ module.exports = {
 	checkParams,
 	queuePublishingWrapper,
 	storedRequestWrapper,
-	publishAdPushupBuild
+	getAmpAds,
+	publishAdPushupBuild,
+	sendDataToAuditLogService
 };

@@ -34,9 +34,9 @@ const updateApConfig = (siteId, apConfigs) => dispatch =>
 		data: { siteId, key: 'apConfigs', value: apConfigs }
 	});
 
-const saveSettings = (siteId, siteData) => dispatch =>
+const saveSettings = (siteId, siteData, dataForAuditLogs) => dispatch => {
 	axiosInstance
-		.post('/site/saveSettings', { siteId, ...siteData })
+		.post('/site/saveSettings', { siteId, ...siteData, dataForAuditLogs })
 		.then(() => {
 			const { apConfigs, adNetworkSettings } = siteData;
 			dispatch({
@@ -57,6 +57,7 @@ const saveSettings = (siteId, siteData) => dispatch =>
 			});
 		})
 		.catch(err => errorHandler(err));
+};
 
 const getAppStatuses = siteId => dispatch =>
 	axiosInstance
@@ -70,7 +71,7 @@ const getAppStatuses = siteId => dispatch =>
 		})
 		.catch(err => errorHandler(err));
 
-const updateSiteAutoOptimise = (siteId, params) => dispatch =>
+const updateSiteAutoOptimise = (siteId, params, dataForAuditLogs) => dispatch =>
 	axiosInstance
 		.post('/site/updateSite', {
 			siteId,
@@ -80,7 +81,8 @@ const updateSiteAutoOptimise = (siteId, params) => dispatch =>
 					value: { autoOptimise: params.autoOptimise },
 					requireResponse: false
 				}
-			]
+			],
+			dataForAuditLogs
 		})
 		.then(() => {
 			dispatch({
@@ -98,7 +100,7 @@ const updateSiteAutoOptimise = (siteId, params) => dispatch =>
 		})
 		.catch(err => errorHandler(err));
 
-const updateAppStatus = (siteId, params) => dispatch =>
+const updateAppStatus = (siteId, params, dataForAuditLogs) => dispatch =>
 	axiosInstance
 		.post('/site/updateSite', {
 			siteId,
@@ -108,7 +110,8 @@ const updateAppStatus = (siteId, params) => dispatch =>
 					value: { [params.app]: params.value },
 					requireResponse: false
 				}
-			]
+			],
+			dataForAuditLogs
 		})
 		.then(() => {
 			dispatch({
@@ -126,11 +129,12 @@ const updateAppStatus = (siteId, params) => dispatch =>
 		})
 		.catch(err => errorHandler(err));
 
-const updateSite = (siteId, params) => dispatch =>
+const updateSite = (siteId, params, dataForAuditLogs) => dispatch =>
 	axiosInstance
 		.post('/site/updateSite', {
 			siteId,
-			toUpdate: [...params]
+			toUpdate: [...params],
+			dataForAuditLogs
 		})
 		.then(() => {
 			params.forEach(data => {

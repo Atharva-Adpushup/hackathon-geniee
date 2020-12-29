@@ -57,12 +57,18 @@ class AdList extends Component {
 			networkConfig,
 			siteId,
 			siteDomain,
-			networkCode
+			networkCode,
+			customProps
 		} = this.props;
 		const { dfpMessage } = this.state;
 		const customStyle = user.isSuperUser ? { minHeight: '540px' } : { minHeight: '440px' };
 		const isBulkFluidEnabled = ads.every(ad => ad.fluid);
 		const doesAllAdsHaveAdpTagNetwork = ads.every(ad => ad.network === NETWORK_MAPPINGS.ADPTAGS);
+
+		const dataForAuditLogs = {
+			appName: customProps.appName,
+			siteDomain: user.sites[siteId].domain
+		};
 
 		if (loading) {
 			return <Loader />;
@@ -79,7 +85,7 @@ class AdList extends Component {
 								variant="primary"
 								className="u-margin-t3 u-margin-r2 pull-right"
 								onClick={() => {
-									masterSave(siteId, user.isSuperUser);
+									masterSave(siteId, dataForAuditLogs);
 									this.setState({
 										dfpMessage:
 											'DFP Sync service is running. Code will be available here once it is completed.'

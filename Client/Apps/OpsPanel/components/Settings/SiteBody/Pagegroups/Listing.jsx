@@ -38,7 +38,7 @@ class Listing extends Component {
 	};
 
 	saveRegex = ({ name, extras }) => {
-		const { showNotification, updatePagegroupPattern } = this.props;
+		const { showNotification, updatePagegroupPattern, dataForAuditLogs } = this.props;
 		const { siteId, pageGroup, platform } = extras;
 		const pattern = name.trim();
 		if (!pattern.length || pattern === DEFAULT_REGEX) {
@@ -49,11 +49,18 @@ class Listing extends Component {
 				autoDismiss: 5
 			});
 		}
-		return updatePagegroupPattern(siteId, {
-			pageGroup,
-			platform,
-			pattern
-		});
+		return updatePagegroupPattern(
+			siteId,
+			{
+				pageGroup,
+				platform,
+				pattern
+			},
+			{
+				...dataForAuditLogs,
+				actionInfo: `Updated Page Group Pattern`
+			}
+		);
 	};
 
 	editRegex = value => {
@@ -82,16 +89,25 @@ class Listing extends Component {
 
 	deletePagegroup = value => {
 		const { deletePagegroup } = this.props;
-		const { channelId, siteId, platform, pageGroup } = value;
+		const { channelId, siteId, platform, pageGroup, dataForAuditLogs } = value;
 		if (
 			window.confirm(
 				`Are you sure you want to delete ${platform}:${pageGroup} for siteId -- ${siteId}`
 			)
 		) {
-			return deletePagegroup(siteId, {
-				channelId,
-				channelKey: `${platform.toUpperCase()}:${pageGroup}`
-			});
+			return deletePagegroup(
+				siteId,
+				{
+					pageGroup,
+					platform,
+					channelId,
+					channelKey: `${platform.toUpperCase()}:${pageGroup}`
+				},
+				{
+					...dataForAuditLogs,
+					actionInfo: 'Deleted Page Group'
+				}
+			);
 		}
 		return false;
 	};

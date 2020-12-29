@@ -47,7 +47,9 @@ export default class BiddersTab extends React.Component {
 			deleteBidderAction,
 			showNotification,
 			domain,
-			inventories
+			inventories,
+			user,
+			customProps
 		} = this.props;
 
 		return (
@@ -57,6 +59,8 @@ export default class BiddersTab extends React.Component {
 				)) ||
 					(currView === 'addBidder' && (
 						<AddBidder
+							user={user}
+							customProps={customProps}
 							siteId={siteId}
 							domain={domain}
 							bidderConfig={bidderConfig}
@@ -68,6 +72,8 @@ export default class BiddersTab extends React.Component {
 					)) ||
 					(currView === 'manageBidder' && (
 						<ManageBidder
+							user={user}
+							customProps={customProps}
 							siteId={siteId}
 							bidderConfig={bidderConfig}
 							updateBidderAction={updateBidderAction}

@@ -11,6 +11,7 @@ class AdList extends Component {
 		dfpMessage: 'click on master save to start dfp syncing',
 		adIdsToUpdate: []
 	};
+
 	componentDidMount() {
 		const { loading, fetchAds, siteId } = this.props;
 		if (loading) fetchAds({ siteId });
@@ -23,6 +24,7 @@ class AdList extends Component {
 				adIdsToUpdate: [...adIdsToUpdate, id]
 			});
 	};
+
 	render() {
 		const {
 			loading,
@@ -32,11 +34,17 @@ class AdList extends Component {
 			modifyAdOnServer,
 			user,
 			siteId,
-			networkCode
+			networkCode,
+			customProps
 		} = this.props;
 
 		const { adIdsToUpdate, dfpMessage } = this.state;
 		const customStyle = user.isSuperUser ? { minHeight: '540px' } : { minHeight: '440px' };
+
+		const dataForAuditLogs = {
+			appName: customProps.appName,
+			siteDomain: user.sites[siteId].domain
+		};
 
 		if (loading) {
 			return <Loader />;
@@ -53,7 +61,9 @@ class AdList extends Component {
 								variant="primary"
 								className="u-margin-t3 u-margin-r2 pull-right"
 								onClick={() => {
-									masterSave(adIdsToUpdate, siteId, user.isSuperUser);
+									// replaced super user with dataForAuditLogs as it
+									// was notbeing used in masterSave func
+									masterSave(adIdsToUpdate, siteId, dataForAuditLogs);
 									this.setState({
 										adIdsToUpdate: [],
 										dfpMessage:

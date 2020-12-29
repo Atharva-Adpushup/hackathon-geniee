@@ -35,14 +35,21 @@ class ApTag extends Component {
 
 	handleSave = () => {
 		const { status } = this.state;
-		const { site, updateSite, updateAppStatus } = this.props;
+		const { site, updateSite, updateAppStatus, dataForAuditLogs } = this.props;
 
 		this.setState({ isLoading: true });
 
-		return updateAppStatus(site.siteId, {
-			app: 'apTag',
-			value: status
-		}).then(() => this.setState({ isLoading: false }));
+		return updateAppStatus(
+			site.siteId,
+			{
+				app: 'apTag',
+				value: status
+			},
+			{
+				...dataForAuditLogs,
+				actionInfo: `Updated AP Tag`
+			}
+		).then(() => this.setState({ isLoading: false }));
 	};
 
 	render() {

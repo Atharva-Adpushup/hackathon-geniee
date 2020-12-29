@@ -60,7 +60,7 @@ class Creation extends Component {
 
 	handleSave = e => {
 		e.preventDefault();
-		const { site, showNotification, createChannels, updateView } = this.props;
+		const { site, showNotification, createChannels, updateView, dataForAuditLogs } = this.props;
 		// const { pagegroupName, forceUrl, sampleUrl, device, tabletLayout } = this.state;
 		const { pagegroupName, forceUrl, sampleUrl, device } = this.state;
 		const { siteDomain, channels, siteId } = site;
@@ -120,16 +120,23 @@ class Creation extends Component {
 			return showNotification(notificationData);
 		}
 
-		return createChannels(siteId, {
-			device,
-			common: {
-				pageGroupName: pagegroupName,
-				sampleUrl,
-				forceSampleUrl: forceUrl ? 'on' : 'off',
-				siteId
-				// tabletLayout
+		return createChannels(
+			siteId,
+			{
+				device,
+				common: {
+					pageGroupName: pagegroupName,
+					sampleUrl,
+					forceSampleUrl: forceUrl ? 'on' : 'off',
+					siteId
+					// tabletLayout
+				}
+			},
+			{
+				...dataForAuditLogs,
+				actionInfo: 'Create Channel'
 			}
-		}).then(response => {
+		).then(response => {
 			const {
 				failed = {
 					channels: []

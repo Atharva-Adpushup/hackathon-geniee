@@ -35,14 +35,21 @@ class InnovativeAds extends Component {
 
 	handleSave = () => {
 		const { status } = this.state;
-		const { site, updateSite, updateAppStatus } = this.props;
+		const { site, updateSite, updateAppStatus, dataForAuditLogs } = this.props;
 
 		this.setState({ isLoading: true });
 
-		return updateAppStatus(site.siteId, {
-			app: 'innovativeAds',
-			value: status
-		}).then(() => this.setState({ isLoading: false }));
+		return updateAppStatus(
+			site.siteId,
+			{
+				app: 'innovativeAds',
+				value: status
+			},
+			{
+				...dataForAuditLogs,
+				actionInfo: 'Updated Innovative Ads'
+			}
+		).then(() => this.setState({ isLoading: false }));
 	};
 
 	render() {

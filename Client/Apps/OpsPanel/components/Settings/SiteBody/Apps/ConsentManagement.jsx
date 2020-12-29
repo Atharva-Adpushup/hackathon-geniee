@@ -51,7 +51,7 @@ class ConsentManagement extends Component {
 
 	handleSave = () => {
 		const { status, config } = this.state;
-		const { updateAppStatus, updateSite, showNotification, site } = this.props;
+		const { updateAppStatus, updateSite, showNotification, site, dataForAuditLogs } = this.props;
 		const { siteId } = site;
 
 		let parsedConfig;
@@ -70,14 +70,23 @@ class ConsentManagement extends Component {
 
 		this.setState({ loading: true });
 
-		return updateAppStatus(siteId, {
-			app: 'consentManagement',
-			value: status
-		})
+		return updateAppStatus(
+			siteId,
+			{
+				app: 'consentManagement',
+				value: status
+			},
+			dataForAuditLogs
+		)
 			.then(() =>
-				updateSite(siteId, [
-					{ key: 'gdpr', value: parsedConfig, replace: true, requireResponse: false }
-				])
+				updateSite(
+					siteId,
+					[{ key: 'gdpr', value: parsedConfig, replace: true, requireResponse: false }],
+					{
+						...dataForAuditLogs,
+						actionInfo: 'Consent Management'
+					}
+				)
 			)
 			.then(() => this.setState({ loading: false }));
 	};

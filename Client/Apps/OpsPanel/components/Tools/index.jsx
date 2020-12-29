@@ -45,7 +45,20 @@ class Tools extends Component {
 
 	renderContent = () => {
 		const { activeKey } = this.state;
-		const { networkConfig, sites, showNotification, updateNetworkConfig, user } = this.props;
+		const {
+			networkConfig,
+			sites,
+			showNotification,
+			updateNetworkConfig,
+			customProps,
+			user
+		} = this.props;
+
+		const dataForAuditLogs = {
+			appName: customProps.appName,
+			siteDomain: '',
+			actionInfo: 'Bidders Configuration Update'
+		};
 
 		switch (activeKey) {
 			default:
@@ -67,6 +80,7 @@ class Tools extends Component {
 			case TOOLS_IDENTIFIERS.BIDDER_CONFIGURATIONS:
 				return (
 					<BidderSettings
+						dataForAuditLogs={dataForAuditLogs}
 						networks={networkConfig}
 						updateNetworkConfig={updateNetworkConfig}
 						showNotification={showNotification}

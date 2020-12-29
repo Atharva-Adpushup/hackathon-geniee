@@ -12,10 +12,13 @@ const mapStateToProps = (state, ownProps) => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-	createChannels: (siteId, data) => dispatch(createChannels(siteId, data)),
+	createChannels: (siteId, data, dataForAuditLogs) =>
+		dispatch(createChannels(siteId, data, dataForAuditLogs)),
 	fetchChannelsInfo: siteId => dispatch(fetchChannelsInfo(siteId)),
-	updatePagegroupPattern: (siteId, data) => dispatch(updatePagegroupPattern(siteId, data)),
-	deletePagegroup: (siteId, params) => dispatch(deletePagegroup(siteId, params))
+	updatePagegroupPattern: (siteId, data, dataForAuditLogs) =>
+		dispatch(updatePagegroupPattern(siteId, data, dataForAuditLogs)),
+	deletePagegroup: (siteId, params, dataForAuditLogs) =>
+		dispatch(deletePagegroup(siteId, params, dataForAuditLogs))
 });
 
 export default connect(

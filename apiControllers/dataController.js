@@ -10,11 +10,20 @@ const CC = require('../configs/commonConsts');
 const httpStatus = require('../configs/httpStatusConsts');
 const pagegroupCreationAutomation = require('../services/pagegroupCreationAutomation');
 const AdpushupError = require('../helpers/AdPushupError');
-const { checkParams, errorHandler, verifyOwner } = require('../helpers/routeHelpers');
+const {
+	checkParams,
+	errorHandler,
+	verifyOwner,
+	sendDataToAuditLogService
+} = require('../helpers/routeHelpers');
 const { sendSuccessResponse, getNetworkConfig } = require('../helpers/commonFunctions');
 const logger = require('../helpers/globalBucketLogger');
 const helperUtils = require('../helpers/utils');
 const config = require('../configs/config');
+
+const {
+	AUDIT_LOGS_ACTIONS: { LAYOUT_EDITOR }
+} = CC;
 
 const router = express.Router();
 
@@ -48,25 +57,24 @@ router
 						site.set('onboardingStage', data.onboardingStage);
 						return site.save();
 					});
-				} else {
-					const siteData = {
-						siteDomain: data.site,
-						siteId,
-						ownerEmail: req.user.email,
-						onboardingStage: data.onboardingStage,
-						step: parseInt(data.step, 10),
-						ads: [],
-						channels: [],
-						templates: [],
-						apConfigs: {
-							mode: CC.site.mode.DRAFT,
-							isAdPushupControlWithPartnerSSP: CC.apConfigDefaults.isAdPushupControlWithPartnerSSP,
-							autoOptimise: false
-						}
-					};
-
-					return siteModel.saveSiteData(siteId, 'POST', siteData);
 				}
+				const siteData = {
+					siteDomain: data.site,
+					siteId,
+					ownerEmail: req.user.email,
+					onboardingStage: data.onboardingStage,
+					step: parseInt(data.step, 10),
+					ads: [],
+					channels: [],
+					templates: [],
+					apConfigs: {
+						mode: CC.site.mode.DRAFT,
+						isAdPushupControlWithPartnerSSP: CC.apConfigDefaults.isAdPushupControlWithPartnerSSP,
+						autoOptimise: false
+					}
+				};
+
+				return siteModel.saveSiteData(siteId, 'POST', siteData);
 			})
 			.then(site => {
 				siteObj = site;
@@ -192,7 +200,57 @@ router
 		}
 
 		return checkChannelsExistence(siteData.siteId, siteData.channels)
+			.then(() => siteModel.getSiteById(siteData.siteId))
+			.then(prevSiteData => {
+				const newObj = {};
+				Object.keys(siteData).map(key => {
+					newObj[key] = prevSiteData.data[key];
+				});
+				const { email, originalEmail } = req.user;
+				// log config changes
+				sendDataToAuditLogService({
+					siteId: siteData.siteId,
+					siteDomain: siteData.siteDomain,
+					appName: 'Console Layout Editor',
+					type: 'site',
+					impersonateId: email,
+					userId: originalEmail,
+					prevConfig: newObj,
+					currentConfig: siteData,
+					action: {
+						name: LAYOUT_EDITOR,
+						data: `Layout Editor`
+					}
+				});
+			})
 			.then(siteModel.saveSiteData.bind(null, siteData.siteId, 'POST', siteData))
+			.then(() => siteModel.getSiteChannels(siteData.siteId))
+			.then(prevSiteChannelsData => {
+				const queue = [];
+				prevSiteChannelsData.map(channel => {
+					const [platform, pageGroup] = channel.split(':');
+					queue.push(channelModel.getChannel(siteData.siteId, platform, pageGroup));
+				});
+				return Promise.all(queue).then(allChannels => {
+					const channels = allChannels.map(channel => channel.data);
+					const { email, originalEmail } = req.user;
+					// log config changes
+					sendDataToAuditLogService({
+						siteId: siteData.siteId,
+						siteDomain: siteData.siteDomain,
+						appName: 'Console Layout Editor',
+						type: 'site',
+						impersonateId: email,
+						userId: originalEmail,
+						prevConfig: channels,
+						currentConfig: parsedData.channels,
+						action: {
+							name: LAYOUT_EDITOR,
+							data: `Layout Editor`
+						}
+					});
+				});
+			})
 			.then(
 				channelModel.saveChannels.bind(null, parseInt(parsedData.siteId, 10), parsedData.channels)
 			)
