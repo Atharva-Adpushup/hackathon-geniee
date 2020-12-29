@@ -153,8 +153,7 @@ class Settings extends Component {
 			revenueShare,
 			hbAnalytics,
 			cmpEnabled,
-			mergeReport,
-			isPnp
+			mergeReport
 		} = this.state;
 		const { showNotification, saveSettings, site, dataForAuditLogs } = this.props;
 		const isTransitionInValid = isSPA && isNaN(Number(spaPageTransitionTimeout));
@@ -200,8 +199,7 @@ class Settings extends Component {
 					adsLabel,
 					hbAnalytics,
 					cmpAvailable: !cmpEnabled,
-					mergeReport,
-					isPnp
+					mergeReport
 				},
 
 				adNetworkSettings: {
