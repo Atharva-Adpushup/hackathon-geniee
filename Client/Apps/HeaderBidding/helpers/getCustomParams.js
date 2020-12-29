@@ -8,6 +8,11 @@ export default function(bidderConfig, siteId, domain) {
 
 			return customParams;
 		}
+		case 'onetag': {
+			customParams.ext = { unit: `AP/${siteId}_${domanize(domain)}` };
+
+			return customParams;
+		}
 		default:
 			return customParams;
 	}
