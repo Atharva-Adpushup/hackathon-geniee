@@ -1,5 +1,5 @@
-const BB_PLAYER_LOG_KEEN_ENDPOINT =
-	'//api.keen.io/3.0/projects/5fd874cedbf8740c9be9d4fe/events/bblogs?api_key=dafa918020ac9521501e4449c9d84f3e06feb3b3cb2346e0de422b3c2f3b1847e622a65464d8696c8a47e041ef66c77c6ee3bcd9f290b0074dcd1ca763b22eed2755a7df941ed7c038f44f352abd8d5092e31442619c3980af9d404443e375fb&data=';
+// const BB_PLAYER_LOG_KEEN_ENDPOINT =
+// 	'//api.keen.io/3.0/projects/5fd874cedbf8740c9be9d4fe/events/bblogs?api_key=dafa918020ac9521501e4449c9d84f3e06feb3b3cb2346e0de422b3c2f3b1847e622a65464d8696c8a47e041ef66c77c6ee3bcd9f290b0074dcd1ca763b22eed2755a7df941ed7c038f44f352abd8d5092e31442619c3980af9d404443e375fb&data=';
 
 var bbPlayerUtils = {
 	removeBbPlayerIfRendered: function(playerId) {
@@ -64,10 +64,10 @@ var bbPlayerUtils = {
 			}
 		}
 
-		const data = adp.utils.base64Encode(JSON.stringify(json));
-		const imgSrc = BB_PLAYER_LOG_KEEN_ENDPOINT + data;
+		// const data = adp.utils.base64Encode(JSON.stringify(json));
+		// const imgSrc = BB_PLAYER_LOG_KEEN_ENDPOINT + data;
 
-		adp.utils.fireImagePixel(imgSrc);
+		// adp.utils.fireImagePixel(imgSrc);
 	}
 };
 

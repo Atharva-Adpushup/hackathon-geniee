@@ -5,8 +5,8 @@ var browserConfig = require('./browserConfig.js'),
 	commonConsts = require('../config/commonConsts'),
 	Base64 = require('Base64'),
 	UM_LOG_ENDPOINT = '//app-log.adpushup.com/umlogv5?data=',
-	UM_LOG_KEEN_ENDPOINT =
-		'//api.keen.io/3.0/projects/5f6455365cf9803b3732965b/events/umlogv1?api_key=a871c7c98adc1b99fbf72820e0704d22bdcae4b9a1d0e2af20b46fe3cf2087d5def88f1e829db5715b4db29f18110d61c5896928ea0fde2e46a2116e91eb24aeb1656ed4a7a58db13f54ae1f8825ea690a34cfaa8001912d88266b9349140537&data=',
+	// UM_LOG_KEEN_ENDPOINT =
+	// 	'//api.keen.io/3.0/projects/5f6455365cf9803b3732965b/events/umlogv1?api_key=a871c7c98adc1b99fbf72820e0704d22bdcae4b9a1d0e2af20b46fe3cf2087d5def88f1e829db5715b4db29f18110d61c5896928ea0fde2e46a2116e91eb24aeb1656ed4a7a58db13f54ae1f8825ea690a34cfaa8001912d88266b9349140537&data=',
 	FETCH_URL_KEY_VALUE_RETRY_LIMIT = 3,
 	FETCH_URL_KEY_RETRY_TIMEOUT = 50;
 
@@ -327,7 +327,7 @@ module.exports = {
 
 			if (window.adpushup.config.urlReportingEnabled) {
 				this.sendURMPageFeedbackEventLogs({ ...feedbackObj });
-				this.sendURMPageFeedbackEventLogsKeen();
+				// this.sendURMPageFeedbackEventLogsKeen();
 			}
 
 			data = this.base64Encode(JSON.stringify(feedbackObj));
@@ -693,25 +693,25 @@ module.exports = {
 		this.fireImagePixel(imgSrc);
 		return true;
 	},
-	createAndFireImagePixelForUmLogUsingKeen: function(json) {
-		var data = this.base64Encode(JSON.stringify(json));
-		var imgSrc = UM_LOG_KEEN_ENDPOINT + data;
+	// createAndFireImagePixelForUmLogUsingKeen: function(json) {
+	// 	var data = this.base64Encode(JSON.stringify(json));
+	// 	var imgSrc = UM_LOG_KEEN_ENDPOINT + data;
 
-		this.fireImagePixel(imgSrc);
-		return true;
-	},
+	// 	this.fireImagePixel(imgSrc);
+	// 	return true;
+	// },
 	fetchAndSetKeyValueForUrlReporting: function(adp) {
 		const { utils } = adp;
 		utils.logURMEvent(commonConsts.EVENT_LOGGER.EVENTS.URM_START);
-		utils.logURMEventKeen(commonConsts.EVENT_LOGGER.EVENTS.URM_START, {
-			[commonConsts.EVENT_LOGGER.EVENTS.URM_START]: new Date().getTime()
-		});
+		// utils.logURMEventKeen(commonConsts.EVENT_LOGGER.EVENTS.URM_START, {
+		// 	[commonConsts.EVENT_LOGGER.EVENTS.URM_START]: new Date().getTime()
+		// });
 
 		if (!adp.config.pageUrlMappingServiceEndpoint || !adp.config.pageUrl) {
 			utils.logURMEvent(commonConsts.EVENT_LOGGER.EVENTS.URM_CONFIG_NOT_FOUND);
-			utils.logURMEventKeen(commonConsts.EVENT_LOGGER.EVENTS.URM_CONFIG_NOT_FOUND, {
-				[commonConsts.EVENT_LOGGER.EVENTS.URM_CONFIG_NOT_FOUND]: new Date().getTime()
-			});
+			// utils.logURMEventKeen(commonConsts.EVENT_LOGGER.EVENTS.URM_CONFIG_NOT_FOUND, {
+			// 	[commonConsts.EVENT_LOGGER.EVENTS.URM_CONFIG_NOT_FOUND]: new Date().getTime()
+			// });
 			return false;
 		}
 
@@ -720,9 +720,9 @@ module.exports = {
 			.replace('__SITE_ID__', adp.config.siteId);
 
 		utils.logURMEvent(commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_STARTED);
-		utils.logURMEventKeen(commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_STARTED, {
-			[commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_STARTED]: new Date().getTime()
-		});
+		// utils.logURMEventKeen(commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_STARTED, {
+		// 	[commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_STARTED]: new Date().getTime()
+		// });
 
 		let retryCount = adp.pageUrlMappingRetries || 0;
 		let hasSuceeded = false;
@@ -742,9 +742,9 @@ module.exports = {
 				}
 			}) {
 				utils.logURMEvent(commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_SUCCESS);
-				utils.logURMEventKeen(commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_SUCCESS, {
-					[commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_SUCCESS]: new Date().getTime()
-				});
+				// utils.logURMEventKeen(commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_SUCCESS, {
+				// 	[commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_SUCCESS]: new Date().getTime()
+				// });
 
 				let logObject = {
 					urlTargetingKey,
@@ -761,14 +761,14 @@ module.exports = {
 					adp.config.pageUrlKeyValue.urlTargetingValue = urlTargetingValue;
 
 					utils.logURMEvent(commonConsts.EVENT_LOGGER.EVENTS.URM_CONFIG_KEY_VALUE_SET, logObject);
-					utils.logURMEventKeen(commonConsts.EVENT_LOGGER.EVENTS.URM_CONFIG_KEY_VALUE_SET, {
-						[commonConsts.EVENT_LOGGER.EVENTS.URM_CONFIG_KEY_VALUE_SET]: new Date().getTime()
-					});
+					// utils.logURMEventKeen(commonConsts.EVENT_LOGGER.EVENTS.URM_CONFIG_KEY_VALUE_SET, {
+					// 	[commonConsts.EVENT_LOGGER.EVENTS.URM_CONFIG_KEY_VALUE_SET]: new Date().getTime()
+					// });
 				} else {
 					utils.logURMEvent(commonConsts.EVENT_LOGGER.EVENTS.URM_CONFIG_KEY_VALUE_EMPTY, logObject);
-					utils.logURMEventKeen(commonConsts.EVENT_LOGGER.EVENTS.URM_CONFIG_KEY_VALUE_EMPTY, {
-						[commonConsts.EVENT_LOGGER.EVENTS.URM_CONFIG_KEY_VALUE_EMPTY]: new Date().getTime()
-					});
+					// utils.logURMEventKeen(commonConsts.EVENT_LOGGER.EVENTS.URM_CONFIG_KEY_VALUE_EMPTY, {
+					// 	[commonConsts.EVENT_LOGGER.EVENTS.URM_CONFIG_KEY_VALUE_EMPTY]: new Date().getTime()
+					// });
 				}
 
 				hasSuceeded = true;
@@ -805,22 +805,22 @@ module.exports = {
 					}
 				});
 
-				utils.logURMEventKeen(commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_FAILED_TIME, {
-					[commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_FAILED_TIME]: new Date().getTime()
-				});
-				utils.logURMEventKeen(commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_FAILED, {
-					[commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_FAILED]: {
-						responseText,
-						responseHeaders: getAllResponseHeaders(),
-						statusText: xhr.statusText,
-						statusCode: xhr.status
-					}
-				});
+				// utils.logURMEventKeen(commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_FAILED_TIME, {
+				// 	[commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_FAILED_TIME]: new Date().getTime()
+				// });
+				// utils.logURMEventKeen(commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_FAILED, {
+				// 	[commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_FAILED]: {
+				// 		responseText,
+				// 		responseHeaders: getAllResponseHeaders(),
+				// 		statusText: xhr.statusText,
+				// 		statusCode: xhr.status
+				// 	}
+				// });
 			})
 			.always(function() {
 				if (hasFailed || hasSuceeded) {
 					utils.sendURMKeyValueEventLogs();
-					utils.sendURMKeyValueEventLogsKeen();
+					// utils.sendURMKeyValueEventLogsKeen();
 				}
 			});
 
@@ -893,14 +893,14 @@ module.exports = {
 			type: commonConsts.EVENT_LOGGER.TYPES.URM_KEY_VALUE
 		});
 	},
-	logURMEventKeen: function(name, data = {}) {
-		const eventLogger = window.adpushup.eventLogger;
-		eventLogger.log({
-			name,
-			data,
-			type: commonConsts.EVENT_LOGGER.TYPES.URM_KEY_VALUE_KEEN
-		});
-	},
+	// logURMEventKeen: function(name, data = {}) {
+	// 	const eventLogger = window.adpushup.eventLogger;
+	// 	eventLogger.log({
+	// 		name,
+	// 		data,
+	// 		type: commonConsts.EVENT_LOGGER.TYPES.URM_KEY_VALUE_KEEN
+	// 	});
+	// },
 	logURMPageFeedbackEvent: function(name, data = {}) {
 		const eventLogger = window.adpushup.eventLogger;
 		eventLogger.log({
@@ -917,14 +917,14 @@ module.exports = {
 			type: commonConsts.EVENT_LOGGER.TYPES.URM_TARGETTING
 		});
 	},
-	logURMTargettingEventKeen: function(name, data = {}) {
-		const eventLogger = window.adpushup.eventLogger;
-		eventLogger.log({
-			name,
-			data,
-			type: commonConsts.EVENT_LOGGER.TYPES.URM_TARGETTING_KEEN
-		})
-	},
+	// logURMTargettingEventKeen: function(name, data = {}) {
+	// 	const eventLogger = window.adpushup.eventLogger;
+	// 	eventLogger.log({
+	// 		name,
+	// 		data,
+	// 		type: commonConsts.EVENT_LOGGER.TYPES.URM_TARGETTING_KEEN
+	// 	})
+	// },
 	getUrmResponseTimeFromEventLogs: function(urmLogs) {
 		let urmReqSuccessTimestamp = 0;
 		let urmReqStartedTimestamp = 0;
@@ -988,69 +988,69 @@ module.exports = {
 			});
 		}
 	},
-	sendURMTargettingEventLogsKeen: function() {
-		try {
-			const { utils, eventLogger, pageUrlMappingRetries, urmRequestStatus = commonConsts.URM_REPORTING.EVENTS.PENDING } = window.adpushup;
-			const eventType = commonConsts.EVENT_LOGGER.TYPES.URM_TARGETTING_KEEN;
+	// sendURMTargettingEventLogsKeen: function() {
+	// 	try {
+	// 		const { utils, eventLogger, pageUrlMappingRetries, urmRequestStatus = commonConsts.URM_REPORTING.EVENTS.PENDING } = window.adpushup;
+	// 		const eventType = commonConsts.EVENT_LOGGER.TYPES.URM_TARGETTING_KEEN;
 
-			let urmLogs = eventLogger.getLogsByEventType(eventType);
-			if (!urmLogs.length) {
-				utils.logURMTargettingEventKeen(commonConsts.EVENT_LOGGER.EVENTS.EMPTY, {
-					[commonConsts.EVENT_LOGGER.EVENTS.EMPTY]: new Date().getTime()
-				});
-				urmLogs = eventLogger.getLogsByEventType(eventType);
-			}
+	// 		let urmLogs = eventLogger.getLogsByEventType(eventType);
+	// 		if (!urmLogs.length) {
+	// 			utils.logURMTargettingEventKeen(commonConsts.EVENT_LOGGER.EVENTS.EMPTY, {
+	// 				[commonConsts.EVENT_LOGGER.EVENTS.EMPTY]: new Date().getTime()
+	// 			});
+	// 			urmLogs = eventLogger.getLogsByEventType(eventType);
+	// 		}
 
-			const packetId = window.adpushup.config.packetId;
-			let urmLogsObj = {};
-			urmLogs.map(log => {
-				urmLogsObj = Object.assign({}, urmLogsObj, log.data);
-			});
+	// 		const packetId = window.adpushup.config.packetId;
+	// 		let urmLogsObj = {};
+	// 		urmLogs.map(log => {
+	// 			urmLogsObj = Object.assign({}, urmLogsObj, log.data);
+	// 		});
 
-			const payload = {
-				packetId,
-				type: eventType,
-				logs: urmLogsObj,
-				timestamp: new Date().getTime(),
-				pageUrl: window.location.href,
-				path: window.location.pathname,
-				domain: window.location.host,
-				retries: pageUrlMappingRetries || 0,
-				user_agent: "${keen.user_agent}",
-				ip_address: "${keen.ip}",
-				keen: {
-					addons: [
-						{
-							name: "keen:ua_parser",
-							input: {
-								ua_string: "user_agent"
-							},
-							output: "parsed_user_agent"
-						},
-						{
-							name: "keen:ip_to_geo",
-							input: {
-							  ip: "ip_address"
-							},
-							output: "ip_geo_info"
-						}
-					]
-				},
-				urmRequestStatus
-			};
+	// 		const payload = {
+	// 			packetId,
+	// 			type: eventType,
+	// 			logs: urmLogsObj,
+	// 			timestamp: new Date().getTime(),
+	// 			pageUrl: window.location.href,
+	// 			path: window.location.pathname,
+	// 			domain: window.location.host,
+	// 			retries: pageUrlMappingRetries || 0,
+	// 			user_agent: "${keen.user_agent}",
+	// 			ip_address: "${keen.ip}",
+	// 			keen: {
+	// 				addons: [
+	// 					{
+	// 						name: "keen:ua_parser",
+	// 						input: {
+	// 							ua_string: "user_agent"
+	// 						},
+	// 						output: "parsed_user_agent"
+	// 					},
+	// 					{
+	// 						name: "keen:ip_to_geo",
+	// 						input: {
+	// 						  ip: "ip_address"
+	// 						},
+	// 						output: "ip_geo_info"
+	// 					}
+	// 				]
+	// 			},
+	// 			urmRequestStatus
+	// 		};
 
-			utils.log('targetting logs keen', {payload});
+	// 		utils.log('targetting logs keen', {payload});
 
-			this.createAndFireImagePixelForUmLogUsingKeen(payload);
-			window.adpushup.isURMTargettingLogsSent = true;
-			eventLogger.removeLogsByEventType(eventType);
-		} catch(error) {
-			window.adpushup.err.push({
-				error,
-				msg: 'Error occured while sending URM targetting event logs'
-			});
-		}
-	},
+	// 		this.createAndFireImagePixelForUmLogUsingKeen(payload);
+	// 		window.adpushup.isURMTargettingLogsSent = true;
+	// 		eventLogger.removeLogsByEventType(eventType);
+	// 	} catch(error) {
+	// 		window.adpushup.err.push({
+	// 			error,
+	// 			msg: 'Error occured while sending URM targetting event logs'
+	// 		});
+	// 	}
+	// },
 	sendURMPageFeedbackEventLogs: function(feedback) {
 		try {
 			if (window.adpushup.config.isURMPageFeedbackSent) {
@@ -1091,36 +1091,36 @@ module.exports = {
 			});
 		}
 	},
-	sendURMPageFeedbackEventLogsKeen: function() {
-		try {
-			if (window.adpushup.config.isURMPageFeedbackKeenSent) {
-				return false;
-			}
+	// sendURMPageFeedbackEventLogsKeen: function() {
+	// 	try {
+	// 		if (window.adpushup.config.isURMPageFeedbackKeenSent) {
+	// 			return false;
+	// 		}
 
-			const eventType = commonConsts.EVENT_LOGGER.TYPES.URM_PAGE_FEEDBACK;
-			const packetId = window.adpushup.config.packetId;
-			const payload = {
-				packetId,
-				type: eventType,
-				timestamp: new Date().getTime(),
-				logs: {
-					[eventType]: new Date().getTime()
-				},
-				pageUrl: window.location.href,
-				path: window.location.pathname,
-				domain: window.location.host
-			};
-			// TODO move url to config
-			this.createAndFireImagePixelForUmLogUsingKeen(payload);
+	// 		const eventType = commonConsts.EVENT_LOGGER.TYPES.URM_PAGE_FEEDBACK;
+	// 		const packetId = window.adpushup.config.packetId;
+	// 		const payload = {
+	// 			packetId,
+	// 			type: eventType,
+	// 			timestamp: new Date().getTime(),
+	// 			logs: {
+	// 				[eventType]: new Date().getTime()
+	// 			},
+	// 			pageUrl: window.location.href,
+	// 			path: window.location.pathname,
+	// 			domain: window.location.host
+	// 		};
+	// 		// TODO move url to config
+	// 		this.createAndFireImagePixelForUmLogUsingKeen(payload);
 
-			window.adpushup.config.isURMPageFeedbackKeenSent = true;
-		} catch (error) {
-			window.adpushup.err.push({
-				error,
-				msg: 'Error occured while sending URM page feedback logs'
-			});
-		}
-	},
+	// 		window.adpushup.config.isURMPageFeedbackKeenSent = true;
+	// 	} catch (error) {
+	// 		window.adpushup.err.push({
+	// 			error,
+	// 			msg: 'Error occured while sending URM page feedback logs'
+	// 		});
+	// 	}
+	// },
 	sendURMKeyValueEventLogs: function() {
 		try {
 			const { utils, eventLogger } = window.adpushup;
@@ -1158,71 +1158,71 @@ module.exports = {
 			});
 		}
 	},
-	sendURMKeyValueEventLogsKeen: function() {
-		try {
-			const { utils, eventLogger, pageUrlMappingRetries } = window.adpushup;
-			const eventType = commonConsts.EVENT_LOGGER.TYPES.URM_KEY_VALUE_KEEN;
+	// sendURMKeyValueEventLogsKeen: function() {
+	// 	try {
+	// 		const { utils, eventLogger, pageUrlMappingRetries } = window.adpushup;
+	// 		const eventType = commonConsts.EVENT_LOGGER.TYPES.URM_KEY_VALUE_KEEN;
 
-			let urmLogs = eventLogger.getLogsByEventType(eventType);
+	// 		let urmLogs = eventLogger.getLogsByEventType(eventType);
 
-			if (!urmLogs.length) {
-				utils.logURMEventKeen(commonConsts.EVENT_LOGGER.EVENTS.EMPTY, {
-					[commonConsts.EVENT_LOGGER.EVENTS.EMPTY]: new Date().getTime()
-				});
-				urmLogs = eventLogger.getLogsByEventType(eventType);
-			}
+	// 		if (!urmLogs.length) {
+	// 			utils.logURMEventKeen(commonConsts.EVENT_LOGGER.EVENTS.EMPTY, {
+	// 				[commonConsts.EVENT_LOGGER.EVENTS.EMPTY]: new Date().getTime()
+	// 			});
+	// 			urmLogs = eventLogger.getLogsByEventType(eventType);
+	// 		}
 
-			const packetId = window.adpushup.config.packetId;
+	// 		const packetId = window.adpushup.config.packetId;
 
-			let urmLogsObj = {};
-			urmLogs.map(log => {
-				urmLogsObj = Object.assign({}, urmLogsObj, log.data);
-			});
+	// 		let urmLogsObj = {};
+	// 		urmLogs.map(log => {
+	// 			urmLogsObj = Object.assign({}, urmLogsObj, log.data);
+	// 		});
 
-			const payload = {
-				packetId,
-				type: eventType,
-				logs: urmLogsObj,
-				timestamp: new Date().getTime(),
-				pageUrl: window.location.href,
-				path: window.location.pathname,
-				domain: window.location.host,
-				retries: pageUrlMappingRetries || 0,
-				user_agent: "${keen.user_agent}",
-				ip_address: "${keen.ip}",
-				keen: {
-					addons: [
-						{
-							name: "keen:ua_parser",
-							input: {
-								ua_string: "user_agent"
-							},
-							output: "parsed_user_agent"
-						},
-						{
-							name: "keen:ip_to_geo",
-							input: {
-							  ip: "ip_address"
-							},
-							output: "ip_geo_info"
-						}
-					]
- 				}
-			};
+	// 		const payload = {
+	// 			packetId,
+	// 			type: eventType,
+	// 			logs: urmLogsObj,
+	// 			timestamp: new Date().getTime(),
+	// 			pageUrl: window.location.href,
+	// 			path: window.location.pathname,
+	// 			domain: window.location.host,
+	// 			retries: pageUrlMappingRetries || 0,
+	// 			user_agent: "${keen.user_agent}",
+	// 			ip_address: "${keen.ip}",
+	// 			keen: {
+	// 				addons: [
+	// 					{
+	// 						name: "keen:ua_parser",
+	// 						input: {
+	// 							ua_string: "user_agent"
+	// 						},
+	// 						output: "parsed_user_agent"
+	// 					},
+	// 					{
+	// 						name: "keen:ip_to_geo",
+	// 						input: {
+	// 						  ip: "ip_address"
+	// 						},
+	// 						output: "ip_geo_info"
+	// 					}
+	// 				]
+ 	// 			}
+	// 		};
 
-			utils.log({payload});
-			// TODO move url to config
-			this.createAndFireImagePixelForUmLogUsingKeen(payload);
+	// 		utils.log({payload});
+	// 		// TODO move url to config
+	// 		this.createAndFireImagePixelForUmLogUsingKeen(payload);
 
-			window.adpushup.config.isURMPageFeedbackSent = true;
-			eventLogger.removeLogsByEventType(eventType);
-		} catch (error) {
-			window.adpushup.err.push({
-				error,
-				msg: 'Error occured while sending URM event logs'
-			});
-		}
-	},
+	// 		window.adpushup.config.isURMPageFeedbackSent = true;
+	// 		eventLogger.removeLogsByEventType(eventType);
+	// 	} catch (error) {
+	// 		window.adpushup.err.push({
+	// 			error,
+	// 			msg: 'Error occured while sending URM event logs'
+	// 		});
+	// 	}
+	// },
 	injectHeadCodeOnPage: function(src) {
 		const scriptEl = document.createElement('script');
 		scriptEl.type = 'text/javascript';
