@@ -479,7 +479,7 @@ class Report extends Component {
 					}
 				} catch (e) {
 					this.removeAllItemsInLocalStorage();
-					console.warn(e)
+					console.warn(e);
 				}
 			});
 
