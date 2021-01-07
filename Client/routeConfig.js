@@ -246,13 +246,18 @@ const ROUTES = {
 		},
 		{
 			exact: true,
+			customProps: { activeTab: REPORTS_NAV_ITEMS_INDEXES.HB_ANALYTICS },
+			name: 'HB Analytics',
+			path: '/reports/hb-analytics',
+			component: Reporting
+		},
+		{
+			exact: true,
 			name: ':siteId',
 			path: '/reports/:siteId',
-			title: 'Reporting',
 			customProps: { activeTab: REPORTS_NAV_ITEMS_INDEXES.REPORT },
 			component: Reporting
 		},
-
 		// Integrations (Connect Google etc.)
 		{
 			exact: true,

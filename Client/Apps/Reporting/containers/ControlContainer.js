@@ -11,13 +11,14 @@ const mapStateToProps = (state, ownProps) => {
 	const reportsMeta =
 		isForOps || isReportTypeGlobal ? { ...globalReportMetaData } : { ...accountReportMetaData };
 	const {
-		data: { filter, metrics, dimension, interval, site }
+		data: { filter, metrics, dimension, interval, site, hbMetrics }
 	} = reportsMeta;
 
 	return {
 		filter,
 		metrics,
 		dimension,
+		hbMetrics,
 		interval,
 		site,
 		...ownProps

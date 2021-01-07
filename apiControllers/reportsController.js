@@ -2,8 +2,6 @@ const express = require('express');
 const request = require('request-promise');
 const _ = require('lodash');
 const { v1: uuid } = require('uuid');
-const axios = require('axios').default;
-const couchbase = require('couchbase');
 
 const HTTP_STATUSES = require('../configs/httpStatusConsts');
 const { sendSuccessResponse, sendErrorResponse } = require('../helpers/commonFunctions');
@@ -13,301 +11,48 @@ const reportsModel = require('../models/reportsModel');
 const FormValidator = require('../helpers/FormValidator');
 const schema = require('../helpers/schema');
 
-const config = require('../configs/config');
-
-const redisClient = require('../middlewares/redis');
-const { queryViewFromAppBucket } = require('../helpers/couchBaseService');
-const cache = require('../middlewares/cacheMiddleware');
+const reportsAccess = require('../middlewares/reportsAuthorizationMiddleware.js');
+const reportsService = require('../apiServices/reportsService');
 
 const router = express.Router();
 
-const getKeyFromProps = (report = {}, props = []) => {
-	const propValues = props.map(prop => report[prop]);
-	return propValues.join(',');
-};
-
-const mergeReportingWithSessionRpmReports = (
-	reports = [],
-	sessionRpmReports = [],
-	sessionRpmColumns = []
-) => {
-	const sessionRpmUniqueProps = CC.SESSION_RPM.SESSION_RPM_PROPS; // list of columns from session rpm report that needs to be merged with normal reports
-	const propsToIgnore = CC.SESSION_RPM.IGNORE_PROPS;
-	const mergableProps = sessionRpmColumns.filter(
-		column => !sessionRpmUniqueProps.includes(column) && !propsToIgnore.includes(column)
-	);
-
-	const sessionRpmMap = sessionRpmReports.reduce((result, report) => {
-		const key = getKeyFromProps(report, mergableProps);
-		return {
-			...result,
-			[key]: report
-		};
-	}, {});
-
-	const mergedReportingData = reports.map(report => {
-		const key = getKeyFromProps(report, mergableProps);
-		const reportClone = _.cloneDeep(report);
-		if (sessionRpmMap[key]) {
-			const rpmReport = sessionRpmMap[key];
-			sessionRpmUniqueProps.forEach(prop => {
-				reportClone[prop] = rpmReport[prop];
-			});
-		} else {
-			sessionRpmUniqueProps.forEach(prop => {
-				reportClone[prop] = 0;
-			});
-		}
-		return reportClone;
-	});
-
-	return mergedReportingData;
-};
-
-const mergeReportColumns = reportColumns => [...reportColumns, ...CC.SESSION_RPM.SESSION_RPM_PROPS];
-
-const calculateSessionTotals = (sessionReports = []) => {
-	const totalSessionRpm =
-		sessionReports.reduce((result, report) => result + report.session_rpm, 0) /
-		sessionReports.length;
-	const totalSessions = sessionReports.reduce((result, report) => result + report.user_sessions, 0);
-
-	return {
-		total_session_rpm: totalSessionRpm,
-		total_user_sessions: totalSessions
-	};
-};
-
-const mergeReportsWithSessionRpmData = (reportsData, sessionRpmData, isSuperUser = false) => {
-	const { result: reports, columns: reportColumns, total: reportsTotals } = reportsData;
-	const { result: sessionRpmReports, columns: sessionRpmColumns } = sessionRpmData;
-
-	const mergedReports = mergeReportingWithSessionRpmReports(
-		reports,
-		sessionRpmReports,
-		sessionRpmColumns
-	);
-
-	const mergedColumns = mergeReportColumns(reportColumns, sessionRpmColumns);
-
-	const sessionTotals = calculateSessionTotals(sessionRpmReports);
-	const mergedTotal = {
-		...reportsTotals,
-		...sessionTotals
-	};
-
-	const mergedData = {
-		result: mergedReports,
-		columns: mergedColumns
-	};
-
-	if (!isSuperUser) mergedData.total = mergedTotal;
-
-	return mergedData;
-};
-
-/**
- *
- * @param {Object} query - req.query object, contains query params.
- * @return {Object} modifiedQuery
- * @description checks if the siteid is pnp, modify query by appending the mapped siteIds to
- * 							query.siteid.
- */
-const modifyQueryIfPnp = query =>
-	new Promise((resolve, reject) => {
-		const modifiedQuery = _.cloneDeep(query);
-		const regex = new RegExp('^[0-9]*(,[0-9]+)*$');
-		if (!regex.test(query.siteid)) {
-			reject(new Error('Invalid parameter in query.siteid'));
-			return;
-		}
-		const siteIds = query.siteid.split(',');
-		const dbQuery = couchbase.N1qlQuery.fromString(
-			`select buc.mappedPnpSiteId from AppBucket 
-   				as buc where meta().id like 'site::%'  
-  	 			and buc.siteId in [${siteIds}]  
-   				and buc.mappedPnpSiteId is not missing  
-				and buc.apConfigs.mergeReport = true
-			`
-		);
-		console.log({ before: modifiedQuery });
-		queryViewFromAppBucket(dbQuery)
-			.then(data => {
-				// data is array of objects e.g.. [{mappedPnpSiteId: 41355}, {mappedPnpSiteId:41395}]
-				data.forEach(ele => {
-					modifiedQuery.siteid += `,${ele.mappedPnpSiteId}`;
-				});
-				console.log({ after: modifiedQuery });
-				resolve(modifiedQuery);
-			})
-			.catch(err => {
-				console.error(err);
-				reject(new Error('Error while accessing data'));
-			});
-	});
-
-const Utils = {
-	generateCronExpression: (interval, startDate) => {
-		if (!interval || !startDate) throw new Error('Invalid parameters to generate schedule cron');
-		let cron = '';
-		const start = new Date(startDate);
-		switch (interval) {
-			case 'daily':
-				cron = '0 20 * * *'; // everyday at 8PM
-				break;
-			case 'weekly':
-				cron = `0 20 * * ${start.getDay()}`; // same day every week at 8PM
-				break;
-			case 'monthly':
-				cron = `0 20 ${start.getDate()} * *`; // same date every month at 8PM
-				break;
-			default:
-				throw new Error('Invalid schedule interval');
-		}
-		return cron;
-	},
-	scheduleReportJob: async (configuration, email) => {
-		const { scheduleOptions, ...reportConfig } = configuration;
-		const jobConfiguration = {
-			type: 'RABBITMQ',
-			config: {
-				queue: 'REPORTS_SCHEDULER',
-				data: {
-					sendTo: email,
-					endDate: reportConfig.endDate,
-					startDate: reportConfig.startDate,
-					name: reportConfig.name,
-					dimension: reportConfig.selectedDimension,
-					filters: reportConfig.selectedFilters,
-					interval: reportConfig.selectedInterval,
-					id: reportConfig.id
-				}
-			},
-			retryOptions: {
-				attempts: 3
-			},
-			executionOptions: {
-				type: 'repeat',
-				value: scheduleOptions.cron,
-				startDate: scheduleOptions.startDate,
-				endDate: scheduleOptions.endDate
-			}
-		};
-		return axios
-			.post(`${config.SCHEDULER_API_ROOT}/schedule`, jobConfiguration)
-			.then(response => response.data);
-	},
-	cancelScheduledJob: async jobId => {
-		if (jobId) {
-			return axios.delete(`${config.SCHEDULER_API_ROOT}/cancel/${jobId}`);
-		}
-		return Promise.resolve();
-	},
-	initiateReportsSchedule: async (reportConfig, email) => {
-		const { interval, startDate } = reportConfig.scheduleOptions;
-		const cronExpression = Utils.generateCronExpression(interval, startDate);
-
-		const scheduleConfig = Object.assign({}, reportConfig);
-
-		scheduleConfig.scheduleOptions.cron = cronExpression;
-
-		const scheduledJobData = await Utils.scheduleReportJob(reportConfig, email);
-		scheduleConfig.scheduleOptions.jobId = scheduledJobData.job.id;
-
-		return scheduleConfig;
-	}
+const setCacheHeaders = res => {
+	res.header('X-AP-CACHE', 'HIT');
 };
 
 router
-	.get('/getCustomStats', cache, async (req, res) => {
+	.get('/getCustomStats', reportsAccess, async (req, res) => {
 		const {
-			query: { siteid = '', isSuperUser = false, fromDate, toDate, interval, dimension, ...filters }
+			query: { bypassCache = 'false' }
 		} = req;
-		const isValidParams = !!((siteid || isSuperUser) && fromDate && toDate && interval);
-		const sessionRpmSupportedDimensions = CC.SESSION_RPM.SUPPORTED_DIMENSIONS;
-		const sessionRpmSupportedFilters = CC.SESSION_RPM.SUPPORTED_FILTERS;
 
-		if (!isValidParams) return res.send({});
-		let reportsData = {};
-		let queryParams = _.cloneDeep(req.query);
+		const reportConfig = _.cloneDeep(req.query);
 		try {
-			// modify query object if PNP site.
-			queryParams = await modifyQueryIfPnp(queryParams);
-
-			const reportsResponse = await request({
-				uri: `${CC.ANALYTICS_API_ROOT}${CC.REPORT_PATH}`,
-				json: true,
-				qs: queryParams
-			});
-			if (!reportsResponse.code === 1 || !reportsResponse.data) return res.send({});
-
-			reportsData = reportsResponse.data;
-
-			const extraFiltersForSession = Object.keys(filters).filter(
-				filter => !sessionRpmSupportedFilters.includes(filter)
+			const { cacheHit, data: reportsData } = await reportsService.getReportsWithCache(
+				reportConfig,
+				bypassCache === 'true'
 			);
-
-			if (
-				!(dimension && !sessionRpmSupportedDimensions.includes(dimension)) &&
-				!extraFiltersForSession.length
-			) {
-				const sessionRpmReportsResponse = await request({
-					uri: `${CC.SESSION_RPM_REPORTS_API}`,
-					json: true,
-					qs: queryParams
-				});
-
-				if (sessionRpmReportsResponse.code === 1 && sessionRpmReportsResponse.data) {
-					const sessionRpmReportsData = sessionRpmReportsResponse.data;
-
-					const mergedData = mergeReportsWithSessionRpmData(
-						reportsData,
-						sessionRpmReportsData,
-						isSuperUser
-					);
-					reportsData = mergedData;
-				}
-			}
+			if (cacheHit) setCacheHeaders(res);
+			return sendSuccessResponse(reportsData, res, HTTP_STATUSES.OK);
 		} catch (err) {
-			console.log(err);
+			return sendErrorResponse({ message: err.message }, res, HTTP_STATUSES.BAD_REQUEST);
 		}
-
-		if (
-			Object.keys(reportsData).length &&
-			JSON.stringify(queryParams) === JSON.stringify(req.query)
-		) {
-			redisClient.setex(JSON.stringify(queryParams), 24 * 3600, JSON.stringify(reportsData));
-		}
-
-		return res.send(reportsData);
 	})
-	.get('/getWidgetData', cache, (req, res) => {
-		const { params, path } = req.query;
+	.get('/getWidgetData', reportsAccess, async (req, res) => {
+		const { params, path, bypassCache = 'false' } = req.query;
 		const reqParams = _.isString(params) ? JSON.parse(params) : {};
-		const { siteid, isSuperUser } = reqParams;
-		const isValidParams = !!(siteid || (isSuperUser && !siteid));
 
-		if (isValidParams)
-			return request({
-				uri: `${CC.ANALYTICS_API_ROOT}${path}`,
-				json: true,
-				qs: reqParams
-			})
-				.then(response => {
-					if (response.code == 1 && response.data) {
-						return res.send(response.data) && response.data;
-					}
-					return res.send({});
-				})
-				.then(data =>
-					// set data to redis
-					redisClient.setex(JSON.stringify(req.query), 24 * 3600, JSON.stringify(data))
-				)
-				.catch(err => {
-					console.log(err);
-					return res.send({});
-				});
-		return res.send({});
+		try {
+			const { data: widgetData, cacheHit } = await reportsService.getWidgetDataWithCache(
+				path,
+				reqParams,
+				bypassCache === 'true'
+			);
+			if (cacheHit) setCacheHeaders(res);
+			return res.json(widgetData);
+		} catch (err) {
+			return sendErrorResponse({ message: err.message }, res, HTTP_STATUSES.BAD_REQUEST);
+		}
 	})
 	.get('/downloadAdpushupReport', (req, res) => {
 		const { data, fileName } = req.query;
@@ -345,47 +90,22 @@ router
 				return res.send({});
 			})
 	)
-	.get('/getMetaData', cache, (req, res) => {
+	.get('/getMetaData', reportsAccess, async (req, res) => {
 		const {
-			query: { sites = '', isSuperUser = false }
+			query: { sites = '', isSuperUser = false, bypassCache = 'false' }
 		} = req;
-		const isValidParams = !!(sites || isSuperUser);
 
-		if (isValidParams) {
-			const params = { siteid: sites, isSuperUser };
-
-			return request({
-				uri: `${CC.ANALYTICS_API_ROOT}${CC.ANALYTICS_METAINFO_URL}`,
-				json: true,
-				qs: params
-			})
-				.then(response => {
-					const { code = -1, data } = response;
-					if (code !== 1) return Promise.reject(new Error(response.data));
-					return response.code == 1 && data ? res.send(data) && data : res.send({});
-				})
-				.then(data =>
-					// set data to redis
-					redisClient.setex(JSON.stringify(req.query), 24 * 3600, JSON.stringify(data))
-				)
-				.catch(err => {
-					const { message: errorMessage } = err;
-
-					const {
-						message = 'Something went wrong',
-						code = HTTP_STATUSES.INTERNAL_SERVER_ERROR
-					} = errorMessage;
-					return sendErrorResponse(
-						{
-							message
-						},
-						res,
-						code
-					);
-				});
+		try {
+			const { data: metaData, cacheHit } = await reportsService.getReportingMetaDataWithCache(
+				sites,
+				isSuperUser,
+				bypassCache === 'true'
+			);
+			if (cacheHit) setCacheHeaders(res);
+			return res.json(metaData);
+		} catch (err) {
+			return sendErrorResponse({ message: err.message }, res, HTTP_STATUSES.BAD_REQUEST);
 		}
-
-		return res.send({});
 	})
 	.get('/sections/generate', (req, res) => {
 		const { from, to, pagegroup } = req.query;
@@ -548,7 +268,7 @@ router
 			}
 
 			if (reportConfig.scheduleOptions && Object.keys(reportConfig.scheduleOptions).length) {
-				reportConfig = await Utils.initiateReportsSchedule(reportConfig, email);
+				reportConfig = await reportsService.initiateReportsSchedule(reportConfig, email);
 			}
 
 			const reportsConfig = await reportsModel.getSavedReportConfig(email);
@@ -610,9 +330,12 @@ router
 				updateConfiguration.scheduleOptions &&
 				Object.keys(updateConfiguration.scheduleOptions).length
 			) {
-				await Utils.cancelScheduledJob(existingConfigForId.scheduleOptions.jobId);
+				await reportsService.cancelScheduledJob(existingConfigForId.scheduleOptions.jobId);
 				updatedReportConfig.scheduleOptions = updateConfiguration.scheduleOptions;
-				updatedReportConfig = await Utils.initiateReportsSchedule(updatedReportConfig, email);
+				updatedReportConfig = await reportsService.initiateReportsSchedule(
+					updatedReportConfig,
+					email
+				);
 			}
 
 			const newSavedReports = reportsConfig.savedReports.map(report => {
@@ -667,7 +390,7 @@ router
 			if (!reportToDelete) throw new Error('Report not found');
 
 			if (reportToDelete.scheduleOptions && reportToDelete.scheduleOptions.jobId) {
-				await Utils.cancelScheduledJob(reportToDelete.scheduleOptions.jobId);
+				await reportsService.cancelScheduledJob(reportToDelete.scheduleOptions.jobId);
 			}
 
 			const newSavedReports = reportsConfig.savedReports.filter(report => report.id !== reportId);

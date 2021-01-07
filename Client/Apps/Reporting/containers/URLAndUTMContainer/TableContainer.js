@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
-import Table from '../../components/Table';
 import { UTM_METRICS } from '../../configs/commonConsts';
+import Table from '../../components/URLAndUTMReporting/Table';
 
 const mapStateToProps = (state, ownProps) => {
 	const {

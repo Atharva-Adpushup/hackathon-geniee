@@ -4,7 +4,6 @@ import {
 	updateGlobalReportMetaData
 } from '../../../actions/globalActions';
 import { showNotification } from '../../../actions/uiActions';
-import { overrideOpsPanelUniqueImpValue } from '../../../actions/userActions';
 import Report from '../components/Report';
 import { checkReportTypeGlobal } from '../../../helpers/commonFunctions';
 
@@ -35,8 +34,7 @@ const mapDispatchToProps = (dispatch, ownProps) => {
 		isForOps || isReportTypeGlobal ? updateGlobalReportMetaData : updateAccountReportMetaData;
 	const computedObject = {
 		updateReportMetaData: params => dispatch(updateReportMetaData(params)),
-		showNotification: data => dispatch(showNotification(data)),
-		overrideOpsPanelUniqueImpValue: data => dispatch(overrideOpsPanelUniqueImpValue(data))
+		showNotification: data => dispatch(showNotification(data))
 	};
 
 	return computedObject;

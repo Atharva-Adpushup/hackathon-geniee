@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import React from 'react';
 import sortBy from 'lodash/sortBy';
 import isEqual from 'lodash/isEqual';
@@ -6,10 +7,10 @@ import countBy from 'lodash/countBy';
 import map from 'lodash/map';
 
 import moment from 'moment';
+import CustomReactTable from '../../../Components/CustomReactTable/index';
 import { numberWithCommas, computeCsvData } from '../helpers/utils';
 import { reactTableSortMethod } from '../../../helpers/commonFunctions';
-import { columnsBlacklistedForAddition } from '../configs/commonConsts';
-import CustomReactTable from '../../../Components/CustomReactTable/index';
+import { columnsBlacklistedForAddition, extraMetricsListForHB } from '../configs/commonConsts';
 
 class Table extends React.Component {
 	constructor(props) {
@@ -53,7 +54,18 @@ class Table extends React.Component {
 		let tableColumns = [];
 		let sortedMetrics = [];
 
-		const { metrics, dimension, aggregatedData, isURLReport } = this.props;
+		const { metrics, dimension, aggregatedData, selectedDimension, isHB, isURLReport } = this.props;
+
+		// metrics is being fetched fom global data from table container
+		// actually this should be passed by parent component where we ca
+		// control which metrics/dimension to pass when needed
+		// added isHB flag and hardcoded metrics to display in table for HB only
+		if (isHB) {
+			extraMetricsListForHB.map(item => {
+				metrics[item.value] = item;
+				return item;
+			});
+		}
 
 		const { isDaily, isMonthly } = this.getDateIntervalValidators();
 		const computedDate = {
@@ -62,7 +74,7 @@ class Table extends React.Component {
 			sortable: isDaily,
 			Cell: props =>
 				isDaily ? <span>{moment(props.value).format('ll')}</span> : <span>{props.value}</span>,
-			Footer: 'Total',
+			Footer: !isHB ? 'Total' : '',
 			pivot: !isURLReport
 		};
 
@@ -82,20 +94,25 @@ class Table extends React.Component {
 						Footer: ''
 					});
 				} else {
-					tableColumns.push({
-						Header: dimension[column].display_name,
-						accessor: column,
-						sortable: true,
-						Footer: ''
-					});
+					// was getting some error - objects are not valid react child
+					// added this condition to fix that
+					// eslint-disable-next-line no-lonely-if
+					if (!columnsBlacklistedForAddition.includes(column)) {
+						tableColumns.push({
+							Header: dimension[column].display_name,
+							accessor: column,
+							sortable: true,
+							Footer: ''
+						});
+					}
 				}
 			}
 
 			if (metrics[column]) {
 				// eslint-disable-next-line camelcase
-				const { display_name: Header, table_position } = metrics[column];
-				let footerValue = total[`total_${column}`] || '';
-
+				let { display_name: Header, table_position } = metrics[column];
+				let width = 100;
+				let footerValue = total[`total_${column}`] || 0;
 				if (footerValue) {
 					switch (metrics[column].valueType) {
 						case 'money': {
@@ -106,10 +123,32 @@ class Table extends React.Component {
 							footerValue = `${numberWithCommas(footerValue.toFixed(2))}%`;
 							break;
 						}
+						case 'milliseconds': {
+							footerValue = `${numberWithCommas(footerValue.toFixed(2))} ms`;
+							break;
+						}
+
 						default: {
 							footerValue = numberWithCommas(footerValue);
 						}
 					}
+					// we need of footer for blacklisted cols
+					if (columnsBlacklistedForAddition.includes(column)) {
+						footerValue = '';
+					}
+				}
+
+				if (column === 'selectedDimensionColumn' && metrics[selectedDimension]) {
+					const mapping = {
+						country: 'Country',
+						device_type: 'Device Type'
+					};
+					Header = mapping[selectedDimension];
+					// eslint-disable-next-line camelcase
+					table_position = 1;
+				}
+				if (column === 'country' || column === 'device_type') {
+					width = 180;
 				}
 
 				sortedMetrics.push({
@@ -117,33 +156,74 @@ class Table extends React.Component {
 					accessor: column,
 					sortable: true,
 					table_position,
-					Footer: footerValue,
-					Cell: props =>
-						// eslint-disable-next-line no-nested-ternary
-						metrics[column].valueType === 'money' ? (
+					width,
+					Footer: !isHB ? footerValue : '',
+					Cell: props => {
+						return metrics[column].valueType === 'money' ? (
 							<span>${numberWithCommas(props.value)}</span>
 						) : metrics[column].valueType === 'percent' ? (
-							<span>{numberWithCommas(props.value)}%</span>
+							<span>{props.value}%</span>
 						) : metrics[column].valueType === 'url' ? (
 							<a rel="noopener noreferrer">{props.value}</a>
+						) : metrics[column].valueType === 'milliseconds' ? (
+							!props.aggregated ? (
+								<span>{numberWithCommas(props.value)} ms</span>
+							) : (
+								<span>{props.value} ms</span>
+							)
+						) : column === 'average_response_time' ? (
+							// hack: don't know but it was not working for this col so as to repeat it
+							!props.aggregated ? (
+								<span>{numberWithCommas(props.value)} ms</span>
+							) : (
+								<span>{props.value} ms</span>
+							)
+						) : (column === 'country' || column === 'device_type') &&
+						  props.value &&
+						  props.value instanceof Array ? (
+							props.value &&
+							props.value.map((val, index) => (
+								// eslint-disable-next-line react/no-array-index-key
+								<div key={index}>
+									<span>
+										{val[column]} {val.overall_net_revenue_percent.toFixed(2).replace(/\.00$/, '')}%
+									</span>
+								</div>
+							))
+						) : column === 'selectedDimensionColumn' && props.value && props.value ? (
+							// eslint-disable-next-line react/no-array-index-key
+							<div>
+								<span>{props.value}</span>
+							</div>
+						) : column === 'prebid_win_percent' && props.value && props.value instanceof Array ? (
+							props.value &&
+							props.value.map((val, index) => (
+								// eslint-disable-next-line react/no-array-index-key
+								<div key={index}>
+									<span>
+										{val.name} {val.percentage}%
+									</span>
+								</div>
+							))
 						) : (
-							<span>{numberWithCommas(props.value)}</span>
-						),
+							<span>{numberWithCommas(props.value || 0)}</span>
+						);
+					},
 					sortMethod: (a, b) => reactTableSortMethod(a, b),
+					// eslint-disable-next-line consistent-return
 					aggregate: (vals, rows) => {
 						let grouped = [];
-						// eslint-disable-next-line no-restricted-syntax
+						/* eslint-disable */
 						for (const key in aggregatedData) {
 							if (key === rows[0].date) {
-								// eslint-disable-next-line no-loop-func
 								aggregatedData[key].map(row => {
-									// eslint-disable-next-line no-restricted-syntax
 									for (const prop in row) {
-										if (!columnsBlacklistedForAddition.includes(prop) && prop === column)
-											grouped = !Number.isInteger(sum(aggregatedData[key].map(val => val[prop])))
-												? sum(aggregatedData[key].map(val => val[prop])).toFixed(2)
-												: sum(aggregatedData[key].map(val => val[prop]));
-										else if (prop === 'adpushup_ad_ecpm' && prop === column)
+										if (!columnsBlacklistedForAddition.includes(prop) && prop === column) {
+												return grouped = !Number.isInteger(sum(aggregatedData[key].map(val => val[prop])))
+													? sum(aggregatedData[key].map(val => val[prop])).toFixed(2)
+													: sum(aggregatedData[key].map(val => val[prop]));
+										}
+										if (prop === 'adpushup_ad_ecpm' && prop === column)
 											grouped = (
 												(sum(aggregatedData[key].map(val => val.network_net_revenue)) /
 													sum(aggregatedData[key].map(val => val.adpushup_impressions))) *
@@ -171,12 +251,71 @@ class Table extends React.Component {
 														sum(aggregatedData[key].map(val => val.adpushup_impressions)))) *
 												100
 											).toFixed(2);
+										else if (prop === 'prebid_win_percent' && prop === column)
+											grouped = (
+												(sum(aggregatedData[key].map(val => val.prebid_bid_win)) /
+													(sum(aggregatedData[key].map(val => val.prebid_bid_win)) +
+														sum(aggregatedData[key].map(val => val.prebid_bid_requests)))) *
+												100
+											).toFixed(2);
+										else if (prop === 'prebid_bid_ecpm' && prop === column)
+											grouped = (
+												(sum(aggregatedData[key].map(val => val.prebid_bid_revenue)) /
+													sum(aggregatedData[key].map(val => val.prebid_bid_received))) *
+												1000
+											).toFixed(2);
+										else if (prop === 'prebid_win_ecpm' && prop === column)
+											grouped = (
+												(sum(aggregatedData[key].map(val => val.prebid_win_revenue)) /
+													sum(aggregatedData[key].map(val => val.prebid_bid_win))) *
+												1000
+											).toFixed(2);
+										else if (prop === 'overall_win_ecpm' && prop === column)
+											grouped = (
+												(sum(aggregatedData[key].map(val => val.overall_net_revenue)) /
+													sum(aggregatedData[key].map(val => val.overall_bid_win))) *
+												1000
+											).toFixed(2);
+										else if (prop === 'overall_win_percent' && prop === column)
+											grouped = (
+												(sum(aggregatedData[key].map(val => val.overall_bid_win)) /
+													(sum(aggregatedData[key].map(val => val.overall_bid_win)) +
+														sum(aggregatedData[key].map(val => val.prebid_bid_requests)))) *
+												100
+											).toFixed(2);
+										else if (prop === 'prebid_timeouts_percentage' && prop === column)
+											grouped = (
+												(sum(aggregatedData[key].map(val => val.prebid_bid_timeouts)) /
+													(sum(aggregatedData[key].map(val => val.prebid_bid_timeouts)) +
+														sum(aggregatedData[key].map(val => val.prebid_bid_requests)))) *
+												100
+											).toFixed(2);
+										else if (prop === 'bid_rate' && prop === column) {
+											grouped = (
+												(sum(aggregatedData[key].map(val => val.prebid_bid_received)) /
+													(sum(aggregatedData[key].map(val => val.prebid_bid_received)) +
+														sum(aggregatedData[key].map(val => val.prebid_bid_requests)))) *
+												100
+											).toFixed(2);
+										}
+										else if (prop === 'country' && prop === column) {
+											grouped = this.processAndreduceEntityWiseData(aggregatedData[key], 'country')
+										} else if (prop === 'device_type' && prop === column) {
+											grouped = this.processAndreduceEntityWiseData(aggregatedData[key], 'device_type')
+										} else if (prop === 'selectedDimensionColumn' && prop === column) {
+											grouped = aggregatedData[key].map(val => val.selectedDimensionColumn).join(',')
+										} else if (prop === 'average_response_time' && prop === column) {
+											grouped = (
+												sum(aggregatedData[key].map(val => val.average_response_time)) / aggregatedData[key].length
+											).toFixed(2)
+										}
 										else if (prop === 'adpushup_count_percent' && prop === column) grouped = 100;
 									}
 								});
 								return grouped;
 							}
 						}
+						/* eslint-enable */
 					}
 				});
 			}
@@ -192,6 +331,58 @@ class Table extends React.Component {
 		tableColumns = [...tableColumns, ...sortedMetrics];
 
 		return tableColumns;
+	};
+
+	processAndreduceEntityWiseData = (aggregatedData, entity) => {
+		const entityObj = {};
+		// get sum of overall net revenue for each entity and for each date
+		// eslint-disable-next-line array-callback-return
+		let totalRevenue = 0;
+		const entityBasedRevenue = {};
+		aggregatedData.map(row => {
+			row[entity].map(item => {
+				if (!entityObj[item[entity]]) {
+					entityObj[item[entity]] = [];
+					entityBasedRevenue[item[entity]] = 0;
+				}
+				entityObj[item[entity]].push(item);
+			});
+
+			Object.keys(entityObj).map(entityItem => {
+				const totalEntityWiseRevenue = entityObj[entityItem].reduce((acc, item) => {
+					// eslint-disable-next-line no-param-reassign
+					acc += item.overall_net_revenue;
+					return acc;
+				}, 0);
+				// entityObj[country] = totalEntityWiseRevenue;
+				if (!entityBasedRevenue[entityItem]) {
+					entityBasedRevenue[entityItem] = {
+						[entity]: entityItem,
+						totalEntityWiseRevenue: 0
+					};
+				}
+				entityBasedRevenue[entityItem].totalEntityWiseRevenue += totalEntityWiseRevenue;
+				totalRevenue += totalEntityWiseRevenue;
+			});
+		});
+
+		return (
+			Object.keys(entityBasedRevenue)
+				.map(entityItem => {
+					entityBasedRevenue[entityItem].totalEntityWiseRevenuePerc =
+						(entityBasedRevenue[entityItem].totalEntityWiseRevenue / totalRevenue) * 100;
+					return entityBasedRevenue[entityItem];
+				})
+				.map(item => ({
+					[entity]: item[entity],
+					overall_net_revenue_percent: item.totalEntityWiseRevenuePerc
+				}))
+				// sort with percentage
+				.sort(
+					(a, b) => Number(b.overall_net_revenue_percent) - Number(a.overall_net_revenue_percent)
+				)
+				.splice(0, 5)
+		); // get top 5 results
 	};
 
 	getTableBody = tableBody => {
@@ -244,9 +435,9 @@ class Table extends React.Component {
 			if (tableRow.siteid) {
 				const { siteid } = tableRow;
 
-				if (site) {
+				if (site && site[siteid]) {
 					tableRow.siteName = React.cloneElement(
-						<a href={`/reports/${siteid}`}>{tableRow.site}</a>
+						<a href={`/reports/${siteid}`}>{site[siteid].siteName}</a>
 					);
 				} else return;
 
@@ -303,9 +494,9 @@ class Table extends React.Component {
 
 	render() {
 		const { tableBody, tableColumns, tableData } = this.state;
-		const { isURLReport, onPageSizeChange, onPageChange } = this.props;
+		const { isURLReport, onPageSizeChange, onPageChange, isHB } = this.props;
 
-		// don't need aggregation for URL Report
+		// don't need aggregation for HB and URL Report
 		const showAggregation = !isURLReport ? this.checkForAggregation(tableBody) : false;
 
 		const onSortFunction = {
@@ -333,7 +524,6 @@ class Table extends React.Component {
 				return moment(columnValue, 'll').valueOf();
 			}
 		};
-
 		if (tableData && tableData.result && tableData.result.length > 0)
 			return (
 				<React.Fragment>

@@ -4,6 +4,7 @@ import {
 	SITE_ACTIONS,
 	REPORTS_ACTIONS,
 	URL_REPORTS_ACTIONS,
+	HB_ANALYTICS_ACTIONS,
 	UI_ACTIONS
 } from '../constants/global';
 import axiosInstance from '../helpers/axiosInstance';
@@ -47,6 +48,12 @@ const updateGlobalURLReportsMetaData = data => dispatch =>
 		data
 	});
 
+const updateGlobalHBAnalyticMetaData = data => dispatch =>
+	dispatch({
+		type: HB_ANALYTICS_ACTIONS.REPLACE_GLOBAL_HB_ANALYTIC_DATA,
+		data
+	});
+
 const updateNetworkConfig = (config, dataForAuditLogs) => dispatch =>
 	axiosInstance
 		.post('/updateNetworkConfig', { config, dataForAuditLogs })
@@ -71,5 +78,6 @@ export {
 	updateNetworkConfig,
 	updateGlobalReportMetaData,
 	updateAccountReportMetaData,
-	updateGlobalURLReportsMetaData
+	updateGlobalURLReportsMetaData,
+	updateGlobalHBAnalyticMetaData
 };

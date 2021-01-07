@@ -13,28 +13,33 @@ import ActionCard from '../../../Components/ActionCard/index';
 import Empty from '../../../Components/Empty/index';
 import ControlContainer from '../containers/ControlContainer';
 import TableContainer from '../containers/TableContainer';
-import ChartContainer from '../containers/ChartContainer';
-import FilterLegend from './FilterLegend';
-import reportService from '../../../services/reportService';
+import ChartContainer from '../containers/HBAnalytics/ChartContainer';
+import BidCPMStatChartContainer from '../containers/HBAnalytics/BidCPMStatChartContainer';
+import hbAnalyticService from '../../../services/hbAnalyticService';
+import CustomToggle from './HBAnalytics/CustomToggle';
+
+import {
+	displayHBMetrics,
+	displayHBCharts,
+	extraMetricsListForHB,
+	extraMetricsListMappingForHBArray,
+	opsDimension,
+	opsFilter,
+	REPORT_INTERVAL_TABLE_KEYS,
+	columnsBlacklistedForAddition,
+	PIVOT,
+	MUST_HAVE_COLS,
+	BID_CPM_STATS_BUCKET_MODE,
+	ANOMALY_THRESHOLD_CONSTANT
+} from '../configs/commonConsts';
 import { DEMO_ACCOUNT_DATA } from '../../../constants/others';
 import Loader from '../../../Components/Loader';
 import { convertObjToArr, roundOffTwoDecimal } from '../helpers/utils';
 import {
 	getReportingDemoUserValidation,
 	getReportingDemoUserSiteIds,
-	getDemoUserSites,
-	isSameScheduleOptions
+	getDemoUserSites
 } from '../../../helpers/commonFunctions';
-import {
-	displayMetrics,
-	displayOpsMetrics,
-	displayUniqueImpressionMetrics,
-	opsDimension,
-	opsFilter,
-	REPORT_INTERVAL_TABLE_KEYS,
-	columnsBlacklistedForAddition,
-	DEFAULT_ERROR_MESSAGE
-} from '../configs/commonConsts';
 
 function oldConsoleRedirection(e) {
 	e.preventDefault();
@@ -49,17 +54,25 @@ function oldConsoleRedirection(e) {
 class Report extends Component {
 	constructor(props) {
 		super(props);
+		const selectedMetrics = displayHBMetrics
+			.filter(metrics => metrics.visible)
+			.map(metrics => metrics.value);
+
 		this.state = {
 			dimensionList: [],
 			filterList: [],
 			intervalList: [],
-			metricsList: props.isForOps ? displayOpsMetrics : displayMetrics,
-			selectedDimension: '',
+			displayHBCharts,
+			chartData: [],
+			displayHBMetrics,
+			metricsList: [],
+			selectedDimension: PIVOT,
 			selectedFilters: {},
-			selectedFilterValues: {},
-			selectedMetrics: [],
+			selectedMetrics: selectedMetrics || [],
+			selectedCharts: [],
 			selectedInterval: 'daily',
 			selectedChartLegendMetric: '',
+			prevGraphData: {},
 			startDate: moment()
 				.startOf('day')
 				.subtract(7, 'days')
@@ -72,19 +85,15 @@ class Report extends Component {
 			csvData: [],
 			reportType: props.reportType || 'account',
 			isLoading: true,
-			isError: false,
-			errorMessage: '',
 			isValidSite: true,
 			isReportingSite: true,
-			show: true,
-			savedReports: [],
-			selectedReport: null,
-			selectedReportName: ''
+			isDefaultBucketEnabled: true,
+			show: true
 		};
 	}
 
 	componentDidMount() {
-		const { userSites, updateReportMetaData, reportsMeta, isForOps } = this.props;
+		const { userSites, updateReportMetaData, hbAnalyticsMeta, isForOps } = this.props;
 		const { email, reportType } = this.getDemoUserParams();
 
 		let userSitesStr = '';
@@ -100,37 +109,29 @@ class Report extends Component {
 			isSuperUser = true;
 		}
 
-		const params = { sites: userSitesStr };
-		// eslint-disable-next-line no-unused-expressions
-		isSuperUser ? (params.isSuperUser = isSuperUser) : null;
-
-		this.getSavedReports();
-		if (!reportsMeta.fetched) {
-			return reportService
-				.getMetaData(params)
+		const { showNotification } = this.props;
+		if (!hbAnalyticsMeta.fetched) {
+			return hbAnalyticService
+				.getMetaData({ sites: userSitesStr, isSuperUser, product: 'hb-analytics' })
 				.then(response => {
 					let { data: computedData } = response;
-
 					computedData = getDemoUserSites(computedData, email);
 					updateReportMetaData(computedData);
 					return this.getContentInfo(computedData);
 				})
-				.catch(this.handleError);
+				.catch(err => {
+					// eslint-disable-next-line no-console
+					console.error(err);
+					showNotification({
+						mode: 'error',
+						title: 'Error',
+						message: 'Network Error - Failed to load Meta'
+					});
+				});
 		}
-		return this.getContentInfo(reportsMeta.data);
-	}
 
-	handleError = err => {
-		const {
-			user: { data: user }
-		} = this.props;
-		const isAdmin = !!user.isSuperUser;
-		const errorMessage =
-			err && err.response && err.response.data && err.response.data.data && isAdmin
-				? err.response.data.data.data || err.response.data.data.message || DEFAULT_ERROR_MESSAGE
-				: DEFAULT_ERROR_MESSAGE;
-		this.setState({ isLoading: false, isError: true, errorMessage });
-	};
+		return this.getContentInfo(hbAnalyticsMeta.data);
+	}
 
 	removeOpsFilterDimension = (filterList, dimensionList) => {
 		const updatedFilterList = [];
@@ -168,13 +169,13 @@ class Report extends Component {
 		const computedMetricsList = metricsList || metricsListFromState;
 
 		const {
-			reportsMeta,
+			hbAnalyticsMeta,
 			user: {
 				data: { isSuperUser }
 			}
 		} = this.props;
 
-		const { dimension: dimensionListObj, filter: filterListObj } = reportsMeta.data;
+		const { dimension: dimensionListObj, filter: filterListObj } = hbAnalyticsMeta.data;
 		const dimensionList = convertObjToArr(dimensionListObj);
 		const filterList = convertObjToArr(filterListObj);
 		const { updatedDimensionList, updatedFilterList } = isSuperUser
@@ -203,25 +204,26 @@ class Report extends Component {
 		};
 	};
 
-	onControlChange = (data, reportType, resetSavedReport = true) => {
+	onControlChange = (data, reportType) => {
 		const params = this.getControlChangedParams({ ...data, reportType });
-		const { selectedFilterValues, selectedReport } = this.state;
-		const newStateData = { ...data };
-		if (data.selectedFilterKey && data.selectedFilterValues) {
-			newStateData.selectedFilterValues = {
-				...selectedFilterValues,
-				[newStateData.selectedFilterKey]: [...newStateData.selectedFilterValues]
-			};
-			delete newStateData.selectedFilterKey;
-		}
+		const { selectedMetrics, selectedCharts } = data;
+		const { selectedCharts: charts } = data;
+		// eslint-disable-next-line no-shadow
+		const { displayHBCharts } = this.state;
 
-		const newSelectedReport = !resetSavedReport ? selectedReport : null;
+		const updatedChartList = displayHBCharts.map(item => {
+			// eslint-disable-next-line no-param-reassign
+			item.visible = charts.indexOf(item.value) !== -1;
+			return item;
+		});
 
 		this.setState({
-			...newStateData,
+			...data,
 			...params,
 			reportType,
-			selectedReport: newSelectedReport
+			selectedMetrics,
+			displayHBCharts: updatedChartList,
+			selectedCharts
 		});
 	};
 
@@ -239,8 +241,8 @@ class Report extends Component {
 
 	getControlChangedParams = (controlParams, metricsList) => {
 		const { selectedDimension, selectedFilters, reportType } = controlParams;
-		const { reportsMeta } = this.props;
-		const { dimension: dimensionList, filter: filterList } = reportsMeta.data;
+		const { hbAnalyticsMeta } = this.props;
+		const { dimension: dimensionList, filter: filterList } = hbAnalyticsMeta.data;
 		let disabledFilter = [];
 		let disabledDimension = [];
 		let disabledMetrics = [];
@@ -289,8 +291,8 @@ class Report extends Component {
 		const { email, reportType } = this.getDemoUserParams();
 		let selectedMetrics;
 
-		if (metricsList) {
-			selectedMetrics = displayMetrics.map(metric => metric.value);
+		if (metricsList && !isCustomizeChartLegend) {
+			selectedMetrics = displayHBMetrics.map(metric => metric.value);
 		}
 
 		if (metricsList && isCustomizeChartLegend) {
@@ -303,7 +305,7 @@ class Report extends Component {
 			fromDate: moment(startDate).format('YYYY-MM-DD'),
 			toDate: moment(endDate).format('YYYY-MM-DD'),
 			interval: selectedInterval,
-			dimension: selectedDimension || null
+			dimension: selectedDimension
 		};
 
 		if (!isCustomizeChartLegend) {
@@ -335,22 +337,224 @@ class Report extends Component {
 		return params;
 	};
 
+	domainFromUrl = url => {
+		const match = url.match(/^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n\?\=]+)/im);
+		if (match) {
+			return match[1];
+		}
+		return url;
+	};
+
+	allItemsInLocalStorage = () => {
+		const archive = {};
+		const keys = Object.keys(localStorage);
+
+		keys.map(key => {
+			archive[key] = localStorage.getItem(key);
+		});
+
+		return archive;
+	};
+
+	removeAllItemsInLocalStorage = () => {
+		const keys = Object.keys(localStorage);
+		keys.map(key => {
+			localStorage.removeItem(key);
+		});
+	};
+
+	generateBidCPMStatsChart = (bidCPMStatsChartData, isDefaultBucketEnabled) => {
+		const { startDate, endDate, selectedInterval } = this.state;
+		const { userSites } = this.props;
+		const DEFAULT_BUCKET_SIZE = 0.05;
+		const bucketSize = isDefaultBucketEnabled ? DEFAULT_BUCKET_SIZE : 0.01;
+
+		let siteIds = Object.keys(userSites);
+		siteIds = siteIds.toString();
+
+		// check cache for particular bucket size
+		// in that we will have data with calculation based on bucket
+		const dataFromCache = localStorage.getItem(`${selectedInterval}-${startDate}-${endDate}-${siteIds}:${bucketSize}`);
+		if (dataFromCache) {
+			return JSON.parse(dataFromCache).cacheData || [];
+		}
+
+		// it is possible that data was cached but bucket is different
+		// so in this case we have to do calculations again.
+		let {
+			data: { result }
+		} = bidCPMStatsChartData.cacheData || bidCPMStatsChartData;
+		result = sortBy(result, ['cpm', 'report_date']);
+
+		// process data - aggregate based on siteId First
+		const obj = {};
+		result.map(item => {
+			if (!obj[item.siteid]) {
+				obj[item.siteid] = {};
+			}
+			if (obj[item.siteid] && !obj[item.siteid][item.cpm]) {
+				obj[item.siteid][item.cpm] = [];
+			}
+			obj[item.siteid][item.cpm].push(item);
+			return item;
+		});
+
+		const xAxis = Array(...new Array(20 / bucketSize)).map((_el, i) => {
+			// eslint-disable-next-line no-param-reassign
+			i *= bucketSize;
+			return +i.toFixed(2);
+		});
+		const yAxis = [];
+		Object.keys(obj).map(siteId => {
+			const series = {
+				name: this.domainFromUrl(userSites[siteId].siteDomain),
+				data: []
+			};
+			xAxis.map(bucketItem => {
+				// let totalBidsReceived = 0;
+				let totalBidsWon = 0;
+				// eslint-disable-next-line no-unused-expressions
+				obj[siteId][bucketItem] &&
+					obj[siteId][bucketItem].map(item => {
+						totalBidsWon += item.total_bids_won;
+					});
+				series.data.push(totalBidsWon);
+			});
+			yAxis.push(series);
+		});
+
+		try {
+			localStorage.setItem(
+				`${selectedInterval}-${startDate}-${endDate}-${siteIds}:${bucketSize}`,
+				JSON.stringify({
+					expiry: moment()
+						.startOf('day')
+						.add(2, 'days'),
+					cacheData: [xAxis, yAxis]
+				})
+			);
+		} catch (e) {
+			// fires When localstorage gets full
+			// you can handle error here or empty the local storage
+			console.warn('Local Storage is full, clenaing up...');
+			this.removeAllItemsInLocalStorage();
+			console.warn('Local Storage is available now.');
+		}
+		return [xAxis, yAxis];
+	};
+
 	generateButtonHandler = (inputState = {}) => {
-		let { tableData, metricsList, selectedFilterValues } = this.state;
-		const { selectedDimension, selectedFilters, dimensionList } = this.state;
+		let { tableData } = this.state;
+		// eslint-disable-next-line no-shadow
+		const {
+			selectedDimension,
+			selectedFilters,
+			dimensionList,
+			displayHBMetrics,
+			isDefaultBucketEnabled,
+			selectedInterval,
+			prevGraphData
+		} = this.state;
 		const { reportType, isForOps } = this.props;
 		const computedState = Object.assign({ isLoading: true }, inputState);
-		const prevMetricsList = metricsList;
 
 		this.setState(computedState, () => {
 			let newState = {};
 			const params = this.formateReportParams();
+			let chartData = [];
 
-			reportService
-				.getCustomStats(params)
-				.then(response => {
-					if (Number(response.status) === 200 && response.data && !response.data.error) {
-						tableData = response.data.data;
+			const { fromDate, toDate, siteid } = params;
+			const DEFAULT_BUCKET_SIZE = 0.05;
+			const bucketSize = isDefaultBucketEnabled ? DEFAULT_BUCKET_SIZE : 0.01;
+			const allItems = this.allItemsInLocalStorage();
+
+			Object.keys(allItems).map(item => {
+				const parsedItem = JSON.parse(allItems[item]);
+				if (parsedItem.expiry) {
+					const toBeExpiredAfter = +new Date(parsedItem.expiry);
+					if (toBeExpiredAfter < Date.now()) {
+						localStorage.removeItem(item);
+					}
+				}
+			});
+
+			const dataFromCache = localStorage.getItem(`${selectedInterval}-${fromDate}-${toDate}-${siteid}:${bucketSize}`);
+			const { showNotification } = this.props;
+
+			let cacheKey = `${selectedInterval}-${fromDate}-${toDate}-${JSON.stringify(selectedFilters)}`
+			let cacheDataForGraph = prevGraphData[cacheKey];
+			Promise.all([
+				dataFromCache
+					? JSON.parse(dataFromCache).cacheData || []
+					: hbAnalyticService.getBidCPMStatsGraphData({
+							fromDate,
+							toDate,
+							siteid
+					  }),
+				hbAnalyticService.getCustomStats({
+					...params
+				}),
+				cacheDataForGraph ? Promise.resolve(cacheDataForGraph): hbAnalyticService.getCustomStats({
+					...params,
+					dimension: 'network'
+				})
+			])
+				.then(([responseBidCPMChartData, response, responseCharts]) => {
+					if(!cacheDataForGraph) {
+						prevGraphData[cacheKey] = {...responseCharts};
+					}
+					const [xAxis, yAxis] = dataFromCache
+						? responseBidCPMChartData
+						: this.generateBidCPMStatsChart(responseBidCPMChartData, isDefaultBucketEnabled);
+
+					if (dataFromCache) {
+						// eslint-disable-next-line no-param-reassign
+						responseBidCPMChartData = JSON.parse(
+							localStorage.getItem(`raw-${selectedInterval}-${fromDate}-${toDate}-${siteid}:${bucketSize}`) || '{}'
+						);
+					} else {
+						try {
+							// cache raw data for in future processing
+							localStorage.setItem(
+								`raw-${selectedInterval}-${fromDate}-${toDate}-${siteid}:${bucketSize}`,
+								JSON.stringify({
+									expiry: moment()
+										.startOf('day')
+										.add(2, 'days'),
+									cacheData: responseBidCPMChartData
+								})
+							);
+						} catch (e) {
+							// fires When localstorage gets full
+							// you can handle error here or empty the local storage
+							console.warn('Local Storage is full, clenaing up...');
+							this.removeAllItemsInLocalStorage();
+							console.warn('Local Storage is available now.');
+						}
+					}
+
+					if (Number(response.status) === 200 && response.data) {
+						chartData = responseCharts.data.result || [];
+						tableData = response.data;
+
+						MUST_HAVE_COLS.map(col => {
+							if (!tableData.columns.includes(col)) {
+								tableData.columns.push(col);
+							}
+						});
+
+						tableData.result = (tableData.result || []).map(item => {
+							if (item.topCountries && item.topDevices) {
+								item.country = [...item.topCountries];
+								item.device_type = [...item.topDevices];
+								if (MUST_HAVE_COLS.includes(selectedDimension)) {
+									// dont' mutate the orig array
+									const entity = [...item[selectedDimension]].shift();
+									item.selectedDimensionColumn = entity[selectedDimension];
+								}
+							}
+							return item;
+						});
 
 						const shouldAddAdpushupCountPercentColumn =
 							(selectedDimension === 'mode' ||
@@ -410,9 +614,10 @@ class Report extends Component {
 							Object.keys(row).forEach(column => {
 								if (
 									REPORT_INTERVAL_TABLE_KEYS.indexOf(column) === -1 &&
+									extraMetricsListMappingForHBArray.indexOf(column) === -1 &&
 									!Number.isNaN(row[column]) &&
-									!dimensionList.find(dimension => dimension.value === column) &&
-									column !== 'site'
+									// eslint-disable-next-line no-shadow
+									!dimensionList.find(dimension => dimension.value === column)
 								) {
 									// eslint-disable-next-line no-param-reassign
 									row[column] = parseFloat(roundOffTwoDecimal(row[column]));
@@ -420,33 +625,24 @@ class Report extends Component {
 							});
 						});
 
-						Object.keys(tableData.total).forEach(column => {
+						Object.keys(tableData.total || {}).forEach(column => {
 							tableData.total[column] = parseFloat(roundOffTwoDecimal(tableData.total[column]));
 						});
 
 						if (tableData.columns && tableData.columns.length) {
-							metricsList = this.getMetricsList(tableData);
-							// we need to persist user column selection when user
-							// generates report multiple times.
-							// for that we will check users previous selection, if it
-							// is different from default list override default wit
-							// previous values
-							if (isForOps && prevMetricsList.length !== metricsList.length) {
-								metricsList = [...prevMetricsList];
-							} else if (isForOps) {
-								// for same length we need to check for individual value
-								const listPrevColList = prevMetricsList
-									.map(item => item.value)
-									.sort()
-									.join();
-								const defaultPrevColList = metricsList
-									.map(item => item.value)
-									.sort()
-									.join();
-								if (listPrevColList !== defaultPrevColList) {
-									metricsList = [...prevMetricsList];
-								}
-							}
+							let metricsList = this.getMetricsList(tableData);
+
+							// device and country are not by default a metrics
+							// and as per requirement default selected dimension is bidder
+							// but we need to show country, devices data all the time regardless of
+							// selected dimension/metrics
+							metricsList = [...metricsList, ...extraMetricsListForHB];
+
+							// this is for metrics dropdown
+							// show only metrices that are in displayHBMetricsList
+							const metricNameList = displayHBMetrics.map(metrics => metrics.value);
+							metricsList = metricsList.filter(metrics => metricNameList.includes(metrics.value));
+
 							newState = { ...newState, metricsList };
 						}
 					}
@@ -454,13 +650,28 @@ class Report extends Component {
 					newState = {
 						...newState,
 						isLoading: false,
-						isError: false,
 						tableData,
-						selectedFilterValues
+						chartData,
+						bidCPMStatsChartData: {
+							xAxis,
+							yAxis,
+							label: 'Bid Landscape'
+						},
+						responseBidCPMChartData,
+						prevGraphData: {...prevGraphData}
 					};
-					this.setState(newState);
+					// don't set state here, as we also need to update charts
+					this.getChartsData(newState);
 				})
-				.catch(this.handleError);
+				.catch(err => {
+					// eslint-disable-next-line no-console
+					console.log(err);
+					showNotification({
+						mode: 'error',
+						title: 'Error',
+						message: 'Network Request Failed'
+					});
+				}); // TypeError: failed to fetch (the text may vary)
 		});
 	};
 
@@ -485,45 +696,30 @@ class Report extends Component {
 	 * - remove unselectable items (given in meta)
 	 * - sort by chart position (given in meta)
 	 * - pick first 5
-	 * @memberof Panel
+	 * @memberof Report
 	 */
 	getMetricsList = tableData => {
-		const {
-			reportsMeta,
-			isForOps,
-			user: {
-				data: { isUniqueImpEnabled = false }
-			}
-		} = this.props;
+		const { hbAnalyticsMeta } = this.props;
+
 		const filteredMetrics = tableData.columns.filter(metric => {
-			const isDimension = !!reportsMeta.data.dimension[metric];
+			const isDimension = !!hbAnalyticsMeta.data.dimension[metric];
 			const isBlacklistedMetric = REPORT_INTERVAL_TABLE_KEYS.indexOf(metric) !== -1;
 			const isSelectableMetric =
-				reportsMeta.data.metrics[metric] && reportsMeta.data.metrics[metric].selectable;
+				hbAnalyticsMeta.data.metrics[metric] && hbAnalyticsMeta.data.metrics[metric].selectable;
 
 			return !isDimension && !isBlacklistedMetric && isSelectableMetric;
 		});
 
-		const sortedMetaMetrics = this.getSortedMetaMetrics(reportsMeta.data.metrics);
+		const sortedMetaMetrics = this.getSortedMetaMetrics(hbAnalyticsMeta.data.metrics);
 
-		let computedMetrics = [];
+		const computedMetrics = [];
 
 		sortedMetaMetrics.forEach(metaMetric => {
 			const { name, value, valueType } = metaMetric;
 			if (filteredMetrics.indexOf(value) !== -1) computedMetrics.push({ name, value, valueType });
 		});
+		// computedMetrics.splice(5);
 
-		let match = displayMetrics.map(item => item.value);
-		if (isForOps) {
-			match = displayOpsMetrics.map(item => item.value);
-			computedMetrics = computedMetrics.filter(item => match.indexOf(item.value) !== -1);
-		} else {
-			// check if unique imp is checked
-			if (isUniqueImpEnabled) {
-				match = displayUniqueImpressionMetrics.map(item => item.value);
-			}
-			computedMetrics = computedMetrics.filter(item => match.indexOf(item.value) !== -1);
-		}
 		return computedMetrics;
 	};
 
@@ -590,10 +786,6 @@ class Report extends Component {
 			).toFixed(2);
 		}
 
-		if (total.hasOwnProperty('total_session_rpm')) {
-			total.total_session_rpm /= tableRows.length;
-		}
-
 		if (total.hasOwnProperty('total_adpushup_count_percent')) {
 			delete total.total_adpushup_count_percent;
 		}
@@ -602,40 +794,15 @@ class Report extends Component {
 	};
 
 	updateMetrics = (newMetrics = []) => {
-		const { reportsMeta, isForOps, overrideOpsPanelUniqueImpValue } = this.props;
-		const sortedMetaMetrics = this.getSortedMetaMetrics(reportsMeta.data.metrics);
-		let sortedMetrics = [];
-		if (isForOps) {
-			sortedMetaMetrics.forEach(metaMetric => {
-				const foundMetric = newMetrics.find(newMetric => newMetric.value === metaMetric.value);
+		const { hbAnalyticsMeta } = this.props;
+		const sortedMetaMetrics = this.getSortedMetaMetrics(hbAnalyticsMeta.data.metrics);
+		const sortedMetrics = [];
 
-				if (foundMetric) sortedMetrics.push(foundMetric);
-			});
-		} else {
-			const found = newMetrics.filter(item => item.value === 'unique_impressions');
-			// if unique impression selected
-			if (found.length) {
-				const match = displayUniqueImpressionMetrics.map(item => item.value);
-				sortedMetrics = sortedMetaMetrics.filter(item => match.indexOf(item.value) !== -1);
-				// temp code for unqiue imp selection in dashboard from this component
-				overrideOpsPanelUniqueImpValue({ isUniqueImpEnabled: true });
-			} else {
-				const match = displayMetrics.map(item => item.value);
-				sortedMetrics = sortedMetaMetrics.filter(item => match.indexOf(item.value) !== -1);
-				// temp code for unqiue imp selection in dashboard from this component
-				overrideOpsPanelUniqueImpValue({ isUniqueImpEnabled: false });
-			}
+		sortedMetaMetrics.forEach(metaMetric => {
+			const foundMetric = newMetrics.find(newMetric => newMetric.value === metaMetric.value);
 
-			const sessionMetrics = newMetrics.filter(
-				item => item.value === 'session_rpm' || item.value === 'user_sessions'
-			);
-			if (sessionMetrics.length) {
-				sortedMetaMetrics.forEach(metaMetric => {
-					const foundMetric = sessionMetrics.find(metric => metric.value === metaMetric.value);
-					if (foundMetric) sortedMetrics.push(foundMetric);
-				});
-			}
-		}
+			if (foundMetric) sortedMetrics.push(foundMetric);
+		});
 
 		this.setState({ metricsList: sortedMetrics });
 	};
@@ -646,7 +813,7 @@ class Report extends Component {
 
 	renderEmptyMessage = msg => <Empty message={msg} />;
 
-	getContentInfo = reportsMetaData => {
+	getContentInfo = hbAnalyticsMetaData => {
 		let {
 			selectedDimension,
 			selectedFilters,
@@ -656,6 +823,12 @@ class Report extends Component {
 			startDate,
 			endDate
 		} = this.state;
+		// eslint-disable-next-line no-shadow
+		const { displayHBCharts } = this.state;
+
+		const _displayHBCharts = JSON.parse(JSON.stringify(displayHBCharts));
+		const selectedCharts = _displayHBCharts.filter(item => item.visible).map(item => item.value);
+
 		const {
 			match: {
 				params: { siteId }
@@ -664,7 +837,7 @@ class Report extends Component {
 			userSites
 		} = this.props;
 		const { email } = this.getDemoUserParams();
-		const { site: reportingSites, interval: intervalsObj } = reportsMetaData;
+		const { site: reportingSites, interval: intervalsObj } = hbAnalyticsMetaData;
 		const selectedControls = qs.parse(queryParams);
 		const isValidSite = !!(userSites && userSites[siteId] && userSites[siteId].siteDomain);
 		const isReportingData = !!reportingSites;
@@ -718,15 +891,119 @@ class Report extends Component {
 				dimensionList,
 				filterList,
 				metricsList,
-				intervalList
+				intervalList,
+				selectedCharts
 			},
 			this.generateButtonHandler
 		);
 	};
 
+	getChartsData = newState => {
+		// eslint-disable-next-line no-shadow
+		const { displayHBCharts, selectedDimension } = this.state;
+		let _displayHBCharts = JSON.parse(JSON.stringify(displayHBCharts));
+
+		const dimensionWiseData = {};
+		newState.chartData.map(item => {
+			if (!dimensionWiseData[item[PIVOT]]) {
+				dimensionWiseData[item[PIVOT]] = [];
+			}
+			dimensionWiseData[item[PIVOT]].push(item);
+			return item;
+		});
+
+		_displayHBCharts = _displayHBCharts.map(chart => {
+			const chartData = {};
+			if (chart.type === 'pie') {
+				// eslint-disable-next-line array-callback-return
+				Object.keys(dimensionWiseData).map(key => {
+					if (!chartData[key]) {
+						chartData[key] = { prebid_bid_win: 0 };
+					}
+					// eslint-disable-next-line array-callback-return
+					dimensionWiseData[key].map(item => {
+						// check for if HB Analytics is enbaled or not
+						// iif not then prebid_bid_requests would be 0
+						if (item.prebid_bid_requests) {
+							chartData[key].name = key;
+							chartData[key].prebid_bid_win += item.prebid_bid_win;
+						}
+					});
+				});
+				// get total of prebid_bid_win
+				let totalWin = 0;
+				// eslint-disable-next-line array-callback-return
+				Object.keys(chartData).map(each => {
+					totalWin += chartData[each].prebid_bid_win;
+				});
+				// percentage of pre bid win for each Bidder as per total prebid win
+				Object.keys(chartData).map(each => {
+					chartData[each].overAllPer =
+						((totalWin && chartData[each].prebid_bid_win / totalWin) || 0) * 100;
+				});
+
+				// now our data is ready to be feed in a Pie chart
+				// eslint-disable-next-line no-param-reassign
+				chart.data = Object.keys(chartData).map(key => ({
+					name: chartData[key].name,
+					y: chartData[key].overAllPer,
+					sliced: true
+				}));
+				// some names ar undefined may be becasue there values are zero
+				// or they have special chars in their name.
+				// eslint-disable-next-line no-param-reassign
+				chart.data = chart.data.filter(item => item.name);
+				// eslint-disable-next-line no-param-reassign
+				chart.data = sortBy(chart.data, ['y'], ['asc']).reverse();
+			} else {
+				const { eCPM, RESPONSE_TIME, PERCENT } = ANOMALY_THRESHOLD_CONSTANT;
+				Object.keys(dimensionWiseData).map(key => {
+					chartData[key] = dimensionWiseData[key].map(item => {
+						switch(chart.value) {
+							case "prebid_win_ecpm":
+							case "overall_win_ecpm":
+								return {
+									date: item.date,
+									value: item[chart.value] > ANOMALY_THRESHOLD_CONSTANT.eCPM?ANOMALY_THRESHOLD_CONSTANT.eCPM: Number(item[chart.value].toFixed(2)) || 0
+								};	  
+							  break;
+							case "average_response_time":
+								return {
+									date: item.date,
+									value: item[chart.value] > ANOMALY_THRESHOLD_CONSTANT.RESPONSE_TIME?ANOMALY_THRESHOLD_CONSTANT.RESPONSE_TIME : Number(item[chart.value].toFixed(2)) || 0
+								};	  
+								break;
+							case "overall_win_percent":
+								return {
+									date: item.date,
+									value: item[chart.value] > ANOMALY_THRESHOLD_CONSTANT.PERCENT ? ANOMALY_THRESHOLD_CONSTANT.PERCENT: Number(item[chart.value].toFixed(2)) || 0
+								};	  
+								break;
+							default:
+							  return {
+								  date: item.date,
+								  value: Number(item[chart.value].toFixed(2)) || 0
+							  };
+						}
+
+					});
+					chartData[key] = sortBy(chartData[key], ['date']);
+				});
+				// eslint-disable-next-line no-param-reassign
+				chart.data = chartData;
+			}
+			return chart;
+		});
+
+		this.setState({
+			...newState,
+			chartData: [..._displayHBCharts]
+		});
+	};
+
 	getAllAvailableMetrics = (
 		isCustomizeChartLegend,
-		reportsMeta,
+		hbAnalyticsMeta,
 		selectedDimension,
 		selectedFilters,
 		reportType,
@@ -735,19 +1012,19 @@ class Report extends Component {
 		let allAvailableMetrics = [];
 		if (
 			isCustomizeChartLegend &&
-			reportsMeta &&
-			reportsMeta.data &&
-			reportsMeta.data.metrics &&
-			typeof reportsMeta.data.metrics === 'object' &&
-			Object.keys(reportsMeta.data.metrics).length &&
+			hbAnalyticsMeta &&
+			hbAnalyticsMeta.data &&
+			hbAnalyticsMeta.data.metrics &&
+			typeof hbAnalyticsMeta.data.metrics === 'object' &&
+			Object.keys(hbAnalyticsMeta.data.metrics).length &&
 			tableData &&
 			tableData.result &&
 			tableData.result.length
 		) {
-			const allAvailableMetricsArr = Object.keys(reportsMeta.data.metrics)
-				.filter(key => reportsMeta.data.metrics[key].selectable)
+			const allAvailableMetricsArr = Object.keys(hbAnalyticsMeta.data.metrics)
+				.filter(key => hbAnalyticsMeta.data.metrics[key].selectable)
 				.map(key => {
-					const { display_name: name, valueType } = reportsMeta.data.metrics[key];
+					const { display_name: name, valueType } = hbAnalyticsMeta.data.metrics[key];
 					return {
 						name,
 						value: key,
@@ -764,13 +1041,31 @@ class Report extends Component {
 
 	filterTableDataBySelectedMetrics = (tableData, metricsList, dimensionList) => {
 		const selectedMetricsTableData = tableData;
+		const { selectedDimension } = this.state;
 
-		selectedMetricsTableData.columns = selectedMetricsTableData.columns.filter(
-			column =>
-				!!metricsList.find(metric => metric.value === column) ||
+		const { selectedMetrics } = this.state;
+		const metricNameList = selectedMetrics;
+		const filteredMetricsList = metricsList.filter(metrics =>
+			metricNameList.includes(metrics.value)
+		);
+
+		selectedMetricsTableData.columns = selectedMetricsTableData.columns.filter(column => {
+			if (selectedDimension !== PIVOT && column === PIVOT) {
+				return false;
+			}
+
+			// check for country and device as metrics only.
+			// the issue here is these are also available in dimension
+			// and condition gets truthy even if ther are not selected as metrics
+			if (extraMetricsListForHB.map(item => item.value).includes(column)) {
+				return !!filteredMetricsList.find(metric => metric.value === column);
+			}
+			return (
+				!!filteredMetricsList.find(metric => metric.value === column) ||
 				REPORT_INTERVAL_TABLE_KEYS.indexOf(column) !== -1 ||
 				!!dimensionList.find(dimension => dimension.value === column)
-		);
+			);
+		});
 
 		selectedMetricsTableData.result = selectedMetricsTableData.result.map(row => {
 			const computedRow = { ...row };
@@ -778,29 +1073,31 @@ class Report extends Component {
 			// eslint-disable-next-line no-restricted-syntax
 			for (const key in computedRow) {
 				if (
-					!metricsList.find(metric => metric.value === key) &&
+					!filteredMetricsList.find(metric => metric.value === key) &&
 					REPORT_INTERVAL_TABLE_KEYS.indexOf(key) === -1 &&
-					!dimensionList.find(dimension => dimension.value === key) &&
-					!computedRow.site
+					!dimensionList.find(dimension => dimension.value === key)
 				) {
-					delete computedRow[key];
+					// delete computedRow[key];
 				}
 			}
 
 			return computedRow;
 		});
 
+		if (extraMetricsListMappingForHBArray.includes(selectedDimension)) {
+			selectedMetricsTableData.columns.push('selectedDimensionColumn');
+		}
+
 		const computedTotal = { ...selectedMetricsTableData.total };
 
 		// eslint-disable-next-line no-restricted-syntax
 		for (const key in computedTotal) {
-			if (!metricsList.find(metric => `total_${metric.value}` === key)) {
+			if (!filteredMetricsList.find(metric => `total_${metric.value}` === key)) {
 				delete computedTotal[key];
 			}
 		}
 
 		selectedMetricsTableData.total = computedTotal;
-
 		return selectedMetricsTableData;
 	};
 
@@ -808,7 +1105,23 @@ class Report extends Component {
 		this.setState({ show: false });
 	};
 
-	aggregateValues(result) {
+	handleToggle = () => {
+		const { isDefaultBucketEnabled, responseBidCPMChartData } = this.state;
+		const [xAxis, yAxis] = this.generateBidCPMStatsChart(
+			responseBidCPMChartData,
+			!isDefaultBucketEnabled
+		);
+		this.setState({
+			bidCPMStatsChartData: {
+				xAxis,
+				yAxis,
+				label: 'Bid Landscape'
+			},
+			isDefaultBucketEnabled: !isDefaultBucketEnabled
+		});
+	};
+
+	aggregateValues(result = []) {
 		const modifiedResult = [];
 		const { selectedInterval, startDate, endDate } = this.state;
 
@@ -859,234 +1172,13 @@ class Report extends Component {
 		return groupedData;
 	}
 
-	handleInputChange = e => {
-		this.setState({
-			[e.target.name]: e.target.value
-		});
-	};
-
-	getSavedReports = () => {
-		const { showNotification } = this.props;
-		return reportService
-			.getSavedReports()
-			.then(res => {
-				const { savedReports } = res.data.data || [];
-				this.processAndSaveReports(savedReports);
-			})
-			.catch(err => {
-				showNotification({
-					mode: 'error',
-					title: 'Operation Failed',
-					message: err.message || 'Something went wrong !',
-					autoDismiss: 5
-				});
-			});
-	};
-
-	processAndSaveReports = (savedReports = [], callback = () => {}) => {
-		const savedReportsWithValue = savedReports.map(report => ({
-			...report,
-			name: report.name,
-			value: report.id
-		}));
-
-		this.setState(
-			{
-				savedReports: savedReportsWithValue
-			},
-			callback
-		);
-	};
-
-	setSelectedReport = (selectedReport, callback) => {
-		this.setState(
-			{
-				selectedReport,
-				selectedReportName: selectedReport.name
-			},
-			() => callback && callback()
-		);
-	};
-
-	onReportSave = (scheduleOptions, reportName) => {
-		const {
-			startDate,
-			endDate,
-			selectedDimension,
-			selectedFilters,
-			selectedInterval,
-			savedReports = []
-		} = this.state;
-		const { showNotification, userSites } = this.props;
-
-		const existingReportWithName = savedReports.find(report => report.name === reportName);
-		if (existingReportWithName) {
-			showNotification({
-				mode: 'error',
-				title: 'Operation Failed',
-				message: `Report with name ${reportName} already exists..`,
-				autoDismiss: 5
-			});
-			return;
-		}
-
-		if (scheduleOptions && scheduleOptions.interval) {
-			if (!scheduleOptions.startDate) {
-				showNotification({
-					mode: 'error',
-					title: 'Operation Failed',
-					message: `Start Date mandatory to schedule report`,
-					autoDismiss: 5
-				});
-				return;
-			}
-		}
-
-		const filters = Object.assign({}, selectedFilters);
-		if (!filters || !filters.siteid || !Object.keys(filters.siteid).length) {
-			// If there are no site id's, send all site ID's of the user so that the scheduler has a context of which sites to fetch reports for.
-			filters.siteid = Object.keys(userSites).reduce(
-				(sites, siteid) => ({ ...sites, [siteid]: true }),
-				{}
-			);
-		}
-
-		const reportConfig = {
-			name: reportName,
-			startDate,
-			endDate,
-			selectedDimension,
-			selectedFilters: filters,
-			selectedInterval,
-			scheduleOptions
-		};
-
-		reportService
-			.saveReportConfig(reportConfig)
-			.then(res => {
-				const response = res.data.data;
-				const { savedReports: newSavedReports } = response;
-				this.processAndSaveReports(newSavedReports, () => {
-					showNotification({
-						mode: 'success',
-						title: 'Success',
-						message: 'Report Saved',
-						autoDismiss: 5
-					});
-				});
-			})
-			.catch(err => {
-				showNotification({
-					mode: 'error',
-					title: 'Operation Failed',
-					message: err.message || 'Something went wrong !',
-					autoDismiss: 5
-				});
-			});
-	};
-
-	onReportUpdate = (scheduleOptions, reportName) => {
-		const { selectedReport, savedReports = [] } = this.state;
-		const { showNotification } = this.props;
-		const updateReportConfig = {
-			name: reportName,
-			id: selectedReport.id
-		};
-
-		const existingReportWithName = savedReports.find(
-			report => report.name === reportName && selectedReport.id !== report.id
-		);
-		if (existingReportWithName) {
-			showNotification({
-				mode: 'error',
-				title: 'Operation Failed',
-				message: `Report with name ${reportName} already exists..`,
-				autoDismiss: 5
-			});
-			return;
-		}
-
-		if (scheduleOptions && scheduleOptions.interval) {
-			if (!scheduleOptions.startDate) {
-				showNotification({
-					mode: 'error',
-					title: 'Operation Failed',
-					message: `Start Date mandatory to schedule report`,
-					autoDismiss: 5
-				});
-				return;
-			}
-		}
-
-		// only send schedule options if it differs
-		if (!isSameScheduleOptions(selectedReport.scheduleOptions, scheduleOptions)) {
-			updateReportConfig.scheduleOptions = scheduleOptions;
-		}
-		reportService
-			.updateSavedReport(updateReportConfig)
-			.then(res => {
-				const response = res.data.data;
-				const { savedReports } = response;
-				this.processAndSaveReports(savedReports, () => {
-					showNotification({
-						mode: 'success',
-						title: 'Success',
-						message: 'Report Updated',
-						autoDismiss: 5
-					});
-				});
-			})
-			.catch(err =>
-				showNotification({
-					mode: 'error',
-					title: 'Operation Failed',
-					message: err.message || 'Something went wrong !',
-					autoDismiss: 5
-				})
-			);
-	};
-
-	onReportDelete = () => {
-		const { selectedReport } = this.state;
-		const { showNotification } = this.props;
-		reportService
-			.deleteSavedReport(selectedReport.id)
-			.then(res => {
-				const response = res.data.data;
-				const { savedReports } = response;
-				this.processAndSaveReports(savedReports, () => {
-					showNotification({
-						mode: 'success',
-						title: 'Success',
-						message: 'Report Deleted',
-						autoDismiss: 5
-					});
-				});
-			})
-			.catch(err =>
-				showNotification({
-					mode: 'error',
-					title: 'Operation Failed',
-					message: err.message || 'Something went wrong !',
-					autoDismiss: 5
-				})
-			);
-	};
-
-	updateReportName = name => {
-		this.setState({
-			selectedReportName: name
-		});
-	};
-
 	renderContent = () => {
 		const {
 			selectedDimension,
 			selectedFilters,
-			selectedFilterValues,
 			selectedInterval,
 			selectedMetrics,
-			selectedChartLegendMetric,
+			selectedCharts,
 			reportType,
 			startDate,
 			endDate,
@@ -1098,12 +1190,14 @@ class Report extends Component {
 			metricsList,
 			filterList,
 			tableData,
-			savedReports,
-			selectedReport,
-			selectedReportName
+			// eslint-disable-next-line no-shadow
+			displayHBCharts,
+			chartData,
+			bidCPMStatsChartData,
+			isDefaultBucketEnabled
 		} = this.state;
 		const {
-			reportsMeta,
+			hbAnalyticsMeta,
 			reportType: defaultReportType,
 			isCustomizeChartLegend,
 			isForOps,
@@ -1111,38 +1205,16 @@ class Report extends Component {
 			user,
 			showNotification
 		} = this.props;
-		const { sessionRpmReports: sessionRpmReportsEnabled = false } = user.data;
 
-		let allAvailableMetrics = this.getAllAvailableMetrics(
+		const allAvailableMetrics = this.getAllAvailableMetrics(
 			isCustomizeChartLegend,
-			reportsMeta,
+			hbAnalyticsMeta,
 			selectedDimension,
 			selectedFilters,
 			reportType,
 			tableData
 		);
 
-		if (!isForOps) {
-			allAvailableMetrics = allAvailableMetrics
-				.filter(
-					item =>
-						item.value === 'unique_impressions' ||
-						(sessionRpmReportsEnabled &&
-							(item.value === 'session_rpm' || item.value === 'user_sessions'))
-				)
-				.map(item => {
-					if (item.value === 'unique_impressions') {
-						// eslint-disable-next-line no-param-reassign
-						item.name = 'Unique Impressions Reporting';
-						// eslint-disable-next-line no-param-reassign
-						item.isDisabled = false;
-					}
-					return item;
-				});
-		} else {
-			// this is for ops panel reports. Don't whow unique impression items in dropdown
-			allAvailableMetrics = allAvailableMetrics.filter(item => item.value.indexOf('unique') === -1);
-		}
 		const aggregatedData = this.aggregateValues(tableData.result);
 		const { email } = this.getDemoUserParams();
 		const { isValid } = getReportingDemoUserValidation(email, reportType);
@@ -1169,6 +1241,7 @@ class Report extends Component {
 			<Row>
 				<Col sm={12}>
 					<ControlContainer
+						isHB
 						startDate={startDate}
 						endDate={endDate}
 						generateButtonHandler={this.generateButtonHandler}
@@ -1177,9 +1250,12 @@ class Report extends Component {
 						filterList={filterList}
 						intervalList={intervalList}
 						metricsList={metricsList}
+						displayHBMetrics={displayHBMetrics}
+						displayHBCharts={displayHBCharts}
 						selectedDimension={selectedDimension}
 						selectedFilters={selectedFilters}
 						selectedMetrics={selectedMetrics}
+						selectedCharts={selectedCharts}
 						selectedInterval={selectedInterval}
 						reportType={reportType}
 						defaultReportType={defaultReportType}
@@ -1189,64 +1265,83 @@ class Report extends Component {
 						userSites={userSites}
 						user={user}
 						showNotification={showNotification}
-						savedReports={savedReports}
-						selectedReport={selectedReport}
-						setSelectedReport={this.setSelectedReport}
-						onReportSave={this.onReportSave}
-						onReportUpdate={this.onReportUpdate}
-						onReportDelete={this.onReportDelete}
-						resetSelectedReport={this.resetSelectedReport}
-						selectedReportName={selectedReportName}
-						updateReportName={this.updateReportName}
 					/>
 				</Col>
-				<Col sm={12}>
-					<FilterLegend selectedFilters={selectedFilterValues} filtersList={filterList} />
+				{chartData.map((chart, index) =>
+					selectedCharts.indexOf(chart.value) !== -1 ? (
+						<Col sm={12} className="u-margin-t5">
+							<ChartContainer
+								// eslint-disable-next-line react/no-array-index-key
+								key={index}
+								isHB
+								chartDetails={chart}
+								chartData={chart.data || []}
+								startDate={startDate}
+								endDate={endDate}
+								reportType={reportType}
+								selectedInterval={selectedInterval}
+							/>
+						</Col>
+					) : (
+						''
+					)
+				)}
+				<Col sm={12} className="u-margin-t5 bidLandscapeTitleWrapper">
+					<h3 />
+					<h3>Bid Landscape</h3>
+					<CustomToggle
+						css="toggleWrapper"
+						label={`Bucket Size: ${isDefaultBucketEnabled ? 0.05 : 0.01}`}
+						selectedItem={isDefaultBucketEnabled ? 0.05 : 0.01}
+						handleToggle={this.handleToggle}
+						options={[0.05, 0.01]}
+					/>
 				</Col>
 				<Col sm={12} className="u-margin-t5">
-					<ChartContainer
-						tableData={tableData}
-						selectedDimension={selectedDimension}
+					<BidCPMStatChartContainer
+						// isHB
+						chartDetails={{
+							name: 'Bid Landscape',
+							caption: ''
+						}}
+						chartData={bidCPMStatsChartData}
 						startDate={startDate}
 						endDate={endDate}
-						metricsList={metricsList}
-						allAvailableMetrics={allAvailableMetrics}
 						reportType={reportType}
-						isForOps={isForOps}
-						isCustomizeChartLegend={isCustomizeChartLegend}
-						updateMetrics={this.updateMetrics}
 						selectedInterval={selectedInterval}
-						selectedChartLegendMetric={selectedChartLegendMetric}
 					/>
 				</Col>
 				<Col sm={12} className="u-margin-t5 u-margin-b4">
-					<TableContainer
-						tableData={selectedMetricsTableData}
-						aggregatedData={aggregatedData}
-						startDate={startDate}
-						endDate={endDate}
-						selectedInterval={selectedInterval}
-						selectedDimension={selectedDimension}
-						getCsvData={this.getCsvData}
-						reportType={reportType}
-						defaultReportType={defaultReportType}
-						isForOps={isForOps}
-					/>
+					{selectedMetricsTableData.result && selectedMetricsTableData.result.length ? (
+						<TableContainer
+							isHB
+							tableData={selectedMetricsTableData}
+							aggregatedData={aggregatedData}
+							startDate={startDate}
+							endDate={endDate}
+							selectedInterval={selectedInterval}
+							selectedDimension={selectedDimension}
+							getCsvData={this.getCsvData}
+							reportType={reportType}
+							defaultReportType={defaultReportType}
+							isForOps={isForOps}
+						/>
+					) : (
+						<div className="noDataRow">
+							<span>No Data found</span>
+						</div>
+					)}
 				</Col>
 			</Row>
 		);
 	};
 
 	render() {
-		const { isLoading, show, isError, errorMessage } = this.state;
-		const { reportsMeta } = this.props;
+		const { isLoading, show } = this.state;
+		const { hbAnalyticsMeta } = this.props;
 
-		if ((!reportsMeta.fetched && !isError) || isLoading) {
+		if (!hbAnalyticsMeta.fetched || isLoading) {
 			return <Loader />;
-		}
-
-		if (!isLoading && isError) {
-			return <Empty message={errorMessage} />;
 		}
 
 		return (
@@ -1256,6 +1351,7 @@ class Report extends Component {
 					<Alert bsStyle="info" onDismiss={this.handleDismiss} className="u-margin-t4">
 						For old reporting data <strong>(before 1st August, 2019)</strong> go to old console by{' '}
 						<a
+							target="_blank"
 							onClick={oldConsoleRedirection}
 							className="u-link-reset"
 							style={{ cursor: 'pointer' }}

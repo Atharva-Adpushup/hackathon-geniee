@@ -133,7 +133,8 @@
 		"url-parse": "^1.1.9",
 		"uuid": "^2.0.3",
 		"validator": "^4.8.0",
-		"woodlot": "^3.0.1"
+		"woodlot": "^3.0.1",
+		"yup": "^0.32.8"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.2.2",

@@ -40,6 +40,10 @@ const computeCsvData = data => {
 				// eslint-disable-next-line no-else-return
 			} else if (header.accessor === 'url') {
 				return row[header.accessor].props.href;
+			} else if (header.accessor === 'country' || header.accessor === 'device_type') {
+				return row[header.accessor]
+					.map(item => `${item[header.accessor]} ${item.overall_net_revenue}%`)
+					.join(',');
 			}
 			return row[header.accessor];
 		});

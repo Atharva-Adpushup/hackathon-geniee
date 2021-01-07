@@ -1,11 +1,12 @@
 const moment = require('moment');
 const cron = require('node-cron');
-const userModel = require('../../models/userModel');
 const request = require('request-promise');
 const CC = require('../../configs/commonConsts');
-const redisClient = require('../../middlewares/redis');
+const redisClient = require('../../middlewares/redis').getClient();
 const siteModel = require('../../models/siteModel');
 const couchbase = require('../../helpers/couchBaseService');
+const { getActiveUsers, getUserSites } = require('./cronhelpers');
+
 const { promiseForeach } = require('node-utils');
 
 let oldTimestamp = null;
@@ -16,29 +17,6 @@ const fromDate = moment()
 const toDate = moment()
 	.subtract(1, 'days')
 	.format('YYYY-MM-DD');
-
-function getActiveUsers() {
-	return siteModel
-		.getActiveSites()
-		.then(users => Array.from(new Set(users.map(({ accountEmail }) => accountEmail))))
-		.catch(err => console.log(err));
-}
-
-function getUserSites(ownerEmail) {
-	let siteid = [];
-
-	return userModel
-		.getUserByEmail(ownerEmail)
-		.then(user => {
-			const userSites = user.get('sites');
-
-			userSites.map(({ siteId }) => {
-				siteid.push(siteId.toString());
-			});
-			return siteid.sort((a, b) => a - b).join();
-		})
-		.catch(err => console.log(err));
-}
 
 function preFetchMeta(ownerEmail) {
 	return getUserSites(ownerEmail).then(siteid => {
@@ -151,10 +129,7 @@ function getLastRunInfo() {
 
 				let newTimestamp = lastRunOn;
 				if (oldTimestamp !== newTimestamp) {
-					redisClient.flushall(function(err, succeeded) {
-						console.log(`${succeeded}: Cache Cleared`); // will be true if successfull
-						getAllUsersData();
-					});
+					getAllUsersData();
 				}
 
 				oldTimestamp = newTimestamp;
@@ -174,5 +149,5 @@ function getLastRunInfo() {
 			console.log(err);
 		});
 }
-
+// getLastRunInfo();
 cron.schedule(CC.cronSchedule.prefetchService, getLastRunInfo);

@@ -17,8 +17,11 @@ import {
 	getValidArray,
 	getValidObject,
 	getItemFromLocalStorage,
-	setItemToLocalStorage
+	setItemToLocalStorage,
+	roundOffTwoDecimal,
+	numberWithCommas
 } from '../helpers/utils';
+import { chart } from 'highcharts';
 
 class Chart extends React.Component {
 	constructor(props) {
@@ -302,7 +305,6 @@ class Chart extends React.Component {
 				const column = sortedResult[j];
 				const xAxisMomentObj = moment(xAxis.categories[i]);
 				const seriesValue = selectedDimension ? column[activeLegendItems.value] : column.value;
-
 				if (selectedInterval === 'daily' || selectedInterval === 'monthly')
 					if (
 						column.date == xAxisMomentObj.format('YYYY-MM-DD') ||
@@ -345,7 +347,8 @@ class Chart extends React.Component {
 
 	render() {
 		const { allAvailableMetrics, reportType, updateMetrics, isCustomizeChartLegend } = this.props;
-		const { type, series, xAxis, legends, activeLegendItems, selectedDimension } = this.state;
+		const { type, series, xAxis, activeLegendItems, selectedDimension } = this.state;
+
 		return (
 			<div>
 				<CustomChart
