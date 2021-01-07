@@ -10,9 +10,17 @@ import AsyncGroupSelect from '../../../Components/AsyncGroupSelect/index';
 import PresetDateRangePicker from '../../../Components/PresetDateRangePicker/index';
 import SelectBox from '../../../Components/SelectBox/index';
 import Schedule from './Schedule';
+import MultiSelectBox from '../../../Components/MultiSelectBox/index';
 import { getPresets } from '../helpers/utils';
 import reportService from '../../../services/reportService';
-import { accountFilter, accountDimension, opsDimension, opsFilter } from '../configs/commonConsts';
+import {
+	accountFilter,
+	accountDimension,
+	opsDimension,
+	opsFilter,
+	displayHBCharts,
+	extraMetricsListMappingForHB
+} from '../configs/commonConsts';
 import {
 	getReportingControlDemoUserSites,
 	getReportingDemoUserSiteIds
@@ -21,28 +29,60 @@ import {
 class Control extends Component {
 	constructor(props) {
 		super(props);
-		// const { updatedDimensionList, updatedFilterList } = this.updateFilterDimensionList(
-		// 	props.reportType,
-		// 	props.filterList,
-		// 	props.dimensionList
-		// );
+
+		const selectedMetrics = props.isHB ? props.selectedMetrics : [];
+		let { metricsList } = props;
+		const {
+			dimensionList,
+			filterList,
+			displayHBMetrics,
+			selectedCharts,
+			hbMetricsList,
+			intervalList,
+			startDate,
+			endDate,
+			reportType,
+			selectedDimension,
+			selectedInterval,
+			selectedFilters,
+			csvData
+		} = props;
+
+		// eslint-disable-next-line array-callback-return
+		metricsList = metricsList.map(metrics => {
+			if (extraMetricsListMappingForHB[metrics.value]) {
+				// eslint-disable-next-line no-param-reassign
+				metrics.name = extraMetricsListMappingForHB[metrics.value].display_name;
+			}
+			return metrics;
+		});
+
 		this.state = {
-			dimensionList: props.dimensionList,
-			filterList: props.filterList,
-			intervalList: props.intervalList,
-			startDate: props.startDate,
-			endDate: props.endDate,
-			reportType: props.reportType,
-			selectedDimension: props.selectedDimension || '',
-			selectedInterval: props.selectedInterval || '',
-			selectedFilters: props.selectedFilters || {},
+			dimensionList,
+			filterList,
+			metricsList,
+			// eslint-disable-next-line react/no-unused-state
+			displayHBMetrics,
+			displayHBCharts,
+			selectedMetrics,
+			selectedCharts,
+			chartList: hbMetricsList,
+			intervalList,
+			startDate,
+			endDate,
+			reportType,
+			selectedDimension: selectedDimension || '',
+			selectedInterval: selectedInterval || '',
+			selectedFilters: selectedFilters || {},
 			disableGenerateButton: false,
 			updateStatusText: '',
-			csvData: props.csvData,
-			fileName: 'adpushup-report',
 			selectedFilterKey: null,
-			selectedFilterValues: null
+			selectedFilterValues: null,
+			csvData,
+			fileName: 'adpushup-report'
 		};
+		this.onMetricsListChange = this.onMetricsListChange.bind(this)
+		this.onChartListChange = this.onChartListChange.bind(this)
 	}
 
 	componentDidMount() {
@@ -54,13 +94,14 @@ class Control extends Component {
 		const isCsvData = !!(nextProps && nextProps.csvData);
 		const updateDimensionList = !isEqual(currState.dimensionList, nextProps.dimensionList);
 		const updateFilterList = !isEqual(currState.filterList, nextProps.filterList);
+		const updateMetricsList = !isEqual(currState.metricsList, nextProps.metricsList);
 
 		const newState = {};
-
+		newState.chartList = currState.chartList;
 		if (isCsvData) newState.csvData = nextProps.csvData;
 		if (updateDimensionList) newState.dimensionList = nextProps.dimensionList;
 		if (updateFilterList) newState.filterList = nextProps.filterList;
-
+		if (updateMetricsList) newState.metricsList = nextProps.metricsList;
 		this.setState(newState);
 	}
 
@@ -72,33 +113,52 @@ class Control extends Component {
 	onFilteChange = (selectedFilters, selectedFilterValues, selectedFilterKey) => {
 		const { defaultReportType } = this.props;
 		let reportType = defaultReportType || 'account';
-		const { filterList, dimensionList } = this.props;
+		const { filterList, dimensionList, hbMetricsList, metricsList } = this.props;
 		const selectedSiteFilters = selectedFilters.siteid || {};
 		if (selectedSiteFilters && Object.keys(selectedSiteFilters).length === 1) {
 			reportType = 'site';
 		}
-		const { updatedFilterList, updatedDimensionList } = this.updateFilterDimensionList(
+
+		const {
+			updatedFilterList,
+			updatedDimensionList,
+			updatedMetricsList,
+			updatedChartList
+		} = this.updateFilterDimensionList(
 			reportType,
 			defaultReportType,
 			filterList,
+			metricsList,
+			hbMetricsList,
 			dimensionList
 		);
 		this.setState(
 			{
 				dimensionList: updatedDimensionList,
 				filterList: updatedFilterList,
-				reportType,
 				selectedFilterKey,
-				selectedFilterValues
+				selectedFilterValues,
+				metricsList: updatedMetricsList,
+				chartList: updatedChartList,
+				reportType
 			},
 			() => this.onControlChange(reportType)
 		);
 	};
 
+	onChartListChange = selectedCharts => {
+		const { reportType } = this.props;
+		this.setState({ selectedCharts }, this.onControlChange.bind(null, reportType));
+	};
+
+	onMetricsListChange = selectedMetrics => {
+		const { reportType } = this.props;
+		this.setState({ selectedMetrics }, this.onControlChange.bind(null, reportType));
+	};
+
 	onControlChange = (reportType, resetSavedReport = true) => {
 		const resultObject = this.getStateParams();
 		const { onControlChange } = this.props;
-
 		onControlChange(resultObject, reportType, resetSavedReport);
 	};
 
@@ -115,9 +175,11 @@ class Control extends Component {
 			selectedInterval,
 			selectedDimension,
 			selectedFilters,
-			reportType,
 			selectedFilterKey,
-			selectedFilterValues
+			selectedFilterValues,
+			selectedMetrics,
+			selectedCharts,
+			reportType
 		} = this.state;
 		const resultObject = {
 			startDate,
@@ -125,6 +187,8 @@ class Control extends Component {
 			selectedInterval,
 			selectedDimension,
 			selectedFilters,
+			selectedMetrics,
+			selectedCharts,
 			reportType
 		};
 
@@ -137,7 +201,7 @@ class Control extends Component {
 	};
 
 	getSelectedFilter = filter => {
-		const { reportType, defaultReportType, selectedFilters, isDemoUser } = this.props;
+		const { reportType, defaultReportType, selectedFilters, selectedMetrics, isDemoUser } = this.props;
 		let siteIds = [];
 		let isSuperUser = false;
 		const selectedSiteIds = selectedFilters.siteid && Object.keys(selectedFilters.siteid);
@@ -208,38 +272,42 @@ class Control extends Component {
 		return { updatedDimensionList, updatedFilterList };
 	};
 
-	updateFilterDimensionList = (reportType, defaultReportType, filterList, dimensionList) => {
+	updateFilterDimensionList = (
+		reportType,
+		defaultReportType,
+		filterList,
+		metricsList,
+		hbMetricsList,
+		dimensionList
+	) => {
 		const updatedDimensionList = JSON.parse(JSON.stringify(dimensionList));
 		const updatedFilterList = JSON.parse(JSON.stringify(filterList));
+		const updatedChartList = JSON.parse(JSON.stringify(hbMetricsList || {}));
+		const updatedMetricsList = JSON.parse(JSON.stringify(metricsList || {}));
 
+		/* eslint-disable no-param-reassign */
 		if (reportType === 'account' || reportType === 'global') {
 			updatedFilterList.forEach(fil => {
 				const index = accountFilter.indexOf(fil.value);
 				if (index >= 0) {
-					// eslint-disable-next-line no-param-reassign
 					fil.isDisabled = false;
-					// eslint-disable-next-line no-param-reassign
 				} else fil.isDisabled = true;
 			});
 			updatedDimensionList.forEach(dim => {
 				const index = accountDimension.indexOf(dim.value);
 				if (index >= 0) {
-					// eslint-disable-next-line no-param-reassign
 					dim.isDisabled = false;
-					// eslint-disable-next-line no-param-reassign
 				} else dim.isDisabled = true;
 			});
 		} else {
 			updatedFilterList.forEach(fil => {
-				// eslint-disable-next-line no-param-reassign
 				fil.isDisabled = false;
 			});
 			updatedDimensionList.forEach(dim => {
-				// eslint-disable-next-line no-param-reassign
 				dim.isDisabled = false;
 			});
 		}
-		return { updatedFilterList, updatedDimensionList };
+		return { updatedFilterList, updatedDimensionList, updatedChartList, updatedMetricsList };
 	};
 
 	handleInputChange = e => {
@@ -279,7 +347,8 @@ class Control extends Component {
 			onReportUpdate,
 			onReportDelete,
 			selectedReportName,
-			updateReportName
+			updateReportName,
+			isHB
 		} = this.props;
 
 		const { scheduleOptions: { startDate, endDate, interval } = {} } = selectedReport || {};
@@ -349,9 +418,14 @@ class Control extends Component {
 							presets={getPresets()}
 							startDate={state.startDate}
 							endDate={state.endDate}
-							datesUpdated={({ startDate, endDate }) =>
-								this.setState({ startDate, endDate }, this.onControlChange.bind(null, reportType))
-							}
+							datesUpdated={({ startDate, endDate }) => {
+								const dateDiff = moment(endDate).diff(startDate, 'days')
+								if(!isNaN(dateDiff) && dateDiff <= 30) {
+									this.setState({ startDate, endDate }, this.onControlChange.bind(null, reportType))
+								} else {
+									this.setState({ startDate, endDate: '' }, this.onControlChange.bind(null, reportType))
+								}
+							}}
 							/*
 								data prior to 1st Aug, 2019 is present in the old console 
 								therefore disabling dates before 1st Aug, 2019
@@ -370,7 +444,49 @@ class Control extends Component {
 						{/* eslint-enable */}
 					</div>
 				</div>
-				<div className="aligner aligner--wrap aligner--hSpaceBetween u-margin-t4">
+				{isHB ? (
+					<div className="aligner aligner--wrap aligner--hSpaceBetween" style={{"marginTop": "1rem !important"}}>
+						<div className="chart-selectorBox aligner-item aligner-item--grow5 u-margin-r4">
+							<div className="aligner-item u-margin-r4">
+								<label className="u-text-normal">Select Chart</label>
+								<MultiSelectBox
+									id="chartList"
+									key="chartList"
+									wrapperClassName="custom-select-box-wrapper"
+									isClearable={false}
+									isSearchable={false}
+									selected={state.selectedCharts}
+									options={state.displayHBCharts || []}
+									onSelect={selectedCharts => {
+										this.setState({ selectedCharts }, this.onControlChange.bind(null, reportType));
+									}}
+								/>
+								{/* eslint-enable */}
+							</div>
+						</div>
+						<div className="chart-selectorBox aligner-item aligner-item--grow5 u-margin-r4">
+							<div className="aligner-item u-margin-r4">
+								<label className="u-text-normal">Select Metrics</label>
+								<MultiSelectBox
+									id="metricsList"
+									key="metricsList"
+									wrapperClassName="custom-select-box-wrapper"
+									isClearable={false}
+									isSearchable={false}
+									selected={state.selectedMetrics}
+									options={state.metricsList || []}
+									onSelect={selectedMetrics => {
+										this.onMetricsListChange(selectedMetrics)
+										// this.setState({ selectedMetrics }, this.onControlChange.bind(null, reportType));
+									}}
+								/>
+								{/* eslint-enable */}
+							</div>
+						</div>
+					</div>
+					):''
+				}
+				<div className="aligner aligner--wrap aligner--hSpaceBetween  u-margin-t4 filterAndGenerateButtonRow">
 					<div className="reporting-filterBox aligner-item aligner-item--grow5 u-margin-r4">
 						{/* eslint-disable */}
 						<AsyncGroupSelect
@@ -383,7 +499,6 @@ class Control extends Component {
 						/>
 						{/* eslint-enable */}
 					</div>
-
 					<div className="aligner-item u-margin-r4 aligner--hEnd">
 						<Button
 							bsStyle="primary"
@@ -409,18 +524,20 @@ class Control extends Component {
 						</CSVLink>
 					</div>
 				</div>
-				<Schedule
-					name={selectedReportName}
-					startDate={selectedReportStartDate}
-					endDate={selectedReportEndDate}
-					reportInterval={interval}
-					isUpdating={isUpdating}
-					onReportSave={onReportSave}
-					onReportUpdate={onReportUpdate}
-					showNotification={showNotification}
-					onReportDelete={onReportDelete}
-					updateReportName={updateReportName}
-				/>
+				{isHB ? '' : (
+					<Schedule
+						name={selectedReportName}
+						startDate={selectedReportStartDate}
+						endDate={selectedReportEndDate}
+						reportInterval={interval}
+						isUpdating={isUpdating}
+						onReportSave={onReportSave}
+						onReportUpdate={onReportUpdate}
+						showNotification={showNotification}
+						onReportDelete={onReportDelete}
+						updateReportName={updateReportName}
+					/>
+				)}
 			</Fragment>
 		);
 	}

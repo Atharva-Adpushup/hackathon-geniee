@@ -1,4 +1,9 @@
 @import '../../shared/dataTable';
+@import '../../base/variables.scss';
+@import '../../base/colors.scss';
+@import '../../base/mixins.scss';
+// @import '../../base/utilities/text/index.scss';
+@import '../../shared/toggle.scss';
 
 $primaryColor: #eb575c;
 $borderColor: #ddd;
@@ -601,5 +606,70 @@ body {
 
 .schedule-buttons {
 	display: inherit;
+}
+
+.filterAndGenerateButtonRow {
 	align-items: flex-end;
 }
+
+.bidLandscapeTitleWrapper {
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr;
+}
+
+.bidLandscapeTitleWrapper h3 {
+	text-align: center;
+}
+
+.toggleWrapper {
+	display: flex;
+    align-items: center;
+	justify-content: flex-end
+}
+
+.noDataRow {
+	display: flex;
+	justify-content: center;
+}
+
+/*
+	CSS for Custom Toggle for Bid Landscape Starts from here
+*/
+.customToggle {
+	display: flex;
+    align-items: center;
+}
+
+.customToggle span {
+	margin-right: 5px;
+}
+
+.customToggle ul {
+	display: flex;
+	list-style: none;
+	font-size: 0.8em;
+	border: 1px solid $borderColor;
+
+	// border: 1px solid green;
+    margin: 0px;
+    padding: 0px;
+}
+
+.customToggle label {
+	margin-right: 5px;
+	margin-bottom:0px;
+	
+}
+
+.customToggle ul li {
+	padding: 5px;
+	cursor: pointer;
+}
+
+.toggleSelection {
+	background-color: green;
+	color: white;
+}
+/*
+	CSS for Custom Toggle for Bid Landscape Ends here
+*/

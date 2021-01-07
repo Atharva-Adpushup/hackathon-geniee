@@ -4,6 +4,11 @@ export default {
 	ANALYTICS_API_WIDGET_DATA: '/reports/getWidgetData',
 	ANALYTICS_API_UPDATE_STATUS: '/reports/getLastUpdateStatus',
 	ANALYTICS_METAINFO_URL: '/common/metaInfo',
+	HB_ANALYTICS_API_CUSTOM_DATA: '/hbanalytics/getCustomStats',
+	HB_ANALYTICS_API_WIDGET_DATA: '/hbanalytics/getWidgetData',
+	HB_ANALYTICS_API_UPDATE_STATUS: '/hbanalytics/getLastUpdateStatus',
+	HB_ANALYTICS_API_CUSTOM_GRAPH_DATA: 'hbanalytics/getCustomGraphData',
+	HB_ANALYTICS_API_BID_CPM_STATS: 'hbanalytics/getBidCPMStats',
 	HB_MSGS: {
 		UNSAVED_CHANGES: 'You have unsaved changes. Are you sure you want to leave?'
 	},

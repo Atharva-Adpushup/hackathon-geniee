@@ -62,22 +62,27 @@ module.exports = (req, res, next) => {
 	} else if (isDifferentGenieeSite) {
 		return res.redirect('/403');
 	}
-
 	const userCookie = req.cookies.user;
-	if (!userCookie) {
+	const adpToken = req.headers.authorization;
+
+	const token = (userCookie && JSON.parse(userCookie).authToken) || adpToken || null;
+
+	if (!token) {
 		res.clearCookie('user');
 		return res.redirect('/login');
 	}
 
-	const token = JSON.parse(userCookie).authToken;
-
-	return Promise.join(authToken.decodeAuthToken(token), decoded =>
-		userModel.getUserByEmail(decoded.email).then(() => {
+	return Promise.join(authToken.decodeAuthToken(token), decoded => {
+		if (decoded.isAdpUser) {
+			req.user = decoded;
+			return next();
+		}
+		return userModel.getUserByEmail(decoded.email).then(() => {
 			req.user = decoded;
 			next();
 			return null;
-		})
-	).catch(() => {
+		});
+	}).catch(() => {
 		res.clearCookie('user');
 		return res.redirect('/login');
 	});

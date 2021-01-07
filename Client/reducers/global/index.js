@@ -5,6 +5,7 @@ import sites from './sites';
 import ui from './ui';
 import reports from './reports';
 import urlreport from './urlReport';
+import hbanalytics from './hbanalytics';
 import notifications from './notifications';
 
 export default combineReducers({
@@ -14,5 +15,6 @@ export default combineReducers({
 	ui,
 	reports,
 	urlreport,
+	hbanalytics,
 	notifications
 });

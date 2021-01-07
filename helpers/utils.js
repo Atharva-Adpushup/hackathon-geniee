@@ -313,6 +313,11 @@ var url = require('url'),
 				});
 				return Promise.reject(err);
 			});
+		},
+		sortObjectEntries: (object = {}) => {
+			return Object.keys(object)
+				.sort()
+				.reduce((result, key) => ({ ...result, [key]: object[key] }), {});
 		}
 	};
 

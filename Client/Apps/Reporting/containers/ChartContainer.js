@@ -4,17 +4,35 @@ import { checkReportTypeGlobal } from '../../../helpers/commonFunctions';
 
 const mapStateToProps = (state, ownProps) => {
 	const isReportTypeGlobal = checkReportTypeGlobal(ownProps);
-	const { isForOps } = ownProps;
+	const { isForOps, isHB } = ownProps;
+	if (!isHB) {
+		const {
+			reports: { account: accountReportMetaData, global: globalReportMetaData }
+		} = state.global;
+		const reportsMeta =
+			isForOps || isReportTypeGlobal ? { ...globalReportMetaData } : { ...accountReportMetaData };
+		const {
+			data: { filter, metrics, dimension, site }
+		} = reportsMeta;
+
+		return {
+			filter,
+			metrics,
+			dimension,
+			site,
+			...ownProps
+		};
+	}
 	const {
-		reports: { account: accountReportMetaData, global: globalReportMetaData }
+		hbanalytics: { account: accountReportMetaData, global: globalHBAnalyticsMetaData }
 	} = state.global;
-	const reportsMeta =
-		isForOps || isReportTypeGlobal ? { ...globalReportMetaData } : { ...accountReportMetaData };
+	const hbAnalyticsMeta = globalHBAnalyticsMetaData;
+
 	const {
 		data: { filter, metrics, dimension, site }
-	} = reportsMeta;
-
+	} = hbAnalyticsMeta;
 	return {
+		isHB,
 		filter,
 		metrics,
 		dimension,

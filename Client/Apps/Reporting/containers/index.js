@@ -2,10 +2,16 @@ import { connect } from 'react-redux';
 import ReportsPanel from '../components/index';
 
 const mapStateToProps = state => {
-	const { sites } = state.global;
+	const {
+		sites,
+		user: {
+			data: { sites: userSitesInfo }
+		}
+	} = state.global;
 
 	return {
-		userSites: sites.fetched ? sites.data : {}
+		userSites: sites.fetched ? sites.data : {},
+		userSitesInfo
 	};
 };
 

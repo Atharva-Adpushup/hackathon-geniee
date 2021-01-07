@@ -144,7 +144,6 @@ router
 			.then(user =>
 				Promise.join(getNetworkConfig(), getUserSites(user), (networkConfig, sites) => {
 					const userData = user.cleanData();
-
 					const sitesArray = [...userData.sites];
 					const sitesArrayLength = sitesArray.length;
 					userData.sites = {};
@@ -155,14 +154,21 @@ router
 					}
 					let params = { siteid: Object.keys(sites).toString(), isSuperUser };
 
-					//return getReportsMetaData(params).then(reports => {
-					return res.status(httpStatus.OK).json({
-						user: { ...userData, isSuperUser },
-						networkConfig,
-						sites
+					// enabled to get meta info for HB Analytics Reporting - Enabled or not
+					// and pass as globalMeta data along with sites data
+					return getReportsMetaData(params).then(reports => {
+						const { site: sitesFromReportMeta } = reports;
+						Object.keys(sitesFromReportMeta).map(site => {
+							// to check is HB enabled or not
+							userData.sites[site].product = sitesFromReportMeta[site].product;
+						})
+						return res.status(httpStatus.OK).json({
+							user: { ...userData, isSuperUser },
+							networkConfig,
+							sites
 						//		reports
+						});
 					});
-					//});
 				})
 			)
 			.catch(err => {
