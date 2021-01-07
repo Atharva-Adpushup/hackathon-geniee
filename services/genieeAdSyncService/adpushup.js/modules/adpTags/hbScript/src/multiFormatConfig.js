@@ -57,7 +57,8 @@ const bidderParamsMapping = {
 	conversant: {
 		videoParams: {
 			// required
-			mimes: CONSTANTS.VIDEO.MIMES,
+			// disabled because conversant didn't want video requests because they don't have demand for it.
+			// mimes: CONSTANTS.VIDEO.MIMES,
 			// optional
 			maxduration: CONSTANTS.VIDEO.MAXDURATION,
 			api: CONSTANTS.VIDEO.API,
