@@ -471,13 +471,14 @@ class Report extends Component {
 			Object.keys(allItems).map(item => {
 				try {
 					const parsedItem = JSON.parse(allItems[item]);
-					if (parsedItem.expiry) {
+					if (parsedItem && parsedItem.expiry) {
 						const toBeExpiredAfter = +new Date(parsedItem.expiry);
 						if (toBeExpiredAfter < Date.now()) {
 							localStorage.removeItem(item);
 						}
 					}
 				} catch (e) {
+					this.removeAllItemsInLocalStorage();
 					console.warn(e)
 				}
 			});
