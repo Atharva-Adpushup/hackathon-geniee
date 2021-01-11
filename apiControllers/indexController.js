@@ -160,7 +160,9 @@ router
 						const { site: sitesFromReportMeta } = reports;
 						Object.keys(sitesFromReportMeta).map(site => {
 							// to check is HB enabled or not
-							userData.sites[site].product = sitesFromReportMeta[site].product;
+							if(userData.sites[site] && userData.sites[site].product) {
+								userData.sites[site].product = sitesFromReportMeta[site].product;
+							}
 						})
 						return res.status(httpStatus.OK).json({
 							user: { ...userData, isSuperUser },

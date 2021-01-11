@@ -41,9 +41,11 @@ const computeCsvData = data => {
 			} else if (header.accessor === 'url') {
 				return row[header.accessor].props.href;
 			} else if (header.accessor === 'country' || header.accessor === 'device_type') {
-				return row[header.accessor]
-					.map(item => `${item[header.accessor]} ${item.overall_net_revenue}%`)
-					.join(',');
+				return row[header.accessor] instanceof Array
+					? row[header.accessor]
+							.map(item => `${item[header.accessor]} ${item.overall_net_revenue}%`)
+							.join(',')
+					: row[header.accessor];
 			}
 			return row[header.accessor];
 		});
