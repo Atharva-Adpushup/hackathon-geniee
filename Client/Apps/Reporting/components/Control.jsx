@@ -81,8 +81,8 @@ class Control extends Component {
 			csvData,
 			fileName: 'adpushup-report'
 		};
-		this.onMetricsListChange = this.onMetricsListChange.bind(this)
-		this.onChartListChange = this.onChartListChange.bind(this)
+		this.onMetricsListChange = this.onMetricsListChange.bind(this);
+		this.onChartListChange = this.onChartListChange.bind(this);
 	}
 
 	componentDidMount() {
@@ -201,7 +201,13 @@ class Control extends Component {
 	};
 
 	getSelectedFilter = filter => {
-		const { reportType, defaultReportType, selectedFilters, selectedMetrics, isDemoUser } = this.props;
+		const {
+			reportType,
+			defaultReportType,
+			selectedFilters,
+			selectedMetrics,
+			isDemoUser
+		} = this.props;
 		let siteIds = [];
 		let isSuperUser = false;
 		const selectedSiteIds = selectedFilters.siteid && Object.keys(selectedFilters.siteid);
@@ -419,11 +425,15 @@ class Control extends Component {
 							startDate={state.startDate}
 							endDate={state.endDate}
 							datesUpdated={({ startDate, endDate }) => {
-								const dateDiff = moment(endDate).diff(startDate, 'days')
-								if(!isNaN(dateDiff) && dateDiff <= 30) {
-									this.setState({ startDate, endDate }, this.onControlChange.bind(null, reportType))
+								if(isHB) {
+									const dateDiff = moment(endDate).diff(startDate, 'days')
+									if(!isNaN(dateDiff) && dateDiff <= 30) {
+										this.setState({ startDate, endDate }, this.onControlChange.bind(null, reportType))
+									} else {
+										this.setState({ startDate, endDate: '' }, this.onControlChange.bind(null, reportType))
+									}
 								} else {
-									this.setState({ startDate, endDate: '' }, this.onControlChange.bind(null, reportType))
+									this.setState({ startDate, endDate }, this.onControlChange.bind(null, reportType))
 								}
 							}}
 							/*
@@ -445,7 +455,10 @@ class Control extends Component {
 					</div>
 				</div>
 				{isHB ? (
-					<div className="aligner aligner--wrap aligner--hSpaceBetween" style={{"marginTop": "1rem !important"}}>
+					<div
+						className="aligner aligner--wrap aligner--hSpaceBetween"
+						style={{ marginTop: '1rem !important' }}
+					>
 						<div className="chart-selectorBox aligner-item aligner-item--grow5 u-margin-r4">
 							<div className="aligner-item u-margin-r4">
 								<label className="u-text-normal">Select Chart</label>
@@ -476,7 +489,7 @@ class Control extends Component {
 									selected={state.selectedMetrics}
 									options={state.metricsList || []}
 									onSelect={selectedMetrics => {
-										this.onMetricsListChange(selectedMetrics)
+										this.onMetricsListChange(selectedMetrics);
 										// this.setState({ selectedMetrics }, this.onControlChange.bind(null, reportType));
 									}}
 								/>
@@ -484,8 +497,9 @@ class Control extends Component {
 							</div>
 						</div>
 					</div>
-					):''
-				}
+				) : (
+					''
+				)}
 				<div className="aligner aligner--wrap aligner--hSpaceBetween  u-margin-t4 filterAndGenerateButtonRow">
 					<div className="reporting-filterBox aligner-item aligner-item--grow5 u-margin-r4">
 						{/* eslint-disable */}
@@ -524,7 +538,9 @@ class Control extends Component {
 						</CSVLink>
 					</div>
 				</div>
-				{isHB ? '' : (
+				{isHB ? (
+					''
+				) : (
 					<Schedule
 						name={selectedReportName}
 						startDate={selectedReportStartDate}

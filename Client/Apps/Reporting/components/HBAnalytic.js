@@ -12,7 +12,7 @@ import sortBy from 'lodash/sortBy';
 import ActionCard from '../../../Components/ActionCard/index';
 import Empty from '../../../Components/Empty/index';
 import ControlContainer from '../containers/ControlContainer';
-import TableContainer from '../containers/TableContainer';
+import TableContainer from '../containers/HBAnalytics/TableContainer';
 import ChartContainer from '../containers/HBAnalytics/ChartContainer';
 import BidCPMStatChartContainer from '../containers/HBAnalytics/BidCPMStatChartContainer';
 import hbAnalyticService from '../../../services/hbAnalyticService';
@@ -374,7 +374,9 @@ class Report extends Component {
 
 		// check cache for particular bucket size
 		// in that we will have data with calculation based on bucket
-		const dataFromCache = localStorage.getItem(`${selectedInterval}-${startDate}-${endDate}-${siteIds}:${bucketSize}`);
+		const dataFromCache = localStorage.getItem(
+			`${selectedInterval}-${startDate}-${endDate}-${siteIds}:${bucketSize}`
+		);
 		if (dataFromCache) {
 			return JSON.parse(dataFromCache).cacheData || [];
 		}
@@ -483,11 +485,15 @@ class Report extends Component {
 				}
 			});
 
-			const dataFromCache = localStorage.getItem(`${selectedInterval}-${fromDate}-${toDate}-${siteid}:${bucketSize}`);
+			const dataFromCache = localStorage.getItem(
+				`${selectedInterval}-${fromDate}-${toDate}-${siteid}:${bucketSize}`
+			);
 			const { showNotification } = this.props;
 
-			let cacheKey = `${selectedInterval}-${fromDate}-${toDate}-${JSON.stringify(selectedFilters)}`
-			let cacheDataForGraph = prevGraphData[cacheKey];
+			const cacheKey = `${selectedInterval}-${fromDate}-${toDate}-${JSON.stringify(
+				selectedFilters
+			)}`;
+			const cacheDataForGraph = prevGraphData[cacheKey];
 			Promise.all([
 				dataFromCache
 					? JSON.parse(dataFromCache).cacheData || []
@@ -499,14 +505,16 @@ class Report extends Component {
 				hbAnalyticService.getCustomStats({
 					...params
 				}),
-				cacheDataForGraph ? Promise.resolve(cacheDataForGraph): hbAnalyticService.getCustomStats({
-					...params,
-					dimension: 'network'
-				})
+				cacheDataForGraph
+					? Promise.resolve(cacheDataForGraph)
+					: hbAnalyticService.getCustomStats({
+							...params,
+							dimension: 'network'
+					  })
 			])
 				.then(([responseBidCPMChartData, response, responseCharts]) => {
-					if(!cacheDataForGraph) {
-						prevGraphData[cacheKey] = {...responseCharts};
+					if (!cacheDataForGraph) {
+						prevGraphData[cacheKey] = { ...responseCharts };
 					}
 					const [xAxis, yAxis] = dataFromCache
 						? responseBidCPMChartData
@@ -515,7 +523,9 @@ class Report extends Component {
 					if (dataFromCache) {
 						// eslint-disable-next-line no-param-reassign
 						responseBidCPMChartData = JSON.parse(
-							localStorage.getItem(`raw-${selectedInterval}-${fromDate}-${toDate}-${siteid}:${bucketSize}`) || '{}'
+							localStorage.getItem(
+								`raw-${selectedInterval}-${fromDate}-${toDate}-${siteid}:${bucketSize}`
+							) || '{}'
 						);
 					} else {
 						try {
@@ -663,7 +673,7 @@ class Report extends Component {
 							label: 'Bid Landscape'
 						},
 						responseBidCPMChartData,
-						prevGraphData: {...prevGraphData}
+						prevGraphData: { ...prevGraphData }
 					};
 					// don't set state here, as we also need to update charts
 					this.getChartsData(newState);
@@ -964,33 +974,41 @@ class Report extends Component {
 				const { eCPM, RESPONSE_TIME, PERCENT } = ANOMALY_THRESHOLD_CONSTANT;
 				Object.keys(dimensionWiseData).map(key => {
 					chartData[key] = dimensionWiseData[key].map(item => {
-						switch(chart.value) {
-							case "prebid_win_ecpm":
-							case "overall_win_ecpm":
+						switch (chart.value) {
+							case 'prebid_win_ecpm':
+							case 'overall_win_ecpm':
 								return {
 									date: item.date,
-									value: item[chart.value] > ANOMALY_THRESHOLD_CONSTANT.eCPM?ANOMALY_THRESHOLD_CONSTANT.eCPM: Number(item[chart.value].toFixed(2)) || 0
-								};	  
-							  break;
-							case "average_response_time":
-								return {
-									date: item.date,
-									value: item[chart.value] > ANOMALY_THRESHOLD_CONSTANT.RESPONSE_TIME?ANOMALY_THRESHOLD_CONSTANT.RESPONSE_TIME : Number(item[chart.value].toFixed(2)) || 0
-								};	  
+									value:
+										item[chart.value] > ANOMALY_THRESHOLD_CONSTANT.eCPM
+											? ANOMALY_THRESHOLD_CONSTANT.eCPM
+											: Number(item[chart.value].toFixed(2)) || 0
+								};
 								break;
-							case "overall_win_percent":
+							case 'average_response_time':
 								return {
 									date: item.date,
-									value: item[chart.value] > ANOMALY_THRESHOLD_CONSTANT.PERCENT ? ANOMALY_THRESHOLD_CONSTANT.PERCENT: Number(item[chart.value].toFixed(2)) || 0
-								};	  
+									value:
+										item[chart.value] > ANOMALY_THRESHOLD_CONSTANT.RESPONSE_TIME
+											? ANOMALY_THRESHOLD_CONSTANT.RESPONSE_TIME
+											: Number(item[chart.value].toFixed(2)) || 0
+								};
+								break;
+							case 'overall_win_percent':
+								return {
+									date: item.date,
+									value:
+										item[chart.value] > ANOMALY_THRESHOLD_CONSTANT.PERCENT
+											? ANOMALY_THRESHOLD_CONSTANT.PERCENT
+											: Number(item[chart.value].toFixed(2)) || 0
+								};
 								break;
 							default:
-							  return {
-								  date: item.date,
-								  value: Number(item[chart.value].toFixed(2)) || 0
-							  };
+								return {
+									date: item.date,
+									value: Number(item[chart.value].toFixed(2)) || 0
+								};
 						}
-
 					});
 					chartData[key] = sortBy(chartData[key], ['date']);
 				});
