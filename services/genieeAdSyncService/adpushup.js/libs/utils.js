@@ -735,12 +735,15 @@ module.exports = {
 			'GET',
 			'json'
 		)
-			.done(function({
-				data: {
-					urlKeys: { urlTargetingKey, urlTargetingValue },
+			.done(function(response) {
+				const { data } = response || {};
+				const  {
+					urlKeys,
 					utmKeys = {}
-				}
-			}) {
+				} = data || {};
+
+				const { urlTargetingKey, urlTargetingValue } = urlKeys || {};
+
 				utils.logURMEvent(commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_SUCCESS);
 				// utils.logURMEventKeen(commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_SUCCESS, {
 				// 	[commonConsts.EVENT_LOGGER.EVENTS.URM_REQUEST_SUCCESS]: new Date().getTime()
