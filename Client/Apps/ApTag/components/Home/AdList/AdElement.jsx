@@ -7,7 +7,7 @@ import { Col, OverlayTrigger, Tooltip, Button } from '@/Client/helpers/react-boo
 import { makeFirstLetterCapitalize } from '../../../../../helpers/commonFunctions';
 import CopyButtonWrapperContainer from '../../../../../Containers/CopyButtonWrapperContainer';
 import { ADCODE, REWARDED_AD_CODE, TIGGER_AUTOMATICALLY_CODE } from '../../../configs/commonConsts';
-import { ADPUSHUP_NETWORK_ID } from '../../../../../../configs/commonConsts';
+import config from '../../../../../config/config';
 
 import CustomButton from '../../../../../Components/CustomButton/index';
 import AdNetworkDetails from './AdNetworkDetails';
@@ -96,7 +96,7 @@ class AdElement extends Component {
 					.replace(/__AD_ID__/g, ad.id)
 					.replace(/__CUSTOM_ATTRIBS__/, customAttributes)
 					.replace(/__AD_UNIT__/g, dfpAdunit)
-					.replace(/__NETWORK_CODE__/g, ADPUSHUP_NETWORK_ID)
+					.replace(/__NETWORK_CODE__/g, config.ADPUSHUP_NETWORK_ID)
 					.replace(
 						/__POST_REWARDED_FUNCTION__/g,
 						rewardTriggerFunction && atob(rewardTriggerFunction)

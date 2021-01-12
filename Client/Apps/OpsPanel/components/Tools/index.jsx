@@ -9,7 +9,6 @@ import AdsTxtLiveSitesEntries from './AdsTxtLiveSitesEntries';
 import BidderSettings from './BidderSettings';
 import DashboardNotifications from './DashboardNotifications';
 import authService from '../../../../services/authService';
-import authToken from '../../../../../helpers/authToken';
 
 class Tools extends Component {
 	state = {
@@ -29,14 +28,13 @@ class Tools extends Component {
 
 	checkStatus = () => {
 		const { user } = this.props;
-		authToken.decodeAuthToken(authService.getAuthToken()).then(({ email, originalEmail }) => {
-			if (
-				(!originalEmail && user.dashboardNotificationAccess) ||
-				(originalEmail === email && user.dashboardNotificationAccess)
-			) {
-				this.toggleDashboardNotificationAccess(true);
-			}
-		});
+		const { email, originalEmail } = authService.getTokenPayloadWithoutVerification();
+		if (
+			(!originalEmail && user.dashboardNotificationAccess) ||
+			(originalEmail === email && user.dashboardNotificationAccess)
+		) {
+			this.toggleDashboardNotificationAccess(true);
+		}
 	};
 
 	componentDidMount = () => {
