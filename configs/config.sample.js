@@ -219,7 +219,7 @@ module.exports = {
 		}
 	},
 	prebidServer: {
-		host: 'https://amp.adpushup.com/'
+		host: 'https://amp.adpushup.com/' // please update this value in Client/config/config.js also
 	},
 	queuePublishingURL: 'http://localhost:9009',
 	urlReportingEnabledSites: [],
