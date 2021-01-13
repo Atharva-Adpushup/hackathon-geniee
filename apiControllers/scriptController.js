@@ -23,6 +23,18 @@ const { isValidThirdPartyDFPAndCurrency } = require('../helpers/commonFunctions'
 
 const Router = express.Router();
 
+const defaultApConfigValues = {
+	// site specific config
+	isUrlReportingEnabled: false,
+	isVideoWaitLimitDisabled: false,
+	isSeparatePrebidDisabled: false,
+	isBbPlayerEnabledForTesting: false,
+	isPerformanceLoggingEnabled: false,
+	isAutoAddMultiformatDisabled: false,
+	// global config
+	isBbPlayerLoggingEnabled: false
+};
+
 Router.get('/:siteId/siteConfig', (req, res) => {
 	SiteModel.getSiteById(req.params.siteId)
 		.then(site => Promise.join(site, UserModel.getUserByEmail(site.get('ownerEmail'))))
@@ -34,7 +46,10 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 			const gptSraDisabled = !!(site.get('apConfigs') && site.get('apConfigs').gptSraDisabled);
 
 			const setAllConfigs = function(prebidAndAdsConfig) {
-				const apConfigs = site.get('apConfigs');
+				const apConfigs = {
+					...defaultApConfigValues,
+					...site.get('apConfigs')
+				};
 				const adServerSettings = user.get('adServerSettings');
 				const isAdPartner = !!site.get('partner');
 				const {
