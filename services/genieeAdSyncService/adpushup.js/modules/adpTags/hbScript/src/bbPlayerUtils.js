@@ -19,43 +19,58 @@ var bbPlayerUtils = {
 	sendBbPlayerLogs: function(type, eventName, adpSlot, bid, bidWonTime) {
 		const adp = window.adpushup;
 		if (!type || !adp.config.enableBbPlayerLogging) return;
-		let json;
+		let json = {
+			eventName: eventName,
+			siteId: adp.config.siteId,
+			domain: adp.config.siteDomain,
+			url: window.location.href,
+			packetId: adp.config.packetId,
+			platform: adp.config.platform,
+			browser: adp.config.browser,
+			userAgent: (window.navigator && window.navigator.userAgent) || '',
+			eventTime: +new Date()
+		};
+
+		if ((type === 'bid' || type === 'not_rendered_video_bid') && bid) {
+			json = {
+				...json,
+				adUnitCode: bid.adUnitCode,
+				cpm: bid.cpm,
+				currency: bid.currency,
+				bidder: bid.bidder,
+				bidderCode: bid.bidderCode,
+				creativeId: bid.creativeId,
+				adId: bid.adId,
+				size: bid.size,
+				mediaType: bid.mediaType,
+				status: bid.status,
+				auctionId: bid.auctionId || '',
+				requestId: bid.requestId || ''
+			};
+		}
+
 		switch (type) {
 			case 'bid': {
 				json = {
-					eventName: eventName,
-					adUnitCode: bid.adUnitCode,
-					siteId: adp.config.siteId,
-					domain: adp.config.siteDomain,
+					...json,
 					refreshCount: adpSlot.refreshCount,
-					packetId: adp.config.packetId,
-					platform: adp.config.platform,
-					cpm: bid.cpm,
-					currency: bid.currency,
-					bidder: bid.bidder,
-					bidderCode: bid.bidderCode,
-					creativeId: bid.creativeId,
-					adId: bid.adId,
-					size: bid.size,
-					mediaType: bid.mediaType,
-					status: bid.status,
-					eventTime: +new Date(),
-					bidWonTime: bidWonTime,
-					auctionId: bid.auctionId || '',
-					requestId: bid.requestId || ''
+					bidWonTime: bidWonTime
 				};
 				break;
 			}
 			case 'refresh': {
 				json = {
-					eventName: eventName,
+					...json,
 					adUnitCode: adpSlot.containerId,
-					siteId: adp.config.siteId,
-					domain: adp.config.siteDomain,
-					refreshCount: adpSlot.refreshCount,
-					packetId: adp.config.packetId,
-					platform: adp.config.platform,
-					eventTime: +new Date()
+					refreshCount: adpSlot.refreshCount
+				};
+				break;
+			}
+			case 'not_rendered_video_bid': {
+				json = {
+					...json,
+					vastXml: bid.vastXml || '',
+					vastUrl: bid.vastUrl || ''
 				};
 				break;
 			}
@@ -64,10 +79,14 @@ var bbPlayerUtils = {
 			}
 		}
 
-		// const data = adp.utils.base64Encode(JSON.stringify(json));
-		// const imgSrc = BB_PLAYER_LOG_KEEN_ENDPOINT + data;
-
-		// adp.utils.fireImagePixel(imgSrc);
+		window.adpushup.$.ajax({
+			type: 'POST',
+			url: '//vastdump-staging.adpushup.com/bb_player_logging',
+			data: JSON.stringify(json),
+			contentType: 'application/json',
+			processData: false,
+			dataType: 'json'
+		});
 	}
 };
 

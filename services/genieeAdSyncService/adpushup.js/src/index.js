@@ -131,6 +131,7 @@ function initAdpConfig() {
 		// eslint-disable-next-line no-undef
 		$.extend(adp.config, __AP_CONFIG__, {
 			platform: browserConfig.platform,
+			browser: browserConfig.name,
 			packetId: utils.uniqueId(__SITE_ID__)
 		});
 
