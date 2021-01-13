@@ -85,38 +85,24 @@ var utils = require('../libs/utils'),
 				removeBidderTargeting(slot);
 
 				if (adp.config.isBbPlayerEnabledForTesting) {
-					// Temporarily logging video bids which are neither rendered nor thrown any error
-					const notRenderedVideoBid =
-						adp.config.notRenderedVideoBids && adp.config.notRenderedVideoBids[slot.containerId];
-					if (adp.config.enableBbPlayerLogging && notRenderedVideoBid) {
-						window.adpushup.$.ajax({
-							type: 'POST',
-							url: '//vastdump-staging.adpushup.com/bb_player_logging',
-							data: JSON.stringify({
-								eventName: 'not_rendered_video_bid',
-								adUnitCode: notRenderedVideoBid.adUnitCode,
-								bidder: notRenderedVideoBid.bidder,
-								bidderCode: notRenderedVideoBid.bidderCode,
-								creativeId: notRenderedVideoBid.creativeId,
-								adId: notRenderedVideoBid.adId,
-								size: notRenderedVideoBid.size,
-								mediaType: notRenderedVideoBid.mediaType,
-								status: notRenderedVideoBid.status,
-								eventTime: +new Date(),
-								auctionId: notRenderedVideoBid.auctionId || '',
-								requestId: notRenderedVideoBid.requestId || '',
-								vastXml: notRenderedVideoBid.vastXml || '',
-								vastUrl: notRenderedVideoBid.vastUrl || ''
-							}),
-							contentType: 'application/json',
-							processData: false,
-							dataType: 'json'
-						});
+					if (adp.config.enableBbPlayerLogging) {
+						sendBbPlayerLogs('refresh', 'refreshAd', slot);
 
-						delete adp.config.notRenderedVideoBids[slot.containerId];
+						// Temporarily logging video bids which are neither rendered nor thrown any error
+						const notRenderedVideoBid =
+							adp.config.notRenderedVideoBids && adp.config.notRenderedVideoBids[slot.containerId];
+
+						if (notRenderedVideoBid) {
+							sendBbPlayerLogs(
+								'not_rendered_video_bid',
+								'not_rendered_video_bid',
+								{},
+								notRenderedVideoBid
+							);
+
+							delete adp.config.notRenderedVideoBids[slot.containerId];
+						}
 					}
-
-					// sendBbPlayerLogs('refresh', 'refreshAd', slot);
 
 					// Remove BB Player if rendered for current adUnit
 					var bbPlayerId = getBbPlayerId(slot.containerId);

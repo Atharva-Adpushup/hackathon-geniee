@@ -17,7 +17,7 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 	var [width, height] = adpSlot.size;
 	const apConfig = window.adpushup.config;
 
-	// sendBbPlayerLogs('bid', 'video_bid_received', adpSlot, bid, bidWonTime);
+	sendBbPlayerLogs('bid', 'video_bid_received', adpSlot, bid, bidWonTime);
 
 	function getBbPlayerConfig(bid) {
 		const config = {
@@ -106,7 +106,7 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 
 		// listen video finished event
 		playerApi.on('adfinished', function() {
-			// sendBbPlayerLogs('bid', 'video_finished', adpSlot, bid, bidWonTime);
+			sendBbPlayerLogs('bid', 'video_finished', adpSlot, bid, bidWonTime);
 
 			// check if there is any another highest alive unused bid in cache
 			var highestAliveBid = utils.getHighestAliveBid(pbjs, bid.adUnitCode, [
@@ -166,7 +166,7 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 					delete apConfig.notRenderedVideoBids[bid.adUnitCode];
 				}
 
-				// sendBbPlayerLogs('bid', eventName, adpSlot, bid, bidWonTime);
+				sendBbPlayerLogs('bid', eventName, adpSlot, bid, bidWonTime);
 			});
 		});
 	};
@@ -209,7 +209,7 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 						apConfig.notRenderedVideoBids[bid.adUnitCode] = bid;
 					}
 
-					// sendBbPlayerLogs('bid', 'bb_queue_fired', adpSlot, bid, bidWonTime);
+					sendBbPlayerLogs('bid', 'bb_queue_fired', adpSlot, bid, bidWonTime);
 
 					customizeBbPlayer(playerApi, slotAttributesToMigrate, preservedSlotElDataset);
 					setupPlayerEvents(playerApi);
@@ -277,13 +277,13 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 			highestAliveBannerBid.adId
 		);
 
-		// sendBbPlayerLogs(
-		// 	'bid',
-		// 	'banner_before_video_rendered',
-		// 	adpSlot,
-		// 	highestAliveBannerBid,
-		// 	bidWonTime
-		// );
+		sendBbPlayerLogs(
+			'bid',
+			'banner_before_video_rendered',
+			adpSlot,
+			highestAliveBannerBid,
+			bidWonTime
+		);
 
 		// send banner bid won feedback
 		prebidDataCollector.collectBidWonData(highestAliveBannerBid);
