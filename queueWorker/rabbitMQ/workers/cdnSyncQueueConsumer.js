@@ -24,7 +24,8 @@ const queueConfig = {
 			header: 'Alert open for Service: CDN SYN Consumer [console.adpushup.com]',
 			content: '<p>Consumer failed multiple times. Please check on priority.</p>'
 		},
-		emailId: 'abhinav.choudhri@adpushup.com,anil.panghal@adpushup.com, ravi.jagga@adpushup.com, rahul.ranjan@adpushup.com'
+		emailId:
+			'abhinav.choudhri@adpushup.com,anil.panghal@adpushup.com, ravi.jagga@adpushup.com, rahul.ranjan@adpushup.com'
 	}
 };
 const QUEUE = CONFIG.RABBITMQ.CDN_SYNC.QUEUE.name;
@@ -71,7 +72,21 @@ function validateMessageData(originalMessage) {
 	});
 }
 
-function syncCDNWrapper(decodedMessage) {
+function processPrebidModule(data) {
+	const [site] = data;
+	const apConfigs = site.get('apConfigs');
+	const { isSeparatePrebidDisabled = false } = apConfigs;
+
+	if (isSeparatePrebidDisabled) {
+		console.log('Separate Prebid bundle feature is disabled.');
+		return data;
+	}
+
+	console.log('Separate Prebid bundle feature is enabled.');
+	return syncPrebidBundle().then(({ name: prebidBundleName }) => [...data, prebidBundleName]);
+}
+
+function processPrebidAndSyncCdn(decodedMessage) {
 	// if (!SITES_TO_PROCESS.includes(decodedMessage.siteId)) {
 	// 	console.log(`Skipping cdn processing for ${decodedMessage.siteId}`);
 	// 	return decodedMessage.siteId;
@@ -80,7 +95,8 @@ function syncCDNWrapper(decodedMessage) {
 	return siteModel
 		.getSiteById(decodedMessage.siteId)
 		.then(site => Promise.join(site, userModel.getUserByEmail(site.get('ownerEmail'))))
-		.then(([site, user]) => syncCDNService(site, user, decodedMessage.prebidBundleName))
+		.then(processPrebidModule)
+		.then(syncCDNService)
 		.then(() => decodedMessage.siteId);
 }
 
@@ -91,7 +107,11 @@ function errorHandler(error, originalMessage) {
 	if (!customErrorMessage) {
 		customErrorMessage = error && error[0] ? error[0].message : 'Unsynced ads in setup';
 		if (typeof customErrorMessage === 'object') {
-			customErrorMessage = `[LOG FROM CONSOLE] Unsynced ads in setup | Pagegroup - ${customErrorMessage.pagegroup} | Platform - ${customErrorMessage.platform} | SectionId - ${customErrorMessage.sectionId} | adId - ${customErrorMessage.ad.id} | Network - ${customErrorMessage.ad.network}`;
+			customErrorMessage = `[LOG FROM CONSOLE] Unsynced ads in setup | Pagegroup - ${
+				customErrorMessage.pagegroup
+			} | Platform - ${customErrorMessage.platform} | SectionId - ${
+				customErrorMessage.sectionId
+			} | adId - ${customErrorMessage.ad.id} | Network - ${customErrorMessage.ad.network}`;
 		}
 	}
 
@@ -131,27 +151,7 @@ function errorHandler(error, originalMessage) {
 
 function doProcessingAndAck(originalMessage) {
 	return validateMessageData(originalMessage)
-		.then(decodedMessage => {
-			// const isSeparatePrebidEnabled =
-			// 	CONFIG.separatePrebidEnabledSites.indexOf(decodedMessage.siteId) !== -1;
-			const isSeparatePrebidEnabled = CONFIG.separatePrebidDisabledSites.indexOf(decodedMessage.siteId) === -1;
-			const siteSpecificPrebidSiteId =
-				Array.isArray(CONFIG.separateSiteSpecificPrebidBundleSites) &&
-				CONFIG.separateSiteSpecificPrebidBundleSites.indexOf(decodedMessage.siteId) !== -1 &&
-				decodedMessage.siteId;
-
-			if (isSeparatePrebidEnabled) {
-				console.log('Separate Prebid bundle feature is enabled.');
-				return syncPrebidBundle(siteSpecificPrebidSiteId).then(({ name: prebidBundleName }) => ({
-					...decodedMessage,
-					prebidBundleName
-				}));
-			}
-
-			console.log('Separate Prebid bundle feature is disabled.');
-			return decodedMessage;
-		})
-		.then(syncCDNWrapper)
+		.then(processPrebidAndSyncCdn)
 		.then((siteId = 'N/A') => {
 			counter = 0;
 			logger({
