@@ -417,116 +417,117 @@ class Report extends Component {
 			});
 
 			Promise.all(reportingData).then(responses => {
-				tableData = responses.reduce(
-					(cummulutaive, response) => {
-						if (Number(response.status) === 200 && response.data) {
-							let tableData = response.data || [];
-							// hide bidder/network col - data is being aggregated data wise
-							tableData.columns = tableData.columns.filter(item => item !== 'network');
-							tableData.total = {};
-							const shouldAddAdpushupCountPercentColumn =
-								(selectedDimension === 'mode' ||
-									selectedDimension === 'error_code' ||
-									selectedFilters.mode ||
-									selectedFilters.error_code) &&
-								tableData.columns.indexOf('adpushup_count') !== -1;
+				tableData = responses.reduce((cummulutaive, response) => {
+					if (Number(response.status) === 200 && response.data) {
+						let tableData = response.data || [];
+						// hide bidder/network col - data is being aggregated data wise
+						tableData.columns = tableData.columns.filter(item => item !== 'network');
+						tableData.total = {};
+						const shouldAddAdpushupCountPercentColumn =
+							(selectedDimension === 'mode' ||
+								selectedDimension === 'error_code' ||
+								selectedFilters.mode ||
+								selectedFilters.error_code) &&
+							tableData.columns.indexOf('adpushup_count') !== -1;
 
-							// Add columns
-							if (isForOps && shouldAddAdpushupCountPercentColumn) {
-								tableData.columns.push('adpushup_count_percent');
+						// Add columns
+						if (isForOps && shouldAddAdpushupCountPercentColumn) {
+							tableData.columns.push('adpushup_count_percent');
 
-								// eslint-disable-next-line no-inner-declarations
-								function getComputedIntervalKey(row) {
-									const { date, month, year } = row;
+							// eslint-disable-next-line no-inner-declarations
+							function getComputedIntervalKey(row) {
+								const { date, month, year } = row;
 
-									if (date) return date;
-									if (month && year) return `${month}-${year}`;
-									return 'cumulative';
+								if (date) return date;
+								if (month && year) return `${month}-${year}`;
+								return 'cumulative';
+							}
+
+							const adpushupCountTotalObj = tableData.result.reduce((totalObj, row) => {
+								const { adpushup_count: adpushupCount } = row;
+								const key = getComputedIntervalKey(row);
+
+								if (Number.isInteger(totalObj[key])) {
+									// eslint-disable-next-line no-param-reassign
+									totalObj[key] += adpushupCount;
+								} else {
+									// eslint-disable-next-line no-param-reassign
+									totalObj[key] = adpushupCount;
 								}
 
-								const adpushupCountTotalObj = tableData.result.reduce((totalObj, row) => {
-									const { adpushup_count: adpushupCount } = row;
-									const key = getComputedIntervalKey(row);
-
-									if (Number.isInteger(totalObj[key])) {
-										// eslint-disable-next-line no-param-reassign
-										totalObj[key] += adpushupCount;
-									} else {
-										// eslint-disable-next-line no-param-reassign
-										totalObj[key] = adpushupCount;
-									}
-
-									return totalObj;
-								}, {});
-
-								tableData.result.forEach(row => {
-									const key = getComputedIntervalKey(row);
-
-									const perc = (row.adpushup_count / adpushupCountTotalObj[key]) * 100;
-									// eslint-disable-next-line no-param-reassign
-									row.adpushup_count_percent = perc;
-								});
-							}
-
-							// Compute data table total
-							if (
-								reportType === 'global' &&
-								!tableData.total &&
-								tableData.columns &&
-								tableData.columns.length
-							) {
-								tableData.total = this.computeTotal(tableData.result);
-							}
+								return totalObj;
+							}, {});
 
 							tableData.result.forEach(row => {
-								Object.keys(row).forEach(column => {
-									if (
-										REPORT_INTERVAL_TABLE_KEYS.indexOf(column) === -1 &&
-										!Number.isNaN(row[column]) &&
-										!dimensionList.find(dimension => dimension.value === column) &&
-										!(typeof row[column] === 'string')
-									) {
-										// eslint-disable-next-line no-param-reassign
-										row[column] = parseFloat(roundOffTwoDecimal(row[column]));
-									}
-								});
+								const key = getComputedIntervalKey(row);
+
+								const perc = (row.adpushup_count / adpushupCountTotalObj[key]) * 100;
+								// eslint-disable-next-line no-param-reassign
+								row.adpushup_count_percent = perc;
 							});
-
-							Object.keys(tableData.total || {}).forEach(column => {
-								tableData.total[column] = parseFloat(roundOffTwoDecimal(tableData.total[column]));
-							});
-
-							if (tableData.columns && tableData.columns.length) {
-								let metricsList = this.getMetricsList(tableData);
-								// eslint-disable-next-line no-shadow
-								const { displayURLMetrics, displayUTMMetrics } = this.state;
-								metricsList = [...(isURL ? displayURLMetrics : displayUTMMetrics)];
-								// show only metrices that are in displayURLAndUTMMetricsList
-								newState = { ...newState, metricsList };
-							}
-							// return { ...cummulutaive, tableData };
-
-							let cummulativeResult;
-							if (!cummulutaive.result) cummulativeResult = tableData;
-							else {
-								const { columns, recordCount, result, total } = cummulutaive;
-								const {
-									recordCount: cuurentRecordCound,
-									result: currentResult,
-									total: currentTotal
-								} = tableData;
-								cummulativeResult = {
-									columns,
-									recordCount: cuurentRecordCound + recordCount,
-									result: [...result, ...currentResult],
-									total: total + currentTotal
-								};
-							}
-							return cummulativeResult;
 						}
-					},
-					{ tableData }
-				);
+
+						// Compute data table total
+						if (
+							reportType === 'global' &&
+							!tableData.total &&
+							tableData.columns &&
+							tableData.columns.length
+						) {
+							tableData.total = this.computeTotal(tableData.result);
+						}
+
+						tableData.result.forEach(row => {
+							Object.keys(row).forEach(column => {
+								if (
+									REPORT_INTERVAL_TABLE_KEYS.indexOf(column) === -1 &&
+									!Number.isNaN(row[column]) &&
+									!dimensionList.find(dimension => dimension.value === column) &&
+									!(typeof row[column] === 'string')
+								) {
+									// eslint-disable-next-line no-param-reassign
+									row[column] = parseFloat(roundOffTwoDecimal(row[column]));
+								}
+							});
+						});
+
+						Object.keys(tableData.total || {}).forEach(column => {
+							tableData.total[column] = parseFloat(roundOffTwoDecimal(tableData.total[column]));
+						});
+
+						if (tableData.columns && tableData.columns.length) {
+							let metricsList = this.getMetricsList(tableData);
+							// eslint-disable-next-line no-shadow
+							const { displayURLMetrics, displayUTMMetrics } = this.state;
+							metricsList = [...(isURL ? displayURLMetrics : displayUTMMetrics)];
+							// show only metrices that are in displayURLAndUTMMetricsList
+							newState = { ...newState, metricsList };
+						}
+						// return { ...cummulutaive, tableData };
+
+						let cummulativeResult;
+						if (!cummulutaive.result) cummulativeResult = tableData;
+						else {
+							const { columns, result, total } = cummulutaive;
+							const { result: currentResult, total: currentTotal } = tableData;
+							cummulativeResult = {
+								columns,
+								result: [...result, ...currentResult],
+								total: {
+									total_network_ad_ecpm:
+										total.total_network_ad_ecpm || 0 + currentTotal.total_network_ad_ecpm || 0,
+									total_network_impressions:
+										total.total_network_impressions ||
+										0 + currentTotal.total_network_impressions ||
+										0,
+									total_network_net_revenue:
+										total.network_net_revenue || 0 + currentTotal.network_net_revenue || 0
+								}
+							};
+						}
+						return cummulativeResult;
+					}
+				}, {});
 				newState = {
 					...newState,
 					isLoading: false,
