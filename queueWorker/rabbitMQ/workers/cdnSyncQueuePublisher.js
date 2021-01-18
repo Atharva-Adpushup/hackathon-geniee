@@ -2,7 +2,9 @@ const CONFIG = require('../../../configs/config');
 const Publisher = require('../libs/publisher');
 const publishJobs = require('../libs/publisherCommon');
 
-const { QUEUE: MAIN_QUEUE, SELECTIVE_ROLLOUT_QUEUE } = CONFIG.RABBITMQ.CDN_SYNC;
+const { CDN_SYNC, SELECTIVE_ROLLOUT } = CONFIG.RABBITMQ;
+const { QUEUE: MAIN_QUEUE } = CDN_SYNC;
+const { QUEUE: SELECTIVE_ROLLOUT_QUEUE } = SELECTIVE_ROLLOUT;
 
 const mainQueueConfig = {
 	url: CONFIG.RABBITMQ.URL,
@@ -11,7 +13,8 @@ const mainQueueConfig = {
 };
 
 const selectiveRolloutQueueConfig = {
-	...mainQueueConfig,
+	url: CONFIG.RABBITMQ.URL,
+	exchange: CONFIG.RABBITMQ.SELECTIVE_ROLLOUT.EXCHANGE,
 	queue: SELECTIVE_ROLLOUT_QUEUE
 };
 

@@ -146,9 +146,16 @@ module.exports = {
 			QUEUE: {
 				name: 'consoleCdnSync',
 				options: { durable: true }
+			}
+		},
+		SELECTIVE_ROLLOUT: {
+			EXCHANGE: {
+				name: 'selectiveRollOut',
+				type: 'direct',
+				options: { durable: true }
 			},
-			SELECTIVE_ROLLOUT_QUEUE: {
-				name: 'consoleCdnSyncSelectiveRollout',
+			QUEUE: {
+				name: 'selectiveRollOut',
 				options: { durable: true }
 			}
 		},
