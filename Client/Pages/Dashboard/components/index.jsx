@@ -28,11 +28,16 @@ import reportService from '../../../services/reportService';
 import { convertObjToArr, getDateRange } from '../helpers/utils';
 import OnboardingCard from '../../../Components/OnboardingCard';
 import CustomButton from '../../../Components/CustomButton';
+import MixpanelHelper from '../../../helpers/mixpanel';
 
 class Dashboard extends React.Component {
 	constructor(props) {
 		super(props);
-		let {user: { data: { isUniqueImpEnabled = false } }}  = props
+		let {
+			user: {
+				data: { isUniqueImpEnabled = false }
+			}
+		} = props;
 		this.state = {
 			quickDates: dates,
 			sites: [],
@@ -182,7 +187,12 @@ class Dashboard extends React.Component {
 					/>
 				);
 			case 'per_overview':
-				return <PerformanceOverviewContainer isUniqueImpEnabled={isUniqueImpEnabled} displayData={widget.data} />;
+				return (
+					<PerformanceOverviewContainer
+						isUniqueImpEnabled={isUniqueImpEnabled}
+						displayData={widget.data}
+					/>
+				);
 			case 'per_site_wise':
 				if (reportType != 'site') {
 					return <SitewiseReportContainer displayData={widget.data} />;
@@ -205,14 +215,9 @@ class Dashboard extends React.Component {
 
 	getDisplayData = wid => {
 		const { widgetsConfig, isUniqueImpEnabled } = this.state;
-		const {
-			selectedDate,
-			selectedSite,
-			name,
-			customDateRange,
-			startDate,
-			endDate
-		} = widgetsConfig[wid];
+		const { selectedDate, selectedSite, name, customDateRange, startDate, endDate } = widgetsConfig[
+			wid
+		];
 		let { path } = widgetsConfig[wid];
 
 		const {
@@ -245,10 +250,10 @@ class Dashboard extends React.Component {
 		widgetsConfig[wid].startDate = params.fromDate;
 		widgetsConfig[wid].endDate = params.toDate;
 
-		if(name == 'per_site_wise' && isUniqueImpEnabled) {
-			path = path.replace('network_impressions,', '')
-			path = path.replace('network_ad_ecpm,', '')
-			path += ',unique_impressions,unique_ad_ecpm'
+		if (name == 'per_site_wise' && isUniqueImpEnabled) {
+			path = path.replace('network_impressions,', '');
+			path = path.replace('network_ad_ecpm,', '');
+			path += ',unique_impressions,unique_ad_ecpm';
 		}
 
 		if (hidPerApOriginData) {
@@ -325,6 +330,11 @@ class Dashboard extends React.Component {
 		return false;
 	};
 
+	onCardHover = eventName => {
+		const properties = { cardName: eventName, cardHovered: true };
+		MixpanelHelper.trackEvent('Dashboard', properties);
+	};
+
 	renderControl(wid) {
 		const {
 			reportType,
@@ -361,6 +371,12 @@ class Dashboard extends React.Component {
 		};
 
 		const handleDatePresetSelect = selection => {
+			const properties = {
+				selection,
+				cardName: widgetsConfig[wid].display_name
+			};
+			MixpanelHelper.trackEvent('Dashboard', properties);
+
 			widgetsConfig[wid].selectedDate = selection;
 
 			if (selection === 'customDateRange') {
@@ -504,6 +520,7 @@ class Dashboard extends React.Component {
 						key={widget.name}
 						type="default"
 						headerClassName="card-header"
+						onMouseEnter={() => this.onCardHover(widget.display_name)}
 						headerChildren={
 							<div className="aligner aligner--row">
 								<span className="aligner-item card-header-title">{widget.display_name}</span>

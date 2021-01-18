@@ -16,7 +16,7 @@ import CustomButton from '../../../../Components/CustomButton/index';
 import CustomMessage from '../../../../Components/CustomMessage/index';
 import SelectBox from '../../../../Components/SelectBox';
 import Loader from '../../../../Components/Loader/index';
-import { ADPUSHUP_NETWORK_ID } from '../../../../../configs/commonConsts';
+import config from '../../../../config/config';
 
 class Account extends Component {
 	constructor(props) {
@@ -348,7 +348,8 @@ class Account extends Component {
 									!apLiteSites.length
 										? dfpAccounts
 										: dfpAccounts.filter(
-												val => val.name.split('-')[0].trim() !== ADPUSHUP_NETWORK_ID.toString()
+												val =>
+													val.name.split('-')[0].trim() !== config.ADPUSHUP_NETWORK_ID.toString()
 										  )
 								}
 								title="Select Google Ad Manager"

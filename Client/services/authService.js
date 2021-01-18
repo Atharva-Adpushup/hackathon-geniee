@@ -1,4 +1,5 @@
 import Cookies from 'universal-cookie';
+import jwt from 'jsonwebtoken';
 
 const cookies = new Cookies();
 const authCookieName = 'user';
@@ -18,5 +19,9 @@ export default {
 	isOps: () => {
 		const authCookie = cookies.get(authCookieName);
 		return !!authCookie && authCookie.isSuperUser;
+	},
+	getTokenPayloadWithoutVerification() {
+		const token = this.getAuthToken();
+		return jwt.decode(token);
 	}
 };

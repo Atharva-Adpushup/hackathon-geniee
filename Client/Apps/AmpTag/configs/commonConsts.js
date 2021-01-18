@@ -1,4 +1,4 @@
-import { prebidServer as prebidServerConfig } from '../../../../configs/config';
+import config from '../../../config/config';
 
 const AMP_NAV_ITEMS_INDEXES = {
 	CREATE_ADS: 'create-ads',
@@ -67,7 +67,7 @@ const SIZES = {
 };
 
 const PREBID_SERVER_ENDPOINT = `${
-	prebidServerConfig.host
+	config.PREBID_SERVER_HOST
 }prebidserver/openrtb2/amp?tag_id=__AD_ID____MULTI_SIZE_QUERY_PARAM__`;
 
 const AMP_FIXED_TARGETING = {
