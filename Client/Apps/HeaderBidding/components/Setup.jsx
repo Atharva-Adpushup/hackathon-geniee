@@ -3,7 +3,7 @@ import { Row } from '@/Client/helpers/react-bootstrap-imports';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
 import CustomButton from '../../../Components/CustomButton';
-import commonConsts from '../../../../configs/commonConsts';
+import hbConfig from '../config';
 
 class Setup extends React.Component {
 	$window = window;
@@ -58,7 +58,7 @@ class Setup extends React.Component {
 		const timer = setInterval(
 			// eslint-disable-next-line no-use-before-define
 			checkDfpStatus.bind(this),
-			commonConsts.hbGlobalSettingDefaults.adserverSetupCheckInterval
+			hbConfig.hbGlobalSettingDefaults.adserverSetupCheckInterval
 		);
 
 		function checkDfpStatus() {

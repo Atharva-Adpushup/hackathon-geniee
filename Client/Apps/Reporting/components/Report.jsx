@@ -35,6 +35,7 @@ import {
 	columnsBlacklistedForAddition,
 	DEFAULT_ERROR_MESSAGE
 } from '../configs/commonConsts';
+import MixpanelHelper from '../../../helpers/mixpanel';
 
 function oldConsoleRedirection(e) {
 	e.preventDefault();
@@ -336,6 +337,25 @@ class Report extends Component {
 	};
 
 	generateButtonHandler = (inputState = {}) => {
+		if (Object.keys(inputState).length) {
+			const {
+				reportType,
+				selectedInterval,
+				selectedDimension,
+				selectedFilters,
+				startDate,
+				endDate
+			} = inputState;
+			const reportDateDifference = moment(endDate).diff(moment(startDate), 'days') + 1;
+			const properties = {
+				reportType,
+				reportDateDifference,
+				interval: selectedInterval,
+				dimension: selectedDimension,
+				filters: Object.keys(selectedFilters)
+			};
+			MixpanelHelper.trackEvent('Reports', properties);
+		}
 		let { tableData, metricsList, selectedFilterValues } = this.state;
 		const { selectedDimension, selectedFilters, dimensionList } = this.state;
 		const { reportType, isForOps } = this.props;

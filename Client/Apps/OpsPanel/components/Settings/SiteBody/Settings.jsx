@@ -6,7 +6,7 @@ import FieldGroup from '../../../../../Components/Layout/FieldGroup';
 import InputBox from '../../../../../Components/InputBox/index';
 import CustomButton from '../../../../../Components/CustomButton/index';
 // import { formatDate } from '../../../../../helpers/commonFunctions';
-import { ADPUSHUP_NETWORK_ID } from '../../../../../../configs/commonConsts';
+import config from '../../../../../config/config';
 import siteService from '../../../../../services/siteService';
 
 class Settings extends Component {
@@ -76,7 +76,7 @@ class Settings extends Component {
 			if (
 				name === 'apLite' &&
 				adServerSettings.hasOwnProperty('dfp') &&
-				adServerSettings.dfp.activeDFPNetwork === ADPUSHUP_NETWORK_ID.toString() &&
+				adServerSettings.dfp.activeDFPNetwork === config.ADPUSHUP_NETWORK_ID.toString() &&
 				value
 			) {
 				alert('AP Lite can not be enabled');

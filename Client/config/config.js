@@ -16,5 +16,10 @@ export default {
 	AP_GETTING_STARTED_URL: 'https://campaign.adpushup.com/get-started/',
 	NOTIFICATION_SERVICE: {
 		HOST: 'https://notifications.adpushup.com'
+	},
+	ADPUSHUP_NETWORK_ID: 103512698,
+	PREBID_SERVER_HOST: 'https://amp.adpushup.com/',
+	MIXPANEL: {
+		TOKEN: '96e958dc847c19d28cf873a827efae75'
 	}
 };

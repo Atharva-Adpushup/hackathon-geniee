@@ -28,8 +28,8 @@ const Routes = () => (
 			})}
 			{/* Private Routes */}
 			{routeConfig.private.map(route => {
-				const { name, ...rest } = route;
-				return <PrivateRoute key={name} {...rest} />;
+				const { name } = route;
+				return <PrivateRoute key={name} {...route} />;
 			})}
 			<Route component={() => <PageNotFound message="Sorry, this page doesn't exist" />} />
 		</Switch>
