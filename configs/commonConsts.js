@@ -1,7 +1,7 @@
 const config = require('./config');
 
 const prodEnv = config.environment.HOST_ENV === 'production';
-const reportingBaseURL = 'https://api.adpushup.com/CentralReportingWebService';
+const reportingBaseURL = 'http://40.75.77.162:8080/CentralReportingWebServiceHBAggregationTest';
 const computedProductionURL = prodEnv
 	? 'https://console.adpushup.com'
 	: `http://localhost:${config.environment.HOST_PORT}`;
@@ -777,5 +777,11 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		BANNER: 'apDisplay',
 		VIDEO: 'apVideo',
 		NATIVE: 'apNative'
+	},
+	PARTNERS_PANEL_INTEGRATION: {
+		ANOMALY_THRESHOLD_IN_PER: 5,
+		MAIL: {
+			HEADER_ITEMS: ['Date', 'Partner', 'Website', 'Difference', 'AdPushup Revenue', 'Demand Partner Revenue']
+		}
 	}
 };

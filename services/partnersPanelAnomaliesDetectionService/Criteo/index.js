@@ -8,6 +8,7 @@ const { appBucket } = require('../../../helpers/routeHelpers');
 const siteModel = require('../../../models/siteModel');
 const config = require('../../../configs/config');
 const constants = require('../../../configs/commonConsts');
+const emailer = require('../emailer');
 
 const TOKEN = 'D152A218-5DE9-4834-91F0-95542119D520';
 const API_ENDPOINT = `https://pmc.criteo.com/api/stats?apitoken=${TOKEN}`;
@@ -51,6 +52,7 @@ const ANALYTICS_API_ROOT = 'https://console.adpushup.com';
  */
 
 function getDataFromAdPushup(siteId) {
+    // TBD - Remove hard coded dates after testing
 	return axios
 		.get(`${reportingBaseURL}${REPORT_PATH}`, {
 			params: {
@@ -59,7 +61,6 @@ function getDataFromAdPushup(siteId) {
                 fromDate:"2021-01-07",
                 toDate:"2021-01-07",
                 interval:"daily",
-                // siteid:40792,
                 dimension:"siteid"
             }
         })
@@ -94,14 +95,7 @@ const fetchData = async (sitesData) => {
 		})
 		.then(response => response.data)
 		.then(async function(data) {
-            // let zouton = data.filter(item => item.Domain == "zouton.com")
-            // console.log(zouton, 'zouton.com')
-            // console.log('Fetching data from AdPushup...');
-
-            // console.log(sitesData, sitesData.length, 'sitesData')
             console.log('processing sitesData....')
-            // let arr = sitesData.map(item => item.siteId);
-            // console.log(arr.join(), 'arr')
 
             // process and map sites data with publishers API data structure
             const sitesDomainAndIdMapping = {};
@@ -118,13 +112,10 @@ const fetchData = async (sitesData) => {
                 sitesIdAndDomainMapping[item.siteId].domain = domain;
                 return item;
             });
-            // console.log(siteIdArr, siteIdArr.length, 'siteIdArr')
-            // console.log(sitesDomainAndIdMapping, 'sitesDomainAndIdMapping')
-            // console.log(sitesIdAndDomainMapping, 'sitesIdAndDomainMapping')
+
             let siteIdArr = [];
             let _data = data.map(item => {
                 const details = sitesDomainAndIdMapping[item.Domain];
-                // console.log(details, item.Domain, item)
                 item.details = details;
                 return item;
             })
@@ -134,34 +125,34 @@ const fetchData = async (sitesData) => {
                 siteIdArr.push(item.details.siteId)
                 return item;
             })
-            // console.log(_data, '_data')
-            // console.log(siteIdArr.join(), siteIdArr.length, 'siteIdArr')
 
             const adpData = await getDataFromAdPushup(siteIdArr.join(','));
             let finalData = [];
             adpData.map((item) => {
-                // console.log(sitesIdAndDomainMapping[item.siteid], 'sitesIdAndDomainMapping[item.siteid]')
                 let siteDetail = sitesIdAndDomainMapping[item.siteid]
-                // console.log(siteDetail, 'siteDetail', item.siteid)
+
                 sitesDomainAndIdMapping[siteDetail.domain].adpRevenue = item.network_gross_revenue
                 sitesDomainAndIdMapping[siteDetail.domain].diff = sitesDomainAndIdMapping[siteDetail.domain].pubRevenue - item.network_gross_revenue
                 sitesDomainAndIdMapping[siteDetail.domain].diffPer = (sitesDomainAndIdMapping[siteDetail.domain].diff/sitesDomainAndIdMapping[siteDetail.domain].pubRevenue) * 100
-                // console.log(sitesDomainAndIdMapping[sitesIdAndDomainMapping[item.siteid].domain])
+
                 finalData.push(sitesDomainAndIdMapping[sitesIdAndDomainMapping[item.siteid].domain])
-                // console.log(item.network_gross_revenue, 'item.network_gross_revenue' ,sitesDomainAndIdMapping[siteDetail.domain].pubRevenue, sitesDomainAndIdMapping[siteDetail.domain])
             })
 
-            console.log(JSON.stringify(finalData, null, 3), 'finalData')
-            // console.log(sitesDomainAndIdMapping)
+            const { PARTNERS_PANEL_INTEGRATION: { ANOMALY_THRESHOLD_IN_PER }} = constants;
+            const dataToSend = finalData.filter(item => item.diffPer <= -ANOMALY_THRESHOLD_IN_PER || item.diffPer >= ANOMALY_THRESHOLD_IN_PER)
+            console.log(JSON.stringify(dataToSend, null, 3), 'finalData')
+            console.log(finalData.length, 'finalData length')
+            console.log(dataToSend.length, 'dataToSend length')
+            // if anmalies found
+            if(dataToSend.length) {
+                emailer.anomaliesMailService(dataToSend)
+            }
 
 		})
 		.catch(function(error) {
 			// handle error
 			console.log(error), 'errrr';
 		})
-		.then(function() {
-			// always executed
-		});
 };
 
 module.exports = fetchData;
