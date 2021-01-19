@@ -2,10 +2,11 @@ const couchbase = require('couchbase');
 const axios = require('axios').default;
 const _ = require('lodash');
 const request = require('request-promise');
+const moment = require('moment');
 
 const config = require('../configs/config');
 const CC = require('../configs/commonConsts');
-const { queryViewFromAppBucket } = require('../helpers/couchBaseService');
+const { queryViewFromAppBucket, getDoc, upsertDoc } = require('../helpers/couchBaseService');
 const { sortObjectEntries } = require('../helpers/utils');
 const AdPushupError = require('../helpers/AdPushupError');
 const {
@@ -292,7 +293,28 @@ const reportsService = {
 		cacheWrapper(
 			{ cacheKey: JSON.stringify({ path, params }), cacheExpiry: 4 * 3600, bypassCache },
 			async () => reportsService.getWidgetData(path, params)
-		)
+		),
+	logReportUsage: async (email, reportConfig) => {
+		const config = _.cloneDeep(reportConfig);
+
+		const todaysDate = moment().format('YYYY-MM-DD');
+		const docId = `${CC.docKeys.freqReports}${email}:${todaysDate}`;
+
+		const { value: todaysConfigDoc } = await getDoc('AppBucket', docId);
+		const reportKey = JSON.stringify(config);
+
+		const existingCount = todaysConfigDoc.reportsLog
+			? todaysConfigDoc.reportsLog[reportKey] || 0
+			: 0;
+		const newConfig = {
+			email,
+			reportsLog: {
+				...todaysConfigDoc.reportsLog,
+				[reportKey]: existingCount + 1
+			}
+		};
+		return upsertDoc('AppBucket', docId, newConfig);
+	}
 };
 
 module.exports = reportsService;
