@@ -24,16 +24,18 @@ router
 	.get('/getCustomStats', reportsAccess, async (req, res) => {
 		req.setTimeout(360000); // timeout set to 6 mins for this particular route - temporary fix, need to remove when the backend responds on time
 		const {
-			query: { bypassCache = 'false' }
+			query: { bypassCache = 'false', ...reportingConfig },
+			user: { originalEmail, email }
 		} = req;
 
-		const reportConfig = _.cloneDeep(req.query);
+		const reportConfig = _.cloneDeep(reportingConfig);
 		try {
 			const { cacheHit, data: reportsData } = await reportsService.getReportsWithCache(
 				reportConfig,
 				bypassCache === 'true'
 			);
 			if (cacheHit) setCacheHeaders(res);
+			await reportsService.logReportUsage(originalEmail || email, reportConfig);
 			return sendSuccessResponse(reportsData, res, HTTP_STATUSES.OK);
 		} catch (err) {
 			return sendErrorResponse({ message: err.message }, res, HTTP_STATUSES.BAD_REQUEST);
