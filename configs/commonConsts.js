@@ -437,6 +437,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		lastRunInfoDoc: 'config::apnd:last-run-info',
 		sizeMapppingConfig: 'data::sizeMapping',
 		activeBidderAdaptersList: 'data::activeBidderAdapters',
+		freqReports: 'freq:rprt::',
 		hbaQueryFrequencyDoc: 'hbaq::'
 	},
 	tagManagerInitialDoc: {
@@ -628,7 +629,17 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		'/site/report?report_name=site_summary',
 		'/site/report?report_name=revenue_by_network',
 		'/site/report?report_name=get_stats_by_custom&dimension=siteid&interval=cumulative&metrics=adpushup_page_views,adpushup_page_cpm,network_ad_ecpm,network_impressions,network_net_revenue',
+		'/site/report?report_name=get_stats_by_custom&dimension=siteid&interval=daily&metrics=adpushup_page_views,adpushup_page_cpm,network_ad_ecpm,network_impressions,network_net_revenue',
 		'/site/report?report_name=country_report'
+	],
+	ADMIN_DASHBOARD_QUERIES: [
+		'/site/report?report_name=estimated_earning_comparison',
+		'/site/report?report_name=ap_vs_baseline',
+		'/site/report?report_name=site_summary',
+		'/site/report?report_name=get_stats_by_custom&dimension=mode,error_code',
+		'/site/report?report_name=top_sites',
+		'/site/report?report_name=country_report&metrics=adpushup_page_views',
+		'/site/report?report_name=network_report&metrics=network_net_revenue'
 	],
 	PREBID_BUNDLING: {
 		PREBID_ADAPTERS_TO_ALWAYS_BUILD: [
