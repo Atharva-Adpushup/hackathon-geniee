@@ -120,7 +120,7 @@ var $ = require('../../libs/jquery'),
 				var adpSlot = {
 					slotId: gptSlotElementId,
 					optionalParam,
-					bidders: bidders || [],
+					bidders: bidders || {},
 					headerBidding: optionalParam.headerBidding,
 					formats,
 					activeDFPNetwork: hbUtils.getActiveDFPNetwork(),

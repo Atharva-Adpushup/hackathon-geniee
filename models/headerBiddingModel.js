@@ -1,6 +1,7 @@
 module.exports = apiModule();
 
 const request = require('request-promise');
+const cloneDeep = require('lodash/cloneDeep');
 const model = require('../helpers/model');
 const couchbase = require('../helpers/couchBaseService');
 const AdPushupError = require('../helpers/AdPushupError');
@@ -12,10 +13,12 @@ const commonFunctions = require('../helpers/commonFunctions');
 const {
 	docKeys,
 	hbGlobalSettingDefaults,
-	amazonUAMConfigDefaults
+	amazonUAMConfigDefaults,
+	FORMAT_WISE_PARAMS_PREFIX
 } = require('../configs/commonConsts');
 const dfpLineItemAutomationReqBody = require('../configs/dfpLineItemAutomationReqBody');
 const config = require('../configs/config');
+const utils = require('../helpers/utils');
 
 const HeaderBidding = model.extend(function() {
 	this.keys = [
@@ -119,6 +122,67 @@ function apiModule() {
 					throw err;
 				});
 		},
+		formatParam(format, paramKey, param) {
+			const formatPrefix = FORMAT_WISE_PARAMS_PREFIX[format.toUpperCase()];
+			const formatWiseParamKey = `${formatPrefix}_${paramKey}`;
+			const paramConfig = {
+				...cloneDeep(param),
+				name: `${utils.capitalizeString(format)} ${param.name || ''}`,
+				isRequired: format === 'banner'
+			};
+
+			return { formatWiseParamKey, paramConfig };
+		},
+		getFormFieldsForFormatWiseParams(bidder) {
+			if (bidder.sizeLess && bidder.enableFormatWiseParams) {
+				const { global, siteLevel, adUnitLevel } = bidder.params;
+
+				const globalParams = {};
+				const siteLevelParams = {};
+				const adUnitLevelParams = {};
+
+				bidder.formats.forEach(format => {
+					Object.keys(global).forEach(globalKey => {
+						const paramField = global[globalKey];
+						const { formatWiseParamKey, paramConfig } = this.formatParam(
+							format,
+							globalKey,
+							paramField
+						);
+						globalParams[formatWiseParamKey] = { ...paramConfig };
+					});
+
+					Object.keys(siteLevel).forEach(siteLevelKey => {
+						const paramField = siteLevel[siteLevelKey];
+						const { formatWiseParamKey, paramConfig } = this.formatParam(
+							format,
+							siteLevelKey,
+							paramField
+						);
+						siteLevelParams[formatWiseParamKey] = { ...paramConfig };
+					});
+
+					Object.keys(adUnitLevel).forEach(adUnitLevelKey => {
+						const paramField = adUnitLevel[adUnitLevelKey];
+						const { formatWiseParamKey, paramConfig } = this.formatParam(
+							format,
+							adUnitLevelKey,
+							paramField
+						);
+						adUnitLevelParams[formatWiseParamKey] = { ...paramConfig };
+					});
+				});
+
+				const params = {
+					global: globalParams,
+					siteLevel: siteLevelParams,
+					adUnitLevel: adUnitLevelParams
+				};
+
+				return params;
+			}
+			return bidder.params;
+		},
 		getMergedBidders(siteId) {
 			return Promise.all([API.getAllBiddersFromNetworkConfig(), API.getUsedBidders(siteId)]).then(
 				([allBidders, addedBidders]) => {
@@ -142,7 +206,11 @@ function apiModule() {
 						}
 
 						addedBidders[addedBidderKey].paramsFormFields = {
-							...allBidders[addedBidderKey].params
+							...this.getFormFieldsForFormatWiseParams(allBidders[addedBidderKey])
+						};
+
+						addedBidders[addedBidderKey].params = {
+							...this.getFormFieldsForFormatWiseParams(allBidders[addedBidderKey])
 						};
 
 						for (const key of keysToMergeForAddedBidders) {
@@ -155,6 +223,10 @@ function apiModule() {
 					for (const key in notAddedBidders) {
 						if (notAddedBidders.hasOwnProperty(key) && !notAddedBidders[key].isActive) {
 							delete notAddedBidders[key];
+						} else {
+							notAddedBidders[key].params = {
+								...this.getFormFieldsForFormatWiseParams(notAddedBidders[key])
+							}
 						}
 					}
 

@@ -2,6 +2,7 @@
 
 var adp = require('./adp');
 var find = require('lodash.find');
+var cloneDeep = require('lodash/cloneDeep');
 var $ = require('../../../../libs/jquery');
 var config = require('./config');
 var constants = require('./constants');
@@ -164,7 +165,8 @@ var utils = {
 		var width = size[0];
 		var height = size[1];
 		var size = width + 'x' + height;
-		var bidders = [];
+		var nonFormatWiseBidders = [];
+		var formatWiseBidders = { display: [], video: [], native: [] };
 		var prebidConfig = config.PREBID_CONFIG;
 		var hbConfig = prebidConfig.hbcf;
 
@@ -182,7 +184,41 @@ var utils = {
 						bidderRulesConfig.allowedBidders.indexOf(bidder) !== -1;
 
 					if (!bidderData.isPaused && isBidderAllowed) {
-						if (bidderData.sizeLess) {
+						if (bidderData.sizeLess && bidderData.enableFormatWiseParams) {
+							var computedBidderObj = {
+								bidder: bidder,
+								params: {}
+							};
+							var bidderParams = bidderData.config;
+							var paramsList = Object.keys(bidderParams)
+
+							computedFormats.forEach(format => {
+								var formatParamPrefix = constants.FORMAT_WISE_PARAMS_PREFIX[format];
+
+								// filter out params for this particular format by checking the starting of each param to match the prefix for this format
+								var formatParams = paramsList.filter(param => param.indexOf(formatParamPrefix) === 0);
+								if (!formatParams.length) {
+									return;
+								}
+
+								var computedFormatBidderObj = cloneDeep(computedBidderObj);
+
+								formatParams.forEach(param => {
+									var actualParam = param.replace(formatParamPrefix, '');
+									computedFormatBidderObj.params[actualParam] = bidderParams[param]
+								});
+
+								if (bidderParamsMapping[bidder]) {
+									computedFormatBidderObj.params = {
+										...this.getVideoOrNativeParams(format, bidder),
+										...computedFormatBidderObj.params
+									}
+								}
+
+								formatWiseBidders[format].push(computedFormatBidderObj);
+							});
+						}
+						else if (bidderData.sizeLess) {
 							var computedBidderObj = {
 								bidder: bidder,
 								params: bidderData.config
@@ -197,7 +233,7 @@ var utils = {
 								});
 							}
 
-							bidders.push(computedBidderObj);
+							nonFormatWiseBidders.push(computedBidderObj);
 						}
 
 						if (!bidderData.sizeLess && bidderData.reusable) {
@@ -222,7 +258,7 @@ var utils = {
 											});
 										}
 
-										bidders.push({
+										nonFormatWiseBidders.push({
 											bidder,
 											params: bidderParams
 										});
@@ -237,9 +273,28 @@ var utils = {
 
 		if (bidderRulesConfig.bidderSequence) {
 			bidders = this.sortBidders(bidders, bidderRulesConfig.bidderSequence);
+			nonFormatWiseBidders = this.sortBidders(nonFormatWiseBidders, bidderRulesConfig.bidderSequence);
+			Object.keys(formatWiseBidders).forEach(format => {
+				formatWiseBidders[format] = this.sortBidders(formatWiseBidders[format], bidderRulesConfig.bidderSequence);
+			});
 		}
 
-		return bidders;
+		return {
+			nonFormatWiseBidders,
+			formatWiseBidders
+		};
+	},
+	checkForValidBidders: function(bidders) {
+		var {
+			formatWiseBidders = {},
+			nonFormatWiseBidders = {}
+		} = bidders || {};
+
+		var formatWiseBiddersList = Object.keys(formatWiseBidders).reduce((result, format) => {
+			return [...result, ...formatWiseBidders[format]]
+		}, []);
+
+		return nonFormatWiseBidders.length || formatWiseBiddersList.length;
 	},
 	sortBidders: function(unsortedBidders, bidderSequence) {
 		if (!(Array.isArray(bidderSequence) && bidderSequence.length)) {
@@ -270,7 +325,7 @@ var utils = {
 			slot &&
 			slot.headerBidding &&
 			slot.bidders &&
-			slot.bidders.length
+			this.checkForValidBidders(slot.bidders)
 		);
 	},
 	isAmazonUamEnabled: function(slot) {
