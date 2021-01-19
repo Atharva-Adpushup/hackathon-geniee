@@ -37,7 +37,7 @@ module.exports = {
 	DEMO_ACCOUNT_EMAIL: 'demo@adpushup.com',
 	AMP_SETTINGS_ACCESS_EMAILS: ['genieeamp@adpushup.com'],
 	DEMO_REPORT_SITE_ID: 31000,
-	ADPUSHUP_NETWORK_ID: 103512698,
+	ADPUSHUP_NETWORK_ID: 103512698, // please update this value in Client/config/config.js also
 	GET_ALL_SITES_STATS_QUERY: `SELECT _site.siteId,
 									_site.siteDomain as domain,
 									_site.ownerEmail as accountEmail,

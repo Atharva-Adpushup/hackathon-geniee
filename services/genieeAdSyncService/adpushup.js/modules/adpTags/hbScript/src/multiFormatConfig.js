@@ -54,16 +54,17 @@ const mediaTypesConfig = {
 };
 
 const bidderParamsMapping = {
-	conversant: {
-		videoParams: {
-			// required
-			mimes: CONSTANTS.VIDEO.MIMES,
-			// optional
-			maxduration: CONSTANTS.VIDEO.MAXDURATION,
-			api: CONSTANTS.VIDEO.API,
-			protocols: CONSTANTS.VIDEO.PROTOCOLS
-		}
-	},
+	// disabled because conversant didn't want video requests since they don't have demand for it.
+	// conversant: {
+	// 	videoParams: {
+	// 		// required
+	// 		mimes: CONSTANTS.VIDEO.MIMES,
+	// 		// optional
+	// 		maxduration: CONSTANTS.VIDEO.MAXDURATION,
+	// 		api: CONSTANTS.VIDEO.API,
+	// 		protocols: CONSTANTS.VIDEO.PROTOCOLS
+	// 	}
+	// },
 	rubicon: {
 		videoParams: {
 			video: {}
