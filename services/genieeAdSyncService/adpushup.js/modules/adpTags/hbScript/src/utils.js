@@ -614,6 +614,31 @@ var utils = {
 			return isValid;
 		});
 	},
+	inflateBidCpm: function(cpm) {
+		const { bidInfationPercentage } = adp.config || {};
+		const isCpmValid = this.isValidNumber(cpm);
+
+		if (!isCpmValid) return cpm;
+
+		if (window.adpushup.shouldInflateBid) {
+			const inflatedCpm = cpm + ( cpm * (bidInfationPercentage / 100) );
+			return inflatedCpm;
+		}
+
+		return cpm;
+	},
+	isValidNumber: function(value) {
+		const isValid = value && !isNaN(value) && typeof value === 'number' && value > 0;
+		return isValid;
+	},
+	setShouldPerformBidInflation: function() {
+		const { bidInfationPercentage, isABTestingForBidInflationEnabled } = adp.config || {};
+		const isBidInflationPercentageValid = this.isValidNumber(bidInfationPercentage);
+
+		const shouldInflateBid = isBidInflationPercentageValid ? ( isABTestingForBidInflationEnabled ? Math.random() * 100 <= 50 : true ) : false;
+		utils.log(`Should Inflate Bid ${shouldInflateBid}`);
+		window.adpushup.shouldInflateBid = shouldInflateBid;
+	}
 };
 
 module.exports = utils;

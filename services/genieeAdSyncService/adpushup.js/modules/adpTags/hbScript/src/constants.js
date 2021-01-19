@@ -80,7 +80,8 @@ var constants = {
 		ADPUSHUP_RAN: 'adpushup_ran',
 		REFRESH_COUNT: 'refreshcount',
 		REFRESH_RATE: 'refreshrate',
-		FLUID: 'fluid'
+		FLUID: 'fluid',
+		INFLATED_CPM: 'bidInf'
 	},
 	AD_SIZE_MAPPING: {
 		IAB_SIZES: {
