@@ -18,5 +18,8 @@ export default {
 		HOST: 'https://notifications.adpushup.com'
 	},
 	ADPUSHUP_NETWORK_ID: 103512698,
-	PREBID_SERVER_HOST: 'https://amp.adpushup.com/'
+	PREBID_SERVER_HOST: 'https://amp.adpushup.com/',
+	MIXPANEL: {
+		TOKEN: '96e958dc847c19d28cf873a827efae75'
+	}
 };
