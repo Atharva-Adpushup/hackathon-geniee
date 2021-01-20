@@ -111,7 +111,6 @@ class Report extends Component {
 		// eslint-disable-next-line no-unused-expressions
 		isSuperUser ? (params.isSuperUser = isSuperUser) : null;
 
-		this.getSavedReports();
 		if (!reportsMeta.fetched) {
 			return reportService
 				.getMetaData(params)
@@ -792,7 +791,10 @@ class Report extends Component {
 				metricsList,
 				intervalList
 			},
-			this.generateButtonHandler
+			() => {
+				this.getSavedReports();
+				this.generateButtonHandler();
+			}
 		);
 	};
 
@@ -966,31 +968,41 @@ class Report extends Component {
 		const { dimensionList = [] } = this.state;
 		const dimensionData = dimensionList.find(dim => dim.value === dimension);
 
+		const filterUi = Object.keys(filters)
+			.filter(filter => filters[filter] && Object.keys(filters[filter]).length)
+			.map(filter => {
+				const values = chunk(Object.keys(filters[filter]), 3)
+					.map(items => items.join(','))
+					.join(',\n');
+				const filterData = dimensionList.find(dim => dim.value === filter);
+				if (!filterData) return null;
+				return (
+					<div>
+						{filterData.display_name}: {values}
+					</div>
+				);
+			});
 		return (
 			<Tooltip placement="top">
-				{dimension && dimension !== '' && <div>Report By: {dimensionData.display_name}</div>}
+				{dimension && dimension !== '' && dimensionData && (
+					<div>Report By: {dimensionData.display_name}</div>
+				)}
 				{intervals && intervals !== '' && <div>Interval: {intervals}</div>}
 				{startDate && <div>Start Date: {startDate}</div>}
 				{endDate && <div>End Date: {endDate}</div>}
-				{Object.keys(filters)
-					.filter(filter => filters[filter] && Object.keys(filters[filter]).length)
-					.map(filter => {
-						const values = chunk(Object.keys(filters[filter]), 3)
-							.map(items => items.join(','))
-							.join(',\n');
-						const filterData = dimensionList.find(dim => dim.value === filter);
-						if (!filterData) return null;
-						return (
-							<div>
-								{filterData ? filterData.display_name : ''}: {values}
-							</div>
-						);
-					})}
+				{filterUi}
 			</Tooltip>
 		);
 	};
 
 	processAndSaveReports = (savedReports = [], frequentReports = [], callback = () => {}) => {
+		const { dimensionList } = this.state;
+		const dimensionsMap = dimensionList.reduce(
+			(results, dimension) => ({ ...results, [dimension.value]: dimension }),
+			{}
+		);
+
+
 		const savedReportsWithValue = savedReports.map(report => ({
 			...report,
 			value: report.id,
@@ -1013,6 +1025,11 @@ class Report extends Component {
 			} else {
 				frequentReportsDimensionCount[report.selectedDimension] = 1;
 			}
+			const reportName = `Report ${
+				dimensionsMap[report.selectedDimension]
+					? dimensionsMap[report.selectedDimension].display_name
+					: ''
+			} ${frequentReportsDimensionCount[report.selectedDimension]}`;
 			return {
 				...report,
 				value: report.id,
@@ -1022,7 +1039,7 @@ class Report extends Component {
 						key={report.id}
 						placement="top"
 					>
-						<span>Report {i + 1}</span>
+						<span>{reportName}</span>
 					</OverlayTrigger>
 				),
 				type: 'frequentReport'

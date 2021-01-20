@@ -392,7 +392,7 @@ class Control extends Component {
 			<Fragment>
 				{!isSavedReportsEmpty && (
 					<div className="aligner aligner--wrap aligner--hSpaceBetween u-margin-t4">
-						<label className="u-text-normal">Saved Reports</label>
+						<label className="u-text-normal">Saved and Frequent Reports</label>
 						<Select
 							onChange={this.onSavedReportSelect}
 							options={savedAndFrequentReportOptions}
