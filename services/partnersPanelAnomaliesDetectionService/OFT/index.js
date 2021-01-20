@@ -7,6 +7,8 @@ const emailer = require('../emailer');
 
 const API_ENDPOINT = `https://api.appnexus.com`;
 const DOMAIN_FIELD_NAME = 'site_name';
+const REVENUE_FIELD = 'publisher_revenue';
+
 const authParams = {
 	auth: {
 		username: 'adpushup152ns',
@@ -76,15 +78,14 @@ const getDataFromPartner = function() {
 };
 
 const fetchData = async sitesData => {
-	const oftMediaPartnerModel = new partnerAndAdpushpModel(sitesData, DOMAIN_FIELD_NAME);
+	const oftMediaPartnerModel = new partnerAndAdpushpModel(sitesData, DOMAIN_FIELD_NAME, REVENUE_FIELD);
 
-    console.log('Fetching data from OFT...');
+	console.log('Fetching data from OFT...');
 	return getDataFromPartner()
 		.then(async function(reportDataJSON) {
+			oftMediaPartnerModel.setPartnersData(reportDataJSON);
 
-            oftMediaPartnerModel.setPartnersData(reportDataJSON);
-
-            // process and map sites data with publishers API data structure
+			// process and map sites data with publishers API data structure
 			oftMediaPartnerModel.mapAdPushupSiteIdAndDomainWithPartnersDomain();
 			// Map PartnersData with AdPushup's SiteId mapping data
 			oftMediaPartnerModel.mapPartnersDataWithAdPushupSiteIdAndDomain();
@@ -93,8 +94,8 @@ const fetchData = async sitesData => {
 			const params = {
 				siteid: oftMediaPartnerModel.getSiteIds().join(','),
 				network: 11,
-				fromDate: '2021-01-12',
-				toDate: '2021-01-18',
+				fromDate: '2021-01-13',
+				toDate: '2021-01-19',
 				interval: 'daily',
 				// siteid:40792,
 				dimension: 'siteid'
@@ -114,10 +115,10 @@ const fetchData = async sitesData => {
 			console.log(JSON.stringify(dataToSend, null, 3), 'finalData');
 			console.log(finalData.length, 'finalData length');
 			console.log(dataToSend.length, 'dataToSend length');
-			// // if anmalies found
-			// if(dataToSend.length) {
-			//     emailer.anomaliesMailService(dataToSend)
-			// }
+			// // // if anmalies found
+			// // if(dataToSend.length) {
+			// //     emailer.anomaliesMailService(dataToSend)
+			// // }
 		})
 		.catch(function(error) {
 			// handle error

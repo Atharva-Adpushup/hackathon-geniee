@@ -5,7 +5,8 @@ const Class = require('../../helpers/class'),
 		const ADPUSHUP_REPORT_BASE_URL = 'https://api.adpushup.com/CentralReportingWebService';
 		const ADPUSHUP_REPORT_PATH = '/site/report?report_name=get_stats_by_custom';
 
-		let domainFieldName = '';
+        let domainFieldName = '';
+        let revenueFieldName = '';
 		// As we need to compare daat from partner and Adpushup db.
 		// And both will have different structure, we need to map both the data
 		// in a common format and then we can compare it.
@@ -18,12 +19,13 @@ const Class = require('../../helpers/class'),
 		this.sitesIdAndDomainMapping = {};
 		this.siteIdArr = [];
 
-		this.constructor = function(sitesData, domainFieldNameFromPartnersAPI) {
+		this.constructor = function(sitesData, domainFieldNameFromPartnersAPI, revenueField) {
 			this.sitesDataFromAdPushupDB = sitesData;
 			// field name for siteName/Domain is different for different partners data
 			// to make this common class work with different partnes data, we are using this field
 			// as a cntainer for that field name which will be set by partnerWrapper
-			domainFieldName = domainFieldNameFromPartnersAPI;
+            domainFieldName = domainFieldNameFromPartnersAPI;
+            revenueFieldName = revenueField;
 		};
 		this.setPartnersData = function(partnersData) {
 			this.partnersData = partnersData;
@@ -49,20 +51,24 @@ const Class = require('../../helpers/class'),
 				this.sitesDomainAndIdMapping[domain] = item;
 				// also map same data with siteId
 				this.sitesIdAndDomainMapping[siteId] = item;
-				this.sitesIdAndDomainMapping[siteId][domainFieldName] = domain;
+                this.sitesIdAndDomainMapping[siteId][domainFieldName] = domain;
 				return item;
 			});
 		};
 
 		this.mapPartnersDataWithAdPushupSiteIdAndDomain = function() {
+            // All Partners related data processing
 			this.partnersData.map(item => {
+                console.log(item)
                 if (this.sitesDomainAndIdMapping[item[domainFieldName]]) {
                     const details = { ...this.sitesDomainAndIdMapping[item[domainFieldName]] };
                     // adding publisher's revenue from partner's data into adpushup mapped data
-                    this.sitesDomainAndIdMapping[item[domainFieldName]].pubRevenue = item.publisher_revenue;
+                    this.sitesDomainAndIdMapping[item[domainFieldName]].pubRevenue = item[revenueFieldName];
                     // extact all SiteIds of domains which are matching with partner's data only.
-					this.siteIdArr.push(details.siteId);
-				}
+                    this.siteIdArr.push(details.siteId);
+				} else {
+                    console.log('elseeee', item, domainFieldName)
+                }
 				return item;
 			});
 		};

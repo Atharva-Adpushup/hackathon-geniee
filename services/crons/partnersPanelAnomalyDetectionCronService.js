@@ -27,7 +27,7 @@ getSitesFromDB()
 	.then(sitesData => {
 		return Promise.all([
 			criteo(sitesData)
-			/*OFT(sitesData)*/
+			// OFT(sitesData)
 		]);
 	})
 	.then(result => {
