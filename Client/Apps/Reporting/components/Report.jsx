@@ -2,8 +2,9 @@
 import React, { Component } from 'react';
 import mapValues from 'lodash/mapValues';
 import omit from 'lodash/omit';
+import chunk from 'lodash/chunk';
 import groupBy from 'lodash/groupBy';
-import { Row, Col, Alert } from '@/Client/helpers/react-bootstrap-imports';
+import { Row, Col, Alert, OverlayTrigger, Tooltip } from '@/Client/helpers/react-bootstrap-imports';
 import moment from 'moment';
 import qs from 'querystringify';
 import isEmpty from 'lodash/isEmpty';
@@ -79,6 +80,7 @@ class Report extends Component {
 			isReportingSite: true,
 			show: true,
 			savedReports: [],
+			frequentReports: [],
 			selectedReport: null,
 			selectedReportName: '',
 			apiLoadTimeStartedAt: null,
@@ -940,8 +942,8 @@ class Report extends Component {
 		return reportService
 			.getSavedReports()
 			.then(res => {
-				const { savedReports } = res.data.data || [];
-				this.processAndSaveReports(savedReports);
+				const { savedReports, frequentReports = [] } = res.data.data || [];
+				this.processAndSaveReports(savedReports, frequentReports);
 			})
 			.catch(err => {
 				showNotification({
@@ -953,16 +955,83 @@ class Report extends Component {
 			});
 	};
 
-	processAndSaveReports = (savedReports = [], callback = () => {}) => {
+	frequentReportsTooltip = report => {
+		const {
+			selectedDimension: dimension,
+			selectedFilters: filters = {},
+			selectedInterval: intervals,
+			startDate,
+			endDate
+		} = report;
+		const { dimensionList = [] } = this.state;
+		const dimensionData = dimensionList.find(dim => dim.value === dimension);
+
+		return (
+			<Tooltip placement="top">
+				{dimension && dimension !== '' && <div>Report By: {dimensionData.display_name}</div>}
+				{intervals && intervals !== '' && <div>Interval: {intervals}</div>}
+				{startDate && <div>Start Date: {startDate}</div>}
+				{endDate && <div>End Date: {endDate}</div>}
+				{Object.keys(filters)
+					.filter(filter => filters[filter] && Object.keys(filters[filter]).length)
+					.map(filter => {
+						const values = chunk(Object.keys(filters[filter]), 3)
+							.map(items => items.join(','))
+							.join(',\n');
+						const filterData = dimensionList.find(dim => dim.value === filter);
+						if (!filterData) return null;
+						return (
+							<div>
+								{filterData ? filterData.display_name : ''}: {values}
+							</div>
+						);
+					})}
+			</Tooltip>
+		);
+	};
+
+	processAndSaveReports = (savedReports = [], frequentReports = [], callback = () => {}) => {
 		const savedReportsWithValue = savedReports.map(report => ({
 			...report,
-			name: report.name,
-			value: report.id
+			value: report.id,
+			label: (
+				<OverlayTrigger
+					overlay={this.frequentReportsTooltip(report)}
+					key={report.id}
+					placement="top"
+				>
+					<span>{report.name}</span>
+				</OverlayTrigger>
+			),
+			type: 'savedReport'
 		}));
 
+		const frequentReportsDimensionCount = {};
+		const frequentReportsWithValue = frequentReports.map((report, i) => {
+			if (frequentReportsDimensionCount[report.selectedDimension]) {
+				frequentReportsDimensionCount[report.selectedDimension] += 1;
+			} else {
+				frequentReportsDimensionCount[report.selectedDimension] = 1;
+			}
+			return {
+				...report,
+				value: report.id,
+				label: (
+					<OverlayTrigger
+						overlay={this.frequentReportsTooltip(report)}
+						key={report.id}
+						placement="top"
+					>
+						<span>Report {i + 1}</span>
+					</OverlayTrigger>
+				),
+				type: 'frequentReport'
+			};
+		});
 		this.setState(
 			{
-				savedReports: savedReportsWithValue
+				savedReports: savedReportsWithValue,
+				frequentReports: frequentReportsWithValue
 			},
 			callback
 		);
@@ -1035,8 +1104,8 @@ class Report extends Component {
 			.saveReportConfig(reportConfig)
 			.then(res => {
 				const response = res.data.data;
-				const { savedReports: newSavedReports } = response;
-				this.processAndSaveReports(newSavedReports, () => {
+				const { savedReports: newSavedReports, frequentReports } = response;
+				this.processAndSaveReports(newSavedReports, frequentReports, () => {
 					showNotification({
 						mode: 'success',
 						title: 'Success',
@@ -1096,8 +1165,8 @@ class Report extends Component {
 			.updateSavedReport(updateReportConfig)
 			.then(res => {
 				const response = res.data.data;
-				const { savedReports } = response;
-				this.processAndSaveReports(savedReports, () => {
+				const { savedReports, frequentReports } = response;
+				this.processAndSaveReports(savedReports, frequentReports, () => {
 					showNotification({
 						mode: 'success',
 						title: 'Success',
@@ -1123,8 +1192,8 @@ class Report extends Component {
 			.deleteSavedReport(selectedReport.id)
 			.then(res => {
 				const response = res.data.data;
-				const { savedReports } = response;
-				this.processAndSaveReports(savedReports, () => {
+				const { savedReports, frequentReports } = response;
+				this.processAndSaveReports(savedReports, frequentReports, () => {
 					showNotification({
 						mode: 'success',
 						title: 'Success',
@@ -1169,6 +1238,7 @@ class Report extends Component {
 			filterList,
 			tableData,
 			savedReports,
+			frequentReports,
 			selectedReport,
 			selectedReportName
 		} = this.state;
@@ -1260,6 +1330,7 @@ class Report extends Component {
 						user={user}
 						showNotification={showNotification}
 						savedReports={savedReports}
+						frequentReports={frequentReports}
 						selectedReport={selectedReport}
 						setSelectedReport={this.setSelectedReport}
 						onReportSave={this.onReportSave}

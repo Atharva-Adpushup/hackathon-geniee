@@ -6,6 +6,7 @@ import { CSVLink } from 'react-csv';
 import isEqual from 'lodash/isEqual';
 import moment from 'moment';
 import cloneDeep from 'lodash/cloneDeep';
+import Select from 'react-select';
 import AsyncGroupSelect from '../../../Components/AsyncGroupSelect/index';
 import PresetDateRangePicker from '../../../Components/PresetDateRangePicker/index';
 import SelectBox from '../../../Components/SelectBox/index';
@@ -322,10 +323,9 @@ class Control extends Component {
 		});
 	};
 
-	onSavedReportSelect = reportId => {
-		const { reportType, setSelectedReport, savedReports } = this.props;
-		const selectedReport = savedReports.find(report => report.id === reportId);
-		if (selectedReport) {
+	onSavedReportSelect = (selectedReport, { action }) => {
+		const { reportType, setSelectedReport } = this.props;
+		if (action === 'select-option' && selectedReport) {
 			this.setState(
 				{
 					startDate: selectedReport.startDate,
@@ -339,8 +339,27 @@ class Control extends Component {
 					setSelectedReport(selectedReport, callback);
 				}
 			);
+		} else if (action === 'clear') {
+			const { startDate, endDate } = this.props || {};
+			this.setState(
+				{
+					startDate,
+					endDate,
+					selectedInterval: 'daily',
+					selectedDimension: '',
+					selectedFilters: {}
+				},
+				() => this.onControlChange(reportType, true)
+			);
 		}
 	};
+
+	formatGroupLabel = group => (
+		<div className="select-options-group">
+			<span className="name">{group.label}</span>
+			<span className="count">{group.options.length}</span>
+		</div>
+	);
 
 	render() {
 		const { state } = this;
@@ -349,6 +368,7 @@ class Control extends Component {
 			showNotification,
 			selectedReport,
 			savedReports = [],
+			frequentReports = [],
 			onReportSave,
 			onReportUpdate,
 			onReportDelete,
@@ -357,28 +377,30 @@ class Control extends Component {
 			isHB
 		} = this.props;
 
-		const { scheduleOptions: { startDate, endDate, interval } = {} } = selectedReport || {};
+		const { scheduleOptions: { startDate, endDate, interval } = {}, type: selectedReportType } =
+			selectedReport || {};
 		const selectedReportStartDate = startDate;
 		const selectedReportEndDate = endDate;
 		const isUpdating = selectedReport !== null;
 		const isSavedReportsEmpty = savedReports.length === 0;
 		// const { selectedReport } = state;
+		const savedAndFrequentReportOptions = [
+			{ label: 'Saved Reports', value: 'savedReports', options: savedReports },
+			{ label: 'Frequent Reports', value: 'frequentReports', options: frequentReports }
+		];
 		return (
 			<Fragment>
 				{!isSavedReportsEmpty && (
 					<div className="aligner aligner--wrap aligner--hSpaceBetween u-margin-t4">
 						<label className="u-text-normal">Saved Reports</label>
-						<SelectBox
-							id="saved-reports"
-							key="saved-reports"
-							isClearable={false}
-							isSearchable={false}
-							wrapperClassName="custom-select-box-wrapper"
-							reset={false}
+						<Select
+							onChange={this.onSavedReportSelect}
+							options={savedAndFrequentReportOptions}
 							selected={selectedReport ? selectedReport.value : null}
-							options={savedReports}
-							onSelect={this.onSavedReportSelect}
-							title="Select Report"
+							isSearchable
+							isClearable
+							className="saved-reports-select custom-select-box-wrapper"
+							formatGroupLabel={this.formatGroupLabel}
 						/>
 					</div>
 				)}
@@ -538,9 +560,7 @@ class Control extends Component {
 						</CSVLink>
 					</div>
 				</div>
-				{isHB ? (
-					''
-				) : (
+				{isHB || selectedReportType === 'frequentReport' ? null : (
 					<Schedule
 						name={selectedReportName}
 						startDate={selectedReportStartDate}
