@@ -17,15 +17,22 @@ module.exports = function(site, useDirect = false) {
 		({ isSelectiveRolloutEnabled = false } = site.get('apConfigs') || {});
 	}
 
+	const {
+		CDN_SYNC: { QUEUE: MAIN_QUEUE },
+		SELECTIVE_ROLLOUT: { QUEUE: SELECTIVE_ROLLOUT_QUEUE }
+	} = config.RABBITMQ;
+
+	let selectedQueue = isSelectiveRolloutEnabled ? SELECTIVE_ROLLOUT_QUEUE : MAIN_QUEUE;
+	
 	if (!isAmpScriptEnabled) {
 		return cdnSyncQueuePublisher
 			.publish(paramConfig, isSelectiveRolloutEnabled)
-			.then(() => `Published into Sync Cdn Queue ${siteId}`);
+			.then(() => `Published into ${selectedQueue.name} Queue ${siteId}`);
 	}
 
 	return Promise.join(
 		cdnSyncQueuePublisher.publish(paramConfig, isSelectiveRolloutEnabled),
 		ampScriptQueuePublisher.publish(paramConfig),
-		() => `Published into Sync Cdn Queue & AMP Script Queue ${siteId}`
+		() => `Published into ${selectedQueue.name} Queue & AMP Script Queue ${siteId}`
 	);
 };
