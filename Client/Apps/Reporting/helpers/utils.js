@@ -99,6 +99,15 @@ const getPresets = () => {
 			end: moment()
 				.subtract(1, 'months')
 				.endOf('month')
+		},
+		{
+			text: 'Last Year',
+			start: moment()
+				.subtract(1, 'years')
+				.startOf('year'),
+			end: moment()
+				.subtract(1, 'years')
+				.endOf('year')
 		}
 	];
 };
