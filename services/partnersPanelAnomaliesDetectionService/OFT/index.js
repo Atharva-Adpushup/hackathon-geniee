@@ -4,6 +4,7 @@ const csv = require('csvtojson');
 const partnerAndAdpushpModel = require('../PartnerAndAdpushpModel');
 const constants = require('../../../configs/commonConsts');
 const emailer = require('../emailer');
+const nodemailer = require("nodemailer");
 
 const API_ENDPOINT = `https://api.appnexus.com`;
 const DOMAIN_FIELD_NAME = 'site_name';
@@ -77,7 +78,8 @@ const getDataFromPartner = function() {
 		});
 };
 
-const fetchData = async sitesData => {
+const fetchData = sitesData => {
+
 	const oftMediaPartnerModel = new partnerAndAdpushpModel(sitesData, DOMAIN_FIELD_NAME, REVENUE_FIELD);
 
 	console.log('Fetching data from OFT...');
@@ -115,10 +117,10 @@ const fetchData = async sitesData => {
 			console.log(JSON.stringify(dataToSend, null, 3), 'finalData');
 			console.log(finalData.length, 'finalData length');
 			console.log(dataToSend.length, 'dataToSend length');
-			// // // if anmalies found
-			// // if(dataToSend.length) {
-			// //     emailer.anomaliesMailService(dataToSend)
-			// // }
+			// // if anmalies found
+			// if(dataToSend.length) {
+            //     emailer.anomaliesMailService(dataToSend)
+			// }
 		})
 		.catch(function(error) {
 			// handle error

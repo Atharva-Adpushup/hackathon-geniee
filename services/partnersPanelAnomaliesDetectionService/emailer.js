@@ -1,21 +1,20 @@
 const constants = require('../../configs/commonConsts');
+const mailService = require('../../services/mailService');
 
 const anomaliesMailService = function(dataToSend) {
-    const {
-        PARTNERS_PANEL_INTEGRATION: {
-            MAIL: { HEADER_ITEMS }
-        }
-    } = constants;
-    
-    const HEADER = HEADER_ITEMS.reduce(
-        (acc, item) => {
-            acc += `<th scope="col" style="padding:5px; font-family: Arial,sans-serif; font-size: 16px; line-height:20px;line-height:30px">${item}</th>`
-            return acc;
-        }
-    );
-    
-    const tableRowsString = dataToSend.reduce((acc, item) => {
-        acc += `
+	const {
+		PARTNERS_PANEL_INTEGRATION: {
+			MAIL: { HEADER_ITEMS }
+		}
+	} = constants;
+
+	const HEADER = HEADER_ITEMS.reduce((acc, item) => {
+		acc += `<th scope="col" style="padding:5px; font-family: Arial,sans-serif; font-size: 16px; line-height:20px;line-height:30px">${item}</th>`;
+		return acc;
+	});
+
+	const tableRowsString = dataToSend.reduce((acc, item) => {
+		acc += `
             <tr>
                 <td valign="top" style="padding:5px; font-family: Arial,sans-serif; font-size: 16px; line-height:20px;">
                     Criteo
@@ -34,9 +33,9 @@ const anomaliesMailService = function(dataToSend) {
                 </td>
             </tr>
         `;
-        return acc;
-    }, '');
-    const table = `
+		return acc;
+	}, '');
+	const table = `
         <table width="100%" cellpadding="0" cellspacing="0" style="min-width:100%;">
             <thead>
                 <tr>
@@ -48,9 +47,8 @@ const anomaliesMailService = function(dataToSend) {
             </tbody>
         </table>
     `;
-    console.log(table);
-}
+};
 
 module.exports = {
-    anomaliesMailService
-}
+	anomaliesMailService
+};

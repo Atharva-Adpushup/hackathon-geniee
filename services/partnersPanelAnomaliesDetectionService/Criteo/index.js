@@ -74,7 +74,10 @@ const fetchData = async sitesData => {
 			console.log(dataToSend.length, 'dataToSend length');
 			// // if anmalies found
 			// if(dataToSend.length) {
-			//     emailer.anomaliesMailService(dataToSend)
+            //     emailer.anomaliesMailService(dataToSend)
+            //     .catch(err => {
+            //         console.log(err);
+            //     });            
 			// }
 		})
 		.catch(function(error) {

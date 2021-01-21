@@ -26,9 +26,12 @@ function getSitesFromDB() {
 getSitesFromDB()
 	.then(sitesData => {
 		return Promise.all([
-			criteo(sitesData)
-			// OFT(sitesData)
-		]);
+			// criteo(sitesData)
+			OFT(sitesData)
+		])
+		.catch(err => {
+			console.log(err, 'err in service');
+		});
 	})
 	.then(result => {
 		if (result instanceof Error) {
