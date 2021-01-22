@@ -22,7 +22,7 @@ const setCacheHeaders = res => {
 
 router
 	.get('/getCustomStats', reportsAccess, async (req, res) => {
-		req.setTimeout(60000); // timeout set to 6 mins for this particular route - temporary fix, need to remove when the backend responds on time
+		req.setTimeout(360000); // timeout set to 6 mins for this particular route - temporary fix, need to remove when the backend responds on time
 		const {
 			query: { bypassCache = 'false' }
 		} = req;
