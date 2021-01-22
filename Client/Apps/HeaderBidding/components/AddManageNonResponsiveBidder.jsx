@@ -501,7 +501,7 @@ class AddManageNonResponsiveBidder extends React.Component {
 	};
 
 	render() {
-		const { openBiddersListView, formType } = this.props;
+		const { openBiddersListView, formType, isSuperUser } = this.props;
 		const {
 			formFields,
 			bidderConfig: { bids, relation, key: bidderKey },
@@ -529,6 +529,7 @@ class AddManageNonResponsiveBidder extends React.Component {
 							getCurrentFieldValue={this.getCurrentFieldValue}
 							errors={errors}
 							meta={this.bidderFormFieldsMeta}
+							isSuperUser={isSuperUser}
 						/>
 
 						{!!(
