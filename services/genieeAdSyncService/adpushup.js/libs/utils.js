@@ -49,7 +49,7 @@ module.exports = {
 	sendFeedback: function(options) {
 		var adp = window.adpushup;
 
-		if (!adp.gaPageViewLogSent) {
+		if (!adp.gaPageViewLogSent && adp.config.mode === 1) {
 			this.emitGaEvent(commonConsts.GA_EVENTS.PAGE_VIEW);
 			window.adpushup.gaPageViewLogSent = true;
 		}
@@ -1320,7 +1320,8 @@ module.exports = {
 			this.log('GA tag already present on site');
 		} else {
 			this.log('Injecting GA tag on site');
-			this.injectHeadCodeOnPage(commonConsts.GOOGLE_ANALYTICS_URL)
+			const gaUrl = `${commonConsts.GOOGLE_ANALYTICS_URL}${commonConsts.GOOGLE_ANALYTICS_ID}`;
+			this.injectHeadCodeOnPage(gaUrl);
 			window.dataLayer = window.dataLayer || [];
 			window.gtag = function() { window.dataLayer.push(arguments); }
 		}

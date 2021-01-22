@@ -21,7 +21,7 @@ if (SEPARATE_PREBID && HB_ACTIVE) {
 	utils.injectHeadCodeOnPage(config.prebidBundleUrl);
 }
 
-if (GA_ANALYTICS) {
+if (GA_ANALYTICS_ACTIVE) {
 	utils.checkAndInjectGAHeadCode();
 }
 
