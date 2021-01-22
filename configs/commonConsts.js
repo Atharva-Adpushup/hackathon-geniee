@@ -1,7 +1,7 @@
 const config = require('./config');
 
 const prodEnv = config.environment.HOST_ENV === 'production';
-const reportingBaseURL = 'http://40.75.77.162:8080/CentralReportingWebServiceHBAggregationTest';
+const reportingBaseURL = 'https://api.adpushup.com/CentralReportingWebService';
 const computedProductionURL = prodEnv
 	? 'https://console.adpushup.com'
 	: `http://localhost:${config.environment.HOST_PORT}`;
