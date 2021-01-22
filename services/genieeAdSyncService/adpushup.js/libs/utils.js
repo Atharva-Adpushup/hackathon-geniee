@@ -49,6 +49,10 @@ module.exports = {
 	sendFeedback: function(options) {
 		var adp = window.adpushup;
 
+		if (!adp.gaPageViewLogSent && adp.config.mode === 1) {
+			this.emitGaEvent(commonConsts.GA_EVENTS.PAGE_VIEW);
+			window.adpushup.gaPageViewLogSent = true;
+		}
 		return this.sendBeacon(
 			adp.config.feedbackUrl,
 			options,
@@ -1309,5 +1313,27 @@ module.exports = {
 	checkForLighthouse: function(siteId) {
 		var ua = navigator.userAgent;
 		return ua && ua.includes('Lighthouse') && commonConsts.LIGHTHOUSE_HACK_SITES.includes(siteId);
+	},
+
+	checkAndInjectGAHeadCode: function() {
+		if (window.gtag && typeof window.gtag === 'function') {
+			this.log('GA tag already present on site');
+		} else {
+			this.log('Injecting GA tag on site');
+			const gaUrl = `${commonConsts.GOOGLE_ANALYTICS_URL}${commonConsts.GOOGLE_ANALYTICS_ID}`;
+			this.injectHeadCodeOnPage(gaUrl);
+			window.dataLayer = window.dataLayer || [];
+			window.gtag = function() { window.dataLayer.push(arguments); }
+		}
+
+        window.gtag('js', new Date());
+        window.gtag('config', commonConsts.GOOGLE_ANALYTICS_ID, { send_page_view: false, 'custom_map': {'dimension1': 'siteid'} });
+	},
+	emitGaEvent: function(action) {
+		if (window.adpushup.config.enableGAAnalytics && window.gtag && typeof window.gtag === 'function') {
+			const siteid = window.adpushup.config.siteId;
+			this.log(`Emitting event ${action} for site ${siteid}`);
+			window.gtag('event', action, { 'send_to': commonConsts.GOOGLE_ANALYTICS_ID, siteid });		
+		}
 	}
 };
