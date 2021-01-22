@@ -26,7 +26,8 @@ const ApConfig = {
 		'hbAnalytics',
 		'beforeJs',
 		'cmpAvailable',
-		'mergeReport'
+		'mergeReport',
+		'enableGAAnalytics'
 	],
 	override: [
 		'mode',
@@ -55,7 +56,8 @@ const ApConfig = {
 		'hbAnalytics',
 		'beforeJs',
 		'cmpAvailable',
-		'mergeReport'
+		'mergeReport',
+		'enableGAAnalytics'
 	],
 	merge: []
 };

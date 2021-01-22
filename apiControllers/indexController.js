@@ -160,7 +160,7 @@ router
 						const { site: sitesFromReportMeta } = reports;
 						Object.keys(sitesFromReportMeta).map(site => {
 							// to check is HB enabled or not
-							if(userData.sites[site] && userData.sites[site].product) {
+							if(userData.sites[site] && sitesFromReportMeta[site].product) {
 								userData.sites[site].product = sitesFromReportMeta[site].product;
 							}
 						})

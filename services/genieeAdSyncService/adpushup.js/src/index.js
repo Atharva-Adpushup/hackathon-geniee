@@ -21,6 +21,10 @@ if (SEPARATE_PREBID && HB_ACTIVE) {
 	utils.injectHeadCodeOnPage(config.prebidBundleUrl);
 }
 
+if (GA_ANALYTICS_ACTIVE) {
+	utils.checkAndInjectGAHeadCode();
+}
+
 if (LAYOUT_ACTIVE) {
 	var selectVariation = require('./variationSelectionModels/index');
 	var nodewatcher = require('../libs/nodeWatcher');
@@ -388,6 +392,8 @@ function main() {
 
 	// Initialise adp config
 	initAdpConfig();
+
+	utils.emitGaEvent(commonConsts.GA_EVENTS.SCRIPT_LOADED);
 
 	if (utils.isAdPushupForceDisabled()) {
 		utils.log(`AdPushup has been forced disabled...`);
