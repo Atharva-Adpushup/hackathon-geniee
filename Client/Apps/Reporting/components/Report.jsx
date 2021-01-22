@@ -352,7 +352,9 @@ class Report extends Component {
 				reportDateDifference,
 				interval: selectedInterval,
 				dimension: selectedDimension,
-				filters: Object.keys(selectedFilters)
+				filters: Object.keys(selectedFilters),
+				toDate: endDate,
+				fromDate: startDate
 			};
 			MixpanelHelper.trackEvent('Reports', properties);
 		}
