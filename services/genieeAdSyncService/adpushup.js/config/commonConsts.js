@@ -29,8 +29,8 @@ module.exports = {
 	},
 	AMP_PUBLISH_URL: '//autoamp.io/publishAmpJob',
 	USER_SYNC_URL: '//e3.adpushup.com/AdPushupFeedbackWebService/user/sync',
-	GOOGLE_ANALYTICS_URL: 'https://www.googletagmanager.com/gtag/js?id=G-8S8T2CBKHL',
-	GOOGLE_ANALYTICS_ID: 'G-8S8T2CBKHL',
+	GOOGLE_ANALYTICS_URL: 'https://www.googletagmanager.com/gtag/js?id=G-Z0TZ7TDHS1',
+	GOOGLE_ANALYTICS_ID: 'G-Z0TZ7TDHS1',
 	BEACON_TYPE: {
 		AD_FEEDBACK: 'AD_FEEDBACK'
 	},
@@ -159,7 +159,7 @@ module.exports = {
 		SUPPORTED_FORMATS: ['STICKYBOTTOM'],
 	},
 	GA_EVENTS: {
-		SCRIPT_LOADED: 'script-loaded',
+		SCRIPT_LOADED: 'script-load',
 		PAGE_VIEW: 'ap-page-view'
 	}
 };
