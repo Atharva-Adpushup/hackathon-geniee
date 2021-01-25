@@ -29,7 +29,7 @@ class AddManageNonResponsiveBidder extends React.Component {
 	};
 
 	componentDidMount() {
-		const { formType } = this.props;
+		const { formType, isSuperUser } = this.props;
 
 		switch (formType) {
 			case 'add': {
@@ -46,7 +46,7 @@ class AddManageNonResponsiveBidder extends React.Component {
 				}
 
 				const formFields = {
-					bidderConfig: getCommonBidderFields(isApRelation),
+					bidderConfig: getCommonBidderFields(isApRelation && isSuperUser),
 					params
 				};
 
