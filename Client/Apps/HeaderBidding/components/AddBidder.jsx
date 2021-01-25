@@ -79,7 +79,7 @@ export default class AddBidder extends React.Component {
 	};
 
 	render() {
-		const { bidderConfig, siteId, showNotification, inventories } = this.props;
+		const { bidderConfig, siteId, showNotification, inventories, isSuperUser } = this.props;
 
 		return (
 			<div className="options-wrapper white-tab-container hb-bidder hb-add-bidder">
@@ -101,6 +101,7 @@ export default class AddBidder extends React.Component {
 								openBiddersListView={this.openBiddersListView}
 								onBidderAdd={this.onBidderAdd}
 								showNotification={showNotification}
+								isSuperUser={isSuperUser}
 							/>
 						) : (
 							<AddManageNonResponsiveBidder
@@ -111,6 +112,7 @@ export default class AddBidder extends React.Component {
 								onBidderAdd={this.onBidderAdd}
 								showNotification={showNotification}
 								inventories={inventories}
+								isSuperUser={isSuperUser}
 							/>
 						)}
 					</Col>
