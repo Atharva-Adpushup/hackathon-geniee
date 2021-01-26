@@ -60,7 +60,7 @@ module.exports = function(siteSpecificPrebidSiteId) {
 
 			const output = {
 				activeBidderAdapters: activeBidders,
-				prebidBundleName: `pb.${siteId}.js`,
+				prebidBundleName: `pb.${siteId}${Date.now()}.js`,
 				isUpdated: true
 			};
 			return output;
