@@ -135,10 +135,14 @@ function doProcessingAndAck(originalMessage) {
 			// const isSeparatePrebidEnabled =
 			// 	CONFIG.separatePrebidEnabledSites.indexOf(decodedMessage.siteId) !== -1;
 			const isSeparatePrebidEnabled = CONFIG.separatePrebidDisabledSites.indexOf(decodedMessage.siteId) === -1;
+			const siteSpecificPrebidSiteId =
+				Array.isArray(CONFIG.separateSiteSpecificPrebidBundleSites) &&
+				CONFIG.separateSiteSpecificPrebidBundleSites.indexOf(decodedMessage.siteId) !== -1 &&
+				decodedMessage.siteId;
 
 			if (isSeparatePrebidEnabled) {
 				console.log('Separate Prebid bundle feature is enabled.');
-				return syncPrebidBundle().then(({ name: prebidBundleName }) => ({
+				return syncPrebidBundle(siteSpecificPrebidSiteId).then(({ name: prebidBundleName }) => ({
 					...decodedMessage,
 					prebidBundleName
 				}));
