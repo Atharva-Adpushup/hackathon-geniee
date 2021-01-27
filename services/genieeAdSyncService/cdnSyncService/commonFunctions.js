@@ -43,10 +43,22 @@ function getActiveUsedBidderAdapters() {
 	return getDataByN1qlQuery(commonConsts.PREBID_BUNDLING.ACTIVE_BIDDER_ADAPTERS_N1QL);
 }
 
+function getActiveUsedBidderAdaptersBySite(siteId) {
+	return getDataByN1qlQuery(
+		commonConsts.PREBID_BUNDLING.ACTIVE_BIDDER_ADAPTERS_BY_SITE_N1QL.replace('__SITE_ID__', siteId)
+	);
+}
+
 function isS2SBidderAddedOnAnySite() {
 	return getDataByN1qlQuery(commonConsts.PREBID_BUNDLING.FIRST_S2S_BIDDER_SITE).then(
 		sites => Array.isArray(sites) && !!sites.length
 	);
+}
+
+function isS2SBidderAddedOnGivenSite(siteId) {
+	return getDataByN1qlQuery(
+		commonConsts.PREBID_BUNDLING.S2S_BIDDER_BY_SITE.replace('__SITE_ID__', siteId)
+	).then(sites => Array.isArray(sites) && !!sites.length);
 }
 
 function getDataByN1qlQuery(queryString) {
@@ -101,7 +113,9 @@ module.exports = {
 	getBiddersFromNetworkTree,
 	getSizeMappingConfigFromCB,
 	getActiveUsedBidderAdapters,
+	getActiveUsedBidderAdaptersBySite,
 	isS2SBidderAddedOnAnySite,
+	isS2SBidderAddedOnGivenSite,
 	writeTempFiles,
 	readTempFile,
 	pushToCdnOriginQueue

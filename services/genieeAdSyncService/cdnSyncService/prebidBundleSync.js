@@ -4,7 +4,9 @@ const Promise = require('bluebird');
 const commonConsts = require('../../../configs/commonConsts');
 const {
 	getActiveUsedBidderAdapters,
+	getActiveUsedBidderAdaptersBySite,
 	isS2SBidderAddedOnAnySite,
+	isS2SBidderAddedOnGivenSite,
 	writeTempFiles,
 	readTempFile,
 	pushToCdnOriginQueue
@@ -14,7 +16,7 @@ const {
 } = require('../../../models/activeBidderAdaptersListModel');
 const prebidGeneration = require('./prebidGeneration');
 
-module.exports = function() {
+module.exports = function(siteSpecificPrebidSiteId) {
 	function buildPrebidBundle(activeBidderAdapters) {
 		const prebidAdapters = [
 			...activeBidderAdapters,
@@ -38,13 +40,42 @@ module.exports = function() {
 		return prebidGeneration(prebidAdapters).then(() => readTempFile(buildFileConfig));
 	}
 
-	return Promise.join(getActiveUsedBidderAdapters(), isS2SBidderAddedOnAnySite())
-		.then(([activeBidders, s2sBidderAddedOnAnySite]) => {
+	function getActiveBiddersForAllSites() {
+		return Promise.join(getActiveUsedBidderAdapters(), isS2SBidderAddedOnAnySite()).then(
+			([activeBidders, s2sBidderAddedOnAnySite]) => {
+				if (s2sBidderAddedOnAnySite) activeBidders.push(commonConsts.PREBID_ADAPTERS.prebidServer);
+
+				// Update activeBidders doc if activeBidders List has been changed
+				return updateActiveBidderAdaptersIfChanged(activeBidders);
+			}
+		);
+	}
+
+	function getActiveBiddersBySite(siteId) {
+		return Promise.join(
+			getActiveUsedBidderAdaptersBySite(siteId),
+			isS2SBidderAddedOnGivenSite(siteId)
+		).then(([activeBidders, s2sBidderAddedOnAnySite]) => {
 			if (s2sBidderAddedOnAnySite) activeBidders.push(commonConsts.PREBID_ADAPTERS.prebidServer);
 
-			// Update activeBidders doc if activeBidders List has been changed
-			return updateActiveBidderAdaptersIfChanged(activeBidders);
-		})
+			const output = {
+				activeBidderAdapters: activeBidders,
+				prebidBundleName: `pb.${siteId}${Date.now()}.js`,
+				isUpdated: true
+			};
+			return output;
+		});
+	}
+
+	function getActiveBidders() {
+		if (siteSpecificPrebidSiteId) {
+			return getActiveBiddersBySite(siteSpecificPrebidSiteId);
+		}
+
+		return getActiveBiddersForAllSites();
+	}
+
+	return getActiveBidders()
 		.then(data => {
 			if (!data.prebidBundleName) {
 				throw new Error('Something went wrong, Prebid bundle name not found.');

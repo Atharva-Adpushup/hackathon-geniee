@@ -29,7 +29,7 @@ module.exports = {
 		host: 'localhost:9200',
 		log: 'trace',
 		requestTimeout: 3500 // in ms
-	}, 
+	},
 	auditLogElasticServer: {
 		host: 'http://127.0.0.1:8083/auditLog',
 	},
@@ -225,6 +225,7 @@ module.exports = {
 	urlReportingEnabledSites: [],
 	// separatePrebidEnabledSites: [],
 	separatePrebidDisabledSites: [],
+	separateSiteSpecificPrebidBundleSites: [],
 	prebidBundleUrl: 'http://localhost:8080/assets/js/builds/geniee/prebid/__FILE_NAME__',
 	SCHEDULER_API_ROOT: 'http://localhost:8081/scheduler',
 	prebidBundleDefaultName: 'prebid.js',

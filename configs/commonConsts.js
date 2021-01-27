@@ -672,13 +672,52 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 								WHERE
 									meta(_apNetworks).id = 'data::apNetworks'
 									ORDER BY activeBidderAdapters ASC;`,
+		ACTIVE_BIDDER_ADAPTERS_BY_SITE_N1QL: `SELECT DISTINCT RAW activeBidderAdapters
+								FROM
+									AppBucket _apNetworks
+									UNNEST
+										(
+											ARRAY _apNetworks.[bidderKey].adapter
+											FOR bidderKey
+											IN (
+												SELECT DISTINCT RAW activeBiddersHbdc
+												FROM
+													AppBucket _hbdc
+													UNNEST
+														(
+															ARRAY hbdcBidderKey
+															FOR hbdcBidderKey
+															IN OBJECT_NAMES(_hbdc.hbcf)
+															WHEN _hbdc.hbcf.[hbdcBidderKey].isPaused = false
+															AND _hbdc.hbcf.[hbdcBidderKey].isActive = true END
+														)
+														AS activeBiddersHbdc
+												WHERE
+													meta(_hbdc).id = 'hbdc::__SITE_ID__'
+											)
+										WHEN
+												_apNetworks.[bidderKey] IS VALUED
+												AND _apNetworks.[bidderKey].isHb = true
+												AND _apNetworks.[bidderKey].isActive = true
+												AND _apNetworks.[bidderKey].params IS VALUED END
+										)
+										AS activeBidderAdapters
+								WHERE
+									meta(_apNetworks).id = 'data::apNetworks'
+									ORDER BY activeBidderAdapters ASC;`,
 		FIRST_S2S_BIDDER_SITE: `SELECT _hbdc.siteId
 							FROM
 								AppBucket _hbdc
 							WHERE
 								meta(_hbdc).id LIKE 'hbdc::%'
 								AND ANY bidder IN OBJECT_VALUES(_hbdc.hbcf) SATISFIES bidder.isS2SActive = true END
-							LIMIT 1;`
+							LIMIT 1;`,
+		S2S_BIDDER_BY_SITE: `SELECT _hbdc.siteId
+							FROM
+								AppBucket _hbdc
+							WHERE
+								meta(_hbdc).id = 'hbdc::__SITE_ID__'
+								AND ANY bidder IN OBJECT_VALUES(_hbdc.hbcf) SATISFIES bidder.isS2SActive = true END;`
 	},
 	SESSION_RPM: {
 		SESSION_RPM_PROPS: ['session_rpm', 'user_sessions'],
