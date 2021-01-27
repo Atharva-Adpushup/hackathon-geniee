@@ -96,8 +96,12 @@ function pushToCdnOriginQueue(fileConfig, siteId) {
 			job.filePath = `${siteId}/${fileConfig.name}`;
 		}
 
-		if (fileConfig.name.match(/^pb.\d+.js$/)) {
+		if (fileConfig.name.match(/^pb\.\d+\.js$/)) {
 			job.filePath = `prebid/${fileConfig.name}`;
+		}
+		
+		if (fileConfig.name.match(/^worker\.[a-z0-9]+\.js$/)) {
+			job.filePath = `workers/${fileConfig.name}`;
 		}
 
 		console.log(`${fileConfig.name} pushed to cdn origin queue at ${job.filePath} path.`);
