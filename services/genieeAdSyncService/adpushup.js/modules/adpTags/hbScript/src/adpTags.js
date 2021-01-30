@@ -155,7 +155,8 @@ var adpTags = {
 				},
 				adType: adType,
 				refreshCount: 0,
-				sizeMapping: sizeMapping
+				sizeMapping: sizeMapping,
+				downwardSizesDisabled: optionalParam.downwardSizesDisabled
 			};
 
 			this.computeSizesAndDefineGPTSlot(adpSlot);
@@ -258,8 +259,9 @@ var adpTags = {
 			} else {
 				computedSizes = utils.getSizesComputedUsingSizeMappingOrAdUnitSize(adpSlot);
 			}
-
-			return computedSizes;
+			return adpSlot.downwardSizesDisabled 
+				? adpSlot.isResponsive ? [computedSizes[0]] : [adpSlot.size]
+				: utils.filterComputedSizes(computedSizes, adpSlot.optionalParam.sizeFilters);
 		},
 		reInitAfterPostBid: function(w) {
 			// adpSlots in an array
