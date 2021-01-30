@@ -79,7 +79,6 @@ var utils = require('../libs/utils'),
 						adType = (ad.formatData && ad.formatData.type) || null,
 						sizeMapping = ad.sizeMapping || [],
 						downwardSizesDisabled = !!ad.downwardSizesDisabled;
-					window.adpushup.utils.log({ ad });
 					window.adpushup.adpTags.defineSlot(
 						computedDFPAdUnitId,
 						defaultAdSizeArray,
