@@ -595,7 +595,25 @@ var utils = {
 		}
 
 		return timeMatches;
-	}
+	},
+	filterComputedSizes: (computedSizes = [], sizeFilters) => {
+		if (!sizeFilters || !Object.keys(sizeFilters).length) return computedSizes;
+		return computedSizes.filter(([width, height]) => {
+			let isValid = true;
+
+			if (sizeFilters.minHeight && height < sizeFilters.minHeight) {
+				isValid = false;
+			} else if (sizeFilters.minWidth && width < sizeFilters.minWidth) {
+				isValid = false;
+			} else if (sizeFilters.maxHeight && height > sizeFilters.maxHeight) {
+				isValid = false;
+			} else if (sizeFilters.maxWidth && width > sizeFilters.maxWidth) {
+				isValid = false;
+			}
+
+			return isValid;
+		});
+	},
 };
 
 module.exports = utils;

@@ -77,8 +77,8 @@ var utils = require('../libs/utils'),
 							: networkData.dfpAdunit,
 						formats = networkData && networkData.formats,
 						adType = (ad.formatData && ad.formatData.type) || null,
-						sizeMapping = ad.sizeMapping || [];
-
+						sizeMapping = ad.sizeMapping || [],
+						downwardSizesDisabled = !!ad.downwardSizesDisabled;
 					window.adpushup.adpTags.defineSlot(
 						computedDFPAdUnitId,
 						defaultAdSizeArray,
@@ -102,7 +102,9 @@ var utils = require('../libs/utils'),
 							refreshInterval: networkData.refreshInterval || consts.AD_REFRESH_INTERVAL / 1000,
 							fluid: ad.fluid,
 							adType: adType,
-							sizeMapping: sizeMapping
+							sizeMapping: sizeMapping,
+							downwardSizesDisabled,
+							sizeFilters: ad.sizeFilters
 						}
 					);
 				}

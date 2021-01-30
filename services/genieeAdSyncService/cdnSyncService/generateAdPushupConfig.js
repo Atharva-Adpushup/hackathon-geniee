@@ -31,7 +31,7 @@ const isAdSynced = ad => {
 	return false;
 };
 
-const pushToAdpTags = function(ad, json) {
+const pushToAdpTags = (ad, json) => {
 	const isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length);
 	const isNetwork = !!ad.network;
 	const isNetworkData = !!ad.networkData;
@@ -60,7 +60,7 @@ const pushToAdpTags = function(ad, json) {
 	}
 };
 
-const getAdConfig = function(adType, section) {
+const getAdConfig = (adType, section) => {
 	const ad =
 		adType === 'layout'
 			? section.ads[Object.keys(section.ads)[0]] // for now we have only one ad inside a section
@@ -74,7 +74,9 @@ const getAdConfig = function(adType, section) {
 		width,
 		multipleAdSizes,
 		fluid,
-		sizeMapping
+		sizeMapping,
+		downwardSizesDisabled,
+		sizeFilters
 	} = ad;
 
 	const { name: sectionName, id, formatData } = section;
@@ -88,7 +90,8 @@ const getAdConfig = function(adType, section) {
 		width: isResponsive ? width : parseInt(width, 10),
 		formatData,
 		fluid: fluid === true,
-		sizeMapping
+		sizeMapping,
+		downwardSizesDisabled: !!downwardSizesDisabled
 	};
 
 	// Add 'multipleAdSizes' property if exists
@@ -96,6 +99,10 @@ const getAdConfig = function(adType, section) {
 
 	if (isMultipleAdSizes) {
 		json.multipleAdSizes = multipleAdSizes.concat([]);
+	}
+
+	if (sizeFilters && Object.keys(sizeFilters).length) {
+		json.sizeFilters = sizeFilters;
 	}
 
 	switch (adType) {
@@ -167,7 +174,7 @@ const getAdConfig = function(adType, section) {
 	return json;
 };
 
-const getSectionsPayload = function(variationSections, platform, pagegroup, selectorsTreeLevel) {
+const getSectionsPayload = (variationSections, platform, pagegroup, selectorsTreeLevel) => {
 	const ads = [];
 	let ad = null;
 	let json;
