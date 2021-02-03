@@ -4,6 +4,7 @@ const PromiseFtp = require('promise-ftp');
 const _ = require('lodash');
 const uglifyJS = require('uglify-js');
 const crypto = require('crypto');
+const axios = require('axios');
 
 const getReportData = require('../../../reports/universal/index');
 const CC = require('../../../configs/commonConsts');
@@ -16,6 +17,8 @@ const config = require('../../../configs/config');
 const generateStatusesAndConfig = require('./generateConfig');
 const bundleGeneration = require('./bundleGeneration');
 const prebidGeneration = require('./prebidGeneration');
+const createWorkerBundle = require('./createWorkerBundle');
+
 const request = require('request-promise');
 const disableSiteCdnSyncList = [38333];
 // NOTE: Above 'disableSiteCdnSyncList' array is added to prevent site specific JavaScript CDN sync
@@ -31,6 +34,9 @@ module.exports = function(site, user, prebidBundleName) {
 		isAutoOptimise = !!(site.get('apConfigs') && site.get('apConfigs').autoOptimise),
 		poweredByBanner = !!(site.get('apConfigs') && site.get('apConfigs').poweredByBanner),
 		gptSraDisabled = !!(site.get('apConfigs') && site.get('apConfigs').gptSraDisabled),
+		isAdhocOptimizationEnabled = !!(
+			site.get('apConfigs') && site.get('apConfigs').isAdhocOptimizationEnabled
+		),
 		tempDestPath = path.join(
 			__dirname,
 			'..',
@@ -213,6 +219,12 @@ module.exports = function(site, user, prebidBundleName) {
 			);
 		},
 		getFinalConfig = () => {
+			const { cdnOriginUrl } = config;
+
+			if (!cdnOriginUrl) {
+				throw new Error('Please add cdnOriginUrl in the config file');
+			}
+
 			return getConfigWrapper(site)
 				.then(generatedConfig => {
 					const {
@@ -225,6 +237,27 @@ module.exports = function(site, user, prebidBundleName) {
 					}
 
 					return prebidGeneration(config.prebidAdapters).then(() => generatedConfig);
+				})
+				.then(generatedConfig => {
+					if (!isAdhocOptimizationEnabled) {
+						return generatedConfig;
+					}
+					return createWorkerBundle(siteId).then(workerFileConfig => {
+						// skip uploading to CDN if file with same name exists (same hash = no change in file contents)
+						return axios
+							.get(`${cdnOriginUrl}/workers/${workerFileConfig.name}`)
+							.then(() => console.log('Web worker file has not changed. Skipping uploading to CDN'))
+							.catch(error => {
+								if (error.response && error.response.status === 404) {
+									return pushToCdnOriginQueue(workerFileConfig);
+								}
+								throw error;
+							})
+							.then(() => ({
+								...generatedConfig,
+								workerFileName: workerFileConfig.name
+							}));
+					});
 				})
 				.then(generatedConfig => bundleGeneration(site, generatedConfig))
 				.spread((generatedConfig, bundle) => {
@@ -293,6 +326,7 @@ module.exports = function(site, user, prebidBundleName) {
 
 					bundle = _.replace(bundle, '__AP_CONFIG__', JSON.stringify(apConfigs));
 					bundle = _.replace(bundle, /__SITE_ID__/g, siteId);
+					bundle = _.replace(bundle, /__CDN_ORIGIN_URL__/g, cdnOriginUrl);
 					//bundle = _.replace(bundle, '__COUNTRY__', false);
 					bundle = _.replace(bundle, '__SIZE_MAPPING__', JSON.stringify(sizeMappingConfig));
 					bundle = _.replace(bundle, '__WEB_S2S_STATUS__', finalConfig.config.isS2SActive);
@@ -316,6 +350,10 @@ module.exports = function(site, user, prebidBundleName) {
 					);
 					// bundle = _.replace(bundle, '__DISABLE_BB_PLAYER__', isBbPlayerDisabled);;
 					bundle = _.replace(bundle, '__ENABLE_BB_PLAYER_LOGGING__', enableBbPlayerLogging);
+
+					if (isAdhocOptimizationEnabled) {
+						bundle = _.replace(bundle, '__WORKER_FILE_NAME__', generatedConfig.workerFileName);
+					}
 
 					// Generate final init script based on the services that are enabled
 					var uncompressed = generateFinalInitScript(bundle)

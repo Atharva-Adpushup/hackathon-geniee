@@ -5,3 +5,7 @@
 	path = services/genieeAdSyncService/adpushup.js/modules/adpTags/Prebid.js
 	url = https://github.com/adpushup/Prebid.js.git
 	ignore = dirty
+[submodule "services/genieeAdSyncService/adpushup.js-optimized/modules/adpTags/Prebid.js"]
+	path = services/genieeAdSyncService/adpushup.js-optimized/modules/adpTags/Prebid.js
+	url = https://github.com/adpushup/Prebid.js.git
+	ignore = dirty
