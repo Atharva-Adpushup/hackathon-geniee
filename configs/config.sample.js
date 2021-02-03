@@ -238,7 +238,8 @@ module.exports = {
 		blacklistedSites: [40792],
 		enableLogging: true,
 		loggingWhitelistedSites: [37780]
-	}
+	},
+	cdnOriginUrl: 'https://test.adpushup.com'
 };
 
 /*

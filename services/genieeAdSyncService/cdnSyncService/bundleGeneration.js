@@ -17,7 +17,7 @@ function init(site, config) {
 		if (!statuses || !Object.keys(statuses).length) {
 			return reject(new AdPushupError(`Invalid Service Statuses for site: ${site.get('siteId')}`));
 		}
-		const compiler = webpack({
+		const webpackConfig = {
 			devtool: 'source-map',
 			mode: 'none',
 			entry: path.join(__dirname, '..', 'adpushup.js', 'main.js'),
@@ -60,7 +60,22 @@ function init(site, config) {
 					GA_ANALYTICS_ACTIVE: apConfigs.enableGAAnalytics
 				})
 			]
-		});
+		};
+
+		if (apConfigs.isAdhocOptimizationEnabled) {
+			webpackConfig.entry = path.join(__dirname, '..', 'adpushup.js-optimized', 'main.js');
+
+			webpackConfig.module.rules.push({
+				test: /\.worker\.js$/,
+				loader: 'worker-loader',
+				options: {
+					esModule: false,
+					inline: 'no-fallback'
+				}
+			});
+		}
+
+		const compiler = webpack(webpackConfig);
 		new webpack.ProgressPlugin().apply(compiler);
 		compiler.run((err, stats) =>
 			err || stats.hasErrors() ? reject(err || stats.compilation.errors) : resolve()
