@@ -142,7 +142,7 @@ class AddManageSizelessBidder extends React.Component {
 					};
 				}
 				const formFields = {
-					bidderConfig: getCommonBidderFields(isApRelation, {
+					bidderConfig: getCommonBidderFields(isApRelation && isSuperUser, {
 						values: {
 							relation,
 							bids,

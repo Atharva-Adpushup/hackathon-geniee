@@ -29,12 +29,6 @@ class BidderFormFields extends React.Component {
 
 		if (dataType === 'array' && currValue) currValue = currValue.toString();
 
-		const filterSelectBoxOptions = (paramKeys, optionsForSelect = []) => {
-			if (paramKeys === 'relation' && !isSuperUser)
-				return optionsForSelect.filter(relationOption => relationOption.name !== 'AdPushup');
-			return optionsForSelect;
-		};
-
 		switch (inputType) {
 			case 'selectBox': {
 				return (
@@ -43,7 +37,7 @@ class BidderFormFields extends React.Component {
 						id={`hb-${paramKey}`}
 						wrapperClassName="hb-input"
 						selected={currValue}
-						options={filterSelectBoxOptions(paramKey, options)}
+						options={options}
 						disabled={!isEditable}
 						onSelect={value => {
 							if (adSize) {
