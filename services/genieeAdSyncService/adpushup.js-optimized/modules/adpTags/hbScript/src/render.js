@@ -11,7 +11,7 @@ var getDfpContainerFromDom = function(containerId) {
 };
 
 let isWindowLoadEventFired = false;
-let isDocumentReadyEventFired = document.readyState !== "loading";
+let isDocumentReadyEventFired = document.readyState === 'complete';
 
 var render = {
 	renderGPTSlots: function(adpSlots) {
@@ -54,10 +54,17 @@ var render = {
 
 			if (!isDocumentReadyEventFired && renderAfterDomReady) {
 				window.adpushup.$(function() {
-					setTimeout(renderFn, parseInt(renderAfterDomReady, 10))
+					let timeout = parseInt(renderAfterDomReady, 10);
+
+					if (!isNaN(timeout)) {
+						setTimeout(renderFn, timeout);
+					} else {
+						renderFn();
+					}
+
 					isDocumentReadyEventFired = true;
 				});
-			} else if (!isWindowLoadEventFired && renderAfterWindowLoad) {
+			} else if (!isDocumentReadyEventFired && renderAfterWindowLoad) {
 				window.adpushup.$(window).load(function() {
 					renderFn();
 					isWindowLoadEventFired = true;
