@@ -11,7 +11,7 @@ var getDfpContainerFromDom = function(containerId) {
 };
 
 let isWindowLoadEventFired = false;
-let isDocumentReadyEventFired = false;
+let isDocumentReadyEventFired = document.readyState !== "loading";
 
 var render = {
 	renderGPTSlots: function(adpSlots) {
@@ -54,7 +54,7 @@ var render = {
 
 			if (!isDocumentReadyEventFired && renderAfterDomReady) {
 				window.adpushup.$(function() {
-					renderFn();
+					setTimeout(renderFn, parseInt(renderAfterDomReady, 10))
 					isDocumentReadyEventFired = true;
 				});
 			} else if (!isWindowLoadEventFired && renderAfterWindowLoad) {
