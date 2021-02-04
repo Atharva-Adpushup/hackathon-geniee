@@ -86,13 +86,7 @@ export default class ManageBidder extends React.Component {
 	};
 
 	render() {
-		const {
-			bidderConfig,
-			siteId,
-			showNotification,
-			inventories,
-			user: { isSuperUser = false } = {}
-		} = this.props;
+		const { bidderConfig, siteId, showNotification, inventories, isSuperUser } = this.props;
 
 		return (
 			<div className="options-wrapper white-tab-container hb-bidder hb-manage-bidder">

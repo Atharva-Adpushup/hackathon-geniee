@@ -83,6 +83,7 @@ export default class BiddersTab extends React.Component {
 							openView={this.openView}
 							showNotification={showNotification}
 							inventories={inventories}
+							isSuperUser={isSuperUser}
 						/>
 					)))) || <Loader />
 		);
