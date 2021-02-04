@@ -14,8 +14,7 @@ class BidderFormFields extends React.Component {
 			setParamInTempState,
 			getCurrentFieldValue,
 			getCurrentParamValue,
-			adSize,
-			isSuperUser = false
+			adSize
 		} = this.props;
 
 		if (!inputType || !paramKey) return false;
