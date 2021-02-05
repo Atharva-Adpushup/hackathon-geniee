@@ -27,7 +27,9 @@ const ApConfig = {
 		'beforeJs',
 		'cmpAvailable',
 		'mergeReport',
-		'enableGAAnalytics'
+		'enableGAAnalytics',
+		'isDailyEmailReportsEnabled',
+		'isWeeklyEmailReportsEnabled'
 	],
 	override: [
 		'mode',
@@ -57,7 +59,9 @@ const ApConfig = {
 		'beforeJs',
 		'cmpAvailable',
 		'mergeReport',
-		'enableGAAnalytics'
+		'enableGAAnalytics',
+		'isDailyEmailReportsEnabled',
+		'isWeeklyEmailReportsEnabled'
 	],
 	merge: []
 };
