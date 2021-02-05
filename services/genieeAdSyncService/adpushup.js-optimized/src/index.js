@@ -368,10 +368,20 @@ function start() {
 		};
 	}
 
+	//check if google funding choice is already avaialble on page
+	function isGoogleFcAvailable() {
+		return (
+			window.googlefc &&
+			window.googlefc.ConsentStatusEnum &&
+			Object.keys(window.googlefc.ConsentStatusEnum).length
+		);
+	}
+
 	// we need to check CMP availabilityt for European countries only
 	function isCmpAplicable() {
 		return Promise.resolve(
-			!commonConsts.CMP_CHECK_EXCLUDED_SITES.includes(adp.config.siteId) &&
+			!isGoogleFcAvailable() &&
+				!commonConsts.CMP_CHECK_EXCLUDED_SITES.includes(adp.config.siteId) &&
 				!adp.config.cmpAvailable &&
 				commonConsts.EU_COUNTRY_LIST.includes(adp.config.country)
 		);
