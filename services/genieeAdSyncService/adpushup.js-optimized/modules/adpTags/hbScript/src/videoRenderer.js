@@ -142,7 +142,20 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 		});
 
 		// ad-hoc data logging
-		var bbPlayerEvents = ['error', 'aderror', 'adstarted'];
+		var bbPlayerEvents = [
+			'error',
+			'aderror',
+			'adstarted',
+			'load',
+			'loadeddata',
+			'loadedmetadata',
+			'canplay',
+			'play',
+			'adnotfound'
+		];
+
+		var videoStartedOrFailedEvents = ['error', 'aderror', 'adstarted'];
+
 		bbPlayerEvents.forEach(function(eventName) {
 			playerApi.on(eventName, function(e) {
 				// window.adpushup.$.ajax({
@@ -161,7 +174,11 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 				// 	processData: false,
 				// 	dataType: 'json'
 				// });
-				if (apConfig.enableBbPlayerLogging) {
+				
+				if (
+					apConfig.enableBbPlayerLogging &&
+					videoStartedOrFailedEvents.includes(eventName)
+				) {
 					delete apConfig.notRenderedVideoBids[bid.adUnitCode];
 				}
 
