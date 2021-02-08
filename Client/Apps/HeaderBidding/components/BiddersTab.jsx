@@ -49,7 +49,8 @@ export default class BiddersTab extends React.Component {
 			domain,
 			inventories,
 			user,
-			customProps
+			customProps,
+			user: { isSuperUser = false } = {}
 		} = this.props;
 
 		return (
@@ -68,6 +69,7 @@ export default class BiddersTab extends React.Component {
 							openView={this.openView}
 							showNotification={showNotification}
 							inventories={inventories}
+							isSuperUser={isSuperUser}
 						/>
 					)) ||
 					(currView === 'manageBidder' && (
@@ -81,6 +83,7 @@ export default class BiddersTab extends React.Component {
 							openView={this.openView}
 							showNotification={showNotification}
 							inventories={inventories}
+							isSuperUser={isSuperUser}
 						/>
 					)))) || <Loader />
 		);
