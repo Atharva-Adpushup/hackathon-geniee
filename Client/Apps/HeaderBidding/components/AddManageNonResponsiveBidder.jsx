@@ -529,7 +529,6 @@ class AddManageNonResponsiveBidder extends React.Component {
 							getCurrentFieldValue={this.getCurrentFieldValue}
 							errors={errors}
 							meta={this.bidderFormFieldsMeta}
-							isSuperUser={isSuperUser}
 						/>
 
 						{!!(

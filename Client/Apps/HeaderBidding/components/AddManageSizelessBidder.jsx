@@ -373,7 +373,6 @@ class AddManageSizelessBidder extends React.Component {
 							getCurrentFieldValue={this.getCurrentFieldValue}
 							errors={errors}
 							meta={this.bidderFormFieldsMeta}
-							isSuperUser={isSuperUser}
 						/>
 						<FormGroup>
 							<Col md={12} className="u-margin-t4">
