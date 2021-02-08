@@ -29,7 +29,7 @@ class AddManageSizelessBidder extends React.Component {
 	};
 
 	componentDidMount() {
-		const { formType } = this.props;
+		const { formType, isSuperUser } = this.props;
 		switch (formType) {
 			case 'add': {
 				const {
@@ -55,7 +55,7 @@ class AddManageSizelessBidder extends React.Component {
 				}
 
 				const formFields = {
-					bidderConfig: getCommonBidderFields(isApRelation),
+					bidderConfig: getCommonBidderFields(isApRelation && isSuperUser),
 					params
 				};
 
@@ -142,7 +142,7 @@ class AddManageSizelessBidder extends React.Component {
 					};
 				}
 				const formFields = {
-					bidderConfig: getCommonBidderFields(isApRelation, {
+					bidderConfig: getCommonBidderFields(isApRelation && isSuperUser, {
 						values: {
 							relation,
 							bids,
@@ -351,7 +351,7 @@ class AddManageSizelessBidder extends React.Component {
 	};
 
 	render() {
-		const { openBiddersListView, formType } = this.props;
+		const { openBiddersListView, formType, isSuperUser } = this.props;
 		const {
 			formFields,
 			bidderConfig: { bids, relation },

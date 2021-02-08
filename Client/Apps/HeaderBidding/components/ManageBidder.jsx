@@ -86,7 +86,7 @@ export default class ManageBidder extends React.Component {
 	};
 
 	render() {
-		const { bidderConfig, siteId, showNotification, inventories } = this.props;
+		const { bidderConfig, siteId, showNotification, inventories, isSuperUser } = this.props;
 
 		return (
 			<div className="options-wrapper white-tab-container hb-bidder hb-manage-bidder">
@@ -109,6 +109,7 @@ export default class ManageBidder extends React.Component {
 								onBidderUpdate={this.onBidderUpdate}
 								onBidderDelete={this.onBidderDelete}
 								showNotification={showNotification}
+								isSuperUser={isSuperUser}
 							/>
 						) : (
 							<AddManageNonResponsiveBidder
@@ -120,6 +121,7 @@ export default class ManageBidder extends React.Component {
 								onBidderDelete={this.onBidderDelete}
 								showNotification={showNotification}
 								inventories={inventories}
+								isSuperUser={isSuperUser}
 							/>
 						)}
 					</Col>
