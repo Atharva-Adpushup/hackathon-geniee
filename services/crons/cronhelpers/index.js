@@ -16,10 +16,10 @@ function getUserSites(ownerEmail) {
 		.then(user => {
 			const userSites = user.get('sites');
 
-			userSites.map(({ siteId }) => {
-				siteid.push(siteId.toString());
-			});
-			return siteid.sort((a, b) => a - b).join();
+			return userSites
+				.map(({ siteId }) => siteId)
+				.sort((a, b) => a - b)
+				.join();
 		})
 		.catch(err => console.log(err));
 }
