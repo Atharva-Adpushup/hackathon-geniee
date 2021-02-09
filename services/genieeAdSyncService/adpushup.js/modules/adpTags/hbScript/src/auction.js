@@ -187,6 +187,17 @@ var auction = {
 					},
 					{
 						name: 'criteo'
+					},
+					{
+						name: "identityLink",
+						params: {
+							pid: '13302'
+						},
+						storage: {
+							type: "html5",
+							name: "pbjs-identityLinkId",
+							expires: 30
+						}
 					}
 				],
 				syncDelay: 3000 // 3 seconds after the first auction
