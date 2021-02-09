@@ -80,11 +80,13 @@ class Report extends Component {
 			show: true,
 			savedReports: [],
 			selectedReport: null,
-			selectedReportName: ''
+			selectedReportName: '',
+			initLoadTime: 0
 		};
 	}
 
 	componentDidMount() {
+		this.state.initLoadTime = new Date().getTime();
 		const { userSites, updateReportMetaData, reportsMeta, isForOps } = this.props;
 		const { email, reportType } = this.getDemoUserParams();
 
@@ -337,6 +339,8 @@ class Report extends Component {
 	};
 
 	generateButtonHandler = (inputState = {}) => {
+		this.setState({ initLoadTime: new Date().getTime() });
+
 		if (Object.keys(inputState).length) {
 			const {
 				reportType,
@@ -1260,8 +1264,9 @@ class Report extends Component {
 	};
 
 	render() {
-		const { isLoading, show, isError, errorMessage } = this.state;
+		const { isLoading, show, isError, errorMessage, initLoadTime } = this.state;
 		const { reportsMeta } = this.props;
+		const finalLoadTime = 0;
 
 		if ((!reportsMeta.fetched && !isError) || isLoading) {
 			return <Loader />;
@@ -1273,6 +1278,13 @@ class Report extends Component {
 
 		return (
 			<React.Fragment>
+				{!finalLoadTime
+					? console.log(
+							'Component loaded in',
+							new Date().getTime(),
+							new Date().getTime() - initLoadTime
+					  )
+					: null}
 				<ActionCard title="AdPushup Reports">{this.renderContent()}</ActionCard>
 				{show ? (
 					<Alert bsStyle="info" onDismiss={this.handleDismiss} className="u-margin-t4">

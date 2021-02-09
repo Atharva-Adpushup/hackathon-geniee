@@ -35,11 +35,16 @@ class MixPanelAnalytics extends React.Component {
 			});
 		}
 
-		this.mixpanel.track(componentName, {
-			distinct_id: loggedInEmail,
-			$email: loggedInEmail,
-			date: new Date().getTime()
-		});
+		// this.mixpanel.track(componentName, {
+		// 	distinct_id: loggedInEmail,
+		// 	$email: loggedInEmail,
+		// 	date: new Date().getTime()
+		// });
+	}
+
+	componentWillUnmount() {
+		const { name: componentName } = this.props;
+		console.log(componentName, ' is unmounting');
 	}
 
 	render() {

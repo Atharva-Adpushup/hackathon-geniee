@@ -14,6 +14,7 @@ export default ({ component: Component, title = '', ...rest }) => {
 
 	return (
 		<>
+			{console.time()}
 			<MixpanelContainer {...rest} />
 			<ShellContainer {...rest}>
 				<Suspense fallback={<Loader height="100vh" />}>
@@ -24,6 +25,7 @@ export default ({ component: Component, title = '', ...rest }) => {
 								path={props.history.location.pathname}
 								isSuperUser={authService.isOps()}
 							>
+								{console.timeEnd()}
 								<Component customProps={customProps} title={title} {...props} />
 							</SendGAPageViewEvent>
 						)}
