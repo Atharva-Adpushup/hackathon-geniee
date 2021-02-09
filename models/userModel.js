@@ -821,7 +821,8 @@ function apiModule() {
 									domain: site.get('siteDomain'),
 									siteId: site.get('siteId'),
 									step: site.get('step'),
-									channels: site.get('channels')
+									channels: site.get('channels'),
+									apConfigs:site.get('apConfigs')
 								};
 							})
 							.catch(function() {

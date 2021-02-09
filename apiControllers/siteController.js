@@ -1,7 +1,7 @@
 const express = require('express');
 const Promise = require('bluebird');
 const _ = require('lodash');
-
+const moment = require('moment');
 // eslint-disable-next-line no-unused-vars
 // const woodlotCustomLogger = require('woodlot').customLogger;
 const userModel = require('../models/userModel');
@@ -430,7 +430,7 @@ router
 		const { siteId, apConfigs, adNetworkSettings, dataForAuditLogs } = req.body;
 		const { isWeeklyEmailReportsEnabled = false } = apConfigs;
 		if (isWeeklyEmailReportsEnabled) {
-			apConfigs.weeklyEmailEnableTimeStamp = new Date().toDateString();
+			apConfigs.weeklyEmailEnableTimeStamp = moment().format();
 		}
 		return verifyOwner(siteId, email)
 			.then(site => {
