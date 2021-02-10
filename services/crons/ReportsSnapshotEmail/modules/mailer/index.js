@@ -61,7 +61,7 @@ function getTemplateConfig(inputData) {
 		cpmChange = inputData.report.metricComparison.cpm.change;
 
 	return {
-		'@__date_range__@': inputData.report.metricComparison.dates.thisWeek.representation,
+		'@__date_range__@': inputData.report.metricComparison.dates.thisWeek.representation, //this is date range from date- to date
 		'@__site_name__@': inputData.siteName.toLowerCase(),
 		'@__revenue_value__@': Math.round(inputData.report.metricComparison.revenue.thisWeekOriginal),
 		'@__cpm_change_text__@': cpmChange,
