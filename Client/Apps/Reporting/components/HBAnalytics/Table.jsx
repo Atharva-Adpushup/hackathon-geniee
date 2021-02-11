@@ -218,9 +218,11 @@ class Table extends React.Component {
 								aggregatedData[key].map(row => {
 									for (const prop in row) {
 										if (!columnsBlacklistedForAddition.includes(prop) && prop === column) {
-												return grouped = !Number.isInteger(sum(aggregatedData[key].map(val => val[prop])))
-													? sum(aggregatedData[key].map(val => val[prop])).toFixed(2)
-													: sum(aggregatedData[key].map(val => val[prop]));
+											return (grouped = !Number.isInteger(
+												sum(aggregatedData[key].map(val => val[prop]))
+											)
+												? sum(aggregatedData[key].map(val => val[prop])).toFixed(2)
+												: sum(aggregatedData[key].map(val => val[prop])));
 										}
 										if (prop === 'adpushup_ad_ecpm' && prop === column)
 											grouped = (
@@ -296,19 +298,23 @@ class Table extends React.Component {
 														sum(aggregatedData[key].map(val => val.prebid_bid_requests)))) *
 												100
 											).toFixed(2);
-										}
-										else if (prop === 'country' && prop === column) {
-											grouped = this.processAndreduceEntityWiseData(aggregatedData[key], 'country')
+										} else if (prop === 'country' && prop === column) {
+											grouped = this.processAndreduceEntityWiseData(aggregatedData[key], 'country');
 										} else if (prop === 'device_type' && prop === column) {
-											grouped = this.processAndreduceEntityWiseData(aggregatedData[key], 'device_type')
+											grouped = this.processAndreduceEntityWiseData(
+												aggregatedData[key],
+												'device_type'
+											);
 										} else if (prop === 'selectedDimensionColumn' && prop === column) {
-											grouped = aggregatedData[key].map(val => val.selectedDimensionColumn).join(',')
+											grouped = aggregatedData[key]
+												.map(val => val.selectedDimensionColumn)
+												.join(',');
 										} else if (prop === 'average_response_time' && prop === column) {
 											grouped = (
-												sum(aggregatedData[key].map(val => val.average_response_time)) / aggregatedData[key].length
-											).toFixed(2)
-										}
-										else if (prop === 'adpushup_count_percent' && prop === column) grouped = 100;
+												sum(aggregatedData[key].map(val => val.average_response_time)) /
+												aggregatedData[key].length
+											).toFixed(2);
+										} else if (prop === 'adpushup_count_percent' && prop === column) grouped = 100;
 									}
 								});
 								return grouped;
@@ -346,23 +352,23 @@ class Table extends React.Component {
 				}
 				entityObj[item[entity]].push(item);
 			});
+		});
 
-			Object.keys(entityObj).map(entityItem => {
-				const totalEntityWiseRevenue = entityObj[entityItem].reduce((acc, item) => {
-					// eslint-disable-next-line no-param-reassign
-					acc += item.overall_net_revenue;
-					return acc;
-				}, 0);
-				// entityObj[country] = totalEntityWiseRevenue;
-				if (!entityBasedRevenue[entityItem]) {
-					entityBasedRevenue[entityItem] = {
-						[entity]: entityItem,
-						totalEntityWiseRevenue: 0
-					};
-				}
-				entityBasedRevenue[entityItem].totalEntityWiseRevenue += totalEntityWiseRevenue;
-				totalRevenue += totalEntityWiseRevenue;
-			});
+		Object.keys(entityObj).map(entityItem => {
+			const totalEntityWiseRevenue = entityObj[entityItem].reduce((acc, item) => {
+				// eslint-disable-next-line no-param-reassign
+				acc += item.overall_net_revenue;
+				return acc;
+			}, 0);
+			// entityObj[country] = totalEntityWiseRevenue;
+			if (!entityBasedRevenue[entityItem]) {
+				entityBasedRevenue[entityItem] = {
+					[entity]: entityItem,
+					totalEntityWiseRevenue: 0
+				};
+			}
+			entityBasedRevenue[entityItem].totalEntityWiseRevenue += totalEntityWiseRevenue;
+			totalRevenue += totalEntityWiseRevenue;
 		});
 
 		return (
