@@ -123,7 +123,7 @@ var gpt = {
 		
 								let unitHeight;
 								if (stickyBg[0]) {
-									unitHeight = parseInt(stickyBg[0].dataset.unitHeight);
+									unitHeight = parseInt(stickyBg[0].dataset.unitheight);
 								}
 		
 								if (!event.isEmpty) {
