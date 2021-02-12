@@ -49,7 +49,7 @@ var request = require('request-promise'),
 				strictSSL: false,
 				resolveWithFullResponse: !!fullResponse,
 				headers: {
-					'User-Agent': userAgent,
+					// 'User-Agent': userAgent,
 					'Accept-Encoding': 'identity'
 				}
 			}).catch(err => {
