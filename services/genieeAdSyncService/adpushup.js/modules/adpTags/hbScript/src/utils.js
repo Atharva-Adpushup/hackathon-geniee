@@ -620,15 +620,12 @@ var utils = {
 
 		if (!isCpmValid) return cpm;
 
-		if (window.adpushup.shouldInflateBid) {
-			const inflatedCpm = cpm + ( cpm * (bidInfationPercentage / 100) );
-			return inflatedCpm;
-		}
-
-		return cpm;
+		const inflatedCpm = cpm + ( cpm * (bidInfationPercentage / 100) );
+		adp.utils.log(`CPM: ${cpm} inflated to ${inflatedCpm}`);
+		return inflatedCpm;
 	},
 	isValidNumber: function(value) {
-		const isValid = value && !isNaN(value) && typeof value === 'number' && value > 0;
+		const isValid = typeof value === 'number' && !!value;
 		return isValid;
 	},
 	setShouldPerformBidInflation: function() {

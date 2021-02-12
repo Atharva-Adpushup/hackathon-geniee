@@ -67,11 +67,11 @@ var targeting = {
 		};
 		var adServerTargeting = this.getAdserverTargeting(adpSlot);
 
-		if (adServerTargeting && Object.keys(adServerTargeting).length && adServerTargeting[keys.CPM]) {
-			const cpm = parseFloat(adServerTargeting[keys.CPM]);
-			const inflatedCpm = utils.inflateBidCpm(cpm);
-			if (inflatedCpm > cpm) {
-				adp.utils.log(`Ad Unit ${adpSlot.slotId} Cpm ${cpm} inflated to ${inflatedCpm}`);
+		if (window.adpushup.shouldInflateBid) {
+			if (adServerTargeting && Object.keys(adServerTargeting).length && adServerTargeting[keys.CPM]) {
+				const cpm = parseFloat(adServerTargeting[keys.CPM]);
+				const inflatedCpm = utils.inflateBidCpm(cpm);
+
 				adServerTargeting[keys.CPM] = inflatedCpm.toString()
 				targeting[keys.INFLATED_CPM] = true;
 			}
