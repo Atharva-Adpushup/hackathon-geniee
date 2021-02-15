@@ -81,13 +81,12 @@ class Report extends Component {
 			savedReports: [],
 			selectedReport: null,
 			selectedReportName: '',
-			initLoadTime: 0,
-			finalLoadTime: 0
+			initLoadTime: null
 		};
 	}
 
 	componentDidMount() {
-		this.setState({ initLoadTime: new Date().getTime(), finalLoadTime: 0 });
+		this.setState({ initLoadTime: new Date().getTime() });
 
 		const { userSites, updateReportMetaData, reportsMeta, isForOps } = this.props;
 		const { email, reportType } = this.getDemoUserParams();
@@ -137,15 +136,14 @@ class Report extends Component {
 		this.setState({ isLoading: false, isError: true, errorMessage });
 	};
 
-	fireLoading = () => {
+	componentLoadingCompleted = () => {
 		const { initLoadTime } = this.state;
 		if (initLoadTime) {
 			const computedFinalTime = new Date().getTime();
-			const loadTime = computedFinalTime - initLoadTime;
-			const properties = { ComponentName: 'Reports', loadTime };
+			const responseLoadTime = computedFinalTime - initLoadTime;
+			const properties = { ComponentName: 'Reports', responseLoadTime };
 			MixpanelHelper.trackEvent('Performance', properties);
-			console.log('Component loaded in', loadTime);
-			this.setState({ initLoadTime: 0 });
+			this.setState({ initLoadTime: null });
 		}
 	};
 
@@ -1304,7 +1302,7 @@ class Report extends Component {
 						</a>
 					</Alert>
 				) : null}
-				{this.fireLoading()}
+				{this.componentLoadingCompleted()}
 			</React.Fragment>
 		);
 	}

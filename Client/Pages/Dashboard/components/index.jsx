@@ -29,6 +29,7 @@ import { convertObjToArr, getDateRange } from '../helpers/utils';
 import OnboardingCard from '../../../Components/OnboardingCard';
 import CustomButton from '../../../Components/CustomButton';
 import MixpanelHelper from '../../../helpers/mixpanel';
+import { faThermometerHalf } from '@fortawesome/free-solid-svg-icons';
 
 class Dashboard extends React.Component {
 	constructor(props) {
@@ -43,7 +44,11 @@ class Dashboard extends React.Component {
 			sites: [],
 			widgetsConfig: [],
 			isLoading: true,
-			isUniqueImpEnabled
+			isUniqueImpEnabled,
+			initialLoadingStarted: new Date().getTime(),
+			componentsLoaded: 0,
+			totalComponentToLoad: 0,
+			loadCounter: 0
 		};
 	}
 
@@ -262,6 +267,19 @@ class Dashboard extends React.Component {
 			this.setState({ widgetsConfig });
 		} else if (params.siteid)
 			reportService.getWidgetData({ path, params }).then(response => {
+				const { loadCounter } = this.state;
+				this.setState({ loadCounter: loadCounter + 1 }, () => {
+					const { initialLoadingStarted, loadCounter: apiLoadCounter } = this.state;
+					if (apiLoadCounter === widgetsConfig.length) {
+						const finalTime = new Date().getTime();
+						const responseLoadTime = finalTime - initialLoadingStarted;
+						const properties = {
+							ComponentName: 'Dashboard',
+							responseLoadTime
+						};
+						MixpanelHelper.trackEvent('Performance', properties);
+					}
+				});
 				if (
 					response.status == 200 &&
 					!isEmpty(response.data) &&
@@ -506,10 +524,11 @@ class Dashboard extends React.Component {
 		const { widgetsConfig } = this.state;
 		const content = [];
 		const hasLayoutSite = this.showApBaselineWidget();
+
 		widgetsConfig.forEach((widget, index) => {
 			// const widget = widgetsConfig[wid];
 			const widgetComponent = this.getWidgetComponent(widget);
-			if ((widget.name == 'per_ap_original' && hasLayoutSite) || widget.name != 'per_ap_original')
+			if ((widget.name == 'per_ap_original' && hasLayoutSite) || widget.name != 'per_ap_original') {
 				content.push(
 					<Card
 						rootClassName={
@@ -535,6 +554,7 @@ class Dashboard extends React.Component {
 						}
 					/>
 				);
+			}
 		});
 
 		return content;
