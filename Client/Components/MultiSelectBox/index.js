@@ -29,6 +29,11 @@ const findSelected = props => {
 	return { selected, name };
 };
 
+const SELECT_ALL = {
+	name: 'select-all',
+	value: 'select-all',
+	label: 'Select All'
+};
 class MultiSelectBox extends Component {
 	constructor(props) {
 		super(props);
@@ -58,12 +63,24 @@ class MultiSelectBox extends Component {
 		const { selectedOption } = this.state;
 		const checked = e.target.checked;
 
-		options.map(option => {
-			if (option.value === dataValue) {
-				selectedOption[dataValue] = Boolean(checked);
-			}
-			return option;
-		});
+		// logic for select/deSelect all
+		if (dataValue === SELECT_ALL.value) {
+			options.map(option => {
+				selectedOption[option.value] = Boolean(checked);
+				return option;
+			});
+		} else {
+			options.map(option => {
+				if (option.value === dataValue) {
+					selectedOption[dataValue] = Boolean(checked);
+				}
+				// to uncheck select all if any of th eoption is unchecked
+				if (!checked) {
+					selectedOption[SELECT_ALL.value] = false;
+				}
+				return option;
+			});
+		}
 
 		this.setState(
 			{
@@ -122,7 +139,7 @@ class MultiSelectBox extends Component {
 			pullRight
 		} = this.props;
 
-		let count = Object.keys(selectedOption).filter(item => selectedOption[item]).length;
+		const count = Object.keys(selectedOption).filter(item => selectedOption[item]).length;
 		const selectedTitle = reset ? (
 			<div
 				className="aligner aligner--hSpaceBetween width-100  aligner--wrap"
@@ -155,6 +172,22 @@ class MultiSelectBox extends Component {
 					id={id}
 					onSelect={this.selectWrapper}
 				>
+					<div className="checkbox-wrapper" key={`${'select-all'}check`}>
+						<Checkbox
+							className=""
+							data-value={SELECT_ALL.value}
+							data-name={SELECT_ALL.name}
+							data-key={dataKey}
+							onChange={e => {
+								this.handleMultiSelect(e);
+							}}
+							checked={selectedOption[SELECT_ALL.value]}
+						>
+							{SELECT_ALL.label}
+							{/* {'select All'} {selectedOption['selectAll']} */}
+						</Checkbox>
+					</div>
+
 					{options.map((option, key) => {
 						if (option.isDisabled) {
 							return (
