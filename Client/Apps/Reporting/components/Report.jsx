@@ -81,12 +81,12 @@ class Report extends Component {
 			savedReports: [],
 			selectedReport: null,
 			selectedReportName: '',
-			initLoadTime: null
+			apiLoadTimeStartedAt: null
 		};
 	}
 
 	componentDidMount() {
-		this.setState({ initLoadTime: new Date().getTime() });
+		this.setState({ apiLoadTimeStartedAt: new Date().getTime() });
 
 		const { userSites, updateReportMetaData, reportsMeta, isForOps } = this.props;
 		const { email, reportType } = this.getDemoUserParams();
@@ -137,13 +137,17 @@ class Report extends Component {
 	};
 
 	componentLoadingCompleted = () => {
-		const { initLoadTime } = this.state;
-		if (initLoadTime) {
-			const computedFinalTime = new Date().getTime();
-			const responseLoadTime = computedFinalTime - initLoadTime;
-			const properties = { ComponentName: 'Reports', responseLoadTime };
+		const { apiLoadTimeStartedAt } = this.state;
+		if (apiLoadTimeStartedAt) {
+			const apiLoadTimeFinishedAt = new Date().getTime();
+			const responseLoadTime = apiLoadTimeFinishedAt - apiLoadTimeStartedAt;
+			const properties = {
+				componentName: 'Reports',
+				responseLoadTime,
+				group: 'componentApiLoadMonitoring'
+			};
 			MixpanelHelper.trackEvent('Performance', properties);
-			this.setState({ initLoadTime: null });
+			this.setState({ apiLoadTimeStartedAt: null });
 		}
 	};
 
@@ -351,7 +355,7 @@ class Report extends Component {
 	};
 
 	generateButtonHandler = (inputState = {}) => {
-		this.setState({ initLoadTime: new Date().getTime() });
+		this.setState({ apiLoadTimeStartedAt: new Date().getTime() });
 
 		if (Object.keys(inputState).length) {
 			const {
@@ -1286,7 +1290,7 @@ class Report extends Component {
 		if (!isLoading && isError) {
 			return <Empty message={errorMessage} />;
 		}
-
+		this.componentLoadingCompleted();
 		return (
 			<React.Fragment>
 				<ActionCard title="AdPushup Reports">{this.renderContent()}</ActionCard>
@@ -1302,7 +1306,6 @@ class Report extends Component {
 						</a>
 					</Alert>
 				) : null}
-				{this.componentLoadingCompleted()}
 			</React.Fragment>
 		);
 	}
