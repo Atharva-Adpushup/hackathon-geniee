@@ -184,7 +184,6 @@ class MultiSelectBox extends Component {
 							checked={selectedOption[SELECT_ALL.value]}
 						>
 							{SELECT_ALL.label}
-							{/* {'select All'} {selectedOption['selectAll']} */}
 						</Checkbox>
 					</div>
 
