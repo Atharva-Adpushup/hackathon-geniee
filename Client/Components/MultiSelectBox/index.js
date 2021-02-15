@@ -69,6 +69,7 @@ class MultiSelectBox extends Component {
 				selectedOption[option.value] = Boolean(checked);
 				return option;
 			});
+			selectedOption[SELECT_ALL.value] = Boolean(checked);
 		} else {
 			options.map(option => {
 				if (option.value === dataValue) {
