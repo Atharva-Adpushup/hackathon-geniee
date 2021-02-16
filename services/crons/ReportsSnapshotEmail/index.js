@@ -1,10 +1,16 @@
 const { promiseForeach } = require('node-utils');
 const CC = require('../../../configs/commonConsts');
-const { getActiveUsers, getWidgetsDataSite, getLastRunInfo } = require('../cronhelpers');
+const {
+	getActiveUsers,
+	getWidgetsDataSite,
+	getLastRunInfo,
+	generateEmailTemplate
+} = require('../cronhelpers');
 const { getAllUserSites } = require('../../../models/userModel');
 const moment = require('moment');
 const cron = require('node-cron');
 const config = require('../../../configs/config');
+const { generateImageBase64 } = require('./modules/highCharts');
 
 let isCronServiceRunning = false;
 let isAllDataFetched = false;
@@ -78,12 +84,21 @@ async function sendDailySnapshot(siteid, userEmail) {
 	const params = { fromDate, toDate, siteid };
 	const resultData = await giveDashboardReports(params);
 	//here we will generate template and send mail to the user
+	const allReportingData = await generateImageBase64(resultData);
+	//here we will generate template and send mail to the user
+	const template = await generateEmailTemplate('hello', {
+		allReportingData
+	});
 }
 
 async function sendWeeklySnapshot(siteid, userEmail) {
 	const params = { fromDate, toDate, siteid };
 	const resultData = await giveDashboardReports(params);
+	const allReportingData = await generateImageBase64(resultData);
 	//here we will generate template and send mail to the user
+	const template = await generateEmailTemplate('hello', {
+		allReportingData
+	});
 }
 
 async function processSitesOfUser(userEmail) {
@@ -92,15 +107,15 @@ async function processSitesOfUser(userEmail) {
 		const dailyWeeklySubscribedSites = await getEmailSnapshotsSites(userEmail);
 		const dailySubscribedSites = dailyWeeklySubscribedSites[0],
 			weeklySubscribedSites = dailyWeeklySubscribedSites[1];
-		if (dailySubscribedSites !== '') sendDailySnapshot(dailySubscribedSites, userEmail);
-		if (weeklySubscribedSites !== '') sendWeeklySnapshot(weeklySubscribedSites, userEmail);
+		if (dailySubscribedSites !== '') await sendDailySnapshot(dailySubscribedSites, userEmail);
+		if (weeklySubscribedSites !== '') await sendWeeklySnapshot(weeklySubscribedSites, userEmail);
 	} catch (error) {
 		console.log(error);
 	}
 }
 
 function processEachUser(allUsers) {
-	// allUsers = ['matt@flytrapcare.com'];
+	// allUsers = ['shikhar@geeksforgeeks.org'];
 	return promiseForeach(allUsers, processSitesOfUser);
 }
 

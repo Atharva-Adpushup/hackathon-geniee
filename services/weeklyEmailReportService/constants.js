@@ -1,6 +1,6 @@
 const LINE_CHART_CONFIG = {
 	chart: {
-		type: 'line'
+		type: 'spline'
 	},
 	title: {
 		text: ''

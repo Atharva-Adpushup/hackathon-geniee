@@ -1,4 +1,6 @@
 const request = require('request-promise');
+const ejs = require('ejs');
+const path = require('path');
 const { getAdpToken } = require('../../../helpers/authToken');
 const CC = require('../../../configs/commonConsts');
 const { BASE_URL } = require('../../../configs/commonConsts');
@@ -61,9 +63,22 @@ function getLastRunInfo() {
 	);
 }
 
+async function generateEmailTemplate(template, params) {
+	// Get the EJS file that will be used to generate the HTML
+	const file = path.join(__dirname, `../ReportsSnapshotEmail/templates/${template}.ejs`);
+
+	// Throw an error if the file path can't be found
+	if (!file) {
+		throw new Error(`Could not find the ${template} in path ${file}`);
+	}
+	const result = await ejs.renderFile(file, params, { async: true });
+	return result;
+}
+
 module.exports = {
 	getUserSites,
 	getActiveUsers,
 	getWidgetsDataSite,
-	getLastRunInfo
+	getLastRunInfo,
+	generateEmailTemplate
 };

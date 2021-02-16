@@ -3,22 +3,25 @@ const Promise = require('bluebird'),
 	extend = require('extend'),
 	moment = require('moment'),
 	{ LINE_CHART_CONFIG, PIE_CHART_CONFIG } = require('../../constants'),
-	Highcharts = require('highcharts-server').default,
-	server = new Highcharts(3003);
+	exporter = require('highcharts-export-server');
+
+exporter.initPool();
+
+const roundOffTwoDecimal = value => {
+	const roundedNum = Math.round(value * 100) / 100;
+	return roundedNum.toFixed(2);
+};
 
 function addHighChartsObject(inputData) {
 	const defaultChartObject = {
 			base64: '',
 			imagePath: ''
 		},
-		resultData = extend(true, {}, inputData);
-
-	resultData.report.charts = {
+		resultData = { ...inputData };
+	resultData.charts = {
 		cpmLine: extend({}, defaultChartObject),
-		adNetworkCPMLine: extend({}, defaultChartObject),
 		adNetworkRevenuePie: extend({}, defaultChartObject),
-		deviceRevenuePie: extend({}, defaultChartObject),
-		pageGroupRevenuePie: extend({}, defaultChartObject)
+		countryReportPie: extend({}, defaultChartObject)
 	};
 
 	return resultData;
@@ -27,172 +30,205 @@ function addHighChartsObject(inputData) {
 function getChartImageOptions() {
 	return {
 		width: 487,
-		scale: 2
+		scale: 2,
+		type: 'png',
+		b64: true
 	};
 }
 
 function generateBase64(imgOptions, chartOptions) {
+	// var exportSettings = {
+	// 	type: 'png',
+	// 	b64: true,
+	// 	options: {
+	// 		title: {
+	// 			text: 'My Chart'
+	// 		},
+	// 		xAxis: {
+	// 			categories: [
+	// 				'Jan',
+	// 				'Feb',
+	// 				'Mar',
+	// 				'Apr',
+	// 				'Mar',
+	// 				'Jun',
+	// 				'Jul',
+	// 				'Aug',
+	// 				'Sep',
+	// 				'Oct',
+	// 				'Nov',
+	// 				'Dec'
+	// 			]
+	// 		},
+	// 		series: [
+	// 			{
+	// 				type: 'line',
+	// 				data: [1, 3, 2, 4]
+	// 			},
+	// 			{
+	// 				type: 'line',
+	// 				data: [5, 3, 4, 2]
+	// 			}
+	// 		]
+	// 	}
+	// };
+
+	const newOptions = { ...imgOptions, options: { ...chartOptions } };
 	return new Promise((resolve, reject) => {
-		server.render(imgOptions, chartOptions, function(base64Data) {
-			if (!base64Data) {
+		exporter.export(newOptions, function(err, res) {
+			if (err) {
 				return reject('generateBase64: Unable to generate high chart base64');
 			}
-
+			const base64Data = res.data;
 			const imageUrl = `data:image/png;base64,${base64Data}`;
 			return resolve(imageUrl);
 		});
 	});
 }
 
-function generateCPMLineBase64(inputData) {
-	const chartConfig = extend(true, {}, LINE_CHART_CONFIG),
-		imageOptions = getChartImageOptions(),
-		series = [],
-		lastWeekSeries = {
-			name: 'Last Week',
-			data: []
-		},
-		thisWeekSeries = {
-			name: 'This Week',
-			data: []
-		},
-		categories = [],
-		contributionData = extend(true, {}, inputData.report.metricComparison.cpm.contribution);
+//required
+async function generateCPMLineBase64(inputData) {
+	function computeGraphData(results) {
+		let series = [];
+		const adpushupSeriesData = [];
+		const baselineSeriesData = [];
+		const xAxis = { categories: [] };
 
-	_.forOwn(contributionData.lastWeek, (cpmValue, dateKey) => {
-		lastWeekSeries.data.push(cpmValue);
-	});
+		if (results.length) {
+			results.sort((a, b) => {
+				const dateA = a.report_date;
+				const dateB = b.report_date;
+				if (dateA < dateB) {
+					return -1;
+				}
+				if (dateA > dateB) {
+					return 1;
+				}
+				return 0;
+			});
 
-	_.forOwn(contributionData.thisWeek, (cpmValue, dateKey) => {
-		const dayCategory = moment(dateKey).format('ddd');
+			results.forEach(result => {
+				adpushupSeriesData.push(result.adpushup_variation_page_cpm);
+				baselineSeriesData.push(result.original_variation_page_cpm);
+				xAxis.categories.push(moment(result.report_date).format('ll'));
+			});
 
-		categories.push(dayCategory);
-		thisWeekSeries.data.push(cpmValue);
-	});
-
-	chartConfig.series.push(lastWeekSeries);
-	chartConfig.series.push(thisWeekSeries);
-	chartConfig.xAxis.categories = chartConfig.xAxis.categories.concat(categories);
-
-	return generateBase64(imageOptions, chartConfig);
-}
-
-function generateAdNetworkCPMLineBase64(inputData) {
-	const chartConfig = extend(true, {}, LINE_CHART_CONFIG),
-		imageOptions = getChartImageOptions(),
-		categories = [],
-		contributionData = extend(true, {}, inputData.report.adNetworkDataContribution.dayWise);
-
-	_.forOwn(contributionData, (adNetworkDayWiseReport, adNetworkKey) => {
-		const seriesObject = {
-				name: adNetworkKey,
-				data: []
-			},
-			// Below condition is added to avoid 'categories' array stuffed with redundant
-			// day values.
-			isCategoriesValidLength = !!(categories && categories.length + 1 <= 7),
-			isChartConfigCategoriesEmptyLength = !!chartConfig.xAxis.categories.length;
-
-		_.forOwn(adNetworkDayWiseReport, (dayWiseObject, dateKey) => {
-			if (isCategoriesValidLength) {
-				const dayCategory = moment(dateKey).format('MMM DD');
-				categories.push(dayCategory);
-			}
-
-			seriesObject.data.push(dayWiseObject.cpm);
-		});
-
-		chartConfig.series.push(seriesObject);
-
-		if (isCategoriesValidLength || !isChartConfigCategoriesEmptyLength) {
-			chartConfig.xAxis.categories = chartConfig.xAxis.categories.concat(categories);
+			series = [
+				{
+					data: adpushupSeriesData,
+					name: 'AdPushup Variation Page RPM',
+					value: 'adpushup_variation_page_cpm',
+					valueType: 'money'
+				},
+				{
+					data: baselineSeriesData,
+					name: 'Original Variation Page RPM',
+					value: 'original_variation_page_cpm',
+					valueType: 'money'
+				}
+			];
 		}
-	});
 
-	return generateBase64(imageOptions, chartConfig);
+		const computedState = {
+			series,
+			xAxis
+		};
+		return computedState;
+	}
+
+	const { APvsBaseline } = inputData;
+	const computedState = computeGraphData(APvsBaseline.result || []);
+	const chartConfig = { ...LINE_CHART_CONFIG, ...computedState };
+	const imageOptions = getChartImageOptions();
+	const base64Encoding = await generateBase64(imageOptions, chartConfig);
+	return base64Encoding;
 }
 
-function generateAdNetworkRevenuePieBase64(inputData) {
-	const chartConfig = extend(true, {}, PIE_CHART_CONFIG),
-		imageOptions = getChartImageOptions(),
-		contributionData = extend(true, {}, inputData.report.adNetworkDataContribution.contribution.revenue);
+function computeDisplayData(props) {
+	const {
+		result: resultData,
+		chartLegend,
+		chartSeriesLabel,
+		chartSeriesMetric,
+		chartSeriesMetricType
+	} = props;
+	const series = [
+		{
+			name: chartLegend,
+			colorByPoint: true,
+			data: []
+		}
+	];
+	const seriesData = [];
 
-	_.forOwn(contributionData, (adNetworkRevenue, adNetworkKey) => {
-		const seriesObject = {
-			name: adNetworkKey,
-			y: adNetworkRevenue
-		};
+	if (resultData) {
+		resultData.forEach(result => {
+			seriesData.push({
+				name: result[chartSeriesLabel],
+				y: parseFloat(roundOffTwoDecimal(result[chartSeriesMetric])),
+				valueType: chartSeriesMetricType
+			});
+		});
+	}
 
-		chartConfig.series[0].data.push(seriesObject);
-	});
-
-	return generateBase64(imageOptions, chartConfig);
+	series[0].data = seriesData.sort((a, b) => a.y - b.y);
+	return series;
 }
 
-function generateDeviceRevenuePieBase64(inputData) {
-	const chartConfig = extend(true, {}, PIE_CHART_CONFIG),
-		imageOptions = getChartImageOptions(),
-		contributionData = extend(true, {}, inputData.report.deviceRevenueContribution.contribution);
-
-	_.forOwn(contributionData, (deviceRevenue, deviceKey) => {
-		const seriesObject = {
-			name: deviceKey,
-			y: deviceRevenue
-		};
-
-		chartConfig.series[0].data.push(seriesObject);
+//required
+async function generateAdNetworkRevenuePieBase64(inputData) {
+	const chartConfig = extend(true, {}, PIE_CHART_CONFIG);
+	const {
+		revenueByNetwork: { result = [] }
+	} = inputData;
+	const computedState = computeDisplayData({
+		result,
+		chartLegend: 'Revenue',
+		chartSeriesLabel: 'network',
+		chartSeriesMetric: 'revenue',
+		chartSeriesMetricType: 'money'
 	});
-
-	return generateBase64(imageOptions, chartConfig);
+	chartConfig.series = computedState || {};
+	const imageOptions = getChartImageOptions();
+	const base64Encoding = await generateBase64(imageOptions, chartConfig);
+	return base64Encoding;
 }
 
-function generatePageGroupRevenuePieBase64(inputData) {
-	const chartConfig = extend(true, {}, PIE_CHART_CONFIG),
-		imageOptions = getChartImageOptions(),
-		contributionData = extend(true, {}, inputData.report.pageGroupRevenueContribution.contribution);
-
-	_.forOwn(contributionData, (pageGroupRevenue, pageGroupKey) => {
-		const seriesObject = {
-			name: pageGroupKey,
-			y: pageGroupRevenue
-		};
-
-		chartConfig.series[0].data.push(seriesObject);
+//required
+async function generateCountryReportsPieBase64(inputData) {
+	const chartConfig = extend(true, {}, PIE_CHART_CONFIG);
+	const {
+		countryReport: { result = [] }
+	} = inputData;
+	const computedState = computeDisplayData({
+		result,
+		chartLegend: 'Country',
+		chartSeriesLabel: 'countrry',
+		chartSeriesMetric: 'adpushup_page_views',
+		chartSeriesMetricType: 'number'
 	});
-
-	return generateBase64(imageOptions, chartConfig);
+	chartConfig.series = computedState || {};
+	const imageOptions = getChartImageOptions();
+	const base64Encoding = await generateBase64(imageOptions, chartConfig);
+	return base64Encoding;
 }
 
 module.exports = {
 	generateImageBase64: inputData => {
 		const reportData = addHighChartsObject(inputData),
 			getCPMLineBase64 = generateCPMLineBase64(reportData),
-			getAdNetworkCPMLineBase64 = generateAdNetworkCPMLineBase64(reportData),
 			getAdNetworkRevenuePieBase64 = generateAdNetworkRevenuePieBase64(reportData),
-			getDeviceRevenuePieBase64 = generateDeviceRevenuePieBase64(reportData),
-			getPageGroupRevenuePieBase64 = generatePageGroupRevenuePieBase64(reportData);
-
-		return Promise.join(
+			getCountryRevenueRevenuePieBase64 = generateCountryReportsPieBase64(reportData);
+		return Promise.all([
 			getCPMLineBase64,
-			getAdNetworkCPMLineBase64,
 			getAdNetworkRevenuePieBase64,
-			getDeviceRevenuePieBase64,
-			getPageGroupRevenuePieBase64,
-			(
-				cpmLineBase64,
-				adNetworkCPMLineBase64,
-				adNetworkRevenuePieBase64,
-				deviceRevenuePieBase64,
-				pageGroupRevenuePieBase64
-			) => {
-				reportData.report.charts.cpmLine.base64 = cpmLineBase64;
-				reportData.report.charts.adNetworkCPMLine.base64 = adNetworkCPMLineBase64;
-				reportData.report.charts.adNetworkRevenuePie.base64 = adNetworkRevenuePieBase64;
-				reportData.report.charts.deviceRevenuePie.base64 = deviceRevenuePieBase64;
-				reportData.report.charts.pageGroupRevenuePie.base64 = pageGroupRevenuePieBase64;
-
-				return reportData;
-			}
-		);
+			getCountryRevenueRevenuePieBase64
+		]).then(values => {
+			reportData.charts.cpmLine.base64 = values[0];
+			reportData.charts.adNetworkRevenuePie.base64 = values[1];
+			reportData.charts.countryReportPie.base64 = values[2];
+			exporter.killPool();
+			return reportData;
+		});
 	}
 };
