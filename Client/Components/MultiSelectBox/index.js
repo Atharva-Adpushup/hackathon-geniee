@@ -61,19 +61,19 @@ class MultiSelectBox extends Component {
 		const { onSelect, options } = this.props;
 
 		const { selectedOption } = this.state;
-		const checked = e.target.checked;
+		const checked = Boolean(e.target.checked);
 
 		// logic for select/deSelect all
 		if (dataValue === SELECT_ALL.value) {
-			options.map(option => {
-				selectedOption[option.value] = Boolean(checked);
+			options.forEach(option => {
+				selectedOption[option.value] = checked;
 				return option;
 			});
-			selectedOption[SELECT_ALL.value] = Boolean(checked);
+			selectedOption[SELECT_ALL.value] = checked;
 		} else {
-			options.map(option => {
+			options.forEach(option => {
 				if (option.value === dataValue) {
-					selectedOption[dataValue] = Boolean(checked);
+					selectedOption[dataValue] = checked;
 				}
 				// to uncheck select all if any of th eoption is unchecked
 				if (!checked) {
