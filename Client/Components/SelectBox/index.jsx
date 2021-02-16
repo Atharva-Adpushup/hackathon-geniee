@@ -101,7 +101,8 @@ class SelectBox extends Component {
 		) : (
 			name
 		);
-		const buttonTitle = selected === 0 || selected ? selectedTitle : title;
+		let buttonTitle = selected === 0 || selected ? selectedTitle : title;
+		if (selected === 'adpushup' && id === 'hb-relation') buttonTitle = 'AdPushup';
 		const tooltip = <Tooltip id="tooltip">Please select a website.</Tooltip>;
 		return (
 			<div className={`custom-select-box-wrapper ${wrapperClassName}`}>
