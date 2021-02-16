@@ -238,7 +238,7 @@ module.exports = function(dependencies) {
 			 */
 			outputData.bidders = outputData.headerBidding
 				? utils.getBiddersForSlot(size, formats, bidderRulesConfig)
-				: [];
+				: {};
 
 			return outputData;
 		}

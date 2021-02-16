@@ -272,7 +272,6 @@ var utils = {
 		}
 
 		if (bidderRulesConfig.bidderSequence) {
-			bidders = this.sortBidders(bidders, bidderRulesConfig.bidderSequence);
 			nonFormatWiseBidders = this.sortBidders(nonFormatWiseBidders, bidderRulesConfig.bidderSequence);
 			Object.keys(formatWiseBidders).forEach(format => {
 				formatWiseBidders[format] = this.sortBidders(formatWiseBidders[format], bidderRulesConfig.bidderSequence);
