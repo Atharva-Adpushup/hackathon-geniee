@@ -89,10 +89,6 @@ class Report extends Component {
 	}
 
 	componentDidMount() {
-		this.setState({
-			apiLoadTimeStartedAt: new Date().getTime()
-		});
-
 		const { userSites, updateReportMetaData, reportsMeta, isForOps } = this.props;
 		const { email, reportType } = this.getDemoUserParams();
 
@@ -381,11 +377,6 @@ class Report extends Component {
 	};
 
 	generateButtonHandler = (inputState = {}) => {
-		this.setState({
-			apiLoadTimeStartedAt: new Date().getTime(),
-			getCustomStatResponseStatus: 'failed'
-		});
-
 		if (Object.keys(inputState).length) {
 			const {
 				reportType,
@@ -417,6 +408,11 @@ class Report extends Component {
 		this.setState(computedState, () => {
 			let newState = {};
 			const params = this.formateReportParams();
+
+			this.setState({
+				apiLoadTimeStartedAt: new Date().getTime(),
+				getCustomStatResponseStatus: 'failed'
+			});
 
 			reportService
 				.getCustomStats(params)
