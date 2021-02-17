@@ -30,7 +30,6 @@ export default ({ component: Component, title = '', ...rest }) => {
 									componentName={rest.name}
 									customProps={customProps}
 									title={title}
-									{...rest}
 									{...props}
 								/>
 							</SendGAPageViewEvent>
