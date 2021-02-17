@@ -81,7 +81,9 @@ class Report extends Component {
 			savedReports: [],
 			selectedReport: null,
 			selectedReportName: '',
-			apiLoadTimeStartedAt: null
+			apiLoadTimeStartedAt: null,
+			getCustomStatResponseStatus: 'failed',
+			lastReportQuery: { initalQuery: true }
 		};
 	}
 
@@ -137,14 +139,16 @@ class Report extends Component {
 	};
 
 	componentLoadingCompleted = () => {
-		const { apiLoadTimeStartedAt } = this.state;
+		const { apiLoadTimeStartedAt, getCustomStatResponseStatus, lastReportQuery } = this.state;
 		if (apiLoadTimeStartedAt) {
 			const apiLoadTimeFinishedAt = new Date().getTime();
 			const responseLoadTime = apiLoadTimeFinishedAt - apiLoadTimeStartedAt;
 			const properties = {
 				componentName: 'Reports',
 				responseLoadTime,
-				group: 'componentApiLoadMonitoring'
+				apiResponseStatus: getCustomStatResponseStatus,
+				group: 'componentApiLoadMonitoring',
+				...lastReportQuery
 			};
 			MixpanelHelper.trackEvent('Performance', properties);
 			this.setState({ apiLoadTimeStartedAt: null });
@@ -376,6 +380,7 @@ class Report extends Component {
 				toDate: endDate,
 				fromDate: startDate
 			};
+			this.setState({ lastReportQuery: properties });
 			MixpanelHelper.trackEvent('Reports', properties);
 		}
 		let { tableData, metricsList, selectedFilterValues } = this.state;
@@ -393,6 +398,7 @@ class Report extends Component {
 				.then(response => {
 					if (Number(response.status) === 200 && response.data && !response.data.error) {
 						tableData = response.data.data;
+						this.setState({ getCustomStatResponseStatus: 'success' });
 
 						const shouldAddAdpushupCountPercentColumn =
 							(selectedDimension === 'mode' ||
@@ -491,6 +497,8 @@ class Report extends Component {
 							}
 							newState = { ...newState, metricsList };
 						}
+					} else {
+						this.setState({ getCustomStatResponseStatus: 'failed' });
 					}
 
 					newState = {

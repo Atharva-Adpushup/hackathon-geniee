@@ -26,8 +26,8 @@ class LoadComponent extends React.Component {
 	};
 
 	render() {
-		const { component: Component, customProps, title } = this.props;
-		return <Component customProps={customProps} title={title} {...this.props} />;
+		const { component: Component } = this.props;
+		return <Component {...this.props} />;
 	}
 }
 

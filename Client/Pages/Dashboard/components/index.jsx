@@ -215,6 +215,17 @@ class Dashboard extends React.Component {
 		}
 	};
 
+	logApiResponseTime = initialLoadingStarted => {
+		const finalTime = new Date().getTime();
+		const responseLoadTime = finalTime - initialLoadingStarted;
+		const properties = {
+			componentName: 'Dashboard',
+			responseLoadTime,
+			group: 'componentApiLoadMonitoring'
+		};
+		MixpanelHelper.trackEvent('Performance', properties);
+	};
+
 	getDisplayData = wid => {
 		const { widgetsConfig, isUniqueImpEnabled } = this.state;
 		const { selectedDate, selectedSite, name, customDateRange, startDate, endDate } = widgetsConfig[
@@ -265,20 +276,11 @@ class Dashboard extends React.Component {
 		} else if (params.siteid)
 			reportService.getWidgetData({ path, params }).then(response => {
 				this.setState(
-					state => {
-						state.loadCounter += 1;
-					},
+					state => ({ ...state, loadCounter: state.loadCounter + 1 }),
 					() => {
 						const { initialLoadingStarted, loadCounter: apiLoadCounter } = this.state;
 						if (apiLoadCounter === widgetsConfig.length) {
-							const finalTime = new Date().getTime();
-							const responseLoadTime = finalTime - initialLoadingStarted;
-							const properties = {
-								componentName: 'Dashboard',
-								responseLoadTime,
-								group: 'componentApiLoadMonitoring'
-							};
-							MixpanelHelper.trackEvent('Performance', properties);
+							this.logApiResponseTime(initialLoadingStarted);
 						}
 					}
 				);
