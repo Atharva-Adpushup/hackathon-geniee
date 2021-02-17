@@ -80,7 +80,11 @@ class Report extends Component {
 			show: true,
 			savedReports: [],
 			selectedReport: null,
-			selectedReportName: ''
+			selectedReportName: '',
+			apiLoadTimeStartedAt: null,
+			getCustomStatResponseStatus: 'failed',
+			lastReportQuery: { initalQuery: true },
+			apiFinalResponseTime: null
 		};
 	}
 
@@ -121,6 +125,14 @@ class Report extends Component {
 		return this.getContentInfo(reportsMeta.data);
 	}
 
+	componentDidUpdate() {
+		const { isLoading } = this.state;
+		if (!isLoading) {
+			const finalRenderTimeTaken = new Date().getTime();
+			this.componentLoadingCompleted(finalRenderTimeTaken);
+		}
+	}
+
 	handleError = err => {
 		const {
 			user: { data: user }
@@ -130,7 +142,35 @@ class Report extends Component {
 			err && err.response && err.response.data && err.response.data.data && isAdmin
 				? err.response.data.data.data || err.response.data.data.message || DEFAULT_ERROR_MESSAGE
 				: DEFAULT_ERROR_MESSAGE;
-		this.setState({ isLoading: false, isError: true, errorMessage });
+		this.setState({
+			isLoading: false,
+			isError: true,
+			errorMessage,
+			apiFinalResponseTime: new Date().getTime()
+		});
+	};
+
+	componentLoadingCompleted = finalRenderTimeTaken => {
+		const {
+			apiLoadTimeStartedAt,
+			apiFinalResponseTime,
+			getCustomStatResponseStatus,
+			lastReportQuery
+		} = this.state;
+		if (apiLoadTimeStartedAt) {
+			const responseLoadTime = apiFinalResponseTime - apiLoadTimeStartedAt;
+			const totalRenderTime = finalRenderTimeTaken - apiLoadTimeStartedAt;
+			const properties = {
+				componentName: 'Reports',
+				responseLoadTime,
+				totalRenderTime,
+				apiResponseStatus: getCustomStatResponseStatus,
+				group: 'componentApiLoadMonitoring',
+				...lastReportQuery
+			};
+			MixpanelHelper.trackEvent('Performance', properties);
+			this.setState({ apiLoadTimeStartedAt: null });
+		}
 	};
 
 	removeOpsFilterDimension = (filterList, dimensionList) => {
@@ -356,6 +396,7 @@ class Report extends Component {
 				toDate: endDate,
 				fromDate: startDate
 			};
+			this.setState({ lastReportQuery: properties });
 			MixpanelHelper.trackEvent('Reports', properties);
 		}
 		let { tableData, metricsList, selectedFilterValues } = this.state;
@@ -368,11 +409,18 @@ class Report extends Component {
 			let newState = {};
 			const params = this.formateReportParams();
 
+			this.setState({
+				apiLoadTimeStartedAt: new Date().getTime(),
+				getCustomStatResponseStatus: 'failed'
+			});
+
 			reportService
 				.getCustomStats(params)
 				.then(response => {
+					this.setState({ apiFinalResponseTime: new Date().getTime() });
 					if (Number(response.status) === 200 && response.data && !response.data.error) {
 						tableData = response.data.data;
+						this.setState({ getCustomStatResponseStatus: 'success' });
 
 						const shouldAddAdpushupCountPercentColumn =
 							(selectedDimension === 'mode' ||
@@ -1270,7 +1318,6 @@ class Report extends Component {
 		if (!isLoading && isError) {
 			return <Empty message={errorMessage} />;
 		}
-
 		return (
 			<React.Fragment>
 				<ActionCard title="AdPushup Reports">{this.renderContent()}</ActionCard>

@@ -43,7 +43,9 @@ class Dashboard extends React.Component {
 			sites: [],
 			widgetsConfig: [],
 			isLoading: true,
-			isUniqueImpEnabled
+			isUniqueImpEnabled,
+			initialLoadingStarted: new Date().getTime(),
+			loadCounter: 0
 		};
 	}
 
@@ -213,6 +215,17 @@ class Dashboard extends React.Component {
 		}
 	};
 
+	logApiResponseTime = initialLoadingStarted => {
+		const finalTime = new Date().getTime();
+		const responseLoadTime = finalTime - initialLoadingStarted;
+		const properties = {
+			componentName: 'Dashboard',
+			responseLoadTime,
+			group: 'componentApiLoadMonitoring'
+		};
+		MixpanelHelper.trackEvent('Performance', properties);
+	};
+
 	getDisplayData = wid => {
 		const { widgetsConfig, isUniqueImpEnabled } = this.state;
 		const { selectedDate, selectedSite, name, customDateRange, startDate, endDate } = widgetsConfig[
@@ -262,6 +275,15 @@ class Dashboard extends React.Component {
 			this.setState({ widgetsConfig });
 		} else if (params.siteid)
 			reportService.getWidgetData({ path, params }).then(response => {
+				this.setState(
+					state => ({ ...state, loadCounter: state.loadCounter + 1 }),
+					() => {
+						const { initialLoadingStarted, loadCounter: apiLoadCounter } = this.state;
+						if (apiLoadCounter === widgetsConfig.length) {
+							this.logApiResponseTime(initialLoadingStarted);
+						}
+					}
+				);
 				if (
 					response.status == 200 &&
 					!isEmpty(response.data) &&
@@ -506,10 +528,11 @@ class Dashboard extends React.Component {
 		const { widgetsConfig } = this.state;
 		const content = [];
 		const hasLayoutSite = this.showApBaselineWidget();
+
 		widgetsConfig.forEach((widget, index) => {
 			// const widget = widgetsConfig[wid];
 			const widgetComponent = this.getWidgetComponent(widget);
-			if ((widget.name == 'per_ap_original' && hasLayoutSite) || widget.name != 'per_ap_original')
+			if ((widget.name == 'per_ap_original' && hasLayoutSite) || widget.name != 'per_ap_original') {
 				content.push(
 					<Card
 						rootClassName={
@@ -535,6 +558,7 @@ class Dashboard extends React.Component {
 						}
 					/>
 				);
+			}
 		});
 
 		return content;
