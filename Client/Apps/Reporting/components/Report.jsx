@@ -83,12 +83,16 @@ class Report extends Component {
 			selectedReportName: '',
 			apiLoadTimeStartedAt: null,
 			getCustomStatResponseStatus: 'failed',
-			lastReportQuery: { initalQuery: true }
+			lastReportQuery: { initalQuery: true },
+			apiFinalResponseTime: null
 		};
 	}
 
 	componentDidMount() {
-		this.setState({ apiLoadTimeStartedAt: new Date().getTime() });
+		this.setState({
+			apiLoadTimeStartedAt: new Date().getTime(),
+			getCustomStatResponseStatus: 'failed'
+		});
 
 		const { userSites, updateReportMetaData, reportsMeta, isForOps } = this.props;
 		const { email, reportType } = this.getDemoUserParams();
@@ -126,6 +130,14 @@ class Report extends Component {
 		return this.getContentInfo(reportsMeta.data);
 	}
 
+	componentDidUpdate() {
+		const { isLoading } = this.state;
+		if (!isLoading) {
+			const finalRenderTimeTaken = new Date().getTime();
+			this.componentLoadingCompleted(finalRenderTimeTaken);
+		}
+	}
+
 	handleError = err => {
 		const {
 			user: { data: user }
@@ -135,17 +147,28 @@ class Report extends Component {
 			err && err.response && err.response.data && err.response.data.data && isAdmin
 				? err.response.data.data.data || err.response.data.data.message || DEFAULT_ERROR_MESSAGE
 				: DEFAULT_ERROR_MESSAGE;
-		this.setState({ isLoading: false, isError: true, errorMessage });
+		this.setState({
+			isLoading: false,
+			isError: true,
+			errorMessage,
+			apiFinalResponseTime: new Date().getTime()
+		});
 	};
 
-	componentLoadingCompleted = () => {
-		const { apiLoadTimeStartedAt, getCustomStatResponseStatus, lastReportQuery } = this.state;
+	componentLoadingCompleted = finalRenderTimeTaken => {
+		const {
+			apiLoadTimeStartedAt,
+			apiFinalResponseTime,
+			getCustomStatResponseStatus,
+			lastReportQuery
+		} = this.state;
 		if (apiLoadTimeStartedAt) {
-			const apiLoadTimeFinishedAt = new Date().getTime();
-			const responseLoadTime = apiLoadTimeFinishedAt - apiLoadTimeStartedAt;
+			const responseLoadTime = apiFinalResponseTime - apiLoadTimeStartedAt;
+			const totalRenderTime = finalRenderTimeTaken - apiLoadTimeStartedAt;
 			const properties = {
 				componentName: 'Reports',
 				responseLoadTime,
+				totalRenderTime,
 				apiResponseStatus: getCustomStatResponseStatus,
 				group: 'componentApiLoadMonitoring',
 				...lastReportQuery
@@ -396,6 +419,7 @@ class Report extends Component {
 			reportService
 				.getCustomStats(params)
 				.then(response => {
+					this.setState({ apiFinalResponseTime: new Date().getTime() });
 					if (Number(response.status) === 200 && response.data && !response.data.error) {
 						tableData = response.data.data;
 						this.setState({ getCustomStatResponseStatus: 'success' });
@@ -497,8 +521,6 @@ class Report extends Component {
 							}
 							newState = { ...newState, metricsList };
 						}
-					} else {
-						this.setState({ getCustomStatResponseStatus: 'failed' });
 					}
 
 					newState = {
@@ -1298,7 +1320,6 @@ class Report extends Component {
 		if (!isLoading && isError) {
 			return <Empty message={errorMessage} />;
 		}
-		this.componentLoadingCompleted();
 		return (
 			<React.Fragment>
 				<ActionCard title="AdPushup Reports">{this.renderContent()}</ActionCard>
