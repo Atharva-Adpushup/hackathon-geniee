@@ -4,13 +4,16 @@ const {
 	getActiveUsers,
 	getWidgetsDataSite,
 	getLastRunInfo,
-	generateEmailTemplate
+	generateEmailTemplate,
+	roundOffTwoDecimal,
+	numberWithCommas
 } = require('../cronhelpers');
 const { getAllUserSites } = require('../../../models/userModel');
 const moment = require('moment');
 const cron = require('node-cron');
 const config = require('../../../configs/config');
 const { generateImageBase64 } = require('./modules/highCharts');
+const { ADPUSHUP_LOGO, ARROW_UP, ARROW_DOWN } = require('./constants');
 
 let isCronServiceRunning = false;
 let isAllDataFetched = false;
@@ -21,6 +24,53 @@ let oldTimestamp = null;
 let cronDateExecuted = {};
 
 let count = 0;
+
+function cleanAllReportingDataForTwoDecimal(allReportingData, widgetKeys) {
+	for (let i = 0; i < widgetKeys.length; i++) {
+		let widget = widgetKeys[i];
+		const widgetData = allReportingData[widget];
+		if (widget === 'getStatsByCustom') {
+			let { total = {} } = widgetData;
+			for (let key in total) {
+				if (!isNaN(total[key])) total[key] = numberWithCommas(roundOffTwoDecimal(total[key]));
+			}
+			widgetData.total = { ...total };
+		}
+		let { result = [{}] } = widgetData;
+		for (let i = 0; i < result.length; i++) {
+			for (let key in result[i]) {
+				if (!isNaN(result[i][key]))
+					result[i][key] = numberWithCommas(roundOffTwoDecimal(result[i][key]));
+			}
+		}
+		allReportingData[widget].result = [...result];
+	}
+	return allReportingData;
+}
+
+function giveEstimatedEarningProgressData(estimatedEarningWidgetData) {
+	const {
+		lastSevenDays,
+		lastThirtyDays,
+		previousSevenDays,
+		previousThirtyDays,
+		sameDayLastWeek,
+		yesterday
+	} = estimatedEarningWidgetData;
+	const dayProgress =
+		yesterday > 0 && sameDayLastWeek > 0
+			? roundOffTwoDecimal(((yesterday - sameDayLastWeek) / sameDayLastWeek) * 100)
+			: 'N/A';
+	const weekProgress =
+		lastSevenDays > 0 && previousSevenDays > 0
+			? roundOffTwoDecimal(((lastSevenDays - previousSevenDays) / previousSevenDays) * 100)
+			: 'N/A';
+	const monthProgress =
+		lastThirtyDays > 0 && previousThirtyDays > 0
+			? roundOffTwoDecimal(((lastThirtyDays - previousThirtyDays) / previousThirtyDays) * 100)
+			: 'N/A';
+	return { dayProgress, weekProgress, monthProgress };
+}
 
 function getWidgetData(params, path) {
 	//return a single widgetData from here
@@ -81,14 +131,33 @@ async function getEmailSnapshotsSites(userEmail) {
 }
 
 async function sendDailySnapshot(siteid, userEmail) {
+	const fromReportingDate = moment(fromDate).format('LL'),
+		toReportingDate = moment(toDate).format('LL');
+	//
+
 	const params = { fromDate, toDate, siteid };
 	const resultData = await giveDashboardReports(params);
 	//here we will generate template and send mail to the user
-	const allReportingData = await generateImageBase64(resultData);
+	let allReportingData = await generateImageBase64(resultData);
+	allReportingData.progressData = giveEstimatedEarningProgressData(
+		allReportingData.estimatedRevenue.result[0]
+	);
+	allReportingData = cleanAllReportingDataForTwoDecimal(allReportingData, [
+		'estimatedRevenue',
+		'getStatsByCustom',
+		'siteSummary'
+	]);
 	//here we will generate template and send mail to the user
-	const template = await generateEmailTemplate('hello', {
-		allReportingData
+	const template = await generateEmailTemplate('reporting', {
+		allReportingData,
+		fromReportingDate,
+		toReportingDate,
+		adpLogo: ADPUSHUP_LOGO,
+		arrowUp: ARROW_UP,
+		arrowDown: ARROW_DOWN
 	});
+
+	//here template is generated we will send this in email
 }
 
 async function sendWeeklySnapshot(siteid, userEmail) {
@@ -127,8 +196,8 @@ function startEmailSnapshotsService() {
 	if (isCronServiceRunning && !isAllDataFetched)
 		return Promise.resolve('Old cron is already running');
 	currentDate = moment();
-	// if (cronDateExecuted[currentDate.format()])
-	// 	return Promise.resolve('Cron job already executed for the today');
+	if (cronDateExecuted[currentDate.format()])
+		return Promise.resolve('Cron job already executed for the today');
 	return getLastRunInfo()
 		.then(lastRunTime => {
 			console.time();
@@ -161,3 +230,4 @@ function startEmailSnapshotsService() {
 
 cron.schedule(CC.cronSchedule.emailSnapshotsService, startEmailSnapshotsService);
 // module.exports = startEmailSnapshotsService;
+// module.exports = sendDailySnapshot;

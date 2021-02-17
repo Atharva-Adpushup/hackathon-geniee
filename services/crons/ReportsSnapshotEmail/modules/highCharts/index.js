@@ -4,13 +4,8 @@ const Promise = require('bluebird'),
 	moment = require('moment'),
 	{ LINE_CHART_CONFIG, PIE_CHART_CONFIG } = require('../../constants'),
 	exporter = require('highcharts-export-server');
-
-exporter.initPool();
-
-const roundOffTwoDecimal = value => {
-	const roundedNum = Math.round(value * 100) / 100;
-	return roundedNum.toFixed(2);
-};
+const fs = require('fs');
+const { roundOffTwoDecimal } = require('../../../cronhelpers');
 
 function addHighChartsObject(inputData) {
 	const defaultChartObject = {
@@ -31,48 +26,13 @@ function getChartImageOptions() {
 	return {
 		width: 487,
 		scale: 2,
-		type: 'png',
 		b64: true
 	};
 }
 
-function generateBase64(imgOptions, chartOptions) {
-	// var exportSettings = {
-	// 	type: 'png',
-	// 	b64: true,
-	// 	options: {
-	// 		title: {
-	// 			text: 'My Chart'
-	// 		},
-	// 		xAxis: {
-	// 			categories: [
-	// 				'Jan',
-	// 				'Feb',
-	// 				'Mar',
-	// 				'Apr',
-	// 				'Mar',
-	// 				'Jun',
-	// 				'Jul',
-	// 				'Aug',
-	// 				'Sep',
-	// 				'Oct',
-	// 				'Nov',
-	// 				'Dec'
-	// 			]
-	// 		},
-	// 		series: [
-	// 			{
-	// 				type: 'line',
-	// 				data: [1, 3, 2, 4]
-	// 			},
-	// 			{
-	// 				type: 'line',
-	// 				data: [5, 3, 4, 2]
-	// 			}
-	// 		]
-	// 	}
-	// };
+exporter.initPool();
 
+function generateBase64(imgOptions, chartOptions) {
 	const newOptions = { ...imgOptions, options: { ...chartOptions } };
 	return new Promise((resolve, reject) => {
 		exporter.export(newOptions, function(err, res) {
@@ -203,7 +163,7 @@ async function generateCountryReportsPieBase64(inputData) {
 	const computedState = computeDisplayData({
 		result,
 		chartLegend: 'Country',
-		chartSeriesLabel: 'countrry',
+		chartSeriesLabel: 'country',
 		chartSeriesMetric: 'adpushup_page_views',
 		chartSeriesMetricType: 'number'
 	});
