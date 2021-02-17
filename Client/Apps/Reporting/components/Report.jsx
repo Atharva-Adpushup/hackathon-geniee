@@ -90,8 +90,7 @@ class Report extends Component {
 
 	componentDidMount() {
 		this.setState({
-			apiLoadTimeStartedAt: new Date().getTime(),
-			getCustomStatResponseStatus: 'failed'
+			apiLoadTimeStartedAt: new Date().getTime()
 		});
 
 		const { userSites, updateReportMetaData, reportsMeta, isForOps } = this.props;
@@ -382,7 +381,10 @@ class Report extends Component {
 	};
 
 	generateButtonHandler = (inputState = {}) => {
-		this.setState({ apiLoadTimeStartedAt: new Date().getTime() });
+		this.setState({
+			apiLoadTimeStartedAt: new Date().getTime(),
+			getCustomStatResponseStatus: 'failed'
+		});
 
 		if (Object.keys(inputState).length) {
 			const {
