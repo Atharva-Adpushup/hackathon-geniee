@@ -17,7 +17,13 @@ export default function getCommonBidderFields({ isApRelation, isSuperUser }, man
 			inputType: 'selectBox',
 			options: isApRelation
 				? [
-						{ name: 'AdPushup', value: 'adpushup', isDisabled: !isSuperUser },
+						{
+							name: 'AdPushup',
+							value: 'adpushup',
+							isDisabled: !isSuperUser,
+							toolTipMessage: null,
+							toolTipDisabled: true
+						},
 						{ name: 'Direct', value: 'direct' }
 				  ]
 				: [{ name: 'Direct', value: 'direct' }],
