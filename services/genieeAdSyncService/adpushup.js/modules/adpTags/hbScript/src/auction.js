@@ -162,6 +162,38 @@ var auction = {
 		}
 	},
 	setPrebidConfig: function(pbjs, prebidAuctionTimeOut) {
+		const userIds = [
+			{
+				name: 'unifiedId',
+				params: {
+					url: '//match.adsrvr.org/track/rid?ttd_pid=pubmatic&fmt=json'
+				},
+				storage: {
+					type: 'html5',
+					name: 'pbjs-unifiedid', // set localstorage with this name
+					expires: 60
+				}
+			},
+			{
+				name: 'criteo'
+			}
+		];
+
+		if (adp.config.siteId === 37780) {
+			// release live ramp only for one site for POC testing purposes.
+			userIds.push({
+				name: "identityLink",
+				params: {
+					pid: '13302'
+				},
+				storage: {
+					type: "html5",
+					name: "pbjs-identityLinkId",
+					expires: 30
+				}
+			});
+		}
+
 		var pbConfig = {
 			rubicon: {
 				singleRequest: true
@@ -173,22 +205,7 @@ var auction = {
 						filter: 'include'
 					}
 				},
-				userIds: [
-					{
-						name: 'unifiedId',
-						params: {
-							url: '//match.adsrvr.org/track/rid?ttd_pid=pubmatic&fmt=json'
-						},
-						storage: {
-							type: 'html5',
-							name: 'pbjs-unifiedid', // set localstorage with this name
-							expires: 60
-						}
-					},
-					{
-						name: 'criteo'
-					}
-				],
+				userIds,
 				syncDelay: 3000 // 3 seconds after the first auction
 			},
 			publisherDomain: adp.config.siteDomain,

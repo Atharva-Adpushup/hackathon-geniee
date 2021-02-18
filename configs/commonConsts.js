@@ -637,7 +637,8 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 			'unifiedIdSystem',
 			'criteoIdSystem',
 			'consentManagement',
-			'consentManagementUsp'
+			'consentManagementUsp',
+			'identityLinkIdSystem'
 		],
 		ACTIVE_BIDDER_ADAPTERS_N1QL: `SELECT DISTINCT RAW activeBidderAdapters
 								FROM
