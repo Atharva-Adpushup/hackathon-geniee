@@ -130,7 +130,7 @@ async function getEmailSnapshotsSites(userEmail) {
 	}
 }
 
-async function sendDailySnapshot(siteid, userEmail) {
+async function sendDailyWeeklySnapshot(siteid, userEmail, type) {
 	const fromReportingDate = moment(fromDate).format('LL'),
 		toReportingDate = moment(toDate).format('LL');
 	//
@@ -154,20 +154,11 @@ async function sendDailySnapshot(siteid, userEmail) {
 		toReportingDate,
 		adpLogo: ADPUSHUP_LOGO,
 		arrowUp: ARROW_UP,
-		arrowDown: ARROW_DOWN
+		arrowDown: ARROW_DOWN,
+		type
 	});
 
 	//here template is generated we will send this in email
-}
-
-async function sendWeeklySnapshot(siteid, userEmail) {
-	const params = { fromDate, toDate, siteid };
-	const resultData = await giveDashboardReports(params);
-	const allReportingData = await generateImageBase64(resultData);
-	//here we will generate template and send mail to the user
-	const template = await generateEmailTemplate('hello', {
-		allReportingData
-	});
 }
 
 async function processSitesOfUser(userEmail) {
@@ -176,8 +167,10 @@ async function processSitesOfUser(userEmail) {
 		const dailyWeeklySubscribedSites = await getEmailSnapshotsSites(userEmail);
 		const dailySubscribedSites = dailyWeeklySubscribedSites[0],
 			weeklySubscribedSites = dailyWeeklySubscribedSites[1];
-		if (dailySubscribedSites !== '') await sendDailySnapshot(dailySubscribedSites, userEmail);
-		if (weeklySubscribedSites !== '') await sendWeeklySnapshot(weeklySubscribedSites, userEmail);
+		if (dailySubscribedSites !== '')
+			await sendDailyWeeklySnapshot(dailySubscribedSites, userEmail, 'daily');
+		if (weeklySubscribedSites !== '')
+			await sendDailyWeeklySnapshot(weeklySubscribedSites, userEmail, 'weekly');
 	} catch (error) {
 		console.log(error);
 	}
