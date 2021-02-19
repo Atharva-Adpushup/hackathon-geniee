@@ -9,16 +9,25 @@
  * @param {object} manageBidderData
  * @returns
  */
-export default function getCommonBidderFields(isApRelation, manageBidderData) {
+export default function getCommonBidderFields(isApRelation, isSuperUser, manageBidderData) {
 	let commonBidderFields = {
 		relation: {
 			name: 'Relation',
 			dataType: 'string',
 			inputType: 'selectBox',
 			options: isApRelation
-				? [{ name: 'AdPushup', value: 'adpushup' }, { name: 'Direct', value: 'direct' }]
+				? [
+						{
+							name: 'AdPushup',
+							value: 'adpushup',
+							isDisabled: !isSuperUser,
+							toolTipMessage: null,
+							toolTipDisabled: true
+						},
+						{ name: 'Direct', value: 'direct' }
+				  ]
 				: [{ name: 'Direct', value: 'direct' }],
-			defaultValue: isApRelation ? 'adpushup' : 'direct',
+			defaultValue: isApRelation && isSuperUser ? 'adpushup' : 'direct',
 			isRequired: true,
 			isEditable: true
 		},
