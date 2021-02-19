@@ -131,6 +131,13 @@ async function getEmailSnapshotsSites(userEmail) {
 }
 
 async function sendDailyWeeklySnapshot(siteid, userEmail, type) {
+	const daysGap = type === 'daily' ? 1 : 7;
+	fromDate = moment()
+		.subtract(daysGap, 'days')
+		.format('YYYY-MM-DD');
+	toDate = moment()
+		.subtract(1, 'days')
+		.format('YYYY-MM-DD');
 	const fromReportingDate = moment(fromDate).format('LL'),
 		toReportingDate = moment(toDate).format('LL');
 	//
@@ -200,12 +207,6 @@ function startEmailSnapshotsService() {
 				return Promise.resolve('Old timestamp and new timestamp are same, no new reporting data');
 			console.log({ lastRunTime, fromDate, toDate, oldTimestamp });
 			oldTimestamp = lastRunTime;
-			fromDate = moment()
-				.subtract(7, 'days')
-				.format('YYYY-MM-DD');
-			toDate = moment()
-				.subtract(1, 'days')
-				.format('YYYY-MM-DD');
 			cronDateExecuted = {};
 			return runSnapshotService();
 		})
