@@ -96,7 +96,7 @@ async function generateCPMLineBase64(inputData) {
 		return computedState;
 	}
 
-	const { APvsBaseline } = inputData;
+	const { APvsBaseline = {} } = inputData;
 	const computedState = computeGraphData(APvsBaseline.result || []);
 	const chartConfig = { ...LINE_CHART_CONFIG, ...computedState };
 	const imageOptions = getChartImageOptions();
@@ -138,9 +138,7 @@ function computeDisplayData(props) {
 //required
 async function generateAdNetworkRevenuePieBase64(inputData) {
 	const chartConfig = extend(true, {}, PIE_CHART_CONFIG);
-	const {
-		revenueByNetwork: { result = [] }
-	} = inputData;
+	const { revenueByNetwork: { result = [] } = {} } = inputData;
 	const computedState = computeDisplayData({
 		result,
 		chartLegend: 'Revenue',
@@ -157,9 +155,7 @@ async function generateAdNetworkRevenuePieBase64(inputData) {
 //required
 async function generateCountryReportsPieBase64(inputData) {
 	const chartConfig = extend(true, {}, PIE_CHART_CONFIG);
-	const {
-		countryReport: { result = [] }
-	} = inputData;
+	const { countryReport: { result = [] } = {} } = inputData;
 	const computedState = computeDisplayData({
 		result,
 		chartLegend: 'Country',
