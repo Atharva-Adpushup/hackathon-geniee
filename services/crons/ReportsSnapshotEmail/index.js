@@ -147,7 +147,7 @@ async function sendDailyWeeklySnapshot(siteid, userEmail, type) {
 	//here we will generate template and send mail to the user
 	let allReportingData = await generateImageBase64(resultData);
 	allReportingData.progressData = giveEstimatedEarningProgressData(
-		allReportingData.estimatedRevenue.result[0]
+		allReportingData.estimatedRevenue.result[0] || []
 	);
 	allReportingData = cleanAllReportingDataForTwoDecimal(allReportingData, [
 		'estimatedRevenue',
