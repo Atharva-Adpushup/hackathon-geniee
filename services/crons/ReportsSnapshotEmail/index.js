@@ -6,7 +6,8 @@ const {
 	getLastRunInfo,
 	generateEmailTemplate,
 	roundOffTwoDecimal,
-	numberWithCommas
+	numberWithCommas,
+	sendEmail
 } = require('../cronhelpers');
 const { getAllUserSites } = require('../../../models/userModel');
 const moment = require('moment');
@@ -145,7 +146,7 @@ async function sendDailyWeeklySnapshot(siteid, userEmail, type) {
 	const params = { fromDate, toDate, siteid };
 	const resultData = await giveDashboardReports(params);
 	//here we will generate template and send mail to the user
-	let allReportingData = await generateImageBase64(resultData);
+	let allReportingData = await generateImageBase64(resultData, { fromDate, toDate, type, siteid });
 	allReportingData.progressData = giveEstimatedEarningProgressData(
 		allReportingData.estimatedRevenue.result[0] || []
 	);
@@ -166,6 +167,15 @@ async function sendDailyWeeklySnapshot(siteid, userEmail, type) {
 	});
 
 	//here template is generated we will send this in email
+	// sendEmail({
+	// 	queue: 'MAILER',
+	// 	data: {
+	// 		to: 'amit.gupta@adpushup.com',
+	// 		body: template,
+	// 		subject: 'Testing daily snapshot'
+	// 	}
+	// });
+	//return template;
 }
 
 async function processSitesOfUser(userEmail) {
@@ -224,4 +234,4 @@ function startEmailSnapshotsService() {
 
 cron.schedule(CC.cronSchedule.emailSnapshotsService, startEmailSnapshotsService);
 // module.exports = startEmailSnapshotsService;
-// module.exports = sendDailySnapshot;
+// module.exports = sendDailyWeeklySnapshot;

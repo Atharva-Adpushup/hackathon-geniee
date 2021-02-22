@@ -1,4 +1,5 @@
 const request = require('request-promise');
+const { BlobServiceClient } = require('@azure/storage-blob');
 const ejs = require('ejs');
 const path = require('path');
 const { getAdpToken } = require('../../../helpers/authToken');
@@ -7,6 +8,8 @@ const { BASE_URL } = require('../../../configs/commonConsts');
 const siteModel = require('../../../models/siteModel');
 const userModel = require('../../../models/userModel');
 const couchbase = require('../../../helpers/couchBaseService');
+const config = require('../../../configs/config');
+
 function getActiveUsers() {
 	return siteModel
 		.getActiveSites()
@@ -28,6 +31,20 @@ function getUserSites(ownerEmail) {
 				.join();
 		})
 		.catch(err => console.log(err));
+}
+
+function sendEmail(body) {
+	return request({
+		method: 'POST',
+		uri: `https://queuepublisher.adpushup.com/publish`,
+		json: true,
+		body: { ...body }
+	}).then(response => {
+		if (response.statusCode == 200) {
+			console.log('Mail send succesfully');
+		}
+		return Promise.reject(new Error('Error in sending email'));
+	});
 }
 
 function getWidgetsDataSite(params) {
@@ -83,6 +100,23 @@ const roundOffTwoDecimal = value => {
 
 const numberWithCommas = x => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
+async function uploadImageToAzure(blobClientName, fileStream) {
+	try {
+		const STORAGE_CONNECTION_STRING = config.weeklyDailySnapshots.CONNECTION_STRING || '';
+		const blobServiceClient = await BlobServiceClient.fromConnectionString(
+			STORAGE_CONNECTION_STRING
+		);
+		const containerClient = await blobServiceClient.getContainerClient(
+			config.weeklyDailySnapshots.CONTAINER_NAME
+		);
+		const blobclient = await containerClient.getBlockBlobClient(blobClientName);
+		await blobclient.upload(fileStream, fileStream.length);
+		console.log('succesfully uploaded image');
+	} catch (error) {
+		console.log(`Error in uploading image:${error}`);
+	}
+}
+
 module.exports = {
 	getUserSites,
 	getActiveUsers,
@@ -90,5 +124,7 @@ module.exports = {
 	getLastRunInfo,
 	generateEmailTemplate,
 	roundOffTwoDecimal,
-	numberWithCommas
+	numberWithCommas,
+	sendEmail,
+	uploadImageToAzure
 };

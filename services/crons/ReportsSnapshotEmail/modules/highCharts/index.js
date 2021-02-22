@@ -5,9 +5,10 @@ const Promise = require('bluebird'),
 	{ LINE_CHART_CONFIG, PIE_CHART_CONFIG } = require('../../constants'),
 	exporter = require('highcharts-export-server');
 const fs = require('fs');
-const { roundOffTwoDecimal } = require('../../../cronhelpers');
+const { roundOffTwoDecimal, uploadImageToAzure } = require('../../../cronhelpers');
 
-function addHighChartsObject(inputData) {
+function addHighChartsObject(inputData, uniqueIdentifier) {
+	const { fromDate = '', toDate = '', type = '', siteid = '' } = uniqueIdentifier;
 	const defaultChartObject = {
 			base64: '',
 			imagePath: ''
@@ -18,8 +19,9 @@ function addHighChartsObject(inputData) {
 		adNetworkRevenuePie: extend({}, defaultChartObject),
 		countryReportPie: extend({}, defaultChartObject)
 	};
-
-	return resultData;
+	let imageUploadPath = `${fromDate}-${toDate}-${type}-${siteid}`;
+	imageUploadPath = imageUploadPath.replace(/ /g, '-');
+	return { resultData, imageUploadPath };
 }
 
 function getChartImageOptions() {
@@ -32,22 +34,23 @@ function getChartImageOptions() {
 
 exporter.initPool();
 
-function generateBase64(imgOptions, chartOptions) {
+function generateBase64(imgOptions, chartOptions, imagPath) {
 	const newOptions = { ...imgOptions, options: { ...chartOptions } };
 	return new Promise((resolve, reject) => {
-		exporter.export(newOptions, function(err, res) {
+		exporter.export(newOptions, async function(err, res) {
 			if (err) {
 				return reject('generateBase64: Unable to generate high chart base64');
 			}
 			const base64Data = res.data;
-			const imageUrl = `data:image/png;base64,${base64Data}`;
-			return resolve(imageUrl);
+			const buffer = await Buffer.from(base64Data, 'base64');
+			await uploadImageToAzure(imagPath, buffer);
+			return resolve(imagPath);
 		});
 	});
 }
 
 //required
-async function generateCPMLineBase64(inputData) {
+async function generateCPMLineBase64(inputData, imageUploadPath) {
 	function computeGraphData(results) {
 		let series = [];
 		const adpushupSeriesData = [];
@@ -100,7 +103,11 @@ async function generateCPMLineBase64(inputData) {
 	const computedState = computeGraphData(APvsBaseline.result || []);
 	const chartConfig = { ...LINE_CHART_CONFIG, ...computedState };
 	const imageOptions = getChartImageOptions();
-	const base64Encoding = await generateBase64(imageOptions, chartConfig);
+	const base64Encoding = await generateBase64(
+		imageOptions,
+		chartConfig,
+		imageUploadPath + 'cpm.png'
+	);
 	return base64Encoding;
 }
 
@@ -136,7 +143,7 @@ function computeDisplayData(props) {
 }
 
 //required
-async function generateAdNetworkRevenuePieBase64(inputData) {
+async function generateAdNetworkRevenuePieBase64(inputData, imageUploadPath) {
 	const chartConfig = extend(true, {}, PIE_CHART_CONFIG);
 	const { revenueByNetwork: { result = [] } = {} } = inputData;
 	const computedState = computeDisplayData({
@@ -148,12 +155,16 @@ async function generateAdNetworkRevenuePieBase64(inputData) {
 	});
 	chartConfig.series = computedState || {};
 	const imageOptions = getChartImageOptions();
-	const base64Encoding = await generateBase64(imageOptions, chartConfig);
+	const base64Encoding = await generateBase64(
+		imageOptions,
+		chartConfig,
+		imageUploadPath + 'network.png'
+	);
 	return base64Encoding;
 }
 
 //required
-async function generateCountryReportsPieBase64(inputData) {
+async function generateCountryReportsPieBase64(inputData, imageUploadPath) {
 	const chartConfig = extend(true, {}, PIE_CHART_CONFIG);
 	const { countryReport: { result = [] } = {} } = inputData;
 	const computedState = computeDisplayData({
@@ -165,16 +176,26 @@ async function generateCountryReportsPieBase64(inputData) {
 	});
 	chartConfig.series = computedState || {};
 	const imageOptions = getChartImageOptions();
-	const base64Encoding = await generateBase64(imageOptions, chartConfig);
+	const base64Encoding = await generateBase64(
+		imageOptions,
+		chartConfig,
+		imageUploadPath + 'country.png'
+	);
 	return base64Encoding;
 }
 
 module.exports = {
-	generateImageBase64: inputData => {
-		const reportData = addHighChartsObject(inputData),
-			getCPMLineBase64 = generateCPMLineBase64(reportData),
-			getAdNetworkRevenuePieBase64 = generateAdNetworkRevenuePieBase64(reportData),
-			getCountryRevenueRevenuePieBase64 = generateCountryReportsPieBase64(reportData);
+	generateImageBase64: (inputData, uniqueIdentifier) => {
+		const { resultData: reportData, imageUploadPath } = addHighChartsObject(
+				inputData,
+				uniqueIdentifier
+			),
+			getCPMLineBase64 = generateCPMLineBase64(reportData, imageUploadPath),
+			getAdNetworkRevenuePieBase64 = generateAdNetworkRevenuePieBase64(reportData, imageUploadPath),
+			getCountryRevenueRevenuePieBase64 = generateCountryReportsPieBase64(
+				reportData,
+				imageUploadPath
+			);
 		return Promise.all([
 			getCPMLineBase64,
 			getAdNetworkRevenuePieBase64,
