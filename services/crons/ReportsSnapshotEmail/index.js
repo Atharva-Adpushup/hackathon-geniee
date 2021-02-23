@@ -19,10 +19,7 @@ const { ADPUSHUP_LOGO, ARROW_UP, ARROW_DOWN } = require('./constants');
 let isCronServiceRunning = false;
 let isAllDataFetched = false;
 let currentDate;
-let fromDate;
-let toDate;
 let oldTimestamp = null;
-let cronDateExecuted = {};
 
 let count = 0;
 
@@ -102,6 +99,7 @@ async function giveDashboardReports(params) {
 
 async function getEmailSnapshotsSites(userEmail) {
 	try {
+		let weeklyEnabledDayAllOverSites = null;
 		const dailyWeeklySubscribedSites = await getAllUserSites(userEmail).reduce(
 			(allSites, site, index) => {
 				console.log(site, '************');
@@ -115,9 +113,13 @@ async function getEmailSnapshotsSites(userEmail) {
 				} = site;
 				if (isWeeklyEmailReportsEnabled) {
 					const weeklyEmailEnableDate = moment(weeklyEmailEnableTimeStamp);
-					const diffDays = currentDate.diff(weeklyEmailEnableDate, 'days');
-					if (diffDays && diffDays % 7 === 0)
-						allSites[1] = index === 0 ? `${siteId}` : `${allSites[1]},${siteId}`;
+					if (
+						!weeklyEnabledDayAllOverSites ||
+						weeklyEmailEnableDate < weeklyEnabledDayAllOverSites
+					) {
+						weeklyEnabledDayAllOverSites = weeklyEmailEnableDate;
+					}
+					allSites[1] = index === 0 ? `${siteId}` : `${allSites[1]},${siteId}`;
 				}
 				if (isDailyEmailReportsEnabled)
 					allSites[0] = index === 0 ? `${siteId}` : `${allSites[0]},${siteId}`;
@@ -125,7 +127,9 @@ async function getEmailSnapshotsSites(userEmail) {
 			},
 			['', '']
 		);
-		return dailyWeeklySubscribedSites;
+		const diffDays = currentDate.diff(weeklyEnabledDayAllOverSites, 'days');
+		if (diffDays && diffDays % 7 === 0) return dailyWeeklySubscribedSites;
+		else return [dailyWeeklySubscribedSites, ''];
 	} catch (err) {
 		console.log(err);
 	}
@@ -133,10 +137,10 @@ async function getEmailSnapshotsSites(userEmail) {
 
 async function sendDailyWeeklySnapshot(siteid, userEmail, type) {
 	const daysGap = type === 'daily' ? 1 : 7;
-	fromDate = moment()
+	let fromDate = moment()
 		.subtract(daysGap, 'days')
 		.format('YYYY-MM-DD');
-	toDate = moment()
+	let toDate = moment()
 		.subtract(1, 'days')
 		.format('YYYY-MM-DD');
 	const fromReportingDate = moment(fromDate).format('LL'),
@@ -146,7 +150,12 @@ async function sendDailyWeeklySnapshot(siteid, userEmail, type) {
 	const params = { fromDate, toDate, siteid };
 	const resultData = await giveDashboardReports(params);
 	//here we will generate template and send mail to the user
-	let allReportingData = await generateImageBase64(resultData, { fromDate, toDate, type, siteid });
+	let allReportingData = await generateImageBase64(resultData, {
+		fromReportingDate,
+		toReportingDate,
+		type,
+		siteid
+	});
 	allReportingData.progressData = giveEstimatedEarningProgressData(
 		allReportingData.estimatedRevenue.result[0] || []
 	);
@@ -206,8 +215,6 @@ function startEmailSnapshotsService() {
 	if (isCronServiceRunning && !isAllDataFetched)
 		return Promise.resolve('Old cron is already running');
 	currentDate = moment();
-	if (cronDateExecuted[currentDate.format()])
-		return Promise.resolve('Cron job already executed for the today');
 	return getLastRunInfo()
 		.then(lastRunTime => {
 			console.time();
@@ -217,7 +224,6 @@ function startEmailSnapshotsService() {
 				return Promise.resolve('Old timestamp and new timestamp are same, no new reporting data');
 			console.log({ lastRunTime, fromDate, toDate, oldTimestamp });
 			oldTimestamp = lastRunTime;
-			cronDateExecuted = {};
 			return runSnapshotService();
 		})
 		.then(() => {
@@ -225,7 +231,6 @@ function startEmailSnapshotsService() {
 			console.log('data fetched');
 			isAllDataFetched = true;
 			isCronServiceRunning = false;
-			cronDateExecuted[currentDate.format()] = true;
 		})
 		.catch(err => {
 			console.error(err);

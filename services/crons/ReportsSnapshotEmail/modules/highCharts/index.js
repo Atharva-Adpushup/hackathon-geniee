@@ -9,7 +9,7 @@ const config = require('../../../../../configs/config');
 const { roundOffTwoDecimal, uploadImageToAzure } = require('../../../cronhelpers');
 
 function addHighChartsObject(inputData, uniqueIdentifier) {
-	const { fromDate = '', toDate = '', type = '', siteid = '' } = uniqueIdentifier;
+	const { fromReportingDate = '', toReportingDate = '', type = '', siteid = '' } = uniqueIdentifier;
 	const defaultChartObject = {
 			base64: '',
 			imagePath: ''
@@ -20,7 +20,7 @@ function addHighChartsObject(inputData, uniqueIdentifier) {
 		adNetworkRevenuePie: extend({}, defaultChartObject),
 		countryReportPie: extend({}, defaultChartObject)
 	};
-	let imageUploadPath = `${fromDate}-${toDate}-${type}-${siteid}`;
+	let imageUploadPath = `${fromReportingDate}-${toReportingDate}-${type}-${siteid}`;
 	imageUploadPath = imageUploadPath.replace(/ /g, '-');
 	return { resultData, imageUploadPath };
 }
