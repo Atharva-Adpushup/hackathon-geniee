@@ -5,6 +5,7 @@ const Promise = require('bluebird'),
 	{ LINE_CHART_CONFIG, PIE_CHART_CONFIG } = require('../../constants'),
 	exporter = require('highcharts-export-server');
 const fs = require('fs');
+const config = require('../../../../../configs/config');
 const { roundOffTwoDecimal, uploadImageToAzure } = require('../../../cronhelpers');
 
 function addHighChartsObject(inputData, uniqueIdentifier) {
@@ -44,7 +45,7 @@ function generateBase64(imgOptions, chartOptions, imagPath) {
 			const base64Data = res.data;
 			const buffer = await Buffer.from(base64Data, 'base64');
 			await uploadImageToAzure(imagPath, buffer);
-			return resolve(imagPath);
+			return resolve(config.weeklyDailySnapshots.BASE_PATH + imagPath);
 		});
 	});
 }

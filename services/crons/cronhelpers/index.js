@@ -39,12 +39,15 @@ function sendEmail(body) {
 		uri: `https://queuepublisher.adpushup.com/publish`,
 		json: true,
 		body: { ...body }
-	}).then(response => {
-		if (response.statusCode == 200) {
-			console.log('Mail send succesfully');
-		}
-		return Promise.reject(new Error('Error in sending email'));
-	});
+	})
+		.then(response => {
+			if (response.statusCode == 200) {
+				console.log('Mail send succesfully');
+			}
+		})
+		.catch(error => {
+			return Promise.reject(new Error(`Error in sending email:${error}`));
+		});
 }
 
 function getWidgetsDataSite(params) {

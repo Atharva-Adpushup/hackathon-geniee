@@ -160,13 +160,13 @@ async function sendDailyWeeklySnapshot(siteid, userEmail, type) {
 		allReportingData,
 		fromReportingDate,
 		toReportingDate,
-		adpLogo: ADPUSHUP_LOGO,
-		arrowUp: ARROW_UP,
-		arrowDown: ARROW_DOWN,
+		adpLogo: config.weeklyDailySnapshots.BASE_PATH + 'logo-red-200X50.png',
+		arrowUp: config.weeklyDailySnapshots.BASE_PATH + 'up-arrow.png',
+		arrowDown: config.weeklyDailySnapshots.BASE_PATH + 'down-arrow.png',
 		type
 	});
 
-	//here template is generated we will send this in email
+	// here template is generated we will send this in email
 	// sendEmail({
 	// 	queue: 'MAILER',
 	// 	data: {
@@ -175,7 +175,7 @@ async function sendDailyWeeklySnapshot(siteid, userEmail, type) {
 	// 		subject: 'Testing daily snapshot'
 	// 	}
 	// });
-	//return template;
+	// return template;
 }
 
 async function processSitesOfUser(userEmail) {
