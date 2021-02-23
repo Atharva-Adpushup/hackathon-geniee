@@ -129,7 +129,7 @@ async function getEmailSnapshotsSites(userEmail) {
 		);
 		const diffDays = currentDate.diff(weeklyEnabledDayAllOverSites, 'days');
 		if (diffDays && diffDays % 7 === 0) return dailyWeeklySubscribedSites;
-		else return [dailyWeeklySubscribedSites, ''];
+		else return [dailyWeeklySubscribedSites[0], ''];
 	} catch (err) {
 		console.log(err);
 	}
