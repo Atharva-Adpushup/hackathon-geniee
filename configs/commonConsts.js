@@ -570,7 +570,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		adManagerSyncService: '0 */12 * * *',
 		prefetchService: '*/10 * * * *', // Every 10 mins
 		prefetchHBService: '*/15 * * * *', // Every 15 mins
-		emailSnapshotsService: '* */1 * * * '
+		emailSnapshotsService: '* * 24 * * * '
 	},
 	SELLERS_JSON: {
 		fileConfig: {
