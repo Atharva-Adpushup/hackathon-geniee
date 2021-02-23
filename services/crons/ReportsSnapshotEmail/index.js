@@ -14,7 +14,6 @@ const moment = require('moment');
 const cron = require('node-cron');
 const config = require('../../../configs/config');
 const { generateImageBase64 } = require('./modules/highCharts');
-const { ADPUSHUP_LOGO, ARROW_UP, ARROW_DOWN } = require('./constants');
 
 let isCronServiceRunning = false;
 let isAllDataFetched = false;
