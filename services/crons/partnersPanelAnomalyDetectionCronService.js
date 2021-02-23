@@ -1,5 +1,6 @@
 const criteo = require('../partnersPanelAnomaliesDetectionService/Criteo');
 const OFT = require('../partnersPanelAnomaliesDetectionService/OFT');
+const Pubmatic = require('../partnersPanelAnomaliesDetectionService/Pubmatic');
 const { appBucket } = require('../../helpers/routeHelpers');
 const constants = require('../../configs/commonConsts');
 
@@ -27,7 +28,8 @@ getSitesFromDB()
 	.then(sitesData => {
 		return Promise.all([
 			// criteo(sitesData)
-			OFT(sitesData)
+			// OFT(sitesData)
+			Pubmatic(sitesData)
 		])
 		.catch(err => {
 			console.log(err, 'err in service');
