@@ -201,12 +201,16 @@ module.exports = {
 			getCPMLineBase64,
 			getAdNetworkRevenuePieBase64,
 			getCountryRevenueRevenuePieBase64
-		]).then(values => {
-			reportData.charts.cpmLine.base64 = values[0];
-			reportData.charts.adNetworkRevenuePie.base64 = values[1];
-			reportData.charts.countryReportPie.base64 = values[2];
-			exporter.killPool();
-			return reportData;
-		});
+		])
+			.then(values => {
+				reportData.charts.cpmLine.base64 = values[0];
+				reportData.charts.adNetworkRevenuePie.base64 = values[1];
+				reportData.charts.countryReportPie.base64 = values[2];
+				exporter.killPool();
+				return reportData;
+			})
+			.catch(error => {
+				return Promise.reject(new Error(`Error in creating images using highcharts${error}`));
+			});
 	}
 };

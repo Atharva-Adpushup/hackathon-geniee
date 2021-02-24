@@ -92,7 +92,7 @@ async function giveDashboardReports(params) {
 		}
 		return dashboardReporting;
 	} catch (error) {
-		console.log(error);
+		return Promise.reject(new Error(`Error in fetching widget data${error}`));
 	}
 }
 
@@ -130,60 +130,65 @@ async function getEmailSnapshotsSites(userEmail) {
 		if (diffDays && diffDays % 7 === 0) return dailyWeeklySubscribedSites;
 		else return [dailyWeeklySubscribedSites[0], ''];
 	} catch (err) {
-		console.log(err);
+		return Promise.reject(new Error(`Error in fetching subscribed sites of user:${error}`));
 	}
 }
 
 async function sendDailyWeeklySnapshot(siteid, userEmail, type) {
-	const daysGap = type === 'daily' ? 1 : 7;
-	let fromDate = moment()
-		.subtract(daysGap, 'days')
-		.format('YYYY-MM-DD');
-	let toDate = moment()
-		.subtract(1, 'days')
-		.format('YYYY-MM-DD');
-	const fromReportingDate = moment(fromDate).format('LL'),
-		toReportingDate = moment(toDate).format('LL');
-	//
+	try {
+		const daysGap = type === 'daily' ? 1 : 7;
+		let fromDate = moment()
+			.subtract(daysGap, 'days')
+			.format('YYYY-MM-DD');
+		let toDate = moment()
+			.subtract(1, 'days')
+			.format('YYYY-MM-DD');
+		const fromReportingDate = moment(fromDate).format('LL'),
+			toReportingDate = moment(toDate).format('LL');
+		//
 
-	const params = { fromDate, toDate, siteid };
-	const resultData = await giveDashboardReports(params);
-	//here we will generate template and send mail to the user
-	let allReportingData = await generateImageBase64(resultData, {
-		fromReportingDate,
-		toReportingDate,
-		type,
-		siteid
-	});
-	allReportingData.progressData = giveEstimatedEarningProgressData(
-		allReportingData.estimatedRevenue.result[0] || []
-	);
-	allReportingData = cleanAllReportingDataForTwoDecimal(allReportingData, [
-		'estimatedRevenue',
-		'getStatsByCustom',
-		'siteSummary'
-	]);
-	//here we will generate template and send mail to the user
-	const template = await generateEmailTemplate('reporting', {
-		allReportingData,
-		fromReportingDate,
-		toReportingDate,
-		adpLogo: config.weeklyDailySnapshots.BASE_PATH + 'logo-red-200X50.png',
-		arrowUp: config.weeklyDailySnapshots.BASE_PATH + 'up-arrow.png',
-		arrowDown: config.weeklyDailySnapshots.BASE_PATH + 'down-arrow.png',
-		type
-	});
+		const params = { fromDate, toDate, siteid };
+		const resultData = await giveDashboardReports(params);
+		//here we will generate template and send mail to the user
+		let allReportingData = await generateImageBase64(resultData, {
+			fromReportingDate,
+			toReportingDate,
+			type,
+			siteid
+		});
+		allReportingData.progressData = giveEstimatedEarningProgressData(
+			allReportingData.estimatedRevenue.result[0] || []
+		);
+		allReportingData = cleanAllReportingDataForTwoDecimal(allReportingData, [
+			'estimatedRevenue',
+			'getStatsByCustom',
+			'siteSummary'
+		]);
+		//here we will generate template and send mail to the user
+		const template = await generateEmailTemplate('reporting', {
+			allReportingData,
+			fromReportingDate,
+			toReportingDate,
+			adpLogo: config.weeklyDailySnapshots.BASE_PATH + 'logo-red-200X50.png',
+			arrowUp: config.weeklyDailySnapshots.BASE_PATH + 'up-arrow.png',
+			arrowDown: config.weeklyDailySnapshots.BASE_PATH + 'down-arrow.png',
+			type
+		});
 
-	// here template is generated we will send this in email
-	// sendEmail({
-	// 	queue: 'MAILER',
-	// 	data: {
-	// 		to: 'amit.gupta@adpushup.com',
-	// 		body: template,
-	// 		subject: 'Testing daily snapshot'
-	// 	}
-	// });
-	// return template;
+		// here template is generated we will send this in email
+		// sendEmail({
+		// 	queue: 'MAILER',
+		// 	data: {
+		// 		to: 'amit.gupta@adpushup.com',
+		// 		body: template,
+		// 		subject: 'Testing daily snapshot'
+		// 	}
+		// });
+		// return template;
+	} catch (error) {
+		//here we can send an email to  monitoring service for what happended wrong.
+		console.log(error);
+	}
 }
 
 async function processSitesOfUser(userEmail) {
