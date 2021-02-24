@@ -174,17 +174,17 @@ async function sendDailyWeeklySnapshot(siteid, userEmail, type) {
 			arrowDown: config.weeklyDailySnapshots.BASE_PATH + 'down-arrow.png',
 			type
 		});
-
+		const subjectMessage = `Adpushup dashboard reporting ${type} snapshot`;
 		// here template is generated we will send this in email
-		// sendEmail({
-		// 	queue: 'MAILER',
-		// 	data: {
-		// 		to: 'amit.gupta@adpushup.com',
-		// 		body: template,
-		// 		subject: 'Testing daily snapshot'
-		// 	}
-		// });
-		// return template;
+		sendEmail({
+			queue: 'MAILER',
+			data: {
+				to: 'amit.gupta@adpushup.com',
+				body: template,
+				subject: subjectMessage
+			}
+		});
+		return template;
 	} catch (error) {
 		//here we can send an email to  monitoring service for what happended wrong.
 		console.log(error);

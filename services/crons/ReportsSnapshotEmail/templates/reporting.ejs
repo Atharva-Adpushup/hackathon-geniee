@@ -1523,7 +1523,8 @@
 																								2
 																							</td>
                                                                                         </tr> -->
-                                                                                        <%for (let result of allReportingData.siteSummary.result){%>
+																						<%for (let result of allReportingData.siteSummary.result){%>
+																							<%if (result.siteName!=="0.00") { %>
                                                                                         <tr>
 																							<td style="width: 25%;font-size:13px;">
 																								<%= `${result.siteName||""}` %>
@@ -1544,7 +1545,7 @@
 																								<%= `$${result.network_net_revenue||""}` %>
 																							</td>
 																						</tr>
-																			
+																						<% } %>
                                                                                             <%}%>
                                                                                           </ul>
 																					</tbody>
