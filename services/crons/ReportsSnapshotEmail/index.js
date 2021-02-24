@@ -101,7 +101,6 @@ async function getEmailSnapshotsSites(userEmail) {
 		let weeklyEnabledDayAllOverSites = null;
 		const dailyWeeklySubscribedSites = await getAllUserSites(userEmail).reduce(
 			(allSites, site, index) => {
-				console.log(site, '************');
 				const {
 					apConfigs: {
 						isWeeklyEmailReportsEnabled = false,
@@ -145,11 +144,8 @@ async function sendDailyWeeklySnapshot(siteid, userEmail, type) {
 			.format('YYYY-MM-DD');
 		const fromReportingDate = moment(fromDate).format('LL'),
 			toReportingDate = moment(toDate).format('LL');
-		//
-
 		const params = { fromDate, toDate, siteid };
 		const resultData = await giveDashboardReports(params);
-		//here we will generate template and send mail to the user
 		let allReportingData = await generateImageBase64(resultData, {
 			fromReportingDate,
 			toReportingDate,
@@ -175,7 +171,6 @@ async function sendDailyWeeklySnapshot(siteid, userEmail, type) {
 			type
 		});
 		const subjectMessage = `Adpushup dashboard reporting ${type} snapshot`;
-		// here template is generated we will send this in email
 		sendEmail({
 			queue: 'MAILER',
 			data: {
@@ -232,7 +227,7 @@ function startEmailSnapshotsService() {
 		})
 		.then(() => {
 			console.timeEnd();
-			console.log('data fetched');
+			console.log('All Snapshots email sent');
 			isAllDataFetched = true;
 			isCronServiceRunning = false;
 		})

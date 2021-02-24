@@ -1,10 +1,8 @@
-const Promise = require('bluebird'),
-	_ = require('lodash'),
-	extend = require('extend'),
-	moment = require('moment'),
-	{ LINE_CHART_CONFIG, PIE_CHART_CONFIG } = require('../../constants'),
-	exporter = require('highcharts-export-server');
-const fs = require('fs');
+const Promise = require('bluebird');
+const extend = require('extend');
+const moment = require('moment');
+const { LINE_CHART_CONFIG, PIE_CHART_CONFIG } = require('../../constants');
+const exporter = require('highcharts-export-server');
 const config = require('../../../../../configs/config');
 const { roundOffTwoDecimal, uploadImageToAzure } = require('../../../cronhelpers');
 
