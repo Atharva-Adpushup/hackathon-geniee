@@ -237,7 +237,7 @@ class Settings extends Component {
 		} = this.state;
 		const { site } = this.props;
 
-		const { siteId, siteDomain } = site;
+		const { siteId, siteDomain, dataFeedActive = true } = site;
 		// const effectRevenueShareDate = formatDate(+new Date(), 'subtract', 2);
 
 		return (
@@ -357,6 +357,7 @@ class Settings extends Component {
 					defaultLayout
 					name={`isDailyEmailReportsEnabled-${siteId}-${siteDomain}`}
 					id={`isDailyEmailReportsEnabled-${siteId}-${siteDomain}`}
+					disabled={!dataFeedActive}
 				/>
 				<CustomToggleSwitch
 					labelText="Email Weekly Reports Updates"
@@ -370,6 +371,7 @@ class Settings extends Component {
 					defaultLayout
 					name={`isWeeklyEmailReportsEnabled-${siteId}-${siteDomain}`}
 					id={`isWeeklyEmailReportsEnabled-${siteId}-${siteDomain}`}
+					disabled={!dataFeedActive}
 				/>
 				{isSPA && (
 					<React.Fragment>
