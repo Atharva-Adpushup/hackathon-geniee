@@ -13,7 +13,7 @@ const { getAllUserSites } = require('../../../models/userModel');
 const moment = require('moment');
 const cron = require('node-cron');
 const config = require('../../../configs/config');
-const { generateImageBase64 } = require('./modules/highCharts');
+const { generateImageSourcePath } = require('./modules/highCharts');
 
 let isCronServiceRunning = false;
 let isAllDataFetched = false;
@@ -146,7 +146,7 @@ async function sendDailyWeeklySnapshot(siteid, userEmail, type) {
 			toReportingDate = moment(toDate).format('LL');
 		const params = { fromDate, toDate, siteid };
 		const resultData = await giveDashboardReports(params);
-		let allReportingData = await generateImageBase64(resultData, {
+		let allReportingData = await generateImageSourcePath(resultData, {
 			fromReportingDate,
 			toReportingDate,
 			type,

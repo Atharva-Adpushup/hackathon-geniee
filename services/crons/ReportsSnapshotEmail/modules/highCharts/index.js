@@ -49,7 +49,7 @@ function generateBase64(imgOptions, chartOptions, imagPath) {
 }
 
 //required
-async function generateCPMLineBase64(inputData, imageUploadPath) {
+async function generateCPMLineSourcePath(inputData, imageUploadPath) {
 	function computeGraphData(results) {
 		let series = [];
 		const adpushupSeriesData = [];
@@ -142,7 +142,7 @@ function computeDisplayData(props) {
 }
 
 //required
-async function generateAdNetworkRevenuePieBase64(inputData, imageUploadPath) {
+async function generateAdNetworkRevenuePieSourcePath(inputData, imageUploadPath) {
 	const chartConfig = extend(true, {}, PIE_CHART_CONFIG);
 	const { revenueByNetwork: { result = [] } = {} } = inputData;
 	const computedState = computeDisplayData({
@@ -163,7 +163,7 @@ async function generateAdNetworkRevenuePieBase64(inputData, imageUploadPath) {
 }
 
 //required
-async function generateCountryReportsPieBase64(inputData, imageUploadPath) {
+async function generateCountryReportsPieSourcePath(inputData, imageUploadPath) {
 	const chartConfig = extend(true, {}, PIE_CHART_CONFIG);
 	const { countryReport: { result = [] } = {} } = inputData;
 	const computedState = computeDisplayData({
@@ -184,27 +184,29 @@ async function generateCountryReportsPieBase64(inputData, imageUploadPath) {
 }
 
 module.exports = {
-	generateImageBase64: (inputData, uniqueIdentifier) => {
+	generateImageSourcePath: (inputData, uniqueIdentifier) => {
 		const { resultData: reportData, imageUploadPath } = addHighChartsObject(
 				inputData,
 				uniqueIdentifier
 			),
-			getCPMLineBase64 = generateCPMLineBase64(reportData, imageUploadPath),
-			getAdNetworkRevenuePieBase64 = generateAdNetworkRevenuePieBase64(reportData, imageUploadPath),
-			getCountryRevenueRevenuePieBase64 = generateCountryReportsPieBase64(
+			getCPMLineSourcePath = generateCPMLineSourcePath(reportData, imageUploadPath),
+			getAdNetworkRevenuePieSourcePath = generateAdNetworkRevenuePieSourcePath(
+				reportData,
+				imageUploadPath
+			),
+			getCountryRevenueRevenuePieSourcePath = generateCountryReportsPieSourcePath(
 				reportData,
 				imageUploadPath
 			);
 		return Promise.all([
-			getCPMLineBase64,
-			getAdNetworkRevenuePieBase64,
-			getCountryRevenueRevenuePieBase64
+			getCPMLineSourcePath,
+			getAdNetworkRevenuePieSourcePath,
+			getCountryRevenueRevenuePieSourcePath
 		])
 			.then(values => {
-				reportData.charts.cpmLine.base64 = values[0];
-				reportData.charts.adNetworkRevenuePie.base64 = values[1];
-				reportData.charts.countryReportPie.base64 = values[2];
-				exporter.killPool();
+				reportData.charts.cpmLine.imagePath = values[0];
+				reportData.charts.adNetworkRevenuePie.imagePath = values[1];
+				reportData.charts.countryReportPie.imagePath = values[2];
 				return reportData;
 			})
 			.catch(error => {
