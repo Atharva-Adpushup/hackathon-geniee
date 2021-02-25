@@ -161,7 +161,8 @@ async function sendDailyWeeklySnapshot(siteid, userEmail, type) {
 			'siteSummary'
 		]);
 		//here we will generate template and send mail to the user
-		const template = await generateEmailTemplate('reporting', {
+
+		const template = await generateEmailTemplate('ReportsSnapshotEmail', 'reporting', {
 			allReportingData,
 			fromReportingDate,
 			toReportingDate,

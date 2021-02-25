@@ -83,9 +83,9 @@ function getLastRunInfo() {
 	);
 }
 
-async function generateEmailTemplate(template, params) {
+async function generateEmailTemplate(base, template, params) {
 	// Get the EJS file that will be used to generate the HTML
-	const file = path.join(__dirname, `../ReportsSnapshotEmail/templates/${template}.ejs`);
+	const file = path.join(__dirname, `../${base}/templates/${template}.ejs`);
 
 	// Throw an error if the file path can't be found
 	if (!file) {

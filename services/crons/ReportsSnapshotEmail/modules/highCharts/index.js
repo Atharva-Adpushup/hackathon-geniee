@@ -78,13 +78,13 @@ async function generateCPMLineBase64(inputData, imageUploadPath) {
 			series = [
 				{
 					data: adpushupSeriesData,
-					name: 'AdPushup Variation Page RPM',
+					name: 'Page RPM Variation - AdPushup',
 					value: 'adpushup_variation_page_cpm',
 					valueType: 'money'
 				},
 				{
 					data: baselineSeriesData,
-					name: 'Original Variation Page RPM',
+					name: 'Page RPM Variation - Without AdPushup',
 					value: 'original_variation_page_cpm',
 					valueType: 'money'
 				}
