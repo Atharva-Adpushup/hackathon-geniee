@@ -36,14 +36,12 @@ function getUserSites(ownerEmail) {
 function sendEmail(body) {
 	return request({
 		method: 'POST',
-		uri: `https://queuepublisher.adpushup.com/publish`,
+		uri: config.weeklyDailySnapshots.mailerQueueUrl,
 		json: true,
 		body: { ...body }
 	})
 		.then(response => {
-			if (response.statusCode == 200) {
-				console.log('Mail send succesfully');
-			}
+			console.log('Mail send succesfully');
 		})
 		.catch(error => {
 			return Promise.reject(new Error(`Error in sending email:${error}`));
