@@ -193,7 +193,7 @@ function apiModule() {
 						be merged with the addedBidders config stored in hbdc:: since
 						we store selected keys from global config in the hbdc::
 					*/
-					const keysToMergeForAddedBidders = ['isS2S', 'isActive'];
+					const keysToMergeForAddedBidders = ['isS2S', 'isActive', 'enableFormatWiseParams'];
 
 					/*
 						iterate over the addedBidders and merge the data from global bidders config
