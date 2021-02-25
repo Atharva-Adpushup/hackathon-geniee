@@ -179,7 +179,7 @@ async function sendDailyWeeklySnapshot(siteid, userEmail, type) {
 				subject: subjectMessage
 			}
 		});
-		return template;
+		// return template;
 	} catch (error) {
 		//here we can send an email to  monitoring service for what happended wrong.
 		console.log(error);
@@ -221,7 +221,7 @@ function startEmailSnapshotsService() {
 			if (!lastRunTime) return Promise.reject(new Error('timestamp not found'));
 			if (config.environment.HOST_ENV === 'development' && oldTimestamp === lastRunTime)
 				return Promise.resolve('Old timestamp and new timestamp are same, no new reporting data');
-			console.log({ lastRunTime, fromDate, toDate, oldTimestamp });
+			console.log({ lastRunTime, oldTimestamp });
 			oldTimestamp = lastRunTime;
 			return runSnapshotService();
 		})
