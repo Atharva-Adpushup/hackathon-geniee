@@ -175,7 +175,7 @@ async function sendDailyWeeklySnapshot(siteid, userEmail, type) {
 		sendEmail({
 			queue: 'MAILER',
 			data: {
-				to: 'amit.gupta@adpushup.com',
+				to: userEmail,
 				body: template,
 				subject: subjectMessage
 			}
