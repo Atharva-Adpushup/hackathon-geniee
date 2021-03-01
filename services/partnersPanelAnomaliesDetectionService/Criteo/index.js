@@ -16,7 +16,7 @@ const queryParams = {
 	generator: 'daily',
 	currency: 'USD',
 	metrics: 'Revenue,CriteoDisplays',
-	begindate: '2021-01-13',
+	begindate: '2021-01-19',
 	enddate: '2021-01-19'
 };
 
@@ -50,8 +50,8 @@ const fetchData = async sitesData => {
 			// TBD - Remove hard coded dates after testing
 			const params = {
 				siteid: critoePartnerModel.getSiteIds().join(','),
-				network: 11,
-				fromDate: '2021-01-13',
+				network: 20,
+				fromDate: '2021-01-19',
 				toDate: '2021-01-19',
 				interval: 'daily',
 				// // siteid:40792,

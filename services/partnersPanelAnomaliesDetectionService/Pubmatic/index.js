@@ -114,9 +114,9 @@ const fetchData = sitesData => {
 			// TBD - Remove hard coded dates after testing
 			const params = {
 				siteid: oftMediaPartnerModel.getSiteIds().join(','),
-				network: 11,
-				fromDate: '2021-01-13',
-				toDate: '2021-01-19',
+				network: 31,
+				fromDate: '2021-01-11',
+				toDate: '2021-01-18',
 				interval: 'daily',
 				// siteid:40792,
 				dimension: 'siteid'
@@ -133,9 +133,9 @@ const fetchData = sitesData => {
 				item =>
 					item.diffPer <= -ANOMALY_THRESHOLD_IN_PER || item.diffPer >= ANOMALY_THRESHOLD_IN_PER
 			);
-			console.log(JSON.stringify(dataToSend, null, 3), 'finalData');
-			console.log(finalData.length, 'finalData length');
-			console.log(dataToSend.length, 'dataToSend length');
+			// console.log(JSON.stringify(dataToSend, null, 3), 'finalData');
+			// console.log(finalData.length, 'finalData length');
+			// console.log(dataToSend.length, 'dataToSend length');
 			// // if anmalies found
 			// if(dataToSend.length) {
             //     emailer.anomaliesMailService(dataToSend)

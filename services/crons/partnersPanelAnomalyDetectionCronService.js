@@ -1,12 +1,13 @@
 const criteo = require('../partnersPanelAnomaliesDetectionService/Criteo');
 const OFT = require('../partnersPanelAnomaliesDetectionService/OFT');
 const Pubmatic = require('../partnersPanelAnomaliesDetectionService/Pubmatic');
+const IndexExchange = require('../partnersPanelAnomaliesDetectionService/IndexExchange');
+const Sovrn = require('../partnersPanelAnomaliesDetectionService/Sovrn');
 const { appBucket } = require('../../helpers/routeHelpers');
 const constants = require('../../configs/commonConsts');
 
 function getSitesFromDB() {
 	// select distinct siteId, siteDomain from AppBucket where meta().id like "site::%";
-
 	const siteListPromise = appBucket
 		.queryDB(
 			`
@@ -28,8 +29,10 @@ getSitesFromDB()
 	.then(sitesData => {
 		return Promise.all([
 			// criteo(sitesData)
-			// OFT(sitesData)
-			Pubmatic(sitesData)
+			OFT(sitesData)
+			// Pubmatic(sitesData)
+			// IndexExchange(sitesData)
+			// Sovrn(sitesData)
 		])
 		.catch(err => {
 			console.log(err, 'err in service');

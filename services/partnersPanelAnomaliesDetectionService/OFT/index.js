@@ -96,13 +96,13 @@ const fetchData = sitesData => {
 			const params = {
 				siteid: oftMediaPartnerModel.getSiteIds().join(','),
 				network: 11,
-				fromDate: '2021-01-13',
-				toDate: '2021-01-19',
+				fromDate: '2021-02-22',
+				toDate: '2021-02-28',
 				interval: 'daily',
 				// siteid:40792,
 				dimension: 'siteid'
 			};
-
+			console.log(params, 'params.....')
 			const adpData = await oftMediaPartnerModel.getDataFromAdPushup(params);
 			let finalData = oftMediaPartnerModel.compareAdPushupDataWithPartnersData(adpData);
 
@@ -117,10 +117,11 @@ const fetchData = sitesData => {
 			console.log(JSON.stringify(dataToSend, null, 3), 'finalData');
 			console.log(finalData.length, 'finalData length');
 			console.log(dataToSend.length, 'dataToSend length');
-			// // if anmalies found
-			// if(dataToSend.length) {
-            //     emailer.anomaliesMailService(dataToSend)
-			// }
+			// if anmalies found
+			if(dataToSend.length) {
+				const res = await emailer.anomaliesMailService(dataToSend)
+				console.log(res, ';email res');
+			}
 		})
 		.catch(function(error) {
 			// handle error

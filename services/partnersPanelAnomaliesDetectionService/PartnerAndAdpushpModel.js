@@ -106,8 +106,9 @@ const Class = require('../../helpers/class'),
                 mappedData.adpRevenue = item.network_gross_revenue;
 
                 const diff = +(mappedData.pubRevenue) - +(mappedData.adpRevenue);
+                const total = +(mappedData.pubRevenue) + +(mappedData.adpRevenue);
 				mappedData.diff = diff;
-				mappedData.diffPer = (diff / mappedData.pubRevenue) * 100;
+				mappedData.diffPer = (diff / (total/2)) * 100;
 
 				finalData.push(mappedData);
 			});
