@@ -4,9 +4,12 @@ const csv = require('csvtojson');
 const partnerAndAdpushpModel = require('../PartnerAndAdpushpModel');
 const constants = require('../../../configs/commonConsts');
 const emailer = require('../emailer');
-const nodemailer = require("nodemailer");
+const saveAnomaliesToDb = require('../saveAnomaliesToDb');
 
 const API_ENDPOINT = `http://api.pubmatic.com/v1`;
+
+const PARTNER_NAME = `Pubmatic`;
+const NETWORK_ID = 31;
 const DOMAIN_FIELD_NAME = 'site_name';
 const REVENUE_FIELD = 'revenue';
 const PUBLISHER_ID = '158261'
@@ -92,28 +95,27 @@ const processDataReceivedFromPublisher = data => {
         row.site_name = data.displayValue.siteId[row.siteId].replace(/(AP|AR)\/\d+_/, '');
         return row;
     })
-    console.log(processedData)
     console.log('Processing end.............')
     return processedData;
 }
 
 const fetchData = sitesData => {
 
-	const oftMediaPartnerModel = new partnerAndAdpushpModel(sitesData, DOMAIN_FIELD_NAME, REVENUE_FIELD);
+	const PubmaticPartnerModel = new partnerAndAdpushpModel(sitesData, DOMAIN_FIELD_NAME, REVENUE_FIELD);
 
 	console.log('Fetching data from Pubmatic...');
 	return getDataFromPartner()
 		.then(async function(reportDataJSON) {
-			oftMediaPartnerModel.setPartnersData(reportDataJSON);
+			PubmaticPartnerModel.setPartnersData(reportDataJSON);
 
 			// process and map sites data with publishers API data structure
-			oftMediaPartnerModel.mapAdPushupSiteIdAndDomainWithPartnersDomain();
+			PubmaticPartnerModel.mapAdPushupSiteIdAndDomainWithPartnersDomain();
 			// Map PartnersData with AdPushup's SiteId mapping data
-			oftMediaPartnerModel.mapPartnersDataWithAdPushupSiteIdAndDomain();
+			PubmaticPartnerModel.mapPartnersDataWithAdPushupSiteIdAndDomain();
 
 			// TBD - Remove hard coded dates after testing
 			const params = {
-				siteid: oftMediaPartnerModel.getSiteIds().join(','),
+				siteid: PubmaticPartnerModel.getSiteIds().join(','),
 				network: 31,
 				fromDate: '2021-01-11',
 				toDate: '2021-01-18',
@@ -122,28 +124,37 @@ const fetchData = sitesData => {
 				dimension: 'siteid'
 			};
 
-			const adpData = await oftMediaPartnerModel.getDataFromAdPushup(params);
-			let finalData = oftMediaPartnerModel.compareAdPushupDataWithPartnersData(adpData);
+			const adpData = await PubmaticPartnerModel.getDataFromAdPushup(params);
+			let finalData = PubmaticPartnerModel.compareAdPushupDataWithPartnersData(adpData);
 
 			const {
 				PARTNERS_PANEL_INTEGRATION: { ANOMALY_THRESHOLD_IN_PER }
 			} = constants;
 			// filter out anomalies
-			const dataToSend = finalData.filter(
+			// filter out anomalies
+			const anomalies = finalData.filter(
 				item =>
 					item.diffPer <= -ANOMALY_THRESHOLD_IN_PER || item.diffPer >= ANOMALY_THRESHOLD_IN_PER
 			);
-			// console.log(JSON.stringify(dataToSend, null, 3), 'finalData');
-			// console.log(finalData.length, 'finalData length');
-			// console.log(dataToSend.length, 'dataToSend length');
-			// // if anmalies found
-			// if(dataToSend.length) {
-            //     emailer.anomaliesMailService(dataToSend)
-			// }
+			// console.log(JSON.stringify(anomalies, null, 3), 'finalData');
+			console.log(finalData.length, 'finalData length');
+			console.log(anomalies.length, 'anomalies length');
+
+			// if aonmalies found
+			if (anomalies.length) {
+				const dataToSend = PubmaticPartnerModel.formatAnomaliesDataForSQL(anomalies, NETWORK_ID);
+				await Promise.all([
+					emailer.anomaliesMailService({
+						partner: PARTNER_NAME,
+						anomalies
+					}),
+					saveAnomaliesToDb(dataToSend)
+				]);
+			}
 		})
 		.catch(function(error) {
 			// handle error
-			console.log('error', 'errrr');
+			console.log('error', `err with ${PARTNER_NAME}`);
 		});
 };
 

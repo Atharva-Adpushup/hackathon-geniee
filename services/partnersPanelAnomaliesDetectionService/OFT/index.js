@@ -4,9 +4,12 @@ const csv = require('csvtojson');
 const partnerAndAdpushpModel = require('../PartnerAndAdpushpModel');
 const constants = require('../../../configs/commonConsts');
 const emailer = require('../emailer');
-const nodemailer = require("nodemailer");
+const saveAnomaliesToDb = require('../saveAnomaliesToDb');
 
 const API_ENDPOINT = `https://api.appnexus.com`;
+
+const PARTNER_NAME = `AppNexus/OFT`;
+const NETWORK_ID = 11;
 const DOMAIN_FIELD_NAME = 'site_name';
 const REVENUE_FIELD = 'publisher_revenue';
 
@@ -62,7 +65,7 @@ const getDataFromPartner = function() {
 			//     }
 			// }
 
-			console.log('Got Report Meta....', reportMetaData);
+			console.log('Got Report Meta....');
 			// 3. Download Report - CSV
 			const reportData = await axios
 				.get(`${API_ENDPOINT}/report-download`, {
@@ -79,53 +82,63 @@ const getDataFromPartner = function() {
 };
 
 const fetchData = sitesData => {
-
-	const oftMediaPartnerModel = new partnerAndAdpushpModel(sitesData, DOMAIN_FIELD_NAME, REVENUE_FIELD);
+	const OFTMediaPartnerModel = new partnerAndAdpushpModel(
+		sitesData,
+		DOMAIN_FIELD_NAME,
+		REVENUE_FIELD
+	);
 
 	console.log('Fetching data from OFT...');
 	return getDataFromPartner()
 		.then(async function(reportDataJSON) {
-			oftMediaPartnerModel.setPartnersData(reportDataJSON);
+			OFTMediaPartnerModel.setPartnersData(reportDataJSON);
 
 			// process and map sites data with publishers API data structure
-			oftMediaPartnerModel.mapAdPushupSiteIdAndDomainWithPartnersDomain();
+			OFTMediaPartnerModel.mapAdPushupSiteIdAndDomainWithPartnersDomain();
 			// Map PartnersData with AdPushup's SiteId mapping data
-			oftMediaPartnerModel.mapPartnersDataWithAdPushupSiteIdAndDomain();
+			OFTMediaPartnerModel.mapPartnersDataWithAdPushupSiteIdAndDomain();
 
 			// TBD - Remove hard coded dates after testing
 			const params = {
-				siteid: oftMediaPartnerModel.getSiteIds().join(','),
-				network: 11,
-				fromDate: '2021-02-22',
-				toDate: '2021-02-28',
+				siteid: OFTMediaPartnerModel.getSiteIds().join(','),
+				network: NETWORK_ID,
+				fromDate: '2021-02-24',
+				toDate: '2021-03-02',
 				interval: 'daily',
 				// siteid:40792,
 				dimension: 'siteid'
 			};
-			console.log(params, 'params.....')
-			const adpData = await oftMediaPartnerModel.getDataFromAdPushup(params);
-			let finalData = oftMediaPartnerModel.compareAdPushupDataWithPartnersData(adpData);
+
+			const adpData = await OFTMediaPartnerModel.getDataFromAdPushup(params);
+			let finalData = OFTMediaPartnerModel.compareAdPushupDataWithPartnersData(adpData);
 
 			const {
 				PARTNERS_PANEL_INTEGRATION: { ANOMALY_THRESHOLD_IN_PER }
 			} = constants;
 			// filter out anomalies
-			const dataToSend = finalData.filter(
+			const anomalies = finalData.filter(
 				item =>
 					item.diffPer <= -ANOMALY_THRESHOLD_IN_PER || item.diffPer >= ANOMALY_THRESHOLD_IN_PER
 			);
-			console.log(JSON.stringify(dataToSend, null, 3), 'finalData');
+			// console.log(JSON.stringify(anomalies, null, 3), 'finalData');
 			console.log(finalData.length, 'finalData length');
-			console.log(dataToSend.length, 'dataToSend length');
-			// if anmalies found
-			if(dataToSend.length) {
-				const res = await emailer.anomaliesMailService(dataToSend)
-				console.log(res, ';email res');
+			console.log(anomalies.length, 'anomalies length');
+
+			// if aonmalies found
+			if (anomalies.length) {
+				const dataToSend = OFTMediaPartnerModel.formatAnomaliesDataForSQL(anomalies);
+				await Promise.all([
+					emailer.anomaliesMailService({
+						partner: PARTNER_NAME,
+						anomalies
+					}),
+					saveAnomaliesToDb(dataToSend, NETWORK_ID)
+				]);
 			}
 		})
 		.catch(function(error) {
 			// handle error
-			console.log(error, 'errrr');
+			console.log('error', `err with ${PARTNER_NAME}`);
 		});
 };
 

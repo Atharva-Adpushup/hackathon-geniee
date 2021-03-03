@@ -5,10 +5,13 @@ const _ = require('lodash');
 const partnerAndAdpushpModel = require('../PartnerAndAdpushpModel');
 const constants = require('../../../configs/commonConsts');
 const emailer = require('../emailer');
-const nodemailer = require('nodemailer');
+const saveAnomaliesToDb = require('../saveAnomaliesToDb');
 
-const AUTH__ENDPOINT = `https://auth.indexexchange.com/auth/oauth/token`;
+const AUTH_ENDPOINT = `https://auth.indexexchange.com/auth/oauth/token`;
 const API_ENDPOINT = `https://api01.indexexchange.com/api`;
+
+const PARTNER_NAME = `IndexExchange`;
+const NETWORK_ID = 79;
 const DOMAIN_FIELD_NAME = 'site_name';
 const REVENUE_FIELD = 'earnings';
 
@@ -64,9 +67,9 @@ const getDataFromPartner = function() {
 
 			// create batches
 			const batchQueue = processReqInBatches(queue, headers);
+			console.log('Processing batches.....')
 			return Promise.all(batchQueue).then(response => {
 				console.log('All done!');
-				console.log(JSON.stringify(response, null, 3), 'res');
 				return processDataReceivedFromPublisher(response, siteIdsAndNameMappingFromPubData);
 			});
 		})
@@ -92,7 +95,6 @@ const getPlacementInfo = headers => {
 
 const getPlacementData = async headers => {
 	const placementsIdArr = await getPlacementInfo(headers);
-	console.log(placementsIdArr);
 	const data = {
 		placementID: placementsIdArr
 	};
@@ -138,10 +140,10 @@ const getAllSitesInfo = headers => {
 
 const processReqInBatches = (queue, headers) => {
 	let count = 0;
-	const batchSize = 5;
+	const batchSize = 50;
 	let endIndex = batchSize;
 	// To Be Removed after testing
-	// queue.splice(100);
+	queue.splice(1000);
 	let batchQueue = [];
 	for (let i = 0; i < queue.length; i = i + batchSize) {
 		count++;
@@ -151,7 +153,7 @@ const processReqInBatches = (queue, headers) => {
 		function processBatch(batch) {
 			let promiseQueue = [];
 			for (const item of batch) {
-				const queryParams = {
+				const data = {
 					filters: {
 						startDate: '2021-01-01',
 						endDate: '2021-01-10',
@@ -164,7 +166,7 @@ const processReqInBatches = (queue, headers) => {
 				let config = {
 					method: 'post',
 					url: `${API_ENDPOINT}/publishers/stats/earnings/open`,
-					data: queryParams,
+					data,
 					headers
 				};
 
@@ -182,7 +184,6 @@ const processReqInBatches = (queue, headers) => {
 						})
 				);
 			}
-			console.log(promiseQueue, 'promiseQueue');
 			return Promise.all(promiseQueue);
 		}
 		batchQueue.push(processBatch(batch));
@@ -222,13 +223,12 @@ const processDataReceivedFromPublisher = (data, siteIdsAndNameMappingFromPubData
 			return item;
 		})
 		.filter(item => item.type == 'AP');
-	console.log(processedData);
 	console.log('Processing end.............');
 	return processedData;
 };
 
 const fetchData = sitesData => {
-	const oftMediaPartnerModel = new partnerAndAdpushpModel(
+	const IndexExchangePartnerModel = new partnerAndAdpushpModel(
 		sitesData,
 		DOMAIN_FIELD_NAME,
 		REVENUE_FIELD
@@ -237,17 +237,17 @@ const fetchData = sitesData => {
 	console.log('Fetching data from IndexExchange...');
 	return getDataFromPartner()
 		.then(async function(reportDataJSON) {
-			oftMediaPartnerModel.setPartnersData(reportDataJSON);
+			IndexExchangePartnerModel.setPartnersData(reportDataJSON);
 
 			// process and map sites data with publishers API data structure
-			oftMediaPartnerModel.mapAdPushupSiteIdAndDomainWithPartnersDomain();
+			IndexExchangePartnerModel.mapAdPushupSiteIdAndDomainWithPartnersDomain();
 			// Map PartnersData with AdPushup's SiteId mapping data
-			oftMediaPartnerModel.mapPartnersDataWithAdPushupSiteIdAndDomain();
+			IndexExchangePartnerModel.mapPartnersDataWithAdPushupSiteIdAndDomain();
 
 			// TBD - Remove hard coded dates after testing
 			const params = {
-				siteid: oftMediaPartnerModel.getSiteIds().join(','),
-				network: 79,
+				siteid: IndexExchangePartnerModel.getSiteIds().join(','),
+				network: NETWORK_ID,
 				fromDate: '2021-01-01',
 				toDate: '2021-01-10',
 				interval: 'daily',
@@ -255,28 +255,36 @@ const fetchData = sitesData => {
 				dimension: 'siteid'
 			};
 
-			const adpData = await oftMediaPartnerModel.getDataFromAdPushup(params);
-			let finalData = oftMediaPartnerModel.compareAdPushupDataWithPartnersData(adpData);
+			const adpData = await IndexExchangePartnerModel.getDataFromAdPushup(params);
+			let finalData = IndexExchangePartnerModel.compareAdPushupDataWithPartnersData(adpData);
 
 			const {
 				PARTNERS_PANEL_INTEGRATION: { ANOMALY_THRESHOLD_IN_PER }
 			} = constants;
 			// filter out anomalies
-			const dataToSend = finalData.filter(
+			const anomalies = finalData.filter(
 				item =>
 					item.diffPer <= -ANOMALY_THRESHOLD_IN_PER || item.diffPer >= ANOMALY_THRESHOLD_IN_PER
 			);
-			console.log(JSON.stringify(dataToSend, null, 3), 'finalData');
+			// console.log(JSON.stringify(anomalies, null, 3), 'finalData');
 			console.log(finalData.length, 'finalData length');
-			console.log(dataToSend.length, 'dataToSend length');
-			// // if anmalies found
-			// if(dataToSend.length) {
-			//     emailer.anomaliesMailService(dataToSend)
-			// }
+			console.log(anomalies.length, 'anomalies length');
+
+			// if aonmalies found
+			if (anomalies.length) {
+				const dataToSend = IndexExchangePartnerModel.formatAnomaliesDataForSQL(anomalies, NETWORK_ID);
+				await Promise.all([
+					emailer.anomaliesMailService({
+						partner: PARTNER_NAME,
+						anomalies
+					}),
+					saveAnomaliesToDb(dataToSend)
+				]);
+			}
 		})
 		.catch(function(error) {
 			// handle error
-			console.log('error', 'errrr');
+			console.log('error', `err with ${PARTNER_NAME}`, error);
 		});
 };
 

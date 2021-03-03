@@ -1,5 +1,6 @@
 const Class = require('../../helpers/class'),
 	axios = require('axios'),
+	moment = require('moment'),
 	// AdPushupError = require('./AdPushupError'),
 	PartnersModel = Class.extend(function() {
 		const ADPUSHUP_REPORT_BASE_URL = 'https://api.adpushup.com/CentralReportingWebService';
@@ -59,15 +60,12 @@ const Class = require('../../helpers/class'),
 		this.mapPartnersDataWithAdPushupSiteIdAndDomain = function() {
             // All Partners related data processing
 			this.partnersData.map(item => {
-                console.log(item)
                 if (this.sitesDomainAndIdMapping[item[domainFieldName]]) {
                     const details = { ...this.sitesDomainAndIdMapping[item[domainFieldName]] };
                     // adding publisher's revenue from partner's data into adpushup mapped data
                     this.sitesDomainAndIdMapping[item[domainFieldName]].pubRevenue = item[revenueFieldName];
                     // extact all SiteIds of domains which are matching with partner's data only.
                     this.siteIdArr.push(details.siteId);
-				} else {
-                    console.log('elseeee', item, domainFieldName)
                 }
 				return item;
 			});
@@ -108,12 +106,24 @@ const Class = require('../../helpers/class'),
                 const diff = +(mappedData.pubRevenue) - +(mappedData.adpRevenue);
                 const total = +(mappedData.pubRevenue) + +(mappedData.adpRevenue);
 				mappedData.diff = diff;
-				mappedData.diffPer = (diff / (total/2)) * 100;
-
+				mappedData.diffPer = ((diff / (total/2)) * 100).toFixed(2);
+				mappedData.date = moment(new Date()).format('MM/DD/YYYY')
 				finalData.push(mappedData);
 			});
 			return finalData;
 		};
+		this.formatAnomaliesDataForSQL = function(data, NETWORK_ID) {		  
+			return data.map(item => {
+				return {
+					report_date: item.date,
+					ntwid: NETWORK_ID,
+					siteid: item.siteId,
+					ap_revenue: item.adpRevenue,
+					network_revenue: item.pubRevenue
+				}
+			})
+		};
+
 	});
 
     module.exports = PartnersModel;
