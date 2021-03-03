@@ -6,6 +6,7 @@ import { Row, Col } from '@/Client/helpers/react-bootstrap-imports';
 import AddManageSizelessBidder from './AddManageSizelessBidder';
 import AddManageNonResponsiveBidder from './AddManageNonResponsiveBidder';
 import getCustomParams from '../helpers/getCustomParams';
+import removeHBEmptyParams from '../helpers/hbEmptyParamsHelper';
 
 export default class AddBidder extends React.Component {
 	onBidderAdd = (bidderConfig, params) => {
@@ -53,7 +54,14 @@ export default class AddBidder extends React.Component {
 			params = { ...params, ...getCustomParams(bidderConfig, siteId, domain) };
 		}
 
-		addBidderAction(siteId, { key: fieldsConfig.key, ...bidderConfig }, params, dataForAuditLogs)
+		const cleanedParams = removeHBEmptyParams(params);
+
+		addBidderAction(
+			siteId,
+			{ key: fieldsConfig.key, ...bidderConfig },
+			cleanedParams,
+			dataForAuditLogs
+		)
 			.then(() => {
 				openView('biddersList');
 				showNotification({
