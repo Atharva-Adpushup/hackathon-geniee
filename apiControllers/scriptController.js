@@ -6,6 +6,7 @@ const Promise = require('bluebird');
 const UserModel = require('../models/userModel');
 const SiteModel = require('../models/siteModel');
 const ActiveBidderAdaptersListModel = require('../models/activeBidderAdaptersListModel');
+const ampScriptModel = require('../models/ampScriptModel');
 
 const getReportData = require('../reports/universal');
 const generateStatusesAndConfig = require('../services/genieeAdSyncService/cdnSyncService/generateConfig');
@@ -158,6 +159,98 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 		.then(([scriptConfig, siteData]) =>
 			res.send({ error: null, data: { config: scriptConfig, siteData } })
 		)
+		.catch(e => res.send({ error: e.message }));
+});
+
+Router.get('/:siteId/ampSiteConfig', (req, res) => {
+	SiteModel.getSiteById(req.params.siteId)
+		.then(site => Promise.join(site, UserModel.getUserByEmail(site.get('ownerEmail'))))
+		.then(([site, user]) => {
+			const siteId = site.get('siteId');
+
+			const generateApConfig = function(prebidAndAdsConfig) {
+				// TODO: rj: to check hb status
+				const apps = site.get('apps');
+				const apConfigs = site.get('apConfigs');
+				const adServerSettings = user.get('adServerSettings');
+
+				const { prebidConfig, refreshLineItems, ampScriptConfig } = prebidAndAdsConfig;
+
+				if (refreshLineItems) apConfigs.refreshLineItems = refreshLineItems;
+				apConfigs.siteDomain = site.get('siteDomain');
+				apConfigs.ownerEmailMD5 = crypto
+					.createHash('md5')
+					.update(site.get('ownerEmail'))
+					.digest('hex')
+					.substr(0, 64);
+				apConfigs.activeDFPNetwork =
+					(adServerSettings && adServerSettings.dfp && adServerSettings.dfp.activeDFPNetwork) ||
+					null;
+
+				// TODO: rj: validate ads
+				if (ampScriptConfig && ampScriptConfig.ads.length) apConfigs.ampAds = ampScriptConfig.ads;
+
+				// Default 'draft' mode is selected if config mode is not present
+				apConfigs.mode = apConfigs.mode === 1 && apConfigs.ampAds.length ? apConfigs.mode : 2;
+
+				if (apps.headerBidding && Object.keys(prebidConfig.hbcf).length) {
+					apConfigs.hbConfig = prebidConfig;
+				}
+
+				return apConfigs;
+			};
+
+			const generateAmpScriptAdsConfig = () =>
+				ampScriptModel.getAmpScriptConfig(siteId).then(({ data: ampScriptConfig }) => {
+					if (
+						!(ampScriptConfig && Array.isArray(ampScriptConfig.ads) && ampScriptConfig.ads.length)
+					) {
+						return;
+					}
+
+					ampScriptConfig.ads = ampScriptConfig.ads.filter(ad => ad.isActive !== false);
+
+					if (!ampScriptConfig.ads.length) return;
+
+					return ampScriptConfig;
+				});
+
+			const getRefreshLineItems = function() {
+				const adServerSettings = user.get('adServerSettings');
+				const activeDFPNetwork =
+					(adServerSettings && adServerSettings.dfp && adServerSettings.dfp.activeDFPNetwork) ||
+					null;
+
+				if (!activeDFPNetwork) return null;
+
+				return generateAdNetworkConfig(activeDFPNetwork).then(adNetworkConfig => {
+					const isValidRefreshLineItems =
+						adNetworkConfig &&
+						adNetworkConfig.lineItems &&
+						Array.isArray(adNetworkConfig.lineItems) &&
+						adNetworkConfig.lineItems.length;
+
+					if (!isValidRefreshLineItems) {
+						return null;
+					}
+
+					return adNetworkConfig.lineItems;
+				});
+			};
+
+			return Promise.join(
+				generatePrebidConfig(siteId),
+				generateAmpScriptAdsConfig(siteId),
+				getRefreshLineItems()
+			)
+				.then(([prebidConfig, ampScriptConfig, refreshLineItems]) => ({
+					prebidConfig,
+					ampScriptConfig,
+					refreshLineItems
+				}))
+				.then(generateApConfig);
+		})
+		.then(scriptConfig => res.send({ error: null, data: { config: scriptConfig } }))
 		.catch(e => res.send({ error: e.message }));
 });
 
