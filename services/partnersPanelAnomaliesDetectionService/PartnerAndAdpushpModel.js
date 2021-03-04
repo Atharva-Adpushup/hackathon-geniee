@@ -107,7 +107,7 @@ const Class = require('../../helpers/class'),
                 const total = +(mappedData.pubRevenue) + +(mappedData.adpRevenue);
 				mappedData.diff = diff;
 				mappedData.diffPer = ((diff / (total/2)) * 100).toFixed(2);
-				mappedData.date = moment(new Date()).format('MM/DD/YYYY')
+				mappedData.date = moment(item.date).format('YYYY-MM-DD')
 				finalData.push(mappedData);
 			});
 			return finalData;
@@ -115,7 +115,7 @@ const Class = require('../../helpers/class'),
 		this.formatAnomaliesDataForSQL = function(data, NETWORK_ID) {		  
 			return data.map(item => {
 				return {
-					report_date: item.date,
+					report_date: moment(item.date).format('YYYY-MM-DD'),
 					ntwid: NETWORK_ID,
 					siteid: item.siteId,
 					ap_revenue: item.adpRevenue,

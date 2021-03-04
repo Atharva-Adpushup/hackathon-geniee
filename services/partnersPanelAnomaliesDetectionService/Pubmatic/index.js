@@ -1,5 +1,5 @@
 const axios = require('axios');
-const csv = require('csvtojson');
+const moment = require('moment');
 
 const partnerAndAdpushpModel = require('../PartnerAndAdpushpModel');
 const constants = require('../../../configs/commonConsts');
@@ -8,10 +8,10 @@ const saveAnomaliesToDb = require('../saveAnomaliesToDb');
 
 const API_ENDPOINT = `http://api.pubmatic.com/v1`;
 
-const PARTNER_NAME = `Pubmatic`;
-const NETWORK_ID = 31;
+const PARTNER_NAME = `Pubmatic(HB)`;
+const NETWORK_ID = 28;
 const DOMAIN_FIELD_NAME = 'site_name';
-const REVENUE_FIELD = 'revenue';
+const REVENUE_FIELD = 'netRevenue';
 const PUBLISHER_ID = '158261'
 
 const authParams = {
@@ -19,6 +19,10 @@ const authParams = {
     "password": "PcCkgS9Huxbh4WN",
     "apiProduct" : "PUBLISHER"
 };
+
+const fromDate = moment().subtract(2, "days").format("YYYY-MM-DD");
+const toDate = fromDate;
+
 // response
 /**
     {
@@ -56,11 +60,11 @@ const getDataFromPartner = function() {
                 dateUnit:'date',
                 dimensions:'siteId',
                 filters:'',
-                fromDate:'2021-01-11T00:00',
-                metrics:'revenue,paidImpressions,ecpm',
+                metrics:'netRevenue,paidImpressions,ecpm',
                 pageSize:'',
-                sort:'-revenue',
-                toDate:'2021-01-18T23:59'
+                sort:'-netRevenue',
+                fromDate,
+                toDate
 			};
 			const headers = {
 				Authorization: `Bearer ${token}`
@@ -73,10 +77,14 @@ const getDataFromPartner = function() {
                 headers
             };
 
-            return await axios(config)
+			return await axios(config)
 				.then(response => {
                     return processDataReceivedFromPublisher(response.data)
-                });
+                }).catch(function(error) {
+					// handle error
+					console.log(error.message, 'error fetching data', 'errrr');
+				});
+		
         })
         .catch(function(error) {
 			// handle error
@@ -90,11 +98,16 @@ const processDataReceivedFromPublisher = data => {
             obj[col] = row[index];
         })
         return obj;
-    });
-    processedData = processedData.map(row => {
-        row.site_name = data.displayValue.siteId[row.siteId].replace(/(AP|AR)\/\d+_/, '');
+	});
+	processedData = processedData
+	.map(row => {
+        row.site_name = data.displayValue.siteId[row.siteId]
         return row;
-    })
+	}).filter(row => /AP\/\d+_/.test(row.site_name))
+	.map(row => {
+		row.site_name = data.displayValue.siteId[row.siteId].replace(/AP\/\d+_/, '');
+		return row;
+	})
     console.log('Processing end.............')
     return processedData;
 }
@@ -116,11 +129,10 @@ const fetchData = sitesData => {
 			// TBD - Remove hard coded dates after testing
 			const params = {
 				siteid: PubmaticPartnerModel.getSiteIds().join(','),
-				network: 31,
-				fromDate: '2021-01-11',
-				toDate: '2021-01-18',
+				network: NETWORK_ID,
+				fromDate,
+				toDate,
 				interval: 'daily',
-				// siteid:40792,
 				dimension: 'siteid'
 			};
 
@@ -148,7 +160,9 @@ const fetchData = sitesData => {
 						partner: PARTNER_NAME,
 						anomalies
 					}),
-					saveAnomaliesToDb(dataToSend)
+					saveAnomaliesToDb({
+						anomalyData: dataToSend
+					})
 				]);
 			}
 		})
