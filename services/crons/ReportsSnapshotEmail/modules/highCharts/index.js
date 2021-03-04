@@ -2,9 +2,8 @@ const Promise = require('bluebird');
 const extend = require('extend');
 const moment = require('moment');
 const { LINE_CHART_CONFIG, PIE_CHART_CONFIG } = require('../../constants');
-const exporter = require('highcharts-export-server');
 const config = require('../../../../../configs/config');
-const { roundOffTwoDecimal, uploadImageToAzure } = require('../../../cronhelpers');
+const { roundOffTwoDecimal, uploadImageToAzure, getBase64Image } = require('../../../cronhelpers');
 
 function addHighChartsObject(inputData, uniqueIdentifier) {
 	const { fromReportingDate = '', toReportingDate = '', type = '', siteid = '' } = uniqueIdentifier;
@@ -31,21 +30,12 @@ function getChartImageOptions() {
 	};
 }
 
-exporter.initPool();
-
-function generateBase64(imgOptions, chartOptions, imagPath) {
+async function generateImageSourcePath(imgOptions, chartOptions, imagPath) {
 	const newOptions = { ...imgOptions, options: { ...chartOptions } };
-	return new Promise((resolve, reject) => {
-		exporter.export(newOptions, async function(err, res) {
-			if (err) {
-				return reject('generateBase64: Unable to generate high chart base64');
-			}
-			const base64Data = res.data;
-			const buffer = await Buffer.from(base64Data, 'base64');
-			await uploadImageToAzure(imagPath, buffer);
-			return resolve(config.weeklyDailySnapshots.BASE_PATH + imagPath);
-		});
-	});
+	const base64Data = await getBase64Image(newOptions);
+	const buffer = await Buffer.from(base64Data, 'base64');
+	await uploadImageToAzure(imagPath, buffer);
+	return `${config.weeklyDailySnapshots.BASE_PATH}${imagPath}`;
 }
 
 //required
@@ -102,12 +92,12 @@ async function generateCPMLineSourcePath(inputData, imageUploadPath) {
 	const computedState = computeGraphData(APvsBaseline.result || []);
 	const chartConfig = { ...LINE_CHART_CONFIG, ...computedState };
 	const imageOptions = getChartImageOptions();
-	const base64Encoding = await generateBase64(
+	const imageSourcePath = await generateImageSourcePath(
 		imageOptions,
 		chartConfig,
 		imageUploadPath + 'cpm.png'
 	);
-	return base64Encoding;
+	return imageSourcePath;
 }
 
 function computeDisplayData(props) {
@@ -154,12 +144,12 @@ async function generateAdNetworkRevenuePieSourcePath(inputData, imageUploadPath)
 	});
 	chartConfig.series = computedState || {};
 	const imageOptions = getChartImageOptions();
-	const base64Encoding = await generateBase64(
+	const imageSourcePath = await generateImageSourcePath(
 		imageOptions,
 		chartConfig,
 		imageUploadPath + 'network.png'
 	);
-	return base64Encoding;
+	return imageSourcePath;
 }
 
 //required
@@ -175,12 +165,12 @@ async function generateCountryReportsPieSourcePath(inputData, imageUploadPath) {
 	});
 	chartConfig.series = computedState || {};
 	const imageOptions = getChartImageOptions();
-	const base64Encoding = await generateBase64(
+	const imageSourcePath = await generateImageSourcePath(
 		imageOptions,
 		chartConfig,
 		imageUploadPath + 'country.png'
 	);
-	return base64Encoding;
+	return imageSourcePath;
 }
 
 module.exports = {

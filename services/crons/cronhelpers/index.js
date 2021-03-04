@@ -118,6 +118,23 @@ async function uploadImageToAzure(blobClientName, fileStream) {
 	}
 }
 
+function getBase64Image(body) {
+	return request({
+		method: 'POST',
+		uri: `${config.weeklyDailySnapshots.highchartsServer}:${
+			config.weeklyDailySnapshots.highchartsServerPort
+		}`,
+		json: true,
+		body: { ...body }
+	})
+		.then(response => {
+			return response;
+		})
+		.catch(error => {
+			return Promise.reject(new Error(`Error in generating image:${error}`));
+		});
+}
+
 module.exports = {
 	getUserSites,
 	getActiveUsers,
@@ -127,5 +144,6 @@ module.exports = {
 	roundOffTwoDecimal,
 	numberWithCommas,
 	sendEmail,
-	uploadImageToAzure
+	uploadImageToAzure,
+	getBase64Image
 };
