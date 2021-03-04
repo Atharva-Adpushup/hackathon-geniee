@@ -32,8 +32,8 @@ const anomaliesMailService = async ({partner, anomalies}) => {
           <th> Partner </th>
           <th> Website </th>
           <th> Diff % </th>
-          <th> ADP Revenue </th>
           <th> Pub Revenue </th>
+          <th> ADP Revenue </th>
         </tr>
         ${dataConvertedToTableRow()}
         </table>
