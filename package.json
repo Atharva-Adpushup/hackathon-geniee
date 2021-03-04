@@ -61,7 +61,6 @@
 		"harmon": "^1.3.1",
 		"helmet": "^3.13.0",
 		"highcharts": "7.0.3",
-		"highcharts-export-server": "^2.0.30",
 		"highcharts-server": "^1.0.2",
 		"history": "^4.7.2",
 		"html-entities": "1.2.1",
