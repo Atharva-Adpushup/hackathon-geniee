@@ -96,44 +96,26 @@ async function giveDashboardReports(params) {
 	}
 }
 
-async function getEmailSnapshotsSites(userEmail) {
+async function getEmailSnapshotsSites(userEmail, type) {
 	try {
-		let weeklyEnabledDayAllOverSites = null;
-		const dailyWeeklySubscribedSites = await getAllUserSites(userEmail).reduce(
-			(allSites, site, index) => {
-				const {
-					apConfigs: {
-						isWeeklyEmailReportsEnabled = false,
-						isDailyEmailReportsEnabled = false,
-						weeklyEmailEnableTimeStamp
-					} = {},
-					siteId
-				} = site;
-				if (isWeeklyEmailReportsEnabled) {
-					const weeklyEmailEnableDate = moment(weeklyEmailEnableTimeStamp);
-					if (
-						!weeklyEnabledDayAllOverSites ||
-						weeklyEmailEnableDate < weeklyEnabledDayAllOverSites
-					) {
-						weeklyEnabledDayAllOverSites = weeklyEmailEnableDate;
-					}
-					allSites[1] = index === 0 ? `${siteId}` : `${allSites[1]},${siteId}`;
-				}
-				if (isDailyEmailReportsEnabled)
-					allSites[0] = index === 0 ? `${siteId}` : `${allSites[0]},${siteId}`;
-				return allSites;
-			},
-			['', '']
-		);
-		const diffDays = currentDate.diff(weeklyEnabledDayAllOverSites, 'days');
-		if (diffDays && diffDays % 7 === 0) return dailyWeeklySubscribedSites;
-		else return [dailyWeeklySubscribedSites[0], ''];
+		const subscribedSites = await getAllUserSites(userEmail).reduce((allSites, site, index) => {
+			const {
+				apConfigs: { isWeeklyEmailReportsEnabled = false, isDailyEmailReportsEnabled = false } = {},
+				siteId
+			} = site;
+			if (type == 'weekly' && isWeeklyEmailReportsEnabled) {
+				allSites = index === 0 ? `${siteId}` : `${allSites},${siteId}`;
+			} else if (type == 'daily' && isDailyEmailReportsEnabled)
+				allSites = index === 0 ? `${siteId}` : `${allSites},${siteId}`;
+			return allSites;
+		}, '');
+		return subscribedSites;
 	} catch (err) {
 		return Promise.reject(new Error(`Error in fetching subscribed sites of user:${error}`));
 	}
 }
 
-async function sendDailyWeeklySnapshot(siteid, userEmail, type) {
+async function sendSnapshot(siteid, userEmail, type) {
 	try {
 		const daysGap = type === 'daily' ? 1 : 7;
 		let fromDate = moment()
@@ -190,13 +172,16 @@ async function sendDailyWeeklySnapshot(siteid, userEmail, type) {
 async function processSitesOfUser(userEmail) {
 	try {
 		console.log(userEmail, count++);
-		const dailyWeeklySubscribedSites = await getEmailSnapshotsSites(userEmail);
-		const dailySubscribedSites = dailyWeeklySubscribedSites[0],
-			weeklySubscribedSites = dailyWeeklySubscribedSites[1];
-		if (dailySubscribedSites !== '')
-			await sendDailyWeeklySnapshot(dailySubscribedSites, userEmail, 'daily');
-		if (weeklySubscribedSites !== '')
-			await sendDailyWeeklySnapshot(weeklySubscribedSites, userEmail, 'weekly');
+		const dailySubscribedSites = await getEmailSnapshotsSites(userEmail, 'daily');
+		if (dailySubscribedSites !== '') await sendSnapshot(dailySubscribedSites, userEmail, 'daily');
+		//0->sunday,1->Monday and so on
+		const dayOfWeek = currentDate.day();
+		//if week day is monday
+		if (dayOfWeek === 1) {
+			const weeklySubscribedSites = await getEmailSnapshotsSites(userEmail, 'weekly');
+			if (weeklySubscribedSites !== '')
+				await sendSnapshot(weeklySubscribedSites, userEmail, 'weekly');
+		}
 	} catch (error) {
 		console.log(error);
 	}
@@ -239,4 +224,4 @@ function startEmailSnapshotsService() {
 
 cron.schedule(CC.cronSchedule.emailSnapshotsService, startEmailSnapshotsService);
 // module.exports = startEmailSnapshotsService;
-// module.exports = sendDailyWeeklySnapshot;
+// module.exports = sendSnapshot;
