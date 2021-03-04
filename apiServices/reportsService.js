@@ -295,7 +295,7 @@ const reportsService = {
 			async () => reportsService.getWidgetData(path, params)
 		),
 	logReportUsage: async (email, reportConfig) => {
-		const config = _.cloneDeep(reportConfig);
+		const config = reportConfig;
 
 		const todaysDate = moment().format('YYYY-MM-DD');
 		const docId = `${CC.docKeys.freqReports}${email}:${todaysDate}`;

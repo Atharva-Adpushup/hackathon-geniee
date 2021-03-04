@@ -28,7 +28,7 @@ router
 			user: { originalEmail, email }
 		} = req;
 
-		const reportConfig = _.cloneDeep(reportingConfig);
+		const reportConfig = reportingConfig;
 		try {
 			const { cacheHit, data: reportsData } = await reportsService.getReportsWithCache(
 				reportConfig,

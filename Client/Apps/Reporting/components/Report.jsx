@@ -792,7 +792,7 @@ class Report extends Component {
 				intervalList
 			},
 			() => {
-				this.getSavedReports();
+				this.getSavedAndFrequentReports();
 				this.generateButtonHandler();
 			}
 		);
@@ -939,12 +939,12 @@ class Report extends Component {
 		});
 	};
 
-	getSavedReports = () => {
+	getSavedAndFrequentReports = () => {
 		const { showNotification } = this.props;
 		return reportService
-			.getSavedReports()
+			.getSavedAndFrequentReports()
 			.then(res => {
-				const { savedReports, frequentReports = [] } = res.data.data || [];
+				const { savedReports, frequentReports = [] } = res.data.data || {};
 				this.processAndSaveReports(savedReports, frequentReports);
 			})
 			.catch(err => {
@@ -969,7 +969,7 @@ class Report extends Component {
 		const dimensionData = dimensionList.find(dim => dim.value === dimension);
 
 		const filterUi = Object.keys(filters)
-			.filter(filter => filters[filter] && Object.keys(filters[filter]).length)
+			.filter(currentFilter => filters[currentFilter] && Object.keys(filters[currentFilter]).length)
 			.map(filter => {
 				const values = chunk(Object.keys(filters[filter]), 3)
 					.map(items => items.join(','))
@@ -1001,7 +1001,6 @@ class Report extends Component {
 			(results, dimension) => ({ ...results, [dimension.value]: dimension }),
 			{}
 		);
-
 
 		const savedReportsWithValue = savedReports.map(report => ({
 			...report,

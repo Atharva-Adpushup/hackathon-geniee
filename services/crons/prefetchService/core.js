@@ -13,15 +13,16 @@ function getLastRunInfo() {
 			//from where lastRunOn is set first
 			const { value = {} } = doc;
 			const { lastRunOn } = value;
-			return Promise.resolve(lastRunOn);
+			return lastRunOn;
 		})
 	);
 }
 
 function getActiveUsers() {
-	return siteModel
-		.getActiveSites()
-		.then(users => Array.from(new Set(users.map(({ accountEmail }) => accountEmail))));
+	return siteModel.getActiveSites().then(users => {
+		const userMapObject = users.map(({ accountEmail }) => accountEmail);
+		return Array.from(new Set(userMapObject));
+	});
 }
 
 function getAllUsersForFreqReportsLog() {
@@ -57,13 +58,13 @@ function getReportingData(params) {
 	}).then(response => {
 		if (response.statusCode == 200 && response.body) {
 			console.log('fetched report');
-			return Promise.resolve(response.body);
+			return response.body;
 		}
-		return Promise.reject(new Error('Invalid reporting data'));
+		throw new Error('Invalid reporting data');
 	});
 }
 
-function getWidgetsDataSite(params) {
+function getWidgetsData(params) {
 	return request({
 		uri: `${BASE_URL}/api/reports/getWidgetData`,
 		json: true,
@@ -78,9 +79,9 @@ function getWidgetsDataSite(params) {
 	}).then(response => {
 		if (response.statusCode == 200 && response.body) {
 			console.log('fetched widget');
-			return Promise.resolve(response.body);
+			return response.body;
 		}
-		return Promise.reject(new Error('Invalid widget data'));
+		throw new Error('Invalid widget data');
 	});
 }
 
@@ -99,9 +100,9 @@ function getMetaData(params) {
 	}).then(response => {
 		if (response.statusCode == 200 && response.body) {
 			console.log('fetched meta');
-			return Promise.resolve(response.body);
+			return response.body;
 		}
-		return Promise.reject(new Error('Invalid meta data'));
+		throw new Error('Invalid meta data');
 	});
 }
 
@@ -111,6 +112,6 @@ module.exports = {
 	getActiveUsers,
 	getLastRunInfo,
 	getMetaData,
-	getWidgetsDataSite,
+	getWidgetsData,
 	getAllUsersForFreqReportsLog
 };

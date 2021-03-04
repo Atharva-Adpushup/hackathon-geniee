@@ -15,7 +15,7 @@ const {
 	getReportingData,
 	getUserSites,
 	getMetaData,
-	getWidgetsDataSite
+	getWidgetsData
 } = require('./core');
 
 let isCronServiceRunning = false;
@@ -28,13 +28,14 @@ let toDate;
 
 function getCustomStatsData(params) {
 	const { siteid = '' } = params;
+	//As we have to fetch customStats data site level as well as for combined site all
 	const sites = (siteid.split(',').length > 1 && siteid.split(',')) || [];
 	sites.push(siteid);
 
 	function getAllCustomStatsDataSiteLevel(site) {
 		console.log(`Fetching for ${site} custom stats`);
 		const paramsNew = { ...params, siteid: site };
-		return getReportingData(paramsNew).catch(err => console.log(err));
+		return getReportingData(paramsNew);
 	}
 
 	return promisePool
@@ -43,30 +44,26 @@ function getCustomStatsData(params) {
 		.process(getAllCustomStatsDataSiteLevel);
 }
 
-function preFetchCustomStats(ownerEmail) {
-	return getUserSites(ownerEmail).then(siteid => {
-		const requestQuery = {
-			fromDate,
-			toDate,
-			interval: 'daily',
-			siteid
-		};
-		return getCustomStatsData(requestQuery).catch(err => console.log(err));
-	});
+function preFetchCustomStats(allSites) {
+	const requestQuery = {
+		fromDate,
+		toDate,
+		interval: 'daily',
+		siteid: allSites
+	};
+	return getCustomStatsData(requestQuery);
 }
 
-function preFetchMeta(ownerEmail) {
-	return getUserSites(ownerEmail).then(siteid => {
-		const requestQuery = { sites: siteid };
-		return getMetaData(requestQuery).catch(err => console.log(err));
-	});
+function preFetchMeta(allSites) {
+	const requestQuery = { sites: allSites };
+	return getMetaData(requestQuery);
 }
 
 function getWidgetData(params, path) {
 	const { siteid = '', isSuperUser = false } = params;
 	const sites = (siteid.split(',').length > 1 && siteid.split(',')) || [];
 	sites.push(siteid);
-	function getAllWidgetDataSiteLevel(site) {
+	function getSiteLevelWidgetData(site) {
 		//As global reports api does not send siteid
 		if (!isSuperUser) {
 			paramsNew = { ...params, siteid: site };
@@ -77,27 +74,24 @@ function getWidgetData(params, path) {
 			path,
 			params: JSON.stringify(paramsNew)
 		};
-		return getWidgetsDataSite(requestQuery).catch(err => {
+		return getWidgetsData(requestQuery).catch(err => {
 			console.log(err);
 		});
 	}
 	return promisePool
 		.for(sites)
 		.withConcurrency(1)
-		.process(getAllWidgetDataSiteLevel);
+		.process(getSiteLevelWidgetData);
 }
 
-function preFetchWidgetData(ownerEmail) {
-	const paths = Array.from(new Set([...CC.DASHBOARD_QUERY_PATHS, ...CC.ADMIN_DASHBOARD_QUERIES]));
-	return getUserSites(ownerEmail)
-		.then(siteid => {
-			const params = { fromDate, toDate, siteid };
-			return promisePool
-				.for(paths)
-				.withConcurrency(1)
-				.process(getWidgetData.bind(null, params));
-		})
-		.catch(err => console.log(err));
+function preFetchWidgetData(allSites) {
+	const pathsSet = new Set([...CC.DASHBOARD_QUERY_PATHS, ...CC.ADMIN_DASHBOARD_QUERIES]);
+	const paths = Array.from(pathsSet);
+	const params = { fromDate, toDate, siteid: allSites };
+	return promisePool
+		.for(paths)
+		.withConcurrency(1)
+		.process(getWidgetData.bind(null, params));
 }
 
 function preFetchGlobalMeta() {
@@ -129,34 +123,32 @@ function preFetchGlobalWidgetData() {
 		.process(getWidgetData.bind(null, params));
 }
 
-function preFetchAllGlobalData() {
-	return preFetchGlobalMeta()
-		.then(preFetchGlobalCustomStats)
-		.then(preFetchGlobalWidgetData)
-		.catch(err => console.log(err));
+async function preFetchAllGlobalData() {
+	await preFetchGlobalMeta();
+	await preFetchGlobalCustomStats();
+	await preFetchGlobalWidgetData();
 }
 
 async function preFetchAllData(ownerEmail) {
 	console.log({ ownerEmail });
-	console.log(ownerEmail, '*****');
-	return preFetchMeta(ownerEmail)
-		.then(() => preFetchCustomStats(ownerEmail))
-		.then(() => preFetchWidgetData(ownerEmail))
-		.catch(err => console.log(err));
+	const allSites = await getUserSites(ownerEmail);
+	await preFetchMeta(allSites);
+	await preFetchCustomStats(allSites);
+	await preFetchWidgetData(allSites);
 }
 
 function getAllUsersData() {
-	// const ownerEmailsTesting = [
-	// 	'shikhar@geeksforgeeks.org',
-	// 	'sonoojaiswal1987@gmail.com',
-	// 	'amit.qazi@zee.esselgroup.com'
-	// ];
+	const ownerEmailsTesting = [
+		'shikhar@geeksforgeeks.org',
+		'sonoojaiswal1987@gmail.com',
+		'amit.qazi@zee.esselgroup.com'
+	];
 	isCronServiceRunning = true;
 	isAllDataFetched = false;
 	return getActiveUsers()
 		.then(ownerEmails =>
 			promisePool
-				.for(ownerEmails)
+				.for(ownerEmailsTesting)
 				.withConcurrency(5)
 				.process(preFetchAllData)
 		)
@@ -175,9 +167,12 @@ function startPrefetchService() {
 		.then(lastRunTime => {
 			console.time();
 			console.log({ lastRunTime, oldTimestamp });
-			if (!lastRunTime) return Promise.reject(new Error('timestamp not found'));
-			if (config.environment.HOST_ENV === 'production' && oldTimestamp === lastRunTime)
+			if (!lastRunTime) {
+				throw new Error('timestamp not found');
+			}
+			if (config.environment.HOST_ENV === 'production' && oldTimestamp === lastRunTime) {
 				return Promise.resolve('Old timestamp and new timestamp are same, no new data to cache');
+			}
 			console.log({ lastRunTime, fromDate, toDate, oldTimestamp });
 			oldTimestamp = lastRunTime;
 			fromDate = moment()

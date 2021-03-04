@@ -71,7 +71,7 @@ const fetchAccessLogs = async (email, dates) => {
 		console.log(`---- LOGS FOUND FOR ${email} ----`);
 		// merge similar logs from multiple days so that each entry has cumulative count
 		const mergedLogs = data.reduce((result, entry) => {
-			const values = _.cloneDeep(result);
+			const values = result;
 			Object.keys(entry).forEach(key => {
 				if (values[key]) {
 					values[key] += entry[key];
@@ -82,7 +82,6 @@ const fetchAccessLogs = async (email, dates) => {
 			return values;
 		}, {});
 		return {
-			email,
 			results: mergedLogs
 		};
 	}
@@ -183,11 +182,11 @@ const saveCachedFrequentReports = log => {
 		});
 };
 
-const fetchAccessLogsForUsers = async (userEmails = [], dates) => {
+const fetchAccessLogsForUsers = (userEmails = [], dates) => {
 	console.log({ userEmails: userEmails.length });
 	return promisePool
 		.for(userEmails)
-		.withConcurrency(userEmails.length < 10 ? userEmails.length : 10)
+		.withConcurrency(Math.min(userEmails.length, 10))
 		.process(email => fetchAccessLogs(email, dates))
 		.then(result => {
 			return result.results;
@@ -217,7 +216,7 @@ const preprocessLogs = async logs => {
 		.map(log => ({ ...log, results: fetchTopLogs(log.results) }));
 };
 
-const cacheFrequentReports = async () => {
+const cacheFrequentReports = () => {
 	console.log('----- STARTING FREQUENT REPORTS PREFETCH -------');
 	const dates = getDatesToProcessFrequentReports();
 	console.log({ dates });
