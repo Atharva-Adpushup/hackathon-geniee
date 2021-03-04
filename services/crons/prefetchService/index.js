@@ -35,7 +35,7 @@ function getCustomStatsData(params) {
 	function getAllCustomStatsDataSiteLevel(site) {
 		console.log(`Fetching for ${site} custom stats`);
 		const paramsNew = { ...params, siteid: site };
-		return getReportingData(paramsNew);
+		return getReportingData(paramsNew).catch(err => console.log(err));
 	}
 
 	return promisePool
@@ -51,12 +51,12 @@ function preFetchCustomStats(allSites) {
 		interval: 'daily',
 		siteid: allSites
 	};
-	return getCustomStatsData(requestQuery);
+	return getCustomStatsData(requestQuery).catch(err => console.log(err));
 }
 
 function preFetchMeta(allSites) {
 	const requestQuery = { sites: allSites };
-	return getMetaData(requestQuery);
+	return getMetaData(requestQuery).catch(err => console.log(err));
 }
 
 function getWidgetData(params, path) {
@@ -138,17 +138,17 @@ async function preFetchAllData(ownerEmail) {
 }
 
 function getAllUsersData() {
-	const ownerEmailsTesting = [
-		'shikhar@geeksforgeeks.org',
-		'sonoojaiswal1987@gmail.com',
-		'amit.qazi@zee.esselgroup.com'
-	];
+	// const ownerEmailsTesting = [
+	// 	'shikhar@geeksforgeeks.org',
+	// 	'sonoojaiswal1987@gmail.com',
+	// 	'amit.qazi@zee.esselgroup.com'
+	// ];
 	isCronServiceRunning = true;
 	isAllDataFetched = false;
 	return getActiveUsers()
 		.then(ownerEmails =>
 			promisePool
-				.for(ownerEmailsTesting)
+				.for(ownerEmails)
 				.withConcurrency(5)
 				.process(preFetchAllData)
 		)
