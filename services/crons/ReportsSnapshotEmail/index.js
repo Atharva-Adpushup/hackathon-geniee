@@ -16,7 +16,6 @@ const config = require('../../../configs/config');
 const { generateImageSourcePath } = require('./modules/highCharts');
 
 let isCronServiceRunning = false;
-let isAllDataFetched = false;
 let currentDate;
 let oldTimestamp = null;
 
@@ -197,8 +196,7 @@ function runSnapshotService() {
 }
 
 function startEmailSnapshotsService() {
-	if (isCronServiceRunning && !isAllDataFetched)
-		return Promise.resolve('Old cron is already running');
+	if (isCronServiceRunning) return Promise.resolve('Old cron is already running');
 	currentDate = moment();
 	return getLastRunInfo()
 		.then(lastRunTime => {
@@ -214,7 +212,6 @@ function startEmailSnapshotsService() {
 		.then(() => {
 			console.timeEnd();
 			console.log('All Snapshots email sent');
-			isAllDataFetched = true;
 			isCronServiceRunning = false;
 		})
 		.catch(err => {

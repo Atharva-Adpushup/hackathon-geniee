@@ -44,7 +44,7 @@ function sendEmail(body) {
 			console.log('Mail send succesfully');
 		})
 		.catch(error => {
-			return Promise.reject(new Error(`Error in sending email:${error}`));
+			throw new Error(`Error in sending email:${error}`);
 		});
 }
 
@@ -65,7 +65,7 @@ function getWidgetsDataSite(params) {
 			console.log('fetched widget');
 			return Promise.resolve(response.body);
 		}
-		return Promise.reject(new Error('Invalid widget data'));
+		throw new Error('Invalid widget data');
 	});
 }
 
@@ -76,7 +76,7 @@ function getLastRunInfo() {
 			//from where lastRunOn is set first
 			const { value = {} } = doc;
 			const { lastRunOn } = value;
-			return Promise.resolve(lastRunOn);
+			return lastRunOn;
 		})
 	);
 }
@@ -87,8 +87,7 @@ async function generateEmailTemplate(base, template, params) {
 
 	// Throw an error if the file path can't be found
 	if (!file) {
-		return Promise.reject(new Error(`Could not find the ${template} in path ${file}`));
-	}
+		 throw new Error(`Could not find the ${template} in path ${file}`);
 	const result = await ejs.renderFile(file, params, { async: true });
 	return result;
 }
@@ -114,7 +113,7 @@ async function uploadImageToAzure(blobClientName, fileStream) {
 		await blobclient.upload(fileStream, fileStream.length);
 		console.log('succesfully uploaded image');
 	} catch (error) {
-		return Promise.reject(new Error(`Error in uploading image:${error}`));
+		throw new Error(`Error in uploading image:${error}`)
 	}
 }
 
@@ -131,7 +130,7 @@ function getBase64Image(body) {
 			return response;
 		})
 		.catch(error => {
-			return Promise.reject(new Error(`Error in generating image:${error}`));
+			throw new Error(`Error in generating image:${error}`)
 		});
 }
 
