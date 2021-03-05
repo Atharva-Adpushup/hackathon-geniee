@@ -46,7 +46,7 @@ const getDatesToProcessFrequentReports = () => {
 	return dates;
 };
 
-const fetchTopLogs = (logs = {}, filterCount) => {
+const orderLogsInDescOrder = (logs = {}, filterCount) => {
 	const sortedLogs = Object.entries(logs).sort(
 		([firstKey, firstCount], [secondKey, secondCount]) => {
 			return secondCount - firstCount;
@@ -213,7 +213,7 @@ const savedCachedLogsInCb = async cachedLogs => {
 const preprocessLogs = async logs => {
 	return logs
 		.filter(log => Object.keys(log).length)
-		.map(log => ({ ...log, results: fetchTopLogs(log.results) }));
+		.map(log => ({ ...log, results: orderLogsInDescOrder(log.results) }));
 };
 
 const cacheFrequentReports = () => {
