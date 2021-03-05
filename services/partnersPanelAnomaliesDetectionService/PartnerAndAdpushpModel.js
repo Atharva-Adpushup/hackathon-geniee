@@ -79,8 +79,9 @@ const Class = require('../../helpers/class'),
 				.then(response => response.data)
 				.then(({ data: { result: adpData } }) => {
 					return adpData.map(item => {
-						const { siteid, network_gross_revenue, site } = item;
+						const { siteid, network_gross_revenue, site, date } = item;
 						return {
+							date,
 							siteid,
 							network_gross_revenue,
 							site
