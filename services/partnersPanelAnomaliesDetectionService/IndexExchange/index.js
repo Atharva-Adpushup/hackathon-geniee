@@ -1,5 +1,5 @@
 const axios = require('axios');
-const csv = require('csvtojson');
+const moment = require('moment');
 const _ = require('lodash');
 
 const partnerAndAdpushpModel = require('../PartnerAndAdpushpModel');
@@ -19,6 +19,9 @@ const authParams = {
 	username: 'dikshant.joshi@adpushup.com',
 	key: 'iGY05Af7QidctaFx9gm9u4uNaNzl+Lo6'
 };
+
+const fromDate = moment().subtract(2, "days").format("YYYY-MM-DD");
+const toDate = fromDate;
 
 /**
  * 1. Get Pub data
@@ -140,10 +143,10 @@ const getAllSitesInfo = headers => {
 
 const processReqInBatches = (queue, headers) => {
 	let count = 0;
-	const batchSize = 50;
+	const batchSize = 100;
 	let endIndex = batchSize;
 	// To Be Removed after testing
-	queue.splice(1000);
+	// queue.splice(1000);
 	let batchQueue = [];
 	for (let i = 0; i < queue.length; i = i + batchSize) {
 		count++;
@@ -155,8 +158,8 @@ const processReqInBatches = (queue, headers) => {
 			for (const item of batch) {
 				const data = {
 					filters: {
-						startDate: '2021-01-01',
-						endDate: '2021-01-10',
+						startDate: fromDate,
+						endDate: toDate,
 						placementID: [item.placementID],
 						siteID: [item.siteID]
 					},
@@ -215,7 +218,7 @@ const processDataReceivedFromPublisher = (data, siteIdsAndNameMappingFromPubData
 					let typeAndSiteId = $1.replace('_', '').split('/');
 					item.type = typeAndSiteId[0];
 					item.siteId = typeAndSiteId[1];
-					item.earnings = item.earnings * 0.00001;
+					item.earnings = (item.earnings * 0.00001).toFixed(2);
 					return '';
 				}
 			);
@@ -248,10 +251,9 @@ const fetchData = sitesData => {
 			const params = {
 				siteid: IndexExchangePartnerModel.getSiteIds().join(','),
 				network: NETWORK_ID,
-				fromDate: '2021-01-01',
-				toDate: '2021-01-10',
+				fromDate: fromDate,
+				toDate: toDate,
 				interval: 'daily',
-				// siteid:40792,
 				dimension: 'siteid'
 			};
 
