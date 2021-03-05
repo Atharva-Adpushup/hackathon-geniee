@@ -4,8 +4,12 @@ const csv = require('csvtojson');
 const partnerAndAdpushpModel = require('../PartnerAndAdpushpModel');
 const constants = require('../../../configs/commonConsts');
 const emailer = require('../emailer');
+const saveAnomaliesToDb = require('../saveAnomaliesToDb');
 
 const API_ENDPOINT = `https://api.sovrn.com`;
+
+const PARTNER_NAME = `Sovrn`;
+const NETWORK_ID = 11;
 const DOMAIN_FIELD_NAME = 'site_name';
 const REVENUE_FIELD = 'revenue';
 
@@ -75,7 +79,6 @@ const getDataFromPartner = function() {
 
 				const {iid, websites} = await axios(config)
 					.then(function(response) {
-						console.log(JSON.stringify(response.data));
 						return response.data;
 					})
 					.catch(function(error) {
@@ -84,11 +87,9 @@ const getDataFromPartner = function() {
 
 				// 3. Req for each date separately - time should be in millisecond
 				// Need to send requests in batches
-				console.log(websites, 'websites');
-				console.log(iid, 'iid');
 				const batchQueue = processReqInBatches(websites.map(item => item.site), headers);
 
-				process;
+				// process;
 				const queryParams = {
 					site: 'All%20Traffic',
 					startDate: '1614018600000',
@@ -183,7 +184,7 @@ const processDataReceivedFromPublisher = data => {
 };
 
 const fetchData = sitesData => {
-	const oftMediaPartnerModel = new partnerAndAdpushpModel(
+	const SovrnPartnerModel = new partnerAndAdpushpModel(
 		sitesData,
 		DOMAIN_FIELD_NAME,
 		REVENUE_FIELD
@@ -192,16 +193,16 @@ const fetchData = sitesData => {
 	console.log('Fetching data from Sovrn...');
 	return getDataFromPartner()
 		.then(async function(reportDataJSON) {
-			oftMediaPartnerModel.setPartnersData(reportDataJSON);
+			SovrnPartnerModel.setPartnersData(reportDataJSON);
 
 			// process and map sites data with publishers API data structure
-			oftMediaPartnerModel.mapAdPushupSiteIdAndDomainWithPartnersDomain();
+			SovrnPartnerModel.mapAdPushupSiteIdAndDomainWithPartnersDomain();
 			// Map PartnersData with AdPushup's SiteId mapping data
-			oftMediaPartnerModel.mapPartnersDataWithAdPushupSiteIdAndDomain();
+			SovrnPartnerModel.mapPartnersDataWithAdPushupSiteIdAndDomain();
 
 			// TBD - Remove hard coded dates after testing
 			const params = {
-				siteid: oftMediaPartnerModel.getSiteIds().join(','),
+				siteid: SovrnPartnerModel.getSiteIds().join(','),
 				network: 11,
 				fromDate: '2021-01-13',
 				toDate: '2021-01-19',
@@ -210,28 +211,36 @@ const fetchData = sitesData => {
 				dimension: 'siteid'
 			};
 
-			const adpData = await oftMediaPartnerModel.getDataFromAdPushup(params);
-			let finalData = oftMediaPartnerModel.compareAdPushupDataWithPartnersData(adpData);
+			const adpData = await SovrnPartnerModel.getDataFromAdPushup(params);
+			let finalData = SovrnPartnerModel.compareAdPushupDataWithPartnersData(adpData);
 
 			const {
 				PARTNERS_PANEL_INTEGRATION: { ANOMALY_THRESHOLD_IN_PER }
 			} = constants;
 			// filter out anomalies
-			const dataToSend = finalData.filter(
+			const anomalies = finalData.filter(
 				item =>
 					item.diffPer <= -ANOMALY_THRESHOLD_IN_PER || item.diffPer >= ANOMALY_THRESHOLD_IN_PER
 			);
-			console.log(JSON.stringify(dataToSend, null, 3), 'finalData');
+			// console.log(JSON.stringify(anomalies, null, 3), 'finalData');
 			console.log(finalData.length, 'finalData length');
-			console.log(dataToSend.length, 'dataToSend length');
-			// // if anmalies found
-			// if(dataToSend.length) {
-			//     emailer.anomaliesMailService(dataToSend)
-			// }
+			console.log(anomalies.length, 'anomalies length');
+
+			// if aonmalies found
+			if (anomalies.length) {
+				const dataToSend = SovrnPartnerModel.formatAnomaliesDataForSQL(anomalies, NETWORK_ID);
+				await Promise.all([
+					emailer.anomaliesMailService({
+						partner: PARTNER_NAME,
+						anomalies
+					}),
+					saveAnomaliesToDb(dataToSend)
+				]);
+			}
 		})
 		.catch(function(error) {
 			// handle error
-			console.log('error', 'errrr');
+			console.log('error', `err with ${PARTNER_NAME}`);
 		});
 };
 
