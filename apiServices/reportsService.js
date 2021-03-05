@@ -295,13 +295,11 @@ const reportsService = {
 			async () => reportsService.getWidgetData(path, params)
 		),
 	logReportUsage: async (email, reportConfig) => {
-		const config = reportConfig;
-
 		const todaysDate = moment().format('YYYY-MM-DD');
 		const docId = `${CC.docKeys.freqReports}${email}:${todaysDate}`;
 
 		const { value: todaysConfigDoc } = await getDoc('AppBucket', docId);
-		const reportKey = JSON.stringify(config);
+		const reportKey = JSON.stringify(reportConfig);
 
 		const existingCount = todaysConfigDoc.reportsLog
 			? todaysConfigDoc.reportsLog[reportKey] || 0

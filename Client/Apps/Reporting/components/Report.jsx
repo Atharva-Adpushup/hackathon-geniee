@@ -1178,7 +1178,7 @@ class Report extends Component {
 			updateReportConfig.scheduleOptions = scheduleOptions;
 		}
 		reportService
-			.updateSavedReport(updateReportConfig)
+			.updateSavedAndFrequentReports(updateReportConfig)
 			.then(res => {
 				const response = res.data.data;
 				const { savedReports, frequentReports } = response;

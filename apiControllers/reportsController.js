@@ -28,14 +28,13 @@ router
 			user: { originalEmail, email }
 		} = req;
 
-		const reportConfig = reportingConfig;
 		try {
 			const { cacheHit, data: reportsData } = await reportsService.getReportsWithCache(
-				reportConfig,
+				reportingConfig,
 				bypassCache === 'true'
 			);
 			if (cacheHit) setCacheHeaders(res);
-			await reportsService.logReportUsage(originalEmail || email, reportConfig);
+			await reportsService.logReportUsage(originalEmail || email, reportingConfig);
 			return sendSuccessResponse(reportsData, res, HTTP_STATUSES.OK);
 		} catch (err) {
 			return sendErrorResponse({ message: err.message }, res, HTTP_STATUSES.BAD_REQUEST);

@@ -19,6 +19,6 @@ export default {
 	getSavedAndFrequentReports: () => axiosInstance.get('/reports'),
 	saveReportConfig: reportConfig => axiosInstance.post('/reports', reportConfig),
 	deleteSavedReport: reportId => axiosInstance.delete(`reports/${reportId}`),
-	updateSavedReport: reportConfig =>
+	updateSavedAndFrequentReports: reportConfig =>
 		axiosInstance.patch(`/reports/${reportConfig.id}`, reportConfig)
 };

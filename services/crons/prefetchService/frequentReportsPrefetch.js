@@ -16,22 +16,18 @@ const COUNT_OF_REPORTS_TO_CACHE = 3;
 const COUNT_OF_CACHED_REPORTS_TO_SHOW = 3;
 
 const getModifiedDateConfig = config => {
-	const updatedConfig = _.cloneDeep(config);
 	let diffBetweenExistingDates = reportCacheDateInterval;
 
-	if (updatedConfig.fromDate && updatedConfig.toDate) {
-		diffBetweenExistingDates = moment(updatedConfig.toDate).diff(
-			moment(updatedConfig.fromDate),
-			'days'
-		);
+	if (config.fromDate && config.toDate) {
+		diffBetweenExistingDates = moment(config.toDate).diff(moment(config.fromDate), 'days');
 	}
 
-	updatedConfig.fromDate = moment()
+	config.fromDate = moment()
 		.subtract(diffBetweenExistingDates, 'days')
 		.format('YYYY-MM-DD');
-	updatedConfig.toDate = moment().format('YYYY-MM-DD');
+	config.toDate = moment().format('YYYY-MM-DD');
 
-	return updatedConfig;
+	return config;
 };
 
 const getDatesToProcessFrequentReports = () => {
@@ -46,7 +42,7 @@ const getDatesToProcessFrequentReports = () => {
 	return dates;
 };
 
-const orderLogsInDescOrder = (logs = {}, filterCount) => {
+const orderLogsByMostFrequent = (logs = {}, filterCount) => {
 	const sortedLogs = Object.entries(logs).sort(
 		([firstKey, firstCount], [secondKey, secondCount]) => {
 			return secondCount - firstCount;
@@ -58,6 +54,7 @@ const orderLogsInDescOrder = (logs = {}, filterCount) => {
 	return sortedLogs;
 };
 
+//This function fetches all the queries and then reduces them to produce unique queries with number of times each query was used
 const fetchAccessLogs = async (email, dates) => {
 	console.log(`Fetching access log for ${email}`);
 	const docIds = dates.map(date => `"${docKey}${email}:${date}"`);
@@ -71,20 +68,21 @@ const fetchAccessLogs = async (email, dates) => {
 		console.log(`---- LOGS FOUND FOR ${email} ----`);
 		// merge similar logs from multiple days so that each entry has cumulative count
 		const mergedLogs = data.reduce((result, entry) => {
-			const values = result;
 			Object.keys(entry).forEach(key => {
-				if (values[key]) {
-					values[key] += entry[key];
+				if (result[key]) {
+					result[key] += entry[key];
 				} else {
-					values[key] = entry[key];
+					result[key] = entry[key];
 				}
 			});
-			return values;
+			return result;
 		}, {});
 		return {
+			email,
 			results: mergedLogs
 		};
 	}
+	// We prepare the parameters and make the API call. The API call is configured to cache the results on its end
 	console.log(`--------- NO LOGS FOUND FOR ${email} --------`);
 	return {};
 };
@@ -118,13 +116,22 @@ const cacheReportsForUser = async (email, reportConfigs) => {
 		.for(reportConfigs)
 		.process(fetchAndCacheReport)
 		.then(({ results }) => {
-			const successfulCachedConfigs = results
-				.filter(result => !result.error)
-				.map(result => result.log);
-			const errorConfigs = results
-				.filter(result => result.error)
-				.map(result => ({ config: result.config, err: result.err, timeTaken: result.timeTaken }));
+			for (let i = 0; i < results.length; i++) {
+				const currentResult = results[i];
+				if (result.error) {
+					errorConfigs.push({
+						config: currentResult.config,
+						err: currentResult.err,
+						timeTaken: currentResult.timeTaken
+					});
+				} else {
+					successfulCachedConfigs.push(currentResult.log);
+				}
+			}
 			console.log({ email, results, successfulCachedConfigs, errorConfigs });
+			let successfulCachedConfigs = [],
+				errorConfigs = [];
+
 			return { email, reports: successfulCachedConfigs, errorLogs: errorConfigs };
 		});
 };
@@ -176,7 +183,7 @@ const saveCachedFrequentReports = log => {
 			};
 			const upsertQuery = `UPSERT INTO ${bucketName} (KEY, VALUE) VALUES("rprt::${email}", ${JSON.stringify(
 				newRprtDoc
-			)}) RETURNING *`;
+			)}) RETURNING`;
 			console.log({ newRprtDoc });
 			return couchbaseService.queryViewFromAppBucket(couchbase.N1qlQuery.fromString(upsertQuery));
 		});
@@ -211,9 +218,16 @@ const savedCachedLogsInCb = async cachedLogs => {
 };
 
 const preprocessLogs = async logs => {
-	return logs
-		.filter(log => Object.keys(log).length)
-		.map(log => ({ ...log, results: orderLogsInDescOrder(log.results) }));
+	const processedLogs = logs.reduce((allLogsResult, currentLogs) => {
+		if (Object.keys(currentLogs).length) {
+			allLogsResult.push({
+				...currentLogs,
+				results: orderLogsByMostFrequent(currentLogs.results)
+			});
+		}
+		return allLogsResult;
+	}, []);
+	return processedLogs;
 };
 
 const cacheFrequentReports = () => {

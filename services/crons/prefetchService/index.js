@@ -28,7 +28,10 @@ let toDate;
 
 function getCustomStatsData(params) {
 	const { siteid = '' } = params;
-	//As we have to fetch customStats data site level as well as for combined site all
+	//As we have to fetch customStats data site level as well as for combined site
+	/*
+	Example if siteid is '42134,32156' than sites array should be ['42134','32156','42134,32156']
+	*/
 	const sites = (siteid.split(',').length > 1 && siteid.split(',')) || [];
 	sites.push(siteid);
 
@@ -63,7 +66,7 @@ function getWidgetData(params, path) {
 	const { siteid = '', isSuperUser = false } = params;
 	const sites = (siteid.split(',').length > 1 && siteid.split(',')) || [];
 	sites.push(siteid);
-	function getSiteLevelWidgetData(site) {
+	function getAllWidgetDataForSiteLevel(site) {
 		//As global reports api does not send siteid
 		if (!isSuperUser) {
 			paramsNew = { ...params, siteid: site };
@@ -81,7 +84,7 @@ function getWidgetData(params, path) {
 	return promisePool
 		.for(sites)
 		.withConcurrency(1)
-		.process(getSiteLevelWidgetData);
+		.process(getAllWidgetDataForSiteLevel);
 }
 
 function preFetchWidgetData(allSites) {

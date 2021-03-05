@@ -27,9 +27,11 @@ function getActiveUsers() {
 
 function getAllUsersForFreqReportsLog() {
 	const query = `select email from AppBucket where meta().id like "freq:%"`;
-	return couchbase
-		.queryViewFromAppBucket(N1qlQuery.fromString(query))
-		.then(data => Array.from(new Set(data.map(({ email }) => email))).filter(email => !!email));
+	return couchbase.queryViewFromAppBucket(N1qlQuery.fromString(query)).then(data => {
+		const userDataSet = new Set(data.map(({ email }) => email));
+		const userDataArray = Array.from(userDataSet);
+		return userDataArray.filter(email => !!email);
+	});
 }
 
 function getUserSites(ownerEmail) {
