@@ -86,8 +86,7 @@ async function generateEmailTemplate(base, template, params) {
 	const file = path.join(__dirname, `../${base}/templates/${template}.ejs`);
 
 	// Throw an error if the file path can't be found
-	if (!file) {
-		 throw new Error(`Could not find the ${template} in path ${file}`);
+	if (!file) throw new Error(`Could not find the ${template} in path ${file}`);
 	const result = await ejs.renderFile(file, params, { async: true });
 	return result;
 }
@@ -113,7 +112,7 @@ async function uploadImageToAzure(blobClientName, fileStream) {
 		await blobclient.upload(fileStream, fileStream.length);
 		console.log('succesfully uploaded image');
 	} catch (error) {
-		throw new Error(`Error in uploading image:${error}`)
+		throw new Error(`Error in uploading image:${error}`);
 	}
 }
 
@@ -130,7 +129,7 @@ function getBase64Image(body) {
 			return response;
 		})
 		.catch(error => {
-			throw new Error(`Error in generating image:${error}`)
+			throw new Error(`Error in generating image:${error}`);
 		});
 }
 
