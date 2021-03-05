@@ -49,14 +49,24 @@ var request = require('request-promise'),
 				strictSSL: false,
 				resolveWithFullResponse: !!fullResponse,
 				headers: {
-					// 'User-Agent': userAgent,
+					'User-Agent': userAgent,
 					'Accept-Encoding': 'identity'
 				}
-			}).catch(err => {
-				if (err && err.message.indexOf('I really need an ID for this to work') === -1) {
-					return false;
-				}
-				return true;
+			}).catch(() => {
+				return request({
+					uri: url,
+					jar: true,
+					strictSSL: false,
+					resolveWithFullResponse: !!fullResponse,
+					headers: {
+						'Accept-Encoding': 'identity'
+					}
+				}).catch(err => {
+					if (err && err.message.indexOf('I really need an ID for this to work') === -1) {
+						return false;
+					}
+					return true;
+				});
 			});
 		},
 		detectCustomAp(url, siteId) {
