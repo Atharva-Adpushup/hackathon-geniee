@@ -49,11 +49,18 @@ const getDataFromPartner = function() {
 			// 2. Get Report Id
 			const queryParams = {
 				report: {
-					report_type: 'publisher_analytics',
-					report_interval: 'yesterday',
-					columns: ['day', 'clicks', 'publisher_revenue', 'site_id', 'site_name'],
-					orders: [{ order_by: 'day', direction: 'ASC' }],
-					format: 'csv'
+					"report_type": "publisher_analytics",
+					"start_date": "2021-03-03",
+					"end_date": "2021-03-04",
+					"columns": ["day","clicks", "publisher_revenue", "site_id", "site_name"],
+					"orders": [{"order_by":"day", "direction":"ASC"}],
+					"format": "csv",
+					"timezone":"PST8PDT"
+					// report_type: 'publisher_analytics',
+					// report_interval: 'yesterday',
+					// columns: ['day', 'clicks', 'publisher_revenue', 'site_id', 'site_name'],
+					// orders: [{ order_by: 'day', direction: 'ASC' }],
+					// format: 'csv'
 				}
 			};
 			const headers = {
@@ -76,9 +83,7 @@ const getDataFromPartner = function() {
 					params: {
 						id: reportMetaData.report_id
 					},
-					headers: {
-						Authorization: `${token}`
-					}
+					headers
 				})
 				.then(response => response.data);
 			return await csv().fromString(reportData);

@@ -20,8 +20,12 @@ const authParams = {
     "apiProduct" : "PUBLISHER"
 };
 
-const fromDate = moment().subtract(2, "days").format("YYYY-MM-DD");
-const toDate = fromDate;
+const date = moment().subtract(2, "days");
+const fromDatePubmatic = date.format("YYYY-MM-DDT00:00");
+const toDatePubmatic = date.format("YYYY-MM-DDT23:59");
+
+const fromDate = date.format("YYYY-MM-DD")
+const toDate = date.format("YYYY-MM-DD")
 
 // response
 /**
@@ -63,9 +67,11 @@ const getDataFromPartner = function() {
                 metrics:'netRevenue,paidImpressions,ecpm',
                 pageSize:'',
                 sort:'-netRevenue',
-                fromDate,
-                toDate
+                fromDate: fromDatePubmatic,
+				toDate: toDatePubmatic,
+				timeZone: "PST"
 			};
+			console.log(queryParams, 'queryParams')
 			const headers = {
 				Authorization: `Bearer ${token}`
             };

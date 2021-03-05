@@ -24,7 +24,8 @@ const queryParams = {
 	currency: 'USD',
 	metrics: 'Revenue,CriteoDisplays',
 	begindate: fromDate,
-	enddate: toDate
+	enddate: toDate,
+	timezone:'PST'
 };
 
 /**
