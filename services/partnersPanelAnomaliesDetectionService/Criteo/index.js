@@ -1,5 +1,5 @@
 const axios = require('axios');
-const csv = require('csvtojson');
+const moment = require('moment');
 
 const partnerAndAdpushpModel = require('../PartnerAndAdpushpModel');
 const constants = require('../../../configs/commonConsts');
@@ -13,14 +13,18 @@ const PARTNER_NAME = `Criteo`;
 const NETWORK_ID = 20;
 const DOMAIN_FIELD_NAME = 'Domain';
 const REVENUE_FIELD = 'Revenue';
+
+const fromDate = moment().subtract(2, "days").format("YYYY-MM-DD");
+const toDate = fromDate;
+
 // TBD - remove hard coded dates
 const queryParams = {
 	dimensions: 'domain',
 	generator: 'daily',
 	currency: 'USD',
 	metrics: 'Revenue,CriteoDisplays',
-	begindate: '2021-01-19',
-	enddate: '2021-01-19'
+	begindate: fromDate,
+	enddate: toDate
 };
 
 /**
@@ -53,8 +57,8 @@ const fetchData = async sitesData => {
 			const params = {
 				siteid: CriteoPartnerModel.getSiteIds().join(','),
 				network: NETWORK_ID,
-				fromDate: '2021-01-19',
-				toDate: '2021-01-19',
+				fromDate,
+				toDate,
 				interval: 'daily',
 				// // siteid:40792,
 				dimension: 'siteid'

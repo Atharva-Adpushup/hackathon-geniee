@@ -1,4 +1,5 @@
 const axios = require('axios');
+const moment = require('moment');
 const csv = require('csvtojson');
 
 const partnerAndAdpushpModel = require('../PartnerAndAdpushpModel');
@@ -12,6 +13,9 @@ const PARTNER_NAME = `AppNexus/OFT`;
 const NETWORK_ID = 11;
 const DOMAIN_FIELD_NAME = 'site_name';
 const REVENUE_FIELD = 'publisher_revenue';
+
+const fromDate = moment().subtract(1, "days").format("YYYY-MM-DD");
+const toDate = fromDate;
 
 const authParams = {
 	auth: {
@@ -46,7 +50,7 @@ const getDataFromPartner = function() {
 			const queryParams = {
 				report: {
 					report_type: 'publisher_analytics',
-					report_interval: 'last_7_days',
+					report_interval: 'yesterday',
 					columns: ['day', 'clicks', 'publisher_revenue', 'site_id', 'site_name'],
 					orders: [{ order_by: 'day', direction: 'ASC' }],
 					format: 'csv'
@@ -102,10 +106,9 @@ const fetchData = sitesData => {
 			const params = {
 				siteid: OFTMediaPartnerModel.getSiteIds().join(','),
 				network: NETWORK_ID,
-				fromDate: '2021-02-24',
-				toDate: '2021-03-02',
+				fromDate,
+				toDate,
 				interval: 'daily',
-				// siteid:40792,
 				dimension: 'siteid'
 			};
 
