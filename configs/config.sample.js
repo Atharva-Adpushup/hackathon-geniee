@@ -180,6 +180,17 @@ module.exports = {
 				name: 'adsenseAdSync',
 				options: { durable: true }
 			}
+		},
+		AMP_SCRIPT_SYNC: {
+			EXCHANGE: {
+				name: 'ampScriptSync',
+				type: 'direct',
+				options: { durable: true }
+			},
+			QUEUE: {
+				name: 'ampScriptSync',
+				options: { durable: true }
+			}
 		}
 	},
 	sqlDatabases: {
