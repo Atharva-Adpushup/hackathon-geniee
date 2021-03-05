@@ -130,11 +130,15 @@ async function preFetchAllGlobalData() {
 }
 
 async function preFetchAllData(ownerEmail) {
-	console.log({ ownerEmail });
-	const allSites = await getUserSites(ownerEmail);
-	await preFetchMeta(allSites);
-	await preFetchCustomStats(allSites);
-	await preFetchWidgetData(allSites);
+	try {
+		console.log({ ownerEmail });
+		const allSites = await getUserSites(ownerEmail);
+		await preFetchMeta(allSites);
+		await preFetchCustomStats(allSites);
+		await preFetchWidgetData(allSites);
+	} catch (error) {
+		console.log(error);
+	}
 }
 
 function getAllUsersData() {
