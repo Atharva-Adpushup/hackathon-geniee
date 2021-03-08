@@ -822,7 +822,7 @@ function apiModule() {
 									siteId: site.get('siteId'),
 									step: site.get('step'),
 									channels: site.get('channels'),
-									apConfigs:site.get('apConfigs')
+									apConfigs: site.get('apConfigs')
 								};
 							})
 							.catch(function() {
@@ -830,7 +830,8 @@ function apiModule() {
 									domain: site.domain,
 									siteId: site.siteId,
 									step: site.step,
-									channels: []
+									channels: [],
+									apConfigs: {}
 								};
 							});
 					});

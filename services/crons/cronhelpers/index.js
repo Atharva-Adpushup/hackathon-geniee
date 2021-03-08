@@ -18,8 +18,6 @@ function getActiveUsers() {
 }
 
 function getUserSites(ownerEmail) {
-	let siteid = [];
-
 	return userModel
 		.getUserByEmail(ownerEmail)
 		.then(user => {
@@ -48,7 +46,7 @@ function sendEmail(body) {
 		});
 }
 
-function getWidgetsDataSite(params) {
+function getSiteWidgetData(params) {
 	return request({
 		uri: `${BASE_URL}/api/reports/getWidgetData`,
 		json: true,
@@ -63,7 +61,7 @@ function getWidgetsDataSite(params) {
 	}).then(response => {
 		if (response.statusCode == 200 && response.body) {
 			console.log('fetched widget');
-			return Promise.resolve(response.body);
+			return response.body;
 		}
 		throw new Error('Invalid widget data');
 	});
@@ -101,7 +99,10 @@ const numberWithCommas = x => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 
 async function uploadImageToAzure(blobClientName, fileStream) {
 	try {
-		const STORAGE_CONNECTION_STRING = config.weeklyDailySnapshots.CONNECTION_STRING || '';
+		const STORAGE_CONNECTION_STRING = config.weeklyDailySnapshots.CONNECTION_STRING;
+		if (!STORAGE_CONNECTION_STRING) {
+			throw new Error(`Connection string does not exist`);
+		}
 		const blobServiceClient = await BlobServiceClient.fromConnectionString(
 			STORAGE_CONNECTION_STRING
 		);
@@ -124,19 +125,15 @@ function getBase64Image(body) {
 		}`,
 		json: true,
 		body: { ...body }
-	})
-		.then(response => {
-			return response;
-		})
-		.catch(error => {
-			throw new Error(`Error in generating image:${error}`);
-		});
+	}).catch(error => {
+		throw new Error(`Error in generating image:${error}`);
+	});
 }
 
 module.exports = {
 	getUserSites,
 	getActiveUsers,
-	getWidgetsDataSite,
+	getSiteWidgetData,
 	getLastRunInfo,
 	generateEmailTemplate,
 	roundOffTwoDecimal,
