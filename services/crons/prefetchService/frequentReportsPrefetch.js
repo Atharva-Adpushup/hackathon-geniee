@@ -116,6 +116,8 @@ const cacheReportsForUser = async (email, reportConfigs) => {
 		.for(reportConfigs)
 		.process(fetchAndCacheReport)
 		.then(({ results }) => {
+			let successfulCachedConfigs = [],
+				errorConfigs = [];
 			for (let i = 0; i < results.length; i++) {
 				const currentResult = results[i];
 				if (result.error) {
@@ -129,8 +131,6 @@ const cacheReportsForUser = async (email, reportConfigs) => {
 				}
 			}
 			console.log({ email, results, successfulCachedConfigs, errorConfigs });
-			let successfulCachedConfigs = [],
-				errorConfigs = [];
 
 			return { email, reports: successfulCachedConfigs, errorLogs: errorConfigs };
 		});
@@ -183,7 +183,7 @@ const saveCachedFrequentReports = log => {
 			};
 			const upsertQuery = `UPSERT INTO ${bucketName} (KEY, VALUE) VALUES("rprt::${email}", ${JSON.stringify(
 				newRprtDoc
-			)}) RETURNING`;
+			)})`;
 			console.log({ newRprtDoc });
 			return couchbaseService.queryViewFromAppBucket(couchbase.N1qlQuery.fromString(upsertQuery));
 		});
