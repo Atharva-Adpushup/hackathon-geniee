@@ -33,12 +33,12 @@ function getChartImageOptions() {
 	};
 }
 
-async function generateImageSourcePath(imgOptions, chartOptions, imagPath) {
+async function generateImageSourcePath(imgOptions, chartOptions, imagePath) {
 	const newOptions = { ...imgOptions, options: { ...chartOptions } };
 	const base64Data = await getBase64Image(newOptions);
 	const buffer = await Buffer.from(base64Data, 'base64');
 	await uploadImageToAzure(imagPath, buffer);
-	return `${config.weeklyDailySnapshots.BASE_PATH}${imagPath}`;
+	return `${config.weeklyDailySnapshots.BASE_PATH}${imagePath}`;
 }
 
 //required
@@ -200,7 +200,7 @@ module.exports = {
 				return reportData;
 			})
 			.catch(error => {
-				return Promise.reject(new Error(`Error in creating images using highcharts${error}`));
+				throw new Error(`Error in creating images using highcharts${error}`);
 			});
 	}
 };

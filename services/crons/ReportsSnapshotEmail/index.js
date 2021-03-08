@@ -168,7 +168,7 @@ async function sendSnapshot(siteids, userEmail, type) {
 			'reporting',
 			ejsTemplateData
 		);
-		const subjectMessage = `Adpushup dashboard reporting ${type} snapshot`;
+		const subjectMessage = `Adpushup ${type} dashboard reporting snapshot `;
 		sendEmail({
 			queue: 'MAILER',
 			data: {
