@@ -109,7 +109,7 @@ async function getEmailSnapshotsSites(userEmail) {
 				apConfigs: { isWeeklyEmailReportsEnabled = false, isDailyEmailReportsEnabled = false } = {},
 				siteId
 			} = site;
-			const { dailySubscribedSites, weeklySubscribedSites } = allSites;
+			let { dailySubscribedSites, weeklySubscribedSites } = allSites;
 			if (isDailyEmailReportsEnabled) {
 				dailySubscribedSites = index === 0 ? `${siteId}` : `${dailySubscribedSites},${siteId}`;
 			}
