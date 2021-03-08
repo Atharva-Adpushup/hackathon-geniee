@@ -20,7 +20,7 @@ const prebidGeneration = require('./prebidGeneration');
 const createWorkerBundle = require('./createWorkerBundle');
 
 const request = require('request-promise');
-const disableSiteCdnSyncList = [38333];
+const disableSiteCdnSyncList = [];
 // NOTE: Above 'disableSiteCdnSyncList' array is added to prevent site specific JavaScript CDN sync
 // as custom generated Javascript files will replace their existing live files for new feature testing purposes.
 // Websites: autocarindia (38333, It is running adpushup lite for which script is uploaded to CDN manually, for now)
