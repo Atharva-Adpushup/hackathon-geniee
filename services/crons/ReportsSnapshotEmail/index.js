@@ -235,6 +235,7 @@ function startEmailSnapshotsService() {
 			isCronServiceRunning = false;
 		})
 		.catch(err => {
+			console.timeEnd();
 			console.error(err);
 		});
 }

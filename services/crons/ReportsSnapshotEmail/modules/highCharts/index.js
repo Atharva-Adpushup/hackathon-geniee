@@ -9,6 +9,7 @@ function generateImageUploadPath(metaData) {
 	const { fromReportingDate = '', toReportingDate = '', type = '', siteids = '' } = metaData;
 	let imageUploadPath = `${fromReportingDate}-${toReportingDate}-${type}-${siteids}`;
 	imageUploadPath = imageUploadPath.replace(/ /g, '-').replace(/,/g, '-');
+	return imageUploadPath;
 }
 
 function addHighChartsObject(inputData, metaData) {
@@ -33,11 +34,11 @@ function getChartImageOptions() {
 	};
 }
 
-async function generateImageSourcePath(imgOptions, chartOptions, imagePath) {
+async function processChartAndgGiveUploadPath(imgOptions, chartOptions, imagePath) {
 	const newOptions = { ...imgOptions, options: { ...chartOptions } };
 	const base64Data = await getBase64Image(newOptions);
 	const buffer = await Buffer.from(base64Data, 'base64');
-	await uploadImageToAzure(imagPath, buffer);
+	await uploadImageToAzure(imagePath, buffer);
 	return `${config.weeklyDailySnapshots.BASE_PATH}${imagePath}`;
 }
 
@@ -95,7 +96,7 @@ async function uploadCPMChartAndGetSourcePath(inputData, imageUploadPath) {
 	const computedState = computeGraphData(APvsBaseline.result || []);
 	const chartConfig = { ...LINE_CHART_CONFIG, ...computedState };
 	const imageOptions = getChartImageOptions();
-	const imageSourcePath = await generateImageSourcePath(
+	const imageSourcePath = await processChartAndgGiveUploadPath(
 		imageOptions,
 		chartConfig,
 		imageUploadPath + 'cpm.png'
@@ -147,7 +148,7 @@ async function uploadAdNetworkPieChartAndGetSourcePath(inputData, imageUploadPat
 	});
 	chartConfig.series = computedState || {};
 	const imageOptions = getChartImageOptions();
-	const imageSourcePath = await generateImageSourcePath(
+	const imageSourcePath = await processChartAndgGiveUploadPath(
 		imageOptions,
 		chartConfig,
 		imageUploadPath + 'network.png'
@@ -168,7 +169,7 @@ async function uploadCountryPieChartAndGetSourcePath(inputData, imageUploadPath)
 	});
 	chartConfig.series = computedState || {};
 	const imageOptions = getChartImageOptions();
-	const imageSourcePath = await generateImageSourcePath(
+	const imageSourcePath = await processChartAndgGiveUploadPath(
 		imageOptions,
 		chartConfig,
 		imageUploadPath + 'country.png'
@@ -178,7 +179,7 @@ async function uploadCountryPieChartAndGetSourcePath(inputData, imageUploadPath)
 
 module.exports = {
 	generateAndProcessCharts: (inputData, metaData) => {
-		const { resultData: reportData, imageUploadPath } = addHighChartsObject(inputData, metaData),
+		const { inputData: reportData, imageUploadPath } = addHighChartsObject(inputData, metaData),
 			getCPMLineSourcePath = uploadCPMChartAndGetSourcePath(reportData, imageUploadPath),
 			getAdNetworkRevenuePieSourcePath = uploadAdNetworkPieChartAndGetSourcePath(
 				reportData,

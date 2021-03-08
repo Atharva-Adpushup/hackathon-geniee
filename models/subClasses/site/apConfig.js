@@ -29,8 +29,7 @@ const ApConfig = {
 		'mergeReport',
 		'enableGAAnalytics',
 		'isDailyEmailReportsEnabled',
-		'isWeeklyEmailReportsEnabled',
-		'weeklyEmailEnableTimeStamp'
+		'isWeeklyEmailReportsEnabled'
 	],
 	override: [
 		'mode',
@@ -62,8 +61,7 @@ const ApConfig = {
 		'mergeReport',
 		'enableGAAnalytics',
 		'isDailyEmailReportsEnabled',
-		'isWeeklyEmailReportsEnabled',
-		'weeklyEmailEnableTimeStamp'
+		'isWeeklyEmailReportsEnabled'
 	],
 	merge: []
 };
