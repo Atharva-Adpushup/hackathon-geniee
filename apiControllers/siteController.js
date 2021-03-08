@@ -428,10 +428,6 @@ router
 	.post('/saveSettings', (req, res) => {
 		const { email, originalEmail } = req.user;
 		const { siteId, apConfigs, adNetworkSettings, dataForAuditLogs } = req.body;
-		const { isWeeklyEmailReportsEnabled = false } = apConfigs;
-		if (isWeeklyEmailReportsEnabled) {
-			apConfigs.weeklyEmailEnableTimeStamp = moment().format();
-		}
 		return verifyOwner(siteId, email)
 			.then(site => {
 				const prevApConfigs = site.get('apConfigs');
