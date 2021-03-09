@@ -8,7 +8,7 @@ const { roundOffTwoDecimal, uploadImageToAzure, getBase64Image } = require('../.
 function generateImageUploadPath(metaData) {
 	const { fromReportingDate = '', toReportingDate = '', type = '', siteids = '' } = metaData;
 	let imageUploadPath = `${fromReportingDate}-${toReportingDate}-${type}-${siteids}`;
-	imageUploadPath = imageUploadPath.replace(/ /g, '-').replace(/,/g, '-');
+	imageUploadPath = imageUploadPath.replace(/ /g, '-');
 	return imageUploadPath;
 }
 
@@ -159,7 +159,7 @@ async function uploadAdNetworkPieChartAndGetSourcePath(inputData, imageUploadPat
 //required
 async function uploadCountryPieChartAndGetSourcePath(inputData, imageUploadPath) {
 	const chartConfig = extend(true, {}, PIE_CHART_CONFIG);
-	const { countryReport: { result = [] } = {} } = inputData;
+	const { countryReports: { result = [] } = {} } = inputData;
 	const computedState = computeDisplayData({
 		result,
 		chartLegend: 'Country',
