@@ -8,7 +8,7 @@ const { roundOffTwoDecimal, uploadImageToAzure, getBase64Image } = require('../.
 function generateImageUploadPath(metaData) {
 	const { fromReportingDate = '', toReportingDate = '', type = '', siteids = '' } = metaData;
 	let imageUploadPath = `${fromReportingDate}-${toReportingDate}-${type}-${siteids}`;
-	imageUploadPath = imageUploadPath.replace(/ /g, '-');
+	imageUploadPath = imageUploadPath.replace(/ /g, '_').replace(/,/g, '_');
 	return imageUploadPath;
 }
 
