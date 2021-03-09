@@ -138,14 +138,19 @@ var auction = {
 		for (var bidderCode in bidders) {
 			var revenueShare = parseFloat(bidders[bidderCode].revenueShare);
 
-			if (
-				bidders.hasOwnProperty(bidderCode) &&
-				bidders[bidderCode].bids === 'gross' &&
-				!isNaN(revenueShare)
-			) {
+			if (bidders.hasOwnProperty(bidderCode)) {
 				bidderSettings[bidderCode] = {
 					bidCpmAdjustment: function(bidCpm) {
-						return bidCpm - bidCpm * (this.revenueShare / 100);
+						var revShareAdjustedCpm = bidCpm;
+						if (bidders[bidderCode].bids === 'gross' && !isNaN(revenueShare)) {
+							revShareAdjustedCpm = bidCpm - bidCpm * (this.revenueShare / 100);
+						}
+
+						if (window.adpushup.shouldInflateBid) {
+							var inflatedCpm = utils.inflateBidCpm(revShareAdjustedCpm);
+							return inflatedCpm;
+						}
+						return revShareAdjustedCpm;
 					}.bind({ revenueShare: revenueShare })
 				};
 			}
