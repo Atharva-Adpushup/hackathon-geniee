@@ -172,7 +172,11 @@ const fetchData = sitesData => {
 				]);
 			}
 		})
-		.catch(function(error) {
+		.catch(async function(error) {
+			await emailer.serviceErrorNotificationMailService({
+				partner: PARTNER_NAME,
+				error
+			})
 			// handle error
 			console.log('error', `err with ${PARTNER_NAME}`);
 		});

@@ -446,39 +446,63 @@ var auth = new OAuth({
         secret: 'd457b1ff100015ca3a7dd1d1ed7972aa455231a9'
     }
 })
-const reqObj = auth.authorize({
-    method: 'post',
-    url:'https://sso.openx.com/api/index/initiate'
-});
+// const reqObj = auth.authorize({
+//     method: 'post',
+//     url:'https://sso.openx.com/api/index/initiate'
+// });
 
-// const params = {foo: "hi there", bar: "100%" };
-const querystring = require('querystring')
-const result = querystring.stringify(reqObj)
-console.log(result);
+// // const params = {foo: "hi there", bar: "100%" };
+// const querystring = require('querystring')
+// const result = querystring.stringify(reqObj)
+// console.log(result);
 
-// // OAuth oauth_consumer_key="3886c1427947cac75c7034db82f590d01bc826d6",oauth_signature_method="HMAC-SHA1",oauth_timestamp="1614339633",oauth_callback="oob",oauth_nonce="123",oauth_version="1.0",oauth_signature="eVZGyAWnuxJZzCgMBvBi0Yy%2Fdk0%3D"
-var axios = require('axios');
+// // // OAuth oauth_consumer_key="3886c1427947cac75c7034db82f590d01bc826d6",oauth_signature_method="HMAC-SHA1",oauth_timestamp="1614339633",oauth_callback="oob",oauth_nonce="123",oauth_version="1.0",oauth_signature="eVZGyAWnuxJZzCgMBvBi0Yy%2Fdk0%3D"
+// var axios = require('axios');
 
-var config = {
-  method: 'post',
-  url: `https://sso.openx.com/api/index/initiate?${result}`,
-  headers: { 
-    'Content-Type': 'application/json',
-    'Cookie': 'PHPSESSID=09sl7anshrv8k30mqr98q6aqs2'
-  }
-};
+// var config = {
+//   method: 'post',
+//   url: `https://sso.openx.com/api/index/initiate?${result}`,
+//   headers: { 
+//     'Content-Type': 'application/json',
+//     'Cookie': 'PHPSESSID=09sl7anshrv8k30mqr98q6aqs2'
+//   }
+// };
 
-axios(config)
-.then(response => response.data)
-.then(function (response) {
-    const resObj = {};
-    response.split('&').map(item => {
-        const [key, val] = item.split('=');
-        resObj[key] = val
-        return item;
-    });
-    console.log(resObj, 'resObj')
-})
-.catch(function (error) {
-  console.log(error);
-});
+// axios(config)
+// .then(response => response.data)
+// .then(function (response) {
+//     const resObj = {};
+//     response.split('&').map(item => {
+//         const [key, val] = item.split('=');
+//         resObj[key] = val
+//         return item;
+//     });
+//     console.log(resObj, 'resObj')
+// })
+// .catch(function (error) {
+//   console.log(error);
+// });
+
+
+const PromisePool = require('@supercharge/promise-pool')
+
+const users = [
+  { name: 'Marcus' },
+  { name: 'Norman' },
+  { name: 'Christian' }
+]
+const asyncFunc = async () => {
+
+    const { results, errors } = await PromisePool
+      .withConcurrency(2)
+      .for(users)
+      .process(async data => {
+          console.log(data, 'in processs')
+        // const user = await User.createIfNotExisting(data)
+    
+        return 'user - ' + data.name
+      })
+    
+      console.log(results, errors)
+}
+asyncFunc();

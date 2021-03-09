@@ -1,6 +1,7 @@
 const axios = require('axios');
 const moment = require('moment');
 const _ = require('lodash');
+const PromisePool = require('@supercharge/promise-pool')
 
 const partnerAndAdpushpModel = require('../PartnerAndAdpushpModel');
 const constants = require('../../../configs/commonConsts');
@@ -11,7 +12,7 @@ const AUTH_ENDPOINT = `https://auth.indexexchange.com/auth/oauth/token`;
 const API_ENDPOINT = `https://api01.indexexchange.com/api`;
 
 const PARTNER_NAME = `IndexExchange`;
-const NETWORK_ID = 79;
+const NETWORK_ID = 21;
 const DOMAIN_FIELD_NAME = 'site_name';
 const REVENUE_FIELD = 'earnings';
 
@@ -20,7 +21,7 @@ const authParams = {
 	key: 'iGY05Af7QidctaFx9gm9u4uNaNzl+Lo6'
 };
 
-const fromDate = moment().subtract(2, "days").format("YYYY-MM-DD");
+const fromDate = moment().subtract(7, "days").format("YYYY-MM-DD");
 const toDate = fromDate;
 
 /**
@@ -34,16 +35,16 @@ const toDate = fromDate;
 // 2. Get Placement info
 // 3. Get Sites data based on Placement Ids
 // 4. Get earnings from siteIds
-const getDataFromPartner = function() {
+const getDataFromPartner = function () {
 	// 1. Get Auth token before each req
 	return axios
 		.post(`${AUTH_ENDPOINT}`, authParams)
 		.then(response => response.data.data)
-		.then(function(data) {
+		.then(function (data) {
 			const { accessToken } = data;
 			return accessToken;
 		})
-		.then(async function(token) {
+		.then(async function (token) {
 			console.log('Got Auth token before req....', token);
 
 			const headers = {
@@ -61,24 +62,23 @@ const getDataFromPartner = function() {
 			const queue = [];
 			placementData.forEach(placement => {
 				for (let i = 0; i < placement.siteID.length; i++) {
-					queue.push({
-						placementID: placement.placementID,
-						siteID: placement.siteID[i]
-					});
+					if(siteIdsAndNameMappingFromPubData[placement.siteID[i]]) {
+						queue.push({
+							placementID: placement.placementID,
+							siteID: placement.siteID[i]
+						});
+					}
 				}
 			});
 
-			// create batches
-			const batchQueue = processReqInBatches(queue, headers);
+			// process batches
 			console.log('Processing batches.....')
-			return Promise.all(batchQueue).then(response => {
-				console.log('All done!');
-				return processDataReceivedFromPublisher(response, siteIdsAndNameMappingFromPubData);
-			});
+			const { results, errors } = await processReqInBatches(queue, headers);
+			return processDataReceivedFromPublisher(results, siteIdsAndNameMappingFromPubData);
 		})
-		.catch(function(error) {
+		.catch(function (error) {
 			// handle error
-			console.log(error.message, 'error token data', 'errrr');
+			console.log(error, 'error token data', 'errrr');
 		});
 };
 
@@ -126,7 +126,7 @@ const getPlacementData = async headers => {
 const getAllSitesInfo = headers => {
 	var config = {
 		method: 'get',
-		url: `${API_ENDPOINT}/publishers/sites/info?status=["A", "D", "N"]`,
+		url: `${API_ENDPOINT}/publishers/sites/info?status=["A", "N"]`,
 		headers
 	};
 
@@ -134,75 +134,69 @@ const getAllSitesInfo = headers => {
 		.then(response => response.data)
 		.then(response => {
 			const obj = {};
-			response.data.forEach(item => {
+			response.data
+			.filter(item => !(/(AR)\/\d+_/.test(item.name)))
+			.forEach(item => {
 				obj[item.siteID] = item.name;
 			});
 			return obj;
 		});
 };
 
-const processReqInBatches = (queue, headers) => {
-	let count = 0;
-	const batchSize = 100;
-	let endIndex = batchSize;
-	// To Be Removed after testing
-	// queue.splice(1000);
-	let batchQueue = [];
-	for (let i = 0; i < queue.length; i = i + batchSize) {
-		count++;
-		const batch = queue.slice(i, endIndex);
-		endIndex += batchSize;
+const processReqInBatches = async (queue, headers) => {
+	const batchSize = 50;
 
-		function processBatch(batch) {
-			let promiseQueue = [];
-			for (const item of batch) {
-				const data = {
-					filters: {
-						startDate: fromDate,
-						endDate: toDate,
-						placementID: [item.placementID],
-						siteID: [item.siteID]
+	return await PromisePool
+		.withConcurrency(batchSize)
+		.for(queue)
+		.process(async item => {
+			const data = {
+				filters: {
+					startDate: fromDate,
+					endDate: toDate,
+					placementID: [item.placementID],
+					siteID: [item.siteID]
+				},
+				aggregation: 'day'
+			};
+
+			let config = {
+				method: 'post',
+				url: `${API_ENDPOINT}/publishers/stats/earnings/open`,
+				data,
+				headers
+			};
+			console.log('Processing....')
+			const apiResponse = await axios(config).then(response => {
+				return {
+					config: {
+						fromDate,
+						toDate,
+						placementId: item.placementID,
+						siteId: item.siteID
 					},
-					aggregation: 'day'
+					data: response.data.data
 				};
-
-				let config = {
-					method: 'post',
-					url: `${API_ENDPOINT}/publishers/stats/earnings/open`,
-					data,
-					headers
-				};
-
-				promiseQueue.push(
-					axios(config)
-						.then(response => {
-							return {
-								config: config.data,
-								data: response.data
-							};
-						})
-						.catch(function(error) {
-							// handle error
-							console.log(error.message, 'error promiseQueue', 'errrr');
-						})
-				);
-			}
-			return Promise.all(promiseQueue);
-		}
-		batchQueue.push(processBatch(batch));
-	}
-	return batchQueue;
+			})
+			.catch(function (error) {
+				// handle error
+				console.log(error.message, 'error promiseQueue', 'errrr');
+			})
+			return apiResponse;
+		})
 };
 
 const processDataReceivedFromPublisher = (data, siteIdsAndNameMappingFromPubData) => {
 	let processedData = data
-		.reduce((acc, item) => {
-			acc = acc.concat(...item);
-			return acc;
-		}, [])
 		.map(item => {
-			return item.data.data.map(row => {
-				row.siteID = item.config.filters.siteID[0];
+			console.log(item, 'item in map')
+			if(!item) {
+				return [];
+			}
+			return item.data.map(row => {
+				row.siteID = item.config.siteId;
+				row.fromDate = item.config.fromDate;
+				row.toDate = item.config.toDate;
 				return row;
 			});
 		})
@@ -214,7 +208,7 @@ const processDataReceivedFromPublisher = (data, siteIdsAndNameMappingFromPubData
 		.map(item => {
 			item.site_name = siteIdsAndNameMappingFromPubData[item.siteID].replace(
 				/(AP|AR)\/\d+_/,
-				function($1) {
+				function ($1) {
 					let typeAndSiteId = $1.replace('_', '').split('/');
 					item.type = typeAndSiteId[0];
 					item.siteId = typeAndSiteId[1];
@@ -226,7 +220,7 @@ const processDataReceivedFromPublisher = (data, siteIdsAndNameMappingFromPubData
 			return item;
 		})
 		.filter(item => item.type == 'AP');
-	console.log('Processing end.............');
+	console.log('Processing end...');
 	return processedData;
 };
 
@@ -239,7 +233,7 @@ const fetchData = sitesData => {
 
 	console.log('Fetching data from IndexExchange...');
 	return getDataFromPartner()
-		.then(async function(reportDataJSON) {
+		.then(async function (reportDataJSON) {
 			IndexExchangePartnerModel.setPartnersData(reportDataJSON);
 
 			// process and map sites data with publishers API data structure
@@ -268,7 +262,7 @@ const fetchData = sitesData => {
 				item =>
 					item.diffPer <= -ANOMALY_THRESHOLD_IN_PER || item.diffPer >= ANOMALY_THRESHOLD_IN_PER
 			);
-			// console.log(JSON.stringify(anomalies, null, 3), 'finalData');
+			console.log(JSON.stringify(anomalies, null, 3), 'anomalies');
 			console.log(finalData.length, 'finalData length');
 			console.log(anomalies.length, 'anomalies length');
 
@@ -284,7 +278,11 @@ const fetchData = sitesData => {
 				]);
 			}
 		})
-		.catch(function(error) {
+		.catch(async function (error) {
+			await emailer.serviceErrorNotificationMailService({
+				partner: PARTNER_NAME,
+				error
+			})
 			// handle error
 			console.log('error', `err with ${PARTNER_NAME}`, error);
 		});

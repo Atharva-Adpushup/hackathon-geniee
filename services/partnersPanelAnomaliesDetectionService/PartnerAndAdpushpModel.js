@@ -58,12 +58,22 @@ const Class = require('../../helpers/class'),
 		};
 
 		this.mapPartnersDataWithAdPushupSiteIdAndDomain = function() {
+			const objFreqCounter = {};
             // All Partners related data processing
 			this.partnersData.map(item => {
+				if(!objFreqCounter[item[domainFieldName]]) {
+					objFreqCounter[item[domainFieldName]] = 0;
+				}
+				objFreqCounter[item[domainFieldName]]++;
                 if (this.sitesDomainAndIdMapping[item[domainFieldName]]) {
-                    const details = { ...this.sitesDomainAndIdMapping[item[domainFieldName]] };
-                    // adding publisher's revenue from partner's data into adpushup mapped data
-                    this.sitesDomainAndIdMapping[item[domainFieldName]].pubRevenue = item[revenueFieldName];
+					const details = { ...this.sitesDomainAndIdMapping[item[domainFieldName]] };
+					if(objFreqCounter[item[domainFieldName]] > 1) {
+						// adding publisher's revenue from partner's data into adpushup mapped data
+						this.sitesDomainAndIdMapping[item[domainFieldName]].pubRevenue += item[revenueFieldName];
+					} else {
+						// adding publisher's revenue from partner's data into adpushup mapped data
+						this.sitesDomainAndIdMapping[item[domainFieldName]].pubRevenue = item[revenueFieldName];
+					}
                     // extact all SiteIds of domains which are matching with partner's data only.
                     this.siteIdArr.push(details.siteId);
                 }

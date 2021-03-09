@@ -140,11 +140,15 @@ const fetchData = sitesData => {
 						partner: PARTNER_NAME,
 						anomalies
 					}),
-					saveAnomaliesToDb(dataToSend, NETWORK_ID)
+					saveAnomaliesToDb(dataToSend, PARTNER_NAME)
 				]);
 			}
 		})
-		.catch(function(error) {
+		.catch(async function(error) {
+			await emailer.serviceErrorNotificationMailService({
+				partner: PARTNER_NAME,
+				error
+			})
 			// handle error
 			console.log('error', `err with ${PARTNER_NAME}`);
 		});

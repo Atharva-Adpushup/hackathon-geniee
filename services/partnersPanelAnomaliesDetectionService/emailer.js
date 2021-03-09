@@ -1,4 +1,5 @@
 const axios = require('axios');
+const URL = 'http://queuepublisher.adpushup.com/publish'
 
 const anomaliesMailService = async ({partner, anomalies}) => {
 	// const ownerEmails = config.onwers.emails || [];
@@ -48,7 +49,44 @@ const anomaliesMailService = async ({partner, anomalies}) => {
 		}
 	};
 
-	const URL = 'http://queuepublisher.adpushup.com/publish'
+	return await axios
+		.post(URL, apiBody)
+		.then(response => response.data)
+		.then(response => {
+			console.log(response, 'Mail response');
+			return response;
+		})
+		.catch(e => {
+			console.log(`error Mail:${e}`);
+			throw { error: true };
+			// return err;
+		});
+};
+
+const serviceErrorNotificationMailService = async ({partner, error}) => {
+	// const ownerEmails = config.onwers.emails || [];
+	const ownerEmails = ['harpreet.singh@adpushup.com'];
+
+	if (!ownerEmails.length) {
+		throw new Error("Please add owner email's in the config file to send email's to the owners");
+	}
+	const emailRecepient = ownerEmails.join(',');
+
+	let emailbody = `<h1> ${partner} - Error Notification Service </h1>
+		<p>
+			${error}
+        </p>
+    `;
+
+	const apiBody = {
+		queue: 'MAILER',
+		data: {
+			to: emailRecepient,
+			body: emailbody,
+			subject: `${partner} - Service Error Alert!!!`
+		}
+	};
+
 	return await axios
 		.post(URL, apiBody)
 		.then(response => response.data)
@@ -64,5 +102,6 @@ const anomaliesMailService = async ({partner, anomalies}) => {
 };
 
 module.exports = {
-	anomaliesMailService
+	anomaliesMailService,
+	serviceErrorNotificationMailService
 };
