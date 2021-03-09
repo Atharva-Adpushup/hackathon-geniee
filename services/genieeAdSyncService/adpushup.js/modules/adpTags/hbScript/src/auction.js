@@ -146,6 +146,7 @@ var auction = {
 							revShareAdjustedCpm = bidCpm - bidCpm * (this.revenueShare / 100);
 						}
 
+						// if bid inflation is enabled, calculate inflated CPM here as this function gets called before prebid calculates price bucket
 						if (window.adpushup.shouldInflateBid) {
 							var inflatedCpm = utils.inflateBidCpm(revShareAdjustedCpm);
 							return inflatedCpm;

@@ -20,15 +20,11 @@ var w = null,
 	calculateBidCpmForFeedback = function(bid) {
 		var bidderConfig = config.PREBID_CONFIG.hbcf[bid.bidder || bid.bidderCode];
 
-		if (utils.currencyConversionActive(config.PREBID_CONFIG.currencyConfig)) {
-			var revShare = bidderConfig.bids == 'gross' && bidderConfig.revenueShare;
-			if (revShare) {
-				return bid.originalCpm - bid.originalCpm * (revShare / 100);
-			}
-			return bid.originalCpm;
+		var revShare = bidderConfig.bids == 'gross' && bidderConfig.revenueShare;
+		if (revShare) {
+			return bid.originalCpm - bid.originalCpm * (revShare / 100);
 		}
-
-		return bid.cpm;
+		return bid.originalCpm;
 	};
 
 var helpers = {
@@ -102,7 +98,7 @@ var helpers = {
 				var cpm = calculateBidCpmForFeedback(bid);
 
 				var bidData = {
-					cpm: bid['cpm'],
+					cpm: window.adpushup.shouldInflateBid ? parseFloat(cpm) : bid['cpm'],
 					adId: bid['adId'],
 					originalCpm: bid['originalCpm'],
 					// fields above are used for calculating cpm if this bid is compared with future bids and be the one with the highest cpm

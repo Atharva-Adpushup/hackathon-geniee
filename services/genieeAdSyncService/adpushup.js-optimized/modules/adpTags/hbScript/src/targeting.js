@@ -68,11 +68,6 @@ var targeting = {
 		var adServerTargeting = this.getAdserverTargeting(adpSlot);
 
 		if (window.adpushup.shouldInflateBid && adServerTargeting && Object.keys(adServerTargeting).length && adServerTargeting[keys.CPM]) {
-			 
-			const cpm = parseFloat(adServerTargeting[keys.CPM]);
-			const inflatedCpm = utils.inflateBidCpm(cpm);
-
-			adServerTargeting[keys.CPM] = inflatedCpm.toString();
 			targeting[keys.INFLATED_CPM] = true;
 		}
 
