@@ -71,7 +71,7 @@ class Control extends Component {
 			startDate,
 			endDate,
 			reportType,
-			selectedDimension: selectedDimension || '',
+			selectedDimension: selectedDimension || [],
 			selectedInterval: selectedInterval || '',
 			selectedFilters: selectedFilters || {},
 			disableGenerateButton: false,
@@ -105,9 +105,12 @@ class Control extends Component {
 		this.setState(newState);
 	}
 
-	onReportBySelect = selectedDimension => {
+	onReportBySelect = selectedDimensions => {
 		const { reportType } = this.props;
-		this.setState({ selectedDimension }, this.onControlChange.bind(null, reportType));
+		this.setState(
+			{ selectedDimension: [...selectedDimensions] },
+			this.onControlChange.bind(null, reportType)
+		);
 	};
 
 	onFilteChange = (selectedFilters, selectedFilterValues, selectedFilterKey) => {
@@ -201,13 +204,7 @@ class Control extends Component {
 	};
 
 	getSelectedFilter = filter => {
-		const {
-			reportType,
-			defaultReportType,
-			selectedFilters,
-			selectedMetrics,
-			isDemoUser
-		} = this.props;
+		const { reportType, defaultReportType, selectedFilters, isDemoUser } = this.props;
 		let siteIds = [];
 		let isSuperUser = false;
 		const selectedSiteIds = selectedFilters.siteid && Object.keys(selectedFilters.siteid);
@@ -331,6 +328,7 @@ class Control extends Component {
 					startDate: selectedReport.startDate,
 					endDate: selectedReport.endDate,
 					selectedInterval: selectedReport.selectedInterval,
+					// need to check this
 					selectedDimension: selectedReport.selectedDimension,
 					selectedFilters: cloneDeep(selectedReport.selectedFilters)
 				},
@@ -386,7 +384,7 @@ class Control extends Component {
 					<div className="aligner-item u-margin-r4">
 						{/* eslint-disable */}
 						<label className="u-text-normal">Report By</label>
-						<SelectBox
+						{/* <SelectBox
 							id="report-by"
 							key="report-by"
 							isClearable={false}
@@ -396,7 +394,34 @@ class Control extends Component {
 							selected={state.selectedDimension}
 							options={state.dimensionList}
 							onSelect={this.onReportBySelect}
-						/>
+						/> */}
+						{!isHB ? (
+							<MultiSelectBox
+								id="report-by"
+								key="report-by"
+								wrapperClassName="custom-select-box-wrapper"
+								isClearable={false}
+								isSearchable={false}
+								selected={state.selectedDimension}
+								options={state.dimensionList || []}
+								onSelect={selectedDimensions => {
+									this.onReportBySelect(selectedDimensions);
+								}}
+							/>
+						) : (
+							<SelectBox
+								id="report-by"
+								key="report-by"
+								isClearable={false}
+								isSearchable={false}
+								wrapperClassName="custom-select-box-wrapper"
+								reset={true}
+								selected={state.selectedDimension}
+								options={state.dimensionList}
+								onSelect={this.onReportBySelect}
+							/>
+						)}
+
 						{/* eslint-enable */}
 					</div>
 
@@ -425,15 +450,24 @@ class Control extends Component {
 							startDate={state.startDate}
 							endDate={state.endDate}
 							datesUpdated={({ startDate, endDate }) => {
-								if(isHB) {
-									const dateDiff = moment(endDate).diff(startDate, 'days')
-									if(!isNaN(dateDiff) && dateDiff <= 30) {
-										this.setState({ startDate, endDate }, this.onControlChange.bind(null, reportType))
+								if (isHB) {
+									const dateDiff = moment(endDate).diff(startDate, 'days');
+									if (!isNaN(dateDiff) && dateDiff <= 30) {
+										this.setState(
+											{ startDate, endDate },
+											this.onControlChange.bind(null, reportType)
+										);
 									} else {
-										this.setState({ startDate, endDate: '' }, this.onControlChange.bind(null, reportType))
+										this.setState(
+											{ startDate, endDate: '' },
+											this.onControlChange.bind(null, reportType)
+										);
 									}
 								} else {
-									this.setState({ startDate, endDate }, this.onControlChange.bind(null, reportType))
+									this.setState(
+										{ startDate, endDate },
+										this.onControlChange.bind(null, reportType)
+									);
 								}
 							}}
 							/*

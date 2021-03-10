@@ -4,7 +4,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
 	DropdownButton,
-	MenuItem,
 	Checkbox,
 	Glyphicon,
 	OverlayTrigger,
@@ -191,19 +190,23 @@ class MultiSelectBox extends Component {
 					{options.map((option, key) => {
 						if (option.isDisabled) {
 							return (
-								<OverlayTrigger overlay={tooltip} key={`id-${key}`}>
-									<MenuItem
-										eventKey={`id-${key}`}
-										key={option.value}
-										data-value={option.value}
-										data-name={option.name}
-										data-key={dataKey}
-										active={selectedOption[option.value]}
-										disabled={option.isDisabled}
-									>
-										{option.name}
-									</MenuItem>
-								</OverlayTrigger>
+								<div className="checkbox-wrapper" key={`${option.name}check`}>
+									<OverlayTrigger overlay={tooltip} key={`id-${key}`}>
+										<Checkbox
+											className=""
+											data-value={option.value}
+											data-name={option.name}
+											data-key={dataKey}
+											onChange={e => {
+												this.handleMultiSelect(e);
+											}}
+											checked={selectedOption[option.value]}
+											disabled
+										>
+											{option.name} {selectedOption[option.value]}
+										</Checkbox>
+									</OverlayTrigger>
+								</div>
 							);
 						}
 						return (
