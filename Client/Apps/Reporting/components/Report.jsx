@@ -56,7 +56,7 @@ class Report extends Component {
 			filterList: [],
 			intervalList: [],
 			metricsList: props.isForOps ? displayOpsMetrics : displayMetrics,
-			selectedDimension: '',
+			selectedDimension: [],
 			selectedFilters: {},
 			selectedFilterValues: {},
 			selectedMetrics: [],
@@ -280,20 +280,28 @@ class Report extends Component {
 	};
 
 	getControlChangedParams = (controlParams, metricsList) => {
-		const { selectedDimension, selectedFilters, reportType } = controlParams;
+		const { selectedDimension = [], selectedFilters, reportType } = controlParams;
 		const { reportsMeta } = this.props;
 		const { dimension: dimensionList, filter: filterList } = reportsMeta.data;
 		let disabledFilter = [];
 		let disabledDimension = [];
 		let disabledMetrics = [];
-		const dimensionObj = dimensionList[selectedDimension];
+		for (const dimension of selectedDimension) {
+			const dimensionObj = dimensionList[dimension];
 
-		if (dimensionObj) {
-			disabledFilter = dimensionObj.disabled_filter || disabledFilter;
-			disabledDimension = dimensionObj.disabled_dimension || disabledDimension;
-			disabledMetrics = dimensionObj.disabled_metrics || disabledMetrics;
+			if (dimensionObj) {
+				const { disabled_filter, disabled_dimension, disabled_metric } = dimensionObj;
+				if (disabled_filter) {
+					disabledFilter.push(disabled_filter);
+				}
+				if (disabled_dimension) {
+					disabledDimension.push(disabled_dimension);
+				}
+				if (disabled_metric) {
+					disabledMetrics.push(disabled_metric);
+				}
+			}
 		}
-
 		Object.keys(selectedFilters).forEach(selectedFilter => {
 			const filterObj = filterList[selectedFilter];
 			if (filterObj && !isEmpty(selectedFilters[selectedFilter])) {
@@ -345,7 +353,7 @@ class Report extends Component {
 			fromDate: moment(startDate).format('YYYY-MM-DD'),
 			toDate: moment(endDate).format('YYYY-MM-DD'),
 			interval: selectedInterval,
-			dimension: selectedDimension || null
+			dimension: selectedDimension.join(',') || null
 		};
 
 		if (!isCustomizeChartLegend) {
@@ -424,8 +432,8 @@ class Report extends Component {
 						this.setState({ getCustomStatResponseStatus: 'success' });
 
 						const shouldAddAdpushupCountPercentColumn =
-							(selectedDimension === 'mode' ||
-								selectedDimension === 'error_code' ||
+							(selectedDimension.includes('mode') ||
+								selectedDimension.includes('error_code') ||
 								selectedFilters.mode ||
 								selectedFilters.error_code) &&
 							tableData.columns.indexOf('adpushup_count') !== -1;
@@ -759,8 +767,8 @@ class Report extends Component {
 		}
 
 		if (Object.keys(selectedControls).length > 0) {
-			const { dimension, interval, fromDate, toDate, chartLegendMetric } = selectedControls;
-			selectedDimension = dimension;
+			const { dimension = '', interval, fromDate, toDate, chartLegendMetric } = selectedControls;
+			selectedDimension = dimension.split(',');
 			selectedInterval = interval || 'daily';
 			selectedChartLegendMetric = chartLegendMetric;
 			startDate = fromDate;
@@ -798,14 +806,7 @@ class Report extends Component {
 		);
 	};
 
-	getAllAvailableMetrics = (
-		isCustomizeChartLegend,
-		reportsMeta,
-		selectedDimension,
-		selectedFilters,
-		reportType,
-		tableData
-	) => {
+	getAllAvailableMetrics = (isCustomizeChartLegend, reportsMeta, tableData) => {
 		let allAvailableMetrics = [];
 		if (
 			isCustomizeChartLegend &&
@@ -1110,7 +1111,7 @@ class Report extends Component {
 			name: reportName,
 			startDate,
 			endDate,
-			selectedDimension,
+			selectedDimension: selectedDimension.join(','),
 			selectedFilters: filters,
 			selectedInterval,
 			scheduleOptions
@@ -1361,7 +1362,7 @@ class Report extends Component {
 					<FilterLegend selectedFilters={selectedFilterValues} filtersList={filterList} />
 				</Col>
 				<Col sm={12} className="u-margin-t5">
-					<ChartContainer
+					{/* <ChartContainer
 						tableData={tableData}
 						selectedDimension={selectedDimension}
 						startDate={startDate}
@@ -1374,7 +1375,7 @@ class Report extends Component {
 						updateMetrics={this.updateMetrics}
 						selectedInterval={selectedInterval}
 						selectedChartLegendMetric={selectedChartLegendMetric}
-					/>
+					/> */}
 				</Col>
 				<Col sm={12} className="u-margin-t5 u-margin-b4">
 					<TableContainer
