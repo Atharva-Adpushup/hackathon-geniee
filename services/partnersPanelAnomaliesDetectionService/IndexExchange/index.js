@@ -189,7 +189,6 @@ const processReqInBatches = async (queue, headers) => {
 const processDataReceivedFromPublisher = (data, siteIdsAndNameMappingFromPubData) => {
 	let processedData = data
 		.map(item => {
-			console.log(item, 'item in map')
 			if(!item) {
 				return [];
 			}
@@ -262,7 +261,7 @@ const fetchData = sitesData => {
 				item =>
 					item.diffPer <= -ANOMALY_THRESHOLD_IN_PER || item.diffPer >= ANOMALY_THRESHOLD_IN_PER
 			);
-			console.log(JSON.stringify(anomalies, null, 3), 'anomalies');
+			// console.log(JSON.stringify(anomalies, null, 3), 'anomalies');
 			console.log(finalData.length, 'finalData length');
 			console.log(anomalies.length, 'anomalies length');
 
@@ -276,6 +275,11 @@ const fetchData = sitesData => {
 					}),
 					saveAnomaliesToDb(dataToSend)
 				]);
+				return {
+					total: finalData.length,
+					anomalies: anomalies.length,
+					partner: PARTNER_NAME
+				};
 			}
 		})
 		.catch(async function (error) {

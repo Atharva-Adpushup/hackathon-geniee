@@ -18,6 +18,8 @@ const Class = require('../../helpers/class'),
 		this.sitesDomainAndIdMapping = {};
 		// for AdPushup's Data mapping with Partners Domain
 		this.sitesIdAndDomainMapping = {};
+		// for AdPushup's Data mapping with ADP SiteId
+		this.adpDataSiteIdMapping = {};
 		this.siteIdArr = [];
 
 		this.constructor = function(sitesData, domainFieldNameFromPartnersAPI, revenueField) {
@@ -47,9 +49,17 @@ const Class = require('../../helpers/class'),
 					.replace(/^w+./, '')
 					.replace(/^hw+./, '')
 					.replace(/\/$/, '');
+
 				// creating separate hash maps to easily map Partners Data and AdPushup Data
-				// by mapping it with common domain name format
-				this.sitesDomainAndIdMapping[domain] = item;
+				// by mapping it with common domain name format. There could be multiple
+				// domain entries in DB. So, using Array now.
+				if(!this.sitesDomainAndIdMapping[domain]) {
+					this.sitesDomainAndIdMapping[domain] = {
+						sites:[]
+					};
+				}
+				this.sitesDomainAndIdMapping[domain].sites.push(item);
+
 				// also map same data with siteId
 				this.sitesIdAndDomainMapping[siteId] = item;
                 this.sitesIdAndDomainMapping[siteId][domainFieldName] = domain;
@@ -66,16 +76,20 @@ const Class = require('../../helpers/class'),
 				}
 				objFreqCounter[item[domainFieldName]]++;
                 if (this.sitesDomainAndIdMapping[item[domainFieldName]]) {
-					const details = { ...this.sitesDomainAndIdMapping[item[domainFieldName]] };
-					if(objFreqCounter[item[domainFieldName]] > 1) {
-						// adding publisher's revenue from partner's data into adpushup mapped data
-						this.sitesDomainAndIdMapping[item[domainFieldName]].pubRevenue += item[revenueFieldName];
-					} else {
-						// adding publisher's revenue from partner's data into adpushup mapped data
-						this.sitesDomainAndIdMapping[item[domainFieldName]].pubRevenue = item[revenueFieldName];
-					}
-                    // extact all SiteIds of domains which are matching with partner's data only.
-                    this.siteIdArr.push(details.siteId);
+					const mappedSitesWithDomain = { ...this.sitesDomainAndIdMapping[item[domainFieldName]] };
+					// extact all SiteIds of domains which are matching with partner's data only.
+					mappedSitesWithDomain.sites.forEach(site => {
+						// There could be multiple entries for Domain in Pub's Data
+						if(objFreqCounter[item[domainFieldName]] > 1) {
+							// adding publisher's revenue from partner's data into adpushup mapped data
+							this.sitesDomainAndIdMapping[item[domainFieldName]].pubRevenue += item[revenueFieldName];
+						} else {
+							// adding publisher's revenue from partner's data into adpushup mapped data
+							this.sitesDomainAndIdMapping[item[domainFieldName]].pubRevenue = item[revenueFieldName];
+						}
+						this.sitesDomainAndIdMapping[item[domainFieldName]].adpRevenue = 0;
+						this.siteIdArr.push(site.siteId);
+					})
                 }
 				return item;
 			});
@@ -89,6 +103,12 @@ const Class = require('../../helpers/class'),
 				.then(response => response.data)
 				.then(({ data: { result: adpData } }) => {
 					return adpData.map(item => {
+						// create a mapping of ADP daa with siteId.
+						// some domains may have multiple siteIds, it would be easy to fetch
+						// revenue using this mapping while calculating revenue of domains with
+						// multiple siteId in ADP data.
+						this.adpDataSiteIdMapping[siteid] = item;
+
 						const { siteid, network_gross_revenue, site, date } = item;
 						return {
 							date,
@@ -107,18 +127,26 @@ const Class = require('../../helpers/class'),
 		this.compareAdPushupDataWithPartnersData = function(adpData) {
 			let finalData = [];
 
-			adpData.map(item => {
-				// get domain using siteId
-				const domainName = this.sitesIdAndDomainMapping[item.siteid][domainFieldName];
+			Object.keys(this.sitesDomainAndIdMapping).map(domain => {
+				this.sitesDomainAndIdMapping[domain].sites.map(site => {
+					if(this.adpDataSiteIdMapping[site.siteId]) {
+						this.sitesDomainAndIdMapping[domain].adpRevenue += this.adpDataSiteIdMapping[site.siteId].network_gross_revenue;
+						this.sitesDomainAndIdMapping[domain].date = this.adpDataSiteIdMapping[site.siteId].date
+					}
+				})
+			})
+
+			// ADP data contains domain with multiple siteIds
+			Object.keys(this.sitesDomainAndIdMapping).map(domain => {
 				// get data from hash object using domain
-				let mappedData = this.sitesDomainAndIdMapping[domainName];
-                mappedData.adpRevenue = item.network_gross_revenue;
+				let mappedData = this.sitesDomainAndIdMapping[domain];
 
                 const diff = +(mappedData.pubRevenue) - +(mappedData.adpRevenue);
                 const total = +(mappedData.pubRevenue) + +(mappedData.adpRevenue);
 				mappedData.diff = diff;
 				mappedData.diffPer = ((diff / (total/2)) * 100).toFixed(2);
-				mappedData.date = moment(item.date).format('YYYY-MM-DD')
+				mappedData.date = moment(mappedData.date).format('YYYY-MM-DD')
+				mappedData.siteDomain = domain
 				finalData.push(mappedData);
 			});
 			return finalData;

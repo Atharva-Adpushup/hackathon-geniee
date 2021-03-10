@@ -169,7 +169,12 @@ const fetchData = sitesData => {
 					saveAnomaliesToDb({
 						anomalyData: dataToSend
 					})
-				]);
+				])
+				return {
+					total: finalData.length,
+					anomalies: anomalies.length,
+					partner: PARTNER_NAME
+				};
 			}
 		})
 		.catch(async function(error) {
