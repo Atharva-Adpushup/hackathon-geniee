@@ -12,7 +12,7 @@ function generateImageUploadPath(metaData) {
 	return imageUploadPath;
 }
 
-function addHighChartsObject(inputData, metaData) {
+function addHighChartsObject(inputData) {
 	const defaultChartObject = {
 		base64: '',
 		imagePath: ''
@@ -22,8 +22,7 @@ function addHighChartsObject(inputData, metaData) {
 		adNetworkRevenuePie: { ...defaultChartObject },
 		countryReportPie: { ...defaultChartObject }
 	};
-	imageUploadPath = generateImageUploadPath(metaData);
-	return { inputData, imageUploadPath };
+	return { inputData };
 }
 
 function getChartImageOptions() {
@@ -179,16 +178,17 @@ async function uploadCountryPieChartAndGetSourcePath(inputData, imageUploadPath)
 
 module.exports = {
 	generateAndProcessCharts: (inputData, metaData) => {
-		const { inputData: reportData, imageUploadPath } = addHighChartsObject(inputData, metaData),
-			getCPMLineSourcePath = uploadCPMChartAndGetSourcePath(reportData, imageUploadPath),
-			getAdNetworkRevenuePieSourcePath = uploadAdNetworkPieChartAndGetSourcePath(
-				reportData,
-				imageUploadPath
-			),
-			getCountryRevenueRevenuePieSourcePath = uploadCountryPieChartAndGetSourcePath(
-				reportData,
-				imageUploadPath
-			);
+		const { inputData: reportData } = addHighChartsObject(inputData);
+		const imageUploadPath = generateImageUploadPath(metaData);
+		const getCPMLineSourcePath = uploadCPMChartAndGetSourcePath(reportData, imageUploadPath);
+		const getAdNetworkRevenuePieSourcePath = uploadAdNetworkPieChartAndGetSourcePath(
+			reportData,
+			imageUploadPath
+		);
+		const getCountryRevenueRevenuePieSourcePath = uploadCountryPieChartAndGetSourcePath(
+			reportData,
+			imageUploadPath
+		);
 		return Promise.all([
 			getCPMLineSourcePath,
 			getAdNetworkRevenuePieSourcePath,

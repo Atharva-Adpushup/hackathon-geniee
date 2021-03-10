@@ -101,8 +101,8 @@ async function getEmailSnapshotsSites(userEmail) {
 	try {
 		//here we are maintaing the daily and weekly subscribed sites in the string comma seprated format
 		const initailObject = {
-			dailySubscribedSites: '',
-			weeklySubscribedSites: ''
+			dailySubscribedSites: [],
+			weeklySubscribedSites: []
 		};
 		const subscribedSites = await getAllUserSites(userEmail).reduce((allSites, site, index) => {
 			const {
@@ -111,10 +111,10 @@ async function getEmailSnapshotsSites(userEmail) {
 			} = site;
 			let { dailySubscribedSites, weeklySubscribedSites } = allSites;
 			if (isDailyEmailReportsEnabled) {
-				dailySubscribedSites = index === 0 ? `${siteId}` : `${dailySubscribedSites},${siteId}`;
+				dailySubscribedSites.push(siteId);
 			}
 			if (isWeeklyEmailReportsEnabled) {
-				weeklySubscribedSites = index === 0 ? `${siteId}` : `${weeklySubscribedSites},${siteId}`;
+				weeklySubscribedSites.push(siteId);
 			}
 			return { dailySubscribedSites, weeklySubscribedSites };
 		}, initailObject);
@@ -187,16 +187,17 @@ async function sendSnapshot(siteids, userEmail, type) {
 async function processSitesOfUser(userEmail) {
 	try {
 		console.log(userEmail, count++);
-		const { dailySubscribedSites = '', weeklySubscribedSites = '' } = await getEmailSnapshotsSites(
+		const { dailySubscribedSites = [], weeklySubscribedSites = [] } = await getEmailSnapshotsSites(
 			userEmail
 		);
-		if (dailySubscribedSites !== '') await sendSnapshot(dailySubscribedSites, userEmail, 'daily');
+		if (dailySubscribedSites.length !== 0)
+			await sendSnapshot(dailySubscribedSites.join(','), userEmail, 'daily');
 		//0->sunday,1->Monday and so on
 		const dayOfWeek = currentDate.day();
 		//if week day is monday
 		if (dayOfWeek === 1) {
-			if (weeklySubscribedSites !== '')
-				await sendSnapshot(weeklySubscribedSites, userEmail, 'weekly');
+			if (weeklySubscribedSites.length !== 0)
+				await sendSnapshot(weeklySubscribedSites.join(','), userEmail, 'weekly');
 		}
 	} catch (error) {
 		console.log(error);

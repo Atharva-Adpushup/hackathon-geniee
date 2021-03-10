@@ -101,7 +101,7 @@ async function uploadImageToAzure(blobClientName, fileStream) {
 	try {
 		const STORAGE_CONNECTION_STRING = config.weeklyDailySnapshots.CONNECTION_STRING;
 		if (!STORAGE_CONNECTION_STRING) {
-			throw new Error(`Connection string does not exist`);
+			throw new Error(`Azure Connection string does not exist`);
 		}
 		const blobServiceClient = await BlobServiceClient.fromConnectionString(
 			STORAGE_CONNECTION_STRING
