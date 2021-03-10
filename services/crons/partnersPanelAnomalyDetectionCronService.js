@@ -33,10 +33,10 @@ function startParntersPanelsAnomaliesDetectionService() {
 	getSitesFromDB()
 		.then(sitesData => {
 			return Promise.all([
-				// criteo(sitesData),
+				criteo(sitesData),
 				OFT(sitesData),
-				// Pubmatic(sitesData),
-				// IndexExchange(sitesData),
+				Pubmatic(sitesData),
+				IndexExchange(sitesData),
 				// Sovrn(sitesData)
 			])
 			.catch(err => {
@@ -49,6 +49,12 @@ function startParntersPanelsAnomaliesDetectionService() {
 				process.exit(1);
 			} else {
 				console.log(result, 'result in main index.js');
+				// Print Final Result
+				console.log(`Name\tTotal\tAnomalies\tAnomaly %`)
+				result.forEach(item => {
+					const perc = (item.anomalies*100)/(item.anomalies + item.total);
+					console.log(`${item.partner}\t${item.total}\t${item.anomalies}\t${perc.toFixed(2)}%`)
+				});
 				process.exit(0);
 			}
 		})
