@@ -1,6 +1,7 @@
 const Class = require('../../helpers/class'),
 	axios = require('axios'),
 	moment = require('moment'),
+	CustomError = require('./CustomError'),
 	// AdPushupError = require('./AdPushupError'),
 	PartnersModel = Class.extend(function() {
 		const ADPUSHUP_REPORT_BASE_URL = 'https://api.adpushup.com/CentralReportingWebService';
@@ -55,7 +56,9 @@ const Class = require('../../helpers/class'),
 				// domain entries in DB. So, using Array now.
 				if(!this.sitesDomainAndIdMapping[domain]) {
 					this.sitesDomainAndIdMapping[domain] = {
-						sites:[]
+						sites:[],
+						pubRevenue:0,
+						adpRevenue:0
 					};
 				}
 				this.sitesDomainAndIdMapping[domain].sites.push(item);
@@ -82,11 +85,13 @@ const Class = require('../../helpers/class'),
 						// There could be multiple entries for Domain in Pub's Data
 						if(objFreqCounter[item[domainFieldName]] > 1) {
 							// adding publisher's revenue from partner's data into adpushup mapped data
-							this.sitesDomainAndIdMapping[item[domainFieldName]].pubRevenue += item[revenueFieldName];
+							this.sitesDomainAndIdMapping[item[domainFieldName]].pubRevenue += +(item[revenueFieldName]);
 						} else {
 							// adding publisher's revenue from partner's data into adpushup mapped data
-							this.sitesDomainAndIdMapping[item[domainFieldName]].pubRevenue = item[revenueFieldName];
+							this.sitesDomainAndIdMapping[item[domainFieldName]].pubRevenue = +(item[revenueFieldName]);
 						}
+
+						this.sitesDomainAndIdMapping[item[domainFieldName]].pubRevenue = +(this.sitesDomainAndIdMapping[item[domainFieldName]].pubRevenue).toFixed(2)
 						this.sitesDomainAndIdMapping[item[domainFieldName]].adpRevenue = 0;
 						this.siteIdArr.push(site.siteId);
 					})
@@ -101,15 +106,20 @@ const Class = require('../../helpers/class'),
 					params
 				})
 				.then(response => response.data)
-				.then(({ data: { result: adpData } }) => {
+				.then(response => {
+					if(response.code == -1) {
+						return Promise.reject(new CustomError(`${response.description} - ${response.data}`))
+					} 
+					const { data: { result: adpData } } = response;
 					return adpData.map(item => {
+						const { siteid, network_gross_revenue, site, date } = item;
+
 						// create a mapping of ADP daa with siteId.
 						// some domains may have multiple siteIds, it would be easy to fetch
 						// revenue using this mapping while calculating revenue of domains with
 						// multiple siteId in ADP data.
 						this.adpDataSiteIdMapping[siteid] = item;
 
-						const { siteid, network_gross_revenue, site, date } = item;
 						return {
 							date,
 							siteid,
@@ -118,10 +128,6 @@ const Class = require('../../helpers/class'),
 						};
 					});
 				})
-				.catch(e => {
-					console.log(`error in getting ADP data:${e}`);
-					throw { error: true };
-				});
 		};
 
 		this.compareAdPushupDataWithPartnersData = function(adpData) {
@@ -130,9 +136,10 @@ const Class = require('../../helpers/class'),
 			Object.keys(this.sitesDomainAndIdMapping).map(domain => {
 				this.sitesDomainAndIdMapping[domain].sites.map(site => {
 					if(this.adpDataSiteIdMapping[site.siteId]) {
-						this.sitesDomainAndIdMapping[domain].adpRevenue += this.adpDataSiteIdMapping[site.siteId].network_gross_revenue;
+						this.sitesDomainAndIdMapping[domain].adpRevenue += +(this.adpDataSiteIdMapping[site.siteId].network_gross_revenue);
 						this.sitesDomainAndIdMapping[domain].date = this.adpDataSiteIdMapping[site.siteId].date
 					}
+					this.sitesDomainAndIdMapping[domain].adpRevenue = +(this.sitesDomainAndIdMapping[domain].adpRevenue).toFixed(2);
 				})
 			})
 
@@ -141,10 +148,11 @@ const Class = require('../../helpers/class'),
 				// get data from hash object using domain
 				let mappedData = this.sitesDomainAndIdMapping[domain];
 
-                const diff = +(mappedData.pubRevenue) - +(mappedData.adpRevenue);
+				const diff = +(mappedData.pubRevenue) - +(mappedData.adpRevenue);
                 const total = +(mappedData.pubRevenue) + +(mappedData.adpRevenue);
 				mappedData.diff = diff;
-				mappedData.diffPer = ((diff / (total/2)) * 100).toFixed(2);
+				// prevent divide by zero
+				mappedData.diffPer = total>0?((diff / (total/2)) * 100).toFixed(2):0;
 				mappedData.date = moment(mappedData.date).format('YYYY-MM-DD')
 				mappedData.siteDomain = domain
 				finalData.push(mappedData);

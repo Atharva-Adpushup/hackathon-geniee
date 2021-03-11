@@ -3,19 +3,24 @@ const moment = require('moment');
 const csv = require('csvtojson');
 
 const partnerAndAdpushpModel = require('../PartnerAndAdpushpModel');
-const constants = require('../../../configs/commonConsts');
 const emailer = require('../emailer');
 const saveAnomaliesToDb = require('../saveAnomaliesToDb');
+const { axiosErrorHandler, partnerModuleErrorHandler } = require('../utils');
 
+const {
+	PARTNERS_PANEL_INTEGRATION: { ANOMALY_THRESHOLD_IN_PER, OFT }
+} = require('../../../configs/commonConsts');
+const { PARTNER_NAME, NETWORK_ID, DOMAIN_FIELD_NAME, REVENUE_FIELD } = OFT;
 const API_ENDPOINT = `https://api.appnexus.com`;
+// const PARTNER_NAME = `AppNexus/OFT`;
+// const NETWORK_ID = 11;
+// const DOMAIN_FIELD_NAME = 'site_name';
+// const REVENUE_FIELD = 'publisher_revenue';
 
-const PARTNER_NAME = `AppNexus/OFT`;
-const NETWORK_ID = 11;
-const DOMAIN_FIELD_NAME = 'site_name';
-const REVENUE_FIELD = 'publisher_revenue';
-
-const fromDate = moment().subtract(1, "days").format("YYYY-MM-DD");
-const toDate = fromDate;
+const fromDate = moment()
+	.subtract(1, 'days')
+	.format('YYYY-MM-DD');
+const toDate = moment().format('YYYY-MM-DD');
 
 const authParams = {
 	auth: {
@@ -34,60 +39,56 @@ const authParams = {
 // 1. Get Auth token before each req
 // 2. Get Report Id
 // 3. Download Report - CSV
-const getDataFromPartner = function() {
+const getDataFromPartner = async function() {
 	// 1. Get Auth token before each req
-	return axios
+	const token = await axios
 		.post(`${API_ENDPOINT}/auth`, authParams)
 		.then(response => response.data.response)
 		.then(function(data) {
 			const { token } = data;
 			return token;
+		}).catch(axiosErrorHandler);
+
+	console.log('Got Auth token before req....', token);
+
+	// 2. Get Report Id
+	const queryParams = {
+		report: {
+			report_type: 'publisher_analytics',
+			start_date: fromDate,
+			end_date: toDate,
+			columns: ['day', 'clicks', 'publisher_revenue', 'site_id', 'site_name'],
+			orders: [{ order_by: 'day', direction: 'ASC' }],
+			format: 'csv',
+			timezone: 'PST8PDT'
+		}
+	};
+	const headers = {
+		Authorization: `${token}`
+	};
+	const reportMetaData = await axios
+		.post(`${API_ENDPOINT}/report`, queryParams, { headers })
+		.then(response => response.data.response)
+		.catch(axiosErrorHandler);
+	// {
+	//     "response": {
+	//         "status": "OK",
+	//         "token": "authn:271746:09a5bf8cec143:lax1",
+	//     }
+	// }
+
+	console.log('Got Report Meta....', reportMetaData);
+	// 3. Download Report - CSV
+	const reportData = await axios
+		.get(`${API_ENDPOINT}/report-download`, {
+			params: {
+				id: reportMetaData.report_id
+			},
+			headers
 		})
-		.then(async function(token) {
-			console.log('Got Auth token before req....', token);
-
-			// 2. Get Report Id
-			const queryParams = {
-				report: {
-					"report_type": "publisher_analytics",
-					"start_date": "2021-03-03",
-					"end_date": "2021-03-04",
-					"columns": ["day","clicks", "publisher_revenue", "site_id", "site_name"],
-					"orders": [{"order_by":"day", "direction":"ASC"}],
-					"format": "csv",
-					"timezone":"PST8PDT"
-					// report_type: 'publisher_analytics',
-					// report_interval: 'yesterday',
-					// columns: ['day', 'clicks', 'publisher_revenue', 'site_id', 'site_name'],
-					// orders: [{ order_by: 'day', direction: 'ASC' }],
-					// format: 'csv'
-				}
-			};
-			const headers = {
-				Authorization: `${token}`
-			};
-			const reportMetaData = await axios
-				.post(`${API_ENDPOINT}/report`, queryParams, { headers })
-				.then(response => response.data.response);
-			// {
-			//     "response": {
-			//         "status": "OK",
-			//         "token": "authn:271746:09a5bf8cec143:lax1",
-			//     }
-			// }
-
-			console.log('Got Report Meta....');
-			// 3. Download Report - CSV
-			const reportData = await axios
-				.get(`${API_ENDPOINT}/report-download`, {
-					params: {
-						id: reportMetaData.report_id
-					},
-					headers
-				})
-				.then(response => response.data);
-			return await csv().fromString(reportData);
-		});
+		.then(response => response.data)
+		.catch(axiosErrorHandler);
+	return await csv().fromString(reportData);
 };
 
 const fetchData = sitesData => {
@@ -120,15 +121,12 @@ const fetchData = sitesData => {
 			const adpData = await OFTMediaPartnerModel.getDataFromAdPushup(params);
 			let finalData = OFTMediaPartnerModel.compareAdPushupDataWithPartnersData(adpData);
 
-			const {
-				PARTNERS_PANEL_INTEGRATION: { ANOMALY_THRESHOLD_IN_PER }
-			} = constants;
 			// filter out anomalies
 			const anomalies = finalData.filter(
 				item =>
 					item.diffPer <= -ANOMALY_THRESHOLD_IN_PER || item.diffPer >= ANOMALY_THRESHOLD_IN_PER
 			);
-			// console.log(JSON.stringify(anomalies, null, 3), 'finalData');
+			// console.log(JSON.stringify(finalData, null, 3), 'finalData');
 			console.log(finalData.length, 'finalData length');
 			console.log(anomalies.length, 'anomalies length');
 
@@ -142,21 +140,15 @@ const fetchData = sitesData => {
 					}),
 					saveAnomaliesToDb(dataToSend, PARTNER_NAME)
 				]);
-				return {
-					total: finalData.length,
-					anomalies: anomalies.length,
-					partner: PARTNER_NAME
-				};
 			}
-		})
-		.catch(async function(error) {
-			await emailer.serviceErrorNotificationMailService({
+			return {
+				total: finalData.length,
+				anomalies: anomalies.length,
 				partner: PARTNER_NAME,
-				error
-			})
-			// handle error
-			console.log('error', `err with ${PARTNER_NAME}`);
-		});
+				message: 'Success'
+			};
+		})
+		.catch(partnerModuleErrorHandler.bind(null, PARTNER_NAME))
 };
 
 module.exports = fetchData;

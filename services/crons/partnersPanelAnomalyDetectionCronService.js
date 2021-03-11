@@ -7,12 +7,11 @@ const Pubmatic = require('../partnersPanelAnomaliesDetectionService/Pubmatic');
 const IndexExchange = require('../partnersPanelAnomaliesDetectionService/IndexExchange');
 const Sovrn = require('../partnersPanelAnomaliesDetectionService/Sovrn');
 const { appBucket } = require('../../helpers/routeHelpers');
-// const constants = require('../../configs/commonConsts');
-const emailer = require('../partnersPanelAnomaliesDetectionService/emailer');
 
-function getSitesFromDB() {
-	// select distinct siteId, siteDomain from AppBucket where meta().id like "site::%";
-	const siteListPromise = appBucket
+const { couchbaseErrorHandler, sendErrorNotification } = require('../partnersPanelAnomaliesDetectionService/utils');
+
+const getSitesFromDB = async () => {
+	const siteListPromise = await appBucket
 		.queryDB(
 			`
             SELECT DISTINCT siteId, siteDomain
@@ -21,26 +20,22 @@ function getSitesFromDB() {
                     AND dataFeedActive = TRUE;
             `
 		)
-		.catch(e => {
-			console.log(`error in getting site Lists:${e}`);
-			throw { error: true };
-			// return err;
-		});
+		.catch(couchbaseErrorHandler);
 	return siteListPromise;
-}
+};
 
 function startParntersPanelsAnomaliesDetectionService() {
 	getSitesFromDB()
 		.then(sitesData => {
 			return Promise.all([
 				criteo(sitesData),
-				OFT(sitesData),
-				Pubmatic(sitesData),
-				IndexExchange(sitesData),
+				// OFT(sitesData),
+				// Pubmatic(sitesData),
+				// IndexExchange(sitesData),
 				// Sovrn(sitesData)
 			])
 			.catch(err => {
-				console.log(err, 'err in service');
+				throw { err }
 			});
 		})
 		.then(result => {
@@ -48,27 +43,22 @@ function startParntersPanelsAnomaliesDetectionService() {
 				console.error(result);
 				process.exit(1);
 			} else {
-				console.log(result, 'result in main index.js');
 				// Print Final Result
-				console.log(`Name\tTotal\tAnomalies\tAnomaly %`)
+				console.log(`Name\tTotal\tAnomalies\tAnomaly %\tMessage`)
 				result.forEach(item => {
 					const perc = (item.anomalies*100)/(item.anomalies + item.total);
-					console.log(`${item.partner}\t${item.total}\t${item.anomalies}\t${perc.toFixed(2)}%`)
+					console.log(`${item.partner}\t${item.total}\t${item.anomalies}\t${perc.toFixed(2)}%\t${item.message}`)
 				});
 				process.exit(0);
 			}
 		})
 		.catch(async err => {
-			console.error(err);
-			await emailer.serviceErrorNotificationMailService({
-				partner: 'Main Service',
-				error:err
-			})
-
+			console.error(err, 'Main catch');
+			await sendErrorNotification(err, 'Patners Panel Service Crashed')
 			process.exit(1);
 		});
 }
 
-startParntersPanelsAnomaliesDetectionService();
+startParntersPanelsAnomaliesDetectionService()
 // const JOB_NAME = 'AnomaliesDetection';
 // cron.schedule(JOB_NAME, CC.cronSchedule.partnerPanelAnomaliesDetectionService, startParntersPanelsAnomaliesDetectionService);

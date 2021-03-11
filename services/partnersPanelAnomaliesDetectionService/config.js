@@ -1,4 +1,4 @@
-const BACKEND_API_URL = `http://staging.adpushup.com/OpsWebService/anomaly/save`
+const BACKEND_API_URL = `http://staging.adpushup.com/OpsWebService/anomaly/save`;
 
 module.exports = {
     BACKEND_API_URL,
@@ -11,4 +11,4 @@ module.exports = {
         limit:100,
         filter:"status='active'"
     }
-}
+};

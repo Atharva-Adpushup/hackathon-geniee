@@ -780,8 +780,29 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 	},
 	PARTNERS_PANEL_INTEGRATION: {
 		ANOMALY_THRESHOLD_IN_PER: 5,
-		MAIL: {
-			HEADER_ITEMS: ['Date', 'Partner', 'Website', 'Difference', 'AdPushup Revenue', 'Demand Partner Revenue']
+		CRITEO: {
+			PARTNER_NAME: 'Criteo',
+			NETWORK_ID: 20,
+			DOMAIN_FIELD_NAME: 'Domain',
+			REVENUE_FIELD: 'Revenue'
+		},
+		PUBMATIC: {
+			PARTNER_NAME: 'Pubmatic',
+			NETWORK_ID: 28,
+			DOMAIN_FIELD_NAME: 'site_name',
+			REVENUE_FIELD: 'netRevenue'
+		},
+		OFT: {
+			PARTNER_NAME: 'OFT/152Media',
+			NETWORK_ID: 11,
+			DOMAIN_FIELD_NAME: 'site_name',
+			REVENUE_FIELD: 'publisher_revenue'
+		},
+		INDEX_EXCHANGE: {
+			PARTNER_NAME: 'Index Exchange',
+			NETWORK_ID: 21,
+			DOMAIN_FIELD_NAME: 'site_name',
+			REVENUE_FIELD: 'earnings'
 		}
 	}
 };

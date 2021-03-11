@@ -2,30 +2,29 @@ const axios = require('axios');
 const moment = require('moment');
 
 const partnerAndAdpushpModel = require('../PartnerAndAdpushpModel');
-const constants = require('../../../configs/commonConsts');
 const emailer = require('../emailer');
 const saveAnomaliesToDb = require('../saveAnomaliesToDb');
+const { axiosErrorHandler, partnerModuleErrorHandler } = require('../utils');
 
+const {
+	PARTNERS_PANEL_INTEGRATION: { ANOMALY_THRESHOLD_IN_PER, PUBMATIC }
+} = require('../../../configs/commonConsts');
+const { PARTNER_NAME, NETWORK_ID, DOMAIN_FIELD_NAME, REVENUE_FIELD } = PUBMATIC;
 const API_ENDPOINT = `http://api.pubmatic.com/v1`;
-
-const PARTNER_NAME = `Pubmatic(HB)`;
-const NETWORK_ID = 28;
-const DOMAIN_FIELD_NAME = 'site_name';
-const REVENUE_FIELD = 'netRevenue';
-const PUBLISHER_ID = '158261'
+const PUBLISHER_ID = '158261';
 
 const authParams = {
-    "userName" : "sharad.yadav@adpushup.com",
-    "password": "PcCkgS9Huxbh4WN",
-    "apiProduct" : "PUBLISHER"
+	userName: 'sharad.yadav@adpushup.com',
+	password: 'PcCkgS9Huxbh4WN',
+	apiProduct: 'PUBLISHER'
 };
 
-const date = moment().subtract(2, "days");
-const fromDatePubmatic = date.format("YYYY-MM-DDT00:00");
-const toDatePubmatic = date.format("YYYY-MM-DDT23:59");
+const date = moment().subtract(2, 'days');
+const fromDatePubmatic = date.format('YYYY-MM-DDT00:00');
+const toDatePubmatic = date.format('YYYY-MM-DDT23:59');
 
-const fromDate = date.format("YYYY-MM-DD")
-const toDate = date.format("YYYY-MM-DD")
+const fromDate = date.format('YYYY-MM-DD');
+const toDate = date.format('YYYY-MM-DD');
 
 // response
 /**
@@ -37,7 +36,7 @@ const toDate = date.format("YYYY-MM-DD")
     }
  */
 
- /**
+/**
  * 1. Get Pub data
  * 2. Get AdPushup data for that Pub
  * 3. Compare both data
@@ -47,80 +46,80 @@ const toDate = date.format("YYYY-MM-DD")
 // 1. Get Auth token before each req
 // 2. Get Report Id
 // 3. Download Report - CSV
-const getDataFromPartner = function() {
+const getDataFromPartner = async function() {
 	// 1. Get Auth token before each req
-	return axios
+	const token = await axios
 		.post(`${API_ENDPOINT}/developer-integrations/developer/token`, authParams)
 		.then(response => response.data)
 		.then(function(data) {
 			const { accessToken } = data;
 			return accessToken;
 		})
-		.then(async function(token) {
-			console.log('Got Auth token before req....', token);
+		.catch(axiosErrorHandler);
+	console.log('Got Auth token before req....', token);
 
-			// 2. Get Report Data
-			const queryParams = {
-                dateUnit:'date',
-                dimensions:'siteId',
-                filters:'',
-                metrics:'netRevenue,paidImpressions,ecpm',
-                pageSize:'',
-                sort:'-netRevenue',
-                fromDate: fromDatePubmatic,
-				toDate: toDatePubmatic,
-				timeZone: "PST"
-			};
-			console.log(queryParams, 'queryParams')
-			const headers = {
-				Authorization: `Bearer ${token}`
-            };
+	// 2. Get Report Data
+	const queryParams = {
+		dateUnit: 'date',
+		dimensions: 'siteId',
+		filters: '',
+		metrics: 'netRevenue,paidImpressions,ecpm',
+		pageSize: '',
+		sort: '-netRevenue',
+		fromDate: fromDatePubmatic,
+		toDate: toDatePubmatic,
+		timeZone: 'PST'
+	};
+	const headers = {
+		Authorization: `Bearer ${token}`
+	};
 
-            var config = {
-                method: 'get',
-                url: `${API_ENDPOINT}/analytics/data/publisher/${PUBLISHER_ID}`,
-                params: queryParams,
-                headers
-            };
+	var config = {
+		method: 'get',
+		url: `${API_ENDPOINT}/analytics/data/publisher/${PUBLISHER_ID}`,
+		params: queryParams,
+		headers
+	};
 
-			return await axios(config)
-				.then(response => {
-                    return processDataReceivedFromPublisher(response.data)
-                }).catch(function(error) {
-					// handle error
-					console.log(error.message, 'error fetching data', 'errrr');
-				});
-		
-        })
-        .catch(function(error) {
+	return await axios(config)
+		.then(response => {
+			return processDataReceivedFromPublisher(response.data);
+		})
+		.catch(function(error) {
 			// handle error
-			console.log(error.message, 'error token data', 'errrr');
-		});
+			console.log(error.message, 'error fetching data', 'errrr');
+		})
+		.catch(axiosErrorHandler);
 };
+
 const processDataReceivedFromPublisher = data => {
-    let processedData = data.rows.map(row => {
-        const obj = {};
-        data.columns.map((col, index) => {
-            obj[col] = row[index];
-        })
-        return obj;
+	let processedData = data.rows.map(row => {
+		const obj = {};
+		data.columns.map((col, index) => {
+			obj[col] = row[index];
+		});
+		return obj;
 	});
 	processedData = processedData
-	.map(row => {
-        row.site_name = data.displayValue.siteId[row.siteId]
-        return row;
-	}).filter(row => /AP\/\d+_/.test(row.site_name))
-	.map(row => {
-		row.site_name = data.displayValue.siteId[row.siteId].replace(/AP\/\d+_/, '');
-		return row;
-	})
-    console.log('Processing end.............')
-    return processedData;
-}
+		.map(row => {
+			row.site_name = data.displayValue.siteId[row.siteId];
+			return row;
+		})
+		.filter(row => /AP\/\d+_/.test(row.site_name))
+		.map(row => {
+			row.site_name = data.displayValue.siteId[row.siteId].replace(/AP\/\d+_/, '');
+			return row;
+		});
+	console.log('Processing end.............');
+	return processedData;
+};
 
 const fetchData = sitesData => {
-
-	const PubmaticPartnerModel = new partnerAndAdpushpModel(sitesData, DOMAIN_FIELD_NAME, REVENUE_FIELD);
+	const PubmaticPartnerModel = new partnerAndAdpushpModel(
+		sitesData,
+		DOMAIN_FIELD_NAME,
+		REVENUE_FIELD
+	);
 
 	console.log('Fetching data from Pubmatic...');
 	return getDataFromPartner()
@@ -145,10 +144,6 @@ const fetchData = sitesData => {
 			const adpData = await PubmaticPartnerModel.getDataFromAdPushup(params);
 			let finalData = PubmaticPartnerModel.compareAdPushupDataWithPartnersData(adpData);
 
-			const {
-				PARTNERS_PANEL_INTEGRATION: { ANOMALY_THRESHOLD_IN_PER }
-			} = constants;
-			// filter out anomalies
 			// filter out anomalies
 			const anomalies = finalData.filter(
 				item =>
@@ -166,25 +161,18 @@ const fetchData = sitesData => {
 						partner: PARTNER_NAME,
 						anomalies
 					}),
-					saveAnomaliesToDb({
-						anomalyData: dataToSend
-					})
-				])
-				return {
-					total: finalData.length,
-					anomalies: anomalies.length,
-					partner: PARTNER_NAME
-				};
+					saveAnomaliesToDb(dataToSend, PARTNER_NAME)
+				]);
 			}
-		})
-		.catch(async function(error) {
-			await emailer.serviceErrorNotificationMailService({
+			return {
+				total: finalData.length,
+				anomalies: anomalies.length,
 				partner: PARTNER_NAME,
-				error
-			})
-			// handle error
-			console.log('error', `err with ${PARTNER_NAME}`);
-		});
+				message: 'Success'
+			};
+
+		})
+		.catch(partnerModuleErrorHandler.bind(null, PARTNER_NAME))
 };
 
 module.exports = fetchData;

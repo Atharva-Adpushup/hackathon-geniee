@@ -63,7 +63,7 @@ const anomaliesMailService = async ({partner, anomalies}) => {
 		});
 };
 
-const serviceErrorNotificationMailService = async ({partner, error}) => {
+const serviceErrorNotificationMailService = async (error, module) => {
 	// const ownerEmails = config.onwers.emails || [];
 	const ownerEmails = ['harpreet.singh@adpushup.com'];
 
@@ -72,7 +72,7 @@ const serviceErrorNotificationMailService = async ({partner, error}) => {
 	}
 	const emailRecepient = ownerEmails.join(',');
 
-	let emailbody = `<h1> ${partner} - Error Notification Service </h1>
+	let emailbody = `<h1> ${module} - Error Notification Service </h1>
 		<p>
 			${error}
         </p>
@@ -83,7 +83,7 @@ const serviceErrorNotificationMailService = async ({partner, error}) => {
 		data: {
 			to: emailRecepient,
 			body: emailbody,
-			subject: `${partner} - Service Error Alert!!!`
+			subject: `${module} - Service Error Alert!!!`
 		}
 	};
 
