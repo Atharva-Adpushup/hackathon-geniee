@@ -635,6 +635,16 @@ var utils = {
 		const shouldInflateBid = isBidInflationPercentageValid ? ( isABTestingForBidInflationEnabled ? Math.random() * 100 <= 50 : true ) : false;
 		utils.log(`Should Inflate Bid ${shouldInflateBid}`);
 		window.adpushup.shouldInflateBid = shouldInflateBid;
+	},
+	getOriginalCpmFromInflated: function(cpm) {
+		const { bidInfationPercentage } = adp.config || {};
+
+		if(typeof cpm !== 'number') {
+			cpm = parseFloat(cpm);
+		}
+
+		return ( cpm * 100 ) / ( bidInfationPercentage + 100 );
+
 	}
 };
 

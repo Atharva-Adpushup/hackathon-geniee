@@ -98,7 +98,7 @@ var helpers = {
 				var cpm = calculateBidCpmForFeedback(bid);
 
 				var bidData = {
-					cpm: window.adpushup.shouldInflateBid ? parseFloat(cpm) : bid['cpm'],
+					cpm: window.adpushup.shouldInflateBid ? utils.getOriginalCpmFromInflated(bid['cpm']) : bid['cpm'],
 					adId: bid['adId'],
 					originalCpm: bid['originalCpm'],
 					// fields above are used for calculating cpm if this bid is compared with future bids and be the one with the highest cpm
