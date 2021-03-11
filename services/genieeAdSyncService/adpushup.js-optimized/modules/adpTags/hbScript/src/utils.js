@@ -614,6 +614,38 @@ var utils = {
 
 			return isValid;
 		});
+	},
+	inflateBidCpm: function(cpm) {
+		const { bidInfationPercentage } = adp.config || {};
+		const isCpmValid = this.isValidNumber(cpm);
+
+		if (!isCpmValid) return cpm;
+
+		const inflatedCpm = cpm + ( cpm * (bidInfationPercentage / 100) );
+		adp.utils.log(`CPM: ${cpm} inflated to ${inflatedCpm}`);
+		return inflatedCpm;
+	},
+	isValidNumber: function(value) {
+		const isValid = typeof value === 'number' && !!value;
+		return isValid;
+	},
+	setShouldPerformBidInflation: function() {
+		const { bidInfationPercentage, isABTestingForBidInflationEnabled } = adp.config || {};
+		const isBidInflationPercentageValid = this.isValidNumber(bidInfationPercentage);
+
+		const shouldInflateBid = isBidInflationPercentageValid ? ( isABTestingForBidInflationEnabled ? Math.random() * 100 <= 50 : true ) : false;
+		utils.log(`Should Inflate Bid ${shouldInflateBid}`);
+		window.adpushup.shouldInflateBid = shouldInflateBid;
+	},
+	getOriginalCpmFromInflated: function(cpm) {
+		const { bidInfationPercentage } = adp.config || {};
+
+		if(typeof cpm !== 'number') {
+			cpm = parseFloat(cpm);
+		}
+
+		return ( cpm * 100 ) / ( bidInfationPercentage + 100 );
+
 	}
 };
 

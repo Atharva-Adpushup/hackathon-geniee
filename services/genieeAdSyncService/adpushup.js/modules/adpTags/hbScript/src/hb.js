@@ -264,6 +264,11 @@ var hb = {
 
 		this.loadPrebid(w);
 		this.loadAmazonApsTag(w);
+
+		if (HB_ACTIVE) {
+			// decision on if inflation should be applied needs to be decided on a page level
+			utils.setShouldPerformBidInflation();
+		}
 	}
 };
 

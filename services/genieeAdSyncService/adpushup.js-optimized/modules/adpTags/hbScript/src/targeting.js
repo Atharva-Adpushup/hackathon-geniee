@@ -67,6 +67,10 @@ var targeting = {
 		};
 		var adServerTargeting = this.getAdserverTargeting(adpSlot);
 
+		if (window.adpushup.shouldInflateBid && adServerTargeting && Object.keys(adServerTargeting).length && adServerTargeting[keys.CPM]) {
+			targeting[keys.INFLATED_CPM] = true;
+		}
+
 		if (adpSlot.bidders.length) {
 			Object.assign(targeting, { [keys.HB_RAN]: 1 });
 		}
