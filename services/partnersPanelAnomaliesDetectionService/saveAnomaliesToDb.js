@@ -1,6 +1,6 @@
 const axios = require('axios');
 const { BACKEND_API_URL } = require('./config')
-const emailer = require('./emailer');
+const emailer = require('./Emailer');
 const saveAnomaliesToDb = async (data, module) => {
 	const config = {
 		method: 'post',
