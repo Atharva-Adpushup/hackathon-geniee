@@ -20,6 +20,14 @@ const authParams = {
 	client_id: 'sovrn',
 	client_secret: 'sovrn'
 };
+
+var FormData = require('form-data');
+var data = new FormData();
+data.append('grant_type', 'password');
+data.append('username', 'adpushup1');
+data.append('password', 'uCB78s6Bb4LR52M');
+data.append('client_id', 'sovrn');
+data.append('client_secret', 'sovrn');
 // response
 /**
     {
@@ -45,73 +53,75 @@ const authParams = {
 const getDataFromPartner = function() {
 	// 1. Get Auth token before each req
 	console.log('Get Auth token before each req');
-	return (
-		Promise.resolve('')
-			// return axios
-			// 	.post(`${API_ENDPOINT}/oauth/token`, authParams)
-			.then(response => response.data)
-			.then(function(data) {
-				return '2ba4aa39-2937-49ed-820a-c8f4d2aac6db';
-				const { accessToken } = data;
-				return accessToken;
-			})
-			.then(async function(token) {
-				console.log('Got Auth token before req....', token);
+	const config = {
+		method: 'post',
+		url: 'https://api.sovrn.com/oauth/token',
+		data: data,
+		headers: {
+			...data.getHeaders()
+		}
+	}
+	return axios(config)
+		.then(response => response.data)
+		.then(function(response) {
+			const { access_token } = response;
+			return access_token;
+		})
+		.then(async function(token) {
+			console.log('Got Auth token before req....', token);
 
-				const headers = {
-					Authorization: `Bearer ${token}`
-				};
+			const headers = {
+				Authorization: `Bearer ${token}`
+			};
 
-				// 2. Get User IID and All Sites
-				// var config = {
-				// 	method: 'get',
-				// 	url: `${API_ENDPOINT}/account/user`,
-				// 	headers
-				// };
+			// 2. Get User IID and All Sites
+			// var config = {
+			// 	method: 'get',
+			// 	url: `${API_ENDPOINT}/account/user`,
+			// 	headers
+			// };
 
-				var config = {
-					method: 'get',
-					url: 'https://api.sovrn.com/account/user',
-					headers: {
-						Authorization: 'Bearer d7eaa068-5715-4b24-af0f-a2a7ab01ff54',
-					}
-				};
+			var config = {
+				method: 'get',
+				url: 'https://api.sovrn.com/account/user',
+				headers,
+				timeout: 1000 * 60 * 3
+			};
 
-				const {iid, websites} = await axios(config)
-					.then(function(response) {
-						return response.data;
-					})
-					.catch(function(error) {
-						console.log(error.message);
-					});
-
-				// 3. Req for each date separately - time should be in millisecond
-				// Need to send requests in batches
-				const batchQueue = processReqInBatches(websites.map(item => item.site), headers);
-
-				// process;
-				const queryParams = {
-					site: 'All%20Traffic',
-					startDate: '1614018600000',
-					startDate: '1614061799000',
-					iid
-				};
-				var config = {
-					method: 'get',
-					url: `${API_ENDPOINT}/earnings/breakout/all`,
-					params: queryParams,
-					headers
-				};
-
-				return await axios(config).then(response => {
-					return processDataReceivedFromPublisher(response.data);
+			const {iid, websites} = await axios(config)
+				.then(function(response) {
+					return response.data;
+				})
+				.catch(function(error) {
+					console.log(error.message);
 				});
-			})
-			.catch(function(error) {
-				// handle error
-				console.log(error.message, 'error token data', 'errrr');
-			})
-	);
+console.log(iid, websites, 'iid, websites')
+			// 3. Req for each date separately - time should be in millisecond
+			// Need to send requests in batches
+			const batchQueue = processReqInBatches(websites.map(item => item.site), headers);
+
+			// process;
+			const queryParams = {
+				site: 'All%20Traffic',
+				startDate: '1614018600000',
+				startDate: '1614061799000',
+				iid
+			};
+			var config = {
+				method: 'get',
+				url: `${API_ENDPOINT}/earnings/breakout/all`,
+				params: queryParams,
+				headers
+			};
+
+			return await axios(config).then(response => {
+				return processDataReceivedFromPublisher(response.data);
+			});
+		})
+		.catch(function(error) {
+			// handle error
+			console.log(error.message, 'error token data', 'errrr');
+		})
 };
 
 const processReqInBatches = (queue, headers) => {

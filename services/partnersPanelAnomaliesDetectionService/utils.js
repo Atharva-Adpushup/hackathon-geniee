@@ -2,6 +2,7 @@ const CustomError = require('./CustomError');
 const Emailer = require('./Emailer');
 
 const axiosErrorHandler = err => {
+    console.log(err)
     if(err.response) {
         throw new CustomError(`${err.response.data.Message} - ${err.response.status} ${err.response.statusText}`)
     } else if(err.request) {
@@ -11,6 +12,7 @@ const axiosErrorHandler = err => {
     }
 }
 const partnerModuleErrorHandler = async (module, err) => {
+    console.log(err)
     if(err instanceof CustomError) {
         await sendErrorNotification(err, module)
     }
@@ -22,6 +24,7 @@ const partnerModuleErrorHandler = async (module, err) => {
     };
 }
 const couchbaseErrorHandler = err => {
+    console.log(err)
     if(err.message) {
         throw new CustomError(`${err.toString()} - ${err.code} ${err.message}`)
     } else {
@@ -30,6 +33,7 @@ const couchbaseErrorHandler = err => {
 }
 
 const sendErrorNotification = async (err, module) => {
+    console.log(err)
     await Emailer.serviceErrorNotificationMailService(err, module);
 }
 

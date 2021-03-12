@@ -148,27 +148,35 @@ const Class = require('../../helpers/class'),
 				// get data from hash object using domain
 				let mappedData = this.sitesDomainAndIdMapping[domain];
 
-				const diff = +(mappedData.pubRevenue) - +(mappedData.adpRevenue);
-                const total = +(mappedData.pubRevenue) + +(mappedData.adpRevenue);
-				mappedData.diff = diff;
-				// prevent divide by zero
-				mappedData.diffPer = total>0?((diff / (total/2)) * 100).toFixed(2):0;
-				mappedData.date = moment(mappedData.date).format('YYYY-MM-DD')
-				mappedData.siteDomain = domain
-				finalData.push(mappedData);
+				// if date is undefined then it means it is not present in ADP data
+				// ignore those values
+				if(mappedData.date) {
+					const diff = +(mappedData.pubRevenue) - +(mappedData.adpRevenue);
+					const total = +(mappedData.pubRevenue) + +(mappedData.adpRevenue);
+					mappedData.diff = diff;
+					// prevent divide by zero
+					mappedData.diffPer = total>0?((diff / (total/2)) * 100).toFixed(2):0;
+					mappedData.siteDomain = domain
+					mappedData.date = moment(mappedData.date).format('YYYY-MM-DD')
+					finalData.push(mappedData);
+				}
 			});
 			return finalData;
 		};
-		this.formatAnomaliesDataForSQL = function(data, NETWORK_ID) {		  
-			return data.map(item => {
+		this.formatAnomaliesDataForSQL = function(data, NETWORK_ID) {
+			const sqlData = data.map(item => {
+				const site = item.sites.shift()
 				return {
 					report_date: moment(item.date).format('YYYY-MM-DD'),
 					ntwid: NETWORK_ID,
-					siteid: item.siteId,
+					siteid: site.siteId,
 					ap_revenue: item.adpRevenue,
 					network_revenue: item.pubRevenue
 				}
 			})
+			return {
+				anomalyData: sqlData
+			}
 		};
 
 	});

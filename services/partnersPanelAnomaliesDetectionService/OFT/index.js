@@ -17,10 +17,16 @@ const API_ENDPOINT = `https://api.appnexus.com`;
 // const DOMAIN_FIELD_NAME = 'site_name';
 // const REVENUE_FIELD = 'publisher_revenue';
 
+const fromDateOFT = moment()
+	.subtract(1, 'days')
+	.format('YYYY-MM-DD');
+const toDateOFT = moment()
+	.format('YYYY-MM-DD');
+
 const fromDate = moment()
 	.subtract(1, 'days')
 	.format('YYYY-MM-DD');
-const toDate = moment().format('YYYY-MM-DD');
+const toDate = fromDate;
 
 const authParams = {
 	auth: {
@@ -47,7 +53,8 @@ const getDataFromPartner = async function() {
 		.then(function(data) {
 			const { token } = data;
 			return token;
-		}).catch(axiosErrorHandler);
+		})
+		.catch(axiosErrorHandler);
 
 	console.log('Got Auth token before req....', token);
 
@@ -55,8 +62,8 @@ const getDataFromPartner = async function() {
 	const queryParams = {
 		report: {
 			report_type: 'publisher_analytics',
-			start_date: fromDate,
-			end_date: toDate,
+			start_date: fromDateOFT,
+			end_date: toDateOFT,
 			columns: ['day', 'clicks', 'publisher_revenue', 'site_id', 'site_name'],
 			orders: [{ order_by: 'day', direction: 'ASC' }],
 			format: 'csv',
@@ -132,7 +139,7 @@ const fetchData = sitesData => {
 
 			// if aonmalies found
 			if (anomalies.length) {
-				const dataToSend = OFTMediaPartnerModel.formatAnomaliesDataForSQL(anomalies);
+				const dataToSend = OFTMediaPartnerModel.formatAnomaliesDataForSQL(anomalies, NETWORK_ID);
 				await Promise.all([
 					emailer.anomaliesMailService({
 						partner: PARTNER_NAME,
@@ -148,7 +155,7 @@ const fetchData = sitesData => {
 				message: 'Success'
 			};
 		})
-		.catch(partnerModuleErrorHandler.bind(null, PARTNER_NAME))
+		.catch(partnerModuleErrorHandler.bind(null, PARTNER_NAME));
 };
 
 module.exports = fetchData;

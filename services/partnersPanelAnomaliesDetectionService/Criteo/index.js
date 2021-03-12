@@ -15,7 +15,7 @@ const TOKEN = 'D152A218-5DE9-4834-91F0-95542119D520';
 const API_ENDPOINT = `https://pmc.criteo.com/api/stats?apitoken=${TOKEN}`;
 
 const fromDate = moment()
-	.subtract(2, 'days')
+	.subtract(1, 'days')
 	.format('YYYY-MM-DD');
 const toDate = fromDate;
 
@@ -35,10 +35,11 @@ const getDataFromPartner = function() {
 	return axios
 		.get(API_ENDPOINT, {
 			params: queryParams
+		}, {
+			timeout: 1000 * 60 * 3
 		})
 		.then(response => response.data)
-		.catch(axiosErrorHandler)
-
+		.catch(axiosErrorHandler);
 };
 /**
  * 1. Get Pub data
@@ -55,17 +56,13 @@ const fetchData = async sitesData => {
 
 	console.log('Fetching data from Criteo...');
 	return getDataFromPartner()
-			.then(async function(reportDataJSON) {
+		.then(async function(reportDataJSON) {
 			CriteoPartnerModel.setPartnersData(reportDataJSON);
 			// process and map sites data with publishers API data structure
 			CriteoPartnerModel.mapAdPushupSiteIdAndDomainWithPartnersDomain();
 			// Map PartnersData with AdPushup's SiteId mapping data
 			CriteoPartnerModel.mapPartnersDataWithAdPushupSiteIdAndDomain();
 
-			const siteIdArr = CriteoPartnerModel.getSiteIds();
-			if(!siteIdArr.length) {
-				return Promise.reject(new Error('something wrong...'))
-			}
 			// TBD - Remove hard coded dates after testing
 			const params = {
 				siteid: CriteoPartnerModel.getSiteIds().join(','),
@@ -76,7 +73,7 @@ const fetchData = async sitesData => {
 				dimension: 'siteid'
 			};
 
-			const adpData = await CriteoPartnerModel.getDataFromAdPushup(params)
+			const adpData = await CriteoPartnerModel.getDataFromAdPushup(params);
 			let finalData = CriteoPartnerModel.compareAdPushupDataWithPartnersData(adpData);
 
 			// filter out anomalies
@@ -106,7 +103,7 @@ const fetchData = async sitesData => {
 				message: 'Success'
 			};
 		})
-		.catch(partnerModuleErrorHandler.bind(null, PARTNER_NAME))
+		.catch(partnerModuleErrorHandler.bind(null, PARTNER_NAME));
 };
 
 module.exports = fetchData;
