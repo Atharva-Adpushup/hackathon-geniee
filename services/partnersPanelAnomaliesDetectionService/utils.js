@@ -1,5 +1,5 @@
 const CustomError = require('./CustomError');
-const Emailer = require('./Emailer');
+const Emailer = require('./emailer');
 
 const axiosErrorHandler = err => {
     console.log(err)
