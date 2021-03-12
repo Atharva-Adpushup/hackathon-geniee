@@ -3,7 +3,7 @@ const moment = require('moment');
 const csv = require('csvtojson');
 
 const partnerAndAdpushpModel = require('../PartnerAndAdpushpModel');
-const emailer = require('../Emailer');
+const emailer = require('../emailer');
 const saveAnomaliesToDb = require('../saveAnomaliesToDb');
 const { axiosErrorHandler, partnerModuleErrorHandler } = require('../utils');
 
