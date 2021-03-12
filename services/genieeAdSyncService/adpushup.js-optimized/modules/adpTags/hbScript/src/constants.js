@@ -494,7 +494,12 @@ var constants = {
 	BATCHING_INTERVAL: 50,
 	UTM_SESSION_COOKIE: '_adp_utm_session_',
 	VIDEO_PLAYER_EXCEPTION_SIZES: [[300, 250], [480, 320], [320, 480], [320, 50]],
-	DEFAULT_JW_PLAYER_SIZE: [256, 144]
+	DEFAULT_JW_PLAYER_SIZE: [256, 144],
+	FORMAT_WISE_PARAMS_PREFIX: {
+		display: 'apDisplay_',
+		native: 'apNative_',
+		video: 'apVideo_'
+	}
 };
 
 module.exports = constants;

@@ -66,9 +66,12 @@ var hb = {
 				size = adpSlot.optionalParam.overrideSizeTo.split('x');
 			}
 
-			var computedBidders = clonedeep(adpSlot.bidders);
+			var {
+				nonFormatWiseBidders = [],
+				formatWiseBidders = {}
+			} = clonedeep(adpSlot.bidders);
 			var sizeConfig = config.PREBID_CONFIG.deviceConfig.sizeConfig;
-			computedBidders.forEach(function(val, i) {
+			nonFormatWiseBidders.forEach(function(val, i) {
 				// find size config of current bidder
 				var index;
 				for (index = 0; index < sizeConfig.length; index++) {
@@ -80,45 +83,81 @@ var hb = {
 
 				// if found then set its labels as labelAny in current bidder object
 				if (!isNaN(index) && sizeConfig[index]) {
-					computedBidders[i].labelAny = sizeConfig[index].labels;
+					nonFormatWiseBidders[i].labelAny = sizeConfig[index].labels;
 				}
+			});
+
+			Object.keys(formatWiseBidders).forEach(format => {
+				const formatBidders = formatWiseBidders[format] || [];
+				formatBidders.forEach((bidder, i) => {
+
+					var index;
+					for (index = 0; index < sizeConfig.length; index++) {
+						var element = sizeConfig[index];
+						if (element.bidder === bidder.bidder) {
+							break;
+						}
+
+						if (!isNaN(index) && sizeConfig[index]) {
+							formatWiseBidders[format][i].labelAny = sizeConfig[index].labels;
+						}
+					}
+
+				});
 			});
 
 			var prebidSlot = {
 				code: adpSlot.containerId,
 				mediaTypes: {},
 				sizes: prebidSizes,
-				bids: computedBidders
+				bids: nonFormatWiseBidders
 			};
 
 			adpSlot.formats.forEach(function(format) {
+				var formatBidders = formatWiseBidders[format] || [];
+				var slotForFormat = { 
+					code: adpSlot.containerId,
+					mediaTypes: {},
+					sizes: prebidSizes,
+					bids: formatBidders
+				};
 				switch (format) {
 					case 'display': {
-						prebidSlot.mediaTypes.banner = {
+						var bannerConfig = {
 							...mediaTypesConfig.banner,
 							sizes: prebidSizes
 						};
+						prebidSlot.mediaTypes.banner = bannerConfig;
+						slotForFormat.mediaTypes.banner = bannerConfig;
 						break;
 					}
 					case 'video': {
 						var playerSize = utils.getVideoPlayerSize(prebidSizes);
-						prebidSlot.renderer = {
+						var renderer = {
 							url: multiFormatConstants.VIDEO.RENDERER_URL,
 							render: videoRenderer.bind(null, adpSlot, playerSize)
 						};
-						prebidSlot.mediaTypes.video = {
+						var videoConfig = {
 							...mediaTypesConfig.video,
 							playerSize
 						};
+						prebidSlot.renderer = renderer;
+						prebidSlot.mediaTypes.video = videoConfig;
+
+						slotForFormat.renderer = renderer;
+						slotForFormat.mediaTypes.video = videoConfig;
 						break;
 					}
 					case 'native': {
-						prebidSlot.mediaTypes.native = {
+						var nativeConfig = {
 							...mediaTypesConfig.native
 						};
+						prebidSlot.mediaTypes.native = nativeConfig
+						slotForFormat.mediaTypes.native = nativeConfig;
 						break;
 					}
 				}
+				if (formatBidders.length) prebidSlots.push(slotForFormat);
 			});
 
 			prebidSlots.push(prebidSlot);

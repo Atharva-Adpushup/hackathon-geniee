@@ -51,7 +51,7 @@ var targeting = {
 		}
 	},
 	getAdserverTargeting: function(adpSlot) {
-		if (adpSlot.optionalParam.headerBidding && adpSlot.bidders.length) {
+		if (adpSlot.optionalParam.headerBidding && utils.checkForValidBidders(adpSlot.bidders)) {
 			return window._apPbJs.getAdserverTargeting()[adpSlot.containerId];
 		}
 
@@ -71,7 +71,7 @@ var targeting = {
 			targeting[keys.INFLATED_CPM] = true;
 		}
 
-		if (adpSlot.bidders.length) {
+		if (utils.checkForValidBidders(adpSlot.bidders)) {
 			Object.assign(targeting, { [keys.HB_RAN]: 1 });
 		}
 
