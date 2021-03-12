@@ -45,7 +45,7 @@ const anomaliesMailService = async ({partner, anomalies}) => {
 		data: {
 			to: emailRecepient,
 			body: emailbody,
-			subject: `${partner} - Partners Panel Anomaly Detection Service !!!`
+			subject: `${partner} - Partners Panel Anomaly Detection Service(Beta verison) !!!`
 		}
 	};
 
@@ -83,7 +83,7 @@ const serviceErrorNotificationMailService = async (error, module) => {
 		data: {
 			to: emailRecepient,
 			body: emailbody,
-			subject: `${module} - Service Error Alert!!!`
+			subject: `${module} - Service Error Alert(Beta verison)!!!`
 		}
 	};
 

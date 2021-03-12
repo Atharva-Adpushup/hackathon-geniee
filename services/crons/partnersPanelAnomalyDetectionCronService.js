@@ -33,8 +33,8 @@ function startParntersPanelsAnomaliesDetectionService() {
 			return Promise.all([
 				criteo(sitesData),
 				OFT(sitesData),
-				Pubmatic(sitesData)
-				// IndexExchange(sitesData),
+				Pubmatic(sitesData),
+				IndexExchange(sitesData),
 				// Sovrn(sitesData)
 			]).catch(err => {
 				throw { err };
