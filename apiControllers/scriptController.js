@@ -16,6 +16,10 @@ const generateAdNetworkConfig = require('../services/genieeAdSyncService/cdnSync
 const generateAdPushupAdsConfig = require('../services/genieeAdSyncService/cdnSyncService/generateAdPushupConfig');
 const AdPushupError = require('../helpers/AdPushupError');
 const httpStatusConsts = require('../configs/httpStatusConsts');
+const {
+	getSizeMappingConfigFromCB
+} = require('../services/genieeAdSyncService/cdnSyncService/commonFunctions');
+const { isValidThirdPartyDFPAndCurrency } = require('../helpers/commonFunctions');
 
 const Router = express.Router();
 
@@ -174,9 +178,17 @@ Router.get('/:siteId/ampSiteConfig', (req, res) => {
 				const apConfigs = site.get('apConfigs');
 				const adServerSettings = user.get('adServerSettings');
 
-				const { prebidConfig, refreshLineItems, ampScriptConfig } = prebidAndAdsConfig;
+				const {
+					prebidConfig,
+					refreshLineItems,
+					ampScriptConfig,
+					sizeMappingConfig,
+					currencyConfig
+				} = prebidAndAdsConfig;
 
 				if (refreshLineItems) apConfigs.refreshLineItems = refreshLineItems;
+				if (sizeMappingConfig) apConfigs.sizeMapping = sizeMappingConfig;
+				if (currencyConfig) apConfigs.currencyConfig = currencyConfig;
 				apConfigs.siteDomain = site.get('siteDomain');
 				apConfigs.ownerEmailMD5 = crypto
 					.createHash('md5')
@@ -187,13 +199,19 @@ Router.get('/:siteId/ampSiteConfig', (req, res) => {
 					(adServerSettings && adServerSettings.dfp && adServerSettings.dfp.activeDFPNetwork) ||
 					null;
 
-				// TODO: rj: validate ads
-				if (ampScriptConfig && ampScriptConfig.ads.length) apConfigs.ampAds = ampScriptConfig.ads;
+				if (ampScriptConfig && ampScriptConfig.ads.length) {
+					apConfigs.ampConfig = {
+						ampAds: ampScriptConfig.ads,
+						isPnpEnabled: !!ampScriptConfig.isPnpEnabled,
+						firstImpressionSiteId: ampScriptConfig.firstImpressionSiteId
+					};
+				}
 
 				// Default 'draft' mode is selected if config mode is not present
-				apConfigs.mode = apConfigs.mode === 1 && apConfigs.ampAds.length ? apConfigs.mode : 2;
+				apConfigs.mode = apConfigs.mode === 1 && apConfigs.ampConfig ? apConfigs.mode : 2;
 
 				if (apps.headerBidding && Object.keys(prebidConfig.hbcf).length) {
+					delete prebidConfig.email;
 					apConfigs.hbConfig = prebidConfig;
 				}
 
@@ -238,16 +256,44 @@ Router.get('/:siteId/ampSiteConfig', (req, res) => {
 				});
 			};
 
+			const getCurrencyConfig = function() {
+				const adServerSettings = user.get('adServerSettings');
+				const isValidCurrencyCnfg =
+					adServerSettings &&
+					adServerSettings.dfp &&
+					isValidThirdPartyDFPAndCurrency(adServerSettings.dfp);
+
+				if (isValidCurrencyCnfg) {
+					const activeAdServer = adServerSettings.dfp;
+					return {
+						adServerCurrency: activeAdServer.activeDFPCurrencyCode,
+						granularityMultiplier: Number(activeAdServer.prebidGranularityMultiplier) || 1
+					};
+				}
+			};
+
 			return Promise.join(
 				generatePrebidConfig(siteId),
 				generateAmpScriptAdsConfig(siteId),
-				getRefreshLineItems()
+				getRefreshLineItems(),
+				getSizeMappingConfigFromCB(),
+				getCurrencyConfig()
 			)
-				.then(([prebidConfig, ampScriptConfig, refreshLineItems]) => ({
-					prebidConfig,
-					ampScriptConfig,
-					refreshLineItems
-				}))
+				.then(
+					([
+						prebidConfig,
+						ampScriptConfig,
+						refreshLineItems,
+						sizeMappingConfig,
+						currencyConfig
+					]) => ({
+						prebidConfig,
+						ampScriptConfig,
+						refreshLineItems,
+						sizeMappingConfig,
+						currencyConfig
+					})
+				)
 				.then(generateApConfig);
 		})
 		.then(scriptConfig => res.send({ error: null, data: { config: scriptConfig } }))
