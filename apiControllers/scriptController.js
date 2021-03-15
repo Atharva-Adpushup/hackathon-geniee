@@ -186,7 +186,8 @@ Router.get('/:siteId/ampSiteConfig', (req, res) => {
 					currencyConfig
 				} = prebidAndAdsConfig;
 
-				if (refreshLineItems) apConfigs.refreshLineItems = refreshLineItems;
+				// TODO: Start sending refresh lineitems when stop refresh feature is ready
+				// if (refreshLineItems) apConfigs.refreshLineItems = refreshLineItems;
 				if (sizeMappingConfig) apConfigs.sizeMapping = sizeMappingConfig;
 				if (currencyConfig) apConfigs.currencyConfig = currencyConfig;
 				apConfigs.siteDomain = site.get('siteDomain');
