@@ -16,7 +16,10 @@ state.cluster = new couchbase.Cluster('couchbase://' + config.couchBase.HOST, {
 
 // RBAC (Role Based Access Control) Authentication,
 // See https://docs.couchbase.com/server/5.1/security/security-rbac-user-management.html
-state.cluster.authenticate(config.couchBase.DEFAULT_USER_NAME, config.couchBase.DEFAULT_USER_PASSWORD);
+state.cluster.authenticate(
+	config.couchBase.DEFAULT_USER_NAME,
+	config.couchBase.DEFAULT_USER_PASSWORD
+);
 
 function connect(bucket) {
 	if (state[bucket]) {
@@ -45,6 +48,27 @@ API = {
 	queryViewFromAppBucket: function(query) {
 		return API.connectToAppBucket().then(function(appBucket) {
 			return appBucket.queryAsync(query);
+		});
+	},
+	getDoc: (bucketName, docId) => {
+		return API.connectToBucket(bucketName)
+			.then(bucket => bucket.getAsync(docId))
+			.catch(err => {
+				if (err && err.code === 13) {
+					return { value: {} };
+				}
+				throw new Error(err);
+			});
+	},
+	replaceDoc: (bucketName, docId, doc) => {
+		return API.connectToBucket(bucketName).then(bucket => bucket.replaceAsync(docId, doc));
+	},
+	upsertDoc: (bucketName, docId, doc) => {
+		return API.connectToBucket(bucketName).then(bucket => {
+			const upsertQuery = `UPSERT INTO ${bucketName} (KEY, VALUE) VALUES ("${docId}", ${JSON.stringify(
+				doc
+			)})`;
+			return bucket.queryAsync(couchbase.N1qlQuery.fromString(upsertQuery));
 		});
 	},
 	cluster: state.cluster
