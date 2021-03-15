@@ -1,4 +1,4 @@
-const schedule = require('node-schedule');
+// const schedule = require('node-schedule');
 
 const CC = require('../../configs/commonConsts');
 const criteo = require('../partnersPanelAnomaliesDetectionService/Criteo');
@@ -34,8 +34,8 @@ function startParntersPanelsAnomaliesDetectionService() {
 				criteo(sitesData),
 				OFT(sitesData),
 				Pubmatic(sitesData),
-				IndexExchange(sitesData),
-				// Sovrn(sitesData)
+				// IndexExchange(sitesData),
+				// // Sovrn(sitesData)
 			]).catch(err => {
 				throw { err };
 			});

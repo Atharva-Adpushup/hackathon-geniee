@@ -3,7 +3,8 @@ const URL = 'http://queuepublisher.adpushup.com/publish'
 
 const anomaliesMailService = async ({partner, anomalies}) => {
 	// const ownerEmails = config.onwers.emails || [];
-	const ownerEmails = ['harpreet.singh@adpushup.com', "anil.panghal@adpushup.com", "rahul.ranjan@adpushup.com", "akshay.varma@adpushup.com", "navya.perla@adpushup.com"];
+	// const ownerEmails = ['harpreet.singh@adpushup.com', "anil.panghal@adpushup.com", "rahul.ranjan@adpushup.com", "akshay.varma@adpushup.com", "navya.perla@adpushup.com"];
+	const ownerEmails = ['harpreet.singh@adpushup.com'];
 
 	if (!ownerEmails.length) {
 		throw new Error("Please add owner email's in the config file to send email's to the owners");
