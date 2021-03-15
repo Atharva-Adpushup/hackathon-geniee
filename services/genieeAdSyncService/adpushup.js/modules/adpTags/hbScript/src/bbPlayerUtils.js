@@ -17,6 +17,9 @@ var bbPlayerUtils = {
 		return '/p/inarticle/a/' + adUnitCode;
 	},
 	sendBbPlayerLogs: function(type, eventName, adpSlot, bid, bidWonTime) {
+		// TODO: Temp change for debugging rubicon issue
+		if (!bid || bid.mediaType !== 'video' || bid.bidderCode !== 'rubicon') return;
+
 		const adp = window.adpushup;
 		if (!type || !adp.config.enableBbPlayerLogging) return;
 		let json = {
@@ -77,6 +80,16 @@ var bbPlayerUtils = {
 			default: {
 				return;
 			}
+		}
+
+		// TODO: Temp change for debugging rubicon issue
+		if (
+			eventName === 'video_bid_received' ||
+			eventName === 'error' ||
+			eventName === 'aderror'
+		) {
+			json.vastXml = bid.vastXml || '';
+			json.vastUrl = bid.vastUrl || '';
 		}
 
 		window.adpushup.$.ajax({

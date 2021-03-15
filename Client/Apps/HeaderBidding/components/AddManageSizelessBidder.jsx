@@ -42,7 +42,8 @@ class AddManageSizelessBidder extends React.Component {
 						params,
 						isAmpActive,
 						isS2SActive,
-						isS2S
+						isS2S,
+						enableFormatWiseParams
 					}
 				} = this.props;
 
@@ -55,7 +56,7 @@ class AddManageSizelessBidder extends React.Component {
 				}
 
 				const formFields = {
-					bidderConfig: getCommonBidderFields(isApRelation && isSuperUser),
+					bidderConfig: getCommonBidderFields(isApRelation, isSuperUser),
 					params
 				};
 
@@ -98,6 +99,7 @@ class AddManageSizelessBidder extends React.Component {
 							reusable,
 							isAmpActive,
 							isS2SActive,
+							enableFormatWiseParams,
 							...newState.bidderConfig
 						};
 						newState.validationSchema = getValidationSchema({
@@ -130,7 +132,8 @@ class AddManageSizelessBidder extends React.Component {
 						revenueShare,
 						isAmpActive,
 						isS2SActive,
-						isS2S
+						isS2S,
+						enableFormatWiseParams
 					}
 				} = this.props;
 
@@ -142,7 +145,7 @@ class AddManageSizelessBidder extends React.Component {
 					};
 				}
 				const formFields = {
-					bidderConfig: getCommonBidderFields(isApRelation && isSuperUser, {
+					bidderConfig: getCommonBidderFields(isApRelation, isSuperUser, {
 						values: {
 							relation,
 							bids,
@@ -204,6 +207,7 @@ class AddManageSizelessBidder extends React.Component {
 							isAmpActive,
 							isS2SActive,
 							revenueShare,
+							enableFormatWiseParams,
 							...newState.bidderConfig
 						};
 						newState.validationSchema = getValidationSchema({

@@ -26,7 +26,9 @@ class Settings extends Component {
 			hbAnalytics = false,
 			cmpAvailable = false,
 			mergeReport = false,
-			isPnp = false
+			isPnp = false,
+			isWeeklyEmailReportsEnabled = false,
+			isDailyEmailReportsEnabled = false
 		} = site.apConfigs || {};
 		const { revenueShare = 10 } = site.adNetworkSettings || {};
 		const status = Object.prototype.hasOwnProperty.call(apps, 'apLite') ? apps.apLite : undefined;
@@ -44,7 +46,9 @@ class Settings extends Component {
 			hbAnalytics,
 			cmpEnabled: !cmpAvailable,
 			mergeReport,
-			isPnp
+			isPnp,
+			isWeeklyEmailReportsEnabled,
+			isDailyEmailReportsEnabled
 		};
 	}
 
@@ -153,7 +157,9 @@ class Settings extends Component {
 			revenueShare,
 			hbAnalytics,
 			cmpEnabled,
-			mergeReport
+			mergeReport,
+			isWeeklyEmailReportsEnabled,
+			isDailyEmailReportsEnabled
 		} = this.state;
 		const { showNotification, saveSettings, site, dataForAuditLogs } = this.props;
 		const isTransitionInValid = isSPA && isNaN(Number(spaPageTransitionTimeout));
@@ -199,7 +205,9 @@ class Settings extends Component {
 					adsLabel,
 					hbAnalytics,
 					cmpAvailable: !cmpEnabled,
-					mergeReport
+					mergeReport,
+					isWeeklyEmailReportsEnabled,
+					isDailyEmailReportsEnabled
 				},
 
 				adNetworkSettings: {
@@ -223,11 +231,13 @@ class Settings extends Component {
 			status,
 			hbAnalytics,
 			cmpEnabled,
-			mergeReport
+			mergeReport,
+			isDailyEmailReportsEnabled,
+			isWeeklyEmailReportsEnabled
 		} = this.state;
 		const { site } = this.props;
 
-		const { siteId, siteDomain } = site;
+		const { siteId, siteDomain, dataFeedActive = true } = site;
 		// const effectRevenueShareDate = formatDate(+new Date(), 'subtract', 2);
 
 		return (
@@ -334,6 +344,34 @@ class Settings extends Component {
 					defaultLayout
 					name={`hbAnalytics-${siteId}-${siteDomain}`}
 					id={`js-hbAnalytics-switch-${siteId}-${siteDomain}`}
+				/>
+				<CustomToggleSwitch
+					labelText="Email Daily Reports Updates"
+					className="u-margin-b4 negative-toggle"
+					checked={isDailyEmailReportsEnabled}
+					onChange={this.handleToggle}
+					layout="horizontal"
+					size="m"
+					on="Yes"
+					off="No"
+					defaultLayout
+					name={`isDailyEmailReportsEnabled-${siteId}-${siteDomain}`}
+					id={`isDailyEmailReportsEnabled-${siteId}-${siteDomain}`}
+					disabled={!dataFeedActive}
+				/>
+				<CustomToggleSwitch
+					labelText="Email Weekly Reports Updates"
+					className="u-margin-b4 negative-toggle"
+					checked={isWeeklyEmailReportsEnabled}
+					onChange={this.handleToggle}
+					layout="horizontal"
+					size="m"
+					on="Yes"
+					off="No"
+					defaultLayout
+					name={`isWeeklyEmailReportsEnabled-${siteId}-${siteDomain}`}
+					id={`isWeeklyEmailReportsEnabled-${siteId}-${siteDomain}`}
+					disabled={!dataFeedActive}
 				/>
 				{isSPA && (
 					<React.Fragment>

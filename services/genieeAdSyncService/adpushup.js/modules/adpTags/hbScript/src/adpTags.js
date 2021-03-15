@@ -131,7 +131,7 @@ var adpTags = {
 			var adpSlot = {
 				slotId: slotId,
 				optionalParam: optionalParam,
-				bidders: bidders || [],
+				bidders: bidders || {},
 				formats: formats,
 				placement: placement,
 				headerBidding: optionalParam.headerBidding,

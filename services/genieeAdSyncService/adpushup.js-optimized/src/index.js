@@ -25,6 +25,10 @@ function start() {
 		utils.injectHeadCodeOnPage(config.prebidBundleUrl);
 	}
 
+	if (GA_ANALYTICS_ACTIVE) {
+		utils.checkAndInjectGAHeadCode();
+	}
+
 	if (LAYOUT_ACTIVE) {
 		var selectVariation = require('./variationSelectionModels/index');
 		var nodewatcher = require('../libs/nodeWatcher');
@@ -368,10 +372,20 @@ function start() {
 		};
 	}
 
+	//check if google funding choice is already avaialble on page
+	function isGoogleFcAvailable() {
+		return (
+			window.googlefc &&
+			window.googlefc.ConsentStatusEnum &&
+			Object.keys(window.googlefc.ConsentStatusEnum).length
+		);
+	}
+
 	// we need to check CMP availabilityt for European countries only
 	function isCmpAplicable() {
 		return Promise.resolve(
-			!commonConsts.CMP_CHECK_EXCLUDED_SITES.includes(adp.config.siteId) &&
+			!isGoogleFcAvailable() &&
+				!commonConsts.CMP_CHECK_EXCLUDED_SITES.includes(adp.config.siteId) &&
 				!adp.config.cmpAvailable &&
 				commonConsts.EU_COUNTRY_LIST.includes(adp.config.country)
 		);
@@ -406,6 +420,8 @@ function start() {
 
 		// Initialise adp config
 		initAdpConfig();
+
+		utils.emitGaEvent(commonConsts.GA_EVENTS.SCRIPT_LOADED);
 
 		if (utils.isAdPushupForceDisabled()) {
 			utils.log(`AdPushup has been forced disabled...`);

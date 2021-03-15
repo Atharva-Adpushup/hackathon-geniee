@@ -354,10 +354,20 @@ function initAdpQue() {
 	};
 }
 
+//check if google funding choice is already avaialble on page
+function isGoogleFcAvailable() {
+	return (
+		window.googlefc &&
+		window.googlefc.ConsentStatusEnum &&
+		Object.keys(window.googlefc.ConsentStatusEnum).length
+	);
+}
+
 // we need to check CMP availabilityt for European countries only
 function isCmpAplicable() {
 	return Promise.resolve(
-		!commonConsts.CMP_CHECK_EXCLUDED_SITES.includes(adp.config.siteId) &&
+		!isGoogleFcAvailable() &&
+			!commonConsts.CMP_CHECK_EXCLUDED_SITES.includes(adp.config.siteId) &&
 			!adp.config.cmpAvailable &&
 			commonConsts.EU_COUNTRY_LIST.includes(adp.config.country)
 	);
@@ -377,6 +387,11 @@ function loadGoogleFundingChoicesCmp() {
 }
 
 function main() {
+	// Initialise adp config
+	initAdpConfig();
+
+	utils.emitGaEvent(commonConsts.GA_EVENTS.SCRIPT_LOADED);
+	
 	utils.logPerformanceEvent(commonConsts.EVENT_LOGGER.EVENTS.MAIN_FN_CALL_DELAY);
 
 	// if traffic is from lighthouse and site has to be paused for lighthouse
@@ -390,10 +405,6 @@ function main() {
 	adp.services.HB_ACTIVE =
 		adp.services.HB_ACTIVE && !utils.getQueryParams().adpushupHeaderBiddingDisabled;
 
-	// Initialise adp config
-	initAdpConfig();
-
-	utils.emitGaEvent(commonConsts.GA_EVENTS.SCRIPT_LOADED);
 
 	if (utils.isAdPushupForceDisabled()) {
 		utils.log(`AdPushup has been forced disabled...`);

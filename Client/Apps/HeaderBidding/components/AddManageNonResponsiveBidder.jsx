@@ -46,7 +46,7 @@ class AddManageNonResponsiveBidder extends React.Component {
 				}
 
 				const formFields = {
-					bidderConfig: getCommonBidderFields(isApRelation && isSuperUser),
+					bidderConfig: getCommonBidderFields(isApRelation, isSuperUser),
 					params
 				};
 
@@ -126,7 +126,7 @@ class AddManageNonResponsiveBidder extends React.Component {
 				}
 
 				const formFields = {
-					bidderConfig: getCommonBidderFields(isApRelation && isSuperUser, {
+					bidderConfig: getCommonBidderFields(isApRelation, isSuperUser, {
 						values: {
 							relation,
 							bids,

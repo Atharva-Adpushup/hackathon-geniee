@@ -11,7 +11,8 @@ import {
 	displayMetrics,
 	AP_REPORTING_ACTIVE_CHART_LEGENDS_STORAGE_KEY,
 	TERMS,
-	METRICS
+	METRICS,
+	columnsBlacklistedForAddition
 } from '../configs/commonConsts';
 import {
 	getValidArray,
@@ -21,6 +22,7 @@ import {
 	roundOffTwoDecimal,
 	numberWithCommas
 } from '../helpers/utils';
+
 import { chart } from 'highcharts';
 
 class Chart extends React.Component {
@@ -291,6 +293,7 @@ class Chart extends React.Component {
 			let j = 0;
 			let seriesName = results;
 			const row = groupByResult[results];
+
 			if (selectedDimension == 'siteid')
 				seriesName = site && site[results] ? site[results].siteName : 'Not Found';
 			const serie = {
@@ -300,24 +303,90 @@ class Chart extends React.Component {
 				valueType: selectedDimension ? activeLegendItems.valueType : row[0].valueType
 			};
 			const sortedResult = this.getSortedResult(row, selectedInterval);
+
 			for (let i = 0; i < xAxis.categories.length; i += 1) {
-				if (!sortedResult[j]) break;
-				const column = sortedResult[j];
 				const xAxisMomentObj = moment(xAxis.categories[i]);
-				const seriesValue = selectedDimension ? column[activeLegendItems.value] : column.value;
-				if (selectedInterval === 'daily' || selectedInterval === 'monthly')
-					if (
-						column.date == xAxisMomentObj.format('YYYY-MM-DD') ||
-						(column.month == xAxisMomentObj.format('M') &&
-							column.year == xAxisMomentObj.format('Y'))
-					) {
+
+				if (
+					selectedDimension !== 'page_variation' ||
+					(selectedDimension === 'page_variation' &&
+						sortedResult.length === xAxis.categories.length)
+				) {
+					if (!sortedResult[j]) break;
+					const column = sortedResult[j];
+					const seriesValue = selectedDimension ? column[activeLegendItems.value] : column.value;
+					if (selectedInterval === 'daily' || selectedInterval === 'monthly')
+						if (
+							column.date == xAxisMomentObj.format('YYYY-MM-DD') ||
+							(column.month == xAxisMomentObj.format('M') &&
+								column.year == xAxisMomentObj.format('Y'))
+						) {
+							serie.data.push(seriesValue);
+							j += 1;
+						} else {
+							serie.data.push(0);
+						}
+					else {
 						serie.data.push(seriesValue);
-						j += 1;
-					} else {
-						serie.data.push(0);
 					}
-				else {
-					serie.data.push(seriesValue);
+				} else {
+					const duplicateDateValues = sortedResult.filter(
+						val => val.date === xAxisMomentObj.format('YYYY-MM-DD')
+					);
+
+					let combinedSeriesValue = 0;
+
+					if (!columnsBlacklistedForAddition.includes(activeLegendItems.value)) {
+						combinedSeriesValue = duplicateDateValues.reduce(function(prev, cur) {
+							return prev + cur[activeLegendItems.value];
+						}, 0);
+					} else if (activeLegendItems.value === 'adpushup_ad_ecpm') {
+						combinedSeriesValue =
+							(duplicateDateValues.reduce(function(prev, cur) {
+								return prev + cur['network_net_revenue'];
+							}, 0) /
+								duplicateDateValues.reduce(function(prev, cur) {
+									return prev + cur['adpushup_impressions'];
+								}, 0)) *
+							1000;
+					} else if (
+						activeLegendItems.value === 'network_ad_ecpm' ||
+						activeLegendItems.value === 'unique_ad_ecpm'
+					) {
+						combinedSeriesValue =
+							(duplicateDateValues.reduce(function(prev, cur) {
+								return prev + cur['network_net_revenue'];
+							}, 0) /
+								duplicateDateValues.reduce(function(prev, cur) {
+									return prev + cur['network_impressions'];
+								}, 0)) *
+							1000;
+					} else if (activeLegendItems.value === 'adpushup_page_cpm') {
+						combinedSeriesValue =
+							(duplicateDateValues.reduce(function(prev, cur) {
+								return prev + cur['network_net_revenue'];
+							}, 0) /
+								duplicateDateValues.reduce(function(prev, cur) {
+									return prev + cur['adpushup_page_views'];
+								}, 0)) *
+							1000;
+					} else if (activeLegendItems.value === 'adpushup_xpath_miss_percent') {
+						combinedSeriesValue = parseFloat(
+							(
+								(duplicateDateValues.reduce(function(prev, cur) {
+									return prev + cur['adpushup_xpath_miss'];
+								}, 0) /
+									(duplicateDateValues.reduce(function(prev, cur) {
+										return prev + cur['adpushup_xpath_miss'];
+									}, 0) +
+										duplicateDateValues.reduce(function(prev, cur) {
+											return prev + cur['adpushup_impressions'];
+										}, 0))) *
+								100
+							).toFixed(2)
+						);
+					}
+					serie.data.push(combinedSeriesValue);
 				}
 			}
 			series.push(serie);

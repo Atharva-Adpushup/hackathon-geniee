@@ -52,21 +52,22 @@ var render = {
 	renderPostBid: function(adpSlots = []) {
 		adpSlots.forEach(slot => {
 			slot.renderedPostBid = true;
+			if (window.adpushup.services.HB_ACTIVE) {
+				var containerId = slot.containerId;
+				var bid = utils.getHighestAliveBid(
+					_apPbJs,
+					containerId,
+					['video', 'banner'],
+					config.POST_BID_SUPPORTED_BIDDERS
+				);
+				if (bid) {
+					var iframe = utils.getIframeDocument(adp.$(`#${containerId}`), {
+						width: bid.width,
+						height: bid.height
+					});
 
-			var containerId = slot.containerId;
-			var bid = utils.getHighestAliveBid(
-				_apPbJs,
-				containerId,
-				['video', 'banner'],
-				config.POST_BID_SUPPORTED_BIDDERS
-			);
-			if (bid) {
-				var iframe = utils.getIframeDocument(adp.$(`#${containerId}`), {
-					width: bid.width,
-					height: bid.height
-				});
-
-				_apPbJs.renderAd(iframe, bid.adId);
+					_apPbJs.renderAd(iframe, bid.adId);
+				}
 			}
 		});
 	}
