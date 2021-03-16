@@ -107,8 +107,9 @@ class Control extends Component {
 
 	onReportBySelect = selectedDimensions => {
 		const { reportType } = this.props;
+		const updatedSelectedDimension = selectedDimensions ? [...selectedDimensions] : [];
 		this.setState(
-			{ selectedDimension: [...selectedDimensions] },
+			{ selectedDimension: updatedSelectedDimension },
 			this.onControlChange.bind(null, reportType)
 		);
 	};
@@ -116,7 +117,7 @@ class Control extends Component {
 	onFilteChange = (selectedFilters, selectedFilterValues, selectedFilterKey) => {
 		const { defaultReportType } = this.props;
 		let reportType = defaultReportType || 'account';
-		const { filterList, dimensionList, hbMetricsList, metricsList } = this.props;
+		const { filterList, dimensionList, hbMetricsList, metricsList, selectedDimension } = this.props;
 		const selectedSiteFilters = selectedFilters.siteid || {};
 		if (selectedSiteFilters && Object.keys(selectedSiteFilters).length === 1) {
 			reportType = 'site';
@@ -126,10 +127,11 @@ class Control extends Component {
 			updatedFilterList,
 			updatedDimensionList,
 			updatedMetricsList,
-			updatedChartList
+			updatedChartList,
+			updatedSelectedDimension
 		} = this.updateFilterDimensionList(
 			reportType,
-			defaultReportType,
+			selectedDimension,
 			filterList,
 			metricsList,
 			hbMetricsList,
@@ -143,7 +145,8 @@ class Control extends Component {
 				selectedFilterValues,
 				metricsList: updatedMetricsList,
 				chartList: updatedChartList,
-				reportType
+				reportType,
+				selectedDimension: updatedSelectedDimension
 			},
 			() => this.onControlChange(reportType)
 		);
@@ -277,7 +280,7 @@ class Control extends Component {
 
 	updateFilterDimensionList = (
 		reportType,
-		defaultReportType,
+		selectedDimension,
 		filterList,
 		metricsList,
 		hbMetricsList,
@@ -289,6 +292,7 @@ class Control extends Component {
 		const updatedMetricsList = JSON.parse(JSON.stringify(metricsList || {}));
 
 		/* eslint-disable no-param-reassign */
+		//Why we have this condition
 		if (reportType === 'account' || reportType === 'global') {
 			updatedFilterList.forEach(fil => {
 				const index = accountFilter.indexOf(fil.value);
@@ -310,7 +314,20 @@ class Control extends Component {
 				dim.isDisabled = false;
 			});
 		}
-		return { updatedFilterList, updatedDimensionList, updatedChartList, updatedMetricsList };
+		const updatedSelectedDimension = selectedDimension.filter(dimension => {
+			for (let i = 0; i < updatedDimensionList.length; i++) {
+				const currentDimension = updatedDimensionList[i];
+				if (currentDimension.value === dimension) return !currentDimension.isDisabled;
+			}
+			return false;
+		});
+		return {
+			updatedFilterList,
+			updatedDimensionList,
+			updatedChartList,
+			updatedMetricsList,
+			updatedSelectedDimension
+		};
 	};
 
 	handleInputChange = e => {

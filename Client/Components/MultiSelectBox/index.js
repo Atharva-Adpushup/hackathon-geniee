@@ -11,6 +11,7 @@ import {
 } from '@/Client/helpers/react-bootstrap-imports';
 
 const findSelected = props => {
+	const selectedOption = {};
 	const { selected, title, options } = props;
 	let name = title;
 
@@ -25,7 +26,13 @@ const findSelected = props => {
 		}
 	}
 
-	return { selected, name };
+	selected.map(key => {
+		selectedOption[key] = true;
+		return key;
+	});
+
+	return { selected: [...selected], name, selectedOption: { ...selectedOption } };
+	// return { selected, name };
 };
 
 const SELECT_ALL = {
@@ -44,13 +51,14 @@ class MultiSelectBox extends Component {
 			});
 		}
 		this.state = {
-			selectedOption
+			selectedOption,
+			selectAll: false
 		};
 		this.handleMultiSelect = this.handleMultiSelect.bind(this);
 	}
 
-	static getDerivedStateFromProps(props) {
-		return { ...findSelected(props) };
+	static getDerivedStateFromProps(props, state) {
+		return { ...findSelected(props, state) };
 	}
 
 	// eslint-disable-next-line react/sort-comp
@@ -59,16 +67,15 @@ class MultiSelectBox extends Component {
 		const dataValue = target.getAttribute('data-value');
 		const { onSelect, options } = this.props;
 
-		const { selectedOption } = this.state;
+		let { selectedOption, selectAll } = this.state;
 		const checked = Boolean(e.target.checked);
 
 		// logic for select/deSelect all
 		if (dataValue === SELECT_ALL.value) {
 			options.forEach(option => {
-				selectedOption[option.value] = checked;
-				return option;
+				if (!option.isDisabled) selectedOption[option.value] = checked;
 			});
-			selectedOption[SELECT_ALL.value] = checked;
+			selectAll = !selectAll;
 		} else {
 			options.forEach(option => {
 				if (option.value === dataValue) {
@@ -76,21 +83,17 @@ class MultiSelectBox extends Component {
 				}
 				// to uncheck select all if any of th eoption is unchecked
 				if (!checked) {
-					selectedOption[SELECT_ALL.value] = false;
+					selectAll = false;
 				}
 				return option;
 			});
 		}
 
-		this.setState(
-			{
-				selectedOption: { ...selectedOption }
-			},
-			() => {
-				const selected = Object.keys(selectedOption).filter(key => selectedOption[key]);
-				onSelect(selected);
-			}
-		);
+		const selected = Object.keys(selectedOption).filter(key => selectedOption[key]);
+		onSelect(selected);
+		this.setState({
+			selectAll
+		});
 	}
 
 	selectWrapper = (key, e) => {
@@ -125,7 +128,7 @@ class MultiSelectBox extends Component {
 	};
 
 	render() {
-		const { name, selected, selectedOption, selectedChartKey } = this.state;
+		const { name, selected, selectedOption, selectedChartKey, selectAll } = this.state;
 		const {
 			//	selected,
 			options,
@@ -181,7 +184,7 @@ class MultiSelectBox extends Component {
 							onChange={e => {
 								this.handleMultiSelect(e);
 							}}
-							checked={selectedOption[SELECT_ALL.value]}
+							checked={selectAll}
 						>
 							{SELECT_ALL.label}
 						</Checkbox>
@@ -200,7 +203,6 @@ class MultiSelectBox extends Component {
 											onChange={e => {
 												this.handleMultiSelect(e);
 											}}
-											checked={selectedOption[option.value]}
 											disabled
 										>
 											{option.name} {selectedOption[option.value]}
