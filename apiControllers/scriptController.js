@@ -203,8 +203,7 @@ Router.get('/:siteId/ampSiteConfig', (req, res) => {
 				if (ampScriptConfig && ampScriptConfig.ads.length) {
 					apConfigs.ampConfig = {
 						ampAds: ampScriptConfig.ads,
-						isPnpEnabled: !!ampScriptConfig.isPnpEnabled,
-						firstImpressionSiteId: ampScriptConfig.firstImpressionSiteId
+						pnpConfig: ampScriptConfig.pnpConfig
 					};
 				}
 
