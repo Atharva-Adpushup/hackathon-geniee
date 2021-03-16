@@ -155,7 +155,7 @@ var auction = {
 					}.bind({ revenueShare: revenueShare })
 				};
 			}
-		}p
+		}
 
 		return bidderSettings;
 	},
