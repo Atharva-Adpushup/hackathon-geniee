@@ -437,6 +437,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		lastRunInfoDoc: 'config::apnd:last-run-info',
 		sizeMapppingConfig: 'data::sizeMapping',
 		activeBidderAdaptersList: 'data::activeBidderAdapters',
+		freqReports: 'freq:rprt::',
 		hbaQueryFrequencyDoc: 'hbaq::'
 	},
 	tagManagerInitialDoc: {
@@ -569,7 +570,8 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		activeSiteMarkingAndAdsTxtService: '20 14,2 * * *',
 		adManagerSyncService: '0 */12 * * *',
 		prefetchService: '*/10 * * * *', // Every 10 mins
-		prefetchHBService: '*/15 * * * *' // Every 15 mins
+		prefetchHBService: '*/15 * * * *', // Every 15 mins
+		emailSnapshotsService: '00 8 * * *' //Run at 8:00 everyday
 	},
 	SELLERS_JSON: {
 		fileConfig: {
@@ -627,7 +629,17 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		'/site/report?report_name=site_summary',
 		'/site/report?report_name=revenue_by_network',
 		'/site/report?report_name=get_stats_by_custom&dimension=siteid&interval=cumulative&metrics=adpushup_page_views,adpushup_page_cpm,network_ad_ecpm,network_impressions,network_net_revenue',
+		'/site/report?report_name=get_stats_by_custom&dimension=siteid&interval=daily&metrics=adpushup_page_views,adpushup_page_cpm,network_ad_ecpm,network_impressions,network_net_revenue',
 		'/site/report?report_name=country_report'
+	],
+	ADMIN_DASHBOARD_QUERIES: [
+		'/site/report?report_name=estimated_earning_comparison',
+		'/site/report?report_name=ap_vs_baseline',
+		'/site/report?report_name=site_summary',
+		'/site/report?report_name=get_stats_by_custom&dimension=mode,error_code',
+		'/site/report?report_name=top_sites',
+		'/site/report?report_name=country_report&metrics=adpushup_page_views',
+		'/site/report?report_name=network_report&metrics=network_net_revenue'
 	],
 	PREBID_BUNDLING: {
 		PREBID_ADAPTERS_TO_ALWAYS_BUILD: [
@@ -728,36 +740,41 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 	},
 	AUDIT_LOGS_ACTIONS: {
 		HEADER_BIDDING: {
-			HB_STATUS:"HB_STATUS",
-			ADD_BIDDER:"ADD_BIDDER",
-			REMOVE_BIDDER:"REMOVE_BIDDER",
-			UPDATE_BIDDER:"UPDATE_BIDDER",
-			PREBID_SETTING:"PREBID_SETTING",
-			OPTIMIZATION:"OPTIMIZATION",
-			AMAZON_UAM_SETTING:"AMAZON_UAM_SETTING",
-			REFRESH_ALL_AD_UNITS:"REFRESH_ALL_AD_UNITS",
-			UPDATE_VIDEO_AND_NATIVE_ON_AD_UNITS:"UPDATE_VIDEO_AND_NATIVE_ON_AD_UNITS",
-			UPDATE_HB_STATUS:"UPDATE_HB_STATUS"
+			HB_STATUS: 'HB_STATUS',
+			ADD_BIDDER: 'ADD_BIDDER',
+			REMOVE_BIDDER: 'REMOVE_BIDDER',
+			UPDATE_BIDDER: 'UPDATE_BIDDER',
+			PREBID_SETTING: 'PREBID_SETTING',
+			OPTIMIZATION: 'OPTIMIZATION',
+			AMAZON_UAM_SETTING: 'AMAZON_UAM_SETTING',
+			REFRESH_ALL_AD_UNITS: 'REFRESH_ALL_AD_UNITS',
+			UPDATE_VIDEO_AND_NATIVE_ON_AD_UNITS: 'UPDATE_VIDEO_AND_NATIVE_ON_AD_UNITS',
+			UPDATE_HB_STATUS: 'UPDATE_HB_STATUS'
 		},
 		AMP: {
-			UPDATE_AMP_ADS:"UPDATE_AMP_ADS"
+			UPDATE_AMP_ADS: 'UPDATE_AMP_ADS'
 		},
 		AP_TAGS: {
-			UPDATE_AP_TAGS:"UPDATE_AP_TAGS"
+			UPDATE_AP_TAGS: 'UPDATE_AP_TAGS'
 		},
 		INNOVATIVE_ADS: {
-			UPDATE_INNOVATIVE_ADS:"UPDATE_INNOVATIVE_ADS"
+			UPDATE_INNOVATIVE_ADS: 'UPDATE_INNOVATIVE_ADS'
 		},
 		OPS_PANEL: {
-			ACCOUNTS_SETTING:'ACCOUNTS_SETTING',
-			SITES_SETTING:"SITES_SETTING",
-			TOOLS:"TOOLS",
+			ACCOUNTS_SETTING: 'ACCOUNTS_SETTING',
+			SITES_SETTING: 'SITES_SETTING',
+			TOOLS: 'TOOLS'
 		},
-		CHANNELS:{
-			CREATE_CHANNEL:"CREATE_CHANNEL",
-			UPDATE_CHANNEL:"UPDATE_CHANNEL",
-			DELETE_CHANNEL:"DELETE_CHANNEL"
+		CHANNELS: {
+			CREATE_CHANNEL: 'CREATE_CHANNEL',
+			UPDATE_CHANNEL: 'UPDATE_CHANNEL',
+			DELETE_CHANNEL: 'DELETE_CHANNEL'
 		},
 		LAYOUT_EDITOR: 'LAYOUT_EDITOR'
+	},
+	FORMAT_WISE_PARAMS_PREFIX: {
+		BANNER: 'apDisplay',
+		VIDEO: 'apVideo',
+		NATIVE: 'apNative'
 	}
 };

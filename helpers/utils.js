@@ -318,6 +318,9 @@ var url = require('url'),
 			return Object.keys(object)
 				.sort()
 				.reduce((result, key) => ({ ...result, [key]: object[key] }), {});
+		},
+		capitalizeString: string => {
+			return string.charAt(0).toUpperCase() + string.slice(1);
 		}
 	};
 

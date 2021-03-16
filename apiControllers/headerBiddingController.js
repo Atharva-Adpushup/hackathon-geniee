@@ -82,7 +82,8 @@ router
 				bids,
 				revenueShare,
 				isAmpActive,
-				isS2SActive
+				isS2SActive,
+				enableFormatWiseParams
 			},
 			params,
 			dataForAuditLogs
@@ -127,7 +128,8 @@ router
 			config: params || {},
 			isActive: true,
 			isAmpActive,
-			isS2SActive
+			isS2SActive,
+			enableFormatWiseParams
 		};
 
 		return (
@@ -152,7 +154,7 @@ router
 				.then(() => headerBiddingModel.getAllBiddersFromNetworkConfig())
 				.then(biddersFromNetworkConfig => {
 					bidderConfig.paramsFormFields = {
-						...biddersFromNetworkConfig[key].params
+						...headerBiddingModel.getFormFieldsForFormatWiseParams(biddersFromNetworkConfig[key])
 					};
 					// log config changes
 					const { siteDomain, appName, type = 'app' } = dataForAuditLogs;
@@ -183,7 +185,9 @@ router
 							.then(() => headerBiddingModel.getAllBiddersFromNetworkConfig())
 							.then(biddersFromNetworkConfig => {
 								bidderConfig.paramsFormFields = {
-									...biddersFromNetworkConfig[key].params
+									...headerBiddingModel.getFormFieldsForFormatWiseParams(
+										biddersFromNetworkConfig[key]
+									)
 								};
 
 								return res.status(httpStatus.OK).json({ bidderKey: key, bidderConfig });
@@ -212,7 +216,8 @@ router
 				revenueShare,
 				status,
 				isAmpActive,
-				isS2SActive
+				isS2SActive,
+				enableFormatWiseParams
 			},
 			params,
 			dataForAuditLogs
@@ -252,7 +257,8 @@ router
 			config: params || {},
 			isActive: true,
 			isAmpActive,
-			isS2SActive
+			isS2SActive,
+			enableFormatWiseParams
 		};
 
 		let prevConfig = {};
@@ -312,7 +318,7 @@ router
 					});
 
 					bidderConfig.paramsFormFields = {
-						...biddersFromNetworkConfig[key].params
+						...headerBiddingModel.getFormFieldsForFormatWiseParams(biddersFromNetworkConfig[key])
 					};
 
 					return res.status(httpStatus.OK).json({ bidderKey: key, bidderConfig });

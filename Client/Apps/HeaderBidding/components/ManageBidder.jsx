@@ -4,6 +4,7 @@ import React from 'react';
 import { Row, Col } from '@/Client/helpers/react-bootstrap-imports';
 import AddManageSizelessBidder from './AddManageSizelessBidder';
 import AddManageNonResponsiveBidder from './AddManageNonResponsiveBidder';
+import removeHBEmptyParams from '../helpers/hbEmptyParamsHelper';
 
 export default class ManageBidder extends React.Component {
 	onBidderUpdate = (bidderConfig, params) => {
@@ -22,7 +23,14 @@ export default class ManageBidder extends React.Component {
 			siteDomain: user.sites[siteId].domain
 		};
 
-		updateBidderAction(siteId, { key: fieldsConfig.key, ...bidderConfig }, params, dataForAuditLogs)
+		const cleanedParams = removeHBEmptyParams(params);
+
+		updateBidderAction(
+			siteId,
+			{ key: fieldsConfig.key, ...bidderConfig },
+			cleanedParams,
+			dataForAuditLogs
+		)
 			.then(() => {
 				openView('biddersList');
 				showNotification({
