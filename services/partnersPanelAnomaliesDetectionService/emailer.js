@@ -1,11 +1,18 @@
 const axios = require('axios');
 const URL = 'http://queuepublisher.adpushup.com/publish'
+const { PRODUCT_TEAM, OPS_TEAM, DEV_TEAM } = require('./config')
+
+const ownerEmails = DEV_TEAM;
+if (process.env.NODE_ENV === 'production') {
+	ownerEmails = ownerEmails.concat(OPS_TEAM);
+} else if(process.env.NODE_ENV === 'staging') {
+	ownerEmails = ownerEmails.concat(PRODUCT_TEAM);
+}
 
 const anomaliesMailService = async ({partner, anomalies}) => {
 	// const ownerEmails = config.onwers.emails || [];
 	// const ownerEmails = ['harpreet.singh@adpushup.com', "anil.panghal@adpushup.com", "rahul.ranjan@adpushup.com", "akshay.varma@adpushup.com", "navya.perla@adpushup.com"];
-	const ownerEmails = ['harpreet.singh@adpushup.com'];
-
+	  
 	if (!ownerEmails.length) {
 		throw new Error("Please add owner email's in the config file to send email's to the owners");
 	}

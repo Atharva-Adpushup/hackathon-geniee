@@ -8,6 +8,13 @@ const IndexExchange = require('../partnersPanelAnomaliesDetectionService/IndexEx
 const Sovrn = require('../partnersPanelAnomaliesDetectionService/Sovrn');
 const { appBucket } = require('../../helpers/routeHelpers');
 
+const PARTNERS_LIST = {
+	"Criteo": criteo,
+	"Pubmatic": Pubmatic,
+	"OFT": OFT,
+	"IndexExchange": IndexExchange
+};
+
 const {
 	couchbaseErrorHandler,
 	sendErrorNotification
@@ -27,20 +34,35 @@ const getSitesFromDB = async () => {
 	return siteListPromise;
 };
 
-function startParntersPanelsAnomaliesDetectionService() {
+function startPartnersPanelsAnomaliesDetectionService(partner, isAlreadyErrored = false) {
 	getSitesFromDB()
 		.then(sitesData => {
-			return Promise.all([
-				criteo(sitesData),
-				OFT(sitesData),
-				Pubmatic(sitesData),
-				// IndexExchange(sitesData),
-				// // Sovrn(sitesData)
-			]).catch(err => {
-				throw { err };
-			});
+			if(partner) {
+				return Promise.all([partner(sitesData)])
+					.catch(err => {
+						throw { err };
+					});
+			} else {
+				return Promise.resolveInSeries([
+					// criteo,
+					OFT,
+					// Pubmatic
+				]).catch(err => {
+					throw { err };
+				})
+				// return Promise.all([
+				// 	// criteo(sitesData)
+				// 	OFT(sitesData),
+				// 	// Pubmatic(sitesData),
+				// 	// IndexExchange(sitesData),
+				// 	// // Sovrn(sitesData)
+				// ]).catch(err => {
+				// 	throw { err };
+				// });
+			}
 		})
 		.then(result => {
+			console.log(result, 'result')
 			if (result instanceof Error) {
 				console.error(result);
 				process.exit(1);
@@ -55,7 +77,21 @@ function startParntersPanelsAnomaliesDetectionService() {
 						}`
 					);
 				});
-				process.exit(0);
+				const errList = result.filter(item => item.status === 'Error')
+				if(errList.length) {
+					errList.forEach(item => {
+						setTimeout(async () => {
+							console.log(PARTNERS_LIST[item.partner], 'PARTNERS_LIST[item.partner]')
+							// to prevent unwanted restarts - multiple failed attempts
+							// Only one restart
+							if(!isAlreadyErrored) {
+								await startPartnersPanelsAnomaliesDetectionService(PARTNERS_LIST[item.partner], true)
+							}
+						}, 5000);
+					})
+				} else {
+					process.exit(0);
+				}
 			}
 		})
 		.catch(async err => {
@@ -65,18 +101,34 @@ function startParntersPanelsAnomaliesDetectionService() {
 		});
 }
 
-startParntersPanelsAnomaliesDetectionService();
+if (process.env.PARTNER_NAME) {
+	const { PARTNER_NAME } = process.env;
+	startPartnersPanelsAnomaliesDetectionService(PARTNERS_LIST[PARTNER_NAME])
+} else {
+	// execute all
+	startPartnersPanelsAnomaliesDetectionService();
+}
 
-// const JOB_NAME = 'AnomaliesDetection';
-// // To cancel the job on a certain condition (uniqueJobName must be known)
-// let currentJob = schedule.scheduledJobs[JOB_NAME];
-// console.log(currentJob)
-// if(currentJob) {
-// 	currentJob.cancel();
-// }
 
-// // Shedule job according to timed according to cron expression
-// var job = schedule.scheduleJob(JOB_NAME, CC.cronSchedule.partnerPanelAnomaliesDetectionService, startParntersPanelsAnomaliesDetectionService);
-// // Inspect the job object (i.E.: job.name etc.)
-// console.log(`************** JOB: ******************`);
-// console.log(job);
+
+Promise.resolveInSeries = function(queue, sitesData) {
+    // function methodThatReturnsAPromise(id) {
+    //     return new Promise((resolve, reject) => {
+    //         setTimeout(() => {
+    //             console.log(`Processing ${id}`);
+    //             resolve(id);
+    //         }, 1000);
+    //     });
+    // }
+    var responseAll = [];
+    return queue.reduce((accumulatorPromise, nextItem) => {
+        return accumulatorPromise.then(() => {
+            return nextItem(sitesData).then(res => {
+				console.log(res, 'resresresresresresres ******************************************')
+                responseAll.push(res);
+                return responseAll;
+            });
+        });
+    }, Promise.resolve());
+    
+};

@@ -20,7 +20,8 @@ const partnerModuleErrorHandler = async (module, err) => {
         total: 0,
         anomalies: 0,
         partner: module,
-        message: err.toString()
+        message: err.toString(),
+        status: 'Error'
     };
 }
 const couchbaseErrorHandler = err => {
