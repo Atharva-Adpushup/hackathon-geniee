@@ -183,11 +183,13 @@ Router.get('/:siteId/ampSiteConfig', (req, res) => {
 					refreshLineItems,
 					ampScriptConfig,
 					sizeMappingConfig,
-					currencyConfig
+					currencyConfig,
+					firstImpressionRefreshLineItems
 				} = prebidAndAdsConfig;
 
-				// TODO: Start sending refresh lineitems when stop refresh feature is ready
-				// if (refreshLineItems) apConfigs.refreshLineItems = refreshLineItems;
+				if (refreshLineItems) apConfigs.refreshLineItems = refreshLineItems;
+				if (firstImpressionRefreshLineItems)
+					apConfigs.firstImpressionRefreshLineItems = firstImpressionRefreshLineItems;
 				if (sizeMappingConfig) apConfigs.sizeMapping = sizeMappingConfig;
 				if (currencyConfig) apConfigs.currencyConfig = currencyConfig;
 				apConfigs.siteDomain = site.get('siteDomain');
@@ -233,8 +235,8 @@ Router.get('/:siteId/ampSiteConfig', (req, res) => {
 					return ampScriptConfig;
 				});
 
-			const getRefreshLineItems = function() {
-				const adServerSettings = user.get('adServerSettings');
+			const getRefreshLineItems = function(userModel) {
+				const adServerSettings = userModel.get('adServerSettings');
 				const activeDFPNetwork =
 					(adServerSettings && adServerSettings.dfp && adServerSettings.dfp.activeDFPNetwork) ||
 					null;
@@ -272,10 +274,18 @@ Router.get('/:siteId/ampSiteConfig', (req, res) => {
 				}
 			};
 
+			const getFirstImpressionRefreshLineItems = function(firstImpressionSiteId) {
+				return SiteModel.getSiteById(parseInt(firstImpressionSiteId, 10))
+					.then(firstImpressionSite =>
+						UserModel.getUserByEmail(firstImpressionSite.get('ownerEmail'))
+					)
+					.then(firstImpressionUser => getRefreshLineItems(firstImpressionUser));
+			};
+
 			return Promise.join(
 				generatePrebidConfig(siteId),
 				generateAmpScriptAdsConfig(siteId),
-				getRefreshLineItems(),
+				getRefreshLineItems(user),
 				getSizeMappingConfigFromCB(),
 				getCurrencyConfig()
 			)
@@ -286,13 +296,32 @@ Router.get('/:siteId/ampSiteConfig', (req, res) => {
 						refreshLineItems,
 						sizeMappingConfig,
 						currencyConfig
-					]) => ({
-						prebidConfig,
-						ampScriptConfig,
-						refreshLineItems,
-						sizeMappingConfig,
-						currencyConfig
-					})
+					]) => {
+						const output = {
+							prebidConfig,
+							ampScriptConfig,
+							refreshLineItems,
+							sizeMappingConfig,
+							currencyConfig
+						};
+
+						const isFirstImpressionSiteIdAvailable =
+							ampScriptConfig &&
+							ampScriptConfig.pnpConfig &&
+							ampScriptConfig.pnpConfig.enabled &&
+							!Number.isNaN(ampScriptConfig.pnpConfig.firstImpressionSiteId);
+
+						if (isFirstImpressionSiteIdAvailable) {
+							return getFirstImpressionRefreshLineItems(
+								ampScriptConfig.pnpConfig.firstImpressionSiteId
+							).then(firstImpressionRefreshLineItems => ({
+								...output,
+								firstImpressionRefreshLineItems
+							}));
+						}
+
+						return output;
+					}
 				)
 				.then(generateApConfig);
 		})
