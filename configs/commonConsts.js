@@ -799,7 +799,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 			REVENUE_FIELD: 'publisher_revenue'
 		},
 		INDEX_EXCHANGE: {
-			PARTNER_NAME: 'Index Exchange',
+			PARTNER_NAME: 'IndexExchange',
 			NETWORK_ID: 21,
 			DOMAIN_FIELD_NAME: 'site_name',
 			REVENUE_FIELD: 'earnings'
