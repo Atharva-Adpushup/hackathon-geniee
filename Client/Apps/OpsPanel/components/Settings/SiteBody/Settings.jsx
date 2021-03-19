@@ -7,7 +7,6 @@ import InputBox from '../../../../../Components/InputBox/index';
 import CustomButton from '../../../../../Components/CustomButton/index';
 // import { formatDate } from '../../../../../helpers/commonFunctions';
 import config from '../../../../../config/config';
-import { weeklyDailySnapshots } from '../../../../../../configs/config';
 import siteService from '../../../../../services/siteService';
 
 class Settings extends Component {
@@ -346,7 +345,7 @@ class Settings extends Component {
 					name={`hbAnalytics-${siteId}-${siteDomain}`}
 					id={`js-hbAnalytics-switch-${siteId}-${siteDomain}`}
 				/>
-				{!weeklyDailySnapshots.isHidden && (
+				{!config.disableDailyWeeklySnapshots && (
 					<CustomToggleSwitch
 						labelText="Email Daily Reports Updates"
 						className="u-margin-b4 negative-toggle"
@@ -363,7 +362,7 @@ class Settings extends Component {
 					/>
 				)}
 
-				{!weeklyDailySnapshots.isHidden && (
+				{!config.disableDailyWeeklySnapshots && (
 					<CustomToggleSwitch
 						labelText="Email Weekly Reports Updates"
 						className="u-margin-b4 negative-toggle"

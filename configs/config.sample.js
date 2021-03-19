@@ -240,7 +240,6 @@ module.exports = {
 	},
 	cdnOriginUrl: 'https://test.adpushup.com',
 	weeklyDailySnapshots: {
-		isHidden: true,
 		CONNECTION_STRING: '',
 		CONTAINER_NAME: 'daily-weekly-snapshot',
 		BASE_PATH: '',
