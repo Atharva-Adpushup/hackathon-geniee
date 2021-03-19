@@ -7,6 +7,7 @@ import InputBox from '../../../../../Components/InputBox/index';
 import CustomButton from '../../../../../Components/CustomButton/index';
 // import { formatDate } from '../../../../../helpers/commonFunctions';
 import config from '../../../../../config/config';
+import { weeklyDailySnapshots } from '../../../../../../configs/config';
 import siteService from '../../../../../services/siteService';
 
 class Settings extends Component {
@@ -345,34 +346,39 @@ class Settings extends Component {
 					name={`hbAnalytics-${siteId}-${siteDomain}`}
 					id={`js-hbAnalytics-switch-${siteId}-${siteDomain}`}
 				/>
-				<CustomToggleSwitch
-					labelText="Email Daily Reports Updates"
-					className="u-margin-b4 negative-toggle"
-					checked={isDailyEmailReportsEnabled}
-					onChange={this.handleToggle}
-					layout="horizontal"
-					size="m"
-					on="Yes"
-					off="No"
-					defaultLayout
-					name={`isDailyEmailReportsEnabled-${siteId}-${siteDomain}`}
-					id={`isDailyEmailReportsEnabled-${siteId}-${siteDomain}`}
-					disabled={!dataFeedActive}
-				/>
-				<CustomToggleSwitch
-					labelText="Email Weekly Reports Updates"
-					className="u-margin-b4 negative-toggle"
-					checked={isWeeklyEmailReportsEnabled}
-					onChange={this.handleToggle}
-					layout="horizontal"
-					size="m"
-					on="Yes"
-					off="No"
-					defaultLayout
-					name={`isWeeklyEmailReportsEnabled-${siteId}-${siteDomain}`}
-					id={`isWeeklyEmailReportsEnabled-${siteId}-${siteDomain}`}
-					disabled={!dataFeedActive}
-				/>
+				{!weeklyDailySnapshots.isHidden && (
+					<CustomToggleSwitch
+						labelText="Email Daily Reports Updates"
+						className="u-margin-b4 negative-toggle"
+						checked={isDailyEmailReportsEnabled}
+						onChange={this.handleToggle}
+						layout="horizontal"
+						size="m"
+						on="Yes"
+						off="No"
+						defaultLayout
+						name={`isDailyEmailReportsEnabled-${siteId}-${siteDomain}`}
+						id={`isDailyEmailReportsEnabled-${siteId}-${siteDomain}`}
+						disabled={!dataFeedActive}
+					/>
+				)}
+
+				{!weeklyDailySnapshots.isHidden && (
+					<CustomToggleSwitch
+						labelText="Email Weekly Reports Updates"
+						className="u-margin-b4 negative-toggle"
+						checked={isWeeklyEmailReportsEnabled}
+						onChange={this.handleToggle}
+						layout="horizontal"
+						size="m"
+						on="Yes"
+						off="No"
+						defaultLayout
+						name={`isWeeklyEmailReportsEnabled-${siteId}-${siteDomain}`}
+						id={`isWeeklyEmailReportsEnabled-${siteId}-${siteDomain}`}
+						disabled={!dataFeedActive}
+					/>
+				)}
 				{isSPA && (
 					<React.Fragment>
 						<CustomToggleSwitch
