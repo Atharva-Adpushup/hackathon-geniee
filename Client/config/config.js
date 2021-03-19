@@ -21,5 +21,6 @@ export default {
 	PREBID_SERVER_HOST: 'https://amp.adpushup.com/',
 	MIXPANEL: {
 		TOKEN: '96e958dc847c19d28cf873a827efae75'
-	}
+	},
+	disableDailyWeeklySnapshots: true
 };
