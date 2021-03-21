@@ -60,10 +60,11 @@ function startPartnersPanelsAnomaliesDetectionService(partner, retryCount = 0 ) 
 			} else {
 				if(retryCount < 10) {
 					retryCount++;
-					console.log(`Retry attempt - ${retryCount}`)
+					const time = 1000 * 60 * 5 * retryCount;
+					console.log(`Retry attempt - ${retryCount} in ${5 * retryCount} min(s)`)
 					setTimeout(async () => {
 						await startPartnersPanelsAnomaliesDetectionService(partner, retryCount)
-					}, (1000 * 60 * 5 * retryCount));
+					}, time);
 				} else {
 					process.exit(0);
 				}
