@@ -199,6 +199,29 @@ function apTagAdsSyncing(currentDataForSyncing, site) {
 	);
 }
 
+function ampScriptAdsSyncing(currentDataForSyncing, site) {
+	/**
+	 * FLOW:
+	 * 1. Read AMP Script Ads Doc
+	 * 2. Fetch Ads
+	 * 3. Filter Unsynced Ads
+	 * 4. Set Dummy values to some variables to compliment current working flow
+	 * 5. Concat ads from Tag manager to current adp.ads
+	 */
+	return adGeneration(`${docKeys.ampScript}${site.get('siteId')}`, currentDataForSyncing, ad =>
+		Promise.resolve({
+			variations: [
+				{
+					variationName: 'manual',
+					variationId: 'manual',
+					pageGroup: null,
+					platform: ad.formatData.platform
+				}
+			]
+		})
+	);
+}
+
 function innovativeAdsSyncing(currentDataForSyncing, site) {
 	function generateLogData(site, ad) {
 		return site
@@ -265,6 +288,7 @@ function getGeneratedPromises(site) {
 		.getAllUnsyncedAds(site)
 		.then(channelWithAds => generateSiteChannelJSON(channelWithAds, site))
 		.then(currentDataForSyncing => apTagAdsSyncing(currentDataForSyncing, site))
+		.then(currentDataForSyncing => ampScriptAdsSyncing(currentDataForSyncing, site))
 		.then(currentDataForSyncing => innovativeAdsSyncing(currentDataForSyncing, site));
 }
 
