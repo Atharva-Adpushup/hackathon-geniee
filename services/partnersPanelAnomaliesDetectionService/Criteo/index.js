@@ -88,13 +88,13 @@ const fetchData = async sitesData => {
 			// if aonmalies found
 			if (anomalies.length) {
 				const dataToSend = CriteoPartnerModel.formatAnomaliesDataForSQL(anomalies, NETWORK_ID);
-				// await Promise.all([
-				// 	emailer.anomaliesMailService({
-				// 		partner: PARTNER_NAME,
-				// 		anomalies
-				// 	}),
-				// 	saveAnomaliesToDb(dataToSend, PARTNER_NAME)
-				// ]);
+				await Promise.all([
+					emailer.anomaliesMailService({
+						partner: PARTNER_NAME,
+						anomalies
+					}),
+					saveAnomaliesToDb(dataToSend, PARTNER_NAME)
+				]);
 			}
 			return {
 				total: finalData.length,

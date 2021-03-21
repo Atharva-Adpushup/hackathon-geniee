@@ -1,5 +1,7 @@
 const axios = require('axios');
 const csv = require('csvtojson');
+const moment = require('moment');
+const PromisePool = require('@supercharge/promise-pool');
 
 const partnerAndAdpushpModel = require('../PartnerAndAdpushpModel');
 const constants = require('../../../configs/commonConsts');
@@ -10,8 +12,8 @@ const API_ENDPOINT = `https://api.sovrn.com`;
 
 const PARTNER_NAME = `Sovrn`;
 const NETWORK_ID = 11;
-const DOMAIN_FIELD_NAME = 'site_name';
-const REVENUE_FIELD = 'revenue';
+const DOMAIN_FIELD_NAME = 'domain';
+const REVENUE_FIELD = 'earnings';
 
 const authParams = {
 	grant_type: 'password',
@@ -20,6 +22,17 @@ const authParams = {
 	client_id: 'sovrn',
 	client_secret: 'sovrn'
 };
+
+const fromDateSovrn = moment()
+.subtract(1, 'days').startOf('day').valueOf();
+
+const toDateSovrn = moment()
+.subtract(1, 'days').endOf('day').valueOf();
+
+const fromDate = moment()
+	.subtract(1, 'days')
+	.format('YYYY-MM-DD');
+const toDate = fromDate;
 
 var FormData = require('form-data');
 var data = new FormData();
@@ -38,6 +51,7 @@ data.append('client_secret', 'sovrn');
     }
  */
 
+ 
 /**
  * 1. Get Pub data
  * 2. Get AdPushup data for that Pub
@@ -75,15 +89,9 @@ const getDataFromPartner = function() {
 			};
 
 			// 2. Get User IID and All Sites
-			// var config = {
-			// 	method: 'get',
-			// 	url: `${API_ENDPOINT}/account/user`,
-			// 	headers
-			// };
-
 			var config = {
 				method: 'get',
-				url: 'https://api.sovrn.com/account/user',
+				url: `${API_ENDPOINT}/account/user`,
 				headers,
 				timeout: 1000 * 60 * 3
 			};
@@ -95,28 +103,15 @@ const getDataFromPartner = function() {
 				.catch(function(error) {
 					console.log(error.message);
 				});
-console.log(iid, websites, 'iid, websites')
-			// 3. Req for each date separately - time should be in millisecond
-			// Need to send requests in batches
-			const batchQueue = processReqInBatches(websites.map(item => item.site), headers);
+			console.log(iid, websites, 'iid, websites')
 
-			// process;
-			const queryParams = {
-				site: 'All%20Traffic',
-				startDate: '1614018600000',
-				startDate: '1614061799000',
-				iid
-			};
-			var config = {
-				method: 'get',
-				url: `${API_ENDPOINT}/earnings/breakout/all`,
-				params: queryParams,
-				headers
-			};
+			// 3. create batch requests and then wait
+			const queue = websites.map(item => item.site);
 
-			return await axios(config).then(response => {
-				return processDataReceivedFromPublisher(response.data);
-			});
+			// process batches
+			console.log('Processing batches.....');
+			const { results, errors } = await processReqInBatches(queue, headers);
+			return processDataReceivedFromPublisher(results);
 		})
 		.catch(function(error) {
 			// handle error
@@ -124,71 +119,62 @@ console.log(iid, websites, 'iid, websites')
 		})
 };
 
-const processReqInBatches = (queue, headers) => {
-	let count = 0;
-	const batchSize = 5;
-	let endIndex = batchSize;
-	// To Be Removed after testing
-	// queue.splice(100);
-	let batchQueue = [];
-	for (let i = 0; i < queue.length; i = i + batchSize) {
-		count++;
-		const batch = queue.slice(i, endIndex);
-		endIndex += batchSize;
-		console.log(batch, batch.length, 'batch', count);
+const processReqInBatches = async (queue, headers) => {
+	const batchSize = 50;
 
-		function processBatch(batch) {
-			let promiseQueue = [];
-			for (const site of batch) {
-				const queryParams = {
-					site,
-					startDate: 1610303400000,
-					startDate: 1610994540000,
-					iid: 13414817
-				};
+	return await PromisePool.withConcurrency(batchSize)
+		.for(queue)
+		.process(async site => {
+			// 3. Req for each date separately - time should be in millisecond
+			const queryParams = {
+				site,
+				startDate: fromDateSovrn,
+				endDate: toDateSovrn,
+				iid: 13414817
+			};
 
-				let config = {
-					method: 'get',
-					url: `${API_ENDPOINT}/earnings/breakout/all`,
-					params: queryParams,
-					headers
-				};
+			var config = {
+				method: 'get',
+				url: `${API_ENDPOINT}/earnings/breakout/all`,
+				params: queryParams,
+				headers
+			};
+			console.log(config, 'config')
+			return await axios(config).then(response => response.data);
 
-				promiseQueue.push(
-					axios(config)
-						.then(response => {
-							return {
-								config: config.data,
-								data: response.data
-							};
-						})
-						.catch(function(error) {
-							// handle error
-							console.log(error.message, 'error promiseQueue', 'errrr');
-						})
-				);
-			}
-			console.log(promiseQueue, 'promiseQueue');
-			return Promise.all(promiseQueue);
-		}
-		batchQueue.push(processBatch(batch));
-	}
-	return batchQueue;
+		});
 };
 
+
 const processDataReceivedFromPublisher = data => {
-	let processedData = data.rows.map(row => {
-		const obj = {};
-		data.columns.map((col, index) => {
-			obj[col] = row[index];
-		});
-		return obj;
+	var res = {};
+	data.breakouts.forEach(row => {
+		row.tags.filter(tag => {
+			return /AP.\d+_/.test(tag.zoneTitle)
+		}).map(tag => {
+			// remove AP_siteId
+			tag.domain = tag.domain.replace(/(AP)\/\d+_/, '')
+			// remove _size if exist
+			// sample AR.34675_cnetfrance.fr_300x250
+			tag.domain = tag.domain.replace(/_\d+x\d+$/,'')
+			const { domain, earnings, impressions } = tag;
+			if(res[domain]) {
+				res[domain].earnings += earning;
+				res[domain].impressions += impressions;
+			} else {
+				res[domain] = {
+					domain,
+					impressions,
+					impressions
+				}
+			}
+			return tag;
+		})
 	});
-	processedData = processedData.map(row => {
-		row.site_name = data.displayValue.siteId[row.siteId].replace(/(AP|AR)\/\d+_/, '');
-		return row;
-	});
-	console.log(processedData);
+
+	console.log(res, 'res');
+	let processedData = Object.keys(res).map(domain => res[domain])
+	console.log(processedData, 'processedData');
 	console.log('Processing end.............');
 	return processedData;
 };
@@ -239,22 +225,23 @@ const fetchData = sitesData => {
 			// if aonmalies found
 			if (anomalies.length) {
 				const dataToSend = SovrnPartnerModel.formatAnomaliesDataForSQL(anomalies, NETWORK_ID);
-				await Promise.all([
-					emailer.anomaliesMailService({
-						partner: PARTNER_NAME,
-						anomalies
-					}),
-					saveAnomaliesToDb(dataToSend)
-				]);
+				// await Promise.all([
+				// 	emailer.anomaliesMailService({
+				// 		partner: PARTNER_NAME,
+				// 		anomalies
+				// 	}),
+				// 	saveAnomaliesToDb(dataToSend)
+				// ]);
 			}
 		})
 		.catch(async function(error) {
-			await emailer.serviceErrorNotificationMailService({
-				partner: PARTNER_NAME,
-				error
-			})
+			// await emailer.serviceErrorNotificationMailService({
+			// 	partner: PARTNER_NAME,
+			// 	error
+			// })
 			// handle error
 			console.log('error', `err with ${PARTNER_NAME}`);
+			console.log(error)
 		});
 };
 

@@ -34,61 +34,36 @@ const getSitesFromDB = async () => {
 	return siteListPromise;
 };
 
-function startPartnersPanelsAnomaliesDetectionService(partner, isAlreadyErrored = false) {
+function startPartnersPanelsAnomaliesDetectionService(partner, retryCount = 0 ) {
 	getSitesFromDB()
 		.then(sitesData => {
 			if(partner) {
-				return Promise.all([partner(sitesData)])
+				return partner(sitesData)
 					.catch(err => {
 						throw { err };
 					});
 			} else {
-				// return Promise.resolveInSeries([
-				// 	criteo,
-				// 	OFT,
-				// 	Pubmatic
-				// ], sitesData).catch(err => {
-				// 	throw { err };
-				// })
-				return Promise.all([
-					criteo(sitesData),
-					OFT(sitesData),
-					Pubmatic(sitesData),
-					IndexExchange(sitesData),
-					// // Sovrn(sitesData)
-				]).catch(err => {
-					throw { err };
-				});
-
+					throw { err: new Error('Partner not found!') };
 			}
 		})
 		.then(result => {
-			if (result instanceof Error) {
-				console.error(result);
-				process.exit(1);
-			} else {
+			if (!result.status) {
 				// Print Final Result
 				console.log(`Name\tTotal\tAnomalies\tAnomaly %\tMessage`);
-				result.forEach(item => {
-					const perc = (item.anomalies * 100) / (item.anomalies + item.total);
-					console.log(
-						`${item.partner}\t${item.total}\t${item.anomalies}\t${perc.toFixed(2)}%\t${
-							item.message
-						}`
-					);
-				});
-				const errList = result.filter(item => item.status === 'Error')
-				if(errList.length) {
-					errList.forEach(item => {
-						setTimeout(async () => {
-							console.log(PARTNERS_LIST[item.partner], 'PARTNERS_LIST[item.partner]')
-							// to prevent unwanted restarts - multiple failed attempts
-							// Only one restart
-							if(!isAlreadyErrored) {
-								await startPartnersPanelsAnomaliesDetectionService(PARTNERS_LIST[item.partner], true)
-							}
-						}, 5000);
-					})
+				const perc = (result.anomalies * 100) / (result.total);
+				console.log(
+					`${result.partner}\t${result.total}\t${result.anomalies}\t${perc.toFixed(2)}%\t${
+						result.message
+					}`
+				);
+				process.exit(0);
+			} else {
+				if(retryCount < 10) {
+					retryCount++;
+					console.log(`Retry attempt - ${retryCount}`)
+					setTimeout(async () => {
+						await startPartnersPanelsAnomaliesDetectionService(partner, retryCount)
+					}, (1000 * 60 * 5 * retryCount));
 				} else {
 					process.exit(0);
 				}
@@ -96,7 +71,7 @@ function startPartnersPanelsAnomaliesDetectionService(partner, isAlreadyErrored 
 		})
 		.catch(async err => {
 			console.error(err, 'Main catch');
-			await sendErrorNotification(err, 'Patners Panel Service Crashed');
+			// await sendErrorNotification(err, 'Patners Panel Service Crashed');
 			process.exit(1);
 		});
 }
@@ -105,22 +80,5 @@ if (process.env.PARTNER_NAME) {
 	const { PARTNER_NAME } = process.env;
 	startPartnersPanelsAnomaliesDetectionService(PARTNERS_LIST[PARTNER_NAME])
 } else {
-	// execute all
-	startPartnersPanelsAnomaliesDetectionService();
+	console.log('No partner name passed!')
 }
-
-
-
-Promise.resolveInSeries = function(queue, sitesData) {
-    var responseAll = [];
-    return queue.reduce((accumulatorPromise, nextItem) => {
-        return accumulatorPromise.then(() => {
-            return nextItem(sitesData).then(res => {
-				console.log(res, 'resresresresresresres ******************************************')
-                responseAll.push(res);
-                return responseAll;
-            });
-        });
-    }, Promise.resolve());
-    
-};
