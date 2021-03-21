@@ -82,4 +82,5 @@ if (process.env.PARTNER_NAME) {
 	startPartnersPanelsAnomaliesDetectionService(PARTNERS_LIST[PARTNER_NAME])
 } else {
 	console.log('No partner name passed!')
+	process.exit(0)
 }
