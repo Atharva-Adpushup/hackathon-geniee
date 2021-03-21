@@ -43,26 +43,26 @@ function startPartnersPanelsAnomaliesDetectionService(partner, isAlreadyErrored 
 						throw { err };
 					});
 			} else {
-				return Promise.resolveInSeries([
-					// criteo,
-					OFT,
-					// Pubmatic
+				// return Promise.resolveInSeries([
+				// 	criteo,
+				// 	OFT,
+				// 	Pubmatic
+				// ], sitesData).catch(err => {
+				// 	throw { err };
+				// })
+				return Promise.all([
+					criteo(sitesData),
+					OFT(sitesData),
+					Pubmatic(sitesData),
+					IndexExchange(sitesData),
+					// // Sovrn(sitesData)
 				]).catch(err => {
 					throw { err };
-				})
-				// return Promise.all([
-				// 	// criteo(sitesData)
-				// 	OFT(sitesData),
-				// 	// Pubmatic(sitesData),
-				// 	// IndexExchange(sitesData),
-				// 	// // Sovrn(sitesData)
-				// ]).catch(err => {
-				// 	throw { err };
-				// });
+				});
+
 			}
 		})
 		.then(result => {
-			console.log(result, 'result')
 			if (result instanceof Error) {
 				console.error(result);
 				process.exit(1);
@@ -112,14 +112,6 @@ if (process.env.PARTNER_NAME) {
 
 
 Promise.resolveInSeries = function(queue, sitesData) {
-    // function methodThatReturnsAPromise(id) {
-    //     return new Promise((resolve, reject) => {
-    //         setTimeout(() => {
-    //             console.log(`Processing ${id}`);
-    //             resolve(id);
-    //         }, 1000);
-    //     });
-    // }
     var responseAll = [];
     return queue.reduce((accumulatorPromise, nextItem) => {
         return accumulatorPromise.then(() => {
