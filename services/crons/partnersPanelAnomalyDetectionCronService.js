@@ -12,7 +12,8 @@ const PARTNERS_LIST = {
 	"Criteo": criteo,
 	"Pubmatic": Pubmatic,
 	"OFT": OFT,
-	"IndexExchange": IndexExchange
+	"IndexExchange": IndexExchange,
+	"Sovrn": Sovrn
 };
 
 const {
@@ -47,7 +48,7 @@ function startPartnersPanelsAnomaliesDetectionService(partner, retryCount = 0 ) 
 			}
 		})
 		.then(result => {
-			if (!result.status) {
+			if (result && !result.status) {
 				// Print Final Result
 				console.log(`Name\tTotal\tAnomalies\tAnomaly %\tMessage`);
 				const perc = (result.anomalies * 100) / (result.total);
@@ -60,8 +61,8 @@ function startPartnersPanelsAnomaliesDetectionService(partner, retryCount = 0 ) 
 			} else {
 				if(retryCount < 10) {
 					retryCount++;
-					const time = 1000 * 60 * 5 * retryCount;
-					console.log(`Retry attempt - ${retryCount}/10 in ${5 * retryCount} min(s). Last attempt was on ${new Date(0)}`)
+					const time = 1000 * 60 * 1 * retryCount;
+					console.log(`Retry attempt - ${retryCount}/10 in ${5 * retryCount} min(s). Last attempt was on ${new Date()}`)
 					setTimeout(async () => {
 						await startPartnersPanelsAnomaliesDetectionService(partner, retryCount)
 					}, time);

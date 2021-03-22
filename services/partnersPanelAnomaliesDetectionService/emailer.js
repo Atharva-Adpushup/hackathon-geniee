@@ -2,7 +2,7 @@ const axios = require('axios');
 const URL = 'http://queuepublisher.adpushup.com/publish'
 const { PRODUCT_TEAM, OPS_TEAM, DEV_TEAM } = require('./config')
 
-const ownerEmails = DEV_TEAM;
+let ownerEmails = DEV_TEAM;
 if (process.env.NODE_ENV === 'production') {
 	ownerEmails = ownerEmails.concat(OPS_TEAM);
 } else if(process.env.NODE_ENV === 'staging') {
