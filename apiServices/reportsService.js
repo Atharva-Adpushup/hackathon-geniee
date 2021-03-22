@@ -280,7 +280,6 @@ const reportsService = {
 		//bypass if site has blocked prefetch
 		if (siteid)
 			config.prefetchBlockedSites.forEach(blockedSitePreFetch => {
-				'41319';
 				if (siteid.indexOf(blockedSitePreFetch) !== -1) bypassCache = true;
 			});
 		const sortedConfig = sortObjectEntries(reportConfig);
