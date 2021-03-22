@@ -481,7 +481,7 @@ function start() {
 			.then(cmpApplicable => {
 				utils.log('cmpApplicable', cmpApplicable);
 				if (cmpApplicable) {
-					adp.config.renderPostBid = true;
+					adp.config.renderPostBid = (adp.config.postBidEnabled === null || adp.config.postBidEnabled === undefined) ? true : adp.config.postBidEnabled;
 					return loadGoogleFundingChoicesCmp();
 				}
 				return '';
