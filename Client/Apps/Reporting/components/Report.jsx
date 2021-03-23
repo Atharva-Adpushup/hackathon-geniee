@@ -1359,7 +1359,11 @@ class Report extends Component {
 					/>
 				</Col>
 				<Col sm={12}>
-					<FilterLegend selectedFilters={selectedFilterValues} filtersList={filterList} />
+					<FilterLegend
+						selectedFilters={selectedFilterValues}
+						filtersList={filterList}
+						selectedDimension={selectedDimension}
+					/>
 				</Col>
 				<Col sm={12} className="u-margin-t5">
 					{/* <ChartContainer
