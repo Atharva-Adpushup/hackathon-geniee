@@ -17,7 +17,7 @@ var refreshAdSlot = require('./refreshAdSlot');
 
 var googlFcCmp = require('../libs/googleFcCmp');
 
-if (SEPARATE_PREBID_ENABLED && HB_ACTIVE) {
+if (!SEPARATE_PREBID_DISABLED && HB_ACTIVE) {
 	utils.injectHeadCodeOnPage(config.prebidBundleUrl);
 }
 

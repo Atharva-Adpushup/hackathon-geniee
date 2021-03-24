@@ -31,6 +31,7 @@ const defaultApConfigValues = {
 	isBbPlayerEnabledForTesting: false,
 	isPerformanceLoggingEnabled: false,
 	isAutoAddMultiformatDisabled: false,
+	isSiteSpecificSeparatePrebidEnabled: false,
 	// global config
 	isBbPlayerLoggingEnabled: false
 };

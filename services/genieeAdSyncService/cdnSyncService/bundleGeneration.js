@@ -57,7 +57,7 @@ function init(site, config) {
 					...statuses,
 					SITE_ID: JSON.stringify(siteId),
 					GA_ANALYTICS_ACTIVE: apConfigs.enableGAAnalytics,
-					SEPARATE_PREBID_ENABLED: !apConfigs.isSeparatePrebidDisabled
+					SEPARATE_PREBID_DISABLED: !!apConfigs.isSeparatePrebidDisabled
 				})
 			]
 		};

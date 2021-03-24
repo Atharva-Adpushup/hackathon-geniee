@@ -21,7 +21,7 @@ var defaultConfig = {};
 function start() {
 	defaultConfig = adp.$.extend({}, require('../config/config.js'));
 
-	if (SEPARATE_PREBID_ENABLED && HB_ACTIVE) {
+	if (!SEPARATE_PREBID_DISABLED && HB_ACTIVE) {
 		utils.injectHeadCodeOnPage(config.prebidBundleUrl);
 	}
 
