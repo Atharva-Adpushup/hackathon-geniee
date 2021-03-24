@@ -44,7 +44,7 @@ function startPartnersPanelsAnomaliesDetectionService(partner, retryCount = 0 ) 
 						throw { err };
 					});
 			} else {
-					throw { err: new Error('Partner not found!') };
+					throw { err: new Error(`Partner not found! - ${process.env.PARTNER_NAME}. Time: ${new Date()}`) };
 			}
 		})
 		.then(result => {
@@ -62,7 +62,7 @@ function startPartnersPanelsAnomaliesDetectionService(partner, retryCount = 0 ) 
 				if(retryCount < 10) {
 					retryCount++;
 					const time = 1000 * 60 * 1 * retryCount;
-					console.log(`Retry attempt - ${retryCount}/10 in ${5 * retryCount} min(s). Last attempt was on ${new Date()}`)
+					console.log(`Retry attempt for ${process.env.PARTNER_NAME} - ${retryCount}/10 in ${5 * retryCount} min(s). Time: ${new Date()}`)
 					setTimeout(async () => {
 						await startPartnersPanelsAnomaliesDetectionService(partner, retryCount)
 					}, time);
