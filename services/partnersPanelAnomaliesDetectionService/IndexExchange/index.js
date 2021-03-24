@@ -166,7 +166,7 @@ const processReqInBatches = async (queue, headers) => {
 				data,
 				headers
 			};
-			console.log('Processing....');
+
 			return await axios(config)
 				.then(response => {
 					return {
