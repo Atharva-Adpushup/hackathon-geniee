@@ -4,7 +4,6 @@ const querystring = require('querystring');
 
 const OAuth = require('../lib/OAuth');
 const partnerAndAdpushpModel = require('../PartnerAndAdpushpModel');
-const constants = require('../../../configs/commonConsts');
 const emailer = require('../emailer');
 const saveAnomaliesToDb = require('../saveAnomaliesToDb');
 const { axiosErrorHandler, partnerModuleErrorHandler } = require('../utils');
@@ -14,7 +13,6 @@ const {
 } = require('../../../configs/commonConsts');
 const { PARTNER_NAME, NETWORK_ID, DOMAIN_FIELD_NAME, REVENUE_FIELD } = OPENX;
 
-const AUTH_ENDPOINT = `https://auth.indexexchange.com/auth/oauth/token`;
 const API_ENDPOINT = `http://openxcorporate-ui3.openxenterprise.com`;
 
 const OAUTH_ENDPOINT_INITIATE = `https://sso.openx.com/api/index/initiate`;
@@ -27,15 +25,13 @@ const AUTH_PARAMS = {
 };
 
 const CONSUMER = {
-    public: '3886c1427947cac75c7034db82f590d01bc826d6',
-    secret: 'd457b1ff100015ca3a7dd1d1ed7972aa455231a9'
-}
+	public: '3886c1427947cac75c7034db82f590d01bc826d6',
+	secret: 'd457b1ff100015ca3a7dd1d1ed7972aa455231a9'
+};
 
-// 2021-03-23T00:00:00Z
 const date = moment().subtract(2, 'days');
 const fromDateOpenX = date.format('YYYY-MM-DDT00:00:00') + 'Z';
 const toDateOpenX = date.format('YYYY-MM-DDT23:59:59') + 'Z';
-console.log(fromDateOpenX, toDateOpenX)
 const fromDate = moment()
 	.subtract(2, 'days')
 	.format('YYYY-MM-DD');
@@ -47,55 +43,50 @@ const toDate = fromDate;
  * 3. Compare both data
  */
 
-// How IndexExchange works.
-// 1. Get Auth token before each req
-// 2. Get Placement info
-// 3. Get Sites data based on Placement Ids
-// 4. Get earnings from siteIds
+// How OpenX works.
+// 1. Access Token
+//     a. Temp Request Token
+//     b. Verify Temp Token
+//     c. Get Access Token
+// 2. Get Data from Partner
 const getDataFromPartner = async function() {
-	var auth = new OAuth({
+	// Step 1 - Access Token
+	// a. Temp Request Token
+	var OAuthInstanceForRequestToken = new OAuth({
 		consumer: CONSUMER
 	});
-	const reqObj = auth.authorize({
+	const signedOAuthDataForRequestToken = OAuthInstanceForRequestToken.authorize({
 		method: 'post',
 		url: OAUTH_ENDPOINT_INITIATE
 	});
-
-	const result = querystring.stringify(reqObj);
-	console.log(result);
-
+	const stringifiedSignedOAuthDataForRequestToken = querystring.stringify(signedOAuthDataForRequestToken);
 	// 1. Get Auth token before each req
-	var config = {
+	const configForRequestToken = {
 		method: 'post',
-		url: `${OAUTH_ENDPOINT_INITIATE}?${result}`,
+		url: `${OAUTH_ENDPOINT_INITIATE}?${stringifiedSignedOAuthDataForRequestToken}`
 	};
 
-	const tokenObj = await axios(config)
+	const requestTokenObj = await axios(configForRequestToken)
 		.then(response => response.data)
 		.then(function(response) {
+			// string to obj
 			const resObj = {};
 			response.split('&').map(item => {
 				const [key, val] = item.split('=');
 				resObj[key] = val;
 				return item;
 			});
-			console.log(response, 'response');
-			console.log(resObj, 'resObj');
 			return resObj;
 		})
-		.catch(function(error) {
-			console.log(error);
-		});
-	// .catch(axiosErrorHandler);
+		.catch(axiosErrorHandler);
 
-	console.log('Got Auth token before req....', tokenObj);
+	// b. Verify Temp Token
+	const FormData = require('form-data');
+	const data = new FormData();
 
-	var FormData = require('form-data');
-    var data = new FormData();
-    
 	data.append('email', AUTH_PARAMS.EMAIL);
 	data.append('password', AUTH_PARAMS.PASSWORD);
-	data.append('oauth_token', tokenObj.oauth_token);
+	data.append('oauth_token', requestTokenObj.oauth_token);
 
 	var config = {
 		method: 'post',
@@ -105,93 +96,68 @@ const getDataFromPartner = async function() {
 		},
 		data: data
 	};
-	console.log(config, 'config tokenverify input');
+
 	const tokenVerifyObj = await axios(config)
 		.then(response => response.data)
 		.then(function(response) {
 			const resObj = {};
 			response = response.replace(/oob\?/, '');
+			// string to obj
 			response.split('&').map(item => {
 				const [key, val] = item.split('=');
 				resObj[key] = val;
 				return item;
 			});
-			console.log(response, 'response');
-			console.log(resObj, 'resObj');
 			return resObj;
 		})
-		.catch(function(error) {
-			console.log(error);
-		});
+		.catch(axiosErrorHandler);
 
-	console.log(tokenVerifyObj, 'tokenVerifyObj');
-	var auth2 = new OAuth({
+	// c. Get Access Token
+	var OAuthInstanceForAccessToken = new OAuth({
 		consumer: CONSUMER
 	});
-
-	const reqObj2 = auth2.authorize(
+	const signedOAuthDataForAccessToken = OAuthInstanceForAccessToken.authorize(
 		{
 			method: 'post',
 			url: OAUTH_ENDPOINT_TOKEN
 		},
 		{
 			public: tokenVerifyObj.oauth_token,
-			secret: tokenObj.oauth_token_secret
+			secret: requestTokenObj.oauth_token_secret
 		},
 		{
 			oauth_verifier: tokenVerifyObj.oauth_verifier
 		}
 	);
-	// reqObj2.oauth_token= tokenVerifyObj.oauth_token;
-	console.log(reqObj2, 'reqObj2');
-	const result2 = querystring.stringify(reqObj2);
-	console.log(result2, 'result2');
 
-	var config2 = {
+	const stringifiedSignedOAuthDataForAccessToken = querystring.stringify(signedOAuthDataForAccessToken);
+	var configForAccessToken = {
 		method: 'post',
-		url: `${OAUTH_ENDPOINT_TOKEN}?${result2}`,
-		headers: {
-			'Content-Type': 'application/json'
-			// Cookie: `openx3_access_token=${tokenVerifyObj.oauth_token}`
-		}
+		url: `${OAUTH_ENDPOINT_TOKEN}?${stringifiedSignedOAuthDataForAccessToken}`,
 	};
-
-	const tokenObj2 = await axios(config2)
+	const accessTokenObj = await axios(configForAccessToken)
 		.then(response => response.data)
 		.then(function(response) {
-			console.log(response, 'response acc token');
-
 			const resObj = {};
 			response.split('&').map(item => {
 				const [key, val] = item.split('=');
 				resObj[key] = val;
 				return item;
 			});
-			console.log(response, 'response');
-			console.log(resObj, 'resObj');
-
 			return resObj;
 		})
-		.catch(function(error) {
-			console.log(error);
-		});
-	console.log('Got Auth token before req....', tokenObj2);
+		.catch(axiosErrorHandler);
 
-	var config2 = {
+    // 2. Fetching data fom Partner
+	var configForFetchingData = {
 		method: 'post',
 		url: `${API_ENDPOINT}/data/1.0/report`,
 		headers: {
-			'Content-Type': 'application/json',
-			Cookie: `openx3_access_token=${tokenObj2.oauth_token}`
+			Cookie: `openx3_access_token=${accessTokenObj.oauth_token}`
 		},
 		data: {
-            // 2021-03-23T00:00:00Z
-            // 2021-03-23T23:59:59Z
-
-			// startDate: '2021-03-24T00:00:00Z',
-            // endDate: '2021-03-23T24:59:59Z',
 			startDate: fromDateOpenX,
-            endDate: toDateOpenX,
+			endDate: toDateOpenX,
 			attributes: [
 				{ id: 'publisherAccountName' },
 				{ id: 'publisherAccountId' },
@@ -203,33 +169,16 @@ const getDataFromPartner = async function() {
 				{ id: 'marketPublisherRevenue' },
 				{ id: 'marketImpressions' }
 			]
-        }
-    };
-    const resData = await axios(config2)
-    .then(response => response.data)
-    .then(function(response) {
-        console.log(response, 'dataaaaa');
-        return response.reportData;
-    });
+		}
+	};
+	const responseDataFromAPI = await axios(configForFetchingData)
+		.then(response => response.data)
+		.then(function(response) {
+			console.log(response, 'dataaaaa');
+			return response.reportData;
+		});
 
-    return processDataReceivedFromPublisher(resData)
-    return resData;
-	// return [];
-	// http://openxcorporate-ui3.openxenterprise.com/data/1.0/report
-
-	// const headers = {
-	// 	Authorization: `Bearer ${token}`
-	// };
-
-	// // 2. Get Placement Info
-	// const placementData = await getPlacementData(headers);
-	// // 3. Get Sites Info from placementIds
-	// const siteIdsAndNameMappingFromPubData = await getAllSitesInfo(headers);
-
-	// // process batches
-	// console.log('Processing batches.....');
-	// const { results, errors } = await processReqInBatches(queue, headers);
-	// return processDataReceivedFromPublisher(results, siteIdsAndNameMappingFromPubData);
+	return processDataReceivedFromPublisher(responseDataFromAPI);
 };
 
 const processDataReceivedFromPublisher = data => {
@@ -260,14 +209,12 @@ const fetchData = sitesData => {
 			siteid: OpenXPartnerModel.getSiteIds().join(','),
 			network: NETWORK_ID,
 			fromDate: fromDate,
-            toDate: toDate,
-            // fromDate: '2021-03-23',
-			// toDate: '2021-03-23',
+			toDate: toDate,
 			interval: 'daily',
 			dimension: 'siteid'
 		};
 
-        const adpData = await OpenXPartnerModel.getDataFromAdPushup(params);
+		const adpData = await OpenXPartnerModel.getDataFromAdPushup(params);
 		let finalData = OpenXPartnerModel.compareAdPushupDataWithPartnersData(adpData);
 
 		// filter out anomalies
@@ -286,7 +233,7 @@ const fetchData = sitesData => {
 					partner: PARTNER_NAME,
 					anomalies
 				}),
-				// saveAnomaliesToDb(dataToSend, PARTNER_NAME)
+				saveAnomaliesToDb(dataToSend, PARTNER_NAME)
 			]);
 		}
 		return {
@@ -295,8 +242,8 @@ const fetchData = sitesData => {
 			partner: PARTNER_NAME,
 			message: 'Success'
 		};
-	});
-	// .catch(partnerModuleErrorHandler.bind(null, PARTNER_NAME));
+	})
+	.catch(partnerModuleErrorHandler.bind(null, PARTNER_NAME));
 };
 
 module.exports = fetchData;
