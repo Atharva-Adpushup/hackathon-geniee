@@ -345,34 +345,39 @@ class Settings extends Component {
 					name={`hbAnalytics-${siteId}-${siteDomain}`}
 					id={`js-hbAnalytics-switch-${siteId}-${siteDomain}`}
 				/>
-				<CustomToggleSwitch
-					labelText="Email Daily Reports Updates"
-					className="u-margin-b4 negative-toggle"
-					checked={isDailyEmailReportsEnabled}
-					onChange={this.handleToggle}
-					layout="horizontal"
-					size="m"
-					on="Yes"
-					off="No"
-					defaultLayout
-					name={`isDailyEmailReportsEnabled-${siteId}-${siteDomain}`}
-					id={`isDailyEmailReportsEnabled-${siteId}-${siteDomain}`}
-					disabled={!dataFeedActive}
-				/>
-				<CustomToggleSwitch
-					labelText="Email Weekly Reports Updates"
-					className="u-margin-b4 negative-toggle"
-					checked={isWeeklyEmailReportsEnabled}
-					onChange={this.handleToggle}
-					layout="horizontal"
-					size="m"
-					on="Yes"
-					off="No"
-					defaultLayout
-					name={`isWeeklyEmailReportsEnabled-${siteId}-${siteDomain}`}
-					id={`isWeeklyEmailReportsEnabled-${siteId}-${siteDomain}`}
-					disabled={!dataFeedActive}
-				/>
+				{!config.disableDailyWeeklySnapshots && (
+					<CustomToggleSwitch
+						labelText="Email Daily Reports Updates"
+						className="u-margin-b4 negative-toggle"
+						checked={isDailyEmailReportsEnabled}
+						onChange={this.handleToggle}
+						layout="horizontal"
+						size="m"
+						on="Yes"
+						off="No"
+						defaultLayout
+						name={`isDailyEmailReportsEnabled-${siteId}-${siteDomain}`}
+						id={`isDailyEmailReportsEnabled-${siteId}-${siteDomain}`}
+						disabled={!dataFeedActive}
+					/>
+				)}
+
+				{!config.disableDailyWeeklySnapshots && (
+					<CustomToggleSwitch
+						labelText="Email Weekly Reports Updates"
+						className="u-margin-b4 negative-toggle"
+						checked={isWeeklyEmailReportsEnabled}
+						onChange={this.handleToggle}
+						layout="horizontal"
+						size="m"
+						on="Yes"
+						off="No"
+						defaultLayout
+						name={`isWeeklyEmailReportsEnabled-${siteId}-${siteDomain}`}
+						id={`isWeeklyEmailReportsEnabled-${siteId}-${siteDomain}`}
+						disabled={!dataFeedActive}
+					/>
+				)}
 				{isSPA && (
 					<React.Fragment>
 						<CustomToggleSwitch

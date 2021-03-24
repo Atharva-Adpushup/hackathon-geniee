@@ -69,6 +69,7 @@ module.exports = {
 					type: section.formatData && section.formatData.type ? section.formatData.type : false,
 					isManual: ad.isManual || false,
 					isInnovativeAd: ad.isInnovativeAd || false,
+					isAmpScriptAd: !!ad.isAmpScriptAd,
 					isNative: isNative,
 					network: ad.network,
 					networkData: {
