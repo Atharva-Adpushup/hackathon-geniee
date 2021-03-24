@@ -75,7 +75,10 @@ function validateMessageData(originalMessage) {
 function processPrebidModule(data) {
 	const [site] = data;
 	const apConfigs = site.get('apConfigs');
-	const { isSeparatePrebidDisabled = false } = apConfigs;
+	const {
+		isSeparatePrebidDisabled = false,
+		isSiteSpecificSeparatePrebidEnabled = false
+	} = apConfigs;
 
 	if (isSeparatePrebidDisabled) {
 		console.log('Separate Prebid bundle feature is disabled.');
@@ -83,7 +86,7 @@ function processPrebidModule(data) {
 	}
 
 	console.log('Separate Prebid bundle feature is enabled.');
-	return syncPrebidBundle().then(({ name: prebidBundleName }) => [...data, prebidBundleName]);
+	return syncPrebidBundle(isSiteSpecificSeparatePrebidEnabled).then(({ name: prebidBundleName }) => [...data, prebidBundleName]);
 }
 
 function processPrebidAndSyncCdn(decodedMessage) {
