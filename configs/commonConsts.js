@@ -803,6 +803,12 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 			NETWORK_ID: 21,
 			DOMAIN_FIELD_NAME: 'site_name',
 			REVENUE_FIELD: 'earnings'
+		},
+		OPENX: {
+			PARTNER_NAME: 'OpenX',
+			NETWORK_ID: 10,
+			DOMAIN_FIELD_NAME: 'publisherSiteName',
+			REVENUE_FIELD: 'marketPublisherRevenueInPCoin'
 		}
 	}
 };

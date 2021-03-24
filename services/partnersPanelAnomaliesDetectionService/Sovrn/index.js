@@ -7,6 +7,7 @@ const partnerAndAdpushpModel = require('../PartnerAndAdpushpModel');
 const constants = require('../../../configs/commonConsts');
 const emailer = require('../emailer');
 const saveAnomaliesToDb = require('../saveAnomaliesToDb');
+const { axiosErrorHandler, partnerModuleErrorHandler } = require('../utils');
 
 const API_ENDPOINT = `https://api.sovrn.com`;
 
@@ -93,24 +94,31 @@ const getDataFromPartner = function() {
 				method: 'get',
 				url: `${API_ENDPOINT}/account/user`,
 				headers,
-				timeout: 1000 * 60 * 3
+				timeout: 1000 * 60 * 5
 			};
-
+console.log(config)
 			const {iid, websites} = await axios(config)
 				.then(function(response) {
 					return response.data;
 				})
-				.catch(function(error) {
-					console.log(error.message);
-				});
+				.catch(axiosErrorHandler);
 			console.log(iid, websites, 'iid, websites')
 
 			// 3. create batch requests and then wait
 			const queue = websites.map(item => item.site);
 
+			// // because of GC error split queue to half
+			// const len = queue.length
+			// const q1 = queue.slice(0, len)
+			// const q2 = queue.slice(len)
+
 			// process batches
 			console.log('Processing batches.....');
-			const { results, errors } = await processReqInBatches(queue, headers);
+			const { results, errors } = await processReqInBatches(queue.slice(200,300), headers);
+			// const { results: res1, err1 } = await processReqInBatches(q1, headers);
+			// const { results: res2, err2 } = await processReqInBatches(q2, headers);
+
+			// const results = [...res1, ...res2];
 			return processDataReceivedFromPublisher(results);
 		})
 		.catch(function(error) {
@@ -139,15 +147,31 @@ const processReqInBatches = async (queue, headers) => {
 				params: queryParams,
 				headers
 			};
-			console.log(config, 'config')
-			return await axios(config).then(response => response.data);
+			console.log(config)
 
+			var config = {
+				method: 'get',
+				url: `https://api.sovrn.com/earnings/breakout/all?site=${site}&startDate=1616265000000&endDate=1616351399999&iid=13414817`,
+				headers: { 
+				  'Authorization': headers.Authorization
+				}
+			  };
+			console.log(site, ' processing....')
+			return await axios(config)
+				.then(response => response.data)
+				.catch((err) => {
+					console.log(err, 'errrrrrr eh wala')
+				});
 		});
 };
 
 
 const processDataReceivedFromPublisher = data => {
 	var res = {};
+	console.log(data, 'data')
+	if(!data.length) {
+		return [];
+	}
 	data.breakouts.forEach(row => {
 		row.tags.filter(tag => {
 			return /AP.\d+_/.test(tag.zoneTitle)

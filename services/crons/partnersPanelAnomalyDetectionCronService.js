@@ -6,6 +6,7 @@ const OFT = require('../partnersPanelAnomaliesDetectionService/OFT');
 const Pubmatic = require('../partnersPanelAnomaliesDetectionService/Pubmatic');
 const IndexExchange = require('../partnersPanelAnomaliesDetectionService/IndexExchange');
 const Sovrn = require('../partnersPanelAnomaliesDetectionService/Sovrn');
+const OpenX = require('../partnersPanelAnomaliesDetectionService/OpenX');
 const { appBucket } = require('../../helpers/routeHelpers');
 
 const PARTNERS_LIST = {
@@ -13,7 +14,8 @@ const PARTNERS_LIST = {
 	"Pubmatic": Pubmatic,
 	"OFT": OFT,
 	"IndexExchange": IndexExchange,
-	"Sovrn": Sovrn
+	"Sovrn": Sovrn,
+	"OpenX": OpenX
 };
 
 const {
