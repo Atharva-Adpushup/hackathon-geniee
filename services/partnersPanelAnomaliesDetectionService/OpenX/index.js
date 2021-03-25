@@ -127,8 +127,6 @@ const getOAuthTokenVerifier = requestTokenObj => {
 	})
 		.then(response => response.body)
 		.then(function(response) {
-			console.log(response, 'response');
-
 			response = response.replace(/oob\?/, '');
 			// string to obj
 			const resObj2 = {};
