@@ -11,6 +11,12 @@ const axiosErrorHandler = err => {
         throw err;
     }
 }
+
+const requestErrorHandler = err => {
+    console.log(err)
+    throw err;
+}
+
 const partnerModuleErrorHandler = async (module, err) => {
     console.log(err)
     if(err instanceof CustomError) {
@@ -40,6 +46,7 @@ const sendErrorNotification = async (err, module) => {
 
 module.exports = {
     axiosErrorHandler,
+    requestErrorHandler,
     partnerModuleErrorHandler,
     couchbaseErrorHandler,
     sendErrorNotification
