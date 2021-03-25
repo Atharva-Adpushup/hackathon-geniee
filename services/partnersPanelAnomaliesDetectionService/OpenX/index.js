@@ -29,11 +29,11 @@ const CONSUMER = {
 	secret: 'd457b1ff100015ca3a7dd1d1ed7972aa455231a9'
 };
 
-const date = moment().subtract(2, 'days');
+const date = moment().subtract(1, 'days');
 const fromDateOpenX = date.format('YYYY-MM-DDT00:00:00') + 'Z';
 const toDateOpenX = date.format('YYYY-MM-DDT23:59:59') + 'Z';
 const fromDate = moment()
-	.subtract(2, 'days')
+	.subtract(1, 'days')
 	.format('YYYY-MM-DD');
 const toDate = fromDate;
 
@@ -52,14 +52,16 @@ const toDate = fromDate;
 const getDataFromPartner = async function() {
 	// Step 1 - Access Token
 	// a. Temp Request Token
-	var OAuthInstanceForRequestToken = new OAuth({
+	const OAuthInstanceForRequestToken = new OAuth({
 		consumer: CONSUMER
 	});
 	const signedOAuthDataForRequestToken = OAuthInstanceForRequestToken.authorize({
 		method: 'post',
 		url: OAUTH_ENDPOINT_INITIATE
 	});
-	const stringifiedSignedOAuthDataForRequestToken = querystring.stringify(signedOAuthDataForRequestToken);
+	const stringifiedSignedOAuthDataForRequestToken = querystring.stringify(
+		signedOAuthDataForRequestToken
+	);
 	// 1. Get Auth token before each req
 	const configForRequestToken = {
 		method: 'post',
@@ -88,7 +90,7 @@ const getDataFromPartner = async function() {
 	data.append('password', AUTH_PARAMS.PASSWORD);
 	data.append('oauth_token', requestTokenObj.oauth_token);
 
-	var config = {
+	const configForRequestTokenVerification = {
 		method: 'post',
 		url: OAUTH_ENDPOINT_PROCESS,
 		headers: {
@@ -97,7 +99,7 @@ const getDataFromPartner = async function() {
 		data: data
 	};
 
-	const tokenVerifyObj = await axios(config)
+	const tokenVerifyObj = await axios(configForRequestTokenVerification)
 		.then(response => response.data)
 		.then(function(response) {
 			const resObj = {};
@@ -113,7 +115,7 @@ const getDataFromPartner = async function() {
 		.catch(axiosErrorHandler);
 
 	// c. Get Access Token
-	var OAuthInstanceForAccessToken = new OAuth({
+	const OAuthInstanceForAccessToken = new OAuth({
 		consumer: CONSUMER
 	});
 	const signedOAuthDataForAccessToken = OAuthInstanceForAccessToken.authorize(
@@ -130,10 +132,12 @@ const getDataFromPartner = async function() {
 		}
 	);
 
-	const stringifiedSignedOAuthDataForAccessToken = querystring.stringify(signedOAuthDataForAccessToken);
-	var configForAccessToken = {
+	const stringifiedSignedOAuthDataForAccessToken = querystring.stringify(
+		signedOAuthDataForAccessToken
+	);
+	const configForAccessToken = {
 		method: 'post',
-		url: `${OAUTH_ENDPOINT_TOKEN}?${stringifiedSignedOAuthDataForAccessToken}`,
+		url: `${OAUTH_ENDPOINT_TOKEN}?${stringifiedSignedOAuthDataForAccessToken}`
 	};
 	const accessTokenObj = await axios(configForAccessToken)
 		.then(response => response.data)
@@ -148,8 +152,8 @@ const getDataFromPartner = async function() {
 		})
 		.catch(axiosErrorHandler);
 
-    // 2. Fetching data fom Partner
-	var configForFetchingData = {
+	// 2. Fetching data fom Partner
+	const configForFetchingData = {
 		method: 'post',
 		url: `${API_ENDPOINT}/data/1.0/report`,
 		headers: {
@@ -196,54 +200,56 @@ const fetchData = sitesData => {
 	const OpenXPartnerModel = new partnerAndAdpushpModel(sitesData, DOMAIN_FIELD_NAME, REVENUE_FIELD);
 
 	console.log('Fetching data from OpenX...');
-	return getDataFromPartner().then(async function(reportDataJSON) {
-		OpenXPartnerModel.setPartnersData(reportDataJSON);
+	return getDataFromPartner()
+		.then(async function(reportDataJSON) {
+			OpenXPartnerModel.setPartnersData(reportDataJSON);
 
-		// process and map sites data with publishers API data structure
-		OpenXPartnerModel.mapAdPushupSiteIdAndDomainWithPartnersDomain();
-		// Map PartnersData with AdPushup's SiteId mapping data
-		OpenXPartnerModel.mapPartnersDataWithAdPushupSiteIdAndDomain();
+			// process and map sites data with publishers API data structure
+			OpenXPartnerModel.mapAdPushupSiteIdAndDomainWithPartnersDomain();
+			// Map PartnersData with AdPushup's SiteId mapping data
+			OpenXPartnerModel.mapPartnersDataWithAdPushupSiteIdAndDomain();
 
-		// TBD - Remove hard coded dates after testing
-		const params = {
-			siteid: OpenXPartnerModel.getSiteIds().join(','),
-			network: NETWORK_ID,
-			fromDate: fromDate,
-			toDate: toDate,
-			interval: 'daily',
-			dimension: 'siteid'
-		};
+			// TBD - Remove hard coded dates after testing
+			const params = {
+				siteid: OpenXPartnerModel.getSiteIds().join(','),
+				network: NETWORK_ID,
+				fromDate: fromDate,
+				toDate: toDate,
+				interval: 'daily',
+				dimension: 'siteid'
+			};
 
-		const adpData = await OpenXPartnerModel.getDataFromAdPushup(params);
-		let finalData = OpenXPartnerModel.compareAdPushupDataWithPartnersData(adpData);
+			const adpData = await OpenXPartnerModel.getDataFromAdPushup(params);
+			let finalData = OpenXPartnerModel.compareAdPushupDataWithPartnersData(adpData);
 
-		// filter out anomalies
-		const anomalies = finalData.filter(
-			item => item.diffPer <= -ANOMALY_THRESHOLD_IN_PER || item.diffPer >= ANOMALY_THRESHOLD_IN_PER
-		);
-		// console.log(JSON.stringify(anomalies, null, 3), 'anomalies');
-		console.log(finalData.length, 'finalData length');
-		console.log(anomalies.length, 'anomalies length');
+			// filter out anomalies
+			const anomalies = finalData.filter(
+				item =>
+					item.diffPer <= -ANOMALY_THRESHOLD_IN_PER || item.diffPer >= ANOMALY_THRESHOLD_IN_PER
+			);
+			// console.log(JSON.stringify(anomalies, null, 3), 'anomalies');
+			console.log(finalData.length, 'finalData length');
+			console.log(anomalies.length, 'anomalies length');
 
-		// if aonmalies found
-		if (anomalies.length) {
-			const dataToSend = OpenXPartnerModel.formatAnomaliesDataForSQL(anomalies, NETWORK_ID);
-			await Promise.all([
-				emailer.anomaliesMailService({
-					partner: PARTNER_NAME,
-					anomalies
-				}),
-				saveAnomaliesToDb(dataToSend, PARTNER_NAME)
-			]);
-		}
-		return {
-			total: finalData.length,
-			anomalies: anomalies.length,
-			partner: PARTNER_NAME,
-			message: 'Success'
-		};
-	})
-	.catch(partnerModuleErrorHandler.bind(null, PARTNER_NAME));
+			// if aonmalies found
+			if (anomalies.length) {
+				const dataToSend = OpenXPartnerModel.formatAnomaliesDataForSQL(anomalies, NETWORK_ID);
+				await Promise.all([
+					emailer.anomaliesMailService({
+						partner: PARTNER_NAME,
+						anomalies
+					}),
+					saveAnomaliesToDb(dataToSend, PARTNER_NAME)
+				]);
+			}
+			return {
+				total: finalData.length,
+				anomalies: anomalies.length,
+				partner: PARTNER_NAME,
+				message: 'Success'
+			};
+		})
+		.catch(partnerModuleErrorHandler.bind(null, PARTNER_NAME));
 };
 
 module.exports = fetchData;

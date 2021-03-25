@@ -1,7 +1,6 @@
-
-if (typeof(module) !== 'undefined' && typeof(exports) !== 'undefined') {
-    module.exports = OAuth;
-    var CryptoJS = require("crypto-js");
+if (typeof module !== 'undefined' && typeof exports !== 'undefined') {
+	module.exports = OAuth;
+	var CryptoJS = require('crypto-js');
 }
 
 /**
@@ -9,54 +8,58 @@ if (typeof(module) !== 'undefined' && typeof(exports) !== 'undefined') {
  * @param {Object} opts consumer key and secret
  */
 function OAuth(opts) {
-    if(!(this instanceof OAuth)) {
-        return new OAuth(opts);
-    }
+	if (!(this instanceof OAuth)) {
+		return new OAuth(opts);
+	}
 
-    if(!opts) {
-        opts = {};
-    }
+	if (!opts) {
+		opts = {};
+	}
 
-    if(!opts.consumer) {
-        throw new Error('consumer option is required');
-    }
+	if (!opts.consumer) {
+		throw new Error('consumer option is required');
+	}
 
-    this.consumer            = opts.consumer;
-    this.signature_method    = opts.signature_method || 'HMAC-SHA1';
-    this.nonce_length        = opts.nonce_length || 32;
-    this.version             = opts.version || '1.0';
-    this.parameter_seperator = opts.parameter_seperator || ', ';
+	this.consumer = opts.consumer;
+	this.signature_method = opts.signature_method || 'HMAC-SHA1';
+	this.nonce_length = opts.nonce_length || 32;
+	this.version = opts.version || '1.0';
+	this.parameter_seperator = opts.parameter_seperator || ', ';
 
-    if(typeof opts.last_ampersand === 'undefined') {
-        this.last_ampersand = true;
-    } else {
-        this.last_ampersand = opts.last_ampersand;
-    }
+	if (typeof opts.last_ampersand === 'undefined') {
+		this.last_ampersand = true;
+	} else {
+		this.last_ampersand = opts.last_ampersand;
+	}
 
-    switch (this.signature_method) {
-        case 'HMAC-SHA1':
-            this.hash = function(base_string, key) {
-                return CryptoJS.HmacSHA1(base_string, key).toString(CryptoJS.enc.Base64);
-            };
-            break;
+	switch (this.signature_method) {
+		case 'HMAC-SHA1':
+			this.hash = function(base_string, key) {
+				return CryptoJS.HmacSHA1(base_string, key).toString(CryptoJS.enc.Base64);
+			};
+			break;
 
-        case 'HMAC-SHA256':
-            this.hash = function(base_string, key) {
-                return CryptoJS.HmacSHA256(base_string, key).toString(CryptoJS.enc.Base64);
-            };
-            break;
+		case 'HMAC-SHA256':
+			this.hash = function(base_string, key) {
+				return CryptoJS.HmacSHA256(base_string, key).toString(CryptoJS.enc.Base64);
+			};
+			break;
 
-        case 'PLAINTEXT':
-            this.hash = function(base_string, key) {
-                return key;
-            };
-            break;
-           
-        case 'RSA-SHA1':
-            throw new Error('oauth-1.0a does not support this signature method right now. Coming Soon...');
-        default:
-            throw new Error('The OAuth 1.0a protocol defines three signature methods: HMAC-SHA1, RSA-SHA1, and PLAINTEXT only');
-    }
+		case 'PLAINTEXT':
+			this.hash = function(base_string, key) {
+				return key;
+			};
+			break;
+
+		case 'RSA-SHA1':
+			throw new Error(
+				'oauth-1.0a does not support this signature method right now. Coming Soon...'
+			);
+		default:
+			throw new Error(
+				'The OAuth 1.0a protocol defines three signature methods: HMAC-SHA1, RSA-SHA1, and PLAINTEXT only'
+			);
+	}
 }
 
 /**
@@ -71,31 +74,31 @@ function OAuth(opts) {
  * @return {Object} OAuth Authorized data
  */
 OAuth.prototype.authorize = function(request, token, options = {}) {
-    var oauth_data = {
-        oauth_callback:    'oob',    //    added by sourabh
-        oauth_consumer_key: this.consumer.public,
-        oauth_nonce: this.getNonce(),
-        oauth_signature_method: this.signature_method,
-        oauth_timestamp: this.getTimeStamp(),
-        oauth_version: this.version,
-        ...options
-    };
+	var oauth_data = {
+		oauth_callback: 'oob', //    added by sourabh
+		oauth_consumer_key: this.consumer.public,
+		oauth_nonce: this.getNonce(),
+		oauth_signature_method: this.signature_method,
+		oauth_timestamp: this.getTimeStamp(),
+		oauth_version: this.version,
+		...options
+	};
 
-    if(!token) {
-        token = {};
-    }
+	if (!token) {
+		token = {};
+	}
 
-    if(token.public) {
-        oauth_data.oauth_token = token.public;    //    commented by sourabh
-    }
-console.log(oauth_data, 'oauth_data')
-    if(!request.data) {
-        request.data = {};
-    }
+	if (token.public) {
+		oauth_data.oauth_token = token.public; //    commented by sourabh
+	}
 
-    oauth_data.oauth_signature = this.getSignature(request, token.secret, oauth_data);
+	if (!request.data) {
+		request.data = {};
+	}
 
-    return oauth_data;
+	oauth_data.oauth_signature = this.getSignature(request, token.secret, oauth_data);
+
+	return oauth_data;
 };
 
 /**
@@ -106,7 +109,7 @@ console.log(oauth_data, 'oauth_data')
  * @return {String} Signature
  */
 OAuth.prototype.getSignature = function(request, token_secret, oauth_data) {
-    return this.hash(this.getBaseString(request, oauth_data), this.getSigningKey(token_secret));
+	return this.hash(this.getBaseString(request, oauth_data), this.getSigningKey(token_secret));
 };
 
 /**
@@ -116,7 +119,13 @@ OAuth.prototype.getSignature = function(request, token_secret, oauth_data) {
  * @return {String} Base String
  */
 OAuth.prototype.getBaseString = function(request, oauth_data) {
-    return request.method.toUpperCase() + '&' + this.percentEncode(this.getBaseUrl(request.url)) + '&' + this.percentEncode(this.getParameterString(request, oauth_data));
+	return (
+		request.method.toUpperCase() +
+		'&' +
+		this.percentEncode(this.getBaseUrl(request.url)) +
+		'&' +
+		this.percentEncode(this.getParameterString(request, oauth_data))
+	);
 };
 
 /**
@@ -130,18 +139,22 @@ OAuth.prototype.getBaseString = function(request, oauth_data) {
  * @return {Object} Parameter string data
  */
 OAuth.prototype.getParameterString = function(request, oauth_data) {
-    var base_string_data = this.sortObject(this.percentEncodeData(this.mergeObject(oauth_data, this.mergeObject(request.data, this.deParamUrl(request.url)))));
+	var base_string_data = this.sortObject(
+		this.percentEncodeData(
+			this.mergeObject(oauth_data, this.mergeObject(request.data, this.deParamUrl(request.url)))
+		)
+	);
 
-    var data_str = '';
+	var data_str = '';
 
-    //base_string_data to string
-    for(var key in base_string_data) {
-        data_str += key + '=' + base_string_data[key] + '&';
-    }
+	//base_string_data to string
+	for (var key in base_string_data) {
+		data_str += key + '=' + base_string_data[key] + '&';
+	}
 
-    //remove the last character
-    data_str = data_str.substr(0, data_str.length - 1);
-    return data_str;
+	//remove the last character
+	data_str = data_str.substr(0, data_str.length - 1);
+	return data_str;
 };
 
 /**
@@ -150,16 +163,16 @@ OAuth.prototype.getParameterString = function(request, oauth_data) {
  * @return {String} Signing Key
  */
 OAuth.prototype.getSigningKey = function(token_secret) {
-    token_secret = token_secret || '';
+	token_secret = token_secret || '';
 
-    if(!this.last_ampersand && !token_secret) {
-        return this.percentEncode(this.consumer.secret);
-    }
-    // commented by Sourabh
-    if(token_secret) {
-        return this.percentEncode(this.consumer.secret) + '&' + this.percentEncode(token_secret);
-    }
-    return this.percentEncode(this.consumer.secret) + '&';
+	if (!this.last_ampersand && !token_secret) {
+		return this.percentEncode(this.consumer.secret);
+	}
+	// commented by Sourabh
+	if (token_secret) {
+		return this.percentEncode(this.consumer.secret) + '&' + this.percentEncode(token_secret);
+	}
+	return this.percentEncode(this.consumer.secret) + '&';
 };
 
 /**
@@ -168,7 +181,7 @@ OAuth.prototype.getSigningKey = function(token_secret) {
  * @return {String}
  */
 OAuth.prototype.getBaseUrl = function(url) {
-    return url.split('?')[0];
+	return url.split('?')[0];
 };
 
 /**
@@ -177,14 +190,14 @@ OAuth.prototype.getBaseUrl = function(url) {
  * @return {Object}
  */
 OAuth.prototype.deParam = function(string) {
-    var arr = decodeURIComponent(string).split('&');
-    var data = {};
+	var arr = decodeURIComponent(string).split('&');
+	var data = {};
 
-    for(var i = 0; i < arr.length; i++) {
-        var item = arr[i].split('=');
-        data[item[0]] = item[1];
-    }
-    return data;
+	for (var i = 0; i < arr.length; i++) {
+		var item = arr[i].split('=');
+		data[item[0]] = item[1];
+	}
+	return data;
 };
 
 /**
@@ -193,12 +206,11 @@ OAuth.prototype.deParam = function(string) {
  * @return {Object}
  */
 OAuth.prototype.deParamUrl = function(url) {
-    var tmp = url.split('?');
+	var tmp = url.split('?');
 
-    if (tmp.length === 1)
-        return {};
+	if (tmp.length === 1) return {};
 
-    return this.deParam(tmp[1]);
+	return this.deParam(tmp[1]);
 };
 
 /**
@@ -207,12 +219,12 @@ OAuth.prototype.deParamUrl = function(url) {
  * @return {String} percent encoded string
  */
 OAuth.prototype.percentEncode = function(str) {
-    return encodeURIComponent(str)
-        .replace(/\!/g, "%21")
-        .replace(/\*/g, "%2A")
-        .replace(/\'/g, "%27")
-        .replace(/\(/g, "%28")
-        .replace(/\)/g, "%29");
+	return encodeURIComponent(str)
+		.replace(/\!/g, '%21')
+		.replace(/\*/g, '%2A')
+		.replace(/\'/g, '%27')
+		.replace(/\(/g, '%28')
+		.replace(/\)/g, '%29');
 };
 
 /**
@@ -221,13 +233,13 @@ OAuth.prototype.percentEncode = function(str) {
  * @return {Object} percent encoded data
  */
 OAuth.prototype.percentEncodeData = function(data) {
-    var result = {};
+	var result = {};
 
-    for(var key in data) {
-        result[this.percentEncode(key)] = this.percentEncode(data[key]);
-    }
+	for (var key in data) {
+		result[this.percentEncode(key)] = this.percentEncode(data[key]);
+	}
 
-    return result;
+	return result;
 };
 
 /**
@@ -236,19 +248,23 @@ OAuth.prototype.percentEncodeData = function(data) {
  * @return {String} Header data key - value
  */
 OAuth.prototype.toHeader = function(oauth_data) {
-    oauth_data = this.sortObject(oauth_data);
+	oauth_data = this.sortObject(oauth_data);
 
-    var header_value = 'OAuth ';
+	var header_value = 'OAuth ';
 
-    for(var key in oauth_data) {
-        if (key.indexOf('oauth_') === -1)
-            continue;
-        header_value += this.percentEncode(key) + '="' + this.percentEncode(oauth_data[key]) + '"' + this.parameter_seperator;
-    }
+	for (var key in oauth_data) {
+		if (key.indexOf('oauth_') === -1) continue;
+		header_value +=
+			this.percentEncode(key) +
+			'="' +
+			this.percentEncode(oauth_data[key]) +
+			'"' +
+			this.parameter_seperator;
+	}
 
-    return {
-        Authorization: header_value.substr(0, header_value.length - this.parameter_seperator.length) //cut the last chars
-    };
+	return {
+		Authorization: header_value.substr(0, header_value.length - this.parameter_seperator.length) //cut the last chars
+	};
 };
 
 /**
@@ -256,14 +272,14 @@ OAuth.prototype.toHeader = function(oauth_data) {
  * @return {String} a random word characters string
  */
 OAuth.prototype.getNonce = function() {
-    var word_characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    var result = '';
+	var word_characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+	var result = '';
 
-    for(var i = 0; i < this.nonce_length; i++) {
-        result += word_characters[parseInt(Math.random() * word_characters.length, 10)];
-    }
+	for (var i = 0; i < this.nonce_length; i++) {
+		result += word_characters[parseInt(Math.random() * word_characters.length, 10)];
+	}
 
-    return result;
+	return result;
 };
 
 /**
@@ -271,11 +287,18 @@ OAuth.prototype.getNonce = function() {
  * @return {Int} current unix timestamp
  */
 OAuth.prototype.getTimeStamp = function() {
-    //return parseInt(new Date().getTime()/1000, 10);
-    // changed by sourabh
-    var now = new Date;
-return  utc_timestamp = Date.UTC(now.getUTCFullYear(),now.getUTCMonth(), now.getUTCDate() ,
-      now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds(), now.getUTCMilliseconds());
+	//return parseInt(new Date().getTime()/1000, 10);
+	// changed by sourabh
+	var now = new Date();
+	return (utc_timestamp = Date.UTC(
+		now.getUTCFullYear(),
+		now.getUTCMonth(),
+		now.getUTCDate(),
+		now.getUTCHours(),
+		now.getUTCMinutes(),
+		now.getUTCSeconds(),
+		now.getUTCMilliseconds()
+	));
 };
 
 ////////////////////// HELPER FUNCTIONS //////////////////////
@@ -287,11 +310,11 @@ return  utc_timestamp = Date.UTC(now.getUTCFullYear(),now.getUTCMonth(), now.get
  * @return {Object}
  */
 OAuth.prototype.mergeObject = function(obj1, obj2) {
-    var merged_obj = obj1;
-    for(var key in obj2) {
-        merged_obj[key] = obj2[key];
-    }
-    return merged_obj;
+	var merged_obj = obj1;
+	for (var key in obj2) {
+		merged_obj[key] = obj2[key];
+	}
+	return merged_obj;
 };
 
 /**
@@ -300,17 +323,17 @@ OAuth.prototype.mergeObject = function(obj1, obj2) {
  * @return {Object} sorted object
  */
 OAuth.prototype.sortObject = function(data) {
-    var keys = Object.keys(data);
-    var result = {};
+	var keys = Object.keys(data);
+	var result = {};
 
-    keys.sort();
+	keys.sort();
 
-    for(var i = 0; i < keys.length; i++) {
-        var key = keys[i];
-        result[key] = data[key];
-    }
+	for (var i = 0; i < keys.length; i++) {
+		var key = keys[i];
+		result[key] = data[key];
+	}
 
-    return result;
+	return result;
 };
 
 module.exports = OAuth;
