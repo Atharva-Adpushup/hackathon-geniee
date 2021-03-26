@@ -62,7 +62,7 @@ const getDataFromPartner = async function() {
 	// 4. Get earnings from Placement Id and SiteIds in batches
 	// 		a. For each Placement Id
 	// 		b. then each placement id have multiple sites - Site Ids based batch
-	// create batch of 50 sites - 50 parallel requests and then wait
+	// create a queue to be processed in batches
 	const queue = [];
 	placementData.forEach(placement => {
 		for (let i = 0; i < placement.siteID.length; i++) {
@@ -186,6 +186,7 @@ const processReqInBatches = async (queue, headers) => {
 const processDataReceivedFromPublisher = (data, siteIdsAndNameMappingFromPubData) => {
 	let processedData = data
 		.map(item => {
+			// empty response handling
 			if (!item) {
 				return [];
 			}
@@ -196,6 +197,7 @@ const processDataReceivedFromPublisher = (data, siteIdsAndNameMappingFromPubData
 				return row;
 			});
 		})
+		// empty response handling - for nested array response
 		.filter(item => item.length)
 		.reduce((acc, item) => {
 			acc = acc.concat(...item);
@@ -232,12 +234,11 @@ const fetchData = sitesData => {
 		.then(async function(reportDataJSON) {
 			IndexExchangePartnerModel.setPartnersData(reportDataJSON);
 
-			// process and map sites data with publishers API data structure
+			// process and map sites data with publishers API data response
 			IndexExchangePartnerModel.mapAdPushupSiteIdAndDomainWithPartnersDomain();
 			// Map PartnersData with AdPushup's SiteId mapping data
 			IndexExchangePartnerModel.mapPartnersDataWithAdPushupSiteIdAndDomain();
 
-			// TBD - Remove hard coded dates after testing
 			const params = {
 				siteid: IndexExchangePartnerModel.getSiteIds().join(','),
 				network: NETWORK_ID,
@@ -255,9 +256,6 @@ const fetchData = sitesData => {
 				item =>
 					item.diffPer <= -ANOMALY_THRESHOLD_IN_PER || item.diffPer >= ANOMALY_THRESHOLD_IN_PER
 			);
-			// console.log(JSON.stringify(anomalies, null, 3), 'anomalies');
-			console.log(finalData.length, 'finalData length');
-			console.log(anomalies.length, 'anomalies length');
 
 			// if aonmalies found
 			if (anomalies.length) {

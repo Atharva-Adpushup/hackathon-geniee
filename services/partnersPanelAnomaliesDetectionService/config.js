@@ -1,8 +1,14 @@
 const BACKEND_API_URL = `http://staging.adpushup.com/OpsWebService/anomaly/save`;
 
 module.exports = {
-    BACKEND_API_URL,
-    PRODUCT_TEAM : ['harpreet.singh@adpushup.com', "anil.panghal@adpushup.com", "rahul.ranjan@adpushup.com", "akshay.varma@adpushup.com", "navya.perla@adpushup.com"],
-    DEV_TEAM : ['harpreet.singh@adpushup.com'],
-    OPS_TEAM : []
+	BACKEND_API_URL,
+	PRODUCT_TEAM: [
+		'harpreet.singh@adpushup.com',
+		'anil.panghal@adpushup.com',
+		'rahul.ranjan@adpushup.com',
+		'akshay.varma@adpushup.com',
+		'navya.perla@adpushup.com'
+	],
+	DEV_TEAM: ['harpreet.singh@adpushup.com'],
+	OPS_TEAM: []
 };

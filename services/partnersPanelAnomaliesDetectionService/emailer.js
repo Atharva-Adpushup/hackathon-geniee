@@ -1,15 +1,15 @@
 const axios = require('axios');
-const URL = 'http://queuepublisher.adpushup.com/publish'
-const { PRODUCT_TEAM, OPS_TEAM, DEV_TEAM } = require('./config')
+const URL = 'http://queuepublisher.adpushup.com/publish';
+const { PRODUCT_TEAM, OPS_TEAM, DEV_TEAM } = require('./config');
 
 let ownerEmails = DEV_TEAM;
 if (process.env.NODE_ENV === 'production') {
 	ownerEmails = ownerEmails.concat(OPS_TEAM);
-} else if(process.env.NODE_ENV === 'staging') {
+} else if (process.env.NODE_ENV === 'staging') {
 	ownerEmails = ownerEmails.concat(PRODUCT_TEAM);
 }
 
-const anomaliesMailService = async ({partner, anomalies}) => {	  
+const anomaliesMailService = async ({ partner, anomalies }) => {
 	if (!ownerEmails.length) {
 		throw new Error("Please add owner email's in the config file to send email's to the owners");
 	}
@@ -17,7 +17,7 @@ const anomaliesMailService = async ({partner, anomalies}) => {
 
 	const dataConvertedToTableRow = () => {
 		let tableRow = '';
-		anomalies.forEach((siteData, siteid) => {
+		anomalies.forEach(siteData => {
 			const thisRow = `<tr>
 			<td> ${siteData.date} </td>
 			<td> ${partner} </td>
@@ -50,7 +50,7 @@ const anomaliesMailService = async ({partner, anomalies}) => {
 		data: {
 			to: emailRecepient,
 			body: emailbody,
-			subject: `${partner} - Partners Panel Anomaly Detection Service(Beta verison) !!!`
+			subject: `${partner} - Partners Panel Anomaly Detection Service !!!`
 		}
 	};
 
@@ -69,7 +69,6 @@ const anomaliesMailService = async ({partner, anomalies}) => {
 };
 
 const serviceErrorNotificationMailService = async (error, module) => {
-	// const ownerEmails = config.onwers.emails || [];
 	const ownerEmails = ['harpreet.singh@adpushup.com'];
 
 	if (!ownerEmails.length) {
@@ -88,7 +87,7 @@ const serviceErrorNotificationMailService = async (error, module) => {
 		data: {
 			to: emailRecepient,
 			body: emailbody,
-			subject: `${module} - Service Error Alert(Beta verison)!!!`
+			subject: `${module} - Service Error Alert!!!`
 		}
 	};
 
@@ -102,7 +101,6 @@ const serviceErrorNotificationMailService = async (error, module) => {
 		.catch(e => {
 			console.log(`error Mail:${e}`);
 			throw { error: true };
-			// return err;
 		});
 };
 

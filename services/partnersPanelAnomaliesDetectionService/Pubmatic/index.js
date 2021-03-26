@@ -126,12 +126,11 @@ const fetchData = sitesData => {
 		.then(async function(reportDataJSON) {
 			PubmaticPartnerModel.setPartnersData(reportDataJSON);
 
-			// process and map sites data with publishers API data structure
+			// process and map sites data with publishers API data response
 			PubmaticPartnerModel.mapAdPushupSiteIdAndDomainWithPartnersDomain();
 			// Map PartnersData with AdPushup's SiteId mapping data
 			PubmaticPartnerModel.mapPartnersDataWithAdPushupSiteIdAndDomain();
 
-			// TBD - Remove hard coded dates after testing
 			const params = {
 				siteid: PubmaticPartnerModel.getSiteIds().join(','),
 				network: NETWORK_ID,
@@ -149,9 +148,6 @@ const fetchData = sitesData => {
 				item =>
 					item.diffPer <= -ANOMALY_THRESHOLD_IN_PER || item.diffPer >= ANOMALY_THRESHOLD_IN_PER
 			);
-			// console.log(JSON.stringify(anomalies, null, 3), 'finalData');
-			console.log(finalData.length, 'finalData length');
-			console.log(anomalies.length, 'anomalies length');
 
 			// if aonmalies found
 			if (anomalies.length) {
@@ -170,9 +166,8 @@ const fetchData = sitesData => {
 				partner: PARTNER_NAME,
 				message: 'Success'
 			};
-
 		})
-		.catch(partnerModuleErrorHandler.bind(null, PARTNER_NAME))
+		.catch(partnerModuleErrorHandler.bind(null, PARTNER_NAME));
 };
 
 module.exports = fetchData;

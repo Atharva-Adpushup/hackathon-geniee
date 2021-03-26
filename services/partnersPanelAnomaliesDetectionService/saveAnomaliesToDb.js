@@ -1,5 +1,5 @@
 const axios = require('axios');
-const { BACKEND_API_URL } = require('./config')
+const { BACKEND_API_URL } = require('./config');
 const emailer = require('./emailer');
 const saveAnomaliesToDb = async (data, module) => {
 	const config = {
@@ -7,15 +7,15 @@ const saveAnomaliesToDb = async (data, module) => {
 		url: BACKEND_API_URL,
 		data,
 		headers: {
-            'Content-Type': 'application/json'
-        }
-	}
+			'Content-Type': 'application/json'
+		}
+	};
 	return await axios(config)
 		.then(response => response.data)
 		.then(async response => {
 			console.log(response, 'API DB Save response');
-			if(response.code === -1) {
-				await emailer.serviceErrorNotificationMailService(response.message, module)	
+			if (response.code === -1) {
+				await emailer.serviceErrorNotificationMailService(response.message, module);
 			}
 			return response;
 		})
@@ -24,7 +24,7 @@ const saveAnomaliesToDb = async (data, module) => {
 			await emailer.serviceErrorNotificationMailService({
 				partner: module,
 				error
-			})
+			});
 			throw { error: true };
 			// return err;
 		});

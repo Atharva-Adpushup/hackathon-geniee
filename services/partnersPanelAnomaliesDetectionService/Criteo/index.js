@@ -19,7 +19,6 @@ const fromDate = moment()
 	.format('YYYY-MM-DD');
 const toDate = fromDate;
 
-// TBD - remove hard coded dates
 const queryParams = {
 	dimensions: 'domain',
 	generator: 'daily',
@@ -33,11 +32,15 @@ const queryParams = {
 const getDataFromPartner = function() {
 	// 1. Get Auth token before each req
 	return axios
-		.get(API_ENDPOINT, {
-			params: queryParams
-		}, {
-			timeout: 1000 * 60 * 3
-		})
+		.get(
+			API_ENDPOINT,
+			{
+				params: queryParams
+			},
+			{
+				timeout: 1000 * 60 * 3
+			}
+		)
 		.then(response => response.data)
 		.catch(axiosErrorHandler);
 };
@@ -58,12 +61,11 @@ const fetchData = async sitesData => {
 	return getDataFromPartner()
 		.then(async function(reportDataJSON) {
 			CriteoPartnerModel.setPartnersData(reportDataJSON);
-			// process and map sites data with publishers API data structure
+			// process and map sites data with publishers API data response
 			CriteoPartnerModel.mapAdPushupSiteIdAndDomainWithPartnersDomain();
 			// Map PartnersData with AdPushup's SiteId mapping data
 			CriteoPartnerModel.mapPartnersDataWithAdPushupSiteIdAndDomain();
 
-			// TBD - Remove hard coded dates after testing
 			const params = {
 				siteid: CriteoPartnerModel.getSiteIds().join(','),
 				network: NETWORK_ID,
@@ -81,9 +83,6 @@ const fetchData = async sitesData => {
 				item =>
 					item.diffPer <= -ANOMALY_THRESHOLD_IN_PER || item.diffPer >= ANOMALY_THRESHOLD_IN_PER
 			);
-			// console.log(JSON.stringify(anomalies, null, 3), 'finalData');
-			console.log(finalData.length, 'finalData length');
-			console.log(anomalies.length, 'anomalies length');
 
 			// if aonmalies found
 			if (anomalies.length) {

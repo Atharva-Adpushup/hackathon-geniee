@@ -25,10 +25,14 @@ const authParams = {
 };
 
 const fromDateSovrn = moment()
-.subtract(1, 'days').startOf('day').valueOf();
+	.subtract(1, 'days')
+	.startOf('day')
+	.valueOf();
 
 const toDateSovrn = moment()
-.subtract(1, 'days').endOf('day').valueOf();
+	.subtract(1, 'days')
+	.endOf('day')
+	.valueOf();
 
 const fromDate = moment()
 	.subtract(1, 'days')
@@ -52,7 +56,6 @@ data.append('client_secret', 'sovrn');
     }
  */
 
- 
 /**
  * 1. Get Pub data
  * 2. Get AdPushup data for that Pub
@@ -75,7 +78,7 @@ const getDataFromPartner = function() {
 		headers: {
 			...data.getHeaders()
 		}
-	}
+	};
 	return axios(config)
 		.then(response => response.data)
 		.then(function(response) {
@@ -96,13 +99,13 @@ const getDataFromPartner = function() {
 				headers,
 				timeout: 1000 * 60 * 5
 			};
-console.log(config)
-			const {iid, websites} = await axios(config)
+			console.log(config);
+			const { iid, websites } = await axios(config)
 				.then(function(response) {
 					return response.data;
 				})
 				.catch(axiosErrorHandler);
-			console.log(iid, websites, 'iid, websites')
+			console.log(iid, websites, 'iid, websites');
 
 			// 3. create batch requests and then wait
 			const queue = websites.map(item => item.site);
@@ -114,7 +117,7 @@ console.log(config)
 
 			// process batches
 			console.log('Processing batches.....');
-			const { results, errors } = await processReqInBatches(queue.slice(200,300), headers);
+			const { results, errors } = await processReqInBatches(queue.slice(200, 300), headers);
 			// const { results: res1, err1 } = await processReqInBatches(q1, headers);
 			// const { results: res2, err2 } = await processReqInBatches(q2, headers);
 
@@ -124,7 +127,7 @@ console.log(config)
 		.catch(function(error) {
 			// handle error
 			console.log(error.message, 'error token data', 'errrr');
-		})
+		});
 };
 
 const processReqInBatches = async (queue, headers) => {
@@ -147,68 +150,65 @@ const processReqInBatches = async (queue, headers) => {
 				params: queryParams,
 				headers
 			};
-			console.log(config)
+			console.log(config);
 
 			var config = {
 				method: 'get',
 				url: `https://api.sovrn.com/earnings/breakout/all?site=${site}&startDate=1616265000000&endDate=1616351399999&iid=13414817`,
-				headers: { 
-				  'Authorization': headers.Authorization
+				headers: {
+					Authorization: headers.Authorization
 				}
-			  };
-			console.log(site, ' processing....')
+			};
+			console.log(site, ' processing....');
 			return await axios(config)
 				.then(response => response.data)
-				.catch((err) => {
-					console.log(err, 'errrrrrr eh wala')
+				.catch(err => {
+					console.log(err);
 				});
 		});
 };
 
-
 const processDataReceivedFromPublisher = data => {
 	var res = {};
-	console.log(data, 'data')
-	if(!data.length) {
+	console.log(data, 'data');
+	if (!data.length) {
 		return [];
 	}
 	data.breakouts.forEach(row => {
-		row.tags.filter(tag => {
-			return /AP.\d+_/.test(tag.zoneTitle)
-		}).map(tag => {
-			// remove AP_siteId
-			tag.domain = tag.domain.replace(/(AP)\/\d+_/, '')
-			// remove _size if exist
-			// sample AR.34675_cnetfrance.fr_300x250
-			tag.domain = tag.domain.replace(/_\d+x\d+$/,'')
-			const { domain, earnings, impressions } = tag;
-			if(res[domain]) {
-				res[domain].earnings += earning;
-				res[domain].impressions += impressions;
-			} else {
-				res[domain] = {
-					domain,
-					impressions,
-					impressions
+		row.tags
+			.filter(tag => {
+				return /AP.\d+_/.test(tag.zoneTitle);
+			})
+			.map(tag => {
+				// remove AP_siteId
+				tag.domain = tag.domain.replace(/(AP)\/\d+_/, '');
+				// remove _size if exist
+				// sample AR.34675_cnetfrance.fr_300x250
+				tag.domain = tag.domain.replace(/_\d+x\d+$/, '');
+				const { domain, earnings, impressions } = tag;
+				if (res[domain]) {
+					res[domain].earnings += earning;
+					res[domain].impressions += impressions;
+				} else {
+					res[domain] = {
+						domain,
+						impressions,
+						impressions
+					};
 				}
-			}
-			return tag;
-		})
+				return tag;
+			});
 	});
 
 	console.log(res, 'res');
-	let processedData = Object.keys(res).map(domain => res[domain])
+	let processedData = Object.keys(res).map(domain => res[domain]);
 	console.log(processedData, 'processedData');
 	console.log('Processing end.............');
 	return processedData;
 };
 
 const fetchData = sitesData => {
-	const SovrnPartnerModel = new partnerAndAdpushpModel(
-		sitesData,
-		DOMAIN_FIELD_NAME,
-		REVENUE_FIELD
-	);
+	const SovrnPartnerModel = new partnerAndAdpushpModel(sitesData, DOMAIN_FIELD_NAME, REVENUE_FIELD);
 
 	console.log('Fetching data from Sovrn...');
 	return getDataFromPartner()
@@ -265,7 +265,7 @@ const fetchData = sitesData => {
 			// })
 			// handle error
 			console.log('error', `err with ${PARTNER_NAME}`);
-			console.log(error)
+			console.log(error);
 		});
 };
 

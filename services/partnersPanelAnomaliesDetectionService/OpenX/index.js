@@ -44,8 +44,8 @@ const oauth = OAuth({
 });
 
 const date = moment().subtract(1, 'days');
-const fromDateOpenX = date.format('YYYY-MM-DDT00:00:00') + 'Z';
-const toDateOpenX = date.format('YYYY-MM-DDT23:59:59') + 'Z';
+const fromDateOpenX = date.format('YYYY-MM-DDT00:00:00Z');
+const toDateOpenX = date.format('YYYY-MM-DDT23:59:59Z');
 const fromDate = moment()
 	.subtract(1, 'days')
 	.format('YYYY-MM-DD');
@@ -74,10 +74,10 @@ const getDataFromPartner = async function() {
 		key: tokenVerifyObj.oauth_token,
 		secret: requestTokenObj.oauth_token_secret
 	};
-	const accessTokenObj = await getOAuthAccessToken(tokenVerifyObj, token)
+	const accessTokenObj = await getOAuthAccessToken(tokenVerifyObj, token);
 
 	// Step 2. Fetching data fom Partner
-	const responseDataFromAPI = await getDataFromOpenX(accessTokenObj)
+	const responseDataFromAPI = await getDataFromOpenX(accessTokenObj);
 
 	return processDataReceivedFromPublisher(responseDataFromAPI);
 };
@@ -129,16 +129,16 @@ const getOAuthTokenVerifier = requestTokenObj => {
 		.then(function(response) {
 			response = response.replace(/oob\?/, '');
 			// string to obj
-			const resObj2 = {};
+			const resObj = {};
 			response.split('&').map(item => {
 				const [key, val] = item.split('=');
-				resObj2[key] = val;
+				resObj[key] = val;
 				return item;
 			});
-			return resObj2;
+			return resObj;
 		})
 		.catch(requestErrorHandler);
-}
+};
 
 const getOAuthAccessToken = (tokenVerifyObj, token) => {
 	const configForAccessToken = {
@@ -165,7 +165,7 @@ const getOAuthAccessToken = (tokenVerifyObj, token) => {
 			return resObj;
 		})
 		.catch(requestErrorHandler);
-}
+};
 
 const getDataFromOpenX = accessTokenObj => {
 	const configForFetchingData = {
@@ -195,7 +195,7 @@ const getDataFromOpenX = accessTokenObj => {
 		.then(response => response.data)
 		.then(response => response.reportData)
 		.catch(axiosErrorHandler);
-}
+};
 const processDataReceivedFromPublisher = data => {
 	let processedData = data
 		.filter(row => /AP\/\d+_/.test(row.publisherSiteName))
@@ -215,12 +215,11 @@ const fetchData = sitesData => {
 		.then(async function(reportDataJSON) {
 			OpenXPartnerModel.setPartnersData(reportDataJSON);
 
-			// process and map sites data with publishers API data structure
+			// process and map sites data with publishers API data response
 			OpenXPartnerModel.mapAdPushupSiteIdAndDomainWithPartnersDomain();
 			// Map PartnersData with AdPushup's SiteId mapping data
 			OpenXPartnerModel.mapPartnersDataWithAdPushupSiteIdAndDomain();
 
-			// TBD - Remove hard coded dates after testing
 			const params = {
 				siteid: OpenXPartnerModel.getSiteIds().join(','),
 				network: NETWORK_ID,
@@ -238,9 +237,6 @@ const fetchData = sitesData => {
 				item =>
 					item.diffPer <= -ANOMALY_THRESHOLD_IN_PER || item.diffPer >= ANOMALY_THRESHOLD_IN_PER
 			);
-			// console.log(JSON.stringify(anomalies, null, 3), 'anomalies');
-			console.log(finalData.length, 'finalData length');
-			console.log(anomalies.length, 'anomalies length');
 
 			// if aonmalies found
 			if (anomalies.length) {

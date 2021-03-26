@@ -16,8 +16,7 @@ const API_ENDPOINT = `https://api.appnexus.com`;
 const fromDateOFT = moment()
 	.subtract(1, 'days')
 	.format('YYYY-MM-DD');
-const toDateOFT = moment()
-	.format('YYYY-MM-DD');
+const toDateOFT = moment().format('YYYY-MM-DD');
 
 const fromDate = moment()
 	.subtract(1, 'days')
@@ -106,12 +105,11 @@ const fetchData = sitesData => {
 		.then(async function(reportDataJSON) {
 			OFTMediaPartnerModel.setPartnersData(reportDataJSON);
 
-			// process and map sites data with publishers API data structure
+			// process and map sites data with publishers API data response
 			OFTMediaPartnerModel.mapAdPushupSiteIdAndDomainWithPartnersDomain();
 			// Map PartnersData with AdPushup's SiteId mapping data
 			OFTMediaPartnerModel.mapPartnersDataWithAdPushupSiteIdAndDomain();
 
-			// TBD - Remove hard coded dates after testing
 			const params = {
 				siteid: OFTMediaPartnerModel.getSiteIds().join(','),
 				network: NETWORK_ID,
@@ -129,9 +127,6 @@ const fetchData = sitesData => {
 				item =>
 					item.diffPer <= -ANOMALY_THRESHOLD_IN_PER || item.diffPer >= ANOMALY_THRESHOLD_IN_PER
 			);
-			// console.log(JSON.stringify(finalData, null, 3), 'finalData');
-			console.log(finalData.length, 'finalData length');
-			console.log(anomalies.length, 'anomalies length');
 
 			// if aonmalies found
 			if (anomalies.length) {
