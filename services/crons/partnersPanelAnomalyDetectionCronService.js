@@ -38,7 +38,7 @@ const getSitesFromDB = async () => {
 };
 
 function startPartnersPanelsAnomaliesDetectionService(partner, retryCount = 0) {
-	Promise.resolve([])
+	getSitesFromDB()
 		.then(sitesData => {
 			if (partner) {
 				return partner(sitesData).catch(err => {
