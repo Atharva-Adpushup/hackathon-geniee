@@ -12,10 +12,6 @@ const {
 } = require('../../../configs/commonConsts');
 const { PARTNER_NAME, NETWORK_ID, DOMAIN_FIELD_NAME, REVENUE_FIELD } = OFT;
 const API_ENDPOINT = `https://api.appnexus.com`;
-// const PARTNER_NAME = `AppNexus/OFT`;
-// const NETWORK_ID = 11;
-// const DOMAIN_FIELD_NAME = 'site_name';
-// const REVENUE_FIELD = 'publisher_revenue';
 
 const fromDateOFT = moment()
 	.subtract(1, 'days')
