@@ -221,7 +221,7 @@ class MultiSelectBox extends Component {
 									onChange={e => {
 										this.handleMultiSelect(e);
 									}}
-									checked={selectedOption[option.value]}
+									checked={selectedOption[option.value] ? true : false}
 								>
 									{option.name} {selectedOption[option.value]}
 								</Checkbox>
