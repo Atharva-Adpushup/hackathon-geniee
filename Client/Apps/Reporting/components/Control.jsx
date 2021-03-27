@@ -107,8 +107,12 @@ class Control extends Component {
 	}
 
 	onReportBySelect = selectedDimensions => {
-		const { reportType } = this.props;
-		const updatedSelectedDimension = selectedDimensions ? [...selectedDimensions] : [];
+		const { reportType, isHB } = this.props;
+		const updatedSelectedDimension = selectedDimensions
+			? isHB
+				? selectedDimensions
+				: [...selectedDimensions]
+			: [];
 		this.setState(
 			{ selectedDimension: updatedSelectedDimension },
 			this.onControlChange.bind(null, reportType)
