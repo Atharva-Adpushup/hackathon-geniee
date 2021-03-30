@@ -1278,8 +1278,47 @@ class Report extends Component {
 						selectedDimension={selectedDimension}
 					/>
 				</Col>
+				{(selectedDimension.length > 0 &&
+					selectedDimension.map(dimension => (
+						<Col sm={12} className="u-margin-t5">
+							<ChartContainer
+								tableData={tableData}
+								selectedDimension={dimension}
+								startDate={startDate}
+								endDate={endDate}
+								metricsList={metricsList}
+								allAvailableMetrics={allAvailableMetrics}
+								reportType={reportType}
+								isForOps={isForOps}
+								isCustomizeChartLegend={isCustomizeChartLegend}
+								updateMetrics={this.updateMetrics}
+								selectedInterval={selectedInterval}
+								selectedChartLegendMetric={selectedChartLegendMetric}
+							/>
+						</Col>
+					))) || (
+					<Col sm={12} className="u-margin-t5">
+						<ChartContainer
+							tableData={tableData}
+							selectedDimension={''}
+							startDate={startDate}
+							endDate={endDate}
+							metricsList={metricsList}
+							allAvailableMetrics={allAvailableMetrics}
+							reportType={reportType}
+							isForOps={isForOps}
+							isCustomizeChartLegend={isCustomizeChartLegend}
+							updateMetrics={this.updateMetrics}
+							selectedInterval={selectedInterval}
+							selectedChartLegendMetric={selectedChartLegendMetric}
+						/>
+					</Col>
+				)}
+				{/* <Col sm={12}>
+					<FilterLegend selectedFilters={selectedFilterValues} filtersList={filterList} />
+				</Col>
 				<Col sm={12} className="u-margin-t5">
-					{/* <ChartContainer
+					<ChartContainer
 						tableData={tableData}
 						selectedDimension={selectedDimension}
 						startDate={startDate}
@@ -1292,21 +1331,112 @@ class Report extends Component {
 						updateMetrics={this.updateMetrics}
 						selectedInterval={selectedInterval}
 						selectedChartLegendMetric={selectedChartLegendMetric}
-					/> */}
-				</Col>
-				<Col sm={12} className="u-margin-t5 u-margin-b4">
-					<TableContainer
-						tableData={selectedMetricsTableData}
-						aggregatedData={aggregatedData}
-						startDate={startDate}
-						endDate={endDate}
-						selectedInterval={selectedInterval}
-						selectedDimension={selectedDimension}
-						getCsvData={this.getCsvData}
-						reportType={reportType}
-						defaultReportType={defaultReportType}
-						isForOps={isForOps}
 					/>
+				</Col> */}
+				<Col sm={12} className="u-margin-t5 u-margin-b4">
+					{(selectedDimension.length > 1 && (
+						<TableContainer
+							tableData={selectedMetricsTableData}
+							aggregatedData={aggregatedData}
+							startDate={startDate}
+							endDate={endDate}
+							selectedInterval={selectedInterval}
+							selectedDimension={selectedDimension}
+							getCsvData={this.getCsvData}
+							reportType={reportType}
+							defaultReportType={defaultReportType}
+							isForOps={isForOps}
+							onPageChange={this.onPageChange}
+							showPaginationTop={false}
+							subTable={row => {
+								const { original: { date } = {} } = row;
+								if (date) {
+									const data = aggregatedData[date];
+									const { columns, total } = selectedMetricsTableData;
+									const totalRowWise = { ...total };
+									for (let key in totalRowWise) {
+										totalRowWise[key] = 0;
+									}
+									for (let i = 0; i < data.length; i++) {
+										data[i].date = date;
+									}
+									data.forEach(dat => {
+										for (let key in totalRowWise) {
+											const newKey = key.slice(6);
+											totalRowWise[key] += dat[newKey];
+										}
+									});
+									return (
+										(data.length > 1 && (
+											<TableContainer
+												tableData={{ columns, result: data, total: totalRowWise }}
+												aggregatedData={{ [date]: data }}
+												startDate={startDate}
+												endDate={endDate}
+												selectedInterval={selectedInterval}
+												selectedDimension={selectedDimension}
+												getCsvData={this.getCsvData}
+												reportType={reportType}
+												defaultReportType={defaultReportType}
+												isForOps={isForOps}
+												onPageChange={this.onPageChange}
+												showPaginationTop={false}
+												isSubTable={true}
+												// tableData={selectedMetricsTableData}
+												// aggregatedData={aggregatedData}
+												// startDate={startDate}
+												// endDate={endDate}
+												// selectedInterval={selectedInterval}
+												// selectedDimension={selectedDimension}
+												// getCsvData={this.getCsvData}
+												// reportType={reportType}
+												// defaultReportType={defaultReportType}
+												// isForOps={isForOps}
+												// onPageChange={this.onPageChange}
+												// showPaginationTop={false}
+											/>
+										)) ||
+										null
+									);
+
+									// return (
+									// 	<ReactTable
+									// 		columns={columns}
+									// 		data={data}
+									// 		pageSizeOptions={pageSizeOptions}
+									// 		defaultPageSize={defaultPageSize}
+									// 		minRows={minRows}
+									// 		sortable={sortable}
+									// 		filterable={filterable}
+									// 		showPaginationTop={showPaginationTop}
+									// 		showPaginationBottom={showPaginationBottom}
+									// 		defaultSorted={defaultSorted}
+									// 		pivotBy={pivotBy}
+									// 		defaultSortMethod={defaultSortMethod}
+									// 		className="u-padding-h3 u-padding-v2 -striped -highlight"
+									// 		onPageChange={onPageChange}
+									// 		onPageSizeChange={onPageSizeChange}
+									// 	/>
+									// );
+								}
+							}}
+						/>
+					)) || (
+						<TableContainer
+							tableData={selectedMetricsTableData}
+							aggregatedData={aggregatedData}
+							startDate={startDate}
+							endDate={endDate}
+							selectedInterval={selectedInterval}
+							selectedDimension={selectedDimension}
+							getCsvData={this.getCsvData}
+							reportType={reportType}
+							defaultReportType={defaultReportType}
+							isForOps={isForOps}
+							onPageChange={this.onPageChange}
+							showPaginationTop={false}
+						/>
+					)}
 				</Col>
 			</Row>
 		);
