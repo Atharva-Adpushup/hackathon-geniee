@@ -438,6 +438,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		lastRunInfoDoc: 'config::apnd:last-run-info',
 		sizeMapppingConfig: 'data::sizeMapping',
 		activeBidderAdaptersList: 'data::activeBidderAdapters',
+		selectiveRolloutActiveBidderAdaptersList: 'data::selectiveRollout:activeBidderAdapters',
 		freqReports: 'freq:rprt::',
 		hbaQueryFrequencyDoc: 'hbaq::'
 	},
@@ -653,7 +654,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 			'consentManagementUsp',
 			'identityLinkIdSystem'
 		],
-		ACTIVE_BIDDER_ADAPTERS_N1QL: `SELECT DISTINCT RAW activeBidderAdapters
+		ACTIVE_BIDDER_ADAPTERS_N1QL_TEMPLATE: `SELECT DISTINCT RAW activeBidderAdapters
 								FROM
 									AppBucket _apNetworks
 									UNNEST
@@ -675,6 +676,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 														AS activeBiddersHbdc
 												WHERE
 													meta(_hbdc).id LIKE 'hbdc::%'
+													AND TONUMBER(_hbdc.siteId) in (__SITES_QUERY__)
 											)
 										WHEN
 												_apNetworks.[bidderKey] IS VALUED
@@ -686,6 +688,33 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 								WHERE
 									meta(_apNetworks).id = 'data::apNetworks'
 									ORDER BY activeBidderAdapters ASC;`,
+		CURRENT_SITES_N1QL: `SELECT
+									RAW _site.siteId
+								FROM
+									AppBucket _site
+								WHERE
+									meta(_site).id LIKE 'site::%'
+									AND (
+										_site.apConfigs IS MISSING
+										OR _site.apConfigs.isSelectiveRolloutEnabled IS MISSING
+										OR _site.apConfigs.isSelectiveRolloutEnabled != true
+									)`,
+		SELECTIVE_ROLLOUT_SITES_N1QL: `SELECT
+											RAW _site.siteId
+										FROM
+											AppBucket _site
+										WHERE
+											meta(_site).id LIKE 'site::%'
+											AND _site.apConfigs IS VALUED
+											AND _site.apConfigs.isSelectiveRolloutEnabled == true`,
+		ACTIVE_BIDDER_ADAPTERS_N1QL: ACTIVE_BIDDER_ADAPTERS_N1QL_TEMPLATE.replace(
+			'__SITES_QUERY__',
+			CURRENT_SITES_N1QL
+		),
+		SELECTIVE_ROLLOUT_ACTIVE_BIDDER_ADAPTERS_N1QL: ACTIVE_BIDDER_ADAPTERS_N1QL_TEMPLATE.replace(
+			'__SITES_QUERY__',
+			SELECTIVE_ROLLOUT_SITES_N1QL
+		),
 		ACTIVE_BIDDER_ADAPTERS_BY_SITE_N1QL: `SELECT DISTINCT RAW activeBidderAdapters
 								FROM
 									AppBucket _apNetworks
@@ -719,13 +748,22 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 								WHERE
 									meta(_apNetworks).id = 'data::apNetworks'
 									ORDER BY activeBidderAdapters ASC;`,
-		FIRST_S2S_BIDDER_SITE: `SELECT _hbdc.siteId
+		FIRST_S2S_BIDDER_SITE_TEMPLATE: `SELECT _hbdc.siteId
 							FROM
 								AppBucket _hbdc
 							WHERE
 								meta(_hbdc).id LIKE 'hbdc::%'
+								AND TONUMBER(_hbdc.siteId) in (__SITES_QUERY__)
 								AND ANY bidder IN OBJECT_VALUES(_hbdc.hbcf) SATISFIES bidder.isS2SActive = true END
 							LIMIT 1;`,
+		FIRST_S2S_BIDDER_SITE: FIRST_S2S_BIDDER_SITE_TEMPLATE.replace(
+			'__SITES_QUERY__',
+			CURRENT_SITES_N1QL
+		),
+		SELECTIVE_ROLLOUT_FIRST_S2S_BIDDER_SITE: FIRST_S2S_BIDDER_SITE_TEMPLATE.replace(
+			'__SITES_QUERY__',
+			SELECTIVE_ROLLOUT_SITES_N1QL
+		),
 		S2S_BIDDER_BY_SITE: `SELECT _hbdc.siteId
 							FROM
 								AppBucket _hbdc

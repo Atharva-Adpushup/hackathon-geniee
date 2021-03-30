@@ -5,7 +5,7 @@ const Promise = require('bluebird');
 
 const UserModel = require('../models/userModel');
 const SiteModel = require('../models/siteModel');
-const ActiveBidderAdaptersListModel = require('../models/activeBidderAdaptersListModel');
+const SelectiveRolloutActiveBidderAdaptersList = require('../models/selectiveRolloutActiveBidderAdaptersListModel');
 const ampScriptModel = require('../models/ampScriptModel');
 
 const getReportData = require('../reports/universal');
@@ -347,8 +347,8 @@ Router.get('/:siteId/ampSiteConfig', (req, res) => {
 
 Router.get('/prebidBundleConfig', (req, res) =>
 	Promise.join(
-		ActiveBidderAdaptersListModel.isS2SActiveOnAnySite(),
-		ActiveBidderAdaptersListModel.getActiveAndUsedBidderAdapters()
+		SelectiveRolloutActiveBidderAdaptersList.isS2SActiveOnAnySite(),
+		SelectiveRolloutActiveBidderAdaptersList.getActiveAndUsedBidderAdapters()
 	)
 		.then(([isS2SActiveOnAnySite, activeAndUsedBidders]) =>
 			res.send({ isS2SActiveOnAnySite, activeAndUsedBidders })
@@ -366,7 +366,9 @@ Router.get('/prebidBundleConfig', (req, res) =>
 
 Router.post('/prebidActiveBidderAdapters', (req, res) => {
 	const { newActiveBidderAdapters } = req.body;
-	return ActiveBidderAdaptersListModel.updateActiveBidderAdaptersIfChanged(newActiveBidderAdapters)
+	return SelectiveRolloutActiveBidderAdaptersList.updateActiveBidderAdaptersIfChanged(
+		newActiveBidderAdapters
+	)
 		.then(data => res.send(data))
 		.catch(err => {
 			if (err instanceof AdPushupError) {
