@@ -1421,7 +1421,7 @@ class Report extends Component {
 					/>
 				</Col> */}
 				<Col sm={12} className="u-margin-t5 u-margin-b4">
-					{(selectedDimension.length > 1 && (
+					{/* {(selectedDimension.length > 1 && (
 						<TableContainer
 							tableData={selectedMetricsTableData}
 							aggregatedData={aggregatedData}
@@ -1508,22 +1508,23 @@ class Report extends Component {
 								}
 							}}
 						/>
-					)) || (
-						<TableContainer
-							tableData={selectedMetricsTableData}
-							aggregatedData={aggregatedData}
-							startDate={startDate}
-							endDate={endDate}
-							selectedInterval={selectedInterval}
-							selectedDimension={selectedDimension}
-							getCsvData={this.getCsvData}
-							reportType={reportType}
-							defaultReportType={defaultReportType}
-							isForOps={isForOps}
-							onPageChange={this.onPageChange}
-							showPaginationTop={false}
-						/>
-					)}
+					)) || */}
+					(
+					<TableContainer
+						tableData={selectedMetricsTableData}
+						aggregatedData={aggregatedData}
+						startDate={startDate}
+						endDate={endDate}
+						selectedInterval={selectedInterval}
+						selectedDimension={selectedDimension}
+						getCsvData={this.getCsvData}
+						reportType={reportType}
+						defaultReportType={defaultReportType}
+						isForOps={isForOps}
+						onPageChange={this.onPageChange}
+						showPaginationTop={false}
+					/>
+					{/* )} */}
 				</Col>
 			</Row>
 		);

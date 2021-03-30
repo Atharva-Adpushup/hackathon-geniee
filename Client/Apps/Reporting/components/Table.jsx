@@ -360,7 +360,7 @@ class Table extends React.Component {
 						showPaginationBottom={false}
 						onPageSizeChange={onPageSizeChange}
 						onPageChange={onPageChange}
-						// pivotBy={showAggregation ? ['date'] : []}
+						pivotBy={showAggregation ? ['date'] : []}
 						subTable={subTable}
 					/>
 					{!isSubTable && (
