@@ -27,16 +27,15 @@ const disableSiteCdnSyncList = [];
 const ieTestingSiteList = [38903]; // iaai.com
 
 const defaultApConfigValues = {
-	// isVideoWaitLimitDisabled: false,
-	// isBbPlayerEnabledForTesting: false,
-	/*
-	 * flags above cannot be used straightaway from siteDoc.apConfigs
-	 * which is why for now, we will continue to use them via list in config.js
-	 */
 	isUrlReportingEnabled: false,
 	isSeparatePrebidDisabled: false,
 	isPerformanceLoggingEnabled: false,
-	isAutoAddMultiformatDisabled: false
+	isAutoAddMultiformatDisabled: false,
+	isSiteSpecificSeparatePrebidEnabled: false,
+	isVideoWaitLimitDisabled: false,
+	// TODO: use these flags when BB player flags are consumed from apConfigs
+	// isBbPlayerEnabledForTesting: false,
+	// isBbPlayerLoggingEnabled: false,
 };
 
 module.exports = function(data) {
@@ -299,14 +298,14 @@ module.exports = function(data) {
 							prebidBundleName || config.prebidBundleDefaultName
 						);
 					}
-					
+
 					// const isPerformanceLoggingEnabled =
 					// 	Array.isArray(config.performanceLoggingEnabledSites) &&
 					// 	config.performanceLoggingEnabledSites.indexOf(parseInt(siteId, 10)) !== -1;
 
-					const isVideoWaitLimitDisabled =
-						Array.isArray(config.sitesToDisableVideoWaitLimit) &&
-						config.sitesToDisableVideoWaitLimit.indexOf(parseInt(siteId, 10)) !== -1;
+					// const isVideoWaitLimitDisabled =
+					// 	Array.isArray(config.sitesToDisableVideoWaitLimit) &&
+					// 	config.sitesToDisableVideoWaitLimit.indexOf(parseInt(siteId, 10)) !== -1;
 
 					// temp flag for temp change that has multiformat on for all the sites
 					// const isAutoAddMultiformatDisabled =
@@ -361,7 +360,7 @@ module.exports = function(data) {
 					// 	'__PERFORMANCE_LOGGING_ENABLED__',
 					// 	isPerformanceLoggingEnabled
 					// );
-					bundle = _.replace(bundle, '__VIDEO_WAIT_LIMIT_DISABLED__', isVideoWaitLimitDisabled);
+					// bundle = _.replace(bundle, '__VIDEO_WAIT_LIMIT_DISABLED__', isVideoWaitLimitDisabled);
 					// bundle = _.replace(bundle, '__AUTO_ADD_MULTIFORMAT_DISABLED__', isAutoAddMultiformatDisabled);
 					bundle = _.replace(
 						bundle,
