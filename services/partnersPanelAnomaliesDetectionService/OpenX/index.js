@@ -43,8 +43,8 @@ const oauth = OAuth({
 			.digest('base64');
 	}
 });
+
 const OFFSET = process.env.NODE_ENV === 'production' ? TIMEZONE_OFFSET.PRODUCTION : TIMEZONE_OFFSET.STAGING;
-console.log(OFFSET, 'OFFSET')
 let fromDateOpenX = moment().subtract(2, 'days');
 let zoneFromDate = moment.tz.zone('America/Los_Angeles').abbr(fromDateOpenX);
 fromDateOpenX = fromDateOpenX.set({
@@ -55,7 +55,7 @@ fromDateOpenX = fromDateOpenX.set({
 let toDateOpenX = moment().subtract(1, 'days');
 let zoneToDate = moment.tz.zone('America/Los_Angeles').abbr(toDateOpenX);
 toDateOpenX = toDateOpenX.set({
-	hour: zoneFromDate === 'PDT'? OFFSET.PDT : OFFSET.PST,
+	hour: zoneToDate === 'PDT'? OFFSET.PDT : OFFSET.PST,
 	minute:30
 }).format('YYYY-MM-DDTHH:MM:00Z');
 
