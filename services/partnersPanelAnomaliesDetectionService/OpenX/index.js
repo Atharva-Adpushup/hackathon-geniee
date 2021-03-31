@@ -1,6 +1,6 @@
 const request = require('request');
 const axios = require('axios');
-const moment = require('moment');
+var moment = require('moment-timezone');
 const OAuth = require('oauth-1.0a');
 const crypto = require('crypto');
 const util = require('util');
@@ -43,11 +43,22 @@ const oauth = OAuth({
 	}
 });
 
-const date = moment().subtract(1, 'days');
-const fromDateOpenX = date.format('YYYY-MM-DDT00:00:00Z');
-const toDateOpenX = date.format('YYYY-MM-DDT23:59:59Z');
+let fromDateOpenX = moment().subtract(2, 'days');
+let zoneFromDate = moment.tz.zone('America/Los_Angeles').abbr(fromDateOpenX);
+fromDateOpenX = fromDateOpenX.set({
+	hour: zoneFromDate === 'PDT'? 13 : 12,
+	minute:30
+}).format('YYYY-MM-DDTHH:MM:00Z');
+
+let toDateOpenX = moment().subtract(1, 'days');
+let zoneToDate = moment.tz.zone('America/Los_Angeles').abbr(toDateOpenX);
+toDateOpenX = toDateOpenX.set({
+	hour: zoneToDate === 'PDT'? 13 : 12,
+	minute:30
+}).format('YYYY-MM-DDTHH:MM:00Z');
+
 const fromDate = moment()
-	.subtract(1, 'days')
+	.subtract(2, 'days')
 	.format('YYYY-MM-DD');
 const toDate = fromDate;
 
