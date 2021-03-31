@@ -247,10 +247,10 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 
 			if (
 				!apUtils.checkElementInViewPercent(container) &&
-				(apConfig.VIDEO_WAIT_LIMIT_DISABLED ||
+				(apConfig.isVideoWaitLimitDisabled ||
 					(timeSpentInMs < watcherExpiryTimeInMs && !timeoutId))
 			) {
-				var computedWatcherInterval = apConfig.VIDEO_WAIT_LIMIT_DISABLED
+				var computedWatcherInterval = apConfig.isVideoWaitLimitDisabled
 					? watcherInterval
 					: watcherExpiryTimeInMs - timeSpentInMs;
 
@@ -264,7 +264,7 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 					}
 				};
 
-				if (!apConfig.VIDEO_WAIT_LIMIT_DISABLED) {
+				if (!apConfig.isVideoWaitLimitDisabled) {
 					scrollEventListener = debounce(inViewCheck, 50);
 					window.addEventListener('scroll', scrollEventListener);
 				}
