@@ -84,7 +84,8 @@ class Report extends Component {
 			apiLoadTimeStartedAt: null,
 			getCustomStatResponseStatus: 'failed',
 			lastReportQuery: { initalQuery: true },
-			apiFinalResponseTime: null
+			apiFinalResponseTime: null,
+			dataFetchedDimension: []
 		};
 	}
 
@@ -534,7 +535,8 @@ class Report extends Component {
 						isLoading: false,
 						isError: false,
 						tableData,
-						selectedFilterValues
+						selectedFilterValues,
+						dataFetchedDimension: selectedDimension
 					};
 					this.setState(newState);
 				})
@@ -1171,7 +1173,8 @@ class Report extends Component {
 			tableData,
 			savedReports,
 			selectedReport,
-			selectedReportName
+			selectedReportName,
+			dataFetchedDimension
 		} = this.state;
 		const {
 			reportsMeta,
@@ -1187,9 +1190,6 @@ class Report extends Component {
 		let allAvailableMetrics = this.getAllAvailableMetrics(
 			isCustomizeChartLegend,
 			reportsMeta,
-			selectedDimension,
-			selectedFilters,
-			reportType,
 			tableData
 		);
 
@@ -1278,8 +1278,8 @@ class Report extends Component {
 						selectedDimension={selectedDimension}
 					/>
 				</Col>
-				{(selectedDimension.length > 0 &&
-					selectedDimension.map(dimension => (
+				{(dataFetchedDimension.length > 0 &&
+					dataFetchedDimension.map(dimension => (
 						<Col sm={12} className="u-margin-t5">
 							<ChartContainer
 								tableData={tableData}
