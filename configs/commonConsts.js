@@ -809,6 +809,16 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 			NETWORK_ID: 10,
 			DOMAIN_FIELD_NAME: 'publisherSiteName',
 			REVENUE_FIELD: 'marketPublisherRevenueInPCoin'
-		}
+		},
+		TIMEZONE_OFFSET: {
+			PRODUCTION: {
+				PDT: 8,
+				PST: 7
+			},
+			STAGING: {
+				PDT: 8,
+				PST: 7
+			}
+		}	
 	}
 };
