@@ -20,7 +20,7 @@ const SelectiveRolloutActiveBidderAdaptersList = model.extend(function() {
 				'activeBidders list and prebidBundleName are required for SelectiveRolloutActiveBidderAdaptersList doc'
 			);
 		}
-		this.key = docKeys.;
+		this.key = docKeys.selectiveRolloutActiveBidderAdaptersList;
 		this.super(data, !!cas);
 		this.casValue = cas; // if user is loaded from database which will be almost every time except first, this value will be thr
 		this.updateActiveBidderAdapters = function(activeBidders) {
@@ -49,8 +49,8 @@ function apiModule() {
 				prebidBundleName: getPrebidBundleName(),
 				activeBiddersInAscOrder: activeBidders
 			};
-			return Promise.resolve(new SelectiveRolloutActiveBidderAdaptersList(json)).then(activeBidderAdaptersList =>
-				activeBidderAdaptersList.save()
+			return Promise.resolve(new SelectiveRolloutActiveBidderAdaptersList(json)).then(
+				activeBidderAdaptersList => activeBidderAdaptersList.save()
 			);
 		},
 		/**
@@ -119,7 +119,9 @@ function apiModule() {
 				.then(appBucket => {
 					return appBucket.queryAsync(query);
 				})
-				.then(sites => Array.isArray(sites) && !!sites.length);
+				.then(sites => {
+					return Array.isArray(sites) && !!sites.length;
+				});
 		}
 	};
 
