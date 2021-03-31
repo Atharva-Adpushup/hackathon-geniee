@@ -4,7 +4,7 @@ const { PRODUCT_TEAM, OPS_TEAM, DEV_TEAM } = require('./config');
 
 let ownerEmails = DEV_TEAM;
 if (process.env.NODE_ENV === 'production') {
-	ownerEmails = ownerEmails.concat(OPS_TEAM);
+	ownerEmails = ownerEmails.concat(PRODUCT_TEAM, OPS_TEAM);
 } else if (process.env.NODE_ENV === 'staging') {
 	ownerEmails = ownerEmails.concat(PRODUCT_TEAM);
 }
