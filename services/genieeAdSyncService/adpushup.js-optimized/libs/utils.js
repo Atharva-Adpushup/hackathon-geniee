@@ -6,7 +6,7 @@ var browserConfig = require('./browserConfig.js'),
 	Base64 = require('Base64'),
 	UM_LOG_ENDPOINT = '//app-log.adpushup.com/umlogv5?data=',
 	// UM_LOG_KEEN_ENDPOINT =
-		//api.keen.io/3.0/projects/5f6455365cf9803b3732965b/events/umlogv1?api_key=a871c7c98adc1b99fbf72820e0704d22bdcae4b9a1d0e2af20b46fe3cf2087d5def88f1e829db5715b4db29f18110d61c5896928ea0fde2e46a2116e91eb24aeb1656ed4a7a58db13f54ae1f8825ea690a34cfaa8001912d88266b9349140537&data=',
+		//'api.keen.io/3.0/projects/5f6455365cf9803b3732965b/events/umlogv1?api_key=a871c7c98adc1b99fbf72820e0704d22bdcae4b9a1d0e2af20b46fe3cf2087d5def88f1e829db5715b4db29f18110d61c5896928ea0fde2e46a2116e91eb24aeb1656ed4a7a58db13f54ae1f8825ea690a34cfaa8001912d88266b9349140537&data=',
 	FETCH_URL_KEY_VALUE_RETRY_LIMIT = 3,
 	FETCH_URL_KEY_RETRY_TIMEOUT = 50;
 
@@ -48,6 +48,11 @@ module.exports = {
 	// All feedback packets are generated from this function except event 2, 3 and 4.
 	sendFeedback: function(options) {
 		var adp = window.adpushup;
+		
+		if (!adp.gaPageViewLogSent && adp.config.mode === 1) {
+			this.emitGaEvent(commonConsts.GA_EVENTS.PAGE_VIEW);
+			window.adpushup.gaPageViewLogSent = true;
+		}
 
 		return this.sendBeacon(
 			adp.config.feedbackUrl,
@@ -785,7 +790,7 @@ module.exports = {
 				retryCount += 1;
 				if (retryCount < FETCH_URL_KEY_VALUE_RETRY_LIMIT) {
 					let retryTimeout = FETCH_URL_KEY_RETRY_TIMEOUT * retryCount;
-					adp.utils.log(`Retrying ${retryCount}, timeout: ${retryTimeout}`)
+					adp.utils.log(`Retrying ${retryCount}, timeout: ${retryTimeout}`);
 					setTimeout(() => { 
 						adp.pageUrlMappingRetries = retryCount;
 						utils.fetchAndSetKeyValueForUrlReporting(adp);
@@ -1314,6 +1319,36 @@ module.exports = {
 		var ua = navigator.userAgent;
 		return ua && ua.includes('Lighthouse') && commonConsts.LIGHTHOUSE_HACK_SITES.includes(siteId);
 	},
+	checkAndInjectGAHeadCode: function() {
+		if (window.gtag && typeof window.gtag === 'function') {
+			this.log('GA tag already present on site');
+		} else {
+			this.log('Injecting GA tag on site');
+			const gaUrl = `${commonConsts.GOOGLE_ANALYTICS_URL}${commonConsts.GOOGLE_ANALYTICS_ID}`;
+			this.injectHeadCodeOnPage(gaUrl);
+			window.dataLayer = window.dataLayer || [];
+			window.gtag = function() {
+				window.dataLayer.push(arguments);
+			};
+		}
+
+		window.gtag('js', new Date());
+		window.gtag('config', commonConsts.GOOGLE_ANALYTICS_ID, {
+			send_page_view: false,
+			custom_map: { dimension1: 'siteid' }
+		});
+	},
+	emitGaEvent: function(action) {
+		if (
+			window.adpushup.config.enableGAAnalytics &&
+			window.gtag &&
+			typeof window.gtag === 'function'
+		) {
+			const siteid = window.adpushup.config.siteId;
+			this.log(`Emitting event ${action} for site ${siteid}`);
+			window.gtag('event', action, { send_to: commonConsts.GOOGLE_ANALYTICS_ID, siteid });
+		}
+	},
 	injectJqueryIfDoesntExist: function(callback) {
 		function compatibleJqueryExists() {
 			if (window.$ && window.$.fn) {
@@ -1331,7 +1366,7 @@ module.exports = {
 		if (compatibleJqueryExists()) {
 			callback();
 		} else {
-			this.injectHeadCodeOnPage(commonConsts.jqueryCdnUrl, function() {
+			this.injectHeadCodeOnPage(commonConsts.JQUERY_CDN_URL, function() {
 				adp.$ = window.$.noConflict(true);
 				setTimeout(callback);
 			});

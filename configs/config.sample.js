@@ -31,7 +31,7 @@ module.exports = {
 		requestTimeout: 3500 // in ms
 	},
 	auditLogElasticServer: {
-		host: 'http://127.0.0.1:8083/auditLog',
+		host: 'http://127.0.0.1:8083/auditLog'
 	},
 	googleOauth: {
 		OAUTH_CLIENT_ID: 'GOOGLE CLIENT ID',
@@ -180,6 +180,17 @@ module.exports = {
 				name: 'adsenseAdSync',
 				options: { durable: true }
 			}
+		},
+		AMP_SCRIPT_SYNC: {
+			EXCHANGE: {
+				name: 'ampScriptSync',
+				type: 'direct',
+				options: { durable: true }
+			},
+			QUEUE: {
+				name: 'ampScriptSync',
+				options: { durable: true }
+			}
 		}
 	},
 	sqlDatabases: {
@@ -187,8 +198,7 @@ module.exports = {
 		sql: 'central-sql',
 		warehouse: 'central-warehouse'
 	},
-	sql: {
-	},
+	sql: {},
 	ampSettings: {
 		selectors: {
 			breadcrumb: { alias: 'Breadcrumb', value: 'breadcrumb' },
@@ -239,7 +249,16 @@ module.exports = {
 		enableLogging: true,
 		loggingWhitelistedSites: [37780]
 	},
-	cdnOriginUrl: 'https://test.adpushup.com'
+	cdnOriginUrl: 'https://test.adpushup.com',
+	weeklyDailySnapshots: {
+		CONNECTION_STRING: '',
+		CONTAINER_NAME: 'daily-weekly-snapshot',
+		BASE_PATH: '',
+		mailerQueueUrl: '',
+		highchartsServer: '',
+		highchartsServerPort: 7801
+	},
+	prefetchBlockedSites: ['41319']
 };
 
 /*

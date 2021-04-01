@@ -2,10 +2,11 @@ const couchbase = require('couchbase');
 const axios = require('axios').default;
 const _ = require('lodash');
 const request = require('request-promise');
+const moment = require('moment');
 
 const config = require('../configs/config');
 const CC = require('../configs/commonConsts');
-const { queryViewFromAppBucket } = require('../helpers/couchBaseService');
+const { queryViewFromAppBucket, getDoc, upsertDoc } = require('../helpers/couchBaseService');
 const { sortObjectEntries } = require('../helpers/utils');
 const AdPushupError = require('../helpers/AdPushupError');
 const {
@@ -17,7 +18,7 @@ const cacheWrapper = require('../helpers/cacheWrapper');
 const ObjectValidator = require('../helpers/ObjectValidator');
 
 const reportsService = {
-    generateCronExpression: (interval, startDate) => {
+	generateCronExpression: (interval, startDate) => {
 		if (!interval || !startDate) throw new Error('Invalid parameters to generate schedule cron');
 		let cron = '';
 		const start = new Date(startDate);
@@ -218,8 +219,8 @@ const reportsService = {
 		const reportsResponse = await request({
 			uri: `${CC.ANALYTICS_API_ROOT}${CC.REPORT_PATH}`,
 			json: true,
-            qs: reportConfig,
-            timeout: 600000 //10 mins
+			qs: reportConfig,
+			timeout: 600000 //10 mins
 		});
 
 		if (reportsResponse.code !== 1) throw new AdPushupError(reportsResponse);
@@ -244,7 +245,10 @@ const reportsService = {
 			filter => !sessionRpmSupportedFilters.includes(filter)
 		);
 
-		if ((dimension && !sessionRpmSupportedDimensions.includes(dimension)) || unsupportedFiltersForSessionData.length) {
+		if (
+			(dimension && !sessionRpmSupportedDimensions.includes(dimension)) ||
+			unsupportedFiltersForSessionData.length
+		) {
 			return reportsData;
 		}
 
@@ -252,8 +256,8 @@ const reportsService = {
 		return reportsService.mergeReportsWithSessionRpmData(reportsData, sessionData, isSuperUser);
 	},
 	getReports: async reportConfig =>
-        ObjectValidator(getCustomStatsValidations, reportConfig)
-            .then(() => reportsService.modifyQueryIfPnp(reportConfig))
+		ObjectValidator(getCustomStatsValidations, reportConfig)
+			.then(() => reportsService.modifyQueryIfPnp(reportConfig))
 			.then(config => reportsService.fetchReports(config))
 			.then(reports =>
 				reportsService.fetchAndMergeSessionData(reportConfig, reports, reportConfig.isSuperUser)
@@ -272,25 +276,57 @@ const reportsService = {
 				return response.data;
 			}),
 	getReportsWithCache: async (reportConfig, bypassCache = false) => {
+		const { siteid } = reportConfig;
+		//bypass if site has blocked prefetch
+		if (siteid)
+			config.prefetchBlockedSites.forEach(blockedSitePreFetch => {
+				if (siteid.indexOf(blockedSitePreFetch) !== -1) bypassCache = true;
+			});
 		const sortedConfig = sortObjectEntries(reportConfig);
-		return ObjectValidator(getCustomStatsValidations, sortedConfig)
-		.then(() => {
+		return ObjectValidator(getCustomStatsValidations, sortedConfig).then(() => {
 			return cacheWrapper(
-				{ cacheKey: JSON.stringify(sortedConfig), bypassCache, cacheExpiry: 24 * 3600 },
+				{ cacheKey: JSON.stringify(sortedConfig), bypassCache, cacheExpiry: 4 * 3600 },
 				async () => reportsService.getReports(reportConfig)
-			)
+			);
 		});
 	},
-	getReportingMetaDataWithCache: async (sites, isSuperUser, bypassCache = false) =>
-		cacheWrapper(
+	getReportingMetaDataWithCache: async (sites, isSuperUser, bypassCache = false) => {
+		return cacheWrapper(
 			{ cacheKey: JSON.stringify({ sites, isSuperUser }), cacheExpiry: 24 * 3600, bypassCache },
 			async () => reportsService.getReportingMetaData(sites, isSuperUser)
-		),
-	getWidgetDataWithCache: async (path, params, bypassCache = false) =>
-		cacheWrapper(
-			{ cacheKey: JSON.stringify({ path, params }), cacheExpiry: 24 * 3600, bypassCache },
+		);
+	},
+	getWidgetDataWithCache: async (path, params, bypassCache = false) => {
+		const { siteid } = params;
+		//bypass if site has blocked prefetch
+		if (siteid)
+			config.prefetchBlockedSites.forEach(blockedSitePreFetch => {
+				if (siteid.indexOf(blockedSitePreFetch) !== -1) bypassCache = true;
+			});
+		return cacheWrapper(
+			{ cacheKey: JSON.stringify({ path, params }), cacheExpiry: 4 * 3600, bypassCache },
 			async () => reportsService.getWidgetData(path, params)
-		)
+		);
+	},
+	logReportUsage: async (email, reportConfig) => {
+		const todaysDate = moment().format('YYYY-MM-DD');
+		const docId = `${CC.docKeys.freqReports}${email}:${todaysDate}`;
+
+		const { value: todaysConfigDoc } = await getDoc('AppBucket', docId);
+		const reportKey = JSON.stringify(reportConfig);
+
+		const existingCount = todaysConfigDoc.reportsLog
+			? todaysConfigDoc.reportsLog[reportKey] || 0
+			: 0;
+		const newConfig = {
+			email,
+			reportsLog: {
+				...todaysConfigDoc.reportsLog,
+				[reportKey]: existingCount + 1
+			}
+		};
+		return upsertDoc('AppBucket', docId, newConfig);
+	}
 };
 
 module.exports = reportsService;

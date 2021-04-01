@@ -102,7 +102,6 @@ class SelectBox extends Component {
 			name
 		);
 		const buttonTitle = selected === 0 || selected ? selectedTitle : title;
-		const tooltip = <Tooltip id="tooltip">Please select a website.</Tooltip>;
 		return (
 			<div className={`custom-select-box-wrapper ${wrapperClassName}`}>
 				<DropdownButton
@@ -115,7 +114,11 @@ class SelectBox extends Component {
 					disabled={disabled}
 				>
 					{options.map((option, key) => {
-						if (option.isDisabled) {
+						if (option.isDisabled && !option.toolTipDisabled) {
+							const toolTipMessage = option.toolTipMessage;
+							const tooltip = (
+								<Tooltip id="tooltip">{toolTipMessage || 'Please select a website'}</Tooltip>
+							);
 							return (
 								<OverlayTrigger overlay={tooltip} key={`id-${key}`}>
 									<MenuItem

@@ -4,7 +4,8 @@ const {
 } = require('../configs/config');
 
 const authToken = {
-	getAuthToken: json => jwt.sign(json, salt, { expiresIn: '24h' }),
+	getAuthToken: json => authToken.generateToken(json, { expiresIn: '24h' }),
+	generateToken: (json, options) => jwt.sign(json, salt, options),
 	decodeAuthToken: token =>
 		jwt.verify(
 			token,
@@ -18,7 +19,7 @@ const authToken = {
 					}
 				})
 		),
-	getAdpToken: () => authToken.getAuthToken({ isAdpUser: true })
+	getAdpToken: () => authToken.generateToken({ isAdpUser: true })
 }
 
 module.exports = authToken;

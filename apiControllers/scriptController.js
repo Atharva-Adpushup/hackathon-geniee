@@ -6,6 +6,7 @@ const Promise = require('bluebird');
 const UserModel = require('../models/userModel');
 const SiteModel = require('../models/siteModel');
 const ActiveBidderAdaptersListModel = require('../models/activeBidderAdaptersListModel');
+const ampScriptModel = require('../models/ampScriptModel');
 
 const getReportData = require('../reports/universal');
 const generateStatusesAndConfig = require('../services/genieeAdSyncService/cdnSyncService/generateConfig');
@@ -15,6 +16,10 @@ const generateAdNetworkConfig = require('../services/genieeAdSyncService/cdnSync
 const generateAdPushupAdsConfig = require('../services/genieeAdSyncService/cdnSyncService/generateAdPushupConfig');
 const AdPushupError = require('../helpers/AdPushupError');
 const httpStatusConsts = require('../configs/httpStatusConsts');
+const {
+	getSizeMappingConfigFromCB
+} = require('../services/genieeAdSyncService/cdnSyncService/commonFunctions');
+const { isValidThirdPartyDFPAndCurrency } = require('../helpers/commonFunctions');
 
 const Router = express.Router();
 
@@ -158,6 +163,169 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 		.then(([scriptConfig, siteData]) =>
 			res.send({ error: null, data: { config: scriptConfig, siteData } })
 		)
+		.catch(e => res.send({ error: e.message }));
+});
+
+Router.get('/:siteId/ampSiteConfig', (req, res) => {
+	SiteModel.getSiteById(req.params.siteId)
+		.then(site => Promise.join(site, UserModel.getUserByEmail(site.get('ownerEmail'))))
+		.then(([site, user]) => {
+			const siteId = site.get('siteId');
+
+			const generateApConfig = function(prebidAndAdsConfig) {
+				// TODO: rj: to check hb status
+				const apps = site.get('apps');
+				const apConfigs = site.get('apConfigs');
+				const adServerSettings = user.get('adServerSettings');
+
+				const {
+					prebidConfig,
+					refreshLineItems,
+					ampScriptConfig,
+					sizeMappingConfig,
+					currencyConfig,
+					firstImpressionRefreshLineItems
+				} = prebidAndAdsConfig;
+
+				if (refreshLineItems) apConfigs.refreshLineItems = refreshLineItems;
+				if (firstImpressionRefreshLineItems)
+					apConfigs.firstImpressionRefreshLineItems = firstImpressionRefreshLineItems;
+				if (sizeMappingConfig) apConfigs.sizeMapping = sizeMappingConfig;
+				if (currencyConfig) apConfigs.currencyConfig = currencyConfig;
+				apConfigs.siteDomain = site.get('siteDomain');
+				apConfigs.ownerEmailMD5 = crypto
+					.createHash('md5')
+					.update(site.get('ownerEmail'))
+					.digest('hex')
+					.substr(0, 64);
+				apConfigs.activeDFPNetwork =
+					(adServerSettings && adServerSettings.dfp && adServerSettings.dfp.activeDFPNetwork) ||
+					null;
+
+				if (ampScriptConfig && ampScriptConfig.ads.length) {
+					apConfigs.ampConfig = {
+						ampAds: ampScriptConfig.ads,
+						pnpConfig: ampScriptConfig.pnpConfig
+					};
+				}
+
+				// Default 'draft' mode is selected if config mode is not present
+				apConfigs.mode = apConfigs.mode === 1 && apConfigs.ampConfig ? apConfigs.mode : 2;
+
+				if (apps.headerBidding && Object.keys(prebidConfig.hbcf).length) {
+					delete prebidConfig.email;
+					apConfigs.hbConfig = prebidConfig;
+				}
+
+				return apConfigs;
+			};
+
+			const generateAmpScriptAdsConfig = () =>
+				ampScriptModel.getAmpScriptConfig(siteId).then(({ data: ampScriptConfig }) => {
+					if (
+						!(ampScriptConfig && Array.isArray(ampScriptConfig.ads) && ampScriptConfig.ads.length)
+					) {
+						return;
+					}
+
+					ampScriptConfig.ads = ampScriptConfig.ads.filter(ad => ad.isActive !== false);
+
+					if (!ampScriptConfig.ads.length) return;
+
+					return ampScriptConfig;
+				});
+
+			const getRefreshLineItems = function(userModel) {
+				const adServerSettings = userModel.get('adServerSettings');
+				const activeDFPNetwork =
+					(adServerSettings && adServerSettings.dfp && adServerSettings.dfp.activeDFPNetwork) ||
+					null;
+
+				if (!activeDFPNetwork) return null;
+
+				return generateAdNetworkConfig(activeDFPNetwork).then(adNetworkConfig => {
+					const isValidRefreshLineItems =
+						adNetworkConfig &&
+						adNetworkConfig.lineItems &&
+						Array.isArray(adNetworkConfig.lineItems) &&
+						adNetworkConfig.lineItems.length;
+
+					if (!isValidRefreshLineItems) {
+						return null;
+					}
+
+					return adNetworkConfig.lineItems;
+				});
+			};
+
+			const getCurrencyConfig = function() {
+				const adServerSettings = user.get('adServerSettings');
+				const isValidCurrencyCnfg =
+					adServerSettings &&
+					adServerSettings.dfp &&
+					isValidThirdPartyDFPAndCurrency(adServerSettings.dfp);
+
+				if (isValidCurrencyCnfg) {
+					const activeAdServer = adServerSettings.dfp;
+					return {
+						adServerCurrency: activeAdServer.activeDFPCurrencyCode,
+						granularityMultiplier: Number(activeAdServer.prebidGranularityMultiplier) || 1
+					};
+				}
+			};
+
+			const getFirstImpressionRefreshLineItems = function(firstImpressionSiteId) {
+				return SiteModel.getSiteById(parseInt(firstImpressionSiteId, 10))
+					.then(firstImpressionSite =>
+						UserModel.getUserByEmail(firstImpressionSite.get('ownerEmail'))
+					)
+					.then(firstImpressionUser => getRefreshLineItems(firstImpressionUser));
+			};
+
+			return Promise.join(
+				generatePrebidConfig(siteId),
+				generateAmpScriptAdsConfig(siteId),
+				getRefreshLineItems(user),
+				getSizeMappingConfigFromCB(),
+				getCurrencyConfig()
+			)
+				.then(
+					([
+						prebidConfig,
+						ampScriptConfig,
+						refreshLineItems,
+						sizeMappingConfig,
+						currencyConfig
+					]) => {
+						const output = {
+							prebidConfig,
+							ampScriptConfig,
+							refreshLineItems,
+							sizeMappingConfig,
+							currencyConfig
+						};
+
+						const isFirstImpressionSiteIdAvailable =
+							ampScriptConfig &&
+							ampScriptConfig.pnpConfig &&
+							ampScriptConfig.pnpConfig.enabled &&
+							!Number.isNaN(ampScriptConfig.pnpConfig.firstImpressionSiteId);
+
+						if (isFirstImpressionSiteIdAvailable) {
+							return getFirstImpressionRefreshLineItems(
+								ampScriptConfig.pnpConfig.firstImpressionSiteId
+							).then(firstImpressionRefreshLineItems => ({
+								...output,
+								firstImpressionRefreshLineItems
+							}));
+						}
+
+						return output;
+					}
+				)
+				.then(generateApConfig);
+		})
+		.then(scriptConfig => res.send({ error: null, data: { config: scriptConfig } }))
 		.catch(e => res.send({ error: e.message }));
 });
 

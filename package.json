@@ -1,6 +1,6 @@
 {
 	"name": "adpushup-app",
-	"version": "1.15.0",
+	"version": "1.17.0",
 	"private": true,
 	"scripts": {
 		"start": "node app.js",
@@ -21,9 +21,11 @@
 		]
 	},
 	"dependencies": {
+		"@azure/storage-blob": "^12.4.1",
 		"@fortawesome/fontawesome-svg-core": "^1.2.12",
 		"@fortawesome/free-solid-svg-icons": "^5.6.3",
 		"@fortawesome/react-fontawesome": "^0.1.4",
+		"@supercharge/promise-pool": "^1.6.0",
 		"Base64": "^1.0.1",
 		"amqplib": "^0.5.1",
 		"atob": "^2.1.2",
@@ -46,6 +48,7 @@
 		"debug": "^4.1.1",
 		"deepmerge": "^0.2.10",
 		"draggabilly": "^2.1.1",
+		"ejs": "^3.1.6",
 		"elasticsearch": "^15.3.1",
 		"emailjs": "^2.2.0",
 		"es6-shim": "^0.35.4",

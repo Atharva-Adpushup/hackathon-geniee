@@ -121,7 +121,11 @@ var gpt = {
 								// Ads by adpushup is disabled. nothing more to do
 								if (!adpBanner[0]) return;
 		
-								const unitHeight = parseInt(stickyBg[0].dataset.unitheight);
+								// const unitHeight = parseInt(stickyBg[0].dataset.unitheight);
+								let unitHeight;
+								if (stickyBg[0]) {
+									unitHeight = parseInt(stickyBg[0].dataset.unitheight);
+								}
 		
 								if (!event.isEmpty) {
 									stickyBg[0] && stickyBg.css('height', unitHeight + commonConsts.POWERED_BY_BANNER.HEIGHT);

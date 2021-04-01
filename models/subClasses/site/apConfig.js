@@ -27,7 +27,11 @@ const ApConfig = {
 		'beforeJs',
 		'cmpAvailable',
 		'mergeReport',
-		'enableGAAnalytics'
+		'enableGAAnalytics',
+		'isDailyEmailReportsEnabled',
+		'isWeeklyEmailReportsEnabled',
+		'bidInfationPercentage',
+		'isABTestingForBidInflationEnabled'
 	],
 	override: [
 		'mode',
@@ -57,7 +61,11 @@ const ApConfig = {
 		'beforeJs',
 		'cmpAvailable',
 		'mergeReport',
-		'enableGAAnalytics'
+		'enableGAAnalytics',
+		'isDailyEmailReportsEnabled',
+		'isWeeklyEmailReportsEnabled',
+		'bidInfationPercentage',
+		'isABTestingForBidInflationEnabled'
 	],
 	merge: []
 };

@@ -120,7 +120,7 @@ var adp = window.adpushup,
 				var adpSlot = {
 					slotId: gptSlotElementId,
 					optionalParam,
-					bidders: bidders || [],
+					bidders: bidders || {},
 					headerBidding: optionalParam.headerBidding,
 					formats,
 					activeDFPNetwork: hbUtils.getActiveDFPNetwork(),
@@ -207,7 +207,7 @@ var adp = window.adpushup,
 								function(gptSlot) {
 									var allSizes = gptSlot.getSizes().map(function(size) {
 											/* layout of size object is { l: 300, j: 100 } */
-											var width = size.l,
+											var width = size.l || size.m,
 												height = size.j;
 											return [width, height];
 										}),

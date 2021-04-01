@@ -51,7 +51,7 @@ var targeting = {
 		}
 	},
 	getAdserverTargeting: function(adpSlot) {
-		if (adpSlot.optionalParam.headerBidding && adpSlot.bidders.length) {
+		if (adpSlot.optionalParam.headerBidding && utils.checkForValidBidders(adpSlot.bidders)) {
 			return window._apPbJs.getAdserverTargeting()[adpSlot.containerId];
 		}
 
@@ -67,7 +67,11 @@ var targeting = {
 		};
 		var adServerTargeting = this.getAdserverTargeting(adpSlot);
 
-		if (adpSlot.bidders.length) {
+		if (window.adpushup.shouldInflateBid && adServerTargeting && Object.keys(adServerTargeting).length && adServerTargeting[keys.CPM]) {
+			targeting[keys.INFLATED_CPM] = true;
+		}
+
+		if (utils.checkForValidBidders(adpSlot.bidders)) {
 			Object.assign(targeting, { [keys.HB_RAN]: 1 });
 		}
 
