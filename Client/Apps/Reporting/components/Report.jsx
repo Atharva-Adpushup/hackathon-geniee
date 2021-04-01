@@ -1280,7 +1280,7 @@ class Report extends Component {
 				</Col>
 				{(dataFetchedDimension.length > 0 &&
 					dataFetchedDimension.map((dimension, index) => (
-						<Col sm={12} className="u-margin-t5">
+						<Col sm={12} className="u-margin-t5 u-margin-b5">
 							<ChartContainer
 								tableData={tableData}
 								selectedDimension={dimension}
