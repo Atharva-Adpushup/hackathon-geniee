@@ -139,7 +139,8 @@ class MultiSelectBox extends Component {
 			type,
 			dataKey,
 			reset,
-			pullRight
+			pullRight,
+			isMainReportingPanel
 		} = this.props;
 
 		const count = Object.keys(selectedOption).filter(item => selectedOption[item]).length;
@@ -165,6 +166,7 @@ class MultiSelectBox extends Component {
 
 		const buttonTitle = selectedOption[selectedChartKey] === 0 || selected ? selectedTitle : title;
 		const tooltip = <Tooltip id="tooltip">Please select a chart.</Tooltip>;
+
 		return (
 			<div className={`custom-select-box-wrapper ${wrapperClassName}`}>
 				<DropdownButton
@@ -175,22 +177,25 @@ class MultiSelectBox extends Component {
 					id={id}
 					onSelect={this.selectWrapper}
 				>
-					<div className="checkbox-wrapper" key={`${'select-all'}check`}>
-						<Checkbox
-							className=""
-							data-value={SELECT_ALL.value}
-							data-name={SELECT_ALL.name}
-							data-key={dataKey}
-							onChange={e => {
-								this.handleMultiSelect(e);
-							}}
-							checked={selectAll}
-						>
-							{SELECT_ALL.label}
-						</Checkbox>
-					</div>
+					{!isMainReportingPanel && (
+						<div className="checkbox-wrapper" key={`${'select-all'}check`}>
+							<Checkbox
+								className={''}
+								data-value={SELECT_ALL.value}
+								data-name={SELECT_ALL.name}
+								data-key={dataKey}
+								onChange={e => {
+									this.handleMultiSelect(e);
+								}}
+								checked={selectAll}
+							>
+								{SELECT_ALL.label}
+							</Checkbox>
+						</div>
+					)}
 
 					{options.map((option, key) => {
+						const checked = selectedOption[option.value] ? true : false;
 						if (option.isDisabled) {
 							return (
 								<div className="checkbox-wrapper" key={`${option.name}check`}>
@@ -221,7 +226,8 @@ class MultiSelectBox extends Component {
 									onChange={e => {
 										this.handleMultiSelect(e);
 									}}
-									checked={selectedOption[option.value] ? true : false}
+									checked={checked}
+									disabled={isMainReportingPanel && !checked && selected.length >= 3}
 								>
 									{option.name} {selectedOption[option.value]}
 								</Checkbox>

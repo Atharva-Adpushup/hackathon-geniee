@@ -445,6 +445,7 @@ class Control extends Component {
 								wrapperClassName="custom-select-box-wrapper"
 								isClearable={false}
 								isSearchable={false}
+								isMainReportingPanel={true}
 								selected={state.selectedDimension}
 								options={state.dimensionList || []}
 								onSelect={selectedDimensions => {
