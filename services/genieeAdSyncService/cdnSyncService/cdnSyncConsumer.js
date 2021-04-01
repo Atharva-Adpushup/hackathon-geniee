@@ -252,7 +252,7 @@ module.exports = function(data) {
 						return generatedConfig;
 					}
 
-					return prebidGeneration(config.prebidAdapters).then(() => generatedConfig);
+					return prebidGeneration(config.prebidAdapters, isAdhocOptimizationEnabled).then(() => generatedConfig);
 				})
 				.then(generatedConfig => {
 					if (!isAdhocOptimizationEnabled) {
