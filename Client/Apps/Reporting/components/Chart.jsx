@@ -415,7 +415,13 @@ class Chart extends React.Component {
 	};
 
 	render() {
-		const { allAvailableMetrics, reportType, updateMetrics, isCustomizeChartLegend } = this.props;
+		const {
+			allAvailableMetrics,
+			reportType,
+			updateMetrics,
+			isCustomizeChartLegend,
+			index
+		} = this.props;
 		const { type, series, xAxis, activeLegendItems, selectedDimension } = this.state;
 
 		return (
@@ -432,6 +438,7 @@ class Chart extends React.Component {
 					reportType={reportType}
 					isCustomizeChartLegend={isCustomizeChartLegend}
 					updateMetrics={updateMetrics}
+					index={index}
 				/>
 			</div>
 		);

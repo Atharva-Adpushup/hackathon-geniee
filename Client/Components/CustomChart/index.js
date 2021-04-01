@@ -19,7 +19,8 @@ const CustomChart = ({
 	availableLegends,
 	reportType,
 	isCustomizeChartLegend,
-	updateMetrics
+	updateMetrics,
+	index
 }) => {
 	if (type === 'line' || type === 'spline') {
 		const chartConfig = getCustomChartConfig(
@@ -38,7 +39,7 @@ const CustomChart = ({
 					load: event => {
 						const chart = event.target;
 
-						const node = document.getElementById('chart-legend-wrap');
+						const node = document.getElementsByClassName('chart-legend-wrap')[index];
 						if (legends && legends.length > 0)
 							ReactDOM.render(
 								<ChartLegend
@@ -60,7 +61,7 @@ const CustomChart = ({
 			return (
 				<div className={containerClass}>
 					{title && <h3 className="text-center">{title}</h3>}
-					<div id="chart-legend-wrap" />
+					<div className="chart-legend-wrap" />
 					<ReactHighcharts config={chartConfig} />
 				</div>
 			);

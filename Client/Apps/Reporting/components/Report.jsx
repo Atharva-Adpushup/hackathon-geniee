@@ -1366,7 +1366,7 @@ class Report extends Component {
 					/>
 				</Col>
 				{(dataFetchedDimension.length > 0 &&
-					dataFetchedDimension.map(dimension => (
+					dataFetchedDimension.map((dimension, index) => (
 						<Col sm={12} className="u-margin-t5">
 							<ChartContainer
 								tableData={tableData}
@@ -1377,6 +1377,7 @@ class Report extends Component {
 								allAvailableMetrics={allAvailableMetrics}
 								reportType={reportType}
 								isForOps={isForOps}
+								index={index}
 								isCustomizeChartLegend={isCustomizeChartLegend}
 								updateMetrics={this.updateMetrics}
 								selectedInterval={selectedInterval}
@@ -1398,6 +1399,7 @@ class Report extends Component {
 							updateMetrics={this.updateMetrics}
 							selectedInterval={selectedInterval}
 							selectedChartLegendMetric={selectedChartLegendMetric}
+							index={0}
 						/>
 					</Col>
 				)}
