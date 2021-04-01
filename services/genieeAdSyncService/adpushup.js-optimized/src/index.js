@@ -455,7 +455,7 @@ function start() {
 		// Initialise adpushup session
 		session.init();
 
-		if (adp.config.urlReportingEnabled) {
+		if (adp.config.isUrlReportingEnabled) {
 			utils.fetchAndSetKeyValueForUrlReporting(adp);
 		}
 
