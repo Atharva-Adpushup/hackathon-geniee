@@ -86,7 +86,8 @@ function processPrebidModule(data) {
 	}
 
 	console.log('Separate Prebid bundle feature is enabled.');
-	return syncPrebidBundle(isSiteSpecificSeparatePrebidEnabled).then(({ name: prebidBundleName }) => [...data, prebidBundleName]);
+	const siteIdForSpecificPrebid = isSiteSpecificSeparatePrebidEnabled ? site.get('siteId') : null;
+	return syncPrebidBundle(siteIdForSpecificPrebid).then(({ name: prebidBundleName }) => [...data, prebidBundleName]);
 }
 
 function processPrebidAndSyncCdn(decodedMessage) {
