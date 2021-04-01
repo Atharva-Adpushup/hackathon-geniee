@@ -257,7 +257,8 @@ module.exports = {
 		mailerQueueUrl: '',
 		highchartsServer: '',
 		highchartsServerPort: 7801
-	}
+	},
+	prefetchBlockedSites: ['41319']
 };
 
 /*

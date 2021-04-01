@@ -570,7 +570,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 	cronSchedule: {
 		activeSiteMarkingAndAdsTxtService: '20 14,2 * * *',
 		adManagerSyncService: '0 */12 * * *',
-		prefetchService: '*/10 * * * *', // Every 10 mins
+		prefetchService: '*/1 * * * *', // Every 1 mins
 		prefetchHBService: '*/15 * * * *', // Every 15 mins
 		emailSnapshotsService: '00 8 * * *' //Run at 8:00 everyday
 	},

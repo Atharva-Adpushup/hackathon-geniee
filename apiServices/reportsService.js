@@ -276,6 +276,12 @@ const reportsService = {
 				return response.data;
 			}),
 	getReportsWithCache: async (reportConfig, bypassCache = false) => {
+		const { siteid } = reportConfig;
+		//bypass if site has blocked prefetch
+		if (siteid)
+			config.prefetchBlockedSites.forEach(blockedSitePreFetch => {
+				if (siteid.indexOf(blockedSitePreFetch) !== -1) bypassCache = true;
+			});
 		const sortedConfig = sortObjectEntries(reportConfig);
 		return ObjectValidator(getCustomStatsValidations, sortedConfig).then(() => {
 			return cacheWrapper(
@@ -284,16 +290,24 @@ const reportsService = {
 			);
 		});
 	},
-	getReportingMetaDataWithCache: async (sites, isSuperUser, bypassCache = false) =>
-		cacheWrapper(
+	getReportingMetaDataWithCache: async (sites, isSuperUser, bypassCache = false) => {
+		return cacheWrapper(
 			{ cacheKey: JSON.stringify({ sites, isSuperUser }), cacheExpiry: 24 * 3600, bypassCache },
 			async () => reportsService.getReportingMetaData(sites, isSuperUser)
-		),
-	getWidgetDataWithCache: async (path, params, bypassCache = false) =>
-		cacheWrapper(
+		);
+	},
+	getWidgetDataWithCache: async (path, params, bypassCache = false) => {
+		const { siteid } = params;
+		//bypass if site has blocked prefetch
+		if (siteid)
+			config.prefetchBlockedSites.forEach(blockedSitePreFetch => {
+				if (siteid.indexOf(blockedSitePreFetch) !== -1) bypassCache = true;
+			});
+		return cacheWrapper(
 			{ cacheKey: JSON.stringify({ path, params }), cacheExpiry: 4 * 3600, bypassCache },
 			async () => reportsService.getWidgetData(path, params)
-		),
+		);
+	},
 	logReportUsage: async (email, reportConfig) => {
 		const todaysDate = moment().format('YYYY-MM-DD');
 		const docId = `${CC.docKeys.freqReports}${email}:${todaysDate}`;

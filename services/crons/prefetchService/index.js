@@ -163,7 +163,10 @@ function getAllUsersData() {
 }
 
 function runPrefetchService() {
-	return getAllUsersData().then(prefetchFrequentQueries);
+	return flushAll()
+		.then(succeeded => console.log(`${succeeded}: Cache Cleared before running prefetch again`))
+		.then(getAllUsersData)
+		.then(prefetchFrequentQueries);
 }
 
 function startPrefetchService() {
