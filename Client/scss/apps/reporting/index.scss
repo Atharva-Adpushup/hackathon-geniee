@@ -623,8 +623,8 @@ body {
 
 .toggleWrapper {
 	display: flex;
-    align-items: center;
-	justify-content: flex-end
+	align-items: center;
+	justify-content: flex-end;
 }
 
 .noDataRow {
@@ -637,7 +637,7 @@ body {
 */
 .customToggle {
 	display: flex;
-    align-items: center;
+	align-items: center;
 }
 
 .customToggle span {
@@ -651,14 +651,13 @@ body {
 	border: 1px solid $borderColor;
 
 	// border: 1px solid green;
-    margin: 0px;
-    padding: 0px;
+	margin: 0px;
+	padding: 0px;
 }
 
 .customToggle label {
 	margin-right: 5px;
-	margin-bottom:0px;
-	
+	margin-bottom: 0px;
 }
 
 .customToggle ul li {
@@ -697,6 +696,8 @@ body {
 		text-align: center;
 		margin: 0 1rem;
 	}
+.reporting_reportby {
+	padding: 0px 20px !important;
 }
 /*
 	CSS for Custom Toggle for Bid Landscape Ends here

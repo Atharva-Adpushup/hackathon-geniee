@@ -198,7 +198,14 @@ class MultiSelectBox extends Component {
 						const checked = selectedOption[option.value] ? true : false;
 						if (option.isDisabled) {
 							return (
-								<div className="checkbox-wrapper" key={`${option.name}check`}>
+								<div
+									className={
+										isMainReportingPanel
+											? 'checkbox-wrapper reporting_reportby'
+											: 'checkbox-wrapper'
+									}
+									key={`${option.name}check`}
+								>
 									<OverlayTrigger overlay={tooltip} key={`id-${key}`}>
 										<Checkbox
 											className=""
@@ -217,7 +224,12 @@ class MultiSelectBox extends Component {
 							);
 						}
 						return (
-							<div className="checkbox-wrapper" key={`${option.name}check`}>
+							<div
+								className={
+									isMainReportingPanel ? 'checkbox-wrapper reporting_reportby' : 'checkbox-wrapper'
+								}
+								key={`${option.name}check`}
+							>
 								<Checkbox
 									className=""
 									data-value={option.value}
