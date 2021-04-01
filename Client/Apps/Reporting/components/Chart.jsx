@@ -280,10 +280,47 @@ class Chart extends React.Component {
 		return groupByResult;
 	};
 
-	getSortedResult = (data, selectedInterval) => {
-		if (selectedInterval === 'daily') return sortBy(data, 'date');
-		if (selectedInterval === 'monthly') return sortBy(sortBy(data, 'month'), 'year');
-		return data;
+	getAggregratedSortedResult = (data, selectedInterval) => {
+		const aggregratedData = {};
+		for (let i = 0; i < data.length; i++) {
+			const rowData = cloneDeep(data[i]);
+			const {
+				date,
+				adpushup_page_views = 0,
+				bot_page_views = 0,
+				network_gross_revenue = 0,
+				network_impressions = 0,
+				network_net_revenue = 0,
+				unique_impressions = 0
+			} = rowData;
+			if (aggregratedData[date]) {
+				aggregratedData[date]['adpushup_page_views'] += adpushup_page_views;
+				aggregratedData[date]['bot_page_views'] += bot_page_views;
+				aggregratedData[date]['network_gross_revenue'] += network_gross_revenue;
+				aggregratedData[date]['network_impressions'] += network_impressions;
+				aggregratedData[date]['network_net_revenue'] += network_net_revenue;
+				aggregratedData[date]['unique_impressions'] += unique_impressions;
+			} else {
+				aggregratedData[date] = rowData;
+			}
+		}
+		Object.keys(aggregratedData).forEach(date => {
+			const {
+				adpushup_page_views,
+				network_impressions,
+				network_net_revenue,
+				unique_impressions
+			} = aggregratedData[date];
+			aggregratedData[date]['adpushup_page_cpm'] =
+				(network_net_revenue / adpushup_page_views) * 1000;
+			aggregratedData[date]['network_ad_ecpm'] = (network_net_revenue / network_impressions) * 1000;
+			aggregratedData[date]['unique_ad_ecpm'] = (network_net_revenue / unique_impressions) * 1000;
+		});
+		const resultOfAggreagratedData = Object.values(aggregratedData);
+		if (selectedInterval === 'daily') return sortBy(resultOfAggreagratedData, 'date');
+		if (selectedInterval === 'monthly')
+			return sortBy(sortBy(resultOfAggreagratedData, 'month'), 'year');
+		return resultOfAggreagratedData;
 	};
 
 	getSeriesData = (groupByResult, xAxis, activeLegendItems) => {
@@ -302,8 +339,7 @@ class Chart extends React.Component {
 				value: results,
 				valueType: selectedDimension ? activeLegendItems.valueType : row[0].valueType
 			};
-			const sortedResult = this.getSortedResult(row, selectedInterval);
-
+			const sortedResult = this.getAggregratedSortedResult(row, selectedInterval);
 			for (let i = 0; i < xAxis.categories.length; i += 1) {
 				const xAxisMomentObj = moment(xAxis.categories[i]);
 
