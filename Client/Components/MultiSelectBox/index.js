@@ -239,7 +239,6 @@ class MultiSelectBox extends Component {
 										this.handleMultiSelect(e);
 									}}
 									checked={checked}
-									disabled={isMainReportingPanel && !checked && selected.length >= 3}
 								>
 									{option.name} {selectedOption[option.value]}
 								</Checkbox>
