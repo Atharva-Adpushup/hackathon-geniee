@@ -457,7 +457,8 @@ class Chart extends React.Component {
 			updateMetrics,
 			isCustomizeChartLegend,
 			index,
-			dimension
+			dimension,
+			isForOps
 		} = this.props;
 
 		const { type, series, xAxis, activeLegendItems, selectedDimension } = this.state;
@@ -470,12 +471,12 @@ class Chart extends React.Component {
 							<b>{dimension[selectedDimension].display_name}</b> Chart
 						</span>
 
-						{index === 0 && (
+						{!isForOps && index === 0 ? (
 							<small style={{ float: 'right' }}>
 								<b>*Note:</b> Unique impressions toggle willl only be available in the first chart.
 								It controls every single chart and the table below.
 							</small>
-						)}
+						) : null}
 					</span>
 				)}
 
