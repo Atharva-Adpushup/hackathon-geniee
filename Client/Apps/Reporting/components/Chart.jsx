@@ -465,10 +465,20 @@ class Chart extends React.Component {
 		return (
 			<div>
 				{selectedDimension && (
-					<h4 style={{ marginLeft: '12px' }}>
-						<b>{dimension[selectedDimension].display_name}</b> Chart
-					</h4>
+					<span>
+						<span style={{ marginLeft: '15px' }}>
+							<b>{dimension[selectedDimension].display_name}</b> Chart
+						</span>
+
+						{index === 0 && (
+							<small style={{ float: 'right' }}>
+								<b>*Note:</b> Unique impressions toggle willl only be available in the first chart.
+								It controls every single chart and the table below.
+							</small>
+						)}
+					</span>
 				)}
+
 				<CustomChart
 					type={type}
 					series={series}

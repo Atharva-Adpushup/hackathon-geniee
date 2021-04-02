@@ -9,7 +9,8 @@ const ChartLegend = ({
 	onLegendChange,
 	availableLegends,
 	isCustomizeChartLegend,
-	updateMetrics
+	updateMetrics,
+	index
 }) => (
 	<div className="text-center chart-legend u-margin-v3">
 		{legends.map((legend, key) => (
@@ -25,7 +26,13 @@ const ChartLegend = ({
 
 		{isCustomizeChartLegend && !!availableLegends.length && (
 			<ManageLegendItems
-				availableLegends={availableLegends}
+				availableLegends={
+					index && index > 0
+						? availableLegends.filter(
+								availableLegend => availableLegend.value !== 'unique_impressions'
+						  )
+						: availableLegends
+				}
 				activeLegends={legends}
 				updateMetrics={updateMetrics}
 			/>
