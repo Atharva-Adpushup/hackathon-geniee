@@ -291,16 +291,9 @@ class Report extends Component {
 			const dimensionObj = dimensionList[dimension];
 
 			if (dimensionObj) {
-				const { disabled_filter, disabled_dimension, disabled_metric } = dimensionObj;
-				if (disabled_filter) {
-					disabledFilter.push(disabled_filter);
-				}
-				if (disabled_dimension) {
-					disabledDimension.push(disabled_dimension);
-				}
-				if (disabled_metric) {
-					disabledMetrics.push(disabled_metric);
-				}
+				disabledFilter = dimensionObj.disabled_filter || disabledFilter;
+				disabledDimension = dimensionObj.disabled_dimension || disabledDimension;
+				disabledMetrics = dimensionObj.disabled_metrics || disabledMetrics;
 			}
 		}
 		Object.keys(selectedFilters).forEach(selectedFilter => {
