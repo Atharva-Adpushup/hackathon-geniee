@@ -144,7 +144,7 @@ var auction = {
 				bidderSettings[bidderCode] = {
 					bidCpmAdjustment: function(bidCpm) {
 						var revShareAdjustedCpm = bidCpm;
-						if (bidders[bidderCode].bids === 'gross' && !isNaN(this.revenueShare)) {
+						if (this.bidType === 'gross' && !isNaN(this.revenueShare)) {
 							revShareAdjustedCpm = bidCpm - bidCpm * (this.revenueShare / 100);
 						}
 
@@ -154,7 +154,7 @@ var auction = {
 							return inflatedCpm;
 						}
 						return revShareAdjustedCpm;
-					}.bind({ revenueShare: revenueShare })
+					}.bind({ revenueShare: revenueShare, bidType:bidders[bidderCode].bids })
 				};
 			}
 		}
