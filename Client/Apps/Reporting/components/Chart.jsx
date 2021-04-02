@@ -462,6 +462,9 @@ class Chart extends React.Component {
 
 		return (
 			<div>
+				{selectedDimension && (
+					<h4 style={{ marginLeft: '12px' }}>Graph for - {selectedDimension}</h4>
+				)}
 				<CustomChart
 					type={type}
 					series={series}
