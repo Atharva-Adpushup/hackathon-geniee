@@ -243,16 +243,15 @@ module.exports = {
 		host: 'https://amp.adpushup.com/' // please update this value in Client/config/config.js also
 	},
 	queuePublishingURL: 'http://localhost:9009',
-	urlReportingEnabledSites: [],
-	// separatePrebidEnabledSites: [],
-	separatePrebidDisabledSites: [],
-	separateSiteSpecificPrebidBundleSites: [],
+	// urlReportingEnabledSites: [],
+	// separatePrebidDisabledSites: [],
+	// separateSiteSpecificPrebidBundleSites: [],
 	prebidBundleUrl: 'http://localhost:8080/assets/js/builds/geniee/prebid/__FILE_NAME__',
 	SCHEDULER_API_ROOT: 'http://localhost:8081/scheduler',
 	prebidBundleDefaultName: 'prebid.js',
-	performanceLoggingEnabledSites: [37780],
-	sitesToDisableVideoWaitLimit: [],
-	disableAutoAddMultiformatForSites: [],
+	// performanceLoggingEnabledSites: [37780],
+	// sitesToDisableVideoWaitLimit: [],
+	// disableAutoAddMultiformatForSites: [],
 	bbPlayer: {
 		sitesListKeyToBeUsed: 'whitelistedSites', // whitelistedSites/blacklistedSites
 		whitelistedSites: [37780, 41159, 31454],
