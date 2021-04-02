@@ -456,14 +456,18 @@ class Chart extends React.Component {
 			reportType,
 			updateMetrics,
 			isCustomizeChartLegend,
-			index
+			index,
+			dimension
 		} = this.props;
+
 		const { type, series, xAxis, activeLegendItems, selectedDimension } = this.state;
 
 		return (
 			<div>
 				{selectedDimension && (
-					<h4 style={{ marginLeft: '12px' }}>Graph for - {selectedDimension}</h4>
+					<h4 style={{ marginLeft: '12px' }}>
+						<b>{dimension[selectedDimension].display_name}</b> Chart
+					</h4>
 				)}
 				<CustomChart
 					type={type}
