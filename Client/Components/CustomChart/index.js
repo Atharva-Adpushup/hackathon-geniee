@@ -51,6 +51,7 @@ const CustomChart = ({
 									activeLegendItems={activeLegendItems}
 									onLegendChange={onLegendChange}
 									updateMetrics={updateMetrics}
+									index={index}
 								/>,
 								node
 							);
