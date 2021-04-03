@@ -329,7 +329,7 @@ module.exports = {
 				return false;
 			}
 
-			if (window.adpushup.config.urlReportingEnabled) {
+			if (window.adpushup.config.isUrlReportingEnabled) {
 				this.sendURMPageFeedbackEventLogs({ ...feedbackObj });
 				// this.sendURMPageFeedbackEventLogsKeen();
 			}

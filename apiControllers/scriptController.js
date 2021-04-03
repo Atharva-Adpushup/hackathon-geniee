@@ -5,7 +5,7 @@ const Promise = require('bluebird');
 
 const UserModel = require('../models/userModel');
 const SiteModel = require('../models/siteModel');
-const ActiveBidderAdaptersListModel = require('../models/activeBidderAdaptersListModel');
+const SelectiveRolloutActiveBidderAdaptersList = require('../models/selectiveRolloutActiveBidderAdaptersListModel');
 const ampScriptModel = require('../models/ampScriptModel');
 
 const getReportData = require('../reports/universal');
@@ -23,6 +23,19 @@ const { isValidThirdPartyDFPAndCurrency } = require('../helpers/commonFunctions'
 
 const Router = express.Router();
 
+const defaultApConfigValues = {
+	// site specific config
+	isUrlReportingEnabled: false,
+	isVideoWaitLimitDisabled: false,
+	isSeparatePrebidDisabled: false,
+	isBbPlayerEnabledForTesting: false,
+	isPerformanceLoggingEnabled: false,
+	isAutoAddMultiformatDisabled: false,
+	isSiteSpecificSeparatePrebidEnabled: false,
+	// global config
+	isBbPlayerLoggingEnabled: false
+};
+
 Router.get('/:siteId/siteConfig', (req, res) => {
 	SiteModel.getSiteById(req.params.siteId)
 		.then(site => Promise.join(site, UserModel.getUserByEmail(site.get('ownerEmail'))))
@@ -34,7 +47,10 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 			const gptSraDisabled = !!(site.get('apConfigs') && site.get('apConfigs').gptSraDisabled);
 
 			const setAllConfigs = function(prebidAndAdsConfig) {
-				const apConfigs = site.get('apConfigs');
+				const apConfigs = {
+					...defaultApConfigValues,
+					...site.get('apConfigs')
+				};
 				const adServerSettings = user.get('adServerSettings');
 				const isAdPartner = !!site.get('partner');
 				const {
@@ -331,8 +347,8 @@ Router.get('/:siteId/ampSiteConfig', (req, res) => {
 
 Router.get('/prebidBundleConfig', (req, res) =>
 	Promise.join(
-		ActiveBidderAdaptersListModel.isS2SActiveOnAnySite(),
-		ActiveBidderAdaptersListModel.getActiveAndUsedBidderAdapters()
+		SelectiveRolloutActiveBidderAdaptersList.isS2SActiveOnAnySite(),
+		SelectiveRolloutActiveBidderAdaptersList.getActiveAndUsedBidderAdapters()
 	)
 		.then(([isS2SActiveOnAnySite, activeAndUsedBidders]) =>
 			res.send({ isS2SActiveOnAnySite, activeAndUsedBidders })
@@ -350,7 +366,9 @@ Router.get('/prebidBundleConfig', (req, res) =>
 
 Router.post('/prebidActiveBidderAdapters', (req, res) => {
 	const { newActiveBidderAdapters } = req.body;
-	return ActiveBidderAdaptersListModel.updateActiveBidderAdaptersIfChanged(newActiveBidderAdapters)
+	return SelectiveRolloutActiveBidderAdaptersList.updateActiveBidderAdaptersIfChanged(
+		newActiveBidderAdapters
+	)
 		.then(data => res.send(data))
 		.catch(err => {
 			if (err instanceof AdPushupError) {

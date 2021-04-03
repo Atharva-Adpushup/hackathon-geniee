@@ -26,7 +26,20 @@ const disableSiteCdnSyncList = [];
 // Websites: autocarindia (38333, It is running adpushup lite for which script is uploaded to CDN manually, for now)
 const ieTestingSiteList = [38903]; // iaai.com
 
-module.exports = function(site, user, prebidBundleName) {
+const defaultApConfigValues = {
+	isUrlReportingEnabled: false,
+	isSeparatePrebidDisabled: false,
+	isPerformanceLoggingEnabled: false,
+	isAutoAddMultiformatDisabled: false,
+	isSiteSpecificSeparatePrebidEnabled: false,
+	isVideoWaitLimitDisabled: false,
+	// TODO: use these flags when BB player flags are consumed from apConfigs
+	// isBbPlayerEnabledForTesting: false,
+	// isBbPlayerLoggingEnabled: false,
+};
+
+module.exports = function(data) {
+	const [site, user, prebidBundleName] = data;
 	var ftp = new PromiseFtp();
 
 	var siteId = site.get('siteId'),
@@ -50,7 +63,10 @@ module.exports = function(site, user, prebidBundleName) {
 			siteId.toString()
 		),
 		setAllConfigs = function(combinedConfig) {
-			let apConfigs = site.get('apConfigs');
+			let apConfigs = {
+				...defaultApConfigValues,
+				...site.get('apConfigs')
+			};
 			const adServerSettings = user.get('adServerSettings');
 			let isAdPartner = !!site.get('partner');
 			let {
@@ -82,7 +98,7 @@ module.exports = function(site, user, prebidBundleName) {
 			apConfigs.activeDFPNetwork =
 				(adServerSettings && adServerSettings.dfp && adServerSettings.dfp.activeDFPNetwork) || null;
 			// apConfigs.isSeparatePrebidEnabled = config.separatePrebidEnabledSites.indexOf(siteId) !== -1;
-			apConfigs.isSeparatePrebidEnabled = config.separatePrebidDisabledSites.indexOf(siteId) === -1;
+			// apConfigs.isSeparatePrebidEnabled = config.separatePrebidDisabledSites.indexOf(siteId) === -1;
 
 			apConfigs.apLiteActive = !!apps.apLite;
 
@@ -232,11 +248,11 @@ module.exports = function(site, user, prebidBundleName) {
 						apConfigs = {}
 					} = generatedConfig;
 
-					if (apConfigs.isSeparatePrebidEnabled || !statuses.HB_ACTIVE) {
+					if (!apConfigs.isSeparatePrebidDisabled || !statuses.HB_ACTIVE) {
 						return generatedConfig;
 					}
 
-					return prebidGeneration(config.prebidAdapters).then(() => generatedConfig);
+					return prebidGeneration(config.prebidAdapters, isAdhocOptimizationEnabled).then(() => generatedConfig);
 				})
 				.then(generatedConfig => {
 					if (!isAdhocOptimizationEnabled) {
@@ -270,24 +286,31 @@ module.exports = function(site, user, prebidBundleName) {
 					} = generatedConfig;
 
 					if (site.get('medianetId')) apConfigs.medianetId = site.get('medianetId');
-					const isUrlReportingEnabled =
-						Array.isArray(config.urlReportingEnabledSites) &&
-						config.urlReportingEnabledSites.indexOf(parseInt(siteId, 10)) !== -1;
-					const prebidBundleUrl = config.prebidBundleUrl.replace(
-						'__FILE_NAME__',
-						prebidBundleName || config.prebidBundleDefaultName
-					);
-					const isPerformanceLoggingEnabled =
-						Array.isArray(config.performanceLoggingEnabledSites) &&
-						config.performanceLoggingEnabledSites.indexOf(parseInt(siteId, 10)) !== -1;
-					const isVideoWaitLimitDisabled =
-						Array.isArray(config.sitesToDisableVideoWaitLimit) &&
-						config.sitesToDisableVideoWaitLimit.indexOf(parseInt(siteId, 10)) !== -1;
+					// const isUrlReportingEnabled =
+					// 	Array.isArray(config.urlReportingEnabledSites) &&
+					// 	config.urlReportingEnabledSites.indexOf(parseInt(siteId, 10)) !== -1;
+
+					let prebidBundleUrl = '';
+
+					if (!apConfigs.isSeparatePrebidDisabled) {
+						prebidBundleUrl = config.prebidBundleUrl.replace(
+							'__FILE_NAME__',
+							prebidBundleName || config.prebidBundleDefaultName
+						);
+					}
+
+					// const isPerformanceLoggingEnabled =
+					// 	Array.isArray(config.performanceLoggingEnabledSites) &&
+					// 	config.performanceLoggingEnabledSites.indexOf(parseInt(siteId, 10)) !== -1;
+
+					// const isVideoWaitLimitDisabled =
+					// 	Array.isArray(config.sitesToDisableVideoWaitLimit) &&
+					// 	config.sitesToDisableVideoWaitLimit.indexOf(parseInt(siteId, 10)) !== -1;
 
 					// temp flag for temp change that has multiformat on for all the sites
-					const isAutoAddMultiformatDisabled =
-						Array.isArray(config.disableAutoAddMultiformatForSites) &&
-						config.disableAutoAddMultiformatForSites.includes(parseInt(siteId, 10));
+					// const isAutoAddMultiformatDisabled =
+					// 	Array.isArray(config.disableAutoAddMultiformatForSites) &&
+					// 	config.disableAutoAddMultiformatForSites.includes(parseInt(siteId, 10));
 
 					// temp flag for bb player testing
 					let isBbPlayerEnabledForTesting = false;
@@ -330,19 +353,15 @@ module.exports = function(site, user, prebidBundleName) {
 					//bundle = _.replace(bundle, '__COUNTRY__', false);
 					bundle = _.replace(bundle, '__SIZE_MAPPING__', JSON.stringify(sizeMappingConfig));
 					bundle = _.replace(bundle, '__WEB_S2S_STATUS__', finalConfig.config.isS2SActive);
-					bundle = _.replace(bundle, '__URL_REPORTING_ENABLED__', isUrlReportingEnabled);
+					// bundle = _.replace(bundle, '__URL_REPORTING_ENABLED__', isUrlReportingEnabled);
 					bundle = _.replace(bundle, '__PREBID_BUNDLE_URL__', prebidBundleUrl);
-					bundle = _.replace(
-						bundle,
-						'__PERFORMANCE_LOGGING_ENABLED__',
-						isPerformanceLoggingEnabled
-					);
-					bundle = _.replace(bundle, '__VIDEO_WAIT_LIMIT_DISABLED__', isVideoWaitLimitDisabled);
-					bundle = _.replace(
-						bundle,
-						'__AUTO_ADD_MULTIFORMAT_DISABLED__',
-						isAutoAddMultiformatDisabled
-					);
+					// bundle = _.replace(
+					// 	bundle,
+					// 	'__PERFORMANCE_LOGGING_ENABLED__',
+					// 	isPerformanceLoggingEnabled
+					// );
+					// bundle = _.replace(bundle, '__VIDEO_WAIT_LIMIT_DISABLED__', isVideoWaitLimitDisabled);
+					// bundle = _.replace(bundle, '__AUTO_ADD_MULTIFORMAT_DISABLED__', isAutoAddMultiformatDisabled);
 					bundle = _.replace(
 						bundle,
 						'__ENABLE_BB_PLAYER_FOR_TESTING__',

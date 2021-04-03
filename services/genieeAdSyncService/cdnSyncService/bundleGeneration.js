@@ -56,8 +56,8 @@ function init(site, config) {
 				new webpack.DefinePlugin({
 					...statuses,
 					SITE_ID: JSON.stringify(siteId),
-					SEPARATE_PREBID: apConfigs.isSeparatePrebidEnabled,
-					GA_ANALYTICS_ACTIVE: apConfigs.enableGAAnalytics
+					GA_ANALYTICS_ACTIVE: !!apConfigs.enableGAAnalytics,
+					SEPARATE_PREBID_DISABLED: !!apConfigs.isSeparatePrebidDisabled
 				})
 			]
 		};

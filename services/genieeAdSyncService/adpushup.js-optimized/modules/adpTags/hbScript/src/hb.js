@@ -289,7 +289,7 @@ var hb = {
             HB flag passed as a global constant to the webpack config using DefinePlugin
             (https://webpack.js.org/plugins/define-plugin/#root)
         */
-		if (!SEPARATE_PREBID && HB_ACTIVE) {
+		if (SEPARATE_PREBID_DISABLED && HB_ACTIVE) {
 			(function() {
 				require('../../Prebid.js/build/dist/prebid');
 			})();
