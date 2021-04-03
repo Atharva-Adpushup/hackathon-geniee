@@ -6,7 +6,7 @@ const { docKeys } = require('../configs/commonConsts');
 const commonConsts = require('../configs/commonConsts');
 const N1qlQuery = require('couchbase').N1qlQuery;
 
-const ActiveBidderAdaptersList = model.extend(function() {
+const SelectiveRolloutActiveBidderAdaptersList = model.extend(function() {
 	this.keys = ['prebidBundleName', 'activeBiddersInAscOrder'];
 	this.clientKeys = ['prebidBundleName', 'activeBiddersInAscOrder'];
 	this.validations = {
@@ -17,10 +17,10 @@ const ActiveBidderAdaptersList = model.extend(function() {
 	this.constructor = function(data, cas) {
 		if (!data.activeBiddersInAscOrder || !data.prebidBundleName) {
 			throw new Error(
-				'activeBidders list and prebidBundleName are required for ActiveBidderAdaptersList doc'
+				'activeBidders list and prebidBundleName are required for SelectiveRolloutActiveBidderAdaptersList doc'
 			);
 		}
-		this.key = docKeys.activeBidderAdaptersList;
+		this.key = docKeys.selectiveRolloutActiveBidderAdaptersList;
 		this.super(data, !!cas);
 		this.casValue = cas; // if user is loaded from database which will be almost every time except first, this value will be thr
 		this.updateActiveBidderAdapters = function(activeBidders) {
@@ -41,16 +41,16 @@ function apiModule() {
 		getActiveBidderAdaptersList: function() {
 			return couchbase
 				.connectToAppBucket()
-				.then(appBucket => appBucket.getAsync(docKeys.activeBidderAdaptersList))
-				.then(json => new ActiveBidderAdaptersList(json.value, json.cas));
+				.then(appBucket => appBucket.getAsync(docKeys.selectiveRolloutActiveBidderAdaptersList))
+				.then(json => new SelectiveRolloutActiveBidderAdaptersList(json.value, json.cas));
 		},
 		createActiveBidderAdaptersList(activeBidders) {
 			const json = {
 				prebidBundleName: getPrebidBundleName(),
 				activeBiddersInAscOrder: activeBidders
 			};
-			return Promise.resolve(new ActiveBidderAdaptersList(json)).then(activeBidderAdaptersList =>
-				activeBidderAdaptersList.save()
+			return Promise.resolve(new SelectiveRolloutActiveBidderAdaptersList(json)).then(
+				activeBidderAdaptersList => activeBidderAdaptersList.save()
 			);
 		},
 		/**
@@ -102,7 +102,8 @@ function apiModule() {
 				});
 		},
 		getActiveAndUsedBidderAdapters: function() {
-			const queryString = commonConsts.PREBID_BUNDLING.ACTIVE_BIDDER_ADAPTERS_N1QL;
+			const queryString =
+				commonConsts.PREBID_BUNDLING.SELECTIVE_ROLLOUT_ACTIVE_BIDDER_ADAPTERS_N1QL;
 			const query = N1qlQuery.fromString(queryString);
 
 			return couchbase.connectToAppBucket().then(appBucket => {
@@ -110,7 +111,7 @@ function apiModule() {
 			});
 		},
 		isS2SActiveOnAnySite: function() {
-			const queryString = commonConsts.PREBID_BUNDLING.FIRST_S2S_BIDDER_SITE;
+			const queryString = commonConsts.PREBID_BUNDLING.SELECTIVE_ROLLOUT_FIRST_S2S_BIDDER_SITE;
 			const query = N1qlQuery.fromString(queryString);
 
 			return couchbase
@@ -118,7 +119,9 @@ function apiModule() {
 				.then(appBucket => {
 					return appBucket.queryAsync(query);
 				})
-				.then(sites => Array.isArray(sites) && !!sites.length);
+				.then(sites => {
+					return Array.isArray(sites) && !!sites.length;
+				});
 		}
 	};
 
