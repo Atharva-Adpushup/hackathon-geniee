@@ -131,7 +131,7 @@ const ADCODE = `<div id="__AD_ID__" class="_ap_apex_ad"__CUSTOM_ATTRIBS__>
 	</script>
 </div>`;
 
-/*************** 
+/** ************* 
       This function implements rejected logic of Rewarded Video Ads and displays ads after 1 week.
       function isResetRejectedFinal() {
 				return true;
@@ -194,7 +194,7 @@ const ADCODE = `<div id="__AD_ID__" class="_ap_apex_ad"__CUSTOM_ATTRIBS__>
 	
 				return feedbackObj;
 			}
-			 *************/
+			 ************ */
 
 const REWARDED_AD_CODE = `<script>
    !(function(w, d) {
@@ -565,7 +565,7 @@ openx.com, 539266264, RESELLER, 6a698e2ec38604c6
 appnexus.com, 1356, RESELLER, f5ab79cb980f11d1  
 emxdgt.com, 326, RESELLER, 1e1d41537f7cad7f  
 google.com, pub-5995202563537249, RESELLER, f08c47fec0942fa0`;
-const INIT_CODE = `<script data-cfasync="false" type="text/javascript">(function(w, d) { var s = d.createElement('script'); s.src = '//cdn.adpushup.com/__SITE_ID__/adpushup.js'; s.type = 'text/javascript'; s.async = true; (d.getElementsByTagName('head')[0] || d.getElementsByTagName('body')[0]).appendChild(s); })(window, document);</script>`;
+const INIT_CODE = `<script data-cfasync="false" type="text/javascript">(function(w, d) { var s = d.createElement('script'); s.src = '//cdn.adpushup.com/__SITE_ID__/adpushup.js'; s.crossOrigin='anonymous'; s.type = 'text/javascript'; s.async = true; (d.getElementsByTagName('head')[0] || d.getElementsByTagName('body')[0]).appendChild(s); })(window, document);</script>`;
 
 // APT abbreviation stands for ApTag
 const APT_NAV_ITEMS_INDEXES = {

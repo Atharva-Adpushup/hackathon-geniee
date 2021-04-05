@@ -176,7 +176,7 @@ var targeting = {
 	setPageLevel: function(googletag) {
 		let pageLevelTargeting = constants.TARGETING.PAGE_LEVEL;
 
-		if (adp.config.urlReportingEnabled) {
+		if (adp.config.isUrlReportingEnabled) {
 			const { urlTargetingKey, urlTargetingValue } = window.adpushup.config.pageUrlKeyValue;
 			const { utils } = window.adpushup;
 			const { pageUTMKeyValue } = window.adpushup.config;
