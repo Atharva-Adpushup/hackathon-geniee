@@ -24,15 +24,9 @@ const ChartLegend = ({
 			/>
 		))}
 
-		{isCustomizeChartLegend && !!availableLegends.length && (
+		{isCustomizeChartLegend && !!availableLegends.length && index === 0 && (
 			<ManageLegendItems
-				availableLegends={
-					index && index > 0
-						? availableLegends.filter(
-								availableLegend => availableLegend.value !== 'unique_impressions'
-						  )
-						: availableLegends
-				}
+				availableLegends={availableLegends}
 				activeLegends={legends}
 				updateMetrics={updateMetrics}
 			/>
