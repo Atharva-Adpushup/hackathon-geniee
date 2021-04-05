@@ -7,6 +7,7 @@ var apUtils = require('../../../../libs/utils');
 var { removeBbPlayerIfRendered, getBbPlayerId, sendBbPlayerLogs } = require('./bbPlayerUtils');
 var config = require('./config');
 const multiFormatConfig = require('./multiFormatConfig');
+const apConfig = window.adpushup.config;
 
 module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 	var pbjs = window._apPbJs;
@@ -15,7 +16,6 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 	bluebillywig.cmd = bluebillywig.cmd || [];
 	var bidWonTime = +new Date();
 	var [width, height] = adpSlot.size;
-	const apConfig = window.adpushup.config;
 
 	sendBbPlayerLogs('bid', 'video_bid_received', adpSlot, bid, bidWonTime);
 
@@ -247,10 +247,10 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 
 			if (
 				!apUtils.checkElementInViewPercent(container) &&
-				(config.VIDEO_WAIT_LIMIT_DISABLED ||
+				(apConfig.isVideoWaitLimitDisabled ||
 					(timeSpentInMs < watcherExpiryTimeInMs && !timeoutId))
 			) {
-				var computedWatcherInterval = config.VIDEO_WAIT_LIMIT_DISABLED
+				var computedWatcherInterval = apConfig.isVideoWaitLimitDisabled
 					? watcherInterval
 					: watcherExpiryTimeInMs - timeSpentInMs;
 
@@ -264,7 +264,7 @@ module.exports = function videoRenderer(adpSlot, playerSize, bid) {
 					}
 				};
 
-				if (!config.VIDEO_WAIT_LIMIT_DISABLED) {
+				if (!apConfig.isVideoWaitLimitDisabled) {
 					scrollEventListener = debounce(inViewCheck, 50);
 					window.addEventListener('scroll', scrollEventListener);
 				}

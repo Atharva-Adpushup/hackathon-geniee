@@ -17,7 +17,7 @@ var refreshAdSlot = require('./refreshAdSlot');
 
 var googlFcCmp = require('../libs/googleFcCmp');
 
-if (SEPARATE_PREBID && HB_ACTIVE) {
+if (!SEPARATE_PREBID_DISABLED && HB_ACTIVE) {
 	utils.injectHeadCodeOnPage(config.prebidBundleUrl);
 }
 
@@ -405,7 +405,6 @@ function main() {
 	adp.services.HB_ACTIVE =
 		adp.services.HB_ACTIVE && !utils.getQueryParams().adpushupHeaderBiddingDisabled;
 
-
 	if (utils.isAdPushupForceDisabled()) {
 		utils.log(`AdPushup has been forced disabled...`);
 		return false;
@@ -438,7 +437,7 @@ function main() {
 	// Initialise adpushup session
 	session.init();
 
-	if (adp.config.urlReportingEnabled) {
+	if (adp.config.isUrlReportingEnabled) {
 		utils.fetchAndSetKeyValueForUrlReporting(adp);
 	}
 

@@ -19,7 +19,7 @@ var config = {
 		S2S_SYNC_ENDPOINT: `${globalConfig.prebidServer.host}prebidserver/cookie_sync`,
 		S2S_ACCOUNT_ID: '1001'
 	},
-	VIDEO_WAIT_LIMIT_DISABLED: __VIDEO_WAIT_LIMIT_DISABLED__,
+	// VIDEO_WAIT_LIMIT_DISABLED: __VIDEO_WAIT_LIMIT_DISABLED__, // will be set by apConfigs flag in adpushup.config now
 	POST_BID_SUPPORTED_BIDDERS: [
 		'nobid',
 		'pubmatic',

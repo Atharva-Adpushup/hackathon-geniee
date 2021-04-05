@@ -21,7 +21,7 @@ var defaultConfig = {};
 function start() {
 	defaultConfig = adp.$.extend({}, require('../config/config.js'));
 
-	if (SEPARATE_PREBID && HB_ACTIVE) {
+	if (!SEPARATE_PREBID_DISABLED && HB_ACTIVE) {
 		utils.injectHeadCodeOnPage(config.prebidBundleUrl);
 	}
 
@@ -405,6 +405,11 @@ function start() {
 	}
 
 	function main() {
+		// Initialise adp config
+		initAdpConfig();
+
+		utils.emitGaEvent(commonConsts.GA_EVENTS.SCRIPT_LOADED);
+
 		utils.logPerformanceEvent(commonConsts.EVENT_LOGGER.EVENTS.MAIN_FN_CALL_DELAY);
 
 		// if traffic is from lighthouse and site has to be paused for lighthouse
@@ -417,11 +422,6 @@ function start() {
 		// disable header bidding if query param contains `?adpushupHeaderBiddingDisabled=true`
 		adp.services.HB_ACTIVE =
 			adp.services.HB_ACTIVE && !utils.getQueryParams().adpushupHeaderBiddingDisabled;
-
-		// Initialise adp config
-		initAdpConfig();
-
-		utils.emitGaEvent(commonConsts.GA_EVENTS.SCRIPT_LOADED);
 
 		if (utils.isAdPushupForceDisabled()) {
 			utils.log(`AdPushup has been forced disabled...`);
@@ -455,7 +455,7 @@ function start() {
 		// Initialise adpushup session
 		session.init();
 
-		if (adp.config.urlReportingEnabled) {
+		if (adp.config.isUrlReportingEnabled) {
 			utils.fetchAndSetKeyValueForUrlReporting(adp);
 		}
 
