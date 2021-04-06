@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Badge, Table } from '@/Client/helpers/react-bootstrap-imports';
 
-const FilterLegend = ({ selectedFilters = {}, filtersList = [], selectedDimension = [] }) => {
+const FilterLegend = ({ selectedFilters = {}, filtersList = [] }) => {
 	const [shouldShowMore, setShouldShowMore] = useState({});
 
 	const toggleShowMore = key => {
@@ -57,9 +57,7 @@ const FilterLegend = ({ selectedFilters = {}, filtersList = [], selectedDimensio
 	);
 	return (
 		<div className="filter-legend">
-			{!isFiltersEmpty || selectedDimension.length !== 0 ? (
-				<h4 className="filter-list-title">Selected Filters</h4>
-			) : null}
+			{!isFiltersEmpty ? <h4 className="filter-list-title">Selected Filters</h4> : null}
 			<div>
 				<Table className="filter-list-table" borderless>
 					<tbody>
@@ -68,18 +66,6 @@ const FilterLegend = ({ selectedFilters = {}, filtersList = [], selectedDimensio
 							const selectedFilterValues = selectedFilters[key];
 							return showFiltersLegend(filterTitle, selectedFilterValues, key);
 						})}
-						{(selectedDimension.length &&
-							showFiltersLegend(
-								'Report By',
-								selectedDimension.map((value, index) => {
-									for (let filter of filtersList) {
-										if (filter.value === value) value = filter.name;
-									}
-									return { value, id: index };
-								}),
-								'selectedDimension'
-							)) ||
-							null}
 					</tbody>
 				</Table>
 			</div>

@@ -393,7 +393,8 @@ class Control extends Component {
 			onReportDelete,
 			selectedReportName,
 			updateReportName,
-			isHB
+			isHB,
+			filterList
 		} = this.props;
 
 		const { scheduleOptions: { startDate, endDate, interval } = {}, type: selectedReportType } =
@@ -402,11 +403,32 @@ class Control extends Component {
 		const selectedReportEndDate = endDate;
 		const isUpdating = selectedReport !== null;
 		const isSavedReportsEmpty = savedReports.length === 0;
-		// const { selectedReport } = state;
+		const { selectedDimension = [] } = state;
 		const savedAndFrequentReportOptions = [
 			{ label: 'Saved Reports', value: 'savedReports', options: savedReports },
 			{ label: 'Frequent Reports', value: 'frequentReports', options: frequentReports }
 		];
+		const allSelectedDimensionsNames =
+			(!isHB &&
+				selectedDimension.map((value, index) => {
+					let dimensionName = '';
+					for (let filter of filterList) {
+						if (filter.value === value) {
+							dimensionName = filter.name;
+						}
+					}
+					return dimensionName;
+				})) ||
+			[];
+		let multiSelectBoxMessage = allSelectedDimensionsNames.join(', ');
+		let isFadeout = false;
+		const multiSelectBoxWidth =
+			(document.getElementById('report-by') && document.getElementById('report-by').offsetWidth) ||
+			0;
+		if (multiSelectBoxMessage.length > multiSelectBoxWidth / 8) {
+			isFadeout = true;
+			multiSelectBoxMessage = `${multiSelectBoxMessage.slice(0, multiSelectBoxWidth / 8)}...`;
+		}
 		return (
 			<Fragment>
 				{!isSavedReportsEmpty && (
@@ -448,9 +470,12 @@ class Control extends Component {
 								isMainReportingPanel={true}
 								selected={state.selectedDimension}
 								options={state.dimensionList || []}
+								isFadeout={isFadeout}
+								multiSelectBoxMessage={multiSelectBoxMessage}
 								onSelect={selectedDimensions => {
 									this.onReportBySelect(selectedDimensions);
 								}}
+								defaultMessage="Select Value"
 							/>
 						) : (
 							<SelectBox

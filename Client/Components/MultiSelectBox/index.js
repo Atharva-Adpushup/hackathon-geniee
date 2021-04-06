@@ -129,6 +129,7 @@ class MultiSelectBox extends Component {
 
 	render() {
 		const { name, selected, selectedOption, selectedChartKey, selectAll } = this.state;
+		let { multiSelectBoxMessage = '', defaultMessage = '' } = this.props;
 		const {
 			//	selected,
 			options,
@@ -142,14 +143,16 @@ class MultiSelectBox extends Component {
 			pullRight,
 			isMainReportingPanel
 		} = this.props;
-
 		const count = Object.keys(selectedOption).filter(item => selectedOption[item]).length;
+		if (multiSelectBoxMessage === '') {
+			multiSelectBoxMessage = defaultMessage !== '' ? defaultMessage : `${count} selected`;
+		}
 		const selectedTitle = reset ? (
 			<div
-				className="aligner aligner--hSpaceBetween width-100  aligner--wrap"
-				style={{ width: '100%' }}
+				className="aligner aligner--hSpaceBetween width-100  aligner--wrap reporting_multiselect_fade_out"
+				style={{ width: '100%', overflow: 'hidden' }}
 			>
-				{name}
+				{defaultMessage !== '' ? defaultMessage : name}
 
 				<Glyphicon
 					glyph="remove"
@@ -161,7 +164,7 @@ class MultiSelectBox extends Component {
 				/>
 			</div>
 		) : (
-			`${count} selected`
+			multiSelectBoxMessage
 		);
 
 		const buttonTitle = selectedOption[selectedChartKey] === 0 || selected ? selectedTitle : title;

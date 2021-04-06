@@ -1314,7 +1314,6 @@ class Report extends Component {
 				dimensionList
 			);
 		}
-
 		return (
 			<Row>
 				<Col sm={12}>
@@ -1352,11 +1351,7 @@ class Report extends Component {
 					/>
 				</Col>
 				<Col sm={12}>
-					<FilterLegend
-						selectedFilters={selectedFilterValues}
-						filtersList={filterList}
-						selectedDimension={selectedDimension}
-					/>
+					<FilterLegend selectedFilters={selectedFilterValues} filtersList={filterList} />
 				</Col>
 				{(dataFetchedDimension.length > 0 &&
 					dataFetchedDimension.map((dimension, index) => (
