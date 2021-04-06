@@ -190,13 +190,15 @@ var utils = {
 								params: {}
 							};
 							var bidderParams = bidderData.config;
-							var paramsList = Object.keys(bidderParams)
+							var paramsList = Object.keys(bidderParams);
 
 							computedFormats.forEach(format => {
 								var formatParamPrefix = constants.FORMAT_WISE_PARAMS_PREFIX[format];
 
 								// filter out params for this particular format by checking the starting of each param to match the prefix for this format
-								var formatParams = paramsList.filter(param => param.indexOf(formatParamPrefix) === 0);
+								var formatParams = paramsList.filter(
+									param => param.indexOf(formatParamPrefix) === 0
+								);
 								if (!formatParams.length) {
 									return;
 								}
@@ -205,14 +207,15 @@ var utils = {
 
 								formatParams.forEach(param => {
 									var actualParam = param.replace(formatParamPrefix, '');
-									computedFormatBidderObj.params[actualParam] = bidderParams[param]
+									computedFormatBidderObj.params[actualParam] =
+										bidderParams[param];
 								});
 
 								if (bidderParamsMapping[bidder]) {
 									computedFormatBidderObj.params = {
 										...this.getVideoOrNativeParams(format, bidder),
 										...computedFormatBidderObj.params
-									}
+									};
 								}
 
 								formatWiseBidders[format].push(computedFormatBidderObj);
@@ -271,9 +274,15 @@ var utils = {
 		}
 
 		if (bidderRulesConfig.bidderSequence) {
-			nonFormatWiseBidders = this.sortBidders(nonFormatWiseBidders, bidderRulesConfig.bidderSequence);
+			nonFormatWiseBidders = this.sortBidders(
+				nonFormatWiseBidders,
+				bidderRulesConfig.bidderSequence
+			);
 			Object.keys(formatWiseBidders).forEach(format => {
-				formatWiseBidders[format] = this.sortBidders(formatWiseBidders[format], bidderRulesConfig.bidderSequence);
+				formatWiseBidders[format] = this.sortBidders(
+					formatWiseBidders[format],
+					bidderRulesConfig.bidderSequence
+				);
 			});
 		}
 
@@ -283,13 +292,10 @@ var utils = {
 		};
 	},
 	checkForValidBidders: function(bidders) {
-		var {
-			formatWiseBidders = {},
-			nonFormatWiseBidders = {}
-		} = bidders || {};
+		var { formatWiseBidders = {}, nonFormatWiseBidders = {} } = bidders || {};
 
 		var formatWiseBiddersList = Object.keys(formatWiseBidders).reduce((result, format) => {
-			return [...result, ...formatWiseBidders[format]]
+			return [...result, ...formatWiseBidders[format]];
 		}, []);
 
 		return nonFormatWiseBidders.length || formatWiseBiddersList.length;
@@ -651,7 +657,7 @@ var utils = {
 	},
 	filterComputedSizes: (computedSizes = [], sizeFilters) => {
 		if (!sizeFilters || !Object.keys(sizeFilters).length) return computedSizes;
-		
+
 		return computedSizes.filter(([width, height]) => {
 			let isValid = true;
 
@@ -669,12 +675,12 @@ var utils = {
 		});
 	},
 	inflateBidCpm: function(cpm) {
-		const { bidInfationPercentage } = adp.config || {};
+		const { bidInflationPercentage } = adp.config || {};
 		const isCpmValid = this.isValidNumber(cpm);
 
 		if (!isCpmValid) return cpm;
 
-		const inflatedCpm = cpm + ( cpm * (bidInfationPercentage / 100) );
+		const inflatedCpm = cpm + cpm * (bidInflationPercentage / 100);
 		adp.utils.log(`CPM: ${cpm} inflated to ${inflatedCpm}`);
 		return inflatedCpm;
 	},
@@ -683,22 +689,25 @@ var utils = {
 		return isValid;
 	},
 	setShouldPerformBidInflation: function() {
-		const { bidInfationPercentage, isABTestingForBidInflationEnabled } = adp.config || {};
-		const isBidInflationPercentageValid = this.isValidNumber(bidInfationPercentage);
+		const { bidInflationPercentage, isABTestingForBidInflationEnabled } = adp.config || {};
+		const isBidInflationPercentageValid = this.isValidNumber(bidInflationPercentage);
 
-		const shouldInflateBid = isBidInflationPercentageValid ? ( isABTestingForBidInflationEnabled ? Math.random() * 100 <= 50 : true ) : false;
+		const shouldInflateBid = isBidInflationPercentageValid
+			? isABTestingForBidInflationEnabled
+				? Math.random() * 100 <= 50
+				: true
+			: false;
 		utils.log(`Should Inflate Bid ${shouldInflateBid}`);
 		window.adpushup.shouldInflateBid = shouldInflateBid;
 	},
 	getOriginalCpmFromInflated: function(cpm) {
-		const { bidInfationPercentage } = adp.config || {};
+		const { bidInflationPercentage } = adp.config || {};
 
-		if(typeof cpm !== 'number') {
+		if (typeof cpm !== 'number') {
 			cpm = parseFloat(cpm);
 		}
 
-		return ( cpm * 100 ) / ( bidInfationPercentage + 100 );
-
+		return (cpm * 100) / (bidInflationPercentage + 100);
 	}
 };
 
