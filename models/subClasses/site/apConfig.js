@@ -30,7 +30,7 @@ const ApConfig = {
 		'enableGAAnalytics',
 		'isDailyEmailReportsEnabled',
 		'isWeeklyEmailReportsEnabled',
-		'bidInfationPercentage',
+		'bidInflationPercentage',
 		'isABTestingForBidInflationEnabled'
 	],
 	override: [
@@ -64,7 +64,7 @@ const ApConfig = {
 		'enableGAAnalytics',
 		'isDailyEmailReportsEnabled',
 		'isWeeklyEmailReportsEnabled',
-		'bidInfationPercentage',
+		'bidInflationPercentage',
 		'isABTestingForBidInflationEnabled'
 	],
 	merge: []
