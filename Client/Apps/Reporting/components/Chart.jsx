@@ -465,14 +465,6 @@ class Chart extends React.Component {
 
 		return (
 			<div>
-				{selectedDimension && (
-					<span>
-						<span style={{ marginLeft: '15px' }}>
-							<b>{dimension[selectedDimension].display_name}</b> Chart
-						</span>
-					</span>
-				)}
-
 				<CustomChart
 					type={type}
 					series={series}
@@ -487,6 +479,11 @@ class Chart extends React.Component {
 					updateMetrics={updateMetrics}
 					index={index}
 				/>
+				{selectedDimension && (
+					<span className="chartLabels">
+						<b>{dimension[selectedDimension].display_name}-Wise Report</b>
+					</span>
+				)}
 			</div>
 		);
 		// else return '';
