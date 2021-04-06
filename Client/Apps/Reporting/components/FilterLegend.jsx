@@ -57,7 +57,9 @@ const FilterLegend = ({ selectedFilters = {}, filtersList = [], selectedDimensio
 	);
 	return (
 		<div className="filter-legend">
-			{!isFiltersEmpty ? <h4 className="filter-list-title">Selected Filters</h4> : null}
+			{!isFiltersEmpty || selectedDimension.length !== 0 ? (
+				<h4 className="filter-list-title">Selected Filters</h4>
+			) : null}
 			<div>
 				<Table className="filter-list-table" borderless>
 					<tbody>
@@ -68,8 +70,13 @@ const FilterLegend = ({ selectedFilters = {}, filtersList = [], selectedDimensio
 						})}
 						{(selectedDimension.length &&
 							showFiltersLegend(
-								'Selected Dimensions',
-								selectedDimension.map((value, index) => ({ value, id: index })),
+								'Report By',
+								selectedDimension.map((value, index) => {
+									for (let filter of filtersList) {
+										if (filter.value === value) value = filter.name;
+									}
+									return { value, id: index };
+								}),
 								'selectedDimension'
 							)) ||
 							null}
