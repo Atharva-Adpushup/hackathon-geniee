@@ -354,7 +354,7 @@ class Table extends React.Component {
 						columns={tableColumns}
 						data={tableBody}
 						defaultPageSize={isURLReport ? 150 : 50}
-						pageSizeOptions={isURLReport ? [150] : [100, 200, 300, 400, 500]}
+						pageSizeOptions={isURLReport ? [150] : [50, 100, 200, 300, 400]}
 						minRows={0}
 						showPaginationTop
 						showPaginationBottom={false}
