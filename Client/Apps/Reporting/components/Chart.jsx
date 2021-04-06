@@ -470,13 +470,6 @@ class Chart extends React.Component {
 						<span style={{ marginLeft: '15px' }}>
 							<b>{dimension[selectedDimension].display_name}</b> Chart
 						</span>
-
-						{index === 0 ? (
-							<small style={{ float: 'right' }}>
-								<b>*Note:</b> Managing chart metrices option will only be available in the first
-								chart. It controls every single chart and the table below.
-							</small>
-						) : null}
 					</span>
 				)}
 

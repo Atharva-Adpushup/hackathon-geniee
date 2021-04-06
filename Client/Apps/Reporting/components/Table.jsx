@@ -353,8 +353,8 @@ class Table extends React.Component {
 					<CustomReactTable
 						columns={tableColumns}
 						data={tableBody}
-						defaultPageSize={isURLReport ? 150 : 10}
-						pageSizeOptions={isURLReport ? [150] : [10, 20, 30, 40, 50]}
+						defaultPageSize={isURLReport ? 150 : 50}
+						pageSizeOptions={isURLReport ? [150] : [100, 200, 300, 400, 500]}
 						minRows={0}
 						showPaginationTop
 						showPaginationBottom={false}
