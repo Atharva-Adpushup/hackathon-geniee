@@ -479,11 +479,11 @@ class Chart extends React.Component {
 					updateMetrics={updateMetrics}
 					index={index}
 				/>
-				{selectedDimension && (
+				{selectedDimension && series.length ? (
 					<span className="chartLabels">
 						<b>{dimension[selectedDimension].display_name}-Wise Report</b>
 					</span>
-				)}
+				) : null}
 			</div>
 		);
 		// else return '';
