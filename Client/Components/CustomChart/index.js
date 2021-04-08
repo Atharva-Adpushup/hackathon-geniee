@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
 import ReactHighcharts from 'react-highcharts';
 import ReactDOM from 'react-dom';
@@ -22,6 +22,7 @@ const CustomChart = ({
 	updateMetrics,
 	index
 }) => {
+	const chartLegendWrap = useRef(null);
 	if (type === 'line' || type === 'spline') {
 		const chartConfig = getCustomChartConfig(
 			type,
@@ -39,8 +40,8 @@ const CustomChart = ({
 					load: event => {
 						const chart = event.target;
 
-						const node = document.getElementsByClassName('chart-legend-wrap')[index];
-						if (legends && legends.length > 0)
+						const node = chartLegendWrap.current;
+						if (node && legends && legends.length > 0)
 							ReactDOM.render(
 								<ChartLegend
 									chart={chart}
@@ -51,7 +52,7 @@ const CustomChart = ({
 									activeLegendItems={activeLegendItems}
 									onLegendChange={onLegendChange}
 									updateMetrics={updateMetrics}
-									index={index}
+									isManageLegendItemsShown={index === 0}
 								/>,
 								node
 							);
@@ -62,7 +63,7 @@ const CustomChart = ({
 			return (
 				<div className={containerClass}>
 					{title && <h3 className="text-center">{title}</h3>}
-					<div className="chart-legend-wrap" />
+					<div className="chart-legend-wrap" ref={chartLegendWrap} />
 					<ReactHighcharts config={chartConfig} />
 				</div>
 			);
@@ -85,7 +86,7 @@ const CustomChart = ({
 			return (
 				<div className={containerClass}>
 					{title && <h3 className="text-center">{title}</h3>}
-					<div id="chart-legend-wrap" />
+					<div id="chart-legend-wrap" ref={chartLegendWrap} />
 					<ReactHighcharts config={chartConfig} />
 				</div>
 			);
