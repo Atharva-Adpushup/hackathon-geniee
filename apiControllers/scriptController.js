@@ -5,6 +5,7 @@ const Promise = require('bluebird');
 
 const UserModel = require('../models/userModel');
 const SiteModel = require('../models/siteModel');
+const activeBidderAdaptersList = require('../models/activeBidderAdaptersListModel');
 const SelectiveRolloutActiveBidderAdaptersList = require('../models/selectiveRolloutActiveBidderAdaptersListModel');
 const ampScriptModel = require('../models/ampScriptModel');
 
@@ -346,39 +347,59 @@ Router.get('/:siteId/ampSiteConfig', (req, res) => {
 });
 
 Router.get('/prebidBundleConfig', (req, res) =>
-	Promise.join(
-		SelectiveRolloutActiveBidderAdaptersList.isS2SActiveOnAnySite(),
-		SelectiveRolloutActiveBidderAdaptersList.getActiveAndUsedBidderAdapters()
-	)
-		.then(([isS2SActiveOnAnySite, activeAndUsedBidders]) =>
-			res.send({ isS2SActiveOnAnySite, activeAndUsedBidders })
-		)
-		.catch(err => {
-			if (err instanceof AdPushupError) {
-				return res.status(httpStatusConsts.NOT_FOUND).json({ error: err.message });
-			}
+	SiteModel.getSiteById(req.query.siteId)
+		.then(site => {
+			const { isSelectiveRolloutEnabled = false } = site.get('apConfigs') || {};
 
-			return res
-				.status(httpStatusConsts.INTERNAL_SERVER_ERROR)
-				.json({ error: 'Internal Server Error!' });
+			return isSelectiveRolloutEnabled
+				? SelectiveRolloutActiveBidderAdaptersList
+				: activeBidderAdaptersList;
 		})
+		.then(activeBiddersModel =>
+			Promise.join(
+				activeBiddersModel.isS2SActiveOnAnySite(),
+				activeBiddersModel.getActiveAndUsedBidderAdapters()
+			)
+				.then(([isS2SActiveOnAnySite, activeAndUsedBidders]) =>
+					res.send({ isS2SActiveOnAnySite, activeAndUsedBidders })
+				)
+				.catch(err => {
+					if (err instanceof AdPushupError) {
+						return res.status(httpStatusConsts.NOT_FOUND).json({ error: err.message });
+					}
+
+					return res
+						.status(httpStatusConsts.INTERNAL_SERVER_ERROR)
+						.json({ error: 'Internal Server Error!' });
+				})
+		)
 );
 
 Router.post('/prebidActiveBidderAdapters', (req, res) => {
-	const { newActiveBidderAdapters } = req.body;
-	return SelectiveRolloutActiveBidderAdaptersList.updateActiveBidderAdaptersIfChanged(
-		newActiveBidderAdapters
-	)
-		.then(data => res.send(data))
-		.catch(err => {
-			if (err instanceof AdPushupError) {
-				return res.status(httpStatusConsts.NOT_FOUND).json({ error: err.message });
-			}
+	const { newActiveBidderAdapters, siteId } = req.body;
 
-			return res
-				.status(httpStatusConsts.INTERNAL_SERVER_ERROR)
-				.json({ error: 'Internal Server Error!' });
-		});
+	return SiteModel.getSiteById(siteId)
+		.then(site => {
+			const { isSelectiveRolloutEnabled = false } = site.get('apConfigs') || {};
+
+			return isSelectiveRolloutEnabled
+				? SelectiveRolloutActiveBidderAdaptersList
+				: activeBidderAdaptersList;
+		})
+		.then(activeBiddersModel =>
+			activeBiddersModel
+				.updateActiveBidderAdaptersIfChanged(newActiveBidderAdapters)
+				.then(data => res.send(data))
+				.catch(err => {
+					if (err instanceof AdPushupError) {
+						return res.status(httpStatusConsts.NOT_FOUND).json({ error: err.message });
+					}
+
+					return res
+						.status(httpStatusConsts.INTERNAL_SERVER_ERROR)
+						.json({ error: 'Internal Server Error!' });
+				})
+		);
 });
 
 module.exports = Router;
