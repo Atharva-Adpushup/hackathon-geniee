@@ -7,7 +7,7 @@ const saveAnomaliesToDb = require('../saveAnomaliesToDb');
 const { axiosErrorHandler, partnerModuleErrorHandler } = require('../utils');
 
 const {
-	PARTNERS_PANEL_INTEGRATION: { ANOMALY_THRESHOLD_IN_PER, PUBMATIC }
+	PARTNERS_PANEL_INTEGRATION: { ANOMALY_THRESHOLD, ANOMALY_THRESHOLD_IN_PER, PUBMATIC }
 } = require('../../../configs/commonConsts');
 const { PARTNER_NAME, NETWORK_ID, DOMAIN_FIELD_NAME, REVENUE_FIELD } = PUBMATIC;
 const API_ENDPOINT = `http://api.pubmatic.com/v1`;
@@ -146,7 +146,8 @@ const fetchData = sitesData => {
 			// filter out anomalies
 			const anomalies = finalData.filter(
 				item =>
-					item.diffPer <= -ANOMALY_THRESHOLD_IN_PER || item.diffPer >= ANOMALY_THRESHOLD_IN_PER
+					(item.diff <= -ANOMALY_THRESHOLD || item.diff >= ANOMALY_THRESHOLD) &&
+					(item.diffPer <= -ANOMALY_THRESHOLD_IN_PER || item.diffPer >= ANOMALY_THRESHOLD_IN_PER)
 			);
 
 			// if aonmalies found

@@ -235,12 +235,13 @@ const fetchData = sitesData => {
 			let finalData = SovrnPartnerModel.compareAdPushupDataWithPartnersData(adpData);
 
 			const {
-				PARTNERS_PANEL_INTEGRATION: { ANOMALY_THRESHOLD_IN_PER }
+				PARTNERS_PANEL_INTEGRATION: { ANOMALY_THRESHOLD, ANOMALY_THRESHOLD_IN_PER }
 			} = constants;
 			// filter out anomalies
 			const anomalies = finalData.filter(
 				item =>
-					item.diffPer <= -ANOMALY_THRESHOLD_IN_PER || item.diffPer >= ANOMALY_THRESHOLD_IN_PER
+					(item.diff <= -ANOMALY_THRESHOLD || item.diff >= ANOMALY_THRESHOLD) &&
+					(item.diffPer <= -ANOMALY_THRESHOLD_IN_PER || item.diffPer >= ANOMALY_THRESHOLD_IN_PER)
 			);
 			// console.log(JSON.stringify(anomalies, null, 3), 'finalData');
 			console.log(finalData.length, 'finalData length');

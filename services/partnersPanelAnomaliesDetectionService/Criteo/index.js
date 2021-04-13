@@ -7,7 +7,7 @@ const saveAnomaliesToDb = require('../saveAnomaliesToDb');
 const { axiosErrorHandler, partnerModuleErrorHandler } = require('../utils');
 
 const {
-	PARTNERS_PANEL_INTEGRATION: { ANOMALY_THRESHOLD_IN_PER, CRITEO }
+	PARTNERS_PANEL_INTEGRATION: { ANOMALY_THRESHOLD, ANOMALY_THRESHOLD_IN_PER, CRITEO }
 } = require('../../../configs/commonConsts');
 const { PARTNER_NAME, NETWORK_ID, DOMAIN_FIELD_NAME, REVENUE_FIELD } = CRITEO;
 
@@ -81,7 +81,8 @@ const fetchData = async sitesData => {
 			// filter out anomalies
 			const anomalies = finalData.filter(
 				item =>
-					item.diffPer <= -ANOMALY_THRESHOLD_IN_PER || item.diffPer >= ANOMALY_THRESHOLD_IN_PER
+					(item.diff <= -ANOMALY_THRESHOLD || item.diff >= ANOMALY_THRESHOLD) &&
+					(item.diffPer <= -ANOMALY_THRESHOLD_IN_PER || item.diffPer >= ANOMALY_THRESHOLD_IN_PER)
 			);
 
 			// if aonmalies found

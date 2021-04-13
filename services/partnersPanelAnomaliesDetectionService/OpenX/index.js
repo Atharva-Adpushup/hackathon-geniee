@@ -12,7 +12,7 @@ const saveAnomaliesToDb = require('../saveAnomaliesToDb');
 const { axiosErrorHandler, requestErrorHandler, partnerModuleErrorHandler } = require('../utils');
 
 const {
-	PARTNERS_PANEL_INTEGRATION: { ANOMALY_THRESHOLD_IN_PER, OPENX },
+	PARTNERS_PANEL_INTEGRATION: { ANOMALY_THRESHOLD, ANOMALY_THRESHOLD_IN_PER, OPENX },
 	PARTNERS_PANEL_INTEGRATION: { TIMEZONE_OFFSET }
 } = require('../../../configs/commonConsts');
 const { PARTNER_NAME, NETWORK_ID, DOMAIN_FIELD_NAME, REVENUE_FIELD } = OPENX;
@@ -248,7 +248,8 @@ const fetchData = sitesData => {
 			// filter out anomalies
 			const anomalies = finalData.filter(
 				item =>
-					item.diffPer <= -ANOMALY_THRESHOLD_IN_PER || item.diffPer >= ANOMALY_THRESHOLD_IN_PER
+					(item.diff <= -ANOMALY_THRESHOLD || item.diff >= ANOMALY_THRESHOLD) &&
+					(item.diffPer <= -ANOMALY_THRESHOLD_IN_PER || item.diffPer >= ANOMALY_THRESHOLD_IN_PER)
 			);
 
 			// if aonmalies found

@@ -779,6 +779,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		NATIVE: 'apNative'
 	},
 	PARTNERS_PANEL_INTEGRATION: {
+		ANOMALY_THRESHOLD: 10,
 		ANOMALY_THRESHOLD_IN_PER: 5,
 		CRITEO: {
 			PARTNER_NAME: 'Criteo',
@@ -819,6 +820,6 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 				PDT: 8,
 				PST: 7
 			}
-		}	
+		}
 	}
 };

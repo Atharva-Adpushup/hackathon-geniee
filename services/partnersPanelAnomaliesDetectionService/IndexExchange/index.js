@@ -10,7 +10,7 @@ const saveAnomaliesToDb = require('../saveAnomaliesToDb');
 const { axiosErrorHandler, partnerModuleErrorHandler } = require('../utils');
 
 const {
-	PARTNERS_PANEL_INTEGRATION: { ANOMALY_THRESHOLD_IN_PER, INDEX_EXCHANGE }
+	PARTNERS_PANEL_INTEGRATION: { ANOMALY_THRESHOLD, ANOMALY_THRESHOLD_IN_PER, INDEX_EXCHANGE }
 } = require('../../../configs/commonConsts');
 const { PARTNER_NAME, NETWORK_ID, DOMAIN_FIELD_NAME, REVENUE_FIELD } = INDEX_EXCHANGE;
 
@@ -254,7 +254,8 @@ const fetchData = sitesData => {
 			// filter out anomalies
 			const anomalies = finalData.filter(
 				item =>
-					item.diffPer <= -ANOMALY_THRESHOLD_IN_PER || item.diffPer >= ANOMALY_THRESHOLD_IN_PER
+					(item.diff <= -ANOMALY_THRESHOLD || item.diff >= ANOMALY_THRESHOLD) &&
+					(item.diffPer <= -ANOMALY_THRESHOLD_IN_PER || item.diffPer >= ANOMALY_THRESHOLD_IN_PER)
 			);
 
 			// if aonmalies found
