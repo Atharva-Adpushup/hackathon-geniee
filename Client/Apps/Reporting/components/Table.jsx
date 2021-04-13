@@ -360,15 +360,20 @@ class Table extends React.Component {
 						showPaginationBottom={false}
 						onPageSizeChange={onPageSizeChange}
 						onPageChange={onPageChange}
+						defaultSorted={[
+							{
+								id: 'date',
+								desc: false
+							}
+						]}
 						// pivotBy={showAggregation ? ['date'] : []}
-						subTable={subTable}
+						// subTable={subTable}
 					/>
-					{!isSubTable && (
-						<div className="u-margin-t3">
-							<b>*Note:</b> Net Revenue is estimated earnings, finalized earnings may vary depending
-							on deductions from the demand partners.
-						</div>
-					)}
+
+					<div className="u-margin-t3">
+						<b>*Note:</b> Net Revenue is estimated earnings, finalized earnings may vary depending
+						on deductions from the demand partners.
+					</div>
 				</React.Fragment>
 			);
 		return '';
