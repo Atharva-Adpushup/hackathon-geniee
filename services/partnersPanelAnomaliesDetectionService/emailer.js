@@ -22,7 +22,7 @@ const anomaliesMailService = async ({ partner, anomalies }) => {
 			<td> ${siteData.date} </td>
 			<td> ${partner} </td>
 			<td> ${siteData.siteDomain} </td>
-			<td> ${siteData.diffPer} </td> 
+			<td> ${siteData.diffPer.toFixed(2)} </td> 
 			<td> ${siteData.pubRevenue} </td> 
 			<td> ${siteData.adpRevenue} </td>`;
 

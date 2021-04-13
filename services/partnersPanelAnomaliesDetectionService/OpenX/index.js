@@ -248,8 +248,8 @@ const fetchData = sitesData => {
 			// filter out anomalies
 			const anomalies = finalData.filter(
 				item =>
-					(item.diff <= -ANOMALY_THRESHOLD || item.diff >= ANOMALY_THRESHOLD) &&
-					(item.diffPer <= -ANOMALY_THRESHOLD_IN_PER || item.diffPer >= ANOMALY_THRESHOLD_IN_PER)
+					Math.abs(item.diff) >= ANOMALY_THRESHOLD &&
+					Math.abs(item.diffPer) >= ANOMALY_THRESHOLD_IN_PER
 			);
 
 			// if aonmalies found

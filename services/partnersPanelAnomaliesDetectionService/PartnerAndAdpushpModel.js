@@ -157,11 +157,13 @@ const Class = require('../../helpers/class'),
 				// if date is undefined then it means it is not present in ADP data
 				// ignore those values
 				if (mappedData.date) {
-					const diff = +mappedData.pubRevenue - +mappedData.adpRevenue;
-					const total = +mappedData.pubRevenue + +mappedData.adpRevenue;
+					const adpRevenue = +mappedData.adpRevenue;
+					const pubRevenue = +mappedData.pubRevenue;
+					const diff = pubRevenue - adpRevenue;
 					mappedData.diff = diff;
 					// prevent divide by zero
-					mappedData.diffPer = total > 0 ? ((diff / (total / 2)) * 100).toFixed(2) : 0;
+					mappedData.diffPer =
+						adpRevenue > 0 ? ((diff / adpRevenue) * 100) : 100;
 					mappedData.siteDomain = domain;
 					mappedData.date = moment(mappedData.date).format('YYYY-MM-DD');
 					finalData.push(mappedData);
