@@ -26,6 +26,7 @@ const {
 } = CC;
 
 const router = express.Router();
+const { generateEmailTemplate, sendEmail } = require('../helpers/queueMailer');
 
 function pushToCdnOriginQueue(filePath, content) {
 	return helperUtils.publishToRabbitMqQueue(
@@ -269,16 +270,53 @@ router
 			);
 	})
 	.post('/createLog', (req, res) =>
-		checkParams(['data'], req, 'post')
-			.then(() => {
-				const { data } = req.body;
+		checkParams(['data', 'isNotifySupportMail'], req, 'post')
+			.then(async () => {
+				const {
+					data,
+					isNotifySupportMail = false,
+					firstName,
+					lastName,
+					email,
+					isSuperUser,
+					routePath
+				} = req.body;
 				const decodedData = atob(data);
-
-				return logger({
-					source: 'CONSOLE ERROR LOGS',
-					message: 'UNCAUGHT ERROR BOUNDARY',
-					debugData: decodedData
-				});
+				const dateOfError = new Date().toDateString();
+				//do all these things in production only
+				const mailAlertTemplateData = {
+					decodedData,
+					firstName,
+					lastName,
+					email,
+					isSuperUser,
+					dateOfError,
+					routePath
+				};
+				const emailTemplate = await generateEmailTemplate(
+					'views/mail',
+					'consoleCrashAlerts',
+					mailAlertTemplateData
+				);
+				const subjectMessage = `Adpushup console error alerts `;
+				if (isNotifySupportMail) {
+					//here we will send mail to the support
+				} else {
+					//By deafult we are alreday sending mail to the hackers
+					sendEmail({
+						queue: 'MAILER',
+						data: {
+							to: 'amit.gupta@adpushup.com',
+							body: emailTemplate,
+							subject: subjectMessage
+						}
+					});
+					return logger({
+						source: 'CONSOLE ERROR LOGS',
+						message: 'UNCAUGHT ERROR BOUNDARY',
+						debugData: decodedData
+					});
+				}
 			})
 			.then(() =>
 				sendSuccessResponse(
@@ -288,7 +326,7 @@ router
 					res
 				)
 			)
-			.catch(() =>
+			.catch(err =>
 				sendSuccessResponse(
 					{
 						message: `Log Written Failed`

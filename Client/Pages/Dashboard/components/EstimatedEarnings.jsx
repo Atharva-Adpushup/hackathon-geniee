@@ -5,7 +5,7 @@ import { numberWithCommas, roundOffTwoDecimal } from '../helpers/utils';
 function EstimatedEarnings(props) {
 	const { displayData } = props;
 
-	let yesterday = 0;
+	// let yesterday = 0;
 	let sameDayLastWeek = 0;
 	let lastSevenDays = 0;
 	let previousSevenDays = 0;
