@@ -14,8 +14,15 @@ import CustomReactTable from '../../../Components/CustomReactTable/index';
 class Table extends React.Component {
 	constructor(props) {
 		super(props);
-		const { metrics, tableData } = props;
-		const { tableColumns, tableBody } = this.updateTableData(tableData);
+		const { metrics, tableData, subTable, aggregatedData } = props;
+		let { tableColumns, tableBody } = this.updateTableData(tableData);
+		if (subTable) {
+			tableBody = Object.keys(aggregatedData).map(date => {
+				const data = aggregatedData[date][0];
+				data.date = date;
+				return data;
+			});
+		}
 		this.state = {
 			metrics,
 			tableData,
@@ -25,8 +32,7 @@ class Table extends React.Component {
 	}
 
 	componentWillReceiveProps({ tableData: nextTableData }) {
-		const { tableData: currTableData } = this.props;
-
+		const { tableData: currTableData, aggregatedData, subTable } = this.props;
 		if (!isEqual(currTableData, nextTableData)) {
 			const { tableColumns, tableBody } = this.updateTableData(nextTableData);
 			this.setState({ tableData: nextTableData, tableColumns, tableBody });
@@ -303,7 +309,14 @@ class Table extends React.Component {
 
 	render() {
 		const { tableBody, tableColumns, tableData } = this.state;
-		const { isURLReport, onPageSizeChange, onPageChange } = this.props;
+		const {
+			isURLReport,
+			onPageSizeChange,
+			onPageChange,
+			aggregatedData,
+			subTable,
+			isSubTable
+		} = this.props;
 
 		// don't need aggregation for URL Report
 		const showAggregation = !isURLReport ? this.checkForAggregation(tableBody) : false;
@@ -340,15 +353,23 @@ class Table extends React.Component {
 					<CustomReactTable
 						columns={tableColumns}
 						data={tableBody}
-						defaultPageSize={isURLReport ? 150 : 10}
-						pageSizeOptions={isURLReport ? [150] : [10, 20, 30, 40, 50]}
+						defaultPageSize={isURLReport ? 150 : 50}
+						pageSizeOptions={isURLReport ? [150] : [50, 100, 200, 300, 400]}
 						minRows={0}
 						showPaginationTop
 						showPaginationBottom={false}
 						onPageSizeChange={onPageSizeChange}
 						onPageChange={onPageChange}
-						pivotBy={showAggregation ? ['date'] : []}
+						defaultSorted={[
+							{
+								id: 'date',
+								desc: false
+							}
+						]}
+						// pivotBy={showAggregation ? ['date'] : []}
+						// subTable={subTable}
 					/>
+
 					<div className="u-margin-t3">
 						<b>*Note:</b> Net Revenue is estimated earnings, finalized earnings may vary depending
 						on deductions from the demand partners.

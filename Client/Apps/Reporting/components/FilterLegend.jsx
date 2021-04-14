@@ -55,7 +55,6 @@ const FilterLegend = ({ selectedFilters = {}, filtersList = [] }) => {
 		(result, filter) => ({ ...result, [filter.value]: filter.name }),
 		{}
 	);
-
 	return (
 		<div className="filter-legend">
 			{!isFiltersEmpty ? <h4 className="filter-list-title">Selected Filters</h4> : null}
