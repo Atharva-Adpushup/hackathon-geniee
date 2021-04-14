@@ -18,7 +18,8 @@ const CustomReactTable = ({
 	defaultSortMethod,
 	pivotBy,
 	onPageChange,
-	onPageSizeChange
+	onPageSizeChange,
+	subTable
 }) => (
 	<ReactTable
 		columns={columns}
@@ -36,6 +37,7 @@ const CustomReactTable = ({
 		className="u-padding-h3 u-padding-v2 -striped -highlight"
 		onPageChange={onPageChange}
 		onPageSizeChange={onPageSizeChange}
+		SubComponent={subTable || null}
 	>
 		{/* To calculate total number of records present */}
 
