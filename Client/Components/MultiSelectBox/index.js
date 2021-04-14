@@ -4,7 +4,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
 	DropdownButton,
-	MenuItem,
 	Checkbox,
 	Glyphicon,
 	OverlayTrigger,
@@ -12,6 +11,7 @@ import {
 } from '@/Client/helpers/react-bootstrap-imports';
 
 const findSelected = props => {
+	const selectedOption = {};
 	const { selected, title, options } = props;
 	let name = title;
 
@@ -26,7 +26,13 @@ const findSelected = props => {
 		}
 	}
 
-	return { selected, name };
+	selected.map(key => {
+		selectedOption[key] = true;
+		return key;
+	});
+
+	return { selected: [...selected], name, selectedOption: { ...selectedOption } };
+	// return { selected, name };
 };
 
 const SELECT_ALL = {
@@ -45,13 +51,14 @@ class MultiSelectBox extends Component {
 			});
 		}
 		this.state = {
-			selectedOption
+			selectedOption,
+			selectAll: false
 		};
 		this.handleMultiSelect = this.handleMultiSelect.bind(this);
 	}
 
-	static getDerivedStateFromProps(props) {
-		return { ...findSelected(props) };
+	static getDerivedStateFromProps(props, state) {
+		return { ...findSelected(props, state) };
 	}
 
 	// eslint-disable-next-line react/sort-comp
@@ -60,16 +67,15 @@ class MultiSelectBox extends Component {
 		const dataValue = target.getAttribute('data-value');
 		const { onSelect, options } = this.props;
 
-		const { selectedOption } = this.state;
+		let { selectedOption, selectAll } = this.state;
 		const checked = Boolean(e.target.checked);
 
 		// logic for select/deSelect all
 		if (dataValue === SELECT_ALL.value) {
 			options.forEach(option => {
-				selectedOption[option.value] = checked;
-				return option;
+				if (!option.isDisabled) selectedOption[option.value] = checked;
 			});
-			selectedOption[SELECT_ALL.value] = checked;
+			selectAll = !selectAll;
 		} else {
 			options.forEach(option => {
 				if (option.value === dataValue) {
@@ -77,21 +83,17 @@ class MultiSelectBox extends Component {
 				}
 				// to uncheck select all if any of th eoption is unchecked
 				if (!checked) {
-					selectedOption[SELECT_ALL.value] = false;
+					selectAll = false;
 				}
 				return option;
 			});
 		}
 
-		this.setState(
-			{
-				selectedOption: { ...selectedOption }
-			},
-			() => {
-				const selected = Object.keys(selectedOption).filter(key => selectedOption[key]);
-				onSelect(selected);
-			}
-		);
+		const selected = Object.keys(selectedOption).filter(key => selectedOption[key]);
+		onSelect(selected);
+		this.setState({
+			selectAll
+		});
 	}
 
 	selectWrapper = (key, e) => {
@@ -126,7 +128,8 @@ class MultiSelectBox extends Component {
 	};
 
 	render() {
-		const { name, selected, selectedOption, selectedChartKey } = this.state;
+		const { name, selected, selectedOption, selectedChartKey, selectAll } = this.state;
+		let { multiSelectBoxMessage = '', defaultMessage = '' } = this.props;
 		const {
 			//	selected,
 			options,
@@ -137,16 +140,19 @@ class MultiSelectBox extends Component {
 			type,
 			dataKey,
 			reset,
-			pullRight
+			pullRight,
+			isMainReportingPanel
 		} = this.props;
-
 		const count = Object.keys(selectedOption).filter(item => selectedOption[item]).length;
+		if (multiSelectBoxMessage === '') {
+			multiSelectBoxMessage = defaultMessage !== '' ? defaultMessage : `${count} selected`;
+		}
 		const selectedTitle = reset ? (
 			<div
-				className="aligner aligner--hSpaceBetween width-100  aligner--wrap"
-				style={{ width: '100%' }}
+				className="aligner aligner--hSpaceBetween width-100  aligner--wrap reporting_multiselect_fade_out"
+				style={{ width: '100%', overflow: 'hidden' }}
 			>
-				{name}
+				{defaultMessage !== '' ? defaultMessage : name}
 
 				<Glyphicon
 					glyph="remove"
@@ -158,11 +164,12 @@ class MultiSelectBox extends Component {
 				/>
 			</div>
 		) : (
-			`${count} selected`
+			multiSelectBoxMessage
 		);
 
 		const buttonTitle = selectedOption[selectedChartKey] === 0 || selected ? selectedTitle : title;
 		const tooltip = <Tooltip id="tooltip">Please select a chart.</Tooltip>;
+
 		return (
 			<div className={`custom-select-box-wrapper ${wrapperClassName}`}>
 				<DropdownButton
@@ -173,41 +180,59 @@ class MultiSelectBox extends Component {
 					id={id}
 					onSelect={this.selectWrapper}
 				>
-					<div className="checkbox-wrapper" key={`${'select-all'}check`}>
-						<Checkbox
-							className=""
-							data-value={SELECT_ALL.value}
-							data-name={SELECT_ALL.name}
-							data-key={dataKey}
-							onChange={e => {
-								this.handleMultiSelect(e);
-							}}
-							checked={selectedOption[SELECT_ALL.value]}
-						>
-							{SELECT_ALL.label}
-						</Checkbox>
-					</div>
+					{!isMainReportingPanel && (
+						<div className="checkbox-wrapper" key={`${'select-all'}check`}>
+							<Checkbox
+								className={''}
+								data-value={SELECT_ALL.value}
+								data-name={SELECT_ALL.name}
+								data-key={dataKey}
+								onChange={e => {
+									this.handleMultiSelect(e);
+								}}
+								checked={selectAll}
+							>
+								{SELECT_ALL.label}
+							</Checkbox>
+						</div>
+					)}
 
 					{options.map((option, key) => {
+						const checked = selectedOption[option.value] ? true : false;
 						if (option.isDisabled) {
 							return (
-								<OverlayTrigger overlay={tooltip} key={`id-${key}`}>
-									<MenuItem
-										eventKey={`id-${key}`}
-										key={option.value}
-										data-value={option.value}
-										data-name={option.name}
-										data-key={dataKey}
-										active={selectedOption[option.value]}
-										disabled={option.isDisabled}
-									>
-										{option.name}
-									</MenuItem>
-								</OverlayTrigger>
+								<div
+									className={
+										isMainReportingPanel
+											? 'checkbox-wrapper reporting_reportby'
+											: 'checkbox-wrapper'
+									}
+									key={`${option.name}check`}
+								>
+									<OverlayTrigger overlay={tooltip} key={`id-${key}`}>
+										<Checkbox
+											className=""
+											data-value={option.value}
+											data-name={option.name}
+											data-key={dataKey}
+											onChange={e => {
+												this.handleMultiSelect(e);
+											}}
+											disabled
+										>
+											{option.name} {selectedOption[option.value]}
+										</Checkbox>
+									</OverlayTrigger>
+								</div>
 							);
 						}
 						return (
-							<div className="checkbox-wrapper" key={`${option.name}check`}>
+							<div
+								className={
+									isMainReportingPanel ? 'checkbox-wrapper reporting_reportby' : 'checkbox-wrapper'
+								}
+								key={`${option.name}check`}
+							>
 								<Checkbox
 									className=""
 									data-value={option.value}
@@ -216,7 +241,7 @@ class MultiSelectBox extends Component {
 									onChange={e => {
 										this.handleMultiSelect(e);
 									}}
-									checked={selectedOption[option.value]}
+									checked={checked}
 								>
 									{option.name} {selectedOption[option.value]}
 								</Checkbox>

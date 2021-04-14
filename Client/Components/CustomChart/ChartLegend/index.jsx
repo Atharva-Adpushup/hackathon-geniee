@@ -9,7 +9,8 @@ const ChartLegend = ({
 	onLegendChange,
 	availableLegends,
 	isCustomizeChartLegend,
-	updateMetrics
+	updateMetrics,
+	isManageLegendItemsShown = false
 }) => (
 	<div className="text-center chart-legend u-margin-v3">
 		{legends.map((legend, key) => (
@@ -23,7 +24,7 @@ const ChartLegend = ({
 			/>
 		))}
 
-		{isCustomizeChartLegend && !!availableLegends.length && (
+		{isCustomizeChartLegend && !!availableLegends.length && isManageLegendItemsShown && (
 			<ManageLegendItems
 				availableLegends={availableLegends}
 				activeLegends={legends}

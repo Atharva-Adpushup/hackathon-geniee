@@ -72,7 +72,7 @@ class Control extends Component {
 			startDate,
 			endDate,
 			reportType,
-			selectedDimension: selectedDimension || '',
+			selectedDimension: selectedDimension || [],
 			selectedInterval: selectedInterval || '',
 			selectedFilters: selectedFilters || {},
 			disableGenerateButton: false,
@@ -106,15 +106,23 @@ class Control extends Component {
 		this.setState(newState);
 	}
 
-	onReportBySelect = selectedDimension => {
-		const { reportType } = this.props;
-		this.setState({ selectedDimension }, this.onControlChange.bind(null, reportType));
+	onReportBySelect = selectedDimensions => {
+		const { reportType, isHB } = this.props;
+		const updatedSelectedDimension = selectedDimensions
+			? isHB
+				? selectedDimensions
+				: [...selectedDimensions]
+			: [];
+		this.setState(
+			{ selectedDimension: updatedSelectedDimension },
+			this.onControlChange.bind(null, reportType)
+		);
 	};
 
 	onFilteChange = (selectedFilters, selectedFilterValues, selectedFilterKey) => {
 		const { defaultReportType } = this.props;
 		let reportType = defaultReportType || 'account';
-		const { filterList, dimensionList, hbMetricsList, metricsList } = this.props;
+		const { filterList, dimensionList, hbMetricsList, metricsList, selectedDimension } = this.props;
 		const selectedSiteFilters = selectedFilters.siteid || {};
 		if (selectedSiteFilters && Object.keys(selectedSiteFilters).length === 1) {
 			reportType = 'site';
@@ -124,10 +132,11 @@ class Control extends Component {
 			updatedFilterList,
 			updatedDimensionList,
 			updatedMetricsList,
-			updatedChartList
+			updatedChartList,
+			updatedSelectedDimension
 		} = this.updateFilterDimensionList(
 			reportType,
-			defaultReportType,
+			selectedDimension,
 			filterList,
 			metricsList,
 			hbMetricsList,
@@ -141,7 +150,8 @@ class Control extends Component {
 				selectedFilterValues,
 				metricsList: updatedMetricsList,
 				chartList: updatedChartList,
-				reportType
+				reportType,
+				selectedDimension: updatedSelectedDimension
 			},
 			() => this.onControlChange(reportType)
 		);
@@ -202,13 +212,7 @@ class Control extends Component {
 	};
 
 	getSelectedFilter = filter => {
-		const {
-			reportType,
-			defaultReportType,
-			selectedFilters,
-			selectedMetrics,
-			isDemoUser
-		} = this.props;
+		const { reportType, defaultReportType, selectedFilters, isDemoUser } = this.props;
 		let siteIds = [];
 		let isSuperUser = false;
 		const selectedSiteIds = selectedFilters.siteid && Object.keys(selectedFilters.siteid);
@@ -281,7 +285,7 @@ class Control extends Component {
 
 	updateFilterDimensionList = (
 		reportType,
-		defaultReportType,
+		selectedDimension,
 		filterList,
 		metricsList,
 		hbMetricsList,
@@ -293,6 +297,7 @@ class Control extends Component {
 		const updatedMetricsList = JSON.parse(JSON.stringify(metricsList || {}));
 
 		/* eslint-disable no-param-reassign */
+		//Why we have this condition
 		if (reportType === 'account' || reportType === 'global') {
 			updatedFilterList.forEach(fil => {
 				const index = accountFilter.indexOf(fil.value);
@@ -314,7 +319,20 @@ class Control extends Component {
 				dim.isDisabled = false;
 			});
 		}
-		return { updatedFilterList, updatedDimensionList, updatedChartList, updatedMetricsList };
+		const updatedSelectedDimension = selectedDimension.filter(dimension => {
+			for (let i = 0; i < updatedDimensionList.length; i++) {
+				const currentDimension = updatedDimensionList[i];
+				if (currentDimension.value === dimension) return !currentDimension.isDisabled;
+			}
+			return false;
+		});
+		return {
+			updatedFilterList,
+			updatedDimensionList,
+			updatedChartList,
+			updatedMetricsList,
+			updatedSelectedDimension
+		};
 	};
 
 	handleInputChange = e => {
@@ -331,6 +349,7 @@ class Control extends Component {
 					startDate: selectedReport.startDate,
 					endDate: selectedReport.endDate,
 					selectedInterval: selectedReport.selectedInterval,
+					// need to check this
 					selectedDimension: selectedReport.selectedDimension,
 					selectedFilters: cloneDeep(selectedReport.selectedFilters)
 				},
@@ -374,7 +393,8 @@ class Control extends Component {
 			onReportDelete,
 			selectedReportName,
 			updateReportName,
-			isHB
+			isHB,
+			filterList
 		} = this.props;
 
 		const { scheduleOptions: { startDate, endDate, interval } = {}, type: selectedReportType } =
@@ -383,11 +403,32 @@ class Control extends Component {
 		const selectedReportEndDate = endDate;
 		const isUpdating = selectedReport !== null;
 		const isSavedReportsEmpty = savedReports.length === 0;
-		// const { selectedReport } = state;
+		const { selectedDimension = [] } = state;
 		const savedAndFrequentReportOptions = [
 			{ label: 'Saved Reports', value: 'savedReports', options: savedReports },
 			{ label: 'Frequent Reports', value: 'frequentReports', options: frequentReports }
 		];
+		const allSelectedDimensionsNames =
+			(!isHB &&
+				selectedDimension.map((value, index) => {
+					let dimensionName = '';
+					for (let filter of filterList) {
+						if (filter.value === value) {
+							dimensionName = filter.name;
+						}
+					}
+					return dimensionName;
+				})) ||
+			[];
+		let multiSelectBoxMessage = allSelectedDimensionsNames.join(', ');
+		let isFadeout = false;
+		const multiSelectBoxWidth =
+			(document.getElementById('report-by') && document.getElementById('report-by').offsetWidth) ||
+			0;
+		if (multiSelectBoxMessage.length > multiSelectBoxWidth / 8) {
+			isFadeout = true;
+			multiSelectBoxMessage = `${multiSelectBoxMessage.slice(0, multiSelectBoxWidth / 8)}...`;
+		}
 		return (
 			<Fragment>
 				{!isSavedReportsEmpty && (
@@ -408,7 +449,7 @@ class Control extends Component {
 					<div className="aligner-item u-margin-r4">
 						{/* eslint-disable */}
 						<label className="u-text-normal">Report By</label>
-						<SelectBox
+						{/* <SelectBox
 							id="report-by"
 							key="report-by"
 							isClearable={false}
@@ -418,7 +459,38 @@ class Control extends Component {
 							selected={state.selectedDimension}
 							options={state.dimensionList}
 							onSelect={this.onReportBySelect}
-						/>
+						/> */}
+						{!isHB ? (
+							<MultiSelectBox
+								id="report-by"
+								key="report-by"
+								wrapperClassName="custom-select-box-wrapper"
+								isClearable={false}
+								isSearchable={false}
+								isMainReportingPanel={true}
+								selected={state.selectedDimension}
+								options={state.dimensionList || []}
+								isFadeout={isFadeout}
+								multiSelectBoxMessage={multiSelectBoxMessage}
+								onSelect={selectedDimensions => {
+									this.onReportBySelect(selectedDimensions);
+								}}
+								defaultMessage="Select Value"
+							/>
+						) : (
+							<SelectBox
+								id="report-by"
+								key="report-by"
+								isClearable={false}
+								isSearchable={false}
+								wrapperClassName="custom-select-box-wrapper"
+								reset={true}
+								selected={state.selectedDimension}
+								options={state.dimensionList}
+								onSelect={this.onReportBySelect}
+							/>
+						)}
+
 						{/* eslint-enable */}
 					</div>
 
@@ -447,15 +519,24 @@ class Control extends Component {
 							startDate={state.startDate}
 							endDate={state.endDate}
 							datesUpdated={({ startDate, endDate }) => {
-								if(isHB) {
-									const dateDiff = moment(endDate).diff(startDate, 'days')
-									if(!isNaN(dateDiff) && dateDiff <= 30) {
-										this.setState({ startDate, endDate }, this.onControlChange.bind(null, reportType))
+								if (isHB) {
+									const dateDiff = moment(endDate).diff(startDate, 'days');
+									if (!isNaN(dateDiff) && dateDiff <= 30) {
+										this.setState(
+											{ startDate, endDate },
+											this.onControlChange.bind(null, reportType)
+										);
 									} else {
-										this.setState({ startDate, endDate: '' }, this.onControlChange.bind(null, reportType))
+										this.setState(
+											{ startDate, endDate: '' },
+											this.onControlChange.bind(null, reportType)
+										);
 									}
 								} else {
-									this.setState({ startDate, endDate }, this.onControlChange.bind(null, reportType))
+									this.setState(
+										{ startDate, endDate },
+										this.onControlChange.bind(null, reportType)
+									);
 								}
 							}}
 							/*

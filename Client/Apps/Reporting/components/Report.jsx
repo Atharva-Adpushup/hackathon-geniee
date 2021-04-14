@@ -56,7 +56,7 @@ class Report extends Component {
 			filterList: [],
 			intervalList: [],
 			metricsList: props.isForOps ? displayOpsMetrics : displayMetrics,
-			selectedDimension: '',
+			selectedDimension: [],
 			selectedFilters: {},
 			selectedFilterValues: {},
 			selectedMetrics: [],
@@ -86,7 +86,8 @@ class Report extends Component {
 			apiLoadTimeStartedAt: null,
 			getCustomStatResponseStatus: 'failed',
 			lastReportQuery: { initalQuery: true },
-			apiFinalResponseTime: null
+			apiFinalResponseTime: null,
+			dataFetchedDimension: []
 		};
 	}
 
@@ -280,20 +281,21 @@ class Report extends Component {
 	};
 
 	getControlChangedParams = (controlParams, metricsList) => {
-		const { selectedDimension, selectedFilters, reportType } = controlParams;
+		const { selectedDimension = [], selectedFilters, reportType } = controlParams;
 		const { reportsMeta } = this.props;
 		const { dimension: dimensionList, filter: filterList } = reportsMeta.data;
 		let disabledFilter = [];
 		let disabledDimension = [];
 		let disabledMetrics = [];
-		const dimensionObj = dimensionList[selectedDimension];
+		for (const dimension of selectedDimension) {
+			const dimensionObj = dimensionList[dimension];
 
-		if (dimensionObj) {
-			disabledFilter = dimensionObj.disabled_filter || disabledFilter;
-			disabledDimension = dimensionObj.disabled_dimension || disabledDimension;
-			disabledMetrics = dimensionObj.disabled_metrics || disabledMetrics;
+			if (dimensionObj) {
+				disabledFilter = dimensionObj.disabled_filter || disabledFilter;
+				disabledDimension = dimensionObj.disabled_dimension || disabledDimension;
+				disabledMetrics = dimensionObj.disabled_metrics || disabledMetrics;
+			}
 		}
-
 		Object.keys(selectedFilters).forEach(selectedFilter => {
 			const filterObj = filterList[selectedFilter];
 			if (filterObj && !isEmpty(selectedFilters[selectedFilter])) {
@@ -345,7 +347,7 @@ class Report extends Component {
 			fromDate: moment(startDate).format('YYYY-MM-DD'),
 			toDate: moment(endDate).format('YYYY-MM-DD'),
 			interval: selectedInterval,
-			dimension: selectedDimension || null
+			dimension: selectedDimension.join(',') || null
 		};
 
 		if (!isCustomizeChartLegend) {
@@ -424,8 +426,8 @@ class Report extends Component {
 						this.setState({ getCustomStatResponseStatus: 'success' });
 
 						const shouldAddAdpushupCountPercentColumn =
-							(selectedDimension === 'mode' ||
-								selectedDimension === 'error_code' ||
+							(selectedDimension.includes('mode') ||
+								selectedDimension.includes('error_code') ||
 								selectedFilters.mode ||
 								selectedFilters.error_code) &&
 							tableData.columns.indexOf('adpushup_count') !== -1;
@@ -527,7 +529,8 @@ class Report extends Component {
 						isLoading: false,
 						isError: false,
 						tableData,
-						selectedFilterValues
+						selectedFilterValues,
+						dataFetchedDimension: selectedDimension
 					};
 					this.setState(newState);
 				})
@@ -759,8 +762,8 @@ class Report extends Component {
 		}
 
 		if (Object.keys(selectedControls).length > 0) {
-			const { dimension, interval, fromDate, toDate, chartLegendMetric } = selectedControls;
-			selectedDimension = dimension;
+			const { dimension = '', interval, fromDate, toDate, chartLegendMetric } = selectedControls;
+			selectedDimension = dimension.split(',');
 			selectedInterval = interval || 'daily';
 			selectedChartLegendMetric = chartLegendMetric;
 			startDate = fromDate;
@@ -798,14 +801,7 @@ class Report extends Component {
 		);
 	};
 
-	getAllAvailableMetrics = (
-		isCustomizeChartLegend,
-		reportsMeta,
-		selectedDimension,
-		selectedFilters,
-		reportType,
-		tableData
-	) => {
+	getAllAvailableMetrics = (isCustomizeChartLegend, reportsMeta, tableData) => {
 		let allAvailableMetrics = [];
 		if (
 			isCustomizeChartLegend &&
@@ -1110,7 +1106,7 @@ class Report extends Component {
 			name: reportName,
 			startDate,
 			endDate,
-			selectedDimension,
+			selectedDimension: selectedDimension.join(','),
 			selectedFilters: filters,
 			selectedInterval,
 			scheduleOptions
@@ -1256,7 +1252,8 @@ class Report extends Component {
 			savedReports,
 			frequentReports,
 			selectedReport,
-			selectedReportName
+			selectedReportName,
+			dataFetchedDimension
 		} = this.state;
 		const {
 			reportsMeta,
@@ -1272,9 +1269,6 @@ class Report extends Component {
 		let allAvailableMetrics = this.getAllAvailableMetrics(
 			isCustomizeChartLegend,
 			reportsMeta,
-			selectedDimension,
-			selectedFilters,
-			reportType,
 			tableData
 		);
 
@@ -1320,7 +1314,6 @@ class Report extends Component {
 				dimensionList
 			);
 		}
-
 		return (
 			<Row>
 				<Col sm={12}>
@@ -1360,22 +1353,45 @@ class Report extends Component {
 				<Col sm={12}>
 					<FilterLegend selectedFilters={selectedFilterValues} filtersList={filterList} />
 				</Col>
-				<Col sm={12} className="u-margin-t5">
-					<ChartContainer
-						tableData={tableData}
-						selectedDimension={selectedDimension}
-						startDate={startDate}
-						endDate={endDate}
-						metricsList={metricsList}
-						allAvailableMetrics={allAvailableMetrics}
-						reportType={reportType}
-						isForOps={isForOps}
-						isCustomizeChartLegend={isCustomizeChartLegend}
-						updateMetrics={this.updateMetrics}
-						selectedInterval={selectedInterval}
-						selectedChartLegendMetric={selectedChartLegendMetric}
-					/>
-				</Col>
+				{(dataFetchedDimension.length > 0 &&
+					dataFetchedDimension.map((dimension, index) => (
+						<Col sm={12} className="u-margin-t5 u-margin-b5">
+							<ChartContainer
+								tableData={tableData}
+								selectedDimension={dimension}
+								startDate={startDate}
+								endDate={endDate}
+								metricsList={metricsList}
+								allAvailableMetrics={allAvailableMetrics}
+								reportType={reportType}
+								isForOps={isForOps}
+								index={index}
+								isCustomizeChartLegend={isCustomizeChartLegend}
+								updateMetrics={this.updateMetrics}
+								selectedInterval={selectedInterval}
+								selectedChartLegendMetric={selectedChartLegendMetric}
+							/>
+						</Col>
+					))) || (
+					<Col sm={12} className="u-margin-t5">
+						<ChartContainer
+							tableData={tableData}
+							selectedDimension={''}
+							startDate={startDate}
+							endDate={endDate}
+							metricsList={metricsList}
+							allAvailableMetrics={allAvailableMetrics}
+							reportType={reportType}
+							isForOps={isForOps}
+							isCustomizeChartLegend={isCustomizeChartLegend}
+							updateMetrics={this.updateMetrics}
+							selectedInterval={selectedInterval}
+							selectedChartLegendMetric={selectedChartLegendMetric}
+							index={0}
+						/>
+					</Col>
+				)}
+
 				<Col sm={12} className="u-margin-t5 u-margin-b4">
 					<TableContainer
 						tableData={selectedMetricsTableData}
@@ -1388,7 +1404,10 @@ class Report extends Component {
 						reportType={reportType}
 						defaultReportType={defaultReportType}
 						isForOps={isForOps}
+						onPageChange={this.onPageChange}
+						showPaginationTop={false}
 					/>
+					{/* )} */}
 				</Col>
 			</Row>
 		);
