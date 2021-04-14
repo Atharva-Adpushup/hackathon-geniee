@@ -76,7 +76,8 @@ const getAdConfig = (adType, section) => {
 		fluid,
 		sizeMapping,
 		downwardSizesDisabled,
-		sizeFilters
+		sizeFilters,
+		collapseUnfilled
 	} = ad;
 
 	const { name: sectionName, id, formatData } = section;
@@ -89,9 +90,10 @@ const getAdConfig = (adType, section) => {
 		height: isResponsive ? height : parseInt(height, 10),
 		width: isResponsive ? width : parseInt(width, 10),
 		formatData,
-		fluid: fluid === true,
+		fluid: collapseUnfilled ? true : fluid === true,
 		sizeMapping,
-		downwardSizesDisabled: !!downwardSizesDisabled
+		downwardSizesDisabled: !!downwardSizesDisabled,
+		collapseUnfilled: !!collapseUnfilled
 	};
 
 	// Add 'multipleAdSizes' property if exists
