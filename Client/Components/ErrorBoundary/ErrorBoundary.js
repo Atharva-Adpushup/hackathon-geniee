@@ -15,13 +15,33 @@ class ErrorBoundary extends React.Component {
 		return { hasError: true };
 	}
 
-	sendErrorLog(type) {}
+	showOrHideModal = status => () => {
+		this.setState({ isModalShown: status });
+	};
 
-	componentDidCatch(err, info) {
+	sendErrorLog = (type, userInput) => {
 		const { firstName, lastName, email, isSuperUser = false } = this.props;
 		const {
 			location: { pathname: routePath }
 		} = history;
+		const { errorInfo } = this.state;
+		return axiosInstance
+			.post('/data/createLog', {
+				data: errorInfo,
+				isNotifySupportMail: false,
+				firstName,
+				lastName,
+				email,
+				isSuperUser,
+				routePath,
+				type,
+				userInput
+			})
+			.then(() => console.log('Log Written'))
+			.catch(error => console.log(`Log written failed : ${error}`));
+	};
+
+	componentDidCatch(err, info) {
 		console.log(err, info);
 		let data = '';
 		info.message = err.message;
@@ -35,37 +55,23 @@ class ErrorBoundary extends React.Component {
 			console.log('Data encoding failed');
 			return false;
 		}
-		console.log(window.atob(data));
-		this.setState({ errorInfo: data });
-		//we will move this logic to when popup renders
-		// return axiosInstance
-		// 	.post('/data/createLog', {
-		// 		data,
-		// 		isNotifySupportMail: false,
-		// 		firstName,
-		// 		lastName,
-		// 		email,
-		// 		isSuperUser,
-		// 		routePath
-		// 	})
-		// 	.then(() => console.log('Log Written'))
-		// 	.catch(error => console.log(`Log written failed : ${error}`));
+		return this.setState({ errorInfo: data }, () => this.sendErrorLog('default'));
 	}
-
-	showOrHideModal = status => () => {
-		this.setState({ isModalShown: status });
-	};
 
 	render() {
 		const { hasError, isModalShown } = this.state;
 		const { children } = this.props;
-		const { showOrHideModal } = this;
+		const { showOrHideModal, sendErrorLog } = this;
 		if (hasError) {
 			return (
 				<div style={{ textAlign: 'center' }}>
 					<CustomError />
 					{isModalShown ? (
-						<UserInteractionModal isModalShown={isModalShown} showOrHideModal={showOrHideModal} />
+						<UserInteractionModal
+							isModalShown={isModalShown}
+							showOrHideModal={showOrHideModal}
+							sendErrorLog={sendErrorLog}
+						/>
 					) : (
 						<p style={{ marginTop: '20px', fontSize: '16px' }}>
 							If you wish to report the issue, please{' '}

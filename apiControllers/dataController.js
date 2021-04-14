@@ -274,12 +274,13 @@ router
 			.then(async () => {
 				const {
 					data,
-					isNotifySupportMail = false,
 					firstName,
 					lastName,
 					email,
 					isSuperUser,
-					routePath
+					routePath,
+					type,
+					userInput = ''
 				} = req.body;
 				const decodedData = atob(data);
 				const dateOfError = new Date().toDateString();
@@ -291,7 +292,8 @@ router
 					email,
 					isSuperUser,
 					dateOfError,
-					routePath
+					routePath,
+					userInput
 				};
 				const emailTemplate = await generateEmailTemplate(
 					'views/mail',
@@ -299,9 +301,17 @@ router
 					mailAlertTemplateData
 				);
 				const subjectMessage = `Adpushup console error alerts `;
-				if (isNotifySupportMail) {
+				if (type === 'UserInteraction') {
 					//here we will send mail to the support
-				} else {
+					sendEmail({
+						queue: 'MAILER',
+						data: {
+							to: 'amit.gupta@adpushup.com',
+							body: emailTemplate,
+							subject: subjectMessage
+						}
+					});
+				} else if (type === 'default') {
 					//By deafult we are alreday sending mail to the hackers
 					sendEmail({
 						queue: 'MAILER',
