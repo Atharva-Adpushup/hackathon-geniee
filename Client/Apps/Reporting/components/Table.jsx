@@ -315,7 +315,8 @@ class Table extends React.Component {
 			onPageChange,
 			aggregatedData,
 			subTable,
-			isSubTable
+			isSubTable,
+			selectedDimension
 		} = this.props;
 
 		// don't need aggregation for URL Report
@@ -366,7 +367,7 @@ class Table extends React.Component {
 								desc: false
 							}
 						]}
-						// pivotBy={showAggregation ? ['date'] : []}
+						pivotBy={selectedDimension.length === 1 && showAggregation ? ['date'] : []}
 						// subTable={subTable}
 					/>
 
