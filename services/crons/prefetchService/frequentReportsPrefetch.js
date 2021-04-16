@@ -210,7 +210,7 @@ const cacheReports = async logs => {
 const savedCachedLogsInCb = async cachedLogs => {
 	return promisePool
 		.for(cachedLogs)
-		.withConcurrency(5)
+		.withConcurrency(1)
 		.handleError((err, config) => {
 			console.log({ err, config });
 		})
