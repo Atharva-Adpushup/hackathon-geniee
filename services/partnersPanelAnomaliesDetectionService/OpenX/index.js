@@ -25,7 +25,7 @@ const OAUTH_ENDPOINT_TOKEN = `https://sso.openx.com/api/index/token`;
 
 const AUTH_PARAMS = {
 	EMAIL: 'sharad.yadav@adpushup.com',
-	PASSWORD: 'L@y58vfThW'
+	PASSWORD: '=Xe/v9ZYrj9q:cK2'
 };
 
 const CONSUMER = {
@@ -44,20 +44,25 @@ const oauth = OAuth({
 	}
 });
 
-const OFFSET = process.env.NODE_ENV === 'production' ? TIMEZONE_OFFSET.PRODUCTION : TIMEZONE_OFFSET.STAGING;
+const OFFSET =
+	process.env.NODE_ENV === 'production' ? TIMEZONE_OFFSET.PRODUCTION : TIMEZONE_OFFSET.STAGING;
 let fromDateOpenX = moment().subtract(2, 'days');
 let zoneFromDate = moment.tz.zone('America/Los_Angeles').abbr(fromDateOpenX);
-fromDateOpenX = fromDateOpenX.set({
-	hour: zoneFromDate === 'PDT'? OFFSET.PDT : OFFSET.PST,
-	minute:30
-}).format('YYYY-MM-DDTHH:MM:00Z');
+fromDateOpenX = fromDateOpenX
+	.set({
+		hour: zoneFromDate === 'PDT' ? OFFSET.PDT : OFFSET.PST,
+		minute: 30
+	})
+	.format('YYYY-MM-DDTHH:MM:00Z');
 
 let toDateOpenX = moment().subtract(1, 'days');
 let zoneToDate = moment.tz.zone('America/Los_Angeles').abbr(toDateOpenX);
-toDateOpenX = toDateOpenX.set({
-	hour: zoneToDate === 'PDT'? OFFSET.PDT : OFFSET.PST,
-	minute:30
-}).format('YYYY-MM-DDTHH:MM:00Z');
+toDateOpenX = toDateOpenX
+	.set({
+		hour: zoneToDate === 'PDT' ? OFFSET.PDT : OFFSET.PST,
+		minute: 30
+	})
+	.format('YYYY-MM-DDTHH:MM:00Z');
 
 const fromDate = moment()
 	.subtract(2, 'days')
@@ -248,7 +253,8 @@ const fetchData = sitesData => {
 			// filter out anomalies
 			const anomalies = finalData.filter(
 				item =>
-					Math.abs(item.diff) >= ANOMALY_THRESHOLD &&
+					(Math.abs(item.adpRevenue) >= ANOMALY_THRESHOLD ||
+						Math.abs(item.pubRevenue) >= ANOMALY_THRESHOLD) &&
 					Math.abs(item.diffPer) >= ANOMALY_THRESHOLD_IN_PER
 			);
 
