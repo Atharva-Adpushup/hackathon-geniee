@@ -300,13 +300,13 @@ router
 					'consoleCrashAlerts',
 					mailAlertTemplateData
 				);
-				const subjectMessage = `Adpushup console error alerts `;
+				const subjectMessage = `Client Bug Report`;
 				if (type === 'UserInteraction') {
 					//here we will send mail to the support
 					sendEmail({
 						queue: 'MAILER',
 						data: {
-							to: 'amit.gupta@adpushup.com',
+							to: config.consoleErrorAlerts.supportMail,
 							body: emailTemplate,
 							subject: subjectMessage
 						}
@@ -316,7 +316,7 @@ router
 					sendEmail({
 						queue: 'MAILER',
 						data: {
-							to: 'amit.gupta@adpushup.com',
+							to: config.consoleErrorAlerts.hackersMail,
 							body: emailTemplate,
 							subject: subjectMessage
 						}

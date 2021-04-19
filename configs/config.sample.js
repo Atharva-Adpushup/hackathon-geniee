@@ -268,7 +268,11 @@ module.exports = {
 		highchartsServer: '',
 		highchartsServerPort: 7801
 	},
-	prefetchBlockedSites: ['41319']
+	prefetchBlockedSites: ['41319'],
+	consoleErrorAlerts: {
+		supportMail: 'support@adpushup.com',
+		hackersMail: 'hackers@adpushup.com'
+	}
 };
 
 /*
