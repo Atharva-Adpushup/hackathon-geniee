@@ -272,7 +272,8 @@ module.exports = {
 	consoleErrorAlerts: {
 		supportMail: 'support@adpushup.com',
 		hackersMail: 'hackers@adpushup.com'
-	}
+	},
+	mailerQueueUrl: 'https://queuepublisher.adpushup.com/publish'
 };
 
 /*
