@@ -31,7 +31,7 @@ const UserInteractionModal = ({ isModalShown, showOrHideModal, sendErrorLog }) =
 					name="user-feedback"
 					value={userInput}
 					onChange={handleChange}
-					placeholder="Enter feedback for this crash"
+					placeholder="Provide details of the error"
 					style={{ width: '100%' }}
 					rows={10}
 					className="user-error-feedback"
@@ -40,7 +40,7 @@ const UserInteractionModal = ({ isModalShown, showOrHideModal, sendErrorLog }) =
 			<Modal.Footer>
 				<Button onClick={showOrHideModal(false)}>Close</Button>
 				<Button variant="primary" onClick={sendErrorReport}>
-					Provide details of the error
+					Send Error Report
 				</Button>
 			</Modal.Footer>
 		</Modal>
