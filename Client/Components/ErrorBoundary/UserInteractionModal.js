@@ -23,7 +23,7 @@ const UserInteractionModal = ({ isModalShown, showOrHideModal, sendErrorLog }) =
 		>
 			<Modal.Header closeButton>
 				<Modal.Title id="contained-modal-title-vcenter">
-					Send error log reports to adpushup
+					Please provide the details of the issue you are facing
 				</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
@@ -40,7 +40,7 @@ const UserInteractionModal = ({ isModalShown, showOrHideModal, sendErrorLog }) =
 			<Modal.Footer>
 				<Button onClick={showOrHideModal(false)}>Close</Button>
 				<Button variant="primary" onClick={sendErrorReport}>
-					Send Error Report
+					Provide details of the error
 				</Button>
 			</Modal.Footer>
 		</Modal>
