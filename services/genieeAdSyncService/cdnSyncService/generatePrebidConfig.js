@@ -69,6 +69,11 @@ const generatePrebidConfig = siteId => {
 				if (biddersFromNetworkTree[bidderCode].alias) {
 					activeUsedBidders[bidderCode].alias = biddersFromNetworkTree[bidderCode].alias;
 				}
+
+				// Remove ampConfig from adpushup.js
+				if (usedBidders[bidderCode].ampConfig) {
+					delete usedBidders[bidderCode].ampConfig;
+				}
 			}
 		}
 

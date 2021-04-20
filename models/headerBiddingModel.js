@@ -14,7 +14,8 @@ const {
 	docKeys,
 	hbGlobalSettingDefaults,
 	amazonUAMConfigDefaults,
-	FORMAT_WISE_PARAMS_PREFIX
+	FORMAT_WISE_PARAMS_PREFIX,
+	FORMAT_WISE_PARAMS_REGEX
 } = require('../configs/commonConsts');
 const dfpLineItemAutomationReqBody = require('../configs/dfpLineItemAutomationReqBody');
 const config = require('../configs/config');
@@ -1316,6 +1317,38 @@ function apiModule() {
 					// 	json: true
 					// });
 				});
+		},
+		removeFormatWiseParamsForAMP: function(accumulator, key, config) {
+			let matchedKey = key.match(FORMAT_WISE_PARAMS_REGEX);
+			// Only allow banner params in AMP
+			if (matchedKey && matchedKey[1] === FORMAT_WISE_PARAMS_PREFIX.BANNER) {
+				let newKey = matchedKey[2];
+				accumulator[newKey] = config[key];
+			}
+			if (matchedKey && matchedKey[1] !== FORMAT_WISE_PARAMS_PREFIX.BANNER) {
+				return accumulator;
+			}
+			if (!matchedKey) {
+				accumulator[key] = config[key];
+			}
+			return accumulator;
+		},
+		createBidderAmpConfig: function(bidderConfig) {
+			const { config, sizeLess } = bidderConfig;
+			let ampConfig;
+			if (sizeLess) {
+				ampConfig = Object.keys(config).reduce((accumulator, key) => {
+					return this.removeFormatWiseParamsForAMP(accumulator, key, config);
+				}, {});
+			} else {
+				ampConfig = {};
+				for (size in config) {
+					ampConfig[size] = Object.keys(config[size]).reduce((accumulator, key) => {
+						return this.removeFormatWiseParamsForAMP(accumulator, key, config[size]);
+					}, {});
+				}
+			}
+			return ampConfig;
 		}
 	};
 
