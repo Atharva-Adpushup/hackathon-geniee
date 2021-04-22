@@ -5,27 +5,16 @@ import omit from 'lodash/omit';
 import groupBy from 'lodash/groupBy';
 import { Row, Col } from '@/Client/helpers/react-bootstrap-imports';
 import moment from 'moment';
-import qs from 'querystringify';
-import isEmpty from 'lodash/isEmpty';
-import union from 'lodash/union';
 import sortBy from 'lodash/sortBy';
 import Empty from '../../../../Components/Empty/index';
 
 import TableContainer from '../../containers/TableContainer';
 import reportService from '../../../../services/reportService';
-import { DEMO_ACCOUNT_DATA } from '../../../../constants/others';
 import Loader from '../../../../Components/Loader';
-import { convertObjToArr, roundOffTwoDecimal } from '../../helpers/utils';
-import {
-	getReportingDemoUserValidation,
-	getReportingDemoUserSiteIds,
-	getDemoUserSites
-} from '../../../../helpers/commonFunctions';
+import { roundOffTwoDecimal } from '../../helpers/utils';
 import {
 	displayUniqueImpressionMetrics,
 	displayOpsMetricsForXPath,
-	opsDimension,
-	opsFilter,
 	REPORT_INTERVAL_TABLE_KEYS,
 	columnsBlacklistedForAddition,
 	DEFAULT_ERROR_MESSAGE
@@ -50,7 +39,6 @@ class XPathAndAPImpressions extends Component {
 			selectedFilters,
 			selectedFilterValues: {},
 			selectedInterval,
-			selectedChartLegendMetric: '',
 			startDate,
 			endDate,
 			reportType: props.reportType || 'account',
