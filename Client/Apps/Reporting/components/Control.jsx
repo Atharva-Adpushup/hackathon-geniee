@@ -364,11 +364,16 @@ class Control extends Component {
 				}
 			);
 		} else if (action === 'clear') {
-			const { startDate, endDate } = this.props || {};
 			this.setState(
 				{
-					startDate,
-					endDate,
+					startDate: moment()
+						.startOf('day')
+						.subtract(7, 'days')
+						.format('YYYY-MM-DD'),
+					endDate: moment()
+						.startOf('day')
+						.subtract(1, 'day')
+						.format('YYYY-MM-DD'),
 					selectedInterval: 'daily',
 					selectedDimension: [],
 					selectedFilters: {}
