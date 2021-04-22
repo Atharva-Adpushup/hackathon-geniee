@@ -226,6 +226,17 @@ const reportsService = {
 		if (reportsResponse.code !== 1) throw new AdPushupError(reportsResponse);
 		return reportsResponse.data;
 	},
+	fetchReportAPCustomStatXPath: async reportConfig => {
+		const reportsResponse = await request({
+			uri: `https://staging.adpushup.com/CentralReportingWebService/${CC.REPORT_PATH_XPATH}`,
+			json: true,
+            qs: reportConfig,
+            timeout: 600000 //10 mins
+		});
+
+		if (reportsResponse.code !== 1) throw new AdPushupError(reportsResponse);
+		return reportsResponse.data;
+	},
 	fetchSessionData: async reportConfig => {
 		const sessionRpmReportsResponse = await request({
 			uri: `${CC.SESSION_RPM_REPORTS_API}`,
@@ -262,6 +273,12 @@ const reportsService = {
 			.then(reports =>
 				reportsService.fetchAndMergeSessionData(reportConfig, reports, reportConfig.isSuperUser)
 			),
+	getReportAPCustomStatXPath: async reportConfig =>
+		ObjectValidator(getCustomStatsValidations, reportConfig)
+			.then(() => reportsService.modifyQueryIfPnp(reportConfig))
+			.then(config => 
+				reportsService.fetchReportAPCustomStatXPath(config)
+			),
 	getWidgetData: async (path, params) =>
 		ObjectValidator(getWidgetDataValidations, { path, params })
 			.then(() =>
@@ -288,6 +305,18 @@ const reportsService = {
 				{ cacheKey: JSON.stringify(sortedConfig), bypassCache, cacheExpiry: 4 * 3600 },
 				async () => reportsService.getReports(reportConfig)
 			);
+		});
+	},
+	getReportsAPCustomStatXPathWithCache: async (reportConfig, bypassCache = false) => {
+		const sortedConfig = sortObjectEntries(reportConfig);
+		return ObjectValidator(getCustomStatsValidations, sortedConfig)
+		.then(() => {
+			// added a prefix 'xPath-' to cacheKey to make it unique for xPath 
+			// because reportConfig is same for General Report and xPath report
+			return cacheWrapper(
+				{ cacheKey: 'xPath-' + JSON.stringify(sortedConfig), bypassCache, cacheExpiry: 24 * 3600 },
+				async () => reportsService.getReportAPCustomStatXPath(reportConfig)
+			)
 		});
 	},
 	getReportingMetaDataWithCache: async (sites, isSuperUser, bypassCache = false) => {
