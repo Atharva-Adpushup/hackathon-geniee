@@ -297,7 +297,7 @@ class Control extends Component {
 		const updatedMetricsList = JSON.parse(JSON.stringify(metricsList || {}));
 
 		/* eslint-disable no-param-reassign */
-		//Why we have this condition
+		// Why we have this condition
 		if (reportType === 'account' || reportType === 'global') {
 			updatedFilterList.forEach(fil => {
 				const index = accountFilter.indexOf(fil.value);
@@ -350,7 +350,12 @@ class Control extends Component {
 					endDate: selectedReport.endDate,
 					selectedInterval: selectedReport.selectedInterval,
 					// need to check this
-					selectedDimension: selectedReport.selectedDimension,
+					// Saved Report may have dimension saved as string instead of Array
+					selectedDimension:
+						selectedReport.selectedDimension instanceof Array
+							? selectedReport.selectedDimension
+							: [selectedReport.selectedDimension] || [],
+					// selectedDimension: selectedReport.selectedDimension,
 					selectedFilters: cloneDeep(selectedReport.selectedFilters)
 				},
 				() => {
@@ -365,7 +370,7 @@ class Control extends Component {
 					startDate,
 					endDate,
 					selectedInterval: 'daily',
-					selectedDimension: '',
+					selectedDimension: [],
 					selectedFilters: {}
 				},
 				() => this.onControlChange(reportType, true)
@@ -412,7 +417,7 @@ class Control extends Component {
 			(!isHB &&
 				selectedDimension.map((value, index) => {
 					let dimensionName = '';
-					for (let filter of filterList) {
+					for (const filter of filterList) {
 						if (filter.value === value) {
 							dimensionName = filter.name;
 						}
