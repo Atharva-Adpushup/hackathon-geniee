@@ -319,13 +319,16 @@ class Control extends Component {
 				dim.isDisabled = false;
 			});
 		}
-		const updatedSelectedDimension = selectedDimension.filter(dimension => {
-			for (let i = 0; i < updatedDimensionList.length; i++) {
-				const currentDimension = updatedDimensionList[i];
-				if (currentDimension.value === dimension) return !currentDimension.isDisabled;
-			}
-			return false;
-		});
+		const { isHB } = this.props;
+		const updatedSelectedDimension = isHB
+			? selectedDimension
+			: selectedDimension.filter(dimension => {
+					for (let i = 0; i < updatedDimensionList.length; i++) {
+						const currentDimension = updatedDimensionList[i];
+						if (currentDimension.value === dimension) return !currentDimension.isDisabled;
+					}
+					return false;
+			  });
 		return {
 			updatedFilterList,
 			updatedDimensionList,
