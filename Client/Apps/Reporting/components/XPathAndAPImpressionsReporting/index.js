@@ -5,7 +5,6 @@ import omit from 'lodash/omit';
 import groupBy from 'lodash/groupBy';
 import { Row, Col } from '@/Client/helpers/react-bootstrap-imports';
 import moment from 'moment';
-import sortBy from 'lodash/sortBy';
 import Empty from '../../../../Components/Empty/index';
 
 import TableContainer from '../../containers/TableContainer';
@@ -13,7 +12,6 @@ import reportService from '../../../../services/reportService';
 import Loader from '../../../../Components/Loader';
 import { roundOffTwoDecimal } from '../../helpers/utils';
 import {
-	displayUniqueImpressionMetrics,
 	displayOpsMetricsForXPath,
 	REPORT_INTERVAL_TABLE_KEYS,
 	columnsBlacklistedForAddition,
@@ -37,7 +35,6 @@ class XPathAndAPImpressions extends Component {
 			metricsList: displayOpsMetricsForXPath,
 			selectedDimension,
 			selectedFilters,
-			selectedFilterValues: {},
 			selectedInterval,
 			startDate,
 			endDate,
@@ -51,7 +48,7 @@ class XPathAndAPImpressions extends Component {
 	}
 
 	componentDidMount() {
-		return this.generateButtonHandler();
+		return this.generateXPathReporting();
 	}
 
 	handleError = err => {
@@ -67,7 +64,7 @@ class XPathAndAPImpressions extends Component {
 		this.setState({ isLoading: false, isError: true, errorMessage });
 	};
 
-	generateButtonHandler = (inputState = {}) => {
+	generateXPathReporting = (inputState = {}) => {
 		if (Object.keys(inputState).length) {
 			const {
 				reportType,
@@ -90,11 +87,10 @@ class XPathAndAPImpressions extends Component {
 			MixpanelHelper.trackEvent('Reports', properties);
 		}
 
-		let { tableData = { result: [], columns: [] }, metricsList, selectedFilterValues } = this.state;
+		let { tableData = { result: [], columns: [] } } = this.state;
 		const { selectedDimension, selectedFilters, dimensionList } = this.state;
 		const { reportType, XPATHParams, isForOps } = this.props;
 		const computedState = Object.assign({ isLoading: true }, inputState);
-		const prevMetricsList = metricsList;
 
 		this.setState(computedState, () => {
 			let newState = {};
@@ -193,108 +189,18 @@ class XPathAndAPImpressions extends Component {
 						Object.keys(tableData.total).forEach(column => {
 							tableData.total[column] = parseFloat(roundOffTwoDecimal(tableData.total[column]));
 						});
-
-						if (tableData.columns && tableData.columns.length) {
-							metricsList = this.getMetricsList(tableData);
-							// we need to persist user column selection when user
-							// generates report multiple times.
-							// for that we will check users previous selection, if it
-							// is different from default list override default wit
-							// previous values
-							if (isForOps && prevMetricsList.length !== metricsList.length) {
-								metricsList = [...prevMetricsList];
-							} else if (isForOps) {
-								// for same length we need to check for individual value
-								const listPrevColList = prevMetricsList
-									.map(item => item.value)
-									.sort()
-									.join();
-								const defaultPrevColList = metricsList
-									.map(item => item.value)
-									.sort()
-									.join();
-								if (listPrevColList !== defaultPrevColList) {
-									metricsList = [...prevMetricsList];
-								}
-							}
-							newState = { ...newState, metricsList };
-						}
 					}
 
 					newState = {
 						...newState,
 						isLoading: false,
 						isError: false,
-						tableData,
-						selectedFilterValues
+						tableData
 					};
 					this.setState(newState);
 				})
 				.catch(this.handleError);
 		});
-	};
-
-	getSortedMetaMetrics = metaMetrics => {
-		const metaMetricsArray = Object.keys(metaMetrics).map(value => {
-			// eslint-disable-next-line camelcase
-			const { display_name: name, chart_position, valueType } = metaMetrics[value];
-
-			return {
-				name,
-				value,
-				valueType,
-				chart_position
-			};
-		});
-		return sortBy(metaMetricsArray, ['chart_position']);
-	};
-
-	/**
-	 * Get first 5 metrics from report data
-	 * - remove dimensions and intervals from report columns
-	 * - remove unselectable items (given in meta)
-	 * - sort by chart position (given in meta)
-	 * - pick first 5
-	 * @memberof Panel
-	 */
-	getMetricsList = tableData => {
-		const {
-			reportsMeta,
-			isForOps,
-			user: {
-				data: { isUniqueImpEnabled = false }
-			}
-		} = this.props;
-		const filteredMetrics = tableData.columns.filter(metric => {
-			const isDimension = !!reportsMeta.data.dimension[metric];
-			const isBlacklistedMetric = REPORT_INTERVAL_TABLE_KEYS.indexOf(metric) !== -1;
-			const isSelectableMetric =
-				reportsMeta.data.metrics[metric] && reportsMeta.data.metrics[metric].selectable;
-
-			return !isDimension && !isBlacklistedMetric && isSelectableMetric;
-		});
-
-		const sortedMetaMetrics = this.getSortedMetaMetrics(reportsMeta.data.metrics);
-
-		let computedMetrics = [];
-
-		sortedMetaMetrics.forEach(metaMetric => {
-			const { name, value, valueType } = metaMetric;
-			if (filteredMetrics.indexOf(value) !== -1) computedMetrics.push({ name, value, valueType });
-		});
-
-		let match = displayOpsMetricsForXPath.map(item => item.value);
-		if (isForOps) {
-			match = displayOpsMetricsForXPath.map(item => item.value);
-			computedMetrics = computedMetrics.filter(item => match.indexOf(item.value) !== -1);
-		} else {
-			// check if unique imp is checked
-			if (isUniqueImpEnabled) {
-				match = displayUniqueImpressionMetrics.map(item => item.value);
-			}
-			computedMetrics = computedMetrics.filter(item => match.indexOf(item.value) !== -1);
-		}
-		return computedMetrics;
 	};
 
 	computeTotal = tableRows => {
