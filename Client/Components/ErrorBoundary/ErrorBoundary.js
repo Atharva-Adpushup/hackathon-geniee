@@ -24,10 +24,11 @@ class ErrorBoundary extends React.Component {
 		const {
 			location: { pathname: routePath }
 		} = history;
-		const { errorInfo } = this.state;
+		const { err, info, errorMessage = '' } = this.state;
 		return axiosInstance
 			.post('/data/createLog', {
-				data: errorInfo,
+				err,
+				info,
 				isNotifySupportMail: false,
 				firstName,
 				lastName,
@@ -35,7 +36,8 @@ class ErrorBoundary extends React.Component {
 				isSuperUser,
 				routePath,
 				type,
-				userInput
+				userInput,
+				errorMessage
 			})
 			.then(() => console.log('Log Written'))
 			.catch(error => console.log(`Log written failed : ${error}`));
@@ -43,19 +45,9 @@ class ErrorBoundary extends React.Component {
 
 	componentDidCatch(err, info) {
 		console.log(err, info);
-		let data = '';
-		info.message = err.message;
-		try {
-			data = window.btoa(
-				`Error: ${err ? JSON.stringify(err, null, '\n') : 'N/A'} ,  \n Info:  ${
-					info ? JSON.stringify(info, null, '\n') : 'N/A'
-				}`
-			);
-		} catch (e) {
-			console.log('Data encoding failed');
-			return false;
-		}
-		return this.setState({ errorInfo: data }, () => this.sendErrorLog('default'));
+		return this.setState({ err: err, info: info, errorMessage: err.message }, () =>
+			this.sendErrorLog('default')
+		);
 	}
 
 	render() {

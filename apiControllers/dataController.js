@@ -270,30 +270,32 @@ router
 			);
 	})
 	.post('/createLog', (req, res) =>
-		checkParams(['data', 'isNotifySupportMail'], req, 'post')
+		checkParams(['err', 'isNotifySupportMail', 'info'], req, 'post')
 			.then(async () => {
 				const {
-					data,
+					err,
+					info,
 					firstName,
 					lastName,
 					email,
 					isSuperUser,
 					routePath,
 					type,
-					userInput = ''
+					userInput = '',
+					errorMessage
 				} = req.body;
-				const decodedData = atob(data);
+				const errorInfo = _.escape(info.componentStack).replace(/\n/g, '<br>');
 				const dateOfError = new Date().toDateString();
-				//do all these things in production only
 				const mailAlertTemplateData = {
-					decodedData,
+					errorInfo,
 					firstName,
 					lastName,
 					email,
 					isSuperUser,
 					dateOfError,
 					routePath,
-					userInput
+					userInput,
+					errorMessage
 				};
 				const emailTemplate = await generateEmailTemplate(
 					'views/mail',
@@ -312,6 +314,9 @@ router
 						}
 					});
 				} else if (type === 'default') {
+					const errorLogToBeTracked = `Error: ${
+						err ? JSON.stringify(err, null, '\n') : 'N/A'
+					} ,  \n Info:  ${info ? JSON.stringify(info, null, '\n') : 'N/A'}`;
 					//By deafult we are alreday sending mail to the hackers
 					sendEmail({
 						queue: 'MAILER',
@@ -324,7 +329,7 @@ router
 					return logger({
 						source: 'CONSOLE ERROR LOGS',
 						message: 'UNCAUGHT ERROR BOUNDARY',
-						debugData: decodedData
+						debugData: errorLogToBeTracked
 					});
 				}
 			})
