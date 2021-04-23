@@ -228,7 +228,7 @@ const reportsService = {
 	},
 	fetchReportAPCustomStatXPath: async reportConfig => {
 		const reportsResponse = await request({
-			uri: `https://staging.adpushup.com/CentralReportingWebService/${CC.REPORT_PATH_XPATH}`,
+			uri: `${CC.ANALYTICS_API_ROOT}${CC.REPORT_PATH_XPATH}`,
 			json: true,
             qs: reportConfig,
             timeout: 600000 //10 mins
