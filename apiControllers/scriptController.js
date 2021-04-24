@@ -169,9 +169,19 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 					.then(setAdNetworkConfig)
 					.then(setAllConfigs);
 
-			const generatedConfig = getPrebidAndAdsConfig().then(prebidAndAdsConfig =>
-				generateStatusesAndConfig(site, prebidAndAdsConfig)
-			);
+			const generatedConfig = getPrebidAndAdsConfig().then(prebidAndAdsConfig => {
+				// Remove ampConfig from adpushup.js
+				const { prebidConfig } = prebidAndAdsConfig;
+				if (prebidConfig && prebidConfig.hbcf) {
+					const { hbcf } = prebidConfig;
+					Object.keys(hbcf).forEach(bidder => {
+						if (hbcf[bidder].ampConfig) {
+							delete hbcf[bidder].ampConfig;
+						}
+					});
+				}
+				return generateStatusesAndConfig(site, prebidAndAdsConfig);
+			});
 
 			return Promise.join(generatedConfig, {
 				siteId: site.get('siteId'),
@@ -315,6 +325,16 @@ Router.get('/:siteId/ampSiteConfig', (req, res) => {
 						sizeMappingConfig,
 						currencyConfig
 					]) => {
+						// set ampConfig to config in bidder config for amp
+						const hbcf = prebidConfig && prebidConfig.hbcf;
+						if (hbcf) {
+							Object.keys(hbcf).forEach(bidder => {
+								if (hbcf[bidder].config && hbcf[bidder].ampConfig) {
+									hbcf[bidder].config = { ...hbcf[bidder].ampConfig };
+									delete hbcf[bidder].ampConfig;
+								}
+							});
+						}
 						const output = {
 							prebidConfig,
 							ampScriptConfig,

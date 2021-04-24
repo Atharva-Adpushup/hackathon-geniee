@@ -126,6 +126,7 @@ router
 			bids,
 			revenueShare,
 			config: params || {},
+			ampConfig: {},
 			isActive: true,
 			isAmpActive,
 			isS2SActive,
@@ -149,7 +150,10 @@ router
 					return headerBiddingModel.getHbConfig(siteId);
 				})
 				// hbConfig found OR created new hbConfig
-				.then(hbConfig => hbConfig.saveBidderConfig(key, bidderConfig))
+				.then(hbConfig => {
+					bidderConfig.ampConfig = headerBiddingModel.createBidderAmpConfig(bidderConfig);
+					return hbConfig.saveBidderConfig(key, bidderConfig);
+				})
 				.then(hbConfig => hbConfig.save())
 				.then(() => headerBiddingModel.getAllBiddersFromNetworkConfig())
 				.then(biddersFromNetworkConfig => {
