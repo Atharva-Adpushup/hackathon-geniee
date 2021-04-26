@@ -1450,12 +1450,7 @@ class Report extends Component {
 							selectedDimension=""
 							startDate={startDate}
 							endDate={endDate}
-							dimensionList={dimensionList}
-							filterList={filterList}
-							intervalList={intervalList}
 							metricsList={metricsList}
-							selectedFilters={selectedFilters}
-							selectedMetrics={selectedMetrics}
 							allAvailableMetrics={allAvailableMetrics}
 							reportType={reportType}
 							isForOps={isForOps}
