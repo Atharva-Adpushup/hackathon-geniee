@@ -402,7 +402,7 @@ class Control extends Component {
 		const selectedReportStartDate = startDate;
 		const selectedReportEndDate = endDate;
 		const isUpdating = selectedReport !== null;
-		const isSavedReportsEmpty = savedReports.length === 0;
+		const isSavedReportsEmpty = savedReports.length === 0 && frequentReports.length === 0;
 		const { selectedDimension = [] } = state;
 		const savedAndFrequentReportOptions = [
 			{ label: 'Saved Reports', value: 'savedReports', options: savedReports },

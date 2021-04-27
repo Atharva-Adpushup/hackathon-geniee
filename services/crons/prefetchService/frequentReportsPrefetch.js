@@ -147,22 +147,15 @@ const processFilters = filters => {
 };
 
 const saveCachedFrequentReports = log => {
-	const reportDimensionSet = {};
 	const { email, reports = [], errorLogs = [] } = log;
 
 	const topLogsForUi = reports.slice(0, COUNT_OF_CACHED_REPORTS_TO_SHOW);
 	const frequentReports = topLogsForUi.map((report, i) => {
 		const { interval, dimension, fromDate, toDate, ...filters } = report;
 
-		if (reportDimensionSet[dimension]) {
-			reportDimensionSet[dimension] += 1;
-		} else {
-			reportDimensionSet[dimension] = 1;
-		}
-
 		return {
 			selectedInterval: interval,
-			selectedDimension: dimension,
+			selectedDimension: dimension ? dimension.split(',') : [],
 			startDate: fromDate,
 			endDate: toDate,
 			selectedFilters: processFilters(filters),

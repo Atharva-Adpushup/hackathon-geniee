@@ -347,7 +347,7 @@ class Report extends Component {
 			fromDate: moment(startDate).format('YYYY-MM-DD'),
 			toDate: moment(endDate).format('YYYY-MM-DD'),
 			interval: selectedInterval,
-			dimension: selectedDimension.join(',') || null
+			dimension: selectedDimension ? selectedDimension.join(',') : null
 		};
 
 		if (!isCustomizeChartLegend) {
@@ -962,7 +962,10 @@ class Report extends Component {
 			endDate
 		} = report;
 		const { dimensionList = [] } = this.state;
-		const dimensionData = dimensionList.find(dim => dim.value === dimension);
+		const dimensionData = dimensionList
+			.filter(dim => dimension && dimension.includes(dim.value))
+			.map(dim => dim.display_name)
+			.join(', ');
 
 		const filterUi = Object.keys(filters)
 			.filter(currentFilter => filters[currentFilter] && Object.keys(filters[currentFilter]).length)
@@ -980,9 +983,7 @@ class Report extends Component {
 			});
 		return (
 			<Tooltip placement="top">
-				{dimension && dimension !== '' && dimensionData && (
-					<div>Report By: {dimensionData.display_name}</div>
-				)}
+				{dimension && dimensionData && <div>Report By: {dimensionData}</div>}
 				{intervals && intervals !== '' && <div>Interval: {intervals}</div>}
 				{startDate && <div>Start Date: {startDate}</div>}
 				{endDate && <div>End Date: {endDate}</div>}
@@ -1015,16 +1016,22 @@ class Report extends Component {
 
 		const frequentReportsDimensionCount = {};
 		const frequentReportsWithValue = frequentReports.map((report, i) => {
-			if (frequentReportsDimensionCount[report.selectedDimension]) {
-				frequentReportsDimensionCount[report.selectedDimension] += 1;
+			const dimensions = report.selectedDimension ? report.selectedDimension.join(',') : '';
+			if (frequentReportsDimensionCount[dimensions]) {
+				frequentReportsDimensionCount[dimensions] += 1;
 			} else {
-				frequentReportsDimensionCount[report.selectedDimension] = 1;
+				frequentReportsDimensionCount[dimensions] = 1;
 			}
-			const reportName = `Report ${
-				dimensionsMap[report.selectedDimension]
-					? dimensionsMap[report.selectedDimension].display_name
-					: ''
-			} ${frequentReportsDimensionCount[report.selectedDimension]}`;
+
+			let reportName = '';
+			if (dimensions === '') {
+				reportName = `Report ${frequentReportsDimensionCount[dimensions]}`;
+			} else {
+				const dimensionsTitles = report.selectedDimension
+					.map(dimension => dimensionsMap[dimension].display_name)
+					.join(', ');
+				reportName = `Report by ${dimensionsTitles} ${frequentReportsDimensionCount[dimensions]}`;
+			}
 			return {
 				...report,
 				value: report.id,
@@ -1106,7 +1113,7 @@ class Report extends Component {
 			name: reportName,
 			startDate,
 			endDate,
-			selectedDimension: selectedDimension.join(','),
+			selectedDimension,
 			selectedFilters: filters,
 			selectedInterval,
 			scheduleOptions
