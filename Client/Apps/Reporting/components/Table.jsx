@@ -361,12 +361,6 @@ class Table extends React.Component {
 						showPaginationBottom={false}
 						onPageSizeChange={onPageSizeChange}
 						onPageChange={onPageChange}
-						defaultSorted={[
-							{
-								id: 'date',
-								desc: false
-							}
-						]}
 						pivotBy={selectedDimension.length === 1 && showAggregation ? ['date'] : []}
 						// subTable={subTable}
 					/>
