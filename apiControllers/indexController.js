@@ -21,7 +21,12 @@ const {
 	sendErrorResponse,
 	sendSuccessResponse
 } = require('../helpers/commonFunctions');
-const { appBucket, errorHandler, checkParams, sendDataToAuditLogService } = require('../helpers/routeHelpers');
+const {
+	appBucket,
+	errorHandler,
+	checkParams,
+	sendDataToAuditLogService
+} = require('../helpers/routeHelpers');
 
 const router = express.Router();
 
@@ -158,17 +163,19 @@ router
 					// and pass as globalMeta data along with sites data
 					return getReportsMetaData(params).then(reports => {
 						const { site: sitesFromReportMeta } = reports;
-						Object.keys(sitesFromReportMeta).map(site => {
-							// to check is HB enabled or not
-							if(userData.sites[site] && sitesFromReportMeta[site].product) {
-								userData.sites[site].product = sitesFromReportMeta[site].product;
-							}
-						})
+						if (sitesFromReportMeta) {
+							Object.keys(sitesFromReportMeta).map(site => {
+								// to check is HB enabled or not
+								if (userData.sites[site] && sitesFromReportMeta[site].product) {
+									userData.sites[site].product = sitesFromReportMeta[site].product;
+								}
+							});
+						}
 						return res.status(httpStatus.OK).json({
 							user: { ...userData, isSuperUser },
 							networkConfig,
 							sites
-						//		reports
+							//		reports
 						});
 					});
 				})
@@ -340,8 +347,10 @@ router
 				// log config changes
 				const { siteDomain, appName } = dataForAuditLogs;
 				const { email, originalEmail } = req.user;
-				const {AUDIT_LOGS_ACTIONS: { OPS_PANEL }} = consts
-				const prevConfig = {...value}
+				const {
+					AUDIT_LOGS_ACTIONS: { OPS_PANEL }
+				} = consts;
+				const prevConfig = { ...value };
 
 				const networks = Object.keys(config);
 
@@ -356,7 +365,7 @@ router
 				});
 				// log config changes
 				sendDataToAuditLogService({
-					siteId:'',
+					siteId: '',
 					siteDomain,
 					appName,
 					type: 'account',

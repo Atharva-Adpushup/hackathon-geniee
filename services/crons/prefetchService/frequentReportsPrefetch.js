@@ -120,7 +120,7 @@ const cacheReportsForUser = async (email, reportConfigs) => {
 				errorConfigs = [];
 			for (let i = 0; i < results.length; i++) {
 				const currentResult = results[i];
-				if (result.error) {
+				if (currentResult.error) {
 					errorConfigs.push({
 						config: currentResult.config,
 						err: currentResult.err,
@@ -210,7 +210,7 @@ const cacheReports = async logs => {
 const savedCachedLogsInCb = async cachedLogs => {
 	return promisePool
 		.for(cachedLogs)
-		.withConcurrency(5)
+		.withConcurrency(1)
 		.handleError((err, config) => {
 			console.log({ err, config });
 		})
@@ -243,11 +243,5 @@ const cacheFrequentReports = () => {
 		.then(({ results: cachedLogs }) => savedCachedLogsInCb(cachedLogs))
 		.catch(err => console.error(err));
 };
-
-// (async function() {
-//     try {
-//         await cacheFrequentReports();
-//     } catch(err) { console.log({ err }); }
-// })();
 
 module.exports = cacheFrequentReports;
