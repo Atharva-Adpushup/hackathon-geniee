@@ -302,7 +302,7 @@ router
 					'consoleCrashAlerts',
 					mailAlertTemplateData
 				);
-				const subjectMessage = `Client Bug Report`;
+				const subjectMessage = `Console Error Report`;
 				if (type === 'UserInteraction') {
 					//here we will send mail to the support
 					sendEmail({

@@ -23,7 +23,8 @@ const UserInteractionModal = ({ isModalShown, showOrHideModal, sendErrorLog }) =
 		>
 			<Modal.Header closeButton>
 				<Modal.Title id="contained-modal-title-vcenter">
-					Please provide the details of the issue you are facing
+					We've notified our team about the issue that you just faced.Please use the box below to
+					add any other relevent details:
 				</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
@@ -31,7 +32,7 @@ const UserInteractionModal = ({ isModalShown, showOrHideModal, sendErrorLog }) =
 					name="user-feedback"
 					value={userInput}
 					onChange={handleChange}
-					placeholder="Provide details of the error"
+					placeholder="(Optional) Type your feedback here"
 					style={{ width: '100%' }}
 					rows={10}
 					className="user-error-feedback"
@@ -39,7 +40,7 @@ const UserInteractionModal = ({ isModalShown, showOrHideModal, sendErrorLog }) =
 			</Modal.Body>
 			<Modal.Footer>
 				<Button onClick={showOrHideModal(false)}>Close</Button>
-				<Button variant="primary" onClick={sendErrorReport}>
+				<Button variant="primary" onClick={sendErrorReport} className="error-modal-submit">
 					Send Error Report
 				</Button>
 			</Modal.Footer>

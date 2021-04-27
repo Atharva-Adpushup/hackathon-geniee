@@ -9,6 +9,12 @@
 					resize: none !important;
 				}
 			}
+			.modal-footer {
+				.error-modal-submit {
+					background: #f65557;
+					color: white;
+				}
+			}
 		}
 	}
 }
