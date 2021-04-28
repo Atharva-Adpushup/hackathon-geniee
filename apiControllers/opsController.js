@@ -12,9 +12,19 @@ const {
 	AUDIT_LOGS_ACTIONS: { OPS_PANEL }
 } = require('../configs/commonConsts');
 const { sendSuccessResponse, sendErrorResponse } = require('../helpers/commonFunctions');
-const { appBucket, errorHandler, sendDataToAuditLogService } = require('../helpers/routeHelpers');
+const {
+	appBucket,
+	errorHandler,
+	sendDataToAuditLogService,
+	getAllAds,
+	updateApTagAd,
+	updateInnovativeAd,
+	updateApLiteAd
+} = require('../helpers/routeHelpers');
 const opsModel = require('../models/opsModel');
 const apLiteModel = require('../models/apLiteModel');
+const channelModel = require('../models/channelModel');
+const { updateAdUnitData } = require('../models/opsModel');
 
 const router = express.Router();
 
@@ -36,7 +46,8 @@ const helpers = {
 			...DEFAULT_OPTIONS,
 			...options
 		});
-	}
+	},
+	directDBUpdate: (key, value, cas) => appBucket.updateDoc(key, value, cas)
 };
 
 router
@@ -367,5 +378,111 @@ router
 			.getAllNotifications()
 			.then(message => sendSuccessResponse(message, res))
 			.catch(err => errorHandler(err, res))
-	);
+	)
+	.get('/getAdUnitMapping', (req, res) =>
+		getAllAds()
+			.then(ads => sendSuccessResponse(ads, res))
+			.catch(err => errorHandler(err, res, HTTP_STATUSES.INTERNAL_SERVER_ERROR))
+	)
+	.get('/getSiteMapping', (req, res) => {
+		if (!req.user.isSuperUser) {
+			return sendErrorResponse(
+				{
+					message: 'Unauthorized Request',
+					code: HTTP_STATUSES.UNAUTHORIZED
+				},
+				res
+			);
+		}
+		opsModel
+			.getAllSiteMapping()
+			.then(message => sendSuccessResponse(message, res))
+			.catch(err => errorHandler(err, res));
+	})
+	.post('/updateAdUnitData/:siteId', (req, res) => {
+		if (!req.user.isSuperUser) {
+			return sendErrorResponse(
+				{
+					message: 'Unauthorized Request',
+					code: HTTP_STATUSES.UNAUTHORIZED
+				},
+				res
+			);
+		}
+		const { adUnitData } = req.body;
+		const {
+			docId,
+			adId,
+			dfpAdUnitId,
+			collapseUnfilled,
+			sizeFilters,
+			downwardSizesDisabled
+		} = adUnitData;
+
+		const docType = docId.substr(0, 4);
+		let newData = {};
+		let adData = {};
+
+		switch (docType) {
+			case 'chnl':
+				let docIdPartValue = docId.substr(6, docId.length - 1);
+				let colonIndex = docIdPartValue.indexOf(':');
+
+				const siteId = docIdPartValue.substr(0, colonIndex);
+				docIdPartValue = docIdPartValue.substr(colonIndex + 1, docIdPartValue.length - 1);
+
+				colonIndex = docIdPartValue.indexOf(':');
+				const platform = docIdPartValue.substr(0, colonIndex);
+				docIdPartValue = docIdPartValue.substr(colonIndex + 1, docIdPartValue.length - 1);
+
+				const pageGroup = docIdPartValue;
+
+				// updateLayoutAd
+				return channelModel
+					.getChannel(siteId, platform, pageGroup)
+					.then(({ data: channelData }) => {
+						const { variations } = channelData;
+						for (const key in variations) {
+							const { sections } = variations[key];
+							for (const section in sections) {
+								const { ads } = sections[section];
+								if (ads[adId]) {
+									console.log(ads[adId]);
+									ads[adId] = {
+										...ads[adId],
+										downwardSizesDisabled,
+										collapseUnfilled,
+										sizeFilters
+									};
+									break;
+								}
+							}
+						}
+						return channelModel.saveChannel(siteId, platform, pageGroup, channelData);
+					})
+					.then(chnlData => sendSuccessResponse(chnlData, res))
+					.catch(err => errorHandler(err, res, HTTP_STATUSES.INTERNAL_SERVER_ERROR));
+			case 'tgmr':
+				newData = { collapseUnfilled, downwardSizesDisabled, sizeFilters };
+				adData = { adUnitId: adId, newData, docId };
+				return updateApTagAd(req, res, adData);
+			case 'fmrt':
+				newData = { collapseUnfilled, downwardSizesDisabled, sizeFilters };
+				adData = { adUnitId: adId, newData, docId };
+				return updateInnovativeAd(req, res, adData);
+			case 'aplt':
+				newData = { collapseUnfilled, downwardSizesDisabled, sizeFilters };
+				adData = { adUnitId: adId, adUnitData: newData, docId };
+				return updateApLiteAd(req, res, adData);
+
+			default:
+				return sendErrorResponse(
+					{
+						message: 'Unauthorized Request',
+						code: HTTP_STATUSES.UNAUTHORIZED
+					},
+					res
+				);
+		}
+	});
 module.exports = router;

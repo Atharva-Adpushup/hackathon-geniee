@@ -6,7 +6,7 @@ const jsondiffpatch = require('jsondiffpatch').create();
 const request = require('request-promise');
 const couchbase = require('../helpers/couchBaseService'),
 	couchbaseModule = require('couchbase'),
-	N1qlQuery = couchbaseModule.N1qlQuery;
+	{ N1qlQuery, ViewQuery } = couchbaseModule;
 
 const config = require('../configs/config');
 const siteModel = require('../models/siteModel');
@@ -19,7 +19,8 @@ const {
 	APP_KEYS,
 	GOOGLE_BOT_USER_AGENT,
 	DEFAULT_APP_STATUS_RESPONSE,
-	ADS_TXT_REDIRECT_PATTERN
+	ADS_TXT_REDIRECT_PATTERN,
+	docKeys
 } = require('../configs/commonConsts');
 
 const appBucket = couchbaseService(
@@ -28,6 +29,27 @@ const appBucket = couchbaseService(
 	config.couchBase.DEFAULT_USER_NAME,
 	config.couchBase.DEFAULT_USER_PASSWORD
 );
+
+const helpers = {
+	adUpdateProcessing: (req, res, key, processing) =>
+		appBucket
+			.getDoc(`${key}${req.params.siteId}`)
+			.then(docWithCas => processing(docWithCas))
+			.then(() => emitEventAndSendResponse(req.body.siteId || req.params.siteId, res))
+			.catch(err => {
+				let error = err;
+				if (err && err.code && err.code === 13) {
+					error = new AdPushupError({
+						message: 'No Doc Found',
+						code: HTTP_STATUS.BAD_REQUEST
+					});
+				}
+				return errorHandler(error, res);
+			}),
+	directDBUpdate: (key, value, cas) => {
+		return appBucket.updateDoc(key, value, cas);
+	}
+};
 
 function verifyOwner(siteId, userEmail) {
 	return siteModel
@@ -389,6 +411,132 @@ function getAmpAds(siteId) {
 		.catch(err => console.log(err));
 }
 
+
+function getAllAds() {
+	const designName = 'AdunitMapping',
+		viewName = 'Adunits';
+	var query = ViewQuery.from(designName, viewName).reduce(false);
+
+	return couchbase
+		.connectToAppBucket()
+		.then(appBucket => appBucket.queryAsync(query))
+		.then(ads => {
+			return ads;
+		})
+		.catch(err => console.log(err));
+}
+
+
+const updateLayoutAd = (req, res, adData) => {
+	const { adUnitId, device: platform, pageGroup, adId, ...rest } = adData;
+
+	return channelModel
+		.getChannel(siteId, platform, pageGroup)
+		.then(channel => {
+			// find variation
+			let variationId = null;
+			const { data: channelData } = channel;
+			const prevConfig = _.cloneDeep(channelData);
+			const { variations } = channelData;
+			// eslint-disable-next-line no-restricted-syntax
+			for (const key in variations) {
+				if (Object.prototype.hasOwnProperty.call(variations, key)) {
+					const { sections } = variations[key];
+					if (adUnitId in sections) {
+						variationId = key;
+						break;
+					}
+				}
+			}
+
+			if (!variationId) {
+				throw new AdPushupError({ message: 'Invalid adUnitId', code: 400 });
+			}
+
+			channelData.variations[variationId].sections[adUnitId].ads[adId].sizeMapping = sizeMapping;
+
+			return channelModel.saveChannel(siteId, platform, pageGroup, channelData);
+		})
+		.then(() => sendSuccessResponse({}, res))
+		.catch(err => errorHandler(err, res));
+};
+
+const updateNonLayoutAds = (req, res, docKey, adData, logServiceNames) => {
+	const { logType, actionName, serviceName } = logServiceNames || {};
+
+	const { adUnitId, newData } = adData;
+
+	return helpers
+		.adUpdateProcessing(req, res, docKey, docWithCas => {
+			const prevConfig = _.cloneDeep(docWithCas.value);
+			const doc = docWithCas.value;
+
+			// Add isAdmin Check
+			if (!req.user.isSuperUser) {
+				throw new AdPushupError({
+					message: 'Unauthorized Request',
+					code: HTTP_STATUS.PERMISSION_DENIED
+				});
+			}
+
+			_.forEach(doc.ads, (ad, index) => {
+				if (ad.id === adUnitId) {
+					doc.ads[index] = { ...ad, ...newData };
+					return false;
+				}
+				return true;
+			});
+
+			return helpers.directDBUpdate(`${docKey}${req.params.siteId}`, doc, docWithCas.cas);
+		})
+		.catch(err => errorHandler(err, res));
+};
+
+const updateApTagAd = (req, res, adData) => {
+	const docKey = docKeys.apTag;
+	return updateNonLayoutAds(req, res, docKey, adData);
+};
+
+const updateInnovativeAd = (req, res, adData) => {
+	const docKey = docKeys.interactiveAds;
+	return updateNonLayoutAds(req, res, docKey, adData);
+};
+
+const updateApLiteAd = (req, res, adData, logServiceNames) => {
+	const { logType, actionName, serviceName } = logServiceNames || {};
+	const docKey = docKeys.apLite;
+	const { adUnitId, adUnitData } = adData;
+
+	return helpers
+		.adUpdateProcessing(req, res, docKey, docWithCas => {
+			const prevConfig = _.cloneDeep(docWithCas.value);
+			const doc = docWithCas.value;
+
+			// Add isAdmin Check
+			if (!req.user.isSuperUser) {
+				throw new AdPushupError({
+					message: 'Unauthorized Request',
+					code: HTTP_STATUS.PERMISSION_DENIED
+				});
+			}
+
+			_.forEach(doc.adUnits, (ad, index) => {
+				if (ad.dfpAdUnit == adUnitId) {
+					doc.adUnits[index] = { ...ad, ...adUnitData };
+					return false;
+				}
+				return true;
+			});
+
+			return helpers.directDBUpdate(`${docKey}${req.params.siteId}`, doc, docWithCas.cas);
+		})
+		.catch(err => {
+			console.log(err);
+			return errorHandler(err, res);
+		});
+};
+
+
 function fetchAmpAds(req, res, docKey) {
 	if (!req.query || !req.query.siteId) {
 		return sendErrorResponse(
@@ -638,5 +786,10 @@ module.exports = {
 	storedRequestWrapper,
 	getAmpAds,
 	publishAdPushupBuild,
-	sendDataToAuditLogService
+	sendDataToAuditLogService,
+	getAllAds,
+	updateApLiteAd,
+	updateLayoutAd,
+	updateInnovativeAd,
+	updateApTagAd
 };
