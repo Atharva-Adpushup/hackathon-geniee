@@ -40,6 +40,27 @@ router
 			return sendErrorResponse({ message: err.message }, res, HTTP_STATUSES.BAD_REQUEST);
 		}
 	})
+	.get('/getAPStatsByCustom', reportsAccess, async (req, res) => {
+		req.setTimeout(360000); // timeout set to 6 mins for this particular route - temporary fix, need to remove when the backend responds on time
+		const {
+			query: { bypassCache = 'false' }
+		} = req;
+
+		const reportConfig = _.cloneDeep(req.query);
+		try {
+			const {
+				cacheHit,
+				data: reportsData
+			} = await reportsService.getReportsAPCustomStatXPathWithCache(
+				reportConfig,
+				bypassCache === 'true'
+			);
+			if (cacheHit) setCacheHeaders(res);
+			return sendSuccessResponse(reportsData, res, HTTP_STATUSES.OK);
+		} catch (err) {
+			return sendErrorResponse({ message: err.message }, res, HTTP_STATUSES.BAD_REQUEST);
+		}
+	})
 	.get('/getWidgetData', reportsAccess, async (req, res) => {
 		const { params, path, bypassCache = 'false' } = req.query;
 		const reqParams = _.isString(params) ? JSON.parse(params) : {};

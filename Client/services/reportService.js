@@ -7,6 +7,10 @@ export default {
 		const url = config.ANALYTICS_API_CUSTOM_DATA;
 		return axiosInstance.get(url, { params });
 	},
+	getAPStatsByCustom: params => {
+		const url = config.ANALYTICS_API_AP_STATS_BY_CUSTOM_DATA;
+		return axiosInstance.get(url, { params });
+	},
 	getWidgetData: params => {
 		const url = config.ANALYTICS_API_WIDGET_DATA;
 		return axiosInstance.get(url, { params });

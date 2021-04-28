@@ -91,6 +91,7 @@ module.exports = {
 	ANALYTICS_API_ROOT: reportingBaseURL,
 	ANALYTICS_METAINFO_URL: '/common/metaInfo',
 	REPORT_PATH: '/site/report?report_name=get_stats_by_custom',
+	REPORT_PATH_XPATH: '/site/report?report_name=get_ap_stats_by_custom',
 	URL_REPORT_PATH: '/url/report?report_name=url_report',
 	UTM_REPORT_PATH: '/url/report?report_name=utm_report&',
 	HB_REPORT_PATH: '/hb_analytics/report?report_name=GET_UI_PANEL_REPORT',
