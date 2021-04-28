@@ -181,12 +181,12 @@ const extraMetricsListMappingForHBArray = [
 	EXTRA_METRICS.COUNTRY.value,
 	EXTRA_METRICS.DEVICE_TYPE.value,
 	EXTRA_METRICS.SELECTED_DIMENSION_COLUMN.value
-]
+];
 
 const extraMetricsListMappingForHB = {
 	country: EXTRA_METRICS.COUNTRY,
 	device_type: EXTRA_METRICS.DEVICE_TYPE
-}
+};
 
 const METRICS = {
 	NETWORK_NET_REVENUE: { value: 'network_net_revenue', name: 'Net Revenue', valueType: 'money' },
@@ -220,6 +220,37 @@ const displayOpsMetrics = [
 	METRICS_OPS_PANEL.NETWORK_IMPRESSIONS,
 	METRICS_OPS_PANEL.NETWORK_AD_ECPM,
 	METRICS_OPS_PANEL.GROSS_REVENUE
+];
+
+const METRICS_OPS_PANEL_XPATH = {
+	ADPUSHUP_XPATH_MISS: { value: 'adpushup_xpath_miss', name: 'Net Revenue', valueType: 'number' },
+	ADPUSHUP_XPATH_MISS_PERCENT: {
+		value: 'adpushup_xpath_miss_percent',
+		name: 'Page Views',
+		valueType: 'percent'
+	},
+	ADPUSHUP_IMPRESSION: { value: 'adpushup_impressions', name: 'Page RPM', valueType: 'number' }
+};
+
+const displayOpsMetricsForXPath = [
+	METRICS_OPS_PANEL_XPATH.ADPUSHUP_XPATH_MISS,
+	METRICS_OPS_PANEL_XPATH.ADPUSHUP_XPATH_MISS_PERCENT,
+	METRICS_OPS_PANEL_XPATH.ADPUSHUP_IMPRESSION
+];
+
+const XPATH_ALLOWED_DIMENSIONS_AND_FILTERS = [
+	'network',
+	'revenue_channel',
+	'ad_format',
+	'country',
+	'siteid',
+	'page_group',
+	'page_variation',
+	'page_variation_type',
+	'device_type',
+	'section',
+	'ad_unit',
+	'ad_unit_type'
 ];
 
 const UNIQUE_IMPRESSION_METRICS = {
@@ -583,7 +614,7 @@ const BID_CPM_STATS_BUCKET_MODE = 0.05;
 const ANOMALY_THRESHOLD_CONSTANT = {
 	eCPM: 5,
 	RESPONSE_TIME: 3000,
-	PERCENT:100
+	PERCENT: 100
 };
 
 export {
@@ -596,6 +627,7 @@ export {
 	REPORT_PATH,
 	displayMetrics,
 	displayOpsMetrics,
+	displayOpsMetricsForXPath,
 	displayUniqueImpressionMetrics,
 	extraMetricsListForHB,
 	extraMetricsListMappingForHB,
@@ -629,5 +661,6 @@ export {
 	PIVOT,
 	MUST_HAVE_COLS,
 	BID_CPM_STATS_BUCKET_MODE,
-	ANOMALY_THRESHOLD_CONSTANT
+	ANOMALY_THRESHOLD_CONSTANT,
+	XPATH_ALLOWED_DIMENSIONS_AND_FILTERS
 };
