@@ -18,6 +18,7 @@ import ChartContainer from '../containers/ChartContainer';
 import FilterLegend from './FilterLegend';
 import reportService from '../../../services/reportService';
 import { DEMO_ACCOUNT_DATA } from '../../../constants/others';
+import XPathAndAPImpressions from './XPathAndAPImpressionsReporting';
 import Loader from '../../../Components/Loader';
 import { convertObjToArr, roundOffTwoDecimal } from '../helpers/utils';
 import {
@@ -30,11 +31,13 @@ import {
 	displayMetrics,
 	displayOpsMetrics,
 	displayUniqueImpressionMetrics,
+	displayOpsMetricsForXPath,
 	opsDimension,
 	opsFilter,
 	REPORT_INTERVAL_TABLE_KEYS,
 	columnsBlacklistedForAddition,
-	DEFAULT_ERROR_MESSAGE
+	DEFAULT_ERROR_MESSAGE,
+	XPATH_ALLOWED_DIMENSIONS_AND_FILTERS
 } from '../configs/commonConsts';
 import MixpanelHelper from '../../../helpers/mixpanel';
 
@@ -347,7 +350,7 @@ class Report extends Component {
 			fromDate: moment(startDate).format('YYYY-MM-DD'),
 			toDate: moment(endDate).format('YYYY-MM-DD'),
 			interval: selectedInterval,
-			dimension: selectedDimension.join(',') || null
+			dimension: selectedDimension ? selectedDimension.join(',') : null
 		};
 
 		if (!isCustomizeChartLegend) {
@@ -403,19 +406,37 @@ class Report extends Component {
 			MixpanelHelper.trackEvent('Reports', properties);
 		}
 		let { tableData, metricsList, selectedFilterValues } = this.state;
-		const { selectedDimension, selectedFilters, dimensionList } = this.state;
 		const { reportType, isForOps } = this.props;
 		const computedState = Object.assign({ isLoading: true }, inputState);
 		const prevMetricsList = metricsList;
 
 		this.setState(computedState, () => {
+			const { selectedDimension, selectedFilters, dimensionList } = this.state;
 			let newState = {};
 			const params = this.formateReportParams();
+			let XPATHParams = {};
 
 			this.setState({
 				apiLoadTimeStartedAt: new Date().getTime(),
 				getCustomStatResponseStatus: 'failed'
 			});
+
+			// check if valid dimension is selected
+			if (isForOps) {
+				if (selectedDimension.length) {
+					const validDimensionsForXPath = this.getValidDimensionListParamsForXPath(
+						selectedDimension
+					);
+					// filter out all invalid filters for XPath
+					XPATHParams = this.validateReportParamsForXPath({
+						...params,
+						dimension: validDimensionsForXPath.join(',')
+					});
+				} else {
+					// filter out all invalid filters for XPath
+					XPATHParams = this.validateReportParamsForXPath({ ...params });
+				}
+			}
 
 			reportService
 				.getCustomStats(params)
@@ -530,7 +551,8 @@ class Report extends Component {
 						isError: false,
 						tableData,
 						selectedFilterValues,
-						dataFetchedDimension: selectedDimension
+						dataFetchedDimension: selectedDimension,
+						XPATHParams
 					};
 					this.setState(newState);
 				})
@@ -718,6 +740,16 @@ class Report extends Component {
 		this.setState({ csvData });
 	};
 
+	getXPathCSVCsvData = csvDataXPath => {
+		let { csvData } = this.state;
+
+		// merge if record count is same
+		if (csvData.length === csvDataXPath.length) {
+			csvData = csvData.map((row, index) => row.concat(csvDataXPath[index].slice(1)));
+		}
+		this.setState({ csvData });
+	};
+
 	renderEmptyMessage = msg => <Empty message={msg} />;
 
 	getContentInfo = reportsMetaData => {
@@ -878,6 +910,7 @@ class Report extends Component {
 		this.setState({ show: false });
 	};
 
+	// eslint-disable-next-line react/sort-comp
 	aggregateValues(result) {
 		const modifiedResult = [];
 		const { selectedInterval, startDate, endDate } = this.state;
@@ -935,6 +968,25 @@ class Report extends Component {
 		});
 	};
 
+	getValidDimensionListParamsForXPath = selectedDimension => {
+		const validDimensions = selectedDimension.filter(dimension =>
+			XPATH_ALLOWED_DIMENSIONS_AND_FILTERS.includes(dimension)
+		);
+		return validDimensions;
+	};
+
+	validateReportParamsForXPath = XPathParams => {
+		const { selectedFilters } = this.state;
+		// check for XPAth Allowed filters
+		Object.keys(selectedFilters).forEach(filter => {
+			if (!XPATH_ALLOWED_DIMENSIONS_AND_FILTERS.includes(filter)) {
+				// eslint-disable-next-line no-param-reassign
+				delete XPathParams[filter];
+			}
+		});
+		return XPathParams;
+	};
+
 	getSavedAndFrequentReports = () => {
 		const { showNotification } = this.props;
 		return reportService
@@ -962,7 +1014,10 @@ class Report extends Component {
 			endDate
 		} = report;
 		const { dimensionList = [] } = this.state;
-		const dimensionData = dimensionList.find(dim => dim.value === dimension);
+		const dimensionData = dimensionList
+			.filter(dim => dimension && dimension.includes(dim.value))
+			.map(dim => dim.display_name)
+			.join(', ');
 
 		const filterUi = Object.keys(filters)
 			.filter(currentFilter => filters[currentFilter] && Object.keys(filters[currentFilter]).length)
@@ -980,9 +1035,7 @@ class Report extends Component {
 			});
 		return (
 			<Tooltip placement="top">
-				{dimension && dimension !== '' && dimensionData && (
-					<div>Report By: {dimensionData.display_name}</div>
-				)}
+				{dimension && dimensionData && <div>Report By: {dimensionData}</div>}
 				{intervals && intervals !== '' && <div>Interval: {intervals}</div>}
 				{startDate && <div>Start Date: {startDate}</div>}
 				{endDate && <div>End Date: {endDate}</div>}
@@ -1015,16 +1068,22 @@ class Report extends Component {
 
 		const frequentReportsDimensionCount = {};
 		const frequentReportsWithValue = frequentReports.map((report, i) => {
-			if (frequentReportsDimensionCount[report.selectedDimension]) {
-				frequentReportsDimensionCount[report.selectedDimension] += 1;
+			const dimensions = report.selectedDimension ? report.selectedDimension.join(',') : '';
+			if (frequentReportsDimensionCount[dimensions]) {
+				frequentReportsDimensionCount[dimensions] += 1;
 			} else {
-				frequentReportsDimensionCount[report.selectedDimension] = 1;
+				frequentReportsDimensionCount[dimensions] = 1;
 			}
-			const reportName = `Report ${
-				dimensionsMap[report.selectedDimension]
-					? dimensionsMap[report.selectedDimension].display_name
-					: ''
-			} ${frequentReportsDimensionCount[report.selectedDimension]}`;
+
+			let reportName = '';
+			if (dimensions === '') {
+				reportName = `Report ${frequentReportsDimensionCount[dimensions]}`;
+			} else {
+				const dimensionsTitles = report.selectedDimension
+					.map(dimension => dimensionsMap[dimension].display_name)
+					.join(', ');
+				reportName = `Report by ${dimensionsTitles} ${frequentReportsDimensionCount[dimensions]}`;
+			}
 			return {
 				...report,
 				value: report.id,
@@ -1106,7 +1165,7 @@ class Report extends Component {
 			name: reportName,
 			startDate,
 			endDate,
-			selectedDimension: selectedDimension.join(','),
+			selectedDimension,
 			selectedFilters: filters,
 			selectedInterval,
 			scheduleOptions
@@ -1230,6 +1289,16 @@ class Report extends Component {
 		});
 	};
 
+	showXPathTable = () => {
+		const { XPATHParams } = this.state;
+		const { isForOps } = this.props;
+
+		if (!Object.keys(XPATHParams).length || !isForOps) {
+			return false;
+		}
+		return true;
+	};
+
 	renderContent = () => {
 		const {
 			selectedDimension,
@@ -1253,7 +1322,9 @@ class Report extends Component {
 			frequentReports,
 			selectedReport,
 			selectedReportName,
-			dataFetchedDimension
+			dataFetchedDimension,
+			isLoading,
+			XPATHParams
 		} = this.state;
 		const {
 			reportsMeta,
@@ -1262,7 +1333,9 @@ class Report extends Component {
 			isForOps,
 			userSites,
 			user,
-			showNotification
+			showNotification,
+			match,
+			location
 		} = this.props;
 		const { sessionRpmReports: sessionRpmReportsEnabled = false } = user.data;
 
@@ -1314,6 +1387,11 @@ class Report extends Component {
 				dimensionList
 			);
 		}
+		const displayOpsMetricsNameForXPath = displayOpsMetricsForXPath.map(metric => metric.value);
+		allAvailableMetrics = allAvailableMetrics.filter(
+			metric => !displayOpsMetricsNameForXPath.includes(metric.value)
+		);
+
 		return (
 			<Row>
 				<Col sm={12}>
@@ -1376,7 +1454,7 @@ class Report extends Component {
 					<Col sm={12} className="u-margin-t5">
 						<ChartContainer
 							tableData={tableData}
-							selectedDimension={''}
+							selectedDimension=""
 							startDate={startDate}
 							endDate={endDate}
 							metricsList={metricsList}
@@ -1409,6 +1487,29 @@ class Report extends Component {
 					/>
 					{/* )} */}
 				</Col>
+				{!isLoading && this.showXPathTable() && (
+					<Col sm={12} className="">
+						<XPathAndAPImpressions
+							user={user}
+							userSites={userSites}
+							match={match}
+							location={location}
+							startDate={startDate}
+							endDate={endDate}
+							XPATHParams={XPATHParams}
+							selectedFilters={selectedFilters}
+							selectedInterval={selectedInterval}
+							selectedDimension={selectedDimension}
+							dimensionList={dimensionList}
+							metricsList={metricsList}
+							reportsMeta={reportsMeta}
+							defaultReportType={defaultReportType}
+							reportType={reportType}
+							isForOps={isForOps}
+							getXPathCSVCsvData={this.getXPathCSVCsvData}
+						/>
+					</Col>
+				)}
 			</Row>
 		);
 	};

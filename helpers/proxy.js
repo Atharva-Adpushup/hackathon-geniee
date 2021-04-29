@@ -43,16 +43,27 @@ var request = require('request-promise'),
 			userAgent =
 				userAgent ||
 				'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36';
-			return request({
-				uri: url,
-				jar: true,
-				strictSSL: false,
-				resolveWithFullResponse: !!fullResponse,
-				headers: {
-					// 'User-Agent': userAgent,
-					'Accept-Encoding': 'identity'
-				}
-			}).catch(err => {
+			return Promise.any([
+				request({
+					uri: url,
+					jar: true,
+					strictSSL: false,
+					resolveWithFullResponse: !!fullResponse,
+					headers: {
+						'User-Agent': userAgent,
+						'Accept-Encoding': 'identity'
+					}
+				}),
+				request({
+					uri: url,
+					jar: true,
+					strictSSL: false,
+					resolveWithFullResponse: !!fullResponse,
+					headers: {
+						'Accept-Encoding': 'identity'
+					}
+				})
+			]).catch(err => {
 				if (err && err.message.indexOf('I really need an ID for this to work') === -1) {
 					return false;
 				}

@@ -297,7 +297,7 @@ class Control extends Component {
 		const updatedMetricsList = JSON.parse(JSON.stringify(metricsList || {}));
 
 		/* eslint-disable no-param-reassign */
-		//Why we have this condition
+		// Why we have this condition
 		if (reportType === 'account' || reportType === 'global') {
 			updatedFilterList.forEach(fil => {
 				const index = accountFilter.indexOf(fil.value);
@@ -319,13 +319,16 @@ class Control extends Component {
 				dim.isDisabled = false;
 			});
 		}
-		const updatedSelectedDimension = selectedDimension.filter(dimension => {
-			for (let i = 0; i < updatedDimensionList.length; i++) {
-				const currentDimension = updatedDimensionList[i];
-				if (currentDimension.value === dimension) return !currentDimension.isDisabled;
-			}
-			return false;
-		});
+		const { isHB } = this.props;
+		const updatedSelectedDimension = isHB
+			? selectedDimension
+			: selectedDimension.filter(dimension => {
+					for (let i = 0; i < updatedDimensionList.length; i++) {
+						const currentDimension = updatedDimensionList[i];
+						if (currentDimension.value === dimension) return !currentDimension.isDisabled;
+					}
+					return false;
+			  });
 		return {
 			updatedFilterList,
 			updatedDimensionList,
@@ -350,7 +353,12 @@ class Control extends Component {
 					endDate: selectedReport.endDate,
 					selectedInterval: selectedReport.selectedInterval,
 					// need to check this
-					selectedDimension: selectedReport.selectedDimension,
+					// Saved Report may have dimension saved as string instead of Array
+					selectedDimension:
+						selectedReport.selectedDimension instanceof Array
+							? selectedReport.selectedDimension
+							: [selectedReport.selectedDimension] || [],
+					// selectedDimension: selectedReport.selectedDimension,
 					selectedFilters: cloneDeep(selectedReport.selectedFilters)
 				},
 				() => {
@@ -359,13 +367,18 @@ class Control extends Component {
 				}
 			);
 		} else if (action === 'clear') {
-			const { startDate, endDate } = this.props || {};
 			this.setState(
 				{
-					startDate,
-					endDate,
+					startDate: moment()
+						.startOf('day')
+						.subtract(7, 'days')
+						.format('YYYY-MM-DD'),
+					endDate: moment()
+						.startOf('day')
+						.subtract(1, 'day')
+						.format('YYYY-MM-DD'),
 					selectedInterval: 'daily',
-					selectedDimension: '',
+					selectedDimension: [],
 					selectedFilters: {}
 				},
 				() => this.onControlChange(reportType, true)
@@ -402,7 +415,7 @@ class Control extends Component {
 		const selectedReportStartDate = startDate;
 		const selectedReportEndDate = endDate;
 		const isUpdating = selectedReport !== null;
-		const isSavedReportsEmpty = savedReports.length === 0;
+		const isSavedReportsEmpty = savedReports.length === 0 && frequentReports.length === 0;
 		const { selectedDimension = [] } = state;
 		const savedAndFrequentReportOptions = [
 			{ label: 'Saved Reports', value: 'savedReports', options: savedReports },
@@ -412,7 +425,7 @@ class Control extends Component {
 			(!isHB &&
 				selectedDimension.map((value, index) => {
 					let dimensionName = '';
-					for (let filter of filterList) {
+					for (const filter of filterList) {
 						if (filter.value === value) {
 							dimensionName = filter.name;
 						}

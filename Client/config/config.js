@@ -1,6 +1,7 @@
 export default {
 	API_ROOT: '/api',
 	ANALYTICS_API_CUSTOM_DATA: '/reports/getCustomStats',
+	ANALYTICS_API_AP_STATS_BY_CUSTOM_DATA: '/reports/getAPStatsByCustom',
 	ANALYTICS_API_WIDGET_DATA: '/reports/getWidgetData',
 	ANALYTICS_API_UPDATE_STATUS: '/reports/getLastUpdateStatus',
 	ANALYTICS_METAINFO_URL: '/common/metaInfo',
