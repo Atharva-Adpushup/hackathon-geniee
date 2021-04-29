@@ -9,7 +9,7 @@
  * @param {object} manageBidderData
  * @returns
  */
-export default function getCommonBidderFields(isApRelation, isSuperUser, manageBidderData) {
+export default function getCommonBidderFields(isApRelation, isSuperUser, manageBidderData, isS2S) {
 	let commonBidderFields = {
 		relation: {
 			name: 'Relation',
@@ -51,8 +51,8 @@ export default function getCommonBidderFields(isApRelation, isSuperUser, manageB
 			dataType: 'string',
 			inputType: 'selectBox',
 			options: [{ name: 'Active', value: 'true' }, { name: 'Inactive', value: 'false' }],
-			isRequired: true,
-			isEditable: true,
+			isRequired: isS2S,
+			isEditable: isS2S,
 			defaultValue: 'false'
 		},
 		isS2SActive: {
@@ -60,8 +60,8 @@ export default function getCommonBidderFields(isApRelation, isSuperUser, manageB
 			dataType: 'string',
 			inputType: 'selectBox',
 			options: [{ name: 'Active', value: 'true' }, { name: 'Inactive', value: 'false' }],
-			isRequired: true,
-			isEditable: true,
+			isRequired: isS2S,
+			isEditable: isS2S,
 			defaultValue: 'false'
 		}
 	};
