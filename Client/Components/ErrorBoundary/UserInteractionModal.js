@@ -23,8 +23,8 @@ const UserInteractionModal = ({ isModalShown, showOrHideModal, sendErrorLog }) =
 		>
 			<Modal.Header closeButton>
 				<Modal.Title id="contained-modal-title-vcenter">
-					We've notified our team about the issue that you just faced.Please use the box below to
-					add any other relevent details:
+					We've notified our team about the issue that you just faced. Please use the box below to
+					add any other relevant details:
 				</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
