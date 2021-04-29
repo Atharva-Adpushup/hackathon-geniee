@@ -273,7 +273,9 @@ module.exports = {
 		supportMail: 'support@adpushup.com',
 		hackersMail: 'hackers@adpushup.com'
 	},
-	mailerQueueUrl: 'https://queuepublisher.adpushup.com/publish'
+	mailerQueueUrl: 'https://queuepublisher.adpushup.com/publish',
+	mailerServiceUrl: 'queuepublisher.adpushup.com',
+	adsTxtSupportEmail: ['testemail@adpushup.com']
 };
 
 /*
