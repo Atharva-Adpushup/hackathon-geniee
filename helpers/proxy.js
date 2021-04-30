@@ -62,7 +62,7 @@ var request = require('request-promise'),
 						data: {
 							to: emailRecepient,
 							body: err.message,
-							subject: 'Error in ads.txt verification'
+							subject: `Error in ads.txt verification for ${url}`
 						}
 					};
 					await fetch(config.mailerServiceUrl, {
