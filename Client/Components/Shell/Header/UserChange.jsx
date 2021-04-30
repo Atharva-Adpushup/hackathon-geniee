@@ -49,6 +49,7 @@ class UserChange extends Component {
 	};
 
 	getFormattedUserDomainsList = (domains = [], siteIds = []) =>
+		//removed filter of 5 as this is affecting the filter on the basis of domain or siteId beyond 5
 		domains
 			.map((domain, i) => {
 				const siteId = siteIds[i];
