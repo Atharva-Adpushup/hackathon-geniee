@@ -1,6 +1,7 @@
 var request = require('request-promise'),
 	utils = require('../helpers/utils'),
 	_ = require('lodash'),
+	fetch=require('node-fetch'),
 	crypto = require('crypto'),
 	Promise = require('bluebird'),
 	soap = require('strong-soap').soap,
@@ -43,27 +44,9 @@ var request = require('request-promise'),
 			userAgent =
 				userAgent ||
 				'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36';
-			return Promise.any([
-				request({
-					uri: url,
-					jar: true,
-					strictSSL: false,
-					resolveWithFullResponse: !!fullResponse,
-					headers: {
-						'User-Agent': userAgent,
-						'Accept-Encoding': 'identity'
-					}
-				}),
-				request({
-					uri: url,
-					jar: true,
-					strictSSL: false,
-					resolveWithFullResponse: !!fullResponse,
-					headers: {
-						'Accept-Encoding': 'identity'
-					}
-				})
-			]).catch(err => {
+			//migrated to node-fetch because some sites send gzip encoded response which axios and requests dont parse automatically	
+			return fetch(url).then(res=>res.text())
+			.catch(err => {
 				if (err && err.message.indexOf('I really need an ID for this to work') === -1) {
 					return false;
 				}

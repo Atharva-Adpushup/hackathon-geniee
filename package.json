@@ -89,6 +89,7 @@
 		"mssql": "^4.0.4",
 		"net": "^1.0.2",
 		"node-cron": "^1.1.2",
+		"node-fetch": "^2.6.1",
 		"node-utils": "git://github.com/adpushup/NodeUtils.git",
 		"node-uuid": "^1.4.7",
 		"normalizeurl": "^0.1.3",
