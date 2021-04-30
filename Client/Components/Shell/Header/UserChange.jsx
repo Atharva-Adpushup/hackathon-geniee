@@ -50,7 +50,6 @@ class UserChange extends Component {
 
 	getFormattedUserDomainsList = (domains = [], siteIds = []) =>
 		domains
-			.slice(0, 5)
 			.map((domain, i) => {
 				const siteId = siteIds[i];
 				const currentDomain = domanize(domain);
