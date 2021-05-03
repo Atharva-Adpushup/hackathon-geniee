@@ -10,5 +10,5 @@ module.exports = {
 		'navya.perla@adpushup.com'
 	],
 	DEV_TEAM: ['harpreet.singh@adpushup.com'],
-	OPS_TEAM: []
+	OPS_TEAM: ['cs-ops@adpushup.com']
 };
