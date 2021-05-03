@@ -156,6 +156,14 @@ const getItemFromLocalStorage = key => window.localStorage.getItem(key);
 
 const setItemToLocalStorage = (key, value) => window.localStorage.setItem(key, value);
 
+const domainFromUrl = url => {
+	const match = url.match(/^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n\?\=]+)/im);
+	if (match) {
+		return match[1];
+	}
+	return url;
+};
+
 export {
 	convertObjToArr,
 	arrayUnique,
@@ -172,5 +180,6 @@ export {
 	getValidArray,
 	getItemFromLocalStorage,
 	setItemToLocalStorage,
-	getReportScheduleIntervals
+	getReportScheduleIntervals,
+	domainFromUrl
 };

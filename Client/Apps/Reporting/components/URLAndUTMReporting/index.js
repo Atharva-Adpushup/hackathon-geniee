@@ -46,6 +46,12 @@ class Report extends Component {
 	constructor(props) {
 		super(props);
 		// let selectedMetrics = displayURLAndUTMMetrics.filter((metrics) => metrics.visible).map((metrics) => metrics.value)
+		const { urlReportingSites, utmReportingSites } = props;
+
+		const isURL = true;
+		const siteList = [...urlReportingSites, ...utmReportingSites];
+		const [selectedSite] = siteList;
+
 		this.state = {
 			dimensionList: [],
 			filterList: [],
@@ -57,13 +63,15 @@ class Report extends Component {
 			// dont forget to set isURL to false below
 			// if selectedDimension is utm
 			selectedDimension: 'url',
-			isURL: true,
+			isURL,
 			selectedFilters: {},
 			selectedMetrics: [],
 			selectedInterval: 'cumulative',
 			selectedOrder: 'top_select_criteria',
 			selectedOrderBy: 'impressions',
 			selectedTotalRecords: '500',
+			siteList,
+			selectedSite: selectedSite.value,
 			searchFilter: '',
 			revenueCutOff: '',
 			pagesFetched: 0,
@@ -195,6 +203,7 @@ class Report extends Component {
 			selectedMetrics,
 			selectedOrder,
 			selectedOrderBy,
+			selectedSite,
 			selectedTotalRecords,
 			regexFilter,
 			revenueCutOff
@@ -209,6 +218,7 @@ class Report extends Component {
 			displayURLAndUTMMetrics: filteredMetricsList,
 			selectedOrder,
 			selectedOrderBy,
+			selectedSite,
 			selectedTotalRecords,
 			searchFilter: regexFilter,
 			revenueCutOff
@@ -266,18 +276,18 @@ class Report extends Component {
 		};
 	};
 
-	formateReportParams = siteId => {
+	formateReportParams = () => {
 		const {
 			startDate,
 			endDate,
 			selectedDimension,
 			selectedOrder,
 			selectedOrderBy,
+			selectedSite,
 			selectedTotalRecords,
 			selectedFilters,
 			selectedInterval,
-			revenueCutOff,
-			isURL
+			revenueCutOff
 		} = this.state;
 		const { defaultReportType } = this.props;
 		const { email, reportType } = this.getDemoUserParams();
@@ -289,6 +299,7 @@ class Report extends Component {
 			dimension: selectedDimension,
 			[selectedOrder]: selectedOrderBy,
 			page_size: selectedTotalRecords,
+			siteid: selectedSite,
 			page: 0
 		};
 
@@ -301,15 +312,6 @@ class Report extends Component {
 			params.cut_off_value = revenueCutOff;
 		}
 
-		// if (!params.siteid) {
-		// 	// 1. multiple sites are not supported, picking first site from array
-		// 	// 2. it might be possible for some site url reporting is enabled and for some sites
-		// 	// 	  utm reporting is enabled. Here added a check to just to ensure to use siteIds
-		// 	//	  where the particular service is actually enabled
-		// 	const [siteId] = isURL ? urlReportingSites : utmReportingSites;
-		// 	params.siteid = siteId;
-		// }
-		params.siteid = siteId;
 		if (reportType === 'global' || defaultReportType === 'global') {
 			params.isSuperUser = true;
 		}
@@ -401,133 +403,101 @@ class Report extends Component {
 
 	generateButtonHandler = (inputState = {}) => {
 		let { tableData } = this.state;
-		const { urlReportingSites, utmReportingSites } = this.props;
 		const { selectedDimension, selectedFilters, dimensionList } = this.state;
 		const { reportType, isForOps } = this.props;
 		const computedState = Object.assign({ isLoading: true }, inputState);
 		const isURL = selectedDimension.indexOf('url') !== -1;
 		this.setState(computedState, () => {
 			let newState = {};
-			let allResultSites;
-			if (selectedDimension === 'url') allResultSites = [...urlReportingSites];
-			else allResultSites = [...utmReportingSites];
-			const reportingData = allResultSites.map(siteId => {
-				const params = this.formateReportParams(siteId);
-				return urlReportService.getCustomStats({ ...params });
-			});
+			const params = this.formateReportParams();
+			urlReportService.getCustomStats({ ...params }).then(response => {
+				if (Number(response.status) === 200 && response.data) {
+					tableData = response.data || [];
+					// hide bidder/network col - data is being aggregated data wise
+					tableData.columns = tableData.columns.filter(item => item !== 'network');
+					tableData.total = {};
+					const shouldAddAdpushupCountPercentColumn =
+						(selectedDimension === 'mode' ||
+							selectedDimension === 'error_code' ||
+							selectedFilters.mode ||
+							selectedFilters.error_code) &&
+						tableData.columns.indexOf('adpushup_count') !== -1;
 
-			Promise.all(reportingData).then(responses => {
-				tableData = responses.reduce((cummulutaive, response) => {
-					if (Number(response.status) === 200 && response.data) {
-						let tableData = response.data || [];
-						// hide bidder/network col - data is being aggregated data wise
-						tableData.columns = tableData.columns.filter(item => item !== 'network');
-						tableData.total = {};
-						const shouldAddAdpushupCountPercentColumn =
-							(selectedDimension === 'mode' ||
-								selectedDimension === 'error_code' ||
-								selectedFilters.mode ||
-								selectedFilters.error_code) &&
-							tableData.columns.indexOf('adpushup_count') !== -1;
+					// Add columns
+					if (isForOps && shouldAddAdpushupCountPercentColumn) {
+						tableData.columns.push('adpushup_count_percent');
 
-						// Add columns
-						if (isForOps && shouldAddAdpushupCountPercentColumn) {
-							tableData.columns.push('adpushup_count_percent');
+						// eslint-disable-next-line no-inner-declarations
+						function getComputedIntervalKey(row) {
+							const { date, month, year } = row;
 
-							// eslint-disable-next-line no-inner-declarations
-							function getComputedIntervalKey(row) {
-								const { date, month, year } = row;
+							if (date) return date;
+							if (month && year) return `${month}-${year}`;
+							return 'cumulative';
+						}
 
-								if (date) return date;
-								if (month && year) return `${month}-${year}`;
-								return 'cumulative';
+						const adpushupCountTotalObj = tableData.result.reduce((totalObj, row) => {
+							const { adpushup_count: adpushupCount } = row;
+							const key = getComputedIntervalKey(row);
+
+							if (Number.isInteger(totalObj[key])) {
+								// eslint-disable-next-line no-param-reassign
+								totalObj[key] += adpushupCount;
+							} else {
+								// eslint-disable-next-line no-param-reassign
+								totalObj[key] = adpushupCount;
 							}
 
-							const adpushupCountTotalObj = tableData.result.reduce((totalObj, row) => {
-								const { adpushup_count: adpushupCount } = row;
-								const key = getComputedIntervalKey(row);
-
-								if (Number.isInteger(totalObj[key])) {
-									// eslint-disable-next-line no-param-reassign
-									totalObj[key] += adpushupCount;
-								} else {
-									// eslint-disable-next-line no-param-reassign
-									totalObj[key] = adpushupCount;
-								}
-
-								return totalObj;
-							}, {});
-
-							tableData.result.forEach(row => {
-								const key = getComputedIntervalKey(row);
-
-								const perc = (row.adpushup_count / adpushupCountTotalObj[key]) * 100;
-								// eslint-disable-next-line no-param-reassign
-								row.adpushup_count_percent = perc;
-							});
-						}
-
-						// Compute data table total
-						if (
-							reportType === 'global' &&
-							!tableData.total &&
-							tableData.columns &&
-							tableData.columns.length
-						) {
-							tableData.total = this.computeTotal(tableData.result);
-						}
+							return totalObj;
+						}, {});
 
 						tableData.result.forEach(row => {
-							Object.keys(row).forEach(column => {
-								if (
-									REPORT_INTERVAL_TABLE_KEYS.indexOf(column) === -1 &&
-									!Number.isNaN(row[column]) &&
-									!dimensionList.find(dimension => dimension.value === column) &&
-									!(typeof row[column] === 'string')
-								) {
-									// eslint-disable-next-line no-param-reassign
-									row[column] = parseFloat(roundOffTwoDecimal(row[column]));
-								}
-							});
+							const key = getComputedIntervalKey(row);
+
+							const perc = (row.adpushup_count / adpushupCountTotalObj[key]) * 100;
+							// eslint-disable-next-line no-param-reassign
+							row.adpushup_count_percent = perc;
 						});
-
-						Object.keys(tableData.total || {}).forEach(column => {
-							tableData.total[column] = parseFloat(roundOffTwoDecimal(tableData.total[column]));
-						});
-
-						if (tableData.columns && tableData.columns.length) {
-							let metricsList = this.getMetricsList(tableData);
-							// eslint-disable-next-line no-shadow
-							const { displayURLMetrics, displayUTMMetrics } = this.state;
-							metricsList = [...(isURL ? displayURLMetrics : displayUTMMetrics)];
-							// show only metrices that are in displayURLAndUTMMetricsList
-							newState = { ...newState, metricsList };
-						}
-						// return { ...cummulutaive, tableData };
-
-						let cummulativeResult;
-						if (!cummulutaive.result) cummulativeResult = tableData;
-						else {
-							const { columns, result, total } = cummulutaive;
-							const { result: currentResult, total: currentTotal } = tableData;
-							cummulativeResult = {
-								columns,
-								result: [...result, ...currentResult],
-								total: {
-									total_network_ad_ecpm:
-										total.total_network_ad_ecpm || 0 + currentTotal.total_network_ad_ecpm || 0,
-									total_network_impressions:
-										total.total_network_impressions ||
-										0 + currentTotal.total_network_impressions ||
-										0,
-									total_network_net_revenue:
-										total.network_net_revenue || 0 + currentTotal.network_net_revenue || 0
-								}
-							};
-						}
-						return cummulativeResult;
 					}
-				}, {});
+
+					// Compute data table total
+					if (
+						reportType === 'global' &&
+						!tableData.total &&
+						tableData.columns &&
+						tableData.columns.length
+					) {
+						tableData.total = this.computeTotal(tableData.result);
+					}
+
+					tableData.result.forEach(row => {
+						Object.keys(row).forEach(column => {
+							if (
+								REPORT_INTERVAL_TABLE_KEYS.indexOf(column) === -1 &&
+								!Number.isNaN(row[column]) &&
+								!dimensionList.find(dimension => dimension.value === column) &&
+								!(typeof row[column] === 'string')
+							) {
+								// eslint-disable-next-line no-param-reassign
+								row[column] = parseFloat(roundOffTwoDecimal(row[column]));
+							}
+						});
+					});
+
+					Object.keys(tableData.total || {}).forEach(column => {
+						tableData.total[column] = parseFloat(roundOffTwoDecimal(tableData.total[column]));
+					});
+
+					if (tableData.columns && tableData.columns.length) {
+						let metricsList = this.getMetricsList(tableData);
+						// eslint-disable-next-line no-shadow
+						const { displayURLMetrics, displayUTMMetrics } = this.state;
+						metricsList = [...(isURL ? displayURLMetrics : displayUTMMetrics)];
+						// show only metrices that are in displayURLAndUTMMetricsList
+						newState = { ...newState, metricsList };
+					}
+				}
+
 				newState = {
 					...newState,
 					isLoading: false,
@@ -539,104 +509,6 @@ class Report extends Component {
 				this.setState(newState);
 			});
 		});
-		// Promise.all[urlReportService.getCustomStats({ ...params })].then(response => {
-		// if (Number(response.status) === 200 && response.data) {
-		// 	tableData = response.data || [];
-		// 	// hide bidder/network col - data is being aggregated data wise
-		// 	tableData.columns = tableData.columns.filter(item => item !== 'network');
-		// 	tableData.total = {};
-		// 	const shouldAddAdpushupCountPercentColumn =
-		// 		(selectedDimension === 'mode' ||
-		// 			selectedDimension === 'error_code' ||
-		// 			selectedFilters.mode ||
-		// 			selectedFilters.error_code) &&
-		// 		tableData.columns.indexOf('adpushup_count') !== -1;
-
-		// 	// Add columns
-		// 	if (isForOps && shouldAddAdpushupCountPercentColumn) {
-		// 		tableData.columns.push('adpushup_count_percent');
-
-		// 		// eslint-disable-next-line no-inner-declarations
-		// 		function getComputedIntervalKey(row) {
-		// 			const { date, month, year } = row;
-
-		// 			if (date) return date;
-		// 			if (month && year) return `${month}-${year}`;
-		// 			return 'cumulative';
-		// 		}
-
-		// 		const adpushupCountTotalObj = tableData.result.reduce((totalObj, row) => {
-		// 			const { adpushup_count: adpushupCount } = row;
-		// 			const key = getComputedIntervalKey(row);
-
-		// 			if (Number.isInteger(totalObj[key])) {
-		// 				// eslint-disable-next-line no-param-reassign
-		// 				totalObj[key] += adpushupCount;
-		// 			} else {
-		// 				// eslint-disable-next-line no-param-reassign
-		// 				totalObj[key] = adpushupCount;
-		// 			}
-
-		// 			return totalObj;
-		// 		}, {});
-
-		// 		tableData.result.forEach(row => {
-		// 			const key = getComputedIntervalKey(row);
-
-		// 			const perc = (row.adpushup_count / adpushupCountTotalObj[key]) * 100;
-		// 			// eslint-disable-next-line no-param-reassign
-		// 			row.adpushup_count_percent = perc;
-		// 		});
-		// 	}
-
-		// 	// Compute data table total
-		// 	if (
-		// 		reportType === 'global' &&
-		// 		!tableData.total &&
-		// 		tableData.columns &&
-		// 		tableData.columns.length
-		// 	) {
-		// 		tableData.total = this.computeTotal(tableData.result);
-		// 	}
-
-		// 	tableData.result.forEach(row => {
-		// 		Object.keys(row).forEach(column => {
-		// 			if (
-		// 				REPORT_INTERVAL_TABLE_KEYS.indexOf(column) === -1 &&
-		// 				!Number.isNaN(row[column]) &&
-		// 				!dimensionList.find(dimension => dimension.value === column) &&
-		// 				!(typeof row[column] === 'string')
-		// 			) {
-		// 				// eslint-disable-next-line no-param-reassign
-		// 				row[column] = parseFloat(roundOffTwoDecimal(row[column]));
-		// 			}
-		// 		});
-		// 	});
-
-		// 	Object.keys(tableData.total || {}).forEach(column => {
-		// 		tableData.total[column] = parseFloat(roundOffTwoDecimal(tableData.total[column]));
-		// 	});
-
-		// 	if (tableData.columns && tableData.columns.length) {
-		// 		let metricsList = this.getMetricsList(tableData);
-		// 		// eslint-disable-next-line no-shadow
-		// 		const { displayURLMetrics, displayUTMMetrics } = this.state;
-		// 		metricsList = [...(isURL ? displayURLMetrics : displayUTMMetrics)];
-		// 		// show only metrices that are in displayURLAndUTMMetricsList
-		// 		newState = { ...newState, metricsList };
-		// 	}
-		// }
-
-		// newState = {
-		// 	...newState,
-		// 	isLoading: false,
-		// 	tableData,
-		// 	isURL,
-		// 	pageIndex: 0,
-		// 	pagesFetched: 0
-		// };
-		// this.setState(newState);
-		// });
 	};
 
 	getSortedMetaMetrics = metaMetrics => {
@@ -995,6 +867,8 @@ class Report extends Component {
 			selectedDimension,
 			selectedOrder,
 			selectedOrderBy,
+			siteList,
+			selectedSite,
 			selectedTotalRecords,
 			searchFilter,
 			revenueCutOff,
@@ -1027,7 +901,7 @@ class Report extends Component {
 			showNotification
 		} = this.props;
 
-		const aggregatedData = this.aggregateValues(tableData.result || []);
+		const aggregatedData = this.aggregateValues(tableData.result);
 		const { email } = this.getDemoUserParams();
 		const { isValid } = getReportingDemoUserValidation(email, reportType);
 
@@ -1080,6 +954,8 @@ class Report extends Component {
 						selectedDimension={selectedDimension}
 						selectedOrder={selectedOrder}
 						selectedOrderBy={selectedOrderBy}
+						selectedSite={selectedSite}
+						siteList={siteList}
 						selectedTotalRecords={selectedTotalRecords}
 						searchFilter={searchFilter}
 						revenueCutOff={revenueCutOff}
