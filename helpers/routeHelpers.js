@@ -454,15 +454,13 @@ console.log(JSON.stringify(ads, null, 3), 'ads old but new')
 		);
 }
 
-function updateAmpTags(id, adDoc, siteId, updateThis) {
+function updateAmpTags(id, ads, siteId, updateThis) {
 	console.log(id, 'id')
-	console.log(adDoc, 'adDoc')
-	const { ads } = adDoc;
 	console.log(updateThis, 'updateThis')
 	if (!id) {
 		return Promise.resolve();
 	}
-console.log(`amtg::${siteId}`)
+console.log(`ampd::${siteId}`)
 	return couchbase
 		.connectToAppBucket()
 		.then(appBucket =>
@@ -476,14 +474,18 @@ console.log(`amtg::${siteId}`)
 				value = { ...value, ...updateThis, updatedOn: +new Date() };
 			} else {
 				const updatedAd = ads.find(val => val.id === id);
-
-				value = updatedAd;
-				value.updatedOn = +new Date();
-				value.ad.isRefreshEnabled
-					? (value.ad.refreshInterval = 30)
-					: delete value.ad.refreshInterval;
+				value.ads = value.ads.map(adItem => {
+					if(adItem.id == id) {
+						adItem = updatedAd;
+						value.updatedOn = +new Date();
+						adItem.isRefreshEnabled
+							? (adItem.refreshInterval = 30)
+							: delete adItem.refreshInterval;
+					}
+					return adItem
+				})
 			}
-
+console.log(value, 'value')
 			return appBucket.replaceAsync(`${docKeys.ampScript}${siteId}`, value) && value;
 		})
 		.catch(err => {
@@ -495,11 +497,11 @@ console.log(`amtg::${siteId}`)
 		});
 }
 
-function checkAmpUnsyncedAds(doc) {
-	const { ad } = doc;
+function checkAmpUnsyncedAds(ad) {
+	// const { ad } = doc;
 	if (!ad.networkData.dfpAdunitCode) {
 		const defaultAdData = {
-			sectionName: doc.name,
+			sectionName: ad.name,
 			variations: [
 				// hard coded! check apTag code
 				{
@@ -509,11 +511,11 @@ function checkAmpUnsyncedAds(doc) {
 					platform: 'mobile'
 				}
 			],
-			adId: doc.id,
+			adId: ad.id,
 			isResponsive: false, // false in amp
 			sizeWidth: ad.width,
 			sizeHeight: ad.height,
-			sectionId: doc.id,
+			sectionId: ad.id,
 			type: ad.type,
 			isManual: false,
 			isInnovativeAd: false,
@@ -615,7 +617,7 @@ function queuePublishingWrapper(siteId, ads) {
 	return commonDataForUnsyncedAmpAds(siteId, ads).then(data => {
 		// If no unsynced ad then skip dfp syncing
 		if (!(data && Array.isArray(data.ads) && data.ads.length)) return Promise.resolve(ads);
-
+console.log(data, 'queue publishing data')
 		var options = {
 			method: 'POST',
 			uri: `${config.queuePublishingURL}/publish`,
