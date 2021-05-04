@@ -27,6 +27,7 @@ class RefreshSettings extends Component {
 	handleSave = () => {
 		const { isRefreshEnabled } = this.state;
 		const { onSubmit, onCancel, ad } = this.props;
+		console.log(ad, 'ad');
 		ad.isRefreshEnabled = isRefreshEnabled;
 		onSubmit({
 			ad

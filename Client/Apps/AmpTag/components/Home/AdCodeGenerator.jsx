@@ -63,7 +63,7 @@ class AdCodeGenerator extends Component {
 	}
 
 	saveHandler() {
-		const { type, size, isRefreshEnabled, isMultiSize, refreshInterval } = this.state;
+		const { type, size, isRefreshEnabled, isMultiSize, refreshInterval, platform } = this.state;
 
 		const { createAd, siteId } = this.props;
 		const isResponsive = size === 'responsive';
@@ -81,12 +81,13 @@ class AdCodeGenerator extends Component {
 			isRefreshEnabled,
 			networkData: {
 				dfpAdunitCode: null,
-				dfpAdunit: null
-			},
-			hbConfig: {
+				dfpAdunit: null,
 				formats: ['display']
 			},
-
+			formatData: {
+				platform,
+				type
+			},
 			isActive: true
 		};
 

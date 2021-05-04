@@ -7,14 +7,15 @@ const createAd = params => dispatch =>
 		.post('/amp/createAd', params)
 		.then(response => {
 			const { data } = response.data;
+			const ad = data.doc.ads.filter(adItem => adItem.id === data.newId);
 			dispatch({
 				type: AD_ACTIONS.UPDATE_ADS_LIST,
-				data: data.doc,
+				data: ad[0],
 				siteId: params.siteId
 			});
 			return dispatch({
 				type: GLOBAL_ACTIONS.SET_CURRENT_AD,
-				currentAd: data.doc.id,
+				currentAd: ad[0],
 				maxHeight: params.ad.maxHeight,
 				siteId: params.siteId
 			});

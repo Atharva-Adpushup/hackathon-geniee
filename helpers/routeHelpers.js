@@ -15,6 +15,7 @@ const adpushup = require('./adpushupEvent');
 const AdPushupError = require('./AdPushupError');
 const { sendErrorResponse, sendSuccessResponse } = require('./commonFunctions');
 const {
+	docKeys,
 	PRODUCT_LIST_API,
 	APP_KEYS,
 	GOOGLE_BOT_USER_AGENT,
@@ -367,8 +368,8 @@ function checkParams(toCheck, req, mode, checkLight = false) {
 function createNewAmpDocAndDoProcessing(payload, initialDoc, docKey, processing) {
 	const defaultDocCopy = _.cloneDeep(initialDoc);
 	return appBucket
-		.createDoc(`${docKey}${payload.siteId}:${payload.id}`, defaultDocCopy, {})
-		.then(() => appBucket.getDoc(`site::${payload.siteId}`))
+		.createDoc(`${docKey}${payload.siteId}`, defaultDocCopy, {})
+		.then(() => appBucket.getDoc(`${docKey}${payload.siteId}`))
 		.then(docWithCas => {
 			payload.siteDomain = docWithCas.value.siteDomain;
 			return processing(defaultDocCopy, payload);
@@ -379,12 +380,38 @@ function getAmpAds(siteId) {
 	const GET_ALL_AMP_ADS_QUERY = `SELECT _amtg as doc 							
 	FROM AppBucket _amtg
 	WHERE meta(_amtg).id LIKE 'amtg::%' AND _amtg.siteId = "${siteId}";`;
-
+console.log(GET_ALL_AMP_ADS_QUERY, 'GET_ALL_AMP_ADS_QUERY')
 	const query = N1qlQuery.fromString(GET_ALL_AMP_ADS_QUERY);
 
 	return couchbase
 		.connectToAppBucket()
 		.then(appBucket => appBucket.queryAsync(query))
+		.then(ads => ads)
+		.catch(err => console.log(err));
+}
+
+function getAmpAds2(siteId) {
+	return couchbase
+		.connectToAppBucket()
+		.then(appBucket => {
+			// console.log(appBucket, 'appBucket');
+			return getSiteDocValues(siteId)
+			.then(site => {
+				const { siteDomain, ownerEmail } = site;
+				return appBucket.getAsync(`user::${ownerEmail}`).then(userDocWithCas => {
+					// console.log(JSON.stringify(userDocWithCas, null, 3), 'userDocWithCas')
+					return appBucket;
+				});
+			})
+	
+		})
+		.then(appBucket => appBucket.getAsync(`ampd::${siteId}`, {}).then(ampdDoc => {
+			console.log(JSON.stringify(ampdDoc, null, 3), 'getAmpAds2');
+			const { value: { ads } } = ampdDoc;
+			console.log(ads, 'adsadsadsadsadsads')
+			// appBucket.getDoc(`user::${ownerEmail}`).then(userDocWithCas 
+			return ads;
+		}))
 		.then(ads => ads)
 		.catch(err => console.log(err));
 }
@@ -401,15 +428,18 @@ function fetchAmpAds(req, res, docKey) {
 	const { siteId } = req.query;
 
 	return verifyOwner(siteId, req.user.email)
-		.then(() => getAmpAds(siteId))
+		.then(() => getAmpAds2(siteId))
+		// .then(() => getAmpAds(siteId))
 		.then(queryResult => queryResult)
-		.then(ads =>
-			sendSuccessResponse(
+		.then((ads = []) => {
+console.log(JSON.stringify(ads, null, 3), 'ads old but new')
+			return sendSuccessResponse(
 				{
-					ads: ads.map(val => val.doc) || []
+					ads
 				},
 				res
 			)
+		}
 		)
 
 		.catch(err =>
@@ -424,17 +454,24 @@ function fetchAmpAds(req, res, docKey) {
 		);
 }
 
-function updateAmpTags(id, ads, updateThis) {
+function updateAmpTags(id, adDoc, siteId, updateThis) {
+	console.log(id, 'id')
+	console.log(adDoc, 'adDoc')
+	const { ads } = adDoc;
+	console.log(updateThis, 'updateThis')
 	if (!id) {
 		return Promise.resolve();
 	}
-
+console.log(`amtg::${siteId}`)
 	return couchbase
 		.connectToAppBucket()
 		.then(appBucket =>
-			appBucket.getAsync(`amtg::${id}`, {}).then(amtgDoc => ({ appBucket, amtgDoc }))
+			appBucket.getAsync(`${docKeys.ampScript}${siteId}`, {}).then(ampd => ({ appBucket, ampd }))
 		)
-		.then(({ appBucket, amtgDoc: { value } }) => {
+		.then(({ appBucket, ampd: { value } }) => {
+			console.log(value, 'value')
+			console.log(ads, 'ads')
+			console.log(updateThis, 'updateThis')
 			if (!ads) {
 				value = { ...value, ...updateThis, updatedOn: +new Date() };
 			} else {
@@ -447,7 +484,7 @@ function updateAmpTags(id, ads, updateThis) {
 					: delete value.ad.refreshInterval;
 			}
 
-			return appBucket.replaceAsync(`amtg::${id}`, value) && value;
+			return appBucket.replaceAsync(`${docKeys.ampScript}${siteId}`, value) && value;
 		})
 		.catch(err => {
 			if (err.code === 13) {
@@ -636,7 +673,7 @@ module.exports = {
 	checkParams,
 	queuePublishingWrapper,
 	storedRequestWrapper,
-	getAmpAds,
+	getAmpAds: getAmpAds2,
 	publishAdPushupBuild,
 	sendDataToAuditLogService
 };

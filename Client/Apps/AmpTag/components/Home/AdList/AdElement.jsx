@@ -27,21 +27,20 @@ class AdElement extends Component {
 			showMultiSize: false,
 			showRefresh: false,
 			editName: false,
-			isActive: Object.prototype.hasOwnProperty.call(props.doc.ad, 'isActive')
-				? props.doc.ad.isActive
+			isActive: Object.prototype.hasOwnProperty.call(props.ad, 'isActive')
+				? props.ad.isActive
 				: true
 		};
 		this.toggleHandler = this.toggleHandler.bind(this);
 		this.renderAdDetails = this.renderAdDetails.bind(this);
 		this.disableAd = this.disableAd.bind(this);
 		this.updateWrapper = this.updateWrapper.bind(this);
+		console.log(props, 'props');
 	}
 
 	disableAd() {
 		const { isActive } = this.state;
-		const {
-			doc: { ad }
-		} = this.props;
+		const { ad } = this.props;
 		const message = isActive
 			? 'Are you sure you want to archive this ad?'
 			: 'Are you sure you want to unarchive this ad?';
@@ -59,12 +58,19 @@ class AdElement extends Component {
 		this.setState(state => ({ [property]: !state[property] }));
 	}
 
+	// console.log('updateWrapper data', data)
+	// const { updateAd, modifyAdOnServer, user, ad, siteId, adsToUpdateOnMasterSave } = this.props;
+	// console.log('ad', ad)
+	// adsToUpdateOnMasterSave(ad.id);
+	// console.log(user.isSuperUser, 'user.isSuperUser')
+	// return user.isSuperUser
+	// 	? updateAd(ad.id, siteId, data)
+	// 	: modifyAdOnServer(siteId, ad.id, data);
 	updateWrapper(data) {
-		const { updateAd, modifyAdOnServer, user, doc, siteId, adsToUpdateOnMasterSave } = this.props;
-		adsToUpdateOnMasterSave(doc.id);
-		return user.isSuperUser
-			? updateAd(doc.id, siteId, data)
-			: modifyAdOnServer(siteId, doc.id, data);
+		console.log('updateWrapper data', data);
+		const { updateAd, modifyAdOnServer, user, ad, siteId, adsToUpdateOnMasterSave } = this.props;
+		adsToUpdateOnMasterSave(ad.id);
+		return user.isSuperUser ? updateAd(ad.id, siteId, data) : modifyAdOnServer(siteId, ad.id, data);
 	}
 
 	renderInformation = (label, value) => (
@@ -74,25 +80,31 @@ class AdElement extends Component {
 	);
 
 	renderAdDetails() {
-		const { user, siteId, doc, networkCode, dfpMessage } = this.props;
-		const {
-			dfpSyncingStatus: { completedOn }
-		} = doc;
+		const { user, siteId, ad, networkCode, dfpMessage } = this.props;
+		console.log(ad, 'ad');
+		// const {
+		// 	dfpSyncingStatus: { completedOn }
+		// } = doc;
 
-		const { ad, id, name } = doc;
+		const { id, name } = ad;
 		const {
 			width,
 			height,
 			isMultiSize,
 			isRefreshEnabled,
 			refreshInterval = 30,
-			type,
+			formatData,
 			networkData: { dfpAdunitCode }
 		} = ad;
+		const { type } = formatData;
 		const { editName, isActive, showMultiSize, showRefresh } = this.state;
 
 		const dynamicAttribsArr = [];
 		const ampFixedTargeting = { ...AMP_FIXED_TARGETING };
+		const totalAmpSlots = 0;
+
+		dynamicAttribsArr.push(`data-siteid="${siteId}"`);
+		dynamicAttribsArr.push(`data-totalAmpSlots=${totalAmpSlots}`);
 
 		if (isRefreshEnabled) {
 			dynamicAttribsArr.push(`data-enable-refresh="${refreshInterval}"`);
@@ -154,7 +166,7 @@ class AdElement extends Component {
 				<EditBox
 					label="Ad Name"
 					name={`name-${id}`}
-					value={name ? name : `Ad-${id}`}
+					value={name || `Ad-${id}`}
 					onSave={this.updateWrapper}
 					onCancel={() => this.toggleHandler('editName')}
 					leftSize={3}
@@ -170,7 +182,7 @@ class AdElement extends Component {
 				) : null}
 				{this.renderInformation('Id', id)}
 				<p>
-					Name: <strong>{name ? name : `Ad-${id}`}</strong>{' '}
+					Name: <strong>{name || `Ad-${id}`}</strong>{' '}
 					<OverlayTrigger
 						placement="bottom"
 						overlay={<Tooltip id="ad-name-edit">Edit Ad Name</Tooltip>}
@@ -194,9 +206,7 @@ class AdElement extends Component {
 						{this.renderInformation('Status', ad.isActive ? 'Active' : 'Archived')}
 					</div>
 				) : null}
-				<pre style={{ wordBreak: 'break-word' }}>
-					{dfpAdunitCode && completedOn ? code : dfpMessage}
-				</pre>{' '}
+				<pre style={{ wordBreak: 'break-word' }}>{dfpAdunitCode ? code : dfpMessage}</pre>{' '}
 				{user.isSuperUser ? (
 					<React.Fragment>
 						<CustomButton
@@ -213,7 +223,7 @@ class AdElement extends Component {
 						>
 							Edit Refresh
 						</CustomButton>
-						{dfpAdunitCode && completedOn ? (
+						{dfpAdunitCode ? (
 							<CopyButtonWrapperContainer content={code} className="u-margin-t3 pull-right">
 								<CustomButton variant="secondary">Copy AdCode</CustomButton>
 							</CopyButtonWrapperContainer>
@@ -225,12 +235,18 @@ class AdElement extends Component {
 	}
 
 	render() {
-		const { doc } = this.props;
-		const { ad } = doc;
+		const { ad } = this.props;
+		console.log(this.props, 'this.props');
+		console.log(ad, 'ad');
+		const {
+			formatData: { type }
+		} = ad;
+
+		// const { ad } = doc;
 		const { isActive } = this.state;
 
 		return (
-			<div key={`adElement-${doc.id}`}>
+			<div key={`adElement-${ad.id}`}>
 				<OverlayTrigger
 					placement="bottom"
 					overlay={
@@ -242,7 +258,7 @@ class AdElement extends Component {
 					</Button>
 				</OverlayTrigger>
 				<Col xs={3} className="ad-image">
-					<img src={`/assets/images/tagManager/${ad.type}.png`} alt="Ad Type" />
+					<img src={`/assets/images/tagManager/${type}.png`} alt="Ad Type" />
 				</Col>
 				<Col xs={9} className="ad-details">
 					{this.renderAdDetails()}
