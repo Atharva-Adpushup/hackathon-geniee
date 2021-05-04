@@ -159,11 +159,9 @@ const getItemFromLocalStorage = key => window.localStorage.getItem(key);
 const setItemToLocalStorage = (key, value) => window.localStorage.setItem(key, value);
 
 const domainFromUrl = url => {
-	const match = url.match(/^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n\?\=]+)/im);
-	if (match) {
-		return match[1];
-	}
-	return url;
+	const aTag = document.createElement('a');
+	aTag.href = url;
+	return aTag.hostname;
 };
 
 export {
