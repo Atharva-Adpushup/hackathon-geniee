@@ -23,6 +23,8 @@ const arrayUnique = array => {
 
 	return a;
 };
+const arrayUniqueObject = (array, field) =>
+	array.filter((v, i, a) => a.findIndex(t => t[field] === v[field]) === i);
 
 const computeCsvData = data => {
 	const { tableBody, tableColumns } = data;
@@ -167,6 +169,7 @@ const domainFromUrl = url => {
 export {
 	convertObjToArr,
 	arrayUnique,
+	arrayUniqueObject,
 	computeCsvData,
 	numberWithCommas,
 	getPresets,
