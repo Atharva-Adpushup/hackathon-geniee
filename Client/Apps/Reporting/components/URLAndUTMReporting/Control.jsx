@@ -401,22 +401,27 @@ class Control extends Component {
 						/>
 						{/* eslint-enable */}
 					</div>
-					<div className="aligner-item u-margin-r4">
-						{/* eslint-disable */}
-						<label className="u-text-normal">Select Site</label>
-						<SelectBox
-							id="orderby"
-							key="orderby"
-							wrapperClassName="custom-select-box-wrapper"
-							isClearable={false}
-							isSearchable={false}
-							selected={state.selectedSite}
-							options={state.siteList}
-							onSelect={selectedSite => {
-								this.setState({ selectedSite }, this.onControlChange.bind(null, reportType));
-							}}
-						/>
-					</div>
+					{state.siteList.length > 1 ? (
+						<div className="aligner-item u-margin-r4">
+							{/* eslint-disable */}
+								<label className="u-text-normal">Select Site</label>
+								<SelectBox
+									id="orderby"
+									key="orderby"
+									wrapperClassName="custom-select-box-wrapper"
+									isClearable={false}
+									isSearchable={false}
+									selected={state.selectedSite}
+									options={state.siteList}
+									onSelect={selectedSite => {
+										this.setState({ selectedSite }, this.onControlChange.bind(null, reportType));
+									}}
+								/>
+							</div>
+						): (
+							<div className="aligner-item u-margin-r4"></div>
+						)
+					}
 					<div
 						className="aligner-item aligner--hEnd"
 						style={{

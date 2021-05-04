@@ -25,7 +25,7 @@ import {
 } from '../../configs/commonConsts';
 import { DEMO_ACCOUNT_DATA } from '../../../../constants/others';
 import Loader from '../../../../Components/Loader';
-import { convertObjToArr, roundOffTwoDecimal } from '../../helpers/utils';
+import { convertObjToArr, roundOffTwoDecimal, arrayUniqueObject } from '../../helpers/utils';
 import {
 	getReportingDemoUserValidation,
 	getReportingDemoUserSiteIds,
@@ -45,11 +45,11 @@ function oldConsoleRedirection(e) {
 class Report extends Component {
 	constructor(props) {
 		super(props);
-		// let selectedMetrics = displayURLAndUTMMetrics.filter((metrics) => metrics.visible).map((metrics) => metrics.value)
 		const { urlReportingSites, utmReportingSites } = props;
 
 		const isURL = true;
-		const siteList = [...urlReportingSites, ...utmReportingSites];
+		// unique by site name
+		const siteList = arrayUniqueObject([...urlReportingSites, ...utmReportingSites], 'name');
 		const [selectedSite] = siteList;
 
 		this.state = {
