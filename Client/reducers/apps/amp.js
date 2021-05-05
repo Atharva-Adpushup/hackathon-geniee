@@ -32,9 +32,6 @@ const ads = (state = {}, action) => {
 				[action.siteId]: {
 					...state[action.siteId],
 					content: content.map(doc => {
-						console.log(doc, 'doc');
-						console.log(action.data, 'action.data');
-
 						if (action.data.id === doc.id) {
 							return { ...doc, ...action.data.updateThis };
 						}

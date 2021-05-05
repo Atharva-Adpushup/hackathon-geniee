@@ -19,7 +19,6 @@ class AdList extends Component {
 
 	adsToUpdate = id => {
 		const { adIdsToUpdate } = this.state;
-		console.log(adIdsToUpdate, 'adIdsToUpdate');
 		if (!adIdsToUpdate.includes(id))
 			this.setState({
 				adIdsToUpdate: [...adIdsToUpdate, id]

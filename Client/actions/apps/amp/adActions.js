@@ -7,6 +7,9 @@ const createAd = params => dispatch =>
 		.post('/amp/createAd', params)
 		.then(response => {
 			const { data } = response.data;
+			// getting newId from backend API to get the unique Id of newly
+			// addded AMP tag and filter it out from the response and then pass
+			// it to dispatch as needed
 			const ad = data.doc.ads.filter(adItem => adItem.id === data.newId);
 			dispatch({
 				type: AD_ACTIONS.UPDATE_ADS_LIST,

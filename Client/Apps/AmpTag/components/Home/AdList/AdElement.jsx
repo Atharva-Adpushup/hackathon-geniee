@@ -35,7 +35,6 @@ class AdElement extends Component {
 		this.renderAdDetails = this.renderAdDetails.bind(this);
 		this.disableAd = this.disableAd.bind(this);
 		this.updateWrapper = this.updateWrapper.bind(this);
-		console.log(props, 'props');
 	}
 
 	disableAd() {
@@ -58,16 +57,7 @@ class AdElement extends Component {
 		this.setState(state => ({ [property]: !state[property] }));
 	}
 
-	// console.log('updateWrapper data', data)
-	// const { updateAd, modifyAdOnServer, user, ad, siteId, adsToUpdateOnMasterSave } = this.props;
-	// console.log('ad', ad)
-	// adsToUpdateOnMasterSave(ad.id);
-	// console.log(user.isSuperUser, 'user.isSuperUser')
-	// return user.isSuperUser
-	// 	? updateAd(ad.id, siteId, data)
-	// 	: modifyAdOnServer(siteId, ad.id, data);
 	updateWrapper(data) {
-		console.log('updateWrapper data', data);
 		const { updateAd, modifyAdOnServer, user, ad, siteId, adsToUpdateOnMasterSave } = this.props;
 		adsToUpdateOnMasterSave(ad.id);
 		return user.isSuperUser
@@ -83,10 +73,6 @@ class AdElement extends Component {
 
 	renderAdDetails() {
 		const { user, siteId, ad, networkCode, dfpMessage } = this.props;
-		console.log(ad, 'ad');
-		// const {
-		// 	dfpSyncingStatus: { completedOn }
-		// } = doc;
 
 		const { id, name } = ad;
 		const {
@@ -238,13 +224,9 @@ class AdElement extends Component {
 
 	render() {
 		const { ad } = this.props;
-		console.log(this.props, 'this.props');
-		console.log(ad, 'ad');
 		const {
 			formatData: { type }
 		} = ad;
-
-		// const { ad } = doc;
 		const { isActive } = this.state;
 
 		return (

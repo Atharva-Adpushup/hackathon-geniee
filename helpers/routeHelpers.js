@@ -380,7 +380,6 @@ function getAmpAds(siteId) {
 	const GET_ALL_AMP_ADS_QUERY = `SELECT _amtg as doc 							
 	FROM AppBucket _amtg
 	WHERE meta(_amtg).id LIKE 'amtg::%' AND _amtg.siteId = "${siteId}";`;
-console.log(GET_ALL_AMP_ADS_QUERY, 'GET_ALL_AMP_ADS_QUERY')
 	const query = N1qlQuery.fromString(GET_ALL_AMP_ADS_QUERY);
 
 	return couchbase
@@ -394,22 +393,17 @@ function getAmpAds2(siteId) {
 	return couchbase
 		.connectToAppBucket()
 		.then(appBucket => {
-			// console.log(appBucket, 'appBucket');
 			return getSiteDocValues(siteId)
 			.then(site => {
 				const { siteDomain, ownerEmail } = site;
 				return appBucket.getAsync(`user::${ownerEmail}`).then(userDocWithCas => {
-					// console.log(JSON.stringify(userDocWithCas, null, 3), 'userDocWithCas')
 					return appBucket;
 				});
 			})
 	
 		})
 		.then(appBucket => appBucket.getAsync(`ampd::${siteId}`, {}).then(ampdDoc => {
-			console.log(JSON.stringify(ampdDoc, null, 3), 'getAmpAds2');
 			const { value: { ads } } = ampdDoc;
-			console.log(ads, 'adsadsadsadsadsads')
-			// appBucket.getDoc(`user::${ownerEmail}`).then(userDocWithCas 
 			return ads;
 		}))
 		.then(ads => ads)
@@ -429,47 +423,28 @@ function fetchAmpAds(req, res, docKey) {
 
 	return verifyOwner(siteId, req.user.email)
 		.then(() => getAmpAds2(siteId))
-		// .then(() => getAmpAds(siteId))
 		.then(queryResult => queryResult)
 		.then((ads = []) => {
-console.log(JSON.stringify(ads, null, 3), 'ads old but new')
-			return sendSuccessResponse(
-				{
-					ads
-				},
-				res
-			)
-		}
-		)
-
+			return sendSuccessResponse({ ads }, res);
+		})
 		.catch(err =>
 			err.code && err.code === 13 && err.message.includes('key does not exist')
-				? sendSuccessResponse(
-						{
-							ads: []
-						},
-						res
-				  )
+				? sendSuccessResponse({ ads: []}, res)
 				: errorHandler(err, res)
 		);
 }
 
 function updateAmpTags(id, ads, siteId, updateThis) {
-	console.log(id, 'id')
-	console.log(updateThis, 'updateThis')
 	if (!id) {
 		return Promise.resolve();
 	}
-console.log(`ampd::${siteId}`)
+
 	return couchbase
 		.connectToAppBucket()
 		.then(appBucket =>
 			appBucket.getAsync(`${docKeys.ampScript}${siteId}`, {}).then(ampd => ({ appBucket, ampd }))
 		)
 		.then(({ appBucket, ampd: { value } }) => {
-			console.log(value, 'value')
-			console.log(ads, 'ads')
-			console.log(updateThis, 'updateThis')
 			if (!ads) {
 				value = { ...value, ...updateThis, updatedOn: +new Date() };
 			} else {
@@ -485,7 +460,6 @@ console.log(`ampd::${siteId}`)
 					return adItem
 				})
 			}
-console.log(value, 'value')
 			return appBucket.replaceAsync(`${docKeys.ampScript}${siteId}`, value) && value;
 		})
 		.catch(err => {
@@ -498,7 +472,6 @@ console.log(value, 'value')
 }
 
 function checkAmpUnsyncedAds(ad) {
-	// const { ad } = doc;
 	if (!ad.networkData.dfpAdunitCode) {
 		const defaultAdData = {
 			sectionName: ad.name,
@@ -617,7 +590,6 @@ function queuePublishingWrapper(siteId, ads) {
 	return commonDataForUnsyncedAmpAds(siteId, ads).then(data => {
 		// If no unsynced ad then skip dfp syncing
 		if (!(data && Array.isArray(data.ads) && data.ads.length)) return Promise.resolve(ads);
-console.log(data, 'queue publishing data')
 		var options = {
 			method: 'POST',
 			uri: `${config.queuePublishingURL}/publish`,
