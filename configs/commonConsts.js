@@ -818,49 +818,5 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		BANNER: 'apDisplay',
 		VIDEO: 'apVideo',
 		NATIVE: 'apNative'
-	},
-	PARTNERS_PANEL_INTEGRATION: {
-		ANOMALY_THRESHOLD: 10,
-		ANOMALY_THRESHOLD_IN_PER: 5,
-		CRITEO: {
-			PARTNER_NAME: 'Criteo',
-			NETWORK_ID: 20,
-			DOMAIN_FIELD_NAME: 'Domain',
-			REVENUE_FIELD: 'Revenue'
-		},
-		PUBMATIC: {
-			PARTNER_NAME: 'Pubmatic',
-			NETWORK_ID: 28,
-			DOMAIN_FIELD_NAME: 'site_name',
-			REVENUE_FIELD: 'netRevenue'
-		},
-		OFT: {
-			PARTNER_NAME: 'OFT/152Media',
-			NETWORK_ID: 11,
-			DOMAIN_FIELD_NAME: 'site_name',
-			REVENUE_FIELD: 'publisher_revenue'
-		},
-		INDEX_EXCHANGE: {
-			PARTNER_NAME: 'IndexExchange',
-			NETWORK_ID: 21,
-			DOMAIN_FIELD_NAME: 'site_name',
-			REVENUE_FIELD: 'earnings'
-		},
-		OPENX: {
-			PARTNER_NAME: 'OpenX',
-			NETWORK_ID: 10,
-			DOMAIN_FIELD_NAME: 'publisherSiteName',
-			REVENUE_FIELD: 'marketPublisherRevenueInPCoin'
-		},
-		TIMEZONE_OFFSET: {
-			PRODUCTION: {
-				PDT: 8,
-				PST: 7
-			},
-			STAGING: {
-				PDT: 8,
-				PST: 7
-			}
-		}
 	}
 };
