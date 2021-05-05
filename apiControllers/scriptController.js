@@ -21,7 +21,10 @@ const httpStatusConsts = require('../configs/httpStatusConsts');
 const {
 	getSizeMappingConfigFromCB
 } = require('../services/genieeAdSyncService/cdnSyncService/commonFunctions');
-const { isValidThirdPartyDFPAndCurrency } = require('../helpers/commonFunctions');
+const {
+	isValidThirdPartyDFPAndCurrency,
+	removeFormatWiseParamsForAMP
+} = require('../helpers/commonFunctions');
 
 const Router = express.Router();
 
@@ -325,14 +328,15 @@ Router.get('/:siteId/ampSiteConfig', (req, res) => {
 						sizeMappingConfig,
 						currencyConfig
 					]) => {
-						// set ampConfig to config in bidder config for amp
-						const hbcf = prebidConfig && prebidConfig.hbcf;
+						// Remove ampConfig from amp.js as ampConfig is used in s2s
+						const { hbcf } = prebidConfig;
 						if (hbcf) {
 							Object.keys(hbcf).forEach(bidder => {
-								if (hbcf[bidder].config && hbcf[bidder].ampConfig) {
-									hbcf[bidder].config = { ...hbcf[bidder].ampConfig };
+								if (hbcf[bidder].ampConfig) {
 									delete hbcf[bidder].ampConfig;
 								}
+								// Remove format wise bidder param prefix from amp.js
+								hbcf[bidder].config = removeFormatWiseParamsForAMP(hbcf[bidder]);
 							});
 						}
 						const output = {
