@@ -23,6 +23,8 @@ const arrayUnique = array => {
 
 	return a;
 };
+const arrayUniqueObject = (array, field) =>
+	array.filter((v, i, a) => a.findIndex(t => t[field] === v[field]) === i);
 
 const computeCsvData = data => {
 	const { tableBody, tableColumns } = data;
@@ -156,9 +158,16 @@ const getItemFromLocalStorage = key => window.localStorage.getItem(key);
 
 const setItemToLocalStorage = (key, value) => window.localStorage.setItem(key, value);
 
+const domainFromUrl = url => {
+	const aTag = document.createElement('a');
+	aTag.href = url;
+	return aTag.hostname;
+};
+
 export {
 	convertObjToArr,
 	arrayUnique,
+	arrayUniqueObject,
 	computeCsvData,
 	numberWithCommas,
 	getPresets,
@@ -172,5 +181,6 @@ export {
 	getValidArray,
 	getItemFromLocalStorage,
 	setItemToLocalStorage,
-	getReportScheduleIntervals
+	getReportScheduleIntervals,
+	domainFromUrl
 };
