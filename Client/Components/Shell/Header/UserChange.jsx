@@ -10,7 +10,8 @@ import { domanize } from '../../../helpers/commonFunctions';
 class UserChange extends Component {
 	state = {
 		email: '',
-		users: []
+		users: [],
+		showFilteredList: false
 	};
 
 	onValChange = e => {
@@ -19,21 +20,25 @@ class UserChange extends Component {
 		});
 	};
 
-	onFocus = () => {
-		const { users: usersState } = this.state;
+	componentDidMount() {
 		const { findUsers } = this.props;
+		return findUsers()
+			.then(response => {
+				const { data } = response.data;
+				this.setState({ users: data.users });
+			})
+			.catch(err => {
+				console.log(err);
+				return window.alert('User Switch Failed. Please contact Tech team.');
+			});
+	}
 
-		if (usersState.length === 0)
-			return findUsers()
-				.then(response => {
-					const { data } = response.data;
-					this.setState({ users: data.users });
-				})
-				.catch(err => {
-					console.log(err);
-					return window.alert('User Switch Failed. Please contact Tech team.');
-				});
-		return null;
+	onFocus = () => {
+		this.setState({ showFilteredList: true });
+	};
+
+	onBlur = () => {
+		this.setState({ showFilteredList: false });
 	};
 
 	handleValidation = email => {
@@ -71,9 +76,22 @@ class UserChange extends Component {
 		return window.alert(formValidationCheck.error);
 	};
 
-	render() {
-		const { email, users } = this.state;
+	getFilteredUserDataList = users => (
+		<datalist id="users-list">
+			{users.map(user => (
+				<option
+					key={user.email}
+					value={user.email}
+					label={this.getFormattedUserDomainsList(user.domains, user.siteIds)}
+				/>
+			))}
+		</datalist>
+	);
 
+	render() {
+		const { email, users, showFilteredList } = this.state;
+		const { getFilteredUserDataList } = this;
+		const filteredUserDataList = getFilteredUserDataList(users);
 		return (
 			<Form onSubmit={this.onFormSubmit} className="change-user-form">
 				<FormControl
@@ -85,20 +103,9 @@ class UserChange extends Component {
 					list="users-list"
 					placeholder="Email"
 					style={{ borderRadius: '0', borderTopLeftRadius: 4, borderBottomLeftRadius: 4 }}
+					onBlur={this.onBlur}
 				/>
-				{users.length ? (
-					<datalist id="users-list">
-						{users.map(user => (
-							<option
-								key={user.email}
-								value={user.email}
-								label={this.getFormattedUserDomainsList(user.domains, user.siteIds)}
-							/>
-						))}
-					</datalist>
-				) : (
-					''
-				)}
+				{showFilteredList ? filteredUserDataList : ''}
 
 				<CustomButton
 					type="submit"
