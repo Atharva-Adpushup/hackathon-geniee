@@ -76,20 +76,10 @@ const AMP_FIXED_TARGETING = {
 	da: 'adx'
 };
 
-const DISPLAYADCODE = `<amp-ad width="__WIDTH__" height="__HEIGHT__" type="doubleclick"__DYNAMIC_ATTRIBS__data-slot="/__NETWORK_CODE__/__AD_UNIT_CODE__" rtc-config='{
-	"urls": [
-	  "${PREBID_SERVER_ENDPOINT}&curl=CANONICAL_URL&gdpr_consent=CONSENT_STRING"
-	]
-}' json='{"targeting":__AMP_FIXED_TARGETING__}'>
-</amp-ad>`;
+const DISPLAYADCODE = `<amp-ad width="__WIDTH__" height="__HEIGHT__" type="adpushup" __DYNAMIC_ATTRIBS__data-slot="/__NETWORK_CODE__/__AD_UNIT_CODE__"></amp-ad>`;
 
 const STICKYADCODE = `<amp-sticky-ad layout="nodisplay">
-<amp-ad width="__WIDTH__" height="__HEIGHT__" type="doubleclick"__DYNAMIC_ATTRIBS__data-slot="/__NETWORK_CODE__/__AD_UNIT_CODE__" rtc-config='{
-	"urls": [
-	  "${PREBID_SERVER_ENDPOINT}&curl=CANONICAL_URL&gdpr_consent=CONSENT_STRING"
-	]
-}' json='{"targeting":__AMP_FIXED_TARGETING__}'>
-</amp-ad>
+<amp-ad width="__WIDTH__" height="__HEIGHT__" type="adpushup" __DYNAMIC_ATTRIBS__data-slot="/__NETWORK_CODE__/__AD_UNIT_CODE__" </amp-ad>
 </amp-sticky-ad>`;
 
 const DEFAULT_ADS_RESPONSE = { fetched: false, content: [] };
