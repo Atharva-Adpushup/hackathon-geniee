@@ -45,7 +45,11 @@ const fn = {
 			...payload.ad,
 			sectionId: `${payload.siteId}:${id}`
 		};
-		value.createdOn = +new Date();
+		value.dateCreated = +new Date();
+		value.pnpConfig = {
+			enabled: false,
+			firstImpressionOptimized: false
+		};
 
 		ad.id = id;
 		ad.name = name;
