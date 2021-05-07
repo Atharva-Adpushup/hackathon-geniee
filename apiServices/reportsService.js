@@ -134,10 +134,6 @@ const reportsService = {
 			(result, report) => result + report.user_sessions,
 			0
 		);
-		const totalSessionRpm =
-			(sessionReports.reduce((result, report) => result + report.network_net_revenue, 0) /
-				totalSessions) *
-			1000;
 
 		const totalSessionRpm =
 			(sessionReports.reduce((result, report) => result + report.network_net_revenue, 0) /
