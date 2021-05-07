@@ -130,13 +130,14 @@ const reportsService = {
 	},
 	mergeReportColumns: reportColumns => [...reportColumns, ...CC.SESSION_RPM.SESSION_RPM_PROPS],
 	calculateSessionTotals: (sessionReports = []) => {
-		const totalSessionRpm =
-			sessionReports.reduce((result, report) => result + report.session_rpm, 0) /
-			sessionReports.length;
 		const totalSessions = sessionReports.reduce(
 			(result, report) => result + report.user_sessions,
 			0
 		);
+		const totalSessionRpm =
+			(sessionReports.reduce((result, report) => result + report.network_net_revenue, 0) /
+				totalSessions) *
+			1000;
 
 		return {
 			total_session_rpm: totalSessionRpm,
