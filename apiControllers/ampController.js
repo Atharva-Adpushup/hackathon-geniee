@@ -148,11 +148,6 @@ router
 						const allAmpAds = ads.map(obj => modifiedAds.find(o => o.id === obj.id) || obj);
 						return queuePublishingWrapper(siteId, allAmpAds);
 					})
-					.then(ads => {
-						const storeRequestArr = ads.map(doc => storedRequestWrapper(doc));
-
-						return Promise.all(storeRequestArr);
-					})
 					.then(() => sendSuccessResponse({ msg: 'success' }, res))
 					.catch(err => console.log(err));
 			})

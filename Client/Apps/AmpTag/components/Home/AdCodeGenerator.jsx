@@ -78,15 +78,14 @@ class AdCodeGenerator extends Component {
 			height,
 			type,
 			fluid: true,
-			headerBidding: true,
-			refreshSlot: true,
 			networkData: {
+				headerBidding: true,
+				refreshSlot: true,
 				dfpAdunitCode: null,
 				dfpAdunit: null,
 				formats: ['display']
 			},
 			formatData: {
-				platform,
 				type
 			},
 			isActive: true

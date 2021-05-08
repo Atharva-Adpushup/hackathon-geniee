@@ -40,7 +40,7 @@ class AmpAds extends Component {
 		return updateAppStatus(
 			site.siteId,
 			{
-				app: 'amp',
+				app: 'ampScript',
 				value: status
 			},
 			{
