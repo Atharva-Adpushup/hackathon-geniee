@@ -42,8 +42,7 @@ const fn = {
 			service: 'A_M'
 		});
 		const ad = {
-			...payload.ad,
-			sectionId: `${payload.siteId}:${id}`
+			...payload.ad
 		};
 		value.dateCreated = +new Date();
 		value.pnpConfig = {
@@ -143,13 +142,20 @@ router
 				// 	}
 				// });
 				const updatedAds = adsToUpdate.map(adId => updateAmpTags(adId, ads, siteId));
-				return Promise.all(updatedAds)
-					.then(modifiedAds => {
-						const allAmpAds = ads.map(obj => modifiedAds.find(o => o.id === obj.id) || obj);
-						return queuePublishingWrapper(siteId, allAmpAds);
-					})
-					.then(() => sendSuccessResponse({ msg: 'success' }, res))
-					.catch(err => console.log(err));
+				return (
+					Promise.all(updatedAds)
+						.verifyOwner(siteId, email)
+						.then(site => {
+							site.save();
+						})
+						// .then(modifiedAds => {
+						// 	const allAmpAds = ads.map(obj => modifiedAds.find(o => o.id === obj.id) || obj);
+						// 	console.log(siteId, JSON.stringify(allAmpAds, null, 3), 'siteId, allAmpAds')
+						// 	return queuePublishingWrapper(siteId, allAmpAds);
+						// })
+						.then(() => sendSuccessResponse({ msg: 'success' }, res))
+						.catch(err => console.log(err))
+				);
 			})
 			.catch(err => console.log(err));
 	})
