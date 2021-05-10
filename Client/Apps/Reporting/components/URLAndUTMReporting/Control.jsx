@@ -36,6 +36,7 @@ class Control extends Component {
 			chartList: props.hbMetricsList,
 			intervalList: props.intervalList,
 			orderByList: optionListForOrderByURLAndUTM,
+			siteList: props.siteList,
 			startDate: props.startDate,
 			endDate: props.endDate,
 			reportType: props.reportType,
@@ -43,6 +44,7 @@ class Control extends Component {
 			selectedInterval: props.selectedInterval || '',
 			selectedOrder: props.selectedOrder || '',
 			selectedOrderBy: props.selectedOrderBy || '',
+			selectedSite: props.selectedSite || '',
 			selectedTotalRecords: props.selectedTotalRecords || '',
 			selectedFilters: props.selectedFilters || {},
 			disableGenerateButton: false,
@@ -164,6 +166,7 @@ class Control extends Component {
 			selectedCharts,
 			selectedOrder,
 			selectedOrderBy,
+			selectedSite,
 			selectedTotalRecords,
 			regexFilter,
 			cutOffRevenue,
@@ -179,6 +182,7 @@ class Control extends Component {
 			selectedCharts,
 			selectedOrder,
 			selectedOrderBy,
+			selectedSite,
 			selectedTotalRecords,
 			regexFilter,
 			revenueCutOff: cutOffRevenue,
@@ -397,31 +401,27 @@ class Control extends Component {
 						/>
 						{/* eslint-enable */}
 					</div>
-					<div
-						className="aligner-item u-margin-r4"
-						style={{
-							display: 'flex',
-							alignItems: 'flex-end'
-						}}
-					>
-						{/* <div className="aligner-item u-margin-r2 custom-select-box-wrapper custom-select-box-wrapper">
-							<label className="u-text-normal">Cut-Off</label>
-							<input
-								className="form-control"
-								type="text"
-								placeholder="Cut Off"
-								name="cutOffRevenue"
-								value={state.cutOffRevenue}
-								onChange={e => {
-									const { value } = e.target;
-									this.setState(
-										{ cutOffRevenue: value },
-										debounce(this.onDebounceControlChange.bind(null, reportType))
-									);
-								}}
-							/>
-						</div> */}
-					</div>
+					{state.siteList.length > 1 ? (
+						<div className="aligner-item u-margin-r4">
+							{/* eslint-disable */}
+								<label className="u-text-normal">Select Site</label>
+								<SelectBox
+									id="orderby"
+									key="orderby"
+									wrapperClassName="custom-select-box-wrapper"
+									isClearable={false}
+									isSearchable={false}
+									selected={state.selectedSite}
+									options={state.siteList}
+									onSelect={selectedSite => {
+										this.setState({ selectedSite }, this.onControlChange.bind(null, reportType));
+									}}
+								/>
+							</div>
+						): (
+							<div className="aligner-item u-margin-r4"></div>
+						)
+					}
 					<div
 						className="aligner-item aligner--hEnd"
 						style={{
@@ -504,9 +504,11 @@ class Control extends Component {
 							justifyContent: 'flex-end'
 						}}
 					>
-						<span>{`${pageSize > 0 ? currentSet + 1 : 0}-${
-							currentSet + pageSize < recordCount ? currentSet + pageSize : recordCount
-						} of ${recordCount} records`}</span>
+						{recordCount ? (
+							<span>{`${pageSize > 0 ? currentSet + 1 : 0}-${
+								currentSet + pageSize < recordCount ? currentSet + pageSize : recordCount
+							} of ${recordCount} records`}</span>
+						) : null}
 					</div>
 				</div>
 			</Fragment>

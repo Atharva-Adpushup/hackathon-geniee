@@ -3,6 +3,7 @@ import { updateGlobalURLReportsMetaData } from '../../../../actions/globalAction
 import { showNotification } from '../../../../actions/uiActions';
 import URLReports from '../../components/URLAndUTMReporting';
 import { URL_UTM_DIMENSIONS } from '../../configs/commonConsts';
+import { domainFromUrl } from '../../helpers/utils';
 
 const mapStateToProps = (state, ownProps) => {
 	const {
@@ -15,11 +16,19 @@ const mapStateToProps = (state, ownProps) => {
 
 	const urlReportingSites = Object.values(userSites)
 		.filter(site => !!site.urlReporting)
-		.map(site => site.siteId);
+		.map(site => ({
+			value: site.siteId,
+			display_name: domainFromUrl(site.siteDomain),
+			name: domainFromUrl(site.siteDomain)
+		}));
 
 	const utmReportingSites = Object.values(userSites)
 		.filter(site => !!site.utmReporting)
-		.map(site => site.siteId);
+		.map(site => ({
+			value: site.siteId,
+			display_name: domainFromUrl(site.siteDomain),
+			name: domainFromUrl(site.siteDomain)
+		}));
 
 	const urlUTMReportingMeta = globalReportMetaData;
 	// if utm reporting is not enabled for any site of the publisher
