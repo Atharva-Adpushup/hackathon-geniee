@@ -454,7 +454,7 @@ function updateAmpTags(id, ads, siteId, updateThis) {
 						adItem = updatedAd;
 						value.updatedOn = +new Date();
 						adItem.isRefreshEnabled
-							? (adItem.refreshInterval = 30)
+							? (adItem.networkData.refreshInterval = 30)
 							: delete adItem.refreshInterval;
 					}
 					return adItem
