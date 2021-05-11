@@ -30,6 +30,7 @@
 		"amqplib": "^0.5.1",
 		"atob": "^2.1.2",
 		"axios": "^0.18.0",
+		"babel-plugin-add-react-displayname": "0.0.5",
 		"base64-img": "^1.0.3",
 		"bayesian-bandit": "^0.10.0",
 		"bluebird": "^3.3.3",

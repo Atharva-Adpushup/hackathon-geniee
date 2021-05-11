@@ -26,6 +26,7 @@ const {
 } = CC;
 
 const router = express.Router();
+const { generateEmailTemplate, sendEmail } = require('../helpers/queueMailer');
 
 function pushToCdnOriginQueue(filePath, content) {
 	return helperUtils.publishToRabbitMqQueue(
@@ -269,16 +270,68 @@ router
 			);
 	})
 	.post('/createLog', (req, res) =>
-		checkParams(['data'], req, 'post')
-			.then(() => {
-				const { data } = req.body;
-				const decodedData = atob(data);
-
-				return logger({
-					source: 'CONSOLE ERROR LOGS',
-					message: 'UNCAUGHT ERROR BOUNDARY',
-					debugData: decodedData
-				});
+		checkParams(['err', 'isNotifySupportMail', 'info'], req, 'post')
+			.then(async () => {
+				const {
+					err,
+					info,
+					firstName,
+					lastName,
+					email,
+					isSuperUser,
+					routePath,
+					type,
+					userInput = '',
+					errorMessage
+				} = req.body;
+				const errorInfo = _.escape(info.componentStack).replace(/\n/g, '<br>');
+				const dateOfError = new Date().toDateString();
+				const mailAlertTemplateData = {
+					errorInfo,
+					firstName,
+					lastName,
+					email,
+					isSuperUser,
+					dateOfError,
+					routePath,
+					userInput,
+					errorMessage
+				};
+				const emailTemplate = await generateEmailTemplate(
+					'views/mail',
+					'consoleCrashAlerts',
+					mailAlertTemplateData
+				);
+				const subjectMessage = `Console Error Report`;
+				if (type === 'UserInteraction') {
+					//here we will send mail to the support
+					sendEmail({
+						queue: 'MAILER',
+						data: {
+							to: config.consoleErrorAlerts.supportMail,
+							body: emailTemplate,
+							subject: subjectMessage
+						}
+					});
+				} else if (type === 'default') {
+					const errorLogToBeTracked = `Error: ${
+						err ? JSON.stringify(err, null, '\n') : 'N/A'
+					} ,  \n Info:  ${info ? JSON.stringify(info, null, '\n') : 'N/A'}`;
+					//By deafult we are alreday sending mail to the hackers
+					sendEmail({
+						queue: 'MAILER',
+						data: {
+							to: config.consoleErrorAlerts.hackersMail,
+							body: emailTemplate,
+							subject: subjectMessage
+						}
+					});
+					return logger({
+						source: 'CONSOLE ERROR LOGS',
+						message: 'UNCAUGHT ERROR BOUNDARY',
+						debugData: errorLogToBeTracked
+					});
+				}
 			})
 			.then(() =>
 				sendSuccessResponse(
@@ -288,7 +341,7 @@ router
 					res
 				)
 			)
-			.catch(() =>
+			.catch(err =>
 				sendSuccessResponse(
 					{
 						message: `Log Written Failed`
