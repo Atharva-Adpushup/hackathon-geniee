@@ -1,0 +1,21 @@
+.user-interaction-modal {
+	display: flex !important;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	.modal-dialog {
+		.modal-content {
+			.modal-body {
+				.user-error-feedback {
+					resize: none !important;
+				}
+			}
+			.modal-footer {
+				.error-modal-submit {
+					background: #f65557;
+					color: white;
+				}
+			}
+		}
+	}
+}

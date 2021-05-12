@@ -13,7 +13,7 @@ CustomError.propTypes = {
 };
 
 CustomError.defaultProps = {
-	message: 'Oops! Seems like something is broken. Please contact AdPushup Operations Team.'
+	message: 'Oops! Seems like something is broken on this page.'
 };
 
 export default CustomError;
