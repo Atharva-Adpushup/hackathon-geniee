@@ -56,10 +56,11 @@ var request = require('request-promise'),
 			])
 				.then(res => res.text())
 				.catch(async err => {
+					const emailRecepient = config.adsTxtSupportEmail.join(',');
 					const emailParams = {
 						queue: 'MAILER',
 						data: {
-							to: config.adsTxtSupportEmail,
+							to: emailRecepient,
 							body: err.message,
 							subject: 'Error in ads.txt verification'
 						}
