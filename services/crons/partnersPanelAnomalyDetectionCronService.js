@@ -59,7 +59,6 @@ function startPartnersPanelsAnomaliesDetectionService(partnerName, retryCount = 
 						result.message
 					}`
 				);
-				process.exit(0);
 			} else {
 				if (retryCount < 10) {
 					retryCount++;
