@@ -88,6 +88,7 @@ class AdList extends Component {
 										updateAd={updateAd}
 										modifyAdOnServer={modifyAdOnServer}
 										siteId={siteId}
+										adsCount={ads.length}
 										networkCode={networkCode}
 										adsToUpdateOnMasterSave={this.adsToUpdate}
 										dfpMessage={dfpMessage}

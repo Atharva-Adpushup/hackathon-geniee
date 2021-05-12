@@ -64,7 +64,7 @@ class AdElement extends Component {
 	);
 
 	renderAdDetails() {
-		const { user, siteId, ad, networkCode, dfpMessage } = this.props;
+		const { user, siteId, ad, adsCount, networkCode, dfpMessage } = this.props;
 
 		const { id, name } = ad;
 		const {
@@ -80,7 +80,7 @@ class AdElement extends Component {
 
 		const dynamicAttribsArr = [];
 		const ampFixedTargeting = { ...AMP_FIXED_TARGETING };
-		const totalAmpSlots = 0;
+		const totalAmpSlots = adsCount;
 
 		dynamicAttribsArr.push(`data-siteid="${siteId}"`);
 		dynamicAttribsArr.push(`data-totalAmpSlots=${totalAmpSlots}`);
