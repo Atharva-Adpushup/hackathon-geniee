@@ -144,7 +144,7 @@ router
 				const updatedAds = adsToUpdate.map(adId => updateAmpTags(adId, ads, siteId));
 				return (
 					Promise.all(updatedAds)
-						.verifyOwner(siteId, email)
+						.then(() => verifyOwner(siteId, email))
 						.then(site => {
 							site.save();
 						})
