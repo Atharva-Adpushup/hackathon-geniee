@@ -1,4 +1,5 @@
 const cron = require('node-cron');
+const { cronSchedule: { partnersPanelService } } = require('./configs/commonConsts');
 
 const {
 	startPartnersPanelsAnomaliesDetectionService
@@ -11,23 +12,23 @@ const PARTNERS_LIST = {
 	IndexExchange: 'IndexExchange',
 	OpenX: 'OpenX'
 };
-
-cron.schedule('27 14 * * *', () => {
+console.log(partnersPanelService, 'partnersPanelService')
+cron.schedule(partnersPanelService.Criteo, () => {
 	startPartnersPanelsAnomaliesDetectionService(PARTNERS_LIST.Criteo);
 });
 
-cron.schedule('27 14 * * *', () => {
+cron.schedule(partnersPanelService.Pubmatic, () => {
 	startPartnersPanelsAnomaliesDetectionService(PARTNERS_LIST.Pubmatic);
 });
 
-cron.schedule('27 14 * * *', () => {
+cron.schedule(partnersPanelService.OFT, () => {
 	startPartnersPanelsAnomaliesDetectionService(PARTNERS_LIST.OFT);
 });
 
-cron.schedule('27 14 * * *', () => {
+cron.schedule(partnersPanelService.IndexExchange, () => {
 	startPartnersPanelsAnomaliesDetectionService(PARTNERS_LIST.IndexExchange);
 });
 
-cron.schedule('27 14 * * *', () => {
+cron.schedule(partnersPanelService.OpenX, () => {
 	startPartnersPanelsAnomaliesDetectionService(PARTNERS_LIST.OpenX);
 });
