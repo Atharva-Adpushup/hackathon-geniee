@@ -18,8 +18,7 @@ class AdCodeGenerator extends Component {
 			size: '',
 			loading: false,
 			isRefreshEnabled: true,
-			refreshInterval: 30,
-			isMultiSize: false
+			refreshInterval: 30
 		};
 		this.selectPlatform = this.selectPlatform.bind(this);
 		this.selectType = this.selectType.bind(this);
@@ -47,8 +46,7 @@ class AdCodeGenerator extends Component {
 			platform: 'mobile',
 			size: '',
 			progress: 50,
-			isRefreshEnabled: true,
-			isMultiSize: false
+			isRefreshEnabled: true
 		});
 	}
 
@@ -57,13 +55,12 @@ class AdCodeGenerator extends Component {
 		this.setState({
 			size,
 			progress: progress > 75 ? progress : 75,
-			isRefreshEnabled: true,
-			isMultiSize: false
+			isRefreshEnabled: true
 		});
 	}
 
 	saveHandler() {
-		const { type, size, isRefreshEnabled, isMultiSize, refreshInterval, platform } = this.state;
+		const { type, size, isRefreshEnabled, refreshInterval } = this.state;
 
 		const { createAd, siteId } = this.props;
 		const isResponsive = size === 'responsive';
@@ -86,12 +83,13 @@ class AdCodeGenerator extends Component {
 				formats: ['display']
 			},
 			formatData: {
+				platform: 'mobile',
 				type
 			},
 			isActive: true
 		};
 
-		if (isRefreshEnabled) ad.refreshInterval = refreshInterval;
+		if (isRefreshEnabled) ad.networkData.refreshInterval = refreshInterval;
 
 		this.setState(
 			{
@@ -116,8 +114,7 @@ class AdCodeGenerator extends Component {
 			size: '',
 			loading: false,
 			isRefreshEnabled: true,
-			refreshInterval: 30,
-			isMultiSize: false
+			refreshInterval: 30
 		});
 	}
 
@@ -211,7 +208,6 @@ class AdCodeGenerator extends Component {
 						{this.renderTypeOptions()}
 						{progress >= 50 ? this.renderSizes() : null}
 						{progress >= 75 ? this.renderRefreshToggle() : null}
-						{progress >= 75 ? this.renderMultiSizeToggle() : null}
 						{progress >= 75 ? this.renderButton('Create Tag', this.saveHandler) : null}
 					</div>
 				)}
@@ -219,6 +215,7 @@ class AdCodeGenerator extends Component {
 		);
 	}
 
+	// eslint-disable-next-line react/sort-comp
 	handleToggle = (value, event) => {
 		const attributeValue = event.target.getAttribute('name');
 		const name = attributeValue.split('-')[0];
@@ -228,32 +225,6 @@ class AdCodeGenerator extends Component {
 			progress: 90
 		});
 	};
-
-	renderMultiSizeToggle() {
-		const { match } = this.props;
-		const { siteId } = match.params;
-		const { isMultiSize } = this.state;
-		return (
-			<Row>
-				<Col md={5}>
-					<CustomToggleSwitch
-						labelText="Multi Size"
-						className="u-margin-b4 negative-toggle toggle"
-						checked={isMultiSize}
-						onChange={this.handleToggle}
-						layout="horizontal"
-						size="m"
-						on="Yes"
-						off="No"
-						defaultLayout
-						name={`isMultiSize-${siteId}`}
-						id={`js-isMultiSize-${siteId}`}
-					/>
-				</Col>
-				<Col md={7} />
-			</Row>
-		);
-	}
 
 	renderRefreshToggle() {
 		const { match } = this.props;
