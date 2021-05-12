@@ -1,5 +1,3 @@
-import config from '../../../config/config';
-
 const AMP_NAV_ITEMS_INDEXES = {
 	CREATE_ADS: 'create-ads',
 	MANAGE_ADS: 'manage-ads'
@@ -65,10 +63,6 @@ const SIZES = {
 		MOBILE: ['320x50', '320x100']
 	}
 };
-
-const PREBID_SERVER_ENDPOINT = `${
-	config.PREBID_SERVER_HOST
-}prebidserver/openrtb2/amp?tag_id=__AD_ID____MULTI_SIZE_QUERY_PARAM__`;
 
 const AMP_FIXED_TARGETING = {
 	adpushup_ran: '1',

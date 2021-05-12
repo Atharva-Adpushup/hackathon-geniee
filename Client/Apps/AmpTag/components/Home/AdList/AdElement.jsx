@@ -5,18 +5,11 @@ import React, { Component } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Col, OverlayTrigger, Tooltip, Button } from '@/Client/helpers/react-bootstrap-imports';
 import CopyButtonWrapperContainer from '../../../../../Containers/CopyButtonWrapperContainer';
-import {
-	DISPLAYADCODE,
-	STICKYADCODE,
-	SIZES,
-	AMP_FIXED_TARGETING
-} from '../../../configs/commonConsts';
+import { DISPLAYADCODE, STICKYADCODE, AMP_FIXED_TARGETING } from '../../../configs/commonConsts';
 import CustomButton from '../../../../../Components/CustomButton/index';
-import MultiSizeSettings from './MultiSizeSettings';
 import RefreshSettings from './RefreshSettings';
 import EditBox from '../../../../../Components/EditBox/index';
 import Tags from '../../../../../Components/Tags/index';
-import { computeDownWardCompatibleSizes } from '../../../lib/helpers';
 
 class AdElement extends Component {
 	constructor(props) {
@@ -24,7 +17,6 @@ class AdElement extends Component {
 		this.state = {
 			showNetworkDetails: false,
 			showLazyload: false,
-			showMultiSize: false,
 			showRefresh: false,
 			editName: false,
 			isActive: Object.prototype.hasOwnProperty.call(props.ad, 'isActive')
@@ -78,14 +70,13 @@ class AdElement extends Component {
 		const {
 			width,
 			height,
-			isMultiSize,
 			isRefreshEnabled,
 			refreshInterval = 30,
 			formatData,
 			networkData: { dfpAdunitCode }
 		} = ad;
 		const { type } = formatData;
-		const { editName, isActive, showMultiSize, showRefresh } = this.state;
+		const { editName, isActive, showRefresh } = this.state;
 
 		const dynamicAttribsArr = [];
 		const ampFixedTargeting = { ...AMP_FIXED_TARGETING };
@@ -98,44 +89,19 @@ class AdElement extends Component {
 			dynamicAttribsArr.push(`data-enable-refresh="${refreshInterval}"`);
 			ampFixedTargeting.refreshrate = '30';
 		}
-		const ampFixedTargetingJson = JSON.stringify(ampFixedTargeting);
-		const availableSizes = SIZES[type.toUpperCase()].MOBILE;
-		const size = `${width}x${height}`;
-		const downwardCompatibleSizes = computeDownWardCompatibleSizes(availableSizes, size);
-
-		if (isMultiSize) {
-			dynamicAttribsArr.push(`data-multi-size="${downwardCompatibleSizes}"`);
-			dynamicAttribsArr.push('data-multi-size-validation=false');
-		}
 
 		const dynamicAttribsStr = dynamicAttribsArr.length ? ` ${dynamicAttribsArr.join(' ')} ` : ' ';
-		const multiSizeQueryParam = isMultiSize ? `&ms=${downwardCompatibleSizes}` : '';
 		const ADCODE = type === 'display' ? DISPLAYADCODE : STICKYADCODE;
 		let code = ADCODE;
 
 		code = code
 			? code
-					.replace(/__AD_ID__/g, id)
 					.replace(/__WIDTH__/, width)
 					.replace(/__HEIGHT__/, height)
 					.replace(/__DYNAMIC_ATTRIBS__/, dynamicAttribsStr)
-					.replace(/__MULTI_SIZE_QUERY_PARAM__/, multiSizeQueryParam)
 					.replace(/__NETWORK_CODE__/, networkCode)
 					.replace(/__AD_UNIT_CODE__/, dfpAdunitCode)
-					.replace(/__AMP_FIXED_TARGETING__/, ampFixedTargetingJson)
 			: null;
-
-		if (showMultiSize) {
-			return (
-				<MultiSizeSettings
-					ad={ad}
-					siteId={siteId}
-					onCancel={() => this.toggleHandler('showMultiSize')}
-					onSubmit={this.updateWrapper}
-					user={user}
-				/>
-			);
-		}
 
 		if (showRefresh) {
 			return (
@@ -197,13 +163,6 @@ class AdElement extends Component {
 				<pre style={{ wordBreak: 'break-word' }}>{dfpAdunitCode ? code : dfpMessage}</pre>{' '}
 				{user.isSuperUser ? (
 					<React.Fragment>
-						<CustomButton
-							variant="secondary"
-							className="u-margin-l3 u-margin-t3 pull-right"
-							onClick={() => this.toggleHandler('showMultiSize')}
-						>
-							Edit Multi size
-						</CustomButton>
 						<CustomButton
 							variant="secondary"
 							className="u-margin-l3 u-margin-t3 pull-right"
