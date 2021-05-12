@@ -65,10 +65,14 @@ var request = require('request-promise'),
 							subject: `Error in ads.txt verification for ${url}`
 						}
 					};
-					await fetch(config.mailerServiceUrl, {
-						method: 'POST',
-						body: emailParams
-					});
+					try {
+						await fetch(config.mailerQueueUrl, {
+							method: 'POST',
+							body: emailParams
+						});
+					} catch (err) {
+						console.error(err.message);
+					}
 					if (err && err.message.indexOf('I really need an ID for this to work') === -1) {
 						return false;
 					}
