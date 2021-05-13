@@ -517,7 +517,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		siteId: null,
 		ownerEmail: null,
 		siteDomain: null,
-		docType: 'amtg'
+		docType: 'ampd'
 	},
 
 	INNOVATIVE_ADS_INITIAL_DOC: {

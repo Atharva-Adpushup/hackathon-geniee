@@ -54,7 +54,7 @@ const fn = {
 		ad.name = name;
 		ad.isAmpScriptAd = true;
 		value.siteDomain = value.siteDomain || payload.siteDomain;
-		value.siteId = value.siteId || payload.siteId;
+		value.siteId = +(value.siteId || payload.siteId);
 		value.ownerEmail = value.ownerEmail || payload.ownerEmail;
 
 		// If no ad is created for the site before
@@ -91,12 +91,16 @@ router
 		fn.isSuperUser = req.user.isSuperUser;
 		const payload = {
 			ad: req.body.ad,
-			siteId: req.body.siteId,
+			siteId: +req.body.siteId,
 			ownerEmail: req.user.email,
 			id: uuid.v4()
 		};
 		return verifyOwner(req.body.siteId, req.user.email)
-			.then(() => appBucket.getDoc(`${docKeys.ampScript}${payload.siteId}`))
+			.then(site => {
+				// set siteDomain to payload
+				payload.siteDomain = site.get('siteDomain');
+				return appBucket.getDoc(`${docKeys.ampScript}${payload.siteId}`);
+			})
 			.then(docWithCas => fn.processing(docWithCas, payload))
 			.catch(err =>
 				err.name && err.name === 'CouchbaseError' && err.code === 13
