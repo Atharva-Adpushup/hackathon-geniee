@@ -5,7 +5,7 @@ import React, { Component } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Col, OverlayTrigger, Tooltip, Button } from '@/Client/helpers/react-bootstrap-imports';
 import CopyButtonWrapperContainer from '../../../../../Containers/CopyButtonWrapperContainer';
-import { DISPLAYADCODE, STICKYADCODE, AMP_FIXED_TARGETING } from '../../../configs/commonConsts';
+import { DISPLAYADCODE, STICKYADCODE } from '../../../configs/commonConsts';
 import CustomButton from '../../../../../Components/CustomButton/index';
 import RefreshSettings from './RefreshSettings';
 import EditBox from '../../../../../Components/EditBox/index';
@@ -79,15 +79,13 @@ class AdElement extends Component {
 		const { editName, isActive, showRefresh } = this.state;
 
 		const dynamicAttribsArr = [];
-		const ampFixedTargeting = { ...AMP_FIXED_TARGETING };
-		const totalAmpSlots = adsCount;
+		const totalAmpSlots = adsCount.toString();
 
 		dynamicAttribsArr.push(`data-siteid="${siteId}"`);
 		dynamicAttribsArr.push(`data-totalAmpSlots=${totalAmpSlots}`);
 
 		if (isRefreshEnabled) {
 			dynamicAttribsArr.push(`data-enable-refresh="${refreshInterval}"`);
-			ampFixedTargeting.refreshrate = '30';
 		}
 
 		const dynamicAttribsStr = dynamicAttribsArr.length ? ` ${dynamicAttribsArr.join(' ')} ` : ' ';
