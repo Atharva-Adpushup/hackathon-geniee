@@ -1,6 +1,7 @@
 var request = require('request-promise'),
 	utils = require('../helpers/utils'),
 	_ = require('lodash'),
+	fetch = require('node-fetch'),
 	crypto = require('crypto'),
 	Promise = require('bluebird'),
 	soap = require('strong-soap').soap,
@@ -43,32 +44,41 @@ var request = require('request-promise'),
 			userAgent =
 				userAgent ||
 				'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36';
+			//migrated to node-fetch because some sites send gzip encoded response which axios and requests dont parse automatically
+			//added promise.any with null user-agent for makemytrip, for whom the api call freezes unless null is passed
 			return Promise.any([
-				request({
-					uri: url,
-					jar: true,
-					strictSSL: false,
-					resolveWithFullResponse: !!fullResponse,
-					headers: {
-						'User-Agent': userAgent,
-						'Accept-Encoding': 'identity'
-					}
+				fetch(url, {
+					headers: { 'User-Agent': userAgent }
 				}),
-				request({
-					uri: url,
-					jar: true,
-					strictSSL: false,
-					resolveWithFullResponse: !!fullResponse,
-					headers: {
-						'Accept-Encoding': 'identity'
-					}
+				fetch(url, {
+					headers: { 'User-Agent': null }
 				})
-			]).catch(err => {
-				if (err && err.message.indexOf('I really need an ID for this to work') === -1) {
-					return false;
-				}
-				return true;
-			});
+			])
+				.then(res => res.text())
+				.catch(async err => {
+					const emailRecepient = config.adsTxtSupportEmail.join(',');
+					const emailParams = {
+						queue: 'MAILER',
+						data: {
+							to: emailRecepient,
+							body: err.message,
+							subject: `Error in ads.txt verification for ${url}`
+						}
+					};
+					try {
+						await fetch(config.mailerQueueUrl, {
+							method: 'POST',
+							body: emailParams
+						});
+					} catch (error) {
+						console.error(error.message);
+					}
+					if (err && err.message.indexOf('I really need an ID for this to work') === -1) {
+						return false;
+					}
+					return true;
+					//add alert main incase ads.txt fails
+				});
 		},
 		detectCustomAp(url, siteId) {
 			return API.load(url).then(body => {
