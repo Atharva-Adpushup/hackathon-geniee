@@ -377,19 +377,6 @@ function createNewAmpDocAndDoProcessing(payload, initialDoc, docKey, processing)
 }
 
 function getAmpAds(siteId) {
-	const GET_ALL_AMP_ADS_QUERY = `SELECT _amtg as doc 							
-	FROM AppBucket _amtg
-	WHERE meta(_amtg).id LIKE 'amtg::%' AND _amtg.siteId = "${siteId}";`;
-	const query = N1qlQuery.fromString(GET_ALL_AMP_ADS_QUERY);
-
-	return couchbase
-		.connectToAppBucket()
-		.then(appBucket => appBucket.queryAsync(query))
-		.then(ads => ads)
-		.catch(err => console.log(err));
-}
-
-function getAmpAds2(siteId) {
 	return couchbase
 		.connectToAppBucket()
 		.then(appBucket => {
@@ -647,7 +634,7 @@ module.exports = {
 	checkParams,
 	queuePublishingWrapper,
 	storedRequestWrapper,
-	getAmpAds: getAmpAds2,
+	getAmpAds,
 	publishAdPushupBuild,
 	sendDataToAuditLogService
 };
