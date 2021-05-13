@@ -79,10 +79,10 @@ class AdElement extends Component {
 		const { editName, isActive, showRefresh } = this.state;
 
 		const dynamicAttribsArr = [];
-		const totalAmpSlots = adsCount.toString();
+		const totalAmpSlots = adsCount;
 
 		dynamicAttribsArr.push(`data-siteid="${siteId}"`);
-		dynamicAttribsArr.push(`data-totalAmpSlots=${totalAmpSlots}`);
+		dynamicAttribsArr.push(`data-totalAmpSlots="${totalAmpSlots}"`);
 
 		if (isRefreshEnabled) {
 			dynamicAttribsArr.push(`data-enable-refresh="${refreshInterval}"`);
