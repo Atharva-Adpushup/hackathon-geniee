@@ -70,8 +70,8 @@ var request = require('request-promise'),
 							method: 'POST',
 							body: emailParams
 						});
-					} catch (err) {
-						console.error(err.message);
+					} catch (error) {
+						console.error(error.message);
 					}
 					if (err && err.message.indexOf('I really need an ID for this to work') === -1) {
 						return false;
