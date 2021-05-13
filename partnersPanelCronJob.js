@@ -12,7 +12,7 @@ const PARTNERS_LIST = {
 	IndexExchange: 'IndexExchange',
 	OpenX: 'OpenX'
 };
-console.log(partnersPanelService, 'partnersPanelService')
+
 cron.schedule(partnersPanelService.Criteo, () => {
 	startPartnersPanelsAnomaliesDetectionService(PARTNERS_LIST.Criteo);
 });
