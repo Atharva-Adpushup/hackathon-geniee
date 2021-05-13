@@ -2,7 +2,6 @@ const express = require('express');
 const Promise = require('bluebird');
 const uuid = require('uuid');
 
-const config = require('../configs/config');
 const { sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFunctions');
 const {
 	docKeys,
@@ -17,8 +16,6 @@ const {
 	fetchAmpAds,
 	createNewAmpDocAndDoProcessing,
 	updateAmpTags,
-	queuePublishingWrapper,
-	storedRequestWrapper,
 	getAmpAds,
 	sendDataToAuditLogService
 } = require('../helpers/routeHelpers');
@@ -131,40 +128,31 @@ router
 				const { siteDomain, appName, type = 'app' } = dataForAuditLogs;
 
 				const adIds = adsToUpdate.map(adId => adId).join(', ');
-				// sendDataToAuditLogService({
-				// 	siteId,
-				// 	siteDomain,
-				// 	appName,
-				// 	type,
-				// 	impersonateId: email,
-				// 	userId: originalEmail,
-				// 	prevConfig: amdAds,
-				// 	currentConfig: ads,
-				// 	action: {
-				// 		name: AMP.UPDATE_AMP_ADS,
-				// 		data: `AMP AD IDs - ${adIds}`
-				// 	}
-				// });
+				sendDataToAuditLogService({
+					siteId,
+					siteDomain,
+					appName,
+					type,
+					impersonateId: email,
+					userId: originalEmail,
+					prevConfig: amdAds,
+					currentConfig: ads,
+					action: {
+						name: AMP.UPDATE_AMP_ADS,
+						data: `AMP AD IDs - ${adIds}`
+					}
+				});
 				const updatedAds = adsToUpdate.map(adId => updateAmpTags(adId, ads, siteId));
-				return (
-					Promise.all(updatedAds)
-						.then(() => verifyOwner(siteId, email))
-						.then(site => {
-							site.save();
-						})
-						// .then(modifiedAds => {
-						// 	const allAmpAds = ads.map(obj => modifiedAds.find(o => o.id === obj.id) || obj);
-						// 	console.log(siteId, JSON.stringify(allAmpAds, null, 3), 'siteId, allAmpAds')
-						// 	return queuePublishingWrapper(siteId, allAmpAds);
-						// })
-						.then(() => sendSuccessResponse({ msg: 'success' }, res))
-						.catch(err => console.log(err))
-				);
+				return Promise.all(updatedAds)
+					.then(() => verifyOwner(siteId, email))
+					.then(site => site.save())
+					.then(() => sendSuccessResponse({ msg: 'success' }, res))
+					.catch(err => console.log(err));
 			})
 			.catch(err => console.log(err));
 	})
 	.post('/modifyAd', (req, res) => {
-		const { adId, data, siteId } = req.body;
+		const { adId, data } = req.body;
 		return updateAmpTags(adId, null, data)
 			.then(() => sendSuccessResponse({ msg: 'success' }, res))
 			.catch(err => console.log(err));
