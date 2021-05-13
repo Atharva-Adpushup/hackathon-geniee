@@ -409,7 +409,7 @@ function fetchAmpAds(req, res, docKey) {
 	const { siteId } = req.query;
 
 	return verifyOwner(siteId, req.user.email)
-		.then(() => getAmpAds2(siteId))
+		.then(() => getAmpAds(siteId))
 		.then(queryResult => queryResult)
 		.then((ads = []) => {
 			return sendSuccessResponse({ ads }, res);
