@@ -13,22 +13,8 @@ const PARTNERS_LIST = {
 	OpenX: 'OpenX'
 };
 
-cron.schedule(partnersPanelService.Criteo, () => {
-	startPartnersPanelsAnomaliesDetectionService(PARTNERS_LIST.Criteo);
-});
-
-cron.schedule(partnersPanelService.Pubmatic, () => {
-	startPartnersPanelsAnomaliesDetectionService(PARTNERS_LIST.Pubmatic);
-});
-
-cron.schedule(partnersPanelService.OFT, () => {
-	startPartnersPanelsAnomaliesDetectionService(PARTNERS_LIST.OFT);
-});
-
-cron.schedule(partnersPanelService.IndexExchange, () => {
-	startPartnersPanelsAnomaliesDetectionService(PARTNERS_LIST.IndexExchange);
-});
-
-cron.schedule(partnersPanelService.OpenX, () => {
-	startPartnersPanelsAnomaliesDetectionService(PARTNERS_LIST.OpenX);
-});
+Object.keys(PARTNERS_LIST).forEach(partner => {
+    cron.schedule(partnersPanelService[PARTNERS_LIST[partner]], () => {
+        startPartnersPanelsAnomaliesDetectionService(PARTNERS_LIST[partner]);
+    });
+})
