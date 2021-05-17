@@ -379,21 +379,18 @@ function createNewAmpDocAndDoProcessing(payload, initialDoc, docKey, processing)
 function getAmpAds(siteId) {
 	return couchbase
 		.connectToAppBucket()
-		.then(appBucket => {
-			return getSiteDocValues(siteId)
-			.then(site => {
-				const { siteDomain, ownerEmail } = site;
-				return appBucket.getAsync(`user::${ownerEmail}`).then(userDocWithCas => {
-					return appBucket;
-				});
-			})
-	
-		})
 		.then(appBucket => appBucket.getAsync(`ampd::${siteId}`, {}).then(ampdDoc => {
 			const { value: { ads } } = ampdDoc;
 			return ads;
 		}))
 		.then(ads => ads)
+		.catch(err => console.log(err));
+}
+
+function checkIfHBConfigExist(siteId) {
+	return couchbase
+		.connectToAppBucket()
+		.then(appBucket => appBucket.getAsync(`${docKeys.hb}${siteId}`, {}).then(({ value }) => value))
 		.catch(err => console.log(err));
 }
 
@@ -618,6 +615,7 @@ function publishAdPushupBuild(siteId) {
 
 module.exports = {
 	verifyOwner,
+	checkIfHBConfigExist,
 	errorHandler,
 	appBucket,
 	sendDataToZapier,

@@ -13,6 +13,7 @@ const {
 	appBucket,
 	errorHandler,
 	verifyOwner,
+	checkIfHBConfigExist,
 	fetchAmpAds,
 	createNewAmpDocAndDoProcessing,
 	updateAmpTags,
@@ -85,18 +86,22 @@ router
 				res
 			);
 		}
+		const { siteId } = req.body;
 		fn.isSuperUser = req.user.isSuperUser;
 		const payload = {
 			ad: req.body.ad,
-			siteId: +req.body.siteId,
+			siteId: +siteId,
 			ownerEmail: req.user.email,
 			id: uuid.v4()
 		};
-		return verifyOwner(req.body.siteId, req.user.email)
+		return verifyOwner(siteId, req.user.email)
 			.then(site => {
 				// set siteDomain to payload
 				payload.siteDomain = site.get('siteDomain');
-				return appBucket.getDoc(`${docKeys.ampScript}${payload.siteId}`);
+				return checkIfHBConfigExist(siteId).then(hbdcDoc => {
+					payload.ad.networkData.headerBidding = !!Object.keys(hbdcDoc).length;
+					return appBucket.getDoc(`${docKeys.ampScript}${payload.siteId}`);
+				});
 			})
 			.then(docWithCas => fn.processing(docWithCas, payload))
 			.catch(err =>
