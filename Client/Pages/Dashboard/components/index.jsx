@@ -13,6 +13,7 @@ import Card from '../../../Components/Layout/Card';
 import EstimatedEarningsContainer from '../containers/EstimatedEarningsContainer';
 import SitewiseReportContainer from '../containers/SitewiseReportContainer';
 import PerformanceOverviewContainer from '../containers/PerformanceOverviewContainer';
+import VideoAdRevenueContainer from '../containers/VideoAdRevenueContainer';
 import PerformanceApOriginalContainer from '../containers/PerformanceApOriginalContainer';
 import RevenueContainer from '../containers/RevenueContainer';
 import Loader from '../../../Components/Loader/index';
@@ -77,6 +78,22 @@ class Dashboard extends React.Component {
 		if (!reportsMeta.fetched) {
 			return reportService.getMetaData({ sites: userSites }).then(response => {
 				let { data: computedData } = response;
+				// TBD: Remove this hard coded sample code
+				response.data.widget.video_revenue = {
+					display_name: 'Video Revenue',
+					filter: ['siteid'],
+					name: 'video_revenue',
+					// path: '/site/report?report_name=primis_video_revenue',
+					path: '/site/report?report_name=site_summary',
+					position: 3
+				};
+				response.data.metrics.primis_revenue = {
+					chart_position: 10,
+					display_name: 'Primis Video Revenue',
+					selectable: true,
+					table_position: 9,
+					valueType: 'money'
+				};
 
 				computedData = getDemoUserSites(computedData, email);
 
@@ -97,6 +114,7 @@ class Dashboard extends React.Component {
 			: null;
 		const selectedSite = reportType == 'site' ? siteId : topPerformingSite || 'all';
 		const widgetsConfig = this.getWidgetConfig(widget, selectedSite, reportType, widgetsList);
+		console.log(widgetsConfig, 'widgetsConfig');
 		this.setState(
 			{
 				sites: allUserSites,
@@ -138,16 +156,16 @@ class Dashboard extends React.Component {
 				widget.selectedDate = dates[2].value;
 				widget.isDataSufficient = false;
 
-				if (reportType == 'site' || widget.name == 'per_ap_original')
+				if (reportType === 'site' || widget.name === 'per_ap_original')
 					widget.selectedSite = selectedSite;
 				else widget.selectedSite = 'all';
 
-				if (widget.name == 'per_ap_original') {
+				if (widget.name === 'per_ap_original') {
 					widget.selectedDimension = 'page_variation_type';
 					widget.selectedChartLegendMetric = 'adpushup_page_cpm';
 				}
 
-				if (widget.name == 'rev_by_network') {
+				if (widget.name === 'rev_by_network') {
 					widget.selectedDimension = 'network';
 					widget.chartLegend = 'Revenue';
 					widget.chartSeriesLabel = 'network';
@@ -155,11 +173,11 @@ class Dashboard extends React.Component {
 					widget.chartSeriesMetricType = 'money';
 				}
 
-				if (widget.name == 'per_site_wise') {
+				if (widget.name === 'per_site_wise' || widget.name === 'video_revenue') {
 					widget.selectedDimension = 'siteid';
 				}
 
-				if (widget.name == 'ops_country_report') {
+				if (widget.name === 'ops_country_report') {
 					widget.selectedDimension = 'ops_country_report';
 					widget.chartLegend = 'Country';
 					widget.chartSeriesLabel = 'country';
@@ -175,7 +193,7 @@ class Dashboard extends React.Component {
 
 	getWidgetComponent = widget => {
 		const { reportType } = this.props;
-		let { isUniqueImpEnabled } = this.state;
+		const { isUniqueImpEnabled } = this.state;
 		if (widget.isLoading) return <Loader height="20vh" />;
 
 		switch (widget.name) {
@@ -196,12 +214,17 @@ class Dashboard extends React.Component {
 					/>
 				);
 			case 'per_site_wise':
-				if (reportType != 'site') {
+				if (reportType !== 'site') {
 					return <SitewiseReportContainer displayData={widget.data} />;
 				}
 				return '';
+			case 'video_revenue':
+				if (reportType !== 'site') {
+					return <VideoAdRevenueContainer displayData={widget.data} />;
+				}
+				return '';
 			case 'per_site_wise_daily':
-				if (reportType == 'site') {
+				if (reportType === 'site') {
 					return <SitewiseReportContainer displayData={widget.data} reportType="site" />;
 				}
 				return '';
@@ -273,8 +296,22 @@ class Dashboard extends React.Component {
 			widgetsConfig[wid].isDataSufficient = false;
 			widgetsConfig[wid].isLoading = false;
 			this.setState({ widgetsConfig });
-		} else if (params.siteid)
+		} else if (params.siteid) {
 			reportService.getWidgetData({ path, params }).then(response => {
+				console.log(response, 'response getWidgetData', path, name, 'path, name');
+				// TBD: remove after getting final API
+				if (name === 'video_revenue') {
+					response.data = {
+						result: [
+							{
+								primis_revenue: 123,
+								siteId: 40792,
+								siteName: 'geeksforgeeks.org'
+							}
+						],
+						columns: ['primis_revenue', 'siteid', 'siteName']
+					};
+				}
 				this.setState(
 					state => ({ ...state, loadCounter: state.loadCounter + 1 }),
 					() => {
@@ -299,7 +336,7 @@ class Dashboard extends React.Component {
 				widgetsConfig[wid].isLoading = false;
 				this.setState({ widgetsConfig });
 			});
-		else {
+		} else {
 			widgetsConfig[wid].data = {};
 			widgetsConfig[wid].isDataSufficient = false;
 			widgetsConfig[wid].isLoading = false;

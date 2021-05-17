@@ -88,7 +88,8 @@ const displayMetrics = {
 	adpushup_page_views: { name: 'Page Views', valueType: 'number' },
 	adpushup_page_cpm: { name: 'Page RPM', valueType: 'money' },
 	network_impressions: { name: 'Impressions', valueType: 'number' },
-	network_ad_ecpm: { name: 'Ad eCPM', valueType: 'money' }
+	network_ad_ecpm: { name: 'Ad eCPM', valueType: 'money' },
+	primis_revenue: { name: 'Video Ad Revenue', valueType: 'money' }
 };
 
 const displayUniqueMetrics = {
@@ -108,6 +109,7 @@ const dashboardWidgets = [
 	'rev_by_network',
 	'per_overview',
 	'per_ap_original',
+	'video_revenue',
 	'ops_country_report'
 ];
 

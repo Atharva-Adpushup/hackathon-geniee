@@ -2,7 +2,7 @@ import React from 'react';
 import sortBy from 'lodash/sortBy';
 import cloneDeep from 'lodash/cloneDeep';
 import { numberWithCommas, roundOffTwoDecimal, getWidgetValidDationState } from '../helpers/utils';
-import { displayMetrics, displayUniqueMetrics, opsDisplayMetricsKeys } from '../configs/commonConsts';
+import { displayMetrics, opsDisplayMetricsKeys } from '../configs/commonConsts';
 
 function computeDisplayData(props) {
 	const {
@@ -38,12 +38,6 @@ function computeDisplayData(props) {
 		});
 	}
 
-	// correct calculation of Unique Ad eCPM
-	resultData["unique_ad_ecpm"].value = (resultData["network_net_revenue"].value/resultData["unique_impressions"].value)*1000
-	// correct calculation of Ad eCPM
-	resultData["network_ad_ecpm"].value = (resultData["network_net_revenue"].value/resultData["network_impressions"].value)*1000
-	// correct calculation of AP Page RPM
-	resultData["adpushup_page_cpm"].value = (resultData["network_net_revenue"].value/resultData["adpushup_page_views"].value)*1000
 	return sortBy(resultData, o => o.position);
 }
 
@@ -51,7 +45,7 @@ const DEFAULT_STATE = {
 	displayData: {}
 };
 
-class PerformanceOverview extends React.Component {
+class VideoAdRevenue extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = DEFAULT_STATE;
@@ -75,9 +69,8 @@ class PerformanceOverview extends React.Component {
 
 	render() {
 		const { displayData } = this.state;
-        console.log(displayData, 'displayData p.o')
-		const { isForOps, isUniqueImpEnabled } = this.props;
-		const computedDisplayMetrics = cloneDeep(isUniqueImpEnabled?displayUniqueMetrics:displayMetrics);
+		const { isForOps } = this.props;
+		const computedDisplayMetrics = cloneDeep(displayMetrics);
 		if (!isForOps) {
 			Object.keys(computedDisplayMetrics).forEach(displayMetricKey => {
 				const isOpsKey = opsDisplayMetricsKeys.indexOf(displayMetricKey) !== -1;
@@ -91,10 +84,10 @@ class PerformanceOverview extends React.Component {
 					displayData.map(({ name, value, col }) =>
 						computedDisplayMetrics[col] ? (
 							<div className="col-sm-4 u-margin-b4 text-center" key={col}>
-								<div className="font-small">{name}</div>
+								{/* <div className="font-small">{name}</div> */}
 								<div className="estimatedEarning">
 									<span>
-										{computedDisplayMetrics[col].valueType == 'money'
+										{computedDisplayMetrics[col].valueType === 'money'
 											? `$${numberWithCommas(roundOffTwoDecimal(value))}`
 											: numberWithCommas(value)}
 									</span>
@@ -112,4 +105,4 @@ class PerformanceOverview extends React.Component {
 	}
 }
 
-export default PerformanceOverview;
+export default VideoAdRevenue;
