@@ -387,13 +387,6 @@ function getAmpAds(siteId) {
 		.catch(err => console.log(err));
 }
 
-function checkIfHBConfigExist(siteId) {
-	return couchbase
-		.connectToAppBucket()
-		.then(appBucket => appBucket.getAsync(`${docKeys.hb}${siteId}`, {}).then(({ value }) => value))
-		.catch(err => console.log(err));
-}
-
 function fetchAmpAds(req, res, docKey) {
 	if (!req.query || !req.query.siteId) {
 		return sendErrorResponse(
@@ -615,7 +608,6 @@ function publishAdPushupBuild(siteId) {
 
 module.exports = {
 	verifyOwner,
-	checkIfHBConfigExist,
 	errorHandler,
 	appBucket,
 	sendDataToZapier,

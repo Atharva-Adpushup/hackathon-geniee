@@ -13,7 +13,6 @@ const {
 	appBucket,
 	errorHandler,
 	verifyOwner,
-	checkIfHBConfigExist,
 	fetchAmpAds,
 	createNewAmpDocAndDoProcessing,
 	updateAmpTags,
@@ -98,10 +97,7 @@ router
 			.then(site => {
 				// set siteDomain to payload
 				payload.siteDomain = site.get('siteDomain');
-				return checkIfHBConfigExist(siteId).then(hbdcDoc => {
-					payload.ad.networkData.headerBidding = !!Object.keys(hbdcDoc).length;
-					return appBucket.getDoc(`${docKeys.ampScript}${payload.siteId}`);
-				});
+				return appBucket.getDoc(`${docKeys.ampScript}${payload.siteId}`);
 			})
 			.then(docWithCas => fn.processing(docWithCas, payload))
 			.catch(err =>

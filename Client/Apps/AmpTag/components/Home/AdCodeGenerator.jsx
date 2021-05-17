@@ -76,6 +76,7 @@ class AdCodeGenerator extends Component {
 			type,
 			fluid: true,
 			networkData: {
+				headerBidding: true,
 				refreshSlot: true,
 				dfpAdunitCode: null,
 				dfpAdunit: null,
