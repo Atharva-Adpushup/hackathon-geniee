@@ -111,7 +111,7 @@ router
 					{
 						message: 'Ad created',
 						doc: { ...value },
-						newId: payload.id
+						newId: payload.id // return id of newly created ad
 					},
 					res
 				)
