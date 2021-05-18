@@ -1,48 +1,52 @@
 import React from 'react';
-import sortBy from 'lodash/sortBy';
-import cloneDeep from 'lodash/cloneDeep';
-import { numberWithCommas, roundOffTwoDecimal, getWidgetValidDationState } from '../helpers/utils';
-import { displayMetrics, opsDisplayMetricsKeys } from '../configs/commonConsts';
+import moment from 'moment';
+import CustomChart from '../../../Components/CustomChart';
+import { yAxisGroupsVideoRevenuePrimis } from '../configs/commonConsts';
+import { getWidgetValidDationState } from '../helpers/utils';
 
-function computeDisplayData(props) {
-	const {
-		displayData: { result, columns },
-		metrics,
-		siteId,
-		reportType
-	} = props;
-	const resultData = {};
+function computeGraphData(results) {
+	let series = [];
+	const adpushupVideoRevenueSeriesData = [];
+	const xAxis = { categories: [] };
 
-	if (columns && result) {
-		columns.forEach(col => {
-			if (metrics[col]) {
-				resultData[col] = {
-					name: metrics[col].display_name,
-					value: 0,
-					position: metrics[col].chart_position,
-					col
-				};
+	if (results.length) {
+		results.sort((a, b) => {
+			const dateA = a.report_date;
+			const dateB = b.report_date;
+			if (dateA < dateB) {
+				return -1;
 			}
+			if (dateA > dateB) {
+				return 1;
+			}
+			return 0;
 		});
-		result.forEach(row => {
-			if (reportType === 'site' && row.siteid === siteId)
-				Object.keys(row).map(col => {
-					if (resultData[col]) resultData[col].value = row[col];
-					return true;
-				});
-			else
-				Object.keys(row).map(col => {
-					if (resultData[col]) resultData[col].value += row[col];
-					return true;
-				});
+
+		results.forEach(result => {
+			adpushupVideoRevenueSeriesData.push(result.primis_revenue);
+			xAxis.categories.push(moment(result.report_date).format('ll'));
 		});
+
+		series = [
+			{
+				data: adpushupVideoRevenueSeriesData,
+				name: 'Primis Video Revenue',
+				value: 'primis_revenue',
+				valueType: 'money'
+			}
+		];
 	}
 
-	return sortBy(resultData, o => o.position);
+	const computedState = {
+		series,
+		xAxis
+	};
+	return computedState;
 }
 
 const DEFAULT_STATE = {
-	displayData: {}
+	series: [],
+	xAxis: {}
 };
 
 class VideoAdRevenue extends React.Component {
@@ -63,45 +67,32 @@ class VideoAdRevenue extends React.Component {
 			return DEFAULT_STATE;
 		}
 
-		const resultData = computeDisplayData(props);
-		return { displayData: resultData };
+		const computedState = computeGraphData(displayData.result);
+		return { ...computedState };
+	}
+
+	renderChart() {
+		const type = 'spline';
+		const { series, xAxis } = this.state;
+		const { isDataSufficient } = this.props;
+
+		if (series && series.length > 0) {
+			return (
+				<div>
+					<CustomChart
+						type={type}
+						series={series}
+						xAxis={xAxis}
+						yAxisGroups={yAxisGroupsVideoRevenuePrimis}
+					/>
+				</div>
+			);
+		}
+		return <div className="text-center">Insufficient Data. Adpushup Optimization is Underway.</div>;
 	}
 
 	render() {
-		const { displayData } = this.state;
-		const { isForOps } = this.props;
-		const computedDisplayMetrics = cloneDeep(displayMetrics);
-		if (!isForOps) {
-			Object.keys(computedDisplayMetrics).forEach(displayMetricKey => {
-				const isOpsKey = opsDisplayMetricsKeys.indexOf(displayMetricKey) !== -1;
-				if (isOpsKey) delete computedDisplayMetrics[displayMetricKey];
-			});
-		}
-
-		return (
-			<div className="u-margin-t4 u-margin-b4">
-				{displayData.length > 0 ? (
-					displayData.map(({ name, value, col }) =>
-						computedDisplayMetrics[col] ? (
-							<div className="col-sm-4 u-margin-b4 text-center" key={col}>
-								{/* <div className="font-small">{name}</div> */}
-								<div className="estimatedEarning">
-									<span>
-										{computedDisplayMetrics[col].valueType === 'money'
-											? `$${numberWithCommas(roundOffTwoDecimal(value))}`
-											: numberWithCommas(value)}
-									</span>
-								</div>
-							</div>
-						) : (
-							''
-						)
-					)
-				) : (
-					<div className="text-center">No Record Found.</div>
-				)}
-			</div>
-		);
+		return this.renderChart();
 	}
 }
 

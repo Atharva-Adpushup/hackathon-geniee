@@ -71,6 +71,18 @@ const yAxisGroups = [
 		}
 	}
 ];
+const yAxisGroupsVideoRevenuePrimis = [
+	{
+		seriesNames: ['Primis Video Revenue'],
+		yAxisConfig: {
+			labels: {
+				// eslint-disable-next-line no-template-curly-in-string
+				format: '${value}'
+			}
+		}
+	}
+];
+
 const tableHeader = [
 	{ title: 'Website', prop: 'siteName' },
 	{ title: 'AdPushup Page views', prop: 'adpushup_page_views' },
@@ -129,6 +141,7 @@ export {
 	sites,
 	ALL_SITES_VALUE,
 	yAxisGroups,
+	yAxisGroupsVideoRevenuePrimis,
 	tableHeader,
 	displayMetrics,
 	displayUniqueMetrics,
