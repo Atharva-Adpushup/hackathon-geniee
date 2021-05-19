@@ -77,7 +77,7 @@ class Dashboard extends React.Component {
 
 		if (!reportsMeta.fetched) {
 			return reportService.getMetaData({ sites: userSites }).then(response => {
-				console.log(response, 'response')
+				console.log(response, 'response');
 				let { data: computedData } = response;
 				// TBD: Remove this hard coded sample code
 				response.data.widget.video_revenue = {
