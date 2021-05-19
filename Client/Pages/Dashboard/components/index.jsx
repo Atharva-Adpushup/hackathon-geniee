@@ -34,7 +34,7 @@ import MixpanelHelper from '../../../helpers/mixpanel';
 class Dashboard extends React.Component {
 	constructor(props) {
 		super(props);
-		let {
+		const {
 			user: {
 				data: { isUniqueImpEnabled = false }
 			}
@@ -77,6 +77,7 @@ class Dashboard extends React.Component {
 
 		if (!reportsMeta.fetched) {
 			return reportService.getMetaData({ sites: userSites }).then(response => {
+				console.log(response, 'response')
 				let { data: computedData } = response;
 				// TBD: Remove this hard coded sample code
 				response.data.widget.video_revenue = {
@@ -304,12 +305,35 @@ class Dashboard extends React.Component {
 					response.data = {
 						result: [
 							{
-								primis_revenue: 123,
-								siteId: 40792,
-								siteName: 'geeksforgeeks.org'
+								primis_revenue: 30,
+								report_date: '2021-05-13'
+							},
+							{
+								primis_revenue: 15,
+								report_date: '2021-05-15'
+							},
+							{
+								primis_revenue: 54,
+								report_date: '2021-05-11'
+							},
+							{
+								primis_revenue: 44,
+								report_date: '2021-05-16'
+							},
+							{
+								primis_revenue: 87,
+								report_date: '2021-05-14'
+							},
+							{
+								primis_revenue: 13,
+								report_date: '2021-05-12'
+							},
+							{
+								primis_revenue: 20,
+								report_date: '2021-05-17'
 							}
 						],
-						columns: ['primis_revenue', 'siteid', 'siteName']
+						columns: ['primis_revenue', 'report_date']
 					};
 				}
 				this.setState(
