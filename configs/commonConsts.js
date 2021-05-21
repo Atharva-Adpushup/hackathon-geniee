@@ -637,7 +637,14 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		adManagerSyncService: '0 */12 * * *',
 		prefetchService: '*/1 * * * *', // Every 1 mins
 		prefetchHBService: '*/15 * * * *', // Every 15 mins
-		emailSnapshotsService: '00 8 * * *' //Run at 8:00 everyday
+		emailSnapshotsService: '00 8 * * *', //Run at 8:00 everyday
+		partnersPanelService: {
+			Criteo: '22 13 * * *',
+			Pubmatic: '24 13 * * *',
+			OFT: '26 14 * * *',
+			IndexExchange: '28 13 * * *',
+			OpenX: '30 13 * * *'
+		}
 	},
 	SELLERS_JSON: {
 		fileConfig: {
