@@ -8,7 +8,7 @@ const IndexExchange = require('../partnersPanelAnomaliesDetectionService/IndexEx
 const OpenX = require('../partnersPanelAnomaliesDetectionService/OpenX');
 const { appBucket } = require('../../helpers/routeHelpers');
 
-const PARTNERS_MODULE_LIST = {
+const PARTNERS_LIST = {
 	Criteo: Criteo,
 	Pubmatic: Pubmatic,
 	OFT: OFT,
@@ -37,8 +37,7 @@ const getSitesFromDB = async () => {
 	return siteListPromise;
 };
 
-function startPartnersPanelsAnomaliesDetectionService(partnerName, retryCount = 0) {
-	const partner = PARTNERS_MODULE_LIST[partnerName];
+function startPartnersPanelsAnomaliesDetectionService(partner, retryCount = 0) {
 	getSitesFromDB()
 		.then(sitesData => {
 			if (partner) {
@@ -46,7 +45,7 @@ function startPartnersPanelsAnomaliesDetectionService(partnerName, retryCount = 
 					throw { err };
 				});
 			} else {
-				throw new Error(`Partner not found! - ${partnerName}. Time: ${new Date()}`);
+				throw new Error(`Partner not found! - ${process.env.PARTNER_NAME}. Time: ${new Date()}`);
 			}
 		})
 		.then(result => {
@@ -59,25 +58,33 @@ function startPartnersPanelsAnomaliesDetectionService(partnerName, retryCount = 
 						result.message
 					}`
 				);
+				process.exit(0);
 			} else {
 				if (retryCount < 10) {
 					retryCount++;
 					const time = 1000 * 60 * 1 * retryCount;
 					console.log(
-						`Retry attempt for ${partnerName} - ${retryCount}/10 in ${5 *
+						`Retry attempt for ${process.env.PARTNER_NAME} - ${retryCount}/10 in ${5 *
 							retryCount} min(s). Time: ${new Date()}`
 					);
 					setTimeout(async () => {
-						await startPartnersPanelsAnomaliesDetectionService(partnerName, retryCount);
+						await startPartnersPanelsAnomaliesDetectionService(partner, retryCount);
 					}, time);
+				} else {
+					process.exit(0);
 				}
 			}
 		})
 		.catch(async err => {
 			await sendErrorNotification(err, 'Patners Panel Service Crashed');
+			process.exit(1);
 		});
 }
 
-module.exports = {
-	startPartnersPanelsAnomaliesDetectionService
+if (process.env.PARTNER_NAME) {
+	const { PARTNER_NAME } = process.env;
+	startPartnersPanelsAnomaliesDetectionService(PARTNERS_LIST[PARTNER_NAME]);
+} else {
+	console.log('No partner name passed!');
+	process.exit(0);
 }

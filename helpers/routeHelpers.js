@@ -15,7 +15,6 @@ const adpushup = require('./adpushupEvent');
 const AdPushupError = require('./AdPushupError');
 const { sendErrorResponse, sendSuccessResponse } = require('./commonFunctions');
 const {
-	docKeys,
 	PRODUCT_LIST_API,
 	APP_KEYS,
 	GOOGLE_BOT_USER_AGENT,
@@ -368,8 +367,8 @@ function checkParams(toCheck, req, mode, checkLight = false) {
 function createNewAmpDocAndDoProcessing(payload, initialDoc, docKey, processing) {
 	const defaultDocCopy = _.cloneDeep(initialDoc);
 	return appBucket
-		.createDoc(`${docKey}${payload.siteId}`, defaultDocCopy, {})
-		.then(() => appBucket.getDoc(`${docKey}${payload.siteId}`))
+		.createDoc(`${docKey}${payload.siteId}:${payload.id}`, defaultDocCopy, {})
+		.then(() => appBucket.getDoc(`site::${payload.siteId}`))
 		.then(docWithCas => {
 			payload.siteDomain = docWithCas.value.siteDomain;
 			return processing(defaultDocCopy, payload);
@@ -377,12 +376,15 @@ function createNewAmpDocAndDoProcessing(payload, initialDoc, docKey, processing)
 }
 
 function getAmpAds(siteId) {
+	const GET_ALL_AMP_ADS_QUERY = `SELECT _amtg as doc 							
+	FROM AppBucket _amtg
+	WHERE meta(_amtg).id LIKE 'amtg::%' AND _amtg.siteId = "${siteId}";`;
+
+	const query = N1qlQuery.fromString(GET_ALL_AMP_ADS_QUERY);
+
 	return couchbase
 		.connectToAppBucket()
-		.then(appBucket => appBucket.getAsync(`ampd::${siteId}`, {}).then(ampdDoc => {
-			const { value: { ads } } = ampdDoc;
-			return ads;
-		}))
+		.then(appBucket => appBucket.queryAsync(query))
 		.then(ads => ads)
 		.catch(err => console.log(err));
 }
@@ -401,17 +403,28 @@ function fetchAmpAds(req, res, docKey) {
 	return verifyOwner(siteId, req.user.email)
 		.then(() => getAmpAds(siteId))
 		.then(queryResult => queryResult)
-		.then((ads = []) => {
-			return sendSuccessResponse({ ads }, res);
-		})
+		.then(ads =>
+			sendSuccessResponse(
+				{
+					ads: ads.map(val => val.doc) || []
+				},
+				res
+			)
+		)
+
 		.catch(err =>
 			err.code && err.code === 13 && err.message.includes('key does not exist')
-				? sendSuccessResponse({ ads: []}, res)
+				? sendSuccessResponse(
+						{
+							ads: []
+						},
+						res
+				  )
 				: errorHandler(err, res)
 		);
 }
 
-function updateAmpTags(id, ads, siteId, updateThis) {
+function updateAmpTags(id, ads, updateThis) {
 	if (!id) {
 		return Promise.resolve();
 	}
@@ -419,25 +432,22 @@ function updateAmpTags(id, ads, siteId, updateThis) {
 	return couchbase
 		.connectToAppBucket()
 		.then(appBucket =>
-			appBucket.getAsync(`${docKeys.ampScript}${siteId}`, {}).then(ampd => ({ appBucket, ampd }))
+			appBucket.getAsync(`amtg::${id}`, {}).then(amtgDoc => ({ appBucket, amtgDoc }))
 		)
-		.then(({ appBucket, ampd: { value } }) => {
+		.then(({ appBucket, amtgDoc: { value } }) => {
 			if (!ads) {
 				value = { ...value, ...updateThis, updatedOn: +new Date() };
 			} else {
 				const updatedAd = ads.find(val => val.id === id);
-				value.ads = value.ads.map(adItem => {
-					if(adItem.id == id) {
-						adItem = updatedAd;
-						value.updatedOn = +new Date();
-						adItem.isRefreshEnabled
-							? (adItem.networkData.refreshInterval = 30)
-							: delete adItem.refreshInterval;
-					}
-					return adItem
-				})
+
+				value = updatedAd;
+				value.updatedOn = +new Date();
+				value.ad.isRefreshEnabled
+					? (value.ad.refreshInterval = 30)
+					: delete value.ad.refreshInterval;
 			}
-			return appBucket.replaceAsync(`${docKeys.ampScript}${siteId}`, value) && value;
+
+			return appBucket.replaceAsync(`amtg::${id}`, value) && value;
 		})
 		.catch(err => {
 			if (err.code === 13) {
@@ -448,10 +458,11 @@ function updateAmpTags(id, ads, siteId, updateThis) {
 		});
 }
 
-function checkAmpUnsyncedAds(ad) {
+function checkAmpUnsyncedAds(doc) {
+	const { ad } = doc;
 	if (!ad.networkData.dfpAdunitCode) {
 		const defaultAdData = {
-			sectionName: ad.name,
+			sectionName: doc.name,
 			variations: [
 				// hard coded! check apTag code
 				{
@@ -461,11 +472,11 @@ function checkAmpUnsyncedAds(ad) {
 					platform: 'mobile'
 				}
 			],
-			adId: ad.id,
+			adId: doc.id,
 			isResponsive: false, // false in amp
 			sizeWidth: ad.width,
 			sizeHeight: ad.height,
-			sectionId: ad.id,
+			sectionId: doc.id,
 			type: ad.type,
 			isManual: false,
 			isInnovativeAd: false,
@@ -567,6 +578,7 @@ function queuePublishingWrapper(siteId, ads) {
 	return commonDataForUnsyncedAmpAds(siteId, ads).then(data => {
 		// If no unsynced ad then skip dfp syncing
 		if (!(data && Array.isArray(data.ads) && data.ads.length)) return Promise.resolve(ads);
+
 		var options = {
 			method: 'POST',
 			uri: `${config.queuePublishingURL}/publish`,
