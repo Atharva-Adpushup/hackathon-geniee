@@ -161,13 +161,5 @@ module.exports = {
 	GA_EVENTS: {
 		SCRIPT_LOADED: 'script-load',
 		PAGE_VIEW: 'ap-page-view'
-	},
-	CUSTOM_UTM_PARAMS_AND_SITE_MAPPING: {
-		42184: 'jita_tg_params', //thedailywobble.com
-		42185: 'jita_tg_params', //uncached.com
-		42186: 'jita_tg_params', //twistity.com
-		42431: 'jita_tg_params', //freshcardio.com
-		42535: 'jita_tg_params', //fizzsy.com
-		42575: 'jita_tg_params'  //Saucyrecipes.com
 	}
 };

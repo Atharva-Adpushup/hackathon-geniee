@@ -14,9 +14,7 @@ class AmpAds extends Component {
 		const {
 			site: { apps = {} }
 		} = props;
-		const status = Object.prototype.hasOwnProperty.call(apps, 'ampScript')
-			? apps.ampScript
-			: undefined;
+		const status = Object.prototype.hasOwnProperty.call(apps, 'amp') ? apps.amp : undefined;
 
 		this.state = {
 			status,
@@ -42,7 +40,7 @@ class AmpAds extends Component {
 		return updateAppStatus(
 			site.siteId,
 			{
-				app: 'ampScript',
+				app: 'amp',
 				value: status
 			},
 			{
