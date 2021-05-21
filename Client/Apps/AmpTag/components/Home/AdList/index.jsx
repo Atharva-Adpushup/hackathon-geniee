@@ -76,18 +76,19 @@ class AdList extends Component {
 							<div style={{ clear: 'both' }}>&nbsp;</div>
 						</div>
 					) : null}
-					{ads.map((doc, key) =>
-						!Object.prototype.hasOwnProperty.call(doc.ad, 'isActive') ||
-						doc.ad.isActive ||
+					{ads.map((ad, key) =>
+						!Object.prototype.hasOwnProperty.call(ad, 'isActive') ||
+						ad.isActive ||
 						user.isSuperUser ? (
 							<div key={key} className="col-sm-6">
-								<li className="section-list-item" key={doc.id} style={customStyle}>
+								<li className="section-list-item" key={key} style={customStyle}>
 									<AdElement
-										doc={doc}
+										ad={ad}
 										user={user}
 										updateAd={updateAd}
 										modifyAdOnServer={modifyAdOnServer}
 										siteId={siteId}
+										adsCount={ads.length}
 										networkCode={networkCode}
 										adsToUpdateOnMasterSave={this.adsToUpdate}
 										dfpMessage={dfpMessage}

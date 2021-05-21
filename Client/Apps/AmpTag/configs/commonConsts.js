@@ -1,5 +1,3 @@
-import config from '../../../config/config';
-
 const AMP_NAV_ITEMS_INDEXES = {
 	CREATE_ADS: 'create-ads',
 	MANAGE_ADS: 'manage-ads'
@@ -66,30 +64,16 @@ const SIZES = {
 	}
 };
 
-const PREBID_SERVER_ENDPOINT = `${
-	config.PREBID_SERVER_HOST
-}prebidserver/openrtb2/amp?tag_id=__AD_ID____MULTI_SIZE_QUERY_PARAM__`;
-
 const AMP_FIXED_TARGETING = {
 	adpushup_ran: '1',
 	fluid: '1',
 	da: 'adx'
 };
 
-const DISPLAYADCODE = `<amp-ad width="__WIDTH__" height="__HEIGHT__" type="doubleclick"__DYNAMIC_ATTRIBS__data-slot="/__NETWORK_CODE__/__AD_UNIT_CODE__" rtc-config='{
-	"urls": [
-	  "${PREBID_SERVER_ENDPOINT}&curl=CANONICAL_URL&gdpr_consent=CONSENT_STRING"
-	]
-}' json='{"targeting":__AMP_FIXED_TARGETING__}'>
-</amp-ad>`;
+const DISPLAYADCODE = `<amp-ad width="__WIDTH__" height="__HEIGHT__" type="adpushup"__DYNAMIC_ATTRIBS__data-slotpath="/__NETWORK_CODE__/__AD_UNIT_CODE__"></amp-ad>`;
 
 const STICKYADCODE = `<amp-sticky-ad layout="nodisplay">
-<amp-ad width="__WIDTH__" height="__HEIGHT__" type="doubleclick"__DYNAMIC_ATTRIBS__data-slot="/__NETWORK_CODE__/__AD_UNIT_CODE__" rtc-config='{
-	"urls": [
-	  "${PREBID_SERVER_ENDPOINT}&curl=CANONICAL_URL&gdpr_consent=CONSENT_STRING"
-	]
-}' json='{"targeting":__AMP_FIXED_TARGETING__}'>
-</amp-ad>
+<amp-ad width="__WIDTH__" height="__HEIGHT__" type="adpushup"__DYNAMIC_ATTRIBS__data-slotpath="/__NETWORK_CODE__/__AD_UNIT_CODE__"> </amp-ad>
 </amp-sticky-ad>`;
 
 const DEFAULT_ADS_RESPONSE = { fetched: false, content: [] };
