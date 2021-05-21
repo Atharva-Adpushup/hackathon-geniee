@@ -274,6 +274,15 @@ module.exports = {
 		}
 		return true;
 	},
+
+	customUTMParamsHandling: function(customUTMObjectField, pageUrl) {
+		var url = new URL(pageUrl);
+		Object.keys(window[customUTMObjectField]).map(key => {
+			url.searchParams.set(key, window[customUTMObjectField][key]);
+		})
+		return url.href;
+	},
+
 	sendBeacon: function(url, data, options, beaconType) {
 		var toFeedback,
 			request,
@@ -283,6 +292,10 @@ module.exports = {
 		if (beaconType === commonConsts.BEACON_TYPE.AD_FEEDBACK) {
 			if (typeof url !== 'string' || typeof data !== 'object') {
 				return false;
+			}
+
+			if (commonConsts.CUSTOM_UTM_PARAMS_AND_SITE_MAPPING[adpConfig.siteId]) {
+				adpConfig.pageUrl = this.customUTMParamsHandling(commonConsts.CUSTOM_UTM_PARAMS_AND_SITE_MAPPING[adpConfig.siteId], adpConfig.pageUrl)
 			}
 
 			var feedbackObj = {
