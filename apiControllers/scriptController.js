@@ -7,6 +7,7 @@ const UserModel = require('../models/userModel');
 const SiteModel = require('../models/siteModel');
 const activeBidderAdaptersList = require('../models/activeBidderAdaptersListModel');
 const SelectiveRolloutActiveBidderAdaptersList = require('../models/selectiveRolloutActiveBidderAdaptersListModel');
+const ampActiveBidderAdaptersListModel = require('../models/ampActiveBidderAdaptersListModel');
 const ampScriptModel = require('../models/ampScriptModel');
 
 const getReportData = require('../reports/universal');
@@ -346,9 +347,15 @@ Router.get('/:siteId/ampSiteConfig', (req, res) => {
 		.catch(e => res.send({ error: e.message }));
 });
 
-Router.get('/prebidBundleConfig', (req, res) =>
-	SiteModel.getSiteById(req.query.siteId)
+Router.get('/prebidBundleConfig', (req, res) => {
+	const { siteId, forAmp } = req.query;
+
+	return SiteModel.getSiteById(siteId)
 		.then(site => {
+			if (forAmp) {
+				return ampActiveBidderAdaptersListModel;
+			}
+
 			const { isSelectiveRolloutEnabled = false } = site.get('apConfigs') || {};
 
 			return isSelectiveRolloutEnabled
@@ -356,30 +363,37 @@ Router.get('/prebidBundleConfig', (req, res) =>
 				: activeBidderAdaptersList;
 		})
 		.then(activeBiddersModel =>
-			Promise.join(
-				activeBiddersModel.isS2SActiveOnAnySite(),
-				activeBiddersModel.getActiveAndUsedBidderAdapters()
-			)
-				.then(([isS2SActiveOnAnySite, activeAndUsedBidders]) =>
-					res.send({ isS2SActiveOnAnySite, activeAndUsedBidders })
-				)
-				.catch(err => {
-					if (err instanceof AdPushupError) {
-						return res.status(httpStatusConsts.NOT_FOUND).json({ error: err.message });
-					}
-
-					return res
-						.status(httpStatusConsts.INTERNAL_SERVER_ERROR)
-						.json({ error: 'Internal Server Error!' });
-				})
+			Promise.join(activeBiddersModel, activeBiddersModel.getActiveAndUsedBidderAdapters())
 		)
-);
+		.then(([activeBiddersModel, activeAndUsedBidders]) => {
+			if (forAmp) {
+				return res.send({ activeAndUsedBidders });
+			}
+
+			return activeBiddersModel
+				.isS2SActiveOnAnySite()
+				.then(isS2SActiveOnAnySite => res.send({ isS2SActiveOnAnySite, activeAndUsedBidders }));
+		})
+		.catch(err => {
+			if (err instanceof AdPushupError) {
+				return res.status(httpStatusConsts.NOT_FOUND).json({ error: err.message });
+			}
+
+			return res
+				.status(httpStatusConsts.INTERNAL_SERVER_ERROR)
+				.json({ error: 'Internal Server Error!' });
+		});
+});
 
 Router.post('/prebidActiveBidderAdapters', (req, res) => {
-	const { newActiveBidderAdapters, siteId } = req.body;
+	const { newActiveBidderAdapters, siteId, forAmp } = req.body;
 
 	return SiteModel.getSiteById(siteId)
 		.then(site => {
+			if (forAmp) {
+				return ampActiveBidderAdaptersListModel;
+			}
+
 			const { isSelectiveRolloutEnabled = false } = site.get('apConfigs') || {};
 
 			return isSelectiveRolloutEnabled
