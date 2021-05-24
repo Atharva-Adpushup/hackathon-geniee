@@ -130,15 +130,11 @@ const reportsService = {
 	},
 	mergeReportColumns: reportColumns => [...reportColumns, ...CC.SESSION_RPM.SESSION_RPM_PROPS],
 	calculateSessionTotals: (sessionReports = []) => {
-		const totalSessions = sessionReports.reduce(
-			(result, report) => result + report.user_sessions,
-			0
-		);
 
-		const totalSessionRpm =
-			(sessionReports.reduce((result, report) => result + report.network_net_revenue, 0) /
-				totalSessions) *
-			1000;
+		const totalSessions = sessionReports.reduce((result, report) => result + report.user_sessions, 0);
+		const totalNetworkRevenue = sessionReports.reduce((result, report) => result + report.network_net_revenue, 0);
+
+		const totalSessionRpm = totalNetworkRevenue / totalSessions * 1000;
 
 		return {
 			total_session_rpm: totalSessionRpm,
@@ -232,8 +228,8 @@ const reportsService = {
 		const reportsResponse = await request({
 			uri: `${CC.ANALYTICS_API_ROOT}${CC.REPORT_PATH_XPATH}`,
 			json: true,
-            qs: reportConfig,
-            timeout: 600000 //10 mins
+			qs: reportConfig,
+			timeout: 600000 //10 mins
 		});
 
 		if (reportsResponse.code !== 1) throw new AdPushupError(reportsResponse);
@@ -278,7 +274,7 @@ const reportsService = {
 	getReportAPCustomStatXPath: async reportConfig =>
 		ObjectValidator(getCustomStatsValidations, reportConfig)
 			.then(() => reportsService.modifyQueryIfPnp(reportConfig))
-			.then(config => 
+			.then(config =>
 				reportsService.fetchReportAPCustomStatXPath(config)
 			),
 	getWidgetData: async (path, params) =>
@@ -312,14 +308,14 @@ const reportsService = {
 	getReportsAPCustomStatXPathWithCache: async (reportConfig, bypassCache = false) => {
 		const sortedConfig = sortObjectEntries(reportConfig);
 		return ObjectValidator(getCustomStatsValidations, sortedConfig)
-		.then(() => {
-			// added a prefix 'xPath-' to cacheKey to make it unique for xPath 
-			// because reportConfig is same for General Report and xPath report
-			return cacheWrapper(
-				{ cacheKey: 'xPath-' + JSON.stringify(sortedConfig), bypassCache, cacheExpiry: 24 * 3600 },
-				async () => reportsService.getReportAPCustomStatXPath(reportConfig)
-			)
-		});
+			.then(() => {
+				// added a prefix 'xPath-' to cacheKey to make it unique for xPath 
+				// because reportConfig is same for General Report and xPath report
+				return cacheWrapper(
+					{ cacheKey: 'xPath-' + JSON.stringify(sortedConfig), bypassCache, cacheExpiry: 24 * 3600 },
+					async () => reportsService.getReportAPCustomStatXPath(reportConfig)
+				)
+			});
 	},
 	getReportingMetaDataWithCache: async (sites, isSuperUser, bypassCache = false) => {
 		return cacheWrapper(
