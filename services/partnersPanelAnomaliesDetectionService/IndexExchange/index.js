@@ -26,6 +26,8 @@ const fromDate = moment()
 	.subtract(1, 'days')
 	.format('YYYY-MM-DD');
 const toDate = fromDate;
+console.log( fromDate, 'IndexExchange fromDate')
+console.log( toDate, 'IndexExchange toDate')
 
 /**
  * 1. Get Pub data
@@ -270,7 +272,7 @@ const fetchData = sitesData => {
 						partner: PARTNER_NAME,
 						anomalies
 					}),
-					saveAnomaliesToDb(dataToSend, PARTNER_NAME)
+					// saveAnomaliesToDb(dataToSend, PARTNER_NAME)
 				]);
 			}
 			return {

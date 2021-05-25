@@ -18,6 +18,8 @@ const fromDate = moment()
 	.subtract(1, 'days')
 	.format('YYYY-MM-DD');
 const toDate = fromDate;
+console.log( fromDate, 'Criteo fromDate')
+console.log( toDate, 'Criteo toDate')
 
 const queryParams = {
 	dimensions: 'domain',
@@ -94,7 +96,7 @@ const fetchData = async sitesData => {
 						partner: PARTNER_NAME,
 						anomalies
 					}),
-					saveAnomaliesToDb(dataToSend, PARTNER_NAME)
+					// saveAnomaliesToDb(dataToSend, PARTNER_NAME)
 				]);
 			}
 			return {

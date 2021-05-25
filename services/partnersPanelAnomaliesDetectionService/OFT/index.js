@@ -22,6 +22,8 @@ const fromDate = moment()
 	.subtract(1, 'days')
 	.format('YYYY-MM-DD');
 const toDate = fromDate;
+console.log( fromDate, 'OFT fromDate')
+console.log( toDate, 'OFT toDate')
 
 const authParams = {
 	auth: {
@@ -138,7 +140,7 @@ const fetchData = sitesData => {
 						partner: PARTNER_NAME,
 						anomalies
 					}),
-					saveAnomaliesToDb(dataToSend, PARTNER_NAME)
+					// saveAnomaliesToDb(dataToSend, PARTNER_NAME)
 				]);
 			}
 			return {

@@ -68,6 +68,8 @@ const fromDate = moment()
 	.subtract(2, 'days')
 	.format('YYYY-MM-DD');
 const toDate = fromDate;
+console.log( fromDate, 'OpenX fromDate')
+console.log( toDate, 'OpenX toDate')
 
 /**
  * 1. Get Pub data
@@ -266,7 +268,7 @@ const fetchData = sitesData => {
 						partner: PARTNER_NAME,
 						anomalies
 					}),
-					saveAnomaliesToDb(dataToSend, PARTNER_NAME)
+					// saveAnomaliesToDb(dataToSend, PARTNER_NAME)
 				]);
 			}
 			return {

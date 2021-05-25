@@ -25,6 +25,8 @@ const toDatePubmatic = date.format('YYYY-MM-DDT23:59');
 
 const fromDate = date.format('YYYY-MM-DD');
 const toDate = date.format('YYYY-MM-DD');
+console.log( fromDate, 'Pubmatic fromDate')
+console.log( toDate, 'Pubmatic toDate')
 
 // response
 /**
@@ -159,7 +161,7 @@ const fetchData = sitesData => {
 						partner: PARTNER_NAME,
 						anomalies
 					}),
-					saveAnomaliesToDb(dataToSend, PARTNER_NAME)
+					// saveAnomaliesToDb(dataToSend, PARTNER_NAME)
 				]);
 			}
 			return {
