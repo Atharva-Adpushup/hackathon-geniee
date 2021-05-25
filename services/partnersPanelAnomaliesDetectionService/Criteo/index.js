@@ -58,8 +58,6 @@ const initDataForpartner = function() {
 	.subtract(1, 'days')
 	.format('YYYY-MM-DD');
 	const toDate = fromDate;
-	console.log( fromDate, 'Criteo fromDate')
-	console.log( toDate, 'Criteo toDate')
 
 	return {
 		fromDate,

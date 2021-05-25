@@ -69,8 +69,7 @@ const initDataForpartner = function() {
 		.subtract(2, 'days')
 		.format('YYYY-MM-DD');
 	const toDate = fromDate;
-	console.log( fromDate, 'OpenX fromDate')
-	console.log( toDate, 'OpenX toDate')
+
 	return {
 		fromDateOpenX,
 		toDateOpenX,

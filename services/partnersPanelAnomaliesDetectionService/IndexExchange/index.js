@@ -222,8 +222,6 @@ const initDataForpartner = function() {
 	.subtract(1, 'days')
 	.format('YYYY-MM-DD');
 	const toDate = fromDate;
-	console.log( fromDate, 'IndexExchange fromDate')
-	console.log( toDate, 'IndexExchange toDate')
 
 	return {
 		fromDate,
