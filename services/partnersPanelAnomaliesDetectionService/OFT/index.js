@@ -13,18 +13,6 @@ const {
 const { PARTNER_NAME, NETWORK_ID, DOMAIN_FIELD_NAME, REVENUE_FIELD } = OFT;
 const API_ENDPOINT = `https://api.appnexus.com`;
 
-const fromDateOFT = moment()
-	.subtract(1, 'days')
-	.format('YYYY-MM-DD');
-const toDateOFT = moment().format('YYYY-MM-DD');
-
-const fromDate = moment()
-	.subtract(1, 'days')
-	.format('YYYY-MM-DD');
-const toDate = fromDate;
-console.log( fromDate, 'OFT fromDate')
-console.log( toDate, 'OFT toDate')
-
 const authParams = {
 	auth: {
 		username: 'adpushup152ns',
@@ -42,7 +30,7 @@ const authParams = {
 // 1. Get Auth token before each req
 // 2. Get Report Id
 // 3. Download Report - CSV
-const getDataFromPartner = async function() {
+const getDataFromPartner = async function(fromDate, toDate) {
 	// 1. Get Auth token before each req
 	const token = await axios
 		.post(`${API_ENDPOINT}/auth`, authParams)
@@ -59,8 +47,8 @@ const getDataFromPartner = async function() {
 	const queryParams = {
 		report: {
 			report_type: 'publisher_analytics',
-			start_date: fromDateOFT,
-			end_date: toDateOFT,
+			start_date: fromDate,
+			end_date: toDate,
 			columns: ['day', 'clicks', 'publisher_revenue', 'site_id', 'site_name'],
 			orders: [{ order_by: 'day', direction: 'ASC' }],
 			format: 'csv',
@@ -95,7 +83,28 @@ const getDataFromPartner = async function() {
 	return await csv().fromString(reportData);
 };
 
+const initDataForpartner = function() {
+	const fromDateOFT = moment()
+	.subtract(1, 'days')
+	.format('YYYY-MM-DD');
+	const toDateOFT = moment().format('YYYY-MM-DD');
+
+	const fromDate = moment()
+		.subtract(1, 'days')
+		.format('YYYY-MM-DD');
+	const toDate = fromDate;
+	console.log( fromDate, 'OFT fromDate')
+	console.log( toDate, 'OFT toDate')
+	return {
+		fromDateOFT,
+		toDateOFT,
+		fromDate,
+		toDate
+	}
+}
+
 const fetchData = sitesData => {
+	const {fromDate, toDate, fromDateOFT, toDateOFT} = initDataForpartner();
 	const OFTMediaPartnerModel = new partnerAndAdpushpModel(
 		sitesData,
 		DOMAIN_FIELD_NAME,
@@ -103,7 +112,7 @@ const fetchData = sitesData => {
 	);
 
 	console.log('Fetching data from OFT...');
-	return getDataFromPartner()
+	return getDataFromPartner(fromDateOFT, toDateOFT)
 		.then(async function(reportDataJSON) {
 			OFTMediaPartnerModel.setPartnersData(reportDataJSON);
 
