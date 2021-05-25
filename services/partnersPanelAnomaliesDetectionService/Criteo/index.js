@@ -36,8 +36,21 @@ const getDataFromPartner = function(fromDate, toDate) {
 				timeout: 1000 * 60 * 3
 			}
 		)
-		.then(response => response.data)
+		.then(response => processDataReceivedFromPublisher(response.data))
 		.catch(axiosErrorHandler);
+};
+
+const processDataReceivedFromPublisher = data => {
+	const processedData = data
+		.map(row => {
+			return row;
+		})
+		.filter(row => /AP\/\d+_/.test(row.Subid))
+		.map(row => {
+			row.Domain = row.Subid.replace(/AP\/\d+_/, '');
+			return row;
+		});
+	return processedData;
 };
 
 const initDataForpartner = function() {
