@@ -168,7 +168,7 @@ const fetchData = sitesData => {
 						partner: PARTNER_NAME,
 						anomalies
 					}),
-					// saveAnomaliesToDb(dataToSend, PARTNER_NAME)
+					saveAnomaliesToDb(dataToSend, PARTNER_NAME)
 				]);
 			}
 			return {
