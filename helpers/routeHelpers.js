@@ -114,7 +114,7 @@ function emitEventAndSendResponse(siteId, res, data = {}) {
 	});
 }
 function sendDataToAuditLogService(data) {
-	const { prevConfig, currentConfig, action = {}, ...restLogData} = data; 
+	const { prevConfig, currentConfig, action = {}, ...restLogData } = data;
 	const delta = jsondiffpatch.diff(prevConfig, currentConfig) || {};
 
 	// don't need to send current config to elastic service
@@ -159,11 +159,11 @@ function fetchAds(req, res, docKey) {
 		.catch(err =>
 			err.code && err.code === 13 && err.message.includes('key does not exist')
 				? sendSuccessResponse(
-						{
-							ads: []
-						},
-						res
-				  )
+					{
+						ads: []
+					},
+					res
+				)
 				: errorHandler(err, res)
 		);
 }
@@ -453,8 +453,6 @@ const updateLayoutAd = (req, res, adData) => {
 				throw new AdPushupError({ message: 'Invalid adUnitId', code: 400 });
 			}
 
-			channelData.variations[variationId].sections[adUnitId].ads[adId].sizeMapping = sizeMapping;
-
 			return channelModel.saveChannel(siteId, platform, pageGroup, channelData);
 		})
 		.then(() => sendSuccessResponse({}, res))
@@ -563,11 +561,11 @@ function fetchAmpAds(req, res, docKey) {
 		.catch(err =>
 			err.code && err.code === 13 && err.message.includes('key does not exist')
 				? sendSuccessResponse(
-						{
-							ads: []
-						},
-						res
-				  )
+					{
+						ads: []
+					},
+					res
+				)
 				: errorHandler(err, res)
 		);
 }

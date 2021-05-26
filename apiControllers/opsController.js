@@ -447,7 +447,6 @@ router
 							for (const section in sections) {
 								const { ads } = sections[section];
 								if (ads[adId]) {
-									console.log(ads[adId]);
 									ads[adId] = {
 										...ads[adId],
 										downwardSizesDisabled,
