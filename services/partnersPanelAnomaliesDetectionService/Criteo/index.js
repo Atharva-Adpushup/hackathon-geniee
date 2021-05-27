@@ -14,22 +14,17 @@ const { PARTNER_NAME, NETWORK_ID, DOMAIN_FIELD_NAME, REVENUE_FIELD } = CRITEO;
 const TOKEN = 'D152A218-5DE9-4834-91F0-95542119D520';
 const API_ENDPOINT = `https://pmc.criteo.com/api/stats?apitoken=${TOKEN}`;
 
-const fromDate = moment()
-	.subtract(1, 'days')
-	.format('YYYY-MM-DD');
-const toDate = fromDate;
-
-const queryParams = {
-	dimensions: 'domain',
-	generator: 'daily',
-	currency: 'USD',
-	metrics: 'Revenue,CriteoDisplays',
-	begindate: fromDate,
-	enddate: toDate,
-	timezone: 'PST'
-};
-
-const getDataFromPartner = function() {
+const getDataFromPartner = function(fromDate, toDate) {
+	const queryParams = {
+		dimensions: 'domain',
+		generator: 'daily',
+		currency: 'USD',
+		metrics: 'Revenue,CriteoDisplays',
+		begindate: fromDate,
+		enddate: toDate,
+		timezone: 'PST'
+	};
+	
 	// 1. Get Auth token before each req
 	return axios
 		.get(
@@ -41,9 +36,32 @@ const getDataFromPartner = function() {
 				timeout: 1000 * 60 * 3
 			}
 		)
-		.then(response => response.data)
+		.then(response => processDataReceivedFromPublisher(response.data))
 		.catch(axiosErrorHandler);
 };
+
+const processDataReceivedFromPublisher = data => {
+	const processedData = data
+		.filter(row => /AP\/\d+_/.test(row.Subid))
+		.map(row => {
+			row.Domain = row.Subid.replace(/AP\/\d+_/, '');
+			return row;
+		});
+	return processedData;
+};
+
+const initDataForpartner = function() {
+	const fromDate = moment()
+	.subtract(1, 'days')
+	.format('YYYY-MM-DD');
+	const toDate = fromDate;
+
+	return {
+		fromDate,
+		toDate
+	}
+}
+
 /**
  * 1. Get Pub data
  * 2. Get AdPushup data for that Pub
@@ -51,6 +69,8 @@ const getDataFromPartner = function() {
  */
 
 const fetchData = async sitesData => {
+	const { fromDate, toDate } = initDataForpartner();
+
 	const CriteoPartnerModel = new partnerAndAdpushpModel(
 		sitesData,
 		DOMAIN_FIELD_NAME,
@@ -58,7 +78,7 @@ const fetchData = async sitesData => {
 	);
 
 	console.log('Fetching data from Criteo...');
-	return getDataFromPartner()
+	return getDataFromPartner(fromDate, toDate)
 		.then(async function(reportDataJSON) {
 			CriteoPartnerModel.setPartnersData(reportDataJSON);
 			// process and map sites data with publishers API data response

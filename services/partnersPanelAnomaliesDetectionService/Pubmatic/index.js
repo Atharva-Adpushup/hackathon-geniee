@@ -19,13 +19,6 @@ const authParams = {
 	apiProduct: 'PUBLISHER'
 };
 
-const date = moment().subtract(2, 'days');
-const fromDatePubmatic = date.format('YYYY-MM-DDT00:00');
-const toDatePubmatic = date.format('YYYY-MM-DDT23:59');
-
-const fromDate = date.format('YYYY-MM-DD');
-const toDate = date.format('YYYY-MM-DD');
-
 // response
 /**
     {
@@ -46,7 +39,7 @@ const toDate = date.format('YYYY-MM-DD');
 // 1. Get Auth token before each req
 // 2. Get Report Id
 // 3. Download Report - CSV
-const getDataFromPartner = async function() {
+const getDataFromPartner = async function(fromDate, toDate) {
 	// 1. Get Auth token before each req
 	const token = await axios
 		.post(`${API_ENDPOINT}/developer-integrations/developer/token`, authParams)
@@ -66,8 +59,8 @@ const getDataFromPartner = async function() {
 		metrics: 'netRevenue,paidImpressions,ecpm',
 		pageSize: '',
 		sort: '-netRevenue',
-		fromDate: fromDatePubmatic,
-		toDate: toDatePubmatic,
+		fromDate,
+		toDate,
 		timeZone: 'PST'
 	};
 	const headers = {
@@ -114,7 +107,23 @@ const processDataReceivedFromPublisher = data => {
 	return processedData;
 };
 
+const initDataForpartner = function() {
+	const date = moment().subtract(2, 'days');
+	const fromDatePubmatic = date.format('YYYY-MM-DDT00:00');
+	const toDatePubmatic = date.format('YYYY-MM-DDT23:59');
+	
+	const fromDate = date.format('YYYY-MM-DD');
+	const toDate = date.format('YYYY-MM-DD');
+	return {
+		fromDate,
+		toDate,
+		fromDatePubmatic,
+		toDatePubmatic
+	}
+}
+
 const fetchData = sitesData => {
+	const {fromDate, toDate, fromDatePubmatic, toDatePubmatic} = initDataForpartner()
 	const PubmaticPartnerModel = new partnerAndAdpushpModel(
 		sitesData,
 		DOMAIN_FIELD_NAME,
@@ -122,7 +131,7 @@ const fetchData = sitesData => {
 	);
 
 	console.log('Fetching data from Pubmatic...');
-	return getDataFromPartner()
+	return getDataFromPartner(fromDatePubmatic, toDatePubmatic)
 		.then(async function(reportDataJSON) {
 			PubmaticPartnerModel.setPartnersData(reportDataJSON);
 

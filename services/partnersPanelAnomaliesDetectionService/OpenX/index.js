@@ -44,31 +44,40 @@ const oauth = OAuth({
 	}
 });
 
-const OFFSET =
+const initDataForpartner = function() {
+	const OFFSET =
 	process.env.NODE_ENV === 'production' ? TIMEZONE_OFFSET.PRODUCTION : TIMEZONE_OFFSET.STAGING;
-let fromDateOpenX = moment().subtract(2, 'days');
-let zoneFromDate = moment.tz.zone('America/Los_Angeles').abbr(fromDateOpenX);
-fromDateOpenX = fromDateOpenX
-	.set({
-		hour: zoneFromDate === 'PDT' ? OFFSET.PDT : OFFSET.PST,
-		minute: 30
-	})
-	.format('YYYY-MM-DDTHH:MM:00Z');
+	let fromDateOpenX = moment().subtract(2, 'days');
+	let zoneFromDate = moment.tz.zone('America/Los_Angeles').abbr(fromDateOpenX);
+	fromDateOpenX = fromDateOpenX
+		.set({
+			hour: zoneFromDate === 'PDT' ? OFFSET.PDT : OFFSET.PST,
+			minute: 30
+		})
+		.format('YYYY-MM-DDTHH:MM:00Z');
 
-let toDateOpenX = moment().subtract(1, 'days');
-let zoneToDate = moment.tz.zone('America/Los_Angeles').abbr(toDateOpenX);
-toDateOpenX = toDateOpenX
-	.set({
-		hour: zoneToDate === 'PDT' ? OFFSET.PDT : OFFSET.PST,
-		minute: 30
-	})
-	.format('YYYY-MM-DDTHH:MM:00Z');
+	let toDateOpenX = moment().subtract(1, 'days');
+	let zoneToDate = moment.tz.zone('America/Los_Angeles').abbr(toDateOpenX);
+	toDateOpenX = toDateOpenX
+		.set({
+			hour: zoneToDate === 'PDT' ? OFFSET.PDT : OFFSET.PST,
+			minute: 30
+		})
+		.format('YYYY-MM-DDTHH:MM:00Z');
 
-const fromDate = moment()
-	.subtract(2, 'days')
-	.format('YYYY-MM-DD');
-const toDate = fromDate;
+	const fromDate = moment()
+		.subtract(2, 'days')
+		.format('YYYY-MM-DD');
+	const toDate = fromDate;
 
+	return {
+		fromDateOpenX,
+		toDateOpenX,
+		fromDate,
+		toDate
+	}
+
+}
 /**
  * 1. Get Pub data
  * 2. Get AdPushup data for that Pub
@@ -81,7 +90,7 @@ const toDate = fromDate;
 //     b. Verify Temp Token
 //     c. Get Access Token
 // 2. Get Data from Partner
-const getDataFromPartner = async function() {
+const getDataFromPartner = async function(fromDate, toDate) {
 	// Step 1 - Access Token
 	// a. Temp Request Token
 	const requestTokenObj = await getOAuthRequestToken();
@@ -95,7 +104,7 @@ const getDataFromPartner = async function() {
 	const accessTokenObj = await getOAuthAccessToken(tokenVerifyObj, token);
 
 	// Step 2. Fetching data fom Partner
-	const responseDataFromAPI = await getDataFromOpenX(accessTokenObj);
+	const responseDataFromAPI = await getDataFromOpenX(accessTokenObj, fromDate, toDate);
 
 	return processDataReceivedFromPublisher(responseDataFromAPI);
 };
@@ -185,7 +194,7 @@ const getOAuthAccessToken = (tokenVerifyObj, token) => {
 		.catch(requestErrorHandler);
 };
 
-const getDataFromOpenX = accessTokenObj => {
+const getDataFromOpenX = (accessTokenObj, fromDate, toDate) => {
 	const configForFetchingData = {
 		method: 'post',
 		url: `${API_ENDPOINT}/data/1.0/report`,
@@ -193,8 +202,8 @@ const getDataFromOpenX = accessTokenObj => {
 			Cookie: `openx3_access_token=${accessTokenObj.oauth_token}`
 		},
 		data: {
-			startDate: fromDateOpenX,
-			endDate: toDateOpenX,
+			startDate: fromDate,
+			endDate: toDate,
 			attributes: [
 				{ id: 'publisherAccountName' },
 				{ id: 'publisherAccountId' },
@@ -226,10 +235,11 @@ const processDataReceivedFromPublisher = data => {
 };
 
 const fetchData = sitesData => {
+	const { fromDate, toDate, fromDateOpenX, toDateOpenX } = initDataForpartner();
 	const OpenXPartnerModel = new partnerAndAdpushpModel(sitesData, DOMAIN_FIELD_NAME, REVENUE_FIELD);
 
 	console.log('Fetching data from OpenX...');
-	return getDataFromPartner()
+	return getDataFromPartner(fromDateOpenX, toDateOpenX)
 		.then(async function(reportDataJSON) {
 			OpenXPartnerModel.setPartnersData(reportDataJSON);
 

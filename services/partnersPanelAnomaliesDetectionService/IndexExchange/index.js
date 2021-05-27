@@ -22,11 +22,6 @@ const authParams = {
 	key: 'iGY05Af7QidctaFx9gm9u4uNaNzl+Lo6'
 };
 
-const fromDate = moment()
-	.subtract(1, 'days')
-	.format('YYYY-MM-DD');
-const toDate = fromDate;
-
 /**
  * 1. Get Pub data
  * 2. Get AdPushup data for that Pub
@@ -38,7 +33,7 @@ const toDate = fromDate;
 // 2. Get Placement info
 // 3. Get Sites data based on Placement Ids
 // 4. Get earnings from siteIds
-const getDataFromPartner = async function() {
+const getDataFromPartner = async function(fromDate, toDate) {
 	// 1. Get Auth token before each req
 	const token = await axios
 		.post(`${AUTH_ENDPOINT}`, authParams)
@@ -77,7 +72,7 @@ const getDataFromPartner = async function() {
 
 	// process batches
 	console.log('Processing batches.....');
-	const { results, errors } = await processReqInBatches(queue, headers);
+	const { results, errors } = await processReqInBatches(queue, headers, fromDate, toDate);
 	return processDataReceivedFromPublisher(results, siteIdsAndNameMappingFromPubData);
 };
 
@@ -144,7 +139,7 @@ const getAllSitesInfo = headers => {
 		.catch(axiosErrorHandler);
 };
 
-const processReqInBatches = async (queue, headers) => {
+const processReqInBatches = async (queue, headers, fromDate, toDate) => {
 	const batchSize = 50;
 
 	return await PromisePool.withConcurrency(batchSize)
@@ -222,7 +217,20 @@ const processDataReceivedFromPublisher = (data, siteIdsAndNameMappingFromPubData
 	return processedData;
 };
 
+const initDataForpartner = function() {
+	const fromDate = moment()
+	.subtract(1, 'days')
+	.format('YYYY-MM-DD');
+	const toDate = fromDate;
+
+	return {
+		fromDate,
+		toDate
+	}
+}
+
 const fetchData = sitesData => {
+	const { fromDate, toDate } = initDataForpartner();
 	const IndexExchangePartnerModel = new partnerAndAdpushpModel(
 		sitesData,
 		DOMAIN_FIELD_NAME,
@@ -230,7 +238,7 @@ const fetchData = sitesData => {
 	);
 
 	console.log('Fetching data from IndexExchange...');
-	return getDataFromPartner()
+	return getDataFromPartner(fromDate, toDate)
 		.then(async function(reportDataJSON) {
 			IndexExchangePartnerModel.setPartnersData(reportDataJSON);
 
