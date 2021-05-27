@@ -31,7 +31,10 @@ const ApConfig = {
 		'isDailyEmailReportsEnabled',
 		'isWeeklyEmailReportsEnabled',
 		'bidInflationPercentage',
-		'isABTestingForBidInflationEnabled'
+		'isABTestingForBidInflationEnabled',
+		'gaTrackingId',
+		'gaEventSampling1',
+		'gaEventSampling2'
 	],
 	override: [
 		'mode',
@@ -65,7 +68,10 @@ const ApConfig = {
 		'isDailyEmailReportsEnabled',
 		'isWeeklyEmailReportsEnabled',
 		'bidInflationPercentage',
-		'isABTestingForBidInflationEnabled'
+		'isABTestingForBidInflationEnabled',
+		'gaTrackingId',
+		'gaEventSampling1',
+		'gaEventSampling2'
 	],
 	merge: []
 };

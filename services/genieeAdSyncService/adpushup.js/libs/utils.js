@@ -48,9 +48,26 @@ module.exports = {
 	// All feedback packets are generated from this function except event 2, 3 and 4.
 	sendFeedback: function(options) {
 		var adp = window.adpushup;
-
-		if (!adp.gaPageViewLogSent && adp.config.mode === 1) {
+		var sectionSuccessStatus =
+			options.ads &&
+			options.ads.length &&
+			options.ads.filter(function(ad) {
+				return ad.status === 1;
+			});
+		if (
+			!adp.gaPageViewLogSent &&
+			(adp.config.mode === 1 || (sectionSuccessStatus && sectionSuccessStatus.length > 0))
+		) {
 			this.emitGaEvent(commonConsts.GA_EVENTS.PAGE_VIEW);
+			const gaEventSampling1 = window.adpushup.config.gaEventSampling1;
+			const gaEventSampling2 = window.adpushup.config.gaEventSampling2;
+			const currentFallBack = Math.random() * 100;
+			if (gaEventSampling1 && currentFallBack <= gaEventSampling1) {
+				this.emitGa3Event(commonConsts.GA_EVENTS.PAGE_VIEW);
+			}
+			if (gaEventSampling2 && currentFallBack <= gaEventSampling2) {
+				this.emitGa3Event(commonConsts.GA_EVENTS.PAGE_VIEW_SECOND);
+			}
 			window.adpushup.gaPageViewLogSent = true;
 		}
 		return this.sendBeacon(
@@ -279,7 +296,7 @@ module.exports = {
 		var url = new URL(pageUrl);
 		Object.keys(window[customUTMObjectField]).map(key => {
 			url.searchParams.set(key, window[customUTMObjectField][key]);
-		})
+		});
 		return url.href;
 	},
 
@@ -295,7 +312,10 @@ module.exports = {
 			}
 
 			if (commonConsts.CUSTOM_UTM_PARAMS_AND_SITE_MAPPING[adpConfig.siteId]) {
-				adpConfig.pageUrl = this.customUTMParamsHandling(commonConsts.CUSTOM_UTM_PARAMS_AND_SITE_MAPPING[adpConfig.siteId], adpConfig.pageUrl)
+				adpConfig.pageUrl = this.customUTMParamsHandling(
+					commonConsts.CUSTOM_UTM_PARAMS_AND_SITE_MAPPING[adpConfig.siteId],
+					adpConfig.pageUrl
+				);
 			}
 
 			var feedbackObj = {
@@ -754,10 +774,7 @@ module.exports = {
 		)
 			.done(function(response) {
 				const { data } = response || {};
-				const  {
-					urlKeys,
-					utmKeys = {}
-				} = data || {};
+				const { urlKeys, utmKeys = {} } = data || {};
 
 				const { urlTargetingKey, urlTargetingValue } = urlKeys || {};
 
@@ -793,7 +810,6 @@ module.exports = {
 
 				hasSuceeded = true;
 				adp.urmRequestStatus = commonConsts.URM_REPORTING.EVENTS.SUCCESS;
-
 			})
 			.fail(function(xhr) {
 				const { responseText, getAllResponseHeaders } = xhr;
@@ -801,8 +817,8 @@ module.exports = {
 				retryCount += 1;
 				if (retryCount < FETCH_URL_KEY_VALUE_RETRY_LIMIT) {
 					let retryTimeout = FETCH_URL_KEY_RETRY_TIMEOUT * retryCount;
-					adp.utils.log(`Retrying ${retryCount}, timeout: ${retryTimeout}`)
-					setTimeout(() => { 
+					adp.utils.log(`Retrying ${retryCount}, timeout: ${retryTimeout}`);
+					setTimeout(() => {
 						adp.pageUrlMappingRetries = retryCount;
 						utils.fetchAndSetKeyValueForUrlReporting(adp);
 					}, retryTimeout);
@@ -1227,7 +1243,7 @@ module.exports = {
 	// 						output: "ip_geo_info"
 	// 					}
 	// 				]
- 	// 			}
+	// 			}
 	// 		};
 
 	// 		utils.log({payload});
@@ -1327,8 +1343,28 @@ module.exports = {
 		var ua = navigator.userAgent;
 		return ua && ua.includes('Lighthouse') && commonConsts.LIGHTHOUSE_HACK_SITES.includes(siteId);
 	},
-
+	checkAndInjectUniversalGAHeadCode: function() {
+		//here we are setting GA3 head code
+		const gaTrackingId = window.adpushup.config.gaTrackingId;
+		if (gaTrackingId) {
+			if (window.ga && typeof window.ga === 'function') {
+				this.log('Universal GA tag already present on site');
+			} else {
+				this.log('Injecting GA tag on site');
+				const gaUrl = `${commonConsts.GOOGLE_ANALYTICS_URL}${gaTrackingId}`;
+				this.injectHeadCodeOnPage(gaUrl);
+				window.ga =
+					window.ga ||
+					function() {
+						(ga.q = ga.q || []).push(arguments);
+					};
+				ga.l = +new Date();
+			}
+			window.ga('create', gaTrackingId, 'auto', 'adpushupClientTracker');
+		}
+	},
 	checkAndInjectGAHeadCode: function() {
+		//here we are setting GA4 head code
 		if (window.gtag && typeof window.gtag === 'function') {
 			this.log('GA tag already present on site');
 		} else {
@@ -1336,17 +1372,41 @@ module.exports = {
 			const gaUrl = `${commonConsts.GOOGLE_ANALYTICS_URL}${commonConsts.GOOGLE_ANALYTICS_ID}`;
 			this.injectHeadCodeOnPage(gaUrl);
 			window.dataLayer = window.dataLayer || [];
-			window.gtag = function() { window.dataLayer.push(arguments); }
+			window.gtag = function() {
+				window.dataLayer.push(arguments);
+			};
 		}
 
-        window.gtag('js', new Date());
-        window.gtag('config', commonConsts.GOOGLE_ANALYTICS_ID, { send_page_view: false, 'custom_map': {'dimension1': 'siteid'} });
+		window.gtag('js', new Date());
+		window.gtag('config', commonConsts.GOOGLE_ANALYTICS_ID, {
+			send_page_view: false,
+			custom_map: { dimension1: 'siteid' }
+		});
 	},
 	emitGaEvent: function(action) {
-		if (window.adpushup.config.enableGAAnalytics && window.gtag && typeof window.gtag === 'function') {
+		if (
+			window.adpushup.config.enableGAAnalytics &&
+			window.gtag &&
+			typeof window.gtag === 'function'
+		) {
 			const siteid = window.adpushup.config.siteId;
 			this.log(`Emitting event ${action} for site ${siteid}`);
-			window.gtag('event', action, { 'send_to': commonConsts.GOOGLE_ANALYTICS_ID, siteid });		
+			window.gtag('event', action, { send_to: commonConsts.GOOGLE_ANALYTICS_ID, siteid });
+		}
+	},
+	emitGa3Event: function(action) {
+		const gaTrackingId = window.adpushup.config.gaTrackingId;
+		if (
+			gaTrackingId &&
+			window.adpushup.config.enableGAAnalytics &&
+			window.ga &&
+			typeof window.ga === 'function'
+		) {
+			const siteid = window.adpushup.config.siteId;
+			this.log(`Emitting event ${action} for site ${siteid}`);
+			window.ga('adpushupClientTracker.send', 'event', 'user-interaction', action, `${siteid}`, {
+				nonInteraction: true
+			});
 		}
 	}
 };
