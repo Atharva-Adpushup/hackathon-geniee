@@ -145,7 +145,7 @@ module.exports = {
 				fontSize: 9,
 				display: 'none',
 				textDecoration: 'none',
-				background: 'transparent',
+				background: 'transparent'
 			},
 			LOGO: {
 				display: 'inline-block',
@@ -156,11 +156,13 @@ module.exports = {
 			}
 		},
 		SUPPORTED_PLATFORMS: ['DESKTOP'],
-		SUPPORTED_FORMATS: ['STICKYBOTTOM'],
+		SUPPORTED_FORMATS: ['STICKYBOTTOM']
 	},
 	GA_EVENTS: {
 		SCRIPT_LOADED: 'script-load',
-		PAGE_VIEW: 'ap-page-view'
+		PAGE_VIEW: 'ap-page-view',
+		SCRIPT_LOADED_SECOND: 'script-load-2',
+		PAGE_VIEW_SECOND: 'ap-page-view-2'
 	},
 	CUSTOM_UTM_PARAMS_AND_SITE_MAPPING: {
 		42184: 'jita_tg_params', //thedailywobble.com
@@ -168,6 +170,6 @@ module.exports = {
 		42186: 'jita_tg_params', //twistity.com
 		42431: 'jita_tg_params', //freshcardio.com
 		42535: 'jita_tg_params', //fizzsy.com
-		42575: 'jita_tg_params'  //Saucyrecipes.com
+		42575: 'jita_tg_params' //Saucyrecipes.com
 	}
 };
