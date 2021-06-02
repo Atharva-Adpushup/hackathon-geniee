@@ -424,7 +424,7 @@ function main() {
 		try {
 			utils.runScript(utils.base64Decode(beforeJs));
 		} catch (e) {
-			err.push({
+			adp.err.push({
 				msg: 'Error in beforeJs.',
 				js: beforeJs,
 				error: e
