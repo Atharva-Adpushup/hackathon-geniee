@@ -141,7 +141,7 @@ router
 								mandatoryEntryMessage && commonEntryMessage
 									? `${mandatoryEntryMessage} and ${commonEntryMessage} not found in publisher's ads.txt`
 									: `${commonEntryMessage ||
-											mandatoryEntryMessage} not found in publisher's ads.txt`;
+									mandatoryEntryMessage} not found in publisher's ads.txt`;
 
 							output = { message, status: partialPresent };
 						} else {
@@ -877,6 +877,16 @@ router
 			.verifySiteOwner(email, siteId)
 			.then(() => updateSizeMapping(type))
 			.catch(err => errorHandler(err, res));
+	})
+	.get('/:siteId/getSelectiveRolloutKey', (req, res) => {
+		const { siteId } = req.params;
+		return siteModel
+			.getSiteById(siteId)
+			.then(data => {
+				const { apConfig: { isSelectiveRolloutEnabled = false } = {} } = data || {};
+				sendSuccessResponse({ isSelectiveRolloutEnabled }, res);
+			})
+			.catch(err => errorHandler(err, res))
 	})
 	.use('/:siteId/pagegroup/', pageGroupController)
 	.post('/:siteId/forceApBuild', (req, res) => {

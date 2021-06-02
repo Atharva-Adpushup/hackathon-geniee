@@ -23,5 +23,41 @@ export default {
 	MIXPANEL: {
 		TOKEN: '96e958dc847c19d28cf873a827efae75'
 	},
-	disableDailyWeeklySnapshots: true
+	disableDailyWeeklySnapshots: true,
+	updateInventoryAdunit: "/ops/updateAdUnitData/",
+	ADMIN_INVENTORY_LIST_TABLE_HEADER: [
+		{
+			Header: 'Site Id',
+			accessor: 'siteId',
+			width: 100,
+			maxWidth: 100,
+			minWidth: 100
+		},
+		{
+			Header: 'Domain',
+			accessor: 'siteDomain',
+			width: 220,
+			maxWidth: 250,
+			minWidth: 250
+		},
+		{
+			Header: 'Ad Unit Name',
+			accessor: 'dfpAdunit',
+			width: 500,
+			maxWidth: 800,
+			minWidth: 500
+		},
+		{
+			Header: 'Settings',
+			accessor: 'adUnitSettings',
+			width: 200,
+			maxWidth: 200,
+			minWidth: 200
+		}
+	],
+	ADMIN_INVENTORY_LIST_FILTER_LIST: [
+		{ name: 'Domains', value: 'siteDomain', isDisabled: false, key: 'siteDomain' },
+		{ name: 'Site Id', value: 'siteId', isDisabled: false, key: 'siteId' },
+		{ name: 'Adunit Name', value: 'dfpAdunit', isDisabled: true, key: 'dfpAdunit' }
+	]
 };

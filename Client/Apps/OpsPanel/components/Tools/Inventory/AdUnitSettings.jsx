@@ -3,8 +3,9 @@ import { Row, Col } from '@/Client/helpers/react-bootstrap-imports';
 import CustomToggleSwitch from '../../../../../Components/CustomToggleSwitch/index';
 import CustomButton from '../../../../../Components/CustomButton/index';
 import FieldGroup from '../../../../../Components/Layout/FieldGroup';
+import Loader from '../../../../../Components/Loader';
 import axiosInstance from '../../../../../helpers/axiosInstance';
-
+import config from '../../../../../../Client/config/config';
 class AdUnitSettings extends Component {
 	constructor(props) {
 		super(props);
@@ -13,6 +14,8 @@ class AdUnitSettings extends Component {
 			downwardSizesDisabled: !!(props.adUnitData && props.adUnitData.downwardSizesDisabled),
 			enableDownwardSizeToggle: !(props.adUnitData && props.adUnitData.downwardSizesDisabled),
 			isLoading: false,
+			modalLoading: true,
+			selectiveRolloutEnabled: false,
 			sizeFilters: {
 				maxHeight:
 					props.adUnitData &&
@@ -54,7 +57,25 @@ class AdUnitSettings extends Component {
 		};
 	}
 
-	componentDidMount = () => {};
+	componentDidMount = () => {
+		const { siteid } = this.props;
+		console.log(siteid);
+		axiosInstance
+			.get(`/site/${siteid}/getSelectiveRolloutKey`)
+			.then(({ data }) => {
+				const { isSelectiveRolloutEnabled } = data;
+				console.log(isSelectiveRolloutEnabled);
+				this.setState({ modalLoading: false, selectiveRolloutEnabled: isSelectiveRolloutEnabled });
+			})
+			.catch(() => {
+				return showNotification({
+					mode: 'error',
+					title: 'Operation Failed',
+					message: 'Failed to get version config',
+					autoDismiss: 5
+				});
+			});
+	};
 
 	handleToggle = (val, event) => {
 		const element = event.target;
@@ -103,6 +124,7 @@ class AdUnitSettings extends Component {
 			showNotification,
 			siteid,
 			adUnitData: adUnitDimensionData,
+			siteDomain,
 			updateAdUnitData
 		} = this.props;
 		const {
@@ -161,12 +183,13 @@ class AdUnitSettings extends Component {
 			const adUnitData = {
 				docId,
 				adId,
+				siteDomain,
 				collapseUnfilled: !!collapseUnfilledToggle,
 				downwardSizesDisabled: !!downwardSizesDisabled,
 				sizeFilters
 			};
 			axiosInstance
-				.post(`/ops/updateAdUnitData/${siteid}`, { adUnitData })
+				.post(`${config.updateInventoryAdunit}${siteid}`, { adUnitData })
 				.then(() => {
 					updateAdUnitData(adUnitData);
 					this.setState({ isLoading: false });
@@ -178,7 +201,8 @@ class AdUnitSettings extends Component {
 						autoDismiss: 5
 					});
 				})
-				.catch(() => {
+				.catch(error => {
+					console.log(error);
 					return showNotification({
 						mode: 'error',
 						title: 'Operation Failed',
@@ -196,27 +220,35 @@ class AdUnitSettings extends Component {
 			collapseUnfilledToggle,
 			sizeFilters,
 			isLoading,
+			modalLoading,
+			selectiveRolloutEnabled,
 			downwardSizesDisabled,
 			enableDownwardSizeToggle
 		} = this.state;
 		const { adid, docid } = this.props;
 
+		if (modalLoading) {
+			return <Loader height="300" />;
+		}
+
 		return (
 			<>
 				<div>
-					<CustomToggleSwitch
-						labelText="Collapse Unfilled Impressions"
-						className="u-cursor-pointer"
-						checked={!!collapseUnfilledToggle}
-						onChange={this.handleToggle}
-						layout="horizontal"
-						size="m"
-						on="Yes"
-						off="No"
-						defaultLayout
-						name={adid}
-						id={'collapseUnfilled-' + adid}
-					/>
+					{selectiveRolloutEnabled ? (
+						<CustomToggleSwitch
+							labelText="Collapse Unfilled Impressions"
+							className="u-cursor-pointer"
+							checked={!!collapseUnfilledToggle}
+							onChange={this.handleToggle}
+							layout="horizontal"
+							size="m"
+							on="Yes"
+							off="No"
+							defaultLayout
+							name={adid}
+							id={'collapseUnfilled-' + adid}
+						/>
+					) : null}
 					<CustomToggleSwitch
 						labelText="Enable Downward Sizes"
 						className="u-cursor-pointer"

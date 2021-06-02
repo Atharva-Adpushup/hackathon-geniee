@@ -11,7 +11,7 @@ const {
 	EMAIL_REGEX,
 	AUDIT_LOGS_ACTIONS: { OPS_PANEL }
 } = require('../configs/commonConsts');
-const { sendSuccessResponse, sendErrorResponse } = require('../helpers/commonFunctions');
+const { sendSuccessResponse, sendErrorResponse, getPageGroupNameAndPlatformFromChannelDoc } = require('../helpers/commonFunctions');
 const {
 	appBucket,
 	errorHandler,
@@ -30,11 +30,9 @@ const router = express.Router();
 
 const helpers = {
 	getAllSitesFromCouchbase: () => {
-		const query = `select a.siteId, a.siteDomain, a.adNetworkSettings, a.ownerEmail, a.step, a.channels, a.apConfigs, a.dateCreated, b.adNetworkSettings[0].pubId, b.adNetworkSettings[0].adsenseEmail from ${
-			couchBase.DEFAULT_BUCKET
-		} a join ${
-			couchBase.DEFAULT_BUCKET
-		} b on keys 'user::' || a.ownerEmail where meta(a).id like 'site::%'`;
+		const query = `select a.siteId, a.siteDomain, a.adNetworkSettings, a.ownerEmail, a.step, a.channels, a.apConfigs, a.dateCreated, b.adNetworkSettings[0].pubId, b.adNetworkSettings[0].adsenseEmail from ${couchBase.DEFAULT_BUCKET
+			} a join ${couchBase.DEFAULT_BUCKET
+			} b on keys 'user::' || a.ownerEmail where meta(a).id like 'site::%'`;
 		return appBucket.queryDB(query);
 	},
 	makeAPIRequest: options => {
@@ -105,9 +103,9 @@ router
 			return date && isValidDate(date)
 				? getDate(date)
 				: getDate(reference, {
-						...DEFAULT_OPERATION,
-						value
-				  });
+					...DEFAULT_OPERATION,
+					value
+				});
 		}
 		function makeAPIRequestWrapper(qs) {
 			return helpers.makeAPIRequest({
@@ -413,41 +411,43 @@ router
 		const {
 			docId,
 			adId,
-			dfpAdUnitId,
 			collapseUnfilled,
 			sizeFilters,
-			downwardSizesDisabled
+			downwardSizesDisabled,
+			siteDomain
 		} = adUnitData;
 
 		const docType = docId.substr(0, 4);
 		let newData = {};
 		let adData = {};
 
+		const { siteId } = req.params;
+
 		switch (docType) {
 			case 'chnl':
-				let docIdPartValue = docId.substr(6, docId.length - 1);
-				let colonIndex = docIdPartValue.indexOf(':');
+				const { pageGroup, platform } = getPageGroupNameAndPlatformFromChannelDoc(docId);
 
-				const siteId = docIdPartValue.substr(0, colonIndex);
-				docIdPartValue = docIdPartValue.substr(colonIndex + 1, docIdPartValue.length - 1);
-
-				colonIndex = docIdPartValue.indexOf(':');
-				const platform = docIdPartValue.substr(0, colonIndex);
-				docIdPartValue = docIdPartValue.substr(colonIndex + 1, docIdPartValue.length - 1);
-
-				const pageGroup = docIdPartValue;
+				console.log({ pageGroup, platform });
 
 				// updateLayoutAd
 				return channelModel
 					.getChannel(siteId, platform, pageGroup)
 					.then(({ data: channelData }) => {
-						const { variations } = channelData;
+						let prevConfig = {}, currentConfig = {};
+						const { variations, siteDomain } = channelData;
 						for (const key in variations) {
 							const { sections } = variations[key];
 							for (const section in sections) {
 								const { ads } = sections[section];
 								if (ads[adId]) {
+									prevConfig = { ...ads[adId] };
 									ads[adId] = {
+										...ads[adId],
+										downwardSizesDisabled,
+										collapseUnfilled,
+										sizeFilters
+									};
+									currentConfig = {
 										...ads[adId],
 										downwardSizesDisabled,
 										collapseUnfilled,
@@ -457,21 +457,41 @@ router
 								}
 							}
 						}
+
+						const appName = "Ad Unit Inventory";
+						const { email, originalEmail } = req.user;
+
+						// log config changes
+						sendDataToAuditLogService({
+							siteId,
+							siteDomain,
+							appName,
+							type: 'app',
+							impersonateId: email,
+							userId: originalEmail,
+							prevConfig,
+							currentConfig,
+							action: {
+								name: OPS_PANEL.TOOLS,
+								data: `Ad Inventory Change - Channel Doc Updated`
+							}
+						});
+
 						return channelModel.saveChannel(siteId, platform, pageGroup, channelData);
 					})
 					.then(chnlData => sendSuccessResponse(chnlData, res))
 					.catch(err => errorHandler(err, res, HTTP_STATUSES.INTERNAL_SERVER_ERROR));
 			case 'tgmr':
 				newData = { collapseUnfilled, downwardSizesDisabled, sizeFilters };
-				adData = { adUnitId: adId, newData, docId };
+				adData = { adUnitId: adId, newData, docId, siteDomain };
 				return updateApTagAd(req, res, adData);
 			case 'fmrt':
 				newData = { collapseUnfilled, downwardSizesDisabled, sizeFilters };
-				adData = { adUnitId: adId, newData, docId };
+				adData = { adUnitId: adId, newData, docId, siteDomain };
 				return updateInnovativeAd(req, res, adData);
 			case 'aplt':
 				newData = { collapseUnfilled, downwardSizesDisabled, sizeFilters };
-				adData = { adUnitId: adId, adUnitData: newData, docId };
+				adData = { adUnitId: adId, adUnitData: newData, docId, siteDomain };
 				return updateApLiteAd(req, res, adData);
 
 			default:

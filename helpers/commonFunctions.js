@@ -62,9 +62,9 @@ const Promise = require('bluebird'),
 				isInvalidRevenue || innerObj[identifier].aggregate.total_impressions == 0
 					? 0
 					: Number(
-							(innerObj[identifier].aggregate.total_revenue * 1000) /
-								innerObj[identifier].aggregate.total_impressions
-					  ).toFixed(3);
+						(innerObj[identifier].aggregate.total_revenue * 1000) /
+						innerObj[identifier].aggregate.total_impressions
+					).toFixed(3);
 		});
 		container[key] = innerObj;
 	},
@@ -113,11 +113,11 @@ const Promise = require('bluebird'),
 	},
 	validateMetricsData = inputData => {
 		const isInputData = !!(
-				inputData &&
-				inputData.siteId &&
-				inputData.lastWeekReport &&
-				inputData.thisWeekReport
-			),
+			inputData &&
+			inputData.siteId &&
+			inputData.lastWeekReport &&
+			inputData.thisWeekReport
+		),
 			isLastWeekReport = !!(
 				isInputData &&
 				inputData.lastWeekReport &&
@@ -196,51 +196,51 @@ const Promise = require('bluebird'),
 	},
 	computeMetricComparison = inputData => {
 		const resultData = {
-				impressions: {
-					lastWeek: 0,
-					lastWeekOriginal: 0,
-					thisWeek: 0,
-					thisWeekOriginal: 0,
-					percentage: 0,
-					change: false
-				},
-				revenue: {
-					lastWeek: 0,
-					lastWeekOriginal: 0,
-					thisWeek: 0,
-					thisWeekOriginal: 0,
-					percentage: 0,
-					change: false
-				},
-				pageViews: {
-					lastWeek: 0,
-					lastWeekOriginal: 0,
-					thisWeek: 0,
-					thisWeekOriginal: 0,
-					percentage: 0,
-					change: false
-				},
-				cpm: {
-					lastWeek: 0,
-					lastWeekOriginal: 0,
-					thisWeek: 0,
-					thisWeekOriginal: 0,
-					percentage: 0,
-					change: false
-				},
-				pageCPM: {
-					lastWeek: 0,
-					lastWeekOriginal: 0,
-					thisWeek: 0,
-					thisWeekOriginal: 0,
-					percentage: 0,
-					change: false
-				},
-				dates: {
-					lastWeek: {},
-					thisWeek: {}
-				}
+			impressions: {
+				lastWeek: 0,
+				lastWeekOriginal: 0,
+				thisWeek: 0,
+				thisWeekOriginal: 0,
+				percentage: 0,
+				change: false
 			},
+			revenue: {
+				lastWeek: 0,
+				lastWeekOriginal: 0,
+				thisWeek: 0,
+				thisWeekOriginal: 0,
+				percentage: 0,
+				change: false
+			},
+			pageViews: {
+				lastWeek: 0,
+				lastWeekOriginal: 0,
+				thisWeek: 0,
+				thisWeekOriginal: 0,
+				percentage: 0,
+				change: false
+			},
+			cpm: {
+				lastWeek: 0,
+				lastWeekOriginal: 0,
+				thisWeek: 0,
+				thisWeekOriginal: 0,
+				percentage: 0,
+				change: false
+			},
+			pageCPM: {
+				lastWeek: 0,
+				lastWeekOriginal: 0,
+				thisWeek: 0,
+				thisWeekOriginal: 0,
+				percentage: 0,
+				change: false
+			},
+			dates: {
+				lastWeek: {},
+				thisWeek: {}
+			}
+		},
 			lastWeekDatesInfo = getWeekDatesRepresentation({
 				startDate: inputData.lastWeekReport.reportFrom,
 				endDate: inputData.lastWeekReport.reportTo
@@ -676,7 +676,7 @@ const Promise = require('bluebird'),
 			data: response
 		});
 	},
-	checkForLog = function(ad) {
+	checkForLog = function (ad) {
 		/* 
 			Should return true only
 				1. Network is not other than adpTags or geniee
@@ -725,7 +725,7 @@ const Promise = require('bluebird'),
 
 		return isDemandChanged || isADPChanged || isGenieeChanged;
 	},
-	isValidThirdPartyDFPAndCurrency = function(config) {
+	isValidThirdPartyDFPAndCurrency = function (config) {
 		const isActiveDFPNetwork = !!(config.activeDFPNetwork && config.activeDFPNetwork.length),
 			isActiveDFPCurrencyCode = !!(
 				config.activeDFPCurrencyCode &&
@@ -817,6 +817,18 @@ const Promise = require('bluebird'),
 			}
 		}
 		return newConfig;
+	},
+	getPageGroupNameAndPlatformFromChannelDoc = (docId) => {
+		let docIdPartValue = docId.substr(6, docId.length - 1);
+		let colonIndex = docIdPartValue.indexOf(':');
+		docIdPartValue = docIdPartValue.substr(colonIndex + 1, docIdPartValue.length - 1);
+
+		colonIndex = docIdPartValue.indexOf(':');
+		const platform = docIdPartValue.substr(0, colonIndex);
+		docIdPartValue = docIdPartValue.substr(colonIndex + 1, docIdPartValue.length - 1);
+		const pageGroup = docIdPartValue;
+
+		return { pageGroup, platform }
 	};
 
 module.exports = {
@@ -849,5 +861,6 @@ module.exports = {
 	verifyKeysInCollection,
 	deleteKeysInCollection,
 	getMandatoryAdsTxtEntrySnippet,
-	removeFormatWiseParamsForAMP
+	removeFormatWiseParamsForAMP,
+	getPageGroupNameAndPlatformFromChannelDoc
 };

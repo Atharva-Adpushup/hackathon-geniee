@@ -426,43 +426,10 @@ function getAllAds() {
 		.catch(err => console.log(err));
 }
 
-
-const updateLayoutAd = (req, res, adData) => {
-	const { adUnitId, device: platform, pageGroup, adId, ...rest } = adData;
-
-	return channelModel
-		.getChannel(siteId, platform, pageGroup)
-		.then(channel => {
-			// find variation
-			let variationId = null;
-			const { data: channelData } = channel;
-			const prevConfig = _.cloneDeep(channelData);
-			const { variations } = channelData;
-			// eslint-disable-next-line no-restricted-syntax
-			for (const key in variations) {
-				if (Object.prototype.hasOwnProperty.call(variations, key)) {
-					const { sections } = variations[key];
-					if (adUnitId in sections) {
-						variationId = key;
-						break;
-					}
-				}
-			}
-
-			if (!variationId) {
-				throw new AdPushupError({ message: 'Invalid adUnitId', code: 400 });
-			}
-
-			return channelModel.saveChannel(siteId, platform, pageGroup, channelData);
-		})
-		.then(() => sendSuccessResponse({}, res))
-		.catch(err => errorHandler(err, res));
-};
-
 const updateNonLayoutAds = (req, res, docKey, adData, logServiceNames) => {
 	const { logType, actionName, serviceName } = logServiceNames || {};
 
-	const { adUnitId, newData } = adData;
+	const { adUnitId, newData, siteDomain } = adData;
 
 	return helpers
 		.adUpdateProcessing(req, res, docKey, docWithCas => {
@@ -477,12 +444,36 @@ const updateNonLayoutAds = (req, res, docKey, adData, logServiceNames) => {
 				});
 			}
 
+			let prevConfig = {}, currentConfig = {};
+
 			_.forEach(doc.ads, (ad, index) => {
 				if (ad.id === adUnitId) {
-					doc.ads[index] = { ...ad, ...newData };
+					prevConfig = { ...ad };
+					currentConfig = { ...ad, ...newData }
+					doc.ads[index] = currentConfig;
 					return false;
 				}
 				return true;
+			});
+
+			const { siteId } = req.params;
+			const appName = "Ad Unit Inventory";
+			const { email, originalEmail } = req.user;
+
+			// log config changes
+			sendDataToAuditLogService({
+				siteId,
+				siteDomain,
+				appName,
+				type: 'app',
+				impersonateId: email,
+				userId: originalEmail,
+				prevConfig,
+				currentConfig,
+				action: {
+					name: OPS_PANEL.TOOLS,
+					data: `Ad Inventory Change - Non Layout Ad Doc Updated`
+				}
 			});
 
 			return helpers.directDBUpdate(`${docKey}${req.params.siteId}`, doc, docWithCas.cas);
@@ -518,12 +509,35 @@ const updateApLiteAd = (req, res, adData, logServiceNames) => {
 				});
 			}
 
+			let prevConfig = {}, currentConfig = {};
 			_.forEach(doc.adUnits, (ad, index) => {
 				if (ad.dfpAdUnit == adUnitId) {
-					doc.adUnits[index] = { ...ad, ...adUnitData };
+					prevConfig = { ...ad };
+					currentConfig = { ...ad, ...adUnitData }
+					doc.ads[index] = currentConfig;
 					return false;
 				}
 				return true;
+			});
+
+			const { siteId } = req.params;
+			const appName = "Ad Unit Inventory";
+			const { email, originalEmail } = req.user;
+
+			// log config changes
+			sendDataToAuditLogService({
+				siteId,
+				siteDomain,
+				appName,
+				type: 'app',
+				impersonateId: email,
+				userId: originalEmail,
+				prevConfig,
+				currentConfig,
+				action: {
+					name: OPS_PANEL.TOOLS,
+					data: `Ad Inventory Change - Non Layout Ad Doc Updated`
+				}
 			});
 
 			return helpers.directDBUpdate(`${docKey}${req.params.siteId}`, doc, docWithCas.cas);
@@ -787,7 +801,7 @@ module.exports = {
 	sendDataToAuditLogService,
 	getAllAds,
 	updateApLiteAd,
-	updateLayoutAd,
+	// updateLayoutAd,
 	updateInnovativeAd,
 	updateApTagAd
 };

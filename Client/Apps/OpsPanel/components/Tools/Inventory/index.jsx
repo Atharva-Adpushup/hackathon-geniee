@@ -9,7 +9,7 @@ import axiosInstance from '../../../../../helpers/axiosInstance';
 import Loader from '../../../../../Components/Loader';
 import AdUnitSettings from './AdUnitSettings';
 import AsyncGroupSelect from '../../../../../Components/AsyncGroupSelect';
-
+import config from '../../../../../../Client/config/config';
 class AdunitsInventory extends React.Component {
 	constructor(props) {
 		super(props);
@@ -24,43 +24,10 @@ class AdunitsInventory extends React.Component {
 	}
 
 	componentWillMount() {
-		const filterList = [
-			{ name: 'Domains', value: 'siteDomain', isDisabled: false, key: 'siteDomain' },
-			{ name: 'Site Id', value: 'siteId', isDisabled: false, key: 'siteId' },
-			{ name: 'Adunit Name', value: 'dfpAdunit', isDisabled: true, key: 'dfpAdunit' }
-		];
+		const filterList = config.ADMIN_INVENTORY_LIST_FILTER_LIST;
 		this.setState({ filterList });
 
-		const tableHeader = [
-			{
-				Header: 'Site Id',
-				accessor: 'siteId',
-				width: 100,
-				maxWidth: 100,
-				minWidth: 100
-			},
-			{
-				Header: 'Domain',
-				accessor: 'siteDomain',
-				width: 220,
-				maxWidth: 250,
-				minWidth: 250
-			},
-			{
-				Header: 'Ad Unit Name',
-				accessor: 'dfpAdunit',
-				width: 500,
-				maxWidth: 800,
-				minWidth: 500
-			},
-			{
-				Header: 'Settings',
-				accessor: 'adUnitSettings',
-				width: 200,
-				maxWidth: 200,
-				minWidth: 200
-			}
-		];
+		const tableHeader = config.ADMIN_INVENTORY_LIST_TABLE_HEADER;
 
 		this.setState({ tableHeader });
 	}
@@ -246,6 +213,7 @@ class AdunitsInventory extends React.Component {
 								adid={rowCopy['adId']}
 								siteid={rowCopy['siteId']}
 								docid={rowCopy['docId']}
+								siteDomain={rowCopy['siteDomain']}
 								onClick={this.openSettings}
 							>
 								Edit Ad Unit
@@ -278,6 +246,7 @@ class AdunitsInventory extends React.Component {
 		const adId = element.getAttribute('adid');
 		const docId = element.getAttribute('docid');
 		const siteId = element.getAttribute('siteid');
+		const siteDomain = element.getAttribute('siteDomain');
 
 		const { filteredAds } = this.state;
 		const adData = filteredAds.filter(d => {
@@ -296,6 +265,7 @@ class AdunitsInventory extends React.Component {
 					docid={docId}
 					siteid={siteId}
 					adUnitData={adData[0]}
+					siteDomain={siteDomain}
 					modalToggle={this.modalToggle}
 					updateAdUnitData={this.updateAdUnitData}
 				/>
