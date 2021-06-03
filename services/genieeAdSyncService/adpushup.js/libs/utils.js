@@ -294,11 +294,21 @@ module.exports = {
 	},
 
 	customUTMParamsHandling: function(customUTMObjectField, pageUrl) {
-		var url = new URL(pageUrl);
 		Object.keys(window[customUTMObjectField]).map(key => {
-			url.searchParams.set(key, window[customUTMObjectField][key]);
+			// if no params exist
+			if(pageUrl.indexOf("?") === -1) {
+				// don't append same value again
+				if(pageUrl.indexOf(key + "=" + window[customUTMObjectField][key]) === -1) {
+					pageUrl += "?" + key + "=" + window[customUTMObjectField][key]
+				}
+			} else {
+				// dont append same value again
+				if(pageUrl.indexOf(key + "=" + window[customUTMObjectField][key]) === -1) {
+					pageUrl += "&" + key + "=" + window[customUTMObjectField][key]
+				}
+			}
 		});
-		return url.href;
+		return pageUrl;
 	},
 
 	sendBeacon: function(url, data, options, beaconType) {
