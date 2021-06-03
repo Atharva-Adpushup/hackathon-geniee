@@ -737,11 +737,9 @@ module.exports = {
 	},
 	createAndFireImagePixelForUTMLog: function(json) {
 		var data = this.base64Encode(JSON.stringify(json));
-		var url = new URL(UTM_LOG_ENDPOINT);
-		url.searchParams.set('event', 'UTM_data');
-		url.searchParams.set('data', data);
+		var imgSrc = UTM_LOG_ENDPOINT+"?data="+data+"&event=UTM_data";
 
-		this.fireImagePixel(url.href);
+		this.fireImagePixel(imgSrc);
 	},
 	// createAndFireImagePixelForUmLogUsingKeen: function(json) {
 	// 	var data = this.base64Encode(JSON.stringify(json));
