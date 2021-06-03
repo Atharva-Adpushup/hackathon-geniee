@@ -1,10 +1,12 @@
 const axios = require('axios');
 const URL = 'http://queuepublisher.adpushup.com/publish';
-const { PRODUCT_TEAM, OPS_TEAM, DEV_TEAM } = require('./config');
+const { PRODUCT_TEAM, OPS_TEAM, DEV_TEAM, TESTING_TEAM } = require('./config');
 
-let ownerEmails = DEV_TEAM;
+let ownerEmails = TESTING_TEAM;
+let ownerEmailsForDevIssue = TESTING_TEAM;
 if (process.env.NODE_ENV === 'production') {
 	ownerEmails = ownerEmails.concat(PRODUCT_TEAM, OPS_TEAM);
+	ownerEmailsForDevIssue = DEV_TEAM;
 } else if (process.env.NODE_ENV === 'staging') {
 	ownerEmails = ownerEmails.concat(PRODUCT_TEAM);
 }
@@ -69,12 +71,10 @@ const anomaliesMailService = async ({ partner, anomalies }) => {
 };
 
 const serviceErrorNotificationMailService = async (error, module) => {
-	const ownerEmails = ['harpreet.singh@adpushup.com'];
-
-	if (!ownerEmails.length) {
+	if (!ownerEmailsForDevIssue.length) {
 		throw new Error("Please add owner email's in the config file to send email's to the owners");
 	}
-	const emailRecepient = ownerEmails.join(',');
+	const emailRecepient = ownerEmailsForDevIssue.join(',');
 
 	let emailbody = `<h1> ${module} - Error Notification Service </h1>
 		<p>
