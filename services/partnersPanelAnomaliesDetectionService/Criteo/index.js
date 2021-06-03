@@ -52,7 +52,7 @@ const processDataReceivedFromPublisher = data => {
 
 const initDataForpartner = function() {
 	const fromDate = moment()
-	.subtract(1, 'days')
+	.subtract(2, 'days')
 	.format('YYYY-MM-DD');
 	const toDate = fromDate;
 
