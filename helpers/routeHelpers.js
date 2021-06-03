@@ -20,6 +20,7 @@ const {
 	GOOGLE_BOT_USER_AGENT,
 	DEFAULT_APP_STATUS_RESPONSE,
 	ADS_TXT_REDIRECT_PATTERN,
+	AUDIT_LOGS_ACTIONS: { OPS_PANEL },
 	docKeys
 } = require('../configs/commonConsts');
 
@@ -426,14 +427,12 @@ function getAllAds() {
 		.catch(err => console.log(err));
 }
 
-const updateNonLayoutAds = (req, res, docKey, adData, logServiceNames) => {
-	const { logType, actionName, serviceName } = logServiceNames || {};
+const updateNonLayoutAds = (req, res, docKey, adData) => {
 
 	const { adUnitId, newData, siteDomain } = adData;
 
 	return helpers
 		.adUpdateProcessing(req, res, docKey, docWithCas => {
-			const prevConfig = _.cloneDeep(docWithCas.value);
 			const doc = docWithCas.value;
 
 			// Add isAdmin Check
@@ -494,11 +493,10 @@ const updateInnovativeAd = (req, res, adData) => {
 const updateApLiteAd = (req, res, adData, logServiceNames) => {
 	const { logType, actionName, serviceName } = logServiceNames || {};
 	const docKey = docKeys.apLite;
-	const { adUnitId, adUnitData } = adData;
+	const { adUnitId, adUnitData, siteDomain } = adData;
 
 	return helpers
 		.adUpdateProcessing(req, res, docKey, docWithCas => {
-			const prevConfig = _.cloneDeep(docWithCas.value);
 			const doc = docWithCas.value;
 
 			// Add isAdmin Check
@@ -801,7 +799,6 @@ module.exports = {
 	sendDataToAuditLogService,
 	getAllAds,
 	updateApLiteAd,
-	// updateLayoutAd,
 	updateInnovativeAd,
 	updateApTagAd
 };

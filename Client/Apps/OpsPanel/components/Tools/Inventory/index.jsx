@@ -213,7 +213,7 @@ class AdunitsInventory extends React.Component {
 								adid={rowCopy['adId']}
 								siteid={rowCopy['siteId']}
 								docid={rowCopy['docId']}
-								siteDomain={rowCopy['siteDomain']}
+								sitedomain={rowCopy['siteDomain']}
 								onClick={this.openSettings}
 							>
 								Edit Ad Unit

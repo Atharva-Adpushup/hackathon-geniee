@@ -124,7 +124,7 @@ class AdUnitSettings extends Component {
 			showNotification,
 			siteid,
 			adUnitData: adUnitDimensionData,
-			siteDomain,
+			sitedomain: siteDomain,
 			updateAdUnitData
 		} = this.props;
 		const {
@@ -321,22 +321,24 @@ class AdUnitSettings extends Component {
 						</Row>
 					) : null}
 					<Row>
-						<CustomButton
-							variant="primary"
-							className="pull-right u-margin-r2"
-							showSpinner={isLoading}
-							onClick={this.closeModal}
-						>
-							Cancel
-						</CustomButton>
-						<CustomButton
-							variant="primary"
-							className="pull-right u-margin-r2"
-							showSpinner={isLoading}
-							onClick={this.saveSettings}
-						>
-							Save Settings
-						</CustomButton>
+						<Col md={12}>
+							<CustomButton
+								variant="primary"
+								className="pull-right u-margin"
+								showSpinner={isLoading}
+								onClick={this.closeModal}
+							>
+								Cancel
+							</CustomButton>
+							<CustomButton
+								variant="primary"
+								className="pull-right u-margin-r2"
+								showSpinner={isLoading}
+								onClick={this.saveSettings}
+							>
+								Save Settings
+							</CustomButton>
+						</Col>
 					</Row>
 				</div>
 			</>
