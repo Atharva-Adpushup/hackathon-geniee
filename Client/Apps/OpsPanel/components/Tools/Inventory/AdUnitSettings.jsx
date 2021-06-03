@@ -124,7 +124,7 @@ class AdUnitSettings extends Component {
 			showNotification,
 			siteid,
 			adUnitData: adUnitDimensionData,
-			sitedomain: siteDomain,
+			siteDomain,
 			updateAdUnitData
 		} = this.props;
 		const {

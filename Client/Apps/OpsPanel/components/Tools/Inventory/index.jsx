@@ -246,7 +246,7 @@ class AdunitsInventory extends React.Component {
 		const adId = element.getAttribute('adid');
 		const docId = element.getAttribute('docid');
 		const siteId = element.getAttribute('siteid');
-		const siteDomain = element.getAttribute('siteDomain');
+		const siteDomain = element.getAttribute('sitedomain');
 
 		const { filteredAds } = this.state;
 		const adData = filteredAds.filter(d => {
