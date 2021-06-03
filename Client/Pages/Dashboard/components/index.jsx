@@ -77,17 +77,8 @@ class Dashboard extends React.Component {
 
 		if (!reportsMeta.fetched) {
 			return reportService.getMetaData({ sites: userSites }).then(response => {
-				console.log(response, 'response');
 				let { data: computedData } = response;
 				// TBD: Remove this hard coded sample code
-				response.data.widget.video_revenue = {
-					display_name: 'Video Revenue',
-					filter: ['siteid'],
-					name: 'video_revenue',
-					// path: '/site/report?report_name=primis_video_revenue',
-					path: '/site/report?report_name=site_summary',
-					position: 3
-				};
 				response.data.metrics.primis_revenue = {
 					chart_position: 10,
 					display_name: 'Primis Video Revenue',
@@ -115,7 +106,7 @@ class Dashboard extends React.Component {
 			: null;
 		const selectedSite = reportType == 'site' ? siteId : topPerformingSite || 'all';
 		const widgetsConfig = this.getWidgetConfig(widget, selectedSite, reportType, widgetsList);
-		console.log(widgetsConfig, 'widgetsConfig');
+
 		this.setState(
 			{
 				sites: allUserSites,
@@ -174,7 +165,7 @@ class Dashboard extends React.Component {
 					widget.chartSeriesMetricType = 'money';
 				}
 
-				if (widget.name === 'per_site_wise' || widget.name === 'video_revenue') {
+				if (widget.name === 'per_site_wise' || widget.name === 'primis_report') {
 					widget.selectedDimension = 'siteid';
 				}
 
@@ -219,7 +210,7 @@ class Dashboard extends React.Component {
 					return <SitewiseReportContainer displayData={widget.data} />;
 				}
 				return '';
-			case 'video_revenue':
+			case 'primis_report':
 				if (reportType !== 'site') {
 					return <VideoAdRevenueContainer displayData={widget.data} />;
 				}
@@ -299,43 +290,6 @@ class Dashboard extends React.Component {
 			this.setState({ widgetsConfig });
 		} else if (params.siteid) {
 			reportService.getWidgetData({ path, params }).then(response => {
-				console.log(response, 'response getWidgetData', path, name, 'path, name');
-				// TBD: remove after getting final API
-				if (name === 'video_revenue') {
-					response.data = {
-						result: [
-							{
-								primis_revenue: 30,
-								report_date: '2021-05-13'
-							},
-							{
-								primis_revenue: 15,
-								report_date: '2021-05-15'
-							},
-							{
-								primis_revenue: 54,
-								report_date: '2021-05-11'
-							},
-							{
-								primis_revenue: 44,
-								report_date: '2021-05-16'
-							},
-							{
-								primis_revenue: 87,
-								report_date: '2021-05-14'
-							},
-							{
-								primis_revenue: 13,
-								report_date: '2021-05-12'
-							},
-							{
-								primis_revenue: 20,
-								report_date: '2021-05-17'
-							}
-						],
-						columns: ['primis_revenue', 'report_date']
-					};
-				}
 				this.setState(
 					state => ({ ...state, loadCounter: state.loadCounter + 1 }),
 					() => {

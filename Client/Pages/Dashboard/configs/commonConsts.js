@@ -121,7 +121,7 @@ const dashboardWidgets = [
 	'rev_by_network',
 	'per_overview',
 	'per_ap_original',
-	'video_revenue',
+	'primis_report',
 	'ops_country_report'
 ];
 

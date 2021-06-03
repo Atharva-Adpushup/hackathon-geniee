@@ -23,7 +23,7 @@ function computeGraphData(results) {
 		});
 
 		results.forEach(result => {
-			adpushupVideoRevenueSeriesData.push(result.primis_revenue);
+			adpushupVideoRevenueSeriesData.push(result.net_revenue);
 			xAxis.categories.push(moment(result.report_date).format('ll'));
 		});
 
@@ -31,7 +31,7 @@ function computeGraphData(results) {
 			{
 				data: adpushupVideoRevenueSeriesData,
 				name: 'Primis Video Revenue',
-				value: 'primis_revenue',
+				value: 'network_revenue',
 				valueType: 'money'
 			}
 		];
