@@ -78,15 +78,6 @@ class Dashboard extends React.Component {
 		if (!reportsMeta.fetched) {
 			return reportService.getMetaData({ sites: userSites }).then(response => {
 				let { data: computedData } = response;
-				// TBD: Remove this hard coded sample code
-				response.data.metrics.primis_revenue = {
-					chart_position: 10,
-					display_name: 'Primis Video Revenue',
-					selectable: true,
-					table_position: 9,
-					valueType: 'money'
-				};
-
 				computedData = getDemoUserSites(computedData, email);
 
 				updateAccountReportMetaData(computedData);

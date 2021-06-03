@@ -2,7 +2,11 @@ import React from 'react';
 import sortBy from 'lodash/sortBy';
 import cloneDeep from 'lodash/cloneDeep';
 import { numberWithCommas, roundOffTwoDecimal, getWidgetValidDationState } from '../helpers/utils';
-import { displayMetrics, displayUniqueMetrics, opsDisplayMetricsKeys } from '../configs/commonConsts';
+import {
+	displayMetrics,
+	displayUniqueMetrics,
+	opsDisplayMetricsKeys
+} from '../configs/commonConsts';
 
 function computeDisplayData(props) {
 	const {
@@ -39,11 +43,14 @@ function computeDisplayData(props) {
 	}
 
 	// correct calculation of Unique Ad eCPM
-	resultData["unique_ad_ecpm"].value = (resultData["network_net_revenue"].value/resultData["unique_impressions"].value)*1000
+	resultData.unique_ad_ecpm.value =
+		(resultData.network_net_revenue.value / resultData.unique_impressions.value) * 1000;
 	// correct calculation of Ad eCPM
-	resultData["network_ad_ecpm"].value = (resultData["network_net_revenue"].value/resultData["network_impressions"].value)*1000
+	resultData.network_ad_ecpm.value =
+		(resultData.network_net_revenue.value / resultData.network_impressions.value) * 1000;
 	// correct calculation of AP Page RPM
-	resultData["adpushup_page_cpm"].value = (resultData["network_net_revenue"].value/resultData["adpushup_page_views"].value)*1000
+	resultData.adpushup_page_cpm.value =
+		(resultData.network_net_revenue.value / resultData.adpushup_page_views.value) * 1000;
 	return sortBy(resultData, o => o.position);
 }
 
@@ -75,9 +82,10 @@ class PerformanceOverview extends React.Component {
 
 	render() {
 		const { displayData } = this.state;
-        console.log(displayData, 'displayData p.o')
 		const { isForOps, isUniqueImpEnabled } = this.props;
-		const computedDisplayMetrics = cloneDeep(isUniqueImpEnabled?displayUniqueMetrics:displayMetrics);
+		const computedDisplayMetrics = cloneDeep(
+			isUniqueImpEnabled ? displayUniqueMetrics : displayMetrics
+		);
 		if (!isForOps) {
 			Object.keys(computedDisplayMetrics).forEach(displayMetricKey => {
 				const isOpsKey = opsDisplayMetricsKeys.indexOf(displayMetricKey) !== -1;
