@@ -294,13 +294,10 @@ module.exports = {
 	},
 
 	customUTMParamsHandling: function(customUTMObjectField, pageUrl) {
-		Object.keys(window[customUTMObjectField]).map(key => {
+		Object.keys(window[customUTMObjectField] || {}).map(key => {
 			// if no params exist
 			if(pageUrl.indexOf("?") === -1) {
-				// don't append same value again
-				if(pageUrl.indexOf(key + "=" + window[customUTMObjectField][key]) === -1) {
-					pageUrl += "?" + key + "=" + window[customUTMObjectField][key]
-				}
+				pageUrl += "?" + key + "=" + window[customUTMObjectField][key]
 			} else {
 				// dont append same value again
 				if(pageUrl.indexOf(key + "=" + window[customUTMObjectField][key]) === -1) {
