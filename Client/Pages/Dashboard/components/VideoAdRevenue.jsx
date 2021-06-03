@@ -30,7 +30,7 @@ function computeGraphData(results) {
 		series = [
 			{
 				data: adpushupVideoRevenueSeriesData,
-				name: 'Primis Video Revenue',
+				name: 'Video Revenue',
 				value: 'network_revenue',
 				valueType: 'money'
 			}

@@ -73,7 +73,7 @@ const yAxisGroups = [
 ];
 const yAxisGroupsVideoRevenuePrimis = [
 	{
-		seriesNames: ['Primis Video Revenue'],
+		seriesNames: ['Video Revenue'],
 		yAxisConfig: {
 			labels: {
 				// eslint-disable-next-line no-template-curly-in-string
