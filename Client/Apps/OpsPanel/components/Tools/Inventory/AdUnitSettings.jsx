@@ -59,7 +59,6 @@ class AdUnitSettings extends Component {
 
 	componentDidMount = () => {
 		const { siteid } = this.props;
-		console.log(siteid);
 		axiosInstance
 			.get(`/site/${siteid}/getSelectiveRolloutKey`)
 			.then(({ data }) => {
@@ -100,7 +99,6 @@ class AdUnitSettings extends Component {
 	};
 
 	handleSizeFilterChange = event => {
-		const { adUnitData } = this.props;
 		const { name, value } = event.target;
 		const inputField = name.split('-')[1];
 

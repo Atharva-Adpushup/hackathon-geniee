@@ -49,7 +49,7 @@ class AdunitsInventory extends React.Component {
 
 	getAdunits = () => {
 		axiosInstance
-			.get('/ops/getSiteMapping')
+			.get(config.GET_SITE_DOMAIN_MAPPING)
 			.then(({ data: siteMappingData }) => {
 				const siteDomainMapping = {};
 				let { data: siteMapping } = siteMappingData;
@@ -58,7 +58,7 @@ class AdunitsInventory extends React.Component {
 				});
 
 				axiosInstance
-					.get('/ops/getAdUnitMapping')
+					.get(config.GET_ADUNIT_MAPPING)
 					.then(({ data }) => {
 						let { data: adUnitData } = data;
 
@@ -199,7 +199,6 @@ class AdunitsInventory extends React.Component {
 
 	getTableBody = (data, columnsMeta) => {
 		const columnsMetaObj = this.convertColumnsMetaArrToObj(columnsMeta);
-		console.log(columnsMetaObj);
 
 		return data.map(row => {
 			const rowCopy = clonedeep(row);
@@ -227,7 +226,6 @@ class AdunitsInventory extends React.Component {
 	};
 
 	updateAdUnitData = adUnitData => {
-		console.log({ adUnitData });
 		const { filteredAds } = this.state;
 		let updateAdIndex = -1;
 		filteredAds.filter((d, i) => {
@@ -237,7 +235,6 @@ class AdunitsInventory extends React.Component {
 			}
 		});
 		filteredAds[updateAdIndex] = { ...filteredAds[updateAdIndex], ...adUnitData };
-		console.log(filteredAds[updateAdIndex]);
 		this.setState({ filteredAds });
 	};
 

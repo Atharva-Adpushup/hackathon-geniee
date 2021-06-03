@@ -59,5 +59,7 @@ export default {
 		{ name: 'Domains', value: 'siteDomain', isDisabled: false, key: 'siteDomain' },
 		{ name: 'Site Id', value: 'siteId', isDisabled: false, key: 'siteId' },
 		{ name: 'Adunit Name', value: 'dfpAdunit', isDisabled: true, key: 'dfpAdunit' }
-	]
+	],
+	GET_SITE_DOMAIN_MAPPING: "/ops/getSiteMapping",
+	GET_ADUNIT_MAPPING: "ops/getAdUnitMapping"
 };
