@@ -11,8 +11,8 @@ function computeGraphData(results) {
 
 	if (results.length) {
 		results.sort((a, b) => {
-			const dateA = a.report_date;
-			const dateB = b.report_date;
+			const dateA = a.date;
+			const dateB = b.date;
 			if (dateA < dateB) {
 				return -1;
 			}
@@ -24,7 +24,7 @@ function computeGraphData(results) {
 
 		results.forEach(result => {
 			adpushupVideoRevenueSeriesData.push(result.net_revenue);
-			xAxis.categories.push(moment(result.report_date).format('ll'));
+			xAxis.categories.push(moment(result.date).format('ll'));
 		});
 
 		series = [
@@ -74,7 +74,6 @@ class VideoAdRevenue extends React.Component {
 	renderChart() {
 		const type = 'spline';
 		const { series, xAxis } = this.state;
-		const { isDataSufficient } = this.props;
 
 		if (series && series.length > 0) {
 			return (
