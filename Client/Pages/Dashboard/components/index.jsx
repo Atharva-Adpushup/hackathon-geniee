@@ -131,6 +131,23 @@ class Dashboard extends React.Component {
 		const sortedWidgets = sortBy(widgets, ['position', 'name']);
 		const widgetsConfig = [];
 
+		const {
+			user: {
+				data: { sites }
+			}
+		} = this.props;
+
+		let isPrimisAllowed = false;
+		Object.keys(sites).map(site => {
+			isPrimisAllowed = isPrimisAllowed || !!sites[site].primis;
+			return site;
+		});
+
+		if (isPrimisAllowed) {
+			const index = widgetsList.indexOf('primis_report');
+			widgetsList.splice(index, 1, 0);
+		}
+
 		Object.keys(sortedWidgets).forEach(wid => {
 			const widget = { ...sortedWidgets[wid] };
 

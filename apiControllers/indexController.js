@@ -169,6 +169,7 @@ router
 								if (userData.sites[site] && sitesFromReportMeta[site].product) {
 									userData.sites[site].product = sitesFromReportMeta[site].product;
 								}
+								userData.sites[site].primis = true;
 							});
 						}
 						return res.status(httpStatus.OK).json({
