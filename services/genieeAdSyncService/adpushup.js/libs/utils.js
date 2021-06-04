@@ -294,12 +294,17 @@ module.exports = {
 	},
 
 	customUTMParamsHandling: function(customUTMObjectField, pageUrl) {
-		var url = new URL(pageUrl);
-		Object.keys(window[customUTMObjectField]).map(key => {
-			url.searchParams.set(key, window[customUTMObjectField][key])
-		});
+		try {
+			var url = new URL(pageUrl);
+			Object.keys(window[customUTMObjectField]).map(key => {
+				url.searchParams.set(key, window[customUTMObjectField][key])
+			});
+
+			return url.href;
+		} catch (err) {
+			console.log(err)
+		}
 	
-		return url.href;
 	},
 
 	sendBeacon: function(url, data, options, beaconType) {
@@ -730,12 +735,16 @@ module.exports = {
 		}
 	},
 	createAndFireImagePixelForUmLog: function(json) {
-		var data = this.base64Encode(JSON.stringify(json));
-		var url = new URL(UTM_LOG_ENDPOINT);
-		url.searchParams.set('event', 'UTM_data');
-		url.searchParams.set('data', data);
+		try {
+			var data = this.base64Encode(JSON.stringify(json));
+			var url = new URL(UTM_LOG_ENDPOINT);
+			url.searchParams.set('event', 'UTM_data');
+			url.searchParams.set('data', data);
 
-		this.fireImagePixel(url.href);
+			this.fireImagePixel(url.href);
+		} catch (err) {
+			console.log(err)
+		}
 	},
 	createAndFireImagePixelForUTMLog: function(json) {
 		var data = this.base64Encode(JSON.stringify(json));
