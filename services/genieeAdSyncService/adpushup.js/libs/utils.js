@@ -735,6 +735,13 @@ module.exports = {
 		}
 	},
 	createAndFireImagePixelForUmLog: function(json) {
+		var data = this.base64Encode(JSON.stringify(json));
+		var imgSrc = UM_LOG_ENDPOINT + data;
+
+		this.fireImagePixel(imgSrc);
+		return true;
+	},
+	createAndFireImagePixelForUTMLog: function(json) {
 		try {
 			var data = this.base64Encode(JSON.stringify(json));
 			var url = new URL(UTM_LOG_ENDPOINT);
@@ -745,12 +752,6 @@ module.exports = {
 		} catch (err) {
 			console.log(err)
 		}
-	},
-	createAndFireImagePixelForUTMLog: function(json) {
-		var data = this.base64Encode(JSON.stringify(json));
-		var imgSrc = UTM_LOG_ENDPOINT+"?data="+data+"&event=UTM_data";
-
-		this.fireImagePixel(imgSrc);
 	},
 	// createAndFireImagePixelForUmLogUsingKeen: function(json) {
 	// 	var data = this.base64Encode(JSON.stringify(json));
