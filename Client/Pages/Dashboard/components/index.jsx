@@ -137,13 +137,14 @@ class Dashboard extends React.Component {
 			}
 		} = this.props;
 
-		let isPrimisAllowed = false;
+		let showVideoAdsDashboardWidget = false;
 		Object.keys(sites).map(site => {
-			isPrimisAllowed = isPrimisAllowed || !!sites[site].primis;
+			const { product = {} } = sites[site];
+			showVideoAdsDashboardWidget = showVideoAdsDashboardWidget || !!product.videoAdsDashboard;
 			return site;
 		});
 
-		if (!isPrimisAllowed) {
+		if (!showVideoAdsDashboardWidget) {
 			const index = widgetsList.indexOf('primis_report');
 			widgetsList.splice(index, 1, 0);
 		}

@@ -124,7 +124,8 @@ function getUserSites(user) {
 
 function getReportsMetaData(params) {
 	return request({
-		uri: `${consts.ANALYTICS_API_ROOT}${consts.ANALYTICS_METAINFO_URL}`,
+		// uri: `${consts.ANALYTICS_API_ROOT}${consts.ANALYTICS_METAINFO_URL}`,
+		uri: `http://staging.adpushup.com/CentralReportingWebService-1.0/${consts.ANALYTICS_METAINFO_URL}`,
 		json: true,
 		qs: params
 	})
@@ -169,7 +170,6 @@ router
 								if (userData.sites[site] && sitesFromReportMeta[site].product) {
 									userData.sites[site].product = sitesFromReportMeta[site].product;
 								}
-								userData.sites[site].primis = true;
 							});
 						}
 						return res.status(httpStatus.OK).json({
