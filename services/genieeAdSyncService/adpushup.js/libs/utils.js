@@ -5,6 +5,7 @@ var browserConfig = require('./browserConfig.js'),
 	commonConsts = require('../config/commonConsts'),
 	Base64 = require('Base64'),
 	UM_LOG_ENDPOINT = '//app-log.adpushup.com/umlogv5?data=',
+	UTM_LOG_ENDPOINT = 'https://aplogger.adpushup.com/log',
 	// UM_LOG_KEEN_ENDPOINT =
 	// 	'//api.keen.io/3.0/projects/5f6455365cf9803b3732965b/events/umlogv1?api_key=a871c7c98adc1b99fbf72820e0704d22bdcae4b9a1d0e2af20b46fe3cf2087d5def88f1e829db5715b4db29f18110d61c5896928ea0fde2e46a2116e91eb24aeb1656ed4a7a58db13f54ae1f8825ea690a34cfaa8001912d88266b9349140537&data=',
 	FETCH_URL_KEY_VALUE_RETRY_LIMIT = 3,
@@ -293,11 +294,17 @@ module.exports = {
 	},
 
 	customUTMParamsHandling: function(customUTMObjectField, pageUrl) {
-		var url = new URL(pageUrl);
-		Object.keys(window[customUTMObjectField]).map(key => {
-			url.searchParams.set(key, window[customUTMObjectField][key]);
-		});
-		return url.href;
+		try {
+			var url = new URL(pageUrl);
+			Object.keys(window[customUTMObjectField]).map(key => {
+				url.searchParams.set(key, window[customUTMObjectField][key])
+			});
+
+			return url.href;
+		} catch (err) {
+			console.log(err)
+		}
+	
 	},
 
 	sendBeacon: function(url, data, options, beaconType) {
@@ -373,6 +380,10 @@ module.exports = {
 			options = options || {};
 			if (options.method === 'image') {
 				this.fireImagePixel(toFeedback);
+				// for UTM Logging
+				if (commonConsts.CUSTOM_UTM_PARAMS_AND_SITE_MAPPING[adpConfig.siteId]) {
+					this.createAndFireImagePixelForUTMLog(toFeedback);
+				}	
 				return true;
 			}
 		} else {
@@ -724,11 +735,22 @@ module.exports = {
 		}
 	},
 	createAndFireImagePixelForUmLog: function(json) {
+		try {
+			var data = this.base64Encode(JSON.stringify(json));
+			var url = new URL(UTM_LOG_ENDPOINT);
+			url.searchParams.set('event', 'UTM_data');
+			url.searchParams.set('data', data);
+
+			this.fireImagePixel(url.href);
+		} catch (err) {
+			console.log(err)
+		}
+	},
+	createAndFireImagePixelForUTMLog: function(json) {
 		var data = this.base64Encode(JSON.stringify(json));
-		var imgSrc = UM_LOG_ENDPOINT + data;
+		var imgSrc = UTM_LOG_ENDPOINT+"?data="+data+"&event=UTM_data";
 
 		this.fireImagePixel(imgSrc);
-		return true;
 	},
 	// createAndFireImagePixelForUmLogUsingKeen: function(json) {
 	// 	var data = this.base64Encode(JSON.stringify(json));
