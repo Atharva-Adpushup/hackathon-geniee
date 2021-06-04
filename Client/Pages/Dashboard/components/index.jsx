@@ -143,7 +143,7 @@ class Dashboard extends React.Component {
 			return site;
 		});
 
-		if (isPrimisAllowed) {
+		if (!isPrimisAllowed) {
 			const index = widgetsList.indexOf('primis_report');
 			widgetsList.splice(index, 1, 0);
 		}
