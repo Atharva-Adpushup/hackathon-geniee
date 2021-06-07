@@ -173,8 +173,7 @@ const reportsService = {
 		return ObjectValidator(getMetaDataValidations, params)
 			.then(() =>
 				request({
-					// uri: `${CC.ANALYTICS_API_ROOT}${CC.ANALYTICS_METAINFO_URL}`,
-					uri: `http://staging.adpushup.com/CentralReportingWebService-1.0${CC.ANALYTICS_METAINFO_URL}`,
+					uri: `${CC.ANALYTICS_API_ROOT}${CC.ANALYTICS_METAINFO_URL}`,
 					json: true,
 					qs: params
 				})
@@ -282,8 +281,7 @@ const reportsService = {
 		ObjectValidator(getWidgetDataValidations, { path, params })
 			.then(() =>
 				request({
-					// uri: `${CC.ANALYTICS_API_ROOT}${path}`,
-					uri: `http://staging.adpushup.com/CentralReportingWebService-1.0${path}`,
+					uri: `${CC.ANALYTICS_API_ROOT}${path}`,
 					json: true,
 					qs: params
 				})
