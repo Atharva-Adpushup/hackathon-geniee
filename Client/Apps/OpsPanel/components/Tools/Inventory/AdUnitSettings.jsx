@@ -58,15 +58,17 @@ class AdUnitSettings extends Component {
 	}
 
 	componentDidMount = () => {
-		const { siteid } = this.props;
+		const { siteid, showNotification } = this.props;
 		axiosInstance
 			.get(`/site/${siteid}/getSelectiveRolloutKey`)
-			.then(({ data }) => {
-				const { isSelectiveRolloutEnabled } = data;
-				console.log(isSelectiveRolloutEnabled);
+			.then(({ data: responseData }) => {
+				const {
+					data: { isSelectiveRolloutEnabled = false }
+				} = responseData || {};
 				this.setState({ modalLoading: false, selectiveRolloutEnabled: isSelectiveRolloutEnabled });
 			})
-			.catch(() => {
+			.catch(error => {
+				console.log(error);
 				return showNotification({
 					mode: 'error',
 					title: 'Operation Failed',
