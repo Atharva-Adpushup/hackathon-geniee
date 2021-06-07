@@ -281,7 +281,7 @@ class Chart extends React.Component {
 
 	getAggregratedSortedResult = (data, selectedInterval) => {
 		const aggregratedData = {};
-		if (selectedInterval === 'daily') {
+		if (selectedInterval === 'daily' || selectedInterval === 'cumulative') {
 			for (let i = 0; i < data.length; i++) {
 				const rowData = cloneDeep(data[i]);
 				const {
