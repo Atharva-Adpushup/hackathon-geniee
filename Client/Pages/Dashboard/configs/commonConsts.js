@@ -71,6 +71,18 @@ const yAxisGroups = [
 		}
 	}
 ];
+const yAxisGroupsVideoRevenuePrimis = [
+	{
+		seriesNames: ['Video Revenue'],
+		yAxisConfig: {
+			labels: {
+				// eslint-disable-next-line no-template-curly-in-string
+				format: '${value}'
+			}
+		}
+	}
+];
+
 const tableHeader = [
 	{ title: 'Website', prop: 'siteName' },
 	{ title: 'AdPushup Page views', prop: 'adpushup_page_views' },
@@ -88,7 +100,8 @@ const displayMetrics = {
 	adpushup_page_views: { name: 'Page Views', valueType: 'number' },
 	adpushup_page_cpm: { name: 'Page RPM', valueType: 'money' },
 	network_impressions: { name: 'Impressions', valueType: 'number' },
-	network_ad_ecpm: { name: 'Ad eCPM', valueType: 'money' }
+	network_ad_ecpm: { name: 'Ad eCPM', valueType: 'money' },
+	primis_revenue: { name: 'Video Ad Revenue', valueType: 'money' }
 };
 
 const displayUniqueMetrics = {
@@ -108,6 +121,7 @@ const dashboardWidgets = [
 	'rev_by_network',
 	'per_overview',
 	'per_ap_original',
+	'primis_report',
 	'ops_country_report'
 ];
 
@@ -127,6 +141,7 @@ export {
 	sites,
 	ALL_SITES_VALUE,
 	yAxisGroups,
+	yAxisGroupsVideoRevenuePrimis,
 	tableHeader,
 	displayMetrics,
 	displayUniqueMetrics,
