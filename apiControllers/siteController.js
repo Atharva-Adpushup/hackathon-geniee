@@ -882,7 +882,7 @@ router
 		const { siteId } = req.params;
 		return siteModel
 			.getSiteById(siteId)
-			.then(data => {
+			.then(({ data }) => {
 				const { apConfigs: { isSelectiveRolloutEnabled = false } = {} } = data || {};
 				sendSuccessResponse({ isSelectiveRolloutEnabled }, res);
 			})
