@@ -5,6 +5,7 @@ import sortBy from 'lodash/sortBy';
 import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
 import moment from 'moment';
+import { chart } from 'highcharts';
 import CustomChart from '../../../Components/CustomChart';
 import {
 	activeLegendItem,
@@ -22,8 +23,6 @@ import {
 	roundOffTwoDecimal,
 	numberWithCommas
 } from '../helpers/utils';
-
-import { chart } from 'highcharts';
 
 class Chart extends React.Component {
 	constructor(props) {
@@ -295,12 +294,12 @@ class Chart extends React.Component {
 					unique_impressions = 0
 				} = rowData;
 				if (aggregratedData[date]) {
-					aggregratedData[date]['adpushup_page_views'] += adpushup_page_views;
-					aggregratedData[date]['bot_page_views'] += bot_page_views;
-					aggregratedData[date]['network_gross_revenue'] += network_gross_revenue;
-					aggregratedData[date]['network_impressions'] += network_impressions;
-					aggregratedData[date]['network_net_revenue'] += network_net_revenue;
-					aggregratedData[date]['unique_impressions'] += unique_impressions;
+					aggregratedData[date].adpushup_page_views += adpushup_page_views;
+					aggregratedData[date].bot_page_views += bot_page_views;
+					aggregratedData[date].network_gross_revenue += network_gross_revenue;
+					aggregratedData[date].network_impressions += network_impressions;
+					aggregratedData[date].network_net_revenue += network_net_revenue;
+					aggregratedData[date].unique_impressions += unique_impressions;
 				} else {
 					aggregratedData[date] = rowData;
 				}
@@ -320,10 +319,9 @@ class Chart extends React.Component {
 				network_net_revenue,
 				unique_impressions
 			} = aggregratedData[date];
-			aggregratedData[date]['adpushup_page_cpm'] =
-				(network_net_revenue / adpushup_page_views) * 1000;
-			aggregratedData[date]['network_ad_ecpm'] = (network_net_revenue / network_impressions) * 1000;
-			aggregratedData[date]['unique_ad_ecpm'] = (network_net_revenue / unique_impressions) * 1000;
+			aggregratedData[date].adpushup_page_cpm = (network_net_revenue / adpushup_page_views) * 1000;
+			aggregratedData[date].network_ad_ecpm = (network_net_revenue / network_impressions) * 1000;
+			aggregratedData[date].unique_ad_ecpm = (network_net_revenue / unique_impressions) * 1000;
 		});
 		const resultOfAggreagratedData = Object.values(aggregratedData);
 		if (selectedInterval === 'daily') return sortBy(resultOfAggreagratedData, 'date');
@@ -382,51 +380,37 @@ class Chart extends React.Component {
 					let combinedSeriesValue = 0;
 
 					if (!columnsBlacklistedForAddition.includes(activeLegendItems.value)) {
-						combinedSeriesValue = duplicateDateValues.reduce(function(prev, cur) {
-							return prev + cur[activeLegendItems.value];
-						}, 0);
+						combinedSeriesValue = duplicateDateValues.reduce(
+							(prev, cur) => prev + cur[activeLegendItems.value],
+							0
+						);
 					} else if (activeLegendItems.value === 'adpushup_ad_ecpm') {
 						combinedSeriesValue =
-							(duplicateDateValues.reduce(function(prev, cur) {
-								return prev + cur['network_net_revenue'];
-							}, 0) /
-								duplicateDateValues.reduce(function(prev, cur) {
-									return prev + cur['adpushup_impressions'];
-								}, 0)) *
+							(duplicateDateValues.reduce((prev, cur) => prev + cur.network_net_revenue, 0) /
+								duplicateDateValues.reduce((prev, cur) => prev + cur.adpushup_impressions, 0)) *
 							1000;
 					} else if (
 						activeLegendItems.value === 'network_ad_ecpm' ||
 						activeLegendItems.value === 'unique_ad_ecpm'
 					) {
 						combinedSeriesValue =
-							(duplicateDateValues.reduce(function(prev, cur) {
-								return prev + cur['network_net_revenue'];
-							}, 0) /
-								duplicateDateValues.reduce(function(prev, cur) {
-									return prev + cur['network_impressions'];
-								}, 0)) *
+							(duplicateDateValues.reduce((prev, cur) => prev + cur.network_net_revenue, 0) /
+								duplicateDateValues.reduce((prev, cur) => prev + cur.network_impressions, 0)) *
 							1000;
 					} else if (activeLegendItems.value === 'adpushup_page_cpm') {
 						combinedSeriesValue =
-							(duplicateDateValues.reduce(function(prev, cur) {
-								return prev + cur['network_net_revenue'];
-							}, 0) /
-								duplicateDateValues.reduce(function(prev, cur) {
-									return prev + cur['adpushup_page_views'];
-								}, 0)) *
+							(duplicateDateValues.reduce((prev, cur) => prev + cur.network_net_revenue, 0) /
+								duplicateDateValues.reduce((prev, cur) => prev + cur.adpushup_page_views, 0)) *
 							1000;
 					} else if (activeLegendItems.value === 'adpushup_xpath_miss_percent') {
 						combinedSeriesValue = parseFloat(
 							(
-								(duplicateDateValues.reduce(function(prev, cur) {
-									return prev + cur['adpushup_xpath_miss'];
-								}, 0) /
-									(duplicateDateValues.reduce(function(prev, cur) {
-										return prev + cur['adpushup_xpath_miss'];
-									}, 0) +
-										duplicateDateValues.reduce(function(prev, cur) {
-											return prev + cur['adpushup_impressions'];
-										}, 0))) *
+								(duplicateDateValues.reduce((prev, cur) => prev + cur.adpushup_xpath_miss, 0) /
+									(duplicateDateValues.reduce((prev, cur) => prev + cur.adpushup_xpath_miss, 0) +
+										duplicateDateValues.reduce(
+											(prev, cur) => prev + cur.adpushup_impressions,
+											0
+										))) *
 								100
 							).toFixed(2)
 						);
