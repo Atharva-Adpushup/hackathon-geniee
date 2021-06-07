@@ -61,5 +61,8 @@ export default {
 		{ name: 'Adunit Name', value: 'dfpAdunit', isDisabled: true, key: 'dfpAdunit' }
 	],
 	GET_SITE_DOMAIN_MAPPING: "/ops/getSiteMapping",
-	GET_ADUNIT_MAPPING: "ops/getAdUnitMapping"
+	GET_ADUNIT_MAPPING: "ops/getAdUnitMapping",
+	AD_NETWORK_DOC_KEYS: {
+		dfpAdunit: "dfpAdunit"
+	}
 };

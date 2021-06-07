@@ -10,6 +10,8 @@ import Loader from '../../../../../Components/Loader';
 import AdUnitSettings from './AdUnitSettings';
 import AsyncGroupSelect from '../../../../../Components/AsyncGroupSelect';
 import config from '../../../../../../Client/config/config';
+
+const { AD_NETWORK_DOC_KEYS } = config;
 class AdunitsInventory extends React.Component {
 	constructor(props) {
 		super(props);
@@ -25,11 +27,8 @@ class AdunitsInventory extends React.Component {
 
 	componentWillMount() {
 		const filterList = config.ADMIN_INVENTORY_LIST_FILTER_LIST;
-		this.setState({ filterList });
-
 		const tableHeader = config.ADMIN_INVENTORY_LIST_TABLE_HEADER;
-
-		this.setState({ tableHeader });
+		this.setState({ filterList, tableHeader });
 	}
 
 	componentDidMount() {
@@ -64,6 +63,9 @@ class AdunitsInventory extends React.Component {
 
 						const allAdUnits = [];
 						adUnitData.forEach(d => {
+							if (!d.value) {
+								return;
+							}
 							d.value.siteDomain = d.value.siteDomain || siteDomainMapping[+d.value.siteId];
 							allAdUnits.push({
 								...d.value,
@@ -91,19 +93,19 @@ class AdunitsInventory extends React.Component {
 
 		if (
 			Object.keys(selectedFilters).length &&
-			(Object.keys(selectedFilters['siteDomain'] || {}).length ||
-				Object.keys(selectedFilters['siteId'] || {}).length)
+			(Object.keys(selectedFilters.siteDomain || {}).length ||
+				Object.keys(selectedFilters.siteId || {}).length)
 		) {
 			filterList.forEach(d => {
-				if (d.key === 'dfpAdunit') {
+				if (d.key === AD_NETWORK_DOC_KEYS.dfpAdunit) {
 					d.isDisabled = false;
 				}
 			});
 
 			this.setState({ filterList });
 		} else {
-			filterList.forEach((d, i) => {
-				if (d.key === 'dfpAdunit') {
+			filterList.forEach(d => {
+				if (d.key === AD_NETWORK_DOC_KEYS.dfpAdunit) {
 					d.isDisabled = true;
 				}
 			});
@@ -122,7 +124,7 @@ class AdunitsInventory extends React.Component {
 					return ad;
 				}
 			});
-			if (filter == 'dfpAdunit' && Object.keys(selectedFilters[filter]).length) {
+			if (filter == AD_NETWORK_DOC_KEYS.dfpAdunit && Object.keys(selectedFilters[filter]).length) {
 				// Display only selected ad units
 				filteredAdList = tempAllAds;
 				this.setState(state => ({ ...state, filteredAds: filteredAdList }));
@@ -163,7 +165,7 @@ class AdunitsInventory extends React.Component {
 					if (!ad.value) {
 						return;
 					}
-					if (filter.key === 'dfpAdunit' && Object.keys(selectedFilters).length) {
+					if (filter.key === AD_NETWORK_DOC_KEYS.dfpAdunit && Object.keys(selectedFilters).length) {
 						if (
 							((selectedFilters.siteId && selectedFilters.siteId[ad.tempSiteId]) ||
 								(selectedFilters.siteDomain && selectedFilters.siteDomain[ad.tempSiteDomain])) &&
@@ -198,8 +200,6 @@ class AdunitsInventory extends React.Component {
 	};
 
 	getTableBody = (data, columnsMeta) => {
-		const columnsMetaObj = this.convertColumnsMetaArrToObj(columnsMeta);
-
 		return data.map(row => {
 			const rowCopy = clonedeep(row);
 			for (const columnKey in rowCopy) {
@@ -209,10 +209,10 @@ class AdunitsInventory extends React.Component {
 							<CustomButton
 								variant="secondary"
 								className="u-margin-t3 u-margin-r3"
-								adid={rowCopy['adId']}
-								siteid={rowCopy['siteId']}
-								docid={rowCopy['docId']}
-								sitedomain={rowCopy['siteDomain']}
+								adid={rowCopy.adId}
+								siteid={rowCopy.siteId}
+								docid={rowCopy.docId}
+								sitedomain={rowCopy.siteDomain}
 								onClick={this.openSettings}
 							>
 								Edit Ad Unit

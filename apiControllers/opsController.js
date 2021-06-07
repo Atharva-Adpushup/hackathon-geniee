@@ -426,9 +426,6 @@ router
 		switch (docType) {
 			case 'chnl':
 				const { pageGroup, platform } = getPageGroupNameAndPlatformFromChannelDoc(docId);
-
-				console.log({ pageGroup, platform });
-
 				// updateLayoutAd
 				return channelModel
 					.getChannel(siteId, platform, pageGroup)
