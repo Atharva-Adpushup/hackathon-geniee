@@ -775,6 +775,14 @@ module.exports = {
 			return false;
 		}
 
+		// for 3bluemedia
+		if (commonConsts.CUSTOM_UTM_PARAMS_AND_SITE_MAPPING[adp.config.siteId]) {
+			adp.config.pageUrl = this.customUTMParamsHandling(
+				commonConsts.CUSTOM_UTM_PARAMS_AND_SITE_MAPPING[adp.config.siteId],
+				adp.config.pageUrl
+			);
+		}
+
 		var pageUrlMappingServiceEndpoint = adp.config.pageUrlMappingServiceEndpoint
 			.replace('__PAGE_URL__', this.base64Encode(adp.config.pageUrl))
 			.replace('__SITE_ID__', adp.config.siteId);
