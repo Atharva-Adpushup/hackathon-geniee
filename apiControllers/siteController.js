@@ -883,10 +883,10 @@ router
 		return siteModel
 			.getSiteById(siteId)
 			.then(data => {
-				const { apConfig: { isSelectiveRolloutEnabled = false } = {} } = data || {};
+				const { apConfigs: { isSelectiveRolloutEnabled = false } = {} } = data || {};
 				sendSuccessResponse({ isSelectiveRolloutEnabled }, res);
 			})
-			.catch(err => errorHandler(err, res))
+			.catch(err => errorHandler(err, res));
 	})
 	.use('/:siteId/pagegroup/', pageGroupController)
 	.post('/:siteId/forceApBuild', (req, res) => {
