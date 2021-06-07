@@ -124,8 +124,7 @@ function getUserSites(user) {
 
 function getReportsMetaData(params) {
 	return request({
-		// uri: `${consts.ANALYTICS_API_ROOT}${consts.ANALYTICS_METAINFO_URL}`,
-		uri: `http://staging.adpushup.com/CentralReportingWebService-1.0/${consts.ANALYTICS_METAINFO_URL}`,
+		uri: `${consts.ANALYTICS_API_ROOT}${consts.ANALYTICS_METAINFO_URL}`,
 		json: true,
 		qs: params
 	})
