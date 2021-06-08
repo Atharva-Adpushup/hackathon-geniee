@@ -386,7 +386,6 @@ router
 
 					const { key: docId, value: ad } = adData;
 					const docType = docId.substr(0, 4);
-					// let networkData, dfpAdunitCode, dfpAdunit, collapseUnfilled, downwardSizesDisabled, adId, sizeFilters, height, width, obj = {};
 					const { siteId, siteDomain, networkData, sizeFilters, height, width } = ad;
 
 					let { adId, collapseUnfilled, downwardSizesDisabled, dfpAdunitCode, dfpAdunit } = ad;
