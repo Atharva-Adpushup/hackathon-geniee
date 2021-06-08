@@ -281,18 +281,33 @@ class Chart extends React.Component {
 
 	getAggregratedSortedResult = (data, selectedInterval) => {
 		const aggregratedData = {};
-		if (selectedInterval === 'daily' || selectedInterval === 'cumulative') {
-			for (let i = 0; i < data.length; i++) {
-				const rowData = cloneDeep(data[i]);
-				const {
-					date,
-					adpushup_page_views = 0,
-					bot_page_views = 0,
-					network_gross_revenue = 0,
-					network_impressions = 0,
-					network_net_revenue = 0,
-					unique_impressions = 0
-				} = rowData;
+
+		for (let i = 0; i < data.length; i += 1) {
+			const rowData = cloneDeep(data[i]);
+			const {
+				date,
+				adpushup_page_views = 0,
+				bot_page_views = 0,
+				network_gross_revenue = 0,
+				network_impressions = 0,
+				network_net_revenue = 0,
+				unique_impressions = 0
+			} = rowData;
+
+			if (selectedInterval === 'monthly') {
+				const { month, year } = rowData;
+
+				if (aggregratedData[`${month}-${year}`]) {
+					aggregratedData[`${month}-${year}`].adpushup_page_views += adpushup_page_views;
+					aggregratedData[`${month}-${year}`].bot_page_views += bot_page_views;
+					aggregratedData[`${month}-${year}`].network_gross_revenue += network_gross_revenue;
+					aggregratedData[`${month}-${year}`].network_impressions += network_impressions;
+					aggregratedData[`${month}-${year}`].network_net_revenue += network_net_revenue;
+					aggregratedData[`${month}-${year}`].unique_impressions += unique_impressions;
+				} else {
+					aggregratedData[`${month}-${year}`] = rowData;
+				}
+			} else {
 				if (aggregratedData[date]) {
 					aggregratedData[date].adpushup_page_views += adpushup_page_views;
 					aggregratedData[date].bot_page_views += bot_page_views;
@@ -305,13 +320,7 @@ class Chart extends React.Component {
 				}
 			}
 		}
-		if (selectedInterval === 'monthly') {
-			for (let i = 0; i < data.length; i += 1) {
-				const rowData = cloneDeep(data[i]);
-				const { month, year } = rowData;
-				aggregratedData[`${month}-${year}`] = rowData;
-			}
-		}
+
 		Object.keys(aggregratedData).forEach(date => {
 			const {
 				adpushup_page_views,
