@@ -272,6 +272,7 @@ router
 	.post('/createLog', (req, res) =>
 		checkParams(['err', 'isNotifySupportMail', 'info'], req, 'post')
 			.then(async () => {
+				let { originalEmail } = req.user;
 				const {
 					err,
 					info,
@@ -284,6 +285,7 @@ router
 					userInput = '',
 					errorMessage
 				} = req.body;
+				if (!originalEmail && isSuperUser) originalEmail = email;
 				const errorInfo = _.escape(info.componentStack).replace(/\n/g, '<br>');
 				const dateOfError = new Date().toDateString();
 				const mailAlertTemplateData = {
@@ -295,7 +297,8 @@ router
 					dateOfError,
 					routePath,
 					userInput,
-					errorMessage
+					errorMessage,
+					originalEmail
 				};
 				const emailTemplate = await generateEmailTemplate(
 					'views/mail',
@@ -303,34 +306,37 @@ router
 					mailAlertTemplateData
 				);
 				const subjectMessage = `Console Error Report`;
-				if (type === 'UserInteraction') {
-					//here we will send mail to the support
-					sendEmail({
-						queue: 'MAILER',
-						data: {
-							to: config.consoleErrorAlerts.supportMail,
-							body: emailTemplate,
-							subject: subjectMessage
-						}
-					});
-				} else if (type === 'default') {
-					const errorLogToBeTracked = `Error: ${
-						err ? JSON.stringify(err, null, '\n') : 'N/A'
-					} ,  \n Info:  ${info ? JSON.stringify(info, null, '\n') : 'N/A'}`;
-					//By deafult we are alreday sending mail to the hackers
-					sendEmail({
-						queue: 'MAILER',
-						data: {
-							to: config.consoleErrorAlerts.hackersMail,
-							body: emailTemplate,
-							subject: subjectMessage
-						}
-					});
-					return logger({
-						source: 'CONSOLE ERROR LOGS',
-						message: 'UNCAUGHT ERROR BOUNDARY',
-						debugData: errorLogToBeTracked
-					});
+				if (config.environment.HOST_ENV === 'production') {
+					//send alerts only on production
+					if (type === 'UserInteraction') {
+						//here we will send mail to the support
+						sendEmail({
+							queue: 'MAILER',
+							data: {
+								to: config.consoleErrorAlerts.supportMail,
+								body: emailTemplate,
+								subject: subjectMessage
+							}
+						});
+					} else if (type === 'default') {
+						const errorLogToBeTracked = `Error: ${
+							err ? JSON.stringify(err, null, '\n') : 'N/A'
+						} ,  \n Info:  ${info ? JSON.stringify(info, null, '\n') : 'N/A'}`;
+						//By deafult we are alreday sending mail to the hackers
+						sendEmail({
+							queue: 'MAILER',
+							data: {
+								to: config.consoleErrorAlerts.hackersMail,
+								body: emailTemplate,
+								subject: subjectMessage
+							}
+						});
+						return logger({
+							source: 'CONSOLE ERROR LOGS',
+							message: 'UNCAUGHT ERROR BOUNDARY',
+							debugData: errorLogToBeTracked
+						});
+					}
 				}
 			})
 			.then(() =>

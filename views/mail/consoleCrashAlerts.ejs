@@ -64,6 +64,24 @@
 						</table>
 					</td>
 				</tr>
+				<% if(isSuperUser){ %>
+				<tr>
+					<td>
+						<table>
+							<tbody>
+								<tr>
+									<td>
+										Admin Email:
+									</td>
+									<td>
+										<%= originalEmail %>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</td>
+				</tr>
+				<% } %>
 				<tr>
 					<td>
 						<table>
