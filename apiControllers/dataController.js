@@ -272,6 +272,7 @@ router
 	.post('/createLog', (req, res) =>
 		checkParams(['err', 'isNotifySupportMail', 'info'], req, 'post')
 			.then(async () => {
+				const { originalEmail } = req.user;
 				const {
 					err,
 					info,
@@ -295,7 +296,8 @@ router
 					dateOfError,
 					routePath,
 					userInput,
-					errorMessage
+					errorMessage,
+					originalEmail
 				};
 				const emailTemplate = await generateEmailTemplate(
 					'views/mail',
