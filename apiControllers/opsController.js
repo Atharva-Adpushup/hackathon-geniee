@@ -379,7 +379,108 @@ router
 	)
 	.get('/getAdUnitMapping', (req, res) =>
 		getAllAds()
-			.then(ads => sendSuccessResponse(ads, res))
+			.then(data => {
+				const ads = [];
+
+				data.forEach((adData) => {
+
+					const { key: docId, value: ad } = adData;
+					const docType = docId.substr(0, 4);
+					// let networkData, dfpAdunitCode, dfpAdunit, collapseUnfilled, downwardSizesDisabled, adId, sizeFilters, height, width, obj = {};
+					const { siteId, siteDomain, networkData, sizeFilters, height, width } = ad;
+
+					let { adId, collapseUnfilled, downwardSizesDisabled, dfpAdunitCode, dfpAdunit } = ad;
+
+					let adObj = { docId };
+
+					// transform the data to display in inventory tab
+					switch (docType) {
+						case "chnl":
+							if (!networkData) {
+								return;
+							}
+							dfpAdunitCode = networkData.dfpAdunitCode;
+							dfpAdunit = networkData.dfpAdunit;
+
+							if (!dfpAdunitCode) {
+								return;
+							}
+
+							collapseUnfilled = !!collapseUnfilled;
+							downwardSizesDisabled = !!downwardSizesDisabled;
+
+							adObj = {
+								...adObj,
+								siteId,
+								siteDomain,
+								dfpAdunitCode,
+								dfpAdunit,
+								adId,
+								collapseUnfilled,
+								downwardSizesDisabled,
+								sizeFilters,
+								height,
+								width,
+							};
+
+							ads.push(adObj);
+							break;
+						case "fmrt":
+						case "tgmr":
+							adId = ad.id;
+							if (!networkData) {
+								return;
+							}
+
+							dfpAdunitCode = networkData.dfpAdunitCode;
+							dfpAdunit = networkData.dfpAdunit;
+							if (!dfpAdunitCode) {
+								return;
+							}
+
+							collapseUnfilled = !!ad.collapseUnfilled;
+							downwardSizesDisabled = !!ad.downwardSizesDisabled;
+							adObj = {
+								...adObj,
+								siteId,
+								siteDomain,
+								dfpAdunitCode,
+								dfpAdunit,
+								adId,
+								collapseUnfilled,
+								downwardSizesDisabled,
+								sizeFilters,
+								height,
+								width
+							};
+							ads.push(adObj);
+							break;
+
+						case "aplt":
+
+							collapseUnfilled = !!ad.collapseUnfilled;
+							downwardSizesDisabled = !!ad.downwardSizesDisabled;
+							dfpAdunit = ad.dfpAdUnit;
+							adObj = {
+								...adObj,
+								siteId,
+								siteDomain,
+								dfpAdunitCode,
+								dfpAdunit,
+								adId: dfpAdunit,
+								collapseUnfilled,
+								downwardSizesDisabled,
+								sizeFilters
+							};
+							ads.push(adObj);
+							break;
+						default:
+							break;
+					}
+				});
+
+				return sendSuccessResponse(ads, res);
+			})
 			.catch(err => errorHandler(err, res, HTTP_STATUSES.INTERNAL_SERVER_ERROR))
 	)
 	.get('/getSiteMapping', (req, res) => {

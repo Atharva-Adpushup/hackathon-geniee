@@ -60,17 +60,15 @@ class AdunitsInventory extends React.Component {
 					.get(config.GET_ADUNIT_MAPPING)
 					.then(({ data }) => {
 						let { data: adUnitData } = data;
-
 						const allAdUnits = [];
 						adUnitData.forEach(d => {
-							if (!d.value) {
+							if (!d) {
 								return;
 							}
-							d.value.siteDomain = d.value.siteDomain || siteDomainMapping[+d.value.siteId];
+							d.siteDomain = d.siteDomain || siteDomainMapping[+d.siteId];
 							allAdUnits.push({
-								...d.value,
-								adUnitSettings: true,
-								docId: d.id
+								...d,
+								adUnitSettings: true
 							});
 						});
 
