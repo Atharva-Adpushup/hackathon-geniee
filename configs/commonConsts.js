@@ -882,5 +882,6 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 				PST: 7
 			}
 		}
-	}
+	},
+	FORMAT_WISE_PARAMS_REGEX: /(ap\w+)_(\w+)/
 };

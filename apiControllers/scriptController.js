@@ -21,7 +21,10 @@ const httpStatusConsts = require('../configs/httpStatusConsts');
 const {
 	getSizeMappingConfigFromCB
 } = require('../services/genieeAdSyncService/cdnSyncService/commonFunctions');
-const { isValidThirdPartyDFPAndCurrency } = require('../helpers/commonFunctions');
+const {
+	isValidThirdPartyDFPAndCurrency,
+	removeFormatWiseParamsForAMP
+} = require('../helpers/commonFunctions');
 
 const Router = express.Router();
 
@@ -169,9 +172,19 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 					.then(setAdNetworkConfig)
 					.then(setAllConfigs);
 
-			const generatedConfig = getPrebidAndAdsConfig().then(prebidAndAdsConfig =>
-				generateStatusesAndConfig(site, prebidAndAdsConfig)
-			);
+			const generatedConfig = getPrebidAndAdsConfig().then(prebidAndAdsConfig => {
+				// Remove ampConfig from adpushup.js
+				const { prebidConfig } = prebidAndAdsConfig;
+				if (prebidConfig && prebidConfig.hbcf) {
+					const { hbcf } = prebidConfig;
+					Object.keys(hbcf).forEach(bidder => {
+						if (hbcf[bidder].ampConfig) {
+							delete hbcf[bidder].ampConfig;
+						}
+					});
+				}
+				return generateStatusesAndConfig(site, prebidAndAdsConfig);
+			});
 
 			return Promise.join(generatedConfig, {
 				siteId: site.get('siteId'),
@@ -315,6 +328,17 @@ Router.get('/:siteId/ampSiteConfig', (req, res) => {
 						sizeMappingConfig,
 						currencyConfig
 					]) => {
+						// Remove ampConfig from amp.js as ampConfig is used in s2s
+						const { hbcf } = prebidConfig;
+						if (hbcf) {
+							Object.keys(hbcf).forEach(bidder => {
+								if (hbcf[bidder].ampConfig) {
+									delete hbcf[bidder].ampConfig;
+								}
+								// Remove format wise bidder param prefix from amp.js
+								hbcf[bidder].config = removeFormatWiseParamsForAMP(hbcf[bidder]);
+							});
+						}
 						const output = {
 							prebidConfig,
 							ampScriptConfig,

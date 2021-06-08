@@ -1316,6 +1316,10 @@ function apiModule() {
 					// 	json: true
 					// });
 				});
+		},
+		createBidderAmpConfig: function(bidderConfig) {
+			const ampConfig = commonFunctions.removeFormatWiseParamsForAMP(bidderConfig);
+			return ampConfig;
 		}
 	};
 

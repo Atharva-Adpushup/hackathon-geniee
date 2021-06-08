@@ -785,6 +785,38 @@ const Promise = require('bluebird'),
 		} = commonConsts;
 
 		return `${domain}, ${sellerId}, ${relationship}, ${certificationAuthorityId}`;
+	},
+	removeFormatWisePrefix = (accumulator, key, config) => {
+		let matchedKey = key.match(commonConsts.FORMAT_WISE_PARAMS_REGEX);
+		// Only allow banner params in AMP
+		if (matchedKey && matchedKey[1] === commonConsts.FORMAT_WISE_PARAMS_PREFIX.BANNER) {
+			let newKey = matchedKey[2];
+			accumulator[newKey] = config[key];
+		}
+		if (matchedKey && matchedKey[1] !== commonConsts.FORMAT_WISE_PARAMS_PREFIX.BANNER) {
+			return accumulator;
+		}
+		if (!matchedKey) {
+			accumulator[key] = config[key];
+		}
+		return accumulator;
+	},
+	removeFormatWiseParamsForAMP = (bidderConfig) => {
+		const { config, sizeLess } = bidderConfig;
+		let newConfig;
+		if (sizeLess) {
+			newConfig = Object.keys(config).reduce((accumulator, key) => {
+				return removeFormatWisePrefix(accumulator, key, config);
+			}, {});
+		} else {
+			newConfig = {};
+			for (size in config) {
+				newConfig[size] = Object.keys(config[size]).reduce((accumulator, key) => {
+					return removeFormatWisePrefix(accumulator, key, config[size]);
+				}, {});
+			}
+		}
+		return newConfig;
 	};
 
 module.exports = {
@@ -816,5 +848,6 @@ module.exports = {
 	getNetworkConfig,
 	verifyKeysInCollection,
 	deleteKeysInCollection,
-	getMandatoryAdsTxtEntrySnippet
+	getMandatoryAdsTxtEntrySnippet,
+	removeFormatWiseParamsForAMP
 };
