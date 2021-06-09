@@ -59,9 +59,7 @@ class VideoAdRevenue extends React.Component {
 		const { displayData } = props;
 		const { isValid, isValidAndEmpty } = getWidgetValidDationState(displayData);
 
-		const {
-			total: { network_revenue: totalNetworkRevenue }
-		} = displayData;
+		const { total = {} } = displayData;
 		if (!isValid) {
 			return null;
 		}
@@ -71,7 +69,7 @@ class VideoAdRevenue extends React.Component {
 		}
 
 		const computedState = computeGraphData(displayData.result);
-		return { ...computedState, totalNetworkRevenue };
+		return { ...computedState, totalNetworkRevenue: total.network_revenue || '' };
 	}
 
 	renderChart() {
@@ -81,9 +79,11 @@ class VideoAdRevenue extends React.Component {
 		if (series && series.length > 0) {
 			return (
 				<div>
-					<div>
-						Cumulative Revenue: <span>${totalNetworkRevenue}</span>
-					</div>
+					{totalNetworkRevenue && (
+						<div>
+							Cumulative Revenue: <span>${totalNetworkRevenue}</span>
+						</div>
+					)}
 					<CustomChart
 						type={type}
 						series={series}
