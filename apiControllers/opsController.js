@@ -11,20 +11,28 @@ const {
 	EMAIL_REGEX,
 	AUDIT_LOGS_ACTIONS: { OPS_PANEL }
 } = require('../configs/commonConsts');
-const { sendSuccessResponse, sendErrorResponse } = require('../helpers/commonFunctions');
-const { appBucket, errorHandler, sendDataToAuditLogService } = require('../helpers/routeHelpers');
+const { sendSuccessResponse, sendErrorResponse, getPageGroupNameAndPlatformFromChannelDoc } = require('../helpers/commonFunctions');
+const {
+	appBucket,
+	errorHandler,
+	sendDataToAuditLogService,
+	getAllAds,
+	updateApTagAd,
+	updateInnovativeAd,
+	updateApLiteAd
+} = require('../helpers/routeHelpers');
 const opsModel = require('../models/opsModel');
 const apLiteModel = require('../models/apLiteModel');
+const channelModel = require('../models/channelModel');
+const { updateAdUnitData } = require('../models/opsModel');
 
 const router = express.Router();
 
 const helpers = {
 	getAllSitesFromCouchbase: () => {
-		const query = `select a.siteId, a.siteDomain, a.adNetworkSettings, a.ownerEmail, a.step, a.channels, a.apConfigs, a.dateCreated, b.adNetworkSettings[0].pubId, b.adNetworkSettings[0].adsenseEmail from ${
-			couchBase.DEFAULT_BUCKET
-		} a join ${
-			couchBase.DEFAULT_BUCKET
-		} b on keys 'user::' || a.ownerEmail where meta(a).id like 'site::%'`;
+		const query = `select a.siteId, a.siteDomain, a.adNetworkSettings, a.ownerEmail, a.step, a.channels, a.apConfigs, a.dateCreated, b.adNetworkSettings[0].pubId, b.adNetworkSettings[0].adsenseEmail from ${couchBase.DEFAULT_BUCKET
+			} a join ${couchBase.DEFAULT_BUCKET
+			} b on keys 'user::' || a.ownerEmail where meta(a).id like 'site::%'`;
 		return appBucket.queryDB(query);
 	},
 	makeAPIRequest: options => {
@@ -36,7 +44,8 @@ const helpers = {
 			...DEFAULT_OPTIONS,
 			...options
 		});
-	}
+	},
+	directDBUpdate: (key, value, cas) => appBucket.updateDoc(key, value, cas)
 };
 
 router
@@ -94,9 +103,9 @@ router
 			return date && isValidDate(date)
 				? getDate(date)
 				: getDate(reference, {
-						...DEFAULT_OPERATION,
-						value
-				  });
+					...DEFAULT_OPERATION,
+					value
+				});
 		}
 		function makeAPIRequestWrapper(qs) {
 			return helpers.makeAPIRequest({
@@ -367,5 +376,229 @@ router
 			.getAllNotifications()
 			.then(message => sendSuccessResponse(message, res))
 			.catch(err => errorHandler(err, res))
-	);
+	)
+	.get('/getAdUnitMapping', (req, res) =>
+		getAllAds()
+			.then(data => {
+				const ads = [];
+
+				data.forEach((adData) => {
+
+					const { key: docId, value: ad } = adData;
+					const docType = docId.substr(0, 4);
+					const { siteId, siteDomain, networkData, sizeFilters, height, width } = ad;
+
+					let { adId, collapseUnfilled, downwardSizesDisabled, dfpAdunitCode, dfpAdunit } = ad;
+
+					let adObj = { docId };
+
+					// transform the data to display in inventory tab
+					switch (docType) {
+						case "chnl":
+							if (!networkData) {
+								return;
+							}
+							dfpAdunitCode = networkData.dfpAdunitCode;
+							dfpAdunit = networkData.dfpAdunit;
+
+							if (!dfpAdunitCode) {
+								return;
+							}
+
+							collapseUnfilled = !!collapseUnfilled;
+							downwardSizesDisabled = !!downwardSizesDisabled;
+
+							adObj = {
+								...adObj,
+								siteId,
+								siteDomain,
+								dfpAdunitCode,
+								dfpAdunit,
+								adId,
+								collapseUnfilled,
+								downwardSizesDisabled,
+								sizeFilters,
+								height,
+								width,
+							};
+
+							ads.push(adObj);
+							break;
+						case "fmrt":
+						case "tgmr":
+							adId = ad.id;
+							if (!networkData) {
+								return;
+							}
+
+							dfpAdunitCode = networkData.dfpAdunitCode;
+							dfpAdunit = networkData.dfpAdunit;
+							if (!dfpAdunitCode) {
+								return;
+							}
+
+							collapseUnfilled = !!ad.collapseUnfilled;
+							downwardSizesDisabled = !!ad.downwardSizesDisabled;
+							adObj = {
+								...adObj,
+								siteId,
+								siteDomain,
+								dfpAdunitCode,
+								dfpAdunit,
+								adId,
+								collapseUnfilled,
+								downwardSizesDisabled,
+								sizeFilters,
+								height,
+								width
+							};
+							ads.push(adObj);
+							break;
+
+						case "aplt":
+
+							collapseUnfilled = !!ad.collapseUnfilled;
+							downwardSizesDisabled = !!ad.downwardSizesDisabled;
+							dfpAdunit = ad.dfpAdUnit;
+							adObj = {
+								...adObj,
+								siteId,
+								siteDomain,
+								dfpAdunitCode,
+								dfpAdunit,
+								adId: dfpAdunit,
+								collapseUnfilled,
+								downwardSizesDisabled,
+								sizeFilters
+							};
+							ads.push(adObj);
+							break;
+						default:
+							break;
+					}
+				});
+
+				return sendSuccessResponse(ads, res);
+			})
+			.catch(err => errorHandler(err, res, HTTP_STATUSES.INTERNAL_SERVER_ERROR))
+	)
+	.get('/getSiteMapping', (req, res) => {
+		if (!req.user.isSuperUser) {
+			return sendErrorResponse(
+				{
+					message: 'Unauthorized Request',
+					code: HTTP_STATUSES.UNAUTHORIZED
+				},
+				res
+			);
+		}
+		opsModel
+			.getAllSiteMapping()
+			.then(message => sendSuccessResponse(message, res))
+			.catch(err => errorHandler(err, res));
+	})
+	.post('/updateAdUnitData/:siteId', (req, res) => {
+		if (!req.user.isSuperUser) {
+			return sendErrorResponse(
+				{
+					message: 'Unauthorized Request',
+					code: HTTP_STATUSES.UNAUTHORIZED
+				},
+				res
+			);
+		}
+		const { adUnitData } = req.body;
+		const {
+			docId,
+			adId,
+			collapseUnfilled,
+			sizeFilters,
+			downwardSizesDisabled,
+			siteDomain
+		} = adUnitData;
+
+		const docType = docId.substr(0, 4);
+		let newData = {};
+		let adData = {};
+
+		const { siteId } = req.params;
+
+		switch (docType) {
+			case 'chnl':
+				const { pageGroup, platform } = getPageGroupNameAndPlatformFromChannelDoc(docId);
+				// updateLayoutAd
+				return channelModel
+					.getChannel(siteId, platform, pageGroup)
+					.then(({ data: channelData }) => {
+						let prevConfig = {}, currentConfig = {};
+						const { variations, siteDomain } = channelData;
+						for (const key in variations) {
+							const { sections } = variations[key];
+							for (const section in sections) {
+								const { ads } = sections[section];
+								if (ads[adId]) {
+									prevConfig = { ...ads[adId] };
+									ads[adId] = {
+										...ads[adId],
+										downwardSizesDisabled,
+										collapseUnfilled,
+										sizeFilters
+									};
+									currentConfig = {
+										...ads[adId],
+										downwardSizesDisabled,
+										collapseUnfilled,
+										sizeFilters
+									};
+									break;
+								}
+							}
+						}
+
+						const appName = "Ad Unit Inventory";
+						const { email, originalEmail } = req.user;
+
+						// log config changes
+						sendDataToAuditLogService({
+							siteId,
+							siteDomain,
+							appName,
+							type: 'app',
+							impersonateId: email,
+							userId: originalEmail,
+							prevConfig,
+							currentConfig,
+							action: {
+								name: OPS_PANEL.TOOLS,
+								data: `Ad Inventory Change - Channel Doc Updated`
+							}
+						});
+
+						return channelModel.saveChannel(siteId, platform, pageGroup, channelData);
+					})
+					.then(chnlData => sendSuccessResponse(chnlData, res))
+					.catch(err => errorHandler(err, res, HTTP_STATUSES.INTERNAL_SERVER_ERROR));
+			case 'tgmr':
+				newData = { collapseUnfilled, downwardSizesDisabled, sizeFilters };
+				adData = { adUnitId: adId, newData, docId, siteDomain };
+				return updateApTagAd(req, res, adData);
+			case 'fmrt':
+				newData = { collapseUnfilled, downwardSizesDisabled, sizeFilters };
+				adData = { adUnitId: adId, newData, docId, siteDomain };
+				return updateInnovativeAd(req, res, adData);
+			case 'aplt':
+				newData = { collapseUnfilled, downwardSizesDisabled, sizeFilters };
+				adData = { adUnitId: adId, adUnitData: newData, docId, siteDomain };
+				return updateApLiteAd(req, res, adData);
+
+			default:
+				return sendErrorResponse(
+					{
+						message: 'Unauthorized Request',
+						code: HTTP_STATUSES.UNAUTHORIZED
+					},
+					res
+				);
+		}
+	});
 module.exports = router;

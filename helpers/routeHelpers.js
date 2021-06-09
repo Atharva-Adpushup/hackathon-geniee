@@ -6,7 +6,7 @@ const jsondiffpatch = require('jsondiffpatch').create();
 const request = require('request-promise');
 const couchbase = require('../helpers/couchBaseService'),
 	couchbaseModule = require('couchbase'),
-	N1qlQuery = couchbaseModule.N1qlQuery;
+	{ N1qlQuery, ViewQuery } = couchbaseModule;
 
 const config = require('../configs/config');
 const siteModel = require('../models/siteModel');
@@ -19,7 +19,9 @@ const {
 	APP_KEYS,
 	GOOGLE_BOT_USER_AGENT,
 	DEFAULT_APP_STATUS_RESPONSE,
-	ADS_TXT_REDIRECT_PATTERN
+	ADS_TXT_REDIRECT_PATTERN,
+	AUDIT_LOGS_ACTIONS: { OPS_PANEL },
+	docKeys
 } = require('../configs/commonConsts');
 
 const appBucket = couchbaseService(
@@ -28,6 +30,27 @@ const appBucket = couchbaseService(
 	config.couchBase.DEFAULT_USER_NAME,
 	config.couchBase.DEFAULT_USER_PASSWORD
 );
+
+const helpers = {
+	adUpdateProcessing: (req, res, key, processing) =>
+		appBucket
+			.getDoc(`${key}${req.params.siteId}`)
+			.then(docWithCas => processing(docWithCas))
+			.then(() => emitEventAndSendResponse(req.body.siteId || req.params.siteId, res))
+			.catch(err => {
+				let error = err;
+				if (err && err.code && err.code === 13) {
+					error = new AdPushupError({
+						message: 'No Doc Found',
+						code: HTTP_STATUS.BAD_REQUEST
+					});
+				}
+				return errorHandler(error, res);
+			}),
+	directDBUpdate: (key, value, cas) => {
+		return appBucket.updateDoc(key, value, cas);
+	}
+};
 
 function verifyOwner(siteId, userEmail) {
 	return siteModel
@@ -92,7 +115,7 @@ function emitEventAndSendResponse(siteId, res, data = {}) {
 	});
 }
 function sendDataToAuditLogService(data) {
-	const { prevConfig, currentConfig, action = {}, ...restLogData} = data; 
+	const { prevConfig, currentConfig, action = {}, ...restLogData } = data;
 	const delta = jsondiffpatch.diff(prevConfig, currentConfig) || {};
 
 	// don't need to send current config to elastic service
@@ -137,11 +160,11 @@ function fetchAds(req, res, docKey) {
 		.catch(err =>
 			err.code && err.code === 13 && err.message.includes('key does not exist')
 				? sendSuccessResponse(
-						{
-							ads: []
-						},
-						res
-				  )
+					{
+						ads: []
+					},
+					res
+				)
 				: errorHandler(err, res)
 		);
 }
@@ -389,6 +412,141 @@ function getAmpAds(siteId) {
 		.catch(err => console.log(err));
 }
 
+
+function getAllAds() {
+	const designName = 'AdunitMapping',
+		viewName = 'Adunits';
+	var query = ViewQuery.from(designName, viewName).reduce(false);
+
+	return couchbase
+		.connectToAppBucket()
+		.then(appBucket => appBucket.queryAsync(query))
+		.then(ads => {
+			return ads;
+		})
+		.catch(err => console.log(err));
+}
+
+const updateNonLayoutAds = (req, res, docKey, adData) => {
+
+	const { adUnitId, newData, siteDomain } = adData;
+
+	return helpers
+		.adUpdateProcessing(req, res, docKey, docWithCas => {
+			const doc = docWithCas.value;
+
+			// Add isAdmin Check
+			if (!req.user.isSuperUser) {
+				throw new AdPushupError({
+					message: 'Unauthorized Request',
+					code: HTTP_STATUS.PERMISSION_DENIED
+				});
+			}
+
+			let prevConfig = {}, currentConfig = {};
+
+			_.forEach(doc.ads, (ad, index) => {
+				if (ad.id === adUnitId) {
+					prevConfig = { ...ad };
+					currentConfig = { ...ad, ...newData }
+					doc.ads[index] = currentConfig;
+					return false;
+				}
+				return true;
+			});
+
+			const { siteId } = req.params;
+			const appName = "Ad Unit Inventory";
+			const { email, originalEmail } = req.user;
+
+			// log config changes
+			sendDataToAuditLogService({
+				siteId,
+				siteDomain,
+				appName,
+				type: 'app',
+				impersonateId: email,
+				userId: originalEmail,
+				prevConfig,
+				currentConfig,
+				action: {
+					name: OPS_PANEL.TOOLS,
+					data: `Ad Inventory Change - Non Layout Ad Doc Updated`
+				}
+			});
+
+			return helpers.directDBUpdate(`${docKey}${req.params.siteId}`, doc, docWithCas.cas);
+		})
+		.catch(err => errorHandler(err, res));
+};
+
+const updateApTagAd = (req, res, adData) => {
+	const docKey = docKeys.apTag;
+	return updateNonLayoutAds(req, res, docKey, adData);
+};
+
+const updateInnovativeAd = (req, res, adData) => {
+	const docKey = docKeys.interactiveAds;
+	return updateNonLayoutAds(req, res, docKey, adData);
+};
+
+const updateApLiteAd = (req, res, adData, logServiceNames) => {
+	const { logType, actionName, serviceName } = logServiceNames || {};
+	const docKey = docKeys.apLite;
+	const { adUnitId, adUnitData, siteDomain } = adData;
+
+	return helpers
+		.adUpdateProcessing(req, res, docKey, docWithCas => {
+			const doc = docWithCas.value;
+
+			// Add isAdmin Check
+			if (!req.user.isSuperUser) {
+				throw new AdPushupError({
+					message: 'Unauthorized Request',
+					code: HTTP_STATUS.PERMISSION_DENIED
+				});
+			}
+
+			let prevConfig = {}, currentConfig = {};
+			_.forEach(doc.adUnits, (ad, index) => {
+				if (ad.dfpAdUnit == adUnitId) {
+					prevConfig = { ...ad };
+					currentConfig = { ...ad, ...adUnitData }
+					doc.ads[index] = currentConfig;
+					return false;
+				}
+				return true;
+			});
+
+			const { siteId } = req.params;
+			const appName = "Ad Unit Inventory";
+			const { email, originalEmail } = req.user;
+
+			// log config changes
+			sendDataToAuditLogService({
+				siteId,
+				siteDomain,
+				appName,
+				type: 'app',
+				impersonateId: email,
+				userId: originalEmail,
+				prevConfig,
+				currentConfig,
+				action: {
+					name: OPS_PANEL.TOOLS,
+					data: `Ad Inventory Change - Non Layout Ad Doc Updated`
+				}
+			});
+
+			return helpers.directDBUpdate(`${docKey}${req.params.siteId}`, doc, docWithCas.cas);
+		})
+		.catch(err => {
+			console.log(err);
+			return errorHandler(err, res);
+		});
+};
+
+
 function fetchAmpAds(req, res, docKey) {
 	if (!req.query || !req.query.siteId) {
 		return sendErrorResponse(
@@ -415,11 +573,11 @@ function fetchAmpAds(req, res, docKey) {
 		.catch(err =>
 			err.code && err.code === 13 && err.message.includes('key does not exist')
 				? sendSuccessResponse(
-						{
-							ads: []
-						},
-						res
-				  )
+					{
+						ads: []
+					},
+					res
+				)
 				: errorHandler(err, res)
 		);
 }
@@ -638,5 +796,9 @@ module.exports = {
 	storedRequestWrapper,
 	getAmpAds,
 	publishAdPushupBuild,
-	sendDataToAuditLogService
+	sendDataToAuditLogService,
+	getAllAds,
+	updateApLiteAd,
+	updateInnovativeAd,
+	updateApTagAd
 };

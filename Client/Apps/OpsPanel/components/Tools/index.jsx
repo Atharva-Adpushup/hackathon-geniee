@@ -9,7 +9,7 @@ import AdsTxtLiveSitesEntries from './AdsTxtLiveSitesEntries';
 import BidderSettings from './BidderSettings';
 import DashboardNotifications from './DashboardNotifications';
 import authService from '../../../../services/authService';
-
+import Inventory from './Inventory';
 class Tools extends Component {
 	state = {
 		activeKey: TOOLS_IDENTIFIERS.BACKUP_ADS,
@@ -87,6 +87,8 @@ class Tools extends Component {
 				);
 			case TOOLS_IDENTIFIERS.DASHBOARD_NOTIFICATIONS:
 				return <DashboardNotifications showNotification={showNotification} />;
+			case TOOLS_IDENTIFIERS.INVENTORY:
+				return <Inventory showNotification={showNotification} />;
 		}
 	};
 
@@ -121,6 +123,7 @@ class Tools extends Component {
 								<NavItem eventKey={TOOLS_IDENTIFIERS.ADS_TXT_LIVE_SITES}>
 									Ads.txt Entries Live Sites
 								</NavItem>
+								<NavItem eventKey={TOOLS_IDENTIFIERS.INVENTORY}>Ad Unit Inventory Tab</NavItem>
 								{dashboardNotificationAccess ? (
 									<NavItem eventKey={TOOLS_IDENTIFIERS.DASHBOARD_NOTIFICATIONS}>
 										Dashboard Notifications

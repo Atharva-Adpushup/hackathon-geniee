@@ -365,6 +365,22 @@ function apiModule() {
 				body: postData
 			});
 		},
+		getAllSiteMapping() {
+			const query = N1qlQuery.fromString(
+				'Select siteId, siteDomain from AppBucket where meta().id like "site::%"'
+			);
+
+			return couchbase
+				.connectToAppBucket()
+				.then(appBucket => appBucket.queryAsync(query))
+				.then(notifications => {
+					return notifications;
+				})
+				.catch(err => {
+					console.log(err);
+					throw new AdPushupError('Something went wrong');
+				});
+		},
 		getAllNotifications() {
 			const query = N1qlQuery.fromString(
 				'Select message, actionUrl,id,dateCreated,userEmail,notificationMeta from apNotificationBucket;'
