@@ -81,7 +81,7 @@ function terminateIfSelectiveRollout(decodedMessage) {
 		if (isSelectiveRolloutEnabled) {
 			// push job to selectiveRollout queue
 			helperUtils.publishToRabbitMqQueue(
-				CONFIG.RABBITMQ.SELECTIVE_ROLLOUT.QUEUE.name,
+				CONFIG.RABBITMQ.SELECTIVE_ROLLOUT.NAME_IN_QUEUE_PUBLISHER_SERVICE,
 				decodedMessage
 			);
 
