@@ -9,6 +9,7 @@ const CustomError = require('./customError');
 const logger = require('../../../helpers/globalBucketLogger');
 const syncCDNService = require('../../../services/genieeAdSyncService/cdnSyncService/cdnSyncConsumer');
 const syncPrebidBundle = require('../../../services/genieeAdSyncService/cdnSyncService/prebidBundleSync');
+const helperUtils = require('../../../helpers/utils');
 
 const queueConfig = {
 	url: CONFIG.RABBITMQ.URL,
@@ -72,6 +73,26 @@ function validateMessageData(originalMessage) {
 	});
 }
 
+function terminateIfSelectiveRollout(decodedMessage) {
+	return siteModel.getSiteById(decodedMessage.siteId).then(site => {
+		const apConfigs = site.get('apConfigs');
+		const isSelectiveRolloutEnabled = !!apConfigs && apConfigs.isSelectiveRolloutEnabled === true;
+
+		if (isSelectiveRolloutEnabled) {
+			// push job to selectiveRollout queue
+			helperUtils.publishToRabbitMqQueue(
+				CONFIG.RABBITMQ.SELECTIVE_ROLLOUT.QUEUE.name,
+				decodedMessage
+			);
+
+			// Throw error to terminate cdnSync process
+			throw new CustomError(CONSTANTS.ERROR_MESSAGES.MESSAGE.SELECTIVE_ROLLOUT_ENABLED);
+		}
+
+		return { decodedMessage, site };
+	});
+}
+
 function processPrebidModule(data) {
 	const [site] = data;
 	const apConfigs = site.get('apConfigs');
@@ -87,18 +108,19 @@ function processPrebidModule(data) {
 
 	console.log('Separate Prebid bundle feature is enabled.');
 	const siteIdForSpecificPrebid = isSiteSpecificSeparatePrebidEnabled ? site.get('siteId') : null;
-	return syncPrebidBundle(siteIdForSpecificPrebid).then(({ name: prebidBundleName }) => [...data, prebidBundleName]);
+	return syncPrebidBundle(siteIdForSpecificPrebid).then(({ name: prebidBundleName }) => [
+		...data,
+		prebidBundleName
+	]);
 }
 
-function processPrebidAndSyncCdn(decodedMessage) {
+function processPrebidAndSyncCdn({ decodedMessage, site }) {
 	// if (!SITES_TO_PROCESS.includes(decodedMessage.siteId)) {
 	// 	console.log(`Skipping cdn processing for ${decodedMessage.siteId}`);
 	// 	return decodedMessage.siteId;
 	// }
 
-	return siteModel
-		.getSiteById(decodedMessage.siteId)
-		.then(site => Promise.join(site, userModel.getUserByEmail(site.get('ownerEmail'))))
+	return Promise.join(site, userModel.getUserByEmail(site.get('ownerEmail')))
 		.then(processPrebidModule)
 		.then(syncCDNService)
 		.then(() => decodedMessage.siteId);
@@ -119,16 +141,15 @@ function errorHandler(error, originalMessage) {
 		}
 	}
 
-	const isEmptyConsumerMessage = !!(
-		customErrorMessage === CONSTANTS.ERROR_MESSAGES.RABBITMQ.CONSUMER.EMPTY_MESSAGE
-	);
+	const isEmptyConsumerMessage =
+		customErrorMessage === CONSTANTS.ERROR_MESSAGES.RABBITMQ.CONSUMER.EMPTY_MESSAGE;
+	const isInvalidConsumerMessage =
+		customErrorMessage === CONSTANTS.ERROR_MESSAGES.MESSAGE.INVALID_DATA;
+	const isSelectiveRolloutEnabled =
+		customErrorMessage === CONSTANTS.ERROR_MESSAGES.MESSAGE.SELECTIVE_ROLLOUT_ENABLED;
 
-	const isInvalidConsumerMessage = !!(
-		customErrorMessage === CONSTANTS.ERROR_MESSAGES.MESSAGE.INVALID_DATA
-	);
-
-	if (isEmptyConsumerMessage || isInvalidConsumerMessage) {
-		if (isInvalidConsumerMessage) {
+	if (isEmptyConsumerMessage || isInvalidConsumerMessage || isSelectiveRolloutEnabled) {
+		if (isInvalidConsumerMessage || isSelectiveRolloutEnabled) {
 			consumer.acknowledge(originalMessage);
 			console.log(customErrorMessage);
 		}
@@ -155,6 +176,7 @@ function errorHandler(error, originalMessage) {
 
 function doProcessingAndAck(originalMessage) {
 	return validateMessageData(originalMessage)
+		.then(terminateIfSelectiveRollout)
 		.then(processPrebidAndSyncCdn)
 		.then((siteId = 'N/A') => {
 			counter = 0;

@@ -43,7 +43,9 @@ var CONSTANTS = {
 		MESSAGE: {
 			INVALID_DATA: 'ADPUSHUP_APP.RABBITMQ.CONSUMER: Invalid Message consumer',
 			CDN_SYNC_ERROR: 'Unable to sync file with cdn',
-			UNSYNCED_SETUP: 'Unsynced ads in setup'
+			UNSYNCED_SETUP: 'Unsynced ads in setup',
+			SELECTIVE_ROLLOUT_ENABLED:
+				'Selective Rollout is enabled. Terminating cdnSyncConsumer and forwarding syncing job to selectiveRollout queue'
 		}
 	},
 	SUCCESS_MESSAGES: {
