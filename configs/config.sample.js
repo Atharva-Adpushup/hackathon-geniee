@@ -149,6 +149,7 @@ module.exports = {
 			}
 		},
 		SELECTIVE_ROLLOUT: {
+			NAME_IN_QUEUE_PUBLISHER_SERVICE: 'SELECTIVE_ROLLOUT',
 			EXCHANGE: {
 				name: 'selectiveRollOut',
 				type: 'direct',
