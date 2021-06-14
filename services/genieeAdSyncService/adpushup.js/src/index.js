@@ -41,7 +41,7 @@ if (APTAG_ACTIVE) {
 if (INNOVATIVE_ADS_ACTIVE) {
 	var processInnovativeAds = require('../modules/interactiveAds/index').default;
 }
-// var	Tracker = require('../libs/tracker');
+var	Tracker = require('../libs/tracker');
 // var	heartBeat = require('../libs/heartBeat');
 // var	ampInit = require('./ampInit');
 
@@ -55,7 +55,7 @@ $.extend(adp, {
 	err: [],
 	utils: utils,
 	control: control,
-	// tracker: new Tracker(),
+	tracker: new Tracker(),
 	eventLogger: new EventLogger(),
 	nodewatcher: nodewatcher,
 	geniee: genieeObject,
