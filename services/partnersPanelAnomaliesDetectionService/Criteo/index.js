@@ -16,7 +16,7 @@ const API_ENDPOINT = `https://pmc.criteo.com/api/stats?apitoken=${TOKEN}`;
 
 const getDataFromPartner = function(fromDate, toDate) {
 	const queryParams = {
-		dimensions: 'domain',
+		dimensions: 'subid',
 		generator: 'daily',
 		currency: 'USD',
 		metrics: 'Revenue,CriteoDisplays',
@@ -24,7 +24,7 @@ const getDataFromPartner = function(fromDate, toDate) {
 		enddate: toDate,
 		timezone: 'PST'
 	};
-	
+
 	// 1. Get Auth token before each req
 	return axios
 		.get(
@@ -52,7 +52,7 @@ const processDataReceivedFromPublisher = data => {
 
 const initDataForpartner = function() {
 	const fromDate = moment()
-	.subtract(1, 'days')
+	.subtract(2, 'days')
 	.format('YYYY-MM-DD');
 	const toDate = fromDate;
 

@@ -650,7 +650,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		partnersPanelService: {
 			Criteo: '22 13 * * *',
 			Pubmatic: '24 13 * * *',
-			OFT: '26 14 * * *',
+			OFT: '26 13 * * *',
 			IndexExchange: '28 13 * * *',
 			OpenX: '30 13 * * *'
 		}
