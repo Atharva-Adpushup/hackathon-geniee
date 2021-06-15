@@ -2,13 +2,17 @@ const axios = require('axios');
 const URL = 'http://queuepublisher.adpushup.com/publish';
 const { PRODUCT_TEAM, OPS_TEAM, DEV_TEAM, TESTING_TEAM } = require('./config');
 
-let ownerEmails = TESTING_TEAM;
-let ownerEmailsForDevIssue = TESTING_TEAM;
+let ownerEmails = [];
+let ownerEmailsForDevIssue = [];
 if (process.env.NODE_ENV === 'production') {
-	ownerEmails = ownerEmails.concat(PRODUCT_TEAM, OPS_TEAM);
+	ownerEmails = ownerEmails.concat(TESTING_TEAM, PRODUCT_TEAM, OPS_TEAM);
 	ownerEmailsForDevIssue = DEV_TEAM;
 } else if (process.env.NODE_ENV === 'staging') {
-	ownerEmails = ownerEmails.concat(PRODUCT_TEAM);
+	ownerEmails = ownerEmails.concat(TESTING_TEAM, PRODUCT_TEAM);
+	ownerEmailsForDevIssue = TESTING_TEAM;
+} else {
+	ownerEmails = TESTING_TEAM;
+	ownerEmailsForDevIssue = TESTING_TEAM;
 }
 
 const anomaliesMailService = async ({ partner, anomalies }) => {
