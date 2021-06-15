@@ -297,14 +297,13 @@ module.exports = {
 		try {
 			var url = new URL(pageUrl);
 			Object.keys(window[customUTMObjectField]).map(key => {
-				url.searchParams.set(key, window[customUTMObjectField][key])
+				url.searchParams.set(key, window[customUTMObjectField][key]);
 			});
 
 			return url.href;
 		} catch (err) {
-			console.log(err)
+			console.log(err);
 		}
-	
 	},
 
 	sendBeacon: function(url, data, options, beaconType) {
@@ -383,7 +382,7 @@ module.exports = {
 				// for UTM Logging
 				if (commonConsts.CUSTOM_UTM_PARAMS_AND_SITE_MAPPING[adpConfig.siteId]) {
 					this.createAndFireImagePixelForUTMLog(toFeedback);
-				}	
+				}
 				return true;
 			}
 		} else {
@@ -750,7 +749,7 @@ module.exports = {
 
 			this.fireImagePixel(url.href);
 		} catch (err) {
-			console.log(err)
+			console.log(err);
 		}
 	},
 	// createAndFireImagePixelForUmLogUsingKeen: function(json) {
@@ -1384,6 +1383,7 @@ module.exports = {
 				this.log('Injecting GA tag on site');
 				const gaUrl = `${commonConsts.GOOGLE_ANALYTICS_URL}${gaTrackingId}`;
 				this.injectHeadCodeOnPage(gaUrl);
+				this.injectHeadCodeOnPage(commonConsts.UNIVERSAL_GOOGLE_ANALYTICS);
 				window.ga =
 					window.ga ||
 					function() {

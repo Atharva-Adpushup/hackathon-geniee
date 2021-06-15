@@ -30,6 +30,7 @@ module.exports = {
 	AMP_PUBLISH_URL: '//autoamp.io/publishAmpJob',
 	USER_SYNC_URL: '//e3.adpushup.com/AdPushupFeedbackWebService/user/sync',
 	GOOGLE_ANALYTICS_URL: 'https://www.googletagmanager.com/gtag/js?id=',
+	UNIVERSAL_GOOGLE_ANALYTICS: 'https://www.google-analytics.com/analytics.js',
 	GOOGLE_ANALYTICS_ID: 'G-Z0TZ7TDHS1',
 	BEACON_TYPE: {
 		AD_FEEDBACK: 'AD_FEEDBACK'
@@ -160,7 +161,9 @@ module.exports = {
 	},
 	GA_EVENTS: {
 		SCRIPT_LOADED: 'script-load',
-		PAGE_VIEW: 'ap-page-view'
+		PAGE_VIEW: 'ap-page-view',
+		SCRIPT_LOADED_SECOND: 'script-load-2',
+		PAGE_VIEW_SECOND: 'ap-page-view-2'
 	},
 	CUSTOM_UTM_PARAMS_AND_SITE_MAPPING: {
 		42184: 'jita_tg_params', //thedailywobble.com
@@ -168,7 +171,7 @@ module.exports = {
 		42186: 'jita_tg_params', //twistity.com
 		42431: 'jita_tg_params', //freshcardio.com
 		42535: 'jita_tg_params', //fizzsy.com
-		42575: 'jita_tg_params'  //Saucyrecipes.com
+		42575: 'jita_tg_params' //Saucyrecipes.com
 	},
 	JQUERY_CDN_URL: '//code.jquery.com/jquery-2.2.2.min.js'
 };

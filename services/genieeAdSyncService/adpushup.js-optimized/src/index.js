@@ -25,10 +25,6 @@ function start() {
 		utils.injectHeadCodeOnPage(config.prebidBundleUrl);
 	}
 
-	if (GA_ANALYTICS_ACTIVE) {
-		utils.checkAndInjectGAHeadCode();
-	}
-
 	if (LAYOUT_ACTIVE) {
 		var selectVariation = require('./variationSelectionModels/index');
 		var nodewatcher = require('../libs/nodeWatcher');
@@ -408,7 +404,22 @@ function start() {
 		// Initialise adp config
 		initAdpConfig();
 
+		if (GA_ANALYTICS_ACTIVE) {
+			utils.checkAndInjectGAHeadCode();
+			utils.checkAndInjectUniversalGAHeadCode();
+		}
+
 		utils.emitGaEvent(commonConsts.GA_EVENTS.SCRIPT_LOADED);
+
+		const gaEventSampling1 = window.adpushup.config.gaEventSampling1;
+		const gaEventSampling2 = window.adpushup.config.gaEventSampling2;
+		const currentFallBack = Math.random() * 100;
+		if (gaEventSampling1 && currentFallBack <= gaEventSampling1) {
+			utils.emitGa3Event(commonConsts.GA_EVENTS.SCRIPT_LOADED);
+		}
+		if (gaEventSampling2 && currentFallBack <= gaEventSampling2) {
+			utils.emitGa3Event(commonConsts.GA_EVENTS.SCRIPT_LOADED_SECOND);
+		}
 
 		utils.logPerformanceEvent(commonConsts.EVENT_LOGGER.EVENTS.MAIN_FN_CALL_DELAY);
 
@@ -481,7 +492,10 @@ function start() {
 			.then(cmpApplicable => {
 				utils.log('cmpApplicable', cmpApplicable);
 				if (cmpApplicable) {
-					adp.config.renderPostBid = (adp.config.postBidEnabled === null || adp.config.postBidEnabled === undefined) ? true : adp.config.postBidEnabled;
+					adp.config.renderPostBid =
+						adp.config.postBidEnabled === null || adp.config.postBidEnabled === undefined
+							? true
+							: adp.config.postBidEnabled;
 					return loadGoogleFundingChoicesCmp();
 				}
 				return '';
