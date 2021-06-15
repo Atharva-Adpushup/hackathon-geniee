@@ -6,7 +6,7 @@ var browserConfig = require('./browserConfig.js'),
 	Base64 = require('Base64'),
 	UM_LOG_ENDPOINT = '//app-log.adpushup.com/umlogv5?data=',
 	// UM_LOG_KEEN_ENDPOINT =
-		//'api.keen.io/3.0/projects/5f6455365cf9803b3732965b/events/umlogv1?api_key=a871c7c98adc1b99fbf72820e0704d22bdcae4b9a1d0e2af20b46fe3cf2087d5def88f1e829db5715b4db29f18110d61c5896928ea0fde2e46a2116e91eb24aeb1656ed4a7a58db13f54ae1f8825ea690a34cfaa8001912d88266b9349140537&data=',
+	//'api.keen.io/3.0/projects/5f6455365cf9803b3732965b/events/umlogv1?api_key=a871c7c98adc1b99fbf72820e0704d22bdcae4b9a1d0e2af20b46fe3cf2087d5def88f1e829db5715b4db29f18110d61c5896928ea0fde2e46a2116e91eb24aeb1656ed4a7a58db13f54ae1f8825ea690a34cfaa8001912d88266b9349140537&data=',
 	FETCH_URL_KEY_VALUE_RETRY_LIMIT = 3,
 	FETCH_URL_KEY_RETRY_TIMEOUT = 50;
 
@@ -48,9 +48,26 @@ module.exports = {
 	// All feedback packets are generated from this function except event 2, 3 and 4.
 	sendFeedback: function(options) {
 		var adp = window.adpushup;
-		
-		if (!adp.gaPageViewLogSent && adp.config.mode === 1) {
+		var sectionSuccessStatus =
+			options.ads &&
+			options.ads.length &&
+			options.ads.filter(function(ad) {
+				return ad.status === 1;
+			});
+		if (
+			!adp.gaPageViewLogSent &&
+			(adp.config.mode === 1 || (sectionSuccessStatus && sectionSuccessStatus.length > 0))
+		) {
 			this.emitGaEvent(commonConsts.GA_EVENTS.PAGE_VIEW);
+			const gaEventSampling1 = window.adpushup.config.gaEventSampling1;
+			const gaEventSampling2 = window.adpushup.config.gaEventSampling2;
+			const currentFallBack = Math.random() * 100;
+			if (gaEventSampling1 && currentFallBack <= gaEventSampling1) {
+				this.emitGa3Event(commonConsts.GA_EVENTS.PAGE_VIEW);
+			}
+			if (gaEventSampling2 && currentFallBack <= gaEventSampling2) {
+				this.emitGa3Event(commonConsts.GA_EVENTS.PAGE_VIEW_SECOND);
+			}
 			window.adpushup.gaPageViewLogSent = true;
 		}
 
@@ -123,7 +140,7 @@ module.exports = {
 		script.html = str;
 		(d.getElementsByTagName('head')[0] || d.getElementsByTagName('body')[0]).appendChild(script);
 	},
-	requestServer: function (url, data, timeout, method, dataType, contentType) {
+	requestServer: function(url, data, timeout, method, dataType, contentType) {
 		adp.$.support.cors = true;
 		return adp.$.ajax({
 			url: url,
@@ -280,7 +297,7 @@ module.exports = {
 		var url = new URL(pageUrl);
 		Object.keys(window[customUTMObjectField]).map(key => {
 			url.searchParams.set(key, window[customUTMObjectField][key]);
-		})
+		});
 		return url.href;
 	},
 	sendBeacon: function(url, data, options, beaconType) {
@@ -295,7 +312,10 @@ module.exports = {
 			}
 
 			if (commonConsts.CUSTOM_UTM_PARAMS_AND_SITE_MAPPING[adpConfig.siteId]) {
-				adpConfig.pageUrl = this.customUTMParamsHandling(commonConsts.CUSTOM_UTM_PARAMS_AND_SITE_MAPPING[adpConfig.siteId], adpConfig.pageUrl)
+				adpConfig.pageUrl = this.customUTMParamsHandling(
+					commonConsts.CUSTOM_UTM_PARAMS_AND_SITE_MAPPING[adpConfig.siteId],
+					adpConfig.pageUrl
+				);
 			}
 
 			var feedbackObj = {
@@ -739,7 +759,7 @@ module.exports = {
 				adp.config.pageUrl
 			);
 		}
-		
+
 		var pageUrlMappingServiceEndpoint = adp.config.pageUrlMappingServiceEndpoint
 			.replace('__PAGE_URL__', this.base64Encode(adp.config.pageUrl))
 			.replace('__SITE_ID__', adp.config.siteId);
@@ -762,10 +782,7 @@ module.exports = {
 		)
 			.done(function(response) {
 				const { data } = response || {};
-				const  {
-					urlKeys,
-					utmKeys = {}
-				} = data || {};
+				const { urlKeys, utmKeys = {} } = data || {};
 
 				const { urlTargetingKey, urlTargetingValue } = urlKeys || {};
 
@@ -801,7 +818,6 @@ module.exports = {
 
 				hasSuceeded = true;
 				adp.urmRequestStatus = commonConsts.URM_REPORTING.EVENTS.SUCCESS;
-
 			})
 			.fail(function(xhr) {
 				const { responseText, getAllResponseHeaders } = xhr;
@@ -810,7 +826,7 @@ module.exports = {
 				if (retryCount < FETCH_URL_KEY_VALUE_RETRY_LIMIT) {
 					let retryTimeout = FETCH_URL_KEY_RETRY_TIMEOUT * retryCount;
 					adp.utils.log(`Retrying ${retryCount}, timeout: ${retryTimeout}`);
-					setTimeout(() => { 
+					setTimeout(() => {
 						adp.pageUrlMappingRetries = retryCount;
 						utils.fetchAndSetKeyValueForUrlReporting(adp);
 					}, retryTimeout);
@@ -1338,6 +1354,27 @@ module.exports = {
 		var ua = navigator.userAgent;
 		return ua && ua.includes('Lighthouse') && commonConsts.LIGHTHOUSE_HACK_SITES.includes(siteId);
 	},
+	checkAndInjectUniversalGAHeadCode: function() {
+		//here we are setting GA3 head code
+		const gaTrackingId = window.adpushup.config.gaTrackingId;
+		if (gaTrackingId) {
+			if (window.ga && typeof window.ga === 'function') {
+				this.log('Universal GA tag already present on site');
+			} else {
+				this.log('Injecting GA tag on site');
+				const gaUrl = `${commonConsts.GOOGLE_ANALYTICS_URL}${gaTrackingId}`;
+				this.injectHeadCodeOnPage(gaUrl);
+				this.injectHeadCodeOnPage(commonConsts.UNIVERSAL_GOOGLE_ANALYTICS);
+				window.ga =
+					window.ga ||
+					function() {
+						(ga.q = ga.q || []).push(arguments);
+					};
+				ga.l = +new Date();
+			}
+			window.ga('create', gaTrackingId, 'auto', 'adpushupClientTracker');
+		}
+	},
 	checkAndInjectGAHeadCode: function() {
 		if (window.gtag && typeof window.gtag === 'function') {
 			this.log('GA tag already present on site');
@@ -1366,6 +1403,21 @@ module.exports = {
 			const siteid = window.adpushup.config.siteId;
 			this.log(`Emitting event ${action} for site ${siteid}`);
 			window.gtag('event', action, { send_to: commonConsts.GOOGLE_ANALYTICS_ID, siteid });
+		}
+	},
+	emitGa3Event: function(action) {
+		const gaTrackingId = window.adpushup.config.gaTrackingId;
+		if (
+			gaTrackingId &&
+			window.adpushup.config.enableGAAnalytics &&
+			window.ga &&
+			typeof window.ga === 'function'
+		) {
+			const siteid = window.adpushup.config.siteId;
+			this.log(`Emitting event ${action} for site ${siteid}`);
+			window.ga('adpushupClientTracker.send', 'event', 'user-interaction', action, `${siteid}`, {
+				nonInteraction: true
+			});
 		}
 	},
 	injectJqueryIfDoesntExist: function(callback) {

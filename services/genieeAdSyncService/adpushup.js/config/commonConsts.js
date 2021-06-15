@@ -29,6 +29,7 @@ module.exports = {
 	},
 	AMP_PUBLISH_URL: '//autoamp.io/publishAmpJob',
 	USER_SYNC_URL: '//e3.adpushup.com/AdPushupFeedbackWebService/user/sync',
+	UNIVERSAL_GOOGLE_ANALYTICS: 'https://www.google-analytics.com/analytics.js',
 	GOOGLE_ANALYTICS_URL: 'https://www.googletagmanager.com/gtag/js?id=',
 	GOOGLE_ANALYTICS_ID: 'G-Z0TZ7TDHS1',
 	BEACON_TYPE: {
