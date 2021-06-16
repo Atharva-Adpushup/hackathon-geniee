@@ -1037,8 +1037,6 @@ class Report extends Component {
 			<Tooltip placement="top">
 				{dimension && dimensionData && <div>Report By: {dimensionData}</div>}
 				{intervals && intervals !== '' && <div>Interval: {intervals}</div>}
-				{startDate && <div>Start Date: {startDate}</div>}
-				{endDate && <div>End Date: {endDate}</div>}
 				{filterUi}
 			</Tooltip>
 		);
