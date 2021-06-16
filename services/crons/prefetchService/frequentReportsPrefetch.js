@@ -3,7 +3,7 @@ const _ = require('lodash');
 const couchbase = require('couchbase');
 const promisePool = require('@supercharge/promise-pool');
 const uuid = require('uuid').v4;
-
+const config = require('../../../configs/config');
 const { getReportingData, getAllUsersForFreqReportsLog } = require('./core');
 const couchbaseService = require('../../../helpers/couchBaseService');
 
@@ -215,7 +215,10 @@ const preprocessLogs = async logs => {
 		if (Object.keys(currentLogs).length) {
 			allLogsResult.push({
 				...currentLogs,
-				results: orderLogsByMostFrequent(currentLogs.results)
+				results: orderLogsByMostFrequent(currentLogs.results).slice(
+					0,
+					config.frequentReportsCachingLimit
+				)
 			});
 		}
 		return allLogsResult;
@@ -227,7 +230,11 @@ const cacheFrequentReports = () => {
 	console.log('----- STARTING FREQUENT REPORTS PREFETCH -------');
 	const dates = getDatesToProcessFrequentReports();
 	console.log({ dates });
-	// const emailsToTest = ['sriram.r@adpushup.com', 'abhishek.sontakke@adpushup.com', 'mayank.madan@adpushup.com'];
+	// const emailsToTest = [
+	// 	'sriram.r@adpushup.com',
+	// 	'abhishek.sontakke@adpushup.com',
+	// 	'mayank.madan@adpushup.com'
+	// ];
 
 	return getAllUsersForFreqReportsLog()
 		.then(userEmails => fetchAccessLogsForUsers(userEmails, dates))
