@@ -4,7 +4,7 @@ const Promise = require('bluebird');
 const uuid = require('node-uuid');
 const request = require('request-promise');
 const _ = require('lodash');
-
+const HTTP_STATUSES = require('../configs/httpStatusConsts');
 const userModel = require('../models/userModel');
 const siteModel = require('../models/siteModel');
 const utils = require('../helpers/utils');
@@ -301,8 +301,17 @@ router
 				return true;
 			});
 	})
-	.get('/findUsers', (req, res) =>
-		appBucket
+	.get('/findUsers', (req, res) => {
+		const { isSuperUser } = req.user;
+		if (!isSuperUser)
+			return sendErrorResponse(
+				{
+					message: 'Unauthorized Request'
+				},
+				res,
+				HTTP_STATUSES.UNAUTHORIZED
+			);
+		return appBucket
 			.queryDB(
 				`SELECT email, ARRAY site.domain
 	              FOR site IN sites WHEN site.domain IS NOT MISSING END AS domains ,
@@ -323,8 +332,8 @@ router
 					res
 				);
 			})
-			.catch(err => errorHandler(err, res))
-	)
+			.catch(err => errorHandler(err, res));
+	})
 	.post('/switchUser', (req, res) => {
 		let { email } = req.body;
 		email = utils.htmlEntities(utils.sanitiseString(email));
