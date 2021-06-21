@@ -4,7 +4,7 @@ const Promise = require('bluebird');
 const uuid = require('node-uuid');
 const request = require('request-promise');
 const _ = require('lodash');
-const HTTP_STATUSES = require('../configs/httpStatusConsts');
+
 const userModel = require('../models/userModel');
 const siteModel = require('../models/siteModel');
 const utils = require('../helpers/utils');
@@ -309,7 +309,7 @@ router
 					message: 'Unauthorized Request'
 				},
 				res,
-				HTTP_STATUSES.UNAUTHORIZED
+				httpStatus.UNAUTHORIZED
 			);
 		return appBucket
 			.queryDB(
