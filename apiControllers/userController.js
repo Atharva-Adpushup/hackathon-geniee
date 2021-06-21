@@ -301,8 +301,17 @@ router
 				return true;
 			});
 	})
-	.get('/findUsers', (req, res) =>
-		appBucket
+	.get('/findUsers', (req, res) => {
+		const { isSuperUser } = req.user;
+		if (!isSuperUser)
+			return sendErrorResponse(
+				{
+					message: 'Unauthorized Request'
+				},
+				res,
+				httpStatus.UNAUTHORIZED
+			);
+		return appBucket
 			.queryDB(
 				`SELECT email, ARRAY site.domain
 	              FOR site IN sites WHEN site.domain IS NOT MISSING END AS domains ,
@@ -323,8 +332,8 @@ router
 					res
 				);
 			})
-			.catch(err => errorHandler(err, res))
-	)
+			.catch(err => errorHandler(err, res));
+	})
 	.post('/switchUser', (req, res) => {
 		let { email } = req.body;
 		email = utils.htmlEntities(utils.sanitiseString(email));
