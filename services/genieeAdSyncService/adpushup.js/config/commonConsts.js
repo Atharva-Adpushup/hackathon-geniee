@@ -160,7 +160,7 @@ module.exports = {
 		SUPPORTED_FORMATS: ['STICKYBOTTOM']
 	},
 	GA_EVENTS: {
-		SCRIPT_LOADED: 'script-load',
+		SCRIPT_LOADED: 'script-loaded',
 		PAGE_VIEW: 'ap-page-view',
 		SCRIPT_LOADED_SECOND: 'script-load-2',
 		PAGE_VIEW_SECOND: 'ap-page-view-2'
