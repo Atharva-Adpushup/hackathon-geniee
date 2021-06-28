@@ -50,11 +50,13 @@ class HeaderBiddingRuleActions extends React.Component {
 	// -------------------------- rendering --------------------------
 
 	renderAddActionButton() {
-		const { actions, dropdownOptions, onAddAction } = this.props;
+		const { actions, dropdownOptions, onAddAction, isForOps } = this.props;
 
 		const { keyOptions } = dropdownOptions;
 		const supportedOptions = keyOptions.filter(option => !option.isNotSupported);
-		const consumedAllSupportedOptions = actions.length >= supportedOptions.length;
+		const consumedAllSupportedOptions = isForOps
+			? actions.length === supportedOptions.length - 1
+			: actions.length >= supportedOptions.length;
 
 		return (
 			<Button
@@ -121,7 +123,12 @@ class HeaderBiddingRuleActions extends React.Component {
 
 		const radioElementTypes = ['s2s_toggle', 'disable_header_bidding'];
 		const numberElementTypes = ['initial_timeout', 'refresh_timeout', 's2s_timeout'];
-		const dropdownElementTypes = ['formats', 'allowed_bidders', 'significant_bidders'];
+		const dropdownElementTypes = [
+			'formats',
+			'allowed_bidders',
+			'disallowed_bidders',
+			'significant_bidders'
+		];
 
 		if (dropdownElementTypes.includes(elementType)) {
 			const validCurrentValue = Array.isArray(currentValue) ? currentValue : [];

@@ -13,14 +13,15 @@ const createMapForDropdown = options =>
 class HeaderBiddingRulesList extends React.Component {
 	renderTableBodyRows = () => {
 		const {
-			rules,
+			rules = [],
 			onEditRule,
 			onToggleStatus,
 			actionKeyOptions,
 			actionValueOptions,
 			triggerKeyOptions,
 			triggerOperatorOptions,
-			triggerValueOptions
+			triggerValueOptions,
+			isForOps
 		} = this.props;
 
 		if (!rules.length) {
@@ -49,7 +50,7 @@ class HeaderBiddingRulesList extends React.Component {
 		}, {});
 
 		return rules.map((rule, index) => {
-			const { isActive, triggers, actions, createdAt } = rule;
+			const { isActive, triggers, actions, createdAt, isGlobal } = rule;
 
 			const triggersContent = triggers.map((trigger, triggerIndex) => {
 				// key, operator, value
@@ -101,7 +102,10 @@ class HeaderBiddingRulesList extends React.Component {
 				} else if (typeof value === 'number') {
 					valueContent = key.includes('timeout') ? `${value} ms` : value;
 				} else if (Array.isArray(value)) {
-					valueContent = value.map(val => actionsValueMap[key][val]).join(', ');
+					valueContent = value
+						.map(val => actionsValueMap[key][val])
+						.filter(val => val)
+						.join(', ');
 				}
 
 				return (
@@ -116,7 +120,11 @@ class HeaderBiddingRulesList extends React.Component {
 			return (
 				<tr key={`rule-${createdAt}`}>
 					<td>{index + 1}</td>
-					<td>{moment(createdAt).format('lll')}</td>
+
+					<td>
+						{!isForOps && isGlobal ? <span className="global-rule">Global Rule</span> : null}{' '}
+						{moment(createdAt).format('lll')}
+					</td>
 					<td>
 						<div className="triggers-section">
 							<div className="section-heading">Triggers</div>
@@ -128,7 +136,11 @@ class HeaderBiddingRulesList extends React.Component {
 						</div>
 					</td>
 					<td>
-						<Button className="btn-primary" onClick={() => onEditRule(index)}>
+						<Button
+							className="btn-primary"
+							onClick={() => onEditRule(index)}
+							disabled={!isForOps && isGlobal}
+						>
 							Edit
 						</Button>
 					</td>
@@ -143,6 +155,7 @@ class HeaderBiddingRulesList extends React.Component {
 							id={`rule-status-${index}`}
 							on="Enable"
 							off="Disable"
+							disabled={!isForOps && isGlobal}
 						/>
 					</td>
 				</tr>

@@ -14,7 +14,7 @@
 		></span>
 		<table
 			class="body"
-			style="Margin:0;background:#f3f6f8;border-collapse:collapse;border-spacing:0;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;height:100%;line-height:1.3;margin:0;padding:0;text-align:left;vertical-align:top;width:100%"
+			style="Margin:0;background:#FFFFFF;border-collapse:collapse;border-spacing:0;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;height:100%;line-height:1.3;margin:0;padding:0;text-align:left;vertical-align:top;width:100%"
 		>
 			<tr style="padding:0;text-align:left;vertical-align:top">
 				<td
@@ -23,32 +23,17 @@
 					valign="top"
 					style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;hyphens:auto;line-height:1.3;margin:0;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
 				>
-					<center data-parsed="" style="min-width:580px;width:100%">
+					<center data-parsed="" style="min-width:600px;width:100%">
 						<table
 							align="center"
 							class="container float-center"
-							style="Margin:0 auto;background:#fefefe;border-collapse:collapse;border-spacing:0;float:none;margin:0 auto;padding:0;text-align:center;vertical-align:top;width:580px"
+							style="Margin:0 auto;background:#fefefe;border-collapse:collapse;border-spacing:0;float:none;margin:0 auto;padding:0;text-align:center;vertical-align:top;width:600px;background-color: #FFDEDE;margin-top: 50px;"
 						>
 							<tbody>
 								<tr style="padding:0;text-align:left;vertical-align:top">
 									<td
-										style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;hyphens:auto;line-height:1.3;margin:0;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
+										style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;hyphens:auto;line-height:1.3;margin:0;padding:0;text-align:left;vertical-align:top;word-wrap:break-word;"
 									>
-										<table
-											class="spacer u-transparent"
-											style="background-color:#f3f6f8!important;border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-										>
-											<tbody>
-												<tr style="padding:0;text-align:left;vertical-align:top">
-													<td
-														height="64px"
-														style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:64px;font-weight:400;hyphens:auto;line-height:64px;margin:0;mso-line-height-rule:exactly;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-													>
-														&#xA0;
-													</td>
-												</tr>
-											</tbody>
-										</table>
 										<table
 											class="wrapper header"
 											align="center"
@@ -56,8 +41,8 @@
 										>
 											<tr style="padding:0;text-align:left;vertical-align:top">
 												<td
-													class="wrapper-inner"
-													style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;hyphens:auto;line-height:1.3;margin:0;padding:20px;text-align:left;vertical-align:top;word-wrap:break-word"
+													class="main-header"
+													style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;hyphens:auto;line-height:1.3;margin:0;padding: 20px 10px 20px 0px;text-align:left;vertical-align:top;word-wrap:break-word;background-color: #FF4954;"
 												>
 													<table
 														align="center"
@@ -88,9 +73,8 @@
 																							<th
 																								style="Margin:0;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0;padding:0;text-align:left"
 																							>
-																								<img
-																									src=<%= adpLogo %>
-																									style="-ms-interpolation-mode:bicubic;clear:both;display:block;max-width:100%;outline:0;text-decoration:none;width:auto;height:40px;"
+																								<img src=<%= adpLogo %>
+																								style="-ms-interpolation-mode:bicubic;clear:both;display:block;max-width:100%;outline:0;text-decoration:none;width:auto;height:35px;"
 																								/>
 																							</th>
 																						</tr>
@@ -111,9 +95,14 @@
 																							>
 																								<p
 																									class="text-right"
-																									style="Margin:0;Margin-bottom:10px;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0;margin-bottom:10px;padding:0;padding-top:15px;text-align:right"
+																									style="Margin:0;Margin-bottom:10px;color:#FFFFFF;font-family:system-ui;font-size:14px;font-weight:400;line-height:1.3;margin:0;margin-bottom:10px;padding:0;padding-top:10px;text-align:right;font-weight: bold;"
 																								>
-																									<%= type=="weekly"?`${fromReportingDate} - ${toReportingDate}`:`${fromReportingDate}` %>
+																									<span style="color: #FFB5B5;">FROM</span> <%= `
+																									${fromReportingDate} ` %>
+																									<span style="color:#FFB5B5;padding-left: 15px;"
+																										>TO</span
+																									>
+																									<%= `${toReportingDate}` %>
 																								</p>
 																							</th>
 																						</tr>
@@ -131,14 +120,14 @@
 										</table>
 
 										<table
-											class="row u-primary-color--dark u-gradient-linear-primary-inverse u-thColsPB-none"
-											style="background-color:#cf474b!important;background-image:linear-gradient(to bottom,#cf474b,#eb575c);border-collapse:collapse;border-spacing:0;display:table;padding:0;position:relative;text-align:left;vertical-align:top;width:100%"
+											class="performance-overview"
+											style="border-collapse:collapse;border-spacing:0;display:table;padding:0;position:relative;text-align:left;vertical-align:top;width:100%;margin-top: 20px;"
 										>
 											<tbody>
 												<tr style="padding:0;text-align:left;vertical-align:top">
 													<th
-														class="small-1 large-1 columns first"
-														style="Margin:0 auto;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0 auto;padding:0;padding-bottom:0!important;padding-left:16px;padding-right:8px;text-align:left;width:32.33px"
+														class="border-padding-common"
+														style="Margin:0 auto;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0 auto;padding:0;padding-bottom:16px;text-align:left;width:15px;background-color: #FFDEDE;"
 													>
 														<table
 															style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
@@ -150,49 +139,204 @@
 															</tr>
 														</table>
 													</th>
-													<th
-														class="small-12 large-12 columns"
-														style="Margin:0 auto;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0 auto;padding:0;padding-bottom:0!important;padding-left:8px;padding-right:8px;text-align:left;width:564px"
-													>
+													<th style="background-color: #FF4954;border-radius: 10px;">
 														<table
-															style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
+															class="estimated-earning-header"
+															style="padding-left: 10px;
+														padding-top: 10px;
+														font-weight: bold;
+														font-size: 24px;
+														font-family: Arial;
+														color:#FFFFFF;"
 														>
-															<tr style="padding:0;text-align:left;vertical-align:top">
-																<th
-																	style="Margin:0;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0;padding:0;text-align:left"
-																>
+															<tr>
+																<th>
+																	Performance Overview
+																</th>
+															</tr>
+														</table>
+
+														<table style="width: 100%;">
+															<tr>
+																<th>
 																	<table
-																		class="spacer"
-																		style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
+																		style="width: 85%;margin-left: 10px;margin-top: 5px;border-collapse: collapse;margin-bottom: 10px;"
 																	>
-																		<tbody>
-																			<tr style="padding:0;text-align:left;vertical-align:top">
+																		<tbody
+																			style="    color: #161616;
+																		font-size: 22px;
+																		font-weight: 600;"
+																		>
+																			<tr class="horizontal-table-spacing-pink-10px">
 																				<td
-																					height="25px"
-																					style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:25px;font-weight:400;hyphens:auto;line-height:25px;margin:0;mso-line-height-rule:exactly;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
+																					style="padding: 0;margin: 0;border-color: #FF4954;
+																				background-color: #FF4954;
+																				border: 0px;"
 																				>
-																					&#xA0;
+																					<hr
+																						style="padding: 0;margin: 0;border-color: #FF4954;
+																					background-color: #FF4954;
+																					border: 0px;height: 10px;"
+																					/>
+																				</td>
+																				<td
+																					style="padding: 0;margin: 0;border-color: #FF4954;
+																				background-color: #FF4954;
+																				border: 0px;"
+																				>
+																					<hr
+																						style="padding: 0;margin: 0;border-color: #FF4954;
+																					background-color: #FF4954;
+																					border: 0px;height: 10px;"
+																					/>
+																				</td>
+																				<td
+																					style="padding: 0;margin: 0;border-color: #FF4954;
+																				background-color: #FF4954;
+																				border: 0px;"
+																				>
+																					<hr
+																						style="padding: 0;margin: 0;border-color: #FF4954;
+																					background-color: #FF4954;
+																					border: 0px;height: 10px;"
+																					/>
+																				</td>
+																			</tr>
+																			<tr
+																				style="font-size: 13px;
+																				color: #FFDEDE;
+																				font-weight: 600;
+																				"
+																			>
+																				<td>
+																					Net Revenue*
+																				</td>
+																				<td>
+																					Page Views
+																				</td>
+																				<td>
+																					Page Rpm
+																				</td>
+																			</tr>
+																			<tr style="color:#FFFFFF">
+																				<td>
+																					<%= `$
+																					${allReportingData.getStatsByCustom.total.total_network_net_revenue||0}`
+																					%>
+																				</td>
+																				<td>
+																					<%=
+																					`${allReportingData.getStatsByCustom.total.total_adpushup_page_views||0}`
+																					%>
+																				</td>
+																				<td>
+																					<%= `$
+																					${allReportingData.getStatsByCustom.total.total_adpushup_page_cpm||0}`
+																					%>
+																				</td>
+																			</tr>
+																			<tr class="horizontal-table-spacing-pink">
+																				<td
+																					style="padding: 0;margin: 0;border-color: #FF4954;
+																				background-color: #FF4954;
+																				border: 0px;"
+																				>
+																					<hr
+																						style="padding: 0;margin: 0;border-color: #FF4954;
+																					background-color: #FF4954;
+																					border: 0px;height: 20px;"
+																					/>
+																				</td>
+																				<td
+																					style="padding: 0;margin: 0;border-color: #FF4954;
+																				background-color: #FF4954;
+																				border: 0px;"
+																				>
+																					<hr
+																						style="padding: 0;margin: 0;border-color: #FF4954;
+																					background-color: #FF4954;
+																					border: 0px;height: 20px;"
+																					/>
+																				</td>
+																				<td
+																					style="padding: 0;margin: 0;border-color: #FF4954;
+																				background-color: #FF4954;
+																				border: 0px;"
+																				>
+																					<hr
+																						style="padding: 0;margin: 0;border-color: #FF4954;
+																					background-color: #FF4954;
+																					border: 0px;height: 20px;"
+																					/>
+																				</td>
+																			</tr>
+																			<tr
+																				style="font-size: 13px;
+																			color: #FFDEDE;font-weight: 600;"
+																			>
+																				<td>
+																					Impressions
+																				</td>
+																				<td>
+																					Ad eCPM
+																				</td>
+																			</tr>
+																			<tr style="color: #FFFFFF;">
+																				<td>
+																					<%=
+																					`${allReportingData.getStatsByCustom.total.total_network_impressions||0}`
+																					%>
+																				</td>
+																				<td>
+																					<%= `$
+																					${allReportingData.getStatsByCustom.total.total_network_ad_ecpm||0}`
+																					%>
+																				</td>
+																			</tr>
+																			<tr class="horizontal-table-spacing-pink-10px">
+																				<td
+																					style="padding: 0;margin: 0;border-color: #FF4954;
+																				background-color: #FF4954;
+																				border: 0px;"
+																				>
+																					<hr
+																						style="padding: 0;margin: 0;border-color: #FF4954;
+																					background-color: #FF4954;
+																					border: 0px;height: 10px;"
+																					/>
+																				</td>
+																				<td
+																					style="padding: 0;margin: 0;border-color: #FF4954;
+																				background-color: #FF4954;
+																				border: 0px;"
+																				>
+																					<hr
+																						style="padding: 0;margin: 0;border-color: #FF4954;
+																					background-color: #FF4954;
+																					border: 0px;height: 10px;"
+																					/>
+																				</td>
+																				<td
+																					style="padding: 0;margin: 0;border-color: #FF4954;
+																				background-color: #FF4954;
+																				border: 0px;"
+																				>
+																					<hr
+																						style="padding: 0;margin: 0;border-color: #FF4954;
+																					background-color: #FF4954;
+																					border: 0px;height: 10px;"
+																					/>
 																				</td>
 																			</tr>
 																		</tbody>
 																	</table>
-																	<h3
-																		class="text-bold text-center u-color-white u-margin-0"
-																		style="Margin:0;Margin-bottom:10px;color:#fefefe!important;font-family:Helvetica,Arial,sans-serif;font-size:20px;font-weight:400;line-height:1.3;margin:0!important;margin-bottom:10px;padding:0;text-align:center;word-wrap:normal;text-align: left;font-weight: bold"
-																	>
-																		Estimated Net Revenue
-																	</h3>
 																</th>
-																<th
-																	class="expander"
-																	style="Margin:0;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0;padding:0!important;text-align:left;visibility:hidden;width:0"
-																></th>
 															</tr>
 														</table>
 													</th>
 													<th
-														class="small-1 large-1 columns last"
-														style="Margin:0 auto;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0 auto;padding:0;padding-bottom:0!important;padding-left:8px;padding-right:16px;text-align:left;width:32.33px"
+														class="border-padding-common"
+														style="Margin:0 auto;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0 auto;padding:0;padding-bottom:16px;text-align:left;width:15px;background-color: #FFDEDE;"
 													>
 														<table
 															style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
@@ -208,14 +352,14 @@
 											</tbody>
 										</table>
 										<table
-											class="row u-primary-color u-gradient-linear-primary"
-											style="background-color:#eb575c!important;background-image:linear-gradient(to bottom,#eb575c,#cf474b);border-collapse:collapse;border-spacing:0;display:table;padding:0;position:relative;text-align:left;vertical-align:top;width:100%"
+											class="estimated-net-revenue"
+											style="border-collapse:collapse;border-spacing:0;display:table;padding:0;position:relative;text-align:left;vertical-align:top;width:100%;margin-top: 20px;"
 										>
 											<tbody>
 												<tr style="padding:0;text-align:left;vertical-align:top">
 													<th
-														class="small-1 large-1 columns first"
-														style="Margin:0 auto;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0 auto;padding:0;padding-bottom:16px;padding-left:16px;padding-right:8px;text-align:left;width:32.33px"
+														class="border-padding-common"
+														style="Margin:0 auto;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0 auto;padding:0;padding-bottom:16px;text-align:left;width:15px;background-color: #FFDEDE;"
 													>
 														<table
 															style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
@@ -227,419 +371,297 @@
 															</tr>
 														</table>
 													</th>
-													<th
-														class="small-10 large-10 columns"
-														style="Margin:0 auto;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0 auto;padding:0;padding-bottom:16px;padding-left:8px;padding-right:8px;text-align:left;width:467.33px"
-													>
+													<th style="background-color: #FFFFFF;border-radius: 10px;">
 														<table
-															style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
+															class="estimated-earning-header"
+															style="padding-left: 10px;
+														padding-top: 10px;
+														font-weight: bold;
+														font-size: 24px;
+														font-family: Arial;
+														color:#FF4954;"
 														>
-															<tr style="padding:0;text-align:left;vertical-align:top">
-																<th
-																	style="Margin:0;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0;padding:0;text-align:left"
-																>
-																	<table
-																		class="wrapper hero-heading-wrapper"
-																		align="center"
-																		style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																	>
-																		<tr style="padding:0;text-align:left;vertical-align:top">
-																			<td
-																				class="wrapper-inner"
-																				style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;hyphens:auto;line-height:1.3;margin:0;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																			>
-																				<table
-																					class="spacer"
-																					style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																				>
-																					<tbody>
-																						<tr
-																							style="padding:0;text-align:left;vertical-align:top"
-																						>
-																							<td
-																								height="30px"
-																								style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:30px;font-weight:400;hyphens:auto;line-height:30px;margin:0;mso-line-height-rule:exactly;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																							>
-																								&#xA0;
-																							</td>
-																						</tr>
-																					</tbody>
-																				</table>
-																				<h6
-																					class="text-center heading-caption"
-																					style="Margin:0;Margin-bottom:10px;color:#fff;font-family:Helvetica,Arial,sans-serif;font-size:12px;font-weight:400;letter-spacing:.9px;line-height:1.3;margin:0;margin-bottom:0;padding:0;text-align:center;text-transform:uppercase;word-wrap:normal"
-																				>
-																					Yesterday vs Same Day Last Week
-																				</h6>
-																				<table
-																					class="spacer"
-																					style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																				>
-																					<tbody>
-																						<tr
-																							style="padding:0;text-align:left;vertical-align:top"
-																						>
-																							<td
-																								height="4px"
-																								style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:4px;font-weight:400;hyphens:auto;line-height:4px;margin:0;mso-line-height-rule:exactly;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																							>
-																								&#xA0;
-																							</td>
-																						</tr>
-																					</tbody>
-																				</table>
-																				<h2
-																					class="text-center heading-main"
-																					style="Margin:0;Margin-bottom:10px;color:#fff;font-family:Helvetica,Arial,sans-serif;font-size:35px;font-weight:500;letter-spacing:-1px;line-height:1;margin:0;margin-bottom:0;padding:10px 0;text-align:center;text-transform:uppercase;word-wrap:normal"
-																				>
-																					<%=
-																					`$${allReportingData.estimatedRevenue.result[0].yesterday||0}
-																					/
-																					$${allReportingData.estimatedRevenue.result[0].sameDayLastWeek||0}`
-																					%>
-																				</h2>
-																				<table
-																					class="spacer"
-																					style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																				>
-																					<tbody>
-																						<tr
-																							style="padding:0;text-align:left;vertical-align:top"
-																						>
-																							<td
-																								height="8px"
-																								style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:8px;font-weight:400;hyphens:auto;line-height:8px;margin:0;mso-line-height-rule:exactly;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																							>
-																								&#xA0;
-																							</td>
-																						</tr>
-																					</tbody>
-																				</table>
-																				<h6
-																					class="text-center heading-description"
-																					style="Margin:0;Margin-bottom:10px;color:#fff;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;letter-spacing:.3px;line-height:1.4;margin:0;margin-bottom:10px;padding:0;text-align:center;word-wrap:normal"
-																				>
-																					<%= `(${allReportingData.progressData.dayProgress}%` %>
-																					<span
-																						class="u-text-highlight"
-																						style="font-size:1.1em;font-weight:700!important"
-																						><img
-																							class="u-icon u-vAlign-middle"
-																							src=<%= allReportingData.progressData.dayProgress>0?arrowUp:arrowDown %>
-																							style="-ms-interpolation-mode:bicubic;clear:both;display:inline-block;max-width:100%;outline:0;text-decoration:none;vertical-align:middle;width:auto"
-																					/></span>
-																					<%= `)` %>
-																				</h6>
-																				<!-- <table
-																					class="spacer"
-																					style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																				>
-																					<tbody>
-																						<tr
-																							style="padding:0;text-align:left;vertical-align:top"
-																						>
-																							<td
-																								height="27px"
-																								style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:27px;font-weight:400;hyphens:auto;line-height:27px;margin:0;mso-line-height-rule:exactly;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																							>
-																								&#xA0;
-																							</td>
-																						</tr>
-																					</tbody>
-																				</table> -->
-																			</td>
-																		</tr>
-																	</table>
-
-																	<table
-																		class="spacer"
-																		style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																	>
-																		<tbody>
-																			<tr style="padding:0;text-align:left;vertical-align:top">
-																				<td
-																					height="10px"
-																					style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:10px;font-weight:400;hyphens:auto;line-height:10px;margin:0;mso-line-height-rule:exactly;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																				>
-																					&#xA0;
-																				</td>
-																			</tr>
-																		</tbody>
-																	</table>
+															<tr>
+																<th>
+																	Estimated Net Revenue
 																</th>
 															</tr>
 														</table>
 
-														<table
-															style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-														>
-															<tr style="padding:0;text-align:left;vertical-align:top">
-																<th
-																	style="Margin:0;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0;padding:0;text-align:left"
-																>
+														<table style="width: 100%;">
+															<tr>
+																<th>
 																	<table
-																		class="wrapper hero-heading-wrapper"
-																		align="center"
-																		style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
+																		style="width: 100%;margin-left: 10px;margin-top: 5px;border-collapse: collapse;margin-bottom: 10px;"
 																	>
-																		<tr style="padding:0;text-align:left;vertical-align:top">
-																			<td
-																				class="wrapper-inner"
-																				style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;hyphens:auto;line-height:1.3;margin:0;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																			>
-																				<table
-																					class="spacer"
-																					style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																				>
-																					<tbody>
-																						<tr
-																							style="padding:0;text-align:left;vertical-align:top"
-																						>
-																							<td
-																								height="30px"
-																								style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:30px;font-weight:400;hyphens:auto;line-height:30px;margin:0;mso-line-height-rule:exactly;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																							>
-																								&#xA0;
-																							</td>
-																						</tr>
-																					</tbody>
-																				</table>
-																				<h6
-																					class="text-center heading-caption"
-																					style="Margin:0;Margin-bottom:10px;color:#fff;font-family:Helvetica,Arial,sans-serif;font-size:12px;font-weight:400;letter-spacing:.9px;line-height:1.3;margin:0;margin-bottom:0;padding:0;text-align:center;text-transform:uppercase;word-wrap:normal"
-																				>
-																					Last 7 days VS Previous 7 days
-																				</h6>
-																				<table
-																					class="spacer"
-																					style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																				>
-																					<tbody>
-																						<tr
-																							style="padding:0;text-align:left;vertical-align:top"
-																						>
-																							<td
-																								height="4px"
-																								style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:4px;font-weight:400;hyphens:auto;line-height:4px;margin:0;mso-line-height-rule:exactly;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																							>
-																								&#xA0;
-																							</td>
-																						</tr>
-																					</tbody>
-																				</table>
-																				<h2
-																					class="text-center heading-main"
-																					style="Margin:0;Margin-bottom:10px;color:#fff;font-family:Helvetica,Arial,sans-serif;font-size:35px;font-weight:500;letter-spacing:-1px;line-height:1;margin:0;margin-bottom:0;padding:10px 0;text-align:center;text-transform:uppercase;word-wrap:normal"
-																				>
-																					<%=
-																					`$${allReportingData.estimatedRevenue.result[0].lastSevenDays||0}
-																					/
-																					$${allReportingData.estimatedRevenue.result[0].previousSevenDays||0}`
-																					%>
-																				</h2>
-																				<table
-																					class="spacer"
-																					style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																				>
-																					<tbody>
-																						<tr
-																							style="padding:0;text-align:left;vertical-align:top"
-																						>
-																							<td
-																								height="8px"
-																								style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:8px;font-weight:400;hyphens:auto;line-height:8px;margin:0;mso-line-height-rule:exactly;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																							>
-																								&#xA0;
-																							</td>
-																						</tr>
-																					</tbody>
-																				</table>
-																				<h6
-																					class="text-center heading-description"
-																					style="Margin:0;Margin-bottom:10px;color:#fff;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;letter-spacing:.3px;line-height:1.4;margin:0;margin-bottom:10px;padding:0;text-align:center;word-wrap:normal"
-																				>
-																					<%= `(${allReportingData.progressData.weekProgress}%` %>
-																					<span
-																						class="u-text-highlight"
-																						style="font-size:1.1em;font-weight:700!important"
-																						><img
-																							class="u-icon u-vAlign-middle"
-																							src=<%= allReportingData.progressData.weekProgress>0?arrowUp:arrowDown %>
-																							style="-ms-interpolation-mode:bicubic;clear:both;display:inline-block;max-width:100%;outline:0;text-decoration:none;vertical-align:middle;width:auto"
-																					/></span>
-																					<%= `)` %>
-																				</h6>
-																				<!-- <table
-																					class="spacer"
-																					style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																				>
-																					<tbody>
-																						<tr
-																							style="padding:0;text-align:left;vertical-align:top"
-																						>
-																							<td
-																								height="27px"
-																								style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:27px;font-weight:400;hyphens:auto;line-height:27px;margin:0;mso-line-height-rule:exactly;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																							>
-																								&#xA0;
-																							</td>
-																						</tr>
-																					</tbody>
-																				</table> -->
-																			</td>
-																		</tr>
-																	</table>
-
-																	<table
-																		class="spacer"
-																		style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																	>
-																		<tbody>
-																			<tr style="padding:0;text-align:left;vertical-align:top">
+																		<tbody
+																			style="    color: #2A2733;
+																		font-size: 22px;
+																		font-weight: 600;"
+																		>
+																			<tr class="horizontal-table-spacing-#FFFFFF-10px">
 																				<td
-																					height="10px"
-																					style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:10px;font-weight:400;hyphens:auto;line-height:10px;margin:0;mso-line-height-rule:exactly;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
+																					style="padding: 0;margin: 0;border-color: #FFFFFF;
+																			background-color:#FFFFFF;
+																			border: 0px;"
 																				>
-																					&#xA0;
+																					<hr
+																						style="padding: 0;margin: 0;border-color:#FFFFFF;
+																				background-color: #FFFFFF;
+																				border: 0px;height: 10px;"
+																					/>
+																				</td>
+																				<td
+																					style="padding: 0;margin: 0;border-color: #FFFFFF;
+																			background-color:#FFFFFF;
+																			border: 0px;"
+																				>
+																					<hr
+																						style="padding: 0;margin: 0;border-color:#FFFFFF;
+																				background-color: #FFFFFF;
+																				border: 0px;height: 10px;"
+																					/>
+																				</td>
+																				<td
+																					style="padding: 0;margin: 0;border-color: #FFFFFF;
+																			background-color:#FFFFFF;
+																			border: 0px;"
+																				>
+																					<hr
+																						style="padding: 0;margin: 0;border-color:#FFFFFF;
+																				background-color: #FFFFFF;
+																				border: 0px;height: 10px;"
+																					/>
 																				</td>
 																			</tr>
-																		</tbody>
-																	</table>
-																</th>
-															</tr>
-														</table>
 
-														<table
-															style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-														>
-															<tr style="padding:0;text-align:left;vertical-align:top">
-																<th
-																	style="Margin:0;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0;padding:0;text-align:left"
-																>
-																	<table
-																		class="wrapper hero-heading-wrapper"
-																		align="center"
-																		style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																	>
-																		<tr style="padding:0;text-align:left;vertical-align:top">
-																			<td
-																				class="wrapper-inner"
-																				style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;hyphens:auto;line-height:1.3;margin:0;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
+																			<tr
+																				style="font-size: 13px;
+																				color: #5A5A5A;
+																				font-weight: 600;"
 																			>
-																				<table
-																					class="spacer"
-																					style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																				>
-																					<tbody>
-																						<tr
-																							style="padding:0;text-align:left;vertical-align:top"
-																						>
-																							<td
-																								height="30px"
-																								style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:30px;font-weight:400;hyphens:auto;line-height:30px;margin:0;mso-line-height-rule:exactly;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																							>
-																								&#xA0;
-																							</td>
-																						</tr>
-																					</tbody>
-																				</table>
-																				<h6
-																					class="text-center heading-caption"
-																					style="Margin:0;Margin-bottom:10px;color:#fff;font-family:Helvetica,Arial,sans-serif;font-size:12px;font-weight:400;letter-spacing:.9px;line-height:1.3;margin:0;margin-bottom:0;padding:0;text-align:center;text-transform:uppercase;word-wrap:normal"
-																				>
-																					Last 30 days VS Previous 30 days
-																				</h6>
-																				<table
-																					class="spacer"
-																					style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																				>
-																					<tbody>
-																						<tr
-																							style="padding:0;text-align:left;vertical-align:top"
-																						>
-																							<td
-																								height="4px"
-																								style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:4px;font-weight:400;hyphens:auto;line-height:4px;margin:0;mso-line-height-rule:exactly;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																							>
-																								&#xA0;
-																							</td>
-																						</tr>
-																					</tbody>
-																				</table>
-																				<h2
-																					class="text-center heading-main"
-																					style="Margin:0;Margin-bottom:10px;color:#fff;font-family:Helvetica,Arial,sans-serif;font-size:35px;font-weight:500;letter-spacing:-1px;line-height:1;margin:0;margin-bottom:0;padding:10px 0;text-align:center;text-transform:uppercase;word-wrap:normal"
-																				>
-																					<%=
-																					`$${allReportingData.estimatedRevenue.result[0].lastThirtyDays||0}
-																					/
-																					$${allReportingData.estimatedRevenue.result[0].previousThirtyDays||0}`
+																				<td>
+																					Yesterday
+																				</td>
+																				<td>
+																					Same Day Last Week
+																				</td>
+																				<td>
+																					% change
+																				</td>
+																				<td></td>
+																			</tr>
+																			<tr>
+																				<td>
+																					<%= `$
+																					${allReportingData.estimatedRevenue.result[0].yesterday||0}`
 																					%>
-																				</h2>
-																				<table
-																					class="spacer"
-																					style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																				>
-																					<tbody>
-																						<tr
-																							style="padding:0;text-align:left;vertical-align:top"
-																						>
-																							<td
-																								height="8px"
-																								style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:8px;font-weight:400;hyphens:auto;line-height:8px;margin:0;mso-line-height-rule:exactly;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																							>
-																								&#xA0;
-																							</td>
-																						</tr>
-																					</tbody>
-																				</table>
-																				<h6
-																					class="text-center heading-description"
-																					style="Margin:0;Margin-bottom:10px;color:#fff;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;letter-spacing:.3px;line-height:1.4;margin:0;margin-bottom:10px;padding:0;text-align:center;word-wrap:normal"
-																				>
-																					<%= `(${allReportingData.progressData.monthProgress}%` %>
-																					<span
-																						class="u-text-highlight"
-																						style="font-size:1.1em;font-weight:700!important"
-																						><img
-																							class="u-icon u-vAlign-middle"
-																							src=<%= allReportingData.progressData.monthProgress>0?arrowUp:arrowDown %>
-																							style="-ms-interpolation-mode:bicubic;clear:both;display:inline-block;max-width:100%;outline:0;text-decoration:none;vertical-align:middle;width:auto"
-																					/></span>
-																					<%= `)` %>
-																				</h6>
-																				<!-- <table
-																					class="spacer"
-																					style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																				>
-																					<tbody>
-																						<tr
-																							style="padding:0;text-align:left;vertical-align:top"
-																						>
-																							<td
-																								height="27px"
-																								style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:27px;font-weight:400;hyphens:auto;line-height:27px;margin:0;mso-line-height-rule:exactly;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																							>
-																								&#xA0;
-																							</td>
-																						</tr>
-																					</tbody>
-																				</table> -->
-																			</td>
-																		</tr>
-																	</table>
-
-																	<table
-																		class="spacer"
-																		style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																	>
-																		<tbody>
-																			<tr style="padding:0;text-align:left;vertical-align:top">
+																				</td>
+																				<td>
+																					<%= `$
+																					${allReportingData.estimatedRevenue.result[0].sameDayLastWeek||0}`
+																					%>
+																				</td>
+																				<td style="font-weight: 600;font-size: 16px;">
+																					<% if(allReportingData.progressData.dayProgress>0){ %>
+																					<span style="color:#1CA54B"
+																						><%= `${allReportingData.progressData.dayProgress}%`
+																						%></span
+																					>
+																					<% } else { %>
+																					<span style="color:#FF4954;"
+																						><%= `${allReportingData.progressData.dayProgress}%`
+																						%></span
+																					>
+																					<% } %>
+																				</td>
+																			</tr>
+																			<tr class="estimated-earning-linebreak">
+																				<td style="padding: 0;margin: 0;">
+																					<hr
+																						style="    border: none;
+    height: 1px;
+    color: #c1a6a6;
+    background-color: #c1a6a6;"
+																					/>
+																				</td>
+																				<td style="padding: 0;margin: 0;">
+																					<hr
+																						style="    border: none;
+    height: 1px;
+    color: #c1a6a6;
+    background-color: #c1a6a6;"
+																					/>
+																				</td>
+																				<td style="padding: 0;margin: 0;">
+																					<hr
+																						style="    border: none;
+    height: 1px;
+    color: #c1a6a6;
+    background-color: #c1a6a6;"
+																					/>
+																				</td>
 																				<td
-																					height="10px"
-																					style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:10px;font-weight:400;hyphens:auto;line-height:10px;margin:0;mso-line-height-rule:exactly;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
+																					style="padding: 0;margin: 0;padding-right: 20px;width: 15%;"
 																				>
-																					&#xA0;
+																					<hr
+																						style="    border: none;
+    height: 1px;
+    color: #c1a6a6;
+    background-color: #c1a6a6;"
+																					/>
+																				</td>
+																			</tr>
+																			<tr
+																				style="font-size: 13px;
+																			color: #5A5A5A;
+																				font-weight: 600;"
+																			>
+																				<td>
+																					Last 7 Days
+																				</td>
+																				<td>
+																					Previous 7 Days
+																				</td>
+																				<td>
+																					% Change
+																				</td>
+																			</tr>
+																			<tr>
+																				<td>
+																					<%= `$
+																					${allReportingData.estimatedRevenue.result[0].lastSevenDays||0}`
+																					%>
+																				</td>
+																				<td>
+																					<%= `$
+																					${allReportingData.estimatedRevenue.result[0].previousSevenDays||0}`
+																					%>
+																				</td>
+																				<td style="font-weight: 600;font-size: 16px;">
+																					<% if(allReportingData.progressData.weekProgress>0){ %>
+																					<span style="color:#1CA54B"
+																						><%= `${allReportingData.progressData.weekProgress}%`
+																						%></span
+																					>
+																					<% } else { %>
+																					<span style="color: #FF4954;"
+																						><%= `${allReportingData.progressData.weekProgress}%`
+																						%></span
+																					>
+																					<% } %>
+																				</td>
+																			</tr>
+																			<tr class="estimated-earning-linebreak">
+																				<td style="padding: 0;margin: 0;">
+																					<hr
+																						style="    border: none;
+    height: 1px;
+    color: #c1a6a6;
+    background-color: #c1a6a6;"
+																					/>
+																				</td>
+																				<td style="padding: 0;margin: 0;">
+																					<hr
+																						style="    border: none;
+    height: 1px;
+    color: #c1a6a6;
+    background-color: #c1a6a6;"
+																					/>
+																				</td>
+																				<td style="padding: 0;margin: 0;">
+																					<hr
+																						style="    border: none;
+    height: 1px;
+    color: #c1a6a6;
+    background-color: #c1a6a6;"
+																					/>
+																				</td>
+																				<td
+																					style="padding: 0;margin: 0;padding-right: 20px;width: 15%;"
+																				>
+																					<hr
+																						style="    border: none;
+    height: 1px;
+    color: #c1a6a6;
+    background-color: #c1a6a6;"
+																					/>
+																				</td>
+																			</tr>
+																			<tr
+																				style="font-size: 13px;
+																			color: #5A5A5A;
+																				font-weight: 600;"
+																			>
+																				<td>
+																					Last 30 Days
+																				</td>
+																				<td>
+																					Previous 30 Days
+																				</td>
+																				<td>
+																					% Change
+																				</td>
+																				<th></th>
+																			</tr>
+																			<tr>
+																				<td>
+																					<%= `$
+																					${allReportingData.estimatedRevenue.result[0].lastThirtyDays||0}`
+																					%>
+																				</td>
+																				<td>
+																					<%= `$
+																					${allReportingData.estimatedRevenue.result[0].previousThirtyDays||0}`
+																					%>
+																				</td>
+																				<td style="font-weight: 600;font-size: 16px;">
+																					<% if(allReportingData.progressData.monthProgress>0){ %>
+																					<span style="color:#1CA54B"
+																						><%= `${allReportingData.progressData.monthProgress}%`
+																						%></span
+																					>
+																					<% } else { %>
+																					<span style="color:#FF4954;"
+																						><%= `${allReportingData.progressData.monthProgress}%`
+																						%></span
+																					>
+																					<% } %>
+																				</td>
+																			</tr>
+																			<tr class="horizontal-table-spacing-white-10px">
+																				<td
+																					style="padding: 0;margin: 0;border-color: #FFFFFF;
+																				background-color:#FFFFFF;
+																				border: 0px;"
+																				>
+																					<hr
+																						style="padding: 0;margin: 0;border-color:#FFFFFF;
+																					background-color: #FFFFFF;
+																					border: 0px;height: 10px;"
+																					/>
+																				</td>
+																				<td
+																					style="padding: 0;margin: 0;border-color: #FFFFFF;
+																				background-color:#FFFFFF;
+																				border: 0px;"
+																				>
+																					<hr
+																						style="padding: 0;margin: 0;border-color:#FFFFFF;
+																					background-color: #FFFFFF;
+																					border: 0px;height: 10px;"
+																					/>
+																				</td>
+																				<td
+																					style="padding: 0;margin: 0;border-color: #FFFFFF;
+																				background-color:#FFFFFF;
+																				border: 0px;"
+																				>
+																					<hr
+																						style="padding: 0;margin: 0;border-color:#FFFFFF;
+																					background-color: #FFFFFF;
+																					border: 0px;height: 10px;"
+																					/>
 																				</td>
 																			</tr>
 																		</tbody>
@@ -649,8 +671,745 @@
 														</table>
 													</th>
 													<th
-														class="small-1 large-1 columns last"
-														style="Margin:0 auto;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0 auto;padding:0;padding-bottom:16px;padding-left:8px;padding-right:16px;text-align:left;width:32.33px"
+														class="border-padding-common"
+														style="Margin:0 auto;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0 auto;padding:0;padding-bottom:16px;text-align:left;width:15px;background-color: #FFDEDE;"
+													>
+														<table
+															style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
+														>
+															<tr style="padding:0;text-align:left;vertical-align:top">
+																<th
+																	style="Margin:0;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0;padding:0;text-align:left"
+																></th>
+															</tr>
+														</table>
+													</th>
+												</tr>
+											</tbody>
+										</table>
+										<% if(isApVsBaslineChartShown){ %>
+										<table
+											class="adpushup-vs-original"
+											style="border-collapse:collapse;border-spacing:0;display:table;padding:0;position:relative;text-align:left;vertical-align:top;width:100%;margin-top: 20px;"
+										>
+											<tbody>
+												<tr style="padding:0;text-align:left;vertical-align:top">
+													<th
+														class="border-padding-common"
+														style="Margin:0 auto;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0 auto;padding:0;padding-bottom:16px;text-align:left;width:15px;background-color: #FFDEDE;"
+													>
+														<table
+															style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
+														>
+															<tr style="padding:0;text-align:left;vertical-align:top">
+																<th
+																	style="Margin:0;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0;padding:0;text-align:left"
+																></th>
+															</tr>
+														</table>
+													</th>
+													<th style="background-color: #FFFFFF;border-radius: 10px;">
+														<table
+															class="estimated-earning-header"
+															style="padding-left: 10px;
+														padding-top: 10px;
+														font-weight: bold;
+														font-size: 24px;
+														font-family: Arial;
+														color:#FF4954;"
+														>
+															<tr>
+																<th>
+																	How We Performed This Week
+																</th>
+															</tr>
+															<tr>
+																<th
+																	style="font-size: 16px;
+																	color: #5A5A5A;
+																	font-weight: 600;;
+															"
+																>
+																	AdPushup vs Without AdPushup
+																</th>
+															</tr>
+															<tr class="horizontal-table-spacing-white-10px">
+																<td
+																	style="padding: 0;margin: 0;border-color: #FFFFFF;
+																background-color:#FFFFFF;
+																border: 0px;"
+																>
+																	<hr
+																		style="padding: 0;margin: 0;border-color:#FFFFFF;
+																	background-color: #FFFFFF;
+																	border: 0px;height: 10px;"
+																	/>
+																</td>
+															</tr>
+														</table>
+
+														<table style="width: 100%;">
+															<tr>
+																<th>
+																	<table
+																		style="width: 100%;margin-left: 10px;margin-top: 5px;border-collapse: collapse;margin-bottom: 10px;margin-right: 10px;"
+																	>
+																		<tbody
+																			style="    color: #161616;
+																		font-size: 20px;
+																		font-weight: 600;"
+																		>
+																			<tr
+																				style="font-size: 13px;
+																				color: #c1a6a6;"
+																			>
+																				<td>
+																					<img alt="Cost per mille (CPM) Contribution" src=<%=
+																					allReportingData.charts.cpmLine.imagePath %>
+																					style="-ms-interpolation-mode:bicubic;clear:both;display:block;width:95%;outline:0;text-decoration:none;"
+																					/>
+																				</td>
+																			</tr>
+																		</tbody>
+																	</table>
+																</th>
+															</tr>
+														</table>
+													</th>
+													<th
+														class="border-padding-common"
+														style="Margin:0 auto;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0 auto;padding:0;padding-bottom:16px;text-align:left;width:15px;background-color: #FFDEDE;"
+													>
+														<table
+															style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
+														>
+															<tr style="padding:0;text-align:left;vertical-align:top">
+																<th
+																	style="Margin:0;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0;padding:0;text-align:left"
+																></th>
+															</tr>
+														</table>
+													</th>
+												</tr>
+											</tbody>
+										</table>
+										<% } %>
+										<table
+											class="network-wise-revenue"
+											style="border-collapse:collapse;border-spacing:0;display:table;padding:0;position:relative;text-align:left;vertical-align:top;width:100%;margin-top: 20px;"
+										>
+											<tbody>
+												<tr style="padding:0;text-align:left;vertical-align:top">
+													<th
+														class="border-padding-common"
+														style="Margin:0 auto;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0 auto;padding:0;padding-bottom:16px;text-align:left;width:15px;background-color: #FFDEDE;"
+													>
+														<table
+															style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
+														>
+															<tr style="padding:0;text-align:left;vertical-align:top">
+																<th
+																	style="Margin:0;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0;padding:0;text-align:left"
+																></th>
+															</tr>
+														</table>
+													</th>
+													<th style="background-color: #FFFFFF;border-radius: 10px;">
+														<table
+															class="estimated-earning-header"
+															style="padding-left: 10px;
+														padding-top: 10px;
+														font-weight: bold;
+														font-size: 24px;
+														font-family: Arial;
+														color:#FF4954;"
+														>
+															<tr>
+																<th>
+																	Network-wise Revenue
+																</th>
+															</tr>
+														</table>
+
+														<table style="width: 100%;">
+															<tr>
+																<th>
+																	<table
+																		style="width: 100%;margin-left: 0px;margin-top: 0px;border-collapse: collapse;margin-bottom: 10px;margin-right: 10px;"
+																	>
+																		<tbody
+																			style="    color: #161616;
+																		font-size: 20px;
+																		font-weight: 600;"
+																		>
+																			<tr
+																				style="font-size: 13px;
+																				color: #c1a6a6;"
+																			>
+																				<td style="width: 100%;">
+																					<img alt="Ad Network Wise Revenue Contribution" src=<%=
+																					allReportingData.charts.adNetworkRevenuePie.imagePath %>
+																					style="-ms-interpolation-mode:bicubic;clear:both;display:block;max-width:100%;outline:0;text-decoration:none;width:auto"
+																					/>
+																				</td>
+																			</tr>
+																			<tr>
+																				<td style="width: 100%;">
+																					<table style="width: 100%;">
+																						<tbody>
+																							<tr>
+																								<td
+																									style="    padding-left: 10px;
+																								padding-top: 15px;
+																								font-size: 14px;
+																								color: #2A2733;
+																							"
+																								>
+																									Others
+																								</td>
+																							</tr>
+																							<tr>
+																								<td
+																									style="width: 100%;font-size: 12px;color:#5A5A5A;font-weight: 600;"
+																								>
+																									<table style="width: 100%;">
+																										<tbody>
+																											<tr>
+																												<td
+																													style="width: 35%;padding-right: 5%;
+																												padding-left: 1%;vertical-align: top"
+																												>
+																													<table style="width: 90%;">
+																														<!-- here comes left table -->
+																														<%for (let result of
+																														allReportingData.charts.adNetworkRevenuePie.networkSeriesDataForTableLeft){%>
+																														<%if (result) { %>
+																														<tr>
+																															<td
+																																style="padding-right:20px;padding-bottom: 5px;"
+																															>
+																																<%= result.name %>
+																															</td>
+																															<td
+																																style="padding-bottom: 5px;text-align: end;"
+																															>
+																																<%= `${result.percent}%` %>
+																															</td>
+																														</tr>
+																														<%}%> <%}%>
+																													</table>
+																												</td>
+																												<td
+																													style="width: 35%;    padding-left: 5%;
+																												padding-right: 1%;vertical-align: top"
+																												>
+																													<table style="width: 90%;">
+																														<!-- here comes left table -->
+																														<%for (let result of
+																														allReportingData.charts.adNetworkRevenuePie.networkSeriesDataForTableRight){%>
+																														<%if (result) { %>
+																														<tr>
+																															<td
+																																style="padding-right:20px;padding-bottom: 5px;"
+																															>
+																																<%= result.name %>
+																															</td>
+																															<td
+																																style="padding-bottom: 5px;text-align: end;"
+																															>
+																																<%= `${result.percent}%` %>
+																															</td>
+																														</tr>
+																														<%}%> <%}%>
+																													</table>
+																												</td>
+																											</tr>
+																										</tbody>
+																									</table>
+																								</td>
+																							</tr>
+																						</tbody>
+																					</table>
+																				</td>
+																			</tr>
+																		</tbody>
+																	</table>
+																</th>
+															</tr>
+														</table>
+													</th>
+													<th
+														class="border-padding-common"
+														style="Margin:0 auto;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0 auto;padding:0;padding-bottom:16px;text-align:left;width:15px;background-color: #FFDEDE;"
+													>
+														<table
+															style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
+														>
+															<tr style="padding:0;text-align:left;vertical-align:top">
+																<th
+																	style="Margin:0;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0;padding:0;text-align:left"
+																></th>
+															</tr>
+														</table>
+													</th>
+												</tr>
+											</tbody>
+										</table>
+										<table
+											class="estimated-net-revenue"
+											style="border-collapse:collapse;border-spacing:0;display:table;padding:0;position:relative;text-align:left;vertical-align:top;width:100%;margin-top: 20px;"
+										>
+											<tbody>
+												<tr style="padding:0;text-align:left;vertical-align:top">
+													<th
+														class="border-padding-common"
+														style="Margin:0 auto;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0 auto;padding:0;padding-bottom:16px;text-align:left;width:15px;background-color: #FFDEDE;"
+													>
+														<table
+															style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
+														>
+															<tr style="padding:0;text-align:left;vertical-align:top">
+																<th
+																	style="Margin:0;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0;padding:0;text-align:left"
+																></th>
+															</tr>
+														</table>
+													</th>
+													<th style="background-color: #FFFFFF;border-radius: 10px;">
+														<table
+															class="estimated-earning-header"
+															style="padding-left: 10px;
+														padding-top: 10px;
+														font-weight: bold;
+														font-size: 24px;
+														font-family: Arial;
+														color:#FF4954;"
+														>
+															<tr>
+																<th>
+																	Site-wise Report
+																</th>
+															</tr>
+														</table>
+
+														<table style="width: 100%;">
+															<tr>
+																<th>
+																	<table
+																		style="margin-left: 10px;margin-top: 5px;border-collapse: collapse;margin-bottom: 10px;width: 97%;"
+																	>
+																		<tbody
+																			style="    color: #161616;
+																		font-size: 20px;
+																		font-weight: 600;"
+																		>
+																			<tr class="horizontal-table-spacing-#FFFFFF-10px">
+																				<td
+																					style="padding: 0;margin: 0;border-color: #FFFFFF;
+																			background-color:#FFFFFF;
+																			border: 0px;"
+																				>
+																					<hr
+																						style="padding: 0;margin: 0;border-color:#FFFFFF;
+																				background-color: #FFFFFF;
+																				border: 0px;height: 10px;"
+																					/>
+																				</td>
+																				<td
+																					style="padding: 0;margin: 0;border-color: #FFFFFF;
+																			background-color:#FFFFFF;
+																			border: 0px;"
+																				>
+																					<hr
+																						style="padding: 0;margin: 0;border-color:#FFFFFF;
+																				background-color: #FFFFFF;
+																				border: 0px;height: 10px;"
+																					/>
+																				</td>
+																				<td
+																					style="padding: 0;margin: 0;border-color: #FFFFFF;
+																			background-color:#FFFFFF;
+																			border: 0px;"
+																				>
+																					<hr
+																						style="padding: 0;margin: 0;border-color:#FFFFFF;
+																				background-color: #FFFFFF;
+																				border: 0px;height: 10px;"
+																					/>
+																				</td>
+																			</tr>
+
+																			<tr
+																				style="font-size: 12px;
+																				color: #2A2733;font-weight: bold;
+																				font-family: Arial;
+																				"
+																			>
+																				<td>
+																					Website
+																				</td>
+																				<td>
+																					Page Views
+																				</td>
+																				<td>
+																					Page RPM
+																				</td>
+																				<td>
+																					Impressions
+																				</td>
+																				<td>
+																					Ad eCPM
+																				</td>
+																				<td>
+																					Net Revenue*
+																				</td>
+																			</tr>
+
+																			<%for (let result of allReportingData.siteSummary.result){%>
+																			<%if (result.siteName!=="0.00") { %>
+																			<tr class="estimated-earning-linebreak">
+																				<td style="padding: 0;margin: 0;">
+																					<hr
+																						style="    border: none;
+    height: 1px;
+    color: #c1a6a6;
+    background-color: #c1a6a6;"
+																					/>
+																				</td>
+																				<td style="padding: 0;margin: 0;">
+																					<hr
+																						style="    border: none;
+    height: 1px;
+    color: #c1a6a6;
+    background-color: #c1a6a6;"
+																					/>
+																				</td>
+																				<td style="padding: 0;margin: 0;">
+																					<hr
+																						style="    border: none;
+    height: 1px;
+    color: #c1a6a6;
+    background-color: #c1a6a6;"
+																					/>
+																				</td>
+																				<td style="padding: 0;margin: 0;">
+																					<hr
+																						style="    border: none;
+    height: 1px;
+    color: #c1a6a6;
+    background-color: #c1a6a6;"
+																					/>
+																				</td>
+																				<td style="padding: 0;margin: 0;">
+																					<hr
+																						style="    border: none;
+    height: 1px;
+    color: #c1a6a6;
+    background-color: #c1a6a6;"
+																					/>
+																				</td>
+																				<td style="padding: 0;margin: 0;">
+																					<hr
+																						style="    border: none;
+    height: 1px;
+    color: #c1a6a6;
+    background-color: #c1a6a6;"
+																					/>
+																				</td>
+																			</tr>
+																			<tr
+																				style="font-weight: 600;
+																		font-size: 12px;"
+																			>
+																				<td>
+																					<%= `${result.siteName||""}` %>
+																				</td>
+																				<td>
+																					<%= `${result.adpushup_page_views||""}` %>
+																				</td>
+																				<td>
+																					<%= `$ ${result.adpushup_page_cpm||""}` %>
+																				</td>
+																				<td>
+																					<%= `${result.network_impressions||""}` %>
+																				</td>
+																				<td>
+																					<%= `$ ${result.network_ad_ecpm||""}` %>
+																				</td>
+																				<td>
+																					<%= `$ ${result.network_net_revenue||""}` %>
+																				</td>
+																			</tr>
+																			<% } %> <%}%>
+																			<tr class="estimated-earning-linebreak">
+																				<td style="padding: 0;margin: 0;">
+																					<hr
+																						style="    border: none;
+    height: 1px;
+    color: #c1a6a6;
+    background-color: #c1a6a6;"
+																					/>
+																				</td>
+																				<td style="padding: 0;margin: 0;">
+																					<hr
+																						style="    border: none;
+    height: 1px;
+    color: #c1a6a6;
+    background-color: #c1a6a6;"
+																					/>
+																				</td>
+																				<td style="padding: 0;margin: 0;">
+																					<hr
+																						style="    border: none;
+    height: 1px;
+    color: #c1a6a6;
+    background-color: #c1a6a6;"
+																					/>
+																				</td>
+																				<td style="padding: 0;margin: 0;">
+																					<hr
+																						style="    border: none;
+    height: 1px;
+    color: #c1a6a6;
+    background-color: #c1a6a6;"
+																					/>
+																				</td>
+																				<td style="padding: 0;margin: 0;">
+																					<hr
+																						style="    border: none;
+    height: 1px;
+    color: #c1a6a6;
+    background-color: #c1a6a6;"
+																					/>
+																				</td>
+																				<td style="padding: 0;margin: 0;">
+																					<hr
+																						style="    border: none;
+    height: 1px;
+    color: #c1a6a6;
+    background-color: #c1a6a6;"
+																					/>
+																				</td>
+																			</tr>
+
+																			<tr class="horizontal-table-spacing-white-10px">
+																				<td
+																					style="padding: 0;margin: 0;border-color: #FFFFFF;
+																				background-color:#FFFFFF;
+																				border: 0px;"
+																				>
+																					<hr
+																						style="padding: 0;margin: 0;border-color:#FFFFFF;
+																					background-color: #FFFFFF;
+																					border: 0px;height: 10px;"
+																					/>
+																				</td>
+																				<td
+																					style="padding: 0;margin: 0;border-color: #FFFFFF;
+																				background-color:#FFFFFF;
+																				border: 0px;"
+																				>
+																					<hr
+																						style="padding: 0;margin: 0;border-color:#FFFFFF;
+																					background-color: #FFFFFF;
+																					border: 0px;height: 10px;"
+																					/>
+																				</td>
+																				<td
+																					style="padding: 0;margin: 0;border-color: #FFFFFF;
+																				background-color:#FFFFFF;
+																				border: 0px;"
+																				>
+																					<hr
+																						style="padding: 0;margin: 0;border-color:#FFFFFF;
+																					background-color: #FFFFFF;
+																					border: 0px;height: 10px;"
+																					/>
+																				</td>
+																			</tr>
+																		</tbody>
+																	</table>
+																</th>
+															</tr>
+														</table>
+													</th>
+													<th
+														class="border-padding-common"
+														style="Margin:0 auto;color:#555;font-family:Arial;font-size:16px;font-weight:400;line-height:1.3;margin:0 auto;padding:0;padding-bottom:16px;text-align:left;width:15px;background-color: #FFDEDE;"
+													>
+														<table
+															style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
+														>
+															<tr style="padding:0;text-align:left;vertical-align:top">
+																<th
+																	style="Margin:0;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0;padding:0;text-align:left"
+																></th>
+															</tr>
+														</table>
+													</th>
+												</tr>
+											</tbody>
+										</table>
+										<table
+											class="country-report"
+											style="border-collapse:collapse;border-spacing:0;display:table;padding:0;position:relative;text-align:left;vertical-align:top;width:100%;margin-top: 20px;"
+										>
+											<tbody>
+												<tr style="padding:0;text-align:left;vertical-align:top">
+													<th
+														class="border-padding-common"
+														style="Margin:0 auto;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0 auto;padding:0;padding-bottom:16px;text-align:left;width:15px;background-color: #FFDEDE;"
+													>
+														<table
+															style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
+														>
+															<tr style="padding:0;text-align:left;vertical-align:top">
+																<th
+																	style="Margin:0;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0;padding:0;text-align:left"
+																></th>
+															</tr>
+														</table>
+													</th>
+													<th style="background-color: #FFFFFF;border-radius: 10px;">
+														<table
+															class="estimated-earning-header"
+															style="padding-left: 10px;
+														padding-top: 10px;
+														font-weight: bold;
+														font-size: 24px;
+														font-family: Arial;
+														color:#FF4954;"
+														>
+															<tr>
+																<th>
+																	Country Report
+																</th>
+															</tr>
+															<tr class="horizontal-table-spacing-white-10px">
+																<td
+																	style="padding: 0;margin: 0;border-color: #FFFFFF;
+																background-color:#FFFFFF;
+																border: 0px;"
+																>
+																	<hr
+																		style="padding: 0;margin: 0;border-color:#FFFFFF;
+																	background-color: #FFFFFF;
+																	border: 0px;height: 10px;"
+																	/>
+																</td>
+															</tr>
+														</table>
+
+														<table style="width: 100%;">
+															<tr>
+																<th>
+																	<table
+																		style="width: 100%;margin-left: 0px;margin-top: 5px;border-collapse: collapse;margin-bottom: 10px;margin-right: 10px;"
+																	>
+																		<tbody
+																			style="    color: #161616;
+																		font-size: 20px;
+																		font-weight: 600;"
+																		>
+																			<tr
+																				style="font-size: 13px;
+																				color: #c1a6a6;"
+																			>
+																				<td style="width: 73%;">
+																					<img alt="Country Wise Revenue Contribution" src=<%=
+																					allReportingData.charts.countryReportPie.imagePath %>
+																					style="-ms-interpolation-mode:bicubic;clear:both;display:block;max-width:100%;outline:0;text-decoration:none;width:auto"
+																					/>
+																				</td>
+																			</tr>
+																			<tr>
+																				<td style="width: 100%;">
+																					<table style="width: 100%;">
+																						<tbody>
+																							<tr>
+																								<td
+																									style="    padding-left: 10px;
+																								padding-top: 15px;
+																								font-size: 14px;
+																								color: #2A2733;
+																							"
+																								>
+																									Others
+																								</td>
+																							</tr>
+																							<tr>
+																								<td
+																									style="width: 100%;font-size: 12px;color:#5A5A5A;font-weight: 600;"
+																								>
+																									<table style="width: 100%;">
+																										<tbody>
+																											<tr>
+																												<td
+																													style="width: 35%;padding-right: 5%;
+																												padding-left: 1%;vertical-align: top;"
+																												>
+																													<table style="width: 90%;">
+																														<!-- here comes left table -->
+																														<%for (let result of
+																														allReportingData.charts.countryReportPie.countrySeriesDataForTableLeft){%>
+																														<%if (result) { %>
+																														<tr>
+																															<td
+																																style="padding-right:20px;padding-bottom: 5px;"
+																															>
+																																<%= result.name %>
+																															</td>
+																															<td
+																																style="padding-bottom: 5px;text-align: end;"
+																															>
+																																<%= `${result.percent}%` %>
+																															</td>
+																														</tr>
+																														<%}%> <%}%>
+																													</table>
+																												</td>
+																												<td
+																													style="width: 35%;    padding-left: 5%;
+																												padding-right: 1%;vertical-align: top"
+																												>
+																													<table style="width: 90%;">
+																														<!-- here comes left table -->
+																														<%for (let result of
+																														allReportingData.charts.countryReportPie.countrySeriesDataForTableRight){%>
+																														<%if (result) { %>
+																														<tr>
+																															<td
+																																style="padding-right:20px;padding-bottom: 5px;"
+																															>
+																																<%= result.name %>
+																															</td>
+																															<td
+																																style="padding-bottom: 5px;text-align: end;"
+																															>
+																																<%= `${result.percent}%` %>
+																															</td>
+																														</tr>
+																														<%}%> <%}%>
+																													</table>
+																												</td>
+																											</tr>
+																										</tbody>
+																									</table>
+																								</td>
+																							</tr>
+																						</tbody>
+																					</table>
+																				</td>
+																			</tr>
+																		</tbody>
+																	</table>
+																</th>
+															</tr>
+														</table>
+													</th>
+													<th
+														class="border-padding-common"
+														style="Margin:0 auto;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0 auto;padding:0;padding-bottom:16px;text-align:left;width:15px;background-color: #FFDEDE;"
 													>
 														<table
 															style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
@@ -672,8 +1431,8 @@
 											<tbody>
 												<tr style="padding:0;text-align:left;vertical-align:top">
 													<th
-														class="small-1 large-1 columns first"
-														style="Margin:0 auto;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0 auto;padding:0;padding-bottom:0!important;padding-left:16px;padding-right:8px;text-align:left;width:32.33px"
+														class="border-padding-common"
+														style="Margin:0 auto;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0 auto;padding:0;padding-bottom:0!important;text-align:left;width:15px;background-color: #FFDEDE;"
 													>
 														<table
 															style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
@@ -697,883 +1456,15 @@
 																	style="Margin:0;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0;padding:0;text-align:left"
 																>
 																	<table
-																		class="wrapper reports-heading-wrapper"
-																		align="center"
-																		style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																	>
-																		<tr style="padding:0;text-align:left;vertical-align:top">
-																			<td
-																				class="wrapper-inner"
-																				style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;hyphens:auto;line-height:1.3;margin:0;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																			>
-																				<table
-																					class="spacer"
-																					style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																				>
-																					<tbody>
-																						<tr
-																							style="padding:0;text-align:left;vertical-align:top"
-																						>
-																							<td
-																								height="70px"
-																								style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:70px;font-weight:400;hyphens:auto;line-height:70px;margin:0;mso-line-height-rule:exactly;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																							>
-																								&#xA0;
-																							</td>
-																						</tr>
-																					</tbody>
-																				</table>
-																				<h5
-																					class="text-center heading-description heading-description--bold u-color-black u-margin-0"
-																					style="Margin:0;Margin-bottom:10px;color:#555!important;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:700;letter-spacing:.3px;line-height:1.4;margin:0!important;margin-bottom:10px;padding:0;text-align:center;word-wrap:normal"
-																				>
-																					- HOW WE PERFORMED <%= type==="weekly"?"THIS WEEK":"THE PREVIOUS DAY" %>-
-																				</h5>
-																				<table
-																					class="spacer"
-																					style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																				>
-																					<tbody>
-																						<tr
-																							style="padding:0;text-align:left;vertical-align:top"
-																						>
-																							<td
-																								height="70px"
-																								style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:70px;font-weight:400;hyphens:auto;line-height:70px;margin:0;mso-line-height-rule:exactly;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																							>
-																								&#xA0;
-																							</td>
-																						</tr>
-																					</tbody>
-																				</table>
-																			</td>
-																		</tr>
-																	</table>
-<% if(type==="weekly"){ %>
-																	<table
-																		class="wrapper reports reports--chartLine reports--cpm"
-																		align="center"
-																		style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																	>
-																		<tr style="padding:0;text-align:left;vertical-align:top">
-																			<td
-																				class="wrapper-inner"
-																				style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;hyphens:auto;line-height:1.3;margin:0;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																			>
-																				<h5
-																					class="u-color-black u-margin-0 text-center"
-																					style="Margin:0;Margin-bottom:10px;color:#555!important;font-family:Helvetica,Arial,sans-serif;font-size:20px;font-weight:400;line-height:1.3;margin:0!important;margin-bottom:10px;padding:0;text-align:center;word-wrap:normal"
-																				>
-																					Performance: AdPushup vs Original
-																				</h5>
-																				<img alt="Cost per mille (CPM) Contribution" src=<%=
-																				allReportingData.charts.cpmLine.imagePath %>
-																				style="-ms-interpolation-mode:bicubic;clear:both;display:block;max-width:100%;outline:0;text-decoration:none;width:auto"
-																				/>
-																				<table
-																					class="spacer"
-																					style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																				>
-																					<tbody>
-																						<tr
-																							style="padding:0;text-align:left;vertical-align:top"
-																						>
-																							<td
-																								height="90px"
-																								style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:90px;font-weight:400;hyphens:auto;line-height:90px;margin:0;mso-line-height-rule:exactly;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																							>
-																								&#xA0;
-																							</td>
-																						</tr>
-																					</tbody>
-																				</table>
-																			</td>
-																		</tr>
-																	</table>
-<% } %>  
-																	<table
-																		class="row u-primary-color--dark u-gradient-linear-primary-inverse u-thColsPB-none"
-																		style="border-collapse:collapse;border-spacing:0;display:table;padding:0;position:relative;text-align:left;vertical-align:top;width:100%"
-																	>
-																		<tbody>
-																			<tr style="padding:0;text-align:left;vertical-align:top">
-																				<th
-																					class="small-12 large-12 columns"
-																					style="Margin:0 auto;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0 auto;padding:0;padding-bottom:0!important;padding-left:8px;padding-right:8px;text-align:left;width:564px"
-																				>
-																					<table
-																						style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																					>
-																						<tr
-																							style="padding:0;text-align:left;vertical-align:top"
-																						>
-																							<th
-																								style="Margin:0;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0;padding:0;text-align:left"
-																							>
-																								<table
-																									class="spacer"
-																									style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																								>
-																									<tbody>
-																										<tr
-																											style="padding:0;text-align:left;vertical-align:top"
-																										>
-																											<td
-																												height="25px"
-																												style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:25px;font-weight:400;hyphens:auto;line-height:25px;margin:0;mso-line-height-rule:exactly;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																											>
-																												&#xA0;
-																											</td>
-																										</tr>
-																									</tbody>
-																								</table>
-																								<h3
-																									class="text-bold text-center u-color-white u-margin-0"
-																									style="Margin:0;Margin-bottom:10px;color: #777!important;font-family:Helvetica,Arial,sans-serif;font-size:20px;font-weight:400;line-height:1.3;margin:0!important;margin-bottom:10px;padding:0;text-align:center;word-wrap:normal;text-align: left;font-weight: bold"
-																								>
-																									Performance Overview
-																								</h3>
-																							</th>
-																							<th
-																								class="expander"
-																								style="Margin:0;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0;padding:0!important;text-align:left;visibility:hidden;width:0"
-																							></th>
-																						</tr>
-																					</table>
-																				</th>
-																			</tr>
-																		</tbody>
-																	</table>
-																	<table
-																		class="row u-primary-color u-gradient-linear-primary"
-																		style="border-collapse:collapse;border-spacing:0;display:table;padding:0;position:relative;text-align:left;vertical-align:top;width:100%"
-																	>
-																		<tbody>
-																			<tr style="padding:0;text-align:left;vertical-align:top">
-																				<th
-																					class="small-10 large-10 columns"
-																					style="Margin:0 auto;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0 auto;padding:0;padding-bottom:16px;padding-left:8px;padding-right:8px;text-align:left;width:467.33px"
-																				>
-																					<table
-																						style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																					>
-																						<tr
-																							style="padding:0;text-align:left;vertical-align:top"
-																						>
-																							<th
-																								style="Margin:0;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0;padding:0;text-align:left"
-																							>
-																								<table
-																									class="wrapper hero-heading-wrapper"
-																									align="center"
-																									style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																								>
-																									<tr
-																										style="padding:0;text-align:left;vertical-align:top"
-																									>
-																										<td
-																											class="wrapper-inner"
-																											style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;hyphens:auto;line-height:1.3;margin:0;padding:0;text-align:left;vertical-align:top;word-wrap:break-word;width: 50%;"
-																										>
-																											<table
-																												class="spacer"
-																												style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																											>
-																												<tbody>
-																													<tr
-																														style="padding:0;text-align:left;vertical-align:top"
-																													>
-																														<td
-																															height="30px"
-																															style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:30px;font-weight:400;hyphens:auto;line-height:30px;margin:0;mso-line-height-rule:exactly;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																														>
-																															&#xA0;
-																														</td>
-																													</tr>
-																												</tbody>
-																											</table>
-																											<h6
-																												class="text-center heading-caption"
-																												style="Margin:0;Margin-bottom:10px;color: #777;font-family:Helvetica,Arial,sans-serif;font-size:12px;font-weight:400;letter-spacing:.9px;line-height:1.3;margin:0;margin-bottom:0;padding:0;text-align:center;text-transform:uppercase;word-wrap:normal"
-																											>
-																												Net Revenue*
-																											</h6>
-																											<table
-																												class="spacer"
-																												style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																											>
-																												<tbody>
-																													<tr
-																														style="padding:0;text-align:left;vertical-align:top"
-																													>
-																														<td
-																															height="4px"
-																															style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:4px;font-weight:400;hyphens:auto;line-height:4px;margin:0;mso-line-height-rule:exactly;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																														>
-																															&#xA0;
-																														</td>
-																													</tr>
-																												</tbody>
-																											</table>
-																											<h2
-																												class="text-center heading-main"
-																												style="Margin:0;Margin-bottom:10px;color: #777;font-family:Helvetica,Arial,sans-serif;font-size:35px;font-weight:500;letter-spacing:-1px;line-height:1;margin:0;margin-bottom:0;padding:10px 0;text-align:center;text-transform:uppercase;word-wrap:normal"
-																											>
-																												<%=
-																												`$${allReportingData.getStatsByCustom.total.total_network_net_revenue||0}`
-																												%>
-																											</h2>
-																											<table
-																												class="spacer"
-																												style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																											>
-																												<tbody>
-																													<tr
-																														style="padding:0;text-align:left;vertical-align:top"
-																													>
-																														<td
-																															height="8px"
-																															style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:8px;font-weight:400;hyphens:auto;line-height:8px;margin:0;mso-line-height-rule:exactly;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																														>
-																															&#xA0;
-																														</td>
-																													</tr>
-																												</tbody>
-																											</table>
-																										</td>
-																										<td
-																											class="wrapper-inner"
-																											style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;hyphens:auto;line-height:1.3;margin:0;padding:0;text-align:left;vertical-align:top;word-wrap:break-word;width: 50%;"
-																										>
-																											<table
-																												class="spacer"
-																												style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																											>
-																												<tbody>
-																													<tr
-																														style="padding:0;text-align:left;vertical-align:top"
-																													>
-																														<td
-																															height="30px"
-																															style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:30px;font-weight:400;hyphens:auto;line-height:30px;margin:0;mso-line-height-rule:exactly;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																														>
-																															&#xA0;
-																														</td>
-																													</tr>
-																												</tbody>
-																											</table>
-																											<h6
-																												class="text-center heading-caption"
-																												style="Margin:0;Margin-bottom:10px;color: #777;font-family:Helvetica,Arial,sans-serif;font-size:12px;font-weight:400;letter-spacing:.9px;line-height:1.3;margin:0;margin-bottom:0;padding:0;text-align:center;text-transform:uppercase;word-wrap:normal"
-																											>
-																											PAGE VIEWS
-																											</h6>
-																											<table
-																												class="spacer"
-																												style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																											>
-																												<tbody>
-																													<tr
-																														style="padding:0;text-align:left;vertical-align:top"
-																													>
-																														<td
-																															height="4px"
-																															style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:4px;font-weight:400;hyphens:auto;line-height:4px;margin:0;mso-line-height-rule:exactly;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																														>
-																															&#xA0;
-																														</td>
-																													</tr>
-																												</tbody>
-																											</table>
-																											<h2
-																												class="text-center heading-main"
-																												style="Margin:0;Margin-bottom:10px;color: #777;font-family:Helvetica,Arial,sans-serif;font-size:35px;font-weight:500;letter-spacing:-1px;line-height:1;margin:0;margin-bottom:0;padding:10px 0;text-align:center;text-transform:uppercase;word-wrap:normal"
-																											>
-																												<%=
-																												`${allReportingData.getStatsByCustom.total.total_adpushup_page_views||0}`
-																												%>
-																											</h2>
-																											<table
-																												class="spacer"
-																												style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																											>
-																												<tbody>
-																													<tr
-																														style="padding:0;text-align:left;vertical-align:top"
-																													>
-																														<td
-																															height="8px"
-																															style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:8px;font-weight:400;hyphens:auto;line-height:8px;margin:0;mso-line-height-rule:exactly;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																														>
-																															&#xA0;
-																														</td>
-																													</tr>
-																												</tbody>
-																											</table>
-																										</td>
-																									</tr>
-																								</table>
-
-																								<table
-																									class="spacer"
-																									style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																								>
-																									<tbody>
-																										<tr
-																											style="padding:0;text-align:left;vertical-align:top"
-																										>
-																											<td
-																												height="10px"
-																												style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:10px;font-weight:400;hyphens:auto;line-height:10px;margin:0;mso-line-height-rule:exactly;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																											>
-																												&#xA0;
-																											</td>
-																										</tr>
-																									</tbody>
-																								</table>
-																							</th>
-																						</tr>
-																					</table>
-																				</th>
-																			</tr>
-
-																			<tr style="padding:0;text-align:left;vertical-align:top">
-																				<th
-																					class="small-10 large-10 columns"
-																					style="Margin:0 auto;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0 auto;padding:0;padding-bottom:16px;padding-left:8px;padding-right:8px;text-align:left;width:467.33px"
-																				>
-																					<table
-																						style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																					>
-																						<tr
-																							style="padding:0;text-align:left;vertical-align:top"
-																						>
-																							<th
-																								style="Margin:0;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0;padding:0;text-align:left"
-																							>
-																								<table
-																									class="wrapper hero-heading-wrapper"
-																									align="center"
-																									style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																								>
-																									<tr
-																										style="padding:0;text-align:left;vertical-align:top"
-																									>
-																										<td
-																											class="wrapper-inner"
-																											style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;hyphens:auto;line-height:1.3;margin:0;padding:0;text-align:left;vertical-align:top;word-wrap:break-word;width: 50%;"
-																										>
-																											<h6
-																												class="text-center heading-caption"
-																												style="Margin:0;Margin-bottom:10px;color: #777;font-family:Helvetica,Arial,sans-serif;font-size:12px;font-weight:400;letter-spacing:.9px;line-height:1.3;margin:0;margin-bottom:0;padding:0;text-align:center;text-transform:uppercase;word-wrap:normal"
-																											>
-																											PAGE RPM
-																											</h6>
-																											<table
-																												class="spacer"
-																												style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																											>
-																												<tbody>
-																													<tr
-																														style="padding:0;text-align:left;vertical-align:top"
-																													>
-																														<td
-																															height="4px"
-																															style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:4px;font-weight:400;hyphens:auto;line-height:4px;margin:0;mso-line-height-rule:exactly;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																														>
-																															&#xA0;
-																														</td>
-																													</tr>
-																												</tbody>
-																											</table>
-																											<h2
-																												class="text-center heading-main"
-																												style="Margin:0;Margin-bottom:10px;color: #777;font-family:Helvetica,Arial,sans-serif;font-size:35px;font-weight:500;letter-spacing:-1px;line-height:1;margin:0;margin-bottom:0;padding:10px 0;text-align:center;text-transform:uppercase;word-wrap:normal"
-																											>
-																												<%=
-																												`$${allReportingData.getStatsByCustom.total.total_adpushup_page_cpm||0}`
-																												%>
-																											</h2>
-																											<table
-																												class="spacer"
-																												style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																											>
-																												<tbody>
-																													<tr
-																														style="padding:0;text-align:left;vertical-align:top"
-																													>
-																														<td
-																															height="8px"
-																															style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:8px;font-weight:400;hyphens:auto;line-height:8px;margin:0;mso-line-height-rule:exactly;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																														>
-																															&#xA0;
-																														</td>
-																													</tr>
-																												</tbody>
-																											</table>
-																										</td>
-																										<td
-																											class="wrapper-inner"
-																											style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;hyphens:auto;line-height:1.3;margin:0;padding:0;text-align:left;vertical-align:top;word-wrap:break-word;width: 50%;"
-																										>
-																											<h6
-																												class="text-center heading-caption"
-																												style="Margin:0;Margin-bottom:10px;color: #777;font-family:Helvetica,Arial,sans-serif;font-size:12px;font-weight:400;letter-spacing:.9px;line-height:1.3;margin:0;margin-bottom:0;padding:0;text-align:center;text-transform:uppercase;word-wrap:normal"
-																											>
-																												Impressions
-																											</h6>
-																											<table
-																												class="spacer"
-																												style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																											>
-																												<tbody>
-																													<tr
-																														style="padding:0;text-align:left;vertical-align:top"
-																													>
-																														<td
-																															height="4px"
-																															style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:4px;font-weight:400;hyphens:auto;line-height:4px;margin:0;mso-line-height-rule:exactly;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																														>
-																															&#xA0;
-																														</td>
-																													</tr>
-																												</tbody>
-																											</table>
-																											<h2
-																												class="text-center heading-main"
-																												style="Margin:0;Margin-bottom:10px;color: #777;font-family:Helvetica,Arial,sans-serif;font-size:35px;font-weight:500;letter-spacing:-1px;line-height:1;margin:0;margin-bottom:0;padding:10px 0;text-align:center;text-transform:uppercase;word-wrap:normal"
-																											>
-																												<%=
-																												`${allReportingData.getStatsByCustom.total.total_network_impressions||0}`
-																												%>
-																											</h2>
-																											<table
-																												class="spacer"
-																												style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																											>
-																												<tbody>
-																													<tr
-																														style="padding:0;text-align:left;vertical-align:top"
-																													>
-																														<td
-																															height="8px"
-																															style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:8px;font-weight:400;hyphens:auto;line-height:8px;margin:0;mso-line-height-rule:exactly;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																														>
-																															&#xA0;
-																														</td>
-																													</tr>
-																												</tbody>
-																											</table>
-																										</td>
-																									</tr>
-																								</table>
-
-																								<table
-																									class="spacer"
-																									style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																								>
-																									<tbody>
-																										<tr
-																											style="padding:0;text-align:left;vertical-align:top"
-																										>
-																											<td
-																												height="10px"
-																												style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:10px;font-weight:400;hyphens:auto;line-height:10px;margin:0;mso-line-height-rule:exactly;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																											>
-																												&#xA0;
-																											</td>
-																										</tr>
-																									</tbody>
-																								</table>
-																							</th>
-																						</tr>
-																					</table>
-																				</th>
-																			</tr>
-
-																			<tr style="padding:0;text-align:left;vertical-align:top">
-																				<th
-																					class="small-10 large-10 columns"
-																					style="Margin:0 auto;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0 auto;padding:0;padding-bottom:16px;padding-left:8px;padding-right:8px;text-align:left;width:467.33px"
-																				>
-																					<table
-																						style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																					>
-																						<tr
-																							style="padding:0;text-align:left;vertical-align:top"
-																						>
-																							<th
-																								style="Margin:0;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0;padding:0;text-align:left"
-																							>
-																								<table
-																									class="wrapper hero-heading-wrapper"
-																									align="center"
-																									style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																								>
-																									<tr
-																										style="padding:0;text-align:left;vertical-align:top"
-																									>
-																										<td
-																											class="wrapper-inner"
-																											style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;hyphens:auto;line-height:1.3;margin:0;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																										>
-																											<h6
-																												class="text-center heading-caption"
-																												style="Margin:0;Margin-bottom:10px;color: #777;font-family:Helvetica,Arial,sans-serif;font-size:12px;font-weight:400;letter-spacing:.9px;line-height:1.3;margin:0;margin-bottom:0;padding:0;text-align:center;text-transform:uppercase;word-wrap:normal"
-																											>
-																												Ad eCPM
-																											</h6>
-																											<table
-																												class="spacer"
-																												style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																											>
-																												<tbody>
-																													<tr
-																														style="padding:0;text-align:left;vertical-align:top"
-																													>
-																														<td
-																															height="4px"
-																															style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:4px;font-weight:400;hyphens:auto;line-height:4px;margin:0;mso-line-height-rule:exactly;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																														>
-																															&#xA0;
-																														</td>
-																													</tr>
-																												</tbody>
-																											</table>
-																											<h2
-																												class="text-center heading-main"
-																												style="Margin:0;Margin-bottom:10px;color: #777;font-family:Helvetica,Arial,sans-serif;font-size:35px;font-weight:500;letter-spacing:-1px;line-height:1;margin:0;margin-bottom:0;padding:10px 0;text-align:center;text-transform:uppercase;word-wrap:normal"
-																											>
-																												<%=
-																												`$${allReportingData.getStatsByCustom.total.total_network_ad_ecpm||0}`
-																												%>
-																											</h2>
-																											<table
-																												class="spacer"
-																												style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																											>
-																												<tbody>
-																													<tr
-																														style="padding:0;text-align:left;vertical-align:top"
-																													>
-																														<td
-																															height="8px"
-																															style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:8px;font-weight:400;hyphens:auto;line-height:8px;margin:0;mso-line-height-rule:exactly;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																														>
-																															&#xA0;
-																														</td>
-																													</tr>
-																												</tbody>
-																											</table>
-																										</td>
-																									</tr>
-																								</table>
-
-																								<table
-																									class="spacer"
-																									style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																								>
-																									<tbody>
-																										<tr
-																											style="padding:0;text-align:left;vertical-align:top"
-																										>
-																											<td
-																												height="10px"
-																												style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:10px;font-weight:400;hyphens:auto;line-height:10px;margin:0;mso-line-height-rule:exactly;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																											>
-																												&#xA0;
-																											</td>
-																										</tr>
-																									</tbody>
-																								</table>
-																							</th>
-																						</tr>
-																					</table>
-																				</th>
-																			</tr>
-																		</tbody>
-																	</table>
-
-																	<table
-																		class="wrapper reports reports--adNetWorkRevenueContrib"
-																		align="center"
-																		style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																	>
-																		<tr style="padding:0;text-align:left;vertical-align:top">
-																			<td
-																				class="wrapper-inner"
-																				style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;hyphens:auto;line-height:1.3;margin:0;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																			>
-																				<h3
-																					class="u-color-black u-margin-0 text-center"
-																					style="Margin:0;Margin-bottom:10px;color:#555!important;font-family:Helvetica,Arial,sans-serif;font-size:20px;font-weight:400;line-height:1.3;margin:0!important;margin-bottom:10px;padding:0;word-wrap:normaltext-align:left;padding-top:10px;font-weight:bold;"
-																				>
-																					Network-wise Revenue
-																				</h3>
-																				<table
-																					class="spacer"
-																					style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																				>
-																					<tbody>
-																						<tr
-																							style="padding:0;text-align:left;vertical-align:top"
-																						>
-																							<td
-																								height="10px"
-																								style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:10px;font-weight:400;hyphens:auto;line-height:10px;margin:0;mso-line-height-rule:exactly;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																							>
-																								&#xA0;
-																							</td>
-																						</tr>
-																					</tbody>
-																				</table>
-																				<img alt="Ad Network Wise Revenue Contribution" src=<%=
-																				allReportingData.charts.adNetworkRevenuePie.imagePath %>
-																				style="-ms-interpolation-mode:bicubic;clear:both;display:block;max-width:100%;outline:0;text-decoration:none;width:auto"
-																				/>
-																				<table
-																					class="spacer"
-																					style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																				>
-																					<tbody>
-																						<tr
-																							style="padding:0;text-align:left;vertical-align:top"
-																						>
-																							<td
-																								height="10px"
-																								style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:10px;font-weight:400;hyphens:auto;line-height:10px;margin:0;mso-line-height-rule:exactly;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																							>
-																								&#xA0;
-																							</td>
-																						</tr>
-																					</tbody>
-																				</table>
-																				
-																				<table
-																					class="spacer"
-																					style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																				>
-																					<tbody>
-																						<tr
-																							style="padding:0;text-align:left;vertical-align:top"
-																						>
-																							<td
-																								height="90px"
-																								style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:90px;font-weight:400;hyphens:auto;line-height:90px;margin:0;mso-line-height-rule:exactly;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																							>
-																								&#xA0;
-																							</td>
-																						</tr>
-																					</tbody>
-																				</table>
-																			</td>
-																		</tr>
-																	</table>
-
-																	<table
 																		class="wrapper reports reports--pageGroupRevenueContrib"
 																		align="center"
-																		style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																	>
-																		<tr style="padding:0;text-align:left;vertical-align:top">
-																			<td
-																				class="wrapper-inner"
-																				style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;hyphens:auto;line-height:1.3;margin:0;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																			>
-																				<h3
-																					class="u-color-black u-margin-0 text-center"
-																					style="Margin:0;Margin-bottom:10px;color:#555!important;font-family:Helvetica,Arial,sans-serif;font-size:20px;font-weight:400;line-height:1.3;margin:0!important;margin-bottom:10px;padding:0;word-wrap:normaltext-align:left;padding-top:10px;font-weight:bold;"
-																				>
-																					Site-wise Report
-																				</h3>
-																				<table
-																					class="spacer"
-																					style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																				>
-																					<tbody>
-																						<tr
-																							style="padding:0;text-align:left;vertical-align:top"
-																						>
-																							<td
-																								height="10px"
-																								style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:10px;font-weight:400;hyphens:auto;line-height:10px;margin:0;mso-line-height-rule:exactly;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																							>
-																								&#xA0;
-																							</td>
-																						</tr>
-																					</tbody>
-																				</table>
-																				<table
-																					class="spacer"
-																					style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																					border="1"
-																				>
-																					<tbody>
-																						<tr style="font-size: 15px;">
-																							<th>
-																								Website
-																							</th>
-																							<th>
-																								Ap Page Views
-																							</th>
-																							<th>
-																								Ap Page Rpm
-																							</th>
-																							<th>
-																								Impressions
-																							</th>
-																							<th>
-																								Ad eCPM
-																							</th>
-																							<th>
-																								Net Revenue*
-																							</th>
-																						</tr>
-																						<!-- <tr>
-																							<td>
-																								A
-																							</td>
-																							<td>
-																								1
-																							</td>
-																						</tr>
-																						<tr>
-																							<td>
-																								B
-																							</td>
-																							<td>
-																								2
-																							</td>
-                                                                                        </tr> -->
-																						<%for (let result of allReportingData.siteSummary.result){%>
-																							<%if (result.siteName!=="0.00") { %>
-                                                                                        <tr>
-																							<td style="width: 25%;font-size:13px;">
-																								<%= `${result.siteName||""}` %>
-																							</td>
-																							<td style="width: 20%;font-size:13px;">
-																								<%= `${result.adpushup_page_views||""}` %>
-                                                                                            </td>
-                                                                                            <td style="width: 8%;font-size:13px;">
-																								<%= `$${result.adpushup_page_cpm||""}` %>
-																							</td>
-																							<td style="width: 20%;font-size:13px;">
-																								<%= `${result.network_impressions||""}` %>
-                                                                                            </td>
-                                                                                            <td style="width: 8%;font-size:13px;">
-                                                                                                <%= `$${result.network_ad_ecpm||""}` %>
-																							</td>
-																							<td style="width: 19%;font-size:13px;">
-																								<%= `$${result.network_net_revenue||""}` %>
-																							</td>
-																						</tr>
-																						<% } %>
-                                                                                            <%}%>
-                                                                                          </ul>
-																					</tbody>
-																				</table>
-																		
-																				<table
-																					class="spacer"
-																					style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																				>
-																					<tbody>
-																						<tr
-																							style="padding:0;text-align:left;vertical-align:top"
-																						>
-																							<td
-																								height="90px"
-																								style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:90px;font-weight:400;hyphens:auto;line-height:90px;margin:0;mso-line-height-rule:exactly;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																							>
-																								&#xA0;
-																							</td>
-																						</tr>
-																					</tbody>
-																				</table>
-																			</td>
-																		</tr>
-																	</table>
-
-																	<table
-																		class="wrapper reports reports--pageGroupRevenueContrib"
-																		align="center"
-																		style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																	>
-																		<tr style="padding:0;text-align:left;vertical-align:top">
-																			<td
-																				class="wrapper-inner"
-																				style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;hyphens:auto;line-height:1.3;margin:0;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																			>
-																				<h3
-																					class="u-color-black u-margin-0 text-center"
-																					style="Margin:0;Margin-bottom:10px;color:#555!important;font-family:Helvetica,Arial,sans-serif;font-size:20px;font-weight:400;line-height:1.3;margin:0!important;margin-bottom:10px;padding:0;word-wrap:normaltext-align:left;padding-top:10px;font-weight:bold;"
-																				>
-																					Country Report
-																				</h3>
-																				<table
-																					class="spacer"
-																					style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																				>
-																					<tbody>
-																						<tr
-																							style="padding:0;text-align:left;vertical-align:top"
-																						>
-																							<td
-																								height="10px"
-																								style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:10px;font-weight:400;hyphens:auto;line-height:10px;margin:0;mso-line-height-rule:exactly;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																							>
-																								&#xA0;
-																							</td>
-																						</tr>
-																					</tbody>
-																				</table>
-																				<img alt="Country Wise Revenue Contribution" src=<%=
-																				allReportingData.charts.countryReportPie.imagePath %>
-																				style="-ms-interpolation-mode:bicubic;clear:both;display:block;max-width:100%;outline:0;text-decoration:none;width:auto"
-																				/>
-																				<table
-																					class="spacer"
-																					style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																				>
-																					<tbody>
-																						<tr
-																							style="padding:0;text-align:left;vertical-align:top"
-																						>
-																							<td
-																								height="10px"
-																								style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:10px;font-weight:400;hyphens:auto;line-height:10px;margin:0;mso-line-height-rule:exactly;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																							>
-																								&#xA0;
-																							</td>
-																						</tr>
-																					</tbody>
-																				</table>
-																				
-																				<table
-																					class="spacer"
-																					style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
-																				>
-																					<tbody>
-																						<tr
-																							style="padding:0;text-align:left;vertical-align:top"
-																						>
-																							<td
-																								height="90px"
-																								style="-moz-hyphens:auto;-webkit-hyphens:auto;Margin:0;border-collapse:collapse!important;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:90px;font-weight:400;hyphens:auto;line-height:90px;margin:0;mso-line-height-rule:exactly;padding:0;text-align:left;vertical-align:top;word-wrap:break-word"
-																							>
-																								&#xA0;
-																							</td>
-																						</tr>
-																					</tbody>
-																				</table>
-																			</td>
-																		</tr>
-																	</table>
+																		style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:75%"
+																	></table>
 
 																	<table
 																		class="wrapper"
 																		align="center"
-																		style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
+																		style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:85%;margin-top: 15px;"
 																	>
 																		<tr style="padding:0;text-align:left;vertical-align:top">
 																			<td
@@ -1582,12 +1473,12 @@
 																			>
 																				<h5
 																					class="heading-description heading-description--small"
-																					style="Margin:0;Margin-bottom:10px;color:#8a8a8a;font-family:Helvetica,Arial,sans-serif;font-size:12px;font-weight:400;letter-spacing:.3px;line-height:1.4;margin:0;margin-bottom:10px;padding:0;text-align:left;word-wrap:normal"
+																					style="Margin:0;Margin-bottom:10px;color:#8a8a8a;font-family:Arial;font-size:14px;font-weight:400;margin:0;margin-bottom:10px;padding:0;text-align:left;word-wrap:normal;font-size: 14px;
+																					padding-left: 10px;color: #222222;text-align: center;"
 																				>
-																					<i
-																						>NOTE: All above shown metrics (Impressions, Revenue,
-																						CPM etc) are generated solely by AdPushup Inc.</i
-																					>
+																					<span style="font-weight: 600;">NOTE:</span>
+																					All above shown metrics (Impressions, Revenue, CPM etc)
+																					are generated solely by AdPushup Inc.
 																				</h5>
 																			</td>
 																		</tr>
@@ -1613,8 +1504,8 @@
 														</table>
 													</th>
 													<th
-														class="small-1 large-1 columns last"
-														style="Margin:0 auto;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0 auto;padding:0;padding-bottom:0!important;padding-left:8px;padding-right:16px;text-align:left;width:32.33px"
+														class="border-padding-common"
+														style="Margin:0 auto;color:#555;font-family:Helvetica,Arial,sans-serif;font-size:16px;font-weight:400;line-height:1.3;margin:0 auto;padding:0;padding-bottom:0!important;text-align:left;width:15px;background-color:#FFDEDE;"
 													>
 														<table
 															style="border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
@@ -1632,7 +1523,7 @@
 										<table
 											class="wrapper secondary"
 											align="center"
-											style="background:#f3f3f3;border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
+											style="background:#FF4954;border-collapse:collapse;border-spacing:0;padding:0;text-align:left;vertical-align:top;width:100%"
 										>
 											<tr style="padding:0;text-align:left;vertical-align:top">
 												<td
@@ -1673,7 +1564,7 @@
 																			>
 																				<h6
 																					class="text-center heading-description u-margin-0"
-																					style="Margin:0;Margin-bottom:10px;color:#8a8a8a;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;letter-spacing:.3px;line-height:1.4;margin:0!important;margin-bottom:10px;padding:0;text-align:center;word-wrap:normal"
+																					style="Margin:0;Margin-bottom:10px;color:#8a8a8a;font-family:Arial;font-size:12px;font-weight:400;letter-spacing:.3px;line-height:1.4;margin:0!important;margin-bottom:10px;padding:0;text-align:center;word-wrap:normal;color: #FFB2B7;"
 																				>
 																					To unsubscribe from this email, kindly write back to us.
 																				</h6>
@@ -1696,13 +1587,13 @@
 																				</table>
 																				<h6
 																					class="text-center heading-description heading-description--small u-margin-0"
-																					style="Margin:0;Margin-bottom:10px;color:#8a8a8a;font-family:Helvetica,Arial,sans-serif;font-size:12px;font-weight:400;letter-spacing:.3px;line-height:1.4;margin:0!important;margin-bottom:10px;padding:0;text-align:center;word-wrap:normal"
+																					style="Margin:0;Margin-bottom:10px;color:#8a8a8a;font-family:Arial;font-size:12px;font-weight:400;letter-spacing:.3px;line-height:1.4;margin:0!important;margin-bottom:10px;padding:0;text-align:center;word-wrap:normal;color: #ffffff;"
 																				>
 																					AdPushup, Inc.,
 																					<a
 																						target="_blank"
 																						href="https://maps.google.com/?q=4023+Kennett+Pike,+Wilmington,+DE&amp;entry=gmail&amp;source=g"
-																						style="Margin:0;color:#eb575c;font-family:Helvetica,Arial,sans-serif;font-weight:400;line-height:1.3;margin:0;padding:0;text-align:left;text-decoration:none"
+																						style="Margin:0;color:#eb575c;font-family:Helvetica,Arial,sans-serif;font-weight:400;line-height:1.3;margin:0;padding:0;text-align:left;text-decoration:none;color:#ffffff;"
 																						>4023 Kennett Pike, Wilmington, DE</a
 																					>
 																					51234, United States

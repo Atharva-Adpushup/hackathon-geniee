@@ -28,11 +28,12 @@ const mapStateToProps = (state, ownProps) => {
 const mapDispatchToProps = dispatch => ({
 	fetchAds: payload => dispatch(fetchAds(payload)),
 	updateAd: (adId, siteId, payload) => dispatch(updateAd(adId, siteId, payload)),
-	modifyAdOnServer: (adId, siteId, payload) => dispatch(modifyAdOnServer(adId, siteId, payload)),
-	archiveAd: (adId, siteId, payload, isSuperUser) =>
-		dispatch(archiveAd(adId, siteId, payload, isSuperUser)),
-	updateTraffic: (adId, siteId, payload, isSuperUser) =>
-		dispatch(updateTraffic(adId, siteId, payload, isSuperUser)),
+	modifyAdOnServer: (adId, siteId, payload, dataForAuditLogs) =>
+		dispatch(modifyAdOnServer(adId, siteId, payload, dataForAuditLogs)),
+	archiveAd: (adId, siteId, payload, isSuperUser, dataForAuditLogs) =>
+		dispatch(archiveAd(adId, siteId, payload, isSuperUser, dataForAuditLogs)),
+	updateTraffic: (adId, siteId, payload, isSuperUser, dataForAuditLogs) =>
+		dispatch(updateTraffic(adId, siteId, payload, isSuperUser, dataForAuditLogs)),
 	masterSave: (siteId, dataForAuditLogs) => dispatch(masterSave(siteId, dataForAuditLogs)),
 	updateAllAds: (siteId, ads) => dispatch(updateAllAds(siteId, ads))
 });

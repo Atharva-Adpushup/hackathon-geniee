@@ -125,8 +125,12 @@ class OnBoardingWrap extends Component {
 	};
 
 	render() {
-		const { isSuperUser } = this.props;
+		const { isSuperUser, customProps } = this.props;
 		const { siteId, existingSite, site, step } = this.state;
+		const dataForAuditLogsTemplate = {
+			appName: 'My Site',
+			siteDomain: ''
+		};
 
 		return (
 			<div className="onboarding-wrapper">
@@ -137,6 +141,7 @@ class OnBoardingWrap extends Component {
 					site={site}
 					changeSite={this.changeSite}
 					onSiteAdd={this.onSiteAdd}
+					dataForAuditLogsTemplate={dataForAuditLogsTemplate}
 					isActive={step === 0}
 					completed={step >= 1}
 				/>
@@ -147,6 +152,7 @@ class OnBoardingWrap extends Component {
 					onComplete={this.onInitCodeVerify}
 					isActive={step === 1}
 					completed={step >= 2}
+					dataForAuditLogsTemplate={dataForAuditLogsTemplate}
 					isSuperUser={isSuperUser}
 				/>
 				<VerifyAdsTxtCodeOnboarding
@@ -156,6 +162,7 @@ class OnBoardingWrap extends Component {
 					onComplete={this.onAdsTxtVerify}
 					isActive={step === 2}
 					completed={step === 3}
+					dataForAuditLogsTemplate={dataForAuditLogsTemplate}
 					isSuperUser={isSuperUser}
 				/>
 			</div>

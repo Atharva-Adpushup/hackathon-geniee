@@ -95,6 +95,12 @@ const roundOffTwoDecimal = value => {
 	return roundedNum.toFixed(2);
 };
 
+const roundOffOneDecimal = value => {
+	if (Number.isInteger(value)) return value;
+	const roundedNum = Math.round(value * 100) / 100;
+	return roundedNum.toFixed(1);
+};
+
 const numberWithCommas = x => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
 async function uploadImageToAzure(blobClientName, fileStream) {
@@ -130,6 +136,27 @@ function getBase64Image(body) {
 	});
 }
 
+function stringifyObjectsWithFunctions(obj, prop) {
+	// Using JSON.stringify on the object will removes any function inside so using this
+	const placeholder = '____PLACEHOLDER____';
+	const allFunctionDefination = [];
+	let json = JSON.stringify(
+		obj,
+		function(key, value) {
+			if (typeof value === 'function') {
+				allFunctionDefination.push(value);
+				return placeholder;
+			}
+			return value;
+		},
+		2
+	);
+	json = json.replace(new RegExp('"' + placeholder + '"', 'g'), function(_) {
+		return allFunctionDefination.shift();
+	});
+	return 'this["' + prop + '"] = ' + json + ';';
+}
+
 module.exports = {
 	getUserSites,
 	getActiveUsers,
@@ -140,5 +167,7 @@ module.exports = {
 	numberWithCommas,
 	sendEmail,
 	uploadImageToAzure,
-	getBase64Image
+	getBase64Image,
+	roundOffOneDecimal,
+	stringifyObjectsWithFunctions
 };

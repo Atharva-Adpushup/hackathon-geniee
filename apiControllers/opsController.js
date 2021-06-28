@@ -9,9 +9,14 @@ const HTTP_STATUSES = require('../configs/httpStatusConsts');
 const {
 	GET_SITES_STATS_API,
 	EMAIL_REGEX,
-	AUDIT_LOGS_ACTIONS: { OPS_PANEL }
+	AUDIT_LOGS_ACTIONS: { OPS_PANEL },
+	docKeys: { networkWideHBRules }
 } = require('../configs/commonConsts');
-const { sendSuccessResponse, sendErrorResponse, getPageGroupNameAndPlatformFromChannelDoc } = require('../helpers/commonFunctions');
+const {
+	sendSuccessResponse,
+	sendErrorResponse,
+	getPageGroupNameAndPlatformFromChannelDoc
+} = require('../helpers/commonFunctions');
 const {
 	appBucket,
 	errorHandler,
@@ -23,6 +28,9 @@ const {
 } = require('../helpers/routeHelpers');
 const opsModel = require('../models/opsModel');
 const apLiteModel = require('../models/apLiteModel');
+const FormValidator = require('../helpers/FormValidator');
+const schema = require('../helpers/schema');
+const AdPushupError = require('../helpers/AdPushupError');
 const channelModel = require('../models/channelModel');
 const { updateAdUnitData } = require('../models/opsModel');
 
@@ -30,9 +38,11 @@ const router = express.Router();
 
 const helpers = {
 	getAllSitesFromCouchbase: () => {
-		const query = `select a.siteId, a.siteDomain, a.adNetworkSettings, a.ownerEmail, a.step, a.channels, a.apConfigs, a.dateCreated, b.adNetworkSettings[0].pubId, b.adNetworkSettings[0].adsenseEmail from ${couchBase.DEFAULT_BUCKET
-			} a join ${couchBase.DEFAULT_BUCKET
-			} b on keys 'user::' || a.ownerEmail where meta(a).id like 'site::%'`;
+		const query = `select a.siteId, a.siteDomain, a.adNetworkSettings, a.ownerEmail, a.step, a.channels, a.apConfigs, a.dateCreated, b.adNetworkSettings[0].pubId, b.adNetworkSettings[0].adsenseEmail from ${
+			couchBase.DEFAULT_BUCKET
+		} a join ${
+			couchBase.DEFAULT_BUCKET
+		} b on keys 'user::' || a.ownerEmail where meta(a).id like 'site::%'`;
 		return appBucket.queryDB(query);
 	},
 	makeAPIRequest: options => {
@@ -103,9 +113,9 @@ router
 			return date && isValidDate(date)
 				? getDate(date)
 				: getDate(reference, {
-					...DEFAULT_OPERATION,
-					value
-				});
+						...DEFAULT_OPERATION,
+						value
+				  });
 		}
 		function makeAPIRequestWrapper(qs) {
 			return helpers.makeAPIRequest({
@@ -367,9 +377,7 @@ router
 		return opsModel
 			.sendNotification(notificationData)
 			.then(message => sendSuccessResponse(message, res))
-			.catch(err => {
-				return errorHandler(err, res);
-			});
+			.catch(err => errorHandler(err, res));
 	})
 	.get('/getAllNotifications', (req, res) =>
 		opsModel
@@ -377,13 +385,184 @@ router
 			.then(message => sendSuccessResponse(message, res))
 			.catch(err => errorHandler(err, res))
 	)
+	.get('/rules', (req, res) => {
+		if (!req.user.isSuperUser) {
+			return sendErrorResponse(
+				{
+					message: 'Unauthorized Request'
+				},
+				res,
+				HTTP_STATUSES.UNAUTHORIZED
+			);
+		}
+
+		return appBucket
+			.getDoc(networkWideHBRules)
+			.then(doc => {
+				const {
+					value: { rules = [] }
+				} = doc;
+				return rules;
+			})
+			.then(rules => res.status(HTTP_STATUSES.OK).json(rules))
+			.catch(err => {
+				// eslint-disable-next-line no-console
+				console.log(err);
+				res.status(HTTP_STATUSES.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error!' });
+			});
+	})
+
+	.post('/rules', (req, res) => {
+		const { email, originalEmail, isSuperUser } = req.user;
+
+		if (!isSuperUser) {
+			return sendErrorResponse(
+				{
+					message: 'Unauthorized Request'
+				},
+				res,
+				HTTP_STATUSES.UNAUTHORIZED
+			);
+		}
+
+		const { hbRule, dataForAuditLogs } = req.body;
+		const { rule } = hbRule;
+
+		const newRule = { ...rule, createdAt: new Date().getTime() };
+
+		return FormValidator.validate(rule, schema.hbRules.rule)
+			.then(() => appBucket.getDoc(networkWideHBRules))
+			.then(doc => {
+				const { value, cas } = doc;
+				const prevRules = [...value.rules] || [];
+
+				value.rules = [...prevRules, newRule] || [];
+				const newRules = value.rules || [];
+
+				// log config changes
+				const { siteDomain, appName } = dataForAuditLogs;
+				sendDataToAuditLogService({
+					siteId: '',
+					siteDomain,
+					appName,
+					type: 'account',
+					impersonateId: email,
+					userId: originalEmail,
+					prevConfig: prevRules,
+					currentConfig: newRules,
+					action: {
+						name: OPS_PANEL.TOOLS,
+						data: `Network Wide HB Rules`
+					}
+				});
+				return appBucket.updateDoc(networkWideHBRules, value, cas) && value;
+			})
+			.then(data => {
+				const { rules = [] } = data;
+				return res.status(HTTP_STATUSES.OK).json(rules);
+			})
+			.catch(err => {
+				// eslint-disable-next-line no-console
+				console.log(err);
+
+				if (err.code && err.code === 13 && err.message.includes('key does not exist')) {
+					const rules = [];
+					rules.push(newRule);
+
+					return appBucket.createDoc(networkWideHBRules, { rules }, {}).then(() => {
+						res.status(HTTP_STATUSES.OK).json(rules);
+					});
+				}
+
+				if (err instanceof AdPushupError) {
+					return res.status(HTTP_STATUSES.BAD_REQUEST).json({ error: err.message });
+				}
+
+				return res
+					.status(HTTP_STATUSES.INTERNAL_SERVER_ERROR)
+					.json({ error: 'Internal Server Error!' });
+			});
+	})
+
+	.put('/rules', (req, res) => {
+		const { email, originalEmail, isSuperUser } = req.user;
+
+		if (!isSuperUser) {
+			return sendErrorResponse(
+				{
+					message: 'Unauthorized Request'
+				},
+				res,
+				HTTP_STATUSES.UNAUTHORIZED
+			);
+		}
+
+		const { hbRuleData, dataForAuditLogs } = req.body;
+		const { rule, ruleIndex } = hbRuleData;
+
+		return FormValidator.validate(rule, schema.hbRules.rule)
+			.then(() => {
+				const parsedRuleIndex = parseInt(ruleIndex, 10);
+				if (Number.isNaN(parsedRuleIndex)) {
+					throw new AdPushupError('Invalid data given to edit rule');
+				}
+			})
+			.then(() => appBucket.getDoc(networkWideHBRules))
+			.then(doc => {
+				const { value, cas } = doc;
+
+				const prevRules = [...value.rules] || [];
+
+				if (value.rules.length <= ruleIndex) {
+					throw new AdPushupError('Invalid data given to edit rule');
+				}
+
+				value.rules[ruleIndex] = { ...prevRules[ruleIndex], ...rule };
+
+				const newRules = value.rules || [];
+
+				// log config changes
+				const { siteDomain, appName } = dataForAuditLogs;
+				sendDataToAuditLogService({
+					siteId: '',
+					siteDomain,
+					appName,
+					type: 'account',
+					impersonateId: email,
+					userId: originalEmail,
+					prevConfig: prevRules,
+					currentConfig: newRules,
+					action: {
+						name: OPS_PANEL.TOOLS,
+						data: `Network Wide HB Rules`
+					}
+				});
+				return appBucket.updateDoc(networkWideHBRules, value, cas) && value;
+			})
+			.then(data => {
+				const { rules = [] } = data;
+				return res.status(HTTP_STATUSES.OK).json(rules);
+			})
+			.catch(err => {
+				// eslint-disable-next-line no-console
+				console.log(err);
+
+				if (err instanceof AdPushupError) {
+					return res.status(HTTP_STATUSES.BAD_REQUEST).json({ error: err.message });
+				}
+
+				return res
+					.status(HTTP_STATUSES.INTERNAL_SERVER_ERROR)
+					.json({ error: 'Internal Server Error!' });
+			});
+	})
+
 	.get('/getAdUnitMapping', (req, res) =>
 		getAllAds()
 			.then(data => {
 				const ads = [];
 
-				data.forEach((adData) => {
-
+				data.forEach(adData => {
 					const { key: docId, value: ad } = adData;
 					const docType = docId.substr(0, 4);
 					const { siteId, siteDomain, networkData, sizeFilters, height, width } = ad;
@@ -394,7 +573,7 @@ router
 
 					// transform the data to display in inventory tab
 					switch (docType) {
-						case "chnl":
+						case 'chnl':
 							if (!networkData) {
 								return;
 							}
@@ -419,13 +598,13 @@ router
 								downwardSizesDisabled,
 								sizeFilters,
 								height,
-								width,
+								width
 							};
 
 							ads.push(adObj);
 							break;
-						case "fmrt":
-						case "tgmr":
+						case 'fmrt':
+						case 'tgmr':
 							adId = ad.id;
 							if (!networkData) {
 								return;
@@ -455,8 +634,7 @@ router
 							ads.push(adObj);
 							break;
 
-						case "aplt":
-
+						case 'aplt':
 							collapseUnfilled = !!ad.collapseUnfilled;
 							downwardSizesDisabled = !!ad.downwardSizesDisabled;
 							dfpAdunit = ad.dfpAdUnit;
@@ -530,7 +708,8 @@ router
 				return channelModel
 					.getChannel(siteId, platform, pageGroup)
 					.then(({ data: channelData }) => {
-						let prevConfig = {}, currentConfig = {};
+						let prevConfig = {};
+						let currentConfig = {};
 						const { variations, siteDomain } = channelData;
 						for (const key in variations) {
 							const { sections } = variations[key];
@@ -555,7 +734,7 @@ router
 							}
 						}
 
-						const appName = "Ad Unit Inventory";
+						const appName = 'Ad Unit Inventory';
 						const { email, originalEmail } = req.user;
 
 						// log config changes

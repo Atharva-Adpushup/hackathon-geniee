@@ -51,15 +51,19 @@ class VerifyAdsTxtCodeOnboarding extends Component {
 	verify = isOnloadVerify => {
 		if (isOnloadVerify !== true) this.setState({ verifyingAdsTxt: true });
 
-		const { siteId, site, onComplete } = this.props;
+		const { siteId, site, onComplete, dataForAuditLogsTemplate } = this.props;
+		const dataForAuditLogs = {
+			...dataForAuditLogsTemplate,
+			actionInfo: 'New Site Ads.txt verification'
+		};
 
 		const onboardingStage = 'onboarded';
 		const step = 3;
 
 		proxyService
-			.verifyAdsTxtCode(site, siteId)
-			.then(() => userService.setSiteStep(siteId, onboardingStage, step))
-			.then(() => siteService.saveSite(siteId, site, onboardingStage, step))
+			.verifyAdsTxtCode(site, siteId, dataForAuditLogs)
+			.then(() => userService.setSiteStep(siteId, onboardingStage, step, dataForAuditLogs))
+			.then(() => siteService.saveSite(siteId, site, onboardingStage, step, dataForAuditLogs))
 			.then(() =>
 				this.setState(
 					() => ({
@@ -146,15 +150,20 @@ class VerifyAdsTxtCodeOnboarding extends Component {
 	};
 
 	skipVerification = () => {
-		const { siteId, site, onComplete } = this.props;
+		const { siteId, site, onComplete, dataForAuditLogsTemplate } = this.props;
+		const dataForAuditLogs = {
+			...dataForAuditLogsTemplate,
+			actionInfo: 'Skip Site Ads.txt verification'
+		};
+
 		const onboardingStage = 'onboarded';
 		const step = 3;
 
 		this.setState({ skippingAdsTxtVerification: true });
 
 		userService
-			.setSiteStep(siteId, onboardingStage, step)
-			.then(() => siteService.saveSite(siteId, site, onboardingStage, step))
+			.setSiteStep(siteId, onboardingStage, step, dataForAuditLogs)
+			.then(() => siteService.saveSite(siteId, site, onboardingStage, step, dataForAuditLogs))
 			.then(() =>
 				this.setState(
 					() => ({

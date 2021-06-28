@@ -53,7 +53,7 @@ class AdElement extends Component {
 
 	toggleAdStatus() {
 		const { isActive } = this.state;
-		const { ad, archiveAd, user, siteId } = this.props;
+		const { ad, archiveAd, user, siteId, dataForAuditLogs } = this.props;
 		const message = isActive
 			? 'Are you sure you want to archive this ad?'
 			: 'Are you sure you want to unarchive this ad?';
@@ -72,7 +72,8 @@ class AdElement extends Component {
 						logWritten: false
 					}
 				},
-				user.isSuperUser
+				user.isSuperUser,
+				dataForAuditLogs
 			).then(response => {
 				if (response) {
 					this.setState(
@@ -110,7 +111,16 @@ class AdElement extends Component {
 	}
 
 	editTraffic() {
-		const { ad, meta, modalToggle, updateTraffic, user, channels, siteId } = this.props;
+		const {
+			ad,
+			meta,
+			modalToggle,
+			updateTraffic,
+			user,
+			channels,
+			siteId,
+			dataForAuditLogs
+		} = this.props;
 		const hasPagegroups = !!(ad.pagegroups && ad.pagegroups.length);
 
 		let body = <p>Custom Traffic Edit would be here</p>;
@@ -124,6 +134,7 @@ class AdElement extends Component {
 					meta={meta}
 					user={user}
 					channels={channels}
+					dataForAuditLogs={dataForAuditLogs}
 					updateTraffic={updateTraffic}
 					updateWrapper={this.updateWrapper}
 					onCancel={modalToggle}
@@ -140,12 +151,14 @@ class AdElement extends Component {
 	}
 
 	updateWrapper(data) {
-		const { user, ad, updateAd, modifyAdOnServer, siteId } = this.props;
-		return user.isSuperUser ? updateAd(ad.id, siteId, data) : modifyAdOnServer(ad.id, siteId, data);
+		const { user, ad, updateAd, modifyAdOnServer, siteId, dataForAuditLogs } = this.props;
+		return user.isSuperUser
+			? updateAd(ad.id, siteId, data)
+			: modifyAdOnServer(ad.id, siteId, data, dataForAuditLogs);
 	}
 
 	userActionsHandler(action) {
-		const { modalToggle, ad } = this.props;
+		const { modalToggle, ad, dataForAuditLogs } = this.props;
 		switch (action) {
 			case 'archive':
 			case 'unarchive':
@@ -153,19 +166,40 @@ class AdElement extends Component {
 			case 'networkEdit':
 				return modalToggle({
 					header: 'Edit Network Options',
-					body: <AdNetworkDetails ad={ad} onSubmit={this.updateWrapper} onCancel={modalToggle} />,
+					body: (
+						<AdNetworkDetails
+							ad={ad}
+							dataForAuditLogs={dataForAuditLogs}
+							onSubmit={this.updateWrapper}
+							onCancel={modalToggle}
+						/>
+					),
 					footer: false
 				});
 			case 'formatEdit':
 				return modalToggle({
 					header: 'Edit Format Options',
-					body: <FormatEdit ad={ad} onSave={this.updateWrapper} onCancel={modalToggle} />,
+					body: (
+						<FormatEdit
+							ad={ad}
+							dataForAuditLogs={dataForAuditLogs}
+							onSave={this.updateWrapper}
+							onCancel={modalToggle}
+						/>
+					),
 					footer: false
 				});
 			case 'fluidEdit':
 				return modalToggle({
 					header: 'Edit Fluid Value',
-					body: <FluidEdit ad={ad} onSubmit={this.updateWrapper} onCancel={modalToggle} />,
+					body: (
+						<FluidEdit
+							ad={ad}
+							dataForAuditLogs={dataForAuditLogs}
+							onSubmit={this.updateWrapper}
+							onCancel={modalToggle}
+						/>
+					),
 					footer: false
 				});
 			default:

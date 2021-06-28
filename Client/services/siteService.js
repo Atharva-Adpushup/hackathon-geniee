@@ -5,8 +5,8 @@ export default {
 		siteId
 			? axiosInstance.get('/site/onboarding', { params: { siteId } })
 			: axiosInstance.get('/site/onboarding'),
-	saveSite: (siteId, site, onboardingStage, step) =>
-		axiosInstance.post('/data/saveSite', { siteId, site, onboardingStage, step }),
+	saveSite: (siteId, site, onboardingStage, step, dataForAuditLogs) =>
+		axiosInstance.post('/data/saveSite', { siteId, site, onboardingStage, step, dataForAuditLogs }),
 	saveApConfigs: (siteId, apConfigs, dataForAuditLogs) =>
 		axiosInstance.post('/site/saveApConfigs', { siteId, apConfigs, dataForAuditLogs }),
 	forceApBuild: (siteId, dataForAuditLogs) =>

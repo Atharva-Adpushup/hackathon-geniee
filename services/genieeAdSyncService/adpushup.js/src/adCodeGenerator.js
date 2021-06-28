@@ -284,8 +284,9 @@ module.exports = {
 	generateMediaNetHeadCode: function() {
 		return executeMediaNetHeadCode();
 	},
-	generatePoweredByBanner(id, styles) {
+	generatePoweredByBanner(id, adFormatType, styles) {
 		const { POWERED_BY_BANNER } = consts;
+
 		const $banner = $('<a />');
 		const $logo = $('<img />');
 		$logo
@@ -293,7 +294,7 @@ module.exports = {
 				alt: 'AdPushup',
 				src: POWERED_BY_BANNER.IMAGE
 			})
-			.css({ ...POWERED_BY_BANNER.CSS.LOGO });
+			.css({ ...POWERED_BY_BANNER.CSS[adFormatType + '_LOGO'] });
 
 		return $banner
 			.attr({

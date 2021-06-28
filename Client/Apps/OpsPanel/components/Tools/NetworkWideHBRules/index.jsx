@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 /* eslint-disable no-alert */
 /* eslint-disable no-restricted-globals */
 /* eslint-disable consistent-return */
@@ -9,14 +8,21 @@ import _cloneDeep from 'lodash/cloneDeep';
 
 import { Button } from '@/Client/helpers/react-bootstrap-imports';
 
-import history from '../../../helpers/history';
-import utils from '../../../helpers/utils';
-import axiosInstance from '../../../helpers/axiosInstance';
-import HeaderBiddingRuleActions from './HeaderBiddingRuleActions';
-import HeaderBiddingRuleTriggers from './HeaderBiddingRuleTriggers';
-import CustomToggleSwitch from '../../../Components/CustomToggleSwitch';
-import Loader from '../../../Components/Loader';
-import HeaderBiddingRulesList from './HeaderBiddingRulesList';
+import history from '../../../../../helpers/history';
+import utils from '../../../../../helpers/utils';
+import axiosInstance from '../../../../../helpers/axiosInstance';
+import HeaderBiddingRuleActions from '../../../../HeaderBidding/components/HeaderBiddingRuleActions';
+import HeaderBiddingRuleTriggers from '../../../../HeaderBidding/components/HeaderBiddingRuleTriggers';
+import CustomToggleSwitch from '../../../../../Components/CustomToggleSwitch';
+import Loader from '../../../../../Components/Loader';
+import HeaderBiddingRulesList from '../../../../HeaderBidding/components/HeaderBiddingRulesList';
+import {
+	TRIGGER_KEY_OPTIONS,
+	TRIGGER_OPERATOR_OPTIONS,
+	ACTION_KEY_OPTIONS,
+	WEEKEND,
+	WEEKDAY
+} from '../../../configs/commonConsts';
 
 const getDefaultState = () => ({
 	isActive: true,
@@ -29,29 +35,14 @@ const getDefaultState = () => ({
 });
 
 const getConvertedBiddersData = bidders => {
-	const { addedBidders } = bidders;
-
-	return Object.keys(addedBidders).map(bidderCode => {
-		const { name } = addedBidders[bidderCode];
+	return Object.keys(bidders).map(bidderCode => {
+		const { name } = bidders[bidderCode];
 		return {
 			label: name,
 			value: bidderCode
 		};
 	});
 };
-
-const getConvertedAdUnitsData = adUnits =>
-	adUnits.map(item => {
-		let labelKey = 'adUnit';
-		let valueKey = 'adUnitId';
-
-		if (item.type === 'apLite') {
-			labelKey = 'adUnit';
-			valueKey = 'sectionId';
-		}
-
-		return { label: item[labelKey], value: item[valueKey] };
-	});
 
 const getTemplate = type => {
 	const template = {
@@ -70,31 +61,16 @@ const getTemplate = type => {
 };
 
 const getResetValueForAction = actionKey => {
-	const booleanTypes = ['s2s_toggle'];
-	const numberTypes = ['refresh_timeout', 'initial_timeout', 's2s_timeout'];
-	const arrayTypes = ['allowed_bidders', 'bidders_order', 'significant_bidders'];
-
-	if (booleanTypes.includes(actionKey)) return false;
-	if (numberTypes.includes(actionKey)) return 0;
+	const arrayTypes = ['allowed_bidders', 'disallowed_bidders'];
 	if (arrayTypes.includes(actionKey)) return [];
-	if (actionKey === 'formats') return ['banner']; // fixed/mandatory option
-
 	return null;
 };
 
-class OptimizationTab extends React.Component {
-	notSupportedOptions = [
-		// 'triggerKeyOptions.country',
-		'actionKeyOptions.s2s_toggle',
-		'actionKeyOptions.s2s_timeout',
-		'actionKeyOptions.significant_bidders'
-	];
-
+class BidderRules extends React.Component {
 	constructor(props) {
 		super(props);
-		const { bidders, inventories } = props;
+		const { bidders } = props;
 
-		const adUnits = getConvertedAdUnitsData(inventories);
 		const allowedBidders = getConvertedBiddersData(bidders);
 
 		this.state = {
@@ -104,98 +80,24 @@ class OptimizationTab extends React.Component {
 			isActive: true,
 			triggers: [],
 			actions: [],
-			actionKeyOptions: [
-				{
-					label: 'Allow Bidders',
-					value: 'allowed_bidders'
-				},
-				{
-					label: 'Disallow Bidders',
-					value: 'disallowed_bidders'
-				},
-				{
-					label: 'Order of bidders',
-					value: 'bidders_order'
-				},
-				{
-					label: 'Set Refresh Timeout',
-					value: 'refresh_timeout'
-				},
-				{
-					label: 'Set Initial Timeout',
-					value: 'initial_timeout'
-				},
-				{
-					label: 'Use formats',
-					value: 'formats'
-				},
-				{
-					label: 'Disable Header Bidding',
-					value: 'disable_header_bidding'
-				},
-				{
-					label: 'Disable S2S',
-					value: 's2s_toggle'
-				},
-				{
-					label: 'Set S2S Timeout',
-					value: 's2s_timeout'
-				},
-				{
-					label: 'Most Significant Bidders',
-					value: 'significant_bidders'
-				}
-			],
+			actionKeyOptions: ACTION_KEY_OPTIONS,
 			actionValueOptions: {
 				allowed_bidders: allowedBidders,
-				disallowed_bidders: allowedBidders,
-				formats: []
+				disallowed_bidders: allowedBidders
 			},
-			triggerKeyOptions: [
-				{
-					label: 'Country',
-					value: 'country'
-				},
-				{
-					label: 'Device',
-					value: 'device'
-				},
-				{
-					label: 'Time Range',
-					value: 'time_range'
-				},
-				{
-					label: 'Ad Unit',
-					value: 'adunit'
-				},
-				{
-					label: 'Day of the Week',
-					value: 'day_of_the_week'
-				}
-			],
-			triggerOperatorOptions: [
-				{
-					label: 'IS IN',
-					value: 'contain'
-				},
-				{
-					label: 'IS NOT IN',
-					value: 'not_contain'
-				}
-			],
+			triggerKeyOptions: TRIGGER_KEY_OPTIONS,
+			triggerOperatorOptions: TRIGGER_OPERATOR_OPTIONS,
 			triggerValueOptions: {
 				country: [],
 				device: [],
 				time_range: [],
-				day_of_the_week: [],
-				adunit: adUnits
+				day_of_the_week: []
 			},
 			actionKeyIndexMap: {},
 			triggerKeyIndexMap: {},
 
 			// required for getDerivedStateFromProps
-			bidders,
-			inventories
+			bidders
 		};
 
 		this.handleSubmit = this.handleSubmit.bind(this);
@@ -214,40 +116,9 @@ class OptimizationTab extends React.Component {
 		this.handleRemoveAction = this.handleRemoveAction.bind(this);
 		this.handleActionKeyChange = this.handleActionKeyChange.bind(this);
 		this.handleActionValueChange = this.handleActionValueChange.bind(this);
-		this.handleBiddersOrderChange = this.handleBiddersOrderChange.bind(this);
-	}
-
-	static getDerivedStateFromProps(props, state) {
-		const { bidders: newBidders, inventories: newInventories } = props;
-		const { bidders: currentBidders, inventories: currentInventories } = state;
-
-		let updatedState = {};
-
-		if (newBidders !== currentBidders) {
-			updatedState = {
-				actionValueOptions: {
-					...state.actionValueOptions,
-					allowed_bidders: getConvertedBiddersData(newBidders)
-				}
-			};
-		}
-
-		if (newInventories !== currentInventories) {
-			updatedState = {
-				...updatedState,
-				triggerValueOptions: {
-					...state.triggerValueOptions,
-					adunit: getConvertedAdUnitsData(newInventories)
-				}
-			};
-		}
-
-		return Object.keys(updatedState).length ? updatedState : null;
 	}
 
 	componentDidMount() {
-		const { siteId, fetchHBRulesAction } = this.props;
-		fetchHBRulesAction(siteId);
 		this.getMetaData();
 	}
 
@@ -255,12 +126,10 @@ class OptimizationTab extends React.Component {
 		axiosInstance
 			.get('headerBidding/rules/meta')
 			.then(({ data }) => {
-				const { countries, devices, days, timeSlots, adTypes } = data;
+				const { countries, devices, days, timeSlots } = data;
 				this.setState(state => ({
 					actionValueOptions: {
-						...state.actionValueOptions,
-						// display is mandatory
-						formats: adTypes.map(item => ({ ...item, isFixed: item.value === 'display' }))
+						...state.actionValueOptions
 					},
 					triggerValueOptions: {
 						...state.triggerValueOptions,
@@ -286,19 +155,6 @@ class OptimizationTab extends React.Component {
 	// ------------------------------ action ----------------------------
 
 	handleAddAction() {
-		const { actions } = this.state;
-
-		if (actions.length) {
-			const isAllowedBiddersAction = actions.find(action => action.key === 'allowed_bidders');
-			const isdisAllowedBiddersAction = actions.find(action => action.key === 'disallowed_bidders');
-
-			if (isAllowedBiddersAction) {
-				this.notSupportedOptions.push('actionKeyOptions.disallowed_bidders');
-			} else if (isdisAllowedBiddersAction) {
-				this.notSupportedOptions.push('actionKeyOptions.allowed_bidders');
-			}
-		}
-
 		this.setState(state => ({
 			...state,
 			actions: [...state.actions, getTemplate('action')]
@@ -306,16 +162,7 @@ class OptimizationTab extends React.Component {
 	}
 
 	handleRemoveAction(index) {
-		const { actions } = this.state;
 		const confirmed = confirm('Are you sure you want to remove this action?');
-
-		if (actions.length) {
-			if (actions[index].key === 'allowed_bidders') {
-				this.notSupportedOptions.pop('actionKeyOptions.disallowed_bidders');
-			} else if (actions[index].key === 'disallowed_bidders') {
-				this.notSupportedOptions.pop('actionKeyOptions.allowed_bidders');
-			}
-		}
 
 		if (!confirmed) return false;
 
@@ -350,34 +197,20 @@ class OptimizationTab extends React.Component {
 
 		// sort options list
 		const enabledOptions = [];
-		const disabledOptions = [];
-		const notSupportedOptions = [];
 
 		actionKeyOptions.forEach(option => {
-			const isNotSupported = this.notSupportedOptions.includes(`actionKeyOptions.${option.value}`);
 			const selectedFor = actionKeyIndexMap[option.value];
 
 			const item = {
 				...option,
-				isDisabled: isNotSupported,
-				isNotSupported,
-				selectedFor,
-				label: `${option.label}${isNotSupported ? ` (Not Supported)` : ``}`
+				selectedFor
 			};
 
 			// eslint-disable-next-line no-nested-ternary
-			isNotSupported
-				? notSupportedOptions.push(item)
-				: typeof selectedFor !== 'undefined'
-				? disabledOptions.push(item)
-				: enabledOptions.push(item);
+			enabledOptions.push(item);
 		});
 
-		const filteredActionKeyOptions = [
-			...enabledOptions,
-			...disabledOptions,
-			...notSupportedOptions
-		];
+		const filteredActionKeyOptions = [...enabledOptions];
 
 		return {
 			keyOptions: filteredActionKeyOptions,
@@ -399,22 +232,6 @@ class OptimizationTab extends React.Component {
 				isIgnored: !!isIgnored,
 				isIgnoredMessage: isIgnored ? isIgnoredMessage : null
 			};
-
-			if (value === 'bidders_order') {
-				const { bidders } = this.props;
-				const addedBiddersData = getConvertedBiddersData(bidders);
-
-				action.value = addedBiddersData;
-			}
-
-			if (value === 'formats') {
-				// display is mandatory
-				action.value = ['display'];
-			}
-
-			if (value === 'disable_header_bidding') {
-				action.value = true;
-			}
 
 			newActions[index] = action;
 
@@ -471,23 +288,6 @@ class OptimizationTab extends React.Component {
 		this.setState(state => ({ ...state, actions: newActions }));
 	}
 
-	handleBiddersOrderChange(dragIndex, hoverIndex, index) {
-		const { actions } = this.state;
-
-		const newActions = [...actions];
-		const orderedBidders = newActions[index].value;
-		const draggedBidder = orderedBidders[dragIndex];
-
-		// remove dragged bidder from its original position
-		orderedBidders.splice(dragIndex, 1);
-		// place it at the position it was hovered at
-		orderedBidders.splice(hoverIndex, 0, draggedBidder);
-
-		this.setState({
-			actions: newActions
-		});
-	}
-
 	// ------------------------------ trigger ----------------------------
 
 	handleAddTrigger() {
@@ -509,7 +309,6 @@ class OptimizationTab extends React.Component {
 
 		const afterStateUpdate = () => {
 			this.updateTriggerKeyIndexMap();
-			this.updateIgnoredFields();
 		};
 
 		this.setState(stateHandler, afterStateUpdate);
@@ -543,81 +342,26 @@ class OptimizationTab extends React.Component {
 
 		// sort options list
 		const enabledOptions = [];
-		const disabledOptions = [];
-		const notSupportedOptions = [];
 
 		triggerKeyOptions.forEach(option => {
-			const isNotSupported = this.notSupportedOptions.includes(`triggerKeyOptions.${option.value}`);
 			const selectedFor = triggerKeyIndexMap[option.value];
 
 			const item = {
 				...option,
-				isDisabled: isNotSupported,
-				isNotSupported,
-				selectedFor,
-				label: `${option.label}${isNotSupported ? ` (Not Supported)` : ``}`
+				selectedFor
 			};
 
 			// eslint-disable-next-line no-nested-ternary
-			isNotSupported
-				? notSupportedOptions.push(item)
-				: typeof selectedFor !== 'undefined'
-				? disabledOptions.push(item)
-				: enabledOptions.push(item);
+			enabledOptions.push(item);
 		});
 
-		const filteredTriggerKeyOptions = [
-			...enabledOptions,
-			...disabledOptions,
-			...notSupportedOptions
-		];
+		const filteredTriggerKeyOptions = [...enabledOptions];
 
 		return {
 			valueOptions: triggerValueOptions,
 			keyOptions: filteredTriggerKeyOptions,
 			operatorOptions: triggerOperatorOptions
 		};
-	}
-
-	updateIgnoredFields() {
-		const { triggers, actions, actionKeyOptions } = this.state;
-
-		const adUnitTriggerIndex = triggers.findIndex(trigger => trigger.key === 'adunit');
-
-		const ignoreHbTimeouts = adUnitTriggerIndex !== -1;
-		const optionsToBeIgnored = ['initial_timeout', 'refresh_timeout'];
-
-		const newActionKeyOptions = actionKeyOptions.map(option => {
-			if (optionsToBeIgnored.includes(option.value)) {
-				// add ignored data to option which will be used when this option is selected
-				// eslint-disable-next-line no-param-reassign
-				option.isIgnored = ignoreHbTimeouts;
-				// eslint-disable-next-line no-param-reassign
-				option.isIgnoredMessage = ignoreHbTimeouts
-					? `You cannot use this Action if Ad Unit Trigger is set`
-					: null;
-			}
-
-			return option;
-		});
-		// add ignored data to action that has these options selected
-		const newActions = actions.map(action => {
-			if (optionsToBeIgnored.includes(action.key)) {
-				// eslint-disable-next-line no-param-reassign
-				action.isIgnored = ignoreHbTimeouts;
-				// eslint-disable-next-line no-param-reassign
-				action.isIgnoredMessage = ignoreHbTimeouts
-					? `You cannot use this Action if Ad Unit Trigger is set`
-					: null;
-			}
-
-			return action;
-		});
-
-		this.setState({
-			actions: newActions,
-			actionKeyOptions: newActionKeyOptions
-		});
 	}
 
 	handleTriggerKeyChange(index, { value }) {
@@ -645,7 +389,7 @@ class OptimizationTab extends React.Component {
 			};
 		};
 
-		this.setState(stateHandler, this.updateIgnoredFields);
+		this.setState(stateHandler);
 	}
 
 	handleTriggerOperatorChange(index, { value }) {
@@ -825,12 +569,10 @@ class OptimizationTab extends React.Component {
 
 	handleSubmit() {
 		const {
-			siteId,
 			showNotification,
-			saveHBRulesAction,
+			saveNetworkWideRules,
 			setUnsavedChangesAction,
-			customProps,
-			user
+			customProps
 		} = this.props;
 		const { triggers, actions, isActive, selectedRuleIndex } = this.state;
 
@@ -842,7 +584,7 @@ class OptimizationTab extends React.Component {
 
 		const dataForAuditLogs = {
 			appName: customProps.appName,
-			siteDomain: user.sites[siteId].domain
+			siteDomain: ''
 		};
 
 		const triggersData = triggers.reduce((data, trigger) => {
@@ -873,11 +615,7 @@ class OptimizationTab extends React.Component {
 
 			if (isIgnored) return data;
 
-			let convertedValue = value;
-
-			if (key === 'bidders_order') {
-				convertedValue = value.map(({ value: val }) => val);
-			}
+			const convertedValue = value;
 
 			data.push({
 				key,
@@ -892,10 +630,11 @@ class OptimizationTab extends React.Component {
 		const rule = {
 			isActive,
 			actions: actionsData,
-			triggers: triggersData
+			triggers: triggersData,
+			isGlobal: true
 		};
 
-		saveHBRulesAction(siteId, { rule, ruleIndex: selectedRuleIndex }, dataForAuditLogs)
+		saveNetworkWideRules({ rule, ruleIndex: selectedRuleIndex }, dataForAuditLogs)
 			.then(() => {
 				const notification = {
 					mode: 'success',
@@ -927,7 +666,7 @@ class OptimizationTab extends React.Component {
 
 		if (getConfirmation && !confirmed) return;
 
-		this.setState({ ...getDefaultState() }, this.updateIgnoredFields);
+		this.setState({ ...getDefaultState() });
 	}
 
 	handleRuleStatusChange(status) {
@@ -989,8 +728,8 @@ class OptimizationTab extends React.Component {
 						onRemoveAction={this.handleRemoveAction}
 						onKeyChange={this.handleActionKeyChange}
 						onValueChange={this.handleActionValueChange}
-						onBiddersOrderChange={this.handleBiddersOrderChange}
 						dropdownOptions={actionDropdownOptions}
+						isForOps
 					/>
 					<div className="divider" />
 					<div className="control">
@@ -1008,12 +747,10 @@ class OptimizationTab extends React.Component {
 
 	handleToggleStatus(index, value) {
 		const {
-			siteId,
 			showNotification,
-			saveHBRulesAction,
+			saveNetworkWideRules,
 			setUnsavedChangesAction,
-			customProps,
-			user
+			customProps
 		} = this.props;
 
 		const rule = {
@@ -1021,10 +758,10 @@ class OptimizationTab extends React.Component {
 		};
 		const dataForAuditLogs = {
 			appName: customProps.appName,
-			siteDomain: user.sites[siteId].domain
+			siteDomain: ''
 		};
 
-		saveHBRulesAction(siteId, { rule, ruleIndex: index }, dataForAuditLogs)
+		saveNetworkWideRules({ rule, ruleIndex: index }, dataForAuditLogs)
 			.then(() => {
 				const notification = {
 					mode: 'success',
@@ -1035,7 +772,6 @@ class OptimizationTab extends React.Component {
 
 				setUnsavedChangesAction(true);
 				showNotification(notification);
-				// this.resetState(false);
 			})
 			.catch(error => {
 				// eslint-disable-next-line no-console
@@ -1051,8 +787,8 @@ class OptimizationTab extends React.Component {
 	}
 
 	handleEditRule(index) {
-		const { rules, bidders } = this.props;
-		const { addedBidders } = bidders;
+		const { rules } = this.props;
+
 		const { triggers = [], actions = [], isActive } = _cloneDeep(rules)[index];
 
 		// convert weekday, weekend value from array to string
@@ -1060,15 +796,12 @@ class OptimizationTab extends React.Component {
 			let convertedValue = trigger.value;
 
 			if (trigger.key === 'day_of_the_week') {
-				const weekend = ['saturday', 'sunday'];
-				const weekday = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
-
-				const hasWeekday = weekday.every(day => trigger.value.includes(day));
-				const hasWeekend = weekend.every(day => trigger.value.includes(day));
+				const hasWeekday = WEEKDAY.every(day => trigger.value.includes(day));
+				const hasWeekend = WEEKEND.every(day => trigger.value.includes(day));
 
 				convertedValue = [];
-				if (hasWeekday) convertedValue.push(weekday.join(','));
-				if (hasWeekend) convertedValue.push(weekend.join(','));
+				if (hasWeekday) convertedValue.push(WEEKDAY.join(','));
+				if (hasWeekend) convertedValue.push(WEEKEND.join(','));
 			}
 
 			// eslint-disable-next-line no-param-reassign
@@ -1078,20 +811,9 @@ class OptimizationTab extends React.Component {
 		});
 
 		const convertedActions = actions.map(action => {
-			const { key, value } = action;
+			const { value } = action;
 
-			let convertedValue = value;
-
-			if (key === 'bidders_order') {
-				const biddersMap = Object.keys(addedBidders).reduce((map, bidderCode) => {
-					const { name } = addedBidders[bidderCode];
-					// eslint-disable-next-line no-param-reassign
-					map[bidderCode] = name;
-					return map;
-				}, {});
-
-				convertedValue = value.map(val => ({ label: biddersMap[val], value: val }));
-			}
+			const convertedValue = value;
 
 			// eslint-disable-next-line no-param-reassign
 			action.value = convertedValue;
@@ -1108,7 +830,6 @@ class OptimizationTab extends React.Component {
 				selectedRuleIndex: index
 			},
 			() => {
-				this.updateIgnoredFields();
 				this.updateActionKeyIndexMap();
 				this.updateTriggerKeyIndexMap();
 			}
@@ -1125,7 +846,6 @@ class OptimizationTab extends React.Component {
 			triggerOperatorOptions,
 			triggerValueOptions
 		} = this.state;
-		const { allowed_bidders = [] } = actionValueOptions;
 
 		const modifiedActionValueOptions = {
 			...actionValueOptions,
@@ -1142,8 +862,8 @@ class OptimizationTab extends React.Component {
 					triggerOperatorOptions={triggerOperatorOptions}
 					triggerValueOptions={triggerValueOptions}
 					actionKeyOptions={actionKeyOptions}
-					allowedBidders={allowed_bidders}
 					actionValueOptions={modifiedActionValueOptions}
+					isForOps
 				/>
 				<div className="control">
 					<Button className="btn-primary" onClick={() => this.handleAddNewRule()}>
@@ -1188,4 +908,4 @@ class OptimizationTab extends React.Component {
 	}
 }
 
-export default OptimizationTab;
+export default BidderRules;

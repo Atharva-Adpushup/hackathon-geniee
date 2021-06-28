@@ -5,7 +5,7 @@ const _ = require('lodash');
 const CB_ERRORS = require('couchbase').errors;
 const couchBase = require('../../../configs/config').couchBase;
 const { docKeys } = require('../../../configs/commonConsts');
-const { getBiddersFromNetworkTree } = require('./commonFunctions');
+const { getBiddersFromNetworkTree, getNetworkWideHBRules } = require('./commonFunctions');
 
 const dbHelper = couchbaseService(
 	`couchbase://${couchBase.HOST}`,
@@ -25,8 +25,9 @@ const generatePrebidConfig = siteId => {
 			}
 			throw err;
 		}),
-		getBiddersFromNetworkTree()
-	).then(([hbDoc, biddersFromNetworkTree]) => {
+		getBiddersFromNetworkTree(),
+		getNetworkWideHBRules()
+	).then(([hbDoc, biddersFromNetworkTree, globalRules]) => {
 		if (!Object.keys(hbDoc.value).length) {
 			return emptyResponse;
 		}
@@ -83,6 +84,7 @@ const generatePrebidConfig = siteId => {
 			delete activeUsedBidders[s2sBidderCode];
 		});
 
+		hbDoc.value.globalRules = globalRules;
 		hbDoc.value.hbcf = activeUsedBidders;
 		hbDoc.value.biddersDisabledOnRefresh = biddersDisabledOnRefresh;
 

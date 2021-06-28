@@ -5,7 +5,8 @@ import CustomButton from '../../../../../Components/CustomButton/index';
 import FieldGroup from '../../../../../Components/Layout/FieldGroup';
 import Loader from '../../../../../Components/Loader';
 import axiosInstance from '../../../../../helpers/axiosInstance';
-import config from '../../../../../../Client/config/config';
+import config from '../../../../../config/config';
+
 class AdUnitSettings extends Component {
 	constructor(props) {
 		super(props);
@@ -87,13 +88,11 @@ class AdUnitSettings extends Component {
 				this.setState({ collapseUnfilledToggle: val });
 				break;
 			case 'downwardSizesDisabled':
-				this.setState(state => {
-					return {
-						...state,
-						downwardSizesDisabled: !val,
-						enableDownwardSizeToggle: val
-					};
-				});
+				this.setState(state => ({
+					...state,
+					downwardSizesDisabled: !val,
+					enableDownwardSizeToggle: val
+				}));
 				break;
 			default:
 				break;
@@ -246,7 +245,7 @@ class AdUnitSettings extends Component {
 							off="No"
 							defaultLayout
 							name={adid}
-							id={'collapseUnfilled-' + adid}
+							id={`collapseUnfilled-${adid}`}
 						/>
 					) : null}
 					<CustomToggleSwitch
@@ -261,7 +260,7 @@ class AdUnitSettings extends Component {
 						defaultLayout
 						name={adid}
 						disabled={docid.includes('aplt') ? 'true' : null}
-						id={'downwardSizesDisabled-' + adid}
+						id={`downwardSizesDisabled-${adid}`}
 					/>
 					{enableDownwardSizeToggle && !docid.includes('aplt') ? (
 						<Row>

@@ -5,19 +5,29 @@ import React, { Component } from 'react';
 
 import CustomToggleSwitch from '../../../../../Components/CustomToggleSwitch/index';
 import CustomButton from '../../../../../Components/CustomButton/index';
+import FieldGroup from '../../../../../Components/Layout/FieldGroup';
 
 class ReportsPanelSettings extends Component {
 	constructor(props) {
 		super(props);
 		const { user } = this.props;
-		const { showUniqueImpressionsReporting = false, sessionRpmReports = false } = user;
+		const { showUniqueImpressionsReporting = false, sessionRpmReports = false, mcm = {} } = user;
+		const { isMcmEnabled = false, childPublisherId = '' } = mcm;
 
 		this.state = {
 			showUniqueImpressionsReporting,
 			loading: false,
-			sessionRpmReports
+			sessionRpmReports,
+			isMcmEnabled,
+			childPublisherId
 		};
 	}
+
+	handleChange = e => {
+		this.setState({
+			[e.target.name]: e.target.value
+		});
+	};
 
 	handleToggle = (val, e) => {
 		const { target } = e;
@@ -28,8 +38,21 @@ class ReportsPanelSettings extends Component {
 	};
 
 	handleSave = () => {
-		const { showUniqueImpressionsReporting, sessionRpmReports } = this.state;
-		const { updateUser, customProps } = this.props;
+		const {
+			showUniqueImpressionsReporting,
+			sessionRpmReports,
+			childPublisherId,
+			isMcmEnabled
+		} = this.state;
+		const { updateUser, customProps, showNotification } = this.props;
+		if (isMcmEnabled && childPublisherId === '') {
+			return showNotification({
+				mode: 'error',
+				title: 'Invalid Value',
+				message: 'Please enter the Child Publisher Id to Save',
+				autoDismiss: 5
+			});
+		}
 
 		const dataForAuditLogs = {
 			appName: customProps.appName,
@@ -47,6 +70,13 @@ class ReportsPanelSettings extends Component {
 				{
 					key: 'sessionRpmReports',
 					value: sessionRpmReports
+				},
+				{
+					key: 'mcm',
+					value: {
+						isMcmEnabled,
+						childPublisherId
+					}
 				}
 			],
 			dataForAuditLogs
@@ -58,13 +88,19 @@ class ReportsPanelSettings extends Component {
 	};
 
 	render() {
-		const { loading, showUniqueImpressionsReporting, sessionRpmReports } = this.state;
+		const {
+			loading,
+			showUniqueImpressionsReporting,
+			sessionRpmReports,
+			isMcmEnabled,
+			childPublisherId
+		} = this.state;
 
 		return (
 			<div className="showUniqueImpressionsReporting">
 				<CustomToggleSwitch
 					labelText="Show Unique Impressions Reporting"
-					className="u-margin-t4 u-margin-b4 u-margin-t4 negative-toggle u-cursor-pointer"
+					className="u-margin-t4 u-margin-b4 negative-toggle u-cursor-pointer"
 					checked={showUniqueImpressionsReporting}
 					onChange={this.handleToggle}
 					layout="horizontal"
@@ -87,6 +123,31 @@ class ReportsPanelSettings extends Component {
 					defaultLayout
 					name="sessionRpmReports"
 					id="js-sessionRpmReports"
+				/>
+				<CustomToggleSwitch
+					labelText="Enable MCM"
+					className="u-margin-b4 negative-toggle u-cursor-pointer"
+					checked={isMcmEnabled}
+					onChange={this.handleToggle}
+					layout="horizontal"
+					size="m"
+					on="Yes"
+					off="No"
+					defaultLayout
+					name="isMcmEnabled"
+					id="js-isMcmEnabled"
+				/>
+				<FieldGroup
+					name="childPublisherId"
+					value={childPublisherId}
+					type="text"
+					label="Child Publisher ID"
+					onChange={this.handleChange}
+					size={6}
+					id="childPublisherId-input"
+					placeholder="Child Publisher ID"
+					className="u-padding-v4 u-padding-h4"
+					disabled={!isMcmEnabled && true}
 				/>
 				<CustomButton
 					variant="primary"

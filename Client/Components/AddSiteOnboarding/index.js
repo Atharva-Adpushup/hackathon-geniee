@@ -20,16 +20,19 @@ class AddSiteOnboarding extends Component {
 	addExistingSite = e => {
 		e.preventDefault();
 
-		const { existingSite, siteId, onSiteAdd } = this.props;
+		const { existingSite, siteId, onSiteAdd, dataForAuditLogsTemplate } = this.props;
+		const dataForAuditLogs = { ...dataForAuditLogsTemplate, actionInfo: 'Add New Site' };
 		const onboardingStage = 'onboarding';
 		const step = 1;
 
 		this.setState({ isAddingSite: true });
 
 		userService
-			.addSite(existingSite)
+			.addSite(existingSite, dataForAuditLogs)
 			// eslint-disable-next-line no-unused-vars
-			.then(resp => siteService.saveSite(siteId, existingSite, onboardingStage, step))
+			.then(resp =>
+				siteService.saveSite(siteId, existingSite, onboardingStage, step, dataForAuditLogs)
+			)
 			.then(resp => {
 				onSiteAdd(resp.data);
 
@@ -43,7 +46,8 @@ class AddSiteOnboarding extends Component {
 	addNewSite = e => {
 		e.preventDefault();
 
-		const { onSiteAdd, site } = this.props;
+		const { onSiteAdd, site, dataForAuditLogsTemplate } = this.props;
+		const dataForAuditLogs = { ...dataForAuditLogsTemplate, actionInfo: 'Add New Site' };
 		const validationResult = formValidator.validate({ site }, validationSchema.user.validations);
 
 		if (validationResult.isValid) {
@@ -51,13 +55,12 @@ class AddSiteOnboarding extends Component {
 			const step = 1;
 
 			this.setState({ isAddingSite: true });
-
 			userService
-				.addSite(site)
+				.addSite(site, dataForAuditLogs)
 				.then(resp => {
 					const { siteId } = resp.data;
 
-					return siteService.saveSite(siteId, site, onboardingStage, step);
+					return siteService.saveSite(siteId, site, onboardingStage, step, dataForAuditLogs);
 				})
 				.then(resp => {
 					this.setState({ isAddingSite: false });

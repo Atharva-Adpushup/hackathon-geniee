@@ -380,9 +380,6 @@
 	}
 }
 
-.hb-optimization {
-}
-
 .hb-rules {
 	.page__header {
 		display: flex;
@@ -628,15 +625,6 @@
 					}
 				}
 
-				// show borders between triggers
-				&:not(:nth-last-child()) {
-					// border-bottom: 1px solid $greyColor;
-				}
-
-				// &:nth-last-child(1) {
-				// 	margin-bottom: 2rem;
-				// }
-
 				.button {
 					margin: 0 1rem;
 				}
@@ -795,5 +783,11 @@
 				margin: 0 1rem;
 			}
 		}
+	}
+
+	.global-rule {
+		color: green;
+		margin-bottom: 5px;
+		font-weight: bold;
 	}
 }

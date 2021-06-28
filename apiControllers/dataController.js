@@ -22,7 +22,7 @@ const helperUtils = require('../helpers/utils');
 const config = require('../configs/config');
 
 const {
-	AUDIT_LOGS_ACTIONS: { LAYOUT_EDITOR }
+	AUDIT_LOGS_ACTIONS: { LAYOUT_EDITOR, MY_SITES, OPS_PANEL }
 } = CC;
 
 const router = express.Router();
@@ -42,9 +42,12 @@ router
 	.post('/saveSite', (req, res) => {
 		// {siteId, site, onboardingStage, step}
 		const data = req.body;
+		const { email, originalEmail } = req.user;
 
 		const siteId = parseInt(req.body.siteId, 10);
+		const { dataForAuditLogs } = data;
 		let siteObj;
+		let prevConfig = {};
 
 		userModel
 			.verifySiteOwner(req.user.email, siteId)
@@ -54,6 +57,7 @@ router
 			.then(() => {
 				if (data.step !== 1) {
 					return siteModel.getSiteById(siteId).then(site => {
+						prevConfig = _.cloneDeep(site).data;
 						site.set('step', parseInt(data.step, 10));
 						site.set('onboardingStage', data.onboardingStage);
 						return site.save();
@@ -74,7 +78,6 @@ router
 						autoOptimise: false
 					}
 				};
-
 				return siteModel.saveSiteData(siteId, 'POST', siteData);
 			})
 			.then(site => {
@@ -89,7 +92,27 @@ router
 				})
 			)
 			.then(() => siteModel.getSiteById(siteId))
-			.then(site => res.status(httpStatus.OK).json(site.data))
+			.then(site => {
+				const currentConfig = _.cloneDeep(site).data;
+				// log config changes
+				const { siteDomain, appName, type = 'app' } = dataForAuditLogs;
+				sendDataToAuditLogService({
+					siteId,
+					siteDomain,
+					appName,
+					type,
+					impersonateId: email,
+					userId: originalEmail,
+					prevConfig,
+					currentConfig,
+					action: {
+						name: MY_SITES.SAVE_SITE,
+						data: `Save New Site`
+					}
+				});
+
+				return res.status(httpStatus.OK).json(site.data);
+			})
 			.catch(err => {
 				if (err instanceof AdpushupError)
 					return res.status(err.message.status).json({ error: err.message.message });
@@ -116,7 +139,8 @@ router
 			});
 	})
 	.post('/createBackupAd', (req, res) => {
-		const { siteId, content, format } = req.body;
+		const { siteId, content, format, dataForAuditLogs } = req.body;
+		const { email, originalEmail } = req.user;
 		const randomId = utils.randomString();
 
 		return checkParams(['siteId', 'content'], req, 'post')
@@ -130,6 +154,27 @@ router
 					},
 					res
 				);
+			})
+			.then(() => {
+				// log config changes
+				const { siteDomain, appName, type = 'site' } = dataForAuditLogs;
+				sendDataToAuditLogService({
+					siteId,
+					siteDomain,
+					appName,
+					type,
+					impersonateId: email,
+					userId: originalEmail,
+					prevConfig: {},
+					currentConfig: {
+						content,
+						format
+					},
+					action: {
+						name: OPS_PANEL.TOOLS,
+						data: `OPS Tools - Backup Ads`
+					}
+				});
 			})
 			.catch(err => errorHandler(err, res, httpStatus.INTERNAL_SERVER_ERROR));
 	})
@@ -307,9 +352,9 @@ router
 				);
 				const subjectMessage = `Console Error Report`;
 				if (config.environment.HOST_ENV === 'production') {
-					//send alerts only on production
+					// send alerts only on production
 					if (type === 'UserInteraction') {
-						//here we will send mail to the support
+						// here we will send mail to the support
 						sendEmail({
 							queue: 'MAILER',
 							data: {
@@ -322,7 +367,7 @@ router
 						const errorLogToBeTracked = `Error: ${
 							err ? JSON.stringify(err, null, '\n') : 'N/A'
 						} ,  \n Info:  ${info ? JSON.stringify(info, null, '\n') : 'N/A'}`;
-						//By deafult we are alreday sending mail to the hackers
+						// By deafult we are alreday sending mail to the hackers
 						sendEmail({
 							queue: 'MAILER',
 							data: {

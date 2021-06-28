@@ -91,7 +91,12 @@ const commonConsts = {
 			LEFT: {},
 			RIGHT: {},
 			BOTTOM: {},
-			TOP: {}
+			TOP: {},
+			DOCKED: {
+				'z-index': 10000,
+				float: 'left',
+				position: 'static',
+			}
 		}
 	},
 	FORMATS: {

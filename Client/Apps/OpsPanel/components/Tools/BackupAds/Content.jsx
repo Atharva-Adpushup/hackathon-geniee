@@ -56,7 +56,8 @@ class Content extends React.Component {
 	handleSave = () => {
 		const {
 			site: { siteId },
-			showNotification
+			showNotification,
+			dataForAuditLogs
 		} = this.props;
 		const { code, format } = this.state;
 		let isSomethingWrong = !code || !code.trim().length;
@@ -83,7 +84,8 @@ class Content extends React.Component {
 			.post('/data/createBackupAd', {
 				siteId,
 				content: encodedCode,
-				format
+				format,
+				dataForAuditLogs
 			})
 			.then(response => {
 				const { data } = response;

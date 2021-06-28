@@ -9,7 +9,7 @@ import axiosInstance from '../../../../../helpers/axiosInstance';
 import Loader from '../../../../../Components/Loader';
 import AdUnitSettings from './AdUnitSettings';
 import AsyncGroupSelect from '../../../../../Components/AsyncGroupSelect';
-import config from '../../../../../../Client/config/config';
+import config from '../../../../../config/config';
 
 const { AD_NETWORK_DOC_KEYS } = config;
 class AdunitsInventory extends React.Component {
@@ -51,7 +51,7 @@ class AdunitsInventory extends React.Component {
 			.get(config.GET_SITE_DOMAIN_MAPPING)
 			.then(({ data: siteMappingData }) => {
 				const siteDomainMapping = {};
-				let { data: siteMapping } = siteMappingData;
+				const { data: siteMapping } = siteMappingData;
 				siteMapping.forEach(d => {
 					siteDomainMapping[d.siteId] = d.siteDomain;
 				});
@@ -59,7 +59,7 @@ class AdunitsInventory extends React.Component {
 				axiosInstance
 					.get(config.GET_ADUNIT_MAPPING)
 					.then(({ data }) => {
-						let { data: adUnitData } = data;
+						const { data: adUnitData } = data;
 						const allAdUnits = [];
 						adUnitData.forEach(d => {
 							if (!d) {
@@ -127,23 +127,20 @@ class AdunitsInventory extends React.Component {
 				filteredAdList = tempAllAds;
 				this.setState(state => ({ ...state, filteredAds: filteredAdList }));
 				return;
-			} else {
-				tempAllAds.forEach(ad => {
-					if (!uniqueAdsFlag.includes(ad.dfpAdunit)) {
-						uniqueAdsFlag.push(ad.dfpAdunit);
-						filteredAdList.push(ad);
-					}
-				});
 			}
+			tempAllAds.forEach(ad => {
+				if (!uniqueAdsFlag.includes(ad.dfpAdunit)) {
+					uniqueAdsFlag.push(ad.dfpAdunit);
+					filteredAdList.push(ad);
+				}
+			});
 		}
 
-		this.setState(state => {
-			return { ...state, filteredAds: filteredAdList };
-		});
+		this.setState(state => ({ ...state, filteredAds: filteredAdList }));
 	};
 
-	getSelectedFilter = filter => {
-		return new Promise((resolve, reject) => {
+	getSelectedFilter = filter =>
+		new Promise((resolve, reject) => {
 			const { allAds, selectedFilters } = this.state;
 			const response = { data: { result: [] }, status: 200 };
 
@@ -172,16 +169,13 @@ class AdunitsInventory extends React.Component {
 							uniqueAds.push(ad.value);
 							return ad;
 						}
-					} else {
-						if (!uniqueAds.includes(ad.value)) {
-							uniqueAds.push(ad.value);
-							return ad;
-						}
+					} else if (!uniqueAds.includes(ad.value)) {
+						uniqueAds.push(ad.value);
+						return ad;
 					}
 				});
 			return resolve(response);
 		});
-	};
 
 	getTableHeaders = columns => {
 		const sortedColumns = sortBy(clonedeep(columns), ['position']);
@@ -197,8 +191,8 @@ class AdunitsInventory extends React.Component {
 		});
 	};
 
-	getTableBody = (data, columnsMeta) => {
-		return data.map(row => {
+	getTableBody = (data, columnsMeta) =>
+		data.map(row => {
 			const rowCopy = clonedeep(row);
 			for (const columnKey in rowCopy) {
 				if (columnKey == 'adUnitSettings') {
@@ -221,7 +215,6 @@ class AdunitsInventory extends React.Component {
 			}
 			return rowCopy;
 		});
-	};
 
 	updateAdUnitData = adUnitData => {
 		const { filteredAds } = this.state;

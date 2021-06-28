@@ -14,6 +14,7 @@ const FormValidator = require('../helpers/FormValidator');
 const schema = require('../helpers/schema');
 const commonConsts = require('../configs/commonConsts');
 const adpushup = require('../helpers/adpushupEvent');
+const { getSiteWiseHBRules, getNetworkWideHBRules } = require('../helpers/commonFunctions');
 
 const { sendDataToAuditLogService } = require('../helpers/routeHelpers');
 
@@ -1089,9 +1090,14 @@ router
 
 		return userModel
 			.verifySiteOwner(email, siteId)
-			.then(() => headerBiddingModel.getHbConfig(siteId, email))
-			.then(hbConfig => hbConfig.get('rules') || [])
-			.then(rules => res.status(httpStatus.OK).json(rules))
+			.then(() =>
+				Promise.all([getSiteWiseHBRules(email, siteId), getNetworkWideHBRules()]).spread(
+					(siteWiseRules, networkWideRules) => {
+						return res.status(httpStatus.OK).json([...siteWiseRules, ...networkWideRules]);
+					}
+				)
+			)
+
 			.catch(err => {
 				// eslint-disable-next-line no-console
 				console.log(err);
@@ -1109,6 +1115,7 @@ router
 		return userModel
 			.verifySiteOwner(email, siteId)
 			.then(() => FormValidator.validate(rule, schema.hbRules.rule))
+
 			.then(() => headerBiddingModel.getHbConfig(siteId, email))
 			.then(hbConfig => {
 				const rules = hbConfig.get('rules') || [];
@@ -1135,7 +1142,12 @@ router
 				});
 				return hbConfig.save();
 			})
-			.then(({ data: { rules } }) => res.status(httpStatus.OK).json(rules))
+			.then(({ data: { rules } }) => {
+				return getNetworkWideHBRules().then(networkWideRules =>
+					res.status(httpStatus.OK).json([...rules, ...networkWideRules])
+				);
+			})
+
 			.catch(err => {
 				// eslint-disable-next-line no-console
 				console.log(err);
@@ -1144,7 +1156,9 @@ router
 					return res.status(httpStatus.BAD_REQUEST).json({ error: err.message });
 				}
 
-				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error!' });
+				return res
+					.status(httpStatus.INTERNAL_SERVER_ERROR)
+					.json({ error: 'Internal Server Error!' });
 			});
 	})
 	.put('/rules/:siteId', (req, res) => {
@@ -1194,7 +1208,11 @@ router
 				});
 				return hbConfig.save();
 			})
-			.then(({ data: { rules } }) => res.status(httpStatus.OK).json(rules))
+			.then(({ data: { rules } }) => {
+				return getNetworkWideHBRules().then(networkWideRules =>
+					res.status(httpStatus.OK).json([...rules, ...networkWideRules])
+				);
+			})
 			.catch(err => {
 				// eslint-disable-next-line no-console
 				console.log(err);
@@ -1203,7 +1221,9 @@ router
 					return res.status(httpStatus.BAD_REQUEST).json({ error: err.message });
 				}
 
-				res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal Server Error!' });
+				return res
+					.status(httpStatus.INTERNAL_SERVER_ERROR)
+					.json({ error: 'Internal Server Error!' });
 			});
 	});
 

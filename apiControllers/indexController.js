@@ -18,6 +18,7 @@ const schema = require('../helpers/schema');
 const AdPushupError = require('../helpers/AdPushupError');
 const {
 	getNetworkConfig,
+	getNetworkWideHBRules,
 	sendErrorResponse,
 	sendSuccessResponse
 } = require('../helpers/commonFunctions');
@@ -147,38 +148,44 @@ router
 		return userModel
 			.getUserByEmail(email)
 			.then(user =>
-				Promise.join(getNetworkConfig(), getUserSites(user), (networkConfig, sites) => {
-					const userData = user.cleanData();
-					const sitesArray = [...userData.sites];
-					const sitesArrayLength = sitesArray.length;
-					userData.sites = {};
+				Promise.join(
+					getNetworkConfig(),
+					getUserSites(user),
+					getNetworkWideHBRules(),
+					(networkConfig, sites, networkWideHBRules) => {
+						const userData = user.cleanData();
+						const sitesArray = [...userData.sites];
+						const sitesArrayLength = sitesArray.length;
+						userData.sites = {};
 
-					for (let i = 0; i < sitesArrayLength; i += 1) {
-						const site = sitesArray[i];
-						userData.sites[site.siteId] = site;
-					}
-					let params = { siteid: Object.keys(sites).toString(), isSuperUser };
-
-					// enabled to get meta info for HB Analytics Reporting - Enabled or not
-					// and pass as globalMeta data along with sites data
-					return getReportsMetaData(params).then(reports => {
-						const { site: sitesFromReportMeta } = reports;
-						if (sitesFromReportMeta) {
-							Object.keys(sitesFromReportMeta).map(site => {
-								// to check is HB enabled or not
-								if (userData.sites[site] && sitesFromReportMeta[site].product) {
-									userData.sites[site].product = sitesFromReportMeta[site].product;
-								}
-							});
+						for (let i = 0; i < sitesArrayLength; i += 1) {
+							const site = sitesArray[i];
+							userData.sites[site.siteId] = site;
 						}
-						return res.status(httpStatus.OK).json({
-							user: { ...userData, isSuperUser },
-							networkConfig,
-							sites
-							//		reports
+						let params = { siteid: Object.keys(sites).toString(), isSuperUser };
+
+						// enabled to get meta info for HB Analytics Reporting - Enabled or not
+						// and pass as globalMeta data along with sites data
+						return getReportsMetaData(params).then(reports => {
+							const { site: sitesFromReportMeta } = reports;
+							if (sitesFromReportMeta) {
+								Object.keys(sitesFromReportMeta).map(site => {
+									// to check is HB enabled or not
+									if (userData.sites[site] && sitesFromReportMeta[site].product) {
+										userData.sites[site].product = sitesFromReportMeta[site].product;
+									}
+								});
+							}
+							return res.status(httpStatus.OK).json({
+								user: { ...userData, isSuperUser },
+								networkConfig,
+								networkWideHBRules,
+								sites
+								//		reports
+							});
 						});
-					});
-				})
+					}
+				)
 			)
 			.catch(err => {
 				console.log(err);

@@ -26,7 +26,7 @@ const {
 } = require('../helpers/routeHelpers');
 
 const {
-	AUDIT_LOGS_ACTIONS: { OPS_PANEL }
+	AUDIT_LOGS_ACTIONS: { OPS_PANEL, MY_SITES }
 } = CC;
 
 const router = express.Router();
@@ -39,9 +39,16 @@ router
 	})
 	.post('/addSite', (req, res) => {
 		const site = req.body.site ? utils.getSafeUrl(req.body.site) : req.body.site;
+		let prevConfig;
+		const { dataForAuditLogs } = req.body;
+		const { email, originalEmail } = req.user;
 
 		return formValidator
 			.validate({ site }, schema.user.validations)
+			.then(() => userModel.getUserByEmail(req.user.email).then(user => user))
+			.then(user => {
+				prevConfig = _.cloneDeep(user.get('sites'));
+			})
 			.then(() => userModel.addSite(req.user.email, site))
 			.spread((user, siteId) => {
 				const userSites = user.get('sites');
@@ -56,6 +63,23 @@ router
 						// eslint-disable-next-line no-shadow
 						const { siteId, domain, onboardingStage, step } = userSites[i];
 
+						const currentConfig = _.cloneDeep(user.get('sites'));
+						// log config changes
+						const { siteDomain, appName, type = 'app' } = dataForAuditLogs;
+						sendDataToAuditLogService({
+							siteId,
+							siteDomain,
+							appName,
+							type,
+							impersonateId: email,
+							userId: originalEmail,
+							prevConfig,
+							currentConfig,
+							action: {
+								name: MY_SITES.ADD_SITE,
+								data: `Add New Site`
+							}
+						});
 						return res.status(httpStatus.OK).json({ siteId, site: domain, onboardingStage, step });
 					}
 				}
@@ -128,12 +152,35 @@ router
 			.catch(() => res.status(500).send({ error: 'Some error occurred' }));
 	})
 	.post('/setSiteStep', (req, res) => {
-		const { siteId, onboardingStage, step } = req.body;
-		siteModel
-			.setSiteStep(siteId, onboardingStage, step)
+		const { siteId, onboardingStage, step, dataForAuditLogs } = req.body;
+		const { email, originalEmail } = req.user;
+		let prevConfig;
+		userModel
+			.getUserByEmail(req.user.email)
+			.then(user => {
+				prevConfig = _.cloneDeep(user.get('sites'));
+			})
+			.then(() => siteModel.setSiteStep(siteId, onboardingStage, step))
 			.then(() => userModel.setSitePageGroups(req.user.email))
 			.then(user => {
 				user.save();
+				const currentConfig = _.cloneDeep(user.get('sites'));
+				// log config changes
+				const { siteDomain, appName, type = 'app' } = dataForAuditLogs;
+				sendDataToAuditLogService({
+					siteId,
+					siteDomain,
+					appName,
+					type,
+					impersonateId: email,
+					userId: originalEmail,
+					prevConfig,
+					currentConfig,
+					action: {
+						name: MY_SITES.UPDATE_SITE_STEP,
+						data: `Update Site Step`
+					}
+				});
 				return res.status(httpStatus.OK).send({ success: 'Update site step successfully!' });
 			})
 			.catch(() =>

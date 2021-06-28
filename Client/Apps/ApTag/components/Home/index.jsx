@@ -58,7 +58,15 @@ class Home extends Component {
 	renderContent() {
 		const activeTab = this.getActiveTab();
 
-		const { user: { adServerSettings: { dfp = null } = {} } = {} } = this.props;
+		const { user, siteId, customProps } = this.props;
+		const {
+			adServerSettings: { dfp = null }
+		} = user;
+
+		const dataForAuditLogs = {
+			appName: customProps.appName,
+			siteDomain: user.sites[siteId].domain
+		};
 
 		if (!dfp || !dfp.activeDFPNetwork)
 			return (
@@ -68,9 +76,9 @@ class Home extends Component {
 		switch (activeTab) {
 			default:
 			case APT_NAV_ITEMS_INDEXES.CREATE_ADS:
-				return <AdCodeGeneratorContainer {...this.props} />;
+				return <AdCodeGeneratorContainer dataForAuditLogs={dataForAuditLogs} {...this.props} />;
 			case APT_NAV_ITEMS_INDEXES.MANAGE_ADS:
-				return <AdListContainer {...this.props} />;
+				return <AdListContainer dataForAuditLogs={dataForAuditLogs} {...this.props} />;
 		}
 	}
 

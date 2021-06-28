@@ -77,11 +77,10 @@ const getAdConfig = (adType, section) => {
 		sizeMapping,
 		downwardSizesDisabled,
 		sizeFilters,
-		collapseUnfilled
+		collapseUnfilled,
+		poweredByBannerOnDocked
 	} = ad;
-
 	const { name: sectionName, id, formatData } = section;
-
 	let json = {
 		id,
 		sectionName,
@@ -93,7 +92,9 @@ const getAdConfig = (adType, section) => {
 		fluid: collapseUnfilled ? true : fluid === true,
 		sizeMapping,
 		downwardSizesDisabled: !!downwardSizesDisabled,
-		collapseUnfilled: !!collapseUnfilled
+		collapseUnfilled: !!collapseUnfilled,
+		poweredByBannerOnDocked:
+			poweredByBannerOnDocked === undefined || poweredByBannerOnDocked === true ? true : false // default to true on unit level unless declared false
 	};
 
 	// Add 'multipleAdSizes' property if exists
@@ -310,7 +311,9 @@ const getChannelPayload = (channel, pageGroupData, pageGroupPattern) => {
 
 	_.each(channel.variations, (variation, id) => {
 		const variationData =
-			pageGroupData && _.isObject(pageGroupData) ? pageGroupData.variations[id.toUpperCase()] : null;
+			pageGroupData && _.isObject(pageGroupData)
+				? pageGroupData.variations[id.toUpperCase()]
+				: null;
 		const variationPayload = getVariationPayload(
 			variation,
 			platform,

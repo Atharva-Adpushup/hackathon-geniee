@@ -130,11 +130,7 @@ class AdList extends Component {
 	}
 
 	saveWrapper() {
-		const { masterSave, user, match, customProps, siteId } = this.props;
-		const dataForAuditLogs = {
-			appName: customProps.appName,
-			siteDomain: user.sites[siteId].domain
-		};
+		const { masterSave, match, dataForAuditLogs } = this.props;
 		return masterSave(match.params.siteId, dataForAuditLogs);
 	}
 
@@ -264,7 +260,8 @@ class AdList extends Component {
 			user,
 			channels,
 			match,
-			siteId
+			siteId,
+			dataForAuditLogs
 		} = this.props;
 		const { show, modalData, filters } = this.state;
 		const HEADERS = user.isSuperUser ? OPS_AD_LIST_HEADERS : USER_AD_LIST_HEADERS;
@@ -301,6 +298,7 @@ class AdList extends Component {
 									key={`adElement-${ad.id}`}
 									identifier={ad.id}
 									ad={ad}
+									dataForAuditLogs={dataForAuditLogs}
 									style={customStyle}
 									meta={meta}
 									channels={channels}

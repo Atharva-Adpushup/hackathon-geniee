@@ -9,7 +9,9 @@ import AdsTxtLiveSitesEntries from './AdsTxtLiveSitesEntries';
 import BidderSettings from './BidderSettings';
 import DashboardNotifications from './DashboardNotifications';
 import authService from '../../../../services/authService';
+import BidderRules from './NetworkWideHBRules';
 import Inventory from './Inventory';
+
 class Tools extends Component {
 	state = {
 		activeKey: TOOLS_IDENTIFIERS.BACKUP_ADS,
@@ -48,8 +50,11 @@ class Tools extends Component {
 			sites,
 			showNotification,
 			updateNetworkConfig,
+			saveNetworkWideRules,
+			setUnsavedChangesAction,
 			customProps,
-			user
+			user,
+			rules
 		} = this.props;
 
 		const dataForAuditLogs = {
@@ -61,7 +66,13 @@ class Tools extends Component {
 		switch (activeKey) {
 			default:
 			case TOOLS_IDENTIFIERS.BACKUP_ADS:
-				return <BackupAds showNotification={showNotification} sites={sites} />;
+				return (
+					<BackupAds
+						showNotification={showNotification}
+						sites={sites}
+						dataForAuditLogs={dataForAuditLogs}
+					/>
+				);
 			case TOOLS_IDENTIFIERS.REGEX_VERIFICATION:
 				return <RegexVerification sites={sites} showNotification={showNotification} />;
 			case TOOLS_IDENTIFIERS.TOP_XPATH_MISS_MODE_URL:
@@ -72,6 +83,18 @@ class Tools extends Component {
 
 			case TOOLS_IDENTIFIERS.ADS_TXT_LIVE_SITES:
 				return <AdsTxtLiveSitesEntries showNotification={showNotification} />;
+
+			case TOOLS_IDENTIFIERS.BIDDER_RULES:
+				return (
+					<BidderRules
+						bidders={networkConfig}
+						showNotification={showNotification}
+						saveNetworkWideRules={saveNetworkWideRules}
+						setUnsavedChangesAction={setUnsavedChangesAction}
+						rules={rules}
+						customProps={customProps}
+					/>
+				);
 
 			case TOOLS_IDENTIFIERS.REGEX_GENERATION:
 				return 'Regex Generation';
@@ -123,6 +146,9 @@ class Tools extends Component {
 								<NavItem eventKey={TOOLS_IDENTIFIERS.ADS_TXT_LIVE_SITES}>
 									Ads.txt Entries Live Sites
 								</NavItem>
+
+								<NavItem eventKey={TOOLS_IDENTIFIERS.BIDDER_RULES}>Bidder Rules</NavItem>
+
 								<NavItem eventKey={TOOLS_IDENTIFIERS.INVENTORY}>Ad Unit Inventory Tab</NavItem>
 								{dashboardNotificationAccess ? (
 									<NavItem eventKey={TOOLS_IDENTIFIERS.DASHBOARD_NOTIFICATIONS}>

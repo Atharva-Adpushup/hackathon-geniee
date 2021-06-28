@@ -31,6 +31,19 @@ function getBiddersFromNetworkTree() {
 		.catch(err => Promise.resolve({}));
 }
 
+function getNetworkWideHBRules() {
+	return couchbase
+		.connectToAppBucket()
+		.then(appBucket => appBucket.getAsync(commonConsts.docKeys.networkWideHBRules))
+		.then(json => {
+			const {
+				value: { rules = [] }
+			} = json;
+			return rules;
+		})
+		.catch(err => Promise.resolve([]));
+}
+
 function getSizeMappingConfigFromCB() {
 	return couchbase
 		.connectToAppBucket()
@@ -99,7 +112,7 @@ function pushToCdnOriginQueue(fileConfig, siteId) {
 		if (fileConfig.name.match(/^pb\.\d+\.js$/)) {
 			job.filePath = `prebid/${fileConfig.name}`;
 		}
-		
+
 		if (fileConfig.name.match(/^worker\.[a-z0-9]+\.js$/)) {
 			job.filePath = `workers/${fileConfig.name}`;
 		}
@@ -122,5 +135,6 @@ module.exports = {
 	isS2SBidderAddedOnGivenSite,
 	writeTempFiles,
 	readTempFile,
-	pushToCdnOriginQueue
+	pushToCdnOriginQueue,
+	getNetworkWideHBRules
 };

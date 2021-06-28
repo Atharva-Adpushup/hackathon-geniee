@@ -23,8 +23,8 @@ export default {
 	MIXPANEL: {
 		TOKEN: '96e958dc847c19d28cf873a827efae75'
 	},
-	disableDailyWeeklySnapshots: true,
-	updateInventoryAdunit: "/ops/updateAdUnitData/",
+	disableDailyWeeklySnapshots: false,
+	updateInventoryAdunit: '/ops/updateAdUnitData/',
 	ADMIN_INVENTORY_LIST_TABLE_HEADER: [
 		{
 			Header: 'Site Id',
@@ -60,9 +60,9 @@ export default {
 		{ name: 'Site Id', value: 'siteId', isDisabled: false, key: 'siteId' },
 		{ name: 'Adunit Name', value: 'dfpAdunit', isDisabled: true, key: 'dfpAdunit' }
 	],
-	GET_SITE_DOMAIN_MAPPING: "/ops/getSiteMapping",
-	GET_ADUNIT_MAPPING: "ops/getAdUnitMapping",
+	GET_SITE_DOMAIN_MAPPING: '/ops/getSiteMapping',
+	GET_ADUNIT_MAPPING: 'ops/getAdUnitMapping',
 	AD_NETWORK_DOC_KEYS: {
-		dfpAdunit: "dfpAdunit"
+		dfpAdunit: 'dfpAdunit'
 	}
 };

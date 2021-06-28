@@ -26,7 +26,7 @@ class BackupAds extends React.Component {
 
 	render() {
 		const { currentSite, options } = this.state;
-		const { sites = {}, showNotification } = this.props;
+		const { sites = {}, showNotification, dataForAuditLogs } = this.props;
 		const site = currentSite ? sites[currentSite] : null;
 		const hasSites = !!Object.keys(sites).length;
 
@@ -41,7 +41,13 @@ class BackupAds extends React.Component {
 					id="regex-verification-select-site"
 					title="Select Site"
 				/>
-				{site !== null ? <Content site={site} showNotification={showNotification} /> : null}
+				{site !== null ? (
+					<Content
+						site={site}
+						showNotification={showNotification}
+						dataForAuditLogs={dataForAuditLogs}
+					/>
+				) : null}
 			</React.Fragment>
 		);
 	}

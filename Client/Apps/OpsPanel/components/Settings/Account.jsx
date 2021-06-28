@@ -394,13 +394,17 @@ class Account extends Component {
 				{isDFPSetup && originalactiveDFP !== null ? null : (
 					<CustomButton
 						variant="primary"
-						className="pull-right u-margin-l4"
+						className="pull-right u-margin-l4 u-margin-b4"
 						onClick={this.handleAdManagerSave}
 					>
 						Sync Ad Manager
 					</CustomButton>
 				)}
-				<CustomButton variant="primary" className="pull-right" onClick={this.handleAdsenseSave}>
+				<CustomButton
+					variant="primary"
+					className="pull-right u-margin-b4"
+					onClick={this.handleAdsenseSave}
+				>
 					Sync AdSense
 				</CustomButton>
 			</Col>

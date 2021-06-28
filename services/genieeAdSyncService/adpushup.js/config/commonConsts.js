@@ -148,16 +148,20 @@ module.exports = {
 				textDecoration: 'none',
 				background: 'transparent'
 			},
-			LOGO: {
+			STICKYBOTTOM_LOGO: {
 				display: 'inline-block',
 				height: '16px !important', // required because some sites override img styles and logo height gets overriden,
 				'vertical-align': 'middle',
 				'margin-top': '0px',
 				'margin-bottom': '0px'
+			},
+			DOCKED_LOGO: {
+				display: 'flex',
+				height: '16px !important'
 			}
 		},
 		SUPPORTED_PLATFORMS: ['DESKTOP'],
-		SUPPORTED_FORMATS: ['STICKYBOTTOM']
+		SUPPORTED_FORMATS: ['STICKYBOTTOM', 'DOCKED']
 	},
 	GA_EVENTS: {
 		SCRIPT_LOADED: 'script-loaded',

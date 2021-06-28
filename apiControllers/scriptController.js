@@ -49,6 +49,9 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 			const apps = site.get('apps');
 			const isAutoOptimise = !!(site.get('apConfigs') && site.get('apConfigs').autoOptimise);
 			const poweredByBanner = !!(site.get('apConfigs') && site.get('apConfigs').poweredByBanner);
+			const poweredByBannerOnDocked = !!(
+				site.get('apConfigs') && site.get('apConfigs').poweredByBannerOnDocked
+			);
 			const gptSraDisabled = !!(site.get('apConfigs') && site.get('apConfigs').gptSraDisabled);
 
 			const setAllConfigs = function(prebidAndAdsConfig) {
@@ -74,6 +77,7 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 				apConfigs.lineItems = (adNetworkConfig && adNetworkConfig.lineItems) || [];
 				apConfigs.autoOptimise = !!isAutoOptimise;
 				apConfigs.poweredByBanner = !!poweredByBanner;
+				apConfigs.poweredByBannerOnDocked = !!poweredByBannerOnDocked;
 				apConfigs.gptSraDisabled = !!gptSraDisabled;
 				apConfigs.siteDomain = site.get('siteDomain');
 				apConfigs.ownerEmailMD5 = crypto
@@ -89,6 +93,9 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 				apConfigs.activeDFPNetwork =
 					(adServerSettings && adServerSettings.dfp && adServerSettings.dfp.activeDFPNetwork) ||
 					null;
+
+				// GAM 360 config
+				apConfigs.mcm = user.get('mcm') || {};
 
 				apConfigs.apLiteActive = !!apps.apLite;
 
@@ -232,6 +239,9 @@ Router.get('/:siteId/ampSiteConfig', (req, res) => {
 				apConfigs.activeDFPNetwork =
 					(adServerSettings && adServerSettings.dfp && adServerSettings.dfp.activeDFPNetwork) ||
 					null;
+
+				// GAM 360 config
+				apConfigs.mcm = user.get('mcm') || {};
 
 				if (ampScriptConfig && ampScriptConfig.ads.length) {
 					apConfigs.ampConfig = {

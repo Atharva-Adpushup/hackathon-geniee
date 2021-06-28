@@ -115,7 +115,7 @@ const ROUTES = {
 		// App ApTag
 		{
 			exact: true,
-			customProps: { activeTab: APT_NAV_ITEMS_INDEXES.CREATE_ADS },
+			customProps: { activeTab: APT_NAV_ITEMS_INDEXES.CREATE_ADS, appName: ROUTE_APP_NAME.AP_TAG },
 			name: 'Ap Tag',
 			path: '/sites/:siteId/apps/ap-tag',
 			component: ApTag

@@ -20,7 +20,8 @@ class VerifyInitCodeOnboarding extends Component {
 	apCodeRef = React.createRef();
 
 	verify = () => {
-		const { siteId, site, onComplete } = this.props;
+		const { siteId, site, onComplete, dataForAuditLogsTemplate } = this.props;
+		const dataForAuditLogs = { ...dataForAuditLogsTemplate, actionInfo: 'New Site Verification' };
 		this.setState({ verifyingInitCode: true });
 
 		const onboardingStage = 'onboarding';
@@ -31,9 +32,9 @@ class VerifyInitCodeOnboarding extends Component {
 			.then(resp => {
 				({ success } = resp.data);
 
-				return userService.setSiteStep(siteId, onboardingStage, step);
+				return userService.setSiteStep(siteId, onboardingStage, step, dataForAuditLogs);
 			})
-			.then(() => siteService.saveSite(siteId, site, onboardingStage, step))
+			.then(() => siteService.saveSite(siteId, site, onboardingStage, step, dataForAuditLogs))
 			.then(() => {
 				this.setState({ verifyingInitCode: false, success });
 
@@ -50,15 +51,16 @@ class VerifyInitCodeOnboarding extends Component {
 	};
 
 	skipVerification = () => {
-		const { siteId, site, onComplete } = this.props;
+		const { siteId, site, onComplete, dataForAuditLogsTemplate } = this.props;
+		const dataForAuditLogs = { ...dataForAuditLogsTemplate, actionInfo: 'Skip Site Verification' };
 		const onboardingStage = 'onboarding';
 		const step = 2;
 
 		this.setState({ skippingInitCodeVerification: true });
 
 		userService
-			.setSiteStep(siteId, onboardingStage, step)
-			.then(() => siteService.saveSite(siteId, site, onboardingStage, step))
+			.setSiteStep(siteId, onboardingStage, step, dataForAuditLogs)
+			.then(() => siteService.saveSite(siteId, site, onboardingStage, step, dataForAuditLogs))
 			.then(() => {
 				this.setState({
 					skippingInitCodeVerification: false,

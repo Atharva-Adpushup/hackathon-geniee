@@ -46,9 +46,9 @@ const updateAd = (adId, siteId, data) => dispatch =>
 		siteId
 	});
 
-const modifyAdOnServer = (siteId, adId, data) => dispatch =>
+const modifyAdOnServer = (siteId, adId, data, dataForAuditLogs) => dispatch =>
 	axiosInstance
-		.post('/apTag/modifyAd', { siteId, adId, data })
+		.post('/apTag/modifyAd', { siteId, adId, data, dataForAuditLogs })
 		.then(() =>
 			dispatch({
 				type: AD_ACTIONS.UPDATE_AD,

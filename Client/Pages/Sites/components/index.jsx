@@ -170,9 +170,15 @@ class MySites extends React.Component {
 	};
 
 	deleteSite = ({ siteId, domanizeDomain }) => {
+		const { user } = this.props;
+		const dataForAuditLogs = {
+			appName: 'My Site',
+			siteDomain: user.sites[siteId].domain
+		};
+
 		if (window.confirm(`Are you sure you want to delete the site -- ${domanizeDomain}?`)) {
 			const { deleteSite } = this.props;
-			return deleteSite(siteId);
+			return deleteSite(siteId, dataForAuditLogs);
 		}
 		return null;
 	};

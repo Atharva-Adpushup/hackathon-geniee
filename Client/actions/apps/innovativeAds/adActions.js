@@ -5,7 +5,7 @@ import { errorHandler } from '../../../helpers/commonFunctions';
 import { pagegroupFiltering, getAdsAndGlobal } from '../../../Apps/InnovativeAds/lib/helpers';
 
 const helpers = {
-	makeAPICall: (adId, siteId, isSuperUser, toUpdate, updatedLogs) => {
+	makeAPICall: (adId, siteId, isSuperUser, toUpdate, updatedLogs, dataForAuditLogs) => {
 		if (isSuperUser) {
 			return Promise.resolve();
 		}
@@ -17,7 +17,8 @@ const helpers = {
 				metaUpdate: {
 					mode: 'pagegroups',
 					logs: updatedLogs
-				}
+				},
+				dataForAuditLogs
 			})
 			.then(response => {
 				if (response.error) {
@@ -34,10 +35,11 @@ const helpers = {
 		updatedLogs,
 		dispatch,
 		mode = 'pagegroups',
+		dataForAuditLogs,
 		logType = GLOBAL_ACTIONS.SET_AD_TRACKING_LOGS
 	) =>
 		helpers
-			.makeAPICall(adId, siteId, isSuperUser, toUpdate, updatedLogs)
+			.makeAPICall(adId, siteId, isSuperUser, toUpdate, updatedLogs, dataForAuditLogs)
 			.then(() => {
 				dispatch({
 					type: AD_ACTIONS.UPDATE_AD,
@@ -60,9 +62,12 @@ const helpers = {
 			.catch(err => errorHandler(err, 'Operation Failed. Please contact AdPushup Operations Team'))
 };
 
-const createAd = params => dispatch =>
+const createAd = (params, dataForAuditLogs) => dispatch =>
 	axiosInstance
-		.post(API_PATHS.CREATE_AD, params)
+		.post(API_PATHS.CREATE_AD, {
+			...params,
+			dataForAuditLogs
+		})
 		.then(response => {
 			const { data } = response.data;
 			dispatch({ type: AD_ACTIONS.UPDATE_ADS_LIST, data: data.ads, siteId: params.siteId });
@@ -111,21 +116,23 @@ const updateAllAds = (siteId, data) => dispatch =>
 		data,
 		siteId
 	});
-const modifyAdOnServer = (adId, siteId, data) => dispatch =>
-	axiosInstance.post(API_PATHS.MODIFY_AD, { siteId, adId, data }).then(response => {
-		if (response.error) {
-			return window.alert(response.data.message);
-		}
-		return dispatch({
-			type: AD_ACTIONS.UPDATE_AD,
-			data: {
-				id: adId,
-				updateThis: data
-			},
-			siteId
+const modifyAdOnServer = (adId, siteId, data, dataForAuditLogs) => dispatch =>
+	axiosInstance
+		.post(API_PATHS.MODIFY_AD, { siteId, adId, data, dataForAuditLogs })
+		.then(response => {
+			if (response.error) {
+				return window.alert(response.data.message);
+			}
+			return dispatch({
+				type: AD_ACTIONS.UPDATE_AD,
+				data: {
+					id: adId,
+					updateThis: data
+				},
+				siteId
+			});
 		});
-	});
-const archiveAd = (adId, siteId, data, isSuperUser) => (dispatch, getState) => {
+const archiveAd = (adId, siteId, data, isSuperUser, dataForAuditLogs) => (dispatch, getState) => {
 	const { global } = getAdsAndGlobal(getState(), {
 		match: {
 			params: { siteId }
@@ -178,14 +185,16 @@ const archiveAd = (adId, siteId, data, isSuperUser) => (dispatch, getState) => {
 		{ isActive, archivedOn, networkData },
 		updatedLogs,
 		dispatch,
-		mode
+		mode,
+		dataForAuditLogs
 	);
 };
 const updateTraffic = (
 	adId,
 	siteId,
 	{ networkData, pagegroups, platform, format },
-	isSuperUser
+	isSuperUser,
+	dataForAuditLogs
 ) => (dispatch, getState) => {
 	const { ads, global } = getAdsAndGlobal(getState(), {
 		match: {
@@ -212,7 +221,8 @@ const updateTraffic = (
 		{ pagegroups, networkData },
 		[...updatedLogs],
 		dispatch,
-		mode
+		mode,
+		dataForAuditLogs
 	);
 };
 

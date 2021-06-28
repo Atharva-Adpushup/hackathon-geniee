@@ -160,11 +160,11 @@ function fetchAds(req, res, docKey) {
 		.catch(err =>
 			err.code && err.code === 13 && err.message.includes('key does not exist')
 				? sendSuccessResponse(
-					{
-						ads: []
-					},
-					res
-				)
+						{
+							ads: []
+						},
+						res
+				  )
 				: errorHandler(err, res)
 		);
 }
@@ -399,7 +399,7 @@ function createNewAmpDocAndDoProcessing(payload, initialDoc, docKey, processing)
 }
 
 function getAmpAds(siteId) {
-	const GET_ALL_AMP_ADS_QUERY = `SELECT _amtg as doc 							
+	const GET_ALL_AMP_ADS_QUERY = `SELECT _amtg as doc
 	FROM AppBucket _amtg
 	WHERE meta(_amtg).id LIKE 'amtg::%' AND _amtg.siteId = "${siteId}";`;
 
@@ -411,7 +411,6 @@ function getAmpAds(siteId) {
 		.then(ads => ads)
 		.catch(err => console.log(err));
 }
-
 
 function getAllAds() {
 	const designName = 'AdunitMapping',
@@ -428,7 +427,6 @@ function getAllAds() {
 }
 
 const updateNonLayoutAds = (req, res, docKey, adData) => {
-
 	const { adUnitId, newData, siteDomain } = adData;
 
 	return helpers
@@ -443,12 +441,13 @@ const updateNonLayoutAds = (req, res, docKey, adData) => {
 				});
 			}
 
-			let prevConfig = {}, currentConfig = {};
+			let prevConfig = {},
+				currentConfig = {};
 
 			_.forEach(doc.ads, (ad, index) => {
 				if (ad.id === adUnitId) {
 					prevConfig = { ...ad };
-					currentConfig = { ...ad, ...newData }
+					currentConfig = { ...ad, ...newData };
 					doc.ads[index] = currentConfig;
 					return false;
 				}
@@ -456,7 +455,7 @@ const updateNonLayoutAds = (req, res, docKey, adData) => {
 			});
 
 			const { siteId } = req.params;
-			const appName = "Ad Unit Inventory";
+			const appName = 'Ad Unit Inventory';
 			const { email, originalEmail } = req.user;
 
 			// log config changes
@@ -507,11 +506,12 @@ const updateApLiteAd = (req, res, adData, logServiceNames) => {
 				});
 			}
 
-			let prevConfig = {}, currentConfig = {};
+			let prevConfig = {},
+				currentConfig = {};
 			_.forEach(doc.adUnits, (ad, index) => {
 				if (ad.dfpAdUnit == adUnitId) {
 					prevConfig = { ...ad };
-					currentConfig = { ...ad, ...adUnitData }
+					currentConfig = { ...ad, ...adUnitData };
 					doc.ads[index] = currentConfig;
 					return false;
 				}
@@ -519,7 +519,7 @@ const updateApLiteAd = (req, res, adData, logServiceNames) => {
 			});
 
 			const { siteId } = req.params;
-			const appName = "Ad Unit Inventory";
+			const appName = 'Ad Unit Inventory';
 			const { email, originalEmail } = req.user;
 
 			// log config changes
@@ -545,7 +545,6 @@ const updateApLiteAd = (req, res, adData, logServiceNames) => {
 			return errorHandler(err, res);
 		});
 };
-
 
 function fetchAmpAds(req, res, docKey) {
 	if (!req.query || !req.query.siteId) {
@@ -573,11 +572,11 @@ function fetchAmpAds(req, res, docKey) {
 		.catch(err =>
 			err.code && err.code === 13 && err.message.includes('key does not exist')
 				? sendSuccessResponse(
-					{
-						ads: []
-					},
-					res
-				)
+						{
+							ads: []
+						},
+						res
+				  )
 				: errorHandler(err, res)
 		);
 }

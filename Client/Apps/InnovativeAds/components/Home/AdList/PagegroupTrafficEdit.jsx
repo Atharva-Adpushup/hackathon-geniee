@@ -39,7 +39,8 @@ class PagegroupTrafficEdit extends Component {
 			isSuperUser,
 			meta,
 			channels,
-			siteId
+			siteId,
+			dataForAuditLogs
 		} = this.props;
 		const { pagegroups } = this.state;
 
@@ -82,7 +83,8 @@ class PagegroupTrafficEdit extends Component {
 											logWritten: false
 										}
 									},
-									isSuperUser
+									isSuperUser,
+									dataForAuditLogs
 								);
 							} else {
 								updateWrapper({

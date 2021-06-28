@@ -513,13 +513,18 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		selectiveRolloutActiveBidderAdaptersList: 'data::selectiveRollout:activeBidderAdapters',
 		ampActiveBidderAdaptersList: 'data::amp:activeBidderAdapters',
 		freqReports: 'freq:rprt::',
-		hbaQueryFrequencyDoc: 'hbaq::'
+		hbaQueryFrequencyDoc: 'hbaq::',
+		networkWideHBRules: 'ntwkwide::rules'
 	},
 	tagManagerInitialDoc: {
 		siteId: null,
 		ownerEmail: null,
 		siteDomain: null,
 		ads: []
+	},
+
+	networkWideRulesInitialDoc: {
+		rules: []
 	},
 
 	ampAdInitialDoc: {
@@ -646,7 +651,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		adManagerSyncService: '0 */12 * * *',
 		prefetchService: '*/1 * * * *', // Every 1 mins
 		prefetchHBService: '*/15 * * * *', // Every 15 mins
-		emailSnapshotsService: '00 8 * * *', //Run at 8:00 everyday
+		emailSnapshotsService: '30 7 * * *', //Run at 8:00 everyday
 		partnersPanelService: {
 			Criteo: '22 13 * * *',
 			Pubmatic: '24 13 * * *',
@@ -816,10 +821,19 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		AMP: {
 			UPDATE_AMP_ADS: 'UPDATE_AMP_ADS'
 		},
+		MY_SITES: {
+			ADD_SITE: 'ADD_SITE',
+			DELETE_SITE: 'DELETE_SITE',
+			SAVE_SITE: 'SAVE_SITE',
+			UPDATE_SITE_STEP: 'UPDATE_SITE_STEP',
+			VERIFY_SITE: 'VERIFY_SITE'
+		},
 		AP_TAGS: {
+			CREATE_AP_TAGS: 'CREATE_AP_TAGS',
 			UPDATE_AP_TAGS: 'UPDATE_AP_TAGS'
 		},
 		INNOVATIVE_ADS: {
+			CREATE_INNOVATIVE_ADS: 'CREATE_INNOVATIVE_ADS',
 			UPDATE_INNOVATIVE_ADS: 'UPDATE_INNOVATIVE_ADS'
 		},
 		OPS_PANEL: {

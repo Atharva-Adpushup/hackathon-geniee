@@ -56,8 +56,10 @@ class AdElement extends Component {
 	}
 
 	updateWrapper(data) {
-		const { updateAd, modifyAdOnServer, user, ad, siteId } = this.props;
-		return user.isSuperUser ? updateAd(ad.id, siteId, data) : modifyAdOnServer(siteId, ad.id, data);
+		const { updateAd, modifyAdOnServer, user, ad, siteId, dataForAuditLogs } = this.props;
+		return user.isSuperUser
+			? updateAd(ad.id, siteId, data)
+			: modifyAdOnServer(siteId, ad.id, data, dataForAuditLogs);
 	}
 
 	renderInformation = (label, value) => (

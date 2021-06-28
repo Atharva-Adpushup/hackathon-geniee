@@ -19,7 +19,7 @@ const mapStateToProps = (state, ownProps) => {
 };
 
 const mapDispatchToProps = dispatch => ({
-	createAd: payload => dispatch(createAd(payload)),
+	createAd: (payload, dataForAuditLogs) => dispatch(createAd(payload, dataForAuditLogs)),
 	resetCurrentAd: siteId => dispatch(resetCurrentAd(siteId))
 });
 

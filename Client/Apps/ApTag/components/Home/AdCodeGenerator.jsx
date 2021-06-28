@@ -129,7 +129,7 @@ class AdCodeGenerator extends Component {
 			modalText
 		} = this.state;
 
-		const { showNotification } = this.props;
+		const { showNotification, dataForAuditLogs } = this.props;
 
 		if (
 			type === 'rewardedAds' &&
@@ -151,8 +151,9 @@ class AdCodeGenerator extends Component {
 
 		const { createAd, siteId } = this.props;
 		const isResponsive = size === 'responsive';
-		let width = 1,
-			height = 1;
+		let width = 1;
+
+		let height = 1;
 
 		if (type !== 'rewardedAds') {
 			const sizesArray = isResponsive ? 'responsive' : size.split('x');
@@ -211,7 +212,8 @@ class AdCodeGenerator extends Component {
 			() =>
 				createAd({
 					siteId,
-					ad
+					ad,
+					dataForAuditLogs
 				})
 		);
 	}
@@ -389,15 +391,13 @@ class AdCodeGenerator extends Component {
 		);
 	}
 
-	renderFluidToggleSubComponent = () => {
-		return (
-			<div>
-				<i style={{ fontSize: '14px', color: '#cf474b' }}>
-					The slot height may increase or decrease depending on the rendered ad size
-				</i>
-			</div>
-		);
-	};
+	renderFluidToggleSubComponent = () => (
+		<div>
+			<i style={{ fontSize: '14px', color: '#cf474b' }}>
+				The slot height may increase or decrease depending on the rendered ad size
+			</i>
+		</div>
+	);
 
 	handleChange = e => {
 		this.setState({

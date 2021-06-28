@@ -180,13 +180,13 @@ class AdCodeGenerator extends Component {
 	}
 
 	saveHandler(data) {
-		const { createAd } = this.props;
+		const { createAd, dataForAuditLogs } = this.props;
 		this.setState(
 			{
 				progress: 100,
 				loading: true
 			},
-			() => createAd(this.generateAdData(data))
+			() => createAd(this.generateAdData(data), dataForAuditLogs)
 		);
 	}
 
@@ -298,15 +298,13 @@ class AdCodeGenerator extends Component {
 		);
 	}
 
-	renderFluidToggleSubComponent = () => {
-		return (
-			<div>
-				<i style={{ fontSize: '14px', color: '#cf474b' }}>
-					The slot height may increase or decrease depending on the rendered ad size
-				</i>
-			</div>
-		);
-	}
+	renderFluidToggleSubComponent = () => (
+		<div>
+			<i style={{ fontSize: '14px', color: '#cf474b' }}>
+				The slot height may increase or decrease depending on the rendered ad size
+			</i>
+		</div>
+	);
 
 	renderFluidToggle() {
 		const { match } = this.props;
@@ -405,15 +403,15 @@ class AdCodeGenerator extends Component {
 				{codeGenerated ? (
 					this.renderGeneratedAdcode()
 				) : (
-						<div>
-							{this.renderPlatformOptions()}
-							{progress >= 10 ? this.renderFormats() : null}
-							{progress >= 20 ? this.renderFluidToggle() : null}
-							{progress >= 20 ? this.renderSizes() : null}
-							{progress >= 45 ? this.renderPagegroups() : null}
-							{progress >= 60 && pagegroupsPresent ? this.renderFormatDetails() : null}
-						</div>
-					)}
+					<div>
+						{this.renderPlatformOptions()}
+						{progress >= 10 ? this.renderFormats() : null}
+						{progress >= 20 ? this.renderFluidToggle() : null}
+						{progress >= 20 ? this.renderSizes() : null}
+						{progress >= 45 ? this.renderPagegroups() : null}
+						{progress >= 60 && pagegroupsPresent ? this.renderFormatDetails() : null}
+					</div>
+				)}
 			</React.Fragment>
 		);
 	}

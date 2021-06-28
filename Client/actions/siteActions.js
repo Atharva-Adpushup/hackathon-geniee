@@ -154,9 +154,9 @@ const updateSite = (siteId, params, dataForAuditLogs) => dispatch =>
 		})
 		.catch(err => errorHandler(err));
 
-const deleteSite = siteId => (dispatch, getState) =>
+const deleteSite = (siteId, dataForAuditLogs) => (dispatch, getState) =>
 	axiosInstance
-		.post('/site/deleteSite', { siteId })
+		.post('/site/deleteSite', { siteId, dataForAuditLogs })
 		.then(() => {
 			const state = getState();
 			const { user, sites } = state.global;

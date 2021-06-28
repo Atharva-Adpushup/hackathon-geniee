@@ -290,6 +290,7 @@ const TOOLS_IDENTIFIERS = {
 	ADS_TXT_LIVE_SITES: 'ADS_TXT_LIVE_SITES',
 	BIDDER_CONFIGURATIONS: 'BIDDER_CONFIGURATIONS',
 	DASHBOARD_NOTIFICATIONS: 'DASHBOARD_NOTIFICATIONS',
+	BIDDER_RULES: 'BIDDER_RULES',
 	INVENTORY: 'INVENTORY'
 };
 
@@ -522,6 +523,49 @@ const REFRESH_RATE_ENTRIES = [
 	{ name: '360 seconds', value: 360 }
 ];
 
+const TRIGGER_KEY_OPTIONS = [
+	{
+		label: 'Country',
+		value: 'country'
+	},
+	{
+		label: 'Device',
+		value: 'device'
+	},
+	{
+		label: 'Time Range',
+		value: 'time_range'
+	},
+	{
+		label: 'Day of the Week',
+		value: 'day_of_the_week'
+	}
+];
+const TRIGGER_OPERATOR_OPTIONS = [
+	{
+		label: 'IS IN',
+		value: 'contain'
+	},
+	{
+		label: 'IS NOT IN',
+		value: 'not_contain'
+	}
+];
+
+const ACTION_KEY_OPTIONS = [
+	{
+		label: 'Allow Bidders',
+		value: 'allowed_bidders'
+	},
+	{
+		label: 'Disallow Bidders',
+		value: 'disallowed_bidders'
+	}
+];
+
+const WEEKEND = ['saturday', 'sunday'];
+const WEEKDAY = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+
 export {
 	OP_NAV_ITEMS,
 	OP_NAV_ITEMS_INDEXES,
@@ -551,5 +595,10 @@ export {
 	ADS_TXT_LIVE_SITES_ENTRIES,
 	HB_BIDDERS_KEYS_NULL_SHOULD_NOT_BE_NULL,
 	REFRESH_RATE_ENTRIES,
-	ADS_TXT_LIVE_SITES_STATUS
+	ADS_TXT_LIVE_SITES_STATUS,
+	TRIGGER_KEY_OPTIONS,
+	TRIGGER_OPERATOR_OPTIONS,
+	ACTION_KEY_OPTIONS,
+	WEEKDAY,
+	WEEKEND
 };

@@ -3,7 +3,13 @@ const extend = require('extend');
 const moment = require('moment');
 const { LINE_CHART_CONFIG, PIE_CHART_CONFIG } = require('../../constants');
 const config = require('../../../../../configs/config');
-const { roundOffTwoDecimal, uploadImageToAzure, getBase64Image } = require('../../../cronhelpers');
+const {
+	roundOffTwoDecimal,
+	uploadImageToAzure,
+	getBase64Image,
+	roundOffOneDecimal,
+	stringifyObjectsWithFunctions
+} = require('../../../cronhelpers');
 
 function generateImageUploadPath(metaData) {
 	const { fromReportingDate = '', toReportingDate = '', type = '', siteids = '' } = metaData;
@@ -27,14 +33,17 @@ function addHighChartsObject(inputData) {
 
 function getChartImageOptions() {
 	return {
-		width: 487,
-		scale: 2,
+		width: 800,
+		scale: 1.5,
 		b64: true
 	};
 }
 
 async function processChartAndgGiveUploadPath(imgOptions, chartOptions, imagePath) {
-	const newOptions = { ...imgOptions, options: { ...chartOptions } };
+	const newOptions = {
+		...imgOptions,
+		options: stringifyObjectsWithFunctions({ ...chartOptions }, 'options')
+	};
 	const base64Data = await getBase64Image(newOptions);
 	const buffer = await Buffer.from(base64Data, 'base64');
 	await uploadImageToAzure(imagePath, buffer);
@@ -47,7 +56,20 @@ async function uploadCPMChartAndGetSourcePath(inputData, imageUploadPath) {
 		let series = [];
 		const adpushupSeriesData = [];
 		const baselineSeriesData = [];
-		const xAxis = { categories: [] };
+		const xAxis = {
+			categories: [],
+			labels: {
+				// eslint-disable-next-line no-template-curly-in-string
+
+				formatter: function() {
+					return (
+						"<div style='font-family: Arial;color:#2A2733!important;font-weight: 600;'>" +
+						this.value +
+						'</div>'
+					);
+				}
+			}
+		};
 
 		if (results.length) {
 			results.sort((a, b) => {
@@ -65,7 +87,7 @@ async function uploadCPMChartAndGetSourcePath(inputData, imageUploadPath) {
 			results.forEach(result => {
 				adpushupSeriesData.push(result.adpushup_variation_page_cpm);
 				baselineSeriesData.push(result.original_variation_page_cpm);
-				xAxis.categories.push(moment(result.report_date).format('ll'));
+				xAxis.categories.push(moment(result.report_date).format('MMM Do'));
 			});
 
 			series = [
@@ -73,13 +95,15 @@ async function uploadCPMChartAndGetSourcePath(inputData, imageUploadPath) {
 					data: adpushupSeriesData,
 					name: 'Page RPM Variation - AdPushup',
 					value: 'adpushup_variation_page_cpm',
-					valueType: 'money'
+					valueType: 'money',
+					color: '#f64f5b'
 				},
 				{
 					data: baselineSeriesData,
 					name: 'Page RPM Variation - Without AdPushup',
 					value: 'original_variation_page_cpm',
-					valueType: 'money'
+					valueType: 'money',
+					color: '#c1a6b6'
 				}
 			];
 		}
@@ -91,7 +115,8 @@ async function uploadCPMChartAndGetSourcePath(inputData, imageUploadPath) {
 		return computedState;
 	}
 
-	const { APvsBaseline = {} } = inputData;
+	const { APvsBaseline = {}, isApVsBaslineChartShown = false } = inputData;
+	if (!isApVsBaslineChartShown) return '';
 	const computedState = computeGraphData(APvsBaseline.result || []);
 	const chartConfig = { ...LINE_CHART_CONFIG, ...computedState };
 	const imageOptions = getChartImageOptions();
@@ -111,69 +136,101 @@ function computeDisplayData(props) {
 		chartSeriesMetric,
 		chartSeriesMetricType
 	} = props;
-	const series = [
-		{
-			name: chartLegend,
-			colorByPoint: true,
+	const plotOptions = {
+		pie: {
+			size: '75%',
 			data: []
 		}
-	];
-	const seriesData = [];
+	};
 
-	if (resultData) {
-		resultData.forEach(result => {
+	const sortedResultData = resultData.sort((first, second) => {
+		const metricValueOfFirst = first[chartSeriesMetric];
+		const metricValueOfSecond = second[chartSeriesMetric];
+		return metricValueOfSecond - metricValueOfFirst;
+	});
+
+	let sumOfAllMetric = 0;
+
+	for (let i = 0; i < resultData.length; i++) {
+		sumOfAllMetric += resultData[i][chartSeriesMetric] || 0;
+	}
+
+	const seriesData = [];
+	let otherSeriesSum = 0;
+	let indexTillChartToBeShown = null;
+	if (sortedResultData) {
+		sortedResultData.forEach((result, index) => {
+			const percent = roundOffOneDecimal(((result[chartSeriesMetric] || 0) / sumOfAllMetric) * 100);
 			seriesData.push({
-				name: result[chartSeriesLabel],
+				name: result[chartSeriesLabel] || 'slice',
 				y: parseFloat(roundOffTwoDecimal(result[chartSeriesMetric])),
-				valueType: chartSeriesMetricType
+				valueType: chartSeriesMetricType,
+				percent
 			});
+			if (percent < 5) {
+				if (!indexTillChartToBeShown) indexTillChartToBeShown = index;
+				otherSeriesSum += result[chartSeriesMetric] || 0;
+			}
 		});
 	}
 
-	series[0].data = seriesData.sort((a, b) => a.y - b.y);
-	return series;
+	plotOptions.pie.data = seriesData.slice(0, indexTillChartToBeShown);
+	const seriesDataForTable = seriesData.slice(indexTillChartToBeShown, sortedResultData.length);
+	while (plotOptions.pie.data.length < 5) {
+		const nextSeriesTableData = seriesDataForTable.shift();
+		plotOptions.pie.data.push(nextSeriesTableData);
+		otherSeriesSum -= nextSeriesTableData['y'];
+	}
+
+	plotOptions.pie.data.push({
+		name: 'Others',
+		y: parseFloat(roundOffTwoDecimal(otherSeriesSum)),
+		valueType: chartSeriesMetricType,
+		percent: roundOffOneDecimal((otherSeriesSum / sumOfAllMetric) * 100)
+	});
+	return { computedState: plotOptions, seriesDataForTable };
 }
 
 //required
 async function uploadAdNetworkPieChartAndGetSourcePath(inputData, imageUploadPath) {
 	const chartConfig = extend(true, {}, PIE_CHART_CONFIG);
 	const { revenueByNetwork: { result = [] } = {} } = inputData;
-	const computedState = computeDisplayData({
+	const { computedState, seriesDataForTable: networkSeriesDataForTable } = computeDisplayData({
 		result,
 		chartLegend: 'Revenue',
 		chartSeriesLabel: 'network',
 		chartSeriesMetric: 'revenue',
 		chartSeriesMetricType: 'money'
 	});
-	chartConfig.series = computedState || {};
+	chartConfig.plotOptions = computedState || {};
 	const imageOptions = getChartImageOptions();
 	const imageSourcePath = await processChartAndgGiveUploadPath(
 		imageOptions,
 		chartConfig,
 		imageUploadPath + 'network.png'
 	);
-	return imageSourcePath;
+	return { imageSourcePath, networkSeriesDataForTable };
 }
 
 //required
 async function uploadCountryPieChartAndGetSourcePath(inputData, imageUploadPath) {
 	const chartConfig = extend(true, {}, PIE_CHART_CONFIG);
 	const { countryReports: { result = [] } = {} } = inputData;
-	const computedState = computeDisplayData({
+	const { computedState, seriesDataForTable: countrySeriesDataForTable } = computeDisplayData({
 		result,
 		chartLegend: 'Country',
 		chartSeriesLabel: 'country',
 		chartSeriesMetric: 'adpushup_page_views',
 		chartSeriesMetricType: 'number'
 	});
-	chartConfig.series = computedState || {};
+	chartConfig.plotOptions = computedState || {};
 	const imageOptions = getChartImageOptions();
 	const imageSourcePath = await processChartAndgGiveUploadPath(
 		imageOptions,
 		chartConfig,
 		imageUploadPath + 'country.png'
 	);
-	return imageSourcePath;
+	return { imageSourcePath, countrySeriesDataForTable };
 }
 
 module.exports = {
@@ -196,8 +253,16 @@ module.exports = {
 		])
 			.then(values => {
 				reportData.charts.cpmLine.imagePath = values[0];
-				reportData.charts.adNetworkRevenuePie.imagePath = values[1];
-				reportData.charts.countryReportPie.imagePath = values[2];
+				reportData.charts.adNetworkRevenuePie.imagePath = values[1].imageSourcePath || '';
+				reportData.charts.adNetworkRevenuePie.networkSeriesDataForTableLeft =
+					values[1].networkSeriesDataForTable.slice(0, 5) || [];
+				reportData.charts.adNetworkRevenuePie.networkSeriesDataForTableRight =
+					values[1].networkSeriesDataForTable.slice(5, 10) || [];
+				reportData.charts.countryReportPie.imagePath = values[2].imageSourcePath || '';
+				reportData.charts.countryReportPie.countrySeriesDataForTableLeft =
+					values[2].countrySeriesDataForTable.slice(0, 5) || [];
+				reportData.charts.countryReportPie.countrySeriesDataForTableRight =
+					values[2].countrySeriesDataForTable.slice(5, 10) || [];
 				return reportData;
 			})
 			.catch(error => {

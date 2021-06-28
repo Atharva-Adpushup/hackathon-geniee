@@ -114,27 +114,37 @@ var gpt = {
 							}
 
 							// powered by adpushup optimisations
-							if (!adpConfig.apLiteActive && slotElementId.indexOf('STICKY') === 0) { 
-								const stickyBg = $(`#bg-sticky-${slotElementId}`);
-								const adpBanner = $(`#banner-${slotElementId}`);
-		
-								// Ads by adpushup is disabled. nothing more to do
-								if (!adpBanner[0]) return;
-		
-								// const unitHeight = parseInt(stickyBg[0].dataset.unitheight);
-								let unitHeight;
-								if (stickyBg[0]) {
-									unitHeight = parseInt(stickyBg[0].dataset.unitheight);
+							if (!adpConfig.apLiteActive) {
+								//checking dockedAd availability
+								const dockedAdFlag =
+									$(`#${slotElementId}`).parent()[0].dataset['adType'] ===
+									'docked';
+								if (slotElementId.indexOf('STICKY') === 0 || dockedAdFlag) {
+									const stickyBg = $(`#bg-sticky-${slotElementId}`);
+									const adpBanner = $(`#banner-${slotElementId}`);
+
+									// Ads by adpushup is disabled. nothing more to do
+									if (!adpBanner[0]) return;
+
+									// const unitHeight = parseInt(stickyBg[0].dataset.unitheight);
+									let unitHeight;
+									if (stickyBg[0]) {
+										unitHeight = parseInt(stickyBg[0].dataset.unitheight);
+									}
+
+									//if we don't get fill we hide the ads-by-adpushup banner
+									if (!event.isEmpty) {
+										stickyBg[0] &&
+											stickyBg.css(
+												'height',
+												unitHeight + commonConsts.POWERED_BY_BANNER.HEIGHT
+											);
+										adpBanner.css('display', 'inline-block');
+									} else {
+										stickyBg[0] && stickyBg.css('height', unitHeight);
+										adpBanner.css('display', 'none');
+									}
 								}
-		
-								if (!event.isEmpty) {
-									stickyBg[0] && stickyBg.css('height', unitHeight + commonConsts.POWERED_BY_BANNER.HEIGHT);
-									adpBanner.css('display', 'inline-block');
-								} else {
-									stickyBg[0] && stickyBg.css('height', unitHeight);
-									adpBanner.css('display', 'none');
-								}
-		
 							}
 						}
 					});

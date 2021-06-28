@@ -106,8 +106,22 @@ const fn = {
 		appBucket
 			.getDoc(`${key}${req.body.siteId}`)
 			.then(docWithCas => {
-				const { siteId, dataForAuditLogs } = req.body;
+				const { siteId, dataForAuditLogs, data = {} } = req.body;
 				const { email, originalEmail } = req.user;
+
+				let prevConfig = docWithCas.value.ads;
+				let currentConfig = req.body.ads;
+				// if change is not done by Super User
+				// i.e change is not made by using Master Save
+				if (req.body.adId) {
+					const origAd = docWithCas.value.ads.filter(ad => ad.id === req.body.adId);
+					if (origAd.length) {
+						// eslint-disable-next-line prefer-destructuring
+						prevConfig = origAd[0];
+						currentConfig = { ..._.cloneDeep(prevConfig), ...data };
+					}
+				}
+
 				// log config changes
 				const { siteDomain, appName, type = 'app' } = dataForAuditLogs;
 				sendDataToAuditLogService({
@@ -117,8 +131,8 @@ const fn = {
 					type,
 					impersonateId: email,
 					userId: originalEmail,
-					prevConfig: docWithCas.value.ads,
-					currentConfig: req.body.ads,
+					prevConfig,
+					currentConfig,
 					action: {
 						name: INNOVATIVE_ADS.UPDATE_INNOVATIVE_ADS,
 						data: `INNOVATIVE AD`
@@ -181,15 +195,20 @@ router
 				res
 			);
 		}
+		const { siteId, dataForAuditLogs } = req.body;
 		fn.isSuperUser = req.user.isSuperUser;
 		const payload = {
 			ad: req.body.ad,
 			siteId: req.body.siteId,
 			ownerEmail: req.user.email
 		};
+		let prevConfig = {};
 		return verifyOwner(payload.siteId, req.user.email)
 			.then(() => appBucket.getDoc(`${docKeys.interactiveAds}${req.body.siteId}`))
-			.then(docWithCas => fn.processing(docWithCas, payload))
+			.then(docWithCas => {
+				prevConfig = _.cloneDeep(docWithCas.value);
+				return fn.processing(docWithCas, payload);
+			})
 			.catch(err =>
 				err.name && err.name === 'CouchbaseError' && err.code === 13
 					? fn.createNewDocAndDoProcessingWrapper(payload)
@@ -197,6 +216,26 @@ router
 			)
 			.spread(fn.dbWrapper)
 			.then(data => emitEventAndSendResponse(req.body.siteId, res, data))
+			.then(() => appBucket.getDoc(`${docKeys.interactiveAds}${req.body.siteId}`))
+			.then(docWithCas => {
+				const { email, originalEmail } = req.user;
+				// log config changes
+				const { siteDomain, appName, type = 'site' } = dataForAuditLogs;
+				sendDataToAuditLogService({
+					siteId,
+					siteDomain,
+					appName,
+					type,
+					impersonateId: email,
+					userId: originalEmail,
+					prevConfig,
+					currentConfig: docWithCas.value,
+					action: {
+						name: INNOVATIVE_ADS.CREATE_INNOVATIVE_ADS,
+						data: 'Create Innovative Ads'
+					}
+				});
+			})
 			.catch(err => errorHandler(err, res));
 	})
 	.post('/masterSave', (req, res) =>

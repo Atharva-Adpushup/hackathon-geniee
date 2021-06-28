@@ -41,11 +41,33 @@ class Component {
 	}
 
 	render() {
-		const { formatData, width, height, id, css: customCSS, poweredByBanner = true, networkData } = this.interactiveAd;
-		const shouldShowPoweredByBanner = adp.config.poweredByBanner 
-			&& poweredByBanner
-			&& constants.POWERED_BY_BANNER.SUPPORTED_PLATFORMS.includes(formatData.platform.toUpperCase())
-			&& constants.POWERED_BY_BANNER.SUPPORTED_FORMATS.includes(formatData.format.toUpperCase())
+		const {
+			formatData,
+			width,
+			height,
+			id,
+			css: customCSS,
+			poweredByBanner = true,
+			poweredByBannerOnDocked = true,
+			networkData
+		} = this.interactiveAd;
+
+		let shouldShowPoweredByBanner = false;
+
+		//Unit level check for ads-by-adpushup
+		if (
+			adp.config.poweredByBanner &&
+			formatData.format.toUpperCase() === 'STICKYBOTTOM' &&
+			poweredByBanner
+		) {
+			shouldShowPoweredByBanner = true;
+		} else if (
+			adp.config.poweredByBannerOnDocked &&
+			formatData.format.toUpperCase() === 'DOCKED' &&
+			poweredByBannerOnDocked
+		) {
+			shouldShowPoweredByBanner = true;
+		}
 
 		adp.interactiveAds.ads[id] = this.interactiveAd;
 
@@ -89,8 +111,9 @@ class Component {
 
 		// New feedback
 		adObj.status = 1;
-		adObj.adUnitType = constants.AD_UNIT_TYPE_MAPPING[formatData.type.toUpperCase()] 
-			|| constants.AD_UNIT_TYPE_MAPPING.DISPLAY; // default to display incase of video ads or in view ads.
+		adObj.adUnitType =
+			constants.AD_UNIT_TYPE_MAPPING[formatData.type.toUpperCase()] ||
+			constants.AD_UNIT_TYPE_MAPPING.DISPLAY; // default to display incase of video ads or in view ads.
 		//newFeedbackAdObj.ads = [newFeedbackAdObj];
 		feedbackOptions.ads = [adObj];
 
@@ -141,17 +164,24 @@ class Component {
 			});
 
 		if (shouldShowPoweredByBanner) {
-			const bannerFrame = adCodeGenerator.generatePoweredByBanner(networkData.dfpAdunit, {
-				...commonConsts.FRAME.CSS.COMMON,
-				...commonConsts.FRAME.CSS[formatData.placement.toUpperCase()],
-				bottom: `${height}px`
-			});
+			const bannerFrame = adCodeGenerator.generatePoweredByBanner(
+				networkData.dfpAdunit,
+				formatData.format.toUpperCase(),
+				{
+					...commonConsts.FRAME.CSS.COMMON,
+					...commonConsts.FRAME.CSS[formatData.placement.toUpperCase()],
+					...commonConsts.FRAME.CSS[formatData.format.toUpperCase()],
+					bottom: `${height}px`
+				}
+			);
+
 			$format.append(bannerFrame);
 		}
 
 		switch (formatData.type) {
 			case commonConsts.FORMATS.STICKY.NAME:
-				const shouldAppendStickyBg = formatData.placement.toLowerCase() === 'bottom' && !formatData.disableStickyBg;
+				const shouldAppendStickyBg =
+					formatData.placement.toLowerCase() === 'bottom' && !formatData.disableStickyBg;
 				$format.css({
 					...commonConsts.FORMAT_CSS,
 					...commonConsts.FORMATS.STICKY.BASE_STYLES,
@@ -159,9 +189,7 @@ class Component {
 					...css
 				});
 				formatData.placement.toLowerCase() === 'top' ? this.pushContent(formatData) : null;
-				shouldAppendStickyBg
-					? this.parentNode.append($bottomStickyBg)
-					: null;
+				shouldAppendStickyBg ? this.parentNode.append($bottomStickyBg) : null;
 				this.parentNode.append($format.append(this.adCode));
 				break;
 
@@ -184,6 +212,7 @@ class Component {
 					...commonConsts.FORMAT_CSS,
 					...css
 				});
+				$format.attr({ 'data-ad-type': 'docked' }); //attribute to differentiate docked ads
 				this.parentNode.append($format.append(this.adCode));
 				window.adpushup.utils.dockify.dockifyAd(`#${id}`, formatData, window.adpushup.utils);
 				break;

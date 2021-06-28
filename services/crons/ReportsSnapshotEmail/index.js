@@ -76,25 +76,49 @@ function getWidgetData(params, path) {
 async function giveDashboardReports(params) {
 	try {
 		let dashboardReporting = {};
-		const keys = {
-			'/site/report?report_name=estimated_earning_comparison': 'estimatedRevenue',
-			'/site/report?report_name=ap_vs_baseline': 'APvsBaseline',
+		const keysMapingForPath = {
 			'/site/report?report_name=site_summary': 'siteSummary',
+			'/site/report?report_name=estimated_earning_comparison': 'estimatedRevenue',
 			'/site/report?report_name=revenue_by_network': 'revenueByNetwork',
 			'/site/report?report_name=get_stats_by_custom&dimension=siteid&interval=cumulative&metrics=adpushup_page_views,adpushup_page_cpm,network_ad_ecpm,network_impressions,network_net_revenue':
 				'getStatsByCustom',
 			'/site/report?report_name=country_report': 'countryReports'
 		};
-		const paths = [...CC.DASHBOARD_QUERY_PATHS];
+		const paths = Object.keys(keysMapingForPath);
 		for (let i = 0; i < paths.length; i++) {
 			const result = await getWidgetData(params, paths[i]);
-			const widgetName = keys[paths[i]];
+			const widgetName = keysMapingForPath[paths[i]];
 			dashboardReporting[widgetName] = result;
 		}
 		return dashboardReporting;
 	} catch (error) {
 		throw new Error(`Error in fetching widget data${error}`);
 	}
+}
+
+async function setDashboardApVsBaslineReports(dashboardReporting, params) {
+	try {
+		const path = '/site/report?report_name=ap_vs_baseline';
+		const widgetName = 'APvsBaseline';
+		const result = await getWidgetData(params, path);
+		dashboardReporting[widgetName] = result;
+	} catch (error) {
+		throw new Error(`Error in fetching ApVsBaseline widget data${error}`);
+	}
+}
+
+function giveHighesRevenueSite(siteSummary) {
+	let highestRevenueSite = '';
+	let highestRevenueValue = -1;
+	const { result = [] } = siteSummary;
+	for (let site of result) {
+		const { network_net_revenue, siteid } = site;
+		if (network_net_revenue > highestRevenueValue) {
+			highestRevenueSite = siteid;
+			highestRevenueValue = network_net_revenue;
+		}
+	}
+	return highestRevenueSite;
 }
 
 async function getEmailSnapshotsSites(userEmail) {
@@ -124,6 +148,23 @@ async function getEmailSnapshotsSites(userEmail) {
 	}
 }
 
+function giveApVsBaselineRevenue(APvsBaseline) {
+	const { result = [] } = APvsBaseline;
+	const adpushupRevenueKey = 'adpushup_variation_revenue';
+	const originalRevenueKey = 'original_variation_revenue';
+	const initialObject = {
+		adpushupRevenue: 0,
+		originalRevenue: 0
+	};
+	return result.reduce((accumulatedResult, currentResult) => {
+		const { adpushupRevenue, originalRevenue } = accumulatedResult;
+		return {
+			adpushupRevenue: adpushupRevenue + currentResult[adpushupRevenueKey],
+			originalRevenue: originalRevenue + currentResult[originalRevenueKey]
+		};
+	}, initialObject);
+}
+
 async function sendSnapshot(siteids, userEmail, type) {
 	try {
 		const daysGap = type === 'daily' ? 1 : 7;
@@ -133,16 +174,32 @@ async function sendSnapshot(siteids, userEmail, type) {
 		let toDate = moment()
 			.subtract(1, 'days')
 			.format('YYYY-MM-DD');
-		const fromReportingDate = moment(fromDate).format('LL'),
-			toReportingDate = moment(toDate).format('LL');
+		const fromReportingDate = moment(fromDate).format('DD/MM/YYYY');
+		const toReportingDate = moment(toDate).format('DD/MM/YYYY');
 		const params = { fromDate, toDate, siteid: siteids };
 		const resultData = await giveDashboardReports(params);
-		let allReportingData = await generateAndProcessCharts(resultData, {
-			fromReportingDate,
-			toReportingDate,
-			type,
-			siteids
-		});
+		let isApVsBaslineChartShown = false;
+		if (type === 'weekly') {
+			const getHighestRevenueSite = giveHighesRevenueSite(resultData.siteSummary);
+			await setDashboardApVsBaslineReports(resultData, {
+				...params,
+				siteid: `${getHighestRevenueSite}`
+			});
+			const { adpushupRevenue, originalRevenue } = giveApVsBaselineRevenue(
+				resultData.APvsBaseline || {}
+			);
+			const baselineRevenuePercentage = (originalRevenue / adpushupRevenue) * 100;
+			if (baselineRevenuePercentage >= 0.05) isApVsBaslineChartShown = true;
+		}
+		let allReportingData = await generateAndProcessCharts(
+			{ ...resultData, isApVsBaslineChartShown },
+			{
+				fromReportingDate,
+				toReportingDate,
+				type,
+				siteids
+			}
+		);
 		allReportingData.progressData = giveEstimatedEarningProgressData(
 			allReportingData.estimatedRevenue.result[0] || []
 		);
@@ -157,10 +214,11 @@ async function sendSnapshot(siteids, userEmail, type) {
 			allReportingData,
 			fromReportingDate,
 			toReportingDate,
-			adpLogo: config.weeklyDailySnapshots.BASE_PATH + 'logo-red-200X50.png',
+			adpLogo: config.weeklyDailySnapshots.BASE_PATH + 'logo-full.png',
 			arrowUp: config.weeklyDailySnapshots.BASE_PATH + 'up-arrow.png',
 			arrowDown: config.weeklyDailySnapshots.BASE_PATH + 'down-arrow.png',
-			type
+			type,
+			isApVsBaslineChartShown
 		};
 
 		const template = await generateEmailTemplate(
@@ -169,6 +227,8 @@ async function sendSnapshot(siteids, userEmail, type) {
 			ejsTemplateData
 		);
 		const subjectMessage = `Adpushup ${type} dashboard reporting snapshot `;
+		console.log('proceesed user', siteids, type, userEmail, ++count);
+		//'amit.gupta@adpushup.com' testing email
 		sendEmail({
 			queue: 'MAILER',
 			data: {
@@ -177,7 +237,6 @@ async function sendSnapshot(siteids, userEmail, type) {
 				subject: subjectMessage
 			}
 		});
-		// return template;
 	} catch (error) {
 		//here we can send an email to  monitoring service for what happended wrong.
 		console.log(error);
@@ -186,7 +245,7 @@ async function sendSnapshot(siteids, userEmail, type) {
 
 async function processSitesOfUser(userEmail) {
 	try {
-		console.log(userEmail, count++);
+		console.log('processing user', userEmail);
 		const { dailySubscribedSites = [], weeklySubscribedSites = [] } = await getEmailSnapshotsSites(
 			userEmail
 		);

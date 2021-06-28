@@ -6,6 +6,8 @@ const Promise = require('bluebird'),
 	commonConsts = require('../configs/commonConsts'),
 	utils = require('./utils'),
 	couchbase = require('./couchBaseService'),
+	userModel = require('../models/userModel'),
+	headerBiddingModel = require('../models/headerBiddingModel'),
 	httpStatus = require('../configs/httpStatusConsts'),
 	sqlReportingModule = require('../reports/default/adpTags/index'),
 	siteTopUrlsQuery = require('../reports/default/adpTags/queries/siteTopUrls'),
@@ -62,9 +64,9 @@ const Promise = require('bluebird'),
 				isInvalidRevenue || innerObj[identifier].aggregate.total_impressions == 0
 					? 0
 					: Number(
-						(innerObj[identifier].aggregate.total_revenue * 1000) /
-						innerObj[identifier].aggregate.total_impressions
-					).toFixed(3);
+							(innerObj[identifier].aggregate.total_revenue * 1000) /
+								innerObj[identifier].aggregate.total_impressions
+					  ).toFixed(3);
 		});
 		container[key] = innerObj;
 	},
@@ -113,11 +115,11 @@ const Promise = require('bluebird'),
 	},
 	validateMetricsData = inputData => {
 		const isInputData = !!(
-			inputData &&
-			inputData.siteId &&
-			inputData.lastWeekReport &&
-			inputData.thisWeekReport
-		),
+				inputData &&
+				inputData.siteId &&
+				inputData.lastWeekReport &&
+				inputData.thisWeekReport
+			),
 			isLastWeekReport = !!(
 				isInputData &&
 				inputData.lastWeekReport &&
@@ -196,51 +198,51 @@ const Promise = require('bluebird'),
 	},
 	computeMetricComparison = inputData => {
 		const resultData = {
-			impressions: {
-				lastWeek: 0,
-				lastWeekOriginal: 0,
-				thisWeek: 0,
-				thisWeekOriginal: 0,
-				percentage: 0,
-				change: false
+				impressions: {
+					lastWeek: 0,
+					lastWeekOriginal: 0,
+					thisWeek: 0,
+					thisWeekOriginal: 0,
+					percentage: 0,
+					change: false
+				},
+				revenue: {
+					lastWeek: 0,
+					lastWeekOriginal: 0,
+					thisWeek: 0,
+					thisWeekOriginal: 0,
+					percentage: 0,
+					change: false
+				},
+				pageViews: {
+					lastWeek: 0,
+					lastWeekOriginal: 0,
+					thisWeek: 0,
+					thisWeekOriginal: 0,
+					percentage: 0,
+					change: false
+				},
+				cpm: {
+					lastWeek: 0,
+					lastWeekOriginal: 0,
+					thisWeek: 0,
+					thisWeekOriginal: 0,
+					percentage: 0,
+					change: false
+				},
+				pageCPM: {
+					lastWeek: 0,
+					lastWeekOriginal: 0,
+					thisWeek: 0,
+					thisWeekOriginal: 0,
+					percentage: 0,
+					change: false
+				},
+				dates: {
+					lastWeek: {},
+					thisWeek: {}
+				}
 			},
-			revenue: {
-				lastWeek: 0,
-				lastWeekOriginal: 0,
-				thisWeek: 0,
-				thisWeekOriginal: 0,
-				percentage: 0,
-				change: false
-			},
-			pageViews: {
-				lastWeek: 0,
-				lastWeekOriginal: 0,
-				thisWeek: 0,
-				thisWeekOriginal: 0,
-				percentage: 0,
-				change: false
-			},
-			cpm: {
-				lastWeek: 0,
-				lastWeekOriginal: 0,
-				thisWeek: 0,
-				thisWeekOriginal: 0,
-				percentage: 0,
-				change: false
-			},
-			pageCPM: {
-				lastWeek: 0,
-				lastWeekOriginal: 0,
-				thisWeek: 0,
-				thisWeekOriginal: 0,
-				percentage: 0,
-				change: false
-			},
-			dates: {
-				lastWeek: {},
-				thisWeek: {}
-			}
-		},
 			lastWeekDatesInfo = getWeekDatesRepresentation({
 				startDate: inputData.lastWeekReport.reportFrom,
 				endDate: inputData.lastWeekReport.reportTo
@@ -676,14 +678,14 @@ const Promise = require('bluebird'),
 			data: response
 		});
 	},
-	checkForLog = function (ad) {
-		/* 
+	checkForLog = function(ad) {
+		/*
 			Should return true only
 				1. Network is not other than adpTags or geniee
 				2. If Geniee
 					dynamicAllocation should be false.
 					if dynamicAllocation is true then adunit should be synced and other changes made
-				3. If adpTags, then adunit should be synced and other changes made 
+				3. If adpTags, then adunit should be synced and other changes made
 				4. logWritten should be false
 		*/
 		const hasNetwork = !!ad.network;
@@ -725,7 +727,7 @@ const Promise = require('bluebird'),
 
 		return isDemandChanged || isADPChanged || isGenieeChanged;
 	},
-	isValidThirdPartyDFPAndCurrency = function (config) {
+	isValidThirdPartyDFPAndCurrency = function(config) {
 		const isActiveDFPNetwork = !!(config.activeDFPNetwork && config.activeDFPNetwork.length),
 			isActiveDFPCurrencyCode = !!(
 				config.activeDFPCurrencyCode &&
@@ -741,6 +743,24 @@ const Promise = require('bluebird'),
 			.connectToAppBucket()
 			.then(appBucket => appBucket.getAsync(commonConsts.docKeys.networkConfig))
 			.then(json => json.value);
+	},
+	getNetworkWideHBRules = () => {
+		return couchbase
+			.connectToAppBucket()
+			.then(appBucket => appBucket.getAsync(commonConsts.docKeys.networkWideHBRules))
+			.then(json => {
+				const {
+					value: { rules = [] }
+				} = json;
+				return rules;
+			})
+			.catch(err => Promise.resolve([]));
+	},
+	getSiteWiseHBRules = (email, siteId) => {
+		return userModel
+			.verifySiteOwner(email, siteId)
+			.then(() => headerBiddingModel.getHbConfig(siteId, email))
+			.then(hbConfig => hbConfig.get('rules') || []);
 	},
 	verifyKeysInCollection = (target, source) => {
 		let recursionLevel = 0;
@@ -801,7 +821,7 @@ const Promise = require('bluebird'),
 		}
 		return accumulator;
 	},
-	removeFormatWiseParamsForAMP = (bidderConfig) => {
+	removeFormatWiseParamsForAMP = bidderConfig => {
 		const { config, sizeLess } = bidderConfig;
 		let newConfig;
 		if (sizeLess) {
@@ -818,7 +838,7 @@ const Promise = require('bluebird'),
 		}
 		return newConfig;
 	},
-	getPageGroupNameAndPlatformFromChannelDoc = (docId) => {
+	getPageGroupNameAndPlatformFromChannelDoc = docId => {
 		let docIdPartValue = docId.substr(6, docId.length - 1);
 		let colonIndex = docIdPartValue.indexOf(':');
 		docIdPartValue = docIdPartValue.substr(colonIndex + 1, docIdPartValue.length - 1);
@@ -828,7 +848,7 @@ const Promise = require('bluebird'),
 		docIdPartValue = docIdPartValue.substr(colonIndex + 1, docIdPartValue.length - 1);
 		const pageGroup = docIdPartValue;
 
-		return { pageGroup, platform }
+		return { pageGroup, platform };
 	};
 
 module.exports = {
@@ -861,6 +881,8 @@ module.exports = {
 	verifyKeysInCollection,
 	deleteKeysInCollection,
 	getMandatoryAdsTxtEntrySnippet,
+	getNetworkWideHBRules,
+	getSiteWiseHBRules,
 	removeFormatWiseParamsForAMP,
 	getPageGroupNameAndPlatformFromChannelDoc
 };

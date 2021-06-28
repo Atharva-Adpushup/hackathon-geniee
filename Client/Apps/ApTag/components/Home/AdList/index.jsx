@@ -128,6 +128,7 @@ class AdList extends Component {
 										ad={ad}
 										user={user}
 										updateAd={updateAd}
+										dataForAuditLogs={dataForAuditLogs}
 										modifyAdOnServer={modifyAdOnServer}
 										networkConfig={networkConfig}
 										siteId={siteId}

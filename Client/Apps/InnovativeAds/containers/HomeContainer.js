@@ -6,7 +6,7 @@ import { DEFAULT_ADS_RESPONSE } from '../configs/commonConsts';
 import { getAdsAndGlobal } from '../lib/helpers';
 
 const mapStateToProps = (state, ownProps) => {
-	const { ads, global } = getAdsAndGlobal(state, ownProps);
+	const { ads, global, siteId } = getAdsAndGlobal(state, ownProps);
 	const { global: { user: { data = {} } = {} } = {} } = state;
 	const meta = global && global.meta ? global.meta : DEFAULT_ADS_RESPONSE;
 
@@ -14,6 +14,7 @@ const mapStateToProps = (state, ownProps) => {
 		ads: ads.content,
 		loading: !ads.fetched,
 		meta,
+		siteId,
 		user: data,
 		...ownProps
 	};

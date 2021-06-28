@@ -1,6 +1,7 @@
 import { combineReducers } from 'redux';
 import user from './user';
 import networkConfig from './networkConfig';
+import networkWideRules from './networkWideRules';
 import sites from './sites';
 import ui from './ui';
 import reports from './reports';
@@ -16,5 +17,6 @@ export default combineReducers({
 	reports,
 	urlreport,
 	hbanalytics,
-	notifications
+	notifications,
+	networkWideRules
 });

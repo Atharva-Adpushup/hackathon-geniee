@@ -1,7 +1,6 @@
 const express = require('express');
 const Promise = require('bluebird');
 const _ = require('lodash');
-const moment = require('moment');
 // eslint-disable-next-line no-unused-vars
 // const woodlotCustomLogger = require('woodlot').customLogger;
 const userModel = require('../models/userModel');
@@ -29,7 +28,7 @@ const proxy = require('../helpers/proxy');
 const pageGroupController = require('./pageGroupController');
 
 const {
-	AUDIT_LOGS_ACTIONS: { OPS_PANEL }
+	AUDIT_LOGS_ACTIONS: { OPS_PANEL, MY_SITES }
 } = CC;
 
 const router = express.Router();
@@ -141,7 +140,7 @@ router
 								mandatoryEntryMessage && commonEntryMessage
 									? `${mandatoryEntryMessage} and ${commonEntryMessage} not found in publisher's ads.txt`
 									: `${commonEntryMessage ||
-									mandatoryEntryMessage} not found in publisher's ads.txt`;
+											mandatoryEntryMessage} not found in publisher's ads.txt`;
 
 							output = { message, status: partialPresent };
 						} else {
@@ -531,14 +530,19 @@ router
 			.catch(err => errorHandler(err, res, HTTP_STATUS.INTERNAL_SERVER_ERROR));
 	})
 	.post('/deleteSite', (req, res) => {
-		const { siteId } = req.body;
-		const { email } = req.user;
+		const { siteId, dataForAuditLogs } = req.body;
+		const { email, originalEmail } = req.user;
+		let prevConfig;
+		let currentConfig;
+		let userInstance;
 		return checkParams(['siteId'], req, 'post')
+			.then(() => siteModel.getSiteById(siteId))
 			.then(() => userModel.verifySiteOwner(email, siteId))
 			.then(({ user }) => {
 				if (!user) return Promise.reject(new Error('No user found. Invalid request'));
-
+				userInstance = user;
 				let sites = user.get('sites');
+				prevConfig = _.cloneDeep(sites);
 				if (sites && sites.length) {
 					sites = sites.filter(site => site.siteId !== siteId);
 					user.set('sites', sites);
@@ -555,6 +559,25 @@ router
 					res
 				)
 			)
+			.then(() => {
+				currentConfig = _.cloneDeep(userInstance.get('sites'));
+				// log config changes
+				const { siteDomain, appName, type = 'site' } = dataForAuditLogs;
+				sendDataToAuditLogService({
+					siteId,
+					siteDomain,
+					appName,
+					type,
+					impersonateId: email,
+					userId: originalEmail,
+					prevConfig,
+					currentConfig,
+					action: {
+						name: MY_SITES.DELETE_SITE,
+						data: `My Sites - SiteId ${siteId} deleted`
+					}
+				});
+			})
 			.catch(err => errorHandler(err, res));
 	})
 	.get('/:siteId/ampSettingsData', (req, res) =>
