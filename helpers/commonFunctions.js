@@ -6,8 +6,6 @@ const Promise = require('bluebird'),
 	commonConsts = require('../configs/commonConsts'),
 	utils = require('./utils'),
 	couchbase = require('./couchBaseService'),
-	userModel = require('../models/userModel'),
-	headerBiddingModel = require('../models/headerBiddingModel'),
 	httpStatus = require('../configs/httpStatusConsts'),
 	sqlReportingModule = require('../reports/default/adpTags/index'),
 	siteTopUrlsQuery = require('../reports/default/adpTags/queries/siteTopUrls'),
@@ -756,12 +754,6 @@ const Promise = require('bluebird'),
 			})
 			.catch(err => Promise.resolve([]));
 	},
-	getSiteWiseHBRules = (email, siteId) => {
-		return userModel
-			.verifySiteOwner(email, siteId)
-			.then(() => headerBiddingModel.getHbConfig(siteId, email))
-			.then(hbConfig => hbConfig.get('rules') || []);
-	},
 	verifyKeysInCollection = (target, source) => {
 		let recursionLevel = 0;
 
@@ -882,7 +874,6 @@ module.exports = {
 	deleteKeysInCollection,
 	getMandatoryAdsTxtEntrySnippet,
 	getNetworkWideHBRules,
-	getSiteWiseHBRules,
 	removeFormatWiseParamsForAMP,
 	getPageGroupNameAndPlatformFromChannelDoc
 };
