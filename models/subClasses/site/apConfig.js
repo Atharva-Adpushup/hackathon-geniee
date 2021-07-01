@@ -34,7 +34,8 @@ const ApConfig = {
 		'isABTestingForBidInflationEnabled',
 		'gaTrackingId',
 		'gaEventSampling1',
-		'gaEventSampling2'
+		'gaEventSampling2',
+		'isSelectiveRolloutEnabled'
 	],
 	override: [
 		'mode',
@@ -71,7 +72,8 @@ const ApConfig = {
 		'isABTestingForBidInflationEnabled',
 		'gaTrackingId',
 		'gaEventSampling1',
-		'gaEventSampling2'
+		'gaEventSampling2',
+		'isSelectiveRolloutEnabled'
 	],
 	merge: []
 };

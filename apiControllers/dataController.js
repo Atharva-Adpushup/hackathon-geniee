@@ -75,7 +75,8 @@ router
 					apConfigs: {
 						mode: CC.site.mode.DRAFT,
 						isAdPushupControlWithPartnerSSP: CC.apConfigDefaults.isAdPushupControlWithPartnerSSP,
-						autoOptimise: false
+						autoOptimise: false,
+						isSelectiveRolloutEnabled: true
 					}
 				};
 				return siteModel.saveSiteData(siteId, 'POST', siteData);
