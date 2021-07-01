@@ -14,7 +14,7 @@ const FormValidator = require('../helpers/FormValidator');
 const schema = require('../helpers/schema');
 const commonConsts = require('../configs/commonConsts');
 const adpushup = require('../helpers/adpushupEvent');
-const { getSiteWiseHBRules, getNetworkWideHBRules } = require('../helpers/commonFunctions');
+const { getNetworkWideHBRules } = require('../helpers/commonFunctions');
 
 const { sendDataToAuditLogService } = require('../helpers/routeHelpers');
 
@@ -23,6 +23,13 @@ const {
 } = commonConsts;
 
 const router = express.Router();
+
+const getSiteWiseHBRules = (email, siteId) => {
+	return userModel
+		.verifySiteOwner(email, siteId)
+		.then(() => headerBiddingModel.getHbConfig(siteId, email))
+		.then(hbConfig => hbConfig.get('rules') || []);
+};
 
 router
 	.get('/isInventoryExist/:siteId', (req, res) => {
