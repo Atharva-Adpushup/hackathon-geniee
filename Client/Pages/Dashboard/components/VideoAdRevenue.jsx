@@ -69,7 +69,7 @@ class VideoAdRevenue extends React.Component {
 		}
 
 		const computedState = computeGraphData(displayData.result);
-		return { ...computedState, totalNetworkRevenue: total.network_revenue || '' };
+		return { ...computedState, totalNetworkRevenue: total.net_revenue || '' };
 	}
 
 	renderChart() {
