@@ -71,7 +71,8 @@ var model = require('../helpers/model'),
 				// Manually update it without any UI incase this condition gets true
 				// NOTE: AdPushup does not recommend this use case but we have to support it to complete
 				// our SSP integrations
-				isAdPushupControlWithPartnerSSP: false
+				isAdPushupControlWithPartnerSSP: false,
+				isSelectiveRolloutEnabled:true
 			},
 			channels: [],
 			cmsInfo: {
