@@ -22,6 +22,7 @@ var modelAPI = (module.exports = apiModule()),
 	pipedriveAPI = require('../misc/vendors/pipedrive'),
 	mailService = require('../services/mailService/index'),
 	{ mailService: nodeUtilsMailService } = require('node-utils'),
+	{ appBucket } = require('../helpers/routeHelpers'),
 	proxy = require('../helpers/proxy'),
 	User = model.extend(function() {
 		this.keys = [
@@ -67,7 +68,8 @@ var modelAPI = (module.exports = apiModule()),
 			'mcm',
 			'peerPerformanceAnalysisSites',
 			'peerPerformanceAnalysis',
-			'activeProducts'
+			'activeProducts',
+			'useGAAnalyticsForReporting'
 		];
 		this.clientKeys = [
 			'firstName',
@@ -103,7 +105,8 @@ var modelAPI = (module.exports = apiModule()),
 			'mcm',
 			'peerPerformanceAnalysisSites',
 			'peerPerformanceAnalysis',
-			'activeProducts'
+			'activeProducts',
+			'useGAAnalyticsForReporting'
 		];
 		this.validations = schema.user.validations;
 		this.classMap = {
@@ -942,6 +945,10 @@ function apiModule() {
 		},
 		getUserPaymentDetailsForRangeFromTipalti: function(email, from, to) {
 			return proxy.getPaymentDetailsForRangeFromTipalti(email, from, to);
+		},
+		getUserGaEnabledSites: function(email) {
+			const queryString = `SELECT siteId FROM AppBucket WHERE apConfigs.enableGAAnalytics and ownerEmail="${email}" and meta().id like "site::%";`;
+			return appBucket.queryDB(queryString);
 		}
 	};
 

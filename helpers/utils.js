@@ -321,6 +321,14 @@ var url = require('url'),
 		},
 		capitalizeString: string => {
 			return string.charAt(0).toUpperCase() + string.slice(1);
+		},
+		roundOffTwoDecimal: value => {
+			if (Number.isInteger(value)) return value;
+			const roundedNum = Math.round(value * 100) / 100;
+			return roundedNum.toFixed(2);
+		},
+		doesReportingHavePageViewData: (reportingColumns = []) => {
+			return reportingColumns.includes('adpushup_page_views');
 		}
 	};
 

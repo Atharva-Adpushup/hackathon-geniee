@@ -65,5 +65,6 @@ export default {
 	AD_NETWORK_DOC_KEYS: {
 		dfpAdunit: 'dfpAdunit'
 	},
-	isCoreWebVitalsEnabled: false
+	isCoreWebVitalsEnabled: false,
+	GA_DISABLED_SITES: [40792]
 };
