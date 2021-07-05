@@ -39,7 +39,9 @@ var model = require('../helpers/model'),
 			'ampSettings',
 			'apps',
 			'adServerSetupStatus',
-			'dataFeedActive'
+			'dataFeedActive',
+			'prebidBundleName',
+			'activeBidderAdaptersListAsc'
 		];
 		this.clientKeys = [
 			'siteId',
@@ -58,7 +60,9 @@ var model = require('../helpers/model'),
 			'ampSettings',
 			'apps',
 			'adServerSetupStatus',
-			'dataFeedActive'
+			'dataFeedActive',
+			'prebidBundleName',
+			'activeBidderAdaptersListAsc'
 		];
 		this.validations = {
 			required: []
@@ -246,7 +250,25 @@ var model = require('../helpers/model'),
 				return this.save();
 			}.bind(this)
 		);
+
+		this.getActiveBidderAdaptersList = function() {
+			return this.get('activeBidderAdaptersListAsc') || '';
+		};
+
+		this.setActiveBidderAdaptersList = function(newActiveBiddersList) {
+			const siteId = this.get('siteId');
+
+			this.set('activeBidderAdaptersListAsc', newActiveBiddersList);
+			this.set('prebidBundleName', getSiteSpecificPrebidBundleName(siteId));
+
+			return this.save();
+		};
 	});
+	
+function getSiteSpecificPrebidBundleName(siteId) {
+	var timestamp = Date.now();
+	return `pb.${siteId}.${timestamp}.js`;
+}
 
 function apiModule() {
 	function generateGetSitesQueryString(siteIds, keysToReturn) {
