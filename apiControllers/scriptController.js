@@ -8,6 +8,7 @@ const SiteModel = require('../models/siteModel');
 const activeBidderAdaptersList = require('../models/activeBidderAdaptersListModel');
 const SelectiveRolloutActiveBidderAdaptersList = require('../models/selectiveRolloutActiveBidderAdaptersListModel');
 const ampActiveBidderAdaptersListModel = require('../models/ampActiveBidderAdaptersListModel');
+const SiteSpecificActiveBidderAdaptersList = require('../models/siteSpecificActiveBidderAdaptersListModel');
 const ampScriptModel = require('../models/ampScriptModel');
 
 const getReportData = require('../reports/universal');
@@ -36,7 +37,8 @@ const defaultApConfigValues = {
 	isBbPlayerEnabledForTesting: false,
 	isPerformanceLoggingEnabled: false,
 	isAutoAddMultiformatDisabled: false,
-	isSiteSpecificSeparatePrebidEnabled: false,
+	isSiteSpecificPrebidDisabled: false,
+	isSiteSpecificSeparatePrebidEnabled: false, // TODO: to be removed; only used by GFG
 	// global config
 	isBbPlayerLoggingEnabled: false
 };
@@ -390,23 +392,37 @@ Router.get('/prebidBundleConfig', (req, res) => {
 				return ampActiveBidderAdaptersListModel;
 			}
 
-			const { isSelectiveRolloutEnabled = false } = site.get('apConfigs') || {};
+			const { isSelectiveRolloutEnabled = false, isSiteSpecificPrebidDisabled = false } =
+				site.get('apConfigs') || {};
 
-			return isSelectiveRolloutEnabled
-				? SelectiveRolloutActiveBidderAdaptersList
-				: activeBidderAdaptersList;
+			if (!isSelectiveRolloutEnabled) {
+				return activeBidderAdaptersList;
+			}
+
+			if (!isSiteSpecificPrebidDisabled) {
+				return SiteSpecificActiveBidderAdaptersList;
+			}
+
+			return SelectiveRolloutActiveBidderAdaptersList;
 		})
 		.then(activeBiddersModel =>
-			Promise.join(activeBiddersModel, activeBiddersModel.getActiveAndUsedBidderAdapters())
+			Promise.join(
+				activeBiddersModel,
+				activeBiddersModel.getActiveAndUsedBidderAdapters(siteId)
+				// siteId is only used by SiteSpecificActiveBidderAdaptersList
+			)
 		)
 		.then(([activeBiddersModel, activeAndUsedBidders]) => {
 			if (forAmp) {
 				return res.send({ activeAndUsedBidders });
 			}
 
-			return activeBiddersModel
-				.isS2SActiveOnAnySite()
-				.then(isS2SActiveOnAnySite => res.send({ isS2SActiveOnAnySite, activeAndUsedBidders }));
+			return (
+				activeBiddersModel
+					.isS2SActiveOnAnySite(siteId)
+					// siteId is only used by SiteSpecificActiveBidderAdaptersList
+					.then(isS2SActiveOnAnySite => res.send({ isS2SActiveOnAnySite, activeAndUsedBidders }))
+			);
 		})
 		.catch(err => {
 			if (err instanceof AdPushupError) {
@@ -428,15 +444,22 @@ Router.post('/prebidActiveBidderAdapters', (req, res) => {
 				return ampActiveBidderAdaptersListModel;
 			}
 
-			const { isSelectiveRolloutEnabled = false } = site.get('apConfigs') || {};
+			const { isSelectiveRolloutEnabled = false, isSiteSpecificPrebidDisabled = false } =
+				site.get('apConfigs') || {};
 
-			return isSelectiveRolloutEnabled
-				? SelectiveRolloutActiveBidderAdaptersList
-				: activeBidderAdaptersList;
+			if (!isSelectiveRolloutEnabled) {
+				return activeBidderAdaptersList;
+			}
+
+			if (!isSiteSpecificPrebidDisabled) {
+				return SiteSpecificActiveBidderAdaptersList;
+			}
+
+			return SelectiveRolloutActiveBidderAdaptersList;
 		})
 		.then(activeBiddersModel =>
 			activeBiddersModel
-				.updateActiveBidderAdaptersIfChanged(newActiveBidderAdapters)
+				.updateActiveBidderAdaptersIfChanged(newActiveBidderAdapters, siteId)
 				.then(data => res.send(data))
 				.catch(err => {
 					if (err instanceof AdPushupError) {
