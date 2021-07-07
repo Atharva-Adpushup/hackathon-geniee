@@ -203,7 +203,24 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 		.then(([scriptConfig, siteData]) =>
 			res.send({ error: null, data: { config: scriptConfig, siteData } })
 		)
-		.catch(e => res.send({ error: e.message }));
+		.catch(e => {
+			if (typeof e.message === 'string') {
+				return res.send({ error: e.message });
+			}
+
+			/**
+			 * error thrown from services/genieeAdSyncService/cdnSyncService/generateAdPushupConfig.js ends up in a really weird state
+			 * adding checks for the same
+			 */
+			if (typeof e[0] === 'object') {
+				const errObject = e[0];
+				if (errObject.message && errObject.message.message) {
+					return res.send({ error: errObject.message.message });
+				}
+			}
+
+			return res.send({ error: `Unknown message occured: ${e}` });
+		});
 });
 
 Router.get('/:siteId/ampSiteConfig', (req, res) => {
