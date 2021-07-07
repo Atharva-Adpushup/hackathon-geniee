@@ -143,7 +143,7 @@ async function getEmailSnapshotsSites(userEmail) {
 			return { dailySubscribedSites, weeklySubscribedSites };
 		}, initailObject);
 		return subscribedSites;
-	} catch (err) {
+	} catch (error) {
 		throw new Error(`Error in fetching subscribed sites of user:${error}`);
 	}
 }
