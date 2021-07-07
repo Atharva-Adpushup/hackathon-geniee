@@ -173,3 +173,11 @@
 		border-color: $linkBlue;
 	}
 }
+.peer-performance-revenue-chart {
+	box-shadow: none;
+	.peer-performance-chart-header {
+		text-align: center;
+		font-weight: 600;
+		margin-top: 20px;
+	}
+}

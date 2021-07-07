@@ -702,3 +702,37 @@
 		}
 	}
 }
+
+.peer-performance-select {
+	margin-left: 0.6em;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	width: '100%';
+	margin-bottom: 20px;
+	h1 {
+		font-size: 16px;
+		margin: 0;
+		font-weight: 700;
+		margin-right: 5%;
+		padding: '0';
+	}
+	.rmsc {
+		width: 60%;
+		.dropdown-content {
+			height: 150px !important;
+			top: initial;
+			bottom: 275%;
+		}
+		.peer-performance-select-option {
+			padding: 0px !important;
+			margin: 0px !important;
+			font-size: 10px;
+			color: red;
+		}
+		.options {
+			height: 160px;
+		}
+	}
+}

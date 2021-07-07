@@ -4,7 +4,6 @@ const Promise = require('bluebird');
 const uuid = require('node-uuid');
 const request = require('request-promise');
 const _ = require('lodash');
-
 const userModel = require('../models/userModel');
 const siteModel = require('../models/siteModel');
 const utils = require('../helpers/utils');
@@ -380,6 +379,26 @@ router
 				);
 			})
 			.catch(err => errorHandler(err, res));
+	})
+	.get('/blockedSitesPeerPerformance', async (req, res) => {
+		try {
+			const peerPerformanceBlockedQuery =
+				'SELECT sites FROM AppBucket WHERE notParticipatingInPeerPerformance=true and meta().id like "user::%";';
+			const userSites = await appBucket.queryDB(peerPerformanceBlockedQuery);
+			const peerBlockedSites = userSites.reduce((allBlockedSites, currentUserSites) => {
+				const { sites = [] } = currentUserSites;
+				const blockedSites = sites.map(site => site.siteId);
+				return [...allBlockedSites, ...blockedSites];
+			}, []);
+			return sendSuccessResponse(
+				{
+					sites: peerBlockedSites
+				},
+				res
+			);
+		} catch (err) {
+			return errorHandler(err, res);
+		}
 	})
 	.post('/switchUser', (req, res) => {
 		let { email } = req.body;

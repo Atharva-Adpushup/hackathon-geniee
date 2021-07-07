@@ -116,6 +116,7 @@
 		"react-highcharts": "^16.0.2",
 		"react-hot-loader": "^4.6.5",
 		"react-moment-proptypes": "1.6.0",
+		"react-multi-select-component": "^4.0.2",
 		"react-notification-system": "0.2.17",
 		"react-onclickoutside": "6.8.0",
 		"react-portal": "4.2.0",

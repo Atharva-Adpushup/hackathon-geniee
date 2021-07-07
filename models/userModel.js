@@ -64,7 +64,9 @@ var modelAPI = (module.exports = apiModule()),
 			'showUniqueImpressionsReporting',
 			'sessionRpmReports',
 			'isBidderAdmin',
-			'mcm'
+			'mcm',
+			'peerPerformanceAnalysisSites',
+			'peerPerformanceAnalysis'
 		];
 		this.clientKeys = [
 			'firstName',
@@ -97,7 +99,9 @@ var modelAPI = (module.exports = apiModule()),
 			'sessionRpmReports',
 			'isBidderAdmin',
 			'dashboardNotificationAccess',
-			'mcm'
+			'mcm',
+			'peerPerformanceAnalysisSites',
+			'peerPerformanceAnalysis'
 		];
 		this.validations = schema.user.validations;
 		this.classMap = {

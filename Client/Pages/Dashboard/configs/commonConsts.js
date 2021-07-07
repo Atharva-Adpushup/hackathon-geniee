@@ -104,6 +104,15 @@ const displayMetrics = {
 	primis_revenue: { name: 'Video Ad Revenue', valueType: 'money' }
 };
 
+const peerPerformanceDisplayMetrics = {
+	network_net_revenue: { name: 'Revenue', valueType: 'money' },
+	adpushup_page_views: { name: 'Page Views', valueType: 'number' },
+	adpushup_page_cpm: { name: 'Page RPM', valueType: 'money' },
+	session_rpm: { name: 'Session RPM', valueType: 'money' },
+	network_ad_ecpm: { name: 'Ad eCPM', valueType: 'money' },
+	page_view_per_session: { name: 'Page Views per Session', valueType: 'integer' }
+};
+
 const displayUniqueMetrics = {
 	network_gross_revenue: { name: 'Gross Revenue', valueType: 'money' },
 	network_net_revenue: { name: 'Net Revenue', valueType: 'money' },
@@ -122,7 +131,8 @@ const dashboardWidgets = [
 	'per_overview',
 	'per_ap_original',
 	'primis_report',
-	'ops_country_report'
+	'ops_country_report',
+	'peer_performance_report'
 ];
 
 const ALL_SITES_VALUE = { name: 'All', value: 'all' };
@@ -148,5 +158,6 @@ export {
 	opsDisplayMetricsKeys,
 	dashboardWidgets,
 	activeLegendItemArray,
-	REPORT_LINK
+	REPORT_LINK,
+	peerPerformanceDisplayMetrics
 };
