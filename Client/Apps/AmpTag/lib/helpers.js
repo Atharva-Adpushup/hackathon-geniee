@@ -37,6 +37,34 @@ function getAdsAndGlobal(state, props) {
 		networkCode
 	};
 }
+
+function getAdsAndGlobalForAmpNew(state, props) {
+	const { ampNew } = state.apps;
+	const {
+		global: { user }
+	} = state;
+	const {
+		data: { adServerSettings = {} }
+	} = user;
+	const { dfp = {} } = adServerSettings;
+	const {
+		match: { params }
+	} = props;
+	const { siteId } = params;
+	const ads = ampNew.ads[siteId] || DEFAULT_ADS_RESPONSE;
+	const global = ampNew.global[siteId] || DEFAULT_GLOBAL_RESPONSE;
+	const currentAdDoc = ads.content[0];
+	const networkCode = dfp.activeDFPNetwork;
+
+	return {
+		siteId,
+		ads,
+		currentAdDoc,
+		global,
+		networkCode
+	};
+}
+
 function computeDownWardCompatibleSizes(sizes, selectedSize) {
 	const sizesArray = selectedSize.split('x');
 	const width = sizesArray[0];
@@ -60,5 +88,6 @@ export {
 	makeFirstLetterCapitalize,
 	copyToClipBoard,
 	getAdsAndGlobal,
+	getAdsAndGlobalForAmpNew,
 	computeDownWardCompatibleSizes
 };

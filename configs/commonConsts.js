@@ -516,6 +516,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		hbaQueryFrequencyDoc: 'hbaq::',
 		networkWideHBRules: 'ntwkwide::rules'
 	},
+	AMP_REFRESH_INTERVAL: 30,
 	tagManagerInitialDoc: {
 		siteId: null,
 		ownerEmail: null,

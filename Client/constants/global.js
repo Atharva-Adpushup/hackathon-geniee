@@ -64,6 +64,7 @@ const ROUTE_APP_NAME = {
 	SETTINGS: 'Site Settings',
 	AP_TAG: 'App - Ap Tag',
 	AMP: 'App - Amp',
+	AMP_NEW: 'App - Amp New',
 	INNOVATIVE_ADS: 'App - Innovative Ads',
 	HEADER_BIDDING_BIDDERS: 'HB App - Bidders',
 	HEADER_BIDDING_INVENTORY: 'HB App - Inventory',

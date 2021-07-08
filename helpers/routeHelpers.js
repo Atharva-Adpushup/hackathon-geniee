@@ -21,7 +21,8 @@ const {
 	DEFAULT_APP_STATUS_RESPONSE,
 	ADS_TXT_REDIRECT_PATTERN,
 	AUDIT_LOGS_ACTIONS: { OPS_PANEL },
-	docKeys
+	docKeys,
+	AMP_REFRESH_INTERVAL
 } = require('../configs/commonConsts');
 
 const appBucket = couchbaseService(
@@ -398,6 +399,18 @@ function createNewAmpDocAndDoProcessing(payload, initialDoc, docKey, processing)
 		});
 }
 
+// for new AMP Tag format
+function createNewAmpScriptDocAndDoProcessing(payload, initialDoc, docKey, processing) {
+	const defaultDocCopy = _.cloneDeep(initialDoc);
+	return appBucket
+		.createDoc(`${docKey}${payload.siteId}`, defaultDocCopy, {})
+		.then(() => appBucket.getDoc(`${docKey}${payload.siteId}`))
+		.then(docWithCas => {
+			payload.siteDomain = docWithCas.value.siteDomain;
+			return processing(defaultDocCopy, payload);
+		});
+}
+
 function getAmpAds(siteId) {
 	const GET_ALL_AMP_ADS_QUERY = `SELECT _amtg as doc
 	FROM AppBucket _amtg
@@ -409,6 +422,17 @@ function getAmpAds(siteId) {
 		.connectToAppBucket()
 		.then(appBucket => appBucket.queryAsync(query))
 		.then(ads => ads)
+		.catch(err => console.log(err));
+}
+
+// for new AMP Ad format
+function getNewAmpAds(siteId) {
+	return couchbase
+		.connectToAppBucket()
+		.then(appBucket => appBucket.getAsync(`${docKeys.ampScript}${siteId}`, {}).then(ampdDoc => {
+			const { value: { ads } } = ampdDoc;
+			return ads;
+		}))
 		.catch(err => console.log(err));
 }
 
@@ -581,6 +605,30 @@ function fetchAmpAds(req, res, docKey) {
 		);
 }
 
+// for new AMP Ad format
+function fetchNewAmpAds(req, res, docKey) {
+	if (!req.query || !req.query.siteId) {
+		return sendErrorResponse(
+			{
+				message: 'Incomplete Parameters. Please check siteId'
+			},
+			res
+		);
+	}
+	const { siteId } = req.query;
+
+	return verifyOwner(siteId, req.user.email)
+		.then(() => getNewAmpAds(siteId))
+		.then((ads = []) => {
+			return sendSuccessResponse({ ads }, res);
+		})
+		.catch(err =>
+			err.code && err.code === 13 && err.message.includes('key does not exist')
+				? sendSuccessResponse({ ads: []}, res)
+				: errorHandler(err, res)
+		);
+}
+
 function updateAmpTags(id, ads, updateThis) {
 	if (!id) {
 		return Promise.resolve();
@@ -599,9 +647,12 @@ function updateAmpTags(id, ads, updateThis) {
 
 				value = updatedAd;
 				value.updatedOn = +new Date();
-				value.ad.isRefreshEnabled
-					? (value.ad.refreshInterval = 30)
-					: delete value.ad.refreshInterval;
+				if (value.ad.isRefreshEnabled) {
+					!value.ad.refreshInterval &&
+						(value.ad.refreshInterval = AMP_REFRESH_INTERVAL);
+				} else {
+					delete value.ad.refreshInterval;
+				}				
 			}
 
 			return appBucket.replaceAsync(`amtg::${id}`, value) && value;
@@ -615,6 +666,45 @@ function updateAmpTags(id, ads, updateThis) {
 		});
 }
 
+function findAndUpdateAmpAd(value, id, update) {
+	const index = value.ads.findIndex(adItem => adItem.id == id);
+	let adItem = value.ads[index];
+	value.ads[index] = {...value.ads[index], ...update}
+
+	value.updatedOn = +new Date();
+	if(!adItem.networkData.refreshInterval) {
+		adItem.isRefreshEnabled
+			? (adItem.networkData.refreshInterval = AMP_REFRESH_INTERVAL)
+			: delete adItem.refreshInterval;
+	}
+	return value;
+}
+
+// for new AMP Ad format
+function updateAmpTagsNewFormat(id, ads, siteId, updateThis) {
+	return couchbase
+		.connectToAppBucket()
+		.then(appBucket =>
+			appBucket.getAsync(`${docKeys.ampScript}${siteId}`, {}).then(ampd => ({ appBucket, ampd }))
+		)
+		.then(({ appBucket, ampd: { value } }) => {
+			if (id) {
+				value = findAndUpdateAmpAd(value, id, updateThis);
+			} else {
+				ads.forEach(ad => {
+					value = findAndUpdateAmpAd(value, ad.id, ad);
+				})
+			}
+			return appBucket.replaceAsync(`${docKeys.ampScript}${siteId}`, value) && value;
+		})
+		.catch(err => {
+			if (err.code === 13) {
+				return [];
+			}
+
+			throw err;
+		});
+}
 function checkAmpUnsyncedAds(doc) {
 	const { ad } = doc;
 	if (!ad.networkData.dfpAdunitCode) {
@@ -783,9 +873,12 @@ module.exports = {
 	emitEventAndSendResponse,
 	fetchAds,
 	fetchAmpAds,
+	fetchNewAmpAds,
 	updateAmpTags,
+	updateAmpTagsNewFormat,
 	createNewDocAndDoProcessing,
 	createNewAmpDocAndDoProcessing,
+	createNewAmpScriptDocAndDoProcessing,
 	masterSave,
 	modifyAd,
 	fetchStatusesFromReporting,
@@ -794,6 +887,7 @@ module.exports = {
 	queuePublishingWrapper,
 	storedRequestWrapper,
 	getAmpAds,
+	getNewAmpAds,
 	publishAdPushupBuild,
 	sendDataToAuditLogService,
 	getAllAds,

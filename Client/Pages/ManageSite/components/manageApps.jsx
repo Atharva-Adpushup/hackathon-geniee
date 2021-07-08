@@ -95,7 +95,7 @@ class ManageApps extends React.Component {
 		const disableAppStyles = { pointerEvents: 'none', opacity: 0.5 };
 
 		const activeAppsArr = [];
-		for (let key in apps) {
+		for (const key in apps) {
 			if (apps[key]) activeAppsArr.push(key);
 		}
 
@@ -109,8 +109,12 @@ class ManageApps extends React.Component {
 		return (
 			<div className="aligner aligner--row aligner--wrap">
 				{APPS.map(app => {
-					const { name, alias, image, description, key, left, right, full = false } = app;
+					const { name, image, description, key, left, right, full = false } = app;
+					let { alias } = app;
 
+					if (alias === 'amp' && activeAppsArr.includes('ampScript')) {
+						alias = 'ampScript';
+					}
 					const isAppActive = activeAppsArr.includes(alias);
 					const statuses = isAppActive ? STATUSES.ACTIVE : STATUSES.INACTIVE;
 					const { type, icon, tooltip } = statuses;
