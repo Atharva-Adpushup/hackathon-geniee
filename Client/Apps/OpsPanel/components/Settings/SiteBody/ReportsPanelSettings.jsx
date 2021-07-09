@@ -2,16 +2,24 @@
 /* eslint-disable no-else-return */
 /* eslint-disable prefer-destructuring */
 import React, { Component } from 'react';
-
+import pullAll from 'lodash/pullAll';
 import CustomToggleSwitch from '../../../../../Components/CustomToggleSwitch/index';
 import CustomButton from '../../../../../Components/CustomButton/index';
 import FieldGroup from '../../../../../Components/Layout/FieldGroup';
+import PeerPerformance from './PeerPerformance';
+import reportService from '../../../../../services/reportService';
 
 class ReportsPanelSettings extends Component {
 	constructor(props) {
 		super(props);
 		const { user } = this.props;
-		const { showUniqueImpressionsReporting = false, sessionRpmReports = false, mcm = {} } = user;
+		const {
+			showUniqueImpressionsReporting = false,
+			sessionRpmReports = false,
+			mcm = {},
+			peerPerformanceAnalysis = false,
+			peerPerformanceAnalysisSites = []
+		} = user;
 		const { isMcmEnabled = false, childPublisherId = '' } = mcm;
 
 		this.state = {
@@ -19,7 +27,9 @@ class ReportsPanelSettings extends Component {
 			loading: false,
 			sessionRpmReports,
 			isMcmEnabled,
-			childPublisherId
+			childPublisherId,
+			peerPerformanceAnalysis,
+			peerPerformanceAnalysisSites
 		};
 	}
 
@@ -27,6 +37,29 @@ class ReportsPanelSettings extends Component {
 		this.setState({
 			[e.target.name]: e.target.value
 		});
+	};
+
+	componentDidMount() {
+		const {
+			globalDataFetched,
+			fetchPeerPerformanceBlockedSite,
+			peerPerformanceBlockedSitesFetched
+		} = this.props;
+		if (!globalDataFetched) {
+			const params = { sites: '', isSuperUser: true };
+			reportService.getMetaData(params).then(responseData => {
+				const { data: metaData } = responseData;
+				this.setReportingMetaData(metaData);
+			});
+		}
+		if (!peerPerformanceBlockedSitesFetched) {
+			fetchPeerPerformanceBlockedSite();
+		}
+	}
+
+	setReportingMetaData = metaData => {
+		const { updateGlobalReportMetaData } = this.props;
+		updateGlobalReportMetaData(metaData);
 	};
 
 	handleToggle = (val, e) => {
@@ -42,7 +75,9 @@ class ReportsPanelSettings extends Component {
 			showUniqueImpressionsReporting,
 			sessionRpmReports,
 			childPublisherId,
-			isMcmEnabled
+			isMcmEnabled,
+			peerPerformanceAnalysisSites,
+			peerPerformanceAnalysis
 		} = this.state;
 		const { updateUser, customProps, showNotification } = this.props;
 		if (isMcmEnabled && childPublisherId === '') {
@@ -77,6 +112,14 @@ class ReportsPanelSettings extends Component {
 						isMcmEnabled,
 						childPublisherId
 					}
+				},
+				{
+					key: 'peerPerformanceAnalysis',
+					value: peerPerformanceAnalysis
+				},
+				{
+					key: 'peerPerformanceAnalysisSites',
+					value: peerPerformanceAnalysisSites
 				}
 			],
 			dataForAuditLogs
@@ -87,14 +130,65 @@ class ReportsPanelSettings extends Component {
 		);
 	};
 
+	getPeerPerformanceOptions = () => {
+		const { allActiveSites, peerPerformanceBlockedSites } = this.props;
+		const { peerPerformanceAnalysisSites } = this.state;
+		//creating map for all selected sites
+		const peerSelectedSiteIdsMap = peerPerformanceAnalysisSites.reduce((sitesMap, site) => {
+			sitesMap[site.value] = true;
+			return sitesMap;
+		}, {});
+		const siteIdsKeys = Object.keys(allActiveSites);
+		//Removing blocked sites from options
+		const filteredSiteIds = pullAll(
+			siteIdsKeys,
+			peerPerformanceBlockedSites.map(site => site.toString())
+		);
+		const options = filteredSiteIds.reduce((allResult, siteId) => {
+			const siteObj = allActiveSites[siteId];
+			const { siteName = '' } = siteObj || {};
+			const value = {
+				label: siteName,
+				value: siteId
+			};
+			if (peerSelectedSiteIdsMap[siteId]) allResult.unshift(value);
+			else allResult.push(value);
+			return allResult;
+		}, []);
+		return options;
+	};
+
+	getPeerPerformanceSelected = () => {
+		const { peerPerformanceBlockedSites } = this.props;
+		const blockedSitesMap = peerPerformanceBlockedSites.reduce((acc, curr) => {
+			acc[curr] = true;
+			return acc;
+		}, {});
+		const { peerPerformanceAnalysisSites } = this.state;
+		const peerPerformanceSitesExcludingBlocked = peerPerformanceAnalysisSites.filter(site => {
+			const { value } = site;
+			return !blockedSitesMap[value];
+		});
+		return peerPerformanceSitesExcludingBlocked;
+	};
+
+	handlePeerSelect = selected => {
+		this.setState({ peerPerformanceAnalysisSites: selected });
+	};
+
 	render() {
 		const {
 			loading,
 			showUniqueImpressionsReporting,
 			sessionRpmReports,
 			isMcmEnabled,
-			childPublisherId
+			childPublisherId,
+			peerPerformanceAnalysis
 		} = this.state;
+
+		const { globalDataFetched, peerPerformanceBlockedSitesFetched } = this.props;
+
+		const { handlePeerSelect, getPeerPerformanceOptions, getPeerPerformanceSelected } = this;
 
 		return (
 			<div className="showUniqueImpressionsReporting">
@@ -149,6 +243,27 @@ class ReportsPanelSettings extends Component {
 					className="u-padding-v4 u-padding-h4"
 					disabled={!isMcmEnabled && true}
 				/>
+				<CustomToggleSwitch
+					labelText="Peer Performance Analysis"
+					className="u-margin-b4 negative-toggle u-cursor-pointer"
+					checked={peerPerformanceAnalysis}
+					onChange={this.handleToggle}
+					layout="horizontal"
+					size="m"
+					on="Yes"
+					off="No"
+					defaultLayout
+					name="peerPerformanceAnalysis"
+					id="js-peerPerformanceAnalysis"
+				/>
+				{peerPerformanceAnalysis && (
+					<PeerPerformance
+						options={getPeerPerformanceOptions()}
+						selected={getPeerPerformanceSelected()}
+						handlePeerSelect={handlePeerSelect}
+						isLoaded={globalDataFetched && peerPerformanceBlockedSitesFetched}
+					/>
+				)}
 				<CustomButton
 					variant="primary"
 					className="pull-right u-margin-r3"

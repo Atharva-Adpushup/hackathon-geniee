@@ -2,22 +2,34 @@ import config from '../../../config/config';
 
 const AMP_NAV_ITEMS_INDEXES = {
 	CREATE_ADS: 'create-ads',
-	MANAGE_ADS: 'manage-ads'
+	MANAGE_ADS: 'manage-ads',
+	CREATE_ADS_NEW: 'create-ads-new',
+	MANAGE_ADS_NEW: 'manage-ads-new'
 };
 
 const AMP_NAV_ITEMS_VALUES = {
-	CREATE_TAG: 'Create Tags',
-	MANAGE_TAG: 'Manage Tags'
+	CREATE_TAG: 'Create Tags(legacy)',
+	MANAGE_TAG: 'Manage Tags(legacy)',
+	CREATE_TAG_NEW: 'Create Tags',
+	MANAGE_TAG_NEW: 'Manage Tags'
 };
 
 const AMP_NAV_ITEMS = {
+	[AMP_NAV_ITEMS_INDEXES.CREATE_ADS_NEW]: {
+		NAME: [AMP_NAV_ITEMS_VALUES.CREATE_ADS_NEW],
+		INDEX: 1
+	},
+	[AMP_NAV_ITEMS_INDEXES.MANAGE_ADS_NEW]: {
+		NAME: [AMP_NAV_ITEMS_VALUES.MANAGE_ADS_NEW],
+		INDEX: 2
+	},
 	[AMP_NAV_ITEMS_INDEXES.CREATE_ADS]: {
 		NAME: [AMP_NAV_ITEMS_VALUES.CREATE_ADS],
-		INDEX: 1
+		INDEX: 3
 	},
 	[AMP_NAV_ITEMS_INDEXES.MANAGE_ADS]: {
 		NAME: [AMP_NAV_ITEMS_VALUES.MANAGE_ADS],
-		INDEX: 2
+		INDEX: 4
 	}
 };
 
@@ -66,9 +78,7 @@ const SIZES = {
 	}
 };
 
-const PREBID_SERVER_ENDPOINT = `${
-	config.PREBID_SERVER_HOST
-}prebidserver/openrtb2/amp?tag_id=__AD_ID____MULTI_SIZE_QUERY_PARAM__`;
+const PREBID_SERVER_ENDPOINT = `${config.PREBID_SERVER_HOST}prebidserver/openrtb2/amp?tag_id=__AD_ID____MULTI_SIZE_QUERY_PARAM__`;
 
 const AMP_FIXED_TARGETING = {
 	adpushup_ran: '1',
@@ -92,6 +102,14 @@ const STICKYADCODE = `<amp-sticky-ad layout="nodisplay">
 </amp-ad>
 </amp-sticky-ad>`;
 
+// for new AMP Tag format
+const DISPLAYADCODE_AMP = `<amp-ad width="__WIDTH__" height="__HEIGHT__" type="adpushup"__DYNAMIC_ATTRIBS__data-slotpath="/__NETWORK_CODE__/__AD_UNIT_CODE__"></amp-ad>`;
+
+// for new AMP Tag format
+const STICKYADCODE_AMP = `<amp-sticky-ad layout="nodisplay">
+<amp-ad width="__WIDTH__" height="__HEIGHT__" type="adpushup"__DYNAMIC_ATTRIBS__data-slotpath="/__NETWORK_CODE__/__AD_UNIT_CODE__"> </amp-ad>
+</amp-sticky-ad>`;
+
 const DEFAULT_ADS_RESPONSE = { fetched: false, content: [] };
 const DEFAULT_GLOBAL_RESPONSE = {
 	currentAd: null
@@ -110,6 +128,8 @@ export {
 	SIZES,
 	DISPLAYADCODE,
 	STICKYADCODE,
+	DISPLAYADCODE_AMP,
+	STICKYADCODE_AMP,
 	AMP_FIXED_TARGETING,
 	DEFAULT_ADS_RESPONSE,
 	DEFAULT_GLOBAL_RESPONSE,

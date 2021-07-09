@@ -2,6 +2,7 @@ import { connect } from 'react-redux';
 import Dashboard from '../components/index';
 import { showNotification } from '../../../actions/uiActions';
 import { updateAccountReportMetaData } from '../../../actions/globalActions';
+import { fetchPeerPerformanceBlockedSite } from '../../../actions/userActions';
 
 const mapStateToProps = (state, ownProps) => {
 	const {
@@ -9,6 +10,16 @@ const mapStateToProps = (state, ownProps) => {
 		user,
 		sites
 	} = state.global;
+	const {
+		data: {
+			peerPerformanceBlockedSites: {
+				value: peerPerformanceblockedSites = [],
+				fetched: peerPerformanceBlockedSitesFetched = false
+			} = {},
+			peerPerformanceAnalysis,
+			peerPerformanceAnalysisSites = []
+		}
+	} = user;
 	return {
 		...ownProps,
 		reportsMeta: accountReportMetaData,
@@ -16,13 +27,18 @@ const mapStateToProps = (state, ownProps) => {
 		user,
 		// reportingSites: reportingData.site || {},
 		sites: sites.fetched ? sites.data : {},
-		reportType: ownProps.reportType || 'account'
+		reportType: ownProps.reportType || 'account',
+		peerPerformanceblockedSites,
+		peerPerformanceBlockedSitesFetched,
+		peerPerformanceAnalysis,
+		peerPerformanceAnalysisSites
 	};
 };
 
 const mapDispatchToProps = dispatch => ({
 	showNotification: data => dispatch(showNotification(data)),
-	updateAccountReportMetaData: params => dispatch(updateAccountReportMetaData(params))
+	updateAccountReportMetaData: params => dispatch(updateAccountReportMetaData(params)),
+	fetchPeerPerformanceBlockedSite: () => dispatch(fetchPeerPerformanceBlockedSite())
 });
 
 export default connect(

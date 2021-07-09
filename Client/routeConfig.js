@@ -2,6 +2,7 @@ import { lazy } from 'react';
 import { NAV_ITEMS_INDEXES } from './Pages/ManageSite/constants/index';
 import { IA_NAV_ITEMS_INDEXES } from './Apps/InnovativeAds/configs/commonConsts';
 import { APT_NAV_ITEMS_INDEXES } from './Apps/ApTag/configs/commonConsts';
+import { AMP_NAV_ITEMS_INDEXES } from './Apps/AmpTag/configs/commonConsts';
 import { REPORTS_NAV_ITEMS_INDEXES } from './Apps/Reporting/configs/commonConsts';
 import { PAYMENT_NAV_ITEMS_INDEXES } from './Pages/Payment/configs/commonConsts';
 import { ADSTXT_NAV_ITEMS_INDEXES } from './Pages/AdsTxtManagement/configs/commonConsts';
@@ -131,16 +132,38 @@ const ROUTES = {
 		// Amp
 		{
 			exact: true,
-			customProps: { activeTab: APT_NAV_ITEMS_INDEXES.CREATE_ADS },
+			customProps: { activeTab: AMP_NAV_ITEMS_INDEXES.CREATE_ADS, appName: ROUTE_APP_NAME.AMP },
 			name: 'AMP',
 			path: '/sites/:siteId/apps/amp',
 			component: Amp
 		},
 		{
 			exact: true,
-			customProps: { activeTab: APT_NAV_ITEMS_INDEXES.MANAGE_ADS, appName: ROUTE_APP_NAME.AMP },
+			customProps: { activeTab: AMP_NAV_ITEMS_INDEXES.MANAGE_ADS, appName: ROUTE_APP_NAME.AMP },
 			name: 'Manage',
 			path: '/sites/:siteId/apps/amp/manage',
+			component: Amp
+		},
+		// Amp new Tags
+		{
+			exact: true,
+			customProps: {
+				activeTab: AMP_NAV_ITEMS_INDEXES.CREATE_ADS_NEW,
+				appName: ROUTE_APP_NAME.AMP_NEW
+			},
+			name: 'AMP New',
+			path: '/sites/:siteId/apps/amp/new',
+			component: Amp
+		},
+		// Amp new Tags
+		{
+			exact: true,
+			customProps: {
+				activeTab: AMP_NAV_ITEMS_INDEXES.MANAGE_ADS_NEW,
+				appName: ROUTE_APP_NAME.AMP_NEW
+			},
+			name: 'Manage New',
+			path: '/sites/:siteId/apps/amp/manage-new',
 			component: Amp
 		},
 

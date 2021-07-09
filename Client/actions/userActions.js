@@ -67,6 +67,16 @@ export const overrideOpsPanelUniqueImpValue = data => dispatch => {
 	});
 };
 
+export const fetchPeerPerformanceBlockedSite = () => dispatch => {
+	axiosInstance.get('/user/blockedSitesPeerPerformance').then(response => {
+		const { data: { data: { sites = [] } = {} } = {} } = response;
+		dispatch({
+			type: USER_ACTIONS.REPLACE_PEER_PERFORMANCE_BLOCKED_SITES,
+			data: { value: sites, key: 'peerPerformanceBlockedSites' }
+		});
+	});
+};
+
 export const updateUser = (params, dataForAuditLogs) => dispatch =>
 	axiosInstance
 		.post('/user/updateUser', { toUpdate: params, dataForAuditLogs })

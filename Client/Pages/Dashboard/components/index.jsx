@@ -7,7 +7,7 @@ import { Button } from '@/Client/helpers/react-bootstrap-imports';
 import 'react-dates/initialize';
 import { DateRangePicker } from 'react-dates';
 import 'react-dates/lib/css/_datepicker.css';
-
+import pullAll from 'lodash/pullAll';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Card from '../../../Components/Layout/Card';
 import EstimatedEarningsContainer from '../containers/EstimatedEarningsContainer';
@@ -15,6 +15,7 @@ import SitewiseReportContainer from '../containers/SitewiseReportContainer';
 import PerformanceOverviewContainer from '../containers/PerformanceOverviewContainer';
 import VideoAdRevenueContainer from '../containers/VideoAdRevenueContainer';
 import PerformanceApOriginalContainer from '../containers/PerformanceApOriginalContainer';
+import PeerPerformanceOverviewContainer from '../containers/PeerPerformanceOveriewContainer';
 import RevenueContainer from '../containers/RevenueContainer';
 import Loader from '../../../Components/Loader/index';
 import { dates } from '../configs/commonConsts';
@@ -58,7 +59,10 @@ class Dashboard extends React.Component {
 			},
 			sites,
 			reportsMeta,
-			updateAccountReportMetaData
+			updateAccountReportMetaData,
+			fetchPeerPerformanceBlockedSite,
+			peerPerformanceBlockedSitesFetched,
+			peerPerformanceAnalysis
 		} = this.props;
 		let userSites = Object.keys(sites).toString();
 
@@ -75,6 +79,10 @@ class Dashboard extends React.Component {
 			});
 		}
 
+		if (peerPerformanceAnalysis && !peerPerformanceBlockedSitesFetched) {
+			fetchPeerPerformanceBlockedSite();
+		}
+
 		if (!reportsMeta.fetched) {
 			return reportService.getMetaData({ sites: userSites }).then(response => {
 				let { data: computedData } = response;
@@ -88,6 +96,22 @@ class Dashboard extends React.Component {
 		return this.getContentInfo(reportsMeta.data);
 	}
 
+	componentDidUpdate(prepProps) {
+		const { peerPerformanceblockedSites } = this.props;
+		const { peerPerformanceblockedSites: previousPeerPerformanceblockedSites } = prepProps;
+		const { widgetsConfig = [] } = this.state;
+		if (
+			peerPerformanceblockedSites.length !== 0 &&
+			peerPerformanceblockedSites !== previousPeerPerformanceblockedSites
+		) {
+			const index = widgetsConfig.findIndex(widget => {
+				const { name = '' } = widget;
+				return name === 'peer_performance_report';
+			});
+			this.getDisplayData(index);
+		}
+	}
+
 	getContentInfo = reportsMetaData => {
 		const { reportType, siteId, widgetsList, sites } = this.props;
 		const { site: reportingSites, widget } = reportsMetaData;
@@ -97,7 +121,6 @@ class Dashboard extends React.Component {
 			: null;
 		const selectedSite = reportType == 'site' ? siteId : topPerformingSite || 'all';
 		const widgetsConfig = this.getWidgetConfig(widget, selectedSite, reportType, widgetsList);
-
 		this.setState(
 			{
 				sites: allUserSites,
@@ -146,7 +169,7 @@ class Dashboard extends React.Component {
 
 		if (!showVideoAdsDashboardWidget) {
 			const index = widgetsList.indexOf('primis_report');
-			widgetsList.splice(index, 1, 0);
+			if (index !== -1) widgetsList.splice(index, 1, 0);
 		}
 
 		Object.keys(sortedWidgets).forEach(wid => {
@@ -184,6 +207,13 @@ class Dashboard extends React.Component {
 					widget.chartSeriesLabel = 'country';
 					widget.chartSeriesMetric = 'adpushup_page_views';
 					widget.chartSeriesMetricType = 'number';
+				}
+
+				if (widget.name === 'peer_performance_report') {
+					widget.chartLegend = 'Revenue';
+					widget.chartSeriesLabel = 'revenue_channel';
+					widget.chartSeriesMetric = 'network_net_revenue';
+					widget.chartSeriesMetricType = 'money';
 				}
 
 				widgetsConfig.push(widget);
@@ -234,7 +264,13 @@ class Dashboard extends React.Component {
 
 			case 'ops_country_report':
 				return <RevenueContainer displayData={widget} reportType="site" />;
-
+			case 'peer_performance_report':
+				return (
+					<PeerPerformanceOverviewContainer
+						displayData={widget}
+						isDataSufficient={widget.isDataSufficient}
+					/>
+				);
 			default:
 		}
 	};
@@ -262,7 +298,11 @@ class Dashboard extends React.Component {
 			reportsMeta,
 			user: {
 				data: { email }
-			}
+			},
+			peerPerformanceAnalysisSites,
+			peerPerformanceAnalysis,
+			peerPerformanceblockedSites,
+			peerPerformanceBlockedSitesFetched
 		} = this.props;
 
 		let params;
@@ -293,6 +333,16 @@ class Dashboard extends React.Component {
 			path += ',unique_impressions,unique_ad_ecpm';
 		}
 
+		if (name === 'peer_performance_report') {
+			if (!peerPerformanceAnalysis || !peerPerformanceBlockedSitesFetched) return;
+			const performanceSubscribedSites = peerPerformanceAnalysisSites.map(site => site.value);
+			const performanceSubscribedExcludingBlocked = pullAll(
+				performanceSubscribedSites,
+				peerPerformanceblockedSites.map(site => site.toString())
+			);
+			params = { ...params, siteid: performanceSubscribedExcludingBlocked.join(',') };
+		}
+
 		if (hidPerApOriginData) {
 			widgetsConfig[wid].isDataSufficient = false;
 			widgetsConfig[wid].isLoading = false;
@@ -311,8 +361,7 @@ class Dashboard extends React.Component {
 				if (
 					response.status == 200 &&
 					!isEmpty(response.data) &&
-					response.data.result &&
-					response.data.result.length
+					((response.data.result && response.data.result.length) || !response.data.result)
 				) {
 					widgetsConfig[wid].data = response.data;
 					widgetsConfig[wid].isDataSufficient = true;
@@ -389,6 +438,7 @@ class Dashboard extends React.Component {
 				data: { email }
 			}
 		} = this.props;
+
 		const isDemoUser = checkDemoUserEmail(email);
 		const { site: reportingSites } = reportsMeta.data;
 		const { widgetsConfig, quickDates, sites } = this.state;
@@ -491,7 +541,7 @@ class Dashboard extends React.Component {
 				) : (
 					''
 				)}
-				{reportType !== 'site' && name !== 'per_site_wise' ? (
+				{reportType !== 'site' && name !== 'per_site_wise' && name !== 'peer_performance_report' ? (
 					<div className="">
 						{/* eslint-disable */}
 						<label className="u-text-normal u-margin-r2">Website</label>
@@ -528,8 +578,10 @@ class Dashboard extends React.Component {
 			selectedSite,
 			selectedDimension = '',
 			selectedChartLegendMetric = '',
-			isDataSufficient
+			isDataSufficient,
+			name
 		} = widgetsConfig[wid];
+		if (name === 'peer_performance_report') return null;
 		const { reportType, siteId } = this.props;
 		let siteSelected = '';
 
@@ -552,9 +604,14 @@ class Dashboard extends React.Component {
 		const { widgetsConfig } = this.state;
 		const content = [];
 		const hasLayoutSite = this.showApBaselineWidget();
-
+		const {
+			user: {
+				data: { peerPerformanceAnalysis = false }
+			}
+		} = this.props;
 		widgetsConfig.forEach((widget, index) => {
 			// const widget = widgetsConfig[wid];
+			if (widget.name === 'peer_performance_report' && !peerPerformanceAnalysis) return;
 			const widgetComponent = this.getWidgetComponent(widget);
 			if ((widget.name == 'per_ap_original' && hasLayoutSite) || widget.name != 'per_ap_original') {
 				content.push(

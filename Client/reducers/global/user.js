@@ -7,8 +7,8 @@ const user = (state = { fetched: false, data: {} }, action) => {
 			// client can change its value temp and it should not affect the flag
 			// in the ops panel. Ops panel will use `showUniqueImpressionsReporting`
 			// and client side reporting will use its copy - `isUniqueImpEnabled`
-			if(action.data && action.data.showUniqueImpressionsReporting) {
-				action.data.isUniqueImpEnabled = action.data.showUniqueImpressionsReporting || false
+			if (action.data && action.data.showUniqueImpressionsReporting) {
+				action.data.isUniqueImpEnabled = action.data.showUniqueImpressionsReporting || false;
 			}
 			return { fetched: true, data: { ...state.data, ...action.data } };
 		case SITE_ACTIONS.UPDATE_SITE_DATA: {
@@ -65,8 +65,8 @@ const user = (state = { fetched: false, data: {} }, action) => {
 			// client can change its value temp and it should not affect the flag
 			// in the ops panel. Ops panel will use `showUniqueImpressionsReporting`
 			// and client side reporting will use its copy - `isUniqueImpEnabled`
-			if(action.data) {
-				state.data.isUniqueImpEnabled = action.data.value || false
+			if (action.data) {
+				state.data.isUniqueImpEnabled = action.data.value || false;
 			}
 			return {
 				...state,
@@ -83,6 +83,18 @@ const user = (state = { fetched: false, data: {} }, action) => {
 				data: {
 					...state.data,
 					isUniqueImpEnabled: action.data.isUniqueImpEnabled
+				}
+			};
+		}
+		case USER_ACTIONS.REPLACE_PEER_PERFORMANCE_BLOCKED_SITES: {
+			return {
+				...state,
+				data: {
+					...state.data,
+					[action.data.key]: {
+						fetched: true,
+						value: [...action.data.value]
+					}
 				}
 			};
 		}
