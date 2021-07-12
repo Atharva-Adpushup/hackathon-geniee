@@ -43,7 +43,9 @@ class SiteSettings extends Component {
 	s.crossOrigin='anonymous'; 
 	s.type = 'text/javascript'; s.async = true;
 	(d.getElementsByTagName('head')[0] || d.getElementsByTagName('body')[0]).appendChild(s);
+	w.adpushup = w.adpushup || {que:[]};
 })(window, document);
+
 </script>`,
 			siteData,
 			siteId,

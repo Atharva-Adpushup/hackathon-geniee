@@ -566,7 +566,7 @@ openx.com, 539266264, RESELLER, 6a698e2ec38604c6
 appnexus.com, 1356, RESELLER, f5ab79cb980f11d1  
 emxdgt.com, 326, RESELLER, 1e1d41537f7cad7f  
 google.com, pub-5995202563537249, RESELLER, f08c47fec0942fa0`;
-const INIT_CODE = `<script data-cfasync="false" type="text/javascript">(function(w, d) { var s = d.createElement('script'); s.src = '//cdn.adpushup.com/__SITE_ID__/adpushup.js'; s.crossOrigin='anonymous'; s.type = 'text/javascript'; s.async = true; (d.getElementsByTagName('head')[0] || d.getElementsByTagName('body')[0]).appendChild(s); })(window, document);</script>`;
+const INIT_CODE = `<script data-cfasync="false" type="text/javascript">(function(w, d) { var s = d.createElement('script'); s.src = '//cdn.adpushup.com/__SITE_ID__/adpushup.js'; s.crossOrigin='anonymous'; s.type = 'text/javascript'; s.async = true; (d.getElementsByTagName('head')[0] || d.getElementsByTagName('body')[0]).appendChild(s); w.adpushup = w.adpushup || {que:[]}; })(window, document);</script>`;
 
 // APT abbreviation stands for ApTag
 const APT_NAV_ITEMS_INDEXES = {
