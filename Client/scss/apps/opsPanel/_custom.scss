@@ -346,6 +346,11 @@
 					vertical-align: middle;
 					width: 5%;
 				}
+				&:nth-of-type(6) {
+					text-align: center;
+					vertical-align: middle;
+					width: 5%;
+				}
 
 				&.enabled {
 					color: $successGreen;
@@ -463,6 +468,32 @@
 
 			& > div {
 				margin-right: 100px;
+			}
+		}
+
+		.description-container {
+			justify-content: space-between;
+			align-items: center;
+
+			h3 {
+				margin: 1rem;
+				font-size: 2rem;
+			}
+
+			& > div {
+				margin-right: 100px;
+			}
+
+			textarea {
+				width: 100%;
+				border-color: #d5d5d5;
+				border-bottom-width: 3px;
+				border-bottom-color: #e6e6e6;
+			}
+
+			textarea:focus {
+				border: #d5d5d5;
+				outline-color: #d5d5d5;
 			}
 		}
 

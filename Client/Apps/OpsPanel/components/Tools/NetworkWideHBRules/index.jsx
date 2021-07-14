@@ -31,7 +31,8 @@ const getDefaultState = () => ({
 	triggers: [],
 	actions: [],
 	actionKeyIndexMap: {},
-	triggerKeyIndexMap: {}
+	triggerKeyIndexMap: {},
+	ruleDescription: ''
 });
 
 const getConvertedBiddersData = bidders => {
@@ -105,6 +106,7 @@ class BidderRules extends React.Component {
 		this.handleEditRule = this.handleEditRule.bind(this);
 		this.handleToggleStatus = this.handleToggleStatus.bind(this);
 		this.handleRuleStatusChange = this.handleRuleStatusChange.bind(this);
+		this.handleChange = this.handleChange.bind(this);
 
 		this.handleAddTrigger = this.handleAddTrigger.bind(this);
 		this.handleRemoveTrigger = this.handleRemoveTrigger.bind(this);
@@ -567,6 +569,12 @@ class BidderRules extends React.Component {
 		);
 	}
 
+	handleChange(event) {
+		this.setState({
+			[event.target.name]: event.target.value || ' '
+		});
+	}
+
 	handleSubmit() {
 		const {
 			showNotification,
@@ -574,7 +582,7 @@ class BidderRules extends React.Component {
 			setUnsavedChangesAction,
 			customProps
 		} = this.props;
-		const { triggers, actions, isActive, selectedRuleIndex } = this.state;
+		const { triggers, actions, isActive, selectedRuleIndex, ruleDescription } = this.state;
 
 		const hasInvalidData = this.validateBeforeSubmit();
 
@@ -631,6 +639,7 @@ class BidderRules extends React.Component {
 			isActive,
 			actions: actionsData,
 			triggers: triggersData,
+			description: ruleDescription,
 			isGlobal: true
 		};
 
@@ -683,7 +692,7 @@ class BidderRules extends React.Component {
 	}
 
 	renderRuleComponent() {
-		const { actions, triggers, isActive, selectedRuleIndex } = this.state;
+		const { actions, triggers, isActive, selectedRuleIndex, ruleDescription } = this.state;
 
 		const actionDropdownOptions = this.getDropdownOptionsForAction();
 		const triggerDropdownOptions = this.getDropdownOptionsForTrigger();
@@ -697,7 +706,19 @@ class BidderRules extends React.Component {
 				</div>
 
 				<div className="rule__content">
-					<div className="status-container">
+					<div className="description-container">
+						<h3>Rule Description</h3>
+						<textarea
+							type="text"
+							name="ruleDescription"
+							required
+							placeholder=" Enter Rule Description/Name...."
+							value={ruleDescription}
+							onChange={this.handleChange}
+							className="u-margin-t2"
+						/>
+					</div>
+					<div className="status-container u-margin-t4">
 						<h3>Rule Status</h3>
 						<CustomToggleSwitch
 							defaultLayout
@@ -711,6 +732,7 @@ class BidderRules extends React.Component {
 							off="Disable"
 						/>
 					</div>
+
 					<div className="divider" />
 					<HeaderBiddingRuleTriggers
 						triggers={triggers}
@@ -789,7 +811,7 @@ class BidderRules extends React.Component {
 	handleEditRule(index) {
 		const { rules } = this.props;
 
-		const { triggers = [], actions = [], isActive } = _cloneDeep(rules)[index];
+		const { triggers = [], actions = [], isActive, description } = _cloneDeep(rules)[index];
 
 		// convert weekday, weekend value from array to string
 		const convertedTriggers = triggers.map(trigger => {
@@ -827,7 +849,8 @@ class BidderRules extends React.Component {
 				actions: convertedActions,
 				triggers: convertedTriggers,
 				activeComponent: 'rule-component',
-				selectedRuleIndex: index
+				selectedRuleIndex: index,
+				ruleDescription: description
 			},
 			() => {
 				this.updateActionKeyIndexMap();

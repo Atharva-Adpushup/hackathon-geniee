@@ -27,7 +27,7 @@ class HeaderBiddingRulesList extends React.Component {
 		if (!rules.length) {
 			return (
 				<tr>
-					<td colSpan="5" className="text-center u-padding-3">
+					<td colSpan="6" className="text-center u-padding-3">
 						No Rules Found
 					</td>
 				</tr>
@@ -50,7 +50,7 @@ class HeaderBiddingRulesList extends React.Component {
 		}, {});
 
 		return rules.map((rule, index) => {
-			const { isActive, triggers, actions, createdAt, isGlobal } = rule;
+			const { isActive, triggers, actions, createdAt, isGlobal, description } = rule;
 
 			const triggersContent = triggers.map((trigger, triggerIndex) => {
 				// key, operator, value
@@ -106,6 +106,10 @@ class HeaderBiddingRulesList extends React.Component {
 						.map(val => actionsValueMap[key][val])
 						.filter(val => val)
 						.join(', ');
+
+					if (valueContent === '') {
+						valueContent = 'The bidders added in the Global Rule are N/A for this site';
+					}
 				}
 
 				return (
@@ -122,7 +126,7 @@ class HeaderBiddingRulesList extends React.Component {
 					<td>{index + 1}</td>
 
 					<td>
-						{!isForOps && isGlobal ? <span className="global-rule">Global Rule</span> : null}{' '}
+						{!isForOps && isGlobal ? <div className="global-rule">Global Rule</div> : null}{' '}
 						{moment(createdAt).format('lll')}
 					</td>
 					<td>
@@ -143,6 +147,9 @@ class HeaderBiddingRulesList extends React.Component {
 						>
 							Edit
 						</Button>
+					</td>
+					<td className={!isForOps && isGlobal ? 'show-global-desc-in-site' : 'show-global-desc'}>
+						{description}
 					</td>
 					<td>
 						<CustomToggleSwitch
@@ -172,6 +179,7 @@ class HeaderBiddingRulesList extends React.Component {
 						<th>Date Added</th>
 						<th>Rules</th>
 						<th>Edit</th>
+						<th>Description</th>
 						<th>Status</th>
 					</tr>
 				</thead>
