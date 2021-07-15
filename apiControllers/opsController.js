@@ -318,8 +318,16 @@ router
 		let prevConfig = {};
 		return apLiteModel
 			.getAPLiteModelBySite(json.siteId)
+			.catch(err => {
+				if (err && err.code === 13) {
+					// doc doesn't exist. proceed with saving config
+					return apLiteModel.saveAdUnits(json)
+				}
+
+				throw err;
+			})
 			.then(apLiteSite => {
-				prevConfig = apLiteSite.data;
+				prevConfig = !!apLiteSite ? apLiteSite.data || {} : {};
 			})
 			.then(() => apLiteModel.saveAdUnits(json))
 			.then(() => apLiteModel.getAPLiteModelBySite(json.siteId))
