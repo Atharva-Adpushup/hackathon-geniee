@@ -28,6 +28,7 @@ class RefreshSettings extends Component {
 		const { isRefreshEnabled } = this.state;
 		const { onSubmit, onCancel, ad } = this.props;
 		ad.isRefreshEnabled = isRefreshEnabled;
+		ad.networkData.refreshSlot = isRefreshEnabled;
 		onSubmit(ad);
 		return onCancel();
 	};

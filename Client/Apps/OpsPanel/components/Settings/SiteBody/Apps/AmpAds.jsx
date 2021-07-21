@@ -37,6 +37,9 @@ class AmpAds extends Component {
 
 		this.setState({ isLoading: true });
 
+		// update code works for one app update at a time.
+		// To handle both the keys - amp, ampScript at the same time
+		// will require lots of unnecessary changes so calling the below func twice.
 		return updateAppStatus(
 			site.siteId,
 			{
@@ -47,7 +50,21 @@ class AmpAds extends Component {
 				...dataForAuditLogs,
 				actionInfo: 'Updated AMP Ads'
 			}
-		).then(() => this.setState({ isLoading: false }));
+		)
+			.then(() =>
+				updateAppStatus(
+					site.siteId,
+					{
+						app: 'ampScript',
+						value: status
+					},
+					{
+						...dataForAuditLogs,
+						actionInfo: 'Updated AMP Ads'
+					}
+				)
+			)
+			.then(() => this.setState({ isLoading: false }));
 	};
 
 	render() {

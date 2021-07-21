@@ -78,8 +78,6 @@ class AdElement extends Component {
 		const {
 			width,
 			height,
-			isRefreshEnabled,
-			refreshInterval = 30,
 			formatData,
 			networkData: { dfpAdunitCode }
 		} = ad;
@@ -90,11 +88,7 @@ class AdElement extends Component {
 		const totalAmpSlots = adsCount;
 
 		dynamicAttribsArr.push(`data-siteid="${siteId}"`);
-		dynamicAttribsArr.push(`data-totalAmpSlots="${totalAmpSlots}"`);
-
-		if (isRefreshEnabled) {
-			dynamicAttribsArr.push(`data-enable-refresh="${refreshInterval}"`);
-		}
+		dynamicAttribsArr.push(`data-totalampslots="${totalAmpSlots}"`);
 
 		const dynamicAttribsStr = dynamicAttribsArr.length ? ` ${dynamicAttribsArr.join(' ')} ` : ' ';
 		const ADCODE = type === 'display' ? DISPLAYADCODE_AMP : STICKYADCODE_AMP;

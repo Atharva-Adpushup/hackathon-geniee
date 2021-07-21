@@ -76,9 +76,9 @@ class AmpAdCodeGenerator extends Component {
 			type,
 			fluid: true,
 			isRefreshEnabled,
+			network: 'adpTags',
 			networkData: {
 				headerBidding: true,
-				refreshSlot: true,
 				dfpAdunitCode: null,
 				dfpAdunit: null,
 				formats: ['display']
@@ -90,7 +90,10 @@ class AmpAdCodeGenerator extends Component {
 			isActive: true
 		};
 
-		if (isRefreshEnabled) ad.networkData.refreshInterval = refreshInterval;
+		if (isRefreshEnabled) {
+			ad.networkData.refreshInterval = refreshInterval;
+			ad.networkData.refreshSlot = isRefreshEnabled;
+		}
 
 		this.setState(
 			{

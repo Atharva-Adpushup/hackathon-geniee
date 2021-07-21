@@ -534,7 +534,13 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		siteDomain: null,
 		docType: 'amtg'
 	},
-
+	// for new AMP tag format
+	ampAdInitialDocForNewAMP: {
+		siteId: null,
+		ownerEmail: null,
+		siteDomain: null,
+		docType: 'ampd'
+	},
 	INNOVATIVE_ADS_INITIAL_DOC: {
 		siteId: null,
 		ownerEmail: null,

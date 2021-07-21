@@ -7,6 +7,7 @@ const { sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFun
 const {
 	docKeys,
 	ampAdInitialDoc,
+	ampAdInitialDocForNewAMP,
 	AUDIT_LOGS_ACTIONS: { AMP }
 } = require('../configs/commonConsts');
 const { generateSectionName } = require('../helpers/clientServerHelpers');
@@ -40,7 +41,7 @@ const fn = {
 		// for new AMP Tag format
 		createNewAmpScriptDocAndDoProcessing(
 			payload,
-			ampAdInitialDoc,
+			ampAdInitialDocForNewAMP,
 			docKeys.ampScript,
 			fn.processingAmp
 		),
