@@ -4,6 +4,7 @@ var moment = require('moment-timezone');
 const OAuth = require('oauth-1.0a');
 const crypto = require('crypto');
 const util = require('util');
+var fs = require('fs');
 
 const requestPromise = util.promisify(request);
 const partnerAndAdpushpModel = require('../PartnerAndAdpushpModel');
@@ -47,7 +48,9 @@ const oauth = OAuth({
 const initDataForpartner = function() {
 	const OFFSET =
 	process.env.NODE_ENV === 'production' ? TIMEZONE_OFFSET.PRODUCTION : TIMEZONE_OFFSET.STAGING;
-	let fromDateOpenX = moment().subtract(2, 'days');
+
+	// data for 7 days with offset of 2 -> 7+2=9
+	let fromDateOpenX = moment().subtract(9, 'days');
 	let zoneFromDate = moment.tz.zone('America/Los_Angeles').abbr(fromDateOpenX);
 	fromDateOpenX = fromDateOpenX
 		.set({
@@ -56,7 +59,7 @@ const initDataForpartner = function() {
 		})
 		.format('YYYY-MM-DDTHH:MM:00Z');
 
-	let toDateOpenX = moment().subtract(1, 'days');
+	let toDateOpenX = moment().subtract(2, 'days');
 	let zoneToDate = moment.tz.zone('America/Los_Angeles').abbr(toDateOpenX);
 	toDateOpenX = toDateOpenX
 		.set({
@@ -65,10 +68,15 @@ const initDataForpartner = function() {
 		})
 		.format('YYYY-MM-DDTHH:MM:00Z');
 
+	// data for 7 days with offset of 2 -> 7+2=9
 	const fromDate = moment()
-		.subtract(2, 'days')
+		.subtract(9, 'days')
 		.format('YYYY-MM-DD');
-	const toDate = fromDate;
+	// here using 3 instead of 2 - because OpenX returns data of day before toDate
+	// because of timezone
+	const toDate = moment()
+		.subtract(3, 'days')
+		.format('YYYY-MM-DD');
 
 	return {
 		fromDateOpenX,
@@ -253,7 +261,7 @@ const fetchData = sitesData => {
 				network: NETWORK_ID,
 				fromDate: fromDate,
 				toDate: toDate,
-				interval: 'daily',
+				interval: 'cumulative',
 				dimension: 'siteid'
 			};
 
@@ -270,14 +278,21 @@ const fetchData = sitesData => {
 
 			// if aonmalies found
 			if (anomalies.length) {
-				const dataToSend = OpenXPartnerModel.formatAnomaliesDataForSQL(anomalies, NETWORK_ID);
-				await Promise.all([
-					emailer.anomaliesMailService({
+				if(process.env.NODE_ENV === 'production') {
+					const dataToSend = OpenXPartnerModel.formatAnomaliesDataForSQL(anomalies, NETWORK_ID);
+					await Promise.all([
+						emailer.anomaliesMailService({
+							partner: PARTNER_NAME,
+							anomalies
+						}),
+						saveAnomaliesToDb(dataToSend, PARTNER_NAME)
+					]);
+				} else {
+					await emailer.anomaliesMailService({
 						partner: PARTNER_NAME,
 						anomalies
-					}),
-					saveAnomaliesToDb(dataToSend, PARTNER_NAME)
-				]);
+					})
+				}
 			}
 			return {
 				total: finalData.length,

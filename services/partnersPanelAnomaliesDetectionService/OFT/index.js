@@ -5,7 +5,7 @@ const csv = require('csvtojson');
 const partnerAndAdpushpModel = require('../PartnerAndAdpushpModel');
 const emailer = require('../emailer');
 const saveAnomaliesToDb = require('../saveAnomaliesToDb');
-const { axiosErrorHandler, partnerModuleErrorHandler } = require('../utils');
+const { axiosErrorHandler, partnerModuleErrorHandler, aggregateWeeklyData } = require('../utils');
 
 const {
 	PARTNERS_PANEL_INTEGRATION: { ANOMALY_THRESHOLD, ANOMALY_THRESHOLD_IN_PER, OFT }
@@ -84,15 +84,22 @@ const getDataFromPartner = async function(fromDate, toDate) {
 };
 
 const initDataForpartner = function() {
+	// for weekly reports
 	const fromDateOFT = moment()
-	.subtract(1, 'days')
-	.format('YYYY-MM-DD');
-	const toDateOFT = moment().format('YYYY-MM-DD');
-
-	const fromDate = moment()
-		.subtract(1, 'days')
+		.subtract(9, 'days')
 		.format('YYYY-MM-DD');
-	const toDate = fromDate;
+	const toDateOFT = moment()
+		.subtract(2, 'days')
+		.format('YYYY-MM-DD');
+;
+
+	// for weekly reports
+	const fromDate = moment()
+		.subtract(9, 'days')
+		.format('YYYY-MM-DD');
+	const toDate = moment()
+		.subtract(3, 'days')
+		.format('YYYY-MM-DD');
 
 	return {
 		fromDateOFT,
@@ -104,6 +111,7 @@ const initDataForpartner = function() {
 
 const fetchData = sitesData => {
 	const {fromDate, toDate, fromDateOFT, toDateOFT} = initDataForpartner();
+
 	const OFTMediaPartnerModel = new partnerAndAdpushpModel(
 		sitesData,
 		DOMAIN_FIELD_NAME,
@@ -113,8 +121,9 @@ const fetchData = sitesData => {
 	console.log('Fetching data from OFT...');
 	return getDataFromPartner(fromDateOFT, toDateOFT)
 		.then(async function(reportDataJSON) {
-			OFTMediaPartnerModel.setPartnersData(reportDataJSON);
-
+			// Partner's Panel does not return cumulative data. Reducing/Converting daily data
+			// into weekly data
+			OFTMediaPartnerModel.setPartnersData(aggregateWeeklyData(reportDataJSON, DOMAIN_FIELD_NAME, REVENUE_FIELD));
 			// process and map sites data with publishers API data response
 			OFTMediaPartnerModel.mapAdPushupSiteIdAndDomainWithPartnersDomain();
 			// Map PartnersData with AdPushup's SiteId mapping data
@@ -125,7 +134,7 @@ const fetchData = sitesData => {
 				network: NETWORK_ID,
 				fromDate,
 				toDate,
-				interval: 'daily',
+				interval: 'cumulative',
 				dimension: 'siteid'
 			};
 
@@ -142,14 +151,21 @@ const fetchData = sitesData => {
 
 			// if aonmalies found
 			if (anomalies.length) {
-				const dataToSend = OFTMediaPartnerModel.formatAnomaliesDataForSQL(anomalies, NETWORK_ID);
-				await Promise.all([
-					emailer.anomaliesMailService({
+				if (process.env.NODE_ENV == 'production') {
+					const dataToSend = OFTMediaPartnerModel.formatAnomaliesDataForSQL(anomalies, NETWORK_ID);
+					await Promise.all([
+						emailer.anomaliesMailService({
+							partner: PARTNER_NAME,
+							anomalies
+						}),
+						saveAnomaliesToDb(dataToSend, PARTNER_NAME)
+					]);
+				} else {
+					await emailer.anomaliesMailService({
 						partner: PARTNER_NAME,
 						anomalies
-					}),
-					saveAnomaliesToDb(dataToSend, PARTNER_NAME)
-				]);
+					})
+				}
 			}
 			return {
 				total: finalData.length,
