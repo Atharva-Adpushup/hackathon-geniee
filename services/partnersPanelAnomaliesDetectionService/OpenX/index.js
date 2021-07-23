@@ -4,6 +4,7 @@ var moment = require('moment-timezone');
 const OAuth = require('oauth-1.0a');
 const crypto = require('crypto');
 const util = require('util');
+var fs = require('fs');
 
 const requestPromise = util.promisify(request);
 const partnerAndAdpushpModel = require('../PartnerAndAdpushpModel');
