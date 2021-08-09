@@ -200,7 +200,7 @@ const getDemoUserSites = (reportData, email) => {
 	return inputReportData;
 };
 
-const getDashboardDemoUserSiteIds = (siteIdValue, email) => {
+const getDashboardDemoUserSiteIds = (siteIdValue = '', email) => {
 	const { SITES, DEFAULT_SITE } = DEMO_ACCOUNT_DATA;
 	const isValidSiteId = !!siteIdValue;
 	const isMultipleSites = !!(siteIdValue.split(',').length > 1);

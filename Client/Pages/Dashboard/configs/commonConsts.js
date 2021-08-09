@@ -112,6 +112,13 @@ const peerPerformanceDisplayMetrics = {
 	network_ad_ecpm: { name: 'Ad eCPM', valueType: 'money' },
 	page_view_per_session: { name: 'Page Views per Session', valueType: 'integer' }
 };
+const vistorDataMetrics = {
+	ga_users: { name: 'Users', valueType: 'number' },
+	ga_page_views: { name: 'AP Page Views', valueType: 'number' },
+	ga_sessions: { name: 'Sessions', valueType: 'number' },
+	ga_pv_per_session: { name: 'PVs/Session', valueType: 'number' },
+	ga_session_rpm: { name: 'Session RPM', valueType: 'money' }
+};
 
 const displayUniqueMetrics = {
 	network_gross_revenue: { name: 'Gross Revenue', valueType: 'money' },
@@ -132,7 +139,25 @@ const dashboardWidgets = [
 	'per_ap_original',
 	'primis_report',
 	'ops_country_report',
-	'peer_performance_report'
+	'peer_performance_report',
+	'top_url_report',
+	'top_utm_report',
+	'rev_by_device_type',
+	'site_ga_stats',
+	'ga_traffic_breakdown_by_country',
+	'ga_traffic_breakdown_by_channel'
+];
+
+const toggleableWidgets = [
+	'site_ga_stats',
+	'ga_traffic_breakdown_by_country',
+	'ga_traffic_breakdown_by_channel',
+	'ads_txt_status',
+	'core_web_vitals',
+	'top_url_report',
+	'top_utm_report',
+	'rev_by_device_type',
+	'payment_history'
 ];
 
 const ALL_SITES_VALUE = { name: 'All', value: 'all' };
@@ -141,6 +166,38 @@ const REPORT_LINK = {
 	ACCOUNT: 'report-vitals',
 	GLOBAL: 'global-report-vitals'
 };
+
+const ADS_TXT_HEADERS = [
+	{
+		Header: 'WebSite',
+		accessor: 'domain'
+	},
+	{
+		Header: 'Ads.txt Status',
+		accessor: 'ourAdsTxtStatus'
+	}
+];
+
+const PAYMENT_HISTORY_HEADERS = [
+	{
+		Header: 'Date Remitted',
+		accessor: 'Date remitted'
+	},
+	{
+		Header: 'Amount Submitted',
+		accessor: 'Amount submitted'
+	},
+	{
+		Header: 'Payment Method',
+		accessor: 'Payment method'
+	},
+	{
+		Header: 'Status',
+		accessor: 'Payment status'
+	}
+];
+
+const DEVICE_OPTIONS = [{ name: 'Mobile', value: 'mobile' }, { name: 'Desktop', value: 'desktop' }];
 
 export {
 	DASHBOARD_NAV_ITEMS_INDEXES,
@@ -154,10 +211,15 @@ export {
 	yAxisGroupsVideoRevenuePrimis,
 	tableHeader,
 	displayMetrics,
+	vistorDataMetrics,
 	displayUniqueMetrics,
 	opsDisplayMetricsKeys,
 	dashboardWidgets,
+	toggleableWidgets,
 	activeLegendItemArray,
 	REPORT_LINK,
-	peerPerformanceDisplayMetrics
+	peerPerformanceDisplayMetrics,
+	ADS_TXT_HEADERS,
+	DEVICE_OPTIONS,
+	PAYMENT_HISTORY_HEADERS
 };

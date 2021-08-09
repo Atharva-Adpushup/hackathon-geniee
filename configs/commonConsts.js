@@ -514,7 +514,8 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		ampActiveBidderAdaptersList: 'data::amp:activeBidderAdapters',
 		freqReports: 'freq:rprt::',
 		hbaQueryFrequencyDoc: 'hbaq::',
-		networkWideHBRules: 'ntwkwide::rules'
+		networkWideHBRules: 'ntwkwide::rules',
+		paymentHistoryDoc: 'tplt::last3months'
 	},
 	AMP_REFRESH_INTERVAL: 30,
 	tagManagerInitialDoc: {
@@ -659,6 +660,8 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		prefetchService: '*/1 * * * *', // Every 1 mins
 		prefetchHBService: '*/15 * * * *', // Every 15 mins
 		emailSnapshotsService: '30 7 * * *', //Run at 8:00 everyday
+		paymentHistoryService: '0 0 5 * *', //At 00:00 on 5th every month
+
 		partnersPanelService: {
 			Criteo: '22 13 * * *',
 			Pubmatic: '24 13 * * *',
@@ -907,5 +910,19 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 			}
 		}
 	},
-	FORMAT_WISE_PARAMS_REGEX: /(ap\w+)_(\w+)/
+	FORMAT_WISE_PARAMS_REGEX: /(ap\w+)_(\w+)/,
+	CORE_WEB_VITALS_API: {
+		uri: 'https://www.googleapis.com/pagespeedonline/v5/runPagespeed',
+		key: 'AIzaSyAwlPiPJIkTejgqqH01v9DmtPoPeOPXDUQ',
+		headers: {
+			'sec-ch-ua': '^^',
+			Referer: 'https://developers.google.com/',
+			'sec-ch-ua-mobile': '?0'
+		}
+	},
+	TIPALTI_SFTP_CREDS: {
+		host: 'ftp.tipalti.com',
+		user: 'AdPushup',
+		password: 'DVBynj73fmfg'
+	}
 };

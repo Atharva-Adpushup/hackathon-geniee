@@ -8,11 +8,15 @@ const { sendSuccessResponse, sendErrorResponse } = require('../helpers/commonFun
 const CC = require('../configs/commonConsts');
 const utils = require('../helpers/utils');
 const reportsModel = require('../models/reportsModel');
+const siteModel = require('../models/siteModel');
+
 const FormValidator = require('../helpers/FormValidator');
 const schema = require('../helpers/schema');
+const AdPushupError = require('../helpers/AdPushupError');
 
 const reportsAccess = require('../middlewares/reportsAuthorizationMiddleware.js');
 const reportsService = require('../apiServices/reportsService');
+const { appBucket } = require('../helpers/routeHelpers');
 
 const router = express.Router();
 
@@ -445,6 +449,174 @@ router
 				code
 			);
 		}
+	})
+
+	.get('/getPaymentHistory', (req, res) => {
+		const { sellerId } = req.query;
+
+		return appBucket
+			.getDoc(CC.docKeys.paymentHistoryDoc)
+			.then(doc => {
+				const { value } = doc;
+				if (!value[sellerId]) throw new Error('data of this seller id not present in the doc');
+				const dataToSend = value[sellerId];
+
+				return res.status(HTTP_STATUSES.OK).json(dataToSend);
+			})
+			.catch(err => {
+				// eslint-disable-next-line no-console
+				console.log(err);
+				if (err instanceof AdPushupError && Array.isArray(err.message)) {
+					return res.status(HTTP_STATUSES.BAD_REQUEST).json({ error: err.message });
+				}
+
+				return res.status(HTTP_STATUSES.INTERNAL_SERVER_ERROR).json({ error: err.message });
+			});
+	})
+
+	.get('/getCoreWebVitals', (req, res) => {
+		const { domain, device, siteId } = req.query;
+
+		function getCalculatedDistributionData(distributionArr) {
+			return distributionArr.map(({ proportion }) =>
+				Number(Math.round(proportion * 100).toFixed(2))
+			);
+		}
+
+		return siteModel
+			.getSiteById(siteId)
+			.then(site => site.get('coreWebVitalsData'))
+			.then(data => {
+				if (!data[device]) {
+					throw new Error(`${device} data not available`);
+				}
+				return sendSuccessResponse(data[device], res, HTTP_STATUSES.OK);
+			})
+
+			.catch(() => {
+				return request({
+					uri: CC.CORE_WEB_VITALS_API.uri,
+					json: true,
+					qs: {
+						key: CC.CORE_WEB_VITALS_API.key,
+						locale: 'en_US',
+						url: domain,
+						strategy: device
+					},
+					headers: CC.CORE_WEB_VITALS_API.headers
+				})
+					.then(response => {
+						const fieldData = {};
+						const labData = {};
+
+						const { loadingExperience = {}, lighthouseResult = {} } = response;
+
+						const { metrics = {} } = loadingExperience;
+						const { audits = {} } = lighthouseResult;
+
+						const {
+							CUMULATIVE_LAYOUT_SHIFT_SCORE = {},
+							FIRST_CONTENTFUL_PAINT_MS = {},
+							FIRST_INPUT_DELAY_MS = {},
+							LARGEST_CONTENTFUL_PAINT_MS = {}
+						} = metrics;
+
+						const CLSPercentile = CUMULATIVE_LAYOUT_SHIFT_SCORE.percentile / 100;
+						const CLSDitributionData = getCalculatedDistributionData(
+							CUMULATIVE_LAYOUT_SHIFT_SCORE.distributions
+						);
+
+						const CLSCategory = CUMULATIVE_LAYOUT_SHIFT_SCORE.category;
+
+						fieldData.CLS = {
+							percentile: CLSPercentile,
+							distributions: CLSDitributionData,
+							category: CLSCategory
+						};
+
+						const FCPPercentile = FIRST_CONTENTFUL_PAINT_MS.percentile / 1000;
+						const FCPDitributionData = getCalculatedDistributionData(
+							FIRST_CONTENTFUL_PAINT_MS.distributions
+						);
+
+						const FCPCategory = FIRST_CONTENTFUL_PAINT_MS.category;
+
+						fieldData.FCP = {
+							percentile: FCPPercentile,
+							distributions: FCPDitributionData,
+							category: FCPCategory
+						};
+
+						const FIDPercentile = FIRST_INPUT_DELAY_MS.percentile / 1000;
+						const FIDDitributionData = getCalculatedDistributionData(
+							FIRST_INPUT_DELAY_MS.distributions
+						);
+
+						const FIDCategory = FIRST_INPUT_DELAY_MS.category;
+
+						fieldData.FID = {
+							percentile: FIDPercentile,
+							distributions: FIDDitributionData,
+							category: FIDCategory
+						};
+
+						const LCPPercentile = LARGEST_CONTENTFUL_PAINT_MS.percentile / 1000;
+						const LCPDitributionData = getCalculatedDistributionData(
+							LARGEST_CONTENTFUL_PAINT_MS.distributions
+						);
+
+						const LCPCategory = LARGEST_CONTENTFUL_PAINT_MS.category;
+
+						fieldData.LCP = {
+							percentile: LCPPercentile,
+							distributions: LCPDitributionData,
+							category: LCPCategory
+						};
+
+						labData.FCP = audits['first-contentful-paint'].displayValue;
+						labData.LCP = audits['largest-contentful-paint'].displayValue;
+						labData.CLS = audits['cumulative-layout-shift'].displayValue;
+						labData.TBT = audits['total-blocking-time'].displayValue;
+						labData.TTI = audits['interactive'].displayValue;
+						labData.SI = audits['speed-index'].displayValue;
+
+						sendSuccessResponse(
+							{
+								fieldData,
+								labData
+							},
+							res,
+							HTTP_STATUSES.OK
+						);
+
+						return {
+							fieldData,
+							labData
+						};
+					})
+					.then(({ fieldData, labData }) => {
+						const newData = {
+							[device]: { fieldData, labData }
+						};
+
+						return siteModel.getSiteById(siteId).then(site => {
+							const prevData = site.get('coreWebVitalsData');
+
+							site.set('coreWebVitalsData', { ...prevData, ...newData });
+							return site.save();
+						});
+					})
+
+					.catch(err => {
+						// eslint-disable-next-line no-console
+						console.log(err);
+						if (err instanceof AdPushupError && Array.isArray(err.message)) {
+							return res.status(HTTP_STATUSES.BAD_REQUEST).json({ error: err.message });
+						}
+
+						return res.status(HTTP_STATUSES.INTERNAL_SERVER_ERROR).json({ error: err.message });
+					});
+			});
 	});
 
 module.exports = router;

@@ -17,20 +17,31 @@ import VideoAdRevenueContainer from '../containers/VideoAdRevenueContainer';
 import PerformanceApOriginalContainer from '../containers/PerformanceApOriginalContainer';
 import PeerPerformanceOverviewContainer from '../containers/PeerPerformanceOveriewContainer';
 import RevenueContainer from '../containers/RevenueContainer';
+import TopURLContainer from '../containers/TopURLContainer';
+import TopUTMContainer from '../containers/TopUTMContainer';
+import AdsTxtStatusContainer from '../containers/AdsTxtStatusContainer';
+import CoreWebVitalsContainer from '../containers/CoreWebVitalsContainer';
+import VisitorDataContainer from '../containers/VisitorDataContainer';
+import PaymentHistoryContainer from '../containers/PaymentHistoryContainer';
+
+import proxyService from '../../../services/proxyService';
+
 import Loader from '../../../Components/Loader/index';
-import { dates } from '../configs/commonConsts';
+import { dates, toggleableWidgets, DEVICE_OPTIONS } from '../configs/commonConsts';
 import {
 	getDashboardDemoUserSiteIds,
 	checkDemoUserEmail,
 	getDemoUserSites,
 	getOnboardingTemplateData
 } from '../../../helpers/commonFunctions';
+
 import SelectBox from '../../../Components/SelectBox/index';
 import reportService from '../../../services/reportService';
 import { convertObjToArr, getDateRange } from '../helpers/utils';
 import OnboardingCard from '../../../Components/OnboardingCard';
 import CustomButton from '../../../Components/CustomButton';
 import MixpanelHelper from '../../../helpers/mixpanel';
+import config from '../../../config/config';
 
 class Dashboard extends React.Component {
 	constructor(props) {
@@ -47,7 +58,10 @@ class Dashboard extends React.Component {
 			isLoading: true,
 			isUniqueImpEnabled,
 			initialLoadingStarted: new Date().getTime(),
-			loadCounter: 0
+			loadCounter: 0,
+			coreWebVitalsdata: {},
+			selectedDevice: 'mobile',
+			errMessage: ''
 		};
 	}
 
@@ -89,6 +103,7 @@ class Dashboard extends React.Component {
 				computedData = getDemoUserSites(computedData, email);
 
 				updateAccountReportMetaData(computedData);
+
 				return this.getContentInfo(computedData);
 			});
 		}
@@ -108,7 +123,8 @@ class Dashboard extends React.Component {
 				const { name = '' } = widget;
 				return name === 'peer_performance_report';
 			});
-			this.getDisplayData(index);
+
+			if (index !== -1) this.getDisplayData(index);
 		}
 	}
 
@@ -119,7 +135,9 @@ class Dashboard extends React.Component {
 		const topPerformingSite = reportingSites
 			? this.getTopPerformingSites(allUserSites, reportingSites)
 			: null;
-		const selectedSite = reportType == 'site' ? siteId : topPerformingSite || 'all';
+
+		const selectedSite = reportType === 'site' ? siteId : topPerformingSite || 'all';
+
 		const widgetsConfig = this.getWidgetConfig(widget, selectedSite, reportType, widgetsList);
 		this.setState(
 			{
@@ -180,7 +198,10 @@ class Dashboard extends React.Component {
 				widget.selectedDate = dates[2].value;
 				widget.isDataSufficient = false;
 
-				if (reportType === 'site' || widget.name === 'per_ap_original')
+				if (widget.name === 'top_url_report' || widget.name === 'top_utm_report') {
+					// eslint-disable-next-line prefer-destructuring
+					widget.selectedSite = Object.keys(sites)[0];
+				} else if (reportType === 'site' || widget.name === 'per_ap_original')
 					widget.selectedSite = selectedSite;
 				else widget.selectedSite = 'all';
 
@@ -202,7 +223,7 @@ class Dashboard extends React.Component {
 				}
 
 				if (widget.name === 'ops_country_report') {
-					widget.selectedDimension = 'ops_country_report';
+					widget.selectedDimension = 'country';
 					widget.chartLegend = 'Country';
 					widget.chartSeriesLabel = 'country';
 					widget.chartSeriesMetric = 'adpushup_page_views';
@@ -216,9 +237,58 @@ class Dashboard extends React.Component {
 					widget.chartSeriesMetricType = 'money';
 				}
 
+				if (widget.name === 'ga_traffic_breakdown_by_country') {
+					widget.selectedDimension = 'country';
+					widget.chartLegend = 'Country';
+					widget.chartSeriesLabel = 'name';
+					widget.chartSeriesMetric = 'ga_page_views';
+					widget.chartSeriesMetricType = 'number';
+				}
+
+				if (widget.name === 'ga_traffic_breakdown_by_channel') {
+					widget.selectedDimension = 'traffic_channel';
+					widget.chartLegend = 'Channel';
+					widget.chartSeriesLabel = 'name';
+					widget.chartSeriesMetric = 'ga_page_views';
+					widget.chartSeriesMetricType = 'number';
+				}
+
+				if (widget.name === 'rev_by_device_type') {
+					widget.selectedDimension = 'device_type';
+					widget.chartLegend = 'Revenue';
+					widget.chartSeriesLabel = 'device_type';
+					widget.chartSeriesMetric = 'network_net_revenue';
+					widget.chartSeriesMetricType = 'money';
+				}
+
 				widgetsConfig.push(widget);
 			}
 		});
+		if (reportType !== 'site') {
+			widgetsConfig.push(
+				{
+					name: 'ads_txt_status',
+					display_name: 'Ads.txt Status',
+					isLoading: true
+				},
+				{
+					name: 'payment_history',
+					display_name: 'Payments',
+					isLoading: true
+				}
+			);
+		}
+
+		if (reportType !== 'site' && config.isCoreWebVitalsEnabled) {
+			// this check to be removed later
+			widgetsConfig.push({
+				name: 'core_web_vitals',
+				display_name: 'Core Web Vitals',
+				selectedSite: Object.keys(sites)[0],
+				isLoading: true
+			});
+		}
+
 		return widgetsConfig;
 	};
 
@@ -271,6 +341,42 @@ class Dashboard extends React.Component {
 						isDataSufficient={widget.isDataSufficient}
 					/>
 				);
+
+			case 'top_url_report':
+				if (reportType !== 'site') {
+					return <TopURLContainer displayData={widget.data} />;
+				}
+				return '';
+			case 'top_utm_report':
+				if (reportType !== 'site') {
+					return <TopUTMContainer displayData={widget.data} />;
+				}
+				return '';
+
+			case 'rev_by_device_type':
+				return <RevenueContainer displayData={widget} />;
+
+			case 'ads_txt_status':
+				return <AdsTxtStatusContainer displayData={widget.data} />;
+
+			case 'payment_history':
+				return <PaymentHistoryContainer displayData={widget.data} />;
+
+			case 'core_web_vitals':
+				return <CoreWebVitalsContainer displayData={widget.data} />;
+
+			case 'site_ga_stats':
+				if (reportType !== 'site') {
+					return <VisitorDataContainer displayData={widget.data} />;
+				}
+				return '';
+
+			case 'ga_traffic_breakdown_by_country':
+				return <RevenueContainer displayData={widget} />;
+
+			case 'ga_traffic_breakdown_by_channel':
+				return <RevenueContainer displayData={widget} />;
+
 			default:
 		}
 	};
@@ -286,18 +392,161 @@ class Dashboard extends React.Component {
 		MixpanelHelper.trackEvent('Performance', properties);
 	};
 
+	getSitesAdstxtStatus = (wid, userSites) => {
+		const { widgetsConfig } = this.state;
+
+		const statusText = {
+			204: 'No Ads.txt present',
+			206: 'Some Entries are missing'
+		};
+
+		const promiseSerial = funcs =>
+			funcs.reduce(
+				(promise, obj) =>
+					promise.then(all => {
+						const { func, siteid } = obj;
+						return func()
+							.then(() => {
+								const result = {
+									domain: React.cloneElement(
+										<a href={`/reports/${siteid}`}>{userSites[siteid].siteDomain}</a>
+									),
+									ourAdsTxtStatus: 'Entries Upto Date',
+									isComplete: true
+								};
+								return all.concat(result);
+							})
+							.catch(error => {
+								let result = {
+									isComplete: false,
+									domain: React.cloneElement(
+										<a href={`/reports/${siteid}`}>{userSites[siteid].siteDomain}</a>
+									)
+								};
+
+								if (error.response) {
+									const errorResponse = error.response.data;
+
+									if (error.response.status === 400) {
+										const { error: errors } = errorResponse;
+
+										for (let index = 0; index < errors.length; index += 1) {
+											const { error: err, type, code } = errors[index];
+
+											if (type === 'ourAdsTxt') {
+												result.ourAdsTxtStatus = statusText[code];
+											} else {
+												result.ourAdsTxtStatus = err;
+											}
+										}
+									} else if (error.response.status === 404) {
+										const { ourAdsTxt: ourAdsTxtError } = errorResponse.error;
+
+										result = {
+											...result,
+											ourAdsTxtStatus: ourAdsTxtError
+										};
+									} else {
+										result = {
+											...result,
+											ourAdsTxtStatus: errorResponse.error
+										};
+									}
+								} else {
+									result = {
+										...result,
+										ourAdsTxtStatus: 'Something went wrong!'
+									};
+								}
+
+								return all.concat(result);
+							});
+					}),
+				Promise.resolve([])
+			);
+		const funcs = Object.keys(userSites).map(siteid => ({
+			func: () => proxyService.verifyAdsTxtCode(userSites[siteid].siteDomain, siteid),
+			siteid
+		}));
+
+		return promiseSerial(funcs)
+			.then(res => {
+				widgetsConfig[wid].data = res;
+				widgetsConfig[wid].isLoading = false;
+				widgetsConfig[wid].isDataSufficient = true;
+
+				this.setState({ widgetsConfig });
+			})
+			.catch(err => {
+				// eslint-disable-next-line no-console
+				console.log(err);
+				widgetsConfig[wid].isLoading = false;
+
+				this.setState({ widgetsConfig });
+			});
+	};
+
+	getPaymentHistory = (wid, sellerId) => {
+		const { widgetsConfig } = this.state;
+
+		return reportService
+			.getPaymentHistory({ sellerId })
+			.then(res => {
+				const { data = [] } = res;
+
+				if (res.status === 200 && !isEmpty(data)) {
+					widgetsConfig[wid].data = data;
+					widgetsConfig[wid].isDataSufficient = true;
+				} else {
+					widgetsConfig[wid].data = {};
+					widgetsConfig[wid].isDataSufficient = false;
+				}
+				widgetsConfig[wid].isLoading = false;
+
+				this.setState({ widgetsConfig });
+			})
+			.catch(() => {
+				widgetsConfig[wid].isLoading = false;
+				this.setState({ widgetsConfig });
+			});
+	};
+
+	getWebVitalsData = (wid, device, domain, siteId) => {
+		const { widgetsConfig } = this.state;
+
+		return reportService
+			.getCorewebVitalsdata({ device, domain, siteId })
+			.then(res => {
+				const { data: { data = {} } = {} } = res;
+
+				if (res.status == 200 && !isEmpty(data)) {
+					widgetsConfig[wid].data = data;
+					widgetsConfig[wid].isDataSufficient = true;
+				} else {
+					widgetsConfig[wid].data = {};
+					widgetsConfig[wid].isDataSufficient = false;
+				}
+				widgetsConfig[wid].isLoading = false;
+
+				this.setState({ widgetsConfig });
+			})
+			.catch(() => {
+				widgetsConfig[wid].isLoading = false;
+				this.setState({ widgetsConfig });
+			});
+	};
+
 	getDisplayData = wid => {
-		const { widgetsConfig, isUniqueImpEnabled } = this.state;
-		const { selectedDate, selectedSite, name, customDateRange, startDate, endDate } = widgetsConfig[
-			wid
-		];
-		let { path } = widgetsConfig[wid];
+		const { widgetsConfig = [], isUniqueImpEnabled, selectedDevice } = this.state;
+		const { selectedDate, selectedSite, name, customDateRange, startDate, endDate } =
+			widgetsConfig[wid] || {};
+		let { path } = widgetsConfig[wid] || {};
 
 		const {
 			sites,
 			reportsMeta,
 			user: {
-				data: { email }
+				data: { email, sellerId, activeProducts = {} }
 			},
 			peerPerformanceAnalysisSites,
 			peerPerformanceAnalysis,
@@ -315,19 +564,36 @@ class Dashboard extends React.Component {
 			params = getDateRange(selectedDate);
 		}
 		const { site: reportingSites } = reportsMeta.data;
+
 		const siteIds = Object.keys(sites);
 		const hidPerApOriginData =
-			name == 'per_ap_original' &&
+			name === 'per_ap_original' &&
 			reportingSites &&
 			reportingSites[selectedSite] &&
 			reportingSites[selectedSite].dataAvailableOutOfLast30Days < 21;
 
-		params.siteid = selectedSite == 'all' ? siteIds.toString() : selectedSite;
+		params.siteid = selectedSite === 'all' ? siteIds.toString() : selectedSite;
 		params.siteid = getDashboardDemoUserSiteIds(params.siteid, email);
 		widgetsConfig[wid].startDate = params.fromDate;
 		widgetsConfig[wid].endDate = params.toDate;
 
-		if (name == 'per_site_wise' && isUniqueImpEnabled) {
+		if (name === 'payment_history' && activeProducts[name]) {
+			return this.getPaymentHistory(wid, sellerId);
+		}
+
+		if (name === 'ads_txt_status' && activeProducts[name]) {
+			return this.getSitesAdstxtStatus(wid, sites);
+		}
+		if (name === 'core_web_vitals' && activeProducts[name]) {
+			return this.getWebVitalsData(
+				wid,
+				selectedDevice,
+				sites[selectedSite].siteDomain,
+				selectedSite
+			);
+		}
+
+		if (name === 'per_site_wise' && isUniqueImpEnabled) {
 			path = path.replace('network_impressions,', '');
 			path = path.replace('network_ad_ecpm,', '');
 			path += ',unique_impressions,unique_ad_ecpm';
@@ -347,31 +613,44 @@ class Dashboard extends React.Component {
 			widgetsConfig[wid].isDataSufficient = false;
 			widgetsConfig[wid].isLoading = false;
 			this.setState({ widgetsConfig });
-		} else if (params.siteid) {
-			reportService.getWidgetData({ path, params }).then(response => {
-				this.setState(
-					state => ({ ...state, loadCounter: state.loadCounter + 1 }),
-					() => {
-						const { initialLoadingStarted, loadCounter: apiLoadCounter } = this.state;
-						if (apiLoadCounter === widgetsConfig.length) {
-							this.logApiResponseTime(initialLoadingStarted);
+		} else if (
+			(!toggleableWidgets.includes(name) && params.siteid) ||
+			(toggleableWidgets.includes(name) && activeProducts[name] && params.siteid)
+		) {
+			reportService
+				.getWidgetData({ path, params })
+				.then(response => {
+					this.setState(
+						state => ({ ...state, loadCounter: state.loadCounter + 1 }),
+						() => {
+							const { initialLoadingStarted, loadCounter: apiLoadCounter } = this.state;
+							if (apiLoadCounter === widgetsConfig.length) {
+								this.logApiResponseTime(initialLoadingStarted);
+							}
 						}
+					);
+					if (
+						// eslint-disable-next-line eqeqeq
+						response.status == 200 &&
+						!isEmpty(response.data) &&
+						((response.data.result && response.data.result.length) || !response.data.result)
+					) {
+						widgetsConfig[wid].data = response.data;
+						widgetsConfig[wid].isDataSufficient = true;
+					} else {
+						widgetsConfig[wid].data = {};
+						widgetsConfig[wid].isDataSufficient = false;
 					}
-				);
-				if (
-					response.status == 200 &&
-					!isEmpty(response.data) &&
-					((response.data.result && response.data.result.length) || !response.data.result)
-				) {
-					widgetsConfig[wid].data = response.data;
-					widgetsConfig[wid].isDataSufficient = true;
-				} else {
+					widgetsConfig[wid].isLoading = false;
+					this.setState({ widgetsConfig });
+				})
+				.catch(err => {
+					// eslint-disable-next-line no-console
+					console.log(err);
 					widgetsConfig[wid].data = {};
-					widgetsConfig[wid].isDataSufficient = false;
-				}
-				widgetsConfig[wid].isLoading = false;
-				this.setState({ widgetsConfig });
-			});
+					widgetsConfig[wid].isLoading = false;
+					this.setState({ widgetsConfig });
+				});
 		} else {
 			widgetsConfig[wid].data = {};
 			widgetsConfig[wid].isDataSufficient = false;
@@ -430,6 +709,17 @@ class Dashboard extends React.Component {
 		MixpanelHelper.trackEvent('Dashboard', properties);
 	};
 
+	handleDeviceSelect = (value, wid) => {
+		const { sites, selectedSite } = this.state;
+
+		const domain = sites.find(s => s.value === selectedSite).name;
+
+		this.setState(
+			{ selectedDevice: value },
+			this.getWebVitalsData(wid, value, domain, selectedSite)
+		);
+	};
+
 	renderControl(wid) {
 		const {
 			reportType,
@@ -441,7 +731,7 @@ class Dashboard extends React.Component {
 
 		const isDemoUser = checkDemoUserEmail(email);
 		const { site: reportingSites } = reportsMeta.data;
-		const { widgetsConfig, quickDates, sites } = this.state;
+		const { widgetsConfig, quickDates, sites, selectedDevice } = this.state;
 		const { selectedDate, selectedSite, name, focusedInput, startDate, endDate } = widgetsConfig[
 			wid
 		];
@@ -449,7 +739,20 @@ class Dashboard extends React.Component {
 		const isPerfApOriginalWidget = !!(name === 'per_ap_original');
 		const isPerfApOriginalWidgetForDemoUser = !!(isDemoUser && isPerfApOriginalWidget);
 		const computedSelectedSite = isPerfApOriginalWidgetForDemoUser ? sites[1].value : selectedSite;
+
 		let sitesToShow = isPerfApOriginalWidget ? layoutSites : sites;
+		const hideDateWidgets = [
+			'estimated_earnings',
+			'ads_txt_status',
+			'core_web_vitals',
+			'payment_history'
+		];
+		const hideWebsiteWidgets = [
+			'per_site_wise',
+			'peer_performance_report',
+			'ads_txt_status',
+			'payment_history'
+		];
 
 		const handleDatesChange = ({ startDate, endDate }) => {
 			widgetsConfig[wid].startDate = startDate;
@@ -493,7 +796,7 @@ class Dashboard extends React.Component {
 
 		return (
 			<div className="aligner aligner--hEnd">
-				{name !== 'estimated_earnings' ? (
+				{hideDateWidgets.indexOf(name) === -1 ? (
 					<div>
 						<div className="u-margin-r4 display-inline">
 							<SelectBox
@@ -541,7 +844,34 @@ class Dashboard extends React.Component {
 				) : (
 					''
 				)}
-				{reportType !== 'site' && name !== 'per_site_wise' && name !== 'peer_performance_report' ? (
+				{name === 'core_web_vitals' ? (
+					<div className="u-margin-r4 display-inline">
+						{/* eslint-disable */}
+						<label className="u-text-normal u-margin-r2">Device</label>
+						<SelectBox
+							id="performance-site"
+							isClearable={false}
+							pullRight
+							isSearchable={false}
+							wrapperClassName="display-inline"
+							selected={selectedDevice}
+							options={DEVICE_OPTIONS}
+							onSelect={() => this.handleDeviceSelect(wid)}
+							onSelect={device => {
+								widgetsConfig[wid].isLoading = true;
+
+								this.setState({ selectedDevice: device, widgetsConfig }, () =>
+									this.getDisplayData(wid)
+								);
+							}}
+						/>
+
+						{/* eslint-enable */}
+					</div>
+				) : (
+					''
+				)}
+				{reportType !== 'site' && hideWebsiteWidgets.indexOf(name) === -1 ? (
 					<div className="">
 						{/* eslint-disable */}
 						<label className="u-text-normal u-margin-r2">Website</label>
@@ -552,7 +882,11 @@ class Dashboard extends React.Component {
 							isSearchable={false}
 							wrapperClassName="display-inline"
 							selected={computedSelectedSite}
-							options={sitesToShow}
+							options={
+								name === 'core_web_vitals' || name === 'top_url_report' || name === 'top_utm_report'
+									? sitesToShow.filter(site => site.value !== 'all')
+									: sitesToShow
+							}
 							onSelect={site => {
 								widgetsConfig[wid]['selectedSite'] = site;
 								widgetsConfig[wid].isLoading = true;
@@ -581,15 +915,31 @@ class Dashboard extends React.Component {
 			isDataSufficient,
 			name
 		} = widgetsConfig[wid];
-		if (name === 'peer_performance_report') return null;
+
+		if (
+			name === 'peer_performance_report' ||
+			name === 'site_ga_stats' ||
+			name === 'ga_traffic_breakdown_by_country' ||
+			name === 'ga_traffic_breakdown_by_channel'
+		)
+			return null;
 		const { reportType, siteId } = this.props;
 		let siteSelected = '';
 
 		if (reportType === 'site') siteSelected = `/${siteId}`;
 		else if (selectedSite !== 'all') siteSelected = `/${selectedSite}`;
 
-		const computedReportLink = `/reports${siteSelected}?fromDate=${startDate}&toDate=${endDate}&dimension=${selectedDimension}&chartLegendMetric=${selectedChartLegendMetric}`;
+		let computedReportLink = `/reports${siteSelected}?fromDate=${startDate}&toDate=${endDate}&dimension=${selectedDimension}&chartLegendMetric=${selectedChartLegendMetric}`;
 
+		if (name === 'top_url_report' || name === 'top_utm_report') {
+			computedReportLink = `/reports/url-utm-analytics`;
+		}
+		if (name === 'ads_txt_status') {
+			computedReportLink = '/adsTxtManagement';
+		}
+		if (name === 'payment_history') {
+			computedReportLink = '/payment/history';
+		}
 		return (
 			<Link to={computedReportLink} className="u-link-reset aligner aligner-item float-right">
 				<Button className="aligner-item aligner aligner--vCenter" disabled={!isDataSufficient}>
@@ -603,17 +953,21 @@ class Dashboard extends React.Component {
 	renderContent = () => {
 		const { widgetsConfig } = this.state;
 		const content = [];
+
 		const hasLayoutSite = this.showApBaselineWidget();
-		const {
-			user: {
-				data: { peerPerformanceAnalysis = false }
-			}
-		} = this.props;
+		const { peerPerformanceAnalysis = false, activeProducts } = this.props;
 		widgetsConfig.forEach((widget, index) => {
 			// const widget = widgetsConfig[wid];
-			if (widget.name === 'peer_performance_report' && !peerPerformanceAnalysis) return;
+			if (
+				(widget.name === 'peer_performance_report' && !peerPerformanceAnalysis) ||
+				(toggleableWidgets.indexOf(widget.name) !== -1 && !activeProducts[widget.name])
+			)
+				return;
 			const widgetComponent = this.getWidgetComponent(widget);
-			if ((widget.name == 'per_ap_original' && hasLayoutSite) || widget.name != 'per_ap_original') {
+			if (
+				(widget.name === 'per_ap_original' && hasLayoutSite) ||
+				widget.name !== 'per_ap_original'
+			) {
 				content.push(
 					<Card
 						rootClassName={
@@ -682,7 +1036,7 @@ class Dashboard extends React.Component {
 			return <Loader />;
 		}
 		return (
-			<Fragment>{isValidUserSites ? this.renderContent() : this.renderOnboardingCard()}</Fragment>
+			<Fragment> {isValidUserSites ? this.renderContent() : this.renderOnboardingCard()}</Fragment>
 		);
 	}
 }

@@ -24,5 +24,7 @@ export default {
 	saveReportConfig: reportConfig => axiosInstance.post('/reports', reportConfig),
 	deleteSavedReport: reportId => axiosInstance.delete(`reports/${reportId}`),
 	updateSavedAndFrequentReports: reportConfig =>
-		axiosInstance.patch(`/reports/${reportConfig.id}`, reportConfig)
+		axiosInstance.patch(`/reports/${reportConfig.id}`, reportConfig),
+	getCorewebVitalsdata: params => axiosInstance.get('/reports/getCoreWebVitals', { params }),
+	getPaymentHistory: params => axiosInstance.get('/reports/getPaymentHistory', { params })
 };

@@ -17,7 +17,8 @@ const mapStateToProps = (state, ownProps) => {
 				fetched: peerPerformanceBlockedSitesFetched = false
 			} = {},
 			peerPerformanceAnalysis,
-			peerPerformanceAnalysisSites = []
+			peerPerformanceAnalysisSites = [],
+			activeProducts = {}
 		}
 	} = user;
 	return {
@@ -31,7 +32,8 @@ const mapStateToProps = (state, ownProps) => {
 		peerPerformanceblockedSites,
 		peerPerformanceBlockedSitesFetched,
 		peerPerformanceAnalysis,
-		peerPerformanceAnalysisSites
+		peerPerformanceAnalysisSites,
+		activeProducts
 	};
 };
 

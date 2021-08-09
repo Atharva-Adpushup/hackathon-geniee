@@ -66,7 +66,8 @@ var modelAPI = (module.exports = apiModule()),
 			'isBidderAdmin',
 			'mcm',
 			'peerPerformanceAnalysisSites',
-			'peerPerformanceAnalysis'
+			'peerPerformanceAnalysis',
+			'activeProducts'
 		];
 		this.clientKeys = [
 			'firstName',
@@ -101,7 +102,8 @@ var modelAPI = (module.exports = apiModule()),
 			'dashboardNotificationAccess',
 			'mcm',
 			'peerPerformanceAnalysisSites',
-			'peerPerformanceAnalysis'
+			'peerPerformanceAnalysis',
+			'activeProducts'
 		];
 		this.validations = schema.user.validations;
 		this.classMap = {
