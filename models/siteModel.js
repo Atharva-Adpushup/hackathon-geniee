@@ -41,7 +41,8 @@ var model = require('../helpers/model'),
 			'adServerSetupStatus',
 			'dataFeedActive',
 			'prebidBundleName',
-			'activeBidderAdaptersListAsc'
+			'activeBidderAdaptersListAsc',
+			'coreWebVitalsData'
 		];
 		this.clientKeys = [
 			'siteId',
@@ -62,7 +63,8 @@ var model = require('../helpers/model'),
 			'adServerSetupStatus',
 			'dataFeedActive',
 			'prebidBundleName',
-			'activeBidderAdaptersListAsc'
+			'activeBidderAdaptersListAsc',
+			'coreWebVitalsData'
 		];
 		this.validations = {
 			required: []
@@ -76,7 +78,7 @@ var model = require('../helpers/model'),
 				// NOTE: AdPushup does not recommend this use case but we have to support it to complete
 				// our SSP integrations
 				isAdPushupControlWithPartnerSSP: false,
-				isSelectiveRolloutEnabled:true
+				isSelectiveRolloutEnabled: true
 			},
 			channels: [],
 			cmsInfo: {
@@ -264,7 +266,7 @@ var model = require('../helpers/model'),
 			return this.save();
 		};
 	});
-	
+
 function getSiteSpecificPrebidBundleName(siteId) {
 	var timestamp = Date.now();
 	return `pb.${siteId}.${timestamp}.js`;

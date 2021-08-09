@@ -64,5 +64,6 @@ export default {
 	GET_ADUNIT_MAPPING: 'ops/getAdUnitMapping',
 	AD_NETWORK_DOC_KEYS: {
 		dfpAdunit: 'dfpAdunit'
-	}
+	},
+	isCoreWebVitalsEnabled: false
 };

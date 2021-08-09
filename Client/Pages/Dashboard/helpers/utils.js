@@ -1,4 +1,5 @@
 import moment from 'moment';
+import sortBy from 'lodash/sortBy';
 
 const convertObjToArr = obj =>
 	Object.keys(obj).map(key => {
@@ -92,11 +93,46 @@ const getWidgetValidDationState = displayData => {
 	return validationState;
 };
 
+const sortHeadersByPosition = (columns, metrics) => {
+	const tempArr = [];
+	columns.forEach(col => {
+		if (metrics[col]) {
+			tempArr.push({
+				Header: metrics[col].display_name,
+				accessor: col,
+				position: metrics[col].table_position
+			});
+		}
+	});
+
+	return sortBy(tempArr, o => o.position);
+};
+
+const formatTableData = (tableBody, metrics) => {
+	// const { metrics } = props;
+
+	tableBody.forEach(row => {
+		// eslint-disable-next-line no-restricted-syntax
+		for (const col in row) {
+			if (metrics[col]) {
+				const num = row[col];
+
+				row[col] =
+					metrics[col].valueType === 'money'
+						? `$${numberWithCommas(roundOffTwoDecimal(num))}`
+						: numberWithCommas(num);
+			}
+		}
+	});
+};
+
 export {
 	convertObjToArr,
 	getDateRange,
 	numberWithCommas,
 	roundOffTwoDecimal,
 	isEmptyObject,
-	getWidgetValidDationState
+	getWidgetValidDationState,
+	formatTableData,
+	sortHeadersByPosition
 };
