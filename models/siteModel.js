@@ -14,6 +14,7 @@ var model = require('../helpers/model'),
 	adSizeMappingConsts = require('../helpers/adSizeMappingConsts'),
 	_ = require('lodash'),
 	{ N1qlQuery } = require('couchbase'),
+	{ appBucket } = require('../helpers/routeHelpers'),
 	Site = model.extend(function() {
 		this.keys = [
 			'siteId',
@@ -749,6 +750,10 @@ function apiModule() {
 			const query = N1qlQuery.fromString(queryString);
 
 			return couchbase.connectToAppBucket().then(appBucket => appBucket.queryAsync(query));
+		},
+		getAllGaEnabledSites: function() {
+			const queryString = `SELECT siteId FROM AppBucket WHERE apConfigs.enableGAAnalytics and meta().id like "site::%";`;
+			return appBucket.queryDB(queryString);
 		}
 	};
 

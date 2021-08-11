@@ -8,6 +8,7 @@ import CustomButton from '../../../../../Components/CustomButton/index';
 // import { formatDate } from '../../../../../helpers/commonFunctions';
 import config from '../../../../../config/config';
 import siteService from '../../../../../services/siteService';
+import { GA_ACCESS_EMAIL_OPTIONS, GA_VERSION_OPTIONS } from '../../../configs/commonConsts';
 
 class Settings extends Component {
 	constructor(props) {
@@ -28,7 +29,14 @@ class Settings extends Component {
 			mergeReport = false,
 			isPnp = false,
 			isWeeklyEmailReportsEnabled = false,
-			isDailyEmailReportsEnabled = false
+			isDailyEmailReportsEnabled = false,
+			enableGAAnalytics = false,
+			gaConfigs: {
+				gaTrackingId = '',
+				viewId = '',
+				accessEmail = 'support@adpushup.com',
+				gaVersion = 3
+			} = {}
 		} = site.apConfigs || {};
 		const { revenueShare = 10 } = site.adNetworkSettings || {};
 		const status = Object.prototype.hasOwnProperty.call(apps, 'apLite') ? apps.apLite : undefined;
@@ -48,7 +56,12 @@ class Settings extends Component {
 			mergeReport,
 			isPnp,
 			isWeeklyEmailReportsEnabled,
-			isDailyEmailReportsEnabled
+			isDailyEmailReportsEnabled,
+			enableGAAnalytics,
+			gaTrackingId,
+			viewId,
+			accessEmail,
+			gaVersion
 		};
 	}
 
@@ -159,8 +172,20 @@ class Settings extends Component {
 			cmpEnabled,
 			mergeReport,
 			isWeeklyEmailReportsEnabled,
-			isDailyEmailReportsEnabled
+			isDailyEmailReportsEnabled,
+			enableGAAnalytics,
+			gaTrackingId,
+			viewId,
+			accessEmail,
+			gaVersion
 		} = this.state;
+		const gaConfigs = {
+			gaTrackingId,
+			viewId,
+			accessEmail,
+			gaEventSampling: 1,
+			gaVersion
+		};
 		const { showNotification, saveSettings, site, dataForAuditLogs } = this.props;
 		const isTransitionInValid = isSPA && isNaN(Number(spaPageTransitionTimeout));
 		const isAdPushupPercentageInValid =
@@ -207,7 +232,9 @@ class Settings extends Component {
 					cmpAvailable: !cmpEnabled,
 					mergeReport,
 					isWeeklyEmailReportsEnabled,
-					isDailyEmailReportsEnabled
+					isDailyEmailReportsEnabled,
+					gaConfigs,
+					enableGAAnalytics
 				},
 
 				adNetworkSettings: {
@@ -233,7 +260,12 @@ class Settings extends Component {
 			cmpEnabled,
 			mergeReport,
 			isDailyEmailReportsEnabled,
-			isWeeklyEmailReportsEnabled
+			isWeeklyEmailReportsEnabled,
+			enableGAAnalytics,
+			gaTrackingId,
+			viewId,
+			accessEmail,
+			gaVersion
 		} = this.state;
 		const { site } = this.props;
 
@@ -428,6 +460,75 @@ class Settings extends Component {
 					placeholder={`Revenue Share - Any changes will be effective from ${effectRevenueShareDate}`}
 					className="u-padding-v4 u-padding-h4"
 				/> */}
+
+				{!config.GA_DISABLED_SITES.includes(siteId) && (
+					<CustomToggleSwitch
+						labelText="Enable GA Analytics"
+						className="u-margin-b4 negative-toggle"
+						checked={enableGAAnalytics}
+						onChange={this.handleToggle}
+						layout="horizontal"
+						size="m"
+						on="Yes"
+						off="No"
+						defaultLayout
+						name={`enableGAAnalytics-${siteId}-${siteDomain}`}
+						id={`enableGAAnalytics-${siteId}-${siteDomain}`}
+						disabled={!dataFeedActive}
+					/>
+				)}
+
+				{!config.GA_DISABLED_SITES.includes(siteId) && enableGAAnalytics && (
+					<>
+						<FieldGroup
+							name="gaTrackingId"
+							value={gaTrackingId}
+							type="text"
+							label="GA Tracking Id"
+							onChange={this.handleChange}
+							size={6}
+							id={`gaTrackingId-${siteId}-${siteDomain}`}
+							placeholder="GA Tracking Id"
+							className="u-padding-v4 u-padding-h4"
+						/>
+						<FieldGroup
+							name="viewId"
+							value={viewId}
+							type="text"
+							label="View Id"
+							onChange={this.handleChange}
+							size={6}
+							id={`viewId-${siteId}-${siteDomain}`}
+							placeholder="View Id"
+							className="u-padding-v4 u-padding-h4"
+						/>
+						<FieldGroup
+							name="accessEmail"
+							value={accessEmail}
+							type="toggle-dropdown-button"
+							label="Access Email"
+							onChange={value => this.setState({ accessEmail: value })}
+							size={6}
+							id={`accessEmail-${siteId}-${siteDomain}`}
+							placeholder="Access Email"
+							className="u-padding-v4 u-padding-h4"
+							itemCollection={GA_ACCESS_EMAIL_OPTIONS}
+						/>
+						<FieldGroup
+							name="gaVersion"
+							value={gaVersion}
+							type="toggle-dropdown-button"
+							label="GA Version"
+							onChange={value => this.setState({ gaVersion: value })}
+							size={6}
+							id={`gaVersion-${siteId}-${siteDomain}`}
+							placeholder="GA Version"
+							className="u-padding-v4 u-padding-h4"
+							itemCollection={GA_VERSION_OPTIONS}
+						/>
+					</>
+				)}
+
 				<Row>
 					<CustomButton variant="primary" className="pull-left" onClick={this.handleForceBuild}>
 						Force adpushup.js Build

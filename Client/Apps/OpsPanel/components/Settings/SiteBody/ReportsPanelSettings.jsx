@@ -18,7 +18,8 @@ class ReportsPanelSettings extends Component {
 			sessionRpmReports = false,
 			mcm = {},
 			peerPerformanceAnalysis = false,
-			peerPerformanceAnalysisSites = []
+			peerPerformanceAnalysisSites = [],
+			useGAAnalyticsForReporting = false
 		} = user;
 		const { isMcmEnabled = false, childPublisherId = '' } = mcm;
 
@@ -29,7 +30,8 @@ class ReportsPanelSettings extends Component {
 			isMcmEnabled,
 			childPublisherId,
 			peerPerformanceAnalysis,
-			peerPerformanceAnalysisSites
+			peerPerformanceAnalysisSites,
+			useGAAnalyticsForReporting
 		};
 	}
 
@@ -77,7 +79,8 @@ class ReportsPanelSettings extends Component {
 			childPublisherId,
 			isMcmEnabled,
 			peerPerformanceAnalysisSites,
-			peerPerformanceAnalysis
+			peerPerformanceAnalysis,
+			useGAAnalyticsForReporting
 		} = this.state;
 		const { updateUser, customProps, showNotification } = this.props;
 		if (isMcmEnabled && childPublisherId === '') {
@@ -120,6 +123,10 @@ class ReportsPanelSettings extends Component {
 				{
 					key: 'peerPerformanceAnalysisSites',
 					value: peerPerformanceAnalysisSites
+				},
+				{
+					key: 'useGAAnalyticsForReporting',
+					value: useGAAnalyticsForReporting
 				}
 			],
 			dataForAuditLogs
@@ -183,7 +190,8 @@ class ReportsPanelSettings extends Component {
 			sessionRpmReports,
 			isMcmEnabled,
 			childPublisherId,
-			peerPerformanceAnalysis
+			peerPerformanceAnalysis,
+			useGAAnalyticsForReporting
 		} = this.state;
 
 		const { globalDataFetched, peerPerformanceBlockedSitesFetched } = this.props;
@@ -204,6 +212,19 @@ class ReportsPanelSettings extends Component {
 					defaultLayout
 					name="showUniqueImpressionsReporting"
 					id="js-showUniqueImpressionsReporting"
+				/>
+				<CustomToggleSwitch
+					labelText="Use GA Page Views For Reporting"
+					className="u-margin-t4 u-margin-b4 negative-toggle u-cursor-pointer"
+					checked={useGAAnalyticsForReporting}
+					onChange={this.handleToggle}
+					layout="horizontal"
+					size="m"
+					on="Yes"
+					off="No"
+					defaultLayout
+					name="useGAAnalyticsForReporting"
+					id="js-useGAAnalyticsForReporting"
 				/>
 				<CustomToggleSwitch
 					labelText="Session RPM Reports"

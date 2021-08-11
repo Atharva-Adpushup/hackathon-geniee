@@ -566,6 +566,28 @@ const ACTION_KEY_OPTIONS = [
 const WEEKEND = ['saturday', 'sunday'];
 const WEEKDAY = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
 
+const GA_ACCESS_EMAIL_OPTIONS = [
+	{
+		name: 'support@adpushup.com',
+		value: 'support@adpushup.com'
+	},
+	{
+		name: 'pub_invite@adpushup.com',
+		value: 'pub_invite@adpushup.com'
+	},
+	{
+		name: 'publisher_invite@adpushup.com',
+		value: 'publisher_invite@adpushup.com'
+	}
+];
+
+const GA_VERSION_OPTIONS = [
+	{
+		name: '3',
+		value: 3
+	}
+];
+
 export {
 	OP_NAV_ITEMS,
 	OP_NAV_ITEMS_INDEXES,
@@ -600,5 +622,7 @@ export {
 	TRIGGER_OPERATOR_OPTIONS,
 	ACTION_KEY_OPTIONS,
 	WEEKDAY,
-	WEEKEND
+	WEEKEND,
+	GA_ACCESS_EMAIL_OPTIONS,
+	GA_VERSION_OPTIONS
 };
