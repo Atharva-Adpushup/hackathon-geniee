@@ -35,7 +35,8 @@ router
 		try {
 			const { cacheHit, data: reportsData } = await reportsService.getReportsWithCache(
 				reportingConfig,
-				bypassCache === 'true'
+				bypassCache === 'true',
+				email
 			);
 			if (cacheHit) setCacheHeaders(res);
 			await reportsService.logReportUsage(originalEmail || email, reportingConfig);

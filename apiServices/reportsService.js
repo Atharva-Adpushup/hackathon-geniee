@@ -7,7 +7,11 @@ const moment = require('moment');
 const config = require('../configs/config');
 const CC = require('../configs/commonConsts');
 const { queryViewFromAppBucket, getDoc, upsertDoc } = require('../helpers/couchBaseService');
-const { sortObjectEntries } = require('../helpers/utils');
+const {
+	sortObjectEntries,
+	roundOffTwoDecimal,
+	doesReportingHavePageViewData
+} = require('../helpers/utils');
 const AdPushupError = require('../helpers/AdPushupError');
 const {
 	getCustomStatsValidations,
@@ -16,6 +20,9 @@ const {
 } = require('../validations/reportsValidations');
 const cacheWrapper = require('../helpers/cacheWrapper');
 const ObjectValidator = require('../helpers/ObjectValidator');
+
+const { getUserGaEnabledSites, getUserByEmail } = require('../models/userModel');
+const { getAllGaEnabledSites } = require('../models/siteModel');
 
 const reportsService = {
 	generateCronExpression: (interval, startDate) => {
@@ -130,11 +137,16 @@ const reportsService = {
 	},
 	mergeReportColumns: reportColumns => [...reportColumns, ...CC.SESSION_RPM.SESSION_RPM_PROPS],
 	calculateSessionTotals: (sessionReports = []) => {
+		const totalSessions = sessionReports.reduce(
+			(result, report) => result + report.user_sessions,
+			0
+		);
+		const totalNetworkRevenue = sessionReports.reduce(
+			(result, report) => result + report.network_net_revenue,
+			0
+		);
 
-		const totalSessions = sessionReports.reduce((result, report) => result + report.user_sessions, 0);
-		const totalNetworkRevenue = sessionReports.reduce((result, report) => result + report.network_net_revenue, 0);
-
-		const totalSessionRpm = totalNetworkRevenue / totalSessions * 1000;
+		const totalSessionRpm = (totalNetworkRevenue / totalSessions) * 1000;
 
 		return {
 			total_session_rpm: totalSessionRpm,
@@ -264,19 +276,14 @@ const reportsService = {
 		const sessionData = await reportsService.fetchSessionData(reportConfig);
 		return reportsService.mergeReportsWithSessionRpmData(reportsData, sessionData, isSuperUser);
 	},
-	getReports: async reportConfig =>
+	getReports: async (reportConfig, email) =>
 		ObjectValidator(getCustomStatsValidations, reportConfig)
 			.then(() => reportsService.modifyQueryIfPnp(reportConfig))
-			.then(config => reportsService.fetchReports(config))
-			.then(reports =>
-				reportsService.fetchAndMergeSessionData(reportConfig, reports, reportConfig.isSuperUser)
-			),
+			.then(config => reportsService.processAndSendReportingData(email, config, reportConfig)),
 	getReportAPCustomStatXPath: async reportConfig =>
 		ObjectValidator(getCustomStatsValidations, reportConfig)
 			.then(() => reportsService.modifyQueryIfPnp(reportConfig))
-			.then(config =>
-				reportsService.fetchReportAPCustomStatXPath(config)
-			),
+			.then(config => reportsService.fetchReportAPCustomStatXPath(config)),
 	getWidgetData: async (path, params) =>
 		ObjectValidator(getWidgetDataValidations, { path, params })
 			.then(() =>
@@ -290,7 +297,7 @@ const reportsService = {
 				if (response && response.code !== 1) throw new AdPushupError(response);
 				return response.data;
 			}),
-	getReportsWithCache: async (reportConfig, bypassCache = false) => {
+	getReportsWithCache: async (reportConfig, bypassCache = false, email) => {
 		const { siteid } = reportConfig;
 		//bypass if site has blocked prefetch
 		if (siteid)
@@ -301,21 +308,20 @@ const reportsService = {
 		return ObjectValidator(getCustomStatsValidations, sortedConfig).then(() => {
 			return cacheWrapper(
 				{ cacheKey: JSON.stringify(sortedConfig), bypassCache, cacheExpiry: 4 * 3600 },
-				async () => reportsService.getReports(reportConfig)
+				async () => reportsService.getReports(reportConfig, email)
 			);
 		});
 	},
 	getReportsAPCustomStatXPathWithCache: async (reportConfig, bypassCache = false) => {
 		const sortedConfig = sortObjectEntries(reportConfig);
-		return ObjectValidator(getCustomStatsValidations, sortedConfig)
-			.then(() => {
-				// added a prefix 'xPath-' to cacheKey to make it unique for xPath 
-				// because reportConfig is same for General Report and xPath report
-				return cacheWrapper(
-					{ cacheKey: 'xPath-' + JSON.stringify(sortedConfig), bypassCache, cacheExpiry: 24 * 3600 },
-					async () => reportsService.getReportAPCustomStatXPath(reportConfig)
-				)
-			});
+		return ObjectValidator(getCustomStatsValidations, sortedConfig).then(() => {
+			// added a prefix 'xPath-' to cacheKey to make it unique for xPath
+			// because reportConfig is same for General Report and xPath report
+			return cacheWrapper(
+				{ cacheKey: 'xPath-' + JSON.stringify(sortedConfig), bypassCache, cacheExpiry: 24 * 3600 },
+				async () => reportsService.getReportAPCustomStatXPath(reportConfig)
+			);
+		});
 	},
 	getReportingMetaDataWithCache: async (sites, isSuperUser, bypassCache = false) => {
 		return cacheWrapper(
@@ -353,6 +359,83 @@ const reportsService = {
 			}
 		};
 		return upsertDoc('AppBucket', docId, newConfig);
+	},
+	shouldUseGaPageViews: async (email, reportConfig) => {
+		const { siteid = '', isSuperUser = false } = reportConfig;
+		let isGlobalReportsBeingFetched = false;
+		if (isSuperUser) {
+			if (siteid === '') return false;
+			isGlobalReportsBeingFetched = true;
+		}
+		const { data: { useGAAnalyticsForReporting = false } = {} } = await getUserByEmail(email);
+		if (!useGAAnalyticsForReporting && !isSuperUser) return false;
+		let allGaEnabledSites;
+		if (isGlobalReportsBeingFetched) {
+			allGaEnabledSites = await getAllGaEnabledSites();
+		} else {
+			allGaEnabledSites = await getUserGaEnabledSites(email);
+		}
+		const selectedSiteidsForReporting = siteid.split(',');
+		const userSiteIdswithEnabledGaAnalyticMap = allGaEnabledSites.reduce((mapResult, site) => {
+			const { siteId } = site;
+			mapResult[siteId] = true;
+			return mapResult;
+		}, {});
+		const isAnySiteWithoutGaEnabled = selectedSiteidsForReporting.some(siteId => {
+			const enableGAAnalytics = userSiteIdswithEnabledGaAnalyticMap[siteId];
+			return !enableGAAnalytics;
+		});
+		if (isAnySiteWithoutGaEnabled) return false;
+		return true;
+	},
+	processAndSendReportingData: (email, config, reportConfig) => {
+		return Promise.all([
+			reportsService.fetchReports(config),
+			reportsService.shouldUseGaPageViews(email, reportConfig)
+		]).then(async ([reports, isGaPageBeingUsed]) => {
+			const result = await reportsService.fetchAndMergeSessionData(
+				reportConfig,
+				reports,
+				reportConfig.isSuperUser
+			);
+			const { columns } = result;
+			const isReportingDataHavePageViews = doesReportingHavePageViewData(columns);
+			if (!isGaPageBeingUsed || !isReportingDataHavePageViews) return result;
+			return reportsService.transformReportingDataForGA(result);
+		});
+	},
+	transformReportingDataForGA: reportingResult => {
+		const { result = [], total } = reportingResult;
+		//This will store the sum of Ap page views where Ga page views is Zero
+		let sumOfApPageViewsWhereGAPageViewNotExist = 0;
+		for (let index = 0; index < result.length; index++) {
+			const rowData = result[index];
+			const {
+				ga_ap_page_views: gaPageViews = 0,
+				network_net_revenue: networkNetRevenue = 0
+			} = rowData;
+			if (gaPageViews) {
+				rowData.adpushup_page_views = gaPageViews;
+				rowData.adpushup_page_cpm = parseFloat(
+					roundOffTwoDecimal((networkNetRevenue / gaPageViews) * 1000)
+				);
+			} else if (total) sumOfApPageViewsWhereGAPageViewNotExist += rowData.adpushup_page_views;
+		}
+		// returning from here if result data have not total field(This happens in site filter reports in Global reports)
+		if (!total) return { ...reportingResult, result };
+		const {
+			total_ga_ap_page_views: totalGaPageViews = 0,
+			total_network_net_revenue: totalNetworkRevenue = 0
+		} = total;
+		if (totalGaPageViews) {
+			//Here we are adding page views which are present in result but not in total data(becuase ga page views is being used here)
+			const updatedTotalGaPageViews = totalGaPageViews + sumOfApPageViewsWhereGAPageViewNotExist;
+			total.total_adpushup_page_views = updatedTotalGaPageViews;
+			total.total_adpushup_page_cpm = parseFloat(
+				roundOffTwoDecimal((totalNetworkRevenue / updatedTotalGaPageViews) * 1000)
+			);
+		}
+		return { ...reportingResult, result, total };
 	}
 };
 
