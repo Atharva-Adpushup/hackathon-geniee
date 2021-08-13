@@ -17,7 +17,7 @@ function adpTagPublisherWrapper(item) {
 function adsensePublisherWrapper(item) {
 	return adsensePublisher.publish(item);
 }
-function publishToQueueWrapper(siteConfigItems, site) {
+function publishToQueueWrapper(siteConfigItems, site, forcePrebidBuild) {
 	const response = {
 		empty: true,
 		message: `ADS_SYNC_QUEUE_PUBLISH: No unsynced ads for site: ${site.get('siteId')}`
@@ -54,22 +54,26 @@ function publishToQueueWrapper(siteConfigItems, site) {
 			)}`
 		}));
 	}
-	return processing().then(response => (response.empty ? syncCdn(site) : response));
+	return processing().then(response =>
+		response.empty ? syncCdn(site, forcePrebidBuild) : response
+	);
 }
-function publishWrapper(siteModel) {
+function publishWrapper(siteModel, forcePrebidBuild) {
 	return siteConfigGenerationModule
 		.generate(siteModel)
-		.then(siteConfigItems => publishToQueueWrapper(siteConfigItems, siteModel));
+		.then(siteConfigItems => publishToQueueWrapper(siteConfigItems, siteModel, forcePrebidBuild));
 }
 
 module.exports = {
-	publish(site) {
+	publish(site, forcePrebidBuild) {
 		const siteIdNum = parseInt(site, 10);
 		if (!isNaN(siteIdNum)) {
 			const siteId = siteIdNum.toString();
-			return siteModelAPI.getSiteById(siteId).then(siteModel => publishWrapper(siteModel));
+			return siteModelAPI
+				.getSiteById(siteId)
+				.then(siteModel => publishWrapper(siteModel, forcePrebidBuild));
 		}
 
-		return publishWrapper(site);
+		return publishWrapper(site, forcePrebidBuild);
 	}
 };

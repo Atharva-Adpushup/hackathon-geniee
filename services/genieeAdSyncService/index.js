@@ -7,10 +7,10 @@ const cron = require('node-cron');
 const { fileLogger } = require('../../helpers/logger/file/index');
 const getAutoOptimisedLiveSites = require('../../misc/scripts/adhoc/autoOptimisedLiveSites/service');
 
-function onSiteSaved(site) {
+function onSiteSaved(site, forcePrebidBuild) {
 	// save only after 5 second of siteSaved event as still channels are not saved as siteSaved called first and then channel data is saved.
 	// so to roughly bypassing this situation run the generator only after 5 seconds, assuming all is saved in 5 seconds
-	setTimeout(() => syncGeneratedFileWithCdn.init(site), 3000);
+	setTimeout(() => syncGeneratedFileWithCdn.init(site, forcePrebidBuild), 3000);
 }
 
 function updateGeneratedScriptsForLiveSites() {
