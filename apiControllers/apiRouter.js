@@ -20,6 +20,7 @@ const adsTxtController = require('./adsTxtController');
 const utilityController = require('./utilityController');
 const ampController = require('./ampController');
 const scriptController = require('./scriptController');
+const paymentController = require('./paymentController');
 
 // TODO: add some security/authentication check
 router.use('/script', scriptController);
@@ -48,5 +49,6 @@ router.use('/adsTxt', adsTxtController);
 router.use('/utils', utilityController);
 router.use('/amp', ampController);
 router.use('/', indexController);
+router.use('/payment', paymentController);
 
 module.exports = router;

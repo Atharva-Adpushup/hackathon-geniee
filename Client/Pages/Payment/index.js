@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import DocumentTitle from 'react-document-title';
-import { Nav, NavItem } from '@/Client/helpers/react-bootstrap-imports';
 import { connect } from 'react-redux';
+import { Nav, NavItem } from '@/Client/helpers/react-bootstrap-imports';
 import { paymentsAction } from '../../actions/userActions';
 import { showNotification } from '../../actions/uiActions';
 import Loader from '../../Components/Loader/index';
@@ -11,23 +11,33 @@ import {
 	PAYMENT_NAV_ITEMS_VALUES
 } from './configs/commonConsts';
 import history from '../../helpers/history';
+import PaymentContainer from '../../Containers/PaymentContainer';
 
 class Payment extends Component {
-	state = {
-		redirectUrl: '',
-		paymentDetails: {
-			url: '',
-			width: '100%',
-			height: '0px',
-			isLoading: true
-		},
-		paymentHistory: {
-			url: '',
-			width: '100%',
-			height: '0px',
-			isLoading: true
-		}
-	};
+	constructor(props) {
+		super(props);
+		this.state = {
+			redirectUrl: '',
+			paymentDetails: {
+				url: '',
+				width: '100%',
+				height: '0px',
+				isLoading: true
+			},
+			paymentHistory: {
+				url: '',
+				width: '100%',
+				height: '0px',
+				isLoading: true
+			},
+			paymentBalance: {
+				url: '',
+				width: '100%',
+				height: '0px',
+				isLoading: true
+			}
+		};
+	}
 
 	componentDidMount() {
 		const { paymentsAction: payments } = this.props;
@@ -82,11 +92,10 @@ class Payment extends Component {
 	);
 
 	handleNavSelect = value => {
-		const { paymentDetails, paymentHistory } = this.state;
+		const { paymentDetails, paymentHistory, paymentBalance } = this.state;
 		const computedRedirectUrl = `/payment`;
 		let redirectUrl = '';
 		switch (value) {
-			default:
 			case 1:
 				paymentDetails.isLoading = true;
 				redirectUrl = `${computedRedirectUrl}`;
@@ -102,6 +111,16 @@ class Payment extends Component {
 					paymentHistory,
 					redirectUrl
 				});
+				break;
+			case 3:
+				paymentBalance.isLoading = true;
+				redirectUrl = `${computedRedirectUrl}/balance`;
+				this.setState({
+					paymentBalance,
+					redirectUrl
+				});
+				break;
+			default:
 				break;
 		}
 	};
@@ -122,11 +141,14 @@ class Payment extends Component {
 		const { paymentDetails, paymentHistory } = this.state;
 		const activeTab = this.getActiveTab();
 		switch (activeTab) {
-			default:
 			case PAYMENT_NAV_ITEMS_INDEXES.DETAILS:
 				return this.renderIframe(paymentDetails);
 			case PAYMENT_NAV_ITEMS_INDEXES.HISTORY:
 				return this.renderIframe(paymentHistory);
+			case PAYMENT_NAV_ITEMS_INDEXES.BALANCE:
+				return <PaymentContainer {...this.props} />;
+			default:
+				return null;
 		}
 	};
 
@@ -134,43 +156,45 @@ class Payment extends Component {
 		const {
 			customProps: { activeTab }
 		} = this.props;
-
 		return activeTab;
 	};
 
 	render() {
+		const { accessBalanceTab } = this.props;
 		const { redirectUrl } = this.state;
 		const activeTab = this.getActiveTab();
 		const activeItem = PAYMENT_NAV_ITEMS[activeTab];
-
 		if (redirectUrl) {
 			history.push(redirectUrl);
 			return null;
 		}
 		return (
-			<Fragment>
+			<>
 				<DocumentTitle title="Payment" />
-
 				<div title="Payment Settings">
 					<Nav bsStyle="tabs" activeKey={activeItem.INDEX} onSelect={this.handleNavSelect}>
 						<NavItem eventKey={1}>{PAYMENT_NAV_ITEMS_VALUES.DETAILS}</NavItem>
 						<NavItem eventKey={2}>{PAYMENT_NAV_ITEMS_VALUES.HISTORY}</NavItem>
+
+						{/* only show this tab for specific sites. Enabled using "accessBalanceTab" flag, maintained in user doc */}
+						{accessBalanceTab ? (
+							<NavItem eventKey={3}>{PAYMENT_NAV_ITEMS_VALUES.BALANCE}</NavItem>
+						) : null}
 					</Nav>
 					{this.renderContent()}
 				</div>
-			</Fragment>
+			</>
 		);
 	}
 }
 
-// const mapStateToProps = (state, ownProps) => ({
-// 		...ownProps
-// 	}),
+const mapStateToProps = state => {
+	const { balancePayment } = state.global.user.data;
+	return balancePayment;
+};
+
 // 	mapDispatchToProps = (dispatch, ownProps) => ({
 // 		showNotification: params => dispatch(showNotification(params))
 // 	});
 
-export default connect(
-	null,
-	{ paymentsAction, showNotification }
-)(Payment);
+export default connect(mapStateToProps, { paymentsAction, showNotification })(Payment);
