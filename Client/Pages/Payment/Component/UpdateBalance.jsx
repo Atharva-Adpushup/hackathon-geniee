@@ -25,7 +25,7 @@ class UpdateBalance extends Component {
 
 		const today = formatDatetoStore(new Date());
 
-		const intAmount = parseInt(amount, 10);
+		const intAmount = parseFloat(amount).toFixed(2);
 		if (intAmount < 1) {
 			this.setState({ error: 'Amount should be greater than 0.' });
 			return;
@@ -69,6 +69,7 @@ class UpdateBalance extends Component {
 							placeholder="Enter Amount"
 							name="amount"
 							value={amount}
+							step="any"
 							icon="dollar-sign"
 							onChange={this.onChange}
 						/>

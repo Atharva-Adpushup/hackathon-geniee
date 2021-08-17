@@ -25,7 +25,7 @@ class RequestPayment extends Component {
 		ev.preventDefault();
 		const { amount } = this.state;
 		const today = formatDatetoStore(new Date());
-		const intAmount = parseInt(amount, 10);
+		const intAmount = parseFloat(amount).toFixed(2);
 		const { handleSubmit, customProps, availableBalance } = this.props;
 
 		const { appName } = customProps;
@@ -81,6 +81,7 @@ class RequestPayment extends Component {
 							placeholder="Enter Amount"
 							name="amount"
 							value={amount}
+							step="any"
 							icon="dollar-sign"
 							onChange={this.onChange}
 						/>
