@@ -78,7 +78,8 @@ const getAdConfig = (adType, section) => {
 		downwardSizesDisabled,
 		sizeFilters,
 		collapseUnfilled,
-		poweredByBannerOnDocked
+		poweredByBannerOnDocked,
+		enableLazyLoading
 	} = ad;
 	const { name: sectionName, id, formatData } = section;
 	let json = {
@@ -102,6 +103,9 @@ const getAdConfig = (adType, section) => {
 
 	if (isMultipleAdSizes) {
 		json.multipleAdSizes = multipleAdSizes.concat([]);
+	}
+	if (enableLazyLoading) {
+		json.enableLazyLoading = enableLazyLoading;
 	}
 
 	if (sizeFilters && Object.keys(sizeFilters).length) {
