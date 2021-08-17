@@ -330,6 +330,16 @@ const ROUTES = {
 			customProps: { activeTab: PAYMENT_NAV_ITEMS_INDEXES.HISTORY },
 			component: Payment
 		},
+		{
+			exact: true,
+			name: 'Payment Balance',
+			path: '/payment/balance',
+			customProps: {
+				activeTab: PAYMENT_NAV_ITEMS_INDEXES.BALANCE,
+				appName: ROUTE_APP_NAME.BALANCE_PAYMENT
+			},
+			component: Payment
+		},
 
 		// Admin Panel
 		{

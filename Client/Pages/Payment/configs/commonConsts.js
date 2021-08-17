@@ -1,11 +1,13 @@
 const PAYMENT_NAV_ITEMS_INDEXES = {
 	DETAILS: 'details',
-	HISTORY: 'history'
+	HISTORY: 'history',
+	BALANCE: 'Balance'
 };
 
 const PAYMENT_NAV_ITEMS_VALUES = {
 	DETAILS: 'Details',
-	HISTORY: 'History'
+	HISTORY: 'History',
+	BALANCE: 'Balance'
 };
 
 const PAYMENT_NAV_ITEMS = {
@@ -16,6 +18,10 @@ const PAYMENT_NAV_ITEMS = {
 	[PAYMENT_NAV_ITEMS_INDEXES.HISTORY]: {
 		NAME: [PAYMENT_NAV_ITEMS_VALUES.HISTORY],
 		INDEX: 2
+	},
+	[PAYMENT_NAV_ITEMS_INDEXES.BALANCE]: {
+		NAME: [PAYMENT_NAV_ITEMS_VALUES.BALANCE],
+		INDEX: 3
 	}
 };
 
