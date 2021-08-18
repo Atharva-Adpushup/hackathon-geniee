@@ -1,7 +1,7 @@
 // In-content section component
 
 import React, { PropTypes } from 'react';
-import { reduxForm, change, registerField } from 'redux-form';
+import { reduxForm, change, registerField , formValueSelector} from 'redux-form';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 import validate from './inContentValidations';
@@ -68,6 +68,18 @@ class inContentForm extends React.Component {
 		super(props);
 		this.state = { networkInfo: false, selectedElement: false };
 		this.setNetwork = this.setNetwork.bind(this);
+		this.getAdSize = this.getAdSize.bind(this);
+	}
+
+	/**
+	 * Method to return size of ad which is being created
+	 */
+	getAdSize () {
+		const isCustomAdSize = !!(Number(this.props.customAdSizeWidth) && Number(this.props.customAdSizeHeight));
+		const adSize = this.props.adSize || getSupportedSizes()[0];
+		const computedAdSize = isCustomAdSize ? `${this.props.customAdSizeWidth} x ${this.props.customAdSizeHeight}` : adSize;
+		const [width, height] = computedAdSize.split(/\s+x\s+/);
+		return {width, height};
 	}
 
 	setNetwork(data) {
@@ -111,9 +123,14 @@ inContentForm.propTypes = {
 	showNotification: PropTypes.func
 };
 
+const selector = formValueSelector('inContentForm');
+
 const mapStateToProps = (state, ownProps) => ({
 		...ownProps,
 		customSizes: getCustomSizes(state),
+		adSize: selector(state, 'adSize'), // Added to pass ad size it to NetworkOptions
+		customAdSizeWidth: selector(state, 'customAdSizeWidth'), //  Added to pass ad size to NetworkOptions
+		customAdSizeHeight: selector(state, 'customAdSizeHeight'), //  Added to pass ad size  to NetworkOptions
 		initialValues: {
 			section: 1,
 			float: 'none',

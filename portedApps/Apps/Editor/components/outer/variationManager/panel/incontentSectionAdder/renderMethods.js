@@ -112,6 +112,7 @@ const renderField = field => {
 								isInsertMode={true}
 								zonesData={that.props.zonesData}
 								networkConfig={that.props.networkConfig}
+								ad={{...that.getAdSize()}} // Passing sizes for isResponsive flag
 							/>
 						</Col>
 					</Row>
