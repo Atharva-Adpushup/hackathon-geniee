@@ -362,7 +362,7 @@ class Report extends Component {
 			params[filter] = filters.length > 0 ? filters.toString() : null;
 		});
 
-		if (!params.siteid) {
+		if (!params.siteid && reportType !== 'global') {
 			const siteIds = Object.keys(userSites);
 			params.siteid = siteIds.toString();
 		}
@@ -371,7 +371,7 @@ class Report extends Component {
 			params.isSuperUser = true;
 		}
 
-		if (reportType === 'global') {
+		if (reportType === 'global' && !params.siteid) {
 			params.siteid = '';
 		}
 
