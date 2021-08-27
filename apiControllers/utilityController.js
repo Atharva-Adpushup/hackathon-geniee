@@ -6,7 +6,7 @@ const adpushup = require('../helpers/adpushupEvent');
 const router = express.Router();
 
 router.get('/syncCdn', (req, res) => {
-	const { sites } = req.query;
+	const { sites, forcePrebidBuild } = req.query;
 
 	const commaSeperatedNumbersRegex = /^(\d*,?)+[^,]$/;
 	const isValidSiteIds = commaSeperatedNumbersRegex.test(sites);
@@ -25,7 +25,7 @@ router.get('/syncCdn', (req, res) => {
 			const validSiteIds = [];
 			validSites.forEach(({ siteId }) => {
 				validSiteIds.push(siteId);
-				adpushup.emit('siteSaved', siteId);
+				adpushup.emit('siteSaved', siteId, forcePrebidBuild);
 			});
 
 			return res.status(httpStatus.OK).json({

@@ -84,7 +84,7 @@ var utils = require('../libs/utils'),
 
 				removeBidderTargeting(slot);
 
-				if (adp.config.isBbPlayerEnabledForTesting) {
+				if (!adp.config.isBbPlayerDisabled) {
 					if (adp.config.enableBbPlayerLogging) {
 						sendBbPlayerLogs('refresh', 'refreshAd', slot);
 

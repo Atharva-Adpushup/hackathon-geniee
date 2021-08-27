@@ -26,7 +26,7 @@ const queueConfig = {
 			content: '<p>Consumer failed multiple times. Please check on priority.</p>'
 		},
 		emailId:
-			'abhinav.choudhri@adpushup.com,anil.panghal@adpushup.com, ravi.jagga@adpushup.com, rahul.ranjan@adpushup.com'
+			'abhinav.choudhri@adpushup.com,anil.panghal@adpushup.com,ravi.jagga@adpushup.com,rahul.ranjan@adpushup.com'
 	}
 };
 const QUEUE = CONFIG.RABBITMQ.CDN_SYNC.QUEUE.name;

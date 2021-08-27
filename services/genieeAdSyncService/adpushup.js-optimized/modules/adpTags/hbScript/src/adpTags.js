@@ -199,7 +199,7 @@ var adpTags = {
 			 */
 			if (
 				Array.isArray(optionalParam.formats) &&
-				!adp.config.isBbPlayerEnabledForTesting &&
+				adp.config.isBbPlayerDisabled &&
 				optionalParam.formats.indexOf('video') !== -1
 			) {
 				optionalParam.formats.splice(optionalParam.formats.indexOf('video'), 1);
@@ -260,10 +260,11 @@ var adpTags = {
 				computedSizes = utils.getSizesComputedUsingSizeMappingOrAdUnitSize(adpSlot);
 			}
 
-			return adpSlot.downwardSizesDisabled 
-				? adpSlot.isResponsive ? [computedSizes[0]] : [adpSlot.size]
+			return adpSlot.downwardSizesDisabled
+				? adpSlot.isResponsive
+					? [computedSizes[0]]
+					: [adpSlot.size]
 				: utils.filterComputedSizes(computedSizes, adpSlot.optionalParam.sizeFilters);
-
 		},
 		reInitAfterPostBid: function(w) {
 			// adpSlots in an array

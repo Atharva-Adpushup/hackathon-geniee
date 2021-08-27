@@ -34,7 +34,7 @@ const defaultApConfigValues = {
 	isUrlReportingEnabled: false,
 	isVideoWaitLimitDisabled: false,
 	isSeparatePrebidDisabled: false,
-	isBbPlayerEnabledForTesting: false,
+	isBbPlayerDisabled: false,
 	isPerformanceLoggingEnabled: false,
 	isAutoAddMultiformatDisabled: false,
 	isSiteSpecificPrebidDisabled: false,
