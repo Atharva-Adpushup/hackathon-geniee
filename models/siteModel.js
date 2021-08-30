@@ -79,7 +79,7 @@ var model = require('../helpers/model'),
 				// NOTE: AdPushup does not recommend this use case but we have to support it to complete
 				// our SSP integrations
 				isAdPushupControlWithPartnerSSP: false,
-				isSelectiveRolloutEnabled: true
+				isSelectiveRolloutEnabled: false
 			},
 			channels: [],
 			cmsInfo: {

@@ -412,15 +412,15 @@ Router.get('/prebidBundleConfig', (req, res) => {
 			const { isSelectiveRolloutEnabled = false, isSiteSpecificPrebidDisabled = false } =
 				site.get('apConfigs') || {};
 
-			if (!isSelectiveRolloutEnabled) {
-				return activeBidderAdaptersList;
+			if (isSelectiveRolloutEnabled) {
+				return SelectiveRolloutActiveBidderAdaptersList;
 			}
 
 			if (!isSiteSpecificPrebidDisabled) {
 				return SiteSpecificActiveBidderAdaptersList;
 			}
 
-			return SelectiveRolloutActiveBidderAdaptersList;
+			return activeBidderAdaptersList;
 		})
 		.then(activeBiddersModel =>
 			Promise.join(
@@ -464,15 +464,15 @@ Router.post('/prebidActiveBidderAdapters', (req, res) => {
 			const { isSelectiveRolloutEnabled = false, isSiteSpecificPrebidDisabled = false } =
 				site.get('apConfigs') || {};
 
-			if (!isSelectiveRolloutEnabled) {
-				return activeBidderAdaptersList;
+			if (isSelectiveRolloutEnabled) {
+				return SelectiveRolloutActiveBidderAdaptersList;
 			}
 
 			if (!isSiteSpecificPrebidDisabled) {
 				return SiteSpecificActiveBidderAdaptersList;
 			}
 
-			return SelectiveRolloutActiveBidderAdaptersList;
+			return activeBidderAdaptersList;
 		})
 		.then(activeBiddersModel =>
 			activeBiddersModel
