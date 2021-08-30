@@ -319,7 +319,6 @@ class Settings extends Component {
 					className="u-margin-b4 negative-toggle"
 					checked={isAdsLabelOn}
 					onChange={this.handleToggle}
-					disabled
 					layout="horizontal"
 					size="m"
 					on="Yes"
@@ -328,6 +327,16 @@ class Settings extends Component {
 					name={`isAdsLabelOn-${siteId}-${siteDomain}`}
 					id={`js-isAdsLabelOn-${siteId}-${siteDomain}`}
 				/>
+				{isAdsLabelOn && (
+					<InputBox
+						name="adsLabel"
+						value={adsLabel}
+						type="text"
+						onChange={this.handleChange}
+						placeholder="Ads Label"
+						classNames="u-margin-b4 u-padding-v3 u-padding-h3"
+					/>
+				)}
 				<CustomToggleSwitch
 					labelText="Inject CMP"
 					className="u-margin-b4 negative-toggle"
@@ -341,16 +350,6 @@ class Settings extends Component {
 					name={`cmpEnabled-${siteId}-${siteDomain}`}
 					id={`js-cmpEnabled-${siteId}-${siteDomain}`}
 				/>
-				{isAdsLabelOn && (
-					<InputBox
-						name="adsLabel"
-						value={adsLabel}
-						type="text"
-						onChange={this.handleChange}
-						placeholder="Ads Label"
-						classNames="u-margin-b4 u-padding-v3 u-padding-h3"
-					/>
-				)}
 				<CustomToggleSwitch
 					labelText="SPA"
 					className="u-margin-b4 negative-toggle"
