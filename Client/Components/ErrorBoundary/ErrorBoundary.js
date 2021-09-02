@@ -72,12 +72,11 @@ class ErrorBoundary extends React.Component {
 							</a>
 							.
 							<p style={{ marginTop: '20px', fontSize: '16px' }}>
-							If you wish to go on Dashboard, please{' '}
+							To go back to Dashboard, please{' '}
 							<a href="/dashboard"> Click here</a>
 							.
 						</p>
 						</p>
-						
 					)}
 				</div>
 			);
