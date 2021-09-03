@@ -455,18 +455,27 @@ router
 	.get('/getPaymentHistory', (req, res) => {
 		const { sellerId } = req.query;
 
+		if (!sellerId) {
+			return res
+				.status(HTTP_STATUSES.BAD_REQUEST)
+				.json({ message: 'seller id not available for this user and hence no payment details!!' });
+		}
+
 		return appBucket
 			.getDoc(CC.docKeys.paymentHistoryDoc)
 			.then(doc => {
 				const { value } = doc;
-				if (!value[sellerId]) throw new Error('data of this seller id not present in the doc');
+				if (!value[sellerId]) {
+					return res
+						.status(HTTP_STATUSES.NOT_FOUND)
+						.json({ message: 'payment details of this seller id not present!!' });
+				}
+
 				const dataToSend = value[sellerId];
 
 				return res.status(HTTP_STATUSES.OK).json(dataToSend);
 			})
 			.catch(err => {
-				// eslint-disable-next-line no-console
-				console.log(err);
 				if (err instanceof AdPushupError && Array.isArray(err.message)) {
 					return res.status(HTTP_STATUSES.BAD_REQUEST).json({ error: err.message });
 				}
