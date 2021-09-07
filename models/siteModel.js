@@ -43,7 +43,8 @@ var model = require('../helpers/model'),
 			'dataFeedActive',
 			'prebidBundleName',
 			'activeBidderAdaptersListAsc',
-			'coreWebVitalsData'
+			'coreWebVitalsData',
+			'lineItemTypes'
 		];
 		this.clientKeys = [
 			'siteId',
@@ -65,7 +66,8 @@ var model = require('../helpers/model'),
 			'dataFeedActive',
 			'prebidBundleName',
 			'activeBidderAdaptersListAsc',
-			'coreWebVitalsData'
+			'coreWebVitalsData',
+			'lineItemTypes'
 		];
 		this.validations = {
 			required: []

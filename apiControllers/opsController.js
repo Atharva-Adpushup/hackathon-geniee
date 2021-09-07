@@ -28,11 +28,10 @@ const {
 } = require('../helpers/routeHelpers');
 const opsModel = require('../models/opsModel');
 const apLiteModel = require('../models/apLiteModel');
-const FormValidator = require('../helpers/FormValidator');
-const schema = require('../helpers/schema');
-const AdPushupError = require('../helpers/AdPushupError');
-const channelModel = require('../models/channelModel');
-const { updateAdUnitData } = require('../models/opsModel');
+const pnpModel = require('../models/pnpRefreshModel');
+const opsService = require('../apiServices/opsService');
+const ObjectValidator = require('../helpers/ObjectValidator');
+const opsValidations = require('../validations/opsValidations');
 
 const router = express.Router();
 
@@ -787,5 +786,38 @@ router
 					res
 				);
 		}
+	})
+	.put('/pnp-refresh/:siteId', async (req, res) => {
+		const pnpConfig = _.cloneDeep(req.body);
+		const { siteId } = req.params;
+		const { email } = req.user;
+
+		try {
+			await ObjectValidator(opsValidations.pnpConfigValidation, pnpConfig);
+			await opsService.updateExistingApTags(pnpConfig);
+			const updatedConfig = await opsService.updatePnPConfig(siteId, email, pnpConfig);
+			await opsService.initScriptSync(updatedConfig.get('pnpSiteId'));
+			await opsService.initScriptSync(siteId);
+
+			return sendSuccessResponse(updatedConfig.toClientJSON(), res, HTTP_STATUSES.OK);
+		} catch (err) {
+			const { message } = err || {};
+			let errorMessage = message;
+			if (Array.isArray(message)) {
+				errorMessage = message[0].message;
+			}
+			if (!errorMessage) errorMessage = 'Something went wrong';
+			return sendErrorResponse({ message: errorMessage }, res, HTTP_STATUSES.BAD_REQUEST);
+		}
+	})
+	.get('/pnp-refresh/:siteId', (req, res) => {
+		const { siteId } = req.params;
+		return pnpModel
+			.getPnPConfig(siteId)
+			.then(config => sendSuccessResponse(config, res, HTTP_STATUSES.OK))
+			.catch(err => {
+				if (err && err.code === 13) return sendSuccessResponse({}, res, HTTP_STATUSES.OK);
+				return sendErrorResponse(err, res, HTTP_STATUSES.BAD_REQUEST);
+			});
 	});
 module.exports = router;

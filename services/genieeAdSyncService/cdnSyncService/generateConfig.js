@@ -178,7 +178,7 @@ function HbProcessing(site, apConfigs) {
 
 function init(site, computedConfig) {
 	const apps = site.get('apps');
-	const { apConfigs, prebidConfig, apLiteConfig } = computedConfig;
+	const { apConfigs, prebidConfig, apLiteConfig, pnpConfig } = computedConfig;
 	let statusesAndAds = {
 		statuses: {
 			APTAG_ACTIVE: !!apConfigs.manualModeActive,
@@ -187,11 +187,17 @@ function init(site, computedConfig) {
 			ADPTAG_ACTIVE: !!prebidConfig,
 			SPA_ACTIVE: !!apConfigs.isSPA,
 			GENIEE_ACTIVE: !!apConfigs.partner,
-			AP_LITE_ACTIVE: !!(apps && apps.apLite && apLiteConfig)
+			AP_LITE_ACTIVE: !!(apps && apps.apLite && apLiteConfig),
+			PNP_REFRESH_ACTIVE: !!(apps && apps.pnp && pnpConfig)
 		},
 		ads: {},
 		config: {}
 	};
+	
+	if (!statusesAndAds.statuses.PNP_REFRESH_ACTIVE) {
+		// Remove PnP script when disabled to avoid script bloating
+		apConfigs.pnpScript = '';
+	}
 
 	return Promise.join(
 		HbProcessing(site, apConfigs),
@@ -231,6 +237,7 @@ function init(site, computedConfig) {
 			};
 
 			if (apps && apps.apLite) output.apLiteConfig = apLiteConfig;
+			if (apps && apps.pnp) output.pnpConfig = pnpConfig;
 
 			return output;
 		}

@@ -379,6 +379,9 @@ class Report extends Component {
 			params.siteid = getReportingDemoUserSiteIds(params.siteid, email, reportType);
 		}
 
+		// cache can be bypassed for smoke testing in production by adding a key in localStorage.
+		params.bypassCache = window.localStorage.getItem('apBypassReportCache') || 'false';
+
 		return params;
 	};
 

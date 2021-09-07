@@ -27,7 +27,6 @@ class Settings extends Component {
 			hbAnalytics = false,
 			cmpAvailable = false,
 			mergeReport = false,
-			isPnp = false,
 			isWeeklyEmailReportsEnabled = false,
 			isDailyEmailReportsEnabled = false,
 			enableGAAnalytics = false,
@@ -40,6 +39,7 @@ class Settings extends Component {
 		} = site.apConfigs || {};
 		const { revenueShare = 10 } = site.adNetworkSettings || {};
 		const status = Object.prototype.hasOwnProperty.call(apps, 'apLite') ? apps.apLite : undefined;
+		const isPnPEnabled = Object.prototype.hasOwnProperty.call(apps, 'pnp') ? apps.pnp : false;
 
 		this.state = {
 			isSPA,
@@ -54,14 +54,14 @@ class Settings extends Component {
 			hbAnalytics,
 			cmpEnabled: !cmpAvailable,
 			mergeReport,
-			isPnp,
 			isWeeklyEmailReportsEnabled,
 			isDailyEmailReportsEnabled,
 			enableGAAnalytics,
 			gaTrackingId,
 			viewId,
 			accessEmail,
-			gaVersion
+			gaVersion,
+			pnp: isPnPEnabled
 		};
 	}
 
@@ -83,6 +83,22 @@ class Settings extends Component {
 					spaButUsingHook: false,
 					spaPageTransitionTimeout: 0
 				};
+			}
+			if (name === 'pnp') {
+				const shouldUpdate = value ? confirm('Are you sure you wanna enable PnP?') : true;
+				if (shouldUpdate) {
+					return updateAppStatus(
+						site.siteId,
+						{
+							app: 'pnp',
+							value
+						},
+						{
+							...dataForAuditLogs,
+							actionInfo: `Updated: ${name} - ${value}`
+						}
+					).then(() => this.setState({ [name]: value }));
+				}
 			}
 
 			if (name !== 'apLite') {
@@ -265,7 +281,8 @@ class Settings extends Component {
 			gaTrackingId,
 			viewId,
 			accessEmail,
-			gaVersion
+			gaVersion,
+			pnp
 		} = this.state;
 		const { site } = this.props;
 
@@ -288,12 +305,25 @@ class Settings extends Component {
 					id={`js-apLite-${siteId}-${siteDomain}`}
 				/>
 				<CustomToggleSwitch
+					labelText="PnP"
+					className="u-margin-b4 negative-toggle"
+					checked={pnp}
+					onChange={this.handleToggle}
+					layout="horizontal"
+					size="m"
+					on="Yes"
+					off="No"
+					defaultLayout
+					name={`pnp-${siteId}-${siteDomain}`}
+					id={`js-pnp-${siteId}-${siteDomain}`}
+				/>
+				<CustomToggleSwitch
 					labelText="Merge Pnp Report"
 					className="u-margin-b4 negative-toggle"
 					checked={mergeReport}
 					onChange={this.handleToggle}
 					layout="horizontal"
-					disabled={!site.apConfigs.isPnp}
+					disabled={!(status && pnp)}
 					size="m"
 					on="Yes"
 					off="No"

@@ -6,6 +6,8 @@ import AppsContainer from '../../../containers/AppsContainer';
 import SettingsContainer from '../../../containers/SettingsContainer';
 import ApLiteContainer from '../../../containers/ApLiteContainer';
 import SiteLevelBeforeJSContainer from '../../../containers/SiteLevelBeforeJSContainer';
+import PnPContainer from '../../../containers/PnpContainer';
+import LineItemTypeRefreshContainer from '../../../containers/LineItemTypeRefreshContainer';
 
 const SiteBody = props => {
 	const { site, showNotification, saveSettings, dataForAuditLogs } = props;
@@ -30,11 +32,13 @@ const SiteBody = props => {
 					site={site}
 					showNotification={showNotification}
 				/>
+				<PnPContainer site={site} showNotification={showNotification} />
 				<PagegroupContainer
 					dataForAuditLogs={dataForAuditLogs}
 					site={site}
 					showNotification={showNotification}
 				/>
+				<LineItemTypeRefreshContainer site={site} />
 				<SiteLevelBeforeJSContainer
 					dataForAuditLogs={dataForAuditLogs}
 					site={site}

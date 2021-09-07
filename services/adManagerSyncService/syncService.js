@@ -1,6 +1,7 @@
 const getLogger = require('./Logger');
 const Database = require('./db');
 const ServiceStatus = require('./serviceStatus');
+const Promise = require("bluebird");
 
 const {
     serviceStatusPingDelayMs,
@@ -23,6 +24,9 @@ const {
     }
 } = require('../../configs/config');
 
+const { LINE_ITEM_TYPES: LINE_ITEM_TYPES_OBJ } = require("../../configs/lineItemsConstants");
+let LINE_ITEM_TYPES = LINE_ITEM_TYPES_OBJ.map(type => type.value).filter(type => type !== "CUSTOM");
+
 const dfpUserConfig = {
     networkCode: '', 
     appName, 
@@ -41,32 +45,67 @@ const LineItemsService = require('./LineItemsService');
 const db = new Database(dbConfig);
 const logger = getLogger();
 
+const getLineItems = async (lineItemsService, type) => {
+    const count = 500;
+    let offset = 0;
+    let updatedCount = 0;
+    let hasMore = true;
+    let results = [];
+    // make paginated requests and collect all data
+    while(hasMore) {
+        // @TODO: retry on failure
+        const {results: lineItems, total} = await lineItemsService.getLineItemsByType(offset, count, type);
+        results = [...results, ...lineItems];
+        offset += count;
+        updatedCount += lineItems.length;
+        hasMore = total > 0 && updatedCount < total;
+    }
+    return {type, results, updatedCount};
+}
+
 const updateLineItemsForNetwork = async (dfpConfig) => {
     try {
-        const count = 500;
-        let offset = 0;
-        let updatedCount = 0;
-        let hasMore = true;
         const lineItemsService = new LineItemsService(dfpConfig, logger);
-        // make paginated requests and collect all data
-        while(hasMore) {
-            // @TODO: retry on failure
-            const {results: lineItems, total} = await lineItemsService.getPricePriorityLineItems(offset, count);
-            let dbResult = null;
-            if(offset === 0) {
-                dbResult = await db.upsertDoc(`ntwk::${dfpConfig.networkCode}`, {networkCode: dfpConfig.networkCode, lineItems, lastUpdated: +new Date()});
-            } else {
-                dbResult = await db.arrayConcat(`ntwk::${dfpConfig.networkCode}`, 'lineItems', lineItems);
+        await lineItemsService.initService();
+        const promises = await Promise.allSettled(LINE_ITEM_TYPES.map(type => getLineItems(lineItemsService, type)));
+        // Get only fulfilled promises
+        let results = promises.reduce((accumulator, promise) => {
+            if(promise.isFulfilled()) {
+                accumulator.push(promise.value());
             }
-            if(dbResult instanceof Error) return dbResult;
-            offset += count;
-            updatedCount += lineItems.length;
-            hasMore = total > 0 && updatedCount < total;
+            return accumulator;
+        }, []);
+        let doc = await db.getDoc(`ntwk::${dfpConfig.networkCode}`);
+        // Update structure of the ntwk doc if its still old
+        if (!doc || !(LINE_ITEM_TYPES.every(type => type in doc.lineItems))) {
+            doc =  {networkCode: dfpConfig.networkCode, lastUpdated: +new Date()};
+            doc.lineItems = LINE_ITEM_TYPES.reduce((accumulator, type) => {
+                accumulator[type] = [];
+                return accumulator;
+            }, {});
+            doc.lineItems.CUSTOM = []; // CUSTOM is removed from LINE_ITEM_TYPES as its not supposed to be fetched from GAM
         }
+        // Replace each key with newly fetched lineitems array
+        for (result of results) {
+            doc.lineItems[result.type] = result.results;
+        }
+        // Update last updated timestamp
+        doc.lastUpdated = +new Date();
+        let dbResult = await db.upsertDoc(`ntwk::${dfpConfig.networkCode}`, doc);
+        if (dbResult instanceof Error) {
+            throw dbResult;
+        }
+        
+        // Get the total number of lineItems fetched across all types
+        const updatedCount = results.reduce((accumulator, result) => {
+            accumulator += result.updatedCount;
+            return accumulator;
+        }, 0);
+
         return updatedCount;
     } catch(ex) {
         logger.error({message: 'Error updating adpushup network lineitems', debugData: {ex}});
-        return ex;
+        throw ex;
     }
 };
 

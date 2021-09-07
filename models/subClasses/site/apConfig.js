@@ -33,7 +33,8 @@ const ApConfig = {
 		'bidInflationPercentage',
 		'isABTestingForBidInflationEnabled',
 		'gaConfigs',
-		'isSelectiveRolloutEnabled'
+		'isSelectiveRolloutEnabled',
+		'pnpScript'
 	],
 	override: [
 		'mode',
@@ -69,7 +70,8 @@ const ApConfig = {
 		'bidInflationPercentage',
 		'isABTestingForBidInflationEnabled',
 		'gaConfigs',
-		'isSelectiveRolloutEnabled'
+		'isSelectiveRolloutEnabled',
+		'pnpScript'
 	],
 	merge: []
 };

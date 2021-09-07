@@ -17,6 +17,7 @@ const generatePrebidConfig = require('../services/genieeAdSyncService/cdnSyncSer
 const generateApLiteAdsConfig = require('../services/genieeAdSyncService/cdnSyncService/generateApLiteConfig');
 const generateAdNetworkConfig = require('../services/genieeAdSyncService/cdnSyncService/generateAdNetworkConfig');
 const generateAdPushupAdsConfig = require('../services/genieeAdSyncService/cdnSyncService/generateAdPushupConfig');
+const generatePnPRefreshConfig = require('../services/genieeAdSyncService/cdnSyncService/generatePnPRefreshConfig');
 const AdPushupError = require('../helpers/AdPushupError');
 const httpStatusConsts = require('../configs/httpStatusConsts');
 const {
@@ -55,6 +56,7 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 				site.get('apConfigs') && site.get('apConfigs').poweredByBannerOnDocked
 			);
 			const gptSraDisabled = !!(site.get('apConfigs') && site.get('apConfigs').gptSraDisabled);
+			const lineItemTypes = site.get('lineItemTypes') || [];
 
 			const setAllConfigs = function(prebidAndAdsConfig) {
 				const apConfigs = {
@@ -67,6 +69,7 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 					experiment,
 					prebidConfig,
 					apLiteConfig,
+					pnpConfig,
 					adNetworkConfig,
 					manualAds,
 					innovativeAds
@@ -127,6 +130,7 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 
 				const output = { apConfigs, prebidConfig };
 				if (apps.apLite) output.apLiteConfig = apLiteConfig;
+				if (apps.pnp) output.pnpConfig = pnpConfig;
 
 				return output;
 			};
@@ -153,7 +157,7 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 					null;
 
 				if (activeDFPNetwork) {
-					return generateAdNetworkConfig(activeDFPNetwork).then(adNetworkConfig => ({
+					return generateAdNetworkConfig(activeDFPNetwork, lineItemTypes).then(adNetworkConfig => ({
 						...prebidAndAdsConfig,
 						adNetworkConfig
 					}));
@@ -161,12 +165,26 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 
 				return Promise.resolve(prebidAndAdsConfig);
 			};
+			const setPnPConfig = function(combinedConfig) {
+				const pnpActive = !!apps.pnp;
+				if (pnpActive) {
+					return generatePnPRefreshConfig(siteId, combinedConfig.adNetworkConfig).then(
+						pnpConfig => ({
+							...combinedConfig,
+							pnpConfig
+						})
+					);
+				}
+
+				return Promise.resolve(combinedConfig);
+			};
 			const getPrebidAndAdsConfig = () =>
 				(() => {
 					if (apps.apLite) {
-						return Promise.join(generatePrebidConfig(siteId), generateApLiteAdsConfig(siteId)).then(
-							([prebidConfig, apLiteConfig]) => ({ prebidConfig, apLiteConfig })
-						);
+						return Promise.join(
+							generatePrebidConfig(siteId),
+							generateApLiteAdsConfig(siteId)
+						).then(([prebidConfig, apLiteConfig]) => ({ prebidConfig, apLiteConfig }));
 					}
 
 					return getReportData(site)
@@ -179,6 +197,7 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 						.spread(combinePrebidAndAdsConfig);
 				})()
 					.then(setAdNetworkConfig)
+					.then(setPnPConfig)
 					.then(setAllConfigs);
 
 			const generatedConfig = getPrebidAndAdsConfig().then(prebidAndAdsConfig => {
@@ -228,6 +247,7 @@ Router.get('/:siteId/ampSiteConfig', (req, res) => {
 		.then(site => Promise.join(site, UserModel.getUserByEmail(site.get('ownerEmail'))))
 		.then(([site, user]) => {
 			const siteId = site.get('siteId');
+			const lineItemTypes = site.get('lineItemTypes') || [];
 
 			const generateApConfig = function(prebidAndAdsConfig) {
 				// TODO: rj: to check hb status
@@ -295,7 +315,7 @@ Router.get('/:siteId/ampSiteConfig', (req, res) => {
 					return ampScriptConfig;
 				});
 
-			const getRefreshLineItems = function(userModel) {
+			const getRefreshLineItems = function(userModel, lineItemTypesToRefresh) {
 				const adServerSettings = userModel.get('adServerSettings');
 				const activeDFPNetwork =
 					(adServerSettings && adServerSettings.dfp && adServerSettings.dfp.activeDFPNetwork) ||
@@ -303,19 +323,21 @@ Router.get('/:siteId/ampSiteConfig', (req, res) => {
 
 				if (!activeDFPNetwork) return null;
 
-				return generateAdNetworkConfig(activeDFPNetwork).then(adNetworkConfig => {
-					const isValidRefreshLineItems =
-						adNetworkConfig &&
-						adNetworkConfig.lineItems &&
-						Array.isArray(adNetworkConfig.lineItems) &&
-						adNetworkConfig.lineItems.length;
+				return generateAdNetworkConfig(activeDFPNetwork, lineItemTypesToRefresh).then(
+					adNetworkConfig => {
+						const isValidRefreshLineItems =
+							adNetworkConfig &&
+							adNetworkConfig.lineItems &&
+							Array.isArray(adNetworkConfig.lineItems) &&
+							adNetworkConfig.lineItems.length;
 
-					if (!isValidRefreshLineItems) {
-						return null;
+						if (!isValidRefreshLineItems) {
+							return null;
+						}
+
+						return adNetworkConfig.lineItems;
 					}
-
-					return adNetworkConfig.lineItems;
-				});
+				);
 			};
 
 			const getCurrencyConfig = function() {
@@ -335,17 +357,20 @@ Router.get('/:siteId/ampSiteConfig', (req, res) => {
 			};
 
 			const getFirstImpressionRefreshLineItems = function(firstImpressionSiteId) {
-				return SiteModel.getSiteById(parseInt(firstImpressionSiteId, 10))
-					.then(firstImpressionSite =>
-						UserModel.getUserByEmail(firstImpressionSite.get('ownerEmail'))
-					)
-					.then(firstImpressionUser => getRefreshLineItems(firstImpressionUser));
+				return SiteModel.getSiteById(parseInt(firstImpressionSiteId, 10)).then(
+					firstImpressionSite => {
+						const firstImpressionLineItemTypes = firstImpressionSite.get('lineItemTypes') || [];
+						return UserModel.getUserByEmail(firstImpressionSite.get('ownerEmail')).then(userDoc =>
+							getRefreshLineItems(userDoc, firstImpressionLineItemTypes)
+						);
+					}
+				);
 			};
 
 			return Promise.join(
 				generatePrebidConfig(siteId),
 				generateAmpScriptAdsConfig(siteId),
-				getRefreshLineItems(user),
+				getRefreshLineItems(user, lineItemTypes),
 				getSizeMappingConfigFromCB(),
 				getCurrencyConfig()
 			)
