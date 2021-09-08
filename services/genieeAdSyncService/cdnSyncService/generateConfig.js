@@ -193,7 +193,7 @@ function init(site, computedConfig) {
 		ads: {},
 		config: {}
 	};
-	
+
 	if (!statusesAndAds.statuses.PNP_REFRESH_ACTIVE) {
 		// Remove PnP script when disabled to avoid script bloating
 		apConfigs.pnpScript = '';
