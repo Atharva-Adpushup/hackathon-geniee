@@ -12,17 +12,6 @@
 			"max_memory_restart": "1G"
 		},
 		{
-			"name": "cdnSyncConsumer",
-			"script": "./cdnSyncConsumer.js",
-			"log_date_format": "YYYY-MM-DD HH:mm Z",
-			"instances": "1",
-			"exec_mode": "fork_mode",
-			"env": {
-				"NODE_ENV": "production"
-			},
-			"max_memory_restart": "1G"
-		},
-		{
 			"name": "markActiveSitesAndUpdateAdsTxtDocService",
 			"script": "./services/crons/commonService.js",
 			"log_date_format": "YYYY-MM-DD HH:mm Z",
