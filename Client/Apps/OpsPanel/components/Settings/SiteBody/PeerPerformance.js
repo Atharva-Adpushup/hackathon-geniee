@@ -1,5 +1,5 @@
 import React from 'react';
-import MultiSelect from 'react-multi-select-component';
+import { MultiSelect } from 'react-multi-select-component';
 
 const PeerPerformance = ({ options, selected = [], handlePeerSelect, isLoaded }) => {
 	const customValueRenderer = selectedItems =>
