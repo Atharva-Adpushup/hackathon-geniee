@@ -145,6 +145,25 @@ class Database {
             }
         });
     }
+
+    replaceKey(id, path, data) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                if(!this.bucket) {
+                    await this.connect();
+                }
+                this.bucket
+                .mutateIn(id)
+                .replace(path, data)
+                .execute((err) => {
+                    if(err) return reject(err);
+                    return resolve(true);
+                });
+            } catch(ex) {
+                return reject(ex);
+            }
+        });
+    }
 }
 
 module.exports = Database;

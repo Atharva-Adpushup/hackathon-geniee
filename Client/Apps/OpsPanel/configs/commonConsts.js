@@ -513,6 +513,20 @@ const HB_BIDDERS_KEYS_NULL_SHOULD_NOT_BE_NULL = [
 ];
 
 const REFRESH_RATE_ENTRIES = [
+	{ name: '30 seconds', value: 30, default: true },
+	{ name: '60 seconds', value: 60 },
+	{ name: '90 seconds', value: 90 },
+	{ name: '120 seconds', value: 120 },
+	{ name: '180 seconds', value: 180 },
+	{ name: '240 seconds', value: 240 },
+	{ name: '300 seconds', value: 300 },
+	{ name: '360 seconds', value: 360 }
+];
+
+const UNFILLED_REFRESH_RATE_ENTRIES = [
+	{ name: '5 seconds', value: 5, default: true },
+	{ name: '10 seconds', value: 10 },
+	{ name: '20 seconds', value: 20 },
 	{ name: '30 seconds', value: 30 },
 	{ name: '60 seconds', value: 60 },
 	{ name: '90 seconds', value: 90 },
@@ -565,6 +579,10 @@ const ACTION_KEY_OPTIONS = [
 
 const WEEKEND = ['saturday', 'sunday'];
 const WEEKDAY = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+const PNP_REFRESH_TYPES = [
+	{ name: 'Active View Refresh', value: 'activeView' },
+	{ name: 'Active Tab Refresh', value: 'activeTab' }
+];
 
 const GA_ACCESS_EMAIL_OPTIONS = [
 	{
@@ -624,5 +642,7 @@ export {
 	WEEKDAY,
 	WEEKEND,
 	GA_ACCESS_EMAIL_OPTIONS,
-	GA_VERSION_OPTIONS
+	GA_VERSION_OPTIONS,
+	UNFILLED_REFRESH_RATE_ENTRIES,
+	PNP_REFRESH_TYPES
 };

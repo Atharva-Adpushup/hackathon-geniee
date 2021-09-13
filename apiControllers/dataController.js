@@ -1,5 +1,4 @@
 const express = require('express');
-const atob = require('atob');
 const _ = require('lodash');
 
 const userModel = require('../models/userModel');
@@ -76,7 +75,7 @@ router
 						mode: CC.site.mode.DRAFT,
 						isAdPushupControlWithPartnerSSP: CC.apConfigDefaults.isAdPushupControlWithPartnerSSP,
 						autoOptimise: false,
-						isSelectiveRolloutEnabled: true
+						isSelectiveRolloutEnabled: false
 					}
 				};
 				return siteModel.saveSiteData(siteId, 'POST', siteData);

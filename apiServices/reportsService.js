@@ -183,13 +183,14 @@ const reportsService = {
 	getReportingMetaData: (siteid, isSuperUser) => {
 		const params = { siteid, isSuperUser };
 		return ObjectValidator(getMetaDataValidations, params)
-			.then(() =>
-				request({
+			.then(() => reportsService.modifyQueryIfPnp(params))
+			.then(params => {
+				return request({
 					uri: `${CC.ANALYTICS_API_ROOT}${CC.ANALYTICS_METAINFO_URL}`,
 					json: true,
 					qs: params
 				})
-			)
+			})
 			.then(response => {
 				const { code = -1, data } = response;
 				if (code !== 1) return Promise.reject(new Error(response.data));
@@ -197,28 +198,25 @@ const reportsService = {
 			});
 	},
 	modifyQueryIfPnp: query => {
-		const modifiedQuery = _.cloneDeep(query);
 		const regex = new RegExp('^[0-9]*(,[0-9]+)*$');
-		if (!query.siteid) return modifiedQuery;
-		if (!regex.test(modifiedQuery.siteid)) {
+		if (!query.siteid) return query;
+		if (!regex.test(query.siteid)) {
 			throw new Error('Invalid parameter in query.siteid');
 		}
-		const siteIds = modifiedQuery.siteid.split(',');
+		const siteIds = query.siteid.split(',').map(siteId => parseInt(siteId));
+		const pnpQuery = CC.GET_ACTIVE_PNP_SITE_MAPPING_QUERY.replace('$1', JSON.stringify(siteIds));
 		const dbQuery = couchbase.N1qlQuery.fromString(
-			`select buc.mappedPnpSiteId from AppBucket 
-				as buc where meta().id like 'site::%'
-				and buc.siteId in [${siteIds}]
-				and buc.mappedPnpSiteId is not missing
-				and buc.apConfigs.mergeReport = true
-			`
+			pnpQuery
 		);
 		return queryViewFromAppBucket(dbQuery)
 			.then(data => {
 				// data is array of objects e.g.. [{mappedPnpSiteId: 41355}, {mappedPnpSiteId:41395}]
-				data.forEach(ele => {
-					modifiedQuery.siteid += `,${ele.mappedPnpSiteId}`;
-				});
-				return modifiedQuery;
+				if (data && Array.isArray(data) && data.length) {
+					const pnpSiteIds = data.reduce((result, { pnpSiteId }) => `${pnpSiteId},${result}`, '');
+					const newSiteIds =  `${pnpSiteIds}${siteIds.join(',')}`;
+					query.siteid = newSiteIds;
+				}
+				return query;
 			})
 			.catch(err => {
 				console.error(err);

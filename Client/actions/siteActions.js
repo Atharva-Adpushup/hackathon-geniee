@@ -208,6 +208,10 @@ const resetSiteInventories = siteId => dispatch => {
 	dispatch({ type: SITE_ACTIONS.UPDATE_SITE_INVENTORIES, data: { siteId, inventories: [] } });
 };
 
+const updateSiteData = (siteId, data) => dispatch => {
+	dispatch({ type: SITE_ACTIONS.UPDATE_SITE_DATA, data: { siteId, ...data } });
+};
+
 export {
 	fetchAppStatuses,
 	addNewSite,
@@ -220,5 +224,6 @@ export {
 	updateSite,
 	deleteSite,
 	fetchSiteInventories,
-	resetSiteInventories
+	resetSiteInventories,
+	updateSiteData
 };

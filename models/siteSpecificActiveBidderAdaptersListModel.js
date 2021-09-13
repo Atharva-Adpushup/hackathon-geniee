@@ -5,7 +5,6 @@ const couchbase = require('../helpers/couchBaseService');
 // const { docKeys } = require('../configs/commonConsts');
 const commonConsts = require('../configs/commonConsts');
 const N1qlQuery = require('couchbase').N1qlQuery;
-const HeaderBiddingModel = require('./headerBiddingModel');
 const SiteModel = require('./siteModel');
 
 function apiModule() {

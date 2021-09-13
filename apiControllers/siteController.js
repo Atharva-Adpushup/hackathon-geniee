@@ -1,6 +1,7 @@
 const express = require('express');
 const Promise = require('bluebird');
 const _ = require('lodash');
+
 // eslint-disable-next-line no-unused-vars
 // const woodlotCustomLogger = require('woodlot').customLogger;
 const userModel = require('../models/userModel');
@@ -26,6 +27,7 @@ const {
 } = require('../helpers/routeHelpers');
 const proxy = require('../helpers/proxy');
 const pageGroupController = require('./pageGroupController');
+const utils = require('../helpers/utils');
 
 const {
 	AUDIT_LOGS_ACTIONS: { OPS_PANEL, MY_SITES }
@@ -496,6 +498,13 @@ router
 					});
 
 					site.set(key, data);
+					if (value.pnp) {
+						// We need to append pnp script to apConfigs.pnpScript when pnp is toggled on
+						const apConfigs = site.get('apConfigs');
+						const pnpCodeHex = utils.btoa(CC.PNP_REFRESH_SCRIPTS);
+						const newApConfigs = { ...apConfigs, pnpScript: pnpCodeHex };
+						site.set('apConfigs', newApConfigs);
+					}
 					if (requireResponse) toSend.push({ key, value: data });
 				});
 
