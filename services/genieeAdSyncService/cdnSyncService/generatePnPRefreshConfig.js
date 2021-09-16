@@ -29,7 +29,8 @@ const generatePnPRefreshConfig = (siteId, adNetworkConfig) => {
     const emptyResponse = {};
 
     const {
-        lineItems = []
+        lineItems = [],
+        separatelyGroupedLineItems = {}
     } = adNetworkConfig || {};
 
     return dbHelper.getDoc(`${docKeys.pnpRefresh}${siteId}`)
@@ -53,7 +54,12 @@ const generatePnPRefreshConfig = (siteId, adNetworkConfig) => {
             if (Array.isArray(pnpLineItems) && pnpLineItems.length) {
                 pnpConfig.lineItems = pnpLineItems.map(lineItem => lineItem.id);
             } else {
-                pnpConfig.lineItems = lineItems;
+                let allLineItems = Object.keys(separatelyGroupedLineItems).reduce((accumulator, currValue) => {
+                    accumulator = [...accumulator, ...separatelyGroupedLineItems[currValue]];
+                    return accumulator;
+                }, []);
+                allLineItems = [...allLineItems, ...separatelyGroupedLineItems];
+                pnpConfig.lineItems = allLineItems;
             }
 
             return pnpConfig;

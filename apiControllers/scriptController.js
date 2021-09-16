@@ -336,7 +336,7 @@ Router.get('/:siteId/ampSiteConfig', (req, res) => {
 							return null;
 						}
 						const groupedLineItems = Object.keys(adNetworkConfig.separatelyGroupedLineItems).reduce((accumulator, currValue) => {
-							accumulator.push(adNetworkConfig.separatelyGroupedLineItems[currValue]);
+							accumulator = [...accumulator, ...adNetworkConfig.separatelyGroupedLineItems[currValue]];
 							return accumulator;
 						}, []);
 						
