@@ -2,8 +2,7 @@ const getLogger = require('./Logger');
 const Database = require('./db');
 const ServiceStatus = require('./serviceStatus');
 const Promise = require('bluebird');
-const ejs = require("ejs");
-
+const { sendEmail } = require('../../helpers/queueMailer');
 const {
 	serviceStatusPingDelayMs,
 	serviceStatusDocExpiryDays,
@@ -17,7 +16,8 @@ const {
 	ADPUSHUP_GAM: {
 		ACTIVE_DFP_NETWORK: ADPUSHUP_DFP_NETWORK_CODE,
 		REFRESH_TOKEN: ADPUSHUP_REFRSH_TOKEN,
-		OAUTH_CALLBACK: ADPUSHUP_OAUTH_CALLBACK
+		OAUTH_CALLBACK: ADPUSHUP_OAUTH_CALLBACK,
+		HB_ORDER_IDS: ADPUSHUP_HB_ORDER_IDS
 	},
 	googleOauth: { OAUTH_CLIENT_ID: ADPUSHUP_CLIENT_ID, OAUTH_CLIENT_SECRET: ADPUSHUP_CLIENT_SECRET }
 } = require('../../configs/config');
@@ -107,7 +107,6 @@ const updateLineItemsForNetwork = async (dfpConfig, hbOrderIds) => {
                 doc.lineItems["HEADER_BIDDING"] = result.hbResults;
             }
         }
-        doc.lineItems['HEADER_BIDDING'] = allHbLineItems;
 		// Update last updated timestamp
 		doc.lastUpdated = +new Date();
 		let dbResult = await db.upsertDoc(`ntwk::${dfpConfig.networkCode}`, doc);
@@ -189,7 +188,7 @@ const updateLineItemsForAdPushupDfp = async () => {
 			networkCode: ADPUSHUP_DFP_NETWORK_CODE,
 			...dfpAuthConfig
 		};
-		return await updateLineItemsForNetwork(dfpConfig);
+		return await updateLineItemsForNetwork(dfpConfig, ADPUSHUP_HB_ORDER_IDS);
 	} catch (ex) {
 		logger.error({ message: 'updateLineItemsForAdPushupDfp::ERROR', debugData: { ex } });
 		return ex;
@@ -204,6 +203,7 @@ async function runService() {
 		serviceStatusDocExpiryDays,
 		logger
 	);
+	let serviceSuccess = false;
 	try {
 		// check if any service instance is already running
 		const isSyncAlreadyRunning = await serviceStatus.isSyncRunning();
@@ -239,6 +239,7 @@ async function runService() {
 		return ex;
 	} finally {
 		await serviceStatus.stopServiceStatusPing();
+		sendEmail
 	}
 }
 

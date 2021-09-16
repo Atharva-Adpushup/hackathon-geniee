@@ -1,4 +1,5 @@
 // Used in client as well
+// isDisabled is for 
 
 const LINE_ITEM_TYPES = [
     {
@@ -7,7 +8,6 @@ const LINE_ITEM_TYPES = [
         key: 'AD_EXCHANGE',
         isMandatory: true,
         toBeFetchedFromGAM: true,
-        groupedSeperatelyInScript: false
     },
     {
         name: 'Price Priority',
@@ -15,49 +15,42 @@ const LINE_ITEM_TYPES = [
         key: 'PRICE_PRIORITY',
         isMandatory: true,
         toBeFetchedFromGAM: true,
-        groupedSeperatelyInScript: false
     },
     {
         name: 'Sponsorship',
         value: 'SPONSORSHIP',
         key: 'SPONSORSHIP',
         toBeFetchedFromGAM: true,
-        groupedSeperatelyInScript: false
     },
     {
         name: 'Standard',
         value: 'STANDARD',
         key: 'STANDARD',
         toBeFetchedFromGAM: true,
-        groupedSeperatelyInScript: false
     },
     {
         name: 'Network',
         value: 'NETWORK',
         key: 'NETWORK',
         toBeFetchedFromGAM: true,
-        groupedSeperatelyInScript: false
     },
     {
         name: 'Bulk',
         value: 'BULK',
         key: 'BULK',
         toBeFetchedFromGAM: true,
-        groupedSeperatelyInScript: false
     },
     {
         name: 'House',
         value: 'HOUSE',
         key: 'HOUSE',
         toBeFetchedFromGAM: true,
-        groupedSeperatelyInScript: false
     },
     {
         name: 'Adsense',
         value: 'ADSENSE',
         key: 'ADSENSE',
         toBeFetchedFromGAM: true,
-        groupedSeperatelyInScript: false
     },
     {
         name: 'Custom',
@@ -66,15 +59,15 @@ const LINE_ITEM_TYPES = [
         isDisabled: true,
         isMandatory: true,
         toBeFetchedFromGAM: false,
-        groupedSeperatelyInScript: false
     },
     {
         name: 'Header Bidding',
         value: 'HEADER_BIDDING', // can be added in ntwk doc manually for any manual addition of line items
         key: 'HEADER_BIDDING',
+        isDisabled: true, // Its disabled so that its not visible in UI. It will be added to the lineitem list in generateAdNetworkConfig
         isMandatory: true,
+        groupedSeparately: true,
         toBeFetchedFromGAM: false, // These are fetched in PRICE_PRIORITY
-        groupedSeperatelyInScript: true
     }
 ];
 
