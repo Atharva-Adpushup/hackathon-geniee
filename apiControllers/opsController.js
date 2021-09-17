@@ -790,12 +790,13 @@ router
 	.put('/pnp-refresh/:siteId', async (req, res) => {
 		const pnpConfig = _.cloneDeep(req.body);
 		const { siteId } = req.params;
-		const { email } = req.user;
 
 		try {
 			await ObjectValidator(opsValidations.pnpConfigValidation, pnpConfig);
 			await opsService.updateExistingApTags(pnpConfig);
-			const updatedConfig = await opsService.updatePnPConfig(siteId, email, pnpConfig);
+			const { pnpSiteId } = pnpConfig;
+			const pnpSiteOwnerEmail = await opsService.getOwnerEmail(pnpSiteId);
+			const updatedConfig = await opsService.updatePnPConfig(siteId, pnpSiteOwnerEmail, pnpConfig);
 			await opsService.initScriptSync(updatedConfig.get('pnpSiteId'));
 			await opsService.initScriptSync(siteId);
 
