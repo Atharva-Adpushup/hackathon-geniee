@@ -13,6 +13,7 @@ const {
 } = require('./config');
 
 const {
+	lineItemServiceAlerts,
 	ADPUSHUP_GAM: {
 		ACTIVE_DFP_NETWORK: ADPUSHUP_DFP_NETWORK_CODE,
 		REFRESH_TOKEN: ADPUSHUP_REFRSH_TOKEN,
@@ -40,6 +41,8 @@ const dfpAuthConfig = {
 	refresh_token: ADPUSHUP_REFRSH_TOKEN,
 	redirect_url: ADPUSHUP_OAUTH_CALLBACK
 };
+
+const LINE_ITEM_SERVICE_EMAIL_SUBJECT = "Line Item Service Notification";
 
 const LineItemsService = require('./LineItemsService');
 
@@ -91,6 +94,14 @@ const updateLineItemsForNetwork = async (dfpConfig, hbOrderIds) => {
 			}
 			return accumulator;
 		}, []);
+		// Get Failed promises
+		let failedTypes = promises.reduce((accumulator, promise) => {
+			if (promise.isRejected()) {
+				const {type, error} = promise.error();
+				accumulator[type] = error;
+			}
+			return accumulator;
+		}, {});
 		let doc = await db.getDoc(`ntwk::${dfpConfig.networkCode}`);
 		// Update structure of the ntwk doc if its still old
 		if (!doc || !LINE_ITEM_TYPES.every(type => type in doc.lineItems)) {
@@ -120,7 +131,7 @@ const updateLineItemsForNetwork = async (dfpConfig, hbOrderIds) => {
 			return accumulator;
 		}, 0);
 
-		return updatedCount;
+		return {updatedCount, failedTypes};
 	} catch (ex) {
 		logger.error({ message: 'Error updating adpushup network lineitems', debugData: { ex } });
 		throw ex;
@@ -160,7 +171,10 @@ const updateLineItemsForThirdPartyDfps = async () => {
 				}
 				dfpConfig.refresh_token = refreshToken;
 				dfpConfig.networkCode = networkId;
-                const updatedCount = await updateLineItemsForNetwork(dfpConfig, hbOrderIds);
+                const {updatedCount, failedTypes} = await updateLineItemsForNetwork(dfpConfig, hbOrderIds);
+				if (Object.keys(failedTypes).length > 0) {
+					errors[networkId] = failedTypes;
+				} 
 				logger.info({
 					message: `updated ${updatedCount} lineItems for ntwk::${dfpConfig.networkCode}`
 				});
@@ -174,10 +188,10 @@ const updateLineItemsForThirdPartyDfps = async () => {
 				logger.error({ message: errors[networkId].message, debugData: { ex: errors[networkId] } });
 			}
 		}
-		return totalLineItemsUpdated;
+		return {totalLineItemsUpdated, errors};
 	} catch (ex) {
 		logger.error({ message: 'updateLineItemsForThirdPartyDfps::ERROR', debugData: { ex } });
-		return ex;
+		throw ex;
 	}
 };
 
@@ -191,7 +205,7 @@ const updateLineItemsForAdPushupDfp = async () => {
 		return await updateLineItemsForNetwork(dfpConfig, ADPUSHUP_HB_ORDER_IDS);
 	} catch (ex) {
 		logger.error({ message: 'updateLineItemsForAdPushupDfp::ERROR', debugData: { ex } });
-		return ex;
+		throw ex;
 	}
 };
 
@@ -203,7 +217,7 @@ async function runService() {
 		serviceStatusDocExpiryDays,
 		logger
 	);
-	let serviceSuccess = false;
+	let totalErrors = {};
 	try {
 		// check if any service instance is already running
 		const isSyncAlreadyRunning = await serviceStatus.isSyncRunning();
@@ -213,33 +227,44 @@ async function runService() {
 		}
 		await serviceStatus.startServiceStatusPing();
 		logger.info({ message: 'Updating adPushup Dfp' });
-		const adPushupUpdateResult = await updateLineItemsForAdPushupDfp();
-		if (adPushupUpdateResult instanceof Error) {
-			logger.error({
-				message: 'Failed to update adpushup dfp line items',
-				debugData: { ex: adPushupUpdateResult }
-			});
-		} else {
-			logger.info({ message: `updated ${adPushupUpdateResult} line items for adPushup dfp` });
-		}
+		const {updatedCount: adpushupLineItemsUpdated, failedTypes: adpushupFailedTypes} = await updateLineItemsForAdPushupDfp();
+		
+		logger.info({ message: `updated ${adpushupLineItemsUpdated} line items for adPushup dfp` });
 
 		logger.info({ message: 'Updating thirdParty Dfps' });
-		const thirdPartyUpdateResult = await updateLineItemsForThirdPartyDfps();
-		if (thirdPartyUpdateResult instanceof Error) {
-			logger.error({
-				message: 'Failed to update 3rd party dfps line items',
-				debugData: { ex: thirdPartyUpdateResult }
-			});
-		} else {
-			logger.info({ message: `updated ${thirdPartyUpdateResult} line items for 3rd party dfps` });
+		const  {totalLineItemsUpdated: totalThirdPartyLineItemsUpdated, errors: thirdPartyErrors} = await updateLineItemsForThirdPartyDfps();
+		
+		totalErrors = {...thirdPartyErrors};
+		if(Object.keys(adpushupFailedTypes).length) {
+			totalErrors[ADPUSHUP_DFP_NETWORK_CODE] = adpushupFailedTypes;
 		}
+		logger.info({ message: `updated ${totalThirdPartyLineItemsUpdated} line items for 3rd party dfps` });
+		
+		// Send Email on completion
+		sendEmail({
+			queue: "MAILER",
+			data: {
+				to: lineItemServiceAlerts,
+				body: `LineItemService finished. <br />AdPushup LineItems updated: ${adpushupLineItemsUpdated} <br />ThirdParty LineItems Updated: ${totalThirdPartyLineItemsUpdated} <br/> Network Codes with errors: ${Object.keys(totalErrors)}`,
+				subject: LINE_ITEM_SERVICE_EMAIL_SUBJECT
+			}
+		});
 		return true;
 	} catch (ex) {
 		logger.error({ message: 'runService::ERROR', debugData: { ex } });
+		totalErrors = ex.stack;
+		// Send Email on failure
+		sendEmail({
+			queue: "MAILER",
+			data: {
+				to: lineItemServiceAlerts,
+				body: `LineItemService Errored. <br/>Error: ${ex.stack}`,
+				subject: LINE_ITEM_SERVICE_EMAIL_SUBJECT
+			}
+		});
 		return ex;
 	} finally {
-		await serviceStatus.stopServiceStatusPing();
-		sendEmail
+		await serviceStatus.stopServiceStatusPing(totalErrors);
 	}
 }
 

@@ -59,7 +59,7 @@ class LineItemService {
 					this.service.getLineItemsByStatement(statement, (err, results) => {
 						if (err) {
 							this.logger.error({ message: 'Error fetching lineItems', debugData: { ex: err } });
-							return reject(err);
+							return reject({type, error: err});
 						}
 						const totalResults = results.rval.totalResultSetSize || 0;
 						this.logger.info({
