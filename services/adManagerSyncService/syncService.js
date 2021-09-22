@@ -66,6 +66,15 @@ const getLineItems = async (lineItemsService, type, hbOrderIds) => {
 				type,
 				hbOrderIds
 			);
+			let nonHbLineItems = [];
+			let hbLineItems = [];
+			lineItemsObjects.forEach(lineItem => {
+				if (lineItem.isHb) {
+					hbLineItems.push(lineItem.id);
+				} else {
+					nonHbLineItems.push(lineItem.id);
+				}
+			});
 			const nonHbLineItems = lineItemsObjects.filter(({ isHb }) => !isHb).map(({ id }) => id);
 			const hbLineItems = lineItemsObjects.filter(({ isHb }) => isHb).map(({ id }) => id);
 			nonHbResults = [...nonHbResults, ...nonHbLineItems];
@@ -150,7 +159,7 @@ const updateLineItemsForThirdPartyDfps = async () => {
             adServerSettings.dfp.hbOrderIds as hbOrderIds,
             ARRAY adNetworkSetting FOR adNetworkSetting IN adNetworkSettings WHEN adNetworkSetting.networkName = 'DFP' END AS dfpNetworkSettings 
             FROM ${dbConfig.bucketName} 
-            WHERE meta().id LIKE 'user::%' 
+            WHERE meta().id LIKE 'user::ravi.jagga@adpushup.com' 
             AND adServerSettings.dfp.activeDFPNetwork != $adPushupNetworkId`;
 		const { results, status, resultCount } = await db.query(queryString, {
 			adPushupNetworkId: ADPUSHUP_DFP_NETWORK_CODE

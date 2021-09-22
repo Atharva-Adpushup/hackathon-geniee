@@ -58,7 +58,7 @@ const generatePnPRefreshConfig = (siteId, adNetworkConfig) => {
                     accumulator = [...accumulator, ...separatelyGroupedLineItems[currValue]];
                     return accumulator;
                 }, []);
-                allLineItems = [...allLineItems, ...separatelyGroupedLineItems];
+                allLineItems = [...allLineItems, ...lineItems];
                 pnpConfig.lineItems = allLineItems;
             }
 
