@@ -1114,7 +1114,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 			}
 			var lineItemId =
 				(sourceAgnosticLineItemId && sourceAgnosticLineItemId.toString()) || "";
-			if (lineItemId && lineItems.indexOf(lineItemId) === -1) {
+			if (lineItemId && lineItems.length && lineItems.indexOf(lineItemId) === -1) {
 				log(
 					"For Ad Unit: " +
 					adUnitPath +

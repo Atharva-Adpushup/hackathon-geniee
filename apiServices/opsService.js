@@ -21,6 +21,11 @@ const opsService = {
 
         return pnpModel.upsertPnPConfig(siteId, newPnpConfig);
     },
+    getOwnerEmail: async siteId => {
+        const siteDoc = await siteModel.getSiteById(siteId);
+        return siteDoc.get("ownerEmail");
+    },
+
     updateExistingApTags: async ({ pnpSiteId, adUnits = [] }) => {
         const apTagAds = await apTagService.fetchAds(pnpSiteId);
 
