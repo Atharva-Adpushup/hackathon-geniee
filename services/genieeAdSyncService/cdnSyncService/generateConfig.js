@@ -188,7 +188,8 @@ function init(site, computedConfig) {
 			SPA_ACTIVE: !!apConfigs.isSPA,
 			GENIEE_ACTIVE: !!apConfigs.partner,
 			AP_LITE_ACTIVE: !!(apps && apps.apLite && apLiteConfig),
-			PNP_REFRESH_ACTIVE: !!(apps && apps.pnp && pnpConfig)
+			PNP_REFRESH_ACTIVE: !!(apps && apps.pnp && pnpConfig),
+			USER_TRACKING: !!(apConfigs && apConfigs.enableUserTracking)
 		},
 		ads: {},
 		config: {}
