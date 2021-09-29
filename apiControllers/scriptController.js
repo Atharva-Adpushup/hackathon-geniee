@@ -41,7 +41,8 @@ const defaultApConfigValues = {
 	isSiteSpecificPrebidDisabled: false,
 	isSiteSpecificSeparatePrebidEnabled: false, // TODO: to be removed; only used by GFG
 	// global config
-	isBbPlayerLoggingEnabled: false
+	isBbPlayerLoggingEnabled: false,
+	isVacantAdSpaceEnabled: false
 };
 
 Router.get('/:siteId/siteConfig', (req, res) => {
@@ -80,6 +81,7 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 				}
 
 				apConfigs.lineItems = (adNetworkConfig && adNetworkConfig.lineItems) || [];
+				apConfigs.separatelyGroupedLineItems = (adNetworkConfig && adNetworkConfig.separatelyGroupedLineItems) || [];
 				apConfigs.autoOptimise = !!isAutoOptimise;
 				apConfigs.poweredByBanner = !!poweredByBanner;
 				apConfigs.poweredByBannerOnDocked = !!poweredByBannerOnDocked;
@@ -181,10 +183,9 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 			const getPrebidAndAdsConfig = () =>
 				(() => {
 					if (apps.apLite) {
-						return Promise.join(
-							generatePrebidConfig(siteId),
-							generateApLiteAdsConfig(siteId)
-						).then(([prebidConfig, apLiteConfig]) => ({ prebidConfig, apLiteConfig }));
+						return Promise.join(generatePrebidConfig(siteId), generateApLiteAdsConfig(siteId)).then(
+							([prebidConfig, apLiteConfig]) => ({ prebidConfig, apLiteConfig })
+						);
 					}
 
 					return getReportData(site)
@@ -334,8 +335,12 @@ Router.get('/:siteId/ampSiteConfig', (req, res) => {
 						if (!isValidRefreshLineItems) {
 							return null;
 						}
-
-						return adNetworkConfig.lineItems;
+						const groupedLineItems = Object.keys(adNetworkConfig.separatelyGroupedLineItems).reduce((accumulator, currValue) => {
+							accumulator = [...accumulator, ...adNetworkConfig.separatelyGroupedLineItems[currValue]];
+							return accumulator;
+						}, []);
+						
+						return Array.isArray(groupedLineItems) && groupedLineItems.length ? [...adNetworkConfig.lineItems, ...groupedLineItems] : adNetworkConfig.lineItems; 
 					}
 				);
 			};

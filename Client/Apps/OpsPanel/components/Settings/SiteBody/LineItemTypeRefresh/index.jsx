@@ -15,7 +15,7 @@ const LineItemTypeRefresh = ({ site, updateSiteData, updateSite }) => {
 		siteDomain: site.domain
 	};
 
-	const allLineItemTypesList = LINE_ITEM_TYPES.map(type => {
+	const allLineItemTypesList = LINE_ITEM_TYPES.filter(type => !type.isDisabled).map(type => {
 		if (selectedLineItemTypes.includes(type.value) || type.isMandatory) {
 			return {
 				...type,
