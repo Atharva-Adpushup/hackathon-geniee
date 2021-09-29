@@ -9,7 +9,7 @@ export default function(bidderConfig, siteId, domain) {
 			return customParams;
 		}
 		case 'onetag': {
-			customParams.ext = { unit: `AP/${siteId}_${domanize(domain)}` };
+			customParams.ext = { placement_name: `AP/${siteId}_${domanize(domain)}` };
 
 			return customParams;
 		}
