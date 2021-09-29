@@ -79,7 +79,8 @@ const getAdConfig = (adType, section) => {
 		sizeFilters,
 		collapseUnfilled,
 		poweredByBannerOnDocked,
-		enableLazyLoading
+		enableLazyLoading,
+		disableReuseVacantAdSpace
 	} = ad;
 	const { name: sectionName, id, formatData } = section;
 	let json = {
@@ -95,7 +96,8 @@ const getAdConfig = (adType, section) => {
 		downwardSizesDisabled: !!downwardSizesDisabled,
 		collapseUnfilled: !!collapseUnfilled,
 		poweredByBannerOnDocked:
-			poweredByBannerOnDocked === undefined || poweredByBannerOnDocked === true ? true : false // default to true on unit level unless declared false
+			poweredByBannerOnDocked === undefined || poweredByBannerOnDocked === true ? true : false, // default to true on unit level unless declared false
+		disableReuseVacantAdSpace: !!disableReuseVacantAdSpace
 	};
 
 	// Add 'multipleAdSizes' property if exists

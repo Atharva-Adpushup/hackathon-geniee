@@ -41,7 +41,8 @@ const defaultApConfigValues = {
 	isSiteSpecificPrebidDisabled: false,
 	isSiteSpecificSeparatePrebidEnabled: false, // TODO: to be removed; only used by GFG
 	// global config
-	isBbPlayerLoggingEnabled: false
+	isBbPlayerLoggingEnabled: false,
+	isVacantAdSpaceEnabled: false
 };
 
 Router.get('/:siteId/siteConfig', (req, res) => {
@@ -182,10 +183,9 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 			const getPrebidAndAdsConfig = () =>
 				(() => {
 					if (apps.apLite) {
-						return Promise.join(
-							generatePrebidConfig(siteId),
-							generateApLiteAdsConfig(siteId)
-						).then(([prebidConfig, apLiteConfig]) => ({ prebidConfig, apLiteConfig }));
+						return Promise.join(generatePrebidConfig(siteId), generateApLiteAdsConfig(siteId)).then(
+							([prebidConfig, apLiteConfig]) => ({ prebidConfig, apLiteConfig })
+						);
 					}
 
 					return getReportData(site)
