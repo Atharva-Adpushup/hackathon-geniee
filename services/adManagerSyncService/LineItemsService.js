@@ -42,7 +42,7 @@ class LineItemService {
 		});
 	}
 
-	getLineItemsByType(offset, count, type) {
+	getLineItemsByType(offset, count, type, hbOrderIds) {
 		return new Promise((resolve, reject) => {
 			try {
 				if (this.service instanceof Error) {
@@ -51,9 +51,7 @@ class LineItemService {
 				} else {
 					// service initialized
 					this.logger.info({
-						message: `network::${
-							this.networkCode
-						}::getLineItems:: offset=${offset}, count=${count}, type=${type}`
+						message: `network::${this.networkCode}::getLineItems:: offset=${offset}, count=${count}, type=${type}`
 					});
 					const statement = new Dfp.Statement(
 						`WHERE LineItemType = '${type}' AND isArchived=false LIMIT ${count} OFFSET ${offset}`
@@ -61,7 +59,7 @@ class LineItemService {
 					this.service.getLineItemsByStatement(statement, (err, results) => {
 						if (err) {
 							this.logger.error({ message: 'Error fetching lineItems', debugData: { ex: err } });
-							return reject(err);
+							return reject({type, error: err});
 						}
 						const totalResults = results.rval.totalResultSetSize || 0;
 						this.logger.info({
@@ -70,7 +68,14 @@ class LineItemService {
 						const _results =
 							totalResults === 0 || !results.rval.results || !results.rval.results.length
 								? []
-								: results.rval.results.map(({ id }) => id);
+								: results.rval.results.map(lineItem => {
+										const { id } = lineItem;
+										return type === 'PRICE_PRIORITY' &&
+											hbOrderIds &&
+											hbOrderIds.indexOf(lineItem.orderId) !== -1
+											? { id, isHb: true }
+											: { id, isHb: false };
+								  });
 						return resolve({
 							results: _results,
 							total: totalResults

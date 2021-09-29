@@ -20,18 +20,26 @@ const generateAdNetworkConfig = (activeDFPNetwork, lineItemTypes = []) => {
 		.getDoc(`${docKeys.network}${activeDFPNetwork}`)
 		.then(adNetworkConfigDoc => {
 			var adNetworkConfig = adNetworkConfigDoc.value;
-			const mandatoryLineItemTypes = LINE_ITEM_TYPES.filter(type => type.isMandatory).map(type => type.value);
+			const mandatoryLineItemTypes = LINE_ITEM_TYPES.filter(type => type.isMandatory && !type.groupedSeparately).map(type => type.value); // HB lineitems are to be kept separately
 			const lineItemTypesToProcess = _.uniq([...mandatoryLineItemTypes, ...lineItemTypes]);
 
+			const separatelyGroupedLineItemTypes = LINE_ITEM_TYPES.filter(type => type.groupedSeparately).map(type => type.value);
 			let lineItems = [];
-
+			
 			lineItemTypesToProcess.forEach(type => {
 				if (adNetworkConfig.lineItems && Array.isArray(adNetworkConfig.lineItems[type]) && adNetworkConfig.lineItems[type].length) {
 					lineItems = lineItems.concat(adNetworkConfig.lineItems[type]);
 				}
-			})
+			});
+			let separatelyGroupedLineItems = separatelyGroupedLineItemTypes.reduce((accumulator, currVal) => {
+				if (adNetworkConfig.lineItems && Array.isArray(adNetworkConfig.lineItems[currVal])) {
+					accumulator[currVal] = adNetworkConfig.lineItems[currVal].length ? adNetworkConfig.lineItems[currVal] : [];
+				}
+				return accumulator;
+			}, {});			
 
 			adNetworkConfig.lineItems = lineItems;
+			adNetworkConfig.separatelyGroupedLineItems = separatelyGroupedLineItems;
 
 			return adNetworkConfig;
 		})

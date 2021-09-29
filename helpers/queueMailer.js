@@ -11,7 +11,7 @@ module.exports = {
 			body: { ...body }
 		})
 			.then(response => {
-				console.log('Mail send succesfully');
+				console.log('Mail sent succesfully');
 			})
 			.catch(error => {
 				throw new Error(`Error in sending email:${error}`);

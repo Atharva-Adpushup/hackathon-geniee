@@ -80,6 +80,7 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 				}
 
 				apConfigs.lineItems = (adNetworkConfig && adNetworkConfig.lineItems) || [];
+				apConfigs.separatelyGroupedLineItems = (adNetworkConfig && adNetworkConfig.separatelyGroupedLineItems) || [];
 				apConfigs.autoOptimise = !!isAutoOptimise;
 				apConfigs.poweredByBanner = !!poweredByBanner;
 				apConfigs.poweredByBannerOnDocked = !!poweredByBannerOnDocked;
@@ -334,8 +335,12 @@ Router.get('/:siteId/ampSiteConfig', (req, res) => {
 						if (!isValidRefreshLineItems) {
 							return null;
 						}
-
-						return adNetworkConfig.lineItems;
+						const groupedLineItems = Object.keys(adNetworkConfig.separatelyGroupedLineItems).reduce((accumulator, currValue) => {
+							accumulator = [...accumulator, ...adNetworkConfig.separatelyGroupedLineItems[currValue]];
+							return accumulator;
+						}, []);
+						
+						return Array.isArray(groupedLineItems) && groupedLineItems.length ? [...adNetworkConfig.lineItems, ...groupedLineItems] : adNetworkConfig.lineItems; 
 					}
 				);
 			};

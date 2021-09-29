@@ -38,7 +38,8 @@ class ServiceStatus {
                     status: 'RUNNING', 
                     startedOn: +new Date(), 
                     lastUpdated: +new Date(),
-                    completedOn: null
+                    completedOn: null,
+                    errors: {}
                 });
             } else {
                 await this.db
@@ -46,7 +47,8 @@ class ServiceStatus {
                     docType: 'AdManagerSyncServiceStatus', 
                     status: 'RUNNING', 
                     startedOn: +new Date(), 
-                    lastUpdated: +new Date()
+                    lastUpdated: +new Date(),
+                    errors: {}
                 });
             }
             return true;
@@ -56,13 +58,14 @@ class ServiceStatus {
         }
     }
     
-    async updateServiceStatusStopped() {
+    async updateServiceStatusStopped(totalErrors) {
         try {
             await this.db
             .updatePartial(this.statusDocId, {
                 status: 'FINISHED', 
                 completedOn: +new Date(), 
-                lastUpdated: +new Date()
+                lastUpdated: +new Date(),
+                errors: totalErrors
             });
             return true;
         } catch(ex) {
@@ -89,10 +92,10 @@ class ServiceStatus {
         this.pingTimer = setInterval(this.updateServiceStatusRunning.bind(this), this.serviceStatusPingDelayMs);
     };
     
-    async stopServiceStatusPing() {
+    async stopServiceStatusPing(totalErrors) {
         if(this.pingTimer) {
             clearInterval(this.pingTimer);
-            await this.updateServiceStatusStopped();
+            await this.updateServiceStatusStopped(totalErrors);
         }
         return true;
     };
