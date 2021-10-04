@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/label-has-for */
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import React, { Component, Fragment } from 'react';
@@ -6,15 +7,18 @@ import uuid from 'uuid';
 import isEqual from 'lodash/isEqual';
 import differenceWith from 'lodash/differenceWith';
 import { CSVLink } from 'react-csv';
-
-import CustomReactTable from '../../../../../../Components/CustomReactTable/index.jsx';
-import axiosInstance from '../../../../../../helpers/axiosInstance';
 import { Panel, PanelGroup, Modal, Checkbox } from '@/Client/helpers/react-bootstrap-imports';
+
+import CustomReactTable from '../../../../../../Components/CustomReactTable/index';
+import axiosInstance from '../../../../../../helpers/axiosInstance';
 import CustomButton from '../../../../../../Components/CustomButton/index';
-import FieldGroup from '../../../../../../Components/Layout/FieldGroup.jsx';
+import FieldGroup from '../../../../../../Components/Layout/FieldGroup';
 import CustomToggleSwitch from '../../../../../../Components/CustomToggleSwitch/index';
 import SelectBox from '../../../../../../Components/SelectBox/index';
-import { REFRESH_RATE_ENTRIES } from '../../../../configs/commonConsts';
+import {
+	REFRESH_RATE_ENTRIES,
+	AP_LIGHT_AD_UNIT_OPERATIONS
+} from '../../../../configs/commonConsts';
 
 const dfpAdsUnitNamesToFilter = ['DEFAULT', 'TOTAL', '', 'AD UNIT CODE', 'AD UNIT'];
 
@@ -39,6 +43,8 @@ class ApLite extends Component {
 		selectedAdUnitCodeForHB: [],
 		selectedAdUnitCodeForVideoFormat: [],
 		selectAllFormats: true,
+		selectedAdUnitOperation: AP_LIGHT_AD_UNIT_OPERATIONS[0].value,
+		selectedAdUnitCodeActive: [],
 		...DEFAULT_STATE
 	};
 
@@ -70,10 +76,10 @@ class ApLite extends Component {
 				const headerBiddingEnabledAdUnits = [];
 				const adRefreshEnabledUnits = [];
 				const videoFormatEnabledUnits = [];
+				const activeAdUnits = [];
 
-				originalAdUnits
-					.filter(({ isActive }) => isActive)
-					.forEach(({ headerBidding, dfpAdunitCode, formats, refreshSlot }) => {
+				originalAdUnits.forEach(
+					({ headerBidding, dfpAdunitCode, formats, refreshSlot, isActive }) => {
 						if (headerBidding) {
 							headerBiddingEnabledAdUnits.push(dfpAdunitCode);
 						}
@@ -83,17 +89,21 @@ class ApLite extends Component {
 						if (formats.includes('video')) {
 							videoFormatEnabledUnits.push(dfpAdunitCode);
 						}
-					});
+						if (isActive) {
+							activeAdUnits.push(dfpAdunitCode);
+						}
+					}
+				);
 
 				const { refreshInterval } = adUnits[0];
 				this.setState({
 					isError: false,
-
 					selectedRefreshRate: refreshInterval,
 					oldAdUnits: adUnits,
 					selectedAdUnitCodeForHB: headerBiddingEnabledAdUnits,
 					selectedAdUnitCodeForAdRefresh: adRefreshEnabledUnits,
 					selectedAdUnitCodeForVideoFormat: videoFormatEnabledUnits,
+					selectedAdUnitCodeActive: activeAdUnits,
 					headerBidding:
 						headerBiddingEnabledAdUnits.length ===
 						adUnits.filter(({ isActive }) => isActive).length,
@@ -268,17 +278,31 @@ class ApLite extends Component {
 						dfpAdUnit,
 						dfpAdunitCode,
 						headerBidding,
+						isActive: true,
 						refreshSlot: adRefresh,
 						formats: ['display', 'video']
 					});
 				}
 				if (!parentAdUnitError)
-					this.setState({
+					this.setState(prevState => ({
 						structuredAdUnits: adUnitsArr,
-						selectedAdUnitCodeForHB: adUnitsArr.map(({ dfpAdunitCode }) => dfpAdunitCode),
-						selectedAdUnitCodeForAdRefresh: adUnitsArr.map(({ dfpAdunitCode }) => dfpAdunitCode),
-						selectedAdUnitCodeForVideoFormat: adUnitsArr.map(({ dfpAdunitCode }) => dfpAdunitCode)
-					});
+						selectedAdUnitCodeForHB: [
+							...prevState.selectedAdUnitCodeForHB,
+							...adUnitsArr.map(({ dfpAdunitCode }) => dfpAdunitCode)
+						],
+						selectedAdUnitCodeForAdRefresh: [
+							...prevState.selectedAdUnitCodeForAdRefresh,
+							...adUnitsArr.map(({ dfpAdunitCode }) => dfpAdunitCode)
+						],
+						selectedAdUnitCodeForVideoFormat: [
+							...prevState.selectedAdUnitCodeForVideoFormat,
+							...adUnitsArr.map(({ dfpAdunitCode }) => dfpAdunitCode)
+						],
+						selectedAdUnitCodeActive: [
+							...prevState.selectedAdUnitCodeActive,
+							...adUnitsArr.map(({ dfpAdunitCode }) => dfpAdunitCode)
+						]
+					}));
 			}
 		});
 	};
@@ -295,7 +319,9 @@ class ApLite extends Component {
 			fileName,
 			adRefresh,
 			headerBidding,
-			selectedRefreshRate
+			selectedRefreshRate,
+			selectedAdUnitOperation,
+			selectedAdUnitCodeActive
 		} = this.state;
 		const {
 			site: { siteId },
@@ -315,8 +341,16 @@ class ApLite extends Component {
 		}
 
 		if (!fileName && (uploadedAdUnits.length || oldAdUnits.length)) {
-			adUnits = uploadedAdUnits.length ? uploadedAdUnits : oldAdUnitsWithDfpNameAndCode;
-		} else if (fileName && (!oldAdUnits.length && !uploadedAdUnits.length)) {
+			adUnits = uploadedAdUnits.length
+				? uploadedAdUnits.map(v => ({
+						...v,
+						isActive: selectedAdUnitCodeActive.includes(v.dfpAdunitCode)
+				  }))
+				: oldAdUnitsWithDfpNameAndCode.map(v => ({
+						...v,
+						isActive: selectedAdUnitCodeActive.includes(v.dfpAdunitCode)
+				  }));
+		} else if (fileName && !oldAdUnits.length && !uploadedAdUnits.length) {
 			adUnits = structuredAdUnits.map(v => ({ ...v, sectionId: uuid.v4(), isActive: true }));
 		} else {
 			const unCommonAdUnits = differenceWith(
@@ -327,21 +361,34 @@ class ApLite extends Component {
 					: oldAdUnitsWithDfpNameAndCode.map(
 							({ sectionId, isActive, headerBidding, formats, refreshSlot, ...rest }) => rest
 					  ),
-				structuredAdUnits.map(({ headerBidding, formats, refreshSlot, ...rest }) => rest),
+				structuredAdUnits.map(({ headerBidding, isActive, formats, refreshSlot, ...rest }) => rest),
 				isEqual
 			);
 
-			adUnits = [
-				...structuredAdUnits.map(v => ({ ...v, sectionId: uuid.v4(), isActive: true })),
-				...unCommonAdUnits.map(v => ({
-					...v,
-					sectionId: uuid.v4(),
-					headerBidding,
-					refreshSlot: adRefresh,
-					isActive: false,
-					formats: ['display', 'video']
-				}))
-			];
+			if (selectedAdUnitOperation === AP_LIGHT_AD_UNIT_OPERATIONS[1].value) {
+				adUnits = [
+					...structuredAdUnits.map(v => ({
+						...v,
+						sectionId: uuid.v4(),
+						isActive: selectedAdUnitCodeActive.includes(v.dfpAdunitCode)
+					}))
+				];
+			} else if (selectedAdUnitOperation === AP_LIGHT_AD_UNIT_OPERATIONS[0].value) {
+				adUnits = [
+					...structuredAdUnits.map(v => ({
+						...v,
+						sectionId: uuid.v4(),
+						isActive: selectedAdUnitCodeActive.includes(v.dfpAdunitCode)
+					})),
+					...unCommonAdUnits.map(v => ({
+						...v,
+						headerBidding,
+						refreshSlot: adRefresh,
+						isActive: selectedAdUnitCodeActive.includes(v.dfpAdunitCode),
+						formats: ['display', 'video']
+					}))
+				];
+			}
 		}
 
 		adUnits = adUnits.map(v =>
@@ -456,33 +503,16 @@ class ApLite extends Component {
 		});
 	};
 
-	handleAdRefreshChange = (e, adunitCode) => {
-		const {
-			uploadedAdUnits,
-			oldAdUnits,
-			structuredAdUnits,
-			selectedAdUnitCodeForAdRefresh
-		} = this.state;
-		const adUnits = structuredAdUnits.length
-			? structuredAdUnits
-			: uploadedAdUnits.length
-			? uploadedAdUnits
-			: oldAdUnits;
-		if (e.target.checked) {
-			selectedAdUnitCodeForAdRefresh.push(adunitCode);
-			adUnits.find(v => v.dfpAdunitCode === adunitCode).refreshSlot = true;
-		} else {
-			selectedAdUnitCodeForAdRefresh.splice(selectedAdUnitCodeForAdRefresh.indexOf(adunitCode), 1);
-			adUnits.find(v => v.dfpAdunitCode === adunitCode).refreshSlot = false;
-		}
+	handleActiveChange = (e, adunitCode) => {
+		const { selectedAdUnitCodeActive } = this.state;
 
+		if (e.target.checked) {
+			selectedAdUnitCodeActive.push(adunitCode);
+		} else {
+			selectedAdUnitCodeActive.splice(selectedAdUnitCodeActive.indexOf(adunitCode), 1);
+		}
 		this.setState({
-			selectedAdUnitCodeForAdRefresh,
-			oldAdUnits,
-			uploadedAdUnits,
-			structuredAdUnits,
-			adRefresh:
-				selectedAdUnitCodeForAdRefresh.length === adUnits.filter(({ isActive }) => isActive).length
+			selectedAdUnitCodeActive
 		});
 	};
 
@@ -535,15 +565,16 @@ class ApLite extends Component {
 			uploadedAdUnits,
 			selectedAdUnitCodeForHB,
 			selectedAdUnitCodeForAdRefresh,
-			selectedAdUnitCodeForVideoFormat
+			selectedAdUnitCodeForVideoFormat,
+			selectedAdUnitCodeActive
 		} = this.state;
 
 		if (structuredAdUnits.length) {
 			showAdUnits = structuredAdUnits;
 		} else if (!structuredAdUnits.length && uploadedAdUnits.length) {
-			showAdUnits = uploadedAdUnits.filter(({ isActive }) => isActive);
+			showAdUnits = uploadedAdUnits;
 		} else {
-			showAdUnits = oldAdUnits.filter(({ isActive }) => isActive);
+			showAdUnits = oldAdUnits;
 		}
 
 		return (
@@ -592,6 +623,15 @@ class ApLite extends Component {
 										video
 									</Checkbox>
 								)
+							},
+							{
+								Header: 'Active',
+								Cell: ({ original: { dfpAdunitCode } }) => (
+									<Checkbox
+										onChange={e => this.handleActiveChange(e, dfpAdunitCode)}
+										checked={selectedAdUnitCodeActive.includes(dfpAdunitCode)}
+									/>
+								)
 							}
 						]}
 						data={showAdUnits}
@@ -629,7 +669,8 @@ class ApLite extends Component {
 			oldAdUnits,
 			uploadedAdUnits,
 			headerBidding,
-			selectAllFormats
+			selectAllFormats,
+			selectedAdUnitOperation
 		} = this.state;
 
 		const { setupStatus } = headerBiddingData[siteId];
@@ -677,21 +718,21 @@ class ApLite extends Component {
 
 				<FieldGroup
 					name="GAM Ad Units"
+					className="u-padding-v4 u-padding-h4"
 					value={fileName}
 					onChange={this.handleGAM}
 					onClick={event => {
 						event.target.value = null;
 					}}
-					type="file"
+					type="toggle-file-select-group"
 					label={this.gamAdUnitsLabel()}
-					size={6}
 					id="gamAdUnits-text"
-					style={{
-						display: 'inline-block',
-						float: 'right',
-						width: '220',
-						fontWeight: '700'
-					}}
+					itemCollection={AP_LIGHT_AD_UNIT_OPERATIONS}
+					dataKey="selectedAdUnitOperation"
+					fileDropdownValue={selectedAdUnitOperation}
+					onFileDropdownChange={this.onSelect}
+					fileDropdownTitle="Select Operation"
+					reset
 				/>
 
 				{fileName || uploadedAdUnits.length || oldAdUnits.length ? (

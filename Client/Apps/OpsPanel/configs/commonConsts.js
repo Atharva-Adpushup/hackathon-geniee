@@ -610,6 +610,11 @@ const GA_VERSION_OPTIONS = [
 	}
 ];
 
+const AP_LIGHT_AD_UNIT_OPERATIONS = [
+	{ name: 'Append', value: 'append', default: true },
+	{ name: 'Replace', value: 'replace' }
+];
+
 export {
 	OP_NAV_ITEMS,
 	OP_NAV_ITEMS_INDEXES,
@@ -648,5 +653,6 @@ export {
 	GA_ACCESS_EMAIL_OPTIONS,
 	GA_VERSION_OPTIONS,
 	UNFILLED_REFRESH_RATE_ENTRIES,
-	PNP_REFRESH_TYPES
+	PNP_REFRESH_TYPES,
+	AP_LIGHT_AD_UNIT_OPERATIONS
 };
