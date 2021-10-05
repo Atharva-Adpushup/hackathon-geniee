@@ -5,7 +5,6 @@ import SizeMappingContainer from '../../../containers/SizeMappingContainer';
 import AppsContainer from '../../../containers/AppsContainer';
 import SettingsContainer from '../../../containers/SettingsContainer';
 import ApLiteContainer from '../../../containers/ApLiteContainer';
-import SiteLevelBeforeJSContainer from '../../../containers/SiteLevelBeforeJSContainer';
 import PnPContainer from '../../../containers/PnpContainer';
 import LineItemTypeRefreshContainer from '../../../containers/LineItemTypeRefreshContainer';
 
@@ -39,11 +38,6 @@ const SiteBody = props => {
 					showNotification={showNotification}
 				/>
 				<LineItemTypeRefreshContainer site={site} />
-				<SiteLevelBeforeJSContainer
-					dataForAuditLogs={dataForAuditLogs}
-					site={site}
-					showNotification={showNotification}
-				/>
 				<SizeMappingContainer
 					dataForAuditLogs={dataForAuditLogs}
 					site={site}
