@@ -518,7 +518,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		hbaQueryFrequencyDoc: 'hbaq::',
 		networkWideHBRules: 'ntwkwide::rules',
 		paymentHistoryDoc: 'tplt::last3months',
-		pnpRefresh: 'apnp::',
+		pnpRefresh: 'apnp::'
 	},
 	AMP_REFRESH_INTERVAL: 30,
 	tagManagerInitialDoc: {
@@ -931,346 +931,336 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		user: 'AdPushup',
 		password: 'DVBynj73fmfg'
 	},
-	PNP_REFRESH_SCRIPTS: `(function () {
-		var PROXY_SITE_ID = window.pnpRefresh.pnpSiteId;
-		// var flag = false;
-		window.pnpRefresh.adUnitState = {};
-		window.pnpRefresh.insertedTags = [];
-		var refreshType = window.pnpRefresh.refreshType;
-		var AD_UNIT_MAPPING = window.pnpRefresh.adUnits[window.adpushup.config.platform];
-		var log = window.adpushup.utils.log.bind(window.adpushup.utils);
-		var checkElementInViewPercent = window.adpushup.utils.checkElementInViewPercent.bind(window.adpushup.utils);
-		var lineItems = window.pnpRefresh.lineItems || [];
-		var googletag = window.googletag || {};
-		googletag.cmd = googletag.cmd || [];
-		googletag.cmd.push(function () {
-		  function isDisplayNone(el) {
+	PNP_REFRESH_SCRIPTS: `(function() {
+	var PROXY_SITE_ID = window.pnpRefresh.pnpSiteId;
+	// var flag = false;
+	window.pnpRefresh.adUnitState = {};
+	window.pnpRefresh.insertedTags = [];
+	var refreshType = window.pnpRefresh.refreshType;
+	var AD_UNIT_MAPPING =
+		window.pnpRefresh.adUnits[window.adpushup.config.platform];
+	var log = window.adpushup.utils.log.bind(window.adpushup.utils);
+	var checkElementInViewPercent = window.adpushup.utils.checkElementInViewPercent.bind(
+		window.adpushup.utils
+	);
+	var lineItems = window.pnpRefresh.lineItems || [];
+	var googletag = window.googletag || {};
+	googletag.cmd = googletag.cmd || [];
+	googletag.cmd.push(function() {
+		function isDisplayNone(el) {
 			var elComputedStyles = window.getComputedStyle(el);
 			var displayNoneRegex = /none/g;
 			return !!displayNoneRegex.test(elComputedStyles.display);
-		  }
-		  function checkElementDisplay(adId) {
+		}
+		function checkElementDisplay(adId) {
 			var el = document.getElementById(adId);
 			if (!el) {
-			  return true;
+				return true;
 			}
 			var isElDisplayNone = isDisplayNone(el);
 			while (!isElDisplayNone && el.tagName !== "BODY") {
-			  el = el.parentNode;
-			  isElDisplayNone = isDisplayNone(el);
+				el = el.parentNode;
+				isElDisplayNone = isDisplayNone(el);
 			}
 			return isElDisplayNone;
-		  }
-		  function replaceSlot(slot, adUnit) {
+		}
+		function replaceSlot(slot, adUnit) {
 			if (!window.pnpRefresh.hasPnPScriptInserted) {
-			  window.pnpRefresh.hasPnPScriptInserted = true;
-			  window.adpushup = undefined;
-			  window._apPbJs = undefined;
-			  window._apPbJsChunk = undefined;
-			  window.adpTags = undefined;
-			  (function (w, d) {
-				var s = d.createElement("script");
-				s.src = "//cdn.adpushup.com/" + PROXY_SITE_ID + "/adpushup.js";
-				s.type = "text/javascript";
-				s.async = true;
-				(
-				  d.getElementsByTagName("head")[0] ||
-				  d.getElementsByTagName("body")[0]
-				).appendChild(s);
-			  })(window, document);
+				window.pnpRefresh.hasPnPScriptInserted = true;
+				window.adpushup = undefined;
+				window._apPbJs = undefined;
+				window._apPbJsChunk = undefined;
+				window.adpTags = undefined;
+				(function(w, d) {
+					var s = d.createElement("script");
+					s.src = "//cdn.adpushup.com/" + PROXY_SITE_ID + "/adpushup.js";
+					s.type = "text/javascript";
+					s.async = true;
+					(
+						d.getElementsByTagName("head")[0] ||
+						d.getElementsByTagName("body")[0]
+					).appendChild(s);
+				})(window, document);
 			}
-			var existingAdElement = document.getElementById(
-			  slot.getSlotElementId()
-			);
+			var existingAdElement = document.getElementById(slot.getSlotElementId());
 			if (!checkElementDisplay(slot.getSlotElementId())) {
-			  log("======replacing=======adUnit", adUnit);
-			  log(
-				"======replacing=======AD_UNIT_MAPPING",
-				AD_UNIT_MAPPING
-			  );
-			  var apTagId = AD_UNIT_MAPPING[adUnit].apTagId;
-			  var apTagDiv = document.createElement("div");
-			  apTagDiv.id = apTagId;
-			  apTagDiv.classList.add("_ap_apex_ad");
-			  var scriptElement = document.createElement("script");
-			  scriptElement.innerText =
-			  "var adpushup = window.adpushup = window.adpushup || {};adpushup.que = adpushup.que || [];adpushup.que.push(function() {adpushup.triggerAd('" +
-				apTagId +
-				"');});";
-			  apTagDiv.appendChild(scriptElement);
-			  window.pnpRefresh.insertedTags.push([slot]);
-			  googletag.destroySlots([slot]);
-			  //empty the existing ad div and append apTag to this div only, so that we do not end up affecting their layout.
-			  while (existingAdElement.firstChild) {
-				existingAdElement.removeChild(existingAdElement.firstChild);
-			  }
-			  if (existingAdElement.style.display === "none") {
-				// To check if display set to none due to collapseEmptyDivs
-				existingAdElement.style.display = "";
-			  }
-			  existingAdElement.appendChild(apTagDiv, existingAdElement);
-			  delete window.pnpRefresh.adUnitState[slot.getSlotElementId()];
-			} else {
-			  setTimeout(function () {
-				//console.log("Checking, " + adUnit);
-				// collapseEmptyDivs set display none in element.style. If display none is set through a css rule, we dont want to change that. But if display: none is set in element.style, then we want to remove that
-				if (existingAdElement.style.display === "none") {
-				  existingAdElement.style.display = "";
+				log("======replacing=======adUnit", adUnit);
+				log("======replacing=======AD_UNIT_MAPPING", AD_UNIT_MAPPING);
+				var apTagId = AD_UNIT_MAPPING[adUnit].apTagId;
+				var apTagDiv = document.createElement("div");
+				apTagDiv.id = apTagId;
+				apTagDiv.classList.add("_ap_apex_ad");
+				var scriptElement = document.createElement("script");
+				scriptElement.innerText =
+					"var adpushup = window.adpushup = window.adpushup || {};adpushup.que = adpushup.que || [];adpushup.que.push(function() {adpushup.triggerAd('" +
+					apTagId +
+					"');});";
+				apTagDiv.appendChild(scriptElement);
+				window.pnpRefresh.insertedTags.push([slot]);
+				googletag.destroySlots([slot]);
+				//empty the existing ad div and append apTag to this div only, so that we do not end up affecting their layout.
+				while (existingAdElement.firstChild) {
+					existingAdElement.removeChild(existingAdElement.firstChild);
 				}
-				replaceSlot(slot, adUnit);
-			  }, 10000);
+				if (existingAdElement.style.display === "none") {
+					// To check if display set to none due to collapseEmptyDivs
+					existingAdElement.style.display = "";
+				}
+				existingAdElement.appendChild(apTagDiv, existingAdElement);
+				delete window.pnpRefresh.adUnitState[slot.getSlotElementId()];
+			} else {
+				setTimeout(function() {
+					//console.log("Checking, " + adUnit);
+					// collapseEmptyDivs set display none in element.style. If display none is set through a css rule, we dont want to change that. But if display: none is set in element.style, then we want to remove that
+					if (existingAdElement.style.display === "none") {
+						existingAdElement.style.display = "";
+					}
+					replaceSlot(slot, adUnit);
+				}, 10000);
 			}
-		  }
-		  // Init AdUnitState for Active View Refresh
-		  function initAdUnitState(slot) {
+		}
+		// Init AdUnitState for Active View Refresh
+		function initAdUnitState(slot) {
 			var divId = slot.getSlotElementId();
 			var el = window.adpushup.$("#" + divId);
 			var height = el.height();
 			var width = el.width();
 			return {
-			  code: slot.getAdUnitPath(),
-			  height: height,
-			  width: width,
-			  rendered: true,
-			  viewedOnce: false,
-			  viewable: false,
-			  viewablePercentage: 0,
-			  gSlot: slot,
-			  timestamp: false,
-			  activeViewTimeoutId: false,
-			  refreshTimeoutId: false,
-			  readyToRefresh: false,
-			  renderTimestamp: +new Date(),
+				code: slot.getAdUnitPath(),
+				height: height,
+				width: width,
+				rendered: true,
+				viewedOnce: false,
+				viewable: false,
+				viewablePercentage: 0,
+				gSlot: slot,
+				timestamp: false,
+				activeViewTimeoutId: false,
+				refreshTimeoutId: false,
+				readyToRefresh: false,
+				renderTimestamp: +new Date(),
 			};
-		  }
-	  
-		  // Active view checkinviewandrefresh
-		  function checkInViewAndRefresh(slot, adUnit) {
-			  var divId = slot.getSlotElementId();
-			  var elementInView = checkElementInViewPercent(
-				"#" + divId
-			  );
-			  if (elementInView) {
+		}
+
+		// Active view checkinviewandrefresh
+		function checkInViewAndRefresh(slot, adUnit) {
+			var divId = slot.getSlotElementId();
+			var elementInView = checkElementInViewPercent("#" + divId);
+			if (elementInView) {
 				// window.pnpRefresh.adUnitState[divId] = resetadUnitState(slot);
 				replaceSlot(slot, adUnit);
-			  } else {
+			} else {
 				window.pnpRefresh.adUnitState[divId].readyToRefresh = true;
-			  }
-		  }
-	  
-		  // Active view handleSettingTimeouts
-		  function handleSettingTimeouts(divId, adUnit) {
-			if (
-			  !window.pnpRefresh.adUnitState[divId].timestamp &&
-			  !window.pnpRefresh.adUnitState[divId].activeViewTimeoutId
-			) {
-			  log(
-				"Setting Active View Timeout for ",
-				window.pnpRefresh.adUnitState[divId].code
-			  );
-			  window.pnpRefresh.adUnitState[divId].timestamp = +new Date();
-			  window.pnpRefresh.adUnitState[divId].activeViewTimeoutId = setTimeout(
-				function () {
-				  window.pnpRefresh.adUnitState[divId].viewedOnce = true;
-				  log(
-					"Viewed Once: ",
-					window.pnpRefresh.adUnitState[divId].gSlot.getAdUnitPath()
-				  );
-				  var REFRESH_INTERVAL = window.pnpRefresh.filledInsertionTrigger;
-				  var refreshAfter =
-					REFRESH_INTERVAL * 1000 -
-					(+new Date() -
-					  window.pnpRefresh.adUnitState[divId].renderTimestamp);
-				  refreshAfter = refreshAfter >= 0 ? refreshAfter : 0;
-				  log(
-					"REFRESHING AFTER: " + refreshAfter / 1000 + " seconds"
-				  );
-				  window.pnpRefresh.adUnitState[divId].refreshTimeoutId = setTimeout(
-					checkInViewAndRefresh,
-					refreshAfter,
-					window.pnpRefresh.adUnitState[divId].gSlot,
-					adUnit
-				  );
-				},
-				1000
-			  );
 			}
-		  }
-	  
-		  // Check if the rendered slot is eligible for refresh
-		  function checkRefreshEligible(slot, sourceAgnosticLineItemId, adUnit) {
+		}
+
+		// Active view handleSettingTimeouts
+		function handleSettingTimeouts(divId, adUnit) {
+			if (
+				!window.pnpRefresh.adUnitState[divId].timestamp &&
+				!window.pnpRefresh.adUnitState[divId].activeViewTimeoutId
+			) {
+				log(
+					"Setting Active View Timeout for ",
+					window.pnpRefresh.adUnitState[divId].code
+				);
+				window.pnpRefresh.adUnitState[divId].timestamp = +new Date();
+				window.pnpRefresh.adUnitState[divId].activeViewTimeoutId = setTimeout(
+					function() {
+						window.pnpRefresh.adUnitState[divId].viewedOnce = true;
+						log(
+							"Viewed Once: ",
+							window.pnpRefresh.adUnitState[divId].gSlot.getAdUnitPath()
+						);
+						var REFRESH_INTERVAL = window.pnpRefresh.filledInsertionTrigger;
+						var refreshAfter =
+							REFRESH_INTERVAL * 1000 -
+							(+new Date() -
+								window.pnpRefresh.adUnitState[divId].renderTimestamp);
+						refreshAfter = refreshAfter >= 0 ? refreshAfter : 0;
+						log("REFRESHING AFTER: " + refreshAfter / 1000 + " seconds");
+						window.pnpRefresh.adUnitState[divId].refreshTimeoutId = setTimeout(
+							checkInViewAndRefresh,
+							refreshAfter,
+							window.pnpRefresh.adUnitState[divId].gSlot,
+							adUnit
+						);
+					},
+					1000
+				);
+			}
+		}
+
+		// Check if the rendered slot is eligible for refresh
+		function checkRefreshEligible(slot, sourceAgnosticLineItemId, adUnit) {
 			var adUnitPath = slot.getAdUnitPath();
 			if (Object.keys(AD_UNIT_MAPPING).indexOf(adUnit) === -1) {
-			  log(
-				"Ad Unit: " + adUnitPath + " not in our mapping"
-			  );
-			  return false;
+				log("Ad Unit: " + adUnitPath + " not in our mapping");
+				return false;
 			}
 			if (!AD_UNIT_MAPPING[adUnit].isActive) {
-			  log(
-				"Ad Unit: " + adUnitPath + " deactivated in config, stopping"
-			  );
-			  return false;
+				log("Ad Unit: " + adUnitPath + " deactivated in config, stopping");
+				return false;
 			}
 			var lineItemId =
 				(sourceAgnosticLineItemId && sourceAgnosticLineItemId.toString()) || "";
-			if (lineItemId && lineItems.length && lineItems.indexOf(lineItemId) === -1) {
+			if (
+				lineItemId &&
+				lineItems.length &&
+				lineItems.indexOf(lineItemId) === -1
+			) {
 				log(
 					"For Ad Unit: " +
-					adUnitPath +
-					" LineItem: " +
-					lineItemId +
-					" not in the whitelist, stopping"
+						adUnitPath +
+						" LineItem: " +
+						lineItemId +
+						" not in the whitelist, stopping"
 				);
 				return false;
 			}
 			if (window.pnpRefresh.insertedTags.indexOf(slot) !== -1) {
-			  log(
-				"Ad Unit: " +
-				  adUnitPath +
-				  " was already rendered with line item id: " +
-				  sourceAgnosticLineItemId
-			  );
-			  return false;
+				log(
+					"Ad Unit: " +
+						adUnitPath +
+						" was already rendered with line item id: " +
+						sourceAgnosticLineItemId
+				);
+				return false;
 			}
 			log("AdUnit: " + adUnitPath + " will be refreshed");
 			return true;
-		  }
-		  // Function which triggers the replacement for activeTab refresh
-		  function triggerReplace(slot, adUnit, REFRESH_INTERVAL) {
-			setTimeout(function () {
-			  function checkdocfocus() {
-				if (!document.hasFocus()) {
-				  setTimeout(checkdocfocus, 0);
-				} else {
-				  replaceSlot(slot, adUnit);
+		}
+		// Function which triggers the replacement for activeTab refresh
+		function triggerReplace(slot, adUnit, REFRESH_INTERVAL) {
+			setTimeout(function() {
+				function checkdocfocus() {
+					if (!document.hasFocus()) {
+						setTimeout(checkdocfocus, 0);
+					} else {
+						replaceSlot(slot, adUnit);
+					}
 				}
-			  }
-			  checkdocfocus();
+				if (refreshType === "activeTab") {
+					checkdocfocus();
+				} else if (refreshType === "bgRefresh") {
+					replaceSlot(slot, adUnit);
+				}
 			}, REFRESH_INTERVAL);
-		  }
-		  if (refreshType === "activeTab") {
+		}
+		if (refreshType === "activeTab" || refreshType === "bgRefresh") {
 			var gptSlots = googletag.pubads().getSlots();
-			gptSlots.forEach(function (slot) {
-			  var slotDivId = slot.getSlotElementId();
-			  var slotDiv = document.getElementById(slotDivId);
-			  if (slotDiv && slotDiv.dataset.googleQueryId) {
-				var adUnit = slot
-				  .getAdUnitPath()
-				  .substring(slot.getAdUnitPath().lastIndexOf("/") + 1);
-				var sourceAgnosticLineItemId;
-				var REFRESH_INTERVAL =
-				  window.pnpRefresh.filledInsertionTrigger * 1000;
-				if (slot.getResponseInformation() === null) {
-				  log(
-					"No Fill for ad unit: " + slot.getAdUnitPath()
-				  );
-				  REFRESH_INTERVAL =
-					window.pnpRefresh.unfilledInsertionTrigger * 1000;
-				  sourceAgnosticLineItemId = null;
-				} else {
-				  sourceAgnosticLineItemId = slot.getResponseInformation()
-					.sourceAgnosticLineItemId;
+			gptSlots.forEach(function(slot) {
+				var slotDivId = slot.getSlotElementId();
+				var slotDiv = document.getElementById(slotDivId);
+				if (slotDiv && slotDiv.dataset.googleQueryId) {
+					var adUnit = slot
+						.getAdUnitPath()
+						.substring(slot.getAdUnitPath().lastIndexOf("/") + 1);
+					var sourceAgnosticLineItemId;
+					var REFRESH_INTERVAL =
+						window.pnpRefresh.filledInsertionTrigger * 1000;
+					if (slot.getResponseInformation() === null) {
+						log("No Fill for ad unit: " + slot.getAdUnitPath());
+						REFRESH_INTERVAL =
+							window.pnpRefresh.unfilledInsertionTrigger * 1000;
+						sourceAgnosticLineItemId = null;
+					} else {
+						sourceAgnosticLineItemId = slot.getResponseInformation()
+							.sourceAgnosticLineItemId;
+					}
+					var refreshEligible = checkRefreshEligible(
+						slot,
+						sourceAgnosticLineItemId,
+						adUnit
+					);
+					if (refreshEligible) {
+						triggerReplace(slot, adUnit, REFRESH_INTERVAL);
+					}
 				}
-				var refreshEligible = checkRefreshEligible(
-				  slot,
-				  sourceAgnosticLineItemId,
-				  adUnit
-				);
-				if (refreshEligible) {
-				  triggerReplace(slot, adUnit, REFRESH_INTERVAL);
-				}
-			  }
 			});
-		  }
-		  // At SlotRenderEnded, if isEmpty is true then replace the slot right away otherwise create a state for adUnit which will create viewability data
-		  googletag.pubads().addEventListener("slotRenderEnded", function (e) {
-			log(
-			  "SlotRenderEnded fired for " + e.slot.getAdUnitPath()
-			);
+		}
+		// At SlotRenderEnded, if isEmpty is true then replace the slot right away otherwise create a state for adUnit which will create viewability data
+		googletag.pubads().addEventListener("slotRenderEnded", function(e) {
+			log("SlotRenderEnded fired for " + e.slot.getAdUnitPath());
 			var adUnit = e.slot
-			  .getAdUnitPath()
-			  .substring(e.slot.getAdUnitPath().lastIndexOf("/") + 1);
+				.getAdUnitPath()
+				.substring(e.slot.getAdUnitPath().lastIndexOf("/") + 1);
 			var slotId = e.slot.getSlotElementId();
 			var refreshEligible = checkRefreshEligible(
-			  e.slot,
-			  e.sourceAgnosticLineItemId,
-			  adUnit
+				e.slot,
+				e.sourceAgnosticLineItemId,
+				adUnit
 			);
 			if (refreshEligible) {
-			  window.adpushup.que.push(function() {
-				  if (e.isEmpty) {
-					  log("e.isEmpty is true for: ", adUnit );
-					setTimeout(function () {
-					  replaceSlot(e.slot, adUnit);
-					}, window.pnpRefresh.unfilledInsertionTrigger * 1000);
-				  } else {
-					if (refreshType === "activeView") {
-					  window.pnpRefresh.adUnitState[slotId] = initAdUnitState(e.slot);
-					  var elementInView = checkElementInViewPercent(
-						"#" + slotId
-					  );
-					  if (elementInView) {
-						window.pnpRefresh.adUnitState[slotId].viewable = true;
-						if (!window.pnpRefresh.adUnitState[slotId].viewedOnce) {
-						  handleSettingTimeouts(slotId, adUnit);
+				window.adpushup.que.push(function() {
+					if (e.isEmpty) {
+						log("e.isEmpty is true for: ", adUnit);
+						setTimeout(function() {
+							replaceSlot(e.slot, adUnit);
+						}, window.pnpRefresh.unfilledInsertionTrigger * 1000);
+					} else {
+						if (refreshType === "activeView") {
+							window.pnpRefresh.adUnitState[slotId] = initAdUnitState(e.slot);
+							var elementInView = checkElementInViewPercent("#" + slotId);
+							if (elementInView) {
+								window.pnpRefresh.adUnitState[slotId].viewable = true;
+								if (!window.pnpRefresh.adUnitState[slotId].viewedOnce) {
+									handleSettingTimeouts(slotId, adUnit);
+								}
+							}
+						} else if (
+							refreshType === "activeTab" ||
+							refreshType === "bgRefresh"
+						) {
+							triggerReplace(
+								e.slot,
+								adUnit,
+								window.pnpRefresh.filledInsertionTrigger * 1000
+							);
 						}
-					  }
-					} else if (refreshType === "activeTab") {
-					  triggerReplace(
-						e.slot,
-						adUnit,
-						window.pnpRefresh.filledInsertionTrigger * 1000
-					  );
 					}
-				  }
-			  })
+				});
 			}
-		  });
-		  if (refreshType === "activeView") {
-			// Everytime visibility percentage changes update it in the state and if its greater than 50% (configurable) then consider it viewable and set viewable to true otherwise false
-			googletag
-			  .pubads()
-			  .addEventListener("slotVisibilityChanged", function (e) {
-				var divId = e.slot.getSlotElementId();
-				if (
-				  Object.keys(window.pnpRefresh.adUnitState).indexOf(divId) !== -1
-				) {
-				  var adUnit = e.slot
-				  .getAdUnitPath()
-				  .substring(e.slot.getAdUnitPath().lastIndexOf("/") + 1);
-				  var percentageToCheck =
-					window.pnpRefresh.adUnitState[divId].height *
-					  window.pnpRefresh.adUnitState[divId].width <
-					242000
-					  ? 50
-					  : 30;
-				  if (e.inViewPercentage >= percentageToCheck) {
-					window.pnpRefresh.adUnitState[divId].viewable = true;
-					if (window.pnpRefresh.adUnitState[divId].readyToRefresh) {
-					  delete window.pnpRefresh.adUnitState[divId];
-					  return replaceSlot(e.slot, adUnit);
-					}
-					if (!window.pnpRefresh.adUnitState[divId].viewedOnce) {
-					  handleSettingTimeouts(divId, adUnit);
-					}
-				  } else {
-					window.pnpRefresh.adUnitState[divId].viewable = false;
-					window.pnpRefresh.adUnitState[divId].timestamp = false;
-					if (window.pnpRefresh.adUnitState[divId].activeViewTimeoutId) {
-					  clearTimeout(
-						window.pnpRefresh.adUnitState[divId].activeViewTimeoutId
-					  );
-					  window.pnpRefresh.adUnitState[
-						divId
-					  ].activeViewTimeoutId = false;
-					}
-				  }
-				  window.pnpRefresh.adUnitState[divId].viewablePercentage =
-					e.inViewPercentage;
-				}
-			  });
-		  }
 		});
-	  })();`
+		if (refreshType === "activeView") {
+			// Everytime visibility percentage changes update it in the state and if its greater than 50% (configurable) then consider it viewable and set viewable to true otherwise false
+			googletag.pubads().addEventListener("slotVisibilityChanged", function(e) {
+				var divId = e.slot.getSlotElementId();
+				if (Object.keys(window.pnpRefresh.adUnitState).indexOf(divId) !== -1) {
+					var adUnit = e.slot
+						.getAdUnitPath()
+						.substring(e.slot.getAdUnitPath().lastIndexOf("/") + 1);
+					var percentageToCheck =
+						window.pnpRefresh.adUnitState[divId].height *
+							window.pnpRefresh.adUnitState[divId].width <
+						242000
+							? 50
+							: 30;
+					if (e.inViewPercentage >= percentageToCheck) {
+						window.pnpRefresh.adUnitState[divId].viewable = true;
+						if (window.pnpRefresh.adUnitState[divId].readyToRefresh) {
+							delete window.pnpRefresh.adUnitState[divId];
+							return replaceSlot(e.slot, adUnit);
+						}
+						if (!window.pnpRefresh.adUnitState[divId].viewedOnce) {
+							handleSettingTimeouts(divId, adUnit);
+						}
+					} else {
+						window.pnpRefresh.adUnitState[divId].viewable = false;
+						window.pnpRefresh.adUnitState[divId].timestamp = false;
+						if (window.pnpRefresh.adUnitState[divId].activeViewTimeoutId) {
+							clearTimeout(
+								window.pnpRefresh.adUnitState[divId].activeViewTimeoutId
+							);
+							window.pnpRefresh.adUnitState[divId].activeViewTimeoutId = false;
+						}
+					}
+					window.pnpRefresh.adUnitState[divId].viewablePercentage =
+						e.inViewPercentage;
+				}
+			});
+		}
+	});
+})();
+`
 };
