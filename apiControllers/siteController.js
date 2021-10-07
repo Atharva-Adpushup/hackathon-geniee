@@ -28,7 +28,7 @@ const {
 const proxy = require('../helpers/proxy');
 const pageGroupController = require('./pageGroupController');
 const utils = require('../helpers/utils');
-
+const apLiteModel = require('../models/apLiteModel');
 const {
 	AUDIT_LOGS_ACTIONS: { OPS_PANEL, MY_SITES }
 } = CC;
@@ -466,9 +466,25 @@ router
 			.then(() => sendSuccessResponse({ success: 1 }, res))
 			.catch(err => sendErrorResponse(err, res));
 	})
-	.post('/updateSite', (req, res) => {
+	.post('/updateSite', async (req, res) => {
 		const { email, originalEmail } = req.user;
 		const { siteId, toUpdate, dataForAuditLogs } = req.body;
+		const { value: { pnp = false } = {} } = toUpdate[0];
+		if (pnp) {
+			//here we will disable aplite refresh slots
+			try {
+				const apLiteDoc = await apLiteModel.getAPLiteModelBySite(siteId);
+				const { data: { adUnits = [] } = {} } = apLiteDoc;
+				const updatedAdUnits = adUnits.map(ad => {
+					ad.refreshSlot = false;
+					return ad;
+				});
+				apLiteDoc.set('adUnits', updatedAdUnits);
+				apLiteDoc.save();
+			} catch (error) {
+				console.log('aplite doc does not exist', error);
+			}
+		}
 		const toSend = [];
 		return checkParams(['siteId', 'toUpdate'], req, 'post')
 			.then(() => verifyOwner(siteId, req.user.email))

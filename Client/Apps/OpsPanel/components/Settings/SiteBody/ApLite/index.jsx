@@ -56,6 +56,18 @@ class ApLite extends Component {
 		fetchHBInitDataAction(siteId);
 	}
 
+	static getDerivedStateFromProps(props, currentState) {
+		const { site: { apps: { pnp = false } = {} } = {} } = props;
+		if (pnp) {
+			return {
+				...currentState,
+				selectedAdUnitCodeForAdRefresh: [],
+				adRefresh: false,
+				isRefreshButtonDisabled: true
+			};
+		} else return { ...currentState, isRefreshButtonDisabled: false };
+	}
+
 	handleReset = () => this.setState(DEFAULT_STATE);
 
 	handleSelect = value => {
@@ -665,7 +677,8 @@ class ApLite extends Component {
 			uploadedAdUnits,
 			headerBidding,
 			selectAllFormats,
-			selectedAdUnitOperation
+			selectedAdUnitOperation,
+			isRefreshButtonDisabled = false
 		} = this.state;
 
 		const { setupStatus } = headerBiddingData[siteId];
@@ -772,6 +785,7 @@ class ApLite extends Component {
 							defaultLayout
 							name={`adRefresh-${siteId}-${siteDomain}`}
 							id={`js-adRefresh-${siteId}-${siteDomain}`}
+							disabled={isRefreshButtonDisabled}
 						/>
 
 						{adRefresh ? (
