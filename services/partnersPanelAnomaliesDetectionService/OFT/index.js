@@ -16,7 +16,7 @@ const API_ENDPOINT = `https://api.appnexus.com`;
 const authParams = {
 	auth: {
 		username: 'adpushup152ns',
-		password: '152Media/12'
+		password: '2021@Adpushup'
 	}
 };
 

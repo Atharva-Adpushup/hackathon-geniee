@@ -122,7 +122,7 @@ const Class = require('../../helpers/class'),
 						// some domains may have multiple siteIds, it would be easy to fetch
 						// revenue using this mapping while calculating revenue of domains with
 						// multiple siteId in ADP data.
-						adpDataSiteIdMapping[siteid] = { ...item, date};
+						adpDataSiteIdMapping[siteid] = { ...item, date, fromDate, toDate};
 
 						return {
 							date,
@@ -143,6 +143,8 @@ const Class = require('../../helpers/class'),
 						sitesDomainAndIdMapping[domain].adpRevenue += +adpDataSiteIdMapping[site.siteId]
 							.network_gross_revenue;
 						sitesDomainAndIdMapping[domain].date = adpDataSiteIdMapping[site.siteId].date;
+						sitesDomainAndIdMapping[domain].fromDate = adpDataSiteIdMapping[site.siteId].fromDate;
+						sitesDomainAndIdMapping[domain].toDate = adpDataSiteIdMapping[site.siteId].toDate;
 					}
 					sitesDomainAndIdMapping[domain].adpRevenue = +sitesDomainAndIdMapping[
 						domain
@@ -167,16 +169,20 @@ const Class = require('../../helpers/class'),
 						adpRevenue > 0 ? ((diff / adpRevenue) * 100) : 100;
 					mappedData.siteDomain = domain;
 					mappedData.date = mappedData.date;
+					mappedData.fromDate = mappedData.fromDate;
+					mappedData.toDate = mappedData.toDate;
 					finalData.push(mappedData);
 				}
 			});
+
 			return finalData;
 		};
 		this.formatAnomaliesDataForSQL = function(data, NETWORK_ID) {
 			const sqlData = data.map(item => {
 				const site = item.sites.shift();
 				return {
-					report_date: item.date,
+					from_date: item.fromDate,
+					to_date: item.toDate,
 					ntwid: NETWORK_ID,
 					siteid: site.siteId,
 					ap_revenue: item.adpRevenue,
