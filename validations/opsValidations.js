@@ -31,7 +31,7 @@ const pnpConfigValidation = {
 		.min(5)
 		.optional(),
 	refreshType: Yup.string()
-		.oneOf(['activeView', 'activeTab', 'bgRefresh'])
+		.oneOf(['activeView', 'activeTab','bgRefresh'])
 		.required()
 };
 
