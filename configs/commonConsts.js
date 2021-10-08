@@ -941,6 +941,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		var log = window.adpushup.utils.log.bind(window.adpushup.utils);
 		var checkElementInViewPercent = window.adpushup.utils.checkElementInViewPercent.bind(window.adpushup.utils);
 		var lineItems = window.pnpRefresh.lineItems || [];
+		var blacklistedLineItems=window.pnpRefresh.blacklistedLineItems || [];
 		var googletag = window.googletag || {};
 		googletag.cmd = googletag.cmd || [];
 		googletag.cmd.push(function () {
@@ -1114,7 +1115,8 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 			}
 			var lineItemId =
 				(sourceAgnosticLineItemId && sourceAgnosticLineItemId.toString()) || "";
-			if (lineItemId && lineItems.length && lineItems.indexOf(lineItemId) === -1) {
+			if (lineItemId && lineItems.length) {
+				if(lineItems.indexOf(lineItemId) === -1){
 				log(
 					"For Ad Unit: " +
 					adUnitPath +
@@ -1123,6 +1125,18 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 					" not in the whitelist, stopping"
 				);
 				return false;
+				}
+				else if(blacklistedLineItems.indexOf(lineItemId) !== -1){
+					log(
+						"For Ad Unit: " +
+						adUnitPath +
+						" LineItem: " +
+						lineItemId +
+						" is in the blacklist, stopping"
+					);
+					return false;
+					}
+				
 			}
 			if (window.pnpRefresh.insertedTags.indexOf(slot) !== -1) {
 			  log(
