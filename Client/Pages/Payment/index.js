@@ -139,7 +139,11 @@ class Payment extends Component {
 
 	renderContent = () => {
 		const { paymentDetails, paymentHistory } = this.state;
-		const activeTab = this.getActiveTab();
+		const { activeProducts } = this.props;
+		const accessDetailsTab =
+			activeProducts.payment_details === undefined ? true : activeProducts.payment_details;
+		const activeTab = accessDetailsTab ? this.getActiveTab() : PAYMENT_NAV_ITEMS_INDEXES.HISTORY;
+
 		switch (activeTab) {
 			case PAYMENT_NAV_ITEMS_INDEXES.DETAILS:
 				return this.renderIframe(paymentDetails);
@@ -160,9 +164,11 @@ class Payment extends Component {
 	};
 
 	render() {
-		const { accessBalanceTab } = this.props;
+		const { accessBalanceTab, activeProducts } = this.props;
 		const { redirectUrl } = this.state;
-		const activeTab = this.getActiveTab();
+		const accessDetailsTab =
+			activeProducts.payment_details === undefined ? true : activeProducts.payment_details;
+		const activeTab = accessDetailsTab ? this.getActiveTab() : PAYMENT_NAV_ITEMS_INDEXES.HISTORY;
 		const activeItem = PAYMENT_NAV_ITEMS[activeTab];
 		if (redirectUrl) {
 			history.push(redirectUrl);
@@ -173,9 +179,9 @@ class Payment extends Component {
 				<DocumentTitle title="Payment" />
 				<div title="Payment Settings">
 					<Nav bsStyle="tabs" activeKey={activeItem.INDEX} onSelect={this.handleNavSelect}>
-						<NavItem eventKey={1}>{PAYMENT_NAV_ITEMS_VALUES.DETAILS}</NavItem>
+						{/* this tab can be disabled for specific sites. Enabled by  default , disble by setting "payment_details" flag false in  "activeProducts", maintained in user doc */}
+						{accessDetailsTab && <NavItem eventKey={1}>{PAYMENT_NAV_ITEMS_VALUES.DETAILS}</NavItem>}
 						<NavItem eventKey={2}>{PAYMENT_NAV_ITEMS_VALUES.HISTORY}</NavItem>
-
 						{/* only show this tab for specific sites. Enabled using "accessBalanceTab" flag, maintained in user doc */}
 						{accessBalanceTab ? (
 							<NavItem eventKey={3}>{PAYMENT_NAV_ITEMS_VALUES.BALANCE}</NavItem>
@@ -189,8 +195,8 @@ class Payment extends Component {
 }
 
 const mapStateToProps = state => {
-	const { balancePayment } = state.global.user.data;
-	return balancePayment;
+	const { balancePayment, activeProducts } = state.global.user.data;
+	return { balancePayment, activeProducts };
 };
 
 // 	mapDispatchToProps = (dispatch, ownProps) => ({
