@@ -141,9 +141,8 @@ class Payment extends Component {
 		const { paymentDetails, paymentHistory } = this.state;
 		const { activeProducts } = this.props;
 		const accessDetailsTab =
-			activeProducts.payment_details === undefined ? true : activeProducts.payment_details;
+			activeProducts?.payment_details === undefined ? true : activeProducts.payment_details;
 		const activeTab = accessDetailsTab ? this.getActiveTab() : PAYMENT_NAV_ITEMS_INDEXES.HISTORY;
-
 		switch (activeTab) {
 			case PAYMENT_NAV_ITEMS_INDEXES.DETAILS:
 				return this.renderIframe(paymentDetails);
@@ -167,7 +166,7 @@ class Payment extends Component {
 		const { accessBalanceTab, activeProducts } = this.props;
 		const { redirectUrl } = this.state;
 		const accessDetailsTab =
-			activeProducts.payment_details === undefined ? true : activeProducts.payment_details;
+			activeProducts?.payment_details === undefined ? true : activeProducts.payment_details;
 		const activeTab = accessDetailsTab ? this.getActiveTab() : PAYMENT_NAV_ITEMS_INDEXES.HISTORY;
 		const activeItem = PAYMENT_NAV_ITEMS[activeTab];
 		if (redirectUrl) {
