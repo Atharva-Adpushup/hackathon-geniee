@@ -49,7 +49,22 @@ const uploadLineItemsLabel = (
 	</React.Fragment>
 );
 
+const uploadBlacklistedLineItemsLabel = (
+	<React.Fragment>
+		GAM Blacklisted Line Items{' '}
+		<CSVLink
+			headers={[{ label: 'Line Item ID', key: 'lineItemID' }]}
+			data={[]}
+			filename="blacklistedLineItemsTemplate.csv"
+			style={{ display: 'block' }}
+		>
+			<small> (Download CSV Template)</small>
+		</CSVLink>
+	</React.Fragment>
+);
+
 const DEFAULT_LINE_ITEMS = [];
+const DEFAULT_BLACKLISTED_LINE_ITEMS = [];
 const DEFAULT_AD_UNITS = [];
 const DEFAULT_PNP_CONFIG = {};
 const PICKER_STYLE = {
@@ -67,6 +82,7 @@ const PnP = (props = {}) => {
 	const [activeKey, setActiveKey] = useState(null);
 	const [adUnitsFileName, setAdUnitsFileName] = useState('');
 	const [lineItemsFileName, setLineItemsFileName] = useState('');
+	const [blacklistedLineItemsFileName, setBlacklistedItemsFileName] = useState('');
 	const [showAdUnitsModal, setShowAdUnitsModal] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
 
@@ -77,10 +93,10 @@ const PnP = (props = {}) => {
 		pnpConfig,
 		showNotification
 	} = props;
-
 	const {
 		adUnits = DEFAULT_AD_UNITS,
 		lineItems = DEFAULT_LINE_ITEMS,
+		blacklistedLineItems = DEFAULT_BLACKLISTED_LINE_ITEMS,
 		pnpSiteId,
 		native,
 		outstream,
@@ -244,7 +260,9 @@ const PnP = (props = {}) => {
 					showNotification({
 						mode: 'error',
 						title: 'Operation Failed',
-						message: `Platfrom ${unit.platform} has duplicate unit code ${unit.code}. Please make sure adUnitCode is unique for each platform`,
+						message: `Platfrom ${unit.platform} has duplicate unit code ${
+							unit.code
+						}. Please make sure adUnitCode is unique for each platform`,
 						autoDismiss: 10
 					});
 					return;
@@ -262,7 +280,9 @@ const PnP = (props = {}) => {
 					showNotification({
 						mode: 'error',
 						title: 'Operation Failed',
-						message: `Unit ${unit.code} has an unsupported size ${size}. Please change the size or remove the unit to proceed.`,
+						message: `Unit ${
+							unit.code
+						} has an unsupported size ${size}. Please change the size or remove the unit to proceed.`,
 						autoDismiss: 10
 					});
 				}
@@ -321,6 +341,16 @@ const PnP = (props = {}) => {
 		[siteId, updatePnPConfigKey]
 	);
 
+	const processBlacklistedLineItems = useCallback(
+		(items = []) => {
+			const processedBlacklistedLineItems = items
+				.splice(1)
+				.map(([lineItemId]) => ({ id: lineItemId }));
+			updatePnPConfigKey(siteId, 'blacklistedLineItems', processedBlacklistedLineItems);
+		},
+		[siteId, updatePnPConfigKey]
+	);
+
 	const parseFile = useCallback(
 		(type, csvFile) => {
 			Papa.parse(csvFile, {
@@ -332,20 +362,29 @@ const PnP = (props = {}) => {
 				complete: responses => {
 					if (type === 'gamAdUnits') {
 						processAdUnits(responses.data);
-					} else {
+					} else if (type === 'lineItems') {
 						processLineItems(responses.data);
+					} else if (type === 'blacklistedLineItems') {
+						processBlacklistedLineItems(responses.data);
 					}
 				}
 			});
 		},
-		[processAdUnits, processLineItems]
+		[processAdUnits, processLineItems, processBlacklistedLineItems]
 	);
 
 	const handleUploadUnits = useCallback(
 		e => {
 			const uploadType = e.target.id;
 			if (!e.target.value.endsWith('.csv')) {
-				uploadType === 'gamAdUnits' ? setAdUnitsFileName('') : setLineItemsFileName('');
+				if (uploadType === 'gamAdUnits') {
+					setAdUnitsFileName('');
+				} else if (uploadType === 'lineItems') {
+					setLineItemsFileName('');
+				} else if (uploadType === 'blacklistedLineItems') {
+					setBlacklistedItemsFileName('');
+				}
+
 				showNotification({
 					mode: 'error',
 					title: 'Operation Failed',
@@ -360,8 +399,11 @@ const PnP = (props = {}) => {
 			if (uploadType === 'gamAdUnits') {
 				setAdUnitsFileName(fileName);
 				parseFile(uploadType, file);
-			} else {
+			} else if (uploadType === 'lineItems') {
 				setLineItemsFileName(fileName);
+				parseFile(uploadType, file);
+			} else if (uploadType === 'blacklistedLineItems') {
+				setBlacklistedItemsFileName(fileName);
 				parseFile(uploadType, file);
 			}
 		},
@@ -379,6 +421,7 @@ const PnP = (props = {}) => {
 		const payload = {
 			adUnits,
 			lineItems,
+			blacklistedLineItems,
 			pnpSiteId,
 			native,
 			outstream,
@@ -417,6 +460,7 @@ const PnP = (props = {}) => {
 	const handleReset = useCallback(() => {
 		setAdUnitsFileName('');
 		setLineItemsFileName('');
+		setBlacklistedItemsFileName('');
 		fetchPnPData();
 	}, [fetchPnPData]);
 
@@ -442,6 +486,17 @@ const PnP = (props = {}) => {
 				label={uploadLineItemsLabel}
 				size={6}
 				id="lineItems"
+				style={PICKER_STYLE}
+			/>
+			<FieldGroup
+				name="Blacklisted Line Items"
+				value={blacklistedLineItemsFileName}
+				onChange={handleUploadUnits}
+				accept=".csv"
+				type="file"
+				label={uploadBlacklistedLineItemsLabel}
+				size={6}
+				id="blacklistedLineItems"
 				style={PICKER_STYLE}
 			/>
 			<CustomToggleSwitch
@@ -534,6 +589,16 @@ const PnP = (props = {}) => {
 				>
 					<CustomButton className="u-margin-l4" variant="primary" bsSize="large">
 						Download Uploaded Line Items
+					</CustomButton>
+				</CSVLink>
+				<CSVLink
+					headers={[{ label: 'Line Item ID', key: 'id' }]}
+					data={blacklistedLineItems}
+					filename="blacklistedLineItems.csv"
+					style={{ display: 'block' }}
+				>
+					<CustomButton className="u-margin-l4" variant="primary" bsSize="large">
+						Download Uploaded Blacklisted Line Items
 					</CustomButton>
 				</CSVLink>
 			</div>
