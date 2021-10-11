@@ -163,7 +163,7 @@ class Payment extends Component {
 	};
 
 	render() {
-		const { accessBalanceTab, activeProducts } = this.props;
+		const { balancePayment, activeProducts } = this.props;
 		const { redirectUrl } = this.state;
 		const accessDetailsTab =
 			activeProducts?.payment_details === undefined ? true : activeProducts.payment_details;
@@ -182,7 +182,7 @@ class Payment extends Component {
 						{accessDetailsTab && <NavItem eventKey={1}>{PAYMENT_NAV_ITEMS_VALUES.DETAILS}</NavItem>}
 						<NavItem eventKey={2}>{PAYMENT_NAV_ITEMS_VALUES.HISTORY}</NavItem>
 						{/* only show this tab for specific sites. Enabled using "accessBalanceTab" flag, maintained in user doc */}
-						{accessBalanceTab ? (
+						{balancePayment?.accessBalanceTab ? (
 							<NavItem eventKey={3}>{PAYMENT_NAV_ITEMS_VALUES.BALANCE}</NavItem>
 						) : null}
 					</Nav>
