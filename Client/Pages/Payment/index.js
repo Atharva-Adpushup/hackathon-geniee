@@ -141,7 +141,9 @@ class Payment extends Component {
 		const { paymentDetails, paymentHistory } = this.state;
 		const { activeProducts } = this.props;
 		const accessDetailsTab =
-			activeProducts?.payment_details === undefined ? true : activeProducts.payment_details;
+			activeProducts === undefined || activeProducts.payment_details === undefined
+				? true
+				: activeProducts.payment_details;
 		const activeTab = accessDetailsTab ? this.getActiveTab() : PAYMENT_NAV_ITEMS_INDEXES.HISTORY;
 		switch (activeTab) {
 			case PAYMENT_NAV_ITEMS_INDEXES.DETAILS:
@@ -166,7 +168,9 @@ class Payment extends Component {
 		const { balancePayment, activeProducts } = this.props;
 		const { redirectUrl } = this.state;
 		const accessDetailsTab =
-			activeProducts?.payment_details === undefined ? true : activeProducts.payment_details;
+			activeProducts === undefined || activeProducts.payment_details === undefined
+				? true
+				: activeProducts.payment_details;
 		const activeTab = accessDetailsTab ? this.getActiveTab() : PAYMENT_NAV_ITEMS_INDEXES.HISTORY;
 		const activeItem = PAYMENT_NAV_ITEMS[activeTab];
 		if (redirectUrl) {
@@ -182,7 +186,7 @@ class Payment extends Component {
 						{accessDetailsTab && <NavItem eventKey={1}>{PAYMENT_NAV_ITEMS_VALUES.DETAILS}</NavItem>}
 						<NavItem eventKey={2}>{PAYMENT_NAV_ITEMS_VALUES.HISTORY}</NavItem>
 						{/* only show this tab for specific sites. Enabled using "accessBalanceTab" flag, maintained in user doc */}
-						{balancePayment?.accessBalanceTab ? (
+						{balancePayment && balancePayment.accessBalanceTab ? (
 							<NavItem eventKey={3}>{PAYMENT_NAV_ITEMS_VALUES.BALANCE}</NavItem>
 						) : null}
 					</Nav>
