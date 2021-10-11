@@ -33,7 +33,7 @@ const pnpConfigValidation = {
     outstream: Yup.boolean(),
     filledInsertionTrigger: Yup.number().min(30).optional(),
     unfilledInsertionTrigger: Yup.number().min(5).optional(),
-    refreshType: Yup.string().oneOf(['activeView', 'activeTab']).required()
+    refreshType: Yup.string().oneOf(['activeView', 'activeTab','bgRefresh']).required()
 };
 
 module.exports = {
