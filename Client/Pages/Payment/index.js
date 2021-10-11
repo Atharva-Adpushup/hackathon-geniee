@@ -141,7 +141,7 @@ class Payment extends Component {
 		const { paymentDetails, paymentHistory } = this.state;
 		const { activeProducts } = this.props;
 		const accessDetailsTab =
-			activeProducts === undefined || activeProducts.payment_details === undefined
+			activeProducts && activeProducts.payment_details?
 				? true
 				: activeProducts.payment_details;
 		const activeTab = accessDetailsTab ? this.getActiveTab() : PAYMENT_NAV_ITEMS_INDEXES.HISTORY;
