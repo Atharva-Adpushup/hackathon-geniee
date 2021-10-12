@@ -8,15 +8,32 @@ const router = express.Router();
 router.get('/syncCdn', (req, res) => {
 	const { sites, forcePrebidBuild } = req.query;
 
-	const commaSeperatedNumbersRegex = /^(\d*,?)+[^,]$/;
-	const isValidSiteIds = commaSeperatedNumbersRegex.test(sites);
+	const siteIds = [];
 	const isAllSites = sites === 'all';
 
-	if (!isAllSites && !isValidSiteIds) {
-		return res.status(httpStatus.BAD_REQUEST).json({ error: 'Sites list is not valid!' });
-	}
+	if (!isAllSites) {
+		const sitesArr = sites && sites.split(',');
 
-	const siteIds = isValidSiteIds ? sites.split(',') : [];
+		let isValidSiteIds = true;
+		if (Array.isArray(sitesArr) && sitesArr.length) {
+			// eslint-disable-next-line no-restricted-syntax
+			for (const siteId of sitesArr) {
+				const cleanedSiteId = parseInt(siteId.trim(), 10);
+				if (!cleanedSiteId || !Number.isInteger(cleanedSiteId)) {
+					isValidSiteIds = false;
+					break;
+				}
+
+				siteIds.push(cleanedSiteId);
+			}
+		} else {
+			isValidSiteIds = false;
+		}
+
+		if (!isValidSiteIds || !siteIds.length) {
+			return res.status(httpStatus.BAD_REQUEST).json({ error: 'Sites list is not valid!' });
+		}
+	}
 
 	// Fetch Valid SiteIds from db
 	return siteModel
