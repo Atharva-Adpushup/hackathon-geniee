@@ -278,7 +278,7 @@ class ApLite extends Component {
 					});
 				}
 				if (!parentAdUnitError)
-					this.setState(prevState => ({
+					this.setState({
 						structuredAdUnits: adUnitsArr,
 						selectedAdUnitCodeForHB: [...adUnitsArr.map(({ dfpAdunitCode }) => dfpAdunitCode)],
 						selectedAdUnitCodeForAdRefresh: [
@@ -288,7 +288,7 @@ class ApLite extends Component {
 							...adUnitsArr.map(({ dfpAdunitCode }) => dfpAdunitCode)
 						],
 						selectedAdUnitCodeActive: [...adUnitsArr.map(({ dfpAdunitCode }) => dfpAdunitCode)]
-					}));
+					});
 			}
 		});
 	};
@@ -449,12 +449,7 @@ class ApLite extends Component {
 	);
 
 	handleHBChange = (e, adunitCode) => {
-		const {
-			uploadedAdUnits,
-			oldAdUnits,
-			structuredAdUnits,
-			selectedAdUnitCodeForHB,
-		} = this.state;
+		const { uploadedAdUnits, oldAdUnits, structuredAdUnits, selectedAdUnitCodeForHB } = this.state;
 
 		const adUnits = structuredAdUnits.length
 			? structuredAdUnits
@@ -489,12 +484,41 @@ class ApLite extends Component {
 		});
 	};
 
+	handleAdRefreshChange = (e, adunitCode) => {
+		const {
+			uploadedAdUnits,
+			oldAdUnits,
+			structuredAdUnits,
+			selectedAdUnitCodeForAdRefresh
+		} = this.state;
+		const adUnits = structuredAdUnits.length
+			? structuredAdUnits
+			: uploadedAdUnits.length
+			? uploadedAdUnits
+			: oldAdUnits;
+		if (e.target.checked) {
+			selectedAdUnitCodeForAdRefresh.push(adunitCode);
+			adUnits.find(v => v.dfpAdunitCode === adunitCode).refreshSlot = true;
+		} else {
+			selectedAdUnitCodeForAdRefresh.splice(selectedAdUnitCodeForAdRefresh.indexOf(adunitCode), 1);
+			adUnits.find(v => v.dfpAdunitCode === adunitCode).refreshSlot = false;
+		}
+
+		this.setState({
+			selectedAdUnitCodeForAdRefresh,
+			oldAdUnits,
+			uploadedAdUnits,
+			structuredAdUnits,
+			adRefresh: selectedAdUnitCodeForAdRefresh.length === adUnits.length
+		});
+	};
+
 	handleVideoChange = (e, adunitCode) => {
 		const {
 			uploadedAdUnits,
 			oldAdUnits,
 			structuredAdUnits,
-			selectedAdUnitCodeForVideoFormat,
+			selectedAdUnitCodeForVideoFormat
 		} = this.state;
 
 		const adUnits = structuredAdUnits.length
