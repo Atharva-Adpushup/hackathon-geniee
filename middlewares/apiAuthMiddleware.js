@@ -74,8 +74,6 @@ module.exports = (req, res, next) => {
 	}
 
 	return Promise.join(authToken.decodeAuthToken(token), decoded => {
-		console.log('===>', new Date(), 'Received from: ', req.method, req.originalUrl);
-		console.log('===>', new Date(), 'User: ', decoded.email, decoded.originalEmail);
 		if (decoded.isAdpUser) {
 			req.user = decoded;
 			return next();
