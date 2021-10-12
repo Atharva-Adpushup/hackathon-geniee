@@ -407,7 +407,10 @@ const XPATH_MODE_URL = {
 		{ name: 'Mobile', value: 'Mobile' },
 		{ name: 'Tablet', value: 'Tablet' }
 	],
-	modes: [{ name: 'Mode 1', value: 1 }, { name: 'Mode 2', value: 2 }],
+	modes: [
+		{ name: 'Mode 1', value: 1 },
+		{ name: 'Mode 2', value: 2 }
+	],
 	ORDER_BY_PARAMS: [
 		{ name: 'Hits', value: 'hits' },
 		{ name: 'XPath Miss', value: 'xpath_miss' },
@@ -581,7 +584,8 @@ const WEEKEND = ['saturday', 'sunday'];
 const WEEKDAY = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
 const PNP_REFRESH_TYPES = [
 	{ name: 'Active View Refresh', value: 'activeView' },
-	{ name: 'Active Tab Refresh', value: 'activeTab' }
+	{ name: 'Active Tab Refresh', value: 'activeTab' },
+	{ name: 'Background Refresh', value: 'bgRefresh' }
 ];
 
 const GA_ACCESS_EMAIL_OPTIONS = [
