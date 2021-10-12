@@ -81,22 +81,16 @@ class ApLite extends Component {
 		const headerBiddingEnabledAdUnits = [];
 		const adRefreshEnabledUnits = [];
 		const videoFormatEnabledUnits = [];
-		const activeHeaderBiddingEnabledAdUnits = [];
-		const activeAdRefreshEnabledUnits = [];
-		const activeVideoFormatEnabledUnits = [];
 		const activeAdUnits = [];
 
 		adUnits.forEach(({ headerBidding, dfpAdunitCode, formats, refreshSlot, isActive }) => {
 			if (headerBidding) {
-				if (isActive) activeHeaderBiddingEnabledAdUnits.push(dfpAdunitCode);
 				headerBiddingEnabledAdUnits.push(dfpAdunitCode);
 			}
 			if (refreshSlot) {
-				if (isActive) activeAdRefreshEnabledUnits.push(dfpAdunitCode);
 				adRefreshEnabledUnits.push(dfpAdunitCode);
 			}
 			if (formats.includes('video')) {
-				if (isActive) activeVideoFormatEnabledUnits.push(dfpAdunitCode);
 				videoFormatEnabledUnits.push(dfpAdunitCode);
 			}
 			if (isActive) {
@@ -112,9 +106,9 @@ class ApLite extends Component {
 			selectedAdUnitCodeForAdRefresh: adRefreshEnabledUnits,
 			selectedAdUnitCodeForVideoFormat: videoFormatEnabledUnits,
 			selectedAdUnitCodeActive: activeAdUnits,
-			headerBidding: activeHeaderBiddingEnabledAdUnits.length === activeAdUnits.length,
-			adRefresh: activeAdRefreshEnabledUnits.length === activeAdUnits.length,
-			selectAllFormats: activeVideoFormatEnabledUnits.length === activeAdUnits.length
+			headerBidding: headerBiddingEnabledAdUnits.length === adUnits.length,
+			adRefresh: adRefreshEnabledUnits.length === adUnits.length,
+			selectAllFormats: videoFormatEnabledUnits.length === adUnits.length
 		});
 	};
 
@@ -156,19 +150,17 @@ class ApLite extends Component {
 			[name]: value
 		};
 
-		adUnits
-			.filter(({ isActive }) => isActive)
-			.map(adUnit => {
-				if (name === 'headerBidding') {
-					adUnit.headerBidding = !!value;
-				}
-				if (name === 'adRefresh') {
-					adUnit.refreshSlot = !!value;
-				}
-				if (name === 'selectAllFormats') {
-					adUnit.formats = value ? ['display', 'video'] : ['display'];
-				}
-			});
+		adUnits.map(adUnit => {
+			if (name === 'headerBidding') {
+				adUnit.headerBidding = !!value;
+			}
+			if (name === 'adRefresh') {
+				adUnit.refreshSlot = !!value;
+			}
+			if (name === 'selectAllFormats') {
+				adUnit.formats = value ? ['display', 'video'] : ['display'];
+			}
+		});
 
 		const stateToReturn = this.stateToReturn(name, value, defaultState, adUnits);
 
@@ -462,10 +454,7 @@ class ApLite extends Component {
 			oldAdUnits,
 			structuredAdUnits,
 			selectedAdUnitCodeForHB,
-			selectedAdUnitCodeActive
 		} = this.state;
-
-		if (!selectedAdUnitCodeActive.includes(adunitCode)) return;
 
 		const adUnits = structuredAdUnits.length
 			? structuredAdUnits
@@ -484,9 +473,7 @@ class ApLite extends Component {
 			oldAdUnits,
 			uploadedAdUnits,
 			structuredAdUnits,
-			headerBidding:
-				adUnits.filter(v => v.headerBidding && selectedAdUnitCodeActive.includes(v.dfpAdunitCode))
-					.length === selectedAdUnitCodeActive.length
+			headerBidding: selectedAdUnitCodeForHB.length === adUnits.length
 		});
 	};
 
@@ -498,8 +485,7 @@ class ApLite extends Component {
 			selectedAdUnitCodeActive.splice(selectedAdUnitCodeActive.indexOf(adunitCode), 1);
 		}
 		this.setState({
-			selectedAdUnitCodeActive,
-			headerBidding: selectedAdUnitCodeForHB.length === selectedAdUnitCodeActive.length
+			selectedAdUnitCodeActive
 		});
 	};
 
@@ -509,10 +495,7 @@ class ApLite extends Component {
 			oldAdUnits,
 			structuredAdUnits,
 			selectedAdUnitCodeForVideoFormat,
-			selectedAdUnitCodeActive
 		} = this.state;
-
-		if (!selectedAdUnitCodeActive.includes(adunitCode)) return;
 
 		const adUnits = structuredAdUnits.length
 			? structuredAdUnits
@@ -541,10 +524,7 @@ class ApLite extends Component {
 			oldAdUnits,
 			uploadedAdUnits,
 			structuredAdUnits,
-			selectAllFormats:
-				adUnits.filter(
-					v => v.formats.includes('video') && selectedAdUnitCodeActive.includes(v.dfpAdunitCode)
-				).length === selectedAdUnitCodeActive.length
+			selectAllFormats: selectedAdUnitCodeForVideoFormat.length === adUnits.length
 		});
 	};
 
