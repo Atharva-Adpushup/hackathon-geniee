@@ -1,6 +1,7 @@
 /* eslint-disable react/forbid-prop-types */
 import React from 'react';
 import map from 'lodash/map';
+import PropTypes from 'prop-types';
 
 import {
 	FormGroup,
@@ -11,7 +12,6 @@ import {
 	ToggleButtonGroup,
 	ToggleButton
 } from '@/Client/helpers/react-bootstrap-imports';
-import PropTypes from 'prop-types';
 import SelectBox from '../SelectBox/index';
 
 const FieldGroup = ({
@@ -26,10 +26,14 @@ const FieldGroup = ({
 	textOnlyStyles,
 	dataKey,
 	toggleGroupType,
+	fileDropdownValue,
+	onFileDropdownChange,
+	fileDropdownTitle,
 	...props
 }) => {
 	const isToggleButtonGroup = !!(type === 'toggle-button-group' && itemCollection);
 	const isDropDownButton = !!(type === 'toggle-dropdown-button' && itemCollection);
+	const isFileSelectDropdownGroup = !!(type === 'toggle-file-select-group' && itemCollection);
 	const buttonGroup = isToggleButtonGroup ? (
 		<ButtonToolbar>
 			<ToggleButtonGroup
@@ -58,6 +62,38 @@ const FieldGroup = ({
 		/>
 	) : null;
 
+	const fileSelectWithDropdown = isFileSelectDropdownGroup ? (
+		<div
+			style={{
+				display: 'inline-flex',
+				alignItems: 'center',
+				justifyContent: 'space-evenly',
+				float: 'right',
+				fontWeight: 700
+			}}
+		>
+			<div style={{ width: '200px' }}>
+				<SelectBox
+					selected={fileDropdownValue}
+					onSelect={onFileDropdownChange}
+					title={fileDropdownTitle}
+					id={`${id}-dropdown`}
+					options={itemCollection}
+					dataKey={dataKey}
+				/>
+			</div>
+
+			<FormControl
+				type="file"
+				onChange={onChange}
+				value={value}
+				id={`${id}-file`}
+				style={{ width: '50%' }}
+				{...props}
+			/>
+		</div>
+	) : null;
+
 	const textComponent =
 		isTextOnly && !type ? (
 			<span style={{ display: 'block', ...textOnlyStyles }}>{value}</span>
@@ -68,6 +104,8 @@ const FieldGroup = ({
 		computedComponent = buttonGroup;
 	} else if (isDropDownButton) {
 		computedComponent = dropdownButton;
+	} else if (isFileSelectDropdownGroup) {
+		computedComponent = fileSelectWithDropdown;
 	} else if (isTextOnly) {
 		computedComponent = textComponent;
 	} else {
@@ -78,7 +116,6 @@ const FieldGroup = ({
 		<FormGroup controlId={id} className="u-margin-b4">
 			{label ? <ControlLabel className="u-margin-b3">{label}</ControlLabel> : null}
 			{computedComponent}
-
 			{help && <HelpBlock>{help}</HelpBlock>}
 		</FormGroup>
 	);
@@ -94,7 +131,10 @@ FieldGroup.propTypes = {
 	value: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
 	dataKey: PropTypes.string,
 	toggleGroupType: PropTypes.string,
-	textOnlyStyles: PropTypes.object
+	textOnlyStyles: PropTypes.object,
+	fileDropdownValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
+	onFileDropdownChange: PropTypes.func,
+	fileDropdownTitle: PropTypes.string
 };
 FieldGroup.defaultProps = {
 	help: '',
@@ -105,6 +145,9 @@ FieldGroup.defaultProps = {
 	dataKey: '',
 	toggleGroupType: 'radio',
 	onChange: () => {},
-	textOnlyStyles: {}
+	textOnlyStyles: {},
+	fileDropdownValue: '',
+	onFileDropdownChange: () => {},
+	fileDropdownTitle: ''
 };
 export default FieldGroup;
