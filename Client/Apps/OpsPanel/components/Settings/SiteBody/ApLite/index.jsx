@@ -395,7 +395,6 @@ class ApLite extends Component {
 					message: 'Settings saved successsfully',
 					autoDismiss: 5
 				});
-				console.log('Log :  ~ adUnits', adUnits);
 
 				this.setSatesFromAdUnits(adUnits);
 				this.handleReset();
