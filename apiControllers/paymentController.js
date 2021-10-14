@@ -5,6 +5,8 @@ const router = express.Router();
 const { sendSuccessResponse } = require('../helpers/commonFunctions');
 const HTTP_STATUSES = require('../configs/httpStatusConsts');
 const { sendDataToAuditLogService } = require('../helpers/routeHelpers');
+const { sendEmail } = require('../helpers/queueMailer');
+
 const cbQuery = require('../apiServices/paymentServices');
 const {
 	AUDIT_LOGS_ACTIONS: { PAYMENT_SETTINGS }
@@ -50,9 +52,18 @@ router
 				.then(reqAmtArr => {
 					const { originalEmail } = req.user;
 					const { dataForAuditLogs } = req.body;
+					const { amtToRelease, created_date } = req.body.data;
 					const { appName, type = 'account' } = dataForAuditLogs;
 					const siteId = '';
 					const siteDomain = '';
+					sendEmail({
+						queue: 'MAILER',
+						data: {
+							to: 'accounts@adpushup.com',
+							body: `G4G requests ${amtToRelease}$ on ${created_date}`,
+							subject: 'G4G payment Request'
+						}
+					});
 					sendDataToAuditLogService({
 						siteId,
 						siteDomain,
