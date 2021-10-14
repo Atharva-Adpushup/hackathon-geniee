@@ -51,19 +51,24 @@ router
 			setRequestAmountDetails(email, reqAmt)
 				.then(reqAmtArr => {
 					const { originalEmail } = req.user;
-					const { dataForAuditLogs } = req.body;
-					const { amtToRelease, created_date } = req.body.data;
+					const {
+						data: { amtToRelease, created_date },
+						dataForAuditLogs
+					} = req.body;
 					const { appName, type = 'account' } = dataForAuditLogs;
 					const siteId = '';
 					const siteDomain = '';
-					sendEmail({
-						queue: 'MAILER',
-						data: {
-							to: 'accounts@adpushup.com',
-							body: `G4G requests ${amtToRelease}$ on ${created_date}`,
-							subject: 'G4G payment Request'
-						}
-					});
+					if (amtToRelease && created_date) {
+						sendEmail({
+							queue: 'MAILER',
+							data: {
+								to: 'accounts@adpushup.com',
+								body: `G4G requests ${amtToRelease}$ on ${created_date}`,
+								subject: 'G4G payment Request'
+							}
+						});
+					}
+
 					sendDataToAuditLogService({
 						siteId,
 						siteDomain,
