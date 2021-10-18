@@ -108,12 +108,12 @@ const processDataReceivedFromPublisher = data => {
 };
 
 const initDataForpartner = function() {
-	const date = moment().subtract(2, 'days');
-	const fromDatePubmatic = date.format('YYYY-MM-DDT00:00');
-	const toDatePubmatic = date.format('YYYY-MM-DDT23:59');
+	// data for one week
+	const fromDatePubmatic = moment().subtract(8, 'days').format('YYYY-MM-DDT00:00');
+	const toDatePubmatic = moment().subtract(2, 'days').format('YYYY-MM-DDT23:59:59');
 	
-	const fromDate = date.format('YYYY-MM-DD');
-	const toDate = date.format('YYYY-MM-DD');
+	const fromDate = moment().subtract(8, 'days').format('YYYY-MM-DD');
+	const toDate = moment().subtract(2, 'days').format('YYYY-MM-DD');
 	return {
 		fromDate,
 		toDate,
@@ -145,7 +145,7 @@ const fetchData = sitesData => {
 				network: NETWORK_ID,
 				fromDate,
 				toDate,
-				interval: 'daily',
+				interval: 'cumulative',
 				dimension: 'siteid'
 			};
 
@@ -162,14 +162,21 @@ const fetchData = sitesData => {
 
 			// if aonmalies found
 			if (anomalies.length) {
-				const dataToSend = PubmaticPartnerModel.formatAnomaliesDataForSQL(anomalies, NETWORK_ID);
-				await Promise.all([
-					emailer.anomaliesMailService({
+				if (process.env.NODE_ENV == 'production') {
+					const dataToSend = PubmaticPartnerModel.formatAnomaliesDataForSQL(anomalies, NETWORK_ID);
+					await Promise.all([
+						emailer.anomaliesMailService({
+							partner: PARTNER_NAME,
+							anomalies
+						}),
+						saveAnomaliesToDb(dataToSend, PARTNER_NAME)
+					]);	
+				} else {
+					await emailer.anomaliesMailService({
 						partner: PARTNER_NAME,
 						anomalies
-					}),
-					saveAnomaliesToDb(dataToSend, PARTNER_NAME)
-				]);
+					})
+				}
 			}
 			return {
 				total: finalData.length,

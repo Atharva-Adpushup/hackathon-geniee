@@ -4,7 +4,7 @@ const moment = require('moment');
 const partnerAndAdpushpModel = require('../PartnerAndAdpushpModel');
 const emailer = require('../emailer');
 const saveAnomaliesToDb = require('../saveAnomaliesToDb');
-const { axiosErrorHandler, partnerModuleErrorHandler } = require('../utils');
+const { axiosErrorHandler, partnerModuleErrorHandler, aggregateWeeklyData } = require('../utils');
 
 const {
 	PARTNERS_PANEL_INTEGRATION: { ANOMALY_THRESHOLD, ANOMALY_THRESHOLD_IN_PER, CRITEO }
@@ -52,9 +52,11 @@ const processDataReceivedFromPublisher = data => {
 
 const initDataForpartner = function() {
 	const fromDate = moment()
-	.subtract(2, 'days')
-	.format('YYYY-MM-DD');
-	const toDate = fromDate;
+		.subtract(8, 'days')
+		.format('YYYY-MM-DD');
+	const toDate = moment()
+		.subtract(2, 'days')
+		.format('YYYY-MM-DD');
 
 	return {
 		fromDate,
@@ -80,7 +82,7 @@ const fetchData = async sitesData => {
 	console.log('Fetching data from Criteo...');
 	return getDataFromPartner(fromDate, toDate)
 		.then(async function(reportDataJSON) {
-			CriteoPartnerModel.setPartnersData(reportDataJSON);
+			CriteoPartnerModel.setPartnersData(aggregateWeeklyData(reportDataJSON, DOMAIN_FIELD_NAME, REVENUE_FIELD));
 			// process and map sites data with publishers API data response
 			CriteoPartnerModel.mapAdPushupSiteIdAndDomainWithPartnersDomain();
 			// Map PartnersData with AdPushup's SiteId mapping data
@@ -91,7 +93,7 @@ const fetchData = async sitesData => {
 				network: NETWORK_ID,
 				fromDate,
 				toDate,
-				interval: 'daily',
+				interval: 'cumulative',
 				dimension: 'siteid'
 			};
 
@@ -108,14 +110,21 @@ const fetchData = async sitesData => {
 
 			// if aonmalies found
 			if (anomalies.length) {
-				const dataToSend = CriteoPartnerModel.formatAnomaliesDataForSQL(anomalies, NETWORK_ID);
-				await Promise.all([
-					emailer.anomaliesMailService({
+				if(process.env.NODE_ENV === 'production') {
+					const dataToSend = CriteoPartnerModel.formatAnomaliesDataForSQL(anomalies, NETWORK_ID);
+					await Promise.all([
+						emailer.anomaliesMailService({
+							partner: PARTNER_NAME,
+							anomalies
+						}),
+						saveAnomaliesToDb(dataToSend, PARTNER_NAME)
+					]);
+				} else {
+					await emailer.anomaliesMailService({
 						partner: PARTNER_NAME,
 						anomalies
-					}),
-					saveAnomaliesToDb(dataToSend, PARTNER_NAME)
-				]);
+					})
+				}
 			}
 			return {
 				total: finalData.length,

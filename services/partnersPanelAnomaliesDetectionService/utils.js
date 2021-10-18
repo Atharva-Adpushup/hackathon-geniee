@@ -19,6 +19,35 @@ const requestErrorHandler = err => {
 	throw err;
 };
 
+/* diff field name for SiteId and Revenue for each partner */
+const aggregateWeeklyData = (reportData, DOMAIN_FIELD_NAME, REVENUE_FIELD) => {
+	// 1. group by domain
+	var obj = reportData.reduce((acc, item) => {
+		if(!acc[item[DOMAIN_FIELD_NAME]]) {
+			acc[item[DOMAIN_FIELD_NAME]] = [];
+		}
+		acc[item[DOMAIN_FIELD_NAME]].push(item)
+		return acc;
+	}, {})
+
+	// 2. aggregate revenue of grouped site's data
+	var res = [];
+	for(let site in obj) {
+		let aggregatedDataForEachSite = obj[site].reduce((acc, item) => {
+			if(!acc[DOMAIN_FIELD_NAME]) {
+				acc = {
+					[DOMAIN_FIELD_NAME]: item[DOMAIN_FIELD_NAME],
+					[REVENUE_FIELD]: 0
+				}
+			}
+			acc[REVENUE_FIELD] += +item[REVENUE_FIELD]
+			return acc;
+		}, {})
+		res.push(aggregatedDataForEachSite)
+	}
+	return res;
+}
+
 const partnerModuleErrorHandler = async (module, err) => {
 	console.log(err);
 	if (err instanceof CustomError) {
@@ -51,5 +80,6 @@ module.exports = {
 	requestErrorHandler,
 	partnerModuleErrorHandler,
 	couchbaseErrorHandler,
-	sendErrorNotification
+	sendErrorNotification,
+	aggregateWeeklyData
 };

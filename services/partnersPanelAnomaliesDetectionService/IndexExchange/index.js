@@ -152,7 +152,7 @@ const processReqInBatches = async (queue, headers, fromDate, toDate) => {
 					placementID: [item.placementID],
 					siteID: [item.siteID]
 				},
-				aggregation: 'day'
+				aggregation: 'siteID'
 			};
 
 			let config = {
@@ -219,15 +219,18 @@ const processDataReceivedFromPublisher = (data, siteIdsAndNameMappingFromPubData
 
 const initDataForpartner = function() {
 	const fromDate = moment()
-	.subtract(1, 'days')
-	.format('YYYY-MM-DD');
-	const toDate = fromDate;
+		.subtract(7, 'days')
+		.format('YYYY-MM-DD');
+
+	const toDate = moment()
+		.subtract(1, 'days')
+		.format('YYYY-MM-DD');
 
 	return {
 		fromDate,
 		toDate
-	}
-}
+	};
+};
 
 const fetchData = sitesData => {
 	const { fromDate, toDate } = initDataForpartner();
@@ -252,7 +255,7 @@ const fetchData = sitesData => {
 				network: NETWORK_ID,
 				fromDate: fromDate,
 				toDate: toDate,
-				interval: 'daily',
+				interval: 'cumulative',
 				dimension: 'siteid'
 			};
 
@@ -269,17 +272,24 @@ const fetchData = sitesData => {
 
 			// if aonmalies found
 			if (anomalies.length) {
-				const dataToSend = IndexExchangePartnerModel.formatAnomaliesDataForSQL(
-					anomalies,
-					NETWORK_ID
-				);
-				await Promise.all([
-					emailer.anomaliesMailService({
+				if(process.env.NODE_ENV === 'production') {
+					const dataToSend = IndexExchangePartnerModel.formatAnomaliesDataForSQL(
+						anomalies,
+						NETWORK_ID
+					);
+					await Promise.all([
+						emailer.anomaliesMailService({
+							partner: PARTNER_NAME,
+							anomalies
+						}),
+						saveAnomaliesToDb(dataToSend, PARTNER_NAME)
+					]);
+				} else {
+					await emailer.anomaliesMailService({
 						partner: PARTNER_NAME,
 						anomalies
-					}),
-					saveAnomaliesToDb(dataToSend, PARTNER_NAME)
-				]);
+					})
+				}
 			}
 			return {
 				total: finalData.length,
