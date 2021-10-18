@@ -13,8 +13,10 @@ const PARTNERS_LIST = {
 	OpenX: 'OpenX'
 };
 
-Object.keys(PARTNERS_LIST).forEach(partner => {
-    cron.schedule(partnersPanelService[PARTNERS_LIST[partner]], () => {
-        startPartnersPanelsAnomaliesDetectionService(PARTNERS_LIST[partner]);
-    });
-})
+if(process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
+	Object.keys(PARTNERS_LIST).forEach(partner => {
+	    cron.schedule(partnersPanelService[PARTNERS_LIST[partner]], () => {
+	        startPartnersPanelsAnomaliesDetectionService(PARTNERS_LIST[partner]);
+	    });
+	})
+}

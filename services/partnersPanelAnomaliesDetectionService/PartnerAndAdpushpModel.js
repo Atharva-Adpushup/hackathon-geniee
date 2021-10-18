@@ -1,6 +1,5 @@
 const Class = require('../../helpers/class'),
 	axios = require('axios'),
-	moment = require('moment'),
 	CustomError = require('./CustomError'),
 	PartnersModel = Class.extend(function() {
 		const ADPUSHUP_REPORT_BASE_URL = 'https://api.adpushup.com/CentralReportingWebService';
@@ -46,8 +45,8 @@ const Class = require('../../helpers/class'),
 				const domain = item.siteDomain
 					.replace(/(^\w+:|^)\/\//, '')
 					.replace(/^https?:\/\//, '')
-					.replace(/^w+./, '')
-					.replace(/^hw+./, '')
+					.replace(/^w+\./, '')
+					.replace(/^hw+\./, '')
 					.replace(/\/$/, '');
 
 				// creating separate hash maps to easily map Partners Data and AdPushup Data
@@ -115,13 +114,15 @@ const Class = require('../../helpers/class'),
 						data: { result: adpData }
 					} = response;
 					return adpData.map(item => {
-						const { siteid, network_gross_revenue, site, date } = item;
+						const { fromDate, toDate } = params;
+						const date = `${fromDate} to ${toDate}`;
+						const { siteid, network_gross_revenue, site } = item;
 
 						// create a mapping of ADP daa with siteId.
 						// some domains may have multiple siteIds, it would be easy to fetch
 						// revenue using this mapping while calculating revenue of domains with
 						// multiple siteId in ADP data.
-						adpDataSiteIdMapping[siteid] = item;
+						adpDataSiteIdMapping[siteid] = { ...item, date, fromDate, toDate};
 
 						return {
 							date,
@@ -142,6 +143,8 @@ const Class = require('../../helpers/class'),
 						sitesDomainAndIdMapping[domain].adpRevenue += +adpDataSiteIdMapping[site.siteId]
 							.network_gross_revenue;
 						sitesDomainAndIdMapping[domain].date = adpDataSiteIdMapping[site.siteId].date;
+						sitesDomainAndIdMapping[domain].fromDate = adpDataSiteIdMapping[site.siteId].fromDate;
+						sitesDomainAndIdMapping[domain].toDate = adpDataSiteIdMapping[site.siteId].toDate;
 					}
 					sitesDomainAndIdMapping[domain].adpRevenue = +sitesDomainAndIdMapping[
 						domain
@@ -165,17 +168,21 @@ const Class = require('../../helpers/class'),
 					mappedData.diffPer =
 						adpRevenue > 0 ? ((diff / adpRevenue) * 100) : 100;
 					mappedData.siteDomain = domain;
-					mappedData.date = moment(mappedData.date).format('YYYY-MM-DD');
+					mappedData.date = mappedData.date;
+					mappedData.fromDate = mappedData.fromDate;
+					mappedData.toDate = mappedData.toDate;
 					finalData.push(mappedData);
 				}
 			});
+
 			return finalData;
 		};
 		this.formatAnomaliesDataForSQL = function(data, NETWORK_ID) {
 			const sqlData = data.map(item => {
 				const site = item.sites.shift();
 				return {
-					report_date: moment(item.date).format('YYYY-MM-DD'),
+					from_date: item.fromDate,
+					to_date: item.toDate,
 					ntwid: NETWORK_ID,
 					siteid: site.siteId,
 					ap_revenue: item.adpRevenue,

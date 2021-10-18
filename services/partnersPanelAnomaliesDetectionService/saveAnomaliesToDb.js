@@ -23,7 +23,7 @@ const saveAnomaliesToDb = async (data, module) => {
 			console.log(`error API DB Save :${e}`);
 			await emailer.serviceErrorNotificationMailService({
 				partner: module,
-				error
+				error: e
 			});
 			throw { error: true };
 			// return err;
