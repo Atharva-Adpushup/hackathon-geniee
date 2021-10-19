@@ -3,6 +3,7 @@ import { Row } from '@/Client/helpers/react-bootstrap-imports';
 import PagegroupContainer from '../../../containers/PagegroupContainer';
 import SizeMappingContainer from '../../../containers/SizeMappingContainer';
 import AppsContainer from '../../../containers/AppsContainer';
+import SiteLevelBeforeJSContainer from '../../../containers/SiteLevelBeforeJSContainer';
 import SettingsContainer from '../../../containers/SettingsContainer';
 import ApLiteContainer from '../../../containers/ApLiteContainer';
 import PnPContainer from '../../../containers/PnpContainer';
@@ -38,6 +39,11 @@ const SiteBody = props => {
 					showNotification={showNotification}
 				/>
 				<LineItemTypeRefreshContainer site={site} />
+				<SiteLevelBeforeJSContainer
+					dataForAuditLogs={dataForAuditLogs}
+					site={site}
+					showNotification={showNotification}
+				/>
 				<SizeMappingContainer
 					dataForAuditLogs={dataForAuditLogs}
 					site={site}
