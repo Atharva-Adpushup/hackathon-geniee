@@ -72,6 +72,15 @@ const LINE_ITEM_TYPES = [
         isMandatory: true,
         groupedSeparately: true,
         toBeFetchedFromGAM: false, // These are fetched in PRICE_PRIORITY
+    },
+    {
+        name: "Preferred Deal",
+        value: "PREFERRED_DEAL",
+        key: "PREFERRED_DEAL",
+        isMandatory: false,
+        isDisabled: false,
+        groupedSeparately: false,
+        toBeFetchedFromGAM: true
     }
 ];
 
