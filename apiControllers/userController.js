@@ -228,7 +228,44 @@ router
 				uri: `https://adsense.googleapis.com/v2/accounts?access_token=${token.access_token}`,
 				json: true
 			})
-				.then(adsenseInfo => adsenseInfo.items)
+				.then(adsenseInfo => {
+					/*
+					in adsense V2 API the response for /accounts REST URL changed from the previous
+					"items": [
+						{
+							"creation_time": "1292409972000",
+							"id": "pub-6717584324019958",
+							"kind": "adsense#account",
+							"name": "Zee Entertainment Enterprises Limited",
+							"premium": false,
+							"timezone": "Asia/Calcutta"
+						}
+					],
+
+					to
+
+					{
+						accounts: [
+							{
+								name: "accounts/pub-1325340429823502",
+								displayName: "AdPushup, Inc",
+								timeZone: {	id: "Asia/Calcutta"},
+								createTime: "2015-07-07T11:05:01Z",
+							}
+						]
+					}
+					*/
+					const { accounts } = adsenseInfo;
+
+					return accounts.map(account => ({
+						creation_time: account.createTime,
+						id: account.name.replace('accounts/', ''),
+						kind: 'adsense#account',
+						name: account.displayName,
+						premium: false,
+						timezone: account.timeZone.id
+					}));
+				})
 				.catch(err => {
 					if (
 						err.error &&
@@ -335,6 +372,7 @@ router
 			}
 		)
 			.catch(err => {
+				console.log(err);
 				const isNoAdsenseAccountMessage = !!(err.message === 'No adsense account');
 				const computedErrorMessage = isNoAdsenseAccountMessage
 					? `Sorry but it seems you have no AdSense account linked to your Google account. If this is a recently verified/created account, it might take upto 24 hours to come in effect. Please try again after sometime or contact support.`
