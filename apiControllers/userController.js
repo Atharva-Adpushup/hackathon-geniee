@@ -225,7 +225,7 @@ router
 		const getAdsenseAccounts = getTokens.then(token =>
 			request({
 				strictSSL: false,
-				uri: `https://www.googleapis.com/adsense/v1.4/accounts?access_token=${token.access_token}`,
+				uri: `https://adsense.googleapis.com/v2/accounts?access_token=${token.access_token}`,
 				json: true
 			})
 				.then(adsenseInfo => adsenseInfo.items)
@@ -363,7 +363,7 @@ router
 	              FOR site IN sites WHEN site.domain IS NOT MISSING END AS domains ,
 				ARRAY site.siteId
 				FOR site IN sites WHEN site.siteId IS NOT MISSING END AS siteIds
-				
+
 				FROM AppBucket WHERE meta().id LIKE "user::%"`
 			)
 			.then(users => {
