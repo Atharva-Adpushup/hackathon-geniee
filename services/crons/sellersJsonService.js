@@ -20,22 +20,30 @@ const filenames = {
 	backup: path.resolve(fileDirectory, `bkp_sellers.json`)
 };
 
-const SELLER_TYPE = 'PUBLISHER';
 const APP_BUCKET = 'AppBucket';
 const AP_APP_BUCKET = 'apAppBucket';
-const NEW_USER_AGE_IN_MONTHS = 3;
-const LAST_PAYMENT_CHECK_EXPIRY = 5;
+const NEW_USER_AGE_IN_MONTHS = 3; // user added in the last 3 months
+const LAST_PAYMENT_CHECK_EXPIRY = 5; // user was paid in the last 5 months or not
 
 let errors = [];
 
-let confidentialDomainValidator = {
+const confidentialDomainValidator = {
 	'media.net': function(domain) {
 		return domain.indexOf('media.net') === 0;
 	}
 };
-let confidentialEmails = ['@media.net'];
-let confidentialCompanyNames = ['media.net'];
-let ignoredEmails = ['@mailinator', '@adpushup'];
+
+const ignoredEmails = ['@mailinator', '@adpushup'];
+const confidentialEmails = ['@media.net', '@blockthrough.com'];
+const confidentialCompanyNames = ['media.net', 'blockthrough inc.'];
+const defaultSellerType = 'PUBLISHER';
+// mapping to store seller type based on sellerId, email or any other field
+const sellerTypeMapping = {
+	sellerId: {
+		dfac7450fc3c184a1be4fba0cb4b0921: 'BOTH'
+	}
+	// email: {}
+};
 
 let fileOutput = commonConsts.SELLERS_JSON.fileConfig;
 
@@ -54,6 +62,11 @@ function colorLog(color, ...messages) {
 		cyan: '\x1b[36m'
 	};
 	console.log(colors[color] + ' \033[1m', ...messages);
+}
+
+function getSellerType(user) {
+	const customisedSellerType = sellerTypeMapping.sellerId[user.sellerId];
+	return customisedSellerType || defaultSellerType;
 }
 
 function isIgnoredEmail(email) {
@@ -161,7 +174,7 @@ function getPreparedSiteObj(user) {
 	}
 
 	siteObj.seller_id = user.sellerId;
-	siteObj.seller_type = SELLER_TYPE;
+	siteObj.seller_type = getSellerType(user);
 	siteObj.is_confidential = isConfidential ? 1 : 0;
 
 	return siteObj;
