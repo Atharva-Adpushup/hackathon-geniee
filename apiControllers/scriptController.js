@@ -1,5 +1,5 @@
 /* eslint-disable func-names */
-const crypto = require('crypto');
+const md5 = require('md5');
 const express = require('express');
 const Promise = require('bluebird');
 
@@ -66,6 +66,7 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 				};
 				const adServerSettings = user.get('adServerSettings');
 				const isAdPartner = !!site.get('partner');
+				const ownerEmail = site.get('ownerEmail');
 				const {
 					experiment,
 					prebidConfig,
@@ -81,17 +82,14 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 				}
 
 				apConfigs.lineItems = (adNetworkConfig && adNetworkConfig.lineItems) || [];
-				apConfigs.separatelyGroupedLineItems = (adNetworkConfig && adNetworkConfig.separatelyGroupedLineItems) || [];
+				apConfigs.separatelyGroupedLineItems =
+					(adNetworkConfig && adNetworkConfig.separatelyGroupedLineItems) || [];
 				apConfigs.autoOptimise = !!isAutoOptimise;
 				apConfigs.poweredByBanner = !!poweredByBanner;
 				apConfigs.poweredByBannerOnDocked = !!poweredByBannerOnDocked;
 				apConfigs.gptSraDisabled = !!gptSraDisabled;
 				apConfigs.siteDomain = site.get('siteDomain');
-				apConfigs.ownerEmailMD5 = crypto
-					.createHash('md5')
-					.update(site.get('ownerEmail'))
-					.digest('hex')
-					.substr(0, 64);
+				apConfigs.ownerEmailMD5 = md5(ownerEmail.toLowerCase());
 				apConfigs.isSPA = apConfigs.isSPA ? apConfigs.isSPA : false;
 				apConfigs.spaButUsingHook = apConfigs.spaButUsingHook ? apConfigs.spaButUsingHook : false;
 				apConfigs.spaPageTransitionTimeout = apConfigs.spaPageTransitionTimeout
@@ -183,9 +181,10 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 			const getPrebidAndAdsConfig = () =>
 				(() => {
 					if (apps.apLite) {
-						return Promise.join(generatePrebidConfig(siteId), generateApLiteAdsConfig(siteId)).then(
-							([prebidConfig, apLiteConfig]) => ({ prebidConfig, apLiteConfig })
-						);
+						return Promise.join(
+							generatePrebidConfig(siteId),
+							generateApLiteAdsConfig(siteId)
+						).then(([prebidConfig, apLiteConfig]) => ({ prebidConfig, apLiteConfig }));
 					}
 
 					return getReportData(site)
@@ -254,6 +253,7 @@ Router.get('/:siteId/ampSiteConfig', (req, res) => {
 				// TODO: rj: to check hb status
 				const apps = site.get('apps');
 				const apConfigs = site.get('apConfigs');
+				const ownerEmail = site.get('ownerEmail');
 				const adServerSettings = user.get('adServerSettings');
 
 				const {
@@ -271,11 +271,7 @@ Router.get('/:siteId/ampSiteConfig', (req, res) => {
 				if (sizeMappingConfig) apConfigs.sizeMapping = sizeMappingConfig;
 				if (currencyConfig) apConfigs.currencyConfig = currencyConfig;
 				apConfigs.siteDomain = site.get('siteDomain');
-				apConfigs.ownerEmailMD5 = crypto
-					.createHash('md5')
-					.update(site.get('ownerEmail'))
-					.digest('hex')
-					.substr(0, 64);
+				apConfigs.ownerEmailMD5 = md5(ownerEmail.toLowerCase());
 				apConfigs.activeDFPNetwork =
 					(adServerSettings && adServerSettings.dfp && adServerSettings.dfp.activeDFPNetwork) ||
 					null;
@@ -335,12 +331,20 @@ Router.get('/:siteId/ampSiteConfig', (req, res) => {
 						if (!isValidRefreshLineItems) {
 							return null;
 						}
-						const groupedLineItems = Object.keys(adNetworkConfig.separatelyGroupedLineItems).reduce((accumulator, currValue) => {
-							accumulator = [...accumulator, ...adNetworkConfig.separatelyGroupedLineItems[currValue]];
-							return accumulator;
-						}, []);
-						
-						return Array.isArray(groupedLineItems) && groupedLineItems.length ? [...adNetworkConfig.lineItems, ...groupedLineItems] : adNetworkConfig.lineItems; 
+						const groupedLineItems = Object.keys(adNetworkConfig.separatelyGroupedLineItems).reduce(
+							(accumulator, currValue) => {
+								accumulator = [
+									...accumulator,
+									...adNetworkConfig.separatelyGroupedLineItems[currValue]
+								];
+								return accumulator;
+							},
+							[]
+						);
+
+						return Array.isArray(groupedLineItems) && groupedLineItems.length
+							? [...adNetworkConfig.lineItems, ...groupedLineItems]
+							: adNetworkConfig.lineItems;
 					}
 				);
 			};
