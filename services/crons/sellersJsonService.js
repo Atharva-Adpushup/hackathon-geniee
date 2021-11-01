@@ -37,18 +37,11 @@ const ignoredEmails = ['@mailinator', '@adpushup'];
 const confidentialEmails = ['@media.net', '@blockthrough.com'];
 const confidentialCompanyNames = ['media.net', 'blockthrough inc.'];
 const defaultSellerType = 'PUBLISHER';
-// mapping to store seller type based on sellerId, email or any other field
-const sellerTypeMapping = {
-	sellerId: {
-		dfac7450fc3c184a1be4fba0cb4b0921: 'BOTH'
-	}
-	// email: {}
-};
 
 let fileOutput = commonConsts.SELLERS_JSON.fileConfig;
 
 function getUsersQueryForBucket(bucketName) {
-	let queryString = `SELECT email, sellerId, dateCreated, manuallyEnteredCompanyName, lastPaymentCheckDateSellersJson, ARRAY site.domain FOR site IN sites END AS siteDomains FROM ${bucketName} WHERE meta().id LIKE 'user::%' AND ARRAY_LENGTH(sites) > 0;`;
+	let queryString = `SELECT email, sellerId, dateCreated, manuallyEnteredCompanyName, domainNameSellersJson, sellerType,lastPaymentCheckDateSellersJson, ARRAY site.domain FOR site IN sites END AS siteDomains FROM ${bucketName} WHERE meta().id LIKE 'user::%' AND ARRAY_LENGTH(sites) > 0;`;
 	return couchbase.N1qlQuery.fromString(queryString);
 }
 
@@ -65,7 +58,7 @@ function colorLog(color, ...messages) {
 }
 
 function getSellerType(user) {
-	const customisedSellerType = sellerTypeMapping.sellerId[user.sellerId];
+	const customisedSellerType = user.sellerType;
 	return customisedSellerType || defaultSellerType;
 }
 
@@ -121,10 +114,19 @@ function formatAndFilterUsers(users) {
 			return output;
 		}
 		user.bucket = [APP_BUCKET];
-		user.siteDomain = user.siteDomains[0];
-		user.hasConfidentialDomain = user.siteDomains.some(domain =>
-			isConfidentialDomain(domanize(domain))
-		);
+		/**
+		 * domainNameSellersJson is used as it is if set in the user doc
+		 * if domainNameSellersJson is set, it means the domain is not confidential
+		 */
+		if (user.domainNameSellersJson) {
+			user.hasConfidentialDomain = false;
+			user.siteDomain = user.domainNameSellersJson;
+		} else {
+			user.siteDomain = user.siteDomains[0];
+			user.hasConfidentialDomain = user.siteDomains.some(domain =>
+				isConfidentialDomain(domanize(domain))
+			);
+		}
 		output.push(user);
 
 		delete user.siteDomains;
@@ -141,10 +143,19 @@ function formatAndFilterUsers(users) {
 			appBucketUsers[userIndex].bucket.push(AP_APP_BUCKET);
 		} else {
 			user.bucket = [AP_APP_BUCKET];
-			user.siteDomain = user.siteDomains[0];
-			user.hasConfidentialDomain = user.siteDomains.some(domain =>
-				isConfidentialDomain(domanize(domain))
-			);
+			/**
+			 * domainNameSellersJson is used as it is if set in the user doc
+			 * if domainNameSellersJson is set, it means the domain is not confidential
+			 */
+			if (user.domainNameSellersJson) {
+				user.hasConfidentialDomain = false;
+				user.siteDomain = user.domainNameSellersJson;
+			} else {
+				user.siteDomain = user.siteDomains[0];
+				user.hasConfidentialDomain = user.siteDomains.some(domain =>
+					isConfidentialDomain(domanize(domain))
+				);
+			}
 			output.push(user);
 		}
 
