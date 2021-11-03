@@ -22,8 +22,8 @@ const filenames = {
 
 const APP_BUCKET = 'AppBucket';
 const AP_APP_BUCKET = 'apAppBucket';
-const NEW_USER_AGE_IN_MONTHS = 3; // user added in the last 3 months
-const LAST_PAYMENT_CHECK_EXPIRY = 5; // user was paid in the last 5 months or not
+const NEW_USER_AGE_IN_MONTHS = 12; // user added in the last 12 months
+const LAST_PAYMENT_CHECK_EXPIRY = 12; // user was paid in the last 12 months or not
 
 let errors = [];
 
