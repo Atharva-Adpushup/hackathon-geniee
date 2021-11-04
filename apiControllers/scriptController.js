@@ -1,5 +1,4 @@
 /* eslint-disable func-names */
-const md5 = require('md5');
 const express = require('express');
 const Promise = require('bluebird');
 
@@ -66,7 +65,7 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 				};
 				const adServerSettings = user.get('adServerSettings');
 				const isAdPartner = !!site.get('partner');
-				const ownerEmail = site.get('ownerEmail');
+
 				const {
 					experiment,
 					prebidConfig,
@@ -89,7 +88,7 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 				apConfigs.poweredByBannerOnDocked = !!poweredByBannerOnDocked;
 				apConfigs.gptSraDisabled = !!gptSraDisabled;
 				apConfigs.siteDomain = site.get('siteDomain');
-				apConfigs.ownerEmailMD5 = md5(ownerEmail.toLowerCase());
+				apConfigs.ownerEmailMD5 = user.get('sellerId');
 				apConfigs.isSPA = apConfigs.isSPA ? apConfigs.isSPA : false;
 				apConfigs.spaButUsingHook = apConfigs.spaButUsingHook ? apConfigs.spaButUsingHook : false;
 				apConfigs.spaPageTransitionTimeout = apConfigs.spaPageTransitionTimeout
@@ -253,7 +252,7 @@ Router.get('/:siteId/ampSiteConfig', (req, res) => {
 				// TODO: rj: to check hb status
 				const apps = site.get('apps');
 				const apConfigs = site.get('apConfigs');
-				const ownerEmail = site.get('ownerEmail');
+
 				const adServerSettings = user.get('adServerSettings');
 
 				const {
@@ -271,7 +270,7 @@ Router.get('/:siteId/ampSiteConfig', (req, res) => {
 				if (sizeMappingConfig) apConfigs.sizeMapping = sizeMappingConfig;
 				if (currencyConfig) apConfigs.currencyConfig = currencyConfig;
 				apConfigs.siteDomain = site.get('siteDomain');
-				apConfigs.ownerEmailMD5 = md5(ownerEmail.toLowerCase());
+				apConfigs.ownerEmailMD5 = user.get('sellerId');
 				apConfigs.activeDFPNetwork =
 					(adServerSettings && adServerSettings.dfp && adServerSettings.dfp.activeDFPNetwork) ||
 					null;
