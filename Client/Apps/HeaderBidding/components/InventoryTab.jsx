@@ -153,7 +153,14 @@ export default class InventoryTab extends React.Component {
 	handleNativeChange = ({ target: { checked } }, params) => {
 		const { adUnitId, app, pageGroup, device } = params;
 		const { selectAllNative, selectAllVideo } = this.state;
-		const { siteId, showNotification, inventories, setUnsavedChangesAction } = this.props;
+		const {
+			siteId,
+			showNotification,
+			inventories,
+			setUnsavedChangesAction,
+			customProps,
+			user
+		} = this.props;
 		const format = 'native';
 		const inventoryToUpdate = [];
 		const jsonTopush = { checked, format, adUnitId, app, pageGroup, device };
@@ -165,7 +172,12 @@ export default class InventoryTab extends React.Component {
 			selectAllNative.splice(selectAllNative.indexOf(adUnitId), 1);
 		}
 
-		return updateFormat(inventoryToUpdate, siteId)
+		const dataForAuditLogs = {
+			appName: customProps.appName,
+			siteDomain: user.sites[siteId].domain
+		};
+
+		return updateFormat(inventoryToUpdate, siteId, dataForAuditLogs)
 			.then(() => {
 				this.setState(
 					{
@@ -190,7 +202,7 @@ export default class InventoryTab extends React.Component {
 	handleVideoChange = ({ target: { checked } }, params) => {
 		const { adUnitId, app, pageGroup, device } = params;
 		const { selectAllVideo, selectAllNative } = this.state;
-		const { siteId, inventories, showNotification } = this.props;
+		const { siteId, inventories, showNotification, customProps, user } = this.props;
 		const format = 'video';
 		const inventoryToUpdate = [];
 		const jsonTopush = { checked, format, adUnitId, app, pageGroup, device };
@@ -202,7 +214,12 @@ export default class InventoryTab extends React.Component {
 			selectAllVideo.splice(selectAllVideo.indexOf(adUnitId), 1);
 		}
 
-		return updateFormat(inventoryToUpdate, siteId)
+		const dataForAuditLogs = {
+			appName: customProps.appName,
+			siteDomain: user.sites[siteId].domain
+		};
+
+		return updateFormat(inventoryToUpdate, siteId, dataForAuditLogs)
 			.then(() => {
 				this.setState({
 					selectAllVideo,
