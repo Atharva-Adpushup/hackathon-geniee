@@ -61,11 +61,26 @@ class ApLite extends Component {
 		if (pnp) {
 			return {
 				...currentState,
-				selectedAdUnitCodeForAdRefresh: [],
 				adRefresh: false,
 				isRefreshButtonDisabled: true
 			};
 		} else return { ...currentState, isRefreshButtonDisabled: false };
+	}
+
+	componentDidUpdate(prevProps) {
+		const { site: { apps: { pnp: previousPnpToggle = false } = {} } = {} } = prevProps;
+		const { site: { apps: { pnp: currentPnpToggle = false } = {}, siteId } = {} } = this.props;
+		if (previousPnpToggle !== currentPnpToggle) {
+			return axiosInstance
+				.get(`ops/ap-lite/${siteId}`)
+				.then(res => {
+					const {
+						data: { adUnits }
+					} = res.data;
+					this.setSatesFromAdUnits(adUnits);
+				})
+				.catch(err => this.setState({ isError: true }));
+		}
 	}
 
 	handleReset = () => this.setState(DEFAULT_STATE);
@@ -573,7 +588,8 @@ class ApLite extends Component {
 			selectedAdUnitCodeForHB,
 			selectedAdUnitCodeForAdRefresh,
 			selectedAdUnitCodeForVideoFormat,
-			selectedAdUnitCodeActive
+			selectedAdUnitCodeActive,
+			isRefreshButtonDisabled
 		} = this.state;
 
 		if (structuredAdUnits.length) {
@@ -616,6 +632,7 @@ class ApLite extends Component {
 									<Checkbox
 										onChange={e => this.handleAdRefreshChange(e, dfpAdunitCode)}
 										checked={selectedAdUnitCodeForAdRefresh.includes(dfpAdunitCode)}
+										disabled={isRefreshButtonDisabled}
 									/>
 								),
 								width: 100
