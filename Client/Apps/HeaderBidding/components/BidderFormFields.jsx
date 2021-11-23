@@ -57,6 +57,8 @@ class BidderFormFields extends React.Component {
 						classNames="hb-input"
 						value={currValue || ''}
 						onChange={({ target: { value } }) => {
+							// parseFloat return NaN for empty values
+							// this is being handled by removeHBEmptyParams func
 							if (adSize) {
 								setParamInTempState(
 									adSize,

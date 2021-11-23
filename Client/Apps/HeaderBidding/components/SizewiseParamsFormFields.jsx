@@ -152,7 +152,7 @@ class SizewiseParamsFormFields extends React.Component {
 	};
 
 	deleteAdSize = adSize => {
-		const { removeSize, sizes } = this.props;
+		const { removeSize } = this.props;
 		removeSize(adSize);
 		this.setState(state => {
 			const { tempParams = {} } = state || {};
@@ -234,8 +234,8 @@ class SizewiseParamsFormFields extends React.Component {
 					{tempParams[size] && tempParams[size].saved ? (
 						<CustomIcon icon="check" className="check-icon" />
 					) : (
-							''
-						)}
+						''
+					)}
 				</NavItem>
 			);
 		}
