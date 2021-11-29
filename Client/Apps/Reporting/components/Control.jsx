@@ -526,7 +526,7 @@ class Control extends Component {
 					</div>
 					<div className="aligner-item ">
 						{/* eslint-disable */}
-						<label className="u-text-normal">Date Range</label>
+						<label className="u-text-normal">Date Range {isHB ? '(Max 30 days can be selected)' : ''}</label>
 						<PresetDateRangePicker
 							presets={getPresets()}
 							startDate={state.startDate}
