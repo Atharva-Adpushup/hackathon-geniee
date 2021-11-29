@@ -24,8 +24,8 @@ const OAUTH_ENDPOINT_PROCESS = `https://sso.openx.com/login/process`;
 const OAUTH_ENDPOINT_TOKEN = `https://sso.openx.com/api/index/token`;
 
 const AUTH_PARAMS = {
-	EMAIL: 'sharad.yadav@adpushup.com',
-	PASSWORD: '=Xe/v9ZYrj9q:cK2'
+	EMAIL: 'ankit.bharthwal@adpushup.com',
+	PASSWORD: 'Adpushup@2022'
 };
 
 const CONSUMER = {
