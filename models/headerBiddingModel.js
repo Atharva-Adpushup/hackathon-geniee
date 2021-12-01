@@ -30,7 +30,8 @@ const HeaderBidding = model.extend(function() {
 		'email',
 		'prebidConfig',
 		'amazonUAMConfig',
-		'rules'
+		'rules',
+		'autoRules'
 	];
 	this.clientKeys = [
 		'hbcf',
@@ -41,7 +42,8 @@ const HeaderBidding = model.extend(function() {
 		'email',
 		'prebidConfig',
 		'amazonUAMConfig',
-		'rules'
+		'rules',
+		'autoRules'
 	];
 	this.validations = {
 		required: []

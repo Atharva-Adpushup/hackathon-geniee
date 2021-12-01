@@ -24,12 +24,16 @@ const {
 
 const router = express.Router();
 
-const getSiteWiseHBRules = (email, siteId) => {
-	return userModel
+const getSiteWiseHBRules = (email, siteId) =>
+	userModel
 		.verifySiteOwner(email, siteId)
 		.then(() => headerBiddingModel.getHbConfig(siteId, email))
-		.then(hbConfig => hbConfig.get('rules') || []);
-};
+		.then(hbConfig => {
+			const sitewiseManualRules = hbConfig.get('rules') || [];
+			const sitewiseAutoRules = hbConfig.get('autoRules') || [];
+
+			return [...sitewiseAutoRules, ...sitewiseManualRules];
+		});
 
 router
 	.get('/isInventoryExist/:siteId', (req, res) => {
@@ -1098,10 +1102,11 @@ router
 		return userModel
 			.verifySiteOwner(email, siteId)
 			.then(() =>
-				Promise.all([getSiteWiseHBRules(email, siteId), getNetworkWideHBRules()]).spread(
-					(siteWiseRules, networkWideRules) => {
-						return res.status(httpStatus.OK).json([...siteWiseRules, ...networkWideRules]);
-					}
+				Promise.all([
+					getSiteWiseHBRules(email, siteId),
+					getNetworkWideHBRules()
+				]).spread((siteWiseRules, networkWideRules) =>
+					res.status(httpStatus.OK).json([...siteWiseRules, ...networkWideRules])
 				)
 			)
 
@@ -1149,11 +1154,11 @@ router
 				});
 				return hbConfig.save();
 			})
-			.then(({ data: { rules } }) => {
-				return getNetworkWideHBRules().then(networkWideRules =>
+			.then(({ data: { rules } }) =>
+				getNetworkWideHBRules().then(networkWideRules =>
 					res.status(httpStatus.OK).json([...rules, ...networkWideRules])
-				);
-			})
+				)
+			)
 
 			.catch(err => {
 				// eslint-disable-next-line no-console
@@ -1215,11 +1220,11 @@ router
 				});
 				return hbConfig.save();
 			})
-			.then(({ data: { rules } }) => {
-				return getNetworkWideHBRules().then(networkWideRules =>
+			.then(({ data: { rules } }) =>
+				getNetworkWideHBRules().then(networkWideRules =>
 					res.status(httpStatus.OK).json([...rules, ...networkWideRules])
-				);
-			})
+				)
+			)
 			.catch(err => {
 				// eslint-disable-next-line no-console
 				console.log(err);
