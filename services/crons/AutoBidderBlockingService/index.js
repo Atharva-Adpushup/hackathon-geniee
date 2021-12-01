@@ -62,8 +62,8 @@ async function getRuleData(startdate, enddate, bidders, country, device_type, si
 		params: {
 			report_name: 'GET_UI_PANEL_REPORT',
 			isSuperUser: true,
-			fromDate: startdate.format('yyyy-MM-DD'),
-			toDate: enddate.format('yyyy-MM-DD'),
+			fromDate: startdate.format('YYYY-MM-DD'),
+			toDate: enddate.format('YYYY-MM-DD'),
 			interval: 'cumulative',
 			refresh_count: 0,
 			network: bidders,
@@ -83,8 +83,8 @@ async function fetchHbAnalyticsData(startdate, enddate) {
 		params: {
 			report_name: 'GET_UI_PANEL_REPORT',
 			isSuperUser: true,
-			fromDate: startdate.format('yyyy-MM-DD'),
-			toDate: enddate.format('yyyy-MM-DD'),
+			fromDate: startdate.format('YYYY-MM-DD'),
+			toDate: enddate.format('YYYY-MM-DD'),
 			dimension: 'siteid,network,country,device_type',
 			siteid: SITES_TO_PROCESS.join(','),
 			refresh_count: 0,

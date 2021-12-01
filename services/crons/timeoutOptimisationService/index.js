@@ -74,8 +74,8 @@ async function getRuleData(startdate, enddate, bid_response_time, countries, dev
 		params: {
 			report_name: 'GET_UI_PANEL_REPORT',
 			isSuperUser: true,
-			fromDate: startdate.format('yyyy-MM-DD'),
-			toDate: enddate.format('yyyy-MM-DD'),
+			fromDate: startdate.format('YYYY-MM-DD'),
+			toDate: enddate.format('YYYY-MM-DD'),
 			dimension: 'bid_response_time',
 			interval: 'cumulative',
 			refresh_count: 0,
@@ -90,15 +90,15 @@ async function getRuleData(startdate, enddate, bid_response_time, countries, dev
 }
 
 async function fetchHbAnalyticsData(startdate, enddate) {
-	console.log(startdate.format('yyyy-MM-DD'));
+	console.log(startdate.format('YYYY-MM-DD'));
 	const response = await axios({
 		method: 'GET',
 		url: 'https://api.adpushup.com/CentralReportingWebService/hb_analytics/report',
 		params: {
 			report_name: 'GET_UI_PANEL_REPORT',
 			isSuperUser: true,
-			fromDate: startdate.format('yyyy-MM-DD'),
-			toDate: enddate.format('yyyy-MM-DD'),
+			fromDate: startdate.format('YYYY-MM-DD'),
+			toDate: enddate.format('YYYY-MM-DD'),
 			dimension: 'siteid,bid_response_time,country,device_type',
 			interval: 'cumulative',
 			refresh_count: 0,
@@ -132,6 +132,7 @@ async function fetchMeta() {
 }
 
 function sendErrorEmail(body, subject) {
+	console.log(body,subject);
 	sendEmail({
 		queue: 'MAILER',
 		data: {
