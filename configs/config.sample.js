@@ -270,6 +270,11 @@ module.exports = {
 		highchartsServerPort: 7801
 	},
 	prefetchBlockedSites: ['41319'],
+	autoBidderBlockEnabledSites: [37780],
+	timeoutOptimisationEnabledSites:[37780],
+	bidderBlockingSupportMail:'rishav.chaudhary@adpushup.com',
+	autoBlockCronSchedule: '0 0 * * 1',
+	timeoutCronSchedule: '0 0 * * 1',
 	consoleErrorAlerts: {
 		supportMail: 'support@adpushup.com',
 		hackersMail: 'hackers@adpushup.com'

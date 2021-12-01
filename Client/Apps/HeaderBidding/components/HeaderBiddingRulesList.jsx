@@ -50,7 +50,7 @@ class HeaderBiddingRulesList extends React.Component {
 		}, {});
 
 		return rules.map((rule, index) => {
-			const { isActive, triggers, actions, createdAt, isGlobal, description } = rule;
+			const { isActive, triggers, actions, createdAt, isGlobal, description, isAuto } = rule;
 
 			const triggersContent = triggers.map((trigger, triggerIndex) => {
 				// key, operator, value
@@ -127,6 +127,7 @@ class HeaderBiddingRulesList extends React.Component {
 
 					<td>
 						{!isForOps && isGlobal ? <div className="global-rule">Global Rule</div> : null}{' '}
+						{!isForOps && isAuto ? <div className="global-rule">Auto Rule</div> : null}{' '}
 						{moment(createdAt).format('lll')}
 					</td>
 					<td>
@@ -143,7 +144,7 @@ class HeaderBiddingRulesList extends React.Component {
 						<Button
 							className="btn-primary"
 							onClick={() => onEditRule(index)}
-							disabled={!isForOps && isGlobal}
+							disabled={!isForOps && (isGlobal || isAuto)}
 						>
 							Edit
 						</Button>
@@ -162,7 +163,7 @@ class HeaderBiddingRulesList extends React.Component {
 							id={`rule-status-${index}`}
 							on="Enable"
 							off="Disable"
-							disabled={!isForOps && isGlobal}
+							disabled={!isForOps && (isGlobal || isAuto)}
 						/>
 					</td>
 				</tr>
