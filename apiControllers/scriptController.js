@@ -51,10 +51,7 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 			const siteId = site.get('siteId');
 			const apps = site.get('apps');
 			const isAutoOptimise = !!(site.get('apConfigs') && site.get('apConfigs').autoOptimise);
-			const poweredByBanner = !!(site.get('apConfigs') && site.get('apConfigs').poweredByBanner);
-			const poweredByBannerOnDocked = !!(
-				site.get('apConfigs') && site.get('apConfigs').poweredByBannerOnDocked
-			);
+			const poweredByBanner = site.get('apConfigs') && site.get('apConfigs').poweredByBanner;
 			const gptSraDisabled = !!(site.get('apConfigs') && site.get('apConfigs').gptSraDisabled);
 			const lineItemTypes = site.get('lineItemTypes') || [];
 
@@ -84,8 +81,7 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 				apConfigs.separatelyGroupedLineItems =
 					(adNetworkConfig && adNetworkConfig.separatelyGroupedLineItems) || [];
 				apConfigs.autoOptimise = !!isAutoOptimise;
-				apConfigs.poweredByBanner = !!poweredByBanner;
-				apConfigs.poweredByBannerOnDocked = !!poweredByBannerOnDocked;
+				apConfigs.poweredByBanner = poweredByBanner;
 				apConfigs.gptSraDisabled = !!gptSraDisabled;
 				apConfigs.siteDomain = site.get('siteDomain');
 				apConfigs.ownerEmailMD5 = user.get('sellerId');

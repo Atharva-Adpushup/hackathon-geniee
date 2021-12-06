@@ -21,7 +21,7 @@ class Settings extends Component {
 			spaButUsingHook = false,
 			spaPageTransitionTimeout = 0,
 			adpushupPercentage = 100,
-			poweredByBanner = false,
+			poweredByBanner = {},
 			isAdsLabelOn = false,
 			adsLabel = 'Advertisement',
 			hbAnalytics = false,
@@ -331,7 +331,7 @@ class Settings extends Component {
 					name={`mergeReport-${siteId}-${siteDomain}`}
 					id={`js-mergeReport-${siteId}-${siteDomain}`}
 				/>
-				<CustomToggleSwitch
+				{/* <CustomToggleSwitch
 					labelText="Powered By AdPushup"
 					className="u-margin-b4 negative-toggle"
 					checked={poweredByBanner}
@@ -343,7 +343,7 @@ class Settings extends Component {
 					defaultLayout
 					name={`poweredByBanner-${siteId}-${siteDomain}`}
 					id={`js-poweredByBanner-${siteId}-${siteDomain}`}
-				/>
+				/> */}
 				<CustomToggleSwitch
 					labelText="Ads Label"
 					className="u-margin-b4 negative-toggle"
