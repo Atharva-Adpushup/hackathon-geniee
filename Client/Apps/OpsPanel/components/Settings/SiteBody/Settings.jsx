@@ -344,7 +344,7 @@ class Settings extends Component {
 					name={`poweredByBanner-${siteId}-${siteDomain}`}
 					id={`js-poweredByBanner-${siteId}-${siteDomain}`}
 				/> */}
-				<CustomToggleSwitch
+				{/* <CustomToggleSwitch
 					labelText="Ads Label"
 					className="u-margin-b4 negative-toggle"
 					checked={isAdsLabelOn}
@@ -356,8 +356,8 @@ class Settings extends Component {
 					defaultLayout
 					name={`isAdsLabelOn-${siteId}-${siteDomain}`}
 					id={`js-isAdsLabelOn-${siteId}-${siteDomain}`}
-				/>
-				{isAdsLabelOn && (
+				/> */}
+				{/* {isAdsLabelOn && (
 					<InputBox
 						name="adsLabel"
 						value={adsLabel}
@@ -366,7 +366,7 @@ class Settings extends Component {
 						placeholder="Ads Label"
 						classNames="u-margin-b4 u-padding-v3 u-padding-h3"
 					/>
-				)}
+				)} */}
 				<CustomToggleSwitch
 					labelText="Inject CMP"
 					className="u-margin-b4 negative-toggle"
