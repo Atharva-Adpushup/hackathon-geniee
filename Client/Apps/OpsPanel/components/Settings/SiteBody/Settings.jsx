@@ -4,9 +4,7 @@ import { MultiSelect } from 'react-multi-select-component';
 import { Row, Col } from '@/Client/helpers/react-bootstrap-imports';
 import CustomToggleSwitch from '../../../../../Components/CustomToggleSwitch/index';
 import FieldGroup from '../../../../../Components/Layout/FieldGroup';
-import InputBox from '../../../../../Components/InputBox/index';
 import CustomButton from '../../../../../Components/CustomButton/index';
-// import { formatDate } from '../../../../../helpers/commonFunctions';
 import config from '../../../../../config/config';
 import siteService from '../../../../../services/siteService';
 import {
