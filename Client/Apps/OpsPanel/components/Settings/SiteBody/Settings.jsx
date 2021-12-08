@@ -1,5 +1,6 @@
 /* eslint-disable no-restricted-globals */
 import React, { Component } from 'react';
+import { MultiSelect } from 'react-multi-select-component';
 import { Row, Col } from '@/Client/helpers/react-bootstrap-imports';
 import CustomToggleSwitch from '../../../../../Components/CustomToggleSwitch/index';
 import FieldGroup from '../../../../../Components/Layout/FieldGroup';
@@ -8,7 +9,11 @@ import CustomButton from '../../../../../Components/CustomButton/index';
 // import { formatDate } from '../../../../../helpers/commonFunctions';
 import config from '../../../../../config/config';
 import siteService from '../../../../../services/siteService';
-import { GA_ACCESS_EMAIL_OPTIONS, GA_VERSION_OPTIONS } from '../../../configs/commonConsts';
+import {
+	GA_ACCESS_EMAIL_OPTIONS,
+	GA_VERSION_OPTIONS,
+	POWERED_BY_BANNER
+} from '../../../configs/commonConsts';
 
 class Settings extends Component {
 	constructor(props) {
@@ -61,7 +66,8 @@ class Settings extends Component {
 			viewId,
 			accessEmail,
 			gaVersion,
-			pnp: isPnPEnabled
+			pnp: isPnPEnabled,
+			selectedAdTypes: [...this.getPoweredByBannerConfig(poweredByBanner)]
 		};
 	}
 
@@ -146,6 +152,17 @@ class Settings extends Component {
 		});
 	};
 
+	handleMultiSelect = selectedAdTypes => {
+		const poweredByBannerConfig = {};
+		selectedAdTypes.forEach(selectedElement => {
+			poweredByBannerConfig[selectedElement.value] = true;
+		});
+		this.setState({
+			poweredByBanner: poweredByBannerConfig,
+			selectedAdTypes: selectedAdTypes
+		});
+	};
+
 	handleForceBuild = () => {
 		const { site, showNotification, dataForAuditLogs } = this.props;
 
@@ -172,6 +189,18 @@ class Settings extends Component {
 				};
 				showNotification(data);
 			});
+	};
+
+	getPoweredByBannerConfig = poweredByBanner => {
+		const selectedAdTypes = [];
+
+		Object.keys(poweredByBanner).forEach(adType => {
+			if (poweredByBanner[adType]) {
+				selectedAdTypes.push({ label: adType, value: adType });
+			}
+		});
+
+		return selectedAdTypes;
 	};
 
 	handleSave = () => {
@@ -267,9 +296,9 @@ class Settings extends Component {
 			spaButUsingHook,
 			spaPageTransitionTimeout,
 			adpushupPercentage,
-			poweredByBanner,
-			isAdsLabelOn,
-			adsLabel,
+			// poweredByBanner,
+			// isAdsLabelOn,
+			// adsLabel,
 			// revenueShare,
 			status,
 			hbAnalytics,
@@ -282,7 +311,8 @@ class Settings extends Component {
 			viewId,
 			accessEmail,
 			gaVersion,
-			pnp
+			pnp,
+			selectedAdTypes
 		} = this.state;
 		const { site } = this.props;
 
@@ -331,19 +361,18 @@ class Settings extends Component {
 					name={`mergeReport-${siteId}-${siteDomain}`}
 					id={`js-mergeReport-${siteId}-${siteDomain}`}
 				/>
-				{/* <CustomToggleSwitch
-					labelText="Powered By AdPushup"
-					className="u-margin-b4 negative-toggle"
-					checked={poweredByBanner}
-					onChange={this.handleToggle}
-					layout="horizontal"
-					size="m"
-					on="Yes"
-					off="No"
-					defaultLayout
-					name={`poweredByBanner-${siteId}-${siteDomain}`}
-					id={`js-poweredByBanner-${siteId}-${siteDomain}`}
-				/> */}
+
+				<div className="powered-by-adpushup">
+					<h1>Powered By AdPushup</h1>
+					<MultiSelect
+						options={POWERED_BY_BANNER}
+						value={selectedAdTypes}
+						onChange={this.handleMultiSelect}
+						disableSearch
+						hasSelectAll={false}
+					/>
+				</div>
+
 				{/* <CustomToggleSwitch
 					labelText="Ads Label"
 					className="u-margin-b4 negative-toggle"
@@ -356,7 +385,7 @@ class Settings extends Component {
 					defaultLayout
 					name={`isAdsLabelOn-${siteId}-${siteDomain}`}
 					id={`js-isAdsLabelOn-${siteId}-${siteDomain}`}
-				/> */}
+				/>  */}
 				{/* {isAdsLabelOn && (
 					<InputBox
 						name="adsLabel"

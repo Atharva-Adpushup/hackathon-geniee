@@ -767,3 +767,41 @@
 		}
 	}
 }
+
+.powered-by-adpushup {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	width: '100%';
+	margin-bottom: 20px;
+	svg.dropdown-search-clear-icon.gray{
+		display: none;
+	}
+	h1 {
+		font-size: 16px;
+		margin: 0;
+		font-weight: 700;
+		margin-right: 5%;
+		padding: '0';
+	}
+	.rmsc {
+		width: 100px;
+		--rmsc-h: 24px !important;
+		.dropdown-content {
+			left: -25;
+			width: 145px;
+			height: 150px !important;
+			top: initial;
+		}
+		.peer-performance-select-option {
+			padding: 0px !important;
+			margin: 0px !important;
+			font-size: 10px;
+			color: red;
+		}
+		.options {
+			height: 160px;
+		}
+	}
+}

@@ -615,6 +615,12 @@ const AP_LIGHT_AD_UNIT_OPERATIONS = [
 	{ name: 'Replace', value: 'replace' }
 ];
 
+const POWERED_BY_BANNER = [
+	{ label: 'Docked', value: 'DOCKED' },
+	{ label: 'Display', value: 'DISPLAY' },
+	{ label: 'Sticky Bottom', value: 'STICKYBOTTOM' }
+];
+
 export {
 	OP_NAV_ITEMS,
 	OP_NAV_ITEMS_INDEXES,
@@ -654,5 +660,6 @@ export {
 	GA_VERSION_OPTIONS,
 	UNFILLED_REFRESH_RATE_ENTRIES,
 	PNP_REFRESH_TYPES,
-	AP_LIGHT_AD_UNIT_OPERATIONS
+	AP_LIGHT_AD_UNIT_OPERATIONS,
+	POWERED_BY_BANNER
 };
