@@ -1,5 +1,6 @@
 const redis = require('redis');
 const config = require('../configs/config');
+const sdClient = require('../helpers/ServerDensityLogger');
 
 const REDIS_PORT = config.redisEnvironment.REDIS_PORT || 6379;
 const REDIS_HOST = config.redisEnvironment.REDIS_HOST || '127.0.0.1';
@@ -13,6 +14,9 @@ redisClient
 	})
 	.on('error', error => {
 		console.log(error);
+		if (config.environment.HOST_ENV === 'production') {
+			throw error;
+		}
 	});
 
 const API = {
@@ -48,5 +52,19 @@ const API = {
 		}),
 	getClient: () => redisClient
 };
+
+if (config.environment.HOST_ENV === 'production') {
+	process.on('uncaughtException', error => {
+		console.log(error.stack);
+		sdClient.increment('monitoring.redis');
+		setTimeout(() => process.exit(1), 2000);
+	});
+
+	process.on('unhandledRejection', error => {
+		console.log(error.stack);
+		sdClient.increment('monitoring.redis');
+		setTimeout(() => process.exit(1), 2000);
+	});
+}
 
 module.exports = API;

@@ -8,6 +8,8 @@ const _findIndex = require('lodash/findIndex');
 
 const userModel = require('../../models/userModel');
 const commonConsts = require('../../configs/commonConsts');
+const config = require('../../configs/config');
+const sdClient = require('../../helpers/ServerDensityLogger');
 const { domanize, rightTrim } = require('../../helpers/utils');
 const couchbaseService = require('../../helpers/couchBaseService');
 const globalBucketLogger = require('../../helpers/globalBucketLogger');
@@ -442,13 +444,24 @@ function init() {
 		.catch(function(error) {
 			handleError(error);
 			reportErrors();
+			throw error;
 		});
 }
 
-process.on('unhandledRejection', function(reason) {
-	colorLog('red', 'UNHANDLED REJECTION', reason);
-	handleError(reason);
-});
+if (config.environment.HOST_ENV === 'production') {
+	process.on('uncaughtException', error => {
+		console.log(error.stack);
+		sdClient.increment('Monitoring.SellersJsonService');
+		setTimeout(() => process.exit(1), 2000);
+	});
+
+	process.on('unhandledRejection', error => {
+		colorLog('red', 'UNHANDLED REJECTION', error);
+		sdClient.increment('Monitoring.SellersJsonService');
+		handleError(reason);
+		setTimeout(() => process.exit(1), 2000);
+	});
+}
 
 try {
 	init();

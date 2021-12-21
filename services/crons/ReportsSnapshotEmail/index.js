@@ -13,6 +13,7 @@ const { getAllUserSites } = require('../../../models/userModel');
 const moment = require('moment');
 const cron = require('node-cron');
 const config = require('../../../configs/config');
+const sdClient = require('../../../helpers/ServerDensityLogger');
 const { generateAndProcessCharts } = require('./modules/highCharts');
 
 let isCronServiceRunning = false;
@@ -296,8 +297,22 @@ function startEmailSnapshotsService() {
 		})
 		.catch(err => {
 			console.timeEnd();
-			console.error(err);
+			throw err;
 		});
+}
+
+if (config.environment.HOST_ENV === 'production') {
+	process.on('uncaughtException', error => {
+		console.log(error.stack);
+		sdClient.increment('Monitoring.ReportSnapshotEmail');
+		setTimeout(() => process.exit(1), 2000);
+	});
+
+	process.on('unhandledRejection', error => {
+		console.log(error.stack);
+		sdClient.increment('Monitoring.ReportSnapshotEmail');
+		setTimeout(() => process.exit(1), 2000);
+	});
 }
 
 cron.schedule(CC.cronSchedule.emailSnapshotsService, startEmailSnapshotsService);

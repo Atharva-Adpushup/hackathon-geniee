@@ -21,6 +21,9 @@ module.exports = {
 			daysForUpdate: 365
 		}
 	},
+	serverDensity: {
+		host: 'staging.adpushup.com'
+	},
 	cacheFlyFtp: {
 		HOST: '127.0.0.1',
 		USERNAME: 'anonymous'
