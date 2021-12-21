@@ -11,6 +11,7 @@ const couchbase = require('../../helpers/couchBaseService');
 const { appBucket } = require('../../helpers/routeHelpers');
 const config = require('../../configs/config');
 const CC = require('../../configs/commonConsts');
+const sdClient = require('../../helpers/ServerDensityLogger');
 
 function getTipaltiConfig() {
 	const tipaltiConfig = config.tipalti;
@@ -164,8 +165,22 @@ function createSFTPConnectionAndDoProcessing() {
 				});
 			})
 			.catch(err => {
-				console.log(err);
+				throw err;
 			});
+	});
+}
+
+if (config.environment.HOST_ENV === 'production') {
+	process.on('uncaughtException', error => {
+		console.log(error.stack);
+		sdClient.increment('Monitoring.PaymentHistory');
+		setTimeout(() => process.exit(1), 2000);
+	});
+
+	process.on('unhandledRejection', error => {
+		console.log(error.stack);
+		sdClient.increment('Monitoring.PaymentHistory');
+		setTimeout(() => process.exit(1), 2000);
 	});
 }
 

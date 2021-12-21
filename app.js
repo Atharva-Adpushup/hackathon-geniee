@@ -21,7 +21,7 @@ const woodlotEvents = require('woodlot').events;
 const uuid = require('uuid');
 const locale = require('locale');
 const helmet = require('helmet');
-
+const sdClient = require('./helpers/ServerDensityLogger');
 const app = express();
 const server = require('http').createServer(app);
 
@@ -57,10 +57,6 @@ app.use(
 		}
 	})
 );
-process.on('uncaughtException', err => {
-	// handle the error safely
-	console.log(err);
-});
 
 // set static directory
 app.use(express.static(path.join(__dirname, 'clientDist')));
@@ -183,7 +179,6 @@ couchBaseService
 					stacktrace: err.stack
 				});
 			});
-			process.on('uncaughtException', error => console.log(error.stack));
 		}
 
 		// production error handler
@@ -200,7 +195,21 @@ couchBaseService
 		console.log(`Server listening at port : ${config.environment.HOST_PORT}`);
 	})
 	.catch(err => {
-		console.log(`err: ${err.toString()}`);
+		throw err;
 	});
+
+if (config.environment.HOST_ENV === 'production') {
+	process.on('uncaughtException', error => {
+		console.log(error.stack);
+		sdClient.increment('monitoring.genieApp');
+		setTimeout(() => process.exit(1), 2000);
+	});
+
+	process.on('unhandledRejection', error => {
+		console.log(error.stack);
+		sdClient.increment('monitoring.genieApp');
+		setTimeout(() => process.exit(1), 2000);
+	});
+}
 
 module.exports = app;

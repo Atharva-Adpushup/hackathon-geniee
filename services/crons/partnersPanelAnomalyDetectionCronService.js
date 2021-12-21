@@ -1,4 +1,5 @@
 const CC = require('../../configs/commonConsts');
+const sdClient = require('../../helpers/ServerDensityLogger');
 const Criteo = require('../partnersPanelAnomaliesDetectionService/Criteo');
 const OFT = require('../partnersPanelAnomaliesDetectionService/OFT');
 const Pubmatic = require('../partnersPanelAnomaliesDetectionService/Pubmatic');
@@ -75,7 +76,22 @@ function startPartnersPanelsAnomaliesDetectionService(partnerName, retryCount = 
 		})
 		.catch(async err => {
 			await sendErrorNotification(err, 'Patners Panel Service Crashed');
+			throw err;
 		});
+}
+
+if (process.env.NODE_ENV === 'production') {
+	process.on('uncaughtException', error => {
+		console.log(error.stack);
+		sdClient.increment('Monitoring.PartnersPanelAnomalyDetection');
+		setTimeout(() => process.exit(1), 2000);
+	});
+
+	process.on('unhandledRejection', error => {
+		console.log(error.stack);
+		sdClient.increment('Monitoring.PartnersPanelAnomalyDetection');
+		setTimeout(() => process.exit(1), 2000);
+	});
 }
 
 module.exports = {
