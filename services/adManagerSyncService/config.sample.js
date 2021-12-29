@@ -1,6 +1,6 @@
 module.exports = {
     appName: 'adManagerSyncService',
-    dfpApiVersion: 'v202011',
+    dfpApiVersion: 'v202111',
     serviceStatusPingDelayMs: 1000, // this should not be changed
     // database where service will store its status doc
     serviceStatusDb: {
