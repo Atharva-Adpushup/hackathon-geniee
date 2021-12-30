@@ -458,7 +458,7 @@ if (config.environment.HOST_ENV === 'production') {
 	process.on('unhandledRejection', error => {
 		colorLog('red', 'UNHANDLED REJECTION', error);
 		sdClient.increment('Monitoring.SellersJsonService');
-		handleError(reason);
+		handleError(error);
 		setTimeout(() => process.exit(1), 2000);
 	});
 }
