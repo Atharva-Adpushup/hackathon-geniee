@@ -618,7 +618,8 @@ const AP_LIGHT_AD_UNIT_OPERATIONS = [
 const POWERED_BY_BANNER = [
 	{ label: 'Docked', value: 'DOCKED' },
 	{ label: 'Display', value: 'DISPLAY' },
-	{ label: 'Sticky Bottom', value: 'STICKYBOTTOM' }
+	{ label: 'Sticky Bottom', value: 'STICKYBOTTOM' },
+	{ label: 'Chained Docked', value: 'CHAINED_DOCKED' }
 ];
 
 export {
