@@ -8,6 +8,12 @@ const { sendEmail } = require('../../../helpers/queueMailer');
 
 const cron = require('node-cron');
 
+const REPORTING_APIS = {
+	LIST: 'https://api.adpushup.com/CentralReportingWebService/site/list',
+	HB_REPORT: 'https://api.adpushup.com/CentralReportingWebService/hb_analytics/report',
+	CENTRAL_REPORT: 'https://api.adpushup.com/CentralReportingWebService/site/report'
+};
+
 const DEVICE_MAPPING = {
 	'Desktop/PC': 'desktop',
 	'Mobile/Phone': 'mobile',
@@ -31,7 +37,7 @@ function extractDataFromResponse(response) {
 async function getNetworkKeys() {
 	const response = await axios({
 		method: 'GET',
-		url: 'https://api.adpushup.com/CentralReportingWebService/site/list',
+		url: REPORTING_APIS.LIST,
 		params: {
 			list_name: 'GET_ALL_NETWORKS',
 			isSuperUser: true,
@@ -45,7 +51,7 @@ async function getNetworkKeys() {
 async function getDeviceKeys() {
 	const response = await axios({
 		method: 'GET',
-		url: 'https://api.adpushup.com/CentralReportingWebService/site/list',
+		url: REPORTING_APIS.LIST,
 		params: {
 			list_name: 'GET_ALL_DEVICES',
 			isSuperUser: true
@@ -55,17 +61,29 @@ async function getDeviceKeys() {
 	return extractDataFromResponse(response);
 }
 
-async function getRuleData(startdate, enddate, bidders, country, device_type, siteid) {
+async function getCountryKeys() {
 	const response = await axios({
 		method: 'GET',
-		url: 'https://api.adpushup.com/CentralReportingWebService/hb_analytics/report',
+		url: REPORTING_APIS.LIST,
+		params: {
+			list_name: 'GET_ALL_COUNTRIES',
+			isSuperUser: true
+		}
+	});
+
+	return extractDataFromResponse(response);
+}
+
+async function getHBRuleData(startdate, enddate, bidders, country, device_type, siteid) {
+	const response = await axios({
+		method: 'GET',
+		url: REPORTING_APIS.HB_REPORT,
 		params: {
 			report_name: 'GET_UI_PANEL_REPORT',
 			isSuperUser: true,
 			fromDate: startdate.format('YYYY-MM-DD'),
 			toDate: enddate.format('YYYY-MM-DD'),
 			interval: 'cumulative',
-			refresh_count: 0,
 			network: bidders,
 			country,
 			siteid,
@@ -76,10 +94,50 @@ async function getRuleData(startdate, enddate, bidders, country, device_type, si
 	return extractDataFromResponse(response);
 }
 
+async function getUAMRuleData(startdate, enddate, country, device_type, siteid) {
+	const response = await axios({
+		method: 'GET',
+		url: REPORTING_APIS.CENTRAL_REPORT,
+		params: {
+			report_name: 'get_stats_by_custom',
+			isSuperUser: true,
+			fromDate: startdate.format('YYYY-MM-DD'),
+			toDate: enddate.format('YYYY-MM-DD'),
+			siteid: SITES_TO_PROCESS.join(','),
+			network: 56,
+			interval: 'cumulative',
+			country,
+			device_type,
+			siteid
+		}
+	});
+
+	return extractDataFromResponse(response);
+}
+
+async function fetchUAMData(startdate, enddate) {
+	const response = await axios({
+		method: 'GET',
+		url: REPORTING_APIS.CENTRAL_REPORT,
+		params: {
+			report_name: 'get_stats_by_custom',
+			isSuperUser: true,
+			fromDate: startdate.format('YYYY-MM-DD'),
+			toDate: enddate.format('YYYY-MM-DD'),
+			dimension: 'siteid,country,device_type',
+			siteid: SITES_TO_PROCESS.join(','),
+			network: 56,
+			interval: 'cumulative'
+		}
+	});
+
+	return extractDataFromResponse(response);
+}
+
 async function fetchHbAnalyticsData(startdate, enddate) {
 	const response = await axios({
 		method: 'GET',
-		url: 'https://api.adpushup.com/CentralReportingWebService/hb_analytics/report',
+		url: REPORTING_APIS.HB_REPORT,
 		params: {
 			report_name: 'GET_UI_PANEL_REPORT',
 			isSuperUser: true,
@@ -87,7 +145,6 @@ async function fetchHbAnalyticsData(startdate, enddate) {
 			toDate: enddate.format('YYYY-MM-DD'),
 			dimension: 'siteid,network,country,device_type',
 			siteid: SITES_TO_PROCESS.join(','),
-			refresh_count: 0,
 			interval: 'cumulative'
 		}
 	});
@@ -99,12 +156,9 @@ function mapToKVPair(data = []) {
 }
 
 async function fetchMeta() {
-	const countryResponse = await axios.get(
-		'https://api.adpushup.com/CentralReportingWebService/site/list?list_name=GET_ALL_COUNTRIES'
-	);
 	const networks = await hbModel.getAllBiddersFromNetworkConfig();
 
-	const countries = extractDataFromResponse(countryResponse);
+	const countries = await getCountryKeys();
 	const deviceKeys = await getDeviceKeys();
 	const networkReportKeys = await getNetworkKeys();
 
@@ -117,7 +171,6 @@ async function fetchMeta() {
 }
 
 function sendErrorEmail(body, subject) {
-	console.error(body)
 	sendEmail({
 		queue: 'MAILER',
 		data: {
@@ -134,35 +187,42 @@ async function bidderBlocking() {
 		const oneWeekAgo = today.clone().subtract(30, 'days');
 
 		// Fetching required data for rule generation
-		const analyticsData = await fetchHbAnalyticsData(oneWeekAgo, today);
+		const hbAnalyticsData = await fetchHbAnalyticsData(oneWeekAgo, today);
+		const uamData = await fetchUAMData(oneWeekAgo, today);
+
+		//maintain uniform key for revenue
+		const keyAddedUAMData = uamData.map(item => {
+			return {
+				...item,
+				overall_gross_revenue: item.network_gross_revenue,
+				network: 'AmazonUAM',
+				ntwid: 56
+			};
+		});
+
+		//combine uam and hb data arrays
+		const analyticsData = hbAnalyticsData.concat(keyAddedUAMData);
 		const meta = await fetchMeta();
 
-		//get total HB revenue
+		//get total HB (device-country) wise revenue
 		const siteCombinationWiseTotalRevenue = analyticsData.reduce((result, item) => {
-			var key = `${item.cid}-${item.device_type}`;
-			result[item.siteid] = result[item.siteid] || {};
-			result[item.siteid][key] =
-				(result[item.siteid][key] || 0) + Number(item.overall_gross_revenue);
+			const { siteid, overall_gross_revenue, cid, device_type } = item;
+			var key = `${cid}-${device_type}`;
+			result[siteid] = result[siteid] || {};
+			result[siteid][key] = (result[siteid][key] || 0) + Number(overall_gross_revenue);
 			return result;
 		}, {});
 
+		//get total site wise HB revenue
 		const totalSiteWiseRevenue = analyticsData.reduce((result, item) => {
 			const { siteid, overall_gross_revenue } = item;
 			result[siteid] = (result[siteid] || 0) + overall_gross_revenue;
 			return result;
 		}, {});
 
-		//get site wise object comtaining array of country-device-bidder revenue share
+		//get site wise object comtaining arrays of country-device bidder revenue share
 		const countryDeviceWiseBidderData = analyticsData.reduce((result, data) => {
-			const {
-				siteid,
-				network,
-				cid,
-				device_type,
-				overall_gross_revenue,
-				average_response_time,
-				prebid_timeouts_percentage
-			} = data;
+			const { siteid, network, cid, device_type, overall_gross_revenue } = data;
 			const key = `${cid}-${device_type}`;
 			const revShare = (
 				(overall_gross_revenue / siteCombinationWiseTotalRevenue[siteid][key]) *
@@ -174,8 +234,6 @@ async function bidderBlocking() {
 				...(result[siteid][key] || []),
 				{
 					revShare,
-					average_response_time,
-					prebid_timeouts_percentage,
 					network,
 					cid,
 					device_type
@@ -189,6 +247,7 @@ async function bidderBlocking() {
 			var blockingData = [];
 
 			for (var [key, revenueData] of Object.entries(siteData)) {
+				//sort in descending order of revenue
 				var sortedRevenue = revenueData.sort((a, b) => a.revShare - b.revShare);
 				var totalRev = 100;
 				for (let i = 0; i < sortedRevenue.length; i++) {
@@ -197,6 +256,7 @@ async function bidderBlocking() {
 					if (totalRev <= 99) {
 						break;
 					}
+					//add bidder to blocking array till 99% revenue is reached
 					blockingData.push({
 						network: deviceEntry.network,
 						device: deviceEntry.device_type,
@@ -215,93 +275,152 @@ async function bidderBlocking() {
 			}, {});
 			console.log(`Generating rules for site ${site}`);
 			const rulesArray = [];
-			
+
 			//generating rule array
 			for (const [bidder, bidderRules] of Object.entries(bidderBlockRules)) {
-				const bidderObj = meta.networks.filter(network =>
-					network.name.toUpperCase().includes(
-						bidder
-							.split('(HB)')
-							.join('')
-							.split('(EB)')
-							.join('')
-							.trim()
-							.toUpperCase()
-					)
-				)[0];
-				if (!bidderObj) {
-					// HANDLE EDGE CASE
-					sendErrorEmail(`Network Meta not found for ${bidder}`, 'Network meta not found error');
-					console.log(`Network Meta not found for ${bidder}`);
-					continue;
+				var bidderObj = bidder;
+				if (bidderObj !== 'AmazonUAM') {
+					bidderObj = meta.networks.find(network =>
+						network.name.toUpperCase().includes(
+							bidder
+								.replace(/(\(EB\))|(\(HB\))/g, '')
+								.trim()
+								.toUpperCase()
+						)
+					);
+					if (!bidderObj) {
+						// HANDLE EDGE CASE
+						sendErrorEmail(`Network Meta not found for ${bidder}`, 'Network meta not found error');
+						console.log(`Network Meta not found for ${bidder}`);
+						continue;
+					}
 				}
 
 				for (const [device, countries] of Object.entries(bidderRules)) {
 					const countryIds = countries.map(id => meta.countries[id].country_code_alpha2);
-					
-					const deviceKey = DEVICE_MAPPING[device];
-					
 
-					rulesArray.push({
-						actions: [{ key: 'disallowed_bidders', value: [bidderObj.ntkey] }],
-						description: 'Auto Bidder Blocking Rules',
-						isActive: true,
-						triggers: [
-							{ key: 'country', operator: 'contain', value: countryIds },
-							{ key: 'device', operator: 'contain', value: [deviceKey] }
-						],
-						isAuto: true
-					});
+					const deviceKey = DEVICE_MAPPING[device];
+					if (bidderObj == 'AmazonUAM') {
+						rulesArray.push({
+							actions: [{ key: 'amazon_block', value: [bidderObj] }],
+							description: 'Auto Bidder Blocking Rules',
+							isActive: true,
+							triggers: [
+								{ key: 'country', operator: 'contain', value: countryIds },
+								{ key: 'device', operator: 'contain', value: [deviceKey] }
+							],
+							isAuto: true
+						});
+					} else {
+						rulesArray.push({
+							actions: [{ key: 'disallowed_bidders', value: [bidderObj.ntkey] }],
+							description: 'Auto Bidder Blocking Rules',
+							isActive: true,
+							triggers: [
+								{ key: 'country', operator: 'contain', value: countryIds },
+								{ key: 'device', operator: 'contain', value: [deviceKey] }
+							],
+							isAuto: true
+						});
+					}
 				}
 			}
 
 			try {
 				const siteHbConfig = await hbModel.getHbConfig(site);
 				const existingAutoRules = siteHbConfig.get('autoRules') || [];
-				fs.writeFileSync(`${site}rulesbackup.json`, JSON.stringify(existingAutoRules))
+				fs.writeFileSync(`${site}rulesbackup.json`, JSON.stringify(existingAutoRules));
 				siteHbConfig.set('autoRules', [...existingAutoRules, ...rulesArray]);
 				siteHbConfig.save();
 
-				const updatedHbConfig=await hbModel.getHbConfig(site);
-				var totalBlockedRevenueFromRule=0;
-				var updatedAutoRules=updatedHbConfig.get('autoRules').filter(rule=>rule.description=='Auto Bidder Blocking Rules');
-				for (var i=0; i<updatedAutoRules.length; i++) {
-					var currentRule=updatedAutoRules[i];
-					var bidder=currentRule.actions[0].value[0];
-					var bidderName=meta.networks.find(network=>network.ntkey==bidder).name;
-					var countries=currentRule.triggers.filter(trigger=>trigger.key=='country')[0].value;
-					var deviceType=currentRule.triggers.filter(trigger=>trigger.key=='device')[0].value[0];
+				const updatedHbConfig = await hbModel.getHbConfig(site);
+				var totalBlockedRevenueFromRule = 0;
+				var updatedAutoRules = updatedHbConfig
+					.get('autoRules')
+					.filter(rule => rule.description == 'Auto Bidder Blocking Rules');
 
-
-					var countryReportKeys = countries.map(id => {
-						return Object.values(meta.countries).filter(countryObj=>countryObj.country_code_alpha2 ===id)[0].id;
-					});
-					const deviceId = meta.deviceKeys.filter(deviceObj => deviceObj.ext == deviceType)[0];
-					const networkKey = meta.networkReportKeys.filter(network =>
-						network.value.toUpperCase().includes(bidderName.toUpperCase())
-					)[0];
-					if(!networkKey){
+				//validate rules created
+				for (var i = 0; i < updatedAutoRules.length; i++) {
+					var currentRule = updatedAutoRules[i];
+					if (!currentRule || !currentRule.actions || !currentRule.actions.length) {
 						continue;
 					}
-					
 
-					var blockedRevenue = await getRuleData(
-						oneWeekAgo,
-						today,
-						networkKey.id,
-						countryReportKeys.join(','),
-						deviceId.id,
-						site
-					);
-					totalBlockedRevenueFromRule += blockedRevenue[0] ? blockedRevenue[0].overall_gross_revenue : 0;
+					var countries = currentRule.triggers.find(trigger => trigger.key == 'country');
+					if (!countries || !countries.value) {
+						continue;
+					}
+					countries = countries.value;
+					var deviceType = currentRule.triggers.find(trigger => trigger.key == 'device');
+					if (!deviceType || !deviceType.value) {
+						continue;
+					}
+					deviceType = deviceType.value[0];
+
+					var countryReportKeys = countries
+						.map(id => {
+							var matchedCountry = Object.values(meta.countries).filter(
+								countryObj => countryObj.country_code_alpha2 === id
+							);
+							matchedCountry = matchedCountry.length && matchedCountry[0];
+							return matchedCountry.id;
+						})
+						.filter(Number);
+
+					if (!countryReportKeys || !countryReportKeys.length) {
+						continue;
+					}
+					const deviceId = meta.deviceKeys.find(deviceObj => deviceObj.ext == deviceType);
+					if (!deviceId) {
+						continue;
+					}
+					let currentRuleAction = currentRule.actions[0];
+					if (currentRuleAction.key == 'disallowed_bidders') {
+						var ruleBidderObj = currentRuleAction.value;
+						if (!ruleBidderObj) {
+							continue;
+						}
+						var bidder = ruleBidderObj[0];
+						if (!bidder) {
+							continue;
+						}
+						var bidderName = meta.networks.find(network => network.ntkey == bidder).name;
+						const networkKey = meta.networkReportKeys.find(network =>
+							network.value.toUpperCase().includes(bidderName.toUpperCase())
+						);
+						if (!networkKey) {
+							continue;
+						}
+
+						var blockedRevenue = await getHBRuleData(
+							oneWeekAgo,
+							today,
+							networkKey.id,
+							countryReportKeys.join(','),
+							deviceId.id,
+							site
+						);
+						totalBlockedRevenueFromRule += blockedRevenue[0]
+							? blockedRevenue[0].overall_gross_revenue
+							: 0;
+					} else if (currentRuleAction.key == 'amazon_block') {
+						var blockedRevenue = await getUAMRuleData(
+							oneWeekAgo,
+							today,
+							countryReportKeys.join(','),
+							deviceId.id,
+							site
+						);
+						totalBlockedRevenueFromRule += blockedRevenue[0]
+							? blockedRevenue[0].network_gross_revenue
+							: 0;
+					}
 				}
 
-				const isRuleCorrect =
-				Math.round(totalBlockedRevenueFromRule  * 100 / totalSiteWiseRevenue[site]) < 1;
-				if(!isRuleCorrect){
-					sendErrorEmail(`Incorrect Rule pushed to site ${site}`,'Incorrect CB update')
+				const isRuleCorrect = (totalBlockedRevenueFromRule * 100) / totalSiteWiseRevenue[site] < 1;
+				if (!isRuleCorrect) {
+					sendErrorEmail(`Incorrect Rule pushed to site ${site}`, 'Incorrect CB update');
 				}
-
 
 				console.log(`Rules generated succesfully for ${site}`);
 			} catch (e) {
@@ -315,8 +434,6 @@ async function bidderBlocking() {
 		console.error(e);
 	}
 }
-
-
 
 bidderBlocking();
 //cron.schedule(config.autoBlockCronSchedule, bidderBlocking);
