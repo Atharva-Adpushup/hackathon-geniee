@@ -302,7 +302,7 @@ async function bidderBlocking() {
 					const deviceKey = DEVICE_MAPPING[device];
 					if (bidderObj == 'AmazonUAM') {
 						rulesArray.push({
-							actions: [{ key: 'amazon_block', value: [bidderObj] }],
+							actions: [{ key: 'amazon_block', value: 'Block AmazonUAM' }],
 							description: 'Auto Bidder Blocking Rules',
 							isActive: true,
 							triggers: [
