@@ -112,6 +112,10 @@ class OptimizationTab extends React.Component {
 					value: 'allowed_bidders'
 				},
 				{
+					label: 'AmazonUAM Blocking',
+					value: 'amazon_block'
+				},
+				{
 					label: 'Disallow Bidders',
 					value: 'disallowed_bidders'
 				},
@@ -151,6 +155,7 @@ class OptimizationTab extends React.Component {
 			actionValueOptions: {
 				allowed_bidders: allowedBidders,
 				disallowed_bidders: allowedBidders,
+				amazon_block: [{ label: 'Block AmazonUAM', value: 'Block AmazonUAM' }],
 				formats: []
 			},
 			triggerKeyOptions: [
