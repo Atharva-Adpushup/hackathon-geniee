@@ -212,6 +212,7 @@ class AdUnitSettings extends Component {
 		} else {
 			modalToggle({ show: false });
 		}
+		return undefined;
 	};
 
 	render() {
@@ -220,7 +221,6 @@ class AdUnitSettings extends Component {
 			sizeFilters,
 			isLoading,
 			modalLoading,
-			selectiveRolloutEnabled,
 			downwardSizesDisabled,
 			enableDownwardSizeToggle
 		} = this.state;
@@ -233,21 +233,19 @@ class AdUnitSettings extends Component {
 		return (
 			<>
 				<div>
-					{selectiveRolloutEnabled ? (
-						<CustomToggleSwitch
-							labelText="Collapse Unfilled Impressions"
-							className="u-cursor-pointer"
-							checked={!!collapseUnfilledToggle}
-							onChange={this.handleToggle}
-							layout="horizontal"
-							size="m"
-							on="Yes"
-							off="No"
-							defaultLayout
-							name={adid}
-							id={`collapseUnfilled-${adid}`}
-						/>
-					) : null}
+					<CustomToggleSwitch
+						labelText="Collapse Unfilled Impressions"
+						className="u-cursor-pointer"
+						checked={!!collapseUnfilledToggle}
+						onChange={this.handleToggle}
+						layout="horizontal"
+						size="m"
+						on="Yes"
+						off="No"
+						defaultLayout
+						name={adid}
+						id={`collapseUnfilled-${adid}`}
+					/>
 					<CustomToggleSwitch
 						labelText="Enable Downward Sizes"
 						className="u-cursor-pointer"
