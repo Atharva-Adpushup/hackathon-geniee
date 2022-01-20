@@ -43,7 +43,7 @@ class Settings extends Component {
 		const { revenueShare = 10 } = site.adNetworkSettings || {};
 		const status = Object.prototype.hasOwnProperty.call(apps, 'apLite') ? apps.apLite : undefined;
 		const isPnPEnabled = Object.prototype.hasOwnProperty.call(apps, 'pnp') ? apps.pnp : false;
-
+		const poweredByBannerConfig = this.getPoweredByBannerConfig(poweredByBanner);
 		this.state = {
 			isSPA,
 			spaButUsingHook,
@@ -65,7 +65,7 @@ class Settings extends Component {
 			accessEmail,
 			gaVersion,
 			pnp: isPnPEnabled,
-			selectedAdTypes: [...this.getPoweredByBannerConfig(poweredByBanner)]
+			selectedAdTypes: [...poweredByBannerConfig]
 		};
 	}
 
@@ -191,8 +191,9 @@ class Settings extends Component {
 
 	getPoweredByBannerConfig = poweredByBanner => {
 		const selectedAdTypes = [];
+		const poweredByBannerSupportedAdTypes = Object.keys(poweredByBanner);
 
-		Object.keys(poweredByBanner).forEach(adType => {
+		poweredByBannerSupportedAdTypes.forEach(adType => {
 			if (poweredByBanner[adType]) {
 				selectedAdTypes.push({ label: adType, value: adType });
 			}
@@ -294,10 +295,6 @@ class Settings extends Component {
 			spaButUsingHook,
 			spaPageTransitionTimeout,
 			adpushupPercentage,
-			// poweredByBanner,
-			// isAdsLabelOn,
-			// adsLabel,
-			// revenueShare,
 			status,
 			hbAnalytics,
 			cmpEnabled,
@@ -312,6 +309,8 @@ class Settings extends Component {
 			pnp,
 			selectedAdTypes
 		} = this.state;
+
+		const { handleMultiSelect } = this;
 		const { site } = this.props;
 
 		const { siteId, siteDomain, dataFeedActive = true } = site;
@@ -365,7 +364,7 @@ class Settings extends Component {
 					<MultiSelect
 						options={POWERED_BY_BANNER}
 						value={selectedAdTypes}
-						onChange={this.handleMultiSelect}
+						onChange={handleMultiSelect}
 						disableSearch
 						hasSelectAll={false}
 					/>
