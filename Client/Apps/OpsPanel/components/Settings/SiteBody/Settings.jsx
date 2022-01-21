@@ -43,13 +43,12 @@ class Settings extends Component {
 		const { revenueShare = 10 } = site.adNetworkSettings || {};
 		const status = Object.prototype.hasOwnProperty.call(apps, 'apLite') ? apps.apLite : undefined;
 		const isPnPEnabled = Object.prototype.hasOwnProperty.call(apps, 'pnp') ? apps.pnp : false;
-		const poweredByBannerConfig = this.getPoweredByBannerConfig(poweredByBanner);
+		const selectedAdTypes = this.getSelectedAdTypes(poweredByBanner);
 		this.state = {
 			isSPA,
 			spaButUsingHook,
 			spaPageTransitionTimeout,
 			adpushupPercentage,
-			poweredByBanner,
 			isAdsLabelOn,
 			adsLabel,
 			revenueShare,
@@ -65,7 +64,7 @@ class Settings extends Component {
 			accessEmail,
 			gaVersion,
 			pnp: isPnPEnabled,
-			selectedAdTypes: [...poweredByBannerConfig]
+			selectedAdTypes: [...selectedAdTypes]
 		};
 	}
 
@@ -151,14 +150,29 @@ class Settings extends Component {
 	};
 
 	handleMultiSelect = selectedAdTypes => {
+		this.setState({ selectedAdTypes });
+	};
+
+	getPoweredByBannerConfig = selectedAdTypes => {
 		const poweredByBannerConfig = {};
 		selectedAdTypes.forEach(selectedElement => {
 			poweredByBannerConfig[selectedElement.value] = true;
 		});
-		this.setState({
-			poweredByBanner: poweredByBannerConfig,
-			selectedAdTypes: selectedAdTypes
+
+		return poweredByBannerConfig;
+	};
+
+	getSelectedAdTypes = poweredByBanner => {
+		const selectedAdTypes = [];
+		const poweredByBannerSupportedAdTypes = Object.keys(poweredByBanner);
+
+		poweredByBannerSupportedAdTypes.forEach(adType => {
+			if (poweredByBanner[adType]) {
+				selectedAdTypes.push({ label: adType, value: adType });
+			}
 		});
+
+		return selectedAdTypes;
 	};
 
 	handleForceBuild = () => {
@@ -189,26 +203,12 @@ class Settings extends Component {
 			});
 	};
 
-	getPoweredByBannerConfig = poweredByBanner => {
-		const selectedAdTypes = [];
-		const poweredByBannerSupportedAdTypes = Object.keys(poweredByBanner);
-
-		poweredByBannerSupportedAdTypes.forEach(adType => {
-			if (poweredByBanner[adType]) {
-				selectedAdTypes.push({ label: adType, value: adType });
-			}
-		});
-
-		return selectedAdTypes;
-	};
-
 	handleSave = () => {
 		const {
 			isSPA,
 			spaButUsingHook,
 			spaPageTransitionTimeout,
 			adpushupPercentage,
-			poweredByBanner,
 			isAdsLabelOn,
 			adsLabel,
 			revenueShare,
@@ -221,8 +221,10 @@ class Settings extends Component {
 			gaTrackingId,
 			viewId,
 			accessEmail,
-			gaVersion
+			gaVersion,
+			selectedAdTypes
 		} = this.state;
+		const poweredByBanner = this.getPoweredByBannerConfig(selectedAdTypes);
 		const gaConfigs = {
 			gaTrackingId,
 			viewId,
