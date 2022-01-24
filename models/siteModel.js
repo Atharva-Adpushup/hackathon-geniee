@@ -473,7 +473,7 @@ function apiModule() {
 						? parseInt(otherSettings.adpushupPercentage, 10)
 						: commonConsts.apConfigDefaults.adpushupPercentage,
 					autoOptimise: settings.autoOptimise === 'false' ? false : true,
-					poweredByBanner: settings.poweredByBanner === 'false' ? false : true,
+					poweredByBanner: settings.poweredByBanner ?  settings.poweredByBanner : {},
 					activeDFPNetwork: settings.activeDFPNetwork ? settings.activeDFPNetwork : '',
 					activeDFPParentId: settings.activeDFPParentId ? settings.activeDFPParentId : '',
 					activeDFPCurrencyCode: settings.activeDFPCurrencyCode || '',
@@ -485,7 +485,7 @@ function apiModule() {
 						? site.get('apConfigs').isAdPushupControlWithPartnerSSP
 						: commonConsts.apConfigDefaults.isAdPushupControlWithPartnerSSP
 				};
-
+				
 				site.set('apConfigs', siteConfig);
 				return site.save();
 			});

@@ -189,7 +189,8 @@ function init(site, computedConfig) {
 			GENIEE_ACTIVE: !!apConfigs.partner,
 			AP_LITE_ACTIVE: !!(apps && apps.apLite && apLiteConfig),
 			PNP_REFRESH_ACTIVE: !!(apps && apps.pnp && pnpConfig),
-			USER_TRACKING: !!(apConfigs && apConfigs.enableUserTracking)
+			USER_TRACKING: !!(apConfigs && apConfigs.enableUserTracking),
+			POWERED_BY_BANNER_ACTIVE: apConfigs.poweredByBanner === 'object' ? !!Object.keys(apConfigs.poweredByBanner).length : false
 		},
 		ads: {},
 		config: {}

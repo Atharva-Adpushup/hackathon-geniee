@@ -78,7 +78,7 @@ const getAdConfig = (adType, section) => {
 		downwardSizesDisabled,
 		sizeFilters,
 		collapseUnfilled,
-		poweredByBannerOnDocked,
+		poweredByBanner,
 		enableLazyLoading,
 		disableReuseVacantAdSpace
 	} = ad;
@@ -95,8 +95,7 @@ const getAdConfig = (adType, section) => {
 		sizeMapping,
 		downwardSizesDisabled: !!downwardSizesDisabled,
 		collapseUnfilled: !!collapseUnfilled,
-		poweredByBannerOnDocked:
-			poweredByBannerOnDocked === undefined || poweredByBannerOnDocked === true ? true : false, // default to true on unit level unless declared false
+		poweredByBanner,
 		disableReuseVacantAdSpace: !!disableReuseVacantAdSpace
 	};
 
