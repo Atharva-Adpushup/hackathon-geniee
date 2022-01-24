@@ -2,15 +2,21 @@ const _ = require('lodash');
 const HTTP_STATUSES = require('../configs/httpStatusConsts');
 const { getAllUserSites } = require('../models/userModel');
 const { sendErrorResponse } = require('../helpers/commonFunctions');
+const CC = require('../configs/commonConsts');
 
 const reportsAccess = async (req, res, next) => {
 	let isAuthorized = false;
 	const {
 		user: { email, isSuperUser = false, isAdpUser = false } = {},
 		query,
-		query: { params }
+		query: { params, path }
 	} = req;
-	if (isSuperUser || isAdpUser) isAuthorized = true;
+	if (
+		isSuperUser ||
+		isAdpUser ||
+		(CC.WIDGET_AUTH_EXCLUDED_PATH.includes(path) && req.url.split('?')[0] === '/getWidgetData')
+	)
+		isAuthorized = true;
 	else {
 		const allSites = await getAllUserSites(email).map(site => site.siteId.toString());
 		let sitesBeingFetched =
