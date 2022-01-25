@@ -190,7 +190,7 @@ function init(site, computedConfig) {
 			AP_LITE_ACTIVE: !!(apps && apps.apLite && apLiteConfig),
 			PNP_REFRESH_ACTIVE: !!(apps && apps.pnp && pnpConfig),
 			USER_TRACKING: !!(apConfigs && apConfigs.enableUserTracking),
-			POWERED_BY_BANNER_ACTIVE: apConfigs.poweredByBanner === 'object' ? !!Object.keys(apConfigs.poweredByBanner).length : false
+			POWERED_BY_BANNER_ACTIVE: typeof apConfigs.poweredByBanner === 'object' ? !!Object.keys(apConfigs.poweredByBanner).length : false
 		},
 		ads: {},
 		config: {}
