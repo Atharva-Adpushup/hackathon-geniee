@@ -49,7 +49,8 @@ const pushToAdpTags = (ad, json) => {
 			dfpAdunit: isZoneContainerId ? ad.networkData.zoneContainerId : ad.networkData.dfpAdunit,
 			dfpAdunitCode: ad.networkData.dfpAdunitCode,
 			headerBidding: ad.networkData.headerBidding,
-			keyValues: ad.networkData.keyValues
+			keyValues: ad.networkData.keyValues,
+			minViewPortSize: ad.minViewPortSize
 		};
 
 		if (isMultipleAdSizes) {
@@ -80,7 +81,8 @@ const getAdConfig = (adType, section) => {
 		collapseUnfilled,
 		poweredByBanner,
 		enableLazyLoading,
-		disableReuseVacantAdSpace
+		disableReuseVacantAdSpace,
+		minViewPortSize = { height: 0, width: 0 }
 	} = ad;
 	const { name: sectionName, id, formatData } = section;
 	let json = {
@@ -96,6 +98,7 @@ const getAdConfig = (adType, section) => {
 		downwardSizesDisabled: !!downwardSizesDisabled,
 		collapseUnfilled: !!collapseUnfilled,
 		poweredByBanner,
+		minViewPortSize,
 		disableReuseVacantAdSpace: !!disableReuseVacantAdSpace
 	};
 
