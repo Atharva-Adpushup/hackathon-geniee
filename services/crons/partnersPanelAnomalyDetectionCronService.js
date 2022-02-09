@@ -23,6 +23,7 @@ const {
 	couchbaseErrorHandler,
 	sendErrorNotification
 } = require('../partnersPanelAnomaliesDetectionService/utils');
+const { PARTNERS_PANEL_INTEGRATION } = require('../../configs/config');
 
 const getSitesFromDB = async () => {
 	const siteListPromise = await appBucket
@@ -60,10 +61,15 @@ function startPartnersPanelsAnomaliesDetectionService(partnerName, retryCount = 
 						result.message
 					}`
 				);
+			} else if (result && result.status && result.status === PARTNERS_PANEL_INTEGRATION.AUTH_ERROR) {
+				// Auth Error - send alert without retry
+				(async () => {
+					await sendErrorNotification('Auth Error: Invalid Token or Password. Please check.', result.partner);
+				})();
 			} else {
 				if (retryCount < 10) {
 					retryCount++;
-					const time = 1000 * 60 * 1 * retryCount;
+					const time = 1000 * 60 * 5 * retryCount;
 					console.log(
 						`Retry attempt for ${partnerName} - ${retryCount}/10 in ${5 *
 							retryCount} min(s). Time: ${new Date()}`
@@ -71,6 +77,9 @@ function startPartnersPanelsAnomaliesDetectionService(partnerName, retryCount = 
 					setTimeout(async () => {
 						await startPartnersPanelsAnomaliesDetectionService(partnerName, retryCount);
 					}, time);
+				} else {
+					console.log(`Retry attempt for ${partnerName} - finished. Time: ${new Date()}`
+)
 				}
 			}
 		})

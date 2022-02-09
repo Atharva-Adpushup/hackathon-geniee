@@ -4,17 +4,16 @@ const moment = require('moment');
 const partnerAndAdpushpModel = require('../PartnerAndAdpushpModel');
 const emailer = require('../emailer');
 const saveAnomaliesToDb = require('../saveAnomaliesToDb');
-const { axiosErrorHandler, partnerModuleErrorHandler, aggregateWeeklyData } = require('../utils');
+const { axiosAuthErrorHandler, axiosErrorHandler, partnerModuleErrorHandler, aggregateWeeklyData } = require('../utils');
 
 const {
 	PARTNERS_PANEL_INTEGRATION: { ANOMALY_THRESHOLD, ANOMALY_THRESHOLD_IN_PER, CRITEO }
-} = require('../../../configs/commonConsts');
-const { PARTNER_NAME, NETWORK_ID, DOMAIN_FIELD_NAME, REVENUE_FIELD } = CRITEO;
+} = require('../../../configs/config');
+const { PARTNER_NAME, NETWORK_ID, DOMAIN_FIELD_NAME, REVENUE_FIELD, AUTH_PARAMS, ENDPOINT } = CRITEO;
 
-const TOKEN = 'D152A218-5DE9-4834-91F0-95542119D520';
-const API_ENDPOINT = `https://pmc.criteo.com/api/stats?apitoken=${TOKEN}`;
+const API_ENDPOINT = `${ENDPOINT}?apitoken=${AUTH_PARAMS.TOKEN}`;
 
-const getDataFromPartner = function(fromDate, toDate) {
+const getDataFromPartner = function (fromDate, toDate) {
 	const queryParams = {
 		dimensions: 'subid',
 		generator: 'daily',
@@ -37,7 +36,18 @@ const getDataFromPartner = function(fromDate, toDate) {
 			}
 		)
 		.then(response => processDataReceivedFromPublisher(response.data))
-		.catch(axiosErrorHandler);
+		.catch((err) => {
+			const errorResponseHandler = function (errResponse) {
+				const { status, statusText } = errResponse;
+				if (errResponse.data) {
+					const { Message } = errResponse.data;
+					return `${Message} - ${status} ${statusText}`
+				} else {
+					return `${status} ${statusText}`
+				}
+			}
+			axiosAuthErrorHandler(err, errorResponseHandler)
+		});
 };
 
 const processDataReceivedFromPublisher = data => {
@@ -50,7 +60,7 @@ const processDataReceivedFromPublisher = data => {
 	return processedData;
 };
 
-const initDataForpartner = function() {
+const initDataForpartner = function () {
 	const fromDate = moment()
 		.subtract(8, 'days')
 		.format('YYYY-MM-DD');
@@ -81,7 +91,7 @@ const fetchData = async sitesData => {
 
 	console.log('Fetching data from Criteo...');
 	return getDataFromPartner(fromDate, toDate)
-		.then(async function(reportDataJSON) {
+		.then(async function (reportDataJSON) {
 			CriteoPartnerModel.setPartnersData(aggregateWeeklyData(reportDataJSON, DOMAIN_FIELD_NAME, REVENUE_FIELD));
 			// process and map sites data with publishers API data response
 			CriteoPartnerModel.mapAdPushupSiteIdAndDomainWithPartnersDomain();
@@ -110,7 +120,7 @@ const fetchData = async sitesData => {
 
 			// if aonmalies found
 			if (anomalies.length) {
-				if(process.env.NODE_ENV === 'production') {
+				if (process.env.NODE_ENV === 'production') {
 					const dataToSend = CriteoPartnerModel.formatAnomaliesDataForSQL(anomalies, NETWORK_ID);
 					await Promise.all([
 						emailer.anomaliesMailService({

@@ -9,29 +9,15 @@ const requestPromise = util.promisify(request);
 const partnerAndAdpushpModel = require('../PartnerAndAdpushpModel');
 const emailer = require('../emailer');
 const saveAnomaliesToDb = require('../saveAnomaliesToDb');
-const { axiosErrorHandler, requestErrorHandler, partnerModuleErrorHandler } = require('../utils');
+const { axiosErrorHandler, authRequestErrorHandler, requestErrorHandler, partnerModuleErrorHandler } = require('../utils');
 
 const {
 	PARTNERS_PANEL_INTEGRATION: { ANOMALY_THRESHOLD, ANOMALY_THRESHOLD_IN_PER, OPENX },
 	PARTNERS_PANEL_INTEGRATION: { TIMEZONE_OFFSET }
-} = require('../../../configs/commonConsts');
-const { PARTNER_NAME, NETWORK_ID, DOMAIN_FIELD_NAME, REVENUE_FIELD } = OPENX;
+} = require('../../../configs/config');
 
-const API_ENDPOINT = `http://openxcorporate-ui3.openxenterprise.com`;
-
-const OAUTH_ENDPOINT_INITIATE = `https://sso.openx.com/api/index/initiate`;
-const OAUTH_ENDPOINT_PROCESS = `https://sso.openx.com/login/process`;
-const OAUTH_ENDPOINT_TOKEN = `https://sso.openx.com/api/index/token`;
-
-const AUTH_PARAMS = {
-	EMAIL: 'ankit.bharthwal@adpushup.com',
-	PASSWORD: 'Adpushup@2022'
-};
-
-const CONSUMER = {
-	key: '3886c1427947cac75c7034db82f590d01bc826d6',
-	secret: 'd457b1ff100015ca3a7dd1d1ed7972aa455231a9'
-};
+const { PARTNER_NAME, NETWORK_ID, DOMAIN_FIELD_NAME, REVENUE_FIELD, AUTH_PARAMS, CONSUMER, ENDPOINT } = OPENX;
+const { API_ENDPOINT, OAUTH_ENDPOINT_INITIATE, OAUTH_ENDPOINT_PROCESS, OAUTH_ENDPOINT_TOKEN } = ENDPOINT;
 
 const oauth = OAuth({
 	consumer: CONSUMER,
@@ -44,9 +30,9 @@ const oauth = OAuth({
 	}
 });
 
-const initDataForpartner = function() {
+const initDataForpartner = function () {
 	const OFFSET =
-	process.env.NODE_ENV === 'production' ? TIMEZONE_OFFSET.PRODUCTION : TIMEZONE_OFFSET.STAGING;
+		process.env.NODE_ENV === 'production' ? TIMEZONE_OFFSET.PRODUCTION : TIMEZONE_OFFSET.STAGING;
 
 	// data for 7 days with offset of 2 -> 7+2=9
 	let fromDateOpenX = moment().subtract(9, 'days');
@@ -97,7 +83,7 @@ const initDataForpartner = function() {
 //     b. Verify Temp Token
 //     c. Get Access Token
 // 2. Get Data from Partner
-const getDataFromPartner = async function(fromDate, toDate) {
+const getDataFromPartner = async function (fromDate, toDate) {
 	// Step 1 - Access Token
 	// a. Temp Request Token
 	const requestTokenObj = await getOAuthRequestToken();
@@ -131,7 +117,7 @@ const getOAuthRequestToken = () => {
 		form: oauth.authorize(configForRequestToken, {})
 	})
 		.then(response => response.body)
-		.then(function(response) {
+		.then(function (response) {
 			// string to obj
 			const resObj = {};
 			response.split('&').map(item => {
@@ -160,7 +146,7 @@ const getOAuthTokenVerifier = requestTokenObj => {
 		form: oauth.authorize(configForRequestTokenVerification, {})
 	})
 		.then(response => response.body)
-		.then(function(response) {
+		.then(function (response) {
 			response = response.replace(/oob\?/, '');
 			// string to obj
 			const resObj = {};
@@ -171,7 +157,18 @@ const getOAuthTokenVerifier = requestTokenObj => {
 			});
 			return resObj;
 		})
-		.catch(requestErrorHandler);
+		.catch((err) => {
+			const errorResponseHandler = function (errResponse) {
+				const { status, statusText } = errResponse;
+				if (errResponse.data) {
+					const { message } = errResponse.data;
+					return `${message} - ${status} ${statusText}`
+				} else {
+					return `${status} ${statusText}`
+				}
+			}
+			authRequestErrorHandler(err, errorResponseHandler)
+		});
 };
 
 const getOAuthAccessToken = (tokenVerifyObj, token) => {
@@ -189,7 +186,7 @@ const getOAuthAccessToken = (tokenVerifyObj, token) => {
 		form: oauth.authorize(configForAccessToken, token)
 	})
 		.then(response => response.body)
-		.then(function(response) {
+		.then(function (response) {
 			const resObj = {};
 			response.split('&').map(item => {
 				const [key, val] = item.split('=');
@@ -247,7 +244,7 @@ const fetchData = sitesData => {
 
 	console.log('Fetching data from OpenX...');
 	return getDataFromPartner(fromDateOpenX, toDateOpenX)
-		.then(async function(reportDataJSON) {
+		.then(async function (reportDataJSON) {
 			OpenXPartnerModel.setPartnersData(reportDataJSON);
 
 			// process and map sites data with publishers API data response
@@ -277,7 +274,7 @@ const fetchData = sitesData => {
 
 			// if aonmalies found
 			if (anomalies.length) {
-				if(process.env.NODE_ENV === 'production') {
+				if (process.env.NODE_ENV === 'production') {
 					const dataToSend = OpenXPartnerModel.formatAnomaliesDataForSQL(anomalies, NETWORK_ID);
 					await Promise.all([
 						emailer.anomaliesMailService({
