@@ -257,6 +257,10 @@ router
 					*/
 					const { accounts } = adsenseInfo;
 
+					if (!accounts) {
+						throw new Error('No adsense account');
+					}
+
 					return accounts.map(account => ({
 						creation_time: account.createTime,
 						id: account.name.replace('accounts/', ''),
