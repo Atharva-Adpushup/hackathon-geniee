@@ -91,7 +91,8 @@ const tableHeader = [
 	{ title: 'Ad eCPM', prop: 'ad_ecpm' },
 	{ title: 'Network Net Revenue', prop: 'network_net_revenue' },
 	{ title: 'Network Gross Revenue', prop: 'network_gross_revenue' },
-	{ title: 'XPath Miss', prop: 'adpushup_xpath_miss' }
+	{ title: 'XPath Miss', prop: 'adpushup_xpath_miss' },
+	{ title: 'AdX CTR', prop: 'network_ad_ctr' }
 ];
 
 const displayMetrics = {
@@ -197,7 +198,10 @@ const PAYMENT_HISTORY_HEADERS = [
 	}
 ];
 
-const DEVICE_OPTIONS = [{ name: 'Mobile', value: 'mobile' }, { name: 'Desktop', value: 'desktop' }];
+const DEVICE_OPTIONS = [
+	{ name: 'Mobile', value: 'mobile' },
+	{ name: 'Desktop', value: 'desktop' }
+];
 
 export {
 	DASHBOARD_NAV_ITEMS_INDEXES,

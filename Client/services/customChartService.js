@@ -92,6 +92,17 @@ const defaultChartConfig = {
 	]
 };
 
+function getFormattedPointValue(valueType, num) {
+	switch (valueType) {
+		case 'money':
+			return `$${numberWithCommas(num)}`;
+		case 'percent':
+			return `${numberWithCommas(num)}%`;
+		default:
+			return numberWithCommas(num);
+	}
+}
+
 function getGroupedYAxisAndSeries(chartType, existingSeries, yAxisGroups) {
 	const yAxis = [];
 	const seriesForChart = [];
@@ -121,6 +132,10 @@ function getGroupedYAxisAndSeries(chartType, existingSeries, yAxisGroups) {
 					legend.labels = {
 						format: '${value}'
 					};
+				if (series.valueType == 'percent')
+					legend.labels = {
+						format: '{value}%'
+					};
 				yAxisCount += 1;
 				opposite = !opposite;
 			}
@@ -132,11 +147,9 @@ function getGroupedYAxisAndSeries(chartType, existingSeries, yAxisGroups) {
 			pointFormatter() {
 				const point = this;
 				const num = roundOffTwoDecimal(point.y);
-				return `<span style="color:${point.color}">\u25CF</span> ${point.series.name}: <b>${
-					point.series.userOptions.valueType === 'money'
-						? `$${numberWithCommas(num)}`
-						: numberWithCommas(point.y)
-				}</b><br/>`;
+				return `<span style="color:${point.color}">\u25CF</span> ${
+					point.series.name
+				}: <b>${getFormattedPointValue(point.series.userOptions.valueType, num)}</b><br/>`;
 			}
 		};
 		seriesForChart.push(singleSeries);
@@ -216,11 +229,9 @@ export function getCustomChartConfig(
 						pointFormatter() {
 							const point = this;
 							const num = roundOffTwoDecimal(point.y);
-							return `<span style="color:${point.color}">\u25CF</span> ${point.series.name}: <b>${
-								point.series.userOptions.valueType === 'money'
-									? `$${numberWithCommas(num)}`
-									: numberWithCommas(point.y)
-							}</b><br/>`;
+							return `<span style="color:${point.color}">\u25CF</span> ${
+								point.series.name
+							}: <b>${getFormattedPointValue(point.series.userOptions.valueType, num)}</b><br/>`;
 						}
 					};
 				}
@@ -258,9 +269,7 @@ export function getCustomChartConfig(
 					const point = this;
 					const isMoneyValueType = !!(point.series.valueType === 'money');
 					const computedValuePrefix = isMoneyValueType ? '$' : '';
-					return `<span style="color:${point.color}">\u25CF</span> ${
-						point.series.name
-					}: <b>${computedValuePrefix}${point.y}</b><br/>`;
+					return `<span style="color:${point.color}">\u25CF</span> ${point.series.name}: <b>${computedValuePrefix}${point.y}</b><br/>`;
 				}
 			};
 		}
@@ -329,6 +338,10 @@ export function getCustomChartConfig(
 				if (activeLegendItems.valueType === 'money')
 					chartConfig.yAxis.labels = {
 						format: '${value}'
+					};
+				if (activeLegendItems.valueType === 'percent')
+					chartConfig.yAxis.labels = {
+						format: '{value}%'
 					};
 				break;
 			}

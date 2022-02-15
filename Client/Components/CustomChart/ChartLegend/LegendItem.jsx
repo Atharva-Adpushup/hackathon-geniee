@@ -70,6 +70,18 @@ class LegendItem extends Component {
 		}
 	}
 
+	giveFormattedValueForLegend(legend) {
+		legend.total = legend.total || 0;
+		switch (legend.valueType) {
+			case 'money':
+				return `$${this.numberWithCommas(this.roundOffTwoDecimal(legend.total))}`;
+			case 'percent':
+				return `${this.numberWithCommas(this.roundOffTwoDecimal(legend.total))}%`;
+			default:
+				return this.numberWithCommas(legend.total);
+		}
+	}
+
 	render() {
 		const { visible } = this.state;
 		const { legend, series } = this.props;
@@ -93,13 +105,7 @@ class LegendItem extends Component {
 				style={style}
 			>
 				<div className="name">{legend.name}</div>
-				<div className="total">
-					{legend.total >= 0
-						? legend.valueType === 'money'
-							? `$${this.numberWithCommas(this.roundOffTwoDecimal(legend.total))}`
-							: this.numberWithCommas(legend.total)
-						: 'N/A'}
-				</div>
+				<div className="total">{this.giveFormattedValueForLegend(legend)}</div>
 			</div>
 		);
 	}
