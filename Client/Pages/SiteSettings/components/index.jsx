@@ -15,6 +15,7 @@ import Empty from '../../../Components/Empty';
 import CopyButtonWrapperContainer from '../../../Containers/CopyButtonWrapperContainer';
 import siteService from '../../../services/siteService';
 import { errorHandler } from '../../../helpers/commonFunctions';
+import LineItemBlockList from './LineItemBlockList';
 
 library.add(faCopy, faEnvelope);
 
@@ -147,35 +148,38 @@ class SiteSettings extends Component {
 			siteData: {
 				apConfigs: { blocklist = [] },
 				apps = {}
-			}
+			},
+			siteData
 		} = this.state;
-
 		const blocklistCopy = Array.isArray(blocklist) ? cloneDeep(blocklist) : [];
 
 		return (
-			<div
-				className="clearfix"
-				style={
-					apps.hasOwnProperty('apLite') && apps.apLite
-						? { pointerEvents: 'none', opacity: 0.5 }
-						: null
-				}
-			>
-				<h4 className="u-margin-t0 u-margin-b4 u-text-bold">Manage Blocklist</h4>
-				<p className="u-margin-b4">Block AdPushup ads on selected URLs of the website</p>
-				<UiList
-					itemCollection={blocklistCopy}
-					emptyCollectionPlaceHolder="No blocklist added"
-					inputPlaceholder="Enter comma separated URLs or URLs pattern to block AdPushup ads"
-					saveButtonText="Add"
-					itemUpdateSaveButtonText="Update"
-					sticky
-					validate
-					plugins={['url-remove-protocol-prefix']}
-					separateSaveButtonText="Save Data"
-					onSave={this.uiListSaveHandler}
-				/>
-			</div>
+			<>
+				<div
+					className="clearfix"
+					style={
+						apps.hasOwnProperty('apLite') && apps.apLite
+							? { pointerEvents: 'none', opacity: 0.5 }
+							: null
+					}
+				>
+					<h4 className="u-margin-t0 u-margin-b4 u-text-bold">Manage Blocklist</h4>
+					<p className="u-margin-b4">Block AdPushup ads on selected URLs of the website</p>
+					<UiList
+						itemCollection={blocklistCopy}
+						emptyCollectionPlaceHolder="No blocklist added"
+						inputPlaceholder="Enter comma separated URLs or URLs pattern to block AdPushup ads"
+						saveButtonText="Add"
+						itemUpdateSaveButtonText="Update"
+						sticky
+						validate
+						plugins={['url-remove-protocol-prefix']}
+						separateSaveButtonText="Save Data"
+						onSave={this.uiListSaveHandler}
+					/>
+				</div>
+				<LineItemBlockList siteData={siteData} {...this.props} />
+			</>
 		);
 	}
 

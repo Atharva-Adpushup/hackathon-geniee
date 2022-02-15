@@ -147,12 +147,17 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 			};
 			const setAdNetworkConfig = function(prebidAndAdsConfig) {
 				const adServerSettings = user.get('adServerSettings');
+				const blockListedLineItems = site.get('blockListedLineItems');
 				const activeDFPNetwork =
 					(adServerSettings && adServerSettings.dfp && adServerSettings.dfp.activeDFPNetwork) ||
 					null;
 
 				if (activeDFPNetwork) {
-					return generateAdNetworkConfig(activeDFPNetwork, lineItemTypes).then(adNetworkConfig => ({
+					return generateAdNetworkConfig(
+						activeDFPNetwork,
+						lineItemTypes,
+						blockListedLineItems
+					).then(adNetworkConfig => ({
 						...prebidAndAdsConfig,
 						adNetworkConfig
 					}));

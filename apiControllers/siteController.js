@@ -29,6 +29,7 @@ const proxy = require('../helpers/proxy');
 const pageGroupController = require('./pageGroupController');
 const utils = require('../helpers/utils');
 const apLiteModel = require('../models/apLiteModel');
+
 const {
 	AUDIT_LOGS_ACTIONS: { OPS_PANEL, MY_SITES }
 } = CC;
@@ -426,6 +427,34 @@ router
 			.then(() => sendSuccessResponse({ success: 1 }, res))
 			.catch(err => sendErrorResponse(err, res));
 	})
+	.post('/updateBlockListedLineItem', (req, res) => {
+		const { email, originalEmail } = req.user;
+		const { siteId, dataForAuditLogs, blockListedLineItems } = req.body;
+
+		return verifyOwner(siteId, email)
+			.then(site => {
+				const prevBlocklistedLineItems = site.get('blockListedLineItems');
+				const { siteDomain, appName, type = 'site' } = dataForAuditLogs;
+				sendDataToAuditLogService({
+					siteId,
+					siteDomain,
+					appName,
+					type,
+					impersonateId: email,
+					userId: originalEmail,
+					prevConfig: prevBlocklistedLineItems,
+					currentConfig: blockListedLineItems,
+					action: {
+						name: OPS_PANEL.SITES_SETTING,
+						data: `Sites Setting - Update blacklisted line items`
+					}
+				});
+				site.set('blockListedLineItems', [...blockListedLineItems]);
+				return site.save();
+			})
+			.then(() => sendSuccessResponse({ success: 1 }, res))
+			.catch(err => sendErrorResponse(err, res));
+	})
 	.post('/saveSettings', (req, res) => {
 		const { email, originalEmail } = req.user;
 		const { siteId, apConfigs, adNetworkSettings, dataForAuditLogs } = req.body;
@@ -471,7 +500,7 @@ router
 		const { siteId, toUpdate, dataForAuditLogs } = req.body;
 		const { value: { pnp = false } = {} } = toUpdate[0];
 		if (pnp) {
-			//here we will disable aplite refresh slots
+			// here we will disable aplite refresh slots
 			try {
 				const apLiteDoc = await apLiteModel.getAPLiteModelBySite(siteId);
 				const { data: { adUnits = [] } = {} } = apLiteDoc;
