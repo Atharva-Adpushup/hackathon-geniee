@@ -59,7 +59,8 @@ class Apps extends Component {
 			updateAppStatus,
 			fetchAllBiddersAction,
 			updateBidderAction,
-			updateSite
+			updateSite,
+			dataForAuditLogs
 		} = this.props;
 
 		const common = {
@@ -67,7 +68,8 @@ class Apps extends Component {
 			site,
 			showNotification,
 			updateAppStatus,
-			resetTab: this.handleSelect
+			resetTab: this.handleSelect,
+			dataForAuditLogs
 		};
 		return (
 			<PanelGroup
