@@ -193,7 +193,8 @@ const METRICS = {
 	ADPUSHUP_PAGE_VIEWS: { value: 'adpushup_page_views', name: 'Page Views', valueType: 'number' },
 	ADPUSHUP_PAGE_CPM: { value: 'adpushup_page_cpm', name: 'Page RPM', valueType: 'money' },
 	NETWORK_IMPRESSIONS: { value: 'network_impressions', name: 'Impressions', valueType: 'number' },
-	NETWORK_AD_ECPM: { value: 'network_ad_ecpm', name: 'Ad eCPM', valueType: 'money' }
+	NETWORK_AD_ECPM: { value: 'network_ad_ecpm', name: 'Ad eCPM', valueType: 'money' },
+	NETWORK_AD_CTR: { value: 'network_ad_ctr', name: 'AdX CTR', valueType: 'percent' }
 };
 
 const displayMetrics = [
@@ -201,7 +202,8 @@ const displayMetrics = [
 	METRICS.ADPUSHUP_PAGE_VIEWS,
 	METRICS.ADPUSHUP_PAGE_CPM,
 	METRICS.NETWORK_IMPRESSIONS,
-	METRICS.NETWORK_AD_ECPM
+	METRICS.NETWORK_AD_ECPM,
+	METRICS.NETWORK_AD_CTR
 ];
 
 const METRICS_OPS_PANEL = {
@@ -210,7 +212,8 @@ const METRICS_OPS_PANEL = {
 	ADPUSHUP_PAGE_CPM: { value: 'adpushup_page_cpm', name: 'Page RPM', valueType: 'money' },
 	NETWORK_IMPRESSIONS: { value: 'network_impressions', name: 'Impressions', valueType: 'number' },
 	NETWORK_AD_ECPM: { value: 'network_ad_ecpm', name: 'Ad eCPM', valueType: 'money' },
-	GROSS_REVENUE: { value: 'network_gross_revenue', name: 'Gross Revenue', valueType: 'money' }
+	GROSS_REVENUE: { value: 'network_gross_revenue', name: 'Gross Revenue', valueType: 'money' },
+	NETWORK_AD_CTR: { value: 'network_ad_ctr', name: 'AdX CTR', valueType: 'percent' }
 };
 
 const displayOpsMetrics = [
@@ -220,6 +223,7 @@ const displayOpsMetrics = [
 	METRICS_OPS_PANEL.NETWORK_IMPRESSIONS,
 	METRICS_OPS_PANEL.NETWORK_AD_ECPM,
 	METRICS_OPS_PANEL.GROSS_REVENUE
+	// METRICS.NETWORK_AD_CTR //add this to make it available in global reports (Ops)
 ];
 
 const METRICS_OPS_PANEL_XPATH = {
@@ -262,7 +266,8 @@ const UNIQUE_IMPRESSION_METRICS = {
 		name: 'Unique Impressions',
 		valueType: 'number'
 	},
-	UNIQUE_AD_ECPM: { value: 'unique_ad_ecpm', name: 'Unique Ad eCPM', valueType: 'money' }
+	UNIQUE_AD_ECPM: { value: 'unique_ad_ecpm', name: 'Unique Ad eCPM', valueType: 'money' },
+	UNIQUE_AD_CTR: { value: 'unique_ad_ctr', name: 'Unique AdX CTR', valueType: 'percent' }
 };
 
 const URL_UTM_METRICS = {
@@ -342,7 +347,8 @@ const displayUniqueImpressionMetrics = [
 	UNIQUE_IMPRESSION_METRICS.ADPUSHUP_PAGE_VIEWS,
 	UNIQUE_IMPRESSION_METRICS.ADPUSHUP_PAGE_CPM,
 	UNIQUE_IMPRESSION_METRICS.UNIQUE_IMPRESSIONS,
-	UNIQUE_IMPRESSION_METRICS.UNIQUE_AD_ECPM
+	UNIQUE_IMPRESSION_METRICS.UNIQUE_AD_ECPM,
+	UNIQUE_IMPRESSION_METRICS.UNIQUE_AD_CTR
 ];
 
 const HB_METRICS = {
@@ -602,7 +608,9 @@ const columnsBlacklistedForAddition = [
 	'topCountries',
 	'topDevices',
 	'selectedDimensionColumn',
-	'average_response_time'
+	'average_response_time',
+	'network_ad_ctr',
+	'unique_ad_ctr'
 ];
 
 const DEFAULT_ERROR_MESSAGE = 'Something went wrong. Please contact AdPushup Ops';
