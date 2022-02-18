@@ -100,21 +100,19 @@ class Table extends React.Component {
 			if (metrics[column]) {
 				// eslint-disable-next-line camelcase
 				const { display_name: Header, table_position } = metrics[column];
-				let footerValue = total[`total_${column}`] || '';
+				let footerValue = total[`total_${column}`] || 0;
 
-				if (footerValue) {
-					switch (metrics[column].valueType) {
-						case 'money': {
-							footerValue = `$${numberWithCommas(footerValue.toFixed(2))}`;
-							break;
-						}
-						case 'percent': {
-							footerValue = `${numberWithCommas(footerValue.toFixed(2))}%`;
-							break;
-						}
-						default: {
-							footerValue = numberWithCommas(footerValue);
-						}
+				switch (metrics[column].valueType) {
+					case 'money': {
+						footerValue = `$${numberWithCommas(footerValue.toFixed(2))}`;
+						break;
+					}
+					case 'percent': {
+						footerValue = `${numberWithCommas(footerValue.toFixed(2))}%`;
+						break;
+					}
+					default: {
+						footerValue = numberWithCommas(footerValue);
 					}
 				}
 
@@ -181,6 +179,18 @@ class Table extends React.Component {
 												100
 											).toFixed(2);
 										else if (prop === 'adpushup_count_percent' && prop === column) grouped = 100;
+										else if (prop === 'network_ad_ctr' && prop === column)
+											grouped = (
+												(sum(aggregatedData[key].map(val => val.network_ad_clicks)) /
+													sum(aggregatedData[key].map(val => val.network_impressions))) *
+												100
+											).toFixed(2);
+										else if (prop === 'unique_ad_ctr' && prop === column)
+											grouped = (
+												(sum(aggregatedData[key].map(val => val.unique_ad_clicks)) /
+													sum(aggregatedData[key].map(val => val.unique_impressions))) *
+												100
+											).toFixed(2);
 									}
 								});
 								return grouped;
@@ -194,7 +204,6 @@ class Table extends React.Component {
 		sortedMetrics = sortBy(sortedMetrics, column => column.table_position).map(column => {
 			const headerCopy = { ...column };
 			delete headerCopy.table_position;
-
 			return headerCopy;
 		});
 
@@ -211,7 +220,11 @@ class Table extends React.Component {
 
 		if (isDaily) tableData = sortBy(tableData, row => row.date);
 
-		if (isMonthly) tableData = sortBy(sortBy(tableData, row => row.month), row => row.year);
+		if (isMonthly)
+			tableData = sortBy(
+				sortBy(tableData, row => row.month),
+				row => row.year
+			);
 
 		tableData.forEach(row => {
 			const tableRow = { ...row };
@@ -306,8 +319,9 @@ class Table extends React.Component {
 			if (dateCount[key] > 1) {
 				return true;
 			}
-			return false;
 		}
+		//fixed the bug of checking only first date count value for aggregation
+		return false;
 	}
 
 	render() {

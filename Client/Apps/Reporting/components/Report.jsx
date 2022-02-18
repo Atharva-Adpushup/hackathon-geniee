@@ -120,7 +120,6 @@ class Report extends Component {
 				.getMetaData(params)
 				.then(response => {
 					let { data: computedData } = response;
-
 					computedData = getDemoUserSites(computedData, email);
 					updateReportMetaData(computedData);
 					return this.getContentInfo(computedData);
@@ -655,17 +654,20 @@ class Report extends Component {
 
 		if (
 			total.hasOwnProperty('total_network_net_revenue') &&
-			total.hasOwnProperty('total_adpushup_impressions')
+			total.hasOwnProperty('total_adpushup_impressions') &&
+			total.hasOwnProperty('total_adpushup_ad_ecpm')
 		) {
-			if (total.hasOwnProperty('total_adpushup_ad_ecpm')) {
-				total.total_adpushup_ad_ecpm =
-					(total.total_network_net_revenue / total.total_adpushup_impressions) * 1000;
-			}
+			total.total_adpushup_ad_ecpm =
+				(total.total_network_net_revenue / total.total_adpushup_impressions) * 1000;
+		}
 
-			if (total.hasOwnProperty('total_network_ad_ecpm')) {
-				total.total_network_ad_ecpm =
-					(total.total_network_net_revenue / total.total_network_impressions) * 1000;
-			}
+		if (
+			total.hasOwnProperty('total_network_ad_ecpm') &&
+			total.hasOwnProperty('total_network_impressions') &&
+			total.hasOwnProperty('total_network_net_revenue')
+		) {
+			total.total_network_ad_ecpm =
+				(total.total_network_net_revenue / total.total_network_impressions) * 1000;
 		}
 
 		if (
@@ -697,6 +699,22 @@ class Report extends Component {
 			delete total.total_adpushup_count_percent;
 		}
 
+		if (
+			total.hasOwnProperty('total_network_ad_ctr') &&
+			total.hasOwnProperty('total_network_impressions') &&
+			total.hasOwnProperty('total_network_ad_clicks')
+		) {
+			total.total_network_ad_ctr =
+				(total.total_network_ad_clicks / total.total_network_impressions) * 100;
+		}
+		if (
+			total.hasOwnProperty('total_unique_ad_ctr') &&
+			total.hasOwnProperty('total_unique_impressions') &&
+			total.hasOwnProperty('total_unique_ad_clicks')
+		) {
+			total.total_unique_ad_ctr =
+				(total.total_unique_ad_clicks / total.total_unique_impressions) * 100;
+		}
 		return total;
 	};
 
