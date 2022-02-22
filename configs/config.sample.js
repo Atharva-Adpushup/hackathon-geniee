@@ -82,6 +82,96 @@ module.exports = {
 		SMTP_USERNAME: 'wrong',
 		SMTP_PASSWORD: 'wrong'
 	},
+	PARTNERS_PANEL_INTEGRATION: {
+		ANOMALY_THRESHOLD: 10,
+		ANOMALY_THRESHOLD_IN_PER: 5,
+		AUTH_ERROR: 'AUTH_ERROR',
+		CRITEO: {
+			PARTNER_NAME: 'Criteo',
+			NETWORK_ID: 20,
+			DOMAIN_FIELD_NAME: 'Domain',
+			REVENUE_FIELD: 'Revenue',
+			ENDPOINT: 'https://pmc.criteo.com/api/stats',
+			AUTH_PARAMS: {
+				TOKEN : 'D152A218-5DE9-4834-91F0-95542119D520'
+			}
+		},
+		PUBMATIC: {
+			PARTNER_NAME: 'Pubmatic',
+			NETWORK_ID: 28,
+			DOMAIN_FIELD_NAME: 'site_name',
+			REVENUE_FIELD: 'netRevenue',
+			ENDPOINT: {
+				API_ENDPOINT: 'http://api.pubmatic.com/v1',
+				PUBLISHER_ID: '158261'
+			},
+			AUTH_PARAMS: {
+				userName: 'sharad.yadav@adpushup.com',
+				password: 'PcCkgS9Huxbh4WN',
+				apiProduct: 'PUBLISHER'
+			}
+		},
+		OFT: {
+			PARTNER_NAME: 'OFT/152Media',
+			NETWORK_ID: 11,
+			DOMAIN_FIELD_NAME: 'site_name',
+			REVENUE_FIELD: 'publisher_revenue',
+			ENDPOINT: {
+				API_ENDPOINT: 'https://api.appnexus.com'
+			},
+			AUTH_PARAMS: {
+				auth: {
+					username: 'adpushup152ns',
+					password: '2021@Adpushup'
+				}
+			}
+		},
+		INDEX_EXCHANGE: {
+			PARTNER_NAME: 'IndexExchange',
+			NETWORK_ID: 21,
+			DOMAIN_FIELD_NAME: 'domain',
+			REVENUE_FIELD: 'publisher_payment',
+			ENDPOINT: {
+				AUTH_ENDPOINT: 'https://app.indexexchange.com/api/authentication/v1/login',
+				API_ENDPOINT:'https://app.indexexchange.com/api/reporting/agg/v1',
+			},
+			REPORT_ID: 340267,
+			AUTH_PARAMS: {
+				username: 'dikshant.joshi@adpushup.com',
+				password: 'y:ZwJqj56_jMZKF'
+			}
+		},
+		OPENX: {
+			PARTNER_NAME: 'OpenX',
+			NETWORK_ID: 10,
+			DOMAIN_FIELD_NAME: 'publisherSiteName',
+			REVENUE_FIELD: 'marketPublisherRevenueInPCoin',
+			CONSUMER: {
+				key: '3886c1427947cac75c7034db82f590d01bc826d6',
+				secret: 'd457b1ff100015ca3a7dd1d1ed7972aa455231a9'
+			},
+			ENDPOINT: {
+				API_ENDPOINT: 'http://openxcorporate-ui3.openxenterprise.com',
+				OAUTH_ENDPOINT_INITIATE: 'https://sso.openx.com/api/index/initiate',
+				OAUTH_ENDPOINT_PROCESS: 'https://sso.openx.com/login/process',
+				OAUTH_ENDPOINT_TOKEN: 'https://sso.openx.com/api/index/token'
+			},
+			AUTH_PARAMS: {
+				EMAIL: 'ankit.bharthwal@adpushup.com',
+				PASSWORD: 'Openx@123$%^'
+			}
+		},
+		TIMEZONE_OFFSET: {
+			PRODUCTION: {
+				PDT: 8,
+				PST: 7
+			},
+			STAGING: {
+				PDT: 8,
+				PST: 7
+			}
+		}
+	},
 	ops: {
 		couchBaseBuckets: {
 			apStatsBucket: {

@@ -1,26 +1,21 @@
+const request = require('request');
 const axios = require('axios');
 const moment = require('moment');
-const _ = require('lodash');
-const PromisePool = require('@supercharge/promise-pool');
+const fs = require('fs');
+const JSZip = require("jszip");
+var csv = require("csvtojson");
 
 const partnerAndAdpushpModel = require('../PartnerAndAdpushpModel');
 const constants = require('../../../configs/commonConsts');
 const emailer = require('../emailer');
 const saveAnomaliesToDb = require('../saveAnomaliesToDb');
-const { axiosErrorHandler, partnerModuleErrorHandler } = require('../utils');
+const { axiosAuthErrorHandler, axiosErrorHandler, partnerModuleErrorHandler } = require('../utils');
 
 const {
 	PARTNERS_PANEL_INTEGRATION: { ANOMALY_THRESHOLD, ANOMALY_THRESHOLD_IN_PER, INDEX_EXCHANGE }
-} = require('../../../configs/commonConsts');
-const { PARTNER_NAME, NETWORK_ID, DOMAIN_FIELD_NAME, REVENUE_FIELD } = INDEX_EXCHANGE;
-
-const AUTH_ENDPOINT = `https://auth.indexexchange.com/auth/oauth/token`;
-const API_ENDPOINT = `https://api01.indexexchange.com/api`;
-
-const authParams = {
-	username: 'dikshant.joshi@adpushup.com',
-	key: 'iGY05Af7QidctaFx9gm9u4uNaNzl+Lo6'
-};
+} = require('../../../configs/config');
+const { PARTNER_NAME, NETWORK_ID, DOMAIN_FIELD_NAME, REVENUE_FIELD, AUTH_PARAMS, ENDPOINT, REPORT_ID } = INDEX_EXCHANGE;
+const { AUTH_ENDPOINT, API_ENDPOINT } = ENDPOINT;
 
 /**
  * 1. Get Pub data
@@ -30,194 +25,165 @@ const authParams = {
 
 // How IndexExchange works.
 // 1. Get Auth token before each req
-// 2. Get Placement info
-// 3. Get Sites data based on Placement Ids
-// 4. Get earnings from siteIds
-const getDataFromPartner = async function(fromDate, toDate) {
+// 2. Run report using report id - constant
+// 3. Downliad file - its a zip file, extract csv file from it
+// 4. Get publisher payment from site_domain
+const getDataFromPartner = async function (fromDate, toDate) {
 	// 1. Get Auth token before each req
 	const token = await axios
-		.post(`${AUTH_ENDPOINT}`, authParams)
-		.then(response => response.data.data)
-		.then(function(data) {
-			const { accessToken } = data;
-			return accessToken;
+		.post(`${AUTH_ENDPOINT}`, AUTH_PARAMS)
+		.then(response => response.data)
+		.then(function (data) {
+			const { loginResponse: { authResponse: { access_token } } } = data;
+			return access_token;
 		})
-		.catch(axiosErrorHandler);
+		.catch((err) => {
+			const errorResponseHandler = function (errResponse) {
+				const { status, statusText } = errResponse;
+				if (errResponse.data) {
+					const { error } = errResponse.data;
+					return `${error[0].code} - ${status} ${statusText}`
+				} else {
+					return `${status} ${statusText}`
+				}
+			}
+			axiosAuthErrorHandler(err, errorResponseHandler)
+		});
 
 	console.log('Got Auth token before req....', token);
 
 	const headers = {
 		Authorization: `Bearer ${token}`
 	};
-	// 2. Get Placement Info
-	const placementData = await getPlacementData(headers);
-	// 3. Get Sites Info from placementIds
-	const siteIdsAndNameMappingFromPubData = await getAllSitesInfo(headers);
 
-	// 4. Get earnings from Placement Id and SiteIds in batches
-	// 		a. For each Placement Id
-	// 		b. then each placement id have multiple sites - Site Ids based batch
-	// create a queue to be processed in batches
-	const queue = [];
-	placementData.forEach(placement => {
-		for (let i = 0; i < placement.siteID.length; i++) {
-			if (siteIdsAndNameMappingFromPubData[placement.siteID[i]]) {
-				queue.push({
-					placementID: placement.placementID,
-					siteID: placement.siteID[i]
-				});
-			}
-		}
-	});
+	// 2. Run existing Report
+	const reportRunID = await runExistingReportConfiguredInIExDashboard(headers)
+	// {"reportRunID":921162}
 
-	// process batches
-	console.log('Processing batches.....');
-	const { results, errors } = await processReqInBatches(queue, headers, fromDate, toDate);
-	return processDataReceivedFromPublisher(results, siteIdsAndNameMappingFromPubData);
+	// 3. Download report - by default is gzipped csv
+	const results = await downloadReport(headers, reportRunID)
+	return processDataReceivedFromPublisher(results);
 };
 
-const getPlacementInfo = headers => {
-	const placementConfig = {
-		method: 'get',
-		url: `${API_ENDPOINT}/publishers/placements/info`,
-		headers
-	};
-
-	return axios(placementConfig)
-		.then(response => response.data)
-		.then(response => {
-			return response.data.map(row => row.placementID);
-		});
-};
-
-const getPlacementData = async headers => {
-	const placementsIdArr = await getPlacementInfo(headers);
+const runExistingReportConfiguredInIExDashboard = headers => {
 	const data = {
-		placementID: placementsIdArr
-	};
+		reportId: REPORT_ID
+	}
 
-	const placementConfig = {
+	const runReportConfig = {
 		method: 'post',
-		url: `${API_ENDPOINT}/publishers/placements`,
+		url: `${API_ENDPOINT}/report-runs`,
 		headers,
 		data
 	};
 
-	return await axios(placementConfig)
+	return axios(runReportConfig)
 		.then(response => response.data)
-		.then(response => {
-			return response.data.reduce((acc, row) => {
-				const { placementID, siteID } = row;
-				acc.push({
-					placementID,
-					siteID
-				});
-				return acc;
-			}, []);
+		.then(function (data) {
+			// {"reportRunID":921162}
+			return data.reportRunID
 		})
-		.catch(axiosErrorHandler);
+		.catch((err) => axiosErrorHandler);
 };
 
-const getAllSitesInfo = headers => {
-	var config = {
-		method: 'get',
-		url: `${API_ENDPOINT}/publishers/sites/info?status=["A", "N"]`,
-		headers
-	};
+const downloadReport = (headers, reportRunID) => {
+	var file = fs.createWriteStream('./report.zip');
 
-	return axios(config)
-		.then(response => response.data)
-		.then(response => {
-			const obj = {};
-			response.data
-				.filter(item => !/(AR)\/\d+_/.test(item.name))
-				.forEach(item => {
-					obj[item.siteID] = item.name;
-				});
-			return obj;
-		})
-		.catch(axiosErrorHandler);
-};
+	var options = {
+		'method': 'GET',
+		'url': `${API_ENDPOINT}/report-files/download/${reportRunID}`,
+		'headers': {
+			'Content-Type': 'application/octet-stream',
+			'Accept': 'application/json; charset=utf-8',
+			...headers
+		}
+	}
 
-const processReqInBatches = async (queue, headers, fromDate, toDate) => {
-	const batchSize = 50;
-
-	return await PromisePool.withConcurrency(batchSize)
-		.for(queue)
-		.process(async item => {
-			const data = {
-				filters: {
-					startDate: fromDate,
-					endDate: toDate,
-					placementID: [item.placementID],
-					siteID: [item.siteID]
-				},
-				aggregation: 'siteID'
-			};
-
-			let config = {
-				method: 'post',
-				url: `${API_ENDPOINT}/publishers/stats/earnings/open`,
-				data,
-				headers
-			};
-
-			return await axios(config)
-				.then(response => {
-					return {
-						config: {
-							fromDate,
-							toDate,
-							placementId: item.placementID,
-							siteId: item.siteID
-						},
-						data: response.data.data
-					};
+	return new Promise((resolve, reject) => {
+		// the run api give response early and file has been generated properly yet
+		// and starteing downloading immediately fails - it worked after adding a delay of
+		// 25sec(s) but added a delay of 60 sec(s) just to be safe
+		setTimeout(() => {
+			request(options)
+				.on('error', function (error) {
+					console.log(error);
+					reject(error);
 				})
-				.catch(axiosErrorHandler);
-		});
-};
+				.pipe(file)
+				.on('finish', function () {
+					const zipread = fs.readFileSync('report.zip')
+					JSZip.loadAsync(zipread).then(async function (zip) {
+						let reportData;
+						// there would be just one file - using loop because we don't know the file name that we want to read
+						for (file in zip.files) {
+							const str = await zip.file(file).async("string");
+							reportData = await csv({
+								colParser: {
+									"column1": `${DOMAIN_FIELD_NAME}`,
+									"column2": "impressions",
+									"column3": "publisher_payment",
+								},
+								checkType: true
+							})
+								.fromString(str)
+						}
+						resolve(reportData)
+					});
+				});
+		}, 60 * 1000)
+	})
+}
 
-const processDataReceivedFromPublisher = (data, siteIdsAndNameMappingFromPubData) => {
-	let processedData = data
+function compare(a, b) {
+	if (a.site_name < b.site_name) {
+		return -1;
+	}
+	if (a.site_name > b.site_name) {
+		return 1;
+	}
+	return 0;
+}
+
+
+const processDataReceivedFromPublisher = (data) => {
+	var obj = {};
+	data
+		.filter(item => /^AP\//.test(item.site_name))
 		.map(item => {
-			// empty response handling
-			if (!item) {
-				return [];
+			item.site_name = item.site_name.replace("AP/", "");
+			// split siteId, domain
+			const siteId = item.site_name.substring(0, item.site_name.indexOf('_'));
+			item.domain = item.site_name.substring(item.site_name.indexOf('_') + 1);
+
+			if (!obj[siteId]) {
+				obj[siteId] = [];
 			}
-			return item.data.map(row => {
-				row.siteID = item.config.siteId;
-				row.fromDate = item.config.fromDate;
-				row.toDate = item.config.toDate;
-				return row;
-			});
-		})
-		// empty response handling - for nested array response
-		.filter(item => item.length)
-		.reduce((acc, item) => {
-			acc = acc.concat(...item);
-			return acc;
-		}, [])
-		.map(item => {
-			item.site_name = siteIdsAndNameMappingFromPubData[item.siteID].replace(
-				/(AP|AR)\/\d+_/,
-				function($1) {
-					let typeAndSiteId = $1.replace('_', '').split('/');
-					item.type = typeAndSiteId[0];
-					item.siteId = typeAndSiteId[1];
-					item.earnings = (item.earnings * 0.00001).toFixed(2);
-					return '';
-				}
-			);
-
+			obj[siteId].push(item);
 			return item;
 		})
-		.filter(item => item.type == 'AP');
+
+	const processedData = [];
+	Object.keys(obj).map(key => {
+		const firstItem = obj[key][0];
+		if (obj[key].length == 1) {
+			processedData.push(firstItem);
+		} else {
+			obj[key] = obj[key].sort(compare);
+			const finalItem = firstItem;
+			finalItem.publisher_payment = obj[key].reduce((rev, siteItem) => {
+				rev += siteItem.publisher_payment;
+				return rev;
+			}, 0)
+
+
+			processedData.push(finalItem);
+		}
+	}, [])
 	console.log('Processing end...');
 	return processedData;
 };
 
-const initDataForpartner = function() {
+const initDataForpartner = function () {
 	const fromDate = moment()
 		.subtract(7, 'days')
 		.format('YYYY-MM-DD');
@@ -242,7 +208,7 @@ const fetchData = sitesData => {
 
 	console.log('Fetching data from IndexExchange...');
 	return getDataFromPartner(fromDate, toDate)
-		.then(async function(reportDataJSON) {
+		.then(async function (reportDataJSON) {
 			IndexExchangePartnerModel.setPartnersData(reportDataJSON);
 
 			// process and map sites data with publishers API data response
@@ -272,7 +238,7 @@ const fetchData = sitesData => {
 
 			// if aonmalies found
 			if (anomalies.length) {
-				if(process.env.NODE_ENV === 'production') {
+				if (process.env.NODE_ENV === 'production') {
 					const dataToSend = IndexExchangePartnerModel.formatAnomaliesDataForSQL(
 						anomalies,
 						NETWORK_ID

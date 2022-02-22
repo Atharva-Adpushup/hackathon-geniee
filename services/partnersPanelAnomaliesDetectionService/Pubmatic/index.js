@@ -4,29 +4,22 @@ const moment = require('moment');
 const partnerAndAdpushpModel = require('../PartnerAndAdpushpModel');
 const emailer = require('../emailer');
 const saveAnomaliesToDb = require('../saveAnomaliesToDb');
-const { axiosErrorHandler, partnerModuleErrorHandler } = require('../utils');
+const { axiosAuthErrorHandler, axiosErrorHandler, partnerModuleErrorHandler } = require('../utils');
 
 const {
 	PARTNERS_PANEL_INTEGRATION: { ANOMALY_THRESHOLD, ANOMALY_THRESHOLD_IN_PER, PUBMATIC }
-} = require('../../../configs/commonConsts');
-const { PARTNER_NAME, NETWORK_ID, DOMAIN_FIELD_NAME, REVENUE_FIELD } = PUBMATIC;
-const API_ENDPOINT = `http://api.pubmatic.com/v1`;
-const PUBLISHER_ID = '158261';
-
-const authParams = {
-	userName: 'sharad.yadav@adpushup.com',
-	password: 'PcCkgS9Huxbh4WN',
-	apiProduct: 'PUBLISHER'
-};
+} = require('../../../configs/config');
+const { PARTNER_NAME, NETWORK_ID, DOMAIN_FIELD_NAME, REVENUE_FIELD, AUTH_PARAMS, ENDPOINT } = PUBMATIC;
+const { API_ENDPOINT, PUBLISHER_ID } = ENDPOINT
 
 // response
 /**
-    {
-        "userEmail": "sharad.yadav@adpushup.com",
-        "tokenType": "BearerToken",
-        "accessToken": "y9poc3G1Eju3Ys7R3PCCcmbtdIul",
-        "refreshToken": "MNzuLSzG61t7X2gDzTGqrdaLr8RPRjgl"
-    }
+	{
+		"userEmail": "sharad.yadav@adpushup.com",
+		"tokenType": "BearerToken",
+		"accessToken": "y9poc3G1Eju3Ys7R3PCCcmbtdIul",
+		"refreshToken": "MNzuLSzG61t7X2gDzTGqrdaLr8RPRjgl"
+	}
  */
 
 /**
@@ -39,16 +32,27 @@ const authParams = {
 // 1. Get Auth token before each req
 // 2. Get Report Id
 // 3. Download Report - CSV
-const getDataFromPartner = async function(fromDate, toDate) {
+const getDataFromPartner = async function (fromDate, toDate) {
 	// 1. Get Auth token before each req
 	const token = await axios
-		.post(`${API_ENDPOINT}/developer-integrations/developer/token`, authParams)
+		.post(`${API_ENDPOINT}/developer-integrations/developer/token`, AUTH_PARAMS)
 		.then(response => response.data)
-		.then(function(data) {
+		.then(function (data) {
 			const { accessToken } = data;
 			return accessToken;
 		})
-		.catch(axiosErrorHandler);
+		.catch((err) => {
+			const errorResponseHandler = function (errResponse) {
+				const { status, statusText } = errResponse;
+				if (errResponse.data && errResponse.data.length) {
+					const { errorCode, errorMessage } = errResponse.data[0];
+					return `${errorCode} ${errorMessage} - ${status} ${statusText}`
+				} else {
+					return `${status} ${statusText}`
+				}
+			}
+			axiosAuthErrorHandler(err, errorResponseHandler)
+		});
 	console.log('Got Auth token before req....', token);
 
 	// 2. Get Report Data
@@ -78,7 +82,7 @@ const getDataFromPartner = async function(fromDate, toDate) {
 		.then(response => {
 			return processDataReceivedFromPublisher(response.data);
 		})
-		.catch(function(error) {
+		.catch(function (error) {
 			// handle error
 			console.log(error.message, 'error fetching data', 'errrr');
 		})
@@ -107,11 +111,11 @@ const processDataReceivedFromPublisher = data => {
 	return processedData;
 };
 
-const initDataForpartner = function() {
+const initDataForpartner = function () {
 	// data for one week
 	const fromDatePubmatic = moment().subtract(8, 'days').format('YYYY-MM-DDT00:00');
 	const toDatePubmatic = moment().subtract(2, 'days').format('YYYY-MM-DDT23:59:59');
-	
+
 	const fromDate = moment().subtract(8, 'days').format('YYYY-MM-DD');
 	const toDate = moment().subtract(2, 'days').format('YYYY-MM-DD');
 	return {
@@ -123,7 +127,7 @@ const initDataForpartner = function() {
 }
 
 const fetchData = sitesData => {
-	const {fromDate, toDate, fromDatePubmatic, toDatePubmatic} = initDataForpartner()
+	const { fromDate, toDate, fromDatePubmatic, toDatePubmatic } = initDataForpartner()
 	const PubmaticPartnerModel = new partnerAndAdpushpModel(
 		sitesData,
 		DOMAIN_FIELD_NAME,
@@ -132,7 +136,7 @@ const fetchData = sitesData => {
 
 	console.log('Fetching data from Pubmatic...');
 	return getDataFromPartner(fromDatePubmatic, toDatePubmatic)
-		.then(async function(reportDataJSON) {
+		.then(async function (reportDataJSON) {
 			PubmaticPartnerModel.setPartnersData(reportDataJSON);
 
 			// process and map sites data with publishers API data response
@@ -170,7 +174,7 @@ const fetchData = sitesData => {
 							anomalies
 						}),
 						saveAnomaliesToDb(dataToSend, PARTNER_NAME)
-					]);	
+					]);
 				} else {
 					await emailer.anomaliesMailService({
 						partner: PARTNER_NAME,

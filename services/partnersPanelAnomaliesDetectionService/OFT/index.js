@@ -5,20 +5,13 @@ const csv = require('csvtojson');
 const partnerAndAdpushpModel = require('../PartnerAndAdpushpModel');
 const emailer = require('../emailer');
 const saveAnomaliesToDb = require('../saveAnomaliesToDb');
-const { axiosErrorHandler, partnerModuleErrorHandler, aggregateWeeklyData } = require('../utils');
+const { axiosAuthErrorHandler, axiosErrorHandler, partnerModuleErrorHandler, aggregateWeeklyData } = require('../utils');
 
 const {
 	PARTNERS_PANEL_INTEGRATION: { ANOMALY_THRESHOLD, ANOMALY_THRESHOLD_IN_PER, OFT }
-} = require('../../../configs/commonConsts');
-const { PARTNER_NAME, NETWORK_ID, DOMAIN_FIELD_NAME, REVENUE_FIELD } = OFT;
-const API_ENDPOINT = `https://api.appnexus.com`;
-
-const authParams = {
-	auth: {
-		username: 'adpushup152ns',
-		password: '2021@Adpushup'
-	}
-};
+} = require('../../../configs/config');
+const { PARTNER_NAME, NETWORK_ID, DOMAIN_FIELD_NAME, REVENUE_FIELD, AUTH_PARAMS, ENDPOINT } = OFT;
+const { API_ENDPOINT } = ENDPOINT;
 
 /**
  * 1. Get Pub data
@@ -30,12 +23,12 @@ const authParams = {
 // 1. Get Auth token before each req
 // 2. Get Report Id
 // 3. Download Report - CSV
-const getDataFromPartner = async function(fromDate, toDate) {
+const getDataFromPartner = async function (fromDate, toDate) {
 	// 1. Get Auth token before each req
 	const token = await axios
-		.post(`${API_ENDPOINT}/auth`, authParams)
+		.post(`${API_ENDPOINT}/auth`, AUTH_PARAMS)
 		.then(response => response.data.response)
-		.then(function(data) {
+		.then(function (data) {
 			const { token } = data;
 			return token;
 		})
@@ -61,7 +54,18 @@ const getDataFromPartner = async function(fromDate, toDate) {
 	const reportMetaData = await axios
 		.post(`${API_ENDPOINT}/report`, queryParams, { headers })
 		.then(response => response.data.response)
-		.catch(axiosErrorHandler);
+		.catch(err => {
+			const errorResponseHandler = function (errResponse) {
+				const { status, statusText } = errResponse;
+				if (errResponse.data) {
+					const { response: { error_id } } = errResponse.data;
+					return `${error_id} - ${status} ${statusText}`
+				} else {
+					return `${status} ${statusText}`
+				}
+			}
+			axiosAuthErrorHandler(err, errorResponseHandler)
+		});
 	// {
 	//     "response": {
 	//         "status": "OK",
@@ -83,7 +87,7 @@ const getDataFromPartner = async function(fromDate, toDate) {
 	return await csv().fromString(reportData);
 };
 
-const initDataForpartner = function() {
+const initDataForpartner = function () {
 	// for weekly reports
 	const fromDateOFT = moment()
 		.subtract(9, 'days')
@@ -91,7 +95,7 @@ const initDataForpartner = function() {
 	const toDateOFT = moment()
 		.subtract(2, 'days')
 		.format('YYYY-MM-DD');
-;
+	;
 
 	// for weekly reports
 	const fromDate = moment()
@@ -110,7 +114,7 @@ const initDataForpartner = function() {
 }
 
 const fetchData = sitesData => {
-	const {fromDate, toDate, fromDateOFT, toDateOFT} = initDataForpartner();
+	const { fromDate, toDate, fromDateOFT, toDateOFT } = initDataForpartner();
 
 	const OFTMediaPartnerModel = new partnerAndAdpushpModel(
 		sitesData,
@@ -120,7 +124,7 @@ const fetchData = sitesData => {
 
 	console.log('Fetching data from OFT...');
 	return getDataFromPartner(fromDateOFT, toDateOFT)
-		.then(async function(reportDataJSON) {
+		.then(async function (reportDataJSON) {
 			// Partner's Panel does not return cumulative data. Reducing/Converting daily data
 			// into weekly data
 			OFTMediaPartnerModel.setPartnersData(aggregateWeeklyData(reportDataJSON, DOMAIN_FIELD_NAME, REVENUE_FIELD));
