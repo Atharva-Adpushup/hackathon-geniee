@@ -33,7 +33,11 @@ const updateApConfig = (siteId, apConfigs) => dispatch =>
 		type: SITE_ACTIONS.UPDATE_SITE_DATA_KEY_OBJ,
 		data: { siteId, key: 'apConfigs', value: apConfigs }
 	});
-
+const updateBlocklistedLineItems = (siteId, blockListedLineItems) => dispatch =>
+	dispatch({
+		type: SITE_ACTIONS.UPDATE_SITE_BLOCKLISTED_LINE_ITEMS,
+		data: { siteId, blockListedLineItems }
+	});
 const saveSettings = (siteId, siteData, dataForAuditLogs) => dispatch => {
 	axiosInstance
 		.post('/site/saveSettings', { siteId, ...siteData, dataForAuditLogs })
@@ -225,5 +229,6 @@ export {
 	deleteSite,
 	fetchSiteInventories,
 	resetSiteInventories,
-	updateSiteData
+	updateSiteData,
+	updateBlocklistedLineItems
 };

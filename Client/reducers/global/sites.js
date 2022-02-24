@@ -86,7 +86,17 @@ const sites = (state = { fetched: false, data: {} }, action) => {
 					}
 				}
 			};
-
+		case SITE_ACTIONS.UPDATE_SITE_BLOCKLISTED_LINE_ITEMS:
+			return {
+				...state,
+				data: {
+					...state.data,
+					[action.data.siteId]: {
+						...state.data[action.data.siteId],
+						blockListedLineItems: [...action.data.blockListedLineItems]
+					}
+				}
+			};
 		default:
 			return state;
 	}

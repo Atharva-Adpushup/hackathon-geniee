@@ -12,5 +12,11 @@ export default {
 	forceApBuild: (siteId, dataForAuditLogs) =>
 		axiosInstance.post(`/site/${siteId}/forceApBuild`, {
 			dataForAuditLogs
+		}),
+	updateBlockListedLineItems: (siteId, blockListedLineItems, dataForAuditLogs) =>
+		axiosInstance.post(`/site/updateBlockListedLineItem`, {
+			dataForAuditLogs,
+			siteId,
+			blockListedLineItems
 		})
 };

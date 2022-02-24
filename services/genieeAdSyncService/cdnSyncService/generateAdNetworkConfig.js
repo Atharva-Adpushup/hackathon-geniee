@@ -3,7 +3,7 @@ const _ = require('lodash');
 const CB_ERRORS = require('couchbase').errors;
 
 const couchBase = require('../../../configs/config').couchBase;
-const { docKeys } = require("../../../configs/commonConsts");
+const { docKeys } = require('../../../configs/commonConsts');
 const { LINE_ITEM_TYPES } = require('../../../configs/lineItemsConstants');
 
 const dbHelper = couchbaseService(
@@ -13,34 +13,53 @@ const dbHelper = couchbaseService(
 	couchBase.DEFAULT_USER_PASSWORD
 );
 
-const generateAdNetworkConfig = (activeDFPNetwork, lineItemTypes = []) => {
+const generateAdNetworkConfig = (
+	activeDFPNetwork,
+	lineItemTypes = [],
+	blockListedLineItems = []
+) => {
 	const emptyResponse = { lineItems: [] };
 
 	return dbHelper
 		.getDoc(`${docKeys.network}${activeDFPNetwork}`)
 		.then(adNetworkConfigDoc => {
 			var adNetworkConfig = adNetworkConfigDoc.value;
-			const mandatoryLineItemTypes = LINE_ITEM_TYPES.filter(type => type.isMandatory && !type.groupedSeparately).map(type => type.value); // HB lineitems are to be kept separately
+			const mandatoryLineItemTypes = LINE_ITEM_TYPES.filter(
+				type => type.isMandatory && !type.groupedSeparately
+			).map(type => type.value); // HB lineitems are to be kept separately
 			const lineItemTypesToProcess = _.uniq([...mandatoryLineItemTypes, ...lineItemTypes]);
 
-			const separatelyGroupedLineItemTypes = LINE_ITEM_TYPES.filter(type => type.groupedSeparately).map(type => type.value);
+			const separatelyGroupedLineItemTypes = LINE_ITEM_TYPES.filter(
+				type => type.groupedSeparately
+			).map(type => type.value);
 			let lineItems = [];
-			
+
 			lineItemTypesToProcess.forEach(type => {
-				if (adNetworkConfig.lineItems && Array.isArray(adNetworkConfig.lineItems[type]) && adNetworkConfig.lineItems[type].length) {
+				if (
+					adNetworkConfig.lineItems &&
+					Array.isArray(adNetworkConfig.lineItems[type]) &&
+					adNetworkConfig.lineItems[type].length
+				) {
 					lineItems = lineItems.concat(adNetworkConfig.lineItems[type]);
 				}
 			});
-			let separatelyGroupedLineItems = separatelyGroupedLineItemTypes.reduce((accumulator, currVal) => {
-				if (adNetworkConfig.lineItems && Array.isArray(adNetworkConfig.lineItems[currVal])) {
-					accumulator[currVal] = adNetworkConfig.lineItems[currVal].length ? adNetworkConfig.lineItems[currVal] : [];
-				}
-				return accumulator;
-			}, {});			
+			let separatelyGroupedLineItems = separatelyGroupedLineItemTypes.reduce(
+				(accumulator, currVal) => {
+					if (adNetworkConfig.lineItems && Array.isArray(adNetworkConfig.lineItems[currVal])) {
+						const lineItems = adNetworkConfig.lineItems[currVal];
+						const lineItemsAfterRemovingBlocklisted = _.pullAll(lineItems, blockListedLineItems);
+						accumulator[currVal] = lineItemsAfterRemovingBlocklisted.length
+							? lineItemsAfterRemovingBlocklisted
+							: [];
+					}
+					return accumulator;
+				},
+				{}
+			);
 
-			adNetworkConfig.lineItems = lineItems;
+			const lineItemsAfterRemovingBlocklisted = _.pullAll(lineItems, blockListedLineItems);
+			adNetworkConfig.lineItems = lineItemsAfterRemovingBlocklisted;
 			adNetworkConfig.separatelyGroupedLineItems = separatelyGroupedLineItems;
-
 			return adNetworkConfig;
 		})
 		.catch(err => {
