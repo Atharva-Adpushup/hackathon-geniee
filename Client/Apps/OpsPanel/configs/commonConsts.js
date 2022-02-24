@@ -1,4 +1,25 @@
 // OP abbreviation stands for Ops Panel
+const adUnitsData = [
+	{
+		dfpAdUnit: 'Ad_Exchange_Display',
+		dfpAdUnitCode: 'ca-pub-3336221094684785-tag',
+		size: '320x100',
+		platform: 'DESKTOP/TABLET/MOBILE'
+	}
+];
+
+const adUnitsHeaders = [
+	{ label: 'Ad Unit Code ', key: 'code' },
+	{ label: 'Width ', key: 'width' },
+	{ label: 'Height ', key: 'height' },
+	{ label: 'Ap Tag Id ', key: 'apTagId' },
+	{ label: 'Platform ', key: 'platform' },
+	{ label: 'Active ', key: 'isActive' },
+	{ label: 'Display ', key: 'formats.display' },
+	{ label: 'Video ', key: 'formats.video' },
+	{ label: 'Native ', key: 'formats.native' }
+];
+
 const OP_NAV_ITEMS_INDEXES = {
 	SETTINGS: 'settings',
 	INFO_PANEL: 'info-panel',
@@ -623,6 +644,8 @@ const POWERED_BY_BANNER = [
 ];
 
 export {
+	adUnitsData,
+	adUnitsHeaders,
 	OP_NAV_ITEMS,
 	OP_NAV_ITEMS_INDEXES,
 	OP_NAV_ITEMS_VALUES,

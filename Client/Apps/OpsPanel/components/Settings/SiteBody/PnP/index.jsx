@@ -10,7 +10,9 @@ import CustomButton from '../../../../../../Components/CustomButton/index';
 import {
 	REFRESH_RATE_ENTRIES,
 	UNFILLED_REFRESH_RATE_ENTRIES,
-	PNP_REFRESH_TYPES
+	PNP_REFRESH_TYPES,
+	adUnitsData,
+	adUnitsHeaders
 } from '../../../../configs/commonConsts';
 import axios from '../../../../../../helpers/axiosInstance';
 import AdUnitsModal from './AdUnitsModal';
@@ -26,7 +28,7 @@ const uploadAdUnitsLabel = (
 				{ label: 'Size', key: 'size' },
 				{ label: 'Platform', key: 'platform' }
 			]}
-			data={[]}
+			data={adUnitsData}
 			filename="adUnitsTemplate.csv"
 			style={{ display: 'block' }}
 		>
@@ -260,9 +262,7 @@ const PnP = (props = {}) => {
 					showNotification({
 						mode: 'error',
 						title: 'Operation Failed',
-						message: `Platfrom ${unit.platform} has duplicate unit code ${
-							unit.code
-						}. Please make sure adUnitCode is unique for each platform`,
+						message: `Platfrom ${unit.platform} has duplicate unit code ${unit.code}. Please make sure adUnitCode is unique for each platform`,
 						autoDismiss: 10
 					});
 					return;
@@ -280,9 +280,7 @@ const PnP = (props = {}) => {
 					showNotification({
 						mode: 'error',
 						title: 'Operation Failed',
-						message: `Unit ${
-							unit.code
-						} has an unsupported size ${size}. Please change the size or remove the unit to proceed.`,
+						message: `Unit ${unit.code} has an unsupported size ${size}. Please change the size or remove the unit to proceed.`,
 						autoDismiss: 10
 					});
 				}
@@ -576,18 +574,27 @@ const PnP = (props = {}) => {
 				className="u-padding-v4 u-padding-h4"
 				style={PICKER_STYLE}
 			/>
-			<div style={{ display: 'flex' }}>
+			<div style={{ display: 'block' }}>
 				<CustomButton variant="primary" bsSize="large" onClick={showUploadedAdUnits}>
 					Show Uploaded Ad Units
 				</CustomButton>
-
+				<CSVLink
+					headers={adUnitsHeaders}
+					data={adUnits}
+					filename="UploadedAdUnits.csv"
+					className="downloadBtnStyles"
+				>
+					<CustomButton variant="primary" bsSize="large">
+						Download Uploaded Ad Units
+					</CustomButton>
+				</CSVLink>
 				<CSVLink
 					headers={[{ label: 'Line Item ID', key: 'id' }]}
 					data={lineItems}
 					filename="lineItems.csv"
-					style={{ display: 'block' }}
+					className="downloadBtnStyles"
 				>
-					<CustomButton className="u-margin-l4" variant="primary" bsSize="large">
+					<CustomButton variant="primary" bsSize="large">
 						Download Uploaded Line Items
 					</CustomButton>
 				</CSVLink>
@@ -595,9 +602,9 @@ const PnP = (props = {}) => {
 					headers={[{ label: 'Line Item ID', key: 'id' }]}
 					data={blacklistedLineItems}
 					filename="blacklistedLineItems.csv"
-					style={{ display: 'block' }}
+					className="downloadBtnStyles"
 				>
-					<CustomButton className="u-margin-l4" variant="primary" bsSize="large">
+					<CustomButton variant="primary" bsSize="large">
 						Download Uploaded Blacklisted Line Items
 					</CustomButton>
 				</CSVLink>
