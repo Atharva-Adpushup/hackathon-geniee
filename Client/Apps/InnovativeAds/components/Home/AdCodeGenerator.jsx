@@ -1,8 +1,10 @@
+/* eslint-disable jsx-a11y/label-has-associated-control */
+/* eslint-disable jsx-a11y/label-has-for */
 import React, { Component } from 'react';
 
 import { Row, Col, ProgressBar } from '@/Client/helpers/react-bootstrap-imports';
 import CustomList from './CustomList';
-import { Docked, Default, InView, StickyTop } from './Formats/index';
+import { Docked, Default, InView, StickyTop, ChainedDocked } from './Formats/index';
 import { PLATFORMS, FORMATS, SIZES, displayAdMessage } from '../../configs/commonConsts';
 import CustomMessage from '../../../../Components/CustomMessage/index';
 import CustomButton from '../../../../Components/CustomButton/index';
@@ -10,6 +12,8 @@ import Loader from '../../../../Components/Loader';
 import { pagegroupFiltering } from '../../lib/helpers';
 import ActionCard from '../../../../Components/ActionCard';
 import CustomToggleSwitch from '../../../../Components/CustomToggleSwitch';
+import CodeBox from '../../../../Components/CodeBox/index';
+import FieldGroup from '../../../../Components/Layout/FieldGroup';
 
 const getAdsByType = (ads, type) => ads.filter(ad => ad.formatData.type === type);
 
@@ -25,6 +29,9 @@ class AdCodeGenerator extends Component {
 			loading: false,
 			pagegroups: [],
 			fluid: true,
+			showCloseButton: false,
+			closeButtonCss: '',
+			closeButtonText: '',
 			pagegroupsPresent: !!(channels && channels.length)
 		};
 		this.selectPlatform = this.selectPlatform.bind(this);
@@ -43,6 +50,24 @@ class AdCodeGenerator extends Component {
 		this.renderMainContent = this.renderMainContent.bind(this);
 		this.renderGeneratedAdcode = this.renderGeneratedAdcode.bind(this);
 		this.generateAdData = this.generateAdData.bind(this);
+		this.cssChangeHandler = this.cssChangeHandler.bind(this);
+		this.handleToggle = this.handleToggle.bind(this);
+	}
+
+	handleChange = e => {
+		this.setState({
+			[e.target.name]: e.target.value
+		});
+	};
+
+	handleToggle(value, event) {
+		const attributeValue = event.target.getAttribute('name');
+		const name = attributeValue.split('-')[0];
+
+		this.setState({
+			[name]: value,
+			progress: name === 'fluid' ? 30 : 60
+		});
 	}
 
 	selectPlatform(platform) {
@@ -72,31 +97,17 @@ class AdCodeGenerator extends Component {
 		});
 	}
 
-	selectPagegroups(pagegroup) {
-		const { pagegroups } = this.state;
-		const updatePagegroups = pagegroups.concat([]);
-		let progress;
-
-		if (updatePagegroups.includes(pagegroup)) {
-			updatePagegroups.splice(updatePagegroups.indexOf(pagegroup), 1);
-		} else {
-			updatePagegroups.push(pagegroup);
-		}
-		if (updatePagegroups.length) {
-			if (this.formatCheck()) {
-				progress = 60;
-			} else {
-				progress = 80;
-			}
-		} else {
-			progress = 45;
-		}
-		return this.setState({ pagegroups: updatePagegroups, progress });
-	}
-
 	generateAdData(data) {
 		const { match } = this.props;
-		const { size, format, pagegroups, platform, fluid } = this.state;
+		const {
+			size,
+			format,
+			pagegroups,
+			platform,
+			fluid,
+			showCloseButton,
+			closeButtonText
+		} = this.state;
 		const sizesArray = size.split('x');
 		const width = sizesArray[0];
 		const height = sizesArray[1];
@@ -105,16 +116,19 @@ class AdCodeGenerator extends Component {
 		let type = null;
 		let placement = null;
 
-		if (format.indexOf('inView') === -1) {
+		if (format === 'chainedDocked') {
+			type = format;
+			placement = 'default';
+		} else if (format === 'inView') {
+			type = format;
+			placement = 'top';
+		} else {
 			typeAndPlacement = format.split(/^([^A-Z]+)/);
 
 			typeAndPlacement.shift();
 
 			type = typeAndPlacement[0] ? typeAndPlacement[0].toLowerCase() : null;
 			placement = typeAndPlacement[1] ? typeAndPlacement[1].toLowerCase() : 'default';
-		} else {
-			type = format;
-			placement = 'top';
 		}
 
 		return {
@@ -124,7 +138,10 @@ class AdCodeGenerator extends Component {
 				height,
 				pagegroups: pagegroups || [],
 				network: 'adpTags',
-				fluid,
+				fluid: format !== 'interstitial' ? fluid : false,
+				showCloseButton,
+				closeButtonText,
+				closeButtonCss: data.closeButtonCss,
 				networkData: {
 					isResponsive: false,
 					headerBidding: false,
@@ -146,11 +163,14 @@ class AdCodeGenerator extends Component {
 					...data.formatData
 				},
 				type: data.type,
-				css: {
-					display: 'block',
-					'text-align': 'center',
-					...data.css
-				},
+				css:
+					format !== 'interstitial'
+						? {
+								display: 'block',
+								'text-align': 'center',
+								...data.css
+						  }
+						: {},
 				blocklist: [],
 				isActive: true,
 				isInnovativeAd: true,
@@ -160,15 +180,31 @@ class AdCodeGenerator extends Component {
 		};
 	}
 
-	handleToggle = (value, event) => {
-		const attributeValue = event.target.getAttribute('name');
-		const name = attributeValue.split('-')[0];
+	selectPagegroups(pagegroup) {
+		const { pagegroups } = this.state;
+		const updatePagegroups = pagegroups.concat([]);
 
-		this.setState({
-			[name]: value,
-			progress: 30
-		});
-	};
+		if (updatePagegroups.includes(pagegroup)) {
+			updatePagegroups.splice(updatePagegroups.indexOf(pagegroup), 1);
+		} else {
+			updatePagegroups.push(pagegroup);
+		}
+		let progress;
+		if (updatePagegroups.length) {
+			if (this.formatCheck()) {
+				progress = 60;
+			} else {
+				progress = 80;
+			}
+		} else {
+			progress = 45;
+		}
+		return this.setState({ pagegroups: updatePagegroups, progress });
+	}
+
+	cssChangeHandler(closeButtonCss) {
+		this.setState({ closeButtonCss: window.btoa(closeButtonCss) });
+	}
 
 	selectFormat(format) {
 		this.setState({
@@ -181,12 +217,26 @@ class AdCodeGenerator extends Component {
 
 	saveHandler(data) {
 		const { createAd, dataForAuditLogs } = this.props;
-		this.setState(
+		const { closeButtonCss } = this.state;
+		let code = {};
+
+		if (closeButtonCss && closeButtonCss.trim().length) {
+			try {
+				code = JSON.parse(window.atob(closeButtonCss));
+				if (!code) {
+					throw new Error('Invalid Close Button CSS');
+				}
+			} catch (e) {
+				return window.alert('Invalid Close Button CSS');
+			}
+		}
+
+		return this.setState(
 			{
 				progress: 100,
 				loading: true
 			},
-			() => createAd(this.generateAdData(data), dataForAuditLogs)
+			() => createAd(this.generateAdData({ ...data, closeButtonCss: code }), dataForAuditLogs)
 		);
 	}
 
@@ -334,8 +384,68 @@ class AdCodeGenerator extends Component {
 		);
 	}
 
+	renderCloseButtonToggle() {
+		const { match } = this.props;
+		const { siteId } = match.params;
+		const { showCloseButton } = this.state;
+		return (
+			<Row>
+				<Col md={5}>
+					<CustomToggleSwitch
+						labelText="Show Close Button"
+						className="u-margin-b4 negative-toggle closeButton-Toggle"
+						checked={showCloseButton}
+						onChange={this.handleToggle}
+						layout="horizontal"
+						size="m"
+						on="Yes"
+						off="No"
+						defaultLayout
+						name={`showCloseButton-${siteId}`}
+						id={`js-showCloseButton-${siteId}`}
+						subText="Enable this option to have a close button on Sticky Ads"
+					/>
+				</Col>
+				<Col md={7} />
+			</Row>
+		);
+	}
+
+	renderCustomCSSInput() {
+		const { closeButtonCss, closeButtonText } = this.state;
+		return (
+			<>
+				<Col md={3} />
+
+				<Col md={9} className="u-padding-l5 u-padding-r3 u-margin-b4 close-button-fields">
+					<FieldGroup
+						label="Close Button Text"
+						name="closeButtonText"
+						value={closeButtonText}
+						type="text"
+						onChange={this.handleChange}
+						size={4}
+						id="closeButtonText-input"
+						placeholder="You can type any name you want for a close button, Eg. Close, Clear etc. Default value is X"
+						className="button-text"
+					/>
+					<label htmlFor="closeButtonCss">Custom CSS for Close Button</label>
+
+					<CodeBox
+						name="closeButtonCss"
+						showButtons={false}
+						code={closeButtonCss}
+						onChange={this.cssChangeHandler}
+						className="closebutton-css"
+					/>
+				</Col>
+			</>
+		);
+	}
+
 	renderIndividualFormat() {
-		const { ads } = this.props;
+		const { ads, match } = this.props;
+		const { siteId } = match.params;
 		const { format, pagegroups } = this.state;
 		const save = {
 			renderFn: this.renderButton,
@@ -344,6 +454,7 @@ class AdCodeGenerator extends Component {
 		};
 		const dockedAds = getAdsByType(ads, 'docked');
 		const inviewAds = getAdsByType(ads, 'inView');
+		const chainedDockedAds = getAdsByType(ads, 'chainedDocked');
 
 		switch (format) {
 			case 'stickyTop':
@@ -352,6 +463,15 @@ class AdCodeGenerator extends Component {
 				return <InView save={save} currentInviewAds={inviewAds} selectedPagegroups={pagegroups} />;
 			case 'docked':
 				return <Docked save={save} currentDockedAds={dockedAds} selectedPagegroups={pagegroups} />;
+			case 'chainedDocked':
+				return (
+					<ChainedDocked
+						save={save}
+						currentChainedDockedAds={chainedDockedAds}
+						selectedPagegroups={pagegroups}
+						siteId={siteId}
+					/>
+				);
 			default:
 				return <Default save={save} />;
 		}
@@ -394,7 +514,7 @@ class AdCodeGenerator extends Component {
 
 	renderMainContent() {
 		const { codeGenerated } = this.props;
-		const { progress, pagegroupsPresent } = this.state;
+		const { progress, pagegroupsPresent, format, showCloseButton } = this.state;
 		return (
 			<React.Fragment>
 				<div className="progress-wrapper">
@@ -406,10 +526,24 @@ class AdCodeGenerator extends Component {
 					<div>
 						{this.renderPlatformOptions()}
 						{progress >= 10 ? this.renderFormats() : null}
-						{progress >= 20 ? this.renderFluidToggle() : null}
+						{progress >= 20 && format !== 'interstitial' ? this.renderFluidToggle() : null}
 						{progress >= 20 ? this.renderSizes() : null}
-						{progress >= 45 ? this.renderPagegroups() : null}
-						{progress >= 60 && pagegroupsPresent ? this.renderFormatDetails() : null}
+						{progress >= 45 && format !== 'interstitial' ? this.renderPagegroups() : null}
+						{format.includes('sticky') && format !== 'interstitial' && progress >= 60
+							? this.renderCloseButtonToggle()
+							: null}
+						{format !== 'interstitial' &&
+						format.includes('sticky') &&
+						showCloseButton &&
+						progress >= 60
+							? this.renderCustomCSSInput()
+							: null}
+						{progress >= 60 && format !== 'interstitial' && pagegroupsPresent
+							? this.renderFormatDetails()
+							: null}
+						{progress >= 45 && format === 'interstitial'
+							? this.renderButton('Create Ad', this.saveHandler)
+							: null}
 					</div>
 				)}
 			</React.Fragment>

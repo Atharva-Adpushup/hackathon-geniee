@@ -153,14 +153,25 @@ const getAdConfig = (adType, section) => {
 			break;
 		}
 		case 'innovativeAds': {
-			const { isInnovativeAd, networkData, pagegroups, type } = ad;
+			const {
+				isInnovativeAd,
+				networkData,
+				pagegroups,
+				type,
+				showCloseButton = false,
+				closeButtonText = 'X',
+				closeButtonCss = {}
+			} = ad;
 
 			json = {
 				...json,
 				isInnovativeAd,
 				networkData,
 				pagegroups,
-				type
+				type,
+				showCloseButton,
+				closeButtonText,
+				closeButtonCss
 			};
 
 			break;
