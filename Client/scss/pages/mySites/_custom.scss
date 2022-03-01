@@ -78,3 +78,55 @@ $cardMinHeight: 237px;
 		display: none !important;
 	}
 }
+.lineitem-blocklist-container {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+
+	align-items: center;
+	background: gainsboro;
+	a {
+		width: 100%;
+		.csvLink {
+			background: rgb(235, 87, 92);
+			color: white;
+			height: 50px;
+			display: flex;
+			flex-direction: row;
+			justify-content: center;
+			align-items: center;
+			border-radius: 10px;
+			padding: 0px 10px;
+			text-align: center;
+			width: 80%;
+			font-size: 16px;
+			margin: 20px auto;
+		}
+	}
+	.csvReader {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		width: 80%;
+		margin: 20px auto;
+		cursor: pointer;
+		button {
+			line-height: 30px;
+			margin: 20px auto;
+			border-radius: 10px;
+		}
+	}
+	.saveUploadedCsv {
+		background-color: #11a314;
+		width: 20%;
+		margin: 20px auto;
+		height: 50px;
+		color: white;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		border-radius: 10px;
+		cursor: pointer;
+	}
+}

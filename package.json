@@ -1,6 +1,6 @@
 {
 	"name": "adpushup-app",
-	"version": "2.16.2",
+	"version": "2.16.3",
 	"private": true,
 	"scripts": {
 		"start": "node app.js",
@@ -121,6 +121,7 @@
 		"react-multi-select-component": "^4.1.10",
 		"react-notification-system": "0.2.17",
 		"react-onclickoutside": "6.8.0",
+		"react-papaparse": "^4.0.2",
 		"react-portal": "4.2.0",
 		"react-redux": "^6.0.0",
 		"react-required-if": "^1.0.3",

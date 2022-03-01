@@ -434,7 +434,7 @@ router
 		return verifyOwner(siteId, email)
 			.then(site => {
 				const prevBlocklistedLineItems = site.get('blockListedLineItems');
-				const { siteDomain, appName, type = 'site' } = dataForAuditLogs;
+				const { siteDomain, appName, type = 'site', csvAction } = dataForAuditLogs;
 				sendDataToAuditLogService({
 					siteId,
 					siteDomain,
@@ -444,6 +444,7 @@ router
 					userId: originalEmail,
 					prevConfig: prevBlocklistedLineItems,
 					currentConfig: blockListedLineItems,
+					csvAction,
 					action: {
 						name: OPS_PANEL.SITES_SETTING,
 						data: `Sites Setting - Update blacklisted line items`
