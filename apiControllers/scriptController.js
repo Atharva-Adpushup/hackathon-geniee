@@ -5,7 +5,7 @@ const Promise = require('bluebird');
 const UserModel = require('../models/userModel');
 const SiteModel = require('../models/siteModel');
 const activeBidderAdaptersList = require('../models/activeBidderAdaptersListModel');
-const SelectiveRolloutActiveBidderAdaptersList = require('../models/selectiveRolloutActiveBidderAdaptersListModel');
+// const SelectiveRolloutActiveBidderAdaptersList = require('../models/selectiveRolloutActiveBidderAdaptersListModel');
 const ampActiveBidderAdaptersListModel = require('../models/ampActiveBidderAdaptersListModel');
 const SiteSpecificActiveBidderAdaptersList = require('../models/siteSpecificActiveBidderAdaptersListModel');
 const ampScriptModel = require('../models/ampScriptModel');
@@ -181,10 +181,9 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 			const getPrebidAndAdsConfig = () =>
 				(() => {
 					if (apps.apLite) {
-						return Promise.join(
-							generatePrebidConfig(siteId),
-							generateApLiteAdsConfig(siteId)
-						).then(([prebidConfig, apLiteConfig]) => ({ prebidConfig, apLiteConfig }));
+						return Promise.join(generatePrebidConfig(siteId), generateApLiteAdsConfig(siteId)).then(
+							([prebidConfig, apLiteConfig]) => ({ prebidConfig, apLiteConfig })
+						);
 					}
 
 					return getReportData(site)
@@ -305,10 +304,12 @@ Router.get('/:siteId/ampSiteConfig', (req, res) => {
 						return;
 					}
 
+					// eslint-disable-next-line no-param-reassign
 					ampScriptConfig.ads = ampScriptConfig.ads.filter(ad => ad.isActive !== false);
 
 					if (!ampScriptConfig.ads.length) return;
 
+					// eslint-disable-next-line consistent-return
 					return ampScriptConfig;
 				});
 
@@ -333,6 +334,7 @@ Router.get('/:siteId/ampSiteConfig', (req, res) => {
 						}
 						const groupedLineItems = Object.keys(adNetworkConfig.separatelyGroupedLineItems).reduce(
 							(accumulator, currValue) => {
+								// eslint-disable-next-line no-param-reassign
 								accumulator = [
 									...accumulator,
 									...adNetworkConfig.separatelyGroupedLineItems[currValue]
@@ -349,6 +351,7 @@ Router.get('/:siteId/ampSiteConfig', (req, res) => {
 				);
 			};
 
+			// eslint-disable-next-line consistent-return
 			const getCurrencyConfig = function() {
 				const adServerSettings = user.get('adServerSettings');
 				const isValidCurrencyCnfg =
@@ -446,11 +449,11 @@ Router.get('/prebidBundleConfig', (req, res) => {
 			const { isSelectiveRolloutEnabled = false, isSiteSpecificPrebidDisabled = false } =
 				site.get('apConfigs') || {};
 
-			if (isSelectiveRolloutEnabled) {
-				return SelectiveRolloutActiveBidderAdaptersList;
-			}
+			// if (isSelectiveRolloutEnabled) {
+			// 	return SelectiveRolloutActiveBidderAdaptersList;
+			// }
 
-			if (!isSiteSpecificPrebidDisabled) {
+			if (!isSiteSpecificPrebidDisabled || isSelectiveRolloutEnabled) {
 				return SiteSpecificActiveBidderAdaptersList;
 			}
 
@@ -498,11 +501,11 @@ Router.post('/prebidActiveBidderAdapters', (req, res) => {
 			const { isSelectiveRolloutEnabled = false, isSiteSpecificPrebidDisabled = false } =
 				site.get('apConfigs') || {};
 
-			if (isSelectiveRolloutEnabled) {
-				return SelectiveRolloutActiveBidderAdaptersList;
-			}
+			// if (isSelectiveRolloutEnabled) {
+			// 	return SelectiveRolloutActiveBidderAdaptersList;
+			// }
 
-			if (!isSiteSpecificPrebidDisabled) {
+			if (!isSiteSpecificPrebidDisabled || isSelectiveRolloutEnabled) {
 				return SiteSpecificActiveBidderAdaptersList;
 			}
 

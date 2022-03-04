@@ -15,6 +15,9 @@ var model = require('../helpers/model'),
 	_ = require('lodash'),
 	{ N1qlQuery } = require('couchbase'),
 	{ appBucket } = require('../helpers/routeHelpers'),
+	prebidVersionConfig = {
+		suffix: { v6: '.v6' }
+	},
 	Site = model.extend(function() {
 		this.keys = [
 			'siteId',
@@ -262,19 +265,36 @@ var model = require('../helpers/model'),
 			return this.get('activeBidderAdaptersListAsc') || '';
 		};
 
-		this.setActiveBidderAdaptersList = function(newActiveBiddersList) {
+		this.checkIfPrebidVersionChangedSinceLastBuild = function(isSelectiveRolloutEnabled) {
+			const currentPrebidBundleName = this.get('prebidBundleName');
+			const isCurrentPrebidBuildV6 =
+				currentPrebidBundleName.indexOf(`${prebidVersionConfig.suffix.v6}.js`) > -1;
+
+			if (isSelectiveRolloutEnabled && isCurrentPrebidBuildV6) {
+				return false;
+			}
+
+			if (!isSelectiveRolloutEnabled && !isCurrentPrebidBuildV6) {
+				return false;
+			}
+
+			return true;
+		};
+
+		this.setActiveBidderAdaptersList = function(newActiveBiddersList, usePrebidV6) {
 			const siteId = this.get('siteId');
 
 			this.set('activeBidderAdaptersListAsc', newActiveBiddersList);
-			this.set('prebidBundleName', getSiteSpecificPrebidBundleName(siteId));
+			this.set('prebidBundleName', getSiteSpecificPrebidBundleName(siteId, usePrebidV6));
 
 			return this.save();
 		};
 	});
 
-function getSiteSpecificPrebidBundleName(siteId) {
+function getSiteSpecificPrebidBundleName(siteId, usePrebidV6) {
 	var timestamp = Date.now();
-	return `pb.${siteId}.${timestamp}.js`;
+	const suffix = usePrebidV6 ? prebidVersionConfig.suffix.v6 : '';
+	return `pb.${siteId}.${timestamp}${suffix}.js`;
 }
 
 function apiModule() {
