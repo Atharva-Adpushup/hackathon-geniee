@@ -21,9 +21,7 @@ function publishJobs(publisher, options, paramConfig) {
 	}
 	return publisher
 		.makeConnection()
-		.then(() => {
-			return publishRabbitMQMessage();
-		})
+		.then(() => publishRabbitMQMessage())
 		.catch(err => {
 			throw err.message;
 		});

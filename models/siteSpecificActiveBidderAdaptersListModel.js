@@ -33,15 +33,28 @@ function apiModule() {
 			return SiteModel.getSiteById(siteId)
 				.then(site => {
 					const activeBidderAdaptersList = site.getActiveBidderAdaptersList();
+					const isBidderListUnchanged =
+						activeBidderAdaptersList == newActiveBiddersInAscOrderString;
 
-					if (activeBidderAdaptersList == newActiveBiddersInAscOrderString) {
+					const { isSelectiveRolloutEnabled = false } = site.get('apConfigs') || {};
+
+					const hasPrebidVersionChangedSinceLastBuild = site.checkIfPrebidVersionChangedSinceLastBuild(
+						isSelectiveRolloutEnabled
+					);
+
+					if (isBidderListUnchanged && !hasPrebidVersionChangedSinceLastBuild) {
 						return site;
 					}
 
-					return site.setActiveBidderAdaptersList(newActiveBiddersInAscOrderString).then(site => {
-						output.isUpdated = true;
-						return site;
-					});
+					return site
+						.setActiveBidderAdaptersList(
+							newActiveBiddersInAscOrderString,
+							isSelectiveRolloutEnabled
+						)
+						.then(site => {
+							output.isUpdated = true;
+							return site;
+						});
 				})
 				.then(site => {
 					output.prebidBundleName = site.get('prebidBundleName');
