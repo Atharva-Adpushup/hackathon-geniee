@@ -132,7 +132,6 @@ async function fetchMeta() {
 }
 
 function sendErrorEmail(body, subject) {
-	console.log(body,subject);
 	sendEmail({
 		queue: 'MAILER',
 		data: {
@@ -151,7 +150,6 @@ async function timeoutOptimiser() {
 		//Fetching required data for rule generation
 		const analyticsData = await fetchHbAnalyticsData(oneWeekAgo, today);
 		const meta = await fetchMeta();
-		console.log('fetched data from api');
 
 		//get total revenue combination (country+device) wise
 		const siteCombinationWiseTotalRevenue = analyticsData.reduce((result, item) => {
@@ -191,9 +189,7 @@ async function timeoutOptimiser() {
 		//generate rules from the combinations of buckets
 		for (const [site, siteData] of Object.entries(deviceCountryWiseBuckets)) {
 			const finalData = {};
-			for (const [countryDeviceKey,keyData] of Object.entries(siteData))
-			 {
-				
+			for (const [countryDeviceKey, keyData] of Object.entries(siteData)) {
 				var cid = Object.values(keyData)[0].cid;
 				var device_type = Object.values(keyData)[0].device_type;
 				var segmentRevenue = siteCombinationWiseTotalRevenue[site][countryDeviceKey] || 0;
@@ -207,7 +203,7 @@ async function timeoutOptimiser() {
 				for (var i = 0; i < responseBuckets.length; i++) {
 					let bucket = responseBuckets[i];
 					minRevShare -= keyData[bucket.key] ? keyData[bucket.key].revShare : 0;
-					if (minRevShare <= 99.0) {
+					if (minRevShare <= 95.0) {
 						minTimeout = bucket.max;
 						break;
 					}
@@ -217,7 +213,7 @@ async function timeoutOptimiser() {
 					finalData[minTimeout][device_type] = finalData[minTimeout][device_type] || [];
 					finalData[minTimeout][device_type].push(cid);
 				}
-			};
+			}
 
 			const rulesArray = [];
 
@@ -243,7 +239,12 @@ async function timeoutOptimiser() {
 
 			try {
 				const siteHbConfig = await hbModel.getHbConfig(site);
-				const existingAutoRules = siteHbConfig.get('autoRules') || [];
+				var existingAutoRules = siteHbConfig.get('autoRules') || [];
+				if (existingAutoRules.length) {
+					existingAutoRules = existingAutoRules.filter(
+						rule => rule.description != 'Timeout Optimisation rules'
+					);
+				}
 				fs.writeFileSync(`${site}rulesbackup.json`, JSON.stringify(existingAutoRules));
 				siteHbConfig.set('autoRules', [...existingAutoRules, ...rulesArray]);
 				siteHbConfig.save();
@@ -287,7 +288,7 @@ async function timeoutOptimiser() {
 						}
 					}
 				}
-				const isRuleCorrect = Math.round((totalRuleRevenue * 100) / totalSiteWiseRevenue[site]) < 1;
+				const isRuleCorrect = Math.round((totalRuleRevenue * 100) / totalSiteWiseRevenue[site]) < 5;
 				if (!isRuleCorrect) {
 					sendErrorEmail(`rules generated incorrectly for site ${site}`, 'INCORRECT RULE ERROR');
 				}
