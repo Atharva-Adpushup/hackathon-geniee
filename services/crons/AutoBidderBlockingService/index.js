@@ -10,7 +10,6 @@ const cron = require('node-cron');
 
 const REPORTING_APIS = {
 	LIST: 'https://api.adpushup.com/CentralReportingWebService/site/list',
-	HB_REPORT: 'https://api.adpushup.com/CentralReportingWebService/hb_analytics/report',
 	CENTRAL_REPORT: 'https://api.adpushup.com/CentralReportingWebService/site/report'
 };
 
@@ -74,26 +73,6 @@ async function getCountryKeys() {
 	return extractDataFromResponse(response);
 }
 
-async function getHBRuleData(startdate, enddate, bidders, country, device_type, siteid) {
-	const response = await axios({
-		method: 'GET',
-		url: REPORTING_APIS.HB_REPORT,
-		params: {
-			report_name: 'GET_UI_PANEL_REPORT',
-			isSuperUser: true,
-			fromDate: startdate.format('YYYY-MM-DD'),
-			toDate: enddate.format('YYYY-MM-DD'),
-			interval: 'cumulative',
-			network: bidders,
-			country,
-			siteid,
-			device_type
-		}
-	});
-
-	return extractDataFromResponse(response);
-}
-
 async function getUAMRuleData(startdate, enddate, country, device_type, siteid) {
 	const response = await axios({
 		method: 'GET',
@@ -115,7 +94,7 @@ async function getUAMRuleData(startdate, enddate, country, device_type, siteid) 
 	return extractDataFromResponse(response);
 }
 
-async function fetchUAMData(startdate, enddate) {
+async function getHBRuleData(startdate, enddate, bidders, country, device_type, siteid) {
 	const response = await axios({
 		method: 'GET',
 		url: REPORTING_APIS.CENTRAL_REPORT,
@@ -124,10 +103,11 @@ async function fetchUAMData(startdate, enddate) {
 			isSuperUser: true,
 			fromDate: startdate.format('YYYY-MM-DD'),
 			toDate: enddate.format('YYYY-MM-DD'),
-			dimension: 'siteid,country,device_type',
-			siteid: SITES_TO_PROCESS.join(','),
-			network: 56,
-			interval: 'cumulative'
+			interval: 'cumulative',
+			network: bidders,
+			country,
+			siteid,
+			device_type
 		}
 	});
 
@@ -137,13 +117,14 @@ async function fetchUAMData(startdate, enddate) {
 async function fetchHbAnalyticsData(startdate, enddate) {
 	const response = await axios({
 		method: 'GET',
-		url: REPORTING_APIS.HB_REPORT,
+		url: REPORTING_APIS.CENTRAL_REPORT,
 		params: {
-			report_name: 'GET_UI_PANEL_REPORT',
+			report_name: 'get_stats_by_custom',
 			isSuperUser: true,
 			fromDate: startdate.format('YYYY-MM-DD'),
 			toDate: enddate.format('YYYY-MM-DD'),
 			dimension: 'siteid,network,country,device_type',
+			revenue_channel: 2,
 			siteid: SITES_TO_PROCESS.join(','),
 			interval: 'cumulative'
 		}
@@ -188,44 +169,31 @@ async function bidderBlocking() {
 
 		// Fetching required data for rule generation
 		const hbAnalyticsData = await fetchHbAnalyticsData(oneWeekAgo, today);
-		const uamData = await fetchUAMData(oneWeekAgo, today);
 
-		//maintain uniform key for revenue
-		const keyAddedUAMData = uamData.map(item => {
-			return {
-				...item,
-				overall_gross_revenue: item.network_gross_revenue,
-				network: 'AmazonUAM',
-				ntwid: 56
-			};
-		});
-
-		//combine uam and hb data arrays
-		const analyticsData = hbAnalyticsData.concat(keyAddedUAMData);
 		const meta = await fetchMeta();
 
 		//get total HB (device-country) wise revenue
-		const siteCombinationWiseTotalRevenue = analyticsData.reduce((result, item) => {
-			const { siteid, overall_gross_revenue, cid, device_type } = item;
+		const siteCombinationWiseTotalRevenue = hbAnalyticsData.reduce((result, item) => {
+			const { siteid, network_gross_revenue, cid, device_type } = item;
 			var key = `${cid}-${device_type}`;
 			result[siteid] = result[siteid] || {};
-			result[siteid][key] = (result[siteid][key] || 0) + Number(overall_gross_revenue);
+			result[siteid][key] = (result[siteid][key] || 0) + Number(network_gross_revenue);
 			return result;
 		}, {});
 
 		//get total site wise HB revenue
-		const totalSiteWiseRevenue = analyticsData.reduce((result, item) => {
-			const { siteid, overall_gross_revenue } = item;
-			result[siteid] = (result[siteid] || 0) + overall_gross_revenue;
+		const totalSiteWiseRevenue = hbAnalyticsData.reduce((result, item) => {
+			const { siteid, network_gross_revenue } = item;
+			result[siteid] = (result[siteid] || 0) + network_gross_revenue;
 			return result;
 		}, {});
 
 		//get site wise object comtaining arrays of country-device bidder revenue share
-		const countryDeviceWiseBidderData = analyticsData.reduce((result, data) => {
-			const { siteid, network, cid, device_type, overall_gross_revenue } = data;
+		const countryDeviceWiseBidderData = hbAnalyticsData.reduce((result, data) => {
+			const { siteid, network, cid, device_type, network_gross_revenue } = data;
 			const key = `${cid}-${device_type}`;
 			const revShare = (
-				(overall_gross_revenue / siteCombinationWiseTotalRevenue[siteid][key]) *
+				(network_gross_revenue / siteCombinationWiseTotalRevenue[siteid][key]) *
 				100
 			).toFixed(3);
 
@@ -253,7 +221,7 @@ async function bidderBlocking() {
 				for (let i = 0; i < sortedRevenue.length; i++) {
 					var deviceEntry = sortedRevenue[i];
 					totalRev -= deviceEntry.revShare;
-					if (totalRev <= 99) {
+					if (totalRev <= 99.5) {
 						break;
 					}
 					//add bidder to blocking array till 99% revenue is reached
@@ -279,7 +247,7 @@ async function bidderBlocking() {
 			//generating rule array
 			for (const [bidder, bidderRules] of Object.entries(bidderBlockRules)) {
 				var bidderObj = bidder;
-				if (bidderObj !== 'AmazonUAM') {
+				if (bidderObj !== 'Amazon UAM (HB)') {
 					bidderObj = meta.networks.find(network =>
 						network.name.toUpperCase().includes(
 							bidder
@@ -300,7 +268,7 @@ async function bidderBlocking() {
 					const countryIds = countries.map(id => meta.countries[id].country_code_alpha2);
 
 					const deviceKey = DEVICE_MAPPING[device];
-					if (bidderObj == 'AmazonUAM') {
+					if (bidderObj == 'Amazon UAM (HB)') {
 						rulesArray.push({
 							actions: [{ key: 'amazon_block', value: 'Block AmazonUAM' }],
 							description: 'Auto Bidder Blocking Rules',
@@ -328,7 +296,12 @@ async function bidderBlocking() {
 
 			try {
 				const siteHbConfig = await hbModel.getHbConfig(site);
-				const existingAutoRules = siteHbConfig.get('autoRules') || [];
+				var existingAutoRules = siteHbConfig.get('autoRules') || [];
+				if (existingAutoRules.length) {
+					existingAutoRules = existingAutoRules.filter(
+						rule => rule.description != 'Auto Bidder Blocking Rules'
+					);
+				}
 				fs.writeFileSync(`${site}rulesbackup.json`, JSON.stringify(existingAutoRules));
 				siteHbConfig.set('autoRules', [...existingAutoRules, ...rulesArray]);
 				siteHbConfig.save();
@@ -401,7 +374,7 @@ async function bidderBlocking() {
 							site
 						);
 						totalBlockedRevenueFromRule += blockedRevenue[0]
-							? blockedRevenue[0].overall_gross_revenue
+							? blockedRevenue[0].network_gross_revenue
 							: 0;
 					} else if (currentRuleAction.key == 'amazon_block') {
 						var blockedRevenue = await getUAMRuleData(
@@ -417,7 +390,8 @@ async function bidderBlocking() {
 					}
 				}
 
-				const isRuleCorrect = (totalBlockedRevenueFromRule * 100) / totalSiteWiseRevenue[site] < 1;
+				const isRuleCorrect =
+					(totalBlockedRevenueFromRule * 100) / totalSiteWiseRevenue[site] < 0.5;
 				if (!isRuleCorrect) {
 					sendErrorEmail(`Incorrect Rule pushed to site ${site}`, 'Incorrect CB update');
 				}
