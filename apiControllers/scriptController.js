@@ -52,6 +52,10 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 			const apps = site.get('apps');
 			const isAutoOptimise = !!(site.get('apConfigs') && site.get('apConfigs').autoOptimise);
 			const poweredByBanner = site.get('apConfigs') && site.get('apConfigs').poweredByBanner;
+			const revenueShare =
+				site.get('adNetworkSettings') && site.get('adNetworkSettings').revenueShare;
+			const shouldDeductApShareFromHb =
+				site.get('apConfigs') && site.get('apConfigs').shouldDeductApShareFromHb && !!revenueShare;
 			const gptSraDisabled = !!(site.get('apConfigs') && site.get('apConfigs').gptSraDisabled);
 			const lineItemTypes = site.get('lineItemTypes') || [];
 
@@ -82,6 +86,9 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 					(adNetworkConfig && adNetworkConfig.separatelyGroupedLineItems) || [];
 				apConfigs.autoOptimise = !!isAutoOptimise;
 				apConfigs.poweredByBanner = poweredByBanner;
+				if (shouldDeductApShareFromHb) {
+					apConfigs.revenueShare = revenueShare;
+				}
 				apConfigs.gptSraDisabled = !!gptSraDisabled;
 				apConfigs.siteDomain = site.get('siteDomain');
 				apConfigs.ownerEmailMD5 = user.get('sellerId');
@@ -181,9 +188,10 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 			const getPrebidAndAdsConfig = () =>
 				(() => {
 					if (apps.apLite) {
-						return Promise.join(generatePrebidConfig(siteId), generateApLiteAdsConfig(siteId)).then(
-							([prebidConfig, apLiteConfig]) => ({ prebidConfig, apLiteConfig })
-						);
+						return Promise.join(
+							generatePrebidConfig(siteId),
+							generateApLiteAdsConfig(siteId)
+						).then(([prebidConfig, apLiteConfig]) => ({ prebidConfig, apLiteConfig }));
 					}
 
 					return getReportData(site)
