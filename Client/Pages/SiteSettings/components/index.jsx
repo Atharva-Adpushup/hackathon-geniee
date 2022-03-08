@@ -27,14 +27,6 @@ class SiteSettings extends Component {
 				params: { siteId }
 			}
 		} = props;
-		const siteData = props.sites[siteId];
-		const isSiteData = !!(
-			siteData &&
-			Object.keys(siteData).length &&
-			siteData.apConfigs &&
-			Object.keys(siteData.apConfigs).length
-		);
-		const invalidSiteData = !isSiteData;
 
 		this.state = {
 			codeText: `<script data-cfasync="false" type="text/javascript">
@@ -48,11 +40,26 @@ class SiteSettings extends Component {
 })(window, document);
 
 </script>`,
-			siteData,
 			siteId,
-			showSendCodeByEmailModal: false,
-			invalidSiteData
+			showSendCodeByEmailModal: false
 		};
+	}
+
+	static getDerivedStateFromProps(props, state) {
+		const {
+			match: {
+				params: { siteId }
+			}
+		} = props;
+		const siteData = props.sites[siteId];
+		const isSiteData = !!(
+			siteData &&
+			Object.keys(siteData).length &&
+			siteData.apConfigs &&
+			Object.keys(siteData.apConfigs).length
+		);
+		const invalidSiteData = !isSiteData;
+		return { ...state, siteData, invalidSiteData };
 	}
 
 	uiListSaveHandler = collection => {
