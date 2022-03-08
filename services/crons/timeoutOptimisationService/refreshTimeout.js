@@ -2,7 +2,7 @@ const axios = require('axios').default;
 const moment = require('moment');
 const fs = require('fs');
 
-const hbModel = require('./../../../models/headerBiddingModel');
+const hbModel = require('../../../models/headerBiddingModel');
 const config = require('../../../configs/config');
 const { sendEmail } = require('../../../helpers/queueMailer');
 
@@ -67,7 +67,14 @@ async function getDeviceKeys() {
 	return extractDataFromResponse(response);
 }
 
-async function getRuleData(startdate, enddate, bid_response_time, countries, device_type, siteid) {
+async function getRuleTotalData(
+	startdate,
+	enddate,
+	bid_response_time,
+	countries,
+	device_type,
+	siteid
+) {
 	const response = await axios({
 		method: 'GET',
 		url: 'https://api.adpushup.com/CentralReportingWebService/hb_analytics/report',
@@ -78,7 +85,6 @@ async function getRuleData(startdate, enddate, bid_response_time, countries, dev
 			toDate: enddate.format('YYYY-MM-DD'),
 			dimension: 'bid_response_time',
 			interval: 'cumulative',
-			refresh_count: 0,
 			country: countries,
 			siteid,
 			device_type,
@@ -89,7 +95,83 @@ async function getRuleData(startdate, enddate, bid_response_time, countries, dev
 	return extractDataFromResponse(response);
 }
 
-async function fetchHbAnalyticsData(startdate, enddate) {
+async function getRuleFirstImpData(
+	startdate,
+	enddate,
+	bid_response_time,
+	countries,
+	device_type,
+	siteid
+) {
+	const response = await axios({
+		method: 'GET',
+		url: 'https://api.adpushup.com/CentralReportingWebService/hb_analytics/report',
+		params: {
+			report_name: 'GET_UI_PANEL_REPORT',
+			isSuperUser: true,
+			fromDate: startdate.format('YYYY-MM-DD'),
+			toDate: enddate.format('YYYY-MM-DD'),
+			dimension: 'bid_response_time',
+			interval: 'cumulative',
+			country: countries,
+			refresh_count: 0,
+			siteid,
+			device_type,
+			bid_response_time
+		}
+	});
+
+	return extractDataFromResponse(response);
+}
+
+async function getRuleData(startdate, enddate, bid_response_time, countries, device_type, siteid) {
+	var totalData = await getRuleTotalData(
+		startdate,
+		enddate,
+		bid_response_time,
+		countries,
+		device_type,
+		siteid
+	);
+	var firstImpData = await getRuleFirstImpData(
+		startdate,
+		enddate,
+		bid_response_time,
+		countries,
+		device_type,
+		siteid
+	);
+	if (
+		totalData[0] &&
+		totalData[0].overall_gross_revenue &&
+		firstImpData[0] &&
+		firstImpData[0].overall_gross_revenue
+	) {
+		totalData[0]['overall_gross_revenue'] -= firstImpData[0]['overall_gross_revenue'];
+	}
+
+	return totalData;
+}
+
+async function fetchHbAnalyticsTotalData(startdate, enddate) {
+	console.log(startdate.format('YYYY-MM-DD'));
+	const response = await axios({
+		method: 'GET',
+		url: 'https://api.adpushup.com/CentralReportingWebService/hb_analytics/report',
+		params: {
+			report_name: 'GET_UI_PANEL_REPORT',
+			isSuperUser: true,
+			fromDate: startdate.format('YYYY-MM-DD'),
+			toDate: enddate.format('YYYY-MM-DD'),
+			dimension: 'siteid,bid_response_time,country,device_type',
+			interval: 'cumulative',
+			siteid: SITES_TO_PROCESS.join(',')
+		}
+	});
+
+	return extractDataFromResponse(response);
+}
+async function fetchHbAnalyticsFirstImpData(startdate, enddate) {
 	console.log(startdate.format('YYYY-MM-DD'));
 	const response = await axios({
 		method: 'GET',
@@ -107,6 +189,26 @@ async function fetchHbAnalyticsData(startdate, enddate) {
 	});
 
 	return extractDataFromResponse(response);
+}
+
+async function fetchHbAnalyticsData(startdate, enddate) {
+	var totalData = await fetchHbAnalyticsTotalData(startdate, enddate);
+	const firstImpData = await fetchHbAnalyticsFirstImpData(startdate, enddate);
+	const siteCombinationFirstImpRevenue = firstImpData.reduce((result, item) => {
+		const { siteid, overall_gross_revenue, cid, device_type, bid_response_time } = item;
+		result[siteid] = result[siteid] || {};
+		const key = `${cid}-${device_type}-${bid_response_time}`;
+		result[siteid][key] = overall_gross_revenue || 0;
+		return result;
+	}, {});
+
+	totalData = totalData.map(item => {
+		const { siteid, cid, device_type, bid_response_time } = item;
+		const key = `${cid}-${device_type}-${bid_response_time}`;
+		item.overall_gross_revenue -= siteCombinationFirstImpRevenue[siteid][key] || 0;
+		return item;
+	});
+	return totalData;
 }
 
 function mapToKVPair(data = []) {
@@ -161,7 +263,9 @@ async function timeoutOptimiser() {
 		}, {});
 		const totalSiteWiseRevenue = analyticsData.reduce((result, item) => {
 			const { siteid, overall_gross_revenue } = item;
-			result[siteid] = (result[siteid] || 0) + overall_gross_revenue;
+			if (!Number.isNaN(overall_gross_revenue)) {
+				result[siteid] = (result[siteid] || 0) + Number(overall_gross_revenue);
+			}
 			return result;
 		}, {});
 
@@ -205,6 +309,7 @@ async function timeoutOptimiser() {
 					minRevShare -= keyData[bucket.key] ? keyData[bucket.key].revShare : 0;
 					if (minRevShare <= 95.0) {
 						minTimeout = bucket.max;
+
 						break;
 					}
 				}
@@ -223,8 +328,8 @@ async function timeoutOptimiser() {
 
 					const deviceKey = DEVICE_MAPPING[device];
 					rulesArray.push({
-						actions: [{ key: 'initial_timeout', value: timeout }],
-						description: 'Timeout Optimisation rules',
+						actions: [{ key: 'refresh_timeout', value: timeout }],
+						description: 'Refresh Timeout Optimisation rules',
 						isActive: true,
 						triggers: [
 							{ key: 'country', operator: 'contain', value: countryAlphaCodes },
@@ -240,12 +345,13 @@ async function timeoutOptimiser() {
 			try {
 				const siteHbConfig = await hbModel.getHbConfig(site);
 				var existingAutoRules = siteHbConfig.get('autoRules') || [];
+				fs.writeFileSync(`${site}rulesbackup.json`, JSON.stringify(existingAutoRules));
 				if (existingAutoRules.length) {
 					existingAutoRules = existingAutoRules.filter(
-						rule => rule.description != 'Timeout Optimisation rules'
+						rule => rule.description != 'Refresh Timeout Optimisation rules'
 					);
 				}
-				fs.writeFileSync(`${site}rulesbackup.json`, JSON.stringify(existingAutoRules));
+
 				siteHbConfig.set('autoRules', [...existingAutoRules, ...rulesArray]);
 				siteHbConfig.save();
 				console.log(`Rules set successfully for site ${site}`);
@@ -253,7 +359,7 @@ async function timeoutOptimiser() {
 				const updatedSiteHbConfig = await hbModel.getHbConfig(site);
 				const updatedTimeoutRules = await updatedSiteHbConfig
 					.get('autoRules')
-					.filter(rule => rule.description == 'Timeout Optimisation rules');
+					.filter(rule => rule.description == 'Refresh Timeout Optimisation rules');
 
 				var totalRuleRevenue = 0;
 				for (var i = 0; i < updatedTimeoutRules.length; i++) {
