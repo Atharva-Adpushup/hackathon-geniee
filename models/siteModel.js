@@ -268,6 +268,7 @@ var model = require('../helpers/model'),
 		this.checkIfPrebidVersionChangedSinceLastBuild = function(isSelectiveRolloutEnabled) {
 			const currentPrebidBundleName = this.get('prebidBundleName');
 			const isCurrentPrebidBuildV6 =
+				currentPrebidBundleName &&
 				currentPrebidBundleName.indexOf(`${prebidVersionConfig.suffix.v6}.js`) > -1;
 
 			if (isSelectiveRolloutEnabled && isCurrentPrebidBuildV6) {
