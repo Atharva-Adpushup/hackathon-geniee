@@ -308,8 +308,11 @@ async function timeoutOptimiser() {
 					let bucket = responseBuckets[i];
 					minRevShare -= keyData[bucket.key] ? keyData[bucket.key].revShare : 0;
 					if (minRevShare <= 95.0) {
-						minTimeout = bucket.max;
-
+						if (bucket.max == 3000) {
+							minTimeout = 2500;
+						} else {
+							minTimeout = bucket.max;
+						}
 						break;
 					}
 				}
