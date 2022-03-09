@@ -297,12 +297,13 @@ async function bidderBlocking() {
 			try {
 				const siteHbConfig = await hbModel.getHbConfig(site);
 				var existingAutoRules = siteHbConfig.get('autoRules') || [];
+				fs.writeFileSync(`${site}rulesbackup.json`, JSON.stringify(existingAutoRules));
 				if (existingAutoRules.length) {
 					existingAutoRules = existingAutoRules.filter(
 						rule => rule.description != 'Auto Bidder Blocking Rules'
 					);
 				}
-				fs.writeFileSync(`${site}rulesbackup.json`, JSON.stringify(existingAutoRules));
+
 				siteHbConfig.set('autoRules', [...existingAutoRules, ...rulesArray]);
 				siteHbConfig.save();
 
