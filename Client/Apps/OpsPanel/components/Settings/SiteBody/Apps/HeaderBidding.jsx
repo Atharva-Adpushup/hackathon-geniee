@@ -85,7 +85,16 @@ class HeaderBidding extends Component {
 						(p, key) =>
 							p.then(() => {
 								const status = bidders[key];
-								const cleanKey = key.replace(/\s+/g, '');
+								const bidderKeyNameMap = Object.keys(biddersFromProps).reduce(
+									(resultMap, currentKey) => {
+										const bidderData = biddersFromProps[currentKey];
+										const { name } = bidderData;
+										resultMap[name] = currentKey;
+										return resultMap;
+									},
+									{}
+								);
+								const cleanKey = bidderKeyNameMap[key];
 								const propsBidder = biddersFromProps[cleanKey];
 								return updateBidderAction(
 									siteId,

@@ -18,11 +18,14 @@ import {
 import Apps from '../components/Settings/SiteBody/Apps/index';
 
 const mapStateToProps = (state, ownProps) => {
-	const { headerBidding } = state.apps;
+	const {
+		headerBidding: { sites }
+	} = state.apps;
 	const {
 		site: { siteId }
 	} = ownProps;
-	const siteData = headerBidding[siteId] || {};
+
+	const siteData = sites[siteId] || {};
 	const { bidders: { addedBidders = null } = {} } = siteData;
 
 	return {
@@ -49,7 +52,4 @@ const mapDispatchToProps = dispatch => ({
 		dispatch(saveSettings(siteId, siteData, dataForAuditLogs))
 });
 
-export default connect(
-	mapStateToProps,
-	mapDispatchToProps
-)(Apps);
+export default connect(mapStateToProps, mapDispatchToProps)(Apps);
