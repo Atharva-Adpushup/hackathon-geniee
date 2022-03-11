@@ -21,7 +21,8 @@ const adUnitsHeaders = [
 ];
 
 const OP_NAV_ITEMS_INDEXES = {
-	SETTINGS: 'settings',
+	ACCOUNT_SETTINGS: 'account-settings',
+	SITE_SETTINGS: 'site-settings',
 	INFO_PANEL: 'info-panel',
 	INFO_PANEL_QUICK_SNAPSHOT: 'QUICK_SNAPSHOT',
 	INFO_PANEL_REPORT_VITALS: 'REPORT_VITALS',
@@ -31,28 +32,33 @@ const OP_NAV_ITEMS_INDEXES = {
 };
 
 const OP_NAV_ITEMS_VALUES = {
-	SETTINGS: 'Settings',
+	ACCOUNT_SETTINGS: 'Account Settings',
+	SITE_SETTINGS: 'Site Settings',
 	INFO_PANEL: 'Info Panel',
 	SITES_MAPPING: 'Site Mapping',
 	TOOLS: 'Tools'
 };
 
 const OP_NAV_ITEMS = {
-	[OP_NAV_ITEMS_INDEXES.SETTINGS]: {
-		NAME: [OP_NAV_ITEMS_VALUES.SETTINGS],
+	[OP_NAV_ITEMS_INDEXES.ACCOUNT_SETTINGS]: {
+		NAME: [OP_NAV_ITEMS_VALUES.ACCOUNT_SETTINGS],
 		INDEX: 1
+	},
+	[OP_NAV_ITEMS_INDEXES.SITE_SETTINGS]: {
+		NAME: [OP_NAV_ITEMS_VALUES.SITE_SETTINGS],
+		INDEX: 2
 	},
 	[OP_NAV_ITEMS_INDEXES.INFO_PANEL]: {
 		NAME: [OP_NAV_ITEMS_VALUES.INFO_PANEL],
-		INDEX: 2
+		INDEX: 3
 	},
 	[OP_NAV_ITEMS_INDEXES.SITES_MAPPING]: {
 		NAME: [OP_NAV_ITEMS_VALUES.SITES_MAPPING],
-		INDEX: 3
+		INDEX: 4
 	},
 	[OP_NAV_ITEMS_INDEXES.TOOLS]: {
 		NAME: [OP_NAV_ITEMS_VALUES.TOOLS],
-		INDEX: 4
+		INDEX: 5
 	}
 };
 
@@ -577,8 +583,13 @@ const TRIGGER_KEY_OPTIONS = [
 	{
 		label: 'Day of the Week',
 		value: 'day_of_the_week'
+	},
+	{
+		label: 'Ad Unit',
+		value: 'adunit'
 	}
 ];
+
 const TRIGGER_OPERATOR_OPTIONS = [
 	{
 		label: 'IS IN',
@@ -643,6 +654,47 @@ const POWERED_BY_BANNER = [
 	{ label: 'Chained Docked', value: 'CHAINED_DOCKED' }
 ];
 
+const RULES_ENGINE = {
+	RULES_ENGINE_ACTIONS_KEY_OPTIONS: [
+		{
+			label: 'Refresh Type',
+			value: 'refreshType'
+		},
+		{
+			label: 'Refresh Interval',
+			value: 'refreshInterval'
+		}
+	],
+	RULES_ENGINE_ACTIONS_VALUE_OPTIONS: {
+		refreshType: [
+			{ label: 'BG', value: 'BG' },
+			{ label: 'AT', value: 'AT' },
+			{ label: 'AV', value: 'AV' }
+		],
+		refreshInterval: []
+	},
+	RULE_ENGINE_KEY_OPTIONS_TYPE: {
+		RADIO_ELEMENT_TYPES: [],
+		NUMBER_ELEMENT_TYPE: ['refreshInterval'],
+		DROP_DOWN: ['refreshType'],
+		DROP_DOWN_MULTI: []
+	},
+	RULES_ENGINE_TRIGGER_KEY_OPTIONS: [
+		{
+			label: 'Country',
+			value: 'country'
+		},
+		{
+			label: 'Device',
+			value: 'device'
+		},
+		{
+			label: 'Ad Unit',
+			value: 'adunit'
+		}
+	]
+};
+
 export {
 	adUnitsData,
 	adUnitsHeaders,
@@ -685,5 +737,6 @@ export {
 	UNFILLED_REFRESH_RATE_ENTRIES,
 	PNP_REFRESH_TYPES,
 	AP_LIGHT_AD_UNIT_OPERATIONS,
-	POWERED_BY_BANNER
+	POWERED_BY_BANNER,
+	RULES_ENGINE
 };

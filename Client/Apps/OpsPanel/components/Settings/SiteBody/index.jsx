@@ -8,6 +8,7 @@ import SettingsContainer from '../../../containers/SettingsContainer';
 import ApLiteContainer from '../../../containers/ApLiteContainer';
 import PnPContainer from '../../../containers/PnpContainer';
 import LineItemTypeRefreshContainer from '../../../containers/LineItemTypeRefreshContainer';
+import RuleEngineContainer from '../../../containers/SiteRuleEngineContainer';
 
 const SiteBody = props => {
 	const { site, showNotification, saveSettings, dataForAuditLogs } = props;
@@ -45,6 +46,11 @@ const SiteBody = props => {
 					showNotification={showNotification}
 				/>
 				<SizeMappingContainer
+					dataForAuditLogs={dataForAuditLogs}
+					site={site}
+					showNotification={showNotification}
+				/>
+				<RuleEngineContainer
 					dataForAuditLogs={dataForAuditLogs}
 					site={site}
 					showNotification={showNotification}

@@ -97,6 +97,32 @@ const sites = (state = { fetched: false, data: {} }, action) => {
 					}
 				}
 			};
+		case SITE_ACTIONS.UPDATE_SITE_RULES_ENGINE_DATA: {
+			const { payload: { siteId, rules } = {} } = action;
+			const siteData = state.data[siteId];
+			return {
+				...state,
+				data: {
+					...state.data,
+					[siteId]: {
+						...siteData,
+						apConfigs: {
+							...siteData.apConfigs,
+							rules
+						}
+					}
+				}
+			};
+		}
+		case SITE_ACTIONS.SET_UNSAVED_CHANGES: {
+			const { hasUnsavedChanges } = action;
+			if (hasUnsavedChanges === state.hasUnsavedChanges) return state;
+
+			return {
+				...state,
+				hasUnsavedChanges
+			};
+		}
 		default:
 			return state;
 	}

@@ -36,7 +36,8 @@ const ApConfig = {
 		'isSelectiveRolloutEnabled',
 		'pnpScript',
 		'separatelyGroupedLineItems',
-		'isUrlReportingEnabled'
+		'isUrlReportingEnabled',
+		'rules'
 	],
 	override: [
 		'mode',
@@ -75,7 +76,8 @@ const ApConfig = {
 		'isSelectiveRolloutEnabled',
 		'pnpScript',
 		'separatelyGroupedLineItems',
-		'isUrlReportingEnabled'
+		'isUrlReportingEnabled',
+		'rules'
 	],
 	merge: []
 };

@@ -3,6 +3,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { SITE_ACTIONS, UI_ACTIONS, USER_ACTIONS } from '../constants/global';
 import axiosInstance from '../helpers/axiosInstance';
 import { errorHandler } from '../helpers/commonFunctions';
+import siteService from '../services/siteService';
 
 const fetchAppStatuses = siteId => dispatch =>
 	axiosInstance
@@ -216,6 +217,37 @@ const updateSiteData = (siteId, data) => dispatch => {
 	dispatch({ type: SITE_ACTIONS.UPDATE_SITE_DATA, data: { siteId, ...data } });
 };
 
+const saveSiteRulesEngine = (siteId, { rule, ruleIndex }, dataForAuditLogs) => dispatch => {
+	const updaterFn =
+		typeof ruleIndex === 'number'
+			? siteService.updateRulesEngineData
+			: siteService.setRuleEngineData;
+
+	return updaterFn(siteId, { rule, ruleIndex }, dataForAuditLogs)
+		.then(({ data: rules }) => {
+			const payload = { rules, siteId };
+			dispatch({ type: SITE_ACTIONS.UPDATE_SITE_RULES_ENGINE_DATA, payload });
+		})
+		.catch(error => {
+			const { response } = error;
+			if (response) {
+				const {
+					data: { error: err }
+				} = response;
+				const message = Array.isArray(err)
+					? err.map(({ message: msg }) => msg).join(' and ')
+					: 'Something went wrong!';
+
+				throw new Error(message);
+			}
+			// pass the error
+			throw new Error(error.message);
+		});
+};
+
+const setUnsavedChangesAction = hasUnsavedChanges => dispatch =>
+	dispatch({ type: SITE_ACTIONS.SET_UNSAVED_CHANGES, hasUnsavedChanges });
+
 export {
 	fetchAppStatuses,
 	addNewSite,
@@ -230,5 +262,7 @@ export {
 	fetchSiteInventories,
 	resetSiteInventories,
 	updateSiteData,
-	updateBlocklistedLineItems
+	updateBlocklistedLineItems,
+	saveSiteRulesEngine,
+	setUnsavedChangesAction
 };

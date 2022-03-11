@@ -29,18 +29,22 @@ class OpsPanel extends Component {
 		switch (Number(value)) {
 			default:
 			case 1:
-				redirectUrl = `${computedRedirectUrl}/settings`;
+				redirectUrl = `${computedRedirectUrl}/settings-account`;
 				break;
 
 			case 2:
-				redirectUrl = `${computedRedirectUrl}/info-panel`;
+				redirectUrl = `${computedRedirectUrl}/settings-sites`;
 				break;
 
 			case 3:
-				redirectUrl = `${computedRedirectUrl}/sites-mapping`;
+				redirectUrl = `${computedRedirectUrl}/info-panel`;
 				break;
 
 			case 4:
+				redirectUrl = `${computedRedirectUrl}/sites-mapping`;
+				break;
+
+			case 5:
 				redirectUrl = `${computedRedirectUrl}/tools`;
 				break;
 		}
@@ -53,8 +57,10 @@ class OpsPanel extends Component {
 
 		switch (activeTab) {
 			default:
-			case OP_NAV_ITEMS_INDEXES.SETTINGS:
-				return <Settings {...this.props} />;
+			case OP_NAV_ITEMS_INDEXES.ACCOUNT_SETTINGS:
+				return <Settings activeKey="account" {...this.props} />;
+			case OP_NAV_ITEMS_INDEXES.SITE_SETTINGS:
+				return <Settings activeKey="sites" {...this.props} />;
 			case OP_NAV_ITEMS_INDEXES.INFO_PANEL:
 				return <InfoPanelContainer {...this.props} />;
 			case OP_NAV_ITEMS_INDEXES.SITES_MAPPING:
@@ -76,10 +82,11 @@ class OpsPanel extends Component {
 		return (
 			<ActionCard>
 				<Nav bsStyle="tabs" activeKey={activeItem.INDEX} onSelect={this.handleNavSelect}>
-					<NavItem eventKey={1}>{OP_NAV_ITEMS_VALUES.SETTINGS}</NavItem>
-					<NavItem eventKey={2}>{OP_NAV_ITEMS_VALUES.INFO_PANEL}</NavItem>
-					<NavItem eventKey={4}>{OP_NAV_ITEMS_VALUES.TOOLS}</NavItem>
-					<NavItem eventKey={3}>{OP_NAV_ITEMS_VALUES.SITES_MAPPING}</NavItem>
+					<NavItem eventKey={1}>{OP_NAV_ITEMS_VALUES.ACCOUNT_SETTINGS}</NavItem>
+					<NavItem eventKey={2}>{OP_NAV_ITEMS_VALUES.SITE_SETTINGS}</NavItem>
+					<NavItem eventKey={3}>{OP_NAV_ITEMS_VALUES.INFO_PANEL}</NavItem>
+					<NavItem eventKey={5}>{OP_NAV_ITEMS_VALUES.TOOLS}</NavItem>
+					<NavItem eventKey={4}>{OP_NAV_ITEMS_VALUES.SITES_MAPPING}</NavItem>
 				</Nav>
 				{this.renderContent()}
 			</ActionCard>
