@@ -226,6 +226,16 @@ const displayOpsMetrics = [
 	// METRICS.NETWORK_AD_CTR //add this to make it available in global reports (Ops)
 ];
 
+const displayOpsMetricsForGlobalReport = [
+	METRICS_OPS_PANEL.NETWORK_NET_REVENUE,
+	METRICS_OPS_PANEL.ADPUSHUP_PAGE_VIEWS,
+	METRICS_OPS_PANEL.ADPUSHUP_PAGE_CPM,
+	METRICS_OPS_PANEL.NETWORK_IMPRESSIONS,
+	METRICS_OPS_PANEL.NETWORK_AD_ECPM,
+	METRICS_OPS_PANEL.GROSS_REVENUE
+	// METRICS.NETWORK_AD_CTR //add this to make it available in global reports (Ops)
+];
+
 const METRICS_OPS_PANEL_XPATH = {
 	ADPUSHUP_XPATH_MISS: { value: 'adpushup_xpath_miss', name: 'Net Revenue', valueType: 'number' },
 	ADPUSHUP_XPATH_MISS_PERCENT: {
@@ -635,6 +645,7 @@ export {
 	REPORT_PATH,
 	displayMetrics,
 	displayOpsMetrics,
+	displayOpsMetricsForGlobalReport,
 	displayOpsMetricsForXPath,
 	displayUniqueImpressionMetrics,
 	extraMetricsListForHB,

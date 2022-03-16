@@ -30,6 +30,7 @@ import {
 import {
 	displayMetrics,
 	displayOpsMetrics,
+	displayOpsMetricsForGlobalReport,
 	displayUniqueImpressionMetrics,
 	displayOpsMetricsForXPath,
 	opsDimension,
@@ -58,7 +59,8 @@ class Report extends Component {
 			dimensionList: [],
 			filterList: [],
 			intervalList: [],
-			metricsList: props.isForOps ? displayOpsMetrics : displayMetrics,
+			// eslint-disable-next-line no-nested-ternary
+			metricsList: this.getAllowedMetrics(),
 			selectedDimension: [],
 			selectedFilters: {},
 			selectedFilterValues: {},
@@ -136,6 +138,27 @@ class Report extends Component {
 			this.componentLoadingCompleted(finalRenderTimeTaken);
 		}
 	}
+
+	getAllowedMetrics = () => {
+		const { props } = this;
+		const {
+			user: {
+				data: { allowGrossRevenue }
+			}
+		} = props;
+
+		if (props.isForOps && props.reportType === 'global') {
+			return displayOpsMetricsForGlobalReport;
+		}
+
+		if (props.isForOps) {
+			if (allowGrossRevenue) {
+				return displayOpsMetrics;
+			}
+			return displayOpsMetrics.filter(item => item.value.indexOf('gross') === -1);
+		}
+		return displayMetrics;
+	};
 
 	handleError = err => {
 		const {
@@ -591,7 +614,8 @@ class Report extends Component {
 			isForOps,
 			user: {
 				data: { isUniqueImpEnabled = false }
-			}
+			},
+			reportType
 		} = this.props;
 		const filteredMetrics = tableData.columns.filter(metric => {
 			const isDimension = !!reportsMeta.data.dimension[metric];
@@ -613,7 +637,7 @@ class Report extends Component {
 
 		let match = displayMetrics.map(item => item.value);
 		if (isForOps) {
-			match = displayOpsMetrics.map(item => item.value);
+			match = this.getAllowedMetrics().map(item => item.value);
 			computedMetrics = computedMetrics.filter(item => match.indexOf(item.value) !== -1);
 		} else {
 			// check if unique imp is checked
@@ -1030,9 +1054,7 @@ class Report extends Component {
 		const {
 			selectedDimension: dimension,
 			selectedFilters: filters = {},
-			selectedInterval: intervals,
-			startDate,
-			endDate
+			selectedInterval: intervals
 		} = report;
 		const { dimensionList = [] } = this.state;
 		const dimensionData = dimensionList
@@ -1086,7 +1108,7 @@ class Report extends Component {
 		}));
 
 		const frequentReportsDimensionCount = {};
-		const frequentReportsWithValue = frequentReports.map((report, i) => {
+		const frequentReportsWithValue = frequentReports.map(report => {
 			const dimensions = report.selectedDimension ? report.selectedDimension.join(',') : '';
 			if (frequentReportsDimensionCount[dimensions]) {
 				frequentReportsDimensionCount[dimensions] += 1;
