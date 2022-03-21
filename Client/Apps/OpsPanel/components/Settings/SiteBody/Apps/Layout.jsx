@@ -252,9 +252,7 @@ class Layout extends Component {
 					if (isAutoOptimiseDisabled && hasVariations) {
 						keys.forEach(variationId => {
 							const variation = variations[variationId];
-							traffic += `<p><span class="u-text-bold">${variation.name}</span> -- ${
-								variation.trafficDistribution
-							}%</p>`;
+							traffic += `<p><span class="u-text-bold">${variation.name}</span> -- ${variation.trafficDistribution}%</p>`;
 							sum += parseInt(variation.trafficDistribution, 10);
 						});
 					} else {
