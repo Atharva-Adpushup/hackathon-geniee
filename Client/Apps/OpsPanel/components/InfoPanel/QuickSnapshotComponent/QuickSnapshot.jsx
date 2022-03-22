@@ -272,9 +272,20 @@ class QuickSnapshot extends React.Component {
 
 	getTransformedWidgetMetricArray = widgetMetrics => {
 		const { metrics } = this.state;
+		const {
+			user: {
+				data: { allowGrossRevenue }
+			}
+		} = this.props;
 		const resultArray = [];
 
-		widgetMetrics.forEach(metricName => {
+		// Check if user has access to Gross Revenue only show those metrics
+		// if allowed show all the metrics otherwise filter out metrics with gross(Gross revenue)
+		const allowedMetrics = allowGrossRevenue
+			? widgetMetrics
+			: widgetMetrics.filter(item => item.indexOf('gross') === -1);
+
+		allowedMetrics.forEach(metricName => {
 			const metricLabel = metrics[metricName].display_name;
 
 			resultArray.push({
@@ -502,7 +513,7 @@ class QuickSnapshot extends React.Component {
 					const [{ top10Sites, selectedSite: computedSelectedSite }, response] = responseData;
 
 					if (
-						response.status == 200 &&
+						response.status === 200 &&
 						!isEmpty(response.data) &&
 						response.data.result &&
 						response.data.result.length > 0
@@ -544,7 +555,7 @@ class QuickSnapshot extends React.Component {
 		allUserSites.forEach(site => {
 			const siteId = site.value;
 			const reportingSite = reportingSites[siteId];
-			if (reportingSite && reportingSite.product && reportingSite.product.Layout == 1) {
+			if (reportingSite && reportingSite.product && reportingSite.product.Layout === 1) {
 				layoutSites.push(site);
 			}
 		});
@@ -701,7 +712,7 @@ class QuickSnapshot extends React.Component {
 		let sitesToShow = isWidgetNamePerAPOriginal ? layoutSites : sites;
 		const shouldSetGlobalSites = !!(isReportTypeGlobal && sitesList && websiteWidgetValidated);
 
-		const handleCustomDateChange = ({ startDate, endDate }) => {
+		const handleCustomDateChange = () => {
 			widgetsConfig[wid].startDate = startDate;
 			widgetsConfig[wid].endDate = endDate;
 			/*	
@@ -891,7 +902,10 @@ class QuickSnapshot extends React.Component {
 	renderHeader = () => {
 		const ref = this;
 		const { reportType } = ref.state;
-		const options = [{ name: 'Account', value: 'account' }, { name: 'Global', value: 'global' }];
+		const options = [
+			{ name: 'Account', value: 'account' },
+			{ name: 'Global', value: 'global' }
+		];
 
 		return (
 			<div
