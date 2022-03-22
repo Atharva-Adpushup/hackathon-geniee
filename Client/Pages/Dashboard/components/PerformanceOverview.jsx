@@ -82,11 +82,11 @@ class PerformanceOverview extends React.Component {
 
 	render() {
 		const { displayData } = this.state;
-		const { isForOps, isUniqueImpEnabled } = this.props;
+		const { isForOps, isUniqueImpEnabled, allowGrossRevenue } = this.props;
 		const computedDisplayMetrics = cloneDeep(
 			isUniqueImpEnabled ? displayUniqueMetrics : displayMetrics
 		);
-		if (!isForOps) {
+		if (!isForOps || !allowGrossRevenue) {
 			Object.keys(computedDisplayMetrics).forEach(displayMetricKey => {
 				const isOpsKey = opsDisplayMetricsKeys.indexOf(displayMetricKey) !== -1;
 				if (isOpsKey) delete computedDisplayMetrics[displayMetricKey];
