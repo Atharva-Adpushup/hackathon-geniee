@@ -30,7 +30,6 @@ import {
 import {
 	displayMetrics,
 	displayOpsMetrics,
-	displayOpsMetricsForGlobalReport,
 	displayUniqueImpressionMetrics,
 	displayOpsMetricsForXPath,
 	opsDimension,
@@ -60,7 +59,7 @@ class Report extends Component {
 			filterList: [],
 			intervalList: [],
 			// eslint-disable-next-line no-nested-ternary
-			metricsList: this.getAllowedMetrics(),
+			metricsList: props.isForOps ? displayOpsMetrics : displayMetrics,
 			selectedDimension: [],
 			selectedFilters: {},
 			selectedFilterValues: {},
@@ -138,27 +137,6 @@ class Report extends Component {
 			this.componentLoadingCompleted(finalRenderTimeTaken);
 		}
 	}
-
-	getAllowedMetrics = () => {
-		const { props } = this;
-		const {
-			user: {
-				data: { allowGrossRevenue }
-			}
-		} = props;
-
-		if (props.isForOps && props.reportType === 'global') {
-			return displayOpsMetricsForGlobalReport;
-		}
-
-		if (props.isForOps) {
-			if (allowGrossRevenue) {
-				return displayOpsMetrics;
-			}
-			return displayOpsMetrics.filter(item => item.value.indexOf('gross') === -1);
-		}
-		return displayMetrics;
-	};
 
 	handleError = err => {
 		const {
@@ -614,8 +592,7 @@ class Report extends Component {
 			isForOps,
 			user: {
 				data: { isUniqueImpEnabled = false }
-			},
-			reportType
+			}
 		} = this.props;
 		const filteredMetrics = tableData.columns.filter(metric => {
 			const isDimension = !!reportsMeta.data.dimension[metric];
@@ -637,7 +614,7 @@ class Report extends Component {
 
 		let match = displayMetrics.map(item => item.value);
 		if (isForOps) {
-			match = this.getAllowedMetrics().map(item => item.value);
+			match = displayOpsMetrics.map(item => item.value);
 			computedMetrics = computedMetrics.filter(item => match.indexOf(item.value) !== -1);
 		} else {
 			// check if unique imp is checked

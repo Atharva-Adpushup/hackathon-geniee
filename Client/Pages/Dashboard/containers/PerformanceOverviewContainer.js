@@ -5,12 +5,8 @@ import { checkReportTypeGlobal } from '../../../helpers/commonFunctions';
 const mapStateToProps = (state, ownProps) => {
 	const isReportTypeGlobal = checkReportTypeGlobal(ownProps);
 	const {
-		reports: { account: accountReportMetaData, global: globalReportMetaData },
-		user
+		reports: { account: accountReportMetaData, global: globalReportMetaData }
 	} = state.global;
-	const {
-		data: { allowGrossRevenue }
-	} = user;
 
 	const reportsMeta = isReportTypeGlobal
 		? { ...globalReportMetaData }
@@ -22,8 +18,7 @@ const mapStateToProps = (state, ownProps) => {
 	return {
 		...ownProps,
 		metrics,
-		site,
-		allowGrossRevenue
+		site
 	};
 };
 

@@ -82,11 +82,11 @@ class PerformanceOverview extends React.Component {
 
 	render() {
 		const { displayData } = this.state;
-		const { isForOps, isUniqueImpEnabled, allowGrossRevenue } = this.props;
+		const { isForOps, isUniqueImpEnabled } = this.props;
 		const computedDisplayMetrics = cloneDeep(
 			isUniqueImpEnabled ? displayUniqueMetrics : displayMetrics
 		);
-		if (!isForOps || !allowGrossRevenue) {
+		if (!isForOps) {
 			Object.keys(computedDisplayMetrics).forEach(displayMetricKey => {
 				const isOpsKey = opsDisplayMetricsKeys.indexOf(displayMetricKey) !== -1;
 				if (isOpsKey) delete computedDisplayMetrics[displayMetricKey];
@@ -102,7 +102,7 @@ class PerformanceOverview extends React.Component {
 								<div className="font-small">{name}</div>
 								<div className="estimatedEarning">
 									<span>
-										{computedDisplayMetrics[col].valueType == 'money'
+										{computedDisplayMetrics[col].valueType === 'money'
 											? `$${numberWithCommas(roundOffTwoDecimal(value))}`
 											: numberWithCommas(value)}
 									</span>
