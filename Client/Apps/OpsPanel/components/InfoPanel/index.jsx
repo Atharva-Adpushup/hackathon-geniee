@@ -62,10 +62,7 @@ class InfoPanel extends Component {
 		const {
 			reportType,
 			match = { params: { siteId: '' } },
-			location = { search: '' },
-			user: {
-				data: { isGlobalReportAllowed }
-			}
+			location = { search: '' }
 		} = this.props;
 
 		if (redirectUrl && redirectUrl !== location.pathname) {
@@ -96,28 +93,21 @@ class InfoPanel extends Component {
 				);
 			case INFO_PANEL_IDENTIFIERS.GLOBAL_REPORT_VITALS:
 				return (
-					isGlobalReportAllowed && (
-						<ReportVitals
-							reportType="global"
-							defaultReportType="global"
-							isForOps
-							customProps={{ activeTab: REPORTS_NAV_ITEMS_INDEXES.REPORT }}
-							isCustomizeChartLegend
-							match={match}
-							location={location}
-						/>
-					)
+					<ReportVitals
+						reportType="global"
+						defaultReportType="global"
+						isForOps
+						customProps={{ activeTab: REPORTS_NAV_ITEMS_INDEXES.REPORT }}
+						isCustomizeChartLegend
+						match={match}
+						location={location}
+					/>
 				);
 		}
 	};
 
 	render() {
 		const { activeKey } = this.state;
-		const {
-			user: {
-				data: { isGlobalReportAllowed }
-			}
-		} = this.props;
 
 		return (
 			<div className="u-padding-v4">
@@ -131,11 +121,9 @@ class InfoPanel extends Component {
 							<Nav bsStyle="pills" bsClass="ap-nav-pills nav" stacked>
 								<NavItem eventKey={INFO_PANEL_IDENTIFIERS.QUICK_SNAPSHOT}>Quick Snapshot</NavItem>
 								<NavItem eventKey={INFO_PANEL_IDENTIFIERS.REPORT_VITALS}>Report Vitals</NavItem>
-								{isGlobalReportAllowed && (
-									<NavItem eventKey={INFO_PANEL_IDENTIFIERS.GLOBAL_REPORT_VITALS}>
-										Global Report Vitals
-									</NavItem>
-								)}
+								<NavItem eventKey={INFO_PANEL_IDENTIFIERS.GLOBAL_REPORT_VITALS}>
+									Global Report Vitals
+								</NavItem>
 							</Nav>
 						</Col>
 						<Col sm={10}>

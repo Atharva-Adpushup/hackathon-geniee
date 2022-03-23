@@ -272,20 +272,9 @@ class QuickSnapshot extends React.Component {
 
 	getTransformedWidgetMetricArray = widgetMetrics => {
 		const { metrics } = this.state;
-		const {
-			user: {
-				data: { allowGrossRevenue }
-			}
-		} = this.props;
 		const resultArray = [];
 
-		// Check if user has access to Gross Revenue only show those metrics
-		// if allowed show all the metrics otherwise filter out metrics with gross(Gross revenue)
-		const allowedMetrics = allowGrossRevenue
-			? widgetMetrics
-			: widgetMetrics.filter(item => item.indexOf('gross') === -1);
-
-		allowedMetrics.forEach(metricName => {
+		widgetMetrics.forEach(metricName => {
 			const metricLabel = metrics[metricName].display_name;
 
 			resultArray.push({

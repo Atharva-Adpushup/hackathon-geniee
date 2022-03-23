@@ -143,19 +143,8 @@ function getReportsMetaData(params) {
 */
 
 router
-	.get('/globalData', async (req, res) => {
-		console.log( req.user, ' req.user')
-		const { email, isSuperUser, originalEmail } = req.user;
-		// for preventing unwanted Global Report access via switch user
-		// first we will check original Users access right then we will pass it to the
-		// Switched user's access
-		let originalUserDetails = {};
-		if (originalEmail) {
-			originalUserDetails = await userModel
-			.getUserByEmail(originalEmail)
-			.then(user => user.cleanData());
-		}
-
+	.get('/globalData', (req, res) => {
+		const { email, isSuperUser } = req.user;
 		return userModel
 			.getUserByEmail(email)
 			.then(user =>
@@ -188,31 +177,12 @@ router
 								});
 							}
 
-							// if switched User
-							if(originalEmail) {
-								return res.status(httpStatus.OK).json({
-									// set originalUser's access of Global Report - instead of switchedUsers Access
-									// case : user A does not have access but user B have if I switch to userB then I can access Global Report which is wrong
-									// same is the case for allowGrossRevenue
-									user: {
-										...userData,
-										isSuperUser,
-										isGlobalReportAllowed: originalUserDetails.isGlobalReportAllowed || false,
-										allowGrossRevenue: originalUserDetails.allowGrossRevenue || false
-									},
-									networkConfig,
-									networkWideHBRules,
-									sites
-								});
-							} else {
-								return res.status(httpStatus.OK).json({
-									user: { ...userData, isSuperUser },
-									networkConfig,
-									networkWideHBRules,
-									sites
-								});
-							}
-
+							return res.status(httpStatus.OK).json({
+								user: { ...userData, isSuperUser },
+								networkConfig,
+								networkWideHBRules,
+								sites
+							});
 						});
 					}
 				)
