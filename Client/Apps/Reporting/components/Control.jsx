@@ -1,5 +1,4 @@
 import React, { Component, Fragment } from 'react';
-import { Glyphicon, Button } from '@/Client/helpers/react-bootstrap-imports';
 import 'react-dates/lib/css/_datepicker.css';
 import 'react-dates/initialize';
 import { CSVLink } from 'react-csv';
@@ -7,6 +6,7 @@ import isEqual from 'lodash/isEqual';
 import moment from 'moment';
 import cloneDeep from 'lodash/cloneDeep';
 import Select from 'react-select';
+import { Glyphicon, Button, Alert } from '@/Client/helpers/react-bootstrap-imports';
 import AsyncGroupSelect from '../../../Components/AsyncGroupSelect/index';
 import PresetDateRangePicker from '../../../Components/PresetDateRangePicker/index';
 import SelectBox from '../../../Components/SelectBox/index';
@@ -108,6 +108,7 @@ class Control extends Component {
 
 	onReportBySelect = selectedDimensions => {
 		const { reportType, isHB } = this.props;
+		// eslint-disable-next-line no-nested-ternary
 		const updatedSelectedDimension = selectedDimensions
 			? isHB
 				? selectedDimensions
@@ -423,8 +424,9 @@ class Control extends Component {
 		];
 		const allSelectedDimensionsNames =
 			(!isHB &&
-				selectedDimension.map((value, index) => {
+				selectedDimension.map(value => {
 					let dimensionName = '';
+					// eslint-disable-next-line no-restricted-syntax
 					for (const filter of filterList) {
 						if (filter.value === value) {
 							dimensionName = filter.name;
@@ -526,7 +528,9 @@ class Control extends Component {
 					</div>
 					<div className="aligner-item ">
 						{/* eslint-disable */}
-						<label className="u-text-normal">Date Range {isHB ? '(Max 30 days can be selected)' : ''}</label>
+						<label className="u-text-normal">
+							Date Range {isHB ? '(Max 30 days can be selected)' : ''}
+						</label>
 						<PresetDateRangePicker
 							presets={getPresets()}
 							startDate={state.startDate}
@@ -654,6 +658,11 @@ class Control extends Component {
 						</CSVLink>
 					</div>
 				</div>
+				<Alert bsStyle="info" onDismiss={this.handleDismiss} className="u-margin-t4">
+					Dynamic Allocation (Adx) reporting data for the last few hours might not yet be completely
+					available in reports due to an ongoing issue in Adx Reporting API.
+					https://ads.google.com/status/publisher/incidents/csC6ESpg6zCkJxQDUEUm
+				</Alert>
 				{isHB || selectedReportType === 'frequentReport' ? null : (
 					<Schedule
 						name={selectedReportName}
