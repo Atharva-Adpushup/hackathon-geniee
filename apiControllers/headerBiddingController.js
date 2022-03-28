@@ -32,7 +32,7 @@ const getSiteWiseHBRules = (email, siteId) =>
 			const sitewiseManualRules = hbConfig.get('rules') || [];
 			const sitewiseAutoRules = hbConfig.get('autoRules') || [];
 
-			return [...sitewiseAutoRules, ...sitewiseManualRules];
+			return [...sitewiseManualRules, ...sitewiseAutoRules];
 		});
 
 router
