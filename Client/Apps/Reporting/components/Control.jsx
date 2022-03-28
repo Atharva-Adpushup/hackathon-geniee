@@ -658,11 +658,6 @@ class Control extends Component {
 						</CSVLink>
 					</div>
 				</div>
-				<Alert bsStyle="info" onDismiss={this.handleDismiss} className="u-margin-t4">
-					Dynamic Allocation (Adx) reporting data for the last few hours might not yet be completely
-					available in reports due to an ongoing issue in Adx Reporting API.
-					https://ads.google.com/status/publisher/incidents/csC6ESpg6zCkJxQDUEUm
-				</Alert>
 				{isHB || selectedReportType === 'frequentReport' ? null : (
 					<Schedule
 						name={selectedReportName}
