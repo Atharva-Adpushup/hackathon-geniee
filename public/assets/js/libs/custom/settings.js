@@ -106,6 +106,7 @@ $(document).ready(function() {
 				} else {
 					var parsedFormValues = this.parseFormData(formValues, 'other'),
 						poweredByBanner = parsedFormValues.poweredByBanner ? parsedFormValues.poweredByBanner : {},
+						isUrlReportingEnabled = parsedFormValues.isUrlReportingEnabled,
 						activeDFPNetwork = parsedFormValues.activeDFPNetwork,
 						activeDFPCurrencyCode = parsedFormValues.activeDFPCurrencyCode,
 						autoOpt = parsedFormValues.autoOptimise ? true : false,
@@ -139,7 +140,8 @@ $(document).ready(function() {
 							cookieControlConfig: cookieControlConfig,
 							blocklist: JSON.stringify(w.blocklist),
 							isAutoOptimiseChanged: isAutoOptimiseChanged,
-							poweredByBanner: poweredByBanner
+							poweredByBanner: poweredByBanner,
+							isUrlReportingEnabled: isUrlReportingEnabled,
 						},
 						function(res) {
 							if (res.success) {

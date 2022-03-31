@@ -35,7 +35,8 @@ const ApConfig = {
 		'gaConfigs',
 		'isSelectiveRolloutEnabled',
 		'pnpScript',
-		'separatelyGroupedLineItems'
+		'separatelyGroupedLineItems',
+		'isUrlReportingEnabled'
 	],
 	override: [
 		'mode',
@@ -73,7 +74,8 @@ const ApConfig = {
 		'gaConfigs',
 		'isSelectiveRolloutEnabled',
 		'pnpScript',
-		'separatelyGroupedLineItems'
+		'separatelyGroupedLineItems',
+		'isUrlReportingEnabled'
 	],
 	merge: []
 };

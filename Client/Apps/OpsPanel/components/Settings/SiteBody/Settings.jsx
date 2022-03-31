@@ -28,6 +28,7 @@ class Settings extends Component {
 			isAdsLabelOn = false,
 			adsLabel = 'Advertisement',
 			hbAnalytics = false,
+			isUrlReportingEnabled = false,
 			cmpAvailable = false,
 			mergeReport = false,
 			isWeeklyEmailReportsEnabled = false,
@@ -41,6 +42,7 @@ class Settings extends Component {
 			} = {}
 		} = site.apConfigs || {};
 		const { revenueShare = 10 } = site.adNetworkSettings || {};
+		const { utmReporting = false, urlReporting = false } = site;
 		const status = Object.prototype.hasOwnProperty.call(apps, 'apLite') ? apps.apLite : undefined;
 		const isPnPEnabled = Object.prototype.hasOwnProperty.call(apps, 'pnp') ? apps.pnp : false;
 		const selectedAdTypes = this.getSelectedAdTypes(poweredByBanner);
@@ -54,6 +56,7 @@ class Settings extends Component {
 			revenueShare,
 			status,
 			hbAnalytics,
+			urlUtm: isUrlReportingEnabled && utmReporting && urlReporting,
 			cmpEnabled: !cmpAvailable,
 			mergeReport,
 			isWeeklyEmailReportsEnabled,
@@ -80,6 +83,11 @@ class Settings extends Component {
 		const name = attributeValue.split('-')[0];
 
 		this.setState(() => {
+			const { status } = this.state;
+			if (name === 'urlUtm' && value && status) {
+				// eslint-disable-next-line no-alert
+				alert('Kindly reach out to tech-team for creating key-values in publishers GAM.');
+			}
 			if (name === 'isSPA' && value === false) {
 				return {
 					[name]: value,
@@ -213,6 +221,7 @@ class Settings extends Component {
 			adsLabel,
 			revenueShare,
 			hbAnalytics,
+			urlUtm,
 			cmpEnabled,
 			mergeReport,
 			isWeeklyEmailReportsEnabled,
@@ -263,32 +272,40 @@ class Settings extends Component {
 			return showNotification(data);
 		}
 
-		return saveSettings(
-			site.siteId,
-			{
-				apConfigs: {
-					isSPA,
-					spaButUsingHook,
-					spaPageTransitionTimeout: Number(spaPageTransitionTimeout),
-					adpushupPercentage: Number(adpushupPercentage),
-					poweredByBanner,
-					isAdsLabelOn,
-					adsLabel,
-					hbAnalytics,
-					cmpAvailable: !cmpEnabled,
-					mergeReport,
-					isWeeklyEmailReportsEnabled,
-					isDailyEmailReportsEnabled,
-					gaConfigs,
-					enableGAAnalytics
-				},
-
-				adNetworkSettings: {
-					revenueShare: Number(revenueShare)
-				}
+		const saveConfig = {
+			apConfigs: {
+				isSPA,
+				spaButUsingHook,
+				spaPageTransitionTimeout: Number(spaPageTransitionTimeout),
+				adpushupPercentage: Number(adpushupPercentage),
+				poweredByBanner,
+				isAdsLabelOn,
+				adsLabel,
+				hbAnalytics,
+				cmpAvailable: !cmpEnabled,
+				mergeReport,
+				isWeeklyEmailReportsEnabled,
+				isDailyEmailReportsEnabled,
+				gaConfigs,
+				enableGAAnalytics
 			},
-			dataForAuditLogs
-		);
+
+			adNetworkSettings: {
+				revenueShare: Number(revenueShare)
+			}
+		};
+
+		if (urlUtm) {
+			saveConfig.apConfigs.isUrlReportingEnabled = true;
+			saveConfig.urlReporting = true;
+			saveConfig.utmReporting = true;
+		} else if (!urlUtm && site.apConfigs.isUrlReportingEnabled) {
+			saveConfig.apConfigs.isUrlReportingEnabled = false;
+			saveConfig.urlReporting = false;
+			saveConfig.utmReporting = false;
+		}
+
+		return saveSettings(site.siteId, saveConfig, dataForAuditLogs);
 	};
 
 	render() {
@@ -299,6 +316,7 @@ class Settings extends Component {
 			adpushupPercentage,
 			status,
 			hbAnalytics,
+			urlUtm,
 			cmpEnabled,
 			mergeReport,
 			isDailyEmailReportsEnabled,
@@ -433,6 +451,19 @@ class Settings extends Component {
 					defaultLayout
 					name={`hbAnalytics-${siteId}-${siteDomain}`}
 					id={`js-hbAnalytics-switch-${siteId}-${siteDomain}`}
+				/>
+				<CustomToggleSwitch
+					labelText="URL/UTM"
+					className="u-margin-b4 negative-toggle"
+					checked={urlUtm}
+					onChange={this.handleToggle}
+					layout="horizontal"
+					size="m"
+					on="Yes"
+					off="No"
+					defaultLayout
+					name={`urlUtm-${siteId}-${siteDomain}`}
+					id={`js-url-utm-switch-${siteId}-${siteDomain}`}
 				/>
 				{!config.disableDailyWeeklySnapshots && (
 					<CustomToggleSwitch
