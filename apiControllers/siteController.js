@@ -458,13 +458,25 @@ router
 	})
 	.post('/saveSettings', (req, res) => {
 		const { email, originalEmail } = req.user;
-		const { siteId, apConfigs, adNetworkSettings, dataForAuditLogs } = req.body;
+		const {
+			siteId,
+			apConfigs,
+			adNetworkSettings,
+			urlReporting,
+			utmReporting,
+			dataForAuditLogs
+		} = req.body;
 		return verifyOwner(siteId, email)
 			.then(site => {
 				const prevApConfigs = site.get('apConfigs');
 				const prevAdNetworkSettings = site.get('adNetworkSettings');
+				const prevUrlReporting = site.get('urlReporting');
+				const prevUtmReporting = site.get('utmReporting');
 				const siteApConfigs = { ...prevApConfigs, ...apConfigs };
-				const siteAdNetworkSettings = { ...prevAdNetworkSettings, ...adNetworkSettings };
+				const siteAdNetworkSettings = {
+					...prevAdNetworkSettings,
+					...adNetworkSettings
+				};
 
 				// log config changes
 				const { siteDomain, appName, type = 'site', actionInfo = '' } = dataForAuditLogs;
@@ -477,11 +489,15 @@ router
 					userId: originalEmail,
 					prevConfig: {
 						siteApConfigs: prevApConfigs,
-						siteAdNetworkSettings: prevAdNetworkSettings
+						siteAdNetworkSettings: prevAdNetworkSettings,
+						urlReporting: prevUrlReporting,
+						utmReporting: prevUtmReporting
 					},
 					currentConfig: {
 						siteApConfigs,
-						siteAdNetworkSettings
+						siteAdNetworkSettings,
+						urlReporting,
+						utmReporting
 					},
 					action: {
 						name: OPS_PANEL.SITES_SETTING,
@@ -491,6 +507,8 @@ router
 
 				site.set('apConfigs', siteApConfigs);
 				site.set('adNetworkSettings', siteAdNetworkSettings);
+				site.set('urlReporting', urlReporting);
+				site.set('utmReporting', utmReporting);
 				return site.save();
 			})
 			.then(() => sendSuccessResponse({ success: 1 }, res))

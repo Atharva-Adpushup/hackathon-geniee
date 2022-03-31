@@ -48,7 +48,9 @@ var model = require('../helpers/model'),
 			'activeBidderAdaptersListAsc',
 			'coreWebVitalsData',
 			'lineItemTypes',
-			'blockListedLineItems'
+			'blockListedLineItems',
+			'urlReporting',
+			'utmReporting'
 		];
 		this.clientKeys = [
 			'siteId',
@@ -72,7 +74,9 @@ var model = require('../helpers/model'),
 			'activeBidderAdaptersListAsc',
 			'coreWebVitalsData',
 			'lineItemTypes',
-			'blockListedLineItems'
+			'blockListedLineItems',
+			'urlReporting',
+			'utmReporting'
 		];
 		this.validations = {
 			required: []
@@ -497,6 +501,7 @@ function apiModule() {
 						: commonConsts.apConfigDefaults.adpushupPercentage,
 					autoOptimise: settings.autoOptimise === 'false' ? false : true,
 					poweredByBanner: settings.poweredByBanner ? settings.poweredByBanner : {},
+					isUrlReportingEnabled: settings.isUrlReportingEnabled,
 					activeDFPNetwork: settings.activeDFPNetwork ? settings.activeDFPNetwork : '',
 					activeDFPParentId: settings.activeDFPParentId ? settings.activeDFPParentId : '',
 					activeDFPCurrencyCode: settings.activeDFPCurrencyCode || '',
