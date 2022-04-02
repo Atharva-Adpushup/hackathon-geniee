@@ -45,6 +45,7 @@ const generatePnPRefreshConfig = (siteId, adNetworkConfig) => {
 
             const adUnits = pnpConfig.adUnits || [];
             const pnpLineItems = pnpConfig.lineItems || [];
+            const pnpBlacklistedLineItems = pnpConfig.blacklistedLineItems || [];
 
             // remove inactive units
             if (Array.isArray(adUnits)) {
@@ -60,6 +61,10 @@ const generatePnPRefreshConfig = (siteId, adNetworkConfig) => {
                 }, []);
                 allLineItems = [...allLineItems, ...lineItems];
                 pnpConfig.lineItems = allLineItems;
+            }
+
+            if (Array.isArray(pnpBlacklistedLineItems) && pnpBlacklistedLineItems.length) {
+                pnpConfig.blacklistedLineItems = pnpBlacklistedLineItems.map(blacklistedLineItem => blacklistedLineItem.id);
             }
 
             return pnpConfig;
