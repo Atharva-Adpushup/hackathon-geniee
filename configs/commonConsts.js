@@ -1083,17 +1083,16 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 				);
 				return false;
 				}
-				else if(blacklistedLineItems.indexOf(lineItemId) !== -1){
-					log(
-						"For Ad Unit: " +
-						adUnitPath +
-						" LineItem: " +
-						lineItemId +
-						" is in the blacklist, stopping"
-					);
-					return false;
-					}
-				
+			}
+			if(blacklistedLineItems.indexOf(lineItemId) !== -1){
+				log(
+					"For Ad Unit: " +
+					adUnitPath +
+					" LineItem: " +
+					lineItemId +
+					" is in the blacklist, stopping"
+				);
+				return false;
 			}
 			if (window.pnpRefresh.insertedTags.indexOf(slot) !== -1) {
 			  log(
