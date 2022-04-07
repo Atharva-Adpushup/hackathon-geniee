@@ -35,15 +35,14 @@ const getDefaultState = () => ({
 	ruleDescription: ''
 });
 
-const getConvertedBiddersData = bidders => {
-	return Object.keys(bidders).map(bidderCode => {
+const getConvertedBiddersData = bidders =>
+	Object.keys(bidders).map(bidderCode => {
 		const { name } = bidders[bidderCode];
 		return {
 			label: name,
 			value: bidderCode
 		};
 	});
-};
 
 const getTemplate = type => {
 	const template = {
@@ -917,6 +916,7 @@ class BidderRules extends React.Component {
 				<div className="page__header">
 					<div className="page__title">
 						<h3 className="u-margin-t0 u-margin-b4">Advanced Configuration</h3>
+						<div>Note: Please inform tech team to sync all the sites after making changes</div>
 					</div>
 					{activeComponent !== 'list-component' && (
 						<Button className="btn-primary" onClick={this.resetState}>
