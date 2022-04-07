@@ -105,6 +105,9 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 				apConfigs.mcm = user.get('mcm') || {};
 
 				apConfigs.apLiteActive = !!apps.apLite;
+				apConfigs.isRedefineGptOnRefreshEnabled = !!(
+					!apConfigs.apLiteActive && apConfigs.isRedefineGptOnRefreshEnabled
+				);
 
 				if (!apps.apLite) {
 					apConfigs.manualModeActive = !!(apps.apTag && manualAds && manualAds.length);
@@ -188,10 +191,9 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 			const getPrebidAndAdsConfig = () =>
 				(() => {
 					if (apps.apLite) {
-						return Promise.join(
-							generatePrebidConfig(siteId),
-							generateApLiteAdsConfig(siteId)
-						).then(([prebidConfig, apLiteConfig]) => ({ prebidConfig, apLiteConfig }));
+						return Promise.join(generatePrebidConfig(siteId), generateApLiteAdsConfig(siteId)).then(
+							([prebidConfig, apLiteConfig]) => ({ prebidConfig, apLiteConfig })
+						);
 					}
 
 					return getReportData(site)
