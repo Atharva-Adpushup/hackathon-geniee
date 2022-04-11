@@ -73,7 +73,7 @@ const HeaderBidding = model.extend(function() {
 	};
 	this.getBidder = function(bidderKey) {
 		const hbcf = this.get('hbcf');
-		return Promise.resolve({...hbcf[bidderKey]});
+		return Promise.resolve({ ...hbcf[bidderKey] });
 	};
 	this.deleteBidder = function(bidderKey) {
 		const hbcf = this.get('hbcf');
@@ -228,7 +228,7 @@ function apiModule() {
 						} else {
 							notAddedBidders[key].params = {
 								...this.getFormFieldsForFormatWiseParams(notAddedBidders[key])
-							}
+							};
 						}
 					}
 
@@ -451,15 +451,14 @@ function apiModule() {
 				API.getLayoutInventoriesForHB(siteId),
 				API.getApTagInventoriesForHB(siteId)
 			]).then(([layoutInventories, innovativeAdsInventories, apTagInventories]) => {
-					const inventories = {
-						layoutEditor: [...layoutInventories],
-						apTag: [...apTagInventories],
-						innovativeAds: [...innovativeAdsInventories]
-					};
+				const inventories = {
+					layoutEditor: [...layoutInventories],
+					apTag: [...apTagInventories],
+					innovativeAds: [...innovativeAdsInventories]
+				};
 
-					return inventories;
-				}
-			),
+				return inventories;
+			}),
 		getInventoriesForHB: siteId =>
 			Promise.all([
 				API.getLayoutInventoriesForHB(siteId),
@@ -822,6 +821,9 @@ function apiModule() {
 		updateRefreshOnInnovAdInventory: async (siteId, refreshStatus) => {
 			const innovativeAdsInventories = await API.getInnovativeAdInventoriesForHB(siteId);
 
+			if (innovativeAdsInventories === null || !innovativeAdsInventories.length)
+				return Promise.resolve();
+
 			const innovativeAdsInventoryMap = innovativeAdsInventories.reduce(
 				(inventoriesMap, inventory) => ({ ...inventoriesMap, [inventory.adUnitId]: inventory }),
 				{}
@@ -947,15 +949,15 @@ function apiModule() {
 					}
 				}
 
-				if (isModified)
-					await channelModel.updateChannel(channelId, modifiedChannelDoc);
+				if (isModified) await channelModel.updateChannel(channelId, modifiedChannelDoc);
 			}
 		},
 
 		updateRefreshOnApLiteInventory: (siteId, refreshStatus) => {
 			return API.getApliteAds(siteId).then(apltAds => {
 				const ads = apltAds.map(ad => ({ ...ad, refreshSlot: refreshStatus }));
-				return API.replaceApLiteAds(siteId, ads);
+				if (ads.length !== 0) return API.replaceApLiteAds(siteId, ads);
+				return Promise.resolve();
 			});
 		},
 
