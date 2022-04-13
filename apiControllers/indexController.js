@@ -265,7 +265,7 @@ router
 
 						if (userPasswordMatch) {
 							const isSuperUser = user.get('isAdmin') === true;
-							const token = authToken.getAuthToken({ email, isSuperUser });
+							const token = authToken.getAuthToken({ email, isSuperUser, loginTime: Date.now() });
 
 							res
 								.status(httpStatus.OK)
