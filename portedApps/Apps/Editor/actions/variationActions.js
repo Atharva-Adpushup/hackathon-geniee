@@ -10,7 +10,7 @@ import {
 import { getSectionWithAds } from 'selectors/sectionSelectors';
 import { uiActions } from '../consts/commonConsts';
 import { updateLogWritten } from './adActions';
-import { updateSectionName} from '../../../common/helpers';
+import { updateSectionName } from '../../../common/helpers';
 
 const getLastVariationNumber = function(variations) {
 		const names = variations.map(({ name }) => {
@@ -30,7 +30,8 @@ const getLastVariationNumber = function(variations) {
 	addVariation = channelId => (dispatch, getState) => {
 		const variationId = Utils.getRandomNumber(),
 			state = getState(),
-			variationCount = getLastVariationNumber(getChannelVariationsWithAds(state, { channelId })) + 1,
+			variationCount =
+				getLastVariationNumber(getChannelVariationsWithAds(state, { channelId })) + 1,
 			variationName = isNaN(variationCount) ? variationId : variationCount;
 		dispatch({
 			type: variationActions.ADD_VARIATION,
@@ -108,7 +109,9 @@ const getLastVariationNumber = function(variations) {
 			state = getState(),
 			copyFromVariation = getVariationSectionsWithAds(state, { variationId }),
 			sectionIds = [],
-			newName = `Variation ${getLastVariationNumber(getChannelVariationsWithAds(state, { channelId })) + 1}`;
+			newName = `Variation ${getLastVariationNumber(
+				getChannelVariationsWithAds(state, { channelId })
+			) + 1}`;
 
 		// Delete 'isControl' property from copied data as only one variation can be tagged as 'control/baseline'
 		delete copyFromVariation.isControl;
@@ -126,7 +129,14 @@ const getLastVariationNumber = function(variations) {
 					name: updateSectionName(section.name),
 					ads: _.map(section.ads, ad => {
 						const adId = Utils.getRandomNumber();
-						ads.push({ ...ad, adCode: '', networkData: getDefaultNetworkData(ad.network, ad.networkData.isResponsive), id: adId });
+						ads.push({
+							...ad,
+							networkData: getDefaultNetworkData(
+								ad.network,
+								ad.networkData							
+							),
+							id: adId
+						});
 						return adId;
 					})
 				};
@@ -158,8 +168,15 @@ const getLastVariationNumber = function(variations) {
 			});
 		}
 	},
-	setActiveVariation = variationId => ({ type: variationActions.SET_ACTIVE_VARIATION, variationId }),
-	updateVariation = (variationId, payload) => ({ type: variationActions.UPDATE_VARIATION, variationId, payload }),
+	setActiveVariation = variationId => ({
+		type: variationActions.SET_ACTIVE_VARIATION,
+		variationId
+	}),
+	updateVariation = (variationId, payload) => ({
+		type: variationActions.UPDATE_VARIATION,
+		variationId,
+		payload
+	}),
 	disableVariation = (variationId, channelId, payload) => (dispatch, getState) => {
 		const allVariations = getChannelVariations(getState(), { channelId }),
 			disabledVariations = _.compact(
@@ -218,7 +235,9 @@ const getLastVariationNumber = function(variations) {
 				isControl ? 'tag this variation as Baseline?' : 'remove Baseline tag from this variation'
 			}`,
 			notificationMessage = `Successfully ${computedMessage} Baseline Variation`,
-			isCurrentVariationSections = !!(currentVariationObj.sections && currentVariationObj.sections.length);
+			isCurrentVariationSections = !!(
+				currentVariationObj.sections && currentVariationObj.sections.length
+			);
 
 		if (hasControlVariationsReachedLimit) {
 			dispatch({
@@ -302,7 +321,11 @@ const getLastVariationNumber = function(variations) {
 			message: 'After JS has been saved'
 		});
 	},
-	saveKeyValues = (variation, adpKeyValues) => ({ type: variationActions.SAVE_KEY_VALUES, variation, adpKeyValues }),
+	saveKeyValues = (variation, adpKeyValues) => ({
+		type: variationActions.SAVE_KEY_VALUES,
+		variation,
+		adpKeyValues
+	}),
 	savePersonalizationInfo = (variation, personalization) => (dispatch, getState) => {
 		dispatch({ type: variationActions.SAVE_PERSONALIZATION_INFO, variation, personalization });
 		dispatch({

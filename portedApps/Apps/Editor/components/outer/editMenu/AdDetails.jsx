@@ -306,7 +306,7 @@ class AdDetails extends Component {
 			headerBidding =
 				ad.networkData && ad.networkData.hasOwnProperty('headerBidding')
 					? String(ad.networkData.headerBidding)
-					: 'true',
+					: 'false',
 			firstFold =
 				ad.networkData && ad.networkData.hasOwnProperty('firstFold')
 					? String(ad.networkData.firstFold)
