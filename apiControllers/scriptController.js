@@ -9,14 +9,16 @@ const activeBidderAdaptersList = require('../models/activeBidderAdaptersListMode
 const ampActiveBidderAdaptersListModel = require('../models/ampActiveBidderAdaptersListModel');
 const SiteSpecificActiveBidderAdaptersList = require('../models/siteSpecificActiveBidderAdaptersListModel');
 const ampScriptModel = require('../models/ampScriptModel');
-
 const getReportData = require('../reports/universal');
 const generateStatusesAndConfig = require('../services/genieeAdSyncService/cdnSyncService/generateConfig');
+const generateAmpStatusesAndConfig = require('../services/genieeAdSyncService/cdnSyncService/generateAmpConfig');
 const generatePrebidConfig = require('../services/genieeAdSyncService/cdnSyncService/generatePrebidConfig');
 const generateApLiteAdsConfig = require('../services/genieeAdSyncService/cdnSyncService/generateApLiteConfig');
 const generateAdNetworkConfig = require('../services/genieeAdSyncService/cdnSyncService/generateAdNetworkConfig');
 const generateAdPushupAdsConfig = require('../services/genieeAdSyncService/cdnSyncService/generateAdPushupConfig');
+const generateAmpAdPushupConfig = require('../services/genieeAdSyncService/cdnSyncService/generateAmpAdPushupConfig');
 const generatePnPRefreshConfig = require('../services/genieeAdSyncService/cdnSyncService/generatePnPRefreshConfig');
+const generateAmpPnPRefreshConfig = require('../services/genieeAdSyncService/cdnSyncService/generateAmpPnPRefreshConfig');
 const AdPushupError = require('../helpers/AdPushupError');
 const httpStatusConsts = require('../configs/httpStatusConsts');
 const {
@@ -26,6 +28,8 @@ const {
 	isValidThirdPartyDFPAndCurrency,
 	removeFormatWiseParamsForAMP
 } = require('../helpers/commonFunctions');
+const utils = require('../helpers/utils');
+const CC = require('../configs/commonConsts');
 
 const Router = express.Router();
 
@@ -43,6 +47,232 @@ const defaultApConfigValues = {
 	isBbPlayerLoggingEnabled: false,
 	isVacantAdSpaceEnabled: false
 };
+
+Router.get('/:siteId/ampDeliveryViaCreativeConfig', (req, res) => {
+	/**
+	 * this route will be used by AmpDeliveryViaCreative repo
+	 * we need to handle 2 cases for AMP here
+	 * 		1. simple AMP delivery via creative setup
+	 * 		2. AMP delivery via creative aplite + pnp setup
+	 * for aplite setup, we don't actually run aplite module but render the aptags with adunits having config for publisher's GAM - dfpAdunit and dfpAdunitCode
+	 * so, we essentially are running aptags with a set of ads other than tgmr ads
+	 * also, some new files are created specially for amp to keep the web and amp versions different
+	 */
+	SiteModel.getSiteById(req.params.siteId)
+		.then(site => Promise.join(site, UserModel.getUserByEmail(site.get('ownerEmail'))))
+		.then(([site, user]) => {
+			const siteId = site.get('siteId');
+			const apps = site.get('apps');
+			apps.pnp = false;
+			apps.aplite = false;
+
+			const isAmpPnpEnabled = !!apps.ampPnp;
+			const isAutoOptimise = !!(site.get('apConfigs') && site.get('apConfigs').autoOptimise);
+			const poweredByBanner = site.get('apConfigs') && site.get('apConfigs').poweredByBanner;
+			const revenueShare =
+				site.get('adNetworkSettings') && site.get('adNetworkSettings').revenueShare;
+			const shouldDeductApShareFromHb =
+				site.get('apConfigs') && site.get('apConfigs').shouldDeductApShareFromHb && !!revenueShare;
+			const gptSraDisabled = !!(site.get('apConfigs') && site.get('apConfigs').gptSraDisabled);
+			const lineItemTypes = site.get('lineItemTypes') || [];
+
+			const setAllConfigs = function(prebidAndAdsConfig) {
+				const apConfigs = {
+					...defaultApConfigValues,
+					...site.get('apConfigs')
+				};
+				const adServerSettings = user.get('adServerSettings');
+				const isAdPartner = !!site.get('partner');
+
+				const {
+					experiment,
+					prebidConfig,
+					apLiteConfig,
+					pnpConfig,
+					adNetworkConfig,
+					manualAds,
+					innovativeAds
+				} = prebidAndAdsConfig;
+
+				if (isAdPartner) {
+					apConfigs.partner = site.get('partner');
+				}
+
+				apConfigs.lineItems = (adNetworkConfig && adNetworkConfig.lineItems) || [];
+				apConfigs.separatelyGroupedLineItems =
+					(adNetworkConfig && adNetworkConfig.separatelyGroupedLineItems) || [];
+				apConfigs.autoOptimise = !!isAutoOptimise;
+				apConfigs.poweredByBanner = poweredByBanner;
+				if (shouldDeductApShareFromHb) {
+					apConfigs.revenueShare = revenueShare;
+				}
+				apConfigs.gptSraDisabled = !!gptSraDisabled;
+				apConfigs.siteDomain = site.get('siteDomain');
+				apConfigs.ownerEmailMD5 = user.get('sellerId');
+				apConfigs.isSPA = apConfigs.isSPA ? apConfigs.isSPA : false;
+				apConfigs.spaButUsingHook = apConfigs.spaButUsingHook ? apConfigs.spaButUsingHook : false;
+				apConfigs.spaPageTransitionTimeout = apConfigs.spaPageTransitionTimeout
+					? apConfigs.spaPageTransitionTimeout
+					: 0;
+				apConfigs.activeDFPNetwork =
+					(adServerSettings && adServerSettings.dfp && adServerSettings.dfp.activeDFPNetwork) ||
+					null;
+
+				// GAM 360 config
+				apConfigs.mcm = user.get('mcm') || {};
+
+				apConfigs.apLiteActive = !!apps.apLite;
+				apConfigs.ampPnpActive = !!apps.ampPnp;
+				apConfigs.ampApliteActive = !!apps.ampAplite;
+				apConfigs.isRedefineGptOnRefreshEnabled = !!(
+					!apConfigs.apLiteActive && apConfigs.isRedefineGptOnRefreshEnabled
+				);
+
+				if (!apps.apLite) {
+					apConfigs.manualModeActive = !!(apps.apTag && manualAds && manualAds.length);
+					apConfigs.innovativeModeActive = !!(
+						apps.innovativeAds &&
+						innovativeAds &&
+						innovativeAds.length
+					);
+
+					// Default 'draft' mode is selected if config mode is not present
+					apConfigs.mode = apps.layout && apConfigs.mode ? apConfigs.mode : 2;
+
+					if (apConfigs.manualModeActive) {
+						apConfigs.manualAds = manualAds || [];
+					}
+
+					if (apConfigs.innovativeModeActive) {
+						apConfigs.innovativeAds = innovativeAds || [];
+					}
+
+					apConfigs.experiment = experiment;
+				}
+
+				delete apConfigs.pageGroupPattern;
+
+				if (isAmpPnpEnabled) {
+					const pnpCodeHex = utils.btoa(CC.AMP_PNP_REFRESH_SCRIPTS);
+					apConfigs.pnpScript = pnpCodeHex;
+				}
+
+				const output = { apConfigs, prebidConfig };
+				if (apps.apLite) output.apLiteConfig = apLiteConfig;
+				if (isAmpPnpEnabled) output.pnpConfig = pnpConfig;
+
+				return output;
+			};
+			const combinePrebidAndAdsConfig = (experiment, adpTags, manualAds, innovativeAds) => {
+				if (!(Array.isArray(adpTags) && adpTags.length)) {
+					return {
+						experiment,
+						prebidConfig: false,
+						manualAds,
+						innovativeAds
+					};
+				}
+				return generatePrebidConfig(siteId).then(prebidConfig => ({
+					prebidConfig,
+					experiment,
+					manualAds,
+					innovativeAds
+				}));
+			};
+			const setAdNetworkConfig = function(prebidAndAdsConfig) {
+				const adServerSettings = user.get('adServerSettings');
+				const blockListedLineItems = site.get('blockListedLineItems');
+				const activeDFPNetwork =
+					(adServerSettings && adServerSettings.dfp && adServerSettings.dfp.activeDFPNetwork) ||
+					null;
+
+				if (activeDFPNetwork) {
+					return generateAdNetworkConfig(
+						activeDFPNetwork,
+						lineItemTypes,
+						blockListedLineItems
+					).then(adNetworkConfig => ({
+						...prebidAndAdsConfig,
+						adNetworkConfig
+					}));
+				}
+
+				return Promise.resolve(prebidAndAdsConfig);
+			};
+			const setPnPConfig = function(combinedConfig) {
+				if (isAmpPnpEnabled) {
+					return generateAmpPnPRefreshConfig(siteId, combinedConfig.adNetworkConfig).then(
+						pnpConfig => ({
+							...combinedConfig,
+							pnpConfig
+						})
+					);
+				}
+
+				return Promise.resolve(combinedConfig);
+			};
+			const getPrebidAndAdsConfig = () =>
+				(() => {
+					if (apps.apLite) {
+						return Promise.join(generatePrebidConfig(siteId), generateApLiteAdsConfig(siteId)).then(
+							([prebidConfig, apLiteConfig]) => ({ prebidConfig, apLiteConfig })
+						);
+					}
+
+					return getReportData(site)
+						.then(reportData => {
+							if (reportData.status && reportData.data) {
+								return generateAmpAdPushupConfig(site, reportData.data);
+							}
+							return generateAmpAdPushupConfig(site);
+						})
+						.spread(combinePrebidAndAdsConfig);
+				})()
+					.then(setAdNetworkConfig)
+					.then(setPnPConfig)
+					.then(setAllConfigs);
+
+			const generatedConfig = getPrebidAndAdsConfig().then(prebidAndAdsConfig => {
+				// Remove ampConfig from adpushup.js
+				const { prebidConfig } = prebidAndAdsConfig;
+				if (prebidConfig && prebidConfig.hbcf) {
+					const { hbcf } = prebidConfig;
+					Object.keys(hbcf).forEach(bidder => {
+						if (hbcf[bidder].ampConfig) {
+							delete hbcf[bidder].ampConfig;
+						}
+					});
+				}
+				return generateAmpStatusesAndConfig(site, prebidAndAdsConfig);
+			});
+
+			return Promise.join(generatedConfig, {
+				siteId: site.get('siteId'),
+				medianetId: site.get('medianetId')
+			});
+		})
+		.then(([scriptConfig, siteData]) =>
+			res.send({ error: null, data: { config: scriptConfig, siteData } })
+		)
+		.catch(e => {
+			if (typeof e.message === 'string') {
+				return res.send({ error: e.message });
+			}
+
+			/**
+			 * error thrown from services/genieeAdSyncService/cdnSyncService/generateAdPushupConfig.js ends up in a really weird state
+			 * adding checks for the same
+			 */
+			if (typeof e[0] === 'object') {
+				const errObject = e[0];
+				if (errObject.message && errObject.message.message) {
+					return res.send({ error: errObject.message.message });
+				}
+			}
+
+			return res.send({ error: `Unknown message occured: ${e}` });
+		});
+});
 
 Router.get('/:siteId/siteConfig', (req, res) => {
 	SiteModel.getSiteById(req.params.siteId)
