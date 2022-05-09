@@ -1323,7 +1323,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 					window.adpTags = undefined;
 					(function(w, d) {
 					  var s = d.createElement('script');
-					  s.src = '//cdn.adpushup.com/' + PROXY_SITE_ID + '/amp-delivery-via-creative.js';
+					  s.src = '//cdn.adpushup.com/' + PROXY_SITE_ID + '/ap-amp.js';
 					  s.type = 'text/javascript';
 					  s.async = true;
 					  (d.getElementsByTagName('head')[0] || d.getElementsByTagName('body')[0]).appendChild(
