@@ -374,7 +374,11 @@ module.exports = {
 	},
 	mailerQueueUrl: 'https://queuepublisher.adpushup.com/publish',
 	adsTxtSupportEmail: ['testemail@adpushup.com'],
-	frequentReportsCachingLimit: 5
+	frequentReportsCachingLimit: 5,
+	poweredByAdpushupBannerService:{
+		enableOnSites: [],
+		supportMail: 'hrishikesh.jangir@adpushup.com'
+	}
 };
 
 /*
