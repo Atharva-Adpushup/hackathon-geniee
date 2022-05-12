@@ -759,6 +759,139 @@ router
 					.json({ error: 'Something went wrong' });
 			});
 	})
+	.post('/:siteId/rulesData', (req, res) => {
+		const { siteId } = req.params;
+		const { email, originalEmail, isSuperUser } = req.user;
+
+		if (!isSuperUser) {
+			return sendErrorResponse(
+				{
+					message: 'Unauthorized Request'
+				},
+				res,
+				HTTP_STATUS.UNAUTHORIZED
+			);
+		}
+
+		const { hbRuleData, dataForAuditLogs } = req.body;
+		const { rule } = hbRuleData;
+
+		const newRule = { ...rule, createdAt: new Date().getTime() };
+
+		return FormValidator.validate(rule, schema.hbRules.rule)
+			.then(() => appBucket.getDoc(`site::${siteId}`))
+			.then(doc => {
+				const { value, cas } = doc;
+				const { apConfigs = {} } = value;
+				const { rules: prevRules = [] } = apConfigs;
+
+				apConfigs.rules = [...prevRules, newRule] || [];
+				const newRules = apConfigs.rules || [];
+
+				// log config changes
+				const { siteDomain, appName } = dataForAuditLogs;
+				sendDataToAuditLogService({
+					siteId: '',
+					siteDomain,
+					appName,
+					type: 'Site',
+					impersonateId: email,
+					userId: originalEmail,
+					prevConfig: prevRules,
+					currentConfig: newRules,
+					action: {
+						name: OPS_PANEL.SITES_SETTING,
+						data: `Site Rules Engine Save`
+					}
+				});
+				value.apConfigs = apConfigs;
+				return appBucket.updateDoc(`site::${siteId}`, value, cas) && value;
+			})
+			.then(data => {
+				const { apConfigs: { rules = [] } = {} } = data;
+				return res.status(HTTP_STATUS.OK).json(rules);
+			})
+			.catch(err => {
+				if (err instanceof AdPushupError) {
+					return res.status(HTTP_STATUS.BAD_REQUEST).json({ error: err.message });
+				}
+
+				return res
+					.status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
+					.json({ error: 'Internal Server Error!' });
+			});
+	})
+
+	.put('/:siteId/rulesData', (req, res) => {
+		const { siteId } = req.params;
+		const { email, originalEmail, isSuperUser } = req.user;
+
+		if (!isSuperUser) {
+			return sendErrorResponse(
+				{
+					message: 'Unauthorized Request'
+				},
+				res,
+				HTTP_STATUS.UNAUTHORIZED
+			);
+		}
+
+		const { hbRuleData, dataForAuditLogs } = req.body;
+		const { rule, ruleIndex } = hbRuleData;
+
+		return FormValidator.validate(rule, schema.hbRules.rule)
+			.then(() => {
+				const parsedRuleIndex = parseInt(ruleIndex, 10);
+				if (Number.isNaN(parsedRuleIndex)) {
+					throw new AdPushupError('Invalid data given to edit rule');
+				}
+			})
+			.then(() => appBucket.getDoc(`site::${siteId}`))
+			.then(doc => {
+				const { value, cas } = doc;
+				const { apConfigs = {} } = value;
+				const { rules: prevRules = [] } = apConfigs;
+				if (prevRules.length <= ruleIndex) {
+					throw new AdPushupError('Invalid data given to edit rule');
+				}
+
+				apConfigs.rules[ruleIndex] = { ...prevRules[ruleIndex], ...rule };
+				const newRules = apConfigs.rules || [];
+
+				// log config changes
+				const { siteDomain, appName } = dataForAuditLogs;
+				sendDataToAuditLogService({
+					siteId: '',
+					siteDomain,
+					appName,
+					type: 'Site',
+					impersonateId: email,
+					userId: originalEmail,
+					prevConfig: prevRules,
+					currentConfig: newRules,
+					action: {
+						name: OPS_PANEL.SITES_SETTING,
+						data: `Site Rules Engine Update`
+					}
+				});
+				value.apConfigs = apConfigs;
+				return appBucket.updateDoc(`site::${siteId}`, value, cas) && value;
+			})
+			.then(data => {
+				const { apConfigs: { rules = [] } = {} } = data;
+				return res.status(HTTP_STATUS.OK).json(rules);
+			})
+			.catch(err => {
+				if (err instanceof AdPushupError) {
+					return res.status(HTTP_STATUS.BAD_REQUEST).json({ error: err.message });
+				}
+
+				return res
+					.status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
+					.json({ error: 'Internal Server Error!' });
+			});
+	})
+
 	.post('/:siteId/sizeMapping', (req, res) => {
 		const { data, dataForAuditLogs } = req.body;
 		const { email, originalEmail } = req.user;
