@@ -18,5 +18,15 @@ export default {
 			dataForAuditLogs,
 			siteId,
 			blockListedLineItems
+		}),
+	setRuleEngineData: (siteId, hbRuleData, dataForAuditLogs) =>
+		axiosInstance.post(`/site/${siteId}/rulesData`, {
+			hbRuleData,
+			dataForAuditLogs
+		}),
+	updateRulesEngineData: (siteId, hbRuleData, dataForAuditLogs) =>
+		axiosInstance.put(`/site/${siteId}/rulesData`, {
+			hbRuleData,
+			dataForAuditLogs
 		})
 };
