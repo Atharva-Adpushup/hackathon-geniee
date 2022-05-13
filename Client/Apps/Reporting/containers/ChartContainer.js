@@ -1,16 +1,12 @@
 import { connect } from 'react-redux';
 import Chart from '../components/Chart';
-import { checkReportTypeGlobal } from '../../../helpers/commonFunctions';
+import { getReportsMeta } from '../../../helpers/commonFunctions';
 
 const mapStateToProps = (state, ownProps) => {
-	const isReportTypeGlobal = checkReportTypeGlobal(ownProps);
-	const { isForOps, isHB } = ownProps;
+	const { isHB } = ownProps;
 	if (!isHB) {
-		const {
-			reports: { account: accountReportMetaData, global: globalReportMetaData }
-		} = state.global;
-		const reportsMeta =
-			isForOps || isReportTypeGlobal ? { ...globalReportMetaData } : { ...accountReportMetaData };
+		const reportsMeta = getReportsMeta(state, ownProps);
+
 		const {
 			data: { filter, metrics, dimension, site }
 		} = reportsMeta;
@@ -24,7 +20,7 @@ const mapStateToProps = (state, ownProps) => {
 		};
 	}
 	const {
-		hbanalytics: { account: accountReportMetaData, global: globalHBAnalyticsMetaData }
+		hbanalytics: { global: globalHBAnalyticsMetaData }
 	} = state.global;
 	const hbAnalyticsMeta = globalHBAnalyticsMetaData;
 

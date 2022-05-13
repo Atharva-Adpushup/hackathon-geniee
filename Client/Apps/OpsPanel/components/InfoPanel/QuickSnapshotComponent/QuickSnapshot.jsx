@@ -84,9 +84,16 @@ class QuickSnapshot extends React.Component {
 	};
 
 	getComputedMetaData = () => {
-		const { globalReportMetaData } = this.props;
-		const params = { sites: '', isSuperUser: true };
-		const inputReportMetaData = globalReportMetaData;
+		const { globalReportMetaData, accountForSuperUserReportMetaData, sites } = this.props;
+		const { reportType } = this.state;
+		const params = {
+			sites: reportType === 'account' ? Object.keys(sites).join(',') : '',
+			isSuperUser: true
+		};
+
+		const inputReportMetaData =
+			reportType === 'account' ? accountForSuperUserReportMetaData : globalReportMetaData;
+
 		const isValidReportMetaData = !!(
 			inputReportMetaData &&
 			inputReportMetaData.fetched &&
@@ -373,14 +380,20 @@ class QuickSnapshot extends React.Component {
 			},
 			isForOps
 		} = this.props;
-		const reportType = 'global';
+		const { reportType } = this.state;
 		let computedWidgetData;
 
 		if (widget.isLoading) return <Loader height="20vh" />;
 
 		switch (widget.name) {
 			case ESTIMATED_EARNINGS:
-				return <EstimatedEarningsContainer reportType={reportType} displayData={widget.data} />;
+				return (
+					<EstimatedEarningsContainer
+						reportType={reportType}
+						displayData={widget.data}
+						isForOps={isForOps}
+					/>
+				);
 
 			case PER_AP_ORIGINAL:
 				return (
@@ -388,6 +401,7 @@ class QuickSnapshot extends React.Component {
 						reportType={reportType}
 						displayData={widget.data}
 						isDataSufficient={widget.isDataSufficient}
+						isForOps={isForOps}
 					/>
 				);
 
@@ -399,7 +413,6 @@ class QuickSnapshot extends React.Component {
 						isForOps={isForOps}
 					/>
 				);
-
 			case OPS_TOP_SITES:
 				computedWidgetData = this.getTopSitesWidgetTransformedData(widget.data);
 				return (
@@ -407,15 +420,20 @@ class QuickSnapshot extends React.Component {
 						reportType={reportType}
 						disableSiteLevelCheck
 						displayData={computedWidgetData}
+						isForOps={isForOps}
 					/>
 				);
 
 			case OPS_COUNTRY_REPORT:
 			case OPS_NETWORK_REPORT:
-				return <RevenueContainer reportType={reportType} displayData={widget} />;
+				return (
+					<RevenueContainer reportType={reportType} displayData={widget} isForOps={isForOps} />
+				);
 
 			case OPS_ERROR_REPORT:
-				return <ModeReportContainer reportType={reportType} displayData={widget} />;
+				return (
+					<ModeReportContainer reportType={reportType} displayData={widget} isForOps={isForOps} />
+				);
 
 			default:
 		}
@@ -597,9 +615,15 @@ class QuickSnapshot extends React.Component {
 	setComputedState = (state, callback) => this.setState(state, callback || (() => {}));
 
 	setReportingMetaData = metaData => {
-		const { updateGlobalReportMetaData } = this.props;
+		const { updateGlobalReportMetaData, updateSuperUserAccountReportMetaData } = this.props;
 
-		updateGlobalReportMetaData(metaData);
+		const { reportType } = this.state;
+
+		if (reportType === 'account') {
+			updateSuperUserAccountReportMetaData(metaData);
+		} else {
+			updateGlobalReportMetaData(metaData);
+		}
 	};
 
 	setReportingMetaDataState = metaData => {

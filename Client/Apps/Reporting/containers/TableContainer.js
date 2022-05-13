@@ -1,19 +1,13 @@
 import { connect } from 'react-redux';
 import Table from '../components/Table';
-import { checkDefaultReportTypeGlobal } from '../../../helpers/commonFunctions';
+import { getReportsMeta } from '../../../helpers/commonFunctions';
 
 const mapStateToProps = (state, ownProps) => {
-	const isReportTypeGlobal = checkDefaultReportTypeGlobal(ownProps);
-	const { isForOps } = ownProps;
-	const {
-		reports: { account: accountReportMetaData, global: globalReportMetaData }
-	} = state.global;
-	const reportsMeta =
-		isForOps || isReportTypeGlobal ? { ...globalReportMetaData } : { ...accountReportMetaData };
+	const reportsMeta = getReportsMeta(state, ownProps);
+
 	const {
 		data: { metrics, dimension, site }
 	} = reportsMeta;
-
 	return {
 		metrics,
 		dimension,
