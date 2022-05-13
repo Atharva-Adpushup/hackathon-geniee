@@ -117,8 +117,9 @@ const vistorDataMetrics = {
 	ga_users: { name: 'Users', valueType: 'number' },
 	ga_page_views: { name: 'AP Page Views', valueType: 'number' },
 	ga_sessions: { name: 'Sessions', valueType: 'number' },
-	ga_pv_per_session: { name: 'PVs/Session', valueType: 'number' },
-	ga_session_rpm: { name: 'Session RPM', valueType: 'money' }
+	ga_pv_per_session: { name: 'PVs/Session', valueType: 'money' },
+	ga_session_rpm: { name: 'Session RPM', valueType: 'number' },
+	country: { name: 'Country', valueType: 'string' }
 };
 
 const displayUniqueMetrics = {
@@ -146,7 +147,8 @@ const dashboardWidgets = [
 	'rev_by_device_type',
 	'site_ga_stats',
 	'ga_traffic_breakdown_by_country',
-	'ga_traffic_breakdown_by_channel'
+	'ga_traffic_breakdown_by_channel',
+	'site_ga_session_stats'
 ];
 
 const toggleableWidgets = [
@@ -203,6 +205,21 @@ const DEVICE_OPTIONS = [
 	{ name: 'Desktop', value: 'desktop' }
 ];
 
+const GA_REPORT_FILTER_LIST = [
+	{ name: 'Country', value: 'country', isDisabled: false, key: 'country' },
+	{ name: 'Device', value: 'device_type', isDisabled: false, key: 'device_type' },
+	{ name: 'Site', value: 'siteid', isDisabled: false, key: 'siteid' }
+];
+
+const API = {
+	COUNTRY_API: `/reports/getWidgetData?path=/site/list?list_name=GET_ALL_COUNTRIES`,
+	DEVICE_API: `/reports/getWidgetData?path=/site/list?list_name=GET_ALL_DEVICES`
+};
+
+const GA_REPORTS = 'site_ga_session_stats';
+
+const DIMENSIONS_SUPPORTED = { Site: 'siteid', Device: 'device_type', Country: 'country' };
+
 export {
 	DASHBOARD_NAV_ITEMS_INDEXES,
 	DASHBOARD_NAV_ITEMS_VALUES,
@@ -225,5 +242,9 @@ export {
 	peerPerformanceDisplayMetrics,
 	ADS_TXT_HEADERS,
 	DEVICE_OPTIONS,
-	PAYMENT_HISTORY_HEADERS
+	PAYMENT_HISTORY_HEADERS,
+	GA_REPORT_FILTER_LIST,
+	API,
+	GA_REPORTS,
+	DIMENSIONS_SUPPORTED
 };

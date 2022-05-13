@@ -213,7 +213,7 @@ const reportsService = {
 				// data is array of objects e.g.. [{mappedPnpSiteId: 41355}, {mappedPnpSiteId:41395}]
 				if (data && Array.isArray(data) && data.length) {
 					const pnpSiteIds = data.reduce((result, { pnpSiteId }) => `${pnpSiteId},${result}`, '');
-					const newSiteIds =  `${pnpSiteIds}${siteIds.join(',')}`;
+					const newSiteIds = `${pnpSiteIds}${siteIds.join(',')}`;
 					query.siteid = newSiteIds;
 				}
 				return query;
@@ -284,13 +284,13 @@ const reportsService = {
 			.then(config => reportsService.fetchReportAPCustomStatXPath(config)),
 	getWidgetData: async (path, params) =>
 		ObjectValidator(getWidgetDataValidations, { path, params })
-			.then(() =>
-				request({
+			.then(() => {
+				return request({
 					uri: `${CC.ANALYTICS_API_ROOT}${path}`,
 					json: true,
 					qs: params
 				})
-			)
+			})
 			.then(response => {
 				if (response && response.code !== 1) throw new AdPushupError(response);
 				return response.data;
@@ -299,7 +299,7 @@ const reportsService = {
 		const { siteid } = reportConfig;
 		//bypass if site has blocked prefetch
 		if (siteid)
-			config.prefetchBlockedSites.forEach(blockedSitePreFetch => {
+			config.prefetchBlockedSites && config.prefetchBlockedSites.forEach(blockedSitePreFetch => {
 				if (siteid.indexOf(blockedSitePreFetch) !== -1) bypassCache = true;
 			});
 		const sortedConfig = sortObjectEntries(reportConfig);
@@ -331,7 +331,7 @@ const reportsService = {
 		const { siteid } = params;
 		//bypass if site has blocked prefetch
 		if (siteid)
-			config.prefetchBlockedSites.forEach(blockedSitePreFetch => {
+			config.prefetchBlockedSites && config.prefetchBlockedSites.forEach(blockedSitePreFetch => {
 				if (siteid.indexOf(blockedSitePreFetch) !== -1) bypassCache = true;
 			});
 		return cacheWrapper(

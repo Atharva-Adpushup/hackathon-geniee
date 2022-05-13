@@ -147,24 +147,32 @@ class AsyncGroupSelect extends Component {
 	}
 
 	renderFilters = () => {
-		const { filterValues, selectedFilters, selectedFilterKey } = this.state;
-		const filters = [];
+		try {
+			const { filterValues, selectedFilters, selectedFilterKey } = this.state;
+			const filters = [];
 
-		filterValues.map(filterValue =>
-			filters.push(
-				<Checkbox
-					className="col-sm-12"
-					key={filterValue.id}
-					onChange={e => {
-						this.handleFilterValueSelect(e.target.checked, filterValue.id);
-					}}
-					checked={!!selectedFilters[selectedFilterKey][filterValue.id]}
-				>
-					{filterValue.value}
-				</Checkbox>
-			)
-		);
-		return filters;
+			filterValues.map(filterValue =>
+				filters.push(
+					<Checkbox
+						className="col-sm-12"
+						key={filterValue.id}
+						onChange={e => {
+							this.handleFilterValueSelect(e.target.checked, filterValue.id);
+						}}
+						checked={
+							!!selectedFilters[selectedFilterKey] &&
+							!!selectedFilters[selectedFilterKey][filterValue.id]
+						}
+					>
+						{filterValue.value}
+					</Checkbox>
+				)
+			);
+			return filters;
+		} catch (error) {
+			// eslint-disable-next-line no-console
+			console.log(error);
+		}
 	};
 
 	selectAll = () => {

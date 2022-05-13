@@ -3,7 +3,7 @@ import sortBy from 'lodash/sortBy';
 import moment from 'moment';
 import isEmpty from 'lodash/isEmpty';
 import { Link } from 'react-router-dom';
-import { Button } from '@/Client/helpers/react-bootstrap-imports';
+import { Button, Glyphicon } from '@/Client/helpers/react-bootstrap-imports';
 import 'react-dates/initialize';
 import { DateRangePicker } from 'react-dates';
 import 'react-dates/lib/css/_datepicker.css';
@@ -23,11 +23,22 @@ import AdsTxtStatusContainer from '../containers/AdsTxtStatusContainer';
 import CoreWebVitalsContainer from '../containers/CoreWebVitalsContainer';
 import VisitorDataContainer from '../containers/VisitorDataContainer';
 import PaymentHistoryContainer from '../containers/PaymentHistoryContainer';
+import GaStatsContainer from '../containers/GaStatsContainer';
+import AsyncGroupSelect from '../../../Components/AsyncGroupSelect';
+import axiosInstance from '../../../helpers/axiosInstance';
+import {
+	API,
+	GA_REPORT_FILTER_LIST,
+	dates,
+	toggleableWidgets,
+	DEVICE_OPTIONS,
+	GA_REPORTS,
+	DIMENSIONS_SUPPORTED
+} from '../configs/commonConsts';
 
 import proxyService from '../../../services/proxyService';
 
 import Loader from '../../../Components/Loader/index';
-import { dates, toggleableWidgets, DEVICE_OPTIONS } from '../configs/commonConsts';
 import {
 	getDashboardDemoUserSiteIds,
 	checkDemoUserEmail,
@@ -61,7 +72,12 @@ class Dashboard extends React.Component {
 			loadCounter: 0,
 			coreWebVitalsdata: {},
 			selectedDevice: 'mobile',
-			errMessage: ''
+			errMessage: '',
+			countries: [],
+			device_types: [],
+			listOfGaReportDimensions: [],
+			selectedGaReportDimension: null,
+			dirty: false
 		};
 	}
 
@@ -79,7 +95,9 @@ class Dashboard extends React.Component {
 			peerPerformanceAnalysis
 		} = this.props;
 		let userSites = Object.keys(sites).toString();
-
+		this.getGaReportDimensions();
+		this.fetchDeviceList();
+		this.fetchCountryList();
 		userSites = getDashboardDemoUserSiteIds(userSites, email);
 
 		// show payment profile incomplete notification
@@ -156,6 +174,7 @@ class Dashboard extends React.Component {
 	getTopPerformingSites = (allUserSites, reportingSites) => {
 		let topPerformingSite;
 
+		// eslint-disable-next-line consistent-return
 		allUserSites.forEach(site => {
 			const siteId = site.value;
 
@@ -168,27 +187,52 @@ class Dashboard extends React.Component {
 		return topPerformingSite;
 	};
 
+	shouldShowPrimisWidget = widgetsList => {
+		const PRIMIS_REPORT = 'primis_report';
+		const VIDEO_ADS_DASHBOARD = 'videoAdsDashboard';
+		const {
+			user: {
+				data: { sites }
+			}
+		} = this.props;
+		let showWidget = false;
+		Object.keys(sites).map(site => {
+			const { product = {} } = sites[site];
+			showWidget = showWidget || !!product[VIDEO_ADS_DASHBOARD];
+			return site;
+		});
+
+		if (!showWidget) {
+			const index = widgetsList.indexOf(PRIMIS_REPORT);
+			if (index !== -1) widgetsList.splice(index, 1, 0);
+		}
+	};
+
+	shouldShowGaSessionDashboard = widgetsList => {
+		const {
+			user: {
+				data: { activeProducts }
+			}
+		} = this.props;
+		const showWidget = !!activeProducts[GA_REPORTS];
+
+		if (!showWidget) {
+			const index = widgetsList.indexOf('site_ga_session_stats');
+			if (index !== -1) widgetsList.splice(index, 1, 0);
+		}
+	};
+
 	getWidgetConfig = (widgets, selectedSite, reportType, widgetsList) => {
 		const sortedWidgets = sortBy(widgets, ['position', 'name']);
 		const widgetsConfig = [];
-
 		const {
 			user: {
 				data: { sites }
 			}
 		} = this.props;
 
-		let showVideoAdsDashboardWidget = false;
-		Object.keys(sites).map(site => {
-			const { product = {} } = sites[site];
-			showVideoAdsDashboardWidget = showVideoAdsDashboardWidget || !!product.videoAdsDashboard;
-			return site;
-		});
-
-		if (!showVideoAdsDashboardWidget) {
-			const index = widgetsList.indexOf('primis_report');
-			if (index !== -1) widgetsList.splice(index, 1, 0);
-		}
+		this.shouldShowPrimisWidget(widgetsList);
+		this.shouldShowGaSessionDashboard(widgetsList);
 
 		Object.keys(sortedWidgets).forEach(wid => {
 			const widget = { ...sortedWidgets[wid] };
@@ -261,6 +305,11 @@ class Dashboard extends React.Component {
 					widget.chartSeriesMetricType = 'money';
 				}
 
+				if (widget.name === GA_REPORTS) {
+					widget.params = widget.params || {};
+					widget.params.report_name = 'site_ga_stats';
+				}
+
 				widgetsConfig.push(widget);
 			}
 		});
@@ -294,7 +343,7 @@ class Dashboard extends React.Component {
 
 	getWidgetComponent = widget => {
 		const { reportType } = this.props;
-		const { isUniqueImpEnabled } = this.state;
+		const { isUniqueImpEnabled, selectedGaReportDimension, dirty } = this.state;
 		if (widget.isLoading) return <Loader height="20vh" />;
 
 		switch (widget.name) {
@@ -376,7 +425,14 @@ class Dashboard extends React.Component {
 
 			case 'ga_traffic_breakdown_by_channel':
 				return <RevenueContainer displayData={widget} />;
-
+			case GA_REPORTS:
+				return (
+					<GaStatsContainer
+						displayData={widget.data}
+						dirty={dirty || false}
+						selectedDimension={selectedGaReportDimension}
+					/>
+				);
 			default:
 		}
 	};
@@ -474,8 +530,11 @@ class Dashboard extends React.Component {
 				widgetsConfig[wid].data = res;
 				widgetsConfig[wid].isLoading = false;
 				widgetsConfig[wid].isDataSufficient = true;
-
-				this.setState({ widgetsConfig });
+				if (widgetsConfig.name === GA_REPORTS) {
+					this.setState({ widgetsConfig, dirty: false });
+				} else {
+					this.setState({ widgetsConfig });
+				}
 			})
 			.catch(err => {
 				// eslint-disable-next-line no-console
@@ -519,7 +578,7 @@ class Dashboard extends React.Component {
 			.then(res => {
 				const { data: { data = {} } = {} } = res;
 
-				if (res.status == 200 && !isEmpty(data)) {
+				if (res.status === 200 && !isEmpty(data)) {
 					widgetsConfig[wid].data = data;
 					widgetsConfig[wid].isDataSufficient = true;
 				} else {
@@ -609,6 +668,11 @@ class Dashboard extends React.Component {
 			params = { ...params, siteid: performanceSubscribedExcludingBlocked.join(',') };
 		}
 
+		if (name === GA_REPORTS && widgetsConfig[wid].params) {
+			// eslint-disable-next-line prefer-destructuring
+			Object.assign(params, widgetsConfig[wid].params);
+		}
+
 		if (hidPerApOriginData) {
 			widgetsConfig[wid].isDataSufficient = false;
 			widgetsConfig[wid].isLoading = false;
@@ -631,7 +695,7 @@ class Dashboard extends React.Component {
 					);
 					if (
 						// eslint-disable-next-line eqeqeq
-						response.status == 200 &&
+						response.status === 200 &&
 						!isEmpty(response.data) &&
 						((response.data.result && response.data.result.length) || !response.data.result)
 					) {
@@ -641,6 +705,7 @@ class Dashboard extends React.Component {
 						widgetsConfig[wid].data = {};
 						widgetsConfig[wid].isDataSufficient = false;
 					}
+
 					widgetsConfig[wid].isLoading = false;
 					this.setState({ widgetsConfig });
 				})
@@ -664,12 +729,114 @@ class Dashboard extends React.Component {
 		allUserSites.forEach(site => {
 			const siteId = site.value;
 			const reportingSite = reportingSites[siteId];
+			// eslint-disable-next-line eqeqeq
 			if (reportingSite && reportingSite.product && reportingSite.product.Layout == 1) {
 				layoutSites.push(site);
 			}
 		});
 		return layoutSites;
 	};
+
+	fetchDeviceList = () => {
+		axiosInstance.get(API.DEVICE_API).then(({ data }) => {
+			this.setState({ device_types: data.result });
+		});
+	};
+
+	fetchCountryList = () => {
+		axiosInstance.get(API.COUNTRY_API).then(({ data }) => {
+			this.setState({ countries: data.result });
+		});
+	};
+
+	onGenerateGaReportButtonClick = wid => {
+		// eslint-disable-next-line func-names
+		this.setState({ dirty: false }, function() {
+			const { sites } = this.props;
+			const { widgetsConfig, selectedGaReportDimension } = this.state;
+			const { selectedFilters } = widgetsConfig[wid];
+			/**
+			 * selectedFilters: {
+			 *		country: {4: true, 12: true}
+			 *		device_type: {2: true}
+			 * }
+			 */
+			widgetsConfig[wid].isLoading = true;
+			widgetsConfig[wid].params = widgetsConfig[wid].params || {};
+			if (selectedGaReportDimension)
+				widgetsConfig[wid].params.dimension = selectedGaReportDimension;
+			if (selectedFilters) {
+				Object.keys(selectedFilters).map(key => {
+					const selectedSubCategoryFilters = Object.keys(selectedFilters[key]).toString();
+					if (key === 'siteid' && !selectedSubCategoryFilters) {
+						widgetsConfig[wid].params[key] = Object.keys(sites).toString();
+					} else {
+						widgetsConfig[wid].params[key] = selectedSubCategoryFilters;
+					}
+					return '';
+				});
+			} else {
+				widgetsConfig[wid].params.siteid = Object.keys(sites).toString();
+			}
+			this.setState({ widgetsConfig });
+			this.getDisplayData(wid);
+		});
+	};
+
+	getGaReportDimensions = () => {
+		let options = [];
+
+		options = Object.keys(DIMENSIONS_SUPPORTED).map((key, i) => ({
+			default_enabled: true,
+			display_name: key,
+			isDisabled: false,
+			name: key,
+			position: i + 1, // becaues array position starts with 0 & we want to set position atleast from 1
+			value: DIMENSIONS_SUPPORTED[key]
+		}));
+		this.setState({ listOfGaReportDimensions: options });
+	};
+
+	getSelectedFilter = event =>
+		new Promise((resolve, reject) => {
+			let dynamicArray = [];
+			// eslint-disable-next-line camelcase
+			const { countries, device_types } = this.state;
+			const response = { data: { result: [] }, status: 200 };
+			const { key } = event;
+
+			switch (key) {
+				case 'country':
+					dynamicArray = countries;
+					break;
+				case 'device_type':
+					// eslint-disable-next-line camelcase
+					dynamicArray = device_types;
+					break;
+				case 'siteid': {
+					const { sites } = this.props;
+					const siteIds = Object.keys(sites);
+					dynamicArray = siteIds.map(siteId => ({
+						id: siteId,
+						value: siteId,
+						name: sites[siteId].siteDomain
+					}));
+					break;
+				}
+				default:
+					break;
+			}
+
+			// dynamicArray can be an array of either countries or device_types or siteIds
+			response.data.result = dynamicArray.map(item => ({
+				id: item.id,
+				value: item.name || item.value,
+				name: item.name || item.value,
+				isDisabled: false
+			}));
+
+			return resolve(response);
+		});
 
 	showApBaselineWidget = () => {
 		const {
@@ -720,38 +887,60 @@ class Dashboard extends React.Component {
 		);
 	};
 
+	handleFilterValueChange = (key, value, widgetsConfig, wid) => {
+		widgetsConfig[wid][key] = value;
+		this.setState({ widgetsConfig });
+	};
+
 	renderControl(wid) {
 		const {
 			reportType,
 			reportsMeta,
 			user: {
 				data: { email }
-			}
+			},
+			showNotification
 		} = this.props;
 
 		const isDemoUser = checkDemoUserEmail(email);
 		const { site: reportingSites } = reportsMeta.data;
-		const { widgetsConfig, quickDates, sites, selectedDevice } = this.state;
-		const { selectedDate, selectedSite, name, focusedInput, startDate, endDate } = widgetsConfig[
-			wid
-		];
+		const {
+			widgetsConfig,
+			quickDates,
+			sites,
+			selectedDevice,
+			selectedGaReportDimension,
+			listOfGaReportDimensions
+		} = this.state;
+		const {
+			selectedDate,
+			selectedSite,
+			selectedFilters = {},
+			name,
+			focusedInput,
+			startDate,
+			endDate
+		} = widgetsConfig[wid];
 		const layoutSites = reportingSites ? this.getLayoutSites(sites, reportingSites) : [];
 		const isPerfApOriginalWidget = !!(name === 'per_ap_original');
 		const isPerfApOriginalWidgetForDemoUser = !!(isDemoUser && isPerfApOriginalWidget);
 		const computedSelectedSite = isPerfApOriginalWidgetForDemoUser ? sites[1].value : selectedSite;
 
 		let sitesToShow = isPerfApOriginalWidget ? layoutSites : sites;
+		const showFiltersWidget = [GA_REPORTS];
 		const hideDateWidgets = [
 			'estimated_earnings',
 			'ads_txt_status',
 			'core_web_vitals',
-			'payment_history'
+			'payment_history',
+			GA_REPORTS
 		];
 		const hideWebsiteWidgets = [
 			'per_site_wise',
 			'peer_performance_report',
 			'ads_txt_status',
-			'payment_history'
+			'payment_history',
+			GA_REPORTS
 		];
 
 		const handleDatesChange = ({ startDate, endDate }) => {
@@ -763,9 +952,16 @@ class Dashboard extends React.Component {
 				otherwise selecting startDate would cause re-render
 				which in not required
 			*/
-			if (startDate && endDate && focusedInput === 'endDate') {
+			if (
+				startDate &&
+				endDate &&
+				focusedInput === 'endDate' &&
+				widgetsConfig[wid].name !== GA_REPORTS
+			) {
 				widgetsConfig[wid].isLoading = true;
 				this.setState({ widgetsConfig }, () => this.getDisplayData(wid));
+			} else {
+				this.setState({ widgetsConfig });
 			}
 		};
 
@@ -782,9 +978,14 @@ class Dashboard extends React.Component {
 				widgetsConfig[wid].customDateRange = true;
 				return this.setState({ widgetsConfig });
 			}
-			widgetsConfig[wid].isLoading = true;
 			widgetsConfig[wid].customDateRange = false;
-			this.setState({ widgetsConfig }, () => this.getDisplayData(wid));
+
+			if (widgetsConfig[wid].name === GA_REPORTS) {
+				this.setState({ widgetsConfig });
+			} else {
+				widgetsConfig[wid].isLoading = true;
+				this.setState({ widgetsConfig }, () => this.getDisplayData(wid));
+			}
 		};
 
 		const handleFocusUpdate = focusedInput => {
@@ -795,9 +996,9 @@ class Dashboard extends React.Component {
 		sitesToShow = isDemoUser ? sites : sitesToShow;
 
 		return (
-			<div className="aligner aligner--hEnd">
-				{hideDateWidgets.indexOf(name) === -1 ? (
-					<div>
+			<>
+				{showFiltersWidget.indexOf(name) > -1 ? (
+					<div className="aligner aligner--wrap aligner--hSpaceBetween  u-margin-t4 filterAndGenerateButtonRow gafilters">
 						<div className="u-margin-r4 display-inline">
 							<SelectBox
 								id="performance-date"
@@ -840,13 +1041,98 @@ class Dashboard extends React.Component {
 								</div>
 							</div>
 						)}
+						<div className="reporting-filterBox aligner-item  aligner-item--grow5 asyncGroupSelect">
+							<SelectBox
+								isClearable={false}
+								isSearchable={false}
+								title="Select Dimension"
+								wrapperClassName="custom-select-box-wrapper"
+								reset
+								selected={selectedGaReportDimension}
+								options={listOfGaReportDimensions}
+								onSelect={ev => this.setState({ selectedGaReportDimension: ev, dirty: true })}
+							/>
+						</div>
+						<div className="reporting-filterBox aligner-item  aligner-item--grow5 u-margin-r4 asyncGroupSelect">
+							<AsyncGroupSelect
+								key="filter list"
+								filterList={GA_REPORT_FILTER_LIST}
+								selectedFilters={selectedFilters}
+								onFilterValueChange={() =>
+									this.handleFilterValueChange(
+										'selectedFilters',
+										selectedFilters,
+										widgetsConfig,
+										wid
+									)
+								}
+								getSelectedFilter={this.getSelectedFilter}
+								showNotification={showNotification}
+							/>
+						</div>
+						<div className="aligner-item u-margin-r4 aligner--hEnd">
+							<Button bsStyle="primary" onClick={() => this.onGenerateGaReportButtonClick(wid)}>
+								<Glyphicon glyph="cog u-margin-r2" />
+								Generate Report
+							</Button>
+						</div>
 					</div>
 				) : (
 					''
 				)}
-				{name === 'core_web_vitals' ? (
-					<div className="u-margin-r4 display-inline">
-						{/* eslint-disable */}
+
+				<div className="aligner aligner--hEnd">
+					{hideDateWidgets.indexOf(name) === -1 ? (
+						<div>
+							<div className="u-margin-r4 display-inline">
+								<SelectBox
+									id="performance-date"
+									wrapperClassName="display-inline"
+									pullRight
+									isClearable={false}
+									isSearchable={false}
+									selected={selectedDate}
+									options={quickDates}
+									onSelect={handleDatePresetSelect}
+								/>
+							</div>
+
+							{widgetsConfig[wid].customDateRange && (
+								<div className="u-margin-r4 display-inline">
+									<div className="display-inline">
+										<DateRangePicker
+											startDate={moment(startDate)}
+											endDate={moment(endDate)}
+											onDatesChange={handleDatesChange}
+											/*
+											data prior to 1st Aug, 2019 is present in the old console 
+											therefore disabling dates before 1st Aug, 2019
+										*/
+											isOutsideRange={day =>
+												day.isAfter(moment()) ||
+												day.isBefore(
+													moment()
+														.startOf('month')
+														.set({ year: 2019, month: 7 })
+												)
+											}
+											focusedInput={focusedInput}
+											onFocusChange={handleFocusUpdate}
+											showDefaultInputIcon
+											hideKeyboardShortcutsPanel
+											minimumNights={0}
+											displayFormat="DD-MM-YYYY"
+										/>
+									</div>
+								</div>
+							)}
+						</div>
+					) : (
+						''
+					)}
+					{name === 'core_web_vitals' ? (
+						<div className="u-margin-r4 display-inline">
+							{/* eslint-disable */}
 						<label className="u-text-normal u-margin-r2">Device</label>
 						<SelectBox
 							id="performance-site"
@@ -867,13 +1153,13 @@ class Dashboard extends React.Component {
 						/>
 
 						{/* eslint-enable */}
-					</div>
-				) : (
-					''
-				)}
-				{reportType !== 'site' && hideWebsiteWidgets.indexOf(name) === -1 ? (
-					<div className="">
-						{/* eslint-disable */}
+						</div>
+					) : (
+						''
+					)}
+					{reportType !== 'site' && hideWebsiteWidgets.indexOf(name) === -1 ? (
+						<div className="">
+							{/* eslint-disable */}
 						<label className="u-text-normal u-margin-r2">Website</label>
 						<SelectBox
 							id="performance-site"
@@ -896,11 +1182,12 @@ class Dashboard extends React.Component {
 						/>
 
 						{/* eslint-enable */}
-					</div>
-				) : (
-					''
-				)}
-			</div>
+						</div>
+					) : (
+						''
+					)}
+				</div>
+			</>
 		);
 	}
 
@@ -920,7 +1207,8 @@ class Dashboard extends React.Component {
 			name === 'peer_performance_report' ||
 			name === 'site_ga_stats' ||
 			name === 'ga_traffic_breakdown_by_country' ||
-			name === 'ga_traffic_breakdown_by_channel'
+			name === 'ga_traffic_breakdown_by_channel' ||
+			name === GA_REPORTS
 		)
 			return null;
 		const { reportType, siteId } = this.props;
@@ -1019,11 +1307,9 @@ class Dashboard extends React.Component {
 				heading="Complete Onboarding Setup"
 				description="Please complete your site onboarding setup by clicking below."
 			>
-				{
-					<Link to={linkUrl} className="u-link-reset u-margin-t4 aligner aligner-item">
-						<CustomButton>{buttonText}</CustomButton>
-					</Link>
-				}
+				<Link to={linkUrl} className="u-link-reset u-margin-t4 aligner aligner-item">
+					<CustomButton>{buttonText}</CustomButton>
+				</Link>
 			</OnboardingCard>
 		);
 	}
