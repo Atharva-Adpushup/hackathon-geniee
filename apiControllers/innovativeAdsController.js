@@ -64,6 +64,21 @@ const fn = {
 					pagegroups: [pagegroup]
 				};
 			});
+		} else if (formatData.format === 'interstitial') {
+			const id = uuid.v4();
+
+			newAds.push({
+				...payload.ad,
+				id,
+				name: generateSectionName({
+					width,
+					height,
+					platform: formatData.platform,
+					id,
+					service: 'I'
+				}),
+				createdOn: +new Date()
+			});
 		} else {
 			throw new AdPushupError({
 				message: 'No Pagegroups found in the ad',

@@ -56,6 +56,17 @@ const FORMATS = {
 			image: '/assets/images/interactiveAdsManager/formats/desktop/docked.gif',
 			disabled: '/assets/images/interactiveAdsManager/formats/desktop/docked-disabled.jpg',
 			key: 'docked'
+		},
+		{
+			name: ' Chained Docked',
+			image: '/assets/images/interactiveAdsManager/formats/desktop/docked.gif',
+			disabled: '/assets/images/interactiveAdsManager/formats/desktop/docked-disabled.jpg',
+			key: 'chainedDocked'
+		},
+		{
+			name: 'Interstitial',
+			image: '/assets/images/interactiveAdsManager/formats/desktop/interstitial.gif',
+			key: 'interstitial'
 		}
 	],
 	MOBILE: [
@@ -76,6 +87,11 @@ const FORMATS = {
 			image: '/assets/images/interactiveAdsManager/formats/mobile/in-view.gif',
 			disabled: '/assets/images/interactiveAdsManager/formats/mobile/in-view-disabled.jpg',
 			key: 'inView'
+		},
+		{
+			name: 'Interstitial',
+			image: '/assets/images/interactiveAdsManager/formats/mobile/interstitial.gif',
+			key: 'interstitial'
 		}
 	],
 	TABLET: [
@@ -96,27 +112,36 @@ const FORMATS = {
 			image: '/assets/images/interactiveAdsManager/formats/tablet/in-view.gif',
 			disabled: '/assets/images/interactiveAdsManager/formats/tablet/in-view-disabled.jpg',
 			key: 'inView'
+		},
+		{
+			name: 'Interstitial',
+			image: '/assets/images/interactiveAdsManager/formats/tablet/interstitial.gif',
+			key: 'interstitial'
 		}
 	]
 };
 const SIZES = {
 	DESKTOP: {
 		DOCKED: ['336x280', '300x250', '250x250', '200x200', '300x600', '160x600', '120x600'],
+		CHAINEDDOCKED: ['336x280', '300x250', '250x250', '200x200', '300x600', '160x600', '120x600'],
 		INVIEW: ['336x280', '300x250', '250x250', '200x200', '728x90', '468x60', '900x90'],
 		STICKYTOP: ['900x90', '728x90'],
 		STICKYBOTTOM: ['900x90', '728x90'],
 		STICKYLEFT: ['160x600', '300x600', '120x600'],
-		STICKYRIGHT: ['160x600', '300x600', '120x600']
+		STICKYRIGHT: ['160x600', '300x600', '120x600'],
+		INTERSTITIAL: ['336x280']
 	},
 	MOBILE: {
 		STICKYTOP: ['320x100', '300x100', '320x50', '300x50'],
 		STICKYBOTTOM: ['320x100', '300x100', '320x50', '300x50'],
-		INVIEW: ['336x280', '300x250', '250x250', '200x200', '320x100', '300x100', '320x50', '300x50']
+		INVIEW: ['336x280', '300x250', '250x250', '200x200', '320x100', '300x100', '320x50', '300x50'],
+		INTERSTITIAL: ['336x280']
 	},
 	TABLET: {
 		STICKYTOP: ['728x90'],
 		STICKYBOTTOM: ['728x90'],
-		INVIEW: ['300x250']
+		INVIEW: ['300x250'],
+		INTERSTITIAL: ['336x280']
 	}
 };
 const interactiveAdEvents = ['DOMContentLoaded', 'scriptLoaded']; // load', 'scroll', 'onMills',
@@ -197,7 +222,8 @@ const OPS_AD_LIST_ACTIONS = [
 	{ displayText: 'Archive', key: 'archive' },
 	{ displayText: 'Unarchive', key: 'unarchive' },
 	{ displayText: 'Format Options', key: 'formatEdit' },
-	{ displayText: 'Edit Fluid', key: 'fluidEdit' }
+	{ displayText: 'Edit Fluid', key: 'fluidEdit' },
+	{ displayText: 'Edit Close Button', key: 'closeButtonEdit' }
 ];
 const AD_LIST_ACTIONS = {
 	copy: {
@@ -244,6 +270,14 @@ const FORMAT_FILTER_OPTIONS = [
 	{
 		name: 'In View',
 		value: 'inView'
+	},
+	{
+		name: 'Interstitial',
+		value: 'interstitial'
+	},
+	{
+		name: 'Chained Docked',
+		value: 'chainedDocked'
 	}
 ];
 const DEFAULT_ADS_RESPONSE = { fetched: false, content: [] };

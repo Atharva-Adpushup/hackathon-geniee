@@ -15,6 +15,7 @@ import {
 import Edit from '../../../../../Components/EditBox/index';
 import AdNetworkDetails from './AdNetworkDetails';
 import FluidEdit from './FluidEdit';
+import CloseButtonEdit from './CloseButtonEdit';
 import Tags from '../../../../../Components/Tags';
 import CustomButton from '../../../../../Components/CustomButton/index';
 
@@ -202,6 +203,20 @@ class AdElement extends Component {
 					),
 					footer: false
 				});
+			case 'closeButtonEdit':
+				return modalToggle({
+					header: 'Edit Close Button Value',
+					body: (
+						<CloseButtonEdit
+							ad={ad}
+							dataForAuditLogs={dataForAuditLogs}
+							onSubmit={this.updateWrapper}
+							onCancel={modalToggle}
+						/>
+					),
+					footer: false
+				});
+
 			default:
 				return null;
 		}
@@ -213,11 +228,14 @@ class AdElement extends Component {
 			return (
 				<div>
 					<p>Pagegroups</p>
-					<Tags labels={ad.pagegroups} labelClasses="custom-label" />
+					<Tags
+						labels={ad.pagegroups && ad.pagegroups.length ? ad.pagegroups : 'All'}
+						labelClasses="custom-label"
+					/>
 				</div>
 			);
 		}
-		return <p>Custom</p>;
+		return <p>All</p>;
 	}
 
 	renderActions(actions, value) {
@@ -280,16 +298,30 @@ class AdElement extends Component {
 				action =>
 					(ad.isActive && action.key !== 'unarchive') || (!ad.isActive && action.key !== 'archive')
 			)
-			.map(action => (
-				<CustomButton
-					key={`adAction-${ad.id}-${action.key}`}
-					variant="secondary"
-					className="u-margin-b3"
-					onClick={() => this.userActionsHandler(action.key)}
-				>
-					{action.displayText}
-				</CustomButton>
-			));
+			.map(action => {
+				if (action.key === 'closeButtonEdit' && ad.formatData.type !== 'sticky') {
+					return '';
+				}
+
+				if (
+					action.key !== 'archive' &&
+					action.key !== 'unarchive' &&
+					ad.formatData.type === 'interstitial'
+				) {
+					return '';
+				}
+
+				return (
+					<CustomButton
+						key={`adAction-${ad.id}-${action.key}`}
+						variant="secondary"
+						className="u-margin-b3"
+						onClick={() => this.userActionsHandler(action.key)}
+					>
+						{action.displayText}
+					</CustomButton>
+				);
+			});
 	}
 
 	renderAdDetails() {

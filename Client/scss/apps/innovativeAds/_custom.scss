@@ -281,3 +281,19 @@ body {
 	padding-left: 15px;
 	padding-right: 15px;
 }
+
+.closeButton-Toggle {
+	.col-xs-8 {
+		b {
+			font-weight: 500;
+			font-size: 18px;
+		}
+	}
+}
+
+.close-button-fields {
+	.form-group,
+	.ReactCodeMirror {
+		margin-right: 2rem;
+	}
+}

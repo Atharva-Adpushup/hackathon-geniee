@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import CustomButton from '../../../../../Components/CustomButton/index';
-import { InView, Docked, Default, StickyTop } from '../Formats/index';
+import { InView, Docked, Default, StickyTop, ChainedDocked } from '../Formats/index';
 
 class FormatEdit extends Component {
 	constructor(props) {
@@ -55,6 +55,9 @@ class FormatEdit extends Component {
 				return <InView {...commonProps} />;
 			case 'docked':
 				return <Docked {...commonProps} />;
+			case 'chainedDocked':
+				return <ChainedDocked {...commonProps} />;
+
 			default:
 				return <Default {...commonProps} />;
 		}
