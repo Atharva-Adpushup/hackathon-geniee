@@ -214,7 +214,7 @@ class Dashboard extends React.Component {
 				data: { activeProducts }
 			}
 		} = this.props;
-		const showWidget = !!activeProducts[GA_REPORTS];
+		const showWidget = !!activeProducts && !!activeProducts[GA_REPORTS];
 
 		if (!showWidget) {
 			const index = widgetsList.indexOf('site_ga_session_stats');
