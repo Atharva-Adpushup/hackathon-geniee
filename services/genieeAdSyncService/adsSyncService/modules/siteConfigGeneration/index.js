@@ -13,6 +13,11 @@ const appBucket = couchbaseService(
 	config.couchBase.DEFAULT_USER_PASSWORD
 );
 
+/**
+ * receives an array of objects [{ channel: 'channelName', unsyncedAds: [] }]
+ * creates group adpTags, adsense, etc and add unsynced ads to a group
+ * return an object with unsynced ads grouped into adpTags, adSense, etc
+ */
 function generateSiteChannelJSON(channelsWithAds, site) {
 	const userEmail = site.get('ownerEmail');
 	const siteId = site.get('siteId');
@@ -20,6 +25,7 @@ function generateSiteChannelJSON(channelsWithAds, site) {
 
 	const unsyncedGenieeZones = [];
 	const unsyncedGenieeDFPCreationZones = [];
+	let adsenseUnsyncedAds = {};
 	const adpTagsUnsyncedAds = {
 		siteId,
 		siteDomain,
@@ -30,7 +36,6 @@ function generateSiteChannelJSON(channelsWithAds, site) {
 		},
 		ads: []
 	};
-	let adsenseUnsyncedAds = {};
 
 	function doIt(channelWithAds) {
 		const noAdsFound = !(
@@ -95,6 +100,7 @@ function generateSiteChannelJSON(channelsWithAds, site) {
 				};
 			}
 
+			// MARK: what is its use?
 			if (hasAdNetworkSettings) {
 				pubId = adNetworkSettings[0].pubId;
 				_.some(adNetworkSettings, network => {
@@ -106,6 +112,7 @@ function generateSiteChannelJSON(channelsWithAds, site) {
 				});
 			}
 
+			// update data in adpTagsUnsyncedAds
 			adpTagsUnsyncedAds.publisher = {
 				...adpTagsUnsyncedAds.publisher,
 				...adpTagsUnsyncedAds.currentDFP,
@@ -115,8 +122,10 @@ function generateSiteChannelJSON(channelsWithAds, site) {
 				isThirdPartyAdx
 			};
 
+			// copy adpTagsUnsyncedAds containing publisher, site, currentDFP? data
 			adsenseUnsyncedAds = { ...adpTagsUnsyncedAds };
 
+			// call doIt for each item in channelsWithAds which further adds the ads to adpTagsUnsyncedAds, adsenseUnsyncedAds, etc and returns them
 			return Promise.map(channelsWithAds, doIt);
 		})
 		.then(() => ({
@@ -127,7 +136,10 @@ function generateSiteChannelJSON(channelsWithAds, site) {
 		}));
 }
 
-function unSyncedAdsWrapper(unSyncedAds, cb, ad) {
+/**
+ * syncs only the ads that belong to adpTag network
+ */
+function getUnsyncedAdpTagAdsData(unSyncedAds, cb, ad) {
 	function processCallback(cb) {
 		return cb ? cb(ad) : Promise.resolve({});
 	}
@@ -151,32 +163,36 @@ function unSyncedAdsWrapper(unSyncedAds, cb, ad) {
 	});
 }
 
-function adGeneration(docKey, currentDataForSyncing, cb = false) {
-	const unSyncedAds = [];
+function getUnsyncedAdpTagAdsFromDoc(docKey, unsyncedAdsGroup, cb = false) {
+	const unSyncedAdpTagAds = [];
 	return appBucket
 		.getDoc(docKey)
 		.then(docWithCas => {
 			const ads = docWithCas.value.ads;
-			return promiseForeach(ads, unSyncedAdsWrapper.bind(null, unSyncedAds, cb), (data, err) => {
-				console.log(err);
-				return false;
-			});
+			return promiseForeach(
+				ads,
+				getUnsyncedAdpTagAdsData.bind(null, unSyncedAdpTagAds, cb),
+				(data, err) => {
+					console.log(err);
+					return false;
+				}
+			);
 		})
 		.then(() => {
-			currentDataForSyncing.adp.ads = unSyncedAds.length
-				? _.concat(currentDataForSyncing.adp.ads, unSyncedAds)
-				: currentDataForSyncing.adp.ads;
+			unsyncedAdsGroup.adp.ads = unSyncedAdpTagAds.length
+				? _.concat(unsyncedAdsGroup.adp.ads, unSyncedAdpTagAds)
+				: unsyncedAdsGroup.adp.ads;
 
-			return currentDataForSyncing;
+			return unsyncedAdsGroup;
 		})
 		.catch(err =>
 			err.name && err.name == 'CouchbaseError' && err.code == 13
-				? currentDataForSyncing
+				? unsyncedAdsGroup
 				: Promise.reject(err)
 		);
 }
 
-function apTagAdsSyncing(currentDataForSyncing, site) {
+function apTagAdsSyncing(unsyncedAdsGroup, site) {
 	/**
 	 * FLOW:
 	 * 1. Read Tag Manager Doc
@@ -185,7 +201,8 @@ function apTagAdsSyncing(currentDataForSyncing, site) {
 	 * 4. Set Dummy values to some variables to compliment current working flow
 	 * 5. Concat ads from Tag manager to current adp.ads
 	 */
-	return adGeneration(`${docKeys.apTag}${site.get('siteId')}`, currentDataForSyncing, ad =>
+	const apTagDocKey = `${docKeys.apTag}${site.get('siteId')}`;
+	const callbackForEachAd = ad =>
 		Promise.resolve({
 			variations: [
 				{
@@ -195,11 +212,12 @@ function apTagAdsSyncing(currentDataForSyncing, site) {
 					platform: ad.formatData.platform
 				}
 			]
-		})
-	);
+		});
+
+	return getUnsyncedAdpTagAdsFromDoc(apTagDocKey, unsyncedAdsGroup, callbackForEachAd);
 }
 
-function ampScriptAdsSyncing(currentDataForSyncing, site) {
+function ampScriptAdsSyncing(unSyncedAdGroups, site) {
 	/**
 	 * FLOW:
 	 * 1. Read AMP Script Ads Doc
@@ -208,7 +226,8 @@ function ampScriptAdsSyncing(currentDataForSyncing, site) {
 	 * 4. Set Dummy values to some variables to compliment current working flow
 	 * 5. Concat ads from Tag manager to current adp.ads
 	 */
-	return adGeneration(`${docKeys.ampScript}${site.get('siteId')}`, currentDataForSyncing, ad =>
+	const docKey = `${docKeys.ampScript}${site.get('siteId')}`;
+	return getUnsyncedAdpTagAdsFromDoc(docKey, unSyncedAdGroups, ad =>
 		Promise.resolve({
 			variations: [
 				{
@@ -222,7 +241,8 @@ function ampScriptAdsSyncing(currentDataForSyncing, site) {
 	);
 }
 
-function innovativeAdsSyncing(currentDataForSyncing, site) {
+function innovativeAdsSyncing(unsyncedAdsGroup, site) {
+	// called by getUnsyncedAdpTagAdsFromDoc for each ad in innovativeAds doc
 	function generateLogData(site, ad) {
 		return site
 			.getAllChannels()
@@ -276,20 +296,27 @@ function innovativeAdsSyncing(currentDataForSyncing, site) {
 			});
 	}
 
-	return adGeneration(
+	return getUnsyncedAdpTagAdsFromDoc(
 		`${docKeys.interactiveAds}${site.get('siteId')}`,
-		currentDataForSyncing,
+		unsyncedAdsGroup,
 		generateLogData.bind(null, site)
 	);
 }
 
 function getGeneratedPromises(site) {
-	return unsyncedAdsGeneration
-		.getAllUnsyncedAds(site)
-		.then(channelWithAds => generateSiteChannelJSON(channelWithAds, site))
-		.then(currentDataForSyncing => apTagAdsSyncing(currentDataForSyncing, site))
-		.then(currentDataForSyncing => ampScriptAdsSyncing(currentDataForSyncing, site))
-		.then(currentDataForSyncing => innovativeAdsSyncing(currentDataForSyncing, site));
+	return (
+		unsyncedAdsGeneration
+			/* get all the unsynced ads present accross the channels (channel => variation => section => ad) */
+			.getAllUnsyncedAds(site) // [{ channel: 'channelName', unsyncedAds: [] }]
+			/* group the unsynced ads under adSense, adpTags, etc */
+			.then(channelsWithAds => generateSiteChannelJSON(channelsWithAds, site))
+			/* get all the adpTag network ads from the aptag docs */
+			.then(unSyncedAdGroups => apTagAdsSyncing(unSyncedAdGroups, site))
+			/* get all the adpTag network ads from the amp docs */
+			.then(unSyncedAdGroups => ampScriptAdsSyncing(unSyncedAdGroups, site))
+			/* get all the adpTag network ads from the innovative docs */
+			.then(unSyncedAdGroups => innovativeAdsSyncing(unSyncedAdGroups, site))
+	);
 }
 
 module.exports = {

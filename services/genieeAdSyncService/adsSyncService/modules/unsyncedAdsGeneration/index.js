@@ -52,13 +52,24 @@ module.exports = {
 		}
 		return false;
 	},
+	/**
+	 * checks if th ad has networkData available
+	 * if not, return false
+	 * else, 
+	 * 		check if we have dfpAdunit saved in the networkData (which means the ad has been synced with the GAM)
+	 * 		if yes, return false
+	 * 		else, create an object with the ad details and return it
+	 */
 	checkAdpTagsUnsyncedAds: function(section, ad) {
 		const hasNetworkData = ad.networkData && Object.keys(ad.networkData).length;
 		if (hasNetworkData) {
-			if (!ad.networkData.dfpAdunit) {
+			// TODO: add the logic to also match the count with the number of duplicate adunits
+			const isAdSynced = !!ad.networkData.dfpAdunit;
+			if (!isAdSynced) {
 				const isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length);
 				const isResponsive = !!(ad.width === 'responsive' && ad.networkData.isResponsive);
 				const isNative = !!(ad.formatData && ad.formatData.type === 'native');
+				// TODO: also add the duplicate adunits in this doc, might need to use ahead
 				const defaultAdData = {
 					adId: ad.id,
 					isResponsive: isResponsive,
@@ -90,12 +101,17 @@ module.exports = {
 		}
 		return false;
 	},
+	/**
+	 * if the ad doesn't have adCode and adUnit and shouldSync is true
+	 * create an object with the ad details and return
+	*/
 	checkAdsenseUnsyncedAds: function(section, ad) {
 		const hasNetworkData = ad.networkData && Object.keys(ad.networkData).length;
 		if (hasNetworkData) {
 			const { adunitId, adCode, shouldSync, isLink = false } = ad.networkData;
-			const isUnsynced = !adCode && !adunitId && shouldSync;
-			if (isUnsynced) {
+			// TODO: add the logic to also match the count with the number of duplicate adunits
+			const isAdUnsynced = !adCode && !adunitId && shouldSync;
+			if (isAdUnsynced) {
 				const isResponsive = !!(ad.width === 'responsive');
 				const defaultAdData = {
 					adId: ad.id,
@@ -116,6 +132,12 @@ module.exports = {
 		}
 		return false;
 	},
+	/**
+	 * iterates over the sections of the given variation (for now each section contains only 1 ad)
+	 * get sync status of the ad basis its network type
+	 * if the ad is not synced, get an ad object with the details
+	 * returns an object of unsynced ads with ads grouped basis the network
+	 */
 	getVariationUnsyncedAds: function(
 		variationId,
 		variationName,
@@ -136,22 +158,6 @@ module.exports = {
 		_.each(variationSections, function(section, sectionId) {
 			_.each(section.ads, function(ad) {
 				switch (ad.network) {
-					case 'geniee':
-						let unsyncedZone = self.checkGenieeUnsyncedZones(variationId, variationName, section, ad);
-						if (unsyncedZone) {
-							unsyncedZone.variations[0] = {
-								...unsyncedZone.variations[0],
-								platform: additionalInfo.platform,
-								pageGroup: additionalInfo.pageGroup
-							};
-							unsyncedZone.forZoneSyncing
-								? unsyncedAds.genieeUnsyncedZones.push(unsyncedZone.zone)
-								: null;
-							unsyncedZone.forGenieeDFPCreation
-								? unsyncedAds.genieeDFPCreationZones.push(unsyncedZone.zone)
-								: null;
-						}
-						break;
 					case 'adsense':
 					case 'adpTags':
 						let fn = self.checkAdpTagsUnsyncedAds;
@@ -163,6 +169,7 @@ module.exports = {
 						}
 
 						let unsyncedAd = fn(section, ad);
+						// undsyncedAd contains the ad details
 						if (unsyncedAd) {
 							unsyncedAd.variations = [
 								{
@@ -181,14 +188,23 @@ module.exports = {
 		});
 		return unsyncedAds;
 	},
+	/**
+	 * gets all the channels and their data for the given site
+	 * iterates over each channel
+	 * 		iterates over each variation of the channel
+	 * 			iterates over each section of the channel
+	 * 				finds the ad that are unsynced
+	 *
+	 * returns an array of objects which contains channel and unsyncedAd
+	 */
 	getAllUnsyncedAds: function(site) {
 		const finalAds = [];
 		const self = this;
 
 		let channelUnsyncedAds = [];
 
-		return site.getAllChannels().then(allChannels => {
-			_.each(allChannels, channel => {
+		return site.getAllChannels().then(allChannelsData => {
+			_.each(allChannelsData, channel => {
 				channelUnsyncedAds = [];
 				_.each(channel.variations, (variation, id) => {
 					// Skip variation config data if it is set disabled from Visual Editor
