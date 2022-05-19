@@ -373,6 +373,9 @@ function apiModule() {
 					const inventories = [];
 					if (value.ads.length) {
 						for (const ad of value.ads) {
+							if (ad.formatData.type === 'interstitial') {
+								ad.pagegroups = [`${ad.formatData.platform}:All`];
+							}
 							const [, device, pageGroup] = ad.pagegroups[0].match(/(.*):(.*)/);
 							const networkData = ad.networkData;
 							const sizeMapping = ad.sizeMapping || [];
