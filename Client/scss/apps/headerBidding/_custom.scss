@@ -826,3 +826,20 @@
 		opacity: 0.6;
 	}
 }
+
+.activeSizes {
+	margin: 4px;
+	background-color: white;
+	border: 1px solid black;
+	color: black;
+}
+
+.showMore,
+.showLess {
+	margin: 4px;
+	font-weight: 600;
+}
+
+.showColor {
+	color: #eb575c;
+}
