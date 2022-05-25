@@ -2,6 +2,7 @@
 /* eslint-disable guard-for-in */
 import React from 'react';
 import PropTypes from 'prop-types';
+import difference from 'lodash/difference';
 import { Col, Form, FormGroup } from '@/Client/helpers/react-bootstrap-imports';
 import CustomButton from '../../../Components/CustomButton';
 import getCommonBidderFields from '../config/commonBidderFields';
@@ -20,7 +21,8 @@ class AddManageNonResponsiveBidder extends React.Component {
 		params: {},
 		sizes: [],
 		errors: {},
-		formError: ''
+		formError: '',
+		sizesNotAddedOnBidderCard: []
 	};
 
 	bidderFormFieldsMeta = {
@@ -29,7 +31,7 @@ class AddManageNonResponsiveBidder extends React.Component {
 	};
 
 	componentDidMount() {
-		const { formType, isSuperUser } = this.props;
+		const { formType, isSuperUser, activeAdUnitSizes } = this.props;
 
 		switch (formType) {
 			case 'add': {
@@ -89,6 +91,8 @@ class AddManageNonResponsiveBidder extends React.Component {
 							...formFields.params.siteLevel,
 							...formFields.params.adUnitLevel
 						});
+
+						newState.sizesNotAddedOnBidderCard = activeAdUnitSizes;
 
 						return newState;
 					});
@@ -156,6 +160,9 @@ class AddManageNonResponsiveBidder extends React.Component {
 
 						const paramSizes = Object.keys(params);
 						newState.sizes = paramSizes;
+
+						const sizesNotAddedOnBidderCard = difference(activeAdUnitSizes, paramSizes);
+						newState.sizesNotAddedOnBidderCard = sizesNotAddedOnBidderCard;
 
 						for (const collectionKey in formFields) {
 							newState[collectionKey] = {};
@@ -285,7 +292,6 @@ class AddManageNonResponsiveBidder extends React.Component {
 		const { onBidderAdd, onBidderUpdate } = this.props;
 		const { formFields, bidderConfig, globalParams, params, validationSchema, sizes } = this.state;
 		const isDirectRelation = bidderConfig.relation === 'direct';
-
 		const validationResult = formValidator.validate(
 			{ ...bidderConfig, ...globalParams },
 			isDirectRelation ? validationSchema : filterValidationSchema(validationSchema, ['bids'])
@@ -506,7 +512,7 @@ class AddManageNonResponsiveBidder extends React.Component {
 	};
 
 	render() {
-		const { openBiddersListView, formType, isSuperUser } = this.props;
+		const { openBiddersListView, formType, activeAdUnitSizes } = this.props;
 		const {
 			formFields,
 			bidderConfig: { bids, relation, key: bidderKey },
@@ -514,7 +520,8 @@ class AddManageNonResponsiveBidder extends React.Component {
 			formError,
 			validationSchema,
 			sizes,
-			params
+			params,
+			sizesNotAddedOnBidderCard
 		} = this.state;
 
 		return (
@@ -557,6 +564,8 @@ class AddManageNonResponsiveBidder extends React.Component {
 								removeSize={this.removeSize}
 								errors={errors}
 								relation={relation}
+								activeAdUnitSizes={activeAdUnitSizes}
+								sizesNotAddedOnBidderCard={sizesNotAddedOnBidderCard}
 							/>
 						)}
 						<FormGroup>

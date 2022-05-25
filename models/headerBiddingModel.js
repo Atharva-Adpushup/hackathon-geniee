@@ -2,6 +2,7 @@ module.exports = apiModule();
 
 const request = require('request-promise');
 const cloneDeep = require('lodash/cloneDeep');
+const uniqBy = require('lodash/uniqBy');
 const model = require('../helpers/model');
 const couchbase = require('../helpers/couchBaseService');
 const AdPushupError = require('../helpers/AdPushupError');
@@ -480,6 +481,22 @@ function apiModule() {
 					return inventories;
 				}
 			),
+
+		getInventoriesForActiveAdUnitSizes: siteId =>
+			Promise.all([
+				API.getLayoutInventoriesForHB(siteId),
+				API.getApTagInventoriesForHB(siteId),
+				API.getInnovativeAdInventoriesForHB(siteId)
+			]).then(([layoutInventories, apTagInventories, innovativeAdsInventories]) => {
+				const inventories = [
+					...layoutInventories,
+					...apTagInventories,
+					...innovativeAdsInventories
+				];
+
+				return inventories;
+			}),
+
 		getApTagAdDoc: siteId =>
 			couchbase
 				.connectToAppBucket()
@@ -1327,6 +1344,23 @@ function apiModule() {
 		createBidderAmpConfig: function(bidderConfig) {
 			const ampConfig = commonFunctions.removeFormatWiseParamsForAMP(bidderConfig);
 			return ampConfig;
+		},
+		getActiveAdUnitSizes: async siteId => {
+			const inventories = await API.getInventoriesForActiveAdUnitSizes(siteId);
+
+			if (!inventories.length) {
+				return [];
+			}
+			const activeAdunitSizes = inventories.map(inventory => inventory.size);
+
+			const uniqueActiveAdUnitSizes = uniqBy(activeAdunitSizes);
+			var responsiveSizeIndex = uniqueActiveAdUnitSizes.indexOf('responsivexresponsive');
+
+			if (responsiveSizeIndex !== -1) {
+				uniqueActiveAdUnitSizes[responsiveSizeIndex] = 'responsive';
+			}
+
+			return uniqueActiveAdUnitSizes;
 		}
 	};
 

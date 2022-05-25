@@ -15,7 +15,8 @@ import {
 	setUnsavedChangesAction,
 	masterSaveAction,
 	fetchHBRulesAction,
-	saveHBRulesAction
+	saveHBRulesAction,
+	fetchActiveAdUnitSizesAction
 } from '../../../actions/apps/headerBidding/hbActions';
 
 import { showNotification, hideNotification } from '../../../actions/uiActions';
@@ -29,12 +30,20 @@ const HeaderBiddingContainer = props => {
 		inventories: null,
 		...currSiteHbData
 	};
-	const { inventoryFound, bidders, setupStatus, inventories, rules = [] } = finalCurrSiteHbData;
+	const {
+		inventoryFound,
+		bidders,
+		setupStatus,
+		inventories,
+		rules = [],
+		activeAdUnitSizes = []
+	} = finalCurrSiteHbData;
 
 	return (
 		<HeaderBidding
 			inventoryFound={inventoryFound}
 			inventories={inventories}
+			activeAdUnitSizes={activeAdUnitSizes}
 			bidders={bidders}
 			setupStatus={setupStatus}
 			rules={rules}
@@ -86,6 +95,7 @@ export default connect(
 		setUnsavedChangesAction,
 		masterSaveAction,
 		fetchHBRulesAction,
-		saveHBRulesAction
+		saveHBRulesAction,
+		fetchActiveAdUnitSizesAction
 	}
 )(HeaderBiddingContainer);

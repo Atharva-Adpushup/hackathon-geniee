@@ -1237,6 +1237,24 @@ router
 					.status(httpStatus.INTERNAL_SERVER_ERROR)
 					.json({ error: 'Internal Server Error!' });
 			});
+	})
+
+	.get('/activeAdUnitSizes/:siteId', async (req, res) => {
+		const { siteId } = req.params;
+		const { email } = req.user;
+
+		return userModel
+			.verifySiteOwner(email, siteId)
+			.then(() =>
+				headerBiddingModel.getActiveAdUnitSizes(siteId).then(activeAdUnitSizes => {
+					return res.status(httpStatus.OK).send(activeAdUnitSizes);
+				})
+			)
+			.catch(e =>
+				res
+					.status(httpStatus.INTERNAL_SERVER_ERROR)
+					.json({ error: e.message || 'Internal Server Error!' })
+			);
 	});
 
 module.exports = router;

@@ -13,7 +13,8 @@ import {
 	FETCH_ALL_BIDDERS,
 	SET_UNSAVED_CHANGES,
 	FETCH_HB_RULES,
-	UPDATE_HB_RULES
+	UPDATE_HB_RULES,
+	FETCH_ACTIVE_ADUNIT_SIZES
 } from '../../constants/headerBidding';
 
 const defaultState = { hasUnsavedChanges: false, sites: {} };
@@ -215,6 +216,21 @@ export default function(state = defaultState, action) {
 					[siteId]: {
 						...state.sites[siteId],
 						rules
+					}
+				}
+			};
+		}
+
+		case FETCH_ACTIVE_ADUNIT_SIZES: {
+			const { siteId, data: activeAdUnitSizes } = action;
+
+			return {
+				...state,
+				sites: {
+					...state.sites,
+					[siteId]: {
+						...state.sites[siteId],
+						activeAdUnitSizes
 					}
 				}
 			};
