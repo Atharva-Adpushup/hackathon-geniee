@@ -50,6 +50,7 @@ export default class BiddersTab extends React.Component {
 			inventories,
 			user,
 			customProps,
+			activeAdUnitSizes,
 			user: { isSuperUser = false } = {}
 		} = this.props;
 
@@ -70,6 +71,7 @@ export default class BiddersTab extends React.Component {
 							showNotification={showNotification}
 							inventories={inventories}
 							isSuperUser={isSuperUser}
+							activeAdUnitSizes={activeAdUnitSizes}
 						/>
 					)) ||
 					(currView === 'manageBidder' && (
@@ -84,6 +86,7 @@ export default class BiddersTab extends React.Component {
 							showNotification={showNotification}
 							inventories={inventories}
 							isSuperUser={isSuperUser}
+							activeAdUnitSizes={activeAdUnitSizes}
 						/>
 					)))) || <Loader />
 		);

@@ -139,3 +139,7 @@ export function updateHbRule(siteId, hbRuleData, dataForAuditLogs) {
 		dataForAuditLogs
 	});
 }
+
+export function fetchActiveAdUnitSizes(siteId) {
+	return axiosInstance.get(`/headerBidding/activeAdUnitSizes/${siteId}`);
+}

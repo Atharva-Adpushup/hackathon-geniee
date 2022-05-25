@@ -1,16 +1,10 @@
 import { connect } from 'react-redux';
 import PerformanceOverview from '../components/PerformanceOverview';
-import { checkReportTypeGlobal } from '../../../helpers/commonFunctions';
+import { getReportsMeta } from '../../../helpers/commonFunctions';
 
 const mapStateToProps = (state, ownProps) => {
-	const isReportTypeGlobal = checkReportTypeGlobal(ownProps);
-	const {
-		reports: { account: accountReportMetaData, global: globalReportMetaData }
-	} = state.global;
+	const reportsMeta = getReportsMeta(state, ownProps);
 
-	const reportsMeta = isReportTypeGlobal
-		? { ...globalReportMetaData }
-		: { ...accountReportMetaData };
 	const {
 		data: { site, metrics }
 	} = reportsMeta;

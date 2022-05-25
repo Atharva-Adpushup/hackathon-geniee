@@ -102,7 +102,8 @@ class Report extends Component {
 		let userSitesStr = '';
 		let isSuperUser = false;
 
-		if (!isForOps && reportType === 'account') {
+		// site id should be appened into getMetaData API if case current user is not Ops or reportType is account
+		if (reportType === 'account' || !isForOps) {
 			userSitesStr = Object.keys(userSites).toString();
 
 			userSitesStr = getReportingDemoUserSiteIds(userSitesStr, email, reportType);
@@ -113,9 +114,9 @@ class Report extends Component {
 		}
 
 		const params = { sites: userSitesStr };
+
 		// eslint-disable-next-line no-unused-expressions
 		isSuperUser ? (params.isSuperUser = isSuperUser) : null;
-
 		if (!reportsMeta.fetched) {
 			return reportService
 				.getMetaData(params)

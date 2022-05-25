@@ -1,15 +1,9 @@
 import { connect } from 'react-redux';
 import SitewiseReport from '../components/SitewiseReport';
-import { checkReportTypeGlobal } from '../../../helpers/commonFunctions';
+import { getReportsMeta } from '../../../helpers/commonFunctions';
 
 const mapStateToProps = (state, ownProps) => {
-	const isReportTypeGlobal = checkReportTypeGlobal(ownProps);
-	const {
-		reports: { account: accountReportMetaData, global: globalReportMetaData }
-	} = state.global;
-	const reportsMeta = isReportTypeGlobal
-		? { ...globalReportMetaData }
-		: { ...accountReportMetaData };
+	const reportsMeta = getReportsMeta(state, ownProps);
 	const {
 		data: { metrics, site }
 	} = reportsMeta;

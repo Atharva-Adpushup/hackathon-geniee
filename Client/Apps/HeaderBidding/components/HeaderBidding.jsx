@@ -23,10 +23,16 @@ class HeaderBidding extends React.Component {
 	componentDidMount() {
 		const {
 			fetchHBInitDataAction,
+			fetchActiveAdUnitSizesAction,
+			activeAdUnitSizes,
 			match: {
 				params: { siteId }
 			}
 		} = this.props;
+
+		if (!activeAdUnitSizes.length) {
+			fetchActiveAdUnitSizesAction(siteId);
+		}
 
 		this.handleDefaultTabWrapper(null, true);
 
@@ -232,7 +238,8 @@ class HeaderBidding extends React.Component {
 			hasUnsavedChanges,
 			rules,
 			user,
-			customProps
+			customProps,
+			activeAdUnitSizes
 		} = this.props;
 
 		const activeTab = this.getActiveTab();
@@ -265,6 +272,7 @@ class HeaderBidding extends React.Component {
 							deleteBidderAction={deleteBidderAction}
 							showNotification={showNotification}
 							inventories={inventories}
+							activeAdUnitSizes={activeAdUnitSizes}
 						/>
 					);
 				case 'inventory':

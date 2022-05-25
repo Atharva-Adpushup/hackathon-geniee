@@ -2,7 +2,7 @@
 /* eslint-disable guard-for-in */
 /* eslint-disable react/prefer-stateless-function */
 import React from 'react';
-import { Row, Col, Nav, NavItem } from '@/Client/helpers/react-bootstrap-imports';
+import { Row, Col, Nav, NavItem, Badge } from '@/Client/helpers/react-bootstrap-imports';
 import CustomButton from '../../../Components/CustomButton';
 import BidderFormFields from './BidderFormFields';
 import formValidator from '../../../helpers/formValidator';
@@ -10,12 +10,15 @@ import allAdSizes from '../constants/adSizes';
 import AdSizeSelector from './AdSizeSelector';
 import { getFilteredAdSizes } from '../helpers/commonHelpers';
 import CustomIcon from '../../../Components/CustomIcon';
+import { uniqBy } from 'lodash';
 
 class SizewiseParamsFormFields extends React.Component {
 	state = {
 		activeKey: '',
 		tempParams: {},
-		tempParamsErrors: {}
+		tempParamsErrors: {},
+		activeSizesToShow: 6,
+		expanded: false
 	};
 
 	componentDidMount() {
@@ -222,6 +225,55 @@ class SizewiseParamsFormFields extends React.Component {
 		}
 	};
 
+	handleShowToggle = () => {
+		const { activeSizesToShow } = this.state;
+		const { activeAdUnitSizes } = this.props;
+		activeSizesToShow <= 6
+			? this.setState({ activeSizesToShow: activeAdUnitSizes.length, expanded: true })
+			: this.setState({ activeSizesToShow: 6, expanded: false });
+	};
+
+	showActiveAdUnitSizes = () => {
+		const { activeAdUnitSizes, sizesNotAddedOnBidderCard } = this.props;
+		const { activeSizesToShow, expanded } = this.state;
+		const modifiedActiveAdUnitSizes = uniqBy([...sizesNotAddedOnBidderCard, ...activeAdUnitSizes]);
+		return (
+			<>
+				<div className="form-group col-sm-6 u-margin-l0">
+					<label className="control-label">Active Ad Unit Sizes</label>
+				</div>
+
+				{modifiedActiveAdUnitSizes.length ? (
+					<div className="col-sm-6 u-margin-t2">
+						{modifiedActiveAdUnitSizes.slice(0, activeSizesToShow).map((size, i) => {
+							const badgeClass = `activeSizes ${
+								i < sizesNotAddedOnBidderCard.length ? 'showColor' : ''
+							}`;
+
+							return (
+								<Badge key={i} className={badgeClass}>
+									{size}
+								</Badge>
+							);
+						})}
+						{expanded ? (
+							<span className="showLess" onClick={this.handleShowToggle}>
+								{' '}
+								{'<<< less'}
+							</span>
+						) : (
+							<span className="showMore" onClick={this.handleShowToggle}>
+								{'more >>>'}
+							</span>
+						)}{' '}
+					</div>
+				) : (
+					<span className="col-sm-6 u-margin-t2">N/A</span>
+				)}
+			</>
+		);
+	};
+
 	renderTabs = () => {
 		const { sizes } = this.props;
 		const { tempParams } = this.state;
@@ -303,16 +355,20 @@ class SizewiseParamsFormFields extends React.Component {
 	render() {
 		const { activeKey } = this.state;
 		return (
-			<Row className="clearfix non-sizeless-params u-margin-v5">
-				<Col sm={3} className="size-tabs">
-					<Nav bsStyle="pills" stacked activeKey={activeKey} onSelect={this.handleNavSelect}>
-						{this.renderTabs()}
-					</Nav>
-				</Col>
-				<Col sm={9} className="size-tab-content">
-					{this.renderTabContent()}
-				</Col>
-			</Row>
+			<>
+				<Row>{this.showActiveAdUnitSizes()}</Row>
+
+				<Row className="clearfix non-sizeless-params u-margin-v5">
+					<Col sm={3} className="size-tabs">
+						<Nav bsStyle="pills" stacked activeKey={activeKey} onSelect={this.handleNavSelect}>
+							{this.renderTabs()}
+						</Nav>
+					</Col>
+					<Col sm={9} className="size-tab-content">
+						{this.renderTabContent()}
+					</Col>
+				</Row>
+			</>
 		);
 	}
 }

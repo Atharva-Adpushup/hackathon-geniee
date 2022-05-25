@@ -50,6 +50,12 @@ const updateAccountReportMetaData = data => dispatch =>
 		data
 	});
 
+const updateSuperUserAccountReportMetaData = data => dispatch =>
+	dispatch({
+		type: REPORTS_ACTIONS.REPLACE_SUPER_USER_ACCOUNT_REPORT_DATA,
+		data
+	});
+
 const updateGlobalURLReportsMetaData = data => dispatch =>
 	dispatch({
 		type: URL_REPORTS_ACTIONS.REPLACE_GLOBAL_URL_REPORTS_DATA,
@@ -110,6 +116,7 @@ export {
 	updateNetworkConfig,
 	updateGlobalReportMetaData,
 	updateAccountReportMetaData,
+	updateSuperUserAccountReportMetaData,
 	updateGlobalURLReportsMetaData,
 	updateGlobalHBAnalyticMetaData,
 	saveNetworkWideRules

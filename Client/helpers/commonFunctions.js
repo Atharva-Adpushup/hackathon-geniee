@@ -340,6 +340,31 @@ const isSameScheduleOptions = (existingOptions, newOptions) =>
 	existingOptions.startDate === newOptions.startDate &&
 	existingOptions.endDate === newOptions.endDate;
 
+// get meta report based on current user and report type
+const getReportsMeta = (state, options) => {
+	const isReportTypeGlobal = checkReportTypeGlobal(options);
+	const { isForOps } = options;
+	const {
+		reports: {
+			account: accountReportMetaData,
+			global: globalReportMetaData,
+			accountForSuperUser: accountForSuperUserReportMetaData
+		}
+	} = state.global;
+
+	let reportsMeta = null;
+
+	if (isForOps && isReportTypeGlobal) {
+		reportsMeta = { ...globalReportMetaData };
+	} else if (isForOps && !isReportTypeGlobal) {
+		reportsMeta = { ...accountForSuperUserReportMetaData };
+	} else {
+		reportsMeta = { ...accountReportMetaData };
+	}
+
+	return reportsMeta;
+};
+
 export {
 	errorHandler,
 	getDuplicatesInArray,
@@ -358,6 +383,7 @@ export {
 	getDashboardDemoUserSiteIds,
 	getReportingDemoUserValidation,
 	getReportingDemoUserSiteIds,
+	getReportsMeta,
 	getDemoUserSites,
 	getReportingControlDemoUserSites,
 	getAppBaseUrls,

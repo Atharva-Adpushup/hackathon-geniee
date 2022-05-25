@@ -14,7 +14,8 @@ import {
 	GET_HB_INIT_DATA,
 	SET_UNSAVED_CHANGES,
 	FETCH_HB_RULES,
-	UPDATE_HB_RULES
+	UPDATE_HB_RULES,
+	FETCH_ACTIVE_ADUNIT_SIZES
 } from '../../../constants/headerBidding';
 import history from '../../../helpers/history';
 import * as service from '../../../services/hbService';
@@ -174,3 +175,14 @@ export const saveHBRulesAction = (siteId, { rule, ruleIndex }, dataForAuditLogs)
 			throw new Error(error.message);
 		});
 };
+
+export const fetchActiveAdUnitSizesAction = siteId => dispatch =>
+	service
+		.fetchActiveAdUnitSizes(siteId)
+		.then(response => {
+			const { data = [] } = response;
+			dispatch({ type: FETCH_ACTIVE_ADUNIT_SIZES, siteId, data });
+		})
+		.catch(() => {
+			history.push('/error');
+		});

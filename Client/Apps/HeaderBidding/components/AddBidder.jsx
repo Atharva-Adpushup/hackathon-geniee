@@ -87,7 +87,14 @@ export default class AddBidder extends React.Component {
 	};
 
 	render() {
-		const { bidderConfig, siteId, showNotification, inventories, isSuperUser } = this.props;
+		const {
+			bidderConfig,
+			siteId,
+			showNotification,
+			inventories,
+			isSuperUser,
+			activeAdUnitSizes
+		} = this.props;
 
 		return (
 			<div className="options-wrapper white-tab-container hb-bidder hb-add-bidder">
@@ -121,6 +128,7 @@ export default class AddBidder extends React.Component {
 								showNotification={showNotification}
 								inventories={inventories}
 								isSuperUser={isSuperUser}
+								activeAdUnitSizes={activeAdUnitSizes}
 							/>
 						)}
 					</Col>
