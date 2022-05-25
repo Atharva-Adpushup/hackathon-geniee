@@ -1,15 +1,10 @@
 import { connect } from 'react-redux';
 import Control from '../components/Control';
-import { checkReportTypeGlobal } from '../../../helpers/commonFunctions';
+import { getReportsMeta } from '../../../helpers/commonFunctions';
 
 const mapStateToProps = (state, ownProps) => {
-	const isReportTypeGlobal = checkReportTypeGlobal(ownProps);
-	const { isForOps } = ownProps;
-	const {
-		reports: { account: accountReportMetaData, global: globalReportMetaData }
-	} = state.global;
-	const reportsMeta =
-		isForOps || isReportTypeGlobal ? { ...globalReportMetaData } : { ...accountReportMetaData };
+	const reportsMeta = getReportsMeta(state, ownProps);
+
 	const {
 		data: { filter, metrics, dimension, interval, site, hbMetrics }
 	} = reportsMeta;
