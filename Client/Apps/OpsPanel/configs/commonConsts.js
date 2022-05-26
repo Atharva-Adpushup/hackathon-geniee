@@ -544,6 +544,7 @@ const HB_BIDDERS_KEYS_NULL_SHOULD_NOT_BE_NULL = [
 
 const REFRESH_RATE_ENTRIES = [
 	{ name: '30 seconds', value: 30, default: true },
+	{ name: '45 seconds', value: 45 },
 	{ name: '60 seconds', value: 60 },
 	{ name: '90 seconds', value: 90 },
 	{ name: '120 seconds', value: 120 },
