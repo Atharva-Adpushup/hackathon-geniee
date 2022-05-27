@@ -12,7 +12,7 @@ import PresetDateRangePicker from '../../../Components/PresetDateRangePicker/ind
 import SelectBox from '../../../Components/SelectBox/index';
 import Schedule from './Schedule';
 import MultiSelectBox from '../../../Components/MultiSelectBox/index';
-import { getPresets } from '../helpers/utils';
+import { getPresets, getPresetDropdownItems } from '../helpers/utils';
 import reportService from '../../../services/reportService';
 import {
 	accountFilter,
@@ -324,12 +324,12 @@ class Control extends Component {
 		const updatedSelectedDimension = isHB
 			? selectedDimension
 			: selectedDimension.filter(dimension => {
-					for (let i = 0; i < updatedDimensionList.length; i++) {
-						const currentDimension = updatedDimensionList[i];
-						if (currentDimension.value === dimension) return !currentDimension.isDisabled;
-					}
-					return false;
-			  });
+				for (let i = 0; i < updatedDimensionList.length; i++) {
+					const currentDimension = updatedDimensionList[i];
+					if (currentDimension.value === dimension) return !currentDimension.isDisabled;
+				}
+				return false;
+			});
 		return {
 			updatedFilterList,
 			updatedDimensionList,
@@ -533,6 +533,7 @@ class Control extends Component {
 						</label>
 						<PresetDateRangePicker
 							presets={getPresets()}
+							getPresetDropdownItems={getPresetDropdownItems()}
 							startDate={state.startDate}
 							endDate={state.endDate}
 							datesUpdated={({ startDate, endDate }) => {

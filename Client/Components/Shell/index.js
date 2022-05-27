@@ -98,10 +98,19 @@ class Shell extends React.Component {
 			switchUser,
 			impersonateCurrentUser,
 			findUsers,
-			hasUnsavedChanges
+			hasUnsavedChanges,
+			showPaymentStatusBar
 		} = this.props;
 		const routes = this.getRoutes(routeConfig.private, location, user);
 		const sidebarOpen = isSidebarOpen !== undefined ? isSidebarOpen : shouldWeOpenSidebar(location);
+		if (
+			userFetched &&
+			!user.isPaymentDetailsComplete &&
+			!window.location.pathname.includes('payment')
+		) {
+			showPaymentStatusBar(true);
+		}
+
 		return (
 			<Grid fluid>
 				<Row style={{ zIndex: 1 }}>

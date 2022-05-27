@@ -19,7 +19,9 @@ const CustomReactTable = ({
 	pivotBy,
 	onPageChange,
 	onPageSizeChange,
-	subTable
+	subTable,
+	customTableControlsParentClass,
+	customTableControls
 }) => (
 	<ReactTable
 		columns={columns}
@@ -62,12 +64,35 @@ const CustomReactTable = ({
 
 			return (
 				<div className="main-grid">
-					<div className="above-table text-right">
-						<div className="col-sm-12">
-							<span className="records-info">{recordsInfoText} </span>
-						</div>
+					<div
+						style={{
+							display: 'flex',
+							justifyContent: 'end',
+							alignItems: 'center'
+						}}
+					>
+						{customTableControls && customTableControls.length ? (
+							<ul
+								className={`${customTableControlsParentClass || 'reportingCustomWidgetContainer'}`}
+							>
+								{customTableControls.map((widget, index) => (
+									// eslint-disable-next-line react/no-array-index-key
+									<li className="reportingCustomWidget" key={index}>
+										{widget}
+									</li>
+								))}
+								<li>
+									<span>{recordsInfoText}</span>
+								</li>
+							</ul>
+						) : (
+							<div className="above-table text-right">
+								<div className="col-sm-12">
+									<span className="records-info">{recordsInfoText} </span>
+								</div>
+							</div>
+						)}
 					</div>
-
 					{makeTable()}
 				</div>
 			);

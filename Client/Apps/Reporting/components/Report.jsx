@@ -216,10 +216,14 @@ class Report extends Component {
 
 		const {
 			reportsMeta,
+			userSites,
 			user: {
 				data: { isSuperUser }
 			}
 		} = this.props;
+
+		// For the publishers with Single site - we should enable all the dimensions, metrics by default
+		const sitesCount = Object.keys(userSites).length;
 
 		const { dimension: dimensionListObj, filter: filterListObj } = reportsMeta.data;
 		const dimensionList = convertObjToArr(dimensionListObj);
@@ -228,15 +232,18 @@ class Report extends Component {
 			? { updatedDimensionList: dimensionList, updatedFilterList: filterList }
 			: this.removeOpsFilterDimension(filterList, dimensionList);
 
-		updatedFilterList.forEach(filter => {
-			// eslint-disable-next-line no-param-reassign
-			filter.isDisabled = this.isControlItemDisabled(filter, disabledFilter, reportType);
-		});
+		// Enable all dimensions, filters if pub has only one site
+		if (sitesCount !== 1) {
+			updatedFilterList.forEach(filter => {
+				// eslint-disable-next-line no-param-reassign
+				filter.isDisabled = this.isControlItemDisabled(filter, disabledFilter, reportType);
+			});
 
-		updatedDimensionList.forEach(dimension => {
-			// eslint-disable-next-line no-param-reassign
-			dimension.isDisabled = this.isControlItemDisabled(dimension, disabledDimension, reportType);
-		});
+			updatedDimensionList.forEach(dimension => {
+				// eslint-disable-next-line no-param-reassign
+				dimension.isDisabled = this.isControlItemDisabled(dimension, disabledDimension, reportType);
+			});
+		}
 
 		computedMetricsList.forEach(metrics => {
 			// eslint-disable-next-line no-param-reassign
@@ -558,7 +565,18 @@ class Report extends Component {
 						dataFetchedDimension: selectedDimension,
 						XPATHParams
 					};
-					this.setState(newState);
+					this.setState(newState, () => {
+						const { selectedInterval } = inputState;
+						if (selectedInterval === 'cumulative') {
+							// Expand Tree view - trigger force click on Caret Icon.
+							setTimeout(() => {
+								Array.from(document.getElementsByClassName('rt-pivot')).map(item => {
+									item.click();
+									return item;
+								});
+							}, 300);
+						}
+					});
 				})
 				.catch(this.handleError);
 		});

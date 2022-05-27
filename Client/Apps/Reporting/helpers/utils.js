@@ -90,11 +90,20 @@ const getPresets = () => {
 		},
 		{
 			text: 'This Month',
-			start: startOfMonth,
+			start: moment().startOf('month'),
 			end: yesterday.isBefore(startOfMonth) ? startOfMonth : yesterday
-		},
-		{
-			text: 'Last Month',
+		}
+	];
+};
+
+const getPresetDropdownItems = () => [
+	{
+		default_enabled: true,
+		display_name: 'Last Month',
+		label: 'Last Month',
+		isDisabled: false,
+		position: 1,
+		value: {
 			start: moment()
 				.subtract(1, 'months')
 				.startOf('month'),
@@ -102,8 +111,94 @@ const getPresets = () => {
 				.subtract(1, 'months')
 				.endOf('month')
 		}
-	];
-};
+	},
+	{
+		default_enabled: true,
+		display_name: 'Last 3 Months',
+		label: 'Last 3 Months',
+		isDisabled: false,
+		position: 1,
+		value: {
+			start: moment()
+				.subtract(3, 'months')
+				.startOf('month'),
+			end: moment()
+				.subtract(1, 'months')
+				.endOf('month')
+		}
+	},
+	{
+		default_enabled: true,
+		display_name: 'Last 6 Months',
+		label: 'Last 6 Months',
+		isDisabled: false,
+		position: 2,
+		value: {
+			start: moment()
+				.subtract(6, 'months')
+				.startOf('month'),
+			end: moment()
+				.subtract(1, 'months')
+				.endOf('month')
+		}
+	},
+	{
+		default_enabled: true,
+		display_name: 'Last Quarter',
+		label: 'Last Quarter',
+		isDisabled: false,
+		position: 3,
+		value: {
+			start: moment()
+				.quarter(moment().quarter() - 1)
+				.startOf('quarter'),
+			end: moment()
+				.quarter(moment().quarter() - 1)
+				.endOf('quarter')
+		}
+	},
+	{
+		default_enabled: true,
+		display_name: 'Week to Date',
+		label: 'Week to Date',
+		isDisabled: false,
+		position: 4,
+		value: {
+			start: moment()
+				.subtract(7, 'days')
+				.startOf('day'),
+			end: moment()
+				.subtract(1, 'days')
+				.endOf('day')
+		}
+	},
+	{
+		default_enabled: true,
+		display_name: 'Quarter to Date',
+		label: 'Quarter to Date',
+		isDisabled: false,
+		position: 5,
+		value: {
+			start: moment().startOf('quarter'),
+			end: moment()
+				.subtract(1, 'days')
+				.endOf('day')
+		}
+	},
+	{
+		default_enabled: true,
+		display_name: 'Year to Date',
+		label: 'Year to Date',
+		isDisabled: false,
+		position: 6,
+		value: {
+			start: moment().startOf('year'),
+			end: moment()
+				.subtract(1, 'days')
+				.endOf('day')
+		}
+	}
+];
 
 const getReportScheduleIntervals = () => [
 	{
@@ -171,6 +266,7 @@ export {
 	computeCsvData,
 	numberWithCommas,
 	getPresets,
+	getPresetDropdownItems,
 	calculateTotalPageViews,
 	calculateTotalNetRevenues,
 	calculateTotalImpressions,
