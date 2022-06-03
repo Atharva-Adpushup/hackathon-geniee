@@ -1,30 +1,26 @@
+/* eslint-disable prefer-destructuring */
 const express = require('express');
 const atob = require('atob');
 const moment = require('moment');
 const request = require('request-promise');
 const _ = require('lodash');
-
+const { getAllUserSites } = require('../models/userModel');
 const { couchBase } = require('../configs/config');
 const HTTP_STATUSES = require('../configs/httpStatusConsts');
 const {
 	GET_SITES_STATS_API,
 	EMAIL_REGEX,
 	AUDIT_LOGS_ACTIONS: { OPS_PANEL },
-	docKeys: { networkWideHBRules }
+	docKeys: { networkWideHBRules },
+	AD_UNIT_TYPE_MAPPING
 } = require('../configs/commonConsts');
-const {
-	sendSuccessResponse,
-	sendErrorResponse,
-	getPageGroupNameAndPlatformFromChannelDoc
-} = require('../helpers/commonFunctions');
+const { sendSuccessResponse, sendErrorResponse } = require('../helpers/commonFunctions');
 const {
 	appBucket,
 	errorHandler,
 	sendDataToAuditLogService,
-	getAllAds,
-	updateApTagAd,
-	updateInnovativeAd,
-	updateApLiteAd
+	updateAds,
+	publishAdPushupBuild
 } = require('../helpers/routeHelpers');
 const opsModel = require('../models/opsModel');
 const apLiteModel = require('../models/apLiteModel');
@@ -35,17 +31,12 @@ const opsValidations = require('../validations/opsValidations');
 const FormValidator = require('../helpers/FormValidator');
 const schema = require('../helpers/schema');
 const AdPushupError = require('../helpers/AdPushupError');
-const channelModel = require('../models/channelModel');
 
 const router = express.Router();
 
 const helpers = {
 	getAllSitesFromCouchbase: () => {
-		const query = `select a.siteId, a.siteDomain, a.adNetworkSettings, a.ownerEmail, a.step, a.channels, a.apConfigs, a.dateCreated, b.adNetworkSettings[0].pubId, b.adNetworkSettings[0].adsenseEmail from ${
-			couchBase.DEFAULT_BUCKET
-		} a join ${
-			couchBase.DEFAULT_BUCKET
-		} b on keys 'user::' || a.ownerEmail where meta(a).id like 'site::%'`;
+		const query = `select a.siteId, a.siteDomain, a.adNetworkSettings, a.ownerEmail, a.step, a.channels, a.apConfigs, a.dateCreated, b.adNetworkSettings[0].pubId, b.adNetworkSettings[0].adsenseEmail from ${couchBase.DEFAULT_BUCKET} a join ${couchBase.DEFAULT_BUCKET} b on keys 'user::' || a.ownerEmail where meta(a).id like 'site::%'`;
 		return appBucket.queryDB(query);
 	},
 	makeAPIRequest: options => {
@@ -324,13 +315,13 @@ router
 			.catch(err => {
 				if (err && err.code === 13) {
 					// doc doesn't exist. proceed with saving config
-					return apLiteModel.saveAdUnits(json)
+					return apLiteModel.saveAdUnits(json);
 				}
 
 				throw err;
 			})
 			.then(apLiteSite => {
-				prevConfig = !!apLiteSite ? apLiteSite.data || {} : {};
+				prevConfig = apLiteSite ? apLiteSite.data || {} : {};
 			})
 			.then(() => apLiteModel.saveAdUnits(json))
 			.then(() => apLiteModel.getAPLiteModelBySite(json.siteId))
@@ -568,19 +559,63 @@ router
 			});
 	})
 
-	.get('/getAdUnitMapping', (req, res) =>
-		getAllAds()
+	// - headerBidding //found networkData->headerBidding
+	// - refreshSlot   //found networkData->refreshSlot
+	// - fluid         //found at root
+	// - enableLazyLoading      //enableLazyLoading root level flag is used, found at root (check for chnl)
+	// - isActive (Archived/deleted)  //found at root                             (check for chnl)
+	// - disableReuseVacantAdSpace   //found root level of node                   (check for chnl)
+	// - collapseUnfilled            //found root level of node                   (check for chnl)
+	// - downwardSizesDisabled       //found root level of node                   (check for chnl)
+
+	.get('/getAdUnitMapping', async (req, res) => {
+		const allSites = await getAllUserSites(req.user.email).map(site => site.siteId.toString());
+		const allAdUnitsPromise = allSites.map(siteId => opsModel.getSiteAllInventory(siteId));
+		Promise.all(allAdUnitsPromise)
+			.then(adUnitsForEverySite => {
+				const allAdUnits = [];
+				for (let index = 0; index < adUnitsForEverySite.length; index += 1) {
+					allAdUnits.push(...adUnitsForEverySite[index]);
+				}
+				return allAdUnits;
+			})
 			.then(data => {
 				const ads = [];
-
 				data.forEach(adData => {
 					const { key: docId, value: ad } = adData;
 					const docType = docId.substr(0, 4);
 					const { siteId, siteDomain, networkData, sizeFilters, height, width } = ad;
-
-					let { adId, collapseUnfilled, downwardSizesDisabled, dfpAdunitCode, dfpAdunit } = ad;
-
-					let adObj = { docId };
+					const {
+						adId,
+						collapseUnfilled,
+						downwardSizesDisabled,
+						fluid,
+						enableLazyLoading,
+						disableReuseVacantAdSpace,
+						formatData
+					} = ad;
+					let { isActive } = ad;
+					let adUnitType = 1;
+					let { headerBidding, refreshSlot, dfpAdunitCode, dfpAdunit } = networkData || {};
+					if (formatData && formatData.type) {
+						const val = AD_UNIT_TYPE_MAPPING[formatData.type.toUpperCase()];
+						if (val) {
+							adUnitType = val;
+						}
+					}
+					let adObj = {
+						docId,
+						adId,
+						refreshSlot: !!refreshSlot,
+						headerBidding: !!headerBidding,
+						collapseUnfilled: !!collapseUnfilled,
+						downwardSizesDisabled: !!downwardSizesDisabled,
+						fluid: !!fluid,
+						isActive: !!isActive,
+						enableLazyLoading: !!enableLazyLoading,
+						disableReuseVacantAdSpace: !!disableReuseVacantAdSpace,
+						adUnitType
+					};
 
 					// transform the data to display in inventory tab
 					switch (docType) {
@@ -588,25 +623,15 @@ router
 							if (!networkData) {
 								return;
 							}
-							dfpAdunitCode = networkData.dfpAdunitCode;
-							dfpAdunit = networkData.dfpAdunit;
-
 							if (!dfpAdunitCode) {
 								return;
 							}
-
-							collapseUnfilled = !!collapseUnfilled;
-							downwardSizesDisabled = !!downwardSizesDisabled;
-
 							adObj = {
 								...adObj,
 								siteId,
 								siteDomain,
 								dfpAdunitCode,
 								dfpAdunit,
-								adId,
-								collapseUnfilled,
-								downwardSizesDisabled,
 								sizeFilters,
 								height,
 								width
@@ -614,30 +639,22 @@ router
 
 							ads.push(adObj);
 							break;
+						case 'ampd':
 						case 'fmrt':
 						case 'tgmr':
-							adId = ad.id;
 							if (!networkData) {
 								return;
 							}
-
-							dfpAdunitCode = networkData.dfpAdunitCode;
-							dfpAdunit = networkData.dfpAdunit;
 							if (!dfpAdunitCode) {
 								return;
 							}
 
-							collapseUnfilled = !!ad.collapseUnfilled;
-							downwardSizesDisabled = !!ad.downwardSizesDisabled;
 							adObj = {
 								...adObj,
 								siteId,
 								siteDomain,
 								dfpAdunitCode,
 								dfpAdunit,
-								adId,
-								collapseUnfilled,
-								downwardSizesDisabled,
 								sizeFilters,
 								height,
 								width
@@ -646,9 +663,11 @@ router
 							break;
 
 						case 'aplt':
-							collapseUnfilled = !!ad.collapseUnfilled;
-							downwardSizesDisabled = !!ad.downwardSizesDisabled;
 							dfpAdunit = ad.dfpAdUnit;
+							dfpAdunitCode = ad.dfpAdunitCode;
+							headerBidding = ad.headerBidding;
+							refreshSlot = ad.refreshSlot;
+							isActive = ad.isActive;
 							adObj = {
 								...adObj,
 								siteId,
@@ -656,12 +675,14 @@ router
 								dfpAdunitCode,
 								dfpAdunit,
 								adId: dfpAdunit,
-								collapseUnfilled,
-								downwardSizesDisabled,
-								sizeFilters
+								sizeFilters,
+								headerBidding,
+								refreshSlot,
+								isActive
 							};
 							ads.push(adObj);
 							break;
+
 						default:
 							break;
 					}
@@ -669,8 +690,10 @@ router
 
 				return sendSuccessResponse(ads, res);
 			})
-			.catch(err => errorHandler(err, res, HTTP_STATUSES.INTERNAL_SERVER_ERROR))
-	)
+			.catch(err => {
+				errorHandler(err, res, HTTP_STATUSES.INTERNAL_SERVER_ERROR);
+			});
+	})
 	.get('/getSiteMapping', (req, res) => {
 		if (!req.user.isSuperUser) {
 			return sendErrorResponse(
@@ -686,102 +709,9 @@ router
 			.then(message => sendSuccessResponse(message, res))
 			.catch(err => errorHandler(err, res));
 	})
-	.post('/updateAdUnitData/:siteId', (req, res) => {
-		if (!req.user.isSuperUser) {
-			return sendErrorResponse(
-				{
-					message: 'Unauthorized Request',
-					code: HTTP_STATUSES.UNAUTHORIZED
-				},
-				res
-			);
-		}
-		const { adUnitData } = req.body;
-		const {
-			docId,
-			adId,
-			collapseUnfilled,
-			sizeFilters,
-			downwardSizesDisabled,
-			siteDomain
-		} = adUnitData;
-
-		const docType = docId.substr(0, 4);
-		let newData = {};
-		let adData = {};
-
-		const { siteId } = req.params;
-
-		switch (docType) {
-			case 'chnl':
-				const { pageGroup, platform } = getPageGroupNameAndPlatformFromChannelDoc(docId);
-				// updateLayoutAd
-				return channelModel
-					.getChannel(siteId, platform, pageGroup)
-					.then(({ data: channelData }) => {
-						let prevConfig = {};
-						let currentConfig = {};
-						const { variations, siteDomain } = channelData;
-						for (const key in variations) {
-							const { sections } = variations[key];
-							for (const section in sections) {
-								const { ads } = sections[section];
-								if (ads[adId]) {
-									prevConfig = { ...ads[adId] };
-									ads[adId] = {
-										...ads[adId],
-										downwardSizesDisabled,
-										collapseUnfilled,
-										sizeFilters
-									};
-									currentConfig = {
-										...ads[adId],
-										downwardSizesDisabled,
-										collapseUnfilled,
-										sizeFilters
-									};
-									break;
-								}
-							}
-						}
-
-						const appName = 'Ad Unit Inventory';
-						const { email, originalEmail } = req.user;
-
-						// log config changes
-						sendDataToAuditLogService({
-							siteId,
-							siteDomain,
-							appName,
-							type: 'app',
-							impersonateId: email,
-							userId: originalEmail,
-							prevConfig,
-							currentConfig,
-							action: {
-								name: OPS_PANEL.TOOLS,
-								data: `Ad Inventory Change - Channel Doc Updated`
-							}
-						});
-
-						return channelModel.saveChannel(siteId, platform, pageGroup, channelData);
-					})
-					.then(chnlData => sendSuccessResponse(chnlData, res))
-					.catch(err => errorHandler(err, res, HTTP_STATUSES.INTERNAL_SERVER_ERROR));
-			case 'tgmr':
-				newData = { collapseUnfilled, downwardSizesDisabled, sizeFilters };
-				adData = { adUnitId: adId, newData, docId, siteDomain };
-				return updateApTagAd(req, res, adData);
-			case 'fmrt':
-				newData = { collapseUnfilled, downwardSizesDisabled, sizeFilters };
-				adData = { adUnitId: adId, newData, docId, siteDomain };
-				return updateInnovativeAd(req, res, adData);
-			case 'aplt':
-				newData = { collapseUnfilled, downwardSizesDisabled, sizeFilters };
-				adData = { adUnitId: adId, adUnitData: newData, docId, siteDomain };
-				return updateApLiteAd(req, res, adData);
-
-			default:
+	.post('/updateInventories', async (req, res) => {
+		try {
+			if (!req.user.isSuperUser) {
 				return sendErrorResponse(
 					{
 						message: 'Unauthorized Request',
@@ -789,6 +719,31 @@ router
 					},
 					res
 				);
+			}
+			const { seggragatedAds, dataForAuditLogs } = req.body;
+			const docIds = Object.keys(seggragatedAds);
+			const allAdsUpdatePromise = docIds.map(docId => updateAds(docId, seggragatedAds[docId]));
+			const { email, originalEmail } = req.user;
+			const { appName, type = 'app', newConfig, oldConfig, actionInfo } = dataForAuditLogs;
+			await Promise.all(allAdsUpdatePromise);
+			const allSiteIds = docIds.map(docId => docId.split(':')[2]);
+			const uniqueSiteIds = [...new Set(allSiteIds)];
+			uniqueSiteIds.forEach(siteId => publishAdPushupBuild(siteId));
+			sendDataToAuditLogService({
+				appName,
+				impersonateId: email,
+				userId: originalEmail,
+				prevConfig: oldConfig,
+				currentConfig: newConfig,
+				action: {
+					name: actionInfo,
+					data: `Inventory Tab Updates`
+				},
+				type
+			});
+			return sendSuccessResponse({ message: 'Operation Successfull' }, res, HTTP_STATUSES.OK);
+		} catch (error) {
+			return sendErrorResponse({ message: error }, res, HTTP_STATUSES.BAD_REQUEST);
 		}
 	})
 	.put('/pnp-refresh/:siteId', async (req, res) => {

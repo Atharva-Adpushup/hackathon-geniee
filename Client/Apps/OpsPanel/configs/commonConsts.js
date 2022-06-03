@@ -696,6 +696,92 @@ const RULES_ENGINE = {
 	]
 };
 
+const INVENTORY_BULK_ACTIONS = [
+	{
+		name: 'Enable Collapse Unfilled Impressions',
+		value: 'enable-collapseUnfilled'
+	},
+	{
+		name: 'Disable Collapse Unfilled Impressions',
+		value: 'disable-collapseUnfilled'
+	},
+	{
+		name: 'Enable Lazy Loading',
+		value: 'enable-enableLazyLoading'
+	},
+	{
+		name: 'Disable Lazy Loading',
+		value: 'disable-enableLazyLoading'
+	},
+	{
+		name: 'Enable Fluid',
+		value: 'enable-fluid'
+	},
+	{
+		name: 'Disable Fluid',
+		value: 'disable-fluid'
+	},
+	{
+		name: 'Enable Header Bidding',
+		value: 'enable-headerBidding'
+	},
+	{
+		name: 'Disable Header Bidding',
+		value: 'disable-headerBidding'
+	},
+	{
+		name: 'Enable Refresh Slot',
+		value: 'enable-refreshSlot'
+	},
+	{
+		name: 'Disable Refresh Slot',
+		value: 'disable-refreshSlot'
+	},
+	{
+		name: 'Enable Ad',
+		value: 'enable-isActive'
+	},
+	{
+		name: 'Disable Ad',
+		value: 'disable-isActive'
+	},
+	{
+		name: 'Enable Reuse Vacant Space',
+		value: 'disable-disableReuseVacantAdSpace'
+	},
+	{
+		name: 'Disable Reuse Vacant Space',
+		value: 'enable-disableReuseVacantAdSpace'
+	},
+	{
+		name: 'Enable Downward Sizes',
+		value: 'disable-downwardSizesDisabled'
+	},
+	{
+		name: 'Disable Downward Sizes',
+		value: 'enable-downwardSizesDisabled'
+	}
+];
+
+const AD_UNIT_TYPE_MAPPING = {
+	1: 'DISPLAY',
+	2: 'DOCKED', // javatpoint
+	3: 'STICKY', // javatpoint
+	// 4: 'AMP', // bollywood shadis , livemint
+	5: 'REWARDED ADS', // erail
+	6: 'INSTREAM', //  Javatpoint, Journaldev, //this will be not present in inventory filter as it is still in poc
+	7: 'CHAINED DOCKED', //  digitbin
+	8: 'INTERSTITIAL', // digitbin
+	101: 'INVIEW'
+};
+
+const FILTER_KEY_VALUE_MAPPING = {
+	adUnitType: 'AD Type',
+	siteDomain: 'Site Domain',
+	siteId: 'Site Id',
+	dfpAdunit: 'Ad Unit'
+};
+
 export {
 	adUnitsData,
 	adUnitsHeaders,
@@ -739,5 +825,8 @@ export {
 	PNP_REFRESH_TYPES,
 	AP_LIGHT_AD_UNIT_OPERATIONS,
 	POWERED_BY_BANNER,
-	RULES_ENGINE
+	RULES_ENGINE,
+	INVENTORY_BULK_ACTIONS,
+	AD_UNIT_TYPE_MAPPING,
+	FILTER_KEY_VALUE_MAPPING
 };

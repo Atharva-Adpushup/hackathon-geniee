@@ -24,6 +24,7 @@ const {
 	docKeys,
 	AMP_REFRESH_INTERVAL
 } = require('../configs/commonConsts');
+const channelModel = require('../models/channelModel');
 
 const appBucket = couchbaseService(
 	`couchbase://${config.couchBase.HOST}/${config.couchBase.DEFAULT_BUCKET}`,
@@ -429,24 +430,14 @@ function getAmpAds(siteId) {
 function getNewAmpAds(siteId) {
 	return couchbase
 		.connectToAppBucket()
-		.then(appBucket => appBucket.getAsync(`${docKeys.ampScript}${siteId}`, {}).then(ampdDoc => {
-			const { value: { ads } } = ampdDoc;
-			return ads;
-		}))
-		.catch(err => console.log(err));
-}
-
-function getAllAds() {
-	const designName = 'AdunitMapping',
-		viewName = 'Adunits';
-	var query = ViewQuery.from(designName, viewName).reduce(false);
-
-	return couchbase
-		.connectToAppBucket()
-		.then(appBucket => appBucket.queryAsync(query))
-		.then(ads => {
-			return ads;
-		})
+		.then(appBucket =>
+			appBucket.getAsync(`${docKeys.ampScript}${siteId}`, {}).then(ampdDoc => {
+				const {
+					value: { ads }
+				} = ampdDoc;
+				return ads;
+			})
+		)
 		.catch(err => console.log(err));
 }
 
@@ -536,7 +527,7 @@ const updateApLiteAd = (req, res, adData, logServiceNames) => {
 				if (ad.dfpAdUnit == adUnitId) {
 					prevConfig = { ...ad };
 					currentConfig = { ...ad, ...adUnitData };
-					doc.ads[index] = currentConfig;
+					doc.adUnits[index] = currentConfig;
 					return false;
 				}
 				return true;
@@ -624,7 +615,7 @@ function fetchNewAmpAds(req, res, docKey) {
 		})
 		.catch(err =>
 			err.code && err.code === 13 && err.message.includes('key does not exist')
-				? sendSuccessResponse({ ads: []}, res)
+				? sendSuccessResponse({ ads: [] }, res)
 				: errorHandler(err, res)
 		);
 }
@@ -648,11 +639,10 @@ function updateAmpTags(id, ads, updateThis) {
 				value = updatedAd;
 				value.updatedOn = +new Date();
 				if (value.ad.isRefreshEnabled) {
-					!value.ad.refreshInterval &&
-						(value.ad.refreshInterval = AMP_REFRESH_INTERVAL);
+					!value.ad.refreshInterval && (value.ad.refreshInterval = AMP_REFRESH_INTERVAL);
 				} else {
 					delete value.ad.refreshInterval;
-				}				
+				}
 			}
 
 			return appBucket.replaceAsync(`amtg::${id}`, value) && value;
@@ -669,10 +659,10 @@ function updateAmpTags(id, ads, updateThis) {
 function findAndUpdateAmpAd(value, id, update) {
 	const index = value.ads.findIndex(adItem => adItem.id == id);
 	let adItem = value.ads[index];
-	value.ads[index] = {...value.ads[index], ...update}
+	value.ads[index] = { ...value.ads[index], ...update };
 
 	value.updatedOn = +new Date();
-	if(!adItem.networkData.refreshInterval) {
+	if (!adItem.networkData.refreshInterval) {
 		adItem.isRefreshEnabled
 			? (adItem.networkData.refreshInterval = AMP_REFRESH_INTERVAL)
 			: delete adItem.refreshInterval;
@@ -693,7 +683,7 @@ function updateAmpTagsNewFormat(id, ads, siteId, updateThis) {
 			} else {
 				ads.forEach(ad => {
 					value = findAndUpdateAmpAd(value, ad.id, ad);
-				})
+				});
 			}
 			return appBucket.replaceAsync(`${docKeys.ampScript}${siteId}`, value) && value;
 		})
@@ -864,6 +854,135 @@ function storedRequestWrapper(doc) {
 function publishAdPushupBuild(siteId) {
 	adpushup.emit('siteSaved', siteId);
 }
+/*
+  headerBidding //found networkData->headerBidding chnl,fmrt,tgmr,amp , aplt(located at root level)
+  refreshSlot   //found networkData->refreshSlot   chnl,fmrt,tgmr,amp , aplt(located at root level)
+  fluid         //found at root                    chnl,fmrt,tgmr,amp
+  enableLazyLoading      //enableLazyLoading root level flag is used, found at root chnl->present at section level chnl::37780:MOBILE:POST PAGE , fmrt ,tgmr, amp (Make that layout change for generateAmpAdPushupConfig also)  (for channel doc handle enableLazyLoading condition)
+  isActive (Archived/deleted)  //found at root                             fmrt , does channel doc have this flag? ,tgmr ,aplt
+  disableReuseVacantAdSpace   //found root level of node                   chnl,fmrt ,tgmr
+  collapseUnfilled            //found root level of node                   chnl,fmrt ,tgmr
+  downwardSizesDisabled       //found root level of node                   chnl,fmrt ,tgmr
+  */
+
+function updateAd({ ad, updatedData, docId }) {
+	const docType = docId.substr(0, 4);
+	const { actionValue, enable } = updatedData;
+	if (docType === 'aplt') {
+		const allowedActions = [
+			'headerBidding',
+			'refreshSlot',
+			'isActive',
+			'enableLazyLoading',
+			'collapseUnfilled',
+			'downwardSizesDisabled'
+		];
+		if (allowedActions.includes(actionValue)) {
+			ad = { ...ad, [actionValue]: enable };
+		}
+	} else {
+		if (actionValue === 'headerBidding' || actionValue === 'refreshSlot') {
+			const { networkData: oldNetworkData } = ad;
+			ad = {
+				...ad,
+				networkData: {
+					...oldNetworkData,
+					[actionValue]: enable
+				}
+			};
+		} else {
+			ad = { ...ad, [actionValue]: enable };
+		}
+	}
+
+	return ad;
+}
+
+//for channel doc ads
+async function updateChannelDocAds({ docId, adsToBeUpdatedMap }) {
+	const { data: channel } = await channelModel.getChannelByDocId(docId);
+	if (channel.variations && Object.keys(channel.variations).length) {
+		for (const variationKey in channel.variations) {
+			const variation = channel.variations[variationKey];
+			if (variation.sections && Object.keys(variation.sections).length) {
+				for (const sectionKey in variation.sections) {
+					let section = variation.sections[sectionKey];
+					if (section.ads && Object.keys(section.ads).length) {
+						for (const adKey in section.ads) {
+							let ad = section.ads[adKey];
+							const adId = ad.id;
+							if (adsToBeUpdatedMap[adId]) {
+								const { actionValue, enable } = adsToBeUpdatedMap[adId];
+								if (actionValue === 'enableLazyLoading') {
+									section = { ...section, [actionValue]: enable };
+								} else {
+									ad = updateAd({ ad, updatedData: adsToBeUpdatedMap[adId], docId });
+								}
+								section.ads[adKey] = ad;
+							}
+						}
+					} else {
+						continue;
+					}
+					variation.sections[sectionKey] = section;
+				}
+			} else {
+				continue;
+			}
+			channel.variations[variationKey] = variation;
+		}
+	}
+	await channelModel.updateChannel(docId, channel);
+}
+
+//for ApTag , Innovative , Amp Ads ,ApLite Ads
+function updateGeneralAds({ docId, adsToBeUpdatedMap }) {
+	return couchbase
+		.connectToAppBucket()
+		.then(appBucket => appBucket.getAsync(docId))
+		.then(docWithCas => {
+			const docType = docId.substr(0, 4);
+			const { value } = docWithCas;
+			let { ads = [] } = value;
+			if (docType === 'aplt') {
+				const { adUnits = [] } = value;
+				ads = adUnits;
+			}
+			for (let index = 0; index < ads.length; index += 1) {
+				const ad = ads[index];
+				let adId = ad.id;
+				if (docType === 'aplt') {
+					const { dfpAdUnit } = ad;
+					adId = dfpAdUnit;
+				}
+				if (adsToBeUpdatedMap[adId]) {
+					ads[index] = updateAd({ ad, updatedData: adsToBeUpdatedMap[adId], docId });
+				}
+			}
+			if (docType === 'aplt') {
+				value.adUnits = ads;
+			} else {
+				value.ads = ads;
+			}
+			return value;
+		})
+		.then(value => appBucket.updateDoc(docId, value));
+}
+
+async function updateAds(docId, ads = []) {
+	const docType = docId.substr(0, 4);
+	const adsToBeUpdatedMap = ads.reduce((adsMap, ad) => {
+		const { adId } = ad;
+		adsMap[adId] = ad;
+		return adsMap;
+	}, {});
+	switch (docType) {
+		case 'chnl':
+			return updateChannelDocAds({ docId, adsToBeUpdatedMap });
+		default:
+			return updateGeneralAds({ docId, adsToBeUpdatedMap });
+	}
+}
 
 module.exports = {
 	verifyOwner,
@@ -890,8 +1009,8 @@ module.exports = {
 	getNewAmpAds,
 	publishAdPushupBuild,
 	sendDataToAuditLogService,
-	getAllAds,
 	updateApLiteAd,
 	updateInnovativeAd,
-	updateApTagAd
+	updateApTagAd,
+	updateAds
 };

@@ -11,10 +11,116 @@ const AdPushupError = require('../helpers/AdPushupError');
 const commonConsts = require('../configs/commonConsts');
 const proxy = require('../helpers/proxy');
 const config = require('../configs/config');
+const siteModel = require('./siteModel');
 
 const axios = require('axios');
 const { AMP_SETTINGS_ACCESS_EMAILS } = require('../configs/commonConsts');
 const commonSiteFunctions = {
+	getLayoutInventories: siteId =>
+		siteModel
+			.getSiteById(siteId)
+			.then(site => site.getAllChannels())
+			.then(channels => {
+				const inventories = [];
+				for (const channel of channels) {
+					const { pageGroup, platform: device } = channel;
+					const inventory = {};
+					if (channel.variations && Object.keys(channel.variations).length) {
+						for (const variationKey in channel.variations) {
+							const variation = channel.variations[variationKey];
+
+							if (variation.sections && Object.keys(variation.sections).length) {
+								for (const sectionKey in variation.sections) {
+									const section = variation.sections[sectionKey];
+									const { enableLazyLoading = false } = section;
+									if (section.ads && Object.keys(section.ads).length) {
+										for (const adKey in section.ads) {
+											const ad = section.ads[adKey];
+											// ad->networkData->formats (Also default value is format if none is found)
+											if (ad.network === 'adpTags') {
+												inventory.key = 'chnl::' + siteId + ':' + device + ':' + pageGroup;
+												ad.siteId = siteId;
+												ad.siteDomain = channel.siteDomain;
+												ad.adId = adKey;
+												ad.enableLazyLoading = enableLazyLoading;
+												inventory.value = ad;
+												inventories.push({ ...inventory });
+											}
+										}
+									} else {
+										continue;
+									}
+								}
+							} else {
+								continue;
+							}
+						}
+					} else {
+						continue;
+					}
+				}
+
+				return inventories;
+			})
+			.catch(err => {
+				return [];
+			}),
+	//for ApTag , Innovative , Amp Ads
+	getAdsInventories: (siteId, type) =>
+		couchbase
+			.connectToAppBucket()
+			.then(appBucket => appBucket.getAsync(`${type}::${siteId}`, {}))
+			.then(({ value }) => {
+				//ampd
+				const inventories = [];
+				if (value.ads.length) {
+					for (const ad of value.ads) {
+						const inventory = {};
+						if (ad.network === 'adpTags') {
+							inventory.key = `${type}::${siteId}`;
+							ad.siteId = siteId;
+							ad.siteDomain = value.siteDomain;
+							ad.adId = ad.id;
+							inventory.value = ad;
+							inventories.push({ ...inventory });
+						}
+					}
+				}
+				return inventories;
+			})
+			.catch(err => {
+				if (err.code === 13) {
+					return [];
+				}
+
+				throw err;
+			}),
+
+	getApLiteInventories: siteId =>
+		couchbase
+			.connectToAppBucket()
+			.then(appBucket => appBucket.getAsync(`aplt::${siteId}`, {}))
+			.then(({ value }) => {
+				const inventories = [];
+				if (value.adUnits.length) {
+					for (const ad of value.adUnits) {
+						const inventory = {};
+						inventory.key = `aplt::${siteId}`;
+						ad.siteId = siteId;
+						inventory.value = ad;
+						inventories.push(inventory);
+					}
+				}
+
+				return inventories;
+			})
+			.catch(err => {
+				if (err.code === 13) {
+					return [];
+				}
+
+				throw err;
+			}),
 	isActiveHbBidder(network, key) {
 		return network.isActive && network.isHb && key !== 'adpTags';
 	},
@@ -248,7 +354,33 @@ const commonSiteFunctions = {
 				...DEFAULT_WIDTH
 			}
 		];
-	}
+	},
+	getInventories: siteId =>
+		Promise.all([
+			commonSiteFunctions.getLayoutInventories(siteId),
+			commonSiteFunctions.getAdsInventories(siteId, 'tgmr'),
+			commonSiteFunctions.getAdsInventories(siteId, 'fmrt'),
+			commonSiteFunctions.getAdsInventories(siteId, 'ampd'),
+			commonSiteFunctions.getApLiteInventories(siteId)
+		]).then(
+			([
+				layoutInventories,
+				apTagInventories = [],
+				innovativeAdsInventories = [],
+				ampAdsInventories = [],
+				apLiteInventories = []
+			]) => {
+				const inventories = [
+					...layoutInventories,
+					...apTagInventories,
+					...innovativeAdsInventories,
+					...ampAdsInventories,
+					...apLiteInventories
+				];
+
+				return inventories;
+			}
+		)
 };
 
 function apiModule() {
@@ -396,6 +528,13 @@ function apiModule() {
 					console.log(err);
 					throw new AdPushupError('Something went wrong');
 				});
+		},
+		getSiteAllInventory: async siteId => {
+			const inventories = await commonSiteFunctions.getInventories(siteId);
+			if (!inventories.length) {
+				return [];
+			}
+			return inventories;
 		}
 	};
 
