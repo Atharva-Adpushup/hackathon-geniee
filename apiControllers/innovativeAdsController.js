@@ -221,6 +221,19 @@ router
 		return verifyOwner(payload.siteId, req.user.email)
 			.then(() => appBucket.getDoc(`${docKeys.interactiveAds}${req.body.siteId}`))
 			.then(docWithCas => {
+				const { formatData } = payload.ad;
+				if (formatData.format === 'interstitial') {
+					const interstitialAdsPlatform = docWithCas.value.ads
+						.filter(ad => ad.formatData.format === 'interstitial')
+						.map(ad => ad.formatData.platform);
+					const { platform } = payload.ad.formatData;
+					if (interstitialAdsPlatform.includes(platform)) {
+						throw new Error(`Interstitial Ad is already running on ${platform}`);
+					}
+				}
+				return docWithCas;
+			})
+			.then(docWithCas => {
 				prevConfig = _.cloneDeep(docWithCas.value);
 				return fn.processing(docWithCas, payload);
 			})
