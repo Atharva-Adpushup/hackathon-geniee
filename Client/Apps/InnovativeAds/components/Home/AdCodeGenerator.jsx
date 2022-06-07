@@ -236,7 +236,10 @@ class AdCodeGenerator extends Component {
 				progress: 100,
 				loading: true
 			},
-			() => createAd(this.generateAdData({ ...data, closeButtonCss: code }), dataForAuditLogs)
+			() =>
+				createAd(this.generateAdData({ ...data, closeButtonCss: code }), dataForAuditLogs)
+					.then(() => this.setState({ progress: 0, loading: false }))
+					.catch(() => this.setState({ progress: 0, loading: false }))
 		);
 	}
 
