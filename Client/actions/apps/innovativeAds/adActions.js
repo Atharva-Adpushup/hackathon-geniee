@@ -85,7 +85,13 @@ const createAd = (params, dataForAuditLogs) => dispatch =>
 				siteId: params.siteId
 			});
 		})
-		.catch(err => errorHandler(err, 'Ad creation failed'));
+		.catch(err => {
+			const { data } = err.response;
+			if (data && data.data && data.data.message) {
+				return errorHandler(err, data.data.message);
+			}
+			return errorHandler(err, 'Ad creation failed');
+		});
 const fetchAds = params => dispatch =>
 	axiosInstance
 		.get(API_PATHS.FETCH_ADS, { params })
