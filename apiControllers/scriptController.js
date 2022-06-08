@@ -64,7 +64,7 @@ Router.get('/:siteId/ampDeliveryViaCreativeConfig', (req, res) => {
 			const siteId = site.get('siteId');
 			const apps = site.get('apps');
 			apps.pnp = false;
-			apps.aplite = false;
+			apps.apLite = false;
 
 			const isAmpPnpEnabled = !!apps.ampPnp;
 			const isAutoOptimise = !!(site.get('apConfigs') && site.get('apConfigs').autoOptimise);
