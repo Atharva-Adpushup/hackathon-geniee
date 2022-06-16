@@ -4,13 +4,11 @@ import momentPropTypes from 'react-moment-proptypes';
 import moment from 'moment';
 import omit from 'lodash/omit';
 import 'react-dates/initialize'; // required by DateRangePicker to work
-
-import { withStyles, withStylesPropTypes, css } from 'react-with-styles';
+import Select from 'react-select';
+import 'react-dates/lib/css/_datepicker.css';
 
 import { DateRangePicker, DateRangePickerShape, isSameDay } from 'react-dates';
-
 import { DateRangePickerPhrases } from './lib/defaultPhrases';
-import 'react-dates/lib/css/_datepicker.css';
 
 const propTypes = {
 	autoFocus: PropTypes.bool,
@@ -107,7 +105,7 @@ class DateRangePickerWrapper extends React.Component {
 	}
 
 	componentWillReceiveProps(nextProps) {
-		let { startDate, endDate } = this.props;
+		const { startDate, endDate } = this.props;
 		if (
 			moment(startDate).format('YYYY-MM-DD') !== nextProps.startDate ||
 			moment(endDate).format('YYYY-MM-DD') !== nextProps.endDate
@@ -129,27 +127,47 @@ class DateRangePickerWrapper extends React.Component {
 	}
 
 	renderDatePresets() {
-		const { presets } = this.props;
+		const { presets, getPresetDropdownItems = [] } = this.props;
 		const { startDate, endDate } = this.state;
 		return (
-			<div className="PresetDateRangePicker_div">
+			<ul className="PresetDateRangePicker_ui">
 				{presets.map(({ text, start, end }) => {
 					const isSelected = isSameDay(start, startDate) && isSameDay(end, endDate);
 					return (
-						<button
-							key={text}
-							className="PresetDateRangePicker_button"
-							type="button"
-							onClick={() => {
-								this.onDatesChange({ startDate: start, endDate: end });
-								this.onFocusChange();
-							}}
-						>
-							{text}
-						</button>
+						<li>
+							<button
+								key={text}
+								className="PresetDateRangePicker_button"
+								type="button"
+								onClick={() => {
+									this.onDatesChange({ startDate: start, endDate: end });
+									this.onFocusChange();
+								}}
+							>
+								{text}
+							</button>
+						</li>
 					);
 				})}
-			</div>
+				{getPresetDropdownItems && (
+					<li>
+						<Select
+							options={getPresetDropdownItems}
+							onChange={({ value }) => {
+								this.onDatesChange({
+									startDate: value.start,
+									endDate: value.end
+								});
+								this.onFocusChange();
+							}}
+							isSearchable
+							isClearable
+							placeholder="Select Duration"
+							className="saved-reports-select custom-select-box-wrapper presetDropdown"
+						/>
+					</li>
+				)}
+			</ul>
 		);
 	}
 

@@ -83,9 +83,8 @@ class Dashboard extends React.Component {
 
 	componentDidMount() {
 		const {
-			showNotification,
 			user: {
-				data: { isPaymentDetailsComplete, email }
+				data: { email }
 			},
 			sites,
 			reportsMeta,
@@ -99,17 +98,6 @@ class Dashboard extends React.Component {
 		this.fetchDeviceList();
 		this.fetchCountryList();
 		userSites = getDashboardDemoUserSiteIds(userSites, email);
-
-		// show payment profile incomplete notification
-		if (!isPaymentDetailsComplete && !window.location.pathname.includes('payment')) {
-			showNotification({
-				mode: 'error',
-				title: 'Payments Error',
-				message: `Please complete your Payment Profile, for timely payments.
-					<a href='/payment'>Go to payments</a>`,
-				autoDismiss: 0
-			});
-		}
 
 		if (peerPerformanceAnalysis && !peerPerformanceBlockedSitesFetched) {
 			fetchPeerPerformanceBlockedSite();
