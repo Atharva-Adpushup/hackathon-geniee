@@ -12,7 +12,8 @@ const mapStateToProps = (state, ownProps) => {
 		metrics,
 		dimension,
 		site,
-		...ownProps
+		...ownProps,
+		memoizedAggregation: {}
 	};
 };
 

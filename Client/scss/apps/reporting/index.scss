@@ -522,7 +522,7 @@ body {
 	overflow: visible !important;
 }
 
-.PresetDateRangePicker_div {
+.PresetDateRangePicker_ui {
 	padding: 0px 22px 11px !important;
 }
 
@@ -709,6 +709,68 @@ body {
 	justify-content: center;
 	margin-top: 1em;
 }
+
+.reportingCustomWidgetContainer {
+	display: flex;
+	justify-self: end;
+	align-items: flex-end;
+	list-style: none;
+}
+
+.reportingCustomWidgetContainer .reportingCustomWidget {
+	padding-right: 10px;
+}
+
+.reportingCustomWidgetContainer .reportingCustomWidget ul li{
+	padding: 2px 18px;
+	text-align: center;
+}
+
+.reportingCustomWidgetContainer .reportingCustomWidget .customToggle .enabledPrimary{
+	background-color: green;
+	color: white;
+}
+
+.reportingCustomWidgetContainer .reportingCustomWidget .customToggle .enabledSecondary{
+	background-color: white;
+	color: green;
+}
+
+.reportingCustomWidgetContainer .reportingCustomWidget .customToggle .disbledPrimary{
+	color: #919191;
+	background-color: white;
+}
+
+.reportingCustomWidgetContainer .reportingCustomWidget .customToggle .disbledSecondary{
+	background-color: #919191;
+	color: white;
+}
+
+.presetDropdown {
+	padding: 5px 8px;
+	width: 200px;
+}
+
+.presetDropdown > div {
+	border: 2px solid #54c3ea;
+}
+
+.presetDropdown > div:hover {
+	border: 2px solid #54c3ea;
+}
+
+.PresetDateRangePicker_ui {
+	display: flex;
+	flex-wrap: wrap;
+	list-style-type: none;
+	padding-bottom: 2px;
+}
+
+.PresetDateRangePicker_ui li {
+	padding-bottom: 8px;
+}
+
+
 
 /*
 	CSS for Custom Toggle for Bid Landscape Ends here
