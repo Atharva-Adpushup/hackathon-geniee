@@ -3,6 +3,7 @@ import sortBy from 'lodash/sortBy';
 import sum from 'lodash/sum';
 import countBy from 'lodash/countBy';
 import map from 'lodash/map';
+import isEqual from 'lodash/isEqual';
 
 import moment from 'moment';
 import { numberWithCommas, computeCsvData } from '../helpers/utils';
@@ -411,7 +412,12 @@ class Table extends React.Component {
 	}
 
 	static getDerivedStateFromProps(props, state) {
-		if (!state.tableData && !state.tableColumns) {
+		if (
+			(!state.tableData && !state.tableColumns) ||
+			(state.tableData &&
+				state.tableColumns &&
+				!isEqual(props.tableData.columns, state.tableData.columns))
+		) {
 			const { tableData, subTable, aggregatedData } = props;
 			// eslint-disable-next-line prefer-const
 			let { tableColumns, tableBody } = updateTableData(tableData, props, state);
