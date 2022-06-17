@@ -1290,6 +1290,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		  var checkElementInViewPercent = window.adpushup.utils.isAmpSlotInView.bind(window.adpushup.utils);
 		  var lineItems = window.pnpRefresh.lineItems || [];
 		  var blacklistedLineItems = window.pnpRefresh.blacklistedLineItems || [];
+		  var forceRefreshFirstImpression = !!window.pnpRefresh.forceRefreshFirstImpression;
 		
 		  
 		  var googletag = (window.googletag = window.googletag || {});
@@ -1313,6 +1314,19 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 				}
 				return isElDisplayNone;
 			  }
+	
+			  function refreshSlot (slot, adUnit) {
+				var lineItem = window.pnpRefresh.adUnitState[slot.getSlotElementId()].lineItemId;
+				if (lineItems.indexOf(lineItem) === -1 && forceRefreshFirstImpression) {
+					log("Lineitem: " + lineItem +  " not in whitelist and forceRefreshFirstImpression is on")
+					log("Force Refreshing the first impression " + slot.getSlotElementId())
+					googletag.pubads().refresh([slot]);
+				}
+				else {
+					replaceSlot(slot, adUnit);
+				}
+			  }
+	
 			  function replaceSlot(slot, adUnit) {
 				try {
 				  if (!window.pnpRefresh.hasPnPScriptInserted) {
@@ -1376,7 +1390,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 				}
 			  }
 			  // Init AdUnitState for Active View Refresh
-			  function initAdUnitState(slot) {
+			  function initAdUnitState(slot, lineItemId) {
 				var divId = slot.getSlotElementId();
 				var el = window.adpushup.$('#' + divId);
 				var height = el.height();
@@ -1394,7 +1408,8 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 				  activeViewTimeoutId: false,
 				  refreshTimeoutId: false,
 				  readyToRefresh: false,
-				  renderTimestamp: +new Date()
+				  renderTimestamp: +new Date(),
+				  lineItemId: lineItemId
 				};
 			  }
 		
@@ -1417,7 +1432,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 					refreshAfter = refreshAfter >= 0 ? refreshAfter : 0;
 					log('REFRESHING AFTER: ' + refreshAfter / 1000 + ' seconds');
 					window.pnpRefresh.adUnitState[divId].refreshTimeoutId = setTimeout(
-					  replaceSlot,
+					  refreshSlot,
 					  refreshAfter,
 					  window.pnpRefresh.adUnitState[divId].gSlot,
 					  adUnit
@@ -1440,13 +1455,13 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 				  }
 				  var lineItemId = (sourceAgnosticLineItemId && sourceAgnosticLineItemId.toString()) || '';
 				  if (lineItemId && lineItems.length) {
-					if (lineItems.indexOf(lineItemId) === -1) {
+					if (lineItems.indexOf(lineItemId) === -1 && !forceRefreshFirstImpression) {
 					  log(
 						'For Ad Unit: ' +
 						  adUnitPath +
 						  ' LineItem: ' +
 						  lineItemId +
-						  ' not in the whitelist, stopping'
+						  ' not in the whitelist, and forceRefreshFirstImpression not enabled, stopping'
 					  );
 					  return false;
 					}
@@ -1513,7 +1528,8 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 						replaceSlot(e.slot, adUnit);
 					  }, window.pnpRefresh.unfilledInsertionTrigger * 1000);
 					} else {
-					  window.pnpRefresh.adUnitState[slotId] = initAdUnitState(e.slot);
+					  // Passing lineItemId to Ad Unit state to check for forceRefreshFirstImpression
+					  window.pnpRefresh.adUnitState[slotId] = initAdUnitState(e.slot, e.sourceAgnosticLineItemId);
 		
 					  handleRefresh(slotId, adUnit);
 		
