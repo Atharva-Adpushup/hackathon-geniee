@@ -18,34 +18,34 @@ function adsensePublisherWrapper(item) {
 	return adsensePublisher.publish(item);
 }
 function publishToQueueWrapper(siteConfigItems, site, forcePrebidBuild) {
+	const jobs = [];
 	const response = {
 		empty: true,
 		message: `ADS_SYNC_QUEUE_PUBLISH: No unsynced ads for site: ${site.get('siteId')}`
 	};
-	const jobs = [];
+
 	if (!Object.keys(siteConfigItems).length) {
 		return response;
 	}
+
 	function processing() {
-		const { geniee, adp, adsense, genieeDFP } = siteConfigItems;
-		const hasUnsyncedGenieeAds = !!(geniee && geniee.length);
+		const { adp, adsense, genieeDFP } = siteConfigItems;
 		const hasUnsyncedAdpAds = !!(adp && adp.ads && adp.ads.length);
 		const hasUnsyncedAdsenseAds = !!(adsense && adsense.ads && adsense.ads.length);
-		const hasUnsyncedGenieeDFPAds = !!(genieeDFP && genieeDFP.length);
 
-		hasUnsyncedGenieeAds ? _.forEach(geniee, item => jobs.push(genieePublishWrapper(item))) : null;
-		hasUnsyncedGenieeDFPAds
-			? _.forEach(genieeDFP, item => jobs.push(adpTagPublisherWrapper(item)))
-			: null;
 		hasUnsyncedAdpAds ? jobs.push(adpTagPublisherWrapper(adp)) : null;
 		hasUnsyncedAdsenseAds ? jobs.push(adsensePublisherWrapper(adsense)) : null;
 
-		const allAdsSynced =
-			!(hasUnsyncedGenieeAds || hasUnsyncedAdpAds || hasUnsyncedGenieeDFPAds || hasUnsyncedAdsenseAds) ||
-			!jobs.length;
+		const allAdsSynced = (!hasUnsyncedAdpAds && !hasUnsyncedAdsenseAds) || !jobs.length;
+
 		if (allAdsSynced) {
 			return Promise.resolve(response);
 		}
+
+		console.log('---'.repeat(20));
+		hasUnsyncedAdpAds && console.log(`Unsynced Adp ads ${adp.ads.length} (excluding refresh ad units count)`);
+		hasUnsyncedAdsenseAds && console.log(`Unsynced Adsense ads ${adsense.ads.length}`);
+		console.log('---'.repeat(20));
 
 		return Promise.all(jobs).then(() => ({
 			...response,
@@ -55,8 +55,9 @@ function publishToQueueWrapper(siteConfigItems, site, forcePrebidBuild) {
 			)}`
 		}));
 	}
+
 	return processing().then(response =>
-		// syncCdn publishes a job in either consoleCdnSync or selectiveRollOut queue 
+		// syncCdn publishes a job in either consoleCdnSync or selectiveRollOut queue
 		response.empty ? syncCdn(site, forcePrebidBuild) : response
 	);
 }

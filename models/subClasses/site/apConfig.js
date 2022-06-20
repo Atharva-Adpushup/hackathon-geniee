@@ -37,7 +37,9 @@ const ApConfig = {
 		'pnpScript',
 		'separatelyGroupedLineItems',
 		'isUrlReportingEnabled',
-		'rules'
+		'rules',
+		'isRedefineGptOnRefreshEnabled',
+		'isReplaceGptSlotOnRefreshEnabled'
 	],
 	override: [
 		'mode',
@@ -77,7 +79,9 @@ const ApConfig = {
 		'pnpScript',
 		'separatelyGroupedLineItems',
 		'isUrlReportingEnabled',
-		'rules'
+		'rules',
+		'isRedefineGptOnRefreshEnabled',
+		'isReplaceGptSlotOnRefreshEnabled'
 	],
 	merge: []
 };

@@ -50,7 +50,8 @@ var model = require('../helpers/model'),
 			'lineItemTypes',
 			'blockListedLineItems',
 			'urlReporting',
-			'utmReporting'
+			'utmReporting',
+			'refreshAdUnitCodesCount'
 		];
 		this.clientKeys = [
 			'siteId',
@@ -76,7 +77,8 @@ var model = require('../helpers/model'),
 			'lineItemTypes',
 			'blockListedLineItems',
 			'urlReporting',
-			'utmReporting'
+			'utmReporting',
+			'refreshAdUnitCodesCount'
 		];
 		this.validations = {
 			required: []
@@ -293,6 +295,14 @@ var model = require('../helpers/model'),
 			this.set('prebidBundleName', getSiteSpecificPrebidBundleName(siteId, usePrebidV6));
 
 			return this.save();
+		};
+
+		this.getRefreshAdUnitCodesCount = function getRefreshAdUnitCodesCount() {
+			const refreshAdUnitCodesCount = parseInt(this.get('refreshAdUnitCodesCount') || 0);
+			const isValidRefreshAdUnitCodesCount =
+				!Number.isNaN(refreshAdUnitCodesCount) && refreshAdUnitCodesCount >= 0;
+
+			return isValidRefreshAdUnitCodesCount ? refreshAdUnitCodesCount : 0;
 		};
 	});
 

@@ -100,7 +100,6 @@ function generateSiteChannelJSON(channelsWithAds, site) {
 				};
 			}
 
-			// MARK: what is its use?
 			if (hasAdNetworkSettings) {
 				pubId = adNetworkSettings[0].pubId;
 				_.some(adNetworkSettings, network => {
@@ -139,16 +138,18 @@ function generateSiteChannelJSON(channelsWithAds, site) {
 /**
  * syncs only the ads that belong to adpTag network
  */
-function getUnsyncedAdpTagAdsData(unSyncedAds, cb, ad) {
+function getUnsyncedAdpTagAdsData(unSyncedAds, cb, additionalParams, ad) {
 	function processCallback(cb) {
 		return cb ? cb(ad) : Promise.resolve({});
 	}
 
 	return processCallback(cb).then(appSpecficData => {
+		// TEST the unsyncedAd
 		const unsyncedAd =
 			ad.network && ad.network == 'adpTags'
-				? unsyncedAdsGeneration.checkAdpTagsUnsyncedAds(ad, ad)
+				? unsyncedAdsGeneration.checkAdpTagsUnsyncedAds(ad, ad, additionalParams)
 				: false;
+
 		if (unsyncedAd) {
 			if (ad.formatData && ad.formatData.platform) {
 				unsyncedAd.platform = ad.formatData.platform;
@@ -163,7 +164,7 @@ function getUnsyncedAdpTagAdsData(unSyncedAds, cb, ad) {
 	});
 }
 
-function getUnsyncedAdpTagAdsFromDoc(docKey, unsyncedAdsGroup, cb = false) {
+function getUnsyncedAdpTagAdsFromDoc(docKey, unsyncedAdsGroup, cb = false, additionalParams = {}) {
 	const unSyncedAdpTagAds = [];
 	return appBucket
 		.getDoc(docKey)
@@ -171,7 +172,7 @@ function getUnsyncedAdpTagAdsFromDoc(docKey, unsyncedAdsGroup, cb = false) {
 			const ads = docWithCas.value.ads;
 			return promiseForeach(
 				ads,
-				getUnsyncedAdpTagAdsData.bind(null, unSyncedAdpTagAds, cb),
+				getUnsyncedAdpTagAdsData.bind(null, unSyncedAdpTagAds, cb, additionalParams),
 				(data, err) => {
 					console.log(err);
 					return false;
@@ -202,6 +203,7 @@ function apTagAdsSyncing(unsyncedAdsGroup, site) {
 	 * 5. Concat ads from Tag manager to current adp.ads
 	 */
 	const apTagDocKey = `${docKeys.apTag}${site.get('siteId')}`;
+
 	const callbackForEachAd = ad =>
 		Promise.resolve({
 			variations: [
@@ -214,7 +216,13 @@ function apTagAdsSyncing(unsyncedAdsGroup, site) {
 			]
 		});
 
-	return getUnsyncedAdpTagAdsFromDoc(apTagDocKey, unsyncedAdsGroup, callbackForEachAd);
+	const refreshAdUnitCodesCount = site.getRefreshAdUnitCodesCount();
+	const { isReplaceGptSlotOnRefreshEnabled = false } = site.get('apConfigs') || {};
+
+	return getUnsyncedAdpTagAdsFromDoc(apTagDocKey, unsyncedAdsGroup, callbackForEachAd, {
+		refreshAdUnitCodesCount,
+		isReplaceGptSlotOnRefreshEnabled
+	});
 }
 
 function ampScriptAdsSyncing(unSyncedAdGroups, site) {
@@ -227,7 +235,8 @@ function ampScriptAdsSyncing(unSyncedAdGroups, site) {
 	 * 5. Concat ads from Tag manager to current adp.ads
 	 */
 	const docKey = `${docKeys.ampScript}${site.get('siteId')}`;
-	return getUnsyncedAdpTagAdsFromDoc(docKey, unSyncedAdGroups, ad =>
+
+	const callbackForEachAd = ad =>
 		Promise.resolve({
 			variations: [
 				{
@@ -237,8 +246,16 @@ function ampScriptAdsSyncing(unSyncedAdGroups, site) {
 					platform: ad.formatData.platform
 				}
 			]
-		})
-	);
+		});
+
+	// NOTE: We don't need to create duplicate ad units for amp ads as of now, hence overriding the flags here
+	const refreshAdUnitCodesCount = 0;
+	const isReplaceGptSlotOnRefreshEnabled = false;
+
+	return getUnsyncedAdpTagAdsFromDoc(docKey, unSyncedAdGroups, callbackForEachAd, {
+		refreshAdUnitCodesCount,
+		isReplaceGptSlotOnRefreshEnabled
+	});
 }
 
 function innovativeAdsSyncing(unsyncedAdsGroup, site) {
@@ -253,32 +270,35 @@ function innovativeAdsSyncing(unsyncedAdsGroup, site) {
 							const pagegroupAssignedToAd = ad.pagegroups.includes(
 								`${channel.platform}:${channel.pageGroup}`
 							);
-							if (pagegroupAssignedToAd) {
-								const variationsExist =
-									channel.variations && Object.keys(channel.variations).length;
-								const common = {
-									channel: `${channel.platform}:${channel.pageGroup}`,
-									pageGroup: channel.pageGroup,
-									platform: channel.platform
-								};
-								if (variationsExist) {
-									return _.map(channel.variations, variation =>
-										!variation.isControl
-											? {
-													...common,
-													variationId: variation.id,
-													variationName: variation.name
-											  }
-											: false
-									);
-								}
-								return {
-									...common,
-									variationId: null,
-									variationName: null
-								};
+
+							if (!pagegroupAssignedToAd) {
+								return false;
 							}
-							return false;
+
+							const variationsExist = channel.variations && Object.keys(channel.variations).length;
+							const common = {
+								channel: `${channel.platform}:${channel.pageGroup}`,
+								pageGroup: channel.pageGroup,
+								platform: channel.platform
+							};
+
+							if (variationsExist) {
+								return _.map(channel.variations, variation =>
+									!variation.isControl
+										? {
+												...common,
+												variationId: variation.id,
+												variationName: variation.name
+										  }
+										: false
+								);
+							}
+
+							return {
+								...common,
+								variationId: null,
+								variationName: null
+							};
 						})
 					)
 				)
@@ -296,17 +316,21 @@ function innovativeAdsSyncing(unsyncedAdsGroup, site) {
 			});
 	}
 
+	const refreshAdUnitCodesCount = site.getRefreshAdUnitCodesCount();
+	const { isReplaceGptSlotOnRefreshEnabled = false } = site.get('apConfigs') || {};
+
 	return getUnsyncedAdpTagAdsFromDoc(
 		`${docKeys.interactiveAds}${site.get('siteId')}`,
 		unsyncedAdsGroup,
-		generateLogData.bind(null, site)
+		generateLogData.bind(null, site),
+		{ refreshAdUnitCodesCount, isReplaceGptSlotOnRefreshEnabled }
 	);
 }
 
 function getGeneratedPromises(site) {
 	return (
 		unsyncedAdsGeneration
-			/* get all the unsynced ads present accross the channels (channel => variation => section => ad) */
+			/* get all the unsynced ads present accross all the channels (channel => variation => section => ad) */
 			.getAllUnsyncedAds(site) // [{ channel: 'channelName', unsyncedAds: [] }]
 			/* group the unsynced ads under adSense, adpTags, etc */
 			.then(channelsWithAds => generateSiteChannelJSON(channelsWithAds, site))
