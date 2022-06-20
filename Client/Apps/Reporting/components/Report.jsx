@@ -32,6 +32,7 @@ import {
 	displayOpsMetrics,
 	displayUniqueImpressionMetrics,
 	displayOpsMetricsForXPath,
+	displayOpsUniqueImpressionMetrics,
 	opsDimension,
 	opsFilter,
 	REPORT_INTERVAL_TABLE_KEYS,
@@ -634,6 +635,10 @@ class Report extends Component {
 		let match = displayMetrics.map(item => item.value);
 		if (isForOps) {
 			match = displayOpsMetrics.map(item => item.value);
+			// check if unique imp is checked
+			if (isUniqueImpEnabled) {
+				match = displayOpsUniqueImpressionMetrics.map(item => item.value);
+			}
 			computedMetrics = computedMetrics.filter(item => match.indexOf(item.value) !== -1);
 		} else {
 			// check if unique imp is checked
@@ -742,14 +747,54 @@ class Report extends Component {
 		const { reportsMeta, isForOps, overrideOpsPanelUniqueImpValue } = this.props;
 		const sortedMetaMetrics = this.getSortedMetaMetrics(reportsMeta.data.metrics);
 		let sortedMetrics = [];
+		const found = newMetrics.filter(item => item.value === 'unique_impressions');
 		if (isForOps) {
-			sortedMetaMetrics.forEach(metaMetric => {
-				const foundMetric = newMetrics.find(newMetric => newMetric.value === metaMetric.value);
+			let selectedMetricsFromChart = [...newMetrics];
+			// if unique impression selected
+			if (found.length) {
+				// Set unique impression equalent of enabled metrics when unique imp  is enabled
+				selectedMetricsFromChart = selectedMetricsFromChart.map(metric => {
+					const matchFound = displayOpsUniqueImpressionMetrics.find(
+						displayOpsUnqImpMetric => displayOpsUnqImpMetric.name === `Unique ${metric.name}`
+					);
+					return matchFound || metric;
+				});
 
-				if (foundMetric) sortedMetrics.push(foundMetric);
+				const match = selectedMetricsFromChart.map(item => item.value);
+				sortedMetrics = sortedMetaMetrics.filter(item => match.indexOf(item.value) !== -1);
+				// temp code for unqiue imp selection in dashboard from this component
+				overrideOpsPanelUniqueImpValue({ isUniqueImpEnabled: true });
+			} else {
+				// replace metrics with unique metrics if enabled
+				selectedMetricsFromChart = selectedMetricsFromChart.map(metric => {
+					const matchFound = displayOpsMetrics.find(
+						displayMetric => displayMetric.name === metric.name
+					);
+					return matchFound || metric;
+				});
+
+				const match = selectedMetricsFromChart.map(item => item.value);
+				sortedMetrics = sortedMetaMetrics.filter(item => match.indexOf(item.value) !== -1);
+				// temp code for unqiue imp selection in dashboard from this component
+				overrideOpsPanelUniqueImpValue({ isUniqueImpEnabled: false });
+			}
+			sortedMetaMetrics.forEach(metaMetric => {
+				const foundMetric = selectedMetricsFromChart.find(
+					metric => metric.name === metaMetric.name
+				);
+				if (foundMetric) {
+					if (foundMetric.name === 'Unique Impressions Reporting') {
+						return;
+					}
+					const alreadyInSortedMetrics = sortedMetrics.find(
+						sortedMetric => sortedMetric.name === foundMetric.name
+					);
+					if (!alreadyInSortedMetrics) {
+						sortedMetrics.push(foundMetric);
+					}
+				}
 			});
 		} else {
-			const found = newMetrics.filter(item => item.value === 'unique_impressions');
 			// if unique impression selected
 			if (found.length) {
 				const match = displayUniqueImpressionMetrics.map(item => item.value);
@@ -1383,26 +1428,31 @@ class Report extends Component {
 		);
 
 		if (!isForOps) {
-			allAvailableMetrics = allAvailableMetrics
-				.filter(
-					item =>
-						item.value === 'unique_impressions' ||
-						(sessionRpmReportsEnabled &&
-							(item.value === 'session_rpm' || item.value === 'user_sessions'))
-				)
-				.map(item => {
-					if (item.value === 'unique_impressions') {
-						// eslint-disable-next-line no-param-reassign
-						item.name = 'Unique Impressions Reporting';
-						// eslint-disable-next-line no-param-reassign
-						item.isDisabled = false;
-					}
-					return item;
-				});
-		} else {
-			// this is for ops panel reports. Don't whow unique impression items in dropdown
-			allAvailableMetrics = allAvailableMetrics.filter(item => item.value.indexOf('unique') === -1);
+			allAvailableMetrics = allAvailableMetrics.filter(
+				item =>
+					item.value === 'unique_impressions' ||
+					(sessionRpmReportsEnabled &&
+						(item.value === 'session_rpm' || item.value === 'user_sessions'))
+			);
 		}
+
+		allAvailableMetrics = allAvailableMetrics
+			.filter(item => {
+				if (item.value === 'unique_impressions') {
+					return true;
+				}
+				return item.value.indexOf('unique') === -1;
+			})
+			.map(item => {
+				if (item.value === 'unique_impressions') {
+					// eslint-disable-next-line no-param-reassign
+					item.name = 'Unique Impressions Reporting';
+					// eslint-disable-next-line no-param-reassign
+					item.isDisabled = false;
+				}
+				return item;
+			});
+
 		const aggregatedData = this.aggregateValues(tableData.result);
 		const { email } = this.getDemoUserParams();
 		const { isValid } = getReportingDemoUserValidation(email, reportType);
