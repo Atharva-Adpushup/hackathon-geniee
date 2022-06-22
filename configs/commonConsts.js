@@ -1317,7 +1317,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 	
 			  function refreshSlot (slot, adUnit) {
 				var lineItem = window.pnpRefresh.adUnitState[slot.getSlotElementId()].lineItemId;
-				if (lineItems.indexOf(lineItem) === -1 && forceRefreshFirstImpression) {
+				if (lineItems.indexOf(String(lineItem)) === -1 && forceRefreshFirstImpression) {
 					log("Lineitem: " + lineItem +  " not in whitelist and forceRefreshFirstImpression is on")
 					log("Force Refreshing the first impression " + slot.getSlotElementId())
 					googletag.pubads().refresh([slot]);
