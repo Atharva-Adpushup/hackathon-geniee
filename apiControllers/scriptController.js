@@ -127,6 +127,9 @@ Router.get('/:siteId/ampDeliveryViaCreativeConfig', (req, res) => {
 				apConfigs.isRedefineGptOnRefreshEnabled = !!(
 					!apConfigs.apLiteActive && apConfigs.isRedefineGptOnRefreshEnabled
 				);
+				apConfigs.isReplaceGptSlotOnRefreshEnabled = !!(
+					!apConfigs.apLiteActive && apConfigs.isReplaceGptSlotOnRefreshEnabled
+				);
 
 				if (!apps.apLite) {
 					apConfigs.manualModeActive = !!(apps.apTag && manualAds && manualAds.length);
@@ -214,9 +217,10 @@ Router.get('/:siteId/ampDeliveryViaCreativeConfig', (req, res) => {
 			const getPrebidAndAdsConfig = () =>
 				(() => {
 					if (apps.apLite) {
-						return Promise.join(generatePrebidConfig(siteId), generateApLiteAdsConfig(siteId)).then(
-							([prebidConfig, apLiteConfig]) => ({ prebidConfig, apLiteConfig })
-						);
+						return Promise.join(
+							generatePrebidConfig(siteId),
+							generateApLiteAdsConfig(siteId)
+						).then(([prebidConfig, apLiteConfig]) => ({ prebidConfig, apLiteConfig }));
 					}
 
 					return getReportData(site)
@@ -338,6 +342,9 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 				apConfigs.isRedefineGptOnRefreshEnabled = !!(
 					!apConfigs.apLiteActive && apConfigs.isRedefineGptOnRefreshEnabled
 				);
+				apConfigs.isReplaceGptSlotOnRefreshEnabled = !!(
+					!apConfigs.apLiteActive && apConfigs.isReplaceGptSlotOnRefreshEnabled
+				);
 
 				if (!apps.apLite) {
 					apConfigs.manualModeActive = !!(apps.apTag && manualAds && manualAds.length);
@@ -421,9 +428,10 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 			const getPrebidAndAdsConfig = () =>
 				(() => {
 					if (apps.apLite) {
-						return Promise.join(generatePrebidConfig(siteId), generateApLiteAdsConfig(siteId)).then(
-							([prebidConfig, apLiteConfig]) => ({ prebidConfig, apLiteConfig })
-						);
+						return Promise.join(
+							generatePrebidConfig(siteId),
+							generateApLiteAdsConfig(siteId)
+						).then(([prebidConfig, apLiteConfig]) => ({ prebidConfig, apLiteConfig }));
 					}
 
 					return getReportData(site)

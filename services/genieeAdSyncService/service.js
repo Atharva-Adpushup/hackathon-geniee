@@ -1,8 +1,8 @@
 const adsSyncService = require('./adsSyncService/index');
 
-function init(site, forcePrebidBuild) {
+function init(siteId, forcePrebidBuild) {
 	return adsSyncService
-		.publish(site, forcePrebidBuild)
+		.publish(siteId, forcePrebidBuild)
 		.then(response =>
 			response && response.hasOwnProperty('empty')
 				? console.log(response.message)
@@ -11,4 +11,4 @@ function init(site, forcePrebidBuild) {
 		.catch(console.log);
 }
 
-module.exports = { init: (site, forcePrebidBuild) => init(site, forcePrebidBuild) };
+module.exports = { init };

@@ -2,7 +2,11 @@ const _ = require('lodash');
 
 module.exports = {
 	checkGenieeUnsyncedZones: function(variationId, variationName, section, ad) {
-		const isValidUnsyncedZone = !!(ad.network === 'geniee' && ad.networkData && !ad.networkData.zoneId);
+		const isValidUnsyncedZone = !!(
+			ad.network === 'geniee' &&
+			ad.networkData &&
+			!ad.networkData.zoneId
+		);
 		const isDynamicAllocationTrue = !!(
 			ad.network === 'geniee' &&
 			ad.networkData &&
@@ -27,7 +31,9 @@ module.exports = {
 					zonePosition: ad.position ? position : 0,
 					firstView: ad.firstFold ? Number(ad.firstFold) : 1,
 					useFriendlyIFrameFlag: ad.asyncTag ? Number(ad.asyncTag) : 1,
-					dynamicAllocation: ad.networkData.dynamicAllocation ? ad.networkData.dynamicAllocation : 0,
+					dynamicAllocation: ad.networkData.dynamicAllocation
+						? ad.networkData.dynamicAllocation
+						: 0,
 					zoneId: ad.networkData && ad.networkData.zoneId ? ad.networkData.zoneId : false,
 					variations: [
 						{
@@ -52,70 +58,111 @@ module.exports = {
 		}
 		return false;
 	},
-	checkAdpTagsUnsyncedAds: function(section, ad) {
+	/**
+	 * checks if th ad has networkData available
+	 * if not, return false
+	 * else,
+	 * 		check if we have dfpAdunit saved in the networkData (which means the ad has been synced with the GAM)
+	 * 		if yes, return false
+	 * 		else, create an object with the ad details and return it
+	 */
+	checkAdpTagsUnsyncedAds: function(section, ad, additionalParams) {
 		const hasNetworkData = ad.networkData && Object.keys(ad.networkData).length;
-		if (hasNetworkData) {
-			if (!ad.networkData.dfpAdunit) {
-				const isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length);
-				const isResponsive = !!(ad.width === 'responsive' && ad.networkData.isResponsive);
-				const isNative = !!(ad.formatData && ad.formatData.type === 'native');
-				const defaultAdData = {
-					adId: ad.id,
-					isResponsive: isResponsive,
-					sizeWidth: isResponsive ? 'responsive' : parseInt(ad.width, 10),
-					sizeHeight: isResponsive ? 'responsive' : parseInt(ad.height, 10),
-					sectionId: section.id,
-					sectionName: section.name,
-					type: section.formatData && section.formatData.type ? section.formatData.type : false,
-					isManual: ad.isManual || false,
-					isInnovativeAd: ad.isInnovativeAd || false,
-					isAmpScriptAd: !!ad.isAmpScriptAd,
-					isNative: isNative,
-					network: ad.network,
-					networkData: {
-						headerBidding:
-							ad.hasOwnProperty('networkData') && ad.networkData.hasOwnProperty('headerBidding')
-								? ad.networkData.headerBidding
-								: false
-					}
-				};
+		const { isReplaceGptSlotOnRefreshEnabled, refreshAdUnitCodesCount } = additionalParams;
 
-				if (isMultipleAdSizes) {
-					defaultAdData.multipleAdSizes = ad.multipleAdSizes.concat([]);
-				}
-
-				return defaultAdData;
-			}
+		if (!hasNetworkData) {
 			return false;
 		}
-		return false;
+
+		const { dfpAdunit, refreshAdUnitCodes } = ad.networkData;
+
+		const hasDfpAdunitCode = !!dfpAdunit;
+		const refreshAdUnitCodesMissing = !Array.isArray(refreshAdUnitCodes);
+		const shouldSyncRefreshAdUnitCodes =
+			isReplaceGptSlotOnRefreshEnabled &&
+			(refreshAdUnitCodesMissing || refreshAdUnitCodes.length != refreshAdUnitCodesCount);
+
+		const isAdSynced = hasDfpAdunitCode && !shouldSyncRefreshAdUnitCodes;
+
+		if (isAdSynced) {
+			return false;
+		}
+
+		const isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length);
+		const isResponsive = !!(ad.width === 'responsive' && ad.networkData.isResponsive);
+		const isNative = !!(ad.formatData && ad.formatData.type === 'native');
+		
+		const defaultAdData = {
+			adId: ad.id,
+			isResponsive: isResponsive,
+			sizeWidth: isResponsive ? 'responsive' : parseInt(ad.width, 10),
+			sizeHeight: isResponsive ? 'responsive' : parseInt(ad.height, 10),
+			sectionId: section.id,
+			sectionName: section.name,
+			type: section.formatData && section.formatData.type ? section.formatData.type : false,
+			isManual: ad.isManual || false,
+			isInnovativeAd: ad.isInnovativeAd || false,
+			isAmpScriptAd: !!ad.isAmpScriptAd,
+			isNative: isNative,
+			network: ad.network,
+			networkData: {
+				headerBidding:
+					ad.hasOwnProperty('networkData') && ad.networkData.hasOwnProperty('headerBidding')
+						? ad.networkData.headerBidding
+						: false
+			},
+			refreshAdUnitCodes,
+			refreshAdUnitCodesCount,
+			shouldSyncRefreshAdUnitCodes
+		};
+
+		if (isMultipleAdSizes) {
+			defaultAdData.multipleAdSizes = ad.multipleAdSizes.concat([]);
+		}
+
+		return defaultAdData;
 	},
+	/**
+	 * if the ad doesn't have adCode and adUnit and shouldSync is true
+	 * create an object with the ad details and return
+	 */
 	checkAdsenseUnsyncedAds: function(section, ad) {
 		const hasNetworkData = ad.networkData && Object.keys(ad.networkData).length;
-		if (hasNetworkData) {
-			const { adunitId, adCode, shouldSync, isLink = false } = ad.networkData;
-			const isUnsynced = !adCode && !adunitId && shouldSync;
-			if (isUnsynced) {
-				const isResponsive = !!(ad.width === 'responsive');
-				const defaultAdData = {
-					adId: ad.id,
-					isResponsive,
-					isLink,
-					sizeWidth: isResponsive ? 'responsive' : parseInt(ad.width, 10),
-					sizeHeight: isResponsive ? 'responsive' : parseInt(ad.height, 10),
-					sectionId: section.id,
-					sectionName: section.name,
-					isManual: ad.isManual || false,
-					isInnovativeAd: ad.isInnovativeAd || false,
-					network: ad.network,
-					networkData: ad.networkData || {}
-				};
-				return defaultAdData;
-			}
+
+		if (!hasNetworkData) {
 			return false;
 		}
-		return false;
+
+		const { adunitId, adCode, shouldSync, isLink = false } = ad.networkData;
+		const isAdUnsynced = !adCode && !adunitId && shouldSync;
+
+		if (!isAdUnsynced) {
+			return false;
+		}
+
+		const isResponsive = !!(ad.width === 'responsive');
+		const defaultAdData = {
+			adId: ad.id,
+			isResponsive,
+			isLink,
+			sizeWidth: isResponsive ? 'responsive' : parseInt(ad.width, 10),
+			sizeHeight: isResponsive ? 'responsive' : parseInt(ad.height, 10),
+			sectionId: section.id,
+			sectionName: section.name,
+			isManual: ad.isManual || false,
+			isInnovativeAd: ad.isInnovativeAd || false,
+			network: ad.network,
+			networkData: ad.networkData || {}
+		};
+
+		return defaultAdData;
 	},
+	/**
+	 * iterates over the sections of the given variation (for now each section contains only 1 ad)
+	 * get sync status of the ad basis its network type
+	 * if the ad is not synced, create an ad object with the details to be used for syncing the ad
+	 * returns an object of unsynced ads with ads grouped basis the network
+	 */
 	getVariationUnsyncedAds: function(
 		variationId,
 		variationName,
@@ -133,25 +180,10 @@ module.exports = {
 			adsenseUnsyncedAds: []
 		};
 		const self = this;
+
 		_.each(variationSections, function(section, sectionId) {
 			_.each(section.ads, function(ad) {
 				switch (ad.network) {
-					case 'geniee':
-						let unsyncedZone = self.checkGenieeUnsyncedZones(variationId, variationName, section, ad);
-						if (unsyncedZone) {
-							unsyncedZone.variations[0] = {
-								...unsyncedZone.variations[0],
-								platform: additionalInfo.platform,
-								pageGroup: additionalInfo.pageGroup
-							};
-							unsyncedZone.forZoneSyncing
-								? unsyncedAds.genieeUnsyncedZones.push(unsyncedZone.zone)
-								: null;
-							unsyncedZone.forGenieeDFPCreation
-								? unsyncedAds.genieeDFPCreationZones.push(unsyncedZone.zone)
-								: null;
-						}
-						break;
 					case 'adsense':
 					case 'adpTags':
 						let fn = self.checkAdpTagsUnsyncedAds;
@@ -162,11 +194,12 @@ module.exports = {
 							container = 'adsenseUnsyncedAds';
 						}
 
-						let unsyncedAd = fn(section, ad);
+						const unsyncedAd = fn(section, ad, additionalInfo);
+						// undsyncedAd contains the ad details
 						if (unsyncedAd) {
 							unsyncedAd.variations = [
 								{
-									variationId: variationId, 
+									variationId: variationId,
 									variationName: variationName,
 									platform: additionalInfo.platform,
 									pageGroup: additionalInfo.pageGroup
@@ -179,16 +212,26 @@ module.exports = {
 				}
 			});
 		});
+
 		return unsyncedAds;
 	},
+	/**
+	 * gets all the channels and their data for the given site
+	 * iterates over each channel
+	 * 		iterates over each variation of the channel
+	 * 			iterates over each section of the channel
+	 * 				finds the ad that is unsynced
+	 *
+	 * returns an array of objects which contains channel and unsyncedAd
+	 */
 	getAllUnsyncedAds: function(site) {
 		const finalAds = [];
 		const self = this;
-
 		let channelUnsyncedAds = [];
+		const { isReplaceGptSlotOnRefreshEnabled = false } = site.get('apConfigs') || {};
 
-		return site.getAllChannels().then(allChannels => {
-			_.each(allChannels, channel => {
+		return site.getAllChannels().then(allChannelsData => {
+			_.each(allChannelsData, channel => {
 				channelUnsyncedAds = [];
 				_.each(channel.variations, (variation, id) => {
 					// Skip variation config data if it is set disabled from Visual Editor
@@ -199,7 +242,14 @@ module.exports = {
 						return true;
 					}
 
-					let channelKey = `chnl::${site.get('siteId')}:${channel.platform}:${channel.pageGroup}`;
+					const channelKey = `chnl::${site.get('siteId')}:${channel.platform}:${channel.pageGroup}`;
+
+					const additionalParams = {
+						platform: channel.platform,
+						pageGroup: channel.pageGroup,
+						isReplaceGptSlotOnRefreshEnabled,
+						refreshAdUnitCodesCount: site.getRefreshAdUnitCodesCount()
+					};
 
 					channelUnsyncedAds = _.concat(
 						channelUnsyncedAds,
@@ -208,14 +258,12 @@ module.exports = {
 							variation.name,
 							channelKey,
 							variation.sections,
-							{
-								platform: channel.platform,
-								pageGroup: channel.pageGroup
-							},
+							additionalParams,
 							variation.isControl
 						)
 					);
 				});
+
 				finalAds.push({ channel: channel, unsyncedAds: channelUnsyncedAds });
 			});
 			return finalAds;
