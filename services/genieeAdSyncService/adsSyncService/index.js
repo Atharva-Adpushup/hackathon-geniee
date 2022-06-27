@@ -18,33 +18,34 @@ function adsensePublisherWrapper(item) {
 	return adsensePublisher.publish(item);
 }
 function publishToQueueWrapper(siteConfigItems, site, forcePrebidBuild) {
+	const jobs = [];
 	const response = {
 		empty: true,
 		message: `ADS_SYNC_QUEUE_PUBLISH: No unsynced ads for site: ${site.get('siteId')}`
 	};
-	const jobs = [];
+
 	if (!Object.keys(siteConfigItems).length) {
 		return response;
 	}
+
 	function processing() {
-		const { geniee, adp, adsense, genieeDFP } = siteConfigItems;
-		const genieeUnsynced = !!(geniee && geniee.length);
-		const adpUnsynced = !!(adp && adp.ads && adp.ads.length);
-		const adsenseUnsynced = !!(adsense && adsense.ads && adsense.ads.length);
-		const genieeDFPUnsynced = !!(genieeDFP && genieeDFP.length);
+		const { adp, adsense, genieeDFP } = siteConfigItems;
+		const hasUnsyncedAdpAds = !!(adp && adp.ads && adp.ads.length);
+		const hasUnsyncedAdsenseAds = !!(adsense && adsense.ads && adsense.ads.length);
 
-		genieeUnsynced ? _.forEach(geniee, item => jobs.push(genieePublishWrapper(item))) : null;
-		genieeDFPUnsynced
-			? _.forEach(genieeDFP, item => jobs.push(adpTagPublisherWrapper(item)))
-			: null;
-		adpUnsynced ? jobs.push(adpTagPublisherWrapper(adp)) : null;
-		adsenseUnsynced ? jobs.push(adsensePublisherWrapper(adsense)) : null;
+		hasUnsyncedAdpAds ? jobs.push(adpTagPublisherWrapper(adp)) : null;
+		hasUnsyncedAdsenseAds ? jobs.push(adsensePublisherWrapper(adsense)) : null;
 
-		const shouldPushToCdn =
-			!(genieeUnsynced || adpUnsynced || genieeDFPUnsynced || adsenseUnsynced) || !jobs.length;
-		if (shouldPushToCdn) {
+		const allAdsSynced = (!hasUnsyncedAdpAds && !hasUnsyncedAdsenseAds) || !jobs.length;
+
+		if (allAdsSynced) {
 			return Promise.resolve(response);
 		}
+
+		console.log('---'.repeat(20));
+		hasUnsyncedAdpAds && console.log(`Unsynced Adp ads ${adp.ads.length} (excluding refresh ad units count)`);
+		hasUnsyncedAdsenseAds && console.log(`Unsynced Adsense ads ${adsense.ads.length}`);
+		console.log('---'.repeat(20));
 
 		return Promise.all(jobs).then(() => ({
 			...response,
@@ -54,26 +55,29 @@ function publishToQueueWrapper(siteConfigItems, site, forcePrebidBuild) {
 			)}`
 		}));
 	}
+
 	return processing().then(response =>
+		// syncCdn publishes a job in either consoleCdnSync or selectiveRollOut queue
 		response.empty ? syncCdn(site, forcePrebidBuild) : response
 	);
 }
-function publishWrapper(siteModel, forcePrebidBuild) {
+function publishWrapper(site, forcePrebidBuild) {
 	return siteConfigGenerationModule
-		.generate(siteModel)
-		.then(siteConfigItems => publishToQueueWrapper(siteConfigItems, siteModel, forcePrebidBuild));
+		.generate(site)
+		.then(siteConfigItems => publishToQueueWrapper(siteConfigItems, site, forcePrebidBuild));
 }
 
 module.exports = {
-	publish(site, forcePrebidBuild) {
-		const siteIdNum = parseInt(site, 10);
-		if (!isNaN(siteIdNum)) {
-			const siteId = siteIdNum.toString();
+	publish(siteId, forcePrebidBuild) {
+		const parsedSiteId = parseInt(siteId, 10);
+		if (!isNaN(parsedSiteId)) {
+			const siteId = parsedSiteId.toString();
 			return siteModelAPI
 				.getSiteById(siteId)
 				.then(siteModel => publishWrapper(siteModel, forcePrebidBuild));
 		}
 
-		return publishWrapper(site, forcePrebidBuild);
+		// assuming that siteId is instance of SiteModel
+		return publishWrapper(siteId, forcePrebidBuild);
 	}
 };
