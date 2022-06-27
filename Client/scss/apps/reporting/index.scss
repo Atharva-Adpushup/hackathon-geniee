@@ -106,6 +106,7 @@ body {
 				background: none;
 			}
 		}
+
 		.DateRangePickerInput_clearDates {
 			position: absolute;
 			right: 0;
@@ -235,19 +236,26 @@ body {
 
 .panel-heading .panel-title a:after {
 	/* symbol for "opening" panels */
-	font-family: 'Glyphicons Halflings'; /* essential for enabling glyphicon */
-	content: '\e114'; /* adjust as needed, taken from bootstrap.css */
-	float: right; /* adjust as needed */
-	color: grey; /* adjust as needed */
+	font-family: 'Glyphicons Halflings';
+	/* essential for enabling glyphicon */
+	content: '\e114';
+	/* adjust as needed, taken from bootstrap.css */
+	float: right;
+	/* adjust as needed */
+	color: grey;
+	/* adjust as needed */
 }
+
 .panel-heading .panel-title a.collapsed:after {
 	/* symbol for "collapsed" panels */
-	content: '\e080'; /* adjust as needed, taken from bootstrap.css */
+	content: '\e080';
+	/* adjust as needed, taken from bootstrap.css */
 }
 
 .reportType:hover {
 	background-color: #f0f0f0;
 }
+
 .productName:hover {
 	background-color: #f0f0f0;
 }
@@ -266,6 +274,7 @@ body {
 	align-items: 'center';
 	justify-content: 'space-between';
 }
+
 .groupBadgeStyles {
 	background-color: '#EBECF0';
 	border-radius: '2em';
@@ -319,6 +328,7 @@ body {
 	align-items: center;
 	flex-wrap: wrap;
 }
+
 .dimension {
 	display: -webkit-box;
 	display: -moz-box;
@@ -402,6 +412,7 @@ body {
 	position: relative;
 	width: $SBContainerWidth;
 	display: inline-block;
+
 	.react-select-box {
 		border-left: none;
 		border-top-left-radius: 0;
@@ -413,10 +424,12 @@ body {
 		text-align: left;
 		background-color: $whiteColor;
 		border: 1px solid $SBBorderColor;
+
 		&:focus {
 			outline: 0;
 			border: 1px solid $FMInputBorderColorActive;
 		}
+
 		&:after {
 			content: ' ';
 			position: absolute;
@@ -427,6 +440,7 @@ body {
 			border-left: $SBArrowBorder solid transparent;
 			border-right: $SBArrowBorder solid transparent;
 		}
+
 		.react-select-box-label {
 			line-height: 16px;
 			font-size: 13px;
@@ -439,6 +453,7 @@ body {
 			color: $fontColor;
 		}
 	}
+
 	.react-select-box-options {
 		margin: 2px 0 0;
 		position: absolute;
@@ -450,9 +465,11 @@ body {
 		background-color: $whiteColor;
 		border: 1px solid $SBBorderColorActive;
 		font-size: 13px;
+
 		&.react-select-box-hidden {
 			display: none;
 		}
+
 		.react-select-box-option {
 			padding: 3px 15px;
 			margin: 0;
@@ -462,19 +479,23 @@ body {
 			text-decoration: none;
 			text-transform: capitalize;
 			color: $fontColor;
+
 			.react-select-box-option:hover {
 				background-color: rgba(85, 85, 85, 0.03);
 			}
 		}
+
 		.react-select-box-option {
 			border: none;
 			width: 100%;
 			text-align: left;
+
 			.react-select-box-option:hover {
 				background-color: rgba(85, 85, 85, 0.03);
 			}
 		}
 	}
+
 	.react-select-box-clear {
 		position: absolute;
 		top: 5px;
@@ -485,6 +506,7 @@ body {
 		text-indent: -9999em;
 		z-index: 3;
 		border: none;
+
 		&:before {
 			content: '\f00d';
 			position: absolute;
@@ -497,6 +519,7 @@ body {
 			line-height: 1;
 			text-indent: 0;
 		}
+
 		&:hover,
 		&:focus {
 			outline: 0;
@@ -597,6 +620,7 @@ body {
 .filter-list-title {
 	margin-left: 10px;
 }
+
 .reports-schedule {
 	border: none;
 	border-bottom: 1px solid lightgrey;
@@ -673,6 +697,7 @@ body {
 .reporting_reportby {
 	padding: 0px 20px !important;
 }
+
 .select-options-group {
 	color: $primaryRed;
 	font-weight: bolder;
@@ -700,6 +725,7 @@ body {
 		margin: 0 1rem;
 	}
 }
+
 .reporting_reportby {
 	padding: 0px 20px !important;
 }
@@ -721,27 +747,27 @@ body {
 	padding-right: 10px;
 }
 
-.reportingCustomWidgetContainer .reportingCustomWidget ul li{
+.reportingCustomWidgetContainer .reportingCustomWidget ul li {
 	padding: 2px 18px;
 	text-align: center;
 }
 
-.reportingCustomWidgetContainer .reportingCustomWidget .customToggle .enabledPrimary{
+.reportingCustomWidgetContainer .reportingCustomWidget .customToggle .enabledPrimary {
 	background-color: green;
 	color: white;
 }
 
-.reportingCustomWidgetContainer .reportingCustomWidget .customToggle .enabledSecondary{
+.reportingCustomWidgetContainer .reportingCustomWidget .customToggle .enabledSecondary {
 	background-color: white;
 	color: green;
 }
 
-.reportingCustomWidgetContainer .reportingCustomWidget .customToggle .disbledPrimary{
+.reportingCustomWidgetContainer .reportingCustomWidget .customToggle .disbledPrimary {
 	color: #919191;
 	background-color: white;
 }
 
-.reportingCustomWidgetContainer .reportingCustomWidget .customToggle .disbledSecondary{
+.reportingCustomWidgetContainer .reportingCustomWidget .customToggle .disbledSecondary {
 	background-color: #919191;
 	color: white;
 }
@@ -770,7 +796,87 @@ body {
 	padding-bottom: 8px;
 }
 
+/* Css for bidder landscape range slider starts here*/
+#bidder-landscape-slider {
+	margin-bottom: 30px;
+	width: 90%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.active-range {
+	color: #eb575c;
+	font-weight: bolder;
+}
+.rc-slider-track {
+	background-color: #38618c;
+}
+.rc-slider-handle {
+	border: 2px solid #38618c;
+}
+/* Css for bidder landscape range slider ends here*/
 
+/* Css for custom legend for bidder landscape graph start here*/
+#bidder-landscape-chart-legend {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: center;
+	width: 90%;
+	margin: auto;
+}
+#bidder-landscape-chart-legend .legend {
+	display: flex;
+	align-items: center;
+	margin: 5px 10px;
+	cursor: pointer;
+}
+#bidder-landscape-chart-legend .legend-icon {
+	border-radius: 50%;
+	width: 8px;
+	height: 8px;
+	margin: 0px 5px;
+}
+#bidder-landscape-chart-legend .legend-disabled {
+	text-decoration: line-through;
+	color: grey;
+}
+/* Css for custom legend for bidder landscape graph ends here*/
+
+/* Css for bidder landscape data cards starts here*/
+.bid-data-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: auto;
+	overflow-y: hidden;
+	overflow-x: visible;
+	width: 95%;
+	margin: auto;
+}
+.bid-data-card {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	justify-content: space-between;
+	box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+	border-radius: 5px;
+	margin: 15px 12px;
+	padding: 10px;
+	min-width: 210px;
+	font-size: 1.7rem;
+}
+.bid-data {
+	margin-top: 5px;
+}
+.bid-data .site-name {
+	font-weight: bold;
+	font-size: 1em;
+}
+.bid-data .site-bid-details {
+	margin-left: 20px;
+	font-size: 0.9em;
+}
+/* Css for bidder landscape data cards ends here*/
 
 /*
 	CSS for Custom Toggle for Bid Landscape Ends here
