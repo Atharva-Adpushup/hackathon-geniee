@@ -809,6 +809,7 @@ router
 			})
 			.then(data => {
 				const { apConfigs: { rules = [] } = {} } = data;
+				publishAdPushupBuild(siteId);
 				return res.status(HTTP_STATUS.OK).json(rules);
 			})
 			.catch(err => {
@@ -879,6 +880,7 @@ router
 			})
 			.then(data => {
 				const { apConfigs: { rules = [] } = {} } = data;
+				publishAdPushupBuild(siteId);
 				return res.status(HTTP_STATUS.OK).json(rules);
 			})
 			.catch(err => {
