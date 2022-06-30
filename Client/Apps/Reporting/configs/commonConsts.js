@@ -213,7 +213,14 @@ const METRICS_OPS_PANEL = {
 	NETWORK_IMPRESSIONS: { value: 'network_impressions', name: 'Impressions', valueType: 'number' },
 	NETWORK_AD_ECPM: { value: 'network_ad_ecpm', name: 'Ad eCPM', valueType: 'money' },
 	GROSS_REVENUE: { value: 'network_gross_revenue', name: 'Gross Revenue', valueType: 'money' },
-	NETWORK_AD_CTR: { value: 'network_ad_ctr', name: 'AdX CTR', valueType: 'percent' }
+	NETWORK_AD_CTR: { value: 'network_ad_ctr', name: 'AdX CTR', valueType: 'percent' },
+	UNIQUE_IMPRESSIONS: {
+		value: 'unique_impressions',
+		name: 'Unique Impressions',
+		valueType: 'number'
+	},
+	UNIQUE_AD_ECPM: { value: 'unique_ad_ecpm', name: 'Unique Ad eCPM', valueType: 'money' },
+	UNIQUE_AD_CTR: { value: 'unique_ad_ctr', name: 'Unique AdX CTR', valueType: 'percent' }
 };
 
 const displayOpsMetrics = [
@@ -349,6 +356,17 @@ const displayUniqueImpressionMetrics = [
 	UNIQUE_IMPRESSION_METRICS.UNIQUE_IMPRESSIONS,
 	UNIQUE_IMPRESSION_METRICS.UNIQUE_AD_ECPM
 	// UNIQUE_IMPRESSION_METRICS.UNIQUE_AD_CTR
+];
+
+const displayOpsUniqueImpressionMetrics = [
+	METRICS_OPS_PANEL.NETWORK_NET_REVENUE,
+	METRICS_OPS_PANEL.ADPUSHUP_PAGE_VIEWS,
+	METRICS_OPS_PANEL.ADPUSHUP_PAGE_CPM,
+	METRICS_OPS_PANEL.UNIQUE_IMPRESSIONS,
+	METRICS_OPS_PANEL.UNIQUE_AD_ECPM,
+	METRICS_OPS_PANEL.UNIQUE_AD_CTR,
+	METRICS_OPS_PANEL.GROSS_REVENUE
+	// METRICS.NETWORK_AD_CTR //add this to make it available in global reports (Ops)
 ];
 
 const HB_METRICS = {
@@ -637,6 +655,7 @@ export {
 	displayOpsMetrics,
 	displayOpsMetricsForXPath,
 	displayUniqueImpressionMetrics,
+	displayOpsUniqueImpressionMetrics,
 	extraMetricsListForHB,
 	extraMetricsListMappingForHB,
 	extraMetricsListMappingForHBArray,
