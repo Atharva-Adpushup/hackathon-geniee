@@ -740,6 +740,13 @@ class Report extends Component {
 			total.total_unique_ad_ctr =
 				(total.total_unique_ad_clicks / total.total_unique_impressions) * 100;
 		}
+		if (
+			total.hasOwnProperty('total_network_net_revenue') &&
+			total.hasOwnProperty('total_unique_impressions')
+		) {
+			total.total_unique_ad_ecpm =
+				(total.total_network_net_revenue / total.total_unique_impressions) * 1000;
+		}
 		return total;
 	};
 
