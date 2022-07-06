@@ -257,18 +257,16 @@ router
 					*/
 					const { accounts } = adsenseInfo;
 
-					if (!accounts) {
-						throw new Error('No adsense account');
-					}
-
-					return accounts.map(account => ({
-						creation_time: account.createTime,
-						id: account.name.replace('accounts/', ''),
-						kind: 'adsense#account',
-						name: account.displayName,
-						premium: false,
-						timezone: account.timeZone.id
-					}));
+					return accounts
+						? accounts.map(account => ({
+								creation_time: account.createTime,
+								id: account.name.replace('accounts/', ''),
+								kind: 'adsense#account',
+								name: account.displayName,
+								premium: false,
+								timezone: account.timeZone.id
+						  }))
+						: [];
 				})
 				.catch(err => {
 					if (
@@ -276,7 +274,7 @@ router
 						err.error.error &&
 						err.error.error.message.indexOf('User does not have an AdSense account') === 0
 					) {
-						throw new Error('No adsense account');
+						return [];
 					}
 					throw err;
 				})
@@ -339,17 +337,34 @@ router
 					}
 					return false;
 				}
-				return Promise.all([
-					user.addNetworkData({
+
+				function addAdSensekData() {
+					if (adsenseAccounts && adsenseAccounts.length) {
+						return user.addNetworkData({
+							networkName: 'ADSENSE',
+							refreshToken: refresh_token,
+							accessToken: access_token,
+							expiresIn: expiry_date,
+							pubId: adsenseAccounts[0].id,
+							adsenseEmail: userInfo.email,
+							userInfo,
+							adsenseAccounts
+						});
+					}
+					return user.addNetworkData({
 						networkName: 'ADSENSE',
 						refreshToken: refresh_token,
 						accessToken: access_token,
 						expiresIn: expiry_date,
-						pubId: adsenseAccounts[0].id,
+						pubId: '',
 						adsenseEmail: userInfo.email,
 						userInfo,
 						adsenseAccounts
-					}),
+					});
+				}
+
+				return Promise.all([
+					addAdSensekData(),
 					user.addNetworkData({
 						networkName: 'DFP',
 						refreshToken: refresh_token,
