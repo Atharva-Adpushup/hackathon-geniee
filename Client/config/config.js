@@ -58,7 +58,8 @@ export default {
 	ADMIN_INVENTORY_LIST_FILTER_LIST: [
 		{ name: 'Domains', value: 'siteDomain', isDisabled: false, key: 'siteDomain' },
 		{ name: 'Site Id', value: 'siteId', isDisabled: false, key: 'siteId' },
-		{ name: 'Adunit Name', value: 'dfpAdunit', isDisabled: true, key: 'dfpAdunit' }
+		{ name: 'Adunit Name', value: 'dfpAdunit', isDisabled: false, key: 'dfpAdunit' },
+		{ name: 'Adunit Type', value: 'adUnitType', isDisabled: false, key: 'adUnitType' }
 	],
 	GET_SITE_DOMAIN_MAPPING: '/ops/getSiteMapping',
 	GET_ADUNIT_MAPPING: 'ops/getAdUnitMapping',

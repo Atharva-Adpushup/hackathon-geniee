@@ -78,6 +78,17 @@ const n1qlQueryTemplates = {
 };
 
 module.exports = {
+	AD_UNIT_TYPE_MAPPING: {
+		DISPLAY: 1,
+		DOCKED: 2,
+		STICKY: 3,
+		// AMP: 4,
+		REWARDEDADS: 5,
+		INSTREAM: 6,
+		CHAINEDDOCKED: 7,
+		INTERSTITIAL: 8,
+		INVIEW: 101
+	},
 	SALT: '_ADP_RANDOMIZER_',
 	BASE_URL: computedProductionURL,
 	INTEGRATION_BASE_URL: computedProductionURL,

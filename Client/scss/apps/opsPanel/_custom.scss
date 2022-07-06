@@ -775,7 +775,7 @@
 	align-items: center;
 	width: '100%';
 	margin-bottom: 20px;
-	svg.dropdown-search-clear-icon.gray{
+	svg.dropdown-search-clear-icon.gray {
 		display: none;
 	}
 	h1 {
@@ -805,7 +805,91 @@
 		}
 	}
 }
-.downloadBtnStyles{
-	display:block;
-	margin-top:20px;
+.downloadBtnStyles {
+	display: block;
+	margin-top: 20px;
+}
+
+.inventory-actions {
+	display: flex;
+	flex-direction: column;
+	margin-top: 25px;
+	margin-bottom: -5px;
+	& > div:first-child {
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		align-items: flex-start;
+		margin-bottom: 20px;
+		.selected-filters {
+			width: 100%;
+			& > div {
+				display: flex;
+				justify-content: flex-start;
+				align-items: flex-start;
+				width: 100%;
+				margin: 15px 0;
+				& > div:first-child {
+					width: 250px;
+					font-size: 14px;
+				}
+				& > div:last-child {
+					margin-left: 78px;
+					display: flex;
+					flex-direction: row;
+					width: 400px;
+					flex-wrap: wrap;
+					justify-content: flex-start;
+					align-items: flex-start;
+				}
+			}
+			& > div:first-child {
+				& > div:first-child {
+					font-size: 18px;
+					width: 250px;
+				}
+				& > div:last-child {
+					color: #000;
+					// margin-left: 50px;
+					font-weight: 700;
+					font-size: 12px;
+					border: 1px solid #000;
+					padding: 2px 5px;
+					display: flex;
+					justify-content: space-between;
+					align-items: center;
+					margin-left: 78px;
+					.cross {
+						font-size: 18px;
+						padding: 0 10px;
+						font-weight: bold;
+						cursor: pointer;
+					}
+				}
+			}
+			.hide {
+				display: none !important;
+			}
+		}
+		button {
+			align-self: flex-end;
+		}
+	}
+	.inventory-actions-bulk {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+		position: relative;
+		.inventory-actions-bulk-dropdown {
+			margin-right: 1rem !important;
+			width: 45%;
+			.custom-select-box-wrapper.custom-select-box-wrapper .dropdown.btn-group.btn-group-default {
+				width: 100%;
+			}
+			.custom-select-box-wrapper {
+				margin-left: 0px;
+			}
+		}
+	}
 }

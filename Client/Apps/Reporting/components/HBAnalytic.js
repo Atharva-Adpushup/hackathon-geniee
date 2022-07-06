@@ -1,4 +1,6 @@
 /* eslint-disable no-prototype-builtins */
+/* eslint-disable no-param-reassign */
+
 import React, { Component } from 'react';
 import mapValues from 'lodash/mapValues';
 import omit from 'lodash/omit';
@@ -363,11 +365,30 @@ class Report extends Component {
 		});
 	};
 
+	calculateTotalBidsWonForBucketItem = (obj, siteId, bucketItem) => {
+		let totalBidsWon = 0;
+		// eslint-disable-next-line no-unused-expressions
+		if (obj[siteId] && obj[siteId][bucketItem])
+			totalBidsWon = obj[siteId][bucketItem].reduce((total, item) => {
+				total += item.total_bids_won;
+				return total;
+			}, 0);
+		return totalBidsWon;
+	};
+
+	generateCpmArr = bucketSize =>
+		Array(...new Array(20 / bucketSize)).map((_el, i) => {
+			// eslint-disable-next-line no-param-reassign
+			i *= bucketSize;
+			return +i.toFixed(2);
+		});
+
 	generateBidCPMStatsChart = (bidCPMStatsChartData, isDefaultBucketEnabled) => {
 		const { startDate, endDate, selectedInterval } = this.state;
 		const { userSites } = this.props;
+		const SMALLEST_BUCKET_SIZE = 0.01;
 		const DEFAULT_BUCKET_SIZE = 0.05;
-		const bucketSize = isDefaultBucketEnabled ? DEFAULT_BUCKET_SIZE : 0.01;
+		const bucketSize = isDefaultBucketEnabled ? DEFAULT_BUCKET_SIZE : SMALLEST_BUCKET_SIZE;
 
 		let siteIds = Object.keys(userSites);
 		siteIds = siteIds.toString();
@@ -389,38 +410,45 @@ class Report extends Component {
 		result = sortBy(result, ['cpm', 'report_date']);
 
 		// process data - aggregate based on siteId First
-		const obj = {};
+		const cpmDataBySite = {};
 		result.map(item => {
-			if (!obj[item.siteid]) {
-				obj[item.siteid] = {};
+			if (!cpmDataBySite[item.siteid]) {
+				cpmDataBySite[item.siteid] = {};
 			}
-			if (obj[item.siteid] && !obj[item.siteid][item.cpm]) {
-				obj[item.siteid][item.cpm] = [];
+			if (cpmDataBySite[item.siteid] && !cpmDataBySite[item.siteid][item.cpm]) {
+				cpmDataBySite[item.siteid][item.cpm] = [];
 			}
-			obj[item.siteid][item.cpm].push(item);
+			cpmDataBySite[item.siteid][item.cpm].push(item);
 			return item;
 		});
-
-		const xAxis = Array(...new Array(20 / bucketSize)).map((_el, i) => {
-			// eslint-disable-next-line no-param-reassign
-			i *= bucketSize;
-			return +i.toFixed(2);
-		});
+		const allCpmArr = this.generateCpmArr(SMALLEST_BUCKET_SIZE);
+		const xAxis = bucketSize !== SMALLEST_BUCKET_SIZE ? this.generateCpmArr(bucketSize) : allCpmArr;
 		const yAxis = [];
-		Object.keys(obj).map(siteId => {
+
+		Object.keys(cpmDataBySite).map(siteId => {
+			let intermediateBidsWon = 0;
 			const series = {
 				name: this.domainFromUrl(userSites[siteId].siteDomain),
 				data: []
 			};
-			xAxis.map(bucketItem => {
-				// let totalBidsReceived = 0;
-				let totalBidsWon = 0;
-				// eslint-disable-next-line no-unused-expressions
-				obj[siteId][bucketItem] &&
-					obj[siteId][bucketItem].map(item => {
-						totalBidsWon += item.total_bids_won;
-					});
-				series.data.push(totalBidsWon);
+
+			allCpmArr.forEach(bucketItem => {
+				// converting values to integer to avoid floating point errors
+				const bucketItemInteger = +(bucketItem * 100).toFixed();
+				const bucketSizeInteger = +(bucketSize * 100).toFixed();
+				const totalBidsWonForBucketItem = this.calculateTotalBidsWonForBucketItem(
+					cpmDataBySite,
+					siteId,
+					bucketItem
+				);
+
+				if (bucketItemInteger % bucketSizeInteger === 0) {
+					const totalBidsWon = totalBidsWonForBucketItem + intermediateBidsWon;
+					series.data.push(totalBidsWon);
+					if (intermediateBidsWon !== 0) intermediateBidsWon = 0;
+					return;
+				}
+				intermediateBidsWon += totalBidsWonForBucketItem;
 			});
 			yAxis.push(series);
 		});
