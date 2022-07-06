@@ -351,16 +351,7 @@ router
 							adsenseAccounts
 						});
 					}
-					return user.addNetworkData({
-						networkName: 'ADSENSE',
-						refreshToken: refresh_token,
-						accessToken: access_token,
-						expiresIn: expiry_date,
-						pubId: '',
-						adsenseEmail: userInfo.email,
-						userInfo,
-						adsenseAccounts
-					});
+					return Promise.resolve();
 				}
 
 				return Promise.all([
