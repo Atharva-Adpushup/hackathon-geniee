@@ -10,7 +10,7 @@ import BidderSettings from './BidderSettings';
 import DashboardNotifications from './DashboardNotifications';
 import authService from '../../../../services/authService';
 import BidderRules from './NetworkWideHBRules';
-import Inventory from './Inventory';
+import InventoryTabContainer from '../../containers/InventoryTabContainer';
 
 class Tools extends Component {
 	state = {
@@ -111,7 +111,9 @@ class Tools extends Component {
 			case TOOLS_IDENTIFIERS.DASHBOARD_NOTIFICATIONS:
 				return <DashboardNotifications showNotification={showNotification} />;
 			case TOOLS_IDENTIFIERS.INVENTORY:
-				return <Inventory showNotification={showNotification} />;
+				return (
+					<InventoryTabContainer dataForAuditLogs={dataForAuditLogs} customProps={customProps} />
+				);
 		}
 	};
 

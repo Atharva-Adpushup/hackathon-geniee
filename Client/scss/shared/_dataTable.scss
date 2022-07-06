@@ -45,3 +45,44 @@
 		}
 	}
 }
+
+.tools-inventory-tab {
+	.inventory-actions-bulk-dropdown {
+		margin-right: 1rem !important;
+		overflow: visible !important ;
+		.custom-select-box-wrapper {
+			margin-left: 0px;
+			ul {
+				left: unset;
+				right: 0;
+			}
+		}
+	}
+	.rt-tbody {
+		min-height: 900px;
+		justify-content: flex-start;
+		.rt-tr-group {
+			flex: initial;
+		}
+		.rt-tr-group:nth-last-child(-n + 9) {
+			.inventory-actions-bulk-dropdown {
+				.custom-select-box-wrapper {
+					ul.dropdown-menu {
+						bottom: 100%;
+						top: auto;
+					}
+				}
+			}
+		}
+		.rt-tr-group:nth-child(-n + 9) {
+			.inventory-actions-bulk-dropdown {
+				.custom-select-box-wrapper {
+					ul.dropdown-menu {
+						top: 100%;
+						bottom: auto;
+					}
+				}
+			}
+		}
+	}
+}

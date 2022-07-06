@@ -206,7 +206,8 @@ const getSectionsPayload = (variationSections, platform, pagegroup, selectorsTre
 			return true;
 		}
 		ad = section.ads[Object.keys(section.ads)[0]]; // for now we have only one ad inside a section
-
+		//if ad is inActive don't process it
+		if (ad.hasOwnProperty('isActive') && !ad.isActive) return;
 		// In case if even one ad inside variation is unsynced then we don't generate JS as unsynced ads will have no impression and hence loss of revenue'
 		if (!isAdSynced(ad)) {
 			throw new AdPushupError({
