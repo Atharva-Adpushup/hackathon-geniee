@@ -448,7 +448,7 @@ router
 			return errorHandler(err, res);
 		}
 	})
-	.post('/switchUser', (req, res) => {
+	.post('/switchUser', async (req, res) => {
 		let { email } = req.body;
 		email = utils.htmlEntities(utils.sanitiseString(email));
 
@@ -461,13 +461,19 @@ router
 				httpStatus.PERMISSION_DENIED
 			);
 		}
+		const userCookie = req.cookies.user;
+		const adpToken = req.headers.authorization;
+		const token = (userCookie && JSON.parse(userCookie).authToken) || adpToken || null;
+		const decoded = await authToken.decodeAuthToken(token);
+		
 		return userModel
 			.setSitePageGroups(email)
 			.then(user => {
 				const token = authToken.getAuthToken({
 					email: user.get('email'),
 					isSuperUser: true,
-					originalEmail: req.user.originalEmail || req.user.email
+					originalEmail: req.user.originalEmail || req.user.email,
+					loginTime: decoded.loginTime
 				});
 
 				return res
@@ -487,7 +493,7 @@ router
 			})
 			.catch(err => errorHandler(err, res));
 	})
-	.post('/impersonateCurrentUser', (req, res) => {
+	.post('/impersonateCurrentUser', async (req, res) => {
 		const { isSuperUser, email } = req.user;
 		if (!isSuperUser || !email) {
 			return sendErrorResponse(
@@ -499,12 +505,19 @@ router
 			);
 		}
 
+		const userCookie = req.cookies.user;
+		const adpToken = req.headers.authorization;
+		const token = (userCookie && JSON.parse(userCookie).authToken) || adpToken || null;
+		const decoded = await authToken.decodeAuthToken(token);
+
 		return userModel
 			.setSitePageGroups(email)
 			.then(user => {
 				const token = authToken.getAuthToken({
 					email: user.get('email'),
-					isSuperUser: false
+					isSuperUser: false,
+					originalEmail: req.user.originalEmail || req.user.email,
+					loginTime: decoded.loginTime
 				});
 
 				return res

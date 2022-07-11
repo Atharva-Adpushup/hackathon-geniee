@@ -7,7 +7,6 @@ const openRoutes = ['/login', '/signup', '/forgotPassword', '/resetPassword', '/
 const closedRoutes = ['/user'];
 
 module.exports = (req, res, next) => {
-
 	function isDifferentGenieeSiteId() {
 		const { url } = req;
 		const sessionSiteId = Number(req.session.siteId);
@@ -78,10 +77,26 @@ module.exports = (req, res, next) => {
 			req.user = decoded;
 			return next();
 		}
-		return userModel.getUserByEmail(decoded.email).then(() => {
-			req.user = decoded;
-			next();
-			return null;
+
+		return userModel.getUserByEmail(decoded.email).then(user => {
+			if (decoded.originalEmail) {
+				userModel.getUserByEmail(decoded.originalEmail).then(originalUser => {
+					if (decoded.loginTime < originalUser.get('passwordUpdatedOn') || !decoded.loginTime) {
+						res.clearCookie('user');
+						return res.redirect('/login');
+					}
+					req.user = decoded;
+					next();
+					return null;
+				});
+			} else if (decoded.loginTime < user.get('passwordUpdatedOn') || !decoded.loginTime) {
+				res.clearCookie('user');
+				return res.redirect('/login');
+			} else {
+				req.user = decoded;
+				next();
+				return null;
+			}
 		});
 	}).catch(() => {
 		res.clearCookie('user');

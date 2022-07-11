@@ -32,6 +32,7 @@ var modelAPI = (module.exports = apiModule()),
 			'balancePayment',
 			'salt',
 			'passwordMd5',
+			'passwordUpdatedOn',
 			'sites',
 			'adNetworkSettings',
 			'createdAt',
@@ -790,6 +791,7 @@ function apiModule() {
 						user.delete('passwordResetKey');
 						user.delete('passwordResetKeyCreatedAt');
 						user.set('passwordMd5', md5(user.get('salt') + json.password + user.get('salt')));
+						user.set('passwordUpdatedOn', Date.now());
 						return user.save();
 					}
 					throw new AdPushupError({ keyNotFound: true });
