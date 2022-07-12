@@ -909,6 +909,9 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		var refreshType = window.pnpRefresh.refreshType;
 		var AD_UNIT_MAPPING =
 		  window.pnpRefresh.adUnits[window.adpushup.config.platform];
+		if(!AD_UNIT_MAPPING){
+			return;
+		}
 		var log = window.adpushup.utils.log.bind(window.adpushup.utils);
 		var checkElementInViewPercent =
 		  window.adpushup.utils.checkElementInViewPercent.bind(window.adpushup.utils);
