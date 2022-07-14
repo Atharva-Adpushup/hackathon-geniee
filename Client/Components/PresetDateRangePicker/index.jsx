@@ -149,7 +149,7 @@ class DateRangePickerWrapper extends React.Component {
 						</li>
 					);
 				})}
-				{getPresetDropdownItems && (
+				{getPresetDropdownItems.length ? (
 					<li>
 						<Select
 							options={getPresetDropdownItems}
@@ -166,6 +166,8 @@ class DateRangePickerWrapper extends React.Component {
 							className="saved-reports-select custom-select-box-wrapper presetDropdown"
 						/>
 					</li>
+				) : (
+					''
 				)}
 			</ul>
 		);

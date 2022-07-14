@@ -12,6 +12,7 @@ import { columnsBlacklistedForAddition } from '../configs/commonConsts';
 import CustomReactTable from '../../../Components/CustomReactTable/index';
 import CustomToggle from '../../../Components/CustomToggle';
 
+let expandedRows = {};
 const formatCellValue = (value, valueType, percValue) => {
 	switch (valueType) {
 		case 'money':
@@ -62,7 +63,8 @@ const getTableBody = (tableBody, props) => {
 		);
 
 	tableData.forEach(row => {
-		const tableRow = { ...row };
+		const tableRow = { ...row, day: '' };
+		tableRow.day = `${moment(tableRow.date).format('dddd')}`;
 
 		if (isDaily) tableRow.date = tableRow.date;
 
@@ -138,7 +140,14 @@ const getTableColumns = (columns, total, props, state) => {
 	let tableColumns = [];
 	let sortedMetrics = [];
 
-	const { metrics, dimension, aggregatedData, isURLReport, memoizedAggregation } = props;
+	const {
+		metrics,
+		dimension,
+		aggregatedData,
+		isURLReport,
+		memoizedAggregation,
+		selectedDimension
+	} = props;
 	const { showPercentInReport } = state;
 
 	const { isDaily, isMonthly } = getDateIntervalValidators(props);
@@ -149,7 +158,7 @@ const getTableColumns = (columns, total, props, state) => {
 		Cell: props =>
 			isDaily ? (
 				// Show Day of the week with date
-				<span>{moment(props.value).format('ll (dddd)')}</span>
+				<span>{moment(props.value).format('ll')}</span>
 			) : (
 				<span>{props.value}</span>
 			),
@@ -162,6 +171,24 @@ const getTableColumns = (columns, total, props, state) => {
 	!isURLReport
 		? tableColumns.push(computedDate)
 		: isURLReport && (isDaily || isMonthly) && tableColumns.push(computedDate);
+
+	const computedDay = {
+		Header: 'Day',
+		accessor: 'day',
+		Cell: props => {
+			if (isDaily && selectedDimension.length === 0) {
+				// Show Day of the week with date
+				return <span>{props.value}</span>;
+			}
+			return '';
+		},
+		sortable: isDaily,
+		Footer: ''
+	};
+
+	if (isDaily && selectedDimension.length === 0) {
+		tableColumns.push(computedDay);
+	}
 
 	columns.forEach(column => {
 		if (dimension[column]) {
@@ -409,6 +436,7 @@ class Table extends React.Component {
 			tableBody: null,
 			showPercentInReport: false
 		};
+		expandedRows = {};
 	}
 
 	static getDerivedStateFromProps(props, state) {
@@ -440,6 +468,20 @@ class Table extends React.Component {
 		return null; // No change to state
 	}
 
+	componentDidMount() {
+		Array.from(document.getElementsByClassName('rt-pivot')).map(item => {
+			item.addEventListener('click', () => {
+				const parent = item.closest('.rt-tr-group');
+				const index = Array.from(parent.parentElement.children).indexOf(parent);
+				const isExpanded = parent.querySelector('.rt-expander').classList.toString();
+				if (parent) {
+					expandedRows[index] = !(isExpanded === 'rt-expander -open');
+				}
+			});
+			return item;
+		});
+	}
+
 	checkForAggregation(tableBody) {
 		const dateCount = countBy(map(tableBody, 'date'));
 		for (const key in dateCount) {
@@ -460,11 +502,23 @@ class Table extends React.Component {
 			},
 			() => {
 				const { tableColumns, tableBody } = updateTableData(tableData, this.props, this.state);
-				this.setState({
-					tableData,
-					tableColumns,
-					tableBody
-				});
+				this.setState(
+					{
+						tableData,
+						tableColumns,
+						tableBody
+					},
+					() => {
+						const allParentRows = Array.from(document.getElementsByClassName('rt-pivot'));
+						Object.keys(expandedRows).map(rowIndex => {
+							if (expandedRows[rowIndex]) {
+								setTimeout(() => {
+									allParentRows[rowIndex].click();
+								}, 10);
+							}
+						});
+					}
+				);
 			}
 		);
 	};

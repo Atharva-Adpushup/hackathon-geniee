@@ -1010,6 +1010,7 @@ class Report extends Component {
 
 		result.forEach(row => {
 			const tableRow = { ...row };
+			tableRow.day = `${moment(tableRow.date).format('dddd')}`;
 
 			if (selectedInterval === 'daily') tableRow.date = tableRow.date;
 

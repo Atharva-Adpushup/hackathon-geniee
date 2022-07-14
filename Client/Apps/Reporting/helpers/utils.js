@@ -96,6 +96,18 @@ const getPresets = () => {
 	];
 };
 
+const getPresetsForHB = () => [
+	...getPresets(),
+	{
+		text: 'Last Month',
+		start: moment()
+			.subtract(1, 'months')
+			.startOf('month'),
+		end: moment()
+			.subtract(1, 'months')
+			.endOf('month')
+	}
+];
 const getPresetDropdownItems = () => [
 	{
 		default_enabled: true,
@@ -266,6 +278,7 @@ export {
 	computeCsvData,
 	numberWithCommas,
 	getPresets,
+	getPresetsForHB,
 	getPresetDropdownItems,
 	calculateTotalPageViews,
 	calculateTotalNetRevenues,

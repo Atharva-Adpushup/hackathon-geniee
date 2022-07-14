@@ -8,7 +8,7 @@ import debounce from 'lodash/debounce';
 import moment from 'moment';
 import PresetDateRangePicker from '../../../../Components/PresetDateRangePicker/index';
 import SelectBox from '../../../../Components/SelectBox/index';
-import { getPresets } from '../../helpers/utils';
+import { getPresets, getPresetDropdownItems } from '../../helpers/utils';
 import reportService from '../../../../services/reportService';
 import {
 	accountFilter,
@@ -355,6 +355,7 @@ class Control extends Component {
 						<label className="u-text-normal">Date Range</label>
 						<PresetDateRangePicker
 							presets={getPresets()}
+							getPresetDropdownItems={getPresetDropdownItems()}
 							startDate={state.startDate}
 							endDate={state.endDate}
 							datesUpdated={({ startDate, endDate }) =>

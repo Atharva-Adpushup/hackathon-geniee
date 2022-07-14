@@ -29,7 +29,17 @@ export default ({ component: Component, title = '', ...rest }) => {
 					}}
 				>
 					Payments Error - Please complete your Payment Profile, for timely payments.{' '}
-					<a href="/payment">Go to payments</a>
+					<a
+						href="/payment"
+						style={{
+							color: 'white',
+							fontWeight: 600,
+							textDecoration: 'underline',
+							textUnderlinePosition: 'under'
+						}}
+					>
+						Go to payments
+					</a>
 				</div>
 			)}
 			<MixpanelContainer {...rest} />
