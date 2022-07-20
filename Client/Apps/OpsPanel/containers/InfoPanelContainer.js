@@ -15,8 +15,17 @@ const mapStateToProps = (state, ownProps) => {
 			accountForSuperUser: accountForSuperUserReportMetaData
 		},
 		user,
-		sites
+		sites,
+		associatedAccounts
 	} = state.global;
+
+	let associatedSites = [];
+	if (associatedAccounts.data.length) {
+		associatedSites = associatedAccounts.data.reduce(
+			(acc, account) => acc.concat(account.siteIds),
+			[]
+		);
+	}
 
 	return {
 		...ownProps,
@@ -25,7 +34,8 @@ const mapStateToProps = (state, ownProps) => {
 		reportType: ownProps.reportType,
 		globalReportMetaData,
 		accountReportMetaDta,
-		accountForSuperUserReportMetaData
+		accountForSuperUserReportMetaData,
+		associatedSites
 	};
 };
 

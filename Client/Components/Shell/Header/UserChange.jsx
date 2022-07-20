@@ -54,7 +54,7 @@ class UserChange extends Component {
 	};
 
 	getFormattedUserDomainsList = (domains = [], siteIds = []) =>
-		//removed filter of 5 as this is affecting the filter on the basis of domain or siteId beyond 5
+		// removed filter of 5 as this is affecting the filter on the basis of domain or siteId beyond 5
 		domains
 			.map((domain, i) => {
 				const siteId = siteIds[i];
@@ -90,8 +90,11 @@ class UserChange extends Component {
 
 	render() {
 		const { email, users, showFilteredList } = this.state;
+		const { associatedAccounts = [] } = this.props;
 		const { getFilteredUserDataList } = this;
-		const filteredUserDataList = getFilteredUserDataList(users);
+		const filteredUserDataList = getFilteredUserDataList(
+			associatedAccounts.length ? [...associatedAccounts] : [...users]
+		);
 		return (
 			<Form onSubmit={this.onFormSubmit} className="change-user-form">
 				<FormControl

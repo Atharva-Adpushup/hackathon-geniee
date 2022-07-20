@@ -23,6 +23,11 @@ const fetchGlobalData = () => dispatch =>
 				data: data.user
 			});
 			dispatch({
+				type: USER_ACTIONS.ASSOCIATED_ACCOUNTS,
+
+				data: data.associatedAccounts
+			});
+			dispatch({
 				type: NETWORK_CONFIG_ACTIONS.REPLACE_NETWORK_CONFIG,
 				data: data.networkConfig
 			});

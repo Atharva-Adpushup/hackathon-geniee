@@ -97,7 +97,7 @@ class Report extends Component {
 	}
 
 	componentDidMount() {
-		const { userSites, updateReportMetaData, reportsMeta, isForOps } = this.props;
+		const { userSites, updateReportMetaData, reportsMeta, isForOps, associatedSites } = this.props;
 		const { email, reportType } = this.getDemoUserParams();
 
 		let userSitesStr = '';
@@ -112,6 +112,9 @@ class Report extends Component {
 
 		if (isForOps || reportType === 'global') {
 			isSuperUser = true;
+			if (associatedSites.length) {
+				userSitesStr = [...Object.keys(userSites), ...associatedSites].join(',');
+			}
 		}
 
 		const params = { sites: userSitesStr };
@@ -341,7 +344,7 @@ class Report extends Component {
 			selectedInterval,
 			metricsList
 		} = this.state;
-		const { userSites, isCustomizeChartLegend, defaultReportType } = this.props;
+		const { userSites, isCustomizeChartLegend, defaultReportType, associatedSites } = this.props;
 		const { email, reportType } = this.getDemoUserParams();
 		let selectedMetrics;
 
@@ -378,6 +381,9 @@ class Report extends Component {
 
 		if (reportType === 'global' || defaultReportType === 'global') {
 			params.isSuperUser = true;
+			if (associatedSites.length) {
+				params.siteid = [...Object.keys(userSites), ...associatedSites].join(',');
+			}
 		}
 
 		if (reportType === 'global' && !params.siteid) {
@@ -1425,7 +1431,8 @@ class Report extends Component {
 			user,
 			showNotification,
 			match,
-			location
+			location,
+			associatedSites
 		} = this.props;
 		const { sessionRpmReports: sessionRpmReportsEnabled = false } = user.data;
 
@@ -1509,6 +1516,7 @@ class Report extends Component {
 						csvData={csvData}
 						isDemoUser={isValid}
 						userSites={userSites}
+						associatedSites={associatedSites}
 						user={user}
 						showNotification={showNotification}
 						savedReports={savedReports}

@@ -92,6 +92,7 @@ class Shell extends React.Component {
 			children,
 			userFetched,
 			user,
+			associatedAccounts,
 			sites,
 			location,
 			logout,
@@ -118,6 +119,7 @@ class Shell extends React.Component {
 						<Header
 							sidebarToggle={this.sidebarToggle}
 							user={user}
+							associatedAccounts={associatedAccounts}
 							logout={logout}
 							switchUser={switchUser}
 							impersonateCurrentUser={impersonateCurrentUser}

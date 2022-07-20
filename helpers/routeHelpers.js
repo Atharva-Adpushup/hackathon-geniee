@@ -25,6 +25,8 @@ const {
 	AMP_REFRESH_INTERVAL
 } = require('../configs/commonConsts');
 const channelModel = require('../models/channelModel');
+const userModel = require('../models/userModel')
+const hubSpotService = require('../apiServices/associatedAccountAccessControlService');
 
 const appBucket = couchbaseService(
 	`couchbase://${config.couchBase.HOST}/${config.couchBase.DEFAULT_BUCKET}`,
@@ -162,11 +164,11 @@ function fetchAds(req, res, docKey) {
 		.catch(err =>
 			err.code && err.code === 13 && err.message.includes('key does not exist')
 				? sendSuccessResponse(
-						{
-							ads: []
-						},
-						res
-				  )
+					{
+						ads: []
+					},
+					res
+				)
 				: errorHandler(err, res)
 		);
 }
@@ -587,11 +589,11 @@ function fetchAmpAds(req, res, docKey) {
 		.catch(err =>
 			err.code && err.code === 13 && err.message.includes('key does not exist')
 				? sendSuccessResponse(
-						{
-							ads: []
-						},
-						res
-				  )
+					{
+						ads: []
+					},
+					res
+				)
 				: errorHandler(err, res)
 		);
 }
@@ -984,6 +986,128 @@ async function updateAds(docId, ads = []) {
 	}
 }
 
+// get details of account from CB
+function getSitesAssociatedWithAccount(email) {
+	return userModel
+		.getUserByEmail(email)
+		.then(user => {
+			const userData = user.cleanData();
+			const sitesArray = [...userData.sites];
+			const sitesArrayLength = sitesArray.length;
+			userData.sites = {};
+
+			for (let i = 0; i < sitesArrayLength; i += 1) {
+				const site = sitesArray[i];
+				userData.sites[site.siteId] = site;
+			}
+			return userData;
+		}).catch(() => {
+			return {
+				sites: {}
+			}
+		})
+
+}
+
+// Check user switiching/impersonating based on allowed accounts only
+// if there are some associated accounts then switch/impersonate only if account to be
+// switched/impersonated is present in associated accounts list
+function checkAllowedEmailForSwitchAndImpersonate(associatedAccounts, switchUserEmail) {
+	if (associatedAccounts.length) {
+		const allAccountsAllowedToSwitchForTheCurrentUser = associatedAccounts.find(account => {
+			return account.email === switchUserEmail;
+		});
+
+		// is switch user allowed for this user
+		return allAccountsAllowedToSwitchForTheCurrentUser;
+	}
+	// associatedAccounts length is zero then it means there is no resttriction
+	return true;
+}
+
+/**
+ * Get accounts associated with user - AdOps/AM from hubspot
+ * and get account details from CB
+ */
+async function getAssociatedAccountsWithUser(userEmail) {
+	// no need to check any access for development mode
+	// else developers have to run a new service during development
+	if (config.environment.HOST_ENV !== 'production') {
+		return [];
+	}
+
+	// Ops Access Control list
+	const { value: opsAcccessList } = await appBucket.getDoc('ops::acl');
+	let emailOfAM = opsAcccessList.AM.includes(userEmail) ? userEmail : '' ;
+	if (!emailOfAM) {
+		const adOpsUserDetails = opsAcccessList.AdOps.find(adOpsUser => {
+			return adOpsUser.email === userEmail
+		})
+		// if found hten set email of AM
+		if (adOpsUserDetails) {
+			// No AM has been assigned to this AdOps person
+			// set email of AdOps which is also equal to userEmail
+			emailOfAM = adOpsUserDetails.AM || adOpsUserDetails.email;
+		}
+	}
+
+	// if original user's email does not exist in access control doc - remove any restrictions
+	if (emailOfAM) {
+		// from hubspot
+		return Promise.resolve(emailOfAM).then(() => {
+			return hubSpotService.getSitesOfUserFromHubspot(emailOfAM)
+		}).then(async (accounts) => {
+			if (!accounts.results.length) {
+				// this is to manage the case where a particular user AM/AdOps
+				// has restricted access but no site has been assigned to him/her
+				// yet and instead of returning empty array - return non-empty array
+				// as empty array means full access
+				return [{
+					email: '',
+					siteIds: [],
+					domains: []
+				}]
+			}
+			// from CB
+			return Promise.all(accounts && accounts.results && accounts.results.map(accountEmail => {
+				return getSitesAssociatedWithAccount(accountEmail)
+			})).then((associatedAccounts) => {
+				// format data into `findUser` api format
+				return associatedAccounts.map(account => {
+					if (Object.keys(account).length) {
+						return {
+							email: account.email,
+							siteIds: Object.keys(account.sites),
+							domains: Object.keys(account.sites).map(siteId => account.sites[siteId].domain)
+						}
+					}
+				}).filter(item => item.siteIds.length)
+			}).catch(() => {
+				// this is to manage the case where a particular user AM/AdOps
+				// has restricted access but no site has been assigned to him/her
+				// yet and instead of returning empty array - return non-empty array
+				// as empty array means full access
+				return [{
+					email: '',
+					siteIds: [],
+					domains: []
+				}]
+			})
+		}).catch(() => {
+			// this is to manage the case where a particular user AM/AdOps
+			// has restricted access but no site has been assigned to him/her
+			// yet and instead of returning empty array - return non-empty array
+			// as empty array means full access
+			return [{
+				email: '',
+				siteIds: [],
+				domains: []
+			}]
+		})
+	}
+	return [];
+};
+
 module.exports = {
 	verifyOwner,
 	errorHandler,
@@ -1012,5 +1136,7 @@ module.exports = {
 	updateApLiteAd,
 	updateInnovativeAd,
 	updateApTagAd,
-	updateAds
+	updateAds,
+	checkAllowedEmailForSwitchAndImpersonate,
+	getAssociatedAccountsWithUser
 };

@@ -36,6 +36,9 @@ module.exports = {
 	auditLogElasticServer: {
 		host: 'http://127.0.0.1:8083/auditLog'
 	},
+    hubSpotService: {
+        host: 'http://localhost:8181'
+    },
 	googleOauth: {
 		OAUTH_CLIENT_ID: 'GOOGLE CLIENT ID',
 		OAUTH_CLIENT_SECRET: 'GOOGLE CLIENT SECRET',
@@ -93,7 +96,7 @@ module.exports = {
 			REVENUE_FIELD: 'Revenue',
 			ENDPOINT: 'https://pmc.criteo.com/api/stats',
 			AUTH_PARAMS: {
-				TOKEN : 'D152A218-5DE9-4834-91F0-95542119D520'
+				TOKEN: 'D152A218-5DE9-4834-91F0-95542119D520'
 			}
 		},
 		PUBMATIC: {
@@ -133,7 +136,7 @@ module.exports = {
 			REVENUE_FIELD: 'publisher_payment',
 			ENDPOINT: {
 				AUTH_ENDPOINT: 'https://app.indexexchange.com/api/authentication/v1/login',
-				API_ENDPOINT:'https://app.indexexchange.com/api/reporting/agg/v1',
+				API_ENDPOINT: 'https://app.indexexchange.com/api/reporting/agg/v1',
 			},
 			REPORT_ID: 340267,
 			AUTH_PARAMS: {
@@ -364,8 +367,8 @@ module.exports = {
 	},
 	prefetchBlockedSites: ['41319'],
 	autoBidderBlockEnabledSites: [37780],
-	timeoutOptimisationEnabledSites:[37780],
-	bidderBlockingSupportMail:'rishav.chaudhary@adpushup.com',
+	timeoutOptimisationEnabledSites: [37780],
+	bidderBlockingSupportMail: 'rishav.chaudhary@adpushup.com',
 	autoBlockCronSchedule: '0 0 * * 1',
 	timeoutCronSchedule: '0 0 * * 1',
 	consoleErrorAlerts: {
@@ -375,7 +378,7 @@ module.exports = {
 	mailerQueueUrl: 'https://queuepublisher.adpushup.com/publish',
 	adsTxtSupportEmail: ['testemail@adpushup.com'],
 	frequentReportsCachingLimit: 5,
-	poweredByAdpushupBannerService:{
+	poweredByAdpushupBannerService: {
 		enableOnSites: [],
 		supportMail: 'hrishikesh.jangir@adpushup.com'
 	}
