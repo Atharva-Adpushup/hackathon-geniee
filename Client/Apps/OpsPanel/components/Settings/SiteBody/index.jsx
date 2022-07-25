@@ -40,11 +40,11 @@ const SiteBody = props => {
 					showNotification={showNotification}
 				/>
 				<LineItemTypeRefreshContainer site={site} />
-				<SiteLevelBeforeJSContainer
+				{/* <SiteLevelBeforeJSContainer
 					dataForAuditLogs={dataForAuditLogs}
 					site={site}
 					showNotification={showNotification}
-				/>
+				/> */}
 				<SizeMappingContainer
 					dataForAuditLogs={dataForAuditLogs}
 					site={site}
