@@ -12,7 +12,7 @@ import PresetDateRangePicker from '../../../Components/PresetDateRangePicker/ind
 import SelectBox from '../../../Components/SelectBox/index';
 import Schedule from './Schedule';
 import MultiSelectBox from '../../../Components/MultiSelectBox/index';
-import { getPresets, getPresetDropdownItems } from '../helpers/utils';
+import { getPresets, getPresetDropdownItems, getPresetsForHB } from '../helpers/utils';
 import reportService from '../../../services/reportService';
 import {
 	accountFilter,
@@ -103,6 +103,7 @@ class Control extends Component {
 		if (updateDimensionList) newState.dimensionList = nextProps.dimensionList;
 		if (updateFilterList) newState.filterList = nextProps.filterList;
 		if (updateMetricsList) newState.metricsList = nextProps.metricsList;
+
 		this.setState(newState);
 	}
 
@@ -324,12 +325,12 @@ class Control extends Component {
 		const updatedSelectedDimension = isHB
 			? selectedDimension
 			: selectedDimension.filter(dimension => {
-				for (let i = 0; i < updatedDimensionList.length; i++) {
-					const currentDimension = updatedDimensionList[i];
-					if (currentDimension.value === dimension) return !currentDimension.isDisabled;
-				}
-				return false;
-			});
+					for (let i = 0; i < updatedDimensionList.length; i++) {
+						const currentDimension = updatedDimensionList[i];
+						if (currentDimension.value === dimension) return !currentDimension.isDisabled;
+					}
+					return false;
+			  });
 		return {
 			updatedFilterList,
 			updatedDimensionList,
@@ -532,8 +533,8 @@ class Control extends Component {
 							Date Range {isHB ? '(Max 30 days can be selected)' : ''}
 						</label>
 						<PresetDateRangePicker
-							presets={getPresets()}
-							getPresetDropdownItems={getPresetDropdownItems()}
+							presets={isHB ? getPresetsForHB() : getPresets()}
+							getPresetDropdownItems={isHB ? [] : getPresetDropdownItems()}
 							startDate={state.startDate}
 							endDate={state.endDate}
 							datesUpdated={({ startDate, endDate }) => {
