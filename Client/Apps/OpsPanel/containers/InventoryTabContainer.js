@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import { connect } from 'react-redux';
 import {
 	fetchInventoryTabAllAdUnits,
@@ -17,6 +18,11 @@ const mapStateToProps = (state, ownProps) => {
 	} = state.global;
 
 	const allAdUnits = [];
+	const allAdsMap = allAds.reduce((adsMap, currentAd) => {
+		const { adId } = currentAd;
+		adsMap[adId] = currentAd;
+		return adsMap;
+	}, {});
 	for (let index = 0; index < allAds.length; index += 1) {
 		const data = allAds[index];
 		if (data) {
@@ -31,6 +37,7 @@ const mapStateToProps = (state, ownProps) => {
 		allAds: allAdUnits,
 		sites,
 		isInventoryFetched: isInventoryFetched && sites.fetched,
+		allAdsMap,
 		...ownProps
 	};
 };

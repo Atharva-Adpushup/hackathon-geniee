@@ -59,7 +59,23 @@
 		}
 	}
 	.rt-tbody {
+		.inventory-actions-bulk-dropdown {
+			margin-right: 1rem !important;
+			overflow: visible !important ;
+			.custom-select-box-wrapper {
+				margin-left: 0px;
+				.custom-select-box {
+					font-size: 12px;
+				}
+				ul {
+					font-size: 13px;
+					left: unset;
+					right: 0;
+				}
+			}
+		}
 		min-height: 900px;
+		font-size: 13px !important;
 		justify-content: flex-start;
 		.rt-tr-group {
 			flex: initial;
@@ -84,5 +100,16 @@
 				}
 			}
 		}
+		.rt-td {
+			.mt-10 {
+				display: flex;
+				align-items: center;
+				height: 100%;
+			}
+		}
+	}
+	button:disabled,
+	button[disabled] {
+		cursor: no-drop;
 	}
 }

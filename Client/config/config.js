@@ -29,27 +29,34 @@ export default {
 		{
 			Header: 'Site Id',
 			accessor: 'siteId',
-			width: 100,
-			maxWidth: 100,
-			minWidth: 100
+			width: 70,
+			maxWidth: 70,
+			minWidth: 70
 		},
 		{
 			Header: 'Domain',
 			accessor: 'siteDomain',
-			width: 220,
-			maxWidth: 250,
-			minWidth: 250
+			width: 150,
+			maxWidth: 150,
+			minWidth: 150
 		},
 		{
 			Header: 'Ad Unit Name',
 			accessor: 'dfpAdunit',
-			width: 500,
-			maxWidth: 800,
-			minWidth: 500
+			width: 400,
+			maxWidth: 500,
+			minWidth: 400
 		},
 		{
 			Header: 'Settings',
 			accessor: 'adUnitSettings',
+			width: 200,
+			maxWidth: 200,
+			minWidth: 200
+		},
+		{
+			Header: 'Action',
+			accessor: 'adUnitAction',
 			width: 200,
 			maxWidth: 200,
 			minWidth: 200
@@ -67,5 +74,11 @@ export default {
 		dfpAdunit: 'dfpAdunit'
 	},
 	isCoreWebVitalsEnabled: false,
-	GA_DISABLED_SITES: [40792]
+	GA_DISABLED_SITES: [40792],
+	BULK_DEFAULT_AD_UNIT_SIZE: {
+		maxHeight: '',
+		maxWidth: '',
+		minHeight: '',
+		minWidth: ''
+	}
 };

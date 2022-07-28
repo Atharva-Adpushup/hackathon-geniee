@@ -892,6 +892,12 @@ function updateAd({ ad, updatedData, docId }) {
 					[actionValue]: enable
 				}
 			};
+		} else if (actionValue === 'downwardSizesDisabled') {
+			const { sizeFilters } = updatedData;
+			if (sizeFilters && !enable) {
+				ad.sizeFilters = sizeFilters;
+			}
+			ad = { ...ad, [actionValue]: enable };
 		} else {
 			ad = { ...ad, [actionValue]: enable };
 		}

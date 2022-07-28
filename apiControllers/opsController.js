@@ -584,7 +584,7 @@ router
 				data.forEach(adData => {
 					const { key: docId, value: ad } = adData;
 					const docType = docId.substr(0, 4);
-					const { siteId, siteDomain, networkData, sizeFilters, height, width } = ad;
+					const { siteId, siteDomain, networkData, sizeFilters = {}, height, width } = ad;
 					const {
 						adId,
 						collapseUnfilled,
@@ -594,6 +594,11 @@ router
 						disableReuseVacantAdSpace,
 						formatData
 					} = ad;
+					const sizeFilterKeys = Object.keys(sizeFilters);
+					for (let index = 0; index < sizeFilterKeys.length; index += 1) {
+						const key = sizeFilterKeys[index];
+						if (sizeFilters[key] !== '') sizeFilters[key] = parseInt(sizeFilters[key], 10);
+					}
 					let { isActive } = ad;
 					let adUnitType = 1;
 					let { headerBidding, refreshSlot, dfpAdunitCode, dfpAdunit } = networkData || {};
@@ -633,8 +638,8 @@ router
 								dfpAdunitCode,
 								dfpAdunit,
 								sizeFilters,
-								height,
-								width
+								height: parseInt(height, 10),
+								width: parseInt(width, 10)
 							};
 
 							ads.push(adObj);
@@ -656,8 +661,8 @@ router
 								dfpAdunitCode,
 								dfpAdunit,
 								sizeFilters,
-								height,
-								width
+								height: parseInt(height, 10),
+								width: parseInt(width, 10)
 							};
 							ads.push(adObj);
 							break;
@@ -746,6 +751,7 @@ router
 			return sendErrorResponse({ message: error }, res, HTTP_STATUSES.BAD_REQUEST);
 		}
 	})
+
 	.put('/pnp-refresh/:siteId', async (req, res) => {
 		const pnpConfig = _.cloneDeep(req.body);
 		const { siteId } = req.params;

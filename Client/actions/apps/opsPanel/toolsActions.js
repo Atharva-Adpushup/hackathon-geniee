@@ -16,7 +16,8 @@ export const fetchInventoryTabAllAdUnits = () => dispatch => {
 export const updateInventoryTabAdUnits = ({
 	seggragatedAds,
 	adUnitLevelAction,
-	dataForAuditLogs
+	dataForAuditLogs,
+	adUnitSizeActions
 }) => dispatch => {
 	dispatch({
 		type: TOOLS_ACTIONS.UPDATE_TOOLS_INVENTORY_AD_UNITS_DATA_STARTED
@@ -24,7 +25,8 @@ export const updateInventoryTabAdUnits = ({
 	axiosInstance.post('ops/updateInventories', { seggragatedAds, dataForAuditLogs }).then(() => {
 		dispatch({
 			type: TOOLS_ACTIONS.UPDATE_TOOLS_INVENTORY_AD_UNITS_DATA_COMPLETED,
-			adUnitLevelAction
+			adUnitLevelAction,
+			adUnitSizeActions
 		});
 		dispatch({
 			type: UI_ACTIONS.SHOW_NOTIFICATION,
