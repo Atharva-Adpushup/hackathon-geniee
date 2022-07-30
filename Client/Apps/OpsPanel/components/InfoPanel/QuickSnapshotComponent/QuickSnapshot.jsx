@@ -84,10 +84,20 @@ class QuickSnapshot extends React.Component {
 	};
 
 	getComputedMetaData = () => {
-		const { globalReportMetaData, accountForSuperUserReportMetaData, sites } = this.props;
+		const {
+			globalReportMetaData,
+			accountForSuperUserReportMetaData,
+			sites,
+			associatedSites
+		} = this.props;
+
+		let siteIdsForGlobal = '';
+		if (associatedSites.length) {
+			siteIdsForGlobal = [...Object.keys(sites), ...associatedSites].join(',');
+		}
 		const { reportType } = this.state;
 		const params = {
-			sites: reportType === 'account' ? Object.keys(sites).join(',') : '',
+			sites: reportType === 'account' ? Object.keys(sites).join(',') : siteIdsForGlobal,
 			isSuperUser: true
 		};
 
@@ -140,6 +150,12 @@ class QuickSnapshot extends React.Component {
 
 	getAllErrorCodesData = path => {
 		const params = { isSuperUser: true };
+		const { sites, associatedSites } = this.props;
+
+		if (associatedSites.length) {
+			// first filter out associated sites then get top10
+			params.siteid = [...Object.keys(sites), ...associatedSites].join(',');
+		}
 
 		return reportService.getWidgetData({ path, params }).then(widgetData => {
 			const {
@@ -168,6 +184,11 @@ class QuickSnapshot extends React.Component {
 
 	getAllModesData = path => {
 		const params = { isSuperUser: true };
+		const { sites, associatedSites } = this.props;
+		if (associatedSites.length) {
+			// first filter out associated sites then get top10
+			params.siteid = [...Object.keys(sites), ...associatedSites].join(',');
+		}
 
 		return reportService.getWidgetData({ path, params }).then(widgetData => {
 			const {
@@ -457,7 +478,8 @@ class QuickSnapshot extends React.Component {
 		const {
 			sites,
 			widgetsName: { PER_AP_ORIGINAL },
-			globalReportMetaData
+			globalReportMetaData,
+			associatedSites
 		} = this.props;
 
 		const metaData = globalReportMetaData;
@@ -487,8 +509,12 @@ class QuickSnapshot extends React.Component {
 		params.siteid = isValidAllSelectedSites ? siteIds.toString() : selectedSite;
 
 		if (isReportTypeGlobal && (!isValidSelectedSite || isValidAllSelectedSites)) {
-			delete params.siteid;
 			params.isSuperUser = true;
+			if (associatedSites.length) {
+				params.siteid = [...siteIds, ...associatedSites].join(',');
+			} else {
+				delete params.siteid;
+			}
 		}
 
 		widgetsConfig[wid].startDate = params.fromDate;
@@ -570,9 +596,16 @@ class QuickSnapshot extends React.Component {
 	};
 
 	getTopSitesWidgetTransformedData = displayData => {
+		const { associatedSites, sites } = this.props;
 		const computedData = cloneDeep(displayData);
 		// set cols to display
-		const { columns = [], result = [] } = computedData;
+		// eslint-disable-next-line prefer-const
+		let { columns = [], result = [] } = computedData;
+		if (associatedSites.length) {
+			// first filter out associated sites then get top10
+			const siteListToFilterOut = [...Object.keys(sites), ...associatedSites].join(',');
+			result = result.filter(item => siteListToFilterOut.includes(item.siteid));
+		}
 		computedData.columns = columns.filter(col => TOP_TEN_SITE_WIDGETS_COLUMNS.includes(col));
 		computedData.result = orderBy(result, ['network_net_revenue'], ['desc']).slice(0, 10);
 

@@ -6,7 +6,7 @@ import { switchUser, impersonateCurrentUser, logout, findUsers } from '../action
 
 const mapStateToProps = (state, ownProps) => {
 	const {
-		global: { user, sites },
+		global: { user, sites, associatedAccounts },
 		apps: {
 			headerBidding: { hasUnsavedChanges = false }
 		}
@@ -16,6 +16,7 @@ const mapStateToProps = (state, ownProps) => {
 		userFetched: user.fetched,
 		user: user.data,
 		sites: sites.data,
+		associatedAccounts: associatedAccounts.data,
 		hasUnsavedChanges,
 		...ownProps
 	};
@@ -30,7 +31,4 @@ const mapDispatchToProps = dispatch => ({
 	findUsers: () => dispatch(findUsers())
 });
 
-export default connect(
-	mapStateToProps,
-	mapDispatchToProps
-)(Shell);
+export default connect(mapStateToProps, mapDispatchToProps)(Shell);

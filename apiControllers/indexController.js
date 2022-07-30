@@ -26,7 +26,8 @@ const {
 	appBucket,
 	errorHandler,
 	checkParams,
-	sendDataToAuditLogService
+	sendDataToAuditLogService,
+	getAssociatedAccountsWithUser
 } = require('../helpers/routeHelpers');
 
 const router = express.Router();
@@ -132,7 +133,7 @@ function getReportsMetaData(params) {
 		.then(response => {
 			return response.code == 1 && response.data ? response.data : {};
 		})
-		.catch(err => {});
+		.catch(err => { });
 }
 
 // Set user session data and redirects to relevant screen based on provided parameters
@@ -145,6 +146,7 @@ function getReportsMetaData(params) {
 router
 	.get('/globalData', (req, res) => {
 		const { email, isSuperUser } = req.user;
+		const userEmail = req.user.originalEmail || req.user.email;
 		return userModel
 			.getUserByEmail(email)
 			.then(user =>
@@ -152,7 +154,11 @@ router
 					getNetworkConfig(),
 					getUserSites(user),
 					getNetworkWideHBRules(),
-					(networkConfig, sites, networkWideHBRules) => {
+					async (networkConfig, sites, networkWideHBRules) => {
+						const userEmail = req.user.originalEmail || req.user.email;
+						// This is for AdOps/Account Managers to prevent unAuth access to other accounts
+						let associatedAccounts = await getAssociatedAccountsWithUser(userEmail);
+
 						const userData = user.cleanData();
 						const sitesArray = [...userData.sites];
 						const sitesArrayLength = sitesArray.length;
@@ -181,6 +187,7 @@ router
 								user: { ...userData, isSuperUser },
 								networkConfig,
 								networkWideHBRules,
+								associatedAccounts,
 								sites
 							});
 						});

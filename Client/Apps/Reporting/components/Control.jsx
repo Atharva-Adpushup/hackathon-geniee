@@ -214,30 +214,32 @@ class Control extends Component {
 	};
 
 	getSelectedFilter = filter => {
-		const { reportType, defaultReportType, selectedFilters, isDemoUser } = this.props;
+		const {
+			reportType,
+			defaultReportType,
+			selectedFilters,
+			isDemoUser,
+			associatedSites
+		} = this.props;
 		let siteIds = [];
 		let isSuperUser = false;
 		const selectedSiteIds = selectedFilters.siteid && Object.keys(selectedFilters.siteid);
 
+		const {
+			userSites,
+			user: {
+				data: { email }
+			}
+		} = this.props;
 		if (defaultReportType !== 'global' && filter.value === 'siteid') {
-			const {
-				userSites,
-				user: {
-					data: { email }
-				}
-			} = this.props;
 			siteIds = Object.keys(userSites);
 			siteIds = getReportingDemoUserSiteIds(siteIds, email, reportType, true);
 		} else if (defaultReportType === 'global' && filter.value === 'siteid') {
 			isSuperUser = true;
+			if (associatedSites.length) {
+				siteIds = [...Object.keys(userSites), ...associatedSites].join(',');
+			}
 		} else if (reportType === 'account') {
-			const {
-				userSites,
-				user: {
-					data: { email }
-				}
-			} = this.props;
-
 			if (selectedSiteIds && selectedSiteIds.length) {
 				siteIds = selectedSiteIds;
 			} else {

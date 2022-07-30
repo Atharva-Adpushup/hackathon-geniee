@@ -9,6 +9,7 @@ import urlreport from './urlReport';
 import hbanalytics from './hbanalytics';
 import notifications from './notifications';
 import tools from './tools';
+import associatedAccounts from './associatedAccounts';
 
 export default combineReducers({
 	user,
@@ -20,5 +21,6 @@ export default combineReducers({
 	hbanalytics,
 	notifications,
 	networkWideRules,
-	tools
+	tools,
+	associatedAccounts
 });

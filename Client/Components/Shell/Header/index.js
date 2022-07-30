@@ -23,6 +23,7 @@ const Header = ({
 	sidebarToggle,
 	logout,
 	user,
+	associatedAccounts,
 	switchUser,
 	impersonateCurrentUser,
 	findUsers,
@@ -56,7 +57,11 @@ const Header = ({
 				{// eslint-disable-next-line no-extra-boolean-cast
 				!!user.isSuperUser ? (
 					<React.Fragment>
-						<UserChange switchUser={switchUser} findUsers={findUsers} />
+						<UserChange
+							switchUser={switchUser}
+							findUsers={findUsers}
+							associatedAccounts={associatedAccounts}
+						/>
 						<CustomButton
 							variant="secondary"
 							onClick={impersonateCurrentUser}

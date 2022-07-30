@@ -21,7 +21,9 @@ const {
 	errorHandler,
 	appBucket,
 	checkParams,
-	sendDataToAuditLogService
+	sendDataToAuditLogService,
+	getAssociatedAccountsWithUser,
+	checkAllowedEmailForSwitchAndImpersonate
 } = require('../helpers/routeHelpers');
 
 const {
@@ -395,38 +397,56 @@ router
 				return true;
 			});
 	})
-	.get('/findUsers', (req, res) => {
-		const { isSuperUser } = req.user;
-		if (!isSuperUser)
-			return sendErrorResponse(
-				{
-					message: 'Unauthorized Request'
-				},
-				res,
-				httpStatus.UNAUTHORIZED
-			);
-		return appBucket
-			.queryDB(
-				`SELECT email, ARRAY site.domain
-	              FOR site IN sites WHEN site.domain IS NOT MISSING END AS domains ,
-				ARRAY site.siteId
-				FOR site IN sites WHEN site.siteId IS NOT MISSING END AS siteIds
+	.get('/findUsers', async (req, res) => {
+		try {
+			const { isSuperUser, email, originalEmail } = req.user;
+			if (!isSuperUser)
+				return sendErrorResponse(
+					{
+						message: 'Unauthorized Request'
+					},
+					res,
+					httpStatus.UNAUTHORIZED
+				);
 
-				FROM AppBucket WHERE meta().id LIKE "user::%"`
-			)
-			.then(users => {
-				let response = [];
-				if (users && Array.isArray(users) && users.length) {
-					response = users.filter(user => CC.EMAIL_REGEX.test(user.email));
-				}
+			const userEmail = originalEmail || email;
+			// This is for AdOps/Account Managers to prevent unAuth access to other accounts
+			const associatedAccounts = await getAssociatedAccountsWithUser(userEmail);
+			if (associatedAccounts.length) {
+				// send only allowed accounts
 				return sendSuccessResponse(
 					{
-						users: response
+						users: associatedAccounts
 					},
 					res
 				);
-			})
-			.catch(err => errorHandler(err, res));
+			}
+
+			// send all accounts
+			return appBucket
+				.queryDB(
+					`SELECT email, ARRAY site.domain
+						FOR site IN sites WHEN site.domain IS NOT MISSING END AS domains ,
+						ARRAY site.siteId
+						FOR site IN sites WHEN site.siteId IS NOT MISSING END AS siteIds
+						FROM AppBucket WHERE meta().id LIKE "user::%"`
+				)
+				.then(users => {
+					let response = [];
+					if (users && Array.isArray(users) && users.length) {
+						response = users.filter(user => CC.EMAIL_REGEX.test(user.email));
+					}
+					return sendSuccessResponse(
+						{
+							users: response
+						},
+						res
+					);
+				})
+				.catch(err => errorHandler(err, res));
+		} catch (err) {
+			return errorHandler(err, res);
+		}
 	})
 	.get('/blockedSitesPeerPerformance', async (req, res) => {
 		try {
@@ -449,93 +469,141 @@ router
 		}
 	})
 	.post('/switchUser', async (req, res) => {
-		let { email } = req.body;
-		email = utils.htmlEntities(utils.sanitiseString(email));
+		try {
+			let { email } = req.body;
+			email = utils.htmlEntities(utils.sanitiseString(email));
 
-		if (!req.user.isSuperUser || !email) {
-			return sendErrorResponse(
-				{
-					message: 'Permission Denined'
-				},
-				res,
-				httpStatus.PERMISSION_DENIED
-			);
-		}
-		const userCookie = req.cookies.user;
-		const adpToken = req.headers.authorization;
-		const token = (userCookie && JSON.parse(userCookie).authToken) || adpToken || null;
-		const decoded = await authToken.decodeAuthToken(token);
-		
-		return userModel
-			.setSitePageGroups(email)
-			.then(user => {
-				const token = authToken.getAuthToken({
-					email: user.get('email'),
-					isSuperUser: true,
-					originalEmail: req.user.originalEmail || req.user.email,
-					loginTime: decoded.loginTime
-				});
+			if (!req.user.isSuperUser || !email) {
+				return sendErrorResponse(
+					{
+						message: 'Permission Denined'
+					},
+					res,
+					httpStatus.PERMISSION_DENIED
+				);
+			}
 
-				return res
-					.status(httpStatus.OK)
-					.cookie(
-						'user',
-						JSON.stringify({
-							authToken: token,
-							isSuperUser: true
-						}),
-						{ maxAge: 86400000, path: '/' }
-					)
-					.send({
-						success: 'Changed User',
-						authToken: token
+			const userEmail = req.user.originalEmail || req.user.email;
+			/**
+			 * Get accounts associated with user and check before switching
+			 */
+			const associatedAccounts = await getAssociatedAccountsWithUser(userEmail);
+			// This is for AdOps/Account Managers to prevent unAuth access to other accounts
+			// if there are some associated accounts then switch only if account to be
+			// switched is present in associated accounts list
+			if (
+				!checkAllowedEmailForSwitchAndImpersonate(associatedAccounts, email /* email to switch */)
+			) {
+				return sendErrorResponse(
+					{
+						message: 'Permission Denined'
+					},
+					res,
+					httpStatus.PERMISSION_DENIED
+				);
+			}
+
+			const userCookie = req.cookies.user;
+			const adpToken = req.headers.authorization;
+			const token = (userCookie && JSON.parse(userCookie).authToken) || adpToken || null;
+			const decoded = await authToken.decodeAuthToken(token);
+
+			return userModel
+				.setSitePageGroups(email)
+				.then(user => {
+					// eslint-disable-next-line no-shadow
+					const newAuthToken = authToken.getAuthToken({
+						email: user.get('email'),
+						isSuperUser: true,
+						originalEmail: req.user.originalEmail || req.user.email,
+						loginTime: decoded.loginTime
 					});
-			})
-			.catch(err => errorHandler(err, res));
+
+					return res
+						.status(httpStatus.OK)
+						.cookie(
+							'user',
+							JSON.stringify({
+								authToken: newAuthToken,
+								isSuperUser: true
+							}),
+							{ maxAge: 86400000, path: '/' }
+						)
+						.send({
+							success: 'Changed User',
+							authToken: newAuthToken
+						});
+				})
+				.catch(err => errorHandler(err, res));
+		} catch (err) {
+			return errorHandler(err, res);
+		}
 	})
 	.post('/impersonateCurrentUser', async (req, res) => {
-		const { isSuperUser, email } = req.user;
-		if (!isSuperUser || !email) {
-			return sendErrorResponse(
-				{
-					message: 'Permission Denined'
-				},
-				res,
-				httpStatus.PERMISSION_DENIED
-			);
-		}
+		try {
+			const { isSuperUser, email } = req.user;
+			if (!isSuperUser || !email) {
+				return sendErrorResponse(
+					{
+						message: 'Permission Denined'
+					},
+					res,
+					httpStatus.PERMISSION_DENIED
+				);
+			}
 
-		const userCookie = req.cookies.user;
-		const adpToken = req.headers.authorization;
-		const token = (userCookie && JSON.parse(userCookie).authToken) || adpToken || null;
-		const decoded = await authToken.decodeAuthToken(token);
+			const userEmail = req.user.originalEmail || req.user.email;
+			/**
+			 * Get accounts associated with user and check before impersonating
+			 */
+			const associatedAccounts = await getAssociatedAccountsWithUser(userEmail);
+			// This is for AdOps/Account Managers to prevent unAuth access to other accounts
+			if (
+				!checkAllowedEmailForSwitchAndImpersonate(associatedAccounts, email /* email to switch */)
+			) {
+				return sendErrorResponse(
+					{
+						message: 'Permission Denined'
+					},
+					res,
+					httpStatus.PERMISSION_DENIED
+				);
+			}
 
-		return userModel
-			.setSitePageGroups(email)
-			.then(user => {
-				const token = authToken.getAuthToken({
-					email: user.get('email'),
-					isSuperUser: false,
-					originalEmail: req.user.originalEmail || req.user.email,
-					loginTime: decoded.loginTime
-				});
+			const userCookie = req.cookies.user;
+			const adpToken = req.headers.authorization;
+			const token = (userCookie && JSON.parse(userCookie).authToken) || adpToken || null;
+			const decoded = await authToken.decodeAuthToken(token);
 
-				return res
-					.status(httpStatus.OK)
-					.cookie(
-						'user',
-						JSON.stringify({
-							authToken: token,
-							isSuperUser: false
-						}),
-						{ maxAge: 86400000, path: '/' }
-					)
-					.send({
-						success: 'User Impersonated Successfully',
-						authToken: token
+			return userModel
+				.setSitePageGroups(email)
+				.then(user => {
+					const newAuthToken = authToken.getAuthToken({
+						email: user.get('email'),
+						isSuperUser: false,
+						originalEmail: req.user.originalEmail || req.user.email,
+						loginTime: decoded.loginTime
 					});
-			})
-			.catch(err => errorHandler(err, res));
+
+					return res
+						.status(httpStatus.OK)
+						.cookie(
+							'user',
+							JSON.stringify({
+								authToken: newAuthToken,
+								isSuperUser: false
+							}),
+							{ maxAge: 86400000, path: '/' }
+						)
+						.send({
+							success: 'User Impersonated Successfully',
+							authToken: newAuthToken
+						});
+				})
+				.catch(err => errorHandler(err, res));
+		} catch (err) {
+			return errorHandler(err, res);
+		}
 	})
 	.post('/updateUser', (req, res) => {
 		const { email, originalEmail } = req.user;

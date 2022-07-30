@@ -1,5 +1,6 @@
 /*
 !apiControllers/
+!apiServices/
 !Client/
 !middlewares/
 !models/headerBiddingModel.js
