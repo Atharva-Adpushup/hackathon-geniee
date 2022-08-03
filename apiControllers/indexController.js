@@ -133,7 +133,7 @@ function getReportsMetaData(params) {
 		.then(response => {
 			return response.code == 1 && response.data ? response.data : {};
 		})
-		.catch(err => { });
+		.catch(err => {});
 }
 
 // Set user session data and redirects to relevant screen based on provided parameters
@@ -164,13 +164,13 @@ router
 							const sitesArray = [...userData.sites];
 							const sitesArrayLength = sitesArray.length;
 							userData.sites = {};
-	
+
 							for (let i = 0; i < sitesArrayLength; i += 1) {
 								const site = sitesArray[i];
 								userData.sites[site.siteId] = site;
 							}
 							let params = { siteid: Object.keys(sites).toString(), isSuperUser };
-	
+
 							// enabled to get meta info for HB Analytics Reporting - Enabled or not
 							// and pass as globalMeta data along with sites data
 							return getReportsMetaData(params).then(reports => {
@@ -183,7 +183,7 @@ router
 										}
 									});
 								}
-	
+
 								return res.status(httpStatus.OK).json({
 									user: { ...userData, isSuperUser },
 									networkConfig,
@@ -192,7 +192,7 @@ router
 									sites
 								});
 							});
-						} catch(err) {
+						} catch (err) {
 							throw err;
 						}
 					}
@@ -212,7 +212,11 @@ router
 					.setSitePageGroups(email)
 					.then(user =>
 						user.save().then(() => {
-							const token = authToken.getAuthToken({ email, isSuperUser: false });
+							const token = authToken.getAuthToken({
+								email,
+								isSuperUser: false,
+								loginTime: Date.now()
+							});
 
 							res
 								.status(httpStatus.OK)

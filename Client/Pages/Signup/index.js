@@ -99,7 +99,7 @@ class Signup extends Component {
 
 			const { signupAction: signup } = this.props;
 
-			signup({ name, email, password, site, websiteRevenue })
+			signup({ name, email, password, site, websiteRevenue, passwordUpdatedOn: Date.now() })
 				.then(resp => history.push('/onboarding'))
 				.catch(({ response }) => {
 					const newState = { isSigningUp: false };
