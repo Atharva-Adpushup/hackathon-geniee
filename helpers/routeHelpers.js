@@ -1039,15 +1039,21 @@ async function getAssociatedAccountsWithUser(userEmail) {
 	// Ops Access Control list
 	const { value: opsAcccessList } = await appBucket.getDoc('ops::acl');
 	let emailOfAM = opsAcccessList.AM.includes(userEmail) ? userEmail : '' ;
+	// for accessing extra accouts which are not associated with the AM
+	let otherEmails = '';
+
 	if (!emailOfAM) {
 		const adOpsUserDetails = opsAcccessList.AdOps.find(adOpsUser => {
 			return adOpsUser.email === userEmail
 		})
-		// if found hten set email of AM
+		// if found then set email of AM
 		if (adOpsUserDetails) {
 			// No AM has been assigned to this AdOps person
 			// set email of AdOps which is also equal to userEmail
 			emailOfAM = adOpsUserDetails.AM || adOpsUserDetails.email;
+			if (adOpsUserDetails.others) {
+				otherEmails = adOpsUserDetails.others;
+			}
 		}
 	}
 
@@ -1057,6 +1063,12 @@ async function getAssociatedAccountsWithUser(userEmail) {
 		return Promise.resolve(emailOfAM).then(() => {
 			return hubSpotService.getSitesOfUserFromHubspot(emailOfAM)
 		}).then(async (accounts) => {
+			// Hack by Harpreet Singh for quick resolution to allow
+			// AdOps person to access other accounts not associated to his/her AM
+			if(otherEmails && otherEmails instanceof Array && otherEmails.length) {
+				accounts.results = [...accounts.results, ...otherEmails];
+			}
+
 			if (!accounts.results.length) {
 				// this is to manage the case where a particular user AM/AdOps
 				// has restricted access but no site has been assigned to him/her
