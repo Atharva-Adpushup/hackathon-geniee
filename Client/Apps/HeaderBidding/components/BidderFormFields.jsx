@@ -105,7 +105,7 @@ class BidderFormFields extends React.Component {
 	renderFormFields = () => {
 		const formFieldsJSX = [];
 
-		const { formFields, errors, tempParamsErrors, adSize, meta = {} } = this.props;
+		const { formFields, errors, tempParamsErrors, adSize, meta = {}, bidderKey } = this.props;
 
 		/*
 			fieldsToHide
@@ -154,7 +154,8 @@ class BidderFormFields extends React.Component {
 				formFieldsJSX.push(
 					<FormGroup key={fieldKey} controlId={`hb-${fieldKey}`}>
 						<Col componentClass={ControlLabel} sm={6}>
-							{fieldConfig.name + (!fieldConfig.isRequired ? ' (optional)' : '')}
+							{fieldConfig.name +
+								(!fieldConfig.isRequired ? (bidderKey !== 'nobid' && ' (optional)') || '' : '')}
 						</Col>
 						<Col sm={6}>
 							{this.getBidderInputField(fieldConfig, fieldKey, collectionKey)}

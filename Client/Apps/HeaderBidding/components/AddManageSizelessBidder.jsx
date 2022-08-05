@@ -363,7 +363,7 @@ class AddManageSizelessBidder extends React.Component {
 		const { openBiddersListView, formType, isSuperUser } = this.props;
 		const {
 			formFields,
-			bidderConfig: { bids, relation },
+			bidderConfig: { bids, relation, key: bidderKey },
 			errors
 		} = this.state;
 
@@ -382,6 +382,7 @@ class AddManageSizelessBidder extends React.Component {
 							getCurrentFieldValue={this.getCurrentFieldValue}
 							errors={errors}
 							meta={this.bidderFormFieldsMeta}
+							bidderKey={bidderKey}
 						/>
 						<FormGroup>
 							<Col md={12} className="u-margin-t4">
