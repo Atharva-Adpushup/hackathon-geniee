@@ -15,18 +15,16 @@ export default function getCommonBidderFields(isApRelation, isSuperUser, manageB
 			name: 'Relation',
 			dataType: 'string',
 			inputType: 'selectBox',
-			options: isApRelation
-				? [
-						{
-							name: 'AdPushup',
-							value: 'adpushup',
-							isDisabled: !isSuperUser,
-							toolTipMessage: null,
-							toolTipDisabled: true
-						},
-						{ name: 'Direct', value: 'direct' }
-				  ]
-				: [{ name: 'Direct', value: 'direct' }],
+			options: [
+				{
+					name: 'AdPushup',
+					value: 'adpushup',
+					isDisabled: !isSuperUser,
+					toolTipMessage: null,
+					toolTipDisabled: true
+				},
+				{ name: 'Direct', value: 'direct' }
+			],
 			defaultValue: isApRelation && isSuperUser ? 'adpushup' : 'direct',
 			isRequired: true,
 			isEditable: true
@@ -35,7 +33,10 @@ export default function getCommonBidderFields(isApRelation, isSuperUser, manageB
 			name: 'Bids',
 			dataType: 'string',
 			inputType: 'selectBox',
-			options: [{ name: 'Net', value: 'net' }, { name: 'Gross', value: 'gross' }],
+			options: [
+				{ name: 'Net', value: 'net' },
+				{ name: 'Gross', value: 'gross' }
+			],
 			isRequired: true,
 			isEditable: true
 		},
@@ -50,7 +51,10 @@ export default function getCommonBidderFields(isApRelation, isSuperUser, manageB
 			name: 'AMP Status',
 			dataType: 'string',
 			inputType: 'selectBox',
-			options: [{ name: 'Active', value: 'true' }, { name: 'Inactive', value: 'false' }],
+			options: [
+				{ name: 'Active', value: 'true' },
+				{ name: 'Inactive', value: 'false' }
+			],
 			isRequired: isS2S,
 			isEditable: isS2S,
 			defaultValue: 'false'
@@ -59,7 +63,10 @@ export default function getCommonBidderFields(isApRelation, isSuperUser, manageB
 			name: 'S2S Web Status',
 			dataType: 'string',
 			inputType: 'selectBox',
-			options: [{ name: 'Active', value: 'true' }, { name: 'Inactive', value: 'false' }],
+			options: [
+				{ name: 'Active', value: 'true' },
+				{ name: 'Inactive', value: 'false' }
+			],
 			isRequired: isS2S,
 			isEditable: isS2S,
 			defaultValue: 'false'
@@ -86,7 +93,10 @@ export default function getCommonBidderFields(isApRelation, isSuperUser, manageB
 					name: 'Partner Status',
 					dataType: 'string',
 					inputType: 'selectBox',
-					options: [{ name: 'Active', value: 'active' }, { name: 'Paused', value: 'paused' }],
+					options: [
+						{ name: 'Active', value: 'active' },
+						{ name: 'Paused', value: 'paused' }
+					],
 					isRequired: true,
 					isEditable: true
 				},
