@@ -22,8 +22,8 @@ var modelAPI = (module.exports = apiModule()),
 	pipedriveAPI = require('../misc/vendors/pipedrive'),
 	mailService = require('../services/mailService/index'),
 	{ mailService: nodeUtilsMailService } = require('node-utils'),
-	{ appBucket } = require('../helpers/routeHelpers'),
 	proxy = require('../helpers/proxy'),
+	N1qlQuery = require('couchbase').N1qlQuery,
 	User = model.extend(function() {
 		this.keys = [
 			'firstName',
@@ -956,7 +956,12 @@ function apiModule() {
 		},
 		getUserGaEnabledSites: function(email) {
 			const queryString = `SELECT siteId FROM AppBucket WHERE apConfigs.enableGAAnalytics and ownerEmail="${email}" and meta().id like "site::%";`;
-			return appBucket.queryDB(queryString);
+
+			const query = N1qlQuery.fromString(queryString);
+
+			return couchbase.connectToAppBucket().then(appBucket => {
+				return appBucket.queryAsync(query);
+			});
 		}
 	};
 
