@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import { TOOLS_ACTIONS } from '../../constants/global';
 
 const DEFAULT_STATE = {
@@ -11,7 +12,7 @@ const tools = (state = DEFAULT_STATE, action) => {
 	switch (action.type) {
 		case TOOLS_ACTIONS.REPLACE_TOOLS_INVENTORY_AD_UNITS_DATA: {
 			let { data } = action;
-			data = data.map(ad => ({ ...ad, adUnitSettings: true }));
+			data = data.map(ad => ({ ...ad, adUnitSettings: true, adUnitAction: true }));
 			return {
 				...state,
 				inventoryAdUnits: {
@@ -31,7 +32,7 @@ const tools = (state = DEFAULT_STATE, action) => {
 			};
 		}
 		case TOOLS_ACTIONS.UPDATE_TOOLS_INVENTORY_AD_UNITS_DATA_COMPLETED: {
-			const { adUnitLevelAction } = action;
+			const { adUnitLevelAction, adUnitSizeActions } = action;
 			let {
 				inventoryAdUnits: { data: oldAdUnitsData }
 			} = state;
@@ -48,6 +49,10 @@ const tools = (state = DEFAULT_STATE, action) => {
 							enable = true;
 						} else {
 							actionValue = value.replace('disable-', '');
+							if (actionValue === 'downwardSizesDisabled') {
+								const sizeFilters = adUnitSizeActions[adId] || {};
+								ad.sizeFilters = { ...sizeFilters };
+							}
 							enable = false;
 						}
 						return { ...ad, [actionValue]: enable };
