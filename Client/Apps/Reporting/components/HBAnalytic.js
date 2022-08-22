@@ -5,7 +5,7 @@ import React, { Component } from 'react';
 import mapValues from 'lodash/mapValues';
 import omit from 'lodash/omit';
 import groupBy from 'lodash/groupBy';
-import { Row, Col, Alert } from '@/Client/helpers/react-bootstrap-imports';
+import { Row, Col } from '@/Client/helpers/react-bootstrap-imports';
 import moment from 'moment';
 import qs from 'querystringify';
 import isEmpty from 'lodash/isEmpty';
@@ -31,7 +31,6 @@ import {
 	columnsBlacklistedForAddition,
 	PIVOT,
 	MUST_HAVE_COLS,
-	BID_CPM_STATS_BUCKET_MODE,
 	ANOMALY_THRESHOLD_CONSTANT
 } from '../configs/commonConsts';
 import { DEMO_ACCOUNT_DATA } from '../../../constants/others';
@@ -42,16 +41,6 @@ import {
 	getReportingDemoUserSiteIds,
 	getDemoUserSites
 } from '../../../helpers/commonFunctions';
-
-function oldConsoleRedirection(e) {
-	e.preventDefault();
-	const now = new Date();
-	now.setHours(now.getHours() + 2);
-	document.cookie = `app_redirect=0; path=/; expires=${now.toUTCString()}; domain=adpushup.com`;
-	setTimeout(() => {
-		window.open('https://old-console.adpushup.com');
-	}, 500);
-}
 
 class Report extends Component {
 	constructor(props) {
@@ -89,8 +78,7 @@ class Report extends Component {
 			isLoading: true,
 			isValidSite: true,
 			isReportingSite: true,
-			isDefaultBucketEnabled: true,
-			show: true
+			isDefaultBucketEnabled: true
 		};
 	}
 
@@ -1152,10 +1140,6 @@ class Report extends Component {
 		return selectedMetricsTableData;
 	};
 
-	handleDismiss = () => {
-		this.setState({ show: false });
-	};
-
 	handleToggle = () => {
 		const { isDefaultBucketEnabled, responseBidCPMChartData } = this.state;
 		const [xAxis, yAxis] = this.generateBidCPMStatsChart(
@@ -1388,7 +1372,7 @@ class Report extends Component {
 	};
 
 	render() {
-		const { isLoading, show } = this.state;
+		const { isLoading } = this.state;
 		const { hbAnalyticsMeta } = this.props;
 
 		if (!hbAnalyticsMeta.fetched || isLoading) {
@@ -1398,19 +1382,6 @@ class Report extends Component {
 		return (
 			<React.Fragment>
 				<ActionCard title="AdPushup Reports">{this.renderContent()}</ActionCard>
-				{show ? (
-					<Alert bsStyle="info" onDismiss={this.handleDismiss} className="u-margin-t4">
-						For old reporting data <strong>(before 1st August, 2019)</strong> go to old console by{' '}
-						<a
-							target="_blank"
-							onClick={oldConsoleRedirection}
-							className="u-link-reset"
-							style={{ cursor: 'pointer' }}
-						>
-							<strong>clicking here.</strong>
-						</a>
-					</Alert>
-				) : null}
 			</React.Fragment>
 		);
 	}
