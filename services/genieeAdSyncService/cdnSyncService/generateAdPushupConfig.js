@@ -82,7 +82,8 @@ const getAdConfig = (adType, section) => {
 		poweredByBanner,
 		enableLazyLoading,
 		disableReuseVacantAdSpace,
-		minViewPortSize = { height: 0, width: 0 }
+		minViewPortSize = { height: 0, width: 0 },
+		flyingCarpetEnabled = false
 	} = ad;
 	const { name: sectionName, id, formatData } = section;
 	let json = {
@@ -115,7 +116,6 @@ const getAdConfig = (adType, section) => {
 	if (sizeFilters && Object.keys(sizeFilters).length) {
 		json.sizeFilters = sizeFilters;
 	}
-
 	switch (adType) {
 		case 'layout': {
 			const { enableLazyLoading, type } = section;
@@ -123,7 +123,8 @@ const getAdConfig = (adType, section) => {
 			json = {
 				...json,
 				enableLazyLoading,
-				type // Format type of ad like, 1 for structural, 2 for incontent
+				type, // Format type of ad like, 1 for structural, 2 for incontent
+				flyingCarpetEnabled
 			};
 
 			if (section.isIncontent) {
@@ -183,7 +184,8 @@ const getAdConfig = (adType, section) => {
 				...json,
 				isManual,
 				networkData,
-				type
+				type,
+				flyingCarpetEnabled
 			};
 
 			break;
