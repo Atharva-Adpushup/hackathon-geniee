@@ -4,7 +4,7 @@ import mapValues from 'lodash/mapValues';
 import omit from 'lodash/omit';
 import chunk from 'lodash/chunk';
 import groupBy from 'lodash/groupBy';
-import { Row, Col, Alert, OverlayTrigger, Tooltip } from '@/Client/helpers/react-bootstrap-imports';
+import { Row, Col, OverlayTrigger, Tooltip } from '@/Client/helpers/react-bootstrap-imports';
 import moment from 'moment';
 import qs from 'querystringify';
 import isEmpty from 'lodash/isEmpty';
@@ -42,16 +42,6 @@ import {
 } from '../configs/commonConsts';
 import MixpanelHelper from '../../../helpers/mixpanel';
 
-function oldConsoleRedirection(e) {
-	e.preventDefault();
-	const now = new Date();
-	now.setHours(now.getHours() + 2);
-	document.cookie = `app_redirect=0; path=/; expires=${now.toUTCString()}; domain=adpushup.com`;
-	setTimeout(() => {
-		window.open('https://old-console.adpushup.com');
-	}, 500);
-}
-
 class Report extends Component {
 	constructor(props) {
 		super(props);
@@ -83,7 +73,6 @@ class Report extends Component {
 			errorMessage: '',
 			isValidSite: true,
 			isReportingSite: true,
-			show: true,
 			savedReports: [],
 			frequentReports: [],
 			selectedReport: null,
@@ -1005,10 +994,6 @@ class Report extends Component {
 		return selectedMetricsTableData;
 	};
 
-	handleDismiss = () => {
-		this.setState({ show: false });
-	};
-
 	// eslint-disable-next-line react/sort-comp
 	aggregateValues(result) {
 		const modifiedResult = [];
@@ -1618,7 +1603,7 @@ class Report extends Component {
 	};
 
 	render() {
-		const { isLoading, show, isError, errorMessage } = this.state;
+		const { isLoading, isError, errorMessage } = this.state;
 		const { reportsMeta } = this.props;
 
 		if ((!reportsMeta.fetched && !isError) || isLoading) {
@@ -1631,18 +1616,6 @@ class Report extends Component {
 		return (
 			<React.Fragment>
 				<ActionCard title="AdPushup Reports">{this.renderContent()}</ActionCard>
-				{show ? (
-					<Alert bsStyle="info" onDismiss={this.handleDismiss} className="u-margin-t4">
-						For old reporting data <strong>(before 1st August, 2019)</strong> go to old console by{' '}
-						<a
-							onClick={oldConsoleRedirection}
-							className="u-link-reset"
-							style={{ cursor: 'pointer' }}
-						>
-							<strong>clicking here.</strong>
-						</a>
-					</Alert>
-				) : null}
 			</React.Fragment>
 		);
 	}

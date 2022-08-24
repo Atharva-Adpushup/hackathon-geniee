@@ -9,7 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "couchbase": "^2.6.10",
+    "couchbase": "2.6.12",
     "node-google-dfp": "^0.3.2",
     "uuid": "^3.4.0",
     "woodlot": "^3.2.8"
