@@ -31,6 +31,7 @@ class Settings extends Component {
 			isUrlReportingEnabled = false,
 			cmpAvailable = false,
 			mergeReport = false,
+			videoAdsDashboard = false,
 			isWeeklyEmailReportsEnabled = false,
 			isDailyEmailReportsEnabled = false,
 			enableGAAnalytics = false,
@@ -59,6 +60,7 @@ class Settings extends Component {
 			urlUtm: isUrlReportingEnabled && utmReporting && urlReporting,
 			cmpEnabled: !cmpAvailable,
 			mergeReport,
+			videoAdsDashboard,
 			isWeeklyEmailReportsEnabled,
 			isDailyEmailReportsEnabled,
 			enableGAAnalytics,
@@ -119,7 +121,7 @@ class Settings extends Component {
 			}
 			if (
 				name === 'apLite' &&
-				adServerSettings.hasOwnProperty('dfp') &&
+				adServerSettings.dfp &&
 				adServerSettings.dfp.activeDFPNetwork === config.ADPUSHUP_NETWORK_ID.toString() &&
 				value
 			) {
@@ -224,6 +226,7 @@ class Settings extends Component {
 			urlUtm,
 			cmpEnabled,
 			mergeReport,
+			videoAdsDashboard,
 			isWeeklyEmailReportsEnabled,
 			isDailyEmailReportsEnabled,
 			enableGAAnalytics,
@@ -284,6 +287,7 @@ class Settings extends Component {
 				hbAnalytics,
 				cmpAvailable: !cmpEnabled,
 				mergeReport,
+				videoAdsDashboard,
 				isWeeklyEmailReportsEnabled,
 				isDailyEmailReportsEnabled,
 				gaConfigs,
@@ -319,6 +323,7 @@ class Settings extends Component {
 			urlUtm,
 			cmpEnabled,
 			mergeReport,
+			videoAdsDashboard,
 			isDailyEmailReportsEnabled,
 			isWeeklyEmailReportsEnabled,
 			enableGAAnalytics,
@@ -464,6 +469,19 @@ class Settings extends Component {
 					defaultLayout
 					name={`urlUtm-${siteId}-${siteDomain}`}
 					id={`js-url-utm-switch-${siteId}-${siteDomain}`}
+				/>
+				<CustomToggleSwitch
+					labelText="Video Ads Dashboard"
+					className="u-margin-b4 negative-toggle"
+					checked={videoAdsDashboard}
+					onChange={this.handleToggle}
+					layout="horizontal"
+					size="m"
+					on="Yes"
+					off="No"
+					defaultLayout
+					name={`videoAdsDashboard-${siteId}-${siteDomain}`}
+					id={`js-videoAdsDashboard-switch-${siteId}-${siteDomain}`}
 				/>
 				{!config.disableDailyWeeklySnapshots && (
 					<CustomToggleSwitch
