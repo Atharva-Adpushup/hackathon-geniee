@@ -103,3 +103,20 @@ export const updateUser = (params, dataForAuditLogs) => dispatch =>
 			});
 		})
 		.catch(err => errorHandler(err));
+
+export const lineItemAutomation = integrationEmail => dispatch => {
+	axiosInstance
+		.post('/user/triggerLineItemSetup', {
+			integrationEmail
+		})
+		.then(
+			dispatch({
+				type: UI_ACTIONS.SHOW_NOTIFICATION,
+				mode: 'success',
+				title: 'Operation Successful',
+				autoDismiss: 5,
+				message: 'Automation in proccess please wait'
+			})
+		)
+		.catch(err => errorHandler(err));
+};
