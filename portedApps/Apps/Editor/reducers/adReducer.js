@@ -16,7 +16,8 @@ const adsByIds = (state = {}, action) => {
 					height: payload.height,
 					width: payload.width,
 					network: payload.network,
-					fluid: payload.fluid
+					fluid: payload.fluid,
+					flyingCarpetEnabled: payload.flyingCarpetEnabled
 				},
 				// Network data object is only added when custom zone id value is added
 				// through Visual Editor
@@ -126,6 +127,8 @@ const adsByIds = (state = {}, action) => {
 		case adActions.UPDATE_NETWORK:
 			const fluid = action.networkData.fluid;
 			delete action.networkData.fluid;
+			const flyingCarpetEnabled = action.networkData.flyingCarpetEnabled;
+			delete action.networkData.flyingCarpetEnabled;
 
 			return {
 				...state,
@@ -133,7 +136,7 @@ const adsByIds = (state = {}, action) => {
 					...state[action.adId],
 					network: action.network,
 					fluid,
-
+					flyingCarpetEnabled,
 					// adCode:
 					// 	action.network == 'adpTags'
 					// 		? ''

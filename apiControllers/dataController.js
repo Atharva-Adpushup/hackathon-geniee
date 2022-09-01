@@ -13,7 +13,8 @@ const {
 	checkParams,
 	errorHandler,
 	verifyOwner,
-	sendDataToAuditLogService
+	sendDataToAuditLogService,
+	udpateApConfigIfFlyingCarpetAdEnabledInApTagOrLayoutEditorAd
 } = require('../helpers/routeHelpers');
 const { sendSuccessResponse, getNetworkConfig } = require('../helpers/commonFunctions');
 const logger = require('../helpers/globalBucketLogger');
@@ -300,6 +301,34 @@ router
 			.then(
 				channelModel.saveChannels.bind(null, parseInt(parsedData.siteId, 10), parsedData.channels)
 			)
+			.then(async () => {
+				const { siteId } = parsedData;
+				try {
+					const updatedConfig = await udpateApConfigIfFlyingCarpetAdEnabledInApTagOrLayoutEditorAd(
+						siteId
+					);
+					// check if apConfig is udpated
+					if (JSON.stringify(updatedConfig) !== '{}') {
+						const { email, originalEmail } = req.user;
+						sendDataToAuditLogService({
+							siteId,
+							siteDomain: siteData.siteDomain,
+							appName: 'Console Layout Editor',
+							type: 'site',
+							impersonateId: email,
+							userId: originalEmail,
+							prevConfig: siteData.apConfigs,
+							currentConfig: updatedConfig,
+							action: {
+								name: LAYOUT_EDITOR,
+								data: `Layout Editor - Update ApConfig`
+							}
+						});
+					}
+				} catch (err) {
+					throw err;
+				}
+			})
 			.then(() =>
 				res.json({
 					success: 1,
@@ -392,7 +421,7 @@ router
 					res
 				)
 			)
-			.catch(err =>
+			.catch(() =>
 				sendSuccessResponse(
 					{
 						message: `Log Written Failed`

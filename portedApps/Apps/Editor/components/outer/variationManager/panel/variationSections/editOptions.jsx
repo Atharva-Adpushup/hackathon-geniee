@@ -195,6 +195,7 @@ class EditOptions extends Component {
 				toggleDeleteButton={this.toggleDeleteButton}
 				updateAdSize={this.props.updateAdSize}
 				channelId={this.props.channelId}
+				platform={this.props.platform}
 			/>
 		);
 	}

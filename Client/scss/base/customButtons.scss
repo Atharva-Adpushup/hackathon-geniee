@@ -51,6 +51,9 @@ button:focus {
 			box-shadow: none;
 		}
 	}
+	&.btn-medium {
+		padding: 7px 13px;
+	}
 }
 
 a > button.btn {

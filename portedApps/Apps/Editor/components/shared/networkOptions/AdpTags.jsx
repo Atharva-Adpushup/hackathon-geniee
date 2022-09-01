@@ -16,6 +16,7 @@ class AdpTags extends Component {
 			priceFloor,
 			headerBidding,
 			fluid,
+			flyingCarpetEnabled = false,
 			code,
 			refreshSlot,
 			refreshInterval,
@@ -50,6 +51,7 @@ class AdpTags extends Component {
 			showMultipleAdSizesSelector: false,
 			multipleAdSizes: [],
 			fluid,
+			flyingCarpetEnabled,
 			dfpAdunitId: '',
 			refreshSlot,
 			refreshInterval,
@@ -105,6 +107,7 @@ class AdpTags extends Component {
 			hbAcivated,
 			pf,
 			fluid,
+			flyingCarpetEnabled,
 			keyValues,
 			refreshSlot,
 			refreshInterval,
@@ -136,6 +139,7 @@ class AdpTags extends Component {
 			overrideSizeTo: overrideActive ? overrideSizeTo : null,
 			formats: ['display'],
 			fluid,
+			flyingCarpetEnabled,
 			dfpAdunitId,
 			// NOTE: Below key is exported only because it is required to provide `Backward compatible size mapping`
 			// functionality in features (such as InContent sections) that cannot receive primary ad size
@@ -561,6 +565,31 @@ class AdpTags extends Component {
 				{this.props.geniee ? this.renderDFPAdUnitIdSelectBox() : null}
 				{/* {this.props.geniee ? this.renderManageMultipleAdSizeBlock() : null} */}
 				{!this.props.geniee ? this.renderOverrideSettings(isGenieeEditableMode) : null}
+				<div>
+					<Row>
+						<Col xs={12} className={this.props.fromPanel ? 'u-padding-0px' : ''}>
+							<CustomToggleSwitch
+								labelText="Flying Carpet"
+								className="mB-10"
+								checked={this.state.flyingCarpetEnabled}
+								onChange={val => {
+									this.setState({ flyingCarpetEnabled: !!val });
+								}}
+								layout="horizontal"
+								subText=""
+								subComponent=""
+								size="m"
+								on="Yes"
+								off="No"
+								defaultLayout={this.props.fromPanel ? false : true}
+								name={this.props.id ? `flyingCarpetEnabled-${this.props.id}` : 'flyingCarpetEnabled'}
+								id={this.props.id ? `flyingCarpetEnabled-${this.props.id}` : 'flyingCarpetEnabled'}
+								customComponentClass={this.props.fromPanel ? 'u-padding-0px' : ''}
+							/>
+						</Col>
+					</Row>
+
+				</div>
 				{!this.props.geniee &&
 					this.props.networkConfig &&
 					this.props.networkConfig.enableRefreshSlot ? (
