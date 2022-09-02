@@ -78,6 +78,16 @@ const n1qlQueryTemplates = {
 };
 
 module.exports = {
+	CORE_WEB_VITALS_API: {
+		uri: 'https://www.googleapis.com/pagespeedonline/v5/runPagespeed',
+		key: 'AIzaSyAwlPiPJIkTejgqqH01v9DmtPoPeOPXDUQ',
+		headers: {
+			'sec-ch-ua': '^^',
+			Referer: 'https://developers.google.com/',
+			'sec-ch-ua-mobile': '?0'
+		}
+	},
+
 	AD_UNIT_TYPE_MAPPING: {
 		DISPLAY: 1,
 		DOCKED: 2,
@@ -101,6 +111,7 @@ module.exports = {
 	REPORT_STATUS: 'https://api.adpushup.com/OpsWebService/ops?report=getNetworkImportServiceStatus',
 	IE_TESTING_ENDPOINT: 'http://apdc1n-central5.eastus2.cloudapp.azure.com:8081/api/health-report',
 	PROXY_ORIGIN: '//proxy.app.adpushup.com',
+	TOP_URLS_API: `${reportingBaseURL}/topUrls`,
 	PRODUCT_LIST_API: `${reportingBaseURL}/common/activeProducts`,
 	SESSION_RPM_REPORTS_API: `${reportingBaseURL}/site/report?report_name=session_rpm_report`,
 	MAB_REPORTING_API: `${reportingBaseURL}/site/mab`,
@@ -531,7 +542,8 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		hbaQueryFrequencyDoc: 'hbaq::',
 		networkWideHBRules: 'ntwkwide::rules',
 		paymentHistoryDoc: 'tplt::last3months',
-		pnpRefresh: 'apnp::'
+		pnpRefresh: 'apnp::',
+		topSitesByRevenue: 'data::topsites'
 	},
 	AMP_REFRESH_INTERVAL: 30,
 	tagManagerInitialDoc: {
@@ -677,6 +689,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		prefetchHBService: '*/15 * * * *', // Every 15 mins
 		emailSnapshotsService: '30 7 * * *', //Run at 8:00 everyday
 		paymentHistoryService: '0 0 5 * *', //At 00:00 on 5th every month
+		clsMonitoringService: '0 8 * * *', //Run at 8:00 everyday',
 		poweredByAdpushupBannerService: '30 1 * * 1', //Runs at 1:30 Every Monday
 		partnersPanelService: {
 			Criteo: '22 13 * * *',
