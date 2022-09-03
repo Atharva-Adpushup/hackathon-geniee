@@ -6,7 +6,7 @@ import isEqual from 'lodash/isEqual';
 import moment from 'moment';
 import cloneDeep from 'lodash/cloneDeep';
 import Select from 'react-select';
-import { Glyphicon, Button, Alert } from '@/Client/helpers/react-bootstrap-imports';
+import { Glyphicon, Button } from '@/Client/helpers/react-bootstrap-imports';
 import AsyncGroupSelect from '../../../Components/AsyncGroupSelect/index';
 import PresetDateRangePicker from '../../../Components/PresetDateRangePicker/index';
 import SelectBox from '../../../Components/SelectBox/index';
@@ -221,6 +221,7 @@ class Control extends Component {
 			isDemoUser,
 			associatedSites
 		} = this.props;
+
 		let siteIds = [];
 		let isSuperUser = false;
 		const selectedSiteIds = selectedFilters.siteid && Object.keys(selectedFilters.siteid);
@@ -263,9 +264,13 @@ class Control extends Component {
 	};
 
 	getReportStatus = () => {
+		const { showReportingDelayPopup } = this.props;
 		reportService.getLastUpdateStatus().then(res => {
 			if (res.status === 200 && res.data) {
-				const updatedDate = res.data.lastRunTimePST;
+				const { lastRunOn: updatedTimeStamp, lastRunTimePST: updatedDate } = res.data;
+				const diffTime = moment.duration(moment().diff(moment(updatedTimeStamp)));
+				const delayHours = diffTime.asHours();
+				showReportingDelayPopup(delayHours);
 				this.setState({
 					updateStatusText: `Last updated on ${updatedDate}.`
 				});
@@ -413,7 +418,6 @@ class Control extends Component {
 			isHB,
 			filterList
 		} = this.props;
-
 		const { scheduleOptions: { startDate, endDate, interval } = {}, type: selectedReportType } =
 			selectedReport || {};
 		const selectedReportStartDate = startDate;
@@ -468,16 +472,16 @@ class Control extends Component {
 						{/* eslint-disable */}
 						<label className="u-text-normal">Report By</label>
 						{/* <SelectBox
-							id="report-by"
-							key="report-by"
-							isClearable={false}
-							isSearchable={false}
-							wrapperClassName="custom-select-box-wrapper"
-							reset={true}
-							selected={state.selectedDimension}
-							options={state.dimensionList}
-							onSelect={this.onReportBySelect}
-						/> */}
+								id="report-by"
+								key="report-by"
+								isClearable={false}
+								isSearchable={false}
+								wrapperClassName="custom-select-box-wrapper"
+								reset={true}
+								selected={state.selectedDimension}
+								options={state.dimensionList}
+								onSelect={this.onReportBySelect}
+							/> */}
 						{!isHB ? (
 							<MultiSelectBox
 								id="report-by"
@@ -561,9 +565,9 @@ class Control extends Component {
 								}
 							}}
 							/*
-								data prior to 1st Aug, 2019 is present in the old console 
-								therefore disabling dates before 1st Aug, 2019
-							*/
+									data prior to 1st Aug, 2019 is present in the old console 
+									therefore disabling dates before 1st Aug, 2019
+								*/
 							isOutsideRange={day =>
 								day.isAfter(moment()) ||
 								day.isBefore(

@@ -11,7 +11,7 @@ import ActionCard from '../../../Components/ActionCard';
 import ReportContainer from '../containers/ReportContainer';
 import URLAndUTMContainer from '../containers/URLAndUTMContainer';
 import HBAnalyticContainer from '../containers/HBAnalyticContainer';
-
+import DelayFlag from './Flag';
 import '../../../scss/apps/reporting/index.scss';
 import history from '../../../helpers/history';
 
@@ -73,7 +73,7 @@ class ReportsPanel extends Component {
 			return null;
 		}
 
-		const { userSites, match, userSitesInfo } = this.props;
+		const { userSites, match, userSitesInfo, reportingDelayPopup } = this.props;
 		let isURLReportingEnabled = false;
 		let isHBAnalyticsEnabled = false;
 
@@ -94,22 +94,25 @@ class ReportsPanel extends Component {
 		}
 
 		return (
-			<ActionCard>
-				{
-					<Nav bsStyle="tabs" activeKey={activeItem.INDEX} onSelect={this.handleNavSelect}>
-						<NavItem eventKey={1}>
-							{isURLReportingEnabled ? 'General' : REPORTS_NAV_ITEMS_VALUES.REPORT}
-						</NavItem>
-						{isURLReportingEnabled && (
-							<NavItem eventKey={2}>{REPORTS_NAV_ITEMS_VALUES.URL_UTM_REPORTING}</NavItem>
-						)}
-						{isHBAnalyticsEnabled && (
-							<NavItem eventKey={3}>{REPORTS_NAV_ITEMS_VALUES.HB_ANALYTICS}</NavItem>
-						)}
-					</Nav>
-				}
-				{this.renderContent()}
-			</ActionCard>
+			<>
+				{reportingDelayPopup && <DelayFlag />}
+				<ActionCard>
+					{
+						<Nav bsStyle="tabs" activeKey={activeItem.INDEX} onSelect={this.handleNavSelect}>
+							<NavItem eventKey={1}>
+								{isURLReportingEnabled ? 'General' : REPORTS_NAV_ITEMS_VALUES.REPORT}
+							</NavItem>
+							{isURLReportingEnabled && (
+								<NavItem eventKey={2}>{REPORTS_NAV_ITEMS_VALUES.URL_UTM_REPORTING}</NavItem>
+							)}
+							{isHBAnalyticsEnabled && (
+								<NavItem eventKey={3}>{REPORTS_NAV_ITEMS_VALUES.HB_ANALYTICS}</NavItem>
+							)}
+						</Nav>
+					}
+					{this.renderContent()}
+				</ActionCard>
+			</>
 		);
 	}
 }

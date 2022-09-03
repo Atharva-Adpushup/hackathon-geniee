@@ -1,10 +1,10 @@
 import { connect } from 'react-redux';
 import Control from '../components/Control';
 import { getReportsMeta } from '../../../helpers/commonFunctions';
+import { showReportingDelayPopup } from '../../../actions/globalActions';
 
 const mapStateToProps = (state, ownProps) => {
 	const reportsMeta = getReportsMeta(state, ownProps);
-
 	const {
 		data: { filter, metrics, dimension, interval, site, hbMetrics }
 	} = reportsMeta;
@@ -20,4 +20,12 @@ const mapStateToProps = (state, ownProps) => {
 	};
 };
 
-export default connect(mapStateToProps)(Control);
+const mapDispatchToProps = dispatch => {
+	const computedObject = {
+		showReportingDelayPopup: time => dispatch(showReportingDelayPopup(time))
+	};
+
+	return computedObject;
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Control);

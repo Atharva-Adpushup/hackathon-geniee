@@ -116,6 +116,11 @@ const saveNetworkWideRules = ({ rule, ruleIndex }, dataForAuditLogs) => dispatch
 		});
 };
 
+const showReportingDelayPopup = updateTime => dispatch => {
+	updateTime > 24
+		? dispatch({ type: REPORTS_ACTIONS.SHOW_REPORTING_DELAY_POPUP, flag: true })
+		: dispatch({ type: REPORTS_ACTIONS.SHOW_REPORTING_DELAY_POPUP, flag: false });
+};
 export {
 	fetchGlobalData,
 	updateNetworkConfig,
@@ -124,5 +129,6 @@ export {
 	updateSuperUserAccountReportMetaData,
 	updateGlobalURLReportsMetaData,
 	updateGlobalHBAnalyticMetaData,
-	saveNetworkWideRules
+	saveNetworkWideRules,
+	showReportingDelayPopup
 };
