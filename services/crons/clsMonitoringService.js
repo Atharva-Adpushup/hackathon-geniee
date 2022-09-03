@@ -100,6 +100,10 @@ function getCoreWebVitalseData(site) {
 				metrics: { CUMULATIVE_LAYOUT_SHIFT_SCORE: { category, percentile } = {} } = {}
 			} = res.loadingExperience;
 
+			if (!category || !percentile) {
+				return;
+			}
+
 			const clsData = {
 				category: category,
 				score: percentile / 100
@@ -153,7 +157,7 @@ function filterCLSUrlsToSend() {
 	return calculateCLS().then(res => {
 		//array will be coming as a response from allSettled Promise result
 		const filteredResponse = res.filter(data => {
-			if (data.status === 'fulfilled') {
+			if (data.status === 'fulfilled' && data.value) {
 				return data.value.clsData.category !== 'FAST';
 			}
 		});
