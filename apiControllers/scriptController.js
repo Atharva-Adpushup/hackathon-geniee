@@ -48,6 +48,16 @@ const defaultApConfigValues = {
 	isVacantAdSpaceEnabled: false
 };
 
+const getActiveDfpNetworkCode = function(user) {
+	const adServerSettings = user.get('adServerSettings');
+	const manuallyAddedPublisherNetworkCode = user.get('manuallyAddedPublisherNetworkCode');
+	return (
+		(adServerSettings && adServerSettings.dfp && adServerSettings.dfp.activeDFPNetwork) ||
+		manuallyAddedPublisherNetworkCode ||
+		null
+	);
+};
+
 Router.get('/:siteId/ampDeliveryViaCreativeConfig', (req, res) => {
 	/**
 	 * this route will be used by AmpDeliveryViaCreative repo
@@ -81,7 +91,7 @@ Router.get('/:siteId/ampDeliveryViaCreativeConfig', (req, res) => {
 					...defaultApConfigValues,
 					...site.get('apConfigs')
 				};
-				const adServerSettings = user.get('adServerSettings');
+
 				const isAdPartner = !!site.get('partner');
 
 				const {
@@ -114,10 +124,7 @@ Router.get('/:siteId/ampDeliveryViaCreativeConfig', (req, res) => {
 				apConfigs.spaPageTransitionTimeout = apConfigs.spaPageTransitionTimeout
 					? apConfigs.spaPageTransitionTimeout
 					: 0;
-				apConfigs.activeDFPNetwork =
-					(adServerSettings && adServerSettings.dfp && adServerSettings.dfp.activeDFPNetwork) ||
-					null;
-
+				apConfigs.activeDFPNetwork = getActiveDfpNetworkCode(user);
 				// GAM 360 config
 				apConfigs.mcm = user.get('mcm') || {};
 
@@ -183,11 +190,8 @@ Router.get('/:siteId/ampDeliveryViaCreativeConfig', (req, res) => {
 				}));
 			};
 			const setAdNetworkConfig = function(prebidAndAdsConfig) {
-				const adServerSettings = user.get('adServerSettings');
 				const blockListedLineItems = site.get('blockListedLineItems');
-				const activeDFPNetwork =
-					(adServerSettings && adServerSettings.dfp && adServerSettings.dfp.activeDFPNetwork) ||
-					null;
+				const activeDFPNetwork = getActiveDfpNetworkCode(user);
 
 				if (activeDFPNetwork) {
 					return generateAdNetworkConfig(
@@ -298,7 +302,7 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 					...defaultApConfigValues,
 					...site.get('apConfigs')
 				};
-				const adServerSettings = user.get('adServerSettings');
+
 				const isAdPartner = !!site.get('partner');
 
 				const {
@@ -331,9 +335,7 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 				apConfigs.spaPageTransitionTimeout = apConfigs.spaPageTransitionTimeout
 					? apConfigs.spaPageTransitionTimeout
 					: 0;
-				apConfigs.activeDFPNetwork =
-					(adServerSettings && adServerSettings.dfp && adServerSettings.dfp.activeDFPNetwork) ||
-					null;
+				apConfigs.activeDFPNetwork = getActiveDfpNetworkCode(user);
 
 				// GAM 360 config
 				apConfigs.mcm = user.get('mcm') || {};
@@ -393,11 +395,8 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 				}));
 			};
 			const setAdNetworkConfig = function(prebidAndAdsConfig) {
-				const adServerSettings = user.get('adServerSettings');
 				const blockListedLineItems = site.get('blockListedLineItems');
-				const activeDFPNetwork =
-					(adServerSettings && adServerSettings.dfp && adServerSettings.dfp.activeDFPNetwork) ||
-					null;
+				const activeDFPNetwork = getActiveDfpNetworkCode(user);
 
 				if (activeDFPNetwork) {
 					return generateAdNetworkConfig(
@@ -501,8 +500,6 @@ Router.get('/:siteId/ampSiteConfig', (req, res) => {
 				const apps = site.get('apps');
 				const apConfigs = site.get('apConfigs');
 
-				const adServerSettings = user.get('adServerSettings');
-
 				const {
 					prebidConfig,
 					refreshLineItems,
@@ -519,9 +516,7 @@ Router.get('/:siteId/ampSiteConfig', (req, res) => {
 				if (currencyConfig) apConfigs.currencyConfig = currencyConfig;
 				apConfigs.siteDomain = site.get('siteDomain');
 				apConfigs.ownerEmailMD5 = user.get('sellerId');
-				apConfigs.activeDFPNetwork =
-					(adServerSettings && adServerSettings.dfp && adServerSettings.dfp.activeDFPNetwork) ||
-					null;
+				apConfigs.activeDFPNetwork = getActiveDfpNetworkCode(user);
 
 				// GAM 360 config
 				apConfigs.mcm = user.get('mcm') || {};
@@ -562,10 +557,7 @@ Router.get('/:siteId/ampSiteConfig', (req, res) => {
 				});
 
 			const getRefreshLineItems = function(userModel, lineItemTypesToRefresh) {
-				const adServerSettings = userModel.get('adServerSettings');
-				const activeDFPNetwork =
-					(adServerSettings && adServerSettings.dfp && adServerSettings.dfp.activeDFPNetwork) ||
-					null;
+				const activeDFPNetwork = getActiveDfpNetworkCode(userModel);
 
 				if (!activeDFPNetwork) return null;
 

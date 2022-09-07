@@ -73,7 +73,8 @@ var modelAPI = (module.exports = apiModule()),
 			'peerPerformanceAnalysisSites',
 			'peerPerformanceAnalysis',
 			'activeProducts',
-			'useGAAnalyticsForReporting'
+			'useGAAnalyticsForReporting',
+			'manuallyAddedPublisherNetworkCode'
 		];
 		this.clientKeys = [
 			'firstName',
@@ -113,7 +114,8 @@ var modelAPI = (module.exports = apiModule()),
 			'peerPerformanceAnalysisSites',
 			'peerPerformanceAnalysis',
 			'activeProducts',
-			'useGAAnalyticsForReporting'
+			'useGAAnalyticsForReporting',
+			'manuallyAddedPublisherNetworkCode'
 		];
 		this.validations = schema.user.validations;
 		this.classMap = {
