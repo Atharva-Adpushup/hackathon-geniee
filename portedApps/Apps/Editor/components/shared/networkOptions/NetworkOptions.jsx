@@ -52,6 +52,7 @@ class NetworkOptions extends Component {
 		return this.props.onSubmit({
 			network: this.state.network,
 			fluid: networkData.fluid,
+			flyingCarpetEnabled: networkData.flyingCarpetEnabled,
 			networkData: { ...networkData }
 		});
 	}
@@ -133,6 +134,7 @@ class NetworkOptions extends Component {
 					? props.ad.networkData.headerBidding
 					: false,
 			fluid = props.ad && props.ad.hasOwnProperty('fluid') ? props.ad.fluid : true,
+			flyingCarpetEnabled = props.ad && props.ad.hasOwnProperty('flyingCarpetEnabled') ? props.ad.flyingCarpetEnabled : false,
 			dynamicAllocation =
 				isAdNetworkData && props.ad.networkData.hasOwnProperty('dynamicAllocation')
 					? props.ad.networkData.dynamicAllocation
@@ -171,6 +173,7 @@ class NetworkOptions extends Component {
 						priceFloor={priceFloor}
 						headerBidding={headerBidding}
 						fluid={fluid}
+						flyingCarpetEnabled={flyingCarpetEnabled}
 						submitHandler={this.submitHandler}
 						onCancel={props.onCancel}
 						code={code}

@@ -1044,7 +1044,7 @@ async function getAssociatedAccountsWithUser(userEmail) {
 
 	// Ops Access Control list
 	const { value: opsAcccessList } = await appBucket.getDoc('ops::acl');
-	let emailOfAM = opsAcccessList.AM.includes(userEmail) ? userEmail : '' ;
+	let emailOfAM = opsAcccessList.AM.includes(userEmail) ? userEmail : '';
 	// for accessing extra accouts which are not associated with the AM
 	let otherEmails = '';
 
@@ -1071,7 +1071,7 @@ async function getAssociatedAccountsWithUser(userEmail) {
 		}).then(async (accounts) => {
 			// Hack by Harpreet Singh for quick resolution to allow
 			// AdOps person to access other accounts not associated to his/her AM
-			if(otherEmails && otherEmails instanceof Array && otherEmails.length) {
+			if (otherEmails && otherEmails instanceof Array && otherEmails.length) {
 				accounts.results = [...accounts.results, ...otherEmails];
 			}
 
@@ -1126,6 +1126,110 @@ async function getAssociatedAccountsWithUser(userEmail) {
 	return [];
 };
 
+/**
+ * 
+ */
+// for new AMP Ad format
+function getApTags(siteId) {
+	return couchbase
+		.connectToAppBucket()
+		.then(appBucket =>
+			appBucket.getAsync(`${docKeys.apTag}${siteId}`, {}).then(apTags => {
+				const {
+					value: { ads = [] }
+				} = apTags;
+				return ads;
+			})
+		)
+		.catch(err => {
+			console.log(err);
+			throw err;
+		});
+}
+
+async function udpateApConfigIfFlyingCarpetAdEnabledInApTagOrLayoutEditorAd(siteId) {
+	/**
+	 * 
+	 * 1. check ApTag
+	 * 2. checkLayoutEditor
+	 * 3. check if need to add or remove or ignore
+	 * 4. check if Already exist
+	 * 5. udpate as per case 4.
+	 */
+	try {
+		const site = await siteModel.getSiteById(siteId);
+		const apTags = await getApTags(siteId)
+		const channels = site.get('channels') || [];
+	
+		// 1. check ApTag
+		let isFlyinCarpetEnabled = !!apTags.find(ad => !!ad.flyingCarpetEnabled);
+		if (!isFlyinCarpetEnabled) {
+			// * 2. checkLayoutEditor
+			const channelsQueue = [];
+			channels.map(async (channel) => {
+				const [platform, pageGroup] = channel.split(':')
+				channelsQueue.push(channelModel
+					.getChannel(siteId, platform, pageGroup));
+			});
+			const allChannelsConfig = await Promise.all(channelsQueue);
+			allChannelsConfig.find(channelConfig => {
+				const { variations } = channelConfig.data;
+				Object.keys(variations).find(variation => {
+					const { sections } = variations[variation];
+					Object.keys(sections).find(sectionId => {
+						Object.keys(sections[sectionId].ads).find(adId => {
+							const ad = sections[sectionId].ads[adId];
+							if (ad) {
+								isFlyinCarpetEnabled = !!ad.flyingCarpetEnabled;
+							}
+							return isFlyinCarpetEnabled;
+						});
+						// if already found exit loop
+						return isFlyinCarpetEnabled;
+					});
+					return isFlyinCarpetEnabled;
+				});
+				return isFlyinCarpetEnabled;
+			})
+		}
+	
+		const prevApConfig = site.get('apConfigs');
+		const updatedConfig = {};
+		// * 3. check if need to add or remove or ignore
+		if (isFlyinCarpetEnabled) {
+			// * 4. check if Already exist
+			// flying carpet is enabled in the Ad and
+			// add `flyingCarpetSettings` if does not exist in apConfig
+			if (!prevApConfig.flyingCarpetSettings) {
+				updatedConfig = {
+					...prevApConfig,
+					...{ flyingCarpetSettings: { CSS: { top: 30 } } }
+				};
+			}
+		} else {
+			// * 4. check if Already exist
+			// flying carpet is not enabled but flag is present in apConfig
+			// remove it from apConfig
+			if (prevApConfig.flyingCarpetSettings) {
+				// remove `flyingCarpetSettings` and save
+				const { flyingCarpetSettings, ...restSiteApConfig } = prevApConfig
+				updatedConfig = restSiteApConfig;
+			}
+		}
+	
+		// * 5. udpate as per case 4.
+		if (JSON.stringify(updatedConfig) !== '{}') {
+			// update if needed
+			site.set('apConfigs', { ...updatedConfig });
+			site.save();
+		}
+		return updatedConfig;
+	} catch (err) {
+		console.log(err)
+		throw err;
+	}
+}
+
 module.exports = {
 	verifyOwner,
 	errorHandler,
@@ -1156,5 +1260,6 @@ module.exports = {
 	updateApTagAd,
 	updateAds,
 	checkAllowedEmailForSwitchAndImpersonate,
-	getAssociatedAccountsWithUser
+	getAssociatedAccountsWithUser,
+	udpateApConfigIfFlyingCarpetAdEnabledInApTagOrLayoutEditorAd
 };

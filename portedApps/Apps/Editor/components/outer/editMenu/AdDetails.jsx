@@ -335,6 +335,7 @@ class AdDetails extends Component {
 					? String(ad.networkData.refreshSlot)
 					: 'false',
 			fluid = ad && ad.hasOwnProperty('fluid') ? String(ad.fluid) : 'false',
+			flyingCarpetEnabled = ad && ad.hasOwnProperty('flyingCarpetEnabled') ? String(ad.flyingCarpetEnabled) : 'false',
 			refreshInterval =
 				ad.networkData && ad.networkData.refreshInterval
 					? String(ad.networkData.refreshInterval)
@@ -362,6 +363,13 @@ class AdDetails extends Component {
 				<p>
 					Fluid : <strong>{fluid}</strong>
 				</p>
+				{
+					ad.network === "adpTags" ? (
+						<p>
+							Flying Carpet : <strong>{flyingCarpetEnabled}</strong>
+						</p>
+					): ''
+				}
 				{refreshInterval ? (
 					<p>
 						Refresh Interval : <strong>{refreshInterval}</strong>
