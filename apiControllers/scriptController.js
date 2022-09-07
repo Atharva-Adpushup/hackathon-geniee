@@ -370,8 +370,6 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 					apConfigs.experiment = experiment;
 				}
 
-				delete apConfigs.pageGroupPattern;
-
 				const output = { apConfigs, prebidConfig };
 				if (apps.apLite) output.apLiteConfig = apLiteConfig;
 				if (apps.pnp) output.pnpConfig = pnpConfig;
