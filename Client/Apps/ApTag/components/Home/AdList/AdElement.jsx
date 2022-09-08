@@ -15,6 +15,7 @@ import LazyLoadSettings from './LazyLoadSettings';
 import EditBox from '../../../../../Components/EditBox/index';
 import Tags from '../../../../../Components/Tags/index';
 import FluidEdit from './FluidEdit';
+import FlyingCarpet from './FlyingCarpet';
 import RewardedVideoSettings from './RewardedVideoSettings';
 
 class AdElement extends Component {
@@ -24,6 +25,7 @@ class AdElement extends Component {
 			showNetworkDetails: false,
 			showLazyload: false,
 			showFluidVal: false,
+			showFlyingCarpet: false,
 			showRewardedVideo: false,
 			editName: false,
 			isActive: Object.prototype.hasOwnProperty.call(props.ad, 'isActive')
@@ -83,6 +85,7 @@ class AdElement extends Component {
 			editName,
 			isActive,
 			showFluidVal,
+			showFlyingCarpet,
 			showRewardedVideo
 		} = this.state;
 
@@ -121,6 +124,18 @@ class AdElement extends Component {
 					ad={ad}
 					siteId={siteId}
 					onCancel={() => this.toggleHandler('showFluidVal')}
+					onSubmit={this.updateWrapper}
+					user={user}
+				/>
+			);
+		}
+
+		if (showFlyingCarpet) {
+			return (
+				<FlyingCarpet
+					ad={ad}
+					siteId={siteId}
+					onCancel={() => this.toggleHandler('showFlyingCarpet')}
 					onSubmit={this.updateWrapper}
 					user={user}
 				/>
@@ -234,7 +249,7 @@ class AdElement extends Component {
 						{!isRewarded && (
 							<CustomButton
 								variant="secondary"
-								className="u-margin-l3 u-margin-t3 pull-right"
+								className="u-margin-l3 u-margin-t3 pull-right btn-medium"
 								onClick={() => this.toggleHandler('showNetworkDetails')}
 							>
 								Network Details
@@ -243,7 +258,16 @@ class AdElement extends Component {
 						{!isRewarded && (
 							<CustomButton
 								variant="secondary"
-								className="u-margin-l3 u-margin-t3 pull-right"
+								className="u-margin-l3 u-margin-t3 pull-right btn-medium"
+								onClick={() => this.toggleHandler('showFlyingCarpet')}
+							>
+								Flying Carpet
+							</CustomButton>
+						)}
+						{!isRewarded && (
+							<CustomButton
+								variant="secondary"
+								className="u-margin-l3 u-margin-t3 pull-right btn-medium"
 								onClick={() => this.toggleHandler('showFluidVal')}
 							>
 								Edit Fluid
@@ -252,7 +276,7 @@ class AdElement extends Component {
 						{!isRewarded && (
 							<CustomButton
 								variant="secondary"
-								className="u-margin-l3 u-margin-t3 pull-right"
+								className="u-margin-l3 u-margin-t3 pull-right btn-medium"
 								onClick={() => this.toggleHandler('showLazyload')}
 							>
 								Lazyload Settings
@@ -261,7 +285,7 @@ class AdElement extends Component {
 						{isRewarded ? (
 							<CustomButton
 								variant="secondary"
-								className="u-margin-l3 u-margin-t3 pull-right"
+								className="u-margin-l3 u-margin-t3 pull-right btn-medium"
 								onClick={() => this.toggleHandler('showRewardedVideo')}
 							>
 								Rewarded Video Settings

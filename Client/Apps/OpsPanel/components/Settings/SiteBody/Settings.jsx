@@ -24,6 +24,11 @@ class Settings extends Component {
 			spaButUsingHook = false,
 			spaPageTransitionTimeout = 0,
 			adpushupPercentage = 100,
+			flyingCarpetSettings = {
+				CSS: {
+					top: 30
+				}
+			}, // default val
 			poweredByBanner = {},
 			isAdsLabelOn = false,
 			adsLabel = 'Advertisement',
@@ -52,6 +57,7 @@ class Settings extends Component {
 			spaButUsingHook,
 			spaPageTransitionTimeout,
 			adpushupPercentage,
+			flyingCarpetTopOffset: flyingCarpetSettings.CSS.top,
 			isAdsLabelOn,
 			adsLabel,
 			revenueShare,
@@ -219,6 +225,7 @@ class Settings extends Component {
 			spaButUsingHook,
 			spaPageTransitionTimeout,
 			adpushupPercentage,
+			flyingCarpetTopOffset,
 			isAdsLabelOn,
 			adsLabel,
 			revenueShare,
@@ -281,6 +288,7 @@ class Settings extends Component {
 				spaButUsingHook,
 				spaPageTransitionTimeout: Number(spaPageTransitionTimeout),
 				adpushupPercentage: Number(adpushupPercentage),
+				flyingCarpetSettings: { CSS: { top: Number(flyingCarpetTopOffset) } },
 				poweredByBanner,
 				isAdsLabelOn,
 				adsLabel,
@@ -318,6 +326,7 @@ class Settings extends Component {
 			spaButUsingHook,
 			spaPageTransitionTimeout,
 			adpushupPercentage,
+			flyingCarpetTopOffset,
 			status,
 			hbAnalytics,
 			urlUtm,
@@ -543,6 +552,19 @@ class Settings extends Component {
 							className="u-padding-v4 u-padding-h4"
 						/>
 					</React.Fragment>
+				)}
+				{site && site.apConfigs && site.apConfigs.flyingCarpetSettings && (
+					<FieldGroup
+						name="flyingCarpetTopOffset"
+						value={flyingCarpetTopOffset}
+						type="number"
+						label="Flying Carpet Top Offset(px)"
+						onChange={this.handleChange}
+						size={6}
+						id={`flyingCarpetTopOffset-input-${siteId}-${siteDomain}`}
+						placeholder="Default 30"
+						className="u-padding-v4 u-padding-h4"
+					/>
 				)}
 				<FieldGroup
 					name="adpushupPercentage"
