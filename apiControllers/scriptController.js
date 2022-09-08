@@ -356,8 +356,8 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 						innovativeAds.length
 					);
 
-					// Default 'draft' mode is selected if config mode is not present
-					apConfigs.mode = apps.layout && apConfigs.mode ? apConfigs.mode : 2;
+					/** removing mode dependency on layout editor */
+					// apConfigs.mode = apps.layout && apConfigs.mode ? apConfigs.mode : 2;
 
 					if (apConfigs.manualModeActive) {
 						apConfigs.manualAds = manualAds || [];
