@@ -1,6 +1,5 @@
 import React from 'react';
 import DocumentTitle from 'react-document-title';
-
 import ReportContainer from './containers/index';
 import '../../scss/apps/reporting/index.scss';
 

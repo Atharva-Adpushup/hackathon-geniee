@@ -1,6 +1,6 @@
 import { REPORTS_ACTIONS } from '../../constants/global';
 
-const DEFAULT_REPORT_STATE = { fetched: false, data: {} };
+const DEFAULT_REPORT_STATE = { fetched: false, data: {}, reportingDelayPopup: false };
 const DEFAULT_STATE = {
 	global: { ...DEFAULT_REPORT_STATE },
 	account: { ...DEFAULT_REPORT_STATE },
@@ -22,6 +22,11 @@ const reports = (state = DEFAULT_STATE, action) => {
 					fetched: true,
 					data: action.data
 				}
+			};
+		case REPORTS_ACTIONS.SHOW_REPORTING_DELAY_POPUP:
+			return {
+				...state,
+				global: { ...global, reportingDelayPopup: action.flag }
 			};
 		default:
 			return state;
