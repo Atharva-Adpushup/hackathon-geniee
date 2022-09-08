@@ -271,28 +271,11 @@ var model = require('../helpers/model'),
 			return this.get('activeBidderAdaptersListAsc') || '';
 		};
 
-		this.checkIfPrebidVersionChangedSinceLastBuild = function(isSelectiveRolloutEnabled) {
-			const currentPrebidBundleName = this.get('prebidBundleName');
-			const isCurrentPrebidBuildV6 =
-				currentPrebidBundleName &&
-				currentPrebidBundleName.indexOf(`${prebidVersionConfig.suffix.v6}.js`) > -1;
-
-			if (isSelectiveRolloutEnabled && isCurrentPrebidBuildV6) {
-				return false;
-			}
-
-			if (!isSelectiveRolloutEnabled && !isCurrentPrebidBuildV6) {
-				return false;
-			}
-
-			return true;
-		};
-
-		this.setActiveBidderAdaptersList = function(newActiveBiddersList, usePrebidV6) {
+		this.setActiveBidderAdaptersList = function(newActiveBiddersList) {
 			const siteId = this.get('siteId');
 
 			this.set('activeBidderAdaptersListAsc', newActiveBiddersList);
-			this.set('prebidBundleName', getSiteSpecificPrebidBundleName(siteId, usePrebidV6));
+			this.set('prebidBundleName', getPrebidBundleName(siteId));
 
 			return this.save();
 		};
@@ -306,10 +289,9 @@ var model = require('../helpers/model'),
 		};
 	});
 
-function getSiteSpecificPrebidBundleName(siteId, usePrebidV6) {
-	var timestamp = Date.now();
-	const suffix = usePrebidV6 ? prebidVersionConfig.suffix.v6 : '';
-	return `pb.${siteId}.${timestamp}${suffix}.js`;
+function getPrebidBundleName(siteId) {
+	const timestamp = Date.now();
+	return `pb.${siteId}.${timestamp}.js`;
 }
 
 function apiModule() {
