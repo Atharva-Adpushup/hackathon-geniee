@@ -1520,7 +1520,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 					var refreshType = window.pnpRefresh && window.pnpRefresh.refreshType;
 					switch (refreshType) {
 						case 'activeTab':
-							setTimeout(function () {
+							adUnitState.refreshTimeoutId = setTimeout(function () {
 								if (!checkDocInFocus()) {
 									return;
 								}
@@ -1544,10 +1544,11 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 	
 						switch (refreshType) {
 							case 'activeTab':
+								if (adUnitState.refreshTimeoutId) return;
 								if (!checkDocInFocus()) {
 									return;
 								}
-								log('pnp slot inactive tab ' + divId);
+								log('pnp slot in active tab ' + divId);
 								var REFRESH_INTERVAL = window.pnpRefresh.filledInsertionTrigger;
 								var refreshAfter =
 									REFRESH_INTERVAL * 1000 - (+new Date() - adUnitState.renderTimestamp);
