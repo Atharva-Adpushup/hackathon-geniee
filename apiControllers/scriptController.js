@@ -370,6 +370,25 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 					apConfigs.experiment = experiment;
 				}
 
+				// Handle deleted page group patterns
+				// Get all channels and filter and remove extra page group patterns from apConfigs.pageGroupPattern
+				const allPageGroups = site.get('channels') || [];
+
+				const allPageGroupPattern = apConfigs.pageGroupPattern || {};
+				Object.keys(allPageGroupPattern).forEach(platform => {
+					const pageGroupPatternsObjects = allPageGroupPattern[platform] || [];
+					allPageGroupPattern[platform] = pageGroupPatternsObjects.filter(patternObj => {
+						const { pageGroup } = patternObj;
+						if (!pageGroup) return false;
+
+						const platformPageGroupKey = `${platform}:${pageGroup}`;
+						if (allPageGroups.indexOf(platformPageGroupKey) === -1) {
+							return false;
+						}
+						return true;
+					});
+				});
+
 				const output = { apConfigs, prebidConfig };
 				if (apps.apLite) output.apLiteConfig = apLiteConfig;
 				if (apps.pnp) output.pnpConfig = pnpConfig;
