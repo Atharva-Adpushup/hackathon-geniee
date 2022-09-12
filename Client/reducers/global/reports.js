@@ -26,8 +26,9 @@ const reports = (state = DEFAULT_STATE, action) => {
 		case REPORTS_ACTIONS.SHOW_REPORTING_DELAY_POPUP:
 			return {
 				...state,
-				global: { ...global, reportingDelayPopup: action.flag }
+				global: { ...state.global, reportingDelayPopup: action.flag }
 			};
+
 		default:
 			return state;
 	}
