@@ -655,6 +655,13 @@ const POWERED_BY_BANNER = [
 	{ label: 'Chained Docked', value: 'CHAINED_DOCKED' }
 ];
 
+const SITE_LEVEL_REFRESH_TYPE = [
+	{ name: 'Active View', value: 'Active View' },
+	{ name: 'Active Tab', value: 'Active Tab' },
+	{ name: 'Background View', value: 'Background View' },
+	{ name: 'Background', value: 'Background' }
+];
+
 const RULES_ENGINE = {
 	RULES_ENGINE_ACTIONS_KEY_OPTIONS: [
 		{
@@ -670,7 +677,8 @@ const RULES_ENGINE = {
 		refreshType: [
 			{ label: 'BG', value: 'BG' },
 			{ label: 'AT', value: 'AT' },
-			{ label: 'AV', value: 'AV' }
+			{ label: 'AV', value: 'AV' },
+			{ label: 'BV', value: 'BV' }
 		],
 		refreshInterval: []
 	},
@@ -828,5 +836,6 @@ export {
 	RULES_ENGINE,
 	INVENTORY_BULK_ACTIONS,
 	AD_UNIT_TYPE_MAPPING,
-	FILTER_KEY_VALUE_MAPPING
+	FILTER_KEY_VALUE_MAPPING,
+	SITE_LEVEL_REFRESH_TYPE
 };

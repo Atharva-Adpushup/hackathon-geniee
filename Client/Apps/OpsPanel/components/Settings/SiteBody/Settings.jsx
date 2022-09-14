@@ -10,8 +10,11 @@ import siteService from '../../../../../services/siteService';
 import {
 	GA_ACCESS_EMAIL_OPTIONS,
 	GA_VERSION_OPTIONS,
-	POWERED_BY_BANNER
+	POWERED_BY_BANNER,
+	SITE_LEVEL_REFRESH_TYPE
 } from '../../../configs/commonConsts';
+
+import SelectBox from '../../../../../Components/SelectBox';
 
 class Settings extends Component {
 	constructor(props) {
@@ -37,6 +40,7 @@ class Settings extends Component {
 			cmpAvailable = false,
 			mergeReport = false,
 			videoAdsDashboard = false,
+			siteLevelRefreshType = SITE_LEVEL_REFRESH_TYPE[0].value,
 			isWeeklyEmailReportsEnabled = false,
 			isDailyEmailReportsEnabled = false,
 			enableGAAnalytics = false,
@@ -75,7 +79,8 @@ class Settings extends Component {
 			accessEmail,
 			gaVersion,
 			pnp: isPnPEnabled,
-			selectedAdTypes: [...selectedAdTypes]
+			selectedAdTypes: [...selectedAdTypes],
+			siteLevelRefreshType
 		};
 	}
 
@@ -169,6 +174,10 @@ class Settings extends Component {
 		this.setState({ selectedAdTypes });
 	};
 
+	handleOnSelect = (value, key) => {
+		this.setState({ [key]: value });
+	};
+
 	getPoweredByBannerConfig = selectedAdTypes => {
 		const poweredByBannerConfig = {};
 		selectedAdTypes.forEach(selectedElement => {
@@ -234,6 +243,7 @@ class Settings extends Component {
 			cmpEnabled,
 			mergeReport,
 			videoAdsDashboard,
+			siteLevelRefreshType,
 			isWeeklyEmailReportsEnabled,
 			isDailyEmailReportsEnabled,
 			enableGAAnalytics,
@@ -299,6 +309,7 @@ class Settings extends Component {
 				isWeeklyEmailReportsEnabled,
 				isDailyEmailReportsEnabled,
 				gaConfigs,
+				siteLevelRefreshType,
 				enableGAAnalytics
 			},
 
@@ -341,7 +352,8 @@ class Settings extends Component {
 			accessEmail,
 			gaVersion,
 			pnp,
-			selectedAdTypes
+			selectedAdTypes,
+			siteLevelRefreshType
 		} = this.state;
 
 		const { handleMultiSelect } = this;
@@ -566,6 +578,18 @@ class Settings extends Component {
 						className="u-padding-v4 u-padding-h4"
 					/>
 				)}
+				<div className="site-level-refresh">
+					<h1>Site Level Refresh</h1>
+					<SelectBox
+						selected={siteLevelRefreshType}
+						options={SITE_LEVEL_REFRESH_TYPE}
+						onSelect={this.handleOnSelect}
+						id="select-entry"
+						title="Refresh Type"
+						dataKey="siteLevelRefreshType"
+						style={{ marginLeft: 'auto', width: '20%' }}
+					/>
+				</div>
 				<FieldGroup
 					name="adpushupPercentage"
 					value={adpushupPercentage}
