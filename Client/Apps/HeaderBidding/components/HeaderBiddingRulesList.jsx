@@ -107,7 +107,7 @@ class HeaderBiddingRulesList extends React.Component {
 						.filter(val => val)
 						.join(', ');
 
-					if (valueContent === '') {
+					if (valueContent === '' && action.key !== 'amazon_block') {
 						valueContent = 'The bidders added in the Global Rule are N/A for this site';
 					}
 				}

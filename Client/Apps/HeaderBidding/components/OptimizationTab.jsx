@@ -746,6 +746,9 @@ class OptimizationTab extends React.Component {
 		for (let index = 0; index < actions.length; index++) {
 			const action = actions[index];
 
+			if (action.key === 'amazon_block') {
+				action.value = [{ label: 'Block AmazonUAM', value: 'Block AmazonUAM' }];
+			}
 			const hasInvalidKey = !action.key || action.keyError;
 			const hasInvalidValue =
 				action.value === null ||
