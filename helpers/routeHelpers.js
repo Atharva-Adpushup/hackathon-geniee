@@ -1194,7 +1194,7 @@ async function udpateApConfigIfFlyingCarpetAdEnabledInApTagOrLayoutEditorAd(site
 		}
 	
 		const prevApConfig = site.get('apConfigs');
-		const updatedConfig = {};
+		let updatedConfig = {};
 		// * 3. check if need to add or remove or ignore
 		if (isFlyinCarpetEnabled) {
 			// * 4. check if Already exist
