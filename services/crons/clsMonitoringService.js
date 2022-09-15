@@ -8,6 +8,7 @@
 
 const request = require('request-promise');
 const cron = require('node-cron');
+const { GoogleSpreadsheet } = require('google-spreadsheet');
 
 const config = require('../../configs/config');
 const couchbase = require('../../helpers/couchBaseService');
@@ -29,10 +30,7 @@ function getTopUrlsOfEachSite() {
 	return getTopSites().then(sites => {
 		return request({
 			uri: CC.TOP_URLS_API,
-			json: true,
-			qs: {
-				siteid: sites.join(',')
-			}
+			json: true
 		}).then(res => res.data.siteUrls); //will be an array
 	});
 }
@@ -165,13 +163,51 @@ function filterCLSUrlsToSend() {
 	});
 }
 
-function prepareDataForAlerts() {
-	return filterCLSUrlsToSend().then(res => {
-		if (!res.length) {
-			return;
-		}
+function generateCSVFormatData(response) {
+	const csvResponse = response.map(entry => {
+		const { siteId, url, platform, clsData: { score, category } = {} } = entry.value;
+		return {
+			siteId,
+			url,
+			platform,
+			score,
+			category
+		};
+	});
 
-		const tableFomatData = `<html>
+	return csvResponse;
+}
+
+async function prepareDataForAlerts() {
+	const res = await filterCLSUrlsToSend();
+
+	if (!res.length) {
+		return;
+	}
+
+	const csvData = generateCSVFormatData(res);
+
+	const doc = new GoogleSpreadsheet(CC.GOOGLE_SPREAD_SHEET_ID); //spreadsheet id
+
+	const creds = JSON.parse(Buffer.from(config.googleSheetCreds, 'base64').toString());
+
+	await doc.useServiceAccountAuth(creds);
+
+	await doc.loadInfo();
+
+	const worksheet = doc.sheetsByIndex[0];
+
+	//clear the sheet before populating it again
+	await worksheet.clear();
+
+	// This is the header row.
+	await worksheet.setHeaderRow(['siteId', 'url', 'platform', 'score', 'category']);
+	// write values to the sheet
+	await worksheet.addRows(csvData);
+
+	const spreadSheetLink = `https://docs.google.com/spreadsheets/d/${CC.GOOGLE_SPREAD_SHEET_ID}/edit#gid=0`;
+
+	const tableFormatData = `<html>
 		<body>
 		<table>
 		  <tr>
@@ -181,54 +217,58 @@ function prepareDataForAlerts() {
 			<th>CLS Score</th>
 			<th>Category</th>
 		  </tr>
-		  ${res.reduce((acc, curr) => {
+		  ${csvData.reduce((acc, curr) => {
+				const { siteId, url, platform, score, category } = curr;
 				acc +=
 					'' +
 					`<tr>
-			  <td>${curr.value.siteId}</td>
-			  <td>${curr.value.url}</td>
-			  <td>${curr.value.platform}</td>
-			  <td>${curr.value.clsData.score}</td>
-			  <td>${curr.value.clsData.category}</td>
+			  <td>${siteId}</td>
+			  <td>${url}</td>
+			  <td>${platform}</td>
+			  <td>${score}</td>
+			  <td>${category}</td>
 			   </tr>`;
 
 				return acc;
 			}, '')}
 			
 		</table>
+		<br>
+		<h4>You can also check the spreadsheet of this result from the link below</h4>
+		<p>${spreadSheetLink}</p>
 		</body>
 		</html>`;
 
-		return tableFomatData;
-	});
+	return tableFormatData;
 }
 
-function sendMailAlertForClsIssues() {
-	return prepareDataForAlerts()
-		.then(bodyData => {
-			if (!bodyData) {
-				return;
+async function sendMailAlertForClsIssues() {
+	try {
+		const tableFormatData = await prepareDataForAlerts();
+
+		if (!tableFormatData) {
+			return;
+		}
+
+		return sendEmail({
+			queue: 'MAILER',
+			data: {
+				to: config.consoleErrorAlerts.hackersMail,
+				body: tableFormatData,
+				subject: 'Website having CLS issues (score> 0.1)'
 			}
-			return sendEmail({
-				queue: 'MAILER',
-				data: {
-					to: config.consoleErrorAlerts.hackersMail,
-					body: bodyData,
-					subject: 'Website having CLS issues (score> 0.1)'
-				}
-			});
-		})
-		.catch(err => {
-			console.log(err);
-			return sendEmail({
-				queue: 'MAILER',
-				data: {
-					to: config.consoleErrorAlerts.hackersMail,
-					body: err.message,
-					subject: 'CLS Monitoring Service fails'
-				}
-			});
 		});
+	} catch (err) {
+		console.log(err);
+		return sendEmail({
+			queue: 'MAILER',
+			data: {
+				to: config.consoleErrorAlerts.hackersMail,
+				body: err.message,
+				subject: 'CLS Monitoring Service fails'
+			}
+		});
+	}
 }
 
 sendMailAlertForClsIssues();

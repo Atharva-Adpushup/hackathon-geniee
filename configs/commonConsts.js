@@ -88,6 +88,8 @@ module.exports = {
 		}
 	},
 
+	GOOGLE_SPREAD_SHEET_ID: '1ju3NvLOBOqUEMzX1AfqKnQtLvB28hjS1-S1mJmOh6fI',
+
 	AD_UNIT_TYPE_MAPPING: {
 		DISPLAY: 1,
 		DOCKED: 2,

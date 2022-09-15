@@ -36,9 +36,9 @@ module.exports = {
 	auditLogElasticServer: {
 		host: 'http://127.0.0.1:8083/auditLog'
 	},
-    hubSpotService: {
-        host: 'http://localhost:8181'
-    },
+	hubSpotService: {
+		host: 'http://localhost:8181'
+	},
 	googleOauth: {
 		OAUTH_CLIENT_ID: 'GOOGLE CLIENT ID',
 		OAUTH_CLIENT_SECRET: 'GOOGLE CLIENT SECRET',
@@ -136,7 +136,7 @@ module.exports = {
 			REVENUE_FIELD: 'publisher_payment',
 			ENDPOINT: {
 				AUTH_ENDPOINT: 'https://app.indexexchange.com/api/authentication/v1/login',
-				API_ENDPOINT: 'https://app.indexexchange.com/api/reporting/agg/v1',
+				API_ENDPOINT: 'https://app.indexexchange.com/api/reporting/agg/v1'
 			},
 			REPORT_ID: 340267,
 			AUTH_PARAMS: {
@@ -381,7 +381,8 @@ module.exports = {
 	poweredByAdpushupBannerService: {
 		enableOnSites: [],
 		supportMail: 'hrishikesh.jangir@adpushup.com'
-	}
+	},
+	googleSheetCreds: ''
 };
 
 /*
