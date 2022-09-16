@@ -69,12 +69,15 @@ module.exports = {
 	checkAdpTagsUnsyncedAds: function(section, ad, additionalParams) {
 		const hasNetworkData = ad.networkData && Object.keys(ad.networkData).length;
 		const { isReplaceGptSlotOnRefreshEnabled, refreshAdUnitCodesCount } = additionalParams;
+		const { formatData: { type: adType, maxInstances = 0 } = {} } = ad;
+
+		const isChainedDockedAd = adType === 'chainedDocked';
 
 		if (!hasNetworkData) {
 			return false;
 		}
 
-		const { dfpAdunit, refreshAdUnitCodes } = ad.networkData;
+		const { dfpAdunit, refreshAdUnitCodes, chainedDockedAdUnitCodes } = ad.networkData;
 
 		const hasDfpAdunitCode = !!dfpAdunit;
 		const refreshAdUnitCodesMissing = !Array.isArray(refreshAdUnitCodes);
@@ -82,7 +85,20 @@ module.exports = {
 			isReplaceGptSlotOnRefreshEnabled &&
 			(refreshAdUnitCodesMissing || refreshAdUnitCodes.length != refreshAdUnitCodesCount);
 
-		const isAdSynced = hasDfpAdunitCode && !shouldSyncRefreshAdUnitCodes;
+		/*for chained docked ad, we save maxInstances in ad config to know how many instances do we want to create, that is why we are using maxInstances here , it is an integer value
+		For each instance of Chained Docked Ad that we render, we want to render a different gpt slot 
+		(having different dfpAdunitCodes). So, we're creating as many adunits on GAM as the number of maxInstances */
+
+		const chainedDockedNumberOfInstances = maxInstances;
+		const chainedDockedCodesMissing = !Array.isArray(chainedDockedAdUnitCodes);
+
+		const shouldSyncChainedDockedCodes =
+			isChainedDockedAd &&
+			(chainedDockedCodesMissing ||
+				chainedDockedAdUnitCodes.length != chainedDockedNumberOfInstances);
+
+		const isAdSynced =
+			hasDfpAdunitCode && !shouldSyncRefreshAdUnitCodes && !shouldSyncChainedDockedCodes;
 
 		if (isAdSynced) {
 			return false;
@@ -91,8 +107,8 @@ module.exports = {
 		const isMultipleAdSizes = !!(ad.multipleAdSizes && ad.multipleAdSizes.length);
 		const isResponsive = !!(ad.width === 'responsive' && ad.networkData.isResponsive);
 		const isNative = !!(ad.formatData && ad.formatData.type === 'native');
-		
-		const defaultAdData = {
+
+		let defaultAdData = {
 			adId: ad.id,
 			isResponsive: isResponsive,
 			sizeWidth: isResponsive ? 'responsive' : parseInt(ad.width, 10),
@@ -110,11 +126,25 @@ module.exports = {
 					ad.hasOwnProperty('networkData') && ad.networkData.hasOwnProperty('headerBidding')
 						? ad.networkData.headerBidding
 						: false
-			},
-			refreshAdUnitCodes,
-			refreshAdUnitCodesCount,
-			shouldSyncRefreshAdUnitCodes
+			}
 		};
+
+		//We do not want to enable refreshAdUnitCodes feature for Chained Docked ads
+		if (isChainedDockedAd) {
+			defaultAdData = {
+				...defaultAdData,
+				chainedDockedAdUnitCodes,
+				chainedDockedNumberOfInstances,
+				shouldSyncChainedDockedCodes
+			};
+		} else {
+			defaultAdData = {
+				...defaultAdData,
+				refreshAdUnitCodes,
+				refreshAdUnitCodesCount,
+				shouldSyncRefreshAdUnitCodes
+			};
+		}
 
 		if (isMultipleAdSizes) {
 			defaultAdData.multipleAdSizes = ad.multipleAdSizes.concat([]);
