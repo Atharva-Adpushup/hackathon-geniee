@@ -253,7 +253,7 @@ async function sendMailAlertForClsIssues() {
 		return sendEmail({
 			queue: 'MAILER',
 			data: {
-				to: config.consoleErrorAlerts.hackersMail,
+				to: `${config.clsMonitoringAlerts.hackersMail},${config.clsMonitoringAlerts.opsMail}`,
 				body: tableFormatData,
 				subject: 'Website having CLS issues (score> 0.1)'
 			}
@@ -263,7 +263,7 @@ async function sendMailAlertForClsIssues() {
 		return sendEmail({
 			queue: 'MAILER',
 			data: {
-				to: config.consoleErrorAlerts.hackersMail,
+				to: config.clsMonitoringAlerts.hackersMail,
 				body: err.message,
 				subject: 'CLS Monitoring Service fails'
 			}
@@ -271,6 +271,4 @@ async function sendMailAlertForClsIssues() {
 	}
 }
 
-sendMailAlertForClsIssues();
-var cronJob = cron.schedule(CC.cronSchedule.clsMonitoringService, sendMailAlertForClsIssues, false);
-cronJob.start();
+cron.schedule(CC.cronSchedule.clsMonitoringService, sendMailAlertForClsIssues);

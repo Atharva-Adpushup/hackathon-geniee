@@ -382,6 +382,11 @@ module.exports = {
 		enableOnSites: [],
 		supportMail: 'hrishikesh.jangir@adpushup.com'
 	},
+	clsMonitoringAlerts: {
+		hackersMail: 'hackers@adpushup.com',
+		opsMail: 'cs-ops@adpushup.com'
+	},
+
 	googleSheetCreds: ''
 };
 
