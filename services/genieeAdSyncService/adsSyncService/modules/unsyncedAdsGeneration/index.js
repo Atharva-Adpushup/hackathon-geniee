@@ -95,7 +95,8 @@ module.exports = {
 		const shouldSyncChainedDockedCodes =
 			isChainedDockedAd &&
 			(chainedDockedCodesMissing ||
-				chainedDockedAdUnitCodes.length != chainedDockedNumberOfInstances);
+				//chainedDockedNumberOfInstances can be changed by user from the UI, suppose we earlier had 10 instances and now we have 6,if we check with inequality operator it will return true which results shouldSyncChainedDockedCodes in true and it  will be wrong in this case because we  already have 6 chainedDockedcodes
+				chainedDockedAdUnitCodes.length < chainedDockedNumberOfInstances);
 
 		const isAdSynced =
 			hasDfpAdunitCode && !shouldSyncRefreshAdUnitCodes && !shouldSyncChainedDockedCodes;
