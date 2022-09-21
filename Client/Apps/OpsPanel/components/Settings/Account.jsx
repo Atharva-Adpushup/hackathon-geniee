@@ -288,7 +288,8 @@ class Account extends Component {
 		});
 
 		const { adNetworkSettings = [] } = user;
-		const activeDFPName = this.getActiveDFPName(adNetworkSettings, activeDFPNetwork, activeDFP);
+		const activeDFPName =
+			this.getActiveDFPName(adNetworkSettings, activeDFPNetwork, activeDFP) || [];
 		const isDFPSetup = !!activeDFP;
 		const disableThirdPartyAdx = isDFPSetup && this.checkAdPushupGAM(activeDFP);
 
