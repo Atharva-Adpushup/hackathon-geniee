@@ -150,7 +150,7 @@ class Account extends Component {
 
 	handleAdsenseSave = () => {
 		const { adsensePubId } = this.state;
-		const { showNotification, updateUser, customProps, user } = this.props;
+		const { updateUser, customProps, user } = this.props;
 
 		const dataForAuditLogs = {
 			appName: customProps.appName,
@@ -185,7 +185,7 @@ class Account extends Component {
 	};
 
 	handleAdManagerSave = () => {
-		const { activeDFP, originalactiveDFP, isThirdPartyAdx, adsensePubId } = this.state;
+		const { activeDFP, originalactiveDFP, isThirdPartyAdx } = this.state;
 		const { showNotification, updateUser, customProps, user } = this.props;
 		const { adServerSettings = {} } = user;
 
@@ -255,6 +255,14 @@ class Account extends Component {
 			);
 	};
 
+	handleLineItemAutomation = () => {
+		const { lineItemAutomation, user } = this.props;
+		const { adNetworkSettings = [] } = user;
+		const integrationEmail = adNetworkSettings[1].userInfo.email;
+
+		return lineItemAutomation(integrationEmail);
+	};
+
 	render() {
 		const {
 			adsensePubId,
@@ -267,7 +275,7 @@ class Account extends Component {
 		} = this.state;
 
 		const { user, sites } = this.props;
-		const { adServerSettings } = user;
+		const { adServerSettings, adServerSetupStatus = null } = user;
 		const { dfp = {} } = adServerSettings;
 		const { activeDFPNetwork } = dfp;
 
@@ -276,7 +284,7 @@ class Account extends Component {
 		const apLiteSites = siteIds.filter(siteId => {
 			const site = sites[siteId];
 			const { apps = {} } = site;
-			if (apps.hasOwnProperty('apLite') && apps.apLite) return apps;
+			return !!apps.apLite;
 		});
 
 		const { adNetworkSettings = [] } = user;
@@ -391,22 +399,50 @@ class Account extends Component {
 					id="js-isThirdPartyAdx"
 					disabled={disableThirdPartyAdx}
 				/>
-				{isDFPSetup && originalactiveDFP !== null ? null : (
-					<CustomButton
-						variant="primary"
-						className="pull-right u-margin-l4 u-margin-b4"
-						onClick={this.handleAdManagerSave}
-					>
-						Sync Ad Manager
-					</CustomButton>
-				)}
-				<CustomButton
-					variant="primary"
-					className="pull-right u-margin-b4"
-					onClick={this.handleAdsenseSave}
-				>
-					Sync AdSense
-				</CustomButton>
+				<div className="account-sync-buttons">
+					<div>
+						{isDFPSetup && originalactiveDFP !== null ? null : (
+							<CustomButton
+								variant="primary"
+								className="pull-right u-margin-l4 u-margin-b4"
+								onClick={this.handleAdManagerSave}
+							>
+								Sync Ad Manager
+							</CustomButton>
+						)}
+						<CustomButton
+							variant="primary"
+							className="pull-right u-margin-b4"
+							onClick={this.handleAdsenseSave}
+						>
+							Sync AdSense
+						</CustomButton>
+					</div>
+					<div className="line-item-automation">
+						{activeDFPName.includes('103512698') ? null : (
+							<Fragment>
+								<p>
+									Line Item Automation
+									<a
+										href="https://www.notion.so/adpushup/TO-DO-Line-Items-in-GAM-77a677e28bc045e2aa817d745a214d6d"
+										target="_blank"
+										rel="noreferrer"
+									>
+										(Steps)
+									</a>
+								</p>
+								<CustomButton
+									variant="primary"
+									onClick={this.handleLineItemAutomation}
+									className="pull-right u-margin-b4"
+									disabled={adServerSetupStatus === 2}
+								>
+									Create Line Items
+								</CustomButton>
+							</Fragment>
+						)}
+					</div>
+				</div>
 			</Col>
 		);
 	}

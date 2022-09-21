@@ -768,6 +768,21 @@
 	}
 }
 
+.account-sync-buttons{
+	display:flex;
+	flex-direction: column;
+}
+
+.line-item-automation{
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+
+	p {
+		font-weight: 700;
+	}
+}
+
 .powered-by-adpushup {
 	display: flex;
 	flex-direction: row;

@@ -1,3 +1,4 @@
+const axios = require('axios');
 const express = require('express');
 const crypto = require('crypto');
 const Promise = require('bluebird');
@@ -29,6 +30,10 @@ const {
 const {
 	AUDIT_LOGS_ACTIONS: { OPS_PANEL, MY_SITES }
 } = CC;
+
+const {
+	RABBITMQ: { PUBLISHER_API: QUEUE_PUBLISHER_ADPUSHUP }
+} = config;
 
 const router = express.Router();
 
@@ -657,6 +662,29 @@ router
 					{
 						message: 'User Updated',
 						toUpdate: toSend
+					},
+					res
+				)
+			)
+			.catch(err => errorHandler(err, res, httpStatus.INTERNAL_SERVER_ERROR));
+	})
+	.post('/triggerLineItemSetup', (req, res) => {
+		const { email, originalEmail } = req.user;
+		const { integrationEmail } = req.body;
+		const apiBody = {
+			queue: 'LINE_ITEM_CONSUMER',
+			data: {
+				user_doc_email: email,
+				adops_email: originalEmail,
+				auth_user_email: integrationEmail
+			}
+		};
+		axios
+			.post(QUEUE_PUBLISHER_ADPUSHUP, apiBody)
+			.then(() =>
+				sendSuccessResponse(
+					{
+						message: 'Line Item Automation in Process'
 					},
 					res
 				)
