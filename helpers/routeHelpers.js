@@ -1142,6 +1142,9 @@ function getApTags(siteId) {
 			})
 		)
 		.catch(err => {
+			if (err.code === 13) {
+				return [];
+			}
 			console.log(err);
 			throw err;
 		});
