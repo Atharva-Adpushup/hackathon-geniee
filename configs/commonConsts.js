@@ -1286,7 +1286,8 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		});
 	  })();
 	  `,
-	AMP_PNP_REFRESH_SCRIPTS: `(function () {
+	AMP_PNP_REFRESH_SCRIPTS: `
+	(function () {
 		var LOG_EVENT = 'AMP_PNP_SETUP';
 		var sendDataToLoggerService = window.adpushup.utils.sendDataToLoggerService.bind(
 			window.adpushup.utils
@@ -1515,11 +1516,16 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 					return document.visibilityState == 'visible';
 				}
 	
+				function checkRefreshType(adUnit) {
+					let adUnitObject = AD_UNIT_MAPPING[adUnit];
+					return (adUnitObject && adUnitObject.refreshType) || (window.pnpRefresh && window.pnpRefresh.refreshType);
+				}
+	
 				function triggerReplace(slot, adUnit, REFRESH_INTERVAL = 0) {
 					var divId = slot.getSlotElementId();
 					var adUnitState = window.pnpRefresh.adUnitState[divId];
 					adUnitState.readyToRefresh = true;
-					var refreshType = window.pnpRefresh && window.pnpRefresh.refreshType;
+					var refreshType = checkRefreshType(adUnit);
 					switch (refreshType) {
 						case 'activeTab':
 							adUnitState.refreshTimeoutId = setTimeout(function () {
@@ -1539,7 +1545,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 	
 				function handleRefresh(divId, adUnit) {
 					if (Object.keys(window.pnpRefresh.adUnitState).indexOf(divId) !== -1) {
-						var refreshType = window.pnpRefresh && window.pnpRefresh.refreshType;
+						var refreshType = checkRefreshType(adUnit);
 						log('Refresh Type on Adunit', refreshType, adUnit);
 						var adUnitState = window.pnpRefresh.adUnitState[divId];
 						var slot = adUnitState.gSlot;
@@ -1637,6 +1643,6 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 				sendLogToApLogger('ERROR_GOOGLE_CMD', error);
 			}
 		});
-	})();
+	})();	
 	`
 };
