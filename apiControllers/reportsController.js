@@ -2,6 +2,7 @@ const express = require('express');
 const request = require('request-promise');
 const _ = require('lodash');
 const { v1: uuid } = require('uuid');
+const { GoogleSpreadsheet } = require('google-spreadsheet');
 
 const HTTP_STATUSES = require('../configs/httpStatusConsts');
 const { sendSuccessResponse, sendErrorResponse } = require('../helpers/commonFunctions');
@@ -17,6 +18,7 @@ const AdPushupError = require('../helpers/AdPushupError');
 const reportsAccess = require('../middlewares/reportsAuthorizationMiddleware.js');
 const reportsService = require('../apiServices/reportsService');
 const { appBucket } = require('../helpers/routeHelpers');
+const config = require('../configs/config');
 
 const router = express.Router();
 
@@ -503,8 +505,8 @@ router
 				return sendSuccessResponse(data[device], res, HTTP_STATUSES.OK);
 			})
 
-			.catch(() => {
-				return request({
+			.catch(() =>
+				request({
 					uri: CC.CORE_WEB_VITALS_API.uri,
 					json: true,
 					qs: {
@@ -625,8 +627,41 @@ router
 						}
 
 						return res.status(HTTP_STATUSES.INTERNAL_SERVER_ERROR).json({ error: err.message });
-					});
-			});
-	});
+					})
+			);
+	})
 
+	.post('/exportDataToGoogleSheet', async (req, res) => {
+		try {
+			const { csvData = [] } = req.body;
+
+			const doc = new GoogleSpreadsheet(CC.GOOGLE_SPREAD_SHEET_ID.REPORTING_DATA); // spreadsheet id
+
+			const creds = JSON.parse(Buffer.from(config.googleSheetCreds, 'base64').toString());
+
+			await doc.useServiceAccountAuth(creds);
+
+			await doc.loadInfo();
+
+			const worksheet = await doc.addSheet();
+
+			const header = csvData.shift();
+
+			// This is the header row.
+			await worksheet.setHeaderRow(header);
+
+			await worksheet.addRows(csvData);
+
+			return sendSuccessResponse(
+				{
+					message: 'data exported successfully',
+					googleSheetLink: `https://docs.google.com/spreadsheets/d/${CC.GOOGLE_SPREAD_SHEET_ID.REPORTING_DATA}/edit#gid=${worksheet.sheetId}`
+				},
+				res,
+				HTTP_STATUSES.OK
+			);
+		} catch (err) {
+			return sendErrorResponse({ message: err.message }, res, HTTP_STATUSES.BAD_REQUEST);
+		}
+	});
 module.exports = router;

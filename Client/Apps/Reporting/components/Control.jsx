@@ -6,7 +6,9 @@ import isEqual from 'lodash/isEqual';
 import moment from 'moment';
 import cloneDeep from 'lodash/cloneDeep';
 import Select from 'react-select';
+
 import { Glyphicon, Button } from '@/Client/helpers/react-bootstrap-imports';
+import CustomButton from '../../../Components/CustomButton';
 import AsyncGroupSelect from '../../../Components/AsyncGroupSelect/index';
 import PresetDateRangePicker from '../../../Components/PresetDateRangePicker/index';
 import SelectBox from '../../../Components/SelectBox/index';
@@ -80,7 +82,8 @@ class Control extends Component {
 			selectedFilterKey: null,
 			selectedFilterValues: null,
 			csvData,
-			fileName: 'adpushup-report'
+			fileName: 'adpushup-report',
+			isLoading: false
 		};
 		this.onMetricsListChange = this.onMetricsListChange.bind(this);
 		this.onChartListChange = this.onChartListChange.bind(this);
@@ -179,6 +182,30 @@ class Control extends Component {
 		const resultObject = this.getStateParams();
 		const { generateButtonHandler } = this.props;
 		generateButtonHandler(resultObject);
+	};
+
+	exportToGoogleSheet = async () => {
+		const { csvData } = this.state;
+		const { showNotification } = this.props;
+
+		this.setState({ isLoading: true });
+		return reportService
+			.getReportingDataInGoogleSheet(csvData)
+			.then(res => {
+				const { data: { googleSheetLink } = {} } = res.data;
+				this.setState({ isLoading: false });
+
+				window.open(googleSheetLink, '_blank');
+			})
+			.catch(err => {
+				this.setState({ isLoading: false });
+				return showNotification({
+					mode: 'error',
+					title: 'Error',
+					message: 'Unable to export data to google sheet',
+					autoDismiss: 5
+				});
+			});
 	};
 
 	getStateParams = () => {
@@ -416,7 +443,8 @@ class Control extends Component {
 			selectedReportName,
 			updateReportName,
 			isHB,
-			filterList
+			filterList,
+			user: { data: { isSuperUser = false } = {} } = {}
 		} = this.props;
 		const { scheduleOptions: { startDate, endDate, interval } = {}, type: selectedReportType } =
 			selectedReport || {};
@@ -651,7 +679,8 @@ class Control extends Component {
 							Generate Report
 						</Button>
 					</div>
-					<div className="aligner-item ">
+
+					<div className="aligner-item u-margin-r2">
 						<CSVLink
 							data={state.csvData}
 							filename={`${state.fileName}.csv`}
@@ -665,6 +694,21 @@ class Control extends Component {
 							Export Report
 						</CSVLink>
 					</div>
+
+					{isSuperUser && (
+						<div className="aligner-item u-margin-r2">
+							<CustomButton
+								type="button"
+								variant="secondary"
+								className="pull-right gs-btn"
+								showSpinner={state.isLoading}
+								// disabled={!hasUnsavedChanges}
+								onClick={this.exportToGoogleSheet}
+							>
+								Export To Google Sheet
+							</CustomButton>
+						</div>
+					)}
 				</div>
 				{isHB || selectedReportType === 'frequentReport' ? null : (
 					<Schedule
