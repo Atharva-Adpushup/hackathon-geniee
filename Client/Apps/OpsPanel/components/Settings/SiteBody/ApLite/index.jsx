@@ -1,7 +1,12 @@
+/* eslint-disable react/destructuring-assignment */
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable guard-for-in */
+/* eslint-disable no-param-reassign */
+/* eslint-disable array-callback-return */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/label-has-for */
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import Papa from 'papaparse';
 import uuid from 'uuid';
 import isEqual from 'lodash/isEqual';
@@ -64,6 +69,7 @@ class ApLite extends Component {
 				adRefresh: false,
 				isRefreshButtonDisabled: true
 			};
+			// eslint-disable-next-line no-else-return
 		} else return { ...currentState, isRefreshButtonDisabled: false };
 	}
 
@@ -71,18 +77,25 @@ class ApLite extends Component {
 		const { site: { apps: { pnp: previousPnpToggle = false } = {} } = {} } = prevProps;
 		const { site: { apps: { pnp: currentPnpToggle = false } = {}, siteId } = {} } = this.props;
 		if (previousPnpToggle !== currentPnpToggle) {
-			return axiosInstance
-				.get(`ops/ap-lite/${siteId}`)
-				.then(res => {
-					const {
-						data: { adUnits }
-					} = res.data;
-					this.setSatesFromAdUnits(adUnits);
-				})
-				.catch(err => this.setState({ isError: true }));
+			return (
+				axiosInstance
+					.get(`ops/ap-lite/${siteId}`)
+					.then(res => {
+						const {
+							data: { adUnits }
+						} = res.data;
+						this.setSatesFromAdUnits(adUnits);
+					})
+					// eslint-disable-next-line no-unused-vars
+					.catch(err => {
+						this.setState({ isError: true });
+					})
+			);
 		}
+		return null;
 	}
 
+	// eslint-disable-next-line react/sort-comp
 	handleReset = () => this.setState(DEFAULT_STATE);
 
 	handleSelect = value => {
@@ -93,15 +106,20 @@ class ApLite extends Component {
 			activeKey: value
 		});
 
-		return axiosInstance
-			.get(`ops/ap-lite/${siteId}`)
-			.then(res => {
-				const {
-					data: { adUnits }
-				} = res.data;
-				this.setSatesFromAdUnits(adUnits);
-			})
-			.catch(err => this.setState({ isError: true }));
+		return (
+			axiosInstance
+				.get(`ops/ap-lite/${siteId}`)
+				.then(res => {
+					const {
+						data: { adUnits }
+					} = res.data;
+					this.setSatesFromAdUnits(adUnits);
+				})
+				// eslint-disable-next-line no-unused-vars
+				.catch(err => {
+					this.setState({ isError: true });
+				})
+		);
 	};
 
 	setSatesFromAdUnits = adUnits => {
@@ -140,27 +158,28 @@ class ApLite extends Component {
 	};
 
 	stateToReturn = (prop, value, defaultState, adUnits) => {
+		const defaultStateTemp = defaultState;
 		if (prop === 'headerBidding') {
-			defaultState.headerBidding = !!value;
-			defaultState.selectedAdUnitCodeForHB = value
+			defaultStateTemp.headerBidding = !!value;
+			defaultStateTemp.selectedAdUnitCodeForHB = value
 				? adUnits.map(({ dfpAdunitCode }) => dfpAdunitCode)
 				: [];
 		}
 		if (prop === 'adRefresh') {
-			defaultState.refreshSlot = !!value;
-			defaultState.selectedAdUnitCodeForAdRefresh = value
+			defaultStateTemp.refreshSlot = !!value;
+			defaultStateTemp.selectedAdUnitCodeForAdRefresh = value
 				? adUnits.map(({ dfpAdunitCode }) => dfpAdunitCode)
 				: [];
 		}
 
 		if (prop === 'selectAllFormats') {
-			defaultState.selectAllFormats = !!value;
-			defaultState.selectedAdUnitCodeForVideoFormat = value
+			defaultStateTemp.selectAllFormats = !!value;
+			defaultStateTemp.selectedAdUnitCodeForVideoFormat = value
 				? adUnits.map(({ dfpAdunitCode }) => dfpAdunitCode)
 				: [];
 		}
 
-		return defaultState;
+		return defaultStateTemp;
 	};
 
 	handleToggle = (value, event) => {
@@ -247,6 +266,7 @@ class ApLite extends Component {
 			},
 			this.handleFileSelect
 		);
+		return null;
 	};
 
 	handleFileSelect = () => {
@@ -257,6 +277,7 @@ class ApLite extends Component {
 		const adUnitMap = {};
 		let parentAdUnitError = false;
 
+		// eslint-disable-next-line react/destructuring-assignment
 		Papa.parse(this.state.file, {
 			delimiter: '',
 			chunkSize: 3,
@@ -330,8 +351,6 @@ class ApLite extends Component {
 			oldAdUnits,
 			uploadedAdUnits,
 			fileName,
-			adRefresh,
-			headerBidding,
 			selectedRefreshRate,
 			selectedAdUnitOperation,
 			selectedAdUnitCodeActive
@@ -403,41 +422,44 @@ class ApLite extends Component {
 		);
 		this.setState({ isLoading: true });
 
-		return axiosInstance
-			.put(`/ops/ap-lite/${siteId}`, {
-				adUnits,
-				dataForAuditLogs: {
-					...dataForAuditLogs,
-					actionInfo: `Updated AP Lite`
-				}
-			})
-			.then(res => {
-				const {
-					data: { adUnits }
-				} = res.data;
+		return (
+			axiosInstance
+				.put(`/ops/ap-lite/${siteId}`, {
+					adUnits,
+					dataForAuditLogs: {
+						...dataForAuditLogs,
+						actionInfo: `Updated AP Lite`
+					}
+				})
+				.then(res => {
+					const {
+						// eslint-disable-next-line no-shadow
+						data: { adUnits }
+					} = res.data;
 
-				showNotification({
-					mode: 'success',
-					title: 'Success',
-					message: 'Settings saved successsfully',
-					autoDismiss: 5
-				});
+					showNotification({
+						mode: 'success',
+						title: 'Success',
+						message: 'Settings saved successsfully',
+						autoDismiss: 5
+					});
 
-				this.setSatesFromAdUnits(adUnits);
-				this.handleReset();
-			})
-			.catch(err => {
-				showNotification({
-					mode: 'error',
-					title: 'Operation Failed',
-					message: 'Something went wrong',
-					autoDismiss: 5
-				});
-				console.log(err);
-			});
+					this.setSatesFromAdUnits(adUnits);
+					this.handleReset();
+				})
+				// eslint-disable-next-line no-unused-vars
+				.catch(err => {
+					showNotification({
+						mode: 'error',
+						title: 'Operation Failed',
+						message: 'Something went wrong',
+						autoDismiss: 5
+					});
+				})
+		);
 	};
 
-	getHbStatus(setupStatus) {
+	getHbStatus = setupStatus => {
 		const { dfpConnected, biddersFound, adServerSetupStatus, isPublisherActiveDfp } = setupStatus;
 		if (dfpConnected && biddersFound && adServerSetupStatus === 2 && isPublisherActiveDfp) {
 			return 'Complete';
@@ -446,16 +468,16 @@ class ApLite extends Component {
 			return 'HB Setup Complete(No Bidders Active)';
 		}
 		return 'Pending';
-	}
+	};
 
-	getNetworkName(adNetworkSettings, activeDFPNetworkId) {
+	getNetworkName = (adNetworkSettings, activeDFPNetworkId) => {
 		const dfPNetworkNameField = adNetworkSettings.find(val => val.networkName === 'DFP') || {};
 		const { dfpAccounts = [] } = dfPNetworkNameField;
 		const matchDfpAccount =
 			dfpAccounts.find(val => val.code === activeDFPNetworkId.toString()) || {};
 
 		return matchDfpAccount.name || '';
-	}
+	};
 
 	gamAdUnitsLabel = () => (
 		<React.Fragment>
@@ -499,7 +521,7 @@ class ApLite extends Component {
 	};
 
 	handleActiveChange = (e, adunitCode) => {
-		const { selectedAdUnitCodeActive, selectedAdUnitCodeForHB } = this.state;
+		const { selectedAdUnitCodeActive } = this.state;
 		if (e.target.checked) {
 			selectedAdUnitCodeActive.push(adunitCode);
 		} else {
@@ -537,6 +559,22 @@ class ApLite extends Component {
 			structuredAdUnits,
 			adRefresh: selectedAdUnitCodeForAdRefresh.length === adUnits.length
 		});
+	};
+
+	adUnitsDownload = () => {
+		let uploadedAdUnits;
+		const { structuredAdUnits } = this.state;
+		const oldAdUnitsTemp = this.state.oldAdUnits;
+		const uploadedAdUnitsTemp = this.state.uploadedAdUnits;
+
+		if (structuredAdUnits.length) {
+			uploadedAdUnits = structuredAdUnits;
+		} else if (!structuredAdUnits.length && uploadedAdUnitsTemp.length) {
+			uploadedAdUnits = uploadedAdUnitsTemp;
+		} else {
+			uploadedAdUnits = oldAdUnitsTemp;
+		}
+		return uploadedAdUnits;
 	};
 
 	handleVideoChange = (e, adunitCode) => {
@@ -702,7 +740,8 @@ class ApLite extends Component {
 		const hbStatus = this.getHbStatus(setupStatus);
 
 		const activeDFPNetworkId =
-			adServerSettings.hasOwnProperty('dfp') && dfp.hasOwnProperty('activeDFPNetwork')
+			Object.prototype.hasOwnProperty.call(adServerSettings, 'dfp') &&
+			Object.prototype.hasOwnProperty.call(dfp, 'activeDFPNetwork')
 				? activeDFPNetwork
 				: null;
 
@@ -712,6 +751,7 @@ class ApLite extends Component {
 				: ''
 			: null;
 
+		const downloadedAdUnits = this.adUnitsDownload();
 		return (
 			<div>
 				<FieldGroup
@@ -821,10 +861,16 @@ class ApLite extends Component {
 								/>
 							</div>
 						) : null}
-
-						<CustomButton variant="primary" bsSize="large" onClick={this.showUploadedAdUnits}>
-							Show Uploaded Ad Units
-						</CustomButton>
+						<div style={{ display: 'block' }}>
+							<CustomButton variant="primary" bsSize="large" onClick={this.showUploadedAdUnits}>
+								Show Uploaded Ad Units
+							</CustomButton>{' '}
+							<CSVLink data={downloadedAdUnits} filename="UploadedAdUnits">
+								<CustomButton variant="primary" bsSize="large">
+									Download Uploaded Ad Units
+								</CustomButton>
+							</CSVLink>
+						</div>
 						{this.renderModal()}
 					</React.Fragment>
 				) : null}
