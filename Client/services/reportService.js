@@ -26,5 +26,7 @@ export default {
 	updateSavedAndFrequentReports: reportConfig =>
 		axiosInstance.patch(`/reports/${reportConfig.id}`, reportConfig),
 	getCorewebVitalsdata: params => axiosInstance.get('/reports/getCoreWebVitals', { params }),
-	getPaymentHistory: params => axiosInstance.get('/reports/getPaymentHistory', { params })
+	getPaymentHistory: params => axiosInstance.get('/reports/getPaymentHistory', { params }),
+	getReportingDataInGoogleSheet: csvData =>
+		axiosInstance.post('/reports/exportDataToGoogleSheet', { csvData })
 };

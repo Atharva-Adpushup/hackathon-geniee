@@ -162,6 +162,7 @@ class DateRangePickerWrapper extends React.Component {
 							}}
 							isSearchable
 							isClearable
+							menuPlacement="auto"
 							placeholder="Select Duration"
 							className="saved-reports-select custom-select-box-wrapper presetDropdown"
 						/>

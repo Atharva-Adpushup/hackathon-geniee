@@ -187,7 +187,7 @@ async function prepareDataForAlerts() {
 
 	const csvData = generateCSVFormatData(res);
 
-	const doc = new GoogleSpreadsheet(CC.GOOGLE_SPREAD_SHEET_ID); //spreadsheet id
+	const doc = new GoogleSpreadsheet(CC.GOOGLE_SPREAD_SHEET_ID.CLS_MONITORING); //spreadsheet id
 
 	const creds = JSON.parse(Buffer.from(config.googleSheetCreds, 'base64').toString());
 
@@ -205,7 +205,7 @@ async function prepareDataForAlerts() {
 	// write values to the sheet
 	await worksheet.addRows(csvData);
 
-	const spreadSheetLink = `https://docs.google.com/spreadsheets/d/${CC.GOOGLE_SPREAD_SHEET_ID}/edit#gid=0`;
+	const spreadSheetLink = `https://docs.google.com/spreadsheets/d/${CC.GOOGLE_SPREAD_SHEET_ID.CLS_MONITORING}/edit#gid=0`;
 
 	const tableFormatData = `<html>
 		<body>
