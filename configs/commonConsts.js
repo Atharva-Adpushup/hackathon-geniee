@@ -88,7 +88,10 @@ module.exports = {
 		}
 	},
 
-	GOOGLE_SPREAD_SHEET_ID: '1ju3NvLOBOqUEMzX1AfqKnQtLvB28hjS1-S1mJmOh6fI',
+	GOOGLE_SPREAD_SHEET_ID: {
+		CLS_MONITORING: '1ju3NvLOBOqUEMzX1AfqKnQtLvB28hjS1-S1mJmOh6fI',
+		REPORTING_DATA: '1LJELLTJxJDPjlz07A7gTvvo59jQI_kLolyyUM89Df2M'
+	},
 
 	AD_UNIT_TYPE_MAPPING: {
 		DISPLAY: 1,
@@ -916,7 +919,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		user: 'AdPushup',
 		password: 'DVBynj73fmfg'
 	},
-	WIDGET_AUTH_EXCLUDED_PATH: ['/site/report?report_name=peer_performance_report'],	
+	WIDGET_AUTH_EXCLUDED_PATH: ['/site/report?report_name=peer_performance_report'],
 	PNP_REFRESH_SCRIPTS: `(function () {
 		var PROXY_SITE_ID = window.pnpRefresh.pnpSiteId;
 		// var flag = false;

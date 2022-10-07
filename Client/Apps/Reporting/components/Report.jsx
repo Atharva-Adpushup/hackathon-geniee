@@ -833,7 +833,7 @@ class Report extends Component {
 
 		// merge if record count is same
 		if (csvData.length === csvDataXPath.length) {
-			csvData = csvData.map((row, index) => row.concat(csvDataXPath[index].slice(1)));
+			csvData = csvData.map((row, index) => row.concat(csvDataXPath[index].slice(2)));
 		}
 		this.setState({ csvData });
 	};
