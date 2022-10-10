@@ -16,13 +16,14 @@ class Database {
         return new Promise(async (resolve, reject) => {
             try {
                 if(!this.cluster) {
-                    this.cluster = new couchbase.Cluster(`${this.host}:${this.port}?detailed_errcodes=1`);
+                    this.cluster = new couchbase.Cluster(`couchbase://${this.host}?detailed_errcodes=1`);
                     this.cluster.authenticate(this.username, this.password);
                 }
                 if(!this.bucket) {
                     this.bucket = this.cluster.openBucket(this.bucketName, err => {
                         return reject(err);
                     });
+                    //this.bucket.operationTimeout = 120 * 1000
                 }
                 return resolve(true);
             } catch(ex) {

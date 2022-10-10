@@ -2,6 +2,11 @@ const getLogger = require('./Logger');
 const Database = require('./db');
 const ServiceStatus = require('./serviceStatus');
 const Promise = require('bluebird');
+const axios = require('axios');
+const utils = require('./utils');
+const _ = require('lodash');
+const fs = require('fs');
+const { uploadToCDN } = require('node-utils');
 const { sendEmail } = require('../../helpers/queueMailer');
 const {
 	serviceStatusPingDelayMs,
@@ -9,7 +14,10 @@ const {
 	serviceStatusDb: serviceStatusDbConfig,
 	appName,
 	dfpApiVersion,
-	db: dbConfig
+	db: dbConfig,
+	azureBlobStorage,
+	rabbitMQ,
+	Geniee
 } = require('./config');
 
 const {
@@ -42,7 +50,7 @@ const dfpAuthConfig = {
 	redirect_url: ADPUSHUP_OAUTH_CALLBACK
 };
 
-const LINE_ITEM_SERVICE_EMAIL_SUBJECT = "Line Item Service Notification";
+const LINE_ITEM_SERVICE_EMAIL_SUBJECT = 'Line Item Service Notification';
 
 const LineItemsService = require('./LineItemsService');
 
@@ -70,9 +78,9 @@ const getLineItems = async (lineItemsService, type, hbOrderIds) => {
 			let hbLineItems = [];
 			lineItemsObjects.forEach(lineItem => {
 				if (lineItem.isHb) {
-					hbLineItems.push(lineItem.id);
+					hbLineItems.push({ id: lineItem.id, totalImpressions: lineItem.totalImpressions });
 				} else {
-					nonHbLineItems.push(lineItem.id);
+					nonHbLineItems.push({ id: lineItem.id, totalImpressions: lineItem.totalImpressions });
 				}
 			});
 			nonHbResults = [...nonHbResults, ...nonHbLineItems];
@@ -87,6 +95,149 @@ const getLineItems = async (lineItemsService, type, hbOrderIds) => {
 	}
 };
 
+const getMandatoryandSeperatelyGroupedLineItems = allLineItems => {
+	let lineItems = [],
+		seperatelyGroupedLineItems = {};
+	//Line Item types used in script(adpushup.js)
+	const mandatoryLineItemTypes = LINE_ITEM_TYPES_OBJ.filter(
+		type => type.isMandatory && !type.groupedSeparately
+	).map(type => type.value); // HB lineitems are to be kept separately
+
+	const separatelyGroupedLineItemTypes = LINE_ITEM_TYPES_OBJ.filter(
+		type => type.groupedSeparately
+	).map(type => type.value);
+
+	mandatoryLineItemTypes.forEach(type => {
+		if (allLineItems && Array.isArray(allLineItems[type]) && allLineItems[type].length) {
+			lineItems = lineItems.concat(allLineItems[type]);
+		}
+	});
+
+	separatelyGroupedLineItemTypes.forEach(type => {
+		if (allLineItems && Array.isArray(allLineItems[type]) && allLineItems[type].length) {
+			seperatelyGroupedLineItems[type] = allLineItems[type];
+		}
+	});
+
+	return { lineItems, seperatelyGroupedLineItems };
+};
+
+const getAllLineItemsForScript = allLineItems => {
+	const { lineItems, seperatelyGroupedLineItems } = getMandatoryandSeperatelyGroupedLineItems(
+		allLineItems
+	);
+	let combinedLineItems = [...lineItems];
+	for (var type in Object.keys(seperatelyGroupedLineItems)) {
+		combinedLineItems.concat(seperatelyGroupedLineItems[type]);
+	}
+	return combinedLineItems;
+};
+
+const checkIfAnyChangeInLineItems = (fetchedLineItems, savedLineItemsHash) => {
+	const accumulatedLineItems = getAllLineItemsForScript(fetchedLineItems),
+		fetchedLineItemsHash = utils.getHash(JSON.stringify(accumulatedLineItems));
+	return fetchedLineItemsHash !== savedLineItemsHash;
+};
+
+const processLineItems = lineItems => {
+	let fetchedLineItems = {},
+		fallbackLineItems = [];
+	for (let result of lineItems) {
+		if (result.type === 'PRICE_PRIORITY') {
+			fallbackLineItems.push(...result.hbResults, ...result.nonHbResults);
+			result.hbResults = result.hbResults.map(lineItem => lineItem.id);
+			fetchedLineItems['HEADER_BIDDING'] = result.hbResults;
+		} else if (
+			result.type === 'AD_EXCHANGE' &&
+			result.nonHbResults &&
+			result.nonHbResults.length > 0
+		) {
+			fallbackLineItems.push(...result.nonHbResults);
+		}
+		result.nonHbResults = result.nonHbResults.map(lineItem => lineItem.id);
+		fetchedLineItems[result.type] = result.nonHbResults;
+	}
+	fallbackLineItems = fallbackLineItems.sort(lineItemsSortFunc); //sort as per total impressions in last seven days
+	fallbackLineItems = fallbackLineItems
+		.slice(0, 20)
+		.map(lineItem => parseInt(lineItem.id))
+		.sort()
+		.map(lineItem => lineItem.toString());
+	return { fetchedLineItems, fallbackLineItems };
+};
+
+const uploadLineItemsFileToCDN = async (fileName, data) => {
+	const config = {
+		containerName: azureBlobStorage.containerName,
+		fileName: fileName,
+		data: data,
+		queuePublishEndpoint: rabbitMQ.PUBLISHER_API,
+		queue: rabbitMQ.CDN_ORIGIN.NAME_IN_QUEUE_PUBLISHER_SERVICE
+	};
+
+	return await uploadToCDN(azureBlobStorage.connectionString, config);
+};
+
+const processfetchedLineItems = async (lineItems, networkCode = '103512698') => {
+	try {
+		let siteSyncRequired = false,
+			doc = await db.getDoc(`ntwk::${networkCode}`);
+
+		// Update structure of the ntwk doc if it is still old
+		if (!doc || !LINE_ITEM_TYPES.every(type => type in doc.lineItems)) {
+			doc = { networkCode: networkCode, lastUpdated: +new Date() };
+			doc.lineItems = LINE_ITEM_TYPES.reduce((accumulator, type) => {
+				accumulator[type] = [];
+				return accumulator;
+			}, {});
+		}
+
+		const { fetchedLineItems, fallbackLineItems } = processLineItems(lineItems),
+			lineItemsUpdated = doc.accumulatedLineItemsHash
+				? checkIfAnyChangeInLineItems(fetchedLineItems, doc.accumulatedLineItemsHash)
+				: true,
+			fallbackLineItemsHash = utils.getHash(JSON.stringify(fallbackLineItems)),
+			fallbackLineItemsUpdated = doc.fallbackLineItemsHash
+				? fallbackLineItemsHash !== doc.fallbackLineItemsHash
+				: true;
+
+		if (fallbackLineItemsUpdated) {
+			doc.fallbackLineItems = fallbackLineItems;
+			doc.fallbackLineItemsHash = fallbackLineItemsHash;
+			siteSyncRequired = true;
+		}
+		if (lineItemsUpdated) {
+			const lineItemsFileName = `lineItems/li.${networkCode}.${new Date().getTime()}.json`,
+				accumulatedLineItems = getAllLineItemsForScript(fetchedLineItems),
+				fetchedLineItemsHash = utils.getHash(JSON.stringify(accumulatedLineItems));
+			siteSyncRequired = true;
+
+			if (!doc.lineItems) doc.lineItems = {};
+			for (let type of Object.keys(fetchedLineItems)) {
+				doc.lineItems[type] = fetchedLineItems[type];
+			}
+
+			await uploadLineItemsFileToCDN(
+				lineItemsFileName,
+				getMandatoryandSeperatelyGroupedLineItems(fetchedLineItems)
+			);
+
+			doc.lineItemsFileName = lineItemsFileName;
+			doc.accumulatedLineItemsHash = fetchedLineItemsHash;
+		}
+		// Update last updated timestamp
+		doc.lastUpdated = +new Date();
+
+		let dbResult = await db.upsertDoc(`ntwk::${networkCode}`, doc);
+		if (dbResult instanceof Error) {
+			throw dbResult;
+		}
+
+		return { lineItems, siteSyncRequired };
+	} catch (e) {
+		console.error(e);
+	}
+};
 const updateLineItemsForNetwork = async (dfpConfig, hbOrderIds) => {
 	try {
 		const lineItemsService = new LineItemsService(dfpConfig, logger);
@@ -104,41 +255,40 @@ const updateLineItemsForNetwork = async (dfpConfig, hbOrderIds) => {
 		// Get Failed promises
 		let failedTypes = promises.reduce((accumulator, promise) => {
 			if (promise.isRejected()) {
-				const {type, error} = promise.error();
+				const { type, error } = promise.error();
 				accumulator[type] = error;
 			}
 			return accumulator;
 		}, {});
-		let doc = await db.getDoc(`ntwk::${dfpConfig.networkCode}`);
-		// Update structure of the ntwk doc if its still old
-		if (!doc || !LINE_ITEM_TYPES.every(type => type in doc.lineItems)) {
-			doc = { networkCode: dfpConfig.networkCode, lastUpdated: +new Date() };
-			doc.lineItems = LINE_ITEM_TYPES.reduce((accumulator, type) => {
-				accumulator[type] = [];
-				return accumulator;
-			}, {});
-		}
-		// Replace each key with newly fetched lineitems array
-		for (let result of results) {
-            doc.lineItems[result.type] = result.nonHbResults;
-            if (result.type === "PRICE_PRIORITY") {
-                doc.lineItems["HEADER_BIDDING"] = result.hbResults;
-            }
-        }
-		// Update last updated timestamp
-		doc.lastUpdated = +new Date();
-		let dbResult = await db.upsertDoc(`ntwk::${dfpConfig.networkCode}`, doc);
-		if (dbResult instanceof Error) {
-			throw dbResult;
+
+		let { lineItems, siteSyncRequired } = await processfetchedLineItems(
+			results,
+			dfpConfig.networkCode
+		);
+
+		if (siteSyncRequired) {
+			const requestSettings = {
+				method: 'GET',
+				url: Geniee.endpoint + Geniee.GAMSiteSync,
+				headers: {
+					'Content-Type': 'application/json; charset=utf-8'
+				},
+				data: {
+					networkCode: dfpConfig.networkCode
+				}
+			};
+
+			await axios(requestSettings).catch(error => {
+				return { error: `failed to sync sites for GAM ${dfpConfig.networkCode}: ${error}` };
+			});
 		}
 
 		// Get the total number of lineItems fetched across all types
-		const updatedCount = results.reduce((accumulator, result) => {
+		const updatedCount = lineItems.reduce((accumulator, result) => {
 			accumulator += result.updatedCount;
 			return accumulator;
 		}, 0);
-
-		return {updatedCount, failedTypes};
+		return { updatedCount, failedTypes };
 	} catch (ex) {
 		logger.error({ message: 'Error updating adpushup network lineitems', debugData: { ex } });
 		throw ex;
@@ -178,10 +328,13 @@ const updateLineItemsForThirdPartyDfps = async () => {
 				}
 				dfpConfig.refresh_token = refreshToken;
 				dfpConfig.networkCode = networkId;
-                const {updatedCount, failedTypes} = await updateLineItemsForNetwork(dfpConfig, hbOrderIds);
+				const { updatedCount, failedTypes } = await updateLineItemsForNetwork(
+					dfpConfig,
+					hbOrderIds
+				);
 				if (Object.keys(failedTypes).length > 0) {
 					errors[networkId] = failedTypes;
-				} 
+				}
 				logger.info({
 					message: `updated ${updatedCount} lineItems for ntwk::${dfpConfig.networkCode}`
 				});
@@ -195,7 +348,7 @@ const updateLineItemsForThirdPartyDfps = async () => {
 				logger.error({ message: errors[networkId].message, debugData: { ex: errors[networkId] } });
 			}
 		}
-		return {totalLineItemsUpdated, errors};
+		return { totalLineItemsUpdated, errors };
 	} catch (ex) {
 		logger.error({ message: 'updateLineItemsForThirdPartyDfps::ERROR', debugData: { ex } });
 		throw ex;
@@ -234,25 +387,33 @@ async function runService() {
 		}
 		await serviceStatus.startServiceStatusPing();
 		logger.info({ message: 'Updating adPushup Dfp' });
-		const {updatedCount: adpushupLineItemsUpdated, failedTypes: adpushupFailedTypes} = await updateLineItemsForAdPushupDfp();
-		
+		const {
+			updatedCount: adpushupLineItemsUpdated,
+			failedTypes: adpushupFailedTypes
+		} = await updateLineItemsForAdPushupDfp();
+
 		logger.info({ message: `updated ${adpushupLineItemsUpdated} line items for adPushup dfp` });
 
 		logger.info({ message: 'Updating thirdParty Dfps' });
-		const  {totalLineItemsUpdated: totalThirdPartyLineItemsUpdated, errors: thirdPartyErrors} = await updateLineItemsForThirdPartyDfps();
-		
-		totalErrors = {...thirdPartyErrors};
-		if(Object.keys(adpushupFailedTypes).length) {
+		const {
+			totalLineItemsUpdated: totalThirdPartyLineItemsUpdated,
+			errors: thirdPartyErrors
+		} = await updateLineItemsForThirdPartyDfps();
+		totalErrors = { ...thirdPartyErrors };
+		if (Object.keys(adpushupFailedTypes).length) {
 			totalErrors[ADPUSHUP_DFP_NETWORK_CODE] = adpushupFailedTypes;
 		}
-		logger.info({ message: `updated ${totalThirdPartyLineItemsUpdated} line items for 3rd party dfps` });
-		
+		logger.info({
+			message: `updated ${totalThirdPartyLineItemsUpdated} line items for 3rd party dfps`
+		});
 		// Send Email on completion
 		sendEmail({
-			queue: "MAILER",
+			queue: 'MAILER',
 			data: {
 				to: lineItemServiceAlerts,
-				body: `LineItemService finished. <br />AdPushup LineItems updated: ${adpushupLineItemsUpdated} <br />ThirdParty LineItems Updated: ${totalThirdPartyLineItemsUpdated} <br/> Network Codes with errors: ${Object.keys(totalErrors)}`,
+				body: `LineItemService finished. <br />AdPushup LineItems updated: ${adpushupLineItemsUpdated} <br />ThirdParty LineItems Updated: ${totalThirdPartyLineItemsUpdated} <br/> Network Codes with errors: ${Object.keys(
+					totalErrors
+				)}`,
 				subject: LINE_ITEM_SERVICE_EMAIL_SUBJECT
 			}
 		});
@@ -262,7 +423,7 @@ async function runService() {
 		totalErrors = ex.stack;
 		// Send Email on failure
 		sendEmail({
-			queue: "MAILER",
+			queue: 'MAILER',
 			data: {
 				to: lineItemServiceAlerts,
 				body: `LineItemService Errored. <br/>Error: ${ex.stack}`,
@@ -273,6 +434,10 @@ async function runService() {
 	} finally {
 		await serviceStatus.stopServiceStatusPing(totalErrors);
 	}
+}
+
+function lineItemsSortFunc(a, b) {
+	return a.totalImpressions > b.totalImpressions ? -1 : 1;
 }
 
 module.exports = runService;

@@ -321,10 +321,20 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 				if (isAdPartner) {
 					apConfigs.partner = site.get('partner');
 				}
+				if (
+					apConfigs.useLineItemsFile &&
+					adNetworkConfig.useLineItemFile &&
+					adNetworkConfig.lineItemsFileName &&
+					adNetworkConfig.fallbackLineItems
+				) {
+					apConfigs.lineItemsFileName = adNetworkConfig.lineItemsFileName;
+					apConfigs.fallbackLineItems = adNetworkConfig.fallbackLineItems;
+				} else {
+					apConfigs.lineItems = (adNetworkConfig && adNetworkConfig.lineItems) || [];
+					apConfigs.separatelyGroupedLineItems =
+						(adNetworkConfig && adNetworkConfig.separatelyGroupedLineItems) || [];
+				}
 
-				apConfigs.lineItems = (adNetworkConfig && adNetworkConfig.lineItems) || [];
-				apConfigs.separatelyGroupedLineItems =
-					(adNetworkConfig && adNetworkConfig.separatelyGroupedLineItems) || [];
 				apConfigs.autoOptimise = !!isAutoOptimise;
 				apConfigs.poweredByBanner = poweredByBanner;
 				if (shouldDeductApShareFromHb) {
@@ -417,12 +427,15 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 			const setAdNetworkConfig = function(prebidAndAdsConfig) {
 				const blockListedLineItems = site.get('blockListedLineItems') || [];
 				const activeDFPNetwork = getActiveDfpNetworkCode(user);
-
+				const apConfigs = site.get('apConfigs');
+				const useLineItemsFile = !!(apConfigs && apConfigs.useLineItemsFile);
 				if (activeDFPNetwork) {
 					return generateAdNetworkConfig(
 						activeDFPNetwork,
 						lineItemTypes,
-						blockListedLineItems
+						blockListedLineItems,
+						useLineItemsFile,
+						true
 					).then(adNetworkConfig => ({
 						...prebidAndAdsConfig,
 						blockListedLineItems,
