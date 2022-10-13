@@ -934,6 +934,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		var log = window.adpushup.utils.log.bind(window.adpushup.utils);
 		var checkElementInViewPercent =
 		  window.adpushup.utils.checkElementInViewPercent.bind(window.adpushup.utils);
+		var cssescape=window.adpushup.utils.cssescape.bind(window.adpushup.utils);
 		var lineItems = window.pnpRefresh.lineItems || [];
 		var blacklistedLineItems = window.pnpRefresh.blacklistedLineItems || [];
 		var googletag = window.googletag || {};
@@ -1014,7 +1015,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		  // Init AdUnitState for Active View Refresh
 		  function initAdUnitState(slot) {
 			var divId = slot.getSlotElementId();
-			var el = window.adpushup.$("#" + divId);
+			var el = window.adpushup.$("#"+cssescape(divId));
 			var height = el.height();
 			var width = el.width();
 			return {
@@ -1037,7 +1038,9 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		  // Active view checkinviewandrefresh
 		  function checkInViewAndRefresh(slot, adUnit) {
 			var divId = slot.getSlotElementId();
-			var elementInView = checkElementInViewPercent("#" + divId);
+			var elementInView = checkElementInViewPercent(
+				"#"+cssescape(divId)
+			  );
 			if (elementInView) {
 			  // window.pnpRefresh.adUnitState[divId] = resetadUnitState(slot);
 			  replaceSlot(slot, adUnit);
@@ -1221,7 +1224,9 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 				} else {
 				  if (refreshType === "activeView") {
 					window.pnpRefresh.adUnitState[slotId] = initAdUnitState(e.slot);
-					var elementInView = checkElementInViewPercent("#" + slotId);
+					var elementInView = checkElementInViewPercent(
+						"#"+cssescape(slotId)
+					  );
 					if (elementInView) {
 					  window.pnpRefresh.adUnitState[slotId].viewable = true;
 					  if (!window.pnpRefresh.adUnitState[slotId].viewedOnce) {
