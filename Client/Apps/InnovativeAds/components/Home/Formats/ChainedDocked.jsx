@@ -60,7 +60,8 @@ class ChainedDocked extends Component {
 			adjustSpaceAvailableByPercentage: hasFormatData
 				? ad.formatData.adjustSpaceAvailableByPercentage
 				: 0,
-			ignoreXpathElementHeight: hasFormatData ? ad.formatData.ignoreXpathElementHeight : false
+			ignoreXpathElementHeight: hasFormatData ? ad.formatData.ignoreXpathElementHeight : false,
+			pairChainedDockedAds: hasFormatData ? ad.formatData.pairChainedDockedAds : false
 		};
 		this.handleChange = this.handleChange.bind(this);
 		this.handleCodeChange = this.handleCodeChange.bind(this);
@@ -149,7 +150,8 @@ class ChainedDocked extends Component {
 			spaceBufferInMultiples,
 			adjustSpaceAvailableByPercentage,
 			adjustSpaceAvailableByPixel,
-			ignoreXpathElementHeight
+			ignoreXpathElementHeight,
+			pairChainedDockedAds
 		} = this.state;
 		const { save } = this.props;
 		let parsedCSS = {};
@@ -178,6 +180,7 @@ class ChainedDocked extends Component {
 				adjustSpaceAvailableByPercentage,
 				adjustSpaceAvailableByPixel,
 				ignoreXpathElementHeight,
+				pairChainedDockedAds,
 				eventData: {
 					value: ''
 				}
@@ -200,7 +203,8 @@ class ChainedDocked extends Component {
 			spaceBufferInMultiples,
 			adjustSpaceAvailableByPixel,
 			adjustSpaceAvailableByPercentage,
-			ignoreXpathElementHeight
+			ignoreXpathElementHeight,
+			pairChainedDockedAds
 		} = this.state;
 		const hasPagegroupsWithDuplicateAds = !!pagegroupsWithDuplicateAds.length;
 		const formattedPagegroupsWithDuplicateAds = pagegroupsWithDuplicateAds
@@ -307,6 +311,22 @@ class ChainedDocked extends Component {
 							size={colSize}
 							id="space-available-percentage-input"
 						/>
+						<Col md={9}>
+							<CustomToggleSwitch
+								labelText="Show Chained Docked Ads in Pair"
+								className="u-margin-b4 u-margin-t4 negative-toggle pair-ads-toggle"
+								checked={pairChainedDockedAds}
+								onChange={this.handleToggle}
+								layout="horizontal"
+								size="m"
+								on="Yes"
+								off="No"
+								defaultLayout
+								name={`pairChainedDockedAds-${siteId}`}
+								id={`js-pairChainedDockedAds-${siteId}`}
+							/>
+						</Col>
+
 						<Col md={9}>
 							<CustomToggleSwitch
 								labelText="Ignore Xpath Element Height"
