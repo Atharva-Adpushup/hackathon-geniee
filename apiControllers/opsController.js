@@ -14,6 +14,7 @@ const {
 	docKeys: { networkWideHBRules },
 	AD_UNIT_TYPE_MAPPING
 } = require('../configs/commonConsts');
+const { RABBITMQ } = require('../configs/config');
 const { sendSuccessResponse, sendErrorResponse } = require('../helpers/commonFunctions');
 const {
 	appBucket,
@@ -31,6 +32,7 @@ const opsValidations = require('../validations/opsValidations');
 const FormValidator = require('../helpers/FormValidator');
 const schema = require('../helpers/schema');
 const AdPushupError = require('../helpers/AdPushupError');
+const { publishToRabbitMqQueue } = require('../helpers/utils');
 
 const router = express.Router();
 
@@ -241,7 +243,7 @@ router
 		if (isDataValid === false) {
 			return sendErrorResponse(
 				{
-					message: 'Missing or Inavalid params.'
+					message: 'Missing or Invalid params.'
 				},
 				res
 			);
@@ -270,6 +272,32 @@ router
 				if (code !== 1) return Promise.reject(new Error(response.data));
 				return sendSuccessResponse(response, res);
 			})
+			.catch(err => errorHandler(err, res));
+	})
+
+	.post('/xpathmissurl', (req, res) => {
+		const data = req.body || {};
+		const { siteId, startDate, endDate, requester, topUrlCount } = data;
+
+		const isDataValid = !!(
+			siteId &&
+			topUrlCount &&
+			startDate &&
+			endDate &&
+			EMAIL_REGEX.test(requester)
+		);
+		if (isDataValid === false) {
+			return sendErrorResponse(
+				{
+					message: 'Missing or Invalid params.'
+				},
+				res
+			);
+		}
+		const xpathMissQueue = RABBITMQ.XPATH_MISS_QUEUE;
+
+		return publishToRabbitMqQueue(xpathMissQueue, data)
+			.then(response => sendSuccessResponse(response, res))
 			.catch(err => errorHandler(err, res));
 	})
 
@@ -699,6 +727,7 @@ router
 				errorHandler(err, res, HTTP_STATUSES.INTERNAL_SERVER_ERROR);
 			});
 	})
+
 	.get('/getSiteMapping', (req, res) => {
 		if (!req.user.isSuperUser) {
 			return sendErrorResponse(
@@ -709,7 +738,7 @@ router
 				res
 			);
 		}
-		opsModel
+		return opsModel
 			.getAllSiteMapping()
 			.then(message => sendSuccessResponse(message, res))
 			.catch(err => errorHandler(err, res));

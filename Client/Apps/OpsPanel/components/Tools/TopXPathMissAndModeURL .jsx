@@ -88,19 +88,21 @@ class TopXPathMissAndModeURL extends Component {
 		}
 		this.setState({ isLoading: true });
 
+		const xpathMissFormData = {
+			siteId,
+			startDate: startDate.format('YYYY-MM-DD'),
+			endDate: endDate.format('YYYY-MM-DD'),
+			errorCode,
+			mode: currentSelectedMode,
+			pageGroup: pageGroups,
+			deviceType: currentSelectedDevice,
+			requester: emailId,
+			topUrlCount: topURLCount,
+			orderBy
+		};
+
 		return axiosInstance
-			.post('/ops/xpathEmailNotifier', {
-				siteId,
-				topURLCount,
-				emailId,
-				pageGroups,
-				currentSelectedDevice,
-				currentSelectedMode,
-				orderBy,
-				errorCode,
-				startDate,
-				endDate
-			})
+			.post('/ops/xpathmissurl', xpathMissFormData)
 			.then(() => {
 				showNotification({
 					mode: 'success',
@@ -111,6 +113,7 @@ class TopXPathMissAndModeURL extends Component {
 				this.setState({ isLoading: false }, this.handleReset);
 			})
 			.catch(err => {
+				// eslint-disable-next-line no-shadow
 				const { data = {} } = err.response;
 				const {
 					data: { message = 'Something went Wrong. Please contact AdPushup Support.' } = {}
