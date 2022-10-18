@@ -178,6 +178,8 @@ function HbProcessing(site, apConfigs) {
 
 function init(site, computedConfig) {
 	const apps = site.get('apps');
+	const e2eTesting = site.get('e2eTesting');
+
 	const { apConfigs, prebidConfig, apLiteConfig, pnpConfig } = computedConfig;
 	let statusesAndAds = {
 		statuses: {
@@ -190,7 +192,10 @@ function init(site, computedConfig) {
 			AP_LITE_ACTIVE: !!(apps && apps.apLite && apLiteConfig),
 			PNP_REFRESH_ACTIVE: !!(apps && apps.pnp && pnpConfig),
 			USER_TRACKING: !!(apConfigs && apConfigs.enableUserTracking),
-			POWERED_BY_BANNER_ACTIVE: typeof apConfigs.poweredByBanner === 'object' ? !!Object.keys(apConfigs.poweredByBanner).length : false
+			POWERED_BY_BANNER_ACTIVE:
+				typeof apConfigs.poweredByBanner === 'object'
+					? !!Object.keys(apConfigs.poweredByBanner).length
+					: false
 		},
 		ads: {},
 		config: {}
@@ -240,7 +245,13 @@ function init(site, computedConfig) {
 
 			if (apps && apps.apLite) output.apLiteConfig = apLiteConfig;
 			if (apps && apps.pnp) output.pnpConfig = pnpConfig;
-
+			if (e2eTesting) {
+				output.e2eTesting = e2eTesting;
+			} else {
+				output.e2eTesting = {
+					enabled: false
+				};
+			}
 			return output;
 		}
 	).catch(err => {
