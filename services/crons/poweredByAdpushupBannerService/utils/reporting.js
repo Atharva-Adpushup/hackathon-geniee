@@ -15,7 +15,7 @@ const fetchCumulativeReportingData = async siteid => {
 		toDate,
 		fromDate,
 		interval: 'cumulative',
-		dimension: 'page_group,section,ad_unit_type',
+		dimension: 'page_group,section,ad_unit_type,device_type',
 		ad_unit_type: '1,2,3,7',
 		bypassCache: false
 	};
