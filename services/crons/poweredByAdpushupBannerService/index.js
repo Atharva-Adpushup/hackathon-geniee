@@ -5,7 +5,8 @@ const { fetchCumulativeReportingData } = require('./utils/reporting');
 const {
 	getMaxImpressionUnits,
 	enablePoweredByBannerFlag,
-	getRecentlyOnboardedSites
+	getSites,
+	getExistingAdUnits
 } = require('./utils/site');
 const config = require('../../../configs/config');
 const siteModel = require('../../../models/siteModel');
@@ -18,19 +19,20 @@ const sitesToProcess =
 const main = async function(siteId) {
 	try {
 		const { data } = await siteModel.getSiteById(siteId);
-		const reportingResponse = await fetchCumulativeReportingData(siteId);
+		const reportingResponse = await fetchCumulativeReportingData(siteId); 
 
 		//Do Nothing in case of insufficient reporting data for ad units
 		if (!reportingResponse || reportingResponse.length < 1) return;
-
 		//fetch units with the most impressions
 		const maxImpressionUnits = await getMaxImpressionUnits(data, reportingResponse);
+		const existingAdUnits = await getExistingAdUnits(siteId);
 
 		//enable poweredByAdpushup flag in CB for fetched units
-		await enablePoweredByBannerFlag(data, maxImpressionUnits);
+		await enablePoweredByBannerFlag(data, maxImpressionUnits, existingAdUnits);
 		return;
 	} catch (err) {
 		const errorMessage = `Powered By Adpushup banner service error. Service failed for siteId : ${siteId} with error : ${err}`;
+		//Error handling Service issue
 		console.log(errorMessage);
 		sendEmail({
 			queue: 'MAILER',
@@ -49,11 +51,12 @@ const init = async () => {
 
 		if (sitesToProcess.length < 1) {
 			//fetch recently onboarded site list
-			const siteList = await getRecentlyOnboardedSites();
+			const siteList = await getSites();
 			await Promise.all(siteList.map(main));
 			return;
 		}
 	} catch (err) {
+		//Error handling Service issue
 		console.log('Powered By Adpushup banner service error :', err);
 	}
 };

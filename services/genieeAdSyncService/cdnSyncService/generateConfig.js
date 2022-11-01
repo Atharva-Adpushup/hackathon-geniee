@@ -192,6 +192,7 @@ function init(site, computedConfig) {
 			AP_LITE_ACTIVE: !!(apps && apps.apLite && apLiteConfig),
 			PNP_REFRESH_ACTIVE: !!(apps && apps.pnp && pnpConfig),
 			USER_TRACKING: !!(apConfigs && apConfigs.enableUserTracking),
+			AUTO_ADPUSHUP_LABEL_SERVICE_ACTIVE: ((typeof apConfigs.disableAutoAdpushupLabel ==='boolean' && apConfigs.disableAutoAdpushupLabel) ? false : true),
 			POWERED_BY_BANNER_ACTIVE:
 				typeof apConfigs.poweredByBanner === 'object'
 					? !!Object.keys(apConfigs.poweredByBanner).length

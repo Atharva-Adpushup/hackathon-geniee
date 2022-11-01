@@ -10,27 +10,72 @@ const AD_UNIT_TYPES = {
 	display: 'Display',
 	sticky: 'Sticky',
 	docked: 'Docked'
+	// chainedDocked: 'Chained Docked Ads' This is excluded intentionally for now.
 };
 
 const AD_UNIT_DOC_TYPES = {
 	chnl: 'Layout',
-	fmrt: 'Innocative',
+	fmrt: 'Innovative',
 	tgmr: 'AP Tag'
 };
 
 // Couchbase Methods
-const getRecentlyOnboardedSites = async () => {
+/* The below function gets the siteList which have been added in last two years */
+const getSites = async () => {
 	const docQuery = N1qlQuery.fromString(`SELECT siteId
 	FROM AppBucket site
 	WHERE Meta().id LIKE "site::%"
-	AND site.dateCreated >= MILLIS(DATE_ADD_STR(CLOCK_STR(), -1, 'week'))
-	AND site.dateCreated < MILLIS(CLOCK_STR());`);
+	AND site.dateCreated >= ${config.timeStampForApLabel}
+	AND site.apConfigs.disableAutoAdpushupLabel is NOT VALUED OR site.apConfigs.disableAutoAdpushupLabel = false`);
 
 	const siteData = await couchbase.queryViewFromAppBucket(docQuery);
 
 	if (!siteData || siteData.length < 1) return [];
 	let siteArr = siteData.map(item => item.siteId);
 	return siteArr;
+};
+
+/* Gets the ad units present in PWBA doc */
+const getExistingAdUnits = async siteId => {
+	const docQuery = N1qlQuery.fromString(`SELECT site.aptag, site.layout, site.sticky, site.docked
+	FROM AppBucket as site
+	WHERE META(site).id = "pwba::${siteId}"`);
+
+	const adUnits = await couchbase.queryViewFromAppBucket(docQuery);
+
+	if (adUnits.length > 0) {
+		return adUnits[0];
+	} else {
+		return [];
+	}
+};
+
+const getTgmrAds = async siteId => {
+	const docQuery = N1qlQuery.fromString(`SELECT raw section.id
+	FROM AppBucket as site
+	Unnest ads as section
+	WHERE META(site).id = "tgmr::${siteId}"`);
+
+	const adUnits = await couchbase.queryViewFromAppBucket(docQuery);
+
+	return adUnits;
+};
+
+/* The below functions removes the common ad units from sectionIdArr & existingUnits */
+const removeDuplicateUnits = (sectionIdArr, existingUnits) => {
+	if (existingUnits.length < 1) {
+		return {
+			enableAdArr: sectionIdArr,
+			disableAdArr: []
+		};
+	}
+	const enableAdArr = sectionIdArr.filter(id => !existingUnits.includes(id));
+	const disableAdArr = existingUnits.filter(id => !sectionIdArr.includes(id));
+
+	return {
+		enableAdArr: enableAdArr,
+		disableAdArr: disableAdArr
+	};
 };
 
 const getActiveAds = async siteid => {
@@ -52,11 +97,17 @@ const getActiveAds = async siteid => {
 	return apTags;
 };
 
-const updateFmrtDoc = async (siteId, sectionIdArr) => {
+const updateFmrtDoc = async (siteId, sectionIdArr, existingUnits) => {
 	if (!sectionIdArr || sectionIdArr.length < 1) return false;
 
+	const { enableAdArr, disableAdArr } = removeDuplicateUnits(sectionIdArr, existingUnits);
+
+	if ((!enableAdArr || enableAdArr.length < 1) && (!disableAdArr || disableAdArr.length < 1))
+		return false;
+
 	let queryString = `UPDATE AppBucket fmrt
-	SET ad.poweredByAdpushup = TRUE FOR ad IN fmrt.ads WHEN ad.id IN [${sectionIdArr.toString()}] END
+	SET ad.poweredByBanner = TRUE FOR ad IN fmrt.ads WHEN ad.id IN [${enableAdArr.toString()}] END,
+	ad.poweredByBanner = FALSE FOR ad IN fmrt.ads WHEN ad.id IN [${disableAdArr.toString()}] END
 	WHERE META(fmrt).id = "fmrt::${siteId}"
 		AND fmrt.ads IS VALUED
 	RETURNING fmrt`;
@@ -67,16 +118,21 @@ const updateFmrtDoc = async (siteId, sectionIdArr) => {
 	return !!fmrtDocData;
 };
 
-const updateTgmrDoc = async (siteId, sectionIdArr) => {
+const updateTgmrDoc = async (siteId, sectionIdArr, existingUnits) => {
 	if (!sectionIdArr || sectionIdArr.length < 1) return false;
 
+	const { enableAdArr, disableAdArr } = removeDuplicateUnits(sectionIdArr, existingUnits);
+
+	if ((!enableAdArr || enableAdArr.length < 1) && (!disableAdArr || disableAdArr.length < 1))
+		return false;
+
 	let queryString = `
-	UPDATE AppBucket tgmr
-	SET ad.poweredByAdpushup = TRUE FOR ad IN tgmr.ads 
-	WHEN ad.id IN [${sectionIdArr.toString()}] END
-	WHERE META(tgmr).id = "tgmr::${siteId}"
-	AND tgmr.ads IS VALUED
-	RETURNING tgmr`;
+		UPDATE AppBucket tgmr
+		SET ad.poweredByBanner = TRUE FOR ad IN tgmr.ads WHEN ad.id IN [${enableAdArr.toString()}] END,
+		ad.poweredByBanner = FALSE FOR ad IN tgmr.ads WHEN ad.id IN [${disableAdArr.toString()}] END
+		WHERE META(tgmr).id = "tgmr::${siteId}"
+			AND tgmr.ads IS VALUED
+		RETURNING tgmr`;
 
 	const docQuery = N1qlQuery.fromString(queryString);
 
@@ -84,15 +140,25 @@ const updateTgmrDoc = async (siteId, sectionIdArr) => {
 	return !!tgmrDocData;
 };
 
-const updateChnlDoc = async (siteId, sectionIdArr) => {
+const updateChnlDoc = async (siteId, sectionIdArr, existingUnits) => {
 	if (!sectionIdArr || sectionIdArr.length < 1) return false;
+
+	const { enableAdArr, disableAdArr } = removeDuplicateUnits(sectionIdArr, existingUnits);
+
+	if ((!enableAdArr || enableAdArr.length < 1) && (!disableAdArr || disableAdArr.length < 1))
+		return false;
 
 	let queryString = `UPDATE AppBucket chnl
 	SET ad.poweredByBanner = TRUE 
 	FOR ad IN OBJECT_VALUES(s.ads) 
 	FOR s IN OBJECT_VALUES(v.sections) 
 	FOR v IN OBJECT_VALUES(chnl.variations) 
-	WHEN s.id IN [${sectionIdArr.toString()}] END
+	WHEN s.id IN [${enableAdArr.toString()}] END,
+	ad.poweredByBanner = FALSE 
+	FOR ad IN OBJECT_VALUES(s.ads) 
+	FOR s IN OBJECT_VALUES(v.sections) 
+	FOR v IN OBJECT_VALUES(chnl.variations) 
+	WHEN s.id IN [${disableAdArr.toString()}] END
 	WHERE META().id LIKE "chnl::${siteId}:%"
 	RETURNING chnl`;
 
@@ -119,17 +185,20 @@ const getMaxImpressionUnits = async (siteData, reportingData) => {
 		if (!activeAds) return;
 		let { allActiveApTags, allBottomStickeyAds, allActiveDockedAds } = filterActiveUnits(activeAds);
 
+		let aptagSectionId = allActiveApTags.map(unit => unit.id.toUpperCase());
+
 		let maxImpressionUnits = {};
-		//if Ap tags are active. Get the max impression ap tag, Otherwise look for layout units
+		//if Ap tags are active. Get the max impression Ap tags
 		if (activeApps.apTag && displayUnits.length > 0 && allActiveApTags.length > 0) {
-			const maxApTagArr = getMaxImpressionAPTag(displayUnits, allActiveApTags);
+			const maxApTagArr = getMaxImpressionAPTag(displayUnits, allActiveApTags, aptagSectionId);
 			if (maxApTagArr.length > 0) {
-				maxImpressionUnits['display'] = maxApTagArr;
+				maxImpressionUnits['aptag'] = maxApTagArr;
 			}
-		} else if (activeApps.layout && channels.length > 0 && displayUnits.length > 0) {
-			const maxLayoutAdArr = getMaxImpressionLayoutAd(displayUnits);
+		}
+		if (activeApps.layout && channels.length > 0 && displayUnits.length > 0) {
+			const maxLayoutAdArr = getMaxImpressionLayoutAd(displayUnits, aptagSectionId);
 			if (maxLayoutAdArr.length > 0) {
-				maxImpressionUnits['display'] = maxLayoutAdArr;
+				maxImpressionUnits['layout'] = maxLayoutAdArr;
 			}
 		}
 
@@ -175,22 +244,24 @@ const filterActiveUnits = unitList => {
 	const allBottomStickeyAds = unitList.filter(
 		item => item.formatData.type === 'sticky' && item.formatData.format === 'stickyBottom'
 	);
-	const allActiveDockedAds = unitList.filter(
-		item => item.formatData.format === 'docked' || item.formatData.format === 'chained_docked'
-	);
+	const allActiveDockedAds = unitList.filter(item => item.formatData.format === 'docked');
 
 	return { allActiveApTags, allBottomStickeyAds, allActiveDockedAds };
 };
 
-const getMaxImpressionAPTag = (reportingUnits, activeUnits) => {
+const getMaxImpressionAPTag = (reportingUnits, activeUnits, activeApUnits) => {
 	let maxImpressionUnit = [];
 	let maxImpressionUnitFound = false;
 	reportingUnits.forEach(unit => {
-		if (maxImpressionUnitFound || !unit.section_id) return;
-		let isMaxImpressionUnit = activeUnits.find(item => item.id.toUpperCase() === unit.section_id);
+		if (maxImpressionUnitFound || !unit.section_id || !activeApUnits.includes(unit.section_id))
+			return;
+		let isMaxImpressionUnit = activeUnits.find(
+			item => item.id.toUpperCase() === unit.section_id.toUpperCase()
+		);
 		if (isMaxImpressionUnit) {
 			maxImpressionUnit.push({
 				page_group: unit.page_group,
+				device_type: unit.device_type,
 				ad_unit_type: unit.ad_unit_type,
 				section_id: unit.section_id,
 				network_impressions: unit.network_impressions,
@@ -204,16 +275,28 @@ const getMaxImpressionAPTag = (reportingUnits, activeUnits) => {
 	return maxImpressionUnit;
 };
 
-const getMaxImpressionLayoutAd = reportingUnits => {
+/**
+ * It takes an array of reporting units and returns an array of reporting units with the highest
+ * impressions for each page group and device type
+ * @returns An array of objects.
+ */
+const getMaxImpressionLayoutAd = (reportingUnits, activeApUnits) => {
 	let maxImpressionUnits = [];
 	reportingUnits.forEach(unit => {
-		if (!unit.section_id || !unit.device_type || !unit.page_group) return;
+		if (
+			!unit.section_id ||
+			!unit.device_type ||
+			!unit.page_group ||
+			activeApUnits.includes(unit.section_id)
+		)
+			return;
 		let unitFound = maxImpressionUnits.find(
 			item => item.device_type === unit.device_type && item.page_group === unit.page_group
 		);
 		if (!unitFound) {
 			maxImpressionUnits.push({
 				page_group: unit.page_group,
+				device_type: unit.device_type,
 				ad_unit_type: unit.ad_unit_type,
 				section_id: unit.section_id,
 				network_impressions: unit.network_impressions,
@@ -238,6 +321,7 @@ const getMaxImpressionInnovativeAds = (reportingUnits, activeUnits) => {
 		if (!unitFound && activeUnitFound) {
 			maxImpressionUnits.push({
 				page_group: unit.page_group,
+				device_type: unit.device_type,
 				ad_unit_type: unit.ad_unit_type,
 				section_id: unit.section_id,
 				network_impressions: unit.network_impressions,
@@ -266,36 +350,53 @@ const getFmrtSectionArr = adUnitObj => {
 	return sectionArr;
 };
 
-const getTgmrAndChnlSectionArr = adUnitObj => {
+const getTgmrSectionArr = adUnitObj => {
 	const sectionArr = [];
-	if (adUnitObj.display) {
-		adUnitObj.display.forEach(item => {
+	if (adUnitObj.aptag) {
+		adUnitObj.aptag.forEach(item => {
 			item.id ? sectionArr.push(`"${item.id}"`) : sectionArr.push(`"${item.section_id}"`);
 		});
 	}
 	return sectionArr;
 };
 
-const enablePoweredByBannerFlag = async (siteData, adUnits) => {
+const getChnlSectionArr = adUnitObj => {
+	const sectionArr = [];
+	if (adUnitObj.layout) {
+		adUnitObj.layout.forEach(item => {
+			item.id ? sectionArr.push(`"${item.id}"`) : sectionArr.push(`"${item.section_id}"`);
+		});
+	}
+	return sectionArr;
+};
+
+const enablePoweredByBannerFlag = async (siteData, adUnits, existingUnits) => {
 	try {
 		//Enable flag for adunits with CB query
 		const siteId = siteData.siteId;
 		const activeApps = siteData.apps || {};
 
 		if (activeApps.apTag) {
-			const tgmrSectionIdArr = getTgmrAndChnlSectionArr(adUnits);
-			if (tgmrSectionIdArr.length > 0) await updateTgmrDoc(siteId, tgmrSectionIdArr);
-		} else if (activeApps.layout) {
+			const tgmrSectionIdArr = getTgmrSectionArr(adUnits);
+			const existingTgmrIdArr = getTgmrSectionArr(existingUnits);
+			if (tgmrSectionIdArr.length > 0)
+				await updateTgmrDoc(siteId, tgmrSectionIdArr, existingTgmrIdArr);
+		}
+		if (activeApps.layout) {
 			//update layout doc
-			const chnlSectionIdArr = getTgmrAndChnlSectionArr(adUnits);
-			if (chnlSectionIdArr.length > 0) await updateChnlDoc(siteId, chnlSectionIdArr);
+			const chnlSectionIdArr = getChnlSectionArr(adUnits);
+			const existingchnlSectionIdArr = getChnlSectionArr(existingUnits);
+			if (chnlSectionIdArr.length > 0)
+				await updateChnlDoc(siteId, chnlSectionIdArr, existingchnlSectionIdArr);
 		}
 		if (activeApps.innovativeAds) {
 			const fmrtSectionIdArr = getFmrtSectionArr(adUnits);
-			if (fmrtSectionIdArr.length > 0) await updateFmrtDoc(siteId, fmrtSectionIdArr);
+			const existingfmrtSectionIdArr = getFmrtSectionArr(existingUnits);
+			if (fmrtSectionIdArr.length > 0)
+				await updateFmrtDoc(siteId, fmrtSectionIdArr, existingfmrtSectionIdArr);
 		}
 
-		// Add units in PWDR doc
+		// Add units in PWBA doc
 		let docId = `pwba::${siteId}`;
 		await couchbase.upsertDoc(config.couchBase.DEFAULT_BUCKET, docId, {
 			...adUnits,
@@ -312,5 +413,6 @@ const enablePoweredByBannerFlag = async (siteData, adUnits) => {
 module.exports = {
 	getMaxImpressionUnits,
 	enablePoweredByBannerFlag,
-	getRecentlyOnboardedSites
+	getSites,
+	getExistingAdUnits
 };
