@@ -25,7 +25,7 @@ const processAdUnits = (adUnits = []) => {
 		}, {});
 };
 
-const generatePnPRefreshConfig = (siteId, adNetworkConfig) => {
+const generatePnPRefreshConfig = (siteId, adNetworkConfig, blockListedlineItems = []) => {
 	const emptyResponse = {};
 	const { lineItems = [], separatelyGroupedLineItems = {} } = adNetworkConfig || {};
 
@@ -35,7 +35,7 @@ const generatePnPRefreshConfig = (siteId, adNetworkConfig) => {
 			if (err.code === CB_ERRORS.keyNotFound) {
 				return emptyResponse;
 			}
-			throw new err;
+			throw err;
 		})
 		.then(pnpDoc => {
 			const pnpConfig = pnpDoc.value || {};
@@ -68,6 +68,10 @@ const generatePnPRefreshConfig = (siteId, adNetworkConfig) => {
 					blacklistedLineItem => blacklistedLineItem.id
 				);
 			}
+
+			pnpConfig.blacklistedLineItems = [
+				...new Set([...pnpConfig.blacklistedLineItems, ...blockListedlineItems])
+			];
 
 			return pnpConfig;
 		});
