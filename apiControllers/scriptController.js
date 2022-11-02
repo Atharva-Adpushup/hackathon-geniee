@@ -200,6 +200,7 @@ Router.get('/:siteId/ampDeliveryViaCreativeConfig', (req, res) => {
 						blockListedLineItems
 					).then(adNetworkConfig => ({
 						...prebidAndAdsConfig,
+						blockListedLineItems,
 						adNetworkConfig
 					}));
 				}
@@ -208,12 +209,14 @@ Router.get('/:siteId/ampDeliveryViaCreativeConfig', (req, res) => {
 			};
 			const setPnPConfig = function(combinedConfig) {
 				if (isAmpPnpEnabled) {
-					return generateAmpPnPRefreshConfig(siteId, combinedConfig.adNetworkConfig).then(
-						pnpConfig => ({
-							...combinedConfig,
-							pnpConfig
-						})
-					);
+					return generateAmpPnPRefreshConfig(
+						siteId,
+						combinedConfig.adNetworkConfig,
+						combinedConfig.blockListedLineItems
+					).then(pnpConfig => ({
+						...combinedConfig,
+						pnpConfig
+					}));
 				}
 
 				return Promise.resolve(combinedConfig);
@@ -412,7 +415,7 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 				}));
 			};
 			const setAdNetworkConfig = function(prebidAndAdsConfig) {
-				const blockListedLineItems = site.get('blockListedLineItems');
+				const blockListedLineItems = site.get('blockListedLineItems') || [];
 				const activeDFPNetwork = getActiveDfpNetworkCode(user);
 
 				if (activeDFPNetwork) {
@@ -422,6 +425,7 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 						blockListedLineItems
 					).then(adNetworkConfig => ({
 						...prebidAndAdsConfig,
+						blockListedLineItems,
 						adNetworkConfig
 					}));
 				}
@@ -431,12 +435,14 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 			const setPnPConfig = function(combinedConfig) {
 				const pnpActive = !!apps.pnp;
 				if (pnpActive) {
-					return generatePnPRefreshConfig(siteId, combinedConfig.adNetworkConfig).then(
-						pnpConfig => ({
-							...combinedConfig,
-							pnpConfig
-						})
-					);
+					return generatePnPRefreshConfig(
+						siteId,
+						combinedConfig.adNetworkConfig,
+						combinedConfig.blockListedLineItems
+					).then(pnpConfig => ({
+						...combinedConfig,
+						pnpConfig
+					}));
 				}
 
 				return Promise.resolve(combinedConfig);
