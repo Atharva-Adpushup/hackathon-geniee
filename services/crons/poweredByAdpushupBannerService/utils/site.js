@@ -21,11 +21,11 @@ const AD_UNIT_DOC_TYPES = {
 
 // Couchbase Methods
 /* The below function gets the siteList which have been added in last two years */
-const getSites = async () => {
+const getSites = async (timeStamp) => {
 	const docQuery = N1qlQuery.fromString(`SELECT siteId
 	FROM AppBucket site
 	WHERE Meta().id LIKE "site::%"
-	AND site.dateCreated >= ${config.timeStampForApLabel}
+	AND site.dateCreated >= ${timeStamp}
 	AND site.apConfigs.disableAutoAdpushupLabel is NOT VALUED OR site.apConfigs.disableAutoAdpushupLabel = false`);
 
 	const siteData = await couchbase.queryViewFromAppBucket(docQuery);
