@@ -1,5 +1,6 @@
 const cron = require('node-cron');
 const commonConsts = require('../../../configs/commonConsts');
+const { POWERED_BY_ADPUSHUP_SERVICE_TIMESTAMP } = commonConsts;
 
 const { fetchCumulativeReportingData } = require('./utils/reporting');
 const {
@@ -51,7 +52,7 @@ const init = async () => {
 
 		if (sitesToProcess.length < 1) {
 			//fetch recently onboarded site list
-			const siteList = await getSites();
+			const siteList = await getSites(POWERED_BY_ADPUSHUP_SERVICE_TIMESTAMP);
 			await Promise.all(siteList.map(main));
 			return;
 		}
