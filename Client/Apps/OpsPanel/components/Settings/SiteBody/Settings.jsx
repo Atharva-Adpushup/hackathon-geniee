@@ -340,6 +340,33 @@ class Settings extends Component {
 		return saveSettings(site.siteId, saveConfig, dataForAuditLogs);
 	};
 
+	handleAmpDvcForceBuild = () => {
+		const { site = {}, showNotification } = this.props;
+
+		const { siteId } = site;
+
+		siteService
+			.forceAmpDvcBuild(siteId)
+			.then(res => {
+				const data = {
+					mode: 'success',
+					title: 'Success',
+					autoDismiss: 5,
+					message: (res.data && res.data.message) || 'AMP DVC Script build in progress'
+				};
+				showNotification(data);
+			})
+			.catch(() => {
+				const data = {
+					mode: 'error',
+					title: 'Error',
+					autoDismiss: 5,
+					message: 'Error building AMP DVC Script'
+				};
+				showNotification(data);
+			});
+	};
+
 	render() {
 		const {
 			isSPA,
@@ -723,6 +750,13 @@ class Settings extends Component {
 					</CustomButton>
 					<CustomButton variant="primary" className="pull-right" onClick={this.handleSave}>
 						Save
+					</CustomButton>
+					<CustomButton
+						variant="primary"
+						className="pull-left u-margin-t3"
+						onClick={this.handleAmpDvcForceBuild}
+					>
+						Force build AMP DVC script
 					</CustomButton>
 				</Row>
 			</Col>
