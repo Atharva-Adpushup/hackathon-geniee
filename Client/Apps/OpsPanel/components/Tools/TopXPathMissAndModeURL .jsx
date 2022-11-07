@@ -89,15 +89,15 @@ class TopXPathMissAndModeURL extends Component {
 		this.setState({ isLoading: true });
 
 		const xpathMissFormData = {
-			siteId,
+			siteId: parseInt(siteId, 10),
 			startDate: startDate.format('YYYY-MM-DD'),
 			endDate: endDate.format('YYYY-MM-DD'),
-			errorCode,
+			errorCode: errorCode && parseInt(errorCode, 10),
 			mode: currentSelectedMode,
 			pageGroup: pageGroups,
 			deviceType: currentSelectedDevice,
 			requester: emailId,
-			topUrlCount: topURLCount,
+			topUrlCount: parseInt(topURLCount, 10),
 			orderBy
 		};
 
