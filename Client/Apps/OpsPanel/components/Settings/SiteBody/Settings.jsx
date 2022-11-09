@@ -33,6 +33,7 @@ class Settings extends Component {
 				}
 			}, // default val
 			poweredByBanner = {},
+			disableAutoAdpushupLabel = false,
 			isAdsLabelOn = false,
 			adsLabel = 'Advertisement',
 			hbAnalytics = false,
@@ -62,6 +63,7 @@ class Settings extends Component {
 			spaPageTransitionTimeout,
 			adpushupPercentage,
 			flyingCarpetTopOffset: flyingCarpetSettings.CSS.top,
+			disableAutoAdpushupLabel,
 			isAdsLabelOn,
 			adsLabel,
 			revenueShare,
@@ -109,6 +111,7 @@ class Settings extends Component {
 				};
 			}
 			if (name === 'pnp') {
+				// eslint-disable-next-line no-alert
 				const shouldUpdate = value ? confirm('Are you sure you wanna enable PnP?') : true;
 				if (shouldUpdate) {
 					return updateAppStatus(
@@ -236,6 +239,7 @@ class Settings extends Component {
 			adpushupPercentage,
 			flyingCarpetTopOffset,
 			isAdsLabelOn,
+			disableAutoAdpushupLabel,
 			adsLabel,
 			revenueShare,
 			hbAnalytics,
@@ -301,6 +305,7 @@ class Settings extends Component {
 				flyingCarpetSettings: { CSS: { top: Number(flyingCarpetTopOffset) } },
 				poweredByBanner,
 				isAdsLabelOn,
+				disableAutoAdpushupLabel,
 				adsLabel,
 				hbAnalytics,
 				cmpAvailable: !cmpEnabled,
@@ -339,6 +344,7 @@ class Settings extends Component {
 			adpushupPercentage,
 			flyingCarpetTopOffset,
 			status,
+			disableAutoAdpushupLabel,
 			hbAnalytics,
 			urlUtm,
 			cmpEnabled,
@@ -415,7 +421,19 @@ class Settings extends Component {
 						hasSelectAll={false}
 					/>
 				</div>
-
+				<CustomToggleSwitch
+					labelText="Disable Max Impresion Unit Branding"
+					className="u-margin-b4 negative-toggle"
+					checked={!!disableAutoAdpushupLabel}
+					onChange={this.handleToggle}
+					layout="horizontal"
+					size="m"
+					on="Yes"
+					off="No"
+					defaultLayout
+					name={`disableAutoAdpushupLabel-${siteId}-${siteDomain}`}
+					id={`js-disableAutoAdpushupLabel-switch-${siteId}-${siteDomain}`}
+				/>
 				{/* <CustomToggleSwitch
 					labelText="Ads Label"
 					className="u-margin-b4 negative-toggle"
