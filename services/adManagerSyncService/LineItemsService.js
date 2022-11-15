@@ -59,7 +59,7 @@ class LineItemService {
 					this.service.getLineItemsByStatement(statement, (err, results) => {
 						if (err) {
 							this.logger.error({ message: 'Error fetching lineItems', debugData: { ex: err } });
-							return reject({type, error: err});
+							return reject({ type, error: err });
 						}
 						const totalResults = results.rval.totalResultSetSize || 0;
 						this.logger.info({
@@ -69,12 +69,16 @@ class LineItemService {
 							totalResults === 0 || !results.rval.results || !results.rval.results.length
 								? []
 								: results.rval.results.map(lineItem => {
-										const { id } = lineItem;
+										const { id, deliveryData = { units: [] } } = lineItem;
+										var totalImpressions = deliveryData.units.reduce(
+											(partialSum, a) => partialSum + parseInt(a),
+											0
+										);
 										return type === 'PRICE_PRIORITY' &&
 											hbOrderIds &&
 											hbOrderIds.indexOf(lineItem.orderId) !== -1
-											? { id, isHb: true }
-											: { id, isHb: false };
+											? { id, isHb: true, totalImpressions }
+											: { id, isHb: false, totalImpressions };
 								  });
 						return resolve({
 							results: _results,

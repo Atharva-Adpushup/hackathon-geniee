@@ -29,5 +29,18 @@ module.exports = {
         },
         logExpiryDays: 30,
         serviceName: 'AdManagerSyncService'
+    },
+    azureBlobStorage: {
+        connectionString: '',
+        containerName: '',
+    },
+    rabbitMQ: {
+		// localhost
+		PUBLISHER_API: 'http://localhost:8087/publish',
+		PUBLISHER_API_BULK: 'http://localhost:8087/publishBulk',
+		CDN_ORIGIN: {
+			NAME_IN_QUEUE_PUBLISHER_SERVICE: 'CDN_ORIGIN',
+		}
     }
+
 };
