@@ -41,6 +41,7 @@ class Settings extends Component {
 			cmpAvailable = false,
 			mergeReport = false,
 			videoAdsDashboard = false,
+			outbrainDisabled = false,
 			siteLevelRefreshType = SITE_LEVEL_REFRESH_TYPE[0].value,
 			isWeeklyEmailReportsEnabled = false,
 			isDailyEmailReportsEnabled = false,
@@ -73,6 +74,7 @@ class Settings extends Component {
 			cmpEnabled: !cmpAvailable,
 			mergeReport,
 			videoAdsDashboard,
+			outbrainDisabled,
 			isWeeklyEmailReportsEnabled,
 			isDailyEmailReportsEnabled,
 			enableGAAnalytics,
@@ -247,6 +249,7 @@ class Settings extends Component {
 			cmpEnabled,
 			mergeReport,
 			videoAdsDashboard,
+			outbrainDisabled,
 			siteLevelRefreshType,
 			isWeeklyEmailReportsEnabled,
 			isDailyEmailReportsEnabled,
@@ -311,6 +314,7 @@ class Settings extends Component {
 				cmpAvailable: !cmpEnabled,
 				mergeReport,
 				videoAdsDashboard,
+				outbrainDisabled,
 				isWeeklyEmailReportsEnabled,
 				isDailyEmailReportsEnabled,
 				gaConfigs,
@@ -350,6 +354,7 @@ class Settings extends Component {
 			cmpEnabled,
 			mergeReport,
 			videoAdsDashboard,
+			outbrainDisabled,
 			isDailyEmailReportsEnabled,
 			isWeeklyEmailReportsEnabled,
 			enableGAAnalytics,
@@ -521,6 +526,19 @@ class Settings extends Component {
 					defaultLayout
 					name={`videoAdsDashboard-${siteId}-${siteDomain}`}
 					id={`js-videoAdsDashboard-switch-${siteId}-${siteDomain}`}
+				/>
+				<CustomToggleSwitch
+					labelText="Disable Outbrain"
+					className="u-margin-b4 negative-toggle"
+					checked={outbrainDisabled}
+					onChange={this.handleToggle}
+					layout="horizontal"
+					size="m"
+					on="Yes"
+					off="No"
+					defaultLayout
+					name={`outbrainDisabled-${siteId}-${siteDomain}`}
+					id={`js-outbrainDisabled-switch-${siteId}-${siteDomain}`}
 				/>
 				{!config.disableDailyWeeklySnapshots && (
 					<CustomToggleSwitch
