@@ -41,6 +41,13 @@ const generateAdNetworkConfig = (
 				adNetworkConfig.separatelyGroupedLineItems = separatelyGroupedLineItems;
 				return adNetworkConfig;
 			}
+			let refreshByTypeLineItems = [];
+			for (let type of lineItemTypes) {
+				if (adNetworkConfig.lineItems && adNetworkConfig.lineItems[type]) {
+					refreshByTypeLineItems = refreshByTypeLineItems.concat(adNetworkConfig.lineItems[type]);
+				}
+			}
+			adNetworkConfig.refreshByTypeLineItems = refreshByTypeLineItems;
 			return adNetworkConfig;
 		})
 		.catch(err => {
