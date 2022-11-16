@@ -9,6 +9,7 @@ const activeBidderAdaptersList = require('../models/activeBidderAdaptersListMode
 const ampActiveBidderAdaptersListModel = require('../models/ampActiveBidderAdaptersListModel');
 const SiteSpecificActiveBidderAdaptersList = require('../models/siteSpecificActiveBidderAdaptersListModel');
 const ampScriptModel = require('../models/ampScriptModel');
+const instreamScriptModel = require('../models/instreamScriptModel');
 const getReportData = require('../reports/universal');
 const generateStatusesAndConfig = require('../services/genieeAdSyncService/cdnSyncService/generateConfig');
 const generateAmpStatusesAndConfig = require('../services/genieeAdSyncService/cdnSyncService/generateAmpConfig');
@@ -710,6 +711,36 @@ Router.get('/:siteId/ampSiteConfig', (req, res) => {
 				.then(generateApConfig);
 		})
 		.then(scriptConfig => res.send({ error: null, data: { config: scriptConfig } }))
+		.catch(e => res.send({ error: e.message }));
+});
+
+Router.get('/:siteId/instreamScriptConfig', (req, res) => {
+	const { siteId } = req.params;
+
+	return SiteModel.getSiteById(siteId)
+		.then(site => Promise.join(site, UserModel.getUserByEmail(site.get('ownerEmail'))))
+		.then(() => {
+			const generateInstreamScriptAdsConfig = () =>
+				instreamScriptModel
+					.getInstreamScriptConfig(siteId)
+					.then(({ data: instreamScriptConfig }) => {
+						if (
+							!(
+								instreamScriptConfig &&
+								Array.isArray(instreamScriptConfig.ads) &&
+								instreamScriptConfig.ads.length
+							)
+						) {
+							return;
+						}
+
+						// eslint-disable-next-line consistent-return
+						return instreamScriptConfig;
+					});
+
+			return generateInstreamScriptAdsConfig(siteId);
+		})
+		.then(instreamScriptConfig => res.send({ error: null, data: { config: instreamScriptConfig } }))
 		.catch(e => res.send({ error: e.message }));
 });
 

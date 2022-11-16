@@ -535,6 +535,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		network: 'ntwk::',
 		amp: 'amtg::',
 		ampScript: 'ampd::',
+		instreamScript: 'inst::',
 		ampAplite: 'ampaplt::',
 		ampPnp: 'ampapnp::',
 		requestLogger: 'reql::',
