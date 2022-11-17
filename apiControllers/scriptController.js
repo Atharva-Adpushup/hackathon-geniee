@@ -330,6 +330,7 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 				) {
 					apConfigs.lineItemsFileName = adNetworkConfig.lineItemsFileName;
 					apConfigs.fallbackLineItems = adNetworkConfig.fallbackLineItems;
+					apConfigs.refreshByTypeLineItems = adNetworkConfig.refreshByTypeLineItems || [];
 				} else {
 					apConfigs.lineItems = (adNetworkConfig && adNetworkConfig.lineItems) || [];
 					apConfigs.separatelyGroupedLineItems =
