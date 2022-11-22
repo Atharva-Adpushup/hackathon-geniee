@@ -92,6 +92,15 @@ module.exports = {
 		CLS_MONITORING: '1ju3NvLOBOqUEMzX1AfqKnQtLvB28hjS1-S1mJmOh6fI',
 		REPORTING_DATA: '1LJELLTJxJDPjlz07A7gTvvo59jQI_kLolyyUM89Df2M'
 	},
+	GOOGLE_OAUTH_CLIENT_ID: '776523595883-ku17c7130dv2bknmr8d3ukk2sdnluu1f.apps.googleusercontent.com',
+	GOOGLE_APP_API_KEY: 'AIzaSyCyrjpwFAJ3WDhpjjFXvF8OFMzoXnCYWiU',
+	REPORT_EXPORT: {
+		SCOPES: 'https://www.googleapis.com/auth/drive',
+		// Discovery doc URL for APIs used by the quickstart
+		DISCOVERY_DOC: 'https://sheets.googleapis.com/$discovery/rest?version=v4',
+		API_LIB: 'https://apis.google.com/js/api.js',
+		GSI_LIB: 'https://accounts.google.com/gsi/client'
+	},
 	POWERED_BY_ADPUSHUP_SERVICE_TIMESTAMP: 1451606400000,
 	AD_UNIT_TYPE_MAPPING: {
 		DISPLAY: 1,
