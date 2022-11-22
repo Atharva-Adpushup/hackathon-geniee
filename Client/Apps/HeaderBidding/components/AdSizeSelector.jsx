@@ -4,7 +4,15 @@
 /* eslint-disable react/destructuring-assignment */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Row, Col, Nav, NavItem, FormGroup, ControlLabel, HelpBlock } from '@/Client/helpers/react-bootstrap-imports';
+import {
+	Row,
+	Col,
+	Nav,
+	NavItem,
+	FormGroup,
+	ControlLabel,
+	HelpBlock
+} from '@/Client/helpers/react-bootstrap-imports';
 import InputBox from '../../../Components/InputBox';
 import CustomButton from '../../../Components/CustomButton';
 
@@ -28,7 +36,7 @@ class AdSizeSelector extends React.Component {
 		const { customSize } = this.state;
 		const { addNewSize } = this.props;
 
-		const regex = /^\d{2,3}x\d{2,3}$/;
+		const regex = /^\d{1,3}x\d{1,3}$/;
 		const isValid = regex.test(customSize);
 
 		if (!isValid) return this.setState({ customSizeError: 'Please enter valid ad size' });

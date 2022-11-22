@@ -3,6 +3,7 @@
 /* eslint-disable react/prefer-stateless-function */
 import React from 'react';
 import { Row, Col, Nav, NavItem, Badge } from '@/Client/helpers/react-bootstrap-imports';
+import { uniqBy } from 'lodash';
 import CustomButton from '../../../Components/CustomButton';
 import BidderFormFields from './BidderFormFields';
 import formValidator from '../../../helpers/formValidator';
@@ -10,7 +11,6 @@ import allAdSizes from '../constants/adSizes';
 import AdSizeSelector from './AdSizeSelector';
 import { getFilteredAdSizes } from '../helpers/commonHelpers';
 import CustomIcon from '../../../Components/CustomIcon';
-import { uniqBy } from 'lodash';
 
 class SizewiseParamsFormFields extends React.Component {
 	state = {
