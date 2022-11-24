@@ -29,6 +29,7 @@ const proxy = require('../helpers/proxy');
 const pageGroupController = require('./pageGroupController');
 const utils = require('../helpers/utils');
 const apLiteModel = require('../models/apLiteModel');
+const { RABBITMQ } = require('../configs/config');
 
 const {
 	AUDIT_LOGS_ACTIONS: { OPS_PANEL, MY_SITES }
@@ -1160,6 +1161,24 @@ router
 				}
 				return res.status(500).json({ message: 'Unable to build adpushup.js' });
 			});
+	})
+	.post('/forceAmpDvcBuild', (req, res) => {
+		const siteId = req.body;
+
+		if (!siteId) {
+			return sendErrorResponse(
+				{
+					message: 'Missing Site ID'
+				},
+				res
+			);
+		}
+		const ampDvcScriptQueue = RABBITMQ.AMP_DVC_SCRIPT_QUEUE;
+
+		return utils
+			.publishToRabbitMqQueue(ampDvcScriptQueue, siteId)
+			.then(() => res.json({ message: 'AMP DVC Script build successful' }))
+			.catch(err => errorHandler(err, res));
 	});
 
 module.exports = router;

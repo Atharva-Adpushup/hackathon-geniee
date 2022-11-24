@@ -13,6 +13,10 @@ export default {
 		axiosInstance.post(`/site/${siteId}/forceApBuild`, {
 			dataForAuditLogs
 		}),
+	forceAmpDvcBuild: siteId =>
+		axiosInstance.post('/site/forceAmpDvcBuild', {
+			siteId
+		}),
 	updateBlockListedLineItems: (siteId, blockListedLineItems, dataForAuditLogs) =>
 		axiosInstance.post(`/site/updateBlockListedLineItem`, {
 			dataForAuditLogs,
