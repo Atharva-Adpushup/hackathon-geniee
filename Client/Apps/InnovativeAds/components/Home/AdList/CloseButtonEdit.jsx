@@ -44,7 +44,7 @@ class CloseButtonEdit extends Component {
 
 	handleSave = () => {
 		const { showCloseButton, closeButtonCss, closeButtonText } = this.state;
-		const { onSubmit } = this.props;
+		const { onSubmit, onCancel } = this.props;
 
 		let code = {};
 
@@ -64,6 +64,7 @@ class CloseButtonEdit extends Component {
 			closeButtonCss: code,
 			closeButtonText
 		});
+		return onCancel();
 	};
 
 	render() {
