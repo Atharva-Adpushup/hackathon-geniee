@@ -1173,7 +1173,7 @@ router
 				res
 			);
 		}
-		const ampDvcScriptQueue = RABBITMQ.AMP_DVC_SCRIPT_QUEUE;
+		const ampDvcScriptQueue = RABBITMQ.AMP_CDN_SYNC.NAME_IN_QUEUE_PUBLISHER_SERVICE;
 
 		return utils
 			.publishToRabbitMqQueue(ampDvcScriptQueue, siteId)

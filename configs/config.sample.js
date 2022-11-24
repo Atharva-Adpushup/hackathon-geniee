@@ -299,7 +299,19 @@ module.exports = {
 				name: 'ampScriptSync',
 				options: { durable: true }
 			}
-		}
+		},
+		AMP_CDN_SYNC: {
+			NAME_IN_QUEUE_PUBLISHER_SERVICE: 'AMP_CDN_SYNC',    
+				EXCHANGE: {
+					name: 'ampConsoleCdnSync',
+					type: 'direct',
+					options: { durable: true }
+				},
+				QUEUE: {
+					name: 'ampConsoleCdnSync',
+					options: { durable: true }
+				}
+			}
 	},
 	sqlDatabases: {
 		test: 'test',
