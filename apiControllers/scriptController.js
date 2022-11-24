@@ -331,6 +331,14 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 					apConfigs.lineItemsFileName = adNetworkConfig.lineItemsFileName;
 					apConfigs.fallbackLineItems = adNetworkConfig.fallbackLineItems;
 					apConfigs.refreshByTypeLineItems = adNetworkConfig.refreshByTypeLineItems || [];
+
+					const blockListedLineItemsAvailable =
+						prebidAndAdsConfig.blockListedLineItems &&
+						Array.isArray(prebidAndAdsConfig.blockListedLineItems) &&
+						prebidAndAdsConfig.blockListedLineItems.length;
+					if (blockListedLineItemsAvailable) {
+						apConfigs.blockListedLineItems = prebidAndAdsConfig.blockListedLineItems;
+					}
 				} else {
 					apConfigs.lineItems = (adNetworkConfig && adNetworkConfig.lineItems) || [];
 					apConfigs.separatelyGroupedLineItems =
