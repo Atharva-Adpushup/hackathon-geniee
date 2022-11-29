@@ -1514,6 +1514,7 @@ class Report extends Component {
 						resetSelectedReport={this.resetSelectedReport}
 						selectedReportName={selectedReportName}
 						updateReportName={this.updateReportName}
+						selectedFilterValues={selectedFilterValues}
 					/>
 				</Col>
 				<Col sm={12}>

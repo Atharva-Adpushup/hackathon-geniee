@@ -8,7 +8,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import Select from 'react-select';
 
 import { Glyphicon, Button } from '@/Client/helpers/react-bootstrap-imports';
-import CustomButton from '../../../Components/CustomButton';
+import GoogleOAuthLogin from '../../../Components/GoogleOAuthLogin';
 import AsyncGroupSelect from '../../../Components/AsyncGroupSelect/index';
 import PresetDateRangePicker from '../../../Components/PresetDateRangePicker/index';
 import SelectBox from '../../../Components/SelectBox/index';
@@ -182,30 +182,6 @@ class Control extends Component {
 		const resultObject = this.getStateParams();
 		const { generateButtonHandler } = this.props;
 		generateButtonHandler(resultObject);
-	};
-
-	exportToGoogleSheet = async () => {
-		const { csvData } = this.state;
-		const { showNotification } = this.props;
-
-		this.setState({ isLoading: true });
-		return reportService
-			.getReportingDataInGoogleSheet(csvData)
-			.then(res => {
-				const { data: { googleSheetLink } = {} } = res.data;
-				this.setState({ isLoading: false });
-
-				window.open(googleSheetLink, '_blank');
-			})
-			.catch(err => {
-				this.setState({ isLoading: false });
-				return showNotification({
-					mode: 'error',
-					title: 'Error',
-					message: 'Unable to export data to google sheet',
-					autoDismiss: 5
-				});
-			});
 	};
 
 	getStateParams = () => {
@@ -429,6 +405,48 @@ class Control extends Component {
 		</div>
 	);
 
+	getSelectedControlsForCSVColumns = () => {
+		const { startDate, endDate, selectedDimension = [], selectedInterval } = this.state;
+		const { selectedFilterValues = {} } = this.props;
+		// HB gives single dimension and type is string
+		const dimensions = Array.isArray(selectedDimension)
+			? selectedDimension.join(',')
+			: selectedDimension;
+		// Add empty strings for formatting - leave a blank cell
+		const csvInfo = [
+			['Start Date', startDate],
+			['End Date', endDate],
+			['Dimension', dimensions || 'N/A'],
+			['Interval', selectedInterval]
+		];
+
+		const filters = [['Filters', 'Filters Value']];
+		const isAnyFilterApplied = !!Object.keys(selectedFilterValues).length;
+		if (isAnyFilterApplied) {
+			const selectedFilterKeys = Object.keys(selectedFilterValues);
+			selectedFilterKeys.forEach(filterType => {
+				const filterValues = selectedFilterValues[filterType];
+				filters.push([
+					filterValues.length ? filterType : '',
+					filterValues.map(filter => filter.value).join(', ')
+				]);
+			});
+		} else {
+			filters.push(['N/A', 'N/A']);
+		}
+
+		filters.forEach((filter, index) => {
+			// exclude - heading of filters
+			if (csvInfo[index]) {
+				csvInfo[index] = [...csvInfo[index], '', ...filter];
+			} else {
+				csvInfo.push(['', '', '', ...filter]);
+			}
+		});
+		csvInfo.push([]);
+		return csvInfo;
+	};
+
 	render() {
 		const { state } = this;
 		const {
@@ -452,7 +470,7 @@ class Control extends Component {
 		const selectedReportEndDate = endDate;
 		const isUpdating = selectedReport !== null;
 		const isSavedReportsEmpty = savedReports.length === 0 && frequentReports.length === 0;
-		const { selectedDimension = [] } = state;
+		const { selectedDimension = [], csvData } = state;
 		const savedAndFrequentReportOptions = [
 			{ label: 'Saved Reports', value: 'savedReports', options: savedReports },
 			{ label: 'Frequent Reports', value: 'frequentReports', options: frequentReports }
@@ -479,6 +497,7 @@ class Control extends Component {
 			isFadeout = true;
 			multiSelectBoxMessage = `${multiSelectBoxMessage.slice(0, multiSelectBoxWidth / 8)}...`;
 		}
+
 		return (
 			<Fragment>
 				{!isSavedReportsEmpty && (
@@ -697,16 +716,17 @@ class Control extends Component {
 
 					{isSuperUser && (
 						<div className="aligner-item u-margin-r2">
-							<CustomButton
+							<GoogleOAuthLogin
 								type="button"
 								variant="secondary"
 								className="pull-right gs-btn"
 								showSpinner={state.isLoading}
+								selectedControlsForCSV={this.getSelectedControlsForCSVColumns()}
+								csvData={csvData}
 								// disabled={!hasUnsavedChanges}
-								onClick={this.exportToGoogleSheet}
 							>
 								Export To Google Sheet
-							</CustomButton>
+							</GoogleOAuthLogin>
 						</div>
 					)}
 				</div>
