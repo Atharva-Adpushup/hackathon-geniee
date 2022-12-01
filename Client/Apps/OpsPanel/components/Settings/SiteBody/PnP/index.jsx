@@ -11,6 +11,7 @@ import {
 	REFRESH_RATE_ENTRIES,
 	UNFILLED_REFRESH_RATE_ENTRIES,
 	PNP_REFRESH_TYPES,
+	PNP_AD_UNIT_OPERATIONS,
 	adUnitsData,
 	adUnitsHeaders
 } from '../../../../configs/commonConsts';
@@ -87,6 +88,11 @@ const PnP = (props = {}) => {
 	const [blacklistedLineItemsFileName, setBlacklistedItemsFileName] = useState('');
 	const [showAdUnitsModal, setShowAdUnitsModal] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
+	const [newUploadedAdUnits, setNewUploadedAdUnits] = useState([]);
+	const [selectedAdUnitOperation, setSelectedAdUnitOperation] = useState(
+		PNP_AD_UNIT_OPERATIONS[0].value
+	);
+	const [file, setFile] = useState(null);
 
 	const {
 		site: { apps = {}, siteId, siteDomain },
@@ -199,6 +205,10 @@ const PnP = (props = {}) => {
 		},
 		[siteId, updatePnPConfigKey]
 	);
+
+	const onSelectDropDown = value => {
+		setSelectedAdUnitOperation(value);
+	};
 
 	const validateUploadedAdUnits = useCallback(
 		(units = []) => {
@@ -316,8 +326,14 @@ const PnP = (props = {}) => {
 				return;
 			}
 
-			const newAdUnits = [...adUnits, ...processedUnits];
+			let newAdUnits = [];
+			if (selectedAdUnitOperation === PNP_AD_UNIT_OPERATIONS[1].value) {
+				newAdUnits = processedUnits;
+			} else if (selectedAdUnitOperation === PNP_AD_UNIT_OPERATIONS[0].value) {
+				newAdUnits = [...adUnits, ...processedUnits];
+			}
 			updatePnPConfigKey(siteId, 'adUnits', newAdUnits);
+			setNewUploadedAdUnits(newAdUnits);
 		},
 		[
 			adUnits,
@@ -325,7 +341,8 @@ const PnP = (props = {}) => {
 			isNativeEnabledOnAllUnits,
 			isOutstreamEnabledOnAllUnits,
 			validateUploadedAdUnits,
-			updatePnPConfigKey
+			updatePnPConfigKey,
+			selectedAdUnitOperation
 		]
 	);
 
@@ -392,21 +409,36 @@ const PnP = (props = {}) => {
 				return;
 			}
 			const fileName = e.target.value;
-			const file = e.target.files[0];
+			const fileToBeParsed = e.target.files[0];
 
 			if (uploadType === 'gamAdUnits') {
 				setAdUnitsFileName(fileName);
-				parseFile(uploadType, file);
 			} else if (uploadType === 'lineItems') {
 				setLineItemsFileName(fileName);
-				parseFile(uploadType, file);
 			} else if (uploadType === 'blacklistedLineItems') {
 				setBlacklistedItemsFileName(fileName);
-				parseFile(uploadType, file);
 			}
+			parseFile(uploadType, fileToBeParsed);
 		},
 		[parseFile, showNotification]
 	);
+
+	const handleGAM = e => {
+		const { value } = e.target;
+		if (!value.endsWith('.csv')) {
+			setAdUnitsFileName('');
+			return showNotification({
+				mode: 'error',
+				title: 'Operation Failed',
+				message: 'Only csv files are allowed',
+				autoDismiss: 5
+			});
+		}
+		setFile(e.target.files[0]);
+		setAdUnitsFileName(value);
+		parseFile('gamAdUnits', file);
+		return null;
+	};
 
 	const handleInputchange = useCallback(
 		e => {
@@ -415,9 +447,16 @@ const PnP = (props = {}) => {
 		[siteId, updatePnPConfigKey]
 	);
 
+	const handleReset = useCallback(() => {
+		setAdUnitsFileName('');
+		setLineItemsFileName('');
+		setBlacklistedItemsFileName('');
+		fetchPnPData();
+	}, [fetchPnPData]);
+
 	const handleSave = () => {
 		const payload = {
-			adUnits,
+			adUnits: newUploadedAdUnits.length || adUnits,
 			lineItems,
 			blacklistedLineItems,
 			pnpSiteId,
@@ -452,28 +491,30 @@ const PnP = (props = {}) => {
 					autoDismiss: 5
 				});
 			})
-			.finally(() => setIsLoading(false));
+			.finally(() => {
+				setIsLoading(false);
+				handleReset();
+			});
 	};
-
-	const handleReset = useCallback(() => {
-		setAdUnitsFileName('');
-		setLineItemsFileName('');
-		setBlacklistedItemsFileName('');
-		fetchPnPData();
-	}, [fetchPnPData]);
 
 	const renderView = () => (
 		<div>
 			<FieldGroup
 				name="GAM Ad Units"
+				className="u-padding-v4 u-padding-h4"
 				value={adUnitsFileName}
-				onChange={handleUploadUnits}
-				type="file"
+				onChange={handleGAM}
+				type="toggle-file-select-group"
 				accept=".csv"
 				label={uploadAdUnitsLabel}
 				size={6}
 				id="gamAdUnits"
-				style={PICKER_STYLE}
+				itemCollection={PNP_AD_UNIT_OPERATIONS}
+				dataKey="selectedAdUnitOperation"
+				fileDropdownValue={selectedAdUnitOperation}
+				onFileDropdownChange={onSelectDropDown}
+				fileDropdownTitle="Select Operation"
+				reset
 			/>
 			<FieldGroup
 				name="Line Items"
