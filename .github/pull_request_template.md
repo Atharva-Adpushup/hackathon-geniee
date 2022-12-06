@@ -11,6 +11,7 @@
 - [ ] Raised PR against develop (applicable only if hotfix or release)
 - [ ] Created Notion Card/JIRA Task
 - [ ] Added logging for analysis or error tracking
+- [ ] Documentation added
 
 # Additional Information
 
