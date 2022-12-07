@@ -648,6 +648,11 @@ const AP_LIGHT_AD_UNIT_OPERATIONS = [
 	{ name: 'Replace', value: 'replace' }
 ];
 
+const PNP_AD_UNIT_OPERATIONS = [
+	{ name: 'Append', value: 'append', default: true },
+	{ name: 'Replace', value: 'replace' }
+];
+
 const POWERED_BY_BANNER = [
 	{ label: 'Docked', value: 'DOCKED' },
 	{ label: 'Display', value: 'DISPLAY' },
@@ -832,6 +837,7 @@ export {
 	UNFILLED_REFRESH_RATE_ENTRIES,
 	PNP_REFRESH_TYPES,
 	AP_LIGHT_AD_UNIT_OPERATIONS,
+	PNP_AD_UNIT_OPERATIONS,
 	POWERED_BY_BANNER,
 	RULES_ENGINE,
 	INVENTORY_BULK_ACTIONS,
