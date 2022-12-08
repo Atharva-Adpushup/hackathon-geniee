@@ -92,7 +92,8 @@ module.exports = {
 		CLS_MONITORING: '1ju3NvLOBOqUEMzX1AfqKnQtLvB28hjS1-S1mJmOh6fI',
 		REPORTING_DATA: '1LJELLTJxJDPjlz07A7gTvvo59jQI_kLolyyUM89Df2M'
 	},
-	GOOGLE_OAUTH_CLIENT_ID: '776523595883-ku17c7130dv2bknmr8d3ukk2sdnluu1f.apps.googleusercontent.com',
+	GOOGLE_OAUTH_CLIENT_ID:
+		'776523595883-ku17c7130dv2bknmr8d3ukk2sdnluu1f.apps.googleusercontent.com',
 	GOOGLE_APP_API_KEY: 'AIzaSyCyrjpwFAJ3WDhpjjFXvF8OFMzoXnCYWiU',
 	REPORT_EXPORT: {
 		SCOPES: 'https://www.googleapis.com/auth/drive',
@@ -128,7 +129,6 @@ module.exports = {
 	TOP_URLS_API: `${reportingBaseURL}/topUrls`,
 	PRODUCT_LIST_API: `${reportingBaseURL}/common/activeProducts`,
 	SESSION_RPM_REPORTS_API: `${reportingBaseURL}/site/report?report_name=session_rpm_report`,
-	MAB_REPORTING_API: `${reportingBaseURL}/site/mab`,
 	GET_SITES_STATS_API: `${reportingBaseURL}/site/report`,
 	ALL_PRODUCTS_META_API: `${reportingBaseURL}/site/list?list_name=get_all_products`,
 	ACTIVE_PRODUCTS_FOR_ALL_SITES_API: `${reportingBaseURL}/common/activeProducts?isSuperUser=true`,
@@ -136,6 +136,7 @@ module.exports = {
 	ANALYTICS_METAINFO_URL: '/common/metaInfo',
 	REPORT_PATH: '/site/report?report_name=get_stats_by_custom',
 	REPORT_PATH_XPATH: '/site/report?report_name=get_ap_stats_by_custom',
+	MAB_REPORTING_API: `${reportingBaseURL}/site/report?report_name=get_stats_by_custom`,
 	URL_REPORT_PATH: '/url/report?report_name=url_report',
 	UTM_REPORT_PATH: '/url/report?report_name=utm_report&',
 	HB_REPORT_PATH: '/hb_analytics/report?report_name=GET_UI_PANEL_REPORT',
