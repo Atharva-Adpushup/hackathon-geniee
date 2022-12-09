@@ -92,7 +92,6 @@ const PnP = (props = {}) => {
 	const [selectedAdUnitOperation, setSelectedAdUnitOperation] = useState(
 		PNP_AD_UNIT_OPERATIONS[0].value
 	);
-	const [file, setFile] = useState(null);
 
 	const {
 		site: { apps = {}, siteId, siteDomain },
@@ -434,9 +433,9 @@ const PnP = (props = {}) => {
 				autoDismiss: 5
 			});
 		}
-		setFile(e.target.files[0]);
+		const fileToBeParsed = e.target.files[0];
 		setAdUnitsFileName(value);
-		parseFile('gamAdUnits', file);
+		parseFile('gamAdUnits', fileToBeParsed);
 		return null;
 	};
 
@@ -456,7 +455,7 @@ const PnP = (props = {}) => {
 
 	const handleSave = () => {
 		const payload = {
-			adUnits: newUploadedAdUnits.length || adUnits,
+			adUnits: newUploadedAdUnits || adUnits,
 			lineItems,
 			blacklistedLineItems,
 			pnpSiteId,
