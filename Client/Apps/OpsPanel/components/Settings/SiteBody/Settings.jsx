@@ -744,20 +744,24 @@ class Settings extends Component {
 					</>
 				)}
 
-				<Row>
-					<CustomButton variant="primary" className="pull-left" onClick={this.handleForceBuild}>
+				<div style={{ display: 'block' }}>
+					<CustomButton variant="primary" className="u-margin-t3" onClick={this.handleForceBuild}>
 						Force adpushup.js Build
-					</CustomButton>
-					<CustomButton variant="primary" className="pull-right" onClick={this.handleSave}>
-						Save
-					</CustomButton>
+					</CustomButton>{' '}
 					<CustomButton
 						variant="primary"
-						className="pull-left u-margin-t3"
+						className="u-margin-t3"
 						onClick={this.handleAmpDvcForceBuild}
 					>
 						Force build AMP DVC script
 					</CustomButton>
+				</div>
+				<Row>
+					<Col>
+						<CustomButton variant="primary" onClick={this.handleSave} className="u-margin-t3">
+							Save
+						</CustomButton>
+					</Col>
 				</Row>
 			</Col>
 		);
