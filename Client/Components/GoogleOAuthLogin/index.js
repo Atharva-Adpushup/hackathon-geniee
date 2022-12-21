@@ -98,36 +98,40 @@ const GoogleLoginButton = ({ selectedControlsForCSV, csvData, ...props }) => {
 			});
 		} catch (err) {
 			console.log('Generate report failed', err);
+			tokenClient.current.requestAccessToken({ prompt: '' });
 		}
 
 		return response.result.spreadsheetUrl;
 	}
+	const downloadReport = async () => {
+		try {
+			const sheetURL = await generateReport();
+			window.open(sheetURL, '_blank');
+		} catch (err) {
+			console.log('Auth failed: ', err);
+		}
+	};
 
 	/**
 	 *  Sign in the user upon button click.
 	 */
 	const handleAuthClick = () => {
-		if (gapiInited && gisInited) {
+		if (gapiInited.current && gisInited.current) {
 			tokenClient.current.callback = async resp => {
-				if (resp.error !== undefined) {
+				if (resp.error) {
 					console.log('Auth failed: ', resp.error);
-				}
-
-				try {
-					const sheetURL = await generateReport();
-					window.open(sheetURL, '_blank');
-				} catch (err) {
-					console.log('Auth failed: ', err);
+				} else {
+					downloadReport();
 				}
 			};
 
 			if (gapi.client.getToken() === null) {
 				// Prompt the user to select a Google Account and ask for consent to share their data
 				// when establishing a new session.
-				tokenClient.current.requestAccessToken({ prompt: 'consent' });
+				tokenClient.current.requestAccessToken();
 			} else {
 				// Skip display of account chooser and consent dialog for an existing session.
-				tokenClient.current.requestAccessToken({ prompt: '' });
+				downloadReport();
 			}
 		}
 	};
