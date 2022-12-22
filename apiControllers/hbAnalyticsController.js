@@ -4,6 +4,7 @@ const _ = require('lodash');
 
 const CC = require('../configs/commonConsts');
 const utils = require('../helpers/utils');
+const { addActiveProductsToMeta } = require('../helpers/routeHelpers');
 
 const router = express.Router();
 
@@ -122,11 +123,14 @@ router
 				json: true,
 				qs: params
 			})
-				.then(response =>
-					response.code === 1 && response.data
-						? res.send(response.data) && response.data
-						: res.send({})
-				)
+				.then(async response => {
+					const { code, data } = response;
+					if (code === 1 && data) {
+						const updatedData = await addActiveProductsToMeta(data);
+						return res.send(updatedData);
+					}
+					return res.send({});
+				})
 				.catch(() => res.send({}));
 		}
 

@@ -23,6 +23,7 @@ const ObjectValidator = require('../helpers/ObjectValidator');
 
 const { getUserGaEnabledSites, getUserByEmail } = require('../models/userModel');
 const { getAllGaEnabledSites } = require('../models/siteModel');
+const { addActiveProductsToMeta } = require('../helpers/routeHelpers');
 
 const reportsService = {
 	generateCronExpression: (interval, startDate) => {
@@ -184,17 +185,18 @@ const reportsService = {
 		const params = { siteid, isSuperUser };
 		return ObjectValidator(getMetaDataValidations, params)
 			.then(() => reportsService.modifyQueryIfPnp(params))
-			.then(params => {
-				return request({
+			.then(params =>
+				request({
 					uri: `${CC.ANALYTICS_API_ROOT}${CC.ANALYTICS_METAINFO_URL}`,
 					json: true,
 					qs: params
 				})
-			})
-			.then(response => {
+			)
+			.then(async response => {
 				const { code = -1, data } = response;
 				if (code !== 1) return Promise.reject(new Error(response.data));
-				return data;
+				const updatedData = await addActiveProductsToMeta(data);
+				return updatedData;
 			});
 	},
 	modifyQueryIfPnp: query => {
@@ -205,9 +207,7 @@ const reportsService = {
 		}
 		const siteIds = query.siteid.split(',').map(siteId => parseInt(siteId));
 		const pnpQuery = CC.GET_ACTIVE_PNP_SITE_MAPPING_QUERY.replace('$1', JSON.stringify(siteIds));
-		const dbQuery = couchbase.N1qlQuery.fromString(
-			pnpQuery
-		);
+		const dbQuery = couchbase.N1qlQuery.fromString(pnpQuery);
 		return queryViewFromAppBucket(dbQuery)
 			.then(data => {
 				// data is array of objects e.g.. [{mappedPnpSiteId: 41355}, {mappedPnpSiteId:41395}]
@@ -228,7 +228,7 @@ const reportsService = {
 			uri: `${CC.ANALYTICS_API_ROOT}${CC.REPORT_PATH}`,
 			json: true,
 			qs: reportConfig,
-			timeout: 600000 //10 mins
+			timeout: 600000 // 10 mins
 		});
 
 		if (reportsResponse.code !== 1) throw new AdPushupError(reportsResponse);
@@ -239,7 +239,7 @@ const reportsService = {
 			uri: `${CC.ANALYTICS_API_ROOT}${CC.REPORT_PATH_XPATH}`,
 			json: true,
 			qs: reportConfig,
-			timeout: 600000 //10 mins
+			timeout: 600000 // 10 mins
 		});
 
 		if (reportsResponse.code !== 1) throw new AdPushupError(reportsResponse);
@@ -284,56 +284,57 @@ const reportsService = {
 			.then(config => reportsService.fetchReportAPCustomStatXPath(config)),
 	getWidgetData: async (path, params) =>
 		ObjectValidator(getWidgetDataValidations, { path, params })
-			.then(() => {
-				return request({
+			.then(() =>
+				request({
 					uri: `${CC.ANALYTICS_API_ROOT}${path}`,
 					json: true,
 					qs: params
 				})
-			})
+			)
 			.then(response => {
 				if (response && response.code !== 1) throw new AdPushupError(response);
 				return response.data;
 			}),
 	getReportsWithCache: async (reportConfig, bypassCache = false, email) => {
 		const { siteid } = reportConfig;
-		//bypass if site has blocked prefetch
+		// bypass if site has blocked prefetch
 		if (siteid)
-			config.prefetchBlockedSites && config.prefetchBlockedSites.forEach(blockedSitePreFetch => {
-				if (siteid.indexOf(blockedSitePreFetch) !== -1) bypassCache = true;
-			});
+			config.prefetchBlockedSites &&
+				config.prefetchBlockedSites.forEach(blockedSitePreFetch => {
+					if (siteid.indexOf(blockedSitePreFetch) !== -1) bypassCache = true;
+				});
 		const sortedConfig = sortObjectEntries(reportConfig);
-		return ObjectValidator(getCustomStatsValidations, sortedConfig).then(() => {
-			return cacheWrapper(
+		return ObjectValidator(getCustomStatsValidations, sortedConfig).then(() =>
+			cacheWrapper(
 				{ cacheKey: JSON.stringify(sortedConfig), bypassCache, cacheExpiry: 4 * 3600 },
 				async () => reportsService.getReports(reportConfig, email)
-			);
-		});
+			)
+		);
 	},
 	getReportsAPCustomStatXPathWithCache: async (reportConfig, bypassCache = false) => {
 		const sortedConfig = sortObjectEntries(reportConfig);
-		return ObjectValidator(getCustomStatsValidations, sortedConfig).then(() => {
+		return ObjectValidator(getCustomStatsValidations, sortedConfig).then(() =>
 			// added a prefix 'xPath-' to cacheKey to make it unique for xPath
 			// because reportConfig is same for General Report and xPath report
-			return cacheWrapper(
-				{ cacheKey: 'xPath-' + JSON.stringify(sortedConfig), bypassCache, cacheExpiry: 24 * 3600 },
+			cacheWrapper(
+				{ cacheKey: `xPath-${JSON.stringify(sortedConfig)}`, bypassCache, cacheExpiry: 24 * 3600 },
 				async () => reportsService.getReportAPCustomStatXPath(reportConfig)
-			);
-		});
-	},
-	getReportingMetaDataWithCache: async (sites, isSuperUser, bypassCache = false) => {
-		return cacheWrapper(
-			{ cacheKey: JSON.stringify({ sites, isSuperUser }), cacheExpiry: 24 * 3600, bypassCache },
-			async () => reportsService.getReportingMetaData(sites, isSuperUser)
+			)
 		);
 	},
+	getReportingMetaDataWithCache: async (sites, isSuperUser, bypassCache = false) =>
+		cacheWrapper(
+			{ cacheKey: JSON.stringify({ sites, isSuperUser }), cacheExpiry: 24 * 3600, bypassCache },
+			async () => reportsService.getReportingMetaData(sites, isSuperUser)
+		),
 	getWidgetDataWithCache: async (path, params, bypassCache = false) => {
 		const { siteid } = params;
-		//bypass if site has blocked prefetch
+		// bypass if site has blocked prefetch
 		if (siteid)
-			config.prefetchBlockedSites && config.prefetchBlockedSites.forEach(blockedSitePreFetch => {
-				if (siteid.indexOf(blockedSitePreFetch) !== -1) bypassCache = true;
-			});
+			config.prefetchBlockedSites &&
+				config.prefetchBlockedSites.forEach(blockedSitePreFetch => {
+					if (siteid.indexOf(blockedSitePreFetch) !== -1) bypassCache = true;
+				});
 		return cacheWrapper(
 			{ cacheKey: JSON.stringify({ path, params }), cacheExpiry: 4 * 3600, bypassCache },
 			async () => reportsService.getWidgetData(path, params)
@@ -386,8 +387,8 @@ const reportsService = {
 		if (isAnySiteWithoutGaEnabled) return false;
 		return true;
 	},
-	processAndSendReportingData: (email, config, reportConfig) => {
-		return Promise.all([
+	processAndSendReportingData: (email, config, reportConfig) =>
+		Promise.all([
 			reportsService.fetchReports(config),
 			reportsService.shouldUseGaPageViews(email, reportConfig)
 		]).then(async ([reports, isGaPageBeingUsed]) => {
@@ -400,11 +401,10 @@ const reportsService = {
 			const isReportingDataHavePageViews = doesReportingHavePageViewData(columns);
 			if (!isGaPageBeingUsed || !isReportingDataHavePageViews) return result;
 			return reportsService.transformReportingDataForGA(result);
-		});
-	},
+		}),
 	transformReportingDataForGA: reportingResult => {
 		const { result = [], total } = reportingResult;
-		//This will store the sum of Ap page views where Ga page views is Zero
+		// This will store the sum of Ap page views where Ga page views is Zero
 		let sumOfApPageViewsWhereGAPageViewNotExist = 0;
 		for (let index = 0; index < result.length; index++) {
 			const rowData = result[index];
@@ -426,7 +426,7 @@ const reportsService = {
 			total_network_net_revenue: totalNetworkRevenue = 0
 		} = total;
 		if (totalGaPageViews) {
-			//Here we are adding page views which are present in result but not in total data(becuase ga page views is being used here)
+			// Here we are adding page views which are present in result but not in total data(becuase ga page views is being used here)
 			const updatedTotalGaPageViews = totalGaPageViews + sumOfApPageViewsWhereGAPageViewNotExist;
 			total.total_adpushup_page_views = updatedTotalGaPageViews;
 			total.total_adpushup_page_cpm = parseFloat(

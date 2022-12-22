@@ -6,6 +6,7 @@ const router = express.Router();
 
 const HTTP_STATUSES = require('../configs/httpStatusConsts');
 const { sendErrorResponse } = require('../helpers/commonFunctions');
+const { addActiveProductsToMeta } = require('../helpers/routeHelpers');
 
 router
 	.get('/getCustomStats', (req, res) => {
@@ -76,10 +77,13 @@ router
 				json: true,
 				qs: params
 			})
-				.then(response => {
+				.then(async response => {
 					const { code = -1, data } = response;
-					if (code !== 1) return Promise.reject(new Error(response.data));
-					return response.code === 1 && data ? res.send(data) && data : res.send({});
+					if (code === 1) {
+						const updatedData = await addActiveProductsToMeta(data);
+						return updatedData ? res.send(updatedData) : res.send({});
+					}
+					return Promise.reject(new Error(response.data));
 				})
 				.catch(err => {
 					const { message: errorMessage } = err;
