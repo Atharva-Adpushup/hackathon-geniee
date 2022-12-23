@@ -88,7 +88,6 @@ const PnP = (props = {}) => {
 	const [blacklistedLineItemsFileName, setBlacklistedItemsFileName] = useState('');
 	const [showAdUnitsModal, setShowAdUnitsModal] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
-	const [newUploadedAdUnits, setNewUploadedAdUnits] = useState([]);
 	const [selectedAdUnitOperation, setSelectedAdUnitOperation] = useState(
 		PNP_AD_UNIT_OPERATIONS[0].value
 	);
@@ -332,7 +331,6 @@ const PnP = (props = {}) => {
 				newAdUnits = [...adUnits, ...processedUnits];
 			}
 			updatePnPConfigKey(siteId, 'adUnits', newAdUnits);
-			setNewUploadedAdUnits(newAdUnits);
 		},
 		[
 			adUnits,
@@ -455,7 +453,7 @@ const PnP = (props = {}) => {
 
 	const handleSave = () => {
 		const payload = {
-			adUnits: newUploadedAdUnits || adUnits,
+			adUnits,
 			lineItems,
 			blacklistedLineItems,
 			pnpSiteId,
