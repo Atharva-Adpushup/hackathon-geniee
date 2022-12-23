@@ -841,12 +841,8 @@ const Promise = require('bluebird'),
 		const pageGroup = docIdPartValue;
 
 		return { pageGroup, platform };
-	},
-	subtractDate = (NumberOfDays = 0) => {
-		return moment()
-			.subtract(NumberOfDays, 'days')
-			.format('YYYY-MM-DD');
 	};
+
 module.exports = {
 	queryResultProcessing,
 	getWeeklyComparisionReport,
@@ -879,6 +875,5 @@ module.exports = {
 	getMandatoryAdsTxtEntrySnippet,
 	getNetworkWideHBRules,
 	removeFormatWiseParamsForAMP,
-	getPageGroupNameAndPlatformFromChannelDoc,
-	subtractDate
+	getPageGroupNameAndPlatformFromChannelDoc
 };
