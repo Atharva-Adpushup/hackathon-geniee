@@ -59,6 +59,13 @@ const getActiveDfpNetworkCode = function(user) {
 	);
 };
 
+const setOutbrainDisabled = function(site, scriptType) {
+	const outbrainDisabled =
+		(site.get('apConfigs') && site.get('apConfigs').outbrainDisabled) || false;
+	if (typeof outbrainDisabled === 'object') return outbrainDisabled[scriptType];
+	return outbrainDisabled;
+};
+
 Router.get('/:siteId/ampDeliveryViaCreativeConfig', (req, res) => {
 	/**
 	 * this route will be used by AmpDeliveryViaCreative repo
@@ -141,6 +148,10 @@ Router.get('/:siteId/ampDeliveryViaCreativeConfig', (req, res) => {
 				if (shouldDeductApShareFromHb) {
 					apConfigs.revenueShare = revenueShare;
 				}
+				apConfigs.outbrainDisabled = setOutbrainDisabled(
+					site,
+					CC.OUTBRAIN_DISABLED_SCRIPTS.AMP_DVC
+				);
 				apConfigs.gptSraDisabled = !!gptSraDisabled;
 				apConfigs.siteDomain = site.get('siteDomain');
 				apConfigs.ownerEmailMD5 = user.get('sellerId');
@@ -382,6 +393,10 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 				if (shouldDeductApShareFromHb) {
 					apConfigs.revenueShare = revenueShare;
 				}
+				apConfigs.outbrainDisabled = setOutbrainDisabled(
+					site,
+					CC.OUTBRAIN_DISABLED_SCRIPTS.ADPUSHUP_JS
+				);
 				apConfigs.gptSraDisabled = !!gptSraDisabled;
 				apConfigs.siteDomain = site.get('siteDomain');
 				apConfigs.ownerEmailMD5 = user.get('sellerId');
@@ -597,7 +612,10 @@ Router.get('/:siteId/ampSiteConfig', (req, res) => {
 				apConfigs.siteDomain = site.get('siteDomain');
 				apConfigs.ownerEmailMD5 = user.get('sellerId');
 				apConfigs.activeDFPNetwork = getActiveDfpNetworkCode(user);
-
+				apConfigs.outbrainDisabled = setOutbrainDisabled(
+					site,
+					CC.OUTBRAIN_DISABLED_SCRIPTS.AMP_TYPE_ADPUSHUP
+				);
 				// GAM 360 config
 				apConfigs.mcm = user.get('mcm') || {};
 

@@ -11,6 +11,8 @@ import {
 	GA_ACCESS_EMAIL_OPTIONS,
 	GA_VERSION_OPTIONS,
 	POWERED_BY_BANNER,
+	OUTBRAIN_DISABLED,
+	OUTBRAIN_DISABLED_OPTIONS,
 	SITE_LEVEL_REFRESH_TYPE
 } from '../../../configs/commonConsts';
 
@@ -41,7 +43,7 @@ class Settings extends Component {
 			cmpAvailable = false,
 			mergeReport = false,
 			videoAdsDashboard = false,
-			outbrainDisabled = false,
+			outbrainDisabled = OUTBRAIN_DISABLED.DEFAULT_VALUES,
 			siteLevelRefreshType = SITE_LEVEL_REFRESH_TYPE[0].value,
 			isWeeklyEmailReportsEnabled = false,
 			isDailyEmailReportsEnabled = false,
@@ -58,6 +60,7 @@ class Settings extends Component {
 		const status = Object.prototype.hasOwnProperty.call(apps, 'apLite') ? apps.apLite : undefined;
 		const isPnPEnabled = Object.prototype.hasOwnProperty.call(apps, 'pnp') ? apps.pnp : false;
 		const selectedAdTypes = this.getSelectedAdTypes(poweredByBanner);
+		const selectedOutbrainDisabledTypes = this.getSelectedOutbrainDisabledTypes(outbrainDisabled);
 		this.state = {
 			isSPA,
 			spaButUsingHook,
@@ -74,7 +77,7 @@ class Settings extends Component {
 			cmpEnabled: !cmpAvailable,
 			mergeReport,
 			videoAdsDashboard,
-			outbrainDisabled,
+			selectedOutbrainDisabledTypes: [...selectedOutbrainDisabledTypes],
 			isWeeklyEmailReportsEnabled,
 			isDailyEmailReportsEnabled,
 			enableGAAnalytics,
@@ -175,8 +178,12 @@ class Settings extends Component {
 		});
 	};
 
-	handleMultiSelect = selectedAdTypes => {
+	handlePoweredByBannerMultiSelect = selectedAdTypes => {
 		this.setState({ selectedAdTypes });
+	};
+
+	handleOutbrainDisabledMultiSelect = selectedOutbrainDisabledTypes => {
+		this.setState({ selectedOutbrainDisabledTypes });
 	};
 
 	handleOnSelect = (value, key) => {
@@ -192,6 +199,14 @@ class Settings extends Component {
 		return poweredByBannerConfig;
 	};
 
+	getOutbrainDisabledConfig = selectedOutbrainDisabledTypes => {
+		const outbrainDisabledConfig = { ...OUTBRAIN_DISABLED.DEFAULT_VALUES };
+		selectedOutbrainDisabledTypes.forEach(selectedElement => {
+			outbrainDisabledConfig[selectedElement.value] = true;
+		});
+		return { ...outbrainDisabledConfig };
+	};
+
 	getSelectedAdTypes = poweredByBanner => {
 		const selectedAdTypes = [];
 		const poweredByBannerSupportedAdTypes = Object.keys(poweredByBanner);
@@ -203,6 +218,33 @@ class Settings extends Component {
 		});
 
 		return selectedAdTypes;
+	};
+
+	getSelectedOutbrainDisabledTypes = outbrainDisabled => {
+		const selectedOutbrainDisabledTypes = [];
+
+		const supportedOutbrainDisabledTypes = Object.keys(OUTBRAIN_DISABLED.DEFAULT_VALUES);
+
+		if (typeof outbrainDisabled === 'boolean' && outbrainDisabled) {
+			supportedOutbrainDisabledTypes.forEach(outbrainDisabledType => {
+				selectedOutbrainDisabledTypes.push({
+					label: outbrainDisabledType,
+					value: outbrainDisabledType
+				});
+			});
+			return selectedOutbrainDisabledTypes;
+		}
+
+		supportedOutbrainDisabledTypes.forEach(outbrainDisabledType => {
+			if (outbrainDisabled[outbrainDisabledType]) {
+				selectedOutbrainDisabledTypes.push({
+					label: outbrainDisabledType,
+					value: outbrainDisabledType
+				});
+			}
+		});
+
+		return selectedOutbrainDisabledTypes;
 	};
 
 	handleForceBuild = () => {
@@ -249,7 +291,7 @@ class Settings extends Component {
 			cmpEnabled,
 			mergeReport,
 			videoAdsDashboard,
-			outbrainDisabled,
+			selectedOutbrainDisabledTypes,
 			siteLevelRefreshType,
 			isWeeklyEmailReportsEnabled,
 			isDailyEmailReportsEnabled,
@@ -261,6 +303,7 @@ class Settings extends Component {
 			selectedAdTypes
 		} = this.state;
 		const poweredByBanner = this.getPoweredByBannerConfig(selectedAdTypes);
+		const outbrainDisabled = this.getOutbrainDisabledConfig(selectedOutbrainDisabledTypes);
 		const gaConfigs = {
 			gaTrackingId,
 			viewId,
@@ -336,7 +379,6 @@ class Settings extends Component {
 			saveConfig.urlReporting = false;
 			saveConfig.utmReporting = false;
 		}
-
 		return saveSettings(site.siteId, saveConfig, dataForAuditLogs);
 	};
 
@@ -381,7 +423,7 @@ class Settings extends Component {
 			cmpEnabled,
 			mergeReport,
 			videoAdsDashboard,
-			outbrainDisabled,
+			selectedOutbrainDisabledTypes,
 			isDailyEmailReportsEnabled,
 			isWeeklyEmailReportsEnabled,
 			enableGAAnalytics,
@@ -394,7 +436,7 @@ class Settings extends Component {
 			siteLevelRefreshType
 		} = this.state;
 
-		const { handleMultiSelect } = this;
+		const { handlePoweredByBannerMultiSelect, handleOutbrainDisabledMultiSelect } = this;
 		const { site } = this.props;
 
 		const { siteId, siteDomain, dataFeedActive = true } = site;
@@ -448,7 +490,7 @@ class Settings extends Component {
 					<MultiSelect
 						options={POWERED_BY_BANNER}
 						value={selectedAdTypes}
-						onChange={handleMultiSelect}
+						onChange={handlePoweredByBannerMultiSelect}
 						disableSearch
 						hasSelectAll={false}
 					/>
@@ -554,19 +596,16 @@ class Settings extends Component {
 					name={`videoAdsDashboard-${siteId}-${siteDomain}`}
 					id={`js-videoAdsDashboard-switch-${siteId}-${siteDomain}`}
 				/>
-				<CustomToggleSwitch
-					labelText="Disable Outbrain"
-					className="u-margin-b4 negative-toggle"
-					checked={outbrainDisabled}
-					onChange={this.handleToggle}
-					layout="horizontal"
-					size="m"
-					on="Yes"
-					off="No"
-					defaultLayout
-					name={`outbrainDisabled-${siteId}-${siteDomain}`}
-					id={`js-outbrainDisabled-switch-${siteId}-${siteDomain}`}
-				/>
+				<div className="outbrain-disabled">
+					<h1>Outbrain Disabled</h1>
+					<MultiSelect
+						options={OUTBRAIN_DISABLED_OPTIONS}
+						value={selectedOutbrainDisabledTypes}
+						onChange={handleOutbrainDisabledMultiSelect}
+						disableSearch
+						hasSelectAll={false}
+					/>
+				</div>
 				{!config.disableDailyWeeklySnapshots && (
 					<CustomToggleSwitch
 						labelText="Email Daily Reports Updates"

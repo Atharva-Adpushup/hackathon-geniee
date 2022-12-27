@@ -660,6 +660,32 @@ const POWERED_BY_BANNER = [
 	{ label: 'Chained Docked', value: 'CHAINED_DOCKED' }
 ];
 
+const OUTBRAIN_DISABLED = {
+	// NOTE: Please do the script name related changes in main configs > commonConsts.js also
+	SCRIPTS: {
+		ADPUSHUP_JS: 'ADPUSHUP_JS',
+		AMP_DVC: 'AMP_DVC',
+		AMP_TYPE_ADPUSHUP: 'AMP_TYPE_ADPUSHUP'
+	},
+	DEFAULT_VALUES: {
+		ADPUSHUP_JS: false,
+		AMP_DVC: false,
+		AMP_TYPE_ADPUSHUP: false
+	}
+};
+
+const OUTBRAIN_DISABLED_OPTIONS = [
+	{
+		label: OUTBRAIN_DISABLED.SCRIPTS.ADPUSHUP_JS,
+		value: OUTBRAIN_DISABLED.SCRIPTS.ADPUSHUP_JS
+	},
+	{
+		label: OUTBRAIN_DISABLED.SCRIPTS.AMP_TYPE_ADPUSHUP,
+		value: OUTBRAIN_DISABLED.SCRIPTS.AMP_TYPE_ADPUSHUP
+	},
+	{ label: OUTBRAIN_DISABLED.SCRIPTS.AMP_DVC, value: OUTBRAIN_DISABLED.SCRIPTS.AMP_DVC }
+];
+
 const SITE_LEVEL_REFRESH_TYPE = [
 	{ name: 'Active View', value: 'Active View' },
 	{ name: 'Active Tab', value: 'Active Tab' },
@@ -847,6 +873,8 @@ export {
 	AP_LIGHT_AD_UNIT_OPERATIONS,
 	PNP_AD_UNIT_OPERATIONS,
 	POWERED_BY_BANNER,
+	OUTBRAIN_DISABLED,
+	OUTBRAIN_DISABLED_OPTIONS,
 	RULES_ENGINE,
 	INVENTORY_BULK_ACTIONS,
 	AD_UNIT_TYPE_MAPPING,

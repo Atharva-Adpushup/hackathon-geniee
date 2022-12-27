@@ -783,7 +783,7 @@
 	}
 }
 
-.powered-by-adpushup {
+.outbrain-disabled,.powered-by-adpushup {
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
@@ -815,6 +815,19 @@
 			font-size: 10px;
 			color: red;
 		}
+	}
+}
+
+.outbrain-disabled{
+	.rmsc {
+		.options {
+			height: 145px;
+		}
+	}
+}
+
+.powered-by-adpushup{
+	.rmsc {
 		.options {
 			height: 160px;
 		}
