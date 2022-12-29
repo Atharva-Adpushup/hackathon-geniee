@@ -80,7 +80,7 @@ class HeaderBiddingRulesList extends React.Component {
 				}
 
 				return (
-					<div className="trigger-content" key={key}>
+					<div className="trigger-content wrap-word" key={key}>
 						<span className="content-item serial">{triggerIndex + 1}. </span>
 						<span className="content-item key-content">{keyContent}</span>
 						<span className="content-item operator-content">
