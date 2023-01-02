@@ -1099,7 +1099,7 @@ async function getAssociatedAccountsWithUser(userEmail) {
 							domains: Object.keys(account.sites).map(siteId => account.sites[siteId].domain)
 						}
 					}
-				}).filter(item => item.siteIds.length)
+				});
 			}).catch(() => {
 				// this is to manage the case where a particular user AM/AdOps
 				// has restricted access but no site has been assigned to him/her
