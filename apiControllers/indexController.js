@@ -27,7 +27,8 @@ const {
 	errorHandler,
 	checkParams,
 	sendDataToAuditLogService,
-	getAssociatedAccountsWithUser
+	getAssociatedAccountsWithUser,
+	addActiveProductsToMeta
 } = require('../helpers/routeHelpers');
 
 const router = express.Router();
@@ -124,14 +125,20 @@ function getUserSites(user) {
 	}).then(() => sites);
 }
 
-function getReportsMetaData(params) {
+async function getReportsMetaData(params) {
 	return request({
 		uri: `${consts.ANALYTICS_API_ROOT}${consts.ANALYTICS_METAINFO_URL}`,
 		json: true,
 		qs: params
 	})
-		.then(response => {
-			return response.code == 1 && response.data ? response.data : {};
+		.then(async response => {
+			const { data, code } = response;
+			if (code == 1 && data) {
+				const updatedData = await addActiveProductsToMeta(data);
+				return updatedData;
+			} else {
+				return {};
+			}
 		})
 		.catch(err => {});
 }
