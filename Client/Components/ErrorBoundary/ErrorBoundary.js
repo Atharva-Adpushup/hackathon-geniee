@@ -45,7 +45,7 @@ class ErrorBoundary extends React.Component {
 
 	componentDidCatch(err, info) {
 		console.log(err, info);
-		return this.setState({ err: err, info: info, errorMessage: err.message }, () =>
+		return this.setState({ err: err.stack, info, errorMessage: err.message }, () =>
 			this.sendErrorLog('default')
 		);
 	}
@@ -72,10 +72,8 @@ class ErrorBoundary extends React.Component {
 							</a>
 							.
 							<p style={{ marginTop: '20px', fontSize: '16px' }}>
-							To go back to Dashboard, please{' '}
-							<a href="/dashboard"> Click here</a>
-							.
-						</p>
+								To go back to Dashboard, please <a href="/dashboard"> Click here</a>.
+							</p>
 						</p>
 					)}
 				</div>

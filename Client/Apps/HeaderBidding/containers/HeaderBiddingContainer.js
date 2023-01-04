@@ -18,6 +18,7 @@ import {
 	saveHBRulesAction,
 	fetchActiveAdUnitSizesAction
 } from '../../../actions/apps/headerBidding/hbActions';
+import CustomError from '../../../helpers/CustomError';
 
 import { showNotification, hideNotification } from '../../../actions/uiActions';
 
@@ -55,29 +56,34 @@ const HeaderBiddingContainer = props => {
 
 export default connect(
 	(state, ownProps) => {
-		const {
-			match: {
-				params: { siteId }
-			}
-		} = ownProps;
-		const { user } = state.global;
-		const {
-			apps: {
-				headerBidding: { hasUnsavedChanges, sites }
-			},
-			global: {
-				user: {
-					data: {
-						sites: {
-							[siteId]: { domain }
-						},
-						isSuperUser
+		try {
+			const {
+				match: {
+					params: { siteId }
+				}
+			} = ownProps;
+			const { user } = state.global;
+
+			const {
+				apps: {
+					headerBidding: { hasUnsavedChanges, sites }
+				},
+				global: {
+					user: {
+						data: {
+							sites: {
+								[siteId]: { domain }
+							},
+							isSuperUser
+						}
 					}
 				}
-			}
-		} = state;
-		const currSiteHbData = sites && sites[siteId];
-		return { currSiteHbData, domain, hasUnsavedChanges, user: user.data, isSuperUser };
+			} = state;
+			const currSiteHbData = sites && sites[siteId];
+			return { currSiteHbData, domain, hasUnsavedChanges, user: user.data, isSuperUser };
+		} catch (err) {
+			throw new CustomError(err, state.global.user.data);
+		}
 	},
 	{
 		checkInventoryAction,

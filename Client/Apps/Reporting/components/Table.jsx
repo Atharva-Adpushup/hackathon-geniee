@@ -11,6 +11,7 @@ import { reactTableSortMethod } from '../../../helpers/commonFunctions';
 import { columnsBlacklistedForAddition } from '../configs/commonConsts';
 import CustomReactTable from '../../../Components/CustomReactTable/index';
 import CustomToggle from '../../../Components/CustomToggle';
+import CustomError from '../../../helpers/CustomError';
 
 let expandedRows = {};
 const formatCellValue = (value, valueType, percValue) => {
@@ -64,73 +65,86 @@ const getTableBody = (tableBody, props) => {
 
 	tableData.forEach(row => {
 		const tableRow = { ...row, day: '' };
-		tableRow.day = `${moment(tableRow.date).format('dddd')}`;
+		try {
+			tableRow.day = `${moment(tableRow.date).format('dddd')}`;
 
-		if (isDaily) tableRow.date = tableRow.date;
+			if (isDaily) tableRow.date = tableRow.date;
 
-		if (isMonthly) {
-			let monthlyDateRangeStart;
-			let monthlyDateRangeEnd;
+			if (isMonthly) {
+				let monthlyDateRangeStart;
+				let monthlyDateRangeEnd;
+				// Compute monthlyDateRangeStart
+				if (`${tableRow.year}-${tableRow.month}` === moment(startDate).format('Y-M')) {
+					monthlyDateRangeStart = moment(startDate).format('ll');
+				} else {
+					monthlyDateRangeStart = moment()
+						.month(tableRow.month - 1) // moment accepts 0-11 months
+						.year(tableRow.year)
+						.startOf('month')
+						.format('ll');
+				}
 
-			// Compute monthlyDateRangeStart
-			if (`${tableRow.year}-${tableRow.month}` === moment(startDate).format('Y-M')) {
-				monthlyDateRangeStart = moment(startDate).format('ll');
-			} else {
-				monthlyDateRangeStart = moment()
-					.month(tableRow.month - 1) // moment accepts 0-11 months
-					.year(tableRow.year)
-					.startOf('month')
-					.format('ll');
+				// Compute monthlyDateRangeEnd
+				if (`${tableRow.year}-${tableRow.month}` === moment(endDate).format('Y-M')) {
+					monthlyDateRangeEnd = moment(endDate).format('ll');
+				} else {
+					monthlyDateRangeEnd = moment()
+						.month(tableRow.month - 1) // moment accepts 0-11 months
+						.year(tableRow.year)
+						.endOf('month')
+						.format('ll');
+				}
+
+				tableRow.date = `${monthlyDateRangeStart} to ${monthlyDateRangeEnd}`;
 			}
 
-			// Compute monthlyDateRangeEnd
-			if (`${tableRow.year}-${tableRow.month}` === moment(endDate).format('Y-M')) {
-				monthlyDateRangeEnd = moment(endDate).format('ll');
-			} else {
-				monthlyDateRangeEnd = moment()
-					.month(tableRow.month - 1) // moment accepts 0-11 months
-					.year(tableRow.year)
-					.endOf('month')
-					.format('ll');
+			if (isCumulative)
+				tableRow.date = `${moment(startDate).format('ll')} to ${moment(endDate).format('ll')}`;
+
+			if (tableRow.siteid) {
+				const { siteid } = tableRow;
+
+				if (site) {
+					tableRow.siteName = React.cloneElement(
+						<a href={`/reports/${siteid}`}>{tableRow.site}</a>
+					);
+				} else return;
+
+				delete tableRow.siteid;
 			}
 
-			tableRow.date = `${monthlyDateRangeStart} to ${monthlyDateRangeEnd}`;
+			if (tableRow.url) {
+				const { url } = tableRow;
+				// adjust url acc to width - add break points for every '-'
+				const splitURL = url.split('-');
+				tableRow.url = React.cloneElement(
+					<a target="_blank" rel="noopener noreferrer" href={`https://${url}`}>
+						{splitURL.map((item, index) => (
+							// eslint-disable-next-line react/no-array-index-key
+							<span key={index}>
+								{`${index !== 0 ? '-' : ''}${item}`}
+								<wbr />
+							</span>
+						))}
+					</a>
+				);
+			}
+			if (tableRow.utm_key) {
+				tableRow.utm_key = tableRow.display_name;
+			}
+
+			displayTableData.push(tableRow);
+		} catch (err) {
+			throw new CustomError(err, {
+				tableRow,
+				startDate,
+				endDate,
+				site,
+				isDaily,
+				isMonthly,
+				isCumulative
+			});
 		}
-
-		if (isCumulative)
-			tableRow.date = `${moment(startDate).format('ll')} to ${moment(endDate).format('ll')}`;
-
-		if (tableRow.siteid) {
-			const { siteid } = tableRow;
-
-			if (site) {
-				tableRow.siteName = React.cloneElement(<a href={`/reports/${siteid}`}>{tableRow.site}</a>);
-			} else return;
-
-			delete tableRow.siteid;
-		}
-
-		if (tableRow.url) {
-			const { url } = tableRow;
-			// adjust url acc to width - add break points for every '-'
-			const splitURL = url.split('-');
-			tableRow.url = React.cloneElement(
-				<a target="_blank" rel="noopener noreferrer" href={`https://${url}`}>
-					{splitURL.map((item, index) => (
-						// eslint-disable-next-line react/no-array-index-key
-						<span key={index}>
-							{`${index !== 0 ? '-' : ''}${item}`}
-							<wbr />
-						</span>
-					))}
-				</a>
-			);
-		}
-		if (tableRow.utm_key) {
-			tableRow.utm_key = tableRow.display_name;
-		}
-
-		displayTableData.push(tableRow);
 	});
 
 	return displayTableData;
