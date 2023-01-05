@@ -51,3 +51,4 @@ local-files/
 services/adManagerSyncService/config.js
 yarn.lock
 package-lock.json
+services/fetchMCMStatusService/config.js
