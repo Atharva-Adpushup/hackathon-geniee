@@ -14,6 +14,7 @@ import HBAnalyticContainer from '../containers/HBAnalyticContainer';
 import DelayFlag from './Flag';
 import '../../../scss/apps/reporting/index.scss';
 import history from '../../../helpers/history';
+import config from '../../../../configs/config';
 
 class ReportsPanel extends Component {
 	state = {
@@ -66,6 +67,7 @@ class ReportsPanel extends Component {
 	render() {
 		const { redirectUrl } = this.state;
 		const activeTab = this.getActiveTab();
+		const { IS_GAM_API_NOT_WORKING } = config;
 
 		const activeItem = REPORTS_NAV_ITEMS[activeTab];
 		if (redirectUrl) {
@@ -95,7 +97,8 @@ class ReportsPanel extends Component {
 
 		return (
 			<>
-				{reportingDelayPopup && <DelayFlag />}
+				{IS_GAM_API_NOT_WORKING ? <DelayFlag /> : !!reportingDelayPopup && <DelayFlag />}
+
 				<ActionCard>
 					{
 						<Nav bsStyle="tabs" activeKey={activeItem.INDEX} onSelect={this.handleNavSelect}>
