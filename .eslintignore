@@ -4,6 +4,7 @@
 !Client/
 !middlewares/
 !models/headerBiddingModel.js
+!helpers/
 !services/genieeAdSyncService/cdnSyncService/
 **/*.html
 **/*.min.js

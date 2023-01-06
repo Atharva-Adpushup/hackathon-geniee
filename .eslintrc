@@ -3,6 +3,7 @@
 	"plugins": ["prettier", "react", "alternate-import"],
 	"parser": "babel-eslint",
 	"rules": {
+		"max-params": ["error", 3],
 		"react/boolean-prop-naming": "off",
 		"linebreak-style": 0,
 		"react/jsx-filename-extension": [
