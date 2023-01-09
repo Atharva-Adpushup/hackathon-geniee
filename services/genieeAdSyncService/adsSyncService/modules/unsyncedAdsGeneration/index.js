@@ -68,9 +68,10 @@ module.exports = {
 	 */
 	checkAdpTagsUnsyncedAds: function(section, ad, additionalParams) {
 		const hasNetworkData = ad.networkData && Object.keys(ad.networkData).length;
-		const { isReplaceGptSlotOnRefreshEnabled, refreshAdUnitCodesCount } = additionalParams;
-		const { formatData: { type: adType, maxInstances = 0 } = {} } = ad;
-
+		const { refreshAdUnitCodesCount, isAmpAds = false } = additionalParams;
+		const { formatData = {}, isReplaceGptSlotOnRefreshEnabled = false } = ad;
+		const { type: adType, maxInstances = 0 } = formatData;
+		const shouldReplaceGptSlotOnRefresh = isAmpAds ? false : isReplaceGptSlotOnRefreshEnabled;
 		const isChainedDockedAd = adType === 'chainedDocked';
 
 		if (!hasNetworkData) {
@@ -82,7 +83,7 @@ module.exports = {
 		const hasDfpAdunitCode = !!dfpAdunit;
 		const refreshAdUnitCodesMissing = !Array.isArray(refreshAdUnitCodes);
 		const shouldSyncRefreshAdUnitCodes =
-			isReplaceGptSlotOnRefreshEnabled &&
+			shouldReplaceGptSlotOnRefresh &&
 			(refreshAdUnitCodesMissing || refreshAdUnitCodes.length != refreshAdUnitCodesCount);
 
 		/*for chained docked ad, we save maxInstances in ad config to know how many instances do we want to create, that is why we are using maxInstances here , it is an integer value
@@ -259,7 +260,6 @@ module.exports = {
 		const finalAds = [];
 		const self = this;
 		let channelUnsyncedAds = [];
-		const { isReplaceGptSlotOnRefreshEnabled = false } = site.get('apConfigs') || {};
 
 		return site.getAllChannels().then(allChannelsData => {
 			_.each(allChannelsData, channel => {
@@ -278,7 +278,6 @@ module.exports = {
 					const additionalParams = {
 						platform: channel.platform,
 						pageGroup: channel.pageGroup,
-						isReplaceGptSlotOnRefreshEnabled,
 						refreshAdUnitCodesCount: site.getRefreshAdUnitCodesCount()
 					};
 

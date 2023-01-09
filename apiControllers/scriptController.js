@@ -397,9 +397,6 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 				apConfigs.isRedefineGptOnRefreshEnabled = !!(
 					!apConfigs.apLiteActive && apConfigs.isRedefineGptOnRefreshEnabled
 				);
-				apConfigs.isReplaceGptSlotOnRefreshEnabled = !!(
-					!apConfigs.apLiteActive && apConfigs.isReplaceGptSlotOnRefreshEnabled
-				);
 
 				if (!apps.apLite) {
 					apConfigs.manualModeActive = !!(apps.apTag && manualAds && manualAds.length);

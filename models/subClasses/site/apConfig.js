@@ -43,7 +43,6 @@ const ApConfig = {
 		'isUrlReportingEnabled',
 		'rules',
 		'isRedefineGptOnRefreshEnabled',
-		'isReplaceGptSlotOnRefreshEnabled',
 		'flyingCarpetSettings'
 	],
 	override: [
@@ -90,7 +89,6 @@ const ApConfig = {
 		'isUrlReportingEnabled',
 		'rules',
 		'isRedefineGptOnRefreshEnabled',
-		'isReplaceGptSlotOnRefreshEnabled',
 		'flyingCarpetSettings'
 	],
 	merge: []

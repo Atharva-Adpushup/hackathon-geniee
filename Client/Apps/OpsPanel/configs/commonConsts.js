@@ -773,6 +773,14 @@ const INVENTORY_BULK_ACTIONS = [
 	{
 		name: 'Disable Downward Sizes',
 		value: 'enable-downwardSizesDisabled'
+	},
+	{
+		name: 'Enable Destroy Slots on Refresh',
+		value: 'enable-isReplaceGptSlotOnRefreshEnabled'
+	},
+	{
+		name: 'Disable Destroy Slots on Refresh',
+		value: 'disable-isReplaceGptSlotOnRefreshEnabled'
 	}
 ];
 
