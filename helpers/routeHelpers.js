@@ -4,9 +4,10 @@ const { couchbaseService } = require('node-utils');
 const jsondiffpatch = require('jsondiffpatch').create();
 
 const request = require('request-promise');
-const couchbase = require('../helpers/couchBaseService'),
-	couchbaseModule = require('couchbase'),
-	{ N1qlQuery, ViewQuery } = couchbaseModule;
+const couchbaseModule = require('couchbase');
+const couchbase = require('../helpers/couchBaseService');
+
+const { N1qlQuery } = couchbaseModule;
 
 const config = require('../configs/config');
 const siteModel = require('../models/siteModel');
@@ -50,9 +51,7 @@ const helpers = {
 				}
 				return errorHandler(error, res);
 			}),
-	directDBUpdate: (key, value, cas) => {
-		return appBucket.updateDoc(key, value, cas);
-	}
+	directDBUpdate: (key, value, cas) => appBucket.updateDoc(key, value, cas)
 };
 
 function verifyOwner(siteId, userEmail) {
@@ -270,11 +269,11 @@ async function fetchStatusesFromReporting(site) {
 	try {
 		const output = {};
 		const siteid = site.get('siteId');
-		//getActiveProductFromCouchbase get an array of siteIds as parameter.
+		// getActiveProductFromCouchbase get an array of siteIds as parameter.
 		const data = await getActiveProductFromCouchbase([siteid]);
 		_.forEach(data, (isActive, product) => {
-			if (isActive) {
-				const productInfo = APP_KEYS[product.toLowerCase()];
+			const productInfo = APP_KEYS[product.toLowerCase()];
+			if (isActive && productInfo && productInfo.key) {
 				output[productInfo.key] = productInfo;
 			}
 		});
@@ -332,7 +331,7 @@ function checkManageAdsTxtStatus(site) {
 			const output = {};
 			const isRedirecting = response.request.uri.href.indexOf(ADS_TXT_REDIRECT_PATTERN) !== -1;
 
-			isRedirecting ? (output['8'] = APP_KEYS['manageadstxt']) : null;
+			isRedirecting ? (output['8'] = APP_KEYS.manageadstxt) : null;
 			return output;
 		})
 		.catch(err => {
@@ -445,8 +444,8 @@ const updateNonLayoutAds = (req, res, docKey, adData) => {
 				});
 			}
 
-			let prevConfig = {},
-				currentConfig = {};
+			let prevConfig = {};
+			let currentConfig = {};
 
 			_.forEach(doc.ads, (ad, index) => {
 				if (ad.id === adUnitId) {
@@ -510,8 +509,8 @@ const updateApLiteAd = (req, res, adData, logServiceNames) => {
 				});
 			}
 
-			let prevConfig = {},
-				currentConfig = {};
+			let prevConfig = {};
+			let currentConfig = {};
 			_.forEach(doc.adUnits, (ad, index) => {
 				if (ad.dfpAdUnit == adUnitId) {
 					prevConfig = { ...ad };
@@ -599,9 +598,7 @@ function fetchNewAmpAds(req, res, docKey) {
 
 	return verifyOwner(siteId, req.user.email)
 		.then(() => getNewAmpAds(siteId))
-		.then((ads = []) => {
-			return sendSuccessResponse({ ads }, res);
-		})
+		.then((ads = []) => sendSuccessResponse({ ads }, res))
 		.catch(err =>
 			err.code && err.code === 13 && err.message.includes('key does not exist')
 				? sendSuccessResponse({ ads: [] }, res)
@@ -647,7 +644,7 @@ function updateAmpTags(id, ads, updateThis) {
 
 function findAndUpdateAmpAd(value, id, update) {
 	const index = value.ads.findIndex(adItem => adItem.id == id);
-	let adItem = value.ads[index];
+	const adItem = value.ads[index];
 	value.ads[index] = { ...value.ads[index], ...update };
 
 	value.updatedOn = +new Date();
@@ -805,7 +802,7 @@ function queuePublishingWrapper(siteId, ads) {
 		// If no unsynced ad then skip dfp syncing
 		if (!(data && Array.isArray(data.ads) && data.ads.length)) return Promise.resolve(ads);
 
-		var options = {
+		const options = {
 			method: 'POST',
 			uri: `${config.queuePublishingURL}/publish`,
 			body: {
@@ -825,7 +822,7 @@ function queuePublishingWrapper(siteId, ads) {
 }
 
 function storedRequestWrapper(doc) {
-	var options = {
+	const options = {
 		method: 'POST',
 		uri: `${config.queuePublishingURL}/publish`,
 		body: {
@@ -869,31 +866,29 @@ function updateAd({ ad, updatedData, docId }) {
 		if (allowedActions.includes(actionValue)) {
 			ad = { ...ad, [actionValue]: enable };
 		}
-	} else {
-		if (actionValue === 'headerBidding' || actionValue === 'refreshSlot') {
-			const { networkData: oldNetworkData } = ad;
-			ad = {
-				...ad,
-				networkData: {
-					...oldNetworkData,
-					[actionValue]: enable
-				}
-			};
-		} else if (actionValue === 'downwardSizesDisabled') {
-			const { sizeFilters } = updatedData;
-			if (sizeFilters && !enable) {
-				ad.sizeFilters = sizeFilters;
+	} else if (actionValue === 'headerBidding' || actionValue === 'refreshSlot') {
+		const { networkData: oldNetworkData } = ad;
+		ad = {
+			...ad,
+			networkData: {
+				...oldNetworkData,
+				[actionValue]: enable
 			}
-			ad = { ...ad, [actionValue]: enable };
-		} else {
-			ad = { ...ad, [actionValue]: enable };
+		};
+	} else if (actionValue === 'downwardSizesDisabled') {
+		const { sizeFilters } = updatedData;
+		if (sizeFilters && !enable) {
+			ad.sizeFilters = sizeFilters;
 		}
+		ad = { ...ad, [actionValue]: enable };
+	} else {
+		ad = { ...ad, [actionValue]: enable };
 	}
 
 	return ad;
 }
 
-//for channel doc ads
+// for channel doc ads
 async function updateChannelDocAds({ docId, adsToBeUpdatedMap }) {
 	const { data: channel } = await channelModel.getChannelByDocId(docId);
 	if (channel.variations && Object.keys(channel.variations).length) {
@@ -930,7 +925,7 @@ async function updateChannelDocAds({ docId, adsToBeUpdatedMap }) {
 	await channelModel.updateChannel(docId, channel);
 }
 
-//for ApTag , Innovative , Amp Ads ,ApLite Ads
+// for ApTag , Innovative , Amp Ads ,ApLite Ads
 function updateGeneralAds({ docId, adsToBeUpdatedMap }) {
 	return couchbase
 		.connectToAppBucket()
@@ -995,11 +990,9 @@ function getSitesAssociatedWithAccount(email) {
 			}
 			return userData;
 		})
-		.catch(() => {
-			return {
-				sites: {}
-			};
-		});
+		.catch(() => ({
+			sites: {}
+		}));
 }
 
 // Check user switiching/impersonating based on allowed accounts only
@@ -1007,9 +1000,9 @@ function getSitesAssociatedWithAccount(email) {
 // switched/impersonated is present in associated accounts list
 function checkAllowedEmailForSwitchAndImpersonate(associatedAccounts, switchUserEmail) {
 	if (associatedAccounts.length) {
-		const allAccountsAllowedToSwitchForTheCurrentUser = associatedAccounts.find(account => {
-			return account.email === switchUserEmail;
-		});
+		const allAccountsAllowedToSwitchForTheCurrentUser = associatedAccounts.find(
+			account => account.email === switchUserEmail
+		);
 
 		// is switch user allowed for this user
 		return allAccountsAllowedToSwitchForTheCurrentUser;
@@ -1036,9 +1029,7 @@ async function getAssociatedAccountsWithUser(userEmail) {
 	let otherEmails = '';
 
 	if (!emailOfAM) {
-		const adOpsUserDetails = opsAcccessList.AdOps.find(adOpsUser => {
-			return adOpsUser.email === userEmail;
-		});
+		const adOpsUserDetails = opsAcccessList.AdOps.find(adOpsUser => adOpsUser.email === userEmail);
 		// if found then set email of AM
 		if (adOpsUserDetails) {
 			// No AM has been assigned to this AdOps person
@@ -1054,9 +1045,7 @@ async function getAssociatedAccountsWithUser(userEmail) {
 	if (emailOfAM) {
 		// from hubspot
 		return Promise.resolve(emailOfAM)
-			.then(() => {
-				return hubSpotService.getSitesOfUserFromHubspot(emailOfAM);
-			})
+			.then(() => hubSpotService.getSitesOfUserFromHubspot(emailOfAM))
 			.then(async accounts => {
 				// Hack by Harpreet Singh for quick resolution to allow
 				// AdOps person to access other accounts not associated to his/her AM
@@ -1081,13 +1070,11 @@ async function getAssociatedAccountsWithUser(userEmail) {
 				return Promise.all(
 					accounts &&
 						accounts.results &&
-						accounts.results.map(accountEmail => {
-							return getSitesAssociatedWithAccount(accountEmail);
-						})
+						accounts.results.map(accountEmail => getSitesAssociatedWithAccount(accountEmail))
 				)
-					.then(associatedAccounts => {
+					.then(associatedAccounts =>
 						// format data into `findUser` api format
-						return associatedAccounts.map(account => {
+						associatedAccounts.map(account => {
 							if (Object.keys(account).length) {
 								return {
 									email: account.email,
@@ -1095,25 +1082,23 @@ async function getAssociatedAccountsWithUser(userEmail) {
 									domains: Object.keys(account.sites).map(siteId => account.sites[siteId].domain)
 								};
 							}
-						});
-					})
-					.catch(() => {
+						})
+					)
+					.catch(() =>
 						// this is to manage the case where a particular user AM/AdOps
 						// has restricted access but no site has been assigned to him/her
 						// yet and instead of returning empty array - return non-empty array
 						// as empty array means full access
-						return [
+						[
 							{
 								email: '',
 								siteIds: [],
 								domains: []
 							}
-						];
-					});
+						]
+					);
 				return Promise.resolve(emailOfAM)
-					.then(() => {
-						return hubSpotService.getSitesOfUserFromHubspot(emailOfAM);
-					})
+					.then(() => hubSpotService.getSitesOfUserFromHubspot(emailOfAM))
 					.then(async accounts => {
 						// Hack by Harpreet Singh for quick resolution to allow
 						// AdOps person to access other accounts not associated to his/her AM
@@ -1138,13 +1123,11 @@ async function getAssociatedAccountsWithUser(userEmail) {
 						return Promise.all(
 							accounts &&
 								accounts.results &&
-								accounts.results.map(accountEmail => {
-									return getSitesAssociatedWithAccount(accountEmail);
-								})
+								accounts.results.map(accountEmail => getSitesAssociatedWithAccount(accountEmail))
 						)
-							.then(associatedAccounts => {
+							.then(associatedAccounts =>
 								// format data into `findUser` api format
-								return associatedAccounts
+								associatedAccounts
 									.map(account => {
 										if (Object.keys(account).length) {
 											return {
@@ -1156,35 +1139,35 @@ async function getAssociatedAccountsWithUser(userEmail) {
 											};
 										}
 									})
-									.filter(item => item.siteIds.length);
-							})
-							.catch(() => {
+									.filter(item => item.siteIds.length)
+							)
+							.catch(() =>
 								// this is to manage the case where a particular user AM/AdOps
 								// has restricted access but no site has been assigned to him/her
 								// yet and instead of returning empty array - return non-empty array
 								// as empty array means full access
-								return [
+								[
 									{
 										email: '',
 										siteIds: [],
 										domains: []
 									}
-								];
-							});
+								]
+							);
 					})
-					.catch(() => {
+					.catch(() =>
 						// this is to manage the case where a particular user AM/AdOps
 						// has restricted access but no site has been assigned to him/her
 						// yet and instead of returning empty array - return non-empty array
 						// as empty array means full access
-						return [
+						[
 							{
 								email: '',
 								siteIds: [],
 								domains: []
 							}
-						];
-					});
+						]
+					);
 			});
 	}
 	return [];
@@ -1306,31 +1289,35 @@ const modifyAndGetProductObject = product => {
 		videoAdsDashboard: Number(!!videoAdsDashboard)
 	};
 };
-// we are removing activeProduct and metaInfo apis from backend and same data we are fetching from couchbase
-async function getActiveProductFromCouchbase(sites = []) {
-	let queryString;
-	let siteIds = sites.map(id => `"site::${id}"`).join(',');
-	queryString = `select siteId, apConfigs.videoAdsDashboard, apConfigs.hbAnalytics,apps.apTag, apps.headerBidding, apps.layout, apps.innovativeAds from AppBucket a where meta().id ${
-		!!sites.length ? `in [${siteIds}]` : 'like "site::%"'
+
+function handleActiveProductsSupplyToApis(data, sites, isMetaData) {
+	let result = {};
+	const shouldMapWithSiteId = !sites.length || isMetaData;
+	for (const item of data) {
+		const { siteId, ...rest } = item;
+		if (shouldMapWithSiteId) {
+			result[siteId] = modifyAndGetProductObject(rest);
+		} else {
+			result = modifyAndGetProductObject(rest);
+		}
+	}
+	return result;
+}
+
+//  removing activeProduct and metaInfo apis from backend and same data we are fetching from couchbase
+async function getActiveProductFromCouchbase(sites = [], isMetaData = false) {
+	const siteIds = sites.map(id => `"site::${id}"`).join(',');
+	const queryString = `select siteId, apConfigs.videoAdsDashboard, apConfigs.hbAnalytics,apps.apTag, apps.headerBidding, apps.layout, apps.innovativeAds from AppBucket a where meta().id ${
+		sites.length ? `in [${siteIds}]` : 'like "site::%"'
 	} and apConfigs is not missing and apps is not missing`;
 	try {
 		const query = N1qlQuery.fromString(queryString);
 		const appBucket = await couchbase.connectToAppBucket();
 		const data = await appBucket.queryAsync(query);
-		if (data) {
-			let result = {};
-
-			for (let item of data) {
-				const { siteId, ...rest } = item;
-				if (!!sites.length && sites.length === 1) {
-					result = modifyAndGetProductObject(rest);
-				} else {
-					result[siteId] = modifyAndGetProductObject(rest);
-				}
-			}
-			return result;
+		if (!data) {
+			return {};
 		}
-		return {};
+		return handleActiveProductsSupplyToApis(data, sites, isMetaData);
 	} catch (er) {
 		console.log(er);
 	}
@@ -1340,7 +1327,8 @@ async function getActiveProductFromCouchbase(sites = []) {
 async function addActiveProductsToMeta(metaData = {}) {
 	const siteData = metaData.site;
 	const siteIds = Object.keys(siteData);
-	const productDataMapping = await getActiveProductFromCouchbase(siteIds);
+	const isMetaData = true;
+	const productDataMapping = await getActiveProductFromCouchbase(siteIds, isMetaData);
 	const updatedMetaData = metaData;
 	for (const siteId of siteIds) {
 		if (updatedMetaData.site && updatedMetaData.site[siteId]) {
