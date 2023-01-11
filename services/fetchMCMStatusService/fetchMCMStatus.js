@@ -53,7 +53,7 @@ const saveMCMStatus = async function saveMCMStatusInDatabase(MCMstatus) {
 				const docId = `ntwk::${childNetwork.childNetworkCode}`;
 				let doc = await appBucket.getDoc(docId);
 				doc = doc.value;
-				const oldMCMStatus = doc.MCMStatus;
+				const oldMCMStatus = doc.mcmStatus;
 				const statusApproved =
 					oldMCMStatus &&
 					oldMCMStatus.proposedDelegationType &&
@@ -62,7 +62,7 @@ const saveMCMStatus = async function saveMCMStatusInDatabase(MCMstatus) {
 					oldMCMStatus && (oldMCMStatus.status != childNetwork.status || statusApproved);
 
 				if (!oldMCMStatus || statusUpdated) {
-					doc.MCMStatus = childNetwork;
+					doc.mcmStatus = childNetwork;
 					await appBucket.updateDoc(docId, doc);
 					let emailBody;
 					if (oldMCMStatus) {
