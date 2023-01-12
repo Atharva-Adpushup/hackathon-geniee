@@ -16,6 +16,4 @@ if (config.environment.HOST_ENV === 'production') {
 		setTimeout(() => process.exit(1), 2000);
 	});
 }
-
 cron.schedule(constants.cronSchedule.fetchMCMStatusService, runService);
-runService();

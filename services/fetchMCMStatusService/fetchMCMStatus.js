@@ -63,6 +63,7 @@ const saveMCMStatus = async function saveMCMStatusInDatabase(MCMstatus) {
 
 				if (!oldMCMStatus || statusUpdated) {
 					doc.mcmStatus = childNetwork;
+					console.log(`updated status in ${docId}`)
 					await appBucket.updateDoc(docId, doc);
 					let emailBody;
 					if (oldMCMStatus) {
