@@ -109,9 +109,32 @@ Router.get('/:siteId/ampDeliveryViaCreativeConfig', (req, res) => {
 					apConfigs.partner = site.get('partner');
 				}
 
-				apConfigs.lineItems = (adNetworkConfig && adNetworkConfig.lineItems) || [];
-				apConfigs.separatelyGroupedLineItems =
-					(adNetworkConfig && adNetworkConfig.separatelyGroupedLineItems) || [];
+				// when using line Items File, lineItems is not an array
+				if (
+					apConfigs.useLineItemsFileAMP &&
+					adNetworkConfig.useLineItemFile &&
+					adNetworkConfig.lineItemsFileName &&
+					!Array.isArray(adNetworkConfig.lineItems) &&
+					adNetworkConfig.fallbackLineItems &&
+					!isAmpPnpEnabled
+				) {
+					apConfigs.lineItemsFileName = adNetworkConfig.lineItemsFileName;
+					apConfigs.fallbackLineItems = adNetworkConfig.fallbackLineItems;
+					apConfigs.refreshByTypeLineItems = adNetworkConfig.refreshByTypeLineItems || [];
+
+					const blockListedLineItemsAvailable =
+						prebidAndAdsConfig.blockListedLineItems &&
+						Array.isArray(prebidAndAdsConfig.blockListedLineItems) &&
+						prebidAndAdsConfig.blockListedLineItems.length;
+					if (blockListedLineItemsAvailable) {
+						apConfigs.blockListedLineItems = prebidAndAdsConfig.blockListedLineItems;
+					}
+				} else {
+					apConfigs.lineItems = (adNetworkConfig && adNetworkConfig.lineItems) || [];
+					apConfigs.separatelyGroupedLineItems =
+						(adNetworkConfig && adNetworkConfig.separatelyGroupedLineItems) || [];
+				}
+
 				apConfigs.autoOptimise = !!isAutoOptimise;
 				apConfigs.poweredByBanner = poweredByBanner;
 				if (shouldDeductApShareFromHb) {
@@ -174,6 +197,7 @@ Router.get('/:siteId/ampDeliveryViaCreativeConfig', (req, res) => {
 
 				return output;
 			};
+			// eslint-disable-next-line
 			const combinePrebidAndAdsConfig = (experiment, adpTags, manualAds, innovativeAds) => {
 				if (!(Array.isArray(adpTags) && adpTags.length)) {
 					return {
@@ -193,12 +217,16 @@ Router.get('/:siteId/ampDeliveryViaCreativeConfig', (req, res) => {
 			const setAdNetworkConfig = function(prebidAndAdsConfig) {
 				const blockListedLineItems = site.get('blockListedLineItems');
 				const activeDFPNetwork = getActiveDfpNetworkCode(user);
-
+				const apConfigs = site.get('apConfigs');
+				const useLineItemsFile = !!(apConfigs && apConfigs.useLineItemsFileAMP);
+				const fromDVC = true;
 				if (activeDFPNetwork) {
 					return generateAdNetworkConfig(
 						activeDFPNetwork,
 						lineItemTypes,
-						blockListedLineItems
+						blockListedLineItems,
+						useLineItemsFile,
+						fromDVC
 					).then(adNetworkConfig => ({
 						...prebidAndAdsConfig,
 						blockListedLineItems,
@@ -326,7 +354,9 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 					apConfigs.useLineItemsFile &&
 					adNetworkConfig.useLineItemFile &&
 					adNetworkConfig.lineItemsFileName &&
-					adNetworkConfig.fallbackLineItems
+					!Array.isArray(adNetworkConfig.lineItems) &&
+					adNetworkConfig.fallbackLineItems &&
+					!apps.pnp
 				) {
 					apConfigs.lineItemsFileName = adNetworkConfig.lineItemsFileName;
 					apConfigs.fallbackLineItems = adNetworkConfig.fallbackLineItems;
@@ -366,9 +396,6 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 				apConfigs.apLiteActive = !!apps.apLite;
 				apConfigs.isRedefineGptOnRefreshEnabled = !!(
 					!apConfigs.apLiteActive && apConfigs.isRedefineGptOnRefreshEnabled
-				);
-				apConfigs.isReplaceGptSlotOnRefreshEnabled = !!(
-					!apConfigs.apLiteActive && apConfigs.isReplaceGptSlotOnRefreshEnabled
 				);
 
 				if (!apps.apLite) {
@@ -418,6 +445,7 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 
 				return output;
 			};
+			// eslint-disable-next-line
 			const combinePrebidAndAdsConfig = (experiment, adpTags, manualAds, innovativeAds) => {
 				if (!(Array.isArray(adpTags) && adpTags.length)) {
 					return {
@@ -439,13 +467,14 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 				const activeDFPNetwork = getActiveDfpNetworkCode(user);
 				const apConfigs = site.get('apConfigs');
 				const useLineItemsFile = !!(apConfigs && apConfigs.useLineItemsFile);
+				const fromScript = true;
 				if (activeDFPNetwork) {
 					return generateAdNetworkConfig(
 						activeDFPNetwork,
 						lineItemTypes,
 						blockListedLineItems,
 						useLineItemsFile,
-						true
+						fromScript
 					).then(adNetworkConfig => ({
 						...prebidAndAdsConfig,
 						blockListedLineItems,

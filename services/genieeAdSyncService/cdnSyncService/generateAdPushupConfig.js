@@ -83,7 +83,8 @@ const getAdConfig = (adType, section) => {
 		enableLazyLoading,
 		disableReuseVacantAdSpace,
 		minViewPortSize = { height: 0, width: 0 },
-		flyingCarpetEnabled = false
+		flyingCarpetEnabled = false,
+		isReplaceGptSlotOnRefreshEnabled = false
 	} = ad;
 	const { name: sectionName, id, formatData } = section;
 	let json = {
@@ -91,16 +92,17 @@ const getAdConfig = (adType, section) => {
 		sectionName,
 		network,
 		css,
-		height: isResponsive ? height : parseInt(height, 10),
-		width: isResponsive ? width : parseInt(width, 10),
 		formatData,
-		fluid: collapseUnfilled ? true : fluid === true,
 		sizeMapping,
-		downwardSizesDisabled: !!downwardSizesDisabled,
-		collapseUnfilled: !!collapseUnfilled,
 		poweredByBanner,
 		minViewPortSize,
-		disableReuseVacantAdSpace: !!disableReuseVacantAdSpace
+		isReplaceGptSlotOnRefreshEnabled,
+		fluid: collapseUnfilled ? true : fluid === true,
+		downwardSizesDisabled: !!downwardSizesDisabled,
+		collapseUnfilled: !!collapseUnfilled,
+		disableReuseVacantAdSpace: !!disableReuseVacantAdSpace,
+		height: isResponsive ? height : parseInt(height, 10),
+		width: isResponsive ? width : parseInt(width, 10)
 	};
 
 	// Add 'multipleAdSizes' property if exists

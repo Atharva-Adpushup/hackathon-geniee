@@ -217,11 +217,9 @@ function apTagAdsSyncing(unsyncedAdsGroup, site) {
 		});
 
 	const refreshAdUnitCodesCount = site.getRefreshAdUnitCodesCount();
-	const { isReplaceGptSlotOnRefreshEnabled = false } = site.get('apConfigs') || {};
 
 	return getUnsyncedAdpTagAdsFromDoc(apTagDocKey, unsyncedAdsGroup, callbackForEachAd, {
-		refreshAdUnitCodesCount,
-		isReplaceGptSlotOnRefreshEnabled
+		refreshAdUnitCodesCount
 	});
 }
 
@@ -250,11 +248,11 @@ function ampScriptAdsSyncing(unSyncedAdGroups, site) {
 
 	// NOTE: We don't need to create duplicate ad units for amp ads as of now, hence overriding the flags here
 	const refreshAdUnitCodesCount = 0;
-	const isReplaceGptSlotOnRefreshEnabled = false;
+	const isAmpAds = true;
 
 	return getUnsyncedAdpTagAdsFromDoc(docKey, unSyncedAdGroups, callbackForEachAd, {
 		refreshAdUnitCodesCount,
-		isReplaceGptSlotOnRefreshEnabled
+		isAmpAds
 	});
 }
 
@@ -317,13 +315,12 @@ function innovativeAdsSyncing(unsyncedAdsGroup, site) {
 	}
 
 	const refreshAdUnitCodesCount = site.getRefreshAdUnitCodesCount();
-	const { isReplaceGptSlotOnRefreshEnabled = false } = site.get('apConfigs') || {};
 
 	return getUnsyncedAdpTagAdsFromDoc(
 		`${docKeys.interactiveAds}${site.get('siteId')}`,
 		unsyncedAdsGroup,
 		generateLogData.bind(null, site),
-		{ refreshAdUnitCodesCount, isReplaceGptSlotOnRefreshEnabled }
+		{ refreshAdUnitCodesCount }
 	);
 }
 
