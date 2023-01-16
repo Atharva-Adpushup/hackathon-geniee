@@ -539,6 +539,7 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 
 			return Promise.join(generatedConfig, {
 				siteId: site.get('siteId'),
+				apScriptSize: site.get('apScriptSize'),
 				medianetId: site.get('medianetId')
 			});
 		})
@@ -891,6 +892,18 @@ Router.post('/prebidActiveBidderAdapters', (req, res) => {
 						.json({ error: 'Internal Server Error!' });
 				})
 		);
+});
+Router.post('/:siteId/updateApScriptSize', (req, res) => {
+	const { siteId } = req.params;
+	const { currentApScriptSize: apScriptSize } = req.body;
+
+	return SiteModel.getSiteById(siteId)
+		.then(site => {
+			site.set('apScriptSize', apScriptSize);
+			return site.save();
+		})
+		.then(() => res.status(httpStatusConsts.OK).send('The script size is updated'))
+		.catch(err => res.status(httpStatusConsts.NOT_FOUND).json({ error: err.message }));
 });
 
 module.exports = Router;
