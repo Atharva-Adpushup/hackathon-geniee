@@ -29,7 +29,7 @@ function Consumer(config) {
 		return queueInstance
 			.connect(
 				self.config.url,
-				{ hearbeat: 20 }
+				{ heartbeat: 20 }
 			)
 			.then(conn => {
 				conn.on('close', () => {
