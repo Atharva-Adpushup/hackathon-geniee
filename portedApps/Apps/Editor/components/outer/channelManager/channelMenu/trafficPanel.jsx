@@ -7,7 +7,9 @@ class TrafficPanel extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			autoOptimise: this.props.channel.hasOwnProperty('autoOptimise') ? this.props.channel.autoOptimise : false
+			autoOptimise: this.props.channel.hasOwnProperty('autoOptimise')
+				? this.props.channel.autoOptimise
+				: false
 		};
 		this.toggleHandler = this.toggleHandler.bind(this);
 	}
@@ -31,7 +33,8 @@ class TrafficPanel extends Component {
 		return (
 			<Row>
 				<Col xs={12}>
-					<CustomToggleSwitch
+					{/* Commenting this toggle temporary. */}
+					{/* <CustomToggleSwitch
 						labelText="Auto Optimise"
 						className="mB-0"
 						defaultLayout
@@ -45,7 +48,7 @@ class TrafficPanel extends Component {
 						id={`js-auto-optimise-${channel.id}`}
 						on="On"
 						off="Off"
-					/>
+					/> */}
 					{!autoOptimise ? (
 						<NumericCollectionManager
 							description={trafficDistributionConfig.description}
