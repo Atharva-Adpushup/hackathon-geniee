@@ -581,7 +581,8 @@ Router.get('/:siteId/ampSiteConfig', (req, res) => {
 					ampScriptConfig,
 					sizeMappingConfig,
 					currencyConfig,
-					firstImpressionRefreshLineItems
+					firstImpressionRefreshLineItems,
+					adpushupAdsConfig = []
 				} = prebidAndAdsConfig;
 
 				if (refreshLineItems) apConfigs.refreshLineItems = refreshLineItems;
@@ -595,6 +596,9 @@ Router.get('/:siteId/ampSiteConfig', (req, res) => {
 
 				// GAM 360 config
 				apConfigs.mcm = user.get('mcm') || {};
+
+				// eslint-disable-next-line prefer-destructuring
+				apConfigs.manualAds = adpushupAdsConfig[2]; // Returns manaul ads at second index
 
 				if (ampScriptConfig && ampScriptConfig.ads.length) {
 					apConfigs.ampConfig = {
@@ -694,12 +698,24 @@ Router.get('/:siteId/ampSiteConfig', (req, res) => {
 				);
 			};
 
+			const getApTagConfig = function() {
+				// Manual ads required only in case of AMP DVC via type adpushup
+				const isTypeAdpushupViaDvc =
+					site.get('apConfigs') && site.get('apConfigs').isTypeAdpushupViaDvc;
+
+				if (!isTypeAdpushupViaDvc) {
+					return [];
+				}
+				return generateAdPushupAdsConfig(site);
+			};
+
 			return Promise.join(
 				generatePrebidConfig(siteId),
 				generateAmpScriptAdsConfig(siteId),
 				getRefreshLineItems(user, lineItemTypes),
 				getSizeMappingConfigFromCB(),
-				getCurrencyConfig()
+				getCurrencyConfig(),
+				getApTagConfig()
 			)
 				.then(
 					([
@@ -707,7 +723,8 @@ Router.get('/:siteId/ampSiteConfig', (req, res) => {
 						ampScriptConfig,
 						refreshLineItems,
 						sizeMappingConfig,
-						currencyConfig
+						currencyConfig,
+						adpushupAdsConfig
 					]) => {
 						// Remove ampConfig from amp.js as ampConfig is used in s2s
 						const { hbcf } = prebidConfig;
@@ -725,7 +742,8 @@ Router.get('/:siteId/ampSiteConfig', (req, res) => {
 							ampScriptConfig,
 							refreshLineItems,
 							sizeMappingConfig,
-							currencyConfig
+							currencyConfig,
+							adpushupAdsConfig
 						};
 
 						const isFirstImpressionSiteIdAvailable =
