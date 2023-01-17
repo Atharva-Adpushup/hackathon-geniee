@@ -33,6 +33,7 @@ const FormValidator = require('../helpers/FormValidator');
 const schema = require('../helpers/schema');
 const AdPushupError = require('../helpers/AdPushupError');
 const { publishToRabbitMqQueue } = require('../helpers/utils');
+const siteModel = require('../models/siteModel');
 
 const router = express.Router();
 
@@ -782,9 +783,10 @@ router
 	})
 
 	.put('/pnp-refresh/:siteId', async (req, res) => {
-		const pnpConfig = _.cloneDeep(req.body);
+		const { pnpConfig, isPnpSiteIdSynced = false, dataForAuditLogs = {} } = _.cloneDeep(req.body);
 		const { siteId } = req.params;
-
+		const { email, originalEmail } = req.user;
+		const { siteDomain, appName, prevConfig } = dataForAuditLogs;
 		try {
 			await ObjectValidator(opsValidations.pnpConfigValidation, pnpConfig);
 			await opsService.updateExistingApTags(pnpConfig);
@@ -794,6 +796,38 @@ router
 			await opsService.initScriptSync(updatedConfig.get('pnpSiteId'));
 			await opsService.initScriptSync(siteId);
 
+			if (!isPnpSiteIdSynced) {
+				//	setting isPnpSite in pnpSite if not set already
+				sendDataToAuditLogService({
+					siteDomain,
+					appName,
+					siteId: pnpSiteId,
+					type: 'site',
+					impersonateId: email,
+					userId: originalEmail,
+					action: {
+						name: OPS_PANEL.SITES_SETTING,
+						data: `SET isPnpSite flag to true in apConfigs`
+					}
+				});
+
+				await siteModel.updateIsPnpSiteIdInPnpSite(pnpSiteId);
+			}
+
+			sendDataToAuditLogService({
+				siteId,
+				siteDomain,
+				appName,
+				type: 'site',
+				impersonateId: email,
+				userId: originalEmail,
+				prevConfig,
+				currentConfig: pnpConfig,
+				action: {
+					name: OPS_PANEL.SITES_SETTING,
+					data: `Sites Setting PNP`
+				}
+			});
 			return sendSuccessResponse(updatedConfig.toClientJSON(), res, HTTP_STATUSES.OK);
 		} catch (err) {
 			const { message } = err || {};

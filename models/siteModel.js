@@ -776,6 +776,16 @@ function apiModule() {
 		getAllGaEnabledSites: function() {
 			const queryString = `SELECT siteId FROM AppBucket WHERE apConfigs.enableGAAnalytics and meta().id like "site::%";`;
 			return appBucket.queryDB(queryString);
+		},
+		updateIsPnpSiteIdInPnpSite: async function(siteId) {
+			if (siteId) {
+				const updatePnpSiteQuery = `update AppBucket set apConfigs.isPnpSite = true where meta().id = "site::${siteId}" returning apConfigs`;
+				const query = N1qlQuery.fromString(updatePnpSiteQuery);
+				couchbase
+					.connectToAppBucket()
+					.then(appBucket => appBucket.queryAsync(query))
+					.catch(err => console.log(err));
+			}
 		}
 	};
 
