@@ -63,23 +63,20 @@ const saveMCMStatus = async function saveMCMStatusInDatabase(MCMstatus) {
 
 				if (!oldMCMStatus || statusUpdated) {
 					doc.mcmStatus = childNetwork;
-					console.log(`updated status in ${docId}`)
 					await appBucket.updateDoc(docId, doc);
-					let emailBody;
+					console.log(`updated status in ${docId}`);
 					if (oldMCMStatus) {
-						emailBody = `<p>MCM Status Changed from ${oldMCMStatus.status} to ${childNetwork.status} for GAM ${childNetwork.childNetworkCode} </p>`;
-					} else {
-						emailBody = `<p>MCM Status Approved For for GAM ${childNetwork.childNetworkCode} </p>`;
+						const emailBody = `<p>MCM Status Changed from ${oldMCMStatus.status} to ${childNetwork.status} for GAM ${childNetwork.childNetworkCode} </p>`;
+						const emailSubject = 'MCM Status changed';
+						utility.sendEmail({
+							queue: 'MAILER',
+							data: {
+								to: config.statusUpdateEmail, //
+								body: emailBody,
+								subject: emailSubject
+							}
+						});
 					}
-					const emailSubject = 'MCM Status changed';
-					utility.sendEmail({
-						queue: 'MAILER',
-						data: {
-							to: config.statusUpdateEmail, //
-							body: emailBody,
-							subject: emailSubject
-						}
-					});
 				}
 			} catch (err) {
 				if (err.code && err.code === 13 && err.message.includes('key does not exist')) {
