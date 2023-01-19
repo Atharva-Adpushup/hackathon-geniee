@@ -112,6 +112,7 @@ Router.get('/:siteId/ampDeliveryViaCreativeConfig', (req, res) => {
 				// when using line Items File, lineItems is not an array
 				if (
 					apConfigs.useLineItemsFileAMP &&
+					adNetworkConfig &&
 					adNetworkConfig.useLineItemFile &&
 					adNetworkConfig.lineItemsFileName &&
 					!Array.isArray(adNetworkConfig.lineItems) &&
@@ -218,7 +219,7 @@ Router.get('/:siteId/ampDeliveryViaCreativeConfig', (req, res) => {
 				const blockListedLineItems = site.get('blockListedLineItems');
 				const activeDFPNetwork = getActiveDfpNetworkCode(user);
 				const apConfigs = site.get('apConfigs');
-				const useLineItemsFile = !!(apConfigs && apConfigs.useLineItemsFileAMP);
+				const useLineItemsFile = !!(apConfigs && apConfigs.useLineItemsFileAMP && !isAmpPnpEnabled);
 				const fromDVC = true;
 				if (activeDFPNetwork) {
 					return generateAdNetworkConfig(
@@ -352,6 +353,7 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 				}
 				if (
 					apConfigs.useLineItemsFile &&
+					adNetworkConfig &&
 					adNetworkConfig.useLineItemFile &&
 					adNetworkConfig.lineItemsFileName &&
 					!Array.isArray(adNetworkConfig.lineItems) &&
@@ -466,7 +468,7 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 				const blockListedLineItems = site.get('blockListedLineItems') || [];
 				const activeDFPNetwork = getActiveDfpNetworkCode(user);
 				const apConfigs = site.get('apConfigs');
-				const useLineItemsFile = !!(apConfigs && apConfigs.useLineItemsFile);
+				const useLineItemsFile = !!(apConfigs && apConfigs.useLineItemsFile && !apps.pnp);
 				const fromScript = true;
 				if (activeDFPNetwork) {
 					return generateAdNetworkConfig(
