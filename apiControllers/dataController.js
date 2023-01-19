@@ -361,8 +361,10 @@ router
 				} = req.body;
 				if (!originalEmail && isSuperUser) originalEmail = email;
 				const errorInfo = _.escape(info.componentStack).replace(/\n/g, '<br>');
+				const errorStack = _.escape(err).replace(/\n/g, '<br>');
 				const dateOfError = new Date().toDateString();
 				const mailAlertTemplateData = {
+					errorStack,
 					errorInfo,
 					firstName,
 					lastName,
