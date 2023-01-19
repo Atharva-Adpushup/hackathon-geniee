@@ -25,7 +25,6 @@ const DEMO_ACCOUNT_DATA = {
 	},
 	SITES: {
 		38903: 'https://www.iaai.com/',
-		29752: 'https://www.ccna7.com/',
 		37780: 'https://www.javatpoint.com/',
 		25019: 'http://rentdigs.com/'
 	}
