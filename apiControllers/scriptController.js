@@ -590,6 +590,7 @@ Router.get('/:siteId/ampSiteConfig', (req, res) => {
 					apConfigs.firstImpressionRefreshLineItems = firstImpressionRefreshLineItems;
 				if (sizeMappingConfig) apConfigs.sizeMapping = sizeMappingConfig;
 				if (currencyConfig) apConfigs.currencyConfig = currencyConfig;
+				apConfigs.siteId = site.get('siteId');
 				apConfigs.siteDomain = site.get('siteDomain');
 				apConfigs.ownerEmailMD5 = user.get('sellerId');
 				apConfigs.activeDFPNetwork = getActiveDfpNetworkCode(user);
