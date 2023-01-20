@@ -70,19 +70,15 @@ export default connect(
 				},
 				global: {
 					user: {
-						data: {
-							sites: {
-								[siteId]: { domain }
-							},
-							isSuperUser
-						}
+						data: { sites: userSites, isSuperUser }
 					}
 				}
 			} = state;
+			const domain = (userSites[siteId] && userSites[siteId].domain) || '';
 			const currSiteHbData = sites && sites[siteId];
 			return { currSiteHbData, domain, hasUnsavedChanges, user: user.data, isSuperUser };
 		} catch (err) {
-			throw new CustomError(err, state.global.user.data);
+			throw new CustomError(err, { data: ownProps });
 		}
 	},
 	{

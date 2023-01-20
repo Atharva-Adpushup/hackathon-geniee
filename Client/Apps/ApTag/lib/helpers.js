@@ -30,7 +30,7 @@ function getAdsAndGlobal(state, props) {
 	const ads = apTag.ads[siteId] || DEFAULT_ADS_RESPONSE;
 	const global = apTag.global[siteId] || DEFAULT_GLOBAL_RESPONSE;
 	const networkCode = dfp.activeDFPNetwork;
-	const siteDomain = sites[siteId].domain;
+	const siteDomain = (sites[siteId] && sites[siteId].domain) || '';
 
 	return {
 		siteId,
