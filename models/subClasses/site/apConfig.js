@@ -43,7 +43,8 @@ const ApConfig = {
 		'isUrlReportingEnabled',
 		'rules',
 		'isRedefineGptOnRefreshEnabled',
-		'flyingCarpetSettings'
+		'flyingCarpetSettings',
+		'isPnpSite'
 	],
 	override: [
 		'mode',
@@ -89,7 +90,8 @@ const ApConfig = {
 		'isUrlReportingEnabled',
 		'rules',
 		'isRedefineGptOnRefreshEnabled',
-		'flyingCarpetSettings'
+		'flyingCarpetSettings',
+		'isPnpSite'
 	],
 	merge: []
 };

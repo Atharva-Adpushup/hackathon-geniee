@@ -91,6 +91,8 @@ const PnP = (props = {}) => {
 	const [selectedAdUnitOperation, setSelectedAdUnitOperation] = useState(
 		PNP_AD_UNIT_OPERATIONS[0].value
 	);
+	const [isPnpSiteIdSynced, setIsPnpSiteIdSynced] = useState(false);
+	const [prevConfig, setPrevConfig] = useState({});
 
 	const {
 		site: { apps = {}, siteId, siteDomain },
@@ -127,6 +129,10 @@ const PnP = (props = {}) => {
 			.get(`ops/pnp-refresh/${siteId}`)
 			.then(res => {
 				const { data: config = {} } = res.data || {};
+				setPrevConfig(config);
+				if (config.pnpSiteId) {
+					setIsPnpSiteIdSynced(true);
+				}
 				updatePnPConfig(siteId, config);
 			})
 			.catch(err => console.log({ err }))
@@ -439,9 +445,11 @@ const PnP = (props = {}) => {
 
 	const handleInputchange = useCallback(
 		e => {
-			updatePnPConfigKey(siteId, 'pnpSiteId', e.target.value);
+			if (!isPnpSiteIdSynced) {
+				updatePnPConfigKey(siteId, 'pnpSiteId', e.target.value);
+			}
 		},
-		[siteId, updatePnPConfigKey]
+		[siteId, updatePnPConfigKey, isPnpSiteIdSynced]
 	);
 
 	const handleReset = useCallback(() => {
@@ -452,7 +460,8 @@ const PnP = (props = {}) => {
 	}, [fetchPnPData]);
 
 	const handleSave = () => {
-		const payload = {
+		const { dataForAuditLogs } = props;
+		const updaedPnpConfig = {
 			adUnits,
 			lineItems,
 			blacklistedLineItems,
@@ -464,12 +473,20 @@ const PnP = (props = {}) => {
 			refreshType,
 			siteId
 		};
+		const payload = {
+			pnpConfig: updaedPnpConfig,
+			isPnpSiteIdSynced,
+			dataForAuditLogs: { ...dataForAuditLogs, prevConfig }
+		};
 		setIsLoading(true);
 		axios
 			.put(`ops/pnp-refresh/${siteId}`, payload)
 			.then(res => {
 				const { data: config } = res.data || {};
 				updatePnPConfig(siteId, config);
+				if (!isPnpSiteIdSynced && pnpSiteId) {
+					setIsPnpSiteIdSynced(true);
+				}
 				showNotification({
 					mode: 'success',
 					title: 'Success',
@@ -607,6 +624,7 @@ const PnP = (props = {}) => {
 				value={pnpSiteId}
 				type="number"
 				onChange={handleInputchange}
+				readOnly={isPnpSiteIdSynced}
 				size={6}
 				id={`pnpSiteId-input-${siteId}-${siteDomain}`}
 				className="u-padding-v4 u-padding-h4"
