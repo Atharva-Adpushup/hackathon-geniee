@@ -316,7 +316,7 @@ class Layout extends Component {
 					name={`appStatus-${siteId}-${siteDomain}`}
 					id={`js-appStatus-${siteId}-${siteDomain}`}
 				/>
-				<CustomToggleSwitch
+				{/* <CustomToggleSwitch
 					labelText="Auto Optimize (Site)"
 					className="u-margin-b4 negative-toggle"
 					checked={siteAutoOptimise}
@@ -328,12 +328,12 @@ class Layout extends Component {
 					defaultLayout
 					name={`autoOptimise-site-${siteId}-${siteDomain}`}
 					id={`js-autoOptimise-${siteId}-${siteDomain}`}
-				/>
+				/> */}
 				<Table striped bordered hover className="custom-table">
 					<thead>
 						<tr>
 							<th>Page Group</th>
-							<th>Auto Optimize</th>
+							{/* <th>Auto Optimize</th> */}
 							<th>Traffic</th>
 						</tr>
 					</thead>
