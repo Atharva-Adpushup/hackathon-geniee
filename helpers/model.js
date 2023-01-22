@@ -99,8 +99,14 @@ var consts = require('../configs/commonConsts'),
 			this.data.dateModified = +moment().utc();
 			if (this.key.indexOf('site::') === 0) {
 				name = 'site';
+				if (self.data.apConfigs) {
+					// force disable autoOptimise
+					self.data.apConfigs.autoOptimise = false;
+				}
 			} else if (this.key.indexOf('chnl::') === 0) {
 				name = 'channel';
+				// force disable autoOptimise
+				self.data.autoOptimise = false;
 			} else if (this.key.indexOf('user::') === 0) {
 				name = 'user';
 			}
