@@ -262,7 +262,7 @@ class Layout extends Component {
 					return (
 						<tr key={`channel-row-${siteId}-${channelId}`}>
 							<td>{channel}</td>
-							<td>
+							{/* <td>
 								<CustomToggleSwitch
 									layout="nolabel"
 									className="u-margin-b4 negative-toggle"
@@ -275,7 +275,7 @@ class Layout extends Component {
 									name={`autoOptimise-channel-${siteId}-${platform}-${pageGroup}`}
 									id={`js-autoOptimise-${siteId}-${channelId}-${platform}-${pageGroup}`}
 								/>
-							</td>
+							</td> */}
 							<td dangerouslySetInnerHTML={{ __html: channelAutoOptimise ? 'N/A' : traffic }} />
 						</tr>
 					);
@@ -334,7 +334,7 @@ class Layout extends Component {
 						<tr>
 							<th>Page Group</th>
 							{/* <th>Auto Optimize</th> */}
-							<th>Traffic</th>
+							{/* <th>Traffic</th> */}
 						</tr>
 					</thead>
 					<tbody>{this.renderChannels()}</tbody>
