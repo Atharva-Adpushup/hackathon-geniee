@@ -3,7 +3,7 @@ module.exports = apiModule();
 const model = require('../helpers/model');
 const couchbase = require('../helpers/couchBaseService');
 const AdPushupError = require('../helpers/AdPushupError');
-const { docKeys } = require('../configs/commonConsts');
+const { docKeys, COUCHBASE_BUCKETS } = require('../configs/commonConsts');
 
 const InstreamScript = model.extend(function() {
 	this.keys = ['siteId', 'siteDomain', 'mcmId', 'videoPlayerId', 'prebid', 'ads', 'dateCreated'];
@@ -35,8 +35,8 @@ function apiModule() {
 	const API = {
 		getInstreamScriptConfig(siteId) {
 			return couchbase
-				.connectToAppBucket()
-				.then(appBucket => appBucket.getAsync(`${docKeys.instreamScript}${siteId}`))
+				.connectToBucket(COUCHBASE_BUCKETS.INSTREAM_APP_BUCKET)
+				.then(instreamAppBucket => instreamAppBucket.getAsync(`${docKeys.instreamScript}${siteId}`))
 				.then(json => new InstreamScript(json.value, json.cas))
 				.catch(err => {
 					if (err.code === 13) {
