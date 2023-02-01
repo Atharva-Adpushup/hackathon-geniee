@@ -26,7 +26,7 @@ export default {
 	disableDailyWeeklySnapshots: false,
 	updateInventoryAdunit: '/ops/updateAdUnitData/',
 	ADMIN_INVENTORY_LIST_TABLE_HEADER: [
-		{
+		{ 
 			Header: 'Site Id',
 			accessor: 'siteId',
 			width: 70,

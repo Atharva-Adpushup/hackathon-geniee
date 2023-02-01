@@ -109,8 +109,8 @@ const getTableBody = (tableBody, props) => {
 						<a href={`/reports/${siteid}`}>{tableRow.site}</a>
 					);
 				} else return;
-
-				delete tableRow.siteid;
+				//-Ankit Verma- removed this line for adding siteId in CSV export
+				//delete tableRow.siteid;  
 			}
 
 			if (tableRow.url) {
@@ -413,11 +413,26 @@ const appendDayToDateCSV = csvData => {
 	});
 };
 
+const addSiteIdToCSVData = (csvData, data) => {
+	const index = data.tableColumns.map(e => e.Header).indexOf('Site Name');
+	if (index !== -1) {
+		csvData[0].splice(index, 0, 'Site Id');
+		const { tableBody = {} } = data;
+		tableBody.forEach((item, itemIndex) => {
+			const siteId = item.siteid;
+			csvData[itemIndex + 1].splice(index, 0, siteId);
+		});
+		csvData[tableBody.length + 1].splice(index, 0, '');
+	}
+};
+
 const setCsvData = (data, props) => {
 	const { getCsvData, selectedInterval, selectedDimension } = props;
 	const csvData = computeCsvData(data);
-
-	// for interval daily and single dimens
+	if (selectedDimension && selectedDimension.length && selectedDimension.includes('siteid')) {
+		addSiteIdToCSVData(csvData, data);
+	}
+	// for interval daily and single dimension
 	if (
 		selectedInterval === 'daily' &&
 		(!selectedDimension.length ||
