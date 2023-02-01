@@ -931,6 +931,9 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		user: 'AdPushup',
 		password: 'DVBynj73fmfg'
 	},
+	COUCHBASE_BUCKETS: {
+		INSTREAM_APP_BUCKET: 'InstreamAppBucket'
+	},
 	WIDGET_AUTH_EXCLUDED_PATH: ['/site/report?report_name=peer_performance_report'],
 	PNP_REFRESH_SCRIPTS: `(function () {
 		var PROXY_SITE_ID = window.pnpRefresh.pnpSiteId;
