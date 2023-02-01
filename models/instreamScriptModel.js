@@ -35,8 +35,8 @@ function apiModule() {
 	const API = {
 		getInstreamScriptConfig(siteId) {
 			return couchbase
-				.connectToAppBucket()
-				.then(appBucket => appBucket.getAsync(`${docKeys.instreamScript}${siteId}`))
+				.connectToBucket('InstreamAppBucket')
+				.then(instreamAppBucket => instreamAppBucket.getAsync(`${docKeys.instreamScript}${siteId}`))
 				.then(json => new InstreamScript(json.value, json.cas))
 				.catch(err => {
 					if (err.code === 13) {
