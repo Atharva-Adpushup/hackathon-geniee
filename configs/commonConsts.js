@@ -701,7 +701,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 	cronSchedule: {
 		fetchMCMStatusService: '0 */12 * * *', //Every 12 hours
 		activeSiteMarkingAndAdsTxtService: '20 14,2 * * *',
-		adManagerSyncService: '0 */4 * * *',
+		adManagerSyncService: '0 */3 * * *',
 		prefetchService: '*/1 * * * *', // Every 1 mins
 		prefetchHBService: '*/15 * * * *', // Every 15 mins
 		emailSnapshotsService: '30 7 * * *', //Run at 8:00 everyday
