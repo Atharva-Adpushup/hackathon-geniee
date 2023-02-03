@@ -21,6 +21,7 @@ var model = require('../helpers/model'),
 	Site = model.extend(function() {
 		this.keys = [
 			'siteId',
+			'apScriptSize',
 			'customSizes',
 			'siteName',
 			'siteDomain',
@@ -55,6 +56,7 @@ var model = require('../helpers/model'),
 		];
 		this.clientKeys = [
 			'siteId',
+			'apScriptSize',
 			'customSizes',
 			'siteName',
 			'siteDomain',
