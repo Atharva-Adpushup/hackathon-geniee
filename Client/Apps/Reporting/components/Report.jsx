@@ -226,7 +226,7 @@ class Report extends Component {
 			: this.removeOpsFilterDimension(filterList, dimensionList);
 
 		// Enable all dimensions, filters if pub has only one site
-		if (sitesCount !== 1) {
+		if (sitesCount !== 1 || reportType === 'global') {
 			updatedFilterList.forEach(filter => {
 				// eslint-disable-next-line no-param-reassign
 				filter.isDisabled = this.isControlItemDisabled(filter, disabledFilter, reportType);
