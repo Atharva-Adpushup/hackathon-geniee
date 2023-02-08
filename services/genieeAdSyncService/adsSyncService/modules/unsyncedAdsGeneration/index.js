@@ -71,8 +71,12 @@ module.exports = {
 		const { refreshAdUnitCodesCount, isAmpAds = false } = additionalParams;
 		const { formatData = {}, isReplaceGptSlotOnRefreshEnabled = false } = ad;
 		const { type: adType, maxInstances = 0 } = formatData;
-		const shouldReplaceGptSlotOnRefresh = isAmpAds ? false : isReplaceGptSlotOnRefreshEnabled;
+
 		const isChainedDockedAd = adType === 'chainedDocked';
+
+		//replace gpt slot can not be enabled on amp ads and chained docked ads
+		const shouldReplaceGptSlotOnRefresh =
+			isAmpAds || isChainedDockedAd ? false : isReplaceGptSlotOnRefreshEnabled;
 
 		if (!hasNetworkData) {
 			return false;
