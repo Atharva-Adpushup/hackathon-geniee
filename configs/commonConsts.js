@@ -943,17 +943,22 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		var refreshType = window.pnpRefresh.refreshType;
 		var AD_UNIT_MAPPING =
 		  window.pnpRefresh.adUnits[window.adpushup.config.platform];
-		if(!AD_UNIT_MAPPING){
-			return;
+		if (!AD_UNIT_MAPPING) {
+		  return;
 		}
+		var isDestroySlotLoggingEnabled = window.adpushup.isDestroySlotLoggingEnabled || false;
+		var triggerDestroySlotLogging = window.adpushup.triggerDestroySlotLogging;
+		var datadogLoggerService = adpushup.utils.sendLogsToDataDogService;
+	  
 		var log = window.adpushup.utils.log.bind(window.adpushup.utils);
 		var checkElementInViewPercent =
 		  window.adpushup.utils.checkElementInViewPercent.bind(window.adpushup.utils);
-		var cssescape=window.adpushup.utils.cssescape.bind(window.adpushup.utils);
+		var cssescape = window.adpushup.utils.cssescape.bind(window.adpushup.utils);
 		var lineItems = window.pnpRefresh.lineItems || [];
 		var blacklistedLineItems = window.pnpRefresh.blacklistedLineItems || [];
 		var googletag = window.googletag || {};
 		googletag.cmd = googletag.cmd || [];
+	  
 		googletag.cmd.push(function () {
 		  function isDisplayNone(el) {
 			var elComputedStyles = window.getComputedStyle(el);
@@ -995,7 +1000,6 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 			if (existingAdElement.style.display === "none") {
 			  existingAdElement.style.display = "";
 			}
-	  
 			if (!checkElementDisplay(slot.getSlotElementId())) {
 			  log("======replacing=======adUnit", adUnit);
 			  log("======replacing=======AD_UNIT_MAPPING", AD_UNIT_MAPPING);
@@ -1011,6 +1015,12 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 			  apTagDiv.appendChild(scriptElement);
 			  window.pnpRefresh.insertedTags.push(slot);
 			  googletag.destroySlots([slot]);
+			  if (isDestroySlotLoggingEnabled) {
+				datadogLoggerService("PNP_DESTROY_SLOT_LOGGING", {
+				  message: "slot destroyed",
+				  id: 1,
+				});
+			  }
 			  //empty the existing ad div and append apTag to this div only, so that we do not end up affecting their layout.
 			  while (existingAdElement.firstChild) {
 				existingAdElement.removeChild(existingAdElement.firstChild);
@@ -1021,6 +1031,13 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 			  }
 			  existingAdElement.appendChild(apTagDiv, existingAdElement);
 			  delete window.pnpRefresh.adUnitState[slot.getSlotElementId()];
+			  if (isDestroySlotLoggingEnabled) {
+				triggerDestroySlotLogging();
+				datadogLoggerService("PNP_DESTROY_SLOT_LOGGING", {
+				  message: "slot injected",
+				  id: 2,
+				});
+			  }
 			} else {
 			  setTimeout(function () {
 				replaceSlot(slot, adUnit);
@@ -1030,7 +1047,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		  // Init AdUnitState for Active View Refresh
 		  function initAdUnitState(slot) {
 			var divId = slot.getSlotElementId();
-			var el = window.adpushup.$("#"+cssescape(divId));
+			var el = window.adpushup.$("#" + cssescape(divId));
 			var height = el.height();
 			var width = el.width();
 			return {
@@ -1053,9 +1070,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		  // Active view checkinviewandrefresh
 		  function checkInViewAndRefresh(slot, adUnit) {
 			var divId = slot.getSlotElementId();
-			var elementInView = checkElementInViewPercent(
-				"#"+cssescape(divId)
-			  );
+			var elementInView = checkElementInViewPercent("#" + cssescape(divId));
 			if (elementInView) {
 			  // window.pnpRefresh.adUnitState[divId] = resetadUnitState(slot);
 			  replaceSlot(slot, adUnit);
@@ -1240,8 +1255,8 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 				  if (refreshType === "activeView") {
 					window.pnpRefresh.adUnitState[slotId] = initAdUnitState(e.slot);
 					var elementInView = checkElementInViewPercent(
-						"#"+cssescape(slotId)
-					  );
+					  "#" + cssescape(slotId)
+					);
 					if (elementInView) {
 					  window.pnpRefresh.adUnitState[slotId].viewable = true;
 					  if (!window.pnpRefresh.adUnitState[slotId].viewedOnce) {
