@@ -152,8 +152,8 @@ async function getReportsMetaData(params) {
 
 router
 	.get('/globalData', (req, res) => {
-		const { email, isSuperUser } = req.user;
-		const userEmail = req.user.originalEmail || req.user.email;
+		const { email, isSuperUser, originalEmail } = req.user;
+
 		return userModel
 			.getUserByEmail(email)
 			.then(user =>
@@ -161,11 +161,20 @@ router
 					getNetworkConfig(),
 					getUserSites(user),
 					getNetworkWideHBRules(),
-					async (networkConfig, sites, networkWideHBRules) => {
+					// get logged in user's details in case of switched user
+					originalEmail && userModel.getUserByEmail(originalEmail) || Promise.resolve(''),
+					async (networkConfig, sites, networkWideHBRules, originalUser) => {
 						try {
 							const userEmail = req.user.originalEmail || req.user.email;
 							// This is for AdOps/Account Managers to prevent unAuth access to other accounts
 							let associatedAccounts = await getAssociatedAccountsWithUser(userEmail);
+
+							const originalUsersData = originalUser && originalUser.cleanData() || {};
+							// get `allowedEmailExport` flag from original user's data and set it into
+							// impersonate user's data
+							// Flag to check if the user is allowed to export site owners email or not
+							// under global report - csv export
+							const { allowedEmailExport = false } = originalUsersData;
 
 							const userData = user.cleanData();
 							const sitesArray = [...userData.sites];
@@ -192,7 +201,7 @@ router
 								}
 
 								return res.status(httpStatus.OK).json({
-									user: { ...userData, isSuperUser },
+									user: { ...userData, isSuperUser, allowedEmailExport /** Pass the flag to check if the user is allowed to export site owners email or not */ },
 									networkConfig,
 									networkWideHBRules,
 									associatedAccounts,

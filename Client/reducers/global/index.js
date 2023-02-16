@@ -10,6 +10,7 @@ import hbanalytics from './hbanalytics';
 import notifications from './notifications';
 import tools from './tools';
 import associatedAccounts from './associatedAccounts';
+import findUsers from './findUsers';
 
 export default combineReducers({
 	user,
@@ -22,5 +23,6 @@ export default combineReducers({
 	notifications,
 	networkWideRules,
 	tools,
-	associatedAccounts
+	associatedAccounts,
+	findUsers
 });
