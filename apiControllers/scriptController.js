@@ -8,6 +8,7 @@ const activeBidderAdaptersList = require('../models/activeBidderAdaptersListMode
 // const SelectiveRolloutActiveBidderAdaptersList = require('../models/selectiveRolloutActiveBidderAdaptersListModel');
 const ampActiveBidderAdaptersListModel = require('../models/ampActiveBidderAdaptersListModel');
 const SiteSpecificActiveBidderAdaptersList = require('../models/siteSpecificActiveBidderAdaptersListModel');
+const SiteLevelPrebidModulesModel = require('../models/siteLevelPrebidModulesModel');
 const ampScriptModel = require('../models/ampScriptModel');
 const instreamScriptModel = require('../models/instreamScriptModel');
 const getReportData = require('../reports/universal');
@@ -847,11 +848,11 @@ Router.get('/prebidBundleConfig', (req, res) => {
 		.then(activeBiddersModel =>
 			Promise.join(
 				activeBiddersModel,
-				activeBiddersModel.getActiveAndUsedBidderAdapters(siteId)
-				// siteId is only used by SiteSpecificActiveBidderAdaptersList
+				activeBiddersModel.getActiveAndUsedBidderAdapters(siteId), // siteId is only used by SiteSpecificActiveBidderAdaptersList
+				SiteLevelPrebidModulesModel.getSiteLevelPrebidAdditionalModules(siteId)
 			)
 		)
-		.then(([activeBiddersModel, activeAndUsedBidders]) => {
+		.then(([activeBiddersModel, activeAndUsedBidders, siteLevelModules]) => {
 			if (forAmp) {
 				return res.send({ activeAndUsedBidders });
 			}
@@ -860,7 +861,9 @@ Router.get('/prebidBundleConfig', (req, res) => {
 				activeBiddersModel
 					.isS2SActiveOnAnySite(siteId)
 					// siteId is only used by SiteSpecificActiveBidderAdaptersList
-					.then(isS2SActiveOnAnySite => res.send({ isS2SActiveOnAnySite, activeAndUsedBidders }))
+					.then(isS2SActiveOnAnySite =>
+						res.send({ isS2SActiveOnAnySite, activeAndUsedBidders, siteLevelModules })
+					)
 			);
 		})
 		.catch(err => {
