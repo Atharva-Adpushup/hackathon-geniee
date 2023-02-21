@@ -4,7 +4,6 @@ import sum from 'lodash/sum';
 import countBy from 'lodash/countBy';
 import map from 'lodash/map';
 import isEqual from 'lodash/isEqual';
-
 import moment from 'moment';
 import { numberWithCommas, computeCsvData } from '../helpers/utils';
 import { reactTableSortMethod } from '../../../helpers/commonFunctions';
@@ -109,8 +108,8 @@ const getTableBody = (tableBody, props) => {
 						<a href={`/reports/${siteid}`}>{tableRow.site}</a>
 					);
 				} else return;
-				//-Ankit Verma- removed this line for adding siteId in CSV export
-				//delete tableRow.siteid;  
+				// -Ankit Verma- removed this line for adding siteId in CSV export
+				// delete tableRow.siteid;
 			}
 
 			if (tableRow.url) {
@@ -413,25 +412,73 @@ const appendDayToDateCSV = csvData => {
 	});
 };
 
-const addSiteIdToCSVData = (csvData, data) => {
+const addSiteIdToCSVData = ({ csvData, data, allowedEmailExport = false, props }) => {
+	const { findUsersData, isForOps } = props;
+	let siteIdEmailMapping = {};
 	const index = data.tableColumns.map(e => e.Header).indexOf('Site Name');
+	// append siteId if the 'Site' dimension is selected
+	// 1. First we will append the columns
+	// 2. Then we will append the data in each row
 	if (index !== -1) {
-		csvData[0].splice(index, 0, 'Site Id');
+		const appendColumnsArr = [];
+		if (isForOps && allowedEmailExport) {
+			siteIdEmailMapping = findUsersData.reduce((acc, user) => {
+				const { email, siteIds = [] } = user;
+				siteIds.forEach(siteId => {
+					acc[siteId] = email;
+				});
+				return acc;
+			}, {});
+			// append Console Email Id as well if allowedEmailExport is true
+			appendColumnsArr.push('Console Email Id');
+		}
+		appendColumnsArr.push('Site Id');
+		// append columns
+		csvData[0].splice(index, 0, ...appendColumnsArr /** append multiple items in the array */);
+
 		const { tableBody = {} } = data;
+		// append data in the rows
 		tableBody.forEach((item, itemIndex) => {
 			const siteId = item.siteid;
-			csvData[itemIndex + 1].splice(index, 0, siteId);
+			// append data - siteId
+			const appendRowData = [];
+
+			// append data - siteId, Console Email Id
+			if (isForOps && allowedEmailExport) {
+				// append site owners email to the row
+				appendRowData.push(siteIdEmailMapping[siteId]);
+			}
+			appendRowData.push(siteId);
+			csvData[itemIndex + 1].splice(
+				index,
+				0,
+				...appendRowData /** append multiple items in the array */
+			);
 		});
-		csvData[tableBody.length + 1].splice(index, 0, '');
+
+		// for the footer - append empty column values
+		csvData[tableBody.length + 1].splice(
+			index,
+			0,
+			...new Array(appendColumnsArr.length).fill('') /** append multiple items in the array */
+		);
 	}
+	return csvData;
 };
 
 const setCsvData = (data, props) => {
-	const { getCsvData, selectedInterval, selectedDimension } = props;
-	const csvData = computeCsvData(data);
+	const {
+		getCsvData,
+		selectedInterval,
+		selectedDimension,
+		user: { allowedEmailExport }
+	} = props;
+	let csvData = computeCsvData(data);
+
 	if (selectedDimension && selectedDimension.length && selectedDimension.includes('siteid')) {
-		addSiteIdToCSVData(csvData, data);
+		csvData = addSiteIdToCSVData({ csvData, data, allowedEmailExport, props });
 	}
+
 	// for interval daily and single dimension
 	if (
 		selectedInterval === 'daily' &&
