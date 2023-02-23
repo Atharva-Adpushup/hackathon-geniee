@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from 'react';
 import moment from 'moment';
-import { gapi } from 'gapi-script';
 
 import {
 	GOOGLE_APP_API_KEY,
@@ -10,6 +9,7 @@ import {
 import CustomButton from '../CustomButton';
 
 const { SCOPES, DISCOVERY_DOC, API_LIB, GSI_LIB } = REPORT_EXPORT;
+const w = window;
 
 const useLoadExternalScript = (src, onLoad, isLoaded) => {
 	useEffect(() => {
@@ -44,22 +44,23 @@ const GoogleLoginButton = ({ selectedControlsForCSV, csvData, ...props }) => {
 	 */
 	async function initializeGapiClient() {
 		try {
-			await gapi.client.init({
-				apiKey: GOOGLE_APP_API_KEY,
-				discoveryDocs: [DISCOVERY_DOC]
-			});
+			if (!gapiInited.current) {
+				await w.gapi.client.init({
+					apiKey: GOOGLE_APP_API_KEY,
+					discoveryDocs: [DISCOVERY_DOC],
+				});
+				gapiInited.current = true;
+			}
 		} catch (err) {
 			console.log('GAPI init failed', err);
 		}
-
-		gapiInited.current = true;
 	}
 
 	/**
 	 * Callback after api.js is loaded.
 	 */
 	const gapiLoaded = () => {
-		gapi.load('client', initializeGapiClient);
+		w.gapi.load('client', initializeGapiClient);
 	};
 
 	/**
@@ -79,7 +80,7 @@ const GoogleLoginButton = ({ selectedControlsForCSV, csvData, ...props }) => {
 		let response;
 		try {
 			const title = `${name}-${moment().format('MM-DD-YYYY')}`;
-			response = await gapi.client.sheets.spreadsheets.create({
+			response = await w.gapi.client.sheets.spreadsheets.create({
 				properties: {
 					title
 				}
@@ -90,7 +91,7 @@ const GoogleLoginButton = ({ selectedControlsForCSV, csvData, ...props }) => {
 			const cols = charFromColumnIndex[csvData[0].length];
 			const rows = sheetData.length;
 
-			await gapi.client.sheets.spreadsheets.values.update({
+			await w.gapi.client.sheets.spreadsheets.values.update({
 				spreadsheetId: response.result.spreadsheetId,
 				range: `A1:${cols}${rows}`,
 				valueInputOption: 'USER_ENTERED',
@@ -125,7 +126,7 @@ const GoogleLoginButton = ({ selectedControlsForCSV, csvData, ...props }) => {
 				}
 			};
 
-			if (gapi.client.getToken() === null) {
+			if (w.gapi.client.getToken() === null) {
 				// Prompt the user to select a Google Account and ask for consent to share their data
 				// when establishing a new session.
 				tokenClient.current.requestAccessToken();
