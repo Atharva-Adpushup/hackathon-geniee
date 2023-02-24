@@ -66,10 +66,18 @@ function apiModule() {
 				prebidBundleName: ''
 			};
 
-			const newActiveBiddersInAscOrderString = newActiveBiddersInAscOrder.join(',');
+			// const newActiveBiddersInAscOrderString = newActiveBiddersInAscOrder.join(',');
 
 			return API.getActiveBidderAdaptersList()
 				.then(activeBidderAdaptersList => {
+					
+					// We will have to upgrade the new version of prebid in type=adpushup component.
+					// It is currently 4.43 and is breaking for new adapter changes.
+					// Our next step should be to upgrade the prebid module and then start updating the active bidders.
+					
+					return activeBidderAdaptersList;
+
+					/*
 					const existingActiveBiddersInAscOrderString = activeBidderAdaptersList
 						.get('activeBiddersInAscOrder')
 						.join(',');
@@ -82,7 +90,8 @@ function apiModule() {
 						});
 					}
 
-					return activeBidderAdaptersList;
+					return activeBidderAdaptersList; 
+					*/
 				})
 				.catch(err => {
 					if (err.code === 13) {
@@ -98,6 +107,7 @@ function apiModule() {
 				})
 				.then(activeBidderAdaptersList => {
 					output.prebidBundleName = activeBidderAdaptersList.get('prebidBundleName');
+					output.activeBidderAdapters = activeBidderAdaptersList.get('activeBiddersInAscOrder');
 					return output;
 				});
 		},
