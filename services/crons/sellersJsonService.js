@@ -4,6 +4,7 @@ const path = require('path');
 const moment = require('moment');
 const validator = require('validator');
 const couchbase = require('couchbase');
+const cron = require('node-cron');
 const _findIndex = require('lodash/findIndex');
 
 const userModel = require('../../models/userModel');
@@ -463,9 +464,18 @@ if (config.environment.HOST_ENV === 'production') {
 	});
 }
 
-try {
-	init();
-} catch (error) {
-	handleError(error);
-	reportErrors();
+function start() {
+	try {
+		init();
+	} catch (error) {
+		handleError(error);
+		reportErrors();
+	}
 }
+
+var cronJob = cron.schedule(
+	commonConsts.cronSchedule.sellersJSONService,
+	start,
+	false
+);
+cronJob.start();
