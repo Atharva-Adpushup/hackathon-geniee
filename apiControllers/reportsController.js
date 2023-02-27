@@ -15,7 +15,7 @@ const FormValidator = require('../helpers/FormValidator');
 const schema = require('../helpers/schema');
 const AdPushupError = require('../helpers/AdPushupError');
 
-const reportsAccess = require('../middlewares/reportsAuthorizationMiddleware.js');
+const reportsAccess = require('../middlewares/reportsAuthorizationMiddleware');
 const reportsService = require('../apiServices/reportsService');
 const { appBucket } = require('../helpers/routeHelpers');
 const config = require('../configs/config');
@@ -41,7 +41,7 @@ router
 				email
 			);
 			if (cacheHit) setCacheHeaders(res);
-			await reportsService.logReportUsage(originalEmail || email, reportingConfig);
+			await reportsService.logReportUsage(email || originalEmail, reportingConfig);
 			return sendSuccessResponse(reportsData, res, HTTP_STATUSES.OK);
 		} catch (err) {
 			return sendErrorResponse({ message: err.message }, res, HTTP_STATUSES.BAD_REQUEST);
@@ -95,7 +95,7 @@ router
 				res.set('Content-Type', 'text/csv');
 
 				const headers = {};
-				for (key in csvData[0]) {
+				for (const key in csvData[0]) {
 					headers[key] = key;
 				}
 
@@ -256,7 +256,7 @@ router
 	})
 	.get('/', (req, res) => {
 		const { user } = req;
-		const email = user.originalEmail || user.email;
+		const email = user.email || user.originalEmail;
 		return reportsModel
 			.getSavedReportConfig(email)
 			.then(reportConfig => sendSuccessResponse(reportConfig, res, HTTP_STATUSES.OK))
@@ -287,7 +287,7 @@ router
 			createdAt: Date.now(),
 			id: uuid()
 		};
-		const email = user.originalEmail || user.email;
+		const email = user.email || user.originalEmail;
 		try {
 			const errors = await FormValidator.validate(reportConfig, schema.saveReportApi.validations);
 			if (errors && errors.length) {
@@ -337,7 +337,7 @@ router
 	.patch('/:id', async (req, res) => {
 		try {
 			const { user, body: updateConfiguration } = req;
-			const email = user.originalEmail || user.email;
+			const email = user.email || user.originalEmail;
 			const savedConfigId = req.params.id;
 
 			if (!savedConfigId) throw new Error('Id required to update saved report');
@@ -408,7 +408,7 @@ router
 	.delete('/:id', async (req, res) => {
 		try {
 			const { user } = req;
-			const email = user.originalEmail || user.email;
+			const email = user.email || user.originalEmail;
 			const reportId = req.params.id;
 			if (!reportId) throw new Error('Invalid report ID');
 
@@ -589,7 +589,7 @@ router
 						labData.LCP = audits['largest-contentful-paint'].displayValue;
 						labData.CLS = audits['cumulative-layout-shift'].displayValue;
 						labData.TBT = audits['total-blocking-time'].displayValue;
-						labData.TTI = audits['interactive'].displayValue;
+						labData.TTI = audits.interactive.displayValue;
 						labData.SI = audits['speed-index'].displayValue;
 
 						sendSuccessResponse(
