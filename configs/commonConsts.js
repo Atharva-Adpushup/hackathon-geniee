@@ -1356,6 +1356,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		var checkElementInViewPercent = window.adpushup.utils.isAmpSlotInView.bind(window.adpushup.utils);
 		var lineItems = window.pnpRefresh.lineItems || [];
 		var blacklistedLineItems = window.pnpRefresh.blacklistedLineItems || [];
+		var firstImpressionRefreshLineItems = window.pnpRefresh.firstImpressionRefreshLineItems || [];
 		var forceRefreshFirstImpression = !!window.pnpRefresh.forceRefreshFirstImpression;
 	
 		var googletag = (window.googletag = window.googletag || {});
@@ -1380,12 +1381,22 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 					return isElDisplayNone;
 				}
 	
+				function isFirstImpressionRefreshEligible(lineItem) {
+					return firstImpressionRefreshLineItems.indexOf(lineItem) > -1;
+				}
+
+				function refreshOnFirstImpression(slot, lineitem) {
+					log('Lineitem: ' + lineitem + ' not in whitelist and forceRefreshFirstImpression is on');
+					log('Force Refreshing the first impression ' + slot.getSlotElementId());
+					googletag.pubads().refresh([slot]);
+				}
+	
 				function refreshSlot(slot, adUnit) {
 					var lineItem = window.pnpRefresh.adUnitState[slot.getSlotElementId()].lineItemId;
 					if (lineItems.indexOf(String(lineItem)) === -1 && forceRefreshFirstImpression) {
-						log('Lineitem: ' + lineItem + ' not in whitelist and forceRefreshFirstImpression is on');
-						log('Force Refreshing the first impression ' + slot.getSlotElementId());
-						googletag.pubads().refresh([slot]);
+						refreshOnFirstImpression(slot, lineItem);
+					} else if (isFirstImpressionRefreshEligible(String(lineItem))) {
+						refreshOnFirstImpression(slot, lineItem);
 					} else {
 						replaceSlot(slot, adUnit);
 					}
@@ -1519,7 +1530,9 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 						}
 						var lineItemId = (sourceAgnosticLineItemId && sourceAgnosticLineItemId.toString()) || '';
 						if (lineItemId && lineItems.length) {
-							if (lineItems.indexOf(lineItemId) === -1 && !forceRefreshFirstImpression) {
+							if (
+								lineItems.indexOf(lineItemId) === -1 && (!forceRefreshFirstImpression || !isFirstImpressionRefreshEligible(lineItemId))
+							) {
 								log(
 									'For Ad Unit: ' +
 										adUnitPath +
@@ -1562,7 +1575,10 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 	
 				function checkRefreshType(adUnit) {
 					let adUnitObject = AD_UNIT_MAPPING[adUnit];
-					return (adUnitObject && adUnitObject.refreshType) || (window.pnpRefresh && window.pnpRefresh.refreshType);
+					return (
+						(adUnitObject && adUnitObject.refreshType) ||
+						(window.pnpRefresh && window.pnpRefresh.refreshType)
+					);
 				}
 	
 				function triggerReplace(slot, adUnit, REFRESH_INTERVAL = 0) {
