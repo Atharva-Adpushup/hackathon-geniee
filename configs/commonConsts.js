@@ -1024,6 +1024,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 			  if (isDestroySlotLoggingEnabled) {
 				datadogLoggerService("PNP_DESTROY_SLOT_LOGGING", {
 				  message: "slot destroyed",
+				  apTagId: apTagId,
 				  id: 1,
 				});
 			  }
@@ -1041,6 +1042,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 				triggerDestroySlotLogging();
 				datadogLoggerService("PNP_DESTROY_SLOT_LOGGING", {
 				  message: "slot injected",
+				  apTagId: apTagId,
 				  id: 2,
 				});
 			  }
