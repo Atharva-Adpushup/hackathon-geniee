@@ -2,6 +2,14 @@
 
 - Added some message explaining what is the PR about
 
+# Note to reviewer
+
+- `configs/config.sample.js`
+  If there is a change in configuration, please make sure that the respective config is updated in the jenkins before merging the PR.
+- Please make sure `pm2-process.json` is updated,
+    - When deploying a new service
+    - When re-deploying an inactive service
+
 # Checklist
 
 - [ ] Tested thoroughly on Local setup
