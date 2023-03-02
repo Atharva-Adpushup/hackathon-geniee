@@ -184,7 +184,6 @@ if (config.environment.HOST_ENV === 'production') {
 	});
 }
 
-createSFTPConnectionAndDoProcessing();
 var cronJob = cron.schedule(
 	CC.cronSchedule.paymentHistoryService,
 	createSFTPConnectionAndDoProcessing,

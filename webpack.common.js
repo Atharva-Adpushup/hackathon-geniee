@@ -8,7 +8,7 @@ module.exports = {
 	context: path.resolve(__dirname, 'Client'),
 	entry: './index.js',
 	output: {
-		path: path.resolve(__dirname, 'clientDist'),
+		path: path.resolve(__dirname, 'clientBuild'),
 		filename: 'shell.js',
 		chunkFilename: '[name].js',
 		publicPath: '/'
