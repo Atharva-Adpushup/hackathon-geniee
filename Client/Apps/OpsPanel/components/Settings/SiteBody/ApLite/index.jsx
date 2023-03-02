@@ -293,7 +293,7 @@ class ApLite extends Component {
 
 				for (const key in adUnitMap) {
 					let parentAdUnit;
-					let dfpAdUnit = adUnitMap[key];
+					let dfpAdUnit = key;
 					const dfpAdunitCode = adUnitMap[key];
 
 					if (key.includes('»')) {
