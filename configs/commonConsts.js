@@ -1387,7 +1387,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 				function isFirstImpressionRefreshEligible(lineItem) {
 					return firstImpressionRefreshLineItems.indexOf(lineItem) > -1;
 				}
-
+	
 				function refreshOnFirstImpression(slot, lineitem) {
 					log('Lineitem: ' + lineitem + ' not in whitelist and forceRefreshFirstImpression is on');
 					log('Force Refreshing the first impression ' + slot.getSlotElementId());
@@ -1534,7 +1534,8 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 						var lineItemId = (sourceAgnosticLineItemId && sourceAgnosticLineItemId.toString()) || '';
 						if (lineItemId && lineItems.length) {
 							if (
-								lineItems.indexOf(lineItemId) === -1 && (!forceRefreshFirstImpression || !isFirstImpressionRefreshEligible(lineItemId))
+								lineItems.indexOf(lineItemId) === -1 &&
+								(!forceRefreshFirstImpression || !isFirstImpressionRefreshEligible(lineItemId))
 							) {
 								log(
 									'For Ad Unit: ' +
@@ -1590,6 +1591,12 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 					adUnitState.readyToRefresh = true;
 					var refreshType = checkRefreshType(adUnit);
 					switch (refreshType) {
+						case 'bgRefresh':
+							adUnitState.refreshTimeoutId = setTimeout(function () {
+								refreshSlot(slot, adUnit);
+								log(adUnit, 'Background Replacement Turned On, Replaced at', new Date());
+							}, REFRESH_INTERVAL);
+							break;
 						case 'activeTab':
 							adUnitState.refreshTimeoutId = setTimeout(function () {
 								if (!checkDocInFocus()) {
@@ -1606,26 +1613,35 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 					}
 				}
 	
+				function getRefreshAfterTiming(adUnitState, adUnit) {
+					var REFRESH_INTERVAL = window.pnpRefresh.filledInsertionTrigger;
+					let refreshAfter = REFRESH_INTERVAL * 1000 - (+new Date() - adUnitState.renderTimestamp);
+					refreshAfter = refreshAfter >= 0 ? refreshAfter : 0;
+					log(adUnit, 'trigger Set for replacement after', refreshAfter);
+					return refreshAfter;
+				}
+	
 				function handleRefresh(divId, adUnit) {
 					if (Object.keys(window.pnpRefresh.adUnitState).indexOf(divId) !== -1) {
 						var refreshType = checkRefreshType(adUnit);
 						log('Refresh Type on Adunit', refreshType, adUnit);
 						var adUnitState = window.pnpRefresh.adUnitState[divId];
 						var slot = adUnitState.gSlot;
+						let refreshAfter;
 	
 						switch (refreshType) {
+							case 'bgRefresh':
+								if (adUnitState.refreshTimeoutId) return;
+								refreshAfter = getRefreshAfterTiming(adUnitState, adUnit);
+								triggerReplace(slot, adUnit, refreshAfter);
+								break;
 							case 'activeTab':
 								if (adUnitState.refreshTimeoutId) return;
 								if (!checkDocInFocus()) {
 									return;
 								}
-								log('pnp slot in active tab ' + divId);
-								var REFRESH_INTERVAL = window.pnpRefresh.filledInsertionTrigger;
-								var refreshAfter =
-									REFRESH_INTERVAL * 1000 - (+new Date() - adUnitState.renderTimestamp);
-								refreshAfter = refreshAfter >= 0 ? refreshAfter : 0;
+								refreshAfter = getRefreshAfterTiming(adUnitState, adUnit);
 								triggerReplace(slot, adUnit, refreshAfter);
-								log(adUnit, 'Active Tab trigger Set for replacement after', refreshAfter);
 								break;
 							default:
 								if (adUnitState.readyToRefresh) {
