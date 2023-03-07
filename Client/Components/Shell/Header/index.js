@@ -27,6 +27,8 @@ const Header = ({
 	switchUser,
 	impersonateCurrentUser,
 	findUsers,
+	findUserFetching,
+	findUserFetched,
 	hasUnsavedChanges
 }) => {
 	function handleLogout() {
@@ -58,7 +60,10 @@ const Header = ({
 				!!user.isSuperUser ? (
 					<React.Fragment>
 						<UserChange
+							user={user}
 							switchUser={switchUser}
+							findUserFetched={findUserFetched}
+							findUserFetching={findUserFetching}
 							findUsers={findUsers}
 							associatedAccounts={associatedAccounts}
 						/>

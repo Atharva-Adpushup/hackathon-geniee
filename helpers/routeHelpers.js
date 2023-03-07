@@ -1046,10 +1046,16 @@ async function getAssociatedAccountsWithUser(userEmail) {
 		// from hubspot
 		return Promise.resolve(emailOfAM)
 			.then(() => hubSpotService.getSitesOfUserFromHubspot(emailOfAM))
+			.then(accounts => {
+				// eslint-disable-next-line no-param-reassign
+				accounts.results = accounts.results.map(siteDetails => siteDetails.email);
+				return accounts;
+			})
 			.then(async accounts => {
 				// Hack by Harpreet Singh for quick resolution to allow
 				// AdOps person to access other accounts not associated to his/her AM
 				if (otherEmails && otherEmails instanceof Array && otherEmails.length) {
+					// eslint-disable-next-line no-param-reassign
 					accounts.results = [...accounts.results, ...otherEmails];
 				}
 
@@ -1097,80 +1103,19 @@ async function getAssociatedAccountsWithUser(userEmail) {
 							}
 						]
 					);
-				return Promise.resolve(emailOfAM)
-					.then(() => hubSpotService.getSitesOfUserFromHubspot(emailOfAM))
-					.then(async accounts => {
-						// Hack by Harpreet Singh for quick resolution to allow
-						// AdOps person to access other accounts not associated to his/her AM
-						if (otherEmails && otherEmails instanceof Array && otherEmails.length) {
-							accounts.results = [...accounts.results, ...otherEmails];
-						}
-
-						if (!accounts.results.length) {
-							// this is to manage the case where a particular user AM/AdOps
-							// has restricted access but no site has been assigned to him/her
-							// yet and instead of returning empty array - return non-empty array
-							// as empty array means full access
-							return [
-								{
-									email: '',
-									siteIds: [],
-									domains: []
-								}
-							];
-						}
-						// from CB
-						return Promise.all(
-							accounts &&
-								accounts.results &&
-								accounts.results.map(accountEmail => getSitesAssociatedWithAccount(accountEmail))
-						)
-							.then(associatedAccounts =>
-								// format data into `findUser` api format
-								associatedAccounts
-									.map(account => {
-										if (Object.keys(account).length) {
-											return {
-												email: account.email,
-												siteIds: Object.keys(account.sites),
-												domains: Object.keys(account.sites).map(
-													siteId => account.sites[siteId].domain
-												)
-											};
-										}
-									})
-									.filter(item => item.siteIds.length)
-							)
-							.catch(() =>
-								// this is to manage the case where a particular user AM/AdOps
-								// has restricted access but no site has been assigned to him/her
-								// yet and instead of returning empty array - return non-empty array
-								// as empty array means full access
-								[
-									{
-										email: '',
-										siteIds: [],
-										domains: []
-									}
-								]
-							);
-					})
-					.catch(() =>
-						// this is to manage the case where a particular user AM/AdOps
-						// has restricted access but no site has been assigned to him/her
-						// yet and instead of returning empty array - return non-empty array
-						// as empty array means full access
-						[
-							{
-								email: '',
-								siteIds: [],
-								domains: []
-							}
-						]
-					);
 			});
 	}
 	return [];
+}
+
+async function getAllAccountsDetailWithTheirAccountManagerFromHubspot() {
+	try {
+		const allSiteDtailsWithTheirAMDetails = await hubSpotService.getAllSiteDetailsWithTheirOwnerDetails();
+		return allSiteDtailsWithTheirAMDetails;
+	} catch (err) {
+		console.log(err);
+		return {};
+	}
 }
 
 /**
@@ -1369,6 +1314,7 @@ module.exports = {
 	updateAds,
 	checkAllowedEmailForSwitchAndImpersonate,
 	getAssociatedAccountsWithUser,
+	getAllAccountsDetailWithTheirAccountManagerFromHubspot,
 	udpateApConfigIfFlyingCarpetAdEnabledInApTagOrLayoutEditorAd,
 	getActiveProductFromCouchbase,
 	addActiveProductsToMeta

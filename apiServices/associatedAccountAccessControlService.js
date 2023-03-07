@@ -2,6 +2,57 @@ const axios = require('axios');
 const {
 	hubSpotService: { host: hubSpotServiceHost }
 } = require('../configs/config');
+const {
+	HUBSPOT: { OPERATOR }
+} = require('../configs/commonConsts');
+
+const getAllCompanyOwnersFromHubspot = async () => {
+	try {
+		// api/owners
+		// Get all owners from the API and filter out using email
+		const responseOwnersAPI = await axios.get(`${hubSpotServiceHost}/api/owners`);
+		const {
+			data: { error, data: allOwners }
+		} = responseOwnersAPI;
+		if (error) {
+			return {};
+		}
+
+		const ownerList = allOwners
+			.map(ownerDetails => {
+				const { email, ownerId } = ownerDetails;
+				return { email, ownerId };
+			})
+			.reduce((acc, owner) => {
+				acc[owner.ownerId] = owner.email;
+				return acc;
+			}, {});
+		return ownerList;
+	} catch (err) {
+		console.log(err);
+		return {};
+	}
+};
+const getAllCompaniesWithOwnerIdFromHubspot = async () => {
+	try {
+		let after = 0;
+		const accountsAssociatedWithAM = [];
+		// eslint-disable-next-line no-await-in-loop, no-use-before-define
+
+		// handle pagination
+		do {
+			// eslint-disable-next-line no-await-in-loop, no-use-before-define
+			const { results, paging } = await hubSpotService.getCompaniesByOwnerId({ after });
+			after = +(paging && paging.next && paging.next.after);
+			// fetch and combine paginated accounts for each owner
+			accountsAssociatedWithAM.push(...results);
+		} while (after);
+		return accountsAssociatedWithAM;
+	} catch (err) {
+		console.log(err);
+		return {};
+	}
+};
 
 const hubSpotService = {
 	getOwnerIdOfUserInHubspot: async email => {
@@ -18,6 +69,7 @@ const hubSpotService = {
 					if (ownerObj.email === email) {
 						return true;
 					}
+					return false;
 				});
 			}
 			// not found
@@ -26,10 +78,14 @@ const hubSpotService = {
 			throw new Error(err.msg);
 		}
 	},
-	getCompaniesByOwnerId: async ownerId => {
+	getCompaniesByOwnerId: async ({ ownerId = '', after = 0 }) => {
 		// create hubspot API input data
-		const AFTER = undefined;
-		const filter = { propertyName: 'hubspot_owner_id', operator: 'EQ', value: ownerId };
+		let filter = { propertyName: 'primary_login_email', operator: OPERATOR.HAS_PROPERTY };
+
+		// fetch owner specific accounts only
+		if (ownerId) {
+			filter = { propertyName: 'hubspot_owner_id', operator: OPERATOR.EQUAL, value: ownerId };
+		}
 		const filterGroup = { filters: [filter] };
 		const properties = ['hubspot_owner_id', 'domain', 'name', 'primary_login_email', 'company'];
 		const limit = 100;
@@ -38,7 +94,7 @@ const hubSpotService = {
 			filterGroups: [filterGroup],
 			properties,
 			limit,
-			AFTER
+			after
 		};
 		const data = publicObjectSearchRequest;
 		// hubspot's fetch company(Adpushup client) data API
@@ -47,7 +103,7 @@ const hubSpotService = {
 				data: { error, data: allCompanies }
 			} = await axios.post(`${hubSpotServiceHost}/api/companies`, data);
 
-			if (!error && allCompanies && allCompanies.results.length) {
+			if (!error && allCompanies && allCompanies.results && allCompanies.results.length) {
 				const allCompaniesEmailIncludingPnpApLiteAcc = [];
 
 				// get primary email - Adpushup Client's Email
@@ -55,23 +111,26 @@ const hubSpotService = {
 				allCompanies.results.forEach(company => {
 					const {
 						// eslint-disable-next-line camelcase
-						properties: { primary_login_email }
+						properties: {
+							primary_login_email: primaryLoginEmail,
+							domain,
+							hubspot_owner_id: hubspotOwnerId
+						}
 					} = company;
-					if (
-						typeof company.properties.primary_login_email === 'string' &&
-						typeof company.properties.domain === 'string'
-					) {
-						const primaryLoginEmail = primary_login_email.trim();
-						// for PnP and ApLite accounts
-						// we will get comma-separated emails
-						if (primaryLoginEmail.indexOf(',') !== -1) {
-							primaryLoginEmail.split(/\s*,\s*/).forEach(email => {
+					if (typeof primaryLoginEmail === 'string' && typeof domain === 'string') {
+						const primaryLoginEmailSanitized = primaryLoginEmail.trim();
+						if (primaryLoginEmailSanitized.indexOf(',') !== -1) {
+							primaryLoginEmailSanitized.split(/\s*,\s*/).forEach(email => {
 								if (email) {
-									allCompaniesEmailIncludingPnpApLiteAcc.push(email);
+									allCompaniesEmailIncludingPnpApLiteAcc.push({ email, domain, hubspotOwnerId });
 								}
 							});
 						} else {
-							allCompaniesEmailIncludingPnpApLiteAcc.push(primaryLoginEmail);
+							allCompaniesEmailIncludingPnpApLiteAcc.push({
+								email: primaryLoginEmailSanitized,
+								domain,
+								hubspotOwnerId
+							});
 						}
 					}
 				});
@@ -84,6 +143,7 @@ const hubSpotService = {
 				results: []
 			};
 		} catch (err) {
+			console.log(err);
 			throw new Error(err.msg);
 		}
 	},
@@ -96,7 +156,7 @@ const hubSpotService = {
 				// use hubspot owner idto get account details
 				// eg: if Adpushup User X is associated with our client site
 				// Y (xyz.com) then get main email of Y
-				return hubSpotService.getCompaniesByOwnerId(ownerId);
+				return hubSpotService.getCompaniesByOwnerId({ ownerId });
 			}
 			return {
 				total: 0,
@@ -104,6 +164,35 @@ const hubSpotService = {
 			};
 		} catch (err) {
 			throw new Error(err.msg);
+		}
+	},
+	getAllSiteDetailsWithTheirOwnerDetails: async () => {
+		try {
+			const [ownersDetailObj, accountsAssociatedWithAM] = await Promise.all([
+				getAllCompanyOwnersFromHubspot(),
+				getAllCompaniesWithOwnerIdFromHubspot()
+			]);
+
+			const publisherAndAccountManagersMapping = {};
+			const domainAndAccountManagersMapping = {};
+			accountsAssociatedWithAM.forEach(accountDetail => {
+				// to fix issue of subdomain matching
+				const domain = accountDetail.domain || '';
+				// regEx - <word>.<word>, eg: abc.com
+				const match = (domain && domain.match(/\w+.\w+$/)) || [];
+				const mainDomain = (match.length && match[0]) || domain;
+				domainAndAccountManagersMapping[mainDomain] = {
+					...accountDetail,
+					owner: ownersDetailObj[accountDetail.hubspotOwnerId]
+				};
+				publisherAndAccountManagersMapping[accountDetail.email] =
+					domainAndAccountManagersMapping[mainDomain];
+			});
+
+			return { publisherAndAccountManagersMapping, domainAndAccountManagersMapping };
+		} catch (err) {
+			console.log(err);
+			return {};
 		}
 	}
 };

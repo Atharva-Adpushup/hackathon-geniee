@@ -38,7 +38,8 @@ import {
 	REPORT_INTERVAL_TABLE_KEYS,
 	columnsBlacklistedForAddition,
 	DEFAULT_ERROR_MESSAGE,
-	XPATH_ALLOWED_DIMENSIONS_AND_FILTERS
+	XPATH_ALLOWED_DIMENSIONS_AND_FILTERS,
+	REPORT_TYPES
 } from '../configs/commonConsts';
 import MixpanelHelper from '../../../helpers/mixpanel';
 
@@ -333,7 +334,13 @@ class Report extends Component {
 			selectedInterval,
 			metricsList
 		} = this.state;
-		const { userSites, isCustomizeChartLegend, defaultReportType, associatedSites, isForOps } = this.props;
+		const {
+			userSites,
+			isCustomizeChartLegend,
+			defaultReportType,
+			associatedSites,
+			isForOps
+		} = this.props;
 		const { email, reportType } = this.getDemoUserParams();
 		let selectedMetrics;
 
@@ -1613,9 +1620,13 @@ class Report extends Component {
 
 	render() {
 		const { isLoading, isError, errorMessage } = this.state;
-		const { reportsMeta } = this.props;
+		const { reportsMeta, hasFindsUserDataFetched, reportType } = this.props;
 
-		if ((!reportsMeta.fetched && !isError) || isLoading) {
+		if (
+			(!reportsMeta.fetched && !isError) ||
+			(reportType === REPORT_TYPES.GLOBAL && !hasFindsUserDataFetched) ||
+			isLoading
+		) {
 			return <Loader />;
 		}
 

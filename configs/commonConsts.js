@@ -865,6 +865,12 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		SUPPORTED_DIMENSIONS: ['country', 'siteid', 'device_type'],
 		SUPPORTED_FILTERS: ['country', 'siteid', 'device_type']
 	},
+	HUBSPOT: {
+		OPERATOR: {
+			HAS_PROPERTY: "HAS_PROPERTY",
+			EQUAL:"EQ"
+		}
+	},
 	AUDIT_LOGS_ACTIONS: {
 		HEADER_BIDDING: {
 			HB_STATUS: 'HB_STATUS',

@@ -10,7 +10,7 @@ import Report from '../components/Report';
 import { checkReportTypeGlobal, getReportsMeta } from '../../../helpers/commonFunctions';
 
 const mapStateToProps = (state, ownProps) => {
-	const { sites, user, associatedAccounts } = state.global;
+	const { sites, user, associatedAccounts, findUsers } = state.global;
 	const reportsMeta = getReportsMeta(state, ownProps);
 
 	let associatedSites = [];
@@ -26,6 +26,8 @@ const mapStateToProps = (state, ownProps) => {
 		reportsMeta,
 		userSites: sites.fetched ? sites.data : {},
 		user,
+		hasFindsUserDataFetched:
+			!!(user.data && user.data.paymentReconciliation && findUsers.fetched) || findUsers.fetched,
 		associatedSites
 	};
 };

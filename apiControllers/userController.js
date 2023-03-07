@@ -24,6 +24,7 @@ const {
 	checkParams,
 	sendDataToAuditLogService,
 	getAssociatedAccountsWithUser,
+	getAllAccountsDetailWithTheirAccountManagerFromHubspot,
 	checkAllowedEmailForSwitchAndImpersonate
 } = require('../helpers/routeHelpers');
 
@@ -405,6 +406,7 @@ router
 	.get('/findUsers', async (req, res) => {
 		try {
 			const { isSuperUser, email, originalEmail } = req.user;
+			const { forPaymentReconciliation } = req.query;
 			if (!isSuperUser)
 				return sendErrorResponse(
 					{
@@ -436,14 +438,62 @@ router
 						FOR site IN sites WHEN site.siteId IS NOT MISSING END AS siteIds
 						FROM AppBucket WHERE meta().id LIKE "user::%"`
 				)
-				.then(users => {
-					let response = [];
+				.then(async users => {
+					let filteredUsers = [];
 					if (users && Array.isArray(users) && users.length) {
-						response = users.filter(user => CC.EMAIL_REGEX.test(user.email));
+						filteredUsers = users.filter(user => CC.EMAIL_REGEX.test(user.email));
 					}
+
+					// value here is a string boolean
+					if (forPaymentReconciliation && forPaymentReconciliation.toLowerCase() === 'true') {
+						try {
+							const accountsWithAMMappingFromHubspot = await getAllAccountsDetailWithTheirAccountManagerFromHubspot();
+							const {
+								publisherAndAccountManagersMapping,
+								domainAndAccountManagersMapping
+							} = accountsWithAMMappingFromHubspot;
+
+							filteredUsers = filteredUsers.map(userDetails => {
+								if (publisherAndAccountManagersMapping[userDetails.email]) {
+									// search with publisher's email
+									// eslint-disable-next-line no-param-reassign
+									userDetails.accountManagerEmail =
+										(publisherAndAccountManagersMapping[userDetails.email] &&
+											publisherAndAccountManagersMapping[userDetails.email].owner) ||
+										'';
+								} else if (!userDetails.accountManagerEmail) {
+									// search with domains
+									// eslint-disable-next-line no-unused-expressions
+									userDetails.domains &&
+										userDetails.domains.find(domain => {
+											const sanitizedDomainName = domain
+												.replace(/^https?:\/\//, '') // replace http/https
+												.replace(/^w+\./, '') // replace www
+												.replace(/\/$/, ''); // replace trailing '/' from end
+
+											// eslint-disable-next-line no-param-reassign
+											userDetails.accountManagerEmail =
+												(domainAndAccountManagersMapping[sanitizedDomainName] &&
+													domainAndAccountManagersMapping[sanitizedDomainName].owner) ||
+												'';
+											// if AM's email is set then exit
+											if (userDetails.accountManagerEmail) {
+												// exit when found
+												return true;
+											}
+											return false;
+										});
+								}
+								return userDetails;
+							});
+						} catch (err) {
+							console.log(err);
+						}
+					}
+
 					return sendSuccessResponse(
 						{
-							users: response
+							users: filteredUsers
 						},
 						res
 					);

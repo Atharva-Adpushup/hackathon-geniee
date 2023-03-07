@@ -14,24 +14,32 @@ class UserChange extends Component {
 		showFilteredList: false
 	};
 
+	componentDidMount() {
+		const {
+			findUsers,
+			findUserFetched,
+			findUserFetching,
+			user: { paymentReconciliation: forPaymentReconciliation }
+		} = this.props;
+		const options = { forPaymentReconciliation };
+		if (!(findUserFetched || findUserFetching)) {
+			findUsers(options)
+				.then(response => {
+					const { data } = response.data;
+					this.setState({ users: data.users });
+				})
+				.catch(err => {
+					console.log(err);
+					return window.alert('User Switch Failed. Please contact Tech team.');
+				});
+		}
+	}
+
 	onValChange = e => {
 		this.setState({
 			[e.target.name]: e.target.value
 		});
 	};
-
-	componentDidMount() {
-		const { findUsers } = this.props;
-		return findUsers()
-			.then(response => {
-				const { data } = response.data;
-				this.setState({ users: data.users });
-			})
-			.catch(err => {
-				console.log(err);
-				return window.alert('User Switch Failed. Please contact Tech team.');
-			});
-	}
 
 	onFocus = () => {
 		this.setState({ showFilteredList: true });
@@ -90,7 +98,7 @@ class UserChange extends Component {
 
 	render() {
 		const { email, users, showFilteredList } = this.state;
-		const { associatedAccounts = [] } = this.props;
+		const { associatedAccounts = [], findUserFetched } = this.props;
 		const { getFilteredUserDataList } = this;
 		const filteredUserDataList = getFilteredUserDataList(
 			associatedAccounts.length ? [...associatedAccounts] : [...users]
@@ -107,6 +115,8 @@ class UserChange extends Component {
 					placeholder="Email"
 					style={{ borderRadius: '0', borderTopLeftRadius: 4, borderBottomLeftRadius: 4 }}
 					onBlur={this.onBlur}
+					// fetch findUser is pending - disable the widget untill it gets fetched
+					disabled={!findUserFetched}
 				/>
 				{showFilteredList ? filteredUserDataList : ''}
 
@@ -120,6 +130,8 @@ class UserChange extends Component {
 						height: '34'
 					}}
 					title="Change User"
+					// fetch findUser is pending - disable the widget untill it gets fetched
+					disabled={!findUserFetched}
 				>
 					<FontAwesomeIcon size="1x" icon="sign-in-alt" className="u-margin-r3" />
 				</CustomButton>
