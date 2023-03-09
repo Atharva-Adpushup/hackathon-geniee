@@ -479,7 +479,8 @@ class QuickSnapshot extends React.Component {
 			sites,
 			widgetsName: { PER_AP_ORIGINAL },
 			globalReportMetaData,
-			associatedSites
+			associatedSites,
+			isForOps
 		} = this.props;
 
 		const metaData = globalReportMetaData;
@@ -508,7 +509,7 @@ class QuickSnapshot extends React.Component {
 
 		params.siteid = isValidAllSelectedSites ? siteIds.toString() : selectedSite;
 
-		if (isReportTypeGlobal && (!isValidSelectedSite || isValidAllSelectedSites)) {
+		if (isReportTypeGlobal && (!isValidSelectedSite || isValidAllSelectedSites) || isForOps) {
 			params.isSuperUser = true;
 			if (associatedSites.length) {
 				params.siteid = [...siteIds, ...associatedSites].join(',');

@@ -42,6 +42,18 @@ router
 			);
 			if (cacheHit) setCacheHeaders(res);
 			await reportsService.logReportUsage(email || originalEmail, reportingConfig);
+
+			if (reportingConfig.isSuperUser !== "true") {
+				reportsData.result = reportsData.result.map(rowData => {
+					// do not send gross revenue
+					delete rowData.network_gross_revenue;
+					return rowData;
+				});
+				// do not send gross revenue
+				delete reportsData.total.total_network_gross_revenue;
+				// do not send gross revenue
+				reportsData.columns = reportsData.columns.filter(column => column !== "network_gross_revenue")
+			}
 			return sendSuccessResponse(reportsData, res, HTTP_STATUSES.OK);
 		} catch (err) {
 			return sendErrorResponse({ message: err.message }, res, HTTP_STATUSES.BAD_REQUEST);
@@ -79,6 +91,21 @@ router
 				bypassCache === 'true'
 			);
 			if (cacheHit) setCacheHeaders(res);
+
+			if (!reqParams.isSuperUser) {
+				widgetData.result = widgetData.result.map(rowData => {
+					// do not send gross revenue
+					delete rowData.network_gross_revenue;
+					delete rowData.gross_revenue;
+					return rowData;
+				});
+				// do not send gross revenue
+				widgetData.total && delete widgetData.total.gross_revenue;
+				widgetData.total && delete widgetData.total.total_network_gross_revenue
+				// do not send gross revenue
+				widgetData.columns = widgetData.columns.filter(column => column !== "network_gross_revenue" || column !== "gross_revenue")
+			}
+
 			return res.json(widgetData);
 		} catch (err) {
 			return sendErrorResponse({ message: err.message }, res, HTTP_STATUSES.BAD_REQUEST);
