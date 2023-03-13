@@ -332,6 +332,13 @@ const ROUTES = {
 		},
 		{
 			exact: true,
+			name: 'MG Deals',
+			path: '/payment/mg-deals',
+			customProps: { activeTab: PAYMENT_NAV_ITEMS_INDEXES.MG_DEALS },
+			component: Payment
+		},
+		{
+			exact: true,
 			name: 'Payment Balance',
 			path: '/payment/balance',
 			customProps: {

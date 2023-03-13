@@ -12,6 +12,7 @@ import {
 } from './configs/commonConsts';
 import history from '../../helpers/history';
 import PaymentContainer from '../../Containers/PaymentContainer';
+import MGDeals from './Component/MGDeals/MGDeals';
 
 class Payment extends Component {
 	constructor(props) {
@@ -31,6 +32,12 @@ class Payment extends Component {
 				isLoading: true
 			},
 			paymentBalance: {
+				url: '',
+				width: '100%',
+				height: '0px',
+				isLoading: true
+			},
+			paymentMGDeals: {
 				url: '',
 				width: '100%',
 				height: '0px',
@@ -92,7 +99,7 @@ class Payment extends Component {
 	);
 
 	handleNavSelect = value => {
-		const { paymentDetails, paymentHistory, paymentBalance } = this.state;
+		const { paymentDetails, paymentHistory, paymentBalance, paymentMGDeals } = this.state;
 		const computedRedirectUrl = `/payment`;
 		let redirectUrl = '';
 		switch (value) {
@@ -120,6 +127,14 @@ class Payment extends Component {
 					redirectUrl
 				});
 				break;
+			case 4:
+				paymentMGDeals.isLoading = true;
+				redirectUrl = `${computedRedirectUrl}/mg-deals`;
+				this.setState({
+					paymentMGDeals,
+					redirectUrl
+				});
+				break;
 			default:
 				break;
 		}
@@ -138,7 +153,7 @@ class Payment extends Component {
 	};
 
 	renderContent = () => {
-		const { paymentDetails, paymentHistory } = this.state;
+		const { paymentDetails, paymentHistory, paymentMGDeals } = this.state;
 		const { activeProducts } = this.props;
 		const accessDetailsTab =
 			activeProducts === undefined || activeProducts.payment_details === undefined
@@ -150,6 +165,8 @@ class Payment extends Component {
 				return this.renderIframe(paymentDetails);
 			case PAYMENT_NAV_ITEMS_INDEXES.HISTORY:
 				return this.renderIframe(paymentHistory);
+			case PAYMENT_NAV_ITEMS_INDEXES.MG_DEALS:
+				return <MGDeals></MGDeals>;
 			case PAYMENT_NAV_ITEMS_INDEXES.BALANCE:
 				return <PaymentContainer {...this.props} />;
 			default:
@@ -189,6 +206,7 @@ class Payment extends Component {
 						{balancePayment && balancePayment.accessBalanceTab ? (
 							<NavItem eventKey={3}>{PAYMENT_NAV_ITEMS_VALUES.BALANCE}</NavItem>
 						) : null}
+						<NavItem eventKey={4}>{PAYMENT_NAV_ITEMS_VALUES.MG_DEALS}</NavItem>
 					</Nav>
 					{this.renderContent()}
 				</div>

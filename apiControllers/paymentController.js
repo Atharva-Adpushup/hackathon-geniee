@@ -12,6 +12,27 @@ const cbQuery = require('../apiServices/paymentServices');
 const {
 	AUDIT_LOGS_ACTIONS: { PAYMENT_SETTINGS }
 } = require('../configs/commonConsts');
+const config = require('../configs/config');
+
+const getEmailBody = ({ type, email, originalEmail }) => {
+	let body = '';
+	let subject = '';
+	switch (type) {
+		case 'create':
+			subject = 'MG Deal Addition';
+			body = `MG deal has been added for ${email} by ${originalEmail}`;
+			break;
+		case 'edit':
+			subject = 'MG Deal Updated';
+			body = `MG deal has been updated for ${email} by ${originalEmail}`;
+			break;
+		case 'delete':
+			subject = 'MG Deal Deleted';
+			body = `MG deal has been deleted for ${email} by ${originalEmail}`;
+			break;
+	}
+	return { body, subject };
+};
 
 const { getReports } = require('../apiServices/reportsService');
 
@@ -275,6 +296,41 @@ router
 				}
 			})
 			.catch(err => errorHandler(err, res, HTTP_STATUSES.INTERNAL_SERVER_ERROR));
+	})
+	.get('/getMGDeals', (req, res) => {
+		const { email } = req.user;
+		cbQuery
+			.getMGDeals(email)
+			.then(data => {
+				if (data.length) {
+					sendSuccessResponse(data, res);
+				} else {
+					sendSuccessResponse([], res);
+				}
+			})
+			.catch(err => errorHandler(err, res, HTTP_STATUSES.INTERNAL_SERVER_ERROR));
+	})
+	.post('/setMGDeals', (req, res) => {
+		const { email, originalEmail } = req.user;
+		const { mgDeals, type } = req.body;
+		cbQuery
+			.setMGDeals(email, mgDeals)
+			.then(data => {
+				sendSuccessResponse(data, res);
+				const { supportMails } = config.mgDealsAlerts;
+				const { body, subject } = getEmailBody({ type, email, originalEmail });
+				sendEmail({
+					queue: 'MAILER',
+					data: {
+						to: supportMails,
+						body: body,
+						subject: subject
+					}
+				});
+			})
+			.catch(err => {
+				errorHandler(err, res, HTTP_STATUSES.INTERNAL_SERVER_ERROR);
+			});
 	});
 
 module.exports = router;
