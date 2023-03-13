@@ -174,6 +174,7 @@ Router.get('/:siteId/ampDeliveryViaCreativeConfig', (req, res) => {
 				apConfigs.isReplaceGptSlotOnRefreshEnabled = !!(
 					!apConfigs.apLiteActive && apConfigs.isReplaceGptSlotOnRefreshEnabled
 				);
+				apConfigs.refreshOnImpressionViewed = apConfigs.refreshOnImpressionViewed || false;
 
 				if (!apps.apLite) {
 					apConfigs.manualModeActive = !!(apps.apTag && manualAds && manualAds.length);
