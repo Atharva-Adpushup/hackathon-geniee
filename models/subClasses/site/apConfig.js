@@ -44,7 +44,8 @@ const ApConfig = {
 		'rules',
 		'isRedefineGptOnRefreshEnabled',
 		'flyingCarpetSettings',
-		'isPnpSite'
+		'isPnpSite',
+		'refreshOnImpressionViewed'
 	],
 	override: [
 		'mode',
@@ -91,7 +92,8 @@ const ApConfig = {
 		'rules',
 		'isRedefineGptOnRefreshEnabled',
 		'flyingCarpetSettings',
-		'isPnpSite'
+		'isPnpSite',
+		'refreshOnImpressionViewed'
 	],
 	merge: []
 };
