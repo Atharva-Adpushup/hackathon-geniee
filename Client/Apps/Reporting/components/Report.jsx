@@ -333,7 +333,7 @@ class Report extends Component {
 			selectedInterval,
 			metricsList
 		} = this.state;
-		const { userSites, isCustomizeChartLegend, defaultReportType, associatedSites } = this.props;
+		const { userSites, isCustomizeChartLegend, defaultReportType, associatedSites, isForOps } = this.props;
 		const { email, reportType } = this.getDemoUserParams();
 		let selectedMetrics;
 
@@ -368,7 +368,7 @@ class Report extends Component {
 			params.siteid = siteIds.toString();
 		}
 
-		if (reportType === 'global' || defaultReportType === 'global') {
+		if (reportType === 'global' || defaultReportType === 'global' || isForOps) {
 			params.isSuperUser = true;
 			if (associatedSites.length) {
 				params.siteid = [...Object.keys(userSites), ...associatedSites].join(',');
@@ -499,7 +499,7 @@ class Report extends Component {
 
 						// Compute data table total
 						if (
-							reportType === 'global' &&
+							(reportType === 'global' || isForOps) &&
 							!tableData.total &&
 							tableData.columns &&
 							tableData.columns.length
@@ -1069,6 +1069,7 @@ class Report extends Component {
 				delete XPathParams[filter];
 			}
 		});
+		delete XPathParams.isSuperUser;
 		return XPathParams;
 	};
 
