@@ -368,8 +368,15 @@ class Report extends Component {
 			params.siteid = siteIds.toString();
 		}
 
-		if (reportType === 'global' || defaultReportType === 'global' || isForOps) {
+		if (isForOps) {
+			// this flag is now mandatory for fetching gross_revenue
 			params.isSuperUser = true;
+		}
+
+		if (reportType === 'global' || defaultReportType === 'global') {
+			params.isSuperUser = true;
+			// restrict the access in global reports for Ops team members
+			// allow accounts associated with the user only in the global reports
 			if (associatedSites.length) {
 				params.siteid = [...Object.keys(userSites), ...associatedSites].join(',');
 			}

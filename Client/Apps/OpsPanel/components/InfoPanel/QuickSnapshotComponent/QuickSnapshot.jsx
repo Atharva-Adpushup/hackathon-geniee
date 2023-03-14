@@ -509,8 +509,15 @@ class QuickSnapshot extends React.Component {
 
 		params.siteid = isValidAllSelectedSites ? siteIds.toString() : selectedSite;
 
-		if (isReportTypeGlobal && (!isValidSelectedSite || isValidAllSelectedSites) || isForOps) {
+		if (isForOps) {
+			// this flag is now mandatory for fetching gross_revenue
 			params.isSuperUser = true;
+		}
+
+		if (isReportTypeGlobal && (!isValidSelectedSite || isValidAllSelectedSites)) {
+			params.isSuperUser = true;
+			// restrict the access in global reports for Ops team members
+			// allow accounts associated with the user only in the global reports
 			if (associatedSites.length) {
 				params.siteid = [...siteIds, ...associatedSites].join(',');
 			} else {
