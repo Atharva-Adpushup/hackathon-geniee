@@ -9,6 +9,10 @@ const commonConsts = require('../../../configs/commonConsts');
 const config = require('../../../configs/config');
 const helperUtils = require('../../../helpers/utils');
 
+const cdnSyncQueuePublisher = require('../../../queueWorker/rabbitMQ/workers/cdnSyncQueuePublisher');
+const ampScriptSyncQueuePublisher = require('../../../queueWorker/rabbitMQ/workers/ampScriptQueuePublisher');
+const ampDvcSyncQueuePublisher = require('../../../queueWorker/rabbitMQ/workers/ampDvcScriptQueuePublisher');
+
 const N1qlQuery = couchbaseModule.N1qlQuery;
 const isNotProduction =
 	config.environment.HOST_ENV === 'development' || config.environment.HOST_ENV === 'staging';
@@ -126,6 +130,34 @@ function pushToCdnOriginQueue(fileConfig, siteId) {
 	}
 }
 
+
+
+function getSyncPublisherForScriptType(type, siteParams = {}) {
+	const scriptTypes = commonConsts.SCRIPT_TYPE;
+	if (type === undefined) type = scriptTypes.ADPUSHUPJS;
+	switch (type) {
+		case scriptTypes.DVC:
+			if (!siteParams.isDVCEnabled) return null;
+			return ampDvcSyncQueuePublisher;
+		case scriptTypes.AMP:
+			if (!siteParams.isAmpScriptEnabled) return null;
+			return ampScriptSyncQueuePublisher;
+		case scriptTypes.ADPUSHUPJS:
+			return cdnSyncQueuePublisher;
+		default:
+			return null;
+	}
+}
+
+function getEnabledPublishersByTypeList(types, siteParams) {
+	const allPublishers = [];
+	for (const type of types) {
+		const publisher = getSyncPublisherForScriptType(type, siteParams);
+		if (publisher !== null) allPublishers.push(publisher);
+	}
+	return allPublishers;
+}
+
 module.exports = {
 	getBiddersFromNetworkTree,
 	getSizeMappingConfigFromCB,
@@ -136,5 +168,7 @@ module.exports = {
 	writeTempFiles,
 	readTempFile,
 	pushToCdnOriginQueue,
-	getNetworkWideHBRules
+	getNetworkWideHBRules,
+	getSyncPublisherForScriptType,
+	getEnabledPublishersByTypeList
 };

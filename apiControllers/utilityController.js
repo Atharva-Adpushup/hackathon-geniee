@@ -7,7 +7,7 @@ const { appBucket } = require('../helpers/routeHelpers');
 const router = express.Router();
 
 router.get('/syncCdn', (req, res) => {
-	const { sites, forcePrebidBuild } = req.query;
+	const { sites, forcePrebidBuild = false, type = false } = req.query;
 
 	const siteIds = [];
 	const isAllSites = sites === 'all';
@@ -43,11 +43,12 @@ router.get('/syncCdn', (req, res) => {
 			const validSiteIds = [];
 			validSites.forEach(({ siteId }) => {
 				validSiteIds.push(siteId);
-				adpushup.emit('siteSaved', siteId, forcePrebidBuild);
+				const options = { type };
+				adpushup.emit('siteSaved', siteId, { forcePrebidBuild, options });
 			});
 
 			return res.status(httpStatus.OK).json({
-				success: `Site Ids '${validSiteIds.join(', ')}' published for CDN Sync successfully`
+				success: `Site Ids '${validSiteIds.join(', ')}' published for Sync successfully`
 			});
 		})
 		.catch(err => {

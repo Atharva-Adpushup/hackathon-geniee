@@ -1756,5 +1756,10 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 			}
 		});
 	})();	
-	`
+	`,
+    SCRIPT_TYPE : {
+        ADPUSHUPJS : 'adpushupjs',
+        DVC: 'dvc',
+        AMP: 'ampScript'
+    }
 };

@@ -17,7 +17,8 @@ function adpTagPublisherWrapper(item) {
 function adsensePublisherWrapper(item) {
 	return adsensePublisher.publish(item);
 }
-function publishToQueueWrapper(siteConfigItems, site, forcePrebidBuild) {
+function publishToQueueWrapper(siteConfigItems, siteOptions) {
+    const { site, forcePrebidBuild, options = {}} = siteOptions
 	const jobs = [];
 	const response = {
 		empty: true,
@@ -46,7 +47,7 @@ function publishToQueueWrapper(siteConfigItems, site, forcePrebidBuild) {
 		hasUnsyncedAdpAds && console.log(`Unsynced Adp ads ${adp.ads.length} (excluding refresh ad units count)`);
 		hasUnsyncedAdsenseAds && console.log(`Unsynced Adsense ads ${adsense.ads.length}`);
 		console.log('---'.repeat(20));
-
+        
 		return Promise.all(jobs).then(() => ({
 			...response,
 			empty: false,
@@ -55,29 +56,29 @@ function publishToQueueWrapper(siteConfigItems, site, forcePrebidBuild) {
 			)}`
 		}));
 	}
-
+    const useDirect = false;
 	return processing().then(response =>
 		// syncCdn publishes a job in either consoleCdnSync or selectiveRollOut queue
-		response.empty ? syncCdn(site, forcePrebidBuild) : response
+		response.empty ? syncCdn(site, {forcePrebidBuild, useDirect, options}) : response
 	);
 }
-function publishWrapper(site, forcePrebidBuild) {
+function publishWrapper(site, forcePrebidBuild, options = {}) {
 	return siteConfigGenerationModule
 		.generate(site)
-		.then(siteConfigItems => publishToQueueWrapper(siteConfigItems, site, forcePrebidBuild));
+		.then(siteConfigItems => publishToQueueWrapper(siteConfigItems, {site, forcePrebidBuild, options}));
 }
 
 module.exports = {
-	publish(siteId, forcePrebidBuild) {
+	publish(siteId, forcePrebidBuild, options = {}) {
 		const parsedSiteId = parseInt(siteId, 10);
-		if (!isNaN(parsedSiteId)) {
+		if (!isNaN(parsedSiteId)) { 
 			const siteId = parsedSiteId.toString();
 			return siteModelAPI
 				.getSiteById(siteId)
-				.then(siteModel => publishWrapper(siteModel, forcePrebidBuild));
+				.then(siteModel => publishWrapper(siteModel, forcePrebidBuild, options));
 		}
 
 		// assuming that siteId is instance of SiteModel
-		return publishWrapper(siteId, forcePrebidBuild);
+		return publishWrapper(siteId, forcePrebidBuild, options);
 	}
 };

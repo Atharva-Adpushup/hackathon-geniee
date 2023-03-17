@@ -1,8 +1,8 @@
 const adsSyncService = require('./adsSyncService/index');
 
-function init(siteId, forcePrebidBuild) {
+function init(siteId, forcePrebidBuild, options = {}) {
 	return adsSyncService
-		.publish(siteId, forcePrebidBuild)
+		.publish(siteId, forcePrebidBuild, options)
 		.then(response =>
 			response && response.hasOwnProperty('empty')
 				? console.log(response.message)
