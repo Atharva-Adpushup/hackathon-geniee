@@ -11,12 +11,17 @@ import DashboardNotifications from './DashboardNotifications';
 import authService from '../../../../services/authService';
 import BidderRules from './NetworkWideHBRules';
 import InventoryTabContainer from '../../containers/InventoryTabContainer';
+import MgDeals from './MgDeals';
 
 class Tools extends Component {
-	state = {
-		activeKey: TOOLS_IDENTIFIERS.BACKUP_ADS,
-		dashboardNotificationAccess: false
-	};
+	constructor(props) {
+		super(props);
+		this.state = {
+			activeKey: TOOLS_IDENTIFIERS.BACKUP_ADS,
+			dashboardNotificationAccess: false,
+			mgDealsDashboardAccess: false // Access controlled
+		};
+	}
 
 	handleSelect = value => {
 		this.setState({
@@ -39,8 +44,20 @@ class Tools extends Component {
 		}
 	};
 
+	checkMgDealsDashboardAccess = () => {
+		const { user } = this.props;
+		const { email, originalEmail } = authService.getTokenPayloadWithoutVerification();
+		if (
+			(!originalEmail && user.mgDealsDashboardAccess) ||
+			(originalEmail === email && user.mgDealsDashboardAccess)
+		) {
+			this.setState({ mgDealsDashboardAccess: true });
+		}
+	};
+
 	componentDidMount = () => {
 		this.checkStatus();
+		this.checkMgDealsDashboardAccess();
 	};
 
 	renderContent = () => {
@@ -54,7 +71,8 @@ class Tools extends Component {
 			setUnsavedChangesAction,
 			customProps,
 			user,
-			rules
+			rules,
+			emailSitesMapping
 		} = this.props;
 
 		const dataForAuditLogs = {
@@ -114,11 +132,13 @@ class Tools extends Component {
 				return (
 					<InventoryTabContainer dataForAuditLogs={dataForAuditLogs} customProps={customProps} />
 				);
+			case TOOLS_IDENTIFIERS.MG_DEAL:
+				return <MgDeals emailSitesMapping={emailSitesMapping} />;
 		}
 	};
 
 	render() {
-		const { activeKey, dashboardNotificationAccess } = this.state;
+		const { activeKey, dashboardNotificationAccess, mgDealsDashboardAccess } = this.state;
 
 		return (
 			<div className="u-padding-v4">
@@ -156,6 +176,11 @@ class Tools extends Component {
 									<NavItem eventKey={TOOLS_IDENTIFIERS.DASHBOARD_NOTIFICATIONS}>
 										Dashboard Notifications
 									</NavItem>
+								) : (
+									<></>
+								)}
+								{mgDealsDashboardAccess ? (
+									<NavItem eventKey={TOOLS_IDENTIFIERS.MG_DEAL}>Mg Deal</NavItem>
 								) : (
 									<></>
 								)}

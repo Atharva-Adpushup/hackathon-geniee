@@ -31,6 +31,9 @@ const OP_NAV_ITEMS_INDEXES = {
 	TOOLS: 'tools'
 };
 
+// prettier-ignore
+const ALL_MONTHS_NAME = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
 const OP_NAV_ITEMS_VALUES = {
 	ACCOUNT_SETTINGS: 'Account Settings',
 	SITE_SETTINGS: 'Site Settings',
@@ -318,7 +321,8 @@ const TOOLS_IDENTIFIERS = {
 	BIDDER_CONFIGURATIONS: 'BIDDER_CONFIGURATIONS',
 	DASHBOARD_NOTIFICATIONS: 'DASHBOARD_NOTIFICATIONS',
 	BIDDER_RULES: 'BIDDER_RULES',
-	INVENTORY: 'INVENTORY'
+	INVENTORY: 'INVENTORY',
+	MG_DEAL: 'MG_DEAL'
 };
 
 const ADS_TXT_LIVE_SITES_ENTRIES = [
@@ -502,6 +506,33 @@ const SITE_MAPPING_COLUMNS = [
 	{
 		Header: 'Ad Manager',
 		accessor: 'adManager'
+	}
+];
+
+const MG_DEALS_COLUMNS = [
+	{
+		Header: 'Email',
+		accessor: 'email'
+	},
+	{
+		Header: 'Site Ids',
+		accessor: 'accountSiteIds'
+	},
+	{
+		Header: 'Gross Revenue',
+		accessor: 'grossRevenue'
+	},
+	{
+		Header: 'Net Revenue',
+		accessor: 'netRevenue'
+	},
+	{
+		Header: 'MG Revenue',
+		accessor: 'mgDealRevenue'
+	},
+	{
+		Header: 'Active Quarter',
+		accessor: 'activeQuarter'
 	}
 ];
 
@@ -879,5 +910,7 @@ export {
 	INVENTORY_BULK_ACTIONS,
 	AD_UNIT_TYPE_MAPPING,
 	FILTER_KEY_VALUE_MAPPING,
-	SITE_LEVEL_REFRESH_TYPE
+	SITE_LEVEL_REFRESH_TYPE,
+	MG_DEALS_COLUMNS,
+	ALL_MONTHS_NAME
 };
