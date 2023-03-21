@@ -16,8 +16,7 @@ const {
 	dfpApiVersion,
 	db: dbConfig,
 	azureBlobStorage,
-	rabbitMQ,
-	Geniee
+	rabbitMQ
 } = require('./config');
 
 const {
@@ -122,23 +121,6 @@ const getMandatoryandSeperatelyGroupedLineItems = allLineItems => {
 	return { lineItems, seperatelyGroupedLineItems };
 };
 
-const getAllLineItemsForScript = allLineItems => {
-	const { lineItems, seperatelyGroupedLineItems } = getMandatoryandSeperatelyGroupedLineItems(
-		allLineItems
-	);
-	let combinedLineItems = [...lineItems];
-	for (var type in Object.keys(seperatelyGroupedLineItems)) {
-		combinedLineItems.concat(seperatelyGroupedLineItems[type]);
-	}
-	return combinedLineItems;
-};
-
-const checkIfAnyChangeInLineItems = (fetchedLineItems, savedLineItemsHash) => {
-	const accumulatedLineItems = getAllLineItemsForScript(fetchedLineItems),
-		fetchedLineItemsHash = utils.getHash(JSON.stringify(accumulatedLineItems));
-	return fetchedLineItemsHash !== savedLineItemsHash;
-};
-
 const processLineItems = lineItems => {
 	let fetchedLineItems = {},
 		fallbackLineItems = [];
@@ -178,10 +160,28 @@ const uploadLineItemsFileToCDN = async (fileName, data) => {
 	return await uploadToCDN(azureBlobStorage.connectionString, config);
 };
 
+function checkIfAnyTypeUpdated(previousHash, lineItems) {
+	let updatedTypes = [];
+	let updatedHash = { ...previousHash };
+	for (let type of Object.keys(lineItems)) {
+		let typeLineItems = lineItems[type].map(lineItem => parseInt(lineItem)).sort();
+		let calculatedTypeHash = utils.getHash(JSON.stringify(typeLineItems));
+		if (calculatedTypeHash !== previousHash[type]) {
+			updatedTypes.push(type);
+			updatedHash[type] = calculatedTypeHash;
+		}
+	}
+
+	if (updatedTypes.length) {
+		return { updated: true, updatedTypes, updatedHash };
+	}
+	return { updated: false };
+}
+
 const processfetchedLineItems = async (lineItems, networkCode = '103512698') => {
 	try {
-		let siteSyncRequired = false,
-			doc = await db.getDoc(`ntwk::${networkCode}`);
+		let allGAMSiteSyncRequired = false;
+		let doc = await db.getDoc(`ntwk::${networkCode}`);
 
 		// Update structure of the ntwk doc if it is still old
 		if (!doc || !LINE_ITEM_TYPES.every(type => type in doc.lineItems)) {
@@ -193,9 +193,6 @@ const processfetchedLineItems = async (lineItems, networkCode = '103512698') => 
 		}
 
 		const { fetchedLineItems, fallbackLineItems } = processLineItems(lineItems),
-			lineItemsUpdated = doc.accumulatedLineItemsHash
-				? checkIfAnyChangeInLineItems(fetchedLineItems, doc.accumulatedLineItemsHash)
-				: true,
 			fallbackLineItemsHash = utils.getHash(JSON.stringify(fallbackLineItems)),
 			fallbackLineItemsUpdated = doc.fallbackLineItemsHash
 				? fallbackLineItemsHash !== doc.fallbackLineItemsHash
@@ -204,38 +201,62 @@ const processfetchedLineItems = async (lineItems, networkCode = '103512698') => 
 		if (fallbackLineItemsUpdated) {
 			doc.fallbackLineItems = fallbackLineItems;
 			doc.fallbackLineItemsHash = fallbackLineItemsHash;
-			siteSyncRequired = true;
+			allGAMSiteSyncRequired = true;
 		}
-		if (lineItemsUpdated) {
-			const lineItemsFileName = `lineItems/li.${networkCode}.${new Date().getTime()}.json`,
-				accumulatedLineItems = getAllLineItemsForScript(fetchedLineItems),
-				fetchedLineItemsHash = utils.getHash(JSON.stringify(accumulatedLineItems));
-			siteSyncRequired = true;
 
-			if (!doc.lineItems) doc.lineItems = {};
-			for (let type of Object.keys(fetchedLineItems)) {
+		if (!doc.typeHash) {
+			doc.typeHash = {};
+		}
+
+		const anyTypeUpdated = checkIfAnyTypeUpdated(doc.typeHash, fetchedLineItems);
+
+		if (anyTypeUpdated.updated) {
+			let { updatedTypes, updatedHash } = anyTypeUpdated;
+			const mandatoryLineItemTypes = LINE_ITEM_TYPES_OBJ.filter(
+				type => type.isMandatory && !type.groupedSeparately
+			).map(type => type.value);
+
+			let mandatoryTypesUpdated = updatedTypes.filter(type =>
+				mandatoryLineItemTypes.includes(type)
+			);
+			let siteLevelTypesUpdated = updatedTypes.filter(
+				type => !mandatoryLineItemTypes.includes(type)
+			);
+
+			for (let type of updatedTypes) {
 				doc.lineItems[type] = fetchedLineItems[type];
 			}
 
-			await uploadLineItemsFileToCDN(
-				lineItemsFileName,
-				getMandatoryandSeperatelyGroupedLineItems(fetchedLineItems)
-			);
+			if (mandatoryTypesUpdated.length) {
+				allGAMSiteSyncRequired = true;
+				handleMandatoryTypeUpdates(doc);
+			} else if (siteLevelTypesUpdated.length) {
+				await utils.handleUpdatedTypes(updatedTypes, networkCode, db);
+			}
 
-			doc.lineItemsFileName = lineItemsFileName;
-			doc.accumulatedLineItemsHash = fetchedLineItemsHash;
+			doc.typeHash = updatedHash;
+			doc.lastUpdated = +new Date();
+			let dbResult = await db.upsertDoc(`ntwk::${networkCode}`, doc);
+			if (dbResult instanceof Error) {
+				throw dbResult;
+			}
 		}
-		// Update last updated timestamp
-		doc.lastUpdated = +new Date();
 
-		let dbResult = await db.upsertDoc(`ntwk::${networkCode}`, doc);
-		if (dbResult instanceof Error) {
-			throw dbResult;
-		}
-
-		return { lineItems, siteSyncRequired };
+		return { lineItems, allGAMSiteSyncRequired };
 	} catch (e) {
 		console.error(e);
+	}
+
+	async function handleMandatoryTypeUpdates(doc) {
+		let lineItems = doc.lineItems;
+		const lineItemsFileName = `lineItems/li.${networkCode}.${new Date().getTime()}.json`;
+
+		await uploadLineItemsFileToCDN(
+			lineItemsFileName,
+			getMandatoryandSeperatelyGroupedLineItems(lineItems)
+		);
+
+		doc.lineItemsFileName = lineItemsFileName;
 	}
 };
 const updateLineItemsForNetwork = async (dfpConfig, hbOrderIds) => {
@@ -261,26 +282,13 @@ const updateLineItemsForNetwork = async (dfpConfig, hbOrderIds) => {
 			return accumulator;
 		}, {});
 
-		let { lineItems, siteSyncRequired } = await processfetchedLineItems(
+		let { lineItems, allGAMSiteSyncRequired } = await processfetchedLineItems(
 			results,
 			dfpConfig.networkCode
 		);
 
-		if (siteSyncRequired) {
-			const requestSettings = {
-				method: 'GET',
-				url: Geniee.endpoint + Geniee.GAMSiteSync,
-				headers: {
-					'Content-Type': 'application/json; charset=utf-8'
-				},
-				data: {
-					networkCode: dfpConfig.networkCode
-				}
-			};
-
-			await axios(requestSettings).catch(error => {
-				return { error: `failed to sync sites for GAM ${dfpConfig.networkCode}: ${error}` };
-			});
+		if (allGAMSiteSyncRequired) {
+			utils.syncAllGAMSites(dfpConfig.networkCode);
 		}
 
 		// Get the total number of lineItems fetched across all types
