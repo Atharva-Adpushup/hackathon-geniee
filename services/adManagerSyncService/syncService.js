@@ -169,8 +169,7 @@ function checkIfAnyTypeUpdated(previousHash, lineItems) {
 		if (calculatedTypeHash !== previousHash[type]) {
 			updatedTypes.push(type);
 			updatedHash[type] = calculatedTypeHash;
-			logger.info({ message: `${type} lineITems Updated, previousValue: ${previousHash[type]}, newValue: ${calculatedTypeHash}` });
-			logger.info({ message: `updated LineItems for ${type}: ${typeLineItems}` });
+			logger.info({ message: `${type} lineItems Updated, previousValue: ${previousHash[type]}, newValue: ${calculatedTypeHash}` });
 		}
 	}
 
