@@ -169,6 +169,7 @@ function checkIfAnyTypeUpdated(previousHash, lineItems) {
 		if (calculatedTypeHash !== previousHash[type]) {
 			updatedTypes.push(type);
 			updatedHash[type] = calculatedTypeHash;
+			logger.info({ message: `${type} lineItems Updated, previousValue: ${previousHash[type]}, newValue: ${calculatedTypeHash}` });
 		}
 	}
 
@@ -201,6 +202,7 @@ const processfetchedLineItems = async (lineItems, networkCode = '103512698') => 
 		if (fallbackLineItemsUpdated) {
 			doc.fallbackLineItems = fallbackLineItems;
 			doc.fallbackLineItemsHash = fallbackLineItemsHash;
+			logger.info({ message: `fallback LineItems Updated, ${fallbackLineItems}, hash: ${fallbackLineItemsHash}` });
 			allGAMSiteSyncRequired = true;
 		}
 
@@ -229,12 +231,17 @@ const processfetchedLineItems = async (lineItems, networkCode = '103512698') => 
 
 			if (mandatoryTypesUpdated.length) {
 				allGAMSiteSyncRequired = true;
+				logger.info({ message: `Mandatory type LineItems Updated, ${JSON.stringify(anyTypeUpdated)}` });
 				handleMandatoryTypeUpdates(doc);
 			} else if (siteLevelTypesUpdated.length) {
+				logger.info({ message: `site level type LineItems Updated, ${JSON.stringify(anyTypeUpdated)}` });
 				await utils.handleUpdatedTypes(updatedTypes, networkCode, db);
 			}
 
 			doc.typeHash = updatedHash;
+		}
+
+		if (fallbackLineItemsUpdated || anyTypeUpdated.updated){
 			doc.lastUpdated = +new Date();
 			let dbResult = await db.upsertDoc(`ntwk::${networkCode}`, doc);
 			if (dbResult instanceof Error) {
