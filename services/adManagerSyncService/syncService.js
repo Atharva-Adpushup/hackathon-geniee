@@ -231,10 +231,10 @@ const processfetchedLineItems = async (lineItems, networkCode = '103512698') => 
 
 			if (mandatoryTypesUpdated.length) {
 				allGAMSiteSyncRequired = true;
-				logger.info({ message: `Mandatory type LineItems Updated, ${anyTypeUpdated}` });
+				logger.info({ message: `Mandatory type LineItems Updated, ${JSON.stringify(anyTypeUpdated)}` });
 				handleMandatoryTypeUpdates(doc);
 			} else if (siteLevelTypesUpdated.length) {
-				logger.info({ message: `site level type LineItems Updated, ${anyTypeUpdated}` });
+				logger.info({ message: `site level type LineItems Updated, ${JSON.stringify(anyTypeUpdated)}` });
 				await utils.handleUpdatedTypes(updatedTypes, networkCode, db);
 			}
 
