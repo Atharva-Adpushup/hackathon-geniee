@@ -84,6 +84,7 @@ const getAdConfig = (adType, section) => {
 		disableReuseVacantAdSpace,
 		minViewPortSize = { height: 0, width: 0 },
 		flyingCarpetEnabled = false,
+		flyingCarpetConfig = {},
 		isReplaceGptSlotOnRefreshEnabled = false
 	} = ad;
 	const { name: sectionName, id, formatData } = section;
@@ -126,7 +127,8 @@ const getAdConfig = (adType, section) => {
 				...json,
 				enableLazyLoading,
 				type, // Format type of ad like, 1 for structural, 2 for incontent
-				flyingCarpetEnabled
+				flyingCarpetEnabled,
+				flyingCarpetConfig
 			};
 
 			if (section.isIncontent) {
@@ -187,7 +189,8 @@ const getAdConfig = (adType, section) => {
 				isManual,
 				networkData,
 				type,
-				flyingCarpetEnabled
+				flyingCarpetEnabled,
+				flyingCarpetConfig
 			};
 
 			break;
