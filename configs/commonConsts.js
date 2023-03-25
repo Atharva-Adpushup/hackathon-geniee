@@ -964,6 +964,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		var lineItems = window.pnpRefresh.lineItems || [];
 		var blacklistedLineItems = window.pnpRefresh.blacklistedLineItems || [];
 		var googletag = window.googletag || {};
+		window.googletag = googletag;
 		googletag.cmd = googletag.cmd || [];
 	  
 		googletag.cmd.push(function () {
