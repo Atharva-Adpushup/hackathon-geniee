@@ -6,7 +6,7 @@ import { setUnsavedChangesAction } from '../../../actions/apps/headerBidding/hbA
 import Tools from '../components/Tools/index';
 
 const mapStateToProps = (state, ownProps) => {
-	const { sites, networkConfig, user, networkWideRules } = state.global;
+	const { sites, networkConfig, user, networkWideRules, findUsers } = state.global;
 
 	const networkConfigData = networkConfig.data;
 	const updatedNetworkConfig = {};
@@ -27,16 +27,14 @@ const mapStateToProps = (state, ownProps) => {
 		networkConfig: updatedNetworkConfig,
 		user: user.data,
 		rules: networkWideRules.data,
+		emailSitesMapping: findUsers.data,
 		...ownProps
 	};
 };
 
-export default connect(
-	mapStateToProps,
-	{
-		showNotification,
-		updateNetworkConfig,
-		saveNetworkWideRules,
-		setUnsavedChangesAction
-	}
-)(Tools);
+export default connect(mapStateToProps, {
+	showNotification,
+	updateNetworkConfig,
+	saveNetworkWideRules,
+	setUnsavedChangesAction
+})(Tools);

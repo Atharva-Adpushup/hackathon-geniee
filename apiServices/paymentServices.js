@@ -1,5 +1,7 @@
-const { appBucket, errorHandler } = require('../helpers/routeHelpers');
+const { appBucket } = require('../helpers/routeHelpers');
 const { couchBase } = require('../configs/config');
+const { upsertDoc } = require('../helpers/couchBaseService');
+
 const cbQuery = {
 	getPaymetHistory: email => {
 		const query = `SELECT release_amount FROM ${couchBase.DEFAULT_BUCKET} WHERE meta().id = "balancePayment::${email}"`;
@@ -35,6 +37,17 @@ const cbQuery = {
 		FROM  ${couchBase.DEFAULT_BUCKET}
 		WHERE META().id = "balancePayment::${email}"`;
 		return appBucket.queryDB(query);
+	},
+	getAllMgDeals: () => {
+		const query = `select mgDeal, doc.email from AppBucket doc UNNEST doc.mgDeals as mgDeal where meta(doc).id like 'mgdl::%' and mgDeal.isActive = true`;
+		return appBucket.queryDB(query);
+	},
+	getMGDeals: email => {
+		const query = `SELECT mgDeals FROM ${couchBase.DEFAULT_BUCKET} WHERE meta().id = 'mgdl::${email}'`;
+		return appBucket.queryDB(query);
+	},
+	setMGDeals: (email, mgDeals) => {
+		return upsertDoc('AppBucket', `mgdl::${email}`, { email, mgDeals });
 	}
 };
 module.exports = cbQuery;

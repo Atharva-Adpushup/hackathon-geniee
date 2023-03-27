@@ -301,17 +301,17 @@ module.exports = {
 			}
 		},
 		AMP_CDN_SYNC: {
-			NAME_IN_QUEUE_PUBLISHER_SERVICE: 'AMP_CDN_SYNC',    
-				EXCHANGE: {
-					name: 'ampConsoleCdnSync',
-					type: 'direct',
-					options: { durable: true }
-				},
-				QUEUE: {
-					name: 'ampConsoleCdnSync',
-					options: { durable: true }
-				}
+			NAME_IN_QUEUE_PUBLISHER_SERVICE: 'AMP_CDN_SYNC',
+			EXCHANGE: {
+				name: 'ampConsoleCdnSync',
+				type: 'direct',
+				options: { durable: true }
+			},
+			QUEUE: {
+				name: 'ampConsoleCdnSync',
+				options: { durable: true }
 			}
+		}
 	},
 	sqlDatabases: {
 		test: 'test',
@@ -398,7 +398,9 @@ module.exports = {
 		hackersMail: 'hackers@adpushup.com',
 		opsMail: 'cs-ops@adpushup.com'
 	},
-
+	mgDealsAlerts: {
+		supportMails: 'abhishek.sontakke@adpushup.com'
+	},
 	googleSheetCreds: ''
 };
 
