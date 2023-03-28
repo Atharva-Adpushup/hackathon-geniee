@@ -1673,7 +1673,13 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 					sendLogToApLogger('EVENT_SLOT_RENDER_ENDED', {
 						adUnit: e.slot.getAdUnitPath()
 					});
-					var adUnit = e.slot.getAdUnitPath().substring(e.slot.getAdUnitPath().lastIndexOf('/') + 1);
+					var adUnitPath = e.slot.getAdUnitPath();
+					var adUnit;
+					if (window.pnpRefresh.checkFullAdUnitCode) {
+						adUnit = adUnitPath.substring(adUnitPath.indexOf('/',1) + 1);
+					} else {
+						adUnit = adUnitPath.substring(adUnitPath.lastIndexOf('/') + 1);
+					}
 					var slotId = e.slot.getSlotElementId();
 					var refreshEligible = checkRefreshEligible(e.slot, e.sourceAgnosticLineItemId, adUnit);
 					if (refreshEligible) {
