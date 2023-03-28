@@ -76,7 +76,7 @@ var modelAPI = (module.exports = apiModule()),
 			'activeProducts',
 			'useGAAnalyticsForReporting',
 			'manuallyAddedPublisherNetworkCode',
-			'allowedEmailExport'
+			'paymentReconciliation'
 		];
 		this.clientKeys = [
 			'firstName',
@@ -119,7 +119,7 @@ var modelAPI = (module.exports = apiModule()),
 			'activeProducts',
 			'useGAAnalyticsForReporting',
 			'manuallyAddedPublisherNetworkCode',
-			'allowedEmailExport'
+			'paymentReconciliation'
 		];
 		this.validations = schema.user.validations;
 		this.classMap = {

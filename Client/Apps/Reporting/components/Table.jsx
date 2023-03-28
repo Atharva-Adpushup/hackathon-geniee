@@ -412,7 +412,7 @@ const appendDayToDateCSV = csvData => {
 	});
 };
 
-const addSiteIdToCSVData = ({ csvData, data, allowedEmailExport = false, props }) => {
+const appendExtraColumnsToCSVData = ({ csvData, data, paymentReconciliation = false, props }) => {
 	const { findUsersData, isForOps } = props;
 	let siteIdEmailMapping = {};
 	const index = data.tableColumns.map(e => e.Header).indexOf('Site Name');
@@ -421,16 +421,18 @@ const addSiteIdToCSVData = ({ csvData, data, allowedEmailExport = false, props }
 	// 2. Then we will append the data in each row
 	if (index !== -1) {
 		const appendColumnsArr = [];
-		if (isForOps && allowedEmailExport) {
+		if (isForOps && paymentReconciliation) {
 			siteIdEmailMapping = findUsersData.reduce((acc, user) => {
-				const { email, siteIds = [] } = user;
+				const { email, siteIds = [], accountManagerEmail } = user;
 				siteIds.forEach(siteId => {
-					acc[siteId] = email;
+					if (!acc[siteId]) {
+						acc[siteId] = { email, accountManagerEmail };
+					}
 				});
 				return acc;
 			}, {});
-			// append Console Email Id as well if allowedEmailExport is true
-			appendColumnsArr.push('Console Email Id');
+			// append Console Email Id, Acc Owner if paymentReconciliation is true
+			appendColumnsArr.push('Console Email Id', 'Account Owner');
 		}
 		appendColumnsArr.push('Site Id');
 		// append columns
@@ -444,9 +446,10 @@ const addSiteIdToCSVData = ({ csvData, data, allowedEmailExport = false, props }
 			const appendRowData = [];
 
 			// append data - siteId, Console Email Id
-			if (isForOps && allowedEmailExport) {
-				// append site owners email to the row
-				appendRowData.push(siteIdEmailMapping[siteId]);
+			if (isForOps && paymentReconciliation) {
+				const { email, accountManagerEmail } = siteIdEmailMapping[siteId] || {};
+				// append publisher's email and account manager's email to the row
+				appendRowData.push(email, accountManagerEmail);
 			}
 			appendRowData.push(siteId);
 			csvData[itemIndex + 1].splice(
@@ -471,12 +474,12 @@ const setCsvData = (data, props) => {
 		getCsvData,
 		selectedInterval,
 		selectedDimension,
-		user: { allowedEmailExport }
+		user: { paymentReconciliation }
 	} = props;
 	let csvData = computeCsvData(data);
 
 	if (selectedDimension && selectedDimension.length && selectedDimension.includes('siteid')) {
-		csvData = addSiteIdToCSVData({ csvData, data, allowedEmailExport, props });
+		csvData = appendExtraColumnsToCSVData({ csvData, data, paymentReconciliation, props });
 	}
 
 	// for interval daily and single dimension

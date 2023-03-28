@@ -7,7 +7,7 @@ export default {
 	logout: () => authService.removeAuthToken(),
 	switchUser: email => axiosInstance.post('/user/switchUser', { email }),
 	impersonateCurrentUser: () => axiosInstance.post('/user/impersonateCurrentUser'),
-	findUsers: () => axiosInstance.get('/user/findUsers'),
+	findUsers: options => axiosInstance.get('/user/findUsers', { params: options }),
 	forgotPassword: email => axiosInstance.post('/forgotPassword', { email }),
 	resetPassword: (email, key, password) =>
 		axiosInstance.post('/resetPassword', { email, key, password }),

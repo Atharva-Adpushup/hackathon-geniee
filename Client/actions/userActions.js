@@ -11,8 +11,12 @@ export const loginAction = (email, password) => () =>
 		window.cookieProcessing();
 		return response;
 	});
-export const findUsers = () => dispatch =>
-	userService.findUsers().then(response => {
+export const findUsers = options => dispatch => {
+	dispatch({
+		type: USER_ACTIONS.FETCHING_FIND_USER,
+		data: []
+	});
+	return userService.findUsers(options).then(response => {
 		const { data } = response.data;
 		dispatch({
 			type: USER_ACTIONS.UPDATE_FIND_USER,
@@ -20,6 +24,7 @@ export const findUsers = () => dispatch =>
 		});
 		return response;
 	});
+};
 export const switchUser = email => dispatch =>
 	userService
 		.switchUser(email)

@@ -170,16 +170,15 @@ router
 							let associatedAccounts = await getAssociatedAccountsWithUser(userEmail);
 
 							const originalUsersData = originalUser && originalUser.cleanData() || {};
-							// get `allowedEmailExport` flag from original user's data and set it into
-							// impersonate user's data
-							// Flag to check if the user is allowed to export site owners email or not
-							// under global report - csv export
-							const { allowedEmailExport = false } = originalUsersData;
-
 							const userData = user.cleanData();
 							const sitesArray = [...userData.sites];
 							const sitesArrayLength = sitesArray.length;
 							userData.sites = {};
+							// get `paymentReconciliation` flag from original user's data and set it into
+							// impersonate user's data
+							// Flag to check if the user is allowed to export site owners email, account managers email or not
+							// under Ops Panel reports with csv export
+							const { paymentReconciliation = false } = originalEmail ? originalUsersData : userData;
 
 							for (let i = 0; i < sitesArrayLength; i += 1) {
 								const site = sitesArray[i];
@@ -201,7 +200,7 @@ router
 								}
 
 								return res.status(httpStatus.OK).json({
-									user: { ...userData, isSuperUser, allowedEmailExport /** Pass the flag to check if the user is allowed to export site owners email or not */ },
+									user: { ...userData, isSuperUser, paymentReconciliation /** Pass the flag to check if the user is allowed to export site owners email or not */ },
 									networkConfig,
 									networkWideHBRules,
 									associatedAccounts,
