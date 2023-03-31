@@ -1368,6 +1368,11 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		var blacklistedLineItems = window.pnpRefresh.blacklistedLineItems || [];
 		var firstImpressionRefreshLineItems = window.pnpRefresh.firstImpressionRefreshLineItems || [];
 		var forceRefreshFirstImpression = !!window.pnpRefresh.forceRefreshFirstImpression;
+		const refreshTypes = {
+			BACKGROUND: 'bgRefresh',
+			ACTIVE_TAB: 'activeTab',
+			ACTIVE_VIEW: 'activeView'
+		}
 	
 		var googletag = (window.googletag = window.googletag || {});
 		googletag.cmd = googletag.cmd || [];
@@ -1497,6 +1502,13 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 						lineItemId: lineItemId
 					};
 				}
+
+				function checkAndReplaceRefreshType(){
+					if(window.pnpRefresh.refreshType === refreshTypes.ACTIVE_VIEW){
+						return refreshTypes.ACTIVE_TAB;
+					}
+					return window.pnpRefresh.refreshType;
+				}
 	
 				// Active view handleSettingTimeouts
 				function handleSettingTimeouts(divId, adUnit) {
@@ -1510,6 +1522,15 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 						window.pnpRefresh.adUnitState[divId].activeViewTimeoutId = setTimeout(function () {
 							window.pnpRefresh.adUnitState[divId].viewedOnce = true;
 							log('Viewed Once: ', window.pnpRefresh.adUnitState[divId].gSlot.getAdUnitPath());
+							let adUnitObject = AD_UNIT_MAPPING[adUnit];
+							if (
+								adUnitObject &&
+								adUnitObject.refreshType &&
+								adUnitObject.changeReplaceTypeOnImpressionViewed
+							) {
+								adUnitObject.refreshType = checkAndReplaceRefreshType();
+								log('Replaced Active view with', adUnitObject.refreshType, adUnit);
+							}
 							var REFRESH_INTERVAL = window.pnpRefresh.filledInsertionTrigger;
 							var refreshAfter =
 								REFRESH_INTERVAL * 1000 -
