@@ -263,6 +263,27 @@ function writeDataToTempFile() {
 	});
 }
 
+function addPermanantEntries() {
+	return new Promise((resolve, reject) => {
+		try {
+			const permanantEntriesSellerJson = require("./permanentEntriesSellerJson.json");
+			if (Array.isArray(permanantEntriesSellerJson)) {
+				for(let permanantEntry of permanantEntriesSellerJson){
+					if(permanantEntry.isEnabled){
+						fileOutput.sellers.push(permanantEntry.data);
+					}
+				}
+			}
+		} catch (e)
+		{
+			console.error(e);
+		}
+		finally {
+			resolve()
+		}
+	})
+}
+
 function replaceWithOldSellersJson() {
 	if (errors.length) {
 		console.log(errors);
@@ -435,6 +456,7 @@ function reportErrors() {
 function init() {
 	return getUsersWithNonEmptySites()
 		.then(processDataInChunks)
+		.then(addPermanantEntries) 
 		.then(writeDataToTempFile)
 		.then(replaceWithOldSellersJson)
 		.then(function() {
