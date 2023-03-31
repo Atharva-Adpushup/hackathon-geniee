@@ -182,7 +182,7 @@ class Payment extends Component {
 	};
 
 	render() {
-		const { balancePayment, activeProducts } = this.props;
+		const { balancePayment, activeProducts, isSuperUser } = this.props;
 		const { redirectUrl } = this.state;
 		const accessDetailsTab =
 			activeProducts === undefined || activeProducts.payment_details === undefined
@@ -206,7 +206,7 @@ class Payment extends Component {
 						{balancePayment && balancePayment.accessBalanceTab ? (
 							<NavItem eventKey={3}>{PAYMENT_NAV_ITEMS_VALUES.BALANCE}</NavItem>
 						) : null}
-						<NavItem eventKey={4}>{PAYMENT_NAV_ITEMS_VALUES.MG_DEALS}</NavItem>
+						{isSuperUser && <NavItem eventKey={4}>{PAYMENT_NAV_ITEMS_VALUES.MG_DEALS}</NavItem>}
 					</Nav>
 					{this.renderContent()}
 				</div>
@@ -216,8 +216,8 @@ class Payment extends Component {
 }
 
 const mapStateToProps = state => {
-	const { balancePayment, activeProducts } = state.global.user.data;
-	return { balancePayment, activeProducts };
+	const { balancePayment, activeProducts, isSuperUser } = state.global.user.data;
+	return { balancePayment, activeProducts, isSuperUser };
 };
 
 // 	mapDispatchToProps = (dispatch, ownProps) => ({

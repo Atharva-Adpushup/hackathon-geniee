@@ -298,7 +298,12 @@ router
 			.catch(err => errorHandler(err, res, HTTP_STATUSES.INTERNAL_SERVER_ERROR));
 	})
 	.get('/getMGDeals', (req, res) => {
-		const { email } = req.user;
+		const { email, isSuperUser } = req.user;
+		if (!isSuperUser) {
+			const err = { message: 'unauthorized access' };
+			return errorHandler(err, res, HTTP_STATUSES.UNAUTHORIZED);
+		}
+
 		cbQuery
 			.getMGDeals(email)
 			.then(data => {
@@ -311,8 +316,13 @@ router
 			.catch(err => errorHandler(err, res, HTTP_STATUSES.INTERNAL_SERVER_ERROR));
 	})
 	.post('/setMGDeals', (req, res) => {
-		const { email, originalEmail } = req.user;
+		const { email, originalEmail, isSuperUser } = req.user;
 		const { mgDeals, type } = req.body;
+		if (!isSuperUser) {
+			const err = { message: 'unauthorized access' };
+			return errorHandler(err, res, HTTP_STATUSES.UNAUTHORIZED);
+		}
+
 		cbQuery
 			.setMGDeals(email, mgDeals)
 			.then(data => {
