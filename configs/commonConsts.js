@@ -708,7 +708,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		paymentHistoryService: '0 0 5 * *', //At 00:00 on 5th every month
 		sellersJSONService: '0 */12 * * *', // Every 12hours
 		clsMonitoringService: '0 8 * * *', //Run at 8:00 everyday,
-		poweredByAdpushupBannerService: '30 1 * * 1', //Runs at 1:30 Every Monday,
+		poweredByAdpushupBannerService: '30 1 * * 0', //Runs at 1:30 Every Sunday,
 		partnersPanelService: {
 			Criteo: '22 13 * * *',
 			Pubmatic: '24 13 * * *',
