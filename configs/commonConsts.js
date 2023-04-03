@@ -563,7 +563,8 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		paymentHistoryDoc: 'tplt::last3months',
 		pnpRefresh: 'apnp::',
 		topSitesByRevenue: 'data::topsites',
-		globalClientAppConfig: 'config::client-globals'
+		globalClientAppConfig: 'config::client-globals',
+		floorEngine: 'config::floorsEngine'
 	},
 	AMP_REFRESH_INTERVAL: 30,
 	tagManagerInitialDoc: {
