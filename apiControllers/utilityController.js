@@ -64,13 +64,20 @@ router.get('/syncGAMSites', async (req, res) => {
 	if (!networkCode || isNaN(networkCode)) {
 		return res.status(httpStatus.BAD_REQUEST).json({ error: 'Please provide a network code!' });
 	}
-	const connectedSitesQuery = `SELECT site.siteId
-	FROM (
-		SELECT sites
-		FROM AppBucket
-		WHERE META().id LIKE "user::%%"
-			AND adServerSettings.dfp.activeDFPNetwork = "${networkCode}" ) AS ds
-	UNNEST sites AS site`;
+	const connectedSitesQuery = `
+	SELECT siteId
+	FROM AppBucket
+	WHERE META().id LIKE "site::%"
+    AND dataFeedActive = TRUE
+    AND siteId IN (
+    	SELECT RAW site.siteId
+    	FROM (
+        	SELECT sites
+        	FROM AppBucket a
+        	WHERE META().id LIKE "user::%%"
+            	AND adServerSettings.dfp.activeDFPNetwork = "${networkCode}" ) AS ds
+    	UNNEST sites AS site)
+	`;
 
 	try {
 		let connectedSites = await appBucket.queryDB(connectedSitesQuery);
