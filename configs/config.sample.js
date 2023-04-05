@@ -404,6 +404,20 @@ module.exports = {
 	googleSheetCreds: '',
 	IS_GAM_API_NOT_WORKING: false,
 	FORCE_REPORTING_DELAY_POPUP: false,
+	SLACK_ENDPOINT: 'https://common-azure-function.azurewebsites.net/api/publish',
+	API_MONITORING: {
+		TIMEOUT: 60 * 1000,
+		TITLE: 'Node API Request - Error Report',
+		TIMEOUT_ERROR_MESSAGE: 'Request Timed Out',
+		CHANNELS: ['C052KHBBRA4'],
+		ENDPOINTS: [
+			'/globalData',
+			'/user/findUsers',
+			'/reports/getWidgetData',
+			'/reports/getMetaData',
+			'/reports/getPaymentHistory'
+		]
+	}
 };
 
 /*
