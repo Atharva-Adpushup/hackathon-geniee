@@ -1761,5 +1761,11 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
         ADPUSHUPJS : 'adpushupjs',
         DVC: 'dvc',
         AMP: 'ampScript'
-    }
+    },
+	URL_REPORTING_REPORT_CONFIG: 'config::rprt:urlReporting',
+	HB_ANALYTICS_REPORT_CONFIG: 'config::rprt:hbAnalytics',
+	OPERATIONS_REPORT_CONFIG: 'config::rprt:operations',
+	USER_REPORT_CONFIG: 'config::rprt:user',
+	URL_REPORTING_PRODUCT: 'url-reporting',
+	HB_ANALYTICS_PRODUCT: 'hb-analytics'
 };
