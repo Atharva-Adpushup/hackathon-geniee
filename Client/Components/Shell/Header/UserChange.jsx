@@ -17,13 +17,13 @@ class UserChange extends Component {
 	componentDidMount() {
 		const {
 			findUsers,
-			findUserFetched,
-			findUserFetching,
+			findUsersAction,
 			user: { paymentReconciliation: forPaymentReconciliation }
 		} = this.props;
+		const { fetched, isFetching, data: users } = findUsers;
 		const options = { forPaymentReconciliation };
-		if (!(findUserFetched || findUserFetching)) {
-			findUsers(options)
+		if (!(fetched || isFetching)) {
+			findUsersAction(options)
 				.then(response => {
 					const { data } = response.data;
 					this.setState({ users: data.users });
@@ -32,6 +32,8 @@ class UserChange extends Component {
 					console.log(err);
 					return window.alert('User Switch Failed. Please contact Tech team.');
 				});
+		} else {
+			this.setState({ users });
 		}
 	}
 
@@ -98,7 +100,8 @@ class UserChange extends Component {
 
 	render() {
 		const { email, users, showFilteredList } = this.state;
-		const { associatedAccounts = [], findUserFetched } = this.props;
+		const { associatedAccounts = [], findUsers } = this.props;
+		const { fetched: findUserFetched } = findUsers;
 		const { getFilteredUserDataList } = this;
 		const filteredUserDataList = getFilteredUserDataList(
 			associatedAccounts.length ? [...associatedAccounts] : [...users]

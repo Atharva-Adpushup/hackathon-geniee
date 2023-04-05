@@ -24,8 +24,7 @@ const mapStateToProps = (state, ownProps) => {
 		associatedAccounts: associatedAccounts.data,
 		// prevent unnecessary findUser req
 		// if already fetched or fetching set the flag to false
-		findUserFetching: findUsers.isFetching,
-		findUserFetched: findUsers.fetched,
+		findUsers,
 		hasUnsavedChanges,
 		...ownProps
 	};
@@ -37,7 +36,7 @@ const mapDispatchToProps = dispatch => ({
 	switchUser: email => dispatch(switchUser(email)),
 	impersonateCurrentUser: () => dispatch(impersonateCurrentUser()),
 	logout: () => dispatch(logout()),
-	findUsers: options => dispatch(findUsersAction(options))
+	findUsersAction: options => dispatch(findUsersAction(options))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Shell);
