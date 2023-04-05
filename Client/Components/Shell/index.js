@@ -99,8 +99,7 @@ class Shell extends React.Component {
 			switchUser,
 			impersonateCurrentUser,
 			findUsers,
-			findUserFetching,
-			findUserFetched,
+			findUsersAction,
 			hasUnsavedChanges,
 			showPaymentStatusBar
 		} = this.props;
@@ -126,8 +125,7 @@ class Shell extends React.Component {
 							switchUser={switchUser}
 							impersonateCurrentUser={impersonateCurrentUser}
 							findUsers={findUsers}
-							findUserFetched={findUserFetched}
-							findUserFetching={findUserFetching}
+							findUsersAction={findUsersAction}
 							hasUnsavedChanges={hasUnsavedChanges}
 						/>
 					</Col>

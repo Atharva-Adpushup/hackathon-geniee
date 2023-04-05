@@ -27,8 +27,7 @@ const Header = ({
 	switchUser,
 	impersonateCurrentUser,
 	findUsers,
-	findUserFetching,
-	findUserFetched,
+	findUsersAction,
 	hasUnsavedChanges
 }) => {
 	function handleLogout() {
@@ -62,9 +61,8 @@ const Header = ({
 						<UserChange
 							user={user}
 							switchUser={switchUser}
-							findUserFetched={findUserFetched}
-							findUserFetching={findUserFetching}
 							findUsers={findUsers}
+							findUsersAction={findUsersAction}
 							associatedAccounts={associatedAccounts}
 						/>
 						<CustomButton
