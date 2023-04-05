@@ -2,7 +2,7 @@
 # Each line is a file pattern followed by one or more owners.
 
 # default ownership: default owners for everything in the repo (Unless a later match takes precedence)
-*      @AnilAdPushup @RahulAdpushup @DivyanshuAdPushup @RaviAdPushup @harpreetAdPushup @AmitAdPushup @YashBhardwajAdpushup
+*      @AnilAdPushup @RahulAdpushup @DivyanshuAdPushup @RaviAdPushup @harpreetAdPushup  @YashBhardwajAdpushup @abhisheksontakke3008
 
 .github/*              @AnilAdPushup @RahulAdpushup @DivyanshuAdPushup @RaviAdPushup @harpreetAdPushup
 
