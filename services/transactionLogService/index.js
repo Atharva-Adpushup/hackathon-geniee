@@ -134,7 +134,10 @@ function createTransactionLog({ siteId, siteDomain, ads, publisherName, publishe
 			}
 			return updateDb(siteId, layoutAds, apTagAds, innovativeAds);
 		})
-		.then(() => syncCdn(siteId, true))
+		.then(() => {
+            const syncOptions = {forcePrebidBuild: true};
+            return syncCdn(siteId, syncOptions)
+        })
 		.catch(err => {
 			console.log(err);
 			return Promise.reject(err);

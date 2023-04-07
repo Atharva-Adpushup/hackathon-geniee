@@ -7,10 +7,11 @@ const syncGeneratedFileWithCdn = require('./service');
 // const { fileLogger } = require('../../helpers/logger/file/index');
 // const getAutoOptimisedLiveSites = require('../../misc/scripts/adhoc/autoOptimisedLiveSites/service');
 
-function onSiteSaved(siteId, forcePrebidBuild) {
-	// save only after 3 second of siteSaved event as still channels are not saved as siteSaved called first and then channel data is saved.
-	// so to roughly bypassing this situation run the generator only after 3 seconds, assuming all is saved in 3 seconds
-	setTimeout(() => syncGeneratedFileWithCdn.init(siteId, forcePrebidBuild), 3000);
+function onSiteSaved(siteId, siteOptions = {}) {
+    const { forcePrebidBuild, options = {} } = siteOptions
+    // save only after 3 second of siteSaved event as still channels are not saved as siteSaved called first and then channel data is saved.
+    // so to roughly bypassing this situation run the generator only after 3 seconds, assuming all is saved in 3 seconds
+    setTimeout(() => syncGeneratedFileWithCdn.init(siteId, forcePrebidBuild, options), 3000);
 }
 
 adpushup.on('siteSaved', onSiteSaved);

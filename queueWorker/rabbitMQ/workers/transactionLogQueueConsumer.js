@@ -78,8 +78,8 @@ function errorHandler(error, originalMessage) {
 			debugData: `Site id : ${decodedMessage.siteId}`,
 			details: `${JSON.stringify(error)}`
 		});
-
-		return syncCdn(decodedMessage.siteId, true).then(() => {
+        const syncOptions = { forcePrebidBuild: true }
+		return syncCdn(decodedMessage.siteId, syncOptions).then(() => {
 			consumer.acknowledge(originalMessage);
 			return Promise.reject(error);
 		});
