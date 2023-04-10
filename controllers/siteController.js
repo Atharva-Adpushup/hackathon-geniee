@@ -201,6 +201,7 @@ router
 		return Promise.all([sitePromise, appBucketPromise])
 			.spread((site, appBucket) => updateHbConfig(siteId, site, JSON.parse(req.body.data), appBucket))
 			.spread((data, site) => {
+				console.log('LOG:: Syncing from opsPanel/hbConfig', siteId);
 				adpushupEvent.emit('siteSaved', site);
 				return res.status(200).send({ success: 1, data: null, message: `Header bidding config updated` });
 			})

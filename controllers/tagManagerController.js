@@ -122,6 +122,7 @@ const fn = {
 			.then(docWithCas => processing(docWithCas))
 			.then(() => siteModel.getSiteById(req.body.siteId))
 			.then(site => {
+				console.log('LOG:: Syncing from adUpdateProcessing', req.body.siteId);
 				adpushup.emit('siteSaved', site); // Emitting Event for Ad Syncing
 				return sendSuccessResponse(
 					{

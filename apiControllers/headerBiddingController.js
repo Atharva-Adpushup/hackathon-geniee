@@ -1,5 +1,6 @@
 /* eslint-disable no-shadow */
 /* eslint-disable no-restricted-syntax */
+/* eslint-disable */
 const axios = require('axios').default;
 const express = require('express');
 const Promise = require('bluebird');
@@ -875,6 +876,7 @@ router
 		return userModel
 			.verifySiteOwner(email, siteId)
 			.then(() => {
+				console.log('LOG:: Syncing from startCdnSync', siteId);
 				adpushup.emit('siteSaved', siteId);
 
 				res.status(httpStatus.OK).json({ success: 'CDN Sync has been Started' });
@@ -1246,8 +1248,8 @@ router
 		return userModel
 			.verifySiteOwner(email, siteId)
 			.then(() =>
-				headerBiddingModel.getActiveAdUnitSizes(siteId).then(activeAdUnitSizes => {
-					return res.status(httpStatus.OK).send(activeAdUnitSizes);
+				headerBiddingModel.getActiveAdUnitSizes(siteId).then(activeAdUnitSizes => {					
+					return res.status(httpStatus.OK).send(activeAdUnitSizes);		
 				})
 			)
 			.catch(e =>
