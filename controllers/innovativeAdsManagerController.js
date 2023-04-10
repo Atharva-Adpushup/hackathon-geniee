@@ -103,7 +103,6 @@ const fn = {
 	},
 	emitEventAndSendResponse: (siteId, res, data = {}) =>
 		siteModel.getSiteById(siteId).then(site => {
-			console.log('LOG:: Syncing from emitEventAndSendResponse', siteId);
 			adpushup.emit('siteSaved', site); // Emitting Event for Ad Syncing
 			return sendSuccessResponse(
 				{

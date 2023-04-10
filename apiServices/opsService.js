@@ -1,4 +1,3 @@
-/* eslint-disable */
 const _ = require('lodash');
 const AdPushupError = require("../helpers/AdPushupError");
 const apTagService = require('./apTagServices');
@@ -73,13 +72,12 @@ const opsService = {
         }
         return newAds;
     },
-    initScriptSync: siteId => { 
+    initScriptSync: siteId => {
         return siteModel.getSiteById(siteId)
             .then(site => {
-                console.log('LOG:: Syncing from initScriptSync', siteId);
                 adpushupEvent.emit('siteSaved', site)
             });
-        },
+    },
     formatsForUnits: (formats = {}) => {
         if (Object.keys(formats).length) {
             return Object.entries(formats).reduce((result, [format, isActive]) => {
@@ -91,4 +89,4 @@ const opsService = {
     }
 };
 
-module.exports = opsService;
+module.exports = opsService; 
