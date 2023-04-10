@@ -42,6 +42,7 @@ const getPublisherConfig = isSelectiveRolloutEnabled => {
 module.exports = {
 	publish(paramConfig, isSelectiveRolloutEnabled = false) {
 		const { publisher, options } = getPublisherConfig(isSelectiveRolloutEnabled);
+		console.log('LOG:: Publishing from cdnSyncQueuePub', paramConfig);
 
 		return publishJobs(publisher, options, paramConfig)
 			.then(console.log)

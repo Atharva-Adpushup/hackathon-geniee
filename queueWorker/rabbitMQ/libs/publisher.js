@@ -10,7 +10,6 @@ function Publisher(config) {
 	this.publishMsg = function(queueName, msg, options) {
 		const me = this;
 		options = Object.assign({}, options, { mandatory: true });
-
 		return new Promise((resolve, reject) => {
 			if (me.connection && me.channel) {
 				console.log('Publishing now.. exchange : ' + me.config.exchange.name + ' queue : ' + queueName);
