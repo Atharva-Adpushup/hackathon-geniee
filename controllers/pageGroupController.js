@@ -47,6 +47,7 @@ router
 			.getChannel(siteId, platform, pageGroup)
 			.then(function(pageGroup) {
 				return Promise.all([siteModel.getSiteById(req.params.siteId), pageGroup]).spread((site, pageGroup) => {
+					console.log('LOG:: Syncing from saveAmpSettings', siteId);
 					adpushupEvent.emit('siteSaved', site);
 					pageGroup.set('ampSettings', req.body.ampData);
 					return pageGroup.save();

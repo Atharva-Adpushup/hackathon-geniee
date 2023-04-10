@@ -1,4 +1,5 @@
 // Geniee-Ap REST API controller
+/* eslint-disable */
 
 const express = require('express');
 const Promise = require('bluebird');
@@ -20,6 +21,7 @@ router.post('/saveAmpSettings', (req, res) => {
 			.then(pageGroup =>
 				// eslint-disable-next-line no-shadow
 				Promise.all([siteModel.getSiteById(siteId), pageGroup]).spread((site, pageGroup) => {
+					console.log('LOG:: Syncing from saveAmpSettings_', siteId);
 					adpushupEvent.emit('siteSaved', site);
 					pageGroup.set('ampSettings', ampData);
 					return pageGroup.save();
