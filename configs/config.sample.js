@@ -401,7 +401,9 @@ module.exports = {
 	mgDealsAlerts: {
 		supportMails: 'abhishek.sontakke@adpushup.com'
 	},
-	googleSheetCreds: ''
+	googleSheetCreds: '',
+	IS_GAM_API_NOT_WORKING: false,
+	FORCE_REPORTING_DELAY_POPUP: false,
 };
 
 /*
