@@ -1,4 +1,3 @@
-/* eslint-disable */
 const express = require('express');
 const siteModel = require('../models/siteModel');
 const httpStatus = require('../configs/httpStatusConsts');
@@ -47,7 +46,6 @@ router.get('/syncCdn', (req, res) => {
 			validSites.forEach(({ siteId }) => {
 				validSiteIds.push(siteId);
 				const options = { type };
-				console.log('LOG:: Syncing from siteSaved', siteId);
 				adpushup.emit('siteSaved', siteId, { forcePrebidBuild, options });
 			});
 

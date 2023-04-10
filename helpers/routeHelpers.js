@@ -1,4 +1,3 @@
-/* eslint-disable */
 const Promise = require('bluebird');
 const _ = require('lodash');
 const { couchbaseService } = require('node-utils');
@@ -107,7 +106,6 @@ function sendDataToZapier(uri, data) {
 
 function emitEventAndSendResponse(siteId, res, data = {}) {
 	return siteModel.getSiteById(siteId).then(site => {
-		console.log('LOG:: Syncing from emitEventAndSendResponse', siteId);
 		adpushup.emit('siteSaved', site); // Emitting Event for Ad Syncing
 		return sendSuccessResponse(
 			{
@@ -840,7 +838,6 @@ function storedRequestWrapper(doc) {
 }
 
 function publishAdPushupBuild(siteId) {
-	console.log('LOG:: Syncing from publishAdPushupBuild', siteId);
 	adpushup.emit('siteSaved', siteId);
 }
 /*
