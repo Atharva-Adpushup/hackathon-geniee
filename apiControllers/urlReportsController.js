@@ -6,6 +6,7 @@ const router = express.Router();
 
 const HTTP_STATUSES = require('../configs/httpStatusConsts');
 const { sendErrorResponse } = require('../helpers/commonFunctions');
+const { getMetaInfo } = require('../apiServices/metaInfoService');
 const { addActiveProductsToMeta } = require('../helpers/routeHelpers');
 
 router
@@ -72,11 +73,7 @@ router
 		if (isValidParams) {
 			const params = { siteid: sites, isSuperUser, product };
 
-			return request({
-				uri: `${CC.ANALYTICS_API_ROOT}${CC.ANALYTICS_METAINFO_URL}`,
-				json: true,
-				qs: params
-			})
+			return getMetaInfo(params)
 				.then(async response => {
 					const { code = -1, data } = response;
 					if (code === 1) {

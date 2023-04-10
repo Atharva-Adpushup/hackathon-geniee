@@ -22,6 +22,7 @@ const {
 	sendErrorResponse,
 	sendSuccessResponse
 } = require('../helpers/commonFunctions');
+const { getMetaInfo } = require('../apiServices/metaInfoService');
 const {
 	appBucket,
 	errorHandler,
@@ -126,11 +127,7 @@ function getUserSites(user) {
 }
 
 async function getReportsMetaData(params) {
-	return request({
-		uri: `${consts.ANALYTICS_API_ROOT}${consts.ANALYTICS_METAINFO_URL}`,
-		json: true,
-		qs: params
-	})
+	return getMetaInfo(params)
 		.then(async response => {
 			const { data, code } = response;
 			if (code == 1 && data) {

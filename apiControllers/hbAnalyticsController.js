@@ -4,6 +4,7 @@ const _ = require('lodash');
 
 const CC = require('../configs/commonConsts');
 const utils = require('../helpers/utils');
+const { getMetaInfo } = require('../apiServices/metaInfoService');
 const { addActiveProductsToMeta } = require('../helpers/routeHelpers');
 
 const router = express.Router();
@@ -118,11 +119,7 @@ router
 		if (isValidParams) {
 			const params = { siteid: sites, product: 'hb-analytics', isSuperUser };
 
-			return request({
-				uri: `${CC.ANALYTICS_API_ROOT}${CC.ANALYTICS_METAINFO_URL}`,
-				json: true,
-				qs: params
-			})
+			return getMetaInfo(params)
 				.then(async response => {
 					const { code, data } = response;
 					if (code === 1 && data) {

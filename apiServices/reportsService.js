@@ -24,6 +24,7 @@ const ObjectValidator = require('../helpers/ObjectValidator');
 const { getUserGaEnabledSites, getUserByEmail } = require('../models/userModel');
 const { getAllGaEnabledSites } = require('../models/siteModel');
 const { addActiveProductsToMeta } = require('../helpers/routeHelpers');
+const { getMetaInfo } = require('../apiServices/metaInfoService');
 
 const reportsService = {
 	generateCronExpression: (interval, startDate) => {
@@ -186,11 +187,7 @@ const reportsService = {
 		return ObjectValidator(getMetaDataValidations, params)
 			.then(() => reportsService.modifyQueryIfPnp(params))
 			.then(params =>
-				request({
-					uri: `${CC.ANALYTICS_API_ROOT}${CC.ANALYTICS_METAINFO_URL}`,
-					json: true,
-					qs: params
-				})
+				getMetaInfo(params)
 			)
 			.then(async response => {
 				const { code = -1, data } = response;
