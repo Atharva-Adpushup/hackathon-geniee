@@ -13,6 +13,8 @@ const publisher = new Publisher(queueConfig);
 
 module.exports = {
 	publish: function(paramConfig) {
+		console.log('LOG:: Publishing from transactionLog', paramConfig);
+
 		return publishJobs(publisher, options, paramConfig)
 			.then(console.log)
 			.catch(console.log);

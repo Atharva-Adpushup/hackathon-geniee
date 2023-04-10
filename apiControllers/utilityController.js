@@ -11,7 +11,9 @@ router.get('/syncCdn', (req, res) => {
 
 	const siteIds = [];
 	const isAllSites = sites === 'all';
-
+	console.log('site Sync Requested for:', sites);
+	const ipAddress = req.header('x-forwarded-for') || req.socket.remoteAddress;
+	console.log('ipAddress:', ipAddress);
 	if (!isAllSites) {
 		const sitesArr = sites && sites.split(',');
 

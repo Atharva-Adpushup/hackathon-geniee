@@ -16,6 +16,8 @@ const publisher = new Publisher(queueConfig);
 
 module.exports = {
 	publish(paramConfig) {
+		console.log('LOG:: Publishing from ampScript', paramConfig);
+
 		return publishJobs(publisher, options, paramConfig)
 			.then(console.log)
 			.catch(console.log);

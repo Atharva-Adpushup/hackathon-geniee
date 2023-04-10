@@ -15,6 +15,8 @@ var Promise = require('bluebird'),
 
 module.exports = {
 	publish: function(paramConfig) {
+		console.log('LOG:: Publishing from genieeAdSync', paramConfig);
+
 		return publishJobs(publisher, options, paramConfig)
 			.then(console.log)
 			.catch(console.log);
