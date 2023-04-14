@@ -326,6 +326,9 @@ module.exports = {
 	},
 	DEFAULT_AD_NETWORK_SETTINGS: {
 		revenueShare: 10,
+		adUnitTypeRevShares: {
+            "6": 10
+        },
 		negate: ['adsense']
 	},
 	PROXY_DOCUMENT_DOMAIN: 'app.adpushup.com',
