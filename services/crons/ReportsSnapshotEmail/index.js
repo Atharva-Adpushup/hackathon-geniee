@@ -284,7 +284,7 @@ function startEmailSnapshotsService() {
 				throw new Error('timestamp not found');
 			}
 			if (config.environment.HOST_ENV === 'production' && oldTimestamp === lastRunTime) {
-				return Promise.resolve('Old timestamp and new timestamp are same, no new reporting data');
+				throw new Error('Old timestamp and new timestamp are same, no new reporting data');
 			}
 			console.log({ lastRunTime, oldTimestamp });
 			oldTimestamp = lastRunTime;

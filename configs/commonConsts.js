@@ -552,7 +552,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		ampAplite: 'ampaplt::',
 		ampPnp: 'ampapnp::',
 		requestLogger: 'reql::',
-		lastRunInfoDoc: 'config::apnd:last-run-info',
+		lastRunInfoDoc: 'new:config::apnd:last-run-info',
 		sizeMapppingConfig: 'data::sizeMapping',
 		activeBidderAdaptersList: 'data::activeBidderAdapters',
 		selectiveRolloutActiveBidderAdaptersList: 'data::selectiveRollout:activeBidderAdapters',
