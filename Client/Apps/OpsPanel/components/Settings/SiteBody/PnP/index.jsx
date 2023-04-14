@@ -10,7 +10,7 @@ import CustomButton from '../../../../../../Components/CustomButton/index';
 import {
 	REFRESH_RATE_ENTRIES,
 	UNFILLED_REFRESH_RATE_ENTRIES,
-	PNP_REFRESH_TYPES,
+	PNP_REPLACE_TYPES,
 	PNP_AD_UNIT_OPERATIONS,
 	adUnitsData,
 	adUnitsHeaders
@@ -605,10 +605,10 @@ const PnP = (props = {}) => {
 				/>
 			</div>
 			<div className="refresh-rate" style={{ display: 'flex' }}>
-				<p className="u-text-bold u-margin-b4">Refresh Type</p>
+				<p className="u-text-bold u-margin-b4">Replace Type</p>
 				<SelectBox
 					selected={refreshType}
-					options={PNP_REFRESH_TYPES}
+					options={PNP_REPLACE_TYPES}
 					onSelect={onSelect}
 					id="select-entry"
 					title="Select Entry"
