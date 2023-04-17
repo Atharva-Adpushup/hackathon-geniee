@@ -1,6 +1,5 @@
 import axios from 'axios';
 import config from '../config/config';
-import { API_MONITORING } from '../../configs/config';
 
 const { API_ROOT } = config;
 
@@ -9,8 +8,9 @@ const axiosInstance = axios.create({
 	withCredentials: true
 });
 
-const apiMonitoringReqInterceptorHandler = req => {
+const apiMonitoringReqInterceptorHandler = (req, globalClientConfig) => {
 	const { url } = req;
+	const { API_MONITORING } = globalClientConfig;
 	// replace params to get the api endpoint
 	const sanitizedURL = url.replace(/\?.*/, '');
 
@@ -23,9 +23,9 @@ const apiMonitoringReqInterceptorHandler = req => {
 
 	return req;
 };
-axiosInstance.interceptors.request.use(apiMonitoringReqInterceptorHandler);
 
-const apiMonitoringErrorResInterceptorHandler = res => {
+const apiMonitoringErrorResInterceptorHandler = (res, globalClientConfig) => {
+	const { API_MONITORING } = globalClientConfig;
 	// only for req that needs to be monitored
 	if (res.config && res.config.meta && res.config.meta.requestStartedAt) {
 		// time difference between the request start and response received
@@ -40,17 +40,25 @@ const apiMonitoringErrorResInterceptorHandler = res => {
 				err: errResponse
 			});
 		}
-		// .then(() => console.log('Log Written'))
-		// .catch(error => console.log(`Log written failed : ${error}`));
 	} else {
 		throw res;
 	}
 };
-axiosInstance.interceptors.response.use(
-	// success
-	res => res,
-	// error
-	apiMonitoringErrorResInterceptorHandler
-);
+
+axiosInstance
+	.get('/getGlobalClientConfig')
+	.then(response => response.data)
+	.then(resp => {
+		const { globalClientConfig } = resp.data;
+		axiosInstance.interceptors.request.use(req =>
+			apiMonitoringReqInterceptorHandler(req, globalClientConfig)
+		);
+		axiosInstance.interceptors.response.use(
+			// success
+			res => res,
+			// error
+			res => apiMonitoringErrorResInterceptorHandler(res, globalClientConfig)
+		);
+	});
 
 export default axiosInstance;

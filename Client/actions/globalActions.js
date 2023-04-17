@@ -6,7 +6,8 @@ import {
 	URL_REPORTS_ACTIONS,
 	HB_ANALYTICS_ACTIONS,
 	UI_ACTIONS,
-	NETWORK_WIDE_RULES_ACTIONS
+	NETWORK_WIDE_RULES_ACTIONS,
+	GLOBAL_APP_CONFIG_ACTIONS
 } from '../constants/global';
 import axiosInstance from '../helpers/axiosInstance';
 import { errorHandler } from '../helpers/commonFunctions';
@@ -39,6 +40,10 @@ const fetchGlobalData = () => dispatch =>
 			dispatch({
 				type: NETWORK_WIDE_RULES_ACTIONS.FETCH_NETWORK_WIDE_RULES,
 				data: data.networkWideHBRules
+			});
+			dispatch({
+				type: GLOBAL_APP_CONFIG_ACTIONS.UPDATE_GLOBAL_APP_CONFIG,
+				data: data.globalClientConfig
 			});
 		})
 		.catch(err => errorHandler(err));

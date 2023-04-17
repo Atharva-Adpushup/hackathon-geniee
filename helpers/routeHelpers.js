@@ -1283,6 +1283,22 @@ async function addActiveProductsToMeta(metaData = {}) {
 	return updatedMetaData;
 }
 
+function getGlobalClientConfig() {
+	return (
+		couchbase
+			.connectToAppBucket()
+			// eslint-disable-next-line no-shadow
+			.then(appBucket => appBucket.getAsync(docKeys.globalClientAppConfig, {}))
+			.then(docWithCase => {
+				const { value } = docWithCase;
+				return value;
+			})
+			.catch(err => {
+				console.log(err, 'err');
+				return {};
+			})
+	);
+}
 module.exports = {
 	verifyOwner,
 	errorHandler,
@@ -1317,5 +1333,6 @@ module.exports = {
 	getAllAccountsDetailWithTheirAccountManagerFromHubspot,
 	udpateApConfigIfFlyingCarpetAdEnabledInApTagOrLayoutEditorAd,
 	getActiveProductFromCouchbase,
-	addActiveProductsToMeta
+	addActiveProductsToMeta,
+	getGlobalClientConfig
 };

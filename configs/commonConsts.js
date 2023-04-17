@@ -562,7 +562,8 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		networkWideHBRules: 'ntwkwide::rules',
 		paymentHistoryDoc: 'tplt::last3months',
 		pnpRefresh: 'apnp::',
-		topSitesByRevenue: 'data::topsites'
+		topSitesByRevenue: 'data::topsites',
+		globalClientAppConfig: 'config::client-globals'
 	},
 	AMP_REFRESH_INTERVAL: 30,
 	tagManagerInitialDoc: {

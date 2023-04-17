@@ -9,12 +9,14 @@ const mapStateToProps = state => {
 		},
 		user: {
 			data: { sites: userSitesInfo }
-		}
+		},
+		globalClientConfig
 	} = state.global;
 	return {
 		userSites: sites.fetched ? sites.data : {},
 		userSitesInfo,
-		reportingDelayPopup
+		reportingDelayPopup,
+		globalClientConfig: globalClientConfig.data
 	};
 };
 const mapDispatchToProps = () => {
