@@ -37,6 +37,19 @@ class UserChange extends Component {
 		}
 	}
 
+	static getDerivedStateFromProps(props, state) {
+		const { findUsers } = props;
+		const { fetched, data: users } = findUsers;
+
+		if (fetched) {
+			return {
+				...state,
+				users
+			};
+		}
+		return state;
+	}
+
 	onValChange = e => {
 		this.setState({
 			[e.target.name]: e.target.value
