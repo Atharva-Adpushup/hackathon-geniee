@@ -646,10 +646,10 @@ const ACTION_KEY_OPTIONS = [
 
 const WEEKEND = ['saturday', 'sunday'];
 const WEEKDAY = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
-const PNP_REFRESH_TYPES = [
-	{ name: 'Active View Refresh', value: 'activeView' },
-	{ name: 'Active Tab Refresh', value: 'activeTab' },
-	{ name: 'Background Refresh', value: 'bgRefresh' }
+const PNP_REPLACE_TYPES = [
+	{ name: 'Active View Replace', value: 'activeView' },
+	{ name: 'Active Tab Replace', value: 'activeTab' },
+	{ name: 'Background Replace', value: 'bgRefresh' }
 ];
 
 const GA_ACCESS_EMAIL_OPTIONS = [
@@ -900,7 +900,7 @@ export {
 	GA_ACCESS_EMAIL_OPTIONS,
 	GA_VERSION_OPTIONS,
 	UNFILLED_REFRESH_RATE_ENTRIES,
-	PNP_REFRESH_TYPES,
+	PNP_REPLACE_TYPES,
 	AP_LIGHT_AD_UNIT_OPERATIONS,
 	PNP_AD_UNIT_OPERATIONS,
 	POWERED_BY_BANNER,
