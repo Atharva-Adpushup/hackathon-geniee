@@ -11,6 +11,7 @@ import notifications from './notifications';
 import tools from './tools';
 import associatedAccounts from './associatedAccounts';
 import findUsers from './findUsers';
+import globalClientConfig from './globalClientConfig';
 
 export default combineReducers({
 	user,
@@ -24,5 +25,6 @@ export default combineReducers({
 	networkWideRules,
 	tools,
 	associatedAccounts,
-	findUsers
+	findUsers,
+	globalClientConfig
 });

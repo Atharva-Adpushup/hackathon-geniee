@@ -29,7 +29,8 @@ const {
 	checkParams,
 	sendDataToAuditLogService,
 	getAssociatedAccountsWithUser,
-	addActiveProductsToMeta
+	addActiveProductsToMeta,
+	getGlobalClientConfig
 } = require('../helpers/routeHelpers');
 
 const router = express.Router();
@@ -160,7 +161,8 @@ router
 					getNetworkWideHBRules(),
 					// get logged in user's details in case of switched user
 					originalEmail && userModel.getUserByEmail(originalEmail) || Promise.resolve(''),
-					async (networkConfig, sites, networkWideHBRules, originalUser) => {
+					getGlobalClientConfig(),
+					async (networkConfig, sites, networkWideHBRules, originalUser, globalClientConfig) => {
 						try {
 							const userEmail = req.user.originalEmail || req.user.email;
 							// This is for AdOps/Account Managers to prevent unAuth access to other accounts
@@ -201,7 +203,8 @@ router
 									networkConfig,
 									networkWideHBRules,
 									associatedAccounts,
-									sites
+									sites,
+									globalClientConfig
 								});
 							});
 						} catch (err) {
@@ -426,6 +429,19 @@ router
 				)
 			)
 			.catch(err => errorHandler(err, res, httpStatus.INTERNAL_SERVER_ERROR));
+	})
+	.get('/getGlobalClientConfig', (req, res) => {
+		return getGlobalClientConfig()
+		.then(globalClientConfig =>
+			sendSuccessResponse(
+				{
+					message: 'Operation successful',
+					globalClientConfig
+				},
+				res
+			)
+		)
+		.catch(err => errorHandler(err, res, httpStatus.INTERNAL_SERVER_ERROR));
 	});
 
 module.exports = router;

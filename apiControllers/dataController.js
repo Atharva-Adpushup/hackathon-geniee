@@ -1,5 +1,6 @@
 const express = require('express');
 const _ = require('lodash');
+const request = require('request-promise');
 
 const userModel = require('../models/userModel');
 const siteModel = require('../models/siteModel');
@@ -413,6 +414,50 @@ router
 							debugData: errorLogToBeTracked
 						});
 					}
+				}
+			})
+			.then(() =>
+				sendSuccessResponse(
+					{
+						message: 'Log Written'
+					},
+					res
+				)
+			)
+			.catch(() =>
+				sendSuccessResponse(
+					{
+						message: `Log Written Failed`
+					},
+					res
+				)
+			)
+	)
+	.post('/createNetworkLog', (req, res) =>
+		checkParams(['url', 'err'], req, 'post')
+			.then(async () => {
+				const { origin, referer } = req.headers;
+				const { email, originalEmail } = req.user;
+				const { err, url } = req.body;
+
+				if (config.environment.HOST_ENV === 'production') {
+					const {
+						MONITORING_API_ENDPOINTS: { TITLE, CHANNELS },
+						SLACK_ENDPOINT
+					} = config;
+					request({
+						method: 'POST',
+						uri: SLACK_ENDPOINT,
+						json: true,
+						body: {
+							channels: CHANNELS,
+							msg: `
+								*${TITLE}*\n*Error*: ${err}\n*URL*: ${origin}${url}\n*Email*: ${email}\n*Origninal Email*: ${originalEmail}\n*Date*: ${new Date()}\n*referer*:${referer}
+							`
+						}
+					}).catch(error => {
+						throw new Error(`Error in sending alert:${error}`);
+					});
 				}
 			})
 			.then(() =>

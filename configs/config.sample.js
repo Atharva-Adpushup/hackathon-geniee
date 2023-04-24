@@ -402,8 +402,7 @@ module.exports = {
 		supportMails: 'abhishek.sontakke@adpushup.com'
 	},
 	googleSheetCreds: '',
-	IS_GAM_API_NOT_WORKING: false,
-	FORCE_REPORTING_DELAY_POPUP: false,
+	SLACK_ENDPOINT: 'https://common-azure-function.azurewebsites.net/api/publish'
 };
 
 /*
