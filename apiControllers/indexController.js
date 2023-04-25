@@ -138,7 +138,10 @@ async function getReportsMetaData(params) {
 				return {};
 			}
 		})
-		.catch(err => {});
+		.catch(err => {
+			console.log(err);
+			return {};
+		});
 }
 
 // Set user session data and redirects to relevant screen based on provided parameters
