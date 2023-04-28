@@ -26,7 +26,8 @@ const getSites = async (timeStamp) => {
 	FROM AppBucket site
 	WHERE Meta().id LIKE "site::%"
 	AND site.dateCreated >= ${timeStamp}
-	AND site.apConfigs.disableAutoAdpushupLabel is NOT VALUED OR site.apConfigs.disableAutoAdpushupLabel = false`);
+	AND (site.apConfigs.disableAutoAdpushupLabel is NOT VALUED OR site.apConfigs.disableAutoAdpushupLabel = false) 
+    AND site.dataFeedActive = true`);
 
 	const siteData = await couchbase.queryViewFromAppBucket(docQuery);
 
