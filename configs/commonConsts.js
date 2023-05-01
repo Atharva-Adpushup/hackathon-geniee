@@ -67,6 +67,16 @@ const n1qlQueryTemplates = {
 							meta(_site).id LIKE 'site::%'
 							AND _site.apps IS VALUED
 							AND _site.apps.ampScript == true`,
+	AMP_SELECTIVE_ROLLOUT_SITES_N1QL: `SELECT
+							RAW _site.siteId
+						FROM
+							AppBucket _site
+						WHERE
+							meta(_site).id LIKE 'site::%'
+							AND _site.apps IS VALUED
+							AND _site.apps.ampScript == true
+							AND _site.apConfigs IS VALUED
+							AND _site.apConfigs.isAmpSelectiveRolloutEnabled == true`,
 	FIRST_S2S_BIDDER_SITE_TEMPLATE: `SELECT _hbdc.siteId
 										FROM
 											AppBucket _hbdc
@@ -327,8 +337,8 @@ module.exports = {
 	DEFAULT_AD_NETWORK_SETTINGS: {
 		revenueShare: 10,
 		adUnitTypeRevShares: {
-            "6": 10
-        },
+			'6': 10
+		},
 		negate: ['adsense']
 	},
 	PROXY_DOCUMENT_DOMAIN: 'app.adpushup.com',
@@ -557,6 +567,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		activeBidderAdaptersList: 'data::activeBidderAdapters',
 		selectiveRolloutActiveBidderAdaptersList: 'data::selectiveRollout:activeBidderAdapters',
 		ampActiveBidderAdaptersList: 'data::amp:activeBidderAdapters',
+		ampSelectiveRolloutActiveBidderAdaptersList: 'data::ampSelectiveRollout:activeBidderAdapters',
 		freqReports: 'freq:rprt::',
 		hbaQueryFrequencyDoc: 'hbaq::',
 		networkWideHBRules: 'ntwkwide::rules',
@@ -815,6 +826,10 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 			'__SITES_QUERY__',
 			n1qlQueryTemplates.AMP_SITES_N1QL
 		),
+		AMP_SELECTIVE_ROLLOUT_ACTIVE_BIDDER_ADAPTERS_N1QL: n1qlQueryTemplates.ACTIVE_BIDDER_ADAPTERS_N1QL_TEMPLATE.replace(
+			'__SITES_QUERY__',
+			n1qlQueryTemplates.AMP_SELECTIVE_ROLLOUT_SITES_N1QL
+		),
 		ACTIVE_BIDDER_ADAPTERS_BY_SITE_N1QL: `SELECT DISTINCT RAW activeBidderAdapters
 								FROM
 									AppBucket _apNetworks
@@ -872,8 +887,8 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 	},
 	HUBSPOT: {
 		OPERATOR: {
-			HAS_PROPERTY: "HAS_PROPERTY",
-			EQUAL:"EQ"
+			HAS_PROPERTY: 'HAS_PROPERTY',
+			EQUAL: 'EQ'
 		}
 	},
 	AUDIT_LOGS_ACTIONS: {
@@ -1771,11 +1786,11 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		});
 	})();	
 	`,
-    SCRIPT_TYPE : {
-        ADPUSHUPJS : 'adpushupjs',
-        DVC: 'dvc',
-        AMP: 'ampScript'
-    },
+	SCRIPT_TYPE: {
+		ADPUSHUPJS: 'adpushupjs',
+		DVC: 'dvc',
+		AMP: 'ampScript'
+	},
 	URL_REPORTING_REPORT_CONFIG: 'config::rprt:urlReporting',
 	HB_ANALYTICS_REPORT_CONFIG: 'config::rprt:hbAnalytics',
 	OPERATIONS_REPORT_CONFIG: 'config::rprt:operations',
