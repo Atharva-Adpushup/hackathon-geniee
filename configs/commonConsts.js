@@ -1350,9 +1350,10 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		var sendDataToLoggerService = window.adpushup.utils.sendDataToLoggerService.bind(
 			window.adpushup.utils
 		);
+		
+		var adpConfig = window.adpushup.config || {};
+
 		var sendLogToApLogger = function (subEvent, data) {
-			var adp = window.adpushup || {};
-			var adpConfig = adp.config || {};
 			var logData = {
 				packetId: adpConfig.packetId,
 				subEvent
@@ -1360,7 +1361,15 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 			Object.assign(logData, data);
 			sendDataToLoggerService(LOG_EVENT, logData);
 		};
-		sendLogToApLogger('PNP_TEMPLATE_INIT');
+		
+		var sendAmpPnpDebugLogToApLogger = function(subEvent, data) {
+			if (adpConfig.debugAmpPnp) {
+				sendLogToApLogger(subEvent, data);
+			}
+		}
+		
+		sendAmpPnpDebugLogToApLogger('PNP_TEMPLATE_INIT')
+	
 		var PROXY_SITE_ID = window.pnpRefresh.pnpSiteId;
 		// var flag = false;
 		window.pnpRefresh.adUnitState = {};
@@ -1465,7 +1474,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 							}
 							existingAdElement.appendChild(apTagDiv, existingAdElement);
 							delete window.pnpRefresh.adUnitState[slot.getSlotElementId()];
-							sendLogToApLogger('REPLACED_SLOT', {
+							sendAmpPnpDebugLogToApLogger('REPLACED_SLOT', {
 								adUnit: adUnit,
 								apTagId: apTagId
 							});
@@ -1701,7 +1710,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 				// At SlotRenderEnded, if isEmpty is true then replace the slot right away otherwise create a state for adUnit which will create viewability data
 				googletag.pubads().addEventListener('slotRenderEnded', function (e) {
 					log('SlotRenderEnded fired for ' + e.slot.getAdUnitPath());
-					sendLogToApLogger('EVENT_SLOT_RENDER_ENDED', {
+					sendAmpPnpDebugLogToApLogger('EVENT_SLOT_RENDER_ENDED', {
 						adUnit: e.slot.getAdUnitPath()
 					});
 					var adUnitPath = e.slot.getAdUnitPath();
@@ -1714,7 +1723,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 					var slotId = e.slot.getSlotElementId();
 					var refreshEligible = checkRefreshEligible(e.slot, e.sourceAgnosticLineItemId, adUnit);
 					if (refreshEligible) {
-						sendLogToApLogger('REFRESH_ELIGIBLE', {
+						sendAmpPnpDebugLogToApLogger('REFRESH_ELIGIBLE', {
 							adUnit: e.slot.getAdUnitPath()
 						});
 						log('Refresh eligible for adunit', adUnit);
@@ -1749,7 +1758,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 							}
 						});
 					} else {
-						sendLogToApLogger('REFRESH_UNELIGIBLE', {
+						sendAmpPnpDebugLogToApLogger('REFRESH_UNELIGIBLE', {
 							adUnit: e.slot.getAdUnitPath()
 						});
 						log('Refresh not eligible for adunit', adUnit);
