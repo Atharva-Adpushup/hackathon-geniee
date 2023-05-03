@@ -43,6 +43,7 @@ class Settings extends Component {
 			cmpAvailable = false,
 			mergeReport = false,
 			videoAdsDashboard = false,
+			forceRenderPostBid = false,
 			outbrainDisabled = OUTBRAIN_DISABLED.DEFAULT_VALUES,
 			siteLevelRefreshType = SITE_LEVEL_REFRESH_TYPE[0].value,
 			isWeeklyEmailReportsEnabled = false,
@@ -77,6 +78,7 @@ class Settings extends Component {
 			cmpEnabled: !cmpAvailable,
 			mergeReport,
 			videoAdsDashboard,
+			forceRenderPostBid,
 			selectedOutbrainDisabledTypes: [...selectedOutbrainDisabledTypes],
 			isWeeklyEmailReportsEnabled,
 			isDailyEmailReportsEnabled,
@@ -291,6 +293,7 @@ class Settings extends Component {
 			cmpEnabled,
 			mergeReport,
 			videoAdsDashboard,
+			forceRenderPostBid,
 			selectedOutbrainDisabledTypes,
 			siteLevelRefreshType,
 			isWeeklyEmailReportsEnabled,
@@ -357,6 +360,7 @@ class Settings extends Component {
 				cmpAvailable: !cmpEnabled,
 				mergeReport,
 				videoAdsDashboard,
+				forceRenderPostBid,
 				outbrainDisabled,
 				isWeeklyEmailReportsEnabled,
 				isDailyEmailReportsEnabled,
@@ -423,6 +427,7 @@ class Settings extends Component {
 			cmpEnabled,
 			mergeReport,
 			videoAdsDashboard,
+			forceRenderPostBid,
 			selectedOutbrainDisabledTypes,
 			isDailyEmailReportsEnabled,
 			isWeeklyEmailReportsEnabled,
@@ -596,6 +601,21 @@ class Settings extends Component {
 					name={`videoAdsDashboard-${siteId}-${siteDomain}`}
 					id={`js-videoAdsDashboard-switch-${siteId}-${siteDomain}`}
 				/>
+				<CustomToggleSwitch
+					labelText="Run Header Bidding Only"
+					className="u-margin-b4 negative-toggle"
+					checked={forceRenderPostBid}
+					onChange={this.handleToggle}
+					layout="horizontal"
+					size="m"
+					on="Yes"
+					off="No"
+					defaultLayout
+					// disabled AdX
+					name={`forceRenderPostBid-${siteId}-${siteDomain}`}
+					id={`js-forceRenderPostBid-switch-${siteId}-${siteDomain}`}
+				/>
+
 				<div className="outbrain-disabled">
 					<h1>Outbrain Disabled</h1>
 					<MultiSelect
