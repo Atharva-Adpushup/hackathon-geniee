@@ -8,5 +8,20 @@
             "seller_type": "PUBLISHER",
             "is_confidential": 0
         }
+    },
+    {
+        "isEnabled":true,
+        "data":{
+            "name": "Eleven Internet Services LLP",
+            "domain": "pubninja.com",
+            "seller_id": "2a8e9028e23639ddba0ee3f4a56ebbb1",
+            "seller_type": "PUBLISHER",
+            "is_confidential": 0
+        }
     }
+    
 ]
+
+
+        
+    
