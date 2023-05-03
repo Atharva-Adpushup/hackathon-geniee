@@ -28,7 +28,8 @@ const {
 } = require('../services/genieeAdSyncService/cdnSyncService/commonFunctions');
 const {
 	isValidThirdPartyDFPAndCurrency,
-	removeFormatWiseParamsForAMP
+	removeFormatWiseParamsForAMP,
+	getFloorEngineConfigFromCB
 } = require('../helpers/commonFunctions');
 const utils = require('../helpers/utils');
 const CC = require('../configs/commonConsts');
@@ -343,7 +344,7 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 			const gptSraDisabled = !!(site.get('apConfigs') && site.get('apConfigs').gptSraDisabled);
 			const lineItemTypes = site.get('lineItemTypes') || [];
 
-			const setAllConfigs = function(prebidAndAdsConfig) {
+			const setAllConfigs = async function(prebidAndAdsConfig) {
 				const apConfigs = {
 					...defaultApConfigValues,
 					...site.get('apConfigs')
@@ -457,6 +458,16 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 						return true;
 					});
 				});
+				if (apConfigs?.floorPriceConfig?.enabled) {
+					const floorEngineConfigDoc = await getFloorEngineConfigFromCB();
+					if (floorEngineConfigDoc.globalFloorsMapping)
+						apConfigs.floorPriceConfig.globalFloorsMapping =
+							floorEngineConfigDoc.globalFloorsMapping;
+					else
+						throw new Error(
+							"FloorEngineConfig Doc Couchbase Error: Can't find globalFloorsMapping"
+						);
+				}
 
 				const output = { apConfigs, prebidConfig };
 				if (apps.apLite) output.apLiteConfig = apLiteConfig;

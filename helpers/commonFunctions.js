@@ -841,6 +841,13 @@ const Promise = require('bluebird'),
 		const pageGroup = docIdPartValue;
 
 		return { pageGroup, platform };
+	},
+	getFloorEngineConfigFromCB = () => {
+		return couchbase
+			.connectToAppBucket()
+			.then(appBucket => appBucket.getAsync(commonConsts.docKeys.floorEngine))
+			.then(({ value }) => value || {})
+			.catch(err => Promise.resolve({}));
 	};
 
 module.exports = {
@@ -875,5 +882,6 @@ module.exports = {
 	getMandatoryAdsTxtEntrySnippet,
 	getNetworkWideHBRules,
 	removeFormatWiseParamsForAMP,
-	getPageGroupNameAndPlatformFromChannelDoc
+	getPageGroupNameAndPlatformFromChannelDoc,
+	getFloorEngineConfigFromCB
 };
