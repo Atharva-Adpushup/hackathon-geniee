@@ -170,7 +170,7 @@ class MgDeals extends Component {
 		const year = selectedYear;
 
 		axiosInstance
-			.get(`/payment/getAllMgDeals/${month}/${year}`)
+			.get(`/payment/getAllMgDeals`, { params: { month, year } })
 			.then(response => {
 				const { data: responseData } = response;
 				const { data: mgDealsData } = responseData;

@@ -1,12 +1,19 @@
 const express = require('express');
-const moment = require('moment');
 const { errorHandler } = require('../helpers/routeHelpers');
 
 const router = express.Router();
-const { sendSuccessResponse, sendErrorResponse } = require('../helpers/commonFunctions');
+const {
+	sendSuccessResponse,
+	sendErrorResponse,
+	getMonthStartDate,
+	getMonthEndDate
+} = require('../helpers/commonFunctions');
 const HTTP_STATUSES = require('../configs/httpStatusConsts');
 const { sendDataToAuditLogService } = require('../helpers/routeHelpers');
 const { sendEmail } = require('../helpers/queueMailer');
+
+const { fetchReports } = require('../apiServices/reportsService');
+const { generateDiscrepancyReport } = require('../apiServices/paymentReconciliationService');
 
 const cbQuery = require('../apiServices/paymentServices');
 const {
@@ -30,26 +37,16 @@ const getEmailBody = ({ type, email, originalEmail }) => {
 			subject = 'MG Deal Deleted';
 			body = `MG deal has been deleted for ${email} by ${originalEmail}`;
 			break;
+		default:
+			break;
 	}
 	return { body, subject };
 };
-
-const { getReports } = require('../apiServices/reportsService');
 
 const getQuarter = date => {
 	const month = Number(date.getMonth());
 	return parseInt(month / 3, 0) + 1;
 };
-
-const getMonthStartDate = date =>
-	moment(date)
-		.startOf('month')
-		.format('YYYY-MM-DD');
-
-const getMonthEndDate = date =>
-	moment(date)
-		.endOf('month')
-		.format('YYYY-MM-DD');
 
 const getSelectedDurationMgData = (mgDealsData, duration) => {
 	const { quarter, year } = duration;
@@ -87,7 +84,7 @@ const getGlobalReportingData = date => {
 		siteId: ''
 	};
 
-	return getReports(reportConfig);
+	return fetchReports(reportConfig);
 };
 
 const processMgDealsData = async (mgDealsData, duration) => {
@@ -277,8 +274,8 @@ router
 			})
 			.catch(err => errorHandler(err, res, HTTP_STATUSES.INTERNAL_SERVER_ERROR));
 	})
-	.get('/getAllMgDeals/:month/:year', (req, res) => {
-		const { month, year } = req.params;
+	.get('/getAllMgDeals', (req, res) => {
+		const { month, year } = req.query;
 		cbQuery
 			.getAllMgDeals()
 			.then(async data => {
@@ -333,14 +330,29 @@ router
 					queue: 'MAILER',
 					data: {
 						to: supportMails,
-						body: body,
-						subject: subject
+						body,
+						subject
 					}
 				});
 			})
 			.catch(err => {
 				errorHandler(err, res, HTTP_STATUSES.INTERNAL_SERVER_ERROR);
 			});
+	})
+	.get('/getPaymentDiscrepancy', async (req, res) => {
+		const { month, year } = req.query || {};
+		if (!month || !year) {
+			return errorHandler('err', res, HTTP_STATUSES.BAD_REQUEST);
+		}
+
+		try {
+			const date = new Date(`${year}-${month}`);
+			const discrepancyConfig = { reportConfig: { date, month, year } };
+			const data = await generateDiscrepancyReport(discrepancyConfig);
+			return sendSuccessResponse(data, res);
+		} catch (e) {
+			return errorHandler('err', res, HTTP_STATUSES.INTERNAL_SERVER_ERROR);
+		}
 	});
 
 module.exports = router;

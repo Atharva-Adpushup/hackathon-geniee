@@ -12,6 +12,7 @@ import authService from '../../../../services/authService';
 import BidderRules from './NetworkWideHBRules';
 import InventoryTabContainer from '../../containers/InventoryTabContainer';
 import MgDeals from './MgDeals';
+import PaymentDiscrepancy from './PaymentReconciliation/PaymentDiscrepancy';
 
 class Tools extends Component {
 	constructor(props) {
@@ -19,7 +20,7 @@ class Tools extends Component {
 		this.state = {
 			activeKey: TOOLS_IDENTIFIERS.BACKUP_ADS,
 			dashboardNotificationAccess: false,
-			mgDealsDashboardAccess: false // Access controlled
+			paymentReconciliation: false // Access controlled
 		};
 	}
 
@@ -44,20 +45,20 @@ class Tools extends Component {
 		}
 	};
 
-	checkMgDealsDashboardAccess = () => {
+	checkPaymentReconciliationAccess = () => {
 		const { user } = this.props;
 		const { email, originalEmail } = authService.getTokenPayloadWithoutVerification();
 		if (
-			(!originalEmail && user.mgDealsDashboardAccess) ||
-			(originalEmail === email && user.mgDealsDashboardAccess)
+			(!originalEmail && user.paymentReconciliation) ||
+			(originalEmail === email && user.paymentReconciliation)
 		) {
-			this.setState({ mgDealsDashboardAccess: true });
+			this.setState({ paymentReconciliation: true });
 		}
 	};
 
 	componentDidMount = () => {
 		this.checkStatus();
-		this.checkMgDealsDashboardAccess();
+		this.checkPaymentReconciliationAccess();
 	};
 
 	renderContent = () => {
@@ -134,11 +135,18 @@ class Tools extends Component {
 				);
 			case TOOLS_IDENTIFIERS.MG_DEAL:
 				return <MgDeals emailSitesMapping={emailSitesMapping} />;
+			case TOOLS_IDENTIFIERS.PAYMENT_DISCREPANCY:
+				return (
+					<PaymentDiscrepancy
+						showNotification={showNotification}
+						emailSitesMapping={emailSitesMapping}
+					/>
+				);
 		}
 	};
 
 	render() {
-		const { activeKey, dashboardNotificationAccess, mgDealsDashboardAccess } = this.state;
+		const { activeKey, dashboardNotificationAccess, paymentReconciliation } = this.state;
 
 		return (
 			<div className="u-padding-v4">
@@ -179,12 +187,19 @@ class Tools extends Component {
 								) : (
 									<></>
 								)}
-								{mgDealsDashboardAccess ? (
+								{paymentReconciliation ? (
 									<NavItem eventKey={TOOLS_IDENTIFIERS.MG_DEAL}>Mg Deal</NavItem>
 								) : (
 									<></>
 								)}
-								{/* <NavItem eventKey={TOOLS_IDENTIFIERS.REGEX_GENERATION}>Regex Generation</NavItem> */}
+
+								{paymentReconciliation ? (
+									<NavItem eventKey={TOOLS_IDENTIFIERS.PAYMENT_DISCREPANCY}>
+										Payment Discrepancy
+									</NavItem>
+								) : (
+									<></>
+								)}
 							</Nav>
 						</Col>
 						<Col sm={10}>

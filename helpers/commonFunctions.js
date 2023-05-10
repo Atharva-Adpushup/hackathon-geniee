@@ -848,7 +848,15 @@ const Promise = require('bluebird'),
 			.then(appBucket => appBucket.getAsync(commonConsts.docKeys.floorEngine))
 			.then(({ value }) => value || {})
 			.catch(err => Promise.resolve({}));
-	};
+	},
+	getMonthStartDate = date =>
+		moment(date)
+			.startOf('month')
+			.format('YYYY-MM-DD'),
+	getMonthEndDate = date =>
+		moment(date)
+			.endOf('month')
+			.format('YYYY-MM-DD');
 
 module.exports = {
 	queryResultProcessing,
@@ -883,5 +891,7 @@ module.exports = {
 	getNetworkWideHBRules,
 	removeFormatWiseParamsForAMP,
 	getPageGroupNameAndPlatformFromChannelDoc,
-	getFloorEngineConfigFromCB
+	getFloorEngineConfigFromCB,
+	getMonthEndDate,
+	getMonthStartDate
 };
