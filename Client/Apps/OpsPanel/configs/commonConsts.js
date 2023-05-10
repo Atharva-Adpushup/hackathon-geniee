@@ -322,7 +322,8 @@ const TOOLS_IDENTIFIERS = {
 	DASHBOARD_NOTIFICATIONS: 'DASHBOARD_NOTIFICATIONS',
 	BIDDER_RULES: 'BIDDER_RULES',
 	INVENTORY: 'INVENTORY',
-	MG_DEAL: 'MG_DEAL'
+	MG_DEAL: 'MG_DEAL',
+	PAYMENT_DISCREPANCY: 'PAYMENT_DISCREPANCY'
 };
 
 const ADS_TXT_LIVE_SITES_ENTRIES = [
@@ -860,6 +861,87 @@ const FILTER_KEY_VALUE_MAPPING = {
 	dfpAdunit: 'Ad Unit'
 };
 
+const DISCREPANCY_TABLE_COLUMNS = [
+	{
+		Header: 'Site Id',
+		accessor: 'siteId'
+	},
+	{
+		Header: 'Site Domain',
+		accessor: 'domain',
+		width: 200
+	},
+	{
+		Header: 'Console Email',
+		accessor: 'email',
+		width: 120
+	},
+	{
+		Header: 'Mg Type',
+		accessor: 'mgType'
+	},
+	{
+		Header: 'MG Revenue',
+		accessor: 'mgRevenue'
+	},
+	{
+		Header: 'Console Revenue',
+		accessor: 'consoleRevenue',
+		width: 120
+	},
+	{
+		Header: 'Partner Panel Revenue',
+		accessor: 'partnerRevenue',
+		width: 200
+	},
+	{
+		Header: 'Console vs Partner',
+		accessor: 'consoleVsPartnerDifference',
+		width: 170
+	},
+	{
+		Header: 'Console vs Partner Panel %',
+		accessor: 'consoleVsPartnerDifferencePercentage',
+		width: 200
+	},
+	{
+		Header: 'Partner Panel vs MG Discrepancy',
+		accessor: 'mgVsPartnerDifference',
+		width: 270
+	},
+	{
+		Header: 'Partner Panel vs MG Discrepancy %',
+		accessor: 'mgVsPartnerDifferencePercentage',
+		width: 270
+	},
+	{
+		Header: 'Account Owner',
+		accessor: 'accountManagerEmail',
+		width: 200
+	}
+];
+
+const PAYMENT_DISCREPANCY_CSV_PROPERTIES = [
+	{ keyName: 'siteId', headerName: 'Site Id' },
+	{ keyName: 'domain', headerName: 'Site Domain' },
+	{ keyName: 'email', headerName: 'Email' },
+	{ keyName: 'mgType', headerName: 'MG Type' },
+	{ keyName: 'mgRevenue', headerName: 'MG Revenue' },
+	{ keyName: 'consoleRevenue', headerName: 'Console Revenue' },
+	{ keyName: 'partnerRevenue', headerName: 'Partner Panel Revenue' },
+	{ keyName: 'mgVsPartnerDifference', headerName: 'Partner Panel vs MG Difference' },
+	{
+		keyName: 'mgVsPartnerDifferencePercentage',
+		headerName: 'Partner Panel vs MG Discrepancy %'
+	},
+	{ keyName: 'consoleVsPartnerDifference', headerName: 'Console vs Partner Difference' },
+	{
+		keyName: 'consoleVsPartnerDifferencePercentage',
+		headerName: 'Console vs Partner Discrepancy'
+	},
+	{ keyName: 'accountManagerEmail', headerName: 'Account Owner' }
+];
+
 export {
 	adUnitsData,
 	adUnitsHeaders,
@@ -912,5 +994,7 @@ export {
 	FILTER_KEY_VALUE_MAPPING,
 	SITE_LEVEL_REFRESH_TYPE,
 	MG_DEALS_COLUMNS,
-	ALL_MONTHS_NAME
+	ALL_MONTHS_NAME,
+	DISCREPANCY_TABLE_COLUMNS,
+	PAYMENT_DISCREPANCY_CSV_PROPERTIES
 };
