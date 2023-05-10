@@ -7,6 +7,7 @@ const SiteModel = require('../models/siteModel');
 const activeBidderAdaptersList = require('../models/activeBidderAdaptersListModel');
 // const SelectiveRolloutActiveBidderAdaptersList = require('../models/selectiveRolloutActiveBidderAdaptersListModel');
 const ampActiveBidderAdaptersListModel = require('../models/ampActiveBidderAdaptersListModel');
+const ampSelectiveRolloutActiveBidderAdaptersList = require('../models/ampSelectiveRolloutActiveBidderAdaptersListModel');
 const SiteSpecificActiveBidderAdaptersList = require('../models/siteSpecificActiveBidderAdaptersListModel');
 const SiteLevelPrebidModulesModel = require('../models/siteLevelPrebidModulesModel');
 const ampScriptModel = require('../models/ampScriptModel');
@@ -894,12 +895,18 @@ Router.post('/prebidActiveBidderAdapters', (req, res) => {
 
 	return SiteModel.getSiteById(siteId)
 		.then(site => {
+			const {
+				isAmpSelectiveRolloutEnabled = false,
+				isSelectiveRolloutEnabled = false,
+				isSiteSpecificPrebidDisabled = false
+			} = site.get('apConfigs') || {};
+
 			if (forAmp) {
+				if (isAmpSelectiveRolloutEnabled) {
+					return ampSelectiveRolloutActiveBidderAdaptersList;
+				}
 				return ampActiveBidderAdaptersListModel;
 			}
-
-			const { isSelectiveRolloutEnabled = false, isSiteSpecificPrebidDisabled = false } =
-				site.get('apConfigs') || {};
 
 			// if (isSelectiveRolloutEnabled) {
 			// 	return SelectiveRolloutActiveBidderAdaptersList;
