@@ -766,7 +766,8 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 	mandatoryAdsTxtSnippet: {
 		domain: 'adpushup.com',
 		relationship: 'DIRECT',
-		certificationAuthorityId: 'b0b8ff8485794fdd'
+		certificationAuthorityId: 'b0b8ff8485794fdd',
+		MANAGERDOMAIN: 'adpushup.com'
 	},
 	liveAdsTxtEntryStatus: {
 		allPresent: 1,

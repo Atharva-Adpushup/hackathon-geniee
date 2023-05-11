@@ -791,12 +791,20 @@ const Promise = require('bluebird'),
 
 		return targetCopy;
 	},
-	getMandatoryAdsTxtEntrySnippet = sellerId => {
+	getMandatoryAdsTxtEntrySnippet = (domainNameSellersJson, sites, sellerId) => {
 		const {
-			mandatoryAdsTxtSnippet: { domain, relationship, certificationAuthorityId }
+			mandatoryAdsTxtSnippet: { domain, relationship, certificationAuthorityId, MANAGERDOMAIN }
 		} = commonConsts;
+		const ownerDomain = domainNameSellersJson
+			? domainNameSellersJson
+			: utils.domanize(sites[0].domain);
 
-		return `${domain}, ${sellerId}, ${relationship}, ${certificationAuthorityId}`;
+		const mandatoryAdsTxtEntryLine = `${domain}, ${sellerId}, ${relationship}, ${certificationAuthorityId}`;
+
+		const mandatoryAdsTxtManagerDomain = `MANAGERDOMAIN=${MANAGERDOMAIN}`;
+		const mandatoryAdsTxtOwnerDomain = `OWNERDOMAIN=${ownerDomain}`;
+
+		return [mandatoryAdsTxtEntryLine, mandatoryAdsTxtManagerDomain, mandatoryAdsTxtOwnerDomain].join('\n')
 	},
 	removeFormatWisePrefix = (accumulator, key, config) => {
 		let matchedKey = key.match(commonConsts.FORMAT_WISE_PARAMS_REGEX);
