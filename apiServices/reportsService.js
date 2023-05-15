@@ -184,11 +184,11 @@ const reportsService = {
 	},
 	getReportingMetaData: (siteid, isSuperUser) => {
 		const params = { siteid, isSuperUser };
+        
+		if (siteid.length === 0 && !isSuperUser) return Promise.resolve({});
 		return ObjectValidator(getMetaDataValidations, params)
 			.then(() => reportsService.modifyQueryIfPnp(params))
-			.then(params =>
-				getMetaInfo(params)
-			)
+			.then(params => getMetaInfo(params))
 			.then(async response => {
 				const { code = -1, data } = response;
 				if (code !== 1) return Promise.reject(new Error(response.data));
