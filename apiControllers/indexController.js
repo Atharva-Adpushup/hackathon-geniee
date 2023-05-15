@@ -173,23 +173,39 @@ router
 
 							const originalUsersData = originalUser && originalUser.cleanData() || {};
 							const userData = user.cleanData();
-							const sitesArray = [...userData.sites];
-							const sitesArrayLength = sitesArray.length;
+							const siteKeys = Object.keys(sites);
+
+							const userSitesArray = siteKeys.length > 0 ? [...userData.sites] : [];
+							const userSitesArrayLength = userSitesArray.length;
+							
 							userData.sites = {};
+
 							// get `paymentReconciliation` flag from original user's data and set it into
 							// impersonate user's data
 							// Flag to check if the user is allowed to export site owners email, account managers email or not
 							// under Ops Panel reports with csv export
 							const { paymentReconciliation = false } = originalEmail ? originalUsersData : userData;
 
-							for (let i = 0; i < sitesArrayLength; i += 1) {
-								const site = sitesArray[i];
+							if (userSitesArrayLength === 0) {
+								return res.status(httpStatus.OK).json({
+									user: { ...userData, isSuperUser, paymentReconciliation },
+									networkConfig,
+									networkWideHBRules,
+									associatedAccounts,
+									sites,
+									globalClientConfig
+								});
+							}
+
+							for (let i = 0; i < userSitesArrayLength; i += 1) {
+								const site = userSitesArray[i];
 								userData.sites[site.siteId] = site;
 							}
-							let params = { siteid: Object.keys(sites).toString(), isSuperUser };
 
+							let params = { siteid: siteKeys.toString(), isSuperUser };
 							// enabled to get meta info for HB Analytics Reporting - Enabled or not
 							// and pass as globalMeta data along with sites data
+
 							return getReportsMetaData(params).then(reports => {
 								const { site: sitesFromReportMeta } = reports;
 								if (sitesFromReportMeta) {
