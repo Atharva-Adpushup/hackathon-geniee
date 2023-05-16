@@ -6,12 +6,15 @@ const mapStateToProps = (state, ownProps) => {
 	const {
 		apps: { pnp: pnpConfig }
 	} = state;
+	const {
+		user: { data: { adServerSettings: { dfp: dfpData = null } = {} } = {} } = {}
+	} = state.global;
 	return {
 		...ownProps,
+		dfpData,
 		pnpConfig
 	};
 };
-
 const mapDispatchToProps = dispatch => ({
 	updatePnPConfig: (siteId, config) => dispatch(updatePnpConfig(siteId, config)),
 	updatePnPConfigKey: (siteId, key, value) => dispatch(updatePnpConfigKey(siteId, key, value))
