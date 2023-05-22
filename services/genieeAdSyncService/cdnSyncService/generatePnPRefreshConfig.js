@@ -43,6 +43,7 @@ const generatePnPRefreshConfig = (siteId, adNetworkConfig, blockListedlineItems 
 
 			const adUnits = pnpConfig.adUnits || [];
 			const pnpLineItems = pnpConfig.lineItems || [];
+			const houseLineItemsToReplace = adNetworkConfig.houseLineItems || null;
 			const pnpBlacklistedLineItems = pnpConfig.blacklistedLineItems || [];
 			// remove inactive units
 			if (Array.isArray(adUnits)) {
@@ -63,6 +64,11 @@ const generatePnPRefreshConfig = (siteId, adNetworkConfig, blockListedlineItems 
 				pnpConfig.lineItems = allLineItems;
 			}
 
+			//Add house lineitems to only if house lineitem quick replace feature flag is enabled
+			if (pnpConfig.isHouseLineItemQuickReplaceEnabled && Array.isArray(houseLineItemsToReplace)) {
+				pnpConfig.houseLineItemsToReplace = houseLineItemsToReplace;
+				pnpConfig.lineItems = pnpConfig.lineItems.concat(houseLineItemsToReplace);
+			}
 			if (Array.isArray(pnpBlacklistedLineItems) && pnpBlacklistedLineItems.length) {
 				pnpConfig.blacklistedLineItems = pnpBlacklistedLineItems.map(
 					blacklistedLineItem => blacklistedLineItem.id

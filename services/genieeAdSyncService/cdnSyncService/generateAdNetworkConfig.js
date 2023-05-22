@@ -3,7 +3,7 @@ const _ = require('lodash');
 const CB_ERRORS = require('couchbase').errors;
 
 const couchBase = require('../../../configs/config').couchBase;
-const { docKeys } = require('../../../configs/commonConsts');
+const { docKeys, ADPUSHUP_NETWORK_ID } = require('../../../configs/commonConsts');
 const { LINE_ITEM_TYPES } = require('../../../configs/lineItemsConstants');
 
 const dbHelper = couchbaseService(
@@ -32,13 +32,16 @@ const generateAdNetworkConfig = (
 				adNetworkConfig.useLineItemFile &&
 				adNetworkConfig.lineItemsFileName;
 			if (!useLineItemFile) {
-				var { lineItems = [], separatelyGroupedLineItems = [] } = getLineItemCollectionsForScript(
+				var { lineItems = [], separatelyGroupedLineItems = [], houseLineItems = [] } = getLineItemCollectionsForScript(
 					adNetworkConfig,
 					blockListedLineItems,
 					lineItemTypes
 				);
 				adNetworkConfig.lineItems = lineItems;
 				adNetworkConfig.separatelyGroupedLineItems = separatelyGroupedLineItems;
+				if (houseLineItems && Array.isArray(houseLineItems) && houseLineItems.length && activeDFPNetwork !== ADPUSHUP_NETWORK_ID.toString()) {
+					 adNetworkConfig.houseLineItems = houseLineItems; 
+				}
 				return adNetworkConfig;
 			}
 			let refreshByTypeLineItems = [];
@@ -92,10 +95,15 @@ const getLineItemCollectionsForScript = (
 		}
 		return accumulator;
 	}, {});
-
+	let houseLineItems = [];
+	if (adNetworkConfig.lineItems &&
+		Array.isArray(adNetworkConfig.lineItems.HOUSE) &&
+		adNetworkConfig.lineItems.HOUSE.length) {
+		houseLineItems = adNetworkConfig.lineItems.HOUSE;
+		houseLineItems = _.pullAll(houseLineItems, blockListedLineItems);
+	}
 	const lineItemsAfterRemovingBlocklisted = _.pullAll(lineItems, blockListedLineItems);
-
-	return { lineItems: lineItemsAfterRemovingBlocklisted, separatelyGroupedLineItems };
+	return { lineItems: lineItemsAfterRemovingBlocklisted, separatelyGroupedLineItems, houseLineItems };
 };
 
 module.exports = generateAdNetworkConfig;
