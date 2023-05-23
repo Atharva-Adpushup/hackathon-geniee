@@ -12,6 +12,7 @@ import {
 	UNFILLED_REFRESH_RATE_ENTRIES,
 	PNP_REPLACE_TYPES,
 	PNP_AD_UNIT_OPERATIONS,
+	ADPUSHUP_DFP,
 	adUnitsData,
 	adUnitsHeaders
 } from '../../../../configs/commonConsts';
@@ -70,6 +71,7 @@ const DEFAULT_LINE_ITEMS = [];
 const DEFAULT_BLACKLISTED_LINE_ITEMS = [];
 const DEFAULT_AD_UNITS = [];
 const DEFAULT_PNP_CONFIG = {};
+const DEFAULT_HOSUE_LINE_ITEM_QUICK_REPLACE_VALUE = false;
 const PICKER_STYLE = {
 	display: 'inline-block',
 	float: 'right',
@@ -99,7 +101,8 @@ const PnP = (props = {}) => {
 		updatePnPConfig,
 		updatePnPConfigKey,
 		pnpConfig,
-		showNotification
+		showNotification,
+		dfpData
 	} = props;
 	const {
 		adUnits = DEFAULT_AD_UNITS,
@@ -110,8 +113,15 @@ const PnP = (props = {}) => {
 		outstream,
 		filledInsertionTrigger,
 		unfilledInsertionTrigger,
-		refreshType
+		refreshType,
+		isHouseLineItemQuickReplaceEnabled = DEFAULT_HOSUE_LINE_ITEM_QUICK_REPLACE_VALUE
 	} = pnpConfig[siteId] || DEFAULT_PNP_CONFIG;
+
+	const isPublisherGamAvailable = useMemo(() => {
+		const activeDFPNetwork = dfpData && dfpData.activeDFPNetwork;
+		if (!activeDFPNetwork || activeDFPNetwork === ADPUSHUP_DFP.code) return false;
+		return true;
+	}, [dfpData]);
 
 	const isNativeEnabledOnAllUnits = useMemo(
 		() => adUnits.length && adUnits.every(unit => unit.formats && unit.formats.native),
@@ -135,7 +145,10 @@ const PnP = (props = {}) => {
 				}
 				updatePnPConfig(siteId, config);
 			})
-			.catch(err => console.log({ err }))
+			.catch(err => {
+				// eslint-disable-next-line
+				console.log({ err })
+			})
 			.finally(() => setIsLoading(false));
 	}, [siteId, updatePnPConfig]);
 
@@ -163,7 +176,13 @@ const PnP = (props = {}) => {
 		},
 		[adUnits, siteId, updatePnPConfigKey]
 	);
-
+	const handleHosueLineItemQuickReplaceToggle = useCallback(
+		(value, e) => {
+			const key = e.target.name;
+			updatePnPConfigKey(siteId, key, value);
+		},
+		[siteId, updatePnPConfigKey]
+	);
 	const handleAdUnitActiveToggle = useCallback(
 		(active, code, platform) => {
 			const newAdUnits = adUnits.map(unit => {
@@ -181,6 +200,7 @@ const PnP = (props = {}) => {
 	);
 
 	const handleAdUnitMultiformatToggle = useCallback(
+		// eslint-disable-next-line
 		(active, code, platform, type) => {
 			const newAdUnits = adUnits.map(unit => {
 				if (unit.code === code && unit.platform === platform) {
@@ -468,6 +488,7 @@ const PnP = (props = {}) => {
 			pnpSiteId,
 			native,
 			outstream,
+			isHouseLineItemQuickReplaceEnabled,
 			filledInsertionTrigger,
 			unfilledInsertionTrigger,
 			refreshType,
@@ -577,6 +598,20 @@ const PnP = (props = {}) => {
 				defaultLayout
 				name={`outstream-${siteId}-${siteDomain}`}
 				id={`js-outstream-${siteId}-${siteDomain}`}
+			/>
+			<CustomToggleSwitch
+				labelText="Enable House lineitem Quick Replace"
+				className="u-margin-b4 negative-toggle"
+				checked={isHouseLineItemQuickReplaceEnabled}
+				onChange={handleHosueLineItemQuickReplaceToggle}
+				disabled={!isPublisherGamAvailable}
+				layout="horizontal"
+				size="m"
+				on="Yes"
+				off="No"
+				defaultLayout
+				name="isHouseLineItemQuickReplaceEnabled"
+				id="house-lineitem-quick-refresh-toggle"
 			/>
 			<div className="refresh-rate" style={{ display: 'flex' }}>
 				<p className="u-text-bold u-margin-b4">Filled Inventory Insertion Trigger</p>

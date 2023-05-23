@@ -5,8 +5,8 @@ const { docKeys } = require('../configs/commonConsts');
 
 const PnP = model.extend(function() {
 
-    this.keys = ['siteId', 'pnpSiteId', 'adUnits', 'lineItems','blacklistedLineItems', 'native', 'outstream', 'filledInsertionTrigger', 'unfilledInsertionTrigger', 'refreshType', 'formats'];
-    this.clientKeys = ['siteId', 'pnpSiteId', 'adUnits', 'lineItems', 'blacklistedLineItems','native', 'outstream', 'filledInsertionTrigger', 'unfilledInsertionTrigger', 'refreshType', 'formats'];
+    this.keys = ['siteId', 'pnpSiteId', 'adUnits', 'lineItems','blacklistedLineItems', 'native', 'outstream', 'filledInsertionTrigger', 'unfilledInsertionTrigger', 'refreshType', 'formats', 'isHouseLineItemQuickReplaceEnabled'];
+    this.clientKeys = ['siteId', 'pnpSiteId', 'adUnits', 'lineItems', 'blacklistedLineItems','native', 'outstream', 'filledInsertionTrigger', 'unfilledInsertionTrigger', 'refreshType', 'formats', 'isHouseLineItemQuickReplaceEnabled'];
 
     this.validations = {
         required: ['siteId', 'pnpSiteId', 'adUnits', 'refreshType']

@@ -998,6 +998,8 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		var cssescape = window.adpushup.utils.cssescape.bind(window.adpushup.utils);
 		var lineItems = window.pnpRefresh.lineItems || [];
 		var blacklistedLineItems = window.pnpRefresh.blacklistedLineItems || [];
+		const DEFAULT_HOUSE_LINEITEM_REPLACE_TRIGGER = 5;
+  		var houseLineItemReplaceTrigger = window.pnpRefresh.houseLineItemReplaceTrigger || DEFAULT_HOUSE_LINEITEM_REPLACE_TRIGGER;
 		var googletag = window.googletag || {};
 		window.googletag = googletag;
 		googletag.cmd = googletag.cmd || [];
@@ -1111,7 +1113,21 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 			  renderTimestamp: +new Date(),
 			};
 		  }
-	  
+		  // Replace house lineitem if feature is enabled in console and house lineitem is received
+		  function replaceHouseLineItem(sourceAgnosticLineItemId, adUnit, slot) {
+			var shouldReplaceHouseLineItems = window.pnpRefresh.isHouseLineItemQuickReplaceEnabled;
+			if(!shouldReplaceHouseLineItems) return false;
+			const lineItemId = (sourceAgnosticLineItemId && sourceAgnosticLineItemId.toString()) || "";
+			const houseLineItemsToReplace = window.pnpRefresh.houseLineItemsToReplace || [];
+			const houseLineItemFound = houseLineItemsToReplace && houseLineItemsToReplace.includes(lineItemId);
+			if(!houseLineItemFound) return false;
+			log('Replacing Unit With House lineitem for: ', adUnit);
+			setTimeout(function () {
+			  replaceSlot(slot, adUnit);
+			}, houseLineItemReplaceTrigger * 1000);
+			return true;
+		  }
+
 		  // Active view checkinviewandrefresh
 		  function checkInViewAndRefresh(slot, adUnit) {
 			var divId = slot.getSlotElementId();
@@ -1261,6 +1277,10 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 				  }, window.pnpRefresh.unfilledInsertionTrigger * 1000);
 				  return;
 				}
+				const isSlotWithHouseLineItemReplaced = replaceHouseLineItem(sourceAgnosticLineItemId, adUnit, slot);
+				if(isSlotWithHouseLineItemReplaced) {
+					return;
+				};
 				if (refreshType === "activeView") {
 				  window.pnpRefresh.adUnitState[slotDivId] = initAdUnitState(slot);
 				  var elementInView = checkElementInViewPercent("#" + slotDivId);
@@ -1297,6 +1317,10 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 					replaceSlot(e.slot, adUnit);
 				  }, window.pnpRefresh.unfilledInsertionTrigger * 1000);
 				} else {
+					const isSlotWithHouseLineItemReplaced = replaceHouseLineItem(e.sourceAgnosticLineItemId, adUnit, e.slot);
+					if(isSlotWithHouseLineItemReplaced) {
+						return;
+					};
 				  if (refreshType === "activeView") {
 					window.pnpRefresh.adUnitState[slotId] = initAdUnitState(e.slot);
 					var elementInView = checkElementInViewPercent(
