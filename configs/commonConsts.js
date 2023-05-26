@@ -990,6 +990,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		}
 		var isDestroySlotLoggingEnabled = window.adpushup.isDestroySlotLoggingEnabled || false;
 		var triggerDestroySlotLogging = window.adpushup.triggerDestroySlotLogging;
+		var isHouseLineItemReplaceLoggingEnabled = window.adpushup.config.isHouseLineItemReplaceLoggingEnabled;
 		var datadogLoggerService = adpushup.utils.sendLogsToDataDogService;
 	  
 		var log = window.adpushup.utils.log.bind(window.adpushup.utils);
@@ -1122,6 +1123,13 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 			const houseLineItemFound = houseLineItemsToReplace && houseLineItemsToReplace.includes(lineItemId);
 			if(!houseLineItemFound) return false;
 			log('Replacing Unit With House lineitem for: ', adUnit);
+			if (isHouseLineItemReplaceLoggingEnabled) {
+				datadogLoggerService("PNP_DESTROY_SLOT_LOGGING", {
+				  message: "House lineitem replaced",
+				  apTagId: adUnit,
+				  id: 3,
+				});
+			  }
 			setTimeout(function () {
 			  replaceSlot(slot, adUnit);
 			}, houseLineItemReplaceTrigger * 1000);
