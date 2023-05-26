@@ -116,15 +116,22 @@ class Table extends React.Component {
 					sortable: true,
 					table_position,
 					Footer: footerValue,
-					Cell: props =>
-						// eslint-disable-next-line no-nested-ternary
-						metrics[column].valueType === 'money' ? (
-							<span>${numberWithCommas(props.value)}</span>
-						) : metrics[column].valueType === 'percent' ? (
-							<span>{numberWithCommas(props.value)}%</span>
-						) : (
-							<span>{numberWithCommas(props.value)}</span>
-						),
+					Cell: props => {
+						switch (metrics[column].valueType) {
+							case 'money': {
+								return <span>${numberWithCommas(props.value)}</span>;
+							}
+							case 'percent': {
+								return <span>{numberWithCommas(props.value)}%</span>;
+							}
+							case 'number': {
+								return <span>{numberWithCommas(props.value)}</span>;
+							}
+							default: {
+								return <span>{props.value}%</span>;
+							}
+						}
+					},
 					sortMethod: (a, b) => reactTableSortMethod(a, b),
 					aggregate: (vals, rows) => {
 						let grouped = [];
