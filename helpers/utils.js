@@ -329,6 +329,15 @@ var url = require('url'),
 		},
 		doesReportingHavePageViewData: (reportingColumns = []) => {
 			return reportingColumns.includes('adpushup_page_views');
+		},
+		getUrlSearchParamsFromPath: (path ='', searchParam) => {
+		try {
+			const url = new URL(path);
+			const urlSearchParams = new URLSearchParams(url.search);
+			return urlSearchParams.get(searchParam);
+		} catch(e) {
+		   return ''
+		}
 		}
 	};
 

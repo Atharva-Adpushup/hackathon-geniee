@@ -43,7 +43,7 @@ router
 			if (cacheHit) setCacheHeaders(res);
 			await reportsService.logReportUsage(email || originalEmail, reportingConfig);
 
-			if (reportingConfig.isSuperUser !== "true") {
+			if (reportingConfig.isSuperUser !== 'true') {
 				reportsData.result = reportsData.result.map(rowData => {
 					// do not send gross revenue
 					delete rowData.network_gross_revenue;
@@ -52,7 +52,9 @@ router
 				// do not send gross revenue
 				delete reportsData.total.total_network_gross_revenue;
 				// do not send gross revenue
-				reportsData.columns = reportsData.columns.filter(column => column !== "network_gross_revenue")
+				reportsData.columns = reportsData.columns.filter(
+					column => column !== 'network_gross_revenue'
+				);
 			}
 			return sendSuccessResponse(reportsData, res, HTTP_STATUSES.OK);
 		} catch (err) {
@@ -93,17 +95,34 @@ router
 			if (cacheHit) setCacheHeaders(res);
 
 			if (!reqParams.isSuperUser) {
-				widgetData.result = widgetData.result.map(rowData => {
+				// handling peer performance report seperately
+				const url = `https://console.adpushup.com${path}`
+				const reportName = utils.getUrlSearchParamsFromPath(url, 'report_name');
+				if (reportName === 'peer_performance_report') {
+					widgetData.revenue_channel_report.result.forEach((rowData, index) => {
+						delete widgetData.revenue_channel_report.result[index].network_gross_revenue;
+					});
+					widgetData.revenue_channel_report.columns.forEach((column, index) => {
+						if (column === 'network_gross_revenue') {
+							widgetData.revenue_channel_report.columns.splice(index, 1);
+						}
+					});
+				} else {
+					widgetData.result.forEach((rowData, index) => {
+						// do not send gross revenue
+						delete widgetData.result[index].network_gross_revenue;
+						delete widgetData.result[index].gross_revenue;
+					});
 					// do not send gross revenue
-					delete rowData.network_gross_revenue;
-					delete rowData.gross_revenue;
-					return rowData;
-				});
-				// do not send gross revenue
-				widgetData.total && delete widgetData.total.gross_revenue;
-				widgetData.total && delete widgetData.total.total_network_gross_revenue
-				// do not send gross revenue
-				widgetData.columns = widgetData.columns.filter(column => column !== "network_gross_revenue" || column !== "gross_revenue")
+					widgetData.total && delete widgetData.total.gross_revenue;
+					widgetData.total && delete widgetData.total.total_network_gross_revenue;
+					// do not send gross revenue
+					widgetData.columns.forEach((column, index) => {
+						if (column === 'network_gross_revenue' || column === 'gross_revenue') {
+							widgetData.columns.splice(index, 1);
+						}
+					});
+				}
 			}
 
 			return res.json(widgetData);
