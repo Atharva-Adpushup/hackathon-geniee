@@ -8,4 +8,3 @@
 !services/genieeAdSyncService/cdnSyncService/
 **/*.html
 **/*.min.js
-*.jsx
