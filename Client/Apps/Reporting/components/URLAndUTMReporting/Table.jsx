@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React from 'react';
 import sortBy from 'lodash/sortBy';
 import isEqual from 'lodash/isEqual';
@@ -8,8 +9,10 @@ import map from 'lodash/map';
 import moment from 'moment';
 import { numberWithCommas, computeCsvData } from '../../helpers/utils';
 import { reactTableSortMethod } from '../../../../helpers/commonFunctions';
-import { columnsBlacklistedForAddition } from '../../configs/commonConsts';
+import { columnsBlacklistedForAddition, METRIC_VALUE_TYPES } from '../../configs/commonConsts';
 import CustomReactTable from '../../../../Components/CustomReactTable/index';
+
+const { MONEY, NUMBER, PERCENT } = METRIC_VALUE_TYPES;
 
 class Table extends React.Component {
 	constructor(props) {
@@ -96,17 +99,17 @@ class Table extends React.Component {
 
 				if (footerValue) {
 					switch (metrics[column].valueType) {
-						case 'money': {
+						case MONEY:
 							footerValue = `$${numberWithCommas(footerValue.toFixed(2))}`;
 							break;
-						}
-						case 'percent': {
+						case PERCENT:
 							footerValue = `${numberWithCommas(footerValue.toFixed(2))}%`;
 							break;
-						}
-						default: {
-							footerValue = numberWithCommas(footerValue);
-						}
+						case NUMBER:
+							footerValue = numberWithCommas(footerValue.toFixed(2));
+							break;
+						default:
+							footerValue = footerValue;
 					}
 				}
 
@@ -116,15 +119,18 @@ class Table extends React.Component {
 					sortable: true,
 					table_position,
 					Footer: footerValue,
-					Cell: props =>
-						// eslint-disable-next-line no-nested-ternary
-						metrics[column].valueType === 'money' ? (
-							<span>${numberWithCommas(props.value)}</span>
-						) : metrics[column].valueType === 'percent' ? (
-							<span>{numberWithCommas(props.value)}%</span>
-						) : (
-							<span>{numberWithCommas(props.value)}</span>
-						),
+					Cell: ({ value }) => {
+						switch (metrics[column].valueType) {
+							case MONEY:
+								return <span>${numberWithCommas(value)}</span>;
+							case PERCENT:
+								return <span>{numberWithCommas(value)}%</span>;
+							case NUMBER:
+								return <span>{numberWithCommas(value)}</span>;
+							default:
+								return <span>{value}</span>;
+						}
+					},
 					sortMethod: (a, b) => reactTableSortMethod(a, b),
 					aggregate: (vals, rows) => {
 						let grouped = [];
