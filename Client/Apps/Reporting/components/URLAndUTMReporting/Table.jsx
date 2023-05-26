@@ -12,7 +12,7 @@ import { reactTableSortMethod } from '../../../../helpers/commonFunctions';
 import { columnsBlacklistedForAddition, METRIC_VALUE_TYPES } from '../../configs/commonConsts';
 import CustomReactTable from '../../../../Components/CustomReactTable/index';
 
-const { money, number, percent } = METRIC_VALUE_TYPES;
+const { MONEY, NUMBER, PERCENT } = METRIC_VALUE_TYPES;
 
 class Table extends React.Component {
 	constructor(props) {
@@ -99,13 +99,13 @@ class Table extends React.Component {
 
 				if (footerValue) {
 					switch (metrics[column].valueType) {
-						case money:
+						case MONEY:
 							footerValue = `$${numberWithCommas(footerValue.toFixed(2))}`;
 							break;
-						case percent:
+						case PERCENT:
 							footerValue = `${numberWithCommas(footerValue.toFixed(2))}%`;
 							break;
-						case number:
+						case NUMBER:
 							footerValue = numberWithCommas(footerValue.toFixed(2));
 							break;
 						default:
@@ -121,11 +121,11 @@ class Table extends React.Component {
 					Footer: footerValue,
 					Cell: ({ value }) => {
 						switch (metrics[column].valueType) {
-							case money:
+							case MONEY:
 								return <span>${numberWithCommas(value)}</span>;
-							case percent:
+							case PERCENT:
 								return <span>{numberWithCommas(value)}%</span>;
-							case number:
+							case NUMBER:
 								return <span>{numberWithCommas(value)}</span>;
 							default:
 								return <span>{value}</span>;

@@ -648,10 +648,10 @@ const REPORT_TYPES = {
 };
 
 const METRIC_VALUE_TYPES = {
-	money: 'money',
-	number: 'number',
-	percent: 'percent',
-	string: 'string'
+	MONEY: 'money',
+	NUMBER: 'number',
+	PERCENT: 'percent',
+	STRING: 'string'
 };
 
 export {
