@@ -145,7 +145,7 @@ Router.get('/:siteId/ampDeliveryViaCreativeConfig', (req, res) => {
 					apConfigs.separatelyGroupedLineItems =
 						(adNetworkConfig && adNetworkConfig.separatelyGroupedLineItems) || [];
 				}
-
+				apConfigs.isSelectiveRolloutEnabled = apConfigs.isAmpDvcSelectiveRolloutEnabled || false;
 				apConfigs.autoOptimise = !!isAutoOptimise;
 				apConfigs.poweredByBanner = poweredByBanner;
 				if (shouldDeductApShareFromHb) {
