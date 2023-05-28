@@ -212,21 +212,6 @@ const getPresetDropdownItems = () => [
 	}
 ];
 
-const getReportScheduleIntervals = () => [
-	{
-		value: 'daily',
-		name: 'Daily'
-	},
-	{
-		value: 'weekly',
-		name: 'Weekly'
-	},
-	{
-		value: 'monthly',
-		name: 'Monthly'
-	}
-];
-
 const calculateTotalPageViews = pageViews => {
 	let totalPageviews = 0;
 	pageViews.forEach(pageView => (totalPageviews += pageView));
@@ -290,6 +275,5 @@ export {
 	getValidArray,
 	getItemFromLocalStorage,
 	setItemToLocalStorage,
-	getReportScheduleIntervals,
 	domainFromUrl
 };
