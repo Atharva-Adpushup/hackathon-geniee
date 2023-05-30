@@ -24,7 +24,7 @@ const getMetaInfoConfigDocValues = configFile => {
 
 const getSiteMetaData = params =>
 	request({
-		uri: `${commonConsts.ANALYTICS_API_ROOT}${commonConsts.ANALYTICS_METAINFO_URL}`,
+		uri: `${commonConsts.ANALYTICS_METAINFO_BASE}${commonConsts.ANALYTICS_METAINFO_URL}`,
 		json: true,
 		qs: params
 	});
