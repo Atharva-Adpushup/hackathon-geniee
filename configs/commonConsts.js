@@ -2,6 +2,7 @@ const config = require('./config');
 
 const prodEnv = config.environment.HOST_ENV === 'production';
 const reportingBaseURL = 'https://api.adpushup.com/CentralReportingWebService';
+const metaInfoServiceBaseUrl = 'https://api.adpushup.com/MetaInfoWebService';
 const computedProductionURL = prodEnv
 	? 'https://console.adpushup.com'
 	: `http://localhost:${config.environment.HOST_PORT}`;
@@ -143,7 +144,8 @@ module.exports = {
 	ALL_PRODUCTS_META_API: `${reportingBaseURL}/site/list?list_name=get_all_products`,
 	ACTIVE_PRODUCTS_FOR_ALL_SITES_API: `${reportingBaseURL}/common/activeProducts?isSuperUser=true`,
 	ANALYTICS_API_ROOT: reportingBaseURL,
-	ANALYTICS_METAINFO_URL: '/common/metaInfo',
+	ANALYTICS_METAINFO_BASE: metaInfoServiceBaseUrl,
+	ANALYTICS_METAINFO_URL: '/meta-endpoint/metaInfo',
 	REPORT_PATH: '/site/report?report_name=get_stats_by_custom',
 	REPORT_PATH_XPATH: '/site/report?report_name=get_ap_stats_by_custom',
 	MAB_REPORTING_API: `${reportingBaseURL}/site/mab`,
