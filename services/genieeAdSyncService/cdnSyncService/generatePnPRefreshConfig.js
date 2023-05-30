@@ -43,7 +43,7 @@ const generatePnPRefreshConfig = (siteId, adNetworkConfig, blockListedlineItems 
 
 			const adUnits = pnpConfig.adUnits || [];
 			const pnpLineItems = pnpConfig.lineItems || [];
-			const houseLineItemsToReplace = adNetworkConfig.houseLineItems || null;
+			const houseLineItemsToReplace = adNetworkConfig && adNetworkConfig.houseLineItems || null;
 			const pnpBlacklistedLineItems = pnpConfig.blacklistedLineItems || [];
 			// remove inactive units
 			if (Array.isArray(adUnits)) {
