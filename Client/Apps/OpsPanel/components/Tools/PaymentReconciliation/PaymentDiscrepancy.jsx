@@ -18,8 +18,10 @@ import SelectBox from '../../../../../Components/SelectBox';
 import CustomButton from '../../../../../Components/CustomButton';
 import axiosInstance from '../../../../../helpers/axiosInstance';
 import Loader from '../../../../../Components/Loader';
+import GoogleOAuthLogin from '../../../../../Components/GoogleOAuthLogin';
 import CustomReactTable from '../../../../../Components/CustomReactTable';
 import { domanize } from '../../../../../helpers/commonFunctions';
+import { DEMO_ACCOUNT_DATA } from '../../../../../constants/others';
 
 class PaymentDiscrepancy extends Component {
 	constructor(props) {
@@ -123,7 +125,13 @@ class PaymentDiscrepancy extends Component {
 				const consoleRevenueObj = siteWiseRevenueData[siteId] || {};
 				const parterWiseRevenue = siteLevelPartnerPanelData[siteId] || 0;
 
-				const { revenue, pageViews, impressions, tagBasedRevenue } = consoleRevenueObj;
+				const {
+					grossRevenue,
+					netRevenue,
+					pageViews,
+					impressions,
+					tagBasedRevenue
+				} = consoleRevenueObj;
 
 				if (!siteLevelObject.siteId) {
 					siteLevelObject.siteId = siteId;
@@ -132,12 +140,20 @@ class PaymentDiscrepancy extends Component {
 					siteLevelObject.domain = domanize(siteLevelObject.domain);
 				}
 
-				const consoleRevenue = this.convertToFormat(revenue);
+				const consoleGrossRevenue = this.convertToFormat(grossRevenue);
+				const consoleNetRevenue = this.convertToFormat(netRevenue);
 				const partnerRevenue = this.convertToFormat(parterWiseRevenue);
 				const tagBasedRevenueFormatted = this.convertToFormat(tagBasedRevenue);
-				const consoleVsPartnerDifference = this.convertToFormat(consoleRevenue - parterWiseRevenue);
+				const consoleVsPartnerDifference = this.convertToFormat(
+					consoleGrossRevenue - parterWiseRevenue
+				);
+
+				const weightedRevenueShare =
+					((consoleGrossRevenue - consoleNetRevenue) / consoleGrossRevenue) * 100;
+				const formattedWeightedRevShare = weightedRevenueShare.toFixed(1);
+
 				const consoleVsPartnerDifferencePercentage = this.convertToFormat(
-					((consoleRevenue - parterWiseRevenue) / parterWiseRevenue) * 100
+					((consoleGrossRevenue - parterWiseRevenue) / parterWiseRevenue) * 100
 				);
 
 				const siteMgDeal = mgDeals.find(mgDeal => Number(mgDeal.siteId) === Number(siteId));
@@ -150,7 +166,8 @@ class PaymentDiscrepancy extends Component {
 
 				return {
 					...siteLevelObject,
-					consoleRevenue,
+					consoleGrossRevenue,
+					weightedRevenueShare: formattedWeightedRevShare,
 					partnerRevenue,
 					consoleVsPartnerDifference,
 					consoleVsPartnerDifferencePercentage,
@@ -178,19 +195,33 @@ class PaymentDiscrepancy extends Component {
 	formatDataForCsv = discrepancyData => {
 		const sortedDicrepancyDataByDomain = _.sortBy(discrepancyData, 'domain');
 
+		const googleSheetHeaders = PAYMENT_DISCREPANCY_CSV_PROPERTIES.map(
+			propertyObj => propertyObj.headerName
+		);
+		const googleSheetData = [];
+
 		const csvData = sortedDicrepancyDataByDomain.map(discrepancyDataRow => {
 			const csvObject = {};
 
-			PAYMENT_DISCREPANCY_CSV_PROPERTIES.forEach(property => {
-				const { keyName, headerName } = property;
-				csvObject[headerName] = discrepancyDataRow[keyName];
+			const googleSheetDataRow = [];
+
+			PAYMENT_DISCREPANCY_CSV_PROPERTIES.forEach(propertyObj => {
+				const { keyName, headerName } = propertyObj;
+				const dataValue = discrepancyDataRow[keyName];
+				googleSheetDataRow.push(dataValue);
+				csvObject[headerName] = dataValue;
 			});
+
+			googleSheetData.push(googleSheetDataRow);
 
 			return csvObject;
 		});
 
+		const googleSheetCsvData = [googleSheetHeaders, ...googleSheetData];
+
 		// Sorting according to site domain
 		this.setState({
+			googleSheetCsvData,
 			selectedDurationCsvDiscrepancyData: csvData
 		});
 	};
@@ -245,18 +276,24 @@ class PaymentDiscrepancy extends Component {
 		const slicedHeadersData = siteWiseParterWiseCsvData.splice(1);
 
 		const parterWiseSiteWiseRevenueData = slicedHeadersData.map(siteWiseParterWiseCsvRow => {
-			const [siteId, revenue, partnerName] = siteWiseParterWiseCsvRow || [];
-			const formattedRevenue = revenue.replace(/,/g, '');
+			const [siteId, grossRevenue, netRevenue, partnerName] = siteWiseParterWiseCsvRow || [];
+			const formattedGrossRevenue = grossRevenue.replace(/,/g, '');
+			const formattedNetRevenue = netRevenue.replace(/,/g, '');
 			const formattedSiteId = this.getFormattedSiteId(siteId);
-			return { siteId: formattedSiteId, revenue: formattedRevenue, partnerName };
+			return {
+				siteId: formattedSiteId,
+				grossRevenue: formattedGrossRevenue,
+				netRevenue: formattedNetRevenue,
+				partnerName
+			};
 		});
 
 		const siteLevelPartnerPanelData = parterWiseSiteWiseRevenueData.reduce((acc, currentData) => {
-			const { siteId, revenue } = currentData;
+			const { siteId, grossRevenue } = currentData;
 			if (!acc[siteId]) {
 				acc[siteId] = 0;
 			}
-			acc[siteId] += Number(revenue);
+			acc[siteId] += Number(grossRevenue);
 			return acc;
 		}, {});
 
@@ -281,6 +318,9 @@ class PaymentDiscrepancy extends Component {
 		const siteEmailMapping = {};
 		emailSitesMapping.forEach(mapping => {
 			const { siteIds = [], domains = [], email, accountManagerEmail } = mapping;
+			if (email === DEMO_ACCOUNT_DATA.EMAIL) {
+				return;
+			}
 			siteIds.forEach((siteId, index) => {
 				const domain = domains[index];
 				siteEmailMapping[siteId] = { email, accountManagerEmail, siteId, domain };
@@ -295,7 +335,8 @@ class PaymentDiscrepancy extends Component {
 			selectedMonth,
 			selectedYear,
 			selectedDurationDiscrepancyData = [],
-			selectedDurationCsvDiscrepancyData = []
+			selectedDurationCsvDiscrepancyData = [],
+			googleSheetCsvData = []
 		} = this.state;
 
 		const { emailSitesMapping = [] } = this.props;
@@ -357,6 +398,17 @@ class PaymentDiscrepancy extends Component {
 
 					{!!selectedDurationCsvDiscrepancyData.length && (
 						<Row>
+							<GoogleOAuthLogin
+								type="button"
+								variant="secondary"
+								className="pull-right gs-btn"
+								showSpinner={false}
+								csvData={googleSheetCsvData}
+								selectedControlsForCSV={[]}
+							>
+								Export To Google Sheet
+							</GoogleOAuthLogin>
+
 							<CSVLink
 								data={selectedDurationCsvDiscrepancyData}
 								filename={`discrepancy_${selectedMonth}_${selectedYear}.csv`}

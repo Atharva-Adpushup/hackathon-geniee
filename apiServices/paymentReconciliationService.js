@@ -58,14 +58,16 @@ const getNonApGamSites = async () =>
 const combineSiteWiseDataCallback = (acc, currentData) => {
 	const {
 		siteid: siteId,
-		network_gross_revenue: revenue = 0,
+		network_gross_revenue: grossRevenue = 0,
+		network_net_revenue: netRevenue = 0,
 		network_impressions: impressions = 0,
 		adpushup_page_views: pageViews = 0
 	} = currentData;
 	if (!acc[siteId]) {
-		acc[siteId] = { revenue: 0, pageViews: 0, impressions: 0 };
+		acc[siteId] = { grossRevenue: 0, netRevenue: 0, pageViews: 0, impressions: 0 };
 	}
-	acc[siteId].revenue += revenue;
+	acc[siteId].grossRevenue += grossRevenue;
+	acc[siteId].netRevenue += netRevenue;
 	acc[siteId].impressions += impressions;
 	acc[siteId].pageViews += pageViews;
 	return acc;
@@ -109,18 +111,21 @@ const getOnlyApRevenueShare = ({
 
 		// Remove Other GAM ADX Revenue
 		if (nonApGamAdXSiteObj && nonApGamAdXSiteObj.revenue) {
-			completeRevenueSiteObj.revenue -= nonApGamAdXSiteObj.revenue;
+			completeRevenueSiteObj.netRevenue -= nonApGamAdXSiteObj.netRevenue;
+			completeRevenueSiteObj.grossRevenue -= nonApGamAdXSiteObj.grossRevenue;
 		}
 
 		// Remove TAG based data
 		if (siteWiseTagWiseRevenueObj && siteWiseTagWiseRevenueObj.revenue) {
-			completeRevenueSiteObj.revenue -= siteWiseTagWiseRevenueObj.revenue;
-			completeRevenueSiteObj.tagBasedRevenue = siteWiseTagWiseRevenueObj.revenue;
+			completeRevenueSiteObj.netRevenue -= siteWiseTagWiseRevenueObj.netRevenue;
+			completeRevenueSiteObj.grossRevenue -= siteWiseTagWiseRevenueObj.grossRevenue;
+			completeRevenueSiteObj.tagBasedRevenue = siteWiseTagWiseRevenueObj.grossRevenue;
 		}
 
 		// Remove HB Direct Revenue
 		if (siteWiseHbDirectRevenueObj && siteWiseHbDirectRevenueObj.revenue) {
-			completeRevenueSiteObj.revenue -= siteWiseHbDirectRevenueObj.revenue;
+			completeRevenueSiteObj.grossRevenue -= siteWiseHbDirectRevenueObj.grossRevenue;
+			completeRevenueSiteObj.netRevenue -= siteWiseHbDirectRevenueObj.netRevenue;
 		}
 	}
 	return siteWiseCombinedRevenueData;

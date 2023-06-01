@@ -886,7 +886,7 @@ const DISCREPANCY_TABLE_COLUMNS = [
 	},
 	{
 		Header: 'Console Revenue',
-		accessor: 'consoleRevenue',
+		accessor: 'consoleGrossRevenue',
 		width: 120
 	},
 	{
@@ -915,6 +915,11 @@ const DISCREPANCY_TABLE_COLUMNS = [
 		width: 270
 	},
 	{
+		Header: 'Weighted Revenue Share %',
+		accessor: 'weightedRevenueShare',
+		width: 270
+	},
+	{
 		Header: 'Account Owner',
 		accessor: 'accountManagerEmail',
 		width: 200
@@ -927,7 +932,7 @@ const PAYMENT_DISCREPANCY_CSV_PROPERTIES = [
 	{ keyName: 'email', headerName: 'Email' },
 	{ keyName: 'mgType', headerName: 'MG Type' },
 	{ keyName: 'mgRevenue', headerName: 'MG Revenue' },
-	{ keyName: 'consoleRevenue', headerName: 'Console Revenue' },
+	{ keyName: 'consoleGrossRevenue', headerName: 'Console Revenue' },
 	{ keyName: 'partnerRevenue', headerName: 'Partner Panel Revenue' },
 	{ keyName: 'mgVsPartnerDifference', headerName: 'Partner Panel vs MG Difference' },
 	{
@@ -939,6 +944,7 @@ const PAYMENT_DISCREPANCY_CSV_PROPERTIES = [
 		keyName: 'consoleVsPartnerDifferencePercentage',
 		headerName: 'Console vs Partner Discrepancy'
 	},
+	{ keyName: 'weightedRevenueShare', headerName: 'Weighted Revenue Share' },
 	{ keyName: 'accountManagerEmail', headerName: 'Account Owner' }
 ];
 
