@@ -1,6 +1,6 @@
 {
 	"name": "adpushup-app",
-	"version": "2.41.7",
+	"version": "2.41.8",
 	"private": true,
 	"scripts": {
 		"start": "node app.js",
