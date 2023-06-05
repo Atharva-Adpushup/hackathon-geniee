@@ -33,7 +33,7 @@ const useLoadExternalScript = (src, onLoad, isLoaded) => {
 	}, [src, onLoad, isLoaded]);
 };
 
-const GoogleLoginButton = ({ selectedControlsForCSV, csvData, ...props }) => {
+const GoogleLoginButton = ({ selectedControlsForCSV = [], csvData, ...props }) => {
 	const tokenClient = useRef('');
 	const gapiInited = useRef(false);
 	const gisInited = useRef(false);
@@ -47,7 +47,7 @@ const GoogleLoginButton = ({ selectedControlsForCSV, csvData, ...props }) => {
 			if (!gapiInited.current) {
 				await w.gapi.client.init({
 					apiKey: GOOGLE_APP_API_KEY,
-					discoveryDocs: [DISCOVERY_DOC],
+					discoveryDocs: [DISCOVERY_DOC]
 				});
 				gapiInited.current = true;
 			}
@@ -86,7 +86,12 @@ const GoogleLoginButton = ({ selectedControlsForCSV, csvData, ...props }) => {
 				}
 			});
 
-			const sheetData = [...selectedControlsForCSV, [], ...csvData];
+			let sheetData = [];
+			if (selectedControlsForCSV.length) {
+				sheetData = [...selectedControlsForCSV, [], ...csvData];
+			} else {
+				sheetData = csvData;
+			}
 			const charFromColumnIndex = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 			const cols = charFromColumnIndex[csvData[0].length];
 			const rows = sheetData.length;

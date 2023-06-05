@@ -185,27 +185,66 @@ var request = require('request-promise'),
 		getMandatoryAdsTxtEntryByUserEmail(email) {
 			return userModel.getUserByEmail(email).then(function(user) {
 				const sellerId = user.get('sellerId');
-				if (sellerId) {
-					return getMandatoryAdsTxtEntrySnippet(sellerId);
+				const domainNameSellersJson = user.get('domainNameSellersJson');
+				const sites = user.get('sites');
+				if (sellerId && sites?.length > 0) {
+					return getMandatoryAdsTxtEntrySnippet(domainNameSellersJson, sites, sellerId);
 				}
 				return null;
 			});
 		},
-
-		verifyMandatoryAdsTxtEntry(mandatoryAdsTxtEntry, existingAdsTxtArr) {
-			let hasMandatoryAdsTxtEntry;
+		checkMandatoryAdsTxtEntry(mandatoryAdsTxtEntry, existingAdsTxtArr) {
+			let hasMandatoryAdsTxtEntryLine = false;
+			let hasMandatoryAdsTxtManagerDomain = false;
+			let hasMandatoryAdsTxtOwnerDomain = false;
 
 			if (mandatoryAdsTxtEntry) {
-				hasMandatoryAdsTxtEntry = existingAdsTxtArr.some(
-					({ domain, pubId, relation, authorityId }) =>
-						`${domain}, ${pubId}, ${relation}, ${authorityId}` === mandatoryAdsTxtEntry
-				);
+				const mandatoryAdsTxtEntryArr = mandatoryAdsTxtEntry.split('\n');
+				const mandatoryAdsTxtLine = mandatoryAdsTxtEntryArr[0];
+				const mandatoryAdsTxtManagerDomain = mandatoryAdsTxtEntryArr[1]?.toLowerCase();
+				const mandatoryAdsTxtOwnerDomain = mandatoryAdsTxtEntryArr[2]?.toLowerCase();
+
+				for (let i = 0; i < existingAdsTxtArr.length; i++) {
+					const { domain, pubId, relation, authorityId } = existingAdsTxtArr[i];
+
+					if (`${domain}, ${pubId}, ${relation}, ${authorityId}` === mandatoryAdsTxtLine) {
+						hasMandatoryAdsTxtEntryLine = true;
+					}
+					// domain will contain mandatoryAdsTxtManagerDomain and mandatoryAdsTxtOwnerDomain 
+					// as entry is not seperated by comma
+					if (mandatoryAdsTxtManagerDomain && domain === mandatoryAdsTxtManagerDomain) {
+						hasMandatoryAdsTxtManagerDomain = true;
+					}
+					if (mandatoryAdsTxtOwnerDomain && domain === mandatoryAdsTxtOwnerDomain) {
+						hasMandatoryAdsTxtOwnerDomain = true;
+					}
+				}
 			}
 
-			if (!hasMandatoryAdsTxtEntry) {
+			return {
+				hasMandatoryAdsTxtEntryLine,
+				hasMandatoryAdsTxtManagerDomain,
+				hasMandatoryAdsTxtOwnerDomain
+			};
+		},
+		verifyMandatoryAdsTxtEntry(mandatoryAdsTxtEntry, existingAdsTxtArr) {
+			const {
+				hasMandatoryAdsTxtEntryLine,
+				hasMandatoryAdsTxtManagerDomain,
+				hasMandatoryAdsTxtOwnerDomain
+			} = API.checkMandatoryAdsTxtEntry(mandatoryAdsTxtEntry, existingAdsTxtArr);
+			const hasCompleteMandatoryAdsTxtEntry =
+				hasMandatoryAdsTxtEntryLine &&
+				hasMandatoryAdsTxtManagerDomain &&
+				hasMandatoryAdsTxtOwnerDomain;
+
+			if (!hasCompleteMandatoryAdsTxtEntry) {
+				const error = hasMandatoryAdsTxtEntryLine
+					? 'Manager and Owner Domain Missing in Mandatory Entry'
+					: 'Mandatory entry Missing';
 				throw new AdPushupError({
 					httpCode: 204,
-					error: 'Mandatory entry missing',
+					error: error,
 					type: 'mandatoryAdsTxtEntry',
 					data: { mandatoryAdsTxtEntry }
 				});
