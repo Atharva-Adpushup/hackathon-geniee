@@ -1,3 +1,7 @@
+const HTTP_STATUS = require('../configs/httpStatusConsts');
+const apLiteModel = require('../models/apLiteModel');
+const { v4: uuidV4 } = require('uuid');
+
 const Promise = require('bluebird'),
 	_ = require('lodash'),
     md5 = require('md5'),
@@ -872,6 +876,129 @@ const Promise = require('bluebird'),
 			.format('YYYY-MM-DD'),
 	createSellerId = email => {
 		return md5(email.toLowerCase());
+	},
+	getDefaultIfNotPresent = (value, defaultValue) => {
+		return value === undefined ? defaultValue : value;
+	},
+	isDuplicateAdUnitsHandled = (adUnitsToBeCreated, curAdunits, res) => {
+		const duplicateAdUnits = _.intersection(
+			adUnitsToBeCreated.map(adUnit => adUnit.dfpAdunitCode),
+			curAdunits.map(adUnit => adUnit.dfpAdunitCode)
+		);
+
+		if (duplicateAdUnits.length) {
+			sendErrorResponse(
+				{
+					message: commonConsts.HTTP_RESPONSE_MESSAGES.UPDATE_FAILED_DUPLICATE_UNITS,
+					duplicateAdUnits
+				},
+				res,
+				HTTP_STATUS.BAD_REQUEST
+			);
+			return true;
+		}
+
+		return false;
+	},
+	isMissingAdUnitsHandled = (adUnitsToBeCreated, curAdunits, res) => {
+		const missingAdUnits = _.difference(
+			adUnitsToBeCreated.map(adUnit => adUnit.dfpAdunitCode),
+			curAdunits.map(adUnit => adUnit.dfpAdunitCode)
+		);
+		if (missingAdUnits.length) {
+			sendErrorResponse(
+				{ message: commonConsts.HTTP_RESPONSE_MESSAGES.UPDATE_FAILED_NO_UNITS, missingAdUnits },
+				res,
+				HTTP_STATUS.BAD_REQUEST
+			);
+			return true;
+		}
+		return false;
+	},
+	initializeAdUnits = adUnits => {
+		const defaultValues = commonConsts.AP_LITE_AD_UNIT_DEFAULT_VALUES;
+
+		return adUnits.map(adUnit => ({
+			...adUnit,
+			headerBidding: getDefaultIfNotPresent(adUnit.headerBidding, defaultValues.HEADER_BIDDING),
+			refreshSlot: getDefaultIfNotPresent(adUnit.refreshSlot, defaultValues.REFRESH),
+			formats: getDefaultIfNotPresent(adUnit.formats, defaultValues.FORMATS),
+			refreshInterval: getDefaultIfNotPresent(
+				adUnit.refreshInterval,
+				defaultValues.REFRESH_INTERVAL
+			),
+			isActive: getDefaultIfNotPresent(adUnit.isActive, defaultValues.ACTIVE),
+			sectionId: uuidV4()
+		}));
+	},
+	updateApLiteAdUnits = (apLiteDoc, adUnits) => {
+		const adUnitsToBeUpdated = new Set(adUnits.map(adUnit => adUnit.dfpAdunitCode));
+
+		apLiteDoc.adUnits = apLiteDoc.adUnits.map(adUnitToUpdate => {
+			if (!adUnitsToBeUpdated.has(adUnitToUpdate.dfpAdunitCode)) {
+				return adUnitToUpdate;
+			}
+
+			return {
+				...adUnitToUpdate,
+				...adUnits.find(adUnit => adUnit.dfpAdunitCode === adUnitToUpdate.dfpAdunitCode)
+			};
+		});
+		return apLiteModel.saveAdUnits(apLiteDoc).then(() => apLiteDoc);
+	},
+	isEmptyApLiteDocHandled = (apLiteDoc, res) => {
+		if (!Object.keys(apLiteDoc).length) {
+			sendErrorResponse(
+				{ message: commonConsts.HTTP_RESPONSE_MESSAGES.NO_AD_UNITS_FOUND },
+				res,
+				HTTP_STATUS.BAD_REQUEST
+			);
+			return true;
+		}
+
+		return false;
+	},
+	handleUpdateApLiteUnitsError = (err, res) => {
+		if (err && err.code === 13) {
+			return sendErrorResponse(
+				{ message: commonConsts.HTTP_RESPONSE_MESSAGES.SITE_NOT_FOUND },
+				res,
+				HTTP_STATUS.NOT_FOUND
+			);
+		}
+
+		return sendErrorResponse(
+			{ message: commonConsts.HTTP_RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR },
+			res,
+			HTTP_STATUS.INTERNAL_SERVER_ERROR
+		);
+	},
+	handleApLiteUnitsCreateError = (err, res) => {
+		sendErrorResponse(
+			{ message: commonConsts.HTTP_RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR },
+			res,
+			HTTP_STATUS.INTERNAL_SERVER_ERROR
+		);
+	},
+	getCommonAuditLog = req => {
+		const { siteId } = req.params;
+		const { email, originalEmail } = req.user;
+		const { siteDomain, appName } = req.body.dataForAuditLogs || {};
+
+		return {
+			siteId,
+			siteDomain,
+			appName,
+			type: commonConsts.AUDIT_LOG_TYPES.SITE,
+			impersonateId: email,
+			userId: originalEmail,
+			action: {
+				name: commonConsts.AUDIT_LOGS_ACTIONS.OPS_PANEL.SITES_SETTING,
+				data: !siteDomain
+					? commonConsts.AUDIT_LOG_MESSAGES.ACTION.SITE_API_CALL
+					: commonConsts.AUDIT_LOG_MESSAGES.ACTION.SITE_SETTINGS_AP_LITE
+			}
+		};
 	};
 
 module.exports = {
@@ -910,5 +1037,14 @@ module.exports = {
 	getFloorEngineConfigFromCB,
 	getMonthEndDate,
 	getMonthStartDate,
-	createSellerId
+	createSellerId,
+	getDefaultIfNotPresent,
+	isDuplicateAdUnitsHandled,
+	isMissingAdUnitsHandled,
+	initializeAdUnits,
+	updateApLiteAdUnits,
+	isEmptyApLiteDocHandled,
+	handleUpdateApLiteUnitsError,
+	handleApLiteUnitsCreateError,
+	getCommonAuditLog
 };

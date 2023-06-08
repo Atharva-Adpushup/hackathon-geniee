@@ -15,7 +15,10 @@ const {
 	AD_UNIT_TYPE_MAPPING
 } = require('../configs/commonConsts');
 const { RABBITMQ } = require('../configs/config');
-const { sendSuccessResponse, sendErrorResponse } = require('../helpers/commonFunctions');
+const {
+	sendSuccessResponse,
+	sendErrorResponse,
+} = require('../helpers/commonFunctions');
 const {
 	appBucket,
 	errorHandler,
@@ -375,7 +378,6 @@ router
 			})
 			.catch(err => errorHandler(err));
 	})
-
 	.get('/ap-lite/:siteId', (req, res) => {
 		const { siteId } = req.params;
 

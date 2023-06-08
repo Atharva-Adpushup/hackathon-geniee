@@ -13,7 +13,19 @@ const CC = require('../configs/commonConsts');
 const HTTP_STATUS = require('../configs/httpStatusConsts');
 const FormValidator = require('../helpers/FormValidator');
 const AdPushupError = require('../helpers/AdPushupError');
-const { sendErrorResponse, sendSuccessResponse } = require('../helpers/commonFunctions');
+const {
+	sendErrorResponse,
+	sendSuccessResponse,
+	isDuplicateAdUnitsHandled,
+	isMissingAdUnitsHandled,
+	initializeAdUnits,
+	updateApLiteAdUnits,
+	isEmptyApLiteDocHandled,
+	handleUpdateApLiteUnitsError,
+	handleApLiteUnitsCreateError,
+	getCommonAuditLog
+} = require('../helpers/commonFunctions');
+
 const {
 	verifyOwner,
 	fetchStatusesFromReporting,
@@ -30,6 +42,12 @@ const pageGroupController = require('./pageGroupController');
 const utils = require('../helpers/utils');
 const apLiteModel = require('../models/apLiteModel');
 const { RABBITMQ } = require('../configs/config');
+
+const {
+	pathParamSiteAccessValidation,
+	validateAdUnitsToBeAnArray,
+	validateApLiteUnitCreationPayload
+} = require('../middlewares/siteControllerMiddlewares');
 
 const {
 	AUDIT_LOGS_ACTIONS: { OPS_PANEL, MY_SITES }
@@ -1179,6 +1197,129 @@ router
 			.publishToRabbitMqQueue(ampDvcScriptQueue, siteId)
 			.then(() => res.json({ message: 'AMP DVC Script build successful' }))
 			.catch(err => errorHandler(err, res));
+	})
+	// API for yandex - https://adpushup.atlassian.net/browse/ER-2169
+	.put(
+		'/ap-lite/:siteId/updateAdUnits',
+		validateAdUnitsToBeAnArray,
+		pathParamSiteAccessValidation,
+		(req, res) => {
+			const { siteId } = req.params;
+			const { adUnits } = req.body;
+
+			let prevConfig = {};
+			let responseSent = false;
+
+			return apLiteModel
+				.getAPLiteModelBySite(siteId)
+				.then(apLiteSite => {
+					prevConfig = apLiteSite ? apLiteSite.data || {} : {};
+					return prevConfig;
+				})
+				.then(apLiteDoc => {
+					if (
+						isEmptyApLiteDocHandled(apLiteDoc, res) ||
+						isMissingAdUnitsHandled(adUnits, apLiteDoc.adUnits, res)
+					) {
+						responseSent = true;
+						return;
+					}
+
+					const clonedApLiteDoc = _.cloneDeep(apLiteDoc);
+					updateApLiteAdUnits(clonedApLiteDoc, adUnits);
+				})
+				.then(currentConfig => {
+					if (responseSent) {
+						return;
+					}
+
+					sendDataToAuditLogService({
+						...getCommonAuditLog(req),
+						prevConfig,
+						currentConfig
+					});
+
+					sendSuccessResponse({ message: CC.HTTP_RESPONSE_MESSAGES.AD_UNITS_UPDATED }, res);
+				})
+				.catch(err => handleUpdateApLiteUnitsError(err, res));
+		}
+	)
+	// API for yandex - https://adpushup.atlassian.net/browse/ER-2169
+	.post(
+		'/ap-lite/:siteId/createAdUnits',
+		validateAdUnitsToBeAnArray,
+		validateApLiteUnitCreationPayload,
+		pathParamSiteAccessValidation,
+		async (req, res) => {
+			const { siteId } = req.params;
+			let { adUnits } = req.body;
+
+			adUnits = initializeAdUnits(adUnits);
+
+			const json = { siteId: parseInt(siteId, 10), adUnits };
+			let prevConfig = {};
+			let newDocCreated = false;
+			let duplicateAdUnitsPresent = false;
+
+			return apLiteModel
+				.getAPLiteModelBySite(siteId)
+				.catch(err => {
+					if (err && err.code === 13) {
+						// doc doesn't exist. proceed with saving config
+						newDocCreated = true;
+						return apLiteModel.saveAdUnits(json);
+					}
+
+					throw err;
+				})
+				.then(apLiteSite => {
+					prevConfig = apLiteSite ? apLiteSite.data || {} : {};
+					return prevConfig;
+				})
+				.then(data => {
+					if (newDocCreated) {
+						return data;
+					}
+
+					// if empty doc exists then add new ad units along with siteId
+					if (!Object.keys(data).length) {
+						return apLiteModel.saveAdUnits(json).then(() => json);
+					}
+
+					// response will be sent from isDuplicateAdUnitsHandled if duplicate ad units are present
+					if (isDuplicateAdUnitsHandled(adUnits, data.adUnits, res)) {
+						duplicateAdUnitsPresent = true;
+						return null;
+					}
+
+					const updatedData = _.cloneDeep(data);
+					updatedData.adUnits.push(...adUnits);
+					return apLiteModel.saveAdUnits(updatedData).then(() => updatedData);
+				})
+				.then(currentConfig => {
+					if (duplicateAdUnitsPresent) {
+						// response has been already sent
+						return;
+					}
+
+					sendDataToAuditLogService({
+						...getCommonAuditLog(req),
+						prevConfig: newDocCreated ? {} : prevConfig,
+						currentConfig
+					});
+
+					sendSuccessResponse({ message: CC.HTTP_RESPONSE_MESSAGES.AD_UNITS_CREATED }, res);
+				})
+				.catch(err => handleApLiteUnitsCreateError(err, res));
+		}
+	)
+	.get('/ap-lite/:siteId/getAdUnits', pathParamSiteAccessValidation, (req, res) => {
+		const { siteId } = req.params;
+
+		return apLiteModel
+			.getAPLiteModelBySite(parseInt(siteId, 10))
+			.then(docData => sendSuccessResponse(docData?.data?.adUnits || [], res))
+			.catch(err => errorHandler(err, res, HTTP_STATUS.NOT_FOUND));
 	});
 
 module.exports = router;
