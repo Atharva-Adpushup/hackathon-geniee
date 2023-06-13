@@ -1,5 +1,6 @@
 const Promise = require('bluebird'),
 	_ = require('lodash'),
+    md5 = require('md5'),
 	request = require('request-promise'),
 	moment = require('moment'),
 	config = require('../configs/config'),
@@ -804,7 +805,11 @@ const Promise = require('bluebird'),
 		const mandatoryAdsTxtManagerDomain = `MANAGERDOMAIN=${MANAGERDOMAIN}`;
 		const mandatoryAdsTxtOwnerDomain = `OWNERDOMAIN=${ownerDomain}`;
 
-		return [mandatoryAdsTxtEntryLine, mandatoryAdsTxtManagerDomain, mandatoryAdsTxtOwnerDomain].join('\n')
+		return [
+			mandatoryAdsTxtEntryLine,
+			mandatoryAdsTxtManagerDomain,
+			mandatoryAdsTxtOwnerDomain
+		].join('\n');
 	},
 	removeFormatWisePrefix = (accumulator, key, config) => {
 		let matchedKey = key.match(commonConsts.FORMAT_WISE_PARAMS_REGEX);
@@ -864,7 +869,10 @@ const Promise = require('bluebird'),
 	getMonthEndDate = date =>
 		moment(date)
 			.endOf('month')
-			.format('YYYY-MM-DD');
+			.format('YYYY-MM-DD'),
+	createSellerId = email => {
+		return md5(email.toLowerCase());
+	};
 
 module.exports = {
 	queryResultProcessing,
@@ -901,5 +909,6 @@ module.exports = {
 	getPageGroupNameAndPlatformFromChannelDoc,
 	getFloorEngineConfigFromCB,
 	getMonthEndDate,
-	getMonthStartDate
+	getMonthStartDate,
+	createSellerId
 };
