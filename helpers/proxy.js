@@ -38,7 +38,7 @@ var request = require('request-promise'),
 			timestamp
 		};
 	},
-	{ getMandatoryAdsTxtEntrySnippet } = require('../helpers/commonFunctions'),
+	{ getMandatoryAdsTxtEntrySnippet, createSellerId } = require('../helpers/commonFunctions'),
 	API = {
 		load(url, userAgent, fullResponse) {
 			userAgent =
@@ -184,7 +184,10 @@ var request = require('request-promise'),
 
 		getMandatoryAdsTxtEntryByUserEmail(email) {
 			return userModel.getUserByEmail(email).then(function(user) {
-				const sellerId = user.get('sellerId');
+				let sellerId = user.get('sellerId');
+				if (!sellerId) {
+					sellerId = createSellerId(email);
+				}
 				const domainNameSellersJson = user.get('domainNameSellersJson');
 				const sites = user.get('sites');
 				if (sellerId && sites?.length > 0) {
@@ -210,7 +213,7 @@ var request = require('request-promise'),
 					if (`${domain}, ${pubId}, ${relation}, ${authorityId}` === mandatoryAdsTxtLine) {
 						hasMandatoryAdsTxtEntryLine = true;
 					}
-					// domain will contain mandatoryAdsTxtManagerDomain and mandatoryAdsTxtOwnerDomain 
+					// domain will contain mandatoryAdsTxtManagerDomain and mandatoryAdsTxtOwnerDomain
 					// as entry is not seperated by comma
 					if (mandatoryAdsTxtManagerDomain && domain === mandatoryAdsTxtManagerDomain) {
 						hasMandatoryAdsTxtManagerDomain = true;
