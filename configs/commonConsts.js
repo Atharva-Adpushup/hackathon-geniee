@@ -1840,5 +1840,30 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 	OPERATIONS_REPORT_CONFIG: 'config::rprt:operations',
 	USER_REPORT_CONFIG: 'config::rprt:user',
 	URL_REPORTING_PRODUCT: 'url-reporting',
-	HB_ANALYTICS_PRODUCT: 'hb-analytics'
+	HB_ANALYTICS_PRODUCT: 'hb-analytics',
+	HTTP_RESPONSE_MESSAGES:{
+		INTERNAL_SERVER_ERROR:"Internal Server Error!",
+		NO_AD_UNITS_FOUND:"No ad units found!",
+		AD_UNITS_UPDATED:"Ad Units Updated",
+		SITE_NOT_FOUND:"Site not found!",
+		AD_UNITS_CREATED:"Ad Units Created!",
+		UPDATE_FAILED_NO_UNITS:'Update failed due to some ad units are not present!',
+		UPDATE_FAILED_DUPLICATE_UNITS:'Update failed due to duplicate ad units!'
+	},
+	AUDIT_LOG_MESSAGES:{
+		ACTION:{
+			SITE_API_CALL:"Sites API Call",
+			SITE_SETTINGS_AP_LITE:"Sites Setting AP-Lite"
+		}
+	},
+	AUDIT_LOG_TYPES:{
+		SITE:"site"
+	},
+	AP_LITE_AD_UNIT_DEFAULT_VALUES:{
+		HEADER_BIDDING:true,
+		REFRESH:false,
+		FORMATS:["video","display"],
+		REFRESH_INTERVAL:30,
+		ACTIVE:true,
+	}
 };
