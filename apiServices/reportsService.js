@@ -184,7 +184,7 @@ const reportsService = {
 	},
 	getReportingMetaData: (siteid, isSuperUser) => {
 		const params = { siteid, isSuperUser };
-        
+
 		if (siteid.length === 0 && !isSuperUser) return Promise.resolve({});
 		return ObjectValidator(getMetaDataValidations, params)
 			.then(() => reportsService.modifyQueryIfPnp(params))
@@ -431,6 +431,43 @@ const reportsService = {
 			);
 		}
 		return { ...reportingResult, result, total };
+	},
+	getReportData: site => {
+		const DEFAULT_DATA = {
+			status: false,
+			data: {}
+		};
+		const siteId = site.get('siteId');
+
+		return request({
+			method: 'GET',
+			uri: CC.MAB_REPORTING_API,
+			json: true,
+			qs: { siteid: siteId }
+		})
+			.then(response => {
+				const { data: { result = [] } = {}, code = -1 } = response;
+				const isDataValid = result && result.length && code === 1;
+
+				if (!isDataValid) return DEFAULT_DATA;
+				const output = { variations: {} };
+				_.forEach(result, variation => {
+					// eslint-disable-next-line camelcase
+					const { variation_id, page_views, revenue } = variation;
+					output.variations[variation_id] = {
+						pageRevenue: parseFloat(revenue),
+						pageViews: parseInt(page_views)
+					};
+				});
+				return {
+					status: true,
+					data: output
+				};
+			})
+			.catch(err => {
+				console.log('CDN Sync Failed while fetching data', err);
+				return DEFAULT_DATA;
+			});
 	}
 };
 

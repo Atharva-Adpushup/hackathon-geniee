@@ -12,7 +12,7 @@ const SiteSpecificActiveBidderAdaptersList = require('../models/siteSpecificActi
 const SiteLevelPrebidModulesModel = require('../models/siteLevelPrebidModulesModel');
 const ampScriptModel = require('../models/ampScriptModel');
 const instreamScriptModel = require('../models/instreamScriptModel');
-const getReportData = require('../reports/universal');
+const reportsService = require('../apiServices/reportsService');
 const generateStatusesAndConfig = require('../services/genieeAdSyncService/cdnSyncService/generateConfig');
 const generateAmpStatusesAndConfig = require('../services/genieeAdSyncService/cdnSyncService/generateAmpConfig');
 const generatePrebidConfig = require('../services/genieeAdSyncService/cdnSyncService/generatePrebidConfig');
@@ -279,7 +279,8 @@ Router.get('/:siteId/ampDeliveryViaCreativeConfig', (req, res) => {
 						).then(([prebidConfig, apLiteConfig]) => ({ prebidConfig, apLiteConfig }));
 					}
 
-					return getReportData(site)
+					return reportsService
+						.getReportData(site)
 						.then(reportData => {
 							if (reportData.status && reportData.data) {
 								return generateAmpAdPushupConfig(site, reportData.data);
@@ -543,7 +544,8 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 						).then(([prebidConfig, apLiteConfig]) => ({ prebidConfig, apLiteConfig }));
 					}
 
-					return getReportData(site)
+					return reportsService
+						.getReportData(site)
 						.then(reportData => {
 							if (reportData.status && reportData.data) {
 								return generateAdPushupAdsConfig(site, reportData.data);
