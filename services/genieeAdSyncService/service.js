@@ -1,3 +1,6 @@
+const { SITE_SYNCING_ERROR, QUEUE_NAMES } = require('../../configs/commonConsts');
+const { SITE_SYNC_ERROR_ALERT_REPORTER, deployment } = require('../../configs/config');
+const { sendEmail } = require('../../helpers/queueMailer');
 const adsSyncService = require('./adsSyncService/index');
 
 function init(siteId, forcePrebidBuild, options = {}) {
@@ -8,6 +11,21 @@ function init(siteId, forcePrebidBuild, options = {}) {
 				? console.log(response.message)
 				: console.log(response)
 		)
+		.catch(err => {
+			let parsedSiteId = parseInt(siteId, 10);
+			if (isNaN(parsedSiteId)) {
+				parsedSiteId = siteId.get('siteId');
+			}
+
+			sendEmail({
+				queue: QUEUE_NAMES.MAILER,
+				data: {
+					to: SITE_SYNC_ERROR_ALERT_REPORTER,
+					subject: `${SITE_SYNCING_ERROR} - ${parsedSiteId} - [${deployment}]`,
+					body: err.toString()
+				}
+			});
+		})
 		.catch(console.log);
 }
 

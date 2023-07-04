@@ -1,25 +1,39 @@
-const _ = require('lodash');
 const Promise = require('bluebird');
-const genieePublisher = require('../../../queueWorker/rabbitMQ/workers/genieeAdSyncQueuePublisher');
-const adpTagPublisher = require('../../../queueWorker/rabbitMQ/workers/adpTagAdSyncQueuePublisher');
-const adsensePublisher = require('../../../queueWorker/rabbitMQ/workers/adsenseAdSyncQueuePublisher');
 const siteConfigGenerationModule = require('./modules/siteConfigGeneration/index');
 const syncCdn = require('../cdnSyncService/index');
 const siteModelAPI = require('../../../models/siteModel');
+const adSyncServiceUtils = require('./modules/misc');
+const { getSelectiveRolloutFeatureConfig } = require('../../../helpers/commonFunctions');
+const queuePublisher = require('../../../queueWorker/rabbitMQ/workers/queuePublisher');
 
-// No need for these wrapper functions. Can remove.
-function genieePublishWrapper(item) {
-	return genieePublisher.publish(item);
+async function syncAds(siteConfigItems, isSelectiveRolloutEnabled, selectiveRolloutFeatureConfig) {
+	const { adp, adsense } = siteConfigItems;
+	const adSyncingJobs = [];
+	const { ADP_TAG_SYNC, ADSENSE_AD_SYNC } = adSyncServiceUtils.getAdSyncQueueConfigs(
+		isSelectiveRolloutEnabled,
+		selectiveRolloutFeatureConfig
+	);
+
+	if (adSyncServiceUtils.hasUnsyncedAdpAds(adp)) {
+		adSyncingJobs.push(queuePublisher.publish(ADP_TAG_SYNC, adp));
+	}
+
+	if (adSyncServiceUtils.hasUnsyncedAdsenseAds(adsense)) {
+		adSyncingJobs.push(queuePublisher.publish(ADSENSE_AD_SYNC, adsense));
+	}
+
+	return Promise.all(adSyncingJobs);
 }
-function adpTagPublisherWrapper(item) {
-	return adpTagPublisher.publish(item);
-}
-function adsensePublisherWrapper(item) {
-	return adsensePublisher.publish(item);
-}
-function publishToQueueWrapper(siteConfigItems, siteOptions) {
-    const { site, forcePrebidBuild, options = {}} = siteOptions
-	const jobs = [];
+
+async function publishToQueueWrapper(siteConfigItems, siteOptions) {
+	const {
+		site,
+		forcePrebidBuild,
+		isSelectiveRolloutEnabled,
+		selectiveRolloutFeatureConfig,
+		options = {}
+	} = siteOptions;
+
 	const response = {
 		empty: true,
 		message: `ADS_SYNC_QUEUE_PUBLISH: No unsynced ads for site: ${site.get('siteId')}`
@@ -29,49 +43,63 @@ function publishToQueueWrapper(siteConfigItems, siteOptions) {
 		return response;
 	}
 
-	function processing() {
-		const { adp, adsense, genieeDFP } = siteConfigItems;
-		const hasUnsyncedAdpAds = !!(adp && adp.ads && adp.ads.length);
-		const hasUnsyncedAdsenseAds = !!(adsense && adsense.ads && adsense.ads.length);
-
-		hasUnsyncedAdpAds ? jobs.push(adpTagPublisherWrapper(adp)) : null;
-		hasUnsyncedAdsenseAds ? jobs.push(adsensePublisherWrapper(adsense)) : null;
-
-		const allAdsSynced = (!hasUnsyncedAdpAds && !hasUnsyncedAdsenseAds) || !jobs.length;
-
-		if (allAdsSynced) {
-			return Promise.resolve(response);
-		}
-
-		console.log('---'.repeat(20));
-		hasUnsyncedAdpAds && console.log(`Unsynced Adp ads ${adp.ads.length} (excluding refresh ad units count)`);
-		hasUnsyncedAdsenseAds && console.log(`Unsynced Adsense ads ${adsense.ads.length}`);
-		console.log('---'.repeat(20));
-        
-		return Promise.all(jobs).then(() => ({
-			...response,
-			empty: false,
-			message: `ADS_SYNC_QUEUE_PUBLISH: Successfully published ads into queue for site: ${site.get(
-				'siteId'
-			)}`
-		}));
+	if (adSyncServiceUtils.isSiteConfigHasUnSyncedAds(siteConfigItems)) {
+		return syncAds(siteConfigItems, isSelectiveRolloutEnabled, selectiveRolloutFeatureConfig);
+	} else {
+		const syncCdnQueue = adSyncServiceUtils.getSyncCdnQueueConfig(
+			site,
+			isSelectiveRolloutEnabled,
+			selectiveRolloutFeatureConfig
+		);
+		return syncCdn(site, {
+			forcePrebidBuild,
+			options,
+			syncCdnQueue
+		});
 	}
-    const useDirect = false;
-	return processing().then(response =>
-		// syncCdn publishes a job in either consoleCdnSync or selectiveRollOut queue
-		response.empty ? syncCdn(site, {forcePrebidBuild, useDirect, options}) : response
-	);
 }
-function publishWrapper(site, forcePrebidBuild, options = {}) {
-	return siteConfigGenerationModule
-		.generate(site)
-		.then(siteConfigItems => publishToQueueWrapper(siteConfigItems, {site, forcePrebidBuild, options}));
+async function publishWrapper(site, forcePrebidBuild, options = {}) {
+	const { selectiveRolloutConfig } = site.get('apConfigs') || {};
+
+	const isSelectiveRolloutEnabled = adSyncServiceUtils.isSelectiveRolloutEnabled(
+		selectiveRolloutConfig
+	);
+
+	const selectiveRolloutFeatureConfig = isSelectiveRolloutEnabled
+		? await getSelectiveRolloutFeatureConfig(selectiveRolloutConfig.feature)
+		: null;
+
+	const isConsoleSelectivelyRolledOut = adSyncServiceUtils.isConsoleSelectivelyRolledOut(
+		isSelectiveRolloutEnabled,
+		selectiveRolloutFeatureConfig
+	);
+
+	if (isConsoleSelectivelyRolledOut) {
+		return adSyncServiceUtils.redirectToSelectiveConsole(
+			selectiveRolloutFeatureConfig,
+			site.get('siteId'),
+			{
+				forcePrebidBuild,
+				...options
+			}
+		);
+	}
+
+	return siteConfigGenerationModule.generate(site).then(siteConfigItems =>
+		publishToQueueWrapper(siteConfigItems, {
+			site,
+			forcePrebidBuild,
+			options,
+			isSelectiveRolloutEnabled,
+			selectiveRolloutFeatureConfig
+		})
+	);
 }
 
 module.exports = {
 	publish(siteId, forcePrebidBuild, options = {}) {
 		const parsedSiteId = parseInt(siteId, 10);
-		if (!isNaN(parsedSiteId)) { 
+		if (!isNaN(parsedSiteId)) {
 			const siteId = parsedSiteId.toString();
 			return siteModelAPI
 				.getSiteById(siteId)

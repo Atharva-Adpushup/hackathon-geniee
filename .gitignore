@@ -5,6 +5,7 @@ public/assets/js/editor/build/
 public/assets/scss/.sass-cache/
 npm-debug.log
 /configs/config.js
+/configs/selectiveRollout.config.js
 public/assets/css/website.style.css.map
 public/assets/js/mcmConnect/.DS_Store
 public/assets/js/mcmConnect/mcmConnect.min.js

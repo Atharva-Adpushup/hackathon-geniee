@@ -4,12 +4,14 @@ const Promise = require('bluebird');
 const _ = require('lodash');
 const md5 = require('md5');
 const moment = require('moment');
+const axios = require('axios');
 const apLiteModel = require('../models/apLiteModel');
 const HTTP_STATUS = require('../configs/httpStatusConsts');
 const commonConsts = require('../configs/commonConsts');
 const utils = require('./utils');
 const couchbase = require('./couchBaseService');
 const httpStatus = require('../configs/httpStatusConsts');
+const config = require('../configs/config');
 
 const createAggregateNonAggregateObjects = (dataset, key, container) => {
 	const innerObj = {};
@@ -389,6 +391,35 @@ const getCommonAuditLog = req => {
 	};
 };
 
+const getSelectiveRolloutFeatureConfigFromCB = async feature => {
+	const appBucket = await couchbase.connectToAppBucket();
+	const { value: selectiveRolloutConfig } = await appBucket.getAsync(
+		`${commonConsts.docKeys.selectiveRollout}${feature}`
+	);
+	return selectiveRolloutConfig;
+};
+
+const getSelectiveRolloutFeatureConfig = feature => {
+	if (config.deployment === commonConsts.MASTER_DEPLOYMENT_FLAG) {
+		return getSelectiveRolloutFeatureConfigFromCB(feature);
+	}
+
+	const endPoint = `${commonConsts.MASTER_CONSOLE_URL}/api/utils/selectiveRolloutConfig?feature=${feature}`;
+	return axios.get(endPoint).then(res => res.data);
+};
+
+const filterFalsyObjectKeys = queryParams => {
+	const validQueryParams = {};
+
+	Object.keys(queryParams).forEach(key => {
+		if (queryParams[key]) {
+			validQueryParams[key] = queryParams[key];
+		}
+	});
+
+	return validQueryParams;
+};
+
 module.exports = {
 	queryResultProcessing,
 	sendSuccessResponse,
@@ -414,5 +445,8 @@ module.exports = {
 	isEmptyApLiteDocHandled,
 	handleUpdateApLiteUnitsError,
 	handleApLiteUnitsCreateError,
-	getCommonAuditLog
+	getCommonAuditLog,
+	getSelectiveRolloutFeatureConfig,
+	getSelectiveRolloutFeatureConfigFromCB,
+	filterFalsyObjectKeys
 };

@@ -587,7 +587,8 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		pnpRefresh: 'apnp::',
 		topSitesByRevenue: 'data::topsites',
 		globalClientAppConfig: 'config::client-globals',
-		floorEngine: 'config::floorsEngine'
+		floorEngine: 'config::floorsEngine',
+		selectiveRollout: 'srfc::'
 	},
 	AMP_REFRESH_INTERVAL: 30,
 	tagManagerInitialDoc: {
@@ -1843,30 +1844,43 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 	USER_REPORT_CONFIG: 'config::rprt:user',
 	URL_REPORTING_PRODUCT: 'url-reporting',
 	HB_ANALYTICS_PRODUCT: 'hb-analytics',
-	HTTP_RESPONSE_MESSAGES:{
-		INTERNAL_SERVER_ERROR:"Internal Server Error!",
-		NO_AD_UNITS_FOUND:"No ad units found!",
-		AD_UNITS_UPDATED:"Ad Units Updated",
-		SITE_NOT_FOUND:"Site not found!",
-		AD_UNITS_CREATED:"Ad Units Created!",
-		UPDATE_FAILED_NO_UNITS:'Update failed due to some ad units are not present!',
-		UPDATE_FAILED_DUPLICATE_UNITS:'Update failed due to duplicate ad units!',
-		OK:"OK"
+	HTTP_RESPONSE_MESSAGES: {
+		INTERNAL_SERVER_ERROR: 'Internal Server Error!',
+		NO_AD_UNITS_FOUND: 'No ad units found!',
+		AD_UNITS_UPDATED: 'Ad Units Updated',
+		SITE_NOT_FOUND: 'Site not found!',
+		AD_UNITS_CREATED: 'Ad Units Created!',
+		UPDATE_FAILED_NO_UNITS: 'Update failed due to some ad units are not present!',
+		UPDATE_FAILED_DUPLICATE_UNITS: 'Update failed due to duplicate ad units!',
+		OK: 'OK'
 	},
-	AUDIT_LOG_MESSAGES:{
-		ACTION:{
-			SITE_API_CALL:"Sites API Call",
-			SITE_SETTINGS_AP_LITE:"Sites Setting AP-Lite"
+	AUDIT_LOG_MESSAGES: {
+		ACTION: {
+			SITE_API_CALL: 'Sites API Call',
+			SITE_SETTINGS_AP_LITE: 'Sites Setting AP-Lite'
 		}
 	},
-	AUDIT_LOG_TYPES:{
-		SITE:"site"
+	AUDIT_LOG_TYPES: {
+		SITE: 'site'
 	},
-	AP_LITE_AD_UNIT_DEFAULT_VALUES:{
-		HEADER_BIDDING:true,
-		REFRESH:false,
-		FORMATS:["video","display"],
-		REFRESH_INTERVAL:30,
-		ACTIVE:true,
-	}
+	AP_LITE_AD_UNIT_DEFAULT_VALUES: {
+		HEADER_BIDDING: true,
+		REFRESH: false,
+		FORMATS: ['video', 'display'],
+		REFRESH_INTERVAL: 30,
+		ACTIVE: true
+	},
+	MASTER_CONSOLE_URL: 'https://console.adpushup.com',
+	SELECTIVE_ROLLOUT_DEPENDENCIES: {
+		ADP_TAG_SYNC_CONSUMER: 'ADP_TAG_SYNC_CONSUMER',
+		ADSENSE_AD_SYNC_CONSUMER: 'ADSENSE_AD_SYNC',
+		CDN_SYNC_CONSUMER: 'CDN_SYNC_CONSUMER',
+		GENIEE_ADPUSHUP: 'GENIEE_ADPUSHUP'
+	},
+	QUEUE_NAMES: {
+		MAILER: 'MAILER'
+	},
+	SITE_SYNCING_ERROR_MESSAGE: 'Selective rollout site sync error | GenieeAdPushup',
+	MASTER_DEPLOYMENT_FLAG: 'master',
+	SITE_SYNCING_ERROR: 'SITE_SYNCING_ERROR'
 };
