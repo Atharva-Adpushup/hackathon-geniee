@@ -69,7 +69,7 @@ class Report extends Component {
 			tableData: {},
 			csvData: [],
 			reportType: props.reportType || 'account',
-			isLoading: true,
+			isLoading: !props.isForOps,
 			isError: false,
 			errorMessage: '',
 			isValidSite: true,
@@ -118,11 +118,17 @@ class Report extends Component {
 					let { data: computedData } = response;
 					computedData = getDemoUserSites(computedData, email);
 					updateReportMetaData(computedData);
-					return this.getContentInfo(computedData);
+					if (!isSuperUser) {
+						return this.getContentInfo(computedData);
+					}
+					return '';
 				})
 				.catch(this.handleError);
 		}
-		return this.getContentInfo(reportsMeta.data);
+		if (!isSuperUser) {
+			return this.getContentInfo(reportsMeta.data);
+		}
+		return '';
 	}
 
 	componentDidUpdate() {
@@ -1009,7 +1015,7 @@ class Report extends Component {
 	};
 
 	// eslint-disable-next-line react/sort-comp
-	aggregateValues(result) {
+	aggregateValues(result = []) {
 		const modifiedResult = [];
 		const { selectedInterval, startDate, endDate } = this.state;
 
@@ -1386,7 +1392,7 @@ class Report extends Component {
 	};
 
 	showXPathTable = () => {
-		const { XPATHParams } = this.state;
+		const { XPATHParams = {} } = this.state;
 		const { isForOps } = this.props;
 
 		if (!Object.keys(XPATHParams).length || !isForOps) {
