@@ -17,10 +17,9 @@ export default ({ component: Component, ...rest }) => (
 						<Component {...props} />
 					</SendGAPageViewEvent>
 				) : (
-					<Redirect to={{ pathname: '/dashboard', state: { from: props.location } }} />
+					<Redirect to={{ pathname: '/reports', state: { from: props.location } }} />
 				)
 			}
 		/>
 	</Suspense>
-
 );

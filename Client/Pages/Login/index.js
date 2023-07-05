@@ -73,7 +73,7 @@ class Login extends Component {
 			const { loginAction: login } = this.props;
 
 			login(email, password)
-				.then(() => history.push('/dashboard'))
+				.then(() => history.push('/reports'))
 				.catch(({ response }) => {
 					let newState = { isLoggingIn: false };
 
@@ -186,7 +186,4 @@ class Login extends Component {
 	}
 }
 
-export default connect(
-	null,
-	{ loginAction, logout }
-)(Login);
+export default connect(null, { loginAction, logout })(Login);

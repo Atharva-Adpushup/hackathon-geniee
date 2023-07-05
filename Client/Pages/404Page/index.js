@@ -4,8 +4,8 @@ import authService from '../../services/authService';
 import CustomError from '../../Components/CustomError';
 
 const PageNotFound = ({ message }) => {
-	const pageName = authService.isLoggedin() ? 'Dashboard' : 'Login Page';
-	const pageUrl = authService.isLoggedin() ? '/dashboard' : '/login';
+	const pageName = authService.isLoggedin() ? 'Reports' : 'Login Page';
+	const pageUrl = authService.isLoggedin() ? '/reports' : '/login';
 	return (
 		<Fragment>
 			<DocumentTitle title={message} />
@@ -13,7 +13,7 @@ const PageNotFound = ({ message }) => {
 				<CustomError message={message} imgSrc="/assets/images/404-error.svg" />
 				<p className="notFoundMessage">
 					{`To go back to ${pageName}, please click `}
-					<a href={pageUrl} title="AdPushup Dashboard">
+					<a href={pageUrl} title="AdPushup Reports">
 						here
 					</a>
 					.
