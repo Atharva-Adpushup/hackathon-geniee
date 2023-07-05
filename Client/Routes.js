@@ -18,7 +18,7 @@ const Routes = () => (
 				exact
 				path="/"
 				render={() =>
-					authService.isLoggedin() ? <Redirect to="/dashboard" /> : <Redirect to="/login" />
+					authService.isLoggedin() ? <Redirect to="/reports" /> : <Redirect to="/login" />
 				}
 			/>
 			<Route exact name="Error" path="/error" render={() => <ErrorPage />} />

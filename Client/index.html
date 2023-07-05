@@ -42,7 +42,7 @@
 				if (cookie.match(/user=/)) {
 					// If current user cookie is not equal to original user cookie then reload
 					if (originalCookie && originalCookie !== cookie) {
-						var url = window.location.origin + '/dashboard';
+						var url = window.location.origin + '/reports';
 						window.location.href = url;
 						return true;
 					}
