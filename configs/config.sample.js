@@ -58,7 +58,7 @@ module.exports = {
 	},
 	// local
 	redisEnvironment: {
-		AZURE_CACHE_FOR_REDIS_PORT: 6379,
+		AZURE_CACHE_FOR_REDIS_PORT: 6380,
 		AZURE_CACHE_FOR_REDIS_HOST_NAME:"...",
 		AZURE_CACHE_FOR_REDIS_ACCESS_KEY:"..."
 	},
