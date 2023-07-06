@@ -1,10 +1,17 @@
 const redis = require('redis');
 const config = require('../configs/config');
 
-const REDIS_PORT = config.redisEnvironment.REDIS_PORT || 6379;
-const REDIS_HOST = config.redisEnvironment.REDIS_HOST || '127.0.0.1';
+const REDIS_PORT = config.redisEnvironment.AZURE_CACHE_FOR_REDIS_PORT || 6379;
+const REDIS_HOST = config.redisEnvironment.AZURE_CACHE_FOR_REDIS_HOST_NAME || '127.0.0.1';
+const REDIS_PASSWORD = config.redisEnvironment.AZURE_CACHE_FOR_REDIS_ACCESS_KEY || '';
 
-const redisClient = redis.createClient(REDIS_PORT, REDIS_HOST);
+const redisClient = redis.createClient({
+	password: REDIS_PASSWORD,
+	socket: {
+		host: REDIS_HOST,
+		port: REDIS_PORT
+	}
+});
 
 redisClient
 	.on('connect', () => {
