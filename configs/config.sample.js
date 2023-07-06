@@ -58,8 +58,9 @@ module.exports = {
 	},
 	// local
 	redisEnvironment: {
-		REDIS_PORT: 6379,
-		REDIS_HOST: '127.0.0.1'
+		AZURE_CACHE_FOR_REDIS_PORT: 6379,
+		AZURE_CACHE_FOR_REDIS_HOST_NAME:"...",
+		AZURE_CACHE_FOR_REDIS_ACCESS_KEY:"..."
 	},
 	couchBase: {
 		HOST: '127.0.0.1',
