@@ -99,6 +99,7 @@ class Control extends Component {
 		const updateDimensionList = !isEqual(currState.dimensionList, nextProps.dimensionList);
 		const updateFilterList = !isEqual(currState.filterList, nextProps.filterList);
 		const updateMetricsList = !isEqual(currState.metricsList, nextProps.metricsList);
+		const updateIntervalList = !isEqual(currState.intervalList, nextProps.intervalList);
 
 		const newState = {};
 		newState.chartList = currState.chartList;
@@ -106,6 +107,7 @@ class Control extends Component {
 		if (updateDimensionList) newState.dimensionList = nextProps.dimensionList;
 		if (updateFilterList) newState.filterList = nextProps.filterList;
 		if (updateMetricsList) newState.metricsList = nextProps.metricsList;
+		if (updateIntervalList) newState.intervalList = nextProps.intervalList;
 
 		this.setState(newState);
 	}

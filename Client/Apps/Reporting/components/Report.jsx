@@ -118,17 +118,11 @@ class Report extends Component {
 					let { data: computedData } = response;
 					computedData = getDemoUserSites(computedData, email);
 					updateReportMetaData(computedData);
-					if (!isSuperUser) {
-						return this.getContentInfo(computedData);
-					}
-					return '';
+					return this.getContentInfo(computedData);
 				})
 				.catch(this.handleError);
 		}
-		if (!isSuperUser) {
-			return this.getContentInfo(reportsMeta.data);
-		}
-		return '';
+		return this.getContentInfo(reportsMeta.data);
 	}
 
 	componentDidUpdate() {
@@ -875,8 +869,14 @@ class Report extends Component {
 				params: { siteId }
 			},
 			location: { search: queryParams },
-			userSites
+			userSites,
+			isForOps
 		} = this.props;
+		let isSuperUser = false;
+		if (isForOps || reportType === 'global') {
+			isSuperUser = true;
+		}
+
 		const { email } = this.getDemoUserParams();
 		const { site: reportingSites, interval: intervalsObj } = reportsMetaData;
 		const selectedControls = qs.parse(queryParams);
@@ -936,7 +936,9 @@ class Report extends Component {
 			},
 			() => {
 				this.getSavedAndFrequentReports();
-				this.generateButtonHandler();
+				if (!isSuperUser) {
+					this.generateButtonHandler();
+				}
 			}
 		);
 	};

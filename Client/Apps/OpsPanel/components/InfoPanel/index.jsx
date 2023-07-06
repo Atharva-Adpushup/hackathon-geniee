@@ -16,7 +16,8 @@ class InfoPanel extends Component {
 		const {
 			customProps: { activeComponentTab }
 		} = props;
-		const activeKey = activeComponentTab || INFO_PANEL_IDENTIFIERS.QUICK_SNAPSHOT;
+		// Temp: set Report Vital as default tab
+		const activeKey = activeComponentTab || INFO_PANEL_IDENTIFIERS.REPORT_VITALS;
 
 		this.state = {
 			activeKey,
@@ -119,7 +120,8 @@ class InfoPanel extends Component {
 					<Row className="clearfix">
 						<Col sm={2}>
 							<Nav bsStyle="pills" bsClass="ap-nav-pills nav" stacked>
-								<NavItem eventKey={INFO_PANEL_IDENTIFIERS.QUICK_SNAPSHOT}>Quick Snapshot</NavItem>
+								{/* Temp: remove Quick Snapshot */}
+								{/* <NavItem eventKey={INFO_PANEL_IDENTIFIERS.QUICK_SNAPSHOT}>Quick Snapshot</NavItem> */}
 								<NavItem eventKey={INFO_PANEL_IDENTIFIERS.REPORT_VITALS}>Report Vitals</NavItem>
 								<NavItem eventKey={INFO_PANEL_IDENTIFIERS.GLOBAL_REPORT_VITALS}>
 									Global Report Vitals
