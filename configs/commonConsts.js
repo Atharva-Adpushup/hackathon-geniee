@@ -1848,7 +1848,8 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		SITE_NOT_FOUND:"Site not found!",
 		AD_UNITS_CREATED:"Ad Units Created!",
 		UPDATE_FAILED_NO_UNITS:'Update failed due to some ad units are not present!',
-		UPDATE_FAILED_DUPLICATE_UNITS:'Update failed due to duplicate ad units!'
+		UPDATE_FAILED_DUPLICATE_UNITS:'Update failed due to duplicate ad units!',
+		OK:"OK"
 	},
 	AUDIT_LOG_MESSAGES:{
 		ACTION:{
