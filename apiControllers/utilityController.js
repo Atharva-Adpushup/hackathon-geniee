@@ -3,6 +3,8 @@ const siteModel = require('../models/siteModel');
 const httpStatus = require('../configs/httpStatusConsts');
 const adpushup = require('../helpers/adpushupEvent');
 const { appBucket } = require('../helpers/routeHelpers');
+const redisClient = require('../middlewares/redis');
+const { HTTP_RESPONSE_MESSAGES } = require('../configs/commonConsts');
 
 const router = express.Router();
 
@@ -97,4 +99,21 @@ router.get('/syncGAMSites', async (req, res) => {
 			.json({ error: `Someting went wrong! ${error}` });
 	}
 });
+
+router.get('/flushRedis', async (req, res) => {
+	try {
+		const isRedisConnected = redisClient.isConnected();
+		if (!isRedisConnected) {
+			return res.send('Redis is not connected!');
+		}
+
+		await redisClient.flushAll();
+		return res.send(HTTP_RESPONSE_MESSAGES.OK);
+	} catch (error) {
+		return res
+			.status(httpStatus.INTERNAL_SERVER_ERROR)
+			.send(HTTP_RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR);
+	}
+});
+
 module.exports = router;
