@@ -86,7 +86,7 @@ const ROUTES = {
 			path: '/sites/:siteId',
 			name: ':siteId',
 			exact: true,
-			customProps: { activeTab: NAV_ITEMS_INDEXES.QUICK_SNAPSHOT },
+			customProps: { activeTab: NAV_ITEMS_INDEXES.SITE_SETTINGS },
 			component: ManageSite
 		},
 		{

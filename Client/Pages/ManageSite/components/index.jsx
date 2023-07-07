@@ -75,8 +75,8 @@ class ManageSite extends React.Component {
 		const siteId = this.getSiteId();
 		switch (activeTab) {
 			default:
-			case NAV_ITEMS_INDEXES.QUICK_SNAPSHOT:
-				return <QuickSnapshotContainer siteId={siteId} />;
+			// case NAV_ITEMS_INDEXES.QUICK_SNAPSHOT:
+			// return <QuickSnapshotContainer siteId={siteId} />;
 			case NAV_ITEMS_INDEXES.SITE_SETTINGS:
 				return <SiteSettings {...this.props} />;
 			case NAV_ITEMS_INDEXES.MANAGE_APPS:
@@ -101,7 +101,7 @@ class ManageSite extends React.Component {
 		return (
 			<div>
 				<Nav bsStyle="tabs" activeKey={activeItem.INDEX} onSelect={this.handleNavSelect}>
-					<NavItem eventKey={1}>{NAV_ITEMS_VALUES.QUICK_SNAPSHOT}</NavItem>
+					{/* <NavItem eventKey={1}>{NAV_ITEMS_VALUES.QUICK_SNAPSHOT}</NavItem> */}
 					<NavItem eventKey={2}>{NAV_ITEMS_VALUES.SITE_SETTINGS}</NavItem>
 					<NavItem eventKey={3}>{NAV_ITEMS_VALUES.MANAGE_APPS}</NavItem>
 				</Nav>
