@@ -1,6 +1,6 @@
 {
 	"name": "adpushup-app",
-	"version": "2.43.0",
+	"version": "2.43.1",
 	"private": true,
 	"scripts": {
 		"start": "node app.js",
@@ -95,6 +95,7 @@
 		"net": "^1.0.2",
 		"node-cron": "^1.1.2",
 		"node-fetch": "^2.6.1",
+		"node-google-dfp": "^0.3.2",
 		"node-utils": "https://github.com/adpushup/NodeUtils.git",
 		"node-uuid": "^1.4.7",
 		"normalizeurl": "^0.1.3",
