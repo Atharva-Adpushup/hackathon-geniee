@@ -90,6 +90,15 @@
 			"exec_mode": "fork_mode",
 			"env": {},
 			"max_memory_restart": "1G"
+		},
+		{
+			"name": "CRON-SellersJsonVerificationService",
+			"script": "./services/crons/sellerJsonVerificationService/sellersJsonVerificationCronService.js",
+			"log_date_format": "YYYY-MM-DD HH:mm Z",
+			"instances": "1",
+			"exec_mode": "fork_mode",
+			"env": {},
+			"max_memory_restart": "1G"
 		}
 	]
 }

@@ -101,7 +101,8 @@ module.exports = {
 
 	GOOGLE_SPREAD_SHEET_ID: {
 		CLS_MONITORING: '1ju3NvLOBOqUEMzX1AfqKnQtLvB28hjS1-S1mJmOh6fI',
-		REPORTING_DATA: '1LJELLTJxJDPjlz07A7gTvvo59jQI_kLolyyUM89Df2M'
+		REPORTING_DATA: '1LJELLTJxJDPjlz07A7gTvvo59jQI_kLolyyUM89Df2M',
+		sellersJSONReporting: '1JKe1F7yZLQt9P67TnpsdAvgO2UTm_HJrkaS9PhHDthY'
 	},
 	GOOGLE_OAUTH_CLIENT_ID:
 		'776523595883-ku17c7130dv2bknmr8d3ukk2sdnluu1f.apps.googleusercontent.com',
@@ -735,6 +736,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		paymentHistoryService: '0 0 5 * *', //At 00:00 on 5th every month
 		sellersJSONService: '0 */12 * * *', // Every 12hours
 		clsMonitoringService: '0 8 * * *', //Run at 8:00 everyday,
+		sellersJsonReportingService: '0 3 * * 1,4', //Runs Mon and Thurs
 		poweredByAdpushupBannerService: '30 1 * * 0', //Runs at 1:30 Every Sunday,
 		partnersPanelService: {
 			Criteo: '22 13 * * *',
