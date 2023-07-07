@@ -1,60 +1,74 @@
 const redis = require('redis');
 const config = require('../configs/config');
 
-const REDIS_PORT = config.redisEnvironment.AZURE_CACHE_FOR_REDIS_PORT || 6379;
-const REDIS_HOST = config.redisEnvironment.AZURE_CACHE_FOR_REDIS_HOST_NAME || '127.0.0.1';
-const REDIS_PASSWORD = config.redisEnvironment.AZURE_CACHE_FOR_REDIS_ACCESS_KEY || '';
+const REDIS_PORT = config.redisEnvironment.AZURE_CACHE_FOR_REDIS_PORT;
+const REDIS_HOST = config.redisEnvironment.AZURE_CACHE_FOR_REDIS_HOST_NAME;
+const REDIS_PASSWORD = config.redisEnvironment.AZURE_CACHE_FOR_REDIS_ACCESS_KEY;
 
 const redisClient = redis.createClient({
+	url: `rediss://${REDIS_HOST}:${REDIS_PORT}`,
 	password: REDIS_PASSWORD,
 	socket: {
-		host: REDIS_HOST,
-		port: REDIS_PORT
+		connectTimeout: 60 * 1000
 	}
 });
 
 redisClient
 	.on('connect', () => {
-		console.log('redis connected');
-		console.log(`connected ${redisClient.connected}`);
+		console.log('Redis connected');
 	})
 	.on('error', error => {
-		console.log(error);
-		if (config.environment.HOST_ENV === 'production') {
-			throw error;
-		}
+		console.log('Redis Connection Error: ', error);
+	})
+	.on('ready', () => {
+		console.log('Redis is ready');
 	});
+
+redisClient.connect();
 
 const API = {
 	getData: key =>
-		new Promise((resolve, reject) => {
-			if (!redisClient.connected) reject(new Error('Redis not connected'));
-			else
-				redisClient.get(key, (err, data) => {
-					if (err) {
-						console.log(err);
-						return reject(err);
-					}
-					return resolve(data);
-				});
+		new Promise(async (resolve, reject) => {
+			if (!redisClient.isOpen || !redisClient.isReady) {
+				return reject(new Error('Redis not connected'));
+			}
+
+			try {
+				const data = await redisClient.get(key);
+				return resolve(data);
+			} catch (err) {
+				console.log(err);
+				return reject(err);
+			}
 		}),
 	setValue: (key, value, expiry) =>
-		new Promise((resolve, reject) => {
-			if (!redisClient.connected) reject(new Error('Redis not connected'));
-			else if (expiry) {
-				redisClient.setex(key, expiry, value);
-			} else {
-				redisClient.set(key, value);
+		new Promise(async (resolve, reject) => {
+			if (!redisClient.isOpen || !redisClient.isReady) {
+				return reject(new Error('Redis not connected'));
 			}
-			resolve();
+
+			try {
+				if (expiry) {
+					await redisClient.set(key, value, {
+						EX: expiry
+					});
+				} else {
+					await redisClient.set(key, value);
+				}
+				return resolve();
+			} catch (err) {
+				return reject(err);
+			}
 		}),
-	isConnected: () => redisClient.connected,
+	isConnected: () => redisClient.isOpen && redisClient.isReady,
 	flushAll: () =>
-		new Promise((resolve, reject) => {
-			redisClient.flushall((err, suceeded) => {
-				if (err) reject(err);
-				else resolve(suceeded);
-			});
+		new Promise(async (resolve, reject) => {
+			try {
+				const suceeded = await redisClient.flushAll();
+				return resolve(suceeded);
+			} catch (err) {
+				return reject(err);
+			}
 		}),
 	getClient: () => redisClient
 };

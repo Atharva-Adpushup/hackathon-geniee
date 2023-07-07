@@ -1,6 +1,6 @@
 {
 	"name": "adpushup-app",
-	"version": "2.42.10",
+	"version": "2.42.11",
 	"private": true,
 	"scripts": {
 		"start": "node app.js",
@@ -136,7 +136,7 @@
 		"react-visibility-sensor": "^5.1.1",
 		"react-with-styles": "3.2.1",
 		"reactcss": "^1.0.3",
-		"redis": "^3.0.2",
+		"redis": "^4.6.7",
 		"redux": "^4.0.1",
 		"redux-thunk": "^2.3.0",
 		"request": "^2.88.0",
