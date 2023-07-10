@@ -4,3 +4,9 @@
 .dropdown{
     z-index:20;
 }
+.mb-10{
+    margin-bottom: 10px;
+}
+.error-red{
+    color: red;
+}

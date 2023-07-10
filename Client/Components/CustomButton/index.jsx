@@ -4,7 +4,10 @@ import PropTypes from 'prop-types';
 import Spinner from '../Spinner';
 
 const CustomButton = ({ children, variant, showSpinner, className, ...props }) => (
-	<Button className={`btn--${variant}${className ? ` ${className}` : ''}`} {...props}>
+	<Button
+		className={`btn--${variant}${className ? ` ${className}` : ''}`}
+		{...props}
+	>
 		{showSpinner && <Spinner size={11} color={variant === 'primary' ? '#fff' : 'primary'} />}{' '}
 		{children}
 	</Button>
