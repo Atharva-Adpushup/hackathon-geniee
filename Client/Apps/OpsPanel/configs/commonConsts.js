@@ -665,6 +665,10 @@ const GA_ACCESS_EMAIL_OPTIONS = [
 	{
 		name: 'publisher_invite@adpushup.com',
 		value: 'publisher_invite@adpushup.com'
+	},
+	{
+		name: 'analytics@adpushup.com',
+		value: 'analytics@adpushup.com'
 	}
 ];
 
