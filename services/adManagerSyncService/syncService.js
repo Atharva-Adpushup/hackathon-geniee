@@ -16,7 +16,8 @@ const {
 	dfpApiVersion,
 	db: dbConfig,
 	azureBlobStorage,
-	rabbitMQ
+	rabbitMQ,
+	fallbackLineItemsUpdateHours
 } = require('./config');
 
 const {
@@ -169,7 +170,9 @@ function checkIfAnyTypeUpdated(previousHash, lineItems) {
 		if (calculatedTypeHash !== previousHash[type]) {
 			updatedTypes.push(type);
 			updatedHash[type] = calculatedTypeHash;
-			logger.info({ message: `${type} lineItems Updated, previousValue: ${previousHash[type]}, newValue: ${calculatedTypeHash}` });
+			logger.info({
+				message: `${type} lineItems Updated, previousValue: ${previousHash[type]}, newValue: ${calculatedTypeHash}`
+			});
 		}
 	}
 
@@ -199,10 +202,17 @@ const processfetchedLineItems = async (lineItems, networkCode = '103512698') => 
 				? fallbackLineItemsHash !== doc.fallbackLineItemsHash
 				: true;
 
-		if (fallbackLineItemsUpdated) {
+		const hoursPassedSinceLastUpdate = doc.fallbackLineItemsLastUpdated
+			? (new Date() - new Date(doc.fallbackLineItemsLastUpdated)) / 36e5
+			: Infinity;
+
+		if (fallbackLineItemsUpdated && hoursPassedSinceLastUpdate > fallbackLineItemsUpdateHours) {
 			doc.fallbackLineItems = fallbackLineItems;
 			doc.fallbackLineItemsHash = fallbackLineItemsHash;
-			logger.info({ message: `fallback LineItems Updated, ${fallbackLineItems}, hash: ${fallbackLineItemsHash}` });
+			logger.info({
+				message: `fallback LineItems Updated, ${fallbackLineItems}, hash: ${fallbackLineItemsHash}`
+			});
+			doc.fallbackLineItemsLastUpdated = +new Date();
 			allGAMSiteSyncRequired = true;
 		}
 
@@ -212,15 +222,14 @@ const processfetchedLineItems = async (lineItems, networkCode = '103512698') => 
 
 		const anyTypeUpdated = checkIfAnyTypeUpdated(doc.typeHash, fetchedLineItems);
 
+		let mandatoryTypesUpdated = [];
 		if (anyTypeUpdated.updated) {
 			let { updatedTypes, updatedHash } = anyTypeUpdated;
 			const mandatoryLineItemTypes = LINE_ITEM_TYPES_OBJ.filter(
 				type => type.isMandatory && !type.groupedSeparately
 			).map(type => type.value);
 
-			let mandatoryTypesUpdated = updatedTypes.filter(type =>
-				mandatoryLineItemTypes.includes(type)
-			);
+			mandatoryTypesUpdated = updatedTypes.filter(type => mandatoryLineItemTypes.includes(type));
 			let siteLevelTypesUpdated = updatedTypes.filter(
 				type => !mandatoryLineItemTypes.includes(type)
 			);
@@ -231,25 +240,35 @@ const processfetchedLineItems = async (lineItems, networkCode = '103512698') => 
 
 			if (mandatoryTypesUpdated.length) {
 				allGAMSiteSyncRequired = true;
-				logger.info({ message: `Mandatory type LineItems Updated, ${JSON.stringify(anyTypeUpdated)}` });
+				logger.info({
+					message: `Mandatory type LineItems Updated, ${JSON.stringify(anyTypeUpdated)}`
+				});
 				handleMandatoryTypeUpdates(doc);
-			} else if (siteLevelTypesUpdated.length) {
-				logger.info({ message: `site level type LineItems Updated, ${JSON.stringify(anyTypeUpdated)}` });
+			} else if (!allGAMSiteSyncRequired && siteLevelTypesUpdated.length) {
+				logger.info({
+					message: `site level type LineItems Updated, ${JSON.stringify(anyTypeUpdated)}`
+				});
 				await utils.handleUpdatedTypes(updatedTypes, networkCode, db);
 			}
 
 			doc.typeHash = updatedHash;
 		}
 
-		if (fallbackLineItemsUpdated || anyTypeUpdated.updated){
+		if (fallbackLineItemsUpdated || anyTypeUpdated.updated) {
 			doc.lastUpdated = +new Date();
 			let dbResult = await db.upsertDoc(`ntwk::${networkCode}`, doc);
 			if (dbResult instanceof Error) {
 				throw dbResult;
 			}
 		}
+		let reason;
+		if (allGAMSiteSyncRequired) {
+			reason = mandatoryTypesUpdated.length
+				? 'Mandatory Type Line Items Updated'
+				: 'Fallback Line Items Updated';
+		}
 
-		return { lineItems, allGAMSiteSyncRequired };
+		return { lineItems, allGAMSiteSyncRequired, reason };
 	} catch (e) {
 		console.error(e);
 	}
@@ -289,13 +308,13 @@ const updateLineItemsForNetwork = async (dfpConfig, hbOrderIds) => {
 			return accumulator;
 		}, {});
 
-		let { lineItems, allGAMSiteSyncRequired } = await processfetchedLineItems(
+		let { lineItems, allGAMSiteSyncRequired, reason } = await processfetchedLineItems(
 			results,
 			dfpConfig.networkCode
 		);
 
 		if (allGAMSiteSyncRequired) {
-			utils.syncAllGAMSites(dfpConfig.networkCode);
+			utils.syncAllGAMSites(dfpConfig.networkCode, reason);
 		}
 
 		// Get the total number of lineItems fetched across all types
