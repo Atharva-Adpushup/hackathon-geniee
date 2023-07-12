@@ -21,6 +21,7 @@ const { appBucket } = require('../helpers/routeHelpers');
 const config = require('../configs/config');
 
 const router = express.Router();
+const reportingTimeOut = 15*60*60*1000;//15 mins reporting time out
 
 const setCacheHeaders = res => {
 	res.header('X-AP-CACHE', 'HIT');
@@ -28,7 +29,7 @@ const setCacheHeaders = res => {
 
 router
 	.get('/getCustomStats', reportsAccess, async (req, res) => {
-		req.setTimeout(360000); // timeout set to 6 mins for this particular route - temporary fix, need to remove when the backend responds on time
+		req.setTimeout(reportingTimeOut); // timeout set to 15 mins for this particular route - temporary fix, need to remove when the backend responds on time
 		const {
 			query: { bypassCache = 'false', ...reportingConfig },
 			user: { originalEmail, email }
@@ -62,7 +63,7 @@ router
 		}
 	})
 	.get('/getAPStatsByCustom', reportsAccess, async (req, res) => {
-		req.setTimeout(360000); // timeout set to 6 mins for this particular route - temporary fix, need to remove when the backend responds on time
+		req.setTimeout(reportingTimeOut); // timeout set to 15 mins for this particular route - temporary fix, need to remove when the backend responds on time
 		const {
 			query: { bypassCache = 'false' }
 		} = req;
