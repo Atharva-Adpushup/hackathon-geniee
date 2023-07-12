@@ -1,5 +1,9 @@
 const axios = require('axios');
 const { geniee } = require('./config');
+const config = require('../../configs/config');
+const helperUtils = require('../../helpers/utils');
+
+const isNotProduction = config.environment.HOST_ENV !== 'production';
 
 function updatedTypeUsedOnSite(siteobject) {
 	let updatedTypes = this;
@@ -61,8 +65,12 @@ module.exports = {
 		let sitesToSync = sitesWithTypes.results.filter(updatedTypeUsedOnSite, updatedTypes);
 		sitesToSync = sitesToSync.map(site => site.siteId);
 		await syncSites(sitesToSync, networkCode);
+		this.logToEvLogger({
+			message: `Syncing site as type line Items updated: ${updatedTypes}`,
+			details: `sites = ${sitesToSync}`
+		});
 	},
-	syncAllGAMSites: async function(networkCode) {
+	syncAllGAMSites: async function(networkCode, reason) {
 		const requestSettings = {
 			method: 'GET',
 			url: geniee.endpoint + geniee.GAMSiteSync,
@@ -79,5 +87,20 @@ module.exports = {
 			.catch(error => {
 				return { error: `failed to sync sites for GAM ${networkCode}: ${error}` };
 			});
+		this.logToEvLogger({
+			message: `Syncing all GAM sites as ${reason} line Items updated`,
+			details: `${reason} line Items updated`
+		});
+	},
+	logToEvLogger: function(job) {
+		if (isNotProduction) {
+			console.log(`Environment is development/staging. Skipping event viewer logging.`);
+			return Promise.resolve(job);
+		}
+		console.log(`${job.message} pushed to evLogger queue.`);
+		return helperUtils.publishToRabbitMqQueue(
+			config.RABBITMQ.EV_LOGGER.NAME_IN_QUEUE_PUBLISHER_SERVICE,
+			{ source: 'LINE ITEM SERVICE', ...job }
+		);
 	}
 };
