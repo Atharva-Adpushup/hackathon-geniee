@@ -26,7 +26,6 @@ import PaymentHistoryContainer from '../containers/PaymentHistoryContainer';
 import GaStatsContainer from '../containers/GaStatsContainer';
 import AsyncGroupSelect from '../../../Components/AsyncGroupSelect';
 import axiosInstance from '../../../helpers/axiosInstance';
-import history from '../../../helpers/history';
 
 import {
 	API,
@@ -64,9 +63,6 @@ class Dashboard extends React.Component {
 				data: { isUniqueImpEnabled = false }
 			}
 		} = props;
-
-		// temp redirect o reports
-		history.push('/reports');
 
 		this.state = {
 			quickDates: dates,
