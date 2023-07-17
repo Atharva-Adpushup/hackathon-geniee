@@ -46,5 +46,6 @@ module.exports = {
 		endpoint: 'http://localhost:8080/',
 		GAMSiteSync: 'api/utils/syncGAMSites',
 		siteSync: 'api/utils/syncCDN'
-	}
+	},
+	fallbackLineItemsUpdateHours : 48
 };

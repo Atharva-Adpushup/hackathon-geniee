@@ -64,9 +64,12 @@ module.exports = {
 		let sitesWithTypes = await db.query(getSiteTypesQuery, { networkCode });
 		let sitesToSync = sitesWithTypes.results.filter(updatedTypeUsedOnSite, updatedTypes);
 		sitesToSync = sitesToSync.map(site => site.siteId);
+		if (!sitesToSync.length) {
+			return;
+		}
 		await syncSites(sitesToSync, networkCode);
 		this.logToEvLogger({
-			message: `Syncing site as type line Items updated: ${updatedTypes}`,
+			message: `Syncing site as type line Items updated: ${updatedTypes} for GAM ${networkCode}`,
 			details: `sites = ${sitesToSync}`
 		});
 	},
@@ -88,7 +91,7 @@ module.exports = {
 				return { error: `failed to sync sites for GAM ${networkCode}: ${error}` };
 			});
 		this.logToEvLogger({
-			message: `Syncing all GAM sites as ${reason} line Items updated`,
+			message: `Syncing all GAM sites for ${networkCode} as ${reason} line Items updated`,
 			details: `${reason} line Items updated`
 		});
 	},
