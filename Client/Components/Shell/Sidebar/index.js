@@ -47,9 +47,7 @@ const Sidebar = ({ show, user, sites }) => {
 	return (
 		<aside className={`sidebar ${show ? 'sb-show' : 'sb-hide'}`}>
 			<ul className="sb-nav primary-nav">
-				{user.email === 'demo@adpushup.com'
-					? getNavItem('Dashboard', '/dashboard', 'tachometer-alt', !show)
-					: ''}
+				{getNavItem('Dashboard', '/dashboard', 'tachometer-alt', !show)}
 				{getNavItem('My Sites', '/sites', 'list', !show)}
 				{getNavItem('Reports', '/reports', 'chart-area', !show)}
 				{getNavItem('Integrations', '/integrations', 'desktop', !show)}

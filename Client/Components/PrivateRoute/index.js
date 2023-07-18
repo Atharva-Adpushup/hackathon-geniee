@@ -18,17 +18,6 @@ export default ({ component: Component, title = '', ...rest }) => {
 		<>
 			{/* Added style instead of className here as sometimes it appears that css file may get delayed loading css styles and
 			the statys bar appears without css */}
-			<div
-				style={{
-					backgroundColor: '#ea585c',
-					textAlign: 'center',
-					color: 'white',
-					padding: '5px 2px 5px 2px'
-				}}
-			>
-				Due to an issue with the AdPushup dashboard, you may face issues while fetching performance
-				reports. Our teams are working round the clock to fix this. Thanks for your patience
-			</div>
 			{showPaymentStatusBar && (
 				<div
 					style={{
