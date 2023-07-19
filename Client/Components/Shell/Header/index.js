@@ -7,7 +7,6 @@ import history from '../../../helpers/history';
 import UserChange from './UserChange';
 import config from '../../../config/config';
 import CustomButton from '../../CustomButton/index';
-import Notifications from '../../../Containers/DashboardNotificationContainer';
 
 function consoleRedirection(e) {
 	e.preventDefault();
@@ -68,7 +67,7 @@ const Header = ({
 						<CustomButton
 							variant="secondary"
 							onClick={impersonateCurrentUser}
-							className="impersonate-btn"
+							className="impersonate-btn u-margin-r3"
 							title={`Impersonate as ${user.email}`}
 						>
 							Impersonate as {user.email}
@@ -78,7 +77,6 @@ const Header = ({
 						</CustomButton> */}
 					</React.Fragment>
 				) : null}
-				<Notifications />
 				<DropdownButton pullRight title={`Hello ${user.firstName || ''}`} id="dropdown-button">
 					{/* <MenuItem eventKey="1">Profile</MenuItem> */}
 					{/* <MenuItem eventKey="2">Settings</MenuItem> */}
