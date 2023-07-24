@@ -9,9 +9,9 @@ const commonConsts = require('../../../configs/commonConsts');
 const config = require('../../../configs/config');
 const helperUtils = require('../../../helpers/utils');
 
-const cdnSyncQueuePublisher = require('../../../queueWorker/rabbitMQ/workers/cdnSyncQueuePublisher');
 const ampScriptSyncQueuePublisher = require('../../../queueWorker/rabbitMQ/workers/ampScriptQueuePublisher');
 const ampDvcSyncQueuePublisher = require('../../../queueWorker/rabbitMQ/workers/ampDvcScriptQueuePublisher');
+const queuePublisher = require('../../../queueWorker/rabbitMQ/workers/queuePublisher');
 
 const N1qlQuery = couchbaseModule.N1qlQuery;
 const isNotProduction =
@@ -143,7 +143,7 @@ function getSyncPublisherForScriptType(type, siteParams = {}) {
 			if (!siteParams.isAmpScriptEnabled) return null;
 			return ampScriptSyncQueuePublisher;
 		case scriptTypes.ADPUSHUPJS:
-			return cdnSyncQueuePublisher;
+			return queuePublisher;
 		default:
 			return null;
 	}
