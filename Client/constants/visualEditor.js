@@ -97,7 +97,7 @@ const iabSizes = {
 		]
 	}
 };
-const refreshIntervals = [30, 60, 90, 120, 180, 240, 300, 360];
+const refreshIntervals = [27, 30, 60, 90, 120, 180, 240, 300, 360];
 const supportedAdSizes = [
 	{
 		layoutType: 'SQUARE',

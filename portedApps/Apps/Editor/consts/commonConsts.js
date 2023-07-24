@@ -514,7 +514,7 @@ const status = {
 			MOBILE: 450
 		}
 	},
-	refreshIntervals = [30, 60, 90, 120, 180, 240, 300, 360];
+	refreshIntervals = [27, 30, 60, 90, 120, 180, 240, 300, 360];
 
 export {
 	status,
