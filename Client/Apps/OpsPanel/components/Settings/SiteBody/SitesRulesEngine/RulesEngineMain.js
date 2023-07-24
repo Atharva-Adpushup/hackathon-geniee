@@ -482,8 +482,15 @@ class RulesEngineMain extends React.Component {
 		refreshInterval action so we will get only one action in actions array and the action[1] here is undefined so here the
 		error check is applied on action[0]
 		*/
+		const missingRefreshIntervalError =
+			RULES_ENGINE.RULES_ENGINE_ACTIONS_KEY_ERRORS.refreshInterval
 		if (!isRefreshIntervalActionPresent) {
-			actions[0].keyError = 'Please also select a Refresh Interval for Refresh Type';
+			actions[0].keyError = missingRefreshIntervalError;
+		} else if (
+			isRefreshIntervalActionPresent &&
+			actions[0].keyError === missingRefreshIntervalError
+		) {
+			actions[0].keyError = '';
 		}
 
 		// set error for key, value of action if not valid
