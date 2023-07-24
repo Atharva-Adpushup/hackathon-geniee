@@ -469,6 +469,23 @@ class RulesEngineMain extends React.Component {
 			updatedTriggers.push(trigger);
 		}
 
+		let isRefreshIntervalActionPresent = false;
+		for (let index = 0; index < actions.length; index++) {
+			const action = actions[index];
+
+			if (action.key === 'refreshInterval') {
+				isRefreshIntervalActionPresent = true;
+			}
+		}
+		/*
+		Currently while looping over the actions if there is only refresh type action and the uer has not selected the
+		refreshInterval action so we will get only one action in actions array and the action[1] here is undefined so here the
+		error check is applied on action[0]
+		*/
+		if (!isRefreshIntervalActionPresent) {
+			actions[0].keyError = 'Please also select a Refresh Interval for Refresh Type';
+		}
+
 		// set error for key, value of action if not valid
 		// eslint-disable-next-line no-plusplus
 		for (let index = 0; index < actions.length; index++) {
