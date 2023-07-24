@@ -768,7 +768,10 @@ const RULES_ENGINE = {
 			label: 'Ad Unit',
 			value: 'adunit'
 		}
-	]
+	],
+	RULES_ENGINE_ACTIONS_KEY_ERRORS: {
+		refreshInterval: 'Please also select a Refresh Interval for Refresh Type'
+	}
 };
 
 const INVENTORY_BULK_ACTIONS = [
