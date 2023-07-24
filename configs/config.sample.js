@@ -1,4 +1,7 @@
-module.exports = {
+const merge = require('lodash/merge');
+const selectiveRolloutConfig = require('./selectiveRollout.config');
+
+const config = {
 	environment: {
 		// change to environment
 		HOST_PORT: 8080,
@@ -6,6 +9,7 @@ module.exports = {
 		LOGS_DIR: 'logs',
 		OPS_HOST_PORT: 8443
 	},
+	deployment: 'master',
 	dfpNetworkCodes: {
 		GENIEE: '11586562'
 	},
@@ -403,9 +407,12 @@ module.exports = {
 		supportMails: 'abhishek.sontakke@adpushup.com'
 	},
 	googleSheetCreds: '',
-	SLACK_ENDPOINT: 'https://common-azure-function.azurewebsites.net/api/publish'
+	SLACK_ENDPOINT: 'https://common-azure-function.azurewebsites.net/api/publish',
+	SITE_SYNC_ERROR_ALERT_REPORTER:
+		'rahul.kumar@adpushup.com,yash.bhardwaj@adpushup.com,divyanshu.bhatnagar@adpushup.com,anil.panghal@adpushup.com,rahul.ranjan@adpushup.com'
 };
 
+module.exports = merge(config, selectiveRolloutConfig);
 /*
 	Production
 	consoleCdnSync - for cdn syncing and uploading adpushup.js

@@ -5,6 +5,7 @@ const adpushup = require('../helpers/adpushupEvent');
 const { appBucket } = require('../helpers/routeHelpers');
 const redisClient = require('../middlewares/redis');
 const { HTTP_RESPONSE_MESSAGES } = require('../configs/commonConsts');
+const { getSelectiveRolloutFeatureConfigFromCB } = require('../helpers/commonFunctions');
 
 const router = express.Router();
 
@@ -109,6 +110,20 @@ router.get('/flushRedis', async (req, res) => {
 
 		await redisClient.flushAll();
 		return res.send(HTTP_RESPONSE_MESSAGES.OK);
+	} catch (error) {
+		return res
+			.status(httpStatus.INTERNAL_SERVER_ERROR)
+			.send(HTTP_RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR);
+	}
+});
+
+router.get('/selectiveRolloutConfig', async (req, res) => {
+	const { feature } = req.query;
+	try {
+		const selectiveRolloutConfigForCurrentFeature = await getSelectiveRolloutFeatureConfigFromCB(
+			feature
+		);
+		return res.status(httpStatus.OK).json(selectiveRolloutConfigForCurrentFeature);
 	} catch (error) {
 		return res
 			.status(httpStatus.INTERNAL_SERVER_ERROR)
