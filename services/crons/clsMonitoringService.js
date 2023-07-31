@@ -6,6 +6,7 @@
 - Trigger for issues - CLS value > 0.1
 */
 
+const os = require('os');
 const request = require('request-promise');
 const cron = require('node-cron');
 const { GoogleSpreadsheet } = require('google-spreadsheet');
@@ -242,6 +243,37 @@ async function prepareDataForAlerts() {
 	return tableFormatData;
 }
 
+function getHostIpAddress() {
+	try {
+		const interfaces = os.networkInterfaces();
+		let ipAddress = "";
+		for(let key in interfaces) {
+			let currentInterfaceAddresses = interfaces[key];
+			let ipV4Addresses = currentInterfaceAddresses.filter(interfaceAddress => interfaceAddress.family === 'IPv4' && !interfaceAddress.internal)
+			if(ipV4Addresses.length) {
+				ipAddress = ipV4Addresses[0].address;
+				break;
+			}
+		}
+		return ipAddress;
+	} catch (err) {
+		console.log(err);
+		return "No IP Address Found"
+	}
+}
+
+function generateErrorMailBody(err, hostIpAddress) {
+	const errorFormatData = `<html>
+		<body>
+			<h4>There was an error in CLS monitoring service</h4>
+			<p><strong>Error Message</strong>: ${err.message}</p>
+			<p><strong>Host IP</strong>: ${hostIpAddress}</p>
+		</body>
+		</html>`;
+	
+	return errorFormatData;
+}
+
 async function sendMailAlertForClsIssues() {
 	try {
 		const tableFormatData = await prepareDataForAlerts();
@@ -260,11 +292,13 @@ async function sendMailAlertForClsIssues() {
 		});
 	} catch (err) {
 		console.log(err);
+		const hostIpAddress = getHostIpAddress();
+		const errorMailBody = generateErrorMailBody(err, hostIpAddress);
 		return sendEmail({
 			queue: 'MAILER',
 			data: {
 				to: config.clsMonitoringAlerts.hackersMail,
-				body: err.message,
+				body: errorMailBody,
 				subject: 'CLS Monitoring Service fails'
 			}
 		});
