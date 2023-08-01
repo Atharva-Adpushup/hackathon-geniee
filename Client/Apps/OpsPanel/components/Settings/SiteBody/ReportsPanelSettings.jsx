@@ -19,7 +19,8 @@ class ReportsPanelSettings extends Component {
 			mcm = {},
 			peerPerformanceAnalysis = false,
 			peerPerformanceAnalysisSites = [],
-			useGAAnalyticsForReporting = false
+			useGAAnalyticsForReporting = false,
+			pushToSellersJson = true
 		} = user;
 		const { isMcmEnabled = false, childPublisherId = '' } = mcm;
 
@@ -31,10 +32,12 @@ class ReportsPanelSettings extends Component {
 			childPublisherId,
 			peerPerformanceAnalysis,
 			peerPerformanceAnalysisSites,
-			useGAAnalyticsForReporting
+			useGAAnalyticsForReporting,
+			pushToSellersJson
 		};
 	}
 
+	// eslint-disable-next-line react/sort-comp
 	handleChange = e => {
 		this.setState({
 			[e.target.name]: e.target.value
@@ -80,7 +83,8 @@ class ReportsPanelSettings extends Component {
 			isMcmEnabled,
 			peerPerformanceAnalysisSites,
 			peerPerformanceAnalysis,
-			useGAAnalyticsForReporting
+			useGAAnalyticsForReporting,
+			pushToSellersJson
 		} = this.state;
 		const { updateUser, customProps, showNotification } = this.props;
 		if (isMcmEnabled && childPublisherId === '') {
@@ -127,6 +131,10 @@ class ReportsPanelSettings extends Component {
 				{
 					key: 'useGAAnalyticsForReporting',
 					value: useGAAnalyticsForReporting
+				},
+				{
+					key: 'pushToSellersJson',
+					value: pushToSellersJson
 				}
 			],
 			dataForAuditLogs
@@ -140,13 +148,14 @@ class ReportsPanelSettings extends Component {
 	getPeerPerformanceOptions = () => {
 		const { allActiveSites, peerPerformanceBlockedSites } = this.props;
 		const { peerPerformanceAnalysisSites } = this.state;
-		//creating map for all selected sites
+		// creating map for all selected sites
 		const peerSelectedSiteIdsMap = peerPerformanceAnalysisSites.reduce((sitesMap, site) => {
+			// eslint-disable-next-line no-param-reassign
 			sitesMap[site.value] = true;
 			return sitesMap;
 		}, {});
 		const siteIdsKeys = Object.keys(allActiveSites);
-		//Removing blocked sites from options
+		// Removing blocked sites from options
 		const filteredSiteIds = pullAll(
 			siteIdsKeys,
 			peerPerformanceBlockedSites.map(site => site.toString())
@@ -191,7 +200,8 @@ class ReportsPanelSettings extends Component {
 			isMcmEnabled,
 			childPublisherId,
 			peerPerformanceAnalysis,
-			useGAAnalyticsForReporting
+			useGAAnalyticsForReporting,
+			pushToSellersJson
 		} = this.state;
 
 		const { globalDataFetched, peerPerformanceBlockedSitesFetched } = this.props;
@@ -238,6 +248,19 @@ class ReportsPanelSettings extends Component {
 					defaultLayout
 					name="sessionRpmReports"
 					id="js-sessionRpmReports"
+				/>
+				<CustomToggleSwitch
+					labelText="Push to Sellers JSON"
+					className="u-margin-t4 u-margin-b4 negative-toggle u-cursor-pointer"
+					checked={pushToSellersJson}
+					onChange={this.handleToggle}
+					layout="horizontal"
+					size="m"
+					on="Yes"
+					off="No"
+					defaultLayout
+					name="pushToSellersJson"
+					id="js-pushToSellersJson"
 				/>
 				<CustomToggleSwitch
 					labelText="Enable MCM"
