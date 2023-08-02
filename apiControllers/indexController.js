@@ -29,6 +29,7 @@ const {
 	checkParams,
 	sendDataToAuditLogService,
 	getAssociatedAccountsWithUser,
+	isVideoAdsDashboardEnabled,
 	addActiveProductsToMeta,
 	getGlobalClientConfig
 } = require('../helpers/routeHelpers');
@@ -163,7 +164,7 @@ router
 					getUserSites(user),
 					getNetworkWideHBRules(),
 					// get logged in user's details in case of switched user
-					originalEmail && userModel.getUserByEmail(originalEmail) || Promise.resolve(''),
+					(originalEmail && userModel.getUserByEmail(originalEmail)) || Promise.resolve(''),
 					getGlobalClientConfig(),
 					async (networkConfig, sites, networkWideHBRules, originalUser, globalClientConfig) => {
 						try {
@@ -171,20 +172,25 @@ router
 							// This is for AdOps/Account Managers to prevent unAuth access to other accounts
 							let associatedAccounts = await getAssociatedAccountsWithUser(userEmail);
 
-							const originalUsersData = originalUser && originalUser.cleanData() || {};
+							const originalUsersData = (originalUser && originalUser.cleanData()) || {};
 							const userData = user.cleanData();
 							const siteKeys = Object.keys(sites);
 
 							const userSitesArray = siteKeys.length > 0 ? [...userData.sites] : [];
 							const userSitesArrayLength = userSitesArray.length;
-							
+
 							userData.sites = {};
+
+							const showVideoAdsDashboard = isVideoAdsDashboardEnabled(sites);
+							userData[consts.SHOW_VIDEO_ADS_DASHBOARD] = showVideoAdsDashboard;
 
 							// get `paymentReconciliation` flag from original user's data and set it into
 							// impersonate user's data
 							// Flag to check if the user is allowed to export site owners email, account managers email or not
 							// under Ops Panel reports with csv export
-							const { paymentReconciliation = false } = originalEmail ? originalUsersData : userData;
+							const { paymentReconciliation = false } = originalEmail
+								? originalUsersData
+								: userData;
 
 							if (userSitesArrayLength === 0) {
 								return res.status(httpStatus.OK).json({
@@ -218,7 +224,11 @@ router
 								}
 
 								return res.status(httpStatus.OK).json({
-									user: { ...userData, isSuperUser, paymentReconciliation /** Pass the flag to check if the user is allowed to export site owners email or not */ },
+									user: {
+										...userData,
+										isSuperUser,
+										paymentReconciliation /** Pass the flag to check if the user is allowed to export site owners email or not */
+									},
 									networkConfig,
 									networkWideHBRules,
 									associatedAccounts,
@@ -451,16 +461,16 @@ router
 	})
 	.get('/getGlobalClientConfig', (req, res) => {
 		return getGlobalClientConfig()
-		.then(globalClientConfig =>
-			sendSuccessResponse(
-				{
-					message: 'Operation successful',
-					globalClientConfig
-				},
-				res
+			.then(globalClientConfig =>
+				sendSuccessResponse(
+					{
+						message: 'Operation successful',
+						globalClientConfig
+					},
+					res
+				)
 			)
-		)
-		.catch(err => errorHandler(err, res, httpStatus.INTERNAL_SERVER_ERROR));
+			.catch(err => errorHandler(err, res, httpStatus.INTERNAL_SERVER_ERROR));
 	});
 
 module.exports = router;
