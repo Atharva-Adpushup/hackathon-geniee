@@ -950,7 +950,8 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		},
 		LAYOUT_EDITOR: 'LAYOUT_EDITOR',
 		PAYMENT_SETTINGS: {
-			PAYMENT_BALANCE: 'PAYMENT_BALANCE'
+			PAYMENT_BALANCE: 'PAYMENT_BALANCE',
+			MG_DEALS: 'MG_DEALS'
 		}
 	},
 	FORMAT_WISE_PARAMS_PREFIX: {
@@ -959,15 +960,6 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		NATIVE: 'apNative'
 	},
 	FORMAT_WISE_PARAMS_REGEX: /(ap\w+)_(\w+)/,
-	CORE_WEB_VITALS_API: {
-		uri: 'https://www.googleapis.com/pagespeedonline/v5/runPagespeed',
-		key: 'AIzaSyAwlPiPJIkTejgqqH01v9DmtPoPeOPXDUQ',
-		headers: {
-			'sec-ch-ua': '^^',
-			Referer: 'https://developers.google.com/',
-			'sec-ch-ua-mobile': '?0'
-		}
-	},
 	TIPALTI_SFTP_CREDS: {
 		host: 'ftp.tipalti.com',
 		user: 'AdPushup',
@@ -1882,5 +1874,39 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 	},
 	SITE_SYNCING_ERROR_MESSAGE: 'Selective rollout site sync error | GenieeAdPushup',
 	MASTER_DEPLOYMENT_FLAG: 'master',
-	SITE_SYNCING_ERROR: 'SITE_SYNCING_ERROR'
+	SITE_SYNCING_ERROR: 'SITE_SYNCING_ERROR',
+	DEAL_CREATION_ACTIONS: {
+		CREATE_MGDEAL: 'create',
+		EDIT_MGDEAL: 'edit',
+		DELETE_MGDEAL: 'delete'
+	},
+	MG_DEAL_EMAIL_SUBJECT: {
+		CREATE_DEAL_SUBJECT: 'MG Deal Addition',
+		EDIT_DEAL_SUBJECT: 'MG Deal Updated',
+		DELETE_DEAL_SUBJECT: 'MG Deal Deleted'
+	},
+	MG_MAIL_BODY_TEMPLATE: {
+		CREATE_DEAL: {
+			isUser: `MG deal has been added for __EMAIL__ for site __SITE_ID__ with the deal data __DEAL_VALUES__`,
+			isSuperUser: `MG deal has been added for __EMAIL__ by __ORIGINAL_EMAIL__ for site __SITE_ID__ with the deal data __DEAL_VALUES__`
+		},
+		EDIT_DEAL: {
+			isUser: `MG deal has been edited for __EMAIL__ for site __SITE_ID__ with the deal data __DEAL_VALUES__`,
+			isSuperUser: `MG deal has been edited for __EMAIL__ by __ORIGINAL_EMAIL__ for site __SITE_ID__ with the deal data __DEAL_VALUES__`
+		},
+		DELETE_DEAL: {
+			isUser: `MG deal has been deleted for __EMAIL__ for site __SITE_ID__`,
+			isSuperUser: `MG deal has been deleted for __EMAIL__ by __ORIGINAL_EMAIL__ for site __SITE_ID__`
+		}
+	},
+	MAIL_HTML_STYLE: {
+		tableStyles: 'border: 1px solid; width:100%;',
+		headerStyles: {
+			theadStyle: 'border: 1px solid; background-color: #e3e3e3;'
+		},
+		bodyStyles: {
+			tbodyStyle: 'border-right: 1px solid #DDD; text-align: center;',
+			cellStyle: 'border-style: 1px solid black'
+		}
+	}
 };

@@ -15,7 +15,8 @@ import {
 	CUSTOM_FIELD_DEFAULT_VALUE,
 	DISPLAY_AD_MESSAGE,
 	AMP_MESSAGE,
-	ADCODE
+	ADCODE,
+	INLINE_STYLE
 } from '../../configs/commonConsts';
 import CopyButtonWrapperContainer from '../../../../Containers/CopyButtonWrapperContainer';
 import CustomMessage from '../../../../Components/CustomMessage/index';
@@ -246,11 +247,15 @@ class AdCodeGenerator extends Component {
 	);
 
 	renderGeneratedAdcode() {
-		const { type } = this.state;
+		const { type, size } = this.state;
 		const { adId, maxHeight, siteId } = this.props;
+		const [ width, height ] = size.split('x');
 		const isDisplayAd = type !== 'amp';
 		const isRewarded = type === 'rewardedAds';
-		const customAttributes = maxHeight ? ` max-height="${maxHeight}"` : '';
+		const inlineCode = INLINE_STYLE
+										.replace(/__AD_WIDTH__/,width)
+										.replace(/__AD_HEIGHT__/,height)
+		const customAttributes = maxHeight ? ` max-height="${maxHeight}"` : inlineCode;
 		const code =
 			isDisplayAd && !isRewarded
 				? ADCODE.replace(/__AD_ID__/g, adId)

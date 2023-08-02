@@ -124,6 +124,7 @@ const DISPLAY_AD_MESSAGE = `<ol style="font-size: 15px;">
 </ol>`;
 const AMP_MESSAGE =
 	'AMP adcode will be sent to your registered e-mail address by your account manager';
+const INLINE_STYLE = ` style="width: __AD_WIDTH__px; height: __AD_HEIGHT__px;"`;
 const ADCODE = `<div id="__AD_ID__" class="_ap_apex_ad"__CUSTOM_ATTRIBS__>
 	<script>
 		var adpushup = window.adpushup = window.adpushup || {};
@@ -795,6 +796,7 @@ export {
 	CUSTOM_FIELDS,
 	CUSTOM_FIELD_DEFAULT_VALUE,
 	DISPLAY_AD_MESSAGE,
+	INLINE_STYLE,
 	ADCODE,
 	ADS_TXT_DATA,
 	INIT_CODE,
