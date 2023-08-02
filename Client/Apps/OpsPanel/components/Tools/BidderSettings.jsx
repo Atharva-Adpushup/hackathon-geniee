@@ -14,7 +14,18 @@ const BidderSettings = ({
 	const hbNetworks = Object.keys(networks)
 		.map(networkKey => ({ id: networkKey, ...networks[networkKey] }))
 		.filter(network => typeof network.isHb === 'boolean' && network.isHb);
-	const [modifiedBidders, setModifiedBidders] = useState({});
+	const [modifiedBidders, setModifiedBidders] = useState(() => {
+		const initialState = {};
+		hbNetworks.forEach(network => {
+			const isNetBid = network.bids === 'net';
+			initialState[network.id] = {
+				bids: isNetBid ? 'net' : 'gross',
+				revenueShare: isNetBid ? network.revenueShare : '',
+				disabled: isNetBid || !isBidderAdmin
+			};
+		});
+		return initialState;
+	});
 	const { isBidderAdmin = false } = user;
 
 	const handleToggle = (value, event) => {
@@ -32,9 +43,7 @@ const BidderSettings = ({
 			[bidder]: {
 				...modifiedBidders[bidder],
 				[field]: fieldValue,
-				revenueShare: modifiedBidders[bidder]
-					? modifiedBidders[bidder].revenueShare
-					: networks[bidder].revenueShare
+				disabled: fieldValue === 'net' || !isBidderAdmin
 			}
 		};
 		setModifiedBidders(bidders);
@@ -111,7 +120,10 @@ const BidderSettings = ({
 									}
 									type="number"
 									onChange={handleChange}
-									disabled={!isBidderAdmin}
+									disabled={
+										(modifiedBidders[network.id] && modifiedBidders[network.id].bids === 'net') ||
+										!isBidderAdmin
+									}
 									size={2}
 									id={`bid-adjustment-${network.id}`}
 									className="u-padding-v4 u-padding-h4"
