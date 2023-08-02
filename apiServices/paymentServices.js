@@ -46,8 +46,6 @@ const cbQuery = {
 		const query = `SELECT mgDeals FROM ${couchBase.DEFAULT_BUCKET} WHERE meta().id = 'mgdl::${email}'`;
 		return appBucket.queryDB(query);
 	},
-	setMGDeals: (email, mgDeals) => {
-		return upsertDoc('AppBucket', `mgdl::${email}`, { email, mgDeals });
-	}
+	setMGDeals: (email, mgDeals) => upsertDoc('AppBucket', `mgdl::${email}`, { email, mgDeals })
 };
 module.exports = cbQuery;

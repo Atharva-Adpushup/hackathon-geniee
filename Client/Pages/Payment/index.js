@@ -166,7 +166,7 @@ class Payment extends Component {
 			case PAYMENT_NAV_ITEMS_INDEXES.HISTORY:
 				return this.renderIframe(paymentHistory);
 			case PAYMENT_NAV_ITEMS_INDEXES.MG_DEALS:
-				return <MGDeals></MGDeals>;
+				return <MGDeals {...this.props} />;
 			case PAYMENT_NAV_ITEMS_INDEXES.BALANCE:
 				return <PaymentContainer {...this.props} />;
 			default:
@@ -182,7 +182,7 @@ class Payment extends Component {
 	};
 
 	render() {
-		const { balancePayment, activeProducts, isSuperUser } = this.props;
+		const { balancePayment, activeProducts, isSuperUser, sites } = this.props;
 		const { redirectUrl } = this.state;
 		const accessDetailsTab =
 			activeProducts === undefined || activeProducts.payment_details === undefined
@@ -216,8 +216,9 @@ class Payment extends Component {
 }
 
 const mapStateToProps = state => {
-	const { balancePayment, activeProducts, isSuperUser } = state.global.user.data;
-	return { balancePayment, activeProducts, isSuperUser };
+	const { balancePayment, activeProducts, isSuperUser, email, sites } = state.global.user.data;
+	const accountAccessData = state.global.findUsers.data;
+	return { balancePayment, activeProducts, isSuperUser, sites, email, accountAccessData };
 };
 
 // 	mapDispatchToProps = (dispatch, ownProps) => ({

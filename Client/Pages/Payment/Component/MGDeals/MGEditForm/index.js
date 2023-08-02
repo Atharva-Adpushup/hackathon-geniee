@@ -1,53 +1,60 @@
 import React from 'react';
-import FormInput from '../../../../../Components/FormInput';
+import moment from 'moment';
 import { Row, Col } from 'react-bootstrap';
-import HELPER_FUNCTIONS from '../../../Helper/helper';
-
-const { findQuarterByValue } = HELPER_FUNCTIONS;
+import FormInput from '../../../../../Components/FormInput';
+import '../Deals.css';
 
 const MGEditForm = ({
 	isChange,
 	selectedDeal,
 	onChangeHandle,
-	onChangeHandler,
-	selectedQuarters
+	selectedMonths,
+	mgInput,
+	handleMgInputChange
 }) => {
+	const getFormattedDisplayDateValue = data =>
+		`${moment()
+			.month(data.month - 1)
+			.format('MMM')} ${data.year}`;
 	return !isChange
-		? selectedDeal.quarterWiseData.map(data => (
-				<Row>
-					<Col sm={6}>
-						<label>
-							{findQuarterByValue(data, selectedQuarters) &&
-								findQuarterByValue(data, selectedQuarters).name}
-						</label>
-					</Col>
-					<Col sm={6}>
-						<FormInput
-							icon="dollar-sign"
-							className="w-25"
-							defaultValue={data.value}
-							min="0"
-							onChange={e => onChangeHandle(e, data)}
-						/>
-					</Col>
-				</Row>
-		  ))
-		: selectedQuarters.length &&
-				selectedQuarters.map(quarter => (
-					<Row>
+		? selectedDeal.dealValues.map(data => (
+				<>
+					<Row className="mb-10">
 						<Col sm={6}>
-							<label>{quarter.name}</label>
+							<label>{getFormattedDisplayDateValue(data)}</label>
 						</Col>
 						<Col sm={6}>
 							<FormInput
 								icon="dollar-sign"
-								type="number"
 								className="w-25"
+								defaultValue={data.mgValue}
 								min="0"
-								onChange={e => onChangeHandler(e, quarter)}
+								onChange={e => onChangeHandle(e, data)}
 							/>
 						</Col>
 					</Row>
+				</>
+		  ))
+		: selectedMonths.length &&
+				selectedMonths.map(month => (
+					<>
+						<Row className="mb-10">
+							<Col sm={6}>
+								<label>{month}</label>
+							</Col>
+							<Col sm={6}>
+								<FormInput
+									icon="dollar-sign"
+									type="number"
+									className="w-25"
+									min="0"
+									name={month}
+									defaultValue={mgInput.month || ''}
+									onChange={handleMgInputChange}
+								/>
+							</Col>
+						</Row>
+					</>
 				));
 };
 

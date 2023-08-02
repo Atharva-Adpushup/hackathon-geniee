@@ -20,28 +20,7 @@ const {
 	AUDIT_LOGS_ACTIONS: { PAYMENT_SETTINGS }
 } = require('../configs/commonConsts');
 const config = require('../configs/config');
-
-const getEmailBody = ({ type, email, originalEmail }) => {
-	let body = '';
-	let subject = '';
-	switch (type) {
-		case 'create':
-			subject = 'MG Deal Addition';
-			body = `MG deal has been added for ${email} by ${originalEmail}`;
-			break;
-		case 'edit':
-			subject = 'MG Deal Updated';
-			body = `MG deal has been updated for ${email} by ${originalEmail}`;
-			break;
-		case 'delete':
-			subject = 'MG Deal Deleted';
-			body = `MG deal has been deleted for ${email} by ${originalEmail}`;
-			break;
-		default:
-			break;
-	}
-	return { body, subject };
-};
+const { getEmailContent } = require('../helpers/mgDealsEmailUtils');
 
 const getQuarter = date => {
 	const month = Number(date.getMonth());
@@ -314,7 +293,7 @@ router
 	})
 	.post('/setMGDeals', (req, res) => {
 		const { email, originalEmail, isSuperUser } = req.user;
-		const { mgDeals, type } = req.body;
+		const { mgDeals, type, newDeal } = req.body;
 		if (!isSuperUser) {
 			const err = { message: 'unauthorized access' };
 			return errorHandler(err, res, HTTP_STATUSES.UNAUTHORIZED);
@@ -325,7 +304,22 @@ router
 			.then(data => {
 				sendSuccessResponse(data, res);
 				const { supportMails } = config.mgDealsAlerts;
-				const { body, subject } = getEmailBody({ type, email, originalEmail });
+				const { dealValues, siteId } = newDeal;
+				const { body, subject } = getEmailContent({ type, email, dealValues, originalEmail, siteId });
+				sendDataToAuditLogService({
+					siteId : newDeal.siteId,
+					siteDomain: newDeal.siteDomain,
+					appName: PAYMENT_SETTINGS.MG_DEALS,
+					type,
+					impersonateId: email,
+					userId: originalEmail,
+					prevConfig: mgDeals,
+					currentConfig: newDeal,
+					action: {
+						name: type,
+						data: newDeal
+					}
+				});
 				sendEmail({
 					queue: 'MAILER',
 					data: {
