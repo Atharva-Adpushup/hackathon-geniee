@@ -191,7 +191,9 @@ const HELPER_FUNCTIONS = {
 	},
 	getDealEditObject: ({ site, mgInput, mgType, selectedDeal, startDate, endDate, siteId }) => {
 		const monthDataArr = [];
-		selectedDeal.dealValues.forEach((deal, index) => {
+		const dealValueObj = [];
+		for (let index = 0; index < selectedDeal.dealValues.length; index++) {
+			const deal = selectedDeal.dealValues[index];
 			Object.keys(mgInput).forEach(key => {
 				const month = Number(
 					moment()
@@ -203,7 +205,16 @@ const HELPER_FUNCTIONS = {
 					selectedDeal.dealValues.splice(index, 1);
 				}
 			});
-		});
+		}
+		for (let index = 0; index < selectedDeal.dealValues.length; index++) {
+			const deal = selectedDeal.dealValues[index];
+			if (
+				new Date(`${endDate.year()} ${endDate.month() + 1}`).valueOf() >=
+				new Date(`${deal.year} ${deal.month}`).valueOf()
+			) {
+				dealValueObj.push(deal);
+			}
+		}
 		Object.keys(mgInput).forEach(key => {
 			const month = Number(
 				moment()
@@ -229,7 +240,7 @@ const HELPER_FUNCTIONS = {
 			endDate: moment(endDate).valueOf(),
 			createdDate: selectedDeal.createdDate,
 			lastModifiedDate: moment().valueOf(),
-			dealValues: [...selectedDeal.dealValues, ...monthDataArr]
+			dealValues: [...dealValueObj, ...monthDataArr]
 		};
 		return newDeal;
 	}
