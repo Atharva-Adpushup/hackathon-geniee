@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Col, OverlayTrigger, Tooltip, Button } from '@/Client/helpers/react-bootstrap-imports';
 import { makeFirstLetterCapitalize } from '../../../../../helpers/commonFunctions';
 import CopyButtonWrapperContainer from '../../../../../Containers/CopyButtonWrapperContainer';
-import { ADCODE, REWARDED_AD_CODE, TIGGER_AUTOMATICALLY_CODE } from '../../../configs/commonConsts';
+import { ADCODE, INLINE_STYLE, REWARDED_AD_CODE, TIGGER_AUTOMATICALLY_CODE } from '../../../configs/commonConsts';
 import config from '../../../../../config/config';
 
 import CustomButton from '../../../../../Components/CustomButton/index';
@@ -93,8 +93,10 @@ class AdElement extends Component {
 		let code = isRewarded ? REWARDED_AD_CODE : ADCODE;
 		const triggerRewardedAd =
 			automaticTrigger || !customScript ? TIGGER_AUTOMATICALLY_CODE : atob(customScript);
-
-		const customAttributes = ad.maxHeight ? ` max-height="${ad.maxHeight}"` : '';
+		const inlineCode = INLINE_STYLE
+			.replace(/__AD_WIDTH__/,ad.width)
+			.replace(/__AD_HEIGHT__/,ad.height)
+		const customAttributes = ad.maxHeight ? ` max-height="${ad.maxHeight}"` : inlineCode;
 
 		code = code
 			? code
