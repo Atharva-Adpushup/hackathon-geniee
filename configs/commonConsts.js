@@ -1908,5 +1908,6 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 			tbodyStyle: 'border-right: 1px solid #DDD; text-align: center;',
 			cellStyle: 'border-style: 1px solid black'
 		}
-	}
+	},
+	SHOW_VIDEO_ADS_DASHBOARD: 'showVideoAdsDashboard'
 };

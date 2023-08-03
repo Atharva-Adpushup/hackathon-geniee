@@ -1299,6 +1299,23 @@ function getGlobalClientConfig() {
 			})
 	);
 }
+
+function isVideoAdsDashboardEnabled(sites) {
+	let showVideoAdsDashboard = false;
+	try {
+		for (const siteKey in sites) {
+			const site = sites[siteKey];
+			showVideoAdsDashboard =
+				showVideoAdsDashboard ||
+				!!(site.get('apConfigs') && site.get('apConfigs').videoAdsDashboard);
+		}
+		return showVideoAdsDashboard;
+	} catch (err) {
+		console.log(err);
+		return showVideoAdsDashboard;
+	}
+}
+
 module.exports = {
 	verifyOwner,
 	errorHandler,
@@ -1334,5 +1351,6 @@ module.exports = {
 	udpateApConfigIfFlyingCarpetAdEnabledInApTagOrLayoutEditorAd,
 	getActiveProductFromCouchbase,
 	addActiveProductsToMeta,
-	getGlobalClientConfig
+	getGlobalClientConfig,
+	isVideoAdsDashboardEnabled
 };

@@ -179,18 +179,12 @@ class Dashboard extends React.Component {
 
 	shouldShowPrimisWidget = widgetsList => {
 		const PRIMIS_REPORT = 'primis_report';
-		const VIDEO_ADS_DASHBOARD = 'videoAdsDashboard';
 		const {
 			user: {
-				data: { sites }
+				data: { showVideoAdsDashboard = false }
 			}
 		} = this.props;
-		let showWidget = false;
-		Object.keys(sites).map(site => {
-			const { product = {} } = sites[site];
-			showWidget = showWidget || !!product[VIDEO_ADS_DASHBOARD];
-			return site;
-		});
+		let showWidget = !!showVideoAdsDashboard
 
 		if (!showWidget) {
 			const index = widgetsList.indexOf(PRIMIS_REPORT);
@@ -1123,26 +1117,26 @@ class Dashboard extends React.Component {
 					{name === 'core_web_vitals' ? (
 						<div className="u-margin-r4 display-inline">
 							{/* eslint-disable */}
-						<label className="u-text-normal u-margin-r2">Device</label>
-						<SelectBox
-							id="performance-site"
-							isClearable={false}
-							pullRight
-							isSearchable={false}
-							wrapperClassName="display-inline"
-							selected={selectedDevice}
-							options={DEVICE_OPTIONS}
-							onSelect={() => this.handleDeviceSelect(wid)}
-							onSelect={device => {
-								widgetsConfig[wid].isLoading = true;
+							<label className="u-text-normal u-margin-r2">Device</label>
+							<SelectBox
+								id="performance-site"
+								isClearable={false}
+								pullRight
+								isSearchable={false}
+								wrapperClassName="display-inline"
+								selected={selectedDevice}
+								options={DEVICE_OPTIONS}
+								onSelect={() => this.handleDeviceSelect(wid)}
+								onSelect={device => {
+									widgetsConfig[wid].isLoading = true;
 
-								this.setState({ selectedDevice: device, widgetsConfig }, () =>
-									this.getDisplayData(wid)
-								);
-							}}
-						/>
+									this.setState({ selectedDevice: device, widgetsConfig }, () =>
+										this.getDisplayData(wid)
+									);
+								}}
+							/>
 
-						{/* eslint-enable */}
+							{/* eslint-enable */}
 						</div>
 					) : (
 						''
@@ -1150,28 +1144,30 @@ class Dashboard extends React.Component {
 					{reportType !== 'site' && hideWebsiteWidgets.indexOf(name) === -1 ? (
 						<div className="">
 							{/* eslint-disable */}
-						<label className="u-text-normal u-margin-r2">Website</label>
-						<SelectBox
-							id="performance-site"
-							isClearable={false}
-							pullRight
-							isSearchable={false}
-							wrapperClassName="display-inline"
-							selected={computedSelectedSite}
-							options={
-								name === 'core_web_vitals' || name === 'top_url_report' || name === 'top_utm_report'
-									? sitesToShow.filter(site => site.value !== 'all')
-									: sitesToShow
-							}
-							onSelect={site => {
-								widgetsConfig[wid]['selectedSite'] = site;
-								widgetsConfig[wid].isLoading = true;
+							<label className="u-text-normal u-margin-r2">Website</label>
+							<SelectBox
+								id="performance-site"
+								isClearable={false}
+								pullRight
+								isSearchable={false}
+								wrapperClassName="display-inline"
+								selected={computedSelectedSite}
+								options={
+									name === 'core_web_vitals' ||
+									name === 'top_url_report' ||
+									name === 'top_utm_report'
+										? sitesToShow.filter(site => site.value !== 'all')
+										: sitesToShow
+								}
+								onSelect={site => {
+									widgetsConfig[wid]['selectedSite'] = site;
+									widgetsConfig[wid].isLoading = true;
 
-								this.setState({ widgetsConfig }, () => this.getDisplayData(wid));
-							}}
-						/>
+									this.setState({ widgetsConfig }, () => this.getDisplayData(wid));
+								}}
+							/>
 
-						{/* eslint-enable */}
+							{/* eslint-enable */}
 						</div>
 					) : (
 						''
