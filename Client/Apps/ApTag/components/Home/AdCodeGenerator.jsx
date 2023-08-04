@@ -249,13 +249,21 @@ class AdCodeGenerator extends Component {
 	renderGeneratedAdcode() {
 		const { type, size } = this.state;
 		const { adId, maxHeight, siteId } = this.props;
-		const [ width, height ] = size.split('x');
 		const isDisplayAd = type !== 'amp';
 		const isRewarded = type === 'rewardedAds';
-		const inlineCode = INLINE_STYLE
-										.replace(/__AD_WIDTH__/,width)
-										.replace(/__AD_HEIGHT__/,height)
-		const customAttributes = maxHeight ? ` max-height="${maxHeight}"` : inlineCode;
+		const isResponsive = !!(size === 'responsive');
+		let customAttributes = '';
+		if (!isRewarded && !isResponsive && size) {
+			const [adWidth, adHeight] = size.split('x');
+			const inlineCode = INLINE_STYLE.replace(/__AD_WIDTH__/, adWidth).replace(
+				/__AD_HEIGHT__/,
+				adHeight
+			);
+			customAttributes = maxHeight ? ` max-height="${maxHeight}"` : inlineCode;
+		}
+		if (isRewarded || isResponsive) {
+			customAttributes = maxHeight ? ` max-height="${maxHeight}"` : '';
+		}
 		const code =
 			isDisplayAd && !isRewarded
 				? ADCODE.replace(/__AD_ID__/g, adId)
