@@ -44,7 +44,7 @@ const defaultSellerType = 'PUBLISHER';
 let fileOutput = commonConsts.SELLERS_JSON.fileConfig;
 
 function getUsersQueryForBucket(bucketName) {
-	let queryString = `SELECT email, sellerId, dateCreated, manuallyEnteredCompanyName, domainNameSellersJson, sellerType,lastPaymentCheckDateSellersJson, ARRAY site.domain FOR site IN sites END AS siteDomains FROM ${bucketName} WHERE meta().id LIKE 'user::%' AND ARRAY_LENGTH(sites) > 0;`;
+	let queryString = `SELECT email, sellerId, dateCreated, manuallyEnteredCompanyName, domainNameSellersJson, pushToSellersJson, sellerType, lastPaymentCheckDateSellersJson, ARRAY site.domain FOR site IN sites END AS siteDomains FROM ${bucketName} WHERE meta().id LIKE 'user::%' AND ARRAY_LENGTH(sites) > 0;`;
 	return couchbase.N1qlQuery.fromString(queryString);
 }
 
@@ -57,7 +57,7 @@ function colorLog(color, ...messages) {
 		magenta: '\x1b[35m',
 		cyan: '\x1b[36m'
 	};
-	console.log(colors[color] + ' \033[1m', ...messages);
+	console.log(colors[color] + ' \x1b[1m', ...messages);
 }
 
 function getSellerType(user) {
@@ -337,6 +337,10 @@ function replaceWithOldSellersJson() {
 }
 
 function shouldUserBeAdded(user) {
+	if(user.pushToSellersJson === false) {
+		return Promise.reject({ skipUser: true });
+	}
+
 	if (user.dateCreated && moment().diff(user.dateCreated, 'months') <= NEW_USER_AGE_IN_MONTHS) {
 		return Promise.resolve();
 	}
