@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { NavLink } from 'react-router-dom';
 import socketIo from 'socket.io-client';
 import { Dropdown, MenuItem } from '@/Client/helpers/react-bootstrap-imports';
@@ -17,29 +17,6 @@ const Notification = props => {
 		replaceUnseenNotifications,
 		addUnseenNotification
 	} = props;
-
-	useEffect(() => {
-		const io = socketIo(config.NOTIFICATION_SERVICE.HOST, {
-			query: {
-				authToken: authService.getAuthToken()
-			},
-			timeout: 5000
-		});
-		io.on('prevNotifications', payload => {
-			const { notifications: prevNotifications } = payload;
-			if (prevNotifications)
-				prevNotifications.forEach(notification => io.emit('notificationReceived', notification.id));
-			// for (const notification of notifications) io.emit('notificationReceived', notification.id);
-			replaceUnseenNotifications(prevNotifications);
-		});
-
-		io.on('newNotification', notification => {
-			io.emit('notificationReceived', notification.id);
-			addUnseenNotification(notification);
-		});
-
-		return () => io.disconnect();
-	}, []);
 
 	const onNotificationClick = id => {
 		const notification = notifications.filter(notif => notif.id === id)[0];
