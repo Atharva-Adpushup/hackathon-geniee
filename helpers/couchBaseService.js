@@ -4,6 +4,7 @@
 var couchbase = require('couchbase'),
 	Promise = require('bluebird'),
 	config = require('../configs/config'),
+	{ N1qlQuery } = require('couchbase'),
 	API = null,
 	state = {
 		cluster: null,
@@ -49,6 +50,10 @@ API = {
 		return API.connectToAppBucket().then(function(appBucket) {
 			return appBucket.queryAsync(query);
 		});
+	},
+	queryFromAppBucket: query => {
+		const n1qlQueryString = N1qlQuery.fromString(query);
+		return API.connectToAppBucket().then(appBucket => appBucket.queryAsync(n1qlQueryString));
 	},
 	getDoc: (bucketName, docId) => {
 		return API.connectToBucket(bucketName)

@@ -24,7 +24,9 @@ redisClient
 		console.log('Redis is ready');
 	});
 
-redisClient.connect();
+if (config.environment.HOST_ENV === 'production') {
+	redisClient.connect();
+}
 
 const API = {
 	getData: key =>
