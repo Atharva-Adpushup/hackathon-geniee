@@ -44,6 +44,7 @@ import {
 // eslint-disable-next-line import/no-extraneous-dependencies
 import 'bootstrap-sass/assets/stylesheets/_bootstrap.scss';
 import ErrorBoundary from './Components/ErrorBoundary';
+import NotificationContainer from './Containers/NotificationContainer';
 import CopiedNotificationContainer from './Containers/CopiedNotificationContainer';
 import Routes from './Routes';
 
@@ -90,6 +91,7 @@ library.add(
 const App = () => (
 	<ErrorBoundary>
 		<Routes />
+		<NotificationContainer />
 		<CopiedNotificationContainer />
 	</ErrorBoundary>
 );
