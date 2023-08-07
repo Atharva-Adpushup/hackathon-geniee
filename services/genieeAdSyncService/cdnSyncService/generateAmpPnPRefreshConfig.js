@@ -11,15 +11,16 @@ const dbHelper = couchbaseService(
 	couchBase.DEFAULT_USER_PASSWORD
 );
 
-const processAdUnits = (adUnits = []) => {
+const processAdUnits = (adUnits = [], sizeWiseReplace = false) => {
 	return adUnits
 		.filter(adUnit => adUnit.isActive)
 		.reduce((units, adUnit) => {
+			const adUnitCode = sizeWiseReplace ? `${adUnit.code}_${adUnit.width}X${adUnit.height}` : adUnit.code;
 			return {
 				...units,
 				[adUnit.platform]: {
 					...units[adUnit.platform],
-					[adUnit.code]: adUnit
+					[adUnitCode]: adUnit
 				}
 			};
 		}, {});
@@ -43,10 +44,11 @@ const generatePnPRefreshConfig = (siteId, adNetworkConfig, blockListedlineItems 
 			const adUnits = pnpConfig.adUnits || [];
 			const pnpLineItems = pnpConfig.lineItems || [];
 			const pnpBlacklistedLineItems = pnpConfig.blacklistedLineItems || [];
+			const sizeWiseReplace = !!pnpConfig.sizeWiseReplace;
 
 			// remove inactive units
 			if (Array.isArray(adUnits)) {
-				pnpConfig.adUnits = processAdUnits(adUnits);
+				pnpConfig.adUnits = processAdUnits(adUnits, sizeWiseReplace);
 			}
 
 			if (Array.isArray(pnpLineItems) && pnpLineItems.length) {
