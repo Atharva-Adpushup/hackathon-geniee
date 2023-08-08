@@ -1407,7 +1407,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		);
 		
 		var adpConfig = window.adpushup.config || {};
-
+	
 		var sendLogToApLogger = function (subEvent, data) {
 			var logData = {
 				packetId: adpConfig.packetId,
@@ -1436,6 +1436,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		var blacklistedLineItems = window.pnpRefresh.blacklistedLineItems || [];
 		var firstImpressionRefreshLineItems = window.pnpRefresh.firstImpressionRefreshLineItems || [];
 		var forceRefreshFirstImpression = !!window.pnpRefresh.forceRefreshFirstImpression;
+		var sizeWiseReplace = !!window.pnpRefresh.sizeWiseReplace;
 		const refreshTypes = {
 			BACKGROUND: 'bgRefresh',
 			ACTIVE_TAB: 'activeTab',
@@ -1485,6 +1486,21 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 					}
 				}
 	
+				function getAdUnit(slot, adUnit) {
+					if(sizeWiseReplace) {
+						if(window.currentSlotAdUnitName) {
+							return window.currentSlotAdUnitName;
+						}
+						let divId = slot.getSlotElementId();
+						let adpSlot = window.adpTags.adpSlots[divId];
+						let [width, height] = adpSlot.size;
+						let adUnitName = adUnit + '_' + width + 'X' + height;
+						window.currentSlotAdUnitName = adUnitName;
+						return adUnitName;
+					}
+					return adUnit;
+				}
+	
 				function replaceSlot(slot, adUnit) {
 					try {
 						if (!window.pnpRefresh.hasPnPScriptInserted) {
@@ -1505,9 +1521,10 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 						}
 						var existingAdElement = document.getElementById(slot.getSlotElementId());
 						if (!checkElementDisplay(slot.getSlotElementId())) {
-							log('======replacing=======adUnit', adUnit);
+							var currentAdUnit = getAdUnit(slot, adUnit);
+							log('======replacing=======adUnit', currentAdUnit);
 							log('======replacing=======AD_UNIT_MAPPING', AD_UNIT_MAPPING);
-							var apTagId = AD_UNIT_MAPPING[adUnit].apTagId;
+							var apTagId = AD_UNIT_MAPPING[currentAdUnit].apTagId;
 							var apTagDiv = document.createElement('div');
 							apTagDiv.id = apTagId;
 							apTagDiv.classList.add('_ap_apex_ad');
@@ -1528,9 +1545,10 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 								existingAdElement.style.display = '';
 							}
 							existingAdElement.appendChild(apTagDiv, existingAdElement);
+							window.currentSlotAdUnitName = undefined;
 							delete window.pnpRefresh.adUnitState[slot.getSlotElementId()];
 							sendAmpPnpDebugLogToApLogger('REPLACED_SLOT', {
-								adUnit: adUnit,
+								adUnit: currentAdUnit,
 								apTagId: apTagId
 							});
 						} else {
@@ -1570,7 +1588,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 						lineItemId: lineItemId
 					};
 				}
-
+	
 				function checkAndReplaceRefreshType(){
 					if(window.pnpRefresh.refreshType === refreshTypes.ACTIVE_VIEW){
 						return refreshTypes.ACTIVE_TAB;
@@ -1619,11 +1637,12 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 				function checkRefreshEligible(slot, sourceAgnosticLineItemId, adUnit) {
 					try {
 						var adUnitPath = slot.getAdUnitPath();
-						if (Object.keys(AD_UNIT_MAPPING).indexOf(adUnit) === -1) {
+						var currentAdUnit = getAdUnit(slot, adUnit);
+						if (Object.keys(AD_UNIT_MAPPING).indexOf(currentAdUnit) === -1) {
 							log('Ad Unit: ' + adUnitPath + ' not in our mapping');
 							return false;
 						}
-						if (!AD_UNIT_MAPPING[adUnit].isActive) {
+						if (!AD_UNIT_MAPPING[currentAdUnit].isActive) {
 							log('Ad Unit: ' + adUnitPath + ' deactivated in config, stopping');
 							return false;
 						}
@@ -1672,8 +1691,9 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 					return document.visibilityState == 'visible';
 				}
 	
-				function checkRefreshType(adUnit) {
-					let adUnitObject = AD_UNIT_MAPPING[adUnit];
+				function checkRefreshType(slot, adUnit) {
+					let currentAdUnit = getAdUnit(slot, adUnit);
+					let adUnitObject = AD_UNIT_MAPPING[currentAdUnit];
 					return (
 						(adUnitObject && adUnitObject.refreshType) ||
 						(window.pnpRefresh && window.pnpRefresh.refreshType)
@@ -1684,7 +1704,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 					var divId = slot.getSlotElementId();
 					var adUnitState = window.pnpRefresh.adUnitState[divId];
 					adUnitState.readyToRefresh = true;
-					var refreshType = checkRefreshType(adUnit);
+					var refreshType = checkRefreshType(slot, adUnit);
 					switch (refreshType) {
 						case 'bgRefresh':
 							adUnitState.refreshTimeoutId = setTimeout(function () {
@@ -1718,10 +1738,11 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 	
 				function handleRefresh(divId, adUnit) {
 					if (Object.keys(window.pnpRefresh.adUnitState).indexOf(divId) !== -1) {
-						var refreshType = checkRefreshType(adUnit);
-						log('Refresh Type on Adunit', refreshType, adUnit);
 						var adUnitState = window.pnpRefresh.adUnitState[divId];
 						var slot = adUnitState.gSlot;
+						var refreshType = checkRefreshType(slot, adUnit);
+						log('Refresh Type on Adunit', refreshType, adUnit);
+	
 						let refreshAfter;
 	
 						switch (refreshType) {
@@ -1794,7 +1815,6 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 									e.slot,
 									e.sourceAgnosticLineItemId
 								);
-	
 								handleRefresh(slotId, adUnit);
 	
 								window.adpushup.$(window).on('visibilitychange', () => {
@@ -1823,7 +1843,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 				sendLogToApLogger('ERROR_GOOGLE_CMD', error);
 			}
 		});
-	})();	
+	})();
 	`,
 	SCRIPT_TYPE: {
 		ADPUSHUPJS: 'adpushupjs',
