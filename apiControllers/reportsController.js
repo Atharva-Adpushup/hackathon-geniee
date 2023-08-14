@@ -45,7 +45,9 @@ router
 			await reportsService.logReportUsage(email || originalEmail, reportingConfig);
 
 			// filter out data with undefined siteIds to preent error(s) in the UI
-			reportsData.result = reportsData.result.filter(rowData => rowData.siteid);
+			if (reportsData.columns && reportsData.columns.includes('siteid')) {
+				reportsData.result = reportsData.result.filter(rowData => rowData.siteid);
+			}
 
 			if (reportingConfig.isSuperUser !== 'true') {
 				reportsData.result = reportsData.result.map(rowData => {
