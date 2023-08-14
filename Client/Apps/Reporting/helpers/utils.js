@@ -38,10 +38,10 @@ const computeCsvData = data => {
 		const csvBodyRow = tableColumns.map(header => {
 			if (header.accessor === 'siteName') {
 				// eslint-disable-next-line no-unused-expressions
-				return row[header.accessor].props.children;
+				return (row[header.accessor] && row[header.accessor].props.children) || '';
 				// eslint-disable-next-line no-else-return
 			} else if (header.accessor === 'url') {
-				return row[header.accessor].props.href;
+				return (row[header.accessor] && row[header.accessor].props.href) || '';
 			} else if (header.accessor === 'country' || header.accessor === 'device_type') {
 				return row[header.accessor] instanceof Array
 					? row[header.accessor]

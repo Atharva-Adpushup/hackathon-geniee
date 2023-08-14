@@ -21,7 +21,7 @@ const { appBucket } = require('../helpers/routeHelpers');
 const config = require('../configs/config');
 
 const router = express.Router();
-const reportingTimeOut = 15*60*60*1000;//15 mins reporting time out
+const reportingTimeOut = 15 * 60 * 60 * 1000; // 15 mins reporting time out
 
 const setCacheHeaders = res => {
 	res.header('X-AP-CACHE', 'HIT');
@@ -43,6 +43,9 @@ router
 			);
 			if (cacheHit) setCacheHeaders(res);
 			await reportsService.logReportUsage(email || originalEmail, reportingConfig);
+
+			// filter out data with undefined siteIds to preent error(s) in the UI
+			reportsData.result = reportsData.result.filter(rowData => rowData.siteid);
 
 			if (reportingConfig.isSuperUser !== 'true') {
 				reportsData.result = reportsData.result.map(rowData => {
@@ -97,7 +100,7 @@ router
 
 			if (!reqParams.isSuperUser) {
 				// handling peer performance report seperately
-				const url = `https://console.adpushup.com${path}`
+				const url = `https://console.adpushup.com${path}`;
 				const reportName = utils.getUrlSearchParamsFromPath(url, 'report_name');
 				if (reportName === 'peer_performance_report') {
 					widgetData.revenue_channel_report.result.forEach((rowData, index) => {
