@@ -1929,5 +1929,11 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 			cellStyle: 'border-style: 1px solid black'
 		}
 	},
-	SHOW_VIDEO_ADS_DASHBOARD: 'showVideoAdsDashboard'
+	SHOW_VIDEO_ADS_DASHBOARD: 'showVideoAdsDashboard',
+	CB_ERRORS: {
+		DOC_DOES_NOT_EXIST: {
+			msg: 'key does not exist',
+			code: 13
+		}
+	}
 };
