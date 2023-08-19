@@ -21,9 +21,9 @@ class HeaderBiddingRulesList extends React.Component {
 			triggerKeyOptions,
 			triggerOperatorOptions,
 			triggerValueOptions,
-			isForOps
+			isForOps,
+			globalBidderRulesAccess
 		} = this.props;
-
 		if (!rules.length) {
 			return (
 				<tr>
@@ -144,7 +144,7 @@ class HeaderBiddingRulesList extends React.Component {
 						<Button
 							className="btn-primary"
 							onClick={() => onEditRule(index)}
-							disabled={!isForOps && (isGlobal || isAuto)}
+							disabled={!globalBidderRulesAccess || (!isForOps && (isGlobal || isAuto))}
 						>
 							Edit
 						</Button>
@@ -163,7 +163,7 @@ class HeaderBiddingRulesList extends React.Component {
 							id={`rule-status-${index}`}
 							on="Enable"
 							off="Disable"
-							disabled={!isForOps && (isGlobal || isAuto)}
+							disabled={!globalBidderRulesAccess || (!isForOps && (isGlobal || isAuto))}
 						/>
 					</td>
 				</tr>

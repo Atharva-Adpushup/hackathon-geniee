@@ -112,6 +112,7 @@ class Tools extends Component {
 						setUnsavedChangesAction={setUnsavedChangesAction}
 						rules={rules}
 						customProps={customProps}
+						user={user}
 					/>
 				);
 
