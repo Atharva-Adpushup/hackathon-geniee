@@ -424,6 +424,8 @@ const isCouchBaseDocDoesNotExistError = err =>
 	err.code === commonConsts.CB_ERRORS.DOC_DOES_NOT_EXIST.code &&
 	err.message.includes(commonConsts.CB_ERRORS.DOC_DOES_NOT_EXIST.msg);
 
+const isMasterDeployment = () => config.deployment === commonConsts.MASTER_DEPLOYMENT_FLAG;
+
 module.exports = {
 	queryResultProcessing,
 	sendSuccessResponse,
@@ -453,5 +455,6 @@ module.exports = {
 	getSelectiveRolloutFeatureConfig,
 	getSelectiveRolloutFeatureConfigFromCB,
 	filterFalsyObjectKeys,
-	isCouchBaseDocDoesNotExistError
+	isCouchBaseDocDoesNotExistError,
+	isMasterDeployment
 };
