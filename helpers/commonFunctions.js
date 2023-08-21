@@ -420,6 +420,10 @@ const filterFalsyObjectKeys = queryParams => {
 	return validQueryParams;
 };
 
+const isCouchBaseDocDoesNotExistError = err =>
+	err.code === commonConsts.CB_ERRORS.DOC_DOES_NOT_EXIST.code &&
+	err.message.includes(commonConsts.CB_ERRORS.DOC_DOES_NOT_EXIST.msg);
+
 module.exports = {
 	queryResultProcessing,
 	sendSuccessResponse,
@@ -448,5 +452,6 @@ module.exports = {
 	getCommonAuditLog,
 	getSelectiveRolloutFeatureConfig,
 	getSelectiveRolloutFeatureConfigFromCB,
-	filterFalsyObjectKeys
+	filterFalsyObjectKeys,
+	isCouchBaseDocDoesNotExistError
 };
