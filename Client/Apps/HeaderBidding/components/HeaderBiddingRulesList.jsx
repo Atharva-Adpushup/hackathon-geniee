@@ -22,7 +22,8 @@ class HeaderBiddingRulesList extends React.Component {
 			triggerOperatorOptions,
 			triggerValueOptions,
 			isForOps,
-			globalBidderRulesAccess
+			globalBidderRulesAccess,
+			switchedAccounts
 		} = this.props;
 		if (!rules.length) {
 			return (
@@ -51,6 +52,8 @@ class HeaderBiddingRulesList extends React.Component {
 
 		return rules.map((rule, index) => {
 			const { isActive, triggers, actions, createdAt, isGlobal, description, isAuto } = rule;
+			const disableGlobalBidderEditAccess = () =>
+				!globalBidderRulesAccess || (!isForOps && (isGlobal || isAuto)) || switchedAccounts();
 
 			const triggersContent = triggers.map((trigger, triggerIndex) => {
 				// key, operator, value
@@ -144,7 +147,7 @@ class HeaderBiddingRulesList extends React.Component {
 						<Button
 							className="btn-primary"
 							onClick={() => onEditRule(index)}
-							disabled={!globalBidderRulesAccess || (!isForOps && (isGlobal || isAuto))}
+							disabled={disableGlobalBidderEditAccess()}
 						>
 							Edit
 						</Button>
@@ -163,7 +166,7 @@ class HeaderBiddingRulesList extends React.Component {
 							id={`rule-status-${index}`}
 							on="Enable"
 							off="Disable"
-							disabled={!globalBidderRulesAccess || (!isForOps && (isGlobal || isAuto))}
+							disabled={disableGlobalBidderEditAccess()}
 						/>
 					</td>
 				</tr>

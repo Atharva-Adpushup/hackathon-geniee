@@ -861,8 +861,14 @@ class BidderRules extends React.Component {
 	}
 
 	renderListComponent() {
-		const { rules, bidders, user } = this.props;
+		const { rules, bidders, user, originalEmail } = this.props;
 		const { globalBidderRulesAccess = false } = user;
+		const switchedAccounts = () => {
+			if (typeof originalEmail !== 'undefined' && user.email !== originalEmail) {
+				return true;
+			}
+			return false;
+		};
 		const {
 			actionKeyOptions,
 			actionValueOptions,
@@ -889,12 +895,13 @@ class BidderRules extends React.Component {
 					actionValueOptions={modifiedActionValueOptions}
 					isForOps
 					globalBidderRulesAccess={globalBidderRulesAccess}
+					switchedAccounts={switchedAccounts}
 				/>
 				<div className="control">
 					<Button
 						className="btn-primary"
 						onClick={() => this.handleAddNewRule()}
-						disabled={!globalBidderRulesAccess}
+						disabled={!globalBidderRulesAccess || switchedAccounts()}
 					>
 						Add New Rule
 					</Button>

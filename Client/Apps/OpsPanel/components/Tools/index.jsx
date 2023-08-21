@@ -62,6 +62,7 @@ class Tools extends Component {
 	};
 
 	renderContent = () => {
+		const { originalEmail } = authService.getTokenPayloadWithoutVerification();
 		const { activeKey } = this.state;
 		const {
 			networkConfig,
@@ -113,6 +114,7 @@ class Tools extends Component {
 						rules={rules}
 						customProps={customProps}
 						user={user}
+						originalEmail={originalEmail}
 					/>
 				);
 
@@ -126,6 +128,7 @@ class Tools extends Component {
 						updateNetworkConfig={updateNetworkConfig}
 						showNotification={showNotification}
 						user={user}
+						originalEmail={originalEmail}
 					/>
 				);
 			case TOOLS_IDENTIFIERS.DASHBOARD_NOTIFICATIONS:
