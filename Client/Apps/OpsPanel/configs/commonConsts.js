@@ -676,9 +676,17 @@ const GA_VERSION_OPTIONS = [
 	{
 		name: '3',
 		value: 3
+	},
+	{
+		name: '4',
+		value: 4
 	}
 ];
 
+const GA_EVENT_SAMPLING = 100;
+
+const TYPE_TEXT = 'text';
+const TYPE_NUMBER = 'number';
 const AP_LIGHT_AD_UNIT_OPERATIONS = [
 	{ name: 'Append', value: 'append', default: true },
 	{ name: 'Replace', value: 'replace' }
@@ -994,6 +1002,9 @@ export {
 	WEEKEND,
 	GA_ACCESS_EMAIL_OPTIONS,
 	GA_VERSION_OPTIONS,
+	GA_EVENT_SAMPLING,
+	TYPE_TEXT,
+	TYPE_NUMBER,
 	UNFILLED_REFRESH_RATE_ENTRIES,
 	PNP_REPLACE_TYPES,
 	AP_LIGHT_AD_UNIT_OPERATIONS,
