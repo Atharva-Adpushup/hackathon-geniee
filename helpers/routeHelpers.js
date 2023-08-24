@@ -14,7 +14,7 @@ const siteModel = require('../models/siteModel');
 const HTTP_STATUS = require('../configs/httpStatusConsts');
 const adpushup = require('./adpushupEvent');
 const AdPushupError = require('./AdPushupError');
-const { sendErrorResponse, sendSuccessResponse } = require('./commonFunctions');
+const { sendErrorResponse, sendSuccessResponse, isMasterDeployment } = require('./commonFunctions');
 const {
 	APP_KEYS,
 	GOOGLE_BOT_USER_AGENT,
@@ -120,20 +120,27 @@ function sendDataToAuditLogService(data) {
 	const { prevConfig, currentConfig, action = {}, ...restLogData } = data;
 	const delta = jsondiffpatch.diff(prevConfig, currentConfig) || {};
 
+	const body = {
+		...restLogData,
+		prevConfig,
+		logData: {
+			delta,
+			action
+		}
+	};
+
+	if (!isMasterDeployment()) {
+		body.deployment = config.deployment;
+	}
+
 	// don't need to send current config to elastic service
 	const options = {
 		method: 'POST',
 		uri: `${config.auditLogElasticServer.host}`,
-		body: {
-			...restLogData,
-			prevConfig,
-			logData: {
-				delta,
-				action
-			}
-		},
+		body,
 		json: true
 	};
+
 	return request(options)
 		.then(() => console.log('Audit Logs saved'))
 		.catch(err => console.log('Audit Logs failed', err));
