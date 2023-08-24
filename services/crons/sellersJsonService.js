@@ -29,7 +29,6 @@ const NEW_USER_AGE_IN_MONTHS = 12; // user added in the last 12 months
 const LAST_PAYMENT_CHECK_EXPIRY = 12; // user was paid in the last 12 months or not
 
 let errors = [];
-
 const confidentialDomainValidator = {
 	'media.net': function(domain) {
 		return domain.indexOf('media.net') === 0;
@@ -44,8 +43,83 @@ const defaultSellerType = 'PUBLISHER';
 let fileOutput = commonConsts.SELLERS_JSON.fileConfig;
 
 function getUsersQueryForBucket(bucketName) {
-	let queryString = `SELECT email, sellerId, dateCreated, manuallyEnteredCompanyName, domainNameSellersJson, pushToSellersJson, sellerType, lastPaymentCheckDateSellersJson, ARRAY site.domain FOR site IN sites END AS siteDomains FROM ${bucketName} WHERE meta().id LIKE 'user::%' AND ARRAY_LENGTH(sites) > 0;`;
+	let queryString = `SELECT email, sellerId, dateCreated, manuallyEnteredCompanyName, domainNameSellersJson, pushToSellersJson, sellerType, lastPaymentCheckDateSellersJson, ARRAY {site.domain, site.siteId} FOR site IN sites END AS sitesInfo FROM ${bucketName} WHERE meta().id LIKE 'user::%' AND ARRAY_LENGTH(sites) > 0;`;
 	return couchbase.N1qlQuery.fromString(queryString);
+}
+
+// retrieving only required entries from adsTxt to be checked for mandatory ads.txt // where domain like 'adpushup'
+function getAdsTxtQueryForBucket(bucketName) {
+	let queryString = `SELECT siteId, (SELECT adsTxt.* FROM ${bucketName}.adsTxt WHERE adsTxt.domain LIKE 'adpushup.com') AS adsTxtArr FROM ${bucketName} WHERE META().id LIKE 'adtx::%';`;
+	return couchbase.N1qlQuery.fromString(queryString);
+}
+
+let sitesAdsTxt = [];
+// get adsTxt for all the sites available
+async function getSitesAdsTxt() {
+	try {
+		if (sitesAdsTxt.length) {
+			return sitesAdsTxt;
+		}
+
+		sitesAdsTxt = await couchbaseService.connectToAppBucket().then(function(appBucket) {
+			return appBucket.queryAsync(getAdsTxtQueryForBucket(APP_BUCKET));
+		});
+		sitesAdsTxt = sitesAdsTxt.filter(adsTxtData => adsTxtData.adsTxtArr.length > 0);
+		colorLog('cyan', `Total non-empty adsTxt files: ${sitesAdsTxt.length}`);
+		return sitesAdsTxt;
+	} catch (error) {
+		console.log(`In getSitesAdsTxt, error while fetching adsTxt data: ${error}`);
+		return [];
+	}
+}
+
+async function verifyMandatoryAdsTxtEntry(siteId, sellerId) {
+	const sitesAdsTxt = await getSitesAdsTxt();
+	const adsTxtEntry = sitesAdsTxt.find(adsTxtData => adsTxtData.siteId === siteId);
+	if (!adsTxtEntry) return false;
+	const {
+		mandatoryAdsTxtSnippet: { domain, relationship, certificationAuthorityId }
+	} = commonConsts;
+	const mandatoryAdsTxtEntryLine = `${domain}, ${sellerId}, ${relationship}, ${certificationAuthorityId}`;
+	for (let i = 0; i < adsTxtEntry.adsTxtArr.length; i++) {
+		const { domain, pubId, relation, authorityId } = adsTxtEntry.adsTxtArr[i];
+		if (`${domain}, ${pubId}, ${relation}, ${authorityId}` === mandatoryAdsTxtEntryLine) {
+			return true;
+		}
+	}
+	return false;
+}
+
+async function getUserSiteDomain(user) {
+	if (user.sitesInfo.length === 1) {
+		return user.sitesInfo[0].domain;
+	}
+
+	for (let i = 0; i < user.sitesInfo.length; i++) {
+		const isVerified = await verifyMandatoryAdsTxtEntry(user.sitesInfo[i].siteId, user.sellerId);
+		if (isVerified) {
+			return user.sitesInfo[i].domain;
+		}
+	}
+	return user.sitesInfo[0].domain;
+}
+
+function getUserHasConfidentialDomain(user) {
+	/**
+	 * domainNameSellersJson is used as it is if set in the user doc
+	 * if domainNameSellersJson is set, it means the domain is not confidential
+	 */
+	if (user.domainNameSellersJson) {
+		return false;
+	}
+	return user.sitesInfo.some(siteInfo => isConfidentialDomain(domanize(siteInfo.domain)));
+}
+
+async function manageUserInformation(user) {
+	user.hasConfidentialDomain = getUserHasConfidentialDomain(user);
+	user.siteDomain = await getUserSiteDomain(user);
+	delete user.sitesInfo;
+	return user;
 }
 
 function colorLog(color, ...messages) {
@@ -105,66 +179,43 @@ function getUsersWithNonEmptySites() {
 	return Promise.all([appBucketUsersQuery, apAppBucketUsersQuery]).then(formatAndFilterUsers);
 }
 
-function formatAndFilterUsers(users) {
+async function formatAndFilterUsers(users) {
 	let [appBucketUsers, apAppBucketUsers] = users;
 	colorLog(
 		'cyan',
 		`Total Users in the Buckets: ${appBucketUsers.length + apAppBucketUsers.length}`
 	);
 
-	appBucketUsers = appBucketUsers.reduce(function(output, user) {
-		if (!validator.isEmail(user.email) || isIgnoredEmail(user.email)) {
-			return output;
-		}
-		user.bucket = [APP_BUCKET];
-		/**
-		 * domainNameSellersJson is used as it is if set in the user doc
-		 * if domainNameSellersJson is set, it means the domain is not confidential
-		 */
-		if (user.domainNameSellersJson) {
-			user.hasConfidentialDomain = false;
-			user.siteDomain = user.domainNameSellersJson;
-		} else {
-			user.siteDomain = user.siteDomains[0];
-			user.hasConfidentialDomain = user.siteDomains.some(domain =>
-				isConfidentialDomain(domanize(domain))
-			);
-		}
-		output.push(user);
+	const appBucketUserList = [];
+	for (let i = 0; i < appBucketUsers.length; i++) {
+		const user = appBucketUsers[i];
 
-		delete user.siteDomains;
-		return output;
-	}, []);
-
-	apAppBucketUsers = apAppBucketUsers.reduce(function(output, user) {
-		if (!validator.isEmail(user.email) || isIgnoredEmail(user.email)) {
-			return output;
+		if (validator.isEmail(user.email) && !isIgnoredEmail(user.email)) {
+			user.bucket = [APP_BUCKET];
+			const updatedUser = await manageUserInformation({ ...user });
+			appBucketUserList.push(updatedUser);
 		}
-		let userIndex = _findIndex(appBucketUsers, { email: user.email });
+	}
 
-		if (userIndex !== -1) {
-			appBucketUsers[userIndex].bucket.push(AP_APP_BUCKET);
-		} else {
-			user.bucket = [AP_APP_BUCKET];
-			/**
-			 * domainNameSellersJson is used as it is if set in the user doc
-			 * if domainNameSellersJson is set, it means the domain is not confidential
-			 */
-			if (user.domainNameSellersJson) {
-				user.hasConfidentialDomain = false;
-				user.siteDomain = user.domainNameSellersJson;
+	appBucketUsers = appBucketUserList;
+
+	const apAppBucketUserList = [];
+	for (let i = 0; i < apAppBucketUsers.length; i++) {
+		const user = apAppBucketUsers[i];
+
+		if (validator.isEmail(user.email) && !isIgnoredEmail(user.email)) {
+			let userIndex = _findIndex(appBucketUsers, { email: user.email });
+			if (userIndex !== -1) {
+				appBucketUsers[userIndex].bucket.push(AP_APP_BUCKET);
 			} else {
-				user.siteDomain = user.siteDomains[0];
-				user.hasConfidentialDomain = user.siteDomains.some(domain =>
-					isConfidentialDomain(domanize(domain))
-				);
+				user.bucket = [AP_APP_BUCKET];
+				const updatedUser = await manageUserInformation({ ...user });
+				apAppBucketUserList.push(updatedUser);
 			}
-			output.push(user);
 		}
+	}
 
-		delete user.siteDomains;
-		return output;
-	}, []);
+	apAppBucketUsers = apAppBucketUserList;
 
 	colorLog('cyan', `Total Unique Users: ${appBucketUsers.length + apAppBucketUsers.length}`);
 
@@ -266,22 +317,20 @@ function writeDataToTempFile() {
 function addPermanantEntries() {
 	return new Promise((resolve, reject) => {
 		try {
-			const permanantEntriesSellerJson = require("./permanentEntriesSellerJson.json");
+			const permanantEntriesSellerJson = require('./permanentEntriesSellerJson.json');
 			if (Array.isArray(permanantEntriesSellerJson)) {
-				for(let permanantEntry of permanantEntriesSellerJson){
-					if(permanantEntry.isEnabled){
+				for (let permanantEntry of permanantEntriesSellerJson) {
+					if (permanantEntry.isEnabled) {
 						fileOutput.sellers.push(permanantEntry.data);
 					}
 				}
 			}
-		} catch (e)
-		{
+		} catch (e) {
 			console.error(e);
+		} finally {
+			resolve();
 		}
-		finally {
-			resolve()
-		}
-	})
+	});
 }
 
 function replaceWithOldSellersJson() {
@@ -337,7 +386,7 @@ function replaceWithOldSellersJson() {
 }
 
 function shouldUserBeAdded(user) {
-	if(user.pushToSellersJson === false) {
+	if (user.pushToSellersJson === false) {
 		return Promise.reject({ skipUser: true });
 	}
 
@@ -460,7 +509,7 @@ function reportErrors() {
 function init() {
 	return getUsersWithNonEmptySites()
 		.then(processDataInChunks)
-		.then(addPermanantEntries) 
+		.then(addPermanantEntries)
 		.then(writeDataToTempFile)
 		.then(replaceWithOldSellersJson)
 		.then(function() {
@@ -499,9 +548,5 @@ function start() {
 	}
 }
 
-var cronJob = cron.schedule(
-	commonConsts.cronSchedule.sellersJSONService,
-	start,
-	false
-);
+var cronJob = cron.schedule(commonConsts.cronSchedule.sellersJSONService, start, false);
 cronJob.start();
