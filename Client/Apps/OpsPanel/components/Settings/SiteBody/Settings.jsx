@@ -10,6 +10,9 @@ import siteService from '../../../../../services/siteService';
 import {
 	GA_ACCESS_EMAIL_OPTIONS,
 	GA_VERSION_OPTIONS,
+	GA_EVENT_SAMPLING,
+	TYPE_TEXT,
+	TYPE_NUMBER,
 	POWERED_BY_BANNER,
 	OUTBRAIN_DISABLED,
 	OUTBRAIN_DISABLED_OPTIONS,
@@ -180,6 +183,11 @@ class Settings extends Component {
 		});
 	};
 
+	handleGaInputChange = (e) => {
+		const updatedViewId = e === 4 ? '' : this.state.viewId;
+		this.setState({ gaVersion: e, viewId: updatedViewId });
+	  };
+
 	handlePoweredByBannerMultiSelect = selectedAdTypes => {
 		this.setState({ selectedAdTypes });
 	};
@@ -311,7 +319,7 @@ class Settings extends Component {
 			gaTrackingId,
 			viewId,
 			accessEmail,
-			gaEventSampling: 1,
+			gaEventSampling: GA_EVENT_SAMPLING,
 			gaVersion
 		};
 		const { showNotification, saveSettings, site, dataForAuditLogs } = this.props;
@@ -445,6 +453,9 @@ class Settings extends Component {
 		const { site } = this.props;
 
 		const { siteId, siteDomain, dataFeedActive = true } = site;
+		const isGaVersionFour = gaVersion === 4;
+		const gaPropertyIdText='GA Property Id';
+		const gaTrackingIdText='GA Tracking Id';
 		// const effectRevenueShareDate = formatDate(+new Date(), 'subtract', 2);
 
 		return (
@@ -757,17 +768,17 @@ class Settings extends Component {
 						<FieldGroup
 							name="gaTrackingId"
 							value={gaTrackingId}
-							type="text"
-							label="GA Tracking Id"
+							type={isGaVersionFour ? TYPE_NUMBER : TYPE_TEXT}
+							label={isGaVersionFour ? gaPropertyIdText : gaTrackingIdText}
 							onChange={this.handleChange}
 							size={6}
 							id={`gaTrackingId-${siteId}-${siteDomain}`}
-							placeholder="GA Tracking Id"
+							placeholder={isGaVersionFour ? gaPropertyIdText : gaTrackingIdText}
 							className="u-padding-v4 u-padding-h4"
 						/>
 						<FieldGroup
 							name="viewId"
-							value={viewId}
+							value={isGaVersionFour ? '' : viewId}
 							type="text"
 							label="View Id"
 							onChange={this.handleChange}
@@ -775,6 +786,7 @@ class Settings extends Component {
 							id={`viewId-${siteId}-${siteDomain}`}
 							placeholder="View Id"
 							className="u-padding-v4 u-padding-h4"
+							disabled={isGaVersionFour}
 						/>
 						<FieldGroup
 							name="accessEmail"
@@ -793,7 +805,7 @@ class Settings extends Component {
 							value={gaVersion}
 							type="toggle-dropdown-button"
 							label="GA Version"
-							onChange={value => this.setState({ gaVersion: value })}
+							onChange={this.handleGaInputChange}
 							size={6}
 							id={`gaVersion-${siteId}-${siteDomain}`}
 							placeholder="GA Version"

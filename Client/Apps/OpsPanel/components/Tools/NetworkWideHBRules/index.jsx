@@ -70,6 +70,7 @@ class BidderRules extends React.Component {
 	constructor(props) {
 		super(props);
 		const { bidders } = props;
+		const { user } = props;
 
 		const allowedBidders = getConvertedBiddersData(bidders);
 
@@ -97,7 +98,8 @@ class BidderRules extends React.Component {
 			triggerKeyIndexMap: {},
 
 			// required for getDerivedStateFromProps
-			bidders
+			bidders,
+			user
 		};
 
 		this.handleSubmit = this.handleSubmit.bind(this);
@@ -859,8 +861,14 @@ class BidderRules extends React.Component {
 	}
 
 	renderListComponent() {
-		const { rules, bidders } = this.props;
-
+		const { rules, bidders, user, originalEmail } = this.props;
+		const { globalBidderRulesAccess = false } = user;
+		const switchedAccounts = () => {
+			if (typeof originalEmail !== 'undefined' && user.email !== originalEmail) {
+				return true;
+			}
+			return false;
+		};
 		const {
 			actionKeyOptions,
 			actionValueOptions,
@@ -886,9 +894,15 @@ class BidderRules extends React.Component {
 					actionKeyOptions={actionKeyOptions}
 					actionValueOptions={modifiedActionValueOptions}
 					isForOps
+					globalBidderRulesAccess={globalBidderRulesAccess}
+					switchedAccounts={switchedAccounts}
 				/>
 				<div className="control">
-					<Button className="btn-primary" onClick={() => this.handleAddNewRule()}>
+					<Button
+						className="btn-primary"
+						onClick={() => this.handleAddNewRule()}
+						disabled={!globalBidderRulesAccess || switchedAccounts()}
+					>
 						Add New Rule
 					</Button>
 				</div>

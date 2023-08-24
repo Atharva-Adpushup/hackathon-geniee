@@ -76,7 +76,8 @@ var modelAPI = (module.exports = apiModule()),
 			'useGAAnalyticsForReporting',
 			'manuallyAddedPublisherNetworkCode',
 			'paymentReconciliation',
-			'pushToSellersJson'
+			'pushToSellersJson',
+			'globalBidderRulesAccess'
 		];
 		this.clientKeys = [
 			'firstName',
@@ -119,7 +120,8 @@ var modelAPI = (module.exports = apiModule()),
 			'useGAAnalyticsForReporting',
 			'manuallyAddedPublisherNetworkCode',
 			'paymentReconciliation',
-			'pushToSellersJson'
+			'pushToSellersJson',
+			'globalBidderRulesAccess'
 		];
 		this.validations = schema.user.validations;
 		this.classMap = {
