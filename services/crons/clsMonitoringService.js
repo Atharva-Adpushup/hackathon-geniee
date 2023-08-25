@@ -15,7 +15,7 @@ const config = require('../../configs/config');
 const couchbase = require('../../helpers/couchBaseService');
 const CC = require('../../configs/commonConsts');
 const { sendEmail } = require('../../helpers/queueMailer');
-
+const { makeReportingRequest } = require('../../helpers/commonFunctions');
 //get top sites by revenue from data::topsites
 function getTopSites() {
 	return couchbase
@@ -29,7 +29,8 @@ function getTopSites() {
 //get Top 5 urls of each site from the predefined list
 function getTopUrlsOfEachSite() {
 	return getTopSites().then(sites => {
-		return request({
+		return makeReportingRequest({
+			serviceName: CC.SERVICE_NAMES.CLS_MONITORING_SERVICE,
 			uri: CC.TOP_URLS_API,
 			json: true
 		}).then(res => res.data.siteUrls); //will be an array
@@ -246,11 +247,13 @@ async function prepareDataForAlerts() {
 function getHostIpAddress() {
 	try {
 		const interfaces = os.networkInterfaces();
-		let ipAddress = "";
-		for(let key in interfaces) {
+		let ipAddress = '';
+		for (let key in interfaces) {
 			let currentInterfaceAddresses = interfaces[key];
-			let ipV4Addresses = currentInterfaceAddresses.filter(interfaceAddress => interfaceAddress.family === 'IPv4' && !interfaceAddress.internal)
-			if(ipV4Addresses.length) {
+			let ipV4Addresses = currentInterfaceAddresses.filter(
+				interfaceAddress => interfaceAddress.family === 'IPv4' && !interfaceAddress.internal
+			);
+			if (ipV4Addresses.length) {
 				ipAddress = ipV4Addresses[0].address;
 				break;
 			}
@@ -258,7 +261,7 @@ function getHostIpAddress() {
 		return ipAddress;
 	} catch (err) {
 		console.log(err);
-		return "No IP Address Found"
+		return 'No IP Address Found';
 	}
 }
 
@@ -270,7 +273,7 @@ function generateErrorMailBody(err, hostIpAddress) {
 			<p><strong>Host IP</strong>: ${hostIpAddress}</p>
 		</body>
 		</html>`;
-	
+
 	return errorFormatData;
 }
 

@@ -25,6 +25,7 @@ const { getUserGaEnabledSites, getUserByEmail } = require('../models/userModel')
 const { getAllGaEnabledSites } = require('../models/siteModel');
 const { addActiveProductsToMeta } = require('../helpers/routeHelpers');
 const { getMetaInfo } = require('../apiServices/metaInfoService');
+const { makeReportingRequest } = require('../helpers/commonFunctions');
 
 const reportsService = {
 	generateCronExpression: (interval, startDate) => {
@@ -221,9 +222,8 @@ const reportsService = {
 			});
 	},
 	fetchReports: async reportConfig => {
-		const reportsResponse = await request({
+		const reportsResponse = await makeReportingRequest({
 			uri: `${CC.ANALYTICS_API_ROOT}${CC.REPORT_PATH}`,
-			json: true,
 			qs: reportConfig,
 			timeout: 600000 // 10 mins
 		});
@@ -232,9 +232,8 @@ const reportsService = {
 		return reportsResponse.data;
 	},
 	fetchReportAPCustomStatXPath: async reportConfig => {
-		const reportsResponse = await request({
+		const reportsResponse = await makeReportingRequest({
 			uri: `${CC.ANALYTICS_API_ROOT}${CC.REPORT_PATH_XPATH}`,
-			json: true,
 			qs: reportConfig,
 			timeout: 600000 // 10 mins
 		});
@@ -243,9 +242,8 @@ const reportsService = {
 		return reportsResponse.data;
 	},
 	fetchSessionData: async reportConfig => {
-		const sessionRpmReportsResponse = await request({
+		const sessionRpmReportsResponse = await makeReportingRequest({
 			uri: `${CC.SESSION_RPM_REPORTS_API}`,
-			json: true,
 			qs: reportConfig
 		});
 		if (sessionRpmReportsResponse.code !== 1) throw new AdPushupError(sessionRpmReportsResponse);
@@ -282,9 +280,8 @@ const reportsService = {
 	getWidgetData: async (path, params) =>
 		ObjectValidator(getWidgetDataValidations, { path, params })
 			.then(() =>
-				request({
+				makeReportingRequest({
 					uri: `${CC.ANALYTICS_API_ROOT}${path}`,
-					json: true,
 					qs: params
 				})
 			)
@@ -439,10 +436,9 @@ const reportsService = {
 		};
 		const siteId = site.get('siteId');
 
-		return request({
+		return makeReportingRequest({
 			method: 'GET',
 			uri: CC.MAB_REPORTING_API,
-			json: true,
 			qs: { siteid: siteId }
 		})
 			.then(response => {

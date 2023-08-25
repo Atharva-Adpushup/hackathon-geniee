@@ -8,6 +8,7 @@ const HTTP_STATUSES = require('../configs/httpStatusConsts');
 const { sendErrorResponse } = require('../helpers/commonFunctions');
 const { getMetaInfo } = require('../apiServices/metaInfoService');
 const { addActiveProductsToMeta } = require('../helpers/routeHelpers');
+const { makeReportingRequest } = require('../helpers/commonFunctions');
 
 router
 	.get('/getCustomStats', (req, res) => {
@@ -48,9 +49,8 @@ router
 		const utmPrams = utmFilter[dimension] ? `&utm_params=${utmFilter[dimension]}` : '';
 
 		if (isValidParams) {
-			return request({
+			return makeReportingRequest({
 				uri: `${CC.ANALYTICS_API_ROOT}${reportPath}${utmPrams}`,
-				json: true,
 				qs: req.query
 			})
 				.then(response => {

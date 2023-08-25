@@ -17,7 +17,7 @@ const adpushup = require('../helpers/adpushupEvent');
 const { getNetworkWideHBRules } = require('../helpers/commonFunctions');
 
 const { sendDataToAuditLogService } = require('../helpers/routeHelpers');
-
+const { makeAxiosReportingRequest } = require('../helpers/commonFunctions');
 const {
 	AUDIT_LOGS_ACTIONS: { HEADER_BIDDING }
 } = commonConsts;
@@ -990,19 +990,14 @@ router
 	})
 	.get('/rules/meta', (req, res) => {
 		const apis = {
-			devices:
-				'https://api.adpushup.com/CentralReportingWebService/site/list?list_name=GET_ALL_DEVICES',
-			countries:
-				'https://api.adpushup.com/CentralReportingWebService/site/list?list_name=GET_ALL_COUNTRIES',
-			days:
-				'https://api.adpushup.com/CentralReportingWebService/hb_analytics/list?list_name=GET_ALL_DAY_TYPES',
-			adTypes:
-				'https://api.adpushup.com/CentralReportingWebService/hb_analytics/list?list_name=GET_AD_TYPE_OPTIONS',
-			timeSlots:
-				'https://api.adpushup.com/CentralReportingWebService/hb_analytics/list?list_name=GET_TIME_OF_AUCTION_BUCKETS'
+			devices: commonConsts.GET_ALL_DEVICES_API,
+			countries: commonConsts.GET_ALL_COUNTRIES_API,
+			days: `${commonConsts.ANALYTICS_API_ROOT}${commonConsts.HB_ALL_DAY_TYPES}`,
+			adTypes: `${commonConsts.ANALYTICS_API_ROOT}${commonConsts.HB_ALL_AD_TYPES}`,
+			timeSlots: `${commonConsts.ANALYTICS_API_ROOT}${commonConsts.HB_ALL_TIME_SLOTS}`
 		};
 
-		const fetchDataFromAPI = api => axios.get(api);
+		const fetchDataFromAPI = api => makeAxiosReportingRequest({ url: api, method: 'GET' });
 		const getDataFromAPIResponse = response =>
 			(response.data &&
 				response.data.description === 'SUCCESS' &&

@@ -16,6 +16,8 @@ const siteModel = require('./siteModel');
 const axios = require('axios');
 const { AMP_SETTINGS_ACCESS_EMAILS } = require('../configs/commonConsts');
 const { getActiveProductFromCouchbase } = require('../helpers/routeHelpers');
+const { makeReportingRequest } = require('../helpers/commonFunctions');
+
 const commonSiteFunctions = {
 	getLayoutInventories: siteId =>
 		siteModel
@@ -170,9 +172,8 @@ const commonSiteFunctions = {
 		}
 	},
 	getProductsMeta() {
-		return request({
+		return makeReportingRequest({
 			method: 'GET',
-			json: true,
 			uri: commonConsts.ALL_PRODUCTS_META_API
 		});
 	},

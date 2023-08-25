@@ -63,8 +63,8 @@ const config = {
 	// local
 	redisEnvironment: {
 		AZURE_CACHE_FOR_REDIS_PORT: 6380,
-		AZURE_CACHE_FOR_REDIS_HOST_NAME:"...",
-		AZURE_CACHE_FOR_REDIS_ACCESS_KEY:"..."
+		AZURE_CACHE_FOR_REDIS_HOST_NAME: '...',
+		AZURE_CACHE_FOR_REDIS_ACCESS_KEY: '...'
 	},
 	couchBase: {
 		HOST: '127.0.0.1',
@@ -409,7 +409,14 @@ const config = {
 	googleSheetCreds: '',
 	SLACK_ENDPOINT: 'https://common-azure-function.azurewebsites.net/api/publish',
 	SITE_SYNC_ERROR_ALERT_REPORTER:
-		'rahul.kumar@adpushup.com,yash.bhardwaj@adpushup.com,divyanshu.bhatnagar@adpushup.com,anil.panghal@adpushup.com,rahul.ranjan@adpushup.com'
+		'rahul.kumar@adpushup.com,yash.bhardwaj@adpushup.com,divyanshu.bhatnagar@adpushup.com,anil.panghal@adpushup.com,rahul.ranjan@adpushup.com',
+	reportingAuthToken: {
+		// Auth tokens are converted into base64
+		GENIEE_CONSOLE: 'Z2VuaWVlY29uc29sZTpZSSs5NWY5RDg3dXVpL2k0bXBRb25BPT0=',
+		CLS_MONITORING_SERVICE: 'Y2xzbW9uaXRvcmluZzpWM002QVlDMUZWVmtkdlcwSVJzbCt3PT0=',
+		ACTIVE_SITES_MARKING_SERVICE:
+			'YWN0aXZlc2l0ZXNtYXJraW5nc2VydmljZTp4OTdJODBJTGJWYXBLZTB3MkdtaWVRPT0='
+	}
 };
 
 module.exports = merge(config, selectiveRolloutConfig);
