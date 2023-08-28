@@ -53,7 +53,7 @@ class HeaderBiddingRulesList extends React.Component {
 		return rules.map((rule, index) => {
 			const { isActive, triggers, actions, createdAt, isGlobal, description, isAuto } = rule;
 			const disableGlobalBidderEditAccess = () =>
-				!globalBidderRulesAccess || (!isForOps && (isGlobal || isAuto)) || switchedAccounts();
+				isForOps ? !globalBidderRulesAccess || switchedAccounts() : isGlobal || isAuto;
 
 			const triggersContent = triggers.map((trigger, triggerIndex) => {
 				// key, operator, value
