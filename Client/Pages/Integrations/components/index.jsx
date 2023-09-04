@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
-import { Nav, NavItem } from '@/Client/helpers/react-bootstrap-imports';
-
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faCheckCircle } from '@/Client/helpers/fort-awesome-imports';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -9,7 +7,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import ActionCard from '../../../Components/ActionCard/index';
 import HeroFeature from '../../../Components/Layout/HeroFeature';
 import CustomButton from '../../../Components/CustomButton/index';
-import { INTG_NAV_ITEMS, INTG_NAV_ITEMS_INDEXES, INTG_NAV_ITEMS_VALUES } from '../constants/index';
+import { INTG_NAV_ITEMS_INDEXES } from '../constants/index';
+import userService from '../../../services/userService';
 
 library.add(faCheckCircle);
 
@@ -30,7 +29,8 @@ class Integrations extends Component {
 
 	state = {
 		redirectUrl: '',
-		isGoogleOauthConnected: this.isGoogleOauthConnected
+		isGoogleOauthConnected: this.isGoogleOauthConnected,
+		isConnectViaSupportAccountLoading: false
 	};
 
 	$window = window;
@@ -76,7 +76,26 @@ class Integrations extends Component {
 		);
 	};
 
-	handleClickHandler = inputParam => {
+	handleGoogleOauthSkipper = async () => {
+		try {
+			this.setState({ isConnectViaSupportAccountLoading: true });
+			const { updateAdNetworkSettings } = this.props;
+			const response = await userService.skipOauthInGoogleAccountIntegration();
+			this.setState({ isGoogleOauthConnected: true }, () => updateAdNetworkSettings(response.data));
+		} catch (error) {
+			const { showNotification } = this.props;
+			showNotification({
+				mode: 'error',
+				title: 'Connect via Support Account falied',
+				message: 'Try updating the refresh token in config',
+				autoDismiss: 5
+			});
+		} finally {
+			this.setState({ isConnectViaSupportAccountLoading: false });
+		}
+	};
+
+	handleGoogleAccountLinking = inputParam => {
 		const { target } = inputParam;
 
 		const { name } = target;
@@ -84,6 +103,9 @@ class Integrations extends Component {
 		switch (name) {
 			case 'connectGoogleAccountButton':
 				this.openGoogleOauthWindow();
+				break;
+			case 'connectViaSupportAccountButton':
+				this.handleGoogleOauthSkipper();
 				break;
 
 			default:
@@ -134,23 +156,43 @@ class Integrations extends Component {
 		</React.Fragment>
 	);
 
-	renderDefaultDescriptionUI = () => (
-		<React.Fragment>
-			<h3 className="u-margin-t3 u-margin-b4 u-text-bold">Connect your Google account</h3>
-			<p className="u-margin-b4 text-center">
-				Connecting your Google account with AdPushup helps us to access your inventory and reports
-				for all Google services and manage them conveniently.
-			</p>
-			<CustomButton
-				variant="primary"
-				className=""
-				name="connectGoogleAccountButton"
-				onClick={this.handleClickHandler}
-			>
-				Connect
-			</CustomButton>
-		</React.Fragment>
-	);
+	renderDefaultDescriptionUI = () => {
+		const { user } = this.props;
+		const { isSuperUser } = user;
+		const { isConnectViaSupportAccountLoading } = this.state;
+		return (
+			<React.Fragment>
+				<h3 className="u-margin-t3 u-margin-b4 u-text-bold">Connect your Google account</h3>
+				<p className="u-margin-b4 text-center">
+					Connecting your Google account with AdPushup helps us to access your inventory and reports
+					for all Google services and manage them conveniently.
+				</p>
+				<CustomButton
+					variant="primary"
+					className=""
+					name="connectGoogleAccountButton"
+					onClick={this.handleGoogleAccountLinking}
+				>
+					Connect
+				</CustomButton>
+				{isSuperUser ? (
+					<>
+						<br />
+						<CustomButton
+							variant="primary"
+							className=""
+							name="connectViaSupportAccountButton"
+							showSpinner={isConnectViaSupportAccountLoading}
+							disabled={isConnectViaSupportAccountLoading}
+							onClick={this.handleGoogleAccountLinking}
+						>
+							Connect via Support Account
+						</CustomButton>
+					</>
+				) : null}
+			</React.Fragment>
+		);
+	};
 
 	renderContent = () => {
 		const activeTab = this.getActiveTab();

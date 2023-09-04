@@ -14,6 +14,8 @@ export default {
 	addSite: (site, dataForAuditLogs) =>
 		axiosInstance.post('/user/addSite', { site, dataForAuditLogs }),
 	payments: () => axiosInstance.get('/user/payment'),
+	// eslint-disable-next-line max-params
 	setSiteStep: (siteId, onboardingStage, step, dataForAuditLogs) =>
-		axiosInstance.post('/user/setSiteStep', { siteId, onboardingStage, step, dataForAuditLogs })
+		axiosInstance.post('/user/setSiteStep', { siteId, onboardingStage, step, dataForAuditLogs }),
+	skipOauthInGoogleAccountIntegration: () => axiosInstance.get('/user/skipOauth2WithRefreshToken')
 };

@@ -527,6 +527,10 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 			INVALID_DATA: 'ADPUSHUP_APP.RABBITMQ.CONSUMER: Invalid Message consumer',
 			CDN_SYNC_ERROR: 'Unable to sync file with cdn',
 			UNSYNCED_SETUP: 'Unsynced ads in setup'
+		},
+		GOOGLE_ERRORS: {
+			NO_ADSENSE_ACCOUNT_ERROR : 'Sorry but it seems you have no AdSense account linked to your Google account. If this is a recently verified/created account, it might take upto 24 hours to come in effect. Please try again after sometime or contact support.',
+			GOOGLE_ACCOUNT_CONNECTION_ERROR : 'Some error occurred while connecting with your Google account. Please try again after some time or contact your account manager.'
 		}
 	},
 	SUCCESS_MESSAGES: {
@@ -538,6 +542,10 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 				MESSAGE_RECEIVED: 'ADPUSHUP_APP.RABBITMQ.CONSUMER: Received message data'
 			}
 		}
+	},
+	GOOGLE_SERVICES_API: {
+		ADSENSE_ACCOUNT_URL: 'https://adsense.googleapis.com/v2/accounts',
+		OAUTH2_USERINFO_URL: 'https://www.googleapis.com/oauth2/v2/userinfo'
 	},
 	environment: {
 		development: 'development',
@@ -773,6 +781,16 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		}
 	},
 	USER_PAYABLE_VERIFICATION_AMOUNT: 5000,
+	USER_PROPERTIES: {
+		AD_SERVER_SETTINGS: 'adServerSettings',
+		AD_NETWORK_SETTINGS: 'adNetworkSettings',
+		NETWORK: {
+			DFP: 'DFP',
+			ADSENSE: 'ADSENSE'
+		},
+		SITES:'sites',
+		EMAIL: 'email'
+	},
 	mandatoryAdsTxtSnippet: {
 		domain: 'adpushup.com',
 		relationship: 'DIRECT',
@@ -1948,5 +1966,12 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		GENIEE_CONSOLE: 'GENIEE_CONSOLE',
 		CLS_MONITORING_SERVICE: 'CLS_MONITORING_SERVICE',
 		ACTIVE_SITES_MARKING_SERVICE: 'ACTIVE_SITES_MARKING_SERVICE'
-	}
+	},
+	GOOGLE_OAUTH_POST_MESSAGE_SCRIPT_TEMPLATE: `<script type="text/javascript">
+	window.opener.postMessage({
+		"cmd":"SAVE_GOOGLE_OAUTH_INFO",
+		"data": __MESSAGE_DATA__
+	}, '__TARGET_ORIGIN__');
+	window.close();
+	</script>`
 };
