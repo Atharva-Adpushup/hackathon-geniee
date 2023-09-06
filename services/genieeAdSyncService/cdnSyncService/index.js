@@ -1,14 +1,10 @@
 const Promise = require('bluebird');
-const queuePublisher = require('../../../queueWorker/rabbitMQ/workers/queuePublisher');
 const CC = require('../../../configs/commonConsts');
 const {
-	getSyncPublisherForScriptType,
-	getEnabledPublishersByTypeList
+	getQueueNameForScriptType
 } = require('./commonFunctions');
 
-const {
-	RABBITMQ: { CDN_SYNC }
-} = require('../../../configs/config');
+const {publishToRabbitMqQueue} = require("../../../helpers/utils");
 
 // useDirect is only sent `true` from transactionLogQueueConsumer which is no longer used
 module.exports = function(site, syncOptions) {
@@ -23,24 +19,18 @@ module.exports = function(site, syncOptions) {
 		paramConfig.forcePrebidBuild = true;
 	}
 
+
 	// If Keys provided in parameter, then sync in only one queue based on keys
 	if (options.type) {
-		const publisher = getSyncPublisherForScriptType(options.type, {
+		const queueName = getQueueNameForScriptType(options.type, {
 			isAmpScriptEnabled,
 			isDVCEnabled
 		});
 
-		if (publisher === null) {
+		if (queueName === null) {
 			return `${options.type} is not available on site ${siteId}`;
 		}
-		if (publisher === queuePublisher) {
-			return publisher
-				.publish(syncCdnQueue || CDN_SYNC, paramConfig)
-				.then(() => `Published into ${syncCdnQueue.name} Queue ${siteId}`);
-		}
-		return publisher
-			.publish(paramConfig)
-			.then(() => `Published into ${options.type} Queue ${siteId}`);
+		return publishToRabbitMqQueue(queueName, paramConfig);
 	}
 
 	// For No Key Provided
@@ -56,14 +46,12 @@ module.exports = function(site, syncOptions) {
 
 	types.push(CC.SCRIPT_TYPE.ADPUSHUPJS);
 
-	const publishers = getEnabledPublishersByTypeList(types, { isAmpScriptEnabled, isDVCEnabled });
-
-	const publishTasks = publishers.map(publisher => {
-		if (publisher === queuePublisher) {
-			return publisher.publish(syncCdnQueue || CDN_SYNC, paramConfig);
-		} else {
-			return publisher.publish(paramConfig);
-		}
+	const publishTasks = types.map(type => {
+		const queueName = getQueueNameForScriptType(type, {
+			isAmpScriptEnabled,
+			isDVCEnabled
+		});
+		return publishToRabbitMqQueue(queueName, paramConfig);
 	});
 
 	return Promise.all(publishTasks).then(() => `Published into ${types.join(', ')} ${siteId}`);
