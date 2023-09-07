@@ -138,6 +138,7 @@ module.exports = {
 	REPORT_STATUS: 'https://api.adpushup.com/OpsWebService/ops?report=getNetworkImportServiceStatus',
 	IE_TESTING_ENDPOINT: 'http://apdc1n-central5.eastus2.cloudapp.azure.com:8081/api/health-report',
 	PROXY_ORIGIN: '//proxy.app.adpushup.com',
+	ACTIVE_SITE_API: `${reportingBaseURL}/site/activeSiteList`,
 	TOP_URLS_API: `${reportingBaseURL}/topUrls`,
 	PRODUCT_LIST_API: `${reportingBaseURL}/common/activeProducts`,
 	SESSION_RPM_REPORTS_API: `${reportingBaseURL}/site/report?report_name=session_rpm_report`,
@@ -153,6 +154,11 @@ module.exports = {
 	URL_REPORT_PATH: '/url/report?report_name=url_report',
 	UTM_REPORT_PATH: '/url/report?report_name=utm_report&',
 	HB_REPORT_PATH: '/hb_analytics/report?report_name=GET_UI_PANEL_REPORT',
+	GET_ALL_DEVICES_API: `${reportingBaseURL}/site/list?list_name=GET_ALL_DEVICES`,
+	GET_ALL_COUNTRIES_API: `${reportingBaseURL}/site/list?list_name=GET_ALL_COUNTRIES`,
+	HB_ALL_DAY_TYPES: '/hb_analytics/list?list_name=GET_ALL_DAY_TYPES',
+	HB_ALL_AD_TYPES: '/hb_analytics/list?list_name=GET_AD_TYPE_OPTIONS',
+	HB_ALL_TIME_SLOTS: '/hb_analytics/list?list_name=GET_TIME_OF_AUCTION_BUCKETS',
 	HB_BID_CPM_STATS_REPORT_PATH: '/hb_analytics/report?report_name=GET_BID_CPM_STATS',
 	DFP_LINE_ITEM_AUTOMATION_API: 'https://api.adpushup.com/DfpInventoryWebService/job',
 	PAGEGROUP_LIST_API: `${reportingBaseURL}/site/list`,
@@ -1935,5 +1941,10 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 			msg: 'key does not exist',
 			code: 13
 		}
+	},
+	SERVICE_NAMES: {
+		GENIEE_CONSOLE: 'GENIEE_CONSOLE',
+		CLS_MONITORING_SERVICE: 'CLS_MONITORING_SERVICE',
+		ACTIVE_SITES_MARKING_SERVICE: 'ACTIVE_SITES_MARKING_SERVICE'
 	}
 };

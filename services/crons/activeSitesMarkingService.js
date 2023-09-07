@@ -7,10 +7,9 @@ const { appBucket } = require('../../helpers/routeHelpers');
 const siteModel = require('../../models/siteModel');
 const config = require('../../configs/config');
 const constants = require('../../configs/commonConsts');
+const { makeReportingRequest } = require('../../helpers/commonFunctions');
 
-// TODO: Use reporting base url
-const activeSiteApiUri =
-	'https://api.adpushup.com/CentralReportingWebService/site/activeSiteList';
+const activeSiteApiUri = constants.ACTIVE_SITE_API;
 
 function getFormattedDate(date, offset) {
 	date.setDate(date.getDate() - (offset || 0));
@@ -57,6 +56,7 @@ function getSitesFromDB() {
 
 function getActiveSites(fromDate, toDate) {
 	const options = {
+		serviceName: constants.SERVICE_NAMES.ACTIVE_SITES_MARKING_SERVICE,
 		uri: activeSiteApiUri,
 		qs: {
 			fromDate,
@@ -68,7 +68,7 @@ function getActiveSites(fromDate, toDate) {
 		},
 		json: true
 	};
-	const activeSiteListPromise = rp(options).catch(e => {
+	const activeSiteListPromise = makeReportingRequest(options).catch(e => {
 		console.log(`error in getting active site Lists:${e}`);
 		throw { error: true };
 		// return err;

@@ -15,10 +15,7 @@ const {
 	AD_UNIT_TYPE_MAPPING
 } = require('../configs/commonConsts');
 const { RABBITMQ } = require('../configs/config');
-const {
-	sendSuccessResponse,
-	sendErrorResponse,
-} = require('../helpers/commonFunctions');
+const { sendSuccessResponse, sendErrorResponse } = require('../helpers/commonFunctions');
 const {
 	appBucket,
 	errorHandler,
@@ -37,6 +34,7 @@ const schema = require('../helpers/schema');
 const AdPushupError = require('../helpers/AdPushupError');
 const { publishToRabbitMqQueue } = require('../helpers/utils');
 const siteModel = require('../models/siteModel');
+const { makeReportingRequest } = require('../helpers/commonFunctions');
 
 const router = express.Router();
 
@@ -118,7 +116,8 @@ router
 				  });
 		}
 		function makeAPIRequestWrapper(qs) {
-			return helpers.makeAPIRequest({
+			return makeReportingRequest({
+				method: 'GET',
 				uri: GET_SITES_STATS_API,
 				qs
 			});
@@ -266,11 +265,11 @@ router
 			toDate: endDate
 		};
 
-		return helpers
-			.makeAPIRequest({
-				uri: GET_SITES_STATS_API,
-				qs: { ...qs, report_name: 'get_url_count' }
-			})
+		return makeReportingRequest({
+			method: 'GET',
+			uri: GET_SITES_STATS_API,
+			qs: { ...qs, report_name: 'get_url_count' }
+		})
 			.then(response => {
 				const { code = -1 } = response;
 				if (code !== 1) return Promise.reject(new Error(response.data));

@@ -19,6 +19,7 @@ const reportsAccess = require('../middlewares/reportsAuthorizationMiddleware');
 const reportsService = require('../apiServices/reportsService');
 const { appBucket } = require('../helpers/routeHelpers');
 const config = require('../configs/config');
+const { makeReportingRequest } = require('../helpers/commonFunctions');
 
 const router = express.Router();
 const reportingTimeOut = 15 * 60 * 60 * 1000; // 15 mins reporting time out
@@ -193,9 +194,8 @@ router
 		const { from, to, pagegroup } = req.query;
 		const siteid = parseInt(req.query.siteid, 10);
 
-		return request({
+		return makeReportingRequest({
 			uri: CC.PAGEGROUP_LIST_API,
-			json: true,
 			qs: {
 				list_name: 'GET_ALL_PAGE_GROUPS',
 				siteid,
@@ -228,9 +228,8 @@ router
 						})
 					);
 
-				return request({
+				return makeReportingRequest({
 					uri: `${CC.ANALYTICS_API_ROOT}${CC.REPORT_PATH}`,
-					json: true,
 					qs: {
 						interval: 'daily',
 						dimension: 'siteid,page_group,page_variation_id,page_variation,section_id,section',

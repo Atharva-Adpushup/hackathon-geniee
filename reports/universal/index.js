@@ -2,6 +2,7 @@ const _ = require('lodash');
 const request = require('request-promise');
 
 const { MAB_REPORTING_API } = require('../../configs/commonConsts');
+const { makeReportingRequest } = require('../../helpers/commonFunctions');
 
 const DEFAULT_DATA = {
 	status: false,
@@ -11,10 +12,9 @@ const DEFAULT_DATA = {
 function init(site) {
 	const siteId = site.get('siteId');
 
-	return request({
+	return makeReportingRequest({
 		method: 'GET',
 		uri: MAB_REPORTING_API,
-		json: true,
 		qs: { siteid: siteId }
 	})
 		.then(response => {

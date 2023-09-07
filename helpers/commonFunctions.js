@@ -1,5 +1,5 @@
 const { v4: uuidV4 } = require('uuid');
-
+const request = require('request-promise');
 const Promise = require('bluebird');
 const _ = require('lodash');
 const md5 = require('md5');
@@ -426,6 +426,50 @@ const isCouchBaseDocDoesNotExistError = err =>
 
 const isMasterDeployment = () => config.deployment === commonConsts.MASTER_DEPLOYMENT_FLAG;
 
+const getAuthorizationHeaderObjectForReporting = (
+	serviceName = commonConsts.SERVICE_NAMES.GENIEE_CONSOLE
+) => {
+	const authToken = config.reportingAuthToken[serviceName];
+	const authorizationHeaderObject = {
+		Authorization: `Basic ${authToken}`
+	};
+	return authorizationHeaderObject;
+};
+
+const makeReportingRequest = options => {
+	const { serviceName = commonConsts.SERVICE_NAMES.GENIEE_CONSOLE, ...restOptions } = options;
+	const headers = Object.assign(
+		getAuthorizationHeaderObjectForReporting(serviceName),
+		options.headers
+	);
+	return request({
+		...restOptions,
+		json: true,
+		headers
+	});
+};
+
+const makeAxiosReportingRequest = options => {
+	const {
+		serviceName = commonConsts.SERVICE_NAMES.GENIEE_CONSOLE,
+		method = 'GET',
+		...restOptions
+	} = options;
+
+	const headers = Object.assign(
+		getAuthorizationHeaderObjectForReporting(serviceName),
+		options.headers
+	);
+
+	const axiosConfig = {
+		...restOptions,
+		method,
+		headers
+	};
+
+	return axios(axiosConfig);
+};
+
 module.exports = {
 	queryResultProcessing,
 	sendSuccessResponse,
@@ -456,5 +500,8 @@ module.exports = {
 	getSelectiveRolloutFeatureConfigFromCB,
 	filterFalsyObjectKeys,
 	isCouchBaseDocDoesNotExistError,
-	isMasterDeployment
+	isMasterDeployment,
+	getAuthorizationHeaderObjectForReporting,
+	makeReportingRequest,
+	makeAxiosReportingRequest
 };

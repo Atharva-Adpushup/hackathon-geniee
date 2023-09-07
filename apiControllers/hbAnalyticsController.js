@@ -6,6 +6,7 @@ const CC = require('../configs/commonConsts');
 const utils = require('../helpers/utils');
 const { getMetaInfo } = require('../apiServices/metaInfoService');
 const { addActiveProductsToMeta } = require('../helpers/routeHelpers');
+const { makeReportingRequest } = require('../helpers/commonFunctions');
 
 const router = express.Router();
 
@@ -23,9 +24,8 @@ router
 		);
 
 		if (isValidParams) {
-			return request({
+			return makeReportingRequest({
 				uri: `${CC.ANALYTICS_API_ROOT}${CC.HB_REPORT_PATH}`,
-				json: true,
 				qs: req.query
 			})
 				.then(response => {
@@ -44,9 +44,8 @@ router
 		const isValidParams = !!(siteid && fromDate && toDate);
 
 		if (isValidParams) {
-			return request({
+			return makeReportingRequest({
 				uri: `${CC.ANALYTICS_API_ROOT}${CC.HB_BID_CPM_STATS_REPORT_PATH}`,
-				json: true,
 				qs: req.query
 			})
 				.then(response => {
@@ -65,9 +64,8 @@ router
 		const isValidParams = !!(siteid || (isSuperUser && !siteid));
 
 		if (isValidParams)
-			return request({
+			return makeReportingRequest({
 				uri: `${CC.ANALYTICS_API_ROOT}${path}`,
-				json: true,
 				qs: reqParams
 			})
 				.then(response => {
