@@ -16,7 +16,8 @@ import {
 	DISPLAY_AD_MESSAGE,
 	AMP_MESSAGE,
 	ADCODE,
-	INLINE_STYLE
+	INLINE_STYLE,
+	INSTREAM_RESPONSIVE_PLATFORMS
 } from '../../configs/commonConsts';
 import CopyButtonWrapperContainer from '../../../../Containers/CopyButtonWrapperContainer';
 import CustomMessage from '../../../../Components/CustomMessage/index';
@@ -25,6 +26,9 @@ import Loader from '../../../../Components/Loader';
 import ActionCard from '../../../../Components/ActionCard/index';
 import CustomToggleSwitch from '../../../../Components/CustomToggleSwitch/index';
 import FieldGroup from '../../../../Components/Layout/FieldGroup.jsx';
+import SelectBox from '../../../../Components/SelectBox';
+import siteService from '../../../../services/siteService';
+import { getInstreamSectionIds, checkAndGetBvsSectionIds } from '../../lib/helpers';
 
 class AdCodeGenerator extends Component {
 	constructor(props) {
@@ -41,7 +45,11 @@ class AdCodeGenerator extends Component {
 			fluid: true,
 			automaticTrigger: true,
 			customJsSnippet: '',
-			rewardTriggerFunction: ''
+			rewardTriggerFunction: '',
+			instreamSectionId: [],
+			bvsSectionId: [],
+			selectedInstreamOption: null,
+			responsivePlatform: null
 		};
 		this.selectPlatform = this.selectPlatform.bind(this);
 		this.selectType = this.selectType.bind(this);
@@ -54,6 +62,7 @@ class AdCodeGenerator extends Component {
 		this.renderMainContent = this.renderMainContent.bind(this);
 		this.renderGeneratedAdcode = this.renderGeneratedAdcode.bind(this);
 		this.getCustomFields = this.getCustomFields.bind(this);
+		this.renderInstreamSelectBox = this.renderInstreamSelectBox.bind(this);
 	}
 
 	selectType(type) {
@@ -127,7 +136,9 @@ class AdCodeGenerator extends Component {
 			rewardValue,
 			customJsSnippet,
 			rewardTriggerFunction,
-			modalText
+			modalText,
+			selectedOptionName,
+			responsivePlatform
 		} = this.state;
 
 		const { showNotification, dataForAuditLogs } = this.props;
@@ -200,6 +211,12 @@ class AdCodeGenerator extends Component {
 			ad.rewardTriggerFunction = btoa(rewardTriggerFunction);
 		}
 
+		if (type === 'instream' && selectedOptionName) {
+			ad.instreamSectionId = selectedOptionName;
+		}
+		if (type === 'instream' && responsivePlatform) {
+			ad.formatData.responsivePlatform = responsivePlatform;
+		}
 		// Add Custom Fields in ad obj
 		Object.keys(customFields).forEach(customFieldKey => {
 			ad[customFieldKey] = customFields[customFieldKey].value;
@@ -294,8 +311,11 @@ class AdCodeGenerator extends Component {
 	}
 
 	renderMainContent() {
-		const { progress, type, automaticTrigger } = this.state;
+		const { progress, type, automaticTrigger, selectedInstreamOption } = this.state;
 		const { codeGenerated } = this.props;
+		const canGenerateAdCode =
+			type !== 'instream' || (type === 'instream' && selectedInstreamOption);
+
 		return (
 			<div>
 				<div className="progress-wrapper">
@@ -307,7 +327,7 @@ class AdCodeGenerator extends Component {
 					<div>
 						{this.renderTypeOptions()}
 						{progress >= 50 ? this.renderSizes() : null}
-
+						{type === 'instream' && progress >= 75 ? this.renderInstreamSelectBox() : null}
 						{type !== 'rewardedAds' ? (progress >= 75 ? this.renderFluidToggle() : null) : null}
 						{type === 'rewardedAds' && progress >= 75 ? this.renderModalText() : null}
 
@@ -317,7 +337,9 @@ class AdCodeGenerator extends Component {
 							? this.renderCustomScriptInput()
 							: null}
 						{type === 'rewardedAds' && progress >= 75 ? this.renderRewardTriggerFunction() : null}
-						{progress >= 75 ? this.renderButton('Generate AdCode', this.saveHandler) : null}
+						{progress >= 75 && canGenerateAdCode
+							? this.renderButton('Generate AdCode', this.saveHandler)
+							: null}
 					</div>
 				)}
 			</div>
@@ -335,7 +357,8 @@ class AdCodeGenerator extends Component {
 	};
 
 	renderSizes() {
-		const { size, platform, type } = this.state;
+		const { size, platform, type, responsivePlatform } = this.state;
+		const options = INSTREAM_RESPONSIVE_PLATFORMS;
 		return (
 			<div>
 				<CustomList
@@ -375,6 +398,31 @@ class AdCodeGenerator extends Component {
 					onClick={this.selectSize}
 					onCustomFieldValueChange={this.setCustomField}
 				/>
+				{/* added a selectbox for selecting responsivePlatform since we create responsive units for both desktop and mobile. */}
+				{type === 'instream' && platform === 'responsive' && (
+					<div className="instream-select-box">
+						<Row>
+							<Col md={3}>
+								<div>Select BVS Platform</div>
+							</Col>
+							<Col md={9}>
+								<div
+									className="platform-select-box"
+									style={{ width: '400px', marginLeft: '40px', marginBottom: '10px' }}
+								>
+									<SelectBox
+										id="responsive-select"
+										options={options}
+										title="Select Option"
+										wrapperClassName="select-box-wrapper"
+										selected={responsivePlatform}
+										onSelect={this.handleSelectPlatform}
+									/>
+								</div>
+							</Col>
+						</Row>
+					</div>
+				)}
 			</div>
 		);
 	}
@@ -401,6 +449,135 @@ class AdCodeGenerator extends Component {
 				rightSize={9}
 				toMatch={type}
 			/>
+		);
+	}
+
+	isSelectedOptionPresent = (selectedInstreamSection, bvsSectionId) =>
+		selectedInstreamSection && Object.values(bvsSectionId).includes(selectedInstreamSection.name);
+
+	// finds if instream section ID is already present in the bvsSectionId object.
+	isMatchingSectionId = params => {
+		const {
+			selectedOptionName,
+			selectedInstreamSection,
+			bvsSectionId,
+			responsivePlatform
+		} = params;
+		if (!selectedOptionName) {
+			return false;
+		}
+		return (
+			this.isSelectedOptionPresent(selectedInstreamSection, bvsSectionId) &&
+			bvsSectionId[responsivePlatform] === selectedOptionName
+		);
+	};
+
+	findSelectedInstreamSection = (instreamSectionId, selectedInstreamOption) => {
+		const selectedInstreamSection = instreamSectionId.find(
+			item => item.value === selectedInstreamOption
+		);
+		return selectedInstreamSection;
+	};
+
+	handleInstreamSectionSelect = selectedInstreamOption => {
+		const { bvsSectionId, instreamSectionId, platform, responsivePlatform } = this.state;
+		let selectedOptionName = '';
+		let showWarning = false;
+
+		const selectedInstreamSection = this.findSelectedInstreamSection(
+			instreamSectionId,
+			selectedInstreamOption
+		);
+
+		if (!selectedInstreamSection) {
+			return;
+		}
+		selectedOptionName = selectedInstreamSection.name;
+
+		const params = {
+			selectedOptionName,
+			selectedInstreamSection,
+			bvsSectionId,
+			platform,
+			responsivePlatform
+		};
+		const isMatchingSectionIdFound = this.isMatchingSectionId(params);
+
+		if (isMatchingSectionIdFound) {
+			showWarning = true;
+		}
+		this.setState({
+			selectedInstreamOption,
+			selectedOptionName,
+			showWarning,
+			matchingSectionName: selectedInstreamSection ? selectedInstreamSection.name : null
+		});
+	};
+
+	// handling selectbox for responsive platform options.
+	handleSelectPlatform = selectedPlatformOption => {
+		// resetting options for instream.
+		this.setState({ responsivePlatform: selectedPlatformOption, selectedInstreamOption: null });
+	};
+
+	componentDidMount() {
+		const { siteId } = this.props;
+
+		// fetching instream config.
+		siteService.getInstreamConfig(siteId).then(responseData => {
+			const {
+				data: {
+					data: { config }
+				}
+			} = responseData;
+
+			// extracting instream sectionId's to display on the selextbox.
+			const instreamSectionId = getInstreamSectionIds(config);
+			// getting the section Id's that already has bvs enabled.
+			const bvsSectionId = checkAndGetBvsSectionIds(config);
+			this.setState({ instreamSectionId, bvsSectionId });
+		});
+	}
+
+	renderInstreamSelectBox() {
+		const {
+			instreamSectionId,
+			selectedInstreamOption,
+			showWarning,
+			matchingSectionName,
+			platform,
+			responsivePlatform
+		} = this.state;
+
+		const selectedPlatformToShow = platform === 'responsive' ? responsivePlatform : platform;
+		return (
+			<div>
+				<Row>
+					<Col md={3}>
+						<div className="instream-section">
+							<h3>Instream Section</h3>
+						</div>
+					</Col>
+					<Col md={9}>
+						<div className="instream-select-box" style={{ width: '400px', marginLeft: '40px' }}>
+							<SelectBox
+								id="empty-select"
+								options={instreamSectionId}
+								title="Select Option"
+								wrapperClassName="select-box-wrapper"
+								selected={selectedInstreamOption}
+								onSelect={this.handleInstreamSectionSelect}
+							/>
+							{showWarning && (
+								<div className="warning-message" style={{ color: 'red', fontSize: '14px' }}>
+									The section id {matchingSectionName} already has Bvs enabled on{' '}
+									{selectedPlatformToShow}.
+								</div>
+							)}
+						</div>
+					</Col>
+				</Row>
+			</div>
 		);
 	}
 

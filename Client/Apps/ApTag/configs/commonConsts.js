@@ -37,6 +37,13 @@ const TYPES = [
 		key: 'rewardedAds',
 		description:
 			'High value video ads that may be watched by visitors in exchange for access to premium content'
+	},
+	{
+		name: 'Display for Instream',
+		image: '/assets/images/tagManager/display.png',
+		key: 'instream',
+		description:
+			'A simple way to get ads on your page. Select size, generate code and you are good to go'
 	}
 ];
 const SIZES = {
@@ -97,6 +104,10 @@ const SIZES = {
 	},
 	REWARDEDADS: {
 		ALLOWED: ['mobile']
+	},
+	INSTREAM: {
+		ALLOWED: ['responsive', 'mobile'],
+		MOBILE: ['300x600']
 	}
 };
 
@@ -789,6 +800,11 @@ const DEFAULT_GLOBAL_RESPONSE = {
 	currentAd: null
 };
 
+const INSTREAM_RESPONSIVE_PLATFORMS = [
+	{ name: 'Desktop', value: 'desktop' },
+	{ name: 'Mobile', value: 'mobile' }
+];
+
 export {
 	PLATFORMS,
 	TYPES,
@@ -813,5 +829,6 @@ export {
 	DEFAULT_GLOBAL_RESPONSE,
 	REWARDED_AD_CODE,
 	TIGGER_AUTOMATICALLY_CODE,
-	NETWORK_MAPPINGS
+	NETWORK_MAPPINGS,
+	INSTREAM_RESPONSIVE_PLATFORMS
 };
