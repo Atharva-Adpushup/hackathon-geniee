@@ -32,7 +32,6 @@ const {
 	removeFormatWiseParamsForAMP,
 	getFloorEngineConfigFromCB
 } = require('../helpers/commonFunctions');
-const utils = require('../helpers/utils');
 const CC = require('../configs/commonConsts');
 
 const Router = express.Router();
@@ -206,11 +205,6 @@ Router.get('/:siteId/ampDeliveryViaCreativeConfig', (req, res) => {
 				}
 
 				delete apConfigs.pageGroupPattern;
-
-				if (isAmpPnpEnabled) {
-					const pnpCodeHex = utils.btoa(CC.AMP_PNP_REFRESH_SCRIPTS);
-					apConfigs.pnpScript = pnpCodeHex;
-				}
 
 				const output = { apConfigs, prebidConfig };
 				if (apps.apLite) output.apLiteConfig = apLiteConfig;
