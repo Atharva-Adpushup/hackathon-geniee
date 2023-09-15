@@ -2,13 +2,13 @@ import React, { useEffect, useState, useRef } from 'react';
 import moment from 'moment/moment';
 import 'react-dates/initialize';
 import 'react-dates/lib/css/_datepicker.css';
+import { DateRangePicker } from 'react-dates';
+import { Row, Col } from 'react-bootstrap';
 import { DropdownButton, MenuItem } from '@/Client/helpers/react-bootstrap-imports';
 import './Deals.css';
-import { DateRangePicker } from 'react-dates';
 import CustomButton from '../../../../Components/CustomButton';
 import HELPER_FUNCTIONS from '../../Helper/helper';
 import Loader from '../../../../Components/Loader';
-import { Row, Col } from 'react-bootstrap';
 import MGEditForm from './MGEditForm';
 import {
 	MG_DEAL_ALERT_MESSAGES,
@@ -19,7 +19,7 @@ import { domanize } from '../../../../helpers/commonFunctions';
 
 const { getMonthsInBetween, findMonthByValue, getDealEditObject } = HELPER_FUNCTIONS;
 
-const { PAGE_RPM, UNIQUE_ECPM, eCPM } = MG_DEAL_TYPES;
+const { PAGE_RPM, eCPM } = MG_DEAL_TYPES;
 
 const EditMGDeal = ({ selectedDeal, onEditSubmit, onEditCancel, onDeleteDeal, sites }) => {
 	const [mgType, setMgType] = useState(selectedDeal.mgType);
@@ -170,7 +170,6 @@ const EditMGDeal = ({ selectedDeal, onEditSubmit, onEditCancel, onDeleteDeal, si
 											e.preventDefault();
 											setMgType(dealTypeName);
 										}}
-										disabled={dealTypeName == UNIQUE_ECPM.displayName ? true : false}
 									>
 										{dealTypeName}
 									</MenuItem>

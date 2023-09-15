@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
 import './Deals.css';
-import { DropdownButton, MenuItem } from '@/Client/helpers/react-bootstrap-imports';
 import { Row, Col } from 'react-bootstrap';
 import 'react-dates/initialize';
 import 'react-dates/lib/css/_datepicker.css';
 import { DateRangePicker } from 'react-dates';
+import { DropdownButton, MenuItem } from '@/Client/helpers/react-bootstrap-imports';
 import CustomButton from '../../../../Components/CustomButton';
 import FormInput from '../../../../Components/FormInput';
 import HELPER_FUNCTIONS from '../../Helper/helper';
@@ -16,7 +16,7 @@ import {
 } from '../../configs/commonConsts';
 import { domanize } from '../../../../helpers/commonFunctions';
 
-const { PAGE_RPM, UNIQUE_ECPM, eCPM } = MG_DEAL_TYPES;
+const { PAGE_RPM, eCPM } = MG_DEAL_TYPES;
 
 const { getMonthsInBetween, createDealObject } = HELPER_FUNCTIONS;
 
@@ -137,7 +137,7 @@ const CreateMGDeal = ({ allDeals, onSubmitCreate, onCancelSubmit, sites }) => {
 				</Col>
 				<Col sm={6} className="dropdown">
 					<DropdownButton open={menuOpen} onToggle={e => dropdownToggleMenu(e)} title={mgType}>
-						{Object.keys(MG_DEAL_TYPES).map((dealType, index) =>{
+						{Object.keys(MG_DEAL_TYPES).map((dealType, index) => {
 							const dealTypeName = MG_DEAL_TYPES[dealType].displayName;
 							return (
 								<MenuItem
@@ -146,11 +146,10 @@ const CreateMGDeal = ({ allDeals, onSubmitCreate, onCancelSubmit, sites }) => {
 										e.preventDefault();
 										setMgType(dealTypeName);
 									}}
-									disabled={dealTypeName == UNIQUE_ECPM.displayName ? true : false}
 								>
 									{dealTypeName}
 								</MenuItem>
-							)
+							);
 						})}
 					</DropdownButton>
 				</Col>
