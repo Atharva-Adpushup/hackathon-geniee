@@ -12,6 +12,9 @@ const utils = require('./utils');
 const couchbase = require('./couchBaseService');
 const httpStatus = require('../configs/httpStatusConsts');
 const config = require('../configs/config');
+const {
+	getSiteConfig: getSelectiveRolloutSiteConfigFromCB
+} = require('../helpers/selectiveRollout/cbHelpers/configHelpers');
 
 const createAggregateNonAggregateObjects = (dataset, key, container) => {
 	const innerObj = {};
@@ -399,13 +402,33 @@ const getSelectiveRolloutFeatureConfigFromCB = async feature => {
 	return selectiveRolloutConfig;
 };
 
+const isMasterDeployment = () => config.deployment === commonConsts.MASTER_DEPLOYMENT_FLAG;
+const isFeatureDeployment = feature => config.deployment === feature;
+
 const getSelectiveRolloutFeatureConfig = feature => {
-	if (config.deployment === commonConsts.MASTER_DEPLOYMENT_FLAG) {
+	if (isMasterDeployment()) {
 		return getSelectiveRolloutFeatureConfigFromCB(feature);
 	}
 
 	const endPoint = `${commonConsts.MASTER_CONSOLE_URL}/api/utils/selectiveRolloutConfig?feature=${feature}`;
 	return axios.get(endPoint).then(res => res.data);
+};
+
+const getSelectiveRolloutSiteConfig = async site => {
+	const isSiteModel = !Number.isNaN(site);
+	const siteId = isSiteModel ? site.get('siteId') : site;
+
+	if (!isMasterDeployment()) {
+		const endPoint = `${commonConsts.MASTER_CONSOLE_URL}/api/utils/selectiveRolloutSiteConfig?siteId=${siteId}`;
+		return axios.get(endPoint).then(res => res.data);
+	}
+
+	if (isSiteModel) {
+		const { selectiveRolloutConfig = {} } = site.get('apConfigs') || {};
+		return selectiveRolloutConfig;
+	}
+
+	return getSelectiveRolloutSiteConfigFromCB(siteId);
 };
 
 const filterFalsyObjectKeys = queryParams => {
@@ -423,8 +446,6 @@ const filterFalsyObjectKeys = queryParams => {
 const isCouchBaseDocDoesNotExistError = err =>
 	err.code === commonConsts.CB_ERRORS.DOC_DOES_NOT_EXIST.code &&
 	err.message.includes(commonConsts.CB_ERRORS.DOC_DOES_NOT_EXIST.msg);
-
-const isMasterDeployment = () => config.deployment === commonConsts.MASTER_DEPLOYMENT_FLAG;
 
 const getAuthorizationHeaderObjectForReporting = (
 	serviceName = commonConsts.SERVICE_NAMES.GENIEE_CONSOLE
@@ -503,5 +524,7 @@ module.exports = {
 	isMasterDeployment,
 	getAuthorizationHeaderObjectForReporting,
 	makeReportingRequest,
-	makeAxiosReportingRequest
+	makeAxiosReportingRequest,
+	getSelectiveRolloutSiteConfig,
+	isFeatureDeployment
 };

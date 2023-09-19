@@ -3,14 +3,18 @@ const siteConfigGenerationModule = require('./modules/siteConfigGeneration/index
 const syncCdn = require('../cdnSyncService/index');
 const siteModelAPI = require('../../../models/siteModel');
 const adSyncServiceUtils = require('./modules/misc');
-const { getSelectiveRolloutFeatureConfig } = require('../../../helpers/commonFunctions');
+const {
+	getSelectiveRolloutFeatureConfig,
+	getSelectiveRolloutSiteConfig,
+	isMasterDeployment,
+	isFeatureDeployment
+} = require('../../../helpers/commonFunctions');
 const queuePublisher = require('../../../queueWorker/rabbitMQ/workers/queuePublisher');
 
-async function syncAds(siteConfigItems, isSelectiveRolloutEnabled, selectiveRolloutFeatureConfig) {
+async function syncAds(siteConfigItems, selectiveRolloutFeatureConfig) {
 	const { adp, adsense } = siteConfigItems;
 	const adSyncingJobs = [];
 	const { ADP_TAG_SYNC, ADSENSE_AD_SYNC } = adSyncServiceUtils.getAdSyncQueueConfigs(
-		isSelectiveRolloutEnabled,
 		selectiveRolloutFeatureConfig
 	);
 
@@ -25,14 +29,8 @@ async function syncAds(siteConfigItems, isSelectiveRolloutEnabled, selectiveRoll
 	return Promise.all(adSyncingJobs);
 }
 
-async function publishToQueueWrapper(siteConfigItems, siteOptions) {
-	const {
-		site,
-		forcePrebidBuild,
-		isSelectiveRolloutEnabled,
-		selectiveRolloutFeatureConfig,
-		options = {}
-	} = siteOptions;
+async function publishToQueueWrapper(site, siteConfigItems, syncOptions) {
+	const { selectiveRolloutFeatureConfig, options = {} } = syncOptions;
 
 	const response = {
 		empty: true,
@@ -44,56 +42,87 @@ async function publishToQueueWrapper(siteConfigItems, siteOptions) {
 	}
 
 	if (adSyncServiceUtils.isSiteConfigHasUnSyncedAds(siteConfigItems)) {
-		return syncAds(siteConfigItems, isSelectiveRolloutEnabled, selectiveRolloutFeatureConfig);
+		return syncAds(siteConfigItems, selectiveRolloutFeatureConfig);
 	} else {
 		const syncCdnQueue = adSyncServiceUtils.getSyncCdnQueueConfig(
 			site,
-			isSelectiveRolloutEnabled,
 			selectiveRolloutFeatureConfig
 		);
 		return syncCdn(site, {
-			forcePrebidBuild,
 			options,
 			syncCdnQueue
 		});
 	}
 }
-async function publishWrapper(site, forcePrebidBuild, options = {}) {
-	const { selectiveRolloutConfig } = site.get('apConfigs') || {};
 
-	const isSelectiveRolloutEnabled = adSyncServiceUtils.isSelectiveRolloutEnabled(
-		selectiveRolloutConfig
-	);
+async function syncSite(site, syncOptions) {
+	return siteConfigGenerationModule
+		.generate(site)
+		.then(siteConfigItems => publishToQueueWrapper(site, siteConfigItems, syncOptions));
+}
 
-	const selectiveRolloutFeatureConfig = isSelectiveRolloutEnabled
-		? await getSelectiveRolloutFeatureConfig(selectiveRolloutConfig.feature)
-		: null;
+async function handleSelectiveDeploymentSync(site, selectiveRolloutFeatureConfig, options) {
+	const siteId = site.get('siteId');
 
+	if (isFeatureDeployment(selectiveRolloutFeatureConfig.feature)) {
+		return syncSite(site, { options, selectiveRolloutFeatureConfig });
+	}
+
+	return adSyncServiceUtils.redirectSyncToMasterConsole(siteId, options);
+}
+
+async function handleMasterDeploymentSync(site, selectiveRolloutFeatureConfig, options) {
+	const siteId = site.get('siteId');
 	const isConsoleSelectivelyRolledOut = adSyncServiceUtils.isConsoleSelectivelyRolledOut(
-		isSelectiveRolloutEnabled,
 		selectiveRolloutFeatureConfig
 	);
 
 	if (isConsoleSelectivelyRolledOut) {
 		return adSyncServiceUtils.redirectToSelectiveConsole(
 			selectiveRolloutFeatureConfig,
-			site.get('siteId'),
-			{
-				forcePrebidBuild,
-				...options
-			}
+			siteId,
+			options
 		);
 	}
 
-	return siteConfigGenerationModule.generate(site).then(siteConfigItems =>
-		publishToQueueWrapper(siteConfigItems, {
-			site,
-			forcePrebidBuild,
-			options,
-			isSelectiveRolloutEnabled,
-			selectiveRolloutFeatureConfig
-		})
+	return syncSite(site, { options, selectiveRolloutFeatureConfig });
+}
+
+async function syncSelectiveRolloutSite(site, selectiveRolloutConfig, options) {
+	const selectiveRolloutFeatureConfig = await getSelectiveRolloutFeatureConfig(
+		selectiveRolloutConfig.feature
 	);
+
+	if (isMasterDeployment()) {
+		return handleMasterDeploymentSync(site, selectiveRolloutFeatureConfig, options);
+	}
+
+	return handleSelectiveDeploymentSync(site, selectiveRolloutFeatureConfig, options);
+}
+
+async function syncNonSelectiveRolloutSite(site, options) {
+	const siteId = site.get('siteId');
+	if (!isMasterDeployment()) {
+		return adSyncServiceUtils.redirectSyncToMasterConsole(siteId, options);
+	}
+
+	return syncSite(site, { options });
+}
+
+async function publishWrapper(site, forcePrebidBuild, options = {}) {
+	const selectiveRolloutConfig = await getSelectiveRolloutSiteConfig(site);
+
+	const isSelectiveRolloutEnabled = adSyncServiceUtils.isSelectiveRolloutEnabled(
+		selectiveRolloutConfig
+	);
+
+	const syncOptions = { forcePrebidBuild, ...options };
+
+	if (isSelectiveRolloutEnabled) {
+		return syncSelectiveRolloutSite(site, selectiveRolloutConfig, syncOptions);
+	}
+
+	return syncNonSelectiveRolloutSite(site, syncOptions);
 }
 
 module.exports = {

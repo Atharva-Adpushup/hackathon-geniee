@@ -3,7 +3,7 @@ const axiosRetry = require('axios-retry');
 const { RABBITMQ } = require('../../../../../configs/config');
 const _cloneDeep = require('lodash/cloneDeep');
 const {
-	SELECTIVE_ROLLOUT_DEPENDENCIES: {
+	SERVICES_NAMES: {
 		ADP_TAG_SYNC_CONSUMER,
 		ADSENSE_AD_SYNC_CONSUMER,
 		CDN_SYNC_CONSUMER,
@@ -13,7 +13,11 @@ const {
 const commonConsts = require('../../../../../configs/commonConsts');
 const config = require('../../../../../configs/config');
 const { sendEmail } = require('../../../../../helpers/queueMailer');
-const { filterFalsyObjectKeys } = require('../../../../../helpers/commonFunctions');
+const {
+	filterFalsyObjectKeys,
+	isMasterDeployment,
+	isFeatureDeployment
+} = require('../../../../../helpers/commonFunctions');
 
 axiosRetry(axios, {
 	retryDelay: axiosRetry.exponentialDelay
@@ -80,7 +84,7 @@ module.exports = {
 		const { adp, adsense } = siteConfigItems;
 		return this.hasUnsyncedAdpAds(adp) || this.hasUnsyncedAdsenseAds(adsense);
 	},
-	getAdSyncQueueConfigs: function(isSelectiveRolloutEnabled, selectiveRolloutFeatureConfig) {
+	getAdSyncQueueConfigs: function(selectiveRolloutFeatureConfig) {
 		const { ADP_TAG_SYNC, ADSENSE_AD_SYNC } = RABBITMQ;
 
 		const queueConfigs = {
@@ -88,7 +92,7 @@ module.exports = {
 			ADSENSE_AD_SYNC
 		};
 
-		if (!isSelectiveRolloutEnabled) {
+		if (!selectiveRolloutFeatureConfig) {
 			return queueConfigs;
 		}
 
@@ -120,7 +124,7 @@ module.exports = {
 
 		return queueConfigs;
 	},
-	getSyncCdnQueueConfig: function(site, isSelectiveRolloutEnabled, selectiveRolloutFeatureConfig) {
+	getSyncCdnQueueConfig: function(site, selectiveRolloutFeatureConfig) {
 		const apConfigs = site.get('apConfigs') || {};
 		const { SELECTIVE_ROLLOUT, CDN_SYNC } = RABBITMQ;
 
@@ -135,7 +139,7 @@ module.exports = {
 		);
 
 		// new selective rollout feature
-		if (!isSelectiveRolloutEnabled || !isCdnSyncConsumerRolledOut) {
+		if (!selectiveRolloutFeatureConfig || !isCdnSyncConsumerRolledOut) {
 			return CDN_SYNC;
 		}
 
@@ -176,14 +180,36 @@ module.exports = {
 				}).then(() => `${commonConsts.SITE_SYNCING_ERROR_MESSAGE} - ${err.toString()} - ${siteId}`)
 			);
 	},
-	isConsoleSelectivelyRolledOut: function(
-		isSelectiveRolloutEnabled,
-		selectiveRolloutFeatureConfig
-	) {
-		return (
-			isSelectiveRolloutEnabled &&
-			selectiveRolloutFeatureConfig?.dependencies[GENIEE_ADPUSHUP]?.selectivelyRolledOut &&
-			config.deployment !== selectiveRolloutFeatureConfig.feature
-		);
+	redirectSyncToMasterConsole: function(siteId, queryParams) {
+		const validQueryParams = filterFalsyObjectKeys(queryParams);
+
+		const requestConfig = {
+			method: 'get',
+			url: `${commonConsts.MASTER_CONSOLE_URL}/api/utils/syncCdn`,
+			params: { ...validQueryParams, sites: siteId }
+		};
+
+		return axios(requestConfig)
+			.then(() => `Redirected site sync to master console - ${siteId}`)
+			.catch(err =>
+				sendEmail({
+					queue: commonConsts.QUEUE_NAMES.MAILER,
+					data: {
+						to: config.SITE_SYNC_ERROR_ALERT_REPORTER,
+						subject: `Can not redirect site sync request to master console for ${siteId} - [${config.deployment}]`,
+						body: `
+				<h3>SiteId: ${siteId}</h3>
+				${err.toString()}
+			`
+					}
+				}).then(() => `${err.toString()} - ${siteId}`)
+			);
+	},
+	isConsoleSelectivelyRolledOut: function(selectiveRolloutFeatureConfig) {
+		const dependencies = selectiveRolloutFeatureConfig?.dependencies;
+		const isConsoleSelectivelyRolledOut =
+			dependencies && dependencies[GENIEE_ADPUSHUP]?.selectivelyRolledOut;
+
+		return isConsoleSelectivelyRolledOut;
 	}
 };

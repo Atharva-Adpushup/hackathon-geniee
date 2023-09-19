@@ -12,14 +12,14 @@ const {
 
 // useDirect is only sent `true` from transactionLogQueueConsumer which is no longer used
 module.exports = function(site, syncOptions) {
-	const { forcePrebidBuild, useDirect = false, options = {}, syncCdnQueue } = syncOptions;
+	const { useDirect = false, options = {}, syncCdnQueue } = syncOptions;
 	const siteId = useDirect ? site : site.get('siteId');
 	const isAmpScriptEnabled = !!site.get('apps').ampScript;
 	const isDVCEnabled = !!site.get('apps').ampDVC;
 
 	const paramConfig = { siteId };
 
-	if (forcePrebidBuild === 'true') {
+	if (options.forcePrebidBuild === 'true') {
 		paramConfig.forcePrebidBuild = true;
 	}
 
