@@ -63,7 +63,7 @@ class PaymentDiscrepancy extends Component {
 
 	convertToFormat = number => number && Number(number.toFixed(2));
 
-	getMgRevenue = ({ mgValue, pageViews, impressions, mgType }) => {
+	getMgRevenue = ({ mgValue, pageViews, impressions, uniqueImpressions, mgType }) => {
 		let revenue = 0;
 
 		switch (mgType) {
@@ -76,6 +76,8 @@ class PaymentDiscrepancy extends Component {
 			case MG_TYPES.ECPM:
 				revenue = (mgValue * impressions) / 1000;
 				break;
+			case MG_TYPES.UNIQUE_ECPM:
+				revenue = (mgValue * uniqueImpressions) / 1000;
 			default:
 				break;
 		}
@@ -87,11 +89,17 @@ class PaymentDiscrepancy extends Component {
 		if (!siteMgDeal) {
 			return {};
 		}
-		const { parterWiseRevenue, pageViews, impressions } = siteLevelMetrics;
+		const { parterWiseRevenue, pageViews, impressions, uniqueImpressions } = siteLevelMetrics;
 
 		const { mgValue, mgType } = siteMgDeal;
 
-		const mgRevenue = this.getMgRevenue({ mgValue, pageViews, impressions, mgType });
+		const mgRevenue = this.getMgRevenue({
+			mgValue,
+			pageViews,
+			impressions,
+			uniqueImpressions,
+			mgType
+		});
 
 		const mgVsPartnerDifference = this.convertToFormat(mgRevenue - parterWiseRevenue);
 		const mgVsPartnerDifferencePercentage = this.convertToFormat(
@@ -130,6 +138,7 @@ class PaymentDiscrepancy extends Component {
 					netRevenue,
 					pageViews,
 					impressions,
+					uniqueImpressions,
 					tagBasedRevenue
 				} = consoleRevenueObj;
 
@@ -161,7 +170,8 @@ class PaymentDiscrepancy extends Component {
 				const mgDiscrepancyData = this.updateMgDetails(siteMgDeal, {
 					parterWiseRevenue,
 					pageViews,
-					impressions
+					impressions,
+					uniqueImpressions
 				});
 
 				return {

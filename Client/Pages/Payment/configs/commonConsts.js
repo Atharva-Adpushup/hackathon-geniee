@@ -15,7 +15,8 @@ const PAYMENT_NAV_ITEMS_VALUES = {
 const MG_TYPES = {
 	PAGE_RPM: 'Page RPM',
 	ECPM: 'eCPM',
-	REVENUE: 'Revenue'
+	REVENUE: 'Revenue',
+	UNIQUE_ECPM: 'Unique eCPM'
 };
 
 const MG_START_YEAR = 2022;
@@ -60,16 +61,16 @@ const MG_DEALS_TABLE_COLUMNS = [
 
 const MG_DEAL_TYPES = {
 	PAGE_RPM: {
-		displayName: "Page RPM"
+		displayName: 'Page RPM'
 	},
 	REVENUE: {
-		displayName: "Revenue"
+		displayName: 'Revenue'
 	},
 	eCPM: {
-		displayName: "eCPM"
+		displayName: 'eCPM'
 	},
 	UNIQUE_ECPM: {
-		displayName: "Unique eCPM"
+		displayName: 'Unique eCPM'
 	}
 };
 
@@ -83,15 +84,28 @@ const MG_DEAL_ALERT_MESSAGES = {
 	createAlertMessage: 'Are you sure you want to create this deal?',
 	updateAlertMessage: 'Are you sure you want to update this deal?',
 	deleteAlertMessage: 'Are you sure you want to delete this deal?'
-}
+};
 
-const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const MONTH_NAMES = [
+	'Jan',
+	'Feb',
+	'Mar',
+	'Apr',
+	'May',
+	'Jun',
+	'Jul',
+	'Aug',
+	'Sep',
+	'Oct',
+	'Nov',
+	'Dec'
+];
 
 const DEAL_CREATION_ACTIONS = {
-	CREATE_MGDEAL: "create",
-	EDIT_MGDEAL: "edit",
-	DELETE_MGDEAL: "delete"
-}
+	CREATE_MGDEAL: 'create',
+	EDIT_MGDEAL: 'edit',
+	DELETE_MGDEAL: 'delete'
+};
 
 export {
 	PAYMENT_NAV_ITEMS,

@@ -61,15 +61,23 @@ const combineSiteWiseDataCallback = (acc, currentData) => {
 		network_gross_revenue: grossRevenue = 0,
 		network_net_revenue: netRevenue = 0,
 		network_impressions: impressions = 0,
-		adpushup_page_views: pageViews = 0
+		adpushup_page_views: pageViews = 0,
+		unique_impressions: uniqueImpressions = 0
 	} = currentData;
 	if (!acc[siteId]) {
-		acc[siteId] = { grossRevenue: 0, netRevenue: 0, pageViews: 0, impressions: 0 };
+		acc[siteId] = {
+			grossRevenue: 0,
+			netRevenue: 0,
+			pageViews: 0,
+			impressions: 0,
+			uniqueImpressions: 0
+		};
 	}
 	acc[siteId].grossRevenue += grossRevenue;
 	acc[siteId].netRevenue += netRevenue;
 	acc[siteId].impressions += impressions;
 	acc[siteId].pageViews += pageViews;
+	acc[siteId].uniqueImpressions += uniqueImpressions;
 	return acc;
 };
 
