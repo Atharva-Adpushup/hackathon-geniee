@@ -1973,5 +1973,6 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		"data": __MESSAGE_DATA__
 	}, '__TARGET_ORIGIN__');
 	window.close();
-	</script>`
+	</script>`,
+	DEFAULT_VACANT_SPLIT: 25
 };
