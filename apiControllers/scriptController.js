@@ -69,6 +69,11 @@ const setOutbrainDisabled = function(site, scriptType) {
 	return outbrainDisabled;
 };
 
+const getVacantAdSpaceProperties = function getVacantAdSpacePropertiesForSite(apConfigs) {
+	const { isVacantAdSpaceEnabled = true, vacantFeatureSplit = CC.DEFAULT_VACANT_SPLIT } = apConfigs;
+	return { isVacantAdSpaceEnabled, vacantFeatureSplit };
+};
+
 Router.get('/:siteId/ampDeliveryViaCreativeConfig', (req, res) => {
 	/**
 	 * this route will be used by AmpDeliveryViaCreative repo
@@ -351,9 +356,11 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 			const lineItemTypes = site.get('lineItemTypes') || [];
 
 			const setAllConfigs = async function(prebidAndAdsConfig) {
+				const dbApConfigProps = site.get('apConfigs');
 				const apConfigs = {
 					...defaultApConfigValues,
-					...site.get('apConfigs')
+					...dbApConfigProps,
+					...getVacantAdSpaceProperties(dbApConfigProps)
 				};
 
 				const isAdPartner = !!site.get('partner');
