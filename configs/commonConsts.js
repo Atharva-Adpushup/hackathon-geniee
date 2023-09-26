@@ -166,11 +166,15 @@ module.exports = {
 	AMP_SETTINGS_ACCESS_EMAILS: ['genieeamp@adpushup.com'],
 	DEMO_REPORT_SITE_ID: 31000,
 	ADPUSHUP_NETWORK_ID: 103512698, // please update this value in Client/config/config.js also
+	AD_UNIT_TYPE_ID: {
+		INSTREAM: '6'
+	},
 	GET_ALL_SITES_STATS_QUERY: `SELECT _site.siteId,
 									_site.siteDomain as domain,
 									_site.ownerEmail as accountEmail,
 									_site.adNetworkSettings.revenueShare,
 									_site.step as onboardingStep,
+									_site.adNetworkSettings.adUnitTypeRevShares as adUnitTypeRevShares,
 									_site.dateCreated,
 									_site.apps,
 									_site.dataFeedActive as activeStatus,
@@ -529,8 +533,10 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 			UNSYNCED_SETUP: 'Unsynced ads in setup'
 		},
 		GOOGLE_ERRORS: {
-			NO_ADSENSE_ACCOUNT_ERROR : 'Sorry but it seems you have no AdSense account linked to your Google account. If this is a recently verified/created account, it might take upto 24 hours to come in effect. Please try again after sometime or contact support.',
-			GOOGLE_ACCOUNT_CONNECTION_ERROR : 'Some error occurred while connecting with your Google account. Please try again after some time or contact your account manager.'
+			NO_ADSENSE_ACCOUNT_ERROR:
+				'Sorry but it seems you have no AdSense account linked to your Google account. If this is a recently verified/created account, it might take upto 24 hours to come in effect. Please try again after sometime or contact support.',
+			GOOGLE_ACCOUNT_CONNECTION_ERROR:
+				'Some error occurred while connecting with your Google account. Please try again after some time or contact your account manager.'
 		}
 	},
 	SUCCESS_MESSAGES: {
@@ -788,7 +794,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 			DFP: 'DFP',
 			ADSENSE: 'ADSENSE'
 		},
-		SITES:'sites',
+		SITES: 'sites',
 		EMAIL: 'email'
 	},
 	mandatoryAdsTxtSnippet: {
@@ -1890,7 +1896,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		UPDATE_FAILED_NO_UNITS: 'Update failed due to some ad units are not present!',
 		UPDATE_FAILED_DUPLICATE_UNITS: 'Update failed due to duplicate ad units!',
 		OK: 'OK',
-		INVALID_SITE_ID:"Invalid siteId passed"
+		INVALID_SITE_ID: 'Invalid siteId passed'
 	},
 	AUDIT_LOG_MESSAGES: {
 		ACTION: {

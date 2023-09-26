@@ -14,7 +14,10 @@ const config = require('../configs/config');
 const siteModel = require('./siteModel');
 
 const axios = require('axios');
-const { AMP_SETTINGS_ACCESS_EMAILS } = require('../configs/commonConsts');
+const {
+	AMP_SETTINGS_ACCESS_EMAILS,
+	AD_UNIT_TYPE_ID
+} = require('../configs/commonConsts');
 const { getActiveProductFromCouchbase } = require('../helpers/routeHelpers');
 const { makeReportingRequest } = require('../helpers/commonFunctions');
 
@@ -330,16 +333,22 @@ const commonSiteFunctions = {
 			},
 			{ name: 'Rev Share (%)', key: 'revenueShare', position: 11, ...DEFAULT_WIDTH },
 			{
+				name: 'Instream Rev Share(%)',
+				key: 'instreamRevenueShare',
+				position: 12,
+				...DEFAULT_WIDTH
+			},
+			{
 				name: 'Publisher Id',
 				key: 'publisherId',
-				position: 12,
+				position: 13,
 				showCopyBtn: true,
 				...DEFAULT_WIDTH
 			},
 			{
 				name: 'Auth Email',
 				key: 'authEmail',
-				position: 13,
+				position: 14,
 				showCopyBtn: true,
 				width: 200,
 				maxWidth: 200,
@@ -348,7 +357,7 @@ const commonSiteFunctions = {
 			{
 				name: 'Ad Manager',
 				key: 'adManager',
-				position: 14,
+				position: 15,
 				showCopyBtn: true,
 				...DEFAULT_WIDTH
 			}
@@ -405,6 +414,12 @@ function apiModule() {
 						);
 						if (!site.revenueShare && site.revenueShare !== 0) {
 							site.revenueShare = 'N/A';
+						}
+						try {
+							site.instreamRevenueShare = site.adUnitTypeRevShares[AD_UNIT_TYPE_ID.INSTREAM];
+							delete site.adUnitTypeRevShares;
+						} catch (error) {
+							site.instreamRevenueShare = 'N/A';
 						}
 						const {
 							activeBidders,

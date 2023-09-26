@@ -497,6 +497,10 @@ const SITE_MAPPING_COLUMNS = [
 		accessor: 'revenueShare'
 	},
 	{
+		Header: 'Instream Rev Share(in %)',
+		accessor: 'instreamRevenueShare'
+	},
+	{
 		Header: 'Publisher Id',
 		accessor: 'publisherId'
 	},
