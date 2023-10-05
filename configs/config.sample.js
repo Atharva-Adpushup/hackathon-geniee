@@ -412,10 +412,10 @@ const config = {
 		'rahul.kumar@adpushup.com,yash.bhardwaj@adpushup.com,divyanshu.bhatnagar@adpushup.com,anil.panghal@adpushup.com,rahul.ranjan@adpushup.com',
 	reportingAuthToken: {
 		// Auth tokens are converted into base64
-		GENIEE_CONSOLE: 'Z2VuaWVlY29uc29sZTpZSSs5NWY5RDg3dXVpL2k0bXBRb25BPT0=',
-		CLS_MONITORING_SERVICE: 'Y2xzbW9uaXRvcmluZzpWM002QVlDMUZWVmtkdlcwSVJzbCt3PT0=',
-		ACTIVE_SITES_MARKING_SERVICE:
-			'YWN0aXZlc2l0ZXNtYXJraW5nc2VydmljZTp4OTdJODBJTGJWYXBLZTB3MkdtaWVRPT0='
+		GENIEE_CONSOLE: '',
+		CLS_MONITORING_SERVICE: '',
+		ACTIVE_SITES_MARKING_SERVICE: '',
+		POWERED_BY_ADPUSHUP_BANNER_SERVICE: ''
 	}
 };
 

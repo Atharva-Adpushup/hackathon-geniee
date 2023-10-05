@@ -1,5 +1,6 @@
 const moment = require('moment');
 const { fetchReports } = require('../../../../apiServices/reportsService');
+const constants = require('../../../../configs/commonConsts');
 
 const fetchCumulativeReportingData = async siteid => {
 	const toDate = moment()
@@ -20,8 +21,10 @@ const fetchCumulativeReportingData = async siteid => {
 		bypassCache: false
 	};
 
+	const serviceName = constants.SERVICE_NAMES.POWERED_BY_ADPUSHUP_BANNER_SERVICE;
+
 	try {
-		const response = await fetchReports(reportConfig);
+		const response = await fetchReports(reportConfig, serviceName);
 		return response.result;
 	} catch (err) {
 		console.log('Powered By Adpushup banner service error :', err);
