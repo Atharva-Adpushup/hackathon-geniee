@@ -60,6 +60,7 @@ const config = {
 		].join(' ')
 	},
 	ADPUSHUP_GAM: {
+		GAM_API_HOST: "https://gamapi.adpushup.com",
 		REFRESH_TOKEN: 'AP GAM REFRESH TOKEN',
 		ACTIVE_DFP_NETWORK: '103512698',
 		ACTIVE_DFP_PARENTID: '102512818'
@@ -417,6 +418,9 @@ const config = {
 	},
 	mgDealsAlerts: {
 		supportMails: 'abhishek.sontakke@adpushup.com'
+	},
+    adUnitsPlacementAutomationAlerts: {
+		supportMails:'sahil@adpushup.com,abhishek.sontakke@adpushup.com,manan.sahni@adpushup.com,anil.panghal@adpushup.com,rahul.ranjan@adpushup.com'
 	},
 	googleSheetCreds: '',
 	SLACK_ENDPOINT: 'https://common-azure-function.azurewebsites.net/api/publish',

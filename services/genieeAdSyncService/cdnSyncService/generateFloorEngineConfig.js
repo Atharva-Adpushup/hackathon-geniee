@@ -22,9 +22,10 @@ const generateFloorEngineConfig = async (siteId) => {
     try {
         const { bannerFloorEngine, globalFloorEngineConfig } = docKeys;
         const floorEngineConfigObject = await getConfig(`${bannerFloorEngine}${siteId}`);
-        const globalFloorsMapping = await getConfig(globalFloorEngineConfig);      
+        const globalFloorsMappingObject = await getConfig(globalFloorEngineConfig);      
         const floorPriceConfig = floorEngineConfigObject.floorPriceConfig || {};      
-        return { ...floorPriceConfig, ...globalFloorsMapping };
+        const globalFloorsMapping = globalFloorsMappingObject.globalFloorsMapping || {};
+        return { ...floorPriceConfig, globalFloorsMapping };
     } catch (err) {
         console.log(
 			`Error while generating floor engine config for site ${siteId} and Error is ${err}`
