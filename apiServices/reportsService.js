@@ -26,6 +26,7 @@ const { getAllGaEnabledSites } = require('../models/siteModel');
 const { addActiveProductsToMeta } = require('../helpers/routeHelpers');
 const { getMetaInfo } = require('../apiServices/metaInfoService');
 const { makeReportingRequest } = require('../helpers/commonFunctions');
+const constants = require('../configs/commonConsts');
 
 const reportsService = {
 	generateCronExpression: (interval, startDate) => {
@@ -221,11 +222,12 @@ const reportsService = {
 				throw new Error('Error while accessing data');
 			});
 	},
-	fetchReports: async reportConfig => {
+	fetchReports: async (reportConfig, serviceName = constants.SERVICE_NAMES.GENIEE_CONSOLE) => {
 		const reportsResponse = await makeReportingRequest({
 			uri: `${CC.ANALYTICS_API_ROOT}${CC.REPORT_PATH}`,
 			qs: reportConfig,
-			timeout: 600000 // 10 mins
+			timeout: 600000, // 10 mins
+			serviceName
 		});
 
 		if (reportsResponse.code !== 1) throw new AdPushupError(reportsResponse);
