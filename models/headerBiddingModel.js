@@ -318,6 +318,12 @@ function apiModule() {
 					}
 
 					return inventories;
+				}).catch(err => {
+					if (err.code === 13) {
+						return [];
+					}
+
+					throw err;
 				}),
 		getApTagInventoriesForHB: siteId =>
 			couchbase
@@ -454,7 +460,7 @@ function apiModule() {
 				API.getInnovativeAdInventoriesForHB(siteId),
 				API.getLayoutInventoriesForHB(siteId),
 				API.getApTagInventoriesForHB(siteId)
-			]).then(([layoutInventories, innovativeAdsInventories, apTagInventories]) => {
+			]).then(([layoutInventories = [], innovativeAdsInventories = [], apTagInventories = []]) => {
 				const inventories = {
 					layoutEditor: [...layoutInventories],
 					apTag: [...apTagInventories],
@@ -470,7 +476,7 @@ function apiModule() {
 				API.getInnovativeAdInventoriesForHB(siteId),
 				API.getApLiteInventoriesForHB(siteId)
 			]).then(
-				([layoutInventories, apTagInventories, innovativeAdsInventories, apLiteInventories]) => {
+				([layoutInventories = [], apTagInventories = [], innovativeAdsInventories = [], apLiteInventories = []]) => {
 					const inventories = [
 						...layoutInventories,
 						...apTagInventories,
@@ -487,7 +493,7 @@ function apiModule() {
 				API.getLayoutInventoriesForHB(siteId),
 				API.getApTagInventoriesForHB(siteId),
 				API.getInnovativeAdInventoriesForHB(siteId)
-			]).then(([layoutInventories, apTagInventories, innovativeAdsInventories]) => {
+			]).then(([layoutInventories = [], apTagInventories = [], innovativeAdsInventories = []]) => {
 				const inventories = [
 					...layoutInventories,
 					...apTagInventories,
