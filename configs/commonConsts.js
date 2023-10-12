@@ -607,7 +607,8 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		pnpRefresh: 'apnp::',
 		topSitesByRevenue: 'data::topsites',
 		globalClientAppConfig: 'config::client-globals',
-		floorEngine: 'config::floorsEngine',
+		globalFloorEngineConfig: 'config::floorsEngine',
+		bannerFloorEngine: 'fpeb::',
 		selectiveRollout: 'srfc::',
 		site: 'site::'
 	},
