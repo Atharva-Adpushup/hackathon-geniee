@@ -10,12 +10,12 @@ const {
 } = require('../helpers/routeHelpers');
 const { generateSectionName } = require('../helpers/clientServerHelpers');
 const instreamScriptModel = require('../models/instreamScriptModel');
-const { option } = require('grunt');
 
 // setting old value to null so that we can have only 1 instreamSectionId key for each ad(platform specific)
-function resetInstreamSectionId(data, platform, responsivePlatform) {
+function resetInstreamSectionId(data, options) {
+	const { platform, responsivePlatform, instreamSectionId } = options;
 	return data.map(obj => {
-		if (obj.instreamSectionId) {
+		if (obj.instreamSectionId === instreamSectionId) {
 			if (
 				(platform !== 'responsive' && platform === obj.formatData.platform) ||
 				(platform === 'responsive' && responsivePlatform === obj.formatData.responsivePlatform)
@@ -81,8 +81,13 @@ const apTagServices = {
 		const { type, platform, responsivePlatform } = ad.formatData;
 		const apTagSectionId = id;
 		const configParams = { siteId, instreamSectionId, apTagSectionId };
+		const options = {
+			platform,
+			responsivePlatform,
+			instreamSectionId
+		};
 		if (type === 'instream' && instreamSectionId) {
-			value.ads = resetInstreamSectionId(value.ads, platform, responsivePlatform);
+			value.ads = resetInstreamSectionId(value.ads, options);
 			ad.name = `Bvs_${ad.name}`;
 			try {
 				instreamScriptModel.updateInstreamConfig(configParams, ad);
