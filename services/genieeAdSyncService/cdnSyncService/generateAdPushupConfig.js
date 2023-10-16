@@ -84,7 +84,17 @@ const getAdConfig = (adType, section) => {
 		disableReuseVacantAdSpace,
 		minViewPortSize = { height: 0, width: 0 },
 		flyingCarpetEnabled = false,
-		flyingCarpetConfig = {},
+		flyingCarpetConfig = {
+			DESKTOP: {
+				enabled: false
+			},
+			MOBILE: {
+				enabled: true
+			},
+			TABLET: {
+				enabled: false
+			}
+		},
 		isReplaceGptSlotOnRefreshEnabled = false
 	} = ad;
 	const { name: sectionName, id, formatData } = section;
