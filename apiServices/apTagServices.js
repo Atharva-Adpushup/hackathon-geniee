@@ -1,34 +1,63 @@
 const uuid = require('uuid');
-const moment = require("moment");
+const moment = require('moment');
 
 const { docKeys, tagManagerInitialDoc } = require('../configs/commonConsts');
 const config = require('../configs/config');
-const { appBucket, sendDataToZapier, createNewDocAndDoProcessing } = require('../helpers/routeHelpers')
+const {
+	appBucket,
+	sendDataToZapier,
+	createNewDocAndDoProcessing
+} = require('../helpers/routeHelpers');
 const { generateSectionName } = require('../helpers/clientServerHelpers');
+const instreamScriptModel = require('../models/instreamScriptModel');
+
+// setting old value to null so that we can have only 1 instreamSectionId key for each ad(platform specific)
+function resetInstreamSectionId(data, options) {
+	const { platform, responsivePlatform, instreamSectionId } = options;
+	return data.map(obj => {
+		if (obj.instreamSectionId === instreamSectionId) {
+			if (
+				(platform !== 'responsive' && platform === obj.formatData.platform) ||
+				(platform === 'responsive' && responsivePlatform === obj.formatData.responsivePlatform)
+			) {
+				obj.instreamSectionId = null;
+			}
+		}
+		return obj;
+	});
+}
 
 const apTagServices = {
-    createAd: (ad, siteId, ownerEmail) => {
-        const payload = {
-            ad,
-            siteId,
+	createAd: (ad, siteId, ownerEmail) => {
+		const payload = {
+			ad,
+			siteId,
 			ownerEmail
 		};
 
-        return appBucket.getDoc(`${docKeys.apTag}${siteId}`)
-            .then(doc => apTagServices.processing(doc, payload))
-            .catch(err => {
-                if (err && err.name === 'CouchbaseError' && err.code === 13) {
-                  return apTagServices.createNewDocAndDoProcessingWrapper(payload);
-                } else {
-                    return Promise.reject(err);
-                }
-            })
-            .spread(apTagServices.dbWrapper);
-    },
-    isSuperUser: false,
+		return appBucket
+			.getDoc(`${docKeys.apTag}${siteId}`)
+			.then(doc => apTagServices.processing(doc, payload))
+			.catch(err => {
+				if (err && err.name === 'CouchbaseError' && err.code === 13) {
+					return apTagServices.createNewDocAndDoProcessingWrapper(payload);
+				} else {
+					return Promise.reject(err);
+				}
+			})
+			.spread(apTagServices.dbWrapper);
+	},
+	isSuperUser: false,
 	createNewDocAndDoProcessingWrapper: payload =>
-		createNewDocAndDoProcessing(payload, tagManagerInitialDoc, docKeys.apTag, apTagServices.processing),
+		createNewDocAndDoProcessing(
+			payload,
+			tagManagerInitialDoc,
+			docKeys.apTag,
+			apTagServices.processing
+		),
 	processing: (data, payload) => {
+		const { siteId } = payload;
+		const instreamSectionId = payload.ad.instreamSectionId || '';
 		const cas = data.cas || false;
 		const value = data.value || data;
 		const id = uuid.v4();
@@ -49,6 +78,23 @@ const apTagServices = {
 				...payload.ad.formatData
 			}
 		};
+		const { type, platform, responsivePlatform } = ad.formatData;
+		const apTagSectionId = id;
+		const configParams = { siteId, instreamSectionId, apTagSectionId };
+		const options = {
+			platform,
+			responsivePlatform,
+			instreamSectionId
+		};
+		if (type === 'instream' && instreamSectionId) {
+			value.ads = resetInstreamSectionId(value.ads, options);
+			ad.name = `Bvs_${ad.name}`;
+			try {
+				instreamScriptModel.updateInstreamConfig(configParams, ad);
+			} catch (error) {
+				console.error(error);
+			}
+		}
 
 		value.ads.push(ad);
 		value.siteDomain = value.siteDomain || payload.siteDomain;
@@ -85,13 +131,16 @@ const apTagServices = {
 		const key = `${docKeys.apTag}${siteId}`;
 
 		function dbOperation() {
-			return !cas ? apTagServices.getAndUpdate(key, value) : apTagServices.directDBUpdate(key, value, cas);
+			return !cas
+				? apTagServices.getAndUpdate(key, value)
+				: apTagServices.directDBUpdate(key, value, cas);
 		}
 
 		return dbOperation().then(() => toReturn);
 	},
 	fetchAds: siteId => {
-		return appBucket.getDoc(`${docKeys.apTag}${siteId}`)
+		return appBucket
+			.getDoc(`${docKeys.apTag}${siteId}`)
 			.then(doc => {
 				console.log({ doc });
 				return doc.value.ads || [];
@@ -104,7 +153,8 @@ const apTagServices = {
 			});
 	},
 	updateAds: (siteId, ads = []) => {
-		return appBucket.getDoc(`${docKeys.apTag}${siteId}`)
+		return appBucket
+			.getDoc(`${docKeys.apTag}${siteId}`)
 			.then(doc => {
 				const newDoc = {
 					...doc.value,
@@ -116,8 +166,8 @@ const apTagServices = {
 			.catch(err => {
 				if (err && err.code && err.code === 13) return {};
 				throw err;
-			})
+			});
 	}
 };
 
-module.exports = apTagServices; 
+module.exports = apTagServices;

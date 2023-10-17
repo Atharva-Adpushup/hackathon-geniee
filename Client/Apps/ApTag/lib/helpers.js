@@ -41,4 +41,39 @@ function getAdsAndGlobal(state, props) {
 	};
 }
 
-export { makeFirstLetterCapitalize, copyToClipBoard, getAdsAndGlobal };
+function getInstreamSectionIds(config) {
+	const { ads } = config;
+	const sectionIds = ads.map(key => ({ name: key.videoSectionId, value: key.name }));
+	return sectionIds;
+}
+function checkAndGetBvsSectionIds(config) {
+	const { ads } = config;
+	const bannerSectionId = {};
+
+	ads.forEach(ad => {
+		const { featuresData } = ad;
+		if (
+			featuresData &&
+			featuresData.bannerReplacementConfig &&
+			featuresData.bannerReplacementConfig.platforms
+		) {
+			const { platforms } = featuresData.bannerReplacementConfig;
+			if (platforms && platforms.DESKTOP && platforms.DESKTOP.apSectionIdDesktop) {
+				bannerSectionId.desktop = ad.videoSectionId;
+			}
+
+			if (platforms && platforms.MOBILE && platforms.MOBILE.apSectionIdMobile) {
+				bannerSectionId.mobile = ad.videoSectionId;
+			}
+		}
+	});
+	return bannerSectionId;
+}
+
+export {
+	makeFirstLetterCapitalize,
+	copyToClipBoard,
+	getAdsAndGlobal,
+	getInstreamSectionIds,
+	checkAndGetBvsSectionIds
+};

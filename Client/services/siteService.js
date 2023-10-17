@@ -32,5 +32,6 @@ export default {
 		axiosInstance.put(`/site/${siteId}/rulesData`, {
 			hbRuleData,
 			dataForAuditLogs
-		})
+		}),
+	getInstreamConfig: siteId => axiosInstance.get(`script/${siteId}/instreamScriptConfig`)
 };
