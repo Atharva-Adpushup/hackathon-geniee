@@ -5,6 +5,7 @@ import { Row, Col } from '@/Client/helpers/react-bootstrap-imports';
 import CustomToggleSwitch from '../../../../../Components/CustomToggleSwitch/index';
 import FieldGroup from '../../../../../Components/Layout/FieldGroup';
 import CustomButton from '../../../../../Components/CustomButton/index';
+import ColorPicker from '../../../../AmpSettings/components/helper/ColorPicker';
 import config from '../../../../../config/config';
 import siteService from '../../../../../services/siteService';
 import {
@@ -35,8 +36,14 @@ class Settings extends Component {
 			flyingCarpetSettings = {
 				CSS: {
 					top: 30
+				},
+				label: {
+					enabled: true,
+					color: '',
+					backgroundColor: ''
 				}
 			}, // default val
+
 			poweredByBanner = {},
 			disableAutoAdpushupLabel = false,
 			isAdsLabelOn = false,
@@ -70,7 +77,10 @@ class Settings extends Component {
 			spaButUsingHook,
 			spaPageTransitionTimeout,
 			adpushupPercentage,
-			flyingCarpetTopOffset: flyingCarpetSettings.CSS.top,
+			flyingCarpetTopOffset: flyingCarpetSettings?.CSS?.top,
+			flyingCarpetLabel: flyingCarpetSettings?.label?.enabled || true,
+			flyingCarpetLabelColor: flyingCarpetSettings?.label?.color || '',
+			flyingCarpetLabelBackgroundColor: flyingCarpetSettings?.label?.backgroundColor || '',
 			disableAutoAdpushupLabel,
 			isAdsLabelOn,
 			adsLabel,
@@ -137,6 +147,11 @@ class Settings extends Component {
 					).then(() => this.setState({ [name]: value }));
 				}
 			}
+			if (name === 'flyingCarpetLabel') {
+				return {
+					[name]: value
+				};
+			}
 
 			if (name !== 'apLite') {
 				return {
@@ -183,10 +198,10 @@ class Settings extends Component {
 		});
 	};
 
-	handleGaInputChange = (e) => {
+	handleGaInputChange = e => {
 		const updatedViewId = e === 4 ? '' : this.state.viewId;
 		this.setState({ gaVersion: e, viewId: updatedViewId });
-	  };
+	};
 
 	handlePoweredByBannerMultiSelect = selectedAdTypes => {
 		this.setState({ selectedAdTypes });
@@ -292,6 +307,9 @@ class Settings extends Component {
 			spaPageTransitionTimeout,
 			adpushupPercentage,
 			flyingCarpetTopOffset,
+			flyingCarpetLabel,
+			flyingCarpetLabelColor,
+			flyingCarpetLabelBackgroundColor,
 			isAdsLabelOn,
 			disableAutoAdpushupLabel,
 			adsLabel,
@@ -359,7 +377,14 @@ class Settings extends Component {
 				spaButUsingHook,
 				spaPageTransitionTimeout: Number(spaPageTransitionTimeout),
 				adpushupPercentage: Number(adpushupPercentage),
-				flyingCarpetSettings: { CSS: { top: Number(flyingCarpetTopOffset) } },
+				flyingCarpetSettings: {
+					CSS: { top: Number(flyingCarpetTopOffset) },
+					label: {
+						enabled: flyingCarpetLabel,
+						color: flyingCarpetLabelColor,
+						backgroundColor: flyingCarpetLabelBackgroundColor
+					}
+				},
 				poweredByBanner,
 				isAdsLabelOn,
 				disableAutoAdpushupLabel,
@@ -428,6 +453,9 @@ class Settings extends Component {
 			spaPageTransitionTimeout,
 			adpushupPercentage,
 			flyingCarpetTopOffset,
+			flyingCarpetLabel,
+			flyingCarpetLabelColor,
+			flyingCarpetLabelBackgroundColor,
 			status,
 			disableAutoAdpushupLabel,
 			hbAnalytics,
@@ -454,8 +482,8 @@ class Settings extends Component {
 
 		const { siteId, siteDomain, dataFeedActive = true } = site;
 		const isGaVersionFour = gaVersion === 4;
-		const gaPropertyIdText='GA Property Id';
-		const gaTrackingIdText='GA Tracking Id';
+		const gaPropertyIdText = 'GA Property Id';
+		const gaTrackingIdText = 'GA Tracking Id';
 		// const effectRevenueShareDate = formatDate(+new Date(), 'subtract', 2);
 
 		return (
@@ -698,19 +726,7 @@ class Settings extends Component {
 						/>
 					</React.Fragment>
 				)}
-				{site && site.apConfigs && site.apConfigs.flyingCarpetSettings && (
-					<FieldGroup
-						name="flyingCarpetTopOffset"
-						value={flyingCarpetTopOffset}
-						type="number"
-						label="Flying Carpet Top Offset(px)"
-						onChange={this.handleChange}
-						size={6}
-						id={`flyingCarpetTopOffset-input-${siteId}-${siteDomain}`}
-						placeholder="Default 30"
-						className="u-padding-v4 u-padding-h4"
-					/>
-				)}
+
 				<div className="site-level-refresh">
 					<h1>Site Level Refresh</h1>
 					<SelectBox
@@ -811,6 +827,62 @@ class Settings extends Component {
 							placeholder="GA Version"
 							className="u-padding-v4 u-padding-h4"
 							itemCollection={GA_VERSION_OPTIONS}
+						/>
+					</>
+				)}
+
+				{/* Flying Carpet Setting  */}
+				{site && site.apConfigs && site.apConfigs.flyingCarpetSettings && (
+					<>
+						<b>Flying Carpet Settings : </b>
+
+						<CustomToggleSwitch
+							labelText="Advertisement Label"
+							className="u-margin-t4 u-margin-b4 negative-toggle"
+							checked={flyingCarpetLabel}
+							onChange={this.handleToggle}
+							layout="horizontal"
+							size="m"
+							on="Yes"
+							off="No"
+							defaultLayout={false}
+							name={`flyingCarpetLabel-switch-${siteId}-${siteDomain}`}
+							id={`flyingCarpetLabel-switch-${siteId}-${siteDomain}`}
+						/>
+						{flyingCarpetLabel && (
+							<>
+								<div className="powered-by-adpushup u-margin-t4">
+									<b>Label Background Color</b>
+									<ColorPicker
+										value={flyingCarpetLabelBackgroundColor || '#fff'}
+										handleChange={selectedColor => {
+											const { hex } = selectedColor;
+											this.setState({ flyingCarpetLabelBackgroundColor: hex });
+										}}
+									/>
+								</div>
+
+								<div className="powered-by-adpushup u-margin-t4">
+									<b>Label Color</b>
+									<ColorPicker
+										value={flyingCarpetLabelColor || '#fff'}
+										handleChange={selectedColor => {
+											const { hex } = selectedColor;
+											this.setState({ flyingCarpetLabelColor: hex });
+										}}
+									/>
+								</div>
+							</>
+						)}
+						<FieldGroup
+							name="flyingCarpetTopOffset"
+							value={flyingCarpetTopOffset}
+							type="number"
+							label="Flying Carpet Top Offset(px)"
+							onChange={this.handleChange}
+							id={`flyingCarpetTopOffset-input-${siteId}-${siteDomain}`}
+							placeholder="Default 30"
+							className="u-padding-v4 u-padding-h4"
 						/>
 					</>
 				)}
