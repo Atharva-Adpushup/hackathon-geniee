@@ -1535,5 +1535,9 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 	}, '__TARGET_ORIGIN__');
 	window.close();
 	</script>`,
-	DEFAULT_VACANT_SPLIT: 25
+	DEFAULT_VACANT_SPLIT: 25,
+	GA_EVENTS: {
+		PAGE_VIEW: 'page_view',
+		AP_PAGE_VIEW: 'ap_page_view'
+	}
 };
