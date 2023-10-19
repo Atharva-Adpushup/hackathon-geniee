@@ -355,39 +355,51 @@ const reportsService = {
 		};
 		return upsertDoc('AppBucket', docId, newConfig);
 	},
-	shouldUseGaPageViews: async (email, reportConfig) => {
-		const { siteid = '', isSuperUser = false } = reportConfig;
+	getUserSiteIdswithEnabledGaAnalytics: async (email, isSuperUser, siteid) => {
 		let isGlobalReportsBeingFetched = false;
 		if (isSuperUser) {
-			if (siteid === '') return false;
+			if (siteid === '') return {};
 			isGlobalReportsBeingFetched = true;
 		}
-		const { data: { useGAAnalyticsForReporting = false } = {} } = await getUserByEmail(email);
-		if (!useGAAnalyticsForReporting && !isSuperUser) return false;
 		let allGaEnabledSites;
 		if (isGlobalReportsBeingFetched) {
 			allGaEnabledSites = await getAllGaEnabledSites();
 		} else {
 			allGaEnabledSites = await getUserGaEnabledSites(email);
 		}
-		const selectedSiteidsForReporting = siteid.split(',');
 		const userSiteIdswithEnabledGaAnalyticMap = allGaEnabledSites.reduce((mapResult, site) => {
 			const { siteId } = site;
 			mapResult[siteId] = true;
 			return mapResult;
 		}, {});
+		return userSiteIdswithEnabledGaAnalyticMap;
+	},
+	shouldUseGaPageViews: async (email, reportConfig) => {
+		const { siteid = '', isSuperUser = false } = reportConfig;
+		const {
+			data: { useGAAnalyticsForReporting = false, useTotalGAPageViews = false } = {}
+		} = await getUserByEmail(email);
+		if (!useTotalGAPageViews && !useGAAnalyticsForReporting && !isSuperUser)
+			return { isGaPageBeingUsed: false };
+		const selectedSiteidsForReporting = siteid.split(',');
+		const userSiteIdswithEnabledGaAnalytics = await reportsService.getUserSiteIdswithEnabledGaAnalytics(
+			email,
+			isSuperUser,
+			siteid
+		);
 		const isAnySiteWithoutGaEnabled = selectedSiteidsForReporting.some(siteId => {
-			const enableGAAnalytics = userSiteIdswithEnabledGaAnalyticMap[siteId];
+			const enableGAAnalytics = userSiteIdswithEnabledGaAnalytics[siteId];
 			return !enableGAAnalytics;
 		});
-		if (isAnySiteWithoutGaEnabled) return false;
-		return true;
+		if (isAnySiteWithoutGaEnabled) return { isGaPageBeingUsed: false };
+		const gaEventType = useTotalGAPageViews ? CC.GA_EVENTS.PAGE_VIEW : CC.GA_EVENTS.AP_PAGE_VIEW;
+		return { isGaPageBeingUsed: true, gaEventType };
 	},
 	processAndSendReportingData: (email, config, reportConfig) =>
 		Promise.all([
 			reportsService.fetchReports(config),
 			reportsService.shouldUseGaPageViews(email, reportConfig)
-		]).then(async ([reports, isGaPageBeingUsed]) => {
+		]).then(async ([reports, gaConfig]) => {
 			const result = await reportsService.fetchAndMergeSessionData(
 				reportConfig,
 				reports,
@@ -395,35 +407,41 @@ const reportsService = {
 			);
 			const { columns } = result;
 			const isReportingDataHavePageViews = doesReportingHavePageViewData(columns);
+			const { isGaPageBeingUsed = false, gaEventType = undefined } = gaConfig;
 			if (!isGaPageBeingUsed || !isReportingDataHavePageViews) return result;
-			return reportsService.transformReportingDataForGA(result);
+			return reportsService.transformReportingDataForGA(result, gaEventType);
 		}),
-	transformReportingDataForGA: reportingResult => {
+	transformReportingDataForGA: (reportingResult, gaEventType) => {
 		const { result = [], total } = reportingResult;
 		// This will store the sum of Ap page views where Ga page views is Zero
 		let sumOfApPageViewsWhereGAPageViewNotExist = 0;
 		for (let index = 0; index < result.length; index++) {
 			const rowData = result[index];
 			const {
-				ga_ap_page_views: gaPageViews = 0,
-				network_net_revenue: networkNetRevenue = 0
+				ga_ap_page_views: gaApPageViews = 0,
+				network_net_revenue: networkNetRevenue = 0,
+				ga_page_views: gaPageViews = 0
 			} = rowData;
-			if (gaPageViews) {
-				rowData.adpushup_page_views = gaPageViews;
+			const pageViews = gaEventType === CC.GA_EVENTS.AP_PAGE_VIEW ? gaApPageViews : gaPageViews;
+			if (pageViews) {
+				rowData.adpushup_page_views = pageViews;
 				rowData.adpushup_page_cpm = parseFloat(
-					roundOffTwoDecimal((networkNetRevenue / gaPageViews) * 1000)
+					roundOffTwoDecimal((networkNetRevenue / pageViews) * 1000)
 				);
 			} else if (total) sumOfApPageViewsWhereGAPageViewNotExist += rowData.adpushup_page_views;
 		}
 		// returning from here if result data have not total field(This happens in site filter reports in Global reports)
 		if (!total) return { ...reportingResult, result };
 		const {
-			total_ga_ap_page_views: totalGaPageViews = 0,
+			total_ga_ap_page_views: totalGaApPageViews = 0,
+			total_ga_page_views: totalGaPageViews = 0,
 			total_network_net_revenue: totalNetworkRevenue = 0
 		} = total;
-		if (totalGaPageViews) {
+		const totalPageViews =
+			gaEventType === CC.GA_EVENTS.AP_PAGE_VIEW ? totalGaApPageViews : totalGaPageViews;
+		if (totalPageViews) {
 			// Here we are adding page views which are present in result but not in total data(becuase ga page views is being used here)
-			const updatedTotalGaPageViews = totalGaPageViews + sumOfApPageViewsWhereGAPageViewNotExist;
+			const updatedTotalGaPageViews = totalPageViews + sumOfApPageViewsWhereGAPageViewNotExist;
 			total.total_adpushup_page_views = updatedTotalGaPageViews;
 			total.total_adpushup_page_cpm = parseFloat(
 				roundOffTwoDecimal((totalNetworkRevenue / updatedTotalGaPageViews) * 1000)
