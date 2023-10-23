@@ -19,6 +19,7 @@ import {
 	OUTBRAIN_DISABLED_OPTIONS,
 	SITE_LEVEL_REFRESH_TYPE
 } from '../../../configs/commonConsts';
+import { FC_SETTINGS } from '../../../../../constants/opsPanel';
 
 import SelectBox from '../../../../../Components/SelectBox';
 
@@ -39,8 +40,8 @@ class Settings extends Component {
 				},
 				label: {
 					enabled: true,
-					color: '',
-					backgroundColor: ''
+					color: FC_SETTINGS.LABEL_COLOR,
+					backgroundColor: FC_SETTINGS.LABEL_BG_COLOR
 				}
 			}, // default val
 
@@ -79,8 +80,9 @@ class Settings extends Component {
 			adpushupPercentage,
 			flyingCarpetTopOffset: flyingCarpetSettings?.CSS?.top,
 			flyingCarpetLabel: flyingCarpetSettings?.label?.enabled || true,
-			flyingCarpetLabelColor: flyingCarpetSettings?.label?.color || '',
-			flyingCarpetLabelBackgroundColor: flyingCarpetSettings?.label?.backgroundColor || '',
+			flyingCarpetLabelColor: flyingCarpetSettings?.label?.color || FC_SETTINGS.LABEL_COLOR,
+			flyingCarpetLabelBackgroundColor:
+				flyingCarpetSettings?.label?.backgroundColor || FC_SETTINGS.LABEL_BG_COLOR,
 			disableAutoAdpushupLabel,
 			isAdsLabelOn,
 			adsLabel,
