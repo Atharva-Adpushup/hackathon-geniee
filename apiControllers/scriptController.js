@@ -22,6 +22,7 @@ const generateAdPushupAdsConfig = require('../services/genieeAdSyncService/cdnSy
 const generateAmpAdPushupConfig = require('../services/genieeAdSyncService/cdnSyncService/generateAmpAdPushupConfig');
 const generatePnPRefreshConfig = require('../services/genieeAdSyncService/cdnSyncService/generatePnPRefreshConfig');
 const generateAmpPnPRefreshConfig = require('../services/genieeAdSyncService/cdnSyncService/generateAmpPnPRefreshConfig');
+const generateFloorEngineConfig = require('../services/genieeAdSyncService/cdnSyncService/generateFloorEngineConfig');
 const AdPushupError = require('../helpers/AdPushupError');
 const httpStatusConsts = require('../configs/httpStatusConsts');
 const {
@@ -29,8 +30,7 @@ const {
 } = require('../services/genieeAdSyncService/cdnSyncService/commonFunctions');
 const {
 	isValidThirdPartyDFPAndCurrency,
-	removeFormatWiseParamsForAMP,
-	getFloorEngineConfigFromCB
+	removeFormatWiseParamsForAMP
 } = require('../helpers/commonFunctions');
 const CC = require('../configs/commonConsts');
 
@@ -366,7 +366,8 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 					pnpConfig,
 					adNetworkConfig,
 					manualAds,
-					innovativeAds
+					innovativeAds,
+					floorPriceConfig
 				} = prebidAndAdsConfig;
 
 				if (isAdPartner) {
@@ -465,20 +466,11 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 						return true;
 					});
 				});
-				if (apConfigs?.floorPriceConfig?.enabled) {
-					const floorEngineConfigDoc = await getFloorEngineConfigFromCB();
-					if (floorEngineConfigDoc.globalFloorsMapping)
-						apConfigs.floorPriceConfig.globalFloorsMapping =
-							floorEngineConfigDoc.globalFloorsMapping;
-					else
-						throw new Error(
-							"FloorEngineConfig Doc Couchbase Error: Can't find globalFloorsMapping"
-						);
-				}
 
 				const output = { apConfigs, prebidConfig };
 				if (apps.apLite) output.apLiteConfig = apLiteConfig;
 				if (apps.pnp) output.pnpConfig = pnpConfig;
+				if (apps.floorEngine) output.floorPriceConfig = floorPriceConfig;
 
 				return output;
 			};
@@ -536,6 +528,17 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 
 				return Promise.resolve(combinedConfig);
 			};
+			const setFloorPriceEngineConfig = function(combinedConfig) {
+				const floorEngineActive = !!apps.floorEngine;
+				if (floorEngineActive) {
+					return generateFloorEngineConfig(siteId).then(floorPriceConfig => ({
+						...combinedConfig,
+						floorPriceConfig
+					}));
+				}
+
+				return Promise.resolve(combinedConfig);
+			};
 			const getPrebidAndAdsConfig = () =>
 				(() => {
 					if (apps.apLite) {
@@ -557,6 +560,7 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 				})()
 					.then(setAdNetworkConfig)
 					.then(setPnPConfig)
+					.then(setFloorPriceEngineConfig)
 					.then(setAllConfigs);
 
 			const generatedConfig = getPrebidAndAdsConfig().then(prebidAndAdsConfig => {

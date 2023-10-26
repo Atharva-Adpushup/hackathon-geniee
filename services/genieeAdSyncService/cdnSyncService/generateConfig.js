@@ -180,7 +180,7 @@ function init(site, computedConfig) {
 	const apps = site.get('apps');
 	const e2eTesting = site.get('e2eTesting');
 
-	const { apConfigs, prebidConfig, apLiteConfig, pnpConfig } = computedConfig;
+	const { apConfigs, prebidConfig, apLiteConfig, pnpConfig, floorPriceConfig } = computedConfig;
 	let statusesAndAds = {
 		statuses: {
 			APTAG_ACTIVE: !!apConfigs.manualModeActive,
@@ -192,11 +192,7 @@ function init(site, computedConfig) {
 			AP_LITE_ACTIVE: !!(apps && apps.apLite && apLiteConfig),
 			PNP_REFRESH_ACTIVE: !!(apps && apps.pnp && pnpConfig),
 			USER_TRACKING: !!(apConfigs && apConfigs.enableUserTracking),
-			FLOOR_PRICE_RULES: !!(
-				apConfigs &&
-				apConfigs.floorPriceConfig &&
-				apConfigs.floorPriceConfig.enabled
-			),
+			FLOOR_PRICE_RULES: !!(apps && apps.floorEngine && floorPriceConfig),
 			AUTO_ADPUSHUP_LABEL_SERVICE_ACTIVE:
 				typeof apConfigs.disableAutoAdpushupLabel === 'boolean' &&
 				apConfigs.disableAutoAdpushupLabel
@@ -255,6 +251,8 @@ function init(site, computedConfig) {
 
 			if (apps && apps.apLite) output.apLiteConfig = apLiteConfig;
 			if (apps && apps.pnp) output.pnpConfig = pnpConfig;
+			if (apps && apps.floorEngine) apConfigs.floorPriceConfig = floorPriceConfig;
+			
 			if (e2eTesting) {
 				output.e2eTesting = e2eTesting;
 			} else {
