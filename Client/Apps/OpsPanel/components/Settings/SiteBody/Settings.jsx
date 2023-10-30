@@ -73,13 +73,17 @@ class Settings extends Component {
 		const isPnPEnabled = Object.prototype.hasOwnProperty.call(apps, 'pnp') ? apps.pnp : false;
 		const selectedAdTypes = this.getSelectedAdTypes(poweredByBanner);
 		const selectedOutbrainDisabledTypes = this.getSelectedOutbrainDisabledTypes(outbrainDisabled);
+		const { label: fcLabel = {} } = flyingCarpetSettings;
+		const isfcLabelEnabled = Object.prototype.hasOwnProperty.call(fcLabel, 'enabled')
+			? fcLabel.enabled
+			: true;
 		this.state = {
 			isSPA,
 			spaButUsingHook,
 			spaPageTransitionTimeout,
 			adpushupPercentage,
 			flyingCarpetTopOffset: flyingCarpetSettings?.CSS?.top,
-			flyingCarpetLabel: flyingCarpetSettings?.label?.enabled || true,
+			flyingCarpetLabel: isfcLabelEnabled,
 			flyingCarpetLabelColor: flyingCarpetSettings?.label?.color || FC_SETTINGS.LABEL_COLOR,
 			flyingCarpetLabelBackgroundColor:
 				flyingCarpetSettings?.label?.backgroundColor || FC_SETTINGS.LABEL_BG_COLOR,
