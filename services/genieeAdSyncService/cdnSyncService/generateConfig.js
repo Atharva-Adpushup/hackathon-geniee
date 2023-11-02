@@ -192,6 +192,7 @@ function init(site, computedConfig) {
 			AP_LITE_ACTIVE: !!(apps && apps.apLite && apLiteConfig),
 			PNP_REFRESH_ACTIVE: !!(apps && apps.pnp && pnpConfig),
 			USER_TRACKING: !!(apConfigs && apConfigs.enableUserTracking),
+			UNTHROTTLED_SET_TIMEOUT: !!(apConfigs && apConfigs.optimiseRefresh && apConfigs.optimiseRefresh.isFeatureEnabledOnSite),
 			FLOOR_PRICE_RULES: !!(apps && apps.floorEngine && floorPriceConfig),
 			AUTO_ADPUSHUP_LABEL_SERVICE_ACTIVE:
 				typeof apConfigs.disableAutoAdpushupLabel === 'boolean' &&
