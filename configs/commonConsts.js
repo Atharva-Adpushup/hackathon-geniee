@@ -849,6 +849,9 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		'/site/report?report_name=network_report&metrics=network_net_revenue'
 	],
 	PREBID_BUNDLING: {
+		MODULES: {
+			PRICE_FLOORS: 'priceFloors'
+		},
 		PREBID_ADAPTERS_TO_ALWAYS_BUILD: [
 			'currency',
 			'schain',
