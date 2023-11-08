@@ -116,7 +116,8 @@ const createSection = (sectionPayload, adPayload, variationId) => dispatch => {
 				createTs: Math.floor(Date.now() / 1000),
 				network,
 				secondaryCss: float !== 'none' ? defaultSectionCss : undefined,
-				networkData: adPayload.networkData
+				networkData: adPayload.networkData,
+				fluid: adPayload.fluid
 			}),
 			sectionPayload: Object.assign(sectionPayload, {
 				id: sectionId,

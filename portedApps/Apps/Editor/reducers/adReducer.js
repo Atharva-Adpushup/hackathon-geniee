@@ -52,7 +52,8 @@ const adsByIds = (state = {}, action) => {
 					customCSS: payload.customCSS,
 					// adCode: payload.adCode ? payload.adCode : undefined,
 					network: payload.network,
-					secondaryCss: payload.secondaryCss
+					secondaryCss: payload.secondaryCss,
+					fluid: payload.fluid
 				},
 				// Network data object is only added when custom zone id value is added
 				// through Visual Editor

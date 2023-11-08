@@ -1,7 +1,7 @@
 // In-content section component
 
 import React, { PropTypes } from 'react';
-import { reduxForm, change, registerField , formValueSelector} from 'redux-form';
+import { reduxForm, change, registerField, formValueSelector } from 'redux-form';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 import validate from './inContentValidations';
@@ -74,12 +74,16 @@ class inContentForm extends React.Component {
 	/**
 	 * Method to return size of ad which is being created
 	 */
-	getAdSize () {
-		const isCustomAdSize = !!(Number(this.props.customAdSizeWidth) && Number(this.props.customAdSizeHeight));
+	getAdSize() {
+		const isCustomAdSize = !!(
+			Number(this.props.customAdSizeWidth) && Number(this.props.customAdSizeHeight)
+		);
 		const adSize = this.props.adSize || getSupportedSizes()[0];
-		const computedAdSize = isCustomAdSize ? `${this.props.customAdSizeWidth} x ${this.props.customAdSizeHeight}` : adSize;
+		const computedAdSize = isCustomAdSize
+			? `${this.props.customAdSizeWidth} x ${this.props.customAdSizeHeight}`
+			: adSize;
 		const [width, height] = computedAdSize.split(/\s+x\s+/);
-		return {width, height};
+		return { width, height };
 	}
 
 	setNetwork(data) {
@@ -108,8 +112,8 @@ class inContentForm extends React.Component {
 					<div>
 						<h1 className="variation-section-heading">Add Incontent Section</h1>
 						<p className="error-message" style={{ fontSize: '1em' }}>
-							Please set your <strong>Content Selector</strong> in Info settings panel first to create
-							in-content sections.
+							Please set your <strong>Content Selector</strong> in Info settings panel first to
+							create in-content sections.
 						</p>
 					</div>
 				)}
@@ -156,7 +160,11 @@ const mapStateToProps = (state, ownProps) => ({
 				isValues = !!values,
 				isCustomCSS = !!(isValues && values.customCSS),
 				isAdpTagsNetwork = !!(networkInfo.network && networkInfo.network === 'adpTags'),
-				isCustomAdSize = !!(isValues && Number(values.customAdSizeWidth) && Number(values.customAdSizeHeight)),
+				isCustomAdSize = !!(
+					isValues &&
+					Number(values.customAdSizeWidth) &&
+					Number(values.customAdSizeHeight)
+				),
 				isAdSize = !!(isValues && values.adSize),
 				computedAdSize = isCustomAdSize
 					? `${values.customAdSizeWidth} x ${values.customAdSizeHeight}`
@@ -186,7 +194,8 @@ const mapStateToProps = (state, ownProps) => ({
 					adCode: btoa(values.adCode),
 					adSize: computedAdSize,
 					network: networkInfo.network,
-					networkData: {}
+					networkData: {},
+					fluid: networkInfo.fluid
 				};
 
 			isCustomCSS ? (adPayload.customCSS = JSON.parse(values.customCSS)) : null;
@@ -214,7 +223,4 @@ const mapStateToProps = (state, ownProps) => ({
 		showNotification: params => dispatch(showNotification(params))
 	});
 
-export default connect(
-	mapStateToProps,
-	mapDispatchToProps
-)(form(inContentForm));
+export default connect(mapStateToProps, mapDispatchToProps)(form(inContentForm));
