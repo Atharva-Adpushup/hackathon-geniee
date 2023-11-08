@@ -195,8 +195,7 @@ const mapStateToProps = (state, ownProps) => ({
 					adSize: computedAdSize,
 					network: networkInfo.network,
 					networkData: {},
-					fluid: networkInfo.fluid,
-					flyingCarpetEnabled: networkInfo.flyingCarpetEnabled
+					fluid: networkInfo.fluid
 				};
 
 			isCustomCSS ? (adPayload.customCSS = JSON.parse(values.customCSS)) : null;

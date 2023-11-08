@@ -117,8 +117,7 @@ const createSection = (sectionPayload, adPayload, variationId) => dispatch => {
 				network,
 				secondaryCss: float !== 'none' ? defaultSectionCss : undefined,
 				networkData: adPayload.networkData,
-				fluid: adPayload.fluid,
-				flyingCarpetEnabled: adPayload.flyingCarpetEnabled
+				fluid: adPayload.fluid
 			}),
 			sectionPayload: Object.assign(sectionPayload, {
 				id: sectionId,
