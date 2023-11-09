@@ -130,32 +130,31 @@ function pushToCdnOriginQueue(fileConfig, siteId) {
 	}
 }
 
-
-
-function getSyncPublisherForScriptType(type, siteParams = {}) {
+function getQueueNameForScriptType(type, siteParams = {}) {
 	const scriptTypes = commonConsts.SCRIPT_TYPE;
+	const rabbitMqConfig = config.RABBITMQ;
+	const scriptTypeToQueueMapping = {
+		[scriptTypes.DVC]: rabbitMqConfig.AMP_CDN_SYNC,
+		[scriptTypes.AMP]: rabbitMqConfig.AMP_SCRIPT_SYNC,
+		[scriptTypes.ADPUSHUPJS]: rabbitMqConfig.CDN_SYNC
+	};
 	if (type === undefined) type = scriptTypes.ADPUSHUPJS;
+	let queue = null;
 	switch (type) {
 		case scriptTypes.DVC:
-			if (!siteParams.isDVCEnabled) return null;
-			return ampDvcSyncQueuePublisher;
+			if (siteParams.isDVCEnabled) {
+				queue = scriptTypeToQueueMapping[scriptTypes.DVC];
+			}
+			break;
 		case scriptTypes.AMP:
-			if (!siteParams.isAmpScriptEnabled) return null;
-			return ampScriptSyncQueuePublisher;
+			if (siteParams.isAmpScriptEnabled) {
+				queue = scriptTypeToQueueMapping[scriptTypes.AMP];
+			}
+			break;
 		case scriptTypes.ADPUSHUPJS:
-			return queuePublisher;
-		default:
-			return null;
+			queue = scriptTypeToQueueMapping[scriptTypes.ADPUSHUPJS];
 	}
-}
-
-function getEnabledPublishersByTypeList(types, siteParams) {
-	const allPublishers = [];
-	for (const type of types) {
-		const publisher = getSyncPublisherForScriptType(type, siteParams);
-		if (publisher !== null) allPublishers.push(publisher);
-	}
-	return allPublishers;
+	return queue && queue.NAME_IN_QUEUE_PUBLISHER_SERVICE;
 }
 
 module.exports = {
@@ -169,6 +168,5 @@ module.exports = {
 	readTempFile,
 	pushToCdnOriginQueue,
 	getNetworkWideHBRules,
-	getSyncPublisherForScriptType,
-	getEnabledPublishersByTypeList
+	getQueueNameForScriptType
 };

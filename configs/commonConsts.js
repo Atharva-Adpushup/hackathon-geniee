@@ -98,7 +98,6 @@ module.exports = {
 			'sec-ch-ua-mobile': '?0'
 		}
 	},
-
 	GOOGLE_SPREAD_SHEET_ID: {
 		CLS_MONITORING: '1ju3NvLOBOqUEMzX1AfqKnQtLvB28hjS1-S1mJmOh6fI',
 		REPORTING_DATA: '1LJELLTJxJDPjlz07A7gTvvo59jQI_kLolyyUM89Df2M',
