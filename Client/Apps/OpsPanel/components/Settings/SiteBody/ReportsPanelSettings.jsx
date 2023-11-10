@@ -20,6 +20,7 @@ class ReportsPanelSettings extends Component {
 			peerPerformanceAnalysis = false,
 			peerPerformanceAnalysisSites = [],
 			useGAAnalyticsForReporting = false,
+			useTotalGAPageViews = false,
 			pushToSellersJson = true
 		} = user;
 		const { isMcmEnabled = false, childPublisherId = '' } = mcm;
@@ -33,6 +34,7 @@ class ReportsPanelSettings extends Component {
 			peerPerformanceAnalysis,
 			peerPerformanceAnalysisSites,
 			useGAAnalyticsForReporting,
+			useTotalGAPageViews,
 			pushToSellersJson
 		};
 	}
@@ -84,6 +86,7 @@ class ReportsPanelSettings extends Component {
 			peerPerformanceAnalysisSites,
 			peerPerformanceAnalysis,
 			useGAAnalyticsForReporting,
+			useTotalGAPageViews,
 			pushToSellersJson
 		} = this.state;
 		const { updateUser, customProps, showNotification } = this.props;
@@ -131,6 +134,10 @@ class ReportsPanelSettings extends Component {
 				{
 					key: 'useGAAnalyticsForReporting',
 					value: useGAAnalyticsForReporting
+				},
+				{
+					key: 'useTotalGAPageViews',
+					value: useTotalGAPageViews
 				},
 				{
 					key: 'pushToSellersJson',
@@ -201,6 +208,7 @@ class ReportsPanelSettings extends Component {
 			childPublisherId,
 			peerPerformanceAnalysis,
 			useGAAnalyticsForReporting,
+			useTotalGAPageViews,
 			pushToSellersJson
 		} = this.state;
 
@@ -235,6 +243,19 @@ class ReportsPanelSettings extends Component {
 					defaultLayout
 					name="useGAAnalyticsForReporting"
 					id="js-useGAAnalyticsForReporting"
+				/>
+				<CustomToggleSwitch
+					labelText="Use Total GA Page Views For Reporting"
+					className="u-margin-t4 u-margin-b4 negative-toggle u-cursor-pointer"
+					checked={useTotalGAPageViews}
+					onChange={this.handleToggle}
+					layout="horizontal"
+					size="m"
+					on="Yes"
+					off="No"
+					defaultLayout
+					name="useTotalGAPageViews"
+					id="js-useTotalGAPageViews"
 				/>
 				<CustomToggleSwitch
 					labelText="Session RPM Reports"
