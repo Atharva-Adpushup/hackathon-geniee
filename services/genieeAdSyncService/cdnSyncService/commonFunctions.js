@@ -130,7 +130,7 @@ function pushToCdnOriginQueue(fileConfig, siteId) {
 	}
 }
 
-function getQueueNameForScriptType(type, siteParams = {}) {
+function getQueueNameForScriptType(scriptType, siteParams = {}, selectiveRolloutConfig = {}) {
 	const scriptTypes = commonConsts.SCRIPT_TYPE;
 	const rabbitMqConfig = config.RABBITMQ;
 	const scriptTypeToQueueMapping = {
@@ -138,9 +138,9 @@ function getQueueNameForScriptType(type, siteParams = {}) {
 		[scriptTypes.AMP]: rabbitMqConfig.AMP_SCRIPT_SYNC,
 		[scriptTypes.ADPUSHUPJS]: rabbitMqConfig.CDN_SYNC
 	};
-	if (type === undefined) type = scriptTypes.ADPUSHUPJS;
+	if (scriptType === undefined) scriptType = scriptTypes.ADPUSHUPJS;
 	let queue = null;
-	switch (type) {
+	switch (scriptType) {
 		case scriptTypes.DVC:
 			if (siteParams.isDVCEnabled) {
 				queue = scriptTypeToQueueMapping[scriptTypes.DVC];
@@ -153,6 +153,10 @@ function getQueueNameForScriptType(type, siteParams = {}) {
 			break;
 		case scriptTypes.ADPUSHUPJS:
 			queue = scriptTypeToQueueMapping[scriptTypes.ADPUSHUPJS];
+	}
+	const selectiveRolloutQueueName = selectiveRolloutConfig.QUEUE?.name;
+	if (scriptType == scriptTypes.ADPUSHUPJS && selectiveRolloutQueueName) {
+		return selectiveRolloutQueueName;
 	}
 	return queue && queue.NAME_IN_QUEUE_PUBLISHER_SERVICE;
 }
