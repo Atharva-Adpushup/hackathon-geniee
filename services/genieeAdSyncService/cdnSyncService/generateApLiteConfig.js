@@ -24,6 +24,9 @@ const generateApLiteConfig = siteId => {
 		})
 		.then(apLiteDoc => {
 			var apLiteConfig = apLiteDoc.value;
+			if(!apLiteConfig) {
+				return false;
+			}
 
 			// Remove Inactive adUnits
 			apLiteConfig.adUnits &&

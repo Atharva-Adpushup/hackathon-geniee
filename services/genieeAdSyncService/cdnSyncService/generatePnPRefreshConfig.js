@@ -39,8 +39,10 @@ const generatePnPRefreshConfig = (siteId, adNetworkConfig, blockListedlineItems 
 			throw err;
 		})
 		.then(pnpDoc => {
-			const pnpConfig = pnpDoc.value || {};
-
+			const pnpConfig = pnpDoc.value;
+			if(!pnpConfig) {
+				return false;
+			}
 			const adUnits = pnpConfig.adUnits || [];
 			const pnpLineItems = pnpConfig.lineItems || [];
 			const houseLineItemsToReplace = adNetworkConfig && adNetworkConfig.houseLineItems || null;
