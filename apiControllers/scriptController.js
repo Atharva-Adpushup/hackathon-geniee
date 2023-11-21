@@ -421,7 +421,7 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 				// GAM 360 config
 				apConfigs.mcm = user.get('mcm') || {};
 
-				apConfigs.apLiteActive = !!apps.apLite;
+				apConfigs.apLiteActive = !!apps.apLite && apLiteConfig;
 				apConfigs.isRedefineGptOnRefreshEnabled = !!(
 					!apConfigs.apLiteActive && apConfigs.isRedefineGptOnRefreshEnabled
 				);
