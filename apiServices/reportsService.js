@@ -1,7 +1,6 @@
 const couchbase = require('couchbase');
 const axios = require('axios').default;
 const _ = require('lodash');
-const request = require('request-promise');
 const moment = require('moment');
 
 const config = require('../configs/config');
@@ -190,7 +189,7 @@ const reportsService = {
 		if (siteid.length === 0 && !isSuperUser) return Promise.resolve({});
 		return ObjectValidator(getMetaDataValidations, params)
 			.then(() => reportsService.modifyQueryIfPnp(params))
-			.then(params => getMetaInfo(params))
+			.then(modifiedParams => getMetaInfo(modifiedParams))
 			.then(async response => {
 				const { code = -1, data } = response;
 				if (code !== 1) return Promise.reject(new Error(response.data));
@@ -204,18 +203,19 @@ const reportsService = {
 		if (!regex.test(query.siteid)) {
 			throw new Error('Invalid parameter in query.siteid');
 		}
-		const siteIds = query.siteid.split(',').map(siteId => parseInt(siteId));
+		const siteIds = query.siteid.split(',').map(siteId => parseInt(siteId, 10));
 		const pnpQuery = CC.GET_ACTIVE_PNP_SITE_MAPPING_QUERY.replace('$1', JSON.stringify(siteIds));
 		const dbQuery = couchbase.N1qlQuery.fromString(pnpQuery);
 		return queryViewFromAppBucket(dbQuery)
 			.then(data => {
+				const modifiedQuery = { ...query };
 				// data is array of objects e.g.. [{mappedPnpSiteId: 41355}, {mappedPnpSiteId:41395}]
 				if (data && Array.isArray(data) && data.length) {
 					const pnpSiteIds = data.reduce((result, { pnpSiteId }) => `${pnpSiteId},${result}`, '');
 					const newSiteIds = `${pnpSiteIds}${siteIds.join(',')}`;
-					query.siteid = newSiteIds;
+					modifiedQuery.siteid = newSiteIds;
 				}
-				return query;
+				return modifiedQuery;
 			})
 			.catch(err => {
 				console.error(err);
@@ -274,11 +274,13 @@ const reportsService = {
 	getReports: async (reportConfig, email) =>
 		ObjectValidator(getCustomStatsValidations, reportConfig)
 			.then(() => reportsService.modifyQueryIfPnp(reportConfig))
-			.then(config => reportsService.processAndSendReportingData(email, config, reportConfig)),
+			.then(updatedConfig =>
+				reportsService.processAndSendReportingData(email, updatedConfig, reportConfig)
+			),
 	getReportAPCustomStatXPath: async reportConfig =>
 		ObjectValidator(getCustomStatsValidations, reportConfig)
 			.then(() => reportsService.modifyQueryIfPnp(reportConfig))
-			.then(config => reportsService.fetchReportAPCustomStatXPath(config)),
+			.then(updatedConfig => reportsService.fetchReportAPCustomStatXPath(updatedConfig)),
 	getWidgetData: async (path, params) =>
 		ObjectValidator(getWidgetDataValidations, { path, params })
 			.then(() =>
@@ -291,14 +293,14 @@ const reportsService = {
 				if (response && response.code !== 1) throw new AdPushupError(response);
 				return response.data;
 			}),
-	getReportsWithCache: async (reportConfig, bypassCache = false, email) => {
+	getReportsWithCache: async (reportConfig, skipCache = false, email) => {
 		const { siteid } = reportConfig;
+		let bypassCache = skipCache;
 		// bypass if site has blocked prefetch
-		if (siteid)
-			config.prefetchBlockedSites &&
-				config.prefetchBlockedSites.forEach(blockedSitePreFetch => {
-					if (siteid.indexOf(blockedSitePreFetch) !== -1) bypassCache = true;
-				});
+		if (siteid && config.prefetchBlockedSites)
+			config.prefetchBlockedSites.forEach(blockedSitePreFetch => {
+				if (siteid.indexOf(blockedSitePreFetch) !== -1) bypassCache = true;
+			});
 		const sortedConfig = sortObjectEntries(reportConfig);
 		return ObjectValidator(getCustomStatsValidations, sortedConfig).then(() =>
 			cacheWrapper(
@@ -323,14 +325,14 @@ const reportsService = {
 			{ cacheKey: JSON.stringify({ sites, isSuperUser }), cacheExpiry: 24 * 3600, bypassCache },
 			async () => reportsService.getReportingMetaData(sites, isSuperUser)
 		),
-	getWidgetDataWithCache: async (path, params, bypassCache = false) => {
+	getWidgetDataWithCache: async (path, params, skipCache = false) => {
 		const { siteid } = params;
+		let bypassCache = skipCache;
 		// bypass if site has blocked prefetch
-		if (siteid)
-			config.prefetchBlockedSites &&
-				config.prefetchBlockedSites.forEach(blockedSitePreFetch => {
-					if (siteid.indexOf(blockedSitePreFetch) !== -1) bypassCache = true;
-				});
+		if (siteid && config.prefetchBlockedSites)
+			config.prefetchBlockedSites.forEach(blockedSitePreFetch => {
+				if (siteid.indexOf(blockedSitePreFetch) !== -1) bypassCache = true;
+			});
 		return cacheWrapper(
 			{ cacheKey: JSON.stringify({ path, params }), cacheExpiry: 4 * 3600, bypassCache },
 			async () => reportsService.getWidgetData(path, params)
@@ -369,8 +371,9 @@ const reportsService = {
 		}
 		const userSiteIdswithEnabledGaAnalyticMap = allGaEnabledSites.reduce((mapResult, site) => {
 			const { siteId } = site;
-			mapResult[siteId] = true;
-			return mapResult;
+			const updatedMapResult = { ...mapResult };
+			updatedMapResult[siteId] = true;
+			return updatedMapResult;
 		}, {});
 		return userSiteIdswithEnabledGaAnalyticMap;
 	},
@@ -395,9 +398,9 @@ const reportsService = {
 		const gaEventType = useTotalGAPageViews ? CC.GA_EVENTS.PAGE_VIEW : CC.GA_EVENTS.AP_PAGE_VIEW;
 		return { isGaPageBeingUsed: true, gaEventType };
 	},
-	processAndSendReportingData: (email, config, reportConfig) =>
+	processAndSendReportingData: (email, updatedConfig, reportConfig) =>
 		Promise.all([
-			reportsService.fetchReports(config),
+			reportsService.fetchReports(updatedConfig),
 			reportsService.shouldUseGaPageViews(email, reportConfig)
 		]).then(async ([reports, gaConfig]) => {
 			const result = await reportsService.fetchAndMergeSessionData(
@@ -415,39 +418,51 @@ const reportsService = {
 		const { result = [], total } = reportingResult;
 		// This will store the sum of Ap page views where Ga page views is Zero
 		let sumOfApPageViewsWhereGAPageViewNotExist = 0;
-		for (let index = 0; index < result.length; index++) {
+		for (let index = 0; index < result.length; index += 1) {
 			const rowData = result[index];
 			const {
-				ga_ap_page_views: gaApPageViews = 0,
+				ga_ap_page_views: gaApPageViewEventCount = 0,
 				network_net_revenue: networkNetRevenue = 0,
-				ga_page_views: gaPageViews = 0
+				ga_page_views: gaPageViewEventCount = 0
 			} = rowData;
-			const pageViews = gaEventType === CC.GA_EVENTS.AP_PAGE_VIEW ? gaApPageViews : gaPageViews;
-			if (pageViews) {
-				rowData.adpushup_page_views = pageViews;
+			const gaPageViews =
+				gaEventType === CC.GA_EVENTS.AP_PAGE_VIEW ? gaApPageViewEventCount : gaPageViewEventCount;
+			if (gaPageViews) {
+				rowData.adpushup_page_views = gaPageViews;
 				rowData.adpushup_page_cpm = parseFloat(
-					roundOffTwoDecimal((networkNetRevenue / pageViews) * 1000)
+					roundOffTwoDecimal((networkNetRevenue / gaPageViews) * 1000)
 				);
 			} else if (total) sumOfApPageViewsWhereGAPageViewNotExist += rowData.adpushup_page_views;
 		}
 		// returning from here if result data have not total field(This happens in site filter reports in Global reports)
 		if (!total) return { ...reportingResult, result };
+		const totalWithUpdatedPageViewsAndCpm = reportsService.updateTotalPageViewsAndCpm(
+			total,
+			gaEventType,
+			sumOfApPageViewsWhereGAPageViewNotExist
+		);
+		return { ...reportingResult, result, total: totalWithUpdatedPageViewsAndCpm };
+	},
+	updateTotalPageViewsAndCpm: (total, gaEventType, sumOfApPageViewsWhereGAPageViewNotExist) => {
 		const {
-			total_ga_ap_page_views: totalGaApPageViews = 0,
-			total_ga_page_views: totalGaPageViews = 0,
+			total_ga_ap_page_views: totalGaApPageViewEventCount = 0,
+			total_ga_page_views: totalGaPageViewEventCount = 0,
 			total_network_net_revenue: totalNetworkRevenue = 0
 		} = total;
-		const totalPageViews =
-			gaEventType === CC.GA_EVENTS.AP_PAGE_VIEW ? totalGaApPageViews : totalGaPageViews;
-		if (totalPageViews) {
+		const totalGAPageViews =
+			gaEventType === CC.GA_EVENTS.AP_PAGE_VIEW
+				? totalGaApPageViewEventCount
+				: totalGaPageViewEventCount;
+		const newTotal = { ...total };
+		if (totalGAPageViews) {
 			// Here we are adding page views which are present in result but not in total data(becuase ga page views is being used here)
-			const updatedTotalGaPageViews = totalPageViews + sumOfApPageViewsWhereGAPageViewNotExist;
-			total.total_adpushup_page_views = updatedTotalGaPageViews;
-			total.total_adpushup_page_cpm = parseFloat(
+			const updatedTotalGaPageViews = totalGAPageViews + sumOfApPageViewsWhereGAPageViewNotExist;
+			newTotal.total_adpushup_page_views = updatedTotalGaPageViews;
+			newTotal.total_adpushup_page_cpm = parseFloat(
 				roundOffTwoDecimal((totalNetworkRevenue / updatedTotalGaPageViews) * 1000)
 			);
 		}
-		return { ...reportingResult, result, total };
+		return newTotal;
 	},
 	getReportData: site => {
 		const DEFAULT_DATA = {
@@ -472,7 +487,7 @@ const reportsService = {
 					const { variation_id, page_views, revenue } = variation;
 					output.variations[variation_id] = {
 						pageRevenue: parseFloat(revenue),
-						pageViews: parseInt(page_views)
+						pageViews: parseInt(page_views, 10)
 					};
 				});
 				return {
