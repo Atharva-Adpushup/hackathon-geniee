@@ -20,6 +20,7 @@ const {
 const { sendSuccessResponse, getNetworkConfig } = require('../helpers/commonFunctions');
 const logger = require('../helpers/globalBucketLogger');
 const helperUtils = require('../helpers/utils');
+const errStackParser = require('../helpers/errStackParser');
 const config = require('../configs/config');
 
 const {
@@ -349,6 +350,7 @@ router
 			.then(async () => {
 				let { originalEmail } = req.user;
 				const {
+					stackframes,
 					err,
 					info,
 					firstName,
@@ -360,9 +362,12 @@ router
 					userInput = '',
 					errorMessage
 				} = req.body;
+
+				const properErrorStack = await errStackParser.getDetailedErrorStack(stackframes);
+
 				if (!originalEmail && isSuperUser) originalEmail = email;
 				const errorInfo = _.escape(info.componentStack).replace(/\n/g, '<br>');
-				const errorStack = _.escape(err).replace(/\n/g, '<br>');
+				const errorStack = _.escape(properErrorStack).replace(/\n/g, '<br>');
 				const dateOfError = new Date().toDateString();
 				const mailAlertTemplateData = {
 					errorStack,

@@ -1,4 +1,6 @@
 import React from 'react';
+import ErrorStackParser from 'error-stack-parser';
+
 import axiosInstance from '../../helpers/axiosInstance';
 import CustomError from '../CustomError/index';
 import '../../scss/shared/_empty.scss';
@@ -25,8 +27,11 @@ class ErrorBoundary extends React.Component {
 			location: { pathname: routePath }
 		} = history;
 		const { err, info, errorMessage = '' } = this.state;
+		const errStackFrames = { stackframes: ErrorStackParser.parse(err) };
+
 		return axiosInstance
 			.post('/data/createLog', {
+				...errStackFrames,
 				err,
 				info,
 				isNotifySupportMail: false,
@@ -45,7 +50,7 @@ class ErrorBoundary extends React.Component {
 
 	componentDidCatch(err, info) {
 		console.log(err, info);
-		return this.setState({ err: err.stack, info, errorMessage: err.message }, () =>
+		return this.setState({ err, info, errorMessage: err.message }, () =>
 			this.sendErrorLog('default')
 		);
 	}

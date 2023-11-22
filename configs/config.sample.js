@@ -1,13 +1,19 @@
 const merge = require('lodash/merge');
 const selectiveRolloutConfig = require('./selectiveRollout.config');
 
+const HOST_PORT = 8080;
 const config = {
 	environment: {
 		// change to environment
-		HOST_PORT: 8080,
+		HOST_PORT,
 		HOST_ENV: 'development',
 		LOGS_DIR: 'logs',
 		OPS_HOST_PORT: 8443
+	},
+	clientErrorTrackingService: {
+		port: 3000,
+		sourceMapsURL: 'http://127.0.0.1:3000/',
+		appUrl: `http://127.0.0.1:${HOST_PORT}`
 	},
 	deployment: 'master',
 	dfpNetworkCodes: {
