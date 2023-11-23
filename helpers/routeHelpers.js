@@ -1381,5 +1381,6 @@ module.exports = {
 	getActiveProductFromCouchbase,
 	addActiveProductsToMeta,
 	getGlobalClientConfig,
-	isVideoAdsDashboardEnabled
+	isVideoAdsDashboardEnabled,
+	sendDataToElasticService
 };

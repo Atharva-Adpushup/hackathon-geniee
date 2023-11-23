@@ -8,6 +8,9 @@ const {
 		ADSENSE_AD_SYNC_CONSUMER,
 		CDN_SYNC_CONSUMER,
 		GENIEE_ADPUSHUP
+	}, 
+	SERVICE_NAMES: {
+		GENIEE_AD_SYNC_SERVICE
 	}
 } = require('../../../../../configs/commonConsts');
 const commonConsts = require('../../../../../configs/commonConsts');
@@ -16,7 +19,8 @@ const { sendEmail } = require('../../../../../helpers/queueMailer');
 const {
 	filterFalsyObjectKeys,
 	isMasterDeployment,
-	isFeatureDeployment
+	isFeatureDeployment,
+	getAccessTokenForSiteSyncingService
 } = require('../../../../../helpers/commonFunctions');
 
 axiosRetry(axios, {
@@ -150,62 +154,63 @@ module.exports = {
 
 		return selectiveCdnSyncQueueConfig;
 	},
-	redirectToSelectiveConsole: function(selectiveRolloutFeatureConfig, siteId, queryParams) {
+	handleError: function (siteId, feature, errorMessage) {
+		return sendEmail({
+			queue: commonConsts.QUEUE_NAMES.MAILER,
+			data: {
+				to: config.SITE_SYNC_ERROR_ALERT_REPORTER,
+				subject: `Can not redirect site sync request for ${feature} - [${config.deployment}]`,
+				body: `<h3>SiteId: ${siteId}</h3> ${errorMessage}`
+			}
+		}).then(() => `${commonConsts.SITE_SYNCING_ERROR_MESSAGE} - ${errorMessage} - ${siteId}`)
+	},
+	redirectToSelectiveConsole: async function (selectiveRolloutFeatureConfig, siteId, queryParams) {
 		const validQueryParams = filterFalsyObjectKeys(queryParams);
-
 		const {
 			instance: { host },
 			feature
 		} = selectiveRolloutFeatureConfig;
 
+		const accessToken = await getAccessTokenForSiteSyncingService(host);
+		if (!accessToken) {
+			const errorMessage = "Unable to fectch access token!"
+			return this.handleError(siteId, feature, errorMessage);
+		}
 		const requestConfig = {
 			method: 'get',
-			url: `${host}/api/utils/syncCdn`,
-			params: { ...validQueryParams, sites: siteId }
+			url: `${host}/api/sync/syncCdn`,
+			params: { ...validQueryParams, sites: siteId, service: GENIEE_AD_SYNC_SERVICE },
+			headers: {
+				authorization: accessToken
+			}
 		};
 
 		return axios(requestConfig)
 			.then(() => `Triggered selective rollout site sync - ${siteId}`)
-			.catch(err =>
-				sendEmail({
-					queue: commonConsts.QUEUE_NAMES.MAILER,
-					data: {
-						to: config.SITE_SYNC_ERROR_ALERT_REPORTER,
-						subject: `Can not redirect site sync request for ${feature} - [${config.deployment}]`,
-						body: `
-					<h3>SiteId: ${siteId}</h3>
-					${err.toString()}
-				`
-					}
-				}).then(() => `${commonConsts.SITE_SYNCING_ERROR_MESSAGE} - ${err.toString()} - ${siteId}`)
-			);
-	},
-	redirectSyncToMasterConsole: function(siteId, queryParams) {
-		const validQueryParams = filterFalsyObjectKeys(queryParams);
+			.catch(err => this.handleError(siteId, feature, err.toString()));
 
+	},
+	redirectSyncToMasterConsole: async function (siteId, queryParams) {
+		const validQueryParams = filterFalsyObjectKeys(queryParams);
+		const accessToken = await getAccessTokenForSiteSyncingService(commonConsts.MASTER_CONSOLE_URL);
+		if (!accessToken) {
+			const errorMessage = "Unable to fectch access token!"
+			return this.handleError(siteId, feature, errorMessage);
+		}
 		const requestConfig = {
 			method: 'get',
-			url: `${commonConsts.MASTER_CONSOLE_URL}/api/utils/syncCdn`,
-			params: { ...validQueryParams, sites: siteId }
+			url: `${commonConsts.MASTER_CONSOLE_URL}/api/sync/syncCdn`,
+			params: { ...validQueryParams, sites: siteId, service: GENIEE_AD_SYNC_SERVICE },
+			headers: {
+				'authorization': accessToken
+			}
 		};
 
 		return axios(requestConfig)
 			.then(() => `Redirected site sync to master console - ${siteId}`)
-			.catch(err =>
-				sendEmail({
-					queue: commonConsts.QUEUE_NAMES.MAILER,
-					data: {
-						to: config.SITE_SYNC_ERROR_ALERT_REPORTER,
-						subject: `Can not redirect site sync request to master console for ${siteId} - [${config.deployment}]`,
-						body: `
-				<h3>SiteId: ${siteId}</h3>
-				${err.toString()}
-			`
-					}
-				}).then(() => `${err.toString()} - ${siteId}`)
-			);
+			.catch(err => this.handleError(siteId, feature, err.toString()));
 	},
-	isConsoleSelectivelyRolledOut: function(selectiveRolloutFeatureConfig) {
+	isConsoleSelectivelyRolledOut: function (selectiveRolloutFeatureConfig) {
 		const dependencies = selectiveRolloutFeatureConfig?.dependencies;
 		const isConsoleSelectivelyRolledOut =
 			dependencies && dependencies[GENIEE_ADPUSHUP]?.selectivelyRolledOut;

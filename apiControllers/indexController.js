@@ -5,12 +5,15 @@ const md5 = require('md5');
 const _ = require('lodash');
 const { promiseForeach } = require('node-utils');
 const request = require('request-promise');
+const jwt = require('jsonwebtoken')
 
 const userModel = require('../models/userModel');
 const siteModel = require('../models/siteModel');
 const consts = require('../configs/commonConsts');
 const utils = require('../helpers/utils');
-
+const {
+	jwt: { refreshTokenConfig }
+} = require('../configs/config');
 const authToken = require('../helpers/authToken');
 const httpStatus = require('../configs/httpStatusConsts');
 const formValidator = require('../helpers/FormValidator');
@@ -325,6 +328,7 @@ router
 						if (userPasswordMatch) {
 							const isSuperUser = user.get('isAdmin') === true;
 							const token = authToken.getAuthToken({ email, isSuperUser, loginTime: Date.now() });
+							const refreshToken = authToken.generateRefreshToken({ email, isSuperUser });
 
 							res
 								.status(httpStatus.OK)
@@ -338,7 +342,8 @@ router
 								)
 								.json({
 									success: 'logged in successfully',
-									authToken: token
+									authToken: token,
+									refreshToken
 								});
 						} else {
 							res
@@ -356,6 +361,28 @@ router
 			.catch(err => {
 				res.status(httpStatus.BAD_REQUEST).json({ error: err.message });
 			});
+	})
+	.get('/getAccessToken', (req, res) => {
+		const refreshToken = req.headers.authorization;
+		if (!refreshToken) {
+			return res.status(httpStatus.UNAUTHORIZED).json({ error: "Pass refresh token in header to generate access token!" });
+		}
+		const { salt } = refreshTokenConfig;
+		jwt.verify(refreshToken, salt, (err, decodedData) => {
+			if (err) {
+				return res.status(httpStatus.FORBIDDEN).json({ error: "Invalid refresh token passed!" });
+			}
+			const isSuperUser = decodedData.isSuperUser;
+			const email = decodedData.email;
+			const loginTime = Date.now();
+			const token = authToken.getAuthToken({ email, isSuperUser, loginTime });
+			return res.status(httpStatus.OK)
+				.json({
+					success: "Successfully generated access token.",
+					token
+				})
+
+		})
 	})
 	.post('/forgotPassword', (req, res) => {
 		userModel

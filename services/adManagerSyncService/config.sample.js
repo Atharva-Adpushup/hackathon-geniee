@@ -44,8 +44,8 @@ module.exports = {
 	},
 	geniee: {
 		endpoint: 'http://localhost:8080/',
-		GAMSiteSync: 'api/utils/syncGAMSites',
-		siteSync: 'api/utils/syncCDN'
+		GAMSiteSync: 'api/sync/syncGAMSites',
+		siteSync: 'api/sync/syncCDN'
 	},
 	fallbackLineItemsUpdateHours : 48
 };

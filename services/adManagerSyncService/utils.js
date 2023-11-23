@@ -2,9 +2,11 @@ const axios = require('axios');
 const { geniee } = require('./config');
 const config = require('../../configs/config');
 const helperUtils = require('../../helpers/utils');
-
+const { SERVICE_NAMES: {
+	AD_MANAGER_SYNC_SERVICE
+} } = require('../../configs/commonConsts');
 const isNotProduction = config.environment.HOST_ENV !== 'production';
-
+const { getAccessTokenForSiteSyncingService } = require('../../helpers/commonFunctions');
 function updatedTypeUsedOnSite(siteobject) {
 	let updatedTypes = this;
 	if (!siteobject.lineItemTypes) {
@@ -13,16 +15,18 @@ function updatedTypeUsedOnSite(siteobject) {
 	return siteobject.lineItemTypes.some(lineItemType => updatedTypes.indexOf(lineItemType) !== -1);
 }
 
-async function syncSites(siteList, networkCode) {
+async function syncSites(siteList, networkCode, accessToken) {
 	const sites = siteList.join(',');
 	const requestSettings = {
 		method: 'GET',
 		url: geniee.endpoint + geniee.siteSync,
 		headers: {
-			'Content-Type': 'application/json; charset=utf-8'
+			'Content-Type': 'application/json; charset=utf-8',
+			'authorization': accessToken
 		},
 		params: {
-			sites
+			sites,
+			service: AD_MANAGER_SYNC_SERVICE
 		}
 	};
 
@@ -67,29 +71,40 @@ module.exports = {
 		if (!sitesToSync.length) {
 			return;
 		}
-		await syncSites(sitesToSync, networkCode);
+		const accessToken = await getAccessTokenForSiteSyncingService(geniee.endpoint);
+		if (!accessToken) {
+			const errorMessage = 'Access token could not be fetched!';
+			return { error: `failed to sync sites for GAM ${networkCode}: ${errorMessage}` };
+		}
+		await syncSites(sitesToSync, networkCode, accessToken);
 		this.logToEvLogger({
 			message: `Syncing site as type line Items updated: ${updatedTypes} for GAM ${networkCode}`,
 			details: `sites = ${sitesToSync}`
 		});
 	},
-	syncAllGAMSites: async function(networkCode, reason) {
-		const requestSettings = {
-			method: 'GET',
-			url: geniee.endpoint + geniee.GAMSiteSync,
-			headers: {
-				'Content-Type': 'application/json; charset=utf-8'
-			},
-			params: {
-				networkCode: networkCode
-			}
-		};
+	syncAllGAMSites: async function (networkCode, reason) {
+		const accessToken = await getAccessTokenForSiteSyncingService(geniee.endpoint);
+		if (!accessToken) {
+			const errorMessage = 'Access token could not be fetched!';
+			return { error: `failed to sync sites for GAM ${networkCode}: ${errorMessage}` };
+		}
 
-		await axios(requestSettings)
+		const params = {
+			networkCode,
+			service: AD_MANAGER_SYNC_SERVICE
+		};
+		const headers = {
+			'authorization': accessToken
+		};
+		const syncGamSitesEndpoint = `${geniee.endpoint}${geniee.GAMSiteSync}`;
+		axios.get(syncGamSitesEndpoint, {
+			headers, params
+		})
 			.then(console.log(`sent request for syncing all connected sites for GAM: ${networkCode}`))
-			.catch(error => {
-				return { error: `failed to sync sites for GAM ${networkCode}: ${error}` };
-			});
+			.catch((err) => {
+				return { error: `failed to sync sites for GAM ${networkCode}: ${err}` };
+			}
+			);
 		this.logToEvLogger({
 			message: `Syncing all GAM sites for ${networkCode} as ${reason} line Items updated`,
 			details: `${reason} line Items updated`
