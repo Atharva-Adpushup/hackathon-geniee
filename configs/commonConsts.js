@@ -1542,5 +1542,9 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 	GA_EVENTS: {
 		PAGE_VIEW: 'page_view',
 		AP_PAGE_VIEW: 'ap_page_view'
+	},
+	SERVICES_FOR_KIBANA_LOGS: {
+		'GENIEE_AUDIT_LOG_SERVICE': 'genieeAuditLog',
+		'SITE_SYNC_SERVICE': 'siteSyncCdn'
 	}
 };

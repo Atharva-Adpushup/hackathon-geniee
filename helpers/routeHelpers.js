@@ -10,6 +10,7 @@ const couchbase = require('../helpers/couchBaseService');
 const { N1qlQuery } = couchbaseModule;
 
 const config = require('../configs/config');
+const { SERVICES_FOR_KIBANA_LOGS } = require('../configs/commonConsts');
 const siteModel = require('../models/siteModel');
 const HTTP_STATUS = require('../configs/httpStatusConsts');
 const adpushup = require('./adpushupEvent');
@@ -116,23 +117,31 @@ function emitEventAndSendResponse(siteId, res, data = {}) {
 		);
 	});
 }
-function sendDataToAuditLogService(data) {
-	const { prevConfig, currentConfig, action = {}, ...restLogData } = data;
-	const delta = jsondiffpatch.diff(prevConfig, currentConfig) || {};
+function getSuffixForGenieeAuditLogIndex(deployment) {
+	const today = new Date();
+	const monthAbbreviations = new Intl.DateTimeFormat('en-US', {
+		month: 'short'
+	});
+	const formattedMonth = monthAbbreviations.format(today).toLowerCase();
+	const fullYear = today.getFullYear();
+	const suffix = `${fullYear}-${formattedMonth}`;
+	return deployment ? `${deployment}-${suffix}` : suffix;
+}
 
+function sendDataToElasticService(data, service, suffix = null) {
+	const payload = data;
+	payload.timestamp = Date.now();
+	if (!isMasterDeployment()) {
+		payload.deployment = config.deployment;
+	}
 	const body = {
-		...restLogData,
-		prevConfig,
-		logData: {
-			delta,
-			action
-		}
+		service,
+		payload
 	};
 
-	if (!isMasterDeployment()) {
-		body.deployment = config.deployment;
+	if (suffix) {
+		body.suffix = suffix;
 	}
-
 	// don't need to send current config to elastic service
 	const options = {
 		method: 'POST',
@@ -144,6 +153,21 @@ function sendDataToAuditLogService(data) {
 	return request(options)
 		.then(() => console.log('Audit Logs saved'))
 		.catch(err => console.log('Audit Logs failed', err));
+}
+
+function sendDataToAuditLogService(data) {
+	const { prevConfig, currentConfig, action = {}, ...restLogData } = data;
+	const delta = jsondiffpatch.diff(prevConfig, currentConfig) || {};
+	const service = SERVICES_FOR_KIBANA_LOGS.GENIEE_AUDIT_LOG_SERVICE;
+	const payload = {
+		...restLogData,
+		prevConfig: JSON.stringify(prevConfig),
+		delta: JSON.stringify(delta),
+		action
+	};
+
+	const suffix = getSuffixForGenieeAuditLogIndex(config.deployment);
+	sendDataToElasticService(payload, service, suffix);
 }
 
 function fetchAds(req, res, docKey) {
