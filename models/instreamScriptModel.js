@@ -3,7 +3,15 @@ module.exports = apiModule();
 const model = require('../helpers/model');
 const couchbase = require('../helpers/couchBaseService');
 const AdPushupError = require('../helpers/AdPushupError');
-const { docKeys, COUCHBASE_BUCKETS, site } = require('../configs/commonConsts');
+const {
+	docKeys,
+	COUCHBASE_BUCKETS,
+	site,
+	FRAMERATE_COMPANION,
+	DATABASE_SUCCESS_RESPONSE_MESSAGES
+} = require('../configs/commonConsts');
+
+const { INTERNAL_SERVER_ERROR } = require('../configs/httpStatusConsts');
 
 const InstreamScript = model.extend(function() {
 	this.keys = ['siteId', 'siteDomain', 'mcmId', 'videoPlayerId', 'prebid', 'ads', 'dateCreated'];
@@ -47,6 +55,16 @@ function createBvsObjectIfNotPresent(existingAd) {
 		existingAd.featuresData.bannerReplacementConfig = {
 			platforms: {}
 		};
+	}
+	return existingAd;
+}
+
+function createCompanionObjectIfNotPresent(existingAd) {
+	if (!existingAd.networkData) {
+		existingAd.networkData = {};
+	}
+	if (!existingAd.networkData.apCompanionAds) {
+		existingAd.networkData.apCompanionAds = {};
 	}
 	return existingAd;
 }
@@ -95,9 +113,45 @@ function updateBannerReplacementConfigObject(existingConfig, options) {
 		return existingAd;
 	});
 
-	instreamAppBucket.upsertAsync(configKey, existingConfig, { cas: existingConfig.cas });
+	return instreamAppBucket.upsertAsync(configKey, existingConfig, { cas: existingConfig.cas });
+}
 
-	return { success: false, message: 'Key already present, configuration not updated' };
+function updateFramrateCompanionConfigObject(existingConfig = {}, options = {}) {
+	const { framerateSectionId, ad, key, apTagSectionId, instreamAppBucket, configKey } = options;
+
+	if (!existingConfig.ads) {
+		return;
+	}
+	existingConfig.ads = modifyCompanionConfigObject(existingConfig, {
+		framerateSectionId,
+		ad,
+		key,
+		apTagSectionId
+	});
+
+	return instreamAppBucket.upsertAsync(configKey, existingConfig, { cas: existingConfig.cas });
+}
+
+function modifyCompanionConfigObject(existingConfig, options) {
+	const { framerateSectionId, ad, key, apTagSectionId } = options;
+
+	const ads = existingConfig.ads.map(existingAd => {
+		if (existingAd.videoSectionId === framerateSectionId) {
+			const { platform } = ad.formatData;
+			if (!platform) {
+				return existingAd;
+			}
+			const upperCasePlatform = platform.toUpperCase();
+			existingAd = createCompanionObjectIfNotPresent(existingAd); // creating companion object if it is not present in the instream config.
+			const apCompanionAds = existingAd.networkData.apCompanionAds;
+			if (!apCompanionAds[upperCasePlatform]) {
+				apCompanionAds[upperCasePlatform] = {};
+			}
+			apCompanionAds[upperCasePlatform][key] = apTagSectionId;
+		}
+		return existingAd;
+	});
+	return ads;
 }
 
 function getKeyForInstreamConfig(platform, responsivePlatform) {
@@ -134,7 +188,12 @@ function apiModule() {
 			const key = getKeyForInstreamConfig(platform, responsivePlatform);
 			return addAptagSectionToInstreamConfig(configParams, key, ad);
 		},
-		addAptagSectionToInstreamConfig: addAptagSectionToInstreamConfig
+		updateFramerateCompanionConfig(companionParams, ad) {
+			const key = FRAMERATE_COMPANION.SECTION_KEY;
+			return addAptagSectionToFramerateConfig(companionParams, key, ad);
+		},
+		addAptagSectionToInstreamConfig,
+		addAptagSectionToFramerateConfig
 	};
 
 	function addAptagSectionToInstreamConfig(configParams, key, ad) {
@@ -157,10 +216,45 @@ function apiModule() {
 					configKey
 				})
 			)
+			.then(result => {
+				console.log(DATABASE_SUCCESS_RESPONSE_MESSAGES.CONFIG_UPDATED, result);
+			})
 			.catch(error => {
 				console.error('Error:', error);
 				throw new AdPushupError({
-					status: 500,
+					status: INTERNAL_SERVER_ERROR,
+					message: `Failed to update Instream Script Config: ${error.message}`
+				});
+			});
+	}
+
+	function addAptagSectionToFramerateConfig(configParams, key, ad) {
+		const { siteId, framerateSectionId, apTagSectionId } = configParams;
+		const configKey = `${docKeys.instreamScript}${siteId}`;
+		let instreamAppBucket;
+
+		return connectToInstreamAppBucket()
+			.then(bucket => {
+				instreamAppBucket = bucket;
+				return fetchDocument(instreamAppBucket, configKey);
+			})
+			.then(doc =>
+				updateFramrateCompanionConfigObject(doc.value, {
+					framerateSectionId,
+					ad,
+					key,
+					apTagSectionId,
+					instreamAppBucket,
+					configKey
+				})
+			)
+			.then(result => {
+				console.log(DATABASE_SUCCESS_RESPONSE_MESSAGES.CONFIG_UPDATED, result);
+			})
+			.catch(error => {
+				console.error('Error:', error);
+				throw new AdPushupError({
+					status: INTERNAL_SERVER_ERROR,
 					message: `Failed to update Instream Script Config: ${error.message}`
 				});
 			});
