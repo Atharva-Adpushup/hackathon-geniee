@@ -90,21 +90,19 @@ Router.get('/:siteId/ampDeliveryViaCreativeConfig', (req, res) => {
 			const apps = site.get('apps');
 			apps.pnp = false;
 			apps.apLite = false;
-
+			const siteApConfigs = site.get('apConfigs') || {};
 			const isAmpPnpEnabled = !!apps.ampPnp;
-			const isAutoOptimise = !!(site.get('apConfigs') && site.get('apConfigs').autoOptimise);
-			const poweredByBanner = site.get('apConfigs') && site.get('apConfigs').poweredByBanner;
+			const isAutoOptimise = !!siteApConfigs.autoOptimise;
+			const { poweredByBanner, ppidActive } = siteApConfigs;
 			const revenueShare =
 				site.get('adNetworkSettings') && site.get('adNetworkSettings').revenueShare;
-			const shouldDeductApShareFromHb =
-				site.get('apConfigs') && site.get('apConfigs').shouldDeductApShareFromHb && !!revenueShare;
-			const gptSraDisabled = !!(site.get('apConfigs') && site.get('apConfigs').gptSraDisabled);
+			const shouldDeductApShareFromHb = siteApConfigs.shouldDeductApShareFromHb && !!revenueShare;
+			const gptSraDisabled = !!siteApConfigs.gptSraDisabled;
 			const lineItemTypes = site.get('lineItemTypes') || [];
-
 			const setAllConfigs = function(prebidAndAdsConfig) {
 				const apConfigs = {
 					...defaultApConfigValues,
-					...site.get('apConfigs')
+					...siteApConfigs
 				};
 
 				const isAdPartner = !!site.get('partner');
@@ -150,6 +148,8 @@ Router.get('/:siteId/ampDeliveryViaCreativeConfig', (req, res) => {
 						(adNetworkConfig && adNetworkConfig.separatelyGroupedLineItems) || [];
 				}
 				apConfigs.isSelectiveRolloutEnabled = apConfigs.isAmpDvcSelectiveRolloutEnabled || false;
+				apConfigs.ppidActive = !!ppidActive;
+
 				apConfigs.autoOptimise = !!isAutoOptimise;
 				apConfigs.poweredByBanner = poweredByBanner;
 				if (shouldDeductApShareFromHb) {

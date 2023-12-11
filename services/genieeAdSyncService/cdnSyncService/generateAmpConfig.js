@@ -182,8 +182,9 @@ function init(site, computedConfig) {
 	const { apConfigs, prebidConfig, apLiteConfig, pnpConfig } = computedConfig;
 	let statusesAndAds = {
 		statuses: {
-			APTAG_ACTIVE: !!apConfigs.manualModeActive,
+			APTAG_ACTIVE: !!apConfigs.manualModeActive,			
 			INNOVATIVE_ADS_ACTIVE: !!apConfigs.innovativeModeActive,
+			PPID_ACTIVE: !!apConfigs.ppidActive,
 			LAYOUT_ACTIVE: !(apps && apps.apLite) && !!apConfigs.mode,
 			ADPTAG_ACTIVE: !!prebidConfig,
 			SPA_ACTIVE: !!apConfigs.isSPA,
