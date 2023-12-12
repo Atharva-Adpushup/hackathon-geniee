@@ -125,15 +125,13 @@ function getSuffixForGenieeAuditLogIndex(deployment) {
 	const formattedMonth = monthAbbreviations.format(today).toLowerCase();
 	const fullYear = today.getFullYear();
 	const suffix = `${fullYear}-${formattedMonth}`;
-	return deployment ? `${deployment}-${suffix}` : suffix;
+	return isMasterDeployment() ? suffix : `${deployment}-${suffix}`;
 }
 
 function sendDataToElasticService(data, service, suffix = null) {
 	const payload = data;
 	payload.timestamp = Date.now();
-	if (!isMasterDeployment()) {
-		payload.deployment = config.deployment;
-	}
+	payload.deployment = config.deployment;
 	const body = {
 		service,
 		payload
