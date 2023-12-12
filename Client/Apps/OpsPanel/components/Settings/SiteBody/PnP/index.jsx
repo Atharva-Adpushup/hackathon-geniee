@@ -147,7 +147,7 @@ const PnP = (props = {}) => {
 			})
 			.catch(err => {
 				// eslint-disable-next-line
-				console.log({ err })
+				console.log({ err });
 			})
 			.finally(() => setIsLoading(false));
 	}, [siteId, updatePnPConfig]);
@@ -232,18 +232,13 @@ const PnP = (props = {}) => {
 
 	const onSelectDropDown = value => {
 		setSelectedAdUnitOperation(value);
+		setAdUnitsFileName('');
 	};
 
 	const validateUploadedAdUnits = useCallback(
 		(units = []) => {
 			let areUnitsValid = true;
-			const uniqueUnitsMap = adUnits.reduce(
-				(result, unit) => ({
-					...result,
-					[`${unit.code}-${unit.platform}`]: true
-				}),
-				{}
-			); // creating a map of existing units;
+			const existingUnitKeys = new Set(adUnits.map(unit => `${unit.code}-${unit.platform}`)); // creating a set of existing units;
 
 			units.forEach(unit => {
 				if (!unit.code) {
@@ -291,7 +286,11 @@ const PnP = (props = {}) => {
 				const size = `${unit.width}x${unit.height}`;
 				const unitUniqueKey = `${unit.code}-${unit.platform}`;
 
-				if (uniqueUnitsMap[unitUniqueKey]) {
+				// This condition will be checked in case of Append only , as in case of Replace we don't have to check duplicate adunit code
+				if (
+					selectedAdUnitOperation === PNP_AD_UNIT_OPERATIONS[0].value &&
+					existingUnitKeys.has(unitUniqueKey)
+				) {
 					areUnitsValid = false;
 					showNotification({
 						mode: 'error',
@@ -301,8 +300,7 @@ const PnP = (props = {}) => {
 					});
 					return;
 				}
-
-				uniqueUnitsMap[unitUniqueKey] = true;
+				existingUnitKeys.add(unitUniqueKey);
 
 				const availableSizesForPlatform =
 					unit.platform.toUpperCase() === 'TABLET'
@@ -321,7 +319,7 @@ const PnP = (props = {}) => {
 			});
 			return areUnitsValid;
 		},
-		[adUnits, showNotification]
+		[adUnits, showNotification, selectedAdUnitOperation]
 	);
 
 	const processAdUnits = useCallback(
