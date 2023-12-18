@@ -5,13 +5,21 @@ const REDIS_PORT = config.redisEnvironment.AZURE_CACHE_FOR_REDIS_PORT;
 const REDIS_HOST = config.redisEnvironment.AZURE_CACHE_FOR_REDIS_HOST_NAME;
 const REDIS_PASSWORD = config.redisEnvironment.AZURE_CACHE_FOR_REDIS_ACCESS_KEY;
 
-const redisClient = redis.createClient({
-	url: `rediss://${REDIS_HOST}:${REDIS_PORT}`,
-	password: REDIS_PASSWORD,
-	socket: {
-		connectTimeout: 60 * 1000
+function getRedisClient() {
+	if (config.redisEnvironment.shouldUseRedisDefaultConfig) {
+		return redis.createClient();
 	}
-});
+
+	return redis.createClient({
+		url: `rediss://${REDIS_HOST}:${REDIS_PORT}`,
+		password: REDIS_PASSWORD,
+		socket: {
+			connectTimeout: 60 * 1000
+		}
+	});
+}
+
+const redisClient = getRedisClient();
 
 redisClient
 	.on('connect', () => {
@@ -24,7 +32,7 @@ redisClient
 		console.log('Redis is ready');
 	});
 
-if (config.environment.HOST_ENV === 'production') {
+if (config.redisEnvironment.shouldUseRedis) {
 	redisClient.connect();
 }
 
@@ -72,7 +80,9 @@ const API = {
 				return reject(err);
 			}
 		}),
-	getClient: () => redisClient
+	getClient: () => redisClient,
+	delete: keys => redisClient.DEL(keys),
+	keys: pattern => redisClient.keys(pattern)
 };
 
 module.exports = API;

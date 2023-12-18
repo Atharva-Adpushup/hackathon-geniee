@@ -68,7 +68,9 @@ const config = {
 	redisEnvironment: {
 		AZURE_CACHE_FOR_REDIS_PORT: 6380,
 		AZURE_CACHE_FOR_REDIS_HOST_NAME: '...',
-		AZURE_CACHE_FOR_REDIS_ACCESS_KEY: '...'
+		AZURE_CACHE_FOR_REDIS_ACCESS_KEY: '...',
+		shouldUseRedis: true,
+		shouldUseRedisDefaultConfig: false
 	},
 	couchBase: {
 		HOST: '127.0.0.1',
@@ -243,7 +245,7 @@ const config = {
 			}
 		},
 		CDN_SYNC: {
-			NAME_IN_QUEUE_PUBLISHER_SERVICE: "CDN_SYNC",
+			NAME_IN_QUEUE_PUBLISHER_SERVICE: 'CDN_SYNC',
 			EXCHANGE: {
 				name: 'consoleCdnSync',
 				type: 'direct',
@@ -300,7 +302,7 @@ const config = {
 			}
 		},
 		AMP_SCRIPT_SYNC: {
-			NAME_IN_QUEUE_PUBLISHER_SERVICE: "AMP_SCRIPT_SYNC",
+			NAME_IN_QUEUE_PUBLISHER_SERVICE: 'AMP_SCRIPT_SYNC',
 			EXCHANGE: {
 				name: 'ampScriptSync',
 				type: 'direct',
