@@ -1,6 +1,7 @@
 /* eslint-disable func-names */
 const express = require('express');
 const Promise = require('bluebird');
+const _ = require('lodash');
 
 const UserModel = require('../models/userModel');
 const SiteModel = require('../models/siteModel');
@@ -73,6 +74,33 @@ const getVacantAdSpaceProperties = function getVacantAdSpacePropertiesForSite(ap
 	return { isVacantAdSpaceEnabled, vacantFeatureSplit };
 };
 
+/**
+ * To extract mcm configs from site doc or user doc
+ * @param {Object} apConfigs
+ * @param {UserModel} user
+ * @returns {Object} mcm
+ */
+const getMcmConfig = function getMcmConfigForSite(apConfigs, user) {
+	const { siteLevelMcm = {} } = apConfigs;
+	const { isSiteLevelMcmEnabled = false } = siteLevelMcm;
+	if (isSiteLevelMcmEnabled) {
+		return siteLevelMcm;
+	}
+	return user.get('mcm') || {};
+};
+
+/**
+ * To delete any unnecessary properties from apConfigs.
+ * @param {Object} apConfigs
+ * @returns deeply cloned and cleaned apConfigs
+ */
+const cleanupApConfig = function(apConfigs) {
+	const configs = _.cloneDeep(apConfigs);
+	delete configs.siteLevelMcm;
+	delete configs.mcm.isSiteLevelMcmEnabled;
+	return configs;
+};
+
 Router.get('/:siteId/ampDeliveryViaCreativeConfig', (req, res) => {
 	/**
 	 * this route will be used by AmpDeliveryViaCreative repo
@@ -100,7 +128,7 @@ Router.get('/:siteId/ampDeliveryViaCreativeConfig', (req, res) => {
 			const gptSraDisabled = !!siteApConfigs.gptSraDisabled;
 			const lineItemTypes = site.get('lineItemTypes') || [];
 			const setAllConfigs = function(prebidAndAdsConfig) {
-				const apConfigs = {
+				let apConfigs = {
 					...defaultApConfigValues,
 					...siteApConfigs
 				};
@@ -169,7 +197,7 @@ Router.get('/:siteId/ampDeliveryViaCreativeConfig', (req, res) => {
 					: 0;
 				apConfigs.activeDFPNetwork = getActiveDfpNetworkCode(user);
 				// GAM 360 config
-				apConfigs.mcm = user.get('mcm') || {};
+				apConfigs.mcm = getMcmConfig(apConfigs, user);
 
 				apConfigs.apLiteActive = !!apps.apLite;
 				apConfigs.ampPnpActive = !!apps.ampPnp;
@@ -205,6 +233,7 @@ Router.get('/:siteId/ampDeliveryViaCreativeConfig', (req, res) => {
 				}
 
 				delete apConfigs.pageGroupPattern;
+				apConfigs = cleanupApConfig(apConfigs);
 
 				const output = { apConfigs, prebidConfig };
 				if (apps.apLite) output.apLiteConfig = apLiteConfig;
@@ -351,7 +380,7 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 
 			const setAllConfigs = async function(prebidAndAdsConfig) {
 				const dbApConfigProps = site.get('apConfigs');
-				const apConfigs = {
+				let apConfigs = {
 					...defaultApConfigValues,
 					...dbApConfigProps,
 					...getVacantAdSpaceProperties(dbApConfigProps)
@@ -419,7 +448,7 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 				apConfigs.activeDFPNetwork = getActiveDfpNetworkCode(user);
 
 				// GAM 360 config
-				apConfigs.mcm = user.get('mcm') || {};
+				apConfigs.mcm = getMcmConfig(apConfigs, user);
 
 				apConfigs.apLiteActive = !!apps.apLite && apLiteConfig;
 				apConfigs.isRedefineGptOnRefreshEnabled = !!(
@@ -466,6 +495,8 @@ Router.get('/:siteId/siteConfig', (req, res) => {
 						return true;
 					});
 				});
+
+				apConfigs = cleanupApConfig(apConfigs);
 
 				const output = { apConfigs, prebidConfig };
 				if (apps.apLite) output.apLiteConfig = apLiteConfig;
@@ -616,7 +647,7 @@ Router.get('/:siteId/ampSiteConfig', (req, res) => {
 			const generateApConfig = function(prebidAndAdsConfig) {
 				// TODO: rj: to check hb status
 				const apps = site.get('apps');
-				const apConfigs = site.get('apConfigs');
+				let apConfigs = site.get('apConfigs');
 
 				const {
 					prebidConfig,
@@ -642,7 +673,7 @@ Router.get('/:siteId/ampSiteConfig', (req, res) => {
 					CC.OUTBRAIN_DISABLED_SCRIPTS.AMP_TYPE_ADPUSHUP
 				);
 				// GAM 360 config
-				apConfigs.mcm = user.get('mcm') || {};
+				apConfigs.mcm = getMcmConfig(apConfigs, user);
 
 				// eslint-disable-next-line prefer-destructuring
 				apConfigs.manualAds = adpushupAdsConfig[2]; // Returns manaul ads at second index
@@ -661,6 +692,8 @@ Router.get('/:siteId/ampSiteConfig', (req, res) => {
 					delete prebidConfig.email;
 					apConfigs.hbConfig = prebidConfig;
 				}
+
+				apConfigs = cleanupApConfig(apConfigs);
 
 				return apConfigs;
 			};
