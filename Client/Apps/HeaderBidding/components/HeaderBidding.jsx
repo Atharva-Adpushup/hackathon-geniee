@@ -10,6 +10,7 @@ import InventoryTab from './InventoryTab';
 import PrebidSettingsTab from './PrebidSettingsTab';
 import OptimizationTab from './OptimizationTab';
 import AmazonUAMTab from './AmazonUAMTab';
+import HBApprovalTab from './HBApprovalTab';
 import CustomButton from '../../../Components/CustomButton';
 import config from '../../../config/config';
 import history from '../../../helpers/history';
@@ -204,6 +205,9 @@ class HeaderBidding extends React.Component {
 				// if (!biddersFound) return false;
 				redirectUrl = `${computedRedirectUrl}/${NAV_ITEMS_INDEXES.TAB_6}`;
 				break;
+			case 7:
+				redirectUrl = `${computedRedirectUrl}/${NAV_ITEMS_INDEXES.TAB_7}`;
+				break;
 
 			default:
 				break;
@@ -246,7 +250,7 @@ class HeaderBidding extends React.Component {
 
 		function getContent() {
 			switch (activeTab) {
-				case 'setup':
+				case NAV_ITEMS_INDEXES.TAB_1:
 					return (
 						<Setup
 							siteId={siteId}
@@ -258,7 +262,7 @@ class HeaderBidding extends React.Component {
 							showNotification={showNotification}
 						/>
 					);
-				case 'bidders':
+				case NAV_ITEMS_INDEXES.TAB_2:
 					return (
 						<BiddersTab
 							user={user}
@@ -275,7 +279,7 @@ class HeaderBidding extends React.Component {
 							activeAdUnitSizes={activeAdUnitSizes}
 						/>
 					);
-				case 'inventory':
+				case NAV_ITEMS_INDEXES.TAB_3:
 					return (
 						<InventoryTab
 							user={user}
@@ -287,7 +291,7 @@ class HeaderBidding extends React.Component {
 							setUnsavedChangesAction={setUnsavedChangesAction}
 						/>
 					);
-				case 'prebid-settings':
+				case NAV_ITEMS_INDEXES.TAB_4:
 					return (
 						<PrebidSettingsTab
 							user={user}
@@ -297,7 +301,7 @@ class HeaderBidding extends React.Component {
 							setUnsavedChangesAction={setUnsavedChangesAction}
 						/>
 					);
-				case 'optimization':
+				case NAV_ITEMS_INDEXES.TAB_5:
 					return (
 						isSuperUser && (
 							<OptimizationTab
@@ -315,10 +319,22 @@ class HeaderBidding extends React.Component {
 							/>
 						)
 					);
-				case 'amazon-uam':
+				case NAV_ITEMS_INDEXES.TAB_6:
 					return (
 						isSuperUser && (
 							<AmazonUAMTab
+								user={user}
+								customProps={customProps}
+								siteId={siteId}
+								showNotification={showNotification}
+								setUnsavedChangesAction={setUnsavedChangesAction}
+							/>
+						)
+					);
+				case NAV_ITEMS_INDEXES.TAB_7:
+					return (
+						isSuperUser && (
+							<HBApprovalTab
 								user={user}
 								customProps={customProps}
 								siteId={siteId}
@@ -383,6 +399,8 @@ class HeaderBidding extends React.Component {
 							{NAV_ITEMS_VALUES.TAB_6}
 						</NavItem>
 					)}
+
+					{isSuperUser && <NavItem eventKey={7}>{NAV_ITEMS_VALUES.TAB_7}</NavItem>}
 
 					<CustomButton
 						type="button"

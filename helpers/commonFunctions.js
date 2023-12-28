@@ -491,6 +491,18 @@ const makeAxiosReportingRequest = options => {
 	return axios(axiosConfig);
 };
 
+const sendDataToZapier = (url, data, serviceName) =>
+	axios
+		.post(url, JSON.stringify(data))
+		.then(response => {
+			console.log('Call made to Zapier for ', serviceName);
+			return response && response.data;
+		})
+		.catch(err => {
+			console.log('Call to Zapier failed for ', serviceName);
+			throw new Error(err);
+		});
+
 module.exports = {
 	queryResultProcessing,
 	sendSuccessResponse,
@@ -526,5 +538,6 @@ module.exports = {
 	makeReportingRequest,
 	makeAxiosReportingRequest,
 	getSelectiveRolloutSiteConfig,
-	isFeatureDeployment
+	isFeatureDeployment,
+	sendDataToZapier
 };

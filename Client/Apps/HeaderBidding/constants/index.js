@@ -20,7 +20,8 @@ export const NAV_ITEMS_INDEXES = {
 	TAB_3: 'inventory',
 	TAB_4: 'prebid-settings',
 	TAB_5: 'optimization',
-	TAB_6: 'amazon-uam'
+	TAB_6: 'amazon-uam',
+	TAB_7: 'hb-approval'
 };
 
 export const NAV_ITEMS_VALUES = {
@@ -29,7 +30,8 @@ export const NAV_ITEMS_VALUES = {
 	TAB_3: 'Inventory',
 	TAB_4: 'Prebid Settings',
 	TAB_5: 'Optimization',
-	TAB_6: 'Amazon UAM'
+	TAB_6: 'Amazon UAM',
+	TAB_7: 'HB Approval'
 };
 
 export const INVENTORY_TABLE_COLUMNS = [
@@ -83,6 +85,10 @@ export const NAV_ITEMS = {
 	[NAV_ITEMS_INDEXES.TAB_6]: {
 		NAME: [NAV_ITEMS_VALUES.TAB_6],
 		INDEX: 6
+	},
+	[NAV_ITEMS_INDEXES.TAB_7]: {
+		NAME: [NAV_ITEMS_VALUES.TAB_7],
+		INDEX: 7
 	}
 };
 
@@ -106,4 +112,16 @@ export const AMAZON_UAM = {
 		MIN: 0,
 		MAX: 10000
 	}
+};
+
+export const HB_APPROVAL = {
+	revenueInvalidMessage: 'Revenue is required',
+	saveFormConfirmMessage: 'Are you sure?',
+	saveSuccessfulMessage: 'Revenue Saved Successfully',
+	saveErrorMessage: 'Unable to save revenue',
+	internalSeverError: 'Error while getting Hubspot company Info, please try again',
+	hubspotIdForGenieeInc: 15315180060,
+	hubspotIdForGenieeInternationals: 15445229907,
+	hubspotCompanyNameForGenieeInc: 'Geniee Inc',
+	hubspotCompanyNameForGenieeInternationals: 'Geniee International'
 };

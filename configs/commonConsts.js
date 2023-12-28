@@ -101,7 +101,8 @@ module.exports = {
 	GOOGLE_SPREAD_SHEET_ID: {
 		CLS_MONITORING: '1ju3NvLOBOqUEMzX1AfqKnQtLvB28hjS1-S1mJmOh6fI',
 		REPORTING_DATA: '1LJELLTJxJDPjlz07A7gTvvo59jQI_kLolyyUM89Df2M',
-		sellersJSONReporting: '1JKe1F7yZLQt9P67TnpsdAvgO2UTm_HJrkaS9PhHDthY'
+		sellersJSONReporting: '1JKe1F7yZLQt9P67TnpsdAvgO2UTm_HJrkaS9PhHDthY',
+		HB_SOT_SHEET: '1lJZWYD91224f26torxPfCDd45_2iEKcGsafbBLsAbVM'
 	},
 	GOOGLE_OAUTH_CLIENT_ID:
 		'776523595883-ku17c7130dv2bknmr8d3ukk2sdnluu1f.apps.googleusercontent.com',
@@ -749,17 +750,17 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 	DEFAULT_APP_STATUS_RESPONSE: {},
 	EMAIL_REGEX: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
 	cronSchedule: {
-		fetchMCMStatusService: '0 */12 * * *', //Every 12 hours
+		fetchMCMStatusService: '0 */12 * * *', // Every 12 hours
 		activeSiteMarkingAndAdsTxtService: '20 14,2 * * *',
 		adManagerSyncService: '0 */3 * * *',
 		prefetchService: '*/1 * * * *', // Every 1 mins
 		prefetchHBService: '*/15 * * * *', // Every 15 mins
-		emailSnapshotsService: '30 7 * * *', //Run at 8:00 everyday
-		paymentHistoryService: '0 0 5 * *', //At 00:00 on 5th every month
+		emailSnapshotsService: '30 7 * * *', // Run at 8:00 everyday
+		paymentHistoryService: '0 0 5 * *', // At 00:00 on 5th every month
 		sellersJSONService: '0 */12 * * *', // Every 12hours
-		clsMonitoringService: '0 8 * * *', //Run at 8:00 everyday,
-		sellersJsonReportingService: '0 3 * * 1,4', //Runs Mon and Thurs
-		poweredByAdpushupBannerService: '30 1 * * 0', //Runs at 1:30 Every Sunday,
+		clsMonitoringService: '0 8 * * *', // Run at 8:00 everyday,
+		sellersJsonReportingService: '0 3 * * 1,4', // Runs Mon and Thurs
+		poweredByAdpushupBannerService: '30 1 * * 0', // Runs at 1:30 Every Sunday,
 		partnersPanelService: {
 			Criteo: '22 13 * * *',
 			Pubmatic: '24 13 * * *',
@@ -1580,5 +1581,18 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		INVALID_KEY_PATTERN: 'Key pattern is not valid!',
 		EMPTY_CACHE: 'Cache is empty!',
 		KEYS_NOT_FOUND: 'No keys found matching the given pattern!'
+	},
+	HB_APPROVAL: {
+		ERRORS: {
+			COMPANY_DOES_NOT_EXIST: 'No Hubspot Company exists with this email, please add it first'
+		},
+		SAVE_SUCCESS_MESSAGE: 'Revenue Added Successfully',
+		HB_SOT_SHEET_TITLE: 'Status'
+	},
+	ZAPIER_SERVICES: {
+		HB_APPROVAL: {
+			URL: 'https://hooks.zapier.com/hooks/catch/547126/oda507v/',
+			SERVICE_NAME: 'Hb approval'
+		}
 	}
 };
