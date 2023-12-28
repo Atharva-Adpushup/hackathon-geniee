@@ -1,6 +1,7 @@
 import { connect } from 'react-redux';
 import Chart from '../components/Chart';
 import { getReportsMeta } from '../../../helpers/commonFunctions';
+import CustomError from '../../../Components/CustomError/index';
 
 const mapStateToProps = (state, ownProps) => {
 	const { isHB } = ownProps;
@@ -27,6 +28,12 @@ const mapStateToProps = (state, ownProps) => {
 	const {
 		data: { filter, metrics, dimension, site }
 	} = hbAnalyticsMeta;
+
+	if (!dimension) {
+		const err = 'dimension undefined';
+		throw new CustomError(err, { hbAnalyticsMeta, globalHBAnalyticsMetaData });
+	}
+
 	return {
 		isHB,
 		filter,

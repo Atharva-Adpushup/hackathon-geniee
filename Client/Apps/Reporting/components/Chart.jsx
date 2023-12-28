@@ -23,6 +23,7 @@ import {
 	roundOffTwoDecimal,
 	numberWithCommas
 } from '../helpers/utils';
+import CustomError from '../../../Components/CustomError/index';
 
 class Chart extends React.Component {
 	constructor(props) {
@@ -143,8 +144,8 @@ class Chart extends React.Component {
 		const isValid = !!(
 			selectedDimension &&
 			selectedChartLegendMetric &&
-			(selectedDimension === PAGE_VARIATION_TYPE &&
-				selectedChartLegendMetric === adpushupPageCPM) &&
+			selectedDimension === PAGE_VARIATION_TYPE &&
+			selectedChartLegendMetric === adpushupPageCPM &&
 			activeItemsByChartLegendMetric.length
 		);
 
@@ -465,6 +466,14 @@ class Chart extends React.Component {
 
 		const { type, series, xAxis, activeLegendItems, selectedDimension } = this.state;
 
+		if (!dimension) {
+			const err = 'dimension undefined';
+			throw new CustomError(err, { dimension, selectedDimension });
+		}
+		if (!selectedDimension) {
+			const err = 'selectedDimension undefined';
+			throw new CustomError(err, { dimension, selectedDimension });
+		}
 		return (
 			<div>
 				<CustomChart
