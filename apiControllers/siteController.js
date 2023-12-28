@@ -491,7 +491,7 @@ router
 				const prevAdNetworkSettings = site.get('adNetworkSettings');
 				const prevUrlReporting = site.get('urlReporting');
 				const prevUtmReporting = site.get('utmReporting');
-				const siteApConfigs = { ...prevApConfigs, ...apConfigs };
+				const siteApConfigs = _.merge({}, prevApConfigs, apConfigs);
 				const siteAdNetworkSettings = {
 					...prevAdNetworkSettings,
 					...adNetworkSettings
