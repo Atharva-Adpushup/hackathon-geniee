@@ -465,15 +465,15 @@ class Chart extends React.Component {
 		} = this.props;
 
 		const { type, series, xAxis, activeLegendItems, selectedDimension } = this.state;
-
-		if (!dimension) {
-			const err = 'dimension undefined';
-			throw new CustomError(err, { dimension, selectedDimension });
-		}
-		if (!selectedDimension) {
-			const err = 'selectedDimension undefined';
-			throw new CustomError(err, { dimension, selectedDimension });
-		}
+		console.log(dimension, selectedDimension);
+		// if (!dimension) {
+		// 	const err = 'dimension undefined';
+		// 	throw new CustomError(err, { dimension, selectedDimension });
+		// }
+		// if (!selectedDimension) {
+		// 	const err = 'selectedDimension undefined';
+		// 	throw new CustomError(err, { dimension, selectedDimension });
+		// }
 		return (
 			<div>
 				<CustomChart

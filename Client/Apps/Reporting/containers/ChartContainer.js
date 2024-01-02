@@ -29,10 +29,12 @@ const mapStateToProps = (state, ownProps) => {
 		data: { filter, metrics, dimension, site }
 	} = hbAnalyticsMeta;
 
-	if (!dimension) {
-		const err = 'dimension undefined';
-		throw new CustomError(err, { hbAnalyticsMeta, globalHBAnalyticsMetaData });
-	}
+	console.log(dimension);
+
+	// if (!dimension) {
+	// 	const err = 'dimension undefined';
+	// 	throw new CustomError(err, { hbAnalyticsMeta, globalHBAnalyticsMetaData });
+	// }
 
 	return {
 		isHB,
