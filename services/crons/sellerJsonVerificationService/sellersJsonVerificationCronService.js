@@ -85,4 +85,4 @@ if (config.environment.HOST_ENV === 'production') {
 
 start();
 
-cron.schedule(CC.cronSchedule.sellersJsonReportingService, start, false);
+cron.schedule(CC.cronSchedule.sellersJsonReportingService, start);
