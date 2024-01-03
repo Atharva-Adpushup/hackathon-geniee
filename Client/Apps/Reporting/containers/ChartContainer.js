@@ -27,7 +27,6 @@ const mapStateToProps = (state, ownProps) => {
 	const {
 		data: { filter, metrics, dimension, site }
 	} = hbAnalyticsMeta;
-
 	return {
 		isHB,
 		filter,
