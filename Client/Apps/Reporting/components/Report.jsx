@@ -42,7 +42,7 @@ import {
 	REPORT_TYPES
 } from '../configs/commonConsts';
 import MixpanelHelper from '../../../helpers/mixpanel';
-import CustomError from '../../../Components/CustomError/index';
+import CustomError from '../../../helpers/CustomError';
 
 class Report extends Component {
 	constructor(props) {
@@ -287,6 +287,7 @@ class Report extends Component {
 	};
 
 	getControlChangedParams = (controlParams, metricsList) => {
+		// Updated a try catch block to resolve missing filterList issue, will be removed.
 		try {
 			const { selectedDimension = [], selectedFilters, reportType } = controlParams;
 			const { reportsMeta } = this.props;
@@ -327,8 +328,8 @@ class Report extends Component {
 			};
 		} catch (err) {
 			const { reportsMeta } = this.props;
-			const issue = 'reporting siteid issue';
-			throw new CustomError(err, { controlParams, reportsMeta, metricsList, issue });
+			const ERR_MSG = 'Reporting siteid issue';
+			throw new CustomError(err, { controlParams, reportsMeta, metricsList, ERR_MSG });
 		}
 	};
 

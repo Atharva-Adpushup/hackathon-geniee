@@ -23,7 +23,7 @@ import {
 	roundOffTwoDecimal,
 	numberWithCommas
 } from '../helpers/utils';
-import CustomError from '../../../Components/CustomError/index';
+import CustomError from '../../../helpers/CustomError';
 
 class Chart extends React.Component {
 	constructor(props) {
@@ -465,38 +465,35 @@ class Chart extends React.Component {
 		} = this.props;
 
 		const { type, series, xAxis, activeLegendItems, selectedDimension } = this.state;
-		console.log(dimension, selectedDimension);
-		// if (!dimension) {
-		// 	const err = 'dimension undefined';
-		// 	throw new CustomError(err, { dimension, selectedDimension });
-		// }
-		// if (!selectedDimension) {
-		// 	const err = 'selectedDimension undefined';
-		// 	throw new CustomError(err, { dimension, selectedDimension });
-		// }
-		return (
-			<div>
-				<CustomChart
-					type={type}
-					series={series}
-					xAxis={xAxis}
-					legends={this.computeLegends()}
-					activeLegendItems={activeLegendItems}
-					onLegendChange={this.onLegendChange}
-					yAxisGroups={selectedDimension ? [] : null}
-					availableLegends={allAvailableMetrics}
-					reportType={reportType}
-					isCustomizeChartLegend={isCustomizeChartLegend}
-					updateMetrics={updateMetrics}
-					index={index}
-				/>
-				{selectedDimension && series.length ? (
-					<span className="chartLabels">
-						<b>{dimension[selectedDimension].display_name}-Wise Report</b>
-					</span>
-				) : null}
-			</div>
-		);
+		try {
+			// Updated a try catch block to resolve missing dimension issue, will be removed.
+			return (
+				<div>
+					<CustomChart
+						type={type}
+						series={series}
+						xAxis={xAxis}
+						legends={this.computeLegends()}
+						activeLegendItems={activeLegendItems}
+						onLegendChange={this.onLegendChange}
+						yAxisGroups={selectedDimension ? [] : null}
+						availableLegends={allAvailableMetrics}
+						reportType={reportType}
+						isCustomizeChartLegend={isCustomizeChartLegend}
+						updateMetrics={updateMetrics}
+						index={index}
+					/>
+					{selectedDimension && series.length ? (
+						<span className="chartLabels">
+							<b>{dimension[selectedDimension].display_name}-Wise Report</b>
+						</span>
+					) : null}
+				</div>
+			);
+		} catch (err) {
+			const ERR_MSG = 'Dimension undefined issue';
+			throw new CustomError(err, { dimension, selectedDimension, ERR_MSG });
+		}
 		// else return '';
 	}
 }
