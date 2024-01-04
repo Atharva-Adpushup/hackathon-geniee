@@ -461,39 +461,47 @@ class Chart extends React.Component {
 			isCustomizeChartLegend,
 			index,
 			dimension,
-			isForOps
+			isForOps,
+			// To be removed after resolving missing dimension issue (isHB and meta)
+			isHB,
+			meta
 		} = this.props;
 
 		const { type, series, xAxis, activeLegendItems, selectedDimension } = this.state;
+		let selectedValue;
 		try {
-			// Updated a try catch block to resolve missing dimension issue, will be removed.
-			return (
-				<div>
-					<CustomChart
-						type={type}
-						series={series}
-						xAxis={xAxis}
-						legends={this.computeLegends()}
-						activeLegendItems={activeLegendItems}
-						onLegendChange={this.onLegendChange}
-						yAxisGroups={selectedDimension ? [] : null}
-						availableLegends={allAvailableMetrics}
-						reportType={reportType}
-						isCustomizeChartLegend={isCustomizeChartLegend}
-						updateMetrics={updateMetrics}
-						index={index}
-					/>
-					{selectedDimension && series.length ? (
-						<span className="chartLabels">
-							<b>{dimension[selectedDimension].display_name}-Wise Report</b>
-						</span>
-					) : null}
-				</div>
-			);
+			// Updated a try catch block to resolve missing dimension issue, will be removed after resolving issue.
+			if (selectedDimension && !dimension) {
+				throw new Error('dimension is undefined');
+			}
+			selectedValue = dimension[selectedDimension];
 		} catch (err) {
 			const ERR_MSG = 'Dimension undefined issue';
-			throw new CustomError(err, { dimension, selectedDimension, ERR_MSG });
+			throw new CustomError(err, { dimension, selectedDimension, ERR_MSG, isHB, meta });
 		}
+		return (
+			<div>
+				<CustomChart
+					type={type}
+					series={series}
+					xAxis={xAxis}
+					legends={this.computeLegends()}
+					activeLegendItems={activeLegendItems}
+					onLegendChange={this.onLegendChange}
+					yAxisGroups={selectedDimension ? [] : null}
+					availableLegends={allAvailableMetrics}
+					reportType={reportType}
+					isCustomizeChartLegend={isCustomizeChartLegend}
+					updateMetrics={updateMetrics}
+					index={index}
+				/>
+				{selectedDimension && series.length ? (
+					<span className="chartLabels">
+						<b>{selectedValue.display_name}-Wise Report</b>
+					</span>
+				) : null}
+			</div>
+		);
 		// else return '';
 	}
 }
