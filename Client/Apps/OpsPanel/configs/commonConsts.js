@@ -300,7 +300,7 @@ const GDPR = {
 const DFP_ACCOUNTS_DEFAULT = [
 	{
 		name: '103512698 - AdPushup, Inc',
-		value: '103512698-103512698-USD'
+		value: '103512698-102512818-USD'
 	}
 ];
 
