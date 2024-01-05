@@ -23,6 +23,7 @@ import {
 	roundOffTwoDecimal,
 	numberWithCommas
 } from '../helpers/utils';
+import CustomError from '../../../helpers/CustomError';
 
 class Chart extends React.Component {
 	constructor(props) {
@@ -143,8 +144,8 @@ class Chart extends React.Component {
 		const isValid = !!(
 			selectedDimension &&
 			selectedChartLegendMetric &&
-			(selectedDimension === PAGE_VARIATION_TYPE &&
-				selectedChartLegendMetric === adpushupPageCPM) &&
+			selectedDimension === PAGE_VARIATION_TYPE &&
+			selectedChartLegendMetric === adpushupPageCPM &&
 			activeItemsByChartLegendMetric.length
 		);
 
@@ -460,11 +461,24 @@ class Chart extends React.Component {
 			isCustomizeChartLegend,
 			index,
 			dimension,
-			isForOps
+			isForOps,
+			// To be removed after resolving missing dimension issue (isHB and meta)
+			isHB,
+			meta
 		} = this.props;
 
 		const { type, series, xAxis, activeLegendItems, selectedDimension } = this.state;
-
+		let selectedValue;
+		try {
+			// Updated a try catch block to resolve missing dimension issue, will be removed after resolving issue.
+			if (selectedDimension && !dimension) {
+				throw new Error('dimension is undefined');
+			}
+			selectedValue = dimension[selectedDimension];
+		} catch (err) {
+			const ERR_MSG = 'Dimension undefined issue';
+			throw new CustomError(err, { dimension, selectedDimension, ERR_MSG, isHB, meta });
+		}
 		return (
 			<div>
 				<CustomChart
@@ -483,7 +497,7 @@ class Chart extends React.Component {
 				/>
 				{selectedDimension && series.length ? (
 					<span className="chartLabels">
-						<b>{dimension[selectedDimension].display_name}-Wise Report</b>
+						<b>{selectedValue.display_name}-Wise Report</b>
 					</span>
 				) : null}
 			</div>

@@ -16,6 +16,7 @@ const mapStateToProps = (state, ownProps) => {
 			metrics,
 			dimension,
 			site,
+			meta: reportsMeta, // to be removed after resolving missing dimension issue
 			...ownProps
 		};
 	}
@@ -33,6 +34,7 @@ const mapStateToProps = (state, ownProps) => {
 		metrics,
 		dimension,
 		site,
+		meta: hbAnalyticsMeta, // to be removed after resolving missing dimension issue
 		...ownProps
 	};
 };
