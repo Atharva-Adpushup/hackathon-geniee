@@ -356,9 +356,9 @@ module.exports = {
 		}
 	},
 	DEFAULT_AD_NETWORK_SETTINGS: {
-		revenueShare: 10,
+		revenueShare: 20,
 		adUnitTypeRevShares: {
-			'6': 10
+			'6': 20
 		},
 		negate: ['adsense']
 	},
