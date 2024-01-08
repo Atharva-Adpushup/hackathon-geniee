@@ -70,10 +70,31 @@ function checkAndGetBvsSectionIds(config) {
 	return bannerSectionId;
 }
 
+function checkAndGetCompanionSectionIds(config) {
+	const { ads = [] } = config;
+	const companionSectionIds = { desktop: [], mobile: [] };
+	ads.forEach(ad => {
+		const { networkData = {}, videoSectionId } = ad || {};
+		const { apCompanionAds } = networkData;
+
+		if (!apCompanionAds && videoSectionId) {
+			return;
+		}
+
+		if (apCompanionAds.DESKTOP && apCompanionAds.DESKTOP.bannerSectionId) {
+			companionSectionIds.desktop.push(videoSectionId);
+		} else if (apCompanionAds.MOBILE && apCompanionAds.MOBILE.bannerSectionId) {
+			companionSectionIds.mobile.push(videoSectionId);
+		}
+	});
+	return companionSectionIds;
+}
+
 export {
 	makeFirstLetterCapitalize,
 	copyToClipBoard,
 	getAdsAndGlobal,
 	getInstreamSectionIds,
-	checkAndGetBvsSectionIds
+	checkAndGetBvsSectionIds,
+	checkAndGetCompanionSectionIds
 };

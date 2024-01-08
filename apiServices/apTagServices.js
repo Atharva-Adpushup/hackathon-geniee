@@ -1,7 +1,7 @@
 const uuid = require('uuid');
 const moment = require('moment');
 
-const { docKeys, tagManagerInitialDoc } = require('../configs/commonConsts');
+const { docKeys, tagManagerInitialDoc, INSTREAM_FORMAT_TYPES } = require('../configs/commonConsts');
 const config = require('../configs/config');
 const {
 	appBucket,
@@ -25,6 +25,30 @@ function resetInstreamSectionId(data, options) {
 		}
 		return obj;
 	});
+}
+
+function resetCompanionSectionId(data, framerateSectionId, platform) {
+	return data.map(obj => {
+		const { framerateCompanionAd } = obj;
+		if (
+			framerateCompanionAd &&
+			framerateCompanionAd.framerateSectionId === framerateSectionId &&
+			platform === obj.formatData.platform
+		) {
+			obj.framerateCompanionAd.framerateSectionId = null;
+		}
+		return obj;
+	});
+}
+
+function getFramerateSectionId(ad) {
+	const { framerateCompanionAd = {} } = ad || {};
+	const { framerateSectionId = '' } = framerateCompanionAd;
+	return framerateSectionId;
+}
+
+function checkIfInstreamAd(type) {
+	return type === INSTREAM_FORMAT_TYPES.INSTREAM;
 }
 
 const apTagServices = {
@@ -56,8 +80,9 @@ const apTagServices = {
 			apTagServices.processing
 		),
 	processing: (data, payload) => {
-		const { siteId } = payload;
-		const instreamSectionId = payload.ad.instreamSectionId || '';
+		const { siteId, ad: payloadAd = {} } = payload;
+		const instreamSectionId = payloadAd.instreamSectionId || '';
+		const framerateSectionId = getFramerateSectionId(payloadAd);
 		const cas = data.cas || false;
 		const value = data.value || data;
 		const id = uuid.v4();
@@ -78,19 +103,36 @@ const apTagServices = {
 				...payload.ad.formatData
 			}
 		};
-		const { type, platform, responsivePlatform } = ad.formatData;
+		const { type, platform, responsivePlatform, subType } = ad.formatData;
 		const apTagSectionId = id;
-		const configParams = { siteId, instreamSectionId, apTagSectionId };
 		const options = {
 			platform,
 			responsivePlatform,
 			instreamSectionId
 		};
-		if (type === 'instream' && instreamSectionId) {
-			value.ads = resetInstreamSectionId(value.ads, options);
-			ad.name = `Bvs_${ad.name}`;
+		const isInstream = checkIfInstreamAd(type);
+
+		if (isInstream) {
+			const isBvs = instreamSectionId && subType === INSTREAM_FORMAT_TYPES.SUBTYPES.BVS;
+			const isCompanion =
+				framerateSectionId && subType === INSTREAM_FORMAT_TYPES.SUBTYPES.COMPANION;
+
 			try {
-				instreamScriptModel.updateInstreamConfig(configParams, ad);
+				if (isBvs || isCompanion) {
+					const adsParam = { siteId, apTagSectionId };
+
+					if (isBvs) {
+						adsParam.instreamSectionId = instreamSectionId;
+						ad.name = `Bvs_${ad.name}`;
+						value.ads = resetInstreamSectionId(value.ads, options);
+						instreamScriptModel.updateInstreamConfig(adsParam, ad);
+					} else if (isCompanion) {
+						adsParam.framerateSectionId = framerateSectionId;
+						ad.name = `Cmp_${ad.name}`;
+						value.ads = resetCompanionSectionId(value.ads, framerateSectionId, platform);
+						instreamScriptModel.updateFramerateCompanionConfig(adsParam, ad);
+					}
+				}
 			} catch (error) {
 				console.error(error);
 			}

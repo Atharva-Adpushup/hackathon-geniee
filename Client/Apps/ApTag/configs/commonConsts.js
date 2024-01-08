@@ -39,9 +39,16 @@ const TYPES = [
 			'High value video ads that may be watched by visitors in exchange for access to premium content'
 	},
 	{
-		name: 'Display for Instream',
-		image: '/assets/images/tagManager/display.png',
-		key: 'instream',
+		name: 'Framerate Bvs',
+		image: '/assets/images/tagManager/instream.png',
+		key: 'framerate_bvs',
+		description:
+			'A simple way to get ads on your page. Select size, generate code and you are good to go'
+	},
+	{
+		name: 'Framerate Companion',
+		image: '/assets/images/tagManager/instream.png',
+		key: 'framerate_companion',
 		description:
 			'A simple way to get ads on your page. Select size, generate code and you are good to go'
 	}
@@ -105,9 +112,14 @@ const SIZES = {
 	REWARDEDADS: {
 		ALLOWED: ['mobile']
 	},
-	INSTREAM: {
+	FRAMERATE_BVS: {
 		ALLOWED: ['responsive', 'mobile'],
 		MOBILE: ['300x600']
+	},
+	FRAMERATE_COMPANION: {
+		ALLOWED: ['desktop', 'mobile'],
+		DESKTOP: ['728x50'],
+		MOBILE: ['320x50']
 	}
 };
 
@@ -805,6 +817,17 @@ const INSTREAM_RESPONSIVE_PLATFORMS = [
 	{ name: 'Mobile', value: 'mobile' }
 ];
 
+const INSTREAM_FORMAT_TYPES = {
+	INSTREAM: 'instream',
+	FRAMERATE_BVS: 'framerate_bvs',
+	FRAMERATE_COMPANION: 'framerate_companion',
+	PLATFORM: 'responsive',
+	SUBTYPES: {
+		BVS: 'bvs',
+		COMPANION: 'companion'
+	}
+};
+
 export {
 	PLATFORMS,
 	TYPES,
@@ -830,5 +853,6 @@ export {
 	REWARDED_AD_CODE,
 	TIGGER_AUTOMATICALLY_CODE,
 	NETWORK_MAPPINGS,
-	INSTREAM_RESPONSIVE_PLATFORMS
+	INSTREAM_RESPONSIVE_PLATFORMS,
+	INSTREAM_FORMAT_TYPES
 };
