@@ -1544,7 +1544,23 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		AP_PAGE_VIEW: 'ap_page_view'
 	},
 	SERVICES_FOR_KIBANA_LOGS: {
-		'GENIEE_AUDIT_LOG_SERVICE': 'genieeAuditLog',
-		'SITE_SYNC_SERVICE': 'siteSyncCdn'
+		GENIEE_AUDIT_LOG_SERVICE: 'genieeAuditLog',
+		SITE_SYNC_SERVICE: 'siteSyncCdn'
+	},
+	FRAMERATE_COMPANION: {
+		SECTION_KEY: 'bannerSectionId'
+	},
+	INSTREAM_FORMAT_TYPES: {
+		INSTREAM: 'instream',
+		SUBTYPES: {
+			BVS: 'bvs',
+			COMPANION: 'companion'
+		}
+	},
+	DATABASE_SUCCESS_RESPONSE_MESSAGES: {
+		CONFIG_UPDATED: {
+			success: true,
+			message: ' configuration updated'
+		}
 	}
 };
