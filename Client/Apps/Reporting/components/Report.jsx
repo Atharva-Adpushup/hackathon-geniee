@@ -42,7 +42,6 @@ import {
 	REPORT_TYPES
 } from '../configs/commonConsts';
 import MixpanelHelper from '../../../helpers/mixpanel';
-import CustomError from '../../../helpers/CustomError';
 
 class Report extends Component {
 	constructor(props) {
@@ -287,50 +286,43 @@ class Report extends Component {
 	};
 
 	getControlChangedParams = (controlParams, metricsList) => {
-		// Updated a try catch block to resolve missing filterList issue, will be removed.
-		try {
-			const { selectedDimension = [], selectedFilters, reportType } = controlParams;
-			const { reportsMeta } = this.props;
-			const { dimension: dimensionList, filter: filterList } = reportsMeta.data;
-			let disabledFilter = [];
-			let disabledDimension = [];
-			let disabledMetrics = [];
-			for (const dimension of selectedDimension) {
-				const dimensionObj = dimensionList[dimension];
+		const { selectedDimension = [], selectedFilters, reportType } = controlParams;
+		const { reportsMeta } = this.props;
+		const { dimension: dimensionList = {}, filter: filterList = {} } = reportsMeta.data;
+		let disabledFilter = [];
+		let disabledDimension = [];
+		let disabledMetrics = [];
+		for (const dimension of selectedDimension) {
+			const dimensionObj = dimensionList[dimension];
 
-				if (dimensionObj) {
-					disabledFilter = dimensionObj.disabled_filter || disabledFilter;
-					disabledDimension = dimensionObj.disabled_dimension || disabledDimension;
-					disabledMetrics = dimensionObj.disabled_metrics || disabledMetrics;
-				}
+			if (dimensionObj) {
+				disabledFilter = dimensionObj.disabled_filter || disabledFilter;
+				disabledDimension = dimensionObj.disabled_dimension || disabledDimension;
+				disabledMetrics = dimensionObj.disabled_metrics || disabledMetrics;
 			}
-			Object.keys(selectedFilters).forEach(selectedFilter => {
-				const filterObj = filterList[selectedFilter];
-				if (filterObj && !isEmpty(selectedFilters[selectedFilter])) {
-					disabledFilter = union(filterObj.disabled_filter, disabledFilter);
-					disabledDimension = union(filterObj.disabled_dimension, disabledDimension);
-					disabledMetrics = union(filterObj.disabled_metrics, disabledMetrics);
-				}
-			});
-
-			const updatedControlList = this.disableControl(
-				disabledFilter,
-				disabledDimension,
-				disabledMetrics,
-				metricsList,
-				reportType
-			);
-
-			return {
-				dimensionList: updatedControlList.updatedDimensionList,
-				filterList: updatedControlList.updatedFilterList,
-				metricsList: updatedControlList.metricsList
-			};
-		} catch (err) {
-			const { reportsMeta } = this.props;
-			const ERR_MSG = 'Reporting siteid issue';
-			throw new CustomError(err, { controlParams, reportsMeta, metricsList, ERR_MSG });
 		}
+		Object.keys(selectedFilters).forEach(selectedFilter => {
+			const filterObj = filterList[selectedFilter];
+			if (filterObj && !isEmpty(selectedFilters[selectedFilter])) {
+				disabledFilter = union(filterObj.disabled_filter, disabledFilter);
+				disabledDimension = union(filterObj.disabled_dimension, disabledDimension);
+				disabledMetrics = union(filterObj.disabled_metrics, disabledMetrics);
+			}
+		});
+
+		const updatedControlList = this.disableControl(
+			disabledFilter,
+			disabledDimension,
+			disabledMetrics,
+			metricsList,
+			reportType
+		);
+
+		return {
+			dimensionList: updatedControlList.updatedDimensionList,
+			filterList: updatedControlList.updatedFilterList,
+			metricsList: updatedControlList.metricsList
+		};
 	};
 
 	formateReportParams = () => {
