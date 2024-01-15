@@ -118,7 +118,7 @@ const SIZES = {
 	},
 	FRAMERATE_COMPANION: {
 		ALLOWED: ['desktop', 'mobile'],
-		DESKTOP: ['728x50'],
+		DESKTOP: ['728x90'],
 		MOBILE: ['320x50']
 	}
 };
