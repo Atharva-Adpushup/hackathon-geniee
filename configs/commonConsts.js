@@ -1009,7 +1009,16 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		AMP_DVC: 'AMP_DVC',
 		AMP_TYPE_ADPUSHUP: 'AMP_TYPE_ADPUSHUP'
 	},
+	/***
+	 * Note: runPnpScriptOnceInSpa is needed to stop adding more than one slotrenderended listeners on rfi.fr (SPA site)
+	 * There hook code is fired and pnpscript could run multiple times which is not required.
+	 */
 	PNP_REFRESH_SCRIPTS: `(function () {
+		var {runPnpScriptOnceInSpa} = window.adpushup.config;
+
+		if (runPnpScriptOnceInSpa && window.hasPnpScriptRan) {
+			return;
+		}
 		var PROXY_SITE_ID = window.pnpRefresh.pnpSiteId;
 		// var flag = false;
 		window.pnpRefresh.adUnitState = {};
@@ -1431,6 +1440,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 			  });
 		  }
 		});
+		window.hasPnpScriptRan = true;
 	  })();
 	  `,
 	SCRIPT_TYPE: {
