@@ -110,7 +110,7 @@ function apiModule() {
 							hbBidders[key] = networks[key];
 						}
 					}
-
+					
 					return hbBidders;
 				});
 		},
@@ -137,7 +137,7 @@ function apiModule() {
 			return { formatWiseParamKey, paramConfig };
 		},
 		getFormFieldsForFormatWiseParams(bidder) {
-			if (bidder.sizeLess && bidder.enableFormatWiseParams) {
+			if ( bidder.enableFormatWiseParams ) {
 				const { global, siteLevel, adUnitLevel } = bidder.params;
 
 				const globalParams = {};

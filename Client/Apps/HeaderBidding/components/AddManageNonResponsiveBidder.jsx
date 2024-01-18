@@ -36,7 +36,16 @@ class AddManageNonResponsiveBidder extends React.Component {
 		switch (formType) {
 			case 'add': {
 				const {
-					bidderConfig: { key, name, sizeLess, reusable, isApRelation, params, isS2S }
+					bidderConfig: {
+						key,
+						name,
+						sizeLess,
+						reusable,
+						isApRelation,
+						params,
+						isS2S,
+						enableFormatWiseParams
+					}
 				} = this.props;
 
 				// disable the AMP and S2S status if not isS2S
@@ -84,7 +93,14 @@ class AddManageNonResponsiveBidder extends React.Component {
 								(formFields.params.global[globalParamKey].dataType === 'number' ? null : '');
 						}
 
-						newState.bidderConfig = { key, name, sizeLess, reusable, ...newState.bidderConfig };
+						newState.bidderConfig = {
+							key,
+							name,
+							sizeLess,
+							reusable,
+							enableFormatWiseParams,
+							...newState.bidderConfig
+						};
 						newState.validationSchema = getValidationSchema({
 							...formFields.bidderConfig,
 							...formFields.params.global,
@@ -117,7 +133,8 @@ class AddManageNonResponsiveBidder extends React.Component {
 						revenueShare,
 						isAmpActive,
 						isS2SActive,
-						isS2S
+						isS2S,
+						enableFormatWiseParams
 					}
 				} = this.props;
 
@@ -214,7 +231,14 @@ class AddManageNonResponsiveBidder extends React.Component {
 							}
 						}
 
-						newState.bidderConfig = { key, name, sizeLess, reusable, ...newState.bidderConfig };
+						newState.bidderConfig = {
+							key,
+							name,
+							sizeLess,
+							reusable,
+							enableFormatWiseParams,
+							...newState.bidderConfig
+						};
 						newState.validationSchema = getValidationSchema({
 							...formFields.bidderConfig,
 							...formFields.params.global,
