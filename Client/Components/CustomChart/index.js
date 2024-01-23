@@ -4,6 +4,7 @@ import ReactHighcharts from 'react-highcharts';
 import ReactDOM from 'react-dom';
 import { getCustomChartConfig } from '../../services/customChartService';
 import ChartLegend from './ChartLegend';
+import CustomError from '../../helpers/CustomError';
 
 const CustomChart = ({
 	title,
@@ -23,6 +24,20 @@ const CustomChart = ({
 	index
 }) => {
 	const chartLegendWrap = useRef(null);
+
+	// Using the component to identify high charts issue, will remove after resolution
+	const getHightChartsUI = (chartConfig, chartLegendWrapRef) => {
+		try {
+			return <ReactHighcharts config={chartConfig} />;
+		} catch (err) {
+			const ERR_MSG = 'highcharts rendering issue';
+			throw new CustomError(err, {
+				ERR_MSG,
+				chartConfig,
+				chartLegendWrapRef
+			});
+		}
+	};
 	if (type === 'line' || type === 'spline') {
 		const chartConfig = getCustomChartConfig(
 			type,
@@ -64,7 +79,9 @@ const CustomChart = ({
 				<div className={containerClass}>
 					{title && <h3 className="text-center">{title}</h3>}
 					<div className="chart-legend-wrap" ref={chartLegendWrap} />
-					<ReactHighcharts config={chartConfig} />
+					{getHightChartsUI(chartConfig, chartLegendWrap)}
+					{/* Using the function to render high
+					charts issue, will remove after issue resolution */}
 				</div>
 			);
 		}
@@ -87,7 +104,9 @@ const CustomChart = ({
 				<div className={containerClass}>
 					{title && <h3 className="text-center">{title}</h3>}
 					<div id="chart-legend-wrap" ref={chartLegendWrap} />
-					<ReactHighcharts config={chartConfig} />
+					{getHightChartsUI(chartConfig, chartLegendWrap)}
+					{/* Using the function to render high
+					charts issue, will remove after issue resolution */}
 				</div>
 			);
 		}
