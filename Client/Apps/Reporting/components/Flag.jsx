@@ -5,7 +5,7 @@ import ActionCard from '../../../Components/ActionCard';
 const Flag = ({ isIssueWithGAM }) => {
 	const messageToDisplay = isIssueWithGAM
 		? 'Google AdManager API is facing some issues, reporting data might be delayed'
-		: 'Currently we are expecting some delay in our reporting for 3rd Jan and 4th Jan. We are working on it.';
+		: 'Currently we are expecting some delay in our reporting. We are working on it.';
 
 	return (
 		<ActionCard className="delay-container">
