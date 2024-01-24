@@ -1463,7 +1463,8 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		UPDATE_FAILED_NO_UNITS: 'Update failed due to some ad units are not present!',
 		UPDATE_FAILED_DUPLICATE_UNITS: 'Update failed due to duplicate ad units!',
 		OK: 'OK',
-		INVALID_SITE_ID: 'Invalid siteId passed'
+		INVALID_SITE_ID: 'Invalid siteId passed',
+		UNAUTHORIZED_ACCESS: 'Unauthorized access. Please provide valid credentials.'
 	},
 	AUDIT_LOG_MESSAGES: {
 		ACTION: {
@@ -1572,5 +1573,12 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 			success: true,
 			message: ' configuration updated'
 		}
+	},
+	REDIS: {
+		NOT_CONNECTED_MESSAGE: 'Redis is not conncted!',
+		INVALID_KEY: 'Key is not valid!',
+		INVALID_KEY_PATTERN: 'Key pattern is not valid!',
+		EMPTY_CACHE: 'Cache is empty!',
+		KEYS_NOT_FOUND: 'No keys found matching the given pattern!'
 	}
 };

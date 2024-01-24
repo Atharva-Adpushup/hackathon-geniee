@@ -2,9 +2,23 @@ const Promise = require('bluebird');
 
 const authToken = require('../helpers/authToken');
 const userModel = require('../models/userModel');
+const shouldRespondWith401Status = require('./shouldRespondWith401Status');
+const httpStatusConsts = require('../configs/httpStatusConsts');
+const { HTTP_RESPONSE_MESSAGES } = require('../configs/commonConsts');
 
 const openRoutes = ['/login', '/signup', '/forgotPassword', '/resetPassword', '/utils'];
 const closedRoutes = ['/user'];
+
+function handleUnauthorizedRequests(req, res) {
+	if (shouldRespondWith401Status(req)) {
+		return res
+			.status(httpStatusConsts.UNAUTHORIZED)
+			.json({ message: HTTP_RESPONSE_MESSAGES.UNAUTHORIZED_ACCESS });
+	}
+
+	res.clearCookie('user');
+	return res.redirect('/login');
+}
 
 module.exports = (req, res, next) => {
 	function isDifferentGenieeSiteId() {
@@ -68,8 +82,7 @@ module.exports = (req, res, next) => {
 	const token = (userCookie && JSON.parse(userCookie).authToken) || adpToken || null;
 
 	if (!token) {
-		res.clearCookie('user');
-		return res.redirect('/login');
+		return handleUnauthorizedRequests(req, res);
 	}
 
 	return Promise.join(authToken.decodeAuthToken(token), decoded => {
@@ -82,8 +95,7 @@ module.exports = (req, res, next) => {
 			if (decoded.originalEmail) {
 				return userModel.getUserByEmail(decoded.originalEmail).then(originalUser => {
 					if (decoded.loginTime < originalUser.get('passwordUpdatedOn') || !decoded.loginTime) {
-						res.clearCookie('user');
-						return res.redirect('/login');
+						return handleUnauthorizedRequests(req, res);
 					}
 					req.user = decoded;
 					next();
@@ -91,15 +103,11 @@ module.exports = (req, res, next) => {
 				});
 			}
 			if (decoded.loginTime < user.get('passwordUpdatedOn') || !decoded.loginTime) {
-				res.clearCookie('user');
-				return res.redirect('/login');
+				return handleUnauthorizedRequests(req, res);
 			}
 			req.user = decoded;
 			next();
 			return null;
 		});
-	}).catch(() => {
-		res.clearCookie('user');
-		return res.redirect('/login');
-	});
+	}).catch(() => handleUnauthorizedRequests(req, res));
 };
