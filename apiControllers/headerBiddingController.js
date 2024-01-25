@@ -18,6 +18,8 @@ const { getNetworkWideHBRules } = require('../helpers/commonFunctions');
 
 const { sendDataToAuditLogService } = require('../helpers/routeHelpers');
 const { makeAxiosReportingRequest } = require('../helpers/commonFunctions');
+const { getHubspotCompanyInfo, sendDomainForHBApproval } = require('../helpers/hbApprovalUtils');
+
 const {
 	AUDIT_LOGS_ACTIONS: { HEADER_BIDDING }
 } = commonConsts;
@@ -643,6 +645,44 @@ router
 			);
 	})
 
+	.post('/hbApproval/getHubspotCompanyInfo', (req, res) => {
+		const { siteDomain } = req.body;
+		const { email } = req.user;
+		getHubspotCompanyInfo(siteDomain, email)
+			.then(companyInfo => {
+				res.status(httpStatus.OK).json(companyInfo);
+			})
+			.catch(error =>
+				res
+					.status(httpStatus.INTERNAL_SERVER_ERROR)
+					.json({ 'Error while getting hubspot company Info': error })
+			);
+	})
+
+	.post('/hbApproval/sendDomainForHBApproval', (req, res) => {
+		try {
+			const { companyId, companyName, siteId, companyRevenue, currentlyAddedDomain } = req.body;
+			const companyInfoObject = {
+				companyId,
+				companyName,
+				domain: currentlyAddedDomain,
+				siteId,
+				companyRevenue
+			};
+			const { email } = req.user;
+
+			sendDomainForHBApproval(companyInfoObject, email)
+				.then(companyInfo => {
+					res.status(httpStatus.OK).json(companyInfo);
+				})
+				.catch(error => {
+					res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error });
+				});
+		} catch (error) {
+			res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ error });
+		}
+	})
+
 	.get('/hbStatusForSite/:siteId', (req, res) => {
 		const { siteId } = req.params;
 		const { email } = req.user;
@@ -1241,9 +1281,9 @@ router
 		return userModel
 			.verifySiteOwner(email, siteId)
 			.then(() =>
-				headerBiddingModel.getActiveAdUnitSizes(siteId).then(activeAdUnitSizes => {
-					return res.status(httpStatus.OK).send(activeAdUnitSizes);
-				})
+				headerBiddingModel
+					.getActiveAdUnitSizes(siteId)
+					.then(activeAdUnitSizes => res.status(httpStatus.OK).send(activeAdUnitSizes))
 			)
 			.catch(e =>
 				res
