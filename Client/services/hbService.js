@@ -80,6 +80,18 @@ export function updateAmazonUAMSettings(siteId, amazonUAMSettings, dataForAuditL
 	});
 }
 
+export function getHubspotCompanyInfo(siteDomain) {
+	return axiosInstance
+		.post('/headerBidding/hbApproval/getHubspotCompanyInfo', siteDomain)
+		.then(({ data: companyInfo }) => companyInfo);
+}
+
+export function sendDomainForHBApproval(revenueData) {
+	return axiosInstance
+		.post(`/headerBidding/hbApproval/sendDomainForHBApproval`, revenueData)
+		.then(({ data: additionStatus }) => additionStatus);
+}
+
 export function getHbStatusForSite(siteId) {
 	return axiosInstance.get(`/headerBidding/hbStatusForSite/${siteId}`).then(({ data }) => data);
 }

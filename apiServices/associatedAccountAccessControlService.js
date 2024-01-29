@@ -2,9 +2,7 @@ const axios = require('axios');
 const {
 	hubSpotService: { host: hubSpotServiceHost }
 } = require('../configs/config');
-const {
-	HUBSPOT: { OPERATOR }
-} = require('../configs/commonConsts');
+const { OPERATOR } = require('./hubspotServices/constants');
 
 const getAllCompanyOwnersFromHubspot = async () => {
 	try {

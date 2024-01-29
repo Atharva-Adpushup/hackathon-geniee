@@ -85,6 +85,7 @@ const ROUTE_APP_NAME = {
 	HEADER_BIDDING_PREBID_SETTINGS: 'HB App - Prebid Settings',
 	HEADER_BIDDING_OPTIMIZATION: 'HB App - Optimization',
 	HEADER_BIDDING_AMAZON_UAM: 'HB App - Amazon UAM',
+	HEADER_BIDDING_HB_APPROVAL: 'HB App - HB Approval',
 	OPS_PANEL_ACCOUNTS: 'Ops Panel - Accounts',
 	OPS_PANEL_SETTINGS: 'Ops Panel - Settings',
 	OPS_PANEL_TOOLS: 'Ops Panel - Tools',

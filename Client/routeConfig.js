@@ -249,6 +249,16 @@ const ROUTES = {
 			path: `/sites/:siteId/apps/header-bidding/${HB_NAV_ITEMS_INDEXES.TAB_6}`,
 			component: HeaderBidding
 		},
+		{
+			exact: true,
+			customProps: {
+				activeTab: HB_NAV_ITEMS_INDEXES.TAB_7,
+				appName: ROUTE_APP_NAME.HEADER_BIDDING_HB_APPROVAL
+			},
+			name: 'HB Approval',
+			path: `/sites/:siteId/apps/header-bidding/${HB_NAV_ITEMS_INDEXES.TAB_7}`,
+			component: HeaderBidding
+		},
 
 		// Reports
 		{
