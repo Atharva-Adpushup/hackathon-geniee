@@ -19,7 +19,6 @@ const {
 	rabbitMQ,
 	fallbackLineItemsUpdateHours
 } = require('./config');
-
 const {
 	lineItemServiceAlerts,
 	ADPUSHUP_GAM: {
@@ -307,13 +306,14 @@ const updateLineItemsForNetwork = async (dfpConfig, hbOrderIds) => {
 			}
 			return accumulator;
 		}, {});
-
+		
 		let { lineItems, allGAMSiteSyncRequired, reason } = await processfetchedLineItems(
 			results,
 			dfpConfig.networkCode
 		);
 
 		if (allGAMSiteSyncRequired) {
+			
 			utils.syncAllGAMSites(dfpConfig.networkCode, reason);
 		}
 

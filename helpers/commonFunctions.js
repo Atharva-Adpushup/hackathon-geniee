@@ -502,6 +502,37 @@ const sendDataToZapier = (url, data, serviceName) =>
 			console.log('Call to Zapier failed for ', serviceName);
 			throw new Error(err);
 		});
+const getAccessTokenForSiteSyncingService = async host => {
+	const {
+		SITE_SYNC_CONFIG_FOR_SERVICES: { GET_ACCESS_TOKEN_ROUTE, REFRESH_TOKEN }
+	} = config;
+	const endpoint = `${host}${GET_ACCESS_TOKEN_ROUTE}`;
+	const headers = {
+		authorization: REFRESH_TOKEN
+	};
+	const token = await axios
+		.get(endpoint, {
+			headers
+		})
+		.then(response => {
+			const { status } = response;
+			if (status === 200) {
+				const { token: accessToken } = response.data;
+				return accessToken;
+			}
+			return null;
+		})
+		.catch(err => {
+			const {
+				response: {
+					data: { error: errorMessage }
+				}
+			} = err;
+			console.log(`Error with fetching access token: ${errorMessage}`);
+			return null;
+		});
+	return token;
+};
 
 module.exports = {
 	queryResultProcessing,
@@ -539,5 +570,6 @@ module.exports = {
 	makeAxiosReportingRequest,
 	getSelectiveRolloutSiteConfig,
 	isFeatureDeployment,
-	sendDataToZapier
+	sendDataToZapier,
+	getAccessTokenForSiteSyncingService
 };

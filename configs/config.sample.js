@@ -210,7 +210,11 @@ const config = {
 		masterPswMd5: 'master password md5'
 	},
 	jwt: {
-		salt: 'JWT salt'
+		salt: 'JWT salt',
+		refreshTokenConfig: {
+			salt: '73c63390f1bde8fc47e907bb743cc80a6c5f826e05f5da99e04c6278936ebb4dc7421678d2afb0aa255c6e2e570d9697be66aff36954cbf1cd9f55144c751ffc',
+			expiresIn: '365d'
+		}
 	},
 	RABBITMQ: {
 		// localhost
@@ -424,6 +428,12 @@ const config = {
 		CLS_MONITORING_SERVICE: '',
 		ACTIVE_SITES_MARKING_SERVICE: '',
 		POWERED_BY_ADPUSHUP_BANNER_SERVICE: ''
+	},
+	SITE_SYNC_CONFIG_FOR_SERVICES: {
+		SITE_SYNCING_ROUTE: '/api/sync/syncCdn',
+		SYNC_GAM_SITES_ROUTE: '/api/sync/syncGAMSites',
+		GET_ACCESS_TOKEN_ROUTE: '/api/getAccessToken',
+		REFRESH_TOKEN: ''
 	}
 };
 

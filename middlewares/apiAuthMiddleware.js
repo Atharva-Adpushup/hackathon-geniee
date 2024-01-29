@@ -1,22 +1,28 @@
 const Promise = require('bluebird');
-
 const authToken = require('../helpers/authToken');
 const userModel = require('../models/userModel');
 const shouldRespondWith401Status = require('./shouldRespondWith401Status');
 const httpStatusConsts = require('../configs/httpStatusConsts');
 const { HTTP_RESPONSE_MESSAGES } = require('../configs/commonConsts');
 
-const openRoutes = ['/login', '/signup', '/forgotPassword', '/resetPassword', '/utils'];
+const openRoutes = [
+	'/login',
+	'/signup',
+	'/forgotPassword',
+	'/resetPassword',
+	'/utils',
+	'/getAccessToken'
+];
 const closedRoutes = ['/user'];
 
 function handleUnauthorizedRequests(req, res) {
+	res.clearCookie('user');
 	if (shouldRespondWith401Status(req)) {
 		return res
 			.status(httpStatusConsts.UNAUTHORIZED)
-			.json({ message: HTTP_RESPONSE_MESSAGES.UNAUTHORIZED_ACCESS });
+			.json({ error: HTTP_RESPONSE_MESSAGES.UNAUTHORIZED_ACCESS });
 	}
 
-	res.clearCookie('user');
 	return res.redirect('/login');
 }
 
