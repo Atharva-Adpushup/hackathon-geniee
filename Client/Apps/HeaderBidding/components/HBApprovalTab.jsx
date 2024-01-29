@@ -265,7 +265,8 @@ class HBApprovalTab extends React.Component {
 				</div>
 				{siteAlreadyExistsinSOTSheet && (
 					<HelpBlock className="error-message" style={{ padding: '0 1.5rem' }}>
-						This site is already approved or revenue already exists in the SOT Sheet for this domain
+						This site is already approved or exists in the SOT Sheet. Please consult the demand
+						team.
 					</HelpBlock>
 				)}
 			</Form>

@@ -1588,7 +1588,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		ERRORS: {
 			COMPANY_DOES_NOT_EXIST: 'No Hubspot Company exists with this email, please add it first'
 		},
-		SAVE_SUCCESS_MESSAGE: 'Revenue Added Successfully',
+		SAVE_SUCCESS_MESSAGE: 'Site Added Successfully.',
 		HB_SOT_SHEET_TITLE: 'Status'
 	},
 	ZAPIER_SERVICES: {
