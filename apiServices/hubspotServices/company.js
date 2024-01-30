@@ -3,7 +3,7 @@ const {
 	hubSpotService: { host: hubSpotServiceHost }
 } = require('../../configs/config');
 const {
-	OPERATOR: { IN },
+	OPERATOR,
 	HUBSPOT_PROPERTIES: { AP_LOGIN_EMAIL, HUBSPOT_COMPANY_NAME, SECONDARY_WEBSITES, HB_PIPELINE },
 	MAX_COMPANY_RESULT_LIMIT
 } = require('./constants');
@@ -27,8 +27,8 @@ const companyHubspotServices = {
 				filters: [
 					{
 						propertyName: AP_LOGIN_EMAIL,
-						operator: IN,
-						values: [email]
+						operator: OPERATOR.CONTAINS_TOKEN,
+						value: email
 					}
 				]
 			};
