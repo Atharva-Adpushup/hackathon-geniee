@@ -4,6 +4,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Checkbox, FormControl } from '@/Client/helpers/react-bootstrap-imports';
+import CustomError from '../../helpers/CustomError';
 
 class FilterBox extends React.Component {
 	state = {
@@ -286,6 +287,50 @@ class FilterBox extends React.Component {
 		);
 	};
 
+	// We are sending a custom error to check FilterBox issue, will revert it after getting resolved
+	renderFilteredValue = (valuesToShow, valueSearchString, selectedValues, currProp) => {
+		const filteredValue = this.getFilteredValues(valuesToShow, valueSearchString);
+		try {
+			return filteredValue.map(({ name: value }) => {
+				if (value.length > 25) {
+					return (
+						// eslint-disable-next-line react/no-array-index-key
+						<li key={value}>
+							<Checkbox
+								checked={selectedValues.indexOf(value) !== -1}
+								onChange={e => this.handleValueSelect(e, currProp, value)}
+								title={value}
+							>
+								{`${value.substring(0, 25)}...`}
+							</Checkbox>
+						</li>
+					);
+				}
+				return (
+					// eslint-disable-next-line react/no-array-index-key
+					<li key={value}>
+						<Checkbox
+							checked={selectedValues.indexOf(value) !== -1}
+							onChange={e => this.handleValueSelect(e, currProp, value)}
+						>
+							{value}
+						</Checkbox>
+					</li>
+				);
+			});
+		} catch (err) {
+			const ERR_MSG = 'missing value issue in filterbox';
+			throw new CustomError(err, {
+				ERR_MSG,
+				filteredValue,
+				valuesToShow,
+				valueSearchString,
+				selectedValues,
+				currProp
+			});
+		}
+	};
+
 	renderValuesView = () => {
 		const {
 			selectedTitle: { prop: currProp },
@@ -344,34 +389,7 @@ class FilterBox extends React.Component {
 
 				<ul className="values">
 					{!!valuesToShow.length &&
-						this.getFilteredValues(valuesToShow, valueSearchString).map(({ name: value }) => {
-							if (value.length > 25) {
-								return (
-									// eslint-disable-next-line react/no-array-index-key
-									<li key={value}>
-										<Checkbox
-											checked={selectedValues.indexOf(value) !== -1}
-											onChange={e => this.handleValueSelect(e, currProp, value)}
-											title={value}
-										>
-											{`${value.substring(0, 25)}...`}
-										</Checkbox>
-									</li>
-								);
-							}
-
-							return (
-								// eslint-disable-next-line react/no-array-index-key
-								<li key={value}>
-									<Checkbox
-										checked={selectedValues.indexOf(value) !== -1}
-										onChange={e => this.handleValueSelect(e, currProp, value)}
-									>
-										{value}
-									</Checkbox>
-								</li>
-							);
-						})}
+						this.renderFilteredValue(valuesToShow, valueSearchString, selectedValues, currProp)}
 				</ul>
 			</div>
 		);
