@@ -1,4 +1,5 @@
 const _ = require('lodash');
+const { checkIfInstreamAd } = require('../../../../../helpers/commonFunctions');
 
 module.exports = {
 	checkGenieeUnsyncedZones: function(variationId, variationName, section, ad) {
@@ -73,6 +74,7 @@ module.exports = {
 		const { type: adType, maxInstances = 0 } = formatData;
 
 		const isChainedDockedAd = adType === 'chainedDocked';
+		const isInstreamAd = checkIfInstreamAd(adType);
 
 		//replace gpt slot can not be enabled on amp ads and chained docked ads
 		const shouldReplaceGptSlotOnRefresh =
@@ -150,6 +152,11 @@ module.exports = {
 				refreshAdUnitCodesCount,
 				shouldSyncRefreshAdUnitCodes
 			};
+		}
+
+		// subType is only applicable for instream ads
+		if (isInstreamAd && section.formatData && section.formatData.subType) {
+			defaultAdData.subType = section.formatData.subType;
 		}
 
 		if (isMultipleAdSizes) {

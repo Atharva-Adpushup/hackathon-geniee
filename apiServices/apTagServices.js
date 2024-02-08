@@ -10,7 +10,7 @@ const {
 } = require('../helpers/routeHelpers');
 const { generateSectionName } = require('../helpers/clientServerHelpers');
 const instreamScriptModel = require('../models/instreamScriptModel');
-
+const { checkIfInstreamAd } = require('../helpers/commonFunctions');
 // setting old value to null so that we can have only 1 instreamSectionId key for each ad(platform specific)
 function resetInstreamSectionId(data, options) {
 	const { platform, responsivePlatform, instreamSectionId } = options;
@@ -45,10 +45,6 @@ function getFramerateSectionId(ad) {
 	const { framerateCompanionAd = {} } = ad || {};
 	const { framerateSectionId = '' } = framerateCompanionAd;
 	return framerateSectionId;
-}
-
-function checkIfInstreamAd(type) {
-	return type === INSTREAM_FORMAT_TYPES.INSTREAM;
 }
 
 const apTagServices = {

@@ -15,6 +15,7 @@ const config = require('../configs/config');
 const {
 	getSiteConfig: getSelectiveRolloutSiteConfigFromCB
 } = require('../helpers/selectiveRollout/cbHelpers/configHelpers');
+const { INSTREAM_FORMAT_TYPES } = require('../configs/commonConsts');
 
 const createAggregateNonAggregateObjects = (dataset, key, container) => {
 	const innerObj = {};
@@ -534,6 +535,8 @@ const getAccessTokenForSiteSyncingService = async host => {
 	return token;
 };
 
+const checkIfInstreamAd = type => type === INSTREAM_FORMAT_TYPES.INSTREAM;
+
 module.exports = {
 	queryResultProcessing,
 	sendSuccessResponse,
@@ -571,5 +574,6 @@ module.exports = {
 	getSelectiveRolloutSiteConfig,
 	isFeatureDeployment,
 	sendDataToZapier,
-	getAccessTokenForSiteSyncingService
+	getAccessTokenForSiteSyncingService,
+	checkIfInstreamAd
 };
