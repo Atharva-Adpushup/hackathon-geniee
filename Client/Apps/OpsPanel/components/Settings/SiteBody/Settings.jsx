@@ -60,6 +60,7 @@ class Settings extends Component {
 			isWeeklyEmailReportsEnabled = false,
 			isDailyEmailReportsEnabled = false,
 			enableGAAnalytics = false,
+			geoEdgeScriptEnabled = false,
 			gaConfigs: {
 				gaTrackingId = '',
 				viewId = '',
@@ -108,7 +109,8 @@ class Settings extends Component {
 			gaVersion,
 			pnp: isPnPEnabled,
 			selectedAdTypes: [...selectedAdTypes],
-			siteLevelRefreshType
+			siteLevelRefreshType,
+			geoEdgeScriptEnabled
 		};
 	}
 
@@ -335,7 +337,8 @@ class Settings extends Component {
 			viewId,
 			accessEmail,
 			gaVersion,
-			selectedAdTypes
+			selectedAdTypes,
+			geoEdgeScriptEnabled
 		} = this.state;
 		const poweredByBanner = this.getPoweredByBannerConfig(selectedAdTypes);
 		const outbrainDisabled = this.getOutbrainDisabledConfig(selectedOutbrainDisabledTypes);
@@ -405,7 +408,8 @@ class Settings extends Component {
 				isDailyEmailReportsEnabled,
 				gaConfigs,
 				siteLevelRefreshType,
-				enableGAAnalytics
+				enableGAAnalytics,
+				geoEdgeScriptEnabled
 			},
 
 			adNetworkSettings: {
@@ -480,7 +484,8 @@ class Settings extends Component {
 			gaVersion,
 			pnp,
 			selectedAdTypes,
-			siteLevelRefreshType
+			siteLevelRefreshType,
+			geoEdgeScriptEnabled
 		} = this.state;
 
 		const { handlePoweredByBannerMultiSelect, handleOutbrainDisabledMultiSelect } = this;
@@ -659,6 +664,20 @@ class Settings extends Component {
 					// disabled AdX
 					name={`forceRenderPostBid-${siteId}-${siteDomain}`}
 					id={`js-forceRenderPostBid-switch-${siteId}-${siteDomain}`}
+				/>
+
+				<CustomToggleSwitch
+					labelText="GeoEdge Script"
+					className="u-margin-b4 negative-toggle"
+					checked={geoEdgeScriptEnabled}
+					onChange={this.handleToggle}
+					layout="horizontal"
+					size="m"
+					on="Yes"
+					off="No"
+					defaultLayout
+					name={`geoEdgeScriptEnabled-${siteId}-${siteDomain}`}
+					id={`js-geoEdgeScriptEnabled-${siteId}-${siteDomain}`}
 				/>
 
 				<div className="outbrain-disabled">

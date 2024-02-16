@@ -46,7 +46,8 @@ const ApConfig = {
 		'isRedefineGptOnRefreshEnabled',
 		'flyingCarpetSettings',
 		'isPnpSite',
-		'refreshOnImpressionViewed'
+		'refreshOnImpressionViewed',
+		'geoEdgeScriptEnabled'
 	],
 	override: [
 		'mode',
@@ -95,7 +96,8 @@ const ApConfig = {
 		'isRedefineGptOnRefreshEnabled',
 		'flyingCarpetSettings',
 		'isPnpSite',
-		'refreshOnImpressionViewed'
+		'refreshOnImpressionViewed',
+		'geoEdgeScriptEnabled'
 	],
 	merge: []
 };
