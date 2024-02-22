@@ -1,6 +1,6 @@
 {
 	"name": "adpushup-app",
-	"version": "2.54.0",
+	"version": "2.54.1",
 	"private": true,
 	"scripts": {
 		"start": "node app.js",
@@ -26,6 +26,7 @@
 		"@fortawesome/fontawesome-svg-core": "^1.2.12",
 		"@fortawesome/free-solid-svg-icons": "^5.6.3",
 		"@fortawesome/react-fontawesome": "^0.1.4",
+		"@googleapis/docs": "^3.0.0",
 		"@supercharge/promise-pool": "^1.7.0",
 		"Base64": "^1.0.1",
 		"amqplib": "^0.5.1",

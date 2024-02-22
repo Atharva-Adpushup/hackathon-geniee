@@ -560,8 +560,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 	},
 	onboarding: {
 		steps: ['Add Site', 'Add AP code', 'Setup Passback'],
-		adsTxtDocUrl:
-			'https://docs.google.com/feeds/download/documents/export/Export?id=1GyE6r2IUC3B0ITGXyAtCW97vrO9T-EHAvKr2ZM-GoQM&exportFormat=txt',
+		adsTxtDocId: '1GyE6r2IUC3B0ITGXyAtCW97vrO9T-EHAvKr2ZM-GoQM',
 		revenueLowerBound: 1000,
 		initialStep: 1,
 		totalSteps: 3
@@ -761,7 +760,7 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 		clsMonitoringService: '0 8 * * *', //Run at 8:00 everyday,
 		sellersJsonReportingService: '0 3 * * 1,4', //Runs Mon and Thurs
 		poweredByAdpushupBannerService: '30 1 * * 0', //Runs at 1:30 Every Sunday,
-		adUnitsPlacementAutomationService: '30 5 * * *', //Runs at 5:30 Everyday,
+adUnitsPlacementAutomationService: '30 5 * * *', //Runs at 5:30 Everyday,
 		partnersPanelService: {
 			Criteo: '22 13 * * *',
 			Pubmatic: '24 13 * * *',
@@ -1597,9 +1596,9 @@ RV+BIeC6ZywS4zUfO9YjSngyhBTHr4iePwtco9oN8l979iYH5r9hI5oLV+OcYg9T
 			URL: 'https://hooks.zapier.com/hooks/catch/547126/oda507v/',
 			SERVICE_NAME: 'Hb approval'
 		}
-	},
+},
 	PROMISE_RESOLVE_STATUS: {
         FULFILLED: "fulfilled",
         REJECTED: "rejected"
-    }
+	}
 };
