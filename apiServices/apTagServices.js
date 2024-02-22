@@ -61,9 +61,8 @@ const apTagServices = {
 			.catch(err => {
 				if (err && err.name === 'CouchbaseError' && err.code === 13) {
 					return apTagServices.createNewDocAndDoProcessingWrapper(payload);
-				} else {
-					return Promise.reject(err);
 				}
+				return Promise.reject(err);
 			})
 			.spread(apTagServices.dbWrapper);
 	},
@@ -176,8 +175,8 @@ const apTagServices = {
 
 		return dbOperation().then(() => toReturn);
 	},
-	fetchAds: siteId => {
-		return appBucket
+	fetchAds: siteId =>
+		appBucket
 			.getDoc(`${docKeys.apTag}${siteId}`)
 			.then(doc => {
 				console.log({ doc });
@@ -188,10 +187,9 @@ const apTagServices = {
 					return [];
 				}
 				throw err;
-			});
-	},
-	updateAds: (siteId, ads = []) => {
-		return appBucket
+			}),
+	updateAds: (siteId, ads = []) =>
+		appBucket
 			.getDoc(`${docKeys.apTag}${siteId}`)
 			.then(doc => {
 				const newDoc = {
@@ -204,8 +202,7 @@ const apTagServices = {
 			.catch(err => {
 				if (err && err.code && err.code === 13) return {};
 				throw err;
-			});
-	}
+			})
 };
 
 module.exports = apTagServices;

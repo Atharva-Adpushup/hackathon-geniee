@@ -53,3 +53,4 @@ services/adManagerSyncService/config.js
 yarn.lock
 package-lock.json
 services/fetchMCMStatusService/config.js
+services/crons/adUnitsPlacementsAutomationService/gamData

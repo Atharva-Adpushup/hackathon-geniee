@@ -3,7 +3,7 @@ const request = require('request-promise');
 const Promise = require('bluebird');
 const _ = require('lodash');
 const md5 = require('md5');
-const moment = require('moment');
+const moment = require('moment-timezone');
 const axios = require('axios');
 const apLiteModel = require('../models/apLiteModel');
 const HTTP_STATUS = require('../configs/httpStatusConsts');
@@ -536,6 +536,98 @@ const getAccessTokenForSiteSyncingService = async host => {
 };
 
 const checkIfInstreamAd = type => type === INSTREAM_FORMAT_TYPES.INSTREAM;
+/**
+ * Function to slice the array provided in batches of provided batch size
+ * @param {Array} array
+ * @param {Number} batchSize
+ * @returns {Array} array sliced into different batches
+ */
+function createBatches(array, batchSize) {
+	return Array(Math.ceil(array.length / batchSize))
+		.fill()
+		.map((elem, index) => index * batchSize)
+		.map(begin => array.slice(begin, begin + batchSize));
+}
+
+/**
+ * Function to send error mail
+ * @param {Object} body
+ * @returns {Promise} resolve when mail has been successfully sent
+ */
+function sendEmail(body) {
+	return request({
+		method: 'POST',
+		uri: config.mailerQueueUrl,
+		json: true,
+		body
+	})
+		.then(() => {
+			console.log('Mail sent succesfully');
+		})
+		.catch(error => {
+			throw new Error(`Error in sending email:${error}`);
+		});
+}
+
+/**
+ * Function to handle errors that occured in the code
+ * @param {Object | String} error
+ */
+async function handleErrorAndSendMail({ emailBody, emailSubject, mailReceivers }) {
+	await sendEmail({
+		queue: 'MAILER',
+		data: {
+			to: mailReceivers,
+			body: emailBody,
+			subject: emailSubject
+		}
+	});
+}
+
+/**
+ * Function to subtract number of days from the given date
+ * @param {Number} numOfDays
+ * @param {Object} date
+ * @returns {Object} new date with the number of days subtracted
+ */
+function subtractDays(numOfDays, date) {
+	const newDate = date || moment().format();
+	return moment(newDate)
+		.subtract(numOfDays, 'days')
+		.format();
+}
+
+/**
+ * Function to get current date in PST timezone
+ * @returns {Object} date in PST timezone
+ */
+function getPstDate() {
+	const date = moment.tz(moment(), 'America/Los_Angeles').format();
+	return date;
+}
+
+/**
+ * Function to get provided date in a particular format
+ * @param {Object} date
+ * @returns {Object} formatted date
+ */
+function getDateObject(date) {
+	const newDate = date || moment().format();
+	return {
+		year: moment(newDate).year(),
+		month: moment(newDate).month() + 1,
+		day: moment(newDate).date()
+	};
+}
+
+/**
+ * Function to create a delay
+ * @param {Number} delayInms
+ * @returns {Promise<void>} resolve when the delay is completed
+ */
+function delay(delayInms) {
+	return new Promise(resolve => setTimeout(resolve, delayInms));
+}
 
 module.exports = {
 	queryResultProcessing,
@@ -575,5 +667,11 @@ module.exports = {
 	isFeatureDeployment,
 	sendDataToZapier,
 	getAccessTokenForSiteSyncingService,
-	checkIfInstreamAd
+	checkIfInstreamAd,
+	createBatches,
+	handleErrorAndSendMail,
+	subtractDays,
+	getPstDate,
+	getDateObject,
+	delay
 };
