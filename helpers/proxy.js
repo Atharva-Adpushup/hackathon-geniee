@@ -1,5 +1,6 @@
 var request = require('request-promise'),
 	utils = require('../helpers/utils'),
+	{ getGoogleDoc, getDocumentDataAsTextValues } = require('./googleDocs'),
 	_ = require('lodash'),
 	fetch = require('node-fetch'),
 	crypto = require('crypto'),
@@ -116,7 +117,16 @@ var request = require('request-promise'),
 			});
 		},
 		fetchOurAdsTxt() {
-			return API.load(commonConst.onboarding.adsTxtDocUrl);
+			return new Promise(async (resolve, reject) => {
+				try {
+					const googleDocResponse = await getGoogleDoc(commonConst.onboarding.adsTxtDocId);
+					const documentData = getDocumentDataAsTextValues(googleDocResponse)
+					return resolve(documentData);
+				} catch (error) {
+					console.error(error);
+					return reject(error);
+				}
+			});
 		},
 		parseAdsTxtEntries: text => {
 			let normalizedText = text.replace(/[, \t]+/g, ',');
