@@ -9,6 +9,7 @@ const config = {
 		LOGS_DIR: 'logs',
 		OPS_HOST_PORT: 8443
 	},
+	googleDocCreds:"eyJ0eXBlIjoiIiwicHJvamVjdF9pZCI6IiIsInByaXZhdGVfa2V5X2lkIjoiIiwicHJpdmF0ZV9rZXkiOiIiLCJjbGllbnRfZW1haWwiOiIiLCJjbGllbnRfaWQiOiIiLCJhdXRoX3VyaSI6IiIsInRva2VuX3VyaSI6IiIsImF1dGhfcHJvdmlkZXJfeDUwOV9jZXJ0X3VybCI6IiIsImNsaWVudF94NTA5X2NlcnRfdXJsIjoiIiwidW5pdmVyc2VfZG9tYWluIjoiIn0=",
 	clientErrorTrackingService: {
 		port: 3000,
 		sourceMapsURL: 'http://127.0.0.1:3000/'
