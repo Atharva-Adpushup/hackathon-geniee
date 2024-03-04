@@ -470,7 +470,7 @@ class Settings extends Component {
 			disableAutoAdpushupLabel,
 			hbAnalytics,
 			urlUtm,
-			cmpEnabled,
+			// cmpEnabled,
 			mergeReport,
 			videoAdsDashboard,
 			forceRenderPostBid,
@@ -586,7 +586,8 @@ class Settings extends Component {
 						classNames="u-margin-b4 u-padding-v3 u-padding-h3"
 					/>
 				)} */}
-				<CustomToggleSwitch
+				{/* Removed as this can be handled through GAM */}
+				{/* <CustomToggleSwitch
 					labelText="Inject CMP"
 					className="u-margin-b4 negative-toggle"
 					checked={cmpEnabled}
@@ -598,7 +599,7 @@ class Settings extends Component {
 					defaultLayout
 					name={`cmpEnabled-${siteId}-${siteDomain}`}
 					id={`js-cmpEnabled-${siteId}-${siteDomain}`}
-				/>
+				/> */}
 				<CustomToggleSwitch
 					labelText="SPA"
 					className="u-margin-b4 negative-toggle"
