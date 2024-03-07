@@ -424,7 +424,7 @@ function createNewAmpScriptDocAndDoProcessing(payload, initialDoc, docKey, proce
 		.createDoc(`${docKey}${payload.siteId}`, defaultDocCopy, {})
 		.then(() => appBucket.getDoc(`${docKey}${payload.siteId}`))
 		.then(docWithCas => {
-			payload.siteDomain = docWithCas.value.siteDomain;
+			payload.siteDomain = docWithCas.value.siteDomain || payload.siteDomain;
 			return processing(defaultDocCopy, payload);
 		});
 }

@@ -103,11 +103,11 @@ const STICKYADCODE = `<amp-sticky-ad layout="nodisplay">
 </amp-sticky-ad>`;
 
 // for new AMP Tag format
-const DISPLAYADCODE_AMP = `<amp-ad width="__WIDTH__" height="__HEIGHT__" type="adpushup"__DYNAMIC_ATTRIBS__data-slotpath="/__NETWORK_CODE__/__AD_UNIT_CODE__"></amp-ad>`;
+const DISPLAYADCODE_AMP = `<amp-ad width="__WIDTH__" height="__HEIGHT__" type="adpushup"__DYNAMIC_ATTRIBS__data-slotpath="/__NETWORK_CODE__,__MCM_ID__/__AD_UNIT_CODE__"></amp-ad>`;
 
 // for new AMP Tag format
 const STICKYADCODE_AMP = `<amp-sticky-ad layout="nodisplay">
-<amp-ad width="__WIDTH__" height="__HEIGHT__" type="adpushup"__DYNAMIC_ATTRIBS__data-slotpath="/__NETWORK_CODE__/__AD_UNIT_CODE__"> </amp-ad>
+<amp-ad width="__WIDTH__" height="__HEIGHT__" type="adpushup"__DYNAMIC_ATTRIBS__data-slotpath="/__NETWORK_CODE__,__MCM_ID__/__AD_UNIT_CODE__"> </amp-ad>
 </amp-sticky-ad>`;
 
 const DEFAULT_ADS_RESPONSE = { fetched: false, content: [] };

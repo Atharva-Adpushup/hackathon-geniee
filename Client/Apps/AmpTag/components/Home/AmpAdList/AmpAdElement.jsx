@@ -82,6 +82,8 @@ class AdElement extends Component {
 			networkData: { dfpAdunitCode }
 		} = ad;
 		const { type } = formatData;
+		const { mcm = {} } = user;
+		const { isMcmEnabled = false, childPublisherId = '' } = mcm;
 		const { editName, isActive, showRefresh } = this.state;
 
 		const dynamicAttribsArr = [];
@@ -100,6 +102,10 @@ class AdElement extends Component {
 					.replace(/__HEIGHT__/, height)
 					.replace(/__DYNAMIC_ATTRIBS__/, dynamicAttribsStr)
 					.replace(/__NETWORK_CODE__/, networkCode)
+					.replace(
+						isMcmEnabled ? /__MCM_ID__/ : /,__MCM_ID__/,
+						isMcmEnabled ? childPublisherId : ''
+					)
 					.replace(/__AD_UNIT_CODE__/, dfpAdunitCode)
 			: null;
 
