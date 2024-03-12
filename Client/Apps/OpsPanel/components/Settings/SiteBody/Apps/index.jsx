@@ -11,7 +11,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import Loader from '../../../../../../Components/Loader';
 import Layout from './Layout';
-import ConsentManagement from './ConsentManagement';
+// import ConsentManagement from './ConsentManagement';
 import HeaderBidding from './HeaderBidding';
 import ApTag from './ApTag';
 import InnovativeAds from './InnovativeAds';
@@ -205,14 +205,15 @@ class Apps extends Component {
 						/>
 					) : null}
 				</Panel>
-				<Panel eventKey="consentManagement">
+				{/* Removed as this can be hanled through GAM */}
+				{/* <Panel eventKey="consentManagement">
 					<Panel.Heading>
 						<Panel.Title toggle>Consent Management</Panel.Title>
 					</Panel.Heading>
 					{activeKey === 'consentManagement' ? (
 						<ConsentManagement {...common} updateSite={updateSite} />
 					) : null}
-				</Panel>
+				</Panel> */}
 				<Panel eventKey="headerBidding">
 					<Panel.Heading>
 						<Panel.Title toggle className="app-panel-title">
