@@ -1,5 +1,5 @@
 /* eslint-disable no-restricted-globals */
-import React, { Component } from 'react';
+import React, { Component} from 'react';
 import { MultiSelect } from 'react-multi-select-component';
 import { Row, Col } from '@/Client/helpers/react-bootstrap-imports';
 import CustomToggleSwitch from '../../../../../Components/CustomToggleSwitch/index';
@@ -78,6 +78,7 @@ class Settings extends Component {
 		const isfcLabelEnabled = Object.prototype.hasOwnProperty.call(fcLabel, 'enabled')
 			? fcLabel.enabled
 			: true;
+		const isSiteSyncingErrorFull = false;
 		this.state = {
 			isSPA,
 			spaButUsingHook,
@@ -110,8 +111,15 @@ class Settings extends Component {
 			pnp: isPnPEnabled,
 			selectedAdTypes: [...selectedAdTypes],
 			siteLevelRefreshType,
-			geoEdgeScriptEnabled
+			geoEdgeScriptEnabled,
+			isSiteSyncingErrorFull
 		};
+	}
+
+	componentDidMount(){
+		siteService.getExistingSitesInQueueStatus()
+		.then((res)=> this.setState({isSiteSyncingErrorFull: res.response}))
+		.catch((error)=> console.log(error))
 	}
 
 	handleToggle = (value, event) => {

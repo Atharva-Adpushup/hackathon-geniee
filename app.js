@@ -39,6 +39,7 @@ const couchbaseStore = new CouchbaseStore({
 process.env.NODE_ENV = config.environment.HOST_ENV;
 
 if (
+	true ||
 	process.env.NODE_ENV === consts.environment.production ||
 	process.env.NODE_ENV === consts.environment.staging
 ) {

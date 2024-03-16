@@ -33,5 +33,8 @@ export default {
 			hbRuleData,
 			dataForAuditLogs
 		}),
-	getInstreamConfig: siteId => axiosInstance.get(`script/${siteId}/instreamScriptConfig`)
+	getInstreamConfig: siteId => axiosInstance.get(`script/${siteId}/instreamScriptConfig`),
+	getExistingSitesInQueueStatus() {
+		return axiosInstance.get('/sites/checkExistingSitesStatus');
+	}
 };

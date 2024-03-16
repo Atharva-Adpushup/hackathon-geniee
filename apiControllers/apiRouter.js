@@ -23,6 +23,7 @@ const scriptController = require('./scriptController');
 const paymentController = require('./paymentController');
 const cacheController = require('./cache/controller');
 const syncController = require('./syncController');
+const getRemainingSitesinQueueStatus = require('./checkQueueExistingSites');
 
 // TODO: add some security/authentication check
 router.use('/script', scriptController);
@@ -54,5 +55,6 @@ router.use('/', indexController);
 router.use('/payment', paymentController);
 router.use('/cache', cacheController);
 router.use('/sync', syncController);
+router.use('./sites', getRemainingSitesinQueueStatus);
 
 module.exports = router;
